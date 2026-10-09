@@ -146,6 +146,11 @@ static int cc_connect_tcp(const cc_target *t, cc_err *err) {
     int fd = CC_INVALID_SOCK, gai;
     double deadline = cc_now() + t->connect_timeout;
 
+    if (cc_net_init() < 0) {
+        cc_err_set(err, CC_ERR_CONNECT, "WSAStartup failed", NULL);
+        return CC_INVALID_SOCK;
+    }
+
     memset(&hints, 0, sizeof hints);
     hints.ai_family   = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
@@ -159,12 +164,16 @@ static int cc_connect_tcp(const cc_target *t, cc_err *err) {
 
     for (ai = res; ai; ai = ai->ai_next) {
         int r;
-        fd = socket(ai->ai_family, ai->ai_socktype, ai->ai_protocol);
+        fd = (int)socket(ai->ai_family, ai->ai_socktype, ai->ai_protocol);
         if (fd < 0) continue;
         cc_suppress_sigpipe(fd);
         if (cc_set_nonblock(fd, 1) < 0) { cc_close_sock(fd); fd = CC_INVALID_SOCK; continue; }
 
+        #ifdef _WIN32
+        r = connect((SOCKET)fd, ai->ai_addr, (cc_socklen_t)ai->ai_addrlen);
+#else
         r = connect(fd, ai->ai_addr, (cc_socklen_t)ai->ai_addrlen);
+#endif
 #ifdef _WIN32
         if (r < 0 && cc_sock_errno() != WSAEWOULDBLOCK) {
 #else
@@ -222,10 +231,9 @@ static int cc_write_all(int fd, const char *buf, size_t len, double deadline, cc
         ssize_t n;
         /* send(), not write(): only send() takes MSG_NOSIGNAL, and a
          * SIGPIPE here would kill the caller's process. */
-        n = send(fd, buf + off, (int)(len - off), CC_MSG_NOSIGNAL);
+        n = cc_send(fd, buf + off, len - off, CC_MSG_NOSIGNAL);
         if (n > 0) { off += (size_t)n; continue; }
         if (n == 0) { cc_err_set(err, CC_ERR_CLOSED, "peer closed during write", NULL); return CC_ERR_CLOSED; }
-#ifndef _WIN32
         if (errno == EINTR) continue;
         if (cc_errno_is_closed(errno)) {
             cc_err_set(err, CC_ERR_CLOSED, "peer closed during write", NULL);
@@ -235,7 +243,6 @@ static int cc_write_all(int fd, const char *buf, size_t len, double deadline, cc
             cc_err_set(err, CC_ERR_IO, "send", strerror(errno));
             return CC_ERR_IO;
         }
-#endif
         w = cc_wait(fd, 1, deadline);
         if (w == 0) { cc_err_set(err, CC_ERR_TIMEOUT, "write timed out", NULL); return CC_ERR_TIMEOUT; }
         if (w < 0)  { cc_err_set(err, CC_ERR_IO, "poll", strerror(errno)); return CC_ERR_IO; }
@@ -315,7 +322,7 @@ static int cc_read_reply(int fd, const cc_target *t, char **out, size_t *outlen,
         if (len + room > hard) room = hard - len;
 
 #ifdef _WIN32
-        n = recv(fd, buf + len, (int)room, 0);
+        n = cc_recv(fd, buf + len, room);
 #else
         n = read(fd, buf + len, room);
 #endif
@@ -347,7 +354,6 @@ static int cc_read_reply(int fd, const cc_target *t, char **out, size_t *outlen,
             *out = buf; *outlen = len;
             return CC_OK;
         }
-#ifndef _WIN32
         if (errno == EINTR) continue;
         if (cc_errno_is_closed(errno)) {
             /* A close with our bytes still unread arrives as
@@ -368,7 +374,6 @@ static int cc_read_reply(int fd, const cc_target *t, char **out, size_t *outlen,
             cc_err_set(err, CC_ERR_IO, "read", strerror(errno));
             return CC_ERR_IO;
         }
-#endif
         w = cc_wait(fd, 0, deadline);
         if (w == 0) {
             free(buf);

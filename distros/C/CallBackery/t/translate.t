@@ -96,4 +96,18 @@ subtest 'a nested message stringifies all the way down' => sub {
         'both placeholders are filled in, the nested one included');
 };
 
+# tra() substituted one placeholder after the other, so text put in for %1
+# was searched again for %2, and %1 also matched the front of %10.
+subtest 'tra substitutes every placeholder exactly once' => sub {
+    my $loc = CallBackery::Translate->new;
+    is($loc->tra('%1 and %2', '50%2 off', 'more'), '50%2 off and more',
+        'an argument containing a placeholder is left as it is');
+    is($loc->tra('%10/%1', 'A'..'J'), 'J/A',
+        '%10 is the tenth argument, not %1 followed by a 0');
+    is($loc->tra('%1 of %3', 'one'), 'one of %3',
+        'a placeholder without an argument stays visible');
+    is($loc->tra('%0 %1', 'one'), '%0 one',
+        '%0 is not an argument');
+};
+
 done_testing;

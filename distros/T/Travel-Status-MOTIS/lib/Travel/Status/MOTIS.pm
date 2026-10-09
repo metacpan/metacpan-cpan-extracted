@@ -23,7 +23,7 @@ use Travel::Status::MOTIS::Trip;
 use Travel::Status::MOTIS::Stopover;
 use Travel::Status::MOTIS::Stop;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 # {{{ Endpoint Definition
 
@@ -452,7 +452,7 @@ Non-blocking variant;
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 DESCRIPTION
 

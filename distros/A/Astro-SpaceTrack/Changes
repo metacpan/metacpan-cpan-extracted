@@ -1,3 +1,11 @@
+0.184		2026-10-08	T. R. Wyant
+    Fix handling of configuration and build requirements in Makefile.PL.
+
+    Further deprecate attribute iridium_status_format. It now warns on
+    every use.
+
+    Remove all code re mccants mcnames, quicksat, and vsnames.
+
 0.183		2026-08-11	T. R. Wyant
     Attempt to retrieve 'canned favorite' catalog is now an exception.
 

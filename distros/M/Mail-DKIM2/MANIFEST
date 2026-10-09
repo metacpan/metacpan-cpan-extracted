@@ -16,6 +16,7 @@ contrib/strip.pl
 lib/Mail/DKIM2.pm
 lib/Mail/DKIM2/Common.pm
 lib/Mail/DKIM2/DSN.pm
+lib/Mail/DKIM2/Gate.pm
 lib/Mail/DKIM2/HeaderParser.pm
 lib/Mail/DKIM2/MessageInstance.pm
 lib/Mail/DKIM2/MessageStore.pm
@@ -31,6 +32,7 @@ lib/Mail/Milter/Authentication/Handler/DKIM2Verify.pm
 spec-review-notes.md
 t/body-canon.t
 t/chain-length.t
+t/chain-number-bound.t
 t/common.t
 t/data-in-sync.t
 t/data/dns.json
@@ -68,6 +70,9 @@ t/fold-info.t
 t/foreign-exception.t
 t/fraud-detection.t
 t/full-chain.t
+t/gate-mime-warn.t
+t/gate-null-top.t
+t/gate-one-walk.t
 t/guide-links.t
 t/hash-agility.t
 t/headerparser.t
@@ -75,13 +80,18 @@ t/ignore-prefixes.t
 t/interop.t
 t/invalid-json.t
 t/lib/DKIM2TestKeys.pm
+t/lib/MockAuthMilter.pm
 t/load-private-key-data.t
 t/malformed-content-type.t
 t/mf-rt-brackets.t
+t/mi-body-recipe-option.t
 t/mi-chain.t
+t/mi-flat-common-len.t
 t/mi-hostile-header.t
+t/mi-null-header-history.t
 t/mi-null-recipe.t
 t/milter-script.t
+t/milter-sign-gate.t
 t/milter.t
 t/nd-chain.t
 t/null-mailfrom.t
@@ -110,10 +120,12 @@ t/undo-bounds.t
 t/undo-encoded-body.t
 t/validate-cgi.t
 t/validate-cli.t
+t/validate-null-body.t
 t/validate-report.t
 t/verifier-accessors.t
 t/verifier-mi-coverage.t
 t/verifier-streaming.t
+t/verifier-unkeyable.t
 t/verifier_flags.t
 t/verify-cli.t
 t/verify-mi-hash.t

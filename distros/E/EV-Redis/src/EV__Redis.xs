@@ -27,6 +27,7 @@ typedef struct ev_redis_s ev_redis_t;
 typedef struct ev_redis_cb_s ev_redis_cb_t;
 typedef struct ev_redis_wait_s ev_redis_wait_t;
 typedef struct ev_redis_drain_s ev_redis_drain_t;
+typedef struct ev_redis_txn_s ev_redis_txn_t;
 
 typedef ev_redis_t* EV__Redis;
 typedef struct ev_loop* EV__Loop;
@@ -90,6 +91,7 @@ struct ev_redis_s {
     int monitoring;
     int in_multi; /* confirmed transaction state on ac */
     int pending_multi; /* transaction boundary replies still outstanding */
+    ev_redis_txn_t* issued_txn;
     ev_tstamp barrier_since; /* the queue is held for those replies since; 0 = not held */
     int keepalive; /* seconds, 0 = disabled */
     int prefer_ipv4;
@@ -108,15 +110,17 @@ struct ev_redis_cb_s {
     SV* cb;
     redisAsyncContext* ac; /* owner: cb_queue is shared with draining old contexts */
     ngx_queue_t queue;
-    int persist;
-    int monitor;
-    int skipped;
-    int running; /* its callback is on the stack: nested loops can run several */
-    int sub_count; /* hiredis channel/pattern entries holding it; MONITOR: 1 */
-    int detached; /* its context was replaced: it awaits the reply but holds no slot */
-    int proto_cmd; /* HELLO or RESET: its reply tells the protocol now in use */
-    int multi; /* transaction boundary, if any */
+    ev_redis_txn_t* txn;
     UV seq; /* order of creation: skip_pending spares the newer ones */
+    int sub_count; /* hiredis channel/pattern entries holding it; MONITOR: 1 */
+    unsigned char persist;
+    unsigned char monitor;
+    unsigned char skipped;
+    unsigned char running; /* its callback is on the stack: nested loops can run several */
+    unsigned char detached; /* its context was replaced: it awaits the reply but holds no slot */
+    unsigned char proto_cmd; /* HELLO or RESET: its reply tells the protocol now in use */
+    unsigned char multi; /* transaction boundary, if any */
+    unsigned char watch;
 };
 
 struct ev_redis_wait_s {
@@ -125,6 +129,7 @@ struct ev_redis_wait_s {
     int argc;
     SV* cb;
     int persist;
+    ev_redis_txn_t* txn;
     ngx_queue_t queue;
     ev_tstamp queued_at;
 };
@@ -134,6 +139,53 @@ struct ev_redis_drain_s {
     UV connection_gen;
     ngx_queue_t queue;
 };
+
+struct ev_redis_txn_s {
+    unsigned int refs;
+    int started;
+    int multi;
+    int multi_started;
+    int watched;
+    int closed;
+};
+
+static ev_redis_txn_t* txn_ref(ev_redis_txn_t* txn) {
+    if (NULL != txn) txn->refs++;
+    return txn;
+}
+
+static void txn_unref(ev_redis_txn_t* txn) {
+    if (NULL != txn && 0 == --txn->refs) Safefree(txn);
+}
+
+static void txn_scope_free(pTHX_ void* ptr) {
+    txn_unref((ev_redis_txn_t*)ptr);
+}
+
+static void free_cb_entry(ev_redis_cb_t* cbt) {
+    txn_unref(cbt->txn);
+    Safefree(cbt);
+}
+
+/* Bind the pointer to its original referent; copies lack this marker or
+ * retain the original referent's address. No shared registry on the hot path. */
+static MGVTBL ev_redis_object_vtbl = {0};
+
+static void ev_redis_mark_sv(SV* sv) {
+    SV* inner = SvRV(sv);
+    MAGIC* mg = sv_magicext(inner, NULL, PERL_MAGIC_ext,
+        &ev_redis_object_vtbl, NULL, 0);
+    mg->mg_ptr = (char*)inner;
+}
+
+static int ev_redis_owns_sv(SV* inner) {
+    MAGIC* mg;
+    if (SvTYPE(inner) < SVt_PVMG) return 0;
+    for (mg = SvMAGIC(inner); NULL != mg; mg = mg->mg_moremagic) {
+        if (mg->mg_virtual == &ev_redis_object_vtbl) return mg->mg_ptr == (char*)inner;
+    }
+    return 0;
+}
 
 /* Each queue is FIFO by queued_at; setup priority does not change deadlines. */
 static ngx_queue_t* oldest_waiting(EV__Redis self) {
@@ -170,18 +222,31 @@ enum {
     EV_REDIS_RESET
 };
 
+/* protocol tokens are ASCII: libc case folding differs under tr_TR */
+static int ascii_strcasecmp(const char* a, const char* b) {
+    int ca, cb;
+    do {
+        ca = (unsigned char)*a++;
+        cb = (unsigned char)*b++;
+        if (ca >= 'A' && ca <= 'Z') ca += 'a' - 'A';
+        if (cb >= 'A' && cb <= 'Z') cb += 'a' - 'A';
+        if (ca != cb) return ca - cb;
+    } while (0 != ca);
+    return 0;
+}
+
 static int transaction_command(const char* cmd) {
     char c = cmd[0];
-    if ((c == 'm' || c == 'M') && 0 == strcasecmp(cmd, "multi")) return EV_REDIS_MULTI;
-    if ((c == 'e' || c == 'E') && 0 == strcasecmp(cmd, "exec")) return EV_REDIS_EXEC;
-    if ((c == 'd' || c == 'D') && 0 == strcasecmp(cmd, "discard")) return EV_REDIS_DISCARD;
-    if ((c == 'r' || c == 'R') && 0 == strcasecmp(cmd, "reset")) return EV_REDIS_RESET;
+    if ((c == 'm' || c == 'M') && 0 == ascii_strcasecmp(cmd, "multi")) return EV_REDIS_MULTI;
+    if ((c == 'e' || c == 'E') && 0 == ascii_strcasecmp(cmd, "exec")) return EV_REDIS_EXEC;
+    if ((c == 'd' || c == 'D') && 0 == ascii_strcasecmp(cmd, "discard")) return EV_REDIS_DISCARD;
+    if ((c == 'r' || c == 'R') && 0 == ascii_strcasecmp(cmd, "reset")) return EV_REDIS_RESET;
     return 0;
 }
 
 /* these replies cannot safely be queued inside a transaction */
 static int needs_transaction_reply(int persist, const char* cmd) {
-    return persist || ((cmd[0] == 'h' || cmd[0] == 'H') && 0 == strcasecmp(cmd, "hello"));
+    return persist || ((cmd[0] == 'h' || cmd[0] == 'H') && 0 == ascii_strcasecmp(cmd, "hello"));
 }
 
 /* errors after which the server holds no transaction (a cluster redirect, or
@@ -199,8 +264,8 @@ static int ends_transaction(const redisReply* err) {
 
 static int is_unsubscribe_command(const char* cmd) {
     char c = cmd[0];
-    if (c == 'u' || c == 'U') return (0 == strcasecmp(cmd, "unsubscribe"));
-    if (c == 'p' || c == 'P') return (0 == strcasecmp(cmd, "punsubscribe"));
+    if (c == 'u' || c == 'U') return (0 == ascii_strcasecmp(cmd, "unsubscribe"));
+    if (c == 'p' || c == 'P') return (0 == ascii_strcasecmp(cmd, "punsubscribe"));
     return 0;
 }
 
@@ -209,46 +274,46 @@ static int is_unsubscribe_command(const char* cmd) {
 static int is_shard_pubsub_command(const char* cmd) {
     char c = cmd[0];
     if (c != 's' && c != 'S') return 0;
-    return (0 == strcasecmp(cmd, "ssubscribe")) ||
-           (0 == strcasecmp(cmd, "sunsubscribe"));
+    return (0 == ascii_strcasecmp(cmd, "ssubscribe")) ||
+           (0 == ascii_strcasecmp(cmd, "sunsubscribe"));
 }
 
 static int is_persistent_command(const char* cmd) {
     char c = cmd[0];
 
     if (c == 's' || c == 'S') {
-        return (0 == strcasecmp(cmd, "subscribe"));
+        return (0 == ascii_strcasecmp(cmd, "subscribe"));
     }
     if (c == 'u' || c == 'U') {
-        return (0 == strcasecmp(cmd, "unsubscribe"));
+        return (0 == ascii_strcasecmp(cmd, "unsubscribe"));
     }
     if (c == 'p' || c == 'P') {
-        if (0 == strcasecmp(cmd, "psubscribe")) return 1;
-        if (0 == strcasecmp(cmd, "punsubscribe")) return 1;
+        if (0 == ascii_strcasecmp(cmd, "psubscribe")) return 1;
+        if (0 == ascii_strcasecmp(cmd, "punsubscribe")) return 1;
         return 0;
     }
     if (c == 'm' || c == 'M') {
-        return (0 == strcasecmp(cmd, "monitor"));
+        return (0 == ascii_strcasecmp(cmd, "monitor"));
     }
 
     return 0;
 }
 
 static int is_monitor_command(const char* cmd) {
-    return (cmd[0] == 'm' || cmd[0] == 'M') && 0 == strcasecmp(cmd, "monitor");
+    return (cmd[0] == 'm' || cmd[0] == 'M') && 0 == ascii_strcasecmp(cmd, "monitor");
 }
 
 /* the server answers neither it nor (SKIP) the next command, and hiredis
  * pairs replies with callbacks by order */
 static int is_reply_suppressing(int argc, char** argv) {
-    if (argc == 3 && 0 == strcasecmp(argv[0], "client") && 0 == strcasecmp(argv[1], "reply")) {
-        return 0 == strcasecmp(argv[2], "off") || 0 == strcasecmp(argv[2], "skip");
+    if (argc == 3 && 0 == ascii_strcasecmp(argv[0], "client") && 0 == ascii_strcasecmp(argv[1], "reply")) {
+        return 0 == ascii_strcasecmp(argv[2], "off") || 0 == ascii_strcasecmp(argv[2], "skip");
     }
-    if (0 == strcasecmp(argv[0], "replconf")) {
+    if (0 == ascii_strcasecmp(argv[0], "replconf")) {
         /* the server takes option, value pairs in order */
         int j;
         for (j = 1; j < argc; j += 2) {
-            if (0 == strcasecmp(argv[j], "ack") || 0 == strcasecmp(argv[j], "getack")) return 1;
+            if (0 == ascii_strcasecmp(argv[j], "ack") || 0 == ascii_strcasecmp(argv[j], "getack")) return 1;
         }
     }
     return 0;
@@ -264,7 +329,9 @@ static int may_be_subscribed(EV__Redis self) {
         ngx_queue_t* list = i == 0 ? &self->wait_queue
             : i == 1 ? &self->setup_queue : &self->resume_setup_queue;
         for (q = ngx_queue_head(list); q != ngx_queue_sentinel(list); q = ngx_queue_next(q)) {
-            if (ngx_queue_data(q, ev_redis_wait_t, queue)->persist) return 1;
+            ev_redis_wait_t* wt = ngx_queue_data(q, ev_redis_wait_t, queue);
+            /* a queued unsubscribe removes subscriptions; it is not one */
+            if (wt->persist && !is_unsubscribe_command(wt->argv[0])) return 1;
         }
     }
     return 0;
@@ -275,7 +342,7 @@ static int may_be_subscribed(EV__Redis self) {
  * (inside MULTI, +QUEUED switches nothing) */
 static void note_protocol_reply(redisAsyncContext* c, const redisReply* reply) {
     if (reply->type == REDIS_REPLY_ARRAY
-            || (reply->type == REDIS_REPLY_STATUS && 0 == strcasecmp(reply->str, "reset"))) {
+            || (reply->type == REDIS_REPLY_STATUS && 0 == ascii_strcasecmp(reply->str, "reset"))) {
         c->c.flags &= ~REDIS_SUPPORTS_PUSH;
     }
 }
@@ -291,9 +358,9 @@ static int is_unsub_reply(redisReply* reply) {
         reply->element[0]->type != REDIS_REPLY_STATUS) return 0;
 
     s = reply->element[0]->str;
-    if (s[0] == 'u' || s[0] == 'U') return (0 == strcasecmp(s, "unsubscribe"));
-    if (s[0] == 'p' || s[0] == 'P') return (0 == strcasecmp(s, "punsubscribe"));
-    if (s[0] == 's' || s[0] == 'S') return (0 == strcasecmp(s, "sunsubscribe"));
+    if (s[0] == 'u' || s[0] == 'U') return (0 == ascii_strcasecmp(s, "unsubscribe"));
+    if (s[0] == 'p' || s[0] == 'P') return (0 == ascii_strcasecmp(s, "punsubscribe"));
+    if (s[0] == 's' || s[0] == 'S') return (0 == ascii_strcasecmp(s, "sunsubscribe"));
     return 0;
 }
 
@@ -389,8 +456,9 @@ static COP* caller_cop(void) {
         {
             /* by name too: each ithread has its own stash */
             HV* stash = CvSTASH(cx->blk_sub.cv);
-            int ours = stash == ev_redis_stash || (NULL != stash && NULL != HvNAME_get(stash)
-                                                   && strEQ(HvNAME_get(stash), "EV::Redis"));
+            const char* name = NULL == stash ? NULL : HvNAME_get(stash);
+            int ours = stash == ev_redis_stash
+                || (NULL != name && strEQ(name, "EV::Redis"));
             return ours ? cx->blk_oldcop : NULL;
         }
     }
@@ -521,6 +589,8 @@ static int check_destroyed(EV__Redis self) {
 }
 
 static void free_c_fields(EV__Redis self) {
+    txn_unref(self->issued_txn);
+    self->issued_txn = NULL;
     if (NULL != self->host) { Safefree(self->host); self->host = NULL; }
     if (NULL != self->path) { Safefree(self->path); self->path = NULL; }
     if (NULL != self->source_addr) { Safefree(self->source_addr); self->source_addr = NULL; }
@@ -587,8 +657,10 @@ static SV* handler_accessor(SV** handler_ptr, SV* handler, int has_handler_arg, 
         && SvROK(handler) && SvTYPE(SvRV(handler)) == SVt_PVCV;
 
     /* before the swap: a die from $SIG{__WARN__} would leak *old */
-    if (has_handler_arg && NULL != handler && SvOK(handler) && !is_code) {
-        warn("EV::Redis: handler is not a code reference, cleared");
+    if (has_handler_arg && NULL != handler && SvOK(handler) && !is_code
+        && ckWARN(WARN_MISC)) {
+        Perl_warner(aTHX_ packWARN(WARN_MISC),
+            "EV::Redis: handler is not a code reference, cleared");
     }
 
     *old = *handler_ptr;
@@ -621,15 +693,25 @@ static void detach_dead_loop(EV__Redis self) {
 static EV__Redis ev_redis_from_sv(SV* sv) {
     SV* inner;
     EV__Redis self;
-    if (!SvROK(sv) || !sv_derived_from(sv, "EV::Redis")) {
+    if (!SvROK(sv)) {
         croak_caller("not an EV::Redis object");
     }
     inner = SvRV(sv);
+    if (!SvOBJECT(inner) || (SvSTASH(inner) != ev_redis_stash
+            && !sv_derived_from(sv, "EV::Redis"))) {
+        croak_caller("not an EV::Redis object");
+    }
     if (SvTYPE(inner) >= SVt_PVAV || !SvOK(inner) || 0 == SvIV(inner)) {
+        croak_caller("EV::Redis object is destroyed or was not made by new()");
+    }
+    if (!ev_redis_owns_sv(inner)) {
         croak_caller("EV::Redis object is destroyed or was not made by new()");
     }
     self = INT2PTR(EV__Redis, SvIV(inner));
     detach_dead_loop(self);
+    /* Perl code re-entered mid-XSUB (warn hooks, magic) may drop the last
+     * reference; hold the referent until the XSUB returns. */
+    sv_2mortal(SvREFCNT_inc_simple_NN(SvRV(sv)));
     return self;
 }
 
@@ -736,7 +818,7 @@ static void remove_cb_queue_sv(EV__Redis self, SV* error_sv,
             }
             SvREFCNT_dec(cbt->cb);
         }
-        Safefree(cbt);
+        free_cb_entry(cbt);
     }
 
     self->in_cb_cleanup = 0;
@@ -752,6 +834,7 @@ static void free_wait_entry(ev_redis_wait_t* wt) {
     if (NULL != wt->cb) {
         SvREFCNT_dec(wt->cb);
     }
+    txn_unref(wt->txn);
     Safefree(wt);
 }
 
@@ -766,6 +849,55 @@ static void take_wait_queue(EV__Redis self, ngx_queue_t* list) {
         self->waiting_count--;
     }
     stop_waiting_timer(self);
+}
+
+/* Shared by setup and backlog: only transactions with submitted commands fail. */
+static void take_txn_wait_queue(EV__Redis self, ngx_queue_t* list) {
+    ngx_queue_t* lists[3];
+    ngx_queue_t* q;
+    ngx_queue_t* next;
+    ev_redis_wait_t* wt;
+    int i;
+    lists[0] = &self->wait_queue;
+    lists[1] = &self->setup_queue;
+    lists[2] = &self->resume_setup_queue;
+    for (i = 0; i < 3; i++) {
+        for (q = ngx_queue_head(lists[i]);
+             q != ngx_queue_sentinel(lists[i]);
+             q = next) {
+            next = ngx_queue_next(q);
+            wt = ngx_queue_data(q, ev_redis_wait_t, queue);
+            if (NULL != wt->txn && wt->txn->started) {
+                ngx_queue_remove(q);
+                ngx_queue_insert_tail(list, q);
+                self->waiting_count--;
+            }
+        }
+    }
+    if (!self->waiting_count) stop_waiting_timer(self);
+}
+
+/* A retained, open transaction still owns subsequent issued commands. */
+static void rederive_span(EV__Redis self) {
+    ngx_queue_t* lists[3];
+    ngx_queue_t* q;
+    int i;
+    txn_unref(self->issued_txn);
+    self->issued_txn = NULL;
+    lists[0] = &self->wait_queue;
+    lists[1] = &self->setup_queue;
+    lists[2] = &self->resume_setup_queue;
+    for (i = 0; i < 3; i++) {
+        for (q = ngx_queue_head(lists[i]);
+             q != ngx_queue_sentinel(lists[i]);
+             q = ngx_queue_next(q)) {
+            ev_redis_txn_t* txn = ngx_queue_data(q, ev_redis_wait_t, queue)->txn;
+            if (NULL != txn && !txn->closed) {
+                self->issued_txn = txn_ref(txn);
+                return;
+            }
+        }
+    }
 }
 
 /* in_wait_cleanup makes skip_waiting and skip_pending from these callbacks
@@ -792,6 +924,7 @@ static void clear_wait_queue_sv(EV__Redis self, SV* error_sv) {
     ngx_queue_t list;
     ngx_queue_init(&list);
     take_wait_queue(self, &list);
+    rederive_span(self);
     fail_wait_list(self, &list, error_sv);
 }
 
@@ -834,10 +967,10 @@ static void schedule_reconnect(EV__Redis self);
 static void EV__redis_connect_cb(redisAsyncContext* c, int status);
 static void EV__redis_disconnect_cb(const redisAsyncContext* c, int status);
 static void EV__redis_push_cb(redisAsyncContext* ac, void* reply_ptr);
-static SV* EV__redis_decode_reply(redisReply* reply);
+static SV* EV__redis_decode_reply(redisReply* reply, int* truncated);
 /* bounds C-stack recursion on deeply nested replies from a hostile server */
 #define EV_REDIS_MAX_REPLY_DEPTH 512
-static SV* decode_reply_depth(redisReply* reply, int depth);
+static SV* decode_reply_depth(redisReply* reply, int depth, int* truncated);
 
 static void clear_connection_params(EV__Redis self) {
     if (NULL != self->host) { Safefree(self->host); self->host = NULL; }
@@ -917,7 +1050,11 @@ static int barrier_update(EV__Redis self) {
 
     if (NULL == self->loop) return 0;
     if (barrier_holds(self)) {
-        if (0 == self->barrier_since) self->barrier_since = ev_now(self->loop);
+        /* ev_now is stale outside ev_run; the end-of-hold math needs the truth */
+        if (0 == self->barrier_since) {
+            ev_now_update(self->loop);
+            self->barrier_since = ev_now(self->loop);
+        }
         return 1;
     }
     if (0 == self->barrier_since) return 0;
@@ -951,11 +1088,16 @@ static void expire_waiting_commands(EV__Redis self) {
     ev_tstamp now;
     ev_tstamp timeout;
 
+    int nested = self->in_wait_cleanup;
+
     if (sync_barrier(self)) return;
     now = ev_now(self->loop);
     /* snapshot: callbacks may change waiting_timeout_ms mid-batch */
     timeout = self->waiting_timeout_ms / 1000.0;
 
+    /* like fail_wait_list: skip_waiting and the waiting half of skip_pending
+     * from these callbacks leave the rest to this batch */
+    self->in_wait_cleanup = 1;
     while (self->waiting_count) {
         q = oldest_waiting(self);
         wt = ngx_queue_data(q, ev_redis_wait_t, queue);
@@ -964,6 +1106,7 @@ static void expire_waiting_commands(EV__Redis self) {
             ngx_queue_remove(q);
             self->waiting_count--;
 
+            if (NULL != wt->txn) rederive_span(self);
             if (NULL != wt->cb) {
                 invoke_callback_error(wt->cb, err_waiting_timeout);
             }
@@ -975,6 +1118,7 @@ static void expire_waiting_commands(EV__Redis self) {
             break;
         }
     }
+    self->in_wait_cleanup = nested;
 }
 
 static void waiting_timer_cb(EV_P_ ev_timer* w, int revents) {
@@ -1092,6 +1236,7 @@ static void EV__redis_connect_cb(redisAsyncContext* c, int status) {
                     || self->intentional_disconnect) {
                 take_wait_queue(self, &doomed);
             }
+            rederive_span(self);
             emit_error_str(self, conn_errstr(c, "connect failed"));
             fail_wait_list(self, &doomed, sv_2mortal(newSVpv(
                 conn_errstr(c, "connect failed"), 0)));
@@ -1102,11 +1247,18 @@ static void EV__redis_connect_cb(redisAsyncContext* c, int status) {
         self->reconnect_attempts = 0;
         demote_setup_waiters(self);
 
-        {
+        if (NULL != self->connect_handler) {
             int prev = self->in_connect_handler;
+            ev_redis_txn_t* backlog_txn = self->issued_txn;
+            self->issued_txn = NULL;
             self->in_connect_handler = 1;
             call_void_handler(self->connect_handler, "connect handler");
             self->in_connect_handler = prev;
+            /* Fresh setup precedes, and is independent of, the retained backlog. */
+            if (NULL == self->issued_txn && self->magic == EV_REDIS_MAGIC && self->ac == c) {
+                rederive_span(self);
+            }
+            txn_unref(backlog_txn);
         }
 
         send_next_waiting(self);
@@ -1165,12 +1317,19 @@ static void EV__redis_disconnect_cb(const redisAsyncContext* c, int status) {
         }
     }
 
-    /* the settings as the connection is lost decide what is kept */
+    /* the settings as the connection is lost decide what is kept; a
+     * transaction does not survive it, so its waiting fragments fail with it
+     * instead of replaying orphaned */
     ngx_queue_init(&doomed);
     keep = should_reconnect && self->reconnect && self->resume_waiting_on_reconnect;
     if (!keep) {
         take_wait_queue(self, &doomed);
     }
+    else {
+        take_txn_wait_queue(self, &doomed);
+    }
+    /* before any callback issues: it must see the span the takes left */
+    rederive_span(self);
 
     if (REDIS_OK != status) {
         emit_error_str(self, conn_errstr(c, "disconnected"));
@@ -1206,6 +1365,7 @@ static void EV__redis_disconnect_cb(const redisAsyncContext* c, int status) {
      * callback runs, so what the callbacks queue stays */
     if (keep && !will_reconnect) {
         take_wait_queue(self, &doomed);
+        rederive_span(self);
     }
     fail_wait_list(self, &doomed, error_sv);
 
@@ -1237,13 +1397,22 @@ static void EV__redis_push_cb(redisAsyncContext* ac, void* reply_ptr) {
         SAVETMPS;
         save_scalar(PL_errgv);
 
-        PUSHMARK(SP);
-        XPUSHs(sv_2mortal(EV__redis_decode_reply(reply)));
-        PUTBACK;
+        int truncated = 0;
+        SV* decoded = sv_2mortal(EV__redis_decode_reply(reply, &truncated));
 
-        call_sv(handler, G_DISCARD | G_EVAL);
-        if (SvTRUE(ERRSV)) {
-            warn_exception("push handler", ERRSV);
+        if (truncated) {
+            /* on_push takes the message only, so a dropped one errors here */
+            emit_error_str(self, "reply exceeds maximum nesting depth");
+        }
+        else {
+            PUSHMARK(SP);
+            XPUSHs(decoded);
+            PUTBACK;
+
+            call_sv(handler, G_DISCARD | G_EVAL);
+            if (SvTRUE(ERRSV)) {
+                warn_exception("push handler", ERRSV);
+            }
         }
 
         FREETMPS;
@@ -1291,6 +1460,7 @@ static int setup_failed(EV__Redis self, SV* err) {
             || self->intentional_disconnect) {
         take_wait_queue(self, &doomed);
     }
+    rederive_span(self);
     emit_error(self, err);
     fail_wait_list(self, &doomed, wait_err);
     return REDIS_ERR;
@@ -1362,7 +1532,7 @@ static void connect_setup_or_retry(EV__Redis self) {
     check_destroyed(self);
 }
 
-static SV* decode_reply_depth(redisReply* reply, int depth) {
+static SV* decode_reply_depth(redisReply* reply, int depth, int* truncated) {
     SV* res;
 
     switch (reply->type) {
@@ -1413,6 +1583,7 @@ static SV* decode_reply_depth(redisReply* reply, int depth) {
             AV* av = newAV();
             size_t i;
             if (depth >= EV_REDIS_MAX_REPLY_DEPTH) {
+                *truncated = 1;
                 res = newRV_noinc((SV*)av);
                 break;
             }
@@ -1420,7 +1591,7 @@ static SV* decode_reply_depth(redisReply* reply, int depth) {
                 av_extend(av, (SSize_t)(reply->elements - 1));
                 for (i = 0; i < reply->elements; i++) {
                     if (NULL != reply->element[i]) {
-                        av_push(av, decode_reply_depth(reply->element[i], depth + 1));
+                        av_push(av, decode_reply_depth(reply->element[i], depth + 1, truncated));
                     }
                     else {
                         av_push(av, newSV(0));
@@ -1439,8 +1610,9 @@ static SV* decode_reply_depth(redisReply* reply, int depth) {
     return res;
 }
 
-static SV* EV__redis_decode_reply(redisReply* reply) {
-    return decode_reply_depth(reply, 0);
+static SV* EV__redis_decode_reply(redisReply* reply, int* truncated) {
+    *truncated = 0;
+    return decode_reply_depth(reply, 0, truncated);
 }
 
 static void EV__redis_reply_cb_body(redisAsyncContext* c, void* reply, void* privdata) {
@@ -1462,11 +1634,11 @@ static void EV__redis_reply_cb_body(redisAsyncContext* c, void* reply, void* pri
     }
     if (cbt->multi && NULL != self && self->magic == EV_REDIS_MAGIC && self->ac == c) {
         redisReply* rr = (redisReply*)reply;
-        self->pending_multi--;
-        if (!self->pending_multi) (void)sync_barrier(self);
         if (NULL != rr) {
+            self->pending_multi--;
+            if (!self->pending_multi) (void)sync_barrier(self);
             if (cbt->multi == EV_REDIS_MULTI) {
-                if (rr->type == REDIS_REPLY_STATUS && 0 == strcasecmp(rr->str, "ok")) {
+                if (rr->type == REDIS_REPLY_STATUS && 0 == ascii_strcasecmp(rr->str, "ok")) {
                     self->in_multi = 1;
                 }
             }
@@ -1476,11 +1648,26 @@ static void EV__redis_reply_cb_body(redisAsyncContext* c, void* reply, void* pri
             }
         }
     }
+    /* A refused first WATCH creates no state; earlier successful WATCHes remain. */
+    if (cbt->watch && NULL != self && self->magic == EV_REDIS_MAGIC && self->ac == c
+            && NULL != reply && NULL != cbt->txn) {
+        if (((redisReply*)reply)->type != REDIS_REPLY_ERROR) {
+            cbt->txn->watched = 1;
+        }
+        else if (!cbt->txn->watched && !cbt->txn->multi_started) {
+            cbt->txn->started = 0;
+            cbt->txn->closed = 1;
+            if (self->issued_txn == cbt->txn) {
+                txn_unref(self->issued_txn);
+                self->issued_txn = NULL;
+            }
+        }
+    }
 
     if (cbt->skipped) {
         int resume_waiting = cbt->multi && NULL != reply && NULL != self
             && self->magic == EV_REDIS_MAGIC && self->ac == c && !self->pending_multi;
-        if (!cbt->persist || cbt->sub_count <= 0) Safefree(cbt);
+        if (!cbt->persist || cbt->sub_count <= 0) free_cb_entry(cbt);
         if (resume_waiting) {
             self->callback_depth++;
             send_next_waiting(self);
@@ -1498,7 +1685,7 @@ static void EV__redis_reply_cb_body(redisAsyncContext* c, void* reply, void* pri
             SvREFCNT_dec(cbt->cb);
             cbt->cb = NULL;
         }
-        if (!cbt->persist || cbt->sub_count <= 0) Safefree(cbt);
+        if (!cbt->persist || cbt->sub_count <= 0) free_cb_entry(cbt);
         return;
     }
 
@@ -1512,7 +1699,7 @@ static void EV__redis_reply_cb_body(redisAsyncContext* c, void* reply, void* pri
         }
         if (!cbt->persist || cbt->sub_count <= 0) {
             ngx_queue_remove(&cbt->queue);
-            Safefree(cbt);
+            free_cb_entry(cbt);
         }
         check_destroyed(self);
         return;
@@ -1521,7 +1708,7 @@ static void EV__redis_reply_cb_body(redisAsyncContext* c, void* reply, void* pri
     /* corrupt self: leave its queue alone */
     if (self->magic != EV_REDIS_MAGIC) {
         if (NULL != cbt->cb) SvREFCNT_dec(cbt->cb);
-        Safefree(cbt);
+        free_cb_entry(cbt);
         return;
     }
 
@@ -1543,12 +1730,16 @@ static void EV__redis_reply_cb_body(redisAsyncContext* c, void* reply, void* pri
             SAVETMPS;
             save_scalar(PL_errgv);
 
+            int truncated = 0;
+
             PUSHMARK(SP);
             EXTEND(SP, 2);
-            sv_reply = sv_2mortal(EV__redis_decode_reply((redisReply*)reply));
-            if (((redisReply*)reply)->type == REDIS_REPLY_ERROR) {
+            sv_reply = sv_2mortal(EV__redis_decode_reply((redisReply*)reply, &truncated));
+            if (((redisReply*)reply)->type == REDIS_REPLY_ERROR || truncated) {
                 PUSHs(sv_newmortal());
-                PUSHs(sv_reply);
+                PUSHs(truncated
+                    ? sv_2mortal(newSVpv("reply exceeds maximum nesting depth", 0))
+                    : sv_reply);
             }
             else {
                 PUSHs(sv_reply);
@@ -1576,7 +1767,7 @@ static void EV__redis_reply_cb_body(redisAsyncContext* c, void* reply, void* pri
             SvREFCNT_dec(cbt->cb);
             cbt->cb = NULL;
         }
-        if (!cbt->persist || cbt->monitor || cbt->sub_count <= 0) Safefree(cbt);
+        if (!cbt->persist || cbt->monitor || cbt->sub_count <= 0) free_cb_entry(cbt);
         check_destroyed(self);
         return;
     }
@@ -1591,7 +1782,7 @@ static void EV__redis_reply_cb_body(redisAsyncContext* c, void* reply, void* pri
                 conn_errstr(c, "disconnected"), 0)));
             SvREFCNT_dec(cbt->cb);
         }
-        Safefree(cbt);
+        free_cb_entry(cbt);
         self->callback_depth--;
         check_destroyed(self);
         return;
@@ -1601,7 +1792,7 @@ static void EV__redis_reply_cb_body(redisAsyncContext* c, void* reply, void* pri
         /* skip_pending already reinitialised the node and adjusted pending_count */
         ngx_queue_remove(&cbt->queue);
         if (cbt->persist && cbt->sub_count > 0) return;
-        Safefree(cbt);
+        free_cb_entry(cbt);
         self->callback_depth++;
         send_next_waiting(self);
         self->callback_depth--;
@@ -1614,7 +1805,7 @@ static void EV__redis_reply_cb_body(redisAsyncContext* c, void* reply, void* pri
             ngx_queue_remove(&cbt->queue);
             self->callback_depth++;
             if (NULL != cbt->cb) SvREFCNT_dec(cbt->cb);
-            Safefree(cbt);
+            free_cb_entry(cbt);
             self->callback_depth--;
             check_destroyed(self);
         }
@@ -1628,7 +1819,7 @@ static void EV__redis_reply_cb_body(redisAsyncContext* c, void* reply, void* pri
         drop_pending(self, cbt);
         self->callback_depth++;
         if (NULL != cbt->cb) SvREFCNT_dec(cbt->cb);
-        Safefree(cbt);
+        free_cb_entry(cbt);
         /* NULL reply: connection dying, disconnect_cb owns the wait queue;
          * unless it is an older one and a newer connection took over */
         if (reply != NULL || (NULL != self->ac && self->ac != c)) {
@@ -1716,7 +1907,7 @@ static int prepare_unsubscribe(EV__Redis self, int pattern,
             stub.privdata = (void*)cbt;
             if (DICT_OK != dictAdd(d, key, &stub)) {
                 sdsfree(key);
-                Safefree(cbt);
+                free_cb_entry(cbt);
                 goto oom;
             }
             ngx_queue_insert_tail(&self->cb_queue, &cbt->queue);
@@ -1751,8 +1942,9 @@ static int submit_to_redis(EV__Redis self, ev_redis_cb_t* cbt,
 
     cbt->ac = self->ac;
     cbt->monitor = cbt->persist && is_monitor_command(cmd);
+    cbt->watch = 0 == ascii_strcasecmp(cmd, "watch");
     cbt->sub_count = cbt->monitor ? 1 : 0;
-    cbt->proto_cmd = 0 == strcasecmp(cmd, "hello") || 0 == strcasecmp(cmd, "reset");
+    cbt->proto_cmd = 0 == ascii_strcasecmp(cmd, "hello") || 0 == ascii_strcasecmp(cmd, "reset");
     cbt->multi = transaction_command(cmd);
 
     /* queued, the server answers QUEUED, which hiredis would hand to the next
@@ -1761,13 +1953,18 @@ static int submit_to_redis(EV__Redis self, ev_redis_cb_t* cbt,
         refused = "pub/sub and MONITOR are not supported inside MULTI";
     }
     /* its protocol switch would come inside EXEC's reply, unseen */
-    else if (self->in_multi && 0 == strcasecmp(cmd, "hello")) {
+    else if (self->in_multi && 0 == ascii_strcasecmp(cmd, "hello")) {
         refused = "HELLO is not supported inside MULTI";
     }
     /* a RESET that waited may meet a subscription on_connect made since */
-    else if (!cbt->persist && 0 == strcasecmp(cmd, "reset")
+    else if (!cbt->persist && 0 == ascii_strcasecmp(cmd, "reset")
              && (self->ac->c.flags & REDIS_SUBSCRIBED)) {
         refused = "RESET is not supported on a subscribed connection";
+    }
+    /* like RESET: the server refuses it, which would kill the connection */
+    else if (!cbt->persist && 0 == ascii_strcasecmp(cmd, "hello")
+             && (self->ac->c.flags & REDIS_SUBSCRIBED)) {
+        refused = "HELLO is not supported on a subscribed connection";
     }
     /* hiredis keeps no callback for unsubscribe (replies go to the subscribe
      * callback): pass NULL so it holds no dangling cbt. */
@@ -1781,6 +1978,10 @@ static int submit_to_redis(EV__Redis self, ev_redis_cb_t* cbt,
             if (REDIS_OK != prepare_unsubscribe(self, pattern, argc, argv, argvlen)) {
                 refused = "Out of memory";
             }
+        }
+        else {
+            /* hiredis refuses these without an error string */
+            refused = "not subscribed";
         }
     }
     else if (cbt->persist && !cbt->monitor) {
@@ -1811,7 +2012,7 @@ static int submit_to_redis(EV__Redis self, ev_redis_cb_t* cbt,
             }
             if (NULL != seen) {
                 int n = NULL != sub ? sub->pending_subs + 1 : 1;
-                (void)hv_store(seen, argv[i], (I32)argvlen[i], n == 1 ? &PL_sv_yes : newSViv(n), 0);
+                (void)hv_store(seen, argv[i], (I32)argvlen[i], newSViv(n), 0);
                 if (n > 1) fix_subs = 1;
             }
             if (NULL != owner) replaced[nreplaced++] = owner;
@@ -1824,10 +2025,21 @@ static int submit_to_redis(EV__Redis self, ev_redis_cb_t* cbt,
         if (!cbt->persist || cbt->monitor) {
             redisLibevExpectNewReply(self->ac);
         }
+        /* hiredis classifies these with locale-sensitive libc comparisons. */
+        if (cbt->persist) {
+            argv[0] = cbt->monitor ? "monitor" : fn == NULL
+                ? (pattern ? "punsubscribe" : "unsubscribe")
+                : (pattern ? "psubscribe" : "subscribe");
+        }
         r = redisAsyncCommandArgv(self->ac, fn, privdata, argc, argv, argvlen);
+        argv[0] = cmd;
     }
 
     if (REDIS_OK == r && cbt->multi) self->pending_multi++;
+    if (REDIS_OK == r && NULL != cbt->txn) {
+        cbt->txn->started = 1;
+        if (cbt->multi == EV_REDIS_MULTI) cbt->txn->multi_started = 1;
+    }
     /* Every named reply now has an entry; pending_unsubs counts only nil replies. */
     if (REDIS_OK == r && named_unsubs) self->ac->sub.pending_unsubs = pending_unsubs;
 
@@ -1856,7 +2068,7 @@ static int submit_to_redis(EV__Redis self, ev_redis_cb_t* cbt,
             ngx_queue_remove(&old->queue);
             /* mortal: a DESTROY this triggers runs after the current statement */
             if (NULL != old->cb) sv_2mortal(old->cb);
-            Safefree(old);
+            free_cb_entry(old);
         }
     }
     Safefree(replaced);
@@ -1871,11 +2083,11 @@ static int submit_to_redis(EV__Redis self, ev_redis_cb_t* cbt,
                 : (self->ac && self->ac->errstr[0]) ? self->ac->errstr : "command failed", 0)));
             SvREFCNT_dec(cbt->cb);
         }
-        Safefree(cbt);
+        free_cb_entry(cbt);
     } else if (fn == NULL) {
         ngx_queue_remove(&cbt->queue);
         if (NULL != cbt->cb) SvREFCNT_dec(cbt->cb);
-        Safefree(cbt);
+        free_cb_entry(cbt);
     }
 
     return r;
@@ -1920,6 +2132,7 @@ static void send_next_waiting(EV__Redis self) {
         if (self->waiting_timeout_ms > 0 && NULL != self->loop) {
             ev_now_update(self->loop);
             if (ev_now(self->loop) - wt->queued_at >= self->waiting_timeout_ms / 1000.0) {
+                if (NULL != wt->txn) rederive_span(self);
                 if (NULL != wt->cb) invoke_callback_error(wt->cb, err_waiting_timeout);
                 free_wait_entry(wt);
                 continue;
@@ -1934,6 +2147,7 @@ static void send_next_waiting(EV__Redis self) {
         cbt->detached = 0;
         cbt->seq = ++self->cb_seq;
         cbt->persist = wt->persist;
+        cbt->txn = txn_ref(wt->txn);
         ngx_queue_init(&cbt->queue);
         ngx_queue_insert_tail(&self->cb_queue, &cbt->queue);
         if (!cbt->persist) self->pending_count++;
@@ -1987,6 +2201,7 @@ CODE:
     /* pin: a dropped non-default loop would free the C loop under us */
     RETVAL->loop_sv = SvREFCNT_inc(SvRV(ST(1)));
     RETVAL->cloexec = 1;
+    RETVAL->reconnect_delay_ms = 1000;
 }
 OUTPUT:
     RETVAL
@@ -2006,6 +2221,8 @@ CODE:
     if (!SvROK(self_sv)) return;
     inner = SvRV(self_sv);
     if (SvTYPE(inner) >= SVt_PVAV || !SvOK(inner) || 0 == SvIV(inner)) return;
+    /* quietly, like a destroyed object: a foreign copy has nothing of ours */
+    if (!ev_redis_owns_sv(inner)) return;
     self = INT2PTR(EV__Redis, SvIV(inner));
     if (self->magic != EV_REDIS_MAGIC) return;
 
@@ -2139,10 +2356,12 @@ CODE:
 }
 
 void
-connect(EV::Redis self, char* hostname, sat_iv port = 6379);
+connect(EV::Redis self, SV* host_sv, SV* port_sv = NULL);
 CODE:
 {
     redisOptions opts;
+    const char* hostname;
+    IV port;
 
     if (self->magic != EV_REDIS_MAGIC) {
         croak_caller("cannot connect: object is being destroyed");
@@ -2153,12 +2372,12 @@ CODE:
     if (NULL != self->ac) {
         croak_caller("already connected");
     }
+    /* omitted or undef means the default, like new()'s port */
+    port = (NULL == port_sv || !SvOK(port_sv)) ? 6379 : sv_to_sat_iv(port_sv);
     if (port < 1 || port > 65535) {
         croak_caller("invalid port %" IVdf, port);
     }
-    if (SvPOK(ST(1)) && SvCUR(ST(1)) != strlen(hostname)) {
-        croak_caller("host name contains a NUL byte");
-    }
+    hostname = c_string(host_sv, "host name");
 
     self->intentional_disconnect = 0;
     self->reconnect_attempts = 0;
@@ -2180,10 +2399,11 @@ CODE:
 }
 
 void
-connect_unix(EV::Redis self, const char* path);
+connect_unix(EV::Redis self, SV* path_sv);
 CODE:
 {
     redisOptions opts;
+    const char* path;
 
     if (self->magic != EV_REDIS_MAGIC) {
         croak_caller("cannot connect: object is being destroyed");
@@ -2194,9 +2414,12 @@ CODE:
     if (NULL != self->ac) {
         croak_caller("already connected");
     }
-    if (SvPOK(ST(1)) && SvCUR(ST(1)) != strlen(path)) {
-        croak_caller("unix socket path contains a NUL byte");
+#ifdef EV_REDIS_SSL
+    if (NULL != self->ssl_ctx) {
+        croak_caller("TLS is not supported over unix sockets");
     }
+#endif
+    path = c_string(path_sv, "unix socket path");
     /* hiredis would cut it to fit sun_path and leave it unterminated */
     if (strlen(path) >= sizeof(((struct sockaddr_un*)0)->sun_path)) {
         croak_caller("unix socket path too long (max %d bytes)",
@@ -2253,7 +2476,7 @@ CODE:
     }
 
     /* no disconnect_cb clears these for a deferred or still-connecting c */
-    if (NULL == self->ac && self->waiting_count) {
+    if (NULL == self->ac) {
         self->callback_depth++;
         clear_wait_queue_sv(self, err_disconnected);
         self->callback_depth--;
@@ -2358,6 +2581,7 @@ PREINIT:
     size_t* argvlen;
     STRLEN len;
     int argc, i, persist;
+    ev_redis_txn_t* txn_now;
     ev_redis_cb_t* cbt;
     ev_redis_wait_t* wt;
     char* p;
@@ -2433,11 +2657,11 @@ CODE:
               "subscribe on a non-cluster channel)", argv[0]);
     }
     /* hiredis drops a leading 'p' and would run it as MONITOR */
-    if (0 == strcasecmp(argv[0], "pmonitor")) {
+    if (0 == ascii_strcasecmp(argv[0], "pmonitor")) {
         croak_caller("%s is not supported", argv[0]);
     }
     if (is_reply_suppressing(argc, argv)) {
-        if (0 == strcasecmp(argv[0], "client")) {
+        if (0 == ascii_strcasecmp(argv[0], "client")) {
             croak_caller("CLIENT REPLY %s is not supported: replies are matched to "
                          "callbacks by their order", argv[2]);
         }
@@ -2445,10 +2669,10 @@ CODE:
     }
     /* the replication stream that follows is not one reply per command: the
      * first unexpected one trips hiredis's assert */
-    if (0 == strcasecmp(argv[0], "sync") || 0 == strcasecmp(argv[0], "psync")) {
+    if (0 == ascii_strcasecmp(argv[0], "sync") || 0 == ascii_strcasecmp(argv[0], "psync")) {
         croak_caller("%s is not supported: a replication stream follows", argv[0]);
     }
-    if (0 == strcasecmp(argv[0], "reset") && may_be_subscribed(self)) {
+    if (0 == ascii_strcasecmp(argv[0], "reset") && may_be_subscribed(self)) {
         croak_caller("RESET is not supported on a subscribed connection");
     }
 
@@ -2466,12 +2690,46 @@ CODE:
             croak_caller("MONITOR requires an active connection");
         }
         /* pending commands would hit the same re-queue hazard; hiredis's own records
-         * count too, as skip_pending unlinks commands still outstanding there */
-        if (!ngx_queue_empty(&self->cb_queue) || self->waiting_count
+         * count too, as skip_pending unlinks commands still outstanding there.
+         * Inside MULTI the submit fails through the callback instead, so the
+         * idle check (which a reply callback of its own never passes) is skipped. */
+        int busy = 0;
+        ngx_queue_t* q;
+        for (q = ngx_queue_head(&self->cb_queue);
+             q != ngx_queue_sentinel(&self->cb_queue);
+             q = ngx_queue_next(q)) {
+            ev_redis_cb_t* cbt = ngx_queue_data(q, ev_redis_cb_t, queue);
+            /* detached drained replies belong to a replaced connection */
+            if (!cbt->detached && cbt->ac == self->ac) { busy = 1; break; }
+        }
+        if (!self->in_multi
+                && (busy || self->waiting_count
                 || NULL != self->ac->replies.head || NULL != self->ac->sub.replies.head
-                || (self->ac->c.flags & REDIS_SUBSCRIBED)) {
+                || (self->ac->c.flags & REDIS_SUBSCRIBED))) {
             croak_caller("MONITOR requires an idle connection "
                   "(no pending, waiting, or subscribed commands)");
+        }
+    }
+
+    /* Track a transaction across both waiting queues and submitted callbacks. */
+    {
+        int boundary = transaction_command(argv[0]);
+        int opens = EV_REDIS_MULTI == boundary
+            || 0 == ascii_strcasecmp(argv[0], "watch");
+        if (opens && NULL == self->issued_txn) {
+            Newxz(self->issued_txn, 1, ev_redis_txn_t);
+            self->issued_txn->refs = 1;
+        }
+        txn_now = txn_ref(self->issued_txn);
+        if (NULL != txn_now) {
+            SAVEDESTRUCTOR_X(txn_scope_free, txn_now);
+            if (EV_REDIS_MULTI == boundary) txn_now->multi = 1;
+            if ((!opens && boundary) || (!txn_now->multi
+                    && 0 == ascii_strcasecmp(argv[0], "unwatch"))) {
+                txn_now->closed = 1;
+                txn_unref(self->issued_txn);
+                self->issued_txn = NULL;
+            }
         }
     }
 
@@ -2499,6 +2757,7 @@ CODE:
         wt->argc = argc;
         wt->cb = SvREFCNT_inc(cb);
         wt->persist = persist;
+        wt->txn = txn_ref(txn_now);
         /* ev_now is stale outside ev_run and would expire the command early */
         ev_now_update(self->loop);
         wt->queued_at = ev_now(self->loop);
@@ -2517,6 +2776,7 @@ CODE:
         cbt->detached = 0;
         cbt->seq = ++self->cb_seq;
         cbt->persist = persist;
+        cbt->txn = txn_ref(txn_now);
         ngx_queue_init(&cbt->queue);
         ngx_queue_insert_tail(&self->cb_queue, &cbt->queue);
         if (!persist) self->pending_count++;
@@ -2538,14 +2798,27 @@ OUTPUT:
     RETVAL
 
 void
-reconnect(EV::Redis self, bool enable, sat_iv delay_ms = 1000, sat_iv max_attempts = 0);
+reconnect(EV::Redis self, bool enable, SV* delay_ms = NULL, SV* max_attempts = NULL);
 CODE:
 {
-    validate_timeout_ms(delay_ms, "reconnect_delay");
+    /* omitted restores the default; explicit undef keeps the current value */
+    if (NULL == delay_ms) {
+        self->reconnect_delay_ms = 1000;
+    }
+    else if (SvOK(delay_ms)) {
+        IV delay = sv_to_sat_iv(delay_ms);
+        validate_timeout_ms(delay, "reconnect_delay");
+        self->reconnect_delay_ms = (int)delay;
+    }
+    if (NULL == max_attempts) {
+        self->max_reconnect_attempts = 0;
+    }
+    else if (SvOK(max_attempts)) {
+        IV attempts = sv_to_sat_iv(max_attempts);
+        self->max_reconnect_attempts = attempts < 0 ? 0
+            : attempts > INT_MAX ? INT_MAX : (int)attempts;
+    }
     self->reconnect = enable ? 1 : 0;
-    self->reconnect_delay_ms = (int)delay_ms;
-    self->max_reconnect_attempts = max_attempts < 0 ? 0
-        : max_attempts > INT_MAX ? INT_MAX : (int)max_attempts;
     self->reconnect_attempts = 0;
 
     if (!enable) {
@@ -2817,7 +3090,8 @@ CODE:
          q = next) {
         next = ngx_queue_next(q);
         cbt = ngx_queue_data(q, ev_redis_cb_t, queue);
-        if (cbt->running || cbt->seq > issued_before) continue;
+        /* the monitor stream is not a pending command; the server has no off switch */
+        if (cbt->running || cbt->monitor || cbt->seq > issued_before) continue;
         ngx_queue_remove(q);
         ngx_queue_insert_tail(&local_queue, q);
     }

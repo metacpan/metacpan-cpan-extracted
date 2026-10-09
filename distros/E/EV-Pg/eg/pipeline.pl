@@ -8,7 +8,7 @@ my $conninfo = shift || $ENV{TEST_PG_CONNINFO} || 'dbname=postgres';
 
 my $pg; $pg = EV::Pg->new(
     conninfo => $conninfo,
-    on_error => sub { die "connection error: $_[0]\n" },
+    on_error => sub { warn "connection error: $_[0]\n"; EV::break },
     on_connect => sub {
         $pg->enter_pipeline;
 
@@ -17,7 +17,7 @@ my $pg; $pg = EV::Pg->new(
         for my $i (1 .. 100) {
             $pg->query_params('select $1::int * $1::int', [$i], sub {
                 my ($rows, $err) = @_;
-                die $err if $err;
+                if ($err) { warn $err; EV::break; return; }
                 push @results, $rows->[0][0];
             });
         }

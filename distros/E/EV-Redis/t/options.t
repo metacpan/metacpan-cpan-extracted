@@ -28,13 +28,34 @@ my %connect_info = $redis_server->connect_info;
         waiting_timeout => 100, resume_waiting_on_reconnect => 0, priority => 0,
         keepalive => 0, prefer_ipv6 => 1, tcp_user_timeout => 0, cloexec => 1,
         reuseaddr => 0, reconnect => 0, reconnect_delay => 10, max_reconnect_attempts => 1,
-        tls_verify => 1, on_error => sub {}, on_connect => sub {}, on_disconnect => sub {},
-        on_push => sub {}, loop => EV::default_loop);
+        (EV::Redis->has_ssl ? (tls => 1, tls_verify => 1) : ()),
+        on_error => sub {}, on_connect => sub {},
+        on_disconnect => sub {}, on_push => sub {}, loop => EV::default_loop);
     is_deeply \@warnings, [], 'documented options do not warn';
 
     { package EV::Redis::OptionsSubclass; our @ISA = ('EV::Redis'); }
     EV::Redis::OptionsSubclass->new(own_option => 1);
     is_deeply \@warnings, [], 'a subclass may pass options of its own';
+
+    @warnings = ();
+    EV::Redis->new(port => 6380);
+    is scalar(@warnings), 1, q{'port' without 'host' warns};
+    like $warnings[0], qr/'port' has no effect without 'host'/, '... saying so';
+
+    @warnings = ();
+    EV::Redis->new(path => $connect_info{sock}, port => 6380);
+    is scalar(@warnings), 1, q{'port' with 'path' warns};
+
+    @warnings = ();
+    EV::Redis->new(host => '127.0.0.1', port => 6380);
+    is_deeply [grep { /'port' has no effect/ } @warnings], [],
+        q{'port' with 'host' does not warn about the port};
+
+    @warnings = ();
+    EV::Redis->new(tls_ca => 'ca.pem', tls_verify => 1);
+    is scalar(@warnings), 1, 'TLS options without tls warn once';
+    like $warnings[0], qr/TLS options \(tls_ca tls_verify\) have no effect without 'tls'/,
+        '... naming them';
 }
 
 {

@@ -42,3 +42,8 @@ Revision history for Loo
 	- Add custom op name fallback for 5.10-5.12 via Perl_custom_op_name
 	  (legacy PL_custom_op_names only; XOP infrastructure doesn't exist)
 
+
+0.13	2026/10/08
+	- Fix build on 5.8: guard OP_DOR, OP_DORASSIGN and OP_SAY
+	- Fix build on 5.10.0: RX_PRECOMP and RX_PRELEN fallbacks
+	- Guard // tests so they parse on 5.8

@@ -88,6 +88,7 @@
 #define CB_CMD_MGETS_FENCE 16   /* NOOP fence in mgets */
 #define CB_CMD_SASL_LIST   17   /* sasl_list_mechs - return string */
 #define CB_CMD_SASL_AUTH   18   /* sasl_auth - return 1 on success */
+#define CB_CMD_AUTO_AUTH   19   /* internal SASL handshake */
 
 #define CLEAR_HANDLER(field) \
     do { if (NULL != (field)) { SvREFCNT_dec(field); (field) = NULL; } } while(0)
@@ -100,6 +101,11 @@
     } while(0)
 
 #define MC_MAX_VALUE_LEN 0x40000000  /* 1 GiB — wire length is u32 */
+
+/* An mget counts as one command in waiting_count: the fence counts,
+   its fan-out entries do not (mirroring pending_count's counted=0). */
+#define MC_WAIT_COUNTED(wt) \
+    ((wt)->cmd != CB_CMD_MGET_ENTRY && (wt)->cmd != CB_CMD_MGETS_ENTRY)
 
 /* ================================================================
  * Type declarations
@@ -124,9 +130,8 @@ struct ev_mc_cb_s {
     int quiet;            /* 1 = quiet variant, may not get response */
     int counted;          /* 1 = contributes to pending_count */
     int skipped;
-    HV *stats_hv;         /* for CB_CMD_STATS: accumulated hash */
-    HV *mget_results;     /* for CB_CMD_MGET_ENTRY: shared hash (borrowed) */
-                          /* for CB_CMD_MGET_FENCE: owned hash */
+    SV *response_data;    /* stats hash or mget fence error */
+    HV *mget_results;     /* owned ref, shared by the batch */
 };
 
 struct ev_mc_wait_s {
@@ -136,8 +141,8 @@ struct ev_mc_wait_s {
     int cmd;
     int quiet;
     uint32_t opaque;
-    HV *stats_hv;
-    HV *mget_results;     /* borrowed for MGET_ENTRY, owned for MGET_FENCE */
+    SV *response_data;
+    HV *mget_results;     /* owned ref, shared by the batch */
     int counted;
     int no_response;      /* 1: fire-and-forget, drain to wbuf only, no cb_queue entry */
     ngx_queue_t queue;
@@ -146,7 +151,7 @@ struct ev_mc_wait_s {
 
 struct ev_mc_s {
     unsigned int magic;
-    unsigned int conn_gen;    /* bumped by cleanup_connection: stale-session guard */
+    unsigned int conn_gen;    /* connection attempt/session generation */
     struct ev_loop *loop;
     SV *loop_sv;              /* held ref on a user-supplied EV::Loop (NULL = default) */
     int fd;
@@ -180,6 +185,9 @@ struct ev_mc_s {
     char *host;
     int port;
     char *path;
+    struct addrinfo *conn_addrs;  /* kept for async failover */
+    struct addrinfo *conn_next;
+    int conn_last_errno;          /* for the exhaustion message */
     int reconnect;
     int reconnect_delay_ms;
     int max_reconnect_attempts;
@@ -214,6 +222,7 @@ struct ev_mc_s {
     /* SASL auth */
     char *username;
     char *password;
+    int auth_pending;     /* auto-auth in flight: user commands stay queued */
 };
 
 /* ================================================================
@@ -252,14 +261,16 @@ static void schedule_reconnect(pTHX_ ev_mc_t *self);
 static void apply_keepalive(ev_mc_t *self);
 static void report_connect_error(pTHX_ ev_mc_t *self, const char *errbuf);
 static void finish_connect_success(pTHX_ ev_mc_t *self);
-static void mc_send_sasl_auth(pTHX_ ev_mc_t *self, SV *cb);
+static void mc_send_auto_auth(pTHX_ ev_mc_t *self);
 static void stop_connect_timer(ev_mc_t *self);
 static void stop_reconnect_timer(ev_mc_t *self);
 static void stop_waiting_timer(ev_mc_t *self);
+static void schedule_waiting_timer(ev_mc_t *self);
 static void send_next_waiting(pTHX_ ev_mc_t *self);
 static int check_destroyed(ev_mc_t *self);
 static void cancel_pending(pTHX_ ev_mc_t *self, SV *err_sv);
 static void cancel_waiting(pTHX_ ev_mc_t *self, SV *err_sv);
+static void splice_skip_queue(pTHX_ ev_mc_t *self);
 
 /* ================================================================
  * Binary protocol helpers (portable, no unaligned access)
@@ -513,23 +524,95 @@ static void emit_disconnect(pTHX_ ev_mc_t *self) {
 }
 
 static void apply_keepalive(ev_mc_t *self) {
-    if (self->keepalive <= 0 || self->path) return;
-    int one = 1;
+    if (self->path) return;
+    int one = self->keepalive > 0;
     setsockopt(self->fd, SOL_SOCKET, SO_KEEPALIVE, &one, sizeof(one));
 #ifdef TCP_KEEPIDLE
-    setsockopt(self->fd, IPPROTO_TCP, TCP_KEEPIDLE,
-               &self->keepalive, sizeof(self->keepalive));
+    if (one)
+        setsockopt(self->fd, IPPROTO_TCP, TCP_KEEPIDLE,
+                   &self->keepalive, sizeof(self->keepalive));
 #endif
+}
+
+/* Best-effort: failures are harmless */
+static void set_cloexec(int fd) {
+#ifdef FD_CLOEXEC
+    fcntl(fd, F_SETFD, FD_CLOEXEC);
+#else
+    (void)fd;
+#endif
+}
+
+static void free_conn_addrs(ev_mc_t *self) {
+    if (self->conn_addrs != NULL) {
+        freeaddrinfo(self->conn_addrs);
+        self->conn_addrs = NULL;
+        self->conn_next = NULL;
+    }
+}
+
+/* Try pending resolved addresses until one connects (immediately or in
+ * progress). Returns the fd, or -1 when the list is exhausted. On
+ * success the cursor stays at the in-progress address so an async
+ * refusal (surfaced later via SO_ERROR) can resume past it. */
+static int tcp_try_addrs(ev_mc_t *self, int *ret_out) {
+    struct addrinfo *rp;
+    int fd = -1, ret = -1;
+
+    for (rp = self->conn_next; rp != NULL; rp = rp->ai_next) {
+        int tfd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
+        if (tfd < 0) { self->conn_last_errno = errno; continue; }
+        set_cloexec(tfd);
+#ifdef SO_NOSIGPIPE
+        {   /* no MSG_NOSIGNAL on macOS/BSD */
+            int one_ns = 1;
+            setsockopt(tfd, SOL_SOCKET, SO_NOSIGPIPE, &one_ns, sizeof one_ns);
+        }
+#endif
+
+        /* non-blocking */
+        {
+            int fl = fcntl(tfd, F_GETFL);
+            if (fl < 0 || fcntl(tfd, F_SETFL, fl | O_NONBLOCK) < 0) {
+                self->conn_last_errno = errno;
+                close(tfd);
+                continue;
+            }
+        }
+
+        /* TCP_NODELAY */
+        {
+            int one = 1;
+            setsockopt(tfd, IPPROTO_TCP, TCP_NODELAY, &one, sizeof(one));
+        }
+
+        ret = connect(tfd, rp->ai_addr, rp->ai_addrlen);
+        if (ret == 0 || errno == EINPROGRESS) {
+            self->conn_next = rp;
+            self->conn_last_errno = errno;
+            fd = tfd;
+            break;
+        }
+        self->conn_last_errno = errno;
+        close(tfd);
+    }
+    if (fd < 0)
+        self->conn_next = NULL;
+    *ret_out = ret;
+    errno = self->conn_last_errno;
+    return fd;
 }
 
 /* Common tail for synchronous connect-failure paths in start_connect:
    emit error, run pending callbacks, and arm reconnect if configured.
    Caller returns immediately after invoking. */
 static void report_connect_error(pTHX_ ev_mc_t *self, const char *errbuf) {
+    unsigned int gen = self->conn_gen;
     self->callback_depth++;
     emit_error(aTHX_ self, errbuf);
     self->callback_depth--;
     if (check_destroyed(self)) return;
+    if (self->conn_gen != gen) return;
     if (!self->intentional_disconnect && self->reconnect) {
         schedule_reconnect(aTHX_ self);
     } else {
@@ -544,18 +627,21 @@ static void report_connect_error(pTHX_ ev_mc_t *self, const char *errbuf) {
 /* Shared post-connect-success path. Caller must already have set
    self->connected = 1 and stopped/initialized the io watchers. */
 static void finish_connect_success(pTHX_ ev_mc_t *self) {
-    self->reconnect_attempts = 0;
-
     start_reading(self);
-    apply_keepalive(self);
+    if (self->keepalive > 0) apply_keepalive(self);
 
     if (self->username && self->password) {
         /* Auto-auth: on_connect fires from the SASL_AUTH success path;
-           on failure the connection drops without it ever firing. */
-        mc_send_sasl_auth(aTHX_ self, NULL);
+           on failure the connection drops without it ever firing.
+           User commands queue until auth completes (auth_pending gates
+           can_send everywhere); without the gate they would hit the
+           wire pre-auth and the server would reject them. */
+        self->auth_pending = 1;
+        mc_send_auto_auth(aTHX_ self);
         return;
     }
 
+    self->reconnect_attempts = 0;
     emit_connect(aTHX_ self);
     if (check_destroyed(self)) return;
 
@@ -574,26 +660,27 @@ static ev_mc_cb_t* alloc_cbt(void) {
 
 static void cleanup_cbt(pTHX_ ev_mc_cb_t *cbt) {
     CLEAR_HANDLER(cbt->cb);
-    if (cbt->stats_hv) {
-        SvREFCNT_dec((SV*)cbt->stats_hv);
-        cbt->stats_hv = NULL;
+    if (cbt->response_data) {
+        SvREFCNT_dec(cbt->response_data);
+        cbt->response_data = NULL;
     }
-    if ((cbt->cmd == CB_CMD_MGET_FENCE || cbt->cmd == CB_CMD_MGETS_FENCE) && cbt->mget_results) {
+    if ((cbt->cmd == CB_CMD_MGET_FENCE || cbt->cmd == CB_CMD_MGETS_FENCE ||
+         cbt->cmd == CB_CMD_MGET_ENTRY || cbt->cmd == CB_CMD_MGETS_ENTRY) && cbt->mget_results) {
         SvREFCNT_dec((SV*)cbt->mget_results);
         cbt->mget_results = NULL;
     }
-    /* MGET_ENTRY has borrowed ref - don't decrement */
     Safefree(cbt);
 }
 
 static void cleanup_wait(pTHX_ ev_mc_wait_t *wt) {
     CLEAR_HANDLER(wt->cb);
     if (wt->packet) { Safefree(wt->packet); wt->packet = NULL; }
-    if (wt->stats_hv) {
-        SvREFCNT_dec((SV*)wt->stats_hv);
-        wt->stats_hv = NULL;
+    if (wt->response_data) {
+        SvREFCNT_dec(wt->response_data);
+        wt->response_data = NULL;
     }
-    if ((wt->cmd == CB_CMD_MGET_FENCE || wt->cmd == CB_CMD_MGETS_FENCE) && wt->mget_results) {
+    if ((wt->cmd == CB_CMD_MGET_FENCE || wt->cmd == CB_CMD_MGETS_FENCE ||
+         wt->cmd == CB_CMD_MGET_ENTRY || wt->cmd == CB_CMD_MGETS_ENTRY) && wt->mget_results) {
         SvREFCNT_dec((SV*)wt->mget_results);
         wt->mget_results = NULL;
     }
@@ -639,13 +726,16 @@ static void cancel_pending_list(pTHX_ ev_mc_t *self, ngx_queue_t *local, SV *err
         if (cbt->cb && !cbt->skipped) {
             invoke_cb(aTHX_ self, cbt->cb, NULL, newSVsv(err_sv));
             if (self->magic == MC_MAGIC_FREED) {
-                /* parked entries are invisible to free_all_queues */
+                /* parked entries are invisible to free_all_queues, and no
+                   strong ref survives to reenter: fire them, never drop */
                 cleanup_cbt(aTHX_ cbt);
                 while (!ngx_queue_empty(local)) {
                     ngx_queue_t *r = ngx_queue_head(local);
                     ev_mc_cb_t *rest = ngx_queue_data(r, ev_mc_cb_t, queue);
                     ngx_queue_remove(r);
                     if (rest->counted) { rest->counted = 0; }
+                    if (!PL_dirty && rest->cb && !rest->skipped)
+                        invoke_cb(aTHX_ self, rest->cb, NULL, newSVsv(err_sv));
                     cleanup_cbt(aTHX_ rest);
                 }
                 return;
@@ -671,6 +761,21 @@ static void cancel_pending(pTHX_ ev_mc_t *self, SV *err_sv) {
     self->in_cb_cleanup = 0;
 }
 
+/* Splice the live cb_queue after the session died under skip_pending:
+ * skipped ghosts freed silently, unskipped failed; leftovers would
+ * poison the next session's opaque matching. */
+static void splice_skip_queue(pTHX_ ev_mc_t *self) {
+    while (!ngx_queue_empty(&self->cb_queue)) {
+        ngx_queue_t *q = ngx_queue_head(&self->cb_queue);
+        ev_mc_cb_t *cbt = ngx_queue_data(q, ev_mc_cb_t, queue);
+        ngx_queue_remove(q);
+        if (cbt->counted) { self->pending_count--; cbt->counted = 0; }
+        if (!PL_dirty && !cbt->skipped && cbt->cb)
+            invoke_cb(aTHX_ self, cbt->cb, NULL, newSVsv(err_disconnected));
+        cleanup_cbt(aTHX_ cbt);
+    }
+}
+
 /* skip_pending: mark + detach first (no Perl calls, queue immutable),
    then fire the detached callbacks. Entries stay on cb_queue so their
    late responses are consumed by FIFO opaque matching and discarded;
@@ -687,6 +792,10 @@ static void skip_pending_impl(pTHX_ ev_mc_t *self, SV *err_sv) {
         ev_mc_cb_t *cbt = ngx_queue_data(q, ev_mc_cb_t, queue);
         q = ngx_queue_next(q);
         if (cbt->skipped) continue;
+        /* internal auto-auth is never user-skippable: its response
+           must still lift the auth gate */
+        if (cbt->cmd == CB_CMD_AUTO_AUTH)
+            continue;
         cbt->skipped = 1;
         if (cbt->counted) { self->pending_count--; cbt->counted = 0; }
         if (cbt->cb) {
@@ -705,11 +814,26 @@ static void skip_pending_impl(pTHX_ ev_mc_t *self, SV *err_sv) {
     for (i = 0; i < n; i++) {
         invoke_cb(aTHX_ self, cbs[i], NULL, newSVsv(err_sv));
         SvREFCNT_dec(cbs[i]);
-        if (self->magic == MC_MAGIC_FREED || self->conn_gen != gen) {
-            /* queue torn down by the callback: release the rest */
-            for (i++; i < n; i++) SvREFCNT_dec(cbs[i]);
+        if (self->magic == MC_MAGIC_FREED)
             break;
+        if (self->conn_gen != gen) {
+            /* nested teardown dropped wbuf bytes: ghosts must not
+               survive into the next session; re-baseline and continue
+               so the remaining detached callbacks still fire. */
+            splice_skip_queue(aTHX_ self);
+            if (self->magic == MC_MAGIC_FREED)
+                break;
+            gen = self->conn_gen;
         }
+    }
+    if (self->magic == MC_MAGIC_FREED && !PL_dirty) {
+        /* nested DESTROY: the detached remainder still fires once each */
+        for (i++; i < n; i++) {
+            invoke_cb(aTHX_ self, cbs[i], NULL, newSVsv(err_sv));
+            SvREFCNT_dec(cbs[i]);
+        }
+    } else if (self->magic == MC_MAGIC_FREED) {
+        for (i++; i < n; i++) SvREFCNT_dec(cbs[i]);
     }
     Safefree(cbs);
     self->in_cb_cleanup = 0;
@@ -720,17 +844,20 @@ static void cancel_waiting_list(pTHX_ ev_mc_t *self, ngx_queue_t *local, SV *err
         ngx_queue_t *q = ngx_queue_head(local);
         ev_mc_wait_t *wt = ngx_queue_data(q, ev_mc_wait_t, queue);
         ngx_queue_remove(q);
-        self->waiting_count--;
+        if (MC_WAIT_COUNTED(wt)) self->waiting_count--;
 
         if (wt->cb) {
             invoke_cb(aTHX_ self, wt->cb, NULL, newSVsv(err_sv));
             if (self->magic == MC_MAGIC_FREED) {
                 cleanup_wait(aTHX_ wt);
-                /* parked entries are invisible to free_all_queues */
+                /* parked entries are invisible to free_all_queues, and no
+                   strong ref survives to reenter: fire them, never drop */
                 while (!ngx_queue_empty(local)) {
                     ngx_queue_t *r = ngx_queue_head(local);
                     ev_mc_wait_t *rest = ngx_queue_data(r, ev_mc_wait_t, queue);
                     ngx_queue_remove(r);
+                    if (!PL_dirty && rest->cb)
+                        invoke_cb(aTHX_ self, rest->cb, NULL, newSVsv(err_sv));
                     cleanup_wait(aTHX_ rest);
                 }
                 return;
@@ -776,9 +903,11 @@ static void cleanup_connection(pTHX_ ev_mc_t *self) {
         close(self->fd);
         self->fd = -1;
     }
+    free_conn_addrs(self);
 
     self->connected = 0;
     self->connecting = 0;
+    self->auth_pending = 0;
     self->rbuf_len = 0;
     self->wbuf_len = 0;
     self->wbuf_off = 0;
@@ -786,6 +915,7 @@ static void cleanup_connection(pTHX_ ev_mc_t *self) {
 
 static void handle_disconnect(pTHX_ ev_mc_t *self, const char *reason) {
     int was_connected = self->connected;
+    int was_connecting = self->connecting;
 
     cleanup_connection(aTHX_ self);
 
@@ -823,12 +953,15 @@ static void handle_disconnect(pTHX_ ev_mc_t *self, const char *reason) {
     }
     if (haveW) {
         if (self->magic == MC_MAGIC_FREED) {
-            /* died during the pending drain: free parked entries silently */
+            /* died during the pending drain: parked entries are
+               invisible to free_all_queues, so fire them here */
             while (!ngx_queue_empty(&localW)) {
                 ngx_queue_t *q = ngx_queue_head(&localW);
                 ev_mc_wait_t *wt = ngx_queue_data(q, ev_mc_wait_t, queue);
                 ngx_queue_remove(q);
-                self->waiting_count--;
+                if (MC_WAIT_COUNTED(wt)) self->waiting_count--;
+                if (!PL_dirty && wt->cb)
+                    invoke_cb(aTHX_ self, wt->cb, NULL, newSVsv(err_disconnected));
                 cleanup_wait(aTHX_ wt);
             }
         } else {
@@ -838,7 +971,10 @@ static void handle_disconnect(pTHX_ ev_mc_t *self, const char *reason) {
     }
     if (self->magic == MC_MAGIC_FREED) return;
 
-    if (was_connected) {
+    /* An intentional teardown always signals completion, even when it
+       only cancels an in-progress connect; failed attempts stay silent
+       here (they report via on_error instead). */
+    if (was_connected || (was_connecting && self->intentional_disconnect)) {
         emit_disconnect(aTHX_ self);
         if (check_destroyed(self)) return;
     }
@@ -851,6 +987,8 @@ static void handle_disconnect(pTHX_ ev_mc_t *self, const char *reason) {
     if (!self->intentional_disconnect && self->reconnect) {
         schedule_reconnect(aTHX_ self);
     }
+    if (self->magic == MC_MAGIC_ALIVE)
+        schedule_waiting_timer(self);
 }
 
 /* ================================================================
@@ -858,13 +996,16 @@ static void handle_disconnect(pTHX_ ev_mc_t *self, const char *reason) {
  * ================================================================ */
 
 static void schedule_reconnect(pTHX_ ev_mc_t *self) {
+    if (self->magic != MC_MAGIC_ALIVE || self->intentional_disconnect ||
+        self->connected || self->connecting) return;
     if (self->reconnect_timer_active) return;
     if (self->max_reconnect_attempts > 0 &&
         self->reconnect_attempts >= self->max_reconnect_attempts) {
         /* giving up for good: the waiting queue must not hang forever */
+        unsigned int gen = self->conn_gen;
         self->callback_depth++;
         emit_error(aTHX_ self, "max reconnect attempts reached");
-        if (self->magic != MC_MAGIC_FREED)
+        if (self->magic != MC_MAGIC_FREED && self->conn_gen == gen)
             cancel_waiting(aTHX_ self, err_disconnected);
         self->callback_depth--;
         check_destroyed(self);
@@ -949,9 +1090,8 @@ static void cmd_timeout_cb(EV_P_ ev_timer *w, int revents) {
     check_destroyed(self);
 }
 
-/* Send SASL PLAIN auth. If cb is NULL, creates an internal callback
- * that disconnects on auth failure. */
-static void mc_send_sasl_auth(pTHX_ ev_mc_t *self, SV *cb) {
+/* Internal SASL PLAIN handshake, ahead of waiting user commands. */
+static void mc_send_auto_auth(pTHX_ ev_mc_t *self) {
     if (!self->username || !self->password) return;
 
     size_t ulen = strlen(self->username);
@@ -965,7 +1105,7 @@ static void mc_send_sasl_auth(pTHX_ ev_mc_t *self, SV *cb) {
     memcpy(authdata + 2 + ulen, self->password, plen);
 
     mc_enqueue_cmd(aTHX_ self, MC_OP_SASL_AUTH, "PLAIN", 5,
-                   authdata, vlen, NULL, 0, 0, CB_CMD_SASL_AUTH, 0, cb);
+                   authdata, vlen, NULL, 0, 0, CB_CMD_AUTO_AUTH, 0, NULL);
     Safefree(authdata);
 }
 
@@ -999,20 +1139,18 @@ static void reconnect_timer_cb(EV_P_ ev_timer *w, int revents) {
  * Flow control: waiting timer
  * ================================================================ */
 
-static void schedule_waiting_timer(ev_mc_t *self);
-
 static void expire_waiting_commands(pTHX_ ev_mc_t *self) {
     ev_tstamp now = ev_now(self->loop);
-    ev_tstamp timeout = (ev_tstamp)self->waiting_timeout_ms / 1000.0;
 
-    while (!ngx_queue_empty(&self->wait_queue)) {
+    while (!ngx_queue_empty(&self->wait_queue) && self->waiting_timeout_ms > 0) {
+        ev_tstamp timeout = (ev_tstamp)self->waiting_timeout_ms / 1000.0;
         ngx_queue_t *q = ngx_queue_head(&self->wait_queue);
         ev_mc_wait_t *wt = ngx_queue_data(q, ev_mc_wait_t, queue);
 
         if (wt->queued_at + timeout > now) break; /* not expired yet */
 
         ngx_queue_remove(q);
-        self->waiting_count--;
+        if (MC_WAIT_COUNTED(wt)) self->waiting_count--;
 
         if (wt->cb) {
             invoke_cb(aTHX_ self, wt->cb, NULL, newSVsv(err_waiting_timeout));
@@ -1063,19 +1201,19 @@ static void schedule_waiting_timer(ev_mc_t *self) {
  * ================================================================ */
 
 static void send_next_waiting(pTHX_ ev_mc_t *self) {
-    while (!ngx_queue_empty(&self->wait_queue) && self->connected) {
+    while (!ngx_queue_empty(&self->wait_queue) && self->connected &&
+           !self->auth_pending) {
         ngx_queue_t *q = ngx_queue_head(&self->wait_queue);
         ev_mc_wait_t *wt = ngx_queue_data(q, ev_mc_wait_t, queue);
 
-        /* max_pending gates only counted entries; mc_enqueue_cmd uses the
-           same exception (|| !counted). Fire-and-forget (no_response) and
-           mget GETKQ entries are uncounted and must not be blocked. */
+        /* Uncounted mget entries are held too, so a batch never
+           leaves without its fence. */
         if (self->max_pending > 0 && self->pending_count >= self->max_pending
-            && !wt->no_response && wt->counted)
+            && !wt->no_response)
             break;
 
         ngx_queue_remove(q);
-        self->waiting_count--;
+        if (MC_WAIT_COUNTED(wt)) self->waiting_count--;
 
         /* Append packet to write buffer */
         buf_append_write(self, wt->packet, wt->packet_len);
@@ -1087,11 +1225,12 @@ static void send_next_waiting(pTHX_ ev_mc_t *self) {
             cbt->cmd = wt->cmd;
             cbt->quiet = wt->quiet;
             cbt->counted = wt->counted;
-            cbt->stats_hv = wt->stats_hv; wt->stats_hv = NULL;
+            cbt->response_data = wt->response_data; wt->response_data = NULL;
             cbt->mget_results = wt->mget_results; wt->mget_results = NULL;
             ngx_queue_insert_tail(&self->cb_queue, &cbt->queue);
             if (cbt->counted) self->pending_count++;
-            arm_cmd_timer(self);
+            if (self->command_timeout_ms > 0 && !self->cmd_timer_active)
+                arm_cmd_timer(self);
         }
 
         Safefree(wt->packet);
@@ -1149,7 +1288,7 @@ static void mc_fire_and_forget(pTHX_ ev_mc_t *self,
     uint32_t body_len = extras_len + (uint32_t)key_len + (uint32_t)value_len;
     size_t packet_len = MC_HEADER_SIZE + body_len;
 
-    if (self->connected) {
+    if (self->connected && !self->auth_pending && ngx_queue_empty(&self->wait_queue)) {
         buf_ensure_write(self, packet_len);
         mc_pack(self->wbuf + self->wbuf_len, opcode,
                 key, (uint16_t)key_len, value, (uint32_t)value_len,
@@ -1195,8 +1334,11 @@ static uint32_t mc_enqueue_cmd(pTHX_ ev_mc_t *self,
     int counted = (cmd != CB_CMD_MGET_ENTRY && cmd != CB_CMD_MGETS_ENTRY);
 
     /* Check if we can send immediately */
-    int can_send = self->connected &&
+    int can_send = self->connected && !self->auth_pending &&
+        ngx_queue_empty(&self->wait_queue) &&
         (self->max_pending <= 0 || self->pending_count < self->max_pending || !counted);
+    if (!can_send && cmd == CB_CMD_AUTO_AUTH && self->connected)
+        can_send = 1;
 
     if (can_send) {
         buf_ensure_write(self, packet_len);
@@ -1212,12 +1354,13 @@ static uint32_t mc_enqueue_cmd(pTHX_ ev_mc_t *self,
         cbt->quiet = quiet;
         cbt->counted = counted;
         if (cmd == CB_CMD_STATS) {
-            cbt->stats_hv = newHV();
+            cbt->response_data = (SV*)newHV();
         }
         ngx_queue_insert_tail(&self->cb_queue, &cbt->queue);
         if (counted) self->pending_count++;
 
-        arm_cmd_timer(self);
+        if (self->command_timeout_ms > 0 && !self->cmd_timer_active)
+            arm_cmd_timer(self);
         start_writing(self);
     } else {
         /* Queue for later */
@@ -1236,11 +1379,12 @@ static uint32_t mc_enqueue_cmd(pTHX_ ev_mc_t *self,
         wt->counted = counted;
         wt->queued_at = ev_now(self->loop);
         if (cmd == CB_CMD_STATS) {
-            wt->stats_hv = newHV();
+            wt->response_data = (SV*)newHV();
         }
 
         ngx_queue_insert_tail(&self->wait_queue, &wt->queue);
-        self->waiting_count++;
+        if (cmd != CB_CMD_MGET_ENTRY && cmd != CB_CMD_MGETS_ENTRY)
+            self->waiting_count++;
 
         if (self->waiting_timeout_ms > 0)
             schedule_waiting_timer(self);
@@ -1285,6 +1429,9 @@ static void mc_enqueue_mget(pTHX_ ev_mc_t *self, AV *keys_av, SV *cb, int full_i
     }
 
     HV *results = newHV();
+    int can_send = self->connected && !self->auth_pending &&
+        ngx_queue_empty(&self->wait_queue) &&
+        (self->max_pending <= 0 || self->pending_count < self->max_pending);
 
     for (i = 0; i < count; i++) {
         SV **sv = av_fetch(keys_av, i, 0);
@@ -1296,8 +1443,6 @@ static void mc_enqueue_mget(pTHX_ ev_mc_t *self, AV *keys_av, SV *cb, int full_i
         uint32_t opaque = mc_next_opaque(self);
         uint32_t body_len = (uint32_t)key_len;
         size_t packet_len = MC_HEADER_SIZE + body_len;
-
-        int can_send = self->connected;
 
         if (can_send) {
             buf_ensure_write(self, packet_len);
@@ -1312,6 +1457,7 @@ static void mc_enqueue_mget(pTHX_ ev_mc_t *self, AV *keys_av, SV *cb, int full_i
             cbt->quiet = 1;
             cbt->counted = 0;
             cbt->mget_results = results;
+            SvREFCNT_inc_simple_void_NN((SV*)results);
             ngx_queue_insert_tail(&self->cb_queue, &cbt->queue);
         } else {
             ev_mc_wait_t *wt;
@@ -1325,9 +1471,10 @@ static void mc_enqueue_mget(pTHX_ ev_mc_t *self, AV *keys_av, SV *cb, int full_i
             wt->quiet = 1;
             wt->counted = 0;
             wt->mget_results = results;
+            SvREFCNT_inc_simple_void_NN((SV*)results);
             wt->queued_at = ev_now(self->loop);
             ngx_queue_insert_tail(&self->wait_queue, &wt->queue);
-            self->waiting_count++;
+            /* entries do not count: the fence below counts as the command */
         }
     }
 
@@ -1335,8 +1482,6 @@ static void mc_enqueue_mget(pTHX_ ev_mc_t *self, AV *keys_av, SV *cb, int full_i
     {
         uint32_t opaque = mc_next_opaque(self);
         size_t packet_len = MC_HEADER_SIZE;
-        int can_send = self->connected;
-
         if (can_send) {
             buf_ensure_write(self, packet_len);
             char *p = self->wbuf + self->wbuf_len;
@@ -1354,7 +1499,8 @@ static void mc_enqueue_mget(pTHX_ ev_mc_t *self, AV *keys_av, SV *cb, int full_i
             ngx_queue_insert_tail(&self->cb_queue, &cbt->queue);
             self->pending_count++;
 
-            arm_cmd_timer(self);
+            if (self->command_timeout_ms > 0 && !self->cmd_timer_active)
+                arm_cmd_timer(self);
             start_writing(self);
         } else {
             ev_mc_wait_t *wt;
@@ -1375,8 +1521,8 @@ static void mc_enqueue_mget(pTHX_ ev_mc_t *self, AV *keys_av, SV *cb, int full_i
         }
     }
 
-    /* results starts with refcnt=1, fence owns +1 = total 2.
-     * Drop our initial ref, fence now owns it (refcnt=1) */
+    /* results starts with refcnt=1, every entry and the fence own +1.
+     * Drop our initial ref; the batch now owns it outright. */
     SvREFCNT_dec((SV*)results);
 
     if (self->waiting_timeout_ms > 0)
@@ -1416,6 +1562,30 @@ static void drain_quiet_before(pTHX_ ev_mc_t *self, uint32_t opaque) {
     }
 }
 
+/* The first entry error fails the batch. Its remaining entries are
+ * marked skipped on the way to the fence, so later replies cost O(1). */
+static void record_mget_error(pTHX_ ev_mc_t *self, HV *results,
+    uint16_t status, const char *value, uint32_t value_len)
+{
+    ngx_queue_t *q;
+    for (q = ngx_queue_head(&self->cb_queue);
+         q != ngx_queue_sentinel(&self->cb_queue); q = ngx_queue_next(q)) {
+        ev_mc_cb_t *f = ngx_queue_data(q, ev_mc_cb_t, queue);
+        if (f->mget_results != results)
+            continue;
+        if (f->cmd == CB_CMD_MGET_FENCE || f->cmd == CB_CMD_MGETS_FENCE) {
+            if (!f->response_data) {
+                const char *errstr = mc_status_str(status);
+                f->response_data = value_len
+                    ? newSVpvf("%s: %.*s", errstr, (int)value_len, value)
+                    : newSVpv(errstr, 0);
+            }
+            return;
+        }
+        f->skipped = 1;
+    }
+}
+
 static void handle_response_packet(pTHX_ ev_mc_t *self) {
     const char *pkt = self->rbuf;
     uint16_t key_len = mc_read_u16(pkt + 2);
@@ -1437,9 +1607,12 @@ static void handle_response_packet(pTHX_ ev_mc_t *self) {
     const char *value_ptr = body + extras_len + key_len;
     uint32_t value_len = body_len - extras_len - key_len;
 
-    /* Drain quiet entries that were skipped (no response) */
-    drain_quiet_before(aTHX_ self, opaque);
-    if (self->magic == MC_MAGIC_FREED) return;
+    /* Drain quiet entries that were skipped (no response). Opaque 0
+       (fire-and-forget error) is out of band and orders nothing. */
+    if (opaque != 0) {
+        drain_quiet_before(aTHX_ self, opaque);
+        if (self->magic == MC_MAGIC_FREED) return;
+    }
 
     /* Find matching callback entry */
     if (ngx_queue_empty(&self->cb_queue)) {
@@ -1462,8 +1635,8 @@ static void handle_response_packet(pTHX_ ev_mc_t *self) {
 
     /* STAT accumulation: don't remove from queue until terminator */
     if (cbt->cmd == CB_CMD_STATS && status == MC_STATUS_OK && key_len > 0) {
-        if (cbt->stats_hv) {
-            hv_store(cbt->stats_hv, key_ptr, key_len,
+        if (cbt->response_data) {
+            hv_store((HV*)cbt->response_data, key_ptr, key_len,
                      newSVpvn(value_ptr, value_len), 0);
         }
         return; /* wait for more stats or terminator */
@@ -1483,30 +1656,20 @@ static void handle_response_packet(pTHX_ ev_mc_t *self) {
                 invoke_cb(aTHX_ self, cbt->cb, NULL, NULL);
         }
         else if (cbt->cmd == CB_CMD_MGET_ENTRY || cbt->cmd == CB_CMD_MGETS_ENTRY) {
-            /* mget miss — nothing to add */
+            if (status != MC_STATUS_KEY_NOT_FOUND && !cbt->skipped)
+                record_mget_error(aTHX_ self, cbt->mget_results, status, value_ptr, value_len);
         }
-        /* SASL auth failure: disconnect (auto-auth) or report to callback */
-        else if (cbt->cmd == CB_CMD_SASL_AUTH) {
-            if (cbt->cb && !cbt->skipped) {
-                const char *errstr = mc_status_str(status);
-                if (value_len > 0)
-                    invoke_cb(aTHX_ self, cbt->cb, NULL,
-                        newSVpvf("%s: %.*s", errstr, (int)value_len, value_ptr));
-                else
-                    invoke_cb(aTHX_ self, cbt->cb, NULL, newSVpv(errstr, 0));
-            } else if (!cbt->cb) {
-                /* Auto-auth failed — disconnect with error */
-                char errbuf[256];
-                if (value_len > 0)
-                    snprintf(errbuf, sizeof(errbuf), "SASL auth failed: %.*s",
-                             (int)value_len, value_ptr);
-                else
-                    snprintf(errbuf, sizeof(errbuf), "SASL auth failed: %s",
-                             mc_status_str(status));
-                cleanup_cbt(aTHX_ cbt);
-                handle_disconnect(aTHX_ self, errbuf);
-                return;
-            }
+        else if (cbt->cmd == CB_CMD_AUTO_AUTH) {
+            char errbuf[256];
+            if (value_len > 0)
+                snprintf(errbuf, sizeof(errbuf), "SASL auth failed: %.*s",
+                         (int)value_len, value_ptr);
+            else
+                snprintf(errbuf, sizeof(errbuf), "SASL auth failed: %s",
+                         mc_status_str(status));
+            cleanup_cbt(aTHX_ cbt);
+            handle_disconnect(aTHX_ self, errbuf);
+            return;
         }
         else {
             /* Real error */
@@ -1584,21 +1747,21 @@ static void handle_response_packet(pTHX_ ev_mc_t *self) {
         break;
 
     case CB_CMD_SASL_AUTH:
-        if (cbt->cb) {
+        if (cbt->cb)
             invoke_cb(aTHX_ self, cbt->cb, newSViv(1), NULL);
-        } else {
-            /* Auto-auth completed: the connection is now fully
-               established — fire on_connect before the common tail
-               drains the wait queue. */
-            emit_connect(aTHX_ self);
-        }
+        break;
+
+    case CB_CMD_AUTO_AUTH:
+        self->auth_pending = 0;
+        self->reconnect_attempts = 0;
+        emit_connect(aTHX_ self);
         break;
 
     case CB_CMD_STATS:
         /* Terminator (key_len==0): deliver accumulated stats */
-        if (cbt->cb && cbt->stats_hv) {
-            SV *rv = newRV_noinc((SV*)cbt->stats_hv);
-            cbt->stats_hv = NULL; /* transferred ownership */
+        if (cbt->cb && cbt->response_data) {
+            SV *rv = newRV_noinc(cbt->response_data);
+            cbt->response_data = NULL; /* transferred ownership */
             invoke_cb(aTHX_ self, cbt->cb, rv, NULL);
         }
         break;
@@ -1625,9 +1788,15 @@ static void handle_response_packet(pTHX_ ev_mc_t *self) {
     case CB_CMD_MGET_FENCE:
     case CB_CMD_MGETS_FENCE:
         if (cbt->cb && cbt->mget_results) {
-            SV *rv = newRV_noinc((SV*)cbt->mget_results);
-            cbt->mget_results = NULL;
-            invoke_cb(aTHX_ self, cbt->cb, rv, NULL);
+            if (cbt->response_data) {
+                SV *err = cbt->response_data;
+                cbt->response_data = NULL;
+                invoke_cb(aTHX_ self, cbt->cb, NULL, err);
+            } else {
+                SV *rv = newRV_noinc((SV*)cbt->mget_results);
+                cbt->mget_results = NULL;
+                invoke_cb(aTHX_ self, cbt->cb, rv, NULL);
+            }
         }
         break;
     }
@@ -1650,8 +1819,7 @@ static void process_responses(pTHX_ ev_mc_t *self) {
         }
 
         uint32_t body_len = mc_read_u32(self->rbuf + 8);
-        /* Sanity bound: memcached's hard limit is 128 MB; cap at 256 MB to
-           catch garbage/MITM responses without rejecting any real reply.
+        /* Sanity bound: cap at 256 MB to catch garbage responses.
            Also avoids size_t overflow on 32-bit perls when MC_HEADER_SIZE
            is added below. */
         if (body_len > 0x10000000u) {
@@ -1740,11 +1908,37 @@ static void on_connect_complete(pTHX_ ev_mc_t *self) {
     int err = 0;
     socklen_t len = sizeof(err);
     if (getsockopt(self->fd, SOL_SOCKET, SO_ERROR, &err, &len) < 0 || err != 0) {
+        /* Async refusal: fail over to the next resolved address, if any.
+           The connect timer keeps running across attempts (total timeout). */
+        if (self->conn_next != NULL && self->conn_next->ai_next != NULL) {
+            int ret2, nfd;
+            self->conn_next = self->conn_next->ai_next;
+            close(self->fd);
+            self->fd = -1;
+            stop_writing(self);
+            nfd = tcp_try_addrs(self, &ret2);
+            (void)ret2;  /* immediate and in-progress wire identically here */
+            if (nfd >= 0) {
+                self->fd = nfd;
+                ev_io_init(&self->rio, io_cb, self->fd, EV_READ);
+                self->rio.data = (void *)self;
+                ev_io_init(&self->wio, io_cb, self->fd, EV_WRITE);
+                self->wio.data = (void *)self;
+                ev_set_priority(&self->rio, self->priority);
+                ev_set_priority(&self->wio, self->priority);
+                start_writing(self);
+                return;
+            }
+        }
+        free_conn_addrs(self);
+
         char errbuf[128];
         snprintf(errbuf, sizeof(errbuf), "connect failed: %s",
                  strerror(err ? err : errno));
-        close(self->fd);
-        self->fd = -1;
+        if (self->fd >= 0) {
+            close(self->fd);
+            self->fd = -1;
+        }
         self->connecting = 0;
         stop_writing(self);
         stop_connect_timer(self);
@@ -1755,6 +1949,7 @@ static void on_connect_complete(pTHX_ ev_mc_t *self) {
 
     self->connecting = 0;
     self->connected = 1;
+    free_conn_addrs(self);
 
     stop_writing(self);
     stop_connect_timer(self);
@@ -1807,6 +2002,7 @@ static void io_cb(EV_P_ ev_io *w, int revents) {
 
 static void start_connect(pTHX_ ev_mc_t *self) {
     int fd, ret;
+    self->conn_gen++;
 
     if (self->path) {
         /* Unix socket */
@@ -1814,7 +2010,7 @@ static void start_connect(pTHX_ ev_mc_t *self) {
         memset(&addr, 0, sizeof(addr));
         addr.sun_family = AF_UNIX;
         if (strlen(self->path) >= sizeof(addr.sun_path)) {
-            emit_error(aTHX_ self, "unix socket path too long");
+            report_connect_error(aTHX_ self, "unix socket path too long");
             return;
         }
         strncpy(addr.sun_path, self->path, sizeof(addr.sun_path) - 1);
@@ -1826,6 +2022,7 @@ static void start_connect(pTHX_ ev_mc_t *self) {
             report_connect_error(aTHX_ self, errbuf);
             return;
         }
+        set_cloexec(fd);
 #ifdef SO_NOSIGPIPE
         {   /* no MSG_NOSIGNAL on macOS/BSD */
             int one_ns = 1;
@@ -1863,41 +2060,26 @@ static void start_connect(pTHX_ ev_mc_t *self) {
             return;
         }
 
-        fd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+        /* Every resolved address is tried in turn: the first one may be
+           an unreachable family (e.g. localhost -> ::1 first against a
+           v4-only server). Refusals that surface asynchronously (via
+           SO_ERROR) resume from the cursor in on_connect_complete. */
+        self->conn_addrs = res;
+        self->conn_next = res;
+        self->conn_last_errno = 0;
+        fd = tcp_try_addrs(self, &ret);
         if (fd < 0) {
-            freeaddrinfo(res);
+            free_conn_addrs(self);
             char errbuf[128];
-            snprintf(errbuf, sizeof(errbuf), "socket: %s", strerror(errno));
+            if (self->conn_last_errno == 0)
+                snprintf(errbuf, sizeof(errbuf), "connect: no usable address");
+            else
+                snprintf(errbuf, sizeof(errbuf), "connect: %s",
+                         strerror(self->conn_last_errno));
             report_connect_error(aTHX_ self, errbuf);
             return;
         }
-#ifdef SO_NOSIGPIPE
-        {   /* no MSG_NOSIGNAL on macOS/BSD */
-            int one_ns = 1;
-            setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, &one_ns, sizeof one_ns);
-        }
-#endif
-
-        /* non-blocking */
-        {
-            int fl = fcntl(fd, F_GETFL);
-            if (fl < 0 || fcntl(fd, F_SETFL, fl | O_NONBLOCK) < 0) {
-                freeaddrinfo(res);
-                close(fd);
-                report_connect_error(aTHX_ self, "fcntl O_NONBLOCK failed");
-                return;
-            }
-        }
-
-        /* TCP_NODELAY */
-        {
-            int one = 1;
-            setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &one, sizeof(one));
-        }
-
         self->fd = fd;
-        ret = connect(fd, res->ai_addr, res->ai_addrlen);
-        freeaddrinfo(res);
     }
 
     if (ret == 0) {
@@ -2034,7 +2216,12 @@ CODE:
         else if (strEQ(k, "connect_timeout"))        RETVAL->connect_timeout_ms = SvIV(v);
         else if (strEQ(k, "command_timeout"))        RETVAL->command_timeout_ms = SvIV(v);
         else if (strEQ(k, "resume_waiting_on_reconnect")) RETVAL->resume_waiting_on_reconnect = SvTRUE(v) ? 1 : 0;
-        else if (strEQ(k, "priority"))               RETVAL->priority = SvIV(v);
+        else if (strEQ(k, "priority")) {
+            int pri = SvIV(v);
+            if (pri < -2) pri = -2;
+            if (pri > 2) pri = 2;
+            RETVAL->priority = pri;
+        }
         else if (strEQ(k, "keepalive"))              RETVAL->keepalive = SvIV(v);
         else if (strEQ(k, "reconnect"))              do_reconnect = SvTRUE(v) ? 1 : 0;
         else if (strEQ(k, "reconnect_delay"))        reconnect_delay = SvIV(v);
@@ -2100,6 +2287,9 @@ CODE:
            global destruction, calling into Perl is unsafe: free silently. */
         if (!PL_dirty) {
             cancel_pending(aTHX_ self, err_disconnected);
+            /* an outer drain owns only its snapshot: what its callbacks
+               queued since sits on the live queue and must fail here */
+            self->in_wait_cleanup = 0;
             cancel_waiting(aTHX_ self, err_disconnected);
         }
 
@@ -2113,6 +2303,13 @@ CODE:
         stop_reconnect_timer(self);
         stop_waiting_timer(self);
         if (self->fd >= 0) { close(self->fd); self->fd = -1; }
+        free_conn_addrs(self);
+
+        /* A skip in progress owns the live cb_queue (cancel_pending
+           above no-op'd on its flag): splice it so fresh stranded
+           commands fire instead of being dropped silently. */
+        if (!PL_dirty && self->in_cb_cleanup)
+            splice_skip_queue(aTHX_ self);
 
         /* Clean up queues without invoking Perl callbacks */
         free_all_queues(aTHX_ self);
@@ -2600,7 +2797,7 @@ CODE:
         self->max_pending = SvIV(ST(1));
         if (self->max_pending < 0) self->max_pending = 0;
         /* If limit increased, drain waiting queue */
-        if (self->connected && self->max_pending > old)
+        if (self->connected && (self->max_pending == 0 || self->max_pending > old))
             send_next_waiting(aTHX_ self);
     }
     RETVAL = self->max_pending;
@@ -2615,9 +2812,8 @@ CODE:
     if (items > 1) {
         self->waiting_timeout_ms = SvIV(ST(1));
         if (self->waiting_timeout_ms < 0) self->waiting_timeout_ms = 0;
-        if (self->waiting_timeout_ms == 0)
-            stop_waiting_timer(self);
-        else if (!ngx_queue_empty(&self->wait_queue))
+        stop_waiting_timer(self);
+        if (self->waiting_timeout_ms > 0 && !ngx_queue_empty(&self->wait_queue))
             schedule_waiting_timer(self);
     }
     RETVAL = self->waiting_timeout_ms;

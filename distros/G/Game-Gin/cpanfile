@@ -4,6 +4,11 @@ requires 'perl', '5.010';
 # non-core prerequisite: Digest::SHA is core and is all the deal needs.
 requires 'Object::Proto::Sugar', '0.05';
 
+# The terminal game points at a card with the arrow keys when this is
+# installed, and is typed at when it is not. Never a requires: the whole game
+# plays without it.
+recommends 'Term::ReadKey', '0';
+
 on test => sub {
     requires 'Test::More', '0';
 };

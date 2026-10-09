@@ -598,6 +598,10 @@ like( $deep_nested_dispatch->{stdout}, qr/deep:four/, 'multi-level nested skill 
     open my $root_env_fh, '>:raw', File::Spec->catfile( $env_runtime_home, '.env' ) or die "Unable to write root .env: $!";
     print {$root_env_fh} "ROOT_SCOPE_ENV=root\nSHARED_SCOPE_ENV=runtime-home\nHOME_SCOPE_ENV=~/skill-home\n";
     close $root_env_fh or die "Unable to close root .env: $!";
+    open my $home_runtime_env_fh, '>:raw', File::Spec->catfile( $env_runtime_home, '.developer-dashboard', '.env' )
+      or die "Unable to write home runtime .env: $!";
+    print {$home_runtime_env_fh} "HOME_SKILL_PRECEDENCE=home-runtime\n";
+    close $home_runtime_env_fh or die "Unable to close home runtime .env: $!";
     open my $child_env_fh, '>:raw', File::Spec->catfile( $env_child_root, '.env' ) or die "Unable to write child .env: $!";
     print {$child_env_fh} "CHILD_SCOPE_ENV=child\nSHARED_SCOPE_ENV=runtime-child\n";
     close $child_env_fh or die "Unable to close child .env: $!";
@@ -629,6 +633,7 @@ print encode_json(
         child      => $ENV{CHILD_SCOPE_ENV},
         runtime_pl => $ENV{RUNTIME_PL_SCOPE_ENV},
         home_scope => $ENV{HOME_SCOPE_ENV},
+        home_skill_precedence => $ENV{HOME_SKILL_PRECEDENCE},
         skill_only => $ENV{SKILL_ONLY_ENV},
         skill_chain => $ENV{SKILL_CHAIN_ENV},
         skill_pl_chain => $ENV{SKILL_PL_CHAIN_ENV},
@@ -641,7 +646,7 @@ PL
     );
     _write_file(
         File::Spec->catfile( $env_skill_root, '.env' ),
-        "SKILL_ONLY_ENV=home-skill\nSHARED_SCOPE_ENV=skill-home\nSKILL_CHAIN_ENV=\$SHARED_SCOPE_ENV/from-skill-env\n",
+        "SKILL_ONLY_ENV=home-skill\nSHARED_SCOPE_ENV=skill-home\nHOME_SKILL_PRECEDENCE=skill\nSKILL_CHAIN_ENV=\$SHARED_SCOPE_ENV/from-skill-env\n",
         0644,
     );
     my $env_child_skill_root = File::Spec->catdir( $env_child_root, '.developer-dashboard', 'skills', 'env-layer-skill' );
@@ -660,6 +665,7 @@ PL
     is( $env_dispatch_payload->{child}, 'child', 'skill dispatch inherits the child runtime env layer' );
     is( $env_dispatch_payload->{runtime_pl}, 'runtime-child-pl', 'skill dispatch inherits runtime .env.pl values before command execution' );
     is( $env_dispatch_payload->{home_scope}, File::Spec->catdir( $env_runtime_home, 'skill-home' ), 'skill dispatch inherits tilde-expanded runtime env values' );
+    is( $env_dispatch_payload->{home_skill_precedence}, 'skill', 'skill env overrides a same-named home runtime env value' );
     is( $env_dispatch_payload->{skill_only}, 'home-skill', 'skill dispatch loads the base skill .env file' );
     is( $env_dispatch_payload->{skill_chain}, 'skill-home/from-skill-env', 'skill dispatch expands skill .env values from earlier keys in the same skill env file' );
     is( $env_dispatch_payload->{skill_pl_chain}, 'skill-home/from-skill-env/from-skill-pl', 'skill dispatch loads skill .env before skill .env.pl within the same skill layer' );
@@ -676,6 +682,7 @@ PL
     is( $dotted_exit >> 8, 0, 'dashboard <skill>.<command> loads runtime and skill env layers through the public dotted switchboard path' );
     my $dotted_payload = decode_json($dotted_stdout);
     is( $dotted_payload->{shared}, 'runtime-child', 'dashboard <skill>.<command> keeps the child runtime env override through the public path' );
+    is( $dotted_payload->{home_skill_precedence}, 'skill', 'dashboard <skill>.<command> lets skill env override a same-named home runtime value through the public path' );
     chdir $previous_cwd or die "Unable to chdir back to $previous_cwd: $!";
 }
 
@@ -1434,7 +1441,7 @@ This test is part of Developer Dashboard.
 
 =head1 PURPOSE
 
-This test is the executable regression contract for the isolated skill installation and routing stack. Read it when you need to understand the real fixture setup, assertions, and failure modes for this slice of the repository instead of guessing from the module names alone.
+This test is the executable regression contract for the isolated skill installation, routing, and dispatch environment stack. It verifies that skill `.env` values override home runtime defaults while deeper project runtime values retain final precedence. Read it when you need the real fixture setup, assertions, and failure modes for this slice of the repository.
 
 =head1 WHY IT EXISTS
 

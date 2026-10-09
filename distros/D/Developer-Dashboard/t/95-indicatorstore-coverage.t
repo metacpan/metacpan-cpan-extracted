@@ -8,6 +8,7 @@ use Test::More;
 use File::Temp qw(tempdir);
 use File::Path qw(make_path);
 use File::Spec;
+use Fcntl qw(:flock);
 
 use lib 'lib';
 
@@ -786,23 +787,33 @@ sub run_plan {
 # Block S: refresh_core_indicators
 # ---------------------------------------------------------------------------
 {
-    # S1: explicit cwd argument (359 A-true) + prompt-only early return
+    # S1: prompt-only refresh no longer probes or creates a Docker indicator.
     {
         my ( $s, $p, $h ) = fresh_store();
         no warnings 'redefine';
-        local *Developer::Dashboard::IndicatorStore::command_in_path = sub { return '/usr/bin/docker' };
+        local *Developer::Dashboard::IndicatorStore::command_in_path = sub { die 'Docker must not be probed'; };
         my $items = $s->refresh_core_indicators( cwd => $h, prompt_only => 1 );
-        is( scalar(@$items), 1, 'refresh_core_indicators prompt-only mode returns just the docker indicator' );
-        is( $items->[0]{status}, 'ok', 'refresh_core_indicators marks docker ok when it is on PATH' );
+        is_deeply( $items, [], 'refresh_core_indicators prompt-only mode adds no built-in Docker indicator' );
+        is( $s->get_indicator('docker'), undef, 'prompt-only core refresh does not persist a Docker indicator' );
     }
 
-    # S2: docker missing (362/368/369 false)
+    # S2: an old core Docker record is removed, but collector-owned records
+    # are user configuration and must remain untouched.
     {
-        my ($s) = fresh_store();
-        no warnings 'redefine';
-        local *Developer::Dashboard::IndicatorStore::command_in_path = sub { return undef };
-        my $items = $s->refresh_core_indicators( prompt_only => 1 );
-        is( $items->[0]{status}, 'missing', 'refresh_core_indicators marks docker missing when it is not on PATH' );
+        my ( $s, $p ) = fresh_store();
+        $s->set_indicator(
+            'docker', alias => '🐳', label => 'Docker', icon => '🐳',
+            page_status_icon => '&#x1F7E2;', status => 'ok', priority => 20,
+            prompt_visible => 1,
+        );
+        $s->refresh_core_indicators( prompt_only => 1 );
+        is( $s->get_indicator('docker'), undef, 'prompt-only core refresh removes a persisted legacy core Docker indicator' );
+
+        $s->sync_collectors( [ { name => 'docker', indicator => { icon => '🐳' } } ] );
+        my $collector_docker = $s->get_indicator('docker');
+        ok( $collector_docker->{managed_by_collector}, 'explicitly configured docker collector creates its own indicator' );
+        $s->refresh_core_indicators( prompt_only => 1 );
+        is( $s->get_indicator('docker')->{collector_name}, 'docker', 'core refresh preserves a collector-owned docker indicator' );
     }
 
     # S3: project resolvable + real git work tree (359 A-false-B-true, 386/388/393/407)
@@ -817,6 +828,7 @@ sub run_plan {
         my %by = map { $_->{name} => $_ } @$items;
         is( $by{project}{status}, 'ok', 'refresh_core_indicators marks the project indicator ok when a project resolves' );
         ok( exists $by{git}, 'refresh_core_indicators emits a git indicator for a real work tree' );
+        ok( !exists $by{docker}, 'refresh_core_indicators does not emit a built-in Docker indicator' );
     }
 
     # DD-589: same bug class DD-585 fixed in CollectorRunner.pm - a query
@@ -910,16 +922,127 @@ sub run_plan {
 }
 
 # ---------------------------------------------------------------------------
-# Block T: _set_indicator_if_changed unchanged fast-path
+# Block T: no Docker probe or built-in Docker record
 # ---------------------------------------------------------------------------
 {
     my ( $s, $p ) = fresh_store();
     no warnings 'redefine';
-    local *Developer::Dashboard::IndicatorStore::command_in_path = sub { return '/usr/bin/docker' };
+    local *Developer::Dashboard::IndicatorStore::command_in_path = sub { die 'Docker must not be probed'; };
     my $first  = $s->refresh_core_indicators( prompt_only => 1 );
     my $second = $s->refresh_core_indicators( prompt_only => 1 );
-    is( $first->[0]{name}, 'docker', 'refresh_core_indicators writes docker on the first pass' );
-    is( $second->[0]{name}, 'docker', 'refresh_core_indicators returns the unchanged docker indicator on the second pass' );
+    is_deeply( $first, [], 'first prompt-only core refresh returns no Docker indicator' );
+    is_deeply( $second, [], 'repeated prompt-only core refresh still returns no Docker indicator' );
+}
+
+# ---------------------------------------------------------------------------
+# Block U: retired built-in Docker record recognition
+# ---------------------------------------------------------------------------
+{
+    my ($s) = fresh_store();
+    my %legacy = (
+        name => 'docker', label => 'Docker', alias => '🐳', icon => '🐳',
+        page_status_icon => '&#x1F7E2;', priority => 20, prompt_visible => 1,
+        status => 'ok',
+    );
+    ok( $s->_is_legacy_core_docker_indicator(\%legacy), 'legacy core Docker record matches the retired signature' );
+    ok( !$s->_is_legacy_core_docker_indicator(undef), 'legacy Docker recognizer rejects an undefined record' );
+    ok( !$s->_is_legacy_core_docker_indicator([]), 'legacy Docker recognizer rejects a non-hash record' );
+
+    my %managed = ( %legacy, managed_by_collector => 1 );
+    ok( !$s->_is_legacy_core_docker_indicator(\%managed), 'legacy Docker recognizer preserves collector-owned records' );
+
+    for my $field ( sort keys %legacy ) {
+        next if $field eq 'status';
+        my %missing = %legacy;
+        delete $missing{$field};
+        ok( !$s->_is_legacy_core_docker_indicator(\%missing), "legacy Docker recognizer rejects a missing $field field" );
+        my %different = %legacy;
+        $different{$field} = $field eq 'priority' ? 21
+          : $field eq 'prompt_visible' ? 0
+          : $field eq 'page_status_icon' ? '&#x1F4A9;'
+          : "other-$field";
+        ok( !$s->_is_legacy_core_docker_indicator(\%different), "legacy Docker recognizer rejects a customized $field field" );
+    }
+
+    for my $field (qw(collector_name configured_label configured_alias configured_icon)) {
+        my %customized = ( %legacy, $field => 'user-owned' );
+        ok( !$s->_is_legacy_core_docker_indicator(\%customized), "legacy Docker recognizer preserves records with $field metadata" );
+    }
+
+    {
+        my ( $locked_store, $locked_paths ) = fresh_store();
+        my ($root) = $locked_paths->indicators_roots;
+        my $file = plant( $root, 'docker', \%legacy );
+        my $lock = File::Spec->catfile( $root, 'docker', '.lock' );
+        my $original_read = Developer::Dashboard::IndicatorStore->can('_read_indicator_file');
+        no warnings 'redefine';
+        local *Developer::Dashboard::IndicatorStore::_read_indicator_file = sub {
+            my ( $reader, $path ) = @_;
+            if ( $path eq $file ) {
+                open my $probe, '>>', $lock or die "Unable to open lock probe: $!";
+                ok( !flock( $probe, LOCK_EX | LOCK_NB ), 'legacy Docker cleanup holds the writer lock while reading ownership' );
+                close $probe or die "Unable to close lock probe: $!";
+            }
+            return $original_read->( $reader, $path );
+        };
+        $locked_store->_remove_legacy_core_docker_indicator;
+        ok( !-f $file, 'locked legacy Docker cleanup removes only the old status file' );
+    }
+
+    {
+        my ( $blocked_store, $blocked_paths ) = fresh_store();
+        my ($root) = $blocked_paths->indicators_roots;
+        plant( $root, 'docker', \%legacy );
+        make_path( File::Spec->catfile( $root, 'docker', '.lock' ) );
+        my $error = eval { $blocked_store->_remove_legacy_core_docker_indicator; 1 } ? '' : $@;
+        like( $error, qr/Unable to open/, 'legacy Docker cleanup exposes lock-open failure' );
+    }
+
+    {
+        my ( $blocked_store, $blocked_paths ) = fresh_store();
+        my ($root) = $blocked_paths->indicators_roots;
+        plant( $root, 'docker', \%legacy );
+        no warnings qw(redefine once);
+        local *Developer::Dashboard::IndicatorStore::_lock_indicator_file = sub { return 0 };
+        my $error = eval { $blocked_store->_remove_legacy_core_docker_indicator; 1 } ? '' : $@;
+        like( $error, qr/Unable to lock/, 'legacy Docker cleanup exposes lock-acquisition failure' );
+        my $write_error = eval { $blocked_store->set_indicator( 'sample', status => 'ok' ); 1 } ? '' : $@;
+        like( $write_error, qr/Unable to lock/, 'indicator writers expose shared lock-acquisition failure' );
+    }
+
+    {
+        my ( $blocked_store, $blocked_paths ) = fresh_store();
+        my ($root) = $blocked_paths->indicators_roots;
+        my $file = plant( $root, 'docker', \%legacy );
+        no warnings 'redefine';
+        local *Developer::Dashboard::IndicatorStore::_is_legacy_core_docker_indicator = sub {
+            unlink $file or die "Unable to replace cleanup fixture: $!";
+            make_path($file);
+            return 1;
+        };
+        my $error = eval { $blocked_store->_remove_legacy_core_docker_indicator; 1 } ? '' : $@;
+        like( $error, qr/Unable to remove retired built-in Docker indicator/, 'legacy Docker cleanup exposes status-file removal failure' );
+    }
+
+    {
+        my ( $layered_store, $layered_paths, $deep_root, $home_root ) = two_layer_store();
+        my $legacy_file = plant( $deep_root, 'docker', \%legacy );
+        my $collector_file = plant( $home_root, 'docker', { %legacy, managed_by_collector => 1, collector_name => 'docker' } );
+        $layered_store->refresh_core_indicators( prompt_only => 1 );
+        ok( !-f $legacy_file, 'legacy core Docker state is removed from the child layer' );
+        ok( -f $collector_file, 'inherited collector Docker state survives child-layer migration' );
+        is( $layered_store->get_indicator('docker')->{collector_name}, 'docker', 'collector Docker state becomes visible after legacy child state is removed' );
+    }
+
+    {
+        my ($custom_store) = fresh_store();
+        $custom_store->set_indicator( 'docker', label => 'My Docker', icon => 'D', status => 'ok' );
+        $custom_store->refresh_core_indicators( prompt_only => 1 );
+        is( $custom_store->get_indicator('docker')->{label}, 'My Docker', 'custom user Docker indicator survives core refresh' );
+        my $first = $custom_store->_set_indicator_if_changed( 'sample', label => 'Sample', status => 'ok' );
+        my $second = $custom_store->_set_indicator_if_changed( 'sample', label => 'Sample', status => 'ok' );
+        is( $second->{updated_at}, $first->{updated_at}, 'unchanged configured indicator refresh preserves its timestamp' );
+    }
 }
 
 done_testing;
@@ -941,18 +1064,21 @@ indicator store so the module holds at 100% on all four Devel::Cover metrics.
 
 The indicator store carries the shared status state read by the prompt renderer
 and the browser status strip, and it merges collector-managed indicators with
-user-managed ones across inherited runtime layers. That merge, the placeholder
-healing path, and the icon-template preservation logic have many condition
-combinations that ordinary CLI and browser flows never reach. This file pins
-those combinations directly so a regression in the merge or refresh logic
-surfaces as a failing assertion rather than as silent indicator drift.
+user-managed ones across inherited runtime layers. That merge, placeholder
+healing, icon-template preservation, and cleanup of the retired built-in Docker
+record have condition combinations that ordinary CLI and browser flows may not
+reach. This file pins those combinations directly so a regression in merge,
+ownership, or refresh behavior surfaces as a failing assertion.
 
 =head1 WHEN TO USE
 
 Use this file when changing indicator persistence, the collector sync and
 need-sync fast paths, collector-managed indicator healing from inherited
 layers, TT-backed icon template handling, indicator ordering, or the built-in
-core indicator refresh.
+project/Git refresh, or legacy Docker-indicator migration. Core refresh must
+not check whether the Docker executable exists, and any Docker status indicator
+must be explicitly configured or user-managed rather than created by core
+refresh.
 
 =head1 HOW TO USE
 

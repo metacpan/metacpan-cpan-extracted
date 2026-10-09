@@ -3,11 +3,12 @@ use warnings;
 use Test::More;
 use EV;
 use EV::Pg;
+use Scalar::Util qw(weaken);
 use lib 't';
 use TestHelper;
 
 require_pg;
-plan tests => 12;
+plan tests => 16;
 
 # Test that objects are properly cleaned up
 {
@@ -37,21 +38,59 @@ plan tests => 12;
 # Test destruction with pending query callback
 {
     my $pg;
-    my $destroyed = 0;
+    my ($destroyed, $other_err) = (0, '');
     $pg = EV::Pg->new(
         conninfo   => $conninfo,
         on_connect => sub {
-            $pg->query("select 1", sub {
+            $pg->enter_pipeline;
+            $pg->query_params("select 'x'::text", [], sub {
                 undef $pg;  # destroy inside callback
                 $destroyed = 1;
-                EV::break;
             });
+            $pg->query_params("select 'y'::text", [], sub {
+                my ($data, $err) = @_;
+                $other_err = $err;
+            });
+            $pg->pipeline_sync(sub { EV::break });
         },
         on_error => sub { EV::break },
     );
     my $t = EV::timer(5, 0, sub { EV::break });
     EV::run;
-    ok($destroyed, 'destroyed inside query callback without crash');
+    ok($destroyed && !defined $pg, 'destroyed inside query callback without crash');
+    is($other_err, 'object destroyed', 'destroy fires pending callbacks with "object destroyed"');
+}
+
+# Object lifecycle: explicit undef frees even with self-capturing
+# handlers; scope exit alone does not (documents the cycle).
+{
+    my $w;
+    {
+        my $pg;
+        $pg = EV::Pg->new(
+            conninfo   => $conninfo,
+            on_connect => sub { $pg->query("select 1", sub { EV::break }) },
+            on_error   => sub { EV::break },
+        );
+        $w = $pg; weaken($w);
+        my $t = EV::timer(5, 0, sub { EV::break });
+        EV::run;
+        undef $pg;
+    }
+    ok(!defined $w, 'explicit undef frees object with capturing handlers');
+    {
+        my $pg;
+        $pg = EV::Pg->new(
+            conninfo   => $conninfo,
+            on_connect => sub { $pg->query("select 1", sub { EV::break }) },
+            on_error   => sub { EV::break },
+        );
+        $w = $pg; weaken($w);
+        my $t = EV::timer(5, 0, sub { EV::break });
+        EV::run;
+        $pg->finish;
+    }
+    ok(defined $w, 'scope exit alone does not free (documented cycle)');
 }
 
 # Test handler cleanup (set and unset)
@@ -129,6 +168,32 @@ plan tests => 12;
     ok($notices >= 1, 'notice receiver fired without leak');
 }
 
+# Regression: destroying $pg inside on_notice.  The notice handler runs
+# from inside libpq, so DESTROY must defer PQfinish until libpq returns
+# (pre-fix: heap use-after-free, 17 valgrind errors, silent natively).
+{
+    my $pg;
+    my ($notices, $destroyed) = (0, 0);
+    $pg = EV::Pg->new(
+        conninfo   => $conninfo,
+        on_notice  => sub {
+            $notices++;
+            undef $pg;  # destroy inside libpq
+            $destroyed = 1;
+        },
+        on_connect => sub {
+            $pg->query("do \$\$ begin raise notice 'bye'; end \$\$", sub {
+                EV::break;
+            });
+        },
+        on_error => sub { EV::break },
+    );
+    my $t = EV::timer(5, 0, sub { EV::break });
+    EV::run;
+    ok($notices >= 1 && $destroyed && !defined $pg,
+       'destroyed inside on_notice without UAF');
+}
+
 # COPY IN cycle
 {
     my $pg;
@@ -190,7 +255,7 @@ plan tests => 12;
 # valgrind) because DESTROY would Safefree(self) at depth 0 while
 # cleanup_connection was still executing.
 SKIP: {
-    skip 'requires libpq >= 17', 1 unless EV::Pg->lib_version >= 170000;
+    skip 'requires libpq >= 17', 1 unless EV::Pg->can('cancel_async') && EV::Pg->lib_version >= 170000;
     my $pg = EV::Pg->new(conninfo => $conninfo,
                          on_connect => sub { EV::break });
     my $t = EV::timer(5, 0, sub { EV::break });

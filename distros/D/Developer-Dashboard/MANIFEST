@@ -32,13 +32,9 @@ doc/docker-service-toggle.md
 doc/file-inventory-api.md
 doc/housekeeper-rotation.md
 doc/housekeeper-temp-cleanup.md
-doc/install-bootstrap.md
 doc/integration-test-plan.md
-doc/internal-operating-checklist.md
-doc/layered-env-loading.md
 doc/owasp-compliance-sow.md
 doc/path-inventory-api.md
-doc/problem-20-report.md
 doc/problem-report.md
 doc/problem-report.txt
 doc/removing-compiled-runtime.md
@@ -57,6 +53,7 @@ doc/which-command.md
 doc/windows-testing.md
 doc/workspace-change-dir.md
 doc/workspace-skill-aliases.md
+file.txt
 install.ps1
 install.sh
 integration/blank-env/Dockerfile
@@ -431,6 +428,7 @@ t/800-pageruntime-exec-helper-coverage.t
 t/801-cli-source-emit-stdout-coverage.t
 t/802-auth-get-user-open-failure-coverage.t
 t/803-handle-proxy-code-deref-coverage.t
+t/804-skill-completion-layer-merge.t
 t/81-actionrunner-coverage.t
 t/82-auth-coverage.t
 t/83-cli-api-coverage.t

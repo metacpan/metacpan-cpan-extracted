@@ -1,3 +1,28 @@
+0.61.2 2026-10-08 23:29:43 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - CSV export: an empty date cell showed "1970-01-01 01:00:00 +0100" (the
+   start of 1970 in the server's time zone). It is now empty, as in the
+   Excel export.
+
+ - CSV export: a row with a line break or any character outside ASCII in
+   one of its cells -- an umlaut, an accent, a warning sign -- came out as
+   an empty line, and the file was not valid UTF-8. Such rows are now
+   written in full, the file is UTF-8 and says so in its content type, and
+   a row that still cannot be written stops the export with an error.
+
+ - A translated text with several placeholders could show the wrong
+   value: when the text for "%1" itself contained "%2", that was replaced
+   too, and "%10" showed the first value followed by a "0". Every
+   placeholder is now filled in once, with its own value.
+
+0.61.1 2026-10-08 17:33:54 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - Excel and CSV export: a table cell holding a translatable message now
+   shows the same text as the table on screen. An XLSX cell showed the
+   bare placeholder "%1" and spilled the rest of the message into the
+   next column; a CSV cell showed "ARRAY(0x...)", and cells and column
+   headings with arguments stayed in English or kept their "%1".
+
 0.61.0 2026-09-18 09:45:59 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - trm() now always crosses the wire as an ARRAY, even with no arguments

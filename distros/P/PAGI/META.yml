@@ -21,14 +21,12 @@ no_index:
   directory:
     - examples
 requires:
-  PAGI::Server: '0.002005'
-  PAGI::Tools: '0.002001'
   perl: '5.018'
 resources:
   bugtracker: https://github.com/jjn1056/pagi/issues
   homepage: https://github.com/jjn1056/pagi
   repository: https://github.com/jjn1056/pagi.git
-version: '0.002013'
+version: '0.003000'
 x_generated_by_perl: v5.42.2
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: Artistic-2.0

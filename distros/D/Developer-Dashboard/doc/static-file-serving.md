@@ -109,10 +109,10 @@ Nested child skills extend that pattern:
    ```bash
    # JavaScript under the runtime public tree
    cp my-library.js ~/.developer-dashboard/dashboard/public/js/
-   
+
    # CSS under the runtime public tree
    cp my-styles.css ~/.developer-dashboard/dashboard/public/css/
-   
+
    # Images or other assets under the runtime public tree
    cp image.png ~/.developer-dashboard/dashboard/public/others/
 

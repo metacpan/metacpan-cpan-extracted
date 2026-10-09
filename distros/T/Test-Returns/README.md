@@ -1,28 +1,30 @@
-# NAME
+## Name
 
 Test::Returns - Verify that a method's output agrees with its specification
 
-# SYNOPSIS
+## Synopsis
 
-    use Test::More;
-    use Test::Returns;
+```perl
+use Test::More;
+use Test::Returns;
 
-    returns_ok(42, { type => 'integer' }, 'Returns valid integer');
-    returns_ok([], { type => 'arrayref' }, 'Returns valid arrayref');
-    returns_not_ok("bad", { type => 'arrayref' }, 'Fails (expected arrayref)');
+returns_ok(42, { type => 'integer' }, 'Returns valid integer');
+returns_ok([], { type => 'arrayref' }, 'Returns valid arrayref');
+returns_not_ok("bad", { type => 'arrayref' }, 'Fails (expected arrayref)');
+```
 
-# VERSION
+## Version
 
-Version 0.04
+Version 0.05
 
-# DESCRIPTION
+## Description
 
 Exports the function `returns_ok`, which asserts that a value satisfies a schema as defined in [Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict).
 Integrates with [Test::Builder](https://metacpan.org/pod/Test%3A%3ABuilder) for use alongside [Test::Most](https://metacpan.org/pod/Test%3A%3AMost) and friends.
 
-# METHODS
+## Methods
 
-## returns\_is($value, $schema, $test\_name)
+### Returns\_Is($Value, $Schema, $Test\_Name)
 
 Passes if `$value` satisfies `$schema` using `Return::Set`.
 Fails otherwise.
@@ -38,35 +40,35 @@ Schema keys prefixed with `_` (such as `_error_return` and `_error_handling`
 as emitted by [App::Test::Generator](https://metacpan.org/pod/App%3A%3ATest%3A%3AGenerator)) are passed through unchanged;
 [Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict) ignores unknown keys in a rule hash.
 
-## returns\_isnt($value, $schema, $test\_name)
+### Returns\_Isnt($Value, $Schema, $Test\_Name)
 
 Opposite of `returns_is`: passes if `$value` does **not** satisfy `$schema`.
 
 Accepts `type => 'array'` as a synonym for `type => 'arrayref'`, for
 the same reasons as `returns_is`.
 
-## returns\_ok($value, $schema, $test\_name)
+### Returns\_Ok($Value, $Schema, $Test\_Name)
 
 Alias for `returns_is`.
 Provided for naming symmetry and clarity.
 
-## returns\_not\_ok
+### Returns\_Not\_Ok
 
 Synonym of returns\_isnt
 
-# AUTHOR
+## Author
 
 Nigel Horne &lt;njh at nigelhorne.com>
 
-# SEE ALSO
+## See Also
 
 [Test::Builder](https://metacpan.org/pod/Test%3A%3ABuilder), [Return::Set](https://metacpan.org/pod/Return%3A%3ASet), [Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict)
 
-# SUPPORT
+## Support
 
 This module is provided as-is without any warranty.
 
-# LICENCE AND COPYRIGHT
+## Licence and Copyright
 
 Copyright 2025-2026 Nigel Horne.
 

@@ -1,16 +1,16 @@
 Codename: problem-report
 
-Historical numbered-problem audit (latest active-change verification checked
-2026-10-03 in the isolated Compose dev container: 257 test files and 22,371
-tests passed. The full run initially measured 99.9% condition coverage; after
-adding and running the missing completion branch under Devel::Cover, the
-aggregate checker reported 100.0% statement, branch, condition, and subroutine
-coverage. The coverage-gate invocation exited 1 before that final test-only
-addition, so the complete suite has not been rerun with the expanded test.
-Problems 12, 32, and 34 have passing implementation regressions; release
-delivery remains in progress. Problem 33's current behavior is verified by a
-new regression and required no production-code change. Earlier release
-references below are from `Changes`. The original
+This file is the chronological evidence log; `doc/problem-report.md` is the
+current numbered status index. Historical status snapshots below are retained
+as historical evidence and are superseded by later release entries. For
+example, the 2026-10-03 verification snapshot recorded 257 test files and
+22,371 tests passing; it first measured 99.9% condition coverage, then reached
+100.0% on all four metrics after a test-only addition. At that point the full
+suite had not been rerun with that addition, and Problems 12, 32, and 34 still
+had release delivery in progress. Later entries record subsequent verification
+and release outcomes; do not treat this opening snapshot as the current status.
+
+Earlier release references below are from `Changes`. The original
 red-test transcripts were not retained, so a detached pre-fix snapshot was
 reconstructed for the 5.00 dashboard/skill batch: commit `37a5bd77` (parent of
 `2a09c53b`), with the regression-test changes from `2a09c53b` applied, ran in
@@ -418,6 +418,35 @@ image failure. This gate is recorded as failed, not passed; Problem 25 remains
 in progress and must not be committed as complete until image-build
 verification is resolved. No commit has been made for this follow-up.
 
+Problem 36: Merge project and home skill command names in shell completion
+(status: in progress; release 5.52)
+Expected outcome: while inside a project, `d2 layered-skill.<TAB>` lists
+commands from both `.developer-dashboard/skills/layered-skill/cli` in the
+project and the same skill under the home runtime. A command name present in
+both is listed once; runtime execution precedence remains deepest project
+layer first.
+Docker reproduction: `t/804-skill-completion-layer-merge.t` creates a
+temporary home and a Git project. Both layers contain `layered-skill`; home
+provides `home-only` and `shared`, project provides `project-only` and
+`shared`. Run `prove -lv t/804-skill-completion-layer-merge.t` through the
+dedicated `dd-problem36` Docker Compose service. Before the fix, the single
+completion assertion failed: only `layered-skill.project-only` and
+`layered-skill.shared` were returned, and `layered-skill.home-only` was
+missing.
+Root cause: `PathRegistry::installed_skill_roots` intentionally emits only
+one effective root per skill name. `Suggest::_all_skill_command_entries`
+iterated those names, then `_skill_command_entries` called
+`SkillManager::get_skill_path`, which again selected only the winning root.
+That behavior was appropriate for execution lookup but incomplete for a
+completion inventory that must merge inherited command names.
+Red test and fix: the new regression checks direct completion and the public
+`dashboard complete` helper, including duplicate suppression. The fix uses
+`PathRegistry::skill_roots_for` to scan every effective root from project to
+home and returns each dotted command name once. Both the direct API and public
+helper now return `layered-skill.home-only`, `layered-skill.project-only`,
+and one `layered-skill.shared` candidate. Focused completion/help tests pass;
+full-suite, coverage, package, and image gate evidence will follow.
+
 Focused Docker verification after implementation: `t/10-extension-action-docker.t`,
 `t/91-cli-ticket-coverage.t`, `t/98-cli-openfile-coverage.t`,
 `t/103-collectorrunner-coverage.t`, `t/770-cli-exec-handoff-coverage.t`,
@@ -444,7 +473,7 @@ Reproduction: configure a collector with `cwd` set to a configured alias whose t
 Root cause: `CollectorRunner::run_once` dispatched only the fixed accessor allowlist and never loaded configured aliases or the secured skill Folder alias provider. Red-first tests now exercise both alias sources, invalid aliases, and the registry contract. The resolver registers config aliases first, then consults the existing guarded Folder.pm resolver; aliases from skills remain read-only.
 Verification: the Docker regression harness exercised both alias sources and unknown-alias failure; full-suite, coverage, security, and packaging results are recorded below.
 
-Problem 29 historical record gap: Collector stop propagation (status: needs investigation)
+Problem 29: Collector stop propagation (status: needs investigation)
 The user asked whether `d2 stop`, `d2 stop collector`, and stopping a named
 collector terminate collector-spawned child processes. The historical report
 does not contain the requested Docker reproduction result or a final status.
@@ -597,7 +626,7 @@ already retained all words when alias lookup failed; new assertions in
 The Docker regression passed. No production change was necessary for this item.
 
 Problem 34: Limit ecosystem Compose services to the local Compose project
-(git ref: pending) (status: implementation and Docker regression pass; release pending)
+(git ref: master) (status: implementation, release gates, and runtime image verification pass; ignored local image recipe still has a repeatability caveat)
 Expected outcome: if the invocation directory contains a supported local
 `compose.yml`, `compose.yaml`, `docker-compose.yml`, or `docker-compose.yaml`,
 that file is the base project. Runtime-discovered services absent from the
@@ -613,7 +642,59 @@ enabled ecosystem service without intersecting with the invocation directory's
 Compose service map. The Docker red test reproduced that mismatch. The resolver
 now parses local base service names, filters automatic discovery, preserves
 explicit selectors and no-local-file behavior, and reports malformed YAML.
-The Docker regressions and full suite pass; release checks remain outstanding.
+The initial Docker regressions and full suite passed for the original behavior.
+The later operational-command follow-up, full release gates, and image-version
+verification are recorded immediately below.
+
+Problem 34 operational-command follow-up (2026-10-05): before the fix, the
+materialized command for `up`, `build`, and `down` used only
+`-f /tmp/.../merged-compose.yml`; Docker Compose therefore derived the project
+directory and relative-path root from the temporary file instead of the
+invocation directory. A red-first Docker regression failed for all three
+actions. The final command now supplies the resolved invocation directory via
+`--project-directory`, unless the user supplied that option explicitly.
+Red-first tests also exposed missing validation for malformed project-directory
+and undefined arguments; these now fail before Compose runs. The focused Docker
+run passed `t/94-dockercompose-coverage.t` (188 assertions). An isolated real
+Compose project also completed `d2 docker compose build`, `up -d`, and `down`
+with a relative Docker build context, confirming all three operations preserve
+the invocation project directory. The full suite
+passed 258 files / 22,473 tests. The all-metric coverage report passed at
+100.0% statement, branch, condition, and subroutine coverage (45,390 detail
+rows; no stale uncoverable annotations). `dzil clean` removed the old 5.53
+archive; `dzil build` produced 5.54 with no `cover_db` contents. The post-build
+smart-router Docker guard passed 7 assertions after installing Docker CLI in a
+socket-mounted disposable test container. The blank-environment integration
+installed the exact 5.54 tarball using plain `cpanm` with tests enabled and
+reported `Blank-environment integration run passed`. `d2 docker.images.build`
+exited successfully, but its first fresh image run reported module version
+5.53 rather than 5.54. The ignored local Dockerfile installs into a system
+library directory while `/root/perl5` remains first in the runtime search
+path. An isolated `d2 docker compose` rebuild installed the 5.54 archive into
+`/root/perl5`; fresh `d2 version` and direct `Developer::Dashboard::VERSION`
+probes both reported 5.54. The ignored local Dockerfile was not changed, so
+future standard image builds may reproduce the shadowing until its install
+target is corrected. Security scans and required targeted tests passed. Commit
+`aeabf0a8` records the Problem 34 code and release updates.
+
+Problem 34 public-helper regression (2026-10-06): a follow-up audit found that
+the public `_dashboard-core docker compose` branch called `resolve()` and then
+directly executed its raw multi-`-f` command. That bypassed the materialization
+path in `DockerCompose::run()`, so the prior tests for `run()` did not verify
+the real CLI's build/up/down path. The red-first regression in
+`t/30-dashboard-loader.t` failed because the helper did not call the streaming
+runner; `t/94-dockercompose-coverage.t` also failed because the method did not
+exist. The helper now calls `run_streaming()` with the already resolved
+command. This runner materializes the layers, keeps its temporary merged file
+alive until Compose exits, inherits stdout/stderr for normal streaming, and
+returns the child exit code. In the isolated `dd-problem34-red` Docker dev
+container, both focused tests passed (2 files / 295 assertions). Its Docker
+client is absent, so actual engine-backed build/up/down was not attempted; a
+stub Compose executable verified for each action that the real operational
+call uses one existing merged file, retains `--project-directory`, streams
+output, and returns the operation status. `doc/problem-report.md` now records
+this distinction instead of implying the prior `run()` tests covered public
+dispatch.
 
 Current-cycle final audit (2026-10-03): `t/90`, `t/91`, and `t/94` passed in
 Docker (3 files / 359 assertions); the added completion defensive-branch test
@@ -695,3 +776,554 @@ The 5.50 archive was installed in a fresh blank Docker environment with
 integration script passed. The matching `d2 docker.images.build` completed,
 and a fresh image returned `d2 version` 5.50. `dzil release` was deliberately
 not run because it would upload the distribution to PAUSE.
+
+Problem 25 and Problem 36 verification cycle (2026-10-03):
+
+Problem 25's external-help regression was reproduced as
+`d2 tira.tasklist.prune --help` being claimed by the dashboard's private
+`skills _exec` help route and failing with an unknown `_exec` action. The fix
+keeps help detection from taking ownership after that private dispatch
+sentinel; a fake installed skill CLI verifies `--help`, `-h`, and `help` are
+passed through unchanged. Problem 36's pre-fix Docker fixture had the same
+skill name in project and home runtimes but completion returned only
+project-local command names. The fix enumerates all discovered skill roots in
+their established precedence order and emits each dotted name once; the
+project layer remains the runtime winner for actual execution.
+
+Focused Docker verification passed 4 files / 1,693 tests, including both
+problem regressions. After installing the optional author-gate dependencies in
+the isolated `dd-problem36` development container and setting its Git
+safe-directory for the `/work` bind mount, `prove -lr t` passed 258 files /
+22,959 tests. `t/158` skipped because operator-local `.claude` tooling is not
+part of this checkout; Windows QEMU and Chromium-only browser tests skipped
+because those optional tools are unavailable. The release-archive guard tests
+also skipped in this pre-build run because the 5.52 tarball does not yet exist.
+The all-metric coverage gate passed 258 files / 22,897 tests with 100.0%
+statement, branch, condition, and subroutine coverage (45,356 detail rows, no
+stale annotations). Devel::Cover emitted warnings for temporary fixture
+modules removed before digesting; these warnings are recorded and were not
+caused by the completion change. Archive kwalitee, final package tests,
+blank-environment install, and image build were pending at the time of that
+coverage run.
+
+Final 5.52 package verification: `dzil clean` and `dzil build` completed.
+There is exactly one root tarball, `Developer-Dashboard-5.52.tar.gz`; all 76
+library modules and `dist.ini` declare 5.52, the embedded main module declares
+5.52, and archive inspection found no `cover_db`. The Docker release-focused
+tests passed 6 files / 6,228 assertions, including kwalitee, POD syntax,
+archive inspection, both numbered regressions, and the smart-router package
+guard. A fresh blank Docker install used `cpanm` with its default test behavior
+(no `--notest`) and finished with “Blank-environment integration run passed.”
+
+The required `d2 docker.images.build` was attempted against 5.52. BuildKit
+failed at the Dockerfile's first `RUN curl ... | sh` with `mount options is too
+long`. The wrapper then disabled the development marker, installed the tarball
+into the host Perl library, and returned success; this is not a successful
+image build and no new image/version claim is made. The same BuildKit failure
+was recorded for 5.51. Problem 25 remains in progress, and delivery of Problem
+36 is also not declared complete while the mandatory image gate remains
+unresolved. No commit or push was made.
+
+BuildKit root-cause follow-up (2026-10-03): the failed Compose context is the
+local D2 image service, whose Dockerfile starts with `FROM
+developer-dashboard:latest` and immediately executes the installer in a new
+RUN layer. A read-only `d2 docker compose run --rm --no-deps` against that
+configured base image measured 408 overlay lowerdirs; the lowerdir option
+alone is 4,085 bytes and the complete `/proc/mounts` record is 4,128 bytes.
+This is consistent with containerd's page-sized mount-option guard rejecting
+the next overlay snapshot before the RUN command executes. The current
+containerd mount implementation compacts large overlay lowerdir options
+before enforcing its page limit; the local build backend still rejects the
+resulting mount options after any compaction it performs. This is
+environmental to the configured base-image layer stack/runtime, not to the
+5.52 Perl archive. Safely reducing the base stack or upgrading/reconfiguring
+the Docker/containerd runtime requires operator-level authorization; no image,
+container storage, or daemon configuration was changed. The P36 regression
+and package changes are still uncommitted while this required image gate is
+unresolved.
+
+Problem 25 and 36 final delivery follow-up (2026-10-03; release 5.53):
+
+The configured base's deep layer stack was exported and flattened into a
+temporary local image using an isolated D2 Compose project. The resulting
+Compose image build completed. Runtime verification initially exposed a stale
+5.41 copy at `/root/perl5/lib/perl5/Developer/Dashboard.pm`, which shadowed
+the newly installed 5.53 module under `/usr/local/share/perl/5.40.1`. For the
+disposable verification image only, that exact stale module file and directory
+were removed before installing the 5.53 archive. A fresh D2 Compose run then
+reported `d2 version` 5.53 and loaded `Developer::Dashboard` 5.53 from the
+installed package path. The ignored local Dockerfile was restored afterward;
+no daemon settings or unrelated containers were changed.
+
+The 5.53 archive contains version 5.53 in `dist.ini` and
+`lib/Developer/Dashboard.pm`, and the built image reports 5.53. The blank
+environment integration flow passed using plain `cpanm` with tests enabled.
+The full D2 suite then passed 258 files / 22,403 tests, including all three
+P25/P36 regression files and the release metadata gate. Its optional skips
+were limited to unavailable external tools/operator-local `.claude` assets.
+
+The initial source-suite run exposed missing ignore rules. HEAD `1dc5c062`
+had narrowed `.gitignore` to only `.claude/`; the worktree restores the
+required `nytprof.out`, `nytprof/`, `.worktrees/`, and `dogfood-output/`
+patterns while retaining `.claude/`. The 5,344-assertion release metadata
+test and the subsequent full suite both pass with those rules. No commit or
+push was made.
+
+Problem 34 post-push security gate (2026-10-06): pushed commits through
+`17cbbb56` and ran the required interactive-shell Scorecard command. Aggregate
+score: 8.2/10. All checks tied to the code and packaging changes scored 10/10.
+The remaining scores are repository-administration or historical-activity
+items, not source fixes: Branch-Protection 0/10 requires GitHub branch settings;
+CII-Best-Practices 0/10 requires external badge-program enrollment;
+Code-Review 0/10 reflects 0 of 20 approved historical changesets; Contributors
+3/10 reflects the repository's one contributing organization. No legitimate
+repository-only edit can change the latter two historical facts. These four
+items are recorded as external follow-ups; the Scorecard output showed no
+additional repo-fixable failure.
+
+Problem 37: False collector watchdog restart warning during cron quiet hours
+(status: implementation verified in focused Docker tests; release gates pending)
+
+Expected outcome: when a collector has a valid cron schedule whose next matching
+run is hours away, a live scheduler loop with a fresh heartbeat remains healthy.
+It must not be stopped, restarted, have its watchdog restart count incremented,
+or be marked attention_required merely because its last job execution is old.
+A cron scheduler whose own heartbeat is stale remains eligible for watchdog
+recovery. Interval collectors continue to use job execution progress.
+
+Reproduction in the isolated Docker dev service: configure
+`nightly.cron` with `cron: '0 7-8 * * *'`; use a live running-loop record with a
+fresh `heartbeat_at`; set collector `last_completed_at` to an old timestamp;
+seed `watchdog_restart_count` at its configured limit (3) and a restart-window
+start less than 300 seconds old; run one `_supervise_collectors_once` pass for
+that collector. Before the fix, `t/09-runtime-manager.t` failed four assertions:
+the watchdog returned an attention entry, stopped the loop, changed the count
+from 3 to 4, and set `watchdog_status` to `attention_required`. In the Docker
+service, `TZ=Pacific/Kiritimati date` showed 22:40 local while
+`_cron_due('0 7-8 * * *', ...)` returned `not due`, confirming the reported
+after-hours schedule condition.
+
+Root cause: `_collector_stalled_for_watchdog` compared only collector-level
+`last_completed_at`, `last_started_at`, or `last_run` against a short
+interval-derived threshold. It did not account for cron being intentionally
+idle between matching schedule minutes. The watchdog therefore classified a
+healthy loop as stalled and consumed its restart budget on every subsequent
+supervisor pass.
+
+Fix: cron jobs now use the persisted loop state's `heartbeat_at` to determine
+scheduler liveness. Missing or malformed cron heartbeat state does not fall
+back to the old job execution timestamp, since that timestamp cannot establish
+cron-loop failure during a legitimate quiet period. Non-cron collector behavior
+is unchanged.
+
+TDD and Docker verification: the regression was added first and failed in the
+isolated `dd-problem37` container with the state transition above. After the
+implementation, focused Docker tests passed: `t/09-runtime-manager.t` and
+`t/100-runtimemanager-coverage.t`, 2 files / 1,005 assertions. The four-metric
+coverage run passed the instrumented full suite (258 files / 22,497 tests) and
+reported 100.0% statement, branch, condition, and subroutine coverage across
+`lib/` (45,455 detail rows; no stale uncoverable annotations). The required
+security web tests also passed (3 files / 459 tests). Devel::Cover emitted
+warnings for temporary skill fixture files removed by tests before report
+digestion; the coverage gate still completed successfully. `dzil clean` and
+`dzil build` produced `Developer-Dashboard-5.56.tar.gz`; `d2
+docker.images.build` exited successfully. The blank-environment integration
+container installed that archive with `cpanm` tests enabled and completed the
+full integration script. One separate image-version check remains noteworthy:
+the built image contains `Developer::Dashboard` 5.56 under
+`/usr/local/share/perl/5.40.1`, but `PERL5LIB=/root/perl5/lib/perl5` selects an
+older 5.54 copy for `dashboard version`. Thus the archive install is verified,
+but the existing image runtime's local-library shadowing is not claimed fixed by
+Problem 37.
+
+Problem 38: Normalize captured merged Docker Compose YAML to valid UTF-8
+(status: done; release 5.57)
+
+Expected outcome: every merged Compose file written by
+`Developer::Dashboard::DockerCompose::_materialized_command` is valid UTF-8,
+including when an input contributes a legacy single-byte character. The
+normalized file must be used by `config`, `up`, `down`, `build`, `ps`, `logs`,
+and other Compose operations through the shared materialization path.
+
+Problem understanding and root cause: the reported `d2 yq` diagnostic is the
+visible symptom, but the failing artifact was produced earlier. The resolver
+captured the output from `docker compose ... config` and wrote those bytes
+straight into the temporary merged YAML file. An isolated Windows-1252 pound
+byte (`0xA3`) therefore remained an invalid UTF-8 octet; `YAML::XS` rejected
+that generated file with `invalid leading UTF-8 octet`. The original
+`/tmp/here.yml` was unavailable in this checkout, so it was not read or reused
+as a fixture; the producer path was reproduced synthetically inside Docker.
+
+Reproduction: run the Docker test `t/94-dockercompose-coverage.t` with a stub
+Compose executable that emits otherwise-valid YAML containing byte `0xA3` in a
+label. Before the fix, the merged file retained `0xA3`, and loading it with
+`YAML::XS::Load` failed with the same invalid-leading-octet error. After the
+fix, the byte is converted to UTF-8 for `£`, the output file parses, and the
+parsed label retains the pound sign. The test also exercises `config`, `up`,
+`down`, `build`, `ps`, and `logs` through `run_streaming` to prove they all
+consume the materialized output. Existing valid UTF-8 of two-, three-, and
+four-byte sequences is retained; undefined Windows-1252 octets become the
+Unicode replacement character.
+
+Verification: the final Docker run of `script/coverage-gate` passed the full
+suite (258 files / 22,514 tests). The coverage gate reported statement,
+branch, condition, and subroutine totals at 100.0%. The focused Compose test
+also passed, including its regression for invalid captured bytes, YAML parsing,
+and operational commands sharing the materialization path. The full suite
+required a separate test-only adjustment in `t/680-io-failure-s7-coverage.t`:
+the assertion now checks that the deliberately blocked nav layer contributes
+no entry while allowing other active runtime layers to contribute. Security
+review found only existing expected references in policy checks, test fixtures,
+and docs; no unsafe execution, interpolation, path handling, or dependency
+change was introduced. `dzil clean` followed by `dzil build` produced
+`Developer-Dashboard-5.57.tar.gz`; `d2 docker.images.build` succeeded. The
+blank-environment flow installed and tested the archive with plain `cpanm`
+(without `--notest`) and completed its installed CLI/web checks. The reported
+`/tmp/here.yml` was not read or used as a fixture.
+
+Problem 38 source-byte follow-up: Normalize local base YAML before service
+discovery (status: done; release 5.63)
+
+Expected outcome: every Docker Compose operation runs `docker compose config`
+against the effective base plus resolved overlays, normalizes the generated
+YAML to UTF-8, and runs the requested verb against that materialized file.
+Local source files must not be edited, and non-Compose commands remain direct.
+
+Root cause and exact reproduction: `resolve()` called
+`YAML::XS::LoadFile` on local base Compose files to determine their service
+names before `_materialized_command` could normalize Compose's output. A
+source `compose.yaml` containing byte `0xA3` therefore failed at resolution
+with `invalid leading UTF-8 octet`, before the Docker/Compose stub was
+invoked. This was a distinct path from the already-fixed case where captured
+`docker compose config` output itself contained an isolated byte. The test
+first wrote a raw Windows-1252 pound byte into an isolated local base and ran
+`t/94-dockercompose-coverage.t` in Docker; the new assertion failed with that
+exact parse diagnostic and zero Compose calls. The fix reads the source as raw
+bytes, normalizes only an in-memory copy for service discovery, and leaves the
+original source untouched. The red regression then verifies the operation
+sequence is `config` followed by `ps -f <temporary-file>` and that the copied
+materialized YAML contains valid UTF-8 `£`. The same test retains coverage for
+config/up/down/build/ps/logs and confirms non-Compose commands bypass
+materialization. `/tmp/here.yml` was not opened or used as a fixture.
+
+Verification: Docker full coverage passed 258 files / 22,550 tests;
+statement, branch, condition, and subroutine totals were each 100.0%, with
+45,519 coverage detail rows and no stale uncoverable annotations. Focused
+release/Compose verification passed 3 files / 5,965 tests, and the required
+focused web-security trio passed 459 tests. The coverage run skipped optional
+browser/QEMU/kwalitee tooling that is unavailable in the dev image, and
+`cpan-audit` advisory-fixture coverage was explicitly skipped because that
+tool is absent; neither skip failed the coverage gate. Devel::Cover printed
+warnings for ephemeral fixture files deleted before report digestion; the
+gate completed successfully.
+
+The release build and image version were verified at 5.61, and the blank
+environment installed that tarball with `cpanm` (without `--notest`) and
+completed the full integration script. The final report and generated README
+were synchronized, and the release metadata advanced to 5.63 rather than
+reusing version 5.62.
+Earlier Problem 38 release work also corrected an image version-shadowing
+issue: the ignored operator-local D2 Dockerfile installs the archive into the
+runtime-first `/root/perl5` library, and an integration assertion guards that
+recipe when present. No commit or push was requested.
+
+Problem 39: Numbering gap — no problem description recorded (status: unassigned)
+
+The supplied problem sequence and repository records contain Problem 38
+followed by Problem 40, with no Problem 39 description, capture, expected
+outcome, or implementation request found. This entry records the gap without
+inventing a bug or claiming a fix. If Problem 39 was assigned elsewhere, its
+source report is needed before this slot can be classified further.
+
+Problem 40: Resolve the base Compose service list before loading service overlays
+Status: implementation, full tests, coverage, packaging, image, and blank-container integration passed.
+Date: 2026-10-07
+
+Expected outcome: run `docker compose config` first with the local base and
+configured non-service layers. Parse that output's `services` map, then search
+active home, project, and nested skill runtime roots for only those service
+names. Apply `disabled.yml` and `develop.yml` marker behavior before adding
+service files to the final config. Preserve explicit project-directory and
+user-supplied `-f` options without calculating the operation argv position
+from a number of generated file pairs.
+
+Root cause: `resolve()` selected isolated service compose files before Docker
+Compose had resolved the base config. It used raw local YAML, command-line
+service inference, and an ecosystem-wide enabled service scan; consequently
+the initial `config` call could contain unrelated service overlays. Then
+`_materialized_command` sliced `@full` at `2 + 2 * number_of_files`, which
+assumed every generated `-f` pair was a contiguous argv prefix and broke when
+other compose-global options or user file arguments were present.
+
+Reproduction steps: a new hermetic fixture is built inside the project dev
+container. Its source base names `source_only` and `blocked`; a project
+non-service overlay defines `present`; runtime files provide home and nested
+skill layers for `present`; the `blocked` service is disabled; and `present`
+has a development marker. Call `run()` with an explicit project directory,
+one additional `-f` base file, and `build ghost`. The docker stub's first
+`config` output lists `present` and `blocked`. The test makes
+`_local_compose_services` die if execution calls it, then checks the first
+invocation has no runtime service overlay, the next config contains only
+matching enabled overlays (including opted-in development), and the last
+operation uses the merged file while retaining its arguments and project
+directory.
+
+A follow-up red test covered a project without a conventional Compose filename
+where the only base is supplied through `-f`. Before the correction, the first
+config call preloaded runtime service folders and omitted the selected skill
+environment; two assertions failed. `resolve()` now parses leading Compose
+options to detect explicit `-f`/`--file` inputs and defers service lookup for
+that case too. The fixture passes with the explicit base alone in the first
+call, matching overlays in the later config, and service environment applied
+only after Compose returned the service map.
+
+Red-before-fix evidence: the first Docker run of the new regression failed
+four assertions. It observed two calls rather than three; the initial config
+already contained `config/docker/ghost/compose.yml` and
+`config/docker/present/compose.yml`; the later config lacked the selected
+`present` overlay; and the expected operation log entry was absent. This
+matched the reported incorrect order. After the fix, the focused red/green
+regression passed with the full resolver file. The six changed focused
+regressions (`t/05`, `t/10`, `t/11`, `t/30`, `t/94`, and `t/266`) first passed
+2,105 assertions; after version alignment, all seven focused files including
+`t/15-release-metadata.t` passed 7,540 tests. The resolver file independently
+passed 305 assertions, including the explicit-file-only base case.
+
+Implementation: execution now passes an internal deferred-discovery flag
+through the private Docker helper. `_materialized_command` explicitly splits
+global compose options, explicit `-f` base files, project-directory, and the
+requested operation; no file-count argv slicing remains. It runs base config,
+parses the service mapping, gathers the matching service files using the
+existing layered disable/development rules, then runs a final config when
+service overlays were selected. Existing base/project/service/addon/mode
+precedence is maintained. Compose-returned service names must be non-empty
+single path segments; `.`/`..` and names containing path separators are
+rejected before filesystem lookup. Dry-run remains non-executing and is
+documented as a source-based preview.
+
+Security review for this change: the command still passes argument vectors to
+`system` and does not compose a shell string; config-derived service names only
+select existing runtime-root paths. No new dependencies, SQL, HTTP routes,
+credentials, or authentication behavior were introduced. The fresh full Docker
+gate passed 258 files / 22,609 tests at 100.0% statement, branch, condition,
+and subroutine coverage (45,787 detail rows and no stale uncoverable
+annotations). The required focused web-security trio passed 459 tests.
+`perlsec` was reviewed from the container's `perlsec.pod` with `pod2text`
+because `perldoc` has no formatter. The 5.65 archive passed CPANTS kwalitee
+(100%, 7/7 assertions) and POD syntax (348 source files, 355 assertions).
+`dzil build` produced `Developer-Dashboard-5.65.tar.gz`; its image reported
+version 5.65 in a one-off Compose run. A blank-environment container installed
+the archive with `cpanm` without `--notest` and passed the full integration
+script. Required security searches found no Problem 40 shell-string execution
+or production use of a forbidden library; broad matches were existing audit
+strings and test fixtures. Devel::Cover warnings for temporary generated
+fixtures removed during tests remain visible, while the coverage gate exits
+successfully with all four metrics at 100.0%.
+
+Problem 41: Remove Docker from built-in indicators (status: done, version 5.67)
+
+Expected outcome: core indicator refresh does not probe for the docker
+executable and does not create a Docker status indicator. Docker status remains
+available when the user explicitly configures a Docker collector. A previously
+persisted core Docker record is removed, while customized and collector-owned
+records named docker are preserved.
+
+Root cause: refresh_core_indicators() called command_in_path('docker') and
+persisted a Docker indicator at priority 20. A configured collector named
+docker then shared that record, which made Docker appear first in the prompt.
+
+Reproduction: run d2 ps1 without tmux indicator suppression. The old path
+probed the Docker executable and created a whale indicator even in a runtime
+without a Docker collector. In the Docker dev service, t/95 was changed first
+to make the executable probe fatal; its red run exited at that probe. The test
+also seeds the old built-in record and verifies migration cleanup while keeping
+an explicitly configured collector-owned docker record.
+
+Implementation removes the Docker probe and write from core refresh and adds
+signature-based cleanup for the old core record only. Shared-lock cleanup
+passes both focused Docker test files (1,042 assertions), preserving custom and
+collector-owned statuses.
+Three additional red assertions exposed missing writer-lock protection and
+lock-failure reporting. Shared-lock cleanup now passes both focused Docker test
+files (1,042 assertions), including layered/custom ownership preservation.
+The first full run failed four tracked-document assertions because container
+Git rejected the /work bind mount's ownership. A disposable test Compose file
+sets safe.directory only inside the container. The affected integration asset
+and indicator tests passed 491 assertions, and the full gate was restarted.
+
+Final verification: all 258 Docker test files passed (22,645 tests); Devel::Cover
+reported 100.0% statement, branch, condition, and subroutine coverage across
+the library (45,841 detail rows, no stale uncoverable annotations). Its report
+included missing-digest diagnostics for temporary generated helpers already
+removed by their tests; the canonical gate exited successfully. The focused
+web/security tests passed 459 assertions. Kwalitee, POD, and release metadata
+passed 5,783 assertions, including 100% CPANTS kwalitee. The final 5.67 archive
+excluded cover_db. The blank Docker environment installed the same 5.67 release
+code through cpanm with tests enabled and passed the complete installed-runtime
+integration runner. Perl's perlsec documentation was reviewed inside the
+runtime container. No new executable, dependency, SQL, endpoint, credential,
+or authentication surface was added.
+
+Problem 42: Let skill environment values override home defaults (status: done, 5.68)
+
+Expected outcome: matching values from a skill's `.env` or `.env.pl` override
+home runtime values from `~/.d2` or `~/.developer-dashboard`. Deeper project
+runtime layers keep final precedence. Non-skill environment behavior is
+unchanged.
+
+Root cause: SkillDispatcher loaded skill and skill-CLI files before loading
+the whole runtime chain. The final runtime load replayed the home `.env` and
+overwrote the skill's value.
+
+Reproduction: in an isolated Docker dev container, create `foo/.env` with
+`SKILL_WILL_OVERWRITE_THIS=I am foo`, `bar/.env` with
+`SKILL_WILL_OVERWRITE_THIS=I am bar`, and
+`~/.developer-dashboard/.env` with `SKILL_WILL_OVERWRITE_THIS=HOME`. Run
+`d2 foo.bash -c` and `d2 bar.bash -c` with each command printing the variable.
+Before the fix both print `HOME`; after the fix they print their own skill
+value. Remove the home file and rerun, then set the key in a deeper project
+runtime file and confirm that deeper value wins.
+
+Red/green: the new skill dispatch assertion failed in Docker before the code
+change (`got home-runtime`, expected `skill`). Focused skill and EnvLoader
+tests pass after implementation, including home `.d2` plus
+`.developer-dashboard` ordering and deeper project precedence. The full Docker
+suite passed 258 files / 22,656 tests with 100.0% statement, branch, condition,
+and subroutine coverage (45,874 detail rows; no stale uncoverable annotations).
+The required web/security trio passed 459 tests. Devel::Cover emitted visible
+missing-digest diagnostics for temporary fixtures removed during tests, and
+existing negative-fixture tests print expected shell/archive diagnostics; the
+run is not called warning-free. README and main POD remain synced. The required
+security scans found no new forbidden library usage, sensitive information,
+unsafe auth behavior, raw SQL, or missing security-header implementation;
+perlsec was reviewed in the same runtime image. `dzil build` produced the sole
+archive `Developer-Dashboard-5.68.tar.gz`, with no `cover_db` entry. CPANTS
+kwalitee passed 7/7 checks at 100%, and POD syntax passed 348 source files / 355
+assertions. The blank Perl 5.44 container installed the tarball using `cpanm`
+without `--notest`, ran distribution tests, and completed the installed-runtime
+integration script. `d2 docker.images.build` completed; a scoped run of its
+image reported `d2 version` 5.68. No release upload was performed.
+
+Problem 43: Keep Docker Compose skill env scoped to the selected service
+(status: done in 5.71)
+
+Expected outcome: when installed skills `foo` and `bar` each contribute a
+Compose service and define the same variable in their skill `.env`,
+`d2 docker compose up foo` uses foo's value and a later
+`d2 docker compose up bar` uses bar's value. Operations without a selected
+service continue to use env from all effective base services. Caller-exported
+values keep their higher precedence under Problem 44.
+
+Reproduction from `/tmp/capture-1476.txt`: create `foo/.env` with
+`SKILL_WILL_OVERWRITE_THIS=I am foo` and `bar/.env` with
+`SKILL_WILL_OVERWRITE_THIS=I am bar`; add a matching
+`config/docker/<skill>/compose.yml` whose message interpolation reads that
+key. Run `d2 docker compose up foo`, remove the home `.env`, then run
+`d2 docker compose up bar`. Before the fix, bar's container printed
+`I am foo` despite its own `.env` containing `I am bar`.
+
+Root cause: `_materialized_command()` replaced the originally requested
+services with every service returned by the base Compose config and then
+loaded all corresponding skill env files into Compose's single global
+interpolation environment. Since both skills set the same key, the last
+enumerated skill won. A red-first Docker regression in
+`t/94-dockercompose-coverage.t` reproduced the exact sequential failure. The
+fix preserves the selected services, intersects them with the effective base
+service set, and resolves skill env from only those services. Deferred local
+base operations infer service selection from parsed operation args. If no
+requested service matches the base or the operation selects none, the
+established all-base-service environment behavior remains. Compose file and
+dependency gathering is unchanged.
+
+After the fix, `d2 docker compose exec dev prove -lv
+t/94-dockercompose-coverage.t` passed 317 assertions. This covers the exact
+foo-then-bar sequence, deferred selection, invalid service fallback, and
+all-service operations. The full Docker suite passed 258 files / 23,044 tests.
+The isolated four-metric coverage gate passed at 100.0% statement, branch,
+condition, and subroutine coverage (46,002 detail rows, no stale uncoverable
+annotations). The required web/security trio passed 459 tests. The successful
+gate output includes existing Devel::Cover diagnostics for temporary fixtures
+removed by tests and expected negative-archive diagnostics. Security review:
+ASVS V1/V11 cover service-scoped interpolation and selection; V5/V12/V14 cover
+validated service identifiers, service-specific environment file discovery,
+and precedence; V7 preserves visible failures. V2/V3/V4/V6/V9/V13 are untouched
+(authentication, sessions, authorization, cryptography, transport, and web
+APIs). V8 adds no secret persistence or logging path. V10 command construction
+is unchanged and uses Compose argv rather than a shell. OWASP A03/A04/A05/A08/A09
+were considered; no new injection, access-control, deployment-security,
+integrity, or logging surface was added. Perl's `perlsec` documentation was
+reviewed in the D2 container. Required source scans found no new production
+forbidden-library, credential, SQL, redirect, traversal, or header issue;
+broad matches were in fixtures and documented scan commands. The web/security
+trio passed 459 tests.
+
+`dzil clean` preceded the 5.71 bump. `dzil build` produced only
+`Developer-Dashboard-5.71.tar.gz`, which contains no `cover_db`. Release
+metadata passed 5,428 assertions; CPANTS kwalitee passed 7/7 indicators.
+The exact archive installed in a blank Perl 5.44 container using plain
+`cpanm` (without `--notest`), ran the packaged distribution tests, and ended
+with `Successfully installed Developer-Dashboard-5.71` / `121 distributions
+installed`. `d2 docker.images.build` succeeded, and an isolated run of the
+image reported version 5.71. The optional t/44 guard skipped because the dev
+container has no nested Docker CLI; the direct blank-container install-and-test
+flow above passed. No `OLD_CODE` file was changed.
+
+Problem 44: Preserve explicit command-line environment overrides
+(status: done in 5.70)
+
+Expected outcome: `NAME=value d2 <skill>.<command>` passes `value` unchanged to
+the command, even when home and skill `.env` or `.env.pl` files define `NAME`.
+When the caller leaves a key unset, normal file precedence remains: skill
+settings override home defaults and deeper project runtime settings override
+skill settings. The same rule applies to ordinary dashboard commands and skill
+commands.
+
+Reproduction from `/tmp/capture-1747.txt`: run a disposable skill command that
+prints `SKILL_WILL_OVERWRITE_THIS` with a home runtime `.env` setting it to
+`HOME`, then invoke it as `SKILL_WILL_OVERWRITE_THIS=here1 d2 foo.bash`. Repeat
+for a second skill and remove the home file before invoking with `foo3` and
+`foo4`. Before the fix, the home value replaced both explicit assignments
+(`here1`/`here2`), and then each skill value replaced explicit assignments
+(`foo3`/`foo4`). The capture also confirmed that ordinary skill values should
+remain active when no caller override is present.
+
+Root cause: the public switchboard loaded runtime env files directly into
+`%ENV`, replacing inherited caller values before it exec'd a helper. Skill
+dispatch then loaded skill env files through `_load_skill_layer_specs()`, a
+separate code path that bypassed `load_files()` and replaced those caller
+values a second time. The two loaders also left env-audit provenance claiming
+that a file supplied a value that actually came from the invoking process.
+
+Red tests: `t/87-envloader-coverage.t` first failed with `from-file` instead of
+`from-caller`; `t/30-dashboard-loader.t` exercises the public switchboard and
+dotted skill command in an isolated home inside the Docker development
+container. Tracing the first partial fix showed that the skill-dispatch test
+still failed because `_load_skill_layer_specs()` independently ran each skill
+file. The final correction preserves caller values at both loading
+boundaries. Focused Docker verification passed 2 files / 216 assertions. It
+also verifies unset keys still populate from files, skill values still
+override home defaults, error paths restore caller values, and errors remain
+visible.
+
+The full Docker suite passed 258 files / 22,690 tests. The all-metric coverage
+gate reported 100.0% statement, branch, condition, and subroutine coverage
+(45,961 detail rows; no stale uncoverable annotations). The required
+web/security trio passed 459 tests. Devel::Cover emitted visible missing-
+digest diagnostics for temporary fixture sources removed during tests, and
+negative-fixture tests printed their expected shell/archive errors; the run is
+not called warning-free. Static security scans found no new forbidden
+libraries, auth/redirect/header issue, raw SQL execution path, or secret in the
+change. The `perlsec` guidance was reviewed against this environment handoff:
+key names are validated, actual caller values remain in `%ENV`, and no
+untrusted value is interpreted as shell syntax or a path.
+
+Release verification: CPANTS kwalitee passed 7/7 indicators (100%), and the
+POD syntax gate passed all 348 discovered Perl source files. The final 5.70 tarball
+passed `dzil build` and contains no `cover_db`; `cpanm` installed and tested it
+without `--notest` in a blank Perl 5.44 Compose container, whose installed-
+runtime integration flow passed. Headless Chromium printed missing-D-Bus
+diagnostics and the expected unauthenticated-route response during browser
+checks; assertions passed. `d2 docker.images.build` completed, and a scoped
+Compose run reported `d2 version` 5.70. An earlier 5.69 image had already been
+built in this cycle; the final report therefore uses a distinct 5.70 version.
+No release upload was performed.

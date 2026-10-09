@@ -62,4 +62,44 @@ for my $case ([ 'test2.dkim2.com', 0, 'a bridged forward validates through the C
     if ($want_fail) { isnt($rc, 0, $name) } else { is($rc, 0, $name) }
 }
 
+# Header-level PERMERRORs, as the Verifier reports them. The walk is driven by
+# the i= values it can read, so a lone junk DKIM2-Signature with no usable i=
+# used to be skipped entirely: exit 0, a pass.
+my $plain = "From: a\@test1.dkim2.com\r\nTo: c\@test2.dkim2.com\r\nSubject: x\r\n\r\nhi\r\n";
+my $signed = bridged_chain('test2.dkim2.com');
+for my $case (
+    [ 'lone junk signature', "DKIM2-Signature: m=1; d=evil.example\r\n$plain",
+      qr/PERMERROR DKIM2-Signature has a missing or malformed i= tag/ ],
+    [ 'lone empty signature', "DKIM2-Signature: \r\n$plain",
+      qr/PERMERROR DKIM2-Signature has a missing or malformed i= tag/ ],
+    [ 'junk signature on a good chain', "DKIM2-Signature: m=2; d=evil.example\r\n$signed",
+      qr/PERMERROR DKIM2-Signature has a missing or malformed i= tag/ ],
+    [ 'huge i=', "DKIM2-Signature: i=99999999999999999999; m=1; d=evil.example\r\n$signed",
+      qr/PERMERROR DKIM2-Signature i= exceeds the maximum chain number of 100/ ],
+    [ 'huge m=', ($signed =~ s/^(DKIM2-Signature: i=3; m=)1;/${1}4294967297;/mr),
+      qr/PERMERROR DKIM2-Signature m= exceeds the maximum chain number of 100/ ],
+    [ 'm=4294967297x', ($signed =~ s/^(DKIM2-Signature: i=3; m=)1;/${1}4294967297x;/mr),
+      qr/PERMERROR DKIM2-Signature has a malformed m= tag/ ],
+    [ 'instance m=abc', ($signed =~ s/^(Message-Instance: m=)1;/${1}abc;/mr),
+      qr/PERMERROR Message-Instance has a malformed m= tag/ ],
+    [ 'instance m=33', ($signed =~ s/^(Message-Instance: m=)1;/${1}33;/mr),
+      qr/PERMERROR Message-Instance m= exceeds the maximum chain length of 32/ ],
+    [ 'FWS around = (allowed)', ($signed =~ s/^(DKIM2-Signature: i=)1; m=1;/${1} 1; m =1;/mr),
+      undef ],
+) {
+    my ($name, $msg, $want) = @$case;
+    my $path = "$dir/hdr.eml";
+    open my $fh, '>', $path or die $!;
+    print $fh $msg;
+    close $fh;
+    my $out = `perl -Ilib bin/validate.pl --ignore-timestamps $path 2>&1`;
+    unless ($want) {
+        is($?, 0, "$name: validates") or diag($out);
+        unlike($out, qr/uninitialized|MISMATCH/, "$name: no warnings");
+        next;
+    }
+    isnt($?, 0, "$name: rejected");
+    like($out, $want, "$name: says why");
+}
+
 done_testing;

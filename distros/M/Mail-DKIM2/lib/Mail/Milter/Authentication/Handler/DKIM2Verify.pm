@@ -4,10 +4,10 @@ use strict;
 use warnings;
 use Mail::Milter::Authentication::Pragmas;
 # ABSTRACT: Handler class for DKIM2 signature verification
-our $VERSION = '0.13';
+our $VERSION = '0.17';
 use base 'Mail::Milter::Authentication::Handler';
 
-use Mail::DKIM2::Common qw(extract_mi_version parse_dkim_pubkey fold_header);
+use Mail::DKIM2::Common qw(extract_mi_version parse_dkim_pubkey fold_header parse_mime);
 use Mail::DKIM2::Verifier;
 use Mail::DKIM2::MessageInstance;
 use Mail::DKIM2::MessageStore;
@@ -22,6 +22,18 @@ sub default_config {
         'snapshot_directory'   => undef,  # store message snapshots for egress diffing
         'ignore_header_prefixes' => [],   # our own fields, hashed by neither end (IgnorePrefixes)
     };
+}
+
+# The handler's configuration with default_config() filled in for every
+# option left out (or undef); an explicit 0 still wins. The framework does
+# not merge default_config() at runtime -- it only uses it to generate a
+# sample config -- so without this add_message_instance, documented as on
+# by default, was off unless set.
+sub _config {
+    my ($self) = @_;
+    my $given    = $self->handler_config() || {};
+    my $defaults = default_config();
+    return { %$given, map { $_ => $given->{$_} // $defaults->{$_} } keys %$defaults };
 }
 
 sub register_metrics {
@@ -57,7 +69,7 @@ sub header_callback {
 sub eoh_callback {
     my ($self) = @_;
     return if $self->{'failmode'};
-    my $config = $self->handler_config();
+    my $config = $self->_config();
 
     unless ( $self->{'has_dkim2'} ) {
         $self->metric_count( 'dkim2_verify_total', { 'result' => 'none' } );
@@ -74,7 +86,7 @@ sub eoh_callback {
     my $verifier;
     eval {
         $verifier = Mail::DKIM2::Verifier->new(
-            IgnorePrefixes => $self->handler_config()->{'ignore_header_prefixes'},
+            IgnorePrefixes => $self->_config()->{'ignore_header_prefixes'},
         );
         $self->_setup_pubkey_callback($verifier);
         $self->set_object('dkim2_verifier', $verifier, 1);
@@ -151,7 +163,7 @@ sub eom_callback {
     return unless $self->{'has_dkim2'};
     return if $self->{'failmode'};
 
-    my $config = $self->handler_config();
+    my $config = $self->_config();
     my $verifier = $self->get_object('dkim2_verifier');
 
     eval {
@@ -194,7 +206,7 @@ sub eom_callback {
 
 sub _add_mi_and_store {
     my ($self) = @_;
-    my $config = $self->handler_config();
+    my $config = $self->_config();
 
     eval {
         my $EOL = "\015\012";
@@ -202,7 +214,7 @@ sub _add_mi_and_store {
                          . $EOL
                          . join(q{}, @{$self->{'body'}});
 
-        my $msg = Email::MIME->new($message_data);
+        my $msg = parse_mime($message_data);
         my @mi_headers = $msg->header_raw('Message-Instance');
         my $mi_value;
         my $snapshot;
@@ -211,6 +223,9 @@ sub _add_mi_and_store {
             # Case 2: Message has existing MI header(s).
             # The topmost MI must match current content (already verified
             # by the DKIM2 chain check).  Use it as the snapshot key.
+            # Only the snapshot needs it: with no snapshot_directory there
+            # is nothing to store, so skip the verify entirely.
+            return unless $config->{'snapshot_directory'};
             my $mi_ver = Mail::DKIM2::MessageInstance->verify($msg,
                 IgnorePrefixes => $config->{'ignore_header_prefixes'});
             unless ( $mi_ver ) {
@@ -271,7 +286,7 @@ sub close_callback {
 
 sub _setup_pubkey_callback {
     my ( $self, $verifier ) = @_;
-    my $config = $self->handler_config();
+    my $config = $self->_config();
 
     # If dns_overrides is set (testing), load keys from that JSON file
     if ( $config->{'dns_overrides'} ) {
@@ -360,7 +375,10 @@ modifications made during local processing.
 
 =head2 default_config()
 
-Returns the default configuration hash for this handler.
+Returns the default configuration hash for this handler. The handler
+applies these itself to any option the configuration leaves out (the
+authentication_milter framework does not), so C<add_message_instance> is
+on unless set to 0.
 
 =head2 register_metrics()
 

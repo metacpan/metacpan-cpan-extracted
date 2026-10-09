@@ -12,7 +12,7 @@ our @ISA = qw(Exporter);
 
 BEGIN {
     use XSLoader;
-    $VERSION = '1.29';
+    $VERSION = '1.30';
     XSLoader::load('Math::Clipper', $VERSION);
 }
 
@@ -632,7 +632,7 @@ contact information.
 
 The C<Math::Clipper> module is
 
-Copyright (C) 2010, 2011, 2014 by Steffen Mueller
+Copyright (C) 2010, 2011, 2014, 2026 by Steffen Mueller
 
 Copyright (C) 2011, 2018, 2019 by Mike Sheldrake
 

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use ExtUtils::Typemaps;
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 our @ISA = qw(ExtUtils::Typemaps);
 
@@ -190,12 +190,12 @@ L<ExtUtils::Typemaps>, L<ExtUtils::Typemaps::Default>, L<ExtUtils::Typemaps::STL
 
 =head1 AUTHOR
 
-The module was written by Steffen Mueller <smueller@cpan.org>,
+The module was written by Steffen Mueller <cpan@steffen-mueller.net>,
 but the important bit, the typemap, was written by Dean Roehrich.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2010, 2011, 2012, 2013 by Steffen Mueller
+Copyright 2010-2026 by Steffen Mueller
 
 Except for the typemap code, which is copyright 1996 Dean Roehrich
 

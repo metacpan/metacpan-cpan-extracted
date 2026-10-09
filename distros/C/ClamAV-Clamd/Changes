@@ -1,5 +1,12 @@
 Revision history for ClamAV-Clamd
 
+0.08    2026-10-08
+        - Builds on Windows: NO_XSLOCKS, and the C core no longer uses
+          poll, gettimeofday or errno on a socket there.
+        - Files are opened binary on Windows.
+        - t/25-tcp.t scans over TCP with no fork, so it runs everywhere.
+        - t/10-new.t and t/80-abi.t skip what needs a UNIX socket.
+
 0.07    2026-08-29
         CPAN Testers fixes 
         - Makefile.PL probes for the flags that reveal the XPG4.2 msghdr

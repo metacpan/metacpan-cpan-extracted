@@ -10,7 +10,7 @@ use Digest::SHA ();
 use Game::Gin::Deadwood qw(deadwood);
 use Game::Gin::Search qw(worth_taking best_discard knock_now LEVELS);
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 has level => (is => 'ro', isa => Int);
 has seed  => (is => 'ro', isa => Str);
@@ -73,7 +73,7 @@ Game::Gin::Bot - an opponent that can only see what a player can see
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

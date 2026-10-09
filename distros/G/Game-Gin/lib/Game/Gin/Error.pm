@@ -5,7 +5,7 @@ use warnings;
 
 use Object::Proto::Sugar -types;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 my %MESSAGE = (
     hand_over      => 'the hand is over',
@@ -41,7 +41,7 @@ Game::Gin::Error - what the rules refuse, as a code
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

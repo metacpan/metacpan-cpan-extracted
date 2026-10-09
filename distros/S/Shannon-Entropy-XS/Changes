@@ -5,3 +5,9 @@ Revision history for Shannon-Entropy-XS
 
 1.12	01/04/2026
 	- Add custom op which improves performance from 5952380.95/s to 7633587.79/s in benchmark
+
+1.17	08/10/2026
+	- Fix assertion failure in newUNOP on DEBUGGING perls (5.18, 5.20)
+	- Only replace the call with the custom op when the argument is a
+	  single scalar; a list argument left extra values on the stack
+	- Register the custom op as a UNOP so B::Concise can walk it

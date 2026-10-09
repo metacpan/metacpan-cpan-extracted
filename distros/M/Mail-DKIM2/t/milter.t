@@ -6,72 +6,12 @@ use Path::Tiny;
 use JSON;
 use Email::MIME;
 use File::Temp qw(tempdir);
+use File::Find ();
 
-# --- Mock the Mail::Milter::Authentication framework ---
-# Must happen in BEGIN before the handler modules are loaded.
-
-BEGIN {
-    # Stub Pragmas (just enables strict/warnings, imports LOG_* constants)
-    $INC{'Mail/Milter/Authentication/Pragmas.pm'} = 1;
-    package Mail::Milter::Authentication::Pragmas;
-    sub import {
-        my $caller = caller;
-        no strict 'refs';
-        *{"${caller}::LOG_DEBUG"} = sub { 'debug' };
-        *{"${caller}::LOG_INFO"}  = sub { 'info' };
-        *{"${caller}::LOG_ERR"}   = sub { 'err' };
-    }
-
-    # Stub base handler
-    $INC{'Mail/Milter/Authentication/Handler.pm'} = 1;
-    package Mail::Milter::Authentication::Handler;
-    sub new {
-        my ($class, %args) = @_;
-        return bless {
-            _config  => $args{config} || {},
-            _objects => {},
-            _auth_headers => [],
-            _pre_headers  => [],
-            _prepended    => [],
-            _log => [],
-            _metrics => {},
-        }, $class;
-    }
-    sub handler_config     { return $_[0]->{_config} }
-    sub is_authenticated   { return $_[0]->{_config}{_authenticated} || 0 }
-    sub is_local_ip_address { return $_[0]->{_config}{_local} || 0 }
-    sub set_object         { $_[0]->{_objects}{$_[1]} = $_[2] }
-    sub get_object         { return $_[0]->{_objects}{$_[1]} }
-    sub destroy_object     { delete $_[0]->{_objects}{$_[1]} }
-    sub check_timeout      { }
-    sub handle_exception   { }
-    sub dbgout             { push @{$_[0]->{_log}}, [@_[1..$#_]] }
-    sub log_error          { push @{$_[0]->{_log}}, ['ERROR', $_[1]] }
-    sub metric_count       { $_[0]->{_metrics}{$_[1]} = ($_[0]->{_metrics}{$_[1]} || 0) + 1 }
-    sub add_auth_header    { push @{$_[0]->{_auth_headers}}, $_[1] }
-    sub prepend_header     { push @{$_[0]->{_prepended}}, { field => $_[1], value => $_[2] } }
-
-    # Stub AuthenticationResults classes
-    $INC{'Mail/AuthenticationResults/Header/Entry.pm'} = 1;
-    package Mail::AuthenticationResults::Header::Entry;
-    sub new       { bless {key => '', value => '', children => []}, shift }
-    sub set_key   { $_[0]->{key} = $_[1]; $_[0] }
-    sub safe_set_value { $_[0]->{value} = $_[1]; $_[0] }
-    sub add_child { push @{$_[0]->{children}}, $_[1]; $_[0] }
-
-    $INC{'Mail/AuthenticationResults/Header/Comment.pm'} = 1;
-    package Mail::AuthenticationResults::Header::Comment;
-    sub new            { bless {value => ''}, shift }
-    sub safe_set_value { $_[0]->{value} = $_[1]; $_[0] }
-
-    $INC{'Mail/AuthenticationResults/Header/SubEntry.pm'} = 1;
-    package Mail::AuthenticationResults::Header::SubEntry;
-    sub new            { bless {key => '', value => ''}, shift }
-    sub set_key        { $_[0]->{key} = $_[1]; $_[0] }
-    sub safe_set_value { $_[0]->{value} = $_[1]; $_[0] }
-}
-
+# The Mail::Milter::Authentication framework is mocked (t/lib/MockAuthMilter.pm);
+# it must load before the handler modules.
 use lib 'lib', 't/lib';
+use MockAuthMilter qw(run_sign);
 use Mail::Milter::Authentication::Handler::DKIM2Verify;
 use Mail::Milter::Authentication::Handler::DKIM2Sign;
 use Mail::DKIM2::Common qw(parse_dkim_pubkey strip_mi_versions);
@@ -80,7 +20,9 @@ use DKIM2TestKeys;
 # Helper: feed a raw message through milter verify callbacks
 sub run_verify {
     my ($raw, %opts) = @_;
-    my $config = {
+    # _bare: pass only the given options, as a config file that leaves the
+    # rest out would.
+    my $config = delete $opts{_bare} ? { %opts } : {
         hide_none => 0,
         dns_overrides => undef,
         add_message_instance => 0,
@@ -142,77 +84,6 @@ sub run_verify {
     return $handler;
 }
 
-# Helper: feed a raw message through milter sign callbacks
-sub run_sign {
-    my ($raw, %opts) = @_;
-    my $env_from = exists $opts{env_from} ? delete $opts{env_from} : '<sender@test1.dkim2.com>';
-    my $env_rcpt = exists $opts{env_rcpt} ? delete $opts{env_rcpt} : '<recipient@test2.dkim2.com>';
-    my $config = {
-        domains => {},
-        sign_authenticated => 1,
-        sign_local => 1,
-        add_message_instance => 1,
-        record_smtp_params => 1,
-        snapshot_directory => undef,
-        _authenticated => 1,
-        # Pin t= so the fixtures written to tests/expected/ are identical on
-        # every run; otherwise a live timestamp dirties the working tree each
-        # time the suite is run.
-        signature_timestamp => 1740000000,
-        %opts,
-    };
-
-    my $handler = Mail::Milter::Authentication::Handler::DKIM2Sign->new(
-        config => $config,
-    );
-
-    $raw =~ s/\r//gs;
-    $raw =~ s/\n/\r\n/gs;
-
-    my ($header_block, $body) = split /\r\n\r\n/, $raw, 2;
-    my @header_lines;
-    my $current = '';
-    for my $line (split /\r\n/, $header_block) {
-        if ($line =~ /^\s/ && $current ne '') {
-            $current .= "\r\n$line";
-        } else {
-            push @header_lines, $current if $current ne '';
-            $current = $line;
-        }
-    }
-    push @header_lines, $current if $current ne '';
-
-    $handler->envfrom_callback($env_from);
-    $handler->envrcpt_callback($env_rcpt);
-
-    for my $hline (@header_lines) {
-        my ($name, $value) = $hline =~ /^([^\s:]+)\s*:\s*(.*)/s;
-        $handler->header_callback($name, $value, $hline);
-    }
-
-    $handler->eoh_callback();
-
-    if (defined $body) {
-        my @chunks = ($body =~ /(.{1,256})/gs);
-        for my $chunk (@chunks) {
-            $handler->body_callback($chunk);
-        }
-    }
-
-    $handler->eom_callback();
-
-    # Simulate addheader phase
-    my $mock_handler = {
-        pre_headers    => [],
-        add_headers    => [],
-        remove_headers => [],
-    };
-    $handler->addheader_callback($mock_handler);
-
-    return ($handler, $mock_handler);
-}
-
-
 # === Tests ===
 
 diag("=== DKIM2Verify milter tests ===");
@@ -242,6 +113,54 @@ diag("=== DKIM2Verify milter tests ===");
     my @auth = @{$handler->{_auth_headers}};
     ok(@auth > 0, "verify signed: auth header added");
     is($auth[0]->{value}, 'pass', "verify signed: result is pass");
+}
+
+# Test 2: options left out of the config take their documented defaults.
+# The authentication_milter framework never merges default_config() into
+# the running config, so the handler applies its own: add_message_instance
+# is on unless set to 0.
+{
+    my $raw = path("tests/emails/brong-orig.eml")->slurp;
+    $raw =~ s/\r//gs;
+    $raw =~ s/\n/\r\n/gs;
+    my $signer = Mail::DKIM2::Signer->new(
+        Domain   => 'test1.dkim2.com',
+        Selector => 'rsa1024',
+        Key      => DKIM2TestKeys::private_key('test1.dkim2.com', 'rsa1024'),
+        MailFrom => 'sender@test1.dkim2.com',
+        RcptTo   => ['recipient@test2.dkim2.com'],
+    );
+    my $with_mi = "Message-Instance: "
+        . Mail::DKIM2::MessageInstance->calculate(Email::MIME->new($raw))->as_string() . "\r\n" . $raw;
+    $signer->PRINT($with_mi);
+    $signer->CLOSE();
+    my $signed_msg = $signer->as_string() . "\r\n" . $with_mi;
+
+    my $snap = tempdir(CLEANUP => 1);
+    my $handler = run_verify($signed_msg, _bare => 1, snapshot_directory => $snap);
+    is($handler->{_auth_headers}[0]{value}, 'pass', 'defaults: verify passes');
+    my $files_in = sub { my @f; File::Find::find(sub { push @f, $File::Find::name if -f }, $_[0]); @f };
+    my @stored = $files_in->($snap);
+    ok(@stored, 'defaults: add_message_instance defaults on (snapshot stored)');
+
+    # Without a snapshot_directory there is nothing to store, so the handler
+    # must not run MessageInstance->verify just to pick a key.
+    {
+        my $calls = 0;
+        no warnings 'redefine';
+        my $orig = \&Mail::DKIM2::MessageInstance::verify;
+        local *Mail::DKIM2::MessageInstance::verify = sub { $calls++; goto &$orig };
+        run_verify($signed_msg, _bare => 1);
+        my $without = $calls;
+        $calls = 0;
+        run_verify($signed_msg, _bare => 1, snapshot_directory => tempdir(CLEANUP => 1));
+        is($calls - $without, 1, 'no snapshot_directory: the snapshot-key verify is skipped');
+    }
+
+    my $snap0 = tempdir(CLEANUP => 1);
+    run_verify($signed_msg, _bare => 1, snapshot_directory => $snap0, add_message_instance => 0);
+    my @none = $files_in->($snap0);
+    is(scalar @none, 0, 'defaults: an explicit add_message_instance => 0 still wins');
 }
 
 # Test 3: Message with no DKIM2-Signature
@@ -501,8 +420,12 @@ sub run_outbound_sign {
     # Override env_from for the forwarding domain
     $handler->{'env_from'} = '<forwarder@test2.dkim2.com>';
     # Re-run addheader with corrected env_from
-    $mock = { pre_headers => [], add_headers => [], remove_headers => [] };
+    $mock = { pre_headers => [], add_headers => [] };
+    $handler->{_changed_headers} = [];
     $handler->addheader_callback($mock);
+    # Header changes go through the framework's change_header(), not the
+    # mock handler object.
+    $mock->{changed_headers} = $handler->{_changed_headers};
     return ($handler, $mock);
 }
 
@@ -520,13 +443,22 @@ sub assemble_outbound {
     }
     $input_msg =~ s/\r//gs;
     $input_msg =~ s/\n/\r\n/gs;
-    # Apply header removals recorded by the signer (e.g. stripped broken MI headers)
-    if (my @removals = @{$mock->{remove_headers} // []}) {
-        my @mi_versions = map { $_->{version} }
-                          grep { lc($_->{field}) eq 'message-instance' } @removals;
-        if (@mi_versions) {
-            $input_msg = strip_mi_versions($input_msg, @mi_versions);
+    # Apply the header changes the handler asked the framework for (e.g.
+    # deleting stripped broken MI headers), in order, as the MTA does: an
+    # empty value deletes the index'th field of that name (1-based).
+    for my $c (@{$mock->{changed_headers} // []}) {
+        my ($hdr, $body) = split /\r\n\r\n/, $input_msg, 2;
+        my @fields;
+        for my $line (split /\r\n/, $hdr) {
+            if ($line =~ /^[ \t]/ && @fields) { $fields[-1] .= "\r\n$line" }
+            else                               { push @fields, $line }
         }
+        my $n = 0;
+        @fields = map {
+            my $hit = /^\Q$c->{field}\E\s*:/i && ++$n == $c->{index};
+            $hit ? ($c->{value} eq '' ? () : ("$c->{field}: $c->{value}")) : ($_)
+        } @fields;
+        $input_msg = join("\r\n", @fields) . "\r\n\r\n" . $body;
     }
     $result .= $input_msg;
     return $result;
@@ -684,7 +616,7 @@ my $expected_dir = path("tests/expected");
     # Simulate: mailman added List-Id header BUT computed a broken MI v=2
     # (wrong hashes — all A's — doesn't describe the actual modification)
     my $bad_hash = 'A' x 43 . '=';   # 44-char base64 (32 bytes, all 0x00)
-    my $broken_mi2_val = "m=2 v=1 h=sha256:${bad_hash}:${bad_hash}";
+    my $broken_mi2_val = "m=2; h=sha256:${bad_hash}:${bad_hash}";
     my $modified = $signed_msg;
     $modified =~ s/\r//gs;
     $modified =~ s/\n/\r\n/gs;
@@ -696,17 +628,19 @@ my $expected_dir = path("tests/expected");
     my ($sign_handler, $mock) = run_outbound_sign($with_broken_mi2, $snapshot_dir);
     my @dk2 = grep { $_->{field} eq 'DKIM2-Signature' } @{$mock->{pre_headers}};
     my @mi  = grep { $_->{field} eq 'Message-Instance' } @{$mock->{pre_headers}};
-    my @rem = grep { lc($_->{field}) eq 'message-instance' } @{$mock->{remove_headers}};
+    my @rem = grep { lc($_->{field}) eq 'message-instance' } @{$mock->{changed_headers}};
 
     ok(@dk2 > 0,       'case4: outbound added DKIM2-Signature');
     ok(@mi > 0,        'case4: outbound added a new MI v=2');
-    ok(@rem > 0,       'case4: outbound recorded bad MI v=2 for removal');
+    ok(@rem > 0,       'case4: outbound asked the framework to delete the bad MI v=2');
     if (@mi) {
         like($mi[0]{value}, qr/^m=2/, 'case4: new MI is version 2');
         like($mi[0]{value}, qr/r=/,   'case4: new MI has recipes (diff from snapshot)');
     }
     if (@rem) {
-        is($rem[0]{version}, 2, 'case4: removal targets MI version 2');
+        is(scalar @rem, 1, 'case4: one header deleted');
+        is($rem[0]{index}, 1, 'case4: the first Message-Instance field (the broken m=2)');
+        is($rem[0]{value}, '', 'case4: deleted (empty value)');
     }
 
     # Assemble the outbound message (with bad MI v=2 stripped)

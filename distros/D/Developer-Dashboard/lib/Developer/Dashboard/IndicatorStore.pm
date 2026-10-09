@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '5.51';
+our $VERSION = '5.73';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
@@ -14,7 +14,6 @@ use Time::HiRes qw(time);
 
 use Developer::Dashboard::JSON qw(json_encode json_decode);
 use Developer::Dashboard::PathsRegistryArg qw(require_paths_arg);
-use Developer::Dashboard::Platform qw(command_in_path);
 
 my $STATUS_ICONS = {
     ok => {
@@ -83,7 +82,7 @@ sub set_indicator {
     my @preserve_existing = ref($preserve_fields) eq 'ARRAY' ? @{$preserve_fields} : ();
 
     open my $lock_fh, '>>', $lock or die "Unable to open $lock: $!";
-    flock( $lock_fh, LOCK_EX ) or die "Unable to lock $lock: $!";
+    $self->_lock_indicator_file($lock_fh) or die "Unable to lock $lock: $!";
     my $existing = $self->_read_indicator_file($file) || {};
 
     for my $field (@preserve_existing) {
@@ -374,9 +373,10 @@ sub is_stale {
 }
 
 # refresh_core_indicators(%args)
-# Refreshes the built-in generic indicators from local machine state.
+# Refreshes project/Git core status and retires obsolete built-in Docker state.
 # Input: optional cwd to resolve project-related state.
-# Output: array reference of updated indicator records.
+# Output: array reference of updated project/Git indicator records; never a
+#        Docker indicator.
 sub refresh_core_indicators {
     my ( $self, %args ) = @_;
     # A QUERY MUST NOT DECIDE ITS CALLER'S EXIT STATUS (DD-589, same shape as
@@ -392,18 +392,7 @@ sub refresh_core_indicators {
     my $cwd   = $args{cwd} || $self->{paths}->current_project_root;
     $cwd = $self->{paths}->home if !$cwd;
     my $items = [];
-
-    my $docker_ok = command_in_path('docker') ? 1 : 0;
-    push @$items, $self->_set_indicator_if_changed(
-        'docker',
-        alias          => '🐳',
-        label          => 'Docker',
-        icon           => '🐳',
-        page_status_icon => $docker_ok ? '&#x1F7E2;' : '&#x1F534;',
-        status         => $docker_ok ? 'ok' : 'missing',
-        priority       => 20,
-        prompt_visible => 1,
-    );
+    $self->_remove_legacy_core_docker_indicator;
     return $items if $prompt_only;
 
     my $project = $self->{paths}->project_root_for($cwd);
@@ -463,6 +452,61 @@ sub refresh_core_indicators {
     );
 
     return $items;
+}
+
+# _remove_legacy_core_docker_indicator()
+# Removes only persisted records matching the retired built-in Docker indicator,
+# leaving collector-owned or user-customized indicators named docker intact.
+# Input: none.
+# Output: true after all matching records across the active runtime layers are removed.
+sub _remove_legacy_core_docker_indicator {
+    my ($self) = @_;
+    for my $file ( $self->_indicator_file_candidates('docker') ) {
+        next if !-f $file;
+        my ( $volume, $directory ) = File::Spec->splitpath($file);
+        my $lock = File::Spec->catpath( $volume, $directory, '.lock' );
+        open my $lock_fh, '>>', $lock or die "Unable to open $lock: $!";
+        $self->_lock_indicator_file($lock_fh) or die "Unable to lock $lock: $!";
+        my $indicator = $self->_read_indicator_file($file);
+        next if !$self->_is_legacy_core_docker_indicator($indicator);
+        unlink $file or die "Unable to remove retired built-in Docker indicator $file: $!";
+    }
+    return 1;
+}
+
+# _lock_indicator_file($handle)
+# Serializes status writers and legacy cleanup using their shared lock file.
+# Input: open indicator lock handle.
+# Output: flock success boolean; callers expose any failure with the lock path.
+sub _lock_indicator_file {
+    my ( $self, $handle ) = @_;
+    return flock( $handle, LOCK_EX );
+}
+
+# _is_legacy_core_docker_indicator($indicator)
+# Identifies the exact persisted shape written by older core refreshes, without
+# treating collector-owned or customized Docker-named indicators as built-ins.
+# Input: decoded indicator value.
+# Output: boolean true only for a legacy core Docker record.
+sub _is_legacy_core_docker_indicator {
+    my ( $self, $indicator ) = @_;
+    return 0 if ref($indicator) ne 'HASH';
+    return 0 if $indicator->{managed_by_collector};
+    my %expected = (
+        name          => 'docker',
+        label         => 'Docker',
+        alias         => '🐳',
+        icon          => '🐳',
+        priority      => 20,
+        prompt_visible => 1,
+    );
+    for my $field ( keys %expected ) {
+        return 0 if !defined $indicator->{$field};
+        return 0 if $indicator->{$field} ne $expected{$field};
+    }
+    return 0 if ( $indicator->{page_status_icon} || '' ) !~ /\A(?:&#x1F7E2;|&#x1F534;)\z/;
+    return 0 if grep { exists $indicator->{$_} } qw(collector_name configured_label configured_alias configured_icon);
+    return 1;
 }
 
 # _set_indicator_if_changed($name, %data)
@@ -781,13 +825,17 @@ Construct and manage the indicator store.
 
 =head2 mark_stale, is_stale, refresh_core_indicators, page_header_items, page_header_payload
 
-Handle stale state and refresh built-in generic indicators.
+Handle stale state and refresh the local project and Git indicators. Docker is
+not a built-in indicator; its status is shown only when a collector is
+configured for Docker. Core refresh also removes persisted records matching
+the retired built-in Docker signature while preserving customized and
+collector-managed records named C<docker>.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
-This module persists prompt and browser status indicators. It stores indicator definitions and live status updates, merges collector-managed indicators with user-managed ones, keeps TT-backed collector icon templates separate from their live rendered icon values, and provides the ordered indicator data used by the prompt renderer and the browser status strip.
+This module persists prompt and browser status indicators. It stores indicator definitions and live status updates, merges collector-managed indicators with user-managed ones, keeps TT-backed collector icon templates separate from their live rendered icon values, refreshes project/Git core state without probing Docker, retires old built-in Docker records without deleting configured collector indicators, and provides the ordered indicator data used by the prompt renderer and the browser status strip.
 
 =head1 WHY IT EXISTS
 
@@ -795,7 +843,7 @@ It exists because indicators are shared state that multiple features read and wr
 
 =head1 WHEN TO USE
 
-Use this file when changing indicator JSON layout, sorting rules, collector-managed indicator behavior, TT-backed collector icon persistence, or the persistence semantics of prompt-visible versus hidden indicators.
+Use this file when changing indicator JSON layout, sorting rules, collector-managed indicator behavior, TT-backed collector icon persistence, core project/Git status refresh, or the persistence semantics of prompt-visible versus hidden indicators. Core refresh must not check for Docker or create a Docker indicator; explicitly configured Docker collectors remain supported.
 
 =head1 HOW TO USE
 

@@ -39,7 +39,9 @@ instead of a loose pile of utilities.
   Starts the web service in the background, stops or restarts both web and collectors, sends numeric POSIX shutdown signals for Alpine/iSH-compatible process control, and falls back to `pkill` plus process scanning instead of trusting pid files alone.
 
 - `Developer::Dashboard::IndicatorStore`
-  Stores prompt/dashboard indicators as file-backed state and can refresh generic built-in indicators.
+  Stores prompt/dashboard indicators as file-backed state and refreshes local
+  project/Git state. Docker is not a built-in indicator; it appears only when
+  explicitly configured as a collector.
 
 - `Developer::Dashboard::Auth`
   Manages helper users and enforces the exact-loopback trust tier so local
@@ -109,6 +111,9 @@ instead of a loose pile of utilities.
   It discovers isolated service folders from layered `config/docker` roots,
   including project-local `./.developer-dashboard/config/docker`, and exports `DDDC` for
   compose-time references to the runtime `config/docker` directory inside YAML.
+  For `up`, `build`, and similar operations, skill `.env` interpolation follows
+  the selected service rather than allowing another service's same-named key
+  to win because its skill was enumerated later.
 
 ## Runtime Model
 
@@ -209,6 +214,13 @@ The core supports compatibility-style environment overrides for project customiz
 
 - `DEVELOPER_DASHBOARD_ALLOW_TRANSIENT_URLS`
   Opt-in flag for browser execution of transient `token=` and `atoken=` payloads.
+
+For skill CLI commands and hooks, home runtime `.env`/`.env.pl` files are
+defaults; skill-root and skill-CLI environment files override matching home
+keys, and deeper project runtime layers retain final precedence among file
+values. Variables explicitly inherited from the invoking process remain above
+all `.env` and `.env.pl` layers. Normal non-skill commands continue to load
+only the root-to-leaf runtime chain while preserving those caller values.
 
 
 The runtime also supports user CLI extensions:

@@ -15,12 +15,19 @@ my $LMTP_PORT = 12610;   # the split daemon
 my $dir = tempdir(CLEANUP => 1);
 my (@pids);
 
-sub cleanup { kill 'TERM', @pids; waitpid($_, 0) for @pids; $? = 0; }
+# Never hang or orphan the daemons: a dead test (SIGPIPE, SIGALRM, SIGTERM)
+# must still run END and reap them, or the survivors hold prove's output pipe.
+$SIG{PIPE} = 'IGNORE';
+$SIG{ALRM} = $SIG{TERM} = $SIG{INT} = sub { die "split-lmtp.t: aborted by signal @_\n" };
+alarm 60;
+
+sub cleanup { alarm 0; kill 'TERM', @pids; waitpid($_, 0) for @pids; $? = 0; }
 END { cleanup(); $? = 0 }   # don't let a reaped child's signal status leak into our exit code
 
 # --- capture sink: one file per injected copy, recording its RCPTs ----------
 my $sink = fork;
 if (defined $sink && $sink == 0) {
+    $SIG{$_} = 'DEFAULT' for qw(TERM INT ALRM); alarm 0;
     my $s = IO::Socket::INET->new(LocalAddr=>'127.0.0.1', LocalPort=>$CAP_PORT,
         Listen=>10, ReuseAddr=>1) or exit 1;
     $SIG{CHLD} = sub { while (waitpid(-1, WNOHANG) > 0) {} };
@@ -51,6 +58,7 @@ push @pids, $sink if $sink;
 # --- the split daemon, re-injecting to the capture sink ---------------------
 my $daemon = fork;
 if (defined $daemon && $daemon == 0) {
+    $SIG{PIPE} = 'DEFAULT'; $SIG{$_} = 'DEFAULT' for qw(TERM INT ALRM); alarm 0;   # as in production
     $ENV{DKIM2_SPLIT_HOST}  = '127.0.0.1'; $ENV{DKIM2_SPLIT_PORT}  = $LMTP_PORT;
     $ENV{DKIM2_INJECT_HOST} = '127.0.0.1'; $ENV{DKIM2_INJECT_PORT} = $CAP_PORT;
     exec($^X, '-Ilib', 'bin/dkim2-split-lmtp');
@@ -60,7 +68,14 @@ push @pids, $daemon if $daemon;
 
 # --- act as the LMTP client -------------------------------------------------
 my $cli;
-for (1..30) { $cli = IO::Socket::INET->new(PeerAddr=>'127.0.0.1', PeerPort=>$LMTP_PORT, Timeout=>2); last if $cli; select undef,undef,undef,0.2; }
+# On macOS/BSD, IO::Socket::INET's Timeout (non-blocking connect) can hand back
+# an object for a refused connection if the daemon is not listening yet, so
+# insist on a real peer before believing it.
+for (1..50) {
+    $cli = IO::Socket::INET->new(PeerAddr=>'127.0.0.1', PeerPort=>$LMTP_PORT, Timeout=>2);
+    last if $cli && $cli->connected && defined $cli->peerport;
+    undef $cli; select undef,undef,undef,0.2;
+}
 unless ($cli) { plan skip_all => "could not start/connect to split daemon"; }
 $cli->autoflush(1);
 sub expect { my ($re,$what)=@_; my $l=<$cli>; ok(defined $l && $l=~$re, "$what: ".($l//'(eof)')); }

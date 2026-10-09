@@ -11,7 +11,7 @@ use Game::Gin::Error ();
 use Game::Gin::Deadwood qw(KNOCK_AT);
 use Game::Gin::Scoring qw(settle);
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 has seed        => (is => 'ro', isa => Str);
 has number      => (is => 'ro', isa => Int);
@@ -237,7 +237,7 @@ Game::Gin::Deal - one hand of gin rummy, from the deal to the knock
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

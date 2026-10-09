@@ -30,7 +30,7 @@ like(deparse_code(sub { $_[0] ^= $_[1] }),  qr/\$_\[0\] \^= \$_\[1\]/,  'compoun
 
 like(deparse_code(sub { $_[0] &&= $_[1] }), qr/\$_\[0\] &&= \$_\[1\]/, 'compound &&=');
 like(deparse_code(sub { $_[0] ||= $_[1] }), qr/\$_\[0\] \|\|= \$_\[1\]/, 'compound ||=');
-like(deparse_code(sub { $_[0] //= $_[1] }), qr/\$_\[0\] \/\/= \$_\[1\]/, 'compound //=');
+$] >= 5.010 and like(deparse_code(eval q{sub { $_[0] //= $_[1] }}), qr/\$_\[0\] \/\/= \$_\[1\]/, 'compound //=');
 
 # ── Binary arithmetic ──────────────────────────────────────────
 
@@ -70,7 +70,7 @@ like(deparse_code(sub { $_[0] cmp $_[1] }), qr/\$_\[0\] cmp \$_\[1\]/, 'cmp');
 
 like(deparse_code(sub { $_[0] && $_[1] }), qr/\$_\[0\] && \$_\[1\]/, '&&');
 like(deparse_code(sub { $_[0] || $_[1] }), qr/\$_\[0\] \|\| \$_\[1\]/, '||');
-like(deparse_code(sub { $_[0] // $_[1] }), qr/\$_\[0\] \/\/ \$_\[1\]/, '//');
+$] >= 5.010 and like(deparse_code(eval q{sub { $_[0] // $_[1] }}), qr/\$_\[0\] \/\/ \$_\[1\]/, '//');
 
 # ── Bitwise operators ──────────────────────────────────────────
 

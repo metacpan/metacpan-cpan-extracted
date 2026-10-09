@@ -11,7 +11,7 @@ my @patterns = (
     ['ternary',        sub { return $_[0] ? 1 : 0 },    qr/\$_\[0\] \? 1 : 0/],
     ['logical and',    sub { return $_[0] && $_[1] },    qr/\$_\[0\] && \$_\[1\]/],
     ['logical or',     sub { return $_[0] || 'x' },      qr/\|\| 'x'/],
-    ['defined or',     sub { return $_[0] // 'y' },      qr|// 'y'|],
+    ($] >= 5.010 ? ['defined or', eval q{sub { return $_[0] // 'y' }}, qr|// 'y'|] : ()),
     ['comparison',     sub { return $_[0] == 1 },        qr/\$_\[0\] == 1/],
     ['my var',         sub { my $x = 10; return $x },    qr/my \$x = 10/],
     ['negation',       sub { return -$_[0] },            qr/-\$_\[0\]/],

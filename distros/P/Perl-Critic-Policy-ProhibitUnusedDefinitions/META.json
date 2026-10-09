@@ -50,21 +50,13 @@
       },
       "runtime" : {
          "requires" : {
-            "Cpanel::JSON::XS" : "0",
-            "Cwd" : "0",
             "Digest::SHA" : "0",
-            "File::Path" : "0",
-            "File::Slurper" : "0",
-            "File::Slurper::Temp" : "0",
-            "File::Spec" : "0",
-            "IO::Compress::Gzip" : "0",
-            "IO::Uncompress::Gunzip" : "0",
             "PPI" : "0",
+            "Perl::Critic::Distribution" : "0",
             "Perl::Critic::Policy" : "0",
             "Perl::Critic::Utils" : "0",
             "Readonly" : "0",
             "Scalar::Util" : "0",
-            "Time::HiRes" : "0",
             "parent" : "0",
             "perl" : "5.014",
             "re" : "0",
@@ -75,9 +67,11 @@
       "test" : {
          "requires" : {
             "File::Basename" : "0",
+            "File::Path" : "0",
             "File::Spec" : "0",
             "File::Temp" : "0",
             "FindBin::libs" : "0",
+            "IO::Compress::Gzip" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Perl::Critic" : "0",
@@ -90,7 +84,7 @@
    "provides" : {
       "Perl::Critic::Policy::ProhibitUnusedDefinitions" : {
          "file" : "lib/Perl/Critic/Policy/ProhibitUnusedDefinitions.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -105,7 +99,7 @@
          "web" : "https://github.com/Troglodyne-Internet-Widgets/perl-critic-policy-prohibitunuseddefinitions"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_generated_by_perl" : "v5.44.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.43",
    "x_spdx_expression" : "MIT"

@@ -32,6 +32,7 @@ t/11-invariants.t
 t/12-replay.t
 t/13-search-blind.t
 t/14-terminal.t
+t/15-pick.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

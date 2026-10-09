@@ -1,3 +1,7 @@
+4.01    2026-10-08
+
+- Bug-fix to cope with hateful v-string versions
+
 4.00    2026-10-07
 
 - Use HTTP::Tiny instead of LWP;

@@ -26,7 +26,7 @@ my $pg; $pg = EV::Pg->new(
             # raise a notice
             $pg->query("do \$\$ begin raise notice 'this is a notice'; end \$\$", sub {
                 my (undef, $err) = @_;
-                die $err if $err;
+                if ($err) { warn $err; EV::break; return; }
                 EV::break;
             });
         });

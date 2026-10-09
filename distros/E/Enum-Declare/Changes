@@ -1,5 +1,9 @@
 Revision history for Enum-Declare
 
+1.01	2026-10-08
+	- Fix build on perl 5.14: drop <stdbool.h>, which changed bool after
+	  object_types.h was read
+
 0.08	2026-04-25
 	- Include <stdbool.h> in Declare.xs so bool/true/false compile 
 

@@ -2,7 +2,7 @@ package Mail::DKIM2::Signer;
 use strict;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.17';
 
 use base 'Mail::DKIM2::HeaderParser';
 use Crypt::Digest::SHA256 qw(sha256);
@@ -17,6 +17,10 @@ use Mail::DKIM2::Common qw(
     MAX_CHAIN_LENGTH
     chain_length_error
     duplicate_number_error
+    valid_sequence
+    UNKEYABLE_SIGNATURE_ERROR
+    chain_number_error
+    mi_version_tag
 );
 use Mail::DKIM2::Signature;
 use Mail::DKIM2::MessageInstance;
@@ -46,12 +50,19 @@ sub finish_header {
     # Extract existing MI and DKIM2-Signature headers from the parsed headers
     my @mi_headers;
     my @dk2_headers;
+    my $unkeyable;
+    my $range;
 
     for my $header (@{$self->{headers}}) {
         if ($header =~ /^Message-Instance:/i) {
             my ($val) = $header =~ /^Message-Instance:\s*(.*)/is;
             $val =~ s/\r\n$//;
             my $v = extract_mi_version($val);
+            # Not a chain number: a PERMERROR to every verifier.
+            if (my $e = chain_number_error('Message-Instance', 'm', mi_version_tag($val))) {
+                $range //= $e;
+                next;
+            }
             push @mi_headers, { v => $v, raw => $header } if $v;
         }
         elsif ($header =~ /^DKIM2-Signature:/i) {
@@ -59,8 +70,18 @@ sub finish_header {
             $val =~ s/\r\n$//;
             my $sig = eval { Mail::DKIM2::Signature->parse($val) };
             die $@ if ref $@;
-            if ($sig && $sig->sequence) {
+            # One no verifier can key (no parse, no valid i=) makes the
+            # chain a PERMERROR, so do not sign over it.
+            my $e = $sig && valid_sequence($sig->sequence)
+                && (chain_number_error('DKIM2-Signature', 'i', $sig->sequence)
+                    // chain_number_error('DKIM2-Signature', 'm', $sig->version));
+            if ($e) {
+                $range //= $e;
+            }
+            elsif ($sig && valid_sequence($sig->sequence)) {
                 push @dk2_headers, { i => $sig->sequence, raw => $header, sig => $sig };
+            } else {
+                $unkeyable = UNKEYABLE_SIGNATURE_ERROR;
             }
         }
     }
@@ -79,6 +100,8 @@ sub finish_header {
         'dkim2-signature'  => $next_i,
     );
     my $error = chain_length_error(\%counts)
+        // $unkeyable
+        // $range
         // duplicate_number_error('Message-Instance', 'm',
                map { $_->{v} } @mi_headers)
         // duplicate_number_error('DKIM2-Signature', 'i',
@@ -376,9 +399,12 @@ Feed the message; see L<Mail::DKIM2::HeaderParser>.
 =head2 result()
 
 Undef until C<CLOSE>; then C<'signed'>, or C<'fail'> when the message
-cannot be signed (no Message-Instance to sign over, a chain already at the
-length limit, or a repeated C<i=> or C<m=>). A failure is a result, not an exception: C<PRINT> and
-C<CLOSE> return normally.
+cannot be signed: no Message-Instance to sign over, a chain already at the
+length limit, a DKIM2-Signature with a missing or malformed C<i=> (or one
+that does not parse), an C<i=> or C<m=> that is not a chain number (see
+L<Mail::DKIM2::Common/"chain_number_error($field, $tag, $n)">), or a
+repeated C<i=> or C<m=>. L</"details()"> says which. A failure is a result, not
+an exception: C<PRINT> and C<CLOSE> return normally.
 
 =head2 details()
 

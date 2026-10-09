@@ -3,7 +3,7 @@ package Developer::Dashboard::EnvAudit;
 use strict;
 use warnings;
 
-our $VERSION = '5.51';
+our $VERSION = '5.73';
 
 use Developer::Dashboard::JSON qw(json_decode json_encode);
 
@@ -34,6 +34,20 @@ sub record {
         value   => $value,
         envfile => $envfile,
     };
+    $class->_sync_to_env();
+    return 1;
+}
+
+# forget($key)
+# Removes provenance for an environment key whose effective value comes from
+# the invoking process rather than a dashboard-managed env file.
+# Input: environment key string.
+# Output: true value.
+sub forget {
+    my ( $class, $key ) = @_;
+    die "Missing env audit key\n" if !defined $key || $key eq '';
+    $class->_load_from_env();
+    delete $AUDIT{$key};
     $class->_sync_to_env();
     return 1;
 }
@@ -144,6 +158,8 @@ Developer::Dashboard::EnvAudit - inspect dashboard-loaded env key provenance
 This module records which dashboard-managed env file supplied each effective
 environment variable so runtime code, custom commands, and skill commands can
 inspect where a value came from after layered env loading has completed.
+Caller-exported variables are not attributed to env files; use C<forget> to
+remove provenance when the invoking process supplies the winning value.
 
 =for comment FULL-POD-DOC START
 
@@ -162,6 +178,8 @@ Use this module when a command, hook, or runtime helper needs to explain where a
 =head1 HOW TO USE
 
 Call C<Developer::Dashboard::EnvAudit-E<gt>key('FOO')> to inspect one key, or C<Developer::Dashboard::EnvAudit-E<gt>keys> to retrieve the full recorded inventory. The module also mirrors the audit inventory into C<DEVELOPER_DASHBOARD_ENV_AUDIT> so exec'd child processes can inspect the same provenance.
+Call C<Developer::Dashboard::EnvAudit-E<gt>forget('FOO')> when the effective
+value is supplied by the invoking process rather than an env file.
 
 =head1 WHAT USES IT
 
@@ -186,6 +204,13 @@ Example 3:
   Developer::Dashboard::EnvAudit->clear;
 
 Clears the current process audit state before a fresh env-loading pass.
+
+Example 4:
+
+  Developer::Dashboard::EnvAudit->forget('DATABASE_URL');
+
+Removes a prior env-file origin when an explicitly exported process value
+becomes the effective value.
 
 =for comment FULL-POD-DOC END
 

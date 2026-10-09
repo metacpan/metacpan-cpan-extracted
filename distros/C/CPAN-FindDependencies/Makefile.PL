@@ -42,6 +42,7 @@ WriteMakefile(
     'Test::Time'              => 0,
     'Text::Diff'              => 0,
     'URI::file'               => 4.13,
+    'version'                 => 0.9924,
     $^O eq 'MSWin32' ? ('Win32::Job' => 0,) : (),
   },
   dist => {

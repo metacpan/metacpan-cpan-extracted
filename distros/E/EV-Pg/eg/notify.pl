@@ -9,7 +9,7 @@ my $conninfo = shift || $ENV{TEST_PG_CONNINFO} || 'dbname=postgres';
 my $pg; $pg = EV::Pg->new(
     conninfo   => $conninfo,
     keep_alive => 1,
-    on_error   => sub { die "connection error: $_[0]\n" },
+    on_error   => sub { warn "connection error: $_[0]\n"; EV::break },
     on_notify => sub {
         my ($channel, $payload, $pid) = @_;
         print "notification on '$channel': $payload (from pid $pid)\n";
@@ -18,12 +18,12 @@ my $pg; $pg = EV::Pg->new(
     on_connect => sub {
         $pg->query("listen my_channel", sub {
             my (undef, $err) = @_;
-            die $err if $err;
+            if ($err) { warn $err; EV::break; return; }
             print "listening on my_channel, sending test notification...\n";
 
             $pg->query("notify my_channel, 'hello from EV::Pg'", sub {
                 my (undef, $err) = @_;
-                die $err if $err;
+                if ($err) { warn $err; EV::break; return; }
             });
         });
     },

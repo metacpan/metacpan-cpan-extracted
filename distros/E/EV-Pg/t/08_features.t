@@ -8,7 +8,7 @@ use TestHelper;
 
 require_pg;
 use File::Temp 'tmpnam';
-plan tests => 130;
+plan tests => 140;
 
 # notice handler
 with_pg(
@@ -270,7 +270,7 @@ with_pg(cb => sub {
 
 # cancel_async (libpq >= 17)
 SKIP: {
-    skip 'requires libpq >= 17', 2 unless EV::Pg->lib_version >= 170000;
+    skip 'requires libpq >= 17', 3 unless EV::Pg->can('cancel_async') && EV::Pg->lib_version >= 170000;
     my $cancel_timer;
     my ($got_query_err, $got_cancel_ok);
     with_pg(cb => sub {
@@ -285,6 +285,7 @@ SKIP: {
             $pg->cancel_async(sub {
                 my ($r, $err) = @_;
                 ok(!defined $err, 'cancel_async: no error');
+                is($r, 1, 'cancel_async: success value 1');
                 $got_cancel_ok = 1;
                 undef $cancel_timer;
                 EV::break if $got_query_err;
@@ -295,7 +296,7 @@ SKIP: {
 
 # cancel_async when not connected
 SKIP: {
-    skip 'requires libpq >= 17', 1 unless EV::Pg->lib_version >= 170000;
+    skip 'requires libpq >= 17', 1 unless EV::Pg->can('cancel_async') && EV::Pg->lib_version >= 170000;
     my $pg = EV::Pg->new(on_error => sub {});
     eval { $pg->cancel_async(sub {}) };
     like($@, qr/not connected/, 'cancel_async when disconnected croaks');
@@ -303,7 +304,7 @@ SKIP: {
 
 # cancel_async double cancel
 SKIP: {
-    skip 'requires libpq >= 17', 3 unless EV::Pg->lib_version >= 170000;
+    skip 'requires libpq >= 17', 3 unless EV::Pg->can('cancel_async') && EV::Pg->lib_version >= 170000;
     my $cancel_timer;
     my ($got_query_err, $got_cancel_ok);
     with_pg(cb => sub {
@@ -331,7 +332,7 @@ SKIP: {
 
 # cancel_async interrupted by finish
 SKIP: {
-    skip 'requires libpq >= 17', 2 unless EV::Pg->lib_version >= 170000;
+    skip 'requires libpq >= 17', 2 unless EV::Pg->can('cancel_async') && EV::Pg->lib_version >= 170000;
     my $pg;
     my $cancel_err;
     $pg = EV::Pg->new(
@@ -371,6 +372,34 @@ with_pg(cb => sub {
         EV::break;
     });
 });
+
+# error_fields cleared by reset (finish shares the path)
+{
+    my ($before, $after);
+    my $pg;
+    my $n = 0;
+    $pg = EV::Pg->new(
+        conninfo => $conninfo,
+        on_connect => sub {
+            if ($n++) {
+                $after = defined $pg->error_fields ? 1 : 0;
+                EV::break;
+                return;
+            }
+            $pg->query("select * from nosuch_ef2_xyz", sub {
+                my $f = $pg->error_fields;
+                $before = $f ? $f->{sqlstate} : undef;
+                $pg->reset;
+            });
+        },
+        on_error => sub { diag "Error: $_[0]"; EV::break },
+    );
+    my $t = EV::timer(10, 0, sub { EV::break });
+    EV::run;
+    $pg->finish if $pg->is_connected;
+    is($before, '42P01', 'error_fields: set after query error');
+    is($after, 0, 'error_fields: cleared by reset');
+}
 
 # error_fields: unique violation with constraint name
 with_pg(cb => sub {
@@ -457,6 +486,47 @@ with_pg(cb => sub {
     });
 });
 
+# Retention is lazy: success meta never asked for is discarded by a later
+# error, COPY tag, or sync result instead of surviving as "last successful".
+with_pg(cb => sub {
+    my ($pg) = @_;
+    $pg->query("select 1 as a, 2 as b", sub {
+        # do NOT call result_meta here: the staged meta stays unretained...
+        $pg->query("select * from no_such_table_rm_xyz", sub {
+            my (undef, $err2) = @_;
+            ok($err2, 'result_meta unretained: query errored');
+            ok(!defined $pg->result_meta,
+                'result_meta: undef after error when never materialized');
+            EV::break;
+        });
+    });
+});
+
+# COPY tag phase keeps retained meta; the terminal COMMAND_OK refreshes it
+# (as a command with no columns).
+with_pg(cb => sub {
+    my ($pg) = @_;
+    $pg->query("select 1 as a, 2 as b", sub {
+        is($pg->result_meta->{nfields}, 2, 'result_meta copy: retained prior meta');
+        $pg->query("copy (select 'x') to stdout", sub {
+            my ($data, $err) = @_;
+            if (defined $data && !ref $data && $data eq 'COPY_OUT') {
+                is($pg->result_meta->{nfields}, 2,
+                    'result_meta copy: tag phase keeps retained meta');
+                while (1) {
+                    my $d = $pg->get_copy_data;
+                    last if !defined $d || $d eq '-1';
+                }
+                return;
+            }
+            my $m = $pg->result_meta;
+            is($m->{nfields}, 0, 'result_meta copy: terminal refresh nfields 0');
+            like($m->{cmd_status}, qr/^COPY /, 'result_meta copy: terminal cmd_status');
+            EV::break;
+        });
+    });
+});
+
 # result_meta after INSERT
 with_pg(cb => sub {
     my ($pg) = @_;
@@ -493,7 +563,7 @@ with_pg(cb => sub {
 
 # --- set_chunked_rows_mode (libpq >= 17) ---
 SKIP: {
-    skip 'requires libpq >= 17', 3 unless EV::Pg->lib_version >= 170000;
+    skip 'requires libpq >= 17', 3 unless EV::Pg->can('set_chunked_rows_mode') && EV::Pg->lib_version >= 170000;
     with_pg(cb => sub {
         my ($pg) = @_;
         my @chunks;
@@ -516,7 +586,7 @@ SKIP: {
 
 # chunked rows abort via finish
 SKIP: {
-    skip 'requires libpq >= 17', 2 unless EV::Pg->lib_version >= 170000;
+    skip 'requires libpq >= 17', 2 unless EV::Pg->can('set_chunked_rows_mode') && EV::Pg->lib_version >= 170000;
     my $pg;
     my @chunks;
     $pg = EV::Pg->new(
@@ -542,7 +612,7 @@ SKIP: {
 
 # --- close_prepared (libpq >= 17) ---
 SKIP: {
-    skip 'requires libpq >= 17', 2 unless EV::Pg->lib_version >= 170000;
+    skip 'requires libpq >= 17', 2 unless EV::Pg->can('close_prepared') && EV::Pg->lib_version >= 170000;
     with_pg(cb => sub {
         my ($pg) = @_;
         $pg->prepare("cp_test", "select 1", sub {
@@ -559,7 +629,7 @@ SKIP: {
 
 # --- close_portal (libpq >= 17) ---
 SKIP: {
-    skip 'requires libpq >= 17', 2 unless EV::Pg->lib_version >= 170000;
+    skip 'requires libpq >= 17', 2 unless EV::Pg->can('close_portal') && EV::Pg->lib_version >= 170000;
     with_pg(cb => sub {
         my ($pg) = @_;
         # Use a cursor to create a named portal, then close it
@@ -579,7 +649,7 @@ SKIP: {
 
 # --- send_pipeline_sync (libpq >= 17) ---
 SKIP: {
-    skip 'requires libpq >= 17', 2 unless EV::Pg->lib_version >= 170000;
+    skip 'requires libpq >= 17', 2 unless EV::Pg->can('send_pipeline_sync') && EV::Pg->lib_version >= 170000;
     with_pg(cb => sub {
         my ($pg) = @_;
         $pg->enter_pipeline;
@@ -621,8 +691,13 @@ with_pg(cb => sub {
     my ($pg) = @_;
     my $used = $pg->connection_used_password;
     ok(defined $used, "connection_used_password: $used");
-    my $gss = $pg->connection_used_gssapi;
-    ok(defined $gss, "connection_used_gssapi: $gss");
+    SKIP: {
+        skip 'requires libpq >= 16', 1
+            unless EV::Pg->can('connection_used_gssapi')
+                && EV::Pg->lib_version >= 160000;
+        my $gss = $pg->connection_used_gssapi;
+        ok(defined $gss, "connection_used_gssapi: $gss");
+    }
     EV::break;
 });
 
@@ -643,19 +718,30 @@ with_pg(cb => sub {
     });
 }
 
-# --- set_trace_flags ---
+# --- trace with bad path croaks ---
 with_pg(cb => sub {
     my ($pg) = @_;
-    my $trace_file = tmpnam();
-    $pg->trace($trace_file);
-    $pg->set_trace_flags(PQTRACE_SUPPRESS_TIMESTAMPS);
-    $pg->query("select 1", sub {
-        $pg->untrace;
-        ok(-s $trace_file, 'set_trace_flags: trace file has content');
-        unlink $trace_file;
-        EV::break;
-    });
+    eval { $pg->trace('/no/such/dir/ev_pg_trace_test.log') };
+    like($@, qr/cannot open/, 'trace: bad path croaks');
+    EV::break;
 });
+
+# --- set_trace_flags ---
+SKIP: {
+    skip 'requires libpq >= 14', 1 unless EV::Pg->can('set_trace_flags');
+    with_pg(cb => sub {
+        my ($pg) = @_;
+        my $trace_file = tmpnam();
+        $pg->trace($trace_file);
+        $pg->set_trace_flags(PQTRACE_SUPPRESS_TIMESTAMPS);
+        $pg->query("select 1", sub {
+            $pg->untrace;
+            ok(-s $trace_file, 'set_trace_flags: trace file has content');
+            unlink $trace_file;
+            EV::break;
+        });
+    });
+}
 
 # --- connection_needs_password ---
 with_pg(cb => sub {
@@ -675,10 +761,10 @@ with_pg(cb => sub {
 with_pg(cb => sub {
     my ($pg) = @_;
     my $names = $pg->ssl_attribute_names;
-    if (defined $names) {
-        is(ref $names, 'ARRAY', 'ssl_attribute_names: returns arrayref');
+    if ($pg->ssl_in_use) {
+        is(ref $names, 'ARRAY', 'ssl_attribute_names: arrayref with SSL');
     } else {
-        pass('ssl_attribute_names: undef (no SSL)');
+        ok(!defined $names, 'ssl_attribute_names: undef without SSL');
     }
     EV::break;
 });

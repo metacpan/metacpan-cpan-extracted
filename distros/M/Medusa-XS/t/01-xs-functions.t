@@ -33,7 +33,7 @@ BEGIN {
     my $time = Medusa::XS::format_time();
     ok(defined $time, 'format_time default: defined');
     ok(length($time) > 0, 'format_time default: not empty');
-    like($time, qr/^\w{3}\s+\w{3}\s+\d+\s+\d+:\d+:\d+\s+\d{4}$/, 'format_time default: matches asctime format');
+    like($time, qr/^(?:Sun|Mon|Tue|Wed|Thu|Fri|Sat) (?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) [ \d]\d \d\d:\d\d:\d\d \d{4}$/, 'format_time default: matches asctime format');
 }
 
 {

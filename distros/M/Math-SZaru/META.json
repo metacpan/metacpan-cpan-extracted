@@ -1,23 +1,24 @@
 {
    "abstract" : "Perl wrapper for the SZaru C++ library",
    "author" : [
-      "Steffen Mueller, E<lt>smueller@cpan.orgE<gt>"
+      "Steffen Mueller, E<lt>cpan@steffen-mueller.netE<gt>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Math-SZaru",
    "prereqs" : {
       "build" : {
          "requires" : {
             "ExtUtils::Typemaps::Default" : "0.01",
-            "ExtUtils::XSpp" : "0.16"
+            "ExtUtils::XSpp" : "0.18",
+            "Test::More" : "0.88"
          }
       },
       "configure" : {
@@ -25,30 +26,27 @@
             "Capture::Tiny" : "0",
             "Devel::CheckLib" : "0",
             "ExtUtils::CChecker" : "0",
-            "ExtUtils::CppGuess" : "0.07",
+            "ExtUtils::CppGuess" : "0.27",
             "File::Copy" : "0",
             "File::Find" : "0",
-            "Module::Build" : "0.40",
-            "Module::Build::WithXSpp" : "0.13"
+            "Module::Build" : "0.42",
+            "Module::Build::WithXSpp" : "0.14"
          }
       }
    },
    "provides" : {
       "Math::SZaru" : {
          "file" : "lib/Math/SZaru.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Math::SZaru::QuantileEstimator" : {
-         "file" : "lib/Math/SZaru/QuantileEstimator.pm",
-         "version" : 0
+         "file" : "lib/Math/SZaru/QuantileEstimator.pm"
       },
       "Math::SZaru::TopEstimator" : {
-         "file" : "lib/Math/SZaru/TopEstimator.pm",
-         "version" : 0
+         "file" : "lib/Math/SZaru/TopEstimator.pm"
       },
       "Math::SZaru::UniqueEstimator" : {
-         "file" : "lib/Math/SZaru/UniqueEstimator.pm",
-         "version" : 0
+         "file" : "lib/Math/SZaru/UniqueEstimator.pm"
       }
    },
    "release_status" : "stable",
@@ -57,5 +55,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.01"
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

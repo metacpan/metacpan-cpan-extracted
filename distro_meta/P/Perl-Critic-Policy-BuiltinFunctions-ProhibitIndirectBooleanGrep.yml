@@ -1,0 +1,4 @@
+---
+distro: Perl-Critic-Policy-BuiltinFunctions-ProhibitIndirectBooleanGrep
+version: 0.001
+author_path: T/TE/TEODESIAN/Perl-Critic-Policy-BuiltinFunctions-ProhibitIndirectBooleanGrep-0.001.tar.gz

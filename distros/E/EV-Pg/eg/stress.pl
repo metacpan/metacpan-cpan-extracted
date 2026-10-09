@@ -26,14 +26,14 @@ sub report {
 
 my $pg; $pg = EV::Pg->new(
     conninfo => $conninfo,
-    on_error => sub { die "connection error: $_[0]\n" },
+    on_error => sub { warn "connection error: $_[0]\n"; EV::break },
     on_connect => sub { phase_setup() },
 );
 
 sub phase_setup {
     $pg->query("create temp table stress (id int, val text)", sub {
         my (undef, $err) = @_;
-        die $err if $err;
+        if ($err) { warn $err; EV::break; return; }
         phase_sequential();
     });
 }
@@ -45,7 +45,7 @@ sub phase_sequential {
     $t0 = time;
     my $next; $next = sub {
         my ($rows, $err) = @_;
-        die $err if $err;
+        if ($err) { warn $err; EV::break; return; }
         if (++$i >= $N_SEQ) {
             report("sequential query_params", $N_SEQ);
             undef $next;
@@ -66,7 +66,7 @@ sub phase_pipeline {
     for my $i (1 .. $N_PIPE) {
         $pg->query_params('select $1::int', [$i], sub {
             my (undef, $err) = @_;
-            die $err if $err;
+            if ($err) { warn $err; EV::break; return; }
         });
 
         if ($i % $PIPE_BATCH == 0 || $i == $N_PIPE) {
@@ -87,7 +87,7 @@ sub phase_prepared {
     print "phase 3: prepared statements ($N_PREP executions)\n";
     $pg->prepare('stress_stmt', 'select $1::int * 2', sub {
         my (undef, $err) = @_;
-        die $err if $err;
+        if ($err) { warn $err; EV::break; return; }
 
         $t0 = time;
         $pg->enter_pipeline;
@@ -95,7 +95,7 @@ sub phase_prepared {
         for my $i (1 .. $N_PREP) {
             $pg->query_prepared('stress_stmt', [$i], sub {
                 my (undef, $err) = @_;
-                die $err if $err;
+                if ($err) { warn $err; EV::break; return; }
             });
 
             if ($i % $PIPE_BATCH == 0 || $i == $N_PREP) {
@@ -117,7 +117,7 @@ sub phase_copy {
     print "phase 4: COPY IN ($N_COPY_ROWS rows)\n";
     $pg->query("truncate stress", sub {
         my (undef, $err) = @_;
-        die $err if $err;
+        if ($err) { warn $err; EV::break; return; }
 
         $t0 = time;
         $pg->query("copy stress from stdin", sub {
@@ -131,7 +131,7 @@ sub phase_copy {
                 return;
             }
 
-            die $err if $err;
+            if ($err) { warn $err; EV::break; return; }
             report("COPY IN", $N_COPY_ROWS);
             phase_reconnect();
         });
@@ -151,7 +151,7 @@ sub phase_reconnect {
         my $q = 0;
         my $next; $next = sub {
             my ($rows, $err) = @_;
-            die $err if $err;
+            if ($err) { warn $err; EV::break; return; }
             $queries++;
             if (++$q >= $queries_per_cycle) {
                 $reconnects++;

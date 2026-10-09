@@ -6,7 +6,8 @@ use EV;
 use EV::Memcached;
 
 my $host = $ENV{TEST_MEMCACHED_HOST} || '127.0.0.1';
-my $port = $ENV{TEST_MEMCACHED_PORT} || 11211;
+my $port = $ENV{TEST_MEMCACHED_PORT}
+    or plan skip_all => "set TEST_MEMCACHED_PORT to a disposable memcached (tests flush it)";
 
 my $sock = IO::Socket::INET->new(
     PeerAddr => $host, PeerPort => $port, Proto => 'tcp', Timeout => 1,

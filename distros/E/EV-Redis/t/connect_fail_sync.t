@@ -183,4 +183,22 @@ SKIP: {
     ok $fired, 'failed connect: pending callback survived connect + DESTROY';
 }
 
+# DESTROY fails surviving waiters with "disconnected", not the recorded error
+{
+    my ($cb_err, @errors);
+    my $r = EV::Redis->new(
+        on_error => sub { push @errors, $_[0] },
+        reconnect => 1,
+        reconnect_delay => 10,
+        resume_waiting_on_reconnect => 1,
+    );
+    $r->connect_unix($missing_sock);
+    $r->command(get => 'x', sub { $cb_err = $_[1] // "reply $_[0]" });
+    { my $g = EV::timer 0.5, 0, sub { EV::break }; EV::run }
+    ok scalar(@errors) && !defined $cb_err, 'waiter outlives the failed connect'
+        or diag explain \@errors;
+    undef $r;
+    is $cb_err, 'disconnected', 'DESTROY: waiter gets "disconnected"';
+}
+
 done_testing;

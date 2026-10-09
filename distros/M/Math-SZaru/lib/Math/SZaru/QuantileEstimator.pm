@@ -54,7 +54,7 @@ added to the estimator.
 
 =head2 estimate
 
-Returns the estimated quantiles in a raference to an array
+Returns the estimated quantiles in a reference to an array
 as described in the C<new> documentation above.
 
 =head1 SEE ALSO
@@ -67,13 +67,13 @@ Sawzall: L<http://code.google.com/p/szl/>
 
 =head1 AUTHOR
 
-Steffen Mueller, E<lt>smueller@cpan.orgE<gt>
+Steffen Mueller, E<lt>cpan@steffen-mueller.netE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
 The Perl wrapper of the SZaru library is:
 
-Copyright (C) 2013 by Steffen Mueller
+Copyright (C) 2013-2026 by Steffen Mueller
 
 Just like SZaru itself, it is licensed 
 under the Apache License, Version 2.0 (the "License");

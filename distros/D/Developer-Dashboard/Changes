@@ -1,3 +1,195 @@
+5.73  2026-10-08
+
+  - Audit and repair the numbered problem report: entries 1–44 now appear in
+    order, and Problem 39 is explicitly recorded as an unassigned numbering gap.
+  - Label the October 3 status paragraph in the historical report as a
+    superseded snapshot so it cannot be mistaken for current delivery status.
+  - Add release-metadata regression checks for complete, unique, ordered
+    problem-index entries and historical evidence coverage.
+  - Exclude generated terminal transcript logs from source distributions so
+    operator-local output cannot leak into a release archive.
+
+5.71  2026-10-08
+
+  - Complete Problem 43: resolve Docker Compose skill env using only the
+    explicitly selected effective service(s), preventing another skill's
+    same-named value from overwriting interpolation during materialization.
+  - Preserve deferred local-base inference and the existing all-base-service
+    behavior when no selected service matches or the operation selects none.
+  - Add red-first sequential foo/bar Compose environment regressions and update
+    the Docker Compose and release verification documentation.
+
+5.70  2026-10-08
+
+  - Finalize Problem 44's release evidence in a distinct package version after
+    the image-build guard rejected reusing the already-built 5.69 version.
+  - Rebuild the documented tarball and runtime image as 5.70; repeat the
+    blank-environment installation and integration gates against that exact
+    final artifact.
+
+5.69  2026-10-08
+
+  - Complete Problem 44: caller-exported environment values take precedence
+    over home, skill, and project .env/.env.pl files while unset keys retain
+    the documented layer precedence.
+  - Preserve caller environment values through both the public dashboard
+    switchboard and the direct nested-skill environment loader; keep env-audit
+    provenance accurate and restore caller values when a file fails to load.
+  - Pass all 258 Docker test files / 22,690 tests with 100.0% statement,
+    branch, condition, and subroutine coverage; pass the 459-test web/security
+    trio, 7/7 CPANTS kwalitee indicators, and all 348 POD syntax checks.
+  - Build the 5.69 tarball and image, verify the image version, and install
+    and test the tarball with cpanm (without --notest) in a blank container;
+    the installed-runtime integration flow passes.
+
+5.68  2026-10-08
+
+  - Complete Problem 42: load home runtime environment files before skill
+    environment files so skill values override matching home defaults; retain
+    deeper project runtime precedence.
+  - Add red-first container regressions for home-versus-skill precedence and
+    preservation of project runtime overrides.
+
+5.67  2026-10-08
+
+  - Complete Problem 41: Docker is no longer a built-in indicator; stale core
+    Docker records are removed safely while configured collector/custom records
+    are retained.
+  - Record full Docker test/coverage, security, release archive, blank-container
+    installation, kwalitee, and runtime-image verification for version 5.67.
+
+5.66  2026-10-07
+
+  - Problem 41: remove Docker availability probing and the Docker status record
+    from built-in indicator refresh; Docker remains available as an explicitly
+    configured collector.
+  - Remove stale persisted records matching the retired built-in Docker
+    signature without deleting collector-owned or customized docker indicators;
+    serialize cleanup with status writers to protect concurrent collector updates.
+  - Add Docker-container regressions for absence of the built-in, safe legacy
+    record cleanup, collector ownership preservation, and prompt-only refresh.
+
+5.65  2026-10-07
+
+  - Complete Problem 40 for explicit-file-only projects: detect leading -f and
+    --file inputs as the base when no conventional compose file exists, then
+    defer isolated service and service-environment discovery until the base
+    Compose config returns its service map.
+  - Add a red-first Docker regression for explicit-file-only base resolution,
+    CLI-only service names, selected overlays, and delayed skill environment.
+  - Re-run all 258 Docker test files (22,609 tests) at 100.0% statement,
+    branch, condition, and subroutine coverage before the 5.65 release build.
+  - Build the 5.65 tarball and image, verify the image runtime version, and
+    pass 100% CPANTS kwalitee on the archive.
+  - Install the tarball with cpanm without --notest in a blank Docker image and
+    pass its complete installed-runtime integration script.
+
+5.64  2026-10-07
+
+  - Fix Problem 40: resolve the base Compose config before selecting isolated
+    service overlays, so only services present in Compose's effective base
+    configuration can activate home, project, or nested-skill overlays.
+  - Preserve explicit Compose global options, -f inputs, and project-directory
+    settings without slicing the generated argv by file count.
+  - Reject Compose service names that are empty, directory-navigation names,
+    or contain path separators before runtime service lookup.
+  - Add Docker regressions for config-first selection, marker behavior, nested
+    skill overlays, CLI-only service names, explicit-file-only bases, native
+    help passthrough, and parser and materialization error paths.
+  - Verify the complete Docker suite (258 files, 22,615 tests) at 100.0%
+    statement, branch, condition, and subroutine coverage; the focused web
+    security tests also pass (459 tests).
+
+5.63  2026-10-06
+
+  - Complete Problem 38's config-first Compose release with README, module,
+    distribution, and package versions aligned after the image guard rejected
+    reusing version 5.62.
+
+5.62  2026-10-06
+
+  - Complete Problem 38 verification records: every Compose operation builds
+    the effective base config first, then runs against the materialized file.
+  - Record the successful Docker coverage, release-image, and blank-container
+    install/integration gates without reusing version 5.61.
+
+5.61  2026-10-06
+
+  - Fix Problem 38's source-side UTF-8 gap: parse a normalized raw-byte copy
+    of each local Compose base before service discovery, without rewriting it.
+  - Add a Docker regression that carries a legacy pound byte from the source
+    base through config materialization and into the operational Compose file.
+
+5.60  2026-10-06
+
+  - Rebuild the final Problem 38 package with the completed verification report
+    included; keep all module and distribution versions aligned.
+
+5.59  2026-10-06
+
+  - Keep the D2 image's active /root/perl5 library aligned with the release
+    tarball by installing the archive into that runtime-first local library.
+  - Add regression coverage for the local image recipe's explicit local-lib
+    target so a fresh image runs the version it just built.
+
+5.58  2026-10-06
+
+  - Problem 38 follow-up: materialize the effective base Compose config before
+    every Docker Compose operation, including when no explicit layered files
+    were resolved; execute the requested verb using that merged file.
+  - Add regression coverage proving a fileless `ps` request first invokes
+    `docker compose config` and then uses the generated config file.
+
+5.57  2026-10-06
+
+  - Problem 38: normalize captured merged Docker Compose YAML to valid UTF-8,
+    preserving valid UTF-8 and converting isolated Windows-1252 bytes before
+    the temporary file is consumed by config, up, down, build, ps, logs, or
+    other Compose operations.
+  - Add Docker regression coverage for the malformed-byte producer case and
+    verify the normalized merged YAML parses while preserving the pound sign.
+  - Make the nav I/O-failure test assert that its blocked layer contributes no
+    entries while allowing other active runtime layers to contribute nav.
+
+5.56  2026-10-06
+
+  - Problem 37: use a cron collector's scheduler heartbeat for watchdog stall
+    detection instead of treating the quiet time between scheduled executions
+    as repeated collector failures.
+  - Add a Docker regression proving a live cron loop awaiting its 7–8am run
+    does not raise the watchdog's repeated-restart warning at 10pm.
+  - Problem 34 follow-up: route public Docker Compose operations through the
+    materializing runner instead of directly executing the unresolved file list.
+  - Keep the merged file alive until Compose exits and preserve streamed output
+    for build, up, down, and other operational commands.
+
+5.54  2026-10-05
+
+  - Problem 34 follow-up: keep the invocation Compose project directory when
+    layered files are materialized for build, up, down, and other operations.
+  - Preserve an explicit user-supplied --project-directory, reject malformed
+    Compose arguments before execution, and cover up, build, and down in Docker.
+
+5.53  2026-10-03
+
+  - Implement Problem 25's external skill-help passthrough and Problem 36's
+    layered skill-command completion, with regression coverage for both.
+  - Rebuild the project Docker image from a flattened local base after the
+    previous base image exceeded the overlay mount-option limit.
+  - Pass the complete D2 test suite (258 files / 22,403 tests) and the 5.53
+    blank-environment integration run with tests enabled.
+  - Keep the internal/external CLI help boundary and layered skill completion
+    regressions covered in the test suite.
+
+5.52  2026-10-03
+
+  - Problem 25 follow-up: keep help handling within internal CLI dispatch and
+    pass native help flags through to dotted external skill commands.
+  - Problem 36: merge dotted skill completion names across project and home
+    runtime layers while de-duplicating shared commands.
+  - Add Docker regression coverage for external CLI help passthrough and
+    layered project/home skill command completion.
+
 5.51  2026-10-03
 
   - Problem 25 follow-up: keep help handling within internal CLI dispatch and

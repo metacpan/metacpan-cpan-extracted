@@ -1,0 +1,48 @@
+xt/ - the author tests
+======================
+
+None of these runs under `make test`. Build first, then give prove the built
+tree: there is an XS object to find, so it is `prove -b` and never `prove -l`.
+
+  xt/boilerplate.t       README, Changes and the main module carry none of the
+                         text Module::Starter wrote. Always runs.
+  xt/attribute-names.t   no attribute of a class shares a name with a method
+                         or an XS function of that class. An attribute
+                         replaces either without a word. Always runs.
+  xt/sort-variables.t    no file declares a lexical $a or $b, so no sort block
+                         can be looking at one. Always runs.
+  xt/bot-ladder.t        each level of the program against the one below, from
+                         both sides, forty games a pairing a side. Slow: it
+                         plays whole games at the top level.
+                         BRANDUBH_LADDER_GAMES sets the count.
+  xt/balance.t           the middle level against itself, sixty games. It
+                         asserts that the games are played and REPORTS who won
+                         them; it does not assert a balance.
+                         BRANDUBH_BALANCE_GAMES sets the count.
+  xt/soak.t              five thousand games of the program against itself at
+                         mixed levels: every game ends, the board is sound
+                         after every move, every game reads back as the same
+                         game, nothing warns. A few minutes.
+                         BRANDUBH_SOAK or RELEASE_TESTING turns it on;
+                         BRANDUBH_SOAK_GAMES sets the count.
+
+The three that live in t/ and are skipped without RELEASE_TESTING are
+t/manifest.t, t/pod.t and t/pod-coverage.t. They read the BUILT tree, so run
+`make` after the last edit and before them, or they grade the copy from the
+build before.
+
+The deepest rows of t/perft.txt are skipped by t/06-perft.t unless
+EXTENDED_TESTING is set. They are the same check, only slower.
+
+    make
+    RELEASE_TESTING=1 EXTENDED_TESTING=1 prove -b t/ xt/
+
+
+Where the perft numbers come from
+---------------------------------
+
+There is no published perft table for this game. Every row of t/perft.txt
+names its author: `hand`, counted by a person from the diagram, or `twin`,
+counted by a second implementation in another language written from the rules
+text and never from this engine's source. The second implementation is not in
+this distribution. A row is regenerated, never edited.

@@ -359,6 +359,70 @@ my $no_client_id = $redis_version < 5 ? 'CLIENT ID needs Redis 5+' : '';
     $r->disconnect;
 }
 
+# undef delay/attempts leave the current values, like other numeric setters
+{
+    my $closed = empty_port();
+    my @ts;
+    my $r = EV::Redis->new(on_error => sub { push @ts, EV::now });
+    $r->reconnect(1, 2000);
+    $r->reconnect(1, undef);
+    $r->connect('127.0.0.1', $closed);
+    { my $g = EV::timer 3, 0, sub { EV::break }; EV::run }
+    my $gap = @ts >= 2 ? $ts[1] - $ts[0] : -1;
+    cmp_ok $gap, '>=', 1.5, 'undef delay: keeps the configured 2000ms';
+    $r->disconnect;
+}
+{
+    my $closed = empty_port();
+    my @ts;
+    my $r = EV::Redis->new(on_error => sub { push @ts, EV::now });
+    $r->reconnect(1, undef);
+    $r->connect('127.0.0.1', $closed);
+    { my $g = EV::timer 3, 0, sub { EV::break }; EV::run }
+    my $gap = @ts >= 2 ? $ts[1] - $ts[0] : -1;
+    cmp_ok $gap, '>=', 0.5, 'fresh undef delay: keeps the 1000ms default';
+    $r->disconnect;
+}
+{
+    my $closed = empty_port();
+    my @errs;
+    my $r = EV::Redis->new(
+        on_error => sub { push @errs, $_[0]; EV::break if $_[0] =~ /max attempts reached/ });
+    $r->reconnect(1, 10, 2);
+    $r->reconnect(1, 10, undef);
+    $r->connect('127.0.0.1', $closed);
+    { my $g = EV::timer 3, 0, sub { EV::break }; EV::run }
+    ok scalar(grep { /max attempts reached/ } @errs),
+        'undef attempts: keeps the configured limit';
+    $r->disconnect;
+}
+
+# omitted args restore the defaults, per the reconnect() pod
+{
+    my $closed = empty_port();
+    my @errs;
+    my $r = EV::Redis->new(
+        on_error => sub { push @errs, 1; EV::break if @errs > 100 });
+    $r->reconnect(1, 0, 0);
+    $r->reconnect(1);
+    $r->connect('127.0.0.1', $closed);
+    { my $g = EV::timer 3, 0, sub { EV::break }; EV::run }
+    cmp_ok scalar(@errs), '<', 100, 'omitted delay: back to the 1000ms default';
+    $r->disconnect;
+}
+{
+    my $closed = empty_port();
+    my @errs;
+    my $r = EV::Redis->new(on_error => sub { push @errs, $_[0] });
+    $r->reconnect(1, 10, 1);
+    $r->reconnect(1, 1000);
+    $r->connect('127.0.0.1', $closed);
+    { my $g = EV::timer 3, 0, sub { EV::break }; EV::run }
+    ok !grep({ /max attempts reached/ } @errs),
+        'omitted attempts: back to unlimited';
+    $r->disconnect;
+}
+
 {
     my $r1 = EV::Redis->new(
         path => $connect_info{sock},
@@ -524,6 +588,669 @@ SKIP: {
 
     is scalar(@wait_results), 2, 'both waiting commands executed after reconnect';
     is $wait_results[0][0], 'OK', 'waiting command succeeded after reconnect';
+}
+
+# orphaned transaction fragments fail instead of resuming across a reconnect
+SKIP: {
+    my $r = EV::Redis->new(
+        path => $connect_info{sock},
+        max_pending => 2,
+        resume_waiting_on_reconnect => 1,
+        reconnect => 1,
+        reconnect_delay => 100,
+        max_reconnect_attempts => 10,
+        on_error => sub { },
+    );
+
+    my $helper = EV::Redis->new(path => $connect_info{sock}, on_error => sub {});
+
+    my $client_id;
+    my $skip_reason;
+    $r->command('CLIENT', 'ID', sub {
+        my ($res, $err) = @_;
+        if ($err) {
+            $skip_reason = "CLIENT ID not supported: $err";
+        } else {
+            $client_id = $res;
+        }
+    });
+
+    my $id_timer; $id_timer = EV::timer 1, 0, sub { undef $id_timer; EV::break };
+    EV::run;
+
+    skip $skip_reason, 6 if $skip_reason;
+    skip 'failed to get client ID', 6 unless defined $client_id;
+
+    $helper->del('resume_txn_key');
+
+    # BLPOP blocks the connection so the MULTI reply stays outstanding
+    $r->blpop('resume_txn_nonexistent_key', 10, sub { });
+    $r->multi(sub { });
+    my ($set_err, $exec_err);
+    $r->set('resume_txn_key', 'v', sub {
+        my ($res, $err) = @_;
+        $set_err = $err;
+    });
+    $r->exec(sub {
+        my ($res, $err) = @_;
+        $exec_err = $err;
+        $r->disconnect;
+    });
+
+    is $r->waiting_count, 2, 'SET and EXEC wait behind BLPOP and MULTI';
+
+    my $kill_res;
+    my $kill_timer; $kill_timer = EV::timer 0.3, 0, sub {
+        undef $kill_timer;
+        $helper->command('CLIENT', 'KILL', 'ID', $client_id, sub {
+            $kill_res = $_[0];
+            $helper->disconnect;
+        });
+    };
+
+    my $timeout; $timeout = EV::timer 5, 0, sub {
+        undef $timeout;
+        $r->disconnect;
+    };
+    EV::run;
+
+    is $kill_res, 1, 'kill landed (errors came from the drop, not the timeout)';
+    ok $set_err, 'orphaned SET fails instead of resuming standalone';
+    ok $exec_err, 'orphaned EXEC fails instead of resuming standalone';
+    unlike $exec_err, qr/without MULTI/i, '... from the drop, not as an orphan EXEC';
+    my $check = EV::Redis->new(path => $connect_info{sock}, on_error => sub {});
+    my ($final, $get_timer);
+    $check->get('resume_txn_key', sub { $final = $_[0]; undef $get_timer; EV::break; });
+    $get_timer = EV::timer 2, 0, sub { undef $get_timer; EV::break };
+    EV::run;
+    isnt $final, 'v', 'orphaned SET never applied server-side';
+    $check->disconnect;
+}
+
+# a watched transaction in flight fails its waiting commands on reconnect
+SKIP: {
+    my $r = EV::Redis->new(
+        path => $connect_info{sock},
+        max_pending => 1,
+        resume_waiting_on_reconnect => 1,
+        reconnect => 1,
+        reconnect_delay => 100,
+        max_reconnect_attempts => 10,
+        on_error => sub { },
+    );
+
+    my $helper = EV::Redis->new(path => $connect_info{sock}, on_error => sub {});
+
+    my $client_id;
+    my $skip_reason;
+    $r->command('CLIENT', 'ID', sub {
+        my ($res, $err) = @_;
+        if ($err) {
+            $skip_reason = "CLIENT ID not supported: $err";
+        } else {
+            $client_id = $res;
+        }
+    });
+
+    my $id_timer; $id_timer = EV::timer 1, 0, sub { undef $id_timer; EV::break };
+    EV::run;
+
+    skip $skip_reason, 5 if $skip_reason;
+    skip 'failed to get client ID', 5 unless defined $client_id;
+
+    $r->watch('resume_watch_key');
+    $helper->set('resume_watch_key', 'orig');
+    $r->blpop('resume_watch_nonexistent_key', 10, sub { });
+    my ($set_err, $exec_err);
+    $r->set('resume_watch_key', 'txn', sub {
+        my ($res, $err) = @_;
+        $set_err = $err;
+    });
+    $r->exec(sub {
+        my ($res, $err) = @_;
+        $exec_err = $err;
+        $r->disconnect;
+    });
+
+    is $r->waiting_count, 3, 'BLPOP, SET and EXEC wait behind WATCH';
+
+    my $kill_res;
+    my $kill_timer; $kill_timer = EV::timer 0.3, 0, sub {
+        undef $kill_timer;
+        $helper->set('resume_watch_key', 'mid', sub {
+            $helper->command('CLIENT', 'KILL', 'ID', $client_id, sub {
+                $kill_res = $_[0];
+                $helper->disconnect;
+            });
+        });
+    };
+
+    my $timeout; $timeout = EV::timer 5, 0, sub {
+        undef $timeout;
+        $r->disconnect;
+    };
+    EV::run;
+
+    is $kill_res, 1, 'kill landed (errors came from the drop, not the timeout)';
+    ok $set_err && $exec_err, 'watched txn fragments fail instead of resuming';
+    unlike $exec_err, qr/without MULTI/i, '... from the drop, not as an orphan EXEC';
+    my $check = EV::Redis->new(path => $connect_info{sock}, on_error => sub {});
+    my ($final, $get_timer);
+    $check->get('resume_watch_key', sub { $final = $_[0]; undef $get_timer; EV::break; });
+    $get_timer = EV::timer 2, 0, sub { undef $get_timer; EV::break };
+    EV::run;
+    isnt $final, 'txn', 'aborted txn never applied server-side';
+    $check->disconnect;
+}
+
+# a span kept across one reconnect still fails its fragments on the next
+SKIP: {
+    my $helper = EV::Redis->new(path => $connect_info{sock}, on_error => sub {});
+
+    my ($gen, $set_res, $set_err, $exec_err, $final);
+    my $skip_reason;
+    my $to;
+    my $r;
+    $r = EV::Redis->new(
+        path => $connect_info{sock},
+        max_pending => 1,
+        resume_waiting_on_reconnect => 1,
+        reconnect => 1,
+        reconnect_delay => 100,
+        max_reconnect_attempts => 10,
+        on_error => sub { },
+        on_connect => sub {
+            $gen++;
+            my $g = $gen;
+            $r->command('CLIENT', 'ID', sub {
+                my ($id) = @_;
+                if (!defined $id && $g == 1) {
+                    $skip_reason = 'CLIENT ID not supported';
+                    undef $to;
+                    EV::break;
+                    return;
+                }
+                return unless defined $id;
+                if ($g == 1) {
+                    my $t; $t = EV::timer 0.3, 0, sub {
+                        undef $t;
+                        $helper->command('CLIENT', 'KILL', 'ID', $id, sub {});
+                    };
+                }
+                elsif ($g == 2) {
+                    $r->max_pending(2);
+                    $r->set('resume_span_key', 'orphan', sub {
+                        ($set_res, $set_err) = @_;
+                    });
+                    $r->exec(sub {
+                        (my $res, $exec_err) = @_;
+                        $helper->get('resume_span_key', sub {
+                            ($final) = @_;
+                            undef $to;
+                            EV::break;
+                        });
+                    });
+                    my $t; $t = EV::timer 0.5, 0, sub {
+                        undef $t;
+                        $helper->command('CLIENT', 'KILL', 'ID', $id, sub {});
+                    };
+                }
+            });
+            if ($g == 2) {
+                $r->blpop('resume_span_block', 30, sub {});
+            }
+        },
+    );
+
+    # MULTI stays waiting behind blpop#0, so kill#1 keeps the whole span
+    $r->blpop('resume_span_pad', 30, sub {});
+    $r->multi(sub {});
+
+    $to = EV::timer 15, 0, sub {
+        undef $to;
+        EV::break;
+    };
+    EV::run;
+    $r->disconnect;
+    $helper->disconnect;
+
+    skip $skip_reason, 4 if $skip_reason;
+    skip 'failed to connect', 4 if $gen == 0;
+    ok $set_err, 'kept-span SET fails on the second disconnect';
+    ok $exec_err, 'kept-span EXEC fails on the second disconnect';
+    unlike $exec_err, qr/without MULTI/i, '... from the drop, not as an orphan EXEC';
+    isnt $final, 'orphan', 'kept-span SET never applied server-side';
+}
+
+# A command issued after a kept setup transaction's EXEC remains standalone.
+SKIP: {
+    my $helper = EV::Redis->new(path => $connect_info{sock}, on_error => sub {});
+    $helper->del('r19_setup_probe');
+
+    my ($gen, $skip_reason, $kill1, $kill2, $probe_err, $final);
+    my $to;
+    my $r;
+    $r = EV::Redis->new(
+        path => $connect_info{sock},
+        max_pending => 1,
+        resume_waiting_on_reconnect => 1,
+        reconnect => 1,
+        reconnect_delay => 100,
+        max_reconnect_attempts => 20,
+        on_error => sub { },
+        on_connect => sub {
+            $gen++;
+            my $g = $gen;
+            $r->command('CLIENT', 'ID', sub {
+                my ($id) = @_;
+                if (!defined $id && $g == 1) {
+                    $skip_reason = 'CLIENT ID not supported';
+                    undef $to;
+                    EV::break;
+                    return;
+                }
+                return unless defined $id;
+                # Both retained setup transactions already have their EXEC.
+                if ($g == 2) {
+                    $r->set('r19_setup_probe', 'p', sub { (undef, $probe_err) = @_; });
+                }
+                my $t; $t = EV::timer 0.3, 0, sub {
+                    undef $t;
+                    if ($g == 1) {
+                        $helper->command('CLIENT', 'KILL', 'ID', $id, sub { $kill1 = $_[0] });
+                    }
+                    elsif ($g == 2) {
+                        $helper->command('CLIENT', 'KILL', 'ID', $id, sub { $kill2 = $_[0] });
+                    }
+                    else {
+                        # queued behind the probe, so its reply means it applied
+                        $r->ping(sub {
+                            $helper->get('r19_setup_probe', sub {
+                                ($final) = @_;
+                                undef $to;
+                                EV::break;
+                            });
+                        });
+                    }
+                };
+            });
+            if ($g == 1) {
+                $r->blpop('r19_setup_block', 30, sub {});
+                $r->multi(sub {});
+                # HELLO waits for MULTI's outstanding reply, freezing the setup
+                $r->command('HELLO', 2, sub {});
+                $r->set('r19_setup_key', 'txn', sub {});
+                $r->exec(sub {});
+                $r->multi(sub {});
+                $r->set('r19_setup_key2', 'txn2', sub {});
+                $r->exec(sub {});
+            }
+            elsif ($g == 2) {
+                $r->blpop('r19_setup_block2', 30, sub {});
+            }
+        },
+    );
+
+    $to = EV::timer 15, 0, sub {
+        undef $to;
+        EV::break;
+    };
+    EV::run;
+    $r->disconnect;
+    $helper->disconnect;
+
+    skip $skip_reason, 4 if $skip_reason;
+    skip 'failed to connect', 4 if $gen == 0;
+    is $kill1, 1, 'first kill landed';
+    is $kill2, 1, 'second kill landed';
+    is $probe_err, undef, 'probe issued after the retained EXEC replays';
+    is $final, 'p', '... and applies server-side';
+}
+
+# a fully unsent later span replays whole while the oldest span fails
+SKIP: {
+    my $r = EV::Redis->new(
+        path => $connect_info{sock},
+        max_pending => 2,
+        resume_waiting_on_reconnect => 1,
+        reconnect => 1,
+        reconnect_delay => 100,
+        max_reconnect_attempts => 10,
+        on_error => sub { },
+    );
+
+    my $helper = EV::Redis->new(path => $connect_info{sock}, on_error => sub {});
+
+    my $to;
+    my $client_id;
+    my $skip_reason;
+    $r->command('CLIENT', 'ID', sub {
+        my ($res, $err) = @_;
+        if ($err) {
+            $skip_reason = "CLIENT ID not supported: $err";
+        } else {
+            $client_id = $res;
+        }
+    });
+
+    my $id_timer; $id_timer = EV::timer 1, 0, sub { undef $id_timer; EV::break };
+    EV::run;
+
+    skip $skip_reason, 5 if $skip_reason;
+    skip 'failed to get client ID', 5 unless defined $client_id;
+
+    $r->blpop('resume_span2_block', 10, sub { });
+    $r->multi(sub { });
+    my $set1_err;
+    $r->set('resume_span1_key', 'x', sub {
+        my ($res, $err) = @_;
+        $set1_err = $err;
+    });
+    my $exec1_err;
+    $r->exec(sub {
+        my ($res, $err) = @_;
+        $exec1_err = $err;
+    });
+    $r->multi(sub { });
+    $r->set('resume_span2_key', 'txn', sub { });
+    my ($exec2_res, $exec2_err, $final);
+    $r->exec(sub {
+        ($exec2_res, $exec2_err) = @_;
+        $helper->get('resume_span2_key', sub {
+            ($final) = @_;
+            undef $to;
+            EV::break;
+        });
+    });
+
+    is $r->waiting_count, 5, 'span1 SET/EXEC and span2 wait behind BLPOP and MULTI';
+
+    my $kill_timer; $kill_timer = EV::timer 0.3, 0, sub {
+        undef $kill_timer;
+        $helper->command('CLIENT', 'KILL', 'ID', $client_id, sub {});
+    };
+
+    $to = EV::timer 8, 0, sub {
+        undef $to;
+        $r->disconnect;
+        EV::break;
+    };
+    EV::run;
+    $r->disconnect;
+    $helper->disconnect;
+
+    ok $set1_err, 'submitted span fails its SET';
+    ok $exec1_err, 'submitted span fails its EXEC';
+    is $exec2_err, undef, 'unsent span replays without error';
+    is $final, 'txn', 'unsent span applied whole server-side';
+}
+
+# commands issued after a taken span stay standalone, not txn-marked
+SKIP: {
+    my ($discs, $conns) = (0, 0);
+    my ($set_err, $ping_res, $ping_err);
+    my $to;
+    my $helper = EV::Redis->new(path => $connect_info{sock}, on_error => sub {});
+    my $r;
+    $r = EV::Redis->new(
+        path => $connect_info{sock},
+        max_pending => 2,
+        resume_waiting_on_reconnect => 1,
+        reconnect => 1,
+        reconnect_delay => 100,
+        max_reconnect_attempts => 10,
+        on_error => sub { },
+        on_disconnect => sub {
+            return if $discs++;
+            # after disconnect_cb returns the reconnect is armed: queueing then
+            # must see no span (the taken one is gone)
+            my $qt; $qt = EV::timer 0, 0, sub {
+                undef $qt;
+                $r->command('ping', sub {
+                    ($ping_res, $ping_err) = @_;
+                    undef $to;
+                    EV::break;
+                });
+            };
+        },
+        on_connect => sub {
+            return if ++$conns != 2;
+            $r->blpop('resume_nospan_block', 30, sub { });
+            $r->multi(sub { });
+            my $kt; $kt = EV::timer 0.3, 0, sub {
+                undef $kt;
+                $helper->command('client', 'list', sub {
+                    my ($line) = grep { /cmd=blpop/ } split /\n/, $_[0];
+                    my ($id) = $line =~ /id=(\d+)/;
+                    $helper->command('client', 'kill', 'id', $id, sub {});
+                });
+            };
+        },
+    );
+
+    my $client_id;
+    my $skip_reason;
+    $r->command('CLIENT', 'ID', sub {
+        my ($res, $err) = @_;
+        if ($err) {
+            $skip_reason = "CLIENT ID not supported: $err";
+        } else {
+            $client_id = $res;
+        }
+    });
+
+    my $id_timer; $id_timer = EV::timer 1, 0, sub { undef $id_timer; EV::break };
+    EV::run;
+
+    skip $skip_reason, 3 if $skip_reason;
+    skip 'failed to get client ID', 3 unless defined $client_id;
+
+    $r->blpop('resume_nospan_pad', 30, sub { });
+    $r->multi(sub { });
+    $r->set('resume_nospan_key', 'x', sub {
+        my ($res, $err) = @_;
+        $set_err = $err;
+    });
+
+    my $kill_timer; $kill_timer = EV::timer 0.3, 0, sub {
+        undef $kill_timer;
+        $helper->command('CLIENT', 'KILL', 'ID', $client_id, sub {});
+    };
+
+    $to = EV::timer 15, 0, sub {
+        undef $to;
+        $r->disconnect;
+        EV::break;
+    };
+    EV::run;
+    $r->disconnect;
+    $helper->disconnect;
+
+    ok $set_err, 'first span fragment fails on the first disconnect';
+    is $ping_err, undef, 'post-take PING replays without error';
+    is $ping_res, 'PONG', '... and gets its reply';
+}
+
+# a refused WATCH watches nothing: later waiting commands still replay
+SKIP: {
+    my $r = EV::Redis->new(
+        path => $connect_info{sock},
+        max_pending => 1,
+        resume_waiting_on_reconnect => 1,
+        reconnect => 1,
+        reconnect_delay => 100,
+        max_reconnect_attempts => 10,
+        on_error => sub { },
+    );
+
+    my $helper = EV::Redis->new(path => $connect_info{sock}, on_error => sub {});
+
+    my $client_id;
+    my $skip_reason;
+    $r->command('CLIENT', 'ID', sub {
+        my ($res, $err) = @_;
+        if ($err) {
+            $skip_reason = "CLIENT ID not supported: $err";
+        } else {
+            $client_id = $res;
+        }
+    });
+
+    my $id_timer; $id_timer = EV::timer 1, 0, sub { undef $id_timer; EV::break };
+    EV::run;
+
+    skip $skip_reason, 3 if $skip_reason;
+    skip 'failed to get client ID', 3 unless defined $client_id;
+
+    my ($watch_err, $set_res);
+    $r->command('watch', sub {
+        my ($res, $err) = @_;
+        $watch_err = $err;
+        $r->blpop('resume_watcherr_block', 10, sub { });
+        $r->set('resume_watcherr_key', 'v', sub {
+            my ($res, $err) = @_;
+            $set_res = $err // $res;
+            $r->disconnect;
+        });
+        is $r->waiting_count, 2, 'BLPOP and SET queue in the WATCH callback';
+        my $kill_timer; $kill_timer = EV::timer 0.3, 0, sub {
+            undef $kill_timer;
+            $helper->command('CLIENT', 'KILL', 'ID', $client_id, sub {
+                $helper->disconnect;
+            });
+        };
+    });
+
+    my $timeout; $timeout = EV::timer 5, 0, sub {
+        undef $timeout;
+        $r->disconnect;
+    };
+    EV::run;
+
+    like $watch_err, qr/wrong number/, 'WATCH with no keys errors';
+    is $set_res, 'OK', 'SET replays after reconnect despite refused WATCH';
+}
+
+# skip_waiting closes the span it clears: later issues stay standalone
+SKIP: {
+    my $r = EV::Redis->new(
+        path => $connect_info{sock},
+        max_pending => 2,
+        resume_waiting_on_reconnect => 1,
+        reconnect => 1,
+        reconnect_delay => 100,
+        max_reconnect_attempts => 10,
+        on_error => sub { },
+    );
+    my $helper = EV::Redis->new(path => $connect_info{sock}, on_error => sub {});
+
+    my $client_id;
+    my $skip_reason;
+    $r->command('CLIENT', 'ID', sub {
+        my ($res, $err) = @_;
+        if ($err) {
+            $skip_reason = "CLIENT ID not supported: $err";
+        } else {
+            $client_id = $res;
+        }
+    });
+
+    my $id_timer; $id_timer = EV::timer 1, 0, sub { undef $id_timer; EV::break };
+    EV::run;
+
+    skip $skip_reason, 4 if $skip_reason;
+    skip 'failed to get client ID', 4 unless defined $client_id;
+
+    $r->blpop('resume_skip_pad', 30, sub { });
+    $r->multi(sub { });
+    my $set_err;
+    $r->set('resume_skip_key', 'x', sub {
+        my ($res, $err) = @_;
+        $set_err = $err;
+    });
+    is $r->waiting_count, 1, 'SET waits behind BLPOP and MULTI';
+    $r->skip_waiting;
+    is $set_err, 'skipped', '... and skip_waiting fails it';
+
+    my ($ping_res, $ping_err, $to);
+    $r->command('ping', sub {
+        ($ping_res, $ping_err) = @_;
+        undef $to;
+        EV::break;
+    });
+
+    my $kt; $kt = EV::timer 0.3, 0, sub {
+        undef $kt;
+        $helper->command('CLIENT', 'KILL', 'ID', $client_id, sub {});
+    };
+
+    $to = EV::timer 10, 0, sub {
+        undef $to;
+        $r->disconnect;
+        EV::break;
+    };
+    EV::run;
+    $r->disconnect;
+    $helper->disconnect;
+
+    is $ping_err, undef, 'post-skip PING replays without error';
+    is $ping_res, 'PONG', '... and gets its reply';
+}
+
+# a setup span split by a drop fails its stranded fragments
+{
+    my ($set_err, $exec_err, $final, $to);
+    my $helper = EV::Redis->new(path => $connect_info{sock}, on_error => sub {});
+    my ($gen, $r);
+    $r = EV::Redis->new(
+        path => $connect_info{sock},
+        resume_waiting_on_reconnect => 1,
+        reconnect => 1,
+        reconnect_delay => 100,
+        max_reconnect_attempts => 5,
+        on_error => sub { },
+        on_connect => sub {
+            return if $gen++;
+            $r->blpop('resume_setup_block', 10, sub { });
+            $r->multi(sub { });
+            $r->command('HELLO', '2', sub { });
+            $r->set('resume_setup_key', 'orphan', sub {
+                my ($res, $err) = @_;
+                $set_err = $err;
+            });
+            $r->exec(sub {
+                my ($res, $err) = @_;
+                $exec_err = $err;
+            });
+        },
+    );
+
+    my $poll; $poll = EV::timer 0.1, 0.1, sub {
+        $helper->command('client', 'list', sub {
+            my ($line) = grep { /cmd=blpop/ } split /\n/, $_[0];
+            return unless $line;
+            my ($id) = $line =~ /id=(\d+)/;
+            undef $poll;
+            $helper->command('client', 'kill', 'id', $id, sub {
+                my $wt; $wt = EV::timer 1.5, 0, sub {
+                    undef $wt;
+                    $helper->get('resume_setup_key', sub {
+                        ($final) = @_;
+                        undef $to;
+                        EV::break;
+                    });
+                };
+            });
+        });
+    };
+    $to = EV::timer 12, 0, sub { undef $to; undef $poll; EV::break };
+    EV::run;
+    $r->disconnect;
+    $helper->disconnect;
+
+    ok $set_err, 'stranded setup SET fails instead of replaying';
+    ok $exec_err, 'stranded setup EXEC fails instead of replaying';
+    isnt $final, 'orphan', '... and never applies server-side';
 }
 
 # command() in the reconnect window queues instead of croaking

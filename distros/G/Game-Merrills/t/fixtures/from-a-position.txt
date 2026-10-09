@@ -1,0 +1,32 @@
+position W.WWWW....B...B..BB.B... w 0 0 1 4
+1. d6-d7xf2 g4-f4
+2. g7-g4 b2-d2
+3. g4-g7xb4 e3-d6
+4. a7-a4 d2-a7
+5. g7-g4 a7-g7
+6. b6-b4 g7-d2
+7. g4-g7 d2-a7
+8. g7-g4 a7-d3
+9. g4-g7 d3-a7
+10. g7-g4 a7-c4
+11. a4-a7 c4-g7
+12. b4-c4 f4-d2
+13. c4-b4 d6-d1
+14. f6-f4 g7-d3xd7
+15. f4-e4 d2-f4
+16. a7-a4 f4-c4
+17. g4-f4 c4-a1
+18. b4-c4 a1-g1
+19. f4-g4 d3-d2
+20. c4-b4 g1-b2
+21. e4-f4 b2-f2
+22. f4-e4 d1-f4
+23. g4-g7 d2-f6xb4
+24. g7-c4 f4-b4
+25. a4-f4 f2-g4
+26. f4-e3 g4-e5
+27. e4-c3 f6-a7
+28. c4-d3xa7
+# White wins: Black has fewer than three men
+# ........B.B....WWW...... b 0 0 0 59
+# 59

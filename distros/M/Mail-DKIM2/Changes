@@ -1,5 +1,194 @@
 Revision history for Mail::DKIM2
 
+0.17    2026-10-08
+        - Mail::DKIM2::Gate: when the Gate runs the Verifier itself and it
+          passes, the Verifier has already walked the whole Message-Instance
+          chain, so the Gate no longer walks it a second time. It still does
+          when there are no signatures, when the caller supplied VerifyResult,
+          or when the Verifier did not pass.
+        - The Gate's null-body refusal now names the library option
+          (AllowNullBodyRecipe), not the CLI flag. dkim2sign and dkim2-milter
+          still show --allow-null-body-recipe, and the authentication_milter
+          DKIM2Sign handler shows allow_null_body_recipe.
+        - authentication_milter DKIM2Verify: for a message that already has
+          Message-Instance headers, skip the MessageInstance verify that only
+          picked the snapshot key when snapshot_directory is not set.
+
+0.16    2026-10-08
+        - Mail::DKIM2::Gate's null body rule: a DKIM2-Signature with m=k
+          covers Message-Instances 1..k, so without AllowNullBodyRecipe the
+          gate refuses when any instance with a null body Recipe has m=
+          above the highest m= of the valid upstream signatures -- the top,
+          or one with another unsigned instance added over it: a null this
+          hop is the first to sign. A null an upstream domain already
+          declared and signed (a list post forwarded unchanged) is extended
+          without the option; the upstream chain must still verify and the
+          header history below the null must still check out. In 0.15 any
+          null top was refused, signed or not, and a null under an unsigned
+          top was never looked at (so the DKIM2Sign handler, recomputing
+          its own instance over a snapshot keyed by the null one, signed it
+          without the option). The refusal reads "unsigned top
+          Message-Instance m=N has a null body Recipe", or "unsigned
+          Message-Instance m=N ..." when it is not the top. The result gains
+          top_signed, covered_m and unsigned_null. bin/dkim2sign,
+          bin/dkim2-milter and the DKIM2Sign handler follow the Gate and add
+          the informational X-DKIM2-Info action=null-body-recipe when they
+          sign over either kind of null. (t/gate-null-top.t,
+          t/milter-sign-gate.t, t/sign-cli.t, t/milter-script.t;
+          signer-gate fixtures null-top-signed, null-below-unsigned-top,
+          null-below-signed)
+        - Behaviour change: Mail::DKIM2::Verifier reports a DKIM2-Signature
+          it cannot key -- no i=, an i= that is not a positive integer
+          (i=, i=0, i=abc, i=-1), or one that does not parse -- as
+          permerror, "PERMERROR DKIM2-Signature has a missing or malformed
+          i= tag", as the Python, Go, C and JS verifiers now all do. It used
+          to ignore such a field and verify the rest, so a junk
+          "DKIM2-Signature: m=2" prepended to a valid chain passed -- and
+          the Gate, counting coverage by m=, took it as signing an unsigned
+          null top. Mail::DKIM2::Signer likewise refuses to sign over such
+          a field (result fail with the same message), and only a signature
+          with a valid i= counts towards the Gate's coverage.
+          (t/verifier-unkeyable.t, t/gate-null-top.t)
+        - Behaviour change: every DKIM2-Signature i= and m=, and every
+          Message-Instance m=, must be a chain number: 1*DIGIT in ASCII
+          (else "PERMERROR <field> has a malformed <tag>= tag", or the
+          unkeyable message above for i=), at most three digits naming
+          1..MAX_CHAIN_NUMBER (100) (else "PERMERROR <field> <tag>= exceeds
+          the maximum chain number of 100"), and no more than
+          MAX_CHAIN_LENGTH (32) (else "... exceeds the maximum chain length
+          of 32"). "01" and "001" are 1, in all five verifiers and four
+          signers. Found while the header fields are read, before any gap
+          check: i=99999999999999999999 used to kill the Verifier ("Range
+          iterator outside integer range"), and m=4294967297x was read as
+          its digit prefix. The Signer refuses to sign over such a field.
+          Common exports chain_number_error(), MAX_CHAIN_NUMBER and
+          mi_version_tag() (the raw m= value, from any position in the
+          field); extract_mi_version() is now numeric and returns undef
+          unless the whole m= is ASCII digits. (t/chain-number-bound.t)
+        - The Verifier keyed Message-Instances by the m= string, so an
+          instance written m=01 read as "missing Message-Instance m=1" in
+          Perl alone; instances and the donotmodify check are keyed by
+          number now. (t/chain-number-bound.t)
+        - A duplicate key anywhere in a Recipe's JSON (at the top level or
+          inside "h") is invalid JSON: "PERMERROR Message-Instance m=N
+          contains invalid JSON". Parsers disagree on which value wins (C's
+          kept the first, the others the last), so {"b":[...],"b":null} was
+          a real body Recipe to some verifiers and gates and a null one to
+          others. Common::decode_tag_json refuses it, so the Verifier, the
+          Gate and the signers all do. (t/invalid-json.t; negative vectors
+          recipe-duplicate-*, signer-gate fixture recipe-duplicate-key)
+        - bin/dkim2-milter fails closed. Outbound, an exception in the Gate,
+          in computing the Message-Instance or in the Signer is logged and
+          the message goes on unsigned. Inbound, a Verifier exception gives
+          dkim2=temperror in Authentication-Results (never pass), and an
+          exception computing the Message-Instance is logged and adds no
+          Message-Instance; the message goes on with its
+          Authentication-Results. An out-of-range Message-Instance m= is
+          never used as a bound when stripping instances above a snapshot
+          (m=99999999999999999999 died there, m=4294967297 ran out of
+          memory). A Signer that declines is logged too. (t/milter-script.t)
+        - The DKIM2Sign handler (authentication_milter) follows the Gate, on
+          the message as it would sign it (its own Message-Instance
+          included), replacing its own chain_verifies() check. New config
+          allow_null_body_recipe (default 0) is the milter's
+          --allow-null-body-recipe. A refusal signs nothing and adds or
+          strips no Message-Instance; it is logged, counted in
+          dkim2_sign_total by reason, and (broken-mi-chain,
+          null-body-recipe) marked with X-DKIM2-Info
+          action=not-signed=<reason>. Upstream keys come from the milter's
+          resolver (dns_overrides and skip_timestamp_check for tests).
+          Mail is signed exactly as before when there is no upstream chain.
+          Gate->check takes Resolver and IgnorePrefixes. The test mock of
+          Mail::Milter::Authentication moved to t/lib/MockAuthMilter.pm.
+          (t/milter-sign-gate.t)
+        - Behaviour change: the DKIM2Sign and DKIM2Verify handlers apply
+          their own default_config() to any option the configuration leaves
+          out (or sets to null); an explicit 0 still wins.
+          authentication_milter only uses default_config() to generate a
+          sample config, so before this DKIM2Sign's sign_local,
+          sign_authenticated, add_message_instance and record_smtp_params,
+          and DKIM2Verify's add_message_instance, were off unless set. A
+          deployment that relied on leaving them out to keep them off must
+          now set them to 0. (t/milter-sign-gate.t, t/milter.t)
+        - The DKIM2Sign handler deletes the broken intermediate
+          Message-Instances it strips through the framework's
+          change_header() (SMFIR_CHGHEADER). It used to push them onto the
+          handler's remove_headers, which authentication_milter never
+          reads, so they stayed on the wire. (t/milter.t)
+        - Mail::DKIM2::Common exports valid_sequence() and
+          UNKEYABLE_SIGNATURE_ERROR.
+        - Signer POD: result() lists every fail cause.
+        - bin/validate.pl reports the header-level PERMERRORs (a
+          DKIM2-Signature with no usable i=, an i=/m= that is not a chain
+          number) before its walk. It used to pass a message whose only
+          DKIM2-Signature was junk. It also reads i=/m= with the tag-list
+          parser, so FWS around "=" no longer breaks its walk.
+          (t/validate-cli.t)
+        - DKIM2_DATE 2026-10-08.
+
+0.15    2026-10-08
+        - MessageInstance->calculate takes BodyRecipe ('none', 'null' or a
+          Recipe) and then skips the body diff; body_hash accessor;
+          body_digest_raw(). For list managers that build the Recipe from
+          their own layout (Sympa always-wrap). (t/mi-body-recipe-option.t)
+        - MessageInstance->calculate takes BodyHash (a base64 sha256 hash, or
+          a hashref per algorithm, from body_digest_raw) with BodyRecipe or
+          for m=1: the body is not hashed or read, so the message passed may
+          be its header block alone. A list manager sending many copies of a
+          large body no longer has each one parsed and hashed twice.
+          body_digest_raw hashes the body a megabyte at a time instead of
+          copying it whole. (t/mi-body-recipe-option.t)
+        - calculate validates both: a BodyHash value must be the base64 of a
+          digest of its algorithm's length (it goes into h= verbatim); a
+          string message without a final line break gets a CRLF; a
+          BodyRecipe of undef, with an undefined step or a literal holding
+          CR or LF, or with no previous message croaks; BodyRecipe 'none'
+          with BodyHash croaks unless the hash is the previous instance's
+          body hash. (t/mi-body-recipe-option.t)
+        - The body diff finds the common prefix and suffix a 4 KB block at a
+          time instead of a character at a time: about 5x faster for a list
+          manager's per-recipient Recipe (2 MB body: 104 ms to 21 ms), the
+          same Recipes. (t/mi-flat-common-len.t)
+
+0.14    2026-10-07
+        - The Verifier and MessageInstance->chain_verifies walk the header
+          history past an instance whose body Recipe is null: the body is
+          unrecoverable there, but every lower instance's header hashes
+          are still checked down to m=1. (t/mi-null-header-history.t)
+        - Validate (and bin/validate.pl): a null body Recipe no longer fails
+          the chain; the header history below it is checked, and the lower
+          levels report body_hash 'not-checked'. (t/validate-null-body.t)
+        - dkim2-milter --allow-null-body-recipe (default off): a message
+          whose top Message-Instance has a null body Recipe is no longer
+          signed silently; it is refused (X-DKIM2-Info
+          not-signed=null-body-recipe) unless the option is set, and signed
+          with X-DKIM2-Info null-body-recipe when it is.
+        - bin/dkim2sign no longer signs blindly over an existing chain: like
+          dkim2-milter it verifies the upstream DKIM2-Signatures (an unsigned
+          top Message-Instance is allowed) and that the Message-Instance chain
+          undoes cleanly, and refuses (exit 1, nothing on stdout) otherwise.
+          A top null body Recipe is refused unless --allow-null-body-recipe.
+          New --dns-json (default $DKIM2_DNS_JSON) and --ignore-timestamps.
+          The decision is the new Mail::DKIM2::Gate, shared with the milter;
+          the Signer library itself still signs ungated. (t/sign-cli.t)
+        - nd= bridge: when the top DKIM2-Signature carries nd=, the Gate
+          (and so dkim2sign and dkim2-milter) signs only if nd= equals the
+          signing d= (case-insensitive) and otherwise refuses with "top
+          signature nd=X names another domain". Verifier gains
+          next_domain_ok($d) / NextDomainOK; Gate->check takes
+          SigningDomain. Every non-nd case behaves as before.
+          (t/sign-cli.t, t/milter-script.t)
+        - A Message-Instance whose r= has a "b" that is neither null nor an
+          array (e.g. 5, "x", {}) is now a PERMERROR instead of being read
+          as a null body Recipe; likewise an "h" that is not an object.
+          (t/mi-null-recipe.t)
+        - A body Recipe's structure (integer bounds, ascending, no overlap)
+          is validated even when a null body Recipe above it means it is
+          never applied; a malformed one below a null now fails the chain.
+          (t/mi-null-header-history.t)
+        - DKIM2_DATE is 2026-10-07: what the milter signs and how the
+          Verifier judges a null body Recipe changed.
+
 0.13    2026-10-04
         - The header Recipe builder treated "no instances" and "one empty
           instance" of a field as the same, so removing an empty header

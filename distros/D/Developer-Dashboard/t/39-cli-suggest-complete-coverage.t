@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 use File::Path qw(make_path);
+use File::Basename qw(basename);
 use File::Spec;
 use File::Temp qw(tempdir);
 use Test::More;
@@ -283,6 +284,10 @@ make_path( File::Spec->catdir( $skill_alpha_root, 'cli', 'ignored-hook.d' ) );
     sub new { bless $_[1], $_[0] }
     sub cli_roots { return @{ $_[0]{cli_roots} || [] }; }
     sub installed_skill_roots { return @{ $_[0]{skill_roots} || [] }; }
+    sub skill_roots_for {
+        my ( $self, $name ) = @_;
+        return grep { File::Basename::basename($_) eq $name } @{ $self->{skill_roots} || [] };
+    }
 }
 
 {

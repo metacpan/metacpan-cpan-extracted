@@ -8,11 +8,11 @@ my $conninfo = shift || $ENV{TEST_PG_CONNINFO} || 'dbname=postgres';
 
 my $pg; $pg = EV::Pg->new(
     conninfo => $conninfo,
-    on_error => sub { die "connection error: $_[0]\n" },
+    on_error => sub { warn "connection error: $_[0]\n"; EV::break },
     on_connect => sub {
         $pg->query("create temp table people (id int, name text)", sub {
             my (undef, $err) = @_;
-            die $err if $err;
+            if ($err) { warn $err; EV::break; return; }
 
             $pg->query("copy people from stdin", sub {
                 my ($data, $err) = @_;
@@ -26,13 +26,13 @@ my $pg; $pg = EV::Pg->new(
                     return;
                 }
 
-                die $err if $err;
+                if ($err) { warn $err; EV::break; return; }
                 print "copied $data rows\n";
 
                 # verify
                 $pg->query("select * from people order by id", sub {
                     my ($rows, $err) = @_;
-                    die $err if $err;
+                    if ($err) { warn $err; EV::break; return; }
                     for my $row (@$rows) {
                         print "  $row->[0]: $row->[1]\n";
                     }

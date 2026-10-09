@@ -3,7 +3,7 @@ package Developer::Dashboard::RuntimeManager;
 use strict;
 use warnings;
 
-our $VERSION = '5.51';
+our $VERSION = '5.73';
 
 use Capture::Tiny qw(capture);
 use File::Spec;
@@ -1291,7 +1291,7 @@ sub _supervise_one_collector {
 
     my $status = $self->{collectors}->read_status($name) || {};
     my $stalled = $running_entry
-      ? $self->_collector_stalled_for_watchdog( $job, $status )
+      ? $self->_collector_stalled_for_watchdog( $job, $status, $running_entry )
       : 0;
     return undef if $running_entry && !$stalled;
 
@@ -1386,16 +1386,31 @@ sub _supervise_one_collector {
     return { bucket => 'restarted', entry => { name => $name, pid => $pid } };
 }
 
-# _collector_stalled_for_watchdog($job, $status)
+# _collector_stalled_for_watchdog($job, $status, $running_entry)
 # Detects when a managed scheduled collector loop is alive but has stopped
-# making progress long enough that the watchdog should recycle it.
-# Input: collector job hash reference and collector status hash reference.
+# making progress long enough that the watchdog should recycle it. Cron loops
+# are judged by their scheduler heartbeat rather than job execution time, since
+# a long gap between scheduled runs is expected behavior.
+# Input: collector job hash reference, collector status hash reference, and
+# optional running-loop entry containing persisted loop state.
 # Output: boolean true when the collector is stalled.
 sub _collector_stalled_for_watchdog {
-    my ( $self, $job, $status ) = @_;
+    my ( $self, $job, $status, $running_entry ) = @_;
     return 0 if ref($job) ne 'HASH';
     return 0 if ref($status) ne 'HASH';
-    my $latest_epoch = $self->_collector_watchdog_last_progress_epoch($status);
+
+    my $latest_epoch;
+    if ( _job_schedule($job) eq 'cron' ) {
+        my $loop_state = ref($running_entry) eq 'HASH' && ref( $running_entry->{state} ) eq 'HASH'
+          ? $running_entry->{state}
+          : {};
+        my $heartbeat = $loop_state->{heartbeat_at};
+        return 0 if !defined $heartbeat || $heartbeat eq '';
+        $latest_epoch = eval { $self->{collectors}->_iso8601_to_epoch($heartbeat) } || 0;
+    }
+    else {
+        $latest_epoch = $self->_collector_watchdog_last_progress_epoch($status);
+    }
     return 0 if !$latest_epoch;
     my $stale_after = $self->_collector_watchdog_stale_seconds($job);
     return 0 if $stale_after < 1;
@@ -3364,7 +3379,9 @@ collector loops, including stop and restart orchestration plus the collector
 watchdog that restarts unexpectedly-dead loops and records explicit
 attention-required state after repeated crashes. Shutdown uses numeric POSIX
 signals internally so minimal Perl builds that reject named signals still stop
-managed processes correctly.
+managed processes correctly. Cron loops are monitored by their scheduler
+heartbeat rather than the age of the last scheduled job execution, so a valid
+quiet period does not trigger repeated restart warnings.
 
 =head1 METHODS
 
@@ -3385,6 +3402,10 @@ It exists because runtime lifecycle management needs one owner for pid files, pr
 =head1 WHEN TO USE
 
 Use this file when changing how the web process is launched, how restart waits for ports to free up, how collectors are stopped, restarted, or watchdog-supervised with the web process, or how runtime state is validated before a lifecycle command acts.
+
+For cron collectors, keep scheduler-loop heartbeat separate from job progress:
+an old execution timestamp is normal between scheduled runs, while a stale
+loop heartbeat still indicates that the scheduler may need recovery.
 
 =head1 HOW TO USE
 

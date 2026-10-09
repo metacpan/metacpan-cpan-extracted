@@ -48,9 +48,7 @@
  * VERDICT, not a failure, and this is the check that keeps it from being
  * mistaken for one. Non-blocking: never waits. */
 static int cc_reply_pending(int sock) {
-    struct pollfd p;
-    p.fd = sock; p.events = POLLIN; p.revents = 0;
-    return poll(&p, 1, 0) > 0 && (p.revents & (POLLIN | POLLHUP | POLLERR)) ? 1 : 0;
+    return cc_readable_now(sock);
 }
 
 /* Source abstraction so memory and a descriptor share one write loop -
@@ -80,7 +78,7 @@ static ssize_t cc_source_next(cc_source *s, const char **p, cc_err *err) {
         return (ssize_t)take;
     }
     for (;;) {
-        ssize_t n = read(s->fd, s->iobuf, s->chunk);
+        ssize_t n = cc_read_fd(s->fd, s->iobuf, s->chunk);
         if (n >= 0) { *p = s->iobuf; return n; }
         if (errno == EINTR) continue;
         cc_err_set(err, CC_ERR_IO, "read", strerror(errno));

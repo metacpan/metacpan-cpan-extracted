@@ -8,14 +8,14 @@ SYNOPSIS
 
         my $pg = EV::Pg->new(
             conninfo   => 'dbname=mydb',
-            on_error   => sub { die "PG error: $_[0]\n" },
+            on_error   => sub { warn "PG error: $_[0]\n"; EV::break },
         );
         $pg->on_connect(sub {
             $pg->query_params(
                 'select $1::int + $2::int', [10, 20],
                 sub {
                     my ($rows, $err) = @_;
-                    die $err if $err;
+                    if ($err) { warn $err; EV::break; return; }
                     say $rows->[0][0];  # 30
                     EV::break;
                 },
@@ -30,7 +30,7 @@ DESCRIPTION
     socket, so the event loop never blocks on database I/O.
 
     Features: parameterized queries, prepared statements, pipeline mode,
-    single-row and chunked rows (libpq >= 17), COPY IN/OUT, LISTEN/NOTIFY,
+    single-row mode, chunked rows (libpq >= 17), COPY IN/OUT, LISTEN/NOTIFY,
     async cancel (libpq >= 17), structured error fields, protocol tracing,
     and notice handling.
 
@@ -68,6 +68,14 @@ CALLBACKS
     Exceptions thrown inside callbacks are caught and reported via "warn" so
     that one bad callback does not derail the rest of the queue.
 
+    All string values are byte strings as returned by libpq, never decoded
+    characters; decode them yourself (see "client_encoding").
+
+    A callback may nest "EV::run", but while a query callback or "on_notice"
+    runs, the object's I/O waits for it to return: never wait there for pg
+    results, the wait would never end. Nested waits from "on_connect",
+    "on_notify" and "on_drain" work.
+
 CONSTRUCTOR
   new
         my $pg = EV::Pg->new(%args);
@@ -84,19 +92,23 @@ CONSTRUCTOR
     conninfo_params
         Hashref of connection parameters (e.g. "{ host => 'localhost',
         dbname => 'mydb', port => 5432 }"), passed to "connect_params".
-        Mutually exclusive with "conninfo".
+        Takes precedence over "conninfo" when both are given.
 
     expand_dbname
         When true together with "conninfo_params", the "dbname" value is
         itself parsed as a connection string -- so "dbname =>
-        'postgresql://host/db?sslmode=require'" works.
+        'postgresql://host/db?sslmode=require'" works. Ignored unless
+        "conninfo_params" is also given.
 
     on_connect
-        Fires once with no arguments when the handshake completes.
+        Fires with no arguments on every successful handshake, including
+        each "reset".
 
     on_error
-        Fires as "($error_message)" on connection-level errors. Defaults to
-        "sub { die @_ }"; pass an explicit handler to keep the loop alive.
+        Fires as "($error_message)" on connection-level errors. The default
+        handler "die"s, which, like any handler exception, is caught and
+        reported via "warn". "on_error => undef" still installs the default;
+        clear it with "$pg->on_error(undef)".
 
     on_notify
         Fires as "($channel, $payload, $backend_pid)" for LISTEN/NOTIFY
@@ -119,12 +131,34 @@ CONSTRUCTOR
 
     Unknown arguments produce a "carp" warning and are otherwise ignored.
 
+OBJECT LIFECYCLE
+    Destroying the object ("undef $pg", including from inside a callback)
+    fires every queued callback with "(undef, "object destroyed")" and
+    closes the connection.
+
+    Handlers that close over $pg form a reference cycle: only "undef $pg"
+    (or clearing the handlers) frees the object; scope exit and "finish" do
+    not.
+
+    After "fork", the child inherits a copy it must not use for I/O.
+    Destroying it ("undef $pg" or plain "exit"), "finish" and "skip_pending"
+    are safe: the parent's connection is untouched and inherited callbacks
+    are dropped silently. Everything that talks to the server croaks on the
+    inherited object. Destroy inherited objects before running an event loop
+    in the child, and create a new object there to talk to PostgreSQL.
+
 CONNECTION METHODS
   connect
         $pg->connect($conninfo);
 
     Starts an asynchronous connection from a libpq connection string.
-    "on_connect" fires on success, "on_error" on failure.
+    "on_connect" fires on success, "on_error" on failure. Croaks if already
+    connected, and synchronously for failures detectable before the first
+    packet (bad keyword, unresolvable host, missing Unix socket, on some
+    systems a refused local port); the rest arrive via "on_error". Do not
+    call "connect" directly from "on_error": the failed connection is still
+    installed while the handler runs, so it croaks -- "finish" first, or
+    defer with a timer like "reset".
 
   connect_params
         $pg->connect_params(\%params);
@@ -132,14 +166,26 @@ CONNECTION METHODS
 
     Like "connect" but takes a hashref of keyword/value parameters. When
     $expand_dbname is true, the "dbname" entry may itself be a connection
-    string or URI.
+    string or URI. Undef values mean the libpq default. Croaks if already
+    connected, or synchronously if the parameters are unusable.
 
   reset
         $pg->reset;
 
     Drops the current connection and reconnects with the same parameters.
-    Pending callbacks fire with "(undef, "connection reset")" first. Alias:
-    "reconnect".
+    Pending callbacks fire with "(undef, "connection reset")" first. Croaks
+    if no connection was ever started. Alias: "reconnect".
+
+    Do not call "reset" directly from "on_error" against a possibly-down
+    server: each attempt fails immediately and reconnects spin hot. Defer
+    with a timer, and catch the synchronous failures "connect" lists:
+
+        on_error => sub {
+            my $t; $t = EV::timer(5, 0, sub {
+                undef $t;
+                eval { $pg->reset; 1 } or $pg->on_error->($@);
+            });
+        },
 
   finish
         $pg->finish;
@@ -151,15 +197,23 @@ CONNECTION METHODS
         my $bool = $pg->is_connected;
 
     True if the handshake has completed and the connection is ready for
-    queries. False during connect, after "finish", and after a fatal error.
+    queries. False during connect, after "finish", and after a
+    connection-level failure. A failed query ("PGRES_FATAL_ERROR") leaves
+    the connection usable, so it does not affect this flag.
 
   status
         my $st = $pg->status;
 
-    libpq connection status: "CONNECTION_OK" or "CONNECTION_BAD". Returns
+    libpq connection status: "CONNECTION_OK" or "CONNECTION_BAD";
+    intermediate libpq states may show during the handshake. Returns
     "CONNECTION_BAD" when not connected.
 
 QUERY METHODS
+    The methods below that issue commands croak when called while not
+    connected; those taking a callback also croak when it is not a coderef.
+    Outside pipeline mode only one query may be in flight; sending another
+    before the first completes croaks.
+
   query
         $pg->query($sql, sub { my ($result, $err) = @_; });
 
@@ -167,7 +221,9 @@ QUERY METHODS
     2") are accepted, but only the final result reaches the callback --
     intermediate results are silently discarded, and because PostgreSQL
     stops at the first error, errors always arrive as that final result. Not
-    allowed in pipeline mode -- use "query_params" there. Alias: "q".
+    allowed in pipeline mode -- use "query_params" there. Alias: "q". An
+    empty, whitespace-only or semicolon-only string yields "(undef, "empty
+    query")".
 
   query_params
         $pg->query_params($sql, \@params, sub { my ($result, $err) = @_; });
@@ -178,7 +234,7 @@ QUERY METHODS
     Values are sent in PostgreSQL's text format. Embedded NUL bytes cause
     the call to croak (text-format params cannot legally contain NULs) --
     pass binary data through "escape_bytea" if you need a "bytea" column.
-    Alias: "qp".
+    The params argument must be an arrayref. Alias: "qp".
 
   prepare
         $pg->prepare($name, $sql, sub { my ($result, $err) = @_; });
@@ -253,7 +309,10 @@ QUERY METHODS
     Sends a non-blocking cancel request using the "PQcancelConn" API
     (requires libpq >= 17). The callback receives "(1)" on success or
     "(undef, $errmsg)" on failure. Croaks if a cancel is already in
-    progress.
+    progress. Success means the cancel was sent, not that the query died: a
+    late cancel loses and the query callback still delivers its result.
+    There is no timeout; guard with your own timer if the server may be
+    unreachable.
 
   pending_count
         my $n = $pg->pending_count;
@@ -274,8 +333,12 @@ QUERY METHODS
         $pg->skip_pending;
 
     Drops every queued callback, invoking each with "(undef, "skipped")".
-    Any in-flight server results are drained and discarded; the connection
-    remains usable for new queries.
+    Results still in flight are discarded as they arrive; until then a send
+    outside pipeline mode croaks with "another command is already in
+    progress", so retry it later. A skipped COPY OUT or COPY BOTH is ended
+    and drained automatically; a skipped COPY IN is aborted when skipped
+    from its own callback, otherwise end it with "put_copy_end" (or
+    "reset").
 
 PIPELINE METHODS
     Pipeline mode lets you send multiple queries without waiting for
@@ -287,26 +350,31 @@ PIPELINE METHODS
         $pg->enter_pipeline;
 
     Switches the connection into pipeline mode. Croaks if there are
-    unfinished results outstanding.
+    unfinished results outstanding. Do not issue "COPY ... FROM STDIN" in
+    pipeline mode: an unfed COPY stalls, and further queries make the server
+    abort the connection ("COPY ... TO STDOUT" is fine). If a query in a
+    batch fails, the server skips the rest of the batch and their callbacks
+    fire with "(undef, "pipeline aborted")".
 
   exit_pipeline
         $pg->exit_pipeline;
 
-    Returns to normal mode. Croaks if the pipeline is not idle.
+    Returns to normal mode. Croaks if the pipeline is not idle. Succeeds
+    quietly when not in pipeline mode.
 
   pipeline_sync
         $pg->pipeline_sync(sub { my ($r, $err) = @_; });
 
     Sends a pipeline sync point. The callback fires with "(1)" after all
     preceding queries in the batch have completed, or "(undef, $errmsg)" if
-    the connection drops first. Alias: "sync".
+    the connection drops first. Croaks outside pipeline mode. Alias: "sync".
 
   send_pipeline_sync
         $pg->send_pipeline_sync(sub { my ($r, $err) = @_; });
 
     Like "pipeline_sync" but does not flush the send buffer (requires libpq
     >= 17). Useful for batching multiple sync points before a single manual
-    flush via "send_flush_request".
+    flush via "send_flush_request". Croaks outside pipeline mode.
 
   send_flush_request
         $pg->send_flush_request;
@@ -320,52 +388,67 @@ PIPELINE METHODS
     One of "PQ_PIPELINE_OFF", "PQ_PIPELINE_ON", or "PQ_PIPELINE_ABORTED".
 
 COPY METHODS
-    A "COPY" command runs in two phases: the query callback first fires with
-    a string tag ("COPY_IN" / "COPY_OUT" / "COPY_BOTH") to signal that
-    streaming has started, then fires a second time with the final command
-    result (or error) when the stream ends. See eg/copy_in.pl and
-    eg/copy_out.pl.
+    During a "COPY" the query callback first fires with a string tag
+    ("COPY_IN" / "COPY_OUT" / "COPY_BOTH") when streaming starts -- for COPY
+    OUT and BOTH again whenever more data arrives -- and once more with the
+    final command result (or error) when the stream ends. See eg/copy_in.pl
+    and eg/copy_out.pl.
 
   put_copy_data
         my $rc = $pg->put_copy_data($data);
 
     Sends a chunk during COPY IN. Returns 1 on success (data buffered or
-    flushed), 0 if the send buffer is full (wait for writability via
-    "on_drain", then retry), or -1 on error.
+    flushed), or -1 on error; -1 also outside COPY IN state. libpq grows its
+    send buffer without limit, so pace large loads yourself (e.g. via
+    "on_drain"). A 0 means the buffer could not grow: wait for "on_drain",
+    then retry.
 
   put_copy_end
         my $rc = $pg->put_copy_end;
         my $rc = $pg->put_copy_end($errmsg);
 
     Ends a COPY IN. With $errmsg aborts the COPY server-side. Same return
-    convention as "put_copy_data".
+    convention as "put_copy_data" (including -1 outside COPY IN state).
 
   get_copy_data
         my $row = $pg->get_copy_data;
 
     Retrieves the next row during COPY OUT. Returns the row bytes, the
     integer -1 when the stream is complete, or "undef" if nothing is
-    currently buffered (call again after the next read).
+    currently buffered. After "undef", return from the callback: it fires
+    again with "COPY_OUT" when more data arrives. Croaks when called outside
+    COPY OUT state.
 
 HANDLER METHODS
     Each handler is a getter/setter: pass a coderef to install it (returning
     the new value), pass "undef" to clear it, or call without arguments to
-    read the current handler.
+    read the current handler. Passing a defined non-coderef croaks.
 
   on_connect
-    Fires once with no arguments after the handshake completes.
+    Fires with no arguments after every successful handshake, including each
+    "reset".
 
   on_error
     Fires as "($error_message)" for connection-level errors (handshake
     failure, lost socket, libpq protocol errors). Per-query errors come
     through the query callback, not here.
 
+    When the socket is lost, "on_error" fires with the libpq error message
+    and every callback still outstanding when the loss is detected then
+    fires with "(undef, "connection lost")" (including "pipeline_sync"
+    callbacks). A final server error may reach a query callback before
+    "on_error" fires.
+
   on_notify
     Fires as "($channel, $payload, $backend_pid)" for each LISTEN/NOTIFY
-    message.
+    message. Without a handler, notifications are silently discarded.
 
   on_notice
-    Fires as "($message)" for server NOTICE/WARNING messages.
+    Fires as "($message)" for server NOTICE/WARNING messages. Without a
+    handler, notices are silently discarded (this overrides libpq's stderr
+    default). The handler runs inside libpq, so the COPY methods,
+    "set_client_encoding" and "encrypt_password" without an algorithm croak
+    while it runs.
 
   on_drain
     Fires with no arguments when the libpq send buffer has been fully
@@ -375,9 +458,9 @@ HANDLER METHODS
 CONNECTION INFO
     String accessors ("db", "user", "host", "hostaddr", "port",
     "error_message", "parameter_status", "ssl_attribute") return "undef"
-    when not connected. Integer accessors return a default value (typically
-    0 or -1). Methods that require an active connection ("client_encoding",
-    "set_client_encoding", "set_error_verbosity",
+    when not connected. Integer accessors return a default value (0, -1, or
+    the enum's unknown member). Methods that require an active connection
+    ("client_encoding", "set_client_encoding", "set_error_verbosity",
     "set_error_context_visibility", "conninfo") croak otherwise.
 
   error_message
@@ -432,7 +515,7 @@ CONNECTION INFO
   hostaddr
         my $addr = $pg->hostaddr;
 
-    Server IP address.
+    Server IP address (empty string over a Unix socket).
 
   port
         my $port = $pg->port;
@@ -473,7 +556,8 @@ CONNECTION INFO
     synchronous (blocking) call that stalls the event loop for one server
     round trip, so it is best invoked right after "on_connect" fires and
     before any queries are dispatched. Croaks if there are pending queries
-    or on failure.
+    or on failure. Notifications read during the call are delivered to
+    "on_notify" before it returns.
 
   set_error_verbosity
         my $old = $pg->set_error_verbosity($level);
@@ -494,9 +578,9 @@ CONNECTION INFO
 
     Returns a hashref of structured error fields from the most recent
     "PGRES_FATAL_ERROR" result, or "undef" if no fatal error has been seen.
-    Persists until the next fatal error; successful queries do not clear it.
-    Each key is present only when the corresponding field is non-NULL in the
-    server response:
+    Persists until the next fatal error; successful queries do not clear it,
+    but "reset"/"finish" do. Each key is present only when the corresponding
+    field is non-NULL in the server response:
 
         sqlstate            severity            primary
         detail              hint                position
@@ -510,10 +594,13 @@ CONNECTION INFO
 
     Returns a hashref of metadata for the most recent query result, or
     "undef" if no result has been delivered. Refreshed by every successful
-    result (including commands with no columns) but not by errors, COPY, or
-    pipeline sync results -- so after an error this returns metadata for the
-    last successful query and you should check $err before relying on it.
-    Cleared by "reset"/"finish".
+    result (including commands with no columns, and the "COMMAND_OK" that
+    terminates a COPY) but not by errors, COPY tags while streaming, or
+    pipeline sync results. Reliable only inside the callback of the result
+    it describes: after an error, COPY tag or sync it may return "undef" or
+    the previous result's metadata. Cleared by "reset"/"finish". The most
+    recent result is retained until the next one arrives; for very large
+    results prefer single-row or chunked mode.
 
     Keys:
 
@@ -530,7 +617,8 @@ CONNECTION INFO
         my $info = $pg->conninfo;
 
     Returns a hashref of the connection parameters actually used by the live
-    connection (keyword => value pairs).
+    connection (keyword => value pairs). Warning: includes the password in
+    cleartext when the connection string has one; do not log it wholesale.
 
   connection_used_password
         my $bool = $pg->connection_used_password;
@@ -540,7 +628,8 @@ CONNECTION INFO
   connection_used_gssapi
         my $bool = $pg->connection_used_gssapi;
 
-    Returns 1 if the connection used GSSAPI authentication.
+    Returns 1 if the connection used GSSAPI authentication. Requires libpq
+    >= 16 (method not defined below that).
 
   connection_needs_password
         my $bool = $pg->connection_needs_password;
@@ -551,7 +640,9 @@ CONNECTION INFO
         $pg->trace($filename);
 
     Enables libpq protocol tracing, writing the wire-level frontend/backend
-    exchange to $filename. Croaks if the file cannot be opened.
+    exchange to $filename (truncating it). Croaks if the file cannot be
+    opened, or when not connected. Tracing stops if the connection is reset,
+    finished, or lost; call "trace" again after reconnecting.
 
   untrace
         $pg->untrace;
@@ -564,9 +655,12 @@ CONNECTION INFO
 
     Sets the trace output style. $flags is a bitmask of
     "PQTRACE_SUPPRESS_TIMESTAMPS" and/or "PQTRACE_REGRESS_MODE" (handy when
-    diffing traces).
+    diffing traces). Croaks when not connected.
 
 UTILITY METHODS
+    "escape_literal", "escape_identifier", "escape_bytea" and
+    "encrypt_password" require a live connection and croak otherwise.
+
   escape_literal
         my $quoted = $pg->escape_literal($string);
 
@@ -593,7 +687,9 @@ UTILITY METHODS
     Hashes a password client-side (so the cleartext never reaches the
     server) ready to be passed to "ALTER ROLE ... PASSWORD". $algorithm is
     optional; when omitted the server's "password_encryption" setting
-    decides (typically "scram-sha-256").
+    decides (typically "scram-sha-256"). That lookup blocks like
+    "set_client_encoding" and croaks with pending or undrained queries; pass
+    an explicit algorithm to avoid the server round trip.
 
   unescape_bytea
         my $binary = EV::Pg->unescape_bytea($escaped);
@@ -622,7 +718,7 @@ ALIASES
         prep        prepare
         reconnect   reset
         disconnect  finish
-        flush       send_flush_request  (libpq >= 17)
+        flush       send_flush_request
         sync        pipeline_sync
         quote       escape_literal
         quote_id    escape_identifier
@@ -650,14 +746,23 @@ BENCHMARK
 
     Sequential mode uses prepared statements (parse once, bind+execute per
     call). Pipeline mode batches queries with "pipeline_sync" every 1000
-    queries. See bench/bench.pl to reproduce.
+    queries. Reproduce with bench/bench.pl ("BENCH_N" queries per workload,
+    default 10,000; "BENCH_BATCH" pipeline batch size, default 1000).
 
 REQUIREMENTS
     libpq >= 14 (PostgreSQL client library) and EV. A handful of features --
     chunked rows mode, "close_prepared"/"close_portal",
-    "send_pipeline_sync"/"send_flush_request", and "cancel_async" -- require
-    libpq >= 17 and degrade gracefully when not available (the methods are
-    simply not defined).
+    "send_pipeline_sync", and "cancel_async" -- require libpq >= 17,
+    "connection_used_gssapi" needs >= 16. Built against older headers these
+    methods are not defined; run against an older library they croak.
+
+THREADS
+    EV::Pg is not thread-safe and must not be used across Perl ithreads,
+    even with separate connections per thread: internal state is
+    unsynchronized and EV watchers are single-threaded. Use separate
+    processes for parallelism. Spawning a thread while an object is visible
+    is safe -- the child gets an unusable unblessed copy and the parent's
+    connection is unaffected.
 
 SEE ALSO
     EV, DBD::Pg, Mojo::Pg, AnyEvent::Pg

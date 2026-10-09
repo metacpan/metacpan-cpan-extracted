@@ -2,7 +2,7 @@ package Mail::DKIM2::Verifier;
 use strict;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.17';
 
 use base 'Mail::DKIM2::HeaderParser';
 use Crypt::Digest::SHA256 qw(sha256);
@@ -23,6 +23,10 @@ use Mail::DKIM2::Common qw(
     MAX_CHAIN_LENGTH
     chain_length_error
     duplicate_number_error
+    valid_sequence
+    UNKEYABLE_SIGNATURE_ERROR
+    chain_number_error
+    mi_version_tag
 );
 use Email::MIME;
 use Mail::DKIM2::Signature;
@@ -38,7 +42,7 @@ sub _extract_mi_hash_sets {
 
 sub known_options {
     return qw(SkipTimestampCheck AllowUnsignedMI MidProcess HeadersOnly
-              PubkeyCallback Resolver IgnorePrefixes);
+              PubkeyCallback Resolver IgnorePrefixes NextDomainOK);
 }
 
 sub init {
@@ -79,6 +83,17 @@ sub allow_unsigned_mi {
     return $self->{AllowUnsignedMI};
 }
 
+# next_domain_ok: an OUTBOUND signer's own d=. A top DKIM2-Signature carrying
+# nd= is then acceptable when nd= names that domain (case-insensitively): the
+# caller is the hop the imaginary hop pointed at, and its signature is the one
+# nd= promised. Any other nd= on top is refused. Unset (the default) keeps the
+# inbound rule: a top nd= is a permerror.
+sub next_domain_ok {
+    my ($self, $val) = @_;
+    $self->{NextDomainOK} = $val if defined $val;
+    return $self->{NextDomainOK};
+}
+
 # mid_process: set when this Verifier is being run against a partial view of
 # the chain (e.g. Validate.pm's per-level sub-verify, which strips
 # higher-numbered DKIM2-Signature headers before re-verifying). In that view
@@ -112,8 +127,14 @@ sub handle_header {
 
     if ($lc_name eq 'message-instance') {
         eval {
+            my $raw = mi_version_tag($contents);
+            # Bounded here, before finish_body walks 1..m= for gaps. Keyed
+            # by number, so m=01 is m=1.
             my $v = extract_mi_version($contents);
-            if ($v) {
+            if (my $e = chain_number_error('Message-Instance', 'm', $raw)) {
+                $self->{_range_error} //= $e;
+            }
+            elsif ($v) {
                 push @{$self->{_numbers}{'message-instance'}}, $v;
                 $self->{_mi_headers}{$v} = $line || "$field_name:$contents";
             }
@@ -124,20 +145,30 @@ sub handle_header {
         };
     }
     elsif ($lc_name eq 'dkim2-signature') {
-        eval {
-            my $sig = Mail::DKIM2::Signature->parse($contents);
-            if ($sig && $sig->sequence) {
-                push @{$self->{_numbers}{'dkim2-signature'}}, $sig->sequence;
-                $self->{_dk2_headers}{$sig->sequence + 0} = {
-                    raw => $line || "$field_name:$contents",
-                    sig => $sig,
-                };
-            }
-            1;
-        } or do {
-            die $@ if ref $@;
-            $self->{_dk2_parse_error} = $@;
-        };
+        # A signature this verifier cannot key -- one that does not parse,
+        # or whose i= is missing or not a positive integer -- is a PERMERROR
+        # (finish_header), never silently ignored: otherwise a junk
+        # "DKIM2-Signature: m=2" would read as covering m=2 to anyone counting
+        # coverage by m= (the signer gate) while nothing here checked it.
+        my $sig = eval { Mail::DKIM2::Signature->parse($contents) };
+        die $@ if ref $@;
+        my $i = $sig ? $sig->sequence : undef;
+        my $range = valid_sequence($i)
+            && (chain_number_error('DKIM2-Signature', 'i', $i)
+                // chain_number_error('DKIM2-Signature', 'm', $sig->version));
+        if ($range) {
+            # Bounded here, before finish_body walks 1..i= for gaps.
+            $self->{_range_error} //= $range;
+        }
+        elsif (valid_sequence($i)) {
+            push @{$self->{_numbers}{'dkim2-signature'}}, $i;
+            $self->{_dk2_headers}{$i + 0} = {
+                raw => $line || "$field_name:$contents",
+                sig => $sig,
+            };
+        } else {
+            $self->{_dk2_unkeyable} //= UNKEYABLE_SIGNATURE_ERROR;
+        }
     }
 }
 
@@ -147,6 +178,8 @@ sub finish_header {
     my $self = shift;
     my $numbers = $self->{_numbers};
     my $error = chain_length_error($self->{_chain_counts})
+        // $self->{_dk2_unkeyable}
+        // $self->{_range_error}
         // duplicate_number_error('Message-Instance', 'm',
                @{$numbers->{'message-instance'} || []})
         // duplicate_number_error('DKIM2-Signature', 'i',
@@ -241,11 +274,25 @@ sub finish_body {
     # mid-chain verify (mid_process set, e.g. by Validate.pm's per-level
     # sub-verify after stripping higher signatures) that "top" is not the
     # real top of the chain, so this rejection must be suppressed.
+    #
+    # An outbound signer (next_domain_ok set to its own d=) may extend a chain
+    # whose top nd= names it: that is the bridge it was named to complete.
     if (!$self->{MidProcess}
         && defined $signature->next_domain && length $signature->next_domain) {
-        $self->{result}  = 'permerror';
-        $self->{details} = "DKIM2-Signature i=$max_i unexpected nd= tag";
-        return;
+        my $ok = $self->{NextDomainOK};
+        if (defined $ok && length $ok) {
+            if (lc $signature->next_domain ne lc $ok) {
+                $self->{result}  = 'permerror';
+                $self->{details} = "not signing: top signature nd="
+                    . $signature->next_domain . " names another domain";
+                return;
+            }
+            # nd= names us: carry on
+        } else {
+            $self->{result}  = 'permerror';
+            $self->{details} = "DKIM2-Signature i=$max_i unexpected nd= tag";
+            return;
+        }
     }
 
     # Validate chain completeness - check for gaps
@@ -302,7 +349,7 @@ sub finish_body {
         my $flags = $sig->flags // [];
 
         if (grep { $_ eq 'donotmodify' } @$flags) {
-            my $m = $sig->version || 0;
+            my $m = 0 + ($sig->version || 0);
             if ($m >= 1 && $mi_map{$m} && $mi_map{$m + 1}) {
                 # spec-06 §3.4/§7.3: an MI may carry several hash-sets. Only
                 # compare hash-sets whose algorithm we implement; if the two
@@ -348,7 +395,8 @@ sub finish_body {
     # NOT that the current body/headers still match them. Walk the MI chain:
     # verify the top instance against the current content, then undo each
     # instance and verify the reconstructed content against the next one down,
-    # until m=1 or an instance that declares the previous state unrecoverable.
+    # until m=1; past an instance with a null body Recipe (previous body
+    # unrecoverable) the walk continues over the header history only.
     #
     # MessageInstance::parse() dies (rather than returning an error) on a
     # malformed r= payload -- e.g. the §11.2 invalid-JSON PERMERROR -- so
@@ -409,6 +457,7 @@ sub _verify_mi_chain {
     my $raw = join('', @{$self->{headers}}) . "\r\n" . ($self->{_buf} // '');
     my $msg = parse_mime($raw);
 
+    my $headers_only = 0;
     while (1) {
         my @mi = $msg->header_raw('Message-Instance');
         my %by_v = map { (extract_mi_version($_) // 0) => $_ } @mi;
@@ -416,7 +465,8 @@ sub _verify_mi_chain {
         last unless $num;
 
         my ($ok, $err) = Mail::DKIM2::MessageInstance->verify($msg,
-            IgnorePrefixes => $self->{IgnorePrefixes});
+            IgnorePrefixes => $self->{IgnorePrefixes},
+            HeadersOnly    => $headers_only);
         unless ($ok) {
             # A malformed instance is a PERMERROR in its own words (§11.2
             # names the strings); a hash that does not match is a fail.
@@ -433,12 +483,15 @@ sub _verify_mi_chain {
 
         last if $num <= 1;
 
-        # If this instance declares the previous state non-recreatable, the
-        # chain cannot (and need not) be undone further — accept what verified.
+        # A null body Recipe loses the previous body, not the header
+        # history: from here down, undo header Recipes only and check each
+        # instance's header hashes, down to m=1.
         my $mi_obj = Mail::DKIM2::MessageInstance->parse($by_v{$num});
-        last if $mi_obj->unrecoverable;
+        $headers_only = 1 if $mi_obj->unrecoverable;
 
-        my $prev = eval { Mail::DKIM2::MessageInstance->undo($msg) };
+        my $prev = eval {
+            Mail::DKIM2::MessageInstance->undo($msg, HeadersOnly => $headers_only)
+        };
         die $@ if ref $@;
         if ($@ || !$prev) {
             $self->{result}  = 'fail';
@@ -893,8 +946,9 @@ chain must be complete (C<i=1> to C<i=N> with no gaps), each signature must
 verify over the headers that existed when it was made, consecutive hops must
 satisfy the chain-of-custody rules of spec-06 section 11.4, and the
 Message-Instance chain must undo cleanly back to the first instance, each
-one matching the content it describes. The outcome is a result and a reason,
-never an exception; see C<result> below.
+one matching the content it describes. Past a null body Recipe (the previous
+body is gone) only the header history is checked. The outcome is a result and
+a reason, never an exception; see C<result> below.
 
 Extends L<Mail::DKIM2::HeaderParser>, which provides C<PRINT>, C<CLOSE>,
 C<load> and the tie interface. A message with no DKIM2-Signature is decided
@@ -947,6 +1001,13 @@ which spec-06 section 11 otherwise makes a permerror. For an outbound path
 that verifies the message it is about to sign, where the new instance
 legitimately exists before its signature does. Never set it on inbound
 mail.
+
+=item NextDomainOK
+
+An outbound signer's own C<d=>. A top signature carrying C<nd=> is then
+accepted when C<nd=> equals it (case-insensitive), and refused with
+"not signing: top signature nd=X names another domain" otherwise. Unset, a
+top C<nd=> is the usual permerror.
 
 =item MidProcess
 
@@ -1040,7 +1101,7 @@ verifier maps that die to C<temperror>: spec-06 section 10 makes a DNS
 failure retryable, never a C<fail>, which would read as a forged
 signature.
 
-=head2 resolver([$resolver]), set_pubkey_callback(\&cb), skip_timestamp_check([$bool]), allow_unsigned_mi([$bool]), mid_process([$bool]), headers_only([$bool])
+=head2 resolver([$resolver]), set_pubkey_callback(\&cb), skip_timestamp_check([$bool]), allow_unsigned_mi([$bool]), next_domain_ok([$domain]), mid_process([$bool]), headers_only([$bool])
 
 Get or set the constructor options of the same names.
 
@@ -1050,9 +1111,13 @@ Get or set the constructor options of the same names.
 
 =item 1.
 
-B<Shape.> At most 32 Message-Instance and 32 DKIM2-Signature fields, no
-C<i=> or C<m=> twice, and no Message-Instance above the highest signed
-C<m=>. Any of these is a C<permerror> decided from the headers alone,
+B<Shape.> At most 32 Message-Instance and 32 DKIM2-Signature fields, every
+DKIM2-Signature parses with an C<i=> that is a positive integer (one that
+does not is never skipped: "PERMERROR DKIM2-Signature has a missing or
+malformed i= tag"), every C<i=> and C<m=> a chain number (1*DIGIT, at
+most three digits naming 1 to 100, and no more than 32; C<01> is 1), no
+C<i=> or C<m=> twice, and no Message-Instance above
+the highest signed C<m=>. Any of these is a C<permerror> decided from the headers alone,
 before any key is fetched. A tag repeated within one signature is a
 C<permerror> found when that signature is checked.
 
@@ -1086,7 +1151,8 @@ exploded it after a C<donotexplode>, is a C<fail>.
 
 B<Content.> The top Message-Instance must match the message; its Recipe
 is applied and the next instance down checked against the result, back to
-C<m=1> or an instance that declares the previous state unrecoverable.
+C<m=1>; past an instance with a null body Recipe the walk continues over the
+header history only.
 
 =back
 

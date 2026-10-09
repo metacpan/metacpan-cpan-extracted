@@ -111,12 +111,12 @@ static void *cca_start_fd(pTHX_ void *target, int fd, int blocking) {
     if (!s) return NULL;
 
     {
-        struct stat st;
-        if (fstat(fd, &st) < 0) {
+        cc_stat_t st;
+        if (cc_fstat(fd, &st) < 0) {
             cc_err_set(&s->err, CC_ERR_IO, "fstat", strerror(errno));
             s->rc = CC_ERR_IO; return s;
         }
-        if (!S_ISREG(st.st_mode)) {
+        if (!CC_S_ISREG(st.st_mode)) {
             cc_err_set(&s->err, CC_ERR_NOTREG, "not a regular file", NULL);
             s->rc = CC_ERR_NOTREG; return s;
         }

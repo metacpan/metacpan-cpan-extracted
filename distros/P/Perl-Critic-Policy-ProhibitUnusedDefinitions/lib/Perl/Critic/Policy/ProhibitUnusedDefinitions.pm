@@ -1,5 +1,5 @@
 package Perl::Critic::Policy::ProhibitUnusedDefinitions;
-$Perl::Critic::Policy::ProhibitUnusedDefinitions::VERSION = '0.004';
+$Perl::Critic::Policy::ProhibitUnusedDefinitions::VERSION = '0.005';
 # ABSTRACT: A sub nobody calls, or a global nobody reads, is code nobody needs.
 
 use 5.014;
@@ -11,21 +11,13 @@ use re '/aa';
 
 use Readonly;
 
-use Cwd                    ();
-use Cpanel::JSON::XS       ();
-use Digest::SHA            ();
-use File::Path             ();
-use File::Slurper          ();
-use File::Slurper::Temp    ();
-use File::Spec             ();
-use IO::Compress::Gzip     ();
-use IO::Uncompress::Gunzip ();
-use PPI                    ();
-use Scalar::Util           ();
-use Time::HiRes            ();
+use Digest::SHA  ();
+use PPI          ();
+use Scalar::Util ();
 
-use Perl::Critic::Utils qw{ :severities :classification all_perl_files };
-use parent              qw{Perl::Critic::Policy};
+use Perl::Critic::Distribution ();
+use Perl::Critic::Utils        qw{ :severities :classification };
+use parent                     qw{Perl::Critic::Policy};
 
 
 Readonly::Scalar my $EXPL => q{Delete it, or it goes on being read, tested and maintained for nothing};
@@ -79,18 +71,12 @@ Readonly::Scalar my $INTERPOLATED_CODE_RX => qr/
 
 # One index per distribution root, for the life of the process.  Per process
 # rather than per policy object, so a harness that builds a new Perl::Critic
-# for every file still parses the distribution once.  our, so that a test can
-# empty it and read the cache on disk as a new process does.
+# for every file still resolves the distribution once.  our, so that a test
+# can empty it and read the cache on disk as a new process does.
 our %INDEX_FOR;
 
-# Change it when what the cache holds for a file changes shape.
-Readonly::Scalar my $CACHE_FORMAT => 3;
-
-Readonly::Scalar my $CACHE_NAME => 'perl-critic-prohibitunuseddefinitions';
-
-# What this policy names the files in its cache directory.  The .json files
-# are from before the cache was compressed.
-Readonly::Scalar my $CACHE_FILE_RX => qr/\A[0-9a-f]{40}[.]json(?:[.]gz)?\z/;
+# Change it when what _parse returns, or what the stash holds, changes shape.
+Readonly::Scalar my $DATA_FORMAT => 4;
 
 
 sub supported_parameters {
@@ -115,7 +101,7 @@ sub supported_parameters {
         },
         {
             name           => 'cache_dir',
-            description    => 'Where the index is kept.  Empty means $XDG_CACHE_HOME, or ~/.cache, and then ' . $CACHE_NAME . q{.},
+            description    => 'Where the index is kept.  Empty means the default of Perl::Critic::Distribution.',
             default_string => q{},
             behavior       => 'string',
         },
@@ -131,6 +117,13 @@ sub initialize_if_enabled {
     $self->{_allow_subs}{$_}    = 1 for split m/\s+/, $DEFAULT_ALLOW_SUBS;
     $self->{_allow_globals}{$_} = 1 for split m/\s+/, $DEFAULT_ALLOW_GLOBALS;
 
+    # Through a closure, so that a test that replaces _parse is seen.
+    Perl::Critic::Distribution->register(
+        name    => __PACKAGE__,
+        version => join( q{/}, $DATA_FORMAT, Perl::Critic::Distribution->stamp(__FILE__) // q{} ),
+        collect => sub { return _parse(@_) },
+    );
+
     return $self->SUPER::initialize_if_enabled($config);
 }
 
@@ -145,7 +138,7 @@ sub violates {
     my $definitions = $self->_definitions_in($doc)                            or return;
     my $defined     = $definitions->{by_elem}{ Scalar::Util::refaddr($elem) } or return;
 
-    my $index = $INDEX_FOR{ $definitions->{root} } //= _build_index( $definitions->{root}, $self->_cache_dir() );
+    my $index = $INDEX_FOR{ $definitions->{root} } //= _build_index( $definitions->{dist} );
 
     return map { $self->violation( sprintf( $DESC_FOR{ $_->[0] }, $_->[1] ), $EXPL, $elem ) }
       grep { !$self->_is_needed( $index, @$_ ) } @$defined;
@@ -160,14 +153,16 @@ sub _definitions_in {
     my $last = $self->{_last};
     return $last->{definitions} if $last && Scalar::Util::refaddr( $last->{doc} ) == Scalar::Util::refaddr($doc);
 
+    # Only a file in bin/ or lib/ is checked.
     my $definitions;
-    if ( my $root = _dist_root( $doc->filename() ) ) {
+    my ( undef, $area ) = Perl::Critic::Distribution->root_of( $doc->filename() );
+    if ( $area && $AREA_OF{$area} eq 'code' && ( my $dist = $self->_distribution( $doc->filename() ) ) ) {
         my %by_elem;
         foreach my $def ( @{ _walk_document( $doc->ppi_document() )->{defs} } ) {
             my ( $elem, @kind_and_key ) = @$def;
             push @{ $by_elem{ Scalar::Util::refaddr($elem) } }, \@kind_and_key;
         }
-        $definitions = { root => $root, by_elem => \%by_elem };
+        $definitions = { root => $dist->root(), dist => $dist, by_elem => \%by_elem };
     }
 
     # The document is held, not just its address, so the address cannot be
@@ -193,216 +188,70 @@ sub _is_needed {
     return 0;
 }
 
-# The distribution a file belongs to, if the file is in its bin/ or lib/.
-sub _dist_root {
-    my ($file) = @_;
+# The distribution of a file, with the cache that this policy is configured
+# with: none when cache is off, the default when cache_dir is empty.
+sub _distribution {
+    my ( $self, $file ) = @_;
 
-    return if !defined $file;
-    my $path = Cwd::abs_path($file) // return;
-
-    my ( $volume, $directories ) = File::Spec->splitpath($path);
-    my @dirs = File::Spec->splitdir($directories);
-    pop @dirs while @dirs && !length $dirs[-1];
-
-    # The nearest directory that looks like a distribution decides, and a file
-    # in its t/lib is not in its lib.  Only with no such directory anywhere do
-    # we guess from the path alone.
-    my $fallback;
-    foreach my $depth ( reverse 0 .. $#dirs ) {
-        my $ancestor = File::Spec->catpath( $volume, File::Spec->catdir( @dirs[ 0 .. $depth ] ), q{} );
-        my $in_code  = $depth < $#dirs && ( $AREA_OF{ $dirs[ $depth + 1 ] } // q{} ) eq 'code';
-
-        if ( grep { -e File::Spec->catfile( $ancestor, $_ ) } @DIST_MARKERS ) {
-            return if !$in_code;
-            return $ancestor;
-        }
-        $fallback //= $ancestor if $in_code;
-    }
-    return $fallback;
+    return Perl::Critic::Distribution->for_file( $file, cache_dir => undef )               if !$self->{_cache};
+    return Perl::Critic::Distribution->for_file( $file, cache_dir => $self->{_cache_dir} ) if $self->{_cache_dir};
+    return Perl::Critic::Distribution->for_file($file);
 }
 
-# Where the index of each distribution is kept, or undef for no cache.
-sub _cache_dir {
-    my ($self) = @_;
-
-    return                     if !$self->{_cache};
-    return $self->{_cache_dir} if $self->{_cache_dir};
-
-    my $base = $ENV{XDG_CACHE_HOME} || ( $ENV{HOME} && File::Spec->catdir( $ENV{HOME}, '.cache' ) ) or return;
-    return File::Spec->catdir( $base, $CACHE_NAME );
-}
-
-# Every definition, export and use in the distribution.  A file whose stamp
-# matches its entry in the cache is not parsed again, and its uses are not
-# resolved again while the set of definitions is the one they were resolved
-# against.
+# Every definition, export and use in the distribution.  A file's uses are
+# not resolved again while the file and the set of definitions are the ones
+# they were resolved against.
 sub _build_index {
-    my ( $root, $cache_dir ) = @_;
+    my ($dist) = @_;
 
-    my $cache  = _read_cache( $root, $cache_dir );
-    my $cached = $cache->{files} // {};
-    my ( %defined, %exported, @walks, %walked );
-    my $changed = 0;
-
-    foreach my $dir ( sort keys %AREA_OF ) {
-        my $path = File::Spec->catdir( $root, $dir );
-        next if !-d $path;
-
-        foreach my $file ( all_perl_files($path) ) {
-            my $stamp = _stamp($file) // next;
-            my $walk  = $cached->{$file};
-
-            if ( !_is_fresh( $walk, $stamp ) ) {
-                $walk    = _parse( $file, $stamp ) or next;
-                $changed = 1;
-            }
-
-            $walked{$file} = $walk;
-            $defined{$_}   = 1 for @{ $walk->{defs} };
-            $exported{$_}  = 1 for @{ $walk->{exports} };
-            push @walks, [ $AREA_OF{$dir}, $walk ];
-        }
+    my $walks = $dist->collected(__PACKAGE__);
+    my ( %defined, %exported );
+    foreach my $walk ( values %$walks ) {
+        $defined{$_}  = 1 for @{ $walk->{defs} };
+        $exported{$_} = 1 for @{ $walk->{exports} };
     }
-
-    # A file in the cache that is gone is a change too.
-    $changed ||= grep { !$walked{$_} } keys %$cached;
 
     # Whether an unqualified bar() in package Baz means Baz::bar depends on
-    # whether some other file defines one.  So a walk resolved against the
-    # same definitions keeps its answer, and every walk is resolved again when
+    # whether some other file defines one.  So a file resolved against the
+    # same definitions keeps its answer, and every file is resolved again when
     # the definitions change.
     my $definitions = Digest::SHA::sha1_hex( join "\n", sort keys %defined );
-    my $same_defs   = ( $cache->{definitions} // q{} ) eq $definitions;
+    my $kept        = $dist->stash(__PACKAGE__) // {};
+    my $held        = ( $kept->{definitions} // q{} ) eq $definitions && ref $kept->{resolved} eq 'HASH' ? $kept->{resolved} : {};
 
-    my %used;
-    foreach my $area_walk (@walks) {
-        my ( $area, $walk ) = @$area_walk;
+    my ( %used, %resolved );
+    my $changed = 0;
+    foreach my $file ( sort keys %$walks ) {
+        my $stamp = $dist->stamp_of($file);
+        my $was   = $held->{$file};
 
-        if ( !$same_defs || ref $walk->{resolved} ne 'ARRAY' ) {
-            my %keys = map { $_ => 1 } map { _resolve( \%defined, @$_ ) } @{ $walk->{uses} };
-            $walk->{resolved} = [ sort keys %keys ];
+        if ( ref $was ne 'HASH' || ( $was->{stamp} // q{} ) ne $stamp || ref $was->{keys} ne 'ARRAY' ) {
+            my %keys = map { $_ => 1 } map { _resolve( \%defined, @$_ ) } @{ $walks->{$file}{uses} };
+            $was     = { stamp => $stamp, keys => [ sort keys %keys ] };
             $changed = 1;
         }
-        $used{$area}{$_} = 1 for @{ $walk->{resolved} };
+        $resolved{$file} = $was;
+        $used{ $AREA_OF{ $dist->area_of($file) } }{$_} = 1 for @{ $was->{keys} };
     }
 
-    _write_cache( $root, $cache_dir, \%walked, $definitions ) if $changed;
+    # A file that is gone is a change too.
+    $changed ||= grep { !$resolved{$_} } keys %$held;
+    $dist->keep( __PACKAGE__, { definitions => $definitions, resolved => \%resolved } ) if $changed;
 
     return { exported => \%exported, used => \%used };
 }
 
-# Whether a walk from the cache is whole, and was made from the file as it is.
-sub _is_fresh {
-    my ( $walk, $stamp ) = @_;
-
-    return if ref $walk ne 'HASH' || !defined $walk->{stamp} || $walk->{stamp} ne $stamp;
-    return !grep { ref $walk->{$_} ne 'ARRAY' } qw{defs exports uses};
-}
-
-# What one file defines, exports and uses, as plain data that JSON can hold,
-# or undef if PPI cannot read the file.
+# What one file defines, exports and uses, as plain data that JSON can hold.
+# Perl::Critic::Distribution calls it, with the parsed file.
 sub _parse {
-    my ( $file, $stamp ) = @_;
+    my ($ppi) = @_;
 
-    my $ppi   = PPI::Document->new($file) or return;
     my $found = _walk_document($ppi);
-
     return {
-        stamp   => $stamp,
         defs    => [ map { $_->[2] } @{ $found->{defs} } ],
         exports => $found->{exports},
         uses    => $found->{uses},
     };
-}
-
-# What changes when a file does.  The inode changes when an editor saves by
-# renaming a new file over the old one, and the high-resolution times change
-# when an edit keeps the same size within one second.
-sub _stamp {
-    my ($file) = @_;
-
-    my @st = Time::HiRes::stat($file) or return;
-    return join q{:}, @st[ 0, 1, 7 ], map { sprintf '%.9f', $_ } @st[ 9, 10 ];
-}
-
-sub _cache_path {
-    my ( $root, $cache_dir ) = @_;
-    return if !defined $cache_dir;
-    return File::Spec->catfile( $cache_dir, Digest::SHA::sha1_hex($root) . '.json.gz' );
-}
-
-# The format of the cache and the stamp of this file.  A cache made by another
-# version of the policy, or by this one before an edit, has a different key.
-sub _cache_key {
-    return join q{/}, $CACHE_FORMAT, _stamp(__FILE__) // q{};
-}
-
-# The cache for this root: its walks under files, keyed by file, and the digest
-# of the definitions that their uses were resolved against.  An empty hash if
-# there is none to use.
-sub _read_cache {
-    my ( $root, $cache_dir ) = @_;
-
-    my $path = _cache_path( $root, $cache_dir ) or return {};
-
-    # A cache that is not there fails to read, like one that is unreadable.
-    my $cache = eval {
-        my $gz = File::Slurper::read_binary($path);
-        IO::Uncompress::Gunzip::gunzip( \$gz => \my $json ) or return;
-        Cpanel::JSON::XS->new->decode($json);
-    };
-    return {} if ref $cache ne 'HASH' || ( $cache->{key} // q{} ) ne _cache_key() || ref $cache->{files} ne 'HASH';
-    return $cache;
-}
-
-# Replaces the file whole, so a reader never sees half of it.  A cache that
-# cannot be written costs the next run a parse, and nothing else.
-sub _write_cache {
-    my ( $root, $cache_dir, $walked, $definitions ) = @_;
-
-    my $path = _cache_path( $root, $cache_dir ) or return;
-    my $json = Cpanel::JSON::XS->new->canonical->encode( { key => _cache_key(), root => $root, definitions => $definitions, files => $walked } );
-
-    # The root goes in the gzip header too, so that _prune_cache can read it
-    # without decompressing the file.
-    IO::Compress::Gzip::gzip( \$json => \my $gz, Comment => $root ) or return;
-
-    File::Path::make_path( $cache_dir, { error => \my $errors } );
-    return if @$errors;
-
-    my $ok = eval { File::Slurper::Temp::write_binary( $path, $gz ); 1 };
-    _prune_cache($cache_dir) if $ok;
-    return $ok;
-}
-
-# Removes the cache of each root that is gone, such as a deleted checkout, and
-# each cache from before the cache was compressed, since nothing reads them.  A
-# file whose header cannot be read is removed too, since nothing can read it
-# either.
-sub _prune_cache {
-    my ($cache_dir) = @_;
-
-    opendir( my $dh, $cache_dir ) or return;
-    my @names = grep { m/$CACHE_FILE_RX/ } readdir $dh;
-    closedir $dh;
-
-    foreach my $name (@names) {
-        my $file = File::Spec->catfile( $cache_dir, $name );
-        my $root = $name =~ m/[.]gz\z/ ? _cached_root($file) : undef;
-        next if defined $root && -d $root;
-        unlink $file;
-    }
-    return;
-}
-
-# The root that a cache file is for, from its gzip header, or undef.
-sub _cached_root {
-    my ($file) = @_;
-
-    my $z      = IO::Uncompress::Gunzip->new($file) or return;
-    my $header = $z->getHeaderInfo();
-    $z->close();
-    return ref $header eq 'HASH' ? $header->{Comment} : undef;
 }
 
 # A use as the walk saw it -- sigil, name, package, enclosing sub, whether it
@@ -644,7 +493,7 @@ Perl::Critic::Policy::ProhibitUnusedDefinitions - A sub nobody calls, or a globa
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 Perl::Critic::Policy::ProhibitUnusedDefinitions
 
@@ -654,11 +503,12 @@ somewhere, needs it.  The same goes for an C<our> variable nothing reads and a
 constant nothing names.
 
 Whether anything uses a definition is not a question one file can answer, so
-this policy reads the whole distribution around the file being critiqued.  The
-first time it is asked about a file, it finds the distribution's root, parses
-everything under F<bin/>, F<lib/>, F<t/> and F<xt/> once, and notes every call
-and every reference.  Every later file in the same distribution is checked
-against that note rather than parsed again.
+this policy reads the whole distribution around the file being critiqued,
+through L<Perl::Critic::Distribution>.  The first time it is asked about a
+file, everything under F<bin/>, F<lib/>, F<t/> and F<xt/> is parsed once, and
+every call and every reference is noted.  Every later file in the same
+distribution is checked against that note rather than parsed again.  Another
+policy that reads the distribution through the same library shares the parse.
 
 =over 4
 
@@ -769,10 +619,11 @@ L</THE INDEX ON DISK>.
 
 =item C<cache_dir>
 
-Where the index is kept.  The default is
-F<$XDG_CACHE_HOME/perl-critic-prohibitunuseddefinitions>, or
-F<~/.cache/perl-critic-prohibitunuseddefinitions> when C<XDG_CACHE_HOME> is not
-set.
+Where the index is kept.  The default is that of
+L<Perl::Critic::Distribution>, F<$XDG_CACHE_HOME/perl-critic-distribution>, or
+F<~/.cache/perl-critic-distribution> when C<XDG_CACHE_HOME> is not set.  Give
+every policy that reads the distribution the same one, or none, so that they
+share a parse.
 
 =back
 
@@ -782,13 +633,10 @@ An editor integration such as PerlNavigator starts a new process for every file
 that it checks.  Without a cache, every check of a file in F<bin/> or F<lib/>
 parses the whole distribution again, which takes seconds on a large one.
 
-So the index is also kept on disk, one file for each distribution, as JSON
-compressed with gzip.
-For each file it holds what the file defines, exports and uses, and a stamp of
-the file: its device, inode, size, and modification and change times.  A new
-process reads the cache, compares each stamp with the file on disk, and parses
-only the files whose stamp differs.  A file that is gone drops out, and a new
-file is parsed.  The cache is written again only when something changed.
+So what each file defines, exports and uses is kept on disk, by
+L<Perl::Critic::Distribution>, whose documentation says how.  A new process
+parses only the files that changed.  A new version of this policy, or an edit
+to it, parses every file again.
 
 Each file's uses are kept resolved, too, with a digest of every definition in
 the distribution when they were resolved.  An unqualified call means a sub in
@@ -797,25 +645,14 @@ when another file changes.  While the definitions stay the same, an unchanged
 file keeps its resolved uses, and only the changed files are resolved.  When a
 definition is added, removed or renamed, every file is resolved again.
 
-The cache also records the stamp of this policy's own file.  So a new version
-of the policy, or an edit to it, starts from an empty cache.
-
-Each time a cache is written, the cache of each distribution whose root is
-gone, such as a deleted checkout, is removed from the cache directory.  The
-root is in the gzip header of each file, so this does not read the files
-whole.
-
-A cache that cannot be read, does not parse, or cannot be written is ignored,
-and the index is built as though there were none.  A check never fails
-because of the cache.
-
 =head2 CAVEATS
 
-The distribution's root is the nearest directory above the file with a
-F<dist.ini>, F<Makefile.PL>, F<Build.PL>, F<META.json>, F<META.yml>,
-F<cpanfile> or F<.git> in it.  Failing that, it is the directory holding the
-F<lib/> or F<bin/> the file is in.  Source with no file name -- a string handed
-to C<critique> -- belongs to no distribution and is never reported.
+The distribution's root is found as L<Perl::Critic::Distribution/root_of>
+says: the nearest directory above the file with a F<dist.ini>, F<Makefile.PL>,
+F<Build.PL>, F<META.json>, F<META.yml>, F<cpanfile> or F<.git> in it.  Only a
+file in its F<lib/> or F<bin/> is checked.  Source with no file name -- a
+string handed to C<critique> -- belongs to no distribution and is never
+reported.
 
 The index is built once per distribution per process.  A file edited after it
 was built is not seen again in that process.  L</THE INDEX ON DISK> is how the
@@ -857,7 +694,9 @@ L</THE INDEX ON DISK>.
 =head3 initialize_if_enabled
 
 Folds the built-in exemptions back into whatever was configured, so a user's
-list adds to the defaults instead of replacing them.
+list adds to the defaults instead of replacing them.  Registers what this
+policy collects from each file with L<Perl::Critic::Distribution>, so that it
+is collected in the same parse as what any other enabled policy needs.
 
 =head3 default_severity
 

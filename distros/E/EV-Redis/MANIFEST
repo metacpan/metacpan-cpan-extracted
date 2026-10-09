@@ -76,6 +76,7 @@ t/command.t
 t/connect.t
 t/connect_fail_sync.t
 t/connect_unix.t
+t/deep_reply.t
 t/dispatch_state.t
 t/flow_control.t
 t/fork.t
@@ -83,11 +84,15 @@ t/handler_selfclear.t
 t/leak.t
 t/lib/RedisTestHelper.pm
 t/options.t
+t/prefer_ip.t
 t/protocol_state.t
 t/protocol_violation.t
 t/pubsub.t
+t/quit.t
 t/reconnect.t
+t/reconnect_txn.t
 t/reconnect_attempts.t
+t/reentrancy.t
 t/regression_leaks.t
 t/replaced_connection.t
 t/resp3.t
@@ -98,6 +103,7 @@ t/uaf_deferred_disconnect.t
 t/uaf_skip_pending.t
 t/warn_hook_die.t
 typemap
+xt/eg_compile.t
 xt/pod.t
 xt/pod_coverage.t
 xt/pod_spell.t

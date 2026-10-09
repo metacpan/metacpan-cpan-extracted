@@ -1,0 +1,20 @@
+1. d2 f4
+2. d3 d1
+3. c3 e3
+4. c5 c4
+5. b2 f2
+6. f6 e4
+7. g4 e5xg4
+8. g4 g1
+9. a1 a7
+10. b2-b4 e5-d5
+11. b4-b6 d5-e5xg4
+12. b6-b4 g1-g4xf6
+13. a1-a4 f4-f6
+14. b4-b6 e4-f4xa4
+15. b6-b4 f4-e4xb4
+16. d2-b2 e4-f4xb2
+17. c5-d7 f4-e4xd3
+# Black wins: White has fewer than three men
+# BW...B..B..BB.BW.B..B.B. w 0 0 0 34
+# 34

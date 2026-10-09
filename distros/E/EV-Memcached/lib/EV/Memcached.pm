@@ -5,7 +5,7 @@ use EV;
 
 BEGIN {
     use XSLoader;
-    our $VERSION = '0.05';
+    our $VERSION = '0.06';
     XSLoader::load __PACKAGE__, $VERSION;
 }
 
@@ -68,14 +68,15 @@ timeouts.
 
 =item *
 
-Predictable lifecycle: pending callbacks always fire (with the
-disconnect reason on teardown), DESTROY is reentrancy-safe across
-callback contexts.
+Predictable lifecycle: pending callbacks always fire, DESTROY is
+reentrancy-safe across callback contexts.
 
 =back
 
 L<AnyEvent> applications can use this module unchanged, since AnyEvent
 runs on top of EV when EV is loaded.
+
+Do not share a client across fork(); reconnect in the child instead.
 
 =head1 ENCODING
 
@@ -125,7 +126,9 @@ handlers right after C<new> is safe.
 
 =item port => $int (default 11211)
 
-TCP host and port. Mutually exclusive with C<path>.
+TCP host and port. Mutually exclusive with C<path>. Every resolved
+address is tried in turn. Name resolution is synchronous; prefer
+numeric IPs.
 
 =item path => $str
 
@@ -166,12 +169,16 @@ server. 0 = no timeout (default).
 =item max_pending => $num
 
 Cap on concurrent in-flight commands. Excess commands are held in a
-local waiting queue. 0 = unlimited (default).
+local waiting queue. 0 = unlimited (default). An C<mget>/C<mgets>
+counts as one command against the cap and in
+C<pending_count>/C<waiting_count>; its keys are always sent together.
+Chunk very large key lists.
 
 =item waiting_timeout => $ms
 
 Maximum time a command may sit in the waiting queue before its callback
-fires with C<"waiting timeout">. 0 = unlimited (default).
+fires with C<"waiting timeout">. Expired fire-and-forget commands are
+dropped silently. 0 = unlimited (default).
 
 =item resume_waiting_on_reconnect => $bool
 
@@ -210,9 +217,10 @@ C<"max reconnect attempts reached">. 0 = unlimited (default).
 =item password => $str
 
 SASL PLAIN credentials. When both are set, the client authenticates
-after every successful connect (and reconnect). Pre-connect commands
-sit in the waiting queue until SASL completes. Requires a memcached
-build with SASL support and the C<-S> flag.
+after every successful connect (and reconnect). Commands issued
+before authentication completes sit in the waiting queue until SASL
+finishes. Requires a memcached build with SASL support and the C<-S>
+flag.
 
 =back
 
@@ -258,15 +266,17 @@ and clears any prior C<host> setting.
 
 Disconnect cleanly. Cancels any pending reconnect, drains pending
 command callbacks with C<(undef, "disconnected")>, then fires
-C<on_disconnect>. For an intentional disconnect, C<on_error> does B<not>
-fire -- that distinction lets you tell user-initiated teardown from
-server-side close.
+C<on_disconnect> when a session exists or a connect is in progress.
+For an intentional disconnect, C<on_error> does B<not> fire -- that
+distinction lets you tell user-initiated teardown from server-side
+close.
 
 =head2 is_connected
 
 Returns true while a session is established B<or> in progress (TCP
 handshake / SASL exchange). Commands issued in the connecting phase
-are queued and sent on completion.
+are queued and sent on completion. Commands issued while neither
+connected nor reconnect-pending croak with C<"not connected">.
 
 =head2 quit([$cb])
 
@@ -340,6 +350,8 @@ that were hits:
         my ($values, $err) = @_;
         # $values = { k1 => 'v1', k3 => 'v3' }   # k2 was a miss
     });
+
+An empty list invokes the callback synchronously with C<{}>.
 
 =head2 mgets(\@keys, [$cb->(\%info, $err)])
 
@@ -440,7 +452,7 @@ Number of commands sent and awaiting a response.
 
 Number of commands held in the local waiting queue (because the
 connection is not ready, SASL is in progress, or C<max_pending> is
-saturated).
+saturated). Commands retain their issue order while queued.
 
 =head1 ACCESSORS
 
@@ -553,7 +565,7 @@ as batch size grows because SV allocation for closures dominates;
 realistic workloads (interleaved sends and receives) stay close to the
 50K-command column.
 
-C<max_pending> overhead (200K commands):
+C<max_pending> overhead (100K commands, hence the faster baseline):
 
     unlimited        ~131K ops/sec
     max_pending=500  ~126K ops/sec

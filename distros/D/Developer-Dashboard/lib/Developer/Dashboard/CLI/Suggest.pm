@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Suggest;
 use strict;
 use warnings;
 
-our $VERSION = '5.51';
+our $VERSION = '5.73';
 
 use File::Basename qw(basename);
 use File::Spec;
@@ -177,15 +177,24 @@ sub _all_skill_command_entries {
 }
 
 # _skill_command_entries($skill_name)
-# Enumerates every dotted command exposed by one installed skill, including
-# nested repeated skills/<repo> trees.
+# Enumerates every dotted command exposed by one installed skill across all
+# participating runtime layers, including nested repeated skills/<repo> trees.
 # Input: skill repository name string.
-# Output: ordered list of hash refs containing full dotted command strings.
+# Output: ordered, de-duplicated hash refs containing full dotted command strings.
 sub _skill_command_entries {
     my ( $self, $skill_name ) = @_;
-    my $skill_root = $self->{manager}->get_skill_path( $skill_name, include_disabled => 1 );
-    return () if !$skill_root;
-    return $self->_collect_skill_commands( $skill_root, $skill_name );
+    my @skill_roots = $self->{paths}->skill_roots_for( $skill_name, include_disabled => 1 );
+    return () if !@skill_roots;
+
+    my %seen;
+    my @entries;
+    for my $skill_root (@skill_roots) {
+        for my $entry ( $self->_collect_skill_commands( $skill_root, $skill_name ) ) {
+            next if $seen{ $entry->{full} }++;
+            push @entries, $entry;
+        }
+    }
+    return @entries;
 }
 
 # _collect_skill_commands($skill_root, $prefix)
@@ -347,6 +356,8 @@ Developer::Dashboard::CLI::Suggest - fuzzy command suggestions for dashboard typ
 
 Builds typo guidance for unknown top-level dashboard commands and dotted skill
 commands by scanning built-ins, layered custom commands, and installed skills.
+For a same-named skill present at multiple runtime layers, it merges command
+names from all participating layers and returns each dotted name once.
 
 =for comment FULL-POD-DOC START
 
@@ -356,7 +367,7 @@ This module centralizes typo suggestions for the public dashboard switchboard an
 
 =head1 WHY IT EXISTS
 
-It exists because unknown-command handling belongs in reusable library code rather than inlined string assembly inside the public entrypoint and skill dispatcher. Keeping fuzzy matching here makes the typo contract testable and keeps the switchboard thin.
+It exists because unknown-command handling belongs in reusable library code rather than inlined string assembly inside the public entrypoint and skill dispatcher. Keeping fuzzy matching here makes the typo contract testable and keeps the switchboard thin. Skill commands inherit across DD-OOP runtime layers, so suggestions and shell completion must include commands from both project and home copies of one skill without listing a shared command more than once.
 
 =head1 WHEN TO USE
 

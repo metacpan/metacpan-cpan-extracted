@@ -413,9 +413,10 @@ subtest 'the distribution is read once' => sub {
 };
 
 # --- The index on disk ---------------------------------------------------
-# A new process is an empty %INDEX_FOR, so emptying it is how these start a new
-# run.  _parse is what reads a file, so counting its calls counts the files that
-# a run read again.
+# A new process is an empty %INDEX_FOR, and an empty %FOR in
+# Perl::Critic::Distribution, so emptying both is how these start a new run.
+# _parse is what Perl::Critic::Distribution hands each parsed file to, so
+# counting its calls counts the files that a run read again.
 
 sub profile {
     my (%set) = @_;
@@ -430,12 +431,13 @@ sub new_run {
     my ( $root, $file, $profile ) = @_;
 
     local %Perl::Critic::Policy::ProhibitUnusedDefinitions::INDEX_FOR;
+    local %Perl::Critic::Distribution::FOR;
     my @parsed;
     my $resolved = 0;
     my $parse    = Perl::Critic::Policy::ProhibitUnusedDefinitions->can('_parse');
     my $resolve  = Perl::Critic::Policy::ProhibitUnusedDefinitions->can('_resolve');
     my $mock     = Test::MockModule->new('Perl::Critic::Policy::ProhibitUnusedDefinitions');
-    $mock->redefine( _parse   => sub { push @parsed, $_[0] =~ s{\A\Q$root\E/}{}r; return $parse->(@_) } );
+    $mock->redefine( _parse   => sub { push @parsed, $_[1] =~ s{\A\Q$root\E/}{}r; return $parse->(@_) } );
     $mock->redefine( _resolve => sub { $resolved++;                               return $resolve->(@_) } );
 
     my $found = found( $root, $file, critic($profile) );
@@ -511,19 +513,10 @@ subtest 'a cache that cannot be used is rebuilt, not trusted' => sub {
     new_run( $root, 'lib/Foo.pm', $profile );
     my ($file) = glob("$cache/*.json.gz");
 
-    # The last three are compressed, so that what fails is the check of what is
-    # inside rather than the decompression.
-    foreach my $case (
-        [ 'a cache that is not gzip',        "\x1f\x8b not gzip",                                                    0 ],
-        [ 'a cache that does not parse',     "{ not json",                                                           1 ],
-        [ 'a cache from another version',    '{"key":"0/bogus","files":{}}',                                         1 ],
-        [ 'a cache with an entry cut short', '{"key":"KEY","files":{"' . "$root/bin/tool" . '":{"stamp":"STAMP"}}}', 1 ],
-    ) {
+    # Perl::Critic::Distribution owns the format, and its tests cover each way
+    # a cache can be broken.  These two show that this policy goes through it.
+    foreach my $case ( [ 'a cache that is not gzip', "\x1f\x8b not gzip", 0 ], [ 'a cache that does not parse', "{ not json", 1 ] ) {
         my ( $name, $content, $compress ) = @$case;
-        my $key   = Perl::Critic::Policy::ProhibitUnusedDefinitions::_cache_key();
-        my $stamp = Perl::Critic::Policy::ProhibitUnusedDefinitions::_stamp("$root/bin/tool");
-        $content =~ s/KEY/$key/;
-        $content =~ s/STAMP/$stamp/;
         IO::Compress::Gzip::gzip( \( my $plain = $content ) => \$content ) if $compress;
         dist_file( $cache, ( $file =~ s{\A\Q$cache\E/}{}r ), $content );
 
@@ -546,18 +539,15 @@ subtest 'a write removes the caches of roots that are gone, and nothing else' =>
     new_run( $kept, 'lib/Foo.pm', $profile );
     my ($kept_cache) = grep { $_ ne $gone_cache } glob("$cache/*.json.gz");
 
-    # A cache from before the cache was compressed, and a file that is not one
-    # of this policy's.
-    dist_file( $cache, ( 'a' x 40 ) . '.json', '{}' );
-    dist_file( $cache, 'notes.txt',            'mine' );
+    # A file that is not a cache.
+    dist_file( $cache, 'notes.txt', 'mine' );
 
     my $third = dist( 'lib/Foo.pm' => $FOO_BAR );
     new_run( $third, 'lib/Foo.pm', $profile );
 
-    ok( !-e $gone_cache,                        'the cache of a root that is gone is removed' );
-    ok( -e $kept_cache,                         'the cache of a root that is there is kept' );
-    ok( !-e "$cache/" . ( 'a' x 40 ) . '.json', 'a cache from before compression is removed' );
-    ok( -e "$cache/notes.txt",                  'a file that is not a cache is left alone' );
+    ok( !-e $gone_cache,       'the cache of a root that is gone is removed' );
+    ok( -e $kept_cache,        'the cache of a root that is there is kept' );
+    ok( -e "$cache/notes.txt", 'a file that is not a cache is left alone' );
 };
 
 subtest 'the cache can be turned off, and a cache_dir that cannot be written costs nothing' => sub {

@@ -22,6 +22,10 @@ src/emitters/szltopheap.h
 src/emitters/szlunique.cc
 src/emitters/top.cc
 src/emitters/topheap.h
+src/myconfig.h
+src/myinit.h
+src/myxshead.h
+src/ppport.h
 src/public/hash_map.h
 src/public/hash_set.h
 src/public/hashutils.h

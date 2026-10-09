@@ -4,7 +4,7 @@
       "Nigel Horne <njh@nigelhorne.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
    "license" : [
       "open_source"
    ],
@@ -34,7 +34,8 @@
          "requires" : {
             "Carp" : "0",
             "Exporter" : "0",
-            "Return::Set" : "0.04",
+            "Return::Set" : "0.05",
+            "Scalar::Util" : "0",
             "perl" : "5.008"
          }
       },
@@ -62,6 +63,6 @@
          "x_repository" : "https://github.com/nigelhorne/Test-Returns"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

@@ -1,5 +1,10 @@
 Revision history for Perl extension EV::Redis
 
+0.16 2026-10-08
+     - Fix crashes on copied, destroyed or re-entered objects
+     - Transactions and protocol state stay consistent across reconnects
+     - Stricter option checks; too-deep replies fail instead of truncating
+
 0.15 2026-10-06
      - Fix crashes and use-after-free in connects, DESTROY, fork and exit
      - Fix misrouted replies; commands that would misroute them now croak

@@ -205,13 +205,19 @@ sub _prime_command_result_env {
 
 # _load_runtime_env()
 # Loads the participating DD-OOP-LAYERS plain-directory and runtime-layer env
-# files into the current process before command resolution and helper exec.
+# files before command resolution, preserving explicitly inherited variables
+# across later helper execs. Only inherited key names are serialized into the
+# private marker; environment values remain in their normal process entries.
 # Input: none.
 # Output: true value.
 sub _load_runtime_env {
     require Developer::Dashboard::EnvAudit;
     require Developer::Dashboard::EnvLoader;
+    require Developer::Dashboard::JSON;
     Developer::Dashboard::EnvAudit->clear();
+    my @inherited_keys = sort grep { $_ ne $Developer::Dashboard::EnvLoader::INHERITED_ENV_KEYS } keys %ENV;
+    $ENV{$Developer::Dashboard::EnvLoader::INHERITED_ENV_KEYS} =
+      Developer::Dashboard::JSON::json_encode_with_options( \@inherited_keys );
     my $paths = _switchboard_paths();
     Developer::Dashboard::EnvLoader->load_runtime_layers( paths => $paths );
     return 1;

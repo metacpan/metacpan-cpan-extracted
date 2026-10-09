@@ -5,6 +5,7 @@ use lib 't/lib';
 
 use File::Temp ();
 use Mojo::IOLoop;
+use Mojo::JSON qw(false true);
 use Mojo::UserAgent;
 use Test::More;
 use Time::HiRes ();
@@ -52,13 +53,14 @@ subtest 'a keyless client builds and sends no credential at all' => sub {
 
 subtest 'responses are unwrapped at the right depth' => sub {
     my $family = InternetDataTest::family();
+    my $open = InternetDataTest::family(base => 'asn', standing => 'unlicensed', open => true, license_type => undef);
     my %bodies = (
-        '/api/v2/database/list' => { databases => [$family] },
+        '/api/v2/database/list' => { databases => [$family, $open] },
         '/api/v2/database/checksum' => {
             id => 'bogon_ip_v1', format => 'csvgz',
             checksums => { md5 => 'm', sha1 => 's1', sha256 => 's256', sha512 => 's512' },
         },
-        '/api/v2/database/downloads' => { downloads => [{ dataset_id => 'bogon_ip_v1' }] },
+        '/api/v2/database/downloads' => { downloads => [{ dataset_id => 'bogon_ip_v1', open => true }] },
         '/api/v2/database/metadata' => { id => 'bogon_ip_v1', entries => 42, size => { csvgz => 760 } },
     );
     my $origin = InternetDataTest::Origin->new(sub {
@@ -77,11 +79,16 @@ subtest 'responses are unwrapped at the right depth' => sub {
     # letter of difference between two brands' feeds is exactly the sort of thing
     # a hand-written client gets wrong once and never notices.
     my $databases = $client->database->list;
-    is_deeply($databases, [$family], 'list unwraps databases');
+    is_deeply($databases, [$family, $open], 'list unwraps databases');
     is($databases->[0]{base}, 'bogon_ip', 'a family is keyed by base, not by a database id');
     is($databases->[0]{versions}[0]{id}, 'bogon_ip_v1', 'and the id to download hangs off versions');
+    # An Open family downloads whatever its standing, which stays as served.
+    is_deeply([map { [!!$_->{open}, $_->{standing}] } @$databases], [['', 'licensed'], [1, 'unlicensed']],
+        'open is read beside standing');
 
-    is_deeply($client->database->downloads, [{ dataset_id => 'bogon_ip_v1' }], 'downloads unwraps downloads');
+    my $downloads = $client->database->downloads;
+    is_deeply($downloads, [{ dataset_id => 'bogon_ip_v1', open => true }], 'downloads unwraps downloads');
+    ok($downloads->[0]{open}, 'and an attempt taken under the Open license says so');
     # metadata is the whole document rather than a member of it: it carries the
     # per-format size a caller budgets a transfer against.
     my $meta = $client->database->metadata('bogon_ip_v1');

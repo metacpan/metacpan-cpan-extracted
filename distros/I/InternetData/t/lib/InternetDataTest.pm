@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Mojo::File 'path';
-use Mojo::JSON 'decode_json';
+use Mojo::JSON qw(decode_json false);
 
 # The language-neutral conformance corpus, generated into every InternetData SDK
 # so a binding that drifts fails its own suite.
@@ -22,6 +22,7 @@ sub family {
         name => 'Bogon IP',
         summary => 'IP ranges that cannot legitimately appear on the internet.',
         standing => 'licensed',
+        open => false,
         license_type => 'standard',
         starts => '2026-09-04T07:49:45.118Z',
         expires => undef,

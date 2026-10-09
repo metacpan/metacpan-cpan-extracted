@@ -25,6 +25,16 @@ my %WriteMakefileArgs = (
         #'ABC'              => '1.6',
         #'Foo::Bar::Module' => '5.0401',
     },
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        prereqs => {
+            runtime => {
+                recommends => {
+                    'Term::ReadKey' => '0',
+                },
+            },
+        },
+    },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Game-Gin-*' },
 );

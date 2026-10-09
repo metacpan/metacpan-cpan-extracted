@@ -34,4 +34,18 @@ returns_ok(\@raw, $output, 'Array with generator meta-keys validates');
 returns_not_ok('not an array', { type => 'array' }, 'String rejected as type array');
 returns_not_ok(42,            { type => 'array' }, 'Integer rejected as type array');
 
+# An object whose overloaded stringification returns undef must not warn
+{
+	package Local::UndefString;
+	use overload '""' => sub { undef }, fallback => 1;
+	sub new { return bless {}, shift }
+}
+{
+	my @warnings;
+	local $SIG{__WARN__} = sub { push @warnings, @_ };
+	returns_ok(Local::UndefString->new(), { type => 'object', isa => 'Local::UndefString' },
+		'Object with undef stringification validates');
+	is_deeply(\@warnings, [], 'No warnings from undef stringification');
+}
+
 done_testing();

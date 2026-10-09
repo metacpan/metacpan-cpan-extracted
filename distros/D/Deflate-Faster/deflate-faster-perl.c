@@ -319,16 +319,17 @@ parse_mod_time_sv (SV * sv)
         warn ("Argument \"%s\" isn't numeric in modification time", SvPV_nomg_nolen (sv));
         return 0;
     }
-    if (SvNV_nomg (sv) < 0) {
+    NV nv = SvNV_nomg (sv);
+    if (nv < 0) {
         warn ("Cannot set modification time to less than 0");
         return 0;
     }
-    UV uv = SvUV_nomg (sv);
-    if (uv > MOD_TIME_MAX) {
+    /* Compared as NV: a 32-bit UV saturates at exactly MOD_TIME_MAX */
+    if (nv >= (NV)MOD_TIME_MAX + 1) {
         warn ("Cannot set modification time to more than 4294967295");
         return MOD_TIME_MAX;
     }
-    return uv;
+    return SvUV_nomg (sv);
 }
 
 #define UO \

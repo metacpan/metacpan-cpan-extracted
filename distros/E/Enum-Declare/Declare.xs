@@ -3,7 +3,15 @@
 #include "callparser1.h"
 #include "XSUB.h"
 #include "object_types.h"
-#include <stdbool.h>
+
+#if !defined(__bool_true_false_are_defined) && !(defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L)
+#  ifndef true
+#    define true 1
+#  endif
+#  ifndef false
+#    define false 0
+#  endif
+#endif
 
 #ifndef XS_INTERNAL
 #define XS_INTERNAL(name) static XSPROTO(name)

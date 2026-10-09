@@ -2593,12 +2593,12 @@ is( $fresh_page_item->{alias}, 'NEW', 'page header status prefers the configured
     system( 'git', '-C', $core_repo, 'commit', '-q', '-m', 'init' ) == 0 or die 'git commit failed';
 
     no warnings 'redefine';
-    local *Developer::Dashboard::IndicatorStore::command_in_path = sub { return 1 };
+    local *Developer::Dashboard::IndicatorStore::command_in_path = sub { die 'Docker must not be probed'; };
     my $core_items = $core_indicators->refresh_core_indicators( cwd => $core_repo );
     my ($docker_indicator)  = grep { $_->{name} eq 'docker' } @{$core_items};
     my ($project_indicator) = grep { $_->{name} eq 'project' } @{$core_items};
     my ($git_indicator)     = grep { $_->{name} eq 'git' } @{$core_items};
-    is( $docker_indicator->{status}, 'ok', 'refresh_core_indicators marks docker available when docker is on PATH' );
+    ok( !defined $docker_indicator, 'refresh_core_indicators does not create a built-in Docker indicator' );
     is( $project_indicator->{status}, 'ok', 'refresh_core_indicators marks the project indicator active inside a repository' );
     is( $git_indicator->{status}, 'clean', 'refresh_core_indicators marks a clean git work tree as clean' );
 }
@@ -2628,6 +2628,8 @@ SH
     close $fake_git_fh;
     chmod 0755, File::Spec->catfile( $fake_git_dir, 'git' ) or die $!;
 
+    no warnings qw(redefine once);
+    local *Developer::Dashboard::IndicatorStore::command_in_path = sub { die 'Docker must not be probed'; };
     local $ENV{PATH} = join ':', $fake_git_dir, ( $ENV{PATH} || () );
     my $prompt_only_items = $prompt_only_indicators->refresh_core_indicators(
         cwd         => $prompt_only_repo,
@@ -2635,8 +2637,8 @@ SH
     );
     is_deeply(
         [ map { $_->{name} } @{$prompt_only_items} ],
-        ['docker'],
-        'refresh_core_indicators prompt_only refreshes only prompt-visible core indicators',
+        [],
+        'refresh_core_indicators prompt_only does not probe or refresh a Docker indicator',
     );
     ok( !-e $fake_git_log, 'refresh_core_indicators prompt_only skips git subprocess checks entirely' );
 }
@@ -6551,7 +6553,9 @@ __END__
 =head1 DESCRIPTION
 
 This test exercises low-level runtime units including paths, files, pages,
-collectors, indicators, prompts, and process helpers.
+collectors, indicators, prompts, and process helpers. Its core-indicator checks
+also ensure prompt refresh does not probe for Docker or create a built-in Docker
+indicator.
 
 =for comment FULL-POD-DOC START
 

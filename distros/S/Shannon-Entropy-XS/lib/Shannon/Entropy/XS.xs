@@ -71,12 +71,27 @@ static OP* entropy_call_checker(pTHX_ OP *entersubop, GV *namegv, SV *ckobj) {
 	}
 	argop = OpSIBLING(pushop);
 	if (!argop) return entersubop;
+	switch (argop->op_type) {
+	case OP_CONST:
+	case OP_PADSV:
+	case OP_RV2SV:
+	case OP_AELEM:
+	case OP_HELEM:
+	case OP_AELEMFAST:
+#if PERL_VERSION >= 16
+	case OP_AELEMFAST_LEX:
+#endif
+		break;
+	default:
+		return entersubop;
+	}
 	nextop = OpSIBLING(argop);
 	if (!nextop) return entersubop;
 	if (OpSIBLING(nextop)) return entersubop;
 	OpMORESIB_set(pushop, nextop);
 	OpLASTSIB_set(argop, NULL);
-	newop = newUNOP(OP_CUSTOM, 0, argop);
+	newop = newUNOP(OP_NULL, 0, argop);
+	newop->op_type = OP_CUSTOM;
 	newop->op_ppaddr = pp_entropy;
 	op_free(entersubop);
 	return newop;
@@ -103,6 +118,7 @@ BOOT:
 	CV *entropy_cv;
 	XopENTRY_set(&entropy_xop, xop_name, "entropy");
 	XopENTRY_set(&entropy_xop, xop_desc, "Shannon entropy calculation");
+	XopENTRY_set(&entropy_xop, xop_class, OA_UNOP);
 	Perl_custom_op_register(aTHX_ pp_entropy, &entropy_xop);
 	entropy_cv = get_cv("Shannon::Entropy::XS::entropy", 0);
 	if (entropy_cv) {

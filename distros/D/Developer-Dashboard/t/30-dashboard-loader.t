@@ -6,6 +6,7 @@ use Cwd qw(getcwd);
 use File::Path qw(make_path);
 use File::Spec;
 use File::Temp qw(tempdir);
+use Capture::Tiny qw(capture);
 use Test::More;
 
 use lib 'lib';
@@ -33,6 +34,16 @@ like( $source, qr/Developer::Dashboard::PerlEnv->bootstrap_perl5lib/, 'dashboard
 
 my $private_core = _slurp( File::Spec->catfile( $repo_root, 'share', 'private-cli', '_dashboard-core' ) );
 like( $private_core, qr/Developer::Dashboard::PerlEnv->bootstrap_perl5lib/, 'private helper core bootstraps a safe Perl library order before loading command modules' );
+like(
+    $private_core,
+    qr/\$docker->run_streaming\(/,
+    'docker compose operational commands use the materializing streaming runner instead of bypassing it with raw exec',
+);
+like(
+    $private_core,
+    qr/_defer_service_discovery\s*=>\s*\$dry_run\s*\?\s*0\s*:\s*1/,
+    'docker execution defers service discovery until the base Compose config has been resolved',
+);
 
 my $share_seeded_root = File::Spec->catdir( $repo_root, 'share', 'seeded-pages' );
 ok(
@@ -360,6 +371,58 @@ for my $path (@perl_scripts) {
     like( $content, qr/\A#!\/usr\/bin\/env perl\b/, "$path uses /usr/bin/env perl" );
 }
 
+{
+    my $dispatch_home = tempdir( CLEANUP => 1 );
+    my $skill_root = File::Spec->catdir( $dispatch_home, '.developer-dashboard', 'skills', 'foo' );
+    my $skill_cli = File::Spec->catdir( $skill_root, 'cli' );
+    my $runtime_root = File::Spec->catdir( $dispatch_home, '.developer-dashboard' );
+    make_path( $skill_cli, $runtime_root );
+    _write_perl_module( File::Spec->catfile( $runtime_root, '.env' ), "DD_T30_CALLER_PRECEDENCE=home\n" );
+    _write_perl_module( File::Spec->catfile( $skill_root, '.env' ), "DD_T30_CALLER_PRECEDENCE=skill\n" );
+    my $skill_command = File::Spec->catfile( $skill_cli, 'bash' );
+    _write_perl_module(
+        $skill_command,
+        "#!/usr/bin/env perl\nuse strict;\nuse warnings;\nprint \$ENV{DD_T30_CALLER_PRECEDENCE} // '';\n",
+    );
+    chmod 0755, $skill_command or die "Unable to make $skill_command executable: $!";
+    my $custom_cli_root = File::Spec->catdir( $runtime_root, 'cli' );
+    make_path($custom_cli_root);
+    my $custom_command = File::Spec->catfile( $custom_cli_root, 'p44-env' );
+    _write_perl_module(
+        $custom_command,
+        "#!/usr/bin/env perl\nuse strict;\nuse warnings;\nprint \$ENV{DD_T30_CALLER_PRECEDENCE} // '';\n",
+    );
+    chmod 0755, $custom_command or die "Unable to make $custom_command executable: $!";
+
+    my ( $switchboard_stdout, $switchboard_stderr, $switchboard_exit ) = capture {
+        local $ENV{HOME} = $dispatch_home;
+        local $ENV{DD_T30_CALLER_PRECEDENCE} = 'caller';
+        system( $^X, "-I$lib", $dashboard, 'p44-env' );
+    };
+    is( $switchboard_exit >> 8, 0, 'the public switchboard command succeeds with an explicit environment override' )
+      or diag $switchboard_stderr;
+    is( $switchboard_stdout, 'caller', 'the public switchboard preserves its caller-provided environment value' );
+
+    my ( $caller_stdout, $caller_stderr, $caller_exit ) = capture {
+        local $ENV{HOME} = $dispatch_home;
+        local $ENV{DD_T30_CALLER_PRECEDENCE} = 'caller';
+        system( $^X, "-I$lib", $dashboard, 'foo.bash' );
+    };
+    is( $caller_exit >> 8, 0, 'd2 skill dispatch succeeds with an explicitly exported value' )
+      or diag $caller_stderr;
+    is( $caller_stdout, 'caller', 'an explicitly exported shell value wins over home and skill .env files' )
+      or diag $caller_stderr;
+
+    my ( $skill_stdout, $skill_stderr, $skill_exit ) = capture {
+        local $ENV{HOME} = $dispatch_home;
+        delete $ENV{DD_T30_CALLER_PRECEDENCE};
+        system( $^X, "-I$lib", $dashboard, 'foo.bash' );
+    };
+    is( $skill_exit >> 8, 0, 'd2 skill dispatch still works without a shell override' )
+      or diag $skill_stderr;
+    is( $skill_stdout, 'skill', 'the skill .env continues to override the home default when no shell value exists' );
+}
+
 done_testing();
 
 sub _slurp {
@@ -388,13 +451,20 @@ __END__
 
 This test keeps the public dashboard entrypoint free from embedded bookmark
 source, verifies lightweight commands avoid the heavy web runtime, and enforces
-the C</usr/bin/env perl> shebang for shipped Perl scripts.
+the C</usr/bin/env perl> shebang for shipped Perl scripts. It also runs real
+switchboard and dotted skill commands under isolated homes to verify that
+caller-exported environment values take precedence while ordinary skill values
+still override home defaults.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
 This test is the executable regression contract for the thin CLI, helper staging, and low-level runtime contracts. Read it when you need to understand the real fixture setup, assertions, and failure modes for this slice of the repository instead of guessing from the module names alone.
+
+Its disposable command fixtures also protect the environment precedence
+contract across the public helper exec boundary and the later skill-dispatch
+boundary; no real user home configuration is read or modified.
 
 =head1 WHY IT EXISTS
 

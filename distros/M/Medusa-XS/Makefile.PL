@@ -3,18 +3,26 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
-# Find Horus and Loo include dirs from installed modules
+# Find Horus and Loo include dirs from installed modules. Both are needed
+# HERE, while this file runs, so they are CONFIGURE_REQUIRES as well as
+# BUILD_REQUIRES: a client installs build prerequisites only after
+# Makefile.PL has already written the include path.
+my %want = (Horus => '0.02', Loo => '0.05');
 my @inc_dirs;
-for my $mod (qw(Horus Loo)) {
-    eval "require $mod";
-    if (!$@ && $mod->can('include_dir')) {
-        my $dir = $mod->include_dir();
-        push @inc_dirs, $dir if -d $dir;
+for my $mod (sort keys %want) {
+    my $dir;
+    if (eval "require $mod; 1" && $mod->can('include_dir')) {
+        $dir = $mod->include_dir();
     }
+    # Fallback to sibling dirs for dev workspace
+    $dir = "../$mod/include" unless defined $dir && -d $dir;
+    unless (-d $dir) {
+        warn "Medusa::XS needs the C headers $mod $want{$mod} or later installs, "
+           . "and cannot find them.\nInstall $mod and run Makefile.PL again.\n";
+        exit 0;
+    }
+    push @inc_dirs, $dir;
 }
-# Fallback to sibling dirs for dev workspace
-push @inc_dirs, '../Horus/include' if !grep { /Horus/ } @inc_dirs && -d '../Horus/include';
-push @inc_dirs, '../Loo/include'   if !grep { /Loo/ }   @inc_dirs && -d '../Loo/include';
 
 my $inc = join(' ', '-I.', map { "-I$_" } @inc_dirs);
 warn "Medusa::XS INC = $inc\n";
@@ -30,11 +38,13 @@ my %WriteMakefileArgs = (
     MIN_PERL_VERSION => '5.010',
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
+        'Horus' => $want{Horus},
+        'Loo'   => $want{Loo},
     },
     BUILD_REQUIRES => {
         'Devel::PPPort' => '3.68',
-        'Horus' => '0.01',
-        'Loo'   => '0.04',
+        'Horus' => $want{Horus},
+        'Loo'   => $want{Loo},
     },
     TEST_REQUIRES => {
         'Test::More' => '0.88',

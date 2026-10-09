@@ -8,7 +8,7 @@ my $conninfo = shift || $ENV{TEST_PG_CONNINFO} || 'dbname=postgres';
 
 my $pg; $pg = EV::Pg->new(
     conninfo => $conninfo,
-    on_error => sub { die "connection error: $_[0]\n" },
+    on_error => sub { warn "connection error: $_[0]\n"; EV::break },
     on_connect => sub {
         # parameterized queries prevent SQL injection
         $pg->query_params(
@@ -16,7 +16,7 @@ my $pg; $pg = EV::Pg->new(
             ['hello ', 'world', 21],
             sub {
                 my ($rows, $err) = @_;
-                die $err if $err;
+                if ($err) { warn $err; EV::break; return; }
                 print "greeting: $rows->[0][0]\n";  # hello world
                 print "doubled:  $rows->[0][1]\n";   # 42
                 EV::break;

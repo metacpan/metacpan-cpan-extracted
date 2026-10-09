@@ -54,6 +54,13 @@ is(EV::Redis->has_ssl, 1, 'has_ssl returns 1 when compiled with TLS');
 }
 
 {
+    my $r = EV::Redis->new(tls => 1, on_error => sub {});
+    eval { $r->connect_unix('/tmp/redis.sock') };
+    like($@, qr/TLS is not supported over unix sockets/, 'tls then connect_unix croaks');
+    $r->disconnect;
+}
+
+{
     my $r = EV::Redis->new();
     eval {
         $r->_setup_ssl_context(undef, undef, undef, undef, undef);

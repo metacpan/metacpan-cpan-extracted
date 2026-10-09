@@ -10,7 +10,7 @@ our @EXPORT = qw(gzip gunzip gzip_file gunzip_file gzip_to_file);
 our @EXPORT_OK = qw(deflate inflate deflate_raw inflate_raw gunzip_to_file);
 our %EXPORT_TAGS = ('all' => [@EXPORT, @EXPORT_OK]);
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 require XSLoader;
 XSLoader::load('Deflate::Faster', $VERSION);

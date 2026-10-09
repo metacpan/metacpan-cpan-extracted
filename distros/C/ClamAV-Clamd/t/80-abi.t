@@ -21,6 +21,12 @@ use FakeClamd;
     ok $ptr != 0,    '  and it is not NULL';
 }
 
+# Everything below talks to the fake, and the fake is a UNIX socket.
+unless (ClamAV::Clamd::_sun_path_max()) {
+    done_testing;
+    exit 0;
+}
+
 # --- the table drives itself --------------------------------------------
 # The provider's own suite must exercise the ABI the way a consumer does,
 # not the way the XS above happens to.

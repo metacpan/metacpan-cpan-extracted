@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use ExtUtils::Typemaps;
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 our @ISA = qw(ExtUtils::Typemaps);
 
@@ -348,7 +348,7 @@ L<ExtUtils::Typemaps::STL>, L<ExtUtils::Typemaps::STL::String>, L<ExtUtils::Type
 
 =head1 AUTHOR
 
-Steffen Mueller <smueller@cpan.org>
+Steffen Mueller <cpan@steffen-mueller.net>
 
 =head1 COPYRIGHT AND LICENSE
 

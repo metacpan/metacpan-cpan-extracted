@@ -109,9 +109,24 @@ close $repo_cfg_fh;
 open my $docker_bin_fh, '>', File::Spec->catfile( $bin, 'docker' ) or die $!;
 print {$docker_bin_fh} <<"SH";
 #!/bin/sh
-printf 'ARGS:%s\n' "\$*"
-printf 'DEBUG:%s\n' "\${DEBUG_ENABLED:-}"
-printf 'MODE:%s\n' "\${APP_MODE:-}"
+last=''
+merged_file=''
+previous=''
+for arg in "\$@"; do
+    last="\$arg"
+    if [ "\$previous" = '-f' ]; then merged_file="\$arg"; fi
+    previous="\$arg"
+done
+case "\$merged_file" in
+*/merged-compose.yml)
+    printf 'ARGS:%s\n' "\$*"
+    printf 'DEBUG:%s\n' "\${DEBUG_ENABLED:-}"
+    printf 'MODE:%s\n' "\${APP_MODE:-}"
+    ;;
+*)
+    printf 'services:\n  app: {}\n  worker: {}\n'
+    ;;
+esac
 SH
 close $docker_bin_fh;
 chmod 0755, File::Spec->catfile( $bin, 'docker' );

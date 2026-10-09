@@ -34,6 +34,8 @@ my $layered_env_doc = _slurp_optional( _repo_path( 'doc', 'layered-env-loading.m
 my $testing_doc = _slurp_optional( _repo_path( 'doc', 'testing.md' ) );
 my $readme_sync_script = _repo_path( 'script', 'sync-readme-from-pod' );
 my $changes = _slurp( _repo_path('Changes') );
+my $problem_report = _slurp( _repo_path( 'doc', 'problem-report.md' ) );
+my $problem_history = _slurp( _repo_path( 'doc', 'problem-report.txt' ) );
 my $dist = _slurp_optional( _repo_path('dist.ini') );
 my $meta = _slurp_optional( _repo_path('META.json') );
 my $cpanfile = _slurp( _repo_path('cpanfile') );
@@ -86,6 +88,24 @@ my @pod_paths = (
 );
 my $skills_pm = _slurp( _repo_path( 'lib', 'Developer', 'Dashboard', 'SKILLS.pm' ) );
 my $skills_pod = _extract_pod($skills_pm);
+
+my @problem_report_numbers = $problem_report =~ /^### Problem (\d+):/gm;
+is_deeply(
+    \@problem_report_numbers,
+    [ 1 .. 44 ],
+    'problem-report.md has one ordered entry for every numbered problem 1 through 44, including explicitly unassigned numbers',
+);
+my %problem_history_numbers = map { $_ => 1 } $problem_history =~ /^Problem (\d+):/gm;
+is_deeply(
+    [ sort { $a <=> $b } keys %problem_history_numbers ],
+    [ 1 .. 44 ],
+    'problem-report.txt records evidence or an explicit unassigned entry for every numbered problem 1 through 44',
+);
+like(
+    $dist,
+    qr/^exclude_match = \^even-terminal-\.\*\\\.log\$$/m,
+    'Dist::Zilla excludes generated terminal transcript logs from the release archive',
+);
 
 like( $pm, qr/our \$VERSION = '([^']+)'/, 'main module declares a version' );
 my ($version) = $pm =~ /our \$VERSION = '([^']+)'/;
@@ -388,6 +408,7 @@ my @operator_local_files = qw(
         local/lib/perl5/Net/SSLeay.pod
         audit-local/lib/perl5/CPANSA/DB.pm
         logs/ft99.log
+        even-terminal-2026-10-08T16-51-27-525Z.log
         Developer-Dashboard-9.99/lib/Developer/Dashboard.pm
         dogfood-output/screenshot.png
         pax-output/d2
@@ -1177,13 +1198,13 @@ __END__
 
 =head1 NAME
 
-15-release-metadata.t - verify release metadata and docs for private helpers and skills
+15-release-metadata.t - verify release metadata and repository documentation records
 
 =head1 DESCRIPTION
 
-This test keeps the shipped version metadata, public executable list, and core
-documentation aligned for the private-helper and isolated-skill packaging
-model. It also pins the declared runtime dependency floors, so a
+This test keeps the shipped version metadata, public executable list, core
+documentation, and numbered problem-report index aligned for the private-helper
+and isolated-skill packaging model. It also pins the declared runtime dependency floors, so a
 distribution carrying a published advisory cannot be permitted by the manifests
 even where no current advisory database is installed to notice.
 It also resolves every C<t/NN-name.t> path cited in the README, the markdown under

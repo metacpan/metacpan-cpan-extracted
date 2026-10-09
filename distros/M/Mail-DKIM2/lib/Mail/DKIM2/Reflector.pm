@@ -1,7 +1,7 @@
 package Mail::DKIM2::Reflector;
 use strict; use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.17';
 use 5.020;
 
 use Email::MIME;
@@ -11,7 +11,7 @@ use Mail::DKIM2::Verifier;
 use Mail::DKIM2::Signer;
 use Mail::DKIM2::MessageInstance;
 use Mail::DKIM2::DSN;
-use Mail::DKIM2::Common qw(fold_header should_skip DKIM2_DRAFT DKIM2_REPO DKIM2_DATE);
+use Mail::DKIM2::Common qw(parse_mime fold_header should_skip DKIM2_DRAFT DKIM2_REPO DKIM2_DATE);
 
 our $SUBJECT_PREFIX = '[DKIM2] ';
 our $FOOTER         = "-- \r\nReflected and signed by the DKIM2 reflector at dkim2.com\r\n";
@@ -96,9 +96,9 @@ sub _fresh_message_text {
       . "Content-Type: text/plain; charset=utf-8\r\n"
       . "\r\n"
       . $a{body};
-    my $mi = Mail::DKIM2::MessageInstance->calculate(Email::MIME->new($text));
+    my $mi = Mail::DKIM2::MessageInstance->calculate(parse_mime($text));
     (my $miv = fold_header("Message-Instance: " . $mi->as_string)) =~ s/^Message-Instance:\s*//;
-    my ($hc, $hn) = _header_list_for_hash(Email::MIME->new($text));
+    my ($hc, $hn) = _header_list_for_hash(parse_mime($text));
     return _info_line('mi-m=1', hc => $hc, hn => $hn)
          . "Message-Instance: $miv\r\n" . $text;
 }
@@ -382,7 +382,7 @@ sub reflect {
     if ($mi) {
         my $val = fold_header("Message-Instance: " . $mi->as_string);
         $val =~ s/^Message-Instance:\s*//;
-        my ($hc, $hn) = _header_list_for_hash(Email::MIME->new($cur_text));
+        my ($hc, $hn) = _header_list_for_hash(parse_mime($cur_text));
         $cur_text = _info_line("mi-m=" . $mi->get_tag('m'), hc => $hc, hn => $hn)
                   . "Message-Instance: $val\r\n" . $cur_text;
     }
@@ -470,7 +470,7 @@ sub _domains_align {
 # Lowercased domain of the message's From: header, or undef.
 sub _from_domain {
     my ($text) = @_;
-    my $from = eval { Email::MIME->new($text)->header('From') };
+    my $from = eval { parse_mime($text)->header('From') };
     return undef unless defined $from && length $from;
     my $addr = ($from =~ /<([^>]+)>/) ? $1 : $from;
     my ($dom) = $addr =~ /\@([A-Za-z0-9.\-]+)/;
@@ -482,7 +482,7 @@ sub _from_domain {
 sub _dkim1_aligned {
     my ($text, $from_domain, $authserv_id) = @_;
     return undef unless defined $from_domain && defined $authserv_id;
-    my @ar = eval { Email::MIME->new($text)->header_raw('Authentication-Results') };
+    my @ar = eval { parse_mime($text)->header_raw('Authentication-Results') };
     for my $ar (@ar) {
         $ar =~ s/\r?\n[ \t]+/ /g;             # unfold
         1 while $ar =~ s/\([^()]*\)//g;       # strip CFWS comments (may hold ';')
@@ -523,7 +523,7 @@ sub _build_mi {
     my ($cur_text, $prev_text, $mode) = @_;
     return undef if $mode eq 'raw' || $mode eq 'damage';
     my $mi = Mail::DKIM2::MessageInstance->calculate(
-        Email::MIME->new($cur_text), Email::MIME->new($prev_text));
+        parse_mime($cur_text), parse_mime($prev_text));
     $mi->set_null_body_recipe if $mode eq 'redacted';
     return $mi;
 }

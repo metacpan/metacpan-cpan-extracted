@@ -3,3 +3,10 @@ Revision history for Medusa-XS
 0.01    Date/time
         First version, released on an unsuspecting world.
 
+0.03    2026-10-08
+        - Horus and Loo are configure-time prerequisites: Makefile.PL needs
+          their headers. Minimums raised to the first releases that install
+          them (Horus 0.02, Loo 0.05).
+        - %ms prints three digits where tv_usec is wider than a long.
+        - Builds on Windows.
+        - t/15-elapsed.t no longer requires the call to take under a second.

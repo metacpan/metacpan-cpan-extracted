@@ -42,12 +42,13 @@ DESCRIPTION
         replay across reconnects, configurable connect / command / waiting
         timeouts.
 
-    *   Predictable lifecycle: pending callbacks always fire (with the
-        disconnect reason on teardown), DESTROY is reentrancy-safe across
-        callback contexts.
+    *   Predictable lifecycle: pending callbacks always fire, DESTROY is
+        reentrancy-safe across callback contexts.
 
     AnyEvent applications can use this module unchanged, since AnyEvent runs
     on top of EV when EV is loaded.
+
+    Do not share a client across fork(); reconnect in the child instead.
 
 ENCODING
     This module treats all keys and values as byte strings. Encode UTF-8
@@ -88,7 +89,9 @@ CONSTRUCTOR
    Connection
     host => $str
     port => $int (default 11211)
-        TCP host and port. Mutually exclusive with "path".
+        TCP host and port. Mutually exclusive with "path". Every resolved
+        address is tried in turn. Name resolution is synchronous; prefer
+        numeric IPs.
 
     path => $str
         Unix socket path. Mutually exclusive with "host".
@@ -118,11 +121,15 @@ CONSTRUCTOR
 
     max_pending => $num
         Cap on concurrent in-flight commands. Excess commands are held in a
-        local waiting queue. 0 = unlimited (default).
+        local waiting queue. 0 = unlimited (default). An "mget"/"mgets"
+        counts as one command against the cap and in
+        "pending_count"/"waiting_count"; its keys are always sent together.
+        Chunk very large key lists.
 
     waiting_timeout => $ms
         Maximum time a command may sit in the waiting queue before its
-        callback fires with "waiting timeout". 0 = unlimited (default).
+        callback fires with "waiting timeout". Expired fire-and-forget
+        commands are dropped silently. 0 = unlimited (default).
 
     resume_waiting_on_reconnect => $bool
         If true, the waiting queue survives a disconnect and is replayed on
@@ -145,9 +152,10 @@ CONSTRUCTOR
     username => $str
     password => $str
         SASL PLAIN credentials. When both are set, the client authenticates
-        after every successful connect (and reconnect). Pre-connect commands
-        sit in the waiting queue until SASL completes. Requires a memcached
-        build with SASL support and the "-S" flag.
+        after every successful connect (and reconnect). Commands issued
+        before authentication completes sit in the waiting queue until SASL
+        finishes. Requires a memcached build with SASL support and the "-S"
+        flag.
 
    Event handlers
     on_error => $cb->($errstr)
@@ -179,14 +187,15 @@ LIFECYCLE
   disconnect
     Disconnect cleanly. Cancels any pending reconnect, drains pending
     command callbacks with "(undef, "disconnected")", then fires
-    "on_disconnect". For an intentional disconnect, "on_error" does not fire
-    -- that distinction lets you tell user-initiated teardown from
-    server-side close.
+    "on_disconnect" when a session exists or a connect is in progress. For
+    an intentional disconnect, "on_error" does not fire -- that distinction
+    lets you tell user-initiated teardown from server-side close.
 
   is_connected
     Returns true while a session is established or in progress (TCP
     handshake / SASL exchange). Commands issued in the connecting phase are
-    queued and sent on completion.
+    queued and sent on completion. Commands issued while neither connected
+    nor reconnect-pending croak with "not connected".
 
   quit([$cb])
     Send a memcached "QUIT" and let the server close the connection. Treated
@@ -243,6 +252,8 @@ RETRIEVAL COMMANDS
             my ($values, $err) = @_;
             # $values = { k1 => 'v1', k3 => 'v3' }   # k2 was a miss
         });
+
+    An empty list invokes the callback synchronously with "{}".
 
   mgets(\@keys, [$cb->(\%info, $err)])
     Like "mget" but each value carries metadata:
@@ -321,7 +332,7 @@ LOCAL CONTROL
   waiting_count
     Number of commands held in the local waiting queue (because the
     connection is not ready, SASL is in progress, or "max_pending" is
-    saturated).
+    saturated). Commands retain their issue order while queued.
 
 ACCESSORS
     The following options have a getter/setter of the same name (there are
@@ -413,7 +424,7 @@ BENCHMARKS
     workloads (interleaved sends and receives) stay close to the 50K-command
     column.
 
-    "max_pending" overhead (200K commands):
+    "max_pending" overhead (100K commands, hence the faster baseline):
 
         unlimited        ~131K ops/sec
         max_pending=500  ~126K ops/sec

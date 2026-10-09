@@ -16,10 +16,7 @@ my %WriteMakefileArgs = (
   "LICENSE" => "artistic_2",
   "MIN_PERL_VERSION" => "5.018",
   "NAME" => "PAGI",
-  "PREREQ_PM" => {
-    "PAGI::Server" => "0.002005",
-    "PAGI::Tools" => "0.002001"
-  },
+  "PREREQ_PM" => {},
   "TEST_REQUIRES" => {
     "Future::AsyncAwait" => "0.38",
     "Future::IO" => "0.08",
@@ -27,7 +24,7 @@ my %WriteMakefileArgs = (
     "Test2::V0" => "0.000159",
     "Test::Pod" => "1.41"
   },
-  "VERSION" => "0.002013",
+  "VERSION" => "0.003000",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,8 +35,6 @@ my %FallbackPrereqs = (
   "Future::AsyncAwait" => "0.38",
   "Future::IO" => "0.08",
   "IO::Async" => "0.78",
-  "PAGI::Server" => "0.002005",
-  "PAGI::Tools" => "0.002001",
   "Test2::V0" => "0.000159",
   "Test::Pod" => "1.41"
 );

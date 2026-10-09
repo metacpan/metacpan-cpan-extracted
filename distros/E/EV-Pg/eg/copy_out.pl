@@ -13,27 +13,29 @@ my $conninfo = shift || $ENV{TEST_PG_CONNINFO} || 'dbname=postgres';
 
 my $pg; $pg = EV::Pg->new(
     conninfo => $conninfo,
-    on_error => sub { die "connection error: $_[0]\n" },
+    on_error => sub { warn "connection error: $_[0]\n"; EV::break },
     on_connect => sub {
         $pg->query("create temp table nums (n int)", sub {
-            my (undef, $err) = @_; die $err if $err;
+            my (undef, $err) = @_;
+            if ($err) { warn $err; EV::break; return; }
 
             $pg->query("insert into nums select generate_series(1, 5)", sub {
-                my ($n, $err) = @_; die $err if $err;
+                my ($n, $err) = @_;
+                if ($err) { warn $err; EV::break; return; }
                 print "inserted $n rows\n";
 
                 # Note: this single callback fires twice -- once for
                 # "COPY_OUT" (start), once for command_ok (done).
                 $pg->query("copy nums to stdout", sub {
                     my ($data, $err) = @_;
-                    die $err if $err;
+                    if ($err) { warn $err; EV::break; return; }
 
                     if ($data eq 'COPY_OUT') {
                         # Drain the stream synchronously.  get_copy_data
                         # returns a row string, the integer -1 (stream
                         # complete), or undef (would block).  In an
-                        # async program you would re-enter the event
-                        # loop on undef and resume on the next read.
+                        # async program, return on undef: this callback
+                        # fires again with "COPY_OUT" when more data arrives.
                         while (1) {
                             my $line = $pg->get_copy_data;
                             last if !defined $line;        # would block

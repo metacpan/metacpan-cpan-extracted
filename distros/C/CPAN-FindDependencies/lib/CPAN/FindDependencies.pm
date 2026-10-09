@@ -3,6 +3,7 @@ package CPAN::FindDependencies;
 use strict;
 use warnings;
 use vars qw(@net_log $VERSION @ISA @EXPORT_OK);
+use version;
 
 use Archive::Tar;
 use Archive::Zip;
@@ -22,7 +23,7 @@ require Exporter;
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(finddeps);
 
-$VERSION = '4.00';
+$VERSION = '4.01';
 
 use constant MAXINT => ~0;
 
@@ -437,6 +438,8 @@ sub _incore {
     my $core = $Module::CoreList::version{$args{perl}}{$args{module}};
     $core =~ s/_/00/g if($core);
     $args{version} =~ s/_/00/g;
+    $args{version} = version->declare($args{version})->numify()
+         if($args{version} =~ /^v/);
     return ($core && $core >= $args{version}) ? $core : undef;
 }
 

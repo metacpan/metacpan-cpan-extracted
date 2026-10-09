@@ -2,6 +2,7 @@ package Medusa::Logger;
 
 use strict;
 use warnings;
+use Fcntl qw(:flock);
 
 sub new {
 	my ($pkg, %args) = (shift, @_ > 1 ? @_ : %{$_[1] || {}});
@@ -29,10 +30,10 @@ sub info {
 
 sub log {
 	my ($self, $line) = @_;
-	flock($self->{fh}, 1);
 	my $fh = $self->{fh};
+	flock($fh, LOCK_EX);
 	print $fh $line . "\n";
-	flock($self->{fh}, 0);
+	flock($fh, LOCK_UN);
 }
 
 sub DESTROY {
@@ -49,7 +50,7 @@ Medusa::Logger - Simple file-based logger for Medusa audit logging
 
 =head1 VERSION
 
-Version 0.03
+Version 0.06
 
 =head1 SYNOPSIS
 

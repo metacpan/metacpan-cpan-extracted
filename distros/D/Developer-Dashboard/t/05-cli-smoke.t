@@ -1585,7 +1585,13 @@ my $fake_docker = File::Spec->catfile( $fake_bin, 'docker' );
 open my $fake_docker_fh, '>', $fake_docker or die "Unable to write $fake_docker: $!";
 print {$fake_docker_fh} <<'SH';
 #!/bin/sh
-printf 'DOCKER:%s\n' "$*"
+last=''
+for arg in "$@"; do last="$arg"; done
+if [ "$last" = 'config' ]; then
+    printf 'services:\n  green: {}\n'
+else
+    printf 'DOCKER:%s\n' "$*"
+fi
 SH
 close $fake_docker_fh;
 chmod 0755, $fake_docker or die "Unable to chmod $fake_docker: $!";

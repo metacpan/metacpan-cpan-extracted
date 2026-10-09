@@ -1,3 +1,9 @@
+0.09  2026-10-08
+    - fix re-entrancy, callback lifetime, COPY, notification and fork/thread
+      safety bugs
+    - fix build against libpq 14-16
+    - documentation fixes
+
 0.08  2026-07-23
     - fix skip_pending accounting: stale-result misdelivery, COPY-OUT skip
       livelock, re-entrant double-count, and phantom credit across reconnect

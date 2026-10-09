@@ -7,7 +7,7 @@ use lib 't';
 use TestHelper;
 
 require_pg;
-plan tests => 32;
+plan tests => 34;
 
 # escape_literal
 with_pg(cb => sub {
@@ -55,7 +55,13 @@ with_pg(cb => sub {
 with_pg(cb => sub {
     my ($pg) = @_;
     ok($pg->is_connected, 'connected before reset');
+    my $reset_err;
+    $pg->query("select pg_sleep(30)", sub {
+        my ($data, $err) = @_;
+        $reset_err = $err;
+    });
     $pg->on_connect(sub {
+        is($reset_err, 'connection reset', 'reset: pending callback got "connection reset"');
         ok($pg->is_connected, 'reconnected after reset');
         EV::break;
     });
@@ -228,8 +234,11 @@ with_pg(cb => sub {
 # handler_accessor rejects non-CODE non-undef
 with_pg(cb => sub {
     my ($pg) = @_;
+    my $good = sub { };
+    $pg->on_connect($good);
     eval { $pg->on_connect("not_a_coderef") };
     like($@, qr/CODE reference/, 'on_connect with non-CODE croaks');
+    is($pg->on_connect, $good, 'failed setter preserves old handler');
     EV::break;
 });
 

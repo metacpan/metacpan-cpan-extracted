@@ -49,8 +49,50 @@ for my $mode (qw(off OFF skip)) {
     $r->disconnect;
 }
 
+# command matching is ASCII-only: tr_TR folds I differently, which must not
+# sneak a reply-suppressing command past the refusal
 SKIP: {
-    skip 'RESET requires Redis 6.2+', 6 if $major < 6 || ($major == 6 && $minor < 2);
+    require POSIX;
+    my $old_locale = POSIX::setlocale(&POSIX::LC_ALL);
+    my $tr = POSIX::setlocale(&POSIX::LC_ALL, "tr_TR.UTF-8");
+    skip 'tr_TR locale unavailable', 10 unless $tr;
+    for my $mode (qw(OFF SKIP)) {
+        my $r = client();
+        eval { $r->command('CLIENT', 'REPLY', $mode, sub {}) };
+        like $@, qr/CLIENT REPLY \Q$mode\E is not supported/,
+            "tr_TR: uppercase CLIENT REPLY $mode croaks";
+        my $got;
+        $r->ping(sub { $got = $_[0] });
+        settle();
+        is $got, 'PONG', "tr_TR: connection unpoisoned after refused $mode";
+        $r->disconnect;
+    }
+    for my $cmd (qw(SUBSCRIBE PSUBSCRIBE)) {
+        my $r = client();
+        my @replies;
+        $r->command($cmd, 'ps_locale', sub { push @replies, $_[0] if defined $_[0] });
+        settle();
+        is $replies[0][0], lc($cmd), "tr_TR: uppercase $cmd is routed";
+        $r->command($cmd eq 'SUBSCRIBE' ? 'UNSUBSCRIBE' : 'PUNSUBSCRIBE');
+        settle();
+        is $replies[1][0], $cmd eq 'SUBSCRIBE' ? 'unsubscribe' : 'punsubscribe',
+            '... and uppercase unsubscribe is routed';
+        $r->disconnect;
+    }
+    my $r = client();
+    my @stream;
+    $r->command('MONITOR', sub { push @stream, $_[0] if defined $_[0] });
+    settle();
+    is $stream[0], 'OK', 'tr_TR: uppercase MONITOR starts';
+    $ctl->ping;
+    settle();
+    ok scalar(grep { /PING/i } @stream), '... and keeps delivering the stream';
+    $r->disconnect;
+    POSIX::setlocale(&POSIX::LC_ALL, $old_locale);
+}
+
+SKIP: {
+    skip 'RESET requires Redis 6.2+', 9 if $major < 6 || ($major == 6 && $minor < 2);
 
     $ctl->del('ps_list', sub {});
     $ctl->rpush('ps_list', 'a', 'b', 'c', sub {});
@@ -83,6 +125,20 @@ SKIP: {
     settle();
     is $reset, 'RESET', 'RESET on an unsubscribed connection';
     is_deeply $range, [qw(a b c)], 'reply after RESET reaches its callback';
+    $r->disconnect;
+
+    # a queued unsubscribe is not a subscription: RESET proceeds past it
+    $r = client();
+    $r->max_pending(1);
+    $r->command('blpop', 'ps_nokey', 1, sub {});
+    my $unsub_err;
+    $r->command('unsubscribe', 'ps_nope', sub { $unsub_err = $_[1] });
+    my $reset2;
+    eval { $r->command('reset', sub { $reset2 = $_[0] }) };
+    is $@, '', 'RESET is accepted with only an unsubscribe waiting';
+    settle(2);
+    is $unsub_err, 'not subscribed', '... the queued unsubscribe is refused';
+    is $reset2, 'RESET', '... and RESET runs once the slot frees';
     $r->disconnect;
 
     # RESP3 with a push seen, then RESET back to RESP2, then subscribe

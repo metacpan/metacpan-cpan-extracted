@@ -32,4 +32,19 @@ my $nullb = encode_base64('{"b":null}', '');
 ok(eval { Mail::DKIM2::MessageInstance->parse("m=2; h=sha256:AAA:BBB; r=$nullb;"); 1 },
    '"b": null still accepted on parse');
 
+# Anything that is neither null nor an array is a malformed body Recipe.
+for my $bad ('5', '"x"', '{}', 'true') {
+    my $enc = encode_base64(qq({"b":$bad}), '');
+    eval { Mail::DKIM2::MessageInstance->parse("m=2; h=sha256:AAA:BBB; r=$enc;") };
+    like($@, qr/^PERMERROR Message-Instance m=2 Recipe body is neither null nor an array/,
+        "\"b\": $bad is a PERMERROR");
+}
+# Likewise a header Recipe that is not an object (null/empty keep their own error).
+for my $bad ('5', '"x"', '[]') {
+    my $enc = encode_base64(qq({"h":$bad}), '');
+    eval { Mail::DKIM2::MessageInstance->parse("m=2; h=sha256:AAA:BBB; r=$enc;") };
+    like($@, qr/^PERMERROR Message-Instance m=2 Recipe header is not an object/,
+        "\"h\": $bad is a PERMERROR");
+}
+
 done_testing;

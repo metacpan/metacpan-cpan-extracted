@@ -2941,6 +2941,43 @@ END {
     ok( $status->{watchdog_attention_required}, '_supervise_collectors_once raises the attention_required flag after too many restarts' );
     is( $status->{watchdog_restart_count}, 2, '_supervise_collectors_once increments the restart count before raising attention_required' );
 }
+
+{
+    no warnings 'redefine';
+    my $cron_name = 'nightly.cron';
+    my $heartbeat = Developer::Dashboard::RuntimeManager::_now_iso8601( tz => 'local' );
+    my $window_started = Developer::Dashboard::RuntimeManager::_now_iso8601( tz => 'utc' );
+    local *Developer::Dashboard::Config::collectors = sub {
+        return [ { name => $cron_name, command => 'true', cron => '0 7-8 * * *' } ];
+    };
+    $collector_store->write_status(
+        $cron_name,
+        {
+            last_completed_at                       => '2020-01-01T00:00:00Z',
+            watchdog_restart_count                  => 3,
+            watchdog_restart_window_started_at       => $window_started,
+            watchdog_restart_window_started_at_epoch => time,
+            watchdog_status                         => 'running',
+        }
+    );
+    $runner->{started} = [];
+    $runner->{stopped} = [];
+    local *Local::RuntimeRunner::running_loops = sub {
+        return ( { name => $cron_name, pid => 98765, state => { heartbeat_at => $heartbeat, schedule => 'cron' } } );
+    };
+    local *Developer::Dashboard::RuntimeManager::_collector_restart_limit = sub { return 3 };
+    local *Developer::Dashboard::RuntimeManager::_collector_runtime_ready = sub { return 1 };
+
+    my $result = $manager->_supervise_collectors_once( names => [$cron_name] );
+    my $status = $collector_store->read_status($cron_name) || {};
+
+    is_deeply( $result->{attention}, [], 'a healthy cron loop awaiting its next scheduled window does not raise a watchdog warning' );
+    is_deeply( $result->{restarted}, [], 'a healthy cron loop is not restarted just because its last job execution is old' );
+    is_deeply( $runner->{started}, [], 'the watchdog does not start a replacement for an idle but healthy cron loop' );
+    is_deeply( $runner->{stopped}, [], 'the watchdog does not stop an idle but healthy cron loop' );
+    is( $status->{watchdog_restart_count}, 3, 'idle cron waiting does not increment the restart-warning counter' );
+    is( $status->{watchdog_status}, 'running', 'idle cron waiting leaves watchdog status running' );
+}
 {
     local $ENV{DEVELOPER_DASHBOARD_COLLECTOR_STALL_GRACE_SECONDS} = 17;
     is( $manager->_collector_stall_grace_seconds, 17, '_collector_stall_grace_seconds honours the explicit environment override' );
@@ -4472,21 +4509,30 @@ __END__
 =head1 DESCRIPTION
 
 This test verifies web-service and collector lifecycle management in the
-runtime manager.
+runtime manager, including watchdog behavior when a cron collector's next run
+is hours away but its scheduler loop remains alive.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
-This test is the executable regression contract for This test verifies web-service and collector lifecycle management in the runtime manager. Read it when you need to understand the real fixture setup, assertions, and failure modes for this slice of the repository instead of guessing from the module names alone.
+This test is the executable regression contract for web-service and collector
+lifecycle management. Its watchdog cases distinguish a dead or stalled loop
+from an intentionally idle cron schedule, so cron quiet hours do not consume
+the unexpected-restart budget.
 
 =head1 WHY IT EXISTS
 
-It exists because This test verifies web-service and collector lifecycle management in the runtime manager has enough moving parts that a code-only review can miss real regressions. Keeping those expectations in a dedicated test file makes the TDD loop, coverage loop, and release gate concrete.
+It exists because runtime lifecycle management has enough moving parts that a
+code-only review can miss real regressions. Keeping process, watchdog, and
+scheduled-collector expectations in a dedicated test file makes the TDD loop,
+coverage loop, and release gate concrete.
 
 =head1 WHEN TO USE
 
-Use this file when changing This test verifies web-service and collector lifecycle management in the runtime manager, when a focused CI failure points here, or when you want a faster regression loop than running the entire suite.
+Use this file when changing runtime process handling, collector watchdog
+thresholds, or cron-loop liveness; also use it when a focused CI failure points
+here or when you need a faster loop than the entire suite.
 
 =head1 HOW TO USE
 

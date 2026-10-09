@@ -3,7 +3,7 @@ package Developer::Dashboard::SkillDispatcher;
 use strict;
 use warnings;
 
-our $VERSION = '5.51';
+our $VERSION = '5.73';
 
 use Config ();
 use Developer::Dashboard::DirEntries qw(sorted_dir_entries);
@@ -87,9 +87,10 @@ sub dispatch {
         else {
             Developer::Dashboard::Runtime::Result::clear_last_result();
         }
-        Developer::Dashboard::EnvLoader->load_skill_layers( skill_layers => \@env_skill_layers );
-        Developer::Dashboard::EnvLoader->load_skill_cli_layers( skill_layers => \@env_skill_layers );
-        Developer::Dashboard::EnvLoader->load_runtime_layers( paths => $self->{manager}{paths} );
+        Developer::Dashboard::EnvLoader->load_skill_runtime_layers(
+            paths        => $self->{manager}{paths},
+            skill_layers => \@env_skill_layers,
+        );
         system( @command, @args );
     };
     my $hook_stdout = join '', map { $_->{stdout} } values %{ $hook_result->{hooks} };
@@ -154,9 +155,10 @@ sub exec_command {
     else {
         Developer::Dashboard::Runtime::Result::clear_last_result();
     }
-    Developer::Dashboard::EnvLoader->load_skill_layers( skill_layers => \@env_skill_layers );
-    Developer::Dashboard::EnvLoader->load_skill_cli_layers( skill_layers => \@env_skill_layers );
-    Developer::Dashboard::EnvLoader->load_runtime_layers( paths => $self->{manager}{paths} );
+    Developer::Dashboard::EnvLoader->load_skill_runtime_layers(
+        paths        => $self->{manager}{paths},
+        skill_layers => \@env_skill_layers,
+    );
     return $self->_exec_resolved_command( $cmd_path, \@command, \@args );
 }
 
@@ -204,9 +206,10 @@ sub execute_hooks {
                 else {
                     Developer::Dashboard::Runtime::Result::clear_last_result();
                 }
-                Developer::Dashboard::EnvLoader->load_skill_layers( skill_layers => \@env_skill_layers );
-                Developer::Dashboard::EnvLoader->load_skill_cli_layers( skill_layers => \@env_skill_layers );
-                Developer::Dashboard::EnvLoader->load_runtime_layers( paths => $self->{manager}{paths} );
+                Developer::Dashboard::EnvLoader->load_skill_runtime_layers(
+                    paths        => $self->{manager}{paths},
+                    skill_layers => \@env_skill_layers,
+                );
                 system( @command, @args );
             };
             my $result_key = $entry;
@@ -348,9 +351,10 @@ sub _run_child_command_streaming {
         else {
             Developer::Dashboard::Runtime::Result::clear_last_result();
         }
-        Developer::Dashboard::EnvLoader->load_skill_layers( skill_layers => \@skill_layers );
-        Developer::Dashboard::EnvLoader->load_skill_cli_layers( skill_layers => \@skill_layers );
-        Developer::Dashboard::EnvLoader->load_runtime_layers( paths => $self->{manager}{paths} );
+        Developer::Dashboard::EnvLoader->load_skill_runtime_layers(
+            paths        => $self->{manager}{paths},
+            skill_layers => \@skill_layers,
+        );
         $pid = open3( $stdin_spec, $stdout, $stderr, @command, @argv );
     }
     close $stdin_fh if $stdin_fh;
@@ -1630,6 +1634,11 @@ joining it onto a skill root, so parent-directory, absolute, drive-qualified,
 backslash, and control-byte shapes resolve to nothing instead of escaping the
 layered skills trees, and C<skill_static_roots> exposes the layered
 C<dashboards/public> roots the web layer asserts containment against.
+
+Skill command and hook environments are loaded through
+C<Developer::Dashboard::EnvLoader::load_skill_runtime_layers>: home runtime
+files provide defaults, skill and skill-CLI files override those defaults, and
+deeper project runtime files retain final precedence.
 
 =for comment FULL-POD-DOC START
 

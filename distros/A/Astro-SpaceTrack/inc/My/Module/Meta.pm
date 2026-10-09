@@ -7,6 +7,8 @@ use warnings;
 
 use Carp;
 
+our $VERSION = '0.184';
+
 sub new {
     my ( $class ) = @_;
     ref $class and $class = ref $class;
@@ -174,6 +176,8 @@ sub provides {
 
     return ( provides => $provides );
 }
+
+sub release_status { 'stable' }
 
 sub requires {
     my ( undef, @extra ) = @_;		# Invocant unused
@@ -352,6 +356,11 @@ This method attempts to load L<Module::Metadata|Module::Metadata>. If
 this succeeds, it returns a C<provides> entry suitable for inclusion in
 L<meta_merge()|/meta_merge> data (i.e. C<'provides'> followed by a hash
 reference). If it can not load the required module, it returns nothing.
+
+=head2 release_status
+
+This returns the L<CPAN::Meta::Spec|CPAN::Meta::Spec> release status for
+the distribution.
 
 =head2 requires
 

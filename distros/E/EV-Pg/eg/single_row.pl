@@ -8,14 +8,14 @@ my $conninfo = shift || $ENV{TEST_PG_CONNINFO} || 'dbname=postgres';
 
 my $pg; $pg = EV::Pg->new(
     conninfo => $conninfo,
-    on_error => sub { die "connection error: $_[0]\n" },
+    on_error => sub { warn "connection error: $_[0]\n"; EV::break },
     on_connect => sub {
         # single-row mode: callback fires once per row, then
         # a final time with an empty arrayref
         my $count = 0;
         $pg->query("select n, n * n as square from generate_series(1, 5) n", sub {
             my ($rows, $err) = @_;
-            die $err if $err;
+            if ($err) { warn $err; EV::break; return; }
 
             if (@$rows) {
                 $count++;

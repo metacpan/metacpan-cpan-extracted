@@ -21,7 +21,6 @@ META.json
 META.yml
 Pg.xs
 README
-README.md
 t/00_load.t
 t/01_connect.t
 t/02_query.t
@@ -35,6 +34,8 @@ t/09_coverage.t
 t/10_timeouts.t
 t/11_bug_skip_pending.t
 t/12_bug_regressions.t
+t/13_threads.t
+t/14_callback_lifetime.t
 t/TestHelper.pm
 typemap
 xt/valgrind.t

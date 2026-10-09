@@ -4,15 +4,18 @@ use strict;
 use warnings;
 use Mail::Milter::Authentication::Pragmas;
 # ABSTRACT: Handler class for DKIM2 signing
-our $VERSION = '0.13';
+our $VERSION = '0.17';
 use base 'Mail::Milter::Authentication::Handler';
 
-use Mail::DKIM2::Common qw(extract_mi_version strip_mi_versions load_private_key fold_header);
+use Mail::DKIM2::Common qw(extract_mi_version strip_mi_versions load_private_key fold_header parse_mime
+    parse_dkim_pubkey chain_number_error mi_version_tag DKIM2_DRAFT DKIM2_REPO DKIM2_DATE);
+use Mail::DKIM2::Gate;
 use Mail::DKIM2::MessageInstance;
 use Mail::DKIM2::MessageStore;
 use Mail::DKIM2::Signer;
 use Email::MIME;
 use MIME::Base64 qw(decode_base64);
+use constant DKIM2_SOFTWARE => 'authentication_milter-DKIM2Sign';
 
 sub default_config {
     return {
@@ -33,7 +36,27 @@ sub default_config {
         # Directory for message snapshots (shared with DKIM2Verify)
         'snapshot_directory'   => undef,
         'ignore_header_prefixes' => [],   # our own fields, hashed by neither end (IgnorePrefixes)
+        # Sign over an UNSIGNED Message-Instance (above every upstream
+        # signature's m=) with a null body Recipe; see Mail::DKIM2::Gate
+        'allow_null_body_recipe' => 0,
+        # Testing only: verify the upstream chain with keys from this dns.json
+        # instead of DNS, and without the t=/expiry check
+        'dns_overrides'        => undef,
+        'skip_timestamp_check' => 0,
     };
+}
+
+# The handler's configuration with default_config() filled in for every
+# option the operator left out (or set to null). authentication_milter does
+# not merge default_config() at runtime -- it only uses it to generate a
+# sample config -- so without this a left-out option is undef: sign_local,
+# sign_authenticated, add_message_instance and record_smtp_params would all
+# silently be off.
+sub _config {
+    my ($self) = @_;
+    my $given    = $self->handler_config() || {};
+    my $defaults = default_config();
+    return { %$given, map { $_ => $given->{$_} // $defaults->{$_} } keys %$defaults };
 }
 
 sub register_metrics {
@@ -113,7 +136,7 @@ sub addheader_callback {
     my $handler = shift;
     return if $self->{'failmode'};
 
-    my $config = $self->handler_config();
+    my $config = $self->_config();
 
     # Determine if we should sign this message
     my $should_sign = 0;
@@ -191,7 +214,12 @@ sub addheader_callback {
             $message_data .= $chunk;
         }
 
-        # Compute Message-Instance if configured
+        # Compute Message-Instance if configured.  Nothing reaches the wire
+        # until the gate below has passed and the signer has signed: a
+        # refused message goes out as it came in (apart from X-DKIM2-Info),
+        # as with bin/dkim2-milter.
+        my @mi_removals;
+        my $mi_value;
         if ( $config->{'add_message_instance'} ) {
             delete $self->{'_stripped_mi_versions'};
             delete $self->{'_clean_message_data'};
@@ -199,22 +227,16 @@ sub addheader_callback {
             if ( $self->{'_stripped_mi_versions'} ) {
                 # Broken intermediate MIs were stripped; use the cleaned message data
                 $message_data = $self->{'_clean_message_data'} // $message_data;
-                # Record the stripped versions so the wire message can be cleaned up
-                push @{$handler->{remove_headers}}, map {
-                    { field => 'Message-Instance', version => $_ }
-                } @{$self->{'_stripped_mi_versions'}};
+                # Record the stripped versions so the wire message can be
+                # cleaned up once we have signed
+                @mi_removals = @{$self->{'_stripped_mi_versions'}};
                 delete $self->{'_stripped_mi_versions'};
                 delete $self->{'_clean_message_data'};
             }
             if ($mi) {
-                my $mi_value = $self->_format_mi($mi);
+                $mi_value = $self->_format_mi($mi);
                 # Prepend MI header (will be included when we re-feed the signer)
                 $message_data = "Message-Instance: $mi_value$EOL" . $message_data;
-                # Also add to pre_headers so it actually gets prepended to the message
-                push @{$handler->{pre_headers}}, {
-                    'field' => 'Message-Instance',
-                    'value' => $mi_value,
-                };
             }
         }
 
@@ -241,18 +263,42 @@ sub addheader_callback {
             }
         }
 
-        # Full-chain undo check before signing: refuse to sign a
-        # Message-Instance chain that does not reverse cleanly (e.g. an upstream
-        # that emitted a non-reversible Recipe) — the same guard the standalone
-        # dkim2-milter applies. Checking the current chain, not just the top
-        # MI, stops us minting a signature over a chain that fails at recipients.
-        my ($mi_chain_ok, $mi_chain_why) =
-            Mail::DKIM2::MessageInstance->chain_verifies($message_data,
-                IgnorePrefixes => $config->{'ignore_header_prefixes'});
-        unless ($mi_chain_ok) {
-            $self->metric_count( 'dkim2_sign_total', { 'result' => 'broken-mi-chain' } );
-            $self->log_error( "DKIM2 not signing for $sign_domain: "
-                . "Message-Instance chain does not undo cleanly: $mi_chain_why" );
+        # The signing decision, shared with bin/dkim2-milter and bin/dkim2sign
+        # (Mail::DKIM2::Gate), made on the message exactly as we would sign it
+        # (so including our own new Message-Instance, if any): the upstream
+        # DKIM2-Signatures must verify (an unsigned Message-Instance above the
+        # top signature -- ours, or a list manager's on this host -- is
+        # allowed); the Message-Instance chain must match the content and undo
+        # cleanly (an upstream that emitted a non-reversible Recipe would give
+        # a signature that fails at every recipient); a top signature with nd=
+        # may be extended only by the domain it names; and an UNSIGNED
+        # instance with a null body Recipe -- the top, or one under our own
+        # new instance -- is refused unless allow_null_body_recipe.  A null
+        # that arrived signed is extended.  A message with no upstream chain
+        # is signed as before.
+        my $gate = Mail::DKIM2::Gate->check($message_data,
+            SigningDomain       => $sign_domain,
+            AllowNullBodyRecipe => $config->{'allow_null_body_recipe'} ? 1 : 0,
+            SkipTimestampCheck  => $config->{'skip_timestamp_check'} ? 1 : 0,
+            IgnorePrefixes      => $config->{'ignore_header_prefixes'},
+            $self->_gate_key_source($config));
+        $self->check_timeout();
+        unless ( $gate->{ok} ) {
+            my $reason = $gate->{reason} // 'refused';
+            $gate->{message} =~ s/AllowNullBodyRecipe not set/allow_null_body_recipe not set/
+                if defined $gate->{message};
+            $self->metric_count( 'dkim2_sign_total', { 'result' => $reason } );
+            $self->dbgout( 'DKIM2Sign',
+                "Not signing for $sign_domain: $gate->{message}", LOG_INFO );
+            # As bin/dkim2-milter: a broken upstream chain is already reported
+            # by the verifier's Authentication-Results; the two refusals that
+            # are this hop's own business are flagged on the message.
+            if ( $reason ne 'upstream-chain' ) {
+                push @{$handler->{pre_headers}}, {
+                    'field' => 'X-DKIM2-Info',
+                    'value' => _dkim2_info("not-signed=$reason"),
+                };
+            }
             return;
         }
 
@@ -266,6 +312,14 @@ sub addheader_callback {
         $self->dbgout( 'DKIM2SignResult', $signer->result_detail // 'none', LOG_DEBUG );
 
         if ( $sig_result eq 'signed' ) {
+            $self->_delete_mi_versions(@mi_removals);
+            if ( defined $mi_value ) {
+                push @{$handler->{pre_headers}}, {
+                    'field' => 'Message-Instance',
+                    'value' => $mi_value,
+                };
+            }
+
             # Extract the DKIM2-Signature header
             my $sig_header = $signer->as_string();
             # Strip the "DKIM2-Signature: " prefix
@@ -276,10 +330,26 @@ sub addheader_callback {
                 'value' => $sig_header,
             };
 
+            # Informational, as bin/dkim2-milter: we signed over a null body
+            # Recipe -- a null top, whether it arrived signed (no option
+            # needed) or is this hop's own, or an unsigned null under the top
+            # (allow_null_body_recipe).
+            my $over_null = $gate->{top_null} || $gate->{unsigned_null};
+            if ( $over_null ) {
+                push @{$handler->{pre_headers}}, {
+                    'field' => 'X-DKIM2-Info',
+                    'value' => _dkim2_info('null-body-recipe'),
+                };
+            }
+
             $self->metric_count( 'dkim2_sign_total', { 'result' => 'signed' } );
-            $self->dbgout( 'DKIM2Sign', "Signed for $sign_domain ($selector)", LOG_INFO );
+            $self->dbgout( 'DKIM2Sign', "Signed for $sign_domain ($selector)"
+                . ( $over_null ? ' over a null body Recipe' : '' ), LOG_INFO );
         }
         else {
+            # The Signer refuses (result fail) rather than dying, e.g. over a
+            # DKIM2-Signature it cannot key -- which the gate has already
+            # refused.  Either way nothing is added to the message.
             $self->metric_count( 'dkim2_sign_total', { 'result' => 'error' } );
             $self->log_error( "DKIM2 signing failed: " . ($signer->result_detail // 'no result') );
         }
@@ -288,6 +358,32 @@ sub addheader_callback {
         $self->handle_exception( $error );
         $self->log_error( 'DKIM2 Sign Error ' . $error );
         $self->metric_count( 'dkim2_sign_total', { 'result' => 'error' } );
+    }
+}
+
+# Delete the Message-Instance fields with these m= values from the message as
+# it goes out, through the framework's change_header() (SMFIR_CHGHEADER with
+# an empty value). The index is the field's position among the message's own
+# Message-Instance fields, 1-based; deleting from the last one up keeps the
+# earlier indexes valid. A version not among the received fields (another
+# handler's) is not ours to delete.
+sub _delete_mi_versions {
+    my ( $self, @versions ) = @_;
+    return unless @versions;
+    my %want = map { $_ => 1 } @versions;
+    my ( $n, @delete ) = ( 0 );
+    for my $chunk ( @{ $self->{'headers'} || [] } ) {
+        next unless $chunk =~ /\AMessage-Instance[ \t]*:(.*)\z/is;
+        $n++;
+        ( my $val = $1 ) =~ s/\A\s+//;
+        my $v = extract_mi_version($val);
+        push @delete, [ $n, $v ] if defined $v && $want{$v};
+    }
+    for my $d ( reverse @delete ) {
+        $self->change_header( 'Message-Instance', $d->[0], q{} );
+        $self->dbgout( 'DKIM2MI',
+            "Deleted broken Message-Instance m=$d->[1] (field $d->[0]) from the message",
+            LOG_INFO );
     }
 }
 
@@ -313,7 +409,7 @@ sub _compute_message_instance {
     my ( $self, $message_data, $config ) = @_;
 
     my $mi = eval {
-        my $msg = Email::MIME->new($message_data);
+        my $msg = parse_mime($message_data);
 
         # Skip if the topmost MI already matches current content
         my @ignore = ( IgnorePrefixes => $config->{'ignore_header_prefixes'} );
@@ -323,6 +419,10 @@ sub _compute_message_instance {
         }
 
         my @mi_headers = $msg->header_raw('Message-Instance');
+        # An m= above MAX_CHAIN_LENGTH is never a loop bound below (the gate
+        # refuses the message on it).
+        return undef if grep { chain_number_error('Message-Instance', 'm', mi_version_tag($_)) }
+                        @mi_headers;
         my %mi_by_v = map { (extract_mi_version($_) || 0) => $_ } @mi_headers;
         my $max_v = @mi_headers ? (sort { $b <=> $a } keys %mi_by_v)[0] : 0;
 
@@ -335,7 +435,7 @@ sub _compute_message_instance {
                 my $snapshot_data = $store->fetch($mi_by_v{$v});
                 if ( $snapshot_data ) {
                     $self->dbgout( 'DKIM2MI', "Found snapshot for MI m=$v, computing diff", LOG_DEBUG );
-                    my $snapshot_msg = Email::MIME->new($snapshot_data);
+                    my $snapshot_msg = parse_mime($snapshot_data);
                     my @snap_mi = $snapshot_msg->header_raw('Message-Instance');
 
                     # If the current message has more MI headers than the snapshot,
@@ -349,7 +449,7 @@ sub _compute_message_instance {
                         my $snap_max_v = (sort { $b <=> $a } keys %snap_by_v)[0] // 0;
                         my @to_strip = ($snap_max_v + 1 .. $max_v);
                         $work_data = strip_mi_versions($message_data, @to_strip);
-                        $work_msg  = Email::MIME->new($work_data);
+                        $work_msg  = parse_mime($work_data);
                         $self->{'_stripped_mi_versions'} = \@to_strip;
                         $self->dbgout( 'DKIM2MI',
                             'Stripped broken MI versions ' . join(',', @to_strip)
@@ -391,6 +491,46 @@ sub _format_mi {
     return $folded;
 }
 
+# X-DKIM2-Info value per draft-gondwana-dkim2-debug-header-01 (as
+# bin/dkim2-milter): a tag-list, every tag (the last included) followed by
+# ";", a ";" inside a value becoming ",".  Folded only after a ";" or a ",",
+# never inside a token.  X-DKIM2-Info is excluded from the header hash by the
+# x-* rule, so it can never affect a signature.
+sub _dkim2_info {
+    my ($action, %extra) = @_;
+    my @tags = ("draft=" . DKIM2_DRAFT, "repo=" . DKIM2_REPO,
+                "date=" . DKIM2_DATE, "sw=" . DKIM2_SOFTWARE, "action=$action");
+    push @tags, "$_=$extra{$_}" for grep { defined $extra{$_} } sort keys %extra;
+    my $val = join ' ', map { (my $t = $_) =~ s/;/,/g; "$t;" } @tags;
+    (my $folded = fold_header("X-DKIM2-Info: $val", undef, delimiters_only => 1))
+        =~ s/^X-DKIM2-Info:\s*//;
+    $folded =~ s/\015?\012\z//;
+    return $folded;
+}
+
+# Where the gate's Verifier gets upstream public keys: dns_overrides (a
+# dns.json, for testing) when set, else the milter's own resolver (so its
+# timeouts and caching apply), as DKIM2Verify does.
+sub _gate_key_source {
+    my ( $self, $config ) = @_;
+    if ( my $file = $config->{'dns_overrides'} ) {
+        require JSON;
+        open my $fh, '<', $file or die "dns_overrides $file: $!\n";
+        my $dns_data = JSON::decode_json( do { local $/; <$fh> } );
+        return ( PubkeyCallback => sub {
+            my ( $signature, $idx ) = @_;
+            my $sel = $signature->selector( $idx // 0 );
+            my $dom = $signature->domain;
+            my $entry = ( $dom && $sel && $dns_data->{$dom} )
+                ? $dns_data->{$dom}{"$sel._domainkey"} : undef;
+            return unless $entry && $entry->[0];
+            return parse_dkim_pubkey( $entry->[0][1] );
+        } );
+    }
+    my $resolver = $self->get_object('resolver');
+    return $resolver ? ( Resolver => $resolver ) : ();
+}
+
 # Domain of the From: header (lower-cased) from the stored raw header chunks,
 # or undef. Used to pick a signing domain for null-sender bounces/DSNs.
 sub _from_header_domain {
@@ -406,7 +546,7 @@ sub _from_header_domain {
 # Look up signing config for a domain (static config, then HTTP endpoint)
 sub _get_sign_config {
     my ( $self, $domain ) = @_;
-    my $config = $self->handler_config();
+    my $config = $self->_config();
 
     # Check static config first
     my $domains = $config->{'domains'} || {};
@@ -433,7 +573,7 @@ sub _get_sign_config {
 # Fetch signing config from HTTP endpoint
 sub _fetch_sign_config {
     my ( $self, $endpoint, $domain ) = @_;
-    my $config = $self->handler_config();
+    my $config = $self->_config();
     my $timeout = $config->{'key_endpoint_timeout'} || 5;
 
     my $result = eval {
@@ -486,6 +626,34 @@ so the signature covers all headers including those added by other handlers.
 
 Signing keys can be configured statically per domain, or looked up dynamically
 via an HTTP REST endpoint.
+
+Before it signs, the handler asks L<Mail::DKIM2::Gate> (the decision
+C<bin/dkim2-milter> and C<bin/dkim2sign> make) about the message exactly as it
+would sign it, its own new Message-Instance included: any upstream
+DKIM2-Signatures must verify (a Message-Instance above the top signature, the
+one being signed, is allowed), the Message-Instance chain must match the
+content and undo cleanly, a top signature with C<nd=> must name the signing
+domain, and an I<unsigned> Message-Instance with a null body Recipe (a null
+this hop introduces, typically a list manager's) is signed only with
+C<allow_null_body_recipe>.  A signature with C<m=k> covers instances 1 to
+I<k>, so this applies to the top instance and equally to one under the
+handler's own new instance.  A null that arrived signed is extended.  A
+message with no upstream chain is signed as it always was.
+
+When the handler recomputes its Message-Instance from a snapshot and drops
+broken intermediate Message-Instances on the way, it deletes those fields from
+the message once it has signed, through the framework's C<change_header()>
+(an empty value: C<SMFIR_CHGHEADER> in milter mode).
+
+On a refusal nothing is signed and no Message-Instance is added or removed;
+the reason is logged (C<dbgout>, C<LOG_INFO>) and counted in
+C<dkim2_sign_total> (C<result> C<upstream-chain>, C<broken-mi-chain> or
+C<null-body-recipe>), and for the last two, as with C<dkim2-milter>, an
+C<X-DKIM2-Info: ... action=not-signed=E<lt>reasonE<gt>;> field is prepended.
+When it signs over a null body Recipe (a null top, or an unsigned null under
+the top) it prepends C<X-DKIM2-Info: ... action=null-body-recipe;>.  If the Signer itself refuses
+(result C<fail>, e.g. over a DKIM2-Signature it cannot key, which the gate has
+already refused), nothing is added and the failure is logged as an error.
 
 This module implements draft-ietf-dkim-dkim2-spec-06; see L<Mail::DKIM2/STATUS>
 for what that means for the wire format and the API, and
@@ -541,8 +709,25 @@ directly does not have this problem; it is specific to the bolt-on-milter model.
         "sign_local"           : 1,                | Sign for local IP senders
         "add_message_instance" : 1,                | Add Message-Instance headers
         "record_smtp_params"   : 1,                | Record MAIL FROM/RCPT TO in signature
-        "snapshot_directory"   : null               | Snapshot dir (shared with DKIM2Verify)
+        "snapshot_directory"   : null,             | Snapshot dir (shared with DKIM2Verify)
+        "ignore_header_prefixes" : [],             | Own fields hashed by neither end
+        "allow_null_body_recipe" : 0,              | Sign over an unsigned
+                                                   |   Message-Instance with a null
+                                                   |   body Recipe (list hosts)
+        "dns_overrides"        : null,             | Path to dns.json for testing
+        "skip_timestamp_check" : 0                 | Testing: ignore upstream t=/expiry
     }
+
+The values shown are the defaults.  authentication_milter does not fill in a
+handler's defaults itself, so the handler does: an option left out of the
+configuration (or set to C<null>) takes the value above, and an explicit
+value, C<0> included, is used as given.
+
+C<allow_null_body_recipe> is C<dkim2-milter>'s C<--allow-null-body-recipe>:
+off by default, for a list host whose list manager rewrites bodies and adds an
+unsigned Message-Instance with a null body Recipe for this handler to sign.  It
+never excuses a broken chain.  C<dns_overrides> and C<skip_timestamp_check>
+only affect the verification of the upstream chain, and are for tests.
 
 When C<snapshot_directory> is set, the handler looks up a stored message
 snapshot (written by DKIM2Verify on inbound) using the topmost Message-Instance
@@ -576,7 +761,8 @@ Return HTTP 404 or an empty response to decline signing for that domain.
 
 =head2 default_config()
 
-Returns the default configuration hash for this handler.
+Returns the default configuration hash for this handler.  The handler also
+applies it at runtime to any option the configuration leaves out.
 
 =head2 register_metrics()
 
@@ -611,8 +797,10 @@ Actual signing is deferred to C<addheader_callback()>.
 
 Performs the signing.  Determines the signing domain from the envelope
 sender, looks up the key configuration, computes a Message-Instance header
-if configured, creates the DKIM2-Signature, and adds both as prepended
-headers via the milter handler object.
+if configured, applies L<Mail::DKIM2::Gate> (see L</DESCRIPTION>), creates the
+DKIM2-Signature, and adds both as prepended headers via the milter handler
+object.  Broken intermediate Message-Instances it stripped are deleted with
+C<change_header()>.
 
 =head2 close_callback()
 

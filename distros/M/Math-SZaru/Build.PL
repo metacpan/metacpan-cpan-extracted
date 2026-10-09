@@ -11,6 +11,9 @@ my $build = Module::Build::WithXSpp->new(
   license         => 'perl',
   requires        => {
   },
+  build_requires => {
+    'Test::More' => '0.88',
+  },
   configure_requires => {
     'Devel::CheckLib' => 0,
     'ExtUtils::CChecker' => 0,

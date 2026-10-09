@@ -8,7 +8,7 @@ use Exporter 'import';
 
 use Game::Gin::Card ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 our @EXPORT_OK = qw(order_for deal_for HAND_SIZE UPCARD_AT STOCK_AT);
 
 use constant HAND_SIZE => 10;
@@ -62,7 +62,7 @@ Game::Gin::Deck - the seeded deal, and the stock as the tail of it
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

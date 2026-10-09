@@ -8,7 +8,7 @@ use TestHelper;
 
 require_pg;
 use Socket;
-plan tests => 76;
+plan tests => 77;
 
 # --- handler getter round-trip ---
 with_pg(cb => sub {
@@ -127,6 +127,14 @@ with_pg(cb => sub {
     });
 });
 
+# --- get_copy_data outside COPY croaks ---
+with_pg(cb => sub {
+    my ($pg) = @_;
+    eval { $pg->get_copy_data };
+    like($@, qr/PQgetCopyData failed/, 'get_copy_data outside COPY croaks');
+    EV::break;
+});
+
 # --- on_drain accessor ---
 with_pg(cb => sub {
     my ($pg) = @_;
@@ -209,8 +217,6 @@ with_pg(cb => sub {
 });
 
 # --- on_drain fires during COPY IN backpressure ---
-# Shrink SO_SNDBUF so PQflush returns 1 (can't flush all), activating the
-# write watcher.  When the socket drains, io_write_cb fires on_drain.
 {
     my $drain_count = 0;
     my $pg;
@@ -223,7 +229,16 @@ with_pg(cb => sub {
                 or diag "setsockopt SO_SNDBUF: $!";
             close $fh;
 
-            $pg->query("create temp table drain_test (payload text)", sub {
+            $pg->query(q{
+                create temp table drain_test (payload text);
+                create function pg_temp.drain_pause() returns trigger language plpgsql as $$
+                    begin
+                        if new.payload = 'pause' then perform pg_sleep(0.3); end if;
+                        return new;
+                    end $$;
+                create trigger drain_pause before insert on drain_test
+                    for each row execute procedure pg_temp.drain_pause()
+            }, sub {
                 my (undef, $err) = @_;
                 die $err if $err;
 
@@ -232,9 +247,9 @@ with_pg(cb => sub {
                 $pg->query("copy drain_test from stdin", sub {
                     my ($data, $err) = @_;
                     if (($data // '') eq 'COPY_IN') {
-                        # blast 16MB into a ~4KB socket buffer
+                        $pg->put_copy_data("pause\n");
                         my $chunk = ("x" x 8000) . "\n";
-                        $pg->put_copy_data($chunk) for 1 .. 2_000;
+                        $pg->put_copy_data($chunk x 32);
                         $pg->put_copy_end;
                         return;
                     }
@@ -435,7 +450,7 @@ like($@, qr/PQconninfoParse failed/, 'conninfo_parse: invalid input croaks');
         },
         on_error => sub { diag "Error: $_[0]"; EV::break },
     );
-    my $t = EV::timer(15, 0, sub { EV::break });
+    my $t = EV::timer(60, 0, sub { EV::break });
     EV::run;
     ok($completed, 'flow control: COPY completed');
     SKIP: {

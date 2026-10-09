@@ -1,0 +1,167 @@
+#!perl
+use v5.36;
+use HTTP::Tiny;
+use Cpanel::JSON::XS;
+
+binmode STDOUT, ':encoding(UTF-8)';
+
+my $res = HTTP::Tiny->new->get(
+  'https://raw.githubusercontent.com/catppuccin/palette/refs/tags/v1.8.0/palette.json',
+);
+die "E: $res->{content}" unless $res->{success};
+my $data = decode_json($res->{content});
+
+say '# generated data package. do not use directly!';
+say 'use warnings;';
+say 'use strict;';
+say 'use utf8;';
+
+sub sort_by ($key, $data) {
+  sort { $data->{$a}{order} <=> $data->{$b}{order} } keys %$data;
+}
+
+emit_package(undef, 'Catppuccin::Data', sub ($st) {
+  emit_sub_str($st, version => delete $data->{version});
+
+  my @flavors = sort_by('order', $data);
+
+  for my $flavor (@flavors) {
+    emit_package($st, $flavor, sub ($st) {
+      my $data = $data->{$flavor};
+
+      emit_sub_str($st, id => $flavor);
+      emit_sub_str($st, name => $data->{name});
+      emit_sub_str($st, emoji => $data->{emoji});
+      emit_sub_num($st, order => $data->{order});
+      emit_sub_bool($st, dark => $data->{dark});
+
+      emit_package($st, 'color', sub ($st) {
+        my $colors = $data->{colors};
+        my @colors = sort_by('order', $colors);
+        for my $color (@colors) {
+          my $data = $colors->{$color};
+
+          emit_package($st, $color, sub ($st) {
+            emit_sub_str($st, id => $color);
+            emit_sub_str($st, name => $data->{name});
+            emit_sub_num($st, order => $data->{order});
+            emit_sub_bool($st, accent => $data->{accent});
+
+            emit_sub_str($st, hex => $data->{hex});
+            emit_sub_num_array($st, rgb => $data->{rgb}->@{qw(r g b)});
+            emit_sub_num_array($st, hsl => $data->{hsl}->@{qw(h s l)});
+            emit_sub_num_array($st, oklch => $data->{oklch}->@{qw(l c h)});
+          });
+        }
+      });
+      emit_last_package_list($st, 'colors');
+
+      emit_package($st, 'ansi', sub ($st) {
+        my $colors = $data->{ansiColors};
+        my @colors = sort_by('order', $colors);
+        for my $color (@colors) {
+          my $data = $colors->{$color};
+
+          emit_package($st, $color, sub ($st) {
+            emit_sub_str($st, id => $color);
+            emit_sub_str($st, name => $data->{name});
+            emit_sub_num($st, order => $data->{order});
+
+            emit_package($st, 'normal', sub ($st) {
+              my $data = $data->{normal};
+
+              emit_sub_str($st, name => $data->{name});
+              emit_sub_num($st, code => $data->{code});
+
+              emit_sub_str($st, hex => $data->{hex});
+              emit_sub_num_array($st, rgb => $data->{rgb}->@{qw(r g b)});
+              emit_sub_num_array($st, hsl => $data->{hsl}->@{qw(h s l)});
+              emit_sub_num_array($st, oklch => $data->{oklch}->@{qw(l c h)});
+            });
+
+            emit_package($st, 'bright', sub ($st) {
+              my $data = $data->{bright};
+
+              emit_sub_str($st, name => $data->{name});
+              emit_sub_num($st, code => $data->{code});
+
+              emit_sub_str($st, hex => $data->{hex});
+              emit_sub_num_array($st, rgb => $data->{rgb}->@{qw(r g b)});
+              emit_sub_num_array($st, hsl => $data->{hsl}->@{qw(h s l)});
+              emit_sub_num_array($st, oklch => $data->{oklch}->@{qw(l c h)});
+            });
+          });
+        }
+      });
+      emit_last_package_list($st, 'ansi_colors');
+    });
+  }
+
+  emit_package_list($st, 'flavors');
+});
+
+say '1;';
+
+sub emit_package ($st, $name, $cb) {
+  if ($st) {
+    push $st->{stack}->@*, [$st->{pkg}, $st->{subpkgs}];
+    $st->{pkg} = $st->{pkg}.'::'.ucfirst($name);
+    push $st->{subpkgs}->@*, $st->{pkg};
+    $st->{subpkgs} = [];
+    emit_sub_str($st, $name, $st->{pkg});
+  } else {
+    $st = {
+      stack => [],
+      pkg => ucfirst($name),
+      subpkgs => [],
+      indent => '',
+    };
+  }
+
+  emit_package_header($st);
+  $st->{indent} = '  ' x ($st->{stack}->@* + 1);
+  $cb->($st);
+  $st->{indent} = '  ' x $st->{stack}->@*;
+  emit_indent($st, '}');
+
+  $st->{last} = $st->{subpkgs};
+  if ($st->{stack}->@*) {
+    ($st->{pkg}, $st->{subpkgs}) = (pop $st->{stack}->@*)->@*;
+  }
+}
+
+sub emit_package_header ($st) {
+  emit_indent($st, 'package # hide from PAUSE');
+  emit_indent($st, ' '.$st->{pkg}.' {');
+}
+
+sub emit_last_package_list ($st, $name) {
+  emit_sub_str_list($st, $name, $st->{last}->@*);
+}
+sub emit_package_list ($st, $name) {
+  emit_sub_str_list($st, $name, $st->{subpkgs}->@*);
+}
+
+sub emit_indent ($st, $str) {
+  say $st->{indent} . $str;
+}
+
+sub emit_sub_str ($st, $sub, $str) {
+  emit_indent($st, 'sub '.$sub.' { q{'.$str.'} }');
+}
+
+sub emit_sub_str_list ($st, $sub, @str) {
+  emit_indent($st, 'sub '.$sub.' { ('.join(',', map { 'q{'.$_.'}' } @str).') }');
+}
+
+sub emit_sub_num ($st, $sub, $num) {
+  emit_indent($st, 'sub '.$sub.' { '.(0+$num).' }');
+}
+
+sub emit_sub_num_array ($st, $sub, @num) {
+  emit_indent($st, 'sub '.$sub.' { ('.join(',', map { 0+$_ } @num).') }');
+}
+
+sub emit_sub_bool ($st, $sub, $bool) {
+  emit_indent($st, 'sub '.$sub.' { '.(!!$bool ? '1' : '0').' }');
+}

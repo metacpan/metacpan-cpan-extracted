@@ -1,0 +1,62 @@
+---
+abstract: 'PostgreSQL session backend for Dancer2'
+author:
+  - 'Mikko Johannes Koivunalho <mikko.koivunalho@iki.fi>'
+build_requires:
+  Dancer2: '0'
+  File::Temp: '0'
+  FindBin: '0'
+  HTTP::Request::Common: '0'
+  List::Util: '0'
+  POSIX: '0'
+  Plack::Test: '0'
+  Test2::Suite: '1.302200'
+  Test2::Tools::GenTemp: '1.302200'
+  Test2::V1: '1.302200'
+  Test::Script: '1.26'
+  Time::HiRes: '0'
+  lib: '0'
+  perl: v5.14.0
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.008'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.040, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - dancer2
+  - session
+  - postgresql
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Session-Pg
+requires:
+  Carp: '0'
+  Crypt::AuthEnc::ChaCha20Poly1305: '0'
+  Crypt::AuthEnc::GCM: '0'
+  Crypt::Digest::SHA256: '0'
+  Crypt::PRNG: '0'
+  DBD::Pg: '0'
+  DBI: '0'
+  Dancer2::Core::Role::SessionFactory: '0'
+  English: '0'
+  Module::Runtime: '0'
+  Moo: '0'
+  Moo::Role: '0'
+  Scalar::Util: '0'
+  Test::Perl::Critic: '0'
+  Types::Common::String: '0'
+  Types::Standard: '0'
+  constant: '0'
+  perl: v5.14.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dancer2-Session-Pg
+  homepage: https://metacpan.org/dist/Dancer2-Session-Pg
+  repository: https://github.com/mikkoi/dancer2-session-pg.git
+version: '0.001'
+x_generated_by_perl: v5.34.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

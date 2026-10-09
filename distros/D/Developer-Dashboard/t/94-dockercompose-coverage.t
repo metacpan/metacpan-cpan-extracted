@@ -9,6 +9,9 @@ use File::Path qw(make_path);
 use File::Basename qw(dirname);
 use File::Spec;
 use File::Temp qw(tempdir);
+use Capture::Tiny qw(capture);
+use Encode qw(encode);
+use YAML::XS ();
 use Test::More;
 
 use lib 'lib';
@@ -228,6 +231,19 @@ subtest '_local_compose_services unions files and rejects invalid Compose docume
     );
     is_deeply( $docker->_local_compose_services( [$base_empty] ), {}, 'a valid Compose document without services yields an empty allow-list' );
 
+    my $missing_base = File::Spec->catfile( $home, 'compose-services-missing.yml' );
+    my $read_ok = eval { $docker->_local_compose_services( [$missing_base] ); 1 };
+    is( $read_ok, undef, 'a missing local base file is rejected before parsing' );
+    like( $@, qr/^Unable to read local Compose file .*:/, 'a source read failure names the local Compose file' );
+
+    my $close_error = '';
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::DockerCompose::_close_local_compose_source = sub { return; };
+        eval { $docker->_local_compose_services( [$base_one] ); 1 } or $close_error = $@;
+    }
+    like( $close_error, qr/^Unable to close local Compose file .*:/, 'a source close failure is reported with its path' );
+
     for my $case (
         [ {}, qr/^Compose base files must be an array reference/, 'a malformed file-list argument is rejected' ],
         [ [$base_bad_mapping], qr/^Local Compose file .* services must be a mapping/, 'a non-mapping services field is rejected' ],
@@ -270,7 +286,7 @@ subtest '_local_compose_services unions files and rejects invalid Compose docume
 # ---- run() with a harmless docker stub on PATH ----------------------------
 my $stubbin = File::Spec->catdir( $home, 'stubbin' );
 make_path($stubbin);
-mkfile( File::Spec->catfile( $stubbin, 'docker' ), "#!/bin/sh\nexit 0\n" );
+mkfile( File::Spec->catfile( $stubbin, 'docker' ), "#!/bin/sh\nlast=''\nfor arg in \"\$@\"; do last=\"\$arg\"; done\n[ \"\$last\" = config ] && printf 'services: {}\\n'\nexit 0\n" );
 chmod 0755, File::Spec->catfile( $stubbin, 'docker' );
 
 {
@@ -294,6 +310,395 @@ chmod 0755, File::Spec->catfile( $stubbin, 'docker' );
     chdir $old or die $!;
 }
 
+# The public helper needs an operational runner that preserves the normal
+# streaming CLI behavior while keeping the materialized Compose file alive
+# until the real Compose command has completed.
+{
+    my $streambin = File::Spec->catdir( $home, 'streambin' );
+    make_path($streambin);
+    my $removed_restore_cwd = File::Spec->catdir( $home, 'streaming-removed-restore-cwd' );
+    make_path($removed_restore_cwd);
+    my $stream_log = File::Spec->catfile( $home, 'docker-streaming-invocations.log' );
+    mkfile(
+        File::Spec->catfile( $streambin, 'docker' ),
+        <<STUB
+#!/bin/sh
+printf '%s\\n' "\$*" >> '$stream_log'
+last=''
+for a in "\$@"; do last="\$a"; done
+if [ "\$last" = 'config' ]; then
+  printf 'services:\n  merged-marker:\n    image: stub\n'
+  exit 0
+fi
+if [ "\$last" = 'remove-old-cwd' ]; then
+  rmdir '$removed_restore_cwd' || exit 31
+  exit 0
+fi
+expect_file=''
+previous=''
+for a in "\$@"; do
+  if [ "\$previous" = '-f' ]; then expect_file="\$a"; fi
+  previous="\$a"
+done
+[ -n "\$expect_file" ] && [ -f "\$expect_file" ] || exit 19
+if [ "\$last" = 'terminate' ]; then kill -TERM "\$\$"; fi
+printf 'STREAM-MARKER\n'
+exit 7
+STUB
+    );
+    chmod 0755, File::Spec->catfile( $streambin, 'docker' );
+
+    my $old = getcwd();
+    chdir $repo or die $!;
+    local $ENV{PATH} = "$streambin:$ENV{PATH}";
+    my $stream_dry = $docker->run_streaming( args => ['up'], dry_run => 1 );
+    ok( !exists $stream_dry->{exit_code}, 'streaming runner dry-run returns resolution data without executing Compose' );
+    unlink $stream_log if -e $stream_log;
+    for my $action (
+        [ up    => [ 'up', '-d', 'app' ] ],
+        [ build => [ 'build', 'app' ] ],
+        [ down  => ['down'] ],
+    ) {
+        my ( $label, $args ) = @{$action};
+        my ( $stdout, $stderr, $result );
+        ( $stdout, $stderr ) = capture {
+            my $resolved = $label eq 'build' ? $docker->resolve( args => $args ) : undef;
+            $result = defined $resolved
+              ? $docker->run_streaming( resolved => $resolved )
+              : $docker->run_streaming( args => $args );
+        };
+        is( $result->{exit_code}, 7, "streaming $label operation returns the Compose command exit status" );
+        like( $stdout, qr/STREAM-MARKER/, "streaming $label operation exposes Compose stdout" );
+        is( $stderr, '', "streaming $label operation leaves Compose stderr available without swallowing it" );
+    }
+    my ( $signal_stdout, $signal_stderr, $signal_result );
+    ( $signal_stdout, $signal_stderr ) = capture {
+        $signal_result = $docker->run_streaming( args => ['terminate'] );
+    };
+    is( $signal_result->{exit_code}, 143, 'streaming runner reports a Compose child terminated by SIGTERM as exit 143' );
+
+    open my $stream_fh, '<', $stream_log or die "Unable to read $stream_log: $!";
+    my @stream_calls = <$stream_fh>;
+    close $stream_fh;
+    chomp @stream_calls;
+    is( scalar @stream_calls, 8, 'streaming up, build, down, and another action each materialize and invoke Compose' );
+    for my $index ( 0, 2, 4, 6 ) {
+        like( $stream_calls[$index], qr/(?:^| )config$/, 'each streaming action first materializes its layered Compose files' );
+    }
+    for my $index ( 1, 3, 5, 7 ) {
+        my @file_flags = ( $stream_calls[$index] =~ /-f (\S+)/g );
+        is( scalar @file_flags, 1, 'each streaming operational action uses one merged Compose file' );
+        like( $stream_calls[$index], qr/--project-directory \Q$repo\E/, 'each streaming operational action retains the invocation project directory' );
+    }
+
+    my $fileless_compose = File::Spec->catfile( $home, 'streaming-fileless-compose.yml' );
+    mkfile( $fileless_compose, "services: {}\n" );
+    my ( $no_env_stdout, $no_env_stderr, $no_env_result );
+    ( $no_env_stdout, $no_env_stderr ) = capture {
+        $no_env_result = $docker->run_streaming(
+            resolved => {
+                command      => [ 'docker', 'compose', '-f', $fileless_compose, 'no-env-action' ],
+                compose_root => $repo,
+                env          => {},
+                files        => [],
+            },
+        );
+    };
+    is( $no_env_result->{exit_code}, 7, 'streaming runner executes a fileless resolved command with no environment overrides' );
+    like( $no_env_stdout, qr/STREAM-MARKER/, 'fileless streaming commands preserve inherited output' );
+    is( $no_env_stderr, '', 'fileless streaming commands leave stderr untouched' );
+
+    my $missing_command_error = '';
+    my ( $missing_command_stdout, $missing_command_stderr ) = capture {
+        eval {
+            $docker->run_streaming(
+                resolved => {
+                    command      => [ File::Spec->catfile( $home, 'no-such-compose-executable' ) ],
+                    compose_root => $repo,
+                    env          => {},
+                    files        => [],
+                },
+            );
+            1;
+        } or $missing_command_error = $@;
+    };
+    like( $missing_command_error, qr/Unable to execute Docker Compose/, 'streaming runner reports a command that the operating system cannot execute' );
+    like( $missing_command_stderr, qr/Can't exec/, 'streaming runner leaves the operating system execution diagnostic visible' );
+    is( getcwd(), $repo, 'streaming runner restores cwd after the operational command cannot start' );
+
+    my $missing_root_error = '';
+    eval {
+        $docker->run_streaming(
+            resolved => {
+                command      => [ 'docker', 'compose', 'unused' ],
+                compose_root => File::Spec->catdir( $home, 'no-such-compose-root' ),
+                env          => {},
+                files        => [],
+            },
+        );
+        1;
+    } or $missing_root_error = $@;
+    like( $missing_root_error, qr/Unable to chdir/, 'streaming runner reports a missing Compose working directory' );
+    is( getcwd(), $repo, 'streaming runner restores cwd after a working-directory error' );
+
+    SKIP: {
+        skip 'an open working directory cannot be removed on Windows', 1 if $^O eq 'MSWin32';
+        chdir $removed_restore_cwd or die $!;
+        my $restore_error = '';
+        eval {
+            $docker->run_streaming(
+                resolved => {
+                    command      => [ 'docker', 'compose', 'remove-old-cwd' ],
+                    compose_root => $repo,
+                    env          => {},
+                    files        => [],
+                },
+            );
+            1;
+        } or $restore_error = $@;
+        like( $restore_error, qr/Unable to restore cwd/, 'streaming runner reports failure to restore a removed invocation directory' );
+        chdir $repo or die $!;
+    }
+    chdir $old or die $!;
+}
+
+# ---------------------------------------------------------------------------
+# Problem 40: the base Compose config, not CLI service arguments or every
+# configured service folder, is authoritative for selecting service overlays.
+# The first config pass must therefore contain only non-service inputs; a
+# second config pass may add overlays for services present in its output.
+# ---------------------------------------------------------------------------
+{
+    my $p40_home = tempdir( CLEANUP => 1 );
+    my $p40_repo = File::Spec->catdir( $p40_home, 'project' );
+    my $p40_project_directory = File::Spec->catdir( $p40_home, 'explicit-project-directory' );
+    my $p40_explicit_file = File::Spec->catfile( $p40_home, 'explicit-base.yaml' );
+    my $p40_bin  = File::Spec->catdir( $p40_home, 'bin' );
+    my $p40_log  = File::Spec->catfile( $p40_home, 'compose-calls.log' );
+    my $p40_env_log = File::Spec->catfile( $p40_home, 'compose-env.log' );
+    make_path( File::Spec->catdir( $p40_repo, '.git' ), $p40_project_directory, $p40_bin );
+    mkfile( File::Spec->catfile( $p40_repo, 'compose.yaml' ), "services:\n  source_only:\n    image: base\n  blocked:\n    image: base\n" );
+    mkfile( $p40_explicit_file, "services:\n  present:\n    image: explicit-input\n" );
+    mkfile( File::Spec->catfile( $p40_repo, 'compose.extra.yaml' ), "services:\n  present:\n    image: project-overlay\n" );
+    mkfile( File::Spec->catfile( $p40_repo, '.developer-dashboard.json' ), <<'P40_CONFIG' );
+{
+  "docker": {
+    "project_overlays": ["compose.extra.yaml"]
+  }
+}
+P40_CONFIG
+    mkfile( File::Spec->catfile( $p40_home, '.developer-dashboard', 'config', 'docker', 'present', 'compose.yml' ), "services:\n  present:\n    labels:\n      from-overlay: home\n" );
+    mkfile( File::Spec->catfile( $p40_home, '.developer-dashboard', 'config', 'docker', 'present', 'development.compose.yml' ), "services:\n  present:\n    environment:\n      HOME_DEVELOPMENT: enabled\n" );
+    mkfile( File::Spec->catfile( $p40_home, '.developer-dashboard', 'skills', 'alpha', 'config', 'docker', 'present', 'compose.yml' ), "services:\n  present:\n    labels:\n      from-overlay: skill\n" );
+    mkfile( File::Spec->catfile( $p40_home, '.developer-dashboard', 'skills', 'alpha', 'config', 'docker', 'present', 'development.compose.yml' ), "services:\n  present:\n    environment:\n      SKILL_DEVELOPMENT: enabled\n" );
+    mkfile( File::Spec->catfile( $p40_home, '.developer-dashboard', 'skills', 'alpha', '.env' ), "P40_SKILL_ENV=alpha\n" );
+    mkfile( File::Spec->catfile( $p40_home, '.developer-dashboard', 'config', 'docker', 'present', 'develop.yml' ), "development: 1\n" );
+    mkfile( File::Spec->catfile( $p40_home, '.developer-dashboard', 'config', 'docker', 'blocked', 'compose.yml' ), "services:\n  blocked:\n    image: must-not-load\n" );
+    mkfile( File::Spec->catfile( $p40_home, '.developer-dashboard', 'config', 'docker', 'blocked', 'disabled.yml' ), "disabled: 1\n" );
+    mkfile( File::Spec->catfile( $p40_home, '.developer-dashboard', 'config', 'docker', 'ghost', 'compose.yml' ), "services:\n  ghost:\n    image: must-not-load\n" );
+    mkfile(
+        File::Spec->catfile( $p40_bin, 'docker' ),
+        <<'P40_STUB'
+#!/bin/sh
+printf '%s\n' "$*" >> "$P40_DOCKER_LOG"
+last=''
+for arg in "$@"; do last="$arg"; done
+case "$*" in
+    *'/skills/alpha/'*) printf 'config=%s\n' "$P40_SKILL_ENV" >> "$P40_ENV_LOG" ;;
+esac
+if [ "$last" != 'config' ]; then printf 'operation=%s\n' "$P40_SKILL_ENV" >> "$P40_ENV_LOG"; fi
+if [ "$last" = 'config' ]; then
+    case "${P40_COMPOSE_OUTPUT:-valid}" in
+        malformed) printf 'services: [\n' ;;
+        scalar) printf '%s\n' '[]' ;;
+        no_services) printf '%s\n' '{}' ;;
+        present_only) printf '%s\n' 'services:' '  present: {}' ;;
+        invalid_services) printf '%s\n' 'services: []' ;;
+        empty_service) printf '%s\n' 'services:' '  "": {}' ;;
+        dot_service) printf '%s\n' 'services:' '  ".": {}' ;;
+        dotdot_service) printf '%s\n' 'services:' '  "..": {}' ;;
+        unsafe_service) printf '%s\n' 'services:' '  "../outside": {}' ;;
+        *) printf 'services:\n  present:\n    image: base\n  blocked:\n    image: base\n' ;;
+    esac
+fi
+exit 0
+P40_STUB
+    );
+    chmod 0755, File::Spec->catfile( $p40_bin, 'docker' );
+    local $ENV{HOME} = $p40_home;
+    local $ENV{P40_DOCKER_LOG} = $p40_log;
+    local $ENV{P40_ENV_LOG} = $p40_env_log;
+    local $ENV{P40_SKILL_ENV};
+    local $ENV{PATH} = "$p40_bin:$ENV{PATH}";
+    my ( $p40_docker, undef ) = build_docker( $p40_home, $p40_repo );
+    my $old = getcwd();
+    chdir $p40_repo or die $!;
+    my $result;
+    {
+        local *Developer::Dashboard::DockerCompose::_local_compose_services = sub {
+            die 'execution must obtain services from docker compose config, not a raw YAML read';
+        };
+        $result = $p40_docker->run(
+            args => [ '--project-directory', $p40_project_directory, '-f', $p40_explicit_file, 'build', 'ghost' ],
+        );
+    }
+    chdir $old or die $!;
+
+    is( $result->{exit_code}, 0, 'base-config service selection completes the requested Compose operation' );
+    open my $calls_fh, '<', $p40_log or die "Unable to read $p40_log: $!";
+    my @calls = <$calls_fh>;
+    close $calls_fh or die "Unable to close $p40_log: $!";
+    chomp @calls;
+    is( scalar @calls, 3, 'Compose resolves base services, materializes selected overlays, then runs the operation' );
+    open my $env_fh, '<', $p40_env_log or die "Unable to read $p40_env_log: $!";
+    my @env_observations = <$env_fh>;
+    close $env_fh or die "Unable to close $p40_env_log: $!";
+    chomp @env_observations;
+    is_deeply( \@env_observations, [ 'config=alpha', 'operation=alpha' ], 'selected skill environment reaches final config and operation but not the base-service probe' );
+    like( $calls[0] || '', qr/(?:^| )config\z/, 'first Compose call resolves the base config' );
+    unlike( $calls[0] || '', qr/config\/docker\//, 'base service discovery does not preload runtime service overlays' );
+    like( $calls[0] || '', qr/--project-directory \Q$p40_project_directory\E/, 'base config preserves the explicit project directory' );
+    like( $calls[0] || '', qr/\Q$p40_explicit_file\E/, 'base config preserves explicit -f input without argv offset assumptions' );
+    like( $calls[0] || '', qr/compose\.extra\.yaml/, 'base service discovery includes configured non-service project overlays' );
+    like( $calls[1] || '', qr{/present/compose\.yml}, 'effective materialization includes an overlay for a base-config service' );
+    like( $calls[1] || '', qr/--project-directory \Q$p40_project_directory\E/, 'overlay config preserves the explicit project directory' );
+    like( $calls[1] || '', qr/\Q$p40_explicit_file\E/, 'overlay config retains explicit -f base input' );
+    like( $calls[1] || '', qr{/present/development\.compose\.yml}, 'effective materialization includes development overlays when the marker is enabled' );
+    like( $calls[1] || '', qr{/skills/alpha/config/docker/present/compose\.yml}, 'service discovery searches installed skill runtime layers' );
+    unlike( $calls[1] || '', qr{/blocked/compose\.yml}, 'disabled services contribute no service overlay' );
+    unlike( $calls[1] || '', qr{/ghost/compose\.yml}, 'effective materialization ignores a CLI service absent from the base config' );
+    like( $calls[2] || '', qr/(?:^| )build ghost\z/, 'requested operation arguments remain intact after explicit command construction' );
+    like( $calls[2] || '', qr/--project-directory \Q$p40_project_directory\E/, 'final operation retains the explicit project directory' );
+
+    # An explicit -f file is itself the base when no conventional local base
+    # exists. It must still be resolved before runtime service directories are
+    # considered, rather than triggering legacy broad auto-discovery.
+    my $p40_explicit_only_repo = File::Spec->catdir( $p40_home, 'explicit-only-project' );
+    make_path( File::Spec->catdir( $p40_explicit_only_repo, '.git' ) );
+    mkfile( $p40_log, '' );
+    mkfile( $p40_env_log, '' );
+    local $ENV{P40_COMPOSE_OUTPUT} = 'present_only';
+    chdir $p40_explicit_only_repo or die $!;
+    my $explicit_only_result = $p40_docker->run(
+        project_root => $p40_explicit_only_repo,
+        args         => [ '-f', $p40_explicit_file, 'build', 'ghost' ],
+    );
+    chdir $old or die $!;
+    is( $explicit_only_result->{exit_code}, 0, 'an explicit-only base config resolves before service overlay discovery' );
+    open my $explicit_calls_fh, '<', $p40_log or die "Unable to read $p40_log: $!";
+    my @explicit_calls = <$explicit_calls_fh>;
+    close $explicit_calls_fh or die "Unable to close $p40_log: $!";
+    chomp @explicit_calls;
+    is( scalar @explicit_calls, 3, 'explicit-only base is resolved, selected overlay is materialized, then operation runs' );
+    like( $explicit_calls[0] || '', qr/\Q$p40_explicit_file\E/, 'first config uses the only explicit base file' );
+    unlike( $explicit_calls[0] || '', qr/config\/docker\//, 'explicit-only base config does not preload runtime service overlays' );
+    like( $explicit_calls[1] || '', qr{/present/compose\.yml}, 'explicit-only base service selects its matching runtime overlay' );
+    unlike( $explicit_calls[1] || '', qr{/ghost/compose\.yml}, 'CLI-only service does not add an overlay with explicit-only base' );
+    my @explicit_env_observations = do {
+        open my $explicit_env_fh, '<', $p40_env_log or die "Unable to read $p40_env_log: $!";
+        my @observations = <$explicit_env_fh>;
+        close $explicit_env_fh or die "Unable to close $p40_env_log: $!";
+        chomp @observations;
+        @observations;
+    };
+    is_deeply( \@explicit_env_observations, [ 'config=alpha', 'operation=alpha' ], 'explicit-only base defers service environment until the base services are known' );
+
+}
+
+# Problem 43: an explicitly selected skill service must own interpolation for
+# that invocation even when the base config contains several skill services.
+# ---------------------------------------------------------------------------
+{
+    my $p43_home = File::Spec->catdir( $home, 'p43-home' );
+    my $p43_repo = File::Spec->catdir( $home, 'p43-project' );
+    my $p43_bin  = File::Spec->catdir( $home, 'p43-bin' );
+    my $p43_log  = File::Spec->catfile( $home, 'p43-compose-env.log' );
+    make_path($p43_repo, $p43_bin);
+
+    for my $pair ( [ foo => 'I am foo' ], [ bar => 'I am bar' ] ) {
+        my ( $skill, $value ) = @{$pair};
+        my $skill_root = File::Spec->catdir( $p43_home, '.developer-dashboard', 'skills', $skill );
+        mkfile( File::Spec->catfile( $skill_root, '.env' ), "SKILL_WILL_OVERWRITE_THIS=$value\n" );
+        mkfile(
+            File::Spec->catfile( $skill_root, 'config', 'docker', $skill, 'compose.yml' ),
+            "services:\n  $skill:\n    image: alpine\n    environment:\n      MESSAGE: \${SKILL_WILL_OVERWRITE_THIS:-UNDEFINED}\n",
+        );
+    }
+
+    mkfile(
+        File::Spec->catfile( $p43_bin, 'docker' ),
+        <<P43_STUB,
+#!/bin/sh
+last=''
+for arg in "\$@"; do last="\$arg"; done
+printf '%s|%s\\n' "\${SKILL_WILL_OVERWRITE_THIS-UNSET}" "\$*" >> '$p43_log'
+if [ "\$last" = config ]; then
+  printf 'services:\\n  bar:\\n    image: alpine\\n  foo:\\n    image: alpine\\n'
+fi
+exit 0
+P43_STUB
+    );
+    chmod 0755, File::Spec->catfile( $p43_bin, 'docker' );
+
+    my ($p43_docker) = build_docker( $p43_home, $p43_repo );
+    is_deeply(
+        [ $p43_docker->_compose_environment_services() ],
+        [],
+        'Problem 43: omitted selector arguments safely resolve to an empty service set',
+    );
+    is_deeply(
+        [ $p43_docker->_compose_environment_services(
+            requested_services => [],
+            operation_args     => [ 'up', 'bar' ],
+            base_services      => [ 'bar', 'foo' ],
+            project_root       => $p43_repo,
+        ) ],
+        ['bar'],
+        'Problem 43: deferred service discovery infers the selected base service for env interpolation',
+    );
+    is_deeply(
+        [ $p43_docker->_compose_environment_services(
+            requested_services => [],
+            operation_args     => ['up'],
+            base_services      => [ 'bar', 'foo' ],
+            project_root       => $p43_repo,
+        ) ],
+        [ 'bar', 'foo' ],
+        'Problem 43: an operation without a service selection uses all effective base services',
+    );
+    is_deeply(
+        [ $p43_docker->_compose_environment_services(
+            requested_services => ['missing'],
+            operation_args     => [],
+            base_services      => [ 'bar', 'foo' ],
+            project_root       => $p43_repo,
+        ) ],
+        [ 'bar', 'foo' ],
+        'Problem 43: a CLI service absent from Compose does not suppress effective base env layers',
+    );
+
+    my $old = getcwd();
+    chdir $p43_repo or die $!;
+    local $ENV{PATH} = "$p43_bin:$ENV{PATH}";
+
+    for my $case ( [ foo => 'I am foo' ], [ bar => 'I am bar' ] ) {
+        my ( $service, $expected ) = @{$case};
+        unlink $p43_log if -e $p43_log;
+        my $result = $p43_docker->run_streaming( args => [ 'up', $service ] );
+        is( $result->{exit_code}, 0, "Problem 43: Compose up $service completes" );
+
+        open my $observed_fh, '<', $p43_log or die "Unable to read $p43_log: $!";
+        my @observed = <$observed_fh>;
+        close $observed_fh or die "Unable to close $p43_log: $!";
+        chomp @observed;
+        is( scalar @observed, 3, "Problem 43: Compose up $service probes base, materializes, and runs" );
+        like( $observed[1] || '', qr/^\Q$expected\E\|.* config\z/, "Problem 43: $service value is used while materializing the merged config" );
+        like( $observed[2] || '', qr/^\Q$expected\E\|.* up \Q$service\E\z/, "Problem 43: $service value reaches the selected operation" );
+    }
+
+    chdir $old or die $!;
+}
+
 # ---------------------------------------------------------------------------
 # DD-857: run() pre-materializes multiple -f layers via `docker compose
 # ... config` into one temp file, then runs the real command against just
@@ -311,7 +716,17 @@ printf '%s\\n' "\$*" >> '$invocation_log'
 last=''
 for a in "\$\@"; do last="\$a"; done
 if [ "\$last" = 'config' ]; then
-  printf 'services:\\n  merged-marker:\\n    image: stub\\n'
+  case "\${P40_COMPOSE_OUTPUT:-valid}" in
+    malformed) printf 'services: [\\n' ;;
+    scalar) printf '%s\\n' '[]' ;;
+    no_services) printf '%s\\n' '{}' ;;
+    invalid_services) printf '%s\\n' 'services: []' ;;
+    empty_service) printf '%s\\n' 'services:' '  "": {}' ;;
+    dot_service) printf '%s\\n' 'services:' '  ".": {}' ;;
+    dotdot_service) printf '%s\\n' 'services:' '  "..": {}' ;;
+    unsafe_service) printf '%s\\n' 'services:' '  "../outside": {}' ;;
+    *) printf 'services:\\n  merged-marker:\\n    image: stub\\n' ;;
+  esac
 fi
 exit 0
 STUB
@@ -353,8 +768,99 @@ chmod 0755, File::Spec->catfile( $logbin, 'docker' );
     like( $final_call, qr/ app$/, 'the executed call still carries the original passthrough args (app)' );
 }
 
-# run() when resolve() names zero compose files - materialization is skipped
-# and the original (file-less) command runs directly. Uses its OWN fresh,
+# Operational commands must retain the invocation Compose root after layered
+# files are materialized into a temporary merged file. Without an explicit
+# project directory, Compose derives relative paths and the default project
+# name from that temporary file instead of the user's local Compose project.
+{
+    my $old = getcwd();
+    chdir $repo or die $!;
+    local $ENV{PATH} = "$logbin:$ENV{PATH}";
+
+    for my $action (
+        [ up    => [ 'up', '-d', 'app' ] ],
+        [ build => [ 'build', 'app' ] ],
+        [ down  => ['down'] ],
+    ) {
+        unlink $invocation_log if -e $invocation_log;
+        my ( $label, $args ) = @{$action};
+        my $result = $docker->run( args => $args );
+        is( $result->{exit_code}, 0, "$label operation succeeds after layered config materialization" );
+
+        open my $log_fh, '<', $invocation_log or die "Unable to read $invocation_log: $!";
+        my @lines = <$log_fh>;
+        close $log_fh;
+        chomp @lines;
+        like( $lines[0] || '', qr/--project-directory \Q$repo\E/, "$label materialization uses the invocation Compose directory" );
+        my $final_call = $lines[-1] || '';
+        like(
+            $final_call,
+            qr/--project-directory \Q$repo\E/,
+            "$label operation keeps the invocation directory as Compose project directory",
+        );
+        like( $final_call, qr/(?:^| )\Q$label\E(?: |$)/, "$label operation remains the requested Compose action" );
+    }
+
+    chdir $old or die $!;
+}
+
+{
+    my $custom_project_dir = File::Spec->catdir( $home, 'explicit-compose-project' );
+    make_path($custom_project_dir);
+    my $old = getcwd();
+    chdir $repo or die $!;
+    local $ENV{PATH} = "$logbin:$ENV{PATH}";
+
+    for my $project_option (
+        [ separate => [ '--project-directory', $custom_project_dir ] ],
+        [ equals   => [ "--project-directory=$custom_project_dir" ] ],
+    ) {
+        unlink $invocation_log if -e $invocation_log;
+        my ( $label, $option_args ) = @{$project_option};
+        $docker->run( args => [ @{$option_args}, 'up', 'app' ] );
+        open my $log_fh, '<', $invocation_log or die "Unable to read $invocation_log: $!";
+        my @lines = <$log_fh>;
+        close $log_fh;
+        chomp @lines;
+        like( $lines[0] || '', qr/--project-directory(?:=| )\Q$custom_project_dir\E/, "explicit $label project directory also applies while materializing" );
+        my $final_call = $lines[-1] || '';
+        like( $final_call, qr/--project-directory(?:=| )\Q$custom_project_dir\E/, "explicit $label project-directory option is preserved" );
+        unlike( $final_call, qr/--project-directory \Q$repo\E/, "explicit $label project-directory option is not overridden" );
+    }
+
+    chdir $old or die $!;
+}
+
+# Materialization must reject malformed project-directory and undefined argv
+# values before invoking Compose, instead of letting the temporary -f file
+# change how a malformed invocation is interpreted.
+{
+    my $old = getcwd();
+    chdir $repo or die $!;
+    local $ENV{PATH} = "$logbin:$ENV{PATH}";
+
+    for my $case (
+        [ missing_value => ['--project-directory'], qr/--project-directory requires a path/ ],
+        [ empty_separate => [ '--project-directory', '' ], qr/--project-directory requires a path/ ],
+        [ empty_value   => [ '--project-directory=', 'up' ], qr/--project-directory requires a path/ ],
+        [ flag_value    => [ '--project-directory', '--bogus', 'up' ], qr/--project-directory requires a path/ ],
+        [ undefined_arg => [ undef, 'up' ], qr/argument 1 is undefined/ ],
+    ) {
+        my ( $label, $args, $expected_error ) = @{$case};
+        unlink $invocation_log if -e $invocation_log;
+        my $error = '';
+        eval { $docker->run( args => $args ); 1 } or $error = $@;
+        like( $error, $expected_error, "$label is rejected with a clear error" );
+        ok( !-e $invocation_log, "$label is rejected before invoking Docker Compose" );
+    }
+
+    chdir $old or die $!;
+}
+
+# run() when resolve() names zero explicit compose files - Compose still gets
+# a config phase from the invocation root before the requested operation. This
+# isolated case verifies call ordering; the source-base case below verifies the
+# actual local-file discovery and byte normalization. Uses its OWN fresh,
 # isolated home - the shared $home above has home-layer docker services
 # (green/blue/purple) that resolve() auto-discovers for ANY repo beneath it,
 # so it can never itself produce a zero-files resolution.
@@ -372,11 +878,24 @@ chmod 0755, File::Spec->catfile( $logbin, 'docker' );
     my $result = $empty_docker->run( args => ['ps'] );
     chdir $old or die $!;
 
-    is( $result->{exit_code}, 0, 'run with zero compose files still succeeds' );
+    is( $result->{exit_code}, 0, 'run with zero explicit compose files still succeeds' );
     open my $log_fh, '<', $invocation_log or die "Unable to read $invocation_log: $!";
     my @lines = <$log_fh>;
     close $log_fh;
-    is( scalar(@lines), 1, 'run with zero files invokes docker exactly once - no materialize step' );
+    is( scalar(@lines), 2, 'run with zero explicit files materializes config before invoking the requested operation' );
+    like( $lines[0], qr/\bconfig\s*\n\z/, 'zero-file resolution first asks Compose to materialize from the invocation root' );
+    like( $lines[1], qr/\s-f\s+\S+\s+ps\s*\n\z/, 'zero-file resolution then runs the requested operation against the materialized config' );
+
+    for my $command (
+        [ File::Spec->catfile( $home, 'standalone-helper' ) ],
+        [ 'standalone-helper', 'argument' ],
+        [ 'docker', 'not-compose', 'argument' ],
+    ) {
+        my $unchanged = $empty_docker->_materialized_command(
+            { files => [], command => $command, compose_root => $empty_repo }
+        );
+        is_deeply( $unchanged, $command, 'a non-Compose command is returned unchanged when no files were resolved' );
+    }
 }
 
 # run() dies with the merge's own stderr when the materialize-via-config call
@@ -393,6 +912,178 @@ chmod 0755, File::Spec->catfile( $logbin, 'docker' );
     my $err = eval { $docker->run( addons => ['mailhog'], args => ['config'], modes => ['dev'] ); 1 } ? '' : $@;
     chdir $old or die $!;
     like( $err, qr/Unable to materialize merged docker compose config \(3\): boom: bad compose file/, 'run dies with the materialize command\'s own exit code and stderr when config itself fails' );
+}
+
+# Materialized Compose YAML must be UTF-8 even when a Compose/plugin output
+# string contains a legacy single-byte character. This is the producer path
+# behind Problem 38: `d2 docker compose config` captures Compose output and
+# writes it as the temporary merged file consumed by later commands.
+{
+    my $utf8bin = File::Spec->catdir( $home, 'compose-utf8-bin' );
+    make_path($utf8bin);
+    my $compose_stub = File::Spec->catfile( $utf8bin, 'docker' );
+    mkfile( $compose_stub, "#!/bin/sh\nprintf \"services:\\\\n  app:\\\\n    labels:\\\\n      - 'price=\\\\243'\\\\n\"\n" );
+    chmod 0755, $compose_stub or die "Unable to chmod $compose_stub: $!";
+
+    my $old = getcwd();
+    chdir $repo or die $!;
+    local $ENV{PATH} = "$utf8bin:$ENV{PATH}";
+    my $resolved = $docker->resolve( args => ['config'] );
+    my $command = $docker->_materialized_command($resolved);
+    chdir $old or die $!;
+
+    my $merged_file;
+    for ( my $index = 0; $index < @{$command} - 1; $index++ ) {
+        $merged_file = $command->[ $index + 1 ] if $command->[$index] eq '-f';
+    }
+    ok( defined $merged_file && -f $merged_file, 'materialization creates the merged Compose YAML file' );
+    my $merged_bytes;
+    open my $merged_fh, '<:raw', $merged_file or die "Unable to read $merged_file: $!";
+    { local $/; $merged_bytes = <$merged_fh> }
+    close $merged_fh or die "Unable to close $merged_file: $!";
+    is( $merged_bytes, encode( 'UTF-8', "services:\n  app:\n    labels:\n      - 'price=\x{00A3}'\n" ), 'materialized YAML converts the legacy pound byte to UTF-8' );
+    my $merged_document = eval { YAML::XS::Load($merged_bytes) };
+    is( $@, '', 'YAML::XS accepts the generated merged YAML without a UTF-8 error' );
+    is( $merged_document->{services}{app}{labels}[0], 'price=£', 'generated merged configuration preserves the pound sign' );
+}
+
+# The same byte-clean merged file must be used for every operational command,
+# not just `config`: run_streaming is the public path for up/down/build and other
+# Compose operations.
+{
+    my $all_actions_bin = File::Spec->catdir( $home, 'compose-utf8-actions-bin' );
+    make_path($all_actions_bin);
+    my $action_state = File::Spec->catfile( $home, 'compose-utf8-action-count' );
+    my $compose_stub = File::Spec->catfile( $all_actions_bin, 'docker' );
+    mkfile(
+        $compose_stub,
+        <<STUB
+#!/bin/sh
+count=0
+[ -f '$action_state' ] && count=\$(cat '$action_state')
+count=\$((count + 1))
+printf '%s' "\$count" > '$action_state'
+if [ "\$count" -eq 1 ]; then
+  printf "services:\\n  app:\\n    labels:\\n      - 'price=\\243'\\n"
+  exit 0
+fi
+merged=''
+previous=''
+for argument in "\$@"; do
+  if [ "\$previous" = '-f' ]; then merged="\$argument"; fi
+  previous="\$argument"
+done
+[ -n "\$merged" ] && [ -f "\$merged" ] || exit 41
+LC_ALL=C grep -Fq 'price=' "\$merged" || exit 42
+exit 0
+STUB
+    );
+    chmod 0755, $compose_stub or die "Unable to chmod $compose_stub: $!";
+
+    my $old = getcwd();
+    chdir $repo or die $!;
+    local $ENV{PATH} = "$all_actions_bin:$ENV{PATH}";
+    for my $action ( qw(config up down build ps logs) ) {
+        unlink $action_state if -e $action_state;
+        my $result = $docker->run_streaming( args => [$action] );
+        is( $result->{exit_code}, 0, "materialized UTF-8 YAML is consumed successfully by Compose $action" );
+    }
+    chdir $old or die $!;
+}
+
+# A legacy byte in the user's source Compose file must not make the resolver's
+# early service-discovery parse fail before `docker compose config` can
+# materialize and normalize the effective YAML.
+{
+    my $legacy_repo = File::Spec->catdir( $home, 'projects', 'legacy-byte-base' );
+    make_path( File::Spec->catdir( $legacy_repo, '.git' ) );
+    my $base_file = File::Spec->catfile( $legacy_repo, 'compose.yaml' );
+    open my $base_fh, '>:raw', $base_file or die "Unable to write $base_file: $!";
+    print {$base_fh} "services:\n  app:\n    image: stub\n    labels:\n      - price=" . pack( 'C', 0xA3 ) . "\n";
+    close $base_fh or die "Unable to close $base_file: $!";
+
+    my ( $legacy_docker, undef ) = build_docker( $home, $legacy_repo );
+    my $legacy_bin = File::Spec->catdir( $home, 'compose-legacy-byte-bin' );
+    make_path($legacy_bin);
+    my $legacy_log = File::Spec->catfile( $home, 'compose-legacy-byte.log' );
+    my $materialized_copy = File::Spec->catfile( $home, 'compose-legacy-byte-materialized.yml' );
+    my $legacy_stub = File::Spec->catfile( $legacy_bin, 'docker' );
+    mkfile(
+        $legacy_stub,
+        <<STUB
+#!/bin/sh
+printf '%s\\n' "\$*" >> '$legacy_log'
+last=''
+for argument in "\$@"; do last="\$argument"; done
+if [ "\$last" = 'config' ]; then
+  cat '$base_file'
+  exit \$?
+fi
+merged=''
+previous=''
+for argument in "\$@"; do
+  if [ "\$previous" = '-f' ]; then merged="\$argument"; fi
+  previous="\$argument"
+done
+[ -n "\$merged" ] && [ -f "\$merged" ] || exit 41
+cp "\$merged" '$materialized_copy' || exit 42
+exit 0
+STUB
+    );
+    chmod 0755, $legacy_stub or die "Unable to chmod $legacy_stub: $!";
+
+    my $old = getcwd();
+    chdir $legacy_repo or die $!;
+    local $ENV{PATH} = "$legacy_bin:$ENV{PATH}";
+    my $error = '';
+    my $result;
+    eval { $result = $legacy_docker->run_streaming( args => ['ps'] ); 1 } or $error = $@;
+    chdir $old or die $!;
+
+    is( $error, '', 'legacy byte in the local base survives resolver service discovery' );
+    is( $result->{exit_code}, 0, 'Compose operation succeeds after local-base UTF-8 normalization' ) if !$error;
+    my @calls;
+    if ( open my $log_fh, '<', $legacy_log ) {
+        @calls = <$log_fh>;
+        close $log_fh or die "Unable to close $legacy_log: $!";
+    }
+    else {
+        diag("The Compose stub was not reached: $!");
+    }
+    is( scalar @calls, 2, 'local base is materialized before the requested Compose operation' );
+    like( $calls[0] || '', qr/(?:^| )config\s*\n\z/, 'first call is Compose config over the raw local base' );
+    like( $calls[0] || '', qr/ -f \Q$base_file\E config\s*\n\z/, 'first call includes the source base file' );
+    like( $calls[1] || '', qr/ -f \S+ ps\s*\n\z/, 'second call uses the materialized file for ps' );
+
+    my $materialized_bytes = '';
+    if ( open my $copy_fh, '<:raw', $materialized_copy ) {
+        { local $/; $materialized_bytes = <$copy_fh> }
+        close $copy_fh or die "Unable to close $materialized_copy: $!";
+    }
+    else {
+        diag("No materialized file reached the operational command: $!");
+    }
+    is(
+        $materialized_bytes,
+        encode( 'UTF-8', "services:\n  app:\n    image: stub\n    labels:\n      - price=\x{00A3}\n" ),
+        'the actual source-file legacy byte is normalized in the file passed to the operation',
+    );
+}
+
+# UTF-8 normalization preserves already-valid UTF-8 of each sequence length,
+# converts isolated Windows-1252 bytes, and also handles Unicode Perl strings.
+{
+    my $normalizer = \&Developer::Dashboard::DockerCompose::_compose_yaml_utf8_bytes;
+    is( $normalizer->('plain ASCII'), 'plain ASCII', 'Compose YAML normalizer keeps ASCII bytes unchanged' );
+    for my $unicode ( "\x{00A3}", "\x{20AC}", "\x{1F433}" ) {
+        my $encoded = encode( 'UTF-8', $unicode );
+        is( $normalizer->($encoded), $encoded, 'Compose YAML normalizer preserves valid UTF-8 sequences' );
+    }
+    my $unicode_output = "price=\x{00A3}";
+    utf8::upgrade($unicode_output);
+    ok( utf8::is_utf8($unicode_output), 'normalizer fixture is held as a Unicode character string' );
+    is( $normalizer->($unicode_output), encode( 'UTF-8', "price=\x{00A3}" ), 'Compose YAML normalizer encodes Unicode-flagged output as UTF-8 bytes' );
+    is( $normalizer->(undef), '', 'Compose YAML normalizer treats undefined output as empty text' );
 }
 
 # run() with a chdir target that does not exist -> chdir failure die path.
@@ -920,6 +1611,226 @@ JSON
     like( $@, qr/Usage: dashboard docker enable/, 'enable dies without service' );
 }
 
+# Problem 40 materializer/parser edge cases: the final service selection must
+# be driven by valid Compose output and option parsing must preserve the user
+# argv without calculating the operation offset from -f pairs.
+{
+    local $ENV{PATH} = "$logbin:$ENV{PATH}";
+    my $parts = $docker->_compose_argument_parts(
+        args => [
+            '-f', 'base.yml', '--file', 'extra.yml',
+            '-p', 'named', '--env-file', '.env', '--profile', 'dev',
+            '--ansi', 'never', '--progress', 'plain', '--parallel', '4',
+            '--project-directory', '/first', '--project-directory=/final',
+            'build', 'app', '--help',
+        ],
+        compose_root => $repo,
+    );
+    is_deeply(
+        $parts,
+        {
+            global_args       => [ '-p', 'named', '--env-file', '.env', '--profile', 'dev', '--ansi', 'never', '--progress', 'plain', '--parallel', '4' ],
+            files             => [ 'base.yml', 'extra.yml' ],
+            project_directory => ['--project-directory=/final'],
+            operation_args    => [ 'build', 'app', '--help' ],
+        },
+        'Compose argument parser separates global flags, repeated files, project directory, and operation arguments',
+    );
+    my $inline_project_name = $docker->_compose_argument_parts(
+        args => ['--project-name=inline'], compose_root => $repo,
+    );
+    is_deeply( $inline_project_name->{global_args}, ['--project-name=inline'], 'Compose parser preserves equals-form global options' );
+    my $compact_project_name = $docker->_compose_argument_parts(
+        args => ['-pcompact'], compose_root => $repo,
+    );
+    is_deeply( $compact_project_name->{global_args}, ['-pcompact'], 'Compose parser preserves compact -p project names' );
+    my $file_equals = $docker->_compose_argument_parts(
+        args => ['--file=relative.yml'], compose_root => $repo,
+    );
+    is_deeply( $file_equals->{files}, ['relative.yml'], 'Compose parser preserves equals-form file options' );
+    my $unknown_global = $docker->_compose_argument_parts(
+        args => ['--future-global', 'ps'], compose_root => $repo,
+    );
+    is_deeply( $unknown_global->{global_args}, ['--future-global'], 'Compose parser leaves unrecognized global flags with Docker Compose' );
+    my $separator = $docker->_compose_argument_parts(
+        args => [ '--', 'ps', '--help' ], compose_root => $repo,
+    );
+    is_deeply( $separator->{operation_args}, [ 'ps', '--help' ], 'Compose parser passes through arguments after the separator' );
+    is_deeply(
+        $docker->_compose_argument_parts(compose_root => $repo),
+        { global_args => [], files => [], project_directory => [ '--project-directory', $repo ], operation_args => [] },
+        'Compose parser accepts an omitted argv list as empty',
+    );
+
+    for my $case (
+        [ undefined_arg => [undef], qr/argument 1 is undefined/ ],
+        [ missing_file  => ['-f'], qr/-f requires a path/ ],
+        [ empty_file    => [ '--file', '' ], qr/--file requires a path/ ],
+        [ empty_file_equals => ['--file='], qr/--file requires a path/ ],
+        [ missing_global_value => ['--env-file'], qr/--env-file requires a value/ ],
+        [ empty_global_value   => [ '--profile', '' ], qr/--profile requires a value/ ],
+    ) {
+        my ( $label, $args, $expected ) = @{$case};
+        my $error = '';
+        eval { $docker->_compose_argument_parts( args => $args, compose_root => $repo ); 1 } or $error = $@;
+        like( $error, $expected, "$label fails explicitly during argument parsing" );
+    }
+
+    my $without_command = $docker->_materialized_command( { compose_root => $repo } );
+    is_deeply( $without_command, [], 'materializer returns an empty command when a resolved command is absent' );
+    my $help_command = [ 'docker', 'compose', 'config', '--help' ];
+    my $help_passthrough = $docker->_materialized_command(
+        { command => $help_command, compose_args => [ 'config', '--help' ], compose_root => $repo }
+    );
+    is_deeply( $help_passthrough, $help_command, 'Compose help requests bypass config materialization unchanged' );
+    my $literal_help_command = [ 'docker', 'compose', 'help', 'ps' ];
+    is_deeply(
+        $docker->_materialized_command(
+            { command => $literal_help_command, compose_args => [ 'help', 'ps' ], compose_root => $repo }
+        ),
+        $literal_help_command,
+        'Compose literal help subcommand bypasses materialization unchanged',
+    );
+
+    my $fallback_args_command = [ 'docker', 'compose', '-f', File::Spec->catfile( $repo, 'compose.yaml' ), 'ps' ];
+    my $fallback_args_result = $docker->_materialized_command(
+        { command => $fallback_args_command, files => undef, compose_root => $repo, project_root => $repo, env => {} }
+    );
+    like( join( ' ', @{$fallback_args_result} ), qr/\bps\z/, 'materializer reads compose argv when compose_args is not supplied' );
+    my $short_command = $docker->_materialized_command(
+        { command => [ 'docker', 'compose' ], compose_root => $repo, files => [], env => {} }
+    );
+    ok( ref($short_command) eq 'ARRAY', 'materializer accepts a Compose command with no passthrough argv' );
+
+    my $missing_resolution_fields = $docker->_materialized_command(
+        {
+            command => [ 'docker', 'compose', 'ps' ], compose_args => ['ps'],
+            base_files => undef, project_files => undef, service_files => undef,
+            addon_files => undef, mode_files => undef, service_map => undef, modes => undef,
+            files => undef, project_root => $repo, compose_root => $repo, env => {},
+        }
+    );
+    like( join( ' ', @{$missing_resolution_fields} ), qr/\bps\z/, 'materializer safely defaults omitted file groups, service map, and modes' );
+
+    for my $case (
+        [ malformed => qr/Unable to parse resolved base docker compose config/ ],
+        [ scalar => qr/Resolved base docker compose config must contain a mapping/ ],
+        [ invalid_services => qr/Resolved base docker compose services must be a mapping/ ],
+        [ empty_service => qr/contains an invalid service name ''/ ],
+        [ dot_service => qr/contains an invalid service name '\.'/ ],
+        [ dotdot_service => qr/contains an invalid service name '\.\.'/ ],
+        [ unsafe_service => qr/contains an invalid service name '\.\.\/outside'/ ],
+    ) {
+        my ( $output_kind, $expected ) = @{$case};
+        local $ENV{P40_COMPOSE_OUTPUT} = $output_kind;
+        my $error = '';
+        eval {
+            $docker->_materialized_command(
+                {
+                    command => [ 'docker', 'compose', 'ps' ], compose_args => ['ps'],
+                    base_files => [], project_root => $repo, compose_root => $repo, env => {},
+                }
+            );
+            1;
+        } or $error = $@;
+        like( $error, $expected, "invalid $output_kind config output is rejected clearly" );
+    }
+
+    {
+        local $ENV{P40_COMPOSE_OUTPUT} = 'no_services';
+        my $result = $docker->_materialized_command(
+            {
+                command => [ 'docker', 'compose', 'ps' ], compose_args => ['ps'],
+                base_files => [], project_root => $repo, compose_root => $repo, env => {},
+            }
+        );
+        like( join( ' ', @{$result} ), qr/\bps\z/, 'valid config without services proceeds with an empty service selection' );
+    }
+
+    my $overlay = File::Spec->catfile( $repo, 'compose.overlay.yaml' );
+    mkfile( $overlay, "services:\n  present: {}\n" );
+    {
+        my $result = $docker->_materialized_command(
+            {
+                command => [ 'docker', 'compose', 'ps' ], compose_args => ['ps'],
+                base_files => [ File::Spec->catfile( $repo, 'compose.yaml' ) ],
+                project_files => [], addon_files => [], mode_files => [],
+                service_map => { 'merged-marker' => { files => [$overlay] } }, modes => [],
+                project_root => $repo, compose_root => $repo, env => undef,
+            }
+        );
+        like( join( ' ', @{$result} ), qr/\bps\z/, 'selected overlay materializes successfully with an empty environment' );
+    }
+
+    my $not_a_directory = File::Spec->catfile( $home, 'materialize-parent-file' );
+    mkfile( $not_a_directory, 'not a directory' );
+    {
+        no warnings 'redefine';
+        local *File::Temp::tempdir = sub { return $not_a_directory };
+        my $error = '';
+        eval {
+            $docker->_materialized_command(
+                {
+                    command => [ 'docker', 'compose', 'ps' ], compose_args => ['ps'],
+                    base_files => [], project_root => $repo, compose_root => $repo,
+                }
+            );
+            1;
+        } or $error = $@;
+        like( $error, qr/Unable to write .*merged-compose\.yml/, 'materializer reports a failure to create its temporary merged YAML' );
+    }
+
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::DockerCompose::_close_materialized_compose_file = sub { return 0 };
+        my $error = '';
+        eval {
+            $docker->_materialized_command(
+                {
+                    command => [ 'docker', 'compose', 'ps' ], compose_args => ['ps'],
+                    base_files => [], project_root => $repo, compose_root => $repo,
+                }
+            );
+            1;
+        } or $error = $@;
+        like( $error, qr/Unable to close .*merged-compose\.yml/, 'materializer reports a failure to close its temporary merged YAML' );
+    }
+
+    my $fail_final_bin = File::Spec->catdir( $home, 'fail-final-bin' );
+    make_path($fail_final_bin);
+    my $fail_final_state = File::Spec->catfile( $home, 'fail-final-count' );
+    mkfile(
+        File::Spec->catfile( $fail_final_bin, 'docker' ),
+        <<'P40_FINAL_FAIL_STUB'
+#!/bin/sh
+if [ ! -e "$P40_FINAL_FAIL_STATE" ]; then
+    : > "$P40_FINAL_FAIL_STATE"
+    printf 'services:\n  present: {}\n'
+    exit 0
+fi
+printf 'selected overlay rejected\n' >&2
+exit 7
+P40_FINAL_FAIL_STUB
+    );
+    chmod 0755, File::Spec->catfile( $fail_final_bin, 'docker' );
+    unlink $fail_final_state if -e $fail_final_state;
+    local $ENV{PATH} = "$fail_final_bin:$ENV{PATH}";
+    local $ENV{P40_FINAL_FAIL_STATE} = $fail_final_state;
+    my $final_error = '';
+    eval {
+        $docker->_materialized_command(
+            {
+                command => [ 'docker', 'compose', 'build', 'present' ], compose_args => [ 'build', 'present' ],
+                base_files => [ File::Spec->catfile( $repo, 'compose.yaml' ) ], project_files => [],
+                service_map => { present => { files => [$overlay] } }, modes => [],
+                project_root => $repo, compose_root => $repo, env => {},
+            }
+        );
+        1;
+    } or $final_error = $@;
+    like( $final_error, qr/Unable to materialize merged docker compose config \(7\): selected overlay rejected/, 'selected-overlay config errors retain Docker stderr and exit status' );
+}
+
 # Constructor guard clauses.
 {
     eval { Developer::Dashboard::DockerCompose->new( paths => $paths ); 1 };
@@ -946,8 +1857,27 @@ service inference, the development marker/base-overlay contract, the skill
 docker-root discovery, and the direct low-level helpers with edge inputs that
 the higher-level paths never generate. Local Compose files are checked as the
 invocation project's base, and automatic ecosystem service overlays are
-restricted to their declared services. Explicit service selection and the
-legacy no-local-file auto-discovery path are verified separately.
+restricted to the services emitted by the first Docker Compose config pass.
+The Problem 40 regression proves this pass excludes isolated service folders,
+ignores CLI-only service names, and preserves explicit project-directory and
+file arguments, including when an explicit file is the only base, before
+selecting enabled overlays across home, project, and skill layers. Returned
+service keys that are empty, directory-navigation
+segments, or contain path separators are rejected before lookup. Direct parser
+cases cover global options, explicit files, separators, native help, malformed
+arguments/config responses, and temporary-file I/O failures. Explicit service
+selection and the legacy no-local-file
+auto-discovery preview are verified separately. Problem 38
+coverage injects a single-byte pound sign both into a local source base and
+captured Compose output, checks the actual temporary merged file is valid
+UTF-8 YAML, confirms the normalized file reaches config, up, down, build, ps,
+and logs, and exercises local source read/close failures explicitly.
+Problem 43 reproduces sequential `up foo` and `up bar` calls when two skill
+services define the same interpolation key. It checks that the selected
+service's environment supplies the final materialization and operation,
+deferred selections are inferred from parsed Compose arguments, and operations
+with no effective service selection retain all-base-service environment
+resolution.
 
 =head1 WHY IT EXISTS
 
@@ -963,16 +1893,25 @@ still pass the suite, and so the coverage gate stays honest for this module.
 Use this file when changing compose file discovery, service inference, the
 disabled or development marker helpers, base/overlay ordering, skill docker-root
 resolution, environment export, local Compose service scoping, or the dry-run
-versus execute behaviour of the docker helper. Extend it with a new failing
-case first whenever a new branch or condition appears. Development-marker tests include absent service folders,
+versus execute behaviour of the docker helper. Keep execution selection based
+on actual Compose config output; do not reintroduce raw YAML or CLI service
+arguments as the authority. It also guards the materialized
+YAML byte-normalization boundary so malformed single-byte octets in source Compose
+files or captured merged output cannot fail early service discovery or create
+a broken merged file. It verifies that every Compose verb
+materializes the effective base config even when no explicit overlay files
+were resolved, while non-Compose commands still bypass materialization. Extend
+it with a new failing case first
+whenever a new branch or condition appears. Development-marker tests include absent service folders,
 missing service arguments, idempotent removal, and unlink failures.
 
 =head1 HOW TO USE
 
-Run C<perl -Ilib t/94-dockercompose-coverage.t> or C<prove -lv
-t/94-dockercompose-coverage.t> while iterating. Keep it green under C<prove -lr
-t> and confirm the module still reports 100% branch and condition coverage under
-the repository Devel::Cover gate before release.
+Run C<d2 docker compose exec -T dev prove -lv
+t/94-dockercompose-coverage.t> while iterating in the isolated development
+container. Keep it green under the full Docker test suite and confirm the module
+still reports 100% branch and condition coverage under the repository
+Devel::Cover gate before release.
 
 =head1 WHAT USES IT
 
@@ -984,15 +1923,16 @@ defensive paths exercised.
 
 Example 1:
 
-  perl -Ilib t/94-dockercompose-coverage.t
+  d2 docker compose exec -T dev prove -lv t/94-dockercompose-coverage.t
 
-Run the coverage-closure test standalone from the repository root.
+Run the coverage-closure test inside the Compose development container.
 
 Example 2:
 
-  prove -lv t/94-dockercompose-coverage.t
+  d2 docker compose --project-name dd-problem40 exec -T dev prove -lv t/94-dockercompose-coverage.t
 
-Run it verbosely through the harness while iterating on the resolver.
+Run it verbosely through the harness in an isolated Compose development
+container while iterating on the resolver.
 
 Example 3:
 

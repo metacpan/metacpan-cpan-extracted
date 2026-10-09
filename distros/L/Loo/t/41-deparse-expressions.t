@@ -42,9 +42,9 @@ assert_exact(
     "};\n"
 );
 
-assert_exact(
+$] >= 5.010 and assert_exact(
     'defined-or operator',
-    sub { return $_[0] // $_[1] },
+    eval q{sub { return $_[0] // $_[1] }},
     "\$VAR1 = sub {\n" .
     "  return \$_[0] // \$_[1];\n" .
     "};\n"
@@ -132,9 +132,9 @@ assert_exact(
     "};\n"
 );
 
-assert_exact(
+$] >= 5.010 and assert_exact(
     'compound //= with default',
-    sub { my $x = $_[0]; $x //= 0; return $x },
+    eval q{sub { my $x = $_[0]; $x //= 0; return $x }},
     "\$VAR1 = sub {\n" .
     "  my \$x = \$_[0];\n" .
     "  \$x //= 0;\n" .

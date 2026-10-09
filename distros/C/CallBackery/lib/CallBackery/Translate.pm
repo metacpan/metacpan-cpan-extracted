@@ -90,11 +90,10 @@ sub tra {
     my @args = @_;
     my $lx = $self->{_lx} // {};
     $str = $lx->{$str} if $lx->{$str};
-    my $id = 1;
-    for my $a (@args){
-        $str =~ s/%$id/$a/g;
-        $id++;
-    }
+    # One pass over the msgid. Substituting the arguments one after the
+    # other searched the text put in for %1 again for %2, and let %1 match
+    # the front of %10. A placeholder without an argument stays visible.
+    $str =~ s{%(\d+)}{$1 >= 1 && $1 <= @args ? $args[$1-1] : "%$1"}eg;
     return $str;
 }
 

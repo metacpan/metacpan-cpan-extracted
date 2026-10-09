@@ -82,9 +82,15 @@ OUTPUT:
 	RETVAL
 
 void
-DESTROY (df)
-	Deflate::Faster df
+DESTROY (self)
+	SV * self
+PREINIT:
+	deflate_faster_t * df;
 CODE:
+	if (! SvROK (self) || SvTYPE (SvRV (self)) > SVt_PVMG || ! SvIOK (SvRV (self))) {
+		return;
+	}
+	df = INT2PTR (deflate_faster_t *, SvIVX (SvRV (self)));
 	if (! df) {
 		return;
 	}

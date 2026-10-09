@@ -12,14 +12,16 @@ my $conninfo = shift || $ENV{TEST_PG_CONNINFO} || 'dbname=postgres';
 
 my $pg; $pg = EV::Pg->new(
     conninfo => $conninfo,
-    on_error => sub { die "connection error: $_[0]\n" },
+    on_error => sub { warn "connection error: $_[0]\n"; EV::break },
     on_connect => sub {
         $pg->prepare('demo', 'select $1::int as n, $2::text as label, now() as ts',
             sub {
-                my (undef, $err) = @_; die $err if $err;
+                my (undef, $err) = @_;
+                if ($err) { warn $err; EV::break; return; }
 
                 $pg->describe_prepared('demo', sub {
-                    my ($meta, $err) = @_; die $err if $err;
+                    my ($meta, $err) = @_;
+                    if ($err) { warn $err; EV::break; return; }
 
                     print "nparams: $meta->{nparams}\n";
                     print "param types (OIDs):\n";

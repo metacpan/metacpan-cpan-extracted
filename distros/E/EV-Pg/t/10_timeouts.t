@@ -8,7 +8,7 @@ use lib 't';
 use TestHelper;
 
 require_pg;
-plan tests => 10;
+plan tests => 14;
 
 # Test 1-2: connect failure — closed port
 {
@@ -102,6 +102,7 @@ with_pg(timeout => 15, cb => sub {
 {
     my $err_received;
     my $query_err;
+    my @order;
     my $pg_active;
     $pg_active = EV::Pg->new(
         conninfo   => $conninfo,
@@ -111,6 +112,7 @@ with_pg(timeout => 15, cb => sub {
             $pg_active->query("select pg_sleep(10)", sub {
                 my ($rows, $err) = @_;
                 $query_err = $err;
+                push @order, 'query';
                 EV::break;
             });
 
@@ -130,6 +132,7 @@ with_pg(timeout => 15, cb => sub {
         },
         on_error => sub {
             $err_received = $_[0];
+            push @order, 'error';
             EV::break;
         },
     );
@@ -141,6 +144,10 @@ with_pg(timeout => 15, cb => sub {
         'active query kill: got error');
     ok(!$pg_active->is_connected,
         'active query kill: connection lost');
+    is($query_err, 'connection lost',
+        'active query kill: pending callback got "connection lost"');
+    is_deeply(\@order, ['error', 'query'],
+        'active query kill: on_error fired before callbacks');
 }
 
 # Test 10: reset after terminate recovers connection
@@ -180,4 +187,47 @@ with_pg(timeout => 15, cb => sub {
     my $guard = EV::timer(10, 0, sub { EV::break });
     EV::run;
     $pg_reset->finish if $pg_reset && $pg_reset->is_connected;
+}
+
+# Pipeline sync callbacks also get "connection lost" on socket loss.
+# (The query itself may first see the server's final FATAL as a regular
+# error, so only the sync half is pinned.)
+{
+    my ($sync_err, $saw_error);
+    my $pg_pipe;
+    $pg_pipe = EV::Pg->new(
+        conninfo   => $conninfo,
+        on_connect => sub {
+            my $pid = $pg_pipe->backend_pid;
+            $pg_pipe->enter_pipeline;
+            $pg_pipe->query_params("select pg_sleep(5)", [], sub { });
+            $pg_pipe->pipeline_sync(sub {
+                my ($r, $e) = @_;
+                $sync_err = $e;
+                EV::break;
+            });
+
+            my $pg2;
+            $pg2 = EV::Pg->new(
+                conninfo   => $conninfo,
+                on_connect => sub {
+                    my $t; $t = EV::timer(0.3, 0, sub {
+                        undef $t;
+                        $pg2->query("select pg_terminate_backend($pid)", sub {
+                            $pg2->finish;
+                        });
+                    });
+                },
+                on_error => sub { diag("pg2: $_[0]") },
+            );
+        },
+        on_error => sub { $saw_error = 1 },
+    );
+
+    my $guard = EV::timer(10, 0, sub { EV::break });
+    EV::run;
+    $pg_pipe->finish if $pg_pipe && $pg_pipe->is_connected;
+    ok($saw_error, 'pipeline kill: on_error fired');
+    is($sync_err, 'connection lost',
+        'pipeline kill: sync callback got "connection lost"');
 }

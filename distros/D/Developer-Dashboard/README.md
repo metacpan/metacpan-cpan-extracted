@@ -6,7 +6,7 @@ Developer::Dashboard - a local home for development work
 
 # VERSION
 
-5.51
+5.73
 
 # INTRODUCTION
 
@@ -86,6 +86,12 @@ supervisor for the targeted collector set while the lifecycle command is in
 flight, then restore supervision for the remaining watched fleet afterwards.
 That prevents the watchdog from racing a manual collector restart and spawning
 another replacement loop underneath the CLI.
+
+Collector watchdog stall checks distinguish cron scheduler liveness from job
+execution time. A cron collector may correctly wait hours between matching
+minutes; while its loop heartbeat is fresh, that quiet period does not count as
+a stalled collector or consume the automatic-restart budget. A stale scheduler
+heartbeat remains eligible for watchdog recovery.
 
 It provides a small ecosystem for:
 
@@ -457,8 +463,9 @@ names from `Developer::Dashboard::DataHelper` automatically for every block.
 
     `Developer::Dashboard::IndicatorStore` and `Developer::Dashboard::Prompt`
     expose cached state to shell prompts and dashboards, including compact versus
-    extended prompt rendering, stale-state marking, generic built-in indicator
-    refresh, and page-header status payloads for the web UI.
+    extended prompt rendering, stale-state marking, local project/Git indicator
+    refresh, and page-header status payloads for the web UI. Docker is not a
+    built-in indicator; Docker status appears only when configured as a collector.
 
 - Web Layer
 
@@ -844,7 +851,11 @@ and supported option flags. Bash and zsh call the live `dashboard complete`
 helper, so their candidates stay aligned with the command catalog rather than
 maintaining separate shell-side action lists. Existing dynamic completions for
 skills, workspace sessions, collectors, and workspace path aliases remain
-available. `cdr` TAB completion lists aliases and direct child directories.
+available. When a skill with the same name exists in project and home runtime
+layers, its dotted command candidates are merged from every participating
+layer and duplicate command names appear once; execution still uses the
+normal deepest-layer lookup. `cdr` TAB completion lists aliases and direct
+child directories.
 Each entered narrowing term descends one matching directory level before
 suggesting the next child, avoiding recursive scans of unrelated repository
 and dependency trees.
@@ -939,22 +950,29 @@ explicitly instead of being skipped silently. Executable logic can live in
 
 Skill-local env files are loaded only when a skill command or skill hook is
 actually running. A normal non-skill command inherits only the root-to-leaf
-runtime env chain. A skill command inherits that same runtime chain first and
-then loads each participating skill root from the base installed skill layer
-to the deepest matching child skill layer, applying:
+runtime env chain. For a skill command, home-level runtime env files load
+first as defaults, then each participating skill root loads from the base
+installed skill layer to the deepest matching child skill layer, applying:
 
 - `<skill-root>/.env`
 - `<skill-root>/.env.pl`
 
-This means a deeper skill env can override a shared runtime key, but that
-override stays isolated to the skill execution path and does not leak into
+Skill `.env` and `.env.pl` values override matching values from the home
+runtime. Skill `cli/.env` and `cli/.env.pl` values are applied after the skill
+root files. Any deeper project runtime layers are applied last, so the nearest
+project runtime still has final precedence among file-based values. Values
+explicitly inherited from the invoking shell have highest precedence and are
+preserved across every env-file layer; a file may populate a variable that the
+caller did not set, but cannot replace an exported caller value. Skill
+overrides stay isolated to the skill execution path and do not leak into
 unrelated commands.
 
 The runtime chain is collected from the DD-OOP layers rooted at the current
-working directory, walking its existing parent directories toward the leaf,
-before the skill chain is applied. Therefore a nested command such as
-`d2 foo.bar.bob` receives both the current directory's inherited
-`.env`/`.env.pl` values and the `foo` then `bar` skill values.
+working directory, walking its existing parent directories toward the leaf.
+For skill execution, the home runtime portion is applied before the skill
+chain and deeper runtime layers after it. Therefore a nested command such as
+`d2 foo.bar.bob` receives home defaults, then the `foo` and `bar` skill
+overrides, then any nearer project runtime values.
 
 For nested skill commands such as `dashboard foo.bar.zzz.show`, the skill env
 chain expands from the root nested skill to the leaf skill before the command
@@ -1386,6 +1404,10 @@ and `d2 version` match the archive, that `d2 of grep --help` reaches GNU
 grep, and that `d2 docker compose config --help` and `d2 docker compose help`
 preserve native Compose arguments. This checks installed runtime behavior and
 the packaged short-entrypoint dispatch, not only the checkout-local scripts.
+The repository's `d2 docker.images.build` workflow also installs the archive
+into the image's active local Perl library, so the rebuilt image runs the same
+release version rather than an older bootstrap copy shadowing the system
+library.
 That same blank-container path also verifies web stop/restart behavior in a
 minimal image where listener ownership may need to be discovered from `/proc`
 instead of `ss`, including a late listener re-probe before
@@ -2048,11 +2070,18 @@ dashboard JSON config. If
 `./.developer-dashboard/config/docker/green/compose.yml` exists in the current
 project it wins; otherwise the resolver falls back to
 `~/.developer-dashboard/config/docker/green/compose.yml`.
-`dashboard docker compose config green` or
-`dashboard docker compose up green` will pick it up automatically by
-inferring service names from the passthrough compose args before the real
-`docker compose` command is assembled. If no service name is passed, the
-resolver scans isolated service folders and preloads every non-disabled folder.
+`dashboard docker compose config` and operational commands first resolve the
+base Compose config, including configured non-service project/addon/mode
+files, and read its resulting `services:` map. Only those service names are
+used to discover isolated service folders; a service name appearing only in
+the CLI arguments or in an unrelated runtime folder cannot introduce an
+overlay. The base config resolution is a real `docker compose config` call,
+not a raw YAML parse, so Compose's own includes, interpolation, and merge
+rules determine the authoritative list. The selected per-service files are
+then layered and materialized before the requested operation runs.
+Service names emitted by Compose must be non-empty single path segments;
+names containing separators or directory-navigation segments are rejected
+before runtime folders are searched.
 If any matching `config/docker/<service>` directory in the active
 runtime layers contains `disabled.yml`, the service is skipped. Each enabled isolated folder
 contributes `compose.yml` as its base whenever it exists. Its optional
@@ -2078,14 +2107,49 @@ services or `--enabled` to show only enabled services.
 
 If the invocation directory contains `compose.yml`, `compose.yaml`,
 `docker-compose.yml`, or `docker-compose.yaml`, those local files are the
-base stack and the Compose command runs from that directory. For an unscoped
-command such as `dashboard docker compose config`, automatic runtime-service
-overlays are limited to service names declared by the local `services:`
-mapping. Other installed service folders are ignored by default. Naming a
-service explicitly opts into its runtime definition and preserves dependency
-file gathering. When no local base file exists, ecosystem-wide auto-discovery
-continues as before. Invalid local Compose YAML or an invalid `services:`
-mapping is reported with the source file path.
+base stack and the Compose command runs from that directory. For execution,
+the first `docker compose config` runs against the base and other configured
+non-service layers. Its resolved services—not service names guessed from
+command arguments—control isolated-service lookup across home, project, and
+nested skill runtime roots. The selected service files are added only after
+that first config succeeds; disabled folders are excluded and development
+files require a matching `develop.yml` marker. In a dry run, Docker is not
+invoked, so the resolver reports a source-based preview instead of a
+Compose-resolved service list. This distinction keeps dry-run non-executing
+while ensuring real operations follow Compose's own effective service map. If
+no local base or explicit Compose file exists but isolated runtime service
+files do, the enabled files seed the first config pass to preserve
+ecosystem-wide auto-discovery; Compose's resulting service map still controls
+the final stack.
+
+For operational actions such as `build`, `up`, and `down`, layered files are
+first materialized into a temporary Compose file. The final Compose invocation
+also receives the original project directory explicitly, so relative build and
+volume paths and the default project identity continue to come from the local
+Compose project rather than the temporary file's directory. An explicit
+`--project-directory` supplied by the user is preserved. An undefined Compose
+argument or an empty/missing project-directory value is rejected before the
+Compose executable is called. The public helper routes these actions through
+the materializing runner (not directly through the unresolved `-f` list),
+keeps the temporary merged file until the operation exits, and streams Compose
+stdout and stderr normally. This applies to `build`, `up`, `down`, and other
+Compose operations; `config` remains available for inspection without starting
+containers.
+
+Before saving that merged output, the resolver preserves valid UTF-8 sequences
+and converts isolated non-UTF-8 Windows-1252 bytes from the combined inputs to
+UTF-8. The temporary file is written as raw bytes only after normalization, so
+the same clean merged YAML is used by `config`, `up`, `down`, `build`,
+`ps`, `logs`, and other Compose operations. Undefined Windows-1252 octets
+become the Unicode replacement character rather than being written as invalid
+UTF-8.
+
+This materialization also runs when the dashboard resolver found no explicit
+layered files. In that case Docker Compose discovers its ordinary base file
+from the configured Compose working directory, emits the effective config,
+and the requested operation consumes the generated temporary file. This keeps
+the UTF-8 normalization and common execution path consistent for `build`,
+`ps`, and other verbs even when no runtime overlay was selected.
 
 During compose execution the dashboard exports `DDDC` as the runtime
 `config/docker` directory for the current runtime, so compose YAML can keep using
@@ -2110,6 +2174,14 @@ normalized to underscores and pointing that variable at the owning
 `config/docker/` root. Nested skill services additionally export the full
 cumulative skill path alias such as `foo_bar_zzz_DDDC` for the same compose
 root, while the leaf alias stays available as `zzz_DDDC`.
+When one or more Compose services are explicitly selected, skill env files
+are resolved only for those selected services during interpolation; unrelated
+skill service folders cannot replace a selected service's same-named env key
+merely because they are enumerated later. If no selected service is present
+in the effective base config, or the operation selects no service, env files
+for all effective base services are used. This keeps sequential commands such
+as `d2 docker compose up foo` and `d2 docker compose up bar` scoped to the
+matching skill env while preserving all-service operations.
 When `--dry-run` is omitted, the dashboard hands off with `exec` so the
 terminal sees the normal streaming output from `docker compose` itself
 instead of a dashboard JSON wrapper.

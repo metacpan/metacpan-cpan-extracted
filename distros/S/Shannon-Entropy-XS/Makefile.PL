@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
         "Import::Export" => '1.00'        
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+    macro => { TARFLAGS => "--format=ustar -c -v -f" },
     clean => { FILES => 'Shannon-Entropy-XS-*' },
 );
 

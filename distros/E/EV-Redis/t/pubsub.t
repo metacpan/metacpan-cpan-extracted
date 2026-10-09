@@ -201,6 +201,129 @@ undef $timeout;  # a leaked active timer would EV::break a later EV::run
     ok $captured_set, 'monitor captured SET command';
 }
 
+# skip_pending leaves a MONITOR stream running: the server has no off switch
+{
+    my $monitor = EV::Redis->new( path => $connect_info{sock} );
+    my $client  = EV::Redis->new( path => $connect_info{sock} );
+
+    my ($got_ok, $captured_set, $got_err);
+    $monitor->monitor(sub {
+        my ($r, $e) = @_;
+        if (defined $e) { $got_err = $e; return; }
+        $got_ok = 1 if $r eq 'OK' && !$got_ok;
+        if ($r =~ /SET.*skip_mon_key/i) {
+            $captured_set = 1;
+            $client->disconnect;
+            EV::break;
+        }
+    });
+    my $s; $s = EV::timer 0.1, 0.1, sub {
+        return unless $got_ok;
+        undef $s;
+        $monitor->skip_pending;
+        $client->set('skip_mon_key', 'v', sub {});
+    };
+
+    my $timeout; $timeout = EV::timer 2, 0, sub {
+        undef $timeout;
+        $monitor->disconnect;
+        $client->disconnect;
+        EV::break;
+    };
+    EV::run;
+    undef $timeout;
+
+    ok !$got_err, 'skip_pending on a MONITOR connection spares the stream';
+    ok $captured_set, '... and the stream still delivers';
+    like do { local $@; eval { $monitor->command('ping', sub {}) }; $@ },
+        qr/MONITOR/, '... while MONITOR stays active';
+    $monitor->disconnect;
+    $client->disconnect;
+}
+
+# (p)unsubscribe with nothing subscribed fails through the callback alone
+{
+    my $r = EV::Redis->new( path => $connect_info{sock} );
+    my %got;
+    $r->command('unsubscribe', sub { $got{bare} = $_[1] // 'no error' });
+    $r->command('punsubscribe', sub { $got{bare_p} = $_[1] // 'no error' });
+    $r->command('unsubscribe', 'ch1', sub { $got{named} = $_[1] // 'no error' });
+    $r->command('punsubscribe', 'pat*', sub { $got{named_p} = $_[1] // 'no error' });
+    my $t; $t = EV::timer 1, 0, sub { undef $t; EV::break };
+    EV::run;
+    undef $t;
+    is $got{bare}, 'not subscribed', 'bare unsubscribe says why';
+    is $got{bare_p}, 'not subscribed', 'bare punsubscribe says why';
+    is $got{named}, 'not subscribed', 'named unsubscribe says why';
+    is $got{named_p}, 'not subscribed', 'named punsubscribe says why';
+    my $pong;
+    $r->command('ping', sub { $pong = $_[0] // $_[1] });
+    my $t2; $t2 = EV::timer 1, 0, sub { undef $t2; EV::break };
+    EV::run;
+    undef $t2;
+    is $pong, 'PONG', '... and the connection survives';
+    $r->disconnect;
+}
+
+# bare (p)unsubscribe drops every subscription and leaves a clean connection
+{
+    my $r = EV::Redis->new( path => $connect_info{sock} );
+    my (@unsubs, $pong);
+    $r->command('subscribe', 'r18_ch', sub { push @unsubs, $_[0] if defined $_[0] });
+    $r->command('psubscribe', 'r18_pat*', sub { push @unsubs, $_[0] if defined $_[0] });
+    my $t; $t = EV::timer 1, 0, sub { undef $t; EV::break };
+    EV::run;
+    undef $t;
+    @unsubs = ();
+    $r->command('unsubscribe', sub { });
+    $r->command('punsubscribe', sub { });
+    my $t2; $t2 = EV::timer 1, 0, sub { undef $t2; EV::break };
+    EV::run;
+    undef $t2;
+    is_deeply [map { [$_->[0], $_->[1]] } @unsubs],
+        [['unsubscribe', 'r18_ch'], ['punsubscribe', 'r18_pat*']],
+        'bare unsubscribe acks every subscription';
+    $r->command('ping', sub { $pong = $_[0] // $_[1] });
+    my $t3; $t3 = EV::timer 1, 0, sub { undef $t3; EV::break };
+    EV::run;
+    undef $t3;
+    is $pong, 'PONG', '... and PING is a regular command again';
+    $r->disconnect;
+}
+
+# HELLO on a subscribed connection is refused, and the connection survives
+{
+    my $r = EV::Redis->new( path => $connect_info{sock} );
+    $r->command('subscribe', 'r18_hello', sub { });
+    my $t; $t = EV::timer 1, 0, sub { undef $t; EV::break };
+    EV::run;
+    undef $t;
+    my $err;
+    $r->command('hello', 3, sub { $err = $_[1] // 'no error' });
+    my $t2; $t2 = EV::timer 1, 0, sub { undef $t2; EV::break };
+    EV::run;
+    undef $t2;
+    like $err, qr/not supported on a subscribed/, 'HELLO refused once subscribed';
+    is $r->is_connected, 1, '... and the connection survives';
+    $r->disconnect;
+}
+
+# a HELLO that waits out a setup subscription fails through the callback alone
+{
+    my $err;
+    my $r;
+    $r = EV::Redis->new( path => $connect_info{sock},
+        reconnect => 1, resume_waiting_on_reconnect => 1,
+        on_connect => sub { $r->command('subscribe', 'r18_hello2', sub { }) } );
+    $r->command('hello', 3, sub { $err = $_[1] // 'no error' });
+    my $t; $t = EV::timer 2, 0, sub { undef $t; EV::break };
+    EV::run;
+    undef $t;
+    like $err, qr/not supported on a subscribed/, 'waited HELLO refused';
+    is $r->is_connected, 1, '... and the connection survives';
+    $r->disconnect;
+}
+
 # hiredis cannot route smessage, so sharded subscribe is refused
 {
     my ($redis_version) = get_redis_version($connect_info{sock});
@@ -277,6 +400,61 @@ undef $timeout;  # a leaked active timer would EV::break a later EV::run
     like $@, qr/subscribe requires at least one channel/, 'no-arg subscribe croaks';
     eval { $r->psubscribe(sub {}) };
     like $@, qr/psubscribe requires at least one channel/, 'no-arg psubscribe croaks';
+    $r->disconnect;
+}
+
+# MONITOR inside MULTI fails through the callback, even from a reply callback
+{
+    my $r = EV::Redis->new(path => $connect_info{sock}, on_error => sub {});
+    my ($rv, $merr, $mcroak);
+    $r->multi(sub {
+        $rv = eval { $r->monitor(sub { $merr = $_[1] }) };
+        $mcroak = $@ unless defined $rv;
+        $r->exec(sub { EV::break });
+    });
+    my $t; $t = EV::timer 4, 0, sub { undef $t; EV::break };
+    EV::run;
+    undef $t;
+    is $mcroak, undef, 'monitor in MULTI from a callback does not croak';
+    is $rv, -1, '... and returns -1';
+    is $merr, 'pub/sub and MONITOR are not supported inside MULTI',
+        '... failing through the callback';
+    $r->disconnect;
+}
+
+# outside MULTI the callback's own command still counts as outstanding
+{
+    my $r = EV::Redis->new(path => $connect_info{sock}, on_error => sub {});
+    my $croak;
+    $r->ping(sub {
+        eval { $r->monitor(sub {}) };
+        $croak = $@;
+        EV::break;
+    });
+    my $t; $t = EV::timer 4, 0, sub { undef $t; EV::break };
+    EV::run;
+    undef $t;
+    like $croak, qr/idle connection/, 'monitor from a reply callback croaks idle';
+    $r->disconnect;
+}
+
+# an idle MONITOR connection times out
+{
+    my (@events, @mon);
+    my $r = EV::Redis->new(path => $connect_info{sock}, command_timeout => 300,
+        on_error => sub { push @events, "error:$_[0]"; },
+        on_disconnect => sub { push @events, 'disconnect'; EV::break; });
+    $r->monitor(sub { push @mon, [@_]; });
+    my $t; $t = EV::timer 4, 0, sub { push @events, 'TIMEOUT'; undef $t; EV::break };
+    EV::run;
+    undef $t;
+    is scalar(@mon), 2, 'monitor callback ran twice';
+    is $mon[0][0], 'OK', 'monitor acknowledged';
+    is $mon[1][0], undef, 'idle monitor times out';
+    is $mon[1][1], 'Timeout', '... with a Timeout error';
+    is_deeply \@events, ['error:Timeout', 'disconnect'],
+        'timeout reported, then disconnect';
+    is $r->is_connected, 0, 'the connection is gone';
     $r->disconnect;
 }
 

@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 1.6.1 are described by their release commits.
 
+## 1.9.0 - 2026-10-09
+
+### Features
+
+- Re-pin the spec to 2026.10.08, adding the Open databases' open flag ([`cb20799`](https://github.com/internetdata/sdk-perl/commit/cb20799d17e736d212f1544720dcd445288b2db8))
+
 ## 1.8.2 - 2026-10-07
 
 ### Fixes

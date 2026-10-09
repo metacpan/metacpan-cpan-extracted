@@ -14,7 +14,16 @@
 
 /* utf8_to_uvchr_buf appeared in 5.16; fall back to utf8_to_uvchr */
 #ifndef utf8_to_uvchr_buf
-#  define utf8_to_uvchr_buf(s, e, lenp) utf8_to_uvchr(s, lenp)
+#  define utf8_to_uvchr_buf(s, e, lenp) utf8_to_uvchr((U8 *)(s), lenp)
+#endif
+
+/* RX_PRECOMP / RX_PRELEN appeared in 5.10.1; before that the pattern
+   lives directly in the regexp struct */
+#ifndef RX_PRECOMP
+#  define RX_PRECOMP(re) ((re)->precomp)
+#endif
+#ifndef RX_PRELEN
+#  define RX_PRELEN(re)  ((re)->prelen)
 #endif
 
 typedef struct {

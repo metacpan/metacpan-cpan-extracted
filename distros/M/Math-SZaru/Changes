@@ -1,4 +1,7 @@
 Change history for Perl extension Math::SZaru:
 
+0.02  Thu Oct 08 21:00:00 2026
+  - Upgrade a dependency to address CVE-2026-107373
+
 0.01  Wed Jan 30 08:00:00 2013
   - initial CPAN release

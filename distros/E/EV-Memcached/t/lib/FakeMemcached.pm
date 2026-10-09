@@ -29,6 +29,10 @@ sub new {
         # no CLEANUP: its END hook would also fire in the forked child
         # and remove the dir while the parent still uses it
         $dir = File::Temp::tempdir('evmc-XXXXXX', TMPDIR => 1);
+        if (length("$dir/mc.sock") > 100) {
+            rmdir $dir;
+            $dir = File::Temp::tempdir('evmc-XXXXXX', DIR => '/tmp');
+        }
         $path = "$dir/mc.sock";
         die "FakeMemcached: socket path too long for sun_path: $path"
             if length($path) > 100;

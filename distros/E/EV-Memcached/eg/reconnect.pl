@@ -20,16 +20,20 @@ my $mc = EV::Memcached->new(
     on_disconnect => sub { print "Disconnected at " . localtime() . "\n" },
 );
 
-# Periodic version check as heartbeat
+# Guarded heartbeat: version() croaks once reconnect gives up.
 my $w = EV::timer 0, 3, sub {
-    $mc->version(sub {
-        my ($ver, $err) = @_;
-        if ($err) {
-            warn "VERSION failed: $err\n";
-        } else {
-            print "Server version: $ver  (" . localtime() . ")\n";
-        }
-    });
+    return unless $mc->is_connected;
+    eval {
+        $mc->version(sub {
+            my ($ver, $err) = @_;
+            if ($err) {
+                warn "VERSION failed: $err\n";
+            } else {
+                print "Server version: $ver  (" . localtime() . ")\n";
+            }
+        });
+    };
+    warn "heartbeat: $@" if $@;
 };
 
 print "Checking version every 3s.\n";

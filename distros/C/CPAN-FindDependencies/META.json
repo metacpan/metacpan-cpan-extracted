@@ -58,7 +58,8 @@
             "Test::More" : "0.88",
             "Test::Time" : "0",
             "Text::Diff" : "0",
-            "URI::file" : "4.13"
+            "URI::file" : "4.13",
+            "version" : "0.9924"
          }
       }
    },
@@ -71,6 +72,6 @@
          "url" : "https://github.com/DrHyde/perl-modules-CPAN-FindDependencies"
       }
    },
-   "version" : "4.00",
+   "version" : "4.01",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

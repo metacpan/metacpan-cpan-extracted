@@ -43,29 +43,44 @@ my $EOL = "\015\012";
 
 # --- Spawn the milter: outbound mode, signing for test2.dkim2.com from a keydir ---
 
-my $dir  = tempdir(CLEANUP => 1);
-my $sock = "$dir/out.sock";
+my $dir = tempdir(CLEANUP => 1);
 my $log  = "$dir/milter.log";
 path("$dir/keys/test2.dkim2.com")->mkpath;
 $KEYS->child('sel1._domainkey.test2.dkim2.com.pem')->copy("$dir/keys/test2.dkim2.com/sel1.key");
+# test3.dkim2.com: a forwarder further down the chain (case 5b).
+path("$dir/keys/test3.dkim2.com")->mkpath;
+$KEYS->child('sel1._domainkey.test3.dkim2.com.pem')->copy("$dir/keys/test3.dkim2.com/sel1.key");
 path("$dir/snap")->mkpath;
 
-my $pid = fork();
-die "fork: $!" unless defined $pid;
-if ($pid == 0) {
-    open STDERR, '>>', $log or die $!;
-    open STDOUT, '>>', $log or die $!;
-    exec $^X, "-I$LIB", $SCRIPT,
-        '--mode', 'outbound',
-        '--socket', "unix:$sock",
-        '--keydir', "$dir/keys",
-        '--dns-json', "$DNS_JSON",
-        '--snapshot-dir', "$dir/snap"
-        or die "exec: $!";
-}
-END { local $?; kill "TERM", $pid if $pid; waitpid($pid, 0) if $pid; }
+my @pids;
+END { local $?; for my $p (@pids) { kill "TERM", $p; waitpid($p, 0) } }
 
-for (1 .. 50) { last if -S $sock; select(undef, undef, undef, 0.2); }
+# Start a milter on its own socket; extra => [...] adds command-line options,
+# perl => [...] options for perl itself (e.g. -M to load a test fault).
+sub spawn_milter {
+    my (%o) = @_;
+    my $n    = @pids;
+    my $sock = $n ? "$dir/out$n.sock" : "$dir/out.sock";
+    my $pid  = fork();
+    die "fork: $!" unless defined $pid;
+    if ($pid == 0) {
+        open STDERR, '>>', $log or die $!;
+        open STDOUT, '>>', $log or die $!;
+        exec $^X, "-I$LIB", @{ $o{perl} || [] }, $SCRIPT,
+            '--mode', 'outbound',
+            '--socket', "unix:$sock",
+            '--keydir', "$dir/keys",
+            '--dns-json', "$DNS_JSON",
+            '--snapshot-dir', "$dir/snap",
+            @{ $o{extra} || [] }
+            or die "exec: $!";
+    }
+    push @pids, $pid;
+    for (1 .. 50) { last if -S $sock; select(undef, undef, undef, 0.2); }
+    return ($pid, $sock);
+}
+
+my ($pid, $sock) = spawn_milter();
 ok(-S $sock, 'milter is listening') or BAIL_OUT("milter never came up:\n" . path($log)->slurp);
 
 sub milter_log { path($log)->slurp }
@@ -128,8 +143,9 @@ sub read_verdict {
 # modifications it asked for.
 sub run_milter {
     my (%a) = @_;
-    my $s = IO::Socket::UNIX->new(Peer => $sock, Type => SOCK_STREAM)
-        or die "connect $sock: $!";
+    my $peer = $a{sock} // $sock;
+    my $s = IO::Socket::UNIX->new(Peer => $peer, Type => SOCK_STREAM)
+        or die "connect $peer: $!";
     $s->autoflush(1);
 
     pkt($s, 'O', pack('NNN', 6, 0x1FF, 0));
@@ -318,6 +334,265 @@ SKIP: {
     is(scalar @sig, 1, 'unreadable: signed with the parent domain key');
     like($sig[0]{value}, qr/\bd=test2\.dkim2\.com;/, 'unreadable: d= is the readable parent');
     chmod 0700, "$dir/keys/unreadable.test2.dkim2.com";
+}
+
+# --- 5. A list's unsigned m=2 with a null body Recipe ---
+#
+# Built like the case in 2, but the list rewrote the body and said so ("b":
+# null). Signing that is the host's choice: --allow-null-body-recipe, off by
+# default. Either way the header history below the null is still checked.
+sub null_list_post {
+    my (%o) = @_;
+    my $signed = originator_signed();
+    my $mod = $signed;
+    $mod =~ s/^Subject: /Subject: [list] /m;
+    $mod =~ s/^To: .*$/To: tampered\@example.net/m if $o{forge};
+    $mod .= "--$EOL" . "rewritten$EOL";
+    my $mi = Mail::DKIM2::MessageInstance->calculate(
+        Email::MIME->new($mod), Email::MIME->new($signed));
+    $mi->set_null_body_recipe;
+    if ($o{forge}) {
+        # hide the To change from the header Recipe
+        my $rh = $mi->{bits}{rh};
+        delete $rh->{$_} for grep { lc($_) eq 'to' } keys %$rh;
+    }
+    return "Message-Instance: " . $mi->as_string . $EOL . $mod;
+}
+
+sub info_values {
+    my ($mods) = @_;
+    return map { $_->{value} } inserted($mods, 'X-DKIM2-Info');
+}
+
+{
+    my ($verdict, $mods) = run_milter(
+        from => 'list-bounces@test2.dkim2.com', rcpt => ['subscriber@example.org'],
+        message => null_list_post());
+    is($verdict, 'c', 'null body: milter continues');
+    is(scalar(inserted($mods, 'DKIM2-Signature')), 0, 'option off: null body Recipe not signed');
+    like(join("\n", info_values($mods)), qr/not-signed=null-body-recipe/,
+        'option off: X-DKIM2-Info records not-signed=null-body-recipe');
+    like(milter_log(), qr/not signing <post\@test1\.dkim2\.com>: unsigned top Message-Instance m=2 has a null body Recipe/,
+        'option off: the log says the null top is unsigned');
+}
+
+# --- 5b. The same null m=2, but the list domain signed it (i=2, m=2) ---
+# A forwarder (test3) relays the list post unchanged. The null was declared
+# and signed upstream, so the default milter (option off) extends the chain,
+# and X-DKIM2-Info still notes the null top it signed over.
+{
+    my $post = null_list_post();
+    my $s = Mail::DKIM2::Signer->new(
+        Domain => 'test2.dkim2.com', Selector => 'sel1',
+        Key => DKIM2TestKeys::private_key('test2.dkim2.com', 'sel1'),
+        MailFrom => 'list-bounces@test2.dkim2.com', RcptTo => ['subscriber@test3.dkim2.com'],
+        Timestamp => time());
+    $s->PRINT($post); $s->CLOSE;
+    my $signed_post = $s->as_string . $EOL . $post;
+
+    my ($verdict, $mods) = run_milter(
+        from => 'fwd@test3.dkim2.com', rcpt => ['user@example.org'],
+        message => $signed_post);
+    is($verdict, 'c', 'signed null top: milter continues');
+    my @sig = inserted($mods, 'DKIM2-Signature');
+    is(scalar @sig, 1, 'signed null top: signed with the option off') or diag(milter_log());
+    like($sig[0]{value} // '', qr/\bi=3;.*\bm=2;/s, 'signed null top: i=3 over the list\'s m=2');
+    like($sig[0]{value} // '', qr/\bd=test3\.dkim2\.com;/, 'signed null top: by the forwarder');
+    like(join("\n", info_values($mods)), qr/action=null-body-recipe/,
+        'signed null top: X-DKIM2-Info notes the null top (informational)');
+    unlike(join("\n", info_values($mods)), qr/not-signed=/,
+        'signed null top: no not-signed= tag');
+    my $v = verify(assemble($signed_post, $mods));
+    is($v->result, 'pass', 'signed null top: full chain verifies at a receiver')
+        or diag($v->result_detail);
+}
+
+{
+    my ($pid2, $sock2) = spawn_milter(extra => ['--allow-null-body-recipe']);
+    ok(-S $sock2, 'option-on milter is listening') or BAIL_OUT("milter never came up");
+    my ($verdict, $mods) = run_milter(sock => $sock2,
+        from => 'list-bounces@test2.dkim2.com', rcpt => ['subscriber@example.org'],
+        message => null_list_post());
+    is(scalar(inserted($mods, 'DKIM2-Signature')), 1, 'option on: signed') or diag(milter_log());
+    like(join("\n", info_values($mods)), qr/action=null-body-recipe/,
+        'option on: X-DKIM2-Info records null-body-recipe');
+
+    # The list also changed To, and its header Recipe hides that: refused
+    # even with the option on, by the header-history walk.
+    ($verdict, $mods) = run_milter(sock => $sock2,
+        from => 'list-bounces@test2.dkim2.com', rcpt => ['subscriber@example.org'],
+        message => null_list_post(forge => 1));
+    is(scalar(inserted($mods, 'DKIM2-Signature')), 0,
+        'option on: forged header history not signed');
+}
+
+# --- 5. nd= bridge: sign when the top nd= names our d=, refuse otherwise ---
+{
+    my $nd_signed = sub {
+        my ($nd) = @_;
+        my $mi  = Mail::DKIM2::MessageInstance->calculate(Email::MIME->new($PLAIN));
+        my $msg = "Message-Instance: " . $mi->as_string . $EOL . $PLAIN;
+        my $signer = Mail::DKIM2::Signer->new(
+            Domain => 'test1.dkim2.com', Selector => 'sel1',
+            Key => DKIM2TestKeys::private_key('test1.dkim2.com', 'sel1'),
+            NextDomain => $nd, Timestamp => time());
+        $signer->PRINT($msg); $signer->CLOSE;
+        return $signer->as_string . $EOL . $msg;
+    };
+    my ($verdict, $mods) = run_milter(
+        from => 'list-bounces@test2.dkim2.com', rcpt => ['subscriber@example.org'],
+        message => $nd_signed->('test2.dkim2.com'));
+    my @sig = inserted($mods, 'DKIM2-Signature');
+    is(scalar @sig, 1, 'nd=us: signed') or diag(milter_log());
+    like($sig[0]{value}, qr/\bi=2;/, 'nd=us: signature is i=2') if @sig;
+
+    ($verdict, $mods) = run_milter(
+        from => 'list-bounces@test2.dkim2.com', rcpt => ['subscriber@example.org'],
+        message => $nd_signed->('test3.dkim2.com'));
+    is(scalar(inserted($mods, 'DKIM2-Signature')), 0, 'nd=other: not signed');
+    like(milter_log(), qr/not signing .*top signature nd=test3\.dkim2\.com names another domain/,
+        'nd=other: refusal is logged');
+}
+
+# --- 6. Malformed Content-Type: parsed quietly, same decision ---
+{
+    for my $ct ('text/plain; charset=Windows-1252;', 'text/plain; Windows-1252') {
+        (my $m = $PLAIN) =~ s/^Content-Type: text\/plain(?=\r)/Content-Type: $ct/m;
+        my $before = length milter_log();
+        my ($verdict, $mods) = run_milter(
+            from => 'list-bounces@test2.dkim2.com', rcpt => ['subscriber@example.org'],
+            message => $m);
+        is(scalar(inserted($mods, 'DKIM2-Signature')), 1, "Content-Type '$ct': signed");
+        my $new = substr(milter_log(), $before);
+        unlike($new, qr/Extra semicolon|Illegal parameter/, "Content-Type '$ct': no Email::MIME warning in log");
+    }
+}
+
+# --- 7. An out-of-range i= upstream: refused, and the milter survives ---
+# i=99999999999999999999 used to kill the Verifier ("Range iterator outside
+# integer range") inside cb_eom, and with it the callback. Every i= and m= is
+# bounded by MAX_CHAIN_LENGTH now, so it is an ordinary PERMERROR refusal.
+{
+    my $msg = "DKIM2-Signature: i=99999999999999999999; m=1; d=evil.example$EOL"
+            . originator_signed();
+    my ($verdict, $mods) = eval { run_milter(
+        from => 'list-bounces@test2.dkim2.com', rcpt => ['subscriber@example.org'],
+        message => $msg) };
+    is($@, '', 'huge i=: the milter answers');
+    is($verdict, 'c', 'huge i=: milter continues');
+    is(scalar(inserted($mods || [], 'DKIM2-Signature')), 0, 'huge i=: not signed');
+    like(milter_log(), qr/not signing <post\@test1\.dkim2\.com>: .*exceeds the maximum chain number of 100/,
+        'huge i=: refusal is logged with the reason');
+}
+
+# --- 8. An exception in the gate or the verifier fails closed ---
+# A die inside the verify/sign path must not kill the callback: the milter
+# logs a refusal and does not sign. Faults are injected with a -M module.
+{
+    path("$dir/inject")->mkpath;
+    path("$dir/inject/DKIM2TestDieGate.pm")->spew(
+        "package DKIM2TestDieGate; require Mail::DKIM2::Gate;\n"
+      . "no warnings 'redefine';\n"
+      . "*Mail::DKIM2::Gate::check = sub { die \"injected gate fault\\n\" };\n1;\n");
+    path("$dir/inject/DKIM2TestDieVerifier.pm")->spew(
+        "package DKIM2TestDieVerifier; require Mail::DKIM2::Verifier;\n"
+      . "no warnings 'redefine';\n"
+      . "*Mail::DKIM2::Verifier::CLOSE = sub { die \"injected verifier fault\\n\" };\n1;\n");
+
+    my (undef, $sock_g) = spawn_milter(perl => ["-I$dir/inject", '-MDKIM2TestDieGate']);
+    my ($verdict, $mods) = eval { run_milter(sock => $sock_g,
+        from => 'list-bounces@test2.dkim2.com', rcpt => ['subscriber@example.org'],
+        message => list_modified(originator_signed())) };
+    is($@, '', 'gate fault: the milter answers');
+    is($verdict, 'c', 'gate fault: milter continues');
+    is(scalar(inserted($mods || [], 'DKIM2-Signature')), 0, 'gate fault: not signed');
+    like(milter_log(), qr/not signing <post\@test1\.dkim2\.com>: .*injected gate fault/,
+        'gate fault: refusal is logged');
+
+    my (undef, $sock_v) = spawn_milter(perl => ["-I$dir/inject", '-MDKIM2TestDieVerifier'],
+                                      extra => ['--mode', 'inbound']);
+    ($verdict, $mods) = eval { run_milter(sock => $sock_v,
+        from => 'author@test1.dkim2.com', rcpt => ['list@test2.dkim2.com'],
+        message => originator_signed()) };
+    is($@, '', 'verifier fault: the milter answers');
+    is($verdict, 'c', 'verifier fault: milter continues');
+    my ($ar) = inserted($mods || [], 'Authentication-Results');
+    like($ar ? $ar->{value} : '', qr/dkim2=temperror/, 'verifier fault: A-R says temperror, not pass');
+    like(milter_log(), qr/verify .*injected verifier fault/, 'verifier fault: logged');
+}
+
+# --- 9. An out-of-range Message-Instance m= at the inbound MI step ---
+# Inbound, the milter computes a Message-Instance against its stored
+# snapshot, and used to strip the instances above the snapshot's top as the
+# range snap_max_v+1 .. max_v: m=99999999999999999999 died ("Range iterator
+# outside integer range") and m=4294967297 built a four-billion-element list.
+# Now the m= is bounded first: no Message-Instance is added, the message
+# passes with its Authentication-Results, and the milter keeps answering.
+# A fault inside the MI computation fails closed the same way (inbound: no
+# MI; outbound: not signed).
+{
+    my (undef, $sock_in) = spawn_milter(extra => ['--mode', 'inbound']);
+    ok(-S $sock_in, 'inbound milter is listening') or BAIL_OUT("milter never came up");
+    my $n = 0;
+    my $base = sub {
+        my ($id) = @_;
+        (my $m = $PLAIN) =~ s/^Message-Id: <post\@/Message-Id: <$id\@/m;
+        return $m;
+    };
+    for my $big ('99999999999999999999', '4294967297', '33') {
+        my $id = 'bigm' . $n++;
+        my ($verdict, $mods) = run_milter(sock => $sock_in,
+            from => 'author@test1.dkim2.com', rcpt => ['list@test2.dkim2.com'],
+            message => $base->($id));
+        my ($mi1) = inserted($mods, 'Message-Instance');
+        ok($mi1, "m=$big: first pass adds m=1 and stores a snapshot") or next;
+        my $first = assemble($base->($id), $mods);
+        # Only the headers the snapshot was taken over: drop the second info line.
+        (my $v1 = $mi1->{value}) =~ s/\r?\n/$EOL/g;
+        my ($ar)   = inserted($mods, 'Authentication-Results');
+        my @info   = inserted($mods, 'X-DKIM2-Info');
+        (my $i0 = $info[0]{value}) =~ s/\r?\n/$EOL/g;
+        my $msg2 = "Message-Instance: m=$big; h=sha256:AAAA:AAAA$EOL"
+                 . "Message-Instance: $v1$EOL"
+                 . "X-DKIM2-Info: $i0$EOL"
+                 . "Authentication-Results: $ar->{value}$EOL"
+                 . $base->($id);
+        $msg2 =~ s/Here's a test user!/a changed body/;
+        my $before = length milter_log();
+        my $t0 = time;
+        ($verdict, $mods) = eval { run_milter(sock => $sock_in,
+            from => 'author@test1.dkim2.com', rcpt => ['list@test2.dkim2.com'],
+            message => $msg2) };
+        is($@, '', "m=$big: the milter answers");
+        is($verdict, 'c', "m=$big: milter continues");
+        ok(time - $t0 < 15, "m=$big: promptly");
+        is(scalar(inserted($mods || [], 'Message-Instance')), 0, "m=$big: no Message-Instance added");
+        my $new = substr(milter_log(), $before);
+        unlike($new, qr/stripping broken MI/, "m=$big: m= never used as a range");
+        unlike($new, qr/Range iterator|Out of memory/, "m=$big: no exception");
+        is(scalar(inserted($mods || [], 'Authentication-Results')), 1,
+            "m=$big: the message passes with its Authentication-Results");
+    }
+
+    path("$dir/inject/DKIM2TestDieMI.pm")->spew(
+        "package DKIM2TestDieMI; require Mail::DKIM2::MessageInstance;\n"
+      . "no warnings 'redefine';\n"
+      . "*Mail::DKIM2::MessageInstance::calculate = sub { die \"injected MI fault\\n\" };\n1;\n");
+    for my $mode ('inbound', 'outbound') {
+        my (undef, $sock_m) = spawn_milter(perl => ["-I$dir/inject", '-MDKIM2TestDieMI'],
+                                          extra => ['--mode', $mode]);
+        my ($verdict, $mods) = eval { run_milter(sock => $sock_m,
+            from => 'list-bounces@test2.dkim2.com', rcpt => ['subscriber@example.org'],
+            message => $PLAIN) };
+        is($@, '', "MI fault ($mode): the milter answers");
+        is($verdict, 'c', "MI fault ($mode): milter continues");
+        is(scalar(inserted($mods || [], 'Message-Instance')), 0, "MI fault ($mode): no Message-Instance");
+        is(scalar(inserted($mods || [], 'DKIM2-Signature')), 0, "MI fault ($mode): not signed");
+        like(milter_log(), $mode eq 'inbound'
+                ? qr/dkim2-milter: no Message-Instance for <post\@test1\.dkim2\.com>: internal error: injected MI fault/
+                : qr/dkim2-milter: not signing <post\@test1\.dkim2\.com>: internal error computing the Message-Instance: injected MI fault/,
+            "MI fault ($mode): logged as a refusal");
+    }
 }
 
 done_testing;

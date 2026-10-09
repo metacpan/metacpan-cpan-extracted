@@ -46,14 +46,25 @@ SKIP: {
         'over-long socket path croaks instead of truncating';
 }
 
-ok +ClamAV::Clamd->new(socket => '/tmp/whatever.sock'), 'a plausible socket path constructs';
+SKIP: {
+    skip 'no UNIX sockets on this platform', 2 unless ClamAV::Clamd::_sun_path_max();
+
+    ok +ClamAV::Clamd->new(socket => '/tmp/whatever.sock'), 'a plausible socket path constructs';
+
+    # new() does not connect, so a dead address is fine until a command runs.
+    ok +ClamAV::Clamd->new(socket => '/nonexistent/clamd.sock'),
+        'new does not connect';
+}
+
+like exception(sub { ClamAV::Clamd->new(socket => '/tmp/whatever.sock') }),
+    qr/UNIX sockets are not supported on this platform/,
+    'a socket path is refused where there are no UNIX sockets'
+    unless ClamAV::Clamd::_sun_path_max();
+
 ok +ClamAV::Clamd->new(host => '127.0.0.1'), 'host constructs, port defaults';
 
 is +ClamAV::Clamd->new(host => 'x')->{port}, 3310, 'default port is 3310';
 
-# new() does not connect, so a dead address is fine until a command runs.
-ok +ClamAV::Clamd->new(socket => '/nonexistent/clamd.sock'),
-    'new does not connect';
 
 sub exception {
     my ($code) = @_;

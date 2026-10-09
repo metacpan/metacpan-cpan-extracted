@@ -10,6 +10,7 @@ t/basic.t
 t/config-restore.t
 t/doc-traversal.t
 t/export-qrcode.t
+t/export-translate.t
 t/invalidPlugin.t
 t/jsonrpc.t
 t/session_expiry.t

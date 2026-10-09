@@ -4498,15 +4498,19 @@ PERL
         };
     };
     local *Developer::Dashboard::EnvLoader::load_runtime_layers = sub {
-        shift;
+        my ( $class, %args ) = @_;
         $seen{runtime_layers_loaded}++;
-        return;
+        push @{ $seen{runtime_scopes} }, $args{scope};
+        return [];
     };
     local *Developer::Dashboard::EnvLoader::load_skill_layers = sub {
         shift;
         my (%args) = @_;
         $seen{skill_layers} = [ @{ $args{skill_layers} || [] } ];
-        return;
+        return [];
+    };
+    local *Developer::Dashboard::EnvLoader::load_skill_cli_layers = sub {
+        return [];
     };
     my $exec_result = $dispatcher->exec_command( 'dep-skill', 'run-test', 'alpha', 'beta' );
     ok( $exec_result->{success}, 'exec_command delegates to the resolved command runner after preparing the environment' );
@@ -4516,7 +4520,8 @@ PERL
     is( $exec_result->{env}{DEVELOPER_DASHBOARD_SKILL_COMMAND}, 'run-test', 'exec_command exposes the resolved command name in the child environment' );
     is_same_path( $exec_result->{env}{DEVELOPER_DASHBOARD_SKILL_ROOT}, $dep_skill_root, 'exec_command exposes the resolved skill path in the child environment' );
     is_deeply( $exec_result->{skill_layers}, [$dep_skill_root], 'exec_command loads the participating skill layers before exec' );
-    is( $exec_result->{runtime_layers_loaded}, 1, 'exec_command reloads runtime env layers before replacing the helper process' );
+    is( $exec_result->{runtime_layers_loaded}, 2, 'exec_command reloads home and descendant runtime env layers before replacing the helper process' );
+    is_deeply( $exec_result->{runtime_scopes}, [ 'home', 'descendants' ], 'exec_command loads home defaults before the skill chain and deeper runtime overrides afterward' );
     is_deeply(
         $exec_result->{last},
         { file => '/tmp/hook', exit => 0, STDOUT => "hook\n", STDERR => '' },
@@ -5315,7 +5320,9 @@ This test closes direct branch coverage for private helper packaging, query
 parsing, runtime results, path registries, isolated skills, and cross-shell
 prompt bootstrap delegation to the common C<dashboard ps1> renderer. Its path
 completion checks also ensure cdr suggestions advance one directory level at
-a time rather than recursively scanning alias targets.
+a time rather than recursively scanning alias targets. The skill dispatcher
+fixture also verifies home runtime defaults load before skill values and
+deeper runtime overrides load afterward.
 
 =for comment FULL-POD-DOC START
 

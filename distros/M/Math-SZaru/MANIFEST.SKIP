@@ -35,6 +35,7 @@
 \.rej$
 \.swp$
 \.swo$
+\.o$
 
 # Avoid OS-specific files/dirs
 #   Mac OSX metadata

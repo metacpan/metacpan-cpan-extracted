@@ -139,7 +139,8 @@ sub write_file {
     my $html = $app->_nav_items_html( page => $page, runtime_context => { params => {} } );
     like( $html, qr/nav-x/, 'readable nav directories contribute fragments' );
     local $FAIL_OPENDIR{$nav_root} = 1;
-    is( $app->_nav_items_html( page => $page, runtime_context => { params => {} } ), '', 'an unopenable nav directory is skipped' );
+    my $html_with_unopenable_root = $app->_nav_items_html( page => $page, runtime_context => { params => {} } );
+    unlike( $html_with_unopenable_root, qr/nav-x/, 'an unopenable nav directory is skipped while other runtime layers may still contribute nav entries' );
 }
 
 # --- Prompt: explicit Git metadata I/O failures ---------------------------

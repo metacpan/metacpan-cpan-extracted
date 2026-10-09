@@ -1,5 +1,10 @@
 Revision history for Deflate::Faster
 
+0.03  2026-10-08
+    - An out-of-range mod_time warns on perls with 32-bit integers too.
+    - DESTROY of a foreign object blessed into Deflate::Faster no longer
+      aborts a perl built with -DDEBUGGING.
+
 0.02  2026-10-07
     - gunzip and unzip reject a gzip header with a wrong header checksum.
     - unzip clears file_name and mod_time in every format, and leaves them

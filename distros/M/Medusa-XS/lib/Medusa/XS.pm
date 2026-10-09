@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 require XSLoader;
 XSLoader::load('Medusa::XS', $VERSION);
@@ -75,7 +75,7 @@ Medusa::XS - High-performance XS audit logging with the C<:Audit> attribute
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

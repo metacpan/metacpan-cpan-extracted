@@ -1145,6 +1145,21 @@ for my $then (qw(max_pending monitor command)) { SKIP: {
     $killer->disconnect;
 } }
 
+# ... and after a manual disconnect()+reconnect() with a reply still draining:
+# the detached leftovers belong to the replaced connection, not the new one
+{
+    my $r = EV::Redis->new(path => $connect_info{sock}, on_error => sub {});
+    $r->command('blpop', 'fc_mon_cycle_nokey', 5, sub {});
+    { my $g = EV::timer 0.3, 0, sub { EV::break }; EV::run }
+    $r->disconnect;
+    $r->connect_unix($connect_info{sock});
+    { my $g = EV::timer 0.5, 0, sub { EV::break }; EV::run }
+    my $monitor_err;
+    eval { $r->command('monitor', sub {}); 1 } or $monitor_err = $@;
+    is $monitor_err, undef, 'manual reconnect: MONITOR is accepted while a reply drains';
+    $r->disconnect;
+}
+
 # disconnect() inside a cancel batch also cancels what its callbacks queued
 {
     my @log;
@@ -1377,6 +1392,60 @@ SKIP: {
     cmp_ok $iterations, '<', 100, 'a nested loop in a callback does not spin on a waiting reply';
     is $second, 'after', 'the waiting reply comes after the callback returns';
     $r->disconnect;
+}
+
+# skip_waiting from a waiting-timeout callback leaves the batch alone
+{
+    my $r = EV::Redis->new(path => $connect_info{sock}, on_error => sub {});
+    $r->max_pending(1);
+    $r->command('blpop', 'fc_tmo_blk', 30, sub {});
+    $r->waiting_timeout(200);
+    my ($g1, $g2, $new);
+    $r->command('incr', 'fc_tmo_a', sub {
+        $g1 = $_[1];
+        $r->command('incr', 'fc_tmo_new', sub { $new = $_[1] // "reply $_[0]" });
+        $r->skip_waiting;
+    });
+    $r->command('incr', 'fc_tmo_b', sub { $g2 = $_[1] });
+    my $t; $t = EV::timer 3, 0, sub { undef $t; EV::break };
+    EV::run;
+    undef $t;
+    is $g1, 'waiting timeout', 'first expiry keeps its error';
+    is $g2, 'waiting timeout', 'skip_waiting from a timeout callback spares siblings';
+    is $new, 'waiting timeout', '... and commands it just queued expire on their own';
+    $r->disconnect;
+}
+
+# skip_pending from a waiting-timeout callback still clears in-flight
+{
+    my $r = EV::Redis->new(path => $connect_info{sock}, on_error => sub {});
+    $r->max_pending(1);
+    my $blocked;
+    $r->command('blpop', 'fc_tmo_blk2', 30, sub { $blocked = $_[1] });
+    $r->waiting_timeout(200);
+    my ($g1, $g2, $new);
+    $r->command('incr', 'fc_tmo_c', sub {
+        $g1 = $_[1];
+        $r->command('incr', 'fc_tmo_new2', sub { $new = $_[1] // "reply $_[0]" });
+        $r->skip_pending;
+    });
+    $r->command('incr', 'fc_tmo_d', sub { $g2 = $_[1] });
+    # the freed slot sends the queued command, but its reply waits behind the
+    # server-side blocked blpop: unblock from a second connection
+    my $unblocker = EV::Redis->new(path => $connect_info{sock}, on_error => sub {});
+    my $u; $u = EV::timer 0.6, 0, sub {
+        undef $u;
+        $unblocker->command('lpush', 'fc_tmo_blk2', 'x', sub {});
+    };
+    my $t; $t = EV::timer 3, 0, sub { undef $t; EV::break };
+    EV::run;
+    undef $t;
+    is $g1, 'waiting timeout', 'first expiry keeps its error';
+    is $g2, 'waiting timeout', 'skip_pending from a timeout callback spares siblings';
+    is $blocked, 'skipped', '... but still clears in-flight commands';
+    like $new, qr/^reply/, '... and commands it just queued run on the freed slot';
+    $r->disconnect;
+    $unblocker->disconnect;
 }
 
 done_testing;

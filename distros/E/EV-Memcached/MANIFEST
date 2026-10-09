@@ -47,6 +47,19 @@ t/14_loop_option.t
 t/15_api_validation.t
 t/16_drain_reentrancy.t
 t/17_connect_deferred.t
+t/18_split_mget.t
+t/19_teardown_reentrancy.t
+t/20_resume_split_mget.t
+t/21_sasl_window.t
+t/22_connect_robustness.t
+t/23_accounting.t
+t/24_flow_order.t
+t/25_timeout_activity.t
+t/26_connect_error_reentry.t
+t/27_mget_errors.t
+t/28_auth_lifecycle.t
+t/29_response_stream.t
+t/30_keepalive.t
 t/lib/FakeMemcached.pm
 typemap
 META.yml                                 Module YAML meta-data (added by MakeMaker)

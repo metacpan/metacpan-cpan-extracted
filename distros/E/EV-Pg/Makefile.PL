@@ -5,10 +5,12 @@ use EV::MakeMaker;
 use Alien::libpq;
 
 # Pipeline mode requires libpq >= 14
+my $pq_major = 14;
 my $pq_ver = Alien::libpq->version;
 if (defined $pq_ver && $pq_ver =~ /^(\d+)/) {
     die "EV::Pg requires libpq >= 14 (pipeline mode). Found: $pq_ver\n"
         if $1 < 14;
+    $pq_major = $1;
 }
 
 my %ev = EV::MakeMaker::ev_args();
@@ -19,12 +21,13 @@ WriteMakefile(
     ABSTRACT      => 'Async PostgreSQL client using libpq and EV',
     AUTHOR        => 'vividsnow',
     LICENSE       => 'perl_5',
-    MIN_PERL_VERSION => '5.012',
+    MIN_PERL_VERSION => '5.014',
     PREREQ_PM     => {
         'EV'           => '4.11',
         'Alien::libpq' => 0,
     },
     XS            => { 'Pg.xs' => 'Pg.c' },
+    DEFINE        => "-DEV_PG_LIBPQ_MAJOR=$pq_major",
     INC           => Alien::libpq->cflags . " $ev{INC}",
     LIBS          => [Alien::libpq->libs],
     OBJECT        => 'Pg$(OBJ_EXT)',

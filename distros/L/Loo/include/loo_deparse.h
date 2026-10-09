@@ -350,7 +350,11 @@ static loo_prec_t
 ddc_op_precedence(U16 op_type)
 {
     switch (op_type) {
-        case OP_OR: case OP_DOR:   return LOO_PREC_OROR;
+        case OP_OR:
+#if PERL_VERSION >= 10  /* // appeared in 5.10 */
+        case OP_DOR:
+#endif
+            return LOO_PREC_OROR;
         case OP_AND:               return LOO_PREC_ANDAND;
         case OP_BIT_OR: case OP_BIT_XOR: return LOO_PREC_BITOR;
         case OP_BIT_AND:           return LOO_PREC_BITAND;
@@ -1202,6 +1206,7 @@ ddc_deparse_op(pTHX_ OP *o, DDCDeparse *ctx)
         }
         break;
     }
+#if PERL_VERSION >= 10
     case OP_DOR: {
         loo_prec_t saved = ctx->prec;
         loo_prec_t my_prec = ddc_op_precedence(type);
@@ -1219,9 +1224,14 @@ ddc_deparse_op(pTHX_ OP *o, DDCDeparse *ctx)
         ctx->prec = saved;
         break;
     }
+#endif
 
     /* ── Compound logical assignment (&&=, ||=, //=) ─────────── */
-    case OP_ANDASSIGN: case OP_ORASSIGN: case OP_DORASSIGN: {
+    case OP_ANDASSIGN: case OP_ORASSIGN:
+#if PERL_VERSION >= 10
+    case OP_DORASSIGN:
+#endif
+    {
         const char *sym;
         OP *left = cLOGOPo->op_first;
         OP *right = OpSIBLING(left);
@@ -2523,13 +2533,19 @@ ddc_deparse_op(pTHX_ OP *o, DDCDeparse *ctx)
     }
 
     /* ── print/say/warn/die ───────────────────────────────────── */
-    case OP_PRINT: case OP_SAY: case OP_WARN: case OP_DIE: {
+    case OP_PRINT: case OP_WARN: case OP_DIE:
+#if PERL_VERSION >= 10
+    case OP_SAY:
+#endif
+    {
         const char *fn;
         OP *kid;
         int first = 1;
         switch (type) {
             case OP_PRINT: fn = "print"; break;
+#if PERL_VERSION >= 10
             case OP_SAY:   fn = "say";   break;
+#endif
             case OP_WARN:  fn = "warn";  break;
             case OP_DIE:   fn = "die";   break;
             default: fn = "???";

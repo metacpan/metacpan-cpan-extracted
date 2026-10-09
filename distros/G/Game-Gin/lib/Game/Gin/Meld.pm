@@ -7,7 +7,7 @@ use Exporter 'import';
 
 use Game::Gin::Card qw(rank_of suit_of);
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 our @EXPORT_OK = qw(melds_in is_meld is_set is_run MIN_MELD);
 
 use constant MIN_MELD => 3;
@@ -93,7 +93,7 @@ Game::Gin::Meld - the sets and runs that can be made from a hand
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

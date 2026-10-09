@@ -9,7 +9,17 @@
 #
 #   dkim2sign -s SELECTOR -d DOMAIN -k KEYFILE [--mailfrom '<a@b>']
 #                [--rcptto '<c@d>']... [--timestamp N] [--next-domain D]
-#                [--flag F]... [MESSAGE|-]
+#                [--flag F]... [--allow-null-body-recipe]
+#                [--ignore-timestamps] [--dns-json PATH] [MESSAGE|-]
+#
+# Before extending an existing DKIM2 chain it runs the same verify-before-sign
+# gate as dkim2-milter (Mail::DKIM2::Gate): the upstream signatures must
+# verify, the Message-Instance chain must undo cleanly, and a null body Recipe
+# on an UNSIGNED Message-Instance (m= above every signature's m=, top or not)
+# is refused unless --allow-null-body-recipe; a null an upstream domain
+# already signed is extended without it. A top signature carrying
+# nd= is extended only when nd= equals DOMAIN. On refusal it prints the reason
+# on stderr and exits 1 with nothing on stdout.
 #
 # Per §9.1/§9.2.5 an unmodified hop adds no Message-Instance: if the top
 # instance already matches the content, its m= is reused and only a
@@ -23,7 +33,8 @@ use Getopt::Long qw(GetOptions);
 use FindBin;
 use lib -d "$FindBin::Bin/../lib/Mail/DKIM2" ? "$FindBin::Bin/../lib" : ();   # running from a checkout
 
-use Mail::DKIM2::Common qw(fold_header);
+use Mail::DKIM2::Common qw(fold_header parse_dkim_pubkey parse_mime);
+use Mail::DKIM2::Gate;
 use Mail::DKIM2::MessageInstance;
 use Mail::DKIM2::Signer;
 
@@ -31,6 +42,8 @@ my ($selector, $domain, $keyfile, $timestamp, $next_domain);
 my $mailfrom = '<>';
 my $hash_algs = 'sha256';
 my (@rcptto, @flags);
+my ($allow_null, $ignore_ts, $dns_json);
+$dns_json = $ENV{DKIM2_DNS_JSON} if defined $ENV{DKIM2_DNS_JSON} && length $ENV{DKIM2_DNS_JSON};
 
 GetOptions(
     's|selector=s'    => \$selector,
@@ -42,6 +55,9 @@ GetOptions(
     'next-domain=s'   => \$next_domain,
     'flag=s'          => \@flags,
     'hash=s'          => \$hash_algs,
+    'allow-null-body-recipe' => \$allow_null,
+    'ignore-timestamps'      => \$ignore_ts,
+    'dns-json=s'      => \$dns_json,
 ) or die _usage();
 
 die _usage() unless defined $selector && defined $domain && defined $keyfile;
@@ -68,7 +84,36 @@ $raw =~ s/\r\n/\n/g;
 $raw =~ s/\r/\n/g;
 $raw =~ s/\n/\r\n/g;
 
-my $msg = Email::MIME->new($raw);
+# Gate (shared with dkim2-milter, Mail::DKIM2::Gate): before extending an
+# existing DKIM2 chain, verify it -- an unsigned top Message-Instance is the one
+# we are about to cover, so it is allowed -- and refuse a null body Recipe on
+# an unsigned instance unless --allow-null-body-recipe. A message with no
+# chain is signed as before.
+my %gate_opts = (AllowNullBodyRecipe => $allow_null, SkipTimestampCheck => $ignore_ts,
+                 SigningDomain => $domain);
+if ($dns_json) {
+    require JSON;
+    my $dns = do {
+        open my $fh, '<', $dns_json or die "$dns_json: $!\n";
+        local $/; JSON::decode_json(<$fh>);
+    };
+    $gate_opts{PubkeyCallback} = sub {
+        my ($sig, $idx, $verifier) = @_;
+        my ($sel, $dom) = ($sig->selector($idx // 0), $sig->domain);
+        my $txt = $dns->{$dom}{"$sel._domainkey"}[0][1]
+            if $dom && $sel && $dns->{$dom};
+        return parse_dkim_pubkey($txt) if $txt;
+        return $verifier->fetch_public_key($sig, $idx);
+    };
+}
+my $gate = Mail::DKIM2::Gate->check($raw, %gate_opts);
+unless ($gate->{ok}) {
+    $gate->{message} =~ s/AllowNullBodyRecipe not set/--allow-null-body-recipe not set/;
+    print STDERR "dkim2sign: not signing: $gate->{message}\n";
+    exit 1;
+}
+
+my $msg = parse_mime($raw);
 
 # §9.1/§9.2.5: only add an instance if this hop actually changed something.
 # MessageInstance->verify returns the version it matched, so a true result means
@@ -119,6 +164,11 @@ usage: $0 -s SELECTOR -d DOMAIN -k KEYFILE [options] [MESSAGE|-]
       --timestamp N  fixed t= (default: now)
       --next-domain D  emit nd= for an imaginary forwarding hop, omitting mf=/rt=
       --flag F       f= flag; repeatable
+      --allow-null-body-recipe  sign even if a Message-Instance has a null body
+                     Recipe that no upstream signature covers (its m= is above
+                     every signature's m=; a signed null needs no option)
+      --ignore-timestamps  do not fail an upstream signature for its t= age
+      --dns-json PATH  answer key lookups from an interop dns.json (default \$DKIM2_DNS_JSON)
       --hash A       hash algorithm(s) for Message-Instance h=: sha256|sha512|both (default sha256)
 USAGE
     return $err ? "$err\n$usage" : $usage;

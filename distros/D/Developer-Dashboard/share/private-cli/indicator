@@ -45,7 +45,7 @@ Use this file when changing indicator CLI verbs, refresh-core behavior, or the h
 
 =head1 HOW TO USE
 
-Users run C<dashboard indicator ...>. The staged helper forwards those arguments into the private runtime, which updates indicator state or recomputes the built-in project/docker/git indicators.
+Users run C<dashboard indicator ...>. The staged helper forwards those arguments into the private runtime, which updates indicator state or recomputes project and Git state. Docker is not a core indicator; Docker indicators come only from explicitly configured collectors.
 
 =head1 WHAT USES IT
 

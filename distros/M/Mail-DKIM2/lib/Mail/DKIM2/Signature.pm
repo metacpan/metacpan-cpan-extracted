@@ -2,7 +2,7 @@ package Mail::DKIM2::Signature;
 use strict;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.17';
 
 use MIME::Base64 qw(encode_base64 decode_base64);
 use Carp;

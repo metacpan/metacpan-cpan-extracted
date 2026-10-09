@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use POSIX ();
 
 use EV::Redis;
 
@@ -31,6 +32,24 @@ ok $redis->can('foo');
     local $SIG{__WARN__} = sub { push @warn, @_ };
     EV::Redis->new->on_error('not code');
     like $warn[0] // '', qr/not a code reference/, 'a non-code handler warns';
+}
+
+{
+    my @warn;
+    local $SIG{__WARN__} = sub { push @warn, @_ };
+    { no warnings; EV::Redis->new->on_error('not code'); }
+    is_deeply \@warn, [], 'a non-code handler honors no warnings';
+}
+
+{
+    my $r = EV::Redis->new;
+    my $died;
+    {
+        use warnings FATAL => 'all';
+        eval { $r->on_error('not code') };
+        $died = $@;
+    }
+    like $died, qr/not a code reference/, 'a non-code handler dies under FATAL warnings';
 }
 
 {
@@ -93,6 +112,11 @@ ok $redis->can('foo');
     like $@, qr/path contains a NUL byte at \Q$0\E line $line\.$/, 'a NUL in the path croaks';
     eval { $line = __LINE__; $r->source_addr("127.0.0.1\0x") };
     like $@, qr/source_addr contains a NUL byte at \Q$0\E line $line\.$/, 'a NUL in source_addr croaks';
+    { package NulOverload; use overload '""' => sub { $_[0]->{s} }, fallback => 1; }
+    eval { $line = __LINE__; $r->connect(bless({ s => "127.0.0.1\0x" }, 'NulOverload'), 6379) };
+    like $@, qr/host name contains a NUL byte at \Q$0\E line $line\.$/, 'a NUL in an overloaded host croaks';
+    eval { $line = __LINE__; $r->connect_unix(bless({ s => "/tmp/x\0y" }, 'NulOverload')) };
+    like $@, qr/path contains a NUL byte at \Q$0\E line $line\.$/, 'a NUL in an overloaded path croaks';
   SKIP: {
         skip 'no TLS support', 1 unless EV::Redis->has_ssl;
         eval { $line = __LINE__; EV::Redis->new(tls => 1, tls_ca => "/dev/null\0x") };
@@ -119,6 +143,55 @@ ok $redis->can('foo');
     my $r = EV::Redis->new;
     ok !eval { Storable::dclone($r); 1 }, 'dclone croaks';
     like $@, qr/cannot be serialized/, '... saying why';
+}
+
+SKIP: {
+    skip 'Sereal not available', 2
+        unless eval { require Sereal::Encoder; 1 };
+    my $r = EV::Redis->new;
+    my $enc = Sereal::Encoder->new({ freeze_callbacks => 1 });
+    ok !eval { $enc->encode($r); 1 }, 'Sereal encode croaks';
+    like $@, qr/cannot be serialized/, '... saying why';
+}
+
+SKIP: {
+    skip 'copy modules not available', 8 unless eval {
+        require Clone; require Sereal::Encoder; require Sereal::Decoder; 1;
+    };
+    for my $copy (
+        sub { Clone::clone($_[0]) },
+        sub { Sereal::Decoder::decode_sereal(Sereal::Encoder::encode_sereal($_[0])) },
+    ) {
+        my $r = EV::Redis->new;
+        my $other = $copy->($r);
+        eval { $other->pending_count };
+        like $@, qr/not made by new/, 'a copied object is inert';
+        undef $other;
+        is $r->pending_count, 0, 'destroying the copy leaves the original alive';
+        $other = $copy->($r);
+        undef $r;
+        eval { $other->pending_count };
+        like $@, qr/not made by new/, 'the copy stays inert after original destruction';
+        undef $other;
+        pass 'destroying the surviving copy is harmless';
+    }
+}
+
+# a foreign pointer (a default-Sereal copy decoded elsewhere) must fail
+# clean: without the live check the child segfaults instead of exiting 1
+{
+    my $pid = fork();
+    die "fork: $!" unless defined $pid;
+    if (0 == $pid) {
+        my $iv = 0x12345678;
+        my $fake = bless \$iv, 'EV::Redis';
+        my $croaked = !eval { $fake->ping(sub {}); 1 }
+            && $@ =~ /destroyed or was not made/;
+        undef $fake;
+        POSIX::_exit($croaked ? 0 : 1);
+    }
+    waitpid $pid, 0;
+    is $?, 0, 'foreign pointer: method croaks, destroy is a no-op';
 }
 
 done_testing;

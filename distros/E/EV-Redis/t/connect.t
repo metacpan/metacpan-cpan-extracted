@@ -450,4 +450,40 @@ SKIP: {
     ok $blpop_done && !defined $blpop_err, 'pending reply: blpop still finishes normally';
 }
 
+# an explicit undef port means the default, like an omitted one
+{
+    my @warns;
+    local $SIG{__WARN__} = sub { push @warns, $_[0] };
+    my @errs;
+    my $r = EV::Redis->new(on_error => sub { push @errs, $_[0]; EV::break });
+    eval { $r->connect('127.0.0.1', undef) };
+    is $@, '', 'connect(host, undef) does not croak';
+    { my $g = EV::timer 2, 0, sub { EV::break }; EV::run }
+    ok scalar(@errs) || $r->is_connected, '... and the attempt reaches the network';
+    is scalar(@warns), 0, '... without warnings';
+    $r->disconnect;
+}
+
+SKIP: {
+    require IO::Socket::INET;
+    my $srv = IO::Socket::INET->new(
+        Listen => 1, LocalAddr => '127.0.0.1', LocalPort => 6379,
+        ReuseAddr => 1,
+    );
+    skip 'port 6379 in use', 1 unless $srv;
+    my $accepted = 0;
+    my $w;
+    $w = EV::io fileno($srv), EV::READ, sub {
+        undef $w; $accepted = 1; EV::break;
+    };
+    my $r = EV::Redis->new(on_error => sub {});
+    eval { $r->connect('127.0.0.1', undef) };
+    my $t; $t = EV::timer 2, 0, sub { undef $t; undef $w; EV::break };
+    EV::run;
+    undef $t;
+    ok $accepted, 'connect(host, undef) uses port 6379';
+    close $srv;
+    $r->disconnect;
+}
+
 done_testing;

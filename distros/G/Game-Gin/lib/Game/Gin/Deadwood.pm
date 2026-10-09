@@ -8,7 +8,7 @@ use Exporter 'import';
 use Game::Gin::Card qw(deadwood_of);
 use Game::Gin::Meld qw(melds_in);
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 our @EXPORT_OK = qw(best deadwood can_knock is_gin KNOCK_AT);
 
 use constant KNOCK_AT => 10;
@@ -94,7 +94,7 @@ Game::Gin::Deadwood - the least deadwood a hand can be left with
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

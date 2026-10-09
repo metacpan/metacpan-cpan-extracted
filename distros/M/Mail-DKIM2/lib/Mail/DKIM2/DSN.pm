@@ -2,13 +2,13 @@ package Mail::DKIM2::DSN;
 use strict;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.17';
 
 use Email::MIME;
 use Carp;
 use List::Util qw(max);
 
-use Mail::DKIM2::Common qw(extract_domain relaxed_domain_match);
+use Mail::DKIM2::Common qw(extract_domain relaxed_domain_match parse_mime);
 use Mail::DKIM2::MessageInstance;
 use Mail::DKIM2::Signature;
 use Mail::DKIM2::Signer;
@@ -62,7 +62,7 @@ sub _embedded {
     my ($part) = @_;
     my @sub = $part->subparts;
     return $sub[0] if @sub;
-    return Email::MIME->new($part->body);
+    return parse_mime($part->body);
 }
 
 # Re-sign a rebuilt/created DSN as a NEW message: prepend one Message-Instance
@@ -72,7 +72,7 @@ sub _sign_as_new {
     my ($signer, $dsn) = @_;
     my $dsn_text = $dsn->as_string;
     $dsn_text =~ s/\r?\n/\r\n/g;
-    my $mi = Mail::DKIM2::MessageInstance->calculate(Email::MIME->new($dsn_text));
+    my $mi = Mail::DKIM2::MessageInstance->calculate(parse_mime($dsn_text));
     my $with_mi = "Message-Instance: " . $mi->as_string . "\r\n" . $dsn_text;
     $signer->PRINT($with_mi);
     $signer->CLOSE;
@@ -118,7 +118,7 @@ sub generate {
     my $status = $args{Status}        // '5.7.1';
     my $reason = $args{Reason}        // 'message rejected by reflector-dsn (demo bounce)';
 
-    my $orig = Email::MIME->new($raw);
+    my $orig = parse_mime($raw);
 
     # Where to send the bounce: explicit envelope sender, else top sig mf=,
     # else the From: header.
@@ -190,7 +190,7 @@ sub generate {
 # Returns ($dsn, $orig_idx, $orig_part); croaks with $who as the prefix.
 sub _parse_report {
     my ($raw, $who) = @_;
-    my $dsn = Email::MIME->new($raw);
+    my $dsn = parse_mime($raw);
     my $ct = $dsn->content_type // '';
     croak "$who: not a multipart/report DSN" unless $ct =~ m{multipart/report}i;
 
@@ -325,7 +325,7 @@ sub authenticate {
     $dv->CLOSE;
     my $dsn_result = $dv->result;
 
-    my $dsn_sig = _origin_sig(Email::MIME->new($dsn_text));
+    my $dsn_sig = _origin_sig(parse_mime($dsn_text));
     my ($alignment, $alignment_detail) =
         ($dsn_result eq 'pass') ? _check_alignment($dsn_sig, $top)
       : ($dsn_result eq 'none') ? ('none', 'DSN carries no DKIM2-Signature of its own')

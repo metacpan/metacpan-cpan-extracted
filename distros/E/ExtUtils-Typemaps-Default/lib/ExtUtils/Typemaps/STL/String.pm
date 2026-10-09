@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use ExtUtils::Typemaps;
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 our @ISA = qw(ExtUtils::Typemaps);
 
@@ -33,18 +33,26 @@ These are:
   TYPEMAP
   std::string   T_STD_STRING
   std::string*  T_STD_STRING_PTR
-
+  
   INPUT
   T_STD_STRING
-      $var = std::string( SvPV_nolen( $arg ), SvCUR( $arg ) );
-
+      {
+        size_t len;
+        const char * c = SvPV($arg, len);
+        $var = std::string(c, len);
+      }
+  
   T_STD_STRING_PTR
-      $var = new std::string( SvPV_nolen( $arg ), SvCUR( $arg ) );
-
+      {
+        size_t len;
+        const char * c = SvPV($arg, len);
+        $var = new std::string(c, len);
+      }
+  
   OUTPUT
   T_STD_STRING
       $arg = newSVpvn( $var.c_str(), $var.length() );
-
+  
   T_STD_STRING_PTR
       $arg = newSVpvn( $var->c_str(), $var->length() );
 
@@ -71,10 +79,18 @@ std::string*  T_STD_STRING_PTR
 
 INPUT
 T_STD_STRING
-    $var = std::string( SvPV_nolen( $arg ), SvCUR( $arg ) );
+    {
+      size_t len;
+      const char * c = SvPV($arg, len);
+      $var = std::string(c, len);
+    }
 
 T_STD_STRING_PTR
-    $var = new std::string( SvPV_nolen( $arg ), SvCUR( $arg ) );
+    {
+      size_t len;
+      const char * c = SvPV($arg, len);
+      $var = new std::string(c, len);
+    }
 
 OUTPUT
 T_STD_STRING
@@ -97,11 +113,11 @@ L<ExtUtils::Typemaps>, L<ExtUtils::Typemaps::Default>, L<ExtUtils::Typemaps::Obj
 
 =head1 AUTHOR
 
-Steffen Mueller <smueller@cpan.org>
+Steffen Mueller <cpan@steffen-mueller.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2010, 2011, 2012, 2013 by Steffen Mueller
+Copyright 2010-2026 by Steffen Mueller
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

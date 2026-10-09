@@ -38,7 +38,8 @@ unlike($text, qr/perldoc -l/, 'nothing depends on perl-doc (not on a stock Debia
 like($text, qr/useradd -r -U -G postfix/, 'the dkim2 user has its own group and is in postfix');
 like($text, qr/install -d -m 750 -o dkim2 -g postfix \/var\/spool\/postfix\/var\/run/,
      'the socket directory is created before the units start');
-like($text, qr/logging\.dkim2/, 'tells Mailman where dkim2.log comes from');
+like($text, qr/mailman3 journal/, 'says Mailman DKIM2 logs go to the mailman3 journal');
+unlike($text, qr/logging\.dkim2/, 'no [logging.dkim2] section (Mailman ignores it)');
 like($text, qr/not (?:been )?tested end to end/i, 'the authentication_milter path is labelled as untested');
 like($text, qr/wwsympa/, 'Sympa restart list includes wwsympa');
 like($text, qr/git -c user\.name/, 'git am works on a host with no identity');

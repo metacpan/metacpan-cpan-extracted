@@ -6,6 +6,7 @@ use warnings;
 use Getopt::Long ();
 use Digest::SHA ();
 
+use Game::Gin::Search ();
 use Game::Gin::Terminal;
 
 my %o = (mode => 'bot', level => 2, seat => 'p1');
@@ -17,6 +18,7 @@ Getopt::Long::GetOptions(
     'ascii'   => \$o{ascii},
     'colour!' => \$o{colour},
     'color!'  => \$o{colour},
+    'pick!'   => \$o{pick},
     'help'    => \$o{help},
 ) or usage(1);
 usage(0) if $o{help};
@@ -25,15 +27,39 @@ usage(1, "mode must be bot, hotseat or watch\n")
     unless $o{mode} =~ /\A(?:bot|hotseat|watch)\z/;
 usage(1, "seat must be p1 or p2\n") unless $o{seat} =~ /\A p[12] \z/x;
 
+my $levels = Game::Gin::Search::LEVELS;
+usage(1, "level must be 1 to $levels\n")
+    unless $o{level} =~ /\A\d+\z/ && $o{level} >= 1 && $o{level} <= $levels;
+
 my $seed = defined $o{seed} ? Digest::SHA::sha256($o{seed}) : undef;
 
-Game::Gin::Terminal->new(
+my $ui = Game::Gin::Terminal->new(
     mode  => $o{mode},
     level => $o{level},
     seat  => $o{seat},
     ($o{ascii} ? (ascii => 1) : ()),
     (defined $o{colour} ? (colour => $o{colour}) : ()),
-)->play(defined $seed ? (seed => $seed) : ());
+    (defined $o{pick} ? (picking => $o{pick} ? 1 : 0) : ()),
+);
+
+for my $signal (qw/ INT TERM HUP /) {
+    $SIG{$signal} = sub {
+        $ui->leave_raw;
+        $SIG{ $_[0] } = 'DEFAULT';
+        kill $_[0], $$;
+    };
+}
+
+my $game = eval { $ui->play(defined $seed ? (seed => $seed) : ()) };
+my $died = $@;
+$ui->leave_raw;
+die $died if $died;
+
+my $result = $game && $game->result;
+exit 1 unless $result;
+exit 0 if $o{mode} eq 'watch' || $o{mode} eq 'hotseat';
+exit 0 if ($result->{winner} // '') eq $o{seat};
+exit 1;
 
 sub usage {
     my ($status, $message) = @_;
@@ -50,13 +76,28 @@ gin - gin rummy at a prompt
     gin --seed tuesday         deal the same game every time
     gin --ascii                letters instead of the suit pips
     gin --nocolour             no colour (NO_COLOR does the same)
+    gin --nopick               type the moves out instead of pointing at them
 
 Your hand is fanned like a hand of cards, with a bracket under each meld
 saying whether it is a set or a run and what the rest of it is costing you.
 
-In a hand: answer y or n for the upcard, d or t to draw or take, and name a
-card to discard it (KH). Add a ! to knock with it (KH!). What the card itself
-says is taken too, so the suit pip and 10H work as well as KH and TH.
+On a terminal you point at the card you mean: the left and right keys walk
+your own hand, and the fan above shows what the hand WOULD be without the
+card under the cursor, remelded, with the deadwood that leaves you. Enter
+discards it, k discards and knocks when that is allowed, u takes the upcard,
+d draws, ? lists the keys and q stops. Needs Term::ReadKey; without it, or
+off a terminal, every move is typed.
+
+Typed instead: answer y or n for the upcard, d or t to draw or take, and name
+a card to discard it (KH). Add a ! to knock with it (KH!). What the card
+itself says is taken too, so the suit pip and 10H work as well as KH and TH.
+Type quit to stop, or help for the rest.
+
+The card you just drew or took is marked in your hand, and so is the upcard
+when your opponent took it rather than drawing.
+
+Exit status is 0 if your seat won, or if nobody was playing a seat, 1 if you
+lost or stopped early, and 1 for a bad option.
 USAGE
     exit $status;
 }

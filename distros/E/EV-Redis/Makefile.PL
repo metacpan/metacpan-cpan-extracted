@@ -41,6 +41,14 @@ sub _detect_openssl {
     return undef;
 }
 
+sub _has_libssl {
+    my ($dir) = @_;
+    opendir my $dh, $dir or return 0;
+    my $found = grep { /^libssl\./ } readdir $dh;
+    closedir $dh;
+    return $found;
+}
+
 my $want_ssl = $ENV{EV_REDIS_SSL};
 my ($has_ssl, $ssl_cflags, $ssl_libs, $ssl_detected) = (0, '', '', undef);
 
@@ -51,7 +59,13 @@ if (!defined $want_ssl || $want_ssl) {
         if (ref $ssl_detected eq 'HASH') {
             ($ssl_cflags, $ssl_libs) = ($ssl_detected->{cflags}, $ssl_detected->{libs});
         } else {
-            ($ssl_cflags, $ssl_libs) = ("-I$ssl_detected/include", "-L$ssl_detected/lib -lssl -lcrypto");
+            # some prefixes (e.g. --libdir=lib64 builds) keep libraries in lib64
+            my $libdir = 'lib';
+            $libdir = 'lib64'
+                if !_has_libssl("$ssl_detected/lib")
+                && _has_libssl("$ssl_detected/lib64");
+            ($ssl_cflags, $ssl_libs) = ("-I$ssl_detected/include",
+                "-L$ssl_detected/$libdir -lssl -lcrypto");
         }
     } elsif ($want_ssl) {
         die "EV_REDIS_SSL=1 but OpenSSL not found. Install OpenSSL development headers or set OPENSSL_PREFIX.\n";
@@ -107,8 +121,7 @@ my $make = $Config{make};
 if (`$make --version 2>&1` !~ /GNU Make/) {
     $make = which('gmake');
     unless (defined $make) {
-        print "OS unsupported: GNU make ('gmake') is necessary to build the bundled hiredis.\n";
-        exit 0;
+        die "OS unsupported: GNU make ('gmake') is necessary to build the bundled hiredis.\n";
     }
 }
 
@@ -124,6 +137,16 @@ if ($has_ssl) {
     push @make_args, 'USE_SSL=1';
     if (defined $ssl_detected && !ref $ssl_detected) {
         push @make_args, "OPENSSL_PREFIX=$ssl_detected";
+    }
+    elsif (ref $ssl_detected) {
+        # hiredis only looks under OPENSSL_PREFIX, while pkg-config may
+        # know a prefix the compiler does not search by default
+        my $pc_prefix = `pkg-config --variable=prefix openssl 2>/dev/null`;
+        if (defined $pc_prefix) {
+            chomp $pc_prefix;
+            push @make_args, "OPENSSL_PREFIX=$pc_prefix"
+                if length $pc_prefix && -d "$pc_prefix/include/openssl";
+        }
     }
 }
 
@@ -218,6 +241,7 @@ sub MY::postamble {
         push @targets, "$lib :\n\t\@echo \"$lib already built\"\n";
     }
     push @targets, "Redis.xs : src/EV__Redis.xs\n\t\$(CP) src/EV__Redis.xs Redis.xs\n";
+    push @targets, "Redis.c : typemap\n";
     push @targets, "Redis\$(OBJ_EXT) : src/libev_adapter.h src/ngx-queue.h deps/hiredis/dict.c deps/hiredis/dict.h\n";
     push @targets, "clean ::\n\t-$make -C deps/hiredis clean\n";
     return join "\n", @targets;

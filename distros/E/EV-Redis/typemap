@@ -11,3 +11,4 @@ T_SAT_IV
 OUTPUT
 T_EVREDIS
 	sv_setref_pv($arg, \"EV::Redis\", (void*)$var);
+	ev_redis_mark_sv($arg);

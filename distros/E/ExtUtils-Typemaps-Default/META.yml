@@ -1,62 +1,62 @@
 ---
 abstract: 'A set of useful typemaps'
 author:
-  - 'Steffen Mueller <smueller@cpan.org>'
+  - 'Steffen Mueller <cpan@steffen-mueller.net>'
 build_requires:
-  Module::Build: 0
+  Module::Build: '0'
+  Test::More: '0'
 configure_requires:
-  Module::Build: 0.40
+  Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4008, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: ExtUtils-Typemaps-Default
 provides:
   ExtUtils::Typemap::Basic:
     file: lib/ExtUtils/Typemap/Basic.pm
-    version: 1.05
+    version: '1.06'
   ExtUtils::Typemap::Default:
     file: lib/ExtUtils/Typemap/Default.pm
-    version: 1.05
+    version: '1.06'
   ExtUtils::Typemap::ObjectMap:
     file: lib/ExtUtils/Typemap/ObjectMap.pm
-    version: 1.05
+    version: '1.06'
   ExtUtils::Typemap::STL:
     file: lib/ExtUtils/Typemap/STL.pm
-    version: 1.05
+    version: '1.06'
   ExtUtils::Typemap::STL::String:
     file: lib/ExtUtils/Typemap/STL/String.pm
-    version: 1.05
+    version: '1.06'
   ExtUtils::Typemap::STL::Vector:
     file: lib/ExtUtils/Typemap/STL/Vector.pm
-    version: 1.05
+    version: '1.06'
   ExtUtils::Typemaps::Basic:
     file: lib/ExtUtils/Typemaps/Basic.pm
-    version: 1.05
+    version: '1.06'
   ExtUtils::Typemaps::Default:
     file: lib/ExtUtils/Typemaps/Default.pm
-    version: 1.05
+    version: '1.06'
   ExtUtils::Typemaps::ObjectMap:
     file: lib/ExtUtils/Typemaps/ObjectMap.pm
-    version: 1.05
+    version: '1.06'
   ExtUtils::Typemaps::STL:
     file: lib/ExtUtils/Typemaps/STL.pm
-    version: 1.05
+    version: '1.06'
   ExtUtils::Typemaps::STL::List:
     file: lib/ExtUtils/Typemaps/STL/List.pm
-    version: 1.05
+    version: '1.06'
   ExtUtils::Typemaps::STL::String:
     file: lib/ExtUtils/Typemaps/STL/String.pm
-    version: 1.05
+    version: '1.06'
   ExtUtils::Typemaps::STL::Vector:
     file: lib/ExtUtils/Typemaps/STL/Vector.pm
-    version: 1.05
+    version: '1.06'
 requires:
-  ExtUtils::Typemaps: 3.18_03
+  ExtUtils::Typemaps: '3.21'
 resources:
   license: http://dev.perl.org/licenses/
-version: 1.05
-x_test_requires:
-  Test::More: 0
+version: '1.06'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

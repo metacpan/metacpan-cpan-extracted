@@ -1,5 +1,10 @@
 Revision history for EV::Memcached
 
+0.06  2026-10-08
+    - Fix ordering, deadlines and mget handling under flow control, SASL and
+      reconnect; mget counts as one command and reports per-key errors
+    - Connection lifecycle and teardown fixes; tests need TEST_MEMCACHED_PORT
+
 0.05  2026-07-23
     - Fix reentrancy at the callback/connection boundary: read-buffer corruption
       on reconnect-from-callback, teardown drains swallowing new-session commands,

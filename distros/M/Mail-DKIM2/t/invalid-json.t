@@ -33,6 +33,25 @@ ok(eval {
     1;
 }, 'valid (empty) recipe JSON still parses cleanly');
 
+# A duplicate key anywhere in the Recipe JSON is invalid JSON: parsers
+# disagree on which value wins (C took the first, the others the last), so
+# {"b":[...],"b":null} was a null body Recipe to some and a real one to others.
+for my $json ('{"b":[{"c":[1,1]}],"b":null}', '{"b":null,"b":[{"c":[1,1]}]}',
+              '{"h":{"subject":[],"subject":[]}}', '{"h":{"subject":[{"d":["x"]}]},"h":{}}',
+              '{"h":{"subject":[{"d":["a"]}],"subj\\u0065ct":[]}}') {
+    eval {
+        my $r = encode_base64($json, '');
+        Mail::DKIM2::MessageInstance->parse("m=2; h=sha256:AAA:BBB; r=$r;");
+    };
+    is($@, "PERMERROR Message-Instance m=2 contains invalid JSON\n",
+       "duplicate key is invalid JSON: $json");
+}
+ok(eval {
+    Mail::DKIM2::MessageInstance->parse('m=2; h=sha256:AAA:BBB; r='
+        . encode_base64('{"h":{"subject":[{"d":["b"]}],"to":[]},"b":[{"d":["b"]}]}', '') . ';');
+    1;
+}, 'the same key in different objects (and "b" inside a step) is fine') or diag($@);
+
 # spec-06 §11.2 ruling: a bad base64 r= value is a DIFFERENT error from a
 # JSON parse failure -- "syntax error", not "contains invalid JSON". "!!!!"
 # is not valid base64 (decode_base64() is lenient and would otherwise just

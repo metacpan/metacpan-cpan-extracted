@@ -14,13 +14,16 @@
  */
 
 #define PERL_NO_GET_CONTEXT
+/* Before the perl headers, not after: Strawberry's XSUB.h turns
+ * gettimeofday into a macro, and a prototype read after that is a
+ * syntax error. */
+#include <sys/time.h>  /* For gettimeofday() */
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
 
 #include "../../ppport.h"
 
-#include <sys/time.h>  /* For gettimeofday() */
 #include <ctype.h>     /* For toupper() */
 
 /* Horus UUID library - pure C, no Perl deps */
@@ -29,6 +32,32 @@
 
 /* Loo Data Dumper - pure XS with colour support */
 #include "loo.h"
+
+/* ------------------------------------------------------------------ */
+/* Time helpers                                                        */
+/* ------------------------------------------------------------------ */
+
+/* tv_sec is not a time_t everywhere: it is a long on Windows, where
+ * time_t is 64 bits wide. Copy it rather than pass its address. */
+static struct tm *
+medusa_tm(const struct timeval *tv, int use_gmtime) {
+    time_t secs = (time_t)tv->tv_sec;
+    return use_gmtime ? gmtime(&secs) : localtime(&secs);
+}
+
+/* The default timestamp is what scalar gmtime prints, and that is
+ * English whatever the locale. strftime's %a and %b follow LC_TIME. */
+static void
+medusa_default_time(char *buf, size_t size, const struct tm *tm) {
+    static const char days[7][4] =
+        { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
+    static const char months[12][4] =
+        { "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+          "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+    snprintf(buf, size, "%s %s %2d %02d:%02d:%02d %d",
+             days[tm->tm_wday % 7], months[tm->tm_mon % 12], tm->tm_mday,
+             tm->tm_hour, tm->tm_min, tm->tm_sec, tm->tm_year + 1900);
+}
 
 /* ------------------------------------------------------------------ */
 /* Compatibility macros for older Perls                                */
@@ -1060,10 +1089,10 @@ medusa_xs_log_cached(pTHX_ AUDIT_CACHE *cache, SV *guid_sv, SV *caller_sv,
         char tbuf[MEDUSA_TIME_BUF_SIZE];
         
         gettimeofday(&tv, NULL);
-        tm_info = cache->time_use_gm ? gmtime(&tv.tv_sec) : localtime(&tv.tv_sec);
+        tm_info = medusa_tm(&tv, cache->time_use_gm);
         
         if (!cache->time_fmt_c) {
-            strftime(tbuf, sizeof(tbuf), "%a %b %e %H:%M:%S %Y", tm_info);
+            medusa_default_time(tbuf, sizeof(tbuf), tm_info);
         } else {
             char *ms_pos;
             char fmt_copy[128];
@@ -1073,7 +1102,7 @@ medusa_xs_log_cached(pTHX_ AUDIT_CACHE *cache, SV *guid_sv, SV *caller_sv,
             if (ms_pos) {
                 char ms_buf[16];
                 STRLEN len;
-                snprintf(ms_buf, sizeof(ms_buf), "%03ld", tv.tv_usec / 1000);
+                snprintf(ms_buf, sizeof(ms_buf), "%03ld", (long)(tv.tv_usec / 1000));
                 *ms_pos = '\0';
                 strftime(tbuf, sizeof(tbuf), fmt_copy, tm_info);
                 len = strlen(tbuf);
@@ -1634,15 +1663,11 @@ medusa_format_time(pTHX_ bool use_gmtime, const char *fmt) {
     
     gettimeofday(&tv, NULL);
     
-    if (use_gmtime) {
-        tm_info = gmtime(&tv.tv_sec);
-    } else {
-        tm_info = localtime(&tv.tv_sec);
-    }
+    tm_info = medusa_tm(&tv, use_gmtime);
     
     if (fmt == NULL || strcmp(fmt, "default") == 0) {
         /* Default format: asctime style */
-        strftime(buf, sizeof(buf), "%a %b %e %H:%M:%S %Y", tm_info);
+        medusa_default_time(buf, sizeof(buf), tm_info);
     } else {
         /* Custom format with %ms placeholder for milliseconds */
         char *ms_pos;
@@ -1654,7 +1679,7 @@ medusa_format_time(pTHX_ bool use_gmtime, const char *fmt) {
         ms_pos = strstr(fmt_copy, "%ms");
         if (ms_pos) {
             /* Replace %ms with actual milliseconds */
-            snprintf(ms_buf, sizeof(ms_buf), "%03ld", tv.tv_usec / 1000);
+            snprintf(ms_buf, sizeof(ms_buf), "%03ld", (long)(tv.tv_usec / 1000));
             *ms_pos = '\0';
             strftime(buf, sizeof(buf), fmt_copy, tm_info);
             len = strlen(buf);

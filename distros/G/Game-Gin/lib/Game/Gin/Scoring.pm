@@ -9,7 +9,7 @@ use Game::Gin::Card qw(deadwood_of);
 use Game::Gin::Meld qw(is_meld);
 use Game::Gin::Deadwood qw(best);
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 our @EXPORT_OK = qw(best_layoff settle match_result
                     GIN_BONUS UNDERCUT_BONUS BIG_GIN_BONUS
                     TARGET BOX_BONUS GAME_BONUS);
@@ -154,7 +154,7 @@ Game::Gin::Scoring - lay-offs, and what a hand was worth
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

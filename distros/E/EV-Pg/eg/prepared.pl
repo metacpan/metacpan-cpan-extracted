@@ -8,12 +8,12 @@ my $conninfo = shift || $ENV{TEST_PG_CONNINFO} || 'dbname=postgres';
 
 my $pg; $pg = EV::Pg->new(
     conninfo => $conninfo,
-    on_error => sub { die "connection error: $_[0]\n" },
+    on_error => sub { warn "connection error: $_[0]\n"; EV::break },
     on_connect => sub {
         # prepare once, execute many times
         $pg->prepare('get_square', 'select $1::int, ($1::int * $1::int) as square', sub {
             my (undef, $err) = @_;
-            die $err if $err;
+            if ($err) { warn $err; EV::break; return; }
 
             # use pipeline mode to execute in batch
             $pg->enter_pipeline;
@@ -23,7 +23,7 @@ my $pg; $pg = EV::Pg->new(
             for my $n (@values) {
                 $pg->query_prepared('get_square', [$n], sub {
                     my ($rows, $err) = @_;
-                    die $err if $err;
+                    if ($err) { warn $err; EV::break; return; }
                     printf "%2d^2 = %3d\n", $rows->[0][0], $rows->[0][1];
                 });
             }

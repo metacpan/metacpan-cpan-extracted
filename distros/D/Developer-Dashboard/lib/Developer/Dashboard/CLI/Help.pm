@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Help;
 use strict;
 use warnings;
 
-our $VERSION = '5.51';
+our $VERSION = '5.73';
 
 use Developer::Dashboard::InternalCLI ();
 
@@ -125,7 +125,7 @@ my %COMMANDS = (
         actions => {
             set          => [ 'dashboard indicator set <name> <label> <icon> <status>', 'Set an indicator.' ],
             list         => [ 'dashboard indicator list', 'List indicators.' ],
-            'refresh-core' => [ 'dashboard indicator refresh-core [cwd]', 'Refresh built-in indicators.' ],
+            'refresh-core' => [ 'dashboard indicator refresh-core [cwd]', 'Refresh local project and Git indicators; Docker remains collector-configured.' ],
         },
     },
     iniq => { usage => 'dashboard iniq [file] [query]', description => 'Query INI input from a file or standard input.' },

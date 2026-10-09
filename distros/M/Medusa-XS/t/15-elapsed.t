@@ -6,7 +6,7 @@ use Test::More;
 use File::Temp qw(tempdir);
 use File::Spec;
 
-plan tests => 4;
+plan tests => 5;
 
 my $tempdir;
 my $file;
@@ -38,6 +38,8 @@ my @lines = split "\n", $content;
 
 like($lines[0], qr/arg/, 'args');
 like($lines[1], qr/returned/, 'returns');
-like($lines[1], qr/elapsed_call=†0.*/, 'elapsed');
+my ($elapsed) = $lines[1] =~ m/elapsed_call=†([0-9.e+-]+)†/;
+ok(defined $elapsed, 'elapsed');
+cmp_ok($elapsed || 0, '>=', 0.2, 'elapsed covers the call');
 
 done_testing();

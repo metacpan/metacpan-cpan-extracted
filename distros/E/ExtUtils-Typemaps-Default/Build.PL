@@ -7,7 +7,7 @@ my $build = Module::Build->new(
   module_name    => 'ExtUtils::Typemaps::Default',
   license        => 'perl',
   requires       => {
-    'ExtUtils::Typemaps' => '3.18_03',
+    'ExtUtils::Typemaps' => '3.21',
   },
   build_requires => {
     'Module::Build' => '0',

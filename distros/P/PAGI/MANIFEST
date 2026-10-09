@@ -57,6 +57,8 @@ examples/17-event-middleware/cpanfile
 examples/18-bidirectional-websocket/README.md
 examples/18-bidirectional-websocket/app.pl
 examples/18-bidirectional-websocket/cpanfile
+examples/19-shutdown-cleanup/README.md
+examples/19-shutdown-cleanup/app.pl
 examples/README.md
 examples/mini-framework/README.md
 examples/mini-framework/app.pl
@@ -73,6 +75,7 @@ lib/PAGI/Spec/Tls.pod
 lib/PAGI/Spec/Www.pod
 lib/PAGI/Tutorial.pod
 lib/PAGI/Upgrading.pod
+nytprof.out
 t/00-load.t
 t/pod-syntax.t
 t/tutorial.t

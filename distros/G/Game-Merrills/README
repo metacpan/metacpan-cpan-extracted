@@ -1,0 +1,39 @@
+Game-Merrills
+
+Nine Men's Morris, also called Merrills, Merels and Mill, as a reusable engine
+with a terminal game on top. Two players, nine men each, and a board of three
+squares joined at the middle of their sides: place the men, move them along the
+lines, and take an enemy man each time three of yours stand in a row.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Game::Merrills
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Game-Merrills
+
+    Search CPAN
+        https://metacpan.org/release/Game-Merrills
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)

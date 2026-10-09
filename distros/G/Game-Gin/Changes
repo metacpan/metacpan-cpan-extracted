@@ -1,5 +1,16 @@
 Revision history for Game-Gin
 
+0.02    2026-10-08
+        - Point at the card you mean: the arrow keys walk your hand and the
+          line under the fan says what throwing it would leave you.
+        - The card you drew or took is marked, and so is the upcard when the
+          opponent put it there.
+        - Fix: hotseat drew both hands on one screen. There is a hand-over
+          between seats now.
+        - Fix: Terminal.pm POD declares =encoding utf8, so t/pod.t passes.
+        - Fix: there was no way to quit at a prompt.
+        - Fix: --level took any number, including ones with no bot behind it.
+        - Exit status: 0 if your seat won, 1 if you lost or stopped early.
+
 0.01    2026-09-15
         First version.
-

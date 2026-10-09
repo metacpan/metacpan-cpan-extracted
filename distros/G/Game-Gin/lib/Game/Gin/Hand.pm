@@ -7,7 +7,7 @@ use Object::Proto::Sugar -types;
 
 use Game::Gin::Deadwood ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 has cards => (is => 'rw', isa => ArrayRef);
 
@@ -48,7 +48,7 @@ Game::Gin::Hand - one player's cards
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

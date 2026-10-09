@@ -11,7 +11,7 @@ use DateTime::Format::ISO8601;
 use Travel::Status::MOTIS::Stop;
 use Travel::Status::MOTIS::Polyline qw(decode_polyline);
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 Travel::Status::MOTIS::Trip->mk_ro_accessors(
 	qw(
@@ -21,6 +21,7 @@ Travel::Status::MOTIS::Trip->mk_ro_accessors(
 	  display_name
 	  route_color
 	  route_text_color
+	  trip_short_name
 	  headsign
 
 	  is_realtime
@@ -39,7 +40,7 @@ Travel::Status::MOTIS::Trip->mk_ro_accessors(
 sub new {
 	my ( $obj, %opt ) = @_;
 
-	my $json = $opt{json}{legs}[0];
+	my $json      = $opt{json}{legs}[0];
 	my $time_zone = $opt{time_zone};
 
 	my $ref = {
@@ -59,17 +60,17 @@ sub new {
 		  [ $json->{from}, @{ $json->{intermediateStops} }, $json->{to} ],
 		raw_polyline => $json->{legGeometry},
 
-		time_zone    => $time_zone,
+		time_zone => $time_zone,
 	};
 
 	$ref->{scheduled_departure} = DateTime::Format::ISO8601->parse_datetime(
 		$json->{scheduledStartTime} );
-	$ref->{scheduled_departure}->set_time_zone( $time_zone );
+	$ref->{scheduled_departure}->set_time_zone($time_zone);
 
 	if ( $json->{realTime} ) {
 		$ref->{realtime_departure}
 		  = DateTime::Format::ISO8601->parse_datetime( $json->{startTime} );
-		$ref->{realtime_departure}->set_time_zone( $time_zone );
+		$ref->{realtime_departure}->set_time_zone($time_zone);
 	}
 
 	$ref->{departure} = $ref->{realtime_departure}
@@ -77,12 +78,12 @@ sub new {
 
 	$ref->{scheduled_arrival}
 	  = DateTime::Format::ISO8601->parse_datetime( $json->{scheduledEndTime} );
-	$ref->{scheduled_arrival}->set_time_zone( $time_zone );
+	$ref->{scheduled_arrival}->set_time_zone($time_zone);
 
 	if ( $json->{realTime} ) {
 		$ref->{realtime_arrival}
 		  = DateTime::Format::ISO8601->parse_datetime( $json->{endTime} );
-		$ref->{realtime_arrival}->set_time_zone( $time_zone );
+		$ref->{realtime_arrival}->set_time_zone($time_zone);
 	}
 
 	$ref->{arrival} = $ref->{realtime_arrival} // $ref->{scheduled_arrival};

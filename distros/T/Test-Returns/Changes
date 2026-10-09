@@ -1,5 +1,9 @@
 Revision history for Test::Returns
 
+0.05	Thu Oct  8 08:01:58 AM EDT 2026
+	[ Bug Fixes ]
+	- Fix unintialized value
+
 0.04	Wed Aug  5 07:30:52 EDT 2026
 	- Bump minimum Return::Set
 

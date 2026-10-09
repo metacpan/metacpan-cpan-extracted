@@ -106,9 +106,9 @@ fatal.
 
 As of version 0.181, B<any> remaining functionality relating to Iridium
 Classic satellites is fatal, except for attribute iridium_status_format,
-which I missed, and which warns on the first use. This will be put
-through the usual deprecation cycle. Six months after it becomes fatal,
-all Iridium functionality will be dropped.
+which I missed, and which warns on every use as of version 0.183. Six
+months after this release it will become fatal, and six months after
+that all Iridium functionality will be dropped.
 
 =head1 DESCRIPTION
 
@@ -149,7 +149,7 @@ use Exporter;
 
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.183';
+our $VERSION = '0.184';
 our @EXPORT_OK = qw{
     shell
 
@@ -500,19 +500,20 @@ my %catalogs = (	# Catalog names (and other info) for each source.
 	    spacetrack_type	=> 'orbit',
 	    url		=> 'https://www.mmccants.org/tles/inttles.zip',
 	},
-	mcnames	=> {
-	    name	=> 'Molczan-format magnitude file',
-	    member	=> undef,	# mcnames
-	    spacetrack_type	=> 'molczan',
-	    url		=> 'https://www.mmccants.org/tles/mcnames.zip',
-	},
 	# Removed 2025-12-15 or thereabouts
-	quicksat	=> {
-	    name	=> 'Quicksat-format magnitude file',
-	    member	=> undef,	# qs.mag
-	    spacetrack_type	=> 'quicksat',
-	    url		=> 'https://www.mmccants.org/programs/qsmag.zip',
-	},
+	#mcnames	=> {
+	#    name	=> 'Molczan-format magnitude file',
+	#    member	=> undef,	# mcnames
+	#    spacetrack_type	=> 'molczan',
+	#    url		=> 'https://www.mmccants.org/tles/mcnames.zip',
+	#},
+	# Removed 2025-12-15 or thereabouts
+	#quicksat	=> {
+	#    name	=> 'Quicksat-format magnitude file',
+	#    member	=> undef,	# qs.mag
+	#    spacetrack_type	=> 'quicksat',
+	#    url		=> 'https://www.mmccants.org/programs/qsmag.zip',
+	#},
 	# Removed 2024-12-29.
 	#rcs	=> {
 	#    name	=> 'McCants-format RCS data (404 2024-04-27)',
@@ -520,12 +521,13 @@ my %catalogs = (	# Catalog names (and other info) for each source.
 	#    spacetrack_type	=> 'rcs.mccants',
 	#    url		=> 'https://www.mmccants.org/catalogs/rcs.zip',
 	#},
-	vsnames	=> {
-	    name	=> 'Molczan-format magnitude file (visual only)',
-	    member	=> undef,	# vsnames
-	    spacetrack_type	=> 'molczan',
-	    url		=> 'https://www.mmccants.org/tles/vsnames.zip',
-	},
+	# Removed 2025-12-15 or thereabouts
+	#vsnames	=> {
+	#    name	=> 'Molczan-format magnitude file (visual only)',
+	#    member	=> undef,	# vsnames
+	#    spacetrack_type	=> 'molczan',
+	#    url		=> 'https://www.mmccants.org/tles/vsnames.zip',
+	#},
     },
     spacetrack => [	# Numbered by space_track_version
 	undef,	# No interface version 0
@@ -1759,9 +1761,6 @@ content-source values of C<'amsat'>, C<'celestrak'>, C<'mccants'>,
 or C<'spacetrack'>, corresponding to the actual source
 of the TLE data.
 
-If the content_type method returns C<'quicksat'>, you can expect a
-content_source value of C<'mccants'>.
-
 If the C<content_type()> method returns C<'search'>, you can expect a
 content-source value of C<'spacetrack'>.
 
@@ -1796,7 +1795,6 @@ following values are supported:
  'modeldef': The content is a REST model definition.
  'molczan': Molczan-format magnitude data.
  'orbit': The content is NORAD data sets.
- 'quicksat': Quicksat-format magnitude data.
  'search': The content is Space Track search results.
  'set': The content is the result of a 'set' operation.
  undef: No spacetrack-type pragma was specified. The
@@ -3001,9 +2999,6 @@ catalog names are:
 
  classified: Classified TLE file (classfd.zip)
  integrated: Integrated TLE file (inttles.zip)
- mcnames: Molczan-format magnitude file (mcnames.zip) REMOVED
- quicksat: Quicksat-format magnitude file (qsmag.zip) REMOVED
- vsnames: Molczan-format mags of visual bodies (vsnames.zip) REMOVED
 
 The files marked B<REMOVED> have been removed from Mike McCants' web
 site. As of version 0.181, use of the associated arguments is fatal.
@@ -5261,7 +5256,7 @@ sub _check_cookie_generic {
 	    url_iridium_status_kelso	=> _MASTER_IRIDIUM_DEPRECATION_LEVEL,
 	    url_iridium_status_mccants	=> _MASTER_IRIDIUM_DEPRECATION_LEVEL,
 	    url_iridium_status_sladen	=> _MASTER_IRIDIUM_DEPRECATION_LEVEL,
-	    iridium_status_format	=> 1,
+	    iridium_status_format	=> 2,
 	},
 	iridium_status	=> _MASTER_IRIDIUM_DEPRECATION_LEVEL,
 	iridium_status_format	=> {
@@ -5272,11 +5267,11 @@ sub _check_cookie_generic {
 	option => {
 	    last5	=> 2,
 	},
-	mccants	=> {
-	    mcnames	=> 3,
-	    quicksat	=> 3,
-	    vsnames	=> 3,
-	},
+#	mccants	=> {
+#	    mcnames	=> 3,
+#	    quicksat	=> 3,
+#	    vsnames	=> 3,
+#	},
 	BODY_STATUS_IS_OPERATIONAL	=> _MASTER_IRIDIUM_DEPRECATION_LEVEL,
 	BODY_STATUS_IS_SPARE	=> _MASTER_IRIDIUM_DEPRECATION_LEVEL,
 	BODY_STATUS_IS_TUMBLING	=> _MASTER_IRIDIUM_DEPRECATION_LEVEL,

@@ -28,7 +28,8 @@ WriteMakefile(
 	}, PREREQ_PM => {
 		'Carp' => 0,
 		'Exporter' => 0,
-		'Return::Set' => 0.04,
+		'Return::Set' => 0.05,
+		'Scalar::Util' => 0,
 	}, TEST_REQUIRES => {
 		'IPC::System::Simple' => 0,
 		'Test::DescribeMe' => 0,

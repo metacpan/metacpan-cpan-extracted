@@ -137,6 +137,7 @@ chmod 0755, $fake_docker or die "Unable to chmod $fake_docker: $!";
     local $ENV{PATH} = "$fake_bin:$ENV{PATH}";
     for my $case (
         [ [ 'docker', 'compose', 'config', '--help' ], qr/config --help\s*\n/, 'Docker Compose config --help' ],
+        [ [ 'docker', 'compose', 'config', '-h' ], qr/config -h\s*\n/, 'Docker Compose config -h' ],
         [ [ 'docker', 'compose', 'help' ], qr/help\s*\n/, 'Docker Compose literal help' ],
         [ [ 'docker', 'compose', '--service', 'dev', 'exec', 'dev', 'dashboard', 'of', 'grep', '--help' ], qr/exec dev dashboard of grep --help\s*\n/, 'nested external CLI help after Compose wrapper selectors' ],
     ) {

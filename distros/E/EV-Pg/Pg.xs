@@ -16,6 +16,12 @@ typedef struct ev_loop* EV__Loop;
 #define EV_PG_MAGIC 0xDEADBEEF
 #define EV_PG_FREED 0xFEEDFACE
 
+/* Major version of the libpq headers, from Makefile.PL (Alien::libpq).
+ * Only used where libpq-fe.h itself has no LIBPQ_HAS_* macro. */
+#ifndef EV_PG_LIBPQ_MAJOR
+#define EV_PG_LIBPQ_MAJOR 14
+#endif
+
 struct ev_pg_s {
     unsigned int magic;
     struct ev_loop *loop;
@@ -39,7 +45,8 @@ struct ev_pg_s {
     int         meta_fresh;
     PGresult   *pending_result;
     ev_pg_cb_t *delivering_cbt;
-    PGconn     *conn_to_finish;
+    PGconn    **finish_q;    /* closed while libpq may still use them */
+    int         finish_n, finish_cap;
 
     SV *on_connect;
     SV *on_error;
@@ -48,6 +55,14 @@ struct ev_pg_s {
     SV *on_drain;
 
     int callback_depth;
+    unsigned int cancel_epoch;
+    /* notice_receiver runs Perl inside libpq: PQfinish/Safefree must wait */
+    int in_libpq;
+    /* dispatch is on the stack: nested EV::run must not reenter it */
+    int in_dispatch;
+    /* io watchers stopped by a nested run; 1=read, 2=write */
+    int io_deferred;
+    pid_t owner_pid;
     int keep_alive;
 
     HV    *last_error_fields;
@@ -97,15 +112,56 @@ static int  handle_conn_loss(ev_pg_t *self);
     if (!(SvROK(cb) && SvTYPE(SvRV(cb)) == SVt_PVCV)) \
         croak("callback must be a CODE reference")
 
-#define CALL_SV_GUARDED(sv, label) \
-    STMT_START { \
-        SV *_guarded_sv = SvREFCNT_inc_simple_NN(sv); \
-        sv_setpvs(ERRSV, ""); \
-        call_sv(_guarded_sv, G_DISCARD | G_EVAL); \
-        if (SvTRUE(ERRSV)) \
-            warn("EV::Pg: exception in " label ": %s", SvPV_nolen(ERRSV)); \
-        SvREFCNT_dec(_guarded_sv); \
-    } STMT_END
+#define REQUIRE_IDLE(self, name) \
+    if ((self)->pending_count > 0 || (self)->skip_results > 0 || \
+        PQtransactionStatus((self)->conn) == PQTRANS_ACTIVE) \
+        croak("%s: cannot call with pending queries", name)
+
+/* libpq.so.5 spans majors, so a newer-header build can load an older lib */
+#define REQUIRE_LIBPQ_VER(floor, name) \
+    if (PQlibVersion() < (floor)) croak("%s requires libpq >= %d", name, (floor) / 10000)
+
+/* on_notice runs inside libpq, which is not reentrant */
+#define REQUIRE_NOT_IN_NOTICE(self, name) \
+    if ((self)->in_libpq) croak("%s: not allowed while on_notice runs", name)
+
+#define REQUIRE_OWNER(self) \
+    if ((self)->owner_pid != getpid()) croak("object created in another process; create a new EV::Pg in the child")
+
+static void call_sv_guarded(SV *sv, const char *label) {
+    SV *cb = SvREFCNT_inc_simple_NN(sv);
+    sv_setpvs(ERRSV, "");
+    call_sv(cb, G_DISCARD | G_EVAL);
+    if (SvTRUE(ERRSV)) {
+        SV *err = newSVsv(ERRSV);
+        SV *msg = mess_sv(sv_2mortal(newSVpvf("EV::Pg: exception in %s: %" SVf,
+                                              label, SVfARG(err))), 0);
+        if (PL_warnhook && SvOK(PL_warnhook)) {
+            dSP;
+            ENTER;
+            SAVETMPS;
+            PUSHMARK(SP);
+            XPUSHs(msg);
+            PUTBACK;
+            call_sv(PL_warnhook, G_DISCARD | G_EVAL);
+            FREETMPS;
+            LEAVE;
+            if (SvTRUE(ERRSV)) {
+                /* a dying hook must not unwind through libev */
+                SV *hook = PL_warnhook;
+                PL_warnhook = NULL;
+                warn_sv(msg);
+                PL_warnhook = hook;
+            }
+        }
+        else {
+            warn_sv(msg);
+        }
+        sv_setsv(ERRSV, err);
+        SvREFCNT_dec(err);
+    }
+    SvREFCNT_dec(cb);
+}
 
 #define RELEASE_HANDLER(slot) \
     STMT_START { if (NULL != (slot)) { SvREFCNT_dec(slot); (slot) = NULL; } } STMT_END
@@ -123,12 +179,15 @@ static int  handle_conn_loss(ev_pg_t *self);
     } STMT_END
 
 static ev_pg_cb_t *cbt_freelist = NULL;
+static int cbt_freelist_len = 0;
+#define CBT_FREELIST_MAX 1024
 
 static ev_pg_cb_t* alloc_cbt(void) {
     ev_pg_cb_t *cbt;
     if (cbt_freelist) {
         cbt = cbt_freelist;
         cbt_freelist = cbt->next;
+        cbt_freelist_len--;
     } else {
         Newx(cbt, 1, ev_pg_cb_t);
     }
@@ -136,8 +195,13 @@ static ev_pg_cb_t* alloc_cbt(void) {
 }
 
 static void release_cbt(ev_pg_cb_t *cbt) {
+    if (cbt_freelist_len >= CBT_FREELIST_MAX) {
+        Safefree(cbt);
+        return;
+    }
     cbt->next = cbt_freelist;
     cbt_freelist = cbt;
+    cbt_freelist_len++;
 }
 
 static void start_reading(ev_pg_t *self) {
@@ -228,6 +292,15 @@ static void cleanup_cancel(ev_pg_t *self) {
     SV *cb;
     stop_cancel_reading(self);
     stop_cancel_writing(self);
+    if (self->owner_pid != getpid()) {
+        self->cancel_fd = -1;
+        self->cancel_conn = NULL;
+        if (self->cancel_cb) {
+            SvREFCNT_dec(self->cancel_cb);
+            self->cancel_cb = NULL;
+        }
+        return;
+    }
     self->cancel_fd = -1;
     if (self->cancel_conn) {
         PQcancelFinish(self->cancel_conn);
@@ -243,7 +316,7 @@ static void cleanup_cancel(ev_pg_t *self) {
         XPUSHs(&PL_sv_undef);
         XPUSHs(sv_2mortal(newSVpv("connection closed", 0)));
         PUTBACK;
-        CALL_SV_GUARDED(cb, "cancel_async cleanup");
+        call_sv_guarded(cb, "cancel_async cleanup");
         FREETMPS;
         LEAVE;
         SvREFCNT_dec(cb);
@@ -300,7 +373,7 @@ static void cancel_poll_cb(EV_P_ ev_io *w, int revents) {
             PUSHMARK(SP);
             XPUSHs(sv_2mortal(newSViv(1)));
             PUTBACK;
-            CALL_SV_GUARDED(cb, "cancel_async callback");
+            call_sv_guarded(cb, "cancel_async callback");
             FREETMPS;
             LEAVE;
             SvREFCNT_dec(cb);
@@ -323,7 +396,7 @@ static void cancel_poll_cb(EV_P_ ev_io *w, int revents) {
             XPUSHs(&PL_sv_undef);
             XPUSHs(sv_2mortal(errsv));
             PUTBACK;
-            CALL_SV_GUARDED(cb, "cancel_async callback");
+            call_sv_guarded(cb, "cancel_async callback");
             FREETMPS;
             LEAVE;
             SvREFCNT_dec(cb);
@@ -346,14 +419,28 @@ static void cancel_poll_cb(EV_P_ ev_io *w, int revents) {
 #define CLEANUP_CANCEL(self) ((void)0)
 #endif /* LIBPQ_HAS_ASYNC_CANCEL */
 
-static int check_destroyed(ev_pg_t *self) {
-    if (self->conn_to_finish && self->callback_depth == 0) {
-        PGconn *conn = self->conn_to_finish;
-        self->conn_to_finish = NULL;
-        PQfinish(conn);
+static void defer_finish(ev_pg_t *self, PGconn *conn) {
+    if (self->finish_n == self->finish_cap) {
+        self->finish_cap = self->finish_cap ? 2 * self->finish_cap : 2;
+        Renew(self->finish_q, self->finish_cap, PGconn *);
     }
+    self->finish_q[self->finish_n++] = conn;
+}
+
+static void finish_deferred(ev_pg_t *self) {
+    int own = (self->owner_pid == getpid());
+    while (self->finish_n > 0) {
+        PGconn *conn = self->finish_q[--self->finish_n];
+        if (own) PQfinish(conn);
+    }
+}
+
+static int check_destroyed(ev_pg_t *self) {
+    if (self->finish_n && self->callback_depth == 0 && self->in_libpq == 0)
+        finish_deferred(self);
     if (self->magic == EV_PG_FREED &&
-        self->callback_depth == 0) {
+        self->callback_depth == 0 && self->in_libpq == 0) {
+        Safefree(self->finish_q);
         Safefree(self);
         return 1;
     }
@@ -370,7 +457,7 @@ static void emit_error(ev_pg_t *self, const char *msg) {
     XPUSHs(sv_2mortal(newSVpv(msg, 0)));
     PUTBACK;
 
-    CALL_SV_GUARDED(self->on_error, "error handler");
+    call_sv_guarded(self->on_error, "error handler");
 
     FREETMPS;
     LEAVE;
@@ -504,7 +591,7 @@ static int deliver_result(ev_pg_t *self, PGresult *res) {
         if (self->meta_res) PQclear(self->meta_res);
         self->meta_res = res;
 
-        CALL_SV_GUARDED(cbt->cb, "callback");
+        call_sv_guarded(cbt->cb, "callback");
         FREETMPS;
         LEAVE;
     }
@@ -553,7 +640,7 @@ static void drain_notifies(ev_pg_t *self) {
             XPUSHs(sv_2mortal(newSViv(notify->be_pid)));
             PUTBACK;
 
-            CALL_SV_GUARDED(self->on_notify, "notify handler");
+            call_sv_guarded(self->on_notify, "notify handler");
 
             FREETMPS;
             LEAVE;
@@ -566,51 +653,44 @@ static void drain_notifies(ev_pg_t *self) {
     }
 }
 
+/* After a blocking libpq call: deliver the NOTIFYs it queued (no fd event
+ * will announce them) and run deferred teardown.  1 if destroyed. */
+static int settle_blocking_call(ev_pg_t *self) {
+    int destroyed;
+    if (self->magic == EV_PG_MAGIC) drain_notifies(self);
+    destroyed = (self->magic != EV_PG_MAGIC);
+    check_destroyed(self);
+    return destroyed;
+}
+
 static void process_results(ev_pg_t *self) {
     PGresult *res;
     PGresult *last_res = self->pending_result;
     self->pending_result = NULL;
 
-    /* Drain residual COPY data after interrupted skip.
-     * draining_copy: 1=OUT, 2=IN, 3=BOTH */
+    /* Drain residual COPY OUT data after an interrupted skip */
     if (self->draining_copy && self->conn) {
-        if (self->draining_copy & 1) {  /* OUT or BOTH */
-            char *buf;
-            int rc;
-            while ((rc = PQgetCopyData(self->conn, &buf, 1)) > 0)
-                PQfreemem(buf);
-            if (rc == 0) {
-                self->pending_result = last_res;
-                return;
-            }
-            if (rc == -2) {
-                self->draining_copy = 0;
-                if (last_res) PQclear(last_res);
-                handle_conn_loss(self);
-                return;
-            }
+        PGconn *orig_conn = self->conn;
+        char *buf;
+        int rc;
+        /* on_notice may finish/reset/destroy us mid-drain */
+        while (self->conn == orig_conn &&
+               (rc = PQgetCopyData(self->conn, &buf, 1)) > 0)
+            PQfreemem(buf);
+        if (self->conn != orig_conn) {
+            if (last_res) PQclear(last_res);
+            return;
         }
-        /* OUT phase complete — clear bit so retries skip it */
-        self->draining_copy &= ~1;
-        if (self->draining_copy & 2) {  /* IN or BOTH */
-            int ce = PQputCopyEnd(self->conn, "skipped");
-            if (ce == -1) {
-                self->draining_copy = 0;
-                if (last_res) PQclear(last_res);
-                handle_conn_loss(self);
-                return;
-            }
-            /* ce == 0: END queued, flush pending; ce > 0: END sent.
-             * Either way, asyncStatus is already PGASYNC_BUSY — do not
-             * retry PQputCopyEnd; just flush and let the main loop
-             * consume COMMAND_OK when it arrives. */
-            check_flush(self);
-            if (self->magic != EV_PG_MAGIC || !self->conn) {
-                if (last_res) PQclear(last_res);
-                return;
-            }
+        if (rc == 0) {
+            self->pending_result = last_res;
+            return;
         }
         self->draining_copy = 0;
+        if (rc == -2) {
+            if (last_res) PQclear(last_res);
+            handle_conn_loss(self);
+            return;
+        }
         update_idle_ref(self);
     }
 
@@ -681,18 +761,51 @@ static void process_results(ev_pg_t *self) {
                 continue;
             }
             if (st == PGRES_COPY_IN || st == PGRES_COPY_OUT || st == PGRES_COPY_BOTH) {
+                if (self->copy_mode && st == PGRES_COPY_IN) {
+                    /* libpq repeats the COPY result on every PQgetResult;
+                     * for COPY OUT that is the data-ready wakeup, for
+                     * COPY IN it would only re-run the callback */
+                    PQclear(res);
+                    if (last_res) { PQclear(last_res); last_res = NULL; }
+                    break;
+                }
                 if (self->skip_results > 0) {
                     /* Skipped COPY — must use protocol-correct drain */
                     int drained = 0;
+                    PGconn *orig_conn = self->conn;
                     PQclear(res);
+                    self->copy_mode = 0;
+                    if (st == PGRES_COPY_IN || st == PGRES_COPY_BOTH) {
+                        /* COPY IN is aborted; a COPY BOTH stream only ends
+                         * once the server sees our CopyDone, so end it before
+                         * draining the OUT side */
+                        int ce = PQputCopyEnd(self->conn,
+                                              st == PGRES_COPY_IN ? "skipped" : NULL);
+                        if (ce == -1) {
+                            if (last_res) PQclear(last_res);
+                            handle_conn_loss(self);
+                            return;
+                        }
+                        /* ce == 0: END queued, flush pending; ce > 0: END sent */
+                        check_flush(self);
+                        if (self->magic != EV_PG_MAGIC || self->conn != orig_conn) {
+                            if (last_res) PQclear(last_res);
+                            return;
+                        }
+                    }
                     if (st == PGRES_COPY_OUT || st == PGRES_COPY_BOTH) {
                         char *buf;
                         int rc;
-                        while ((rc = PQgetCopyData(self->conn, &buf, 1)) > 0)
+                        while (self->conn == orig_conn &&
+                               (rc = PQgetCopyData(self->conn, &buf, 1)) > 0)
                             PQfreemem(buf);
+                        if (self->conn != orig_conn) {
+                            if (last_res) PQclear(last_res);
+                            return;
+                        }
                         /* rc == -1: COPY done, rc == 0: would block, rc == -2: error */
                         if (rc == 0) {
-                            self->draining_copy = (st == PGRES_COPY_BOTH) ? 3 : 1;
+                            self->draining_copy = 1;
                             update_idle_ref(self);
                             self->pending_result = last_res;   /* resume via top-of-function draining_copy handler on next read */
                             return;
@@ -703,27 +816,15 @@ static void process_results(ev_pg_t *self) {
                             return;
                         }
                     }
-                    if (st == PGRES_COPY_IN || st == PGRES_COPY_BOTH) {
-                        int ce = PQputCopyEnd(self->conn, "skipped");
-                        if (ce == -1) {
-                            if (last_res) PQclear(last_res);
-                            handle_conn_loss(self);
-                            return;
-                        }
-                        /* ce == 0: END queued, flush pending; ce > 0: END sent.
-                         * asyncStatus is already PGASYNC_BUSY — fall through to
-                         * drain COMMAND_OK (or set draining_single_row if busy). */
-                        check_flush(self);
-                        if (self->magic != EV_PG_MAGIC || !self->conn) {
-                            if (last_res) PQclear(last_res);
-                            return;
-                        }
-                    }
                     /* Drain COMMAND_OK + NULL */
-                    while (self->conn && !PQisBusy(self->conn)) {
+                    while (self->conn == orig_conn && !PQisBusy(self->conn)) {
                         PGresult *r = PQgetResult(self->conn);
                         if (NULL == r) { drained = 1; break; }
                         PQclear(r);
+                    }
+                    if (self->conn != orig_conn) {
+                        if (last_res) PQclear(last_res);
+                        return;
                     }
                     if (drained)
                         self->skip_results--;
@@ -735,12 +836,17 @@ static void process_results(ev_pg_t *self) {
                 }
                 self->copy_mode = 1;
                 {
+                    PGconn *orig_conn = self->conn;
                     int consumed = deliver_result(self, res);
                     if (self->magic != EV_PG_MAGIC) {
                         if (last_res) PQclear(last_res);
                         return;
                     }
                     if (consumed) {
+                        /* the delivering cbt was popped without a skip
+                         * credit; its own stream still has to be drained */
+                        if (self->conn == orig_conn && self->conn)
+                            self->skip_results++;
                         self->copy_mode = 0;
                         update_idle_ref(self);
                     }
@@ -759,11 +865,16 @@ static void process_results(ev_pg_t *self) {
                 if (self->skip_results > 0) {
                     /* Skipped single-row stream — drain remaining rows */
                     int drained = 0;
+                    PGconn *orig_conn = self->conn;
                     PQclear(res);
-                    while (self->conn && !PQisBusy(self->conn)) {
+                    while (self->conn == orig_conn && !PQisBusy(self->conn)) {
                         PGresult *drain = PQgetResult(self->conn);
                         if (NULL == drain) { drained = 1; break; }
                         PQclear(drain);
+                    }
+                    if (self->conn != orig_conn) {
+                        if (last_res) PQclear(last_res);
+                        return;
                     }
                     if (drained)
                         self->skip_results--;
@@ -843,7 +954,10 @@ static int handle_conn_loss(ev_pg_t *self) {
 }
 
 static void check_flush(ev_pg_t *self) {
-    int ret = PQflush(self->conn);
+    int ret;
+    /* a notice fired mid-send may have finished or reset the conn */
+    if (NULL == self->conn || self->connecting) return;
+    ret = PQflush(self->conn);
     if (ret == 1) {
         start_writing(self);
     }
@@ -855,6 +969,28 @@ static void check_flush(ev_pg_t *self) {
     }
 }
 
+/* A nested EV::run must not reenter libpq or result dispatch.  Park the
+ * watcher instead of returning, which would spin on a level-triggered fd. */
+static int defer_io(ev_pg_t *self, ev_io *w) {
+    if (!self->in_dispatch && !self->in_libpq) return 0;
+    if (w == &self->rio) {
+        stop_reading(self);
+        self->io_deferred |= 1;
+    } else {
+        stop_writing(self);
+        self->io_deferred |= 2;
+    }
+    return 1;
+}
+
+static void resume_io(ev_pg_t *self) {
+    if (!self->io_deferred || self->in_dispatch || self->in_libpq) return;
+    if (self->io_deferred & 1) start_reading(self);
+    if (self->io_deferred & 2) start_writing(self);
+    self->io_deferred = 0;
+    update_idle_ref(self);
+}
+
 static void io_read_cb(EV_P_ ev_io *w, int revents) {
     ev_pg_t *self = (ev_pg_t *)w->data;
     (void)loop;
@@ -862,6 +998,7 @@ static void io_read_cb(EV_P_ ev_io *w, int revents) {
 
     if (self == NULL || self->magic != EV_PG_MAGIC) return;
     if (self->conn == NULL) return;
+    if (defer_io(self, w)) return;
 
     self->callback_depth++;
 
@@ -878,12 +1015,15 @@ static void io_read_cb(EV_P_ ev_io *w, int revents) {
         return;
     }
 
+    self->in_dispatch++;
     process_results(self);
+    self->in_dispatch--;
     if (self->magic != EV_PG_MAGIC) {
         self->callback_depth--;
         check_destroyed(self);
         return;
     }
+    resume_io(self);
 
     if (self->conn && !self->connecting) check_flush(self);
     if (self->magic != EV_PG_MAGIC) {
@@ -904,6 +1044,7 @@ static void io_write_cb(EV_P_ ev_io *w, int revents) {
 
     if (self == NULL || self->magic != EV_PG_MAGIC) return;
     if (self->conn == NULL) return;
+    if (defer_io(self, w)) return;
 
     self->callback_depth++;
 
@@ -911,12 +1052,15 @@ static void io_write_cb(EV_P_ ev_io *w, int revents) {
     if (ret == 0) {
         stop_writing(self);
         if (self->draining_copy) {
+            self->in_dispatch++;
             process_results(self);
+            self->in_dispatch--;
             if (self->magic != EV_PG_MAGIC) {
                 self->callback_depth--;
                 check_destroyed(self);
                 return;
             }
+            resume_io(self);
         }
         else if (self->copy_mode && self->on_drain != NULL) {
             dSP;
@@ -924,7 +1068,7 @@ static void io_write_cb(EV_P_ ev_io *w, int revents) {
             SAVETMPS;
             PUSHMARK(SP);
             PUTBACK;
-            CALL_SV_GUARDED(self->on_drain, "drain handler");
+            call_sv_guarded(self->on_drain, "drain handler");
             FREETMPS;
             LEAVE;
             if (self->magic != EV_PG_MAGIC) {
@@ -947,6 +1091,7 @@ static void io_write_cb(EV_P_ ev_io *w, int revents) {
 static void reinit_io_watchers(ev_pg_t *self) {
     stop_reading(self);
     stop_writing(self);
+    self->io_deferred = 0;
 
     /* notice_receiver firing during the prior PQconnectPoll could have
      * triggered finish() in user code, nulling self->conn */
@@ -968,17 +1113,22 @@ static void reinit_io_watchers(ev_pg_t *self) {
 static void connect_poll_cb(EV_P_ ev_io *w, int revents) {
     ev_pg_t *self = (ev_pg_t *)w->data;
     PostgresPollingStatusType poll_status;
+    PGconn *entry_conn;
     (void)loop;
     (void)revents;
 
     if (self == NULL || self->magic != EV_PG_MAGIC) return;
+    if (defer_io(self, w)) return;
 
     self->callback_depth++;
 
+    entry_conn = self->conn;
     poll_status = PQconnectPoll(self->conn);
 
     /* notice_receiver may fire during PQconnectPoll and destroy us */
     if (self->magic != EV_PG_MAGIC) goto out;
+    /* ... or reset()/finish() swapped the conn: the status is stale */
+    if (self->conn != entry_conn) goto out;
 
     /* Socket can change during PQconnectPoll (multi-host, SSL) */
     {
@@ -1018,7 +1168,7 @@ static void connect_poll_cb(EV_P_ ev_io *w, int revents) {
             PUSHMARK(SP);
             PUTBACK;
 
-            CALL_SV_GUARDED(self->on_connect, "connect handler");
+            call_sv_guarded(self->on_connect, "connect handler");
 
             FREETMPS;
             LEAVE;
@@ -1054,6 +1204,7 @@ out:
 static int cleanup_connection(ev_pg_t *self) {
     PGconn *conn;
     int outer_depth;
+    int foreign = (self->owner_pid != getpid());
 
     stop_reading(self);
     stop_writing(self);
@@ -1085,25 +1236,24 @@ static int cleanup_connection(ev_pg_t *self) {
     /* meta_res is gone — drop the lazily-built cache too, otherwise
      * result_meta would keep returning the previous connection's data */
     RELEASE_LAST_HV(self->last_result_meta);
+    RELEASE_LAST_HV(self->last_error_fields);
 
     if (self->trace_fp) {
-        if (self->conn) PQuntrace(self->conn);
-        fclose(self->trace_fp);
+        if (self->conn && !foreign) PQuntrace(self->conn);
+        if (!foreign) fclose(self->trace_fp);
         self->trace_fp = NULL;
     }
 
     conn = self->conn;
     self->conn = NULL;
     self->skip_results = 0;
-    if (conn) {
-        if (outer_depth > 0) {
-            /* Defer PQfinish — we may be inside libpq (e.g. notice_receiver) */
-            if (self->conn_to_finish)
-                PQfinish(self->conn_to_finish);
-            self->conn_to_finish = conn;
-        } else {
+    self->io_deferred = 0;
+    if (conn && !foreign) {
+        /* we may be inside libpq (notice_receiver) */
+        if (outer_depth > 0)
+            defer_finish(self, conn);
+        else
             PQfinish(conn);
-        }
     }
     return 0;
 }
@@ -1111,12 +1261,31 @@ static int cleanup_connection(ev_pg_t *self) {
 static int cancel_pending(ev_pg_t *self, const char *errmsg) {
     ev_pg_cb_t *cbt;
     unsigned int entry_magic = self->magic;
+    unsigned int epoch = ++self->cancel_epoch;
     int remaining = self->pending_count;
     int skipped = 0;
 
     self->meta_fresh = 0;
 
     self->callback_depth++;
+    self->in_dispatch++;
+
+    if (self->owner_pid != getpid()) {
+        /* the parent still delivers these */
+        while (self->cb_head) {
+            cbt = self->cb_head;
+            self->cb_head = cbt->next;
+            if (!self->cb_head) self->cb_tail = NULL;
+            self->pending_count--;
+            if (NULL != cbt->cb) SvREFCNT_dec(cbt->cb);
+            skipped++;
+            release_cbt(cbt);
+        }
+        self->in_dispatch--;
+        self->callback_depth--;
+        update_idle_ref(self);
+        return skipped;
+    }
 
     while (remaining-- > 0 && self->cb_head) {
         cbt = self->cb_head;
@@ -1143,7 +1312,7 @@ static int cancel_pending(ev_pg_t *self, const char *errmsg) {
             PUSHs(&PL_sv_undef);
             PUSHs(sv_2mortal(newSVpv(errmsg, 0)));
             PUTBACK;
-            CALL_SV_GUARDED(cbt->cb, "callback during cancel");
+            call_sv_guarded(cbt->cb, "callback during cancel");
             FREETMPS;
             LEAVE;
 
@@ -1165,16 +1334,20 @@ static int cancel_pending(ev_pg_t *self, const char *errmsg) {
             }
             break;
         }
+        /* a nested cancellation took the old queue; keep its retries */
+        if (self->cancel_epoch != epoch) break;
     }
 
+    self->in_dispatch--;
     self->callback_depth--;
     update_idle_ref(self);
+    if (self->magic == EV_PG_MAGIC) resume_io(self);
     return skipped;
 }
 
 static ev_pg_cb_t* push_cb(ev_pg_t *self, SV *cb, int is_sync) {
     ev_pg_cb_t *cbt = alloc_cbt();
-    cbt->cb = SvREFCNT_inc(cb);
+    cbt->cb = SvREFCNT_inc(SvRV(cb));
     cbt->is_pipeline_sync = is_sync;
     cbt->is_describe = 0;
     cbt->next = NULL;
@@ -1188,14 +1361,15 @@ static ev_pg_cb_t* push_cb(ev_pg_t *self, SV *cb, int is_sync) {
 
 static SV* handler_accessor(SV **slot, SV *handler, int has_arg) {
     if (has_arg) {
+        if (NULL != handler && SvOK(handler) &&
+            (!SvROK(handler) || SvTYPE(SvRV(handler)) != SVt_PVCV))
+            croak("handler must be a CODE reference or undef");
         if (NULL != *slot) {
             SvREFCNT_dec(*slot);
             *slot = NULL;
         }
         if (NULL != handler && SvOK(handler)) {
-            if (!SvROK(handler) || SvTYPE(SvRV(handler)) != SVt_PVCV)
-                croak("handler must be a CODE reference or undef");
-            *slot = SvREFCNT_inc(handler);
+            *slot = newSVsv(handler);
         }
     }
 
@@ -1215,6 +1389,7 @@ static void notice_receiver(void *arg, const PGresult *res) {
     if (!msg || !msg[0]) return;
 
     self->callback_depth++;
+    self->in_libpq++;
     {
         dSP;
         ENTER;
@@ -1223,13 +1398,14 @@ static void notice_receiver(void *arg, const PGresult *res) {
         XPUSHs(sv_2mortal(newSVpv(msg, 0)));
         PUTBACK;
 
-        CALL_SV_GUARDED(self->on_notice, "notice handler");
+        call_sv_guarded(self->on_notice, "notice handler");
 
         FREETMPS;
         LEAVE;
     }
     self->callback_depth--;
-    check_destroyed(self);
+    self->in_libpq--;
+    if (self->magic == EV_PG_MAGIC) resume_io(self);
 }
 
 
@@ -1329,7 +1505,6 @@ static void setup_new_conn(ev_pg_t *self, const char *what) {
     if (NULL == self->conn) {
         croak("cannot allocate PGconn");
     }
-
     if (PQstatus(self->conn) == CONNECTION_BAD) {
         SV *errsv = newSVpv(PQerrorMessage(self->conn), 0);
         SAVEFREESV(errsv);
@@ -1417,6 +1592,7 @@ CODE:
     PERL_UNUSED_VAR(class);
     Newxz(RETVAL, 1, ev_pg_t);
     RETVAL->magic = EV_PG_MAGIC;
+    RETVAL->owner_pid = getpid();
     RETVAL->loop = loop;
     RETVAL->loop_sv = newSVsv(ST(1));   /* keep the loop object alive for our lifetime */
     RETVAL->fd = -1;
@@ -1435,10 +1611,41 @@ CODE:
 
     self->magic = EV_PG_FREED;
 
-    /* loop_sv keeps the loop alive for these stops in the normal case;
-     * during global destruction (PL_dirty) loop teardown order isn't guaranteed. */
+    /* loop_sv keeps a custom loop alive, except during global destruction */
+    if (PL_dirty && self->loop != EV_DEFAULT_UC) {
+        self->reading = self->writing = 0;
+#ifdef LIBPQ_HAS_ASYNC_CANCEL
+        self->cancel_reading = self->cancel_writing = 0;
+#endif
+    }
     stop_reading(self);
     stop_writing(self);
+
+    if (self->owner_pid != getpid()) {
+        /* fork child: the conn, trace file and queue belong to the parent */
+        CLEANUP_CANCEL(self);
+        self->conn = NULL;
+        self->finish_n = 0;
+        self->loop = NULL;
+        self->fd = -1;
+        if (self->pending_result) PQclear(self->pending_result);
+        if (self->meta_res) PQclear(self->meta_res);
+        cancel_pending(self, "object destroyed");
+        RELEASE_HANDLER(self->on_connect);
+        RELEASE_HANDLER(self->on_error);
+        RELEASE_HANDLER(self->on_notify);
+        RELEASE_HANDLER(self->on_notice);
+        RELEASE_HANDLER(self->on_drain);
+        RELEASE_LAST_HV(self->last_error_fields);
+        RELEASE_LAST_HV(self->last_result_meta);
+        if (self->loop_sv) SvREFCNT_dec(self->loop_sv);
+        Safefree(self->conninfo);
+        if (self->callback_depth == 0) {
+            Safefree(self->finish_q);
+            Safefree(self);
+        }
+        return;
+    }
 
     if (PL_dirty) {
 #ifdef LIBPQ_HAS_ASYNC_CANCEL
@@ -1454,7 +1661,8 @@ CODE:
             fclose(self->trace_fp);
         }
         if (self->conn) PQfinish(self->conn);
-        if (self->conn_to_finish) PQfinish(self->conn_to_finish);
+        finish_deferred(self);
+        Safefree(self->finish_q);
         Safefree(self->conninfo);
         RELEASE_HANDLER(self->on_connect);
         RELEASE_HANDLER(self->on_error);
@@ -1491,11 +1699,14 @@ CODE:
         self->loop = NULL;
         self->fd = -1;
         if (self->trace_fp && conn) PQuntrace(conn);
-        if (conn) PQfinish(conn);
-        if (self->conn_to_finish) {
-            PQfinish(self->conn_to_finish);
-            self->conn_to_finish = NULL;
+        if (conn) {
+            if (self->in_libpq > 0)
+                defer_finish(self, conn);
+            else
+                PQfinish(conn);
         }
+        if (self->in_libpq == 0)
+            finish_deferred(self);
     }
 
     cancel_pending(self, "object destroyed");
@@ -1511,8 +1722,10 @@ CODE:
     if (self->trace_fp) fclose(self->trace_fp);
     Safefree(self->conninfo);
 
-    if (self->callback_depth == 0)
+    if (self->callback_depth == 0) {
+        Safefree(self->finish_q);
         Safefree(self);
+    }
     /* else: deferred free via check_destroyed */
 }
 
@@ -1520,7 +1733,11 @@ void
 connect(EV::Pg self, const char *conninfo)
 CODE:
 {
+    REQUIRE_OWNER(self);
     if (NULL != self->conn) {
+        if (!self->connecting && PQstatus(self->conn) == CONNECTION_BAD)
+            croak("previous connection failed; call finish() first, or "
+                  "connect from a timer after on_error returns");
         croak("already connected");
     }
 
@@ -1539,7 +1756,11 @@ CODE:
     const char **keywords;
     const char **values;
 
+    REQUIRE_OWNER(self);
     if (NULL != self->conn) {
+        if (!self->connecting && PQstatus(self->conn) == CONNECTION_BAD)
+            croak("previous connection failed; call finish() first, or "
+                  "connect from a timer after on_error returns");
         croak("already connected");
     }
 
@@ -1609,6 +1830,7 @@ CODE:
 {
     PGconn *old_conn;
 
+    REQUIRE_OWNER(self);
     if (NULL == self->conninfo) {
         croak("no previous connection to reset");
     }
@@ -1711,6 +1933,7 @@ query(EV::Pg self, const char *sql, SV *cb)
 CODE:
 {
     REQUIRE_CONN(self);
+    REQUIRE_OWNER(self);
     REQUIRE_CB(cb);
 
     if (PQpipelineStatus(self->conn) != PQ_PIPELINE_OFF) {
@@ -1735,6 +1958,7 @@ PREINIT:
 CODE:
 {
     REQUIRE_CONN(self);
+    REQUIRE_OWNER(self);
     REQUIRE_CB(cb);
     if (!SvROK(params_ref) || SvTYPE(SvRV(params_ref)) != SVt_PVAV) {
         croak("params must be an ARRAY reference");
@@ -1759,6 +1983,7 @@ prepare(EV::Pg self, const char *name, const char *sql, SV *cb)
 CODE:
 {
     REQUIRE_CONN(self);
+    REQUIRE_OWNER(self);
     REQUIRE_CB(cb);
 
     if (!PQsendPrepare(self->conn, name, sql, 0, NULL)) {
@@ -1779,6 +2004,7 @@ PREINIT:
 CODE:
 {
     REQUIRE_CONN(self);
+    REQUIRE_OWNER(self);
     REQUIRE_CB(cb);
     if (!SvROK(params_ref) || SvTYPE(SvRV(params_ref)) != SVt_PVAV) {
         croak("params must be an ARRAY reference");
@@ -1803,6 +2029,7 @@ describe_prepared(EV::Pg self, const char *name, SV *cb)
 CODE:
 {
     REQUIRE_CONN(self);
+    REQUIRE_OWNER(self);
     REQUIRE_CB(cb);
 
     if (!PQsendDescribePrepared(self->conn, name)) {
@@ -1818,6 +2045,7 @@ describe_portal(EV::Pg self, const char *name, SV *cb)
 CODE:
 {
     REQUIRE_CONN(self);
+    REQUIRE_OWNER(self);
     REQUIRE_CB(cb);
 
     if (!PQsendDescribePortal(self->conn, name)) {
@@ -1867,6 +2095,7 @@ pipeline_sync(EV::Pg self, SV *cb)
 CODE:
 {
     REQUIRE_CONN(self);
+    REQUIRE_OWNER(self);
     REQUIRE_CB(cb);
 
     if (!PQpipelineSync(self->conn)) {
@@ -1877,13 +2106,14 @@ CODE:
     check_flush(self);
 }
 
-#ifdef LIBPQ_HAS_SEND_PIPELINE_SYNC
+#ifdef LIBPQ_HAS_PIPELINING
 
 void
 send_flush_request(EV::Pg self)
 CODE:
 {
     REQUIRE_CONN(self);
+    REQUIRE_OWNER(self);
     if (!PQsendFlushRequest(self->conn)) {
         croak("PQsendFlushRequest failed: %s", PQerrorMessage(self->conn));
     }
@@ -1907,14 +2137,23 @@ put_copy_data(EV::Pg self, SV *data)
 PREINIT:
     STRLEN len;
     const char *buf;
+    int destroyed;
 CODE:
 {
     REQUIRE_CONN(self);
+    REQUIRE_OWNER(self);
+    REQUIRE_NOT_IN_NOTICE(self, "put_copy_data");
     buf = SvPV(data, len);
     if (len > (STRLEN)INT_MAX)
         croak("put_copy_data: data too large");
     RETVAL = PQputCopyData(self->conn, buf, (int)len);
-    if (RETVAL >= 0)
+    destroyed = (self->magic != EV_PG_MAGIC);
+    if (destroyed || self->finish_n)
+        check_destroyed(self);
+    if (destroyed) {
+        RETVAL = -1;
+    }
+    else if (RETVAL >= 0)
         check_flush(self);
 }
 OUTPUT:
@@ -1926,6 +2165,8 @@ CODE:
 {
     const char *msg = NULL;
     REQUIRE_CONN(self);
+    REQUIRE_OWNER(self);
+    REQUIRE_NOT_IN_NOTICE(self, "put_copy_end");
     if (errmsg && SvOK(errmsg)) {
         msg = SvPV_nolen(errmsg);
     }
@@ -1941,19 +2182,28 @@ get_copy_data(EV::Pg self)
 CODE:
 {
     char *buf = NULL;
-    int len;
+    int len, destroyed;
 
     REQUIRE_CONN(self);
+    REQUIRE_OWNER(self);
+    REQUIRE_NOT_IN_NOTICE(self, "get_copy_data");
 
     len = PQgetCopyData(self->conn, &buf, 1);
-    if (len > 0) {
+    destroyed = (self->magic != EV_PG_MAGIC);
+    if (destroyed || self->finish_n)
+        check_destroyed(self);
+    if (destroyed) {
+        if (buf) PQfreemem(buf);
+        RETVAL = &PL_sv_undef;
+    }
+    else if (len > 0) {
         RETVAL = newSVpvn(buf, len);
         PQfreemem(buf);
     }
     else if (len == -1) {
         /* COPY OUT complete — the COMMAND_OK result is buffered in libpq.
          * Clear copy_mode so process_results continues to drain it.
-         * If we're inside io_read_cb (callback_depth > 0), the outer
+         * If a dispatch frame is active (callback_depth > 0), its
          * process_results loop will pick it up after this callback returns.
          * Otherwise, synthetically trigger io_read_cb. */
         RETVAL = newSViv(-1);
@@ -2230,6 +2480,7 @@ PREINIT:
 CODE:
 {
     REQUIRE_CONN(self);
+    REQUIRE_OWNER(self);
     cn = PQgetCancel(self->conn);
     if (NULL == cn) {
         croak("PQgetCancel failed");
@@ -2250,7 +2501,9 @@ cancel_async(EV::Pg self, SV *cb)
 CODE:
 {
     REQUIRE_CONN(self);
+    REQUIRE_OWNER(self);
     REQUIRE_CB(cb);
+    REQUIRE_LIBPQ_VER(170000, "cancel_async");
 
     if (self->cancel_conn)
         croak("cancel already in progress");
@@ -2260,10 +2513,11 @@ CODE:
         croak("PQcancelCreate failed");
 
     if (!PQcancelStart(self->cancel_conn)) {
-        const char *err = PQcancelErrorMessage(self->cancel_conn);
+        SV *errsv = newSVpv(PQcancelErrorMessage(self->cancel_conn), 0);
+        SAVEFREESV(errsv);
         PQcancelFinish(self->cancel_conn);
         self->cancel_conn = NULL;
-        croak("PQcancelStart failed: %s", err);
+        croak("PQcancelStart failed: %s", SvPV_nolen(errsv));
     }
 
     self->cancel_fd = PQcancelSocket(self->cancel_conn);
@@ -2273,7 +2527,7 @@ CODE:
         croak("PQcancelSocket returned invalid fd");
     }
 
-    self->cancel_cb = SvREFCNT_inc(cb);
+    self->cancel_cb = SvREFCNT_inc(SvRV(cb));
 
     ev_io_init(&self->cancel_rio, cancel_poll_cb, self->cancel_fd, EV_READ);
     self->cancel_rio.data = (void *)self;
@@ -2341,10 +2595,15 @@ void
 set_client_encoding(EV::Pg self, const char *encoding)
 CODE:
 {
+    int rc;
     REQUIRE_CONN(self);
-    if (self->pending_count > 0)
-        croak("set_client_encoding: cannot call with pending queries");
-    if (PQsetClientEncoding(self->conn, encoding) != 0) {
+    REQUIRE_OWNER(self);
+    REQUIRE_NOT_IN_NOTICE(self, "set_client_encoding");
+    REQUIRE_IDLE(self, "set_client_encoding");
+    rc = PQsetClientEncoding(self->conn, encoding);
+    if (settle_blocking_call(self))
+        XSRETURN_EMPTY;
+    if (rc != 0) {
         croak("PQsetClientEncoding failed: %s", PQerrorMessage(self->conn));
     }
 }
@@ -2384,9 +2643,9 @@ CODE:
         ExecStatusType mst = PQresultStatus(self->meta_res);
         if (mst == PGRES_TUPLES_OK || mst == PGRES_SINGLE_TUPLE
             || mst == PGRES_COMMAND_OK
- #ifdef LIBPQ_HAS_CHUNK_MODE
+#ifdef LIBPQ_HAS_CHUNK_MODE
             || mst == PGRES_TUPLES_CHUNK
- #endif
+#endif
            )
             STORE_LAST_HV(self->last_result_meta, build_result_meta(self->meta_res));
     }
@@ -2405,6 +2664,7 @@ set_chunked_rows_mode(EV::Pg self, int chunk_size)
 CODE:
 {
     REQUIRE_CONN(self);
+    REQUIRE_LIBPQ_VER(170000, "set_chunked_rows_mode");
     RETVAL = PQsetChunkedRowsMode(self->conn, chunk_size);
 }
 OUTPUT:
@@ -2419,7 +2679,9 @@ close_prepared(EV::Pg self, const char *name, SV *cb)
 CODE:
 {
     REQUIRE_CONN(self);
+    REQUIRE_OWNER(self);
     REQUIRE_CB(cb);
+    REQUIRE_LIBPQ_VER(170000, "close_prepared");
     if (!PQsendClosePrepared(self->conn, name)) {
         croak("PQsendClosePrepared failed: %s", PQerrorMessage(self->conn));
     }
@@ -2432,7 +2694,9 @@ close_portal(EV::Pg self, const char *name, SV *cb)
 CODE:
 {
     REQUIRE_CONN(self);
+    REQUIRE_OWNER(self);
     REQUIRE_CB(cb);
+    REQUIRE_LIBPQ_VER(170000, "close_portal");
     if (!PQsendClosePortal(self->conn, name)) {
         croak("PQsendClosePortal failed: %s", PQerrorMessage(self->conn));
     }
@@ -2449,7 +2713,9 @@ send_pipeline_sync(EV::Pg self, SV *cb)
 CODE:
 {
     REQUIRE_CONN(self);
+    REQUIRE_OWNER(self);
     REQUIRE_CB(cb);
+    REQUIRE_LIBPQ_VER(170000, "send_pipeline_sync");
     if (!PQsendPipelineSync(self->conn)) {
         croak("PQsendPipelineSync failed: %s", PQerrorMessage(self->conn));
     }
@@ -2494,14 +2760,19 @@ CODE:
 OUTPUT:
     RETVAL
 
+#if EV_PG_LIBPQ_MAJOR >= 16
+
 int
 connection_used_gssapi(EV::Pg self)
 CODE:
 {
+    REQUIRE_LIBPQ_VER(160000, "connection_used_gssapi");
     RETVAL = (NULL != self->conn) ? PQconnectionUsedGSSAPI(self->conn) : 0;
 }
 OUTPUT:
     RETVAL
+
+#endif
 
 int
 connection_needs_password(EV::Pg self)
@@ -2530,6 +2801,7 @@ PPCODE:
     int i;
 
     if (!self->conn) XSRETURN_UNDEF;
+    if (!PQsslInUse(self->conn)) XSRETURN_UNDEF;
     names = PQsslAttributeNames(self->conn);
     if (!names) XSRETURN_UNDEF;
 
@@ -2558,7 +2830,16 @@ CODE:
 
     REQUIRE_CONN(self);
     algorithm = (items > 3 && SvOK(ST(3))) ? SvPV_nolen(ST(3)) : NULL;
+    if (!algorithm) {
+        REQUIRE_OWNER(self);
+        REQUIRE_NOT_IN_NOTICE(self, "encrypt_password");
+        REQUIRE_IDLE(self, "encrypt_password");
+    }
     enc = PQencryptPasswordConn(self->conn, password, user, algorithm);
+    if (!algorithm && settle_blocking_call(self)) {
+        if (enc) PQfreemem(enc);
+        XSRETURN_UNDEF;
+    }
     if (!enc)
         croak("PQencryptPasswordConn failed: %s", PQerrorMessage(self->conn));
     RETVAL = newSVpv(enc, 0);
@@ -2572,6 +2853,7 @@ trace(EV::Pg self, const char *filename)
 CODE:
 {
     REQUIRE_CONN(self);
+    REQUIRE_OWNER(self);
     if (self->trace_fp) {
         PQuntrace(self->conn);
         fclose(self->trace_fp);
@@ -2587,6 +2869,7 @@ void
 untrace(EV::Pg self)
 CODE:
 {
+    REQUIRE_OWNER(self);
     if (self->conn) PQuntrace(self->conn);
     if (self->trace_fp) {
         fclose(self->trace_fp);
@@ -2605,4 +2888,3 @@ CODE:
 }
 
 #endif
-

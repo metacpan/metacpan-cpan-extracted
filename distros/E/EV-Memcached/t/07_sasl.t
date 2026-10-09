@@ -43,7 +43,11 @@ unless ($port) {
     close $conf;
 
     # Start SASL memcached
-    $port = 18399;
+    my $probe = IO::Socket::INET->new(
+        LocalAddr => $host, LocalPort => 0, Listen => 1, ReuseAddr => 1)
+        or plan skip_all => "no free port: $!";
+    $port = $probe->sockport;
+    close $probe;
     system("SASL_CONF_PATH=$dir memcached -S -B binary -d -p $port -U 0 -P $dir/mc.pid 2>/dev/null");
 
     # Wait for startup with retry

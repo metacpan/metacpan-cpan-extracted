@@ -12,6 +12,7 @@ use parent 'Exporter';
 # } '_find_match returns undef when no interactions exist';
 #
 
+use Scalar::Util qw(refaddr);
 use Test::Builder;
 use Return::Set qw(set_return);
 
@@ -34,11 +35,11 @@ Test::Returns - Verify that a method's output agrees with its specification
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 DESCRIPTION
 
@@ -80,7 +81,18 @@ sub returns_is {
 
 	eval {
 		if(defined($value)) {
-			$ok = set_return($value, $schema) eq $value;
+			if(defined(my $ret = set_return($value, $schema))) {
+				# Compare references by address: an object may overload
+				# stringification and return undef (e.g. Geo::Location::Point)
+				if(ref($value)) {
+					$ok = ref($ret) && (refaddr($ret) == refaddr($value));
+				} else {
+					$ok = ($ret eq $value);
+				}
+			} else {
+				$error = 'set_return returned undef';
+				$ok = 0;
+			}
 		} else {
 			set_return(undef, $schema);
 			$ok = 1;

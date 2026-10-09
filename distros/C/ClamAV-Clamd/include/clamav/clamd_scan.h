@@ -9,10 +9,6 @@
 #include "clamav/clamd_stream.h"
 #include "clamav/clamd_async.h"
 
-#ifndef _WIN32
-#  include <sys/stat.h>
-#endif
-
 /* CC_ERR_NOTREG and CC_ERR_NOFDPASS live in clamd_conn.h. They were
  * defined here, below the includes, which meant clamd_async.h - included
  * above - had already been parsed without them: the branch it takes on a
@@ -45,12 +41,12 @@
  * Refuse rather than hand clamd something it will answer about
  * meaninglessly. */
 static int cc_check_regular(int fd, cc_err *err) {
-    struct stat st;
-    if (fstat(fd, &st) < 0) {
+    cc_stat_t st;
+    if (cc_fstat(fd, &st) < 0) {
         cc_err_set(err, CC_ERR_IO, "fstat", strerror(errno));
         return CC_ERR_IO;
     }
-    if (!S_ISREG(st.st_mode)) {
+    if (!CC_S_ISREG(st.st_mode)) {
         cc_err_set(err, CC_ERR_NOTREG, "not a regular file", NULL);
         return CC_ERR_NOTREG;
     }
@@ -89,12 +85,12 @@ static int cc_scan_fd(const cc_target *t, int fd,
                                            : CC_TRANSPORT_INSTREAM;
 
     {
-        struct stat st;
-        if (fstat(fd, &st) < 0) {
+        cc_stat_t st;
+        if (cc_fstat(fd, &st) < 0) {
             cc_err_set(err, CC_ERR_IO, "fstat", strerror(errno));
             return CC_ERR_IO;
         }
-        if (!S_ISREG(st.st_mode)) {
+        if (!CC_S_ISREG(st.st_mode)) {
             cc_err_set(err, CC_ERR_NOTREG, "not a regular file", NULL);
             return CC_ERR_NOTREG;
         }
@@ -133,13 +129,13 @@ static int cc_scan_path(const cc_target *t, const char *path,
     *out = NULL; *outlen = 0;
     if (transport) *transport = CC_TRANSPORT_NONE;
 
-    fd = open(path, O_RDONLY);
+    fd = cc_open_ro(path);
     if (fd < 0) {
         cc_err_set(err, CC_ERR_IO, "open", strerror(errno));
         return CC_ERR_IO;
     }
     rc = cc_scan_fd(t, fd, out, outlen, transport, err);
-    close(fd);                 /* ours, so ours to close - on every path */
+    cc_close_fd(fd);           /* ours, so ours to close - on every path */
     return rc;
 }
 

@@ -1,5 +1,14 @@
 Revision history for Perl-Critic-Policy-ProhibitUnusedDefinitions
 
+0.005 2026-10-08 TEODESIAN
+    - Read the distribution through Perl::Critic::Distribution, which parses
+      each file once for every policy that needs the whole distribution, and
+      keeps the cache that this policy kept.  The cache moves to
+      ~/.cache/perl-critic-distribution, so the first run after an upgrade
+      parses every file once.  An old cache in
+      ~/.cache/perl-critic-prohibitunuseddefinitions is no longer read, and
+      can be deleted.
+
 0.004 2026-09-18 TEODESIAN
     - Keep each file's uses resolved in the cache, with a digest of the
       definitions they were resolved against.  While no definition changes,

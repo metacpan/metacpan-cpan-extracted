@@ -4,7 +4,9 @@ use 5.020;
 use Path::Tiny;
 use Email::MIME;
 use lib 'lib';
-use Mail::DKIM2::Common qw(extract_mi_version parse_dkim_pubkey);
+use Mail::DKIM2::Common qw(extract_mi_version parse_dkim_pubkey parse_mime
+                           valid_sequence chain_number_error mi_version_tag UNKEYABLE_SIGNATURE_ERROR);
+use Mail::DKIM2::Signature;
 use Mail::DKIM2::MessageInstance;
 use Mail::DKIM2::Verifier;
 use List::Util qw(max);
@@ -25,9 +27,26 @@ my $f1 = shift;
 my $data = path($f1)->slurp;
 $data =~ s/\r//gs;
 $data =~ s/\n/\r\n/gs;
-my $msg1 = Email::MIME->new($data);
+my $msg1 = parse_mime($data);
 
 my $dns = decode_json(path($dns_json)->slurp);
+
+# Header-level PERMERRORs first, as the Verifier reports them. The walk below
+# is driven by the i= and m= values it can read, so without this a junk
+# DKIM2-Signature with no usable i= -- even the only one -- would simply never
+# be visited, and an i= or m= above MAX_CHAIN_LENGTH would be a loop bound.
+for my $h ($msg1->header_raw('DKIM2-Signature')) {
+  my $sig = eval { Mail::DKIM2::Signature->parse($h) };
+  my $i = $sig ? $sig->sequence : undef;
+  die UNKEYABLE_SIGNATURE_ERROR . "\n" unless valid_sequence($i);
+  my $e = chain_number_error('DKIM2-Signature', 'i', $i)
+       // chain_number_error('DKIM2-Signature', 'm', $sig->version);
+  die "$e\n" if $e;
+}
+for my $h ($msg1->header_raw('Message-Instance')) {
+  my $e = chain_number_error('Message-Instance', 'm', mi_version_tag($h));
+  die "$e\n" if $e;
+}
 
 my %map = map { _geti($_) => $_ } $msg1->header('DKIM2-Signature');
 my $num = %map ? max(keys %map) : 0;
@@ -52,18 +71,24 @@ if ($instance) {
     if $instance > $top_signed;
 }
 
+# Set once past an instance with a null body Recipe: the body below it is
+# lost, so lower levels check header hashes only, undoing header Recipes only.
+my $hdr_only = 0;
+
 while (1) {
   my $hi = $num ? _getv($map{$num}) : 0;
   while ($instance > $hi) {
-    my ($check, $error) = Mail::DKIM2::MessageInstance->verify($msg1);
+    my ($check, $error) = Mail::DKIM2::MessageInstance->verify($msg1, HeadersOnly => $hdr_only);
     die "ERROR: failed to verify instance $instance: $error\n" unless $check;
     die "DIDN'T FIND TOP $instance <> $check" unless $instance == $check;
     say "OK Message-Instance: m=$check";
-    die "Failed to undo" unless Mail::DKIM2::MessageInstance->undo($msg1);
+    my $mi = Mail::DKIM2::MessageInstance->parse($mimap{$instance});
+    $hdr_only = 1 if $mi && $mi->unrecoverable;
+    die "Failed to undo" unless Mail::DKIM2::MessageInstance->undo($msg1, HeadersOnly => $hdr_only);
     # Email::MIME keeps internal caches which get broken by replacing the body
     $instance--;
     last unless $instance;
-    $msg1 = Email::MIME->new($msg1->as_string);
+    $msg1 = parse_mime($msg1->as_string);
     %mimap = map { extract_mi_version($_) => $_ } $msg1->header('Message-Instance');
     %map = map { _geti($_) => $_ } $msg1->header('DKIM2-Signature');
     my $newnum = %map ? max(keys %map) : 0;
@@ -85,6 +110,7 @@ while (1) {
   # legitimate §9.3 nd= bridge below the top looks locally topmost here.
   # The first step still sees the whole chain, so a true top nd= is caught.
   $verifier->mid_process(1) if $num < $top_i;
+  $verifier->headers_only(1) if $hdr_only;
   $verifier->set_pubkey_callback(sub { find_key(@_) });
   $verifier->PRINT($msg1->as_string());
   $verifier->CLOSE;
@@ -98,16 +124,17 @@ while (1) {
   $num--;
 }
 
-sub _geti {
-  my $arg = shift;
-  return 0 unless $arg =~ m/\bi=(\d+)/;
-  return 0 + $1;
-}
+# i= and m= of a DKIM2-Signature, read with the tag-list parser so FWS around
+# "=" (which the syntax allows) is no obstacle. Both are already known to be
+# in range (checked above).
+sub _geti { return _sigtag(shift, 'sequence') }
+sub _getv { return _sigtag(shift, 'version') }
 
-sub _getv {
-  my $arg = shift;
-  return 0 unless $arg =~ m/\bm=(\d+)/;
-  return 0 + $1;
+sub _sigtag {
+  my ($arg, $tag) = @_;
+  my $sig = eval { Mail::DKIM2::Signature->parse($arg) } or return 0;
+  my $v = $sig->$tag;
+  return (defined $v && $v =~ /\A[0-9]+\z/) ? 0 + $v : 0;
 }
 
 sub find_key {

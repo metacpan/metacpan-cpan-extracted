@@ -1,0 +1,165 @@
+#!perl
+
+use 5.010;
+use strict;
+use warnings;
+
+use Getopt::Long ();
+use Game::Brandubh;
+use Game::Brandubh::Terminal;
+
+my %given;
+my $parsed = Getopt::Long::GetOptionsFromArray(
+    \@ARGV, \%given,
+    'level=i', 'side=s', 'seed=s', 'variant=s', 'load=s',
+    'colour|color!', 'pick!', 'unicode!', 'version', 'help',
+);
+
+if (!$parsed || @ARGV) {
+    print STDERR "brandubh: I do not know '@ARGV'.\n" if $parsed && @ARGV;
+    print STDERR usage();
+    exit 2;
+}
+if ($given{help}) {
+    print usage();
+    exit 0;
+}
+if ($given{version}) {
+    print "brandubh $Game::Brandubh::VERSION\n";
+    exit 0;
+}
+
+my %with;
+$with{level}   = $given{level}   if defined $given{level};
+$with{human}   = $given{side}    if defined $given{side};
+$with{variant} = $given{variant} if defined $given{variant};
+$with{colour}  = $given{colour}  if defined $given{colour};
+$with{picking} = $given{pick}    if defined $given{pick};
+$with{unicode} = $given{unicode} if defined $given{unicode};
+$with{menu}    = 1 unless defined $given{side} || defined $given{level} || defined $given{load};
+
+if (defined $given{seed}) {
+    if ($given{seed} !~ /\A[0-9a-fA-F]{64}\z/) {
+        print STDERR "brandubh: a seed is sixty-four hexadecimal characters.\n";
+        exit 2;
+    }
+    $with{seed} = pack 'H*', $given{seed};
+}
+
+my $terminal = eval { Game::Brandubh::Terminal->new(%with) };
+if (!$terminal) {
+    (my $why = $@) =~ s/ at \S+ line \d+\.?\s*\z//;
+    $why =~ s/\AGame::Brandubh(?:::\w+)*: //;
+    print STDERR "brandubh: $why.\n";
+    exit 2;
+}
+
+if (defined $given{load}) {
+    exit 2 unless $terminal->load($given{load});
+}
+
+exit $terminal->start;
+
+sub usage {
+    return <<'USAGE';
+brandubh - the Irish tafl game, in a terminal
+
+  brandubh [options]
+
+  --side WHO       attackers (the default), defenders, both, or none
+  --level N        how hard the program plays: 1, 2 (the default) or 3
+  --variant TEXT   the rule set, for example 'custom repeat=2'
+  --seed HEX       sixty-four hexadecimal characters; the same seed plays the same game
+  --load FILE      carry on with a saved game
+  --no-colour      letters and lines instead of a painted board
+  --no-pick        type moves instead of choosing them with the arrow keys
+  --no-unicode     letters for the pieces, with colour kept
+  --version        the version, and stop
+  --help           this, and stop
+
+In a terminal, moves are chosen on the board with the arrow keys; press ? for
+the keys. Anywhere else, type a move as two squares, like d1d3, or help.
+USAGE
+}
+
+__END__
+
+=head1 NAME
+
+brandubh - the Irish tafl game, in a terminal
+
+=head1 SYNOPSIS
+
+    brandubh
+    brandubh --side defenders --level 3
+    brandubh --side both --no-colour
+    brandubh --load saved.txt
+
+=head1 DESCRIPTION
+
+Plays brandubh against the program, between two people, or the program against
+itself. See L<Game::Brandubh::Terminal> for how it is played and
+L<Game::Brandubh> for the rules.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--side> I<who>
+
+Which side is yours: C<attackers> (the default), C<defenders>, C<both> for two
+people at one keyboard, or C<none> to watch.
+
+=item B<--level> I<n>
+
+1, 2 or 3. 2 by default.
+
+=item B<--variant> I<text>
+
+The rule set, as L<Game::Brandubh::Variant/as_string> writes one.
+
+=item B<--seed> I<hex>
+
+Sixty-four hexadecimal characters. The program draws its choices from them, so
+the same seed plays the same game.
+
+=item B<--load> I<file>
+
+Carry on with a game written by the C<save> command.
+
+=item B<--no-colour>
+
+Draw the board in letters and lines. C<--no-color> is the same.
+
+=item B<--no-pick>
+
+Type moves instead of choosing them with the arrow keys.
+
+=item B<--no-unicode>
+
+Letters for the pieces, keeping the colour.
+
+=item B<--version>, B<--help>
+
+Say so and stop.
+
+=back
+
+=head1 EXIT STATUS
+
+0 when the game was left in the ordinary way, 2 when the options were wrong or
+a file could not be loaded.
+
+=head1 AUTHOR
+
+LNATION <email@lnation.org>
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION <email@lnation.org>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

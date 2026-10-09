@@ -18,6 +18,9 @@ use Mail::DKIM2::Signer;
 use Mail::DKIM2::Common qw(fold_header);
 use DKIM2TestKeys;
 
+# bin/dkim2sign verifies an upstream chain before extending it.
+$ENV{DKIM2_DNS_JSON} = DKIM2TestKeys::dns_json();
+
 # spec-06 §3: both hashing algorithms must be implemented
 my $algs = Mail::DKIM2::MessageInstance::hash_algs();
 is_deeply([sort keys %$algs], ['sha256', 'sha512'], 'spec-06 §3: both hash algorithms present');
@@ -266,6 +269,7 @@ my $hop1_512;
         '--mailfrom' => '<sender@test2.dkim2.com>',
         '--rcptto'   => '<final@test3.dkim2.com>',
         '--timestamp' => 1740000100,
+        '--ignore-timestamps',   # the fixture carries a fixed old t=
         '--hash'     => 'sha512');
     is($rc, 0, 're-signing a sha512-only message exits 0 (no crash)')
         or diag $resigned;

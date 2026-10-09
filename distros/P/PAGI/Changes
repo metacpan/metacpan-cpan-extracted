@@ -1,5 +1,40 @@
 # This file documents the revision history for Perl extension PAGI
 
+0.003000 - 2026-10-08
+
+  A major release. The specifications it describes, Www 0.6 (since
+  0.002009) and Lifespan 0.3, add requirements that servers and
+  applications written against earlier versions may not meet. It is
+  released alongside PAGI-Server and PAGI-Tools 0.003000, which implement
+  them; PAGI::Upgrading covers moving an application from Www 0.5 to 0.6.
+
+  [Packaging]
+  - Installing PAGI no longer installs PAGI-Server and PAGI-Tools. Through
+    the 0.002 releases the distribution kept them as runtime dependencies
+    for code that relied on `requires 'PAGI'` from before the split; it is
+    now the specification only. Require PAGI::Server and/or PAGI::Tools
+    directly (cpanm PAGI::Server PAGI::Tools).
+
+  [Specification]
+  - Www 0.6: a server shutting down closes each accepted WebSocket with
+    Close 1012 ("Service Restart") and reports 1012 with reason
+    server_shutdown, on every transport, instead of dropping it as 1006.
+    Shutdown joins the other closes the server decides (1002, 1007, 1008,
+    1011), so a client can tell a planned restart from a crash.
+  - Lifespan 0.3 and Www 0.6: a shutting-down server waits, within its
+    shutdown bound, for the application calls serving its connections to
+    return before lifespan.shutdown, so cleanup an application starts on its
+    disconnect finishes before the process exits.
+  - Www 0.6: a server delivers terminal callbacks (on_disconnect,
+    on_complete, on_end) once the end has happened and MUST NOT hold one
+    until the application returns, since an application may await its own
+    scope's end (as PAGI-Tools' helpers do for their on_close cleanup).
+
+  [Documentation]
+  - Cookbook: "Cleaning up when the server shuts down", with the new
+    examples/19-shutdown-cleanup -- a WebSocket app that saves each session
+    asynchronously on its server_shutdown disconnect.
+
 0.002013 - 2026-10-04
 
   [Specification]

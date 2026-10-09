@@ -1,0 +1,59 @@
+---
+abstract: 'Parse a distribution once, for every policy that needs all of it.'
+author:
+  - 'George S. Baugh <george@troglodyne.net>'
+build_requires:
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Scalar::Util: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl-Critic-Distribution
+no_index:
+  directory:
+    - docs
+    - t
+    - templates
+provides:
+  Perl::Critic::Distribution:
+    file: lib/Perl/Critic/Distribution.pm
+    version: '0.001'
+requires:
+  Cpanel::JSON::XS: '0'
+  Cwd: '0'
+  Digest::SHA: '0'
+  File::Basename: '0'
+  File::Find: '0'
+  File::Path: '0'
+  File::Slurper: '0'
+  File::Slurper::Temp: '0'
+  File::Spec: '0'
+  IO::Compress::Gzip: '0'
+  IO::Uncompress::Gunzip: '0'
+  List::Util: '0'
+  PPI: '0'
+  Perl::Critic::Utils: '0'
+  Readonly: '0'
+  Time::HiRes: '0'
+  perl: '5.014'
+  re: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/teodesian/perl-critic-distribution/issues
+  homepage: https://github.com/teodesian/perl-critic-distribution
+  repository: https://github.com/teodesian/perl-critic-distribution.git
+version: '0.001'
+x_generated_by_perl: v5.44.0
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: MIT

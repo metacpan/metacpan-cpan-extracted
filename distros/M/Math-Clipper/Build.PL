@@ -16,7 +16,7 @@ my $build = Module::Build::WithXSpp->new(
   extra_compiler_flags => [qw(-D_GLIBCXX_USE_C99 -DHAS_BOOL)],
   # Provides extra C typemaps that are auto-merged
   extra_typemap_modules => {
-    'ExtUtils::Typemaps::Default' => '0.05',
+    'ExtUtils::Typemaps::Default' => '1.06',
   },
   #for MSVC builds
   early_includes => [qw(

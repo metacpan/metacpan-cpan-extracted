@@ -6,6 +6,12 @@
  * Win32 scar tissue already paid for.
  */
 #define PERL_NO_GET_CONTEXT
+/* The C core under include/clamav is plain C with no interpreter to
+ * hand. On a PERL_IMPLICIT_SYS perl - every Strawberry - XSUB.h rewrites
+ * malloc, free, send, socket, read and the rest into macros that
+ * dereference my_perl; this is the switch it provides to not do that.
+ * Nothing here hands a libc pointer to perl's allocator or takes one. */
+#define NO_XSLOCKS
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
@@ -770,7 +776,7 @@ cca_start_scan(self, what, ...)
 
     if (strEQ(kind, "path")) {
         const char *path = SvPV_nolen(what);
-        fd = open(path, O_RDONLY);
+        fd = cc_open_ro(path);
         if (fd < 0) {
             cc_err_set(&sc->err, CC_ERR_IO, "open", strerror(errno));
             sc->rc = CC_ERR_IO; sc->phase = CC_PH_DONE;

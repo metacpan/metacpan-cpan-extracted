@@ -103,7 +103,7 @@ typedef struct {
 static void cc_scan_free(cc_scan *s) {
     if (!s) return;
     if (s->sock != CC_INVALID_SOCK) { cc_close_sock(s->sock); s->sock = CC_INVALID_SOCK; }
-    if (s->own_fd && s->scan_fd >= 0) { close(s->scan_fd); }
+    if (s->own_fd && s->scan_fd >= 0) { cc_close_fd(s->scan_fd); }
     s->scan_fd = -1; s->own_fd = 0;
     if (s->src.iobuf) { free(s->src.iobuf); s->src.iobuf = NULL; }
     if (s->reply)     { free(s->reply);     s->reply = NULL; }
@@ -222,8 +222,8 @@ static int cc_scan_step(cc_scan *s) {
         switch (s->phase) {
 
         case CC_PH_SEND_CMD: {
-            ssize_t n = send(s->sock, s->cmd + s->cmdoff,
-                             (int)(s->cmdlen - s->cmdoff), CC_MSG_NOSIGNAL);
+            ssize_t n = cc_send(s->sock, s->cmd + s->cmdoff,
+                                s->cmdlen - s->cmdoff, CC_MSG_NOSIGNAL);
             if (n > 0) {
                 s->cmdoff += (size_t)n;
                 progressed = 1;
@@ -324,8 +324,8 @@ static int cc_scan_step(cc_scan *s) {
              * exception - and an offset that does not survive between
              * steps corrupts the stream silently. */
             if (s->hdroff < 4) {
-                ssize_t n = send(s->sock, (const char *)s->hdr + s->hdroff,
-                                 (int)(4 - s->hdroff), CC_MSG_NOSIGNAL);
+                ssize_t n = cc_send(s->sock, (const char *)s->hdr + s->hdroff,
+                                    4 - s->hdroff, CC_MSG_NOSIGNAL);
                 if (n > 0) { s->hdroff += (size_t)n; progressed = 1; continue; }
                 if (n < 0 && errno == EINTR) continue;
                 if (n < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
@@ -337,8 +337,8 @@ static int cc_scan_step(cc_scan *s) {
             }
 
             if (s->chunkoff < s->chunklen) {
-                ssize_t n = send(s->sock, s->chunk + s->chunkoff,
-                                 (int)(s->chunklen - s->chunkoff), CC_MSG_NOSIGNAL);
+                ssize_t n = cc_send(s->sock, s->chunk + s->chunkoff,
+                                    s->chunklen - s->chunkoff, CC_MSG_NOSIGNAL);
                 if (n > 0) { s->chunkoff += (size_t)n; progressed = 1; continue; }
                 if (n < 0 && errno == EINTR) continue;
                 if (n < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
@@ -354,8 +354,8 @@ static int cc_scan_step(cc_scan *s) {
         }
 
         case CC_PH_STREAM_END: {
-            ssize_t n = send(s->sock, (const char *)s->hdr + s->hdroff,
-                             (int)(4 - s->hdroff), CC_MSG_NOSIGNAL);
+            ssize_t n = cc_send(s->sock, (const char *)s->hdr + s->hdroff,
+                                4 - s->hdroff, CC_MSG_NOSIGNAL);
             if (n > 0) {
                 s->hdroff += (size_t)n;
                 progressed = 1;
@@ -406,7 +406,7 @@ static int cc_scan_step(cc_scan *s) {
             room = s->replycap - s->replylen - 1;
             if (s->replylen + room > hard) room = hard - s->replylen;
 
-            n = recv(s->sock, s->reply + s->replylen, (int)room, 0);
+            n = cc_recv(s->sock, s->reply + s->replylen, room);
             if (n > 0) {
                 size_t start = s->replylen, i;
                 s->replylen += (size_t)n;

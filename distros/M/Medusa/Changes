@@ -3,3 +3,9 @@ Revision history for Medusa
 0.01    Date/time
         First version, released on an unsuspecting world.
 
+0.06    2026-10-08
+        - Logger takes an exclusive lock and releases it with LOCK_UN; the
+          shared lock it took before discarded every write on Windows
+        - t/06-elapsed.t no longer requires the call to take under a second
+        - :Audit works on perl 5.8 and 5.10, where the sub has no name yet
+          when its attributes are applied

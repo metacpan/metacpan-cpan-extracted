@@ -8,6 +8,7 @@ use Compress::Zlib ();
 use File::Temp ();
 use Mojo::Asset::Memory;
 use Mojo::JSON qw(true false);
+use Mojo::Util qw(encode);
 use Time::Piece;
 
 # Text::QRCode is only pulled in when an export actually asks for a qrCode
@@ -325,6 +326,25 @@ installations without QR code exports do not have to carry it.
 
 =cut
 
+# The rule xtr() applies in the frontend: an array is a message to
+# translate, anything else is data. That covers a trm() made in this process
+# and one that crossed JSON on its way here -- a status some other system
+# reported, say -- which is a plain array by now. Handed to the writer as it
+# was, the first came out in English and the second as "ARRAY(0x...)" in a
+# csv, while Excel::Writer::XLSX spread it over the following cells and left
+# the bare "%1" standing in this one. Arguments are rendered first, so a
+# nested message gets its own msgid translated before it is substituted.
+sub _renderMessage {
+    my $loc = shift;
+    my $value = shift;
+    return $value
+        unless ref $value eq 'CallBackery::Translate'
+            or ref $value eq 'ARRAY';
+    my ($str,@args) = @$value;
+    return '' unless defined $str and $str ne '';
+    return $loc->tra($str, map { _renderMessage($loc, $_) // '' } @args);
+}
+
 sub makeExportAction {
     my $self = shift;
     my %args = @_;
@@ -354,34 +374,38 @@ sub makeExportAction {
             $loc->setLocale($self->user->userInfo->{lang} // 'en');
             my $tCfg = $self->tableCfg;
 
-            my $tra = sub {
-                my $label = shift;
-                return undef unless defined $label;
-                return ref $label eq 'CallBackery::Translate'
-                    ? $loc->tra($label->[0])
-                    : $label;
-            };
+            my $tra = sub { _renderMessage($loc, shift) };
 
             my @titles = map { $tra->($_->{label}) // $_->{key} } @$tCfg;
 
             if ($type eq 'CSV') {
-                my $csv = Text::CSV->new;
-                $csv->combine(@titles);
-                my $csv_str = $csv->string . "\n";
+                # Without binary mode Text::CSV refuses a line break or any
+                # character outside ASCII, and combine() then leaves an
+                # empty string behind: the row went missing without a word.
+                my $csv = Text::CSV->new({ binary => 1 });
+                my $line = sub {
+                    $csv->combine(@_)
+                        or die mkerror(9938, "failed to write csv line: "
+                            . $csv->error_diag);
+                    return $csv->string . "\n";
+                };
+                my $csv_str = $line->(@titles);
                 for my $record (@$data) {
-                    $csv->combine(map {
+                    $csv_str .= $line->(map {
                         my $v = $record->{$_->{key}};
-                        if ($_->{type} eq 'date') {
+                        # an empty date is an empty cell, as in the xlsx
+                        # export, not the start of 1970
+                        if ($_->{type} eq 'date' and $v) {
                             $v= localtime($v/1000)->strftime("%Y-%m-%d %H:%M:%S %z");
                         }
-                        $v} @$tCfg);
-                    $csv_str .= $csv->string . "\n";
+                        $tra->($v)} @$tCfg);
                 }
                 my $asset = Mojo::Asset::Memory->new;
-                $asset->add_chunk($csv_str);
+                # an asset holds bytes; the text has to be encoded first
+                $asset->add_chunk(encode('UTF-8', $csv_str));
                 return {
                     asset    => $asset,
-                    type     => 'text/csv',
+                    type     => 'text/csv; charset=UTF-8',
                     filename => $filename,
                 }
             }
@@ -434,6 +458,7 @@ sub makeExportAction {
                                 $worksheet->write_date_time($row,$col,localtime($v/1000)->strftime("%Y-%m-%dT%H:%M:%S"),$date_format{$fmt}) if $v;
                             }
                             else {
+                                $v = $tra->($v);
                                 $worksheet->write($row, $col, $v) if defined $v;
                             }
                         }

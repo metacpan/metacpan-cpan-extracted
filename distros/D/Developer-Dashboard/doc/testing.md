@@ -235,7 +235,11 @@ actually set, and it must resolve the trailing git branch from `.git/HEAD`
 metadata without spawning `git branch`. The prompt-only core indicator refresh
 path also skips the hidden `project` and `git` status subprocess checks, so
 slow hosts such as iSH do not pay for those background details on every prompt
-render.
+render. It must not probe Docker or seed a built-in Docker indicator. Retired
+Docker cleanup holds the status writer lock while checking ownership and
+removing only the retired signature; explicit collectors and custom indicators
+must survive. Tests exercise lock-open, lock-acquisition, and deletion failures
+as visible errors, plus preservation across runtime layers.
 Custom route coverage now also includes the runtime-level `config/routes.json`
 surface, not only installed skills. A flat alias such as `"/java":
 "/app/learn.ai"` must resolve to the same saved bookmark body as
@@ -258,6 +262,9 @@ commands backed by `cli/<command>.py` and `cli/<command>.js`, and the release
 loop also rechecks those two command shapes inside the
 `developer-dashboard:latest` container image so packaged Python and Node
 dispatch stays aligned with the source-tree suite.
+After `d2 docker.images.build`, verify `d2 version` from a fresh one-off image
+container; the image archive must be installed into the local Perl library
+that runtime lookup checks before the system library.
 The release-metadata checks also reject repeated FULL-POD-DOC template prose in shipped Perl assets, so contributors have to document the actual responsibility of each module or staged helper instead of pasting one generic block across the tree. The release gate also treats one-line or placeholder POD as a failure: shipped Perl docs must cover real inputs, outputs or side effects, command/runtime position, and multiple concrete examples.
 The tarball release gate now also includes `t/36-release-kwalitee.t`, which
 reads the built `Developer-Dashboard-X.XX.tar.gz` through
@@ -660,6 +667,22 @@ d2 docker compose exec -T dev git config --global user.name TiraTests
 These settings are disposable container state. If a previous container created
 root-owned files under the local runtime configuration, restore readability
 before invoking `d2` again; never replace or discard the user's configuration.
+
+For Docker Compose resolver changes, keep the worktree at `/work` in the dev
+container and use a unique Compose project name. The Problem 40 regression
+exercises the two-stage resolution directly: its stubbed base `config` output
+(from either a discovered local base or an explicit `-f`-only base) is
+authoritative for service selection, then selected home/project/skill overlays
+are checked against disable and development markers. Run it with:
+
+```sh
+d2 docker compose --project-name dd-problem40-dev exec -T dev prove -lv \
+  t/30-dashboard-loader.t t/94-dockercompose-coverage.t
+```
+
+The first resolver call must not contain isolated service files. A selected
+overlay triggers a second `config`; the final command uses the materialized
+file and retains the original project-directory and explicit `-f` inputs.
 
 The repository-wide gate also executes operator-local specifications under
 `.claude/tools/`. A clean Docker result for the product suite does not imply

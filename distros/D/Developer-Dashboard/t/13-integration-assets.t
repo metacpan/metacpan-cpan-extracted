@@ -157,6 +157,15 @@ if ($has_integration_assets) {
     like( $dockerfile, qr/\bzlib1g-dev\b/, 'integration Dockerfile installs zlib1g-dev for native CPAN prerequisite builds' );
     unlike( $dockerfile, qr/\bDist::Zilla\b/, 'integration Dockerfile no longer installs Dist::Zilla because host builds the tarball' );
 
+    SKIP: {
+        skip 'the local D2 image recipe is operator configuration and is not included in the distribution', 1
+          if !-f '.developer-dashboard/config/docker/d2/Dockerfile';
+        open my $d2_docker_fh, '<', '.developer-dashboard/config/docker/d2/Dockerfile' or die $!;
+        my $d2_dockerfile = do { local $/; <$d2_docker_fh> };
+        close $d2_docker_fh;
+        like( $d2_dockerfile, qr/RUN cpanm --notest --local-lib=\/root\/perl5 \/tmp\/DD\.tgz/, 'D2 image build installs the current tarball into the local Perl library that precedes system modules at runtime' );
+    }
+
     open my $compose_fh, '<', 'integration/blank-env/docker-compose.yml' or die $!;
     my $compose = do { local $/; <$compose_fh> };
     close $compose_fh;
@@ -413,13 +422,15 @@ __END__
 =head1 DESCRIPTION
 
 This test verifies that the blank-environment Docker integration plan and
-runner assets are present and cover the intended install and smoke flow.
+runner assets are present and cover the intended install and smoke flow. When
+the ignored local D2 image recipe exists, it also checks that image rebuilds
+install the release archive into the runtime-first local Perl library.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
-This test is the executable regression contract for This test verifies that the blank-environment Docker integration plan and runner assets are present and cover the intended install and smoke flow. Read it when you need to understand the real fixture setup, assertions, and failure modes for this slice of the repository instead of guessing from the module names alone.
+This test is the executable regression contract for the blank-environment Docker integration plan and runner assets, including the release-to-local-library behavior of the ignored local D2 image recipe when it is present. Read it when you need to understand the real fixture setup, assertions, and failure modes for this slice of the repository instead of guessing from the module names alone.
 
 =head1 WHY IT EXISTS
 

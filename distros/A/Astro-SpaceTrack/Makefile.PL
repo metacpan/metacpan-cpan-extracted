@@ -55,14 +55,13 @@ if ( $mmv >= 6.4501 ) {
 $mmv >= 6.4701
     and $args{MIN_PERL_VERSION} = $meta->requires_perl();
 
-
-if ( $mmv >= 6.52 ) {
+if ( $mmv >= 6.55_03 ) {
     $args{BUILD_REQUIRES} = $meta->build_requires();
     $args{CONFIGURE_REQUIRES} = $meta->configure_requires();
-} elsif ( $mmv >= 6.5501 ) {
-    $args{BUILD_REQUIRES} = $meta->build_requires();
-    $args{META_MERGE}{configure_requires} = $meta->configure_requires();
-} elsif ( $mmv >= 6.4501 ) {
+} elsif ( $mmv >= 6.52 ) {
+    $args{META_MERGE}{build_requires} = $meta->build_requires();
+    $args{CONFIGURE_REQUIRES} = $meta->configure_requires();
+} elsif ( $mmv >= 6.45_01 ) {
     $args{META_MERGE}{build_requires} = $meta->build_requires();
     $args{META_MERGE}{configure_requires} = $meta->configure_requires();
 } else {

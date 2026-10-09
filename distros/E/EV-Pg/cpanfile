@@ -1,4 +1,4 @@
-requires 'perl', '5.012000';
+requires 'perl', '5.014000';
 requires 'EV', '4.11';
 requires 'Alien::libpq';
 

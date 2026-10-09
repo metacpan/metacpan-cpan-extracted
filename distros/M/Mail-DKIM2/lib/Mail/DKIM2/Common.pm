@@ -3,7 +3,7 @@ use 5.20.0;
 use strict;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.17';
 
 use Carp ();
 use MIME::Base64 qw(encode_base64 decode_base64);
@@ -29,6 +29,7 @@ our @EXPORT_OK = qw(
     fold_value
     build_signing_input
     extract_mi_version
+    mi_version_tag
     strip_mi_versions
     extract_domain
     to_rfc5321_path
@@ -40,7 +41,11 @@ our @EXPORT_OK = qw(
     DKIM2_REPO
     DKIM2_DATE
     MAX_CHAIN_LENGTH
+    MAX_CHAIN_NUMBER
     chain_length_error
+    valid_sequence
+    UNKEYABLE_SIGNATURE_ERROR
+    chain_number_error
     duplicate_number_error
 );
 
@@ -52,7 +57,7 @@ our @EXPORT_OK = qw(
 # emit, not only on a spec bump. See ../spec/draft-gondwana-dkim2-debug-header.
 use constant DKIM2_DRAFT => 'ietf-dkim-dkim2-spec-06';
 use constant DKIM2_REPO  => 'github.com/dkim2wg/interop';
-use constant DKIM2_DATE  => '2026-10-04';
+use constant DKIM2_DATE  => '2026-10-08';
 
 # Local policy, not spec-06: a message carrying more Message-Instance or
 # DKIM2-Signature fields than this is a PERMERROR, found before any key is
@@ -60,6 +65,12 @@ use constant DKIM2_DATE  => '2026-10-04';
 # DNS lookup, a signature check and an undo of the whole message, and the
 # sender chooses how many hops there are.
 use constant MAX_CHAIN_LENGTH => 32;
+
+# The largest number a DKIM2-Signature i= or m=, or a Message-Instance m=, may
+# be written as: at most three ASCII digits naming 1..100. Anything else is
+# malformed before it is ever compared with MAX_CHAIN_LENGTH, and is never
+# converted to a number big enough to be a loop bound.
+use constant MAX_CHAIN_NUMBER => 100;
 
 # Headers excluded from hashing per draft-ietf-dkim-dkim2-spec-06 Section 4.
 # spec-05 narrowed the old /^arc-/ prefix to the three RFC 8617 field names and
@@ -117,6 +128,39 @@ sub chain_length_error {
         return "PERMERROR more than " . MAX_CHAIN_LENGTH . " $field fields"
             if $count > MAX_CHAIN_LENGTH;
     }
+    return;
+}
+
+# A DKIM2-Signature's i= must be a positive integer (ASCII digits) for the
+# signature to be placed in the chain and keyed. One that is not -- no i=,
+# i=, i=0, i=abc, or a header that does not parse -- is a PERMERROR, never
+# silently skipped: a signer gate that counts which instances are signed by
+# m= must not be fooled by a junk signature naming an m=.
+use constant UNKEYABLE_SIGNATURE_ERROR =>
+    'PERMERROR DKIM2-Signature has a missing or malformed i= tag';
+
+sub valid_sequence {
+    my ($i) = @_;
+    return (defined $i && $i =~ /\A[0-9]+\z/ && $i > 0) ? 1 : 0;
+}
+
+# The PERMERROR for an i= or m= value that is not a chain number, or undef
+# (also undef for a missing value, which is left to the callers). A value must
+# be 1*DIGIT in ASCII -- "4294967297x" is malformed, never its digit prefix --
+# with at most three digits naming 1..MAX_CHAIN_NUMBER, so "01" and "001" are
+# 1; and since each number names one hop, no more than MAX_CHAIN_LENGTH.
+# Checking this before anything walks 1..max keeps a value like
+# 99999999999999999999 from being used as a loop bound.
+sub chain_number_error {
+    my ($field, $tag, $n) = @_;
+    return unless defined $n;
+    my $malformed = $tag eq 'i' ? UNKEYABLE_SIGNATURE_ERROR
+                  : "PERMERROR $field has a malformed $tag= tag";
+    return $malformed unless $n =~ /\A[0-9]+\z/ && $n =~ /[1-9]/;
+    return "PERMERROR $field $tag= exceeds the maximum chain number of "
+        . MAX_CHAIN_NUMBER if length($n) > 3 || $n > MAX_CHAIN_NUMBER;
+    return "PERMERROR $field $tag= exceeds the maximum chain length of "
+        . MAX_CHAIN_LENGTH if $n > MAX_CHAIN_LENGTH;
     return;
 }
 
@@ -191,7 +235,43 @@ sub encode_tag_json {
 # Decode a base64 JSON tag value
 sub decode_tag_json {
     my ($b64) = @_;
-    return JSON->new->decode(decode_base64($b64));
+    my $text = decode_base64($b64);
+    my $data = JSON->new->decode($text);
+    # A key given twice in one object is invalid here: JSON parsers disagree
+    # on which value wins (first or last), so {"b":[...],"b":null} would be a
+    # null body Recipe to some verifiers and signers and a real one to others.
+    if (defined(my $k = _json_duplicate_key($text))) {
+        die "duplicate JSON object key \"$k\"\n";
+    }
+    return $data;
+}
+
+# The first key that appears twice in one JSON object of $text (already known
+# to be valid JSON), compared after unescaping, or undef.
+sub _json_duplicate_key {
+    my ($text) = @_;
+    my $json = JSON->new->allow_nonref;
+    my @stack;   # one entry per open container: undef for an array, a hash of keys for an object
+    my $want_key = 0;
+    pos($text) = 0;
+    while (pos($text) < length $text) {
+        if ($text =~ /\G\s+/gc) { next }
+        if ($text =~ /\G\{/gc) { push @stack, {}; $want_key = 1; next }
+        if ($text =~ /\G\[/gc) { push @stack, undef; $want_key = 0; next }
+        if ($text =~ /\G[\}\]]/gc) { pop @stack; $want_key = 0; next }
+        if ($text =~ /\G,/gc) { $want_key = ref $stack[-1] ? 1 : 0; next }
+        if ($text =~ /\G:/gc) { next }
+        if ($text =~ /\G("(?:[^"\\]|\\.)*")/gcs) {
+            if ($want_key && ref $stack[-1]) {
+                my $k = $json->decode($1);
+                return $k if $stack[-1]{$k}++;
+                $want_key = 0;
+            }
+            next;
+        }
+        $text =~ /\G[^\s,:\[\]\{\}"]+/gc or last;   # number, true, false, null
+    }
+    return;
 }
 
 # Fold a header line at 72 characters.
@@ -322,13 +402,29 @@ sub fold_value {
     return join("\r\n\t", @parts);
 }
 
-# Extract the revision number from a Message-Instance header value (m= tag)
-sub extract_mi_version {
+# The raw m= value of a Message-Instance header value (whitespace removed,
+# as MessageInstance->parse does), or undef if it has no m= tag.
+sub mi_version_tag {
     my ($header) = @_;
     $header = $header->[0] if ref($header) eq 'ARRAY';
     $header = $$header if ref($header);
-    return unless $header =~ m/^\s*m=(\d+)/;
-    return $1;
+    return unless defined $header;
+    for my $part (split /;/, $header) {
+        next unless $part =~ /\A\s*m\s*=(.*)\z/s;
+        (my $v = $1) =~ s/\s//g;
+        return $v;
+    }
+    return;
+}
+
+# The m= number of a Message-Instance header value, or undef when it has no
+# m= or the m= is not all ASCII digits (never a digit prefix). Numeric, so
+# "01" and "001" are 1. Callers check chain_number_error(mi_version_tag(...))
+# before using it as a bound.
+sub extract_mi_version {
+    my $v = mi_version_tag(@_);
+    return unless defined $v && $v =~ /\A[0-9]+\z/;
+    return length($v) <= 15 ? 0 + $v : $v;
 }
 
 # Strip Message-Instance headers with the given version numbers from a raw message string.
@@ -585,8 +681,13 @@ changed. Emitted in X-DKIM2-Info debug headers
 =head2 MAX_CHAIN_LENGTH
 
 32: a message carrying more Message-Instance or DKIM2-Signature fields
-than this is a PERMERROR, found before any key is fetched. Local policy,
-not spec.
+than this, or an C<i=> or C<m=> naming a larger number, is a PERMERROR,
+found before any key is fetched. Local policy, not spec.
+
+=head2 MAX_CHAIN_NUMBER
+
+100: the largest number an C<i=> or C<m=> may be written as (at most
+three digits). See L</chain_number_error($field, $tag, $n)>.
 
 =head1 CANONICALIZATION
 
@@ -620,8 +721,15 @@ in the value is removed rather than collapsed.
 
 =head2 extract_mi_version($header_value)
 
-The C<m=> number of a Message-Instance value, or undef. Accepts a string,
-a scalar ref, or an arrayref (first element).
+The C<m=> number of a Message-Instance value, as a number (so C<01> is
+1), or undef when there is no C<m=> or it is not all ASCII digits.
+Accepts a string, a scalar ref, or an arrayref (first element).
+
+=head2 mi_version_tag($header_value)
+
+The raw C<m=> value of a Message-Instance value with whitespace removed,
+or undef when there is none. Pass it to
+L</chain_number_error($field, $tag, $n)> before trusting it.
 
 =head2 strip_mi_versions($message, @m)
 
@@ -648,6 +756,31 @@ chose are signed.
 The PERMERROR string for a message over L</MAX_CHAIN_LENGTH>, or undef.
 Takes an L<Email::MIME> or a hashref of field counts keyed by lowercased
 name.
+
+=head2 valid_sequence($i)
+
+True when C<$i> (a DKIM2-Signature C<i=> value) is a positive integer
+written in ASCII digits. A signature whose C<i=> is not is one no verifier
+can place in the chain or key: L<Mail::DKIM2::Verifier> reports it as
+L</UNKEYABLE_SIGNATURE_ERROR>.
+
+=head2 UNKEYABLE_SIGNATURE_ERROR
+
+The PERMERROR string for a DKIM2-Signature with a missing or malformed
+C<i=>, or one that does not parse.
+
+=head2 chain_number_error($field, $tag, $n)
+
+The PERMERROR string for an C<i=> or C<m=> value that is not a chain
+number, or undef (also for an undefined C<$n>, which is left to the
+caller). A value that is not 1*DIGIT in ASCII, or is zero, is malformed:
+L</UNKEYABLE_SIGNATURE_ERROR> for C<i=>, else
+C<"PERMERROR $field has a malformed $tag= tag">. More than three digits
+or above L</MAX_CHAIN_NUMBER> is C<"PERMERROR $field $tag= exceeds the
+maximum chain number of 100">. Above L</MAX_CHAIN_LENGTH> is
+C<"PERMERROR $field $tag= exceeds the maximum chain length of 32">: every
+C<i=> and C<m=> names one hop, so none can be larger than the chain.
+C<01> and C<001> are 1.
 
 =head2 duplicate_number_error($field, $tag, @numbers)
 
@@ -718,7 +851,8 @@ of RFC 8463 or as DER. Returns undef for a record it cannot parse.
 
 =head2 encode_tag_json($data), decode_tag_json($base64)
 
-Canonical JSON in base64, the encoding of the C<r=> Recipe tag.
+Canonical JSON in base64, the encoding of the C<r=> Recipe tag. C<decode_tag_json> dies on invalid JSON, including an object that gives
+the same key twice (parsers disagree on which value wins).
 
 =head2 digest64($digest_object)
 

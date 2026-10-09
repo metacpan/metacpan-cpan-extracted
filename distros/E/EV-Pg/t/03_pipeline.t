@@ -7,7 +7,7 @@ use lib 't';
 use TestHelper;
 
 require_pg;
-plan tests => 18;
+plan tests => 20;
 
 # Basic pipeline test
 with_pg(cb => sub {
@@ -150,4 +150,25 @@ with_pg(cb => sub {
         });
     });
 
+});
+
+# enter_pipeline with unfinished results croaks
+with_pg(cb => sub {
+    my ($pg) = @_;
+    $pg->query("select pg_sleep(0.2)", sub { });
+    eval { $pg->enter_pipeline };
+    like($@, qr/PQenterPipelineMode failed/,
+         'enter_pipeline with unfinished results croaks');
+    EV::break;
+});
+
+# exit_pipeline while busy croaks
+with_pg(cb => sub {
+    my ($pg) = @_;
+    $pg->enter_pipeline;
+    $pg->query_params("select 'x'::text", [], sub { });
+    eval { $pg->exit_pipeline };
+    like($@, qr/PQexitPipelineMode failed/,
+         'exit_pipeline while busy croaks');
+    EV::break;
 });

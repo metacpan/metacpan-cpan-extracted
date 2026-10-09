@@ -16,4 +16,5 @@
 ^EV-Memcached-
 ^MANIFEST\.bak$
 ^\.claude/
+^\.pcg/
 ^_Inline/

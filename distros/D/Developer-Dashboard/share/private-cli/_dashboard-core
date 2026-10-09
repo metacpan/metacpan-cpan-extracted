@@ -927,15 +927,14 @@ DOCKER_USAGE
             modes        => \@modes,
             services     => \@services,
             project_root => $project_root || undef,
+            _defer_service_discovery => $dry_run ? 0 : 1,
         );
         if ($dry_run) {
             print json_encode($result);
             exit 0;
         }
-        chdir $result->{project_root} or die "Unable to chdir to $result->{project_root}: $!";
-        local @ENV{ keys %{ $result->{env} } } = values %{ $result->{env} } if %{ $result->{env} };
-        exec @{ $result->{command} };
-        die "Unable to exec docker compose: $!";
+        my $execution = $docker->run_streaming( resolved => $result );
+        exit $execution->{exit_code};
     }
     if ( $sub eq 'development' ) {
         my $action = @ARGV ? shift @ARGV : '';
@@ -1914,6 +1913,18 @@ C<development.compose.yml> after it. The Docker helper's C<--help>, C<-h>,
 C<help>, and no-subcommand forms print its usage without starting Docker.
 Completion offers the Docker service subcommands and the nested development
 actions.
+
+For non-dry-run Compose commands, this helper requests deferred service
+discovery and passes the request to C<DockerCompose::run_streaming>. The
+resolver first runs C<docker compose config> against the base and configured
+non-service inputs, then uses that output's C<services:> map to select matching
+service overlays from home, project, and nested skill runtime layers. Disabled
+service folders are skipped, and development overlays require a C<develop.yml>
+marker. The selected layers are materialized before C<build>, C<up>, C<down>,
+or another Compose action; the invocation project directory is preserved and
+the merged file stays present until the child exits. The child inherits stdout
+and stderr, so progress and follow-mode output remain visible. C<--dry-run>
+continues to print a source-based preview without starting Compose.
 
 Before dispatching a public built-in body, this runtime checks explicit
 C<--help>, C<-h>, and trailing C<help> requests against

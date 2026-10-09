@@ -9,9 +9,9 @@ use Data::Dumper;
 use POSIX qw(strftime);
 use Data::GUID;
 
-our %LOG;
+our (%LOG, @PENDING);
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 BEGIN {
 	%LOG = (
@@ -131,56 +131,85 @@ sub MODIFY_CODE_ATTRIBUTES {
 		$LOG{LOG} = $LOG{LOG_INIT}->();
 	}
 	
+	_wrap_pending();
 	my ($att) = grep { $_ =~ m/Audit/ && $_ } @attrs;
 	if ($att) {
-		$att =~ m/Audit(?:\((.*)\))/;
-		$att = $1;
-		my $meta = B::svref_2object($code);
-		my $meth = $meta->GV->NAME;
 		my $caller = caller(1);
-		no strict 'refs';
-		no warnings 'redefine';
-		*{"${caller}::$meth"} = sub {
-			my $options = $LOG{OPTIONS};	
-			my ($n, $caller) = (0, "");
-			if ($options->{caller}) {
-				while (my @l = (caller($n))) {
-					$caller .= "->" if $caller;
-					$caller = sprintf "%s%s:%s", $caller, $l[0], $l[2];
-					$n++;
-				}
-			}
-			my $guid = !$options->{guid} ? 0 : Data::GUID->new->as_string;
-			my ($now, $after) = (0, 0);
-			log_message(
-				($caller ? ( caller => $caller ) : ()),
-				guid => $guid,
-				message => sprintf(
-					"subroutine %s called with args:",
-					$meth
-				),
-				params => [@_],
-				prefix => 'arg'
-			);
-			$now = time if $options->{elapsed_call};
-			my @out = $code->(@_);
-			$after = time if $options->{elapsed_call};
-			log_message(
-				($caller ? ( caller => $caller ) : ()),
-				guid => $guid,
-				message => sprintf(
-					"subroutine %s returned:",
-					$meth
-				),
-				params => [@out],
-				($options->{elapsed_call} ? (elapsed_call => $after == $now ? 0 : $after - $now) : ()),
-				prefix => 'return'
-			);
-			return wantarray ? @out : shift @out;
-		};
+		my $gv = B::svref_2object($code)->GV;
+		if ($gv->isa('B::SPECIAL')) {
+			push @PENDING, [$caller, $code];
+			$^H |= 0x20000;
+			$^H{'Medusa/pending'} = bless [], 'Medusa::Pending';
+		} else {
+			_wrap($caller, $gv->NAME, $code);
+		}
 		return;
 	}
 
+}
+
+sub _wrap_pending {
+	my @later;
+	for my $pending (splice @PENDING) {
+		my ($caller, $code) = @{$pending};
+		no strict 'refs';
+		my ($meth) = grep {
+			my $glob = ${"${caller}::"}{$_};
+			ref(\$glob) eq 'GLOB' && defined *{$glob}{CODE} && *{$glob}{CODE} == $code
+		} keys %{"${caller}::"};
+		if (defined $meth) {
+			_wrap($caller, $meth, $code);
+		} else {
+			push @later, $pending;
+		}
+	}
+	push @PENDING, @later;
+}
+
+sub Medusa::Pending::DESTROY { _wrap_pending() }
+
+sub _wrap {
+	my ($caller, $meth, $code) = @_;
+	no strict 'refs';
+	no warnings 'redefine';
+	*{"${caller}::$meth"} = sub {
+		my $options = $LOG{OPTIONS};	
+		my ($n, $caller) = (0, "");
+		if ($options->{caller}) {
+			while (my @l = (caller($n))) {
+				$caller .= "->" if $caller;
+				$caller = sprintf "%s%s:%s", $caller, $l[0], $l[2];
+				$n++;
+			}
+		}
+		my $guid = !$options->{guid} ? 0 : Data::GUID->new->as_string;
+		my ($now, $after) = (0, 0);
+		log_message(
+			($caller ? ( caller => $caller ) : ()),
+			guid => $guid,
+			message => sprintf(
+				"subroutine %s called with args:",
+				$meth
+			),
+			params => [@_],
+			prefix => 'arg'
+		);
+		$now = time if $options->{elapsed_call};
+		my @out = $code->(@_);
+		$after = time if $options->{elapsed_call};
+		log_message(
+			($caller ? ( caller => $caller ) : ()),
+			guid => $guid,
+			message => sprintf(
+				"subroutine %s returned:",
+				$meth
+			),
+			params => [@out],
+			($options->{elapsed_call} ? (elapsed_call => $after == $now ? 0 : $after - $now) : ()),
+			prefix => 'return'
+		);
+		return wantarray ? @out : shift @out;
+	};
 }
 
 sub log_message {

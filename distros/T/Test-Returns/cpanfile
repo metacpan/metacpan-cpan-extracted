@@ -4,7 +4,7 @@ requires 'perl', '5.008';
 
 requires 'Carp';
 requires 'Exporter';
-requires 'Return::Set', '0.04';
+requires 'Return::Set', '0.05';
 
 on 'configure' => sub {
 	requires 'ExtUtils::MakeMaker', '6.64';   # Minimum version for TEST_REQUIRES

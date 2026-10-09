@@ -264,6 +264,62 @@ is( $manager->_collector_stalled_for_watchdog( {},   {} ), 0, '_collector_stalle
     local *Developer::Dashboard::RuntimeManager::_collector_watchdog_stale_seconds = sub { return 0 };
     is( $manager->_collector_stalled_for_watchdog( { interval => 1 }, { last_run => Developer::Dashboard::RuntimeManager::_now_iso8601( tz => 'utc' ) } ), 0, '_collector_stalled_for_watchdog false when the stale window is under one second' );
 }
+{
+    my $old_run = '2020-01-01T00:00:00Z';
+    my $recent_heartbeat = Developer::Dashboard::RuntimeManager::_now_iso8601( tz => 'local' );
+    my $cron_job = { name => 'nightly.cron', cron => '0 7-8 * * *' };
+    is(
+        $manager->_collector_stalled_for_watchdog(
+            $cron_job,
+            { last_completed_at => $old_run },
+            { state => { heartbeat_at => $recent_heartbeat, schedule => 'cron' } },
+        ),
+        0,
+        '_collector_stalled_for_watchdog uses a fresh scheduler heartbeat while a cron job is waiting for its next scheduled run',
+    );
+    is(
+        $manager->_collector_stalled_for_watchdog(
+            $cron_job,
+            { last_completed_at => $old_run },
+            { state => { heartbeat_at => $old_run, schedule => 'cron' } },
+        ),
+        1,
+        '_collector_stalled_for_watchdog detects a cron scheduler loop with a stale heartbeat',
+    );
+    is(
+        $manager->_collector_stalled_for_watchdog( $cron_job, { last_completed_at => $old_run }, { state => {} } ),
+        0,
+        '_collector_stalled_for_watchdog does not infer cron-loop failure from an old job execution when heartbeat state is absent',
+    );
+    is(
+        $manager->_collector_stalled_for_watchdog(
+            $cron_job,
+            { last_completed_at => $old_run },
+            { state => { heartbeat_at => 'invalid' } },
+        ),
+        0,
+        '_collector_stalled_for_watchdog ignores an unparseable cron heartbeat rather than substituting last job execution time',
+    );
+    is(
+        $manager->_collector_stalled_for_watchdog( $cron_job, { last_completed_at => $old_run }, undef ),
+        0,
+        '_collector_stalled_for_watchdog does not infer a cron scheduler failure without a loop entry',
+    );
+    is(
+        $manager->_collector_stalled_for_watchdog( $cron_job, { last_completed_at => $old_run }, { state => 'invalid' } ),
+        0,
+        '_collector_stalled_for_watchdog ignores a non-hash cron loop state',
+    );
+    is(
+        $manager->_collector_stalled_for_watchdog(
+            $cron_job,
+            { last_completed_at => $old_run },
+            { state => { heartbeat_at => '' } },
+        ),
+        0,
+        '_collector_stalled_for_watchdog treats an empty cron heartbeat as unavailable',
+    );
+}
 
 # --- _collector_watchdog_last_progress_epoch --------------------------------
 is( $manager->_collector_watchdog_last_progress_epoch('x'), 0, '_collector_watchdog_last_progress_epoch rejects non-hash status' );
@@ -3421,7 +3477,8 @@ t/100-runtimemanager-coverage.t - branch and condition coverage closure for the 
 This test drives the residual branch and condition paths of
 L<Developer::Dashboard::RuntimeManager> that the broader lifecycle tests leave
 uncovered: guard clauses on process ids and ports, collector watchdog window and
-stall arithmetic, Windows-only detached launch and file-replacement fallbacks,
+stall arithmetic (including cron scheduler heartbeat versus execution-time
+idleness), Windows-only detached launch and file-replacement fallbacks,
 external process-table and listener discovery, and the many small default and
 error branches inside the serve/stop/restart family.
 

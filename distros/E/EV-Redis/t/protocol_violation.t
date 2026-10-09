@@ -196,4 +196,34 @@ sub run_client {
     is $disconnected, 1, 'short unsub: disconnected';
 }
 
+# an over-deep push is dropped with an error instead of reaching on_push
+{
+    my $hello = "%7\r\n\$6\r\nserver\r\n\$5\r\nredis\r\n\$7\r\nversion\r\n\$3\r\n8.0"
+        . "\r\n\$5\r\nproto\r\n:3\r\n\$2\r\nid\r\n:1\r\n\$4\r\nmode\r\n\$10\r\nstandalone"
+        . "\r\n\$4\r\nrole\r\n\$6\r\nmaster\r\n\$7\r\nmodules\r\n*0\r\n";
+    my ($port, $close) = fake_server(
+        $hello,
+        ">2\r\n\$10\r\ninvalidate\r\n*1\r\n\$4\r\nkey1\r\n",
+        ">1\r\n" . ("*1\r\n" x 600) . ":7\r\n",
+    );
+    my (@pushes, $error, $disconnected, $herr);
+    my $r = EV::Redis->new(
+        on_error => sub { $error = $_[0]; EV::break },
+        on_disconnect => sub { $disconnected++; EV::break; },
+    );
+    $r->connect('127.0.0.1', $port);
+    $r->on_push(sub { push @pushes, [@_] });
+    $r->hello(3, sub { $herr = $_[1] });
+    my $guard = EV::timer 5, 0, sub { EV::break };
+    EV::run;
+    $close->();
+    is $herr, undef, 'deep push: hello answered';
+    is scalar(@pushes), 1, 'deep push: only the shallow push delivered';
+    is_deeply $pushes[0][0], ['invalidate', ['key1']], '... with its content';
+    like $error // '', qr/nesting depth/, 'deep push: error signalled';
+    is $disconnected, undef, 'deep push: stays connected';
+    ok $r->is_connected, 'deep push: still connected';
+    $r->disconnect;
+}
+
 done_testing;

@@ -1,0 +1,127 @@
+Game-Brandubh
+=============
+
+Brandubh, the Irish tafl game: a board of seven squares by seven, a king and
+four defenders in the middle, eight attackers around them. The king wins by
+reaching a corner. The attackers win by capturing him first. The two sides
+have different pieces and want different things, and that is the game.
+
+         a   b   c   d   e   f   g
+       +---+---+---+---+---+---+---+
+     7 | X |   |   | A |   |   | X |
+       +---+---+---+---+---+---+---+
+     6 |   |   |   | A |   |   |   |
+       +---+---+---+---+---+---+---+
+     5 |   |   |   | D |   |   |   |
+       +---+---+---+---+---+---+---+
+     4 | A | A | D | K | D | A | A |
+       +---+---+---+---+---+---+---+
+     3 |   |   |   | D |   |   |   |
+       +---+---+---+---+---+---+---+
+     2 |   |   |   | A |   |   |   |
+       +---+---+---+---+---+---+---+
+     1 | X |   |   | A |   |   | X |
+       +---+---+---+---+---+---+---+
+
+    use Game::Brandubh;
+
+    my $game = Game::Brandubh->new;
+
+    $game->turn;                    # 'p1', who has the attackers
+    $game->legal;                   # every move, each with what it captures
+    my $refused = $game->play('d1c1');
+    print $refused->message if $refused;    # play never throws
+
+    $game->result->how if $game->status eq 'finished';
+
+    my $saved = $game->as_text;
+    my $again = Game::Brandubh->from_text($saved);
+
+
+PLAY IT IN A TERMINAL
+
+    brandubh                      # you attack, the program defends
+    brandubh --side defenders     # the other way round
+    brandubh --side both          # two people at one keyboard
+    brandubh --level 3            # 1, 2 or 3
+
+In a terminal the board is painted and a move is chosen on it with the arrow
+keys, in two steps: the piece, then where it goes. Every square the piece can
+reach is lit, and before you press enter the board shows the position the
+move would leave, with whatever it captures marked. Press ? for the keys.
+
+Install Term::ReadKey for the arrow keys. Without it, and whenever the
+program is not talking to a terminal, moves are typed as two squares, like
+d1d3. --no-colour, --no-unicode and --no-pick turn each nicety off, and
+NO_COLOR is honoured.
+
+
+THE RULES, AND WHOSE THEY ARE
+
+Nobody wrote the rules of Brandubh down. These are the reconstruction by Aage
+Nielsen as published at tafl.cyningstan.com, and where that text is silent
+this distribution has decided and says so: `perldoc Game::Brandubh` gives the
+rules in full and marks which are its own readings.
+
+    Every piece moves like a rook, any distance, never over another piece.
+    Only the king may stop on the throne or on a corner.
+    A piece is captured when the enemy moves to close it in between two of
+      their own, or between one and a corner or the empty throne.
+    Moving in between two enemies is safe.
+    The king is captured by two like any other piece, but it takes three
+      beside the throne and four on it.
+    The same position coming round a third time is a draw. So is a side
+      with no move, and so is a game that reaches 400 moves.
+
+`Game::Brandubh::Variant` lets you set each rule yourself, for the other
+common readings: a king that always takes four, an escape to any edge, a
+draw at the second repetition.
+
+
+THE PROGRAM THAT PLAYS
+
+The search is bounded in positions looked at and never in seconds. Nothing
+in this distribution reads a clock, so the same position and the same seed
+give the same move on a loaded machine as on an idle one, and a finished
+game can be replayed move for move.
+
+It is not an even game for the program: playing itself, the defenders win
+far more often than the attackers, and how much more depends on how far it
+looks. Take that as a fact about this program and not about Brandubh.
+
+
+INSTALLATION
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+A C compiler is required, and Makefile.PL says so, with the command for your
+platform, if one is missing. Object::Proto::Sugar is the one dependency that
+is not in core.
+
+
+THE AUTHOR TESTS
+
+`xt/` holds the slow ones. `xt/README` says what each is and what turns it on.
+
+
+SUPPORT AND DOCUMENTATION
+
+    perldoc Game::Brandubh
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Game-Brandubh
+
+    Search CPAN
+        https://metacpan.org/release/Game-Brandubh
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION <email@lnation.org>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)

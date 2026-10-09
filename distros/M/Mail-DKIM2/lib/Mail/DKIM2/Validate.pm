@@ -1,11 +1,11 @@
 package Mail::DKIM2::Validate;
 use strict; use warnings; use 5.020;
 
-our $VERSION = '0.13';
+our $VERSION = '0.17';
 
 use Email::MIME;
 use List::Util qw(max);
-use Mail::DKIM2::Common qw(extract_mi_version extract_domain relaxed_domain_match parse_dkim_pubkey);
+use Mail::DKIM2::Common qw(extract_mi_version extract_domain relaxed_domain_match parse_dkim_pubkey parse_mime);
 use Mail::DKIM2::MessageInstance;
 use Mail::DKIM2::Verifier;
 use Mail::DKIM2::Signature;
@@ -147,7 +147,7 @@ sub _report_once {
     my %res = (overall => 'none', summary => '',
                counts => { signatures => 0, instances => 0 }, levels => []);
 
-    my $msg = eval { Email::MIME->new($text) };
+    my $msg = eval { parse_mime($text) };
     return { %res, overall => 'fail', summary => "could not parse message: $@" }
         if $@ || !$msg;
 
@@ -189,8 +189,12 @@ sub _report_once {
     # for them), then record that MI level and undo one step. Records a level
     # for every signature and every MI, in chain order (top hop first).
     my @levels;
-    my $work = Email::MIME->new($text);
+    my $work = parse_mime($text);
     my $stopped;
+    # Set once the walk has crossed an instance with a null body Recipe: the
+    # body below it is lost, so lower levels are judged on their header
+    # hashes alone, undoing header Recipes only (as Verifier.pm does).
+    my $hdr_only = 0;
 
     while (1) {
         my %sigmap = map { _i($_) => $_ } $work->header('DKIM2-Signature');
@@ -201,7 +205,7 @@ sub _report_once {
 
         # Signatures covering the current top MI (highest i first).
         while ($num > 0 && _m($sigmap{$num}) == $inst) {
-            push @levels, _sig_level($work, $num, \%sig_by_i, $cb, $skip_ts);
+            push @levels, _sig_level($work, $num, \%sig_by_i, $cb, $skip_ts, $hdr_only);
             $work->header_raw_set('DKIM2-Signature',
                 grep { _i($_) < $num } $work->header('DKIM2-Signature'));
             %sigmap = map { _i($_) => $_ } $work->header('DKIM2-Signature');
@@ -210,13 +214,23 @@ sub _report_once {
 
         last unless $inst;   # no more MIs to record
 
-        my $lvl = _mi_level($work, $inst, $mimap{$inst});
+        my $lvl = _mi_level($work, $inst, $mimap{$inst}, $hdr_only);
         push @levels, $lvl;
 
         last if $inst <= 1;                 # base instance recorded; done
-        if ($lvl->{undo} eq 'clean') {
-            Mail::DKIM2::MessageInstance->undo($work);
-            $work = Email::MIME->new($work->as_string);   # reset Email::MIME caches
+        if ($lvl->{undo} eq 'unrecoverable') {
+            # Null body Recipe: keep going on the header history only. A
+            # header Recipe that will not apply stops the walk here.
+            $hdr_only = 1;
+            my $prev = eval { Mail::DKIM2::MessageInstance->undo($work, HeadersOnly => 1) };
+            unless ($prev) {
+                $stopped = "stopped below m=$inst (header history did not undo)";
+                last;
+            }
+            $work = parse_mime($work->as_string);
+        } elsif ($lvl->{undo} eq 'clean') {
+            Mail::DKIM2::MessageInstance->undo($work, HeadersOnly => $hdr_only);
+            $work = parse_mime($work->as_string);   # reset Email::MIME caches
         } else {
             $stopped = "stopped below m=$inst ($lvl->{undo})";
             last;
@@ -237,8 +251,9 @@ sub _report_once {
 }
 
 # Level hashref for the top Message-Instance m=$inst of $msg.
+# $hdr_only: below a null body Recipe, so the body is not checkable.
 sub _mi_level {
-    my ($msg, $inst, $mi_raw) = @_;
+    my ($msg, $inst, $mi_raw, $hdr_only) = @_;
     my %lvl = (kind => 'mi', m => $inst, result => 'fail',
                header_hash => 'mismatch', body_hash => 'mismatch',
                recipe => 'none', undo => 'n/a', detail => '',
@@ -267,7 +282,7 @@ sub _mi_level {
         }
     }
     $lvl{header_hash} = $h_match ? 'match' : 'mismatch';
-    $lvl{body_hash}   = $b_match ? 'match' : 'mismatch';
+    $lvl{body_hash}   = $hdr_only ? 'not-checked' : $b_match ? 'match' : 'mismatch';
     my $rh = $mi->get_tag('rh');
     my $rb = $mi->get_tag('rb');
     $lvl{recipe} = $mi->unrecoverable ? 'null' : ($rb || $rh) ? 'diff' : 'none';
@@ -278,8 +293,8 @@ sub _mi_level {
     } elsif ($mi->unrecoverable) {
         $lvl{undo} = 'unrecoverable';
     } else {
-        my $clone = Email::MIME->new($msg->as_string);
-        my $ok = eval { Mail::DKIM2::MessageInstance->undo($clone) };
+        my $clone = parse_mime($msg->as_string);
+        my $ok = eval { Mail::DKIM2::MessageInstance->undo($clone, HeadersOnly => $hdr_only ? 1 : 0) };
         $lvl{undo} = ($ok && !$@) ? 'clean' : 'failed';
         if ($ok && !$@ && $rh) {
             for my $h (sort keys %$rh) {
@@ -294,14 +309,15 @@ sub _mi_level {
         }
     }
 
-    $lvl{result} = ($lvl{header_hash} eq 'match' && $lvl{body_hash} eq 'match')
+    $lvl{result} = ($lvl{header_hash} eq 'match'
+                    && ($hdr_only || $lvl{body_hash} eq 'match'))
                  ? 'pass' : 'fail';
     return \%lvl;
 }
 
 # Signature-level hashref for i=$num, verifying the chain prefix on $work.
 sub _sig_level {
-    my ($work, $num, $sig_by_i, $cb, $skip_ts) = @_;
+    my ($work, $num, $sig_by_i, $cb, $skip_ts, $hdr_only) = @_;
     # $sig_by_i values come from Email::MIME->header() — already bare values.
     my $sig = eval { Mail::DKIM2::Signature->parse($sig_by_i->{$num}) };
     my %lvl = (kind => 'signature', i => $num, m => _m($sig_by_i->{$num}),
@@ -382,6 +398,7 @@ sub _sig_level {
     my $vv = Mail::DKIM2::Verifier->new;
     $vv->skip_timestamp_check(1);
     $vv->mid_process(1);
+    $vv->headers_only(1) if $hdr_only;   # body lost below a null Recipe
     $vv->set_pubkey_callback($cb);
     eval { $vv->PRINT($work->as_string); $vv->CLOSE; 1 };
     my $r = $vv->result // 'fail';

@@ -32,232 +32,232 @@ no_index:
 provides:
   Developer::Dashboard:
     file: lib/Developer/Dashboard.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::ActionRunner:
     file: lib/Developer/Dashboard/ActionRunner.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::Auth:
     file: lib/Developer/Dashboard/Auth.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::CLI::API:
     file: lib/Developer/Dashboard/CLI/API.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::CLI::Ask:
     file: lib/Developer/Dashboard/CLI/Ask.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::CLI::Complete:
     file: lib/Developer/Dashboard/CLI/Complete.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::CLI::Files:
     file: lib/Developer/Dashboard/CLI/Files.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::CLI::Help:
     file: lib/Developer/Dashboard/CLI/Help.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::CLI::OpenFile:
     file: lib/Developer/Dashboard/CLI/OpenFile.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::CLI::OpenFileChooser:
     file: lib/Developer/Dashboard/CLI/OpenFileChooser.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::CLI::OpenFileGrep:
     file: lib/Developer/Dashboard/CLI/OpenFileGrep.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::CLI::OpenFileJavaSource:
     file: lib/Developer/Dashboard/CLI/OpenFileJavaSource.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::CLI::OpenFileUtil:
     file: lib/Developer/Dashboard/CLI/OpenFileUtil.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::CLI::Paths:
     file: lib/Developer/Dashboard/CLI/Paths.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::CLI::Progress:
     file: lib/Developer/Dashboard/CLI/Progress.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::CLI::Query:
     file: lib/Developer/Dashboard/CLI/Query.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::CLI::RuntimeControl:
     file: lib/Developer/Dashboard/CLI/RuntimeControl.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::CLI::SeededPages:
     file: lib/Developer/Dashboard/CLI/SeededPages.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::CLI::Skills:
     file: lib/Developer/Dashboard/CLI/Skills.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::CLI::Source:
     file: lib/Developer/Dashboard/CLI/Source.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::CLI::Suggest:
     file: lib/Developer/Dashboard/CLI/Suggest.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::CLI::TableHelpers:
     file: lib/Developer/Dashboard/CLI/TableHelpers.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::CLI::Ticket:
     file: lib/Developer/Dashboard/CLI/Ticket.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::CLI::Upgrade:
     file: lib/Developer/Dashboard/CLI/Upgrade.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::CLI::Which:
     file: lib/Developer/Dashboard/CLI/Which.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::Codec:
     file: lib/Developer/Dashboard/Codec.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::Collector:
     file: lib/Developer/Dashboard/Collector.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::CollectorRunner:
     file: lib/Developer/Dashboard/CollectorRunner.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::CommandRunner:
     file: lib/Developer/Dashboard/CommandRunner.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::Config:
     file: lib/Developer/Dashboard/Config.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::DataHelper:
     file: lib/Developer/Dashboard/DataHelper.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::DirEntries:
     file: lib/Developer/Dashboard/DirEntries.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::DockerCompose:
     file: lib/Developer/Dashboard/DockerCompose.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::Doctor:
     file: lib/Developer/Dashboard/Doctor.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::EnvAudit:
     file: lib/Developer/Dashboard/EnvAudit.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::EnvInclude:
     file: lib/Developer/Dashboard/EnvInclude.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::EnvLoader:
     file: lib/Developer/Dashboard/EnvLoader.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::File:
     file: lib/Developer/Dashboard/File.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::FileRegistry:
     file: lib/Developer/Dashboard/FileRegistry.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::FileSlurp:
     file: lib/Developer/Dashboard/FileSlurp.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::Folder:
     file: lib/Developer/Dashboard/Folder.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::Handle:
     file: lib/Developer/Dashboard/Handle.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::Housekeeper:
     file: lib/Developer/Dashboard/Housekeeper.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::HtmlEscape:
     file: lib/Developer/Dashboard/HtmlEscape.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::IndicatorStore:
     file: lib/Developer/Dashboard/IndicatorStore.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::InternalCLI:
     file: lib/Developer/Dashboard/InternalCLI.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::IsoTimestamp:
     file: lib/Developer/Dashboard/IsoTimestamp.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::JSON:
     file: lib/Developer/Dashboard/JSON.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::PageDocument:
     file: lib/Developer/Dashboard/PageDocument.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::PageResolver:
     file: lib/Developer/Dashboard/PageResolver.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::PageRuntime:
     file: lib/Developer/Dashboard/PageRuntime.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::PageRuntime::StreamHandle:
     file: lib/Developer/Dashboard/PageRuntime/StreamHandle.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::PageStore:
     file: lib/Developer/Dashboard/PageStore.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::PathIdentity:
     file: lib/Developer/Dashboard/PathIdentity.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::PathRegistry:
     file: lib/Developer/Dashboard/PathRegistry.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::PathsRegistryArg:
     file: lib/Developer/Dashboard/PathsRegistryArg.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::PerlEnv:
     file: lib/Developer/Dashboard/PerlEnv.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::Platform:
     file: lib/Developer/Dashboard/Platform.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::ProcessSupervision:
     file: lib/Developer/Dashboard/ProcessSupervision.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::Prompt:
     file: lib/Developer/Dashboard/Prompt.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::Runtime::Result:
     file: lib/Developer/Dashboard/Runtime/Result.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::RuntimeManager:
     file: lib/Developer/Dashboard/RuntimeManager.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::SKILLS:
     file: lib/Developer/Dashboard/SKILLS.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::SeedSync:
     file: lib/Developer/Dashboard/SeedSync.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::SessionStore:
     file: lib/Developer/Dashboard/SessionStore.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::SkillDispatcher:
     file: lib/Developer/Dashboard/SkillDispatcher.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::SkillManager:
     file: lib/Developer/Dashboard/SkillManager.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::StreamDrain:
     file: lib/Developer/Dashboard/StreamDrain.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::TextUtils:
     file: lib/Developer/Dashboard/TextUtils.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::TimeUtils:
     file: lib/Developer/Dashboard/TimeUtils.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::UpdateManager:
     file: lib/Developer/Dashboard/UpdateManager.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::Web::App:
     file: lib/Developer/Dashboard/Web/App.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::Web::DancerApp:
     file: lib/Developer/Dashboard/Web/DancerApp.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::Web::Server:
     file: lib/Developer/Dashboard/Web/Server.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::Web::Server::Daemon:
     file: lib/Developer/Dashboard/Web/Server/Daemon.pm
-    version: '5.51'
+    version: '5.73'
   Developer::Dashboard::Zipper:
     file: lib/Developer/Dashboard/Zipper.pm
-    version: '5.51'
+    version: '5.73'
 requires:
   Archive::Tar: '3.10'
   Archive::Zip: '1.61'
@@ -328,7 +328,7 @@ resources:
   bugtracker: https://github.com/manif3station/developer-dashboard/issues
   homepage: https://github.com/manif3station/developer-dashboard
   repository: https://github.com/manif3station/developer-dashboard
-version: '5.51'
+version: '5.73'
 x_generated_by_perl: v5.38.2
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: MIT
