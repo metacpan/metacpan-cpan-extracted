@@ -88,6 +88,14 @@ my $data = dirname(abs_path(__FILE__)) . '/data';
 	is_deeply($i->{chain_order}, [ '' ], 'a blank chain id is one chain');
 	is($i->{chains}{''}{type}, 'protein', 'a CA-only model is still a protein');
 	is($i->{chains}{''}{n_missing}, 35, 'and it knows what SEQRES has that it does not');
+
+	# every other field read past column 72 ended in the id too, until 0.039:
+	# the first revision's list of records came back '1GDR   6', and REMARK 2's
+	# text '1GDR  44'
+	is_deeply([ grep { /1GDR/ } map { $_->{what} } @{ $i->{revdat} } ], [],
+		'no revision lists the id among the records it touched');
+	is_deeply([ grep { /1GDR/ } map { @$_ } values %{ $i->{remarks} } ], [],
+		'and no REMARK line ends in it');
 }
 
 # --- the same file name rule, without the file
@@ -242,18 +250,25 @@ PDB
 
 # --- a serial number that spills out of its columns -----
 #
-# a_structure.pdb writes one atom as 'ATOM 111757', which puts the seventh
-# digit in column 12 and the first in column 6 -- so columns 1-6 are 'ATOM 1'
-# and not 'ATOM  '.  This module reads the record name from its columns, so the
-# line is not a coordinate record; what it must not do is lose it silently, and
-# it does not: the count of records by name says where it went.
+# a_structure.pdb writes one atom as 'ATOM 111757', a six-digit serial that
+# starts in column 6 -- so columns 1-6 are 'ATOM 1' and not 'ATOM  ', and every
+# column after the serial is where it belongs.  The two readers part company
+# here: Biopython 1.85 reads the record name from its six columns and skips the
+# line, and gemmi 0.7.5 reads it by its first four letters, as the atom it is.
+# This module took Biopython's reading until 0.039, and filed the atom as a
+# header record called 'ATOM 1', out of every count; it takes gemmi's now,
+# because the other one throws a real atom away.
 {
 	my $i = structure_info_string(<<'PDB');
 ATOM    756  CG1 VAL B  52       5.661  -6.261  42.321  1.00 30.99           C
 ATOM 111757  CG3 VAL B  52       7.588  -6.386  43.856  1.00 23.53           C
 PDB
-	is($i->{stats}{n_atoms}, 1, 'a record whose name field is not ATOM is not an atom');
-	is($i->{records}{'ATOM 1'}, 1, 'and it is counted under the name it does have');
+	is($i->{stats}{n_atoms}, 2, 'a serial that runs into the record name is still an atom');
+	my $r = $i->{chains}{B}{residues}{52};
+	is_deeply($r->{atom_order}, [qw(CG1 CG3)], 'the atom it names, in its residue');
+	is($r->{atoms}{CG3}{serial}, 111757, 'with the whole serial, read from column 6');
+	is($r->{atoms}{CG3}{x}, 7.588, 'and the columns after it where they always were');
+	ok(!exists $i->{records}{'ATOM 1'}, 'and nothing filed as a header record');
 }
 
 # --- one residue in two chemical states, in mmCIF ------
@@ -321,6 +336,13 @@ CIF
 		[ 'FE  ', 'FE',  'Fe', 'iron' ],
 		[ ' N  ', 'N',   'N',  'nitrogen' ],
 		[ 'CL  ', 'CL',  'Cl', 'chlorine' ],
+		# A name out of its place: a one-letter guess that is no element is
+		# the two letters the name starts with, and a two-letter guess that is
+		# none is its first letter.  gemmi 0.7.5 gives X for all three; these
+		# came back Z, HB and OX until 0.039.
+		[ ' ZN ', 'ZN',  'Zn', 'a zinc in the column a one-letter element takes is still zinc' ],
+		[ 'HB1 ', 'HB1', 'H',  'a hydrogen started in column 13 is a hydrogen, not HB' ],
+		[ 'OXT ', 'OXT', 'O',  'and an OXT started there is an oxygen, not OX' ],
 	);
 	for my $w (@want) {
 		my ($cols, $name, $element, $why) = @$w;
@@ -328,6 +350,16 @@ CIF
 			sprintf("HETATM    1 %-4s LIG A   1       1.000   2.000   3.000  1.00 10.00\n", $cols));
 		my $r = $i->{chains}{A}{residues}{1};
 		is($r->{atoms}{$name} && $r->{atoms}{$name}{element}, $element, $why);
+	}
+	# An atom named for its own residue, in two letters that spell an element,
+	# is the ion of that element wherever in the four columns it sits: ' NA ' in
+	# a residue NA is sodium, and in any other residue a nitrogen.
+	for my $w ([ 'NA',  'Na', "an atom named for its residue is that residue's ion" ],
+	           [ 'LIG', 'N',  'and the same name in another residue is a nitrogen' ]) {
+		my ($res, $element, $why) = @$w;
+		my $i = structure_info_string(
+			sprintf("HETATM    1  NA  %3s A   1       1.000   2.000   3.000  1.00 10.00\n", $res));
+		is($i->{chains}{A}{residues}{1}{atoms}{NA}{element}, $element, $why);
 	}
 }
 
@@ -375,7 +407,7 @@ PDB
 	is($i->{resolution}, 2.6, 'REMARK 2 wins where the file has one');
 }
 
-# --- line endings 
+# --- line endings
 #
 # gemmi keeps tests/eol-test.cif for this.  A file that came through a Windows
 # machine is read the same as one that did not.
@@ -667,6 +699,71 @@ PDB
 	is($w->{residues}{1223056}{atoms}{O}{serial}, 43770016, 'a0000 is 100000 + 26 * 36**4');
 	is($w->{residues}{2436111}{atoms}{O}{serial}, 87440031, 'and zzzzz is 87440031');
 	ok(!defined $w->{residues}{''}{number}, 'a field that mixes the cases is not a number');
+}
+
+# --- a residue given a number the chain has already used ------------------
+#
+# The archive never writes one; other programs do.  Below is a protein residue,
+# then a water after TER under the same chain and number, which is how a program
+# that adds waters behind a protein numbers them, then a ligand numbered 1 in the
+# protein's chain, as a docking program writes its pose, then END and a second
+# pose after it.
+#
+# gemmi 0.7.5 reads three residues, MET 1, HOH 1 and LIG 1, each with its own
+# atoms, and stops at END.  Biopython 1.85 reads the same three, as the residue
+# ids (' ', 1, ' '), ('W', 1, ' ') and ('H_LIG', 1, ' ').  This module made one
+# residue of all of them until 0.039 -- the water's O a conformer of the
+# methionine's, the ligand's atoms beside them, the second pose's on top -- and
+# keys the two that were given a taken number with their names after it.
+{
+	my $text = <<'PDB';
+ATOM      1  N   MET A   1       1.000   2.000   3.000  1.00 10.00           N
+ATOM      2  CA  MET A   1       2.000   2.000   3.000  1.00 10.00           C
+ATOM      3  O   MET A   1       9.000   2.000   3.000  1.00 10.00           O
+TER
+HETATM    4  O   HOH A   1      20.000  20.000  20.000  1.00 10.00           O
+HETATM    5  C1  LIG A   1      30.000  30.000  30.000  1.00 10.00           C
+HETATM    6  O1  LIG A   1      31.000  30.000  30.000  1.00 10.00           O
+END
+HETATM    7  C1  LIG A   2      40.000  30.000  30.000  1.00 10.00           C
+PDB
+	for my $atoms (1, 0) {
+		my $i = structure_info_string($text, atoms => $atoms, features => 0);
+		my $c = $i->{chains}{A};
+		is_deeply($c->{residue_order}, [ '1', '1(HOH)', '1(LIG)' ],
+			"atoms => $atoms: three residues, the two that collided keyed with their names");
+		is_deeply([ map { $c->{residues}{$_}{n_atoms} } @{ $c->{residue_order} } ], [ 3, 1, 2 ],
+			"atoms => $atoms: each with its own atoms");
+		is($i->{stats}{total_atoms}, 6, "atoms => $atoms: and END is where the file ends");
+	}
+	my $i = structure_info_string($text);
+	my $c = $i->{chains}{A};
+	my $met = $c->{residues}{1};
+	is_deeply($met->{atom_order}, [qw(N CA O)], 'the methionine keeps its own atoms');
+	ok(!exists $met->{atoms}{O}{altlocs}, 'and its O is one atom, not two conformers');
+	my $w = $c->{residues}{'1(HOH)'};
+	is($w->{number}, 1, 'the water keeps its number');
+	is($w->{key}, '1(HOH)', 'and its key says which residue numbered 1 it is');
+	is($w->{type}, 'water', 'and it is a water');
+	ok(structure_ligands($i)->{'LIG_A_1(LIG)'}, 'the ligand is a ligand, under its own key');
+	is($c->{sequence}, 'M', "and the chain's sequence is the protein's");
+}
+
+# --- a charge of zero, with a sign ------------------------------------------
+#
+# 4iu3 (PDBbind v2020) writes LYS A 32's CB with '0-' in columns 79-80; the line
+# below is the record exactly as deposited.  gemmi 0.7.5 reads no charge from
+# it, and the mmCIF reader reads a pdbx_formal_charge of 0 as '0'.  The PDB
+# reader passed '0-' through, so one atom had two charges according to its
+# format, and a charge of zero that Perl reads as true.
+{
+	my $i = structure_info_string(<<'PDB');
+ATOM    227  CB  LYS A  32      90.314  63.824  51.990  1.00 17.81           C0-
+ATOM    228  CG  LYS A  32      90.000  63.000  51.000  1.00 17.81           C-0
+PDB
+	my $r = $i->{chains}{A}{residues}{32};
+	is($r->{atoms}{CB}{charge}, '0', "'0-' is a charge of zero, with no sign");
+	is($r->{atoms}{CG}{charge}, '0', "and so is '-0', written sign first");
 }
 
 done_testing();

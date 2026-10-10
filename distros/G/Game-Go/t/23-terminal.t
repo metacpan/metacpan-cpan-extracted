@@ -84,11 +84,20 @@ subtest 'the star points are marked, and legal moves are not' => sub {
 
 	# In Reversi a legal-move marker earns its place because there are a
 	# handful of them. In Go very nearly every empty point is legal, so marking
-	# them draws a board of plus signs that tells a player nothing. The first
+	# them draws a board of markers that tells a player nothing. The first
 	# version of this did exactly that.
-	my @plus = $out =~ /\+/g;
-	cmp_ok(scalar @plus, '>', 0, 'some points are marked');
-	cmp_ok(scalar @plus, '<', 20, 'but only a few, so it is the star points and not every empty point');
+	#
+	# The marker is `*`, not `+`: `+` is now every intersection of the drawn
+	# grid, and counting it was counting the board rather than the stars.
+	my $first = (split /\n\n/, $out)[1] // $out;
+	my @star = $first =~ /\*/g;
+	cmp_ok(scalar @star, '>', 0, 'some points are marked');
+	cmp_ok(scalar @star, '<', 20,
+		'but only a few, so it is the star points and not every empty point');
+
+	# And the grid itself really is drawn, or the line above is counting
+	# markers on a board that no longer has any.
+	like($out, qr/\+-\+-\+/, 'the board is drawn as a grid rather than a lattice of dots');
 	done_testing();
 };
 
@@ -298,6 +307,182 @@ subtest 'the stones are wide characters and the handle is told' => sub {
 	# And the characters really are wide, or none of the above matters.
 	my $glyph = $term->glyph(Game::Go::BLACK);
 	cmp_ok(ord($glyph), '>', 127, 'a stone really is a wide character');
+	done_testing();
+};
+
+# The key loop, driven by `keysource` so nothing here needs a tty or
+# Term::ReadKey. ONE character a call: a source handing back "\e[C" whole
+# never becomes a right arrow.
+sub picker {
+	my ($keys, %o) = @_;
+	open my $in, '<', \(my $script = "resign\n") or die $!;
+	my $text = '';
+	open my $out, '>', \$text or die $!;
+	my @chars = split //, $keys;
+
+	my $t = Game::Go::Terminal->new(
+		in => $in, out => $out, size => 9, level => 1, seed => 'pick',
+		ascii => 1, ansi => 0, picking => 1,
+		keysource => sub { shift @chars },
+		%o,
+	);
+	return ($t, \$text);
+}
+
+subtest 'a key at a time, named' => sub {
+	my ($t) = picker("k\e[A\e[B\e[C\e[D\e[5~\eOH\r\t\x7f\x03\x04 q\e\e[6~");
+
+	my @got;
+	while (defined(my $key = $t->read_key)) {
+		push @got, $key eq ' ' ? 'space' : $key;
+	}
+
+	is_deeply(\@got, [ qw/ k up down right left page_up home enter tab backspace
+		interrupt eof space q escape page_down / ],
+		'a character comes back as itself and a sequence as a name');
+	done_testing();
+};
+
+subtest 'an escape does not eat the key behind it' => sub {
+	my ($t) = picker("\eq");
+	is($t->read_key, 'escape', 'the escape is an escape');
+	is($t->read_key, 'q', 'and the keystroke behind it survives');
+	done_testing();
+};
+
+# THE CURSOR IS A SHAPE, NOT A COLOUR. A go board has a line between every
+# two points, so there is a character there to spend: the cursor brackets its
+# point and takes the place of the grid line either side. That survives
+# --ascii, NO_COLOR and a redirected handle, which reverse video does not,
+# and it costs no columns, so the rows stay in line.
+subtest 'the cursor brackets its point and the rows stay aligned' => sub {
+	my ($t, $text) = picker('q');
+	$t->enter_raw;
+	$t->pick_point(Game::Go::BLACK);
+	like($$text, qr/\[X\]/, 'the point under the cursor is bracketed');
+
+	# THE EDGES ARE THE CASE THAT BREAKS. In the middle a bracket replaces a
+	# grid line either side and the width is unchanged whatever you do; at
+	# column A and at the last column there is no line on one side, only the
+	# space before the row number, and a bracket that does not take ITS place
+	# makes that one row wider than the rest. The cursor starts at tengen, so
+	# a test that never walks it to an edge never visits the bug.
+	for my $walk ([ 'q', 'the middle' ],
+		[ ("\e[D" x 4) . 'q', 'column A' ],
+		[ ("\e[C" x 4) . 'q', 'the last column' ]) {
+		my ($keys, $where) = @$walk;
+		my ($walker, $drawn) = picker($keys);
+		$walker->enter_raw;
+		$walker->pick_point(Game::Go::BLACK);
+
+		my @rows = grep { /\A\d/ } split /\n/, $$drawn;
+		my %width = map { length($_) => 1 } @rows;
+		is(scalar keys %width, 1, "every board row is the same width at $where")
+			or diag join "\n", @rows;
+	}
+	done_testing();
+};
+
+subtest 'the cursor walks, and the caption follows it' => sub {
+	my ($t, $text) = picker(("\e[D" x 4) . 'q');
+	$t->enter_raw;
+	$t->pick_point(Game::Go::BLACK);
+
+	# It starts at tengen on an empty board, so four left is the A file.
+	like($$text, qr/\bA5:/, 'four left of the middle is the A file');
+	done_testing();
+};
+
+# THE LINE UNDER THE BOARD IS WHAT THE MOVE WOULD DO, and the oracle is the
+# engine: the point is played on a CLONE and the clone is asked.
+subtest 'the line under the board is the move it would make' => sub {
+	my ($t) = picker('q');
+	my $g = $t->game;
+	my $B = Game::Go::BLACK;
+	my $W = Game::Go::WHITE;
+
+	# White at A9 with black at B9 leaves A8 a capture for black.
+	$g->play($B, $g->point(1, 0));
+	$g->play($W, $g->point(0, 0));
+	$g->play($B, $g->point(4, 4));
+	$g->play($W, $g->point(8, 8));
+
+	like($t->point_line($B, $g->point(0, 0)), qr/there is a stone there/,
+		'an occupied point says so');
+	like($t->point_line($B, $g->point(0, 1)), qr/takes 1/,
+		'a capture says what it takes');
+	like($t->point_line($B, $g->point(3, 3)), qr/a lone stone with 4 liberties/,
+		'an ordinary point says what it would be');
+	like($t->point_line($B, $g->point(2, 0)), qr/joins a group of 2/,
+		'and a point beside your own stone says what it joins');
+
+	# NOTHING IS PLAYED. A preview that moved the game would be worse than
+	# no preview at all.
+	is($g->board->at(0, 1), Game::Go::Rules::EMPTY, 'the board is untouched');
+	is($g->turn, $B, 'and it is still the same turn');
+	done_testing();
+};
+
+subtest 'the suicide rule is named before the stone is placed' => sub {
+	my ($t) = picker('q');
+	my $g = $t->game;
+	my $B = Game::Go::BLACK;
+	my $W = Game::Go::WHITE;
+
+	$g->play($B, $g->point(4, 4));
+	$g->play($W, $g->point(1, 0));
+	$g->play($B, $g->point(5, 5));
+	$g->play($W, $g->point(0, 1));
+
+	is($g->turn, $B, 'black to play');
+	like($t->point_line($B, $g->point(0, 0)), qr/no liberty/,
+		'and A9 says why it cannot be played');
+	done_testing();
+};
+
+subtest 'enter plays the point under the cursor' => sub {
+	my ($t, $text) = picker("\r");
+	$t->enter_raw;
+	my $ok = $t->pick_point(Game::Go::BLACK);
+
+	is($ok, 1, 'the turn was taken');
+	like($$text, qr/you play E5\./, 'and it played the point it was showing');
+	isnt($t->game->board->at(4, 4), Game::Go::Rules::EMPTY,
+		'there is a stone there now');
+	done_testing();
+};
+
+subtest 'p passes, q stops, and a dud key says so' => sub {
+	my ($pass, $ptext) = picker('p');
+	$pass->enter_raw;
+	is($pass->pick_point(Game::Go::BLACK), 1, 'p is a turn');
+	like($$ptext, qr/you pass/, 'and it passed');
+
+	my ($stop) = picker('q');
+	$stop->enter_raw;
+	is($stop->pick_point(Game::Go::BLACK), 0, 'q stops');
+
+	my ($dud, $dtext) = picker('zq');
+	$dud->enter_raw;
+	$dud->pick_point(Game::Go::BLACK);
+	like($$dtext, qr/that key does nothing here/, 'and a dud key says so');
+	done_testing();
+};
+
+# Without Term::ReadKey and without a keysource there is nothing to read keys
+# with, and the fallback is the typed game rather than a failure.
+subtest 'no key source at all falls back to typing' => sub {
+	open my $in, '<', \(my $script = "D4\nresign\n") or die $!;
+	my $text = '';
+	open my $out, '>', \$text or die $!;
+	my $t = Game::Go::Terminal->new(
+		in => $in, out => $out, size => 9, level => 1, seed => 'fall',
+		ascii => 1, ansi => 0, picking => 1);
+
+	is($t->keys_available, 0, 'nothing to read keys with');
+	$t->start;
+	like($text, qr/your move> /, 'so the typed prompt was used');
+	is($t->picking, 0, 'and it does not try the keys again');
 	done_testing();
 };
 

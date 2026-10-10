@@ -122,4 +122,19 @@ my $file = "$data/nmr.pdb";
 	ok($i->{stats}{n_atoms} > 0, 'and its atoms are read under the default');
 }
 
+#--------
+# what the header says about a chain, on every model's chain.  The header
+# describes the molecule, and with model => 'all' each model has its own copy of
+# its chains; the SEQRES and the counts drawn from it reached model 1's chain
+# alone until 0.039, and 2ll7 (PDBbind v2020) read that way had CALMODULIN on
+# model 1's chain A and nothing on the other nineteen.
+#--------
+{
+	my $i = structure_info($file, model => 'all');
+	is_deeply([ map { $i->{models}{$_}{chains}{A}{seqres} } 1 .. 3 ], [ ('GSW') x 3 ],
+		"model => 'all': every model's chain has the SEQRES");
+	is_deeply([ map { $i->{models}{$_}{chains}{A}{n_missing} } 1 .. 3 ], [ (0) x 3 ],
+		'and what it says is missing from each');
+}
+
 done_testing();

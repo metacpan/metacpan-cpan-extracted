@@ -9,7 +9,7 @@ use Object::Proto::Sugar -types;
 use Digest::SHA ();
 use Game::Mahjong::Tiles;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use constant DEALT => 53;
 
@@ -134,7 +134,7 @@ Game::Mahjong::Wall - the seeded order, the deal, the front and the back
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

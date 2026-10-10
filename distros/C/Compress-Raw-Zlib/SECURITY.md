@@ -5,7 +5,7 @@ This is the Security Policy for Compress::Raw::Zlib.
 Security vulnerabilities can be reported via the project GitHub repository
 [Security Advisories](https://github.com/pmqs/Compress-Raw-Zlib/security/advisories).
 (If you do not have access to GitHub, then you can report issues via email
-to <pmqs@cpan.org>.)
+to <pmqs@outlook.com>.)
 
 The latest version of the Security Policy can be found in the
 [git repository for Compress::Raw::Zlib](https://github.com/pmqs/Compress-Raw-Zlib/blob/main/SECURITY.md).
@@ -20,7 +20,7 @@ Security vulnerabilities can be reported via the project GitHub repository
 [Security Advisories](https://github.com/pmqs/Compress-Raw-Zlib/security/advisories).
 On the “Advisories” page you can click on the “Report a vulnerability”
 button. (If you do not have access to GitHub, then you can report issues
-via email to <pmqs@cpan.org>.)
+via email to <pmqs@outlook.com>.)
 
 Please include as many details as possible, including code samples or test
 cases, so that we can reproduce the issue.  Check that your report does not

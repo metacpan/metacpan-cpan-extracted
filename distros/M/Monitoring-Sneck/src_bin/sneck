@@ -6,22 +6,30 @@ sneck - a boopable LibreNMS JSON style SNMP extend for remotely running nagios s
 
 =head1 SYNOPSIS
 
-sneck -u [B<-C> <cache file] [B<-f> <config file>] [B<-p>] [B<-i>] [B<-d>] [B<-q>] [B<-l>]
+sneck -u [B<-C> <cache file>] [B<-f> <config file>] [B<-p>] [B<-i>] [B<-d>] [B<-q>] [B<-l>|B<-L>] [B<-P> <pid dir>] [B<-r>] [B<-T> <seconds>] [B<-s> <signal>] [B<-k>|B<-K>]
 
-sneck -c [B<-C> <cache file] [B<-b>]
+sneck -c [B<-C> <cache file>] [B<-f> <config file>] [B<-b>]
 
-sneck [B<-f> <config file>] [B<-p>] [B<-i>]
+sneck [B<-f> <config file>] [B<-p>] [B<-i>] [B<-r>] [B<-T> <seconds>] [B<-s> <signal>] [B<-k>|B<-K>]
+
+sneck -t [B<-f> <config file>]
 
 =head1 DESCRIPTION
 
 For a description of the config file format and output,
 please see L<Monitoring::Sneck>.
 
+The cache file, PID dir, locking, and check timeout settings may also
+be set in the config file. Flags override those. See OPTIONS in L<Monitoring::Sneck::Config>.
+
 =head1 FLAGS
 
 =head2 -f <config file>
 
 The config file to use.
+
+Files ending in .yaml or .yml are read as YAML, which needs YAML::XS.
+See L<Monitoring::Sneck::Config> for both formats.
 
 Default :: /usr/local/etc/sneck.conf
 
@@ -33,12 +41,14 @@ Pretty it in a nicely formatted format.
 
 The cache file to use.
 
+Overrides cache_file in the config.
+
 Default :: /var/cache/sneck.cache
 
 A secondary cache file based on this name
 is also created. By default it is
-/var/cache/sneck.cache.snmp and is used for
-storing the compressed version.
+/var/cache/sneck.cache.snmp and always holds
+the GZip+BASE64 compressed version.
 
 =head2 -u
 
@@ -51,8 +61,8 @@ this as this flag only reads/prints the cache file.
 
 =head2 -b
 
-When used with B<-c>, it does optional LibreNMS style GZip+BASE64
-style compression.
+When used with B<-c>, print the LibreNMS style GZip+BASE64
+compressed cache instead.
 
 =head2 -i
 
@@ -69,6 +79,71 @@ Don't print the results for -u. Exit queitly.
 =head2 -l
 
 Enable locking for with -u so more than one instance can't run at a time.
+Overrides locking in the config.
+
+The PID file is sneck.pid in the directory set by B<-P>.
+
+=head2 -L
+
+Disable locking, overriding locking in the config. Can not be used with
+B<-l>.
+
+=head2 -P <pid dir>
+
+The directory for the PID file used by B<-l>. The user running sneck
+must be able to write to it.
+
+Overrides pid_dir in the config.
+
+Default :: /var/run
+
+=head2 -r
+
+Run any restarts whose checks failed. Without this, restarts are only
+reported as 'restarts disabled'. Meant to be used with B<-u> from cron.
+Never use it from snmpd.
+
+Restart state, used for min_interval and max_retries, is kept in the
+cache file name with '.restarts' added, so by default
+/var/cache/sneck.cache.restarts.
+
+Use locking with this to make sure two runs can't restart things at the
+same time. Without it, a warning saying so is printed to stderr.
+
+See L<Monitoring::Sneck::Config> for how restarts are configured.
+
+=head2 -T <seconds>
+
+Seconds to wait on each check before giving up on it. Overrides
+check_timeout in the config.
+
+Default :: 30
+
+=head2 -s <signal>
+
+Signal to send a check on timeout, such as TERM. Overrides
+check_timeout_signal in the config. 'none' sends no signal, even if the
+config sets one.
+
+Default :: none
+
+=head2 -k
+
+Also send the timeout signal to all child processes of a check.
+Overrides check_kill_sub_pids in the config. Does nothing without a
+timeout signal. This is the default.
+
+=head2 -K
+
+Do not send the timeout signal to child processes of a check. Overrides
+check_kill_sub_pids in the config. Can not be used with B<-k>.
+
+=head2 -t
+
+Test the config file. Prints any errors and warnings, then exits 0 if
+there are no errors and 1 if there are or the file can't be read.
+Warnings, such as a check using a undefined variable, do not affect the
+exit code.
 
 =cut
 
@@ -78,6 +153,7 @@ use Getopt::Long       qw( GetOptions );
 use File::Slurp        qw(read_file write_file);
 use JSON               qw(encode_json);
 use Monitoring::Sneck  ();
+use Monitoring::Sneck::Config ();
 use MIME::Base64       qw(encode_base64);
 use IO::Compress::Gzip qw(gzip);
 use Pod::Usage         qw(pod2usage);
@@ -92,7 +168,7 @@ sub main::HELP_MESSAGE {
 	pod2usage( -exitval => 255, -verbose => 2, -output => \*STDOUT, );
 }
 
-my $cache_file  = '/var/cache/sneck.cache';
+my $cache_file;
 my $config_file = '/usr/local/etc/sneck.conf';
 my $update;
 my $print_cache;
@@ -105,6 +181,14 @@ my $compress;
 my $debug;
 my $quiet;
 my $locking;
+my $no_locking;
+my $pid_dir;
+my $test_config;
+my $restart;
+my $check_timeout;
+my $check_timeout_signal;
+my $kill_sub_pids;
+my $no_kill_sub_pids;
 Getopt::Long::Configure('no_ignore_case');
 Getopt::Long::Configure('bundling');
 GetOptions(
@@ -122,6 +206,14 @@ GetOptions(
 	'd'       => \$debug,
 	'q'       => \$quiet,
 	'l'       => \$locking,
+	'L'       => \$no_locking,
+	'P=s'     => \$pid_dir,
+	't'       => \$test_config,
+	'r'       => \$restart,
+	'T=s'     => \$check_timeout,
+	's=s'     => \$check_timeout_signal,
+	'k'       => \$kill_sub_pids,
+	'K'       => \$no_kill_sub_pids,
 );
 
 # print version or help if requested
@@ -132,6 +224,51 @@ if ($help) {
 if ($version) {
 	main::VERSION_MESSAGE;
 	exit 42;
+}
+
+if ( $locking && $no_locking ) {
+	die("-l and -L can not be used together\n");
+}
+if ( $kill_sub_pids && $no_kill_sub_pids ) {
+	die("-k and -K can not be used together\n");
+}
+
+# test the config and exit if requested
+if ($test_config) {
+	my $parsed_config;
+	eval { $parsed_config = Monitoring::Sneck::Config->new( { file => $config_file } ); };
+	if ($@) {
+		print 'error: ' . $@;
+		exit 1;
+	}
+
+	foreach my $error ( $parsed_config->errors ) {
+		print 'error: ' . $error->{where} . ': ' . $error->{message} . "\n";
+	}
+	foreach my $warning ( $parsed_config->warnings ) {
+		print 'warning: ' . $warning->{where} . ': ' . $warning->{message} . "\n";
+	}
+
+	if ( !$parsed_config->is_valid ) {
+		exit 1;
+	}
+	print 'config OK: ' . $config_file . "\n";
+	exit 0;
+} ## end if ($test_config)
+
+# options from the config fill in anything not given on the command line,
+# using the valid ones even if the config has other errors, so the error
+# still ends up in the right cache file
+my %config_options;
+eval { %config_options = %{ Monitoring::Sneck::Config->new( { file => $config_file } )->options }; };
+if ( !defined($cache_file) ) {
+	$cache_file = defined( $config_options{cache_file} ) ? $config_options{cache_file} : '/var/cache/sneck.cache';
+}
+if ( !defined($pid_dir) ) {
+	$pid_dir = defined( $config_options{pid_dir} ) ? $config_options{pid_dir} : '/var/run';
+}
+if ( !$locking && !$no_locking && $config_options{locking} ) {
+	$locking = 1;
 }
 
 # prints the cache and exit if requested
@@ -154,13 +291,28 @@ if ($print_cache) {
 	exit;
 } ## end if ($print_cache)
 
-my $sneck = Monitoring::Sneck->new( { config => $config_file, include => $include, debug => $debug } );
+if ( $restart && !$locking ) {
+	warn("-r used without locking, so overlapping runs may restart things more than once\n");
+}
+
+my $sneck = Monitoring::Sneck->new(
+	{
+		config     => $config_file,
+		include    => $include,
+		debug      => $debug,
+		restart    => $restart,
+		state_file => $cache_file . '.restarts',
+		check_timeout        => $check_timeout,
+		check_timeout_signal => $check_timeout_signal,
+		check_kill_sub_pids  => $kill_sub_pids ? 1 : $no_kill_sub_pids ? 0 : undef,
+	}
+);
 # -l if asked for
 if ($locking) {
 	my $alive;
-	eval { $alive = Proc::PID::File->running(); };
+	eval { $alive = Proc::PID::File->running( dir => $pid_dir, name => 'sneck' ); };
 	if ($@) {
-		die( '-l specified and PID file check failed... ' . $@ );
+		die( 'locking enabled and PID file check failed... ' . $@ );
 		exit 255;
 	}
 	if ($alive) {
@@ -182,10 +334,7 @@ gzip \$raw_json => \$compressed_string;
 my $compressed = encode_base64($compressed_string);
 $compressed =~ s/\n//g;
 $compressed = $compressed . "\n";
-my $snmp = $raw_json;
-if ( length($compressed) < length($raw_json) ) {
-	$snmp = $compressed;
-}
+my $snmp = $compressed;
 
 # non-pretty does not include a new line, so add it
 if ( !$pretty ) {
@@ -198,6 +347,6 @@ if ( !$quiet ) {
 }
 
 if ($update) {
-	write_file( $cache_file,           $raw_json );
-	write_file( $cache_file . '.snmp', $snmp );
+	write_file( $cache_file,           { atomic => 1 }, $raw_json );
+	write_file( $cache_file . '.snmp', { atomic => 1 }, $snmp );
 }

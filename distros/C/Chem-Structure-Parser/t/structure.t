@@ -6,6 +6,7 @@ use strict;
 use warnings FATAL => 'all';
 use Cwd 'abs_path';
 use File::Basename 'dirname';
+use File::Temp 'tempdir';
 use Chem::Structure::Parser;
 use Test::Exception;
 use Test::More;
@@ -315,6 +316,44 @@ is(scalar @{ $info->{stats}{center} }, 3, 'and a centre');
 		'and the elements are worked out from the atom names');
 	is($bare->{title}, undef, 'a missing TITLE is undef rather than missing');
 	is_deeply($bare->{keywords}, [], 'and a missing KEYWDS is an empty list');
+}
+
+#--------
+# the id a file with no HEADER takes from its name.  The archive's own spelling,
+# pdb1abc.ent, loses its 'pdb'; until 0.039 every name did, so a file called
+# pdbfixer_output.pdb came back as FIXER_OUTPUT, and a .pdbx -- a suffix the
+# format is read from -- kept its suffix in the id.
+#--------
+{
+	my $dir = tempdir(CLEANUP => 1);
+	open my $in, '<', "$data/bare.pdb" or die "Can't open '$data/bare.pdb' with mode '<': '$!'";
+	my $text = do { local $/; <$in> };
+	close $in or die "Can't close '$data/bare.pdb': '$!'";
+	for my $w ([ 'pdb1abc.ent',         '1ABC',           "the archive's pdb1abc.ent is 1ABC" ],
+	           [ 'pdbfixer_output.pdb', 'PDBFIXER_OUTPUT', 'and a name that only begins with pdb keeps it' ],
+	           [ '2abc.pdbx',           '2ABC',           'a .pdbx is a suffix like the others' ]) {
+		my ($name, $id, $why) = @$w;
+		open my $out, '>', "$dir/$name" or die "Can't open '$dir/$name' with mode '>': '$!'";
+		print {$out} $text;
+		close $out or die "Can't close '$dir/$name': '$!'";
+		is(structure_info("$dir/$name", features => 0, format => 'pdb')->{id}, $id, $why);
+	}
+}
+
+#--------
+# a coordinate that reads as nan.  The bounding box, the centres and the
+# B-factor extremes are over the finite values only; they took a NaN in or not
+# according to where in the file it fell -- first, and every comparison after
+# it failed, so the box was NaN; anywhere later, and it was left out.
+#--------
+{
+	my $nan  = "ATOM      1  N   ALA A   1         nan   5.000   5.000  1.00   nan           N\n";
+	my $real = "ATOM      2  CA  ALA A   1       5.000   5.000   5.000  1.00 10.00           C\n";
+	my $first  = structure_info_string($nan . $real,  features => 0)->{stats};
+	my $second = structure_info_string($real . $nan, features => 0)->{stats};
+	is_deeply([ @{ $first->{bbox} }{qw(xmin xmax)}, $first->{bfactor}{max} ], [ 5, 5, 10 ],
+		'a NaN on the first atom does not become the box or the B-factor range');
+	is_deeply($first, $second, 'and where in the file it falls makes no difference');
 }
 
 #--------

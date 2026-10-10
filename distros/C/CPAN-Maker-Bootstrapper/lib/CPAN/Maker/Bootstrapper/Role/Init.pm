@@ -63,6 +63,7 @@ sub _init_config {
 
   # Example usage:
   my $reader = eval { CPAN::Maker::Bootstrapper::ConfigReader->new( $self->get_config ); };
+  $self->set_reader($reader);
 
   $self->set_config( $reader ? $reader->get_config_file : undef );
 

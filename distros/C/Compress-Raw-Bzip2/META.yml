@@ -1,7 +1,7 @@
 ---
 abstract: 'Low-Level Interface to bzip2 compression library'
 author:
-  - 'Paul Marquess <pmqs@cpan.org>'
+  - 'Paul Marquess <pmqs@outlook.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
@@ -23,5 +23,5 @@ resources:
   bugtracker: https://github.com/pmqs/Compress-Raw-Bzip2/issues
   homepage: https://github.com/pmqs/Compress-Raw-Bzip2
   repository: git://github.com/pmqs/Compress-Raw-Bzip2.git
-version: '2.224'
+version: '2.225'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

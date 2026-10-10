@@ -1,5 +1,65 @@
 Revision history for Mail::DKIM2
 
+0.18    2026-10-09
+        Fixes from an external review against spec-06. Several are
+        behaviour changes for messages that are malformed or adversarial;
+        well-formed mail verifies as before.
+        - Behaviour change: only the signature algorithms rsa-sha256 and
+          ed25519-sha256, matched exactly, are verified. An s= item naming
+          anything else is ignored before its key is fetched (spec-06 §3.4);
+          it used to be fetched and verified as RSA, so a correctly
+          RSA-signed item declaring an unknown algorithm passed, and many
+          distinct unknown names meant as many sequential DNS lookups. s= is
+          parsed once, not once per item accessed. A signature whose items
+          all name unknown algorithms is FAIL "has no signature with a
+          supported algorithm"; a known item whose value is not a padded
+          base64string is PERMERROR "syntax error"; a key of the wrong type
+          for the algorithm is PERMERROR "algorithm mismatch".
+        - Behaviour change: key records are validated whole
+          (Mail::DKIM2::Common::parse_dkim_key_record, new): a repeated tag,
+          v= not first or not exactly DKIM1, a missing, unpadded or
+          non-base64 p=, or a p= that is not a key make the record a syntax
+          error; an empty p= is revoked; k= other than rsa or ed25519 is no
+          longer read as RSA. More than one TXT record for a selector is an
+          error (one record in several strings is joined). The verifier
+          reports these as spec-06 §11.5's PERMERRORs naming the selector, and
+          a key absent for every item as PERMERROR "public key <sel> does not
+          exist". parse_dkim_pubkey keeps its key-or-undef contract.
+        - Behaviour change: Message-Instance tag names are case insignificant
+          (spec-06 §7): M= and H= are read as m= and h= everywhere, and a tag
+          repeated in any case is PERMERROR "syntax error" -- a wrong h= ahead
+          of the right one used to be overwritten and pass.
+        - Behaviour change: t= must be 1*DIGIT; anything else is PERMERROR
+          "syntax error", even with SkipTimestampCheck, and t=0 is subject to
+          the age check.
+        - Behaviour change: a failed signature item reads "DKIM2-Signature
+          i=N <selector> incorrect signature" (spec-06 §11.6).
+        - Body Recipes come from a built-in capped Myers diff, the same
+          algorithm as this repository's C, Python, Go and Mailman
+          generators (vectors/body-diff.json); Algorithm::Diff is no longer a
+          prerequisite. Repeated-line bodies no longer take quadratic time.
+          A Recipe carries at most MaxRecipeLiterals literal lines (new
+          calculate option, default 1000); over that the default path gives
+          the null body Recipe, and EpilogueThreshold (no longer capped) the
+          epilogue. dkim2-milter --max-recipe-literals and the DKIM2Sign
+          handler's max_recipe_literals set it. An unchanged body under
+          EpilogueThreshold gets no Recipe instead of an epilogue copy.
+        - Behaviour change: every public constructor and class method that
+          takes named options croaks on one it does not know, as the
+          CONVENTIONS always said (Signature->new, MessageInstance
+          calculate/verify/undo/chain_verifies, Gate->check, DSN
+          generate/authenticate/propagate, MessageStore->new,
+          Validate::report, fold_header).
+        - Mail::DKIM2::DSN: authenticate and propagate take keys from DNS
+          through Resolver when no PubkeyCallback is given, as documented;
+          propagate croaks unless ForwarderDomain is the d= of the hop it
+          strips; the POD says what ok means for an unsigned DSN.
+        - Every eval in the library, Validate, Reflector and Split included,
+          rethrows a host's exception object.
+        - TagValueList/Signature parse() always returns a new object.
+        - The README and Mail::DKIM2 SYNOPSIS sign and verify correctly, and
+          t/synopsis.t runs them.
+
 0.17    2026-10-08
         - Mail::DKIM2::Gate: when the Gate runs the Verifier itself and it
           passes, the Verifier has already walked the whole Message-Instance

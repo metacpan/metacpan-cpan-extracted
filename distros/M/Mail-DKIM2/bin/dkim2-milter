@@ -77,6 +77,7 @@ GetOptions(\%opts,
     'allow-null-body-recipe',
     'use-epilogue',
     'epilogue-threshold=i',
+    'max-recipe-literals=i',
     'help|h',
 ) or pod2usage(2);
 
@@ -84,6 +85,13 @@ pod2usage(-exitval => 0, -verbose => 2, -noperldoc => 1) if $opts{help};
 
 if ($opts{'use-epilogue'} && defined $opts{'epilogue-threshold'}) {
     die "--use-epilogue and --epilogue-threshold are mutually exclusive\n";
+}
+if (defined $opts{'max-recipe-literals'}
+    && ($opts{'use-epilogue'} || defined $opts{'epilogue-threshold'})) {
+    die "--max-recipe-literals cannot be combined with --use-epilogue or --epilogue-threshold\n";
+}
+if (defined $opts{'max-recipe-literals'} && $opts{'max-recipe-literals'} < 0) {
+    die "--max-recipe-literals must not be negative\n";
 }
 
 $opts{socket}    //= 'unix:/var/run/dkim2-milter.sock';
@@ -156,6 +164,10 @@ if ($opts{'use-epilogue'}) {
 elsif (defined $opts{'epilogue-threshold'}) {
     $mi_opts{EpilogueThreshold} = $opts{'epilogue-threshold'};
     warn "dkim2-milter: MI strategy: EpilogueThreshold=$opts{'epilogue-threshold'}\n";
+}
+elsif (defined $opts{'max-recipe-literals'}) {
+    $mi_opts{MaxRecipeLiterals} = $opts{'max-recipe-literals'};
+    warn "dkim2-milter: MI strategy: MaxRecipeLiterals=$opts{'max-recipe-literals'}\n";
 }
 
 # --- Key directory lookup ---
@@ -1004,6 +1016,13 @@ diff recipe would contain more than I<N> literal (non-range) lines.  Small
 changes (C<< <= N >> lines) stay as a compact inline diff; large changes
 fall back to epilogue.  C<5> is a reasonable starting value.
 Cannot be combined with C<--use-epilogue>.
+
+=item B<--max-recipe-literals> I<N>
+
+Without either epilogue option, a diff-based MI whose body recipe would
+need more than I<N> literal lines (default 1000) gets a null body recipe
+instead: the previous body is declared unrecoverable rather than carried
+in the header.  Cannot be combined with the epilogue options.
 
 =item B<--dns-json> I<PATH>
 

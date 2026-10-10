@@ -6,9 +6,7 @@ use warnings;
 use CGI::Info;
 use Log::Abstraction;
 use Test::Most;
-
-use lib 't/lib';
-use MyLogger;
+use Test::Log::Abstraction;
 
 BEGIN { use_ok('CGI::Lingua') }
 
@@ -86,7 +84,7 @@ if(-e 't/online.enabled') {
 	$l = CGI::Lingua->new(
 		supported => ['en', 'fr', 'en-gb', 'en-us'],
 		syslog => 1,
-		logger => MyLogger->new()
+		logger => Test::Log::Abstraction->new()
 	);
 	ok(defined $l);
 	ok($l->isa('CGI::Lingua'));
@@ -354,7 +352,7 @@ if(-e 't/online.enabled') {
 		supported => ['ja', 'en'],
 		syslog => 1,
 		dont_use_ip => 1,
-		logger => MyLogger->new()
+		logger => Test::Log::Abstraction->new()
 	}]);
 	cmp_ok($l->language(), 'eq', 'English', 'Checking quality value');
 	$ENV{'HTTP_ACCEPT_LANGUAGE'} = 'en;q=0.1, ja;q=0.5';
@@ -362,7 +360,7 @@ if(-e 't/online.enabled') {
 		supported => ['ja', 'en'],
 		syslog => 1,
 		dont_use_ip => 1,
-		logger => MyLogger->new()
+		logger => Test::Log::Abstraction->new()
 	}]);
 	cmp_ok($l->preferred_language(), 'eq', 'Japanese', 'Checking quality value');
 

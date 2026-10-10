@@ -389,10 +389,17 @@ subtest 'Score::validate -- path: no staves -> returns diagnostic' => sub {
 };
 
 subtest 'Score::validate -- path: has staves -> returns empty diagnostics' => sub {
+	my $staff = Music::NWC2MusicXML::Staff->new;
+	$staff->add_event(Music::NWC2MusicXML::Event->new(
+		type     => 'Note',
+		duration => [1, 1],
+		data     => { nwc_pos => '0', base_dur => '4th', dots => 0,
+		              articulations => [], opts => {} },
+	));
 	my $score = Music::NWC2MusicXML::Score->new;
-	$score->add_staff(Music::NWC2MusicXML::Staff->new);
+	$score->add_staff($staff);
 	my $diags = $score->validate;
-	is(scalar @$diags, 0, 'validate returns no diagnostics for non-empty score');
+	is(scalar @$diags, 0, 'validate returns no diagnostics for well-formed score');
 };
 
 # ---------------------------------------------------------------------------

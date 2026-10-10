@@ -106,6 +106,16 @@ my %WriteMakefileArgs = (
         'Object::Proto::Sugar' => '0.06',
         'Digest::SHA'          => '0',
     },
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        prereqs => {
+            runtime => {
+                recommends => {
+                    'Term::ReadKey' => '0',
+                },
+            },
+        },
+    },
     XS     => { 'Mahjong.xs' => 'Mahjong.c' },
     C      => [ 'Mahjong.c', 'mahjong_tiles.c', 'mahjong_decompose.c', 'mahjong_shanten.c' ],
     OBJECT => 'Mahjong$(OBJ_EXT) mahjong_tiles$(OBJ_EXT) mahjong_decompose$(OBJ_EXT) mahjong_shanten$(OBJ_EXT)',

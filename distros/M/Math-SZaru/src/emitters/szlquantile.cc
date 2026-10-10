@@ -341,14 +341,17 @@ void ComputeQuantiles(const vector<vector<Key>* >& buffer,
           }
         }
       }
-      // CHECK_GE(min_buffer_id, 0);
+      if (min_buffer_id < 0) {
+        quantiles->push_back(max_Key);
+        break;
+      }
 
       // Now increment "S" by the weight associated with "min_buffer_id".
       //
       // Note: The "weight" of elements in buffer[0] and buffer[1] is 1 (these
       //       are leaf nodes in the Munro-Paterson "tree of buffers".
       //       The weight of elements in buffer[i] is 2^(i-1) for i >= 2.
-      int64 S_incr = (min_buffer_id <= 1) ? 1 : (0x1LL << (min_buffer_id - 1));
+      int64 S_incr = (min_buffer_id <= 1) ? 1 : (min_buffer_id - 1 < 62 ? (static_cast<int64>(1) << (min_buffer_id - 1)) : (static_cast<int64>(1) << 62));
 
       // If we have met/exceeded "target_S", we have found the next quantile.
       // Then break the loop. Otherwise, just update index[min_buffer_id] and S

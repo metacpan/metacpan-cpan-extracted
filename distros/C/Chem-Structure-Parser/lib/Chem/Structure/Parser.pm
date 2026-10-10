@@ -3,7 +3,7 @@
 require 5.010001;
 use strict;
 package Chem::Structure::Parser;
-our $VERSION = 0.038;
+our $VERSION = 0.039;
 require XSLoader;
 use warnings FATAL => 'all';
 # No `use autodie': it would ask every installer for a prerequisite in order to
@@ -137,20 +137,59 @@ my %VIEW_OPT = (dssp => { dssp => 1 });
 # other spellings of a view, which the error message does not list
 my %VIEW_ALIAS = (torsion => 'torsions');
 
+# _args($who, @args) -- @args, once it is a first argument followed by name =>
+# value pairs.  A list with a stray element in it died where it was unpacked
+# into a hash, of 'Odd number of elements in hash assignment' under FATAL
+# warnings, which said neither which function had been called nor what was wrong
+# with the call.
+sub _args {
+	my $who = shift;
+	die "$who: the options after the first argument come in name => value pairs, "
+	  . 'and these are an odd number' if @_ > 1 && !(@_ % 2);
+	return @_;
+}
+
+# _view_args($who, $first, @args) -- the view a call names, if it names one, and
+# its options as a hash reference with the ones the view needs added.  $first
+# is how the message spells the first argument, '$file' or '$text'.  A second
+# argument that is a plain string with an even number after it is a view rather
+# than the first half of an option pair; an odd number after anything else is a
+# list that is not pairs.
+sub _view_args {
+	my ($who, $first, @args) = @_;
+	my $view;
+	if (@args % 2 == 1 && defined $args[0] && !ref $args[0]) {
+		$view = shift @args;
+		$view = $VIEW_ALIAS{$view} if exists $VIEW_ALIAS{$view};
+		die "$who: '$view' is not a view; the ones there are: "
+		    . join(', ', sort keys %VIEW) . "\nOr did you mean an option? "
+		    . "Those are named pairs: $who($first, $view => 1)"
+			unless exists $VIEW{$view};
+	}
+	die "$who: the options come in name => value pairs, and these are an odd number"
+		if @args % 2;
+	return ($view, { @args, (defined $view && $VIEW_OPT{$view} ? %{ $VIEW_OPT{$view} } : ()) });
+}
+
+# _view_of($info, $view, $o, $who) -- the structure, or the one view of it asked for
+sub _view_of {
+	my ($info, $view, $o, $who) = @_;
+	return $info unless defined $view;
+	# a view asked for on its own is the whole answer, and asking for one of a
+	# file read with features => 0 or atoms => 0 is a mistake worth saying out
+	# loud rather than an empty hash that reads as a structure with none
+	die "$who: '$view' needs the features, and this file was read with "
+	  . (!$o->{atoms} ? 'atoms => 0' : 'features => 0')
+		unless $info->{features} || $VIEW_OPT{$view};
+	return $VIEW{$view}->($info);
+}
+
 # structure_info($file, %opt) -- read a structure file into a hash of hashes.
 # structure_info($file, $view, %opt) -- one view of it, and nothing else.
 sub structure_info {
 	my $file = shift;
-	my $view;
-	if (@_ % 2 == 1 && defined $_[0] && !ref $_[0]) {
-		$view = shift;
-		$view = $VIEW_ALIAS{$view} if exists $VIEW_ALIAS{$view};
-		die "structure_info: '$view' is not a view; the ones there are: "
-		    . join(', ', sort keys %VIEW) . "\nOr did you mean an option? "
-		    . "Those are named pairs: structure_info(\$file, $view => 1)"
-			unless exists $VIEW{$view};
-	}
-	my %opt = (@_, (defined $view && $VIEW_OPT{$view} ? %{ $VIEW_OPT{$view} } : ()));
+	my ($view, $optref) = _view_args('structure_info', '$file', @_);
+	my %opt = %$optref;
 	die 'structure_info: no file name given' unless defined $file && length $file;
 	die "structure_info: '$file' does not exist"  unless -e $file;
 	die "structure_info: '$file' is a directory"  if -d $file;
@@ -168,15 +207,7 @@ sub structure_info {
 		       . (exists $NOT_YET{$fmt}
 		          ? "$NOT_YET{$fmt} is not implemented yet; formats read today: " . join(', ', sort keys %READER)
 		          : "unrecognized format '$fmt'; formats read today: " . join(', ', sort keys %READER));
-	my $info = $reader->($file, $o);
-	return $info unless defined $view;
-	# a view asked for on its own is the whole answer, and asking for one of a
-	# file read with features => 0 or atoms => 0 is a mistake worth saying out
-	# loud rather than an empty hash that reads as a structure with none
-	die "structure_info: '$view' needs the features, and this file was read with "
-	  . (!$o->{atoms} ? 'atoms => 0' : 'features => 0')
-		unless $info->{features} || $VIEW_OPT{$view};
-	return $VIEW{$view}->($info);
+	return _view_of($reader->($file, $o), $view, $o, 'structure_info');
 }
 
 # _torsion_view($info) -- each chain's torsions hash, keyed by chain id, with
@@ -198,10 +229,12 @@ sub _torsion_view {
 }
 
 # structure_info_string($text, %opt) -- the same, from a string already in hand.
+# structure_info_string($text, $view, %opt) -- and one view of it, the same way.
 sub structure_info_string {
-	my ($text, %opt) = @_;
+	my $text = shift;
+	my ($view, $opt) = _view_args('structure_info_string', '$text', @_);
 	die 'structure_info_string: text is undefined' unless defined $text;
-	my $o = _options(\%opt, 'structure_info_string');
+	my $o = _options($opt, 'structure_info_string');
 	my $fmt = defined $o->{format} ? _alias($o->{format}) : _sniff_format($text);
 	# a string has no name to go on, and the caller has already said this is a
 	# structure, so text that looks like nothing in particular is read as PDB.
@@ -214,7 +247,8 @@ sub structure_info_string {
 		unless $READER{$fmt};
 	my $parse = $XS{$fmt}{string};
 	my $p = $parse->($text, _xs_options($o));
-	return _build_structure(_retry_model($p, $o, $parse, $text), $o, undef);
+	return _view_of(_build_structure(_retry_model($p, $o, $parse, $text), $o, undef),
+	                $view, $o, 'structure_info_string');
 }
 
 # formats() -- the formats that can be read, in list context; in scalar
@@ -294,7 +328,7 @@ sub structure_ligands {
 # already in hand there is nothing left for options to affect, so passing them
 # there is a mistake and is said to be one rather than quietly ignored.
 sub structure_sequences {
-	my ($info, %opt) = @_;
+	my ($info, %opt) = _args('structure_sequences', @_);
 	if (ref $info) {
 		die 'structure_sequences: options apply to reading a file, not to a structure already parsed: '
 		    . join(', ', sort keys %opt) if %opt;
@@ -743,7 +777,7 @@ sub _features_and_after {
 # the same answer for the price of the walk.  Name any option and it is
 # computed again with that option in force.
 sub structure_features {
-	my ($info, %opt) = @_;
+	my ($info, %opt) = _args('structure_features', @_);
 	_check_info($info, 'structure_features');
 	return $info->{features} if !%opt && $info->{features};
 	my $o = _feature_options(\%opt, 'structure_features',
@@ -763,7 +797,7 @@ sub structure_features {
 # rather than started from the whole structure's, which is the one thing the
 # rest of the walk would have saved it.
 sub structure_interface {
-	my ($info, %opt) = @_;
+	my ($info, %opt) = _args('structure_interface', @_);
 	_check_info($info, 'structure_interface');
 	if (!%opt && $info->{features}) {
 		return $info->{features}{interface} if $info->{features}{interface};
@@ -787,7 +821,7 @@ sub structure_interface {
 
 # structure_sasa($info, %opt) -- the solvent-accessible surface, and nothing else.
 sub structure_sasa {
-	my ($info, %opt) = @_;
+	my ($info, %opt) = _args('structure_sasa', @_);
 	_check_info($info, 'structure_sasa');
 	return $info->{features}{sasa} if !%opt && $info->{features};
 	my $o = _feature_options(\%opt, 'structure_sasa', \@SASA_OPT);
@@ -807,7 +841,7 @@ sub structure_sasa {
 
 # structure_pi_stacking($info, %opt) -- the stacked pairs of aromatic rings.
 sub structure_pi_stacking {
-	my ($info, %opt) = @_;
+	my ($info, %opt) = _args('structure_pi_stacking', @_);
 	_check_info($info, 'structure_pi_stacking');
 	return $info->{features}{pi_stacking} if !%opt && $info->{features};
 	my $o = _feature_options(\%opt, 'structure_pi_stacking', \@PI_OPT);
@@ -828,7 +862,7 @@ sub structure_pi_stacking {
 
 # structure_contacts($info, %opt) -- which residues touch which.
 sub structure_contacts {
-	my ($info, %opt) = @_;
+	my ($info, %opt) = _args('structure_contacts', @_);
 	_check_info($info, 'structure_contacts');
 	return $info->{features}{contacts} if !%opt && $info->{features};
 	my $o = _feature_options(\%opt, 'structure_contacts', \@CONT_OPT);
@@ -848,7 +882,7 @@ sub structure_contacts {
 
 # structure_hbonds($info, %opt) -- the backbone hydrogen bonds.
 sub structure_hbonds {
-	my ($info, %opt) = @_;
+	my ($info, %opt) = _args('structure_hbonds', @_);
 	_check_info($info, 'structure_hbonds');
 	return $info->{features}{hbonds} if !%opt && $info->{features};
 	my $o = _feature_options(\%opt, 'structure_hbonds', \@HB_OPT);
@@ -862,7 +896,7 @@ sub structure_hbonds {
 # letter.  There is nothing to tune, so there are no options: DSSP is the
 # hydrogen bonds and the two constants Kabsch and Sander chose for them.
 sub structure_dssp {
-	my ($info, %opt) = @_;
+	my ($info, %opt) = _args('structure_dssp', @_);
 	_check_info($info, 'structure_dssp');
 	return $info->{features}{dssp} if !%opt && $info->{features};
 	my $o = _feature_options(\%opt, 'structure_dssp', []);
@@ -874,7 +908,7 @@ sub structure_dssp {
 
 # structure_disulfides($info, %opt) -- the SG-SG pairs close enough to be bonded.
 sub structure_disulfides {
-	my ($info, %opt) = @_;
+	my ($info, %opt) = _args('structure_disulfides', @_);
 	_check_info($info, 'structure_disulfides');
 	return $info->{features}{disulfides} if !%opt && $info->{features};
 	my $o = _feature_options(\%opt, 'structure_disulfides', \@SS_OPT);
@@ -894,7 +928,7 @@ sub structure_disulfides {
 
 # structure_base_pairs($info, %opt) -- the Watson-Crick and wobble base pairs.
 sub structure_base_pairs {
-	my ($info, %opt) = @_;
+	my ($info, %opt) = _args('structure_base_pairs', @_);
 	_check_info($info, 'structure_base_pairs');
 	return $info->{features}{base_pairs} if !%opt && $info->{features};
 	my $o = _feature_options(\%opt, 'structure_base_pairs', \@BP_OPT);
@@ -914,7 +948,7 @@ sub structure_base_pairs {
 
 # structure_base_stacks($info, %opt) -- how stacked every nearby pair of bases is.
 sub structure_base_stacks {
-	my ($info, %opt) = @_;
+	my ($info, %opt) = _args('structure_base_stacks', @_);
 	_check_info($info, 'structure_base_stacks');
 	return $info->{features}{base_stacks} if !%opt && $info->{features};
 	my $o = _feature_options(\%opt, 'structure_base_stacks', \@BS_OPT);
@@ -1614,6 +1648,15 @@ sub _options {
 	if (defined $o{model} && $o{model} ne 'all') {
 		die "$who: model must be a whole number or 'all', not '$o{model}'"
 			unless $o{model} =~ /\A[0-9]+\z/;
+		# And one the parse can hold.  '9223372036854775808' passed the pattern
+		# and wrapped to a negative IV on its way in, which is the parse's "every
+		# model": one model asked for, all of them handed back.  Compared as
+		# digits, because as numbers the two ends of the range round together.
+		(my $digits = $o{model}) =~ s/\A0+(?=[0-9])//;
+		my $max = ~0 >> 1;    # IV_MAX, whatever the width of this perl's IV
+		die "$who: model $o{model} is larger than any model number this perl can hold ($max)"
+			if length($digits) > length($max)
+			|| (length($digits) == length($max) && $digits gt $max);
 	}
 	return \%o;
 }
@@ -1928,6 +1971,9 @@ sub _assemble {
 	# used to apply an atom at a time
 	my $atom_of = ($o->{atoms} && @{ $p->{atoms} || [] }) ? $p->{atoms} : undef;
 	my ($res_atoms, $res_order) = @{$p}{qw(res_atoms res_order)};
+	# per run, whether the parse filed it as a residue of its own that was given
+	# a number another residue of the chain already has; see run_key() in the XS
+	my $apart = $p->{res_apart} || [];
 	# the residue's identity and first element are one entry per residue in
 	# both of the shapes structure_info() asks for -- the atom hashes, and the
 	# slim columns of atoms => 0 -- and per atom only in the full columns
@@ -1953,6 +1999,12 @@ sub _assemble {
 		my $num = $resseq->[$ri];
 		my $ic  = $icode->[$ri];
 		my $key = (defined $num ? $num : '') . $ic;
+		# Such a residue -- a water after TER, a docked ligand numbered 1 in the
+		# protein's chain -- is keyed with its name after the number, '1(HOH)',
+		# because the number alone is taken.  It is filed by that key here as the
+		# parse filed its atoms by it, and never meets the residue it collided
+		# with.
+		$key .= "($rn)" if $apart->[$r];
 
 		my $mm = $by_model{$m} ||= { chains => {}, chain_order => [] };
 		my $c  = $mm->{chains}{$cid};
@@ -2070,7 +2122,7 @@ sub _assemble {
 	return \%by_model;
 }
 
-#  per-chain sequence, type and gaps 
+# per-chain sequence, type and gaps
 sub _finish_chains {
 	my ($info) = @_;
 	# with model => 'all' the main model's chains are one of the models, so
@@ -2269,21 +2321,31 @@ sub _chain_stats {
 			organism => $s->{organism_scientific},
 		} for @{ $info->{chain_order} };
 	}
-	for my $cid (@{ $info->{chain_order} }) {
-		my $c = $info->{chains}{$cid};
-		if (my $s = $info->{seqres}{$cid}) {
-			$c->{seqres}        = $s->{sequence};
-			$c->{seqres_length} = $s->{length};
-			$c->{n_missing}     = $s->{length} - $c->{n_polymer} if defined $s->{length};
+	# Every model's chains, not only the main model's: with model => 'all' each
+	# model is its own set of chains, and the header describes all of them alike.
+	# 2ll7 read that way had CALMODULIN and its 148-residue SEQRES on model 1's
+	# chain A and nothing on the other nineteen.  The main model is one of the
+	# models, so walking the models covers it.
+	my @sets = $info->{models}
+	         ? map { $info->{models}{$_} } sort { $a <=> $b } keys %{ $info->{models} }
+	         : ({ chains => $info->{chains}, chain_order => $info->{chain_order} });
+	for my $set (@sets) {
+		for my $cid (@{ $set->{chain_order} }) {
+			my $c = $set->{chains}{$cid};
+			if (my $s = $info->{seqres}{$cid}) {
+				$c->{seqres}        = $s->{sequence};
+				$c->{seqres_length} = $s->{length};
+				$c->{n_missing}     = $s->{length} - $c->{n_polymer} if defined $s->{length};
+			}
+			if (my $e = $info->{entity_of_chain}{$cid}) {
+				$c->{mol_id}   = $e->{mol_id};
+				$c->{molecule} = $e->{molecule} if defined $e->{molecule};
+				$c->{organism} = $e->{organism} if defined $e->{organism};
+				$c->{fragment} = $e->{fragment} if defined $e->{fragment};
+				$c->{ec}       = $e->{ec}       if defined $e->{ec};
+			}
+			$c->{dbref} = $info->{dbref}{$cid} if $info->{dbref}{$cid};
 		}
-		if (my $e = $info->{entity_of_chain}{$cid}) {
-			$c->{mol_id}   = $e->{mol_id};
-			$c->{molecule} = $e->{molecule} if defined $e->{molecule};
-			$c->{organism} = $e->{organism} if defined $e->{organism};
-			$c->{fragment} = $e->{fragment} if defined $e->{fragment};
-			$c->{ec}       = $e->{ec}       if defined $e->{ec};
-		}
-		$c->{dbref} = $info->{dbref}{$cid} if $info->{dbref}{$cid};
 	}
 	return $info;
 }
@@ -2294,9 +2356,14 @@ sub _id_from {
 	return undef unless defined $file;
 	my ($base) = $file =~ m{([^/\\]+)\z};
 	$base =~ s/\.(gz|bz2|z)\z//i;
-	$base =~ s/\.(pdb|ent|cif|mmcif)\z//i;
+	# every suffix _detect_format() reads a format from: '2abc.pdbx' came back
+	# as the id 2ABC.PDBX
+	$base =~ s/\.(pdb|ent|cif|mmcif|pdbx)\z//i;
 	$base =~ s/\.ent\z//i;
-	$base =~ s/\Apdb//i;
+	# The archive's own name for an entry is pdb1abc.ent, and the prefix is not
+	# part of the id.  Only that: a file called pdbfixer_output.pdb came back as
+	# FIXER_OUTPUT, the prefix taken off a name that never had one.
+	$base =~ s/\Apdb(?=[0-9][0-9a-z]{3}\z)//i;
 	return uc $base;
 }
 
@@ -2318,7 +2385,27 @@ sub _meta_defaults {
 	$info->{$_} = {}    for qw(header compound source seqres het hetnam formul
 	                           remarks dbref entity_of_chain cryst1 journal
 	                           modres);
-	$info->{$_} = []    for qw(helix sheet ssbond link cispep revdat site conect);
+	# seqadv was missing from this list, so a file with no SEQADV -- every mmCIF
+	# file, and any PDB file without one -- had no key at all where every other
+	# list is an empty one
+	$info->{$_} = []    for qw(helix sheet ssbond link cispep revdat site conect
+	                           seqadv);
+	return $info;
+}
+
+# _het_names($info) -- hetnam and formul, which the README's tree has always
+# listed and nothing ever filled: each heterogen's name and its formula, keyed by
+# its id, read off the het hash after either reader has filled that.  The same
+# text stays in the het hash, where it is beside the rest of what is known
+# about the heterogen; these are the two flat lookups a caller who wants only
+# the name reaches for.
+sub _het_names {
+	my ($info) = @_;
+	for my $id (keys %{ $info->{het} }) {
+		my $h = $info->{het}{$id};
+		$info->{hetnam}{$id} = $h->{name}    if defined $h->{name};
+		$info->{formul}{$id} = $h->{formula} if defined $h->{formula};
+	}
 	return $info;
 }
 
@@ -2335,7 +2422,12 @@ sub _parse_meta {
 		};
 	}
 	# The entry id, for _untail(): the text records of an old file end in it, and
-	# it is the only thing that tells the stationery from the text.
+	# it is the only thing that tells the stationery from the text.  Every field
+	# read past column 72 goes through it -- the text records, REVDAT's record
+	# list, the REMARKs, the comments of SEQADV and MODRES, HETNAM, HETSYN and
+	# FORMUL, and the SSBOND and LINK lengths -- because each of them came back
+	# with the id on the end otherwise: pdb1gdr's first revision touched
+	# '1GDR   6' and its REMARK 2 read '1GDR  44'.
 	my $eid = $info->{header}{id_code};
 
 	# a record that is not in the file reads as undef, not as an empty string:
@@ -2362,7 +2454,7 @@ sub _parse_meta {
 	for my $l (@{ $meta->{REVDAT} || [] }) {
 		my $prev = $info->{revdat}[-1];
 		if (length _c($l, 10, 2) && $prev && $prev->{num} eq _c($l, 7, 3)) {
-			$prev->{what} = _rejoin($prev->{what}, _c($l, 39));
+			$prev->{what} = _rejoin($prev->{what}, _c(_untail($l, $eid), 39));
 			next;
 		}
 		push @{ $info->{revdat} }, {
@@ -2370,7 +2462,7 @@ sub _parse_meta {
 			date => _c($l, 13, 9),
 			id   => _c($l, 23, 4),
 			type => _c($l, 31, 1),
-			what => _c($l, 39),
+			what => _c(_untail($l, $eid), 39),
 		};
 	}
 
@@ -2391,7 +2483,7 @@ sub _parse_meta {
 	for my $l (@{ $meta->{REMARK} || [] }) {
 		my $n = _c($l, 7, 3);
 		next unless length $n;
-		push @{ $info->{remarks}{$n} }, _c($l, 11);
+		push @{ $info->{remarks}{$n} }, _c(_untail($l, $eid), 11);
 	}
 	for my $l (@{ $info->{remarks}{2} || [] }) {
 		$info->{resolution} = $1 + 0 if $l =~ /RESOLUTION\.\s+($NUM)\s+ANGSTROM/;
@@ -2508,7 +2600,7 @@ sub _parse_meta {
 			accession => _c($l, 29, 9),
 			db_res    => _c($l, 39, 3),
 			db_seq    => _c($l, 43, 5),
-			comment   => _c($l, 49),
+			comment   => _c(_untail($l, $eid), 49),
 		};
 	}
 	for my $l (@{ $meta->{MODRES} || [] }) {
@@ -2516,7 +2608,7 @@ sub _parse_meta {
 		$info->{modres}{$r} ||= {
 			resname  => $r,
 			standard => _c($l, 24, 3),
-			comment  => _c($l, 29),
+			comment  => _c(_untail($l, $eid), 29),
 		};
 	}
 
@@ -2533,18 +2625,18 @@ sub _parse_meta {
 	}
 	for my $l (@{ $meta->{HETNAM} || [] }) {
 		my $id = _c($l, 11, 3);
-		my $t  = _c($l, 15);
+		my $t  = _c(_untail($l, $eid), 15);
 		$info->{het}{$id}{het_id} = $id;
 		$info->{het}{$id}{name} = _rejoin($info->{het}{$id}{name}, $t);
 	}
 	for my $l (@{ $meta->{HETSYN} || [] }) {
 		my $id = _c($l, 11, 3);
-		$info->{het}{$id}{synonym} = _rejoin($info->{het}{$id}{synonym}, _c($l, 15));
+		$info->{het}{$id}{synonym} = _rejoin($info->{het}{$id}{synonym}, _c(_untail($l, $eid), 15));
 	}
 	for my $l (@{ $meta->{FORMUL} || [] }) {
 		my $id = _c($l, 12, 3);
 		$info->{het}{$id}{het_id}  = $id;
-		$info->{het}{$id}{formula} = _rejoin($info->{het}{$id}{formula}, _c($l, 19));
+		$info->{het}{$id}{formula} = _rejoin($info->{het}{$id}{formula}, _c(_untail($l, $eid), 19));
 		$info->{het}{$id}{water}   = 1 if _c($l, 18, 1) eq '*';
 	}
 
@@ -2588,7 +2680,7 @@ sub _parse_meta {
 			resseq1 => _c($l, 17, 4),
 			chain2  => _c($l, 29, 1),
 			resseq2 => _c($l, 31, 4),
-			length  => _c($l, 73, 5),
+			length  => _c(_untail($l, $eid), 73, 5),
 		};
 	}
 	for my $l (@{ $meta->{LINK} || [] }) {
@@ -2597,8 +2689,36 @@ sub _parse_meta {
 			chain1   => _c($l, 21, 1), resseq1  => _c($l, 22, 4),
 			name2    => _c($l, 42, 4), resname2 => _c($l, 47, 3),
 			chain2   => _c($l, 51, 1), resseq2  => _c($l, 52, 4),
-			length   => _c($l, 73, 5),
+			length   => _c(_untail($l, $eid), 73, 5),
 		};
+	}
+	# SITE -- the residues of each site, four to a line and as many lines as the
+	# site needs, every line carrying the site's id and its residue count again.
+	# Columns from the wwPDB format v3.3: the id in 12-14, the count in 16-17,
+	# and each residue eleven columns after the one before it, from 19 -- name,
+	# a blank, chain, number in four columns, insertion code.  site was in the
+	# keys a structure always has and nothing filled it, so a file with SITE
+	# records read the same as one without.
+	my %site_at;
+	for my $l (@{ $meta->{SITE} || [] }) {
+		my $id = _c($l, 11, 3);
+		next unless length $id;
+		my $s = $site_at{$id};
+		unless ($s) {
+			$s = $site_at{$id} = { id => $id, n_residues => _c($l, 15, 2), residues => [] };
+			push @{ $info->{site} }, $s;
+		}
+		for my $k (0 .. 3) {
+			my $at = 18 + 11 * $k;
+			my $rn = _c($l, $at, 3);
+			next unless length $rn;
+			push @{ $s->{residues} }, {
+				resname => $rn,
+				chain   => _c($l, $at + 4, 1),
+				resseq  => _c($l, $at + 5, 4),
+				icode   => _c($l, $at + 9, 1),
+			};
+		}
 	}
 	for my $l (@{ $meta->{CISPEP} || [] }) {
 		push @{ $info->{cispep} }, {
@@ -2628,6 +2748,7 @@ sub _parse_meta {
 		my $v = _c($n->[0], 10, 4);
 		$info->{n_models_declared} = $v + 0 if $v =~ /\A\d+\z/;
 	}
+	_het_names($info);
 	$info->{records} = { map { $_ => scalar @{ $meta->{$_} } } keys %$meta };
 	return $info;
 }
@@ -2639,7 +2760,13 @@ sub _mol_records {
 	my $text = _joined($lines, $from, $entry_id);
 	my %mol;
 	my $id = 1;
-	for my $piece (split /;/, $text) {
+	# A ';' ends a specification only where the next thing is another TOKEN: or
+	# the end of the record, past any stray ';' a depositor doubled it with.  One
+	# inside a value is part of the value: 3iaw's molecule is "[GLY51;AIB51']
+	# 'COVALENT DIMER' HIV-1 PROTEASE", and splitting on every ';' made it
+	# '[GLY51'.  Biopython 1.85's parse_pdb_header gives the whole name, as it
+	# does for 3ka2's "[L-ALA51;GLY51']HIV-1 PROTEASE".
+	for my $piece (split /;[;\s]*(?=\z|[A-Z0-9_][A-Z0-9_ ]*:)/, $text) {
 		next unless $piece =~ /\S/;
 		my ($k, $v) = $piece =~ /\A\s*([A-Z0-9_ ]+?)\s*:\s*(.*)\z/;
 		next unless defined $k;
@@ -2676,10 +2803,17 @@ sub _mol_records {
 sub _entities {
 	my ($info) = @_;
 	my %by_chain;
-	for my $id (keys %{ $info->{compound} }) {
+	# In MOL_ID order, and the first to name a chain keeps it.  A file that puts
+	# one chain under two MOL_IDs is malformed, and the chain used to take
+	# whichever the hash walked last -- one molecule under one PERL_HASH_SEED and
+	# the other under the next.  No PDBbind v2020 entry does it.
+	my @ids = sort { ($a =~ /\A[0-9]+\z/ && $b =~ /\A[0-9]+\z/) ? $a <=> $b : $a cmp $b }
+	          keys %{ $info->{compound} };
+	for my $id (@ids) {
 		my $c = $info->{compound}{$id};
 		my $s = $info->{source}{$id} || {};
 		for my $cid (@{ $c->{chain} || [] }) {
+			next if $by_chain{$cid};
 			$by_chain{$cid} = {
 				mol_id   => $id,
 				molecule => $c->{molecule},
@@ -2800,6 +2934,7 @@ sub _parse_cif_meta {
 	_cif_seqres($info, $p);
 	_cif_het($info, $p);
 	_cif_annotations($info, $p);
+	_het_names($info);
 
 	# what the file actually contained, by category, which is the mmCIF answer
 	# to the question $info->{records} answers for a PDB file
@@ -2812,7 +2947,7 @@ sub _parse_cif_meta {
 	return $info;
 }
 
-#  the entities, and which chains they are 
+# the entities, and which chains they are
 #
 # COMPND and SOURCE in a PDB file are one _entity plus one _entity_src_* here,
 # so they are put back into the shape _entities() already knows how to turn
@@ -2895,7 +3030,7 @@ sub _cif_entities {
 	return $info;
 }
 
-#  SEQRES 
+# SEQRES
 #
 # _entity_poly_seq is the residue list, one row per position, per entity;
 # _entity_poly says which chains an entity was crystallised as.  A chain's
@@ -2983,7 +3118,7 @@ sub _cif_het {
 	return $info;
 }
 
-#  secondary structure, bonds and database cross-references 
+# secondary structure, bonds and database cross-references
 sub _cif_annotations {
 	my ($info, $p) = @_;
 
@@ -3092,6 +3227,52 @@ sub _cif_annotations {
 		};
 	}
 
+	# SEQADV is _struct_ref_seq_dif, a row per difference from the database
+	# sequence.  The fields are the PDB reader's, and so is the empty string for
+	# one the file leaves '?', which is what a blank SEQADV column reads as.
+	for my $r (@{ _cif_rows($p, '_struct_ref_seq_dif') }) {
+		push @{ $info->{seqadv} }, {
+			resname   => _t($r->{mon_id}),
+			chain     => _t($r->{pdbx_pdb_strand_id}),
+			resseq    => _t($r->{pdbx_auth_seq_num}),
+			database  => _t($r->{pdbx_seq_db_name}),
+			accession => _t($r->{pdbx_seq_db_accession_code}),
+			db_res    => _t($r->{db_mon_id}),
+			db_seq    => _t($r->{pdbx_seq_db_seq_num}),
+			comment   => _t($r->{details}),
+		};
+	}
+
+	# SITE is two categories here: _struct_site, a row per site with its residue
+	# count, and _struct_site_gen, a row per residue of a site.  Auth names
+	# first, as everywhere in this reader, and a site that only the residues
+	# name is still a site, counted from them.
+	my %site_at;
+	for my $r (@{ _cif_rows($p, '_struct_site') }) {
+		next unless defined $r->{id};
+		push @{ $info->{site} }, $site_at{ $r->{id} } = {
+			id => $r->{id}, n_residues => _t($r->{pdbx_num_residues}), residues => [],
+		};
+	}
+	for my $r (@{ _cif_rows($p, '_struct_site_gen') }) {
+		my $id = $r->{site_id};
+		next unless defined $id;
+		my $s = $site_at{$id};
+		unless ($s) {
+			$s = $site_at{$id} = { id => $id, n_residues => '', residues => [] };
+			push @{ $info->{site} }, $s;
+		}
+		push @{ $s->{residues} }, {
+			resname => _t(_cif_named($r, 'comp_id')),
+			chain   => _t(_cif_named($r, 'asym_id')),
+			resseq  => _t(_cif_named($r, 'seq_id')),
+			icode   => _t($r->{pdbx_auth_ins_code}),
+		};
+	}
+	for my $s (@{ $info->{site} }) {
+		$s->{n_residues} = scalar @{ $s->{residues} } unless length $s->{n_residues};
+	}
+
 	for my $r (@{ _cif_rows($p, '_pdbx_audit_revision_history') }) {
 		push @{ $info->{revdat} }, {
 			num  => $r->{ordinal},
@@ -3103,7 +3284,7 @@ sub _cif_annotations {
 	return $info;
 }
 
-#  reading the parsed categories 
+# reading the parsed categories
 
 # _cif_rows($p, $category) -- a category as a list of rows, whether it was
 # written as a loop_ or, having only one row, as a run of plain tags.  The
@@ -3167,7 +3348,16 @@ sub _cif_ptnr {
 	return undef;
 }
 
-#  small helpers 
+# the same, for a category that names its columns auth_$item and label_$item
+sub _cif_named {
+	my ($r, $item) = @_;
+	for my $k ("auth_$item", "label_$item") {
+		return $r->{$k} if defined $r->{$k} && length $r->{$k};
+	}
+	return undef;
+}
+
+# small helpers
 
 sub _t {
 	my ($s) = @_;
@@ -3548,6 +3738,21 @@ key:
   <td><code>_chem_comp</code>, <code>_pdbx_nonpoly_scheme</code></td>
 </tr>
 <tr>
+  <td><code>hetnam</code>, <code>formul</code></td>
+  <td><code>HETNAM</code>, <code>FORMUL</code></td>
+  <td><code>_chem_comp</code></td>
+</tr>
+<tr>
+  <td><code>seqadv</code></td>
+  <td><code>SEQADV</code></td>
+  <td><code>_struct_ref_seq_dif</code></td>
+</tr>
+<tr>
+  <td><code>site</code></td>
+  <td><code>SITE</code></td>
+  <td><code>_struct_site</code>, <code>_struct_site_gen</code></td>
+</tr>
+<tr>
   <td><code>helix</code></td>
   <td><code>HELIX</code></td>
   <td><code>_struct_conf</code>, with <code>pdbx_PDB_helix_id</code> as the id</td>
@@ -3585,7 +3790,7 @@ key:
 <tr>
   <td><code>n_models</code></td>
   <td><code>MODEL</code></td>
-  <td><code>_atom_site.pdbx_PDB_model_num</code></td>
+  <td><code>_atom_site.pdbx_PDB_model_num</code>, counted as distinct numbers</td>
 </tr>
 </tbody>
 </table>
@@ -3593,6 +3798,13 @@ key:
 =end html
 
 
+
+Where a file ends is decided the way gemmi decides it. A PDB file ends at its
+C<END> record, and what a program appends after one — a second docking pose, a
+second structure — is not read into the first. An mmCIF file is its first data
+block, and a second C<data_> ends it. An mmCIF loop whose last row has fewer
+values than the loop has columns was cut short, and that row is left out; every
+whole row before it is read, as the whole lines of a cut-short PDB file are.
 
 =head1 Installing
 
@@ -3728,8 +3940,8 @@ file, real values, the long lists cut short:
  ├── modres          { }                     no MSE-style residues here
  ├── het
  │   └── HOH         { het_id 'HOH', formula '69(H2 O)', water 1 }
- ├── hetnam          { }
- ├── formul          { }
+ ├── hetnam          { }                     HETNAM's name by het id: ZN 'ZINC ION'
+ ├── formul          { HOH '69(H2 O)' }      FORMUL's formula by het id
  ├── helix           [ { id '1', class '1', length '29',
  │                       init_chain 'A', init_resname 'SER', init_resseq '7',
  │                       end_chain 'A', end_resname 'TYR', end_resseq '35' },
@@ -3739,7 +3951,11 @@ file, real values, the long lists cut short:
  │                       chain2 'A', resseq2 '165', length '2.02' }, ... ]  5
  ├── link            [ ]
  ├── cispep          [ ]
- ├── site            [ ]
+ ├── site            [ ]                     none here; where SITE has them,
+ │                                           [ { id 'AC1', n_residues '4',
+ │                                               residues [ { resname 'HIS',
+ │                                               chain 'A', resseq '94',
+ │                                               icode '' }, ... ] }, ... ]
  ├── cryst1          { a '67.7', b '67.7', c '228',
  │                     alpha '90', beta '90', gamma '90',
  │                     sgroup 'P 43 21 2', z '8' }
@@ -3903,7 +4119,9 @@ A number too big for its columns is read the way cctbx, phenix and gemmi write
 it, in L<hybrid-36|https://cci.lbl.gov/hybrid_36/>: a residue numbered C<A000>
 in a PDB file is residue C<10000>, and an atom serial of C<A0000> is C<100000>,
 so a chain past 9,999 residues reads the same from a PDB file as from its
-mmCIF. A residue whose number field is blank, or is not a number in either
+mmCIF. A serial written out in six digits instead runs leftwards into the
+record name — C<ATOM 100000> — with every column after it in place, and is read
+as the atom it is, as gemmi reads it. A residue whose number field is blank, or is not a number in either
 spelling, has an C<undef> number and the empty key C<''>; it is still a residue
 of its own and not part of the one before it.
 
@@ -3914,6 +4132,19 @@ C and D, a selenomethionine that only went halfway in — and those are one
 residue, not two. It takes the name written first, counts the records of both
 states, and keeps the atoms that tell them apart, so an MSE/MET like that has
 both an SE and an SD, each carrying the conformers of its own state.
+
+A different residue given a number the chain already used is the exception.
+The archive never writes one, but a program that adds waters after C<TER> under
+the protein's chain, or a docking program that numbers its ligand 1 in the
+protein's chain, does, and that residue is keyed with its name after the
+number: the methionine stays C<1> and the water is C<1(HOH)>, with C<number> 1
+like the other. Such a run has another name, no altloc letter on its first
+record — one residue in two states writes every record of its second state
+with one — and one of the two is a HETATM, which is where Biopython's residue
+id, the record type with the number and insertion code, tells two residues
+apart. gemmi and Biopython both keep a water or a ligand written that way apart
+from the residue it collides with; two ATOM residues under one number stay one,
+as Biopython reads them.
 
 =head3 Counting elements
 
@@ -3955,6 +4186,16 @@ Only the 118 named elements are corrected. A file whose element column holds
 something that spells no element keeps it exactly as written — C<XX> stays C<XX>
 rather than becoming a plausible-looking C<Xx> — so a field the module does not
 recognise is visibly not an element rather than quietly dressed up as one.
+
+Where the file gives no element at all — no columns 77-78, no C<type_symbol> —
+it is worked out from the atom name by where the name sits in its four columns:
+C<CA> is a carbon alpha and C<CA> a calcium. Two readings come before that,
+for a name that is not where the format puts it, which every name in an mmCIF
+file is, having no columns. An atom named for its own residue in two letters
+that spell an element is that residue's ion, so C<NA> in a residue C<NA> is
+sodium and in any other residue a nitrogen; and a guess that spells nothing is
+read the other way, so C<ZN> written where a one-letter element goes is zinc
+and an C<HB1> started in column 13 is a hydrogen.
 
 Each count is an unsigned integer. It is counted up from zero and never down,
 so there is no sign for it to carry.
@@ -4048,10 +4289,17 @@ C<total_atoms> 411,648.
 =head2 structure_info_string
 
  my $info = structure_info_string($text, %options);
+ my $dssp = structure_info_string($text, 'dssp', %options);    # one view of it
 
-The same, for a structure already in a string. A string has no name to go on,
-so text that looks like nothing in particular is read as PDB; text that looks
-like another format still gets a straight answer about it.
+The same, for a structure already in a string, views included. A string has
+no name to go on, so text that looks like nothing in particular is read as
+PDB; text that looks like another format still gets a straight answer about
+it.
+
+A string is read as its characters, however perl happens to be holding it: one
+perl has upgraded to UTF-8 reads exactly as the same string not upgraded does,
+so a file decoded before it is handed over gives the answer the file itself
+gives.
 
 =head2 structure_atoms
 
@@ -6256,6 +6504,15 @@ Measuring with the rotation it returns itself gives 3.60899. C<t/rmsd.t> says so
 in its header, so that the next person to compare against it knows what they
 are looking at.
 
+Atoms that lie on one line are the one shape where the three references part
+company with QCP's own arithmetic. A line can be turned about itself freely,
+the eigenvalue the rotation comes from is a repeated one, and the cofactors
+QCP takes the rotation from all vanish; here the rotation is then found by
+Jacobi rotations of the 4x4 matrix instead, and the answer is
+C<SVDSuperimposer>'s — 0 for three carbons along one axis against the same
+three along another, where gemmi's C<superpose_positions> answers NaN. Before
+0.039 this module took the identity rotation there and answered 1.732 A.
+
 =head2 aa3to1
 
  aa3to1('ALA');    # 'A'
@@ -6376,9 +6633,12 @@ So the columns are read as columns. SEQRES takes 20-70 and no more; an element
 field that is not letters is not an element and the atom name is used instead;
 a charge field that is not a digit and a sign reads as the empty string a blank
 one would have given; a C<HELIX> length that is not a number reads as empty; and
-a text record whose columns 73-80 hold nothing but the entry id and a line
-number is cut there — text that is not the entry id is left alone, so a title
-that really does run to column 80 is not truncated.
+a record whose columns 73-80 hold nothing but the entry id and a line number is
+cut there before any field past column 72 is read — the text records, the
+REMARKs, a revision's list of records, the comments of C<SEQADV> and C<MODRES>,
+C<HETNAM>, C<HETSYN> and C<FORMUL>, and the C<SSBOND> and C<LINK> lengths. Text
+that is not the entry id is left alone, so a title that really does run to
+column 80 is not truncated.
 
 C<COMPND> and C<SOURCE> predate the C<MOL_ID> convention in a file like this and
 are free text: C<COMPND    GAMMA DELTA RESOLVASE>. There is no chain list in that
@@ -6599,6 +6859,12 @@ to take apart. Residue name lookup, three letters to one letter and the amino
 acid/nucleotide/water question, is a switch on three packed bytes, and one
 table serves C<aa3to1()>, C<res1()> and C<res_type()> so the three can never
 disagree.
+
+The sums are over the finite coordinates and B-factors only. A field that says
+C<nan> or C<inf> reads back as that number in the atom, as the file has it, and is
+left out of the box, the centres and the B-factor range wherever in the file
+it falls; in the physical properties an atom at NaN is nobody's neighbour, so
+it makes no contact, no hydrogen bond and no torsion.
 
 When atoms are wanted the parse builds the atom hashes itself, rather than
 handing back columns for Perl to rebuild them from; building every atom twice

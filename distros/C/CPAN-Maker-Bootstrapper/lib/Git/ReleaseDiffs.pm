@@ -15,7 +15,7 @@ use version;
 use parent qw(Class::Accessor::Fast);
 
 __PACKAGE__->follow_best_practice;
-__PACKAGE__->mk_accessors(qw(repo last_tag diffs diff_list repo_path release_version));
+__PACKAGE__->mk_accessors(qw(repo last_tag diffs diff_list status repo_path release_version));
 
 caller or exit __PACKAGE__->main;
 
@@ -73,7 +73,51 @@ sub new {
 
   $self->_diffs;
 
+  $self->_status;
+
   return $self;
+}
+
+########################################################################
+sub _status {
+########################################################################
+  my ($self) = @_;
+
+  my $repo = $self->get_repo;
+  my $head = $repo->head->peel('commit');
+
+  # HEAD -> index
+  my $diff = $repo->diff( { tree => $head->tree, } );
+
+  # index -> working tree
+  my $worktree_diff = $repo->diff;
+
+  # Produce HEAD -> working tree, equivalent to:
+  #
+  #   git diff --name-status HEAD
+  #
+  $diff->merge($worktree_diff);
+
+  $self->set_status( $diff->buffer('name_status') );
+
+  return;
+}
+
+########################################################################
+sub write_status {
+########################################################################
+  my ($self) = @_;
+
+  my $file = sprintf 'release-%s.status', $self->get_release_version;
+
+  open my $fh, '>', $file
+    or die "ERROR: could not open $file for writing: $!\n";
+
+  print {$fh} $self->get_status;
+
+  close $fh;
+
+  return $file;
 }
 
 ########################################################################
@@ -174,6 +218,7 @@ sub main {
 
   my $diffs   = $release->write_diffs;
   my $list    = $release->write_list;
+  my $status  = $release->write_status;
   my $tarball = $release->write_tarball;
 
   printf "wrote: %s\n", $_ for ( $diffs, $list, $tarball );

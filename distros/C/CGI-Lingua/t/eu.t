@@ -7,8 +7,7 @@
 use strict;
 use warnings;
 use Test::Most;
-use lib 't/lib';
-use MyLogger;
+use Test::Log::Abstraction;
 
 # Check comments in Whois records
 
@@ -32,7 +31,7 @@ unless(-e 't/online.enabled') {
 	$ENV{'REMOTE_ADDR'} = '212.49.88.99';
 	my $l = new_ok('CGI::Lingua' => [
 		supported => ['en'],
-		logger => MyLogger->new()
+		logger => Test::Log::Abstraction->new()
 	]);
 	ok(defined $l);
 	ok($l->isa('CGI::Lingua'));

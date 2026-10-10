@@ -1,3 +1,95 @@
+Fri Oct  9 16:49:25 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.3.1]:
+	* README.md: generated
+	* VERSION: bump
+	* lib/CLI/Simple.pm.in: POD update
+
+Fri Oct  9 07:46:59 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.3.0]:
+	* VERSION: bump
+	* README.md: generated
+	* .gitignore
+	- +*.reconciled, *.rendered, build-config.mk
+	- +release artifact files
+	* .includes/build-init.mk: new
+	* .includes/local.mk
+	- honor QUIET for dependency installation
+	- install runtime and test dependencies separately with carton
+	* .includes/perl.mk
+	- move build configuration and helper discovery out of perl.mk
+	- create .rendered module files before POD processing
+	- support POD extract, remove and passthrough from rendered sources
+	- check POD against rendered source
+	- batch perltidy and perlcritic checks through cmb
+	- batch resolve-vars processing
+	- allow perltidy/perlcritic default profiles when none configured
+	* .includes/publish.mk
+	- require PAUSE credentials before publishing
+	- add pre-publish and post-publish extension points
+	- test unpacked distribution before upload
+	* .includes/test.mk
+	- require local dependencies before tests
+	- add author, release and smoke test targets
+	- add test-all
+	- honor AUTHOR_TESTING, RELEASE_TESTING and AUTOMATED_TESTING
+	* .includes/update.mk
+	- move managed include definitions to Makefile
+	(update-available)
+	- use cmb update-available
+	- use cmb dist-file --path-only to locate cmb_md5sums.txt
+	* Makefile
+	- require GNU Make 4.3 or newer
+	- generate and include build-config.mk
+	- centralize managed make fragment inclusion
+	- add rendered source files as intermediate build artifacts
+	- batch dependency reconciliation
+	- avoid rewriting scanned dependency files when content has not changed
+	- only update provides when content changes
+	- remove provided modules from test-requires after reconciliation
+	- add real-quick target
+	- quick also disables POD checking
+	- build tarball explicitly from buildspec.yml
+	- clean rendered sources, reconciliation sentinels and build-config.mk
+	* builder
+	- clean before CI build
+	* cpanfile
+	- +Test::Exit, Test::Output, Log::Log4perl 1.58
+	* lib/CLI/Simple.pm.in
+	(_load_manifest)
+	- add selective command role declarations through roles:
+	- normalize scalar and array role specifications
+	- reject commands declared in both commands: and roles:
+	- retain commands: as legacy manifest metadata
+	- defer role composition until command selection
+	(main)
+	- pass legacy command and selective role metadata to constructor
+	(new)
+	- register manifest commands before command validation
+	- resolve aliases and abbreviations before selective role composition
+	- compose only the roles required by a selected roles: command
+	- preserve legacy commands: behavior by composing the complete legacy role set
+	- restore command aliases after legacy role composition
+	- validate that selected roles implement the command method
+	* lib/CLI/Simple/Constants.pm.in
+	- fix COLRO typo
+	(@VALID_OPTIONS)
+	- +command_roles, manifest_commands
+	* t/cli-simple-manifest.t
+	- test manifest parsing and normalization without eager role composition
+	- test duplicate commands and invalid selective role specifications
+	- test manifest metadata passthrough
+	* t/cli-simple-selective-roles.t: new
+	- test single and multiple selective roles
+	- test legacy all-role composition
+	- test abbreviation and command alias resolution
+	- test invalid role specifications and missing command methods
+	* test-requires
+	- Role::Tiny, Test::Exit, Test::Output, YAM::Tiny
+	* requires.skip: removed
+	* suggests: +Perl::Tidy
+
 Sun Oct  4 09:29:56 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[2.2.5]:

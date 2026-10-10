@@ -33,11 +33,8 @@ RT69509: {
 		ok($l->country() eq 'lk');
 		ok(defined($l->requested_language()));
 
-		TODO: {
-			local $TODO = 'https://rt.cpan.org/Public/Bug/Display.html?id=69509';
-
-			ok($l->language() eq 'Unknown');
-			ok(!defined($l->code_alpha2()));
-		}
+		# RT#69509, fixed: these used to be TODO
+		ok($l->language() eq 'Unknown');
+		ok(!defined($l->code_alpha2()));
 	}
 }

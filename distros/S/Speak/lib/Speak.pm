@@ -52,7 +52,7 @@ use base 'Exporter';
 
 use Clipboard;
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 {
 
@@ -239,11 +239,11 @@ sub _convert_mp3_to_wav ($mp3, $wav) {
 } ## end sub _convert_mp3_to_wav
 
 ## no critic (Subroutines::ProhibitExcessComplexity)
-sub speak ($msg, $log = undef, $lang = undef, $persona = undef) {
+sub speak ($msg, $log = undef, $lang = undef, $persona = undef, $output_file = undef) {
 
 =pod
 
-=head2 speak($msg, $log, $lang, $persona)
+=head2 speak($msg, $log, $lang, $persona, $output_file)
 
 Convert $msg to speech.
 
@@ -270,6 +270,10 @@ Language code (e.g. 'en', 'en-gb', 'en-au'). Defaults to $ENV{SPEAK_LANG} or 'en
 =item $persona
 
 Optional. The persona name to use for the voice. If provided, the MCP server is used instead of standard TTS.
+
+=item $output_file
+
+Optional. Path to save output speech audio file.
 
 =back
 
@@ -359,7 +363,7 @@ Returns:
   if ($server && $port) {
     if (hostname () eq $server) {
       local $ENV{TTS_DAEMON_URL} = "http://127.0.0.1:$port";
-      say_persona (undef, $msg, $persona);
+      say_persona (undef, $msg, $persona, $output_file);
       return;
     } else {
       my $ua = LWP::UserAgent->new;
@@ -426,7 +430,7 @@ Returns:
   } ## end if ($server && $port)
 
   if ($persona) {
-    say_persona (undef, $msg, $persona);
+    say_persona (undef, $msg, $persona, $output_file);
     return;
   }
 
@@ -626,7 +630,14 @@ The persona name to use for the voice. The system will look for a file named C<l
 sub say_persona {
 
   # Experimental - requires MCP server
-  my ($self, $text, $persona) = @_;
+  my ($self, $text, $persona, $output_file) = @_;
+
+  # Handle positional invocation if not called as method
+  if (defined $self && !ref $self && $self !~ /^\// && length $self > 0 && !defined $persona) {
+    $output_file = $persona;
+    $persona = $text;
+    $text = $self;
+  }
 
   my $mcp_client = '/opt/tts/mcp_client.pl';
 
@@ -638,6 +649,10 @@ sub say_persona {
   my @cmd = ($mcp_client, "--text", $text);
   if ($persona) {
     push @cmd, "--voice", $persona;
+  }
+  if ($output_file) {
+    push @cmd, "--output", $output_file;
+    push @cmd, "--keep";
   }
 
   system (@cmd);

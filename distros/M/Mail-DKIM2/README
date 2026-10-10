@@ -32,7 +32,6 @@ From this directory:
 DEPENDENCIES
 
     Perl 5.20 or later
-    Algorithm::Diff
     CryptX
     Email::MIME
     JSON
@@ -48,6 +47,15 @@ SYNOPSIS
 
     use Mail::DKIM2;
 
+    # $message is the outgoing message, CRLF line endings.
+
+    # Sign, as the originating hop: record the message in a Message-Instance
+    # (m=1), then add a DKIM2-Signature over it. (A hop that changes a
+    # message records the next m= with a Recipe; see
+    # Mail::DKIM2::MessageInstance.)
+    my $mi = Mail::DKIM2::MessageInstance->calculate($message);
+    $message = Mail::DKIM2::Common::fold_header('Message-Instance: ' . $mi->as_string)
+             . "\r\n" . $message;
     my $signer = Mail::DKIM2::Signer->new(
         Domain   => 'example.com',
         Selector => 'sel1',
@@ -55,10 +63,19 @@ SYNOPSIS
         MailFrom => '<sender@example.com>',
         RcptTo   => ['<recipient@example.net>'],
     )->load($message);
-    print $signer->as_string if $signer->result eq 'signed';
+    die $signer->result_detail unless $signer->result eq 'signed';
+    $message = $signer->as_string . "\r\n" . $message;   # what goes out
 
+    # Verify: every signature in the chain, and the Message-Instance chain
+    # beneath them.
     my $verifier = Mail::DKIM2::Verifier->new->load($message);
-    print $verifier->result_detail, "\n";
+    print $verifier->result_detail, "\n";   # pass (i=1..1 verified)
+
+    # Streaming, for a milter or other filter that sees the message in
+    # pieces; one object per message:
+    my $v = Mail::DKIM2::Verifier->new;
+    $v->PRINT($chunk) for @chunks;
+    $v->CLOSE;
 
 SEE ALSO
 

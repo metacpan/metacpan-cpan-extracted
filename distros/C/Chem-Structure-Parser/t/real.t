@@ -7,7 +7,9 @@
 # by hand.
 #
 # Set STRUCTURE_INFO_TEST_DIR to a directory of .pdb/.ent files to run it
-# somewhere else.  With nothing to read, the file skips rather than fails --
+# somewhere else; each may be gzipped or bzipped (.gz, .bz2), and the default
+# directory, PDBbind v2020, is bzipped whole -- every one of its 10,116 entries
+# is a .ent.pdb.bz2.  With nothing to read, the file skips rather than fails --
 # the distribution has to build on a machine with no structures on it.
 require 5.010001;
 use strict;
@@ -31,10 +33,61 @@ my @DIRS = grep { defined && -d } (
 plan skip_all => 'no directory of real structures found; set STRUCTURE_INFO_TEST_DIR'
 	unless @DIRS;
 
+# The decompressors, for the files named as compressed.  They are the module's
+# own -- IO::Uncompress, in core from 5.10.1 -- so a disagreement below is still
+# about reading columns and not about unpacking, which is t/compressed.t's
+# business.  The one-shot functions rather than a read loop, because they say
+# so when an archive is cut short: a truncated .bz2 or .gz returns false with
+# "unexpected end of file" on IO::Compress 2.020 (perl 5.10.1) and 2.223 (perl
+# 5.44.0) alike, where a loop that stops at the first short read would hand the
+# reference reader half a file.
+my %UNPACK = (
+	gz  => { class => 'IO::Uncompress::Gunzip',  fn => 'gunzip',
+	         error => sub { no warnings 'once'; $IO::Uncompress::Gunzip::GunzipError } },
+	bz2 => { class => 'IO::Uncompress::Bunzip2', fn => 'bunzip2',
+	         error => sub { no warnings 'once'; $IO::Uncompress::Bunzip2::Bunzip2Error } },
+);
+# Some vendors package IO::Compress apart from perl, and a file this perl cannot
+# unpack is not a column the XS read wrongly, so it is left out of the spread
+# and counted rather than failed.
+my %can_unpack = map {
+	(my $pm = "$UNPACK{$_}{class}.pm") =~ s{::}{/}g;
+	($_ => (eval { require $pm; 1 } ? 1 : 0));
+} keys %UNPACK;
+
 opendir(my $dh, $DIRS[0]) or plan skip_all => "cannot read $DIRS[0]: $!";
-my @all = sort grep { /\.(pdb|ent)(\.gz)?\z/ } readdir $dh;
+my (@all, $cannot_unpack);
+for my $e (sort readdir $dh) {
+	next unless $e =~ /\.(?:pdb|ent)(?:\.(gz|bz2))?\z/i;
+	if (defined $1 && !$can_unpack{ lc $1 }) { $cannot_unpack++; next }
+	push @all, $e;
+}
 closedir $dh;
+diag("left out $cannot_unpack compressed files this perl has no decompressor for")
+	if $cannot_unpack;
 plan skip_all => "no structure files in $DIRS[0]" unless @all;
+
+# open_structure($file) -- a handle on the file's text, unpacked first if its
+# name says it is compressed, which is the rule structure_info() follows.
+sub open_structure {
+	my ($file) = @_;
+	my ($kind) = $file =~ /\.(gz|bz2)\z/i;
+	my $text;
+	if (defined $kind) {
+		my $u = $UNPACK{ lc $kind };
+		# MultiStream, as the module asks for: pbzip2, bgzip and `cat a.gz b.gz'
+		# all write one file of several streams, and bzcat reads all of them
+		$u->{class}->can($u->{fn})->($file => \$text, MultiStream => 1)
+			or die "Can't $u->{fn} '$file': '" . $u->{error}->() . "'";
+	}
+	my $fh;
+	if (defined $text) {
+		open $fh, '<', \$text or die "Can't open the text of '$file' in memory: '$!'";
+	} else {
+		open $fh, '<', $file or die "Can't open '$file' with mode '<': '$!'";
+	}
+	return $fh;
+}
 
 # a spread across the directory rather than the first N, which in a directory
 # named by PDB id would be all the same vintage
@@ -45,7 +98,7 @@ my @files = map { "$DIRS[0]/$all[$_]" } grep { $_ % $step == 0 } 0 .. $#all;
 
 diag(sprintf('reading %d of %d structures in %s', scalar @files, scalar @all, $DIRS[0]));
 
-# --- an independent reader, for the things worth checking twice ------------
+# an independent reader, for the things worth checking twice:
 #
 # The point of the XS is to slice fixed columns quickly.  This does the same
 # slicing in the most obvious Perl there is, and the two are compared on every
@@ -71,7 +124,7 @@ diag(sprintf('reading %d of %d structures in %s', scalar @files, scalar @all, $D
 # string being compared -- only the counting is by position.
 sub reference_read {
 	my ($file) = @_;
-	open my $fh, '<', $file or die "$file: $!";
+	my $fh = open_structure($file);
 	my (%res, %seq, %seen, $ended);
 	while (my $l = <$fh>) {
 		last if $ended;
@@ -87,7 +140,7 @@ sub reference_read {
 		push @{ $res{$chain} }, "$num|$icode|$resname";
 		$seq{$chain} .= aa3to1($resname) if res_type($resname) eq 'amino_acid';
 	}
-	close $fh;
+	close $fh or die "Can't close '$file': '$!'";
 	return (\%res, \%seq);
 }
 
@@ -105,7 +158,7 @@ for my $file (@files) {
 	}
 	$checked++;
 
-	# --- the counts have to add up ---------------------------------------
+	# the counts have to add up
 	my $chain_atoms = 0;
 	$chain_atoms += $info->{chains}{$_}{n_atoms} for @{ $info->{chain_order} };
 	is($chain_atoms, $info->{stats}{n_atoms}, "$name: the chains account for every atom")
@@ -130,7 +183,7 @@ for my $file (@files) {
 	}
 	ok($ok, "$name: residues, atoms and sequence lengths agree inside every chain");
 
-	# --- against the naive reader ----------------------------------------
+	# against the naive reader
 	my ($ref_res, $ref_seq) = reference_read($file);
 	my $got_res = {};
 	for my $cid (@{ $info->{chain_order} }) {
@@ -159,7 +212,7 @@ for my $file (@files) {
 	is_deeply($got_seq, { map { $_ => $ref_seq->{$_} } grep { length $ref_seq->{$_} } keys %$ref_seq },
 		"$name: and the same amino acid sequence");
 
-	# --- what the header said, where it said anything --------------------
+	# what the header said, where it said anything
 	if (defined $info->{resolution}) {
 		ok($info->{resolution} > 0 && $info->{resolution} < 100,
 			"$name: resolution $info->{resolution} is a plausible number");
@@ -190,7 +243,7 @@ ok(@over <= $chains_with_seqres / 20,
 	sprintf('the observed sequence is no longer than SEQRES in all but a few chains (%d of %d)',
 		scalar @over, $chains_with_seqres));
 
-# --- the id in the file agrees with the name of the file -------------------
+# the id in the file agrees with the name of the file
 {
 	my $named = 0;
 	for my $file (@files[0 .. ($#files > 20 ? 20 : $#files)]) {
@@ -204,7 +257,7 @@ ok(@over <= $chains_with_seqres / 20,
 	ok($named > 0, 'at least one file had an id to check');
 }
 
-# --- the physical properties, on real structures --------------------------
+# the physical properties, on real structures
 #
 # What is checked here is what the file itself settles, in the spirit of the
 # rest of this file: a total that is the sum of its parts, a surface no atom can
@@ -448,8 +501,8 @@ ok(@over <= $chains_with_seqres / 20,
 			is_deeply($alone->{pocket}, $p, "$name: the pocket computed alone is the same, to the bit");
 		}
 	}
-	# --- the disulfides the coordinates show, against the ones the file
-	#     declares in its SSBOND records ---------------------------------------
+	# the disulfides the coordinates show, against the ones the file
+	# declares in its SSBOND records
 	#
 	# Two independent answers to the same question, one computed here and one
 	# written by the depositor, so a disagreement is a fact about the entry

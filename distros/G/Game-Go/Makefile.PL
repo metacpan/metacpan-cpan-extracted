@@ -128,6 +128,16 @@ my %WriteMakefileArgs = (
         'Object::Proto::Sugar' => '0.06',
         'Digest::SHA'          => '0',
     },
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        prereqs => {
+            runtime => {
+                recommends => {
+                    'Term::ReadKey' => '0',
+                },
+            },
+        },
+    },
     # The two programs. Both are Getopt::Long and two filehandles, and neither
     # is needed by anything in lib/, so an installer who wants only the engine
     # loses nothing by them.

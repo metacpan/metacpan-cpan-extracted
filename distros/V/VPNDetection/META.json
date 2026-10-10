@@ -69,6 +69,6 @@
          "web" : "https://github.com/vpndetection-io/sdk-perl"
       }
    },
-   "version" : "v3.5.2",
+   "version" : "v3.5.3",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

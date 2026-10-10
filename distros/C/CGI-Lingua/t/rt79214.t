@@ -3,9 +3,7 @@
 use strict;
 use warnings;
 use Test::More tests => 9;
-
-use lib 't/lib';
-use MyLogger;
+use Test::Log::Abstraction;
 
 # See https://rt.cpan.org/Public/Bug/Display.html?id=79214
 
@@ -28,7 +26,7 @@ RT79214: {
 	delete $ENV{'HTTP_ACCEPT_LANGUAGE'};
 	my $l = new_ok('CGI::Lingua' => [
 		supported => [ 'en-gb', 'nl', 'da', 'fr', 'de', 'pl' ],
-		logger => new_ok('MyLogger')
+		logger => new_ok('Test::Log::Abstraction')
 	]);
 	ok(defined($l));
 	ok($l->isa('CGI::Lingua'));

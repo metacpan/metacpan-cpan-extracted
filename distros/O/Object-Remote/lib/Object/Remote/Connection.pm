@@ -53,7 +53,8 @@ has read_channel => (
     $ch->on_line_call(sub { $self->_receive(@_) });
     $ch->on_close_call(sub {
       log_trace { "invoking 'done' on on_close handler for connection id '$id'" };
-      $self->on_close->done(@_);
+      $self->on_close->done(@_)
+          unless $self->on_close->is_ready;
     });
   },
 );
@@ -508,6 +509,20 @@ sub _invoke {
     1;
   } or do { $future->fail($@); return; };
   return;
+}
+
+sub DEMOLISH {
+  my ($self, $in_global_destruction) = @_;
+
+  return if $in_global_destruction;
+
+  my $child_pid = $self->child_pid;
+  return unless $child_pid;
+
+  unless ($self->on_close->is_ready) {
+    kill('TERM', $child_pid);
+    $self->on_close->done('No more references to connection');
+  }
 }
 
 1;

@@ -1,5 +1,12 @@
 Revision history for Object-Remote
 
+0.005002 - 2026-10-09
+  - fix spelling errors reported by Debian
+  - reap child processes when the connection object goes out of scope (RT#129951)
+  - fix FatNode messing with the ARGV filehandle (RT#112426)
+  - call WatchDog->shutdown instead of alarm(0) for better semantics
+  - declare minimum requirement for List::Util (1.29)
+
 0.005001 - 2026-07-04
   - fix MANIFEST missing Object::Remote::Loop
   - unbreak CPAN upload by hiding 'maybe' package from the indexer

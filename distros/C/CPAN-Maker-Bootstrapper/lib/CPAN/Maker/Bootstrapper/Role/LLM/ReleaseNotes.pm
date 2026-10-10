@@ -48,10 +48,11 @@ sub cmd_release_notes {
   my $release = Git::ReleaseDiffs->new( release_version => $version );
   $release->write_diffs;
   $release->write_list;
+  $release->write_status;
   $release->write_tarball;
 
   # verify artifacts exist
-  my @file_list = map {"release-$version.$_"} qw(diffs lst tar.gz);
+  my @file_list = map {"release-$version.$_"} qw(diffs lst status tar.gz);
 
   foreach my $file (@file_list) {
     die "ERROR: $file not found or empty!\n"
@@ -76,8 +77,8 @@ sub cmd_release_notes {
 
   push @prompt,
     $llm->document(
-    data  => slurp("release-$version.diffs"),
-    title => 'Diffs'
+    data  => slurp("release-$version.status"),
+    title => 'Git File Status'
     ) if !$self->get_dryrun;
 
   push @prompt,

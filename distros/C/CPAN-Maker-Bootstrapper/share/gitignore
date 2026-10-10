@@ -14,9 +14,10 @@
 *-review-2*.annotate
 *-review-2*.code
 *-review-2*.pod
-*.diffs
-*.lst
-*.gz
+release-*.diffs
+release-*.lst
+release-*.gz
+release-*.status
 buildspec.yml.current
 buildspec.yml.tmpl
 cpanfile.*
@@ -32,3 +33,5 @@ test-requires.cpanfile
 test.t.tmpl
 deps.mk
 *.reconciled
+*.rendered
+build-config.mk

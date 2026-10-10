@@ -1,5 +1,10 @@
 Revision history for MIDI-RtMidi-Util
 
+0.0500 2026-10-09 18:45:03
+    - Add the `program_changer()` funtion.
+    - Flesh-out missing tests.
+    - Fixed bugs surfaced by testing!
+
 0.0401 2026-09-11 13:29:00
     - Add the handy `stop_all_notes()` function.
 

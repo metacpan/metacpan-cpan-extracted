@@ -370,6 +370,15 @@ SKIP: {
 		merge($emp, $dept, how => 'cross');
 		merge($emp, $dept, on => 'dept', 'output_type' => 'hoa');
 	} 'merge does not leak across all join types';
+	# A suffixed name that collides croaks after it is built; up to 0.3215 it
+	# was not yet owned by anything there, and leaked one SV per call.
+	my $d1 = [ { a => 1, b => 1, 'b.x' => 5 } ];
+	my $d2 = [ { a => 1, b => 101 } ];
+	my $d3 = [ { a => 1, b => 101, 'b.y' => 7 } ];
+	no_leaks_ok {
+		eval { merge($d1, $d2, on => 'a') };	# left-hand b.x collides
+		eval { merge($d2, $d3, on => 'a', suffixes => ['.x', '.y']) };	# right-hand b.y collides
+	} 'merge does not leak when a suffixed column name collides';
 }
 
 # Numeric join keys.  mg_key() renders plain integers and doubles itself
@@ -391,6 +400,41 @@ SKIP: {
 		$bad++ unless @{ $got->{id} } == $want;
 	}
 	is($bad, 0, 'numeric join keys match a string-keyed join');
+}
+
+# HoA output is filled column by column in blocks of 1024 output rows
+# (MG_BLOCK in LikeR.xs).  Over several blocks, with a partial last one, it
+# must be the AoH output transposed, row for row -- unmatched rows on both
+# sides and keys coalesced from the right included.
+{
+	my $n = 2500;
+	my $L = [ map { +{ k => ($_ % 7 ? $_ : undef), v => "l$_" } } 1 .. $n ];
+	my $R = { k => [ map { $_ * 2 } 1 .. $n ], w => [ map { "r$_" } 1 .. $n ] };
+	for my $how (qw(inner left right outer)) {
+		my $aoh = merge($L, $R, how => $how, on => 'k', output_type => 'aoh');
+		my $hoa = merge($L, $R, how => $how, on => 'k', output_type => 'hoa');
+		my @cols = sort keys %$hoa;
+		my $t = [ map { my $i = $_; +{ map { $_ => $hoa->{$_}[$i] } @cols } }
+		            0 .. $#{ $hoa->{k} } ];
+		cmp_ok(scalar @$aoh, '>', 1024, "$how join spans more than one block");
+		is_deeply($t, $aoh, "$how join: HoA output is the AoH output transposed");
+	}
+}
+
+# The column universe of a row frame is gathered by looking each row's keys up
+# by their own bytes (mg_saw_he in LikeR.xs).  A key perl stored downgraded from
+# UTF-8 is one column with its byte spelling, and a wide one its own column.
+{
+	my $up = "caf\x{e9}";
+	utf8::upgrade($up);
+	my $L = [ { id => 1, "caf\x{e9}" => 1 }, { id => 2, $up => 2 },
+	          { id => 3, "\x{263A}" => 3 }, { id => 4, "\xe2\x98\xba" => 4 } ];
+	my $got = merge($L, [ map { +{ id => $_ } } 1 .. 4 ], on => 'id',
+	                output_type => 'hoa');
+	is_deeply([ sort keys %$got ], [ sort 'id', "caf\x{e9}", "\x{263A}", "\xe2\x98\xba" ],
+	          'a key with two spellings is one column; a wide one is its own');
+	is_deeply($got->{"caf\x{e9}"}, [ 1, 2, undef, undef ],
+	          'both spellings of the same key fill the same column');
 }
 
 done_testing();

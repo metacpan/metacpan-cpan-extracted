@@ -1,0 +1,43 @@
+---
+abstract: 'find calendar entries overlapping a timespan'
+author:
+  - 'Max Maischein <corion@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-CalDAV-FindEntry
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Exporter: '5'
+  File::Spec: '0'
+  File::XDG: '0'
+  Getopt::Long: '0'
+  Moo: '2'
+  Net::CalDAVTalk: '0'
+  POSIX: '0'
+  Text::JSCalendar: '0'
+  Time::Local: '0'
+  URI::Escape: '0'
+  XML::Spice: '0'
+  YAML::Tiny: '0'
+  experimental: '0.036'
+  perl: '5.020'
+resources:
+  bugtracker: https://github.com/Corion/Net-CalDAV-FindEntry/issues
+  license: https://dev.perl.org/licenses/
+  repository: git://github.com/Corion/Net-CalDAV-FindEntry.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

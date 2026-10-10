@@ -8,9 +8,8 @@ use CLI::Simple::Constants qw(:booleans);
 use CLI::Simple::Utils qw(slurp choose);
 use Data::Dumper;
 use English qw(-no_match_vars);
-use HTTP::Tiny;
-use IO::Uncompress::Gunzip qw(gunzip $GunzipError);
 use JSON;
+
 use Role::Tiny;
 
 use Readonly;
@@ -24,6 +23,9 @@ Readonly::Scalar our $REQUIRES_FILE    => 'requires';
 sub cmd_create_darkpan_requires {
 ########################################################################
   my ($self) = @_;
+
+  require HTTP::Tiny;
+  require IO::Uncompress::Gunzip;
 
   my ($requires_file) = $self->get_args;
   $requires_file //= $REQUIRES_FILE;
@@ -232,10 +234,11 @@ sub fetch_02packages {
 
   my $listing = q{};
 
-  gunzip \$rsp->{content} => \$listing
+  no warnings 'once';
+
+  IO::Uncompress::Gunzip::gunzip( \$rsp->{content} => \$listing )
     or croak sprintf 'ERROR: could not decompress %s: %s',
-    $url,
-    $GunzipError;
+    $url, $IO::Uncompress::Gunzip::GunzipError;
 
   return $listing;
 }

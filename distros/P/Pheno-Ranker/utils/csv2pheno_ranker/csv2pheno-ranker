@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 #
-#   An utility from Pheno-Ranker to convert a CSV to:
+#   A utility from Pheno-Ranker to convert a CSV to:
 #
 #   1 - Input file (JSON array of objects)
 #   2 - Configuration file (needed for Pheno-Ranker)
@@ -439,6 +439,6 @@ Written by Manuel Rueda, PhD. Info about CNAG can be found at L<https://www.cnag
 
 =head1 COPYRIGHT AND LICENSE
 
-This PERL file is copyrighted. See the LICENSE file included in this distribution.
+This Perl file is copyrighted. See the LICENSE file included in this distribution.
 
 =cut

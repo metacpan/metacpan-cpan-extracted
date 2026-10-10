@@ -10,7 +10,7 @@ use Object::Proto::Sugar -types;
 use Game::Go::Rules;
 use Game::Go::Move;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 my $B = Game::Go::Rules::BLACK;
 my $W = Game::Go::Rules::WHITE;
@@ -154,7 +154,7 @@ Game::Go::Bot - Monte Carlo, because alpha-beta does not work on Go
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

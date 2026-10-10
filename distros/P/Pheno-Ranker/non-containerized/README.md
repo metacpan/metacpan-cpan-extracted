@@ -1,6 +1,6 @@
 # Non-Containerized Installation
 
-Use this path when you want to run `pheno-ranker` directly from CPAN, GitHub, Conda, or your own Perl environment.
+Use this path when you want to run `pheno-ranker` directly from CPAN, in an isolated Conda environment, from GitHub, or in your own Perl environment.
 
 ## System Dependencies
 
@@ -38,9 +38,9 @@ To update later:
 cpanm Pheno::Ranker
 ```
 
-## Method 2: CPAN In A Conda Environment
+## Method 2: Isolated Conda Environment
 
-This path is useful when you want an isolated environment but still want to run the non-containerized CLI.
+Use this option when Conda is your preferred local environment and you do not want to use Docker or modify the system Perl installation. Conda isolates the compiler and Perl dependencies; Pheno-Ranker is then installed from CPAN inside that environment. In the publication nomenclature, this remains installation path `C` rather than a separate native Conda package.
 
 ### Step 1: Install Miniconda
 
@@ -53,28 +53,21 @@ bash Miniconda3-latest-Linux-x86_64.sh
 
 Close and reopen the terminal after the installer finishes.
 
-### Step 2: Configure Channels
+### Step 2: Create The Environment And Install
 
-Set up the channels required by Bioconda:
-
-```bash
-conda config --add channels bioconda
-```
-
-It is better to install into a fresh environment to avoid dependency conflicts.
-
-### Step 3: Create The Environment And Install
+Create a dedicated environment so that the build tools and installed modules remain separate from other projects:
 
 ```bash
-conda create -n myenv
-conda activate myenv
-conda install -c conda-forge gcc_linux-64 perl perl-app-cpanminus
+conda create -n pheno-ranker \
+  -c conda-forge --strict-channel-priority \
+  gcc_linux-64 make perl perl-app-cpanminus
+conda activate pheno-ranker
 # conda install -c bioconda perl-mac-systemdirectory   # macOS only
 cpanm --notest Pheno::Ranker
 pheno-ranker --help
 ```
 
-Replace `myenv` with your preferred environment name.
+The command above targets `x86_64` Linux, matching the Miniconda example. Replace `pheno-ranker` with another environment name if preferred.
 
 To deactivate the environment:
 
@@ -84,7 +77,16 @@ conda deactivate
 
 ## Method 3: From GitHub
 
-Clone the repository:
+Install the current GitHub version directly with `cpanm`:
+
+```bash
+cpanm --notest https://github.com/CNAG-Biomedical-Informatics/pheno-ranker.git
+pheno-ranker --help
+```
+
+### Developer Checkout
+
+Clone the repository only when you want to inspect the source code, run tests, use local examples, or edit the code locally:
 
 ```bash
 git clone https://github.com/cnag-biomedical-informatics/pheno-ranker.git

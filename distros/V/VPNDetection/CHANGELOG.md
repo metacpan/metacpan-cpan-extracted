@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 3.3.2 are described by their release commits.
 
+## 3.5.3 - 2026-10-10
+
+### Fixes
+
+- Re-pin the spec to 2026.10.09: rotating a key needs apikeys.reveal ([`891a1d3`](https://github.com/vpndetection-io/sdk-perl/commit/891a1d3fd1cfff847194508f3c68811a6b93b2cd))
+
 ## 3.5.2 - 2026-10-06
 
 ### Fixes

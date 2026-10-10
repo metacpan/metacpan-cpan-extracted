@@ -5,6 +5,7 @@ ChangeLog
 lib/CPAN/Maker/Bootstrapper.pm
 lib/CPAN/Maker/Bootstrapper/ConfigReader.pm
 lib/CPAN/Maker/Bootstrapper/Constants.pm
+lib/CPAN/Maker/Bootstrapper/Role/CreateBuildConfig.pm
 lib/CPAN/Maker/Bootstrapper/Role/CreateConfig.pm
 lib/CPAN/Maker/Bootstrapper/Role/CreateDeps.pm
 lib/CPAN/Maker/Bootstrapper/Role/Critic.pm
@@ -21,10 +22,14 @@ lib/CPAN/Maker/Bootstrapper/Role/LLM/ReleaseNotes.pm
 lib/CPAN/Maker/Bootstrapper/Role/LLM/Reviewer.pm
 lib/CPAN/Maker/Bootstrapper/Role/LLM/Utils.pm
 lib/CPAN/Maker/Bootstrapper/Role/PAUSEUpload.pm
+lib/CPAN/Maker/Bootstrapper/Role/PerlCritic.pm
+lib/CPAN/Maker/Bootstrapper/Role/PerlTidy.pm
 lib/CPAN/Maker/Bootstrapper/Role/Provides.pm
+lib/CPAN/Maker/Bootstrapper/Role/ReconcileDeps.pm
 lib/CPAN/Maker/Bootstrapper/Role/ResolveVars.pm
 lib/CPAN/Maker/Bootstrapper/Role/ScaffoldImporter.pm
 lib/CPAN/Maker/Bootstrapper/Role/ShowDefaults.pm
+lib/CPAN/Maker/Bootstrapper/Role/UpdateAvailable.pm
 lib/CPAN/Maker/Bootstrapper/Role/Version.pm
 lib/Git/ReleaseDiffs.pm
 lib/Text/ASCIITable/FixANSI.pm
@@ -35,6 +40,7 @@ postamble
 release-notes.md
 share/bash-completion.mk
 share/bootstrap.mk
+share/build-init.mk
 share/build.yml
 share/builder
 share/builder.env

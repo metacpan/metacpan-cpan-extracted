@@ -59,7 +59,7 @@ WriteMakefile(
                      'runtime'=>{
                                     'suggests'=>{
                                                     'IO::Pager'=>'2.10',
-                                                    'Log::Log4perl'=>'1.57',
+                                                    'Log::Log4perl'=>'1.58',
                                                     'Perl::Tidy'=>'20260204'
                                                   }
                                   }
@@ -67,11 +67,11 @@ WriteMakefile(
       'provides'=>{
                       'CLI::Simple'=>{
                                          'file'=>'lib/CLI/Simple.pm',
-                                         'version'=>'2.2.5'
+                                         'version'=>'2.3.1'
                                        },
                       'CLI::Simple::Constants'=>{
                                                     'file'=>'lib/CLI/Simple/Constants.pm',
-                                                    'version'=>'2.2.5'
+                                                    'version'=>'2.3.1'
                                                   },
                       'CLI::Simple::DumpSpec'=>{
                                                    'file'=>'lib/CLI/Simple/DumpSpec.pm',
@@ -99,7 +99,7 @@ WriteMakefile(
                                               },
                       'CLI::Simple::Utils'=>{
                                                 'file'=>'lib/CLI/Simple/Utils.pm',
-                                                'version'=>'2.2.5'
+                                                'version'=>'2.3.1'
                                               }
                     },
       'resources'=>{

@@ -5,7 +5,7 @@ This is the Security Policy for IO::Compress.
 Security vulnerabilities can be reported via the project GitHub repository
 [Security Advisories](https://github.com/pmqs/IO-Compress/security/advisories).
 (If you do not have access to GitHub, then you can report issues via email
-to <pmqs@cpan.org>.)
+to <pmqs@outlook.com>.)
 
 The latest version of the Security Policy can be found in the
 [git repository for IO::Compress](https://github.com/pmqs/IO-Compress/blob/main/SECURITY.md).
@@ -20,7 +20,7 @@ Security vulnerabilities can be reported via the project GitHub repository
 [Security Advisories](https://github.com/pmqs/IO-Compress/security/advisories).
 On the “Advisories” page you can click on the “Report a vulnerability”
 button. (If you do not have access to GitHub, then you can report issues
-via email to <pmqs@cpan.org>.)
+via email to <pmqs@outlook.com>.)
 
 Please include as many details as possible, including code samples or test
 cases, so that we can reproduce the issue.  Check that your report does not

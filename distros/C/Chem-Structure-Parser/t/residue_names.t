@@ -47,15 +47,18 @@ is(aa3to1('UNK'), 'X', 'aa3to1: UNK is X');
 #
 # Checked against gemmi 0.7.5's find_tabulated_residue().one_letter_code on
 # 2026-09-15: of the 150 names below, gemmi's built-in table carries 119 and
-# agrees about 116 of them.  It disagrees about three, and each is a judgement
+# agrees about 117 of them.  It disagrees about two, and each is a judgement
 # rather than a mistake on either side:
 #
 #   ORN, DAB  gemmi maps both to alanine; here they are X.  Ornithine and
 #             2,4-diaminobutyrate are neither alanine nor one of the twenty,
 #             and a sequence that calls them A is a sequence that has lost them.
-#   5MU       gemmi calls it a U; here it is a T.  It is ribothymidine, the T
-#             of the TPsiC loop of tRNA, which is where it is nearly always
-#             found.
+#
+# 5MU was a third until 0.039, a T here and a U to gemmi.  It is
+# 5-methyluridine, ribothymidine: a U methylated in the tRNA, so a U by the
+# rule the rest of the table follows for a modified residue -- its parent -- and
+# Biopython 1.85's Bio/Data/PDBData.py says U as well.  A T put a DNA letter in an
+# RNA sequence.
 #
 # The remaining 31 are names gemmi's table does not carry at all, most of them
 # the spellings AMBER and CHARMM use (HID, HIE, HIP, HSD, HSE, HSP, CYX) and
@@ -87,7 +90,7 @@ my %NUCLEIC = (
 	'DA'  => 'A', 'DC'  => 'C', 'DG'  => 'G', 'DT'  => 'T', 'DU'  => 'U', 'DI'  => 'I',
 	'A'   => 'A', 'C'   => 'C', 'G'   => 'G', 'T'   => 'T', 'U'   => 'U', 'I'   => 'I',
 	'N'   => 'N', 'ADE' => 'A', 'CYT' => 'C', 'GUA' => 'G', 'THY' => 'T', 'URI' => 'U',
-	'PSU' => 'U', 'H2U' => 'U', '4SU' => 'U', '5MU' => 'T', '5MC' => 'C', 'OMC' => 'C',
+	'PSU' => 'U', 'H2U' => 'U', '4SU' => 'U', '5MU' => 'U', '5MC' => 'C', 'OMC' => 'C',
 	'1MA' => 'A', '2MG' => 'G', '7MG' => 'G', '1MG' => 'G', 'M2G' => 'G', 'OMG' => 'G',
 );
 my @WATER = qw(HOH WAT DOD H2O SOL TIP);

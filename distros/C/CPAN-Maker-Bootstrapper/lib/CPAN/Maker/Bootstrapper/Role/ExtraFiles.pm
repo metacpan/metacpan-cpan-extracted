@@ -11,7 +11,7 @@ use Scalar::Util qw(reftype);
 
 use Role::Tiny;
 
-our $VERSION = '2.4.0';
+our $VERSION = '2.4.1';
 
 ########################################################################
 sub cmd_extra_files {

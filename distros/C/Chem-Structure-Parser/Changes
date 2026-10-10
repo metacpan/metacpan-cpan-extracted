@@ -1,6 +1,85 @@
 Revision history for Chem-Structure-Parser
 
 
+0.039 2026-10-09 CDT
+
+ - A residue given a number its chain has already used is a residue of its
+   own: a water written after TER under the protein's chain and number, or a
+   docked ligand numbered 1 in the protein's chain.  It used to vanish into
+   the residue it collided with, its atoms filed as that residue's
+   conformers.  It is keyed with its name after the number, '1(HOH)', and
+   keeps number 1.  gemmi and Biopython both keep the two apart; one residue
+   modelled in two chemical states, MSE/MET in altlocs, is one residue as
+   before.
+ - A PDB file ends at END, as gemmi reads it.  A second pose appended after
+   one was read into the first, under the same residue numbers.
+ - An atom whose serial runs to six digits, 'ATOM 100000', is read; it was
+   filed as a header record called 'ATOM 1' and left out of every count.
+ - An mmCIF file is its first data block.  A second block was read into the
+   first: its atoms as conformers of the first's, its header over the
+   first's.
+ - An mmCIF loop whose last row was cut short no longer makes an atom of
+   it, with no y or z and the label_* chain and number.
+ - mmCIF models are counted by number.  A file listing chain A of models 1
+   and 2 and then chain B of the same two had four models; it has two.
+ - An mmCIF _atom_site_anisotrop of one row written as plain tags is one
+   record, where each tag counted one, and is kept with anisou => 1.
+ - A line of unclosed quotes in an mmCIF file reads in time proportional to
+   its length; 40,000 of them took a second.
+ - An element worked out from an atom name is an element.  An mmCIF file
+   without type_symbol read a zinc as Z, a magnesium as M and a sodium as N;
+   an atom named for its own residue is now that residue's ion, and a guess
+   that spells nothing is read the other way, so ' ZN ' out of its PDB
+   columns is zinc and 'HB1 ' a hydrogen.
+ - 5MU, 5-methyluridine, is U, as gemmi and Biopython have it, and not T.
+ - A formal charge of '0-' reads as '0', which is what the mmCIF reader
+   gives for the same charge.
+ - A coordinate or B-factor that reads as nan or inf is left out of the
+   bounding box, the centres and the B-factor range, which were NaN or not
+   according to where in the file it fell.  An atom at NaN is nobody's
+   neighbour in the properties: it was a contact of every residue near it at
+   a distance of NaN, an acceptor of hydrogen bonds at the strongest energy
+   there is, and a sugar pucker phase cast to an index.
+ - One atom far from the rest no longer makes the neighbour grid slow:
+   4fqr with a zinc at (9999.999, 9999.999, 9999.999) took structure_sasa()
+   29.5 s, against 1.4 s without it, and takes 0.8 s.  No answer changes.
+ - structure_rmsd() of atoms that lie on one line is right.  The rotation
+   came out as the identity there, so three carbons along x against the
+   same three along y were 1.732 A apart; they are 0, as Biopython's
+   SVDSuperimposer says.
+ - A string handed to structure_info_string() reads the same whether or not
+   perl has upgraded it to UTF-8; an upgraded one read its accented letters
+   as two bytes each, and its ATOM columns one out after one.
+ - structure_info_string() takes a view, as structure_info() does:
+   structure_info_string($text, 'dssp').  It died of perl's 'Odd number of
+   elements in hash assignment', and so did an option list of odd length to
+   any function; each now says which function and what was wrong.
+ - A model number too large for an IV is refused.  model =>
+   '9223372036854775808' wrapped to the "every model" sentinel and handed
+   back every model.
+ - A ';' inside a COMPND or SOURCE value is part of the value:
+   "[GLY51;AIB51'] 'COVALENT DIMER' HIV-1 PROTEASE" was '[GLY51', and
+   '7C8 FAB FRAGMENT; SHORT CHAIN' was '7C8 FAB FRAGMENT'.  Over PDBbind
+   v2020 that is 141 values in 107 entries, most of them synonyms; 124 now
+   read as Biopython's parse_pdb_header reads them, 16 differ from it only
+   where Biopython drops the ';' at the end of a line, and the last is a
+   molecule name Biopython stops at the end of its first line.
+ - A file that keeps its entry id in columns 73-80 no longer has it on the
+   end of a revision's record list, a REMARK, a SEQADV or MODRES comment,
+   HETNAM, HETSYN, FORMUL, or an SSBOND or LINK length.
+ - site is filled, from SITE and from _struct_site and _struct_site_gen;
+   hetnam and formul are filled with each heterogen's name and formula; and
+   seqadv is a key of every structure, filled from _struct_ref_seq_dif in
+   mmCIF.  All four were documented and empty, or missing.
+ - With model => 'all' every model's chains carry what the header says
+   about them -- molecule, organism, SEQRES and what it shows missing --
+   where only the first model's did.
+ - A file with no HEADER called pdbfixer_output.pdb is PDBFIXER_OUTPUT, not
+   FIXER_OUTPUT: only the archive's pdb1abc.ent loses its 'pdb'.  And
+   2abc.pdbx is 2ABC, not 2ABC.PDBX.
+ - A chain two COMPND MOL_IDs both claim belongs to the first, where it
+   belonged to one or the other according to the hash seed.
+
 0.038 2026-10-05 CDT
 
  - structure_rmsd() keeps each row of its RMSD and count matrices as it

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Mail::Milter::Authentication::Pragmas;
 # ABSTRACT: Handler class for DKIM2 signing
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 use base 'Mail::Milter::Authentication::Handler';
 
 use Mail::DKIM2::Common qw(extract_mi_version strip_mi_versions load_private_key fold_header parse_mime
@@ -35,6 +35,9 @@ sub default_config {
         'record_smtp_params'   => 1,
         # Directory for message snapshots (shared with DKIM2Verify)
         'snapshot_directory'   => undef,
+        # Body Recipe literal-line cap for a snapshot diff; over it the
+        # body Recipe is null (MessageInstance MaxRecipeLiterals)
+        'max_recipe_literals'  => 1000,
         'ignore_header_prefixes' => [],   # our own fields, hashed by neither end (IgnorePrefixes)
         # Sign over an UNSIGNED Message-Instance (above every upstream
         # signature's m=) with a null body Recipe; see Mail::DKIM2::Gate
@@ -458,7 +461,8 @@ sub _compute_message_instance {
                     }
 
                     $self->{'_clean_message_data'} = $work_data;
-                    return Mail::DKIM2::MessageInstance->calculate($work_msg, $snapshot_msg, @ignore);
+                    return Mail::DKIM2::MessageInstance->calculate($work_msg, $snapshot_msg, @ignore,
+                        MaxRecipeLiterals => $config->{'max_recipe_literals'});
                 }
             }
         }
@@ -710,6 +714,7 @@ directly does not have this problem; it is specific to the bolt-on-milter model.
         "add_message_instance" : 1,                | Add Message-Instance headers
         "record_smtp_params"   : 1,                | Record MAIL FROM/RCPT TO in signature
         "snapshot_directory"   : null,             | Snapshot dir (shared with DKIM2Verify)
+        "max_recipe_literals"  : 1000,             | Body Recipe literal-line cap
         "ignore_header_prefixes" : [],             | Own fields hashed by neither end
         "allow_null_body_recipe" : 0,              | Sign over an unsigned
                                                    |   Message-Instance with a null
@@ -733,7 +738,12 @@ When C<snapshot_directory> is set, the handler looks up a stored message
 snapshot (written by DKIM2Verify on inbound) using the topmost Message-Instance
 header value as the key.  If found, a diff-based MI is computed capturing
 header and body changes made during local processing.  Without a snapshot,
-a simple hash-only MI is computed.
+a simple hash-only MI is computed.  A snapshot diff whose body Recipe would need more
+than C<max_recipe_literals> literal lines declares the body unrecoverable
+(a null body Recipe): this handler only adds header fields, so it cannot
+move the old body into the MIME epilogue.  Like any null this hop adds, it is
+signed only with C<allow_null_body_recipe>; without it the message goes out
+unsigned.
 
 =head1 HTTP KEY ENDPOINT
 

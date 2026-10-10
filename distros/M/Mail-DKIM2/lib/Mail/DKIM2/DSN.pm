@@ -2,13 +2,13 @@ package Mail::DKIM2::DSN;
 use strict;
 use warnings;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use Email::MIME;
 use Carp;
 use List::Util qw(max);
 
-use Mail::DKIM2::Common qw(extract_domain relaxed_domain_match parse_mime);
+use Mail::DKIM2::Common qw(extract_domain relaxed_domain_match parse_mime extract_mi_version);
 use Mail::DKIM2::MessageInstance;
 use Mail::DKIM2::Signature;
 use Mail::DKIM2::Signer;
@@ -112,6 +112,8 @@ sub _set_report_type {
 # From:), ReportingMTA, Status, Reason.
 sub generate {
     my ($class, %args) = @_;
+    Mail::DKIM2::Common::_check_options("$class->generate", \%args,
+        qw(Message Signer To ReportingMTA Status Reason FinalRecipient));
     my $raw    = $args{Message}    or croak "generate: need Message";
     my $signer = $args{Signer} or croak "generate: need Signer";
     my $mta    = $args{ReportingMTA} // 'dkim2.com';
@@ -299,16 +301,20 @@ sub _check_alignment {
 # Croaks, as propagate does, when the message is not an RFC 6522 DSN.
 sub authenticate {
     my ($class, %args) = @_;
+    Mail::DKIM2::Common::_check_options("$class->authenticate", \%args,
+        qw(Message PubkeyCallback Resolver SkipTimestampCheck));
     my $raw = $args{Message} or croak "authenticate: need Message";
-    my $cb  = $args{PubkeyCallback} or croak "authenticate: need PubkeyCallback";
+    # The keys: PubkeyCallback, else the verifier's own DNS fetch through
+    # Resolver (one is made if none is given).
+    my %key_source = map { exists $args{$_} ? ($_ => $args{$_}) : () }
+        qw(PubkeyCallback Resolver);
 
     my (undef, undef, $orig_part) = _parse_report($raw, 'authenticate');
     my $headers_only = ($orig_part->content_type // '') =~ m{text/rfc822-headers}i;
     my $embedded = _embedded($orig_part);
     my $top = _top_sig($embedded);
 
-    my $v = Mail::DKIM2::Verifier->new;
-    $v->set_pubkey_callback($cb);
+    my $v = Mail::DKIM2::Verifier->new(%key_source);
     $v->headers_only(1) if $headers_only;
     $v->skip_timestamp_check(1) if $args{SkipTimestampCheck};
     (my $text = $embedded->as_string) =~ s/\r?\n/\r\n/g;
@@ -317,8 +323,7 @@ sub authenticate {
 
     # The DSN itself, from the bytes as they arrived: re-serializing the
     # Email::MIME we parsed could move a byte the body hash covers.
-    my $dv = Mail::DKIM2::Verifier->new;
-    $dv->set_pubkey_callback($cb);
+    my $dv = Mail::DKIM2::Verifier->new(%key_source);
     $dv->skip_timestamp_check(1) if $args{SkipTimestampCheck};
     (my $dsn_text = $raw) =~ s/\r?\n/\r\n/g;
     $dv->PRINT($dsn_text);
@@ -360,18 +365,19 @@ sub authenticate {
 # SkipAuthentication => 1 to say so.
 sub propagate {
     my ($class, %args) = @_;
+    Mail::DKIM2::Common::_check_options("$class->propagate", \%args,
+        qw(Message ForwarderDomain Signer PubkeyCallback Resolver
+           SkipAuthentication SkipTimestampCheck));
     my $raw = $args{Message}              or croak "propagate: need Message";
     my $fwd = $args{ForwarderDomain} or croak "propagate: need ForwarderDomain";
     my $signer = $args{Signer}        or croak "propagate: need Signer";
 
     unless ($args{SkipAuthentication}) {
-        croak "propagate: need PubkeyCallback to authenticate the DSN (§12.1.2), "
-            . "or SkipAuthentication if it has been authenticated already"
-            unless $args{PubkeyCallback};
         my $auth = $class->authenticate(
             Message            => $raw,
-            PubkeyCallback     => $args{PubkeyCallback},
             SkipTimestampCheck => $args{SkipTimestampCheck},
+            map { exists $args{$_} ? ($_ => $args{$_}) : () }
+                qw(PubkeyCallback Resolver),
         );
         unless ($auth->{ok}) {
             croak "propagate: DSN did not authenticate (§12.1.2), not propagating: "
@@ -386,6 +392,15 @@ sub propagate {
     my $headers_only = ($orig_part->content_type // '') =~ m{text/rfc822-headers}i;
     my $embedded = _embedded($orig_part);
 
+    # 0. The hop to strip is ForwarderDomain's own: the returned original's
+    #    top signature must be its. Authentication shows the chain is
+    #    genuine, not that this caller added the top hop.
+    my $own = _top_sig($embedded);
+    my $own_d = $own ? ($own->domain // '') : '';
+    croak "propagate: ForwarderDomain $fwd is not the d= ($own_d) of the "
+        . "returned message's top DKIM2-Signature, so that hop is not ours to strip"
+        unless lc $own_d eq lc $fwd;
+
     # 1. Undo the Forwarder's outward modification (reverses the highest MI and
     #    removes that Message-Instance header). If the body cannot be
     #    regenerated, fall back to headers-only.
@@ -394,7 +409,7 @@ sub propagate {
         # Determine whether the top MI declares an unrecoverable body.
         my @mis = $embedded->header_raw('Message-Instance');
         if (@mis) {
-            my ($high) = sort { ($b =~ /m=(\d+)/)[0] <=> ($a =~ /m=(\d+)/)[0] } @mis;
+            my ($high) = sort { (extract_mi_version($b) // 0) <=> (extract_mi_version($a) // 0) } @mis;
             my $mi_obj = Mail::DKIM2::MessageInstance->parse($high);
             $body_recoverable = 0 if $mi_obj->unrecoverable;
         }
@@ -519,22 +534,36 @@ Returns C<< { raw => $bytes, to => $address } >>.
 Checks C<Message>, a DSN, per section 12.1.2: the returned original's
 chain verifies (from its headers alone if that is all the DSN carries),
 the DSN's own signature verifies, and the DSN's C<d=> is aligned with the
-returned original's top C<rt=>. C<PubkeyCallback>, C<Resolver> and
-C<SkipTimestampCheck> are passed to the verifiers. Returns a hashref with
-C<ok>; C<top>, the returned original's highest signature, for the caller
-to recognise as its own by C<d=> and C<mf=>; C<result>, C<details>,
-C<dsn_result>, C<dsn_details>, C<dsn_sig>; C<alignment> (C<pass>, C<fail>
-or C<none>) and C<alignment_detail>; C<headers_only>; and C<embedded>,
-the returned original as an L<Email::MIME>.
+returned original's top C<rt=>. Keys come from C<PubkeyCallback> if given,
+else from DNS through C<Resolver> (a L<Net::DNS::Resolver> is made if
+neither is given); C<SkipTimestampCheck> is passed to the verifiers too.
+Returns a hashref with C<ok>; C<top>, the returned original's highest
+signature, for the caller to recognise as its own by C<d=> and C<mf=>;
+C<result>, C<details>, C<dsn_result>, C<dsn_details>, C<dsn_sig>;
+C<alignment> (C<pass>, C<fail> or C<none>) and C<alignment_detail>;
+C<headers_only>; and C<embedded>, the returned original as an
+L<Email::MIME>.
+
+What C<ok> covers: the returned original's chain verified, the DSN's own
+signature did not fail, and alignment did not fail. A DSN that carries no
+DKIM2-Signature of its own (C<dsn_result> C<none>, as from an MTA that
+does not sign its bounces) is still C<ok> when the returned original
+verifies -- so C<ok> alone shows the bounce is about a genuine message,
+not that the bounce itself is signed. A caller that requires a signed
+bounce checks C<< dsn_result eq 'pass' >> as well. Neither says the
+message was one I<this> host sent: compare C<top>'s C<d=> and C<mf=> with
+your own.
 
 =head2 propagate(%args)
 
 Authenticates C<Message> as above (pass C<< SkipAuthentication => 1 >> if
 the caller already has), then rebuilds and re-signs it as described. Croaks
 rather than propagate a DSN that does not authenticate: section 12.1.2
-says such a DSN MUST NOT be propagated. C<ForwarderDomain> is the C<d=>
-of the hop to strip. Returns C<< { raw => $bytes, upstream_mailfrom =>
-$address } >>.
+says such a DSN MUST NOT be propagated; C<PubkeyCallback> and C<Resolver>
+are passed to C<authenticate>. C<ForwarderDomain> is the C<d=> of the hop
+to strip, and must be the C<d=> of the returned original's top
+DKIM2-Signature: propagate croaks rather than strip another domain's hop.
+Returns C<< { raw => $bytes, upstream_mailfrom => $address } >>.
 
 =head1 AUTHOR
 

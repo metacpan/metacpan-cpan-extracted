@@ -885,7 +885,8 @@ subtest 'MusicXML::_annotate_events -- slur arc detection' => sub {
 		);
 	};
 
-	# Three-note slur: notes 1-3 carry Slur; note 4 does not.
+	# Three-note slur: notes 1-3 carry Slur; note 4 (no Slur) is the landing note.
+	# slur_start goes on n1; slur_stop goes on n4 (the first note without Slur).
 	my $n1 = $mk_note->(['Slur']);
 	my $n2 = $mk_note->(['Slur']);
 	my $n3 = $mk_note->(['Slur']);
@@ -893,11 +894,12 @@ subtest 'MusicXML::_annotate_events -- slur arc detection' => sub {
 
 	my $ann = $gen->_annotate_events([$n1, $n2, $n3, $n4]);
 
-	ok $ann->{"$n1"}{slur_start}, 'n1: slur_start set (first in run)';
-	ok !$ann->{"$n2"}{slur_start}, 'n2: no second slur_start';
-	ok !$ann->{"$n2"}{slur_stop},  'n2: no slur_stop mid-run';
-	ok $ann->{"$n3"}{slur_stop},  'n3: slur_stop set (last in run)';
-	ok !$ann->{"$n4"}{slur_start}, 'n4: no slur involvement';
+	ok  $ann->{"$n1"}{slur_start},  'n1: slur_start set (first in run)';
+	ok !$ann->{"$n2"}{slur_start},  'n2: no second slur_start';
+	ok !$ann->{"$n2"}{slur_stop},   'n2: no slur_stop mid-run';
+	ok !$ann->{"$n3"}{slur_stop},   'n3: no slur_stop (arc continues to landing note)';
+	ok  $ann->{"$n4"}{slur_stop},   'n4: slur_stop on landing note';
+	ok !$ann->{"$n4"}{slur_start},  'n4: no slur_start on landing note';
 
 	diag 'slur annotation: ' . join(' ', map { "[$_]" } keys %$ann) if $ENV{TEST_VERBOSE};
 };

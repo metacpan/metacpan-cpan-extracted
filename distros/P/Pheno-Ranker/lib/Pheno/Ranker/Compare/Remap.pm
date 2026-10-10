@@ -12,7 +12,7 @@ use Pheno::Ranker::Compare::Prune
 
 use Exporter 'import';
 our @EXPORT_OK =
-  qw(remap_hash add_id2key guess_label canonicalize_nested_array_indexes normalize_nested_array_indexes remap_leaf_is_usable);
+  qw(remap_hash add_id2key guess_label normalize_nested_array_indexes remap_leaf_is_usable);
 
 sub remap_hash {
     my $arg          = shift;
@@ -40,16 +40,17 @@ sub remap_hash {
     #        %$hash  = 0 , then we return {}, to avoid trouble w/ Fold.pm
     return {} unless %$hash;
 
-# A bit more pruning plus nested array normalization and folding
-# NB: Hash::Fold keeps white spaces on keys
-#
-# Options for 1D-array folding:
-# A) Array to Hash then Fold
-# B) Fold then Regex <=== CHOSEN
-#  - Avoids the need for deep cloning
-#  - Works across any JSON data structure (without specific key requirements)
-#  - BUT profiling shows it's ~5-10% slower than 'Array to Hash then Fold'
-#  - Does not accommodate specific remappings like 'interpretations.diagnosis.genomicInterpretations'
+    # Remapping pipeline:
+    # 1. Apply include/exclude pruning before identities are generated.
+    # 2. Normalize nested arrays before folding. Deeper arrays are converted
+    #    to hashes keyed by deterministic content signatures, so order-only
+    #    nested index differences disappear.
+    # 3. Fold with Hash::Fold. NB: Hash::Fold keeps white spaces on keys.
+    # 4. Replace first-level array indexes after folding.
+    #
+    # First-level arrays intentionally use the fold-then-remap path. This keeps
+    # the documented CURIE-style replacement separate from the content-derived
+    # signatures used for deeper nested arrays.
     set_excluded_phenotypicFeatures( $hash, $switch, $format );
     normalize_nested_array_indexes( $hash, $self );
     $hash = fold($hash);
@@ -227,56 +228,13 @@ sub _nested_item_signature {
     return 'idx_' . substr( sha1_hex( join "\x1e", @items ), 0, 12 );
 }
 
-sub canonicalize_nested_array_indexes {
-    my ( $hash, $self ) = @_;
-    my %work = %{$hash};
-
-    my @prefixes =
-      sort { _path_depth($b) <=> _path_depth($a) || $a cmp $b }
-      _nested_array_prefixes( \%work );
-
-    for my $prefix (@prefixes) {
-        my $signature = _nested_array_signature( $prefix, \%work, $self );
-        next unless defined $signature;
-
-        my $replacement = $prefix;
-        $replacement =~ s/([^\.]+):\d+\z/$1.$signature/;
-
-        for my $key ( keys %work ) {
-            next unless $key eq $prefix || index( $key, "$prefix." ) == 0;
-            my $new_key = $key;
-            substr( $new_key, 0, length $prefix ) = $replacement;
-            $work{$new_key} = delete $work{$key};
-        }
-    }
-
-    return \%work;
-}
-
-sub _nested_array_prefixes {
-    my $hash = shift;
-    my %prefix;
-
-    for my $key ( keys %{$hash} ) {
-        my @parts = split /\./, $key;
-        my $array_seen = 0;
-
-        for my $i ( 0 .. $#parts ) {
-            next unless $parts[$i] =~ /:\d+\z/;
-            $array_seen++;
-            next if $array_seen == 1;
-
-            $prefix{ join '.', @parts[ 0 .. $i ] } = 1;
-        }
-    }
-
-    return keys %prefix;
-}
-
 sub _nested_array_signature {
     my ( $prefix, $hash, $self ) = @_;
     my @items;
 
+    # Used for generic JSON first-level array default identity inference from
+    # already-folded hashes. Pre-fold nested array normalization uses
+    # _nested_item_signature().
     for my $key ( sort keys %{$hash} ) {
         next unless $key eq $prefix || index( $key, "$prefix." ) == 0;
         my $value = $hash->{$key};
@@ -290,11 +248,6 @@ sub _nested_array_signature {
 
     return unless @items;
     return 'idx_' . substr( sha1_hex( join "\x1e", @items ), 0, 12 );
-}
-
-sub _path_depth {
-    my $path = shift;
-    return scalar split /\./, $path;
 }
 
 sub remap_leaf_is_usable {

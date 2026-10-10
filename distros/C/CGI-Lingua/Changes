@@ -1,5 +1,173 @@
 Revision history for CGI-Lingua
 
+0.87	Fri Oct  9 04:54:52 PM EDT 2026
+	[ Incompatible changes ]
+	- Entries of the supported list that are not language tags (e.g.
+	  'english', undef, references) are dropped with a warning; a list entry
+	  'en-uk' becomes 'en-gb', anywhere in Accept-Language too
+	- Accept-Language tags with q=0, or with a q value outside the RFC 7231
+	  range, are never chosen
+	- country(), locale(), time_zone() and translation_file() return a real
+	  undef in list context (one element), not an empty list
+	- translation_file() returns only readable regular files, and refuses an
+	  empty or reference directory argument
+	- requested_language() always returns a string ('Unknown' rather than
+	  undef)
+	- new() croaks "info must be an object with a lang() method" for an info
+	  argument that cannot answer lang()
+	- Cache keys and the saved state have changed; entries written by 0.86
+	  are ignored and rebuilt.  The cache is only used when REMOTE_ADDR is a
+	  valid address
+	- Public methods no longer clear the caller's $@ or $!
+	- Nothing is imported into the CGI::Lingua namespace any more, so
+	  $obj->carp, $obj->croak, $obj->blessed and the 29 Data::Validate::IP
+	  functions ($obj->is_public_ip and so on) are no longer methods
+	- CGI::Info, Class::Load, Sys::Syslog and I18N::LangTags::Detect are no
+	  longer prerequisites (CGI::Info is recommended for the lang= parameter)
+	[ Documentation ]
+	- Documented the en-uk to en-gb rule and its warning, the Puerto Rico
+	  and Hong Kong corrections in country(), and the "English (Unknown: zz)"
+	  form of requested_language()
+	- New CONFIGURATION VARIABLES section: $CGI::Lingua::ZONE_FILE and the new
+	  @CGI::Lingua::GEOIP_DAT; language() now lists its input warnings; the
+	  supported-list rules are in new() and COMMON PITFALLS
+	- FORMAL SPECIFICATION (new) and STATE DIAGRAM brought in line with the
+	  validated cache restore
+	- Post-release roadmap added as TODO comments at the top of the module
+	- country(): note that geoplugin.net no longer has a free tier (as of
+	  October 2026 it returns HTTP 403 with no country code, so the lookup falls
+	  through to Whois), and that legacy GeoIP.dat databases are frozen and can
+	  be wrong for reallocated addresses
+	- Rewrote the POD in plain English: more SYNOPSIS examples, a DESCRIPTION
+	  of how the language and country are found, and new COMMON PITFALLS,
+	  ENCODING and STATE DIAGRAM sections
+	- Every public method now has an API SPECIFICATION with Input and Output
+	  schemas (Params::Validate::Strict / Return::Set format); the POD passes
+	  extract-schemas --strict-pod=fatal
+	- FORMAL SPECIFICATION rewritten as Z schemas
+	- Fixed inaccurate POD: new() no longer lists a 'data' argument (it was
+	  never used); LIMITATIONS no longer says that the logger must be a
+	  blessed object; locale() example called a non-existent currency_code()
+	  method; text_direction() example had broken quoting
+	[ Security ]
+	- The lang= parameter from the info object (CGI::Info) was used without
+	  any check: CR/LF, markup and any length reached I18N::AcceptLanguage, the
+	  cache key and log messages.  It now passes the same check as
+	  HTTP_ACCEPT_LANGUAGE, or is ignored with "lang parameter contains invalid
+	  characters; ignoring"
+	- HTTP_ACCEPT_LANGUAGE was checked with \s, which allows CR and LF, so
+	  "en\r\nstats" was accepted; only spaces and tabs are allowed now
+	- Cache keys were built from the raw REMOTE_ADDR, so
+	  "1.2.3.4\r\nflush_all" became part of a key (command injection on the
+	  Memcached text protocol).  Keys now use only the checked address and
+	  language values, and an invalid REMOTE_ADDR means no object caching.
+	  REMOTE_ADDR is checked in one place (_untaint_ip, anchored with \z)
+	- Cache poisoning: values read back from the cache were trusted, so a
+	  shared or world-writable backend could make country() return
+	  "gb<script>...", language() return a hash, or language_code_alpha2()
+	  return "../../etc" (which translation_file() then put into a path).
+	  Every cached value is now checked against the shape CGI::Lingua writes;
+	  a malformed one is removed and warned about ("Discarding malformed cache
+	  entry for ..."), and the answer is worked out again
+	- new() restored every key of the saved blob into the object, so a blob
+	  could replace the logger, the supported list or dont_use_ip; only the
+	  six answer fields are restored now
+	- translation_file() returned anything named en.json that existed: a
+	  directory, /dev/urandom or /dev/zero (via a symlink), or an unreadable
+	  file; it now returns only readable regular files, refuses an empty or
+	  reference $dir and an extension with a trailing newline, and escapes
+	  control characters in its warnings (log-line forging)
+	- time_zone() read /etc/timezone with an unbounded <$fh>, so a link to
+	  /dev/zero would never finish; it now reads at most 256 bytes of a
+	  regular file, checks the zone name, and falls back to
+	  DateTime::TimeZone otherwise (an empty file used to warn and give undef)
+	[ Bug Fixes ]
+	- The deprecated en-uk tag was only rewritten to en-gb when it was the
+	  whole Accept-Language header; "en-uk,fr;q=0.5" gave "English (Unknown:
+	  uk)".  It is now rewritten wherever it appears, with a warning
+	- Makefile.PL: Carp, Scalar::Util and Socket are declared; the local geo
+	  databases, LWP::Simple and CGI::Info are listed as optional features;
+	  the repository URL uses https
+	- Entries of the supported list that are not language tags ("english")
+	  were silently never matched; they are now dropped with "Ignoring '...' in
+	  the supported list: not a language code"
+	- A corrupt GeoIP.dat made Geo::IP->open die or return undef, and
+	  country() then called a method on undef; the file is now skipped with
+	  "Can't open ... with Geo::IP; not using it"
+	- Removed code that could never run: the I18N::LangTags::Detect fallback in
+	  _find_language (I18N::LangTags::Detect is no longer a prerequisite) and
+	  the hyphen-less branch of _resolve_sublanguage_match (with its
+	  mismatched "accepts:" cache keys)
+	- _is_ipv4() accepted non-ASCII digits (e.g. U+0661) and a trailing newline
+	- _is_ipv6() pure-Perl fallback could never return true: it used tr/:://,
+	  which counts colon characters rather than "::" pairs
+	- _in_baidu_subnet() treated out-of-range octets as inside the subnet
+	  (pack 'C' wraps 185.10.104.300 to .44), accepted a trailing newline, and
+	  warned on undef
+	- _clean_country_code() warned on undef
+	- GEOIP_COUNTRY_CODE and HTTP_CF_IPCOUNTRY (in country() and locale())
+	  are now checked with /^([A-Z]{2})\z/a; with $ a trailing newline such as
+	  "GB\n" was accepted
+	- Public methods (new, the language accessors, country, locale, time_zone,
+	  translation_file) and DESTROY no longer overwrite the caller's $@ or $!;
+	  internal evals, file tests and HTTP calls now run under local
+	- CGI::Lingua::new() called as a function with an unblessed logger (e.g. an
+	  arrayref) died with "Can't call method error on unblessed reference"
+	  instead of the documented "use ->new() not ::new()" message
+	- requested_language() is documented to return a string and now returns
+	  'Unknown' rather than undef if I18N::LangTags::Detect finds nothing
+	- _find_language_from_ip(): the "Couldn't determine closest language"
+	  warning printed ARRAY(0x...) instead of the supported languages, and the
+	  "Can't determine code from IP" warning raised an uninitialized-value
+	  warning when the country came from LANG (no REMOTE_ADDR)
+	- _resolve_sublanguage_match(): a cached variety entry with an empty name
+	  (e.g. "=en") produced a requested language of "English ()"
+	- Warnings that CGI::Lingua does not suppress now reach the caller's
+	  $SIG{__WARN__} handler; previously they went straight to STDERR, and
+	  _accept_language_match() reset the handler to DEFAULT for the rest of the
+	  call
+	- An upstream failure no longer takes down the request: a geoplugin or
+	  ip-api.com timeout (LWP dying), an IANA connection error, or a cache
+	  backend that dies (full disk, unreachable server, CHI with
+	  on_get_error => 'die') used to make new(), country() or time_zone() die;
+	  each is now caught, logged ("geoplugin lookup failed: ...",
+	  "ip-api.com lookup failed: ...", "Cache get failed: ...") and treated as
+	  "no answer from that source"
+	- country(): a malformed geoplugin answer (a JSON object, "GB<script>") is
+	  now rejected at once, so the Whois fallback still runs; before, the junk
+	  value stopped Whois and was then discarded, leaving no country
+	- time_zone(): when an LWP module is installed but JSON::Parse is not, the
+	  warning now says "JSON::Parse is absent; cannot read ip-api.com answers"
+	  instead of wrongly claiming that both LWP modules are absent (with no LWP
+	  module at all, the LWP message is still given)
+	- _resolve_sublanguage_match(): a stale $@ from the caller could be
+	  logged as a Locale::Object error; the eval's error is now kept in a
+	  lexical
+	- country(), locale(), time_zone() and translation_file() returned an
+	  empty list in list context instead of undef, so
+	  "%vars = (country => $l->country(), ...)" shifted every later key
+	- Accept-Language: q=0 ("not acceptable", RFC 7231) was ignored, so
+	  "fr;q=0, en;q=0.5" chose French; tags with a q value outside the RFC
+	  grammar are now dropped too
+	- sublanguage() was undef after a restore from the cache (_sublanguage was
+	  not saved), and a cached dont_use_ip overrode the caller's
+	- new() with supported => 'en' (a string) and a cache hit left
+	  _supported as a string
+	- An info object without lang() made new() die with Perl's own message;
+	  it now croaks "info must be an object with a lang() method", and an
+	  AUTOLOAD lang() that dies is treated as no lang parameter
+	- undef, references or '' inside the supported list made
+	  I18N::AcceptLanguage warn; they are now ignored
+	[ Tests ]
+	- Much larger suite: white-box tests for every helper, an API ledger that
+	  fails if any documented message or return state is not produced, tests
+	  for every combination of optional modules, hostile-input, filesystem and
+	  upstream-failure tests, with a regression test for each fix above
+	- t/country.t no longer fails on hosts with Debian's frozen GeoIP.dat,
+	  which maps 45.128.139.41 to Guadeloupe; added t/geoip.t
+	- Test requirements now include JSON::Parse, LWP::Simple::WithCache,
+	  CGI::Info, Test::Permissions, Test::More and Test::Mockingbird 0.14
+
 0.86	Mon Oct  5 02:32:02 PM EDT 2026
 	[ Bug Fixes ]
 	- t/mutant_killers.t: time_zone() local-mode test failed on FreeBSD, which has

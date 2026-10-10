@@ -1,5 +1,5 @@
 ---
-abstract: '😸 Soothing pastel theme for the high-spirited!'
+abstract: 'Soothing pastel theme for the high-spirited!'
 author:
   - 'Rob Norris <robn@despairlabs.com>'
 build_requires:
@@ -21,7 +21,7 @@ resources:
   bugtracker: https://github.com/robn/Catppuccin/issues
   homepage: https://github.com/robn/Catppuccin
   repository: https://github.com/robn/Catppuccin.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.044000'
@@ -165,7 +165,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.001'
+          tag: '0.002'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

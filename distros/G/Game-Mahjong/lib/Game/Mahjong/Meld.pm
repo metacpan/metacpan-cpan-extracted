@@ -9,7 +9,7 @@ use Object::Proto::Sugar -types;
 use Game::Mahjong::Tiles;
 use Game::Mahjong::Notation;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 our %KIND;
 BEGIN { %KIND = (chow => 3, pung => 3, kong => 4) }
@@ -141,7 +141,7 @@ Game::Mahjong::Meld - a chow, a pung or a kong
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

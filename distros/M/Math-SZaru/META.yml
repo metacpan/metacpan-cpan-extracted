@@ -3,6 +3,7 @@ abstract: 'Perl wrapper for the SZaru C++ library'
 author:
   - 'Steffen Mueller, E<lt>cpan@steffen-mueller.netE<gt>'
 build_requires:
+  ExtUtils::CBuilder: '0'
   ExtUtils::Typemaps::Default: '0.01'
   ExtUtils::XSpp: '0.18'
   Test::More: '0.88'
@@ -12,7 +13,6 @@ configure_requires:
   ExtUtils::CChecker: '0'
   ExtUtils::CppGuess: '0.27'
   File::Copy: '0'
-  File::Find: '0'
   Module::Build: '0.42'
   Module::Build::WithXSpp: '0.14'
 dynamic_config: 1
@@ -25,7 +25,7 @@ name: Math-SZaru
 provides:
   Math::SZaru:
     file: lib/Math/SZaru.pm
-    version: '0.02'
+    version: '0.03'
   Math::SZaru::QuantileEstimator:
     file: lib/Math/SZaru/QuantileEstimator.pm
   Math::SZaru::TopEstimator:
@@ -34,5 +34,5 @@ provides:
     file: lib/Math/SZaru/UniqueEstimator.pm
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

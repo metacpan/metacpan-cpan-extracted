@@ -1,7 +1,7 @@
 {
    "abstract" : "Low-Level Perl Interface to lzma compression library",
    "author" : [
-      "Paul Marquess <pmqs@cpan.org>"
+      "Paul Marquess <pmqs@outlook.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
@@ -45,6 +45,6 @@
          "web" : "https://github.com/pmqs/Compress-Raw-Lzma"
       }
    },
-   "version" : "2.224",
+   "version" : "2.225",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

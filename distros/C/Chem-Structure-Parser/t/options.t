@@ -241,6 +241,59 @@ lives_ok  { structure_info($file, model => 'all') } "model => 'all' is allowed";
 }
 
 #--------
+# the same views of a structure already in a string.  structure_info_string()
+# read a view's name as the first half of an option pair, and died of perl's
+# 'Odd number of elements in hash assignment' until 0.039.
+#--------
+{
+	open my $fh, '<', $file or die "Can't open '$file' with mode '<': '$!'";
+	my $text = do { local $/; <$fh> };
+	close $fh or die "Can't close '$file': '$!'";
+	is_deeply(structure_info_string($text, 'dssp'), structure_info($file, 'dssp'),
+		"structure_info_string(\$text, 'dssp') is the view, as it is from the file");
+	is_deeply(structure_info_string($text, 'torsions', hydrogens => 0),
+	          structure_info($file, 'torsions', hydrogens => 0),
+		'and the options after a view are the reader\'s there too');
+	throws_ok { structure_info_string($text, 'nosuch') }
+		qr/\Astructure_info_string: 'nosuch' is not a view/,
+		'a name that is not a view dies, naming the function called';
+	throws_ok { structure_info_string($text, 'hydrogens') }
+		qr/structure_info_string\(\$text, hydrogens => 1\)/,
+		'and an option name in that place is told how to write it';
+}
+
+#--------
+# an option list that is not pairs.  It died where it was unpacked into a hash,
+# of perl's 'Odd number of elements in hash assignment', which said neither
+# which function was called nor what was wrong.
+#--------
+throws_ok { structure_info($file, { model => 1 }) }
+	qr/\Astructure_info: the options come in name => value pairs/,
+	'structure_info: an option list of odd length says so';
+throws_ok { structure_features(structure_info($file, features => 0), 'sasa') }
+	qr/\Astructure_features: the options after the first argument come in name => value pairs/,
+	'and so does every function that takes options after a structure';
+
+#--------
+# a model number larger than the parse can hold.  '9223372036854775808' passed
+# the pattern and wrapped to a negative IV on the way in, which is the parse's
+# sentinel for every model: one model asked for, all of them handed back.  The
+# largest IV is the last that is allowed, on any perl's IV.
+#--------
+{
+	my $max = ~0 >> 1;
+	(my $over = "$max") =~ s/7\z/8/;    # IV_MAX ends in 7 at 32 and at 64 bits
+	throws_ok { structure_info($file, model => $over) }
+		qr/\Astructure_info: model $over is larger than any model number this perl can hold/,
+		'a model number one past the largest integer is refused';
+	throws_ok { structure_info($file, model => '9223372036854775808') }
+		qr/is larger than any model number/, 'and so is the one that came back as every model';
+	lives_ok { structure_info($file, model => $max) } 'the largest integer is a model number';
+	is(structure_info($file, model => "000$max")->{model}, 1,
+		'and leading zeros pad it rather than overflow it');
+}
+
+#--------
 # the torsions view: each chain's torsions hash, keyed by chain id, with the
 # residue_order the arrays are parallel to.  A structure whose chains are of
 # different kinds is the case it is for, and no fixture is one with real

@@ -1,0 +1,3305 @@
+finkel|4xx2/8/4xx2 l 7 0 7 0|0|
+finkel|4xx2/8/4xx2 l 7 0 7 0|1|0>1
+finkel|4xx2/8/4xx2 l 7 0 7 0|2|0>2
+finkel|4xx2/8/4xx2 l 7 0 7 0|3|0>3
+finkel|4xx2/8/4xx2 l 7 0 7 0|4|0>4*
+masters|4xx2/8/4xx2 l 7 0 7 0|1|0>1
+masters|4xx2/8/4xx2 l 7 0 7 0|2|0>2
+masters|4xx2/8/4xx2 l 7 0 7 0|3|0>3
+masters|4xx2/8/4xx2 l 7 0 7 0|4|0>4*
+finkel|4xx2/8/4xx2 d 7 0 7 0|0|
+finkel|4xx2/8/4xx2 d 7 0 7 0|1|0>1
+finkel|4xx2/8/4xx2 d 7 0 7 0|2|0>2
+finkel|4xx2/8/4xx2 d 7 0 7 0|3|0>3
+finkel|4xx2/8/4xx2 d 7 0 7 0|4|0>4*
+masters|4xx2/8/4xx2 d 7 0 7 0|1|0>1
+masters|4xx2/8/4xx2 d 7 0 7 0|2|0>2
+masters|4xx2/8/4xx2 d 7 0 7 0|3|0>3
+masters|4xx2/8/4xx2 d 7 0 7 0|4|0>4*
+finkel|4xx2/l2d2l1/1l2xx1l l 2 1 6 0|0|
+finkel|4xx2/l2d2l1/1l2xx1l l 2 1 6 0|1|0>1 3>4* 5>6 11>12 13>14*
+finkel|4xx2/l2d2l1/1l2xx1l l 2 1 6 0|2|0>2 5>7 13>15
+finkel|4xx2/l2d2l1/1l2xx1l l 2 1 6 0|3|3>6 11>14*
+finkel|4xx2/l2d2l1/1l2xx1l l 2 1 6 0|4|0>4* 3>7 5>9 11>15
+short-open|4xx2/l2d2l1/1l2xx1l l 2 1 6 0|0|
+short-open|4xx2/l2d2l1/1l2xx1l l 2 1 6 0|1|0>1 3>4* 5>6 11>12 13>14*
+short-open|4xx2/l2d2l1/1l2xx1l l 2 1 6 0|2|0>2 5>7 13>15
+short-open|4xx2/l2d2l1/1l2xx1l l 2 1 6 0|3|3>6 5>8x* 11>14*
+short-open|4xx2/l2d2l1/1l2xx1l l 2 1 6 0|4|0>4* 3>7 5>9 11>15
+masters|4xxdd/l2d2ll/4xx1l l 3 0 4 0|1|0>1 5>6 11>12x* 15>16*
+masters|4xxdd/l2d2ll/4xx1l l 3 0 4 0|2|0>2 5>7 11>13x 14>16* 15>17
+masters|4xxdd/l2d2ll/4xx1l l 3 0 4 0|3|0>3 5>8x* 14>17
+masters|4xxdd/l2d2ll/4xx1l l 3 0 4 0|4|0>4* 5>9
+masters|4xxdd/l2d2ll/4xx1l d 3 0 4 0|1|0>1 8>9 16>17
+masters|4xxdd/l2d2ll/4xx1l d 3 0 4 0|2|0>2 8>10 15>17
+masters|4xxdd/l2d2ll/4xx1l d 3 0 4 0|3|0>3 8>11x
+masters|4xxdd/l2d2ll/4xx1l d 3 0 4 0|4|0>4* 8>12*
+long-safe|4xxdd/l2d2ll/4xx1l l 3 0 4 0|0|
+long-safe|4xxdd/l2d2ll/4xx1l l 3 0 4 0|1|0>1 5>6 15>16*
+long-safe|4xxdd/l2d2ll/4xx1l l 3 0 4 0|2|0>2 5>7 11>13x 14>16* 15>17
+long-safe|4xxdd/l2d2ll/4xx1l l 3 0 4 0|3|0>3 14>17
+long-safe|4xxdd/l2d2ll/4xx1l l 3 0 4 0|4|0>4* 5>9
+long-safe|4xxdd/l2d2ll/4xx1l d 3 0 4 0|0|
+long-safe|4xxdd/l2d2ll/4xx1l d 3 0 4 0|1|0>1 8>9 16>17
+long-safe|4xxdd/l2d2ll/4xx1l d 3 0 4 0|2|0>2 8>10 15>17
+long-safe|4xxdd/l2d2ll/4xx1l d 3 0 4 0|3|0>3 8>11x
+long-safe|4xxdd/l2d2ll/4xx1l d 3 0 4 0|4|0>4* 8>12*
+finkel|4xx2/1l1l1l1l/l1l1xx2 l 1 0 7 0|0|
+finkel|4xx2/1l1l1l1l/l1l1xx2 l 1 0 7 0|1|0>1 2>3 4>5 6>7 8>9 10>11 12>13
+finkel|4xx2/1l1l1l1l/l1l1xx2 l 1 0 7 0|2|12>14*
+finkel|4xx2/1l1l1l1l/l1l1xx2 l 1 0 7 0|3|0>3 2>5 4>7 6>9 8>11 10>13 12>15
+finkel|4xx2/1l1l1l1l/l1l1xx2 l 1 0 7 0|4|10>14*
+masters|4xx2/1l1l1l1l/l1l1xx2 l 1 0 7 0|1|0>1 2>3 4>5 6>7 8>9 10>11 14>15
+masters|4xx2/1l1l1l1l/l1l1xx2 l 1 0 7 0|2|10>12* 14>16*
+masters|4xx2/1l1l1l1l/l1l1xx2 l 1 0 7 0|3|0>3 2>5 4>7 6>9 8>11 10>13 14>17
+masters|4xx2/1l1l1l1l/l1l1xx2 l 1 0 7 0|4|8>12*
+finkel|4xx2/1lldll2/lll1xx2 l 0 0 3 3|0|
+finkel|4xx2/1lldll2/lll1xx2 l 0 0 3 3|1|4>5 10>11
+finkel|4xx2/1lldll2/lll1xx2 l 0 0 3 3|2|3>5 9>11 10>12
+finkel|4xx2/1lldll2/lll1xx2 l 0 0 3 3|3|2>5 9>12 10>13
+finkel|4xx2/1lldll2/lll1xx2 l 0 0 3 3|4|7>11 9>13 10>14*
+finkel|1d1dxxdd/1d1d1d2/3lxx1l l 3 2 0 0|0|
+finkel|1d1dxxdd/1d1d1d2/3lxx1l l 3 2 0 0|1|1>2 13>14*
+finkel|1d1dxxdd/1d1d1d2/3lxx1l l 3 2 0 0|2|0>2 1>3 13>15
+finkel|1d1dxxdd/1d1d1d2/3lxx1l l 3 2 0 0|3|0>3 1>4*
+finkel|1d1dxxdd/1d1d1d2/3lxx1l l 3 2 0 0|4|0>4* 1>5
+finkel|4xx2/d1dddlll/lll1xxl1 l 0 0 3 0|0|
+finkel|4xx2/d1dddlll/lll1xxl1 l 0 0 3 0|1|4>5x 12>13 14>15
+finkel|4xx2/d1dddlll/lll1xxl1 l 0 0 3 0|2|3>5x 4>6 11>13
+finkel|4xx2/d1dddlll/lll1xxl1 l 0 0 3 0|3|2>5x 3>6 4>7x 10>13 12>15
+finkel|4xx2/d1dddlll/lll1xxl1 l 0 0 3 0|4|2>6 3>7x 11>15
+finkel|2ddxxdd/dd1ll1ld/3lxx2 d 2 1 0 0|0|
+finkel|2ddxxdd/dd1ll1ld/3lxx2 d 2 1 0 0|1|2>3 6>7 14>15
+finkel|2ddxxdd/dd1ll1ld/3lxx2 d 2 1 0 0|2|1>3 2>4* 5>7 13>15
+finkel|2ddxxdd/dd1ll1ld/3lxx2 d 2 1 0 0|3|1>4* 6>9x 12>15
+finkel|2ddxxdd/dd1ll1ld/3lxx2 d 2 1 0 0|4|5>9x 6>10
+finkel|4xx2/3d3l/1ll1xxl1 l 1 2 6 0|0|
+finkel|4xx2/3d3l/1ll1xxl1 l 1 2 6 0|1|0>1 3>4* 12>13 14>15
+finkel|4xx2/3d3l/1ll1xxl1 l 1 2 6 0|2|2>4* 3>5
+finkel|4xx2/3d3l/1ll1xxl1 l 1 2 6 0|3|2>5 3>6 12>15
+finkel|4xx2/3d3l/1ll1xxl1 l 1 2 6 0|4|0>4* 2>6 3>7
+finkel|4xx2/1d1lll2/4xx2 d 3 1 0 6|0|
+finkel|4xx2/1d1lll2/4xx2 d 3 1 0 6|1|6>7
+finkel|4xx2/1d1lll2/4xx2 d 3 1 0 6|2|
+finkel|4xx2/1d1lll2/4xx2 d 3 1 0 6|3|6>9x
+finkel|4xx2/1d1lll2/4xx2 d 3 1 0 6|4|6>10x
+finkel|dd1dxx1d/1l1l3l/4xx1l d 3 0 3 0|0|
+finkel|dd1dxx1d/1l1l3l/4xx1l d 3 0 3 0|1|1>2 4>5 13>14*
+finkel|dd1dxx1d/1l1l3l/4xx1l d 3 0 3 0|2|0>2 3>5 4>6x 13>15
+finkel|dd1dxx1d/1l1l3l/4xx1l d 3 0 3 0|3|3>6x 4>7
+finkel|dd1dxx1d/1l1l3l/4xx1l d 3 0 3 0|4|1>5 3>7
+finkel|2d1xxd1/dl1d1d2/4xx2 l 2 4 2 0|0|
+finkel|2d1xxd1/dl1d1d2/4xx2 l 2 4 2 0|1|0>1 6>7
+finkel|2d1xxd1/dl1d1d2/4xx2 l 2 4 2 0|2|0>2
+finkel|2d1xxd1/dl1d1d2/4xx2 l 2 4 2 0|3|0>3 6>9
+finkel|2d1xxd1/dl1d1d2/4xx2 l 2 4 2 0|4|0>4* 6>10x
+finkel|d1ddxx2/ll1d1ll1/1ll1xxl1 l 0 0 2 1|0|
+finkel|d1ddxx2/ll1d1ll1/1ll1xxl1 l 0 0 2 1|1|3>4* 6>7 11>12 14>15
+finkel|d1ddxx2/ll1d1ll1/1ll1xxl1 l 0 0 2 1|2|2>4* 5>7 10>12 11>13
+finkel|d1ddxx2/ll1d1ll1/1ll1xxl1 l 0 0 2 1|3|6>9 10>13
+finkel|d1ddxx2/ll1d1ll1/1ll1xxl1 l 0 0 2 1|4|3>7 5>9 11>15
+finkel|4xx2/3l1l2/4xx2 d 5 0 0 7|0|
+finkel|4xx2/3l1l2/4xx2 d 5 0 0 7|1|
+finkel|4xx2/3l1l2/4xx2 d 5 0 0 7|2|
+finkel|4xx2/3l1l2/4xx2 d 5 0 0 7|3|
+finkel|4xx2/3l1l2/4xx2 d 5 0 0 7|4|
+finkel|d3xxdd/1d1dl2l/4xx2 l 2 3 0 2|0|
+finkel|d3xxdd/1d1dl2l/4xx2 l 2 3 0 2|1|0>1 9>10 12>13
+finkel|d3xxdd/1d1dl2l/4xx2 l 2 3 0 2|2|0>2 9>11 12>14*
+finkel|d3xxdd/1d1dl2l/4xx2 l 2 3 0 2|3|0>3 12>15
+finkel|d3xxdd/1d1dl2l/4xx2 l 2 3 0 2|4|0>4* 9>13
+finkel|1dd1xx2/1dddl1l1/l2lxx2 l 2 1 0 2|0|
+finkel|1dd1xx2/1dddl1l1/l2lxx2 l 2 1 0 2|1|1>2 4>5 9>10 11>12
+finkel|1dd1xx2/1dddl1l1/l2lxx2 l 2 1 0 2|2|0>2 1>3 4>6x 11>13
+finkel|1dd1xx2/1dddl1l1/l2lxx2 l 2 1 0 2|3|0>3 4>7x 9>12 11>14*
+finkel|1dd1xx2/1dddl1l1/l2lxx2 l 2 1 0 2|4|1>5 9>13 11>15
+finkel|4xx2/3dl1l1/l3xx2 l 0 4 2 4|0|
+finkel|4xx2/3dl1l1/l3xx2 l 0 4 2 4|1|4>5 9>10 11>12
+finkel|4xx2/3dl1l1/l3xx2 l 0 4 2 4|2|4>6 11>13
+finkel|4xx2/3dl1l1/l3xx2 l 0 4 2 4|3|4>7 9>12 11>14*
+finkel|4xx2/3dl1l1/l3xx2 l 0 4 2 4|4|9>13 11>15
+finkel|2d1xxd1/1ddl1ldd/1ll1xx2 d 0 3 1 0|0|
+finkel|2d1xxd1/1ddl1ldd/1ll1xx2 d 0 3 1 0|1|0>1 2>3 12>13 14>15
+finkel|2d1xxd1/1ddl1ldd/1ll1xx2 d 0 3 1 0|2|2>4* 7>9 11>13
+finkel|2d1xxd1/1ddl1ldd/1ll1xx2 d 0 3 1 0|3|0>3 2>5 6>9 7>10x 12>15
+finkel|2d1xxd1/1ddl1ldd/1ll1xx2 d 0 3 1 0|4|0>4* 6>10x 11>15
+finkel|d1ddxxdd/ldld1l2/1lllxx2 l 0 1 0 0|0|
+finkel|d1ddxxdd/ldld1l2/1lllxx2 l 0 1 0 0|1|3>4* 5>6x 10>11
+finkel|d1ddxxdd/ldld1l2/1lllxx2 l 0 1 0 0|2|2>4* 7>9 10>12
+finkel|d1ddxxdd/ldld1l2/1lllxx2 l 0 1 0 0|3|1>4* 3>6x 10>13
+finkel|d1ddxxdd/ldld1l2/1lllxx2 l 0 1 0 0|4|2>6x 5>9 7>11 10>14*
+finkel|4xx2/ll1l2l1/l2lxx2 d 1 0 5 2|0|
+finkel|4xx2/ll1l2l1/l2lxx2 d 1 0 5 2|1|0>1
+finkel|4xx2/ll1l2l1/l2lxx2 d 1 0 5 2|2|0>2
+finkel|4xx2/ll1l2l1/l2lxx2 d 1 0 5 2|3|0>3
+finkel|4xx2/ll1l2l1/l2lxx2 d 1 0 5 2|4|0>4*
+finkel|1dd1xx1d/l2dd1ld/4xx2 l 0 5 1 0|0|
+finkel|1dd1xx1d/l2dd1ld/4xx2 l 0 5 1 0|1|5>6 11>12x
+finkel|1dd1xx1d/l2dd1ld/4xx2 l 0 5 1 0|2|5>7 11>13
+finkel|1dd1xx1d/l2dd1ld/4xx2 l 0 5 1 0|3|11>14*
+finkel|1dd1xx1d/l2dd1ld/4xx2 l 0 5 1 0|4|5>9x 11>15
+finkel|d3xxd1/dd1ld1ld/ll1lxx2 d 2 0 0 1|0|
+finkel|d3xxd1/dd1ld1ld/ll1lxx2 d 2 0 0 1|1|6>7 9>10 12>13 14>15
+finkel|d3xxd1/dd1ld1ld/ll1lxx2 d 2 0 0 1|2|5>7 9>11x
+finkel|d3xxd1/dd1ld1ld/ll1lxx2 d 2 0 0 1|3|4>7 12>15
+finkel|d3xxd1/dd1ld1ld/ll1lxx2 d 2 0 0 1|4|6>10 9>13
+finkel|4xxdd/d1dl2d1/4xx2 d 2 4 2 0|0|
+finkel|4xxdd/d1dl2d1/4xx2 d 2 4 2 0|1|0>1 5>6 11>12 14>15
+finkel|4xxdd/d1dl2d1/4xx2 d 2 4 2 0|2|0>2 7>9 13>15
+finkel|4xxdd/d1dl2d1/4xx2 d 2 4 2 0|3|0>3 7>10
+finkel|4xxdd/d1dl2d1/4xx2 d 2 4 2 0|4|0>4* 5>9 11>15
+finkel|4xx1d/1lll1ld1/1ll1xx2 d 0 1 2 3|0|
+finkel|4xx1d/1lll1ld1/1ll1xx2 d 0 1 2 3|1|0>1 11>12 13>14*
+finkel|4xx1d/1lll1ld1/1ll1xx2 d 0 1 2 3|2|0>2 13>15
+finkel|4xx1d/1lll1ld1/1ll1xx2 d 0 1 2 3|3|0>3 11>14*
+finkel|4xx1d/1lll1ld1/1ll1xx2 d 0 1 2 3|4|0>4* 11>15
+finkel|3dxx2/1d1l4/ll2xxl1 d 0 3 3 2|0|
+finkel|3dxx2/1d1l4/ll2xxl1 d 0 3 3 2|1|1>2 6>7
+finkel|3dxx2/1d1l4/ll2xxl1 d 0 3 3 2|2|0>2 1>3
+finkel|3dxx2/1d1l4/ll2xxl1 d 0 3 3 2|3|0>3 1>4* 6>9
+finkel|3dxx2/1d1l4/ll2xxl1 d 0 3 3 2|4|0>4* 1>5 6>10
+finkel|4xx1d/l1ld1ll1/l1l1xxl1 l 0 0 1 4|0|
+finkel|4xx1d/l1ld1ll1/l1l1xxl1 l 0 0 1 4|1|2>3 5>6 11>12 14>15
+finkel|4xx1d/l1ld1ll1/l1l1xxl1 l 0 0 1 4|2|4>6 7>9 10>12 11>13
+finkel|4xx1d/l1ld1ll1/l1l1xxl1 l 0 0 1 4|3|10>13
+finkel|4xx1d/l1ld1ll1/l1l1xxl1 l 0 0 1 4|4|2>6 5>9 11>15
+finkel|4xx2/d2l4/4xx2 d 1 5 4 2|0|
+finkel|4xx2/d2l4/4xx2 d 1 5 4 2|1|0>1 5>6
+finkel|4xx2/d2l4/4xx2 d 1 5 4 2|2|0>2 5>7
+finkel|4xx2/d2l4/4xx2 d 1 5 4 2|3|0>3
+finkel|4xx2/d2l4/4xx2 d 1 5 4 2|4|0>4* 5>9
+finkel|d1ddxxd1/1dllld2/ll1lxx2 d 1 0 0 1|0|
+finkel|d1ddxxd1/1dllld2/ll1lxx2 d 1 0 0 1|1|2>3 4>5 6>7x 10>11 14>15
+finkel|d1ddxxd1/1dllld2/ll1lxx2 d 1 0 0 1|2|1>3 10>12
+finkel|d1ddxxd1/1dllld2/ll1lxx2 d 1 0 0 1|3|2>5 4>7x 6>9x 10>13
+finkel|d1ddxxd1/1dllld2/ll1lxx2 d 1 0 0 1|4|1>5
+finkel|dd2xx2/1ddd1ldd/3lxx2 l 0 5 0 0|0|
+finkel|dd2xx2/1ddd1ldd/3lxx2 l 0 5 0 0|1|1>2 10>11x
+finkel|dd2xx2/1ddd1ldd/3lxx2 l 0 5 0 0|2|1>3 10>12x
+finkel|dd2xx2/1ddd1ldd/3lxx2 l 0 5 0 0|3|1>4* 10>13
+finkel|dd2xx2/1ddd1ldd/3lxx2 l 0 5 0 0|4|1>5 10>14*
+finkel|4xx2/3d2ll/llllxx2 l 0 1 5 1|0|
+finkel|4xx2/3d2ll/llllxx2 l 0 1 5 1|1|4>5 12>13
+finkel|4xx2/3d2ll/llllxx2 l 0 1 5 1|2|3>5 4>6 11>13 12>14*
+finkel|4xx2/3d2ll/llllxx2 l 0 1 5 1|3|2>5 3>6 4>7 11>14* 12>15
+finkel|4xx2/3d2ll/llllxx2 l 0 1 5 1|4|1>5 2>6 3>7 11>15
+finkel|4xx2/3d4/2l1xx2 l 2 4 2 4|0|
+finkel|4xx2/3d4/2l1xx2 l 2 4 2 4|1|0>1 2>3
+finkel|4xx2/3d4/2l1xx2 l 2 4 2 4|2|2>4*
+finkel|4xx2/3d4/2l1xx2 l 2 4 2 4|3|0>3 2>5
+finkel|4xx2/3d4/2l1xx2 l 2 4 2 4|4|0>4* 2>6
+finkel|4xx2/dlddlll1/4xxl1 l 1 1 3 1|0|
+finkel|4xx2/dlddlll1/4xxl1 l 1 1 3 1|1|0>1 6>7x 11>12 14>15
+finkel|4xx2/dlddlll1/4xxl1 l 1 1 3 1|2|0>2 10>12 11>13
+finkel|4xx2/dlddlll1/4xxl1 l 1 1 3 1|3|0>3 9>12 10>13
+finkel|4xx2/dlddlll1/4xxl1 l 1 1 3 1|4|0>4* 9>13 11>15
+finkel|d1ddxx1d/1ldddl1l/l2lxxl1 l 0 1 0 0|0|
+finkel|d1ddxx1d/1ldddl1l/l2lxxl1 l 0 1 0 0|1|1>2 4>5 6>7x 10>11 12>13 14>15
+finkel|d1ddxx1d/1ldddl1l/l2lxxl1 l 0 1 0 0|2|1>3
+finkel|d1ddxx1d/1ldddl1l/l2lxxl1 l 0 1 0 0|3|4>7x 6>9x 10>13 12>15
+finkel|d1ddxx1d/1ldddl1l/l2lxxl1 l 0 1 0 0|4|1>5
+finkel|4xx2/3d4/4xx2 l 6 1 3 3|0|
+finkel|4xx2/3d4/4xx2 l 6 1 3 3|1|0>1
+finkel|4xx2/3d4/4xx2 l 6 1 3 3|2|0>2
+finkel|4xx2/3d4/4xx2 l 6 1 3 3|3|0>3
+finkel|4xx2/3d4/4xx2 l 6 1 3 3|4|0>4*
+finkel|d2dxx1d/dldd1d1l/1lllxx2 l 0 2 0 0|0|
+finkel|d2dxx1d/dldd1d1l/1lllxx2 l 0 2 0 0|1|3>4* 6>7x 12>13
+finkel|d2dxx1d/dldd1d1l/1lllxx2 l 0 2 0 0|2|2>4* 3>5x 12>14*
+finkel|d2dxx1d/dldd1d1l/1lllxx2 l 0 2 0 0|3|1>4* 2>5x 6>9 12>15
+finkel|d2dxx1d/dldd1d1l/1lllxx2 l 0 2 0 0|4|1>5x 3>7x 6>10x
+finkel|4xx2/3d4/4xx1l l 6 0 5 1|0|
+finkel|4xx2/3d4/4xx1l l 6 0 5 1|1|0>1 13>14*
+finkel|4xx2/3d4/4xx1l l 6 0 5 1|2|0>2 13>15
+finkel|4xx2/3d4/4xx1l l 6 0 5 1|3|0>3
+finkel|4xx2/3d4/4xx1l l 6 0 5 1|4|0>4*
+finkel|3dxxdd/dd1l1d1d/2l1xxl1 d 2 2 0 0|0|
+finkel|3dxxdd/dd1l1d1d/2l1xxl1 d 2 2 0 0|1|1>2 6>7 10>11 14>15
+finkel|3dxxdd/dd1l1d1d/2l1xxl1 d 2 2 0 0|2|1>3 5>7 13>15
+finkel|3dxxdd/dd1l1d1d/2l1xxl1 d 2 2 0 0|3|1>4* 6>9 12>15
+finkel|3dxxdd/dd1l1d1d/2l1xxl1 d 2 2 0 0|4|5>9
+finkel|4xxdd/1dldll1d/3lxxll l 0 1 1 1|0|
+finkel|4xxdd/1dldll1d/3lxxll l 0 1 1 1|1|1>2 10>11 14>15
+finkel|4xxdd/1dldll1d/3lxxll l 0 1 1 1|2|1>3 9>11 10>12x 13>15
+finkel|4xxdd/1dldll1d/3lxxll l 0 1 1 1|3|1>4* 9>12x
+finkel|4xxdd/1dldll1d/3lxxll l 0 1 1 1|4|1>5 7>11
+finkel|1d2xx2/3ldd2/1l2xx1l d 1 3 3 1|0|
+finkel|1d2xx2/3ldd2/1l2xx1l d 1 3 3 1|1|0>1 3>4* 10>11
+finkel|1d2xx2/3ldd2/1l2xx1l d 1 3 3 1|2|0>2 3>5 9>11 10>12
+finkel|1d2xx2/3ldd2/1l2xx1l d 1 3 3 1|3|3>6 9>12 10>13
+finkel|1d2xx2/3ldd2/1l2xx1l d 1 3 3 1|4|0>4* 3>7 9>13 10>14*
+finkel|4xx2/1lll2dd/l1l1xxll d 0 0 0 5|0|
+finkel|4xx2/1lll2dd/l1l1xxll d 0 0 0 5|1|12>13
+finkel|4xx2/1lll2dd/l1l1xxll d 0 0 0 5|2|11>13 12>14*
+finkel|4xx2/1lll2dd/l1l1xxll d 0 0 0 5|3|11>14* 12>15
+finkel|4xx2/1lll2dd/l1l1xxll d 0 0 0 5|4|11>15
+finkel|3dxx1d/1dldl2l/l1llxx1l l 0 0 0 3|0|
+finkel|3dxx1d/1dldl2l/l1llxx1l l 0 0 0 3|1|2>3 4>5 9>10 13>14*
+finkel|3dxx1d/1dldl2l/l1llxx1l l 0 0 0 3|2|1>3 4>6x 9>11 12>14* 13>15
+finkel|3dxx1d/1dldl2l/l1llxx1l l 0 0 0 3|3|2>5 7>10 12>15
+finkel|3dxx1d/1dldl2l/l1llxx1l l 0 0 0 3|4|1>5 2>6x 7>11
+finkel|1d2xx2/d1ld1lll/2llxx1l l 0 0 0 4|0|
+finkel|1d2xx2/d1ld1lll/2llxx1l l 0 0 0 4|1|2>3 13>14*
+finkel|1d2xx2/d1ld1lll/2llxx1l l 0 0 0 4|2|1>3 2>4* 7>9 12>14* 13>15
+finkel|1d2xx2/d1ld1lll/2llxx1l l 0 0 0 4|3|1>4* 2>5x 11>14* 12>15
+finkel|1d2xx2/d1ld1lll/2llxx1l l 0 0 0 4|4|1>5x 2>6 10>14* 11>15
+finkel|4xx2/l1ll1ld1/l3xx1l l 0 1 0 6|0|
+finkel|4xx2/l1ll1ld1/l3xx1l l 0 1 0 6|1|5>6 8>9 10>11x 13>14*
+finkel|4xx2/l1ll1ld1/l3xx1l l 0 1 0 6|2|4>6 7>9 10>12 13>15
+finkel|4xx2/l1ll1ld1/l3xx1l l 0 1 0 6|3|8>11x
+finkel|4xx2/l1ll1ld1/l3xx1l l 0 1 0 6|4|5>9 7>11x 8>12 10>14*
+finkel|1d1dxx1d/lll1dll1/1l2xxl1 d 0 0 2 1|0|
+finkel|1d1dxx1d/lll1dll1/1l2xxl1 d 0 0 2 1|1|1>2 3>4* 9>10x 13>14*
+finkel|1d1dxx1d/lll1dll1/1l2xxl1 d 0 0 2 1|2|0>2 3>5x 9>11x 13>15
+finkel|1d1dxx1d/lll1dll1/1l2xxl1 d 0 0 2 1|3|1>4* 3>6x 9>12
+finkel|1d1dxx1d/lll1dll1/1l2xxl1 d 0 0 2 1|4|0>4* 1>5x 3>7x
+finkel|4xx2/1dl4d/l2lxx1l d 3 0 4 1|0|
+finkel|4xx2/1dl4d/l2lxx1l d 3 0 4 1|1|0>1 6>7x 12>13
+finkel|4xx2/1dl4d/l2lxx1l d 3 0 4 1|2|0>2 6>8* 12>14*
+finkel|4xx2/1dl4d/l2lxx1l d 3 0 4 1|3|0>3 6>9 12>15
+finkel|4xx2/1dl4d/l2lxx1l d 3 0 4 1|4|0>4* 6>10
+finkel|2ddxx1d/d1l5/1lllxx2 d 3 0 1 2|0|
+finkel|2ddxx1d/d1l5/1lllxx2 d 3 0 1 2|1|2>3 5>6 13>14*
+finkel|2ddxx1d/d1l5/1lllxx2 d 3 0 1 2|2|1>3 2>4* 5>7x 13>15
+finkel|2ddxx1d/d1l5/1lllxx2 d 3 0 1 2|3|0>3 1>4* 5>8*
+finkel|2ddxx1d/d1l5/1lllxx2 d 3 0 1 2|4|0>4* 2>6 5>9
+finkel|4xx2/4l2d/4xx2 d 3 3 0 6|0|
+finkel|4xx2/4l2d/4xx2 d 3 3 0 6|1|12>13
+finkel|4xx2/4l2d/4xx2 d 3 3 0 6|2|12>14*
+finkel|4xx2/4l2d/4xx2 d 3 3 0 6|3|12>15
+finkel|4xx2/4l2d/4xx2 d 3 3 0 6|4|
+finkel|1dd1xxd1/d2l3l/l1l1xxll l 0 1 1 2|0|
+finkel|1dd1xxd1/d2l3l/l1l1xxll l 0 1 1 2|1|2>3 4>5x 8>9 14>15
+finkel|1dd1xxd1/d2l3l/l1l1xxll l 0 1 1 2|2|4>6 8>10 13>15
+finkel|1dd1xxd1/d2l3l/l1l1xxll l 0 1 1 2|3|2>5x 4>7 8>11 12>15
+finkel|1dd1xxd1/d2l3l/l1l1xxll l 0 1 1 2|4|2>6
+finkel|2ddxx2/2ddll2/4xx1l l 0 4 1 2|0|
+finkel|2ddxx2/2ddll2/4xx1l l 0 4 1 2|1|10>11 13>14*
+finkel|2ddxx2/2ddll2/4xx1l l 0 4 1 2|2|9>11 10>12 13>15
+finkel|2ddxx2/2ddll2/4xx1l l 0 4 1 2|3|9>12
+finkel|2ddxx2/2ddll2/4xx1l l 0 4 1 2|4|10>14*
+finkel|4xxdd/d3dddd/4xx2 d 2 5 0 0|0|
+finkel|4xxdd/d3dddd/4xx2 d 2 5 0 0|1|5>6 14>15
+finkel|4xxdd/d3dddd/4xx2 d 2 5 0 0|2|5>7 13>15
+finkel|4xxdd/d3dddd/4xx2 d 2 5 0 0|3|5>8* 12>15
+finkel|4xxdd/d3dddd/4xx2 d 2 5 0 0|4|11>15
+finkel|4xx2/6ll/l3xx1l l 3 0 6 1|0|
+finkel|4xx2/6ll/l3xx1l l 3 0 6 1|1|0>1 4>5 13>14*
+finkel|4xx2/6ll/l3xx1l l 3 0 6 1|2|0>2 4>6 12>14* 13>15
+finkel|4xx2/6ll/l3xx1l l 3 0 6 1|3|0>3 4>7 11>14* 12>15
+finkel|4xx2/6ll/l3xx1l l 3 0 6 1|4|4>8* 11>15
+finkel|4xx2/1ll3ld/1l2xx2 d 1 2 1 5|0|
+finkel|4xx2/1ll3ld/1l2xx2 d 1 2 1 5|1|0>1 12>13
+finkel|4xx2/1ll3ld/1l2xx2 d 1 2 1 5|2|0>2 12>14*
+finkel|4xx2/1ll3ld/1l2xx2 d 1 2 1 5|3|0>3 12>15
+finkel|4xx2/1ll3ld/1l2xx2 d 1 2 1 5|4|0>4*
+finkel|4xx2/l1ld1lld/2llxxl1 d 0 0 4 1|0|
+finkel|4xx2/l1ld1lld/2llxxl1 d 0 0 4 1|1|0>1 8>9 12>13
+finkel|4xx2/l1ld1lld/2llxxl1 d 0 0 4 1|2|0>2 8>10x 12>14*
+finkel|4xx2/l1ld1lld/2llxxl1 d 0 0 4 1|3|0>3 8>11x 12>15
+finkel|4xx2/l1ld1lld/2llxxl1 d 0 0 4 1|4|0>4*
+finkel|3dxx1d/2ddd1dd/4xx1l l 4 2 0 0|0|
+finkel|3dxx1d/2ddd1dd/4xx1l l 4 2 0 0|1|0>1 13>14*
+finkel|3dxx1d/2ddd1dd/4xx1l l 4 2 0 0|2|0>2 13>15
+finkel|3dxx1d/2ddd1dd/4xx1l l 4 2 0 0|3|0>3
+finkel|3dxx1d/2ddd1dd/4xx1l l 4 2 0 0|4|0>4*
+finkel|4xx2/7d/4xx2 d 4 3 2 4|0|
+finkel|4xx2/7d/4xx2 d 4 3 2 4|1|0>1 12>13
+finkel|4xx2/7d/4xx2 d 4 3 2 4|2|0>2 12>14*
+finkel|4xx2/7d/4xx2 d 4 3 2 4|3|0>3 12>15
+finkel|4xx2/7d/4xx2 d 4 3 2 4|4|0>4*
+finkel|d1ddxx2/d2d3l/4xx2 l 2 4 2 0|0|
+finkel|d1ddxx2/d2d3l/4xx2 l 2 4 2 0|1|0>1 12>13
+finkel|d1ddxx2/d2d3l/4xx2 l 2 4 2 0|2|0>2 12>14*
+finkel|d1ddxx2/d2d3l/4xx2 l 2 4 2 0|3|0>3 12>15
+finkel|d1ddxx2/d2d3l/4xx2 l 2 4 2 0|4|0>4*
+finkel|4xx2/8/4xx1l l 1 5 1 6|0|
+finkel|4xx2/8/4xx1l l 1 5 1 6|1|0>1 13>14*
+finkel|4xx2/8/4xx1l l 1 5 1 6|2|0>2 13>15
+finkel|4xx2/8/4xx1l l 1 5 1 6|3|0>3
+finkel|4xx2/8/4xx1l l 1 5 1 6|4|0>4*
+finkel|3dxx1d/ddd5/4xx1l l 6 0 1 1|0|
+finkel|3dxx1d/ddd5/4xx1l l 6 0 1 1|1|0>1 13>14*
+finkel|3dxx1d/ddd5/4xx1l l 6 0 1 1|2|0>2 13>15
+finkel|3dxx1d/ddd5/4xx1l l 6 0 1 1|3|0>3
+finkel|3dxx1d/ddd5/4xx1l l 6 0 1 1|4|0>4*
+finkel|d3xx2/ldddl2d/1l1lxx2 d 1 2 1 1|0|
+finkel|d3xx2/ldddl2d/1l1lxx2 d 1 2 1 1|1|0>1 4>5x 8>9x 12>13
+finkel|d3xx2/ldddl2d/1l1lxx2 d 1 2 1 1|2|0>2 7>9x 8>10 12>14*
+finkel|d3xx2/ldddl2d/1l1lxx2 d 1 2 1 1|3|0>3 6>9x 7>10 8>11 12>15
+finkel|d3xx2/ldddl2d/1l1lxx2 d 1 2 1 1|4|6>10 7>11
+finkel|4xx1d/2l5/4xx2 d 5 1 3 3|0|
+finkel|4xx1d/2l5/4xx2 d 5 1 3 3|1|0>1 13>14*
+finkel|4xx1d/2l5/4xx2 d 5 1 3 3|2|0>2 13>15
+finkel|4xx1d/2l5/4xx2 d 5 1 3 3|3|0>3
+finkel|4xx1d/2l5/4xx2 d 5 1 3 3|4|0>4*
+finkel|3dxx2/7d/4xx1l l 0 6 2 3|0|
+finkel|3dxx2/7d/4xx1l l 0 6 2 3|1|13>14*
+finkel|3dxx2/7d/4xx1l l 0 6 2 3|2|13>15
+finkel|3dxx2/7d/4xx1l l 0 6 2 3|3|
+finkel|3dxx2/7d/4xx1l l 0 6 2 3|4|
+finkel|dd2xx1d/ldl1ldd1/1l2xx1l l 2 0 1 0|0|
+finkel|dd2xx1d/ldl1ldd1/1l2xx1l l 2 0 1 0|1|0>1 3>4* 5>6x 7>8* 9>10x 13>14*
+finkel|dd2xx1d/ldl1ldd1/1l2xx1l l 2 0 1 0|2|0>2 9>11x 13>15
+finkel|dd2xx1d/ldl1ldd1/1l2xx1l l 2 0 1 0|3|3>6x 5>8* 7>10x 9>12
+finkel|dd2xx1d/ldl1ldd1/1l2xx1l l 2 0 1 0|4|0>4* 7>11x
+finkel|2d1xx2/l1ld1dll/ll2xxl1 l 0 0 1 3|0|
+finkel|2d1xx2/l1ld1dll/ll2xxl1 l 0 0 1 3|1|5>6 12>13 14>15
+finkel|2d1xx2/l1ld1dll/ll2xxl1 l 0 0 1 3|2|4>6 7>9 11>13
+finkel|2d1xx2/l1ld1dll/ll2xxl1 l 0 0 1 3|3|3>6 7>10x 12>15
+finkel|2d1xx2/l1ld1dll/ll2xxl1 l 0 0 1 3|4|5>9 11>15
+finkel|ddd1xxd1/lll1dddl/1l2xx1l l 1 0 0 0|0|
+finkel|ddd1xxd1/lll1dddl/1l2xx1l l 1 0 0 0|1|0>1 3>4* 7>8* 13>14*
+finkel|ddd1xxd1/lll1dddl/1l2xx1l l 1 0 0 0|2|0>2 6>8* 7>9x 12>14* 13>15
+finkel|ddd1xxd1/lll1dddl/1l2xx1l l 1 0 0 0|3|5>8* 6>9x 7>10x 12>15
+finkel|ddd1xxd1/lll1dddl/1l2xx1l l 1 0 0 0|4|0>4* 5>9x 6>10x 7>11x
+finkel|d3xxd1/4ddl1/1l2xx1l l 2 2 3 0|0|
+finkel|d3xxd1/4ddl1/1l2xx1l l 2 2 3 0|1|0>1 3>4* 11>12 13>14*
+finkel|d3xxd1/4ddl1/1l2xx1l l 2 2 3 0|2|0>2 3>5 13>15
+finkel|d3xxd1/4ddl1/1l2xx1l l 2 2 3 0|3|3>6 11>14*
+finkel|d3xxd1/4ddl1/1l2xx1l l 2 2 3 0|4|0>4* 3>7 11>15
+finkel|4xxd1/d4dd1/4xx1l l 2 4 3 0|0|
+finkel|4xxd1/d4dd1/4xx1l l 2 4 3 0|1|0>1 13>14*
+finkel|4xxd1/d4dd1/4xx1l l 2 4 3 0|2|0>2 13>15
+finkel|4xxd1/d4dd1/4xx1l l 2 4 3 0|3|0>3
+finkel|4xxd1/d4dd1/4xx1l l 2 4 3 0|4|0>4*
+finkel|1d1dxx2/d1l1d2l/4xx2 l 0 5 2 1|0|
+finkel|1d1dxx2/d1l1d2l/4xx2 l 0 5 2 1|1|7>8* 12>13
+finkel|1d1dxx2/d1l1d2l/4xx2 l 0 5 2 1|2|7>9x 12>14*
+finkel|1d1dxx2/d1l1d2l/4xx2 l 0 5 2 1|3|7>10 12>15
+finkel|1d1dxx2/d1l1d2l/4xx2 l 0 5 2 1|4|7>11
+finkel|1d2xxd1/8/4xx1l l 5 1 4 1|0|
+finkel|1d2xxd1/8/4xx1l l 5 1 4 1|1|0>1 13>14*
+finkel|1d2xxd1/8/4xx1l l 5 1 4 1|2|0>2 13>15
+finkel|1d2xxd1/8/4xx1l l 5 1 4 1|3|0>3
+finkel|1d2xxd1/8/4xx1l l 5 1 4 1|4|0>4*
+finkel|4xx2/8/4xx1l l 4 2 5 2|0|
+finkel|4xx2/8/4xx1l l 4 2 5 2|1|0>1 13>14*
+finkel|4xx2/8/4xx1l l 4 2 5 2|2|0>2 13>15
+finkel|4xx2/8/4xx1l l 4 2 5 2|3|0>3
+finkel|4xx2/8/4xx1l l 4 2 5 2|4|0>4*
+finkel|dd2xxd1/2l4d/l2lxx2 d 0 4 0 3|0|
+finkel|dd2xxd1/2l4d/l2lxx2 d 0 4 0 3|1|4>5 12>13 14>15
+finkel|dd2xxd1/2l4d/l2lxx2 d 0 4 0 3|2|3>5 4>6
+finkel|dd2xxd1/2l4d/l2lxx2 d 0 4 0 3|3|3>6 4>7x 12>15
+finkel|dd2xxd1/2l4d/l2lxx2 d 0 4 0 3|4|3>7x 4>8*
+finkel|3dxxd1/dd1d2dl/4xx2 l 3 3 1 0|0|
+finkel|3dxxd1/dd1d2dl/4xx2 l 3 3 1 0|1|0>1 12>13
+finkel|3dxxd1/dd1d2dl/4xx2 l 3 3 1 0|2|0>2 12>14*
+finkel|3dxxd1/dd1d2dl/4xx2 l 3 3 1 0|3|0>3 12>15
+finkel|3dxxd1/dd1d2dl/4xx2 l 3 3 1 0|4|0>4*
+finkel|4xx1d/1d1l1l1d/4xxl1 d 1 3 3 1|0|
+finkel|4xx1d/1d1l1l1d/4xxl1 d 1 3 3 1|1|0>1 6>7 13>14*
+finkel|4xx1d/1d1l1l1d/4xxl1 d 1 3 3 1|2|0>2 12>14* 13>15
+finkel|4xx1d/1d1l1l1d/4xxl1 d 1 3 3 1|3|0>3 6>9 12>15
+finkel|4xx1d/1d1l1l1d/4xxl1 d 1 3 3 1|4|0>4* 6>10x
+finkel|2d1xx2/2l3dl/l2lxx2 l 1 2 4 1|0|
+finkel|2d1xx2/2l3dl/l2lxx2 l 1 2 4 1|1|1>2 4>5 7>8* 12>13
+finkel|2d1xx2/2l3dl/l2lxx2 l 1 2 4 1|2|0>2 1>3 4>6 7>9 12>14*
+finkel|2d1xx2/2l3dl/l2lxx2 l 1 2 4 1|3|0>3 7>10 12>15
+finkel|2d1xx2/2l3dl/l2lxx2 l 1 2 4 1|4|1>5 4>8* 7>11x
+finkel|ddd1xx2/3d4/2l1xx1l l 5 0 0 3|0|
+finkel|ddd1xx2/3d4/2l1xx1l l 5 0 0 3|1|0>1 2>3 13>14*
+finkel|ddd1xx2/3d4/2l1xx1l l 5 0 0 3|2|2>4* 13>15
+finkel|ddd1xx2/3d4/2l1xx1l l 5 0 0 3|3|0>3 2>5
+finkel|ddd1xx2/3d4/2l1xx1l l 5 0 0 3|4|0>4* 2>6
+finkel|4xx2/l7/l3xx1l l 1 3 6 1|0|
+finkel|4xx2/l7/l3xx1l l 1 3 6 1|1|0>1 5>6 13>14*
+finkel|4xx2/l7/l3xx1l l 1 3 6 1|2|0>2 4>6 5>7 13>15
+finkel|4xx2/l7/l3xx1l l 1 3 6 1|3|0>3 4>7 5>8*
+finkel|4xx2/l7/l3xx1l l 1 3 6 1|4|4>8* 5>9
+finkel|4xx2/1d1dld2/1l2xx1l l 2 2 4 0|0|
+finkel|4xx2/1d1dld2/1l2xx1l l 2 2 4 0|1|0>1 3>4* 9>10x 13>14*
+finkel|4xx2/1d1dld2/1l2xx1l l 2 2 4 0|2|0>2 3>5 9>11 13>15
+finkel|4xx2/1d1dld2/1l2xx1l l 2 2 4 0|3|3>6x 9>12
+finkel|4xx2/1d1dld2/1l2xx1l l 2 2 4 0|4|0>4* 3>7
+finkel|1dd1xx2/1dd1dd1l/4xx2 l 4 2 1 0|0|
+finkel|1dd1xx2/1dd1dd1l/4xx2 l 4 2 1 0|1|0>1 12>13
+finkel|1dd1xx2/1dd1dd1l/4xx2 l 4 2 1 0|2|0>2 12>14*
+finkel|1dd1xx2/1dd1dd1l/4xx2 l 4 2 1 0|3|0>3 12>15
+finkel|1dd1xx2/1dd1dd1l/4xx2 l 4 2 1 0|4|0>4*
+finkel|ddd1xx1d/1ldd2dl/4xx2 l 5 0 0 0|0|
+finkel|ddd1xx1d/1ldd2dl/4xx2 l 5 0 0 0|1|0>1 6>7x 12>13
+finkel|ddd1xx1d/1ldd2dl/4xx2 l 5 0 0 0|2|0>2 12>14*
+finkel|ddd1xx1d/1ldd2dl/4xx2 l 5 0 0 0|3|0>3 6>9 12>15
+finkel|ddd1xx1d/1ldd2dl/4xx2 l 5 0 0 0|4|0>4* 6>10
+finkel|4xx2/l3d1ll/4xx1l l 3 0 5 1|0|
+finkel|4xx2/l3d1ll/4xx1l l 3 0 5 1|1|0>1 5>6 13>14*
+finkel|4xx2/l3d1ll/4xx1l l 3 0 5 1|2|0>2 5>7 12>14* 13>15
+finkel|4xx2/l3d1ll/4xx1l l 3 0 5 1|3|0>3 5>8* 11>14* 12>15
+finkel|4xx2/l3d1ll/4xx1l l 3 0 5 1|4|0>4* 5>9x 11>15
+finkel|4xx2/dl1l3l/l1l1xxl1 l 1 0 6 0|0|
+finkel|4xx2/dl1l3l/l1l1xxl1 l 1 0 6 0|1|0>1 2>3 4>5x 6>7 8>9 12>13 14>15
+finkel|4xx2/dl1l3l/l1l1xxl1 l 1 0 6 0|2|8>10
+finkel|4xx2/dl1l3l/l1l1xxl1 l 1 0 6 0|3|0>3 2>5x 4>7 6>9 8>11 12>15
+finkel|4xx2/dl1l3l/l1l1xxl1 l 1 0 6 0|4|6>10
+finkel|dd1dxx2/dlldddll/3lxxll l 0 0 0 0|0|
+finkel|dd1dxx2/dlldddll/3lxxll l 0 0 0 0|1|1>2 14>15
+finkel|dd1dxx2/dlldddll/3lxxll l 0 0 0 0|2|1>3 7>9x 13>15
+finkel|dd1dxx2/dlldddll/3lxxll l 0 0 0 0|3|1>4* 6>9x 7>10x 12>15
+finkel|dd1dxx2/dlldddll/3lxxll l 0 0 0 0|4|1>5x 6>10x 11>15
+finkel|d3xx2/l1d4l/1l1lxxl1 l 0 2 3 2|0|
+finkel|d3xx2/l1d4l/1l1lxxl1 l 0 2 3 2|1|1>2 3>4* 5>6 12>13 14>15
+finkel|d3xx2/l1d4l/1l1lxxl1 l 0 2 3 2|2|5>7x
+finkel|d3xx2/l1d4l/1l1lxxl1 l 0 2 3 2|3|1>4* 3>6 5>8* 12>15
+finkel|d3xx2/l1d4l/1l1lxxl1 l 0 2 3 2|4|3>7x 5>9
+finkel|2d1xx2/1dlld1ld/1l1lxx1l d 0 1 2 1|0|
+finkel|2d1xx2/1dlld1ld/1l1lxx1l d 0 1 2 1|1|0>1 2>3 6>7x 9>10 12>13
+finkel|2d1xx2/1dlld1ld/1l1lxx1l d 0 1 2 1|2|2>4* 9>11x 12>14*
+finkel|2d1xx2/1dlld1ld/1l1lxx1l d 0 1 2 1|3|0>3 2>5 12>15
+finkel|2d1xx2/1dlld1ld/1l1lxx1l d 0 1 2 1|4|0>4* 6>10 9>13
+finkel|1d1dxxd1/1d1dl1ld/1l2xxll d 0 2 0 1|0|
+finkel|1d1dxxd1/1d1dl1ld/1l2xxll d 0 2 0 1|1|1>2 3>4* 6>7 8>9x 12>13 14>15
+finkel|1d1dxxd1/1d1dl1ld/1l2xxll d 0 2 0 1|2|3>5 8>10
+finkel|1d1dxxd1/1d1dl1ld/1l2xxll d 0 2 0 1|3|1>4* 6>9x 8>11x 12>15
+finkel|1d1dxxd1/1d1dl1ld/1l2xxll d 0 2 0 1|4|1>5 3>7 6>10
+finkel|3dxx1d/1dd5/2l1xx2 l 6 0 1 2|0|
+finkel|3dxx1d/1dd5/2l1xx2 l 6 0 1 2|1|0>1 2>3
+finkel|3dxx1d/1dd5/2l1xx2 l 6 0 1 2|2|2>4*
+finkel|3dxx1d/1dd5/2l1xx2 l 6 0 1 2|3|0>3 2>5
+finkel|3dxx1d/1dd5/2l1xx2 l 6 0 1 2|4|0>4* 2>6x
+finkel|2ddxx2/dddd2dl/l1llxx1l l 0 2 0 0|0|
+finkel|2ddxx2/dddd2dl/l1llxx1l l 0 2 0 0|1|2>3 4>5x 13>14*
+finkel|2ddxx2/dddd2dl/l1llxx1l l 0 2 0 0|2|1>3 4>6x 12>14* 13>15
+finkel|2ddxx2/dddd2dl/l1llxx1l l 0 2 0 0|3|2>5x 4>7x 12>15
+finkel|2ddxx2/dddd2dl/l1llxx1l l 0 2 0 0|4|1>5x 2>6x
+finkel|4xx2/1l2l2l/l3xx2 d 2 1 5 2|0|
+finkel|4xx2/1l2l2l/l3xx2 d 2 1 5 2|1|0>1
+finkel|4xx2/1l2l2l/l3xx2 d 2 1 5 2|2|0>2
+finkel|4xx2/1l2l2l/l3xx2 d 2 1 5 2|3|0>3
+finkel|4xx2/1l2l2l/l3xx2 d 2 1 5 2|4|0>4*
+finkel|d3xx1d/dddll2d/2llxx1l d 1 1 1 0|0|
+finkel|d3xx1d/dddll2d/2llxx1l d 1 1 1 0|1|0>1 13>14*
+finkel|d3xx1d/dddll2d/2llxx1l d 1 1 1 0|2|0>2 7>9x 12>14* 13>15
+finkel|d3xx1d/dddll2d/2llxx1l d 1 1 1 0|3|0>3 6>9x 7>10 12>15
+finkel|d3xx1d/dddll2d/2llxx1l d 1 1 1 0|4|5>9x 6>10 7>11
+finkel|4xxdd/ddld2dl/l1l1xxl1 d 2 0 1 0|0|
+finkel|4xxdd/ddld2dl/l1l1xxl1 d 2 0 1 0|1|0>1 6>7x 8>9 11>12x 14>15
+finkel|4xxdd/ddld2dl/l1l1xxl1 d 2 0 1 0|2|0>2 5>7x 8>10 13>15
+finkel|4xxdd/ddld2dl/l1l1xxl1 d 2 0 1 0|3|0>3 6>9
+finkel|4xxdd/ddld2dl/l1l1xxl1 d 2 0 1 0|4|0>4* 5>9 6>10 8>12x 11>15
+finkel|4xx2/2dd1ll1/3lxx2 d 4 0 3 2|0|
+finkel|4xx2/2dd1ll1/3lxx2 d 4 0 3 2|1|0>1 8>9
+finkel|4xx2/2dd1ll1/3lxx2 d 4 0 3 2|2|0>2 7>9 8>10x
+finkel|4xx2/2dd1ll1/3lxx2 d 4 0 3 2|3|0>3 7>10x 8>11x
+finkel|4xx2/2dd1ll1/3lxx2 d 4 0 3 2|4|0>4* 7>11x 8>12
+finkel|dd2xx2/d6d/1l1lxx2 d 5 0 2 1|0|
+finkel|dd2xx2/d6d/1l1lxx2 d 5 0 2 1|1|0>1 5>6 12>13
+finkel|dd2xx2/d6d/1l1lxx2 d 5 0 2 1|2|0>2 4>6 5>7 12>14*
+finkel|dd2xx2/d6d/1l1lxx2 d 5 0 2 1|3|3>6 4>7 5>8* 12>15
+finkel|dd2xx2/d6d/1l1lxx2 d 5 0 2 1|4|3>7 4>8* 5>9
+finkel|1d2xx2/lddlll2/3lxxll l 0 0 0 4|0|
+finkel|1d2xx2/lddlll2/3lxxll l 0 0 0 4|1|1>2 5>6x 10>11 14>15
+finkel|1d2xx2/lddlll2/3lxxll l 0 0 0 4|2|1>3 5>7x 9>11 10>12 13>15
+finkel|1d2xx2/lddlll2/3lxxll l 0 0 0 4|3|1>4* 8>11 9>12
+finkel|1d2xx2/lddlll2/3lxxll l 0 0 0 4|4|8>12
+finkel|3dxxd1/llddl1dl/2l1xx2 l 1 1 2 0|0|
+finkel|3dxxd1/llddl1dl/2l1xx2 l 1 1 2 0|1|0>1 2>3 6>7x 9>10 12>13
+finkel|3dxxd1/llddl1dl/2l1xx2 l 1 1 2 0|2|2>4* 5>7x 9>11x 12>14*
+finkel|3dxxd1/llddl1dl/2l1xx2 l 1 1 2 0|3|0>3 12>15
+finkel|3dxxd1/llddl1dl/2l1xx2 l 1 1 2 0|4|0>4* 6>10 9>13
+finkel|3dxxd1/2l2ld1/l2lxx2 l 2 1 3 1|0|
+finkel|3dxxd1/2l2ld1/l2lxx2 l 2 1 3 1|1|1>2 4>5 7>8* 10>11x
+finkel|3dxxd1/2l2ld1/l2lxx2 l 2 1 3 1|2|0>2 1>3 4>6 7>9 10>12
+finkel|3dxxd1/2l2ld1/l2lxx2 l 2 1 3 1|3|0>3 10>13
+finkel|3dxxd1/2l2ld1/l2lxx2 l 2 1 3 1|4|1>5 4>8* 7>11x 10>14*
+finkel|2d1xx2/6l1/4xx2 d 5 1 4 2|0|
+finkel|2d1xx2/6l1/4xx2 d 5 1 4 2|1|0>1 2>3
+finkel|2d1xx2/6l1/4xx2 d 5 1 4 2|2|2>4*
+finkel|2d1xx2/6l1/4xx2 d 5 1 4 2|3|0>3 2>5
+finkel|2d1xx2/6l1/4xx2 d 5 1 4 2|4|0>4* 2>6
+finkel|d3xx2/3l4/2l1xx2 l 3 2 6 0|0|
+finkel|d3xx2/3l4/2l1xx2 l 3 2 6 0|1|0>1 2>3 8>9
+finkel|d3xx2/3l4/2l1xx2 l 3 2 6 0|2|2>4* 8>10
+finkel|d3xx2/3l4/2l1xx2 l 3 2 6 0|3|0>3 2>5 8>11
+finkel|d3xx2/3l4/2l1xx2 l 3 2 6 0|4|0>4* 2>6 8>12
+finkel|4xxd1/d2dlddl/l3xxll l 2 0 1 1|0|
+finkel|4xxd1/d2dlddl/l3xxll l 2 0 1 1|1|0>1 4>5x 9>10x 14>15
+finkel|4xxd1/d2dlddl/l3xxll l 2 0 1 1|2|0>2 4>6 9>11x 13>15
+finkel|4xxd1/d2dlddl/l3xxll l 2 0 1 1|3|0>3 4>7 12>15
+finkel|4xxd1/d2dlddl/l3xxll l 2 0 1 1|4|
+finkel|dd2xx2/2d1d3/4xx2 l 2 5 3 0|0|
+finkel|dd2xx2/2d1d3/4xx2 l 2 5 3 0|1|0>1
+finkel|dd2xx2/2d1d3/4xx2 l 2 5 3 0|2|0>2
+finkel|dd2xx2/2d1d3/4xx2 l 2 5 3 0|3|0>3
+finkel|dd2xx2/2d1d3/4xx2 l 2 5 3 0|4|0>4*
+finkel|d3xxd1/1ld1l3/3lxx2 l 3 1 0 4|0|
+finkel|d3xxd1/1ld1l3/3lxx2 l 3 1 0 4|1|1>2 6>7x 9>10
+finkel|d3xxd1/1ld1l3/3lxx2 l 3 1 0 4|2|0>2 1>3 6>8* 9>11
+finkel|d3xxd1/1ld1l3/3lxx2 l 3 1 0 4|3|0>3 1>4* 9>12
+finkel|d3xxd1/1ld1l3/3lxx2 l 3 1 0 4|4|0>4* 1>5 6>10 9>13
+finkel|4xxd1/lll1d2l/ll2xxl1 d 0 0 5 0|0|
+finkel|4xxd1/lll1d2l/ll2xxl1 d 0 0 5 0|1|0>1 9>10 14>15
+finkel|4xxd1/lll1d2l/ll2xxl1 d 0 0 5 0|2|0>2 9>11
+finkel|4xxd1/lll1d2l/ll2xxl1 d 0 0 5 0|3|0>3 9>12x
+finkel|4xxd1/lll1d2l/ll2xxl1 d 0 0 5 0|4|0>4* 9>13
+finkel|2d1xx2/2llll1l/1l2xx2 l 1 0 4 2|0|
+finkel|2d1xx2/2llll1l/1l2xx2 l 1 0 4 2|1|0>1 3>4* 10>11 12>13
+finkel|2d1xx2/2llll1l/1l2xx2 l 1 0 4 2|2|0>2 3>5 9>11 12>14*
+finkel|2d1xx2/2llll1l/1l2xx2 l 1 0 4 2|3|3>6 8>11 10>13 12>15
+finkel|2d1xx2/2llll1l/1l2xx2 l 1 0 4 2|4|0>4* 7>11 9>13 10>14*
+finkel|4xx2/d7/1l2xx2 d 0 6 2 4|0|
+finkel|4xx2/d7/1l2xx2 d 0 6 2 4|1|0>1 5>6
+finkel|4xx2/d7/1l2xx2 d 0 6 2 4|2|0>2 5>7
+finkel|4xx2/d7/1l2xx2 d 0 6 2 4|3|0>3 5>8*
+finkel|4xx2/d7/1l2xx2 d 0 6 2 4|4|0>4* 5>9
+finkel|2d1xx2/l1l1dll1/ll2xx1l d 0 0 2 3|0|
+finkel|2d1xx2/l1l1dll1/ll2xx1l d 0 0 2 3|1|0>1 2>3 9>10x
+finkel|2d1xx2/l1l1dll1/ll2xx1l d 0 0 2 3|2|2>4* 9>11x
+finkel|2d1xx2/l1l1dll1/ll2xx1l d 0 0 2 3|3|0>3 2>5x 9>12
+finkel|2d1xx2/l1l1dll1/ll2xx1l d 0 0 2 3|4|0>4* 2>6 9>13
+finkel|2d1xx1d/2d1dd1l/1l2xx2 d 0 5 0 2|0|
+finkel|2d1xx1d/2d1dd1l/1l2xx2 d 0 5 0 2|1|2>3 7>8* 10>11 13>14*
+finkel|2d1xx1d/2d1dd1l/1l2xx2 d 0 5 0 2|2|2>4* 9>11 10>12x 13>15
+finkel|2d1xx1d/2d1dd1l/1l2xx2 d 0 5 0 2|3|2>5 9>12x
+finkel|2d1xx1d/2d1dd1l/1l2xx2 d 0 5 0 2|4|2>6 7>11 10>14*
+finkel|1d2xxd1/ld1d2l1/l1l1xxl1 d 1 1 0 3|0|
+finkel|1d2xxd1/ld1d2l1/l1l1xxl1 d 1 1 0 3|1|3>4* 6>7 8>9 14>15
+finkel|1d2xxd1/ld1d2l1/l1l1xxl1 d 1 1 0 3|2|3>5x 8>10
+finkel|1d2xxd1/ld1d2l1/l1l1xxl1 d 1 1 0 3|3|6>9 8>11x
+finkel|1d2xxd1/ld1d2l1/l1l1xxl1 d 1 1 0 3|4|3>7 6>10 8>12
+finkel|4xx2/3d2l1/4xx1l l 1 4 6 0|0|
+finkel|4xx2/3d2l1/4xx1l l 1 4 6 0|1|0>1 11>12 13>14*
+finkel|4xx2/3d2l1/4xx1l l 1 4 6 0|2|0>2 13>15
+finkel|4xx2/3d2l1/4xx1l l 1 4 6 0|3|0>3 11>14*
+finkel|4xx2/3d2l1/4xx1l l 1 4 6 0|4|0>4* 11>15
+finkel|1dddxx2/llld2dd/1lllxxl1 l 0 0 1 0|0|
+finkel|1dddxx2/llld2dd/1lllxxl1 l 0 0 1 0|1|3>4* 14>15
+finkel|1dddxx2/llld2dd/1lllxxl1 l 0 0 1 0|2|2>4* 7>9
+finkel|1dddxx2/llld2dd/1lllxxl1 l 0 0 1 0|3|1>4* 6>9 7>10
+finkel|1dddxx2/llld2dd/1lllxxl1 l 0 0 1 0|4|5>9 6>10 7>11x
+finkel|2d1xxd1/1lld4/l3xx2 d 2 2 3 1|0|
+finkel|2d1xxd1/1lld4/l3xx2 d 2 2 3 1|1|0>1 2>3 8>9 14>15
+finkel|2d1xxd1/1lld4/l3xx2 d 2 2 3 1|2|2>4* 8>10
+finkel|2d1xxd1/1lld4/l3xx2 d 2 2 3 1|3|0>3 2>5 8>11
+finkel|2d1xxd1/1lld4/l3xx2 d 2 2 3 1|4|0>4* 2>6x 8>12
+finkel|2d1xxd1/l4ldl/1l2xx2 l 1 2 2 2|0|
+finkel|2d1xxd1/l4ldl/1l2xx2 l 1 2 2 2|1|0>1 3>4* 5>6 10>11x 12>13
+finkel|2d1xxd1/l4ldl/1l2xx2 l 1 2 2 2|2|0>2 5>7 12>14*
+finkel|2d1xxd1/l4ldl/1l2xx2 l 1 2 2 2|3|3>6 5>8* 10>13 12>15
+finkel|2d1xxd1/l4ldl/1l2xx2 l 1 2 2 2|4|0>4* 3>7 5>9 10>14*
+finkel|d1ddxx1d/l1dd1ll1/3lxx1l l 0 2 1 0|0|
+finkel|d1ddxx1d/l1dd1ll1/3lxx1l l 0 2 1 0|1|1>2 5>6 11>12 13>14*
+finkel|d1ddxx1d/l1dd1ll1/3lxx1l l 0 2 1 0|2|1>3 5>7x 10>12 13>15
+finkel|d1ddxx1d/l1dd1ll1/3lxx1l l 0 2 1 0|3|1>4* 11>14*
+finkel|d1ddxx1d/l1dd1ll1/3lxx1l l 0 2 1 0|4|5>9 10>14* 11>15
+finkel|d1ddxxd1/4d2d/2l1xx2 d 1 5 0 1|0|
+finkel|d1ddxxd1/4d2d/2l1xx2 d 1 5 0 1|1|2>3 4>5 9>10 12>13 14>15
+finkel|d1ddxxd1/4d2d/2l1xx2 d 1 5 0 1|2|1>3 4>6 9>11
+finkel|d1ddxxd1/4d2d/2l1xx2 d 1 5 0 1|3|2>5 4>7 12>15
+finkel|d1ddxxd1/4d2d/2l1xx2 d 1 5 0 1|4|1>5 2>6 4>8* 9>13
+finkel|4xx2/1d1ll1ll/lll1xx2 d 0 0 0 6|0|
+finkel|4xx2/1d1ll1ll/lll1xx2 d 0 0 0 6|1|6>7
+finkel|4xx2/1d1ll1ll/lll1xx2 d 0 0 0 6|2|
+finkel|4xx2/1d1ll1ll/lll1xx2 d 0 0 0 6|3|6>9x
+finkel|4xx2/1d1ll1ll/lll1xx2 d 0 0 0 6|4|6>10
+finkel|dd1dxx1d/d1ld2d1/1l1lxxll l 0 2 0 0|0|
+finkel|dd1dxx1d/d1ld2d1/1l1lxxll l 0 2 0 0|1|1>2 3>4* 14>15
+finkel|dd1dxx1d/d1ld2d1/1l1lxxll l 0 2 0 0|2|3>5x 7>9 13>15
+finkel|dd1dxx1d/d1ld2d1/1l1lxxll l 0 2 0 0|3|1>4* 3>6 7>10
+finkel|dd1dxx1d/d1ld2d1/1l1lxxll l 0 2 0 0|4|1>5x 7>11x
+finkel|4xx2/l1llll2/4xx1l l 0 1 7 0|0|
+finkel|4xx2/l1llll2/4xx1l l 0 1 7 0|1|5>6 10>11 13>14*
+finkel|4xx2/l1llll2/4xx1l l 0 1 7 0|2|9>11 10>12 13>15
+finkel|4xx2/l1llll2/4xx1l l 0 1 7 0|3|8>11 9>12
+finkel|4xx2/l1llll2/4xx1l l 0 1 7 0|4|7>11 8>12 10>14*
+finkel|1dd1xxdd/1l3dd1/2l1xx2 d 2 3 1 0|0|
+finkel|1dd1xxdd/1l3dd1/2l1xx2 d 2 3 1 0|1|0>1 3>4* 11>12 14>15
+finkel|1dd1xxdd/1l3dd1/2l1xx2 d 2 3 1 0|2|2>4* 3>5 10>12 13>15
+finkel|1dd1xxdd/1l3dd1/2l1xx2 d 2 3 1 0|3|2>5 3>6x
+finkel|1dd1xxdd/1l3dd1/2l1xx2 d 2 3 1 0|4|0>4* 2>6x 3>7 11>15
+finkel|4xxd1/1dll2dl/2llxxll d 0 0 1 3|0|
+finkel|4xxd1/1dll2dl/2llxxll d 0 0 1 3|1|0>1 6>7x 11>12x 14>15
+finkel|4xxd1/1dll2dl/2llxxll d 0 0 1 3|2|0>2 11>13
+finkel|4xxd1/1dll2dl/2llxxll d 0 0 1 3|3|0>3 6>9
+finkel|4xxd1/1dll2dl/2llxxll d 0 0 1 3|4|0>4* 6>10 11>15
+finkel|d1ddxx2/dldl1d2/4xx2 d 1 4 0 1|0|
+finkel|d1ddxx2/dldl1d2/4xx2 d 1 4 0 1|1|2>3 5>6x 10>11
+finkel|d1ddxx2/dldl1d2/4xx2 d 1 4 0 1|2|1>3 4>6x 7>9 10>12
+finkel|d1ddxx2/dldl1d2/4xx2 d 1 4 0 1|3|10>13
+finkel|d1ddxx2/dldl1d2/4xx2 d 1 4 0 1|4|2>6x 5>9 7>11 10>14*
+finkel|d1d1xxd1/3dd2d/4xx1l l 1 5 0 1|0|
+finkel|d1d1xxd1/3dd2d/4xx1l l 1 5 0 1|1|0>1 13>14*
+finkel|d1d1xxd1/3dd2d/4xx1l l 1 5 0 1|2|0>2 13>15
+finkel|d1d1xxd1/3dd2d/4xx1l l 1 5 0 1|3|0>3
+finkel|d1d1xxd1/3dd2d/4xx1l l 1 5 0 1|4|0>4*
+finkel|4xx2/ld2ddld/4xx2 d 1 4 2 1|0|
+finkel|4xx2/ld2ddld/4xx2 d 1 4 2 1|1|0>1 6>7 10>11x 12>13
+finkel|4xx2/ld2ddld/4xx2 d 1 4 2 1|2|0>2 6>8* 9>11x 12>14*
+finkel|4xx2/ld2ddld/4xx2 d 1 4 2 1|3|0>3 10>13 12>15
+finkel|4xx2/ld2ddld/4xx2 d 1 4 2 1|4|0>4* 9>13 10>14*
+finkel|4xx2/2ll1l1l/4xx1l d 0 2 6 1|0|
+finkel|4xx2/2ll1l1l/4xx1l d 0 2 6 1|1|0>1
+finkel|4xx2/2ll1l1l/4xx1l d 0 2 6 1|2|0>2
+finkel|4xx2/2ll1l1l/4xx1l d 0 2 6 1|3|0>3
+finkel|4xx2/2ll1l1l/4xx1l d 0 2 6 1|4|0>4*
+finkel|2d1xxd1/5dl1/1l2xx2 l 4 1 2 2|0|
+finkel|2d1xxd1/5dl1/1l2xx2 l 4 1 2 2|1|0>1 3>4* 11>12
+finkel|2d1xxd1/5dl1/1l2xx2 l 4 1 2 2|2|0>2 3>5 11>13
+finkel|2d1xxd1/5dl1/1l2xx2 l 4 1 2 2|3|3>6 11>14*
+finkel|2d1xxd1/5dl1/1l2xx2 l 4 1 2 2|4|0>4* 3>7 11>15
+finkel|d3xxdd/3lll2/1lllxx2 l 0 1 4 0|0|
+finkel|d3xxdd/3lll2/1lllxx2 l 0 1 4 0|1|3>4* 10>11
+finkel|d3xxdd/3lll2/1lllxx2 l 0 1 4 0|2|2>4* 3>5 9>11 10>12
+finkel|d3xxdd/3lll2/1lllxx2 l 0 1 4 0|3|1>4* 2>5 3>6 8>11 9>12 10>13
+finkel|d3xxdd/3lll2/1lllxx2 l 0 1 4 0|4|1>5 2>6 3>7 8>12 9>13 10>14*
+finkel|d1d1xx1d/dl1dld1l/2llxxll l 0 0 0 1|0|
+finkel|d1d1xx1d/dl1dld1l/2llxxll l 0 0 0 1|1|2>3 6>7 9>10x 14>15
+finkel|d1d1xx1d/dl1dld1l/2llxxll l 0 0 0 1|2|1>3 2>4* 9>11 13>15
+finkel|d1d1xx1d/dl1dld1l/2llxxll l 0 0 0 1|3|1>4* 2>5x 12>15
+finkel|d1d1xx1d/dl1dld1l/2llxxll l 0 0 0 1|4|1>5x 6>10x
+finkel|1d2xx1d/l3ldl1/ll2xxl1 l 0 1 2 2|0|
+finkel|1d2xx1d/l3ldl1/ll2xxl1 l 0 1 2 2|1|5>6 9>10x 11>12 14>15
+finkel|1d2xx1d/l3ldl1/ll2xxl1 l 0 1 2 2|2|4>6 5>7 11>13
+finkel|1d2xx1d/l3ldl1/ll2xxl1 l 0 1 2 2|3|3>6 4>7 5>8* 9>12
+finkel|1d2xx1d/l3ldl1/ll2xxl1 l 0 1 2 2|4|3>7 4>8* 9>13 11>15
+finkel|2ddxx1d/3l2d1/1ll1xxl1 l 2 1 1 2|0|
+finkel|2ddxx1d/3l2d1/1ll1xxl1 l 2 1 1 2|1|0>1 3>4* 8>9 14>15
+finkel|2ddxx1d/3l2d1/1ll1xxl1 l 2 1 1 2|2|2>4* 3>5 8>10
+finkel|2ddxx1d/3l2d1/1ll1xxl1 l 2 1 1 2|3|2>5 3>6 8>11x
+finkel|2ddxx1d/3l2d1/1ll1xxl1 l 2 1 1 2|4|0>4* 2>6 3>7 8>12
+finkel|ddddxx1d/dll1lldl/2l1xx2 l 0 1 0 0|0|
+finkel|ddddxx1d/dll1lldl/2l1xx2 l 0 1 0 0|1|2>3 7>8* 10>11x 12>13
+finkel|ddddxx1d/dll1lldl/2l1xx2 l 0 1 0 0|2|2>4* 6>8* 9>11x 12>14*
+finkel|ddddxx1d/dll1lldl/2l1xx2 l 0 1 0 0|3|2>5x 10>13 12>15
+finkel|ddddxx1d/dll1lldl/2l1xx2 l 0 1 0 0|4|7>11x 9>13 10>14*
+finkel|4xx2/ld3l2/2llxx1l d 1 1 6 0|0|
+finkel|4xx2/ld3l2/2llxx1l d 1 1 6 0|1|0>1 6>7
+finkel|4xx2/ld3l2/2llxx1l d 1 1 6 0|2|0>2 6>8*
+finkel|4xx2/ld3l2/2llxx1l d 1 1 6 0|3|0>3 6>9
+finkel|4xx2/ld3l2/2llxx1l d 1 1 6 0|4|0>4* 6>10x
+finkel|4xx1d/d1dllll1/1l2xx2 d 2 0 3 1|0|
+finkel|4xx1d/d1dllll1/1l2xx2 d 2 0 3 1|1|0>1 5>6 13>14*
+finkel|4xx1d/d1dllll1/1l2xx2 d 2 0 3 1|2|0>2 7>9x 13>15
+finkel|4xx1d/d1dllll1/1l2xx2 d 2 0 3 1|3|0>3 7>10x
+finkel|4xx1d/d1dllll1/1l2xx2 d 2 0 3 1|4|0>4* 5>9x 7>11x
+finkel|2ddxxd1/d1d1dd2/4xxl1 l 1 5 0 0|0|
+finkel|2ddxxd1/d1d1dd2/4xxl1 l 1 5 0 0|1|0>1 14>15
+finkel|2ddxxd1/d1d1dd2/4xxl1 l 1 5 0 0|2|0>2
+finkel|2ddxxd1/d1d1dd2/4xxl1 l 1 5 0 0|3|0>3
+finkel|2ddxxd1/d1d1dd2/4xxl1 l 1 5 0 0|4|0>4*
+finkel|1d2xxd1/d1dd2ld/lll1xx2 d 1 2 0 1|0|
+finkel|1d2xxd1/d1dd2ld/lll1xx2 d 1 2 0 1|1|3>4* 5>6 8>9 12>13 14>15
+finkel|1d2xxd1/d1dd2ld/lll1xx2 d 1 2 0 1|2|7>9 8>10
+finkel|1d2xxd1/d1dd2ld/lll1xx2 d 1 2 0 1|3|3>6 7>10 8>11x 12>15
+finkel|1d2xxd1/d1dd2ld/lll1xx2 d 1 2 0 1|4|5>9 7>11x
+finkel|dd2xx1d/d2l1dl1/llllxx2 d 1 0 2 0|0|
+finkel|dd2xx1d/d2l1dl1/llllxx2 d 1 0 2 0|1|0>1 5>6 10>11x 13>14*
+finkel|dd2xx1d/d2l1dl1/llllxx2 d 1 0 2 0|2|0>2 4>6 5>7 10>12 13>15
+finkel|dd2xx1d/d2l1dl1/llllxx2 d 1 0 2 0|3|3>6 4>7
+finkel|dd2xx1d/d2l1dl1/llllxx2 d 1 0 2 0|4|3>7 5>9 10>14*
+finkel|d2dxxdd/3l3d/l3xx2 l 2 3 1 1|0|
+finkel|d2dxxdd/3l3d/l3xx2 l 2 3 1 1|1|0>1 4>5 8>9
+finkel|d2dxxdd/3l3d/l3xx2 l 2 3 1 1|2|0>2 4>6 8>10
+finkel|d2dxxdd/3l3d/l3xx2 l 2 3 1 1|3|0>3 4>7 8>11
+finkel|d2dxxdd/3l3d/l3xx2 l 2 3 1 1|4|8>12x
+finkel|1dddxx1d/dllldldl/4xx1l l 0 1 0 0|0|
+finkel|1dddxx1d/dllldldl/4xx1l l 0 1 0 0|1|8>9x 10>11x 13>14*
+finkel|1dddxx1d/dllldldl/4xx1l l 0 1 0 0|2|7>9x 12>14* 13>15
+finkel|1dddxx1d/dllldldl/4xx1l l 0 1 0 0|3|6>9x 8>11x 12>15
+finkel|1dddxx1d/dllldldl/4xx1l l 0 1 0 0|4|7>11x 10>14*
+finkel|1dd1xxd1/dl1d4/2l1xx2 l 4 1 1 1|0|
+finkel|1dd1xxd1/dl1d4/2l1xx2 l 4 1 1 1|1|0>1 2>3 6>7
+finkel|1dd1xxd1/dl1d4/2l1xx2 l 4 1 1 1|2|2>4*
+finkel|1dd1xxd1/dl1d4/2l1xx2 l 4 1 1 1|3|0>3 2>5x 6>9
+finkel|1dd1xxd1/dl1d4/2l1xx2 l 4 1 1 1|4|0>4* 6>10
+finkel|4xx2/1l2l2l/l2lxx1l d 0 1 2 5|0|
+finkel|4xx2/1l2l2l/l2lxx1l d 0 1 2 5|1|0>1
+finkel|4xx2/1l2l2l/l2lxx1l d 0 1 2 5|2|0>2
+finkel|4xx2/1l2l2l/l2lxx1l d 0 1 2 5|3|0>3
+finkel|4xx2/1l2l2l/l2lxx1l d 0 1 2 5|4|0>4*
+finkel|4xxd1/d5dd/4xx2 d 1 6 3 0|0|
+finkel|4xxd1/d5dd/4xx2 d 1 6 3 0|1|0>1 5>6 12>13 14>15
+finkel|4xxd1/d5dd/4xx2 d 1 6 3 0|2|0>2 5>7 11>13
+finkel|4xxd1/d5dd/4xx2 d 1 6 3 0|3|0>3 5>8* 12>15
+finkel|4xxd1/d5dd/4xx2 d 1 6 3 0|4|0>4* 5>9 11>15
+finkel|4xxd1/1l2l2l/lll1xx1l l 0 0 5 1|0|
+finkel|4xxd1/1l2l2l/lll1xx1l l 0 0 5 1|1|4>5 6>7 9>10 13>14*
+finkel|4xxd1/1l2l2l/lll1xx1l l 0 0 5 1|2|3>5 6>8* 9>11 12>14* 13>15
+finkel|4xxd1/1l2l2l/lll1xx1l l 0 0 5 1|3|2>5 4>7 12>15
+finkel|4xxd1/1l2l2l/lll1xx1l l 0 0 5 1|4|3>7 4>8* 6>10
+finkel|d3xx2/5d2/4xx2 d 1 6 1 4|0|
+finkel|d3xx2/5d2/4xx2 d 1 6 1 4|1|0>1 4>5 10>11
+finkel|d3xx2/5d2/4xx2 d 1 6 1 4|2|0>2 4>6 10>12
+finkel|d3xx2/5d2/4xx2 d 1 6 1 4|3|0>3 4>7 10>13
+finkel|d3xx2/5d2/4xx2 d 1 6 1 4|4|4>8* 10>14*
+finkel|d3xx1d/d3ll1d/1ll1xxll l 1 0 2 1|0|
+finkel|d3xx1d/d3ll1d/1ll1xxll l 1 0 2 1|1|0>1 3>4* 10>11 14>15
+finkel|d3xx1d/d3ll1d/1ll1xxll l 1 0 2 1|2|2>4* 3>5x 9>11 10>12x 13>15
+finkel|d3xx1d/d3ll1d/1ll1xxll l 1 0 2 1|3|2>5x 3>6 9>12x
+finkel|d3xx1d/d3ll1d/1ll1xxll l 1 0 2 1|4|0>4* 2>6 3>7
+finkel|1d2xx1d/1dl1ld1d/4xx2 l 4 1 2 0|0|
+finkel|1d2xx1d/1dl1ld1d/4xx2 l 4 1 2 0|1|0>1 7>8* 9>10x
+finkel|1d2xx1d/1dl1ld1d/4xx2 l 4 1 2 0|2|0>2 9>11
+finkel|1d2xx1d/1dl1ld1d/4xx2 l 4 1 2 0|3|0>3 7>10x 9>12x
+finkel|1d2xx1d/1dl1ld1d/4xx2 l 4 1 2 0|4|0>4* 7>11 9>13
+finkel|4xx2/1l1ll3/lll1xx2 l 0 1 4 3|0|
+finkel|4xx2/1l1ll3/lll1xx2 l 0 1 4 3|1|4>5 6>7 9>10
+finkel|4xx2/1l1ll3/lll1xx2 l 0 1 4 3|2|3>5 8>10 9>11
+finkel|4xx2/1l1ll3/lll1xx2 l 0 1 4 3|3|2>5 4>7 8>11 9>12
+finkel|4xx2/1l1ll3/lll1xx2 l 0 1 4 3|4|3>7 6>10 8>12 9>13
+finkel|1dddxxdd/l2ldl1d/2l1xx2 l 1 2 0 0|0|
+finkel|1dddxxdd/l2ldl1d/2l1xx2 l 1 2 0 0|1|0>1 2>3 5>6 8>9x 10>11
+finkel|1dddxxdd/l2ldl1d/2l1xx2 l 1 2 0 0|2|2>4* 5>7 10>12x
+finkel|1dddxxdd/l2ldl1d/2l1xx2 l 1 2 0 0|3|0>3 8>11 10>13
+finkel|1dddxxdd/l2ldl1d/2l1xx2 l 1 2 0 0|4|0>4* 2>6 5>9x 8>12x 10>14*
+finkel|4xxd1/ddlllddd/1l2xx1l d 2 0 1 0|0|
+finkel|4xxd1/ddlllddd/1l2xx1l d 2 0 1 0|1|0>1 6>7x 12>13 14>15
+finkel|4xxd1/ddlllddd/1l2xx1l d 2 0 1 0|2|0>2 5>7x 11>13
+finkel|4xxd1/ddlllddd/1l2xx1l d 2 0 1 0|3|0>3 6>9x 10>13 12>15
+finkel|4xxd1/ddlllddd/1l2xx1l d 2 0 1 0|4|0>4* 5>9x 11>15
+finkel|d3xx2/2dld3/4xx2 l 6 0 1 3|0|
+finkel|d3xx2/2dld3/4xx2 l 6 0 1 3|1|0>1 8>9x
+finkel|d3xx2/2dld3/4xx2 l 6 0 1 3|2|0>2 8>10
+finkel|d3xx2/2dld3/4xx2 l 6 0 1 3|3|0>3 8>11
+finkel|d3xx2/2dld3/4xx2 l 6 0 1 3|4|0>4* 8>12
+finkel|4xxdd/4dl1d/2l1xx2 l 5 0 1 2|0|
+finkel|4xxdd/4dl1d/2l1xx2 l 5 0 1 2|1|0>1 2>3 10>11
+finkel|4xxdd/4dl1d/2l1xx2 l 5 0 1 2|2|2>4* 10>12x
+finkel|4xxdd/4dl1d/2l1xx2 l 5 0 1 2|3|0>3 2>5 10>13
+finkel|4xxdd/4dl1d/2l1xx2 l 5 0 1 2|4|0>4* 2>6 10>14*
+finkel|3dxx2/dlldld2/1ll1xx1l d 1 0 0 3|0|
+finkel|3dxx2/dlldld2/1ll1xx1l d 1 0 0 3|1|1>2 5>6x 8>9x 10>11
+finkel|3dxx2/dlldld2/1ll1xx1l d 1 0 0 3|2|1>3 5>7x 10>12
+finkel|3dxx2/dlldld2/1ll1xx1l d 1 0 0 3|3|1>4* 8>11 10>13
+finkel|3dxx2/dlldld2/1ll1xx1l d 1 0 0 3|4|5>9x 8>12 10>14*
+finkel|2d1xx2/8/4xx2 l 3 4 3 3|0|
+finkel|2d1xx2/8/4xx2 l 3 4 3 3|1|0>1
+finkel|2d1xx2/8/4xx2 l 3 4 3 3|2|0>2
+finkel|2d1xx2/8/4xx2 l 3 4 3 3|3|0>3
+finkel|2d1xx2/8/4xx2 l 3 4 3 3|4|0>4*
+finkel|4xx2/l2l4/4xx2 l 1 4 4 3|0|
+finkel|4xx2/l2l4/4xx2 l 1 4 4 3|1|0>1 5>6 8>9
+finkel|4xx2/l2l4/4xx2 l 1 4 4 3|2|0>2 5>7 8>10
+finkel|4xx2/l2l4/4xx2 l 1 4 4 3|3|0>3 8>11
+finkel|4xx2/l2l4/4xx2 l 1 4 4 3|4|0>4* 5>9 8>12
+finkel|d3xx2/2l2l2/4xx2 l 1 4 4 2|0|
+finkel|d3xx2/2l2l2/4xx2 l 1 4 4 2|1|0>1 7>8* 10>11
+finkel|d3xx2/2l2l2/4xx2 l 1 4 4 2|2|0>2 7>9 10>12
+finkel|d3xx2/2l2l2/4xx2 l 1 4 4 2|3|0>3 10>13
+finkel|d3xx2/2l2l2/4xx2 l 1 4 4 2|4|0>4* 7>11 10>14*
+finkel|4xxdd/3l1dd1/4xx2 l 1 5 0 3|0|
+finkel|4xxdd/3l1dd1/4xx2 l 1 5 0 3|1|0>1 8>9
+finkel|4xxdd/3l1dd1/4xx2 l 1 5 0 3|2|0>2 8>10x
+finkel|4xxdd/3l1dd1/4xx2 l 1 5 0 3|3|0>3 8>11x
+finkel|4xxdd/3l1dd1/4xx2 l 1 5 0 3|4|0>4* 8>12
+finkel|ddddxx2/1lddl3/lll1xx2 l 0 2 0 1|0|
+finkel|ddddxx2/1lddl3/lll1xx2 l 0 2 0 1|1|4>5 6>7x 9>10
+finkel|ddddxx2/1lddl3/lll1xx2 l 0 2 0 1|2|3>5 9>11
+finkel|ddddxx2/1lddl3/lll1xx2 l 0 2 0 1|3|2>5 4>7x 9>12
+finkel|ddddxx2/1lddl3/lll1xx2 l 0 2 0 1|4|3>7x 6>10 9>13
+finkel|d1d1xxd1/d1d4d/1ll1xxll d 3 0 0 1|0|
+finkel|d1d1xxd1/d1d4d/1ll1xxll d 3 0 0 1|1|2>3 5>6 7>8* 12>13 14>15
+finkel|d1d1xxd1/d1d4d/1ll1xxll d 3 0 0 1|2|4>6 7>9
+finkel|d1d1xxd1/d1d4d/1ll1xxll d 3 0 0 1|3|5>8* 7>10 12>15
+finkel|d1d1xxd1/d1d4d/1ll1xxll d 3 0 0 1|4|2>6 4>8* 5>9 7>11
+finkel|d3xx1d/3l2d1/4xx2 d 4 2 4 0|0|
+finkel|d3xx1d/3l2d1/4xx2 d 4 2 4 0|1|0>1 4>5 11>12 13>14*
+finkel|d3xx1d/3l2d1/4xx2 d 4 2 4 0|2|0>2 4>6 13>15
+finkel|d3xx1d/3l2d1/4xx2 d 4 2 4 0|3|0>3 4>7 11>14*
+finkel|d3xx1d/3l2d1/4xx2 d 4 2 4 0|4|11>15
+finkel|4xx2/2d4d/2l1xx2 d 0 6 2 3|0|
+finkel|4xx2/2d4d/2l1xx2 d 0 6 2 3|1|0>1 7>8* 12>13
+finkel|4xx2/2d4d/2l1xx2 d 0 6 2 3|2|0>2 7>9 12>14*
+finkel|4xx2/2d4d/2l1xx2 d 0 6 2 3|3|0>3 7>10 12>15
+finkel|4xx2/2d4d/2l1xx2 d 0 6 2 3|4|0>4* 7>11
+finkel|d1ddxxd1/3dd1dl/1lllxx2 d 3 0 0 0|0|
+finkel|d1ddxxd1/3dd1dl/1lllxx2 d 3 0 0 0|1|2>3 4>5 9>10 11>12x 14>15
+finkel|d1ddxxd1/3dd1dl/1lllxx2 d 3 0 0 0|2|1>3 4>6 8>10 11>13
+finkel|d1ddxxd1/3dd1dl/1lllxx2 d 3 0 0 0|3|2>5 4>7 9>12x
+finkel|d1ddxxd1/3dd1dl/1lllxx2 d 3 0 0 0|4|1>5 2>6 8>12x 9>13 11>15
+finkel|4xx2/1l2ll1l/ll2xx1l d 0 0 1 6|0|
+finkel|4xx2/1l2ll1l/ll2xx1l d 0 0 1 6|1|0>1
+finkel|4xx2/1l2ll1l/ll2xx1l d 0 0 1 6|2|0>2
+finkel|4xx2/1l2ll1l/ll2xx1l d 0 0 1 6|3|0>3
+finkel|4xx2/1l2ll1l/ll2xx1l d 0 0 1 6|4|0>4*
+finkel|3dxx2/3l1ld1/4xx2 d 3 2 2 3|0|
+finkel|3dxx2/3l1ld1/4xx2 d 3 2 2 3|1|1>2 11>12
+finkel|3dxx2/3l1ld1/4xx2 d 3 2 2 3|2|0>2 1>3 11>13
+finkel|3dxx2/3l1ld1/4xx2 d 3 2 2 3|3|0>3 1>4* 11>14*
+finkel|3dxx2/3l1ld1/4xx2 d 3 2 2 3|4|0>4* 1>5 11>15
+finkel|1d2xx2/1d1d1dd1/ll2xx2 d 5 0 1 1|0|
+finkel|1d2xx2/1d1d1dd1/ll2xx2 d 5 0 1 1|1|0>1 3>4* 6>7 8>9 11>12
+finkel|1d2xx2/1d1d1dd1/ll2xx2 d 5 0 1 1|2|0>2 3>5 10>12 11>13
+finkel|1d2xx2/1d1d1dd1/ll2xx2 d 5 0 1 1|3|6>9 10>13 11>14*
+finkel|1d2xx2/1d1d1dd1/ll2xx2 d 5 0 1 1|4|0>4* 3>7 8>12 10>14* 11>15
+finkel|d3xxd1/1ll1d3/l2lxxll l 1 0 4 0|0|
+finkel|d3xxd1/1ll1d3/l2lxxll l 1 0 4 0|1|1>2 4>5 7>8* 14>15
+finkel|d3xxd1/1ll1d3/l2lxxll l 1 0 4 0|2|0>2 1>3 6>8* 7>9x 13>15
+finkel|d3xxd1/1ll1d3/l2lxxll l 1 0 4 0|3|0>3 6>9x 7>10
+finkel|d3xxd1/1ll1d3/l2lxxll l 1 0 4 0|4|1>5 4>8* 6>10 7>11
+finkel|2d1xx1d/lddd2dl/4xx2 d 4 1 0 1|0|
+finkel|2d1xx1d/lddd2dl/4xx2 d 4 1 0 1|1|2>3 8>9 11>12x 13>14*
+finkel|2d1xx1d/lddd2dl/4xx2 d 4 1 0 1|2|2>4* 7>9 8>10 13>15
+finkel|2d1xx1d/lddd2dl/4xx2 d 4 1 0 1|3|2>5x 6>9 7>10 11>14*
+finkel|2d1xx1d/lddd2dl/4xx2 d 4 1 0 1|4|6>10 8>12x 11>15
+finkel|2d1xx2/ll3ld1/ll2xx1l d 1 0 3 2|0|
+finkel|2d1xx2/ll3ld1/ll2xx1l d 1 0 3 2|1|0>1 2>3 11>12
+finkel|2d1xx2/ll3ld1/ll2xx1l d 1 0 3 2|2|2>4* 11>13
+finkel|2d1xx2/ll3ld1/ll2xx1l d 1 0 3 2|3|0>3 2>5x 11>14*
+finkel|2d1xx2/ll3ld1/ll2xx1l d 1 0 3 2|4|0>4* 2>6x 11>15
+finkel|1d2xx1d/l1l2l1l/2l1xx1l l 1 0 1 4|0|
+finkel|1d2xx1d/l1l2l1l/2l1xx1l l 1 0 1 4|1|0>1 2>3 5>6 7>8* 10>11 13>14*
+finkel|1d2xx1d/l1l2l1l/2l1xx1l l 1 0 1 4|2|2>4* 7>9 12>14* 13>15
+finkel|1d2xx1d/l1l2l1l/2l1xx1l l 1 0 1 4|3|0>3 5>8* 12>15
+finkel|1d2xx1d/l1l2l1l/2l1xx1l l 1 0 1 4|4|0>4* 2>6 5>9 7>11 10>14*
+finkel|1d1dxxd1/dddllll1/2l1xxl1 d 1 0 1 0|0|
+finkel|1d1dxxd1/dddllll1/2l1xxl1 d 1 0 1 0|1|1>2 3>4* 14>15
+finkel|1d1dxxd1/dddllll1/2l1xxl1 d 1 0 1 0|2|0>2 7>9x
+finkel|1d1dxxd1/dddllll1/2l1xxl1 d 1 0 1 0|3|1>4* 6>9x 7>10x
+finkel|1d1dxxd1/dddllll1/2l1xxl1 d 1 0 1 0|4|0>4* 5>9x 6>10x 7>11x
+finkel|dd1dxxd1/3ldl1l/4xx2 l 0 4 2 0|0|
+finkel|dd1dxxd1/3ldl1l/4xx2 l 0 4 2 0|1|8>9x 10>11 12>13
+finkel|dd1dxxd1/3ldl1l/4xx2 l 0 4 2 0|2|12>14*
+finkel|dd1dxxd1/3ldl1l/4xx2 l 0 4 2 0|3|8>11 10>13 12>15
+finkel|dd1dxxd1/3ldl1l/4xx2 l 0 4 2 0|4|10>14*
+finkel|d2dxx2/dldddd1l/1lllxx2 d 2 0 0 0|0|
+finkel|d2dxx2/dldddd1l/1lllxx2 d 2 0 0 0|1|1>2 5>6x 10>11
+finkel|d2dxx2/dldddd1l/1lllxx2 d 2 0 0 0|2|1>3 4>6x 9>11 10>12x
+finkel|d2dxx2/dldddd1l/1lllxx2 d 2 0 0 0|3|8>11 9>12x 10>13
+finkel|d2dxx2/dldddd1l/1lllxx2 d 2 0 0 0|4|7>11 8>12x 9>13 10>14*
+finkel|dd1dxxd1/2ddld2/1lllxx2 l 0 3 0 0|0|
+finkel|dd1dxxd1/2ddld2/1lllxx2 l 0 3 0 0|1|3>4* 9>10x
+finkel|dd1dxxd1/2ddld2/1lllxx2 l 0 3 0 0|2|2>4* 3>5 9>11
+finkel|dd1dxxd1/2ddld2/1lllxx2 l 0 3 0 0|3|1>4* 2>5 3>6 9>12
+finkel|dd1dxxd1/2ddld2/1lllxx2 l 0 3 0 0|4|1>5 2>6 3>7x 9>13
+finkel|1dddxx1d/2d3d1/4xx2 l 4 3 1 0|0|
+finkel|1dddxx1d/2d3d1/4xx2 l 4 3 1 0|1|0>1
+finkel|1dddxx1d/2d3d1/4xx2 l 4 3 1 0|2|0>2
+finkel|1dddxx1d/2d3d1/4xx2 l 4 3 1 0|3|0>3
+finkel|1dddxx1d/2d3d1/4xx2 l 4 3 1 0|4|0>4*
+finkel|d1ddxxdd/dlllld2/2llxx1l d 0 0 0 0|0|
+finkel|d1ddxxdd/dlllld2/2llxx1l d 0 0 0 0|1|2>3 5>6x 10>11 14>15
+finkel|d1ddxxdd/dlllld2/2llxx1l d 0 0 0 0|2|1>3 4>6x 5>7x 10>12 13>15
+finkel|d1ddxxdd/dlllld2/2llxx1l d 0 0 0 0|3|4>7x
+finkel|d1ddxxdd/dlllld2/2llxx1l d 0 0 0 0|4|2>6x 5>9x
+finkel|1d1dxx2/1dll2ll/l2lxx2 l 0 1 1 3|0|
+finkel|1d1dxx2/1dll2ll/l2lxx2 l 0 1 1 3|1|1>2 4>5 8>9 12>13
+finkel|1d1dxx2/1dll2ll/l2lxx2 l 0 1 1 3|2|1>3 4>6x 7>9 8>10 11>13 12>14*
+finkel|1d1dxx2/1dll2ll/l2lxx2 l 0 1 1 3|3|7>10 11>14* 12>15
+finkel|1d1dxx2/1dll2ll/l2lxx2 l 0 1 1 3|4|1>5 11>15
+finkel|4xx2/l2lllll/3lxx2 d 0 0 2 5|0|
+finkel|4xx2/l2lllll/3lxx2 d 0 0 2 5|1|0>1
+finkel|4xx2/l2lllll/3lxx2 d 0 0 2 5|2|0>2
+finkel|4xx2/l2lllll/3lxx2 d 0 0 2 5|3|0>3
+finkel|4xx2/l2lllll/3lxx2 d 0 0 2 5|4|0>4*
+finkel|4xx2/1l3l2/1l2xxl1 l 0 3 7 0|0|
+finkel|4xx2/1l3l2/1l2xxl1 l 0 3 7 0|1|3>4* 6>7 10>11 14>15
+finkel|4xx2/1l3l2/1l2xxl1 l 0 3 7 0|2|3>5 6>8* 10>12
+finkel|4xx2/1l3l2/1l2xxl1 l 0 3 7 0|3|6>9 10>13
+finkel|4xx2/1l3l2/1l2xxl1 l 0 3 7 0|4|3>7
+finkel|3dxx2/d1d3dl/4xx2 d 6 0 1 2|0|
+finkel|3dxx2/d1d3dl/4xx2 d 6 0 1 2|1|1>2 5>6 7>8* 11>12x
+finkel|3dxx2/d1d3dl/4xx2 d 6 0 1 2|2|0>2 1>3 7>9 11>13
+finkel|3dxx2/d1d3dl/4xx2 d 6 0 1 2|3|0>3 1>4* 5>8* 7>10 11>14*
+finkel|3dxx2/d1d3dl/4xx2 d 6 0 1 2|4|0>4* 5>9 11>15
+finkel|3dxxdd/ddlld1l1/l2lxxl1 d 1 0 0 1|0|
+finkel|3dxxdd/ddlld1l1/l2lxxl1 d 1 0 0 1|1|1>2 6>7x 9>10 14>15
+finkel|3dxxdd/ddlld1l1/l2lxxl1 d 1 0 0 1|2|1>3 5>7x 9>11x 13>15
+finkel|3dxxdd/ddlld1l1/l2lxxl1 d 1 0 0 1|3|1>4* 9>12
+finkel|3dxxdd/ddlld1l1/l2lxxl1 d 1 0 0 1|4|6>10
+finkel|4xx2/2ll2l1/4xxl1 d 0 3 5 2|0|
+finkel|4xx2/2ll2l1/4xxl1 d 0 3 5 2|1|0>1
+finkel|4xx2/2ll2l1/4xxl1 d 0 3 5 2|2|0>2
+finkel|4xx2/2ll2l1/4xxl1 d 0 3 5 2|3|0>3
+finkel|4xx2/2ll2l1/4xxl1 d 0 3 5 2|4|0>4*
+finkel|4xxdd/d1lll3/4xxl1 l 1 2 4 0|0|
+finkel|4xxdd/d1lll3/4xxl1 l 1 2 4 0|1|0>1 9>10 14>15
+finkel|4xxdd/d1lll3/4xxl1 l 1 2 4 0|2|0>2 8>10 9>11
+finkel|4xxdd/d1lll3/4xxl1 l 1 2 4 0|3|0>3 7>10 8>11 9>12
+finkel|4xxdd/d1lll3/4xxl1 l 1 2 4 0|4|0>4* 7>11 8>12 9>13
+finkel|4xx2/3ll3/l3xx2 d 4 0 1 6|0|
+finkel|4xx2/3ll3/l3xx2 d 4 0 1 6|1|0>1
+finkel|4xx2/3ll3/l3xx2 d 4 0 1 6|2|0>2
+finkel|4xx2/3ll3/l3xx2 d 4 0 1 6|3|0>3
+finkel|4xx2/3ll3/l3xx2 d 4 0 1 6|4|0>4*
+finkel|1d2xx1d/4d1dl/l3xx2 d 1 4 3 0|0|
+finkel|1d2xx1d/4d1dl/l3xx2 d 1 4 3 0|1|0>1 3>4* 9>10 11>12x 13>14*
+finkel|1d2xx1d/4d1dl/l3xx2 d 1 4 3 0|2|0>2 3>5 13>15
+finkel|1d2xx1d/4d1dl/l3xx2 d 1 4 3 0|3|3>6 9>12x 11>14*
+finkel|1d2xx1d/4d1dl/l3xx2 d 1 4 3 0|4|0>4* 3>7 11>15
+finkel|dd2xx2/1lll2dl/3lxxll l 0 0 4 0|0|
+finkel|dd2xx2/1lll2dl/3lxxll l 0 0 4 0|1|1>2 8>9 14>15
+finkel|dd2xx2/1lll2dl/3lxxll l 0 0 4 0|2|1>3 7>9 8>10 13>15
+finkel|dd2xx2/1lll2dl/3lxxll l 0 0 4 0|3|1>4* 6>9 7>10 8>11x 12>15
+finkel|dd2xx2/1lll2dl/3lxxll l 0 0 4 0|4|1>5 6>10 7>11x
+finkel|dd2xxd1/1d1dd2d/4xx2 l 5 2 0 0|0|
+finkel|dd2xxd1/1d1dd2d/4xx2 l 5 2 0 0|1|0>1
+finkel|dd2xxd1/1d1dd2d/4xx2 l 5 2 0 0|2|0>2
+finkel|dd2xxd1/1d1dd2d/4xx2 l 5 2 0 0|3|0>3
+finkel|dd2xxd1/1d1dd2d/4xx2 l 5 2 0 0|4|0>4*
+finkel|d2dxxd1/l1d1d1dd/l3xx2 d 1 4 0 0|0|
+finkel|d2dxxd1/l1d1d1dd/l3xx2 d 1 4 0 0|1|1>2 4>5x 7>8* 9>10 12>13 14>15
+finkel|d2dxxd1/l1d1d1dd/l3xx2 d 1 4 0 0|2|1>3 4>6 11>13
+finkel|d2dxxd1/l1d1d1dd/l3xx2 d 1 4 0 0|3|7>10 12>15
+finkel|d2dxxd1/l1d1d1dd/l3xx2 d 1 4 0 0|4|1>5x 4>8* 9>13 11>15
+finkel|4xx2/5d2/4xxll l 5 0 5 1|0|
+finkel|4xx2/5d2/4xxll l 5 0 5 1|1|0>1 14>15
+finkel|4xx2/5d2/4xxll l 5 0 5 1|2|0>2 13>15
+finkel|4xx2/5d2/4xxll l 5 0 5 1|3|0>3
+finkel|4xx2/5d2/4xxll l 5 0 5 1|4|0>4*
+finkel|dd2xx1d/6d1/3lxx2 l 3 3 3 0|0|
+finkel|dd2xx1d/6d1/3lxx2 l 3 3 3 0|1|1>2
+finkel|dd2xx1d/6d1/3lxx2 l 3 3 3 0|2|0>2 1>3
+finkel|dd2xx1d/6d1/3lxx2 l 3 3 3 0|3|0>3 1>4*
+finkel|dd2xx1d/6d1/3lxx2 l 3 3 3 0|4|0>4* 1>5
+finkel|dd1dxx2/2dl4/3lxx2 d 0 5 2 1|0|
+finkel|dd1dxx2/2dl4/3lxx2 d 0 5 2 1|1|1>2 4>5
+finkel|dd1dxx2/2dl4/3lxx2 d 0 5 2 1|2|0>2 3>5 4>6 7>9
+finkel|dd1dxx2/2dl4/3lxx2 d 0 5 2 1|3|3>6 7>10
+finkel|dd1dxx2/2dl4/3lxx2 d 0 5 2 1|4|1>5 7>11
+finkel|2d1xxdd/dll1ldld/1lllxx2 l 0 0 1 0|0|
+finkel|2d1xxdd/dll1ldld/1lllxx2 l 0 0 1 0|1|3>4* 7>8* 9>10x 11>12x
+finkel|2d1xxdd/dll1ldld/1lllxx2 l 0 0 1 0|2|2>4* 3>5x 6>8* 11>13
+finkel|2d1xxdd/dll1ldld/1lllxx2 l 0 0 1 0|3|1>4* 2>5x 7>10x 9>12x 11>14*
+finkel|2d1xxdd/dll1ldld/1lllxx2 l 0 0 1 0|4|1>5x 6>10x 9>13 11>15
+finkel|1dd1xxdd/d3d1d1/4xx2 l 2 5 0 0|0|
+finkel|1dd1xxdd/d3d1d1/4xx2 l 2 5 0 0|1|0>1
+finkel|1dd1xxdd/d3d1d1/4xx2 l 2 5 0 0|2|0>2
+finkel|1dd1xxdd/d3d1d1/4xx2 l 2 5 0 0|3|0>3
+finkel|1dd1xxdd/d3d1d1/4xx2 l 2 5 0 0|4|0>4*
+finkel|1dd1xx2/ldd4l/llllxx1l l 0 0 0 3|0|
+finkel|1dd1xx2/ldd4l/llllxx1l l 0 0 0 3|1|5>6x 13>14*
+finkel|1dd1xx2/ldd4l/llllxx1l l 0 0 0 3|2|4>6x 5>7x 12>14* 13>15
+finkel|1dd1xx2/ldd4l/llllxx1l l 0 0 0 3|3|3>6x 4>7x 5>8* 12>15
+finkel|1dd1xx2/ldd4l/llllxx1l l 0 0 0 3|4|2>6x 3>7x 4>8* 5>9
+finkel|4xx2/lll1ll2/l3xx1l d 0 0 2 5|0|
+finkel|4xx2/lll1ll2/l3xx1l d 0 0 2 5|1|0>1
+finkel|4xx2/lll1ll2/l3xx1l d 0 0 2 5|2|0>2
+finkel|4xx2/lll1ll2/l3xx1l d 0 0 2 5|3|0>3
+finkel|4xx2/lll1ll2/l3xx1l d 0 0 2 5|4|0>4*
+finkel|dd1dxxdd/1lldllld/1l1lxx2 l 0 0 0 0|0|
+finkel|dd1dxxdd/1lldllld/1l1lxx2 l 0 0 0 0|1|1>2 3>4* 11>12x
+finkel|dd1dxxdd/1lldllld/1l1lxx2 l 0 0 0 0|2|3>5 10>12x 11>13
+finkel|dd1dxxdd/1lldllld/1l1lxx2 l 0 0 0 0|3|1>4* 9>12x 10>13 11>14*
+finkel|dd1dxxdd/1lldllld/1l1lxx2 l 0 0 0 0|4|1>5 9>13 10>14* 11>15
+finkel|4xx2/2d5/4xx2 d 7 0 3 3|0|
+finkel|4xx2/2d5/4xx2 d 7 0 3 3|1|0>1 7>8*
+finkel|4xx2/2d5/4xx2 d 7 0 3 3|2|0>2 7>9
+finkel|4xx2/2d5/4xx2 d 7 0 3 3|3|0>3 7>10
+finkel|4xx2/2d5/4xx2 d 7 0 3 3|4|0>4* 7>11
+finkel|4xxdd/dl2dll1/l3xx1l d 0 2 3 0|0|
+finkel|4xxdd/dl2dll1/l3xx1l d 0 2 3 0|1|0>1 5>6x 9>10x 14>15
+finkel|4xxdd/dl2dll1/l3xx1l d 0 2 3 0|2|0>2 5>7 9>11x 13>15
+finkel|4xxdd/dl2dll1/l3xx1l d 0 2 3 0|3|0>3 5>8* 9>12
+finkel|4xxdd/dl2dll1/l3xx1l d 0 2 3 0|4|0>4*
+finkel|d3xx2/4d3/4xx2 l 7 0 4 1|0|
+finkel|d3xx2/4d3/4xx2 l 7 0 4 1|1|0>1
+finkel|d3xx2/4d3/4xx2 l 7 0 4 1|2|0>2
+finkel|d3xx2/4d3/4xx2 l 7 0 4 1|3|0>3
+finkel|d3xx2/4d3/4xx2 l 7 0 4 1|4|0>4*
+finkel|d1d1xxdd/2ldl1ld/ll1lxx2 l 0 1 0 1|0|
+finkel|d1d1xxdd/2ldl1ld/ll1lxx2 l 0 1 0 1|1|1>2 4>5 9>10 11>12x
+finkel|d1d1xxdd/2ldl1ld/ll1lxx2 l 0 1 0 1|2|3>5 4>6 11>13
+finkel|d1d1xxdd/2ldl1ld/ll1lxx2 l 0 1 0 1|3|3>6 7>10 9>12x 11>14*
+finkel|d1d1xxdd/2ldl1ld/ll1lxx2 l 0 1 0 1|4|1>5 9>13 11>15
+finkel|d1d1xxdd/lldlld1d/1l2xx1l l 1 0 0 0|0|
+finkel|d1d1xxdd/lldlld1d/1l2xx1l l 1 0 0 0|1|0>1 3>4* 6>7x 9>10x 13>14*
+finkel|d1d1xxdd/lldlld1d/1l2xx1l l 1 0 0 0|2|0>2 5>7x 8>10x 9>11 13>15
+finkel|d1d1xxdd/lldlld1d/1l2xx1l l 1 0 0 0|3|8>11 9>12x
+finkel|d1d1xxdd/lldlld1d/1l2xx1l l 1 0 0 0|4|0>4* 3>7x 6>10x 8>12x
+finkel|4xx2/l3d3/1l2xx2 d 4 1 4 2|0|
+finkel|4xx2/l3d3/1l2xx2 d 4 1 4 2|1|0>1 9>10
+finkel|4xx2/l3d3/1l2xx2 d 4 1 4 2|2|0>2 9>11
+finkel|4xx2/l3d3/1l2xx2 d 4 1 4 2|3|0>3 9>12
+finkel|4xx2/l3d3/1l2xx2 d 4 1 4 2|4|0>4* 9>13
+finkel|4xx2/l2ll1ll/2l1xx1l d 0 0 2 5|0|
+finkel|4xx2/l2ll1ll/2l1xx1l d 0 0 2 5|1|0>1
+finkel|4xx2/l2ll1ll/2l1xx1l d 0 0 2 5|2|0>2
+finkel|4xx2/l2ll1ll/2l1xx1l d 0 0 2 5|3|0>3
+finkel|4xx2/l2ll1ll/2l1xx1l d 0 0 2 5|4|0>4*
+finkel|1dddxxdd/2lll1dd/3lxx2 l 2 1 0 0|0|
+finkel|1dddxxdd/2lll1dd/3lxx2 l 2 1 0 0|1|1>2 9>10
+finkel|1dddxxdd/2lll1dd/3lxx2 l 2 1 0 0|2|0>2 1>3 8>10 9>11x
+finkel|1dddxxdd/2lll1dd/3lxx2 l 2 1 0 0|3|0>3 1>4* 7>10 8>11x 9>12x
+finkel|1dddxxdd/2lll1dd/3lxx2 l 2 1 0 0|4|0>4* 1>5 7>11x 8>12x 9>13
+finkel|2ddxx2/1ll5/4xx2 d 5 0 4 1|0|
+finkel|2ddxx2/1ll5/4xx2 d 5 0 4 1|1|2>3
+finkel|2ddxx2/1ll5/4xx2 d 5 0 4 1|2|1>3 2>4*
+finkel|2ddxx2/1ll5/4xx2 d 5 0 4 1|3|0>3 1>4* 2>5
+finkel|2ddxx2/1ll5/4xx2 d 5 0 4 1|4|0>4* 1>5 2>6x
+finkel|4xx2/1l1l1lll/ll2xx2 d 0 0 7 0|0|
+finkel|4xx2/1l1l1lll/ll2xx2 d 0 0 7 0|1|0>1
+finkel|4xx2/1l1l1lll/ll2xx2 d 0 0 7 0|2|0>2
+finkel|4xx2/1l1l1lll/ll2xx2 d 0 0 7 0|3|0>3
+finkel|4xx2/1l1l1lll/ll2xx2 d 0 0 7 0|4|0>4*
+finkel|3dxx2/dld2d1l/4xxll l 1 2 2 1|0|
+finkel|3dxx2/dld2d1l/4xxll l 1 2 2 1|1|0>1 6>7x 14>15
+finkel|3dxx2/dld2d1l/4xxll l 1 2 2 1|2|0>2 6>8* 13>15
+finkel|3dxx2/dld2d1l/4xxll l 1 2 2 1|3|0>3 6>9 12>15
+finkel|3dxx2/dld2d1l/4xxll l 1 2 2 1|4|0>4* 6>10x
+finkel|2d1xx1d/3ldl2/l2lxxl1 d 1 1 0 4|0|
+finkel|2d1xx1d/3ldl2/l2lxxl1 d 1 1 0 4|1|2>3 9>10x 13>14*
+finkel|2d1xx1d/3ldl2/l2lxxl1 d 1 1 0 4|2|2>4* 9>11 13>15
+finkel|2d1xx1d/3ldl2/l2lxxl1 d 1 1 0 4|3|2>5 9>12
+finkel|2d1xx1d/3ldl2/l2lxxl1 d 1 1 0 4|4|2>6
+finkel|4xx2/1ldll2l/4xxl1 d 0 2 6 0|0|
+finkel|4xx2/1ldll2l/4xxl1 d 0 2 6 0|1|0>1
+finkel|4xx2/1ldll2l/4xxl1 d 0 2 6 0|2|0>2 7>9x
+finkel|4xx2/1ldll2l/4xxl1 d 0 2 6 0|3|0>3 7>10
+finkel|4xx2/1ldll2l/4xxl1 d 0 2 6 0|4|0>4* 7>11
+finkel|2ddxxd1/d1dl1ldd/ll1lxxll l 0 0 0 0|0|
+finkel|2ddxxd1/d1dl1ldd/ll1lxxll l 0 0 0 0|1|1>2 4>5x 8>9 10>11x 14>15
+finkel|2ddxxd1/d1dl1ldd/ll1lxxll l 0 0 0 0|2|3>5x 4>6 10>12x 13>15
+finkel|2ddxxd1/d1dl1ldd/ll1lxxll l 0 0 0 0|3|3>6 4>7x 8>11x
+finkel|2ddxxd1/d1dl1ldd/ll1lxxll l 0 0 0 0|4|1>5x 3>7x 8>12x
+finkel|4xxdd/1d1l2d1/3lxx2 d 1 4 2 1|0|
+finkel|4xxdd/1d1l2d1/3lxx2 d 1 4 2 1|1|0>1 6>7 11>12 14>15
+finkel|4xxdd/1d1l2d1/3lxx2 d 1 4 2 1|2|0>2 13>15
+finkel|4xxdd/1d1l2d1/3lxx2 d 1 4 2 1|3|0>3 6>9
+finkel|4xxdd/1d1l2d1/3lxx2 d 1 4 2 1|4|0>4* 6>10 11>15
+finkel|1d1dxx2/2ld2d1/2l1xx2 d 1 4 0 3|0|
+finkel|1d1dxx2/2ld2d1/2l1xx2 d 1 4 0 3|1|1>2 3>4* 8>9 11>12
+finkel|1d1dxx2/2ld2d1/2l1xx2 d 1 4 0 3|2|3>5 8>10 11>13
+finkel|1d1dxx2/2ld2d1/2l1xx2 d 1 4 0 3|3|1>4* 3>6 11>14*
+finkel|1d1dxx2/2ld2d1/2l1xx2 d 1 4 0 3|4|1>5 3>7x 8>12 11>15
+finkel|3dxx2/lld1dd1l/lll1xx2 l 1 0 0 3|0|
+finkel|3dxx2/lld1dd1l/lll1xx2 l 1 0 0 3|1|0>1 6>7x 12>13
+finkel|3dxx2/lld1dd1l/lll1xx2 l 1 0 0 3|2|5>7x 6>8* 12>14*
+finkel|3dxx2/lld1dd1l/lll1xx2 l 1 0 0 3|3|4>7x 5>8* 6>9x 12>15
+finkel|3dxx2/lld1dd1l/lll1xx2 l 1 0 0 3|4|3>7x 4>8* 5>9x 6>10x
+finkel|dd2xxd1/3d1l2/1ll1xx1l d 3 0 1 2|0|
+finkel|dd2xxd1/3d1l2/1ll1xx1l d 3 0 1 2|1|0>1 4>5 8>9 14>15
+finkel|dd2xxd1/3d1l2/1ll1xx1l d 3 0 1 2|2|0>2 3>5 4>6 8>10x
+finkel|dd2xxd1/3d1l2/1ll1xx1l d 3 0 1 2|3|3>6 4>7 8>11
+finkel|dd2xxd1/3d1l2/1ll1xx1l d 3 0 1 2|4|3>7 8>12
+finkel|d1d1xx1d/d1ddldll/ll1lxx2 l 0 1 0 0|0|
+finkel|d1d1xx1d/d1ddldll/ll1lxx2 l 0 1 0 0|1|1>2 4>5x 9>10x 12>13
+finkel|d1d1xx1d/d1ddldll/ll1lxx2 l 0 1 0 0|2|3>5x 4>6 11>13 12>14*
+finkel|d1d1xx1d/d1ddldll/ll1lxx2 l 0 1 0 0|3|3>6 4>7x 11>14* 12>15
+finkel|d1d1xx1d/d1ddldll/ll1lxx2 l 0 1 0 0|4|1>5x 3>7x 9>13 11>15
+finkel|d3xxd1/1d1dd1dd/1lllxx2 d 2 2 0 0|0|
+finkel|d3xxd1/1d1dd1dd/1lllxx2 d 2 2 0 0|1|4>5 6>7 9>10 12>13 14>15
+finkel|d3xxd1/1d1dd1dd/1lllxx2 d 2 2 0 0|2|8>10 11>13
+finkel|d3xxd1/1d1dd1dd/1lllxx2 d 2 2 0 0|3|4>7 12>15
+finkel|d3xxd1/1d1dd1dd/1lllxx2 d 2 2 0 0|4|6>10 9>13 11>15
+finkel|2d1xxd1/ldldl1ld/3lxx2 l 1 1 0 2|0|
+finkel|2d1xxd1/ldldl1ld/3lxx2 l 1 1 0 2|1|1>2 5>6x 9>10 11>12x
+finkel|2d1xxd1/ldldl1ld/3lxx2 l 1 1 0 2|2|0>2 1>3 11>13
+finkel|2d1xxd1/ldldl1ld/3lxx2 l 1 1 0 2|3|0>3 1>4* 7>10 9>12x 11>14*
+finkel|2d1xxd1/ldldl1ld/3lxx2 l 1 1 0 2|4|0>4* 9>13 11>15
+finkel|4xx2/1dl1ld2/1ll1xxl1 d 1 1 4 1|0|
+finkel|4xx2/1dl1ld2/1ll1xxl1 d 1 1 4 1|1|0>1 6>7x 10>11
+finkel|4xx2/1dl1ld2/1ll1xxl1 d 1 1 4 1|2|0>2 6>8* 10>12
+finkel|4xx2/1dl1ld2/1ll1xxl1 d 1 1 4 1|3|0>3 6>9x 10>13
+finkel|4xx2/1dl1ld2/1ll1xxl1 d 1 1 4 1|4|0>4* 10>14*
+finkel|d1d1xx1d/lddd1d2/4xx2 d 3 3 0 0|0|
+finkel|d1d1xx1d/lddd1d2/4xx2 d 3 3 0 0|1|2>3 4>5x 8>9 10>11 13>14*
+finkel|d1d1xx1d/lddd1d2/4xx2 d 3 3 0 0|2|7>9 10>12 13>15
+finkel|d1d1xx1d/lddd1d2/4xx2 d 3 3 0 0|3|2>5x 6>9 8>11
+finkel|d1d1xx1d/lddd1d2/4xx2 d 3 3 0 0|4|7>11 8>12 10>14*
+finkel|1dd1xxd1/d1ldlddl/l2lxxll l 0 0 0 0|0|
+finkel|1dd1xxd1/d1ldlddl/l2lxxll l 0 0 0 0|1|1>2 4>5x 9>10x 14>15
+finkel|1dd1xxd1/d1ldlddl/l2lxxll l 0 0 0 0|2|1>3 4>6 9>11x 13>15
+finkel|1dd1xxd1/d1ldlddl/l2lxxll l 0 0 0 0|3|7>10x 12>15
+finkel|1dd1xxd1/d1ldlddl/l2lxxll l 0 0 0 0|4|1>5x 7>11x
+finkel|d3xx1d/dlld1ldd/2llxxll d 0 0 1 0|0|
+finkel|d3xx1d/dlld1ldd/2llxxll d 0 0 1 0|1|0>1 5>6x 8>9 13>14*
+finkel|d3xx1d/dlld1ldd/2llxxll d 0 0 1 0|2|0>2 4>6x 5>7x 8>10x 12>14* 13>15
+finkel|d3xx1d/dlld1ldd/2llxxll d 0 0 1 0|3|0>3 4>7x 11>14* 12>15
+finkel|d3xx1d/dlld1ldd/2llxxll d 0 0 1 0|4|5>9 11>15
+finkel|4xx2/6ld/2llxxl1 d 2 1 4 2|0|
+finkel|4xx2/6ld/2llxxl1 d 2 1 4 2|1|0>1 12>13
+finkel|4xx2/6ld/2llxxl1 d 2 1 4 2|2|0>2 12>14*
+finkel|4xx2/6ld/2llxxl1 d 2 1 4 2|3|0>3 12>15
+finkel|4xx2/6ld/2llxxl1 d 2 1 4 2|4|0>4*
+finkel|4xx2/l1l5/4xx2 d 3 2 0 7|0|
+finkel|4xx2/l1l5/4xx2 d 3 2 0 7|1|
+finkel|4xx2/l1l5/4xx2 d 3 2 0 7|2|
+finkel|4xx2/l1l5/4xx2 d 3 2 0 7|3|
+finkel|4xx2/l1l5/4xx2 d 3 2 0 7|4|
+finkel|2d1xx1d/ddd1ddll/lll1xx2 d 2 0 0 0|0|
+finkel|2d1xx1d/ddd1ddll/lll1xx2 d 2 0 0 0|1|2>3 7>8* 10>11x 13>14*
+finkel|2d1xx1d/ddd1ddll/lll1xx2 d 2 0 0 0|2|2>4* 6>8* 9>11x 10>12x 13>15
+finkel|2d1xx1d/ddd1ddll/lll1xx2 d 2 0 0 0|3|5>8* 9>12x
+finkel|2d1xx1d/ddd1ddll/lll1xx2 d 2 0 0 0|4|7>11x 10>14*
+finkel|dd2xx2/ldd1ldl1/l1l1xx2 d 0 2 2 0|0|
+finkel|dd2xx2/ldd1ldl1/l1l1xx2 d 0 2 2 0|1|0>1 4>5x 7>8* 10>11x
+finkel|dd2xx2/ldd1ldl1/l1l1xx2 d 0 2 2 0|2|0>2 3>5x 6>8* 7>9x 10>12
+finkel|dd2xx2/ldd1ldl1/l1l1xx2 d 0 2 2 0|3|6>9x 10>13
+finkel|dd2xx2/ldd1ldl1/l1l1xx2 d 0 2 2 0|4|4>8* 7>11x 10>14*
+finkel|1d1dxxd1/dd1d2d1/2l1xx2 l 5 1 0 0|0|
+finkel|1d1dxxd1/dd1d2d1/2l1xx2 l 5 1 0 0|1|0>1 2>3
+finkel|1d1dxxd1/dd1d2d1/2l1xx2 l 5 1 0 0|2|2>4*
+finkel|1d1dxxd1/dd1d2d1/2l1xx2 l 5 1 0 0|3|0>3 2>5x
+finkel|1d1dxxd1/dd1d2d1/2l1xx2 l 5 1 0 0|4|0>4* 2>6x
+finkel|4xx2/l3l2l/ll2xx2 d 1 1 0 7|0|
+finkel|4xx2/l3l2l/ll2xx2 d 1 1 0 7|1|
+finkel|4xx2/l3l2l/ll2xx2 d 1 1 0 7|2|
+finkel|4xx2/l3l2l/ll2xx2 d 1 1 0 7|3|
+finkel|4xx2/l3l2l/ll2xx2 d 1 1 0 7|4|
+finkel|d3xx2/1d2ddd1/l3xx2 l 3 3 1 1|0|
+finkel|d3xx2/1d2ddd1/l3xx2 l 3 3 1 1|1|0>1 4>5
+finkel|d3xx2/1d2ddd1/l3xx2 l 3 3 1 1|2|0>2 4>6x
+finkel|d3xx2/1d2ddd1/l3xx2 l 3 3 1 1|3|0>3 4>7
+finkel|d3xx2/1d2ddd1/l3xx2 l 3 3 1 1|4|4>8*
+finkel|1d2xx2/l6l/1l2xx2 d 1 3 5 1|0|
+finkel|1d2xx2/l6l/1l2xx2 d 1 3 5 1|1|0>1 3>4*
+finkel|1d2xx2/l6l/1l2xx2 d 1 3 5 1|2|0>2 3>5x
+finkel|1d2xx2/l6l/1l2xx2 d 1 3 5 1|3|3>6
+finkel|1d2xx2/l6l/1l2xx2 d 1 3 5 1|4|0>4* 3>7
+finkel|4xx2/l1ll3l/4xx1l d 2 0 6 1|0|
+finkel|4xx2/l1ll3l/4xx1l d 2 0 6 1|1|0>1
+finkel|4xx2/l1ll3l/4xx1l d 2 0 6 1|2|0>2
+finkel|4xx2/l1ll3l/4xx1l d 2 0 6 1|3|0>3
+finkel|4xx2/l1ll3l/4xx1l d 2 0 6 1|4|0>4*
+finkel|3dxxdd/1dd3d1/4xx2 l 1 6 0 1|0|
+finkel|3dxxdd/1dd3d1/4xx2 l 1 6 0 1|1|0>1
+finkel|3dxxdd/1dd3d1/4xx2 l 1 6 0 1|2|0>2
+finkel|3dxxdd/1dd3d1/4xx2 l 1 6 0 1|3|0>3
+finkel|3dxxdd/1dd3d1/4xx2 l 1 6 0 1|4|0>4*
+finkel|dd2xx2/3d2dl/1lllxxl1 l 2 0 3 0|0|
+finkel|dd2xx2/3d2dl/1lllxxl1 l 2 0 3 0|1|3>4* 12>13 14>15
+finkel|dd2xx2/3d2dl/1lllxxl1 l 2 0 3 0|2|2>4* 3>5
+finkel|dd2xx2/3d2dl/1lllxxl1 l 2 0 3 0|3|1>4* 2>5 3>6 12>15
+finkel|dd2xx2/3d2dl/1lllxxl1 l 2 0 3 0|4|0>4* 1>5 2>6 3>7
+finkel|4xx2/2ddl1dl/l1llxx1l l 0 1 3 1|0|
+finkel|4xx2/2ddl1dl/l1llxx1l l 0 1 3 1|1|2>3 4>5 9>10 13>14*
+finkel|4xx2/2ddl1dl/l1llxx1l l 0 1 3 1|2|1>3 4>6 9>11x 12>14* 13>15
+finkel|4xx2/2ddl1dl/l1llxx1l l 0 1 3 1|3|2>5 4>7x 12>15
+finkel|4xx2/2ddl1dl/l1llxx1l l 0 1 3 1|4|1>5 2>6
+finkel|4xx2/l1dl1ll1/1ll1xx1l d 0 0 0 6|0|
+finkel|4xx2/l1dl1ll1/1ll1xx1l d 0 0 0 6|1|
+finkel|4xx2/l1dl1ll1/1ll1xx1l d 0 0 0 6|2|7>9
+finkel|4xx2/l1dl1ll1/1ll1xx1l d 0 0 0 6|3|7>10x
+finkel|4xx2/l1dl1ll1/1ll1xx1l d 0 0 0 6|4|7>11x
+finkel|d2dxx1d/1ldd1dd1/2l1xx1l d 0 4 0 0|0|
+finkel|d2dxx1d/1ldd1dd1/2l1xx1l d 0 4 0 0|1|1>2 4>5 8>9 11>12 13>14*
+finkel|d2dxx1d/1ldd1dd1/2l1xx1l d 0 4 0 0|2|1>3 4>6x 7>9 10>12 13>15
+finkel|d2dxx1d/1ldd1dd1/2l1xx1l d 0 4 0 0|3|11>14*
+finkel|d2dxx1d/1ldd1dd1/2l1xx1l d 0 4 0 0|4|1>5 8>12 10>14* 11>15
+finkel|d1d1xxd1/l1d1d1ll/l1l1xxl1 d 0 1 1 1|0|
+finkel|d1d1xxd1/l1d1d1ll/l1l1xxl1 d 0 1 1 1|1|0>1 2>3 4>5x 7>8* 9>10 14>15
+finkel|d1d1xxd1/l1d1d1ll/l1l1xxl1 d 0 1 1 1|2|4>6 9>11x
+finkel|d1d1xxd1/l1d1d1ll/l1l1xxl1 d 0 1 1 1|3|0>3 2>5x 7>10 9>12x
+finkel|d1d1xxd1/l1d1d1ll/l1l1xxl1 d 0 1 1 1|4|2>6 4>8* 7>11x 9>13
+finkel|dd2xx2/4l1ld/3lxxl1 l 0 3 2 2|0|
+finkel|dd2xx2/4l1ld/3lxxl1 l 0 3 2 2|1|1>2 9>10 11>12x 14>15
+finkel|dd2xx2/4l1ld/3lxxl1 l 0 3 2 2|2|1>3 11>13
+finkel|dd2xx2/4l1ld/3lxxl1 l 0 3 2 2|3|1>4* 9>12x
+finkel|dd2xx2/4l1ld/3lxxl1 l 0 3 2 2|4|1>5 9>13 11>15
+finkel|4xxdd/1d3ll1/2llxx1l l 2 0 0 4|0|
+finkel|4xxdd/1d3ll1/2llxx1l l 2 0 0 4|1|2>3 11>12 13>14*
+finkel|4xxdd/1d3ll1/2llxx1l l 2 0 0 4|2|1>3 2>4* 10>12 13>15
+finkel|4xxdd/1d3ll1/2llxx1l l 2 0 0 4|3|0>3 1>4* 2>5 11>14*
+finkel|4xxdd/1d3ll1/2llxx1l l 2 0 0 4|4|0>4* 1>5 2>6x 10>14* 11>15
+finkel|4xx2/ll2ll2/3lxx1l l 1 0 0 7|0|
+finkel|4xx2/ll2ll2/3lxx1l l 1 0 0 7|1|1>2 6>7 10>11 13>14*
+finkel|4xx2/ll2ll2/3lxx1l l 1 0 0 7|2|0>2 1>3 5>7 6>8* 9>11 10>12 13>15
+finkel|4xx2/ll2ll2/3lxx1l l 1 0 0 7|3|0>3 1>4* 5>8* 9>12
+finkel|4xx2/ll2ll2/3lxx1l l 1 0 0 7|4|0>4* 10>14*
+finkel|ddd1xx2/2ll2l1/l3xx1l d 1 1 4 0|0|
+finkel|ddd1xx2/2ll2l1/l3xx1l d 1 1 4 0|1|0>1 4>5
+finkel|ddd1xx2/2ll2l1/l3xx1l d 1 1 4 0|2|3>5 4>6
+finkel|ddd1xx2/2ll2l1/l3xx1l d 1 1 4 0|3|2>5 3>6 4>7x
+finkel|ddd1xx2/2ll2l1/l3xx1l d 1 1 4 0|4|2>6 3>7x
+finkel|ddd1xx2/2ldld2/l3xx2 d 0 4 2 0|0|
+finkel|ddd1xx2/2ldld2/l3xx2 d 0 4 2 0|1|0>1 4>5 8>9x 10>11
+finkel|ddd1xx2/2ldld2/l3xx2 d 0 4 2 0|2|3>5 4>6 10>12
+finkel|ddd1xx2/2ldld2/l3xx2 d 0 4 2 0|3|2>5 3>6 4>7x 8>11 10>13
+finkel|ddd1xx2/2ldld2/l3xx2 d 0 4 2 0|4|2>6 3>7x 8>12 10>14*
+finkel|4xx2/8/1l2xx2 d 6 0 1 6|0|
+finkel|4xx2/8/1l2xx2 d 6 0 1 6|1|0>1
+finkel|4xx2/8/1l2xx2 d 6 0 1 6|2|0>2
+finkel|4xx2/8/1l2xx2 d 6 0 1 6|3|0>3
+finkel|4xx2/8/1l2xx2 d 6 0 1 6|4|0>4*
+finkel|2d1xx2/8/4xx2 l 7 0 3 3|0|
+finkel|2d1xx2/8/4xx2 l 7 0 3 3|1|0>1
+finkel|2d1xx2/8/4xx2 l 7 0 3 3|2|0>2
+finkel|2d1xx2/8/4xx2 l 7 0 3 3|3|0>3
+finkel|2d1xx2/8/4xx2 l 7 0 3 3|4|0>4*
+finkel|2d1xxd1/3dd3/4xx2 d 1 6 0 3|0|
+finkel|2d1xxd1/3dd3/4xx2 d 1 6 0 3|1|2>3 9>10 14>15
+finkel|2d1xxd1/3dd3/4xx2 d 1 6 0 3|2|2>4* 8>10 9>11
+finkel|2d1xxd1/3dd3/4xx2 d 1 6 0 3|3|2>5 8>11 9>12
+finkel|2d1xxd1/3dd3/4xx2 d 1 6 0 3|4|2>6 8>12 9>13
+finkel|4xx2/3l2dl/1lllxx2 l 1 1 0 6|0|
+finkel|4xx2/3l2dl/1lllxx2 l 1 1 0 6|1|3>4* 8>9 12>13
+finkel|4xx2/3l2dl/1lllxx2 l 1 1 0 6|2|2>4* 3>5 8>10 12>14*
+finkel|4xx2/3l2dl/1lllxx2 l 1 1 0 6|3|1>4* 2>5 3>6 8>11x 12>15
+finkel|4xx2/3l2dl/1lllxx2 l 1 1 0 6|4|0>4* 1>5 2>6 3>7
+finkel|4xx2/1l3l2/l3xxl1 d 2 1 7 0|0|
+finkel|4xx2/1l3l2/l3xxl1 d 2 1 7 0|1|0>1
+finkel|4xx2/1l3l2/l3xxl1 d 2 1 7 0|2|0>2
+finkel|4xx2/1l3l2/l3xxl1 d 2 1 7 0|3|0>3
+finkel|4xx2/1l3l2/l3xxl1 d 2 1 7 0|4|0>4*
+finkel|ddd1xxd1/1d2llld/1lllxx2 d 1 0 1 0|0|
+finkel|ddd1xxd1/1d2llld/1lllxx2 d 1 0 1 0|1|0>1 4>5 6>7 12>13 14>15
+finkel|ddd1xxd1/1d2llld/1lllxx2 d 1 0 1 0|2|3>5 6>8*
+finkel|ddd1xxd1/1d2llld/1lllxx2 d 1 0 1 0|3|2>5 4>7 6>9x 12>15
+finkel|ddd1xxd1/1d2llld/1lllxx2 d 1 0 1 0|4|3>7 4>8* 6>10x
+finkel|3dxxd1/2dd2ll/l2lxx2 l 1 2 0 3|0|
+finkel|3dxxd1/2dd2ll/l2lxx2 l 1 2 0 3|1|1>2 4>5 12>13
+finkel|3dxxd1/2dd2ll/l2lxx2 l 1 2 0 3|2|0>2 1>3 4>6 11>13 12>14*
+finkel|3dxxd1/2dd2ll/l2lxx2 l 1 2 0 3|3|0>3 4>7x 11>14* 12>15
+finkel|3dxxd1/2dd2ll/l2lxx2 l 1 2 0 3|4|1>5 11>15
+finkel|4xx2/d3l2l/l3xxl1 d 1 2 2 4|0|
+finkel|4xx2/d3l2l/l3xxl1 d 1 2 2 4|1|0>1 5>6
+finkel|4xx2/d3l2l/l3xxl1 d 1 2 2 4|2|0>2 5>7
+finkel|4xx2/d3l2l/l3xxl1 d 1 2 2 4|3|0>3 5>8*
+finkel|4xx2/d3l2l/l3xxl1 d 1 2 2 4|4|0>4* 5>9x
+finkel|4xx1d/d2d2d1/4xx2 d 0 7 3 0|0|
+finkel|4xx1d/d2d2d1/4xx2 d 0 7 3 0|1|0>1 5>6 8>9 11>12 13>14*
+finkel|4xx1d/d2d2d1/4xx2 d 0 7 3 0|2|0>2 5>7 8>10 13>15
+finkel|4xx1d/d2d2d1/4xx2 d 0 7 3 0|3|0>3 11>14*
+finkel|4xx1d/d2d2d1/4xx2 d 0 7 3 0|4|0>4* 5>9 8>12 11>15
+finkel|4xxd1/dddl2dd/2l1xxl1 d 2 2 1 0|0|
+finkel|4xxd1/dddl2dd/2l1xxl1 d 2 2 1 0|1|0>1 12>13 14>15
+finkel|4xxd1/dddl2dd/2l1xxl1 d 2 2 1 0|2|0>2 7>9 11>13
+finkel|4xxd1/dddl2dd/2l1xxl1 d 2 2 1 0|3|0>3 6>9 7>10 12>15
+finkel|4xxd1/dddl2dd/2l1xxl1 d 2 2 1 0|4|0>4* 5>9 6>10 11>15
+finkel|4xxd1/3l2d1/2l1xx2 d 3 2 5 0|0|
+finkel|4xxd1/3l2d1/2l1xx2 d 3 2 5 0|1|0>1 11>12 14>15
+finkel|4xxd1/3l2d1/2l1xx2 d 3 2 5 0|2|0>2 11>13
+finkel|4xxd1/3l2d1/2l1xx2 d 3 2 5 0|3|0>3
+finkel|4xxd1/3l2d1/2l1xx2 d 3 2 5 0|4|0>4* 11>15
+finkel|4xx2/6d1/4xx2 l 4 3 2 4|0|
+finkel|4xx2/6d1/4xx2 l 4 3 2 4|1|0>1
+finkel|4xx2/6d1/4xx2 l 4 3 2 4|2|0>2
+finkel|4xx2/6d1/4xx2 l 4 3 2 4|3|0>3
+finkel|4xx2/6d1/4xx2 l 4 3 2 4|4|0>4*
+finkel|4xx2/1l1l1dl1/2llxxl1 d 1 0 6 0|0|
+finkel|4xx2/1l1l1dl1/2llxxl1 d 1 0 6 0|1|0>1 10>11x
+finkel|4xx2/1l1l1dl1/2llxxl1 d 1 0 6 0|2|0>2 10>12
+finkel|4xx2/1l1l1dl1/2llxxl1 d 1 0 6 0|3|0>3 10>13
+finkel|4xx2/1l1l1dl1/2llxxl1 d 1 0 6 0|4|0>4* 10>14*
+finkel|3dxxd1/llddl1d1/1l2xxll l 0 1 1 1|0|
+finkel|3dxxd1/llddl1d1/1l2xxll l 0 1 1 1|1|3>4* 6>7x 9>10 14>15
+finkel|3dxxd1/llddl1d1/1l2xxll l 0 1 1 1|2|5>7x 9>11x 13>15
+finkel|3dxxd1/llddl1d1/1l2xxll l 0 1 1 1|3|9>12
+finkel|3dxxd1/llddl1d1/1l2xxll l 0 1 1 1|4|3>7x 6>10
+finkel|4xx2/l1l1l1l1/4xx2 l 0 3 6 1|0|
+finkel|4xx2/l1l1l1l1/4xx2 l 0 3 6 1|1|5>6 7>8* 9>10 11>12
+finkel|4xx2/l1l1l1l1/4xx2 l 0 3 6 1|2|11>13
+finkel|4xx2/l1l1l1l1/4xx2 l 0 3 6 1|3|5>8* 7>10 9>12 11>14*
+finkel|4xx2/l1l1l1l1/4xx2 l 0 3 6 1|4|9>13 11>15
+finkel|2ddxxdd/l3dd1l/3lxxl1 l 3 0 0 1|0|
+finkel|2ddxxdd/l3dd1l/3lxxl1 l 3 0 0 1|1|1>2 5>6 12>13 14>15
+finkel|2ddxxdd/l3dd1l/3lxxl1 l 3 0 0 1|2|0>2 1>3 5>7
+finkel|2ddxxdd/l3dd1l/3lxxl1 l 3 0 0 1|3|0>3 1>4* 5>8* 12>15
+finkel|2ddxxdd/l3dd1l/3lxxl1 l 3 0 0 1|4|0>4* 5>9x
+finkel|d3xx1d/dld1d1ld/1l2xx2 l 4 0 0 1|0|
+finkel|d3xx1d/dld1d1ld/1l2xx2 l 4 0 0 1|1|0>1 3>4* 6>7x 11>12x
+finkel|d3xx1d/dld1d1ld/1l2xx2 l 4 0 0 1|2|0>2 3>5x 6>8* 11>13
+finkel|d3xx1d/dld1d1ld/1l2xx2 l 4 0 0 1|3|6>9x 11>14*
+finkel|d3xx1d/dld1d1ld/1l2xx2 l 4 0 0 1|4|0>4* 3>7x 6>10 11>15
+finkel|dd2xx1d/dd1dld2/l1llxxll d 0 1 0 0|0|
+finkel|dd2xx1d/dd1dld2/l1llxxll d 0 1 0 0|1|6>7 8>9x 10>11 13>14*
+finkel|dd2xx1d/dd1dld2/l1llxxll d 0 1 0 0|2|5>7 10>12 13>15
+finkel|dd2xx1d/dd1dld2/l1llxxll d 0 1 0 0|3|4>7 6>9x 8>11
+finkel|dd2xx1d/dd1dld2/l1llxxll d 0 1 0 0|4|3>7 5>9x 8>12 10>14*
+finkel|d1ddxx2/1dl1ld2/lll1xx1l d 0 1 0 2|0|
+finkel|d1ddxx2/1dl1ld2/lll1xx1l d 0 1 0 2|1|2>3 4>5 6>7x 10>11
+finkel|d1ddxx2/1dl1ld2/lll1xx1l d 0 1 0 2|2|1>3 6>8* 10>12
+finkel|d1ddxx2/1dl1ld2/lll1xx1l d 0 1 0 2|3|2>5 4>7x 6>9x 10>13
+finkel|d1ddxx2/1dl1ld2/lll1xx1l d 0 1 0 2|4|1>5 4>8* 10>14*
+finkel|1d2xx2/2ldl1l1/1l1lxx1l l 1 0 5 0|0|
+finkel|1d2xx2/2ldl1l1/1l1lxx1l l 1 0 5 0|1|1>2 3>4* 9>10 11>12 13>14*
+finkel|1d2xx2/2ldl1l1/1l1lxx1l l 1 0 5 0|2|0>2 3>5 13>15
+finkel|1d2xx2/2ldl1l1/1l1lxx1l l 1 0 5 0|3|1>4* 3>6 7>10 9>12 11>14*
+finkel|1d2xx2/2ldl1l1/1l1lxx1l l 1 0 5 0|4|0>4* 1>5 11>15
+finkel|2d1xx1d/d1d3l1/llllxxll d 0 0 0 3|0|
+finkel|2d1xx1d/d1d3l1/llllxxll d 0 0 0 3|1|2>3 5>6 7>8* 13>14*
+finkel|2d1xx1d/d1d3l1/llllxxll d 0 0 0 3|2|2>4* 7>9 13>15
+finkel|2d1xx1d/d1d3l1/llllxxll d 0 0 0 3|3|5>8* 7>10
+finkel|2d1xx1d/d1d3l1/llllxxll d 0 0 0 3|4|2>6 5>9 7>11x
+masters|4xxld/1llldd1l/4xxdl d 0 1 2 1|1|0>1 10>11 12>13x 15>16x*
+masters|4xxld/1llldd1l/4xxdl d 0 1 2 1|2|0>2 9>11 12>14x 15>17
+masters|4xxld/1llldd1l/4xxdl d 0 1 2 1|3|0>3 10>13x
+masters|4xxld/1llldd1l/4xxdl d 0 1 2 1|4|0>4* 9>13x 10>14x 12>16x*
+masters|1dddxx2/3l1lld/l3xxd1 d 1 2 1 1|1|3>4* 12>13 14>15
+masters|1dddxx2/3l1lld/l3xxd1 d 1 2 1 1|2|2>4* 3>5 14>16*
+masters|1dddxx2/3l1lld/l3xxd1 d 1 2 1 1|3|1>4* 2>5 3>6 12>15 14>17
+masters|1dddxx2/3l1lld/l3xxd1 d 1 2 1 1|4|0>4* 1>5 2>6 3>7 12>16*
+masters|1d1dxx1l/dldlll2/l3xxl1 d 0 0 3 0|1|1>2 3>4* 5>6x 7>8x*
+masters|1d1dxx1l/dldlll2/l3xxl1 d 0 0 3 0|2|0>2 7>9x
+masters|1d1dxx1l/dldlll2/l3xxl1 d 0 0 3 0|3|1>4* 3>6x 5>8x* 7>10x
+masters|1d1dxx1l/dldlll2/l3xxl1 d 0 0 3 0|4|0>4* 5>9x 7>11
+masters|1d1dxxll/1lldd3/4xxll l 0 1 0 3|1|7>8x* 13>14 16>17
+masters|1d1dxxll/1lldd3/4xxll l 0 1 0 3|2|6>8x* 7>9x 12>14 15>17
+masters|1d1dxxll/1lldd3/4xxll l 0 1 0 3|3|6>9x 7>10
+masters|1d1dxxll/1lldd3/4xxll l 0 1 0 3|4|6>10 7>11 13>17
+masters|4xx2/2ld4/l2lxxll l 0 2 4 2|1|1>2 4>5 7>8x* 16>17
+masters|4xx2/2ld4/l2lxxll l 0 2 4 2|2|1>3 4>6 7>9 15>17
+masters|4xx2/2ld4/l2lxxll l 0 2 4 2|3|7>10
+masters|4xx2/2ld4/l2lxxll l 0 2 4 2|4|1>5 4>8x* 7>11
+masters|1dd1xxd1/l2lll2/1l2xx1d d 2 0 1 2|1|0>1 3>4* 13>14 16>17
+masters|1dd1xxd1/l2lll2/1l2xx1d d 2 0 1 2|2|2>4* 3>5x 13>15
+masters|1dd1xxd1/l2lll2/1l2xx1d d 2 0 1 2|3|2>5x 3>6
+masters|1dd1xxd1/l2lll2/1l2xx1d d 2 0 1 2|4|0>4* 2>6 3>7 13>17
+masters|4xx2/l2dd3/4xx2 l 1 5 3 2|1|0>1 5>6
+masters|4xx2/l2dd3/4xx2 l 1 5 3 2|2|0>2 5>7
+masters|4xx2/l2dd3/4xx2 l 1 5 3 2|3|0>3 5>8x*
+masters|4xx2/l2dd3/4xx2 l 1 5 3 2|4|0>4* 5>9x
+masters|4xxl1/3l4/l3xx2 d 4 0 6 1|1|0>1
+masters|4xxl1/3l4/l3xx2 d 4 0 6 1|2|0>2
+masters|4xxl1/3l4/l3xx2 d 4 0 6 1|3|0>3
+masters|4xxl1/3l4/l3xx2 d 4 0 6 1|4|0>4*
+masters|4xx2/3d4/4xxl1 l 1 5 6 0|1|0>1 16>17
+masters|4xx2/3d4/4xxl1 l 1 5 6 0|2|0>2
+masters|4xx2/3d4/4xxl1 l 1 5 6 0|3|0>3
+masters|4xx2/3d4/4xxl1 l 1 5 6 0|4|0>4*
+masters|1d1dxx2/ddldll2/l2lxxd1 l 1 1 0 1|1|1>2 4>5x 7>8x* 10>11
+masters|1d1dxx2/ddldll2/l2lxxd1 l 1 1 0 1|2|0>2 1>3 4>6x 9>11 10>12*
+masters|1d1dxx2/ddldll2/l2lxxd1 l 1 1 0 1|3|0>3 9>12* 10>13
+masters|1d1dxx2/ddldll2/l2lxxd1 l 1 1 0 1|4|1>5x 4>8x* 7>11 9>13 10>14
+masters|4xxld/3l4/1l1lxx2 d 3 0 6 0|1|0>1 15>16x*
+masters|4xxld/3l4/1l1lxx2 d 3 0 6 0|2|0>2 15>17
+masters|4xxld/3l4/1l1lxx2 d 3 0 6 0|3|0>3
+masters|4xxld/3l4/1l1lxx2 d 3 0 6 0|4|0>4*
+masters|4xx2/3d4/4xxl1 l 2 4 2 4|1|0>1 16>17
+masters|4xx2/3d4/4xxl1 l 2 4 2 4|2|0>2
+masters|4xx2/3d4/4xxl1 l 2 4 2 4|3|0>3
+masters|4xx2/3d4/4xxl1 l 2 4 2 4|4|0>4*
+masters|4xxl1/l1ld3l/2l1xx1l l 1 0 6 0|1|0>1 2>3 5>6 7>8x* 12>13 15>16*
+masters|4xxl1/l1ld3l/2l1xx1l l 1 0 6 0|2|2>4* 7>9 14>16* 15>17
+masters|4xxl1/l1ld3l/2l1xx1l l 1 0 6 0|3|0>3 5>8x* 7>10 14>17
+masters|4xxl1/l1ld3l/2l1xx1l l 1 0 6 0|4|0>4* 2>6 5>9 7>11 12>16*
+masters|ddd1xxdl/l1lddl2/1l2xxdl l 0 1 0 0|1|3>4* 5>6 7>8x* 10>11 13>14 15>16x*
+masters|ddd1xxdl/l1lddl2/1l2xxdl l 0 1 0 0|2|7>9x 10>12x* 15>17
+masters|ddd1xxdl/l1lddl2/1l2xxdl l 0 1 0 0|3|3>6 5>8x* 13>16x*
+masters|ddd1xxdl/l1lddl2/1l2xxdl l 0 1 0 0|4|5>9x 7>11 10>14 13>17
+masters|4xx2/d2l4/4xx2 d 3 3 6 0|1|0>1 5>6
+masters|4xx2/d2l4/4xx2 d 3 3 6 0|2|0>2 5>7
+masters|4xx2/d2l4/4xx2 d 3 3 6 0|3|0>3 5>8x*
+masters|4xx2/d2l4/4xx2 d 3 3 6 0|4|0>4* 5>9
+masters|4xx1l/d1ddl2l/2l1xxdl l 1 1 0 3|1|0>1 2>3 9>10 15>16x*
+masters|4xx1l/d1ddl2l/2l1xxdl l 1 1 0 3|2|2>4* 9>11 14>16x* 15>17
+masters|4xx1l/d1ddl2l/2l1xxdl l 1 1 0 3|3|0>3 2>5x 9>12* 13>16x* 14>17
+masters|4xx1l/d1ddl2l/2l1xxdl l 1 1 0 3|4|0>4* 2>6 13>17
+masters|2d1xx2/3l2d1/4xxd1 d 3 3 1 3|1|0>1 2>3 12>13
+masters|2d1xx2/3l2d1/4xxd1 d 3 3 1 3|2|2>4* 11>13 12>14
+masters|2d1xx2/3l2d1/4xxd1 d 3 3 1 3|3|0>3 2>5 11>14 12>15
+masters|2d1xx2/3l2d1/4xxd1 d 3 3 1 3|4|0>4* 2>6 11>15 12>16*
+masters|4xx1d/3d2d1/4xx2 l 3 4 4 0|1|0>1
+masters|4xx1d/3d2d1/4xx2 l 3 4 4 0|2|0>2
+masters|4xx1d/3d2d1/4xx2 l 3 4 4 0|3|0>3
+masters|4xx1d/3d2d1/4xx2 l 3 4 4 0|4|0>4*
+masters|4xxll/2ll2d1/4xx2 d 0 3 6 0|1|0>1 11>12*
+masters|4xxll/2ll2d1/4xx2 d 0 3 6 0|2|0>2 11>13
+masters|4xxll/2ll2d1/4xx2 d 0 3 6 0|3|0>3 11>14
+masters|4xxll/2ll2d1/4xx2 d 0 3 6 0|4|0>4* 11>15x
+masters|d1d1xx1l/l1ld4/2llxxl1 l 1 0 4 0|1|2>3 5>6 7>8x* 13>14 16>17
+masters|d1d1xx1l/l1ld4/2llxxl1 l 1 0 4 0|2|1>3 2>4* 7>9 13>15
+masters|d1d1xx1l/l1ld4/2llxxl1 l 1 0 4 0|3|0>3 1>4* 5>8x* 7>10
+masters|d1d1xx1l/l1ld4/2llxxl1 l 1 0 4 0|4|0>4* 2>6 5>9 7>11 13>17
+masters|4xx1l/3dl3/4xx2 l 3 2 4 2|1|0>1 9>10 13>14
+masters|4xx1l/3dl3/4xx2 l 3 2 4 2|2|0>2 9>11 13>15
+masters|4xx1l/3dl3/4xx2 l 3 2 4 2|3|0>3 9>12* 13>16*
+masters|4xx1l/3dl3/4xx2 l 3 2 4 2|4|0>4* 13>17
+masters|4xx2/1l1ll1l1/2l1xx2 d 1 1 5 2|1|0>1
+masters|4xx2/1l1ll1l1/2l1xx2 d 1 1 5 2|2|0>2
+masters|4xx2/1l1ll1l1/2l1xx2 d 1 1 5 2|3|0>3
+masters|4xx2/1l1ll1l1/2l1xx2 d 1 1 5 2|4|0>4*
+masters|4xxll/2dd1l1d/3lxx2 l 3 0 1 3|1|1>2 10>11 13>14x
+masters|4xxll/2dd1l1d/3lxx2 l 3 0 1 3|2|0>2 1>3 12>14x 13>15
+masters|4xxll/2dd1l1d/3lxx2 l 3 0 1 3|3|0>3 1>4* 12>15 13>16*
+masters|4xxll/2dd1l1d/3lxx2 l 3 0 1 3|4|0>4* 1>5 10>14x 12>16* 13>17
+masters|2d1xx1l/1l1ll1l1/1l2xxld d 0 0 4 1|1|0>1 2>3 13>14
+masters|2d1xx1l/1l1ll1l1/1l2xxld d 0 0 4 1|2|2>4* 13>15x
+masters|2d1xx1l/1l1ll1l1/1l2xxld d 0 0 4 1|3|0>3 2>5 13>16*
+masters|2d1xx1l/1l1ll1l1/1l2xxld d 0 0 4 1|4|0>4* 2>6x 13>17
+masters|dd2xxd1/1d1ld2d/l3xx1d d 3 2 0 0|1|4>5 6>7 9>10 14>15 16>17
+masters|dd2xxd1/1d1ld2d/l3xx1d d 3 2 0 0|2|3>5 6>8x* 9>11 13>15
+masters|dd2xxd1/1d1ld2d/l3xx1d d 3 2 0 0|3|4>7 9>12* 14>17
+masters|dd2xxd1/1d1ld2d/l3xx1d d 3 2 0 0|4|3>7 4>8x* 6>10 13>17
+masters|3dxx1l/ld1d2l1/1ll1xx2 l 0 2 0 4|1|3>4* 5>6x 11>12* 13>14
+masters|3dxx1l/ld1d2l1/1ll1xx2 l 0 2 0 4|2|2>4* 5>7 13>15
+masters|3dxx1l/ld1d2l1/1ll1xx2 l 0 2 0 4|3|3>6x 5>8x* 11>14 13>16*
+masters|3dxx1l/ld1d2l1/1ll1xx2 l 0 2 0 4|4|2>6x 3>7 5>9 11>15 13>17
+masters|d3xxdd/l2ddd1d/l3xx1l l 3 1 0 0|1|0>1 5>6 15>16*
+masters|d3xxdd/l2ddd1d/l3xx1l l 3 1 0 0|2|0>2 4>6 5>7 15>17
+masters|d3xxdd/l2ddd1d/l3xx1l l 3 1 0 0|3|0>3 4>7 5>8x*
+masters|d3xxdd/l2ddd1d/l3xx1l l 3 1 0 0|4|4>8x* 5>9x
+masters|ddd1xx1l/1d1l1lld/4xxdd d 3 0 0 0|1|4>5 6>7 14>15x
+masters|ddd1xx1l/1d1l1lld/4xxdd d 3 0 0 0|2|3>5 6>8x* 13>15x 14>16*
+masters|ddd1xx1l/1d1l1lld/4xxdd d 3 0 0 0|3|2>5 4>7 6>9 12>15x 13>16* 14>17
+masters|ddd1xx1l/1d1l1lld/4xxdd d 3 0 0 0|4|3>7 4>8x* 6>10x 12>16* 13>17
+masters|ddddxx2/1d1d2d1/4xx2 l 2 5 0 0|1|0>1
+masters|ddddxx2/1d1d2d1/4xx2 l 2 5 0 0|2|0>2
+masters|ddddxx2/1d1d2d1/4xx2 l 2 5 0 0|3|0>3
+masters|ddddxx2/1d1d2d1/4xx2 l 2 5 0 0|4|0>4*
+masters|dd2xxld/1l1l3d/l3xx1l d 2 0 3 0|1|0>1 4>5 15>16x*
+masters|dd2xxld/1l1l3d/l3xx1l d 2 0 3 0|2|0>2 3>5 4>6x 14>16x* 15>17
+masters|dd2xxld/1l1l3d/l3xx1l d 2 0 3 0|3|3>6x 4>7 14>17
+masters|dd2xxld/1l1l3d/l3xx1l d 2 0 3 0|4|3>7 4>8x*
+masters|2d1xx1l/d1dl1d1d/2l1xxdd d 1 3 0 0|1|2>3 5>6 7>8x* 10>11 14>15x
+masters|2d1xx1l/d1dl1d1d/2l1xxdd d 1 3 0 0|2|2>4* 7>9 13>15x 14>16*
+masters|2d1xx1l/d1dl1d1d/2l1xxdd d 1 3 0 0|3|5>8x* 12>15x 13>16* 14>17
+masters|2d1xx1l/d1dl1d1d/2l1xxdd d 1 3 0 0|4|2>6 5>9 7>11 12>16* 13>17
+masters|1d2xx2/3l4/4xx2 d 1 5 3 3|1|0>1 3>4*
+masters|1d2xx2/3l4/4xx2 d 1 5 3 3|2|0>2 3>5
+masters|1d2xx2/3l4/4xx2 d 1 5 3 3|3|3>6
+masters|1d2xx2/3l4/4xx2 d 1 5 3 3|4|0>4* 3>7
+masters|d1d1xx2/1ddd2d1/4xxd1 l 2 5 0 0|1|0>1
+masters|d1d1xx2/1ddd2d1/4xxd1 l 2 5 0 0|2|0>2
+masters|d1d1xx2/1ddd2d1/4xxd1 l 2 5 0 0|3|0>3
+masters|d1d1xx2/1ddd2d1/4xxd1 l 2 5 0 0|4|0>4*
+masters|4xx2/2dld3/4xx1d d 2 4 3 1|1|0>1 7>8x* 9>10 13>14
+masters|4xx2/2dld3/4xx1d d 2 4 3 1|2|0>2 9>11 13>15
+masters|4xx2/2dld3/4xx1d d 2 4 3 1|3|0>3 7>10 9>12* 13>16*
+masters|4xx2/2dld3/4xx1d d 2 4 3 1|4|0>4* 7>11 13>17
+masters|4xxl1/3dl2l/3lxx1l l 1 1 5 1|1|1>2 9>10 12>13 15>16*
+masters|4xxl1/3dl2l/3lxx1l l 1 1 5 1|2|0>2 1>3 9>11 14>16* 15>17
+masters|4xxl1/3dl2l/3lxx1l l 1 1 5 1|3|0>3 1>4* 14>17
+masters|4xxl1/3dl2l/3lxx1l l 1 1 5 1|4|0>4* 1>5 9>13 12>16*
+masters|4xx2/2ld4/4xx2 l 1 5 6 0|1|0>1 7>8x*
+masters|4xx2/2ld4/4xx2 l 1 5 6 0|2|0>2 7>9
+masters|4xx2/2ld4/4xx2 l 1 5 6 0|3|0>3 7>10
+masters|4xx2/2ld4/4xx2 l 1 5 6 0|4|0>4* 7>11
+masters|4xx2/1l1l1d2/4xxd1 d 0 5 1 4|1|0>1 10>11 12>13
+masters|4xx2/1l1l1d2/4xxd1 d 0 5 1 4|2|0>2 12>14
+masters|4xx2/1l1l1d2/4xxd1 d 0 5 1 4|3|0>3 10>13 12>15
+masters|4xx2/1l1l1d2/4xxd1 d 0 5 1 4|4|0>4* 10>14 12>16*
+masters|ddd1xxll/d2ddll1/l2lxxdl l 0 0 0 0|1|1>2 4>5x 13>14 15>16x*
+masters|ddd1xxll/d2ddll1/l2lxxdl l 0 0 0 0|2|1>3 4>6 12>14 15>17
+masters|ddd1xxll/d2ddll1/l2lxxdl l 0 0 0 0|3|4>7 11>14 13>16x*
+masters|ddd1xxll/d2ddll1/l2lxxdl l 0 0 0 0|4|1>5x 4>8x* 10>14 12>16x* 13>17
+masters|2d1xxll/3l1lll/l3xx2 l 0 0 2 4|1|4>5 8>9 14>15
+masters|2d1xxll/3l1lll/l3xx2 l 0 0 2 4|2|4>6 13>15 14>16*
+masters|2d1xxll/3l1lll/l3xx2 l 0 0 2 4|3|4>7 12>15 13>16* 14>17
+masters|2d1xxll/3l1lll/l3xx2 l 0 0 2 4|4|11>15 12>16* 13>17
+masters|d3xx2/1dlld1dl/ll2xxd1 d 1 1 1 1|1|0>1 4>5 6>7x 9>10 12>13
+masters|d3xx2/1dlld1dl/ll2xxd1 d 1 1 1 1|2|0>2 6>8x* 11>13 12>14x
+masters|d3xx2/1dlld1dl/ll2xxd1 d 1 1 1 1|3|0>3 4>7x 11>14x 12>15
+masters|d3xx2/1dlld1dl/ll2xxd1 d 1 1 1 1|4|4>8x* 6>10 9>13 11>15 12>16*
+masters|3dxx2/1d1llddl/ll2xx1d d 1 1 1 1|1|1>2 6>7 11>12* 13>14x
+masters|3dxx2/1d1llddl/ll2xx1d d 1 1 1 1|2|0>2 1>3 6>8x* 10>12* 13>15
+masters|3dxx2/1d1llddl/ll2xx1d d 1 1 1 1|3|0>3 1>4* 6>9x 11>14x 13>16*
+masters|3dxx2/1d1llddl/ll2xx1d d 1 1 1 1|4|0>4* 1>5 10>14x 11>15 13>17
+masters|2d1xx1l/d1d1d2d/4xxd1 l 0 6 0 1|1|13>14x
+masters|2d1xx1l/d1d1d2d/4xxd1 l 0 6 0 1|2|13>15
+masters|2d1xx1l/d1d1d2d/4xxd1 l 0 6 0 1|3|13>16x*
+masters|2d1xx1l/d1d1d2d/4xxd1 l 0 6 0 1|4|13>17
+masters|1d2xxld/2ll1l1l/4xxdl d 1 0 1 3|1|0>1 3>4* 12>13x 15>16x*
+masters|1d2xxld/2ll1l1l/4xxdl d 1 0 1 3|2|0>2 3>5 12>14x 15>17
+masters|1d2xxld/2ll1l1l/4xxdl d 1 0 1 3|3|3>6
+masters|1d2xxld/2ll1l1l/4xxdl d 1 0 1 3|4|0>4* 3>7x 12>16x*
+masters|4xxdl/l3l3/4xx2 l 3 1 4 2|1|0>1 5>6 9>10 13>14
+masters|4xxdl/l3l3/4xx2 l 3 1 4 2|2|0>2 5>7 9>11 13>15
+masters|4xxdl/l3l3/4xx2 l 3 1 4 2|3|0>3 5>8* 9>12x* 13>16*
+masters|4xxdl/l3l3/4xx2 l 3 1 4 2|4|0>4* 13>17
+masters|d3xx1l/1dl4l/4xx2 l 4 0 2 3|1|0>1 7>8* 14>15
+masters|d3xx1l/1dl4l/4xx2 l 4 0 2 3|2|0>2 7>9 13>15 14>16*
+masters|d3xx1l/1dl4l/4xx2 l 4 0 2 3|3|0>3 7>10 13>16* 14>17
+masters|d3xx1l/1dl4l/4xx2 l 4 0 2 3|4|0>4* 7>11 13>17
+masters|d3xxdl/4d3/2l1xx2 l 2 3 2 2|1|0>1 2>3 13>14
+masters|d3xxdl/4d3/2l1xx2 l 2 3 2 2|2|2>4* 13>15
+masters|d3xxdl/4d3/2l1xx2 l 2 3 2 2|3|0>3 2>5 13>16*
+masters|d3xxdl/4d3/2l1xx2 l 2 3 2 2|4|0>4* 2>6 13>17
+masters|4xxdl/8/2l1xx2 l 3 2 3 3|1|0>1 2>3 13>14
+masters|4xxdl/8/2l1xx2 l 3 2 3 3|2|2>4* 13>15
+masters|4xxdl/8/2l1xx2 l 3 2 3 3|3|0>3 2>5 13>16*
+masters|4xxdl/8/2l1xx2 l 3 2 3 3|4|0>4* 2>6 13>17
+masters|4xx2/d5dd/4xx1d d 4 3 1 2|1|0>1 5>6 11>12* 14>15
+masters|4xx2/d5dd/4xx1d d 4 3 1 2|2|0>2 5>7 13>15 14>16*
+masters|4xx2/d5dd/4xx1d d 4 3 1 2|3|0>3 5>8* 13>16* 14>17
+masters|4xx2/d5dd/4xx1d d 4 3 1 2|4|0>4* 5>9 11>15 13>17
+masters|4xxll/ll1d1d1l/l1l1xxd1 d 0 0 0 4|1|8>9 10>11 12>13
+masters|4xxll/ll1d1d1l/l1l1xxd1 d 0 0 0 4|2|12>14x
+masters|4xxll/ll1d1d1l/l1l1xxd1 d 0 0 0 4|3|8>11 10>13 12>15x
+masters|4xxll/ll1d1d1l/l1l1xxd1 d 0 0 0 4|4|10>14x 12>16x*
+masters|d3xxld/3lll1d/1l2xx2 l 0 2 0 4|1|3>4* 10>11 12>13x
+masters|d3xxld/3lll1d/1l2xx2 l 0 2 0 4|2|3>5 9>11 12>14x
+masters|d3xxld/3lll1d/1l2xx2 l 0 2 0 4|3|3>6 8>11 10>13x 12>15
+masters|d3xxld/3lll1d/1l2xx2 l 0 2 0 4|4|3>7 9>13x 10>14x 12>16*
+masters|4xxl1/1d1ll2l/l2lxx2 l 0 1 1 5|1|1>2 4>5 9>10 12>13 14>15
+masters|4xxl1/1d1ll2l/l2lxx2 l 0 1 1 5|2|1>3 4>6x 8>10 9>11 14>16*
+masters|4xxl1/1d1ll2l/l2lxx2 l 0 1 1 5|3|4>7 8>11 12>15 14>17
+masters|4xxl1/1d1ll2l/l2lxx2 l 0 1 1 5|4|1>5 9>13 12>16*
+masters|4xxll/1l2d3/1l1lxx1l l 1 0 2 4|1|1>2 3>4* 6>7 13>14 15>16*
+masters|4xxll/1l2d3/1l1lxx1l l 1 0 2 4|2|0>2 3>5 6>8* 12>14 15>17
+masters|4xxll/1l2d3/1l1lxx1l l 1 0 2 4|3|1>4* 6>9x 13>16*
+masters|4xxll/1l2d3/1l1lxx1l l 1 0 2 4|4|0>4* 1>5 3>7 6>10 12>16* 13>17
+masters|2d1xx1l/2ld1d1d/2l1xxdl l 0 3 1 1|1|2>3 7>8x* 13>14x 15>16x*
+masters|2d1xx1l/2ld1d1d/2l1xxdl l 0 3 1 1|2|2>4* 7>9 15>17
+masters|2d1xx1l/2ld1d1d/2l1xxdl l 0 3 1 1|3|2>5 7>10x 13>16x*
+masters|2d1xx1l/2ld1d1d/2l1xxdl l 0 3 1 1|4|2>6 7>11 13>17
+masters|1d1dxxl1/3dd2d/4xx2 l 0 6 2 0|1|12>13
+masters|1d1dxxl1/3dd2d/4xx2 l 0 6 2 0|2|12>14x
+masters|1d1dxxl1/3dd2d/4xx2 l 0 6 2 0|3|12>15
+masters|1d1dxxl1/3dd2d/4xx2 l 0 6 2 0|4|12>16*
+masters|d3xxll/d4l1d/1l1lxx1l l 1 0 1 3|1|1>2 3>4* 10>11 13>14x 15>16*
+masters|d3xxll/d4l1d/1l1lxx1l l 1 0 1 3|2|0>2 3>5x 12>14x 15>17
+masters|d3xxll/d4l1d/1l1lxx1l l 1 0 1 3|3|1>4* 3>6 13>16*
+masters|d3xxll/d4l1d/1l1lxx1l l 1 0 1 3|4|0>4* 1>5x 3>7 10>14x 12>16* 13>17
+masters|d3xx1l/d2ddl1l/2l1xxl1 l 1 1 3 0|1|0>1 2>3 10>11 14>15 16>17
+masters|d3xx1l/d2ddl1l/2l1xxl1 l 1 1 3 0|2|2>4* 10>12* 13>15
+masters|d3xx1l/d2ddl1l/2l1xxl1 l 1 1 3 0|3|0>3 2>5x 14>17
+masters|d3xx1l/d2ddl1l/2l1xxl1 l 1 1 3 0|4|0>4* 2>6 13>17
+masters|4xx1d/1l2ddl1/4xx1d d 2 3 2 1|1|0>1 10>11x 13>14 15>16*
+masters|4xx1d/1l2ddl1/4xx1d d 2 3 2 1|2|0>2 9>11x 10>12* 15>17
+masters|4xx1d/1l2ddl1/4xx1d d 2 3 2 1|3|0>3 9>12* 13>16*
+masters|4xx1d/1l2ddl1/4xx1d d 2 3 2 1|4|0>4* 10>14 13>17
+masters|1dddxxdl/ll1ld1dl/4xx1l l 0 1 1 0|1|6>7 8>9x 15>16*
+masters|1dddxxdl/ll1ld1dl/4xx1l l 0 1 1 0|2|5>7 8>10 14>16* 15>17
+masters|1dddxxdl/ll1ld1dl/4xx1l l 0 1 1 0|3|6>9x 8>11x 13>16* 14>17
+masters|1dddxxdl/ll1ld1dl/4xx1l l 0 1 1 0|4|5>9x 6>10 8>12x* 13>17
+masters|d3xxld/3ddd2/4xxdd l 0 6 0 0|1|12>13x
+masters|d3xxld/3ddd2/4xxdd l 0 6 0 0|2|12>14
+masters|d3xxld/3ddd2/4xxdd l 0 6 0 0|3|12>15x
+masters|d3xxld/3ddd2/4xxdd l 0 6 0 0|4|12>16x*
+masters|4xx2/2l4l/l3xx1d d 0 4 3 3|1|0>1 13>14x
+masters|4xx2/2l4l/l3xx1d d 0 4 3 3|2|0>2 13>15
+masters|4xx2/2l4l/l3xx1d d 0 4 3 3|3|0>3 13>16*
+masters|4xx2/2l4l/l3xx1d d 0 4 3 3|4|0>4* 13>17
+masters|d2dxxld/1d3d2/l3xxdd l 5 0 0 0|1|0>1 4>5 12>13x
+masters|d2dxxld/1d3d2/l3xxdd l 5 0 0 0|2|0>2 4>6x 12>14
+masters|d2dxxld/1d3d2/l3xxdd l 5 0 0 0|3|0>3 4>7 12>15x
+masters|d2dxxld/1d3d2/l3xxdd l 5 0 0 0|4|4>8* 12>16x*
+masters|4xxld/6dd/1l2xx1d l 0 5 0 3|1|3>4* 12>13x
+masters|4xxld/6dd/1l2xx1d l 0 5 0 3|2|3>5 12>14x
+masters|4xxld/6dd/1l2xx1d l 0 5 0 3|3|3>6 12>15x
+masters|4xxld/6dd/1l2xx1d l 0 5 0 3|4|3>7 12>16*
+masters|4xx2/2ll1lll/1ll1xxd1 d 0 0 1 5|1|0>1 12>13
+masters|4xx2/2ll1lll/1ll1xxd1 d 0 0 1 5|2|0>2 12>14x
+masters|4xx2/2ll1lll/1ll1xxd1 d 0 0 1 5|3|0>3 12>15
+masters|4xx2/2ll1lll/1ll1xxd1 d 0 0 1 5|4|0>4* 12>16*
+masters|4xx2/8/1l2xxd1 d 0 6 6 0|1|0>1 12>13
+masters|4xx2/8/1l2xxd1 d 0 6 6 0|2|0>2 12>14
+masters|4xx2/8/1l2xxd1 d 0 6 6 0|3|0>3 12>15
+masters|4xx2/8/1l2xxd1 d 0 6 6 0|4|0>4* 12>16*
+masters|4xx1l/d1l1d1d1/3lxxdd d 4 0 2 0|1|0>1 5>6 9>10 13>14
+masters|4xx1l/d1l1d1d1/3lxxdd d 4 0 2 0|2|0>2 5>7x 12>14 13>15x
+masters|4xx1l/d1l1d1d1/3lxxdd d 4 0 2 0|3|0>3 5>8* 11>14 12>15x 13>16*
+masters|4xx1l/d1l1d1d1/3lxxdd d 4 0 2 0|4|0>4* 11>15x 12>16* 13>17
+masters|4xxl1/d7/4xx2 l 2 4 5 1|1|0>1 12>13
+masters|4xxl1/d7/4xx2 l 2 4 5 1|2|0>2 12>14
+masters|4xxl1/d7/4xx2 l 2 4 5 1|3|0>3 12>15
+masters|4xxl1/d7/4xx2 l 2 4 5 1|4|0>4* 12>16*
+masters|2d1xxll/2d1dl2/1lllxxd1 d 0 1 1 2|1|0>1 2>3 7>8* 9>10x 12>13
+masters|2d1xxll/2d1dl2/1lllxxd1 d 0 1 1 2|2|2>4* 9>11 12>14
+masters|2d1xxll/2d1dl2/1lllxxd1 d 0 1 1 2|3|0>3 2>5 7>10x 12>15x
+masters|2d1xxll/2d1dl2/1lllxxd1 d 0 1 1 2|4|0>4* 2>6 7>11 9>13 12>16x*
+masters|4xxd1/ddll1d2/l3xxld d 1 2 2 0|1|0>1 6>7x 10>11 13>14 16>17
+masters|4xxd1/ddll1d2/l3xxld d 1 2 2 0|2|0>2 5>7x 6>8x* 10>12x* 13>15
+masters|4xxd1/ddll1d2/l3xxld d 1 2 2 0|3|0>3 5>8x* 6>9
+masters|4xxd1/ddll1d2/l3xxld d 1 2 2 0|4|0>4* 5>9 10>14 13>17
+masters|dd2xx1l/dl1dd1l1/2l1xxd1 d 1 2 1 0|1|0>1 5>6x 9>10 12>13
+masters|dd2xx1l/dl1dd1l1/2l1xxd1 d 1 2 1 0|2|0>2 4>6x 5>7 8>10 9>11x 12>14
+masters|dd2xx1l/dl1dd1l1/2l1xxd1 d 1 2 1 0|3|3>6x 4>7 8>11x 12>15x
+masters|dd2xx1l/dl1dd1l1/2l1xxd1 d 1 2 1 0|4|3>7 9>13 12>16*
+masters|d3xxll/ldl2d1l/4xx2 l 1 1 4 0|1|0>1 5>6x 7>8* 14>15
+masters|d3xxll/ldl2d1l/4xx2 l 1 1 4 0|2|0>2 7>9 13>15 14>16*
+masters|d3xxll/ldl2d1l/4xx2 l 1 1 4 0|3|0>3 5>8* 7>10x 12>15 13>16* 14>17
+masters|d3xxll/ldl2d1l/4xx2 l 1 1 4 0|4|0>4* 5>9 7>11 12>16* 13>17
+masters|1dd1xxdl/4d1ld/4xx2 l 0 5 1 1|1|11>12x* 13>14x
+masters|1dd1xxdl/4d1ld/4xx2 l 0 5 1 1|2|13>15
+masters|1dd1xxdl/4d1ld/4xx2 l 0 5 1 1|3|11>14x 13>16*
+masters|1dd1xxdl/4d1ld/4xx2 l 0 5 1 1|4|11>15 13>17
+masters|4xxld/1lldl1dl/4xxd1 d 2 0 1 2|1|0>1 8>9x 12>13 15>16x*
+masters|4xxld/1lldl1dl/4xxd1 d 2 0 1 2|2|0>2 8>10 11>13 12>14x 15>17
+masters|4xxld/1lldl1dl/4xxd1 d 2 0 1 2|3|0>3 11>14x
+masters|4xxld/1lldl1dl/4xxd1 d 2 0 1 2|4|0>4* 12>16x*
+masters|2ddxxl1/d1d2l2/1ll1xxdd d 3 0 1 0|1|2>3 5>6 7>8* 13>14
+masters|2ddxxl1/d1d2l2/1ll1xxdd d 3 0 1 0|2|1>3 2>4* 7>9 12>14 13>15
+masters|2ddxxl1/d1d2l2/1ll1xxdd d 3 0 1 0|3|0>3 1>4* 5>8* 7>10x 12>15 13>16x*
+masters|2ddxxl1/d1d2l2/1ll1xxdd d 3 0 1 0|4|0>4* 2>6 5>9 7>11 12>16x* 13>17
+masters|4xxl1/lll3d1/4xx1l l 0 2 6 0|1|7>8* 12>13 15>16*
+masters|4xxl1/lll3d1/4xx1l l 0 2 6 0|2|6>8* 7>9 12>14 15>17
+masters|4xxl1/lll3d1/4xx1l l 0 2 6 0|3|5>8* 6>9 7>10
+masters|4xxl1/lll3d1/4xx1l l 0 2 6 0|4|5>9 6>10 7>11x 12>16*
+masters|1d2xx2/1ll1d3/4xxd1 d 0 5 4 0|1|0>1 3>4* 9>10 12>13
+masters|1d2xx2/1ll1d3/4xxd1 d 0 5 4 0|2|0>2 3>5 9>11 12>14
+masters|1d2xx2/1ll1d3/4xxd1 d 0 5 4 0|3|3>6x 12>15
+masters|1d2xx2/1ll1d3/4xxd1 d 0 5 4 0|4|0>4* 3>7x 9>13 12>16*
+masters|1d2xx1d/dl1ll1l1/1ll1xx2 l 1 0 2 2|1|0>1 3>4* 6>7 9>10 11>12*
+masters|1d2xx1d/dl1ll1l1/1ll1xx2 l 1 0 2 2|2|2>4* 3>5x 8>10 11>13x
+masters|1d2xx1d/dl1ll1l1/1ll1xx2 l 1 0 2 2|3|2>5x 9>12* 11>14
+masters|1d2xx1d/dl1ll1l1/1ll1xx2 l 1 0 2 2|4|0>4* 3>7 6>10 8>12* 9>13x 11>15
+masters|dd2xx2/dld1d1d1/4xx2 l 4 2 1 0|1|0>1 6>7x
+masters|dd2xx2/dld1d1d1/4xx2 l 4 2 1 0|2|0>2 6>8*
+masters|dd2xx2/dld1d1d1/4xx2 l 4 2 1 0|3|0>3 6>9x
+masters|dd2xx2/dld1d1d1/4xx2 l 4 2 1 0|4|0>4* 6>10
+masters|4xx2/l2l1lll/1l2xx2 d 0 1 6 1|1|0>1
+masters|4xx2/l2l1lll/1l2xx2 d 0 1 6 1|2|0>2
+masters|4xx2/l2l1lll/1l2xx2 d 0 1 6 1|3|0>3
+masters|4xx2/l2l1lll/1l2xx2 d 0 1 6 1|4|0>4*
+masters|4xx2/l1dll1d1/l3xxld d 1 1 0 4|1|7>8x* 11>12x* 13>14
+masters|4xx2/l1dll1d1/l3xxld d 1 1 0 4|2|7>9x 13>15
+masters|4xx2/l1dll1d1/l3xxld d 1 1 0 4|3|7>10 11>14 13>16*
+masters|4xx2/l1dll1d1/l3xxld d 1 1 0 4|4|11>15 13>17
+masters|d2dxxdd/d1d1l2d/l1llxx2 d 3 0 0 0|1|1>2 5>6 7>8* 16>17
+masters|d2dxxdd/d1d1l2d/l1llxx2 d 3 0 0 0|2|1>3 4>6 7>9x 15>17
+masters|d2dxxdd/d1d1l2d/l1llxx2 d 3 0 0 0|3|5>8* 7>10 14>17
+masters|d2dxxdd/d1d1l2d/l1llxx2 d 3 0 0 0|4|4>8* 5>9x 7>11
+masters|4xxd1/5l2/ll2xx1l l 3 0 1 5|1|0>1 4>5 10>11 15>16*
+masters|4xxd1/5l2/ll2xx1l l 3 0 1 5|2|0>2 3>5 4>6 10>12x* 15>17
+masters|4xxd1/5l2/ll2xx1l l 3 0 1 5|3|3>6 4>7 10>13
+masters|4xxd1/5l2/ll2xx1l l 3 0 1 5|4|3>7 4>8* 10>14
+masters|4xx2/dd2ddl1/4xxdd l 4 2 0 1|1|0>1 11>12*
+masters|4xx2/dd2ddl1/4xxdd l 4 2 0 1|2|0>2 11>13
+masters|4xx2/dd2ddl1/4xxdd l 4 2 0 1|3|0>3 11>14
+masters|4xx2/dd2ddl1/4xxdd l 4 2 0 1|4|0>4* 11>15x
+masters|4xx2/8/4xx2 d 7 0 7 0|1|0>1
+masters|4xx2/8/4xx2 d 7 0 7 0|2|0>2
+masters|4xx2/8/4xx2 d 7 0 7 0|3|0>3
+masters|4xx2/8/4xx2 d 7 0 7 0|4|0>4*
+masters|4xxd1/ddd5/4xx1l d 6 0 3 0|1|0>1 7>8* 16>17
+masters|4xxd1/ddd5/4xx1l d 6 0 3 0|2|0>2 6>8* 7>9
+masters|4xxd1/ddd5/4xx1l d 6 0 3 0|3|0>3 5>8* 6>9 7>10
+masters|4xxd1/ddd5/4xx1l d 6 0 3 0|4|0>4* 5>9 6>10 7>11
+masters|d3xxdd/3ldd1d/4xx2 d 3 3 0 1|1|4>5 10>11 16>17
+masters|d3xxdd/3ldd1d/4xx2 d 3 3 0 1|2|4>6 9>11 10>12* 15>17
+masters|d3xxdd/3ldd1d/4xx2 d 3 3 0 1|3|4>7 9>12* 10>13 14>17
+masters|d3xxdd/3ldd1d/4xx2 d 3 3 0 1|4|4>8x* 9>13
+masters|1d1dxx2/3d4/4xx2 l 3 4 3 1|1|0>1
+masters|1d1dxx2/3d4/4xx2 l 3 4 3 1|2|0>2
+masters|1d1dxx2/3d4/4xx2 l 3 4 3 1|3|0>3
+masters|1d1dxx2/3d4/4xx2 l 3 4 3 1|4|0>4*
+masters|4xx2/1l1ll3/l3xx2 d 1 2 7 0|1|0>1
+masters|4xx2/1l1ll3/l3xx2 d 1 2 7 0|2|0>2
+masters|4xx2/1l1ll3/l3xx2 d 1 2 7 0|3|0>3
+masters|4xx2/1l1ll3/l3xx2 d 1 2 7 0|4|0>4*
+masters|2ddxxl1/dlldlldd/2llxx1d d 0 0 0 0|1|2>3 5>6x 8>9x 11>12* 14>15
+masters|2ddxxl1/dlldlldd/2llxx1d d 0 0 0 0|2|1>3 2>4* 5>7x 8>10x 13>15 14>16x*
+masters|2ddxxl1/dlldlldd/2llxx1d d 0 0 0 0|3|1>4* 13>16x* 14>17
+masters|2ddxxl1/dlldlldd/2llxx1d d 0 0 0 0|4|2>6x 5>9x 8>12* 11>15 13>17
+masters|d2dxxl1/4l2l/l1l1xxll l 0 0 3 2|1|2>3 4>5 9>10 12>13 16>17
+masters|d2dxxl1/4l2l/l1l1xxll l 0 0 3 2|2|4>6 9>11 15>17
+masters|d2dxxl1/4l2l/l1l1xxll l 0 0 3 2|3|2>5 4>7 14>17
+masters|d2dxxl1/4l2l/l1l1xxll l 0 0 3 2|4|2>6 4>8* 9>13
+masters|1dd1xxdd/1d2d2d/4xx2 l 5 2 0 0|1|0>1
+masters|1dd1xxdd/1d2d2d/4xx2 l 5 2 0 0|2|0>2
+masters|1dd1xxdd/1d2d2d/4xx2 l 5 2 0 0|3|0>3
+masters|1dd1xxdd/1d2d2d/4xx2 l 5 2 0 0|4|0>4*
+masters|1d2xxd1/7d/4xx2 d 5 2 3 1|1|0>1 3>4* 14>15 16>17
+masters|1d2xxd1/7d/4xx2 d 5 2 3 1|2|0>2 3>5
+masters|1d2xxd1/7d/4xx2 d 5 2 3 1|3|3>6 14>17
+masters|1d2xxd1/7d/4xx2 d 5 2 3 1|4|0>4* 3>7
+masters|4xxdd/ddl3ld/2l1xx2 l 3 1 2 0|1|0>1 2>3 7>8* 11>12x*
+masters|4xxdd/ddl3ld/2l1xx2 l 3 1 2 0|2|2>4* 7>9 11>13x
+masters|4xxdd/ddl3ld/2l1xx2 l 3 1 2 0|3|0>3 2>5x 7>10 11>14x
+masters|4xxdd/ddl3ld/2l1xx2 l 3 1 2 0|4|0>4* 2>6x 11>15
+masters|4xx2/1l1l4/1l2xx2 d 2 2 7 0|1|0>1
+masters|4xx2/1l1l4/1l2xx2 d 2 2 7 0|2|0>2
+masters|4xx2/1l1l4/1l2xx2 d 2 2 7 0|3|0>3
+masters|4xx2/1l1l4/1l2xx2 d 2 2 7 0|4|0>4*
+masters|4xx2/l1ll4/l1llxxl1 l 0 0 5 2|1|2>3 5>6 8>9 16>17
+masters|4xx2/l1ll4/l1llxxl1 l 0 0 5 2|2|1>3 4>6 7>9 8>10
+masters|4xx2/l1ll4/l1llxxl1 l 0 0 5 2|3|7>10 8>11
+masters|4xx2/l1ll4/l1llxxl1 l 0 0 5 2|4|2>6 5>9 7>11 8>12*
+masters|3dxx1d/4d1l1/l3xxll l 3 0 2 2|1|0>1 4>5 11>12* 16>17
+masters|3dxx1d/4d1l1/l3xxll l 3 0 2 2|2|0>2 4>6 11>13x 15>17
+masters|3dxx1d/4d1l1/l3xxll l 3 0 2 2|3|0>3 4>7 11>14
+masters|3dxx1d/4d1l1/l3xxll l 3 0 2 2|4|4>8*
+masters|1d2xx2/d3d1d1/4xx2 l 2 5 0 3|1|0>1
+masters|1d2xx2/d3d1d1/4xx2 l 2 5 0 3|2|0>2
+masters|1d2xx2/d3d1d1/4xx2 l 2 5 0 3|3|0>3
+masters|1d2xx2/d3d1d1/4xx2 l 2 5 0 3|4|0>4*
+masters|d1ddxxl1/3d3l/4xx1d d 0 5 1 1|1|2>3 4>5 8>9 13>14x
+masters|d1ddxxl1/3d3l/4xx1d d 0 5 1 1|2|1>3 4>6 8>10 13>15
+masters|d1ddxxl1/3d3l/4xx1d d 0 5 1 1|3|0>3 2>5 4>7 8>11 13>16x*
+masters|d1ddxxl1/3d3l/4xx1d d 0 5 1 1|4|1>5 2>6 8>12* 13>17
+masters|3dxx2/4dd2/4xx2 d 0 7 3 1|1|1>2 10>11
+masters|3dxx2/4dd2/4xx2 d 0 7 3 1|2|0>2 1>3 9>11 10>12*
+masters|3dxx2/4dd2/4xx2 d 0 7 3 1|3|0>3 1>4* 9>12* 10>13
+masters|3dxx2/4dd2/4xx2 d 0 7 3 1|4|0>4* 1>5 9>13 10>14
+masters|1d2xx2/2d3l1/2l1xxd1 d 5 0 4 0|1|0>1 3>4* 7>8* 12>13
+masters|1d2xx2/2d3l1/2l1xxd1 d 5 0 4 0|2|0>2 3>5 7>9 12>14
+masters|1d2xx2/2d3l1/2l1xxd1 d 5 0 4 0|3|3>6 7>10 12>15
+masters|1d2xx2/2d3l1/2l1xxd1 d 5 0 4 0|4|0>4* 7>11x 12>16*
+masters|2d1xx2/l1ll1ll1/3lxx1l d 0 0 1 5|1|0>1 2>3
+masters|2d1xx2/l1ll1ll1/3lxx1l d 0 0 1 5|2|2>4*
+masters|2d1xx2/l1ll1ll1/3lxx1l d 0 0 1 5|3|0>3 2>5x
+masters|2d1xx2/l1ll1ll1/3lxx1l d 0 0 1 5|4|0>4* 2>6
+masters|4xxl1/4d1d1/4xxd1 l 6 0 0 4|1|0>1 12>13
+masters|4xxl1/4d1d1/4xxd1 l 6 0 0 4|2|0>2 12>14
+masters|4xxl1/4d1d1/4xxd1 l 6 0 0 4|3|0>3 12>15
+masters|4xxl1/4d1d1/4xxd1 l 6 0 0 4|4|0>4* 12>16x*
+masters|1dddxx1l/1ld1d1ld/3lxxld d 1 1 0 0|1|3>4* 7>8* 9>10 14>15x
+masters|1dddxx1l/1ld1d1ld/3lxxld d 1 1 0 0|2|2>4* 3>5 9>11x 13>15x 14>16*
+masters|1dddxx1l/1ld1d1ld/3lxxld d 1 1 0 0|3|1>4* 2>5 3>6x 7>10 9>12x* 13>16* 14>17
+masters|1dddxx1l/1ld1d1ld/3lxxld d 1 1 0 0|4|1>5 2>6x 7>11x 13>17
+masters|2d1xx2/3lddd1/3lxx1d l 0 5 0 2|1|1>2 8>9x
+masters|2d1xx2/3lddd1/3lxx1d l 0 5 0 2|2|1>3 8>10x
+masters|2d1xx2/3lddd1/3lxx1d l 0 5 0 2|3|1>4* 8>11x
+masters|2d1xx2/3lddd1/3lxx1d l 0 5 0 2|4|1>5 8>12*
+masters|4xxl1/1l1d1l1l/4xx1l d 2 0 4 2|1|0>1 8>9
+masters|4xxl1/1l1d1l1l/4xx1l d 2 0 4 2|2|0>2 8>10x
+masters|4xxl1/1l1d1l1l/4xx1l d 2 0 4 2|3|0>3 8>11
+masters|4xxl1/1l1d1l1l/4xx1l d 2 0 4 2|4|0>4* 8>12*
+masters|4xxl1/4ll1l/1ll1xxl1 d 0 0 1 6|1|0>1
+masters|4xxl1/4ll1l/1ll1xxl1 d 0 0 1 6|2|0>2
+masters|4xxl1/4ll1l/1ll1xxl1 d 0 0 1 6|3|0>3
+masters|4xxl1/4ll1l/1ll1xxl1 d 0 0 1 6|4|0>4*
+masters|4xx1l/ll2ld2/1ll1xx2 l 0 1 3 3|1|3>4* 6>7 9>10x 13>14
+masters|4xx1l/ll2ld2/1ll1xx2 l 0 1 3 3|2|2>4* 5>7 6>8* 9>11 13>15
+masters|4xx1l/ll2ld2/1ll1xx2 l 0 1 3 3|3|5>8* 9>12* 13>16*
+masters|4xx1l/ll2ld2/1ll1xx2 l 0 1 3 3|4|3>7 6>10x 13>17
+masters|d2dxx2/4d1d1/4xx2 l 7 0 2 1|1|0>1
+masters|d2dxx2/4d1d1/4xx2 l 7 0 2 1|2|0>2
+masters|d2dxx2/4d1d1/4xx2 l 7 0 2 1|3|0>3
+masters|d2dxx2/4d1d1/4xx2 l 7 0 2 1|4|0>4*
+masters|4xx2/1ld2ld1/3lxxl1 d 0 3 2 3|1|0>1 7>8* 11>12x*
+masters|4xx2/1ld2ld1/3lxxl1 d 0 3 2 3|2|0>2 7>9 11>13
+masters|4xx2/1ld2ld1/3lxxl1 d 0 3 2 3|3|0>3 7>10x 11>14
+masters|4xx2/1ld2ld1/3lxxl1 d 0 3 2 3|4|0>4* 11>15
+masters|dd2xxd1/l1l1l3/l1l1xxdd l 0 2 1 1|1|2>3 5>6 7>8* 9>10
+masters|dd2xxd1/l1l1l3/l1l1xxdd l 0 2 1 1|2|4>6 9>11
+masters|dd2xxd1/l1l1l3/l1l1xxdd l 0 2 1 1|3|5>8* 7>10 9>12x*
+masters|dd2xxd1/l1l1l3/l1l1xxdd l 0 2 1 1|4|2>6 4>8* 7>11 9>13
+masters|d3xx1l/l5ll/3lxx1d d 1 1 5 0|1|0>1 4>5x 13>14x
+masters|d3xx1l/l5ll/3lxx1d d 1 1 5 0|2|0>2 4>6 13>15x
+masters|d3xx1l/l5ll/3lxx1d d 1 1 5 0|3|0>3 4>7 13>16*
+masters|d3xx1l/l5ll/3lxx1d d 1 1 5 0|4|4>8* 13>17
+masters|dd1dxxd1/dd2llll/2l1xxll l 0 0 1 0|1|2>3 11>12x* 16>17
+masters|dd1dxxd1/dd2llll/2l1xxll l 0 0 1 0|2|2>4* 10>12x* 11>13 15>17
+masters|dd1dxxd1/dd2llll/2l1xxll l 0 0 1 0|3|2>5x 9>12x* 10>13 14>17
+masters|dd1dxxd1/dd2llll/2l1xxll l 0 0 1 0|4|2>6x 9>13
+masters|1d2xxl1/3ll3/l1l1xx2 d 2 0 6 0|1|0>1 3>4*
+masters|1d2xxl1/3ll3/l1l1xx2 d 2 0 6 0|2|0>2 3>5
+masters|1d2xxl1/3ll3/l1l1xx2 d 2 0 6 0|3|3>6
+masters|1d2xxl1/3ll3/l1l1xx2 d 2 0 6 0|4|0>4* 3>7
+masters|4xx2/2lll1ll/4xx2 d 1 1 2 5|1|0>1
+masters|4xx2/2lll1ll/4xx2 d 1 1 2 5|2|0>2
+masters|4xx2/2lll1ll/4xx2 d 1 1 2 5|3|0>3
+masters|4xx2/2lll1ll/4xx2 d 1 1 2 5|4|0>4*
+masters|2ddxxld/1d2l3/llllxx1d l 0 1 2 0|1|4>5 9>10 12>13x
+masters|2ddxxld/1d2l3/llllxx1d l 0 1 2 0|2|3>5 4>6x 9>11 12>14
+masters|2ddxxld/1d2l3/llllxx1d l 0 1 2 0|3|2>5 3>6x 4>7 12>15x
+masters|2ddxxld/1d2l3/llllxx1d l 0 1 2 0|4|1>5 2>6x 3>7 4>8* 9>13x 12>16*
+masters|4xxld/l2ld1l1/1l2xx2 l 1 1 1 4|1|0>1 3>4* 5>6 8>9x 12>13x
+masters|4xxld/l2ld1l1/1l2xx2 l 1 1 1 4|2|0>2 5>7 8>10 11>13x 12>14
+masters|4xxld/l2ld1l1/1l2xx2 l 1 1 1 4|3|3>6 11>14 12>15
+masters|4xxld/l2ld1l1/1l2xx2 l 1 1 1 4|4|0>4* 3>7 5>9x 11>15 12>16*
+masters|1dd1xx2/d3ll1d/1ll1xxll l 0 1 2 1|1|3>4* 10>11 16>17
+masters|1dd1xx2/d3ll1d/1ll1xxll l 0 1 2 1|2|2>4* 3>5x 9>11 10>12* 15>17
+masters|1dd1xx2/d3ll1d/1ll1xxll l 0 1 2 1|3|2>5x 3>6 9>12* 10>13
+masters|1dd1xx2/d3ll1d/1ll1xxll l 0 1 2 1|4|2>6 3>7 9>13 10>14x
+masters|1d2xxdl/dl2l1ld/1l1lxxld d 0 0 2 0|1|0>1 3>4* 5>6x 14>15x 16>17
+masters|1d2xxdl/dl2l1ld/1l1lxxld d 0 0 2 0|2|0>2 5>7 13>15x
+masters|1d2xxdl/dl2l1ld/1l1lxxld d 0 0 2 0|3|3>6x 5>8* 14>17
+masters|1d2xxdl/dl2l1ld/1l1lxxld d 0 0 2 0|4|0>4* 3>7 5>9x 13>17
+masters|4xx1d/8/4xx2 d 2 5 6 0|1|0>1 15>16*
+masters|4xx1d/8/4xx2 d 2 5 6 0|2|0>2 15>17
+masters|4xx1d/8/4xx2 d 2 5 6 0|3|0>3
+masters|4xx1d/8/4xx2 d 2 5 6 0|4|0>4*
+masters|4xx2/3d3d/4xx2 d 6 1 3 2|1|0>1 8>9 14>15
+masters|4xx2/3d3d/4xx2 d 6 1 3 2|2|0>2 8>10 14>16*
+masters|4xx2/3d3d/4xx2 d 6 1 3 2|3|0>3 8>11 14>17
+masters|4xx2/3d3d/4xx2 d 6 1 3 2|4|0>4* 8>12*
+masters|4xx2/1lll1dl1/4xx2 l 2 1 5 1|1|0>1 8>9 11>12*
+masters|4xx2/1lll1dl1/4xx2 l 2 1 5 1|2|0>2 7>9 8>10x 11>13
+masters|4xx2/1lll1dl1/4xx2 l 2 1 5 1|3|0>3 6>9 7>10x 11>14
+masters|4xx2/1lll1dl1/4xx2 l 2 1 5 1|4|0>4* 6>10x 8>12* 11>15
+masters|4xx1d/ld2l2d/4xxdd d 5 0 0 2|1|6>7 15>16*
+masters|4xx1d/ld2l2d/4xxdd d 5 0 0 2|2|6>8* 14>16* 15>17
+masters|4xx1d/ld2l2d/4xxdd d 5 0 0 2|3|6>9x 13>16* 14>17
+masters|4xx1d/ld2l2d/4xxdd d 5 0 0 2|4|6>10 12>16* 13>17
+masters|3dxx1l/ll1ld2l/4xx2 l 2 0 0 5|1|0>1 6>7 8>9x 14>15
+masters|3dxx1l/ll1ld2l/4xx2 l 2 0 0 5|2|0>2 5>7 8>10 13>15 14>16*
+masters|3dxx1l/ll1ld2l/4xx2 l 2 0 0 5|3|0>3 6>9x 8>11 13>16* 14>17
+masters|3dxx1l/ll1ld2l/4xx2 l 2 0 0 5|4|0>4* 5>9x 6>10 8>12* 13>17
+masters|3dxxll/l1dd3d/4xxl1 d 1 2 3 0|1|1>2 8>9 14>15x
+masters|3dxxll/l1dd3d/4xxl1 d 1 2 3 0|2|0>2 1>3 7>9 8>10 14>16x*
+masters|3dxxll/l1dd3d/4xxl1 d 1 2 3 0|3|0>3 1>4* 7>10 8>11 14>17
+masters|3dxxll/l1dd3d/4xxl1 d 1 2 3 0|4|0>4* 1>5x 7>11 8>12x*
+masters|1dddxx1l/d2ddlll/l1llxx1d d 0 0 0 0|1|3>4* 5>6 9>10x 13>14x
+masters|1dddxx1l/d2ddlll/l1llxx1d d 0 0 0 0|2|2>4* 5>7 8>10x 9>11x 13>15x
+masters|1dddxx1l/d2ddlll/l1llxx1d d 0 0 0 0|3|1>4* 3>6 8>11x 9>12* 13>16*
+masters|1dddxx1l/d2ddlll/l1llxx1d d 0 0 0 0|4|2>6 3>7 8>12* 13>17
+masters|4xxl1/2d5/4xxl1 l 1 4 5 1|1|0>1 12>13 16>17
+masters|4xxl1/2d5/4xxl1 l 1 4 5 1|2|0>2 12>14
+masters|4xxl1/2d5/4xxl1 l 1 4 5 1|3|0>3 12>15
+masters|4xxl1/2d5/4xxl1 l 1 4 5 1|4|0>4*
+masters|d1d1xx2/d1d1d1d1/4xxdl l 6 0 0 0|1|0>1 15>16x*
+masters|d1d1xx2/d1d1d1d1/4xxdl l 6 0 0 0|2|0>2 15>17
+masters|d1d1xx2/d1d1d1d1/4xxdl l 6 0 0 0|3|0>3
+masters|d1d1xx2/d1d1d1d1/4xxdl l 6 0 0 0|4|0>4*
+masters|d3xx2/d2dd3/3lxx1d d 6 0 0 2|1|5>6 9>10 13>14
+masters|d3xx2/d2dd3/3lxx1d d 6 0 0 2|2|4>6 5>7 8>10 9>11 13>15
+masters|d3xx2/d2dd3/3lxx1d d 6 0 0 2|3|4>7 8>11 9>12* 13>16*
+masters|d3xx2/d2dd3/3lxx1d d 6 0 0 2|4|8>12* 13>17
+masters|4xx1d/3d4/4xx2 d 1 6 0 5|1|8>9 15>16*
+masters|4xx1d/3d4/4xx2 d 1 6 0 5|2|8>10 15>17
+masters|4xx1d/3d4/4xx2 d 1 6 0 5|3|8>11
+masters|4xx1d/3d4/4xx2 d 1 6 0 5|4|8>12*
+masters|d3xxd1/dl4dd/3lxx2 d 5 0 1 1|1|0>1 5>6x 11>12* 14>15 16>17
+masters|d3xxd1/dl4dd/3lxx2 d 5 0 1 1|2|0>2 4>6x 5>7 11>13
+masters|d3xxd1/dl4dd/3lxx2 d 5 0 1 1|3|0>3 4>7 5>8* 14>17
+masters|d3xxd1/dl4dd/3lxx2 d 5 0 1 1|4|4>8* 5>9 11>15
+masters|4xx2/l2dlldd/4xx1l l 1 2 4 0|1|0>1 5>6 10>11x 15>16*
+masters|4xx2/l2dlldd/4xx1l l 1 2 4 0|2|0>2 5>7 9>11x 10>12* 15>17
+masters|4xx2/l2dlldd/4xx1l l 1 2 4 0|3|0>3 5>8x* 9>12* 10>13
+masters|4xx2/l2dlldd/4xx1l l 1 2 4 0|4|0>4* 9>13 10>14x
+masters|4xxl1/8/4xxll d 3 1 4 3|1|0>1
+masters|4xxl1/8/4xxll d 3 1 4 3|2|0>2
+masters|4xxl1/8/4xxll d 3 1 4 3|3|0>3
+masters|4xxl1/8/4xxll d 3 1 4 3|4|0>4*
+masters|2d1xxd1/d3dd2/4xx1d d 0 7 1 0|1|0>1 2>3 5>6 10>11 13>14 16>17
+masters|2d1xxd1/d3dd2/4xx1d d 0 7 1 0|2|2>4* 5>7 9>11 10>12* 13>15
+masters|2d1xxd1/d3dd2/4xx1d d 0 7 1 0|3|0>3 5>8* 9>12*
+masters|2d1xxd1/d3dd2/4xx1d d 0 7 1 0|4|0>4* 2>6 10>14 13>17
+masters|4xxll/1d5l/2llxx1l l 0 1 5 1|1|2>3 15>16*
+masters|4xxll/1d5l/2llxx1l l 0 1 5 1|2|1>3 2>4* 14>16* 15>17
+masters|4xxll/1d5l/2llxx1l l 0 1 5 1|3|1>4* 2>5 13>16* 14>17
+masters|4xxll/1d5l/2llxx1l l 0 1 5 1|4|1>5 2>6x 12>16* 13>17
+masters|dd2xxl1/3d2dd/4xx2 d 6 0 1 1|1|0>1 4>5 8>9 11>12* 14>15
+masters|dd2xxl1/3d2dd/4xx2 d 6 0 1 1|2|0>2 3>5 4>6 8>10 11>13 14>16x*
+masters|dd2xxl1/3d2dd/4xx2 d 6 0 1 1|3|3>6 4>7 14>17
+masters|dd2xxl1/3d2dd/4xx2 d 6 0 1 1|4|3>7 8>12* 11>15
+masters|1d1dxx2/dd1ll1ll/4xx2 l 0 3 2 1|1|9>10 11>12* 14>15
+masters|1d1dxx2/dd1ll1ll/4xx2 l 0 3 2 1|2|8>10 11>13 14>16*
+masters|1d1dxx2/dd1ll1ll/4xx2 l 0 3 2 1|3|9>12* 14>17
+masters|1d1dxx2/dd1ll1ll/4xx2 l 0 3 2 1|4|8>12* 9>13 11>15
+masters|2d1xxl1/6ll/1l1lxxld d 1 0 0 5|1|2>3 13>14x
+masters|2d1xxl1/6ll/1l1lxxld d 1 0 0 5|2|2>4* 13>15
+masters|2d1xxl1/6ll/1l1lxxld d 1 0 0 5|3|2>5 13>16x*
+masters|2d1xxl1/6ll/1l1lxxld d 1 0 0 5|4|2>6 13>17
+masters|d1d1xxl1/dlll2d1/4xxdl l 1 1 1 1|1|0>1 8>9 12>13 15>16x*
+masters|d1d1xxl1/dlll2d1/4xxdl l 1 1 1 1|2|0>2 7>9 8>10 12>14 15>17
+masters|d1d1xxl1/dlll2d1/4xxdl l 1 1 1 1|3|0>3 6>9 7>10 8>11x
+masters|d1d1xxl1/dlll2d1/4xxdl l 1 1 1 1|4|0>4* 6>10 7>11x 12>16x*
+masters|4xx1l/1l3l2/1l2xx2 l 0 3 0 7|1|3>4* 6>7 10>11 13>14
+masters|4xx1l/1l3l2/1l2xx2 l 0 3 0 7|2|3>5 6>8* 10>12* 13>15
+masters|4xx1l/1l3l2/1l2xx2 l 0 3 0 7|3|6>9 13>16*
+masters|4xx1l/1l3l2/1l2xx2 l 0 3 0 7|4|3>7 10>14 13>17
+masters|2d1xxld/8/1l2xx1l l 1 3 1 4|1|0>1 3>4* 12>13x 15>16*
+masters|2d1xxld/8/1l2xx1l l 1 3 1 4|2|0>2 3>5 12>14 15>17
+masters|2d1xxld/8/1l2xx1l l 1 3 1 4|3|3>6
+masters|2d1xxld/8/1l2xx1l l 1 3 1 4|4|0>4* 3>7 12>16*
+masters|4xx2/1ll1lld1/2l1xxld d 0 1 1 4|1|0>1 11>12x* 13>14
+masters|4xx2/1ll1lld1/2l1xxld d 0 1 1 4|2|0>2 13>15
+masters|4xx2/1ll1lld1/2l1xxld d 0 1 1 4|3|0>3 11>14 13>16*
+masters|4xx2/1ll1lld1/2l1xxld d 0 1 1 4|4|0>4* 11>15 13>17
+masters|d2dxx1l/dd1ddl1d/3lxx2 l 2 2 0 0|1|1>2 10>11 13>14x
+masters|d2dxx1l/dd1ddl1d/3lxx2 l 2 2 0 0|2|0>2 1>3 10>12* 13>15
+masters|d2dxx1l/dd1ddl1d/3lxx2 l 2 2 0 0|3|0>3 1>4* 13>16*
+masters|d2dxx1l/dd1ddl1d/3lxx2 l 2 2 0 0|4|0>4* 1>5x 10>14x 13>17
+masters|4xxd1/ld2ll2/2l1xx2 d 1 2 1 4|1|0>1 6>7 16>17
+masters|4xxd1/ld2ll2/2l1xx2 d 1 2 1 4|2|0>2 6>8*
+masters|4xxd1/ld2ll2/2l1xx2 d 1 2 1 4|3|0>3 6>9x
+masters|4xxd1/ld2ll2/2l1xx2 d 1 2 1 4|4|0>4* 6>10x
+masters|d2dxx1d/dld1dl2/llllxx1d d 1 0 0 0|1|1>2 5>6x 7>8* 9>10x 13>14 15>16*
+masters|d2dxx1d/dld1dl2/llllxx1d d 1 0 0 0|2|1>3 4>6x 9>11 15>17
+masters|d2dxx1d/dld1dl2/llllxx1d d 1 0 0 0|3|5>8* 7>10x 9>12* 13>16*
+masters|d2dxx1d/dld1dl2/llllxx1d d 1 0 0 0|4|4>8* 7>11 13>17
+masters|1d2xx1l/1d6/4xx2 d 1 5 1 4|1|0>1 3>4* 6>7
+masters|1d2xx1l/1d6/4xx2 d 1 5 1 4|2|0>2 3>5 6>8*
+masters|1d2xx1l/1d6/4xx2 d 1 5 1 4|3|6>9
+masters|1d2xx1l/1d6/4xx2 d 1 5 1 4|4|0>4* 3>7 6>10
+masters|4xx1l/2d4l/1l2xx2 d 2 2 2 4|1|0>1 7>8*
+masters|4xx1l/2d4l/1l2xx2 d 2 2 2 4|2|0>2 7>9
+masters|4xx1l/2d4l/1l2xx2 d 2 2 2 4|3|0>3 7>10
+masters|4xx1l/2d4l/1l2xx2 d 2 2 2 4|4|0>4* 7>11
+masters|4xx2/l1dd2dd/2llxx2 l 4 0 1 2|1|2>3 5>6
+masters|4xx2/l1dd2dd/2llxx2 l 4 0 1 2|2|1>3 2>4* 5>7x
+masters|4xx2/l1dd2dd/2llxx2 l 4 0 1 2|3|0>3 1>4* 5>8x*
+masters|4xx2/l1dd2dd/2llxx2 l 4 0 1 2|4|0>4* 2>6 5>9
+masters|4xx2/8/l2lxx2 d 2 3 4 3|1|0>1
+masters|4xx2/8/l2lxx2 d 2 3 4 3|2|0>2
+masters|4xx2/8/l2lxx2 d 2 3 4 3|3|0>3
+masters|4xx2/8/l2lxx2 d 2 3 4 3|4|0>4*
+masters|3dxx2/lll1ll2/4xxl1 l 0 1 2 4|1|7>8* 10>11 16>17
+masters|3dxx2/lll1ll2/4xxl1 l 0 1 2 4|2|6>8* 9>11 10>12*
+masters|3dxx2/lll1ll2/4xxl1 l 0 1 2 4|3|5>8* 9>12* 10>13
+masters|3dxx2/lll1ll2/4xxl1 l 0 1 2 4|4|7>11 9>13 10>14
+masters|1d2xx1l/ld2d3/l1l1xx1d l 0 3 0 3|1|2>3 5>6x 13>14
+masters|1d2xx1l/ld2d3/l1l1xx1d l 0 3 0 3|2|4>6x 5>7 13>15x
+masters|1d2xx1l/ld2d3/l1l1xx1d l 0 3 0 3|3|4>7 5>8* 13>16*
+masters|1d2xx1l/ld2d3/l1l1xx1d l 0 3 0 3|4|2>6x 4>8* 5>9x 13>17
+masters|2d1xx1l/6d1/l3xx2 l 4 1 5 0|1|0>1 4>5 13>14
+masters|2d1xx1l/6d1/l3xx2 l 4 1 5 0|2|0>2 4>6 13>15
+masters|2d1xx1l/6d1/l3xx2 l 4 1 5 0|3|0>3 4>7 13>16*
+masters|2d1xx1l/6d1/l3xx2 l 4 1 5 0|4|4>8* 13>17
+masters|2ddxx2/d1dl4/1l2xx2 l 1 4 2 1|1|0>1 3>4* 8>9
+masters|2ddxx2/d1dl4/1l2xx2 l 1 4 2 1|2|0>2 3>5x 8>10
+masters|2ddxx2/d1dl4/1l2xx2 l 1 4 2 1|3|3>6 8>11
+masters|2ddxx2/d1dl4/1l2xx2 l 1 4 2 1|4|0>4* 3>7x 8>12*
+masters|4xx2/6d1/2l1xxll l 4 0 5 1|1|0>1 2>3 16>17
+masters|4xx2/6d1/2l1xxll l 4 0 5 1|2|2>4* 15>17
+masters|4xx2/6d1/2l1xxll l 4 0 5 1|3|0>3 2>5
+masters|4xx2/6d1/2l1xxll l 4 0 5 1|4|0>4* 2>6
+masters|d2dxxll/dld1dlll/3lxxdd l 0 0 0 0|1|1>2 6>7x 14>15x
+masters|d2dxxll/dld1dlll/3lxxdd l 0 0 0 0|2|1>3 6>8* 13>15x 14>16x*
+masters|d2dxxll/dld1dlll/3lxxdd l 0 0 0 0|3|1>4* 6>9x 12>15x 13>16x* 14>17
+masters|d2dxxll/dld1dlll/3lxxdd l 0 0 0 0|4|1>5x 11>15x 12>16x* 13>17
+masters|4xxl1/l2dd3/4xxd1 d 2 3 3 1|1|0>1 9>10 12>13
+masters|4xxl1/l2dd3/4xxd1 d 2 3 3 1|2|0>2 8>10 9>11 12>14
+masters|4xxl1/l2dd3/4xxd1 d 2 3 3 1|3|0>3 8>11 12>15
+masters|4xxl1/l2dd3/4xxd1 d 2 3 3 1|4|0>4* 9>13 12>16x*
+masters|4xx2/8/4xx2 d 0 7 7 0|1|0>1
+masters|4xx2/8/4xx2 d 0 7 7 0|2|0>2
+masters|4xx2/8/4xx2 d 0 7 7 0|3|0>3
+masters|4xx2/8/4xx2 d 0 7 7 0|4|0>4*
+masters|d1ddxx1l/d2ll1ld/l3xxll l 0 0 2 0|1|4>5x 9>10 11>12* 13>14x 16>17
+masters|d1ddxx1l/d2ll1ld/l3xxll l 0 0 2 0|2|4>6 8>10 15>17
+masters|d1ddxx1l/d2ll1ld/l3xxll l 0 0 2 0|3|4>7 9>12* 11>14x
+masters|d1ddxx1l/d2ll1ld/l3xxll l 0 0 2 0|4|8>12* 13>17
+masters|4xxdd/dd2d1d1/4xxd1 d 3 4 0 0|1|6>7 9>10 12>13 16>17
+masters|4xxdd/dd2d1d1/4xxd1 d 3 4 0 0|2|5>7 6>8* 11>13 12>14 15>17
+masters|4xxdd/dd2d1d1/4xxd1 d 3 4 0 0|3|5>8* 11>14
+masters|4xxdd/dd2d1d1/4xxd1 d 3 4 0 0|4|6>10 9>13
+masters|2d1xxll/1ddll1l1/l3xx1l d 0 0 1 3|1|0>1 2>3 7>8x*
+masters|2d1xxll/1ddll1l1/l3xx1l d 0 0 1 3|2|2>4* 6>8x* 7>9x
+masters|2d1xxll/1ddll1l1/l3xx1l d 0 0 1 3|3|0>3 2>5 6>9x 7>10
+masters|2d1xxll/1ddll1l1/l3xx1l d 0 0 1 3|4|0>4* 6>10 7>11x
+masters|4xxl1/3ld1l1/2llxx1l d 0 1 5 1|1|0>1 9>10
+masters|4xxl1/3ld1l1/2llxx1l d 0 1 5 1|2|0>2 9>11x
+masters|4xxl1/3ld1l1/2llxx1l d 0 1 5 1|3|0>3 9>12*
+masters|4xxl1/3ld1l1/2llxx1l d 0 1 5 1|4|0>4* 9>13x
+masters|1d2xx2/8/4xxl1 l 3 3 2 4|1|0>1 16>17
+masters|1d2xx2/8/4xxl1 l 3 3 2 4|2|0>2
+masters|1d2xx2/8/4xxl1 l 3 3 2 4|3|0>3
+masters|1d2xx2/8/4xxl1 l 3 3 2 4|4|0>4*
+masters|d1ddxx1l/l4l1d/4xxl1 l 2 1 3 0|1|0>1 5>6 10>11 13>14x 16>17
+masters|d1ddxx1l/l4l1d/4xxl1 l 2 1 3 0|2|0>2 5>7 10>12* 13>15
+masters|d1ddxx1l/l4l1d/4xxl1 l 2 1 3 0|3|0>3 5>8*
+masters|d1ddxx1l/l4l1d/4xxl1 l 2 1 3 0|4|0>4* 5>9 10>14x 13>17
+masters|4xx2/8/l1llxxll l 2 0 7 0|1|2>3 4>5 16>17
+masters|4xx2/8/l1llxxll l 2 0 7 0|2|1>3 4>6 15>17
+masters|4xx2/8/l1llxxll l 2 0 7 0|3|0>3 2>5 4>7
+masters|4xx2/8/l1llxxll l 2 0 7 0|4|1>5 2>6 4>8*
+masters|2d1xx1d/1dd1d3/4xxd1 d 4 3 1 0|1|0>1 2>3 7>8* 9>10 12>13 15>16*
+masters|2d1xx1d/1dd1d3/4xxd1 d 4 3 1 0|2|2>4* 6>8* 9>11 12>14 15>17
+masters|2d1xx1d/1dd1d3/4xxd1 d 4 3 1 0|3|0>3 2>5 7>10
+masters|2d1xx1d/1dd1d3/4xxd1 d 4 3 1 0|4|0>4* 6>10 7>11 9>13 12>16*
+masters|2d1xxl1/1l1lddl1/l3xx2 l 2 0 3 1|1|0>1 4>5 6>7 8>9x 12>13
+masters|2d1xxl1/1l1lddl1/l3xx2 l 2 0 3 1|2|0>2 8>10x 11>13 12>14
+masters|2d1xxl1/1l1lddl1/l3xx2 l 2 0 3 1|3|0>3 4>7 6>9x 11>14 12>15
+masters|2d1xxl1/1l1lddl1/l3xx2 l 2 0 3 1|4|6>10x 11>15 12>16*
+masters|1d2xx2/d4dd1/4xxd1 d 7 0 0 2|1|3>4* 5>6 12>13
+masters|1d2xx2/d4dd1/4xxd1 d 7 0 0 2|2|5>7 11>13 12>14
+masters|1d2xx2/d4dd1/4xxd1 d 7 0 0 2|3|3>6 5>8* 10>13 11>14 12>15
+masters|1d2xx2/d4dd1/4xxd1 d 7 0 0 2|4|3>7 5>9 10>14 11>15 12>16*
+masters|d3xx1d/5d2/4xxdd d 2 5 2 0|1|0>1 4>5 10>11 13>14 15>16*
+masters|d3xx1d/5d2/4xxdd d 2 5 2 0|2|0>2 4>6 12>14 15>17
+masters|d3xx1d/5d2/4xxdd d 2 5 2 0|3|0>3 4>7 13>16*
+masters|d3xx1d/5d2/4xxdd d 2 5 2 0|4|4>8* 10>14 12>16* 13>17
+masters|d3xxd1/ldl1d1dl/1lllxxld d 0 0 1 0|1|0>1 4>5x 6>7x 9>10 11>12x* 13>14x 16>17
+masters|d3xxd1/ldl1d1dl/1lllxxld d 0 0 1 0|2|0>2 6>8* 13>15
+masters|d3xxd1/ldl1d1dl/1lllxxld d 0 0 1 0|3|0>3 4>7x 9>12x* 11>14x
+masters|d3xxd1/ldl1d1dl/1lllxxld d 0 0 1 0|4|4>8* 6>10 11>15 13>17
+masters|4xxd1/4d3/1l2xxd1 l 4 2 0 4|1|0>1 3>4*
+masters|4xxd1/4d3/1l2xxd1 l 4 2 0 4|2|0>2 3>5
+masters|4xxd1/4d3/1l2xxd1 l 4 2 0 4|3|3>6
+masters|4xxd1/4d3/1l2xxd1 l 4 2 0 4|4|0>4* 3>7
+masters|4xxd1/dll1d3/2llxxdl d 2 0 0 3|1|5>6x 9>10 12>13x 16>17
+masters|4xxd1/dll1d3/2llxxdl d 2 0 0 3|2|5>7x 9>11 12>14
+masters|4xxd1/dll1d3/2llxxdl d 2 0 0 3|3|5>8* 12>15
+masters|4xxd1/dll1d3/2llxxdl d 2 0 0 3|4|9>13x
+masters|1d1dxx2/7l/ll2xx2 l 2 2 2 3|1|0>1 4>5 14>15
+masters|1d1dxx2/7l/ll2xx2 l 2 2 2 3|2|0>2 3>5 4>6 14>16*
+masters|1d1dxx2/7l/ll2xx2 l 2 2 2 3|3|3>6 4>7 14>17
+masters|1d1dxx2/7l/ll2xx2 l 2 2 2 3|4|3>7 4>8*
+masters|3dxx1d/ldldl3/1ll1xxll l 0 0 2 1|1|3>4* 5>6x 7>8x* 9>10 16>17
+masters|3dxx1d/ldldl3/1ll1xxll l 0 0 2 1|2|2>4* 9>11 15>17
+masters|3dxx1d/ldldl3/1ll1xxll l 0 0 2 1|3|3>6x 5>8x* 7>10 9>12*
+masters|3dxx1d/ldldl3/1ll1xxll l 0 0 2 1|4|2>6x 7>11 9>13x
+masters|2d1xxl1/5l1l/1l2xx2 d 3 0 4 2|1|0>1 2>3
+masters|2d1xxl1/5l1l/1l2xx2 d 3 0 4 2|2|2>4*
+masters|2d1xxl1/5l1l/1l2xx2 d 3 0 4 2|3|0>3 2>5
+masters|2d1xxl1/5l1l/1l2xx2 d 3 0 4 2|4|0>4* 2>6
+masters|4xx2/3ll3/l3xx1l l 0 3 4 3|1|4>5 9>10 15>16*
+masters|4xx2/3ll3/l3xx1l l 0 3 4 3|2|4>6 8>10 9>11 15>17
+masters|4xx2/3ll3/l3xx1l l 0 3 4 3|3|4>7 8>11 9>12*
+masters|4xx2/3ll3/l3xx1l l 0 3 4 3|4|8>12* 9>13
+masters|1d2xx2/1d1ll1ll/ll2xx2 l 0 1 2 3|1|4>5 9>10 11>12* 14>15
+masters|1d2xx2/1d1ll1ll/ll2xx2 l 0 1 2 3|2|3>5 4>6x 8>10 11>13 14>16*
+masters|1d2xx2/1d1ll1ll/ll2xx2 l 0 1 2 3|3|3>6x 4>7 9>12* 14>17
+masters|1d2xx2/1d1ll1ll/ll2xx2 l 0 1 2 3|4|3>7 8>12* 9>13 11>15
+masters|4xx1l/1l6/1l2xxl1 d 3 0 0 7|1|
+masters|4xx1l/1l6/1l2xxl1 d 3 0 0 7|2|
+masters|4xx1l/1l6/1l2xxl1 d 3 0 0 7|3|
+masters|4xx1l/1l6/1l2xxl1 d 3 0 0 7|4|
+masters|d3xxll/ld1dd2l/1ll1xx2 l 1 0 2 1|1|0>1 3>4* 5>6x 14>15
+masters|d3xxll/ld1dd2l/1ll1xx2 l 1 0 2 1|2|2>4* 5>7 13>15 14>16*
+masters|d3xxll/ld1dd2l/1ll1xx2 l 1 0 2 1|3|3>6x 5>8x* 12>15 13>16* 14>17
+masters|d3xxll/ld1dd2l/1ll1xx2 l 1 0 2 1|4|0>4* 2>6x 3>7 5>9x 12>16* 13>17
+masters|1dd1xxdd/ll2ll1d/l1l1xx1l d 0 0 1 1|1|0>1 3>4* 16>17
+masters|1dd1xxdd/ll2ll1d/l1l1xx1l d 0 0 1 1|2|2>4* 3>5x 15>17
+masters|1dd1xxdd/ll2ll1d/l1l1xx1l d 0 0 1 1|3|2>5x 3>6x 14>17
+masters|1dd1xxdd/ll2ll1d/l1l1xx1l d 0 0 1 1|4|0>4* 2>6x 3>7
+masters|1d2xxd1/l3d1ld/l2lxxd1 d 0 3 0 2|1|3>4* 9>10 12>13 14>15 16>17
+masters|1d2xxd1/l3d1ld/l2lxxd1 d 0 3 0 2|2|3>5x 9>11x
+masters|1d2xxd1/l3d1ld/l2lxxd1 d 0 3 0 2|3|3>6 12>15 14>17
+masters|1d2xxd1/l3d1ld/l2lxxd1 d 0 3 0 2|4|3>7 9>13
+masters|3dxx1d/2l1dd2/4xx1l d 0 5 2 1|1|1>2 10>11 15>16*
+masters|3dxx1d/2l1dd2/4xx1l d 0 5 2 1|2|0>2 1>3 9>11 10>12* 15>17
+masters|3dxx1d/2l1dd2/4xx1l d 0 5 2 1|3|0>3 1>4* 9>12* 10>13x
+masters|3dxx1d/2l1dd2/4xx1l d 0 5 2 1|4|0>4* 1>5 9>13x 10>14
+masters|dd2xx1l/l2l4/ll2xxld l 0 1 3 1|1|5>6 8>9 13>14 16>17
+masters|dd2xx1l/l2l4/ll2xxld l 0 1 3 1|2|4>6 5>7 8>10 13>15x
+masters|dd2xx1l/l2l4/ll2xxld l 0 1 3 1|3|3>6 4>7 8>11
+masters|dd2xx1l/l2l4/ll2xxld l 0 1 3 1|4|3>7 5>9 8>12* 13>17
+masters|1d1dxx1l/1dldd1ld/l2lxxll d 0 0 1 0|1|1>2 3>4* 6>7x 9>10 14>15x
+masters|1d1dxx1l/1dldd1ld/l2lxxll d 0 0 1 0|2|0>2 3>5 8>10 9>11x 14>16*
+masters|1d1dxx1l/1dldd1ld/l2lxxll d 0 0 1 0|3|1>4* 8>11x 9>12x* 14>17
+masters|1d1dxx1l/1dldd1ld/l2lxxll d 0 0 1 0|4|0>4* 1>5 3>7x 6>10 8>12x* 9>13x
+masters|3dxx1d/5l1d/1l2xxd1 l 2 3 3 0|1|0>1 3>4* 10>11
+masters|3dxx1d/5l1d/1l2xxd1 l 2 3 3 0|2|0>2 3>5 10>12*
+masters|3dxx1d/5l1d/1l2xxd1 l 2 3 3 0|3|3>6 10>13x
+masters|3dxx1d/5l1d/1l2xxd1 l 2 3 3 0|4|0>4* 3>7 10>14x
+masters|4xx1d/8/4xx1d d 3 4 1 4|1|0>1 13>14 15>16*
+masters|4xx1d/8/4xx1d d 3 4 1 4|2|0>2 15>17
+masters|4xx1d/8/4xx1d d 3 4 1 4|3|0>3 13>16*
+masters|4xx1d/8/4xx1d d 3 4 1 4|4|0>4* 13>17
+masters|d2dxxdl/2l4l/1ll1xxl1 d 0 1 0 4|1|1>2 4>5 16>17
+masters|d2dxxdl/2l4l/1ll1xxl1 d 0 1 0 4|2|1>3 4>6
+masters|d2dxxdl/2l4l/1ll1xxl1 d 0 1 0 4|3|4>7x
+masters|d2dxxdl/2l4l/1ll1xxl1 d 0 1 0 4|4|1>5 4>8*
+masters|3dxx2/2lll1d1/4xx1l d 2 1 2 3|1|1>2 11>12*
+masters|3dxx2/2lll1d1/4xx1l d 2 1 2 3|2|0>2 1>3 11>13x
+masters|3dxx2/2lll1d1/4xx1l d 2 1 2 3|3|0>3 1>4* 11>14
+masters|3dxx2/2lll1d1/4xx1l d 2 1 2 3|4|0>4* 1>5 11>15
+masters|1d1dxx1l/dddd1l2/4xxld l 3 1 0 0|1|0>1 10>11 13>14 16>17
+masters|1d1dxx1l/dddd1l2/4xxld l 3 1 0 0|2|0>2 10>12* 13>15x
+masters|1d1dxx1l/dddd1l2/4xxld l 3 1 0 0|3|0>3
+masters|1d1dxx1l/dddd1l2/4xxld l 3 1 0 0|4|0>4* 10>14 13>17
+masters|2ddxxd1/2d2d2/l2lxxl1 l 3 1 1 1|1|1>2 4>5 16>17
+masters|2ddxxd1/2d2d2/l2lxxl1 l 3 1 1 1|2|0>2 1>3 4>6
+masters|2ddxxd1/2d2d2/l2lxxl1 l 3 1 1 1|3|0>3 4>7x
+masters|2ddxxd1/2d2d2/l2lxxl1 l 3 1 1 1|4|1>5 4>8*
+masters|2d1xxll/1l2l1l1/4xxll l 0 0 3 3|1|6>7 9>10 13>14 16>17
+masters|2d1xxll/1l2l1l1/4xxll l 0 0 3 3|2|6>8* 12>14 15>17
+masters|2d1xxll/1l2l1l1/4xxll l 0 0 3 3|3|11>14
+masters|2d1xxll/1l2l1l1/4xxll l 0 0 3 3|4|6>10 13>17
+masters|4xx2/6l1/l3xxl1 d 1 3 5 2|1|0>1
+masters|4xx2/6l1/l3xxl1 d 1 3 5 2|2|0>2
+masters|4xx2/6l1/l3xxl1 d 1 3 5 2|3|0>3
+masters|4xx2/6l1/l3xxl1 d 1 3 5 2|4|0>4*
+masters|1d1dxxdl/l1d1l1ld/l2lxxdl l 0 0 1 0|1|1>2 5>6 9>10 11>12x* 13>14x 15>16x*
+masters|1d1dxxdl/l1d1l1ld/l2lxxdl l 0 0 1 0|2|1>3 4>6 5>7x 15>17
+masters|1d1dxxdl/l1d1l1ld/l2lxxdl l 0 0 1 0|3|4>7x 5>8* 9>12x* 11>14x 13>16x*
+masters|1d1dxxdl/l1d1l1ld/l2lxxdl l 0 0 1 0|4|4>8* 13>17
+masters|4xx1l/1d2l2l/4xx2 l 1 3 1 5|1|0>1 9>10 14>15
+masters|4xx1l/1d2l2l/4xx2 l 1 3 1 5|2|0>2 9>11 13>15 14>16*
+masters|4xx1l/1d2l2l/4xx2 l 1 3 1 5|3|0>3 9>12* 13>16* 14>17
+masters|4xx1l/1d2l2l/4xx2 l 1 3 1 5|4|0>4* 13>17
+masters|4xxdl/l2l4/ll1lxxd1 d 0 1 3 2|1|0>1 12>13 16>17
+masters|4xxdl/l2l4/ll1lxxd1 d 0 1 3 2|2|0>2 12>14
+masters|4xxdl/l2l4/ll1lxxd1 d 0 1 3 2|3|0>3 12>15x
+masters|4xxdl/l2l4/ll1lxxd1 d 0 1 3 2|4|0>4*
+masters|4xx1l/5l2/2l1xxl1 d 2 1 2 5|1|0>1
+masters|4xx1l/5l2/2l1xxl1 d 2 1 2 5|2|0>2
+masters|4xx1l/5l2/2l1xxl1 d 2 1 2 5|3|0>3
+masters|4xx1l/5l2/2l1xxl1 d 2 1 2 5|4|0>4*
+masters|4xx1d/8/4xxd1 l 4 3 0 5|1|0>1
+masters|4xx1d/8/4xxd1 l 4 3 0 5|2|0>2
+masters|4xx1d/8/4xxd1 l 4 3 0 5|3|0>3
+masters|4xx1d/8/4xxd1 l 4 3 0 5|4|0>4*
+masters|2ddxxll/dld2d2/4xxd1 l 1 3 1 0|1|0>1 6>7x 13>14
+masters|2ddxxll/dld2d2/4xxd1 l 1 3 1 0|2|0>2 6>8* 12>14 13>15
+masters|2ddxxll/dld2d2/4xxd1 l 1 3 1 0|3|0>3 6>9 12>15 13>16x*
+masters|2ddxxll/dld2d2/4xxd1 l 1 3 1 0|4|0>4* 6>10x 12>16x* 13>17
+masters|2d1xx1l/dld1dd2/4xx1l l 1 3 1 1|1|0>1 6>7x 13>14 15>16*
+masters|2d1xx1l/dld1dd2/4xx1l l 1 3 1 1|2|0>2 6>8* 15>17
+masters|2d1xx1l/dld1dd2/4xx1l l 1 3 1 1|3|0>3 6>9x 13>16*
+masters|2d1xx1l/dld1dd2/4xx1l l 1 3 1 1|4|0>4* 6>10x 13>17
+masters|2d1xxl1/2l1l3/ll1lxx1l l 0 0 0 6|1|1>2 4>5 7>8* 9>10 12>13 15>16*
+masters|2d1xxl1/2l1l3/ll1lxx1l l 0 0 0 6|2|3>5 4>6 9>11 12>14 15>17
+masters|2d1xxl1/2l1l3/ll1lxx1l l 0 0 0 6|3|3>6 7>10
+masters|2d1xxl1/2l1l3/ll1lxx1l l 0 0 0 6|4|1>5 4>8* 7>11 9>13 12>16*
+masters|d3xx1l/8/3lxxl1 l 3 1 5 1|1|1>2 13>14 16>17
+masters|d3xx1l/8/3lxxl1 l 3 1 5 1|2|0>2 1>3 13>15
+masters|d3xx1l/8/3lxxl1 l 3 1 5 1|3|0>3 1>4*
+masters|d3xx1l/8/3lxxl1 l 3 1 5 1|4|0>4* 1>5 13>17
+masters|4xxdd/1ddld1ll/l2lxxdl l 1 0 0 1|1|1>2 4>5 8>9x 11>12x* 15>16x*
+masters|4xxdd/1ddld1ll/l2lxxdl l 1 0 0 1|2|0>2 1>3 4>6x 8>10 11>13x 14>16x* 15>17
+masters|4xxdd/1ddld1ll/l2lxxdl l 1 0 0 1|3|0>3 4>7x 14>17
+masters|4xxdd/1ddld1ll/l2lxxdl l 1 0 0 1|4|1>5 8>12x*
+masters|4xxd1/d1d2l2/4xx1l d 0 5 3 1|1|0>1 5>6 7>8* 16>17
+masters|4xxd1/d1d2l2/4xx1l d 0 5 3 1|2|0>2 7>9
+masters|4xxd1/d1d2l2/4xx1l d 0 5 3 1|3|0>3 5>8* 7>10x
+masters|4xxd1/d1d2l2/4xx1l d 0 5 3 1|4|0>4* 5>9 7>11
+masters|2d1xx1l/1dl1d3/l3xxd1 d 0 4 2 1|1|0>1 2>3 6>7x 9>10 12>13
+masters|2d1xx1l/1dl1d3/l3xxd1 d 0 4 2 1|2|2>4* 6>8* 9>11 12>14
+masters|2d1xx1l/1dl1d3/l3xxd1 d 0 4 2 1|3|0>3 2>5 12>15x
+masters|2d1xx1l/1dl1d3/l3xxd1 d 0 4 2 1|4|0>4* 6>10 9>13 12>16*
+masters|4xxl1/2l1ld2/2llxxl1 d 1 0 1 5|1|0>1 10>11
+masters|4xxl1/2l1ld2/2llxxl1 d 1 0 1 5|2|0>2 10>12x*
+masters|4xxl1/2l1ld2/2llxxl1 d 1 0 1 5|3|0>3 10>13
+masters|4xxl1/2l1ld2/2llxxl1 d 1 0 1 5|4|0>4* 10>14
+masters|2ddxx2/ddld1dl1/4xx1d d 3 2 0 0|1|2>3 6>7x 8>9 10>11x 13>14
+masters|2ddxx2/ddld1dl1/4xx1d d 3 2 0 0|2|1>3 2>4* 5>7x 10>12* 13>15
+masters|2ddxx2/ddld1dl1/4xx1d d 3 2 0 0|3|1>4* 6>9 8>11x 13>16*
+masters|2ddxx2/ddld1dl1/4xx1d d 3 2 0 0|4|5>9 8>12* 10>14 13>17
+masters|4xx2/7d/4xx2 d 2 5 6 0|1|0>1 14>15
+masters|4xx2/7d/4xx2 d 2 5 6 0|2|0>2 14>16*
+masters|4xx2/7d/4xx2 d 2 5 6 0|3|0>3 14>17
+masters|4xx2/7d/4xx2 d 2 5 6 0|4|0>4*
+masters|1d2xxdl/lld1dddl/l2lxxl1 d 0 0 0 1|1|3>4* 7>8* 11>12x* 16>17
+masters|1d2xxdl/lld1dddl/l2lxxl1 d 0 0 0 1|2|3>5x 10>12x* 11>13
+masters|1d2xxdl/lld1dddl/l2lxxl1 d 0 0 0 1|3|3>6x 9>12x* 10>13 11>14x
+masters|1d2xxdl/lld1dddl/l2lxxl1 d 0 0 0 1|4|9>13 10>14x 11>15x
+masters|d3xxdd/2d2d1d/4xx2 d 6 1 0 1|1|4>5 7>8* 10>11 16>17
+masters|d3xxdd/2d2d1d/4xx2 d 6 1 0 1|2|4>6 7>9 10>12* 15>17
+masters|d3xxdd/2d2d1d/4xx2 d 6 1 0 1|3|10>13 14>17
+masters|d3xxdd/2d2d1d/4xx2 d 6 1 0 1|4|4>8* 7>11
+masters|4xx1l/1l2llll/1l2xx2 l 0 0 1 6|1|3>4* 6>7 11>12* 14>15
+masters|4xx1l/1l2llll/1l2xx2 l 0 0 1 6|2|3>5 6>8* 10>12* 13>15 14>16*
+masters|4xx1l/1l2llll/1l2xx2 l 0 0 1 6|3|9>12* 13>16* 14>17
+masters|4xx1l/1l2llll/1l2xx2 l 0 0 1 6|4|3>7 11>15 13>17
+masters|2ddxxdl/1l1dd3/2l1xx1l l 2 1 2 0|1|0>1 2>3 6>7 13>14 15>16*
+masters|2ddxxdl/1l1dd3/2l1xx1l l 2 1 2 0|2|2>4* 6>8x* 15>17
+masters|2ddxxdl/1l1dd3/2l1xx1l l 2 1 2 0|3|0>3 2>5 6>9x 13>16*
+masters|2ddxxdl/1l1dd3/2l1xx1l l 2 1 2 0|4|0>4* 6>10 13>17
+masters|d3xx1l/1d3ll1/4xxdd d 0 4 2 1|1|0>1 4>5 6>7 13>14
+masters|d3xx1l/1d3ll1/4xxdd d 0 4 2 1|2|0>2 6>8* 12>14 13>15x
+masters|d3xx1l/1d3ll1/4xxdd d 0 4 2 1|3|0>3 4>7 6>9 12>15x 13>16*
+masters|d3xx1l/1d3ll1/4xxdd d 0 4 2 1|4|4>8* 6>10x 12>16* 13>17
+masters|4xx1d/5d2/4xx2 l 1 6 0 5|1|0>1
+masters|4xx1d/5d2/4xx2 l 1 6 0 5|2|0>2
+masters|4xx1d/5d2/4xx2 l 1 6 0 5|3|0>3
+masters|4xx1d/5d2/4xx2 l 1 6 0 5|4|0>4*
+masters|1dddxx2/7d/4xx2 d 0 7 1 2|1|3>4* 14>15
+masters|1dddxx2/7d/4xx2 d 0 7 1 2|2|2>4* 3>5 14>16*
+masters|1dddxx2/7d/4xx2 d 0 7 1 2|3|1>4* 2>5 3>6 14>17
+masters|1dddxx2/7d/4xx2 d 0 7 1 2|4|0>4* 1>5 2>6 3>7
+masters|dd2xxl1/1dl4l/4xx1l d 0 3 1 3|1|0>1 4>5 6>7x
+masters|dd2xxl1/1dl4l/4xx1l d 0 3 1 3|2|0>2 3>5 6>8*
+masters|dd2xxl1/1dl4l/4xx1l d 0 3 1 3|3|4>7x 6>9
+masters|dd2xxl1/1dl4l/4xx1l d 0 3 1 3|4|3>7x 4>8* 6>10
+masters|2d1xx2/5dd1/4xx2 l 2 5 0 4|1|0>1
+masters|2d1xx2/5dd1/4xx2 l 2 5 0 4|2|0>2
+masters|2d1xx2/5dd1/4xx2 l 2 5 0 4|3|0>3
+masters|2d1xx2/5dd1/4xx2 l 2 5 0 4|4|0>4*
+masters|4xx1l/l7/4xx2 d 0 5 5 2|1|0>1
+masters|4xx1l/l7/4xx2 d 0 5 5 2|2|0>2
+masters|4xx1l/l7/4xx2 d 0 5 5 2|3|0>3
+masters|4xx1l/l7/4xx2 d 0 5 5 2|4|0>4*
+masters|4xxdl/l2ll3/1l2xx1l l 0 1 4 2|1|3>4* 5>6 9>10 13>14 15>16*
+masters|4xxdl/l2ll3/1l2xx1l l 0 1 4 2|2|5>7 8>10 9>11 15>17
+masters|4xxdl/l2ll3/1l2xx1l l 0 1 4 2|3|3>6 8>11 9>12x* 13>16*
+masters|4xxdl/l2ll3/1l2xx1l l 0 1 4 2|4|3>7 8>12x* 13>17
+masters|d2dxxll/d1d2ldd/l3xx2 l 3 0 1 0|1|0>1 4>5x 10>11x 13>14x
+masters|d2dxxll/d1d2ldd/l3xx2 l 3 0 1 0|2|0>2 4>6 12>14x 13>15
+masters|d2dxxll/d1d2ldd/l3xx2 l 3 0 1 0|3|0>3 4>7x 12>15 13>16*
+masters|d2dxxll/d1d2ldd/l3xx2 l 3 0 1 0|4|4>8* 10>14x 12>16* 13>17
+masters|4xx2/lll2d1l/l3xxdl l 0 1 4 1|1|7>8* 15>16x*
+masters|4xx2/lll2d1l/l3xxdl l 0 1 4 1|2|6>8* 7>9 14>16x* 15>17
+masters|4xx2/lll2d1l/l3xxdl l 0 1 4 1|3|5>8* 6>9 7>10x 14>17
+masters|4xx2/lll2d1l/l3xxdl l 0 1 4 1|4|4>8* 5>9 6>10x 7>11
+masters|1d2xxl1/dddd2ld/ll2xxdl d 1 1 0 0|1|3>4* 8>9 12>13x 14>15
+masters|1d2xxl1/dddd2ld/ll2xxdl d 1 1 0 0|2|7>9 8>10 14>16x*
+masters|1d2xxl1/dddd2ld/ll2xxdl d 1 1 0 0|3|6>9 7>10 8>11x 12>15 14>17
+masters|1d2xxl1/dddd2ld/ll2xxdl d 1 1 0 0|4|5>9 6>10 7>11x 12>16x*
+masters|1d2xx1l/2l1d1dl/1l2xxl1 d 1 1 0 4|1|3>4* 9>10 11>12x*
+masters|1d2xx1l/2l1d1dl/1l2xxl1 d 1 1 0 4|2|3>5 11>13
+masters|1d2xx1l/2l1d1dl/1l2xxl1 d 1 1 0 4|3|3>6 9>12x* 11>14x
+masters|1d2xx1l/2l1d1dl/1l2xxl1 d 1 1 0 4|4|3>7x 9>13 11>15x
+masters|2d1xx2/1l1l2ll/1l1lxxd1 l 0 1 4 1|1|1>2 3>4* 6>7 8>9 11>12* 14>15
+masters|2d1xx2/1l1l2ll/1l1lxxd1 l 0 1 4 1|2|3>5 8>10 11>13 14>16x*
+masters|2d1xx2/1l1l2ll/1l1lxxd1 l 0 1 4 1|3|1>4* 6>9 14>17
+masters|2d1xx2/1l1l2ll/1l1lxxd1 l 0 1 4 1|4|1>5 3>7 6>10 8>12* 11>15
+masters|4xxd1/ll3l2/4xxld d 0 3 4 1|1|0>1 13>14 16>17
+masters|4xxd1/ll3l2/4xxld d 0 3 4 1|2|0>2 13>15
+masters|4xxd1/ll3l2/4xxld d 0 3 4 1|3|0>3
+masters|4xxd1/ll3l2/4xxld d 0 3 4 1|4|0>4* 13>17
+masters|2d1xx2/l2dl1d1/lll1xx2 d 0 2 2 2|1|0>1 2>3 8>9x 11>12*
+masters|2d1xx2/l2dl1d1/lll1xx2 d 0 2 2 2|2|2>4* 8>10 11>13
+masters|2d1xx2/l2dl1d1/lll1xx2 d 0 2 2 2|3|0>3 2>5x 11>14
+masters|2d1xx2/l2dl1d1/lll1xx2 d 0 2 2 2|4|0>4* 2>6 8>12* 11>15
+masters|4xx2/6l1/4xx2 d 6 0 6 1|1|0>1
+masters|4xx2/6l1/4xx2 d 6 0 6 1|2|0>2
+masters|4xx2/6l1/4xx2 d 6 0 6 1|3|0>3
+masters|4xx2/6l1/4xx2 d 6 0 6 1|4|0>4*
+masters|2ddxx2/ldll2ld/4xxdl l 2 0 2 0|1|0>1 5>6x 8>9 11>12* 15>16x*
+masters|2ddxx2/ldll2ld/4xxdl l 2 0 2 0|2|0>2 7>9 8>10 11>13 15>17
+masters|2ddxx2/ldll2ld/4xxdl l 2 0 2 0|3|0>3 7>10 11>14x
+masters|2ddxx2/ldll2ld/4xxdl l 2 0 2 0|4|0>4* 5>9 8>12*
+masters|4xx1l/1l1dd1l1/l1l1xx2 d 1 1 3 2|1|0>1 9>10
+masters|4xx1l/1l1dd1l1/l1l1xx2 d 1 1 3 2|2|0>2 8>10 9>11x
+masters|4xx1l/1l1dd1l1/l1l1xx2 d 1 1 3 2|3|0>3 8>11x 9>12*
+masters|4xx1l/1l1dd1l1/l1l1xx2 d 1 1 3 2|4|0>4* 8>12* 9>13
+masters|d3xxl1/l4dd1/1l2xx2 d 3 1 3 1|1|0>1 4>5x 11>12*
+masters|d3xxl1/l4dd1/1l2xx2 d 3 1 3 1|2|0>2 4>6 10>12* 11>13
+masters|d3xxl1/l4dd1/1l2xx2 d 3 1 3 1|3|0>3 4>7 10>13 11>14
+masters|d3xxl1/l4dd1/1l2xx2 d 3 1 3 1|4|4>8* 10>14 11>15
+masters|4xxdd/d1l2lld/ll2xxld d 1 0 1 1|1|0>1 5>6 16>17
+masters|4xxdd/d1l2lld/ll2xxld d 1 0 1 1|2|0>2 5>7x 15>17
+masters|4xxdd/d1l2lld/ll2xxld d 1 0 1 1|3|0>3 5>8* 14>17
+masters|4xxdd/d1l2lld/ll2xxld d 1 0 1 1|4|0>4* 5>9 13>17
+masters|4xx2/8/4xx2 d 3 4 6 1|1|0>1
+masters|4xx2/8/4xx2 d 3 4 6 1|2|0>2
+masters|4xx2/8/4xx2 d 3 4 6 1|3|0>3
+masters|4xx2/8/4xx2 d 3 4 6 1|4|0>4*
+masters|4xx1l/2l1ll1l/l3xxl1 l 0 0 6 1|1|4>5 7>8* 10>11 14>15 16>17
+masters|4xx1l/2l1ll1l/l3xxl1 l 0 0 6 1|2|4>6 9>11 10>12* 13>15
+masters|4xx1l/2l1ll1l/l3xxl1 l 0 0 6 1|3|9>12* 14>17
+masters|4xx1l/2l1ll1l/l3xxl1 l 0 0 6 1|4|4>8* 7>11 13>17
+masters|1d1dxxdd/2d2ldl/2l1xxd1 l 4 0 0 0|1|0>1 2>3 10>11x 14>15
+masters|1d1dxxdd/2d2ldl/2l1xxd1 l 4 0 0 0|2|2>4* 10>12x* 14>16x*
+masters|1d1dxxdd/2d2ldl/2l1xxd1 l 4 0 0 0|3|0>3 2>5 10>13x 14>17
+masters|1d1dxxdd/2d2ldl/2l1xxd1 l 4 0 0 0|4|0>4* 2>6
+masters|4xxd1/l1ll4/4xx2 l 4 0 5 1|1|0>1 5>6 8>9
+masters|4xxd1/l1ll4/4xx2 l 4 0 5 1|2|0>2 7>9 8>10
+masters|4xxd1/l1ll4/4xx2 l 4 0 5 1|3|0>3 7>10 8>11
+masters|4xxd1/l1ll4/4xx2 l 4 0 5 1|4|0>4* 5>9 7>11 8>12x*
+masters|4xx1l/4d1dd/4xx1l l 5 0 1 3|1|0>1 13>14x 15>16*
+masters|4xx1l/4d1dd/4xx1l l 5 0 1 3|2|0>2 15>17
+masters|4xx1l/4d1dd/4xx1l l 5 0 1 3|3|0>3 13>16*
+masters|4xx1l/4d1dd/4xx1l l 5 0 1 3|4|0>4* 13>17
+masters|1d2xx1l/dd1dd2d/3lxxd1 l 4 1 0 0|1|1>2 13>14x
+masters|1d2xx1l/dd1dd2d/3lxxd1 l 4 1 0 0|2|0>2 1>3 13>15
+masters|1d2xx1l/dd1dd2d/3lxxd1 l 4 1 0 0|3|0>3 1>4* 13>16x*
+masters|1d2xx1l/dd1dd2d/3lxxd1 l 4 1 0 0|4|0>4* 1>5x 13>17
+masters|d2dxx1l/1dll3d/4xx2 d 4 0 2 1|1|1>2 4>5 6>7x 14>15x
+masters|d2dxx1l/1dll3d/4xx2 d 4 0 2 1|2|0>2 1>3 6>8x* 14>16*
+masters|d2dxx1l/1dll3d/4xx2 d 4 0 2 1|3|0>3 4>7x 6>9 14>17
+masters|d2dxx1l/1dll3d/4xx2 d 4 0 2 1|4|1>5 4>8x* 6>10
+masters|d3xxld/1dl1l2d/ll1lxxl1 l 0 0 3 0|1|1>2 4>5 7>8* 9>10 12>13x 16>17
+masters|d3xxld/1dl1l2d/ll1lxxl1 l 0 0 3 0|2|3>5 4>6x 9>11 12>14x
+masters|d3xxld/1dl1l2d/ll1lxxl1 l 0 0 3 0|3|3>6x 7>10 12>15
+masters|d3xxld/1dl1l2d/ll1lxxl1 l 0 0 3 0|4|1>5 4>8* 7>11 9>13x
+masters|ddddxxll/ll1dd2d/2llxx2 l 1 0 0 0|1|2>3 6>7 13>14x
+masters|ddddxxll/ll1dd2d/2llxx2 l 1 0 0 0|2|1>3 2>4* 5>7 6>8x* 12>14x 13>15
+masters|ddddxxll/ll1dd2d/2llxx2 l 1 0 0 0|3|0>3 1>4* 5>8x* 6>9x 12>15 13>16*
+masters|ddddxxll/ll1dd2d/2llxx2 l 1 0 0 0|4|0>4* 5>9x 6>10 12>16* 13>17
+masters|4xxl1/l2l1l1d/ll2xx1d l 1 0 3 2|1|0>1 5>6 8>9 10>11 12>13
+masters|4xxl1/l2l1l1d/ll2xx1d l 1 0 3 2|2|0>2 4>6 5>7 12>14x
+masters|4xxl1/l2l1l1d/ll2xx1d l 1 0 3 2|3|3>6 4>7 8>11 10>13 12>15x
+masters|4xxl1/l2l1l1d/ll2xx1d l 1 0 3 2|4|3>7 5>9 10>14x 12>16*
+masters|4xx2/4d3/l3xx2 d 0 6 3 3|1|0>1 9>10
+masters|4xx2/4d3/l3xx2 d 0 6 3 3|2|0>2 9>11
+masters|4xx2/4d3/l3xx2 d 0 6 3 3|3|0>3 9>12*
+masters|4xx2/4d3/l3xx2 d 0 6 3 3|4|0>4* 9>13
+masters|1d1dxx1l/d3lldd/1l1lxx2 d 1 1 2 0|1|1>2 3>4* 5>6 11>12* 14>15x
+masters|1d1dxx1l/d3lldd/1l1lxx2 d 1 1 2 0|2|0>2 5>7 11>13 14>16*
+masters|1d1dxx1l/d3lldd/1l1lxx2 d 1 1 2 0|3|1>4* 3>6 5>8* 14>17
+masters|1d1dxx1l/d3lldd/1l1lxx2 d 1 1 2 0|4|0>4* 3>7 5>9x 11>15x
+masters|1d1dxx1l/2ddd3/ll1lxxd1 d 2 1 0 1|1|1>2 3>4* 9>10 12>13
+masters|1d1dxx1l/2ddd3/ll1lxxd1 d 2 1 0 1|2|3>5 8>10 9>11 12>14
+masters|1d1dxx1l/2ddd3/ll1lxxd1 d 2 1 0 1|3|1>4* 3>6 7>10 8>11 12>15x
+masters|1d1dxx1l/2ddd3/ll1lxxd1 d 2 1 0 1|4|1>5 7>11 9>13 12>16*
+masters|d1d1xxd1/l4ld1/4xx2 d 0 5 2 1|1|0>1 2>3 4>5x 11>12* 16>17
+masters|d1d1xxd1/l4ld1/4xx2 d 0 5 2 1|2|4>6 11>13
+masters|d1d1xxd1/l4ld1/4xx2 d 0 5 2 1|3|0>3 2>5x 4>7 11>14
+masters|d1d1xxd1/l4ld1/4xx2 d 0 5 2 1|4|2>6 4>8* 11>15
+masters|2d1xx1d/3dl1dd/2l1xxd1 d 3 2 0 1|1|2>3 8>9x 12>13 15>16*
+masters|2d1xx1d/3dl1dd/2l1xxd1 d 3 2 0 1|2|2>4* 8>10 11>13 14>16* 15>17
+masters|2d1xx1d/3dl1dd/2l1xxd1 d 3 2 0 1|3|2>5 14>17
+masters|2d1xx1d/3dl1dd/2l1xxd1 d 3 2 0 1|4|2>6 12>16*
+masters|4xx2/2l5/4xx2 l 5 1 0 7|1|0>1 7>8*
+masters|4xx2/2l5/4xx2 l 5 1 0 7|2|0>2 7>9
+masters|4xx2/2l5/4xx2 l 5 1 0 7|3|0>3 7>10
+masters|4xx2/2l5/4xx2 l 5 1 0 7|4|0>4* 7>11
+masters|2d1xx2/6d1/4xx1l d 4 2 0 5|1|2>3 11>12*
+masters|2d1xx2/6d1/4xx1l d 4 2 0 5|2|2>4* 11>13x
+masters|2d1xx2/6d1/4xx1l d 4 2 0 5|3|2>5 11>14
+masters|2d1xx2/6d1/4xx1l d 4 2 0 5|4|2>6 11>15
+masters|1dd1xxl1/d2dld2/l3xx1d l 1 3 0 1|1|0>1 4>5x 9>10x 12>13
+masters|1dd1xxl1/d2dld2/l3xx1d l 1 3 0 1|2|0>2 4>6 9>11 12>14
+masters|1dd1xxl1/d2dld2/l3xx1d l 1 3 0 1|3|0>3 4>7 12>15x
+masters|1dd1xxl1/d2dld2/l3xx1d l 1 3 0 1|4|4>8x* 9>13 12>16*
+masters|1d2xxdd/2l1lldl/4xxdd l 2 1 1 0|1|0>1 7>8* 10>11x 14>15x
+masters|1d2xxdd/2l1lldl/4xxdd l 2 1 1 0|2|0>2 9>11x 10>12x* 14>16x*
+masters|1d2xxdd/2l1lldl/4xxdd l 2 1 1 0|3|0>3 9>12x* 10>13x 14>17
+masters|1d2xxdd/2l1lldl/4xxdd l 2 1 1 0|4|0>4* 7>11x 9>13x
+masters|4xx2/7l/1l2xx2 d 5 0 5 2|1|0>1
+masters|4xx2/7l/1l2xx2 d 5 0 5 2|2|0>2
+masters|4xx2/7l/1l2xx2 d 5 0 5 2|3|0>3
+masters|4xx2/7l/1l2xx2 d 5 0 5 2|4|0>4*
+masters|3dxx2/4l1dd/4xx2 d 6 0 2 2|1|1>2 11>12* 14>15
+masters|3dxx2/4l1dd/4xx2 d 6 0 2 2|2|0>2 1>3 11>13 14>16*
+masters|3dxx2/4l1dd/4xx2 d 6 0 2 2|3|0>3 1>4* 14>17
+masters|3dxx2/4l1dd/4xx2 d 6 0 2 2|4|0>4* 1>5 11>15
+masters|d3xx1d/lldll1ld/4xxl1 l 1 0 0 3|1|0>1 6>7x 9>10 11>12* 16>17
+masters|d3xx1d/lldll1ld/4xxl1 l 1 0 0 3|2|0>2 5>7x 8>10 11>13x
+masters|d3xx1d/lldll1ld/4xxl1 l 1 0 0 3|3|0>3 9>12* 11>14x
+masters|d3xx1d/lldll1ld/4xxl1 l 1 0 0 3|4|0>4* 6>10 8>12* 9>13x 11>15
+masters|d1d1xxl1/dl1ldld1/ll1lxx2 d 0 0 1 1|1|0>1 2>3 5>6x 9>10x 11>12*
+masters|d1d1xxl1/dl1ldld1/ll1lxx2 d 0 0 1 1|2|4>6x 5>7 11>13
+masters|d1d1xxl1/dl1ldld1/ll1lxx2 d 0 0 1 1|3|0>3 4>7 5>8x* 9>12* 11>14
+masters|d1d1xxl1/dl1ldld1/ll1lxx2 d 0 0 1 1|4|2>6x 4>8x* 9>13 11>15
+short-open|1d2xxd1/d2dd2d/l3xx2 l 5 1 1 0|0|
+short-open|1d2xxd1/d2dd2d/l3xx2 l 5 1 1 0|1|0>1 4>5x
+short-open|1d2xxd1/d2dd2d/l3xx2 l 5 1 1 0|2|0>2 4>6
+short-open|1d2xxd1/d2dd2d/l3xx2 l 5 1 1 0|3|0>3 4>7
+short-open|1d2xxd1/d2dd2d/l3xx2 l 5 1 1 0|4|4>8x*
+short-open|4xx2/dl1dl2l/l3xx2 l 0 3 2 3|0|
+short-open|4xx2/dl1dl2l/l3xx2 l 0 3 2 3|1|4>5x 6>7 9>10 12>13
+short-open|4xx2/dl1dl2l/l3xx2 l 0 3 2 3|2|6>8x* 9>11 12>14*
+short-open|4xx2/dl1dl2l/l3xx2 l 0 3 2 3|3|4>7 12>15
+short-open|4xx2/dl1dl2l/l3xx2 l 0 3 2 3|4|4>8x* 6>10 9>13
+short-open|4xxd1/1l1llldd/l3xx2 d 1 1 4 0|0|
+short-open|4xxd1/1l1llldd/l3xx2 d 1 1 4 0|1|0>1 12>13 14>15
+short-open|4xxd1/1l1llldd/l3xx2 d 1 1 4 0|2|0>2 11>13
+short-open|4xxd1/1l1llldd/l3xx2 d 1 1 4 0|3|0>3 12>15
+short-open|4xxd1/1l1llldd/l3xx2 d 1 1 4 0|4|0>4* 11>15
+short-open|d2dxxd1/d1ld1dd1/4xxl1 l 4 1 0 0|0|
+short-open|d2dxxd1/d1ld1dd1/4xxl1 l 4 1 0 0|1|0>1 7>8x* 14>15
+short-open|d2dxxd1/d1ld1dd1/4xxl1 l 4 1 0 0|2|0>2 7>9
+short-open|d2dxxd1/d1ld1dd1/4xxl1 l 4 1 0 0|3|0>3 7>10x
+short-open|d2dxxd1/d1ld1dd1/4xxl1 l 4 1 0 0|4|0>4* 7>11x
+short-open|4xx2/2ld4/1l2xx2 l 5 0 0 6|0|
+short-open|4xx2/2ld4/1l2xx2 l 5 0 0 6|1|0>1 3>4* 7>8x*
+short-open|4xx2/2ld4/1l2xx2 l 5 0 0 6|2|0>2 3>5 7>9
+short-open|4xx2/2ld4/1l2xx2 l 5 0 0 6|3|3>6 7>10
+short-open|4xx2/2ld4/1l2xx2 l 5 0 0 6|4|0>4* 7>11
+short-open|dd2xx2/3d4/4xx2 l 0 7 4 0|0|
+short-open|dd2xx2/3d4/4xx2 l 0 7 4 0|1|
+short-open|dd2xx2/3d4/4xx2 l 0 7 4 0|2|
+short-open|dd2xx2/3d4/4xx2 l 0 7 4 0|3|
+short-open|dd2xx2/3d4/4xx2 l 0 7 4 0|4|
+short-open|4xx2/l1ld1l1l/1l2xxl1 l 0 1 0 6|0|
+short-open|4xx2/l1ld1l1l/1l2xxl1 l 0 1 0 6|1|3>4* 5>6 7>8x* 10>11 12>13 14>15
+short-open|4xx2/l1ld1l1l/1l2xxl1 l 0 1 0 6|2|7>9
+short-open|4xx2/l1ld1l1l/1l2xxl1 l 0 1 0 6|3|3>6 5>8x* 10>13 12>15
+short-open|4xx2/l1ld1l1l/1l2xxl1 l 0 1 0 6|4|5>9 7>11
+short-open|d3xx2/l2ldl1d/l1l1xxll d 0 0 2 2|0|
+short-open|d3xx2/l2ldl1d/l1l1xxll d 0 0 2 2|1|0>1 4>5x 9>10x 12>13
+short-open|d3xx2/l2ldl1d/l1l1xxll d 0 0 2 2|2|0>2 4>6 9>11 12>14*
+short-open|d3xx2/l2ldl1d/l1l1xxll d 0 0 2 2|3|0>3 4>7 12>15
+short-open|d3xx2/l2ldl1d/l1l1xxll d 0 0 2 2|4|4>8x* 9>13
+short-open|3dxx2/3dl3/4xx1l l 3 2 5 0|0|
+short-open|3dxx2/3dl3/4xx1l l 3 2 5 0|1|0>1 9>10 13>14*
+short-open|3dxx2/3dl3/4xx1l l 3 2 5 0|2|0>2 9>11 13>15
+short-open|3dxx2/3dl3/4xx1l l 3 2 5 0|3|0>3 9>12
+short-open|3dxx2/3dl3/4xx1l l 3 2 5 0|4|0>4*
+short-open|dd2xx2/dd1l1d2/4xx2 d 0 6 1 1|0|
+short-open|dd2xx2/dd1l1d2/4xx2 d 0 6 1 1|1|0>1 6>7 10>11
+short-open|dd2xx2/dd1l1d2/4xx2 d 0 6 1 1|2|0>2 5>7 6>8x* 10>12
+short-open|dd2xx2/dd1l1d2/4xx2 d 0 6 1 1|3|4>7 5>8x* 6>9 10>13
+short-open|dd2xx2/dd1l1d2/4xx2 d 0 6 1 1|4|3>7 4>8x* 5>9 10>14*
+short-open|2d1xx2/d2l4/4xx2 d 1 5 3 2|0|
+short-open|2d1xx2/d2l4/4xx2 d 1 5 3 2|1|0>1 2>3 5>6
+short-open|2d1xx2/d2l4/4xx2 d 1 5 3 2|2|2>4* 5>7
+short-open|2d1xx2/d2l4/4xx2 d 1 5 3 2|3|0>3 5>8x*
+short-open|2d1xx2/d2l4/4xx2 d 1 5 3 2|4|0>4* 2>6 5>9
+short-open|1d2xx2/l1ll2ll/2l1xx1l d 0 0 1 5|0|
+short-open|1d2xx2/l1ll2ll/2l1xx1l d 0 0 1 5|1|0>1 3>4*
+short-open|1d2xx2/l1ll2ll/2l1xx1l d 0 0 1 5|2|0>2 3>5x
+short-open|1d2xx2/l1ll2ll/2l1xx1l d 0 0 1 5|3|3>6
+short-open|1d2xx2/l1ll2ll/2l1xx1l d 0 0 1 5|4|0>4* 3>7x
+short-open|4xxd1/2ddd3/l1l1xx2 l 4 1 0 3|0|
+short-open|4xxd1/2ddd3/l1l1xx2 l 4 1 0 3|1|0>1 2>3 4>5
+short-open|4xxd1/2ddd3/l1l1xx2 l 4 1 0 3|2|4>6
+short-open|4xxd1/2ddd3/l1l1xx2 l 4 1 0 3|3|0>3 2>5 4>7x
+short-open|4xxd1/2ddd3/l1l1xx2 l 4 1 0 3|4|2>6 4>8x*
+short-open|2ddxx2/1l1d2l1/4xx1l l 2 2 0 4|0|
+short-open|2ddxx2/1l1d2l1/4xx1l l 2 2 0 4|1|0>1 6>7 11>12 13>14*
+short-open|2ddxx2/1l1d2l1/4xx1l l 2 2 0 4|2|0>2 6>8x* 13>15
+short-open|2ddxx2/1l1d2l1/4xx1l l 2 2 0 4|3|0>3 6>9 11>14*
+short-open|2ddxx2/1l1d2l1/4xx1l l 2 2 0 4|4|0>4* 6>10 11>15
+short-open|1dddxx2/d2dl2l/2llxx1l l 0 2 0 2|0|
+short-open|1dddxx2/d2dl2l/2llxx1l l 0 2 0 2|1|2>3 9>10 13>14*
+short-open|1dddxx2/d2dl2l/2llxx1l l 0 2 0 2|2|1>3 2>4* 9>11 12>14* 13>15
+short-open|1dddxx2/d2dl2l/2llxx1l l 0 2 0 2|3|1>4* 2>5x 12>15
+short-open|1dddxx2/d2dl2l/2llxx1l l 0 2 0 2|4|1>5x 2>6
+short-open|d2dxx2/dddd4/4xx2 l 1 6 1 0|0|
+short-open|d2dxx2/dddd4/4xx2 l 1 6 1 0|1|0>1
+short-open|d2dxx2/dddd4/4xx2 l 1 6 1 0|2|0>2
+short-open|d2dxx2/dddd4/4xx2 l 1 6 1 0|3|0>3
+short-open|d2dxx2/dddd4/4xx2 l 1 6 1 0|4|0>4*
+short-open|d2dxx2/d2l4/4xx2 d 6 0 2 2|0|
+short-open|d2dxx2/d2l4/4xx2 d 6 0 2 2|1|1>2 5>6
+short-open|d2dxx2/d2l4/4xx2 d 6 0 2 2|2|0>2 1>3 4>6 5>7
+short-open|d2dxx2/d2l4/4xx2 d 6 0 2 2|3|0>3 4>7 5>8x*
+short-open|d2dxx2/d2l4/4xx2 d 6 0 2 2|4|4>8x* 5>9
+short-open|4xxdd/1d1ldl1l/l3xx2 d 2 1 1 2|0|
+short-open|4xxdd/1d1ldl1l/l3xx2 d 2 1 1 2|1|0>1 6>7 9>10x 14>15
+short-open|4xxdd/1d1ldl1l/l3xx2 d 2 1 1 2|2|0>2 6>8x* 9>11 13>15
+short-open|4xxdd/1d1ldl1l/l3xx2 d 2 1 1 2|3|0>3 9>12x
+short-open|4xxdd/1d1ldl1l/l3xx2 d 2 1 1 2|4|0>4* 6>10x
+short-open|dd1dxx2/ll1ldddd/2l1xx1l d 2 0 0 0|0|
+short-open|dd1dxx2/ll1ldddd/2l1xx1l d 2 0 0 0|1|1>2 4>5x 12>13
+short-open|dd1dxx2/ll1ldddd/2l1xx1l d 2 0 0 0|2|3>5x 4>6x 11>13 12>14*
+short-open|dd1dxx2/ll1ldddd/2l1xx1l d 2 0 0 0|3|3>6x 4>7 10>13 11>14* 12>15
+short-open|dd1dxx2/ll1ldddd/2l1xx1l d 2 0 0 0|4|1>5x 3>7 4>8x* 9>13 10>14* 11>15
+short-open|d3xxdd/l1ld3d/3lxx2 l 2 2 0 2|0|
+short-open|d3xxdd/l1ld3d/3lxx2 l 2 2 0 2|1|1>2 5>6 7>8x*
+short-open|d3xxdd/l1ld3d/3lxx2 l 2 2 0 2|2|0>2 1>3 7>9
+short-open|d3xxdd/l1ld3d/3lxx2 l 2 2 0 2|3|0>3 1>4* 5>8x* 7>10
+short-open|d3xxdd/l1ld3d/3lxx2 l 2 2 0 2|4|0>4* 5>9 7>11
+short-open|4xx1d/d2d1ll1/4xx2 l 5 0 0 4|0|
+short-open|4xx1d/d2d1ll1/4xx2 l 5 0 0 4|1|0>1 11>12
+short-open|4xx1d/d2d1ll1/4xx2 l 5 0 0 4|2|0>2 10>12 11>13
+short-open|4xx1d/d2d1ll1/4xx2 l 5 0 0 4|3|0>3 10>13 11>14*
+short-open|4xx1d/d2d1ll1/4xx2 l 5 0 0 4|4|0>4* 10>14* 11>15
+short-open|dd2xx2/dd1l2ll/l2lxxl1 d 1 0 0 3|0|
+short-open|dd2xx2/dd1l2ll/l2lxxl1 d 1 0 0 3|1|6>7
+short-open|dd2xx2/dd1l2ll/l2lxxl1 d 1 0 0 3|2|5>7 6>8x*
+short-open|dd2xx2/dd1l2ll/l2lxxl1 d 1 0 0 3|3|4>7 5>8x* 6>9
+short-open|dd2xx2/dd1l2ll/l2lxxl1 d 1 0 0 3|4|3>7 4>8x* 5>9 6>10
+short-open|3dxx2/ldldl1dd/4xx1l l 2 1 1 1|0|
+short-open|3dxx2/ldldl1dd/4xx1l l 2 1 1 1|1|0>1 5>6x 7>8x* 9>10 13>14*
+short-open|3dxx2/ldldl1dd/4xx1l l 2 1 1 1|2|0>2 9>11x 13>15
+short-open|3dxx2/ldldl1dd/4xx1l l 2 1 1 1|3|0>3 5>8x* 7>10 9>12x
+short-open|3dxx2/ldldl1dd/4xx1l l 2 1 1 1|4|0>4* 7>11x
+short-open|4xx2/3l4/4xx2 d 4 2 2 5|0|
+short-open|4xx2/3l4/4xx2 d 4 2 2 5|1|0>1
+short-open|4xx2/3l4/4xx2 d 4 2 2 5|2|0>2
+short-open|4xx2/3l4/4xx2 d 4 2 2 5|3|0>3
+short-open|4xx2/3l4/4xx2 d 4 2 2 5|4|0>4*
+short-open|2d1xx1d/1llddl2/1lllxxl1 l 0 0 0 3|0|
+short-open|2d1xx1d/1llddl2/1lllxxl1 l 0 0 0 3|1|3>4* 7>8x* 10>11 14>15
+short-open|2d1xx1d/1llddl2/1lllxxl1 l 0 0 0 3|2|2>4* 3>5 6>8x* 7>9x 10>12
+short-open|2d1xx1d/1llddl2/1lllxxl1 l 0 0 0 3|3|1>4* 2>5 6>9x 10>13
+short-open|2d1xx1d/1llddl2/1lllxxl1 l 0 0 0 3|4|1>5 7>11
+short-open|4xx2/3d1d2/l2lxx2 l 3 2 4 1|0|
+short-open|4xx2/3d1d2/l2lxx2 l 3 2 4 1|1|1>2 4>5
+short-open|4xx2/3d1d2/l2lxx2 l 3 2 4 1|2|0>2 1>3 4>6
+short-open|4xx2/3d1d2/l2lxx2 l 3 2 4 1|3|0>3 4>7
+short-open|4xx2/3d1d2/l2lxx2 l 3 2 4 1|4|1>5 4>8x*
+short-open|4xxd1/1ldld1d1/1l2xx2 d 2 2 3 0|0|
+short-open|4xxd1/1ldld1d1/1l2xx2 d 2 2 3 0|1|0>1 7>8x* 9>10 11>12 14>15
+short-open|4xxd1/1ldld1d1/1l2xx2 d 2 2 3 0|2|0>2 11>13
+short-open|4xxd1/1ldld1d1/1l2xx2 d 2 2 3 0|3|0>3 7>10 9>12
+short-open|4xxd1/1ldld1d1/1l2xx2 d 2 2 3 0|4|0>4* 9>13 11>15
+short-open|4xx2/3l4/1l2xx2 d 2 3 7 0|0|
+short-open|4xx2/3l4/1l2xx2 d 2 3 7 0|1|0>1
+short-open|4xx2/3l4/1l2xx2 d 2 3 7 0|2|0>2
+short-open|4xx2/3l4/1l2xx2 d 2 3 7 0|3|0>3
+short-open|4xx2/3l4/1l2xx2 d 2 3 7 0|4|0>4*
+short-open|1d2xxdd/d1ddd3/3lxxll l 4 0 0 0|0|
+short-open|1d2xxdd/d1ddd3/3lxxll l 4 0 0 0|1|1>2 14>15
+short-open|1d2xxdd/d1ddd3/3lxxll l 4 0 0 0|2|0>2 1>3 13>15
+short-open|1d2xxdd/d1ddd3/3lxxll l 4 0 0 0|3|0>3 1>4*
+short-open|1d2xxdd/d1ddd3/3lxxll l 4 0 0 0|4|0>4* 1>5x
+short-open|4xx2/dl1l4/2l1xxl1 d 1 2 2 4|0|
+short-open|4xx2/dl1l4/2l1xxl1 d 1 2 2 4|1|0>1 5>6x
+short-open|4xx2/dl1l4/2l1xxl1 d 1 2 2 4|2|0>2 5>7
+short-open|4xx2/dl1l4/2l1xxl1 d 1 2 2 4|3|0>3 5>8x*
+short-open|4xx2/dl1l4/2l1xxl1 d 1 2 2 4|4|0>4* 5>9
+short-open|4xx2/3l4/4xx2 d 4 2 2 5|0|
+short-open|4xx2/3l4/4xx2 d 4 2 2 5|1|0>1
+short-open|4xx2/3l4/4xx2 d 4 2 2 5|2|0>2
+short-open|4xx2/3l4/4xx2 d 4 2 2 5|3|0>3
+short-open|4xx2/3l4/4xx2 d 4 2 2 5|4|0>4*
+short-open|d3xx2/1l1l4/1l2xx1l d 0 3 5 1|0|
+short-open|d3xx2/1l1l4/1l2xx1l d 0 3 5 1|1|0>1 4>5
+short-open|d3xx2/1l1l4/1l2xx1l d 0 3 5 1|2|0>2 4>6x
+short-open|d3xx2/1l1l4/1l2xx1l d 0 3 5 1|3|0>3 4>7
+short-open|d3xx2/1l1l4/1l2xx1l d 0 3 5 1|4|4>8x*
+short-open|4xx2/1l1dl3/l1l1xxl1 l 0 2 6 0|0|
+short-open|4xx2/1l1dl3/l1l1xxl1 l 0 2 6 0|1|2>3 4>5 6>7 9>10 14>15
+short-open|4xx2/1l1dl3/l1l1xxl1 l 0 2 6 0|2|6>8x* 9>11
+short-open|4xx2/1l1dl3/l1l1xxl1 l 0 2 6 0|3|2>5 4>7 9>12
+short-open|4xx2/1l1dl3/l1l1xxl1 l 0 2 6 0|4|4>8x* 6>10 9>13
+short-open|2d1xx2/dl1l1l2/ll2xxl1 d 1 0 2 3|0|
+short-open|2d1xx2/dl1l1l2/ll2xxl1 d 1 0 2 3|1|0>1 2>3 5>6x
+short-open|2d1xx2/dl1l1l2/ll2xxl1 d 1 0 2 3|2|2>4* 5>7
+short-open|2d1xx2/dl1l1l2/ll2xxl1 d 1 0 2 3|3|0>3 5>8x*
+short-open|2d1xx2/dl1l1l2/ll2xxl1 d 1 0 2 3|4|0>4* 2>6x 5>9
+short-open|2ddxxd1/d1dl2dd/4xx2 d 1 5 0 0|0|
+short-open|2ddxxd1/d1dl2dd/4xx2 d 1 5 0 0|1|2>3 5>6 7>8x* 12>13 14>15
+short-open|2ddxxd1/d1dl2dd/4xx2 d 1 5 0 0|2|1>3 2>4* 7>9 11>13
+short-open|2ddxxd1/d1dl2dd/4xx2 d 1 5 0 0|3|1>4* 5>8x* 7>10 12>15
+short-open|2ddxxd1/d1dl2dd/4xx2 d 1 5 0 0|4|2>6 5>9 11>15
+short-open|4xx2/1llll1d1/4xxl1 d 0 2 3 3|0|
+short-open|4xx2/1llll1d1/4xxl1 d 0 2 3 3|1|0>1 11>12
+short-open|4xx2/1llll1d1/4xxl1 d 0 2 3 3|2|0>2 11>13
+short-open|4xx2/1llll1d1/4xxl1 d 0 2 3 3|3|0>3 11>14*
+short-open|4xx2/1llll1d1/4xxl1 d 0 2 3 3|4|0>4* 11>15
+short-open|1dddxxd1/1l1l3l/1l2xx2 d 0 3 2 1|0|
+short-open|1dddxxd1/1l1l3l/1l2xx2 d 0 3 2 1|1|3>4* 14>15
+short-open|1dddxxd1/1l1l3l/1l2xx2 d 0 3 2 1|2|2>4* 3>5
+short-open|1dddxxd1/1l1l3l/1l2xx2 d 0 3 2 1|3|1>4* 2>5 3>6x
+short-open|1dddxxd1/1l1l3l/1l2xx2 d 0 3 2 1|4|0>4* 1>5 2>6x 3>7
+short-open|dd2xx2/l2d1ll1/4xx1l l 3 0 2 2|0|
+short-open|dd2xx2/l2d1ll1/4xx1l l 3 0 2 2|1|0>1 5>6 11>12 13>14*
+short-open|dd2xx2/l2d1ll1/4xx1l l 3 0 2 2|2|0>2 5>7 10>12 13>15
+short-open|dd2xx2/l2d1ll1/4xx1l l 3 0 2 2|3|0>3 5>8x* 11>14*
+short-open|dd2xx2/l2d1ll1/4xx1l l 3 0 2 2|4|0>4* 5>9 10>14* 11>15
+short-open|dd1dxxd1/l1lllddd/1ll1xxl1 d 0 0 0 0|0|
+short-open|dd1dxxd1/l1lllddd/1ll1xxl1 d 0 0 0 0|1|1>2 4>5x 12>13 14>15
+short-open|dd1dxxd1/l1lllddd/1ll1xxl1 d 0 0 0 0|2|3>5x 4>6 11>13
+short-open|dd1dxxd1/l1lllddd/1ll1xxl1 d 0 0 0 0|3|3>6 4>7x 10>13 12>15
+short-open|dd1dxxd1/l1lllddd/1ll1xxl1 d 0 0 0 0|4|1>5x 3>7x 4>8x* 11>15
+short-open|3dxxd1/dd1lddl1/l1llxx1l d 0 1 0 1|0|
+short-open|3dxxd1/dd1lddl1/l1llxx1l d 0 1 0 1|1|1>2 6>7 10>11x 14>15
+short-open|3dxxd1/dd1lddl1/l1llxx1l d 0 1 0 1|2|1>3 5>7 6>8x* 9>11x 10>12
+short-open|3dxxd1/dd1lddl1/l1llxx1l d 0 1 0 1|3|1>4* 5>8x* 9>12 10>13
+short-open|3dxxd1/dd1lddl1/l1llxx1l d 0 1 0 1|4|9>13
+short-open|4xx2/d2dld1l/ll1lxx2 l 2 0 2 2|0|
+short-open|4xx2/d2dld1l/ll1lxx2 l 2 0 2 2|1|1>2 4>5x 9>10x 12>13
+short-open|4xx2/d2dld1l/ll1lxx2 l 2 0 2 2|2|0>2 3>5x 4>6 9>11 12>14*
+short-open|4xx2/d2dld1l/ll1lxx2 l 2 0 2 2|3|3>6 4>7 12>15
+short-open|4xx2/d2dld1l/ll1lxx2 l 2 0 2 2|4|1>5x 3>7 4>8x* 9>13
+short-open|4xx2/2ldl2l/1l1lxx2 l 0 2 1 5|0|
+short-open|4xx2/2ldl2l/1l1lxx2 l 0 2 1 5|1|1>2 3>4* 7>8x* 9>10 12>13
+short-open|4xx2/2ldl2l/1l1lxx2 l 0 2 1 5|2|3>5 9>11 12>14*
+short-open|4xx2/2ldl2l/1l1lxx2 l 0 2 1 5|3|1>4* 3>6 7>10 12>15
+short-open|4xx2/2ldl2l/1l1lxx2 l 0 2 1 5|4|1>5 7>11 9>13
+short-open|d1ddxx2/d1lddlll/3lxx2 l 0 2 1 0|0|
+short-open|d1ddxx2/d1lddlll/3lxx2 l 0 2 1 0|1|1>2 7>8x* 12>13
+short-open|d1ddxx2/d1lddlll/3lxx2 l 0 2 1 0|2|1>3 7>9x 11>13 12>14*
+short-open|d1ddxx2/d1lddlll/3lxx2 l 0 2 1 0|3|1>4* 10>13 11>14* 12>15
+short-open|d1ddxx2/d1lddlll/3lxx2 l 0 2 1 0|4|1>5x 10>14* 11>15
+short-open|2ddxxdd/3ldd1d/4xx2 d 3 3 0 0|0|
+short-open|2ddxxdd/3ldd1d/4xx2 d 3 3 0 0|1|2>3 10>11 14>15
+short-open|2ddxxdd/3ldd1d/4xx2 d 3 3 0 0|2|1>3 2>4* 9>11 13>15
+short-open|2ddxxdd/3ldd1d/4xx2 d 3 3 0 0|3|1>4* 2>5 12>15
+short-open|2ddxxdd/3ldd1d/4xx2 d 3 3 0 0|4|1>5 2>6
+short-open|4xx2/d2d3d/4xx2 l 1 6 4 0|0|
+short-open|4xx2/d2d3d/4xx2 l 1 6 4 0|1|0>1
+short-open|4xx2/d2d3d/4xx2 l 1 6 4 0|2|0>2
+short-open|4xx2/d2d3d/4xx2 l 1 6 4 0|3|0>3
+short-open|4xx2/d2d3d/4xx2 l 1 6 4 0|4|0>4*
+short-open|d3xxd1/l1dddlll/l3xxll l 0 0 2 0|0|
+short-open|d3xxd1/l1dddlll/l3xxll l 0 0 2 0|1|5>6 14>15
+short-open|d3xxd1/l1dddlll/l3xxll l 0 0 2 0|2|4>6 5>7x 13>15
+short-open|d3xxd1/l1dddlll/l3xxll l 0 0 2 0|3|4>7x 5>8x* 12>15
+short-open|d3xxd1/l1dddlll/l3xxll l 0 0 2 0|4|4>8x* 5>9x 11>15
+short-open|d3xx1d/3d4/4xx2 l 5 2 1 3|0|
+short-open|d3xx1d/3d4/4xx2 l 5 2 1 3|1|0>1
+short-open|d3xx1d/3d4/4xx2 l 5 2 1 3|2|0>2
+short-open|d3xx1d/3d4/4xx2 l 5 2 1 3|3|0>3
+short-open|d3xx1d/3d4/4xx2 l 5 2 1 3|4|0>4*
+short-open|3dxx2/1l1l3d/4xx2 d 0 5 1 4|0|
+short-open|3dxx2/1l1l3d/4xx2 d 0 5 1 4|1|1>2 12>13
+short-open|3dxx2/1l1l3d/4xx2 d 0 5 1 4|2|0>2 1>3 12>14*
+short-open|3dxx2/1l1l3d/4xx2 d 0 5 1 4|3|0>3 1>4* 12>15
+short-open|3dxx2/1l1l3d/4xx2 d 0 5 1 4|4|0>4* 1>5
+short-open|1d2xxdd/3ddd2/4xx2 l 4 3 1 0|0|
+short-open|1d2xxdd/3ddd2/4xx2 l 4 3 1 0|1|0>1
+short-open|1d2xxdd/3ddd2/4xx2 l 4 3 1 0|2|0>2
+short-open|1d2xxdd/3ddd2/4xx2 l 4 3 1 0|3|0>3
+short-open|1d2xxdd/3ddd2/4xx2 l 4 3 1 0|4|0>4*
+short-open|dd1dxxdd/2dl4/4xxl1 d 4 1 1 0|0|
+short-open|dd1dxxdd/2dl4/4xxl1 d 4 1 1 0|1|1>2 4>5 7>8x* 14>15
+short-open|dd1dxxdd/2dl4/4xxl1 d 4 1 1 0|2|0>2 3>5 4>6 7>9 13>15
+short-open|dd1dxxdd/2dl4/4xxl1 d 4 1 1 0|3|3>6 7>10
+short-open|dd1dxxdd/2dl4/4xxl1 d 4 1 1 0|4|1>5 4>8x* 7>11
+short-open|1dd1xx2/2lld1d1/l2lxx1l d 2 0 3 0|0|
+short-open|1dd1xx2/2lld1d1/l2lxx1l d 2 0 3 0|1|0>1 3>4* 9>10 11>12
+short-open|1dd1xx2/2lld1d1/l2lxx1l d 2 0 3 0|2|2>4* 3>5 11>13
+short-open|1dd1xx2/2lld1d1/l2lxx1l d 2 0 3 0|3|2>5 3>6 9>12 11>14*
+short-open|1dd1xx2/2lld1d1/l2lxx1l d 2 0 3 0|4|0>4* 2>6 3>7x 9>13 11>15
+short-open|dd1dxxd1/1lllddd1/2l1xx2 d 2 1 0 0|0|
+short-open|dd1dxxd1/1lllddd1/2l1xx2 d 2 1 0 0|1|1>2 4>5 11>12 14>15
+short-open|dd1dxxd1/1lllddd1/2l1xx2 d 2 1 0 0|2|3>5 4>6x 10>12 11>13
+short-open|dd1dxxd1/1lllddd1/2l1xx2 d 2 1 0 0|3|3>6x 4>7x 9>12 10>13
+short-open|dd1dxxd1/1lllddd1/2l1xx2 d 2 1 0 0|4|1>5 3>7x 4>8x* 9>13 11>15
+short-open|2ddxx1d/1ddl2dd/4xx2 d 3 3 0 0|0|
+short-open|2ddxx1d/1ddl2dd/4xx2 d 3 3 0 0|1|2>3 7>8x* 13>14*
+short-open|2ddxx1d/1ddl2dd/4xx2 d 3 3 0 0|2|1>3 2>4* 6>8x* 7>9 12>14* 13>15
+short-open|2ddxx1d/1ddl2dd/4xx2 d 3 3 0 0|3|1>4* 2>5 6>9 7>10 11>14* 12>15
+short-open|2ddxx1d/1ddl2dd/4xx2 d 3 3 0 0|4|1>5 6>10 11>15
+short-open|4xx2/3l4/4xx2 d 3 3 7 0|0|
+short-open|4xx2/3l4/4xx2 d 3 3 7 0|1|0>1
+short-open|4xx2/3l4/4xx2 d 3 3 7 0|2|0>2
+short-open|4xx2/3l4/4xx2 d 3 3 7 0|3|0>3
+short-open|4xx2/3l4/4xx2 d 3 3 7 0|4|0>4*
+short-open|4xxdd/l1ldlddl/4xxl1 l 2 0 1 1|0|
+short-open|4xxdd/l1ldlddl/4xxl1 l 2 0 1 1|1|0>1 5>6 7>8x* 9>10x 12>13 14>15
+short-open|4xxdd/l1ldlddl/4xxl1 l 2 0 1 1|2|0>2 9>11x
+short-open|4xxdd/l1ldlddl/4xxl1 l 2 0 1 1|3|0>3 5>8x* 7>10x 12>15
+short-open|4xxdd/l1ldlddl/4xxl1 l 2 0 1 1|4|0>4* 7>11x 9>13
+short-open|2d1xx2/dllldld1/2l1xxl1 d 0 1 2 1|0|
+short-open|2d1xx2/dllldld1/2l1xxl1 d 0 1 2 1|1|0>1 2>3 5>6x 9>10x 11>12
+short-open|2d1xx2/dllldld1/2l1xxl1 d 0 1 2 1|2|2>4* 5>7x 11>13
+short-open|2d1xx2/dllldld1/2l1xxl1 d 0 1 2 1|3|0>3 5>8x* 9>12 11>14*
+short-open|2d1xx2/dllldld1/2l1xxl1 d 0 1 2 1|4|0>4* 2>6x 9>13 11>15
+short-open|d2dxxd1/ldld2ld/ll1lxxl1 l 0 0 1 0|0|
+short-open|d2dxxd1/ldld2ld/ll1lxxl1 l 0 0 1 0|1|1>2 5>6x 7>8x* 11>12x 14>15
+short-open|d2dxxd1/ldld2ld/ll1lxxl1 l 0 0 1 0|2|4>6x 7>9 11>13
+short-open|d2dxxd1/ldld2ld/ll1lxxl1 l 0 0 1 0|3|3>6x 5>8x* 7>10
+short-open|d2dxxd1/ldld2ld/ll1lxxl1 l 0 0 1 0|4|4>8x* 5>9 11>15
+short-open|d3xx2/l1ldlll1/l1l1xx2 l 0 0 5 0|0|
+short-open|d3xx2/l1ldlll1/l1l1xx2 l 0 0 5 0|1|2>3 5>6 7>8x* 11>12
+short-open|d3xx2/l1ldlll1/l1l1xx2 l 0 0 5 0|2|4>6 10>12 11>13
+short-open|d3xx2/l1ldlll1/l1l1xx2 l 0 0 5 0|3|5>8x* 9>12 10>13 11>14*
+short-open|d3xx2/l1ldlll1/l1l1xx2 l 0 0 5 0|4|2>6 4>8x* 9>13 10>14* 11>15
+short-open|4xx2/dl1ddl1d/1l2xx2 l 4 0 1 2|0|
+short-open|4xx2/dl1ddl1d/1l2xx2 l 4 0 1 2|1|0>1 3>4* 6>7 10>11
+short-open|4xx2/dl1ddl1d/1l2xx2 l 4 0 1 2|2|0>2 3>5x 6>8x* 10>12x
+short-open|4xx2/dl1ddl1d/1l2xx2 l 4 0 1 2|3|6>9x 10>13
+short-open|4xx2/dl1ddl1d/1l2xx2 l 4 0 1 2|4|0>4* 3>7 10>14*
+short-open|4xx2/2ldll2/ll2xxl1 l 0 1 0 6|0|
+short-open|4xx2/2ldll2/ll2xxl1 l 0 1 0 6|1|4>5 7>8x* 10>11 14>15
+short-open|4xx2/2ldll2/ll2xxl1 l 0 1 0 6|2|3>5 4>6 9>11 10>12
+short-open|4xx2/2ldll2/ll2xxl1 l 0 1 0 6|3|3>6 9>12 10>13
+short-open|4xx2/2ldll2/ll2xxl1 l 0 1 0 6|4|4>8x* 7>11 9>13
+short-open|4xxd1/d4lld/2l1xxl1 d 2 1 4 0|0|
+short-open|4xxd1/d4lld/2l1xxl1 d 2 1 4 0|1|0>1 5>6 12>13 14>15
+short-open|4xxd1/d4lld/2l1xxl1 d 2 1 4 0|2|0>2 5>7
+short-open|4xxd1/d4lld/2l1xxl1 d 2 1 4 0|3|0>3 5>8* 12>15
+short-open|4xxd1/d4lld/2l1xxl1 d 2 1 4 0|4|0>4* 5>9
+short-open|4xx2/2l2d1d/4xxl1 d 1 4 4 1|0|
+short-open|4xx2/2l2d1d/4xxl1 d 1 4 4 1|1|0>1 10>11 12>13
+short-open|4xx2/2l2d1d/4xxl1 d 1 4 4 1|2|0>2 12>14*
+short-open|4xx2/2l2d1d/4xxl1 d 1 4 4 1|3|0>3 10>13 12>15
+short-open|4xx2/2l2d1d/4xxl1 d 1 4 4 1|4|0>4* 10>14*
+short-open|d1d1xx2/d1l1l2l/4xx2 l 0 4 4 0|0|
+short-open|d1d1xx2/d1l1l2l/4xx2 l 0 4 4 0|1|7>8* 9>10 12>13
+short-open|d1d1xx2/d1l1l2l/4xx2 l 0 4 4 0|2|9>11 12>14*
+short-open|d1d1xx2/d1l1l2l/4xx2 l 0 4 4 0|3|7>10 12>15
+short-open|d1d1xx2/d1l1l2l/4xx2 l 0 4 4 0|4|7>11 9>13
+short-open|2d1xx2/1l1d2d1/l2lxx1l l 0 3 0 4|0|
+short-open|2d1xx2/1l1d2d1/l2lxx1l l 0 3 0 4|1|1>2 4>5 6>7 13>14*
+short-open|2d1xx2/1l1d2d1/l2lxx1l l 0 3 0 4|2|1>3 6>8x* 13>15
+short-open|2d1xx2/1l1d2d1/l2lxx1l l 0 3 0 4|3|4>7 6>9
+short-open|2d1xx2/1l1d2d1/l2lxx1l l 0 3 0 4|4|1>5 4>8x* 6>10
+short-open|3dxxd1/5ddl/1l2xx2 l 5 0 1 2|0|
+short-open|3dxxd1/5ddl/1l2xx2 l 5 0 1 2|1|0>1 3>4* 12>13
+short-open|3dxxd1/5ddl/1l2xx2 l 5 0 1 2|2|0>2 3>5 12>14*
+short-open|3dxxd1/5ddl/1l2xx2 l 5 0 1 2|3|3>6 12>15
+short-open|3dxxd1/5ddl/1l2xx2 l 5 0 1 2|4|0>4* 3>7
+short-open|4xx1d/dlddldd1/ll1lxxll d 0 0 0 1|0|
+short-open|4xx1d/dlddldd1/ll1lxxll d 0 0 0 1|1|5>6x 8>9x 11>12 13>14*
+short-open|4xx1d/dlddldd1/ll1lxxll d 0 0 0 1|2|7>9x 10>12 13>15
+short-open|4xx1d/dlddldd1/ll1lxxll d 0 0 0 1|3|11>14*
+short-open|4xx1d/dlddldd1/ll1lxxll d 0 0 0 1|4|5>9x 8>12 10>14* 11>15
+short-open|4xx2/1lll3d/2l1xxll d 1 0 5 1|0|
+short-open|4xx2/1lll3d/2l1xxll d 1 0 5 1|1|0>1 12>13
+short-open|4xx2/1lll3d/2l1xxll d 1 0 5 1|2|0>2 12>14*
+short-open|4xx2/1lll3d/2l1xxll d 1 0 5 1|3|0>3 12>15
+short-open|4xx2/1lll3d/2l1xxll d 1 0 5 1|4|0>4*
+short-open|2d1xxd1/d2dl1ll/lll1xx1l l 0 0 3 0|0|
+short-open|2d1xxd1/d2dl1ll/lll1xx1l l 0 0 3 0|1|4>5x 9>10 13>14*
+short-open|2d1xxd1/d2dl1ll/lll1xx1l l 0 0 3 0|2|3>5x 4>6 12>14* 13>15
+short-open|2d1xxd1/d2dl1ll/lll1xx1l l 0 0 3 0|3|2>5x 3>6 4>7 11>14* 12>15
+short-open|2d1xxd1/d2dl1ll/lll1xx1l l 0 0 3 0|4|2>6 3>7 4>8x* 11>15
+short-open|d2dxx1d/l3ll1d/l3xx1l l 0 2 2 1|0|
+short-open|d2dxx1d/l3ll1d/l3xx1l l 0 2 2 1|1|5>6 10>11 13>14*
+short-open|d2dxx1d/l3ll1d/l3xx1l l 0 2 2 1|2|4>6 5>7 9>11 10>12x 13>15
+short-open|d2dxx1d/l3ll1d/l3xx1l l 0 2 2 1|3|4>7 5>8* 9>12x
+short-open|d2dxx1d/l3ll1d/l3xx1l l 0 2 2 1|4|4>8* 10>14*
+short-open|4xx1d/dd2l2l/ll2xxll l 0 1 3 1|0|
+short-open|4xx1d/dd2l2l/ll2xxll l 0 1 3 1|1|4>5x 9>10 14>15
+short-open|4xx1d/dd2l2l/ll2xxll l 0 1 3 1|2|3>5x 4>6x 9>11 13>15
+short-open|4xx1d/dd2l2l/ll2xxll l 0 1 3 1|3|3>6x 4>7 12>15
+short-open|4xx1d/dd2l2l/ll2xxll l 0 1 3 1|4|3>7 4>8*
+short-open|1d2xxd1/2d5/llllxxll l 0 1 4 0|0|
+short-open|1d2xxd1/2d5/llllxxll l 0 1 4 0|1|4>5 14>15
+short-open|1d2xxd1/2d5/llllxxll l 0 1 4 0|2|3>5 4>6 13>15
+short-open|1d2xxd1/2d5/llllxxll l 0 1 4 0|3|2>5 3>6 4>7x
+short-open|1d2xxd1/2d5/llllxxll l 0 1 4 0|4|1>5 2>6 3>7x 4>8*
+short-open|4xx1d/8/3lxx2 d 5 1 4 2|0|
+short-open|4xx1d/8/3lxx2 d 5 1 4 2|1|0>1 13>14*
+short-open|4xx1d/8/3lxx2 d 5 1 4 2|2|0>2 13>15
+short-open|4xx1d/8/3lxx2 d 5 1 4 2|3|0>3
+short-open|4xx1d/8/3lxx2 d 5 1 4 2|4|0>4*
+short-open|d3xxd1/4d2d/4xx2 d 1 6 0 3|0|
+short-open|d3xxd1/4d2d/4xx2 d 1 6 0 3|1|4>5 9>10 12>13 14>15
+short-open|d3xxd1/4d2d/4xx2 d 1 6 0 3|2|4>6 9>11
+short-open|d3xxd1/4d2d/4xx2 d 1 6 0 3|3|4>7 12>15
+short-open|d3xxd1/4d2d/4xx2 d 1 6 0 3|4|4>8* 9>13
+short-open|4xx2/l1ll3d/4xxl1 d 1 2 1 5|0|
+short-open|4xx2/l1ll3d/4xxl1 d 1 2 1 5|1|0>1 12>13
+short-open|4xx2/l1ll3d/4xxl1 d 1 2 1 5|2|0>2 12>14*
+short-open|4xx2/l1ll3d/4xxl1 d 1 2 1 5|3|0>3 12>15
+short-open|4xx2/l1ll3d/4xxl1 d 1 2 1 5|4|0>4*
+short-open|3dxxdd/1dd5/4xx1l l 0 6 0 2|0|
+short-open|3dxxdd/1dd5/4xx1l l 0 6 0 2|1|13>14*
+short-open|3dxxdd/1dd5/4xx1l l 0 6 0 2|2|13>15
+short-open|3dxxdd/1dd5/4xx1l l 0 6 0 2|3|
+short-open|3dxxdd/1dd5/4xx1l l 0 6 0 2|4|
+short-open|3dxx2/ddddd2d/4xx1l l 5 1 0 0|0|
+short-open|3dxx2/ddddd2d/4xx1l l 5 1 0 0|1|0>1 13>14*
+short-open|3dxx2/ddddd2d/4xx1l l 5 1 0 0|2|0>2 13>15
+short-open|3dxx2/ddddd2d/4xx1l l 5 1 0 0|3|0>3
+short-open|3dxx2/ddddd2d/4xx1l l 5 1 0 0|4|0>4*
+short-open|1d2xx1d/1d1dd2d/4xx2 d 0 7 1 0|0|
+short-open|1d2xx1d/1d1dd2d/4xx2 d 0 7 1 0|1|0>1 3>4* 6>7 9>10 13>14*
+short-open|1d2xx1d/1d1dd2d/4xx2 d 0 7 1 0|2|0>2 3>5 8>10 9>11 12>14* 13>15
+short-open|1d2xx1d/1d1dd2d/4xx2 d 0 7 1 0|3|8>11 12>15
+short-open|1d2xx1d/1d1dd2d/4xx2 d 0 7 1 0|4|0>4* 3>7 6>10
+short-open|dd1dxxd1/1d6/4xx1l l 0 6 2 0|0|
+short-open|dd1dxxd1/1d6/4xx1l l 0 6 2 0|1|13>14*
+short-open|dd1dxxd1/1d6/4xx1l l 0 6 2 0|2|13>15
+short-open|dd1dxxd1/1d6/4xx1l l 0 6 2 0|3|
+short-open|dd1dxxd1/1d6/4xx1l l 0 6 2 0|4|
+short-open|3dxx1d/1l3ll1/2llxxll d 0 0 1 4|0|
+short-open|3dxx1d/1l3ll1/2llxxll d 0 0 1 4|1|1>2 13>14*
+short-open|3dxx1d/1l3ll1/2llxxll d 0 0 1 4|2|0>2 1>3 13>15
+short-open|3dxx1d/1l3ll1/2llxxll d 0 0 1 4|3|0>3 1>4*
+short-open|3dxx1d/1l3ll1/2llxxll d 0 0 1 4|4|0>4* 1>5
+short-open|4xx2/8/4xx1l l 3 3 2 5|0|
+short-open|4xx2/8/4xx1l l 3 3 2 5|1|0>1 13>14*
+short-open|4xx2/8/4xx1l l 3 3 2 5|2|0>2 13>15
+short-open|4xx2/8/4xx1l l 3 3 2 5|3|0>3
+short-open|4xx2/8/4xx1l l 3 3 2 5|4|0>4*
+short-open|d1ddxxd1/2dlllll/4xx1l l 1 0 0 2|0|
+short-open|d1ddxxd1/2dlllll/4xx1l l 1 0 0 2|1|0>1 13>14*
+short-open|d1ddxxd1/2dlllll/4xx1l l 1 0 0 2|2|0>2 12>14* 13>15
+short-open|d1ddxxd1/2dlllll/4xx1l l 1 0 0 2|3|0>3 11>14* 12>15
+short-open|d1ddxxd1/2dlllll/4xx1l l 1 0 0 2|4|0>4* 10>14* 11>15
+short-open|4xx2/ddl2lll/1l1lxx2 l 1 0 2 3|0|
+short-open|4xx2/ddl2lll/1l1lxx2 l 1 0 2 3|1|1>2 3>4* 7>8* 12>13
+short-open|4xx2/ddl2lll/1l1lxx2 l 1 0 2 3|2|0>2 3>5x 7>9 11>13 12>14*
+short-open|4xx2/ddl2lll/1l1lxx2 l 1 0 2 3|3|1>4* 3>6x 10>13 11>14* 12>15
+short-open|4xx2/ddl2lll/1l1lxx2 l 1 0 2 3|4|0>4* 1>5x 10>14* 11>15
+short-open|3dxx1d/3lld2/l1llxxll d 0 0 1 3|0|
+short-open|3dxx1d/3lld2/l1llxxll d 0 0 1 3|1|1>2 10>11 13>14*
+short-open|3dxx1d/3lld2/l1llxxll d 0 0 1 3|2|0>2 1>3 10>12 13>15
+short-open|3dxx1d/3lld2/l1llxxll d 0 0 1 3|3|0>3 1>4*
+short-open|3dxx1d/3lld2/l1llxxll d 0 0 1 3|4|0>4* 1>5 10>14*
+short-open|3dxx1d/1d1ddd1l/ll2xx2 d 2 2 0 1|0|
+short-open|3dxx1d/1d1ddd1l/ll2xx2 d 2 2 0 1|1|1>2 6>7 10>11 13>14*
+short-open|3dxx1d/1d1ddd1l/ll2xx2 d 2 2 0 1|2|1>3 9>11 10>12x 13>15
+short-open|3dxx1d/1d1ddd1l/ll2xx2 d 2 2 0 1|3|1>4* 8>11 9>12x
+short-open|3dxx1d/1d1ddd1l/ll2xx2 d 2 2 0 1|4|1>5 8>12x 10>14*
+short-open|4xx1d/3dll1d/4xx2 d 0 5 4 0|0|
+short-open|4xx1d/3dll1d/4xx2 d 0 5 4 0|1|0>1 8>9x 13>14*
+short-open|4xx1d/3dll1d/4xx2 d 0 5 4 0|2|0>2 8>10x 12>14* 13>15
+short-open|4xx1d/3dll1d/4xx2 d 0 5 4 0|3|0>3 8>11 12>15
+short-open|4xx1d/3dll1d/4xx2 d 0 5 4 0|4|0>4*
+short-open|1d1dxx2/3dd2l/1l2xxl1 l 2 2 0 3|0|
+short-open|1d1dxx2/3dd2l/1l2xxl1 l 2 2 0 3|1|0>1 3>4* 12>13 14>15
+short-open|1d1dxx2/3dd2l/1l2xxl1 l 2 2 0 3|2|0>2 3>5
+short-open|1d1dxx2/3dd2l/1l2xxl1 l 2 2 0 3|3|3>6 12>15
+short-open|1d1dxx2/3dd2l/1l2xxl1 l 2 2 0 3|4|0>4* 3>7
+short-open|dd2xx2/1dd2d1d/4xx2 d 7 0 1 0|0|
+short-open|dd2xx2/1dd2d1d/4xx2 d 7 0 1 0|1|0>1 4>5 7>8* 10>11 12>13
+short-open|dd2xx2/1dd2d1d/4xx2 d 7 0 1 0|2|0>2 3>5 6>8* 7>9 12>14*
+short-open|dd2xx2/1dd2d1d/4xx2 d 7 0 1 0|3|6>9 10>13 12>15
+short-open|dd2xx2/1dd2d1d/4xx2 d 7 0 1 0|4|4>8* 7>11 10>14*
+short-open|2d1xx2/d3d2d/4xx2 d 0 7 3 0|0|
+short-open|2d1xx2/d3d2d/4xx2 d 0 7 3 0|1|0>1 2>3 5>6 9>10 12>13
+short-open|2d1xx2/d3d2d/4xx2 d 0 7 3 0|2|2>4* 5>7 9>11 12>14*
+short-open|2d1xx2/d3d2d/4xx2 d 0 7 3 0|3|0>3 5>8* 12>15
+short-open|2d1xx2/d3d2d/4xx2 d 0 7 3 0|4|0>4* 2>6 9>13
+short-open|4xx1d/3ll2d/3lxx1l d 1 2 0 5|0|
+short-open|4xx1d/3ll2d/3lxx1l d 1 2 0 5|1|13>14*
+short-open|4xx1d/3ll2d/3lxx1l d 1 2 0 5|2|12>14* 13>15
+short-open|4xx1d/3ll2d/3lxx1l d 1 2 0 5|3|12>15
+short-open|4xx1d/3ll2d/3lxx1l d 1 2 0 5|4|
+short-open|4xx1d/6ld/l2lxx2 d 4 0 2 3|0|
+short-open|4xx1d/6ld/l2lxx2 d 4 0 2 3|1|0>1 13>14*
+short-open|4xx1d/6ld/l2lxx2 d 4 0 2 3|2|0>2 12>14* 13>15
+short-open|4xx1d/6ld/l2lxx2 d 4 0 2 3|3|0>3 12>15
+short-open|4xx1d/6ld/l2lxx2 d 4 0 2 3|4|0>4*
+short-open|dd1dxx1d/1d1dldll/3lxx2 l 0 3 0 0|0|
+short-open|dd1dxx1d/1d1dldll/3lxx2 l 0 3 0 0|1|1>2 9>10x 12>13
+short-open|dd1dxx1d/1d1dldll/3lxx2 l 0 3 0 0|2|1>3 11>13 12>14*
+short-open|dd1dxx1d/1d1dldll/3lxx2 l 0 3 0 0|3|1>4* 11>14* 12>15
+short-open|dd1dxx1d/1d1dldll/3lxx2 l 0 3 0 0|4|1>5 9>13 11>15
+short-open|2d1xx2/l1l2dld/l3xx1l d 1 1 1 3|0|
+short-open|2d1xx2/l1l2dld/l3xx1l d 1 1 1 3|1|0>1 2>3 10>11x 12>13
+short-open|2d1xx2/l1l2dld/l3xx1l d 1 1 1 3|2|2>4* 12>14*
+short-open|2d1xx2/l1l2dld/l3xx1l d 1 1 1 3|3|0>3 2>5x 10>13 12>15
+short-open|2d1xx2/l1l2dld/l3xx1l d 1 1 1 3|4|0>4* 2>6 10>14*
+short-open|4xx1d/ll2dlld/2llxx1l d 0 0 3 1|0|
+short-open|4xx1d/ll2dlld/2llxx1l d 0 0 3 1|1|0>1 9>10x 13>14*
+short-open|4xx1d/ll2dlld/2llxx1l d 0 0 3 1|2|0>2 9>11x 12>14* 13>15
+short-open|4xx1d/ll2dlld/2llxx1l d 0 0 3 1|3|0>3 12>15
+short-open|4xx1d/ll2dlld/2llxx1l d 0 0 3 1|4|0>4*
+short-open|3dxx2/1llld2l/3lxx2 l 0 2 2 3|0|
+short-open|3dxx2/1llld2l/3lxx2 l 0 2 2 3|1|1>2 8>9x 12>13
+short-open|3dxx2/1llld2l/3lxx2 l 0 2 2 3|2|1>3 7>9x 8>10 12>14*
+short-open|3dxx2/1llld2l/3lxx2 l 0 2 2 3|3|1>4* 6>9x 7>10 8>11 12>15
+short-open|3dxx2/1llld2l/3lxx2 l 0 2 2 3|4|1>5 6>10 7>11
+short-open|2d1xx1d/2ldll2/4xx2 d 4 0 2 2|0|
+short-open|2d1xx1d/2ldll2/4xx2 d 4 0 2 2|1|0>1 2>3 8>9x 13>14*
+short-open|2d1xx1d/2ldll2/4xx2 d 4 0 2 2|2|2>4* 8>10x 13>15
+short-open|2d1xx1d/2ldll2/4xx2 d 4 0 2 2|3|0>3 2>5 8>11
+short-open|2d1xx1d/2ldll2/4xx2 d 4 0 2 2|4|0>4* 2>6 8>12
+short-open|4xx2/6ld/l2lxx2 d 3 1 2 4|0|
+short-open|4xx2/6ld/l2lxx2 d 3 1 2 4|1|0>1 12>13
+short-open|4xx2/6ld/l2lxx2 d 3 1 2 4|2|0>2 12>14*
+short-open|4xx2/6ld/l2lxx2 d 3 1 2 4|3|0>3 12>15
+short-open|4xx2/6ld/l2lxx2 d 3 1 2 4|4|0>4*
+short-open|dd2xx1d/l1d1dl1l/1l1lxxl1 d 1 0 0 2|0|
+short-open|dd2xx1d/l1d1dl1l/1l1lxxl1 d 1 0 0 2|1|4>5x 7>8* 9>10x 13>14*
+short-open|dd2xx1d/l1d1dl1l/1l1lxxl1 d 1 0 0 2|2|3>5x 4>6 9>11 13>15
+short-open|dd2xx1d/l1d1dl1l/1l1lxxl1 d 1 0 0 2|3|3>6 7>10x 9>12x
+short-open|dd2xx1d/l1d1dl1l/1l1lxxl1 d 1 0 0 2|4|4>8* 7>11
+short-open|dd1dxxdd/dl4d1/1l2xxl1 d 3 1 0 0|0|
+short-open|dd1dxxdd/dl4d1/1l2xxl1 d 3 1 0 0|1|1>2 5>6x 11>12 14>15
+short-open|dd1dxxdd/dl4d1/1l2xxl1 d 3 1 0 0|2|4>6x 5>7 13>15
+short-open|dd1dxxdd/dl4d1/1l2xxl1 d 3 1 0 0|3|3>6x 4>7 5>8*
+short-open|dd1dxxdd/dl4d1/1l2xxl1 d 3 1 0 0|4|3>7 4>8* 5>9 11>15
+short-open|2d1xx1d/3dddld/1lllxx2 d 2 1 0 1|0|
+short-open|2d1xx1d/3dddld/1lllxx2 d 2 1 0 1|1|2>3 10>11x 13>14*
+short-open|2d1xx1d/3dddld/1lllxx2 d 2 1 0 1|2|2>4* 9>11x 12>14* 13>15
+short-open|2d1xx1d/3dddld/1lllxx2 d 2 1 0 1|3|2>5 8>11x 12>15
+short-open|2d1xx1d/3dddld/1lllxx2 d 2 1 0 1|4|2>6 10>14*
+short-open|2ddxx1d/2dd2d1/l1l1xx1l l 4 0 0 1|0|
+short-open|2ddxx1d/2dd2d1/l1l1xx1l l 4 0 0 1|1|0>1 2>3 4>5 13>14*
+short-open|2ddxx1d/2dd2d1/l1l1xx1l l 4 0 0 1|2|4>6 13>15
+short-open|2ddxx1d/2dd2d1/l1l1xx1l l 4 0 0 1|3|0>3 2>5 4>7x
+short-open|2ddxx1d/2dd2d1/l1l1xx1l l 4 0 0 1|4|2>6 4>8x*
+long-safe|1d1dxx1d/1lld3d/l1l1xx1d l 2 1 1 0|0|
+long-safe|1d1dxx1d/1lld3d/l1l1xx1d l 2 1 1 0|1|0>1 2>3 4>5
+long-safe|1d1dxx1d/1lld3d/l1l1xx1d l 2 1 1 0|2|7>9
+long-safe|1d1dxx1d/1lld3d/l1l1xx1d l 2 1 1 0|3|0>3 2>5 6>9 7>10
+long-safe|1d1dxx1d/1lld3d/l1l1xx1d l 2 1 1 0|4|6>10 7>11
+long-safe|4xx2/3dl1l1/4xx2 l 2 3 5 1|0|
+long-safe|4xx2/3dl1l1/4xx2 l 2 3 5 1|1|0>1 9>10 11>12*
+long-safe|4xx2/3dl1l1/4xx2 l 2 3 5 1|2|0>2 11>13
+long-safe|4xx2/3dl1l1/4xx2 l 2 3 5 1|3|0>3 9>12* 11>14
+long-safe|4xx2/3dl1l1/4xx2 l 2 3 5 1|4|0>4* 9>13 11>15
+long-safe|4xx2/dldl2d1/4xxd1 d 1 4 0 3|0|
+long-safe|4xx2/dldl2d1/4xxd1 d 1 4 0 3|1|5>6x 12>13
+long-safe|4xx2/dldl2d1/4xxd1 d 1 4 0 3|2|7>9 11>13 12>14
+long-safe|4xx2/dldl2d1/4xxd1 d 1 4 0 3|3|7>10 11>14 12>15
+long-safe|4xx2/dldl2d1/4xxd1 d 1 4 0 3|4|5>9 11>15 12>16*
+long-safe|4xxl1/l1lldlll/4xx2 d 0 0 1 5|0|
+long-safe|4xxl1/l1lldlll/4xx2 d 0 0 1 5|1|0>1 9>10x
+long-safe|4xxl1/l1lldlll/4xx2 d 0 0 1 5|2|0>2 9>11x
+long-safe|4xxl1/l1lldlll/4xx2 d 0 0 1 5|3|0>3 9>12*
+long-safe|4xxl1/l1lldlll/4xx2 d 0 0 1 5|4|0>4* 9>13
+long-safe|1d2xxl1/ll1d1d1l/4xxl1 l 0 2 1 3|0|
+long-safe|1d2xxl1/ll1d1d1l/4xxl1 l 0 2 1 3|1|6>7 12>13 14>15 16>17
+long-safe|1d2xxl1/ll1d1d1l/4xxl1 l 0 2 1 3|2|5>7
+long-safe|1d2xxl1/ll1d1d1l/4xxl1 l 0 2 1 3|3|6>9 12>15 14>17
+long-safe|1d2xxl1/ll1d1d1l/4xxl1 l 0 2 1 3|4|5>9 6>10x
+long-safe|2d1xx1l/dldd2ld/4xx2 l 4 0 2 0|0|
+long-safe|2d1xx1l/dldd2ld/4xx2 l 4 0 2 0|1|0>1 6>7x 11>12* 13>14x
+long-safe|2d1xx1l/dldd2ld/4xx2 l 4 0 2 0|2|0>2 13>15
+long-safe|2d1xx1l/dldd2ld/4xx2 l 4 0 2 0|3|0>3 6>9 11>14x 13>16*
+long-safe|2d1xx1l/dldd2ld/4xx2 l 4 0 2 0|4|0>4* 6>10 11>15 13>17
+long-safe|4xx1l/3d1ll1/lll1xx2 l 1 0 0 6|0|
+long-safe|4xx1l/3d1ll1/lll1xx2 l 1 0 0 6|1|0>1 4>5 11>12* 13>14
+long-safe|4xx1l/3d1ll1/lll1xx2 l 1 0 0 6|2|3>5 4>6 10>12* 13>15
+long-safe|4xx1l/3d1ll1/lll1xx2 l 1 0 0 6|3|2>5 3>6 4>7 11>14 13>16*
+long-safe|4xx1l/3d1ll1/lll1xx2 l 1 0 0 6|4|2>6 3>7 10>14 11>15 13>17
+long-safe|4xx1l/l2d2l1/l3xx2 l 2 1 4 2|0|
+long-safe|4xx1l/l2d2l1/l3xx2 l 2 1 4 2|1|0>1 5>6 11>12* 13>14
+long-safe|4xx1l/l2d2l1/l3xx2 l 2 1 4 2|2|0>2 4>6 5>7 13>15
+long-safe|4xx1l/l2d2l1/l3xx2 l 2 1 4 2|3|0>3 4>7 11>14 13>16*
+long-safe|4xx1l/l2d2l1/l3xx2 l 2 1 4 2|4|5>9 11>15 13>17
+long-safe|4xx2/3lll1l/l1l1xxl1 d 0 0 5 2|0|
+long-safe|4xx2/3lll1l/l1l1xxl1 d 0 0 5 2|1|0>1
+long-safe|4xx2/3lll1l/l1l1xxl1 d 0 0 5 2|2|0>2
+long-safe|4xx2/3lll1l/l1l1xxl1 d 0 0 5 2|3|0>3
+long-safe|4xx2/3lll1l/l1l1xxl1 d 0 0 5 2|4|0>4*
+long-safe|1d1dxx2/1l1dld1d/l1llxxdd l 0 2 0 0|0|
+long-safe|1d1dxx2/1l1dld1d/l1llxxdd l 0 2 0 0|1|2>3 4>5 6>7 9>10x
+long-safe|1d1dxx2/1l1dld1d/l1llxxdd l 0 2 0 0|2|1>3 9>11
+long-safe|1d1dxx2/1l1dld1d/l1llxxdd l 0 2 0 0|3|2>5 4>7 9>12*
+long-safe|1d1dxx2/1l1dld1d/l1llxxdd l 0 2 0 0|4|1>5 6>10x 9>13
+long-safe|1dd1xxd1/ll1d1ldd/1l1lxxl1 l 0 1 1 0|0|
+long-safe|1dd1xxd1/ll1d1ldd/1l1lxxl1 l 0 1 1 0|1|1>2 3>4* 6>7 10>11x 16>17
+long-safe|1dd1xxd1/ll1d1ldd/1l1lxxl1 l 0 1 1 0|2|5>7
+long-safe|1dd1xxd1/ll1d1ldd/1l1lxxl1 l 0 1 1 0|3|1>4* 6>9 10>13
+long-safe|1dd1xxd1/ll1d1ldd/1l1lxxl1 l 0 1 1 0|4|3>7 5>9 10>14x
+long-safe|ddd1xx2/1ddl1l2/4xx1d d 4 1 1 0|0|
+long-safe|ddd1xx2/1ddl1l2/4xx1d d 4 1 1 0|1|0>1 4>5 13>14
+long-safe|ddd1xx2/1ddl1l2/4xx1d d 4 1 1 0|2|3>5 7>9 13>15
+long-safe|ddd1xx2/1ddl1l2/4xx1d d 4 1 1 0|3|2>5 6>9 7>10x 13>16*
+long-safe|ddd1xx2/1ddl1l2/4xx1d d 4 1 1 0|4|6>10x 7>11 13>17
+long-safe|4xx1d/1l1ldl1l/4xxd1 d 1 2 0 4|0|
+long-safe|4xx1d/1l1ldl1l/4xxd1 d 1 2 0 4|1|9>10x 12>13 15>16*
+long-safe|4xx1d/1l1ldl1l/4xxd1 d 1 2 0 4|2|9>11 12>14x 15>17
+long-safe|4xx1d/1l1ldl1l/4xxd1 d 1 2 0 4|3|
+long-safe|4xx1d/1l1ldl1l/4xxd1 d 1 2 0 4|4|9>13 12>16*
+long-safe|dd2xxl1/l2dl2l/ll2xxl1 l 0 0 3 1|0|
+long-safe|dd2xxl1/l2dl2l/ll2xxl1 l 0 0 3 1|1|5>6 9>10 12>13 14>15 16>17
+long-safe|dd2xxl1/l2dl2l/ll2xxl1 l 0 0 3 1|2|4>6 5>7 9>11
+long-safe|dd2xxl1/l2dl2l/ll2xxl1 l 0 0 3 1|3|3>6 4>7 12>15 14>17
+long-safe|dd2xxl1/l2dl2l/ll2xxl1 l 0 0 3 1|4|3>7 9>13
+long-safe|1d2xxll/l2ll1ld/l3xx2 d 0 0 5 0|0|
+long-safe|1d2xxll/l2ll1ld/l3xx2 d 0 0 5 0|1|0>1 3>4* 14>15x
+long-safe|1d2xxll/l2ll1ld/l3xx2 d 0 0 5 0|2|0>2 3>5x
+long-safe|1d2xxll/l2ll1ld/l3xx2 d 0 0 5 0|3|3>6 14>17
+long-safe|1d2xxll/l2ll1ld/l3xx2 d 0 0 5 0|4|0>4* 3>7
+long-safe|dd1dxxl1/l2dd1ld/1l1lxxdl l 1 0 0 0|0|
+long-safe|dd1dxxl1/l2dd1ld/1l1lxxdl l 1 0 0 0|1|1>2 3>4* 5>6 12>13
+long-safe|dd1dxxl1/l2dd1ld/1l1lxxdl l 1 0 0 0|2|0>2 5>7 11>13 12>14x 15>17
+long-safe|dd1dxxl1/l2dd1ld/1l1lxxdl l 1 0 0 0|3|1>4* 3>6 11>14x
+long-safe|dd1dxxl1/l2dd1ld/1l1lxxdl l 1 0 0 0|4|0>4* 3>7 5>9x
+long-safe|4xx1l/d2l1l2/l1l1xxl1 d 0 1 6 0|0|
+long-safe|4xx1l/d2l1l2/l1l1xxl1 d 0 1 6 0|1|0>1 5>6
+long-safe|4xx1l/d2l1l2/l1l1xxl1 d 0 1 6 0|2|0>2 5>7
+long-safe|4xx1l/d2l1l2/l1l1xxl1 d 0 1 6 0|3|0>3
+long-safe|4xx1l/d2l1l2/l1l1xxl1 d 0 1 6 0|4|0>4* 5>9
+long-safe|4xxl1/dl1l2l1/2llxx1l d 0 0 4 2|0|
+long-safe|4xxl1/dl1l2l1/2llxx1l d 0 0 4 2|1|0>1 5>6x
+long-safe|4xxl1/dl1l2l1/2llxx1l d 0 0 4 2|2|0>2 5>7
+long-safe|4xxl1/dl1l2l1/2llxx1l d 0 0 4 2|3|0>3
+long-safe|4xxl1/dl1l2l1/2llxx1l d 0 0 4 2|4|0>4* 5>9
+long-safe|4xx2/1l1l4/4xx2 d 4 1 7 0|0|
+long-safe|4xx2/1l1l4/4xx2 d 4 1 7 0|1|0>1
+long-safe|4xx2/1l1l4/4xx2 d 4 1 7 0|2|0>2
+long-safe|4xx2/1l1l4/4xx2 d 4 1 7 0|3|0>3
+long-safe|4xx2/1l1l4/4xx2 d 4 1 7 0|4|0>4*
+long-safe|4xx2/l2d3d/4xxd1 l 3 3 3 1|0|
+long-safe|4xx2/l2d3d/4xxd1 l 3 3 3 1|1|0>1 5>6
+long-safe|4xx2/l2d3d/4xxd1 l 3 3 3 1|2|0>2 5>7
+long-safe|4xx2/l2d3d/4xxd1 l 3 3 3 1|3|0>3
+long-safe|4xx2/l2d3d/4xxd1 l 3 3 3 1|4|0>4* 5>9
+long-safe|1d2xx2/1d1l3d/4xxd1 d 3 3 3 0|0|
+long-safe|1d2xx2/1d1l3d/4xxd1 d 3 3 3 0|1|0>1 3>4* 6>7 12>13 14>15
+long-safe|1d2xx2/1d1l3d/4xxd1 d 3 3 3 0|2|0>2 3>5 14>16*
+long-safe|1d2xx2/1d1l3d/4xxd1 d 3 3 3 0|3|6>9 12>15 14>17
+long-safe|1d2xx2/1d1l3d/4xxd1 d 3 3 3 0|4|0>4* 3>7 6>10 12>16*
+long-safe|1d2xxdd/3l4/3lxxd1 d 4 1 2 1|0|
+long-safe|1d2xxdd/3l4/3lxxd1 d 4 1 2 1|1|0>1 3>4* 12>13 16>17
+long-safe|1d2xxdd/3l4/3lxxd1 d 4 1 2 1|2|0>2 3>5 12>14 15>17
+long-safe|1d2xxdd/3l4/3lxxd1 d 4 1 2 1|3|3>6
+long-safe|1d2xxdd/3l4/3lxxd1 d 4 1 2 1|4|0>4* 3>7
+long-safe|d2dxx1l/1d1dl2l/1l2xxll l 1 0 0 3|0|
+long-safe|d2dxx1l/1d1dl2l/1l2xxll l 1 0 0 3|1|0>1 3>4* 9>10 16>17
+long-safe|d2dxx1l/1d1dl2l/1l2xxll l 1 0 0 3|2|0>2 3>5 9>11 15>17
+long-safe|d2dxx1l/1d1dl2l/1l2xxll l 1 0 0 3|3|3>6x 9>12* 14>17
+long-safe|d2dxx1l/1d1dl2l/1l2xxll l 1 0 0 3|4|0>4* 3>7 13>17
+long-safe|3dxx1d/l2ld2d/4xx1l d 1 3 1 2|0|
+long-safe|3dxx1d/l2ld2d/4xx1l d 1 3 1 2|1|1>2 9>10 15>16*
+long-safe|3dxx1d/l2ld2d/4xx1l d 1 3 1 2|2|0>2 1>3 9>11 14>16* 15>17
+long-safe|3dxx1d/l2ld2d/4xx1l d 1 3 1 2|3|0>3 1>4* 9>12* 14>17
+long-safe|3dxx1d/l2ld2d/4xx1l d 1 3 1 2|4|0>4* 1>5x 9>13x
+long-safe|2d1xxdl/1d1dll2/lll1xx1l l 0 0 1 2|0|
+long-safe|2d1xxdl/1d1dll2/lll1xx1l l 0 0 1 2|1|4>5 10>11 13>14 15>16*
+long-safe|2d1xxdl/1d1dll2/lll1xx1l l 0 0 1 2|2|3>5 4>6x 9>11 15>17
+long-safe|2d1xxdl/1d1dll2/lll1xx1l l 0 0 1 2|3|2>5 3>6x 4>7 13>16*
+long-safe|2d1xxdl/1d1dll2/lll1xx1l l 0 0 1 2|4|2>6x 3>7 10>14 13>17
+long-safe|4xxl1/dd1d1l2/3lxx1l l 3 0 3 1|0|
+long-safe|4xxl1/dd1d1l2/3lxx1l l 3 0 3 1|1|1>2 10>11 12>13 15>16*
+long-safe|4xxl1/dd1d1l2/3lxx1l l 3 0 3 1|2|0>2 1>3 12>14 15>17
+long-safe|4xxl1/dd1d1l2/3lxx1l l 3 0 3 1|3|0>3 1>4* 10>13
+long-safe|4xxl1/dd1d1l2/3lxx1l l 3 0 3 1|4|0>4* 1>5x 10>14 12>16*
+long-safe|4xxd1/2dl4/4xx2 d 6 0 2 3|0|
+long-safe|4xxd1/2dl4/4xx2 d 6 0 2 3|1|0>1 16>17
+long-safe|4xxd1/2dl4/4xx2 d 6 0 2 3|2|0>2 7>9
+long-safe|4xxd1/2dl4/4xx2 d 6 0 2 3|3|0>3 7>10
+long-safe|4xxd1/2dl4/4xx2 d 6 0 2 3|4|0>4* 7>11
+long-safe|1d2xxd1/ll1ll2l/2l1xx2 d 0 1 3 2|0|
+long-safe|1d2xxd1/ll1ll2l/2l1xx2 d 0 1 3 2|1|0>1 3>4* 16>17
+long-safe|1d2xxd1/ll1ll2l/2l1xx2 d 0 1 3 2|2|0>2 3>5x
+long-safe|1d2xxd1/ll1ll2l/2l1xx2 d 0 1 3 2|3|3>6x
+long-safe|1d2xxd1/ll1ll2l/2l1xx2 d 0 1 3 2|4|0>4* 3>7
+long-safe|3dxx2/d1dlddll/4xx1l d 2 1 1 1|0|
+long-safe|3dxx2/d1dlddll/4xx1l d 2 1 1 1|1|1>2 5>6 10>11x
+long-safe|3dxx2/d1dlddll/4xx1l d 2 1 1 1|2|0>2 1>3 9>11x 10>12*
+long-safe|3dxx2/d1dlddll/4xx1l d 2 1 1 1|3|0>3 1>4* 9>12* 10>13x
+long-safe|3dxx2/d1dlddll/4xx1l d 2 1 1 1|4|0>4* 7>11x 9>13x 10>14x
+long-safe|4xxl1/1l1d2ll/1l2xxll l 0 0 2 4|0|
+long-safe|4xxl1/1l1d2ll/1l2xxll l 0 0 2 4|1|3>4* 6>7 12>13 16>17
+long-safe|4xxl1/1l1d2ll/1l2xxll l 0 0 2 4|2|3>5 11>13 15>17
+long-safe|4xxl1/1l1d2ll/1l2xxll l 0 0 2 4|3|6>9 14>17
+long-safe|4xxl1/1l1d2ll/1l2xxll l 0 0 2 4|4|3>7 6>10
+long-safe|1d2xxdd/2lld2l/2l1xxl1 d 0 2 3 0|0|
+long-safe|1d2xxdd/2lld2l/2l1xxl1 d 0 2 3 0|1|0>1 3>4* 9>10 16>17
+long-safe|1d2xxdd/2lld2l/2l1xxl1 d 0 2 3 0|2|0>2 3>5 9>11 15>17
+long-safe|1d2xxdd/2lld2l/2l1xxl1 d 0 2 3 0|3|3>6
+long-safe|1d2xxdd/2lld2l/2l1xxl1 d 0 2 3 0|4|0>4* 3>7x 9>13
+long-safe|1d2xx1d/3l1l2/4xx1d d 1 4 2 2|0|
+long-safe|1d2xx1d/3l1l2/4xx1d d 1 4 2 2|1|0>1 3>4* 13>14 15>16*
+long-safe|1d2xx1d/3l1l2/4xx1d d 1 4 2 2|2|0>2 3>5 15>17
+long-safe|1d2xx1d/3l1l2/4xx1d d 1 4 2 2|3|3>6 13>16*
+long-safe|1d2xx1d/3l1l2/4xx1d d 1 4 2 2|4|0>4* 3>7 13>17
+long-safe|1d2xxd1/3ld1d1/4xx1d d 2 4 2 0|0|
+long-safe|1d2xxd1/3ld1d1/4xx1d d 2 4 2 0|1|0>1 3>4* 9>10 11>12* 13>14 16>17
+long-safe|1d2xxd1/3ld1d1/4xx1d d 2 4 2 0|2|0>2 3>5 13>15
+long-safe|1d2xxd1/3ld1d1/4xx1d d 2 4 2 0|3|3>6 9>12* 11>14
+long-safe|1d2xxd1/3ld1d1/4xx1d d 2 4 2 0|4|0>4* 3>7 11>15 13>17
+long-safe|1d1dxx2/d1dd4/4xx2 l 3 4 0 2|0|
+long-safe|1d1dxx2/d1dd4/4xx2 l 3 4 0 2|1|0>1
+long-safe|1d1dxx2/d1dd4/4xx2 l 3 4 0 2|2|0>2
+long-safe|1d1dxx2/d1dd4/4xx2 l 3 4 0 2|3|0>3
+long-safe|1d1dxx2/d1dd4/4xx2 l 3 4 0 2|4|0>4*
+long-safe|4xx2/3d4/4xx2 l 1 6 2 4|0|
+long-safe|4xx2/3d4/4xx2 l 1 6 2 4|1|0>1
+long-safe|4xx2/3d4/4xx2 l 1 6 2 4|2|0>2
+long-safe|4xx2/3d4/4xx2 l 1 6 2 4|3|0>3
+long-safe|4xx2/3d4/4xx2 l 1 6 2 4|4|0>4*
+long-safe|dd2xxdd/ld1dll2/4xxld l 1 2 0 0|0|
+long-safe|dd2xxdd/ld1dll2/4xxld l 1 2 0 0|1|0>1 5>6x 10>11 16>17
+long-safe|dd2xxdd/ld1dll2/4xxld l 1 2 0 0|2|0>2 5>7 9>11
+long-safe|dd2xxdd/ld1dll2/4xxld l 1 2 0 0|3|0>3 10>13x
+long-safe|dd2xxdd/ld1dll2/4xxld l 1 2 0 0|4|0>4* 9>13x 10>14
+long-safe|4xxl1/3d1l2/1l2xxd1 l 2 2 0 5|0|
+long-safe|4xxl1/3d1l2/1l2xxd1 l 2 2 0 5|1|0>1 3>4* 10>11 12>13
+long-safe|4xxl1/3d1l2/1l2xxd1 l 2 2 0 5|2|0>2 3>5 12>14
+long-safe|4xxl1/3d1l2/1l2xxd1 l 2 2 0 5|3|3>6 10>13 12>15
+long-safe|4xxl1/3d1l2/1l2xxd1 l 2 2 0 5|4|0>4* 3>7 10>14
+long-safe|d1d1xx2/3d1ldd/4xx1d l 4 2 1 0|0|
+long-safe|d1d1xx2/3d1ldd/4xx1d l 4 2 1 0|1|0>1 10>11x
+long-safe|d1d1xx2/3d1ldd/4xx1d l 4 2 1 0|2|0>2 10>12*
+long-safe|d1d1xx2/3d1ldd/4xx1d l 4 2 1 0|3|0>3 10>13
+long-safe|d1d1xx2/3d1ldd/4xx1d l 4 2 1 0|4|0>4* 10>14x
+long-safe|4xx2/1l1l1d2/4xxl1 d 4 0 3 3|0|
+long-safe|4xx2/1l1l1d2/4xxl1 d 4 0 3 3|1|0>1 10>11
+long-safe|4xx2/1l1l1d2/4xxl1 d 4 0 3 3|2|0>2
+long-safe|4xx2/1l1l1d2/4xxl1 d 4 0 3 3|3|0>3 10>13
+long-safe|4xx2/1l1l1d2/4xxl1 d 4 0 3 3|4|0>4* 10>14
+long-safe|4xxld/d2dld1d/l3xx1d l 3 1 1 0|0|
+long-safe|4xxld/d2dld1d/l3xx1d l 3 1 1 0|1|0>1 4>5x 9>10x 12>13x
+long-safe|4xxld/d2dld1d/l3xx1d l 3 1 1 0|2|0>2 4>6 9>11 12>14x
+long-safe|4xxld/d2dld1d/l3xx1d l 3 1 1 0|3|0>3 4>7 12>15x
+long-safe|4xxld/d2dld1d/l3xx1d l 3 1 1 0|4|9>13x 12>16*
+long-safe|4xx2/dl1l1dd1/2l1xx2 d 1 3 1 3|0|
+long-safe|4xx2/dl1l1dd1/2l1xx2 d 1 3 1 3|1|0>1 5>6x 11>12*
+long-safe|4xx2/dl1l1dd1/2l1xx2 d 1 3 1 3|2|0>2 5>7 10>12* 11>13
+long-safe|4xx2/dl1l1dd1/2l1xx2 d 1 3 1 3|3|0>3 10>13 11>14
+long-safe|4xx2/dl1l1dd1/2l1xx2 d 1 3 1 3|4|0>4* 5>9 10>14 11>15
+long-safe|4xxd1/3d4/4xx2 l 6 1 2 3|0|
+long-safe|4xxd1/3d4/4xx2 l 6 1 2 3|1|0>1
+long-safe|4xxd1/3d4/4xx2 l 6 1 2 3|2|0>2
+long-safe|4xxd1/3d4/4xx2 l 6 1 2 3|3|0>3
+long-safe|4xxd1/3d4/4xx2 l 6 1 2 3|4|0>4*
+long-safe|4xx1d/1dld1l1l/4xx2 l 2 2 1 3|0|
+long-safe|4xx1d/1dld1l1l/4xx2 l 2 2 1 3|1|0>1 10>11 14>15
+long-safe|4xx1d/1dld1l1l/4xx2 l 2 2 1 3|2|0>2 7>9 10>12* 14>16*
+long-safe|4xx1d/1dld1l1l/4xx2 l 2 2 1 3|3|0>3 10>13x 14>17
+long-safe|4xx1d/1dld1l1l/4xx2 l 2 2 1 3|4|0>4* 7>11
+long-safe|4xx2/3d4/4xx2 l 4 3 2 4|0|
+long-safe|4xx2/3d4/4xx2 l 4 3 2 4|1|0>1
+long-safe|4xx2/3d4/4xx2 l 4 3 2 4|2|0>2
+long-safe|4xx2/3d4/4xx2 l 4 3 2 4|3|0>3
+long-safe|4xx2/3d4/4xx2 l 4 3 2 4|4|0>4*
+long-safe|4xxll/l2l1l2/1l2xx2 d 1 0 5 2|0|
+long-safe|4xxll/l2l1l2/1l2xx2 d 1 0 5 2|1|0>1
+long-safe|4xxll/l2l1l2/1l2xx2 d 1 0 5 2|2|0>2
+long-safe|4xxll/l2l1l2/1l2xx2 d 1 0 5 2|3|0>3
+long-safe|4xxll/l2l1l2/1l2xx2 d 1 0 5 2|4|0>4*
+long-safe|4xx2/3d3l/4xxll l 4 0 1 5|0|
+long-safe|4xx2/3d3l/4xxll l 4 0 1 5|1|0>1 16>17
+long-safe|4xx2/3d3l/4xxll l 4 0 1 5|2|0>2 15>17
+long-safe|4xx2/3d3l/4xxll l 4 0 1 5|3|0>3 14>17
+long-safe|4xx2/3d3l/4xxll l 4 0 1 5|4|0>4*
+long-safe|d1d1xx2/2ddldd1/4xxd1 l 6 0 0 0|0|
+long-safe|d1d1xx2/2ddldd1/4xxd1 l 6 0 0 0|1|0>1 9>10x
+long-safe|d1d1xx2/2ddldd1/4xxd1 l 6 0 0 0|2|0>2 9>11x
+long-safe|d1d1xx2/2ddldd1/4xxd1 l 6 0 0 0|3|0>3 9>12*
+long-safe|d1d1xx2/2ddldd1/4xxd1 l 6 0 0 0|4|0>4* 9>13
+long-safe|4xx1d/2llldd1/lll1xxdd d 1 0 2 0|0|
+long-safe|4xx1d/2llldd1/lll1xxdd d 1 0 2 0|1|0>1 13>14 15>16*
+long-safe|4xx1d/2llldd1/lll1xxdd d 1 0 2 0|2|0>2 12>14 15>17
+long-safe|4xx1d/2llldd1/lll1xxdd d 1 0 2 0|3|0>3 11>14 13>16*
+long-safe|4xx1d/2llldd1/lll1xxdd d 1 0 2 0|4|0>4* 10>14 12>16* 13>17
+long-safe|1d2xx1d/2ddlld1/4xxdl l 1 3 1 0|0|
+long-safe|1d2xx1d/2ddlld1/4xxdl l 1 3 1 0|1|0>1 10>11x
+long-safe|1d2xx1d/2ddlld1/4xxdl l 1 3 1 0|2|0>2 9>11x 10>12* 15>17
+long-safe|1d2xx1d/2ddlld1/4xxdl l 1 3 1 0|3|0>3 9>12* 10>13x
+long-safe|1d2xx1d/2ddlld1/4xxdl l 1 3 1 0|4|0>4* 9>13x 10>14
+long-safe|4xxl1/lddd1ddd/4xx2 l 4 1 1 0|0|
+long-safe|4xxl1/lddd1ddd/4xx2 l 4 1 1 0|1|0>1 5>6x 12>13
+long-safe|4xxl1/lddd1ddd/4xx2 l 4 1 1 0|2|0>2 5>7x 12>14x
+long-safe|4xxl1/lddd1ddd/4xx2 l 4 1 1 0|3|0>3 12>15
+long-safe|4xxl1/lddd1ddd/4xx2 l 4 1 1 0|4|0>4* 5>9 12>16*
+long-safe|1dddxx1l/2dddl1l/1lllxxl1 l 0 0 0 1|0|
+long-safe|1dddxx1l/2dddl1l/1lllxxl1 l 0 0 0 1|1|3>4* 10>11 14>15 16>17
+long-safe|1dddxx1l/2dddl1l/1lllxxl1 l 0 0 0 1|2|2>4* 3>5 10>12* 13>15
+long-safe|1dddxx1l/2dddl1l/1lllxxl1 l 0 0 0 1|3|1>4* 2>5 3>6 14>17
+long-safe|1dddxx1l/2dddl1l/1lllxxl1 l 0 0 0 1|4|1>5 2>6 3>7x 13>17
+long-safe|d3xxld/2ll2l1/2l1xx1d d 1 1 3 1|0|
+long-safe|d3xxld/2ll2l1/2l1xx1d d 1 1 3 1|1|0>1 4>5 13>14
+long-safe|d3xxld/2ll2l1/2l1xx1d d 1 1 3 1|2|0>2 4>6 15>17
+long-safe|d3xxld/2ll2l1/2l1xx1d d 1 1 3 1|3|0>3 4>7x
+long-safe|d3xxld/2ll2l1/2l1xx1d d 1 1 3 1|4|13>17
+long-safe|d1d1xxd1/3l1dd1/4xxdd d 6 0 0 0|0|
+long-safe|d1d1xxd1/3l1dd1/4xxdd d 6 0 0 0|1|2>3 4>5 13>14 16>17
+long-safe|d1d1xxd1/3l1dd1/4xxdd d 6 0 0 0|2|4>6 12>14 13>15
+long-safe|d1d1xxd1/3l1dd1/4xxdd d 6 0 0 0|3|2>5 4>7 11>14 12>15
+long-safe|d1d1xxd1/3l1dd1/4xxdd d 6 0 0 0|4|2>6 10>14 11>15 13>17
+long-safe|4xx2/l2dd1l1/l3xx2 l 4 0 1 4|0|
+long-safe|4xx2/l2dd1l1/l3xx2 l 4 0 1 4|1|0>1 5>6 11>12*
+long-safe|4xx2/l2dd1l1/l3xx2 l 4 0 1 4|2|0>2 4>6 5>7 11>13
+long-safe|4xx2/l2dd1l1/l3xx2 l 4 0 1 4|3|0>3 4>7 11>14
+long-safe|4xx2/l2dd1l1/l3xx2 l 4 0 1 4|4|5>9x 11>15
+long-safe|3dxx2/lddlldl1/1l2xx1l d 0 1 0 3|0|
+long-safe|3dxx2/lddlldl1/1l2xx1l d 0 1 0 3|1|1>2 10>11x
+long-safe|3dxx2/lddlldl1/1l2xx1l d 0 1 0 3|2|1>3 7>9x 10>12*
+long-safe|3dxx2/lddlldl1/1l2xx1l d 0 1 0 3|3|1>4* 6>9x 10>13x
+long-safe|3dxx2/lddlldl1/1l2xx1l d 0 1 0 3|4|1>5x 7>11x 10>14
+long-safe|4xx1l/l2l4/1l1lxx2 d 2 0 1 6|0|
+long-safe|4xx1l/l2l4/1l1lxx2 d 2 0 1 6|1|0>1
+long-safe|4xx1l/l2l4/1l1lxx2 d 2 0 1 6|2|0>2
+long-safe|4xx1l/l2l4/1l1lxx2 d 2 0 1 6|3|0>3
+long-safe|4xx1l/l2l4/1l1lxx2 d 2 0 1 6|4|0>4*
+long-safe|4xx2/3l2l1/4xx2 d 0 5 5 2|0|
+long-safe|4xx2/3l2l1/4xx2 d 0 5 5 2|1|0>1
+long-safe|4xx2/3l2l1/4xx2 d 0 5 5 2|2|0>2
+long-safe|4xx2/3l2l1/4xx2 d 0 5 5 2|3|0>3
+long-safe|4xx2/3l2l1/4xx2 d 0 5 5 2|4|0>4*
+long-safe|4xx2/3l4/4xx2 d 2 4 6 1|0|
+long-safe|4xx2/3l4/4xx2 d 2 4 6 1|1|0>1
+long-safe|4xx2/3l4/4xx2 d 2 4 6 1|2|0>2
+long-safe|4xx2/3l4/4xx2 d 2 4 6 1|3|0>3
+long-safe|4xx2/3l4/4xx2 d 2 4 6 1|4|0>4*
+long-safe|3dxxd1/d1dl2d1/4xx1d d 3 3 0 1|0|
+long-safe|3dxxd1/d1dl2d1/4xx1d d 3 3 0 1|1|1>2 5>6 11>12* 13>14 16>17
+long-safe|3dxxd1/d1dl2d1/4xx1d d 3 3 0 1|2|1>3 7>9 13>15
+long-safe|3dxxd1/d1dl2d1/4xx1d d 3 3 0 1|3|1>4* 7>10 11>14
+long-safe|3dxxd1/d1dl2d1/4xx1d d 3 3 0 1|4|5>9 11>15 13>17
+long-safe|d1d1xxdl/llld1dld/l3xx1l l 0 0 1 0|0|
+long-safe|d1d1xxdl/llld1dld/l3xx1l l 0 0 1 0|1|13>14x 15>16*
+long-safe|d1d1xxdl/llld1dld/l3xx1l l 0 0 1 0|2|7>9 15>17
+long-safe|d1d1xxdl/llld1dld/l3xx1l l 0 0 1 0|3|6>9 7>10x 11>14x 13>16*
+long-safe|d1d1xxdl/llld1dld/l3xx1l l 0 0 1 0|4|5>9 6>10x 13>17
+long-safe|4xx1l/2lldldd/4xx2 l 3 0 4 0|0|
+long-safe|4xx1l/2lldldd/4xx2 l 3 0 4 0|1|0>1 8>9x 10>11x 13>14x
+long-safe|4xx1l/2lldldd/4xx2 l 3 0 4 0|2|0>2 7>9x 10>12* 13>15
+long-safe|4xx1l/2lldldd/4xx2 l 3 0 4 0|3|0>3 8>11x 13>16*
+long-safe|4xx1l/2lldldd/4xx2 l 3 0 4 0|4|0>4* 7>11x 8>12* 10>14x 13>17
+long-safe|4xxll/1l2l3/ll2xxl1 l 0 0 2 5|0|
+long-safe|4xxll/1l2l3/ll2xxl1 l 0 0 2 5|1|4>5 6>7 9>10 13>14 16>17
+long-safe|4xxll/1l2l3/ll2xxl1 l 0 0 2 5|2|3>5 6>8* 9>11 12>14 13>15
+long-safe|4xxll/1l2l3/ll2xxl1 l 0 0 2 5|3|4>7 12>15
+long-safe|4xxll/1l2l3/ll2xxl1 l 0 0 2 5|4|3>7 4>8* 6>10 13>17
+long-safe|4xxll/l4l1l/l3xx2 l 0 1 1 6|0|
+long-safe|4xxll/l4l1l/l3xx2 l 0 1 1 6|1|5>6 10>11 14>15
+long-safe|4xxll/l4l1l/l3xx2 l 0 1 1 6|2|4>6 5>7 13>15 14>16*
+long-safe|4xxll/l4l1l/l3xx2 l 0 1 1 6|3|4>7 5>8* 12>15 13>16* 14>17
+long-safe|4xxll/l4l1l/l3xx2 l 0 1 1 6|4|4>8* 5>9 12>16* 13>17
+long-safe|1d2xxll/ldld3l/4xxl1 l 1 0 2 2|0|
+long-safe|1d2xxll/ldld3l/4xxl1 l 1 0 2 2|1|0>1 5>6x 14>15 16>17
+long-safe|1d2xxll/ldld3l/4xxl1 l 1 0 2 2|2|0>2 7>9 13>15
+long-safe|1d2xxll/ldld3l/4xxl1 l 1 0 2 2|3|0>3 7>10 12>15 14>17
+long-safe|1d2xxll/ldld3l/4xxl1 l 1 0 2 2|4|0>4* 5>9 7>11 13>17
+long-safe|4xx2/1l3dl1/l2lxx1d d 3 0 1 4|0|
+long-safe|4xx2/1l3dl1/l2lxx1d d 3 0 1 4|1|0>1 10>11x 13>14
+long-safe|4xx2/1l3dl1/l2lxx1d d 3 0 1 4|2|0>2 10>12* 13>15
+long-safe|4xx2/1l3dl1/l2lxx1d d 3 0 1 4|3|0>3 13>16*
+long-safe|4xx2/1l3dl1/l2lxx1d d 3 0 1 4|4|0>4* 10>14 13>17
+long-safe|1d2xxdl/1d2d1dl/4xx2 l 3 2 0 2|0|
+long-safe|1d2xxdl/1d2d1dl/4xx2 l 3 2 0 2|1|0>1 14>15
+long-safe|1d2xxdl/1d2d1dl/4xx2 l 3 2 0 2|2|0>2 13>15 14>16*
+long-safe|1d2xxdl/1d2d1dl/4xx2 l 3 2 0 2|3|0>3 13>16* 14>17
+long-safe|1d2xxdl/1d2d1dl/4xx2 l 3 2 0 2|4|0>4* 13>17
+long-safe|d1ddxxl1/dlddl2l/2l1xx2 l 1 1 0 1|0|
+long-safe|d1ddxxl1/dlddl2l/2l1xx2 l 1 1 0 1|1|0>1 2>3 6>7x 9>10 12>13 14>15
+long-safe|d1ddxxl1/dlddl2l/2l1xx2 l 1 1 0 1|2|2>4* 9>11 14>16*
+long-safe|d1ddxxl1/dlddl2l/2l1xx2 l 1 1 0 1|3|0>3 2>5x 12>15 14>17
+long-safe|d1ddxxl1/dlddl2l/2l1xx2 l 1 1 0 1|4|0>4* 6>10 9>13 12>16*
+long-safe|dd1dxx2/l2dd2d/4xxd1 d 5 1 0 0|0|
+long-safe|dd1dxx2/l2dd2d/4xxd1 d 5 1 0 0|1|1>2 4>5x 9>10 12>13 14>15
+long-safe|dd1dxx2/l2dd2d/4xxd1 d 5 1 0 0|2|3>5x 4>6 8>10 9>11 14>16*
+long-safe|dd1dxx2/l2dd2d/4xxd1 d 5 1 0 0|3|3>6 4>7 8>11 12>15 14>17
+long-safe|dd1dxx2/l2dd2d/4xxd1 d 5 1 0 0|4|1>5x 3>7 9>13 12>16*
+long-safe|d3xx1l/2l3l1/3lxxll l 1 0 0 6|0|
+long-safe|d3xx1l/2l3l1/3lxxll l 1 0 0 6|1|1>2 7>8* 11>12* 13>14 16>17
+long-safe|d3xx1l/2l3l1/3lxxll l 1 0 0 6|2|0>2 1>3 7>9 15>17
+long-safe|d3xx1l/2l3l1/3lxxll l 1 0 0 6|3|0>3 1>4* 7>10 11>14
+long-safe|d3xx1l/2l3l1/3lxxll l 1 0 0 6|4|0>4* 1>5 13>17
+long-safe|4xxl1/ll6/2l1xxl1 l 0 2 3 4|0|
+long-safe|4xxl1/ll6/2l1xxl1 l 0 2 3 4|1|2>3 6>7 12>13 16>17
+long-safe|4xxl1/ll6/2l1xxl1 l 0 2 3 4|2|2>4* 5>7 6>8* 12>14
+long-safe|4xxl1/ll6/2l1xxl1 l 0 2 3 4|3|5>8* 6>9 12>15
+long-safe|4xxl1/ll6/2l1xxl1 l 0 2 3 4|4|5>9 6>10
+long-safe|3dxxd1/d4ld1/4xxd1 d 2 4 0 2|0|
+long-safe|3dxxd1/d4ld1/4xxd1 d 2 4 0 2|1|1>2 5>6 12>13 16>17
+long-safe|3dxxd1/d4ld1/4xxd1 d 2 4 0 2|2|1>3 5>7 11>13 12>14
+long-safe|3dxxd1/d4ld1/4xxd1 d 2 4 0 2|3|1>4* 5>8* 11>14 12>15
+long-safe|3dxxd1/d4ld1/4xxd1 d 2 4 0 2|4|5>9 11>15
+long-safe|3dxxl1/3d1ddd/4xx1d d 5 1 0 1|0|
+long-safe|3dxxl1/3d1ddd/4xx1d d 5 1 0 1|1|1>2 8>9 11>12* 14>15
+long-safe|3dxxl1/3d1ddd/4xx1d d 5 1 0 1|2|1>3 10>12* 13>15
+long-safe|3dxxl1/3d1ddd/4xx1d d 5 1 0 1|3|1>4* 14>17
+long-safe|3dxxl1/3d1ddd/4xx1d d 5 1 0 1|4|1>5 8>12* 11>15 13>17
+long-safe|4xxl1/ll5l/1l1lxxd1 d 1 0 0 6|0|
+long-safe|4xxl1/ll5l/1l1lxxd1 d 1 0 0 6|1|12>13
+long-safe|4xxl1/ll5l/1l1lxxd1 d 1 0 0 6|2|12>14x
+long-safe|4xxl1/ll5l/1l1lxxd1 d 1 0 0 6|3|12>15
+long-safe|4xxl1/ll5l/1l1lxxd1 d 1 0 0 6|4|
+long-safe|4xxl1/8/4xxd1 d 2 4 3 3|0|
+long-safe|4xxl1/8/4xxd1 d 2 4 3 3|1|0>1 12>13
+long-safe|4xxl1/8/4xxd1 d 2 4 3 3|2|0>2 12>14
+long-safe|4xxl1/8/4xxd1 d 2 4 3 3|3|0>3 12>15
+long-safe|4xxl1/8/4xxd1 d 2 4 3 3|4|0>4*
+long-safe|1dddxxll/2l1d1l1/1l1lxx1d l 0 1 1 1|0|
+long-safe|1dddxxll/2l1d1l1/1l1lxx1d l 0 1 1 1|1|1>2 3>4* 7>8* 13>14
+long-safe|1dddxxll/2l1d1l1/1l1lxx1d l 0 1 1 1|2|3>5 7>9x 12>14 13>15x
+long-safe|1dddxxll/2l1d1l1/1l1lxx1d l 0 1 1 1|3|1>4* 3>6 7>10 11>14 12>15x 13>16*
+long-safe|1dddxxll/2l1d1l1/1l1lxx1d l 0 1 1 1|4|1>5 11>15x 12>16* 13>17
+long-safe|4xxl1/dd1l1dl1/4xx1d d 1 3 1 2|0|
+long-safe|4xxl1/dd1l1dl1/4xx1d d 1 3 1 2|1|0>1 6>7 10>11x 13>14
+long-safe|4xxl1/dd1l1dl1/4xx1d d 1 3 1 2|2|0>2 5>7 10>12* 13>15
+long-safe|4xxl1/dd1l1dl1/4xx1d d 1 3 1 2|3|0>3 6>9
+long-safe|4xxl1/dd1l1dl1/4xx1d d 1 3 1 2|4|0>4* 5>9 10>14 13>17
+long-safe|3dxx2/dd4d1/l3xxd1 d 4 2 2 0|0|
+long-safe|3dxx2/dd4d1/l3xxd1 d 4 2 2 0|1|1>2 6>7 12>13
+long-safe|3dxx2/dd4d1/l3xxd1 d 4 2 2 0|2|0>2 1>3 5>7 6>8* 11>13 12>14
+long-safe|3dxx2/dd4d1/l3xxd1 d 4 2 2 0|3|0>3 1>4* 5>8* 6>9 11>14 12>15
+long-safe|3dxx2/dd4d1/l3xxd1 d 4 2 2 0|4|0>4* 5>9 6>10 11>15 12>16*
+long-safe|4xxl1/6dd/4xx2 l 4 2 0 5|0|
+long-safe|4xxl1/6dd/4xx2 l 4 2 0 5|1|0>1 12>13
+long-safe|4xxl1/6dd/4xx2 l 4 2 0 5|2|0>2 12>14x
+long-safe|4xxl1/6dd/4xx2 l 4 2 0 5|3|0>3 12>15
+long-safe|4xxl1/6dd/4xx2 l 4 2 0 5|4|0>4* 12>16*
+long-safe|4xx1d/l2l2l1/4xxld d 1 2 1 4|0|
+long-safe|4xx1d/l2l2l1/4xxld d 1 2 1 4|1|0>1 13>14 15>16*
+long-safe|4xx1d/l2l2l1/4xxld d 1 2 1 4|2|0>2 15>17
+long-safe|4xx1d/l2l2l1/4xxld d 1 2 1 4|3|0>3 13>16*
+long-safe|4xx1d/l2l2l1/4xxld d 1 2 1 4|4|0>4* 13>17
+long-safe|4xxl1/l3ldd1/ll2xx1d d 2 0 1 3|0|
+long-safe|4xxl1/l3ldd1/ll2xx1d d 2 0 1 3|1|0>1 11>12* 13>14
+long-safe|4xxl1/l3ldd1/ll2xx1d d 2 0 1 3|2|0>2 10>12* 13>15
+long-safe|4xxl1/l3ldd1/ll2xx1d d 2 0 1 3|3|0>3 11>14
+long-safe|4xxl1/l3ldd1/ll2xx1d d 2 0 1 3|4|0>4* 10>14 11>15 13>17
+long-safe|4xxll/1l3l2/4xxl1 l 0 2 5 2|0|
+long-safe|4xxll/1l3l2/4xxl1 l 0 2 5 2|1|6>7 10>11 13>14 16>17
+long-safe|4xxll/1l3l2/4xxl1 l 0 2 5 2|2|6>8* 12>14 13>15
+long-safe|4xxll/1l3l2/4xxl1 l 0 2 5 2|3|6>9 12>15
+long-safe|4xxll/1l3l2/4xxl1 l 0 2 5 2|4|10>14 13>17
+long-safe|4xx1l/7l/4xx2 l 3 2 6 1|0|
+long-safe|4xx1l/7l/4xx2 l 3 2 6 1|1|0>1 14>15
+long-safe|4xx1l/7l/4xx2 l 3 2 6 1|2|0>2 13>15 14>16*
+long-safe|4xx1l/7l/4xx2 l 3 2 6 1|3|0>3 13>16* 14>17
+long-safe|4xx1l/7l/4xx2 l 3 2 6 1|4|0>4* 13>17
+long-safe|4xxll/d1dl2l1/2llxx2 l 1 0 1 4|0|
+long-safe|4xxll/d1dl2l1/2llxx2 l 1 0 1 4|1|2>3 8>9 13>14
+long-safe|4xxll/d1dl2l1/2llxx2 l 1 0 1 4|2|1>3 2>4* 8>10 12>14 13>15
+long-safe|4xxll/d1dl2l1/2llxx2 l 1 0 1 4|3|0>3 1>4* 2>5x 11>14 12>15 13>16*
+long-safe|4xxll/d1dl2l1/2llxx2 l 1 0 1 4|4|0>4* 1>5x 2>6 11>15 12>16* 13>17
+long-safe|2d1xxl1/4ll2/4xx2 l 0 4 6 0|0|
+long-safe|2d1xxl1/4ll2/4xx2 l 0 4 6 0|1|10>11 12>13
+long-safe|2d1xxl1/4ll2/4xx2 l 0 4 6 0|2|9>11 12>14
+long-safe|2d1xxl1/4ll2/4xx2 l 0 4 6 0|3|10>13 12>15
+long-safe|2d1xxl1/4ll2/4xx2 l 0 4 6 0|4|9>13 10>14 12>16*
+long-safe|4xxl1/7l/4xx2 l 5 0 5 2|0|
+long-safe|4xxl1/7l/4xx2 l 5 0 5 2|1|0>1 12>13 14>15
+long-safe|4xxl1/7l/4xx2 l 5 0 5 2|2|0>2 14>16*
+long-safe|4xxl1/7l/4xx2 l 5 0 5 2|3|0>3 12>15 14>17
+long-safe|4xxl1/7l/4xx2 l 5 0 5 2|4|0>4* 12>16*
+long-safe|3dxxdl/l2d4/1l2xx2 l 2 2 4 0|0|
+long-safe|3dxxdl/l2d4/1l2xx2 l 2 2 4 0|1|0>1 3>4* 5>6 13>14
+long-safe|3dxxdl/l2d4/1l2xx2 l 2 2 4 0|2|0>2 5>7 13>15
+long-safe|3dxxdl/l2d4/1l2xx2 l 2 2 4 0|3|3>6 13>16*
+long-safe|3dxxdl/l2d4/1l2xx2 l 2 2 4 0|4|0>4* 3>7 5>9 13>17
+long-safe|d3xxld/l1ldld1l/1l2xx1d l 0 1 0 2|0|
+long-safe|d3xxld/l1ldld1l/1l2xx1d l 0 1 0 2|1|3>4* 5>6 9>10x 12>13x 14>15x
+long-safe|d3xxld/l1ldld1l/1l2xx1d l 0 1 0 2|2|9>11 14>16*
+long-safe|d3xxld/l1ldld1l/1l2xx1d l 0 1 0 2|3|3>6 7>10x 12>15x 14>17
+long-safe|d3xxld/l1ldld1l/1l2xx1d l 0 1 0 2|4|7>11 9>13x 12>16*
+long-safe|4xxd1/d1ld4/4xxdd d 3 3 0 2|0|
+long-safe|4xxd1/d1ld4/4xxdd d 3 3 0 2|1|5>6 8>9 13>14 16>17
+long-safe|4xxd1/d1ld4/4xxdd d 3 3 0 2|2|5>7x 8>10 12>14 13>15
+long-safe|4xxd1/d1ld4/4xxdd d 3 3 0 2|3|8>11 12>15
+long-safe|4xxd1/d1ld4/4xxdd d 3 3 0 2|4|5>9 13>17
+long-safe|d2dxxl1/1d6/4xxd1 l 3 3 0 3|0|
+long-safe|d2dxxl1/1d6/4xxd1 l 3 3 0 3|1|0>1 12>13
+long-safe|d2dxxl1/1d6/4xxd1 l 3 3 0 3|2|0>2 12>14
+long-safe|d2dxxl1/1d6/4xxd1 l 3 3 0 3|3|0>3 12>15
+long-safe|d2dxxl1/1d6/4xxd1 l 3 3 0 3|4|0>4*
+long-safe|4xxdl/2d1d3/4xxdd l 3 3 1 1|0|
+long-safe|4xxdl/2d1d3/4xxdd l 3 3 1 1|1|0>1 13>14
+long-safe|4xxdl/2d1d3/4xxdd l 3 3 1 1|2|0>2 13>15x
+long-safe|4xxdl/2d1d3/4xxdd l 3 3 1 1|3|0>3
+long-safe|4xxdl/2d1d3/4xxdd l 3 3 1 1|4|0>4* 13>17
+long-safe|1d2xxl1/1l2ddld/2l1xxll l 0 1 3 0|0|
+long-safe|1d2xxl1/1l2ddld/2l1xxll l 0 1 3 0|1|2>3 6>7 12>13 16>17
+long-safe|1d2xxl1/1l2ddld/2l1xxll l 0 1 3 0|2|2>4* 6>8* 11>13 12>14x 15>17
+long-safe|1d2xxl1/1l2ddld/2l1xxll l 0 1 3 0|3|2>5 6>9x 11>14x
+long-safe|1d2xxl1/1l2ddld/2l1xxll l 0 1 3 0|4|6>10x
+long-safe|4xxll/3dll2/l3xxdd d 0 2 0 4|0|
+long-safe|4xxll/3dll2/l3xxdd d 0 2 0 4|1|8>9x 13>14
+long-safe|4xxll/3dll2/l3xxdd d 0 2 0 4|2|8>10x 12>14 13>15x
+long-safe|4xxll/3dll2/l3xxdd d 0 2 0 4|3|8>11 12>15x
+long-safe|4xxll/3dll2/l3xxdd d 0 2 0 4|4|13>17
+long-safe|dd2xx1l/1l6/l1l1xx2 l 2 1 3 2|0|
+long-safe|dd2xx1l/1l6/l1l1xx2 l 2 1 3 2|1|0>1 2>3 4>5 6>7 13>14
+long-safe|dd2xx1l/1l6/l1l1xx2 l 2 1 3 2|2|6>8* 13>15
+long-safe|dd2xx1l/1l6/l1l1xx2 l 2 1 3 2|3|0>3 2>5 4>7 6>9 13>16*
+long-safe|dd2xx1l/1l6/l1l1xx2 l 2 1 3 2|4|4>8* 6>10 13>17
+long-safe|ddd1xx1l/ll1ldl2/2l1xx1d l 0 1 2 0|0|
+long-safe|ddd1xx1l/ll1ldl2/2l1xx1d l 0 1 2 0|1|2>3 6>7 8>9x 10>11 13>14
+long-safe|ddd1xx1l/ll1ldl2/2l1xx1d l 0 1 2 0|2|2>4* 5>7 10>12* 13>15x
+long-safe|ddd1xx1l/ll1ldl2/2l1xx1d l 0 1 2 0|3|6>9x 8>11 13>16*
+long-safe|ddd1xx1l/ll1ldl2/2l1xx1d l 0 1 2 0|4|5>9x 8>12* 10>14 13>17
+long-safe|4xx1l/2l5/4xx1d d 4 1 2 4|0|
+long-safe|4xx1l/2l5/4xx1d d 4 1 2 4|1|0>1 13>14
+long-safe|4xx1l/2l5/4xx1d d 4 1 2 4|2|0>2 13>15x
+long-safe|4xx1l/2l5/4xx1d d 4 1 2 4|3|0>3 13>16*
+long-safe|4xx1l/2l5/4xx1d d 4 1 2 4|4|0>4* 13>17
+long-safe|3dxx2/5dl1/2llxx1d d 2 2 3 1|0|
+long-safe|3dxx2/5dl1/2llxx1d d 2 2 3 1|1|1>2 10>11x 13>14
+long-safe|3dxx2/5dl1/2llxx1d d 2 2 3 1|2|0>2 1>3 10>12* 13>15
+long-safe|3dxx2/5dl1/2llxx1d d 2 2 3 1|3|0>3 1>4* 13>16*
+long-safe|3dxx2/5dl1/2llxx1d d 2 2 3 1|4|0>4* 1>5 10>14 13>17
+long-safe|4xxd1/ldl2d2/4xxd1 d 2 3 2 1|0|
+long-safe|4xxd1/ldl2d2/4xxd1 d 2 3 2 1|1|0>1 6>7x 10>11 12>13 16>17
+long-safe|4xxd1/ldl2d2/4xxd1 d 2 3 2 1|2|0>2 6>8* 12>14
+long-safe|4xxd1/ldl2d2/4xxd1 d 2 3 2 1|3|0>3 6>9 10>13 12>15
+long-safe|4xxd1/ldl2d2/4xxd1 d 2 3 2 1|4|0>4* 10>14
+long-safe|4xx1l/l1l1lddd/2llxxd1 d 0 1 3 0|0|
+long-safe|4xx1l/l1l1lddd/2llxxd1 d 0 1 3 0|1|0>1 12>13 14>15x
+long-safe|4xx1l/l1l1lddd/2llxxd1 d 0 1 3 0|2|0>2 11>13 14>16*
+long-safe|4xx1l/l1l1lddd/2llxxd1 d 0 1 3 0|3|0>3 10>13 12>15x 14>17
+long-safe|4xx1l/l1l1lddd/2llxxd1 d 0 1 3 0|4|0>4* 11>15x 12>16*
+long-safe|4xx2/ddd5/4xxd1 d 3 4 2 1|0|
+long-safe|4xx2/ddd5/4xxd1 d 3 4 2 1|1|0>1 7>8* 12>13
+long-safe|4xx2/ddd5/4xxd1 d 3 4 2 1|2|0>2 6>8* 7>9 12>14
+long-safe|4xx2/ddd5/4xxd1 d 3 4 2 1|3|0>3 5>8* 6>9 7>10 12>15
+long-safe|4xx2/ddd5/4xxd1 d 3 4 2 1|4|0>4* 5>9 6>10 7>11 12>16*
+long-safe|4xx2/l7/4xxd1 d 4 2 1 5|0|
+long-safe|4xx2/l7/4xxd1 d 4 2 1 5|1|0>1 12>13
+long-safe|4xx2/l7/4xxd1 d 4 2 1 5|2|0>2 12>14
+long-safe|4xx2/l7/4xxd1 d 4 2 1 5|3|0>3 12>15
+long-safe|4xx2/l7/4xxd1 d 4 2 1 5|4|0>4* 12>16*

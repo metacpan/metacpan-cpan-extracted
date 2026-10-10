@@ -12,7 +12,7 @@ use Game::Mahjong::Decompose;
 use Game::Mahjong::Shanten;
 use Game::Mahjong::Score;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 our %OFF;
 
@@ -285,7 +285,7 @@ Game::Mahjong::Search - the three rungs of the bot, reading a view and nothing e
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

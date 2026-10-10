@@ -15,8 +15,6 @@ use Scalar::Util qw(blessed);
 use Test::Most;
 use Test::Mockingbird;
 
-use lib 't/lib';
-
 BEGIN { use_ok('CGI::Lingua') }
 
 # Pre-require every lazily-loaded module so mocks installed before their

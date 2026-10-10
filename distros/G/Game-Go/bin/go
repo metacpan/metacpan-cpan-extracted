@@ -19,7 +19,7 @@ my %opt = (
 
 Getopt::Long::GetOptions(\%opt,
 	'size=i', 'level=i', 'colour|color=s', 'komi=s',
-	'handicap=i', 'seed=s', 'ascii', 'help|h',
+	'handicap=i', 'seed=s', 'ascii', 'pick!', 'help|h',
 ) or usage(2);
 
 usage(0) if $opt{help};
@@ -35,6 +35,7 @@ my $terminal = eval {
 		handicap => $opt{handicap},
 		seed     => $opt{seed},
 		ascii    => ($opt{ascii} ? 1 : 0),
+		(defined $opt{pick} ? (picking => $opt{pick} ? 1 : 0) : ()),
 	);
 };
 if (!$terminal) {
@@ -44,7 +45,19 @@ if (!$terminal) {
 	exit 2;
 }
 
-my $result = $terminal->start;
+for my $signal (qw/ INT TERM HUP /) {
+	$SIG{$signal} = sub {
+		$terminal->leave_raw;
+		$SIG{ $_[0] } = 'DEFAULT';
+		kill $_[0], $$;
+	};
+}
+
+my $result = eval { $terminal->start };
+my $died = $@;
+$terminal->leave_raw;
+die $died if $died;
+
 my $game = $terminal->game;
 
 exit 0 unless defined $game->winner;
@@ -67,11 +80,22 @@ go - play Go against the bot
   --handicap N   2 to 9 on 19x19, 2 to 5 on the smaller boards
   --seed S       the seed the bot plays from
   --ascii        X and O rather than stones
+  --no-pick      type the points out instead of pointing at them
   --help
 
 Columns are A to T with I left out, and rows are numbered from the bottom, so
 the bottom left point is A1. Two passes STOP play; the game is not over until
 both players have agreed which stones are dead.
+
+On a terminal the arrow keys walk a cursor over the board and the point under
+it is bracketed, showing the stone you would play there. The line under the
+board says what that move would do: what it takes, how many liberties it
+would have, or why it cannot be played. Enter plays it, p passes, r resigns,
+t goes back to typing and ? lists the keys. Needs Term::ReadKey; without it,
+or off a terminal, the points are typed.
+
+The last move is a ringed stone and a point a capture has just emptied is an
+x, so both are visible with --ascii and with colour off.
 
 Exit status is 0 for a win, 1 for a loss, 2 for a bad option.
 USAGE

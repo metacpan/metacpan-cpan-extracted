@@ -2,7 +2,7 @@ package Mail::DKIM2::Split;
 use strict;
 use warnings;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use Email::MIME;
 use Mail::DKIM2::Common qw(parse_mime);
@@ -27,7 +27,9 @@ our @EXPORT_OK = qw(plan_copies disclosed_addresses);
 sub disclosed_addresses {
     my ($msg_bytes) = @_;
     my %seen;
-    my $em = eval { parse_mime($msg_bytes) } or return \%seen;
+    my $em = eval { parse_mime($msg_bytes) };
+    die $@ if ref $@;
+    return \%seen unless $em;
     for my $hdr (qw(To Cc)) {
         for my $val ($em->header($hdr)) {
             next unless defined $val;

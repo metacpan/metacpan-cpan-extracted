@@ -3,20 +3,25 @@ abstract: 'Create a multilingual web page'
 author:
   - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
+  CGI::Info: '1.14'
   CHI: '0'
   ExtUtils::MakeMaker: '0'
   File::Temp: '0'
   FindBin: '0'
   IPC::Run3: '0'
   IPC::System::Simple: '0'
+  JSON::Parse: '0'
   LWP::Simple::WithCache: '0.04'
   Test::Compile: '0'
   Test::DescribeMe: '0'
+  Test::Log::Abstraction: '0'
   Test::Memory::Cycle: '0'
-  Test::Mockingbird: '0'
+  Test::Mockingbird: '0.14'
+  Test::More: '0'
   Test::Most: '0'
   Test::Needs: '0'
   Test::NoWarnings: '0'
+  Test::Permissions: '0'
   Test::Requires: '0'
   Test::RequiresInternet: '0'
   Test::Returns: '0'
@@ -40,6 +45,16 @@ optional_features:
     description: 'Detect Baidu crawler IPs that misreport as EU (RT-86809); not available on Windows due to Socket6 build dependency'
     recommends:
       Net::Subnet: '0'
+  lang_parameter:
+    description: 'Let a lang= query parameter choose the language, through the info argument to new()'
+    recommends:
+      CGI::Info: '1.14'
+  local_geo_databases:
+    description: 'Look up the country from a local database (fastest, no network): IP::Country, Geo::IP (needs a GeoIP.dat) or Geo::IPfree'
+    recommends:
+      Geo::IP: '0'
+      Geo::IPfree: '0'
+      IP::Country: '0'
   local_time_zone:
     description: 'Detect local time zone via DateTime::TimeZone::Local for time_zone() when running non-CGI (CLI); not available on all Windows Perl builds'
     recommends:
@@ -49,14 +64,18 @@ optional_features:
     recommends:
       Data::Validate::IP: '0.25'
       NetAddr::IP: '0'
+  web_lookups:
+    description: 'Look up the country (geoplugin.net) and time zone (ip-api.com) over the web when no local geo database answers; JSON::Parse and LWP::Simple::WithCache (or LWP::Simple) are needed'
+    recommends:
+      JSON::Parse: '0'
+      LWP::Simple: '0'
+      LWP::Simple::WithCache: '0.04'
 requires:
-  CGI::Info: '1.14'
+  Carp: '0'
   Class::Autouse: '0'
-  Class::Load: '0'
   DBD::SQLite: '0'
   HTTP::BrowserDetect: '0'
   I18N::AcceptLanguage: '0'
-  I18N::LangTags::Detect: '1.04'
   JSON::PP: '2.27'
   Locale::Codes: '3.59'
   Locale::Language: '0'
@@ -68,11 +87,12 @@ requires:
   Object::Configure: '0.24'
   Params::Get: '0.17'
   Readonly: '0'
-  Sys::Syslog: '0'
+  Scalar::Util: '0'
+  Socket: '0'
   autodie: '0'
   perl: '5.010001'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Lingua
-  repository: git://github.com/nigelhorne/CGI-Lingua.git
-version: '0.86'
+  repository: https://github.com/nigelhorne/CGI-Lingua.git
+version: '0.87'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

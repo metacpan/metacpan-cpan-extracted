@@ -64,6 +64,7 @@
     * [Builder lifecycle hooks](#builder-lifecycle-hooks)
     * [`make build-ci`](#make-build-ci)
     * [Builder input files](#builder-input-files)
+    * [`perlcritic` and `perltidy` Gates](#perlcritic-and-perltidy-gates)
     * [See Also](#see-also)
 * [PREREQUISITES](#prerequisites)
 * [CAVEATS](#caveats)
@@ -1062,6 +1063,7 @@ with `make update`.
 
         .includes/bootstrap.mk       - used internally by the bootstrapper
         .includes/bash-completion.mk - make bash-completion target
+        .includes/build-init.mk      - used to initialize build-time variables
         .includes/modulino.mk        - make modulino target
         .includes/git.mk             - make git target
         .includes/help.mk            - make help target
@@ -1069,6 +1071,7 @@ with `make update`.
         .includes/perl.mk            - pattern rules, syntax checking, tidy, critic
         .includes/publish.mk         - publish to CPAN
         .includes/release-notes.mk   - make release-notes target
+        .includes/test.mk            - recipes for the test targets; test, test-all, etc
         .includes/update.mk          - make update target
         .includes/upgrade.mk         - make upgrade/check-upgrade targets
         .includes/version.mk         - make release/minor/major targets
@@ -1087,6 +1090,13 @@ and `make major`.
     The directory is created automatically the first time `pod-review`
     or `code-review` needs the default prompt files.
 
+- `config.mk` - developer-maintained Make configuration for
+persistent project build settings. This file is not managed by
+`make update`.
+- `build-config.mk` - generated Make configuration containing
+resolved project values and discovered build helper commands. It is
+created automatically as needed and should not be edited or committed.
+
 # THE PROJECT MAKEFILE
 
 The installed Makefile is self-configuring. It can derive the primary
@@ -1101,6 +1111,11 @@ For example, a primary module of `My::New::Module` produces:
 
 If `MODULE_NAME` is not supplied on the command line, it is inferred
 from the project directory name.
+
+At build initialization, `cmb create-build-config` resolves project
+paths, defaults, and configured helper commands into `build-config.mk`,
+which is then included by Make. Developer overrides belong in
+`config.mk`; `build-config.mk` is generated state.
 
 Key Makefile targets:
 
@@ -1241,8 +1256,8 @@ Key Makefile targets:
 
 - `make release-notes`
 
-    Generates a diff, file list, and tarball comparing the current version
-    to the previous git tag.
+    Generates the diff, file list, Git status, and draft release tarball
+    used as evidence for LLM-generated release notes.
 
 - `make clean`
 
@@ -1639,7 +1654,7 @@ If you want to generate `README.md` from a custom source, create a
     with values drawn from the environment (or from a `--vars-file`). This
     is the mechanism the generated `Makefile` uses to turn `.pm.in` and
     `.pl.in` sources into their built `.pm`/`.pl` counterparts -- for
-    example filling `2.4.0` from the `VERSION` file or
+    example filling `2.4.1` from the `VERSION` file or
     `@BUILD_DATE@` at build time.
 
     A placeholder is required to have a value only when it appears in live
@@ -1758,13 +1773,15 @@ would be visible in shell history and process listings._
 
         release-<version>.diffs
         release-<version>.lst
+        release-<version>.status
         release-<version>.tar.gz
 
         cmb release-notes <version>
 
-    The generated release notes are written to `release-notes-<version>.md`.
-    Binary files are automatically excluded. Use `--max-diff-files` to
-    cap token consumption on large distributions (default: 50, 0 = unlimited).
+    The generated release notes are written to
+    `release-notes-<version>.md`.  Binary files are automatically
+    excluded. Use `--max-diff-files` to cap token consumption on large
+    distributions (default: 50, 0 = unlimited).
 
 - code-finding
 
@@ -2796,7 +2813,7 @@ The build lifecycle is:
     builder-pre
         |
         v
-    make
+      make
         |
         v
     builder-post
@@ -2820,8 +2837,8 @@ or pass the project directory explicitly:
 
 The project directory defaults to the current working directory.
 
-`builder` changes to that directory, installs the build environment and
-declared dependencies, loads the project CI environment, and runs the
+`builder` changes to that directory, loads the project CI environment,
+resolves and installs the required build dependencies, and runs the
 configured build lifecycle.
 
 For the standard containerized clean-room build, use:
@@ -2836,7 +2853,8 @@ include uncommitted and untracked files present on disk.
 ### Environment variables
 
 `builder` accepts environment variables that control dependency
-installation and build behavior.
+installation and build behavior. These values may also be set in
+`builder.env`.
 
 - `INSTALLER`
 
@@ -2845,6 +2863,64 @@ installation and build behavior.
     The default is:
 
         cpm install -g --show-build-log-on-failure --verbose
+
+- `SCAN`
+
+    Controls dependency scanning during the project build.
+
+    The builder default is:
+
+        SCAN=on
+
+- `SYNTAX_CHECKING`
+
+    Controls Perl syntax checking during the project build.
+
+    The builder does not enable syntax checking by default. To use syntax
+    checking as a CI quality gate, add the following to `builder.env`:
+
+        SYNTAX_CHECKING=on
+
+- `LINT`
+
+    Controls the perltidy and perlcritic quality gates.
+
+    The builder does not enable linting by default. To enable configured
+    lint tools during CI, add:
+
+        LINT=on
+
+    to `builder.env`.
+
+- `PERLTIDYRC`
+
+    Specifies the perltidy profile used when linting is enabled.
+
+    If `PERLTIDYRC` is not defined, `builder` looks for `.perltidyrc`
+    or `perltidyrc` in the project. An explicitly supplied value is not
+    overwritten by profile discovery.
+
+    When a profile is configured and `LINT=on`, `builder` installs
+    [Perl::Tidy](https://metacpan.org/pod/Perl%3A%3ATidy) before running the project build.
+
+    If `PERLTIDYRC` names a file that does not exist, the build fails.
+
+- `PERLCRITICRC`
+
+    Specifies the perlcritic profile used when linting is enabled.
+
+    If `PERLCRITICRC` is not defined, `builder` looks for
+    `.perlcriticrc` or `perlcriticrc` in the project. An explicitly
+    supplied value is not overwritten by profile discovery.
+
+    When a profile is configured and `LINT=on`, `builder` installs
+    [Perl::Critic](https://metacpan.org/pod/Perl%3A%3ACritic) and the supporting policy modules required by the
+    managed build.
+
+    If `PERLCRITICRC` names a file that does not exist, the build fails.
+
+    Setting `LINT=on` without either a perltidy or perlcritic profile is
+    treated as a configuration error.
 
 - `NO_ECHO`
 
@@ -2862,18 +2938,34 @@ installation and build behavior.
 
 ### `builder.env`
 
-Before running the project build, `builder` loads `builder.env` from
-the project root when that file exists.
+Before installing project build dependencies or running the project
+build, `builder` loads `builder.env` from the project root when that
+file exists.
 
-Variables defined there are exported to the build environment.
+Variables defined there are exported to the build environment and are
+used when resolving the effective CI build policy.
 
 A generated project includes:
 
     CMB_VERSION_DRIFT=ignore
     NO_ECHO=
 
-`builder.env` provides a project-local place to customize CI build
-behavior without modifying `builder` itself.
+The default builder performs a clean distribution build but does not
+enable syntax checking or linting as CI phase gates. Projects that want
+those checks may opt in through `builder.env`.
+
+For example:
+
+    SYNTAX_CHECKING=on
+    LINT=on
+
+When linting is enabled, provide a `perltidyrc`, `.perltidyrc`,
+`perlcriticrc`, or `.perlcriticrc` for each lint tool the CI build
+should run. The corresponding tool dependencies are installed by
+`builder` before `make` is invoked.
+
+`builder.env` therefore provides a project-local place to define CI
+policy without modifying `builder` itself.
 
 ### Builder lifecycle hooks
 
@@ -2985,6 +3077,27 @@ requirements without modifying `builder` itself.
 These files describe build inputs. For environment variables use
 `builder.env`; for project-specific Makefile behavior use
 `project.mk`.
+
+### `perlcritic` and `perltidy` Gates
+
+During a CI build, the build script enables `PERLTIDY` and
+`PERLCRITIC` when it can find the corresponding configuration files
+in the project.
+
+For reproducible CI builds, keep the project's `perltidyrc` and
+`perlcriticrc` aligned with the configuration used in your development
+environment.
+
+Many editors and IDEs run Perltidy or Perl::Critic automatically while
+you work. If those tools use a personal configuration that differs from
+the project's checked-in configuration, code that appears clean locally
+may fail during `build-ci`.
+
+When a project-local `perltidyrc` or `perlcriticrc` is present,
+`build-ci` uses it to enforce the project's formatting and critic
+policies in the clean build environment. If no project-local
+configuration can be discovered, the corresponding check is disabled
+rather than falling back to the tool's default configuration.
 
 ### See Also
 
@@ -3287,20 +3400,22 @@ See ["MODULINOS"](#modulinos) for full details.
 
 ## What is `make release-notes` used for?
 
-`make release-notes` generates three artifacts comparing the current
+`make release-notes` generates four artifacts comparing the current
 working state of your repository against the previous git tag:
 
 - `release-<version>.diffs` - a unified diff of all
 changed files
 - `release-<version>.lst` - a list of added, modified,
 and removed files
+- `release-<version>.status` - Git name-status output
+classifying added, modified, deleted, and renamed files
 - `release-<version>.tar.gz` - a tarball containing
 only the changed files
 
-These are primarily useful for generating release notes and changelogs,
-and for submitting targeted patches. Run it after bumping the version
-with `make release`, `make minor`, or `make major` and before
-publishing to CPAN:
+These are primarily useful for generating release notes and
+changelogs, and for submitting targeted patches. Run it after bumping
+the version with `make release`, `make minor`, or `make major` and
+before creating your final distribution.
 
     make minor
     make release-notes
@@ -3309,6 +3424,16 @@ publishing to CPAN:
 
 The artifacts are all the clues needed for LLMs to produce accurate
 and well written release notes for your project.
+
+To generate the release artifacts without submitting them to the LLM,
+use:
+
+    make release-notes DRYRUN=1
+
+This is useful for inspecting or debugging the release evidence before
+requesting generated release notes. The `.diffs`, `.lst`, `.status`,
+and `.tar.gz` artifacts are produced normally, but no LLM request is
+made.
 
 The release artifacts are cleaned up by `make clean`.
 
@@ -3384,7 +3509,7 @@ features are used.
 
 # VERSION
 
-This documentation refers to version 2.4.0
+This documentation refers to version 2.4.1
 
 # AUTHOR
 

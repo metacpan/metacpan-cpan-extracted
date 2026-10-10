@@ -154,6 +154,9 @@ key:
 | `compound`, `source` | `COMPND`, `SOURCE` | `_entity`, `_entity_src_gen`, `_entity_src_nat`, `_pdbx_entity_src_syn` |
 | `seqres` | `SEQRES` | `_entity_poly`, `_entity_poly_seq` |
 | `het` | `HET`, `HETNAM`, `FORMUL` | `_chem_comp`, `_pdbx_nonpoly_scheme` |
+| `hetnam`, `formul` | `HETNAM`, `FORMUL` | `_chem_comp` |
+| `seqadv` | `SEQADV` | `_struct_ref_seq_dif` |
+| `site` | `SITE` | `_struct_site`, `_struct_site_gen` |
 | `helix` | `HELIX` | `_struct_conf`, with `pdbx_PDB_helix_id` as the id |
 | `sheet` | `SHEET` | `_struct_sheet_range`, `_struct_sheet`, `_struct_sheet_order` |
 | `ssbond`, `link` | `SSBOND`, `LINK` | `_struct_conn` |
@@ -161,7 +164,14 @@ key:
 | `modres` | `MODRES` | `_pdbx_struct_mod_residue` |
 | `dbref` | `DBREF`, `DBREF1`/`DBREF2` | `_struct_ref`, `_struct_ref_seq` |
 | `cryst1` | `CRYST1` | `_cell`, `_symmetry` |
-| `n_models` | `MODEL` | `_atom_site.pdbx_PDB_model_num` |
+| `n_models` | `MODEL` | `_atom_site.pdbx_PDB_model_num`, counted as distinct numbers |
+
+Where a file ends is decided the way gemmi decides it. A PDB file ends at its
+`END` record, and what a program appends after one — a second docking pose, a
+second structure — is not read into the first. An mmCIF file is its first data
+block, and a second `data_` ends it. An mmCIF loop whose last row has fewer
+values than the loop has columns was cut short, and that row is left out; every
+whole row before it is read, as the whole lines of a cut-short PDB file are.
 
 # Installing
 
@@ -297,8 +307,8 @@ file, real values, the long lists cut short:
     ├── modres          { }                     no MSE-style residues here
     ├── het
     │   └── HOH         { het_id 'HOH', formula '69(H2 O)', water 1 }
-    ├── hetnam          { }
-    ├── formul          { }
+    ├── hetnam          { }                     HETNAM's name by het id: ZN 'ZINC ION'
+    ├── formul          { HOH '69(H2 O)' }      FORMUL's formula by het id
     ├── helix           [ { id '1', class '1', length '29',
     │                       init_chain 'A', init_resname 'SER', init_resseq '7',
     │                       end_chain 'A', end_resname 'TYR', end_resseq '35' },
@@ -308,7 +318,11 @@ file, real values, the long lists cut short:
     │                       chain2 'A', resseq2 '165', length '2.02' }, ... ]  5
     ├── link            [ ]
     ├── cispep          [ ]
-    ├── site            [ ]
+    ├── site            [ ]                     none here; where SITE has them,
+    │                                           [ { id 'AC1', n_residues '4',
+    │                                               residues [ { resname 'HIS',
+    │                                               chain 'A', resseq '94',
+    │                                               icode '' }, ... ] }, ... ]
     ├── cryst1          { a '67.7', b '67.7', c '228',
     │                     alpha '90', beta '90', gamma '90',
     │                     sgroup 'P 43 21 2', z '8' }
@@ -472,7 +486,9 @@ A number too big for its columns is read the way cctbx, phenix and gemmi write
 it, in [hybrid-36](https://cci.lbl.gov/hybrid_36/): a residue numbered `A000`
 in a PDB file is residue `10000`, and an atom serial of `A0000` is `100000`,
 so a chain past 9,999 residues reads the same from a PDB file as from its
-mmCIF. A residue whose number field is blank, or is not a number in either
+mmCIF. A serial written out in six digits instead runs leftwards into the
+record name — `ATOM 100000` — with every column after it in place, and is read
+as the atom it is, as gemmi reads it. A residue whose number field is blank, or is not a number in either
 spelling, has an `undef` number and the empty key `''`; it is still a residue
 of its own and not part of the one before it.
 
@@ -483,6 +499,19 @@ C and D, a selenomethionine that only went halfway in — and those are one
 residue, not two. It takes the name written first, counts the records of both
 states, and keeps the atoms that tell them apart, so an MSE/MET like that has
 both an SE and an SD, each carrying the conformers of its own state.
+
+A different residue given a number the chain already used is the exception.
+The archive never writes one, but a program that adds waters after `TER` under
+the protein's chain, or a docking program that numbers its ligand 1 in the
+protein's chain, does, and that residue is keyed with its name after the
+number: the methionine stays `1` and the water is `1(HOH)`, with `number` 1
+like the other. Such a run has another name, no altloc letter on its first
+record — one residue in two states writes every record of its second state
+with one — and one of the two is a HETATM, which is where Biopython's residue
+id, the record type with the number and insertion code, tells two residues
+apart. gemmi and Biopython both keep a water or a ligand written that way apart
+from the residue it collides with; two ATOM residues under one number stay one,
+as Biopython reads them.
 
 ### Counting elements
 
@@ -524,6 +553,16 @@ Only the 118 named elements are corrected. A file whose element column holds
 something that spells no element keeps it exactly as written — `XX` stays `XX`
 rather than becoming a plausible-looking `Xx` — so a field the module does not
 recognise is visibly not an element rather than quietly dressed up as one.
+
+Where the file gives no element at all — no columns 77-78, no `type_symbol` —
+it is worked out from the atom name by where the name sits in its four columns:
+` CA ` is a carbon alpha and `CA  ` a calcium. Two readings come before that,
+for a name that is not where the format puts it, which every name in an mmCIF
+file is, having no columns. An atom named for its own residue in two letters
+that spell an element is that residue's ion, so `NA` in a residue `NA` is
+sodium and in any other residue a nitrogen; and a guess that spells nothing is
+read the other way, so ` ZN ` written where a one-letter element goes is zinc
+and an `HB1 ` started in column 13 is a hydrogen.
 
 Each count is an unsigned integer. It is counted up from zero and never down,
 so there is no sign for it to carry.
@@ -617,10 +656,17 @@ say -- and `total_atoms == n_atoms + n_skipped` however the options were set.
 ## structure_info_string
 
     my $info = structure_info_string($text, %options);
+    my $dssp = structure_info_string($text, 'dssp', %options);    # one view of it
 
-The same, for a structure already in a string. A string has no name to go on,
-so text that looks like nothing in particular is read as PDB; text that looks
-like another format still gets a straight answer about it.
+The same, for a structure already in a string, views included. A string has
+no name to go on, so text that looks like nothing in particular is read as
+PDB; text that looks like another format still gets a straight answer about
+it.
+
+A string is read as its characters, however perl happens to be holding it: one
+perl has upgraded to UTF-8 reads exactly as the same string not upgraded does,
+so a file decoded before it is handed over gives the answer the file itself
+gives.
 
 ## structure_atoms
 
@@ -1985,6 +2031,15 @@ Measuring with the rotation it returns itself gives 3.60899. `t/rmsd.t` says so
 in its header, so that the next person to compare against it knows what they
 are looking at.
 
+Atoms that lie on one line are the one shape where the three references part
+company with QCP's own arithmetic. A line can be turned about itself freely,
+the eigenvalue the rotation comes from is a repeated one, and the cofactors
+QCP takes the rotation from all vanish; here the rotation is then found by
+Jacobi rotations of the 4x4 matrix instead, and the answer is
+`SVDSuperimposer`'s — 0 for three carbons along one axis against the same
+three along another, where gemmi's `superpose_positions` answers NaN. Before
+0.039 this module took the identity rotation there and answered 1.732 A.
+
 ## aa3to1
 
     aa3to1('ALA');    # 'A'
@@ -2105,9 +2160,12 @@ So the columns are read as columns. SEQRES takes 20-70 and no more; an element
 field that is not letters is not an element and the atom name is used instead;
 a charge field that is not a digit and a sign reads as the empty string a blank
 one would have given; a `HELIX` length that is not a number reads as empty; and
-a text record whose columns 73-80 hold nothing but the entry id and a line
-number is cut there — text that is not the entry id is left alone, so a title
-that really does run to column 80 is not truncated.
+a record whose columns 73-80 hold nothing but the entry id and a line number is
+cut there before any field past column 72 is read — the text records, the
+REMARKs, a revision's list of records, the comments of `SEQADV` and `MODRES`,
+`HETNAM`, `HETSYN` and `FORMUL`, and the `SSBOND` and `LINK` lengths. Text
+that is not the entry id is left alone, so a title that really does run to
+column 80 is not truncated.
 
 `COMPND` and `SOURCE` predate the `MOL_ID` convention in a file like this and
 are free text: `COMPND    GAMMA DELTA RESOLVASE`. There is no chain list in that
@@ -2203,6 +2261,12 @@ to take apart. Residue name lookup, three letters to one letter and the amino
 acid/nucleotide/water question, is a switch on three packed bytes, and one
 table serves `aa3to1()`, `res1()` and `res_type()` so the three can never
 disagree.
+
+The sums are over the finite coordinates and B-factors only. A field that says
+`nan` or `inf` reads back as that number in the atom, as the file has it, and is
+left out of the box, the centres and the B-factor range wherever in the file
+it falls; in the physical properties an atom at NaN is nobody's neighbour, so
+it makes no contact, no hydrogen bond and no torsion.
 
 When atoms are wanted the parse builds the atom hashes itself, rather than
 handing back columns for Perl to rebuild them from; building every atom twice

@@ -1,5 +1,13 @@
 Revision history for Perl extension Text::JSCalendar
 
+0.07  2026-10-09
+	- write each participant's ATTENDEE from its jscalendarbis
+	  calendarAddress URI, falling back to the JSCalendar 1.0 "email";
+	  previously only "email" was read, so a jscalendarbis participant
+	  produced "MAILTO:" with an undefined address
+	- skip a participant with neither address rather than writing an
+	  empty ATTENDEE
+
 0.06  2026-08-31
 	- clarify licensing: same terms as Perl itself (Artistic License 1.0
 	  or GPL version 1 or later)

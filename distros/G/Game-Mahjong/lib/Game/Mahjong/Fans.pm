@@ -7,7 +7,7 @@ use warnings;
 use Game::Mahjong::Tiles;
 use Game::Mahjong::Fan;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 our @GRADES = (88, 64, 48, 32, 24, 16, 12, 8, 6, 4, 2, 1);
 our %PER_GRADE = (88 => 7, 64 => 6, 48 => 2, 32 => 3, 24 => 9, 16 => 6, 12 => 5, 8 => 10, 6 => 6, 4 => 4, 2 => 10, 1 => 13);
@@ -610,7 +610,7 @@ Game::Mahjong::Fans - the eighty-one scoring elements, as data with a checker ea
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

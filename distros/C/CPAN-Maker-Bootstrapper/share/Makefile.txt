@@ -2,8 +2,12 @@
 # To see available targets"
 # make help
 
-SHELL := /bin/bash
+# ...before we get too far
+ifeq ($(filter grouped-target,$(.FEATURES)),)
+$(error GNU Make 4.3 or newer is required)
+endif
 
+SHELL := /bin/bash
 .SHELLFLAGS := -e -o pipefail -c
 
 # this the user's version from their VERSION file
@@ -11,94 +15,55 @@ VERSION := $(shell test -e VERSION || echo 1.0.0 > VERSION; cat VERSION)
 
 PACKAGE_VERSION = $(VERSION)
 
-lc = $(shell printf '%s' '$(1)' | tr '[:upper:]' '[:lower:]')
+lc = $(shell v='$(1)'; printf '%s' "$${v,,}")
 
 # this is the current version in your Perl path (but not necessarily the version that produced this Makefile)
 BOOTSTRAPPER_VERSION := $(shell perl -MCPAN::Maker::Bootstrapper -e 'print CPAN::Maker::Bootstrapper->VERSION;' 2>/dev/null || true) 
 
-config.mk: ;
+NO_ECHO ?= @
+NO_COLOR ?=
 
--include config.mk
+BOOTSTRAP_BUILD := $(if $(wildcard build-config.mk),,1)
 
-ifeq ($(origin MODULE_NAME),undefined)
-  MODULE_NAME := $(shell SOURCE=$$(pwd) perl -MCwd=abs_path -MFile::Basename=basename \
-    -e '$$m=basename(abs_path($$ENV{SOURCE})); $$m =~s/\-/::/g; print $$m')
-endif
+config.mk:
+	$(NO_ECHO)touch $@
+
+build-config.mk: config.mk
+	 $(NO_ECHO)cmb create-build-config > $@
+
+include build-config.mk
 
 export MODULE_NAME PACKAGE_VERSION
-
-MODULE_PATH     = lib/$(shell echo $(MODULE_NAME) | perl -npe 's/::/\//g;').pm
-PROJECT_NAME   ?= $(shell echo $(MODULE_NAME) | sed -e 's/::/-/g;')
-UNIT_TEST_NAME  = $(shell TEST_NAME=$(PROJECT_NAME) perl -e 'printf q{t/00-%s.t}, lc $$ENV{TEST_NAME}')
 
 CMB_UPDATE_CHECK  ?= on
 CMB_VERSION_DRIFT ?= fail
 
 DARKPAN_REQUIRES ?=
-DARKPAN_URL ?=
-
+DARKPAN_URL      ?=
 export DARKPAN_URL
 
 LOG_LEVEL ?= info
 
-NO_ECHO ?= @
-NO_COLOR ?=
-
 TARBALL_ORDER_ONLY_PREREQS ?=
-
-
-BOOTSTRAPPER   := $(shell command -v cmb)
-DOCKER         := $(shell command -v docker)
-GIT            := $(shell command -v git)
-CPAN_MAKER     := $(shell command -v cpan-maker)
-MD_UTILS       := $(shell command -v markdown-render)
-POD2MARKDOWN   := $(shell command -v pod2markdown)
-PODEXTRACT     := $(shell command -v podextract)
-SCANDEPS       := $(shell command -v scandeps-static)
-GITHUB_ACTIONS := $(shell command -v gha-aws)
-CPM            := $(shell command -v cpm)
-CARTON         := $(shell command -v carton)
-
-CPAN_INSTALLER ?= $(firstword $(CPM) $(CARTON))
-
-ifeq ($(CPAN_INSTALLER),)
-  $(warning no cpm/carton found -- set SYNTAX_CHECKING=off if builds fail to find dependencies)
-endif
-
-ifeq ($(MD_UTILS),)
-    $(warning Markdown::Render is not installed - run: cpanm Markdown::Render to generate .md files from pod)
-endif
-
 
 GIT_NAME     ?= $(shell $(GIT) config --global user.name 2>/dev/null || echo "Anonymouse")
 GIT_EMAIL    ?= $(shell $(GIT) config --global user.email 2>/dev/null || echo "anonymouse@example.org")
 GITHUB_USER  ?= $(shell $(GIT) config --global user.github 2>/dev/null || echo "anonymouse")
+GIT_USER     := $(GITHUB_USER)
+GIT_SHA      := $(shell (test -d .git && $(GIT) rev-parse HEAD 2>/dev/null) || echo 'unknown' )
+GIT_DIRTY    := $(shell (test -d .git && $(GIT) describe --always --dirty --abbrev=40 2>/dev/null) || echo 'unknown')
 
-GIT_SHA      := $(shell $(GIT) rev-parse HEAD 2>/dev/null || echo 'unknown' )
-GIT_DIRTY    := $(shell $(GIT) describe --always --dirty --abbrev=40 2>/dev/null || echo 'unknown')
-
-CONFIG_READER = CPAN::Maker::Bootstrapper::ConfigReader
-
-BASEDIR  ?= $(shell perl -M$(CONFIG_READER) -e 'print $(CONFIG_READER)->new("$(CONFIG)")->cpan_maker_basedir;')
+.PHONY: test-dirty
+test-dirty:
+	$(NO_ECHO)echo $(GIT_DIRTY)
 
 MIN_PERL_VERSION ?= 5.010
 
 MIN_PERL_VERSION_FLAG := $(shell v=$$(test -e buildspec.yml && dnk get .min-perl-version < buildspec.yml 2>/dev/null); [[ -n "$$v" ]] && echo "-m $$v")
 
-ifeq ($(SCANDEPS),)
-  SCAN = OFF
-else
-  SCAN ?= ON
-endif
-
-scan_on := $(filter on,$(call lc,$(SCAN)))
 
 cmb_update_check  := $(call lc,$(CMB_UPDATE_CHECK))
 cmb_version_drift := $(call lc,$(CMB_VERSION_DRIFT))
-
-ifeq ($(BOOTSTRAPPER),)
-  $(error CPAN::Maker::Bootstrapper not installed - run cpanm CPAN::Maker::Bootstrapper)
-endif
 
 define find-files
 $(1) := $(patsubst %.in,%,$(shell for d in $(2); do test -d "$$d" && \
@@ -121,6 +86,9 @@ $(eval $(call find-files,SOURCE_FILES,lib bin,*.p[ml].in))
 
 SOURCE_FILES_IN := $(addsuffix .in,$(SOURCE_FILES))
 
+RENDERED_SOURCE_FILES := $(addsuffix .rendered,$(PERL_MODULES))
+.SECONDARY: $(RENDERED_MODULES)
+
 POD_MODULES = $(PERL_MODULES:.pm=.pod)
 
 TARBALL = $(PROJECT_NAME)-$(VERSION).tar.gz
@@ -139,14 +107,41 @@ DEPS += \
     $(UNIT_TEST_NAME) \
     ChangeLog
 
+ifeq ($(POD),extract)
+DEPS += $(POD_MODULES)
+endif
+
+MANAGED_MK_FILES = \
+    build-init.mk \
+    bash-completion.mk \
+    bootstrap.mk \
+    builder.mk \
+    git.mk \
+    help.mk \
+    local.mk \
+    modulino.mk \
+    perl.mk \
+    publish.mk \
+    release-notes.mk \
+    test.mk \
+    update.mk \
+    upgrade.mk \
+    version.mk
+
+INCLUDES_DIR = .includes/
+
+INCLUDES_FILES = $(addprefix $(INCLUDES_DIR),$(MANAGED_MK_FILES))
+ifeq ($(BOOTSTRAP_BUILD),)
+# config.mk should remain first
+-include \
+    config.mk \
+    $(INCLUDES_FILES)
+endif
+
 .DEFAULT_GOAL := $(TARBALL)
 
 .PHONY: all
 all: $(TARBALL)
-
-PACKAGE_VERSION = $(VERSION)
-
-GIT_USER := $(GITHUB_USER)
 
 TEMPLATE_VARS += \
     PACKAGE_VERSION \
@@ -159,9 +154,6 @@ TEMPLATE_VARS += \
     MIN_PERL_VERSION \
     PROJECT_NAME \
 
--include .includes/local.mk
-
-include .includes/perl.mk
 
 bin/%.sh: bin/%.sh.in
 	$(call gen-vars-file,$<.vars)
@@ -176,10 +168,13 @@ bin/%: bin/%.in
 	chmod +x $@
 
 .PHONY: quick
-quick: ## turns off scanning, perltidy, perlcritic
-	$(NO_ECHO)$(MAKE) SCAN=off LINT=off
+quick: ## turns off scanning, perltidy, perlcritic, pod checking
+	$(NO_ECHO)$(MAKE) SCAN=off LINT=off PODCHECKER=
 
--include .includes/bootstrap.mk
+.PHONY: real-quick
+real-quick: ## turns off scanning, perltidy, perlcritic, pod checking, syntax checking
+	$(NO_ECHO)$(MAKE) SCAN=off LINT=off PODCHECKER= SYNTAX_CHECKING=off
+
 
 cpanfile.runtime: requires
 	$(NO_ECHO)$(CPAN_MAKER) create-cpanfile \
@@ -216,7 +211,8 @@ cpanfile.darkpan cpanm.darkpan: requires $(wildcard darkpan.skip)
 	$(BOOTSTRAPPER) extra-files . cpanfile.darkpan cpanm.darkpan
 endif
 
-$(TARBALL): $(DEPS) | update-available $(TARBALL_ORDER_ONLY_PREREQS) \
+
+$(TARBALL): $(DEPS) | local/.installed update-available $(TARBALL_ORDER_ONLY_PREREQS) \
     $(if $(syntax_on), $(PERL_CHECKED_FILES) $(PERL_BIN_CHECKED_FILES)) \
     $(if $(tidy_on), $(PERL_MODULES:%=%.tdy) $(PERL_BIN_FILES:%=%.tdy)) \
     $(if $(critic_on), $(PERL_MODULES:%=%.crit) $(PERL_BIN_FILES:%=%.crit))
@@ -227,7 +223,7 @@ $(TARBALL): $(DEPS) | update-available $(TARBALL_ORDER_ONLY_PREREQS) \
 	  SKIP_TESTS="--skip-tests"; \
 	fi; \
 	PERL5LIB=$$(pwd)/local/lib/perl5:$$PERL5LIB \
-	  $(CPAN_MAKER) $$SKIP_TESTS -l $(LOG_LEVEL) $$COLOR -b $<
+	  $(CPAN_MAKER) $$SKIP_TESTS -l $(LOG_LEVEL) $$COLOR -b buildspec.yml
 
 $(dir $(MODULE_PATH)):
 	$(NO_ECHO)mkdir -p $@
@@ -241,12 +237,7 @@ $(MODULE_PATH).in: | $(dir $(MODULE_PATH))
 	$(BOOTSTRAPPER) resolve-vars "$$tmpl" $(TEMPLATE_VARS) > $@
 
 test.t.tmpl:
-	$(NO_ECHO)template=$$(perl -MFile::ShareDir=dist_file -e 'print dist_file(q{CPAN-Maker-Bootstrapper}, q{$@});' 2>/dev/null || true); \
-	if [[ -n "$$template" ]]; then \
-	  cp $$template $@; \
-	else \
-	  touch $@; \
-	fi; \
+	$(NO_ECHO)$(BOOTSTRAPPER) dist-file $@ > $@; \
 	chmod 0644 $@
 
 $(UNIT_TEST_NAME): | test.t.tmpl
@@ -277,30 +268,42 @@ README.md: README.md.in
 	fi
 endif
 
--include .includes/modulino.mk
-
--include .includes/bash-completion.mk
 
 ifneq ($(scan_on),)
 requires.raw recommends.raw suggests.raw &: $(SOURCE_FILES_IN) ## single scan producing all three library dependency tiers
-	$(NO_ECHO)printf '%s\n' $(SOURCE_FILES_IN) > file_list.tmp; \
-	PERL5LIB=lib:local/lib/perl5:$$PERL5LIB $(SCANDEPS) $(MIN_PERL_VERSION_FLAG) \
+	$(NO_ECHO)tmpdir="$$(mktemp -d)"; \
+	trap 'rm -rf "$$tmpdir" file_list.tmp' EXIT; \
+	printf '%s\n' $(SOURCE_FILES_IN) > file_list.tmp; \
+	echo "Scanning...lib/, bin/"; \
+	PERL5LIB=lib:local/lib/perl5:$$PERL5LIB $(SCANDEPS) -m $(MIN_PERL_VERSION) \
 	  --raw \
 	  --file-list file_list.tmp \
 	  --no-core --filter \
-	  --requires-file requires.raw \
-	  --recommends-file recommends.raw \
-	  --suggests-file suggests.raw > /dev/null; \
-	rm -f file_list.tmp
+	  --requires-file "$$tmpdir/requires.raw" \
+	  --recommends-file "$$tmpdir/recommends.raw" \
+	  --suggests-file "$$tmpdir/suggests.raw" >/dev/null; \
+	for type in requires recommends suggests; do \
+	  if [[ ! -e "$$type.raw" ]] || \
+	     ! cmp -s "$$tmpdir/$$type.raw" "$$type.raw"; then \
+	    mv "$$tmpdir/$$type.raw" "$$type.raw"; \
+	  fi; \
+	done
 
 provides: $(addsuffix .in,$(PERL_MODULES))
-	$(NO_ECHO)$(BOOTSTRAPPER) provides >$@
+	$(NO_ECHO)tmp="$$(mktemp)"; \
+	trap 'rm -f "$$tmp"' EXIT; \
+	$(BOOTSTRAPPER) provides > "$$tmp"; \
+	if [[ ! -e provides ]] || ! cmp -s "$$tmp" provides; then \
+	  mv "$$tmp" provides; \
+	fi
 
 test-requires.scan: $(TESTS)
 	$(NO_ECHO)printf '%s\n' $(TESTS) > file_list.tmp; \
 	tmp=$$(mktemp); trap 'rm -f $$tmp' EXIT; \
+        echo "Scanning...t/"; \
 	PERL5LIB=lib:local/lib/perl5:$$PERL5LIB $(SCANDEPS) $(MIN_PERL_VERSION_FLAG) \
 	  --raw \
+          --log-level info \
 	  --file-list file_list.tmp \
 	  --no-core --filter \
 	  --requires-file $$tmp > /dev/null; \
@@ -310,49 +313,53 @@ test-requires.scan: $(TESTS)
 test-requires.raw: test-requires.scan
 	$(NO_ECHO)sed -e 's/ 0$$/ undef/g' $< > $@
 
-test-requires: test-requires.raw provides ## creates or updates the `test-requires` file used to populate the TEST_REQUIRES section of the Makefile.PL
-	$(NO_ECHO)cleanfiles="$@.xxx"; \
-	reconciled=$$(mktemp); \
-	filtered=$$(mktemp); \
-	trap 'rm -f $$cleanfiles $$reconciled $$filtered' EXIT; \
-	if test -e "$@"; then \
-	  cp "$@" "$@.xxx"; \
-	fi; \
-	$(BOOTSTRAPPER) filter "$<" "$@.skip" "$@.xxx" > "$$reconciled"; \
-	$(BOOTSTRAPPER) deps-filter "$$reconciled" > "$$filtered"; \
-	awk 'NR == FNR { provided[$$1] = 1; next } !provided[$$1]' \
-	  provides "$$filtered" > "$@"; \
-	if test ! -e "$@" || ! cmp -s "$$output" "$@"; then \
-	  if test -n "$$output"; then  \
-	    mv "$$output" "$@"; \
-	  fi; \
-	fi
-
-
 requires: ## creates or updates the `requires` file used to populate PREQ_PM section of the Makefile.PL
 
 recommends: ## creates or updates the `recommends` file (soft, non-eval conditional dependencies)
 
 suggests: ## creates or updates the `suggests` file (eval-wrapped, optional dependencies)
 
-requires recommends suggests: %: %.reconciled
+test-requires: ## creates or updates the `test-requires` file used to populate the TEST_REQUIRES section of the Makefile.PL
+
+requires recommends suggests test-requires: %: %.reconciled
 	@:
 
-requires.reconciled recommends.reconciled suggests.reconciled: %.reconciled: %.raw
-	$(NO_ECHO)cleanfiles="$*.xxx"; \
-	reconciled=$$(mktemp); \
-	filtered=$$(mktemp); \
-	trap 'rm -f $$cleanfiles $$reconciled $$filtered' EXIT; \
-	if test -e "$*"; then \
-	  cp "$*" "$*.xxx"; \
+requires.reconciled \
+recommends.reconciled \
+suggests.reconciled \
+test-requires.reconciled &: \
+    requires.raw \
+    recommends.raw \
+    suggests.raw \
+    test-requires.raw \
+    | provides
+	$(NO_ECHO)deps="$$(mktemp)"; \
+	output="$$(mktemp)"; \
+	trap 'rm -f "$$deps" "$$output"' EXIT; \
+	for type in requires recommends suggests; do \
+	  if [[ ! -e "$$type.reconciled" || \
+	        "$$type.raw" -nt "$$type.reconciled" ]]; then \
+	    printf '%s\n' "$$type" >> "$$deps"; \
+	  fi; \
+	done; \
+	if [[ ! -e test-requires.reconciled || \
+	      test-requires.raw -nt test-requires.reconciled || \
+	      provides -nt test-requires.reconciled ]]; then \
+	  printf '%s\n' test-requires >> "$$deps"; \
 	fi; \
-	$(BOOTSTRAPPER) filter "$*.raw" "$*.skip" "$*.xxx" > "$$reconciled"; \
-	$(BOOTSTRAPPER) deps-filter "$$reconciled" > "$$filtered"; \
-	if test ! -e "$*" || ! cmp -s "$$filtered" "$*"; then \
-	  mv "$$filtered" "$*"; \
+	if [[ -s "$$deps" ]]; then \
+	  $(BOOTSTRAPPER) reconcile-deps $$(cat "$$deps"); \
 	fi; \
-	touch "$@"
-
+	if grep -qx 'test-requires' "$$deps"; then \
+	  awk 'NR == FNR { provided[$$1] = 1; next } !provided[$$1]' \
+	    provides test-requires > "$$output"; \
+	  if ! cmp -s "$$output" test-requires; then \
+	    mv "$$output" test-requires; \
+	  fi; \
+	fi; \
+	while read -r type; do \
+	  touch "$$type.reconciled"; \
+	done < "$$deps"
 else
 
 requires recommends suggests test-requires:
@@ -393,13 +400,6 @@ buildspec.yml: | buildspec.yml.tmpl
 	cp $$buildspec $@; \
 	chmod 0644 $@
 
-include .includes/git.mk
-include .includes/help.mk
-include .includes/release-notes.mk
-include .includes/update.mk
-include .includes/upgrade.mk
-include .includes/version.mk
-
 GENERATED_FILES += \
     provides \
     test-requires.scan
@@ -409,6 +409,7 @@ CLEANFILES += \
     $(PERL_MODULES) \
     $(POD_MODULES) \
     $(GENERATED_FILES) \
+    $(RENDERED_SOURCE_FILES) \
     *.tar.gz \
     *.tmp \
     *.xxx \
@@ -421,7 +422,8 @@ CLEANFILES += \
     cpanfile.recommends \
     cpanfile.requires \
     cpanfile.runtime \
-    cpanfile.suggests
+    cpanfile.suggests \
+    build-config.mk
 
 .PHONY: clean-local
 clean-local::
@@ -432,7 +434,6 @@ clean: clean-local ## removes temporary build artifacts
 .PHONY: basedir
 basedir:
 	$(NO_ECHO)echo $(BASEDIR)
-
 
 GSOURCE_FILES = $(SOURCE_FILES:.in=)
 
@@ -473,11 +474,6 @@ extra-files.mk: extra-files
 	  "$$(awk 'NF{print $$1}' $< | tr '\n' ' ')" > $@
 
 ifeq ($(BOOTSTRAP_BUILD),)
-include extra-files.mk
+-include extra-files.mk
 endif
 
-include .includes/publish.mk
-
-include .includes/builder.mk
-
-include .includes/test.mk

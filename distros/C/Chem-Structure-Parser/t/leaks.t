@@ -408,4 +408,64 @@ for my $stem (qw(mini.pdb mini.cif)) {
 	is($atom,    undef, "$stem: and its atoms: nothing points back up at its parent");
 }
 
+#--------
+# the paths 0.039 added: a residue filed apart under a number already used, a
+# file that stops at END, a UTF-8 string read through a downgraded copy, a
+# second mmCIF data block, a row cut short, a one-row anisotropic record kept,
+# models out of order, the grid's trimmed box and the RMSD's Jacobi rotation
+#--------
+{
+	my $collide = join '',
+		"ATOM      1  N   MET A   1       1.000   2.000   3.000  1.00 10.00           N\n",
+		"TER\n",
+		"HETATM    2  O   HOH A   1      20.000  20.000  20.000  1.00 10.00           O\n",
+		"END\n",
+		"HETATM    3  C1  LIG A   2      30.000  30.000  30.000  1.00 10.00           C\n";
+	no_leaks_ok { structure_info_string($collide, features => 0) }
+		'a residue filed apart, and a file read to its END, do not leak';
+	no_leaks_ok { structure_info_string($collide, features => 0, atoms => 0) }
+		'nor in the slim shape';
+	(my $up = $collide) =~ s/MET/M\x{e9}T/;
+	utf8::upgrade($up);
+	no_leaks_ok { Chem::Structure::Parser::_parse_string($up, {}) }
+		'a string upgraded to UTF-8 does not leak its downgraded copy';
+
+	my $head = join '', map { "_atom_site.$_\n" }
+		qw(group_PDB id type_symbol label_atom_id label_comp_id label_asym_id label_seq_id
+		   Cartn_x Cartn_y Cartn_z auth_seq_id auth_asym_id pdbx_PDB_model_num);
+	my $cif = "data_ONE\nloop_\n$head"
+	        . "ATOM 1 C CA GLY A 1 1.0 0.0 0.0 1 A 2\n"
+	        . "ATOM 2 C CA GLY A 1 1.5 0.0 0.0 1 A 1\n"
+	        . "ATOM 3 C CA GLY A 2 2.0\n"
+	        . "_atom_site_anisotrop.id 1\n_atom_site_anisotrop.U[1][1] 1\n"
+	        . "data_TWO\nloop_\n$head"
+	        . "ATOM 1 C CA GLY A 1 9.0 0.0 0.0 1 A 1\n";
+	no_leaks_ok { Chem::Structure::Parser::_parse_cif_string($cif, { anisou => 1, atom_hashes => 1 }) }
+		'a second data block, a cut-short row and models out of order do not leak';
+	no_leaks_ok { structure_info_string($cif, model => 'all', anisou => 1, features => 0) }
+		'nor the structure built from them';
+
+	my $far = do {
+		open my $fh, '<', "$data/fold.pdb" or die "Can't open '$data/fold.pdb' with mode '<': '$!'";
+		local $/;
+		my $t = <$fh>;
+		close $fh or die "Can't close '$data/fold.pdb': '$!'";
+		$t =~ s/^END\s*\z//m;
+		$t . "HETATM 9999 ZN    ZN Z 999    9999.9999999.9999999.999  1.00 10.00          ZN\n";
+	};
+	my $info = structure_info_string($far, features => 0);
+	no_leaks_ok { structure_sasa($info, store => 0) } "the grid's trimmed box does not leak";
+
+	my $line = sub {
+		my $n = 0;
+		return structure_info_string(join('', map {
+			sprintf "HETATM%5d  C%-2d LIG A   1    %8.3f%8.3f%8.3f  1.00 10.00           C\n",
+			        ++$n, $n, @$_ } @_), features => 0);
+	};
+	my $a = $line->([0, 0, 0], [1.5, 0, 0], [3, 0, 0]);
+	my $b = $line->([0, 0, 0], [0, 1.5, 0], [0, 3, 0]);
+	no_leaks_ok { structure_rmsd($a, $b, detail => 1) }
+		'an RMSD of points on a line, through the Jacobi rotation, does not leak';
+}
+
 done_testing();

@@ -1,5 +1,26 @@
 Revision history for Stats-LikeR
 
+0.3216 2026-10-09 CDT
+
+ [merge()]
+
+ - A join whose suffixed column name collided with an existing column
+   leaked one scalar each time it died, because the new name belonged to
+   nothing yet when the error was raised. The name is now freed with the
+   error. t/merge.t checks both the left and the right side.
+
+ - Joining a row frame (AoH or HoH) used far less memory. Gathering the
+   column names kept a temporary copy of the key for every cell of the
+   input until the join finished. Joining a 200,000-row, 22-column AoH to
+   a 2-column frame on its id peaked at 594 MB above the starting size,
+   and now peaks at 384 MB; with HoA output, 414 MB fell to 205 MB.
+
+ - HoA output from a row frame is faster: 0.70 s to 0.30 s for the join
+   above. Filling the result one whole column at a time read every input
+   row once per output column, and 200,000 rows do not fit in cache. The
+   columns are now filled in blocks of 1024 rows, which keeps a HoA input
+   at its old speed and each output column's values together in memory.
+
 0.3215 2026-10-06 CDT
 
  [read_table(): Excel workbooks]

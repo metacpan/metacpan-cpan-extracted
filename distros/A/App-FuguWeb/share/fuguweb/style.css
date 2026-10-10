@@ -26,7 +26,6 @@
 	--band2: #eeeef4;
 	--band-rule: #c0c0cc;
 	--code-bg: #f0f0f0;
-	--code-rule: #999999;
 	--serif: "Times New Roman", Times, serif;
 	--mono: Courier, "Courier New", monospace;
 }
@@ -43,7 +42,6 @@
 		--band2: #1e1e2c;
 		--band-rule: #3a3a50;
 		--code-bg: #1c1c22;
-		--code-rule: #44444c;
 	}
 }
 
@@ -143,7 +141,7 @@ code, pre, tt, kbd, samp, var {
 
 pre {
 	background: var(--code-bg);
-	border: 1px solid var(--code-rule);
+	border: 1px solid var(--rule);
 	line-height: 1.4;
 	overflow-x: auto;
 	padding: 0.7em 0.9em;
@@ -194,9 +192,6 @@ h2.Ss {
 	border: 0;
 	padding: 0;
 	font-weight: bold;
-	font-variant-caps: normal;
-	letter-spacing: 0;
-	text-transform: none;
 }
 
 h1.Sh {
@@ -208,11 +203,6 @@ h1.Sh {
 h2.Ss {
 	font-size: 1.05em;
 	margin-left: calc(-1.75em / 1.05);
-}
-
-h1.Sh::before,
-h2.Ss::before {
-	content: none;
 }
 
 a.permalink:link,
@@ -229,13 +219,6 @@ a.permalink:visited {
 	display: none;
 }
 
-/* Inline code of a manual page takes no box */
-
-.manual-text code {
-	background: none;
-	padding: 0;
-}
-
 table.Nm td {
 	vertical-align: top;
 }
@@ -246,10 +229,6 @@ table.Nm td:first-child {
 }
 
 .Bd-indent {
-	margin-left: 2em;
-}
-
-dl.Bl-tag > dd {
 	margin-left: 2em;
 }
 

@@ -19,7 +19,7 @@ sub cmd_version {
 ########################################################################
   my ($self) = @_;
 
-  print {*STDERR} sprintf "CPAN::Maker::Bootstrapper v%s\n", '2.4.0';
+  print {*STDERR} sprintf "CPAN::Maker::Bootstrapper v%s\n", '2.4.1';
   print {*STDERR} sprintf "Copyright 2026 (c) Robert C. Lauer, All rights reserved.\n";
 
   return $SUCCESS;

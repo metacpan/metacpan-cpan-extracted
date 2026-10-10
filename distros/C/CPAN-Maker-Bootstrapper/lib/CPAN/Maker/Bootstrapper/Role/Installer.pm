@@ -20,7 +20,7 @@ use Time::HiRes qw(time);
 
 use Role::Tiny;
 
-our $VERSION = '2.4.0';
+our $VERSION = '2.4.1';
 
 ########################################################################
 sub cmd_install {

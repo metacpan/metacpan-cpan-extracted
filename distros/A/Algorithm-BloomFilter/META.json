@@ -4,13 +4,13 @@
       "Steffen Mueller <smueller@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Algorithm-BloomFilter",
    "no_index" : {
@@ -32,10 +32,12 @@
       },
       "runtime" : {
          "requires" : {
-            "List::Util" : "0"
+            "List::Util" : "0",
+            "perl" : "5.008009"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.02"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

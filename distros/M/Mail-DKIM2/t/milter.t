@@ -404,7 +404,7 @@ sub run_inbound_verify {
 
 # Helper: run the full outbound sign with snapshot lookup
 sub run_outbound_sign {
-    my ($raw, $snapshot_dir) = @_;
+    my ($raw, $snapshot_dir, %extra) = @_;
     my ($handler, $mock) = run_sign($raw,
         domains => {
             'test2.dkim2.com' => {
@@ -416,6 +416,7 @@ sub run_outbound_sign {
         snapshot_directory   => $snapshot_dir,
         _authenticated       => 0,
         _local               => 1,
+        %extra,
     );
     # Override env_from for the forwarding domain
     $handler->{'env_from'} = '<forwarder@test2.dkim2.com>';
@@ -544,6 +545,34 @@ my $expected_dir = path("tests/expected");
     # Write the final outbound message for interop testing
     my $outbound = assemble_outbound($modified, $mock);
     $expected_dir->child("milter-case2-modified-no-intermediate-mi.eml")->spew($outbound);
+}
+
+# Case 2b: the body changed too, and max_recipe_literals decides whether
+# the snapshot diff carries the old line or declares the body unrecoverable
+# (this handler only adds header fields, so there is no epilogue). Signing
+# over its own null is then the host's choice: allow_null_body_recipe.
+for my $c (
+    ['default', 'diff'],
+    ['max_recipe_literals 0', 'refused', max_recipe_literals => 0],
+    ['max_recipe_literals 0, allow_null_body_recipe', 'null',
+        max_recipe_literals => 0, allow_null_body_recipe => 1],
+) {
+    my ($name, $want, %extra) = @$c;
+    my $snapshot_dir = tempdir(CLEANUP => 1);
+    my $signed_msg = make_originator_message();
+    run_inbound_verify($signed_msg, $snapshot_dir);
+    my $modified = $signed_msg;
+    $modified =~ s/(\r\n\r\n)[^\r\n]+/${1}A rewritten first body line/ or die;
+    my (undef, $mock) = run_outbound_sign($modified, $snapshot_dir, %extra);
+    my @dk2 = grep { $_->{field} eq 'DKIM2-Signature' } @{$mock->{pre_headers}};
+    my ($mi) = grep { $_->{field} eq 'Message-Instance' } @{$mock->{pre_headers}};
+    if ($want eq 'refused') {
+        ok(!@dk2 && !$mi, "case2b $name: not signed");
+        next;
+    }
+    ok(@dk2 && $mi, "case2b $name: signed with MI v=2") or next;
+    my $p = Mail::DKIM2::MessageInstance->parse($mi->{value});
+    is($p->unrecoverable ? 'null' : 'diff', $want, "case2b $name: body Recipe $want");
 }
 
 # Case 3: Modified message, intermediate code already added MI v=2

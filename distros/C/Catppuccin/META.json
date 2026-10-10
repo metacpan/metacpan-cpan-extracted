@@ -1,5 +1,5 @@
 {
-   "abstract" : "\ud83d\ude38 Soothing pastel theme for the high-spirited!",
+   "abstract" : "Soothing pastel theme for the high-spirited!",
    "author" : [
       "Rob Norris <robn@despairlabs.com>"
    ],
@@ -44,7 +44,7 @@
          "web" : "https://github.com/robn/Catppuccin"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.044000"
@@ -227,7 +227,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.001",
+                  "tag" : "0.002",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },

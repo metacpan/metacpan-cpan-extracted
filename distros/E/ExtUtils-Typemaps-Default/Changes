@@ -1,5 +1,12 @@
 Revision history for Perl extension ExtUtils::Typemaps::Default.
 
+1.07   Fri Oct  9 CET 2026
+  - Address CVE-2026-107794:
+    Fix integer underflow in ExtUtils::Typemaps::STL::List on empty lists.
+    Calling av_extend(av, len-1) when len == 0 underflowed the unsigned
+    integer and attempted to allocate a 32GiB array.
+  - Fix missing index increment in std::list<char*> OUTPUT typemaps.
+
 1.06   Thu Oct  8 CET 2026
   - Address CVE-2026-107373:
     Using "std::string( SvPV_nolen( $arg ), SvCUR( $arg ) );"

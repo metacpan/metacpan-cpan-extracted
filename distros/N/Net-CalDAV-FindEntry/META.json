@@ -1,0 +1,75 @@
+{
+   "abstract" : "find calendar entries overlapping a timespan",
+   "author" : [
+      "Max Maischein <corion@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-CalDAV-FindEntry",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "5",
+            "File::Spec" : "0",
+            "File::XDG" : "0",
+            "Getopt::Long" : "0",
+            "Moo" : "2",
+            "Net::CalDAVTalk" : "0",
+            "POSIX" : "0",
+            "Text::JSCalendar" : "0",
+            "Time::Local" : "0",
+            "URI::Escape" : "0",
+            "XML::Spice" : "0",
+            "YAML::Tiny" : "0",
+            "experimental" : "0.036",
+            "perl" : "5.020"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Corion/Net-CalDAV-FindEntry/issues"
+      },
+      "license" : [
+         "https://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Corion/Net-CalDAV-FindEntry.git",
+         "web" : "https://github.com/Corion/Net-CalDAV-FindEntry"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_static_install" : 1
+}

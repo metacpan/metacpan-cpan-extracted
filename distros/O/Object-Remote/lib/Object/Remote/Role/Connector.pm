@@ -37,6 +37,11 @@ sub connect {
       }
       undef($channel);
     });
+    $f->on_fail(sub {
+        # when the future doesn't fail, the connection takes ownership of the child process
+        kill('TERM', $child_pid);
+        waitpid $child_pid, 0;
+    });
     $channel->on_close_call(sub {
       log_trace { "Connection has been closed" };
       $f->fail("Channel closed without seeing Shere: $_[0]");

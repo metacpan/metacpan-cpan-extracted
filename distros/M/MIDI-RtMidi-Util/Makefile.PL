@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.036000;
+use 5.040000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,13 +14,11 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "MIDI-RtMidi-Util",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.036000",
+  "MIN_PERL_VERSION" => "5.040000",
   "NAME" => "MIDI::RtMidi::Util",
   "PREREQ_PM" => {
     "Exporter" => 0,
-    "MIDI::RtMidi::FFI::Device" => 0,
-    "feature" => 0,
-    "warnings" => 0
+    "MIDI::RtMidi::FFI::Device" => 0
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
@@ -28,9 +26,10 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::Exception" => 0,
     "Test::More" => "0.88",
-    "strict" => 0
+    "strict" => 0,
+    "warnings" => 0
   },
-  "VERSION" => "0.0401",
+  "VERSION" => "0.0500",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,7 +44,6 @@ my %FallbackPrereqs = (
   "MIDI::RtMidi::FFI::Device" => 0,
   "Test::Exception" => 0,
   "Test::More" => "0.88",
-  "feature" => 0,
   "strict" => 0,
   "warnings" => 0
 );

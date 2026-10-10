@@ -8,6 +8,7 @@ MANIFEST			This list of files
 ppport.h
 t/00_load.t
 t/01_basic.t
+t/02_security.t
 t/02_serialize.t
 t/03_merge.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

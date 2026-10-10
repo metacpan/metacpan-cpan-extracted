@@ -36,29 +36,31 @@ template <typename Value>
 void SzlSketch<Value>::Dims(int totalSize, int* nTabs, int* tabSize) {
   int ts = totalSize / 31;
   int bits;
-  for (bits = 2; bits < 32 && ts > (1 << bits); bits++)
+  for (bits = 2; bits < 31 && ts > static_cast<int>(1U << bits); bits++)
     ;
   int tabs;
   for (tabs = kMaxTabs; tabs > kMinTabs; tabs -= 2)
     if (((tabs - 2) << bits) < totalSize)
       break;
   *nTabs = tabs;
-  *tabSize = 1 << bits;
+  *tabSize = static_cast<int>(1U << bits);
 }
 
 template <typename Value>
 SzlSketch<Value>::SzlSketch(int nTabs, int tabSize)
-  : weights_(new Value[nTabs * tabSize]),
+  // The trailing "()" value-initialises the array: for the primitive Value
+  // types used here (int32_t, int64_t, double) "new Value[n]" would leave the
+  // weights uninitialised.
+  : weights_(new Value[static_cast<size_t>(nTabs) * static_cast<size_t>(tabSize)]()),
     nTabs_(nTabs),
     tabSize_(tabSize) {
-  // SzlValues's are clear by default, so we don't need to clear weights_
   
   // Check for valid nTabs, pow(2) tabSize;
   // CHECK(nTabs >= kMinTabs && nTabs <= kMaxTabs && (nTabs & 1) == 1);
   // CHECK(tabSize > 0 && (tabSize & (tabSize - 1)) == 0);
 
   int bits;
-  for (bits = 0; bits < 32 && tabSize > (1 << bits); bits++)
+  for (bits = 0; bits < 31 && tabSize > static_cast<int>(1U << bits); bits++)
     ;
   tabBits_ = bits;
 }
@@ -133,13 +135,17 @@ void SzlSketch<Value>::ComputeIndex(const string& s, Index* index) {
         MD5Digest(digest, MD5_DIGEST_LENGTH, &digest);
         digi = 0;
       }
-      bits |= digest[digi++] << nbits;
+      if (nbits < 32) {
+        bits |= static_cast<uint32>(digest[digi++]) << nbits;
+      } else {
+        digi++;
+      }
       nbits += 8;
     }
 
     // compute the index into this row of the sketch
     // and the sign we should use while summing.
-    int ind = bits & ((1 << tabBits_) - 1);
+    int ind = bits & ((tabBits_ < 31 ? (1U << tabBits_) : 0x7fffffffU) - 1);
     index->index[i].elem = origin + ind;
     origin += tabSize_;
     bits >>= tabBits_;
@@ -209,7 +215,7 @@ void SzlSketch<Value>::Estimate(Index* index, Value* est) {
 //   }
   
   nth_element(values, mid, last);
-  est = mid;
+  *est = *mid;
 }
 
 // Compute the estimated standard deviation of values in the sketch.

@@ -1,5 +1,11 @@
 Changes file for Speak
 
+1.06    2026-10-09
+        - Added -o|utput <filename> support to speak and say commands to save
+          speech audio to an output file.
+        - Added optional $output_file argument to speak() and say_persona().
+        - Unified say and speak commands by symlinking say to speak.
+
 1.05    2026-09-10
         - Decoupled network transport logic from proprietary domains.
         - Made WAN server failover completely generic and configurable via

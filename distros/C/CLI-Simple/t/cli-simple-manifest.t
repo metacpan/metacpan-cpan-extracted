@@ -21,172 +21,192 @@ sub write_manifest {
   my (%manifest) = @_;
 
   my ( $fh, $path ) = tempfile( 'manifest-XXXX', SUFFIX => '.yml', UNLINK => 1 );
+
   close $fh;
+
   DumpFile( $path, \%manifest );
 
   return $path;
 }
 
 ########################################################################
-# Command name -> method name transformation
+# _load_manifest stores legacy command metadata without composing roles
 ########################################################################
 
 {
-  my @cases = (
-    [ 'annotate',           'cmd_annotate' ],
-    [ 'code-review',        'cmd_code_review' ],
-    [ 'update-annotations', 'cmd_update_annotations' ],
-    [ 'pod-finding',        'cmd_pod_finding' ],
-    [ 'release-notes',      'cmd_release_notes' ],
-  );
 
-  for my $case (@cases) {
-    my ( $cmd, $expected ) = @{$case};
-    ( my $got = "cmd_$cmd" ) =~ s/-/_/gxsm;
-    is( $got, $expected, "name transform: $cmd -> $expected" );
-  }
-}
-
-########################################################################
-# _load_manifest: roles applied and dispatch table built
-########################################################################
-
-{
   package CLI::Simple::Test::RoleA;
+
   use Role::Tiny;
-  sub cmd_foo { return 'foo' }
-  sub cmd_bar { return 'bar' }
+
+  sub cmd_foo {
+    return 'foo';
+  }
+
+  sub cmd_bar {
+    return 'bar';
+  }
 
   package CLI::Simple::Test::RoleB;
+
   use Role::Tiny;
-  sub cmd_baz { return 'baz' }
+
+  sub cmd_baz {
+    return 'baz';
+  }
 }
 
 {
   my $yaml = write_manifest(
     options  => [qw(help|h verbose!)],
     commands => {
-      'foo' => 'CLI::Simple::Test::RoleA',
-      'bar' => 'CLI::Simple::Test::RoleA',
-      'baz' => 'CLI::Simple::Test::RoleB',
+      foo => 'CLI::Simple::Test::RoleA',
+      bar => 'CLI::Simple::Test::RoleA',
+      baz => 'CLI::Simple::Test::RoleB',
     },
   );
 
   {
+
     package CLI::Simple::Test::Consumer;
+
     use parent qw(CLI::Simple);
   }
 
   CLI::Simple->_load_manifest( 'CLI::Simple::Test::Consumer', $yaml );
 
-  ok( CLI::Simple::Test::Consumer->can('cmd_foo'),
-    '_load_manifest: cmd_foo composed into consumer' );
-
-  ok( CLI::Simple::Test::Consumer->can('cmd_bar'),
-    '_load_manifest: cmd_bar composed into consumer' );
-
-  ok( CLI::Simple::Test::Consumer->can('cmd_baz'),
-    '_load_manifest: cmd_baz composed from second role' );
-
   my $manifest = CLI::Simple::Test::Consumer->_manifest;
 
-  ok( $manifest, '_manifest returns stored manifest' );
+  ok( $manifest, '_manifest returns stored manifest', );
 
-  ok( exists $manifest->{_dispatch}{foo}, 'dispatch table has foo' );
-  ok( exists $manifest->{_dispatch}{bar}, 'dispatch table has bar' );
-  ok( exists $manifest->{_dispatch}{baz}, 'dispatch table has baz' );
+  is_deeply(
+    $manifest->{_commands},
+    { foo => 'CLI::Simple::Test::RoleA',
+      bar => 'CLI::Simple::Test::RoleA',
+      baz => 'CLI::Simple::Test::RoleB',
+    },
+    'legacy command metadata preserved',
+  );
 
-  my $obj = bless {}, 'CLI::Simple::Test::Consumer';
-  is( $manifest->{_dispatch}{foo}->($obj), 'foo', 'dispatch foo calls cmd_foo' );
-  is( $manifest->{_dispatch}{baz}->($obj), 'baz', 'dispatch baz calls cmd_baz' );
+  ok( !CLI::Simple::Test::Consumer->can('cmd_foo'), '_load_manifest does not compose first legacy role', );
+
+  ok( !CLI::Simple::Test::Consumer->can('cmd_baz'), '_load_manifest does not compose second legacy role', );
 }
 
 ########################################################################
-# Role deduplication - same role for multiple commands
+# _load_manifest normalizes selective role metadata
 ########################################################################
-
-{
-  package CLI::Simple::Test::RoleC;
-  use Role::Tiny;
-  sub cmd_one { return 'one' }
-  sub cmd_two { return 'two' }
-}
 
 {
   my $yaml = write_manifest(
-    options  => [qw(help|h)],
-    commands => {
-      'one' => 'CLI::Simple::Test::RoleC',
-      'two' => 'CLI::Simple::Test::RoleC',
+    roles => {
+      foo => 'CLI::Simple::Test::RoleA',
+      baz => [ 'CLI::Simple::Test::RoleA', 'CLI::Simple::Test::RoleB', ],
     },
   );
 
   {
-    package CLI::Simple::Test::ConsumerC;
+
+    package CLI::Simple::Test::Selective;
+
     use parent qw(CLI::Simple);
   }
 
-  my $ok = eval {
-    CLI::Simple->_load_manifest( 'CLI::Simple::Test::ConsumerC', $yaml );
-    1;
-  };
+  CLI::Simple->_load_manifest( 'CLI::Simple::Test::Selective', $yaml );
 
-  ok( $ok, 'deduplication: same role for two commands does not die' );
-  ok( CLI::Simple::Test::ConsumerC->can('cmd_one'), 'cmd_one available after dedup' );
-  ok( CLI::Simple::Test::ConsumerC->can('cmd_two'), 'cmd_two available after dedup' );
+  my $manifest = CLI::Simple::Test::Selective->_manifest;
+
+  is_deeply( $manifest->{_roles}{foo}, ['CLI::Simple::Test::RoleA'], 'scalar selective role normalized to array', );
+
+  is_deeply(
+    $manifest->{_roles}{baz},
+    [ 'CLI::Simple::Test::RoleA', 'CLI::Simple::Test::RoleB', ],
+    'selective role array preserved',
+  );
+
+  ok( !CLI::Simple::Test::Selective->can('cmd_foo'), '_load_manifest does not compose selective roles', );
 }
 
 ########################################################################
-# Error: role does not implement the expected method
+# command cannot be declared in both commands and roles
 ########################################################################
-
-{
-  package CLI::Simple::Test::RoleEmpty;
-  use Role::Tiny;
-  # deliberately no cmd_missing
-}
 
 {
   my $yaml = write_manifest(
-    options  => [qw(help|h)],
-    commands => { 'missing' => 'CLI::Simple::Test::RoleEmpty' },
+    commands => { foo => 'CLI::Simple::Test::RoleA', },
+    roles    => { foo => 'CLI::Simple::Test::RoleA', },
   );
 
   {
-    package CLI::Simple::Test::ConsumerBad;
+
+    package CLI::Simple::Test::Duplicate;
+
     use parent qw(CLI::Simple);
   }
 
   my $err = do {
     local $@;
-    eval { CLI::Simple->_load_manifest( 'CLI::Simple::Test::ConsumerBad', $yaml ) };
+
+    eval { CLI::Simple->_load_manifest( 'CLI::Simple::Test::Duplicate', $yaml ); };
+
     $@;
   };
 
-  like( $err, qr/does not implement cmd_missing/,
-    'error when role missing required method' );
+  like( $err, qr/command 'foo' is defined in both commands and roles/, 'command cannot appear in both commands and roles', );
 }
 
 ########################################################################
-# Backward compatibility: classes without YAML are unaffected
+# selective role specification must be scalar or array
 ########################################################################
 
 {
-  package CLI::Simple::Test::Legacy;
-  use parent qw(CLI::Simple);
-  sub cmd_legacy { return 'legacy' }
-}
+  my $yaml = write_manifest( roles => { foo => { role => 'CLI::Simple::Test::RoleA', }, }, );
 
-{
-  ok( !CLI::Simple::Test::Legacy->_manifest,
-    'backward compat: no manifest on class that did not load YAML' );
+  {
 
-  ok( CLI::Simple::Test::Legacy->can('cmd_legacy'),
-    'backward compat: own methods still present' );
+    package CLI::Simple::Test::InvalidRoles;
+
+    use parent qw(CLI::Simple);
+  }
+
+  my $err = do {
+    local $@;
+
+    eval { CLI::Simple->_load_manifest( 'CLI::Simple::Test::InvalidRoles', $yaml ); };
+
+    $@;
+  };
+
+  like( $err, qr/invalid roles specification for command 'foo'/, 'invalid selective role specification rejected', );
 }
 
 ########################################################################
-# manifest option/default_options/extra_options pass-through
+# selective role names must be valid class names
+########################################################################
+
+{
+  my $yaml = write_manifest( roles => { foo => 'not a class name', }, );
+
+  {
+
+    package CLI::Simple::Test::InvalidRoleName;
+
+    use parent qw(CLI::Simple);
+  }
+
+  my $err = do {
+    local $@;
+
+    eval { CLI::Simple->_load_manifest( 'CLI::Simple::Test::InvalidRoleName', $yaml ); };
+
+    $@;
+  };
+
+  like( $err, qr/invalid role 'not a class name' for command 'foo'/, 'invalid selective role class name rejected', );
+}
+
+########################################################################
+# manifest values pass through unchanged
 ########################################################################
 
 {
@@ -194,26 +214,52 @@ sub write_manifest {
     options         => [qw(help|h verbose! format=s)],
     default_options => { format => 'json' },
     extra_options   => [qw(content)],
-    commands        => { 'foo' => 'CLI::Simple::Test::RoleA' },
+    abbreviations   => 1,
+    alias           => { commands => { f => 'foo', }, },
+    commands        => { foo      => 'CLI::Simple::Test::RoleA', },
   );
 
   {
-    package CLI::Simple::Test::ConsumerD;
+
+    package CLI::Simple::Test::PassThrough;
+
     use parent qw(CLI::Simple);
   }
 
-  CLI::Simple->_load_manifest( 'CLI::Simple::Test::ConsumerD', $yaml );
+  CLI::Simple->_load_manifest( 'CLI::Simple::Test::PassThrough', $yaml );
 
-  my $m = CLI::Simple::Test::ConsumerD->_manifest;
+  my $manifest = CLI::Simple::Test::PassThrough->_manifest;
 
-  is_deeply( $m->{default_options}, { format => 'json' },
-    'manifest preserves default_options' );
+  is_deeply( $manifest->{default_options}, { format => 'json' }, 'manifest preserves default_options', );
 
-  is_deeply( $m->{extra_options}, [qw(content)],
-    'manifest preserves extra_options' );
+  is_deeply( $manifest->{extra_options}, [qw(content)], 'manifest preserves extra_options', );
 
-  is_deeply( $m->{options}, [qw(help|h verbose! format=s)],
-    'manifest preserves options' );
+  is_deeply( $manifest->{options}, [qw(help|h verbose! format=s)], 'manifest preserves options', );
+
+  is( $manifest->{abbreviations}, 1, 'manifest preserves abbreviations', );
+
+  is_deeply( $manifest->{alias}, { commands => { f => 'foo', }, }, 'manifest preserves aliases', );
+}
+
+########################################################################
+# classes without manifests are unaffected
+########################################################################
+
+{
+
+  package CLI::Simple::Test::Legacy;
+
+  use parent qw(CLI::Simple);
+
+  sub cmd_legacy {
+    return 'legacy';
+  }
+}
+
+{
+  ok( !CLI::Simple::Test::Legacy->_manifest, 'class without manifest has no manifest metadata', );
+
+  ok( CLI::Simple::Test::Legacy->can('cmd_legacy'), 'class without manifest retains its own methods', );
 }
 
 done_testing;

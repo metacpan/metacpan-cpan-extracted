@@ -19,6 +19,7 @@ Getopt::Long::GetOptions(
 	'auto'     => \$o{auto},
 	'ascii!'   => \$o{ascii},
 	'clear!'   => \$o{clear},
+	'pick!'    => \$o{pick},
 	'help|h'   => \$o{help},
 ) or usage(1);
 usage(0) if $o{help};
@@ -27,16 +28,47 @@ $o{seed} //= sprintf('%s-%d', scalar(localtime), $$);
 
 binmode STDOUT, ':encoding(UTF-8)' unless $o{ascii};
 
-my $t = Game::Mahjong::Terminal->new(
-	seed => $o{seed}, level => $o{level}, seat => $o{seat},
-	in => \*STDIN, out => \*STDOUT, colour => $o{colour}, glyphs => $o{glyphs}, auto => $o{auto},
-	ascii => $o{ascii}, clear => $o{clear},
-);
-$t->run;
+my $t = eval {
+	Game::Mahjong::Terminal->new(
+		seed => $o{seed}, level => $o{level}, seat => $o{seat},
+		in => \*STDIN, out => \*STDOUT, colour => $o{colour}, glyphs => $o{glyphs}, auto => $o{auto},
+		ascii => $o{ascii}, clear => $o{clear},
+		(defined $o{pick} ? (picking => $o{pick} ? 1 : 0) : ()),
+	);
+};
+
+unless ($t) {
+	my $why = $@ || 'could not start';
+	$why =~ s/ at \S+ line \d+\.?\s*\z//;
+	$why =~ s/\A[\w:]+: //;
+	chomp $why;
+	print {\*STDERR} "mahjong: $why\n";
+	exit 2;
+}
+
+for my $signal (qw/ INT TERM HUP /) {
+	$SIG{$signal} = sub {
+		$t->leave_raw;
+		$SIG{ $_[0] } = 'DEFAULT';
+		kill $_[0], $$;
+	};
+}
+
+my $g = eval { $t->run };
+my $died = $@;
+$t->leave_raw;
+die $died if $died;
+
+exit 1 unless $t->finished;
+exit 0 if $o{auto};
+exit 0 unless defined $t->winner;
+exit 0 if $t->winner == $o{seat};
+exit 1;
 
 sub usage {
 	my ($code) = @_;
-	print <<'USAGE';
+	my $fh = $code ? \*STDERR : \*STDOUT;
+	print {$fh} <<'USAGE';
 mahjong: a game against three bots under the Chinese Official rules
 
   --seed STRING     the game (the same seed deals the same tiles); a fresh one by default
@@ -46,10 +78,20 @@ mahjong: a game against three bots under the Chinese Official rules
   --ascii           draw the tile frames with + - | for a terminal without box drawing
   --no-clear        do not clear the screen before each table
   --no-colour       plain text (colour is on when standard output is a terminal)
+  --no-pick         type the moves out instead of pointing at them
   --auto            four bots, no prompt: watch a game
   --help            this
 
-At the prompt: a number discards that tile, "help" lists the rest.
+On a terminal the left and right keys walk your own rack and the tile under
+the cursor is the one you would throw. The line under it says what that
+leaves you: how far from a winning hand, and how many tiles would help.
+Enter throws it, the number keys still work, ? lists the keys and q stops.
+Needs Term::ReadKey; without it, or off a terminal, every move is typed.
+
+At a typed prompt: a number discards that tile, "help" lists the rest.
+
+Exit status is 0 if you won or the game was drawn, 1 if you lost or stopped
+early, 2 for an option the game will not take.
 USAGE
 	exit $code;
 }

@@ -6,8 +6,7 @@ use strict;
 use warnings;
 use Test::Most;
 # use Test::NoWarnings;	# Win32::locale::Lexicon produces warnings
-use lib 't/lib';
-use MyLogger;
+use Test::Log::Abstraction;
 
 eval 'use autodie qw(:all)';	# Test for open/close failures
 
@@ -37,7 +36,7 @@ unless(-e 't/online.enabled') {
 
 	my $l = CGI::Lingua->new({
 		supported => ['en', 'fr', 'en-gb', 'en-us'],
-		logger => MyLogger->new()
+		logger => Test::Log::Abstraction->new()
 	});
 	ok(defined $l);
 	ok($l->isa('CGI::Lingua'));

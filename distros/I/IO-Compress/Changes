@@ -1,6 +1,32 @@
 CHANGES
 -------
 
+  2.225 9 October 2026
+
+    * update to version 2,225
+      Fri Oct 9 15:32:13 2026 +0100
+      ad11c5d0913e697572987e9c1bfc49b59743dee3
+
+    * Update email address
+      Fri Oct 9 14:12:19 2026 +0100
+      08b77153277feaee4aa8f29778470b97983e19ca
+
+    * Fix inefficient and unbounded code for reading gzip Name & Comment fields #86
+      Fri Oct 9 13:58:14 2026 +0100
+      cdc16a0607c97c457d49fcf23d9f28a049dc05de
+
+    * add newStreamHook #84
+      Fri Oct 9 11:49:22 2026 +0100
+      d283b082186ec57fb11bd693f7ccca762d567c96
+
+    * Fix typo
+      Fri Sep 4 00:08:27 2026 +0100
+      f6755650cc4ac1e2e34502ee5db1f9c855215976
+
+    * Fix typo in Changes file
+      Fri Aug 28 12:32:14 2026 +0100
+      bd72147253d077e10157c4696e9d11b135762a4e
+
   2.224 28 August 2026
 
     * Update to version 2.224
@@ -59,7 +85,7 @@ CHANGES
       Tue Jul 21 23:10:54 2026 +0100
       4dc945b0b64f8ead71b7bbba87407889bb0cf0cb
 
-    * Update CHENGES
+    * Update CHANGES
       Sat Jul 4 09:23:19 2026 +0100
       cfbbd9e8f32c8279076be21591da0ef65bf4aecf
 
@@ -69,8 +95,7 @@ CHANGES
       Sat Jul 4 09:22:42 2026 +0100
       5e2d96044b22be0c6cd0ba408b671281d15e5a9c
 
-    * * Error:  Compress::Raw::Zlib version 2.222 required--this is only version 2.221
-      * Update to version 2.223 Fixes #79
+    * Update to version 2.223 Fixes #79
       Sat Jul 4 09:16:41 2026 +0100
       b9031b0fc30ad378e6cfda5c3dfbede82ec6ac59
 

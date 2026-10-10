@@ -64,6 +64,7 @@ t/30-search.t
 t/31-bot.t
 t/32-terminal.t
 t/33-no-io.t
+t/lib/Capture.pm
 t/lib/FanCheck.pm
 t/lib/Play.pm
 t/manifest.t

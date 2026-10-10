@@ -1,6 +1,7 @@
 Makefile.txt
 bash-completion.mk
 bootstrap.mk
+build-init.mk
 builder
 builder.env
 builder.mk

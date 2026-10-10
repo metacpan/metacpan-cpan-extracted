@@ -197,7 +197,7 @@ With out any additional configuration the consumers of this logging system will
 automatically be enabled via OBJECT_REMOTE_LOG_LEVEL and formated with
 OBJECT_REMOTE_LOG_FORMAT but those additional log messages are not sent to STDERR.
 By setting the OBJECT_REMOTE_LOG_SELECTIONS environment variable to a list of logging
-package names seperated by spaces then logs generated using those packages
+package names separated by spaces then logs generated using those packages
 will be sent to STDERR. If the asterisk character (*) is used in the place of a package
 name then all package names will be selected by default instead of ignored. An individual
 package name can be turned off by prefixing the name with a hypen character (-). This is

@@ -4,15 +4,15 @@ use strict ;
 use warnings;
 use bytes;
 
-use IO::Compress::Base::Common 2.224 qw(:Status createSelfTiedObject);
+use IO::Compress::Base::Common 2.225 qw(:Status createSelfTiedObject);
 
-use IO::Uncompress::Base 2.224 ;
-use IO::Uncompress::Adapter::UnXz 2.224 ;
+use IO::Uncompress::Base 2.225 ;
+use IO::Uncompress::Adapter::UnXz 2.225 ;
 
 require Exporter ;
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $UnXzError);
 
-$VERSION = '2.224';
+$VERSION = '2.225';
 $UnXzError = '';
 
 @ISA    = qw( IO::Uncompress::Base Exporter );
@@ -913,7 +913,7 @@ L<IO::Zlib|IO::Zlib>
 
 =head1 AUTHOR
 
-This module was written by Paul Marquess, C<pmqs@cpan.org>.
+This module was written by Paul Marquess, C<pmqs@outlook.com>.
 
 =head1 MODIFICATION HISTORY
 

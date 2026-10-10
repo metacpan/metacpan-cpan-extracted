@@ -37,6 +37,50 @@ my $here = dirname(abs_path(__FILE__));
 # there is no default path to try, and the entry drops out.
 my $home = defined $ENV{HOME} ? $ENV{HOME} : $ENV{USERPROFILE};
 
+# The decompressors, for the files named as compressed: the PDB corpus in
+# PDBbind v2020 is bzipped whole, every one of its 10,116 entries a
+# .ent.pdb.bz2.  t/real.t has the same table and argues it -- the module's own
+# IO::Uncompress, through the one-shot functions because those report an
+# archive cut short, and a file this perl has no decompressor for left out
+# rather than failed.
+my %UNPACK = (
+	gz  => { class => 'IO::Uncompress::Gunzip',  fn => 'gunzip',
+	         error => sub { no warnings 'once'; $IO::Uncompress::Gunzip::GunzipError } },
+	bz2 => { class => 'IO::Uncompress::Bunzip2', fn => 'bunzip2',
+	         error => sub { no warnings 'once'; $IO::Uncompress::Bunzip2::Bunzip2Error } },
+);
+my %can_unpack = map {
+	(my $pm = "$UNPACK{$_}{class}.pm") =~ s{::}{/}g;
+	($_ => (eval { require $pm; 1 } ? 1 : 0));
+} keys %UNPACK;
+
+# can_read($name) -- plain, or compressed with something this perl can undo
+sub can_read {
+	my ($name) = @_;
+	my ($kind) = $name =~ /\.(gz|bz2)\z/i;
+	return !defined $kind || $can_unpack{ lc $kind };
+}
+
+# open_structure($file) -- a handle on the file's text, unpacked first if its
+# name says it is compressed, which is the rule structure_info() follows
+sub open_structure {
+	my ($file) = @_;
+	my ($kind) = $file =~ /\.(gz|bz2)\z/i;
+	my $text;
+	if (defined $kind) {
+		my $u = $UNPACK{ lc $kind };
+		$u->{class}->can($u->{fn})->($file => \$text, MultiStream => 1)
+			or die "Can't $u->{fn} '$file': '" . $u->{error}->() . "'";
+	}
+	my $fh;
+	if (defined $text) {
+		open $fh, '<', \$text or die "Can't open the text of '$file' in memory: '$!'";
+	} else {
+		open $fh, '<', $file or die "Can't open '$file' with mode '<': '$!'";
+	}
+	return $fh;
+}
+
 # canon_charges() -- both readers' charges in one spelling, in place.
 #
 # The two formats write a formal charge differently and each reader reports
@@ -165,12 +209,14 @@ sub adds_up {
 		my @e = sort grep { !/\A\./ } readdir $dh;
 		closedir $dh;
 		# a flat directory of .cif files, or one directory per structure
-		push @files, map { "$d/$_" } grep { /\.(cif|mmcif|pdbx)(\.gz)?\z/ } @e;
+		push @files, map { "$d/$_" }
+		             grep { /\.(cif|mmcif|pdbx)(\.(gz|bz2))?\z/i && can_read($_) } @e;
 		next if @files;
 		for my $sub (grep { -d "$d/$_" } @e) {
 			opendir(my $sh, "$d/$sub") or next;
 			push @files, map { "$d/$sub/$_" }
-			             sort grep { /\.(cif|mmcif|pdbx)(\.gz)?\z/ } readdir $sh;
+			             sort grep { /\.(cif|mmcif|pdbx)(\.(gz|bz2))?\z/i && can_read($_) }
+			             readdir $sh;
 			closedir $sh;
 		}
 	}
@@ -276,7 +322,7 @@ sub cifq {
 
 sub to_cif {
 	my ($file) = @_;
-	open my $fh, '<', $file or die "$file: $!";
+	my $fh = open_structure($file);
 	my @rows;
 	my $model = 1;
 	my $aniso = 0;
@@ -316,7 +362,7 @@ sub to_cif {
 			$chg, $model,
 		];
 	}
-	close $fh;
+	close $fh or die "Can't close '$file': '$!'";
 	my @out = ('data_converted', '#', 'loop_',
 		map { "_atom_site.$_" } qw(
 			group_PDB id type_symbol auth_atom_id label_alt_id auth_comp_id
@@ -342,7 +388,7 @@ sub to_cif {
 	);
 	my @all;
 	if (@dirs && opendir(my $dh, $dirs[0])) {
-		@all = sort grep { /\.(pdb|ent)\z/ } readdir $dh;   # not .gz: to_cif reads plain
+		@all = sort grep { /\.(pdb|ent)(\.(gz|bz2))?\z/i && can_read($_) } readdir $dh;
 		closedir $dh;
 	}
 

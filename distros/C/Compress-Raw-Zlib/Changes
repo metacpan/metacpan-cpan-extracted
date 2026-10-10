@@ -1,7 +1,21 @@
 CHANGES
 -------
 
-  2.224 28 Auguat 2026
+  2.225 9 October 2026
+
+    * update to version 2,225
+      Fri Oct 9 14:35:13 2026 +0100
+      d60303914478956af6d38651f971ec2d3bb90747
+
+    * Update email address
+      Fri Oct 9 14:09:32 2026 +0100
+      18df572c0ddac6b9200792fde0d49cc3050d903e
+
+    * Changes: correct typo in date
+      Fri Sep 4 00:05:53 2026 +0100
+      571fd6482e8d76e4e7834d129cf994b174498c47
+
+  2.224 28 August 2026
 
     * Remove call to UpDowngrade in Makefile.PL
       Fri Aug 28 11:10:08 2026 +0100

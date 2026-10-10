@@ -10,9 +10,6 @@ use Digest::SHA qw(sha1_hex);
 use English qw(-no_match_vars);
 use File::Spec;
 use File::Path qw(make_path);
-use HTTP::Tiny;
-use IO::Uncompress::Gunzip qw(gunzip $GunzipError);
-use Storable qw(nstore retrieve);
 
 use Role::Tiny;
 
@@ -56,6 +53,8 @@ sub _create_index {
 
   my %index;
 
+  require IO::Uncompress::Gunzip;
+
   # Later repositories take precedence over earlier repositories.
   foreach my $details ( @{$url_list} ) {
     my $listing;
@@ -66,8 +65,10 @@ sub _create_index {
       die "ERROR: $filename not found\n"
         if !-f $filename;
 
-      gunzip $filename => \$listing
-        or die "ERROR: could not read $filename - $GunzipError\n";
+      no warnings 'once';
+
+      IO::Uncompress::Gunzip::gunzip( $filename => \$listing )
+        or die sprintf "ERROR: could not read %s - %s\n", $filename, $IO::Uncompress::Gunzip::GunzipError;
     }
     else {
       $listing = $self->fetch_02packages("$details/modules/02packages.details.txt.gz");
@@ -100,18 +101,32 @@ sub _filter_packages {
 
   my $packages = slurp($package_list);
 
-  my %found_index;
-  my %not_found_index;
   my %requires;
 
   foreach my $p ( split /\n/xsm, $packages ) {
     next if !$p || $p =~ /^[#]/xsm;
+
     my ($module_name) = split /\s+/xsm, $p;
     $module_name =~ s/^[+\s]+//xsm;
-    $requires{$module_name} = $p;
 
-    if ( $index->{$module_name} && $module_name eq $index->{$module_name} ) {
-      $found_index{$module_name} = $index->{$module_name};  # what distribution are you in?
+    $requires{$module_name} = $p;
+  }
+
+  return $self->_filter_package_hash( $index, \%requires );
+}
+
+########################################################################
+sub _filter_package_hash {
+########################################################################
+  my ( $self, $index, $requires ) = @_;
+
+  my %found_index;
+  my %not_found_index;
+
+  foreach my $module_name ( keys %{$requires} ) {
+    if ( $index->{$module_name}
+      && $module_name eq $index->{$module_name} ) {
+      $found_index{$module_name} = $index->{$module_name};
     }
     else {
       $not_found_index{$module_name} = $index->{$module_name};
@@ -121,12 +136,14 @@ sub _filter_packages {
   my @found = keys %found_index;
 
   foreach my $m ( keys %not_found_index ) {
-    next if $index->{$m} && $found_index{ $index->{$m} };
+    next
+      if defined $index->{$m}
+      && $found_index{ $index->{$m} };
 
     push @found, $m;
   }
 
-  return { map { $_ => $requires{$_} } @found };
+  return { map { $_ => $requires->{$_} } @found };
 }
 
 ########################################################################
@@ -184,6 +201,9 @@ sub _refresh_02packages {
 ########################################################################
   my ( $self, $cache_dir, $url ) = @_;
 
+  require HTTP::Tiny;
+  require Storable;
+
   my $cache_key = sha1_hex($url);
 
   my $repo_dir = File::Spec->catdir( $cache_dir, 'repositories', $cache_key, );
@@ -198,7 +218,7 @@ sub _refresh_02packages {
   my $state = {};
 
   if ( -f $state_file ) {
-    $state = retrieve($state_file);
+    $state = Storable::retrieve($state_file);
   }
 
   my %headers;
@@ -245,7 +265,7 @@ sub _refresh_02packages {
     digest        => sha1_hex( $res->{content} ),
   };
 
-  nstore $state, $state_file;
+  Storable::nstore( $state, $state_file );
 
   return { %{$state}, file_url => "file://$packages_file", };
 }
@@ -266,6 +286,8 @@ sub _load_cached_index {
 ########################################################################
   my ( $self, $cache_dir, $signature ) = @_;
 
+  require Storable;
+
   my $index_file = File::Spec->catfile( $cache_dir, 'index.storable', );
 
   my $state_file = File::Spec->catfile( $cache_dir, 'index.signature', );
@@ -279,7 +301,7 @@ sub _load_cached_index {
   return
     if $cached_signature ne $signature;
 
-  return retrieve($index_file);
+  return Storable::retrieve($index_file);
 }
 
 ########################################################################
@@ -291,7 +313,7 @@ sub _store_cached_index {
 
   my $state_file = File::Spec->catfile( $cache_dir, 'index.signature', );
 
-  nstore $index, $index_file;
+  Storable::nstore( $index, $index_file );
 
   open my $fh, '>', $state_file
     or die "ERROR: could not write $state_file\n$OS_ERROR";

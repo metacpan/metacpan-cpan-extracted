@@ -16,7 +16,7 @@ use Scalar::Util ();
 use VPNDetection::Error;
 use VPNDetection::OauthError;
 
-our $VERSION = '3.5.2';
+our $VERSION = '3.5.3';
 
 use constant DEVICE_CODE_GRANT => 'urn:ietf:params:oauth:grant-type:device_code';
 # The only PKCE method the server accepts.

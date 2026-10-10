@@ -91,4 +91,20 @@ my $signed = signed_message();
     ok(!$ok && $@ == $thrown, 'parse_dkim_pubkey rethrows an object from the Ed25519 constructor');
 }
 
+# The web validator's report is library code too: an object thrown from its
+# key callback comes straight out, after one call -- it used to be caught,
+# the report came back as overall=none, and work carried on.
+{
+    require Mail::DKIM2::Validate;
+    my $thrown = Host::Timeout->new('validate');
+    my $calls = 0;
+    my $ok = eval {
+        Mail::DKIM2::Validate::report(signed_message(),
+            PubkeyCallback => sub { $calls++; die $thrown });
+        1;
+    };
+    ok(!$ok && ref $@ && $@ == $thrown, 'Validate::report rethrows the object');
+    is($calls, 1, '  ... after one callback');
+}
+
 done_testing;

@@ -128,7 +128,7 @@ CPAN::Maker::ConfigReader - Read CPAN::Maker configuration from an INI file
 
 =head1 SYNOPSIS
 
-  use CPAN::Maker::ConfigReader;
+  use CPAN::Maker::Bootstrapper::ConfigReader;
 
   # uses ~/.gitconfig by default
   my $reader = CPAN::Maker::ConfigReader->new;

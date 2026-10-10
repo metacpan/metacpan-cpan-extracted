@@ -25,7 +25,7 @@ BEGIN {
     # Define a hidden directory in the user's home for Inline's compiled code.
     # Include the distribution, Perl version, and architecture to avoid reusing
     # cached Inline objects compiled for a different Perl ABI.
-    my $inline_dir = File::Spec::Functions::catdir(
+    my $inline_dir = $ENV{PHENO_RANKER_INLINE_DIR} // File::Spec::Functions::catdir(
         File::HomeDir->my_home,
         '.Inline',
         'Pheno-Ranker',

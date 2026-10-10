@@ -1,7 +1,7 @@
 package Mail::DKIM2::Validate;
 use strict; use warnings; use 5.020;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use Email::MIME;
 use List::Util qw(max);
@@ -10,8 +10,9 @@ use Mail::DKIM2::MessageInstance;
 use Mail::DKIM2::Verifier;
 use Mail::DKIM2::Signature;
 
-sub _i { my $h = shift // ''; $h =~ /\bi=(\d+)/ ? 0 + $1 : 0 }
-sub _m { my $h = shift // ''; $h =~ /\bm=(\d+)/ ? 0 + $1 : 0 }
+# i= / m= of a field value; tag names are case insignificant (spec-06 §7, §8).
+sub _i { my $h = shift // ''; $h =~ /(?:\A|;)\s*i\s*=\s*(\d+)/i ? 0 + $1 : 0 }
+sub _m { my $h = shift // ''; $h =~ /(?:\A|;)\s*m\s*=\s*(\d+)/i ? 0 + $1 : 0 }
 
 # --- parsed-tag breakdown for the validator UI ---------------------------
 # A compact, human-readable rendering of every tag in a DKIM2-Signature or
@@ -103,6 +104,7 @@ sub _default_cb {
         require JSON;
         if (open my $fh, '<', $dns_path) {
             $dns = eval { JSON::decode_json(do { local $/; <$fh> }) };
+            die $@ if ref $@;
             close $fh;
         }
     }
@@ -132,6 +134,8 @@ sub _default_cb {
 # deploy/www/verify/verify.js's verifyMessage().
 sub report {
     my ($text, %opts) = @_;
+    Mail::DKIM2::Common::_check_options('Mail::DKIM2::Validate::report', \%opts,
+        qw(DnsPath PubkeyCallback SkipTimestampCheck));
     $text //= '';
 
     return _report_once($text, %opts);
@@ -148,6 +152,7 @@ sub _report_once {
                counts => { signatures => 0, instances => 0 }, levels => []);
 
     my $msg = eval { parse_mime($text) };
+    die $@ if ref $@;
     return { %res, overall => 'fail', summary => "could not parse message: $@" }
         if $@ || !$msg;
 
@@ -178,6 +183,7 @@ sub _report_once {
     $v->skip_timestamp_check(1);
     $v->set_pubkey_callback($cb);
     eval { $v->PRINT($text); $v->CLOSE; 1 };
+    die $@ if ref $@;
     my $ov = $v->result // 'fail';
     $res{summary} = $v->result_detail // '';
     $res{overall} = $ov eq 'pass' ? 'pass' : ($ov eq 'none' ? 'none' : 'fail');
@@ -223,6 +229,7 @@ sub _report_once {
             # header Recipe that will not apply stops the walk here.
             $hdr_only = 1;
             my $prev = eval { Mail::DKIM2::MessageInstance->undo($work, HeadersOnly => 1) };
+            die $@ if ref $@;
             unless ($prev) {
                 $stopped = "stopped below m=$inst (header history did not undo)";
                 last;
@@ -259,6 +266,7 @@ sub _mi_level {
                recipe => 'none', undo => 'n/a', detail => '',
                header_recipes => [], body_recipe => 'none');
     my $mi = eval { Mail::DKIM2::MessageInstance->parse($mi_raw) };
+    die $@ if ref $@;
     unless ($mi) { $lvl{detail} = 'unparseable Message-Instance'; return \%lvl; }
 
     $lvl{tags} = _mi_tags($mi);
@@ -295,6 +303,7 @@ sub _mi_level {
     } else {
         my $clone = parse_mime($msg->as_string);
         my $ok = eval { Mail::DKIM2::MessageInstance->undo($clone, HeadersOnly => $hdr_only ? 1 : 0) };
+        die $@ if ref $@;
         $lvl{undo} = ($ok && !$@) ? 'clean' : 'failed';
         if ($ok && !$@ && $rh) {
             for my $h (sort keys %$rh) {
@@ -320,6 +329,7 @@ sub _sig_level {
     my ($work, $num, $sig_by_i, $cb, $skip_ts, $hdr_only) = @_;
     # $sig_by_i values come from Email::MIME->header() — already bare values.
     my $sig = eval { Mail::DKIM2::Signature->parse($sig_by_i->{$num}) };
+    die $@ if ref $@;
     my %lvl = (kind => 'signature', i => $num, m => _m($sig_by_i->{$num}),
                domain => ($sig ? ($sig->domain // '') : ''),
                mail_from => '', rcpt_to => [],
@@ -348,6 +358,7 @@ sub _sig_level {
         }
         if ($num > 1 && $sig_by_i->{$num - 1}) {
             my $prev = eval { Mail::DKIM2::Signature->parse($sig_by_i->{$num-1}) };
+            die $@ if ref $@;
             if ($prev) {
                 my $prev_nd = $prev->next_domain;
                 if (defined $prev_nd && length $prev_nd) {
@@ -401,6 +412,7 @@ sub _sig_level {
     $vv->headers_only(1) if $hdr_only;   # body lost below a null Recipe
     $vv->set_pubkey_callback($cb);
     eval { $vv->PRINT($work->as_string); $vv->CLOSE; 1 };
+    die $@ if ref $@;
     my $r = $vv->result // 'fail';
     my $crypto = ($r eq 'pass') ? 'pass' : 'fail';
     $lvl{result} = $crypto;

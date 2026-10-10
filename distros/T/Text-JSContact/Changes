@@ -1,5 +1,13 @@
 Revision history for Perl extension Text::JSContact
 
+0.03  2026-10-09
+	- read IMPP's RFC 9554 SERVICE-TYPE and USERNAME parameters, the ones
+	  jscontact_to_vcard writes, as well as the older X-SERVICE-TYPE and
+	  X-USER; an OnlineService lost its service and user on a round trip
+	- an IMPP whose value is just the USERNAME (a service with no uri)
+	  no longer comes back with that name as its uri
+	- add t/online-services.t
+
 0.02  2026-08-31
 	- clarify licensing: same terms as Perl itself (Artistic License 1.0
 	  or GPL version 1 or later)

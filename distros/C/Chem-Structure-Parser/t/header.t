@@ -110,6 +110,92 @@ PDB
 		'a SOURCE with no MOL_ID belongs to the first entity, as the COMPND did');
 }
 
+# A ';' inside a value.  A specification ends at a ';' followed by the next
+# TOKEN: or by the end of the record, and nowhere else.  The COMPND lines below
+# are 3iaw's, 1ct8's and 1jrh's (PDBbind v2020) as deposited; the record was
+# split on every ';' until 0.039, which made 3iaw's molecule '[GLY51', 1ct8's
+# '7C8 FAB FRAGMENT', and 1jrh's fragment 'FAB FRAGMENT'.  Biopython 1.85's
+# parse_pdb_header gives the whole of each, lower-cased.  Over PDBbind v2020
+# the change reaches 141 values in 107 entries; 124 read as Biopython reads
+# them, 16 differ only where Biopython drops the ';' at the end of a line --
+# 1ry7's synonyms come back 'afgfbeta-endothelial' from it -- and in the last,
+# 2az5's molecule, Biopython stops at the end of the first line.
+{
+	my $c = structure_info_string(<<'PDB');
+COMPND    MOL_ID: 1;
+COMPND   2 MOLECULE: [GLY51;AIB51'] 'COVALENT DIMER' HIV-1 PROTEASE;
+COMPND   3 CHAIN: A;
+COMPND   4 MOL_ID: 2;
+COMPND   5 MOLECULE: 7C8 FAB FRAGMENT; SHORT CHAIN;
+COMPND   6 CHAIN: B;
+COMPND   7 MOL_ID: 3;
+COMPND   8 MOLECULE: ANTIBODY A6;
+COMPND   9 CHAIN: C;
+COMPND  10 FRAGMENT: FAB FRAGMENT;PEPSIN DIGESTION OF INTACT ANTIBODY;
+COMPND  11 ENGINEERED: YES
+ATOM      1  CA  ALA A   1      10.000  10.000  10.000  1.00 20.00           C
+ATOM      2  CA  ALA B   1      12.000  10.000  10.000  1.00 20.00           C
+ATOM      3  CA  ALA C   1      14.000  10.000  10.000  1.00 20.00           C
+PDB
+	is($c->{compound}{1}{molecule}, "[GLY51;AIB51'] 'COVALENT DIMER' HIV-1 PROTEASE",
+		"COMPND: a ';' inside a value is part of it");
+	is($c->{compound}{2}{molecule}, '7C8 FAB FRAGMENT; SHORT CHAIN',
+		"COMPND: and so is one followed by text that is not a TOKEN:");
+	is($c->{compound}{3}{fragment}, 'FAB FRAGMENT;PEPSIN DIGESTION OF INTACT ANTIBODY',
+		"COMPND: in any of the record's values");
+	is_deeply([ @{ $c->{compound}{1} }{qw(chain)} ], [ [ 'A' ] ],
+		'COMPND: and the TOKEN: after it still starts a specification');
+	is($c->{compound}{3}{engineered}, 'YES', 'COMPND: to the last one');
+	is($c->{chains}{A}{molecule}, $c->{compound}{1}{molecule}, 'and the chain says the same');
+}
+
+# One chain claimed by two MOL_IDs, which no PDBbind v2020 entry does.  The
+# chain took whichever entity the hash walked last, which was one or the other
+# according to PERL_HASH_SEED; the first MOL_ID to name it keeps it, under any
+# seed.
+{
+	my $c = structure_info_string(<<'PDB');
+COMPND    MOL_ID: 1;
+COMPND   2 MOLECULE: FIRST THING;
+COMPND   3 CHAIN: A;
+COMPND   4 MOL_ID: 2;
+COMPND   5 MOLECULE: SECOND THING;
+COMPND   6 CHAIN: A;
+ATOM      1  CA  ALA A   1      10.000  10.000  10.000  1.00 20.00           C
+PDB
+	is($c->{chains}{A}{molecule}, 'FIRST THING', 'a chain two MOL_IDs claim is the first one\'s');
+}
+
+# The records a file old enough to keep its entry id in columns 73-80 has there
+# instead of text.  Each field below is read to the end of the line, or into
+# those columns, and came back with the id on the end until 0.039.  The lines
+# are built on the layout of gemmi's tests/pdb1gdr.ent, which has none of
+# these records itself.
+{
+	my $old = sub { sprintf "%-72s%-4s%4d\n", $_[0], '9OLD', $_[1] };
+	my $c = structure_info_string(
+		  sprintf("%-72s%-8s\n", 'HEADER    TEST                                    01-JAN-94   9OLD', '9OLD   1')
+		. $old->('SEQADV 9OLD MSE A    7  UNP  P12345    MET     7 MODIFIED RESIDUE', 2)
+		. $old->('MODRES 9OLD MSE A    7  MET  SELENOMETHIONINE', 3)
+		. $old->('HETNAM      ZN ZINC ION', 4)
+		. $old->('HETSYN      ZN ZINC', 5)
+		. $old->('FORMUL   4   ZN    ZN 2+', 6)
+		. $old->('SSBOND   1 CYS A    6    CYS A   11', 7)
+		. $old->('LINK         ZN    ZN A 101                 SG  CYS A   6', 8)
+		. $old->('REVDAT   1   31-JAN-94 9OLD    0', 9)
+		. $old->('REMARK   2 RESOLUTION. 2.00 ANGSTROMS.', 10)
+		. "ATOM      1  CA  ALA A   1      10.000  10.000  10.000  1.00 20.00           C\n");
+	is($c->{seqadv}[0]{comment}, 'MODIFIED RESIDUE', 'SEQADV: the comment stops before the id');
+	is($c->{modres}{MSE}{comment}, 'SELENOMETHIONINE', 'MODRES: and so does this one');
+	is($c->{het}{ZN}{name}, 'ZINC ION', 'HETNAM: the name');
+	is($c->{het}{ZN}{synonym}, 'ZINC', 'HETSYN: the synonym');
+	is($c->{het}{ZN}{formula}, 'ZN 2+', 'FORMUL: the formula');
+	is($c->{ssbond}[0]{length}, '', 'SSBOND: a length the id stands in for is no length');
+	is($c->{link}[0]{length}, '', 'LINK: nor here');
+	is($c->{revdat}[0]{what}, '', 'REVDAT: and the id is not a record the revision touched');
+	is($c->{remarks}{2}[0], 'RESOLUTION. 2.00 ANGSTROMS.', 'REMARK: nor part of the text');
+}
+
 #--------
 # SEQRES, DBREF, SEQADV, MODRES
 #--------

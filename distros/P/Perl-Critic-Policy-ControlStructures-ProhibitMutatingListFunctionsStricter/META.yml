@@ -1,0 +1,51 @@
+---
+abstract: 'Do not change $_ in a list function, directly or through a sub that the block calls.'
+author:
+  - 'George S. Baugh <george@troglodyne.net>'
+build_requires:
+  File::Path: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Perl::Critic: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl-Critic-Policy-ControlStructures-ProhibitMutatingListFunctionsStricter
+no_index:
+  directory:
+    - docs
+    - t
+    - templates
+provides:
+  Perl::Critic::Policy::ControlStructures::ProhibitMutatingListFunctionsStricter:
+    file: lib/Perl/Critic/Policy/ControlStructures/ProhibitMutatingListFunctionsStricter.pm
+    version: '0.001'
+requires:
+  List::Util: '0'
+  Perl::Critic::Distribution: '0'
+  Perl::Critic::Document: '0'
+  Perl::Critic::Policy::ControlStructures::ProhibitMutatingListFunctions: '0'
+  Perl::Critic::Utils: '0'
+  Readonly: '0'
+  Scalar::Util: '0'
+  parent: '0'
+  perl: '5.014'
+  re: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/teodesian/perl-critic-policy-prohibitmutatinglistfunctionsstricter/issues
+  homepage: https://github.com/teodesian/perl-critic-policy-prohibitmutatinglistfunctionsstricter
+  repository: https://github.com/teodesian/perl-critic-policy-prohibitmutatinglistfunctionsstricter.git
+version: '0.001'
+x_generated_by_perl: v5.44.0
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: MIT

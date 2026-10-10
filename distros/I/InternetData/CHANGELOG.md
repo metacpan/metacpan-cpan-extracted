@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 1.6.1 are described by their release commits.
 
+## 1.9.1 - 2026-10-10
+
+### Fixes
+
+- Re-pin the spec to 2026.10.09: rotating a key needs apikeys.reveal ([`fc1e0f0`](https://github.com/internetdata/sdk-perl/commit/fc1e0f01c51a822279d5e13bee5f4ca518f27ff1))
+
 ## 1.9.0 - 2026-10-09
 
 ### Features

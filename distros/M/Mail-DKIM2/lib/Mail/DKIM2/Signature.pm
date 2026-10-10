@@ -2,7 +2,7 @@ package Mail::DKIM2::Signature;
 use strict;
 use warnings;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use MIME::Base64 qw(encode_base64 decode_base64);
 use Carp;
@@ -20,6 +20,9 @@ use constant SIG_VALUE     => 2;
 
 sub new {
     my ($class, %args) = @_;
+    Mail::DKIM2::Common::_check_options("$class->new", \%args,
+        qw(Domain Flags MailFrom NextDomain Nonce RcptTo Sequence Signatures
+           Timestamp Version));
 
     my $self = $class->SUPER::new();
     bless $self, $class;
@@ -114,12 +117,14 @@ sub nonce {
     return $self->get_tag('n');
 }
 
-# spec-06 §2.12: folding whitespace may appear anywhere inside a tag value and
-# "MUST be ignored when the value is used".  DKIM2 tag values are base64,
-# tokens, digits or domains and never carry significant internal whitespace, so
-# any WSP present came from a fold.  TagValueList::parse only trims the ends of
-# the whole value, which leaves a fold inside a comma-separated list glued to
-# the item that follows it -- so strip per item, before splitting on ':'.
+# Where the grammar allows FWS inside a value -- within a base64string
+# (§2.13: a signature value folded across lines), and around the "," and ":"
+# that separate s= items and their parts (§8.9's sig-set) -- it is not part
+# of the value. TagValueList::parse only trims the ends of the whole value,
+# which leaves a fold after a "," glued to the next item's Selector, so strip
+# per item, before splitting on ':'. This is lenient reading, not
+# validation: it would also accept whitespace the grammar does not allow
+# (inside a Selector or flag name), which no conforming signer emits.
 sub _strip_fws {
     my ($v) = @_;
     return $v unless defined $v;
@@ -203,9 +208,19 @@ sub rcpt_to {
 
 # --- Convenience methods for signature items ---
 
+# The s= items, parsed once per s= value: selector(), algorithm() and
+# signature_value() take an index, and the verifier calls them for every
+# item, so reparsing the whole list each time was quadratic in its length
+# (review R1). The cache is keyed on the raw value, so set_tag('s', ...)
+# invalidates it.
 sub _sig_items {
     my ($self) = @_;
-    return $self->signatures_data;
+    my $s = $self->get_tag('s');
+    my $c = $self->{_sig_cache};
+    return $c->[1] if $c && defined $s && defined $c->[0] && $c->[0] eq $s;
+    my $items = $self->signatures_data;
+    $self->{_sig_cache} = [$s, $items];
+    return $items;
 }
 
 sub selector {
@@ -447,8 +462,9 @@ C<NextDomain> suppresses C<MailFrom> and C<RcptTo>.
 =head2 parse($header_value)
 
 Parses a header value, with or without the leading C<DKIM2-Signature:>.
-Tag names keep their case and order so the header can be re-serialised
-byte for byte; lookups are case-insensitive.
+Tag names keep their case and order (whitespace around separators is
+normalised on output; see L<Mail::DKIM2::TagValueList>); lookups are
+case-insensitive. Always returns a new object.
 
 =head1 TAG ACCESSORS
 

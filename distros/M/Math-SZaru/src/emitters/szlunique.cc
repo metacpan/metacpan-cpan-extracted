@@ -102,13 +102,15 @@ private:
 
 UniqueEstimator *
 UniqueEstimator::Create(int maxElems) {
+  if (maxElems <= 0 || maxElems > 10000000)
+    return NULL;
   return new UniqueEstimatorImpl(maxElems);
 }
 
 inline UniqueEstimatorImpl::HashVal
 UniqueEstimatorImpl::PackUniqueHash(const uint8* mem) {
-  uint32 hhi = (mem[0] << 24) | (mem[1] << 16) | (mem[2] << 8) | mem[3];
-  uint32 hlo = (mem[4] << 24) | (mem[5] << 16) | (mem[6] << 8) | mem[7];
+  uint32 hhi = (static_cast<uint32>(mem[0]) << 24) | (static_cast<uint32>(mem[1]) << 16) | (static_cast<uint32>(mem[2]) << 8) | static_cast<uint32>(mem[3]);
+  uint32 hlo = (static_cast<uint32>(mem[4]) << 24) | (static_cast<uint32>(mem[5]) << 16) | (static_cast<uint32>(mem[6]) << 8) | static_cast<uint32>(mem[7]);
   uint64 h = hhi;
   return (h << 32) | hlo;
 }
@@ -240,17 +242,24 @@ int64 UniqueEstimatorImpl::Estimate() const {
   //
   // Strip leading zero bytes to maintain precision.
   // Do this by byte to maintain same estimate.
-  uint8 unpacked[MD5_DIGEST_LENGTH];
+  //
+  // Only sizeof(HashVal) bytes are produced by UnpackUniqueHash, so the buffer
+  // is exactly that big (and zero-initialised); we read four bytes starting at
+  // z, hence z is clamped to sizeof(HashVal) - 4.
+  uint8 unpacked[sizeof(HashVal)] = { 0 };
   UnpackUniqueHash(heap_[0], unpacked);
   int z = 0;
   // Number of leading denom. bytes of zeros stripped.
-  for (; z < MD5_DIGEST_LENGTH; ++z) {
+  const int maxz = static_cast<int>(sizeof(HashVal)) - 4;
+  for (; z < maxz; ++z) {
     if (unpacked[z]) {
       break;
     }
   }
-  uint32 biggestsmall = (unpacked[z] << 24) | (unpacked[z + 1] << 16)
-                      | (unpacked[z + 2] << 8) | unpacked[z + 3];
+  uint32 biggestsmall = (static_cast<uint32>(unpacked[z]) << 24)
+                      | (static_cast<uint32>(unpacked[z + 1]) << 16)
+                      | (static_cast<uint32>(unpacked[z + 2]) << 8)
+                      | static_cast<uint32>(unpacked[z + 3]);
   if (biggestsmall == 0) {
     biggestsmall = 1;
   }
@@ -259,8 +268,14 @@ int64 UniqueEstimatorImpl::Estimate() const {
       / biggestsmall;
 
   int renorm = z * 8 - (31 - msbnum);
-  if (renorm < 0) {
+  if (renorm <= -64) {
+    // Shifting by >= the width of the type is undefined; the result is 0.
+    r = 0;
+  } else if (renorm < 0) {
     r >>= -renorm;
+  } else if (renorm >= 64) {
+    // Any non-zero r shifted this far would overflow; clamp like below.
+    return TotElems();
   } else {
     // Make sure we don't overflow.
     // This test isn't strictly an overflow test, but assures that r

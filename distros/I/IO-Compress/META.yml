@@ -1,7 +1,7 @@
 ---
 abstract: 'IO Interface to compressed data files/buffers'
 author:
-  - 'Paul Marquess <pmqs@cpan.org>'
+  - 'Paul Marquess <pmqs@outlook.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
@@ -20,8 +20,8 @@ no_index:
     - t
     - private
 requires:
-  Compress::Raw::Bzip2: '2.224'
-  Compress::Raw::Zlib: '2.224'
+  Compress::Raw::Bzip2: '2.225'
+  Compress::Raw::Zlib: '2.225'
   Encode: '0'
   Scalar::Util: '0'
   Time::Local: '0'
@@ -29,5 +29,5 @@ resources:
   bugtracker: https://github.com/pmqs/IO-Compress/issues
   homepage: https://github.com/pmqs/IO-Compress
   repository: git://github.com/pmqs/IO-Compress.git
-version: '2.224'
+version: '2.225'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

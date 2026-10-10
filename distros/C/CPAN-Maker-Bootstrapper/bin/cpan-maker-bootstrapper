@@ -2,8 +2,11 @@
 #-*- mode: sh; -*-
 # modulino invocation
 
-MODULINO_WRAPPER=cpan-maker-bootstrapper
-MODULE_NAME=CPAN::Maker::Bootstrapper
-MODULE_PATH=$(MODULE_PATH="${MODULE_NAME//:://}.pm" perl -M$MODULE_NAME -e 'print $INC{$ENV{MODULE_PATH}};')
+MODULINO_WRAPPER=cmb
+MODULINO_MODULE_NAME=CPAN::Maker::Bootstrapper
 
-MODULINO_WRAPPER=$MODULINO_WRAPPER perl $MODULE_PATH "$@"
+MODULINO_WRAPPER="$MODULINO_WRAPPER" \
+MODULINO_MODULE_NAME="$MODULINO_MODULE_NAME" \
+  perl -M"$MODULINO_MODULE_NAME" \
+  -e 'exit $ENV{MODULINO_MODULE_NAME}->main' \
+  -- "$@"

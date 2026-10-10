@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Mail::Milter::Authentication::Pragmas;
 # ABSTRACT: Handler class for DKIM2 signature verification
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 use base 'Mail::Milter::Authentication::Handler';
 
 use Mail::DKIM2::Common qw(extract_mi_version parse_dkim_pubkey fold_header parse_mime);

@@ -1,4 +1,18 @@
 Revision history for Game-Mahjong
 
+0.02    2026-10-09
+	- Fix: t/32 failed on one perl 5.14.2 smoker, where output captured
+	  through an in-memory handle came back undecoded.
+	- Fix: the number under a tile threw a DIFFERENT tile. The rack moves
+	  the tile just drawn to the end and numbers what it drew; the parser
+	  indexed the unreordered hand.
+	- Point at the tile you mean: the arrow keys walk your rack and the
+	  line under it says how far the throw leaves you from a win and how
+	  many kinds would help.
+	- Fix: the tile you may claim lost its <> marker with colour off, so
+	  it looked like every other tile in the pool.
+	- Fix: a bad --level or --seat died with a Perl file and line and exit
+	  25; a refused option printed the usage to stdout.
+
 0.01    2026-09-24
 	First version

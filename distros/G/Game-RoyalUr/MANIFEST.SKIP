@@ -1,0 +1,35 @@
+# ---- version control and editors ----
+^\.git/
+^\.gitignore$
+\.swp$
+~$
+^\.DS_Store$
+/\.DS_Store$
+
+# ---- the build tree ----
+^blib/
+^pm_to_blib$
+^Makefile$
+^Makefile\.old$
+^MYMETA\.
+^MANIFEST\.bak$
+^Install/
+^RoyalUr\.bs$
+\.o$
+\.bundle$
+\.so$
+\.dll$
+
+# GENERATED FROM RoyalUr.xs, and shipping it is worse than not: a stale RoyalUr.c
+# in the tarball is what a smoker compiles when xsubpp is newer than the file.
+^RoyalUr\.c$
+
+# ---- the dist tarball and its unpacked copy ----
+^Game-RoyalUr-[0-9._]+/
+^Game-RoyalUr-[0-9._]+\.tar\.gz$
+
+# ---- scratch that is not part of the dist ----
+^ignore\.txt$
+^nytprof
+^cover_db/
+

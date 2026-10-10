@@ -25,7 +25,6 @@ recommends:
   Sendmail::PMilter: '1.28'
   Sys::Syslog: '0'
 requires:
-  Algorithm::Diff: '0'
   Carp: '0'
   CryptX: '0.060'
   Email::MIME: '0'
@@ -39,5 +38,5 @@ requires:
 resources:
   bugtracker: https://github.com/dkim2wg/interop/issues
   repository: https://github.com/dkim2wg/interop.git
-version: '0.17'
+version: '0.18'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

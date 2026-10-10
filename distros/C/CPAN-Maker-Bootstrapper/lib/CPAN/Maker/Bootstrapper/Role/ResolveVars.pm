@@ -20,15 +20,60 @@ sub cmd_resolve_vars {
 
   my ($source) = $self->get_args;
 
-  die "ERROR: usage: cmb resolve-var [--vars-file var-file] source-file\n"
-    if !$source;
+  my $file_list = $self->get_file_list;
+
+  die "ERROR: usage: cmb resolve-vars [--vars-file var-file] [--file-list file-list | source-file]\n"
+    if !$source && !$file_list;
+
+  die "ERROR: source-file and --file-list are mutually exclusive\n"
+    if $source && $file_list;
+
+  if ($file_list) {
+    die "ERROR: $file_list not found or not readable\n"
+      if !-f $file_list || !-r $file_list;
+
+    foreach my $file ( split /\n/xsm, slurp($file_list) ) {
+      next if !$file || $file =~ /^[#]/xsm;
+
+      die "ERROR: $file not found or not readable\n"
+        if !-f $file || !-r $file;
+
+      my $output = $file;
+      $output =~ s/[.]in\z/.rendered/xsm;
+
+      die "ERROR: cannot determine rendered output for $file\n"
+        if $output eq $file;
+
+      open my $fh, '>', $output
+        or die "ERROR: cannot write $output: $ERRNO\n";
+
+      print {$fh} $self->_resolve_source($file);
+
+      close $fh
+        or die "ERROR: cannot close $output: $ERRNO\n";
+    }
+
+    return $SUCCESS;
+  }
 
   die "ERROR: $source not found or not readable\n"
     if !-f $source || !-r $source;
 
+  print {*STDOUT} $self->_resolve_source($source);
+
+  return $SUCCESS;
+}
+
+########################################################################
+sub _resolve_source {
+########################################################################
+  my ( $self, $source ) = @_;
+
+  local %ENV = %ENV;
+
   my $vars_file = $self->get_vars_file;
 
-  die "ERROR: %s is not found or unreadable!\n"
+  die "ERROR: $vars_file is not found or unreadable!\n"
     if $vars_file && ( !-f $vars_file || !-r $vars_file );
 
   $vars_file //= "$source.vars";
@@ -42,11 +87,7 @@ sub cmd_resolve_vars {
     }
   }
 
-  my $resolved_text = $self->_resolve_vars( slurp($source) );
-
-  print {*STDOUT} $resolved_text;
-
-  return $SUCCESS;
+  return $self->_resolve_vars( slurp($source) );
 }
 
 ########################################################################

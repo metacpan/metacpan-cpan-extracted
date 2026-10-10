@@ -3,8 +3,7 @@
 use strict;
 use warnings;
 use Test::Most;
-use lib 't/lib';
-use MyLogger;
+use Test::Log::Abstraction;
 
 if(!(-e 't/online.enabled')) {
 	plan(skip_all => 'On-line tests disabled');
@@ -31,7 +30,7 @@ if(!(-e 't/online.enabled')) {
 	$ENV{'REMOTE_ADDR'} = '212.159.106.41';
 	my $l = CGI::Lingua->new(
 		supported => ['en'],
-		logger => MyLogger->new()
+		logger => Test::Log::Abstraction->new()
 	);
 	ok(defined($l));
 	ok($l->isa('CGI::Lingua'));
@@ -41,7 +40,7 @@ if(!(-e 't/online.enabled')) {
 
 	$l = CGI::Lingua->new(
 		supported => ['en'],
-		logger => MyLogger->new()
+		logger => Test::Log::Abstraction->new()
 	);
 	ok(defined($l));
 	ok($l->isa('CGI::Lingua'));

@@ -6,6 +6,7 @@
 %typemap{uint32_t};
 %typemap{size_t};
 %typemap{AV *};
+%typemap{SV *};
 %typemap{const double};
 %typemap{std::vector<double>};
 

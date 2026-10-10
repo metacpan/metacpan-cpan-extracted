@@ -33,7 +33,7 @@ sub run {
     Object::Remote::WatchDog->instance(timeout => $args{watchdog_timeout});
   } else {
     #reset connection watchdog from the fatnode
-    alarm(0);
+    Object::Remote::WatchDog->shutdown;
   }
   $loop->want_run;
   $loop->run_while_wanted;

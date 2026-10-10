@@ -31,12 +31,13 @@ RT77332: {
 	ok(defined $l);
 	ok($l->isa('CGI::Lingua'));
 
-	TODO: {
-		local $TODO = 'https://rt.cpan.org/Public/Bug/Display.html?id=77332';
-		SKIP: {
-			skip 'Test requires Internet access', 2 unless(-e 't/online.enabled');
+	SKIP: {
+		skip 'Test requires Internet access', 2 unless(-e 't/online.enabled');
+		TODO: {
+			# Still open: no code_alpha2 for this request
+			local $TODO = 'https://rt.cpan.org/Public/Bug/Display.html?id=77332';
 			ok(defined($l->code_alpha2()));
-			ok($l->country() eq 'by');
 		}
+		ok($l->country() eq 'by');
 	}
 }

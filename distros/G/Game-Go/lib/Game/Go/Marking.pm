@@ -8,7 +8,7 @@ use Object::Proto::Sugar -types;
 
 use Game::Go::Rules;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 has proposer => (is => 'rw');
 has answerer => (is => 'rw');
@@ -52,7 +52,7 @@ Game::Go::Marking - the confirmation phase, which Article 9 requires
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

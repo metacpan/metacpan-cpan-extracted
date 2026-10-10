@@ -1,5 +1,12 @@
 Revision history for Perl distribution Pheno-Ranker
 
+1.09 2026-10-09T00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
+
+ - Added a native desktop application for local patient and cohort analysis, result exploration, reusable projects, and Beacon v2 import
+ - Migrated project documentation from MkDocs to Docusaurus
+ - Replaced bff-pxf-plot PNG output with self-contained HTML reports covering annotation distributions, coverage, and term frequencies
+ - Added CLI label exports and optional ontology label hints in PDF reports
+
 1.08 2025-05-01:00:00Z (Manuel Rueda <mrueda@cpan.org>)
 
  - Refactored internals to split configuration, context, compare, ranking, and graph helpers

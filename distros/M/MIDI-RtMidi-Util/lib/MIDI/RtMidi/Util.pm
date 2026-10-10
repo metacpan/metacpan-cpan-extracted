@@ -3,14 +3,13 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Handy Utilities for Real-time MIDI
 
-our $VERSION = '0.0401';
+our $VERSION = '0.0500';
 
-use v5.36;
-use feature 'try';
-
+use v5.40;
 # use Data::Dumper::Compact qw(ddc);
 use MIDI::RtMidi::FFI::Device ();
 use Exporter 'import';
+
 our @EXPORT = qw(
     in_port
     out_port
@@ -18,10 +17,8 @@ our @EXPORT = qw(
     input_ports
     output_ports
     stop_all_notes
+    program_changer
 );
-
-no warnings 'experimental::try';
-
 
 
 sub in_port ($name) {
@@ -44,13 +41,23 @@ sub out_port ($name) {
 }
 
 
-sub stop_device ($midi_out) {
+sub stop_device ($device) {
     try {
-        $midi_out->stop;
-        $midi_out->panic;
+        $device->stop;
+        $device->panic;
     }
     catch ($e) {
+        chomp $e;
         warn "Can't stop the MIDI device: $e\n";
+    }
+}
+
+
+sub stop_all_notes ($device) {
+    for my $chan (0 .. 15) {
+        for my $n (0 .. 127) {
+            $device->note_off($chan, $n, 0);
+        }
     }
 }
 
@@ -73,11 +80,16 @@ sub output_ports () {
 }
 
 
-sub stop_all_notes ($midi_out) {
-    for my $chan (0, 15) {
-        for my $n (0 .. 127) {
-            $midi_out->note_off($chan, $n, 0);
-        }
+sub program_changer ($device, $program = 0, $channel = 0, $msb_bank = 0, $lsb_bank = undef) {
+    try {
+        $device->control_change($channel, 0, $msb_bank);
+        $device->control_change($channel, 32, $lsb_bank) if defined $lsb_bank;
+        $device->program_change($channel, $program);
+    }
+    catch ($e) {
+        # BUGFIX: errors usually end in a newline already; avoid a doubled one.
+        chomp $e;
+        die "ERROR: $e\n";
     }
 }
 
@@ -95,7 +107,7 @@ MIDI::RtMidi::Util - Handy Utilities for Real-time MIDI
 
 =head1 VERSION
 
-version 0.0401
+version 0.0500
 
 =head1 SYNOPSIS
 
@@ -137,9 +149,15 @@ This function takes a unique part of an open port name as its argument.
 
 =head2 stop_device
 
-  stop_device();
+  stop_device($device);
 
-Stop and close an open C<MIDI::RtMidi::FFI::Device> device.
+Stop an open C<MIDI::RtMidi::FFI::Device> device.
+
+=head2 stop_all_notes
+
+  stop_all_notes($device);
+
+Send a C<note_off()> message to all 16 channels and all 128 notes.
 
 =head2 input_ports
 
@@ -153,11 +171,13 @@ Return an array-reference of open MIDI input port names.
 
 Return an array-reference of open MIDI output port names.
 
-=head2 stop_all_notes
+=head2 program_changer
 
-  stop_all_notes();
+  program_changer($device, $program, $channel, $msb_bank, $lsb_bank);
 
-Send a C<note_off()> message to all channels and all notes.
+Send a bank select (CC 0 MSB, and CC 32 LSB when given) followed by a
+program change.  All arguments but the device are optional and default
+to C<0> (the LSB is skipped if it is not defined).
 
 =head1 SEE ALSO
 

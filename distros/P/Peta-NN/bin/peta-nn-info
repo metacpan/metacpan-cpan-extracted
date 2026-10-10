@@ -1,0 +1,135 @@
+#!perl
+# What a model file is: its name and description, when it was made, what it
+# reads and answers, how large it is. For a fused model's file also what it
+# is made of.
+#
+#   peta-nn-info FILE.model [FILE.chain FILE.fused ...]
+#
+# Needs only the inference leg. A file that is not a well-formed model is
+# reported as such, and the exit status is then 1.
+use v5.36;
+use utf8;
+use open qw(:std :encoding(UTF-8));
+use POSIX qw(strftime);
+
+use Peta::NN::Chain;
+use Peta::NN::Fused;
+use Peta::NN::Inference;
+
+my $VALUES_SHOWN = 12;      # of a parameter's values, before the rest is summed up
+
+die "usage: peta-nn-info FILE.model [FILE.chain FILE.fused ...]\n" if !@ARGV;
+
+sub line ($label, $value) { printf "  %-12s %s\n", $label, $value if defined $value && length $value }
+
+# A chain: itself, then its models in the order of its parts.
+sub chained ($file, $chain) {
+    my $info = $chain->info;
+    print "$file\n";
+    line(name        => $info->{name});
+    line(description => $info->{description});
+    line(created     => defined $info->{created} ? strftime('%Y-%m-%d %H:%M UTC', gmtime $info->{created}) : undef);
+    line(file        => sprintf '%s bytes, written by Peta::NN %s', -s $file, $info->{version});
+    line(kind        => 'chain');
+    line(parts       => join ' -> ', @{ $info->{parts} });
+    line(takes       => @{ $info->{given} } ? join(', ', @{ $info->{given} }) : 'no arguments');
+    line(answers     => join ', ', @{ $info->{answers} });
+    line(weights     => sprintf '%d, those of its models', $info->{weights});
+    for my $name ($chain->models) {
+        my $model = $info->{models}{$name};
+        line("model $name" => sprintf '%s, %s-bit weights, reads %s; %s (%d weights); %d labels%s', $model->{kind}, $model->{bits} // 64,
+            @$model{qw(reads layers weights labels)}, @{ $model->{given} } ? '; given ' . join(', ', @{ $model->{given} }) : '');
+    }
+    print "\n";
+    return;
+}
+
+# A fused model: itself, then its parts in the order of its steps.
+sub fused ($file, $fused) {
+    my $info = $fused->info;
+    print "$file\n";
+    line(name        => $info->{name});
+    line(description => $info->{description});
+    line(created     => defined $info->{created} ? strftime('%Y-%m-%d %H:%M UTC', gmtime $info->{created}) : undef);
+    line(file        => sprintf '%s bytes, written by Peta::NN %s', -s $file, $info->{version});
+    line(kind        => "fused, reads $info->{reads}");
+    line(steps       => join ' -> ', @{ $info->{steps} });
+    line(weights     => sprintf '%d, those of its parts', $info->{weights});
+    line(arguments   => $info->{arguments});
+    for my $name ($fused->parts) {
+        my $part = $info->{parts}{$name};
+        line("part $name" => sprintf '%s-bit weights, reads %s; %s (%d weights); %d labels', $part->{bits} // 64, @$part{qw(reads layers weights labels)});
+    }
+    print "\n";
+    return;
+}
+
+my $failed = 0;
+for my $file (@ARGV) {
+    my $model = eval { Peta::NN::Inference->load($file) };
+    my $why   = $@;
+    if (!$model && $why =~ /is not a Peta::NN model file/) {       # then it may be models put together
+        if (my $fused = eval { Peta::NN::Fused->load($file, engine => 'cpu') }) { fused($file, $fused);   next }
+        if (my $chain = eval { Peta::NN::Chain->load($file) })                  { chained($file, $chain); next }
+    }
+    if (!$model) { print "$file\n  NOT A USABLE MODEL: $why\n"; $failed = 1; next }
+    my $info = $model->info;
+
+    print "$file\n";
+    line(name        => $info->{name});
+    line(description => $info->{description});
+    line(source      => $info->{source});
+    line(created     => defined $info->{created} ? strftime('%Y-%m-%d %H:%M UTC', gmtime $info->{created}) : undef);
+    line(file        => sprintf '%s bytes, %s-bit weights, written by Peta::NN %s', -s $file, @$info{qw(bits version)});
+    line(kind        => "$info->{kind}, reads $info->{reads}");
+    line(network     => sprintf '%s (%d weights)', @$info{qw(layers weights)});
+    line(answers     => "$info->{labels} labels");
+    line(vocabulary  => "$info->{characters} characters");
+
+    my @parameters = @{ $info->{parameters} };
+    line(parameters => 'none') if !@parameters;
+    for my $n (0 .. $#parameters) {
+        my @values = @{ $parameters[$n] };
+        my $shown  = join ', ', @values[ 0 .. ($#values < $VALUES_SHOWN - 1 ? $#values : $VALUES_SHOWN - 1) ];
+        $shown .= sprintf ', ... (%d in all)', scalar @values if @values > $VALUES_SHOWN;
+        line(($info->{given}[$n] // 'parameter ' . ($n + 1)) => $shown);
+    }
+
+    my $fidelity = $info->{fidelity};
+    if (ref $fidelity eq 'HASH' && %$fidelity) {
+        line(fidelity => join ', ', map { sprintf '%s %.1f%%', $_, 100 * $fidelity->{$_} } sort keys %$fidelity);
+    }
+    print "\n";
+}
+exit $failed;
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+peta-nn-info - what a Peta::NN model file is
+
+=head1 VERSION
+
+version 0.2610090
+
+=head1 SYNOPSIS
+
+    peta-nn-info FILE.model [FILE.chain FILE.fused ...]
+
+=head1 DESCRIPTION
+
+For each model file: its name, description and source, when it was made, its
+size and how its weights are stored, what the model reads and answers, its
+parameters with their values, and the fidelity that was measured for it.
+
+For a chain's file (L<Peta::NN::Chain>): the same of the chain, its parts,
+what it takes, and each of its models. For a fused model's file
+(L<Peta::NN::Fused>): its steps and each of its parts.
+
+A file that is not a well-formed model is reported as such, and the exit
+status is then 1. Only the inference leg is needed.
+
+=cut

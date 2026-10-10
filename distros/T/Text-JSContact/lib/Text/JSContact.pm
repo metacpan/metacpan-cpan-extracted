@@ -5,7 +5,7 @@ use warnings;
 
 package Text::JSContact;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 # vCard <=> JSContact (RFC 9553) conversion
 # Follows RFC 9555 for vCard mapping and RFC 9554 for extensions
@@ -620,11 +620,15 @@ sub _convert_online_services {
     my $val = $item->{value};
     next unless defined $val && $val ne '';
     my $id = _prop_id($item, $new_id);
-    my $obj = { '@type' => 'OnlineService', uri => $val };
-    my $service = _param($item, 'x-service-type');
+    my $obj = { '@type' => 'OnlineService' };
+    # RFC 9554 SERVICE-TYPE and USERNAME, as _unconvert_online_services
+    # writes them, or the older x- forms
+    my $service = _param($item, 'service-type') // _param($item, 'x-service-type');
     $obj->{service} = $service if defined $service;
-    my $user = _param($item, 'x-user');
+    my $user = _param($item, 'username') // _param($item, 'x-user');
     $obj->{user} = $user if defined $user;
+    # a service with only a user name is written with that name as the value
+    $obj->{uri} = $val unless defined $user && $val eq $user && $val !~ /^[a-z][a-z0-9+.-]*:/i;
     my @types = _params_list($item, 'type');
     if (my $ctx = _make_contexts(@types)) { $obj->{contexts} = $ctx }
     if (my $pref = _make_pref($item)) { $obj->{pref} = $pref }

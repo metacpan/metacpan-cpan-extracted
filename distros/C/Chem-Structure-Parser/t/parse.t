@@ -323,4 +323,22 @@ PDB
 	ok($tried, "the locale spread found $tried to test");
 }
 
+# The same string, however perl is holding it.  A string perl has upgraded to
+# UTF-8 stores a character past ASCII as two bytes, and the parse read the
+# bytes: a title with an accented letter came back a byte longer than the same
+# string not upgraded gave it, and the letter on an ATOM line put every column
+# after it one out.  Both strings are the same characters, and now parse alike.
+{
+	my $pdb = "TITLE     CAF\x{e9} PROTEIN\n"
+	        . "ATOM      1  CA  ALA A   1      11.104  13.207  10.000  1.00 20.00           C\n";
+	my $up = $pdb;
+	utf8::upgrade($up);
+	my $a = Chem::Structure::Parser::_parse_string($pdb, {});
+	my $b = Chem::Structure::Parser::_parse_string($up, {});
+	is($b->{meta}{TITLE}[0], "TITLE     CAF\x{e9} PROTEIN",
+		'a string upgraded to UTF-8 is read as its characters');
+	is_deeply($b, $a, 'and parses exactly as the same string not upgraded');
+	is(structure_info_string($up)->{title}, "CAF\x{e9} PROTEIN", 'all the way to the title');
+}
+
 done_testing();

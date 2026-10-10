@@ -5,16 +5,16 @@ use warnings;
 use bytes;
 require Exporter ;
 
-use IO::Compress::Base 2.224 ;
+use IO::Compress::Base 2.225 ;
 
-use IO::Compress::Base::Common  2.224 qw(createSelfTiedObject);
-use IO::Compress::Adapter::Lzma 2.224 ;
+use IO::Compress::Base::Common  2.225 qw(createSelfTiedObject);
+use IO::Compress::Adapter::Lzma 2.225 ;
 
 
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $LzmaError);
 
-$VERSION = '2.224';
+$VERSION = '2.225';
 $LzmaError = '';
 
 @ISA    = qw(IO::Compress::Base Exporter);
@@ -823,7 +823,7 @@ L<IO::Zlib|IO::Zlib>
 
 =head1 AUTHOR
 
-This module was written by Paul Marquess, C<pmqs@cpan.org>.
+This module was written by Paul Marquess, C<pmqs@outlook.com>.
 
 =head1 MODIFICATION HISTORY
 

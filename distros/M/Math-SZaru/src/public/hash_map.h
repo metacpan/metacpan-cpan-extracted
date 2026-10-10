@@ -19,7 +19,7 @@
 #ifndef _UTILITIES_HASH_MAP_
 #define _UTILITIES_HASH_MAP_
 
-#include "myconfig.h"
+#include "config.h"
 
 #ifdef HASH_MAP_H
 #include HASH_MAP_H

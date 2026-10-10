@@ -9,8 +9,7 @@ use Data::Dumper;
 use English qw(-no_match_vars);
 use English;
 use File::Basename qw(basename);
-use HTTP::Tiny;
-use MIME::Base64 qw(encode_base64);
+
 use Role::Tiny;
 
 use Readonly;
@@ -21,6 +20,9 @@ Readonly::Scalar our $PAUSE_URL => 'https://pause.perl.org/pause/authenquery?ACT
 sub cmd_publish_to_cpan {
 ########################################################################
   my ($self) = @_;
+
+  require HTTP::Tiny;
+  require MIME::Base64;
 
   my ( $file, $user, $pass ) = $self->get_args;
   $user //= $ENV{PAUSE_USER};
@@ -73,7 +75,7 @@ sub cmd_publish_to_cpan {
     POST => $PAUSE_URL,
     { headers => {
         'Content-Type'  => "multipart/form-data; boundary=$boundary",
-        'Authorization' => 'Basic ' . encode_base64( "$user:$pass", q{} ),
+        'Authorization' => 'Basic ' . MIME::Base64::encode_base64( "$user:$pass", q{} ),
       },
       content => $body,
     }

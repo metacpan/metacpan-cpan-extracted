@@ -1,7 +1,7 @@
 {
    "abstract" : "Write lzma files/buffers",
    "author" : [
-      "Paul Marquess <pmqs@cpan.org>"
+      "Paul Marquess <pmqs@outlook.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
@@ -34,9 +34,9 @@
       },
       "runtime" : {
          "requires" : {
-            "Compress::Raw::Lzma" : "2.224",
-            "IO::Compress::Base" : "2.224",
-            "IO::Uncompress::Base" : "2.224"
+            "Compress::Raw::Lzma" : "2.225",
+            "IO::Compress::Base" : "2.225",
+            "IO::Uncompress::Base" : "2.225"
          }
       }
    },
@@ -52,6 +52,6 @@
          "web" : "https://github.com/pmqs/IO-Compress-Lzma"
       }
    },
-   "version" : "2.224",
+   "version" : "2.225",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

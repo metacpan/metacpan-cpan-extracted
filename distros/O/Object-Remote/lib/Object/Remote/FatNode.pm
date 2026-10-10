@@ -129,7 +129,14 @@ my $end = stripspace <<'END_END';
 
 END_END
 
-my %files = map +($mods{$_} => scalar do { local (@ARGV, $/) = ($_); <> }),
+sub slurp {
+  open(my $fh, '<', $_[0])
+    or die "Can't open file $_[0]: $!";
+  local $/ = undef;
+  return <$fh>;
+}
+
+my %files = map +($mods{$_} => scalar do { slurp($_) }),
               @non_core_non_arch, @core_non_arch;
 
 sub generate_fatpack_hash {

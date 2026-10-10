@@ -1,14 +1,15 @@
 FROM perl:stable-bookworm
 
-LABEL org.opencontainers.image.authors="Manuel Rueda <manuel.rueda@cnag.eu>"
+ARG BUILD_VERSION=dev
+ARG VCS_REF=unknown
+LABEL org.opencontainers.image.authors="Manuel Rueda <manuel.rueda@cnag.eu>" \
+      org.opencontainers.image.version="${BUILD_VERSION}" \
+      org.opencontainers.image.revision="${VCS_REF}"
 
 # Prevent interactive prompts during package installation
 ENV DEBIAN_FRONTEND=noninteractive
 # Ensure that system sbin directories are in PATH
 ENV PATH="/usr/local/sbin:/usr/sbin:/sbin:${PATH}"
-
-# Override ldconfig to prevent segfaults under QEMU
-RUN ln -sf /bin/true /sbin/ldconfig
 
 # Update and install all system dependencies in one command
 RUN apt-get update && \
@@ -31,22 +32,16 @@ RUN apt-get update && \
         libzbar0 && \
     rm -rf /var/lib/apt/lists/*
 
-# Clone the Pheno-Ranker repository
-WORKDIR /usr/share/
-RUN git clone https://github.com/CNAG-Biomedical-Informatics/pheno-ranker.git
-
-# Remove Git metadata and CI configs to shrink image and avoid shipping them
-RUN rm -rf pheno-ranker/.git pheno-ranker/.github pheno-ranker/.gitattributes pheno-ranker/.gitignore
-
-# Remove docs
-RUN rm -rf pheno-ranker/docs/ pheno-ranker/mkdocs.yml
-
 # Install Perl and Python dependencies
 WORKDIR /usr/share/pheno-ranker
-RUN cpanm --notest --installdeps .
+COPY cpanfile requirements.txt ./
+RUN cpanm --notest --configure-timeout 300 --installdeps .
 
 # Install Python packages (utils/barcode)                                                          
 RUN pip3 install -r requirements.txt --break-system-packages 
+
+# Package the selected checkout, not the current remote main branch.
+COPY . .
 
 # Install R packages (optional)
 #RUN Rscript -e "install.packages(c('pheatmap', 'ggplot2', 'ggrepel', 'dplyr', 'stringr'), repos='http://cran.rstudio.com/')"

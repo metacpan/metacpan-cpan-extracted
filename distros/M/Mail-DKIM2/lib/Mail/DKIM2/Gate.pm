@@ -2,7 +2,7 @@ package Mail::DKIM2::Gate;
 use strict;
 use warnings;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use Email::MIME;
 use Mail::DKIM2::Common qw(extract_mi_version parse_mime valid_sequence chain_number_error);
@@ -94,7 +94,9 @@ sub _top_has_nd {
     my ($best, $top_nd) = (-1, 0);
     for my $raw (@$sigs) {
         (my $v = $raw) =~ s/^\s+//;
-        my $sig = eval { Mail::DKIM2::Signature->parse($v) } or next;
+        my $sig = eval { Mail::DKIM2::Signature->parse($v) };
+        die $@ if ref $@;
+        next unless $sig;
         my $i = $sig->sequence;
         next unless valid_sequence($i) && $i > $best;
         my $nd = $sig->next_domain;
@@ -105,6 +107,9 @@ sub _top_has_nd {
 
 sub check {
     my ($class, $message, %o) = @_;
+    Mail::DKIM2::Common::_check_options("$class->check", \%o,
+        qw(SigningDomain AllowNullBodyRecipe SkipTimestampCheck IgnorePrefixes
+           PubkeyCallback Resolver VerifyResult));
 
     my $msg = parse_mime($message);
     my @sigs = $msg->header_raw('DKIM2-Signature');
@@ -163,7 +168,9 @@ sub check {
     my ($top) = sort { $b <=> $a } keys %by_v;
     my %null = map { $_ => 1 } grep {
         my $v = $_;
-        $v && eval { Mail::DKIM2::MessageInstance->parse($by_v{$v})->unrecoverable };
+        my $null = $v && eval { Mail::DKIM2::MessageInstance->parse($by_v{$v})->unrecoverable };
+        die $@ if ref $@;
+        $null;
     } keys %by_v;
     my $top_null = ($top && $null{$top}) ? 1 : 0;
     # How far up the upstream signatures reach: a DKIM2-Signature with m=k
@@ -176,7 +183,9 @@ sub check {
     my $covered = 0;
     for my $raw (@sigs) {
         (my $v = $raw) =~ s/^\s+//;
-        my $sig = eval { Mail::DKIM2::Signature->parse($v) } or next;
+        my $sig = eval { Mail::DKIM2::Signature->parse($v) };
+        die $@ if ref $@;
+        next unless $sig;
         next unless valid_sequence($sig->sequence);
         my $m = $sig->version // next;
         next if chain_number_error('DKIM2-Signature', 'm', $m);

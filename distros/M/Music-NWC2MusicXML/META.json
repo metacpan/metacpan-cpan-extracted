@@ -85,6 +85,6 @@
          "web" : "https://github.com/nigelhorne/NWC2MusicXML"
       }
    },
-   "version" : "v0.001.2",
+   "version" : "v0.002.0",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

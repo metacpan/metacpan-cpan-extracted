@@ -57,4 +57,38 @@ sub pubkey_callback {
     };
 }
 
+# A stand-in Net::DNS::Resolver answering TXT queries from the shared
+# dns.json, for exercising the verifier's own key fetch (the Resolver
+# option) rather than a PubkeyCallback.
+sub resolver {
+    my $dns = decode_json($DNS_JSON->slurp);
+    return bless { dns => $dns }, 'DKIM2TestKeys::Resolver';
+}
+
+{
+    package DKIM2TestKeys::Resolver;
+    sub query {
+        my ($self, $name) = @_;
+        $self->{err} = 'NXDOMAIN';
+        my ($sel, $dom) = $name =~ /\A(.+?\._domainkey)\.(.+)\z/ or return;
+        my $entry = $self->{dns}{$dom}{$sel} or return;
+        $self->{err} = 'NOERROR';
+        return bless { rr => [ map { bless { txt => $_->[1] },
+            'DKIM2TestKeys::RR' } @$entry ] }, 'DKIM2TestKeys::Reply';
+    }
+    sub errorstring { $_[0]{err} }
+    package DKIM2TestKeys::Reply;
+    sub answer { @{ $_[0]{rr} } }
+    package DKIM2TestKeys::RR;
+    sub type { 'TXT' }
+    sub txtdata { $_[0]{txt} }
+}
+
+# The TXT record text for $selector at $domain in the shared dns.json.
+sub dns_txt {
+    my ($domain, $selector) = @_;
+    my $entry = decode_json($DNS_JSON->slurp)->{$domain}{"${selector}._domainkey"};
+    return $entry && $entry->[0] ? $entry->[0][1] : undef;
+}
+
 1;

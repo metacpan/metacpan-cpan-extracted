@@ -2,4 +2,7 @@
 *.pm linguist-language=Perl
 *.t linguist-language=Perl
 *.pdf binary
+# The precomputed-reference manifests hash the exact configuration bytes.
+share/conf/config.yaml text eol=lf
 nb/** linguist-vendored
+docs-site/** linguist-documentation

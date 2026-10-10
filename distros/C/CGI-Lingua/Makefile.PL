@@ -66,17 +66,25 @@ if(eval { require IP::Country; 1 }) {
 }
 
 my $test_requires = {
+	'CGI::Info' => 1.14,	# t/language.t uses it directly; it is only recommended at run time
 	'CHI' => 0,
 	'IPC::System::Simple' => 0,
 	'IPC::Run3' => 0,
 	'File::Temp' => 0,
 	'FindBin' => 0,
+	# Needed so the geoplugin and ip-api.com code paths are tested at all;
+	# they are optional at run time (see the web_lookups feature below)
+	'JSON::Parse' => 0,
+	'LWP::Simple::WithCache' => 0.04,
 	'Test::Compile' => 0,
 	'Test::DescribeMe' => 0,
+	'Test::Log::Abstraction' => 0,
 	'Test::Memory::Cycle' => 0,
-	'Test::Mockingbird' => 0,
+	'Test::Mockingbird' => 0.14,	# spy on inherited methods; unmock peels one layer
+	'Test::More' => 0,
 	'Test::Most' => 0,
 	'Test::Needs' => 0,
+	'Test::Permissions' => 0,	# permission-drop tests; they skip where chmod cannot revoke access
 	'Test::NoWarnings' => 0,
 	'Test::Requires' => 0,
 	'Test::RequiresInternet' => 0,
@@ -88,7 +96,6 @@ my $test_requires = {
 if($online_tests) {
 	open(my $enabled, '>', 't/online.enabled') || die "Can't touch t/online.enabled $!";
 	close($enabled) || die "Can't touch t/online.enabled $!";
-	$test_requires->{'LWP::Simple::WithCache'} = 0.04;
 } else {
 	unlink('t/online.enabled');
 }
@@ -114,57 +121,65 @@ WriteMakefile(
 	}, TEST_REQUIRES => $test_requires,
 	PREREQ_PM => {
 		'autodie' => 0,		# used at compile time: use autodie qw(:all)
-		'JSON::PP' => 2.27,	# cache serialisation; in core from 5.13.9, explicit for 5.10/5.12 compat
+		'Carp' => 0,
+		'Class::Autouse' => 0,
 		'DBD::SQLite' => 0,	# Locale::Object doesn't declare this prerequisite
-		'Log::Abstraction' => 0.33,	# used by Object::Configure for logger conversion
-		'Locale::Object::Country' => 0.78,	# Fix for RT#79214
-		'Locale::Object' => 0.80,	# Fix for RT#131347
+		'HTTP::BrowserDetect' => 0,
 		'I18N::AcceptLanguage' => 0,
-		'Locale::Language' => 0,
-		'I18N::LangTags::Detect' => 1.04,
+		'JSON::PP' => 2.27,	# cache serialisation; in core from 5.13.9, explicit for 5.10/5.12 compat
 		'Locale::Codes' => 3.59,	# Silence noisy warn messages in perl 5.28
+		'Locale::Language' => 0,
+		'Locale::Object' => 0.80,	# Fix for RT#131347
+		'Locale::Object::Country' => 0.78,	# Fix for RT#79214
+		'Log::Abstraction' => 0.33,	# used by Object::Configure for logger conversion
 		'Net::Whois::IANA' => 0,
 		'Net::Whois::IP' => 0,
 		'Object::Configure' => 0.24,
 		'Params::Get' => 0.17,	# 0.15 fast-path: unblessed hashref arg returned directly (not stored under default key)
 		'Readonly' => 0,
-		'Class::Load' => 0,
-		'CGI::Info' => 1.14, # For AUTOLOAD
-		'Sys::Syslog' => 0,
-		'HTTP::BrowserDetect' => 0,
-		'Class::Autouse' => 0
-    }, dist => $dist,
-    clean               => { FILES => 'CGI-Lingua-* t/online.enabled' },
-    META_MERGE		=> {
-    	'meta-spec' => { version => 2 },
-    	optional_features => {
-    	    baidu_subnet_detection => {
-    	        description => 'Detect Baidu crawler IPs that misreport as EU (RT-86809); not available on Windows due to Socket6 build dependency',
-    	        prereqs => { runtime => { recommends => { 'Net::Subnet' => 0 } } },
-    	    },
-    	    precise_ip_validation => {
-    	        description => 'More rigorous IPv6 private-range detection via Data::Validate::IP; not available on Windows because NetAddr::IP (its dep) fails to build there',
-    	        prereqs => { runtime => { recommends => { 'Data::Validate::IP' => 0.25, 'NetAddr::IP' => 0 } } },
-    	    },
-    	    local_time_zone => {
-    	        description => 'Detect local time zone via DateTime::TimeZone::Local for time_zone() when running non-CGI (CLI); not available on all Windows Perl builds',
-    	        prereqs => { runtime => { recommends => { 'DateTime::TimeZone' => 0 } } },
-    	    },
-    	}, resources => {
-		repository => {
-			type => 'git',
-			url => 'git://github.com/nigelhorne/CGI-Lingua.git',
-			web => 'https://github.com/nigelhorne/CGI-Lingua',
-			repository => 'https://github.com/nigelhorne/CGI-Lingua',
-		}, bugtracker => {
-			url => 'https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Lingua',
-			web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Lingua',
-			# web => 'https://github.com/nigelhorne/CGI-Lingua/issues',
-			# url => 'https://github.com/nigelhorne/CGI-Lingua/issues',
-			mailto => 'bug-CGI-Lingua@rt.cpan.org'
-		}
+		'Scalar::Util' => 0,
+		'Socket' => 0,	# inet_pton for the pure-Perl IPv6 check
+	}, dist => $dist,
+	clean => { FILES => 'CGI-Lingua-* t/online.enabled' },
+	META_MERGE => {
+		'meta-spec' => { version => 2 },
+		optional_features => {
+			local_geo_databases => {
+				description => 'Look up the country from a local database (fastest, no network): IP::Country, Geo::IP (needs a GeoIP.dat) or Geo::IPfree',
+				prereqs => { runtime => { recommends => { 'IP::Country' => 0, 'Geo::IP' => 0, 'Geo::IPfree' => 0 } } },
+			},
+			baidu_subnet_detection => {
+				description => 'Detect Baidu crawler IPs that misreport as EU (RT-86809); not available on Windows due to Socket6 build dependency',
+				prereqs => { runtime => { recommends => { 'Net::Subnet' => 0 } } },
+			},
+			precise_ip_validation => {
+				description => 'More rigorous IPv6 private-range detection via Data::Validate::IP; not available on Windows because NetAddr::IP (its dep) fails to build there',
+				prereqs => { runtime => { recommends => { 'Data::Validate::IP' => 0.25, 'NetAddr::IP' => 0 } } },
+			},
+			web_lookups => {
+				description => 'Look up the country (geoplugin.net) and time zone (ip-api.com) over the web when no local geo database answers; JSON::Parse and LWP::Simple::WithCache (or LWP::Simple) are needed',
+				prereqs => { runtime => { recommends => { 'JSON::Parse' => 0, 'LWP::Simple::WithCache' => 0.04, 'LWP::Simple' => 0 } } },
+			},
+			local_time_zone => {
+				description => 'Detect local time zone via DateTime::TimeZone::Local for time_zone() when running non-CGI (CLI); not available on all Windows Perl builds',
+				prereqs => { runtime => { recommends => { 'DateTime::TimeZone' => 0 } } },
+			},
+			lang_parameter => {
+				description => 'Let a lang= query parameter choose the language, through the info argument to new()',
+				prereqs => { runtime => { recommends => { 'CGI::Info' => 1.14 } } },	# 1.14: lang() via AUTOLOAD
+			},
+		}, resources => {
+			repository => {
+				type => 'git',
+				url => 'https://github.com/nigelhorne/CGI-Lingua.git',
+				web => 'https://github.com/nigelhorne/CGI-Lingua',
+			}, bugtracker => {
+				web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Lingua',
+				# web => 'https://github.com/nigelhorne/CGI-Lingua/issues',
+				mailto => 'bug-CGI-Lingua@rt.cpan.org'
+			}
+		},
 	},
-    },
 	MIN_PERL_VERSION	=> '5.10.1'	# autodie bundled into core from 5.10.1; //= and defined-or used throughout
 );
 

@@ -18,3 +18,4 @@ MANIFEST.SKIP
 META.json
 META.yml
 t/001_basic.t
+t/002_cve_2026_107794.t

@@ -10,7 +10,7 @@ use Game::Go;
 use Game::Go::Rules;
 use Game::Go::Notation;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 my $B = Game::Go::Rules::BLACK;
 my $W = Game::Go::Rules::WHITE;
@@ -357,7 +357,7 @@ Game::Go::SGF - read and write the SGF subset a Go record needs
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

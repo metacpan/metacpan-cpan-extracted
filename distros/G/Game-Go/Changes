@@ -1,4 +1,16 @@
 Revision history for Game-Go
 
+0.02    2026-10-10
+        - The board is drawn as a board: grid lines and star points, with
+          stones on the intersections.
+        - Point at the move you mean: the arrow keys walk a cursor over the
+          board and the line under it says what the move would take, what
+          liberties it would have, or why it cannot be played.
+        - Fix: the last move was marked by wrapping an already-coloured cell,
+          so the mark was emitted on every board and never once visible. It
+          is a ringed stone now, and a point a capture emptied is an x.
+        - Fix: an answer, a refusal or a redrawn board landed on the prompt's
+          own line off a terminal.
+
 0.01    2026-09-18
         First version

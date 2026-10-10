@@ -3,9 +3,10 @@ package Music::NWC2MusicXML::Score;
 use strict;
 use warnings;
 
-our $VERSION = '0.001.2';
+our $VERSION = '0.002.0';
 
 use Carp qw(croak carp);
+use List::Util qw(any);
 use Readonly;
 use Scalar::Util qw(blessed);
 use Params::Validate::Strict qw(validate_strict);
@@ -13,9 +14,13 @@ use Params::Get;
 use Music::NWC2MusicXML::Staff;
 
 Readonly::Hash my %MESSAGES => (
-	error_bad_staff  => 'add_staff: argument must be a Music::NWC2MusicXML::Staff, got: %s',
-	error_no_staves  => 'Score contains no staves',
-	error_internal   => 'Internal error: %s',
+	error_bad_staff       => 'add_staff: argument must be a Music::NWC2MusicXML::Staff, got: %s',
+	error_no_staves       => 'Score contains no staves',
+	error_internal        => 'Internal error: %s',
+	warn_empty_staff      => "Staff '%s' has no events",
+	warn_bar_duration     => "Staff '%s', measure %d: duration %s quarter-notes does not match time signature (%s expected)",
+	warn_unmatched_tie    => "Staff '%s': unterminated tie from position '%s'",
+	warn_unclosed_slur    => "Staff '%s': slur arc not closed at end of staff",
 );
 
 # Recognised SongInfo keys that map to MusicXML metadata elements
@@ -35,7 +40,7 @@ Music::NWC2MusicXML::Score - Internal representation of a complete NWC score.
 
 =head1 VERSION
 
-0.001.2
+0.002.0
 
 =head1 SYNOPSIS
 
@@ -331,7 +336,7 @@ Arrayref of diagnostic strings (empty on success).
 =cut
 
 sub validate {
-	my ($self) = @_;
+	my $self = $_[0];
 
 	# Strategy: iterate staves; for each staff check that:
 	#  - event list is non-empty
@@ -347,11 +352,76 @@ sub validate {
 	}
 
 	for my $staff (@{ $self->{_staves} }) {
-		# TODO Phase 3: implement per-staff validation checks
-		# - time signature consistency
-		# - tie/slur pairing
-		# - tuplet structure
-		# - pitch validity
+		my $sname = $staff->name // '(unnamed)';
+
+		if ($staff->event_count == 0) {
+			push @diagnostics, _fmt_msg('warn_empty_staff', $sname);
+			next;
+		}
+
+		my %pending_tie;          # pos_key => 1  for ties awaiting a stop
+		my $in_slur    = 0;       # 1 while inside an unclosed slur arc
+		my $bar_num    = 1;
+		my ($acc_n, $acc_d) = (0, 1);   # accumulated bar duration as a rational
+
+		my $ts = $staff->initial_timesig // {};
+		my ($exp_n, $exp_d) = _ts_to_rational($ts);
+
+		for my $ev (@{ $staff->events }) {
+			my $type = $ev->type;
+			my $d    = $ev->data // {};
+
+			if ($type eq 'TimeSig') {
+				($exp_n, $exp_d) = _ts_to_rational($d);
+				next;
+			}
+
+			if ($type eq 'Bar') {
+				if ($acc_n > 0 && $exp_n > 0) {
+					my ($cn, $cd) = _rat_reduce($acc_n, $acc_d);
+					my ($en, $ed) = _rat_reduce($exp_n, $exp_d);
+					push @diagnostics, _fmt_msg(
+						'warn_bar_duration', $sname, $bar_num,
+						"$cn/$cd", "$en/$ed",
+					) unless $cn * $ed == $en * $cd;
+				}
+				$bar_num++;
+				($acc_n, $acc_d) = (0, 1);
+				next;
+			}
+
+			next unless $type eq 'Note' || $type eq 'Chord' || $type eq 'Rest';
+
+			# Accumulate duration (grace notes contribute nothing)
+			unless ($d->{is_grace}) {
+				my ($dn, $dd) = @{ $d->{duration} // [0, 1] };
+				($acc_n, $acc_d) = _rat_reduce(
+					$acc_n * $dd + $dn * $acc_d,
+					$acc_d * $dd,
+				);
+			}
+
+			# Tie tracking (rests cannot be tied)
+			unless ($type eq 'Rest') {
+				my @pos_strs = $type eq 'Chord'
+					? @{ $d->{nwc_positions} // [] }
+					: ($d->{nwc_pos} // '0');
+				for my $ps (@pos_strs) {
+					(my $pk = $ps) =~ s/\^\z//;
+					delete $pending_tie{$pk};          # consume any pending stop
+					$pending_tie{$pk} = 1 if $ps =~ /\^\z/;
+				}
+			}
+
+			# Slur tracking (rests are transparent to slur arcs)
+			next if $type eq 'Rest';
+			$in_slur = any { $_ eq 'Slur' } @{ $d->{articulations} // [] } ? 1 : 0;
+		}
+
+		for my $pk (sort keys %pending_tie) {
+			push @diagnostics, _fmt_msg('warn_unmatched_tie', $sname, $pk);
+		}
+		push @diagnostics, _fmt_msg('warn_unclosed_slur', $sname) if $in_slur;
 	}
 
 	return \@diagnostics;
@@ -365,6 +435,28 @@ sub _fmt_msg {
 	my ($key, @args) = @_;
 	croak "Unknown message key: $key" unless exists $MESSAGES{$key};
 	return sprintf $MESSAGES{$key}, @args;
+}
+
+# Convert a timesig hashref {beats, beat_type} to a rational [n, d] in quarter-note units.
+# Returns (0, 1) when the timesig is absent or incomplete.
+sub _ts_to_rational {
+	my ($ts) = @_;
+	return (0, 1) unless ref $ts eq 'HASH' && $ts->{beats} && $ts->{beat_type};
+	return _rat_reduce($ts->{beats} * 4, $ts->{beat_type});
+}
+
+# Reduce a fraction to lowest terms.  Returns ($n, $d) with $d > 0.
+sub _rat_reduce {
+	my ($n, $d) = @_;
+	return (0, 1) unless $n;
+	my $g = _gcd(abs($n), abs($d));
+	return ($n / $g, $d / $g);
+}
+
+sub _gcd {
+	my ($a, $b) = @_;
+	($a, $b) = ($b, $a % $b) while $b;
+	return $a;
 }
 
 1;
@@ -383,8 +475,6 @@ __END__
 =head1 LIMITATIONS
 
 =over 4
-
-=item * C<validate> is a stub; full validation implemented in Phase 3.
 
 =item * Page-layout and graphical properties are stored but not used in MusicXML generation.
 

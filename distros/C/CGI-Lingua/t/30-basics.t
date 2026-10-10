@@ -6,7 +6,7 @@ use warnings;
 use File::Temp qw/tempfile/;
 use Test::Most;
 use Test::Mockingbird;
-use Test::Needs 'CHI', 'IP::Country', 'Test::LWP::UserAgent';
+use Test::Needs 'CHI', 'IP::Country', 'Test::LWP::UserAgent', 'JSON::Parse';	# JSON::Parse: time_zone() reads ip-api.com
 use Test::Without::Module qw(Geo::IP);
 
 BEGIN { use_ok('CGI::Lingua') }

@@ -4,13 +4,13 @@ use strict;
 use warnings;
 use bytes;
 
-use IO::Compress::Base::Common  2.224 qw(:Status);
+use IO::Compress::Base::Common  2.225 qw(:Status);
 
-use Compress::Raw::Lzma  2.224 qw(LZMA_OK LZMA_STREAM_END) ;
-use Compress::Raw::Zlib 2.224 qw() ;
+use Compress::Raw::Lzma  2.225 qw(LZMA_OK LZMA_STREAM_END) ;
+use Compress::Raw::Zlib 2.225 qw() ;
 
 our ($VERSION);
-$VERSION = '2.224';
+$VERSION = '2.225';
 
 
 

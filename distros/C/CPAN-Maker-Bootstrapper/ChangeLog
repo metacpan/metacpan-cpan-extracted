@@ -1,3 +1,140 @@
+Thu Oct  8 17:08:00 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.4.1]:
+	* VERSION: bump
+	* README.md: generated
+	* release-notes.md: update
+	* release-notes/release-notes-2.4.1.md: new
+	(.prompts/release-notes.prompt)
+	- significantly enhanced by LLM
+	* .prompts/change-log.prompt: new
+	- added for next release planned feature
+	* .gitignore
+	- +*.rendered, build-config.mk, config.mk, config.ini
+	* gitignore
+	- +*.rendered, build-config.mk
+	* .includes/build-init.mk: new
+	- validate required build tooling
+	- derive CPAN installer and scan state
+	- centralize build-time prerequisite checks
+	* .includes/perl.mk
+	- move tool/configuration discovery out of perl.mk
+	- create .rendered module files before POD processing
+	- support POD extract, remove and passthrough from rendered sources
+	- check POD against rendered source
+	- batch perltidy and perlcritic checks through cmb
+	* .includes/test.mk
+	- require local dependencies before test targets
+	- add help descriptions for author, release and smoke tests
+	* .includes/update.mk
+	- move managed include definitions to Makefile
+	(update-available)
+	- use cmb update-available
+	- use cmb dist-file --path-only to locate cmb_md5sums.txt
+	* MANIFEST: +build-init.mk
+	* Makefile
+	- require GNU Make 4.3 or newer
+	- move build configuration discovery to build-config.mk
+	- include managed make fragments from one location
+	- add rendered source files as intermediate build artifacts
+	- avoid rewriting scanned dependency files when content has not	changed
+	- use grouped targets for dependency reconciliation
+	- reconcile requires, recommends, suggests and test-requires together
+	- only update provides when content changes
+	- remove provided modules from test-requires after reconciliation
+	- use cmb commands instead of direct File::ShareDir/config-reader access
+	- add real-quick target
+	- quick also disables POD checking
+	- build tarball explicitly from buildspec.yml
+	- clean rendered sources and build-config.mk
+	* buildspec.yml
+	- +.includes/build-init.mk
+	* cmb_md5sums.txt
+	- +.includes/build-init.mk
+	- update managed file checksums
+	* cpan-maker-bootstrapper.yml
+	- add create-build-config, perlcritic, perltidy and reconcile-deps commands
+	- move deps-filter, dist-file, resolve-vars and update-available to selective roles
+	- add --path-only, --severity, --theme and --profile options
+	- add reader extra option
+	* bin/cmb.in
+	- load modulino once and invoke main directly
+	* bin/cpan-maker-bootstrapper.in: likewise
+	* share/modulino.tmpl: likewise
+	* lib/CPAN/Maker/Bootstrapper.pm.in
+	- document perlcritic and perltidy CI gates
+	* lib/CPAN/Maker/Bootstrapper/ConfigReader.pm.in
+	- fix SYNOPSIS package name
+	* lib/CPAN/Maker/Bootstrapper/Role/CreateBuildConfig.pm.in: new
+	(cmd_create_build_config)
+	- generate build-config.mk assignments
+	(_build_config): new
+	- resolve module/project paths and build defaults
+	- discover configured build helper commands
+	(_resolve_helper): new
+	- honor configured helper paths before command discovery
+	* lib/CPAN/Maker/Bootstrapper/Role/DarkPANRequires.pm.in
+	- lazy load HTTP::Tiny and IO::Uncompress::Gunzip
+	* lib/CPAN/Maker/Bootstrapper/Role/DepsFilter.pm.in
+	- lazy load HTTP::Tiny, IO::Uncompress::Gunzip and Storable
+	(_filter_package_hash): new
+	- separate hash filtering from file processing
+	* lib/CPAN/Maker/Bootstrapper/Role/DistFile.pm.in
+	(cmd_dist_file)
+	- default distribution to CPAN-Maker-Bootstrapper
+	- add --path-only
+	- find files in distribution root or share directory
+	* lib/CPAN/Maker/Bootstrapper/Role/Filter.pm.in
+	(_filter_requires): new
+	- separate dependency filtering from command output
+	* lib/CPAN/Maker/Bootstrapper/Role/Init.pm.in
+	(_init_config): save config reader on application
+	* lib/CPAN/Maker/Bootstrapper/Role/PAUSEUpload.pm.in
+	- lazy load HTTP::Tiny and MIME::Base64
+	* lib/CPAN/Maker/Bootstrapper/Role/PerlCritic.pm.in: new
+	(cmd_perlcritic)
+	- critique source files individually or from --file-list
+	- support severity, profile and theme
+	- write violations to .crit reports
+	* lib/CPAN/Maker/Bootstrapper/Role/PerlTidy.pm.in: new
+	(cmd_perltidy)
+	- verify source files individually or from --file-list
+	- support perltidy profile
+	- create .tdy sentinel files for tidy sources
+	* lib/CPAN/Maker/Bootstrapper/Role/ReconcileDeps.pm.in: new
+	(cmd_reconcile_deps)
+	- reconcile one or more dependency types in a single invocation
+	- apply dependency and DarkPAN filtering before writing results
+	- avoid rewriting unchanged dependency files
+	* lib/CPAN/Maker/Bootstrapper/Role/ResolveVars.pm.in
+	(cmd_resolve_vars)
+	- add --file-list support
+	- write batch results to .rendered files
+	- make source-file and --file-list mutually exclusive
+	(_resolve_source): new
+	* lib/CPAN/Maker/Bootstrapper/Role/ShowDefaults.pm.in
+	(_resolve_defaults): new
+	- resolve syntax checking, perltidyrc and perlcriticrc from
+	environment, configuration, project or home directory
+	* lib/CPAN/Maker/Bootstrapper/Role/UpdateAvailable.pm.in: new
+	(cmd_update_available)
+	- report a newer CPAN release when available
+	- default module to CPAN::Maker::Bootstrapper
+	(_get_module_version): new
+	- query MetaCPAN for latest module version
+	* requires
+	- bump CLI::Simple to 2.3.0
+	- +File::Which 1.27
+	* cpanfile: likewise
+	- +Perl::Tidy suggests
+	* suggests: +Perl::Tidy 20260204
+	* deps.mk
+	- add ReconcileDeps dependency on DepsFilter
+	* t/find-primary-package.t
+	- test Installer role directly instead of loading full bootstrapper
+	- remove host-specific test paths
+	* builder: remove comments
+
 Fri Oct  2 15:52:52 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[2.4.0]:
@@ -16,8 +153,10 @@ Fri Oct  2 15:52:52 2026  Rob Lauer  <rclauer@gmail.com>
 	(extra-files): + .includes/builder.mk, .includes/test.mk
 	* builder
 	- CI hooks
-	- builder.env
+	- Load builder.env before resolving build dependencies
+	- Preserve explicit lint profile environment settings and validate configured rc files
 	- make clean
+	- conditionally load perltidy/perlcritic dependencies
 	* builder.env: new
 	* MANIFEST
 	- +builder, builder.env, builder.mk, test.mk
@@ -34,12 +173,7 @@ Fri Oct  2 15:52:52 2026  Rob Lauer  <rclauer@gmail.com>
 	- install test-requires.cpanfile for carton too
 	- mode line
 	- create local directory if it does not exist
-	* .includes/perl.mk
-	- no recursive expansion for SYNTAX_CHECKING, PERLTIDYRC, PERLCRITICRC
-	- only create deps.mk if syntax checking is on
-	- add check sentinel for syntax checking
-	- use PERLCRITIC, not PERLCRITICRC to gate perlcritic
-	- use PERLTIDY, not PERLTIDYRC to gate perltidy
+	- moved test related things to .includes/test.mk
 	* .includes/update.mk
 	- add builder.mk, test.mk
 	(INCLUDES_FILES)
@@ -128,6 +262,8 @@ Fri Oct  2 15:52:52 2026  Rob Lauer  <rclauer@gmail.com>
 	- stop using CPAN::Maker::Role::Provides::create_provides
 	- use File::Find to find .pm.in files
 
+
+
 Thu Oct  1 06:24:45 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[2.3.6]:
@@ -148,6 +284,7 @@ Thu Oct  1 06:24:45 2026  Rob Lauer  <rclauer@gmail.com>
 	* lib/CPAN/Maker/Bootstrapper/Role/DarkPANRequires.pm.in
 	(cmd_create_darkpan_requires): use --filter to remove modules
 	* lib/CPAN/Maker/Bootstrapper/Role/DepsFilter.pm.in
+	- lazy load modules
 	(cmd_deps_filter): do not write empty files
 	* lib/CPAN/Maker/Bootstrapper/Role/Filter.pm.in
 	- move cmd method to top of file
@@ -544,14 +681,21 @@ Sat Jul 25 06:24:38 2026  Rob Lauer  <rclauer@gmail.com>
 	* lib/CPAN/Maker/Bootstrapper/Role/LLM/Reviewer.pm.in
 	(cmd_code_review): lazy load Text::ASCIITable
 	(cmd_pod_review): likewise
-	(cmd_code_finding): likewise
-	* lib/CPAN/Maker/Bootstrapper/Role/LLM/Utils.pm.in
-	(_check_llm): use or do {} pattern to trap error
-	(_pre_submission_report): lazy load Text::ASCITable
-	(_fmt_tokens): refactored
-	(_print_token_usage): lazy load Text::ASCIITable
 	* lib/Git/ReleaseDiffs.pm.in
-	(new): die if Git::Raw not installed
+	- add status accessor
+	(_status): new
+	- generate git name-status for HEAD
+	(write_status): new
+	- write release-X.Y.Z.status
+	* lib/CPAN/Maker/Bootstrapper/Role/LLM/ReleaseNotes.pm.in
+	(cmd_release_notes)
+	- generate release status artifact
+	- include .status in release artifacts submitted to LLM
+	(cmd_code_finding): likewise
+	* lib/CPAN/Maker/Bootstrapper/Role/LLM/ReleaseNotes.pm.in
+	(cmd_release_notes):
+	- write_status to file
+	- add .status to file list
 	* lib/Text/ASCIITable/FixANSI.pm.in
 	(BEGIN): lazy load Text::ASCIITable
 	* recommends: moved to suggests

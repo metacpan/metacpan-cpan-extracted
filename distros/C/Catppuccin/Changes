@@ -1,3 +1,6 @@
 Revision history for Catppuccin
 
+0.002     2026-10-09 20:39:30+11:00 Australia/Melbourne
+- remove the emoji from the abstract; metacpan (at least) didn't like it
+
 0.001     2026-10-09 13:20:47+11:00 Australia/Melbourne

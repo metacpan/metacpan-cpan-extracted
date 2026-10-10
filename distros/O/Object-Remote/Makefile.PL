@@ -18,16 +18,17 @@ my %META = (
     },
     runtime => {
       requires => {
-        'Moo'                       => 1.006,
-        'Module::Runtime'           => 0,
-        'JSON::PP'                  => 0,
-        'Future'                    => 0.49,
-        'MRO::Compat'               => 0, # required to fatpack Moo
         'Class::C3'                 => 0, # required to fatpack Moo
         'Devel::GlobalDestruction'  => 0, # required to fatpack Moo
-        'String::ShellQuote'        => 0, # required for ssh argument manipulation
+        'Future'                    => 0.49,
+        'JSON::PP'                  => 0,
+        'List::Util'                => 1.29,
         'Log::Contextual'           => 0.005000,
+        'Module::Runtime'           => 0,
+        'Moo'                       => 1.006,
+        'MRO::Compat'               => 0, # required to fatpack Moo
         'strictures'                => 2,
+        'String::ShellQuote'        => 0, # required for ssh argument manipulation
       },
     },
     develop   => {

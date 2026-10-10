@@ -15,7 +15,7 @@ use Game::Mahjong::Score;
 use Game::Mahjong::Result;
 use Game::Mahjong::Error;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 our %PRIORITY;
 BEGIN { %PRIORITY = (pass => 0, chow => 1, pung => 2, kong => 2, win => 3) }
@@ -689,7 +689,7 @@ Game::Mahjong::Rules - the state of one game: the deal, the turns, the window, t
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

@@ -15,6 +15,18 @@ sub cmd_filter {
 
   my ( $requires_new, $skip_file, $requires_old ) = $self->get_args;
 
+  my $new_requires = $self->_filter_requires( $requires_new, $skip_file, $requires_old, );
+
+  print join q{}, map {"$_ $new_requires->{$_}\n"} sort keys %{$new_requires};
+
+  return $SUCCESS;
+}
+
+########################################################################
+sub _filter_requires {
+########################################################################
+  my ( $self, $requires_new, $skip_file, $requires_old ) = @_;
+
   my %files = (
     skip => $self->_fetch_requires($skip_file),
     new  => $self->_fetch_requires($requires_new),
@@ -25,17 +37,20 @@ sub cmd_filter {
 
   # copy preserved modules (ones preceded with '+')
   foreach my $m ( keys %{ $files{old} } ) {
-    next if $m !~ /^\+/xsm;
+    next if $m !~ /^[+]/xsm;
     $new_requires{$m} = $files{old}->{$m};
   }
 
   foreach my $m ( keys %{ $files{new} } ) {
+
     # skip modules on skip list
     next if exists $files{skip}->{$m};
     next if exists $files{old}->{"+$m"};
 
-    # keep modules from preserved list if versions differ (user must have specified specific version)
-    if ( exists $files{old}->{$m} && $files{old}->{$m} ne $files{new}->{$m} ) {
+    # keep modules from preserved list if versions differ
+    # (user must have specified specific version)
+    if ( exists $files{old}->{$m}
+      && $files{old}->{$m} ne $files{new}->{$m} ) {
       $new_requires{$m} = $files{old}->{$m};
     }
     else {
@@ -43,9 +58,7 @@ sub cmd_filter {
     }
   }
 
-  print join q{}, map {"$_ $new_requires{$_}\n"} sort keys %new_requires;
-
-  return $SUCCESS;
+  return \%new_requires;
 }
 
 ########################################################################

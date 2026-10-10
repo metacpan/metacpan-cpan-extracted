@@ -2,7 +2,7 @@
 
 Use Docker when you want a reproducible environment with the Perl and Python dependencies preinstalled.
 
-## Method 1: From Docker Hub
+## Method 4: From Docker Hub
 
 Download the latest image:
 
@@ -11,7 +11,7 @@ docker pull manuelrueda/pheno-ranker:latest
 docker image tag manuelrueda/pheno-ranker:latest cnag/pheno-ranker:latest
 ```
 
-## Method 2: Build From Dockerfile
+## Method 5: With Dockerfile
 
 The repository includes `docker/Dockerfile`.
 
@@ -27,55 +27,70 @@ For multi-architecture builds, use Buildx:
 docker buildx build -f docker/Dockerfile -t cnag/pheno-ranker:latest .
 ```
 
-## Run The Container
+## Run Pheno-Ranker
 
-Start a detached container:
+Run each analysis in the foreground and mount the current directory so Pheno-Ranker can read local inputs and write its results back to the host:
 
 ```bash
-docker run -tid -e USERNAME=root --name pheno-ranker cnag/pheno-ranker:latest
+docker run --rm \
+  --volume "$PWD:/data" \
+  --workdir /data \
+  cnag/pheno-ranker:latest \
+  /usr/share/pheno-ranker/bin/pheno-ranker \
+  -r individuals.json -t patient.json -o rank.txt
 ```
 
-Enter the container:
+The command displays progress and errors in the terminal, then removes the container when it finishes. A successful run creates `rank.txt` in the current directory. Replace the final line with the Pheno-Ranker arguments required for your analysis.
+
+The image runs as `root` by default. On Linux, add `--user "$(id -u):$(id -g)"` to keep output files owned by your current user:
 
 ```bash
+docker run --rm \
+  --user "$(id -u):$(id -g)" \
+  --volume "$PWD:/data" \
+  --workdir /data \
+  cnag/pheno-ranker:latest \
+  /usr/share/pheno-ranker/bin/pheno-ranker \
+  -r individuals.json -t patient.json -o rank.txt
+```
+
+## Interactive Container (Optional)
+
+Use a named, detached container when you want to inspect the image or run several commands in the same environment:
+
+```bash
+docker run -tid \
+  --volume "$PWD:/data" \
+  --workdir /data \
+  --name pheno-ranker \
+  cnag/pheno-ranker:latest
 docker exec -ti pheno-ranker bash
 ```
 
-The command-line executable is available at:
-
-```text
-/usr/share/pheno-ranker/bin/pheno-ranker
-```
-
-The default container user is `root`, but you can also run as `UID=1000` (`dockeruser`):
+The command-line executable is available at `/usr/share/pheno-ranker/bin/pheno-ranker`. You can invoke it repeatedly from the host:
 
 ```bash
-docker run --user 1000 -tid --name pheno-ranker cnag/pheno-ranker:latest
+docker exec -i pheno-ranker \
+  /usr/share/pheno-ranker/bin/pheno-ranker \
+  -r individuals.json -t patient.json -o rank.txt
 ```
+
+Remove the named container when it is no longer needed:
+
+```bash
+docker rm -f pheno-ranker
+```
+
+The image also includes `dockeruser` with `UID=1000`. To use it, add `--user 1000:1000` to the initial `docker run` command.
 
 ## Use `make`
 
-If you prefer, use the included `makefile.docker` from the repository root:
+The included `makefile.docker` builds and manages an interactive container from the repository root:
 
 ```bash
 make -f makefile.docker install
 make -f makefile.docker run
 make -f makefile.docker enter
-```
-
-## Mount Volumes
-
-Containers are isolated, so mount a host directory when you need to read or write local data:
-
-```bash
-docker run -tid --volume /path/to/data:/data --name pheno-ranker-mount cnag/pheno-ranker:latest
-```
-
-One convenient pattern is to create an alias on the host:
-
-```bash
-alias pheno-ranker='docker exec -ti pheno-ranker-mount /usr/share/pheno-ranker/bin/pheno-ranker'
-pheno-ranker -r /data/individuals.json -o /data/matrix.txt
 ```
 
 ## System Requirements

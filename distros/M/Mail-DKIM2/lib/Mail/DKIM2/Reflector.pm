@@ -1,7 +1,7 @@
 package Mail::DKIM2::Reflector;
 use strict; use warnings;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 use 5.020;
 
 use Email::MIME;
@@ -471,6 +471,7 @@ sub _domains_align {
 sub _from_domain {
     my ($text) = @_;
     my $from = eval { parse_mime($text)->header('From') };
+    die $@ if ref $@;
     return undef unless defined $from && length $from;
     my $addr = ($from =~ /<([^>]+)>/) ? $1 : $from;
     my ($dom) = $addr =~ /\@([A-Za-z0-9.\-]+)/;
@@ -483,6 +484,7 @@ sub _dkim1_aligned {
     my ($text, $from_domain, $authserv_id) = @_;
     return undef unless defined $from_domain && defined $authserv_id;
     my @ar = eval { parse_mime($text)->header_raw('Authentication-Results') };
+    die $@ if ref $@;
     for my $ar (@ar) {
         $ar =~ s/\r?\n[ \t]+/ /g;             # unfold
         1 while $ar =~ s/\([^()]*\)//g;       # strip CFWS comments (may hold ';')

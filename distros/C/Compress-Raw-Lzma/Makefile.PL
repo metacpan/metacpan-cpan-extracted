@@ -41,7 +41,7 @@ WriteMakefile(
     ),
 
     ABSTRACT_FROM => 'lib/Compress/Raw/Lzma.pm',
-    AUTHOR        => 'Paul Marquess <pmqs@cpan.org>',
+    AUTHOR        => 'Paul Marquess <pmqs@outlook.com>',
 
      ( eval { ExtUtils::MakeMaker->VERSION(6.46) }
         ? ( META_MERGE  => {

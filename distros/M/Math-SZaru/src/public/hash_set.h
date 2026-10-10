@@ -19,7 +19,7 @@
 #ifndef _UTILITIES_HASH_SET_
 #define _UTILITIES_HASH_SET_
 
-#include "myconfig.h"
+#include "config.h"
 
 #ifdef HASH_SET_H
 #include HASH_SET_H

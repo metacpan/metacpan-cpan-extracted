@@ -19,18 +19,27 @@ my %WriteMakefileArgs = (
 		'Test::More' => '0',
 	},
 	PREREQ_PM => {
-		'JSON'               => '0',
-		'File::Slurp'        => '0',
-		'Sys::Hostname'      => '0',
-		'MIME::Base64'       => '0',
-		'IO::Compress::Gzip' => '0',
-		'Pod::Usage'         => '0',
-		'Proc::PID::File'    => '0',
+		'JSON'                  => '0',
+		'File::Slurp'           => '0',
+		'Sys::Hostname'         => '0',
+		'MIME::Base64'          => '0',
+		'IO::Compress::Gzip'    => '0',
+		'Pod::Usage'            => '0',
+		'Proc::PID::File'       => '0',
+		'DateTime'              => '0',
+		'DateTime::Event::Cron' => '0',
 	},
 	dist       => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 	clean      => { FILES    => 'Monitoring-Sneck-*' },
 	META_MERGE => {
 		"meta-spec" => { version => 2 },
+		prereqs     => {
+			runtime => {
+				recommends => {
+					'YAML::XS' => '0',
+				},
+			},
+		},
 		resources   => {
 			repository => {
 				type => 'git',

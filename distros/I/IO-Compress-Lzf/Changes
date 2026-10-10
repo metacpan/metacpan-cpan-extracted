@@ -1,7 +1,56 @@
 CHANGES
 -------
 
-  2.217 1 February 2027
+  2.225 9 October 2026
+
+    * update to version 2,225
+      Fri Oct 9 15:50:02 2026 +0100
+      6f8d04c89a31506674a9f1fadbb3cafa1e4fddc6
+
+    * Update email address
+      Fri Oct 9 14:08:03 2026 +0100
+      61efa8a98497917857a56db946d0143e7bab79d8
+
+
+  2.224 28 August 2026
+
+    * Add  "use private::MakeUtil" back into Makefile.PL
+      Fri Aug 28 14:46:03 2026 +0100
+      4f384616472fb8af760cd33f3f9aeb7d23af4470
+
+    * Fix linux workflow file
+      Fri Aug 28 12:51:03 2026 +0100
+      42ca17d25432b10695b8a2844127bf9133f74142
+
+    * Remove call to UpDowngradein Makefile.PL
+      Fri Aug 28 12:35:13 2026 +0100
+      8f866332ceb2ca4c76ff3dec6a0759fa5ccc91be
+
+    * Update to version 2.224
+      Fri Aug 28 11:42:09 2026 +0100
+      b106f8b490d1dbb2e481d2fdf7cf24f1b2d1a08a
+
+    * remove 5.6-specific code and make 5.8 the min versionsupported
+      Wed Aug 26 16:06:38 2026 +0100
+      adb8b32db767ec5f34ccfc2c3db9aa3f3bc586f7
+
+    * Merge pull request #3 from pmqs/dependabot/github_actions/actions/checkout-7
+      Fri Jul 3 12:07:39 2026 +0100
+      955dc16a809280e68416e5a1f4b8c111e7613c57
+
+    * Bump actions/checkout from 6 to 7
+      Wed Jul 1 16:07:08 2026 +0000
+      2f091f72dedb8e4362d8dee2bc61f5b4bcf84543
+
+    * fix spelling typo
+      Tue Feb 24 19:47:44 2026 +0000
+      530841cadf1f8edae8eed0fa781c749c33b1f5ea
+
+    * Fix formatting of Changes
+      Sun Feb 1 11:26:18 2026 +0000
+      dd66d860b88a5c752e0e1c39fa8022af784845ee
+
+  2.217 1 February 2026
 
     * Update release date in README
       Sun Feb 1 11:18:25 2026 +0000

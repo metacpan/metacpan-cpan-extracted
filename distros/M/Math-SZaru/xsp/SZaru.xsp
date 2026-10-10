@@ -9,9 +9,10 @@ class UniqueEstimator {
   static
   %name{new}
   UniqueEstimator*
-  Create(const char *CLASS, int nElemes)
+  Create(const char *CLASS, SV *nElemes)
     %code{%
-      RETVAL = UniqueEstimator::Create(nElemes);
+      check_szaru_constructor_param(nElemes, 10000000.0, "UniqueEstimator");
+      RETVAL = UniqueEstimator::Create((int)SvNV(nElemes));
     %};
 
   // Redundant interface
@@ -28,6 +29,8 @@ class UniqueEstimator {
 void
 add_elems(UniqueEstimator *THIS, ...)
   CODE:
+    if (!THIS)
+      croak("Math::SZaru::UniqueEstimator::add_elems() -- THIS is NULL / invalid");
     char *str;
     STRLEN len;
     for (unsigned int i = 1; i < items; ++i) {
@@ -43,26 +46,34 @@ add_elems(UniqueEstimator *THIS, ...)
 %name{Math::SZaru::TopEstimator}
 class PTopEstimator {
   ~PTopEstimator();
-  PTopEstimator(uint64_t numTops);
+  static
+  %name{new}
+  PTopEstimator*
+  new(const char *CLASS, SV *numTops)
+    %code{%
+      check_szaru_constructor_param(numTops, 1000000.0, "TopEstimator");
+      RETVAL = new PTopEstimator((uint32_t)SvNV(numTops));
+    %};
   void add_elem(const std::string& elm);
   void add_weighted_elem(const std::string& elem, double weight);
   uint64_t tot_elems();
 
-  AV *
+  SV *
   estimate()
     %code{%
-      RETVAL = newAV();
-      sv_2mortal((SV *)RETVAL);
+      AV *av = newAV();
       std::vector< SZaru::TopEstimator<double>::Elem > v;
       THIS->estimate(v);
-      av_extend(RETVAL, v.size()-1);
+      if (!v.empty())
+        av_extend(av, v.size()-1);
       for (unsigned int i = 0; i < v.size(); ++i) {
         AV *iav = newAV();
         const std::string &str = v[i].value;
         av_store(iav, 0, newSVpvn(str.c_str(), str.length()));
         av_store(iav, 1, newSVnv(v[i].weight));
-        av_store(RETVAL, i, newRV_noinc((SV *)iav));
+        av_store(av, i, newRV_noinc((SV *)iav));
       }
+      RETVAL = newRV_noinc((SV *)av);
     %};
 
 // Pure XS implementation of multi-element add for performance
@@ -70,6 +81,8 @@ class PTopEstimator {
 void
 add_elems(PTopEstimator *THIS, ...)
   CODE:
+    if (!THIS)
+      croak("Math::SZaru::TopEstimator::add_elems() -- THIS is NULL / invalid");
     char *str;
     STRLEN len;
     for (unsigned int i = 1; i < items; ++i) {
@@ -80,14 +93,19 @@ add_elems(PTopEstimator *THIS, ...)
 void
 add_weighted_elems(PTopEstimator *THIS, ...)
   CODE:
+    if (!THIS)
+      croak("Math::SZaru::TopEstimator::add_weighted_elems() -- THIS is NULL / invalid");
     char *str;
     STRLEN len;
     if (items % 2 == 0) /* params PLUS invocant! */
       croak("Need an even number of arguments: (string, weight, string, weight, ...)");
 
     for (unsigned int i = 1; i < items; i += 2) {
+      double w = SvNV(ST(i+1));
+      if (!std::isfinite(w))
+        croak("TopEstimator: weight must be a finite number (not NaN or Inf)");
       str = SvPV(ST(i), len);
-      THIS->add_weighted_elem(std::string(str, len), SvNV(ST(i+1)));
+      THIS->add_weighted_elem(std::string(str, len), w);
     }
 %}
 }; // End of TopEstimator
@@ -96,7 +114,14 @@ add_weighted_elems(PTopEstimator *THIS, ...)
 %name{Math::SZaru::QuantileEstimator}
 class PQuantileEstimator {
   ~PQuantileEstimator();
-  PQuantileEstimator(uint32_t numQuantiles);
+  static
+  %name{new}
+  PQuantileEstimator*
+  new(const char *CLASS, SV *numQuantiles)
+    %code{%
+      check_szaru_constructor_param(numQuantiles, 1000000.0, "QuantileEstimator");
+      RETVAL = new PQuantileEstimator((uint32_t)SvNV(numQuantiles));
+    %};
   void add_elem(const double elm);
   uint64_t tot_elems();
 
@@ -109,10 +134,14 @@ class PQuantileEstimator {
 void
 add_elems(PQuantileEstimator *THIS, ...)
   CODE:
+    if (!THIS)
+      croak("Math::SZaru::QuantileEstimator::add_elems() -- THIS is NULL / invalid");
     for (unsigned int i = 1; i < items; ++i) {
-      THIS->add_elem(SvNV(ST(i)));
+      double val = SvNV(ST(i));
+      if (!std::isfinite(val))
+        croak("QuantileEstimator: element must be a finite number (not NaN or Inf)");
+      THIS->add_elem(val);
     }
 %}
 
 }; // End of QuantileEstimator
-

@@ -1,5 +1,15 @@
 Revision history for Perl extension Algorithm::BloomFilter.
 
+0.03  Fri Oct 09 21:20:00 2026
+  - Security fixes:
+    - Deserialization bounds checking and validation of k and significant_bits.
+    - Prevent returning blessed NULL pointer on deserialization failure.
+    - Allocator safety: replace custom SvPV_set logic with newSVpvn/free to avoid allocator mismatch.
+    - Fix uninitialized memory leak in bl_serialize (+1 length bug).
+    - Integer and bit-shift overflow safety in S_which_power_of_two and bl_alloc.
+    - Enforce sv_isa type check on method invocations.
+    - Portable byte-shift decoding in U8TO64_LE.
+
 0.02  Sat Jun 13 22:30:00 2015
   - Portability fixes.
 

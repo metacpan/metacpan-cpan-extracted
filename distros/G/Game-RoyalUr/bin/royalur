@@ -1,0 +1,222 @@
+#!perl
+
+use 5.010;
+use strict;
+use warnings;
+
+use Getopt::Long ();
+use Game::RoyalUr;
+use Game::RoyalUr::Terminal;
+
+my %given;
+my $parsed = Getopt::Long::GetOptionsFromArray(
+    \@ARGV, \%given,
+    'mode=s', 'rules=s', 'level=i', 'side=s', 'first=s', 'seed=s', 'pace=s',
+    'record=s', 'replay=s', 'ascii', 'unicode!', 'route', 'colour|color!', 'pick!', 'version', 'help',
+);
+
+if (!$parsed || @ARGV) {
+    print STDERR "royalur: I do not know '@ARGV'.\n" if $parsed && @ARGV;
+    print STDERR usage();
+    exit 2;
+}
+if ($given{help}) {
+    print usage();
+    exit 0;
+}
+if ($given{version}) {
+    print "royalur $Game::RoyalUr::VERSION\n";
+    exit 0;
+}
+
+my %with;
+$with{$_} = $given{$_} for grep { defined $given{$_} } qw(mode rules level side first pace record route);
+$with{colour}  = $given{colour} if defined $given{colour};
+$with{picking} = $given{pick}   if defined $given{pick};
+$with{unicode} = $given{unicode} if defined $given{unicode};
+$with{unicode} = 0               if $given{ascii};
+
+if (defined $given{seed}) {
+    if ($given{seed} !~ /\A(?:[0-9a-fA-F]{2})+\z/) {
+        print STDERR "royalur: a seed is hexadecimal, two characters a byte.\n";
+        exit 2;
+    }
+    $with{seed} = pack 'H*', $given{seed};
+}
+
+if (defined $given{replay}) {
+    my $text = do {
+        open my $fh, '<', $given{replay} or do {
+            print STDERR "royalur: I could not read '$given{replay}'.\n";
+            exit 2;
+        };
+        local $/;
+        <$fh>;
+    };
+    my ($game, $error) = Game::RoyalUr->replay($text);
+    if (!$game) {
+        my $detail = $error->detail;
+        print STDERR "royalur: '$given{replay}' is not a game I can replay: ", $error->message,
+            (defined $detail->{line} ? " (line $detail->{line})" : defined $detail->{ply} ? ' (turn ' . ($detail->{ply} + 1) . ')' : ''), ".\n";
+        exit 2;
+    }
+    $with{game} = $game;
+    $with{rules} = $game->variant;
+    $with{seed} = $game->seed if defined $game->seed;
+}
+
+my $terminal = eval { Game::RoyalUr::Terminal->new(%with) };
+if (!$terminal) {
+    (my $why = $@) =~ s/ at \S+ line \d+\.?\s*\z//;
+    $why =~ s/\AGame::RoyalUr(?:::\w+)*: //;
+    print STDERR "royalur: $why.\n";
+    exit 2;
+}
+
+exit $terminal->start;
+
+sub usage {
+    return <<'USAGE';
+royalur - the Royal Game of Ur, in a terminal
+
+  royalur [options]
+
+  --mode HOW       bot (the default): you against the program
+                   hotseat: two people at one keyboard
+                   watch: the program against itself
+  --rules NAME     finkel (the default) or masters
+  --level N        how well the program plays, 1 upward; the top by default
+  --side WHICH     light (the default) or dark: your side against the program
+  --first WHO      light, dark, or roll (the default): throw the dice for it
+  --seed HEX       hexadecimal; the same seed throws the same dice
+  --pace SECONDS   how long a lost turn and the program's move stay up
+  --route          show the order the squares are visited in
+  --record FILE    write the game to FILE when you leave
+  --replay FILE    carry on from a game written by --record
+  --ascii          plain letters and lines, for a terminal with no Unicode
+  --unicode        line and shape characters, where they are not the default
+  --no-colour      no colour; nothing is lost without it
+  --no-pick        type moves instead of choosing them with the arrow keys
+  --version        the version, and stop
+  --help           this, and stop
+
+In a terminal, the pieces that can move are walked with the arrow keys and the
+board shows what each move would leave; press ? for the keys. Anywhere else,
+type a number from the list, a move such as hand-b1 or a2-d2, or help.
+USAGE
+}
+
+__END__
+
+=head1 NAME
+
+royalur - the Royal Game of Ur, in a terminal
+
+=head1 SYNOPSIS
+
+    royalur
+    royalur --rules masters --level 2
+    royalur --mode hotseat --route
+    royalur --mode watch --pace 0.3
+    royalur --seed 5f1c9a --first light --record game.txt
+
+=head1 DESCRIPTION
+
+Plays the Royal Game of Ur against the program, between two people, or the
+program against itself. See L<Game::RoyalUr::Terminal> for how it is played
+and L<Game::RoyalUr> for the game.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--mode> I<how>
+
+C<bot>, you against the program, which is the default; C<hotseat>, two people
+at one keyboard; C<watch>, the program against itself.
+
+=item B<--rules> I<name>
+
+C<finkel>, the default, or C<masters>. See L<Game::RoyalUr::Variant>.
+
+=item B<--level> I<n>
+
+How well the program plays, from 1. The top of the ladder by default. See
+L<Game::RoyalUr::Bot>.
+
+=item B<--side> I<which>
+
+C<light>, the default, or C<dark>: your side against the program.
+
+=item B<--first> I<who>
+
+C<light> or C<dark> to say who moves first, or C<roll>, the default, to have
+both sides throw the dice for it.
+
+=item B<--seed> I<hex>
+
+Hexadecimal, two characters a byte. Every throw of the dice follows from the
+seed, so the same seed and the same moves are the same game.
+
+=item B<--pace> I<seconds>
+
+How long a turn lost to the roll, and each move the program makes, stays on
+the screen. 1 by default in a terminal.
+
+=item B<--route>
+
+Show, under the board, the order in which the side to move visits the
+squares.
+
+=item B<--record> I<file>
+
+Write the game to a file when you leave, in the form
+L<Game::RoyalUr::Notation> describes.
+
+=item B<--replay> I<file>
+
+Carry on from a game written by B<--record>.
+
+=item B<--ascii>
+
+Draw with plain letters and lines. B<--no-unicode> is the same.
+
+=item B<--unicode>
+
+Draw with line and shape characters. That is the default in a terminal; this
+asks for it anywhere else.
+
+=item B<--no-colour>
+
+No colour. Pieces, rosettes and marks are shapes as well as colours, so
+nothing is lost. B<--no-color> is the same, and so is setting C<NO_COLOR> in
+the environment.
+
+=item B<--no-pick>
+
+Type moves instead of choosing them with the arrow keys.
+
+=item B<--version>, B<--help>
+
+Say so and stop.
+
+=back
+
+=head1 EXIT STATUS
+
+0 when the game was left in the ordinary way, 2 when the options were wrong
+or a file could not be read.
+
+=head1 AUTHOR
+
+LNATION <email@lnation.org>
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION <email@lnation.org>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

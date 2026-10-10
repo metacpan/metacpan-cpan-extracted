@@ -1,10 +1,11 @@
-use 5.008001;
+use 5.008009;
 use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 WriteMakefile(
     NAME              => 'Algorithm::BloomFilter',
     VERSION_FROM      => 'lib/Algorithm/BloomFilter.pm', # finds $VERSION
+    MIN_PERL_VERSION  => '5.8.9',
     PREREQ_PM         => {
       'List::Util' => '0',
     }, # e.g., Module::Name => 1.1

@@ -12,7 +12,7 @@ use DKIM2TestKeys;
 
 # A transient DNS failure (timeout / SERVFAIL / network unreachable) MUST be
 # reported as TEMPERROR (retryable), per draft-ietf-dkim-dkim2-spec-06 §10 —
-# NOT as a permanent "no verifiable signature items". Only an answer that
+# NOT as a permanent "does not exist". Only an answer that
 # positively says the name has no TXT record (NXDOMAIN, NOERROR, NODATA) is
 # permanent and returns undef (no key). Anything else -- including an error
 # string this code has never seen -- is treated as transient: a DNS blip must
@@ -82,7 +82,7 @@ for my $err ('NXDOMAIN', 'NOERROR', 'NODATA') {
 #    the reflector dropped the message instead of reflecting it unsigned.
 #
 #    Note what the result must NOT be: if the callback merely returned undef the
-#    key would be skipped, leaving "no verifiable signature items" -> 'fail'.
+#    key would be skipped, leaving "public key ... does not exist" (permerror).
 #    A DNS blip must never read as a forged signature.
 sub signed_message {
     my $raw = join('',

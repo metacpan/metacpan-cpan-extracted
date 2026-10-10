@@ -622,4 +622,53 @@ for my $fmt (qw(pdb cif)) {
 		'and an empty file against a real one has none either');
 }
 
+#--------
+# atoms on one line, which can be turned about it freely.  The key matrix's
+# largest eigenvalue is then a repeated one, every row of cofactors
+# qcp_rotation() takes the quaternion from vanishes, and it took the identity
+# rotation instead: three carbons along x against the same three along y came
+# back 1.732 A apart, and an O2 against another 0.856 A.
+#
+# The answers are Biopython 1.85's Bio.SVDSuperimposer, as written below, for
+# these exact coordinates on 2026-10-09.  gemmi 0.7.5's superpose_positions is
+# no reference here: it answers NaN for the first ('More than 50 iterations
+# needed!') and about 1e-4 A for the two that are only nearly on a line, the
+# cancellation qcp_rotation()'s comment is about.  Before 0.039 this module
+# answered 9.4e-5 and 8.5e-5 A for those two.
+#
+# The bound is absolute: the answers are 0, or a residual of 5.2e-7 A that the
+# rounding of the last set's coordinates leaves, and the largest difference
+# from Biopython observed on a double perl is 3.6e-16 A -- the coordinates' own
+# rounding at a few angstroms.  1e-12 leaves the long double and quadmath perls
+# room to answer the exact cases nearer zero, and is still eleven orders of
+# magnitude under the answers the identity rotation gave.
+#--------
+{
+	my $set = sub {
+		my $n = 0;
+		return structure_info_string(join('', map {
+			sprintf "HETATM%5d  C%-2d LIG A   1    %8.5f%8.5f%8.5f  1.00 10.00           C\n",
+			        ++$n, $n, @$_ } @_), features => 0);
+	};
+	my @case = (
+		[ 'three carbons along x, against the same along y', 0,
+		  [ [0, 0, 0], [1.5, 0, 0], [3, 0, 0] ], [ [0, 0, 0], [0, 1.5, 0], [0, 3, 0] ] ],
+		[ 'two atoms', 0,
+		  [ [0, 0, 0], [1.21, 0, 0] ], [ [5, 5, 5], [5, 5, 6.21] ] ],
+		[ 'a line bent by 0.0002 A, against the same bent line', 3.6259732257845419e-16,
+		  [ [0, 0, 0], [1.5, 0, 0], [3, 0.0002, 0] ], [ [0, 0, 0], [0, 1.5, 0], [0.0002, 3, 0] ] ],
+		[ 'a line against the same line along a diagonal, rounded', 5.2128346874230648e-07,
+		  [ [0, 0, 0], [1, 0, 0], [2, 0, 0], [3, 0, 0] ],
+		  [ [1, 1, 1], [1.57735, 1.57735, 1.57735], [2.1547, 2.1547, 2.1547],
+		    [2.73205, 2.73205, 2.73205] ] ],
+	);
+	for my $c (@case) {
+		my ($what, $want, $a, $b) = @$c;
+		my $got = structure_rmsd($set->(@$a), $set->(@$b), min_atoms => 2);
+		ok(defined $got && abs($got - $want) < 1e-12,
+			"points on a line: $what, as Biopython's SVD answers it")
+			or diag("got $got, Biopython $want");
+	}
+}
+
 done_testing();

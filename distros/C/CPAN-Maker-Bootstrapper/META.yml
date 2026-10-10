@@ -5,6 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '6.64'
   File::ShareDir::Install: '0'
+  Role::Tiny: '2.002005'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::ShareDir::Install: '0'
@@ -22,12 +23,15 @@ no_index:
 provides:
   CPAN::Maker::Bootstrapper:
     file: lib/CPAN/Maker/Bootstrapper.pm
-    version: v2.4.0
+    version: v2.4.1
   CPAN::Maker::Bootstrapper::ConfigReader:
     file: lib/CPAN/Maker/Bootstrapper/ConfigReader.pm
     version: '0'
   CPAN::Maker::Bootstrapper::Constants:
     file: lib/CPAN/Maker/Bootstrapper/Constants.pm
+    version: '0'
+  CPAN::Maker::Bootstrapper::Role::CreateBuildConfig:
+    file: lib/CPAN/Maker/Bootstrapper/Role/CreateBuildConfig.pm
     version: '0'
   CPAN::Maker::Bootstrapper::Role::CreateConfig:
     file: lib/CPAN/Maker/Bootstrapper/Role/CreateConfig.pm
@@ -49,7 +53,7 @@ provides:
     version: '0'
   CPAN::Maker::Bootstrapper::Role::ExtraFiles:
     file: lib/CPAN/Maker/Bootstrapper/Role/ExtraFiles.pm
-    version: v2.4.0
+    version: v2.4.1
   CPAN::Maker::Bootstrapper::Role::Filter:
     file: lib/CPAN/Maker/Bootstrapper/Role/Filter.pm
     version: '0'
@@ -58,7 +62,7 @@ provides:
     version: '0'
   CPAN::Maker::Bootstrapper::Role::Installer:
     file: lib/CPAN/Maker/Bootstrapper/Role/Installer.pm
-    version: v2.4.0
+    version: v2.4.1
   CPAN::Maker::Bootstrapper::Role::LLM::Annotator:
     file: lib/CPAN/Maker/Bootstrapper/Role/LLM/Annotator.pm
     version: '0'
@@ -77,8 +81,17 @@ provides:
   CPAN::Maker::Bootstrapper::Role::PAUSEUpload:
     file: lib/CPAN/Maker/Bootstrapper/Role/PAUSEUpload.pm
     version: '0'
+  CPAN::Maker::Bootstrapper::Role::PerlCritic:
+    file: lib/CPAN/Maker/Bootstrapper/Role/PerlCritic.pm
+    version: '0'
+  CPAN::Maker::Bootstrapper::Role::PerlTidy:
+    file: lib/CPAN/Maker/Bootstrapper/Role/PerlTidy.pm
+    version: '0'
   CPAN::Maker::Bootstrapper::Role::Provides:
     file: lib/CPAN/Maker/Bootstrapper/Role/Provides.pm
+    version: '0'
+  CPAN::Maker::Bootstrapper::Role::ReconcileDeps:
+    file: lib/CPAN/Maker/Bootstrapper/Role/ReconcileDeps.pm
     version: '0'
   CPAN::Maker::Bootstrapper::Role::ResolveVars:
     file: lib/CPAN/Maker/Bootstrapper/Role/ResolveVars.pm
@@ -88,6 +101,9 @@ provides:
     version: '0'
   CPAN::Maker::Bootstrapper::Role::ShowDefaults:
     file: lib/CPAN/Maker/Bootstrapper/Role/ShowDefaults.pm
+    version: '0'
+  CPAN::Maker::Bootstrapper::Role::UpdateAvailable:
+    file: lib/CPAN/Maker/Bootstrapper/Role/UpdateAvailable.pm
     version: '0'
   CPAN::Maker::Bootstrapper::Role::Version:
     file: lib/CPAN/Maker/Bootstrapper/Role/Version.pm
@@ -99,7 +115,7 @@ provides:
     file: lib/Text/ASCIITable/FixANSI.pm
     version: v1.0.0
 requires:
-  CLI::Simple: v2.2.2
+  CLI::Simple: v2.3.0
   CPAN::Maker: v2.0.11
   Class::Accessor::Fast: '0.51'
   Config::Tiny: '2.30'
@@ -107,6 +123,7 @@ requires:
   File::Copy::Recursive: '0.45'
   File::HomeDir: '1.006'
   File::ShareDir: '1.118'
+  File::Which: '1.27'
   HTTP::Tiny: '0'
   IO::Interactive: '1.027'
   IO::Scalar: '2.113'
@@ -126,5 +143,5 @@ resources:
   bugtracker: http://github.com/rlauer6/CPAN-Maker-Bootstrapper/issues
   homepage: http://github.com/rlauer6/CPAN-Maker-Bootstrapper
   repository: git://github.com/rlauer6/CPAN-Maker-Bootstrapper.git
-version: v2.4.0
+version: v2.4.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

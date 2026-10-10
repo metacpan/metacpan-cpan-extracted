@@ -2,7 +2,7 @@ package Mail::DKIM2::Verifier;
 use strict;
 use warnings;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use base 'Mail::DKIM2::HeaderParser';
 use Crypt::Digest::SHA256 qw(sha256);
@@ -32,11 +32,18 @@ use Email::MIME;
 use Mail::DKIM2::Signature;
 use Mail::DKIM2::MessageInstance;
 
+# The signing algorithms this verifier implements (spec-06 §3.2, §3.3), and
+# the key class each needs. Every other s= item is ignored (§3.4).
+my %IMPLEMENTED_ALG = (
+    'rsa-sha256'     => 'Crypt::PK::RSA',
+    'ed25519-sha256' => 'Crypt::PK::Ed25519',
+);
+
 sub _extract_mi_hash_sets {
     my ($raw) = @_;
     $raw =~ s/^[^:]+://;        # strip "Message-Instance:" field name
     $raw =~ s/\r?\n[ \t]/ /g;   # unfold continuation lines
-    return [] unless $raw =~ /\bh=([^;]*)/;
+    return [] unless $raw =~ /(?:\A|;)\s*h\s*=([^;]*)/i;    # §7: any case
     return Mail::DKIM2::MessageInstance::parse_hash_sets($1);
 }
 
@@ -603,21 +610,27 @@ sub _verify_signature {
         return 0;
     }
 
-    # §10.3 SHOULD: reject signatures more than 14 days old or in the future
+    # §8.4: t= is 1*DIGIT. A malformed value is a syntax error even when the
+    # age check is skipped; it used to numify to 0 and skip that check.
+    my $ts = $signature->timestamp;
+    unless (defined $ts && $ts =~ /\A[0-9]+\z/) {
+        $self->{result}  = 'permerror';
+        $self->{details} = "DKIM2-Signature i=$i syntax error (t= is not a decimal timestamp)";
+        return 0;
+    }
+
+    # §11.3 SHOULD: reject signatures more than 14 days old or in the future
     unless ($self->{SkipTimestampCheck}) {
-        my $ts = $signature->timestamp;
-        if (defined $ts && $ts > 0) {
-            my $now = time();
-            if ($ts > $now + 300) {
-                $self->{result}  = 'fail';
-                $self->{details} = "DKIM2-Signature i=$i timestamp is in the future";
-                return 0;
-            }
-            if ($now > $ts + 14 * 24 * 3600) {
-                $self->{result}  = 'fail';
-                $self->{details} = "DKIM2-Signature i=$i has expired (age > 14 days)";
-                return 0;
-            }
+        my $now = time();
+        if ($ts > $now + 300) {
+            $self->{result}  = 'fail';
+            $self->{details} = "DKIM2-Signature i=$i timestamp is in the future";
+            return 0;
+        }
+        if ($now > $ts + 14 * 24 * 3600) {
+            $self->{result}  = 'fail';
+            $self->{details} = "DKIM2-Signature i=$i has expired (age > 14 days)";
+            return 0;
         }
     }
 
@@ -658,10 +671,38 @@ sub _verify_signature {
         return 0;
     }
 
-    my $verified_any = 0;
+    # The items' outcome, in the order every implementation in this
+    # repository follows (docs/superpowers/specs/
+    # 2026-10-09-verifier-strictness-review-fixes.md, section E).
+    #
+    # §3.4: an algorithm this verifier does not implement is ignored --
+    # before any key lookup, so a list of unknown names costs nothing. Names
+    # match exactly: tag values are case significant (§8), and a name that
+    # is merely like a known one must never be verified as it. A known
+    # algorithm's value must be a padded base64string (§2.13).
+    my @items;
     for my $idx (0 .. $sig_count - 1) {
-        my $sig_b64 = $signature->signature_value($idx);
-        next unless $sig_b64;
+        my $alg = $signature->algorithm($idx) // '';
+        next unless $IMPLEMENTED_ALG{$alg};
+        my $sig_b64 = $signature->signature_value($idx) // '';
+        unless (Mail::DKIM2::Common::_is_base64string($sig_b64)) {
+            $self->{result}  = 'permerror';
+            $self->{details} = "DKIM2-Signature i=$i syntax error ($alg signature value is not base64)";
+            return 0;
+        }
+        push @items, [$idx, $alg, $sig_b64];
+    }
+    # §11.6: when every signature that can be checked fails, FAIL -- here
+    # vacuously, as none can be.
+    unless (@items) {
+        $self->{result}  = 'fail';
+        $self->{details} = "DKIM2-Signature i=$i has no signature with a supported algorithm";
+        return 0;
+    }
+
+    my ($verified_any, $first_absent);
+    for my $item (@items) {
+        my ($idx, $alg, $sig_b64) = @$item;
 
         # Get the public key for this signature item.  The fetch is eval'd
         # whichever way the key is sourced: a pubkey callback may end in
@@ -676,43 +717,58 @@ sub _verify_signature {
                 : $self->fetch_public_key($signature, $idx);
             1;
         };
+        my $sel = $signature->selector($idx) // '?';
         unless ($fetched) {
             die $@ if ref $@;
-            # A transient DNS failure is a TEMPERROR per spec-06 §10 —
-            # retryable, not a permanent "no verifiable signature items", and
-            # emphatically not a 'fail', which reads as a forged signature.
-            my $sel = $signature->selector($idx) // '?';
             # Drop croak's " at FILE line N." tail: this reason is reported in
             # Authentication-Results on mail we send out, and our source paths
             # are nobody else's business.
             (my $why = $@) =~ s/\s+at\s+\S+\s+line\s+\d+\.?\s*\z//;
             $why =~ s/\s+\z//;
+            # A key record that is there but unusable (spec-06 §11.5:
+            # several records, a syntax error, revoked, the wrong key type).
+            if ($why =~ /\APERMERROR:\s*(.*)\z/s) {
+                $self->{result}  = 'permerror';
+                $self->{details} = "DKIM2-Signature i=$i public key $sel $1";
+                return 0;
+            }
+            # A transient DNS failure is a TEMPERROR per spec-06 §10 --
+            # retryable, not a permanent "does not exist", and emphatically
+            # not a 'fail', which reads as a forged signature.
             $self->{result}  = 'temperror';
             $self->{details} = "DKIM2-Signature i=$i public key $sel could not be fetched ($why)";
             return 0;
         }
 
         unless ($pubkey) {
-            # Can't fetch key for this algorithm — skip it
+            # No key published for this item: skip it, as long as another
+            # item can be checked (below).
+            $first_absent //= $sel;
             next;
         }
 
-        my $alg = $signature->algorithm($idx) || 'unknown';
+        # §8.9: the key must be of the signature's algorithm. A
+        # PubkeyCallback hands back any key object, so check what it is.
+        unless ($pubkey->isa($IMPLEMENTED_ALG{$alg})) {
+            $self->{result}  = 'permerror';
+            $self->{details} = "DKIM2-Signature i=$i public key $sel algorithm mismatch";
+            return 0;
+        }
 
         # §3.2: RSA keys MUST be at least 1024 bits; reject shorter keys
         # (permerror) rather than trusting a weak signature.
-        if ($alg !~ /^ed25519/ && $pubkey->can('size')) {
+        if ($alg eq 'rsa-sha256') {
             my $bits = $pubkey->size * 8;
             if ($bits < 1024) {
                 $self->{result}  = 'permerror';
-                $self->{details} = "DKIM2-Signature i=$i RSA key too short ($bits bits < 1024, spec 3.2)";
+                $self->{details} = "DKIM2-Signature i=$i public key $sel is shorter than 1024 bits ($bits)";
                 return 0;
             }
         }
 
         my $sig_raw = decode_base64($sig_b64);
         my $verified = eval {
-            if ($alg =~ /^ed25519/) {
+            if ($alg eq 'ed25519-sha256') {
                 # Ed25519-SHA256: SHA-256 hash first, then verify with PureEdDSA
                 my $digest = sha256($signing_input);
                 $pubkey->verify_message($sig_raw, $digest);
@@ -728,17 +784,20 @@ sub _verify_signature {
             return 0;
         }
         unless ($verified) {
+            # §11.6's wording, naming the selector.
             $self->{result} = 'fail';
-            $self->{details} = "signature verification failed for $alg at i=$i";
+            $self->{details} = "DKIM2-Signature i=$i $sel incorrect signature";
             return 0;
         }
 
         $verified_any = 1;
     }
 
+    # §11.5: "a DNS result that indicates the key is absent MUST be reported
+    # as a PERMERROR" -- when no item had a key to check.
     unless ($verified_any) {
         $self->{result} = 'permerror';
-        $self->{details} = "no verifiable signature items at i=$i";
+        $self->{details} = "DKIM2-Signature i=$i public key $first_absent does not exist";
         return 0;
     }
 
@@ -832,6 +891,10 @@ sub _verify_chain {
 # TEMPERROR: spec-06 §10 makes a DNS failure retryable, never a permanent "no
 # verifiable signature items", and emphatically never a 'fail', which reads as
 # a forged signature. _verify_signature's eval maps the die to temperror.
+# A record that is there but unusable dies with "PERMERROR: <why>" instead
+# (spec-06 §11.5): more than one TXT record, a record that does not validate
+# (parse_dkim_key_record), revoked, or a key type that is not the signature
+# algorithm's -- mapped to permerror, with the selector.
 #
 # A PubkeyCallback replaces this; it is called as ($signature, $idx, $verifier)
 # so a callback that only overrides some keys can fall back to
@@ -854,11 +917,20 @@ sub fetch_public_key {
         return if $err =~ /^(?:NXDOMAIN|NOERROR|NODATA)\s*$/i;
         croak "TEMPERROR: DNS lookup for $fqdn failed: $err";
     }
-    for my $rr ($reply->answer) {
-        next unless $rr->type eq 'TXT';
-        return Mail::DKIM2::Common::parse_dkim_pubkey(join('', $rr->txtdata));
-    }
-    return;
+    # One TXT RR may hold several strings, joined with nothing between;
+    # several RRs for one selector are an error (spec-06 §11.5).
+    my @txt = map { join '', $_->txtdata } grep { $_->type eq 'TXT' } $reply->answer;
+    return unless @txt;
+    croak "PERMERROR: has multiple records\n" if @txt > 1;
+    my ($key, $why) = Mail::DKIM2::Common::parse_dkim_key_record($txt[0]);
+    $why = 'algorithm mismatch'
+        if $why && $why eq 'has an unsupported key type';
+    croak "PERMERROR: $why\n" if $why;
+    # §8.9: the key's type must be the signature's algorithm's.
+    my $alg = $signature->algorithm($idx) // '';
+    croak "PERMERROR: algorithm mismatch\n"
+        if $IMPLEMENTED_ALG{$alg} && !$key->isa($IMPLEMENTED_ALG{$alg});
+    return $key;
 }
 
 sub resolver {
@@ -1100,6 +1172,13 @@ anything else, including a resolver error string it has never seen. The
 verifier maps that die to C<temperror>: spec-06 section 10 makes a DNS
 failure retryable, never a C<fail>, which would read as a forged
 signature.
+
+A record that is present but unusable dies with C<PERMERROR: E<lt>whyE<gt>>,
+which the verifier reports as C<permerror> naming the selector (spec-06
+section 11.5): C<has multiple records> (more than one TXT RR; several
+strings in one RR are joined), C<has a syntax error> and C<has been
+revoked> (see L<Mail::DKIM2::Common/parse_dkim_key_record>), or
+C<algorithm mismatch> (a C<k=> that is not the signature algorithm's).
 
 =head2 resolver([$resolver]), set_pubkey_callback(\&cb), skip_timestamp_check([$bool]), allow_unsigned_mi([$bool]), next_domain_ok([$domain]), mid_process([$bool]), headers_only([$bool])
 

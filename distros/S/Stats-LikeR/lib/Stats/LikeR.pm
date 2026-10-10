@@ -3,7 +3,7 @@
 require 5.010001;
 use strict;
 package Stats::LikeR;
-our $VERSION = '0.3215';	# quoted: a bare version ending in 0, such as 0.320, is the number 0.32, which the dist would be named
+our $VERSION = '0.3216';	# quoted: a bare version ending in 0, such as 0.320, is the number 0.32, which the dist would be named
 require XSLoader;
 use warnings FATAL => 'all';
 use Exporter 'import';
@@ -6388,7 +6388,7 @@ Stats::LikeR - Get basic statistical functions, like in R, but with Perl using X
 
 =head1 VERSION
 
-version 0.3215
+version 0.3216
 
 =head1 Synopsis
 

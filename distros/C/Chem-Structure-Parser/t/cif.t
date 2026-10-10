@@ -1026,4 +1026,243 @@ CIF
 	is_deeply($d->{cif}, $u->{cif}, 'and every tag reads as it does from the LF file');
 }
 
+#--------------------------------------------------------------------
+# files gemmi reads differently, or refuses
+#
+# Each text below was read with gemmi 0.7.5 (read_structure) on 2026-10-09,
+# and its answer is the one written against it.  The _atom_site columns are
+# the ones gemmi needs before it will read a model at all.
+#--------------------------------------------------------------------
+my $SITE_HEAD = join '', map { "_atom_site.$_\n" } qw(group_PDB id type_symbol
+	label_atom_id label_alt_id label_comp_id label_asym_id label_entity_id label_seq_id
+	pdbx_PDB_ins_code Cartn_x Cartn_y Cartn_z occupancy B_iso_or_equiv auth_seq_id
+	auth_asym_id pdbx_PDB_model_num);
+{
+	# Rows not in model order.  Nothing in the format asks for them to be, and
+	# a reader that counted a model at each change of model number counted four
+	# here, chain A of models 1 and 2 and then chain B of the same two.  gemmi
+	# finds two models of two atoms each.
+	my $i = structure_info_string("data_X\nloop_\n$SITE_HEAD" . <<'CIF', model => 'all', features => 0);
+ATOM 1 C CA . GLY A 1 1 ? 1.0 0.0 0.0 1.0 10.0 1 A 1
+ATOM 2 C CA . GLY A 1 1 ? 1.5 0.0 0.0 1.0 10.0 1 A 2
+ATOM 3 C CA . ALA B 1 1 ? 5.0 0.0 0.0 1.0 10.0 1 B 1
+ATOM 4 C CA . ALA B 1 1 ? 5.5 0.0 0.0 1.0 10.0 1 B 2
+CIF
+	is($i->{n_models}, 2, 'models are counted by number, not by each change of number');
+	is_deeply([ sort keys %{ $i->{models} } ], [ 1, 2 ], 'and they are models 1 and 2');
+	is_deeply([ map { $i->{models}{$_}{chains}{B}{n_atoms} } 1, 2 ], [ 1, 1 ],
+		'each with its own atom of chain B');
+}
+{
+	# Two data blocks.  gemmi refuses the file -- '2+ blocks are ok if only the
+	# first one has coordinates' -- and reads only the first block of one whose
+	# later blocks have none.  The blocks were read as one: block two's atoms
+	# went under block one's residue numbers as conformers of them, and its
+	# header over block one's.  The first block is the structure.
+	my $block = sub {
+		my ($name, $a, $x) = @_;
+		return "data_$name\n_cell.length_a $a\n_cell.length_b $a\n_cell.length_c $a\n"
+		     . "loop_\n$SITE_HEAD"
+		     . "ATOM 1 N N . GLY A 1 1 ? $x 0.0 0.0 1.0 10.0 1 A 1\n"
+		     . "ATOM 2 C CA . GLY A 1 1 ? 2.0 0.0 0.0 1.0 10.0 1 A 1\n";
+	};
+	my $i = structure_info_string($block->('ONE', 10, '1.0') . $block->('TWO', 99, '9.0'),
+		features => 0);
+	my $r = $i->{chains}{A}{residues}{1};
+	is($r->{n_atoms}, 2, 'a second data block is not read into the first');
+	ok(!exists $r->{atoms}{N}{altlocs}, 'its atoms are not conformers of the first block\'s');
+	is($r->{atoms}{N}{x}, 1, 'the coordinates are the first block\'s');
+	is($i->{cryst1}{a}, 10, 'and so is the header');
+}
+{
+	# A last row with fewer values than the loop has tags: the file was cut
+	# short.  gemmi refuses it, 'Wrong number of values in loop _atom_site.*'.
+	# The row was read as an atom with no y or z, filed under its label_* chain
+	# and number for want of the auth_* ones further along; it is left out, and
+	# every whole row before it is read.
+	my $i = structure_info_string("data_X\nloop_\n$SITE_HEAD" . <<'CIF', features => 0);
+ATOM 1 C CA . GLY A 1 1 ? 1.0 0.0 0.0 1.0 10.0 1 A 1
+ATOM 2 C CA . GLY A 1 2 ? 2.0
+CIF
+	is($i->{stats}{n_atoms}, 1, 'a row the file cut short is not an atom');
+	is_deeply($i->{chain_order}, [ 'A' ], 'and makes no residue');
+	is($i->{stats}{total_atoms}, 1, 'and is not counted as a record');
+}
+{
+	# _atom_site_anisotrop of one row, written as plain tags rather than a
+	# loop_: one record, however many tags it takes, as the loop counts it.  It
+	# was counted once per tag, eight here, and kept nowhere with anisou => 1.
+	my $tags = join '', map { "_atom_site_anisotrop.$_ 1\n" }
+		qw(id type_symbol U[1][1] U[2][2] U[3][3] U[1][2] U[1][3] U[2][3]);
+	my $text = "data_X\nloop_\n$SITE_HEAD"
+	         . "ATOM 1 C CA . GLY A 1 1 ? 1.0 0.0 0.0 1.0 10.0 1 A 1\n" . $tags;
+	my $i = structure_info_string($text, features => 0);
+	is($i->{stats}{n_anisou}, 1, 'an anisotropic record of eight plain tags is one record');
+	my $k = structure_info_string($text, features => 0, anisou => 1);
+	is($k->{records}{_atom_site_anisotrop}, 1, 'and is kept, as the loop form is, with anisou => 1');
+	is($k->{stats}{n_anisou}, 1, 'and is still one record');
+}
+{
+	# An mmCIF file without _atom_site.type_symbol has only the name to go on,
+	# and the name has no columns to say where it starts.  It was put where a
+	# one-letter element goes, so a zinc read as Z, a magnesium as M and a
+	# sodium as N.  An atom named for its own residue in two letters that spell
+	# an element is the ion of that element; a carbon alpha is named CA in a
+	# residue that is not called CA.  gemmi reads no model from a file without
+	# type_symbol, so there is no answer of its to set beside these.
+	my $head = $SITE_HEAD;
+	$head =~ s/_atom_site\.type_symbol\n//;
+	my $i = structure_info_string("data_X\nloop_\n$head" . <<'CIF', features => 0);
+HETATM 1 ZN . ZN Z 1 . ? 1.0 0.0 0.0 1.0 10.0 1 Z 1
+HETATM 2 MG . MG Z 2 . ? 2.0 0.0 0.0 1.0 10.0 2 Z 1
+HETATM 3 NA . NA Z 3 . ? 3.0 0.0 0.0 1.0 10.0 3 Z 1
+HETATM 4 CL . CL Z 4 . ? 4.0 0.0 0.0 1.0 10.0 4 Z 1
+ATOM 5 CA . ALA Z 5 . ? 5.0 0.0 0.0 1.0 10.0 5 Z 1
+CIF
+	my $c = $i->{chains}{Z};
+	is_deeply([ map { my $r = $c->{residues}{$_}; $r->{atoms}{ $r->{atom_order}[0] }{element} }
+	            @{ $c->{residue_order} } ],
+	          [ qw(Zn Mg Na Cl C) ],
+	          'an ion named for its residue is that element, and a CA in ALA is a carbon');
+}
+{
+	# A line of quotes that never close.  Each is the start of a bare word
+	# (see cif_next()), and each sent the lexer to the end of its line to look
+	# for the closing quote again: 40,000 of them took a second to read where
+	# the same words without the quotes took a hundredth.  What they read as has
+	# not changed.
+	my $n = 20000;
+	my $p = Chem::Structure::Parser::_parse_cif_string(
+		"data_x\nloop_\n_a.x\n" . join(' ', map { "'a$_" } 1 .. $n) . "\n", {});
+	my $rows = $p->{cif_loops}{_a};
+	is(scalar @$rows, $n, 'a line of unclosed quotes is a line of words');
+	is($rows->[0]{x}, "'a1", 'each starting with its quote');
+	is($rows->[-1]{x}, "'a$n", 'to the last one');
+}
+
+# the same residue collision t/foreign.t reads from a PDB file, written as
+# mmCIF: one reader's answer is the other's
+{
+	my $text = "data_X\nloop_\n$SITE_HEAD" . <<'CIF';
+ATOM 1 N N . MET A 1 1 ? 1.0 2.0 3.0 1.0 10.0 1 A 1
+ATOM 2 C CA . MET A 1 1 ? 2.0 2.0 3.0 1.0 10.0 1 A 1
+ATOM 3 O O . MET A 1 1 ? 9.0 2.0 3.0 1.0 10.0 1 A 1
+HETATM 4 O O . HOH A 2 . ? 20.0 20.0 20.0 1.0 10.0 1 A 1
+HETATM 5 C C1 . LIG A 3 . ? 30.0 30.0 30.0 1.0 10.0 1 A 1
+HETATM 6 O O1 . LIG A 3 . ? 31.0 30.0 30.0 1.0 10.0 1 A 1
+CIF
+	my $pdb = <<'PDB';
+ATOM      1  N   MET A   1       1.000   2.000   3.000  1.00 10.00           N
+ATOM      2  CA  MET A   1       2.000   2.000   3.000  1.00 10.00           C
+ATOM      3  O   MET A   1       9.000   2.000   3.000  1.00 10.00           O
+TER
+HETATM    4  O   HOH A   1      20.000  20.000  20.000  1.00 10.00           O
+HETATM    5  C1  LIG A   1      30.000  30.000  30.000  1.00 10.00           C
+HETATM    6  O1  LIG A   1      31.000  30.000  30.000  1.00 10.00           O
+PDB
+	for my $atoms (1, 0) {
+		my $c = structure_info_string($text, atoms => $atoms, features => 0);
+		my $p = structure_info_string($pdb,  atoms => $atoms, features => 0);
+		is_deeply($c->{chains}{A}{residue_order}, [ '1', '1(HOH)', '1(LIG)' ],
+			"atoms => $atoms: a residue given a taken number is its own, in mmCIF too");
+		is_deeply(coords($c), coords($p), "atoms => $atoms: and the two formats agree about it");
+	}
+}
+
+# SITE, SEQADV, HETNAM and FORMUL, which the mmCIF reader reads out of
+# _struct_site and _struct_site_gen, _struct_ref_seq_dif and _chem_comp.  site,
+# hetnam and formul were keys a structure always had and nothing filled; seqadv
+# was not a key of an mmCIF structure at all.  The PDB lines are mini.pdb's,
+# and the SITE ones are in the wwPDB v3.3 columns, written here by sprintf so
+# that no column is off by one.
+{
+	my $site = sub { sprintf "SITE   %3d %3s %2d %s\n", $_[0], $_[1], $_[2],
+		join ' ', map { sprintf '%3s %1s%4d%1s', @$_ } @_[3 .. $#_] };
+	my $pdb = "HEADER    TEST                                    01-JAN-20   9XYZ\n"
+	        . "SEQADV 9XYZ MSE A    7  UNP  P12345    MET     7 MODIFIED RESIDUE\n"
+	        . "HETNAM      ZN ZINC ION\n"
+	        . "FORMUL   4   ZN    ZN 2+\n"
+	        . $site->(1, 'AC1', 5, [ 'HIS', 'A', 94, '' ], [ 'HIS', 'A', 96, '' ],
+	                               [ 'GLU', 'A', 106, 'A' ], [ 'HOH', 'A', 301, '' ])
+	        . $site->(2, 'AC1', 5, [ 'ZN', 'A', 401, '' ])
+	        . "ATOM      1  CA  ALA A   1      10.000  10.000  10.000  1.00 20.00           C\n";
+	my $cif = <<'CIF';
+data_9XYZ
+_entry.id 9XYZ
+_struct_ref_seq_dif.mon_id                      MSE
+_struct_ref_seq_dif.pdbx_pdb_strand_id          A
+_struct_ref_seq_dif.pdbx_auth_seq_num           7
+_struct_ref_seq_dif.pdbx_seq_db_name            UNP
+_struct_ref_seq_dif.pdbx_seq_db_accession_code  P12345
+_struct_ref_seq_dif.db_mon_id                   MET
+_struct_ref_seq_dif.pdbx_seq_db_seq_num         7
+_struct_ref_seq_dif.details                     'MODIFIED RESIDUE'
+_chem_comp.id      ZN
+_chem_comp.name    'ZINC ION'
+_chem_comp.formula 'ZN 2+'
+_struct_site.id                AC1
+_struct_site.pdbx_num_residues 5
+loop_
+_struct_site_gen.id
+_struct_site_gen.site_id
+_struct_site_gen.auth_comp_id
+_struct_site_gen.auth_asym_id
+_struct_site_gen.auth_seq_id
+_struct_site_gen.pdbx_auth_ins_code
+1 AC1 HIS A 94  ?
+2 AC1 HIS A 96  ?
+3 AC1 GLU A 106 A
+4 AC1 HOH A 301 ?
+5 AC1 ZN  A 401 ?
+loop_
+_atom_site.group_PDB
+_atom_site.id
+_atom_site.type_symbol
+_atom_site.auth_atom_id
+_atom_site.auth_comp_id
+_atom_site.auth_asym_id
+_atom_site.auth_seq_id
+_atom_site.Cartn_x
+_atom_site.Cartn_y
+_atom_site.Cartn_z
+ATOM 1 C CA ALA A 1 10.000 10.000 10.000
+CIF
+	my $p = structure_info_string($pdb, features => 0);
+	my $c = structure_info_string($cif, features => 0);
+	is_deeply($p->{site}, [ { id => 'AC1', n_residues => 5, residues => [
+		{ resname => 'HIS', chain => 'A', resseq => 94,  icode => '' },
+		{ resname => 'HIS', chain => 'A', resseq => 96,  icode => '' },
+		{ resname => 'GLU', chain => 'A', resseq => 106, icode => 'A' },
+		{ resname => 'HOH', chain => 'A', resseq => 301, icode => '' },
+		{ resname => 'ZN',  chain => 'A', resseq => 401, icode => '' } ] } ],
+		'SITE: one site, its residues four to a line and the fifth on the next');
+	is_deeply($c->{site}, $p->{site}, 'and the mmCIF categories say the same');
+	is_deeply($c->{seqadv}, $p->{seqadv}, 'SEQADV and _struct_ref_seq_dif agree');
+	is($c->{seqadv}[0]{db_res}, 'MET', 'about what the database has');
+	is_deeply($p->{hetnam}, { ZN => 'ZINC ION' }, 'HETNAM fills hetnam');
+	is_deeply($p->{formul}, { ZN => 'ZN 2+' }, 'and FORMUL fills formul');
+	is_deeply([ $c->{hetnam}, $c->{formul} ], [ $p->{hetnam}, $p->{formul} ],
+		'and _chem_comp fills both the same way');
+	my $bare = structure_info_string("data_X\nloop_\n$SITE_HEAD"
+		. "ATOM 1 C CA . GLY A 1 1 ? 1.0 0.0 0.0 1.0 10.0 1 A 1\n", features => 0);
+	is_deeply([ @{$bare}{qw(seqadv site)} ], [ [], [] ],
+		'a file with none of them has them as empty lists, as every list is');
+}
+
+# The text of a structure handed over as a string is its characters, not the
+# way perl happens to be storing them: a string perl has upgraded to UTF-8
+# reads as the same string not upgraded does.  An author's name with an
+# accented letter came back a byte longer from the upgraded one, the letter as
+# the two bytes of its UTF-8.
+{
+	my $text = "data_X\n_audit_author.name 'M\x{fc}ller, A.'\nloop_\n$SITE_HEAD"
+	         . "ATOM 1 C CA . GLY A 1 1 ? 1.0 0.0 0.0 1.0 10.0 1 A 1\n";
+	my $up = $text;
+	utf8::upgrade($up);
+	my $a = Chem::Structure::Parser::_parse_cif_string($text, {});
+	my $b = Chem::Structure::Parser::_parse_cif_string($up, {});
+	is($b->{cif}{'_audit_author.name'}, "M\x{fc}ller, A.", 'an upgraded string reads as its characters');
+	is_deeply($b->{cif}, $a->{cif}, 'and as the same string not upgraded');
+}
+
 done_testing();

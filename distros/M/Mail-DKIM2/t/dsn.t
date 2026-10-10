@@ -476,6 +476,36 @@ sub dsn_around {
     );
     is($out->{upstream_mailfrom}, '<sender@test1.dkim2.com>',
        'the bridge is stripped with the hop: the report goes to the hop before both');
+
+    # Without a PubkeyCallback the keys come from DNS, through Resolver
+    # (review R15: authenticate used to croak, and ignored Resolver).
+    my $dns_auth = Mail::DKIM2::DSN->authenticate(
+        Message => dsn_around($msg), Resolver => DKIM2TestKeys::resolver(),
+        SkipTimestampCheck => 1,
+    );
+    ok($dns_auth->{ok}, 'authenticate with Resolver and no PubkeyCallback')
+        or diag($dns_auth->{details});
+    my $dns_out = Mail::DKIM2::DSN->propagate(
+        Message => dsn_around($msg), ForwarderDomain => 'test3.dkim2.com',
+        Signer => mk_signer(domain => 'test2.dkim2.com'),
+        Resolver => DKIM2TestKeys::resolver(), SkipTimestampCheck => 1,
+    );
+    is($dns_out->{upstream_mailfrom}, '<sender@test1.dkim2.com>',
+       'propagate authenticates through Resolver too');
+
+    # ForwarderDomain names the hop to strip: it must be the top signer's.
+    eval {
+        Mail::DKIM2::DSN->propagate(
+            Message => dsn_around($msg), ForwarderDomain => 'test2.dkim2.com',
+            Signer => mk_signer(domain => 'test2.dkim2.com'),
+            PubkeyCallback => $CB, SkipTimestampCheck => 1,
+        );
+    };
+    like($@, qr/ForwarderDomain test2\.dkim2\.com is not the d= \(test3\.dkim2\.com\)/,
+         'propagate refuses to strip a hop that is not ForwarderDomain\'s');
+
+    eval { Mail::DKIM2::DSN->authenticate(Message => dsn_around($msg), Bogus => 1) };
+    like($@, qr/unknown option Bogus/, 'authenticate: unknown option croaks');
     my $m = Email::MIME->new($out->{raw});
     my ($orig) = grep { ($_->content_type // '') =~ m{^message/rfc822} } $m->subparts;
     my @inner = map { Mail::DKIM2::Signature->parse($_) } Email::MIME->new($orig->body)->header_raw('DKIM2-Signature');
@@ -604,15 +634,19 @@ sub signed_dsn_around {
 # === §12.1.2: "If the verification fails then the DSN MUST NOT be propagated
 # any further" -- propagate enforces that itself. ===
 {
+    # With no PubkeyCallback the keys come from DNS (here the stand-in
+    # resolver); the chain is fixed at $TS, so without SkipTimestampCheck it
+    # has expired and must not be propagated.
     my $signer = mk_signer(domain => 'test2.dkim2.com');
     eval {
         Mail::DKIM2::DSN->propagate(
             Message => dsn_around(verifiable_twohop()),
             ForwarderDomain => 'test2.dkim2.com', Signer => $signer,
+            Resolver => DKIM2TestKeys::resolver(),
         );
     };
-    like($@, qr/need PubkeyCallback to authenticate/,
-        'propagate will not propagate without the means to authenticate');
+    like($@, qr/did not authenticate .*expired/,
+        'propagate authenticates through DNS when given no PubkeyCallback');
 }
 
 {

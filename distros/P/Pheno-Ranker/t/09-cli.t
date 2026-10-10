@@ -9,8 +9,16 @@ use Test::More;
 use Test::PhenoRanker qw(fixture);
 
 use Pheno::Ranker::CLI;
+use Pheno::Ranker::Version ();
 
 my $cli = Pheno::Ranker::CLI->new( pod_file => catfile( 'bin', 'pheno-ranker' ) );
+
+subtest 'loading the CLI does not initialize analysis dependencies' => sub {
+    ok !exists $INC{'Pheno/Ranker.pm'}, 'analysis engine is not loaded';
+    ok !exists $INC{'Pheno/Ranker/Metrics.pm'}, 'Inline C metrics are not loaded';
+    ok !exists $INC{'Pheno/Ranker/Options.pm'}, 'analysis options are not loaded';
+    ok !exists $INC{'Pheno/Ranker/IO.pm'}, 'analysis I/O is not loaded';
+};
 
 subtest 'parse_args translates CLI options into Ranker constructor arguments' => sub {
     my $args = $cli->parse_args(
@@ -72,6 +80,21 @@ subtest '--man is deprecated but exits successfully' => sub {
     is $exit, 0, '--man exits successfully';
     like $output, qr/--man is deprecated/, '--man reports deprecation';
     like $output, qr/pheno-ranker\/usage/, '--man points to usage documentation';
+};
+
+subtest '--help and --version exit successfully without an analysis' => sub {
+    my $script = catfile( 'bin', 'pheno-ranker' );
+
+    my $help_output = qx{$^X -Ilib $script --help 2>&1};
+    my $help_exit   = $? >> 8;
+    is $help_exit, 0, '--help exits successfully';
+    like $help_output, qr/Usage:/i, '--help prints CLI usage';
+
+    my $version_output = qx{$^X -Ilib $script --version 2>&1};
+    my $version_exit   = $? >> 8;
+    is $version_exit, 0, '--version exits successfully';
+    like $version_output, qr/Version \Q$Pheno::Ranker::Version::VERSION\E/,
+      '--version prints the shared distribution version';
 };
 
 done_testing;

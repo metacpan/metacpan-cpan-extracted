@@ -19,7 +19,7 @@ use lib 'lib';
 use Music::NWC2MusicXML;
 use Music::NWC2MusicXML::Diagnostics;
 
-our $VERSION = '0.001.1';
+our $VERSION = '0.002.0';
 
 # ---------------------------------------------------------------------------
 # Parse command-line options

@@ -17,46 +17,46 @@ name: ExtUtils-Typemaps-Default
 provides:
   ExtUtils::Typemap::Basic:
     file: lib/ExtUtils/Typemap/Basic.pm
-    version: '1.06'
+    version: '1.07'
   ExtUtils::Typemap::Default:
     file: lib/ExtUtils/Typemap/Default.pm
-    version: '1.06'
+    version: '1.07'
   ExtUtils::Typemap::ObjectMap:
     file: lib/ExtUtils/Typemap/ObjectMap.pm
-    version: '1.06'
+    version: '1.07'
   ExtUtils::Typemap::STL:
     file: lib/ExtUtils/Typemap/STL.pm
-    version: '1.06'
+    version: '1.07'
   ExtUtils::Typemap::STL::String:
     file: lib/ExtUtils/Typemap/STL/String.pm
-    version: '1.06'
+    version: '1.07'
   ExtUtils::Typemap::STL::Vector:
     file: lib/ExtUtils/Typemap/STL/Vector.pm
-    version: '1.06'
+    version: '1.07'
   ExtUtils::Typemaps::Basic:
     file: lib/ExtUtils/Typemaps/Basic.pm
-    version: '1.06'
+    version: '1.07'
   ExtUtils::Typemaps::Default:
     file: lib/ExtUtils/Typemaps/Default.pm
-    version: '1.06'
+    version: '1.07'
   ExtUtils::Typemaps::ObjectMap:
     file: lib/ExtUtils/Typemaps/ObjectMap.pm
-    version: '1.06'
+    version: '1.07'
   ExtUtils::Typemaps::STL:
     file: lib/ExtUtils/Typemaps/STL.pm
-    version: '1.06'
+    version: '1.07'
   ExtUtils::Typemaps::STL::List:
     file: lib/ExtUtils/Typemaps/STL/List.pm
-    version: '1.06'
+    version: '1.07'
   ExtUtils::Typemaps::STL::String:
     file: lib/ExtUtils/Typemaps/STL/String.pm
-    version: '1.06'
+    version: '1.07'
   ExtUtils::Typemaps::STL::Vector:
     file: lib/ExtUtils/Typemaps/STL/Vector.pm
-    version: '1.06'
+    version: '1.07'
 requires:
   ExtUtils::Typemaps: '3.21'
 resources:
   license: http://dev.perl.org/licenses/
-version: '1.06'
+version: '1.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -2,7 +2,7 @@ package Mail::DKIM2::TagValueList;
 use strict;
 use warnings;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 # Simple tag=value list as defined in draft-ietf-dkim-dkim2-spec-06 Sections 6 and 7.
 # Preserves insertion order for serialization.
@@ -12,18 +12,22 @@ sub new {
     return bless { tags => {}, order => [] }, $class;
 }
 
+# A constructor: always a fresh object, even when called on an existing one
+# (parsing into one left its old tags and duplicate flag behind).
 sub parse {
     my ($class, $string) = @_;
-    my $self = ref($class) ? $class : $class->new();
-    bless $self, ref($class) || $class;
+    my $self = (ref($class) || $class)->new();
 
     $string =~ s/^\s+//;
     $string =~ s/\s+$//;
     my @order;
     my %seen;
-    # Tag names keep their ORIGINAL case and order so the header can be
-    # re-serialized byte-for-byte for signing-input reconstruction; get_tag()
-    # does the case-insensitive lookup required by spec-06 §8.
+    # Tag names keep their original case and order, and values their
+    # internal whitespace; as_string() writes "name=value" joined by "; ",
+    # so the whitespace around "=" and ";" and a trailing ";" are not kept.
+    # That is harmless for signing input: §9.6 deletes all WSP from these
+    # fields before hashing. get_tag() does the case-insensitive lookup
+    # required by spec-06 §8.
     for my $part (split /\s*;\s*/, $string) {
         next unless $part =~ /^(\w+)\s*=\s*(.*)/s;
         my ($name, $val) = ($1, $2);
@@ -88,9 +92,11 @@ Mail::DKIM2::TagValueList - The tag=value list a DKIM2 header is made of
 =head1 DESCRIPTION
 
 A semicolon-separated list of C<tag=value> pairs (spec-06 section 2.12 and
-8). Tag names keep their original case and order so a parsed header can be
-re-serialised byte for byte for the signing input; lookups are
-case-insensitive. L<Mail::DKIM2::Signature> is a subclass.
+8). Tag names keep their original case and order, and values their
+internal whitespace; serialisation joins C<name=value> pairs with C<; >, so
+the whitespace around C<=> and C<;> and a trailing C<;> are normalised
+(harmless for signing input, which section 9.6 strips of all whitespace).
+Lookups are case-insensitive. L<Mail::DKIM2::Signature> is a subclass.
 
 =head1 CONSTRUCTORS
 
@@ -100,7 +106,9 @@ An empty list.
 
 =head2 parse($string)
 
-Parses a list, trimming whitespace around names and values.
+Parses a list into a new object (also when called on an existing one),
+trimming whitespace around names and values. A tag given twice (in any
+case) is reported by C<duplicate_tag>; the verifier rejects such a field.
 
 =head1 METHODS
 

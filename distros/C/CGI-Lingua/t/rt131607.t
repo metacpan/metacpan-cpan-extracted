@@ -5,9 +5,7 @@ use warnings;
 use Test::More;
 use Test::Without::Module qw(LWP::Simple::WithCache LWP::Simple);
 use Test::Needs 'Geo::IP', 'JSON::Parse';
-
-use lib 't/lib';
-use MyLogger;
+use Test::Log::Abstraction;
 
 # See https://rt.cpan.org/Public/Bug/Display.html?id=79214
 
@@ -31,7 +29,7 @@ if(-e 't/online.enabled') {
 	$ENV{'REMOTE_ADDR'} = '212.159.106.41';
 	my $l = CGI::Lingua->new(
 		supported => ['en'],
-		logger => MyLogger->new()
+		logger => Test::Log::Abstraction->new()
 	);
 	ok(defined($l));
 	ok($l->isa('CGI::Lingua'));

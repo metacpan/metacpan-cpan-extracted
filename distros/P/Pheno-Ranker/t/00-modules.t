@@ -17,6 +17,7 @@ use Pheno::Ranker::Options;
 use Pheno::Ranker::Graph;
 use Pheno::Ranker::IO;
 use Pheno::Ranker::Metrics;
+use Pheno::Ranker::Version;
 use Pheno::Ranker::Compare;
 use Pheno::Ranker::Compare::Alignment;
 use Pheno::Ranker::Compare::Encoding;
@@ -28,6 +29,9 @@ use Pheno::Ranker::Compare::Rank;
 use Pheno::Ranker::Compare::Remap;
 
 my $tmpdir = tempdir( CLEANUP => 1 );
+
+is $Pheno::Ranker::VERSION, $Pheno::Ranker::Version::VERSION,
+  'public module and lightweight CLI versions stay synchronized';
 
 subtest 'Graph helpers can build and summarize Cytoscape graphs' => sub {
     my ( $binary_graph_fh, $binary_graph_file ) =
@@ -572,46 +576,6 @@ subtest 'Compare helpers cover deterministic transforms and exports' => sub {
         age                        => 1,
         exclude_variables_regex_qr => qr/label|timestamp|reference\.id/,
     };
-    my $nested_a = {
-        'medicalActions:0.treatment.agent.id' => 'CHEBI:1',
-        'medicalActions:0.treatment.doseIntervals:0.quantity.unit.id' =>
-          'UCUM:mg',
-        'medicalActions:0.treatment.doseIntervals:0.quantity.value' => 10,
-        'medicalActions:0.treatment.doseIntervals:0.quantity.unit.label' =>
-          'milligram',
-        'medicalActions:0.treatment.doseIntervals:1.quantity.unit.id' =>
-          'UCUM:g',
-        'medicalActions:0.treatment.doseIntervals:1.quantity.value' => 20,
-        'medicalActions:0.treatment.doseIntervals:1.quantity.unit.label' =>
-          'gram',
-    };
-    my $nested_b = {
-        'medicalActions:0.treatment.agent.id' => 'CHEBI:1',
-        'medicalActions:0.treatment.doseIntervals:0.quantity.unit.id' =>
-          'UCUM:g',
-        'medicalActions:0.treatment.doseIntervals:0.quantity.value' => 20,
-        'medicalActions:0.treatment.doseIntervals:0.quantity.unit.label' =>
-          'different ignored label',
-        'medicalActions:0.treatment.doseIntervals:1.quantity.unit.id' =>
-          'UCUM:mg',
-        'medicalActions:0.treatment.doseIntervals:1.quantity.value' => 10,
-        'medicalActions:0.treatment.doseIntervals:1.quantity.unit.label' =>
-          'also ignored',
-    };
-    my $canon_a =
-      Pheno::Ranker::Compare::Remap::canonicalize_nested_array_indexes(
-        $nested_a, $nested_filter_self );
-    my $canon_b =
-      Pheno::Ranker::Compare::Remap::canonicalize_nested_array_indexes(
-        $nested_b, $nested_filter_self );
-    is_deeply [ sort keys %{$canon_a} ], [ sort keys %{$canon_b} ],
-      'nested array canonicalization removes order-only index differences';
-    like join( "\n", sort keys %{$canon_a} ),
-      qr/doseIntervals\.idx_[0-9a-f]{12}\.quantity\.unit\.id/,
-      'nested array canonicalization replaces nested indexes with signatures';
-    unlike join( "\n", sort keys %{$canon_a} ), qr/doseIntervals:\d+/,
-      'nested array canonicalization removes raw nested indexes';
-
     my $prefold_nested = {
         medicalActions => [
             {
@@ -624,6 +588,35 @@ subtest 'Compare helpers cover deterministic transforms and exports' => sub {
                                 value => 10,
                             },
                         },
+                        {
+                            quantity => {
+                                unit  => { id => 'UCUM:g', label => 'gram' },
+                                value => 20,
+                            },
+                        },
+                    ],
+                },
+            },
+        ],
+    };
+    my $prefold_nested_reordered = {
+        medicalActions => [
+            {
+                treatment => {
+                    agent => { id => 'CHEBI:1' },
+                    doseIntervals => [
+                        {
+                            quantity => {
+                                unit  => { id => 'UCUM:g', label => 'ignored text' },
+                                value => 20,
+                            },
+                        },
+                        {
+                            quantity => {
+                                unit  => { id => 'UCUM:mg', label => 'ignored text' },
+                                value => 10,
+                            },
+                        },
                     ],
                 },
             },
@@ -631,79 +624,74 @@ subtest 'Compare helpers cover deterministic transforms and exports' => sub {
     };
     Pheno::Ranker::Compare::Remap::normalize_nested_array_indexes(
         $prefold_nested, $nested_filter_self );
+    Pheno::Ranker::Compare::Remap::normalize_nested_array_indexes(
+        $prefold_nested_reordered, $nested_filter_self );
     is ref $prefold_nested->{medicalActions}, 'ARRAY',
       'pre-fold normalization preserves first-level arrays for id_correspondence';
     is ref $prefold_nested->{medicalActions}[0]{treatment}{doseIntervals}, 'HASH',
       'pre-fold normalization converts nested arrays to identity-keyed objects';
-    like(
-        join( "\n",
-            keys %{ $prefold_nested->{medicalActions}[0]{treatment}{doseIntervals} } ),
-        qr/^idx_[0-9a-f]{12}$/,
+    is_deeply(
+        [ sort keys %{ $prefold_nested->{medicalActions}[0]{treatment}{doseIntervals} } ],
+        [
+            sort keys %{
+                $prefold_nested_reordered->{medicalActions}[0]{treatment}{doseIntervals}
+            }
+        ],
+        'pre-fold normalization removes order-only nested index differences'
+    );
+    is(
+        scalar(
+            grep { !/^idx_[0-9a-f]{12}$/ }
+              keys %{ $prefold_nested->{medicalActions}[0]{treatment}{doseIntervals} }
+        ),
+        0,
         'pre-fold normalization uses content signatures for nested object keys'
     );
 
-    my $bff_nested_a = {
-        'measurements:0.assayCode.id' => 'NCIT:C156778',
-        'measurements:0.complexValue.typedQuantities:0.quantityType.id' =>
-          'NCIT:C87149',
-        'measurements:0.complexValue.typedQuantities:0.quantity.unit.id' =>
-          'NCIT:C48570',
-        'measurements:0.complexValue.typedQuantities:1.quantityType.id' =>
-          'NCIT:C25250',
-        'measurements:0.complexValue.typedQuantities:1.quantity.unit.id' =>
-          'UCUM:kg',
-        'biosamples:0.id'                         => 'biosample 1',
-        'biosamples:0.diagnosticMarkers:0.id'     => 'NCIT:C131711',
-        'biosamples:0.diagnosticMarkers:0.label'  => 'ignored marker label',
-        'biosamples:0.diagnosticMarkers:1.id'     => 'NCIT:C140720',
-        'biosamples:0.pathologicalTnmFinding:0.id' => 'NCIT:C48725',
-        'biosamples:0.pathologicalTnmFinding:1.id' => 'NCIT:C48709',
+    my $bff_prefold = {
+        measurements => [
+            {
+                assayCode    => { id => 'NCIT:C156778' },
+                complexValue => {
+                    typedQuantities => [
+                        {
+                            quantityType => { id => 'NCIT:C87149' },
+                            quantity     => { unit => { id => 'NCIT:C48570' } },
+                        },
+                    ],
+                },
+            },
+        ],
+        biosamples => [
+            {
+                id                => 'biosample 1',
+                diagnosticMarkers => [
+                    { id => 'NCIT:C131711', label => 'ignored marker label' },
+                    { id => 'NCIT:C140720' },
+                ],
+                pathologicalTnmFinding => [
+                    { id => 'NCIT:C48725' },
+                    { id => 'NCIT:C48709' },
+                ],
+            },
+        ],
     };
-    my $bff_nested_b = {
-        'measurements:0.assayCode.id' => 'NCIT:C156778',
-        'measurements:0.complexValue.typedQuantities:0.quantityType.id' =>
-          'NCIT:C25250',
-        'measurements:0.complexValue.typedQuantities:0.quantity.unit.id' =>
-          'UCUM:kg',
-        'measurements:0.complexValue.typedQuantities:1.quantityType.id' =>
-          'NCIT:C87149',
-        'measurements:0.complexValue.typedQuantities:1.quantity.unit.id' =>
-          'NCIT:C48570',
-        'biosamples:0.id'                         => 'biosample 1',
-        'biosamples:0.diagnosticMarkers:0.id'     => 'NCIT:C140720',
-        'biosamples:0.diagnosticMarkers:1.id'     => 'NCIT:C131711',
-        'biosamples:0.diagnosticMarkers:1.label'  => 'different ignored label',
-        'biosamples:0.pathologicalTnmFinding:0.id' => 'NCIT:C48709',
-        'biosamples:0.pathologicalTnmFinding:1.id' => 'NCIT:C48725',
-    };
-    my $bff_canon_a =
-      Pheno::Ranker::Compare::Remap::canonicalize_nested_array_indexes(
-        $bff_nested_a,
-        { %{$nested_filter_self}, format => 'BFF' }
-      );
-    my $bff_canon_b =
-      Pheno::Ranker::Compare::Remap::canonicalize_nested_array_indexes(
-        $bff_nested_b,
-        { %{$nested_filter_self}, format => 'BFF' }
-      );
-    is_deeply [ sort keys %{$bff_canon_a} ], [ sort keys %{$bff_canon_b} ],
-      'nested array canonicalization handles BFF-style nested arrays';
-    like join( "\n", sort keys %{$bff_canon_a} ),
-      qr/typedQuantities\.idx_[0-9a-f]{12}\.quantityType\.id/,
-      'nested array canonicalization covers complex typed quantities';
-    like join( "\n", sort keys %{$bff_canon_a} ),
-      qr/diagnosticMarkers\.idx_[0-9a-f]{12}\.id/,
-      'nested array canonicalization covers biosample marker arrays';
-
-    my $ignored_only = {
-        'medicalActions:0.treatment.doseIntervals:0.label' => 'ignored',
-    };
-    is_deeply(
-        Pheno::Ranker::Compare::Remap::canonicalize_nested_array_indexes(
-            $ignored_only, $nested_filter_self
+    Pheno::Ranker::Compare::Remap::normalize_nested_array_indexes(
+        $bff_prefold, { %{$nested_filter_self}, format => 'BFF' }
+    );
+    is ref $bff_prefold->{measurements}, 'ARRAY',
+      'pre-fold normalization preserves first-level BFF arrays';
+    is ref $bff_prefold->{measurements}[0]{complexValue}{typedQuantities}, 'HASH',
+      'pre-fold normalization canonicalizes BFF complex typed quantities';
+    is ref $bff_prefold->{biosamples}[0]{diagnosticMarkers}, 'HASH',
+      'pre-fold normalization canonicalizes BFF biosample marker arrays';
+    is(
+        scalar(
+            grep { !/^idx_[0-9a-f]{12}$/ }
+              keys %{ $bff_prefold->{biosamples}[0]{diagnosticMarkers} }
         ),
-        $ignored_only,
-        'nested array canonicalization leaves indexes when no usable leaves remain'
+        0,
+        'pre-fold normalization uses signatures for BFF nested array keys'
     );
 
     my $nested_remap_self = {

@@ -5,6 +5,9 @@ Changes
 cpanfile
 docker/Dockerfile
 docker/README.md
+examples/quickstart/individuals.json
+examples/quickstart/patient.json
+examples/quickstart/README.md
 lib/Pheno/Ranker.pm
 lib/Pheno/Ranker/CLI.pm
 lib/Pheno/Ranker/Compare.pm
@@ -22,12 +25,11 @@ lib/Pheno/Ranker/Graph.pm
 lib/Pheno/Ranker/IO.pm
 lib/Pheno/Ranker/Metrics.pm
 lib/Pheno/Ranker/Options.pm
+lib/Pheno/Ranker/Version.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
-mkdocs.yml
 non-containerized/README.md
-README.md.template
 requirements.txt
 share/conf/config.yaml
 share/db/hp.json
@@ -47,6 +49,7 @@ t/05-weights.t
 t/06-csv2pheno-ranker.t
 t/07-bff-pxf-simulator.t
 t/09-cli.t
+t/10-precomputed-labels.t
 t/data/cars.json
 t/data/cars_config.yaml
 t/data/cars_matrix.txt

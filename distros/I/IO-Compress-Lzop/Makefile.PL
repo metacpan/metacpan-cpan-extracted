@@ -3,7 +3,7 @@
 use strict ;
 require 5.008 ;
 
-$::VERSION = '2.224' ;
+$::VERSION = '2.225' ;
 
 use lib '.';
 use private::MakeUtil;
@@ -29,7 +29,7 @@ WriteMakefile(
     ),
 
     ABSTRACT_FROM => 'lib/IO/Compress/Lzop.pm',
-    AUTHOR       => 'Paul Marquess <pmqs@cpan.org>',
+    AUTHOR       => 'Paul Marquess <pmqs@outlook.com>',
 
      ( eval { ExtUtils::MakeMaker->VERSION(6.46) }
         ? ( META_MERGE  => {

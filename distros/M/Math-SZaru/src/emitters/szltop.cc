@@ -185,6 +185,7 @@ void TopEstimatorImpl<Value>::AddWeightedElem(const string& elem,
     sketch_->ComputeIndex(worst->value, &index);
     sketch_->AddSub(&index, worst->weight, 1);
     // mem += tops_.ReplaceSmallest(elem, tw);
+    tops_.ReplaceSmallest(elem, tw);
   }
   // weight_ops().Clear(&sw);
   // weight_ops().Clear(&tw);

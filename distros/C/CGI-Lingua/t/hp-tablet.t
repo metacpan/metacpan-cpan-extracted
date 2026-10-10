@@ -30,9 +30,20 @@ RT77332: {
 	ok(defined $l);
 	ok($l->isa('CGI::Lingua'));
 
-	TODO: {
-		local $TODO = 'https://github.com/oalders/http-browserdetect/issues/36';
-		ok(defined($l->code_alpha2()));
+	# https://github.com/oalders/http-browserdetect/issues/36 is fixed; these
+	# used to be TODO
+	ok(defined($l->code_alpha2()));
+
+	# locale() needs Locale::Object's SQLite database, which Windows
+	# installations often omit
+	my $has_locale_db = eval {
+		require Locale::Object::DB;
+		Locale::Object::DB->new()->lookup(table => 'country', result_column => 'name',
+			search_column => 'code_alpha2', value => 'gb');
+		1;
+	};
+	SKIP: {
+		skip 'Locale::Object database absent', 2 unless $has_locale_db;
 		isa_ok($l->locale(), 'Locale::Object::Country');
 		SKIP: {
 			skip 'Test requires Internet access', 1 unless(-e 't/online.enabled');

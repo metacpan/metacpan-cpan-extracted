@@ -3,7 +3,7 @@ use 5.20.0;
 use strict;
 use warnings;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use Crypt::Digest::SHA256 qw(sha256_hex);
 use File::Path qw(make_path);
@@ -11,6 +11,7 @@ use Carp;
 
 sub new {
     my ($class, %args) = @_;
+    Mail::DKIM2::Common::_check_options("$class->new", \%args, qw(directory));
     croak "directory required" unless $args{directory};
     my $self = bless \%args, $class;
     return $self;

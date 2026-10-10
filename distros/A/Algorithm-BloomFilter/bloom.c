@@ -22,6 +22,7 @@ S_which_power_of_two(uint64_t n)
 {
   uint64_t power = 1;
   uint64_t num = 1;
+  if (n == 0 || n > (1ULL << 62)) return 0;
   while(num < n) {
     ++power;
     num *=2;
@@ -33,15 +34,24 @@ bloom_t *
 bl_alloc(const size_t n_bits, const unsigned int k_hashes,
          bl_hash_function_t hashfun)
 {
+  uint64_t power;
+  bloom_t *bl;
 
-  bloom_t *bl = malloc(sizeof(bloom_t));
+  if (k_hashes < 1)
+    return NULL;
+
+  power = S_which_power_of_two(n_bits);
+  if (power < 3 || power >= 64)
+    return NULL;
+
+  bl = malloc(sizeof(bloom_t));
   if (!bl)
     return NULL;
 
-  bl->significant_bits = (unsigned int)S_which_power_of_two(n_bits);
+  bl->significant_bits = (unsigned int)power;
   bl->shift = 64 - bl->significant_bits;
 
-  bl->nbytes = (1ll << bl->significant_bits) / 8ll;
+  bl->nbytes = (1ULL << bl->significant_bits) / 8ULL;
 
   bl->bitmap = calloc(sizeof(char), bl->nbytes);
   if (!(bl->bitmap)) {
@@ -59,6 +69,7 @@ bl_alloc(const size_t n_bits, const unsigned int k_hashes,
 void
 bl_free(bloom_t *bl)
 {
+  if (!bl) return;
   free(bl->bitmap);
   free(bl);
 }
@@ -172,7 +183,7 @@ bl_serialize(bloom_t *bl, char **out, size_t *out_len)
   memcpy(cur, bl->bitmap, bl->nbytes);
   cur += bl->nbytes;
 
-  *out_len = (size_t)(cur-start) + 1;
+  *out_len = (size_t)(cur - start);
   return 0;
 }
 
@@ -181,27 +192,37 @@ bloom_t *
 bl_deserialize(const char *blob, size_t blob_len, bl_hash_function_t hash_function)
 {
   bloom_t *bl = NULL;
-  const char const *end = blob + blob_len - 1;
+  const char *end;
+  uint64_t k;
+  uint64_t significant_bits;
+  size_t expected_bytes;
+
+  if (!blob || blob_len < 2) return NULL;
+  end = blob + blob_len;
+
+  k = S_varint_to_uint64_t((unsigned char **)&blob, (size_t)(end - blob));
+  if (blob == NULL || k < 1) {
+    return NULL;
+  }
+
+  significant_bits = S_varint_to_uint64_t((unsigned char **)&blob, (size_t)(end - blob));
+  if (blob == NULL || significant_bits < 3 || significant_bits >= 64) {
+    return NULL;
+  }
+
+  expected_bytes = (1ULL << significant_bits) / 8ULL;
+  if ((size_t)(end - blob) != expected_bytes) {
+    return NULL;
+  }
 
   bl = malloc(sizeof(bloom_t));
   if (!bl)
     return NULL;
   bl->hash_function = hash_function;
-
-  bl->k = (unsigned int) S_varint_to_uint64_t((unsigned char **)&blob, (size_t)(end-blob));
-  if (blob == NULL) {
-    free(bl);
-    return NULL;
-  }
-
-  bl->significant_bits = (unsigned int) S_varint_to_uint64_t((unsigned char **)&blob, (size_t)(end-blob));
-  if (blob == NULL) {
-    free(bl);
-    return NULL;
-  }
-
+  bl->k = (unsigned int)k;
+  bl->significant_bits = (unsigned int)significant_bits;
   bl->shift = 64 - bl->significant_bits;
-  bl->nbytes = end-blob;
+  bl->nbytes = expected_bytes;
 
   bl->bitmap = malloc(bl->nbytes);
   if (!bl->bitmap) {
@@ -247,7 +268,14 @@ bl_merge(bloom_t *into, const bloom_t * other)
 static inline uint64_t
 U8TO64_LE(const unsigned char *p)
 {
-  return *(const uint64_t *) p;
+  return ((uint64_t)p[0]) |
+         (((uint64_t)p[1]) << 8) |
+         (((uint64_t)p[2]) << 16) |
+         (((uint64_t)p[3]) << 24) |
+         (((uint64_t)p[4]) << 32) |
+         (((uint64_t)p[5]) << 40) |
+         (((uint64_t)p[6]) << 48) |
+         (((uint64_t)p[7]) << 56);
 }
 
 #define ROTL64(a,b) (((a)<<(b))|((a)>>(64-b)))

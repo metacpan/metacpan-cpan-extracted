@@ -39,7 +39,6 @@
             "Sys::Syslog" : "0"
          },
          "requires" : {
-            "Algorithm::Diff" : "0",
             "Carp" : "0",
             "CryptX" : "0.060",
             "Email::MIME" : "0",
@@ -75,6 +74,6 @@
          "web" : "https://github.com/dkim2wg/interop"
       }
    },
-   "version" : "0.17",
+   "version" : "0.18",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

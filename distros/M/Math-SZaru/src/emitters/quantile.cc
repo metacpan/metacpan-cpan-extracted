@@ -21,18 +21,24 @@ namespace SZaru {
 template <>
 QuantileEstimator<int32_t>* 
 QuantileEstimator<int32_t>::Create(uint32_t numQuantiles) {
+  if (numQuantiles == 0 || numQuantiles > 1000000)
+    return NULL;
   return new QuantileEstimatorImpl<int32_t>(numQuantiles);
 }
 
 template <>
 QuantileEstimator<int64_t>* 
 QuantileEstimator<int64_t>::Create(uint32_t numQuantiles) {
+  if (numQuantiles == 0 || numQuantiles > 1000000)
+    return NULL;
   return new QuantileEstimatorImpl<int64_t>(numQuantiles);
 }
 
 template <>
 QuantileEstimator<double>* 
 QuantileEstimator<double>::Create(uint32_t numQuantiles) {
+  if (numQuantiles == 0 || numQuantiles > 1000000)
+    return NULL;
   return new QuantileEstimatorImpl<double>(numQuantiles);
 }
 

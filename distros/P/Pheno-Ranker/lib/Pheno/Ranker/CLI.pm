@@ -11,8 +11,9 @@ use POSIX           qw(strftime);
 use Sys::Hostname   qw(hostname);
 use Term::ANSIColor qw(:constants);
 
-use Pheno::Ranker qw($VERSION write_json);
-use Pheno::Ranker::Options;
+use Pheno::Ranker::Version ();
+
+my $VERSION = $Pheno::Ranker::Version::VERSION;
 
 Getopt::Long::Configure('no_ignore_case');
 
@@ -24,6 +25,7 @@ sub run {
 
     say BOLD CYAN program_header($VERSION), RESET if $data->{verbose};
 
+    require Pheno::Ranker;
     my $ranker = Pheno::Ranker->new($data);
     $ranker->run;
 
@@ -89,7 +91,7 @@ sub parse_args {
         'version|V' => sub { say "$0 Version $VERSION"; exit; }
     ) or $self->_pod2usage(2);
 
-    $self->_pod2usage(1) if $help;
+    $self->_pod2usage(0) if $help;
     if ($man) {
         say "--man is deprecated. Please use --help or see the full documentation:";
         say "https://cnag-biomedical-informatics.github.io/pheno-ranker/usage/";
@@ -121,7 +123,7 @@ sub parse_args {
 
     my (
         $glob_hash_file,       $ref_hash_file,
-        $ref_binary_hash_file, $coverage_stats_file
+        $ref_binary_hash_file, $coverage_stats_file, $labels_file
     );
     if ( defined $precomputed_ref_prefix ) {
         my $has_incompatible_options =
@@ -151,6 +153,8 @@ sub parse_args {
         $ref_hash_file        = resolve_file( $precomputed_ref_prefix . '.ref_hash.json' );
         $ref_binary_hash_file = resolve_file( $precomputed_ref_prefix . '.ref_binary_hash.json' );
         $coverage_stats_file  = resolve_file( $precomputed_ref_prefix . '.coverage_stats.json' );
+        my $candidate = resolve_file( $precomputed_ref_prefix . '.labels.json' );
+        $labels_file = $candidate if -e $candidate;
     }
 
     handle_option(
@@ -196,6 +200,7 @@ sub parse_args {
         ref_hash_file                      => $ref_hash_file,
         ref_binary_hash_file               => $ref_binary_hash_file,
         coverage_stats_file                => $coverage_stats_file,
+        labels_file                        => $labels_file,
         config_file                        => $config_file,
         age                                => $age,
         cli                                => $cli,
@@ -205,6 +210,7 @@ sub parse_args {
         verbose                            => $verbose
     };
 
+    require Pheno::Ranker::Options;
     return Pheno::Ranker::Options->defined_constructor_args($data);
 }
 
@@ -268,7 +274,8 @@ sub write_log {
     };
 
     say BOLD GREEN "Writing <$log> file\n", RESET if $data->{verbose};
-    write_json(
+    require Pheno::Ranker::IO;
+    Pheno::Ranker::IO::write_json(
         {
             filepath => $log,
             data     => { info => $info, data => $data }

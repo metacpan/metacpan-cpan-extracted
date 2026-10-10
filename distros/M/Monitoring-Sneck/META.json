@@ -31,7 +31,12 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "YAML::XS" : "0"
+         },
          "requires" : {
+            "DateTime" : "0",
+            "DateTime::Event::Cron" : "0",
             "File::Slurp" : "0",
             "IO::Compress::Gzip" : "0",
             "JSON" : "0",
@@ -55,6 +60,6 @@
          "web" : "https://github.com/VVelox/Monitoring-Sneck.git"
       }
    },
-   "version" : "v1.4.2",
+   "version" : "v1.6.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

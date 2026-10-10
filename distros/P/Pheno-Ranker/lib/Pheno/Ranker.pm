@@ -25,8 +25,8 @@ our @EXPORT_OK = qw($VERSION write_json);
 $SIG{__WARN__} = sub { warn BOLD YELLOW "Warn: ", @_, RESET };
 $SIG{__DIE__}  = sub { die BOLD RED "Error: ", @_, RESET };
 
-our $VERSION   = '1.08';
-our $share_dir = dist_dir('Pheno-Ranker');
+our $VERSION   = '1.09';
+our $share_dir = $ENV{PHENO_RANKER_SHARE_DIR} // dist_dir('Pheno-Ranker');
 
 # Set development mode
 use constant DEVEL_MODE => 0;
@@ -132,7 +132,7 @@ has [
 
 has [qw/append_prefixes reference_files patients_of_interest/] => ( is => 'ro' );
 
-has [qw/glob_hash_file ref_hash_file ref_binary_hash_file coverage_stats_file/]
+has [qw/glob_hash_file ref_hash_file ref_binary_hash_file coverage_stats_file labels_file/]
   => ( is => 'ro' );
 
 ##########################################
@@ -176,6 +176,9 @@ sub BUILD {
 # ============================================================
 sub run {
     my $self = shift;
+
+    # Labels belong to this run, including when reusing the module in one process.
+    local %Pheno::Ranker::Compare::nomenclature;
 
     $self->_validate_output_directories;
 
@@ -262,12 +265,25 @@ sub _load_precomputed_data {
     my $ref_binary_hash = read_json( $self->{ref_binary_hash_file} );
     my $coverage_stats  = read_json( $self->{coverage_stats_file} );
 
+    if (defined $self->{labels_file}) {
+        my $labels = read_json($self->{labels_file});
+        die "Precomputed labels must be a JSON object\n" unless ref($labels) eq 'HASH';
+        for my $key (keys %$labels) {
+            die "Precomputed label key is absent from the global vector: $key\n"
+              unless exists $glob_hash->{$key};
+            die "Precomputed labels must contain defined scalar values\n"
+              if !defined($labels->{$key}) || ref($labels->{$key});
+        }
+        %Pheno::Ranker::Compare::nomenclature = %$labels;
+    }
+
     $self->_add_attribute( 'format', $coverage_stats->{format} );
 
     my $hash2serialize = {
         glob_hash       => $glob_hash,
         ref_hash        => $ref_hash,
         ref_binary_hash => $ref_binary_hash,
+        coverage_stats  => $coverage_stats,
     };
 
     return ( $glob_hash, $ref_hash, $ref_binary_hash, $hash2serialize );
@@ -351,6 +367,14 @@ sub _maybe_process_patient {
 sub _maybe_export_hashes {
     my ( $self, $hash2serialize ) = @_;
     return 1 unless defined $self->{export};
+
+    # Use the same feature keys and fallback as alignment; never alter vector data.
+    $hash2serialize->{labels} = {
+        map { $_ => (exists $Pheno::Ranker::Compare::nomenclature{$_}
+            ? $Pheno::Ranker::Compare::nomenclature{$_}
+            : Pheno::Ranker::Compare::Remap::guess_label($_)) }
+        keys %{$hash2serialize->{glob_hash}}
+    };
 
     serialize_hashes(
         {

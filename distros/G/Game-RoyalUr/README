@@ -1,0 +1,73 @@
+Game-RoyalUr
+
+The Royal Game of Ur: a race for two players on a board of twenty squares,
+about 4,600 years old. Each side has seven pieces, throws a handful of
+two-sided dice, and moves one piece that many squares along a route that
+crosses the other side's.
+
+This distribution is the game, an opponent for it, and a program to play it
+in a terminal.
+
+    use Game::RoyalUr;
+
+    my $game = Game::RoyalUr->new(seed => 'any bytes at all');
+    until ($game->is_over) {
+        my @moves = $game->legal;
+        $game->play($moves[0]);
+    }
+    print $game->result->winner, " wins\n";
+
+Or, from a shell:
+
+    royalur
+    royalur --rules masters --level 2
+
+The rules of the game are lost and every set is a modern reconstruction. Two
+are played here by name: finkel, proposed by Irving Finkel of the British
+Museum, and masters, proposed by James Masters.
+
+Every throw of the dice follows from a seed, so a game can be recorded and
+played again exactly. The engine is C, with no floating point in it; the
+opponent looks ahead through the dice and is bounded by the number of
+positions it may look at, never by the clock, so it makes the same move on
+every machine.
+
+
+INSTALLATION
+
+A C compiler is needed. To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+It requires Object::Proto::Sugar. Term::ReadKey is recommended: with it the
+terminal program is played with the arrow keys, and without it by typing.
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Game::RoyalUr
+    perldoc royalur
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Game-RoyalUr
+
+    Search CPAN
+        https://metacpan.org/release/Game-RoyalUr
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION <email@lnation.org>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

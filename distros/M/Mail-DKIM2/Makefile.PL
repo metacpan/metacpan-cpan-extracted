@@ -20,7 +20,6 @@ WriteMakefile(
     },
 
     PREREQ_PM => {
-        'Algorithm::Diff'                        => '0',
         'Carp'                                   => '0',
         'CryptX'                                 => '0.060',
         'Email::MIME'                            => '0',

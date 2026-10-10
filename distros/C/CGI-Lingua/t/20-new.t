@@ -4,8 +4,7 @@ use strict;
 use warnings;
 
 use Test::Most tests => 33;
-use lib 't/lib';
-use MyLogger;
+use Test::Log::Abstraction;
 
 BEGIN {
 	use_ok('CGI::Lingua');
@@ -79,7 +78,7 @@ LANGUAGES: {
         $ENV{'REMOTE_ADDR'} = '212.159.106.41';
 	$l = CGI::Lingua->new({
 		supported => ['en', 'fr', 'en-gb', 'en-us'],
-		logger => MyLogger->new()
+		logger => Test::Log::Abstraction->new()
 	});
 	ok(defined $l);
 	ok($l->isa('CGI::Lingua'));

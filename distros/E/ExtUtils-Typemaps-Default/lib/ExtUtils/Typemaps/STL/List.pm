@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use ExtUtils::Typemaps;
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 our @ISA = qw(ExtUtils::Typemaps);
 
@@ -111,7 +111,8 @@ HERE
 	AV* av = newAV();
 	$arg = newRV_noinc((SV*)av);
 	const unsigned int len = $var.size(); // Technically may be linear...
-	av_extend(av, len-1);
+	if (len)
+	  av_extend(av, len-1);
 	unsigned int i = 0;
 	std::list<!TYPE!>::const_iterator lend = $var.cend();
 	std::list<!TYPE!>::const_iterator lit  = $var.cbegin();
@@ -123,7 +124,8 @@ HERE
 	AV* av = newAV();
 	$arg = newRV_noinc((SV*)av);
 	const unsigned int len = $var->size(); // Technically may be linear...
-	av_extend(av, len-1);
+	if (len)
+	  av_extend(av, len-1);
 	unsigned int i = 0;
 	std::list<!TYPE!>::const_iterator lend = (*$var).cend();
 	std::list<!TYPE!>::const_iterator lit  = (*$var).cbegin();
@@ -161,7 +163,8 @@ T_STD_LIST_STD_STRING
 	AV* av = newAV();
 	$arg = newRV_noinc((SV*)av);
 	const unsigned int len = $var.size(); // Technically may be linear...
-	av_extend(av, len-1);
+	if (len)
+	  av_extend(av, len-1);
 	unsigned int i = 0;
 	std::list<std::string>::const_iterator lend = $var.cend();
 	std::list<std::string>::const_iterator lit  = $var.cbegin();
@@ -175,7 +178,8 @@ T_STD_LIST_STD_STRING_PTR
 	AV* av = newAV();
 	$arg = newRV_noinc((SV*)av);
 	const unsigned int len = $var->size(); // Technically may be linear...
-	av_extend(av, len-1);
+	if (len)
+	  av_extend(av, len-1);
 	unsigned int i = 0;
 	std::list<std::string>::const_iterator lend = (*$var).cend();
 	std::list<std::string>::const_iterator lit  = (*$var).cbegin();
@@ -189,24 +193,26 @@ T_STD_LIST_CSTRING
 	AV* av = newAV();
 	$arg = newRV_noinc((SV*)av);
 	const unsigned int len = $var.size();
-	av_extend(av, len-1);
+	if (len)
+	  av_extend(av, len-1);
 	unsigned int i = 0;
 	std::list<char *>::const_iterator lend = $var.cend();
 	std::list<char *>::const_iterator lit  = $var.cbegin();
 	for (; lit != lend; ++lit) {
-	  av_store(av, i, newSVpv(*lit, (STRLEN)strlen(*lit)));
+	  av_store(av, i++, newSVpv(*lit, (STRLEN)strlen(*lit)));
 	}
 
 T_STD_LIST_CSTRING_PTR
 	AV* av = newAV();
 	$arg = newRV_noinc((SV*)av);
 	const unsigned int len = $var->size();
-	av_extend(av, len-1);
+	if (len)
+	  av_extend(av, len-1);
 	unsigned int i = 0;
 	std::list<char *>::const_iterator lend = (*$var).cend();
 	std::list<char *>::const_iterator lit  = (*$var).cbegin();
 	for (; lit != lend; ++lit) {
-	  av_store(av, i, newSVpv(*lit, (STRLEN)strlen(*lit)));
+	  av_store(av, i++, newSVpv(*lit, (STRLEN)strlen(*lit)));
 	}
 
 END_OUTPUT

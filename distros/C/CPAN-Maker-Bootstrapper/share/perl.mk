@@ -1,31 +1,8 @@
 #-*- mode: makefile; -*-
 
-PERL       := $(shell command -v perl)
-PERLTIDY   := $(shell command -v perltidy)
-PERLCRITIC := $(shell command -v perlcritic)
-
-PODCHECKER := $(shell command -v podchecker)
-CPM        := $(shell command -v cpm)
-CARTON     := $(shell command -v carton)
-
 PERL_BIN_FILES = $(patsubst %.pl.in,%.pl,$(filter %.pl.in,$(BIN_FILES:%=%.in)))
 
 PERLINCLUDE ?= -I lib -I local/lib/perl5
-
-ifeq ($(origin SYNTAX_CHECKING),undefined)
-  SYNTAX_CHECKING := $(shell $(PERL) -MCPAN::Maker::ConfigReader \
-    -e 'print CPAN::Maker::ConfigReader->new->cpan_maker_syntax_checking // q{}' 2>/dev/null)
-endif
-
-ifeq ($(origin PERLTIDYRC),undefined)
-  PERLTIDYRC := $(shell $(PERL) -MCPAN::Maker::ConfigReader \
-    -e 'print CPAN::Maker::ConfigReader->new->cpan_maker_perltidyrc // q{}' 2>/dev/null)
-endif
-
-ifeq ($(origin PERLCRITICRC),undefined)
-  PERLCRITICRC := $(shell $(PERL) -MCPAN::Maker::ConfigReader \
-    -e 'print CPAN::Maker::ConfigReader->new->cpan_maker_perlcriticrc // q{}' 2>/dev/null)
-endif
 
 lint_off  := $(filter off,$(call lc,$(LINT)))
 syntax_on := $(filter-out off,$(call lc,$(SYNTAX_CHECKING)))
@@ -46,25 +23,33 @@ PERL_BIN_CHECKED_FILES = $(PERL_BIN_FILES:%=%.checked)
 
 CLEANFILES += $(TIDY_FILES) $(CRITIC_FILES) $(ERR_FILES) $(PERL_CHECKED_FILES) $(PERL_BIN_CHECKED_FILES)
 
+ifeq ($(POD),extract)
+
+%.pm %.pod &: %.pm.rendered
+	$(NO_ECHO)$(PODEXTRACT) -i $< -o $*.pm -p $*.pod
+
+else ifeq ($(POD),remove)
+
+%.pm: %.pm.rendered
+	$(NO_ECHO)$(PODEXTRACT) -i $< -o $@ -p /dev/null
+
+else
+
+%.pm: %.pm.rendered
+	$(NO_ECHO)cp $< $@
+
+endif
+
 # ------------------------------------------------------------------
 # snippets
 # ------------------------------------------------------------------
-
-define run_podextract
-	if [[ "$$POD" =~ ^(extract|remove)$$ ]]; then \
-	  if [[ -z "$(PODEXTRACT)" ]]; then \
-	    echo >&2 "ERROR: Pod::Extract not installed - run cpanm Pod::Extract"; \
-	    exit 1; \
-	  fi; \
-	  nopod_tmp="$$(mktemp)"; \
-	  local_cleanfiles="$$local_cleanfiles $$nopod_tmp"; \
-	  if [[ "$$POD" = "extract" ]]; then \
-	    podout="$@"; podout="$${podout%.pm}.pod"; \
-	  else \
-	    podout="/dev/null"; \
-	  fi; \
-	  $(PODEXTRACT) -i "$$module_tmp" -o "$$nopod_tmp" -p "$$podout"; \
-	  cp "$$nopod_tmp" "$$module_tmp"; \
+define check_pod
+	if [[ -n "$(PODCHECKER)" ]]; then \
+	  echo -n "Checking POD...$(1)..."; \
+	  podcheck="$$($(PODCHECKER) $(1) 2>&1 || true)"; \
+	  echo "$$podcheck" | grep -q "does not contain\|OK" \
+	    || { echo "$$podcheck"; exit 1; }; \
+	  echo "OK"; \
 	fi
 endef
 
@@ -86,10 +71,6 @@ define check_syntax_pm
 	  PERL5LIB= perl -wc $(PERLINCLUDE) -M"$$module" -e 1 2>$$errfile \
 	    || { rm -f "$<"; cat $$errfile; exit 1; }; \
 	  echo "OK"; \
-	  echo -n "Checking POD...$<..."; \
-	  podcheck="$$($(PODCHECKER) $< 2>&1 || true)"; \
-	  echo "$$podcheck" | grep -q "does not contain\|OK" || { rm -f "$<"; echo "$$podcheck"; exit 1; }; \
-	  echo "OK"; \
 	fi
 endef
 
@@ -110,109 +91,62 @@ define check_syntax_pl
 	  PERL5LIB= perl -wc $(PERLINCLUDE) "$<" 2>$$errfile \
 	    || { rm -f "$<"; cat $$errfile; exit 1; }; \
 	  echo "$< OK"; \
-	  echo "Checking POD...$<"; \
-	  podcheck="$$($(PODCHECKER) $< 2>&1 || true)"; \
-	  echo "$$podcheck" | grep -q "does not contain\|OK" || { rm -f "$<"; echo "$$podcheck"; exit 1; }; \
-	  echo "$< OK"; \
 	fi
 endef
 
-%.pm.checked: %.pm | local/.installed
+%.pm.checked: %.pm %.pm.rendered | local/.installed
 	$(NO_ECHO)local_cleanfiles=""; \
 	trap 'rm -f $$local_cleanfiles' EXIT; \
 	$(check_syntax_pm); \
+	$(call check_pod,$(word 2,$^)); \
 	touch "$@"
 
 %.pl.checked: %.pl | local/.installed
 	$(NO_ECHO)local_cleanfiles=""; \
 	trap 'rm -f $$local_cleanfiles' EXIT; \
 	$(check_syntax_pl); \
+	$(call check_pod,$<); \
 	touch "$@"
 
-# ------------------------------------------------------------------
-# sentinel rules - real gate or no-op touch based on configuration
-# ------------------------------------------------------------------
-
-# sentinel rules now depend on %.pm not %.pm.in
-
-%.pm.tdy: %.pm
+$(addsuffix .tdy,$(PERL_MODULES) $(PERL_BIN_FILES)) &: $(PERL_MODULES) $(PERL_BIN_FILES)
 ifneq ($(tidy_on),)
-	$(NO_ECHO)if [[ -n "$(PERLTIDYRC)" && ! -e "$(PERLTIDYRC)" ]]; then \
-	  echo "ERROR: $(PERLTIDYRC) not found"; \
-	  exit 1; \
-	fi; \
-	if [[ -z "$(PERLTIDY)" ]]; then \
-	  echo "ERROR: perltidy not found - install with: cpanm Perl::Tidy"; \
-	  exit 1; \
-	fi; \
-	echo -n "Checking TIDINESS...$<..."; \
-	$(PERLTIDY) $(if $(PERLTIDYRC),--profile="$(PERLTIDYRC)") $< >/dev/null 2>&1; \
-	diff -q "$<" "$<.tdy" >/dev/null 2>&1 \
-	  || { echo "ERROR: $< is not tidy - run: make tidy"; rm -f "$<.tdy" "$@"; exit 1; }; \
-	rm -f "$<.tdy"; \
-	echo "OK"; \
-	touch "$@"
+	$(NO_ECHO)tidy_files="$$(mktemp)"; \
+	trap 'rm -f "$$tidy_files"' EXIT; \
+	for file in $(PERL_MODULES) $(PERL_BIN_FILES); do \
+	  if [[ ! -e "$$file.tdy" || "$$file" -nt "$$file.tdy" ]]; then \
+	    printf '%s\n' "$$file" >> "$$tidy_files"; \
+	  fi; \
+	done; \
+	if [[ -s "$$tidy_files" ]]; then \
+	  echo -n "Checking PERLTIDY..."; \
+	  $(BOOTSTRAPPER) perltidy --file-list "$$tidy_files" \
+	    $(if $(PERLTIDYRC),--profile="$(PERLTIDYRC)"); \
+	  echo "OK"; \
+	fi
 else
-	$(NO_ECHO)touch "$@"
+	$(NO_ECHO)touch $(addsuffix .tdy,$(PERL_MODULES) $(PERL_BIN_FILES))
 endif
 
-# note that perlcritic output errors on STDOUT
-%.pm.crit: %.pm
+$(addsuffix .crit,$(PERL_MODULES) $(PERL_BIN_FILES)) &: $(PERL_MODULES) $(PERL_BIN_FILES)
 ifneq ($(critic_on),)
-	$(NO_ECHO)if [[ -n "$(PERLCRITICRC)"  && ! -e "$(PERLCRITICRC)" ]]; then \
-	  echo "ERROR: $(PERLCRITICRC) not found"; \
-	exit 1; \
-	fi; \
-	if [[ -z "$(PERLCRITIC)" ]]; then \
-	  echo "ERROR: perlcritic not found - install with: cpanm Perl::Critic"; \
-	  exit 1; \
-	fi; \
-	echo -n "Checking PERLCRITIC...$<..."; \
-	$(PERLCRITIC) \
-	  --theme=$(PERLCRITIC_THEME) $(if $(PERLCRITICRC),--profile="$(PERLCRITICRC)") \
-	  --severity=$(PERLCRITIC_SEVERITY) $<  >/dev/null 2>&1 | tee $@ || { echo "ERROR: $< fails perlcritic"; exit 1; }; \
-	echo "OK"
+	$(NO_ECHO)critic_files="$$(mktemp)"; \
+	trap 'rm -f "$$critic_files"' EXIT; \
+	for file in $(PERL_MODULES) $(PERL_BIN_FILES); do \
+	  if [[ ! -e "$$file.crit" || "$$file" -nt "$$file.crit" ]]; then \
+	    printf '%s\n' "$$file" >> "$$critic_files"; \
+	  fi; \
+	done; \
+	if [[ -s "$$critic_files" ]]; then \
+	  echo -n "Checking PERLCRITIC..."; \
+	  $(BOOTSTRAPPER) perlcritic \
+	    --file-list "$$critic_files" \
+	    --theme=$(PERLCRITIC_THEME) \
+	    --severity=$(PERLCRITIC_SEVERITY) \
+	    $(if $(PERLCRITICRC),--profile="$(PERLCRITICRC)"); \
+	  echo "OK"; \
+	fi
 else
-	$(NO_ECHO)touch "$@"
-endif
-
-%.pl.tdy: %.pl
-ifneq ($(tidy_on),)
-	$(NO_ECHO)if [[ -n "$(PERLTIDYRC)"  && ! -e "$(PERLTIDYRC)" ]]; then \
-	  echo "ERROR: $(PERLTIDYRC) not found"; \
-	exit 1; \
-	fi; \
-	if [[ -z "$(PERLTIDY)" ]]; then \
-	  echo "ERROR: perltidy not found - install with: cpanm Perl::Tidy"; \
-	  exit 1; \
-	fi; \
-	echo >&2 "Checking tidiness...$<"; \
-	$(PERLTIDY) $(if $(PERLTIDYRC),--profile="$(PERLTIDYRC)") $<; \
-	diff -q "$<" "$<.tdy" 2>/dev/null \
-	  || { echo "ERROR: $< is not tidy - run: make tidy"; rm -f "$<.tdy" "$@"; exit 1; }; \
-	rm -f "$<.tdy"; \
-	touch "$@"
-else
-	$(NO_ECHO)touch "$@"
-endif
-
-%.pl.crit: %.pl
-ifneq ($(critic_on),)
-	$(NO_ECHO)if [[ -n "$(PERLCRITICRC)" && ! -e "$(PERLCRITICRC)" ]]; \
-	  echo "ERROR: $(PERLCRITICRC) not found"; \
-	  exit 1; \
-	fi; 
-	if [[ -z "$(PERLCRITIC)" ]]; then \
-	  echo "ERROR: perlcritic not found - install with: cpanm Perl::Critic"; \
-	  exit 1; \
-	fi; \
-	echo >&2 "Critiquing...$<"; \
-	$(PERLCRITIC) \
-	  --theme=$(PERLCRITIC_THEME) \
-	  --severity=$(PERLCRITIC_SEVERITY) \
-	  $(if $(PERLCRITICRC),--profile="$(PERLCRITICRC)") $< 2>&1 | tee $@ || { echo "ERROR: $< fails perlcritic"; exit 1; };
-else
-	$(NO_ECHO)touch "$@"
+	$(NO_ECHO)touch $(addsuffix .crit,$(PERL_MODULES) $(PERL_BIN_FILES))
 endif
 
 # $(call gen-vars-file,PATH): write NAME=value pairs to PATH, values
@@ -225,20 +159,22 @@ gen-vars-file = $(file >$(1),)$(foreach v,$(TEMPLATE_VARS),$(file >>$(1),$(v)=$(
 # ------------------------------------------------------------------
 #
 
-# Module/script generation is separate from syntax validation.
-# The .checked sentinels record that the current generated artifact
-# has passed syntax/POD checks.
 
-%.pm: %.pm.in
-	$(call gen-vars-file,$<.vars)
-	$(NO_ECHO)module_tmp="$$(mktemp)"; \
-	local_cleanfiles="$$module_tmp"; \
-	trap 'rm -f $$local_cleanfiles $<.vars' EXIT; \
-	$(BOOTSTRAPPER) resolve-vars $< > "$$module_tmp"; \
-	$(run_podextract); \
-	rm -f "$@"; \
-	cp "$$module_tmp" "$@"; \
-	chmod -w "$@"
+$(addsuffix .rendered,$(PERL_MODULES)) &: $(addsuffix .in,$(PERL_MODULES))
+	$(call gen-vars-file,resolve-vars.vars)
+	$(NO_ECHO)render_files="$$(mktemp)"; \
+	trap 'rm -f "$$render_files" resolve-vars.vars' EXIT; \
+	for source in $(addsuffix .in,$(PERL_MODULES)); do \
+	    rendered="$${source%.in}.rendered"; \
+	    if [[ ! -e "$$rendered" || "$$source" -nt "$$rendered" ]]; then \
+	        printf '%s\n' "$$source" >> "$$render_files"; \
+	    fi; \
+	done; \
+	if [[ -s "$$render_files" ]]; then \
+	  $(BOOTSTRAPPER) resolve-vars \
+	    --vars-file resolve-vars.vars \
+	    --file-list "$$render_files"; \
+	fi
 
 %.pl: %.pl.in
 	$(call gen-vars-file,$<.vars)
@@ -255,6 +191,15 @@ check-syntax: $(PERL_CHECKED_FILES) $(PERL_BIN_CHECKED_FILES)
 else
 check-syntax:
 endif
+
+
+render-files:
+	$(NO_ECHO)printf '%s\n' $(SOURCE_FILES_IN) > $@
+
+.PHONY: test-resolver
+test-resolver: render-files
+	$(call gen-vars-file,$@.vars)
+	time cmb resolve-vars --vars-file $@.vars --file-list $<
 
 # ------------------------------------------------------------------
 # convenience targets
@@ -322,8 +267,9 @@ include deps.mk
 # so there's no chicken-and-egg with $(PERL_MODULES) needing to be
 # built before deps.mk can be regenerated, and 'make clean' can never
 # trigger a rebuild through this include (clean doesn't touch .pm.in).
+
 deps.mk: $(SOURCE_FILES_IN)
-	$(NO_ECHO)cmb create-deps > $@.tmp \
+	$(NO_ECHO)$(BOOTSTRAPPER) create-deps > $@.tmp \
 	  && mv $@.tmp $@ \
 	  || { rm -f $@.tmp; false; }
 

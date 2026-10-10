@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use autodie qw(:all);
 
-our $VERSION = '0.001.2';
+our $VERSION = '0.002.0';
 
 use Carp qw(croak carp);
 use POSIX qw(floor);
@@ -1210,8 +1210,8 @@ sub _emit_measure {
 
 # Walk all events in a staff once and build an annotation hashref keyed by
 # stringified event reference.  Each value is a hashref with:
-#   slur_start      => 1   this note opens a slur arc
-#   slur_stop       => 1   this note closes a slur arc
+#   slur_start      => N   this note opens slur arc N
+#   slur_stop       => N   this note closes slur arc N (placed on the landing note, not the last Slur-bearing note)
 #   tie_stop_keys   => { pos_key => 1, ... }  tie stops arriving at this note
 #   tie_start_keys  => { pos_key => 1, ... }  tie starts leaving from this note
 #
@@ -1266,13 +1266,14 @@ sub _annotate_events {
 				$ann{$key}{slur_start} = $slur_num;
 				$in_slur = 1;
 			}
-			# Rolling assignment: only the last slurred note's key matters for
-			# slur_stop; intermediate dead-stores are intentional.
-			$last_slur_ev  = $key;
+			$last_slur_ev  = $key;   # kept only for the end-of-staff fallback below
 			$last_slur_num = $slur_num;
 		} else {
 			if ($in_slur) {
-				$ann{$last_slur_ev}{slur_stop} = $last_slur_num;
+				# Stop goes on the landing note (first note WITHOUT Slur), not the
+				# last note that carries Slur.  Placing it on the Slur-bearing note
+				# produces a zero-length arc when only one note has the token.
+				$ann{$key}{slur_stop} = $last_slur_num;
 				$in_slur      = 0;
 				$last_slur_ev = undef;
 			}
@@ -1998,32 +1999,9 @@ independent stems -- is deferred to a future release.
 
 =item *
 
-Slur numbering: all slurs use number 1.  If more than one slur arc is open
-simultaneously (which is rare but legal in NWC), the overlapping slurs will
-share the same number and the output will be invalid.  The constant
-C<$MAX_SLUR_NUMBER> documents the intended limit.
-
-=item *
-
-Lyric text (C<Lyric> events) is not yet serialised.  The events are parsed
-and stored in the Score but no C<< <lyric> >> elements appear in the output.
-
-=item *
-
-Flow-control directives (Coda, Segno, DaCapo, Volta brackets, etc.) are
-stored as C<FlowControl> events by the parser but produce no MusicXML output.
-
-=item *
-
 Page dimensions are always assumed to be A4 (210 x 297 mm).  NWC supports
 custom page sizes through C<PgSetup> fields that are not yet read by the
 parser.
-
-=item *
-
-Only uniform margins are supported.  NWC allows different left, right, top,
-and bottom margins, and also supports mirrored margins for left/right pages.
-The generator uses only the left margin value and applies it to all four sides.
 
 =back
 

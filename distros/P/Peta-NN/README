@@ -1,0 +1,66 @@
+Peta-NN 0.2610090
+
+a small neural network, defined, trained and saved in Perl
+
+Small neural networks that each do one limited thing with a string, trained
+in Perl and put together. The target is the class of language tasks that
+were solved with rule sets 10-15 years ago (inflection, language
+identification, diacritics, word classes): a model learns from pairs a rule
+set or a lexicon produces, ships as a file of a few kilobytes, and also
+answers for the words the rules never listed.
+
+Training small models and composing them is the main way of working. A
+chain of models is itself a model; its parts stay parts, so one can be
+improved alone; and fused, a whole batch passes all of them on a graphics
+card without coming back to Perl in between. Why it is built this way:
+What Peta::NN is for.
+
+MODULES
+
+    Peta::NN                       a small neural network, defined, trained and saved in Perl
+    Peta::NN::Backend              the engines Peta::NN can compute on
+    Peta::NN::Backend::PDL         Peta::NN on PDL ndarrays
+    Peta::NN::Backend::Plain       Peta::NN on plain Perl arrays
+    Peta::NN::Backend::WebGPU      Peta::NN on the graphics card
+    Peta::NN::Chain                models put together into a model
+    Peta::NN::Codec                characters to token indices, string pairs to edit labels
+    Peta::NN::Data                 records with named fields, to train models on and measure them by
+    Peta::NN::Fused                micro models fused into one, as they are, the seams inside
+    Peta::NN::Inference            load a trained model and get answers from it
+    Peta::NN::Job                  train a model until it meets given fidelity thresholds, at the smallest size that can
+    Peta::NN::Layer::Activation    relu, tanh and sigmoid
+    Peta::NN::Layer::Dense         fully connected layer
+    Peta::NN::Layer::Embed         learned vectors for token indices
+    Peta::NN::Model                train a micro model from string pairs, export it as a model file
+    Peta::NN::Optimizer            SGD with momentum, and Adam
+    Peta::NN::Parallel             independent pieces of work on several cores
+    Peta::NN::Pipeline             models in series, and routed by a classifier
+    Peta::NN::RNG                  seeded random numbers that are the same on every perl
+
+INSTALLATION
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Perl 5.36 or later. PDL makes training and inference faster and
+Parallel::ForkManager lets training runs go in parallel; neither is needed.
+
+DOCUMENTATION
+
+    docs/getting_started.md      a first model, a second, the two as one
+    docs/index.md                the guides, the reference, the examples
+
+    perldoc Peta::NN::Data
+    perldoc Peta::NN::Model
+    perldoc Peta::NN::Chain
+
+LICENSE
+
+    This package is free software, dual-licensed under the
+    Artistic License 2.0 and the BSD 2-Clause License.
+    https://opensource.org/licenses/Artistic-2.0
+    https://opensource.org/licenses/BSD-2-Clause
+
+Copyright (c) 2026 PetaMem s.r.o.

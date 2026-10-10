@@ -16,6 +16,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "ExtUtils::CBuilder" : "0",
             "ExtUtils::Typemaps::Default" : "0.01",
             "ExtUtils::XSpp" : "0.18",
             "Test::More" : "0.88"
@@ -28,7 +29,6 @@
             "ExtUtils::CChecker" : "0",
             "ExtUtils::CppGuess" : "0.27",
             "File::Copy" : "0",
-            "File::Find" : "0",
             "Module::Build" : "0.42",
             "Module::Build::WithXSpp" : "0.14"
          }
@@ -37,7 +37,7 @@
    "provides" : {
       "Math::SZaru" : {
          "file" : "lib/Math/SZaru.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Math::SZaru::QuantileEstimator" : {
          "file" : "lib/Math/SZaru/QuantileEstimator.pm"
@@ -55,6 +55,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

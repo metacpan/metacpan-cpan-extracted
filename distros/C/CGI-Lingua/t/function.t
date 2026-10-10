@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# t/function.t — White-box unit tests for every sub in CGI::Lingua.
+# t/function.t - White-box unit tests for every sub in CGI::Lingua.
 #
 # Strategy: each sub is exercised in isolation.  External dependencies
 # (I18N::AcceptLanguage, IP::Country, Locale::Language, etc.) are mocked
@@ -18,13 +18,11 @@ use Test::Memory::Cycle;
 use Test::Mockingbird;
 use Test::Most;
 use Test::Returns qw(returns_ok returns_is);
-
-use lib 't/lib';
-use MyLogger;
+use Test::Log::Abstraction;
 
 BEGIN { use_ok('CGI::Lingua') }
 
-# ── Test fixtures ────────────────────────────────────────────────────────────
+# -- Test fixtures ------------------------------------------------------------
 
 # Sentinel values that the module uses internally; duplicated here so tests
 # are self-documenting without having to grep the source.
@@ -42,7 +40,7 @@ sub _basic_obj {
 	CGI::Lingua->new(supported => ['en', 'fr'], %extra);
 }
 
-# ── new() ────────────────────────────────────────────────────────────────────
+# -- new() --------------------------------------------------------------------
 
 subtest 'new: ::new() misuse is rejected' => sub {
 	# Using :: instead of -> should croak; the error is caught inside new()
@@ -80,7 +78,7 @@ subtest 'new: plain hashref logger accepted as Object::Configure config' => sub 
 	local %ENV = ();
 	my $l;
 	lives_ok { $l = CGI::Lingua->new(supported => ['en'], logger => {}) }
-		'plain hashref logger does not croak — Object::Configure converts it';
+		'plain hashref logger does not croak - Object::Configure converts it';
 	ok(blessed($l->{logger}), 'converted logger is a blessed object');
 };
 
@@ -138,7 +136,7 @@ subtest 'new: cache restoration thaws frozen state' => sub {
 	is($second->{_slanguage}, 'English', 'Cached _slanguage is restored');
 };
 
-# ── _build_cache_key ─────────────────────────────────────────────────────────
+# -- _build_cache_key ---------------------------------------------------------
 
 subtest '_build_cache_key: string supported' => sub {
 	local %ENV = ();
@@ -172,7 +170,7 @@ subtest '_build_cache_key: info->lang() takes priority over env var' => sub {
 	Test::Mockingbird::restore_all();
 };
 
-# ── DESTROY ──────────────────────────────────────────────────────────────────
+# -- DESTROY ------------------------------------------------------------------
 
 subtest 'DESTROY: stores serialised state in cache' => sub {
 	local %ENV = (REMOTE_ADDR => '10.20.30.40', HTTP_ACCEPT_LANGUAGE => 'fr');
@@ -220,7 +218,7 @@ subtest 'DESTROY: does not overwrite existing cache entry' => sub {
 	is($thawed->{_slanguage}, 'SentinelLanguage', 'Existing cache entry was not overwritten');
 };
 
-# ── Public language accessors ─────────────────────────────────────────────────
+# -- Public language accessors -------------------------------------------------
 # These thin wrappers must delegate to _find_language() exactly once and then
 # use the cached result on subsequent calls.
 
@@ -295,7 +293,7 @@ subtest 'requested_language() includes sublanguage in parens' => sub {
 	like($l->requested_language(), qr/English.*United Kingdom/, 'requested_language includes country');
 };
 
-# ── _what_language ────────────────────────────────────────────────────────────
+# -- _what_language ------------------------------------------------------------
 
 subtest '_what_language: reads HTTP_ACCEPT_LANGUAGE env var' => sub {
 	local %ENV = (HTTP_ACCEPT_LANGUAGE => 'en-us');
@@ -324,7 +322,7 @@ subtest '_what_language: rejects header with invalid characters' => sub {
 };
 
 subtest '_what_language: rejects header exceeding max length' => sub {
-	# Header is exactly 257 bytes — one over the 256-byte limit
+	# Header is exactly 257 bytes - one over the 256-byte limit
 	local %ENV = (HTTP_ACCEPT_LANGUAGE => 'a' x 257);
 	my $l = _basic_obj();
 	ok(!defined $l->_what_language(), '257-char header is rejected');
@@ -358,7 +356,7 @@ subtest '_what_language: * wildcard is accepted' => sub {
 	like($l->_what_language(), qr/\*/, 'Wildcard * is accepted in Accept-Language');
 };
 
-# ── en-uk normalisation ───────────────────────────────────────────────────────
+# -- en-uk normalisation -------------------------------------------------------
 
 subtest '_find_language: en-uk normalised to en-gb' => sub {
 	# Some older browsers send 'en-uk' instead of the correct 'en-gb'.
@@ -367,7 +365,7 @@ subtest '_find_language: en-uk normalised to en-gb' => sub {
 	is($l->sublanguage_code_alpha2(), 'gb', 'en-uk is treated as en-gb');
 };
 
-# ── _scan_sublanguage_pairs ────────────────────────────────────────────────────
+# -- _scan_sublanguage_pairs ----------------------------------------------------
 
 subtest '_scan_sublanguage_pairs: finds base language from pair' => sub {
 	local %ENV = ();
@@ -399,7 +397,7 @@ subtest '_scan_sublanguage_pairs: returns undef/undef when no match' => sub {
 	Test::Mockingbird::restore_all();
 };
 
-# ── _scan_plain_tokens ────────────────────────────────────────────────────────
+# -- _scan_plain_tokens --------------------------------------------------------
 
 subtest '_scan_plain_tokens: finds matching plain token' => sub {
 	local %ENV = ();
@@ -429,7 +427,7 @@ subtest '_scan_plain_tokens: skips tokens with sublanguage suffix' => sub {
 	require I18N::AcceptLanguage;
 	Test::Mockingbird::mock('I18N::AcceptLanguage', 'accepts', sub {
 		my ($self, $lang, $supported) = @_;
-		# Accept 'en' only — simulates a site that supports English
+		# Accept 'en' only - simulates a site that supports English
 		return $lang eq 'en' ? 'en' : undef;
 	});
 
@@ -456,7 +454,7 @@ subtest '_scan_plain_tokens: q-values already stripped by _sorted_tokens' => sub
 	Test::Mockingbird::restore_all();
 };
 
-# ── _get_closest ──────────────────────────────────────────────────────────────
+# -- _get_closest --------------------------------------------------------------
 
 subtest '_get_closest: sets _slanguage when base matches supported entry' => sub {
 	local %ENV = ();
@@ -486,7 +484,7 @@ subtest '_get_closest: no match leaves _slanguage untouched' => sub {
 	ok(!exists $l->{_slanguage}, '_slanguage not set when no match');
 };
 
-# ── country() ─────────────────────────────────────────────────────────────────
+# -- country() -----------------------------------------------------------------
 
 subtest 'country: quick return when _country already cached on object' => sub {
 	local %ENV = ();
@@ -630,7 +628,7 @@ subtest 'country: result is stored in CHI cache' => sub {
 subtest 'country: numeric country in cache triggers removal' => sub {
 	local %ENV = (REMOTE_ADDR => '8.8.8.8');
 	my $cache = _fresh_cache();
-	# Pre-seed with a numeric country (invalid — would have been a bug)
+	# Pre-seed with a numeric country (invalid - would have been a bug)
 	$cache->set($CACHE_NS . 'country:8.8.8.8', '404', '1 month');
 	Test::Mockingbird::mock('IP::Country::Fast', 'inet_atocc', sub { 'US' });
 	my $l = CGI::Lingua->new(supported => ['en'], cache => $cache);
@@ -644,7 +642,7 @@ subtest 'country: numeric country in cache triggers removal' => sub {
 	Test::Mockingbird::restore_all();
 };
 
-# ── _handle_eu_country ────────────────────────────────────────────────────────
+# -- _handle_eu_country --------------------------------------------------------
 
 subtest '_handle_eu_country: Baidu subnet maps to cn' => sub {
 	# 185.10.104.1 is inside the Baidu subnet 185.10.104.0/22
@@ -663,7 +661,7 @@ subtest '_handle_eu_country: non-Baidu EU address becomes Unknown' => sub {
 	is($l->{_country}, 'Unknown', 'Non-Baidu EU address becomes Unknown');
 };
 
-# ── _code2language ────────────────────────────────────────────────────────────
+# -- _code2language ------------------------------------------------------------
 
 subtest '_code2language: returns undef for empty/undef code' => sub {
 	local %ENV = ();
@@ -706,7 +704,7 @@ subtest '_code2language: stores result in cache and returns the value (not set()
 	Test::Mockingbird::restore_all();
 };
 
-# ── _code2country ─────────────────────────────────────────────────────────────
+# -- _code2country -------------------------------------------------------------
 
 subtest '_code2country: returns undef for empty/undef code' => sub {
 	local %ENV = ();
@@ -729,7 +727,7 @@ subtest '_code2country: suppresses "No result found" warning' => sub {
 
 subtest '_code2country: suppression filter is narrowly scoped' => sub {
 	# The regex /No result found in country table/ must only match its own
-	# specific message — not generic Locale warnings or other messages.
+	# specific message - not generic Locale warnings or other messages.
 	# Directly validate the filter without calling warn() to avoid
 	# interaction with the enclosing $SIG{__WARN__} capture.
 	my $pattern = qr/No result found in country table/;
@@ -742,7 +740,7 @@ subtest '_code2country: suppression filter is narrowly scoped' => sub {
 		'Filter does not suppress other Locale errors');
 };
 
-# ── _code2countryname ─────────────────────────────────────────────────────────
+# -- _code2countryname ---------------------------------------------------------
 
 subtest '_code2countryname: returns undef for empty/undef code' => sub {
 	local %ENV = ();
@@ -774,7 +772,7 @@ subtest '_code2countryname: stores name in cache and returns it (not set() resul
 		'Same value stored in cache as returned');
 };
 
-# ── _log ──────────────────────────────────────────────────────────────────────
+# -- _log ----------------------------------------------------------------------
 
 subtest '_log: appends to messages array' => sub {
 	local %ENV = ();
@@ -836,7 +834,7 @@ subtest '_log: no-op for empty message list' => sub {
 	is(scalar @{$l->{messages} // []}, $count, 'Empty _log does not append to messages');
 };
 
-# ── _debug / _info / _notice / _trace ─────────────────────────────────────────
+# -- _debug / _info / _notice / _trace -----------------------------------------
 
 subtest '_debug/_info/_notice/_trace delegate to _log with correct level' => sub {
 	local %ENV = ();
@@ -849,7 +847,7 @@ subtest '_debug/_info/_notice/_trace delegate to _log with correct level' => sub
 	}
 };
 
-# ── _warn ─────────────────────────────────────────────────────────────────────
+# -- _warn ---------------------------------------------------------------------
 
 subtest '_warn: with logger calls logger->warn() with extracted string' => sub {
 	local %ENV = ();
@@ -874,16 +872,16 @@ subtest '_warn: without logger appends to messages and carps' => sub {
 	my $l = _basic_obj();
 	$l->{logger} = undef;    # force the Carp::carp code path
 	my @carp_msgs;
-	# carp is now imported into CGI::Lingua at compile time (use Carp qw(carp)),
-	# so we must mock CGI::Lingua::carp — mocking Carp::carp would miss it.
-	Test::Mockingbird::mock('CGI::Lingua', 'carp', sub { push @carp_msgs, $_[0] });
+	# CGI::Lingua calls Carp::carp by its full name (nothing is imported), so
+	# Carp::carp is what to mock
+	Test::Mockingbird::mock('Carp', 'carp', sub { push @carp_msgs, $_[0] });
 	$l->_warn({ warning => 'carp test' });
-	ok((grep { /carp test/ } @carp_msgs), 'CGI::Lingua::carp called with message text');
+	ok((grep { /carp test/ } @carp_msgs), 'Carp::carp called with message text');
 	ok((grep { $_->{message} =~ /carp test/ } @{$l->{messages}}), 'Message recorded internally');
 	Test::Mockingbird::restore_all();
 };
 
-# ── locale() ─────────────────────────────────────────────────────────────────
+# -- locale() -----------------------------------------------------------------
 
 subtest 'locale: quick return when _locale already set' => sub {
 	local %ENV = ();
@@ -895,7 +893,7 @@ subtest 'locale: quick return when _locale already set' => sub {
 
 subtest 'locale: GEOIP_COUNTRY_CODE validated before use in locale()' => sub {
 	# The security fix from critique: locale() must apply the same ISO 3166-1
-	# check as country() — an invalid value must not be passed to _code2country.
+	# check as country() - an invalid value must not be passed to _code2country.
 	local %ENV = (GEOIP_COUNTRY_CODE => 'NOT_CC');
 	my $l = _basic_obj();
 	my $called = 0;
@@ -919,7 +917,7 @@ subtest 'locale: valid GEOIP_COUNTRY_CODE used after validation' => sub {
 	Test::Mockingbird::restore_all();
 };
 
-# ── time_zone() ───────────────────────────────────────────────────────────────
+# -- time_zone() ---------------------------------------------------------------
 
 subtest 'time_zone: quick return when _timezone cached' => sub {
 	local %ENV = (REMOTE_ADDR => '8.8.8.8');
@@ -939,7 +937,7 @@ subtest 'time_zone: invalid REMOTE_ADDR warns and returns undef' => sub {
 	Test::Mockingbird::restore_all();
 };
 
-# ── Memory cycle tests ────────────────────────────────────────────────────────
+# -- Memory cycle tests --------------------------------------------------------
 # CGI::Lingua stores caches, loggers, and self-referential state.  Ensure
 # none of these create reference cycles that would block garbage collection.
 
@@ -976,7 +974,7 @@ subtest 'No memory cycles in frozen DESTROY copy' => sub {
 	memory_cycle_ok($thawed, 'Thawed DESTROY copy has no cycles');
 };
 
-# ── _sorted_tokens ────────────────────────────────────────────────────────────
+# -- _sorted_tokens ------------------------------------------------------------
 
 subtest '_sorted_tokens: returns arrayref sorted by q descending' => sub {
 	local %ENV = ();
@@ -1004,7 +1002,7 @@ subtest '_sorted_tokens: empty header returns empty arrayref' => sub {
 	is(scalar @{$sorted}, 0, 'No entries for empty header');
 };
 
-# ── is_rtl() / text_direction() ──────────────────────────────────────────────
+# -- is_rtl() / text_direction() ----------------------------------------------
 
 subtest 'is_rtl: returns 1 for Arabic' => sub {
 	local %ENV = (HTTP_ACCEPT_LANGUAGE => 'ar');
@@ -1042,7 +1040,7 @@ subtest 'text_direction: returns ltr for French' => sub {
 	is($l->text_direction(), 'ltr', 'French text direction is ltr');
 };
 
-# ── plural_category() ────────────────────────────────────────────────────────
+# -- plural_category() --------------------------------------------------------
 
 subtest 'plural_category: English one/other' => sub {
 	local %ENV = (HTTP_ACCEPT_LANGUAGE => 'en');
@@ -1076,7 +1074,7 @@ subtest 'plural_category: Russian three forms' => sub {
 
 subtest 'plural_category: falls back to one/other for unknown language' => sub {
 	# Construct directly with a code not in %PLURAL_RULES
-	local %ENV = (HTTP_ACCEPT_LANGUAGE => 'tlh'); # Klingon — not in table
+	local %ENV = (HTTP_ACCEPT_LANGUAGE => 'tlh'); # Klingon - not in table
 	my $l = CGI::Lingua->new(supported => ['tlh', 'en']);
 	# language will be Unknown, so language_code_alpha2 returns undef
 	# plural_category must return 'other' without dying
@@ -1085,7 +1083,7 @@ subtest 'plural_category: falls back to one/other for unknown language' => sub {
 	ok(defined $cat, 'Returns a defined value');
 };
 
-# ── translation_file() ───────────────────────────────────────────────────────
+# -- translation_file() -------------------------------------------------------
 
 subtest 'translation_file: returns undef when dir arg is undef' => sub {
 	local %ENV = (HTTP_ACCEPT_LANGUAGE => 'en');
@@ -1133,6 +1131,1017 @@ subtest 'translation_file: accepts extension with leading dot' => sub {
 	local %ENV = (HTTP_ACCEPT_LANGUAGE => 'de');
 	my $l = CGI::Lingua->new(supported => ['de']);
 	is($l->translation_file($dir, '.json'), "$dir/de.json", 'Leading dot normalised');
+};
+
+# =============================================================================
+# Second pass: helpers that had no direct tests, and hostile inputs.
+#
+# Strategy: every helper is driven with the minimum state it needs.  Other
+# CGI::Lingua subs that a helper calls are mocked so that a failure points at
+# the helper under test, not at its collaborators.  Most subtests here are
+# negative: they feed malformed, oversized or injected values, or make a
+# dependency die mid-call, and check that the helper fails closed (returns
+# undef/0, warns, or croaks with the documented message) without corrupting
+# the object or leaking Perl warnings.
+# =============================================================================
+
+# Values used by more than one subtest.  Kept here so that each expectation
+# is written once and the subtests read as intent, not as literals.
+Readonly my %CFG => (
+	baidu_first        => '185.10.104.0',
+	baidu_last         => '185.10.107.255',
+	baidu_below        => '185.10.103.255',
+	baidu_above        => '185.10.108.0',
+	public_v4          => '8.8.8.8',
+	public_v6          => '2001:db8::1',
+	ua_max             => 512,	# HTTP_USER_AGENT limit in locale()
+	accept_lang_max    => 256,	# HTTP_ACCEPT_LANGUAGE limit in _what_language()
+	many_tokens        => 5_000,	# large but bounded header for _sorted_tokens
+	long_string_len    => 10_000,
+	tz_hostile         => 'Europe/London<script>alert(1)</script>',
+	whois_crlf         => "GB\r\nX-Injected: evil",
+	sentinel           => 'caller-owned value',
+	plural_croak       => qr/^plural_category: \$n must be defined at /,
+	missing_supported  => qr/^You must give a list of supported languages at /,
+	bad_ref_supported  => qr/^List of supported languages must be an array ref at /,
+	short_code         => qr/^Supported languages must be the short code at /,
+);
+
+# Pre-require every module whose functions are mocked below.  A module's own
+# BEGIN/import code would otherwise overwrite a mock installed before its
+# first lazy require inside CGI::Lingua.
+my $HAS_LWP   = eval { require LWP::Simple::WithCache; 1 } ? 1 : 0;
+my $HAS_JSONP = eval { require JSON::Parse; 1 } ? 1 : 0;
+my $HAS_WHOIS = eval { require Net::Whois::IP; require Net::Whois::IANA; 1 } ? 1 : 0;
+require I18N::AcceptLanguage;
+
+# Stop every remote look-up.  Called at the start of this section and after
+# each restore_all(), because restore_all() also removes these mocks.
+sub _block_network {
+	Test::Mockingbird::mock('CGI::Lingua', '_resolve_country_via_whois', sub { });
+	if($HAS_LWP) {
+		local $SIG{__WARN__} = sub { };	# prototype mismatch on get($)
+		Test::Mockingbird::mock('LWP::Simple::WithCache', 'get', sub { undef });
+	}
+}
+
+sub _reset_mocks {
+	local $SIG{__WARN__} = sub { };
+	Test::Mockingbird::restore_all();
+	_block_network();
+}
+
+_block_network();
+
+# A logger that records every call, so subtests can assert on warnings
+# without the noise of carp().  Injected directly into $obj->{logger} because
+# Object::Configure replaces anything passed to new().
+{
+	package Spy::Logger;
+	sub new { return bless { calls => [] }, shift }
+	for my $level (qw(debug info notice trace warn error)) {
+		no strict 'refs';
+		*{$level} = sub { push @{$_[0]{calls}}, [$level, $_[1]] };
+	}
+	sub messages {
+		my ($self, $level) = @_;
+		return map { $_->[1] } grep { $_->[0] eq $level } @{$self->{calls}};
+	}
+}
+
+# Minimal stand-ins for Locale::Object::Country / ::Language, so that the
+# language-from-IP logic can be tested without the SQLite database.
+{
+	package Fake::Language;
+	sub new { my ($c, %a) = @_; return bless { %a }, $c }
+	sub name { $_[0]{name} }
+	sub code_alpha2 { $_[0]{code} }
+
+	package Fake::Country;
+	sub new { my ($c, %a) = @_; return bless { %a }, $c }
+	sub name { $_[0]{name} }
+	sub languages_official { @{$_[0]{languages} || []} }
+}
+
+# Object with a spy logger already attached.
+sub _spied_obj {
+	my (%args) = @_;
+	my $l = CGI::Lingua->new(supported => ['en', 'fr'], %args);
+	my $spy = Spy::Logger->new();
+	$l->{logger} = $spy;
+	return ($l, $spy);
+}
+
+# Run a block and return every Perl warning it raised.  Used to prove that
+# hostile input does not leak "uninitialized" or "isn't numeric" noise.
+sub _warnings_from(&) {
+	my $code = shift;
+	my @w;
+	local $SIG{__WARN__} = sub { push @w, $_[0] };
+	$code->();
+	return @w;
+}
+
+# -- _is_ipv4 -----------------------------------------------------------------
+
+subtest '_is_ipv4: accepts the full valid range' => sub {
+	# Boundary values: the lowest and highest legal octets
+	ok(CGI::Lingua::_is_ipv4($_), "$_ is IPv4") for qw(0.0.0.0 255.255.255.255 8.8.8.8);
+};
+
+subtest '_is_ipv4: rejects malformed and hostile addresses' => sub {
+	# Each of these has slipped through a naive regex in some codebase;
+	# the helper is the last line of defence when Data::Validate::IP is absent.
+	my %bad = (
+		'octet over 255'         => '256.1.1.1',
+		'three octets'           => '1.2.3',
+		'five octets'            => '1.2.3.4.5',
+		'four-digit octet'       => '1.2.3.1000',
+		'trailing newline'       => "1.2.3.4\n",
+		'leading space'          => ' 1.2.3.4',
+		'shell injection'        => '1.2.3.4;rm -rf /',
+		'negative octet'         => '-1.2.3.4',
+		'empty string'           => '',
+		'IPv6'                   => '::1',
+		'Arabic-Indic digits'    => join('.', ("\x{661}") x 4),
+	);
+	my @w = _warnings_from {
+		for my $why (sort keys %bad) {
+			ok(!CGI::Lingua::_is_ipv4($bad{$why}), "rejects $why");
+		}
+		ok(!CGI::Lingua::_is_ipv4(undef), 'rejects undef');
+	};
+	is(scalar(@w), 0, 'no Perl warnings for hostile input') or diag(explain(\@w));
+};
+
+# -- _is_ipv6 -----------------------------------------------------------------
+
+subtest '_is_ipv6: accepts valid addresses' => sub {
+	ok(CGI::Lingua::_is_ipv6($_), "$_ is IPv6") for ('::1', $CFG{public_v6}, '::ffff:1.2.3.4', 'fe80::1');
+};
+
+subtest '_is_ipv6: rejects malformed and hostile addresses' => sub {
+	my %bad = (
+		'IPv4'               => '1.2.3.4',
+		'non-hex group'      => 'gggg::1',
+		'two double colons'  => '1::2::3',
+		'shell injection'    => '::1;id',
+		'empty string'       => '',
+		'too many groups'    => '1:2:3:4:5:6:7:8:9',
+	);
+	for my $why (sort keys %bad) {
+		ok(!CGI::Lingua::_is_ipv6($bad{$why}), "rejects $why");
+	}
+	ok(!CGI::Lingua::_is_ipv6(undef), 'rejects undef');
+};
+
+subtest '_is_ipv6: structural fallback works without Socket::inet_pton' => sub {
+	# Strategy: hide inet_pton to force the pure-regex branch, which is what
+	# runs on very old Perls.  The branch used tr/::// (a character count),
+	# so it could never return true; these positives guard that fix.
+	no warnings qw(redefine once);
+	local *Socket::inet_pton;
+	ok(!defined(&Socket::inet_pton), 'inet_pton hidden for this block');
+	ok(CGI::Lingua::_is_ipv6($CFG{public_v6}), "fallback accepts $CFG{public_v6}");
+	ok(CGI::Lingua::_is_ipv6('::1'), 'fallback accepts ::1');
+	ok(CGI::Lingua::_is_ipv6('::ffff:1.2.3.4'), 'fallback accepts mixed notation');
+	ok(!CGI::Lingua::_is_ipv6('1::2::3'), 'fallback rejects two "::"');
+	ok(!CGI::Lingua::_is_ipv6('zz::1'), 'fallback rejects non-hex');
+	ok(!CGI::Lingua::_is_ipv6("::1\n"), 'fallback rejects trailing newline');
+};
+
+# -- _is_private_ip / _is_loopback_ip ------------------------------------------
+
+subtest '_is_private_ip: RFC 1918, link-local and ULA ranges' => sub {
+	ok(CGI::Lingua::_is_private_ip($_), "$_ is private")
+		for qw(10.0.0.1 172.16.0.1 172.31.255.255 192.168.1.1 169.254.1.1 fe80::1 fd00::1);
+};
+
+subtest '_is_private_ip: addresses just outside the private ranges' => sub {
+	# Off-by-one at the 172.16/12 edges is the classic mistake here
+	ok(!CGI::Lingua::_is_private_ip($_), "$_ is not private")
+		for ('172.15.255.255', '172.32.0.1', '192.169.0.1', '11.0.0.1', $CFG{public_v4}, $CFG{public_v6});
+	ok(!CGI::Lingua::_is_private_ip(undef), 'undef is not private');
+};
+
+subtest '_is_loopback_ip: loopback detection and near misses' => sub {
+	ok(CGI::Lingua::_is_loopback_ip($_), "$_ is loopback") for qw(127.0.0.1 127.255.255.254 ::1);
+	ok(!CGI::Lingua::_is_loopback_ip($_), "$_ is not loopback") for qw(128.0.0.1 ::2 1.127.0.0);
+	ok(!CGI::Lingua::_is_loopback_ip(undef), 'undef is not loopback');
+};
+
+# -- _clean_country_code --------------------------------------------------------
+
+subtest '_clean_country_code: strips Whois decoration' => sub {
+	is(CGI::Lingua::_clean_country_code("US\r"), 'US', 'trailing CR removed');
+	is(CGI::Lingua::_clean_country_code('GB # United Kingdom'), 'GB', 'trailing comment removed');
+};
+
+subtest '_clean_country_code: malformed values return undef' => sub {
+	# Whois data is attacker-influenced; anything that is not exactly a
+	# two-letter code must be refused, never "repaired".
+	my %bad = (
+		'CRLF header injection' => $CFG{whois_crlf},
+		'three letters'         => 'GBR',
+		'digits'                => '12',
+		'embedded space'        => 'G B',
+		'markup'                => '<b>',
+		'empty'                 => '',
+	);
+	my @w = _warnings_from {
+		for my $why (sort keys %bad) {
+			ok(!defined(CGI::Lingua::_clean_country_code($bad{$why})), "rejects $why");
+		}
+		ok(!defined(CGI::Lingua::_clean_country_code(undef)), 'undef in, undef out');
+	};
+	is(scalar(@w), 0, 'no warnings, even for undef');
+};
+
+# -- _in_baidu_subnet -----------------------------------------------------------
+
+subtest '_in_baidu_subnet: both ends of 185.10.104.0/22 are inside' => sub {
+	ok(CGI::Lingua::_in_baidu_subnet($CFG{baidu_first}), 'first address');
+	ok(CGI::Lingua::_in_baidu_subnet($CFG{baidu_last}), 'last address');
+};
+
+subtest '_in_baidu_subnet: neighbours and malformed input are outside' => sub {
+	# 185.10.104.300 used to wrap to .44 inside pack('C') and match
+	my @w = _warnings_from {
+		ok(!CGI::Lingua::_in_baidu_subnet($CFG{baidu_below}), 'address below the block');
+		ok(!CGI::Lingua::_in_baidu_subnet($CFG{baidu_above}), 'address above the block');
+		ok(!CGI::Lingua::_in_baidu_subnet('185.10.104.300'), 'out-of-range octet');
+		ok(!CGI::Lingua::_in_baidu_subnet("$CFG{baidu_first}\n"), 'trailing newline');
+		ok(!CGI::Lingua::_in_baidu_subnet('not an address'), 'garbage');
+		ok(!CGI::Lingua::_in_baidu_subnet('::ffff:185.10.104.1'), 'IPv6 form');
+		ok(!CGI::Lingua::_in_baidu_subnet(undef), 'undef');
+	};
+	is(scalar(@w), 0, 'no pack() wrap or uninitialized warnings') or diag(explain(\@w));
+};
+
+# -- _country_short_name ---------------------------------------------------------
+
+subtest '_country_short_name: override table and Locale::Codes fallback' => sub {
+	my $l = _basic_obj();
+	is($l->_country_short_name('gb'), 'United Kingdom', 'override wins over the ISO long name');
+	is($l->_country_short_name('GB'), 'United Kingdom', 'case-insensitive');
+	is($l->_country_short_name('fr'), 'France', 'non-overridden code from Locale::Codes');
+};
+
+subtest '_country_short_name: unknown and hostile codes return undef' => sub {
+	my $l = _basic_obj();
+	my @w = _warnings_from {
+		ok(!defined($l->_country_short_name($_)), "undef for '" . ($_ =~ s/\n/\\n/r) . "'")
+			for ('zz', '', "gb\n", '../etc/passwd', 'x' x $CFG{long_string_len});
+		ok(!defined($l->_country_short_name(undef)), 'undef for undef');
+	};
+	is(scalar(@w), 0, 'no warnings');
+};
+
+# -- _resolve_country_via_whois --------------------------------------------------
+
+# Install narrow mocks for both Whois modules.  $ip_result is what
+# whoisip_query returns (or a coderef to run); $iana_cc is IANA's answer.
+sub _mock_whois {
+	my (%args) = @_;
+	Test::Mockingbird::unmock('CGI::Lingua', '_resolve_country_via_whois');
+	Test::Mockingbird::mock('Net::Whois::IP', 'whoisip_query', sub {
+		my $r = $args{ip_result};
+		return ref($r) eq 'CODE' ? $r->() : $r;
+	});
+	Test::Mockingbird::mock('Net::Whois::IANA', 'whois_query', sub {
+		die "IANA unreachable\n" if $args{iana_dies};
+		return 1;
+	});
+	Test::Mockingbird::mock('Net::Whois::IANA', 'country', sub { $args{iana_cc} });
+}
+
+subtest '_resolve_country_via_whois: Whois answer is used and cleaned' => sub {
+	plan(skip_all => 'Net::Whois::IP / Net::Whois::IANA not installed') unless $HAS_WHOIS;
+	_mock_whois(ip_result => { Country => "GB\r" }, iana_cc => 'XX');
+	my $l = _basic_obj();
+	$l->_resolve_country_via_whois($CFG{public_v4});
+	is($l->{_country}, 'GB', 'Country field used, CR stripped, IANA not needed');
+	_reset_mocks();
+};
+
+subtest '_resolve_country_via_whois: lower-case key and Puerto Rico rule' => sub {
+	plan(skip_all => 'Net::Whois modules not installed') unless $HAS_WHOIS;
+	_mock_whois(ip_result => { country => 'FR' });
+	my $l = _basic_obj();
+	$l->_resolve_country_via_whois($CFG{public_v4});
+	is($l->{_country}, 'FR', "'country' key accepted when 'Country' is absent");
+	_reset_mocks();
+
+	# RT#131347: a US record whose StateProv is PR is Puerto Rico
+	_mock_whois(ip_result => { Country => 'US', StateProv => 'PR' });
+	$l = _basic_obj();
+	$l->_resolve_country_via_whois($CFG{public_v4});
+	is($l->{_country}, 'pr', 'US/PR becomes pr');
+	_reset_mocks();
+};
+
+subtest '_resolve_country_via_whois: Whois failures fall through to IANA' => sub {
+	plan(skip_all => 'Net::Whois modules not installed') unless $HAS_WHOIS;
+	# Each failure mode must lead to the IANA look-up, never to a crash
+	my %failures = (
+		'query dies'          => sub { die "connection refused\n" },
+		'query warns'         => sub { warn "timeout\n"; return { Country => 'GB' } },
+		'non-hash result'     => 'garbage string',
+		'undef result'        => undef,
+		'EU is not a country' => { Country => 'EU' },
+		'CRLF injection'      => { Country => $CFG{whois_crlf} },
+	);
+	for my $why (sort keys %failures) {
+		_mock_whois(ip_result => $failures{$why}, iana_cc => 'DE');
+		my $l = _basic_obj();
+		my @w = _warnings_from { $l->_resolve_country_via_whois($CFG{public_v4}) };
+		is($l->{_country}, 'DE', "$why: IANA answer used");
+		is(scalar(@w), 0, "$why: no warning escapes");
+		_reset_mocks();
+	}
+};
+
+subtest '_resolve_country_via_whois: both sources failing leaves no country' => sub {
+	plan(skip_all => 'Net::Whois modules not installed') unless $HAS_WHOIS;
+	for my $case (
+		[ 'IANA dies',             { ip_result => undef, iana_dies => 1 } ],
+		[ 'IANA returns undef',    { ip_result => undef, iana_cc => undef } ],
+		[ 'IANA returns injected', { ip_result => undef, iana_cc => $CFG{whois_crlf} } ],
+	) {
+		my ($why, $args) = @{$case};
+		_mock_whois(%{$args});
+		my $l = _basic_obj();
+		lives_ok { $l->_resolve_country_via_whois($CFG{public_v4}) } "$why: lives";
+		ok(!defined($l->{_country}), "$why: _country not set");
+		_reset_mocks();
+	}
+};
+
+# -- _load_geoip ----------------------------------------------------------------
+
+subtest '_load_geoip: no database file means GEO_ABSENT' => sub {
+	# Strategy: the -r file probes cannot be mocked, so this runs only on
+	# hosts without a GeoIP.dat; t/geoip.t covers the present case.
+	my $db = grep { -r } qw(/usr/share/GeoIP/GeoIP.dat /usr/local/share/GeoIP/GeoIP.dat c:/GeoIP/GeoIP.dat);
+	plan(skip_all => 'a GeoIP.dat is installed') if $db;
+	my $l = _basic_obj();
+	lives_ok { $l->_load_geoip() } 'does not die';
+	is($l->{_have_geoip}, $GEO_ABSENT, 'sentinel set to GEO_ABSENT');
+	ok(!exists($l->{_geoip}), 'no Geo::IP handle created');
+};
+
+# -- _accept_language_match -----------------------------------------------------
+
+subtest '_accept_language_match: direct and fallback matches' => sub {
+	local %ENV = ();
+	my $l = CGI::Lingua->new(supported => ['en', 'fr']);
+	is_deeply([$l->_accept_language_match('fr')], ['fr', undef], 'exact match, no sublanguage');
+	is_deeply([$l->_accept_language_match('en-us')], ['en', undef],
+		'strict matching accepts the base of a variant directly');
+};
+
+subtest '_accept_language_match: fallback scan reports the unsupported variant' => sub {
+	# Strategy: make the strict whole-header match fail so that the q-sorted
+	# pair scan runs; it must return the base and the variant separately.
+	local %ENV = ();
+	my $l = CGI::Lingua->new(supported => ['en']);
+	Test::Mockingbird::mock('I18N::AcceptLanguage', 'accepts', sub {
+		my ($self, $tag) = @_;
+		return $tag eq 'en' ? 'en' : undef;
+	});
+	is_deeply([$l->_accept_language_match('de;q=0.1,en-us;q=0.9')], ['en', 'us'],
+		'base and variant returned by the pair scan');
+	_reset_mocks();
+};
+
+subtest '_accept_language_match: nothing supported gives (undef, undef)' => sub {
+	local %ENV = ();
+	my $l = CGI::Lingua->new(supported => ['en', 'fr']);
+	is_deeply([$l->_accept_language_match('de-de,ja;q=0.5')], [undef, undef], 'no match');
+};
+
+subtest '_accept_language_match: a variant the client did not ask for is discarded' => sub {
+	# I18N::AcceptLanguage strict mode can answer 'en-gb' for a request that
+	# never mentioned it.  Trusting it would serve the wrong language.
+	local %ENV = ();
+	my $l = CGI::Lingua->new(supported => ['en-gb']);
+	Test::Mockingbird::mock('I18N::AcceptLanguage', 'accepts', sub {
+		my ($self, $header) = @_;
+		return $header eq 'de-at' ? 'en-gb' : undef;
+	});
+	is_deeply([$l->_accept_language_match('de-at')], [undef, undef], 'bogus answer rejected');
+	_reset_mocks();
+};
+
+subtest '_accept_language_match: only "uninitialized" warnings are suppressed' => sub {
+	# RT 74338: the suppression must be narrow, or real problems in
+	# I18N::AcceptLanguage would disappear silently.
+	local %ENV = ();
+	my $l = CGI::Lingua->new(supported => ['en']);
+	Test::Mockingbird::mock('I18N::AcceptLanguage', 'accepts', sub {
+		warn "Use of uninitialized value in pattern match\n";
+		warn "Something important\n";
+		return 'en';
+	});
+	my @w = _warnings_from { $l->_accept_language_match('en') };
+	is_deeply(\@w, ["Something important\n"], 'unrelated warning passes through');
+	_reset_mocks();
+};
+
+subtest '_accept_language_match: caller $SIG{__WARN__} is restored' => sub {
+	local %ENV = ();
+	my $l = CGI::Lingua->new(supported => ['en']);
+	my $handler = sub { };
+	local $SIG{__WARN__} = $handler;
+	$l->_accept_language_match('en');
+	is($SIG{__WARN__}, $handler, 'handler is the same coderef after the call');
+};
+
+# -- _resolve_match -------------------------------------------------------------
+
+subtest '_resolve_match: dispatches on the shape of the matched code' => sub {
+	my $l = _basic_obj();
+	my @calls;
+	Test::Mockingbird::mock('CGI::Lingua', '_resolve_base_match', sub { shift; push @calls, ['base', @_]; 1 });
+	Test::Mockingbird::mock('CGI::Lingua', '_resolve_sublanguage_match', sub { shift; push @calls, ['sub', @_]; 1 });
+
+	$l->_resolve_match('en', 'us', 'en-us');
+	$l->_resolve_match('en-gb', undef, 'en-gb');
+	is_deeply(\@calls, [
+		['base', 'en', 'us', 'en-us'],
+		['sub', 'en-gb', 'en', 'gb', 'en-gb'],
+	], 'base and sublanguage helpers receive the split code');
+	_reset_mocks();
+};
+
+subtest '_resolve_match: malformed codes resolve to nothing' => sub {
+	# A three-letter or numeric region (es-419, en-gbx) has no ISO 3166-1
+	# alpha-2 variety; neither helper may be called with a bad split.
+	my $l = _basic_obj();
+	my $called = 0;
+	Test::Mockingbird::mock('CGI::Lingua', '_resolve_sublanguage_match', sub { $called++; 1 });
+	is($l->_resolve_match($_, undef, $_), 0, "$_ returns 0") for qw(en-gbx es-419);
+	is($called, 0, 'sublanguage helper never called');
+	_reset_mocks();
+};
+
+# -- _resolve_base_match --------------------------------------------------------
+
+subtest '_resolve_base_match: names the variant the client asked for' => sub {
+	my $l = _basic_obj();
+	Test::Mockingbird::mock('CGI::Lingua', '_code2language', sub { 'English' });
+	Test::Mockingbird::mock('CGI::Lingua', '_code2country', sub { Fake::Country->new(name => 'United States') });
+	is($l->_resolve_base_match('en', undef, 'en-us'), 1, 'returns 1 on success');
+	is($l->{_slanguage}, 'English', '_slanguage set');
+	is($l->{_slanguage_code_alpha2}, 'en', 'code set');
+	is($l->{_rlanguage}, 'English (United States)', 'requested variant named');
+	_reset_mocks();
+};
+
+subtest '_resolve_base_match: unknown variant is labelled, not dropped' => sub {
+	my $l = _basic_obj();
+	Test::Mockingbird::mock('CGI::Lingua', '_code2language', sub { 'English' });
+	Test::Mockingbird::mock('CGI::Lingua', '_code2countryname', sub { undef });
+	$l->_resolve_base_match('en', 'zz', 'en');
+	is($l->{_rlanguage}, 'English (Unknown: zz)', 'unknown variant shown to the caller');
+	_reset_mocks();
+};
+
+subtest '_resolve_base_match: unknown language code fails without side effects' => sub {
+	my $l = _basic_obj();
+	Test::Mockingbird::mock('CGI::Lingua', '_code2language', sub { undef });
+	is($l->_resolve_base_match('xx', undef, 'xx'), 0, 'returns 0');
+	ok(!defined($l->{_slanguage_code_alpha2}), 'no code recorded');
+	ok(!defined($l->{_rlanguage}), 'no requested language recorded');
+	_reset_mocks();
+};
+
+# -- _resolve_sublanguage_match -------------------------------------------------
+
+# Object for en-gb whose country name comes from the cache, so the test
+# does not depend on the Locale::Object database.
+sub _en_gb_obj {
+	my ($cached) = @_;
+	my $cache = _fresh_cache();
+	$cache->set("${CACHE_NS}variety:gb", $cached) if defined $cached;
+	my $l = CGI::Lingua->new(supported => ['en-gb'], cache => $cache);
+	my $spy = Spy::Logger->new();
+	$l->{logger} = $spy;
+	return ($l, $spy, $cache);
+}
+
+subtest '_resolve_sublanguage_match: cached variety name is used' => sub {
+	local %ENV = ();
+	my ($l) = _en_gb_obj('United Kingdom=en');
+	is($l->_resolve_sublanguage_match('en-gb', 'en', 'gb', 'en-gb'), 1, 'returns 1');
+	is($l->{_sublanguage}, 'United Kingdom', 'sublanguage from cache');
+	is($l->{_sublanguage_code_alpha2}, 'gb', 'variety code set');
+	is($l->{_rlanguage}, 'English (United Kingdom)', 'requested language includes variety');
+	diag(explain({ map { $_ => $l->{$_} } grep { /^_[sr]/ } keys %{$l} })) if $ENV{TEST_VERBOSE};
+};
+
+subtest 'new / _find_language: deprecated en-uk is treated as en-gb' => sub {
+	# The rule is applied where the tag enters: in the supported list (new)
+	# and anywhere in the header (_find_language), not only when the header
+	# is exactly "en-uk".  The caller's own array must not be rewritten.
+	my @log;
+	my $supported = ['en-uk', 'fr'];
+	my $l = CGI::Lingua->new(supported => $supported, logger => \@log);
+	is_deeply($l->{_supported}, ['en-gb', 'fr'], 'supported entry rewritten in the object');
+	is_deeply($supported, ['en-uk', 'fr'], "caller's array unchanged");
+	ok((grep { $_->{message} eq 'Resetting country code to GB for en-uk' } @log), 'new(): warned');
+
+	local %ENV = (HTTP_ACCEPT_LANGUAGE => 'fr;q=0.1, en-UK');
+	my ($m, $spy) = _spied_obj(dont_use_ip => 1);
+	$m->{_supported} = ['en-gb'];
+	$m->_find_language();
+	is($m->{_sublanguage_code_alpha2}, 'gb', 'header tag inside a list is rewritten');
+	ok((grep { /^Resetting country code to GB for fr;q=0\.1,\s*en-UK$/ } $spy->messages('warn')), '_find_language(): warned');
+};
+
+subtest '_resolve_sublanguage_match: poisoned cache entry is not trusted' => sub {
+	# "=en" splits into an empty name; it used to produce "English ()"
+	local %ENV = ();
+	my ($l) = _en_gb_obj('=en');
+	$l->_resolve_sublanguage_match('en-gb', 'en', 'gb', 'en-gb');
+	is($l->{_sublanguage}, 'United Kingdom', 'empty cached name replaced by the real one');
+	unlike($l->{_rlanguage}, qr/\(\)/, 'no empty brackets in requested language');
+};
+
+subtest '_resolve_sublanguage_match: stale $@ from the caller is not reported' => sub {
+	# The helper inspects $@ after its own eval; an error left over from
+	# unrelated caller code must not be logged as if it happened here.
+	local %ENV = ();
+	my ($l, $spy) = _en_gb_obj('United Kingdom=en');
+	local $@ = "stale error from caller\n";
+	$l->_resolve_sublanguage_match('en-gb', 'en', 'gb', 'en-gb');
+	is($l->{_sublanguage}, 'United Kingdom', 'cached value kept');
+	ok(!(grep { /stale error/ } $spy->messages('warn')), 'stale error not logged');
+};
+
+subtest '_resolve_sublanguage_match: unsupported language returns 0' => sub {
+	local %ENV = ();
+	my $l = CGI::Lingua->new(supported => ['fr']);
+	$l->{logger} = Spy::Logger->new();
+	Test::Mockingbird::mock('CGI::Lingua', '_code2language', sub { 'English' });
+	is($l->_resolve_sublanguage_match('en-gb', 'en', 'gb', 'en-gb'), 0, 'returns 0');
+	ok(!defined($l->{_sublanguage}), 'no sublanguage');
+	ok(!defined($l->{_sublanguage_code_alpha2}), 'no variety code');
+	_reset_mocks();
+};
+
+# -- _find_language_from_ip -----------------------------------------------------
+
+# Country object whose official language is $name/$code.
+sub _country_speaking {
+	my ($name, $code) = @_;
+	return Fake::Country->new(languages => [ Fake::Language->new(name => $name, code => $code) ]);
+}
+
+subtest '_find_language_from_ip: official language of the country is chosen' => sub {
+	local %ENV = (REMOTE_ADDR => $CFG{public_v4});
+	my $cache = _fresh_cache();
+	my ($l) = _spied_obj(cache => $cache);
+	Test::Mockingbird::mock('CGI::Lingua', 'country', sub { 'fr' });
+	Test::Mockingbird::mock('CGI::Lingua', '_code2country', sub { _country_speaking('French', 'fr') });
+	$l->_find_language_from_ip(undef);
+	is($l->{_slanguage}, 'French', 'language set from the country');
+	is($l->{_slanguage_code_alpha2}, 'fr', 'code set');
+	is($cache->get("${CACHE_NS}language_name:fr"), 'French=fr', 'answer cached for the next visitor');
+	_reset_mocks();
+};
+
+subtest '_find_language_from_ip: cache hit skips the Locale look-up' => sub {
+	local %ENV = (REMOTE_ADDR => $CFG{public_v4});
+	my $cache = _fresh_cache();
+	$cache->set("${CACHE_NS}language_name:fr", 'French=fr');
+	my ($l) = _spied_obj(cache => $cache);
+	Test::Mockingbird::mock('CGI::Lingua', 'country', sub { 'fr' });
+	Test::Mockingbird::mock('CGI::Lingua', '_code2country', sub { die "must not be called\n" });
+	lives_ok { $l->_find_language_from_ip(undef) } 'no Locale look-up';
+	is($l->{_slanguage}, 'French', 'language from the cache');
+	_reset_mocks();
+};
+
+subtest '_find_language_from_ip: country from LANG when there is no IP' => sub {
+	local %ENV = (LANG => 'fr_FR.UTF-8');
+	my ($l) = _spied_obj();
+	my @asked;
+	Test::Mockingbird::mock('CGI::Lingua', 'country', sub { undef });
+	Test::Mockingbird::mock('CGI::Lingua', '_code2country', sub { push @asked, $_[1]; _country_speaking('French', 'fr') });
+	$l->_find_language_from_ip(undef);
+	is_deeply(\@asked, ['FR'], 'country taken from the LANG territory');
+	is($l->{_slanguage}, 'French', 'language found');
+	_reset_mocks();
+};
+
+subtest '_find_language_from_ip: no country and no LANG changes nothing' => sub {
+	local %ENV = ();
+	my ($l) = _spied_obj();
+	Test::Mockingbird::mock('CGI::Lingua', 'country', sub { undef });
+	Test::Mockingbird::mock('CGI::Lingua', '_code2country', sub { die "must not be called\n" });
+	lives_ok { $l->_find_language_from_ip(undef) } 'returns quietly';
+	ok(!exists($l->{_slanguage}), '_slanguage untouched');
+	_reset_mocks();
+};
+
+subtest '_find_language_from_ip: unsupported official language is reported readably' => sub {
+	# The warning used to print "ARRAY(0x...)" instead of the language list
+	local %ENV = (REMOTE_ADDR => $CFG{public_v4});
+	my ($l, $spy) = _spied_obj();
+	Test::Mockingbird::mock('CGI::Lingua', 'country', sub { 'de' });
+	Test::Mockingbird::mock('CGI::Lingua', '_code2country', sub { _country_speaking('German', 'de') });
+	$l->_find_language_from_ip(undef);
+	ok(!$l->{_slanguage}, 'no language chosen');
+	my ($msg) = $spy->messages('warn');
+	like($msg, qr/closest language for German in en, fr$/, 'supported list is printed');
+	unlike($msg // '', qr/ARRAY\(0x/, 'no stringified array ref');
+	_reset_mocks();
+};
+
+subtest '_find_language_from_ip: unknown country or no official language' => sub {
+	local %ENV = (REMOTE_ADDR => $CFG{public_v4});
+	for my $case (
+		[ 'Locale knows nothing', undef ],
+		[ 'no official language', Fake::Country->new(languages => []) ],
+	) {
+		my ($why, $country) = @{$case};
+		my ($l) = _spied_obj();
+		Test::Mockingbird::mock('CGI::Lingua', 'country', sub { 'zz' });
+		Test::Mockingbird::mock('CGI::Lingua', '_code2country', sub { $country });
+		lives_ok { $l->_find_language_from_ip(undef) } "$why: lives";
+		ok(!exists($l->{_slanguage}), "$why: no language");
+		_reset_mocks();
+	}
+};
+
+subtest '_find_language_from_ip: poisoned cache entry is discarded' => sub {
+	# A value without the "name=code" shape DESTROY writes must not be used
+	local %ENV = (LANG => 'xx');
+	my $cache = _fresh_cache();
+	$cache->set("${CACHE_NS}language_name:xx", 'garbage');
+	my ($l, $spy) = _spied_obj(cache => $cache);
+	Test::Mockingbird::mock('CGI::Lingua', 'country', sub { undef });
+	my @w = _warnings_from { $l->_find_language_from_ip(undef) };
+	is(scalar(@w), 0, 'no Perl warnings') or diag(explain(\@w));
+	ok((grep { /^Discarding malformed cache entry for \Q${CACHE_NS}\Elanguage_name:xx$/ } $spy->messages('warn')),
+		'poisoned entry reported through the logger');
+	ok(!defined($cache->get("${CACHE_NS}language_name:xx")), 'and removed from the cache');
+	ok(!$l->{_slanguage}, 'no language chosen from garbage');
+	_reset_mocks();
+};
+
+subtest '_find_language_from_ip: unmappable language without REMOTE_ADDR' => sub {
+	# Regression: the "Can't determine code from IP" warning interpolated an
+	# undef REMOTE_ADDR when the country came from LANG (command-line use).
+	# A header is given so the slow language2code() path is taken, and the
+	# official language name maps to no code.
+	local %ENV = (LANG => 'xx');
+	my ($l, $spy) = _spied_obj();
+	Test::Mockingbird::mock('CGI::Lingua', 'country', sub { undef });
+	Test::Mockingbird::mock('CGI::Lingua', '_code2country', sub { _country_speaking('Nolanguage', undef) });
+	my @w = _warnings_from { $l->_find_language_from_ip('zz') };
+	is(scalar(@w), 0, 'no Perl warnings') or diag(explain(\@w));
+	ok((grep { /^Can't determine code from IP \(none\) for requested language Nolanguage$/ } $spy->messages('warn')),
+		'problem reported through the logger');
+	ok(!$l->{_slanguage}, 'no language chosen');
+	_reset_mocks();
+};
+
+subtest '_find_language_from_ip: an existing language is not overwritten' => sub {
+	local %ENV = (REMOTE_ADDR => $CFG{public_v4});
+	my ($l) = _spied_obj();
+	$l->{_slanguage} = 'English';
+	Test::Mockingbird::mock('CGI::Lingua', 'country', sub { 'fr' });
+	Test::Mockingbird::mock('CGI::Lingua', '_code2country', sub { _country_speaking('French', 'fr') });
+	$l->_find_language_from_ip('en');
+	is($l->{_slanguage}, 'English', 'header choice wins over the IP guess');
+	_reset_mocks();
+};
+
+# -- _code2country / _sorted_tokens: hostile input -------------------------------
+
+subtest '_code2country: SQL metacharacters return undef' => sub {
+	# The code reaches an SQLite query inside Locale::Object
+	my $l = _basic_obj();
+	my $obj;
+	lives_ok { $obj = $l->_code2country(q{gb'; DROP TABLE country;--}) } 'lives';
+	ok(!defined($obj), 'no country for an injected code');
+};
+
+subtest '_sorted_tokens: equal q values keep header order' => sub {
+	my $l = _basic_obj();
+	my @tags = map { $_->[0] } @{$l->_sorted_tokens('de,fr;q=0.5,en,it;q=0.5')};
+	is_deeply(\@tags, [qw(de en fr it)], 'stable sort within each q value');
+};
+
+subtest '_sorted_tokens: degenerate and very large headers' => sub {
+	my $l = _basic_obj();
+	is_deeply($l->_sorted_tokens(',,, ,'), [], 'only separators gives no tokens');
+	my $big = join(',', ('en') x $CFG{many_tokens});
+	my $sorted;
+	lives_ok { $sorted = $l->_sorted_tokens($big) } 'large header parsed';
+	is(scalar(@{$sorted}), $CFG{many_tokens}, 'every token kept');
+};
+
+# -- Public methods: hostile input --------------------------------------------
+
+subtest 'new: false and malformed supported values croak with exact messages' => sub {
+	local %ENV = ();
+	# An arrayref logger keeps the expected error messages off STDERR
+	my @log;
+	throws_ok { CGI::Lingua->new(supported => 0, logger => \@log) } $CFG{missing_supported}, 'supported => 0';
+	throws_ok { CGI::Lingua->new(supported => '', logger => \@log) } $CFG{missing_supported}, "supported => ''";
+	throws_ok { CGI::Lingua->new(supported => undef, logger => \@log) } $CFG{missing_supported}, 'supported => undef';
+	throws_ok { CGI::Lingua->new(supported => { en => 1 }) } $CFG{bad_ref_supported}, 'hashref';
+	throws_ok { CGI::Lingua->new(supported => sub { 'en' }) } $CFG{bad_ref_supported}, 'coderef';
+	throws_ok { CGI::Lingua->new(supported => 'e') } $CFG{short_code}, 'one character';
+	throws_ok { CGI::Lingua->new(supported => 'english') } $CFG{short_code}, 'seven characters';
+};
+
+subtest 'new: supported_languages is an alias for supported' => sub {
+	local %ENV = (HTTP_ACCEPT_LANGUAGE => 'fr');
+	my $l = CGI::Lingua->new(supported_languages => ['fr']);
+	isa_ok($l, 'CGI::Lingua');
+	is($l->language(), 'French', 'alias honoured');
+};
+
+subtest 'country: hostile REMOTE_ADDR values are rejected' => sub {
+	my %bad = (
+		'shell injection'      => "$CFG{public_v4};cat /etc/passwd",
+		'mapped out-of-range'  => '::ffff:999.999.999.999',
+		'Arabic-Indic digits'  => join('.', ("\xd9\xa1") x 4),	# UTF-8 bytes; %ENV holds bytes
+		'overlong'             => '1' x $CFG{long_string_len},
+	);
+	for my $why (sort keys %bad) {
+		local %ENV = (REMOTE_ADDR => $bad{$why});
+		my ($l, $spy) = _spied_obj();
+		my $cc;
+		lives_ok { $cc = $l->country() } "$why: lives";
+		ok(!defined($cc), "$why: no country");
+		ok((grep { /isn't a valid IP address/ } $spy->messages('warn')), "$why: warned");
+	}
+};
+
+subtest 'country: malformed GEOIP_COUNTRY_CODE and HTTP_CF_IPCOUNTRY values are ignored' => sub {
+	# "GB\n" matters: /^..$/ allows a trailing newline, so the check must use \z.
+	# 'XX' is left out for Cloudflare because it is skipped without a warning.
+	for my $var (qw(GEOIP_COUNTRY_CODE HTTP_CF_IPCOUNTRY)) {
+		for my $bad ('gb', 'GBR', "GB\n", 'G1', '<b>') {
+			local %ENV = ($var => $bad);
+			my ($l, $spy) = _spied_obj();
+			my $shown = $bad =~ s/\n/\\n/r;
+			ok(!defined($l->country()), "$var '$shown' not trusted");
+			ok((grep { /$var contains an invalid/ } $spy->messages('warn')), "$var '$shown' warned");
+		}
+	}
+};
+
+subtest 'locale: GEOIP_COUNTRY_CODE with a trailing newline is not used' => sub {
+	# locale() has its own copy of the GEOIP_COUNTRY_CODE check
+	local %ENV = (GEOIP_COUNTRY_CODE => "GB\n");
+	my ($l) = _spied_obj();
+	my @asked;
+	Test::Mockingbird::mock('CGI::Lingua', 'country', sub { undef });
+	Test::Mockingbird::mock('CGI::Lingua', '_code2country', sub { push @asked, $_[1]; Fake::Country->new(name => 'United Kingdom') });
+	ok(!defined($l->locale()), 'no locale');
+	is_deeply(\@asked, [], 'country look-up never attempted');
+	_reset_mocks();
+};
+
+subtest 'time_zone: hostile ip-api.com answer is discarded' => sub {
+	plan(skip_all => 'LWP::Simple::WithCache or JSON::Parse not installed') unless $HAS_LWP && $HAS_JSONP;
+	local %ENV = (REMOTE_ADDR => $CFG{public_v4});
+	my ($l, $spy) = _spied_obj();
+	$l->{_have_geoip} = $GEO_ABSENT;	# force the web-service path
+	{
+		local $SIG{__WARN__} = sub { };
+		Test::Mockingbird::mock('LWP::Simple::WithCache', 'get', sub {
+			JSON::PP::encode_json({ timezone => $CFG{tz_hostile} });
+		});
+	}
+	ok(!defined($l->time_zone()), 'undef returned');
+	ok((grep { /Discarding malformed timezone/ } $spy->messages('warn')), 'warned');
+	_reset_mocks();
+};
+
+subtest 'time_zone: unparseable ip-api.com answer is survived' => sub {
+	plan(skip_all => 'LWP::Simple::WithCache or JSON::Parse not installed') unless $HAS_LWP && $HAS_JSONP;
+	local %ENV = (REMOTE_ADDR => $CFG{public_v4});
+	my ($l, $spy) = _spied_obj();
+	$l->{_have_geoip} = $GEO_ABSENT;
+	{
+		local $SIG{__WARN__} = sub { };
+		Test::Mockingbird::mock('LWP::Simple::WithCache', 'get', sub { '{"timezone": ' });
+	}
+	my $tz;
+	lives_ok { $tz = $l->time_zone() } 'lives';
+	ok(!defined($tz), 'undef returned');
+	ok((grep { /unparseable JSON/ } $spy->messages('warn')), 'parse failure reported');
+	_reset_mocks();
+};
+
+subtest 'locale: hostile User-Agent strings are ignored' => sub {
+	for my $case (
+		[ 'control characters', "Mozilla/5.0 (en-GB)\x00\r\nX-Evil: 1" ],
+		[ 'over the length limit', 'Mozilla/5.0 (' . ('a' x $CFG{ua_max}) . ')' ],
+	) {
+		my ($why, $ua) = @{$case};
+		local %ENV = (HTTP_USER_AGENT => $ua);
+		my ($l, $spy) = _spied_obj();
+		Test::Mockingbird::mock('CGI::Lingua', 'country', sub { undef });
+		ok(!defined($l->locale()), "$why: no locale");
+		ok((grep { /HTTP_USER_AGENT contains invalid/ } $spy->messages('warn')), "$why: warned");
+		_reset_mocks();
+	}
+};
+
+subtest 'language: overlong Accept-Language header is ignored' => sub {
+	local %ENV = (HTTP_ACCEPT_LANGUAGE => 'fr,' . ('x' x $CFG{accept_lang_max}));
+	my ($l, $spy) = _spied_obj(dont_use_ip => 1);
+	is($l->language(), 'Unknown', 'header not used');
+	ok((grep { /HTTP_ACCEPT_LANGUAGE contains invalid/ } $spy->messages('warn')), 'warned');
+};
+
+subtest 'plural_category: undef croaks; odd numbers do not' => sub {
+	local %ENV = (HTTP_ACCEPT_LANGUAGE => 'en');
+	my $l = CGI::Lingua->new(supported => ['en']);
+	throws_ok { $l->plural_category(undef) } $CFG{plural_croak}, 'undef croaks with the documented message';
+	is($l->plural_category(1.9), 'one', 'fraction is truncated, not rounded');
+	is($l->plural_category(-1), 'other', 'negative number is not "one"');
+	lives_ok { $l->plural_category(9**9**9) } 'infinity does not die';
+	returns_ok($l->plural_category(2), { type => 'string', memberof => [qw(zero one two few many other)] },
+		'result is a CLDR category');
+};
+
+subtest 'plural_category: no negotiated language always gives other' => sub {
+	local %ENV = ();
+	my $l = CGI::Lingua->new(supported => ['en'], dont_use_ip => 1);
+	is($l->plural_category(1), 'other', "'other', not 'one', when the language is Unknown");
+};
+
+subtest 'translation_file: traversal and unsafe extensions are refused' => sub {
+	local %ENV = (HTTP_ACCEPT_LANGUAGE => 'en');
+	my %bad = (
+		'parent directory'      => ['/var/www/../../etc'],
+		'null byte in dir'      => ["/var/www\x00/etc"],
+		'traversal in ext'      => ['/tmp', '../../etc/passwd'],
+		'shell meta in ext'     => ['/tmp', 'json;rm -rf /'],
+		'only a dot'            => ['/tmp', '.'],
+		'slash in ext'          => ['/tmp', 'a/b'],
+	);
+	for my $why (sort keys %bad) {
+		my ($l, $spy) = _spied_obj();
+		ok(!defined($l->translation_file(@{$bad{$why}})), "$why: undef");
+		ok((grep { /translation_file: unsafe/ } $spy->messages('warn')), "$why: warned");
+	}
+};
+
+subtest 'translation_file: variant file is preferred, Unknown finds nothing' => sub {
+	use File::Temp qw(tempdir);
+	my $dir = tempdir(CLEANUP => 1);
+	for my $name (qw(en-gb.json en.json)) {
+		open(my $fh, '>', "$dir/$name") or die "$dir/$name: $!";
+		close $fh;
+	}
+	{
+		local %ENV = (HTTP_ACCEPT_LANGUAGE => 'en-gb');
+		my $l = CGI::Lingua->new(supported => ['en-gb', 'en']);
+		is($l->translation_file($dir), "$dir/en-gb.json", 'en-gb.json chosen over en.json');
+	}
+	{
+		local %ENV = ();
+		my $l = CGI::Lingua->new(supported => ['en'], dont_use_ip => 1);
+		ok(!defined($l->translation_file($dir)), 'no file when no language was found');
+	}
+};
+
+# -- Global state and memory ---------------------------------------------------
+
+subtest 'helpers do not disturb the caller $_' => sub {
+	# Strategy: put a sentinel in $_, call every helper that loops or maps,
+	# and check that the sentinel survives.
+	local %ENV = ();
+	my $l = _basic_obj();
+	local $_ = $CFG{sentinel};
+	$l->_sorted_tokens('en,fr;q=0.5');
+	$l->_get_closest('en', 'en');
+	$l->_country_short_name('fr');
+	$l->_accept_language_match('fr');
+	CGI::Lingua::_in_baidu_subnet($CFG{baidu_first});
+	CGI::Lingua::_is_ipv4($CFG{public_v4});
+	is($_, $CFG{sentinel}, '$_ unchanged');
+};
+
+subtest 'helpers restore the caller signal handlers' => sub {
+	my $l = _basic_obj();
+	my $warn = sub { };
+	my $die  = sub { die @_ };
+	local $SIG{__WARN__} = $warn;
+	local $SIG{__DIE__}  = $die;
+	$l->_code2country('gb');
+	$l->_country_short_name('fr');
+	is($SIG{__WARN__}, $warn, '__WARN__ handler restored');
+	is($SIG{__DIE__}, $die, '__DIE__ handler restored');
+};
+
+subtest 'objects are freed after use (no leaks, no cycles)' => sub {
+	# Strategy: run the code paths that store caches, loggers and geo state,
+	# then check both for cycles and that the last reference really frees it.
+	local %ENV = (REMOTE_ADDR => $CFG{public_v4}, HTTP_ACCEPT_LANGUAGE => 'en-gb,fr;q=0.5');
+	my $weak;
+	{
+		my $l = CGI::Lingua->new(supported => ['en', 'fr'], cache => _fresh_cache());
+		Test::Mockingbird::mock('CGI::Lingua', 'country', sub { 'gb' });
+		$l->language();
+		$l->sublanguage();
+		$l->requested_language();
+		$l->_find_language_from_ip('en-gb');
+		memory_cycle_ok($l, 'no cycles after the full language pipeline');
+		$weak = $l;
+		Scalar::Util::weaken($weak);
+		_reset_mocks();
+	}
+	ok(!defined($weak), 'object destroyed when it goes out of scope');
+};
+
+# -- _load_geoip with a database, and missing modules --------------------------
+
+# A require that fails for $file even if the module is already loaded:
+# remove it from %INC for the block and refuse it from the front of @INC.
+sub _hide_module_for {
+	my ($file, $code) = @_;
+	delete local $INC{$file};
+	local @INC = (sub { die "hidden by the test\n" if $_[1] eq $file; return }, @INC);
+	return $code->();
+}
+
+subtest '_load_geoip: first readable GeoIP.dat in @GEOIP_DAT is opened' => sub {
+	plan(skip_all => 'Geo::IP not installed') unless eval { require Geo::IP; 1 };
+	my $dir = File::Temp::tempdir(CLEANUP => 1);
+	my $dat = "$dir/GeoIP.dat";
+	open(my $fh, '>', $dat) or die "$dat: $!";
+	close $fh;
+	no warnings 'once';
+	local @CGI::Lingua::GEOIP_DAT = ("$dir/missing.dat", $dir, $dat);	# missing, a directory, then the file
+
+	my @opened;
+	Test::Mockingbird::mock('Geo::IP', 'open', sub { push @opened, [ @_[1, 2] ]; bless {}, 'Geo::IP' });
+	my $l = _basic_obj();
+	$l->_load_geoip();
+	is($l->{_have_geoip}, $GEO_PRESENT, 'sentinel set to GEO_PRESENT');
+	isa_ok($l->{_geoip}, 'Geo::IP', 'handle stored');
+	is_deeply(\@opened, [ [ $dat, 0 ] ], 'only the readable regular file is opened, in standard mode');
+	_reset_mocks();
+};
+
+subtest '_load_geoip: a corrupt database is not used' => sub {
+	# Geo::IP->open dies or returns undef on a truncated file; country() must
+	# not later call a method on undef
+	plan(skip_all => 'Geo::IP not installed') unless eval { require Geo::IP; 1 };
+	my $dir = File::Temp::tempdir(CLEANUP => 1);
+	my $dat = "$dir/GeoIP.dat";
+	open(my $fh, '>', $dat) or die "$dat: $!";
+	close $fh;
+	no warnings 'once';
+	local @CGI::Lingua::GEOIP_DAT = ($dat);
+	for my $failure (sub { die "Bad database\n" }, sub { undef }) {
+		Test::Mockingbird::mock('Geo::IP', 'open', $failure);
+		my ($l, $spy) = _spied_obj();
+		lives_ok { $l->_load_geoip() } 'lives';
+		is($l->{_have_geoip}, $GEO_ABSENT, 'treated as no database');
+		ok((grep { /^Can't open \Q$dat\E with Geo::IP; not using it$/ } $spy->messages('warn')), 'reported');
+		_reset_mocks();
+	}
+};
+
+subtest '_load_geoip: database present but Geo::IP missing' => sub {
+	my $dir = File::Temp::tempdir(CLEANUP => 1);
+	my $dat = "$dir/GeoIP.dat";
+	open(my $fh, '>', $dat) or die "$dat: $!";
+	close $fh;
+	no warnings 'once';
+	local @CGI::Lingua::GEOIP_DAT = ($dat);
+	my $l = _basic_obj();
+	_hide_module_for('Geo/IP.pm', sub { $l->_load_geoip() });
+	is($l->{_have_geoip}, $GEO_ABSENT, 'sentinel set to GEO_ABSENT');
+};
+
+subtest 'time_zone: falls back to LWP::Simple without LWP::Simple::WithCache' => sub {
+	plan(skip_all => 'LWP::Simple or JSON::Parse not installed')
+		unless eval { require LWP::Simple; require JSON::Parse; 1 };
+	local %ENV = (REMOTE_ADDR => $CFG{public_v4});
+	my @urls;
+	{
+		local $SIG{__WARN__} = sub { };	# LWP::Simple::get has a prototype
+		Test::Mockingbird::mock('LWP::Simple', 'get', sub { push @urls, $_[0]; '{"timezone":"Asia/Tokyo"}' });
+	}
+	my $l = _basic_obj();
+	$l->{_have_geoip} = $GEO_ABSENT;
+	my $tz = _hide_module_for('LWP/Simple/WithCache.pm', sub { $l->time_zone() });
+	is($tz, 'Asia/Tokyo', 'zone from LWP::Simple');
+	is_deeply(\@urls, ["http://ip-api.com/json/$CFG{public_v4}"], 'ip-api.com asked about the visitor');
+	_reset_mocks();
 };
 
 done_testing();

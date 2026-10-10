@@ -1,8 +1,5 @@
 #-*- mode: makefile; -*-
 
-test-requires.cpanfile: test-requires
-	$(NO_ECHO)$(CPAN_MAKER) create-cpanfile --dependency-type requires $< -o $@
-
 local: local/.installed
 
 local/.installed:  cpanfile.runtime test-requires.cpanfile

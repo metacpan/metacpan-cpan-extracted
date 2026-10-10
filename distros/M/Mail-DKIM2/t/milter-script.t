@@ -595,4 +595,14 @@ sub info_values {
     }
 }
 
+# --max-recipe-literals: the default path's cap, exclusive of the epilogue
+# options, which carry their own.
+for my $c ([qw(--use-epilogue)], [qw(--epilogue-threshold 5)]) {
+    my $err = `$^X -I$LIB $SCRIPT --max-recipe-literals 5 @$c 2>&1`;
+    like($err, qr/--max-recipe-literals cannot be combined/,
+        "--max-recipe-literals with @$c refused");
+}
+like(`$^X -I$LIB $SCRIPT --max-recipe-literals -1 2>&1`,
+    qr/--max-recipe-literals must not be negative/, 'negative cap refused');
+
 done_testing;

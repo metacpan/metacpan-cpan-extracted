@@ -1,5 +1,35 @@
 Revision history for Monitoring-Sneck
 
+1.6.0   2026-10-09/15:15
+        - add $ option lines for cache_file, pid_dir, and locking
+        - add -L to disable locking
+        - add check_timeout, check_timeout_signal, and check_kill_sub_pids
+          options, plus -T, -s, -k, and -K for them
+        - checks now time out after 30 seconds by default
+        - checks no longer wait on their output pipes once they exit
+
+1.5.0   2026-10-09/13:00
+        - signal deaths now exit as 128 + signal and count as errored
+        - run no longer accumulates results when called more than once
+        - .snmp cache is now always gzip+base64
+        - additional tests
+        - add Monitoring::Sneck::Config for parsing and validating configs
+        - config errors report every bad line with line numbers
+        - env lines only applied if the config is valid
+        - CRLF line endings now supported
+        - empty check commands are now an error
+        - %%name| is no longer accepted for debug checks
+        - add -t for testing the config
+        - add optional YAML config support via YAML::XS for .yaml/.yml files
+        - add restarts, run via -r, with thresholds, depends, cascade,
+          cooldown, max retries, timeouts, timeout signals, rechecking
+          via check_restart, not_every maintenance windows, and SNECK_*
+          env vars for the command
+        - restart options may be quoted
+        - cache files are now written atomically
+        - checks get a closed stdin so ones reading it no longer hang
+        - add -P for PID dir
+
 1.4.2   2026-09-11/16:00
         - add in error handling for open3
 

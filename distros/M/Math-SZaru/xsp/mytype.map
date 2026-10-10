@@ -1,7 +1,22 @@
-UniqueEstimator*	O_OBJECT
-PTopEstimator*	O_OBJECT
-PQuantileEstimator*	O_OBJECT
+UniqueEstimator*	O_SZARU_OBJECT
+PTopEstimator*	O_SZARU_OBJECT
+PQuantileEstimator*	O_SZARU_OBJECT
 uint64_t	T_UV
 uint32_t	T_UV
 int64_t	T_IV
 int32_t	T_IV
+
+INPUT
+O_SZARU_OBJECT
+	if (sv_isobject($arg)) {
+		$var = ($type)SvIV((SV*)SvRV($arg));
+		if ($var == NULL && strcmp(\"${func_name}\", \"DESTROY\") != 0) {
+			croak(\"${Package}::$func_name() -- object pointer is NULL\");
+		}
+	} else {
+		croak(\"${Package}::$func_name() -- invocant is not a blessed SV reference\");
+	}
+
+OUTPUT
+O_SZARU_OBJECT
+	sv_setref_pv($arg, CLASS, (void*)$var);

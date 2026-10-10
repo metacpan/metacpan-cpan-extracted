@@ -1,5 +1,35 @@
 Change history for Perl extension Math::SZaru:
 
+0.03  Fri Oct 09 22:00:00 2026
+  - Security and correctness fixes:
+    - SZARU-01: Fix use-after-free / double-free in TopEstimator::estimate by
+      returning SV* with single refcount ownership and removing unsafe sv_2mortal.
+    - SZARU-02: Fix uninitialized memory read, out-of-bounds read, and shift UB
+      in UniqueEstimatorImpl::Estimate.
+    - SZARU-03: Value-initialize SzlSketch weights array to prevent reading
+      uninitialized memory.
+    - SZARU-04: Prevent min_buffer_id < 0 index[-1] heap corruption and
+      infinite loop in QuantileEstimator::ComputeQuantiles.
+    - SZARU-05: Guard av_extend(..., size()-1) on empty vectors against
+      size_t underflow in TopEstimator::estimate and typemaps.
+    - SZARU-06: Fix SzlSketch::Estimate pointer assignment bug (*est = *mid)
+      and restore ReplaceSmallest in Top-N estimator.
+    - SZARU-07: Fix bit shift undefined behaviors across szlquantile,
+      szlsketch, szlunique, and hashutils.
+    - SZARU-08: Add strict constructor parameter validation for bounds
+      and type correctness on TopEstimator, QuantileEstimator, and
+      UniqueEstimator.
+    - SZARU-09: Reject NaN and Inf values in add_elem, add_elems,
+      add_weighted_elem, and add_weighted_elems to protect heap invariants.
+    - SZARU-10: Safely check for NULL object pointers and non-object
+      invocants in all XS methods and typemaps.
+    - SZARU-11: Replace unaligned pun_cast pointer dereferencing in
+      hashutils with safe memcpy and length checks.
+    - SZARU-12: Delete copy constructors and copy assignment operators on
+      PTopEstimator and PQuantileEstimator (rule of three).
+    - SZARU-13: Make Build.PL config.h inclusion non-destructive using
+      a compiler -iquote include shim.
+
 0.02  Thu Oct 08 21:00:00 2026
   - Upgrade a dependency to address CVE-2026-107373
 

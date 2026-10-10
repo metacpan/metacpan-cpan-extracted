@@ -12,8 +12,6 @@ use Test::Most;
 use Test::Needs qw(CHI IP::Country);
 use Test::Mockingbird;
 
-use lib 't/lib';
-
 BEGIN { use_ok('CGI::Lingua') }
 
 # ── Sanity: the GeoIP mock must be operational ────────────────────────────

@@ -18,7 +18,11 @@ no_index:
   directory:
     - t
     - inc
+recommends:
+  YAML::XS: '0'
 requires:
+  DateTime: '0'
+  DateTime::Event::Cron: '0'
   File::Slurp: '0'
   IO::Compress::Gzip: '0'
   JSON: '0'
@@ -29,5 +33,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/VVelox/Monitoring-Sneck.git
-version: v1.4.2
+version: v1.6.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -3,7 +3,7 @@ module: CGI::Lingua
 function: language
 
 new:
-  supported: 'en_gb'
+  supported: "en_gb"
 
 input: undef
 

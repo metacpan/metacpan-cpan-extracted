@@ -64,7 +64,7 @@ sub to_json_canonical {
     my $sneck   = Monitoring::Sneck->new( { config => $cfg } );
     my $decoded = decode_json( to_json_canonical( $sneck->run ) );
     my $data    = $decoded->{data};
-    for my $field (qw(hostname ok warning critical unknown errored alert alertString checks debugs time run_time vars)) {
+    for my $field (qw(hostname ok warning critical unknown errored alert alertString checks debugs restarts restarted time run_time vars)) {
         ok( exists $data->{$field}, "data.$field key present in JSON" );
     }
 }
@@ -229,21 +229,23 @@ sub to_json_canonical {
 }
 
 #
-# canonical encoding produces consistent key order across two calls
+# canonical encoding sorts keys at every level
 #
 {
-    my $cfg   = write_config("A=1\nB=2\ncheck_a|$perl -e 'exit 0'\ncheck_b|$perl -e 'exit 0'\n");
+    my $cfg   = write_config("B=2\nA=1\nchk|$perl -e 'print qq(hi)'\n");
     my $sneck = Monitoring::Sneck->new( { config => $cfg } );
-    my $j1    = to_json_canonical( $sneck->run );
-    # decode then re-encode to compare structure (times will differ between runs)
-    my $d1 = decode_json($j1);
-    # verify top-level keys are alphabetically sorted (canonical=1 guarantee)
-    my @keys = ( $j1 =~ /"(\w+)":/g );
-    # just confirm it round-trips cleanly
-    my $j2 = to_json_canonical($d1);
-    my $d2 = decode_json($j2);
-    is_deeply( [ sort keys %{ $d1->{data}{vars} } ], [ sort keys %{ $d2->{data}{vars} } ],
-        'round-tripped JSON preserves vars keys' );
+    my $raw   = to_json_canonical( $sneck->run );
+    like( $raw, qr/^\{"data":\{.*\},"error":0,"errorString":"","version":1\}$/s, 'top-level keys sorted' );
+    like(
+        $raw,
+        qr/^\{"data":\{"alert":0,"alertString":"","checks":\{.*\},"critical":0,"debugs":\{\},"errored":0,"hostname":"[^"]*","ok":1,"restarted":0,"restarts":\{\},"run_time":"[\d.]+","time":"?\d+"?,"unknown":0,"vars":\{"A":"1","B":"2"\},"warning":0\}/s,
+        'data keys sorted'
+    );
+    like(
+        $raw,
+        qr/"chk":\{"check":"[^"]*","exit":0,"output":"hi","ran":"[^"]*","run_time":"[\d.]+"\}/,
+        'per-check keys sorted'
+    );
 }
 
 #

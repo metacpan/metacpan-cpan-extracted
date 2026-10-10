@@ -2,9 +2,9 @@
 
 =pod
 
-=head1 NAME speak
+=head1 NAME speak / say
 
-Simply speaks the passed in message, clipboard or file
+Simply speaks the passed in message, clipboard or file (invoked as speak or say)
 
 =head1 VERSION
 
@@ -22,8 +22,9 @@ Wed 24 Feb 2021 12:01:12 PM PST
 
 =head1 SYNOPSIS
 
- Usage: speak [-usa|ge] [-h|elp] [-v|erbose] [-de|bug]
-              [-c|lipboard] [-f|ile <filename>] [-p|ersona <name>] ["message"]
+ Usage: speak | say [-usa|ge] [-h|elp] [-v|erbose] [-de|bug]
+              [-c|lipboard] [-f|ile <filename>] [-p|ersona <name>]
+              [-o|utput <filename>] ["message"]
 
  Where:
    -usa|ge:          Print this usage
@@ -31,11 +32,13 @@ Wed 24 Feb 2021 12:01:12 PM PST
    -c|lipboard:      Speak the contents of the clipboard
    -f|ile <filename> Speak the contents of <filename>
    -p|ersona <name>  Use a specific persona voice
+   -o|utput <file>   Save output speech to specified audio file
    "message"         Speak the message
 
 =head1 DESCRIPTION
 
-This script speaks the contents of the passed in message, clipboard or file
+This script speaks the contents of the passed in message, clipboard or file.
+Can be called as either 'speak' or 'say'.
 
 =cut
 
@@ -69,7 +72,7 @@ my %opts = (
 );
 
 ## Main
-GetOptions (\%opts, 'usage', 'help', 'verbose', 'debug', 'clipboard', 'file=s', 'persona=s',)
+GetOptions (\%opts, 'usage', 'help', 'verbose', 'debug', 'clipboard', 'file=s', 'persona=s', 'output=s')
   || pod2usage;
 
 my $msg = join ' ', @ARGV;
@@ -104,4 +107,4 @@ if ($opts{clipboard}) {
   }    # if
 }    # if
 
-speak ($msg, undef, undef, $opts{persona});
+speak ($msg, undef, undef, $opts{persona}, $opts{output});

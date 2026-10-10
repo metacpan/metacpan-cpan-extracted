@@ -1,199 +1,333 @@
-# CPAN::Maker::Bootstrapper 2.4.0
+# CPAN::Maker::Bootstrapper 2.4.1 Release Notes
 
-Version 2.4.0 significantly expands CPAN::Maker::Bootstrapper's ability
-to bring existing Perl projects under CMB management and makes the same
-project build cleanly across local development, Docker, and CI.
+## Overview
 
-The import workflow is now a complete conversion path rather than
-simply a file-copying mechanism, while the CI builder has been reduced
-to a cleaner responsibility: build the project it is given.
+This release significantly improves build performance, adds five new
+`cmb` commands, extends several existing commands with
+batch-processing and filtering capabilities, restructures the build
+system around a new `build-config.mk` generated artifact, and requires
+GNU Make 4.3 or newer. Projects using managed build files will need to
+run `make update` after upgrading.
 
-## Importing Existing Projects
+---
 
-CMB can now bootstrap many existing Perl projects with little more than:
+## Performance Improvements
 
-```
-cd Foo-Bar
-cmb --import .
-```
+A major focus of 2.4.1 is reducing both command startup time and
+repeated work during builds.
 
-When a single import root is supplied, CMB can infer the primary module
-name from the directory name. In this example, _Foo-Bar_ implies
-`Foo::Bar`.
+The modulino wrapper now loads `CPAN::Maker::Bootstrapper` only once.
+Previously, the wrapper started Perl and loaded the module to locate its
+installed file, then started Perl again and loaded the same module to
+execute it. In testing, eliminating the second module load reduced
+startup time for a lightweight `cmb` command by roughly 60 percent.
 
-The importer now builds an explicit import plan before creating the
-project. This enables several new capabilities:
+CLI startup work has also been reduced by taking advantage of
+CLI::Simple 2.3.0 selective role loading. Commands declared as selective
+roles load only the roles they require rather than composing the
+complete legacy command set.
 
-- `--dry-run` displays the complete import plan without creating files
-  or running the build.
-- `--exclude` omits selected source trees from the import.
-- `.git/`, `.hg+`, and `.svn` are always excluded.
-- Conventional `t/`, `xt/author/`, `xt/release/`, and `xt/smoke/`
-  trees are preserved, including test helpers and data files.
-- Files that cannot be classified safely, or whose canonical
-  destinations collide, are preserved under `import-errors/` for
-  manual review rather than being silently discarded or overwritten.
-- Common root-level change log files are preserved.
-- Import destinations are checked to prevent a generated project from
-  being created inside its own import source.
-- `--project-tarball` creates a portable archive of the complete
-  generated CMB project instead of installing it into a directory.
+Several roles also now lazy load heavier dependencies, reducing startup
+cost even for commands that still use legacy role composition. The
+actual savings depend heavily on each role's dependency graph, so these
+results should be treated as representative rather than universal.
 
-Imported projects are built with dependency scanning and syntax
-checking enabled, linting disabled, and the test suite skipped:
+Build-time work has also been consolidated to reduce repeated process
+startup and setup costs. `perlcritic`, `perltidy`, and `resolve-vars`
+can now process batches of files through a single `cmb` invocation
+rather than starting a new Perl process for each source file. Dependency
+reconciliation similarly processes multiple dependency classes in one
+invocation.
 
-```
-SCAN=on
-SKIP_TESTS=1
-SYNTAX_CHECKING=on
-LINT=off
-```
+Across the CMB build itself, these changes reduced elapsed build time
+from roughly 1 minute 20 seconds to about 30 seconds in our testing,
+an overall improvement of approximately 60 percent.
 
-Tests remain a developer-controlled validation step after import and
-can be run with `make test`.
+Incremental builds benefit as well. Generated dependency artifacts are
+no longer rewritten when their contents have not changed, preserving
+their timestamps and allowing Make to avoid unnecessary downstream
+rebuilds.
 
-This verifies that the converted project builds without requiring an
-existing codebase to immediately conform to CMB's perltidy and
-perlcritic policies.
+### Developer Impact
 
-## One Build Model for Local Development and CI
+The result is that developers are no longer heavily penalized for
+leaving the full quality pipeline enabled during normal development.
+In testing, an incremental CMB build after modifying a source file,
+with the normal quality gates enabled, completed in under nine
+seconds.
 
-The _builder_ script no longer acquires source or knows anything about
-Git branches or repository hosting.
+The faster build graph also improves the normal edit-test cycle. Because
+`make test` does not produce a distribution tarball, it does not invoke
+the tarball-oriented quality gates. It still performs dependency
+discovery and installs newly required modules into the project-local
+`local-lib` environment as needed before running the test suite.
 
-It now builds an existing project directory:
+In testing, touching a source file and running `make test` completed in
+roughly 2.5 seconds, making `edit -> make test` a practical low-latency
+development loop without giving up automatic dependency maintenance.
 
-```
-./builder /path/to/project
-```
+## New Commands
 
-or the current working directory when no path is supplied.
+### `create-build-config`
 
-Source acquisition belongs to the caller. GitHub Actions may perform a
-checkout, another CI system may provide a workspace, and `make
-build-ci` uses the developer's current working tree.
+`cmb create-build-config` generates a `build-config.mk` file
+containing Make variable assignments for module paths, project
+defaults, and discovered build helper commands (`perltidy`,
+`perlcritic`, etc.). The `Makefile` now includes this generated file
+rather than discovering tools inline within `perl.mk`. On a fresh
+checkout, `build-config.mk` is generated automatically as a
+prerequisite of the first build.
 
-`make build-ci` therefore tests the files actually present on disk,
-including uncommitted and untracked files, by mounting the source
-read-only, copying it into a disposable container workspace, and
-running _builder_ against that copy.
+### `perlcritic` and `perltidy`
 
-The builder also gains a simple project-controlled lifecycle:
+Two new commands expose `Perl::Critic` and `Perl::Tidy` through
+`cmb` for use as build-system CI gates:
 
-```
-    builder.env
-        |
-    builder-pre
-        |
-    make
-        |
-    builder-post
-```
+- `cmb perlcritic [--file-list FILE] [--severity N]
+  [--theme NAME] [--profile FILE] source ...`
+  Critiques one or more source files and writes violations to `.crit`
+  sentinel files.
 
-_builder.env_ provides CI-specific environment configuration, while
-`builder-pre::` and `builder-post::` can be extended safely from
-_project.mk_. `builder-post` runs only after a successful project
-build.
+- `cmb perltidy [--file-list FILE] [--profile FILE] source ...`
+  Verifies source files against a perltidy profile and creates `.tdy`
+  sentinel files for sources that pass.
 
-## Conventional Extended Test Suites
+Both commands accept either individual file arguments or a
+newline-delimited `--file-list`, enabling `perl.mk` to batch
+perltidy and perlcritic checks through a single `cmb` invocation
+rather than calling the underlying tools directly. `Perl::Tidy` is
+now listed as a suggested dependency.
 
-CMB now directly supports the conventional Perl extended-test trees:
+### `reconcile-deps`
 
-```
-    xt/author/
-    xt/release/
-    xt/smoke/
-```
+`cmb reconcile-deps TYPE [TYPE ...]` reconciles one or more dependency
+types (`requires`, `recommends`, `suggests`, `test-requires`) in a
+single invocation, applying both dependency and DarkPAN filtering
+before writing results. The `Makefile` now calls this command through
+a grouped Make target rather than running separate per-type
+reconciliation steps. Files are not rewritten when their content has
+not changed.
 
-with:
+### `update-available`
 
-```
-    make test-author
-    make test-release
-    make test-smoke
-    make test-all
-```
+`cmb update-available` queries MetaCPAN for the latest published
+version of `CPAN::Maker::Bootstrapper` (or a named module) and
+reports when a newer release is available. The `update-available`
+Make target now delegates to this command instead of implementing
+the check inline in `update.mk`.
 
-They may also be enabled through the conventional testing variables:
+---
 
-```
-    AUTHOR_TESTING=1 make test
-    RELEASE_TESTING=1 make test
-    AUTOMATED_TESTING=1 make test
-```
+## New Make Targets and Build System Changes
 
-The managed test rules have been moved into _.includes/test.mk_ and
-remain extensible through double-colon targets in _project.mk_.
+### GNU Make 4.3 Required
 
-## Quality Gates and Make Dependency State
+The `Makefile` now checks for the `grouped-target` feature at startup
+and stops with an error if GNU Make 4.3 or newer is not available.
+Grouped targets (`&:`) are used for dependency reconciliation and
+several other rules; this is now a hard requirement rather than a
+silent assumption.
 
-Syntax validation is now separated from generated-source creation.
+### `build-config.mk` and `build-init.mk`
 
-Generated _.pm_ and _.pl_ files represent generation state, while
-sentinel files represent successful quality-gate processing:
+Build-time tool and configuration discovery has been moved out of
+`perl.mk` and into two new files:
 
-```
-    .checked
-    .tdy
-    .crit
-```
+- `.includes/build-init.mk` — validates required build tooling,
+  derives the CPAN installer in use, and centralizes prerequisite
+  checks. This file is new and is now included in the distribution's
+  managed file set (`MANIFEST`, `cmb_md5sums.txt`, `buildspec.yml`).
 
-This allows GNU make to rerun validation only when the source or the
-prerequisites for the corresponding gate change.
+- `build-config.mk` — generated by `cmb create-build-config` on
+  first build, contains resolved variable assignments for the current
+  project. Added to `.gitignore` and `CLEANFILES`; it is not tracked
+  in source control.
 
-Perltidy and perlcritic controls have also been clarified.
-`PERLTIDY` and `PERLCRITIC` determine whether the corresponding tool
-runs; `PERLTIDYRC` and `PERLCRITICRC` only select configuration
-files. Both tools can now run normally without an explicit profile.
+### Rendered Source Files as Build Intermediates
 
-## Inspecting Resolved Defaults
+Module source files (`.pm.in`) now go through an explicit
+`.rendered` intermediate step before POD processing and syntax
+checking. `perl.mk` generates `.rendered` files in a single batched
+`cmb resolve-vars` invocation using `--file-list`. The rendered
+files are tracked as `.SECONDARY` build artifacts and are cleaned
+by `make clean`. POD checking is now performed against the rendered
+source rather than the `.in` file.
 
-The new `show-defaults` command exposes the configuration CMB has
-actually resolved before a project is created:
+### `quick` and `real-quick` Targets
 
-```
-    cmb show-defaults
-```
+`make quick` now also disables POD checking in addition to scanning
+and linting. A new `make real-quick` target disables scanning,
+linting, POD checking, and syntax checking, for the fastest possible
+iterative build.
 
-For example:
+### Dependency Reconciliation Changes
 
-```
-    basedir              /home/rlauer/git
-    color                on
-    config_source        /home/rlauer/.gitconfig
-    email                rclauer@gmail.com
-    github_user          rlauer6
-    installdir           /home/rlauer/git/{module-name}
-    llm_api_key_helper   <not set>
-    max_diff_files       50
-    max_tokens           8192
-    resources            github
-    username             Rob Lauer
-```
+The `Makefile` uses a single grouped Make target to reconcile
+`requires`, `recommends`, `suggests`, and `test-requires` together.
+After reconciliation, modules listed in `provides` are removed from
+`test-requires`. Reconciled files are not rewritten when their content
+has not changed.
 
-`show-defaults` complements `--dry-run`: one exposes resolved
-configuration; the other exposes the operation CMB intends to perform.
+### `dist-file --path-only`
 
-## Other Build Framework Changes
+`cmb dist-file` gains a `--path-only` option that prints the resolved
+filesystem path to a distribution file instead of its contents. The
+`update-available` target in `update.mk` uses this to locate
+`cmb_md5sums.txt` without reading the file.
 
-Additional changes in 2.4.0 include:
+### `resolve-vars` Batch Mode
 
-- New _.includes/builder.mk_ and _.includes/test.mk_ managed build
-  components.
-- A new `dist-file` command for retrieving individual files from a
-  distribution.
-- `provides` is derived directly from _.pm.in_ source files rather
-  than requiring generated modules first.
-- _deps.mk_ is generated only when syntax checking requires it.
-- `CMB_UPDATE_CHECK` and `CMB_VERSION_DRIFT` values are normalized
-  case-insensitively and invalid values are rejected.
-- `pre-publish::` and `post-publish::` provide extension points
-  around publishing.
-- PAUSE credentials are no longer expanded into echoed Make recipes.
-- Managed-file updates now fail when an expected framework file is
-  missing instead of silently skipping it.
-- The default LLM token limit is centralized and resolved with the
-  other CMB configuration defaults.
-- Stable Make configuration predicates are evaluated once rather than
-  recursively spawning helper processes, substantially reducing
-  overhead for no-op builds.
+`cmb resolve-vars` now accepts `--file-list FILE` to process multiple
+`.in` sources in one invocation, writing each result to a
+corresponding `.rendered` file. The `source-file` positional argument
+and `--file-list` are mutually exclusive.
+
+---
+
+## Behavioral Changes
+
+### Lazy Loading of Optional Dependencies
+
+`HTTP::Tiny`, `IO::Uncompress::Gunzip`, `Storable`, and `MIME::Base64`
+are now loaded on demand within the roles that use them
+(`DarkPANRequires`, `DepsFilter`, `PAUSEUpload`). This avoids
+loading network and I/O modules for commands that do not need them.
+
+### `show-defaults` Resolution Order
+
+`_resolve_defaults` in `ShowDefaults` now resolves `perltidyrc` and
+`perlcriticrc` through a defined search order: environment variable,
+configuration file, project-local file, home directory. The same
+logic applies to the `syntax-checking` setting.
+
+### `dist-file` Default Distribution
+
+`cmb dist-file` now defaults the distribution name to
+`CPAN-Maker-Bootstrapper` when only a filename is supplied, so
+callers within the bootstrapper's own build do not need to name the
+distribution explicitly.
+
+### `deps-filter` Internal Refactoring
+
+Hash filtering logic in `DepsFilter` has been extracted into
+`_filter_package_hash`, separating it from file I/O. This makes the
+filtering step available for reuse by `ReconcileDeps` without
+duplicating code.
+
+### Filter Role Extraction
+
+`_filter_requires` in `Filter` has been separated from the command
+output path (`cmd_filter`), making the filtering logic callable
+internally without producing console output.
+
+### Modulino Wrapper Simplified
+
+`bin/cmb.in`, `bin/cpan-maker-bootstrapper.in`, and
+`share/modulino.tmpl` now load the module once and invoke `main`
+directly via `-e 'exit $ENV{MODULINO_MODULE_NAME}->main'`, removing
+an intermediate wrapper step. The two invocations of `perl` also
+caused `CPAN::Maker::Bootstrapper` to unnecessarily be loaded twice;
+once to determine its path and the second for execution.
+
+### Release Notes Generation
+
+Release-note generation now includes a `release-X.Y.Z.status` artifact
+containing the equivalent of `git diff --name-status HEAD`. This gives
+the LLM an explicit classification of added, modified, deleted, and
+renamed files alongside the full diff, changed-file list, draft
+tarball, and ChangeLog.
+
+The `releases-note` prompt has also been expanded to treat those artifacts
+according to their roles: the status identifies file state, the diff
+describes implementation changes, the tarball represents the final
+release, and the ChangeLog provides the maintainer-reviewed technical
+record. This produces release notes organized around release themes
+rather than a reformatted ChangeLog.
+
+---
+
+## Dependency Changes
+
+- `CLI::Simple` minimum version bumped to **2.3.0**.
+- `File::Which` **1.27** added as a runtime requirement (used for
+  build helper discovery in `CreateBuildConfig`).
+- `Perl::Tidy` **20260204** added as a suggested dependency.
+- `Perl::Critic` was already suggested; no version change.
+
+---
+
+## Test Changes
+
+`t/find-primary-package.t` now loads and applies
+`CPAN::Maker::Bootstrapper::Role::Installer` directly using
+`Role::Tiny` rather than loading the full bootstrapper. Host-specific
+paths have been removed from the test cases, making the test suite
+portable across environments.
+
+---
+
+## User Action Required
+
+- **GNU Make 4.3 or newer is required.** Builds on older Make
+  versions will fail immediately with a descriptive error.
+- **Run `make update`** after upgrading to refresh managed files
+  in `.includes/`, including the new `build-init.mk`.
+- Projects that set `PERLTIDYRC` or `PERLCRITICRC` to control linting
+  should review `show-defaults` output; the resolution order for these
+  settings is now documented and consistently applied.
+- `build-config.mk`, `config.mk`, and `*.rendered`
+  files should be added to `.gitignore` if not already present.
+  The managed `gitignore` template now includes these entries and
+  `make update` will merge them into `.gitignore` for existing
+  projects.
+
+---
+
+## ChangeLog Review Notes
+
+The following observations concern the ChangeLog for 2.4.1; they
+are not reflected in the release notes above.
+
+1. **`dist-file` is listed under new "selective roles"** in the
+   `cpan-maker-bootstrapper.yml` entry, but `DistFile` has existed
+   since 2.4.0. The entry accurately notes that `dist-file` gains
+   `--path-only` and a default distribution name, but the phrasing
+   "move … to selective roles" may mislead readers into thinking
+   `DistFile` is new in this release.
+
+2. **`update-available` role** (`Role::UpdateAvailable`) is listed
+   as new in 2.4.1, but the `update-available` Make target has been
+   present since at least 2.0.9. The ChangeLog correctly describes
+   it as a new role that backs the existing target; this distinction
+   could be clearer.
+
+3. **`create-build-config` and the `build-config.mk` mechanism** are
+   among the most significant structural changes in this release, but
+   the ChangeLog entry is brief relative to the scope of the change.
+   The interaction between `build-config.mk`, `build-init.mk`, and
+   the removal of inline discovery from `perl.mk` is spread across
+   multiple terse entries.
+
+4. **`_filter_package_hash`** is listed under `DepsFilter` but its
+   role as the shared primitive consumed by `ReconcileDeps` is not
+   called out. The `deps.mk` entry notes the dependency, but the
+   architectural connection between the two roles is absent from the
+   prose.
+
+5. **The `real-quick` target** is mentioned only as "add real-quick
+   target" in the `Makefile` section; its semantics (disables syntax
+   checking in addition to scanning and linting, unlike `quick`) are
+   not stated.
+
+6. **`reader` added to `extra_options`** in `cpan-maker-bootstrapper.yml`
+   is noted in the ChangeLog but its purpose—storing the
+   `ConfigReader` instance on the application object—is only
+   explained in the `Init.pm.in` entry. The connection is non-obvious
+   to readers scanning the YAML entry alone.
+
+---
+
+*Add four new `cmb` commands (`create-build-config`, `perlcritic`,
+`perltidy`, `reconcile-deps`), batch-process lint and render steps
+through `cmb`, require GNU Make 4.3, and restructure build
+initialization around a generated `build-config.mk`.*

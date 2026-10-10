@@ -1103,4 +1103,76 @@ PDB
 		'an atom at NaN changes no other atom\'s surface, even as the first atom of the set');
 }
 
+# ...and it is nobody's neighbour anywhere else either.  Every neighbour test
+# was written as the test a neighbour fails, `d2 >= cut2', which a NaN distance
+# does not fail, so the atom was a contact of every residue near the end cell
+# it was put in, at a distance of NaN; the secondary structure's energy took a
+# NaN distance for two atoms at one point, the strongest bond there is; and a
+# ring torsion through an infinite coordinate came out a NaN that the sugar
+# pucker cast to an index into its table of names.
+{
+	my $i = structure_info_string(<<'PDB');
+ATOM      1  CA  ALA A   1       0.000   0.000   0.000  1.00 10.00           C
+ATOM      2  CA  ALA A   5      50.000  50.000  50.000  1.00 10.00           C
+ATOM      3  CA  ALA B   9         nan   0.000   0.000  1.00 10.00           C
+PDB
+	is_deeply($i->{features}{contacts}, [], 'an atom at NaN is in no contact');
+
+	open my $fh, '<', "$data/fold.pdb" or die "Can't open '$data/fold.pdb' with mode '<': '$!'";
+	my $text = do { local $/; <$fh> };
+	close $fh or die "Can't close '$data/fold.pdb': '$!'";
+	(my $odd = $text) =~ s/^(ATOM.{9}O   PRO A  13    ).{8}/${1}     nan/m or die 'no PRO A 13 O';
+	my $h = structure_hbonds(structure_info_string($odd));
+	is_deeply([ grep { $_->{energy} <= -9.9 } @$h ], [],
+		'a carbonyl O at NaN makes no hydrogen bond, at the floor or anywhere');
+	is_deeply([ grep { $_->{acceptor_residue} eq '13' } @$h ], [],
+		'and its residue accepts none');
+
+	open $fh, '<', "$data/rna.pdb" or die "Can't open '$data/rna.pdb' with mode '<': '$!'";
+	$text = do { local $/; <$fh> };
+	close $fh or die "Can't close '$data/rna.pdb': '$!'";
+	(my $inf = $text) =~ s/^(ATOM.{9}C2'.{14}).{8}/${1}     inf/m or die "no C2'";
+	my $r = structure_info_string($inf);
+	my @res = map { my $c = $r->{chains}{$_}; map { $c->{residues}{$_} } @{ $c->{residue_order} } }
+	          @{ $r->{chain_order} };
+	is_deeply([ grep { defined $_->{pucker_phase} && $_->{pucker_phase} != $_->{pucker_phase} } @res ], [],
+		'a ring atom at infinity gives no pucker phase that is not a number');
+	is(scalar(grep { defined $_->{pucker} } @res), 5,
+		'and its sugar no pucker, while the other five keep theirs');
+}
+
+# One atom far from the rest.  The neighbour grid caps its cells at eight per
+# atom, and a box wide enough to take in a zinc at (9999.999, 9999.999,
+# 9999.999) met the cap by widening every cell to hundreds of angstroms: 4fqr
+# (PDBbind v2020) with that zinc took structure_sasa() from 1.4 s to 29.5 s.
+# The box is taken over the bulk of the atoms instead, and the far ones are put
+# in its end cells -- which can change no answer, and does not: every surface and
+# every contact of fold.pdb is what it is without the zinc, to the bit.
+{
+	open my $fh, '<', "$data/fold.pdb" or die "Can't open '$data/fold.pdb' with mode '<': '$!'";
+	my $text = do { local $/; <$fh> };
+	close $fh or die "Can't close '$data/fold.pdb': '$!'";
+	(my $far = $text) =~ s/^END\s*\z//m;
+	$far .= "HETATM 9999 ZN    ZN Z 999    9999.9999999.9999999.999  1.00 10.00          ZN\n";
+	my $plain = structure_info_string($text);
+	my $odd   = structure_info_string($far);
+	my $surface = sub {
+		my ($i) = @_;
+		my $c = $i->{chains}{A};
+		return [ map { my $r = $c->{residues}{$_}; map { $r->{atoms}{$_}{sasa} } @{ $r->{atom_order} } }
+		         @{ $c->{residue_order} } ];
+	};
+	is_deeply($surface->($odd), $surface->($plain),
+		'a far atom changes no surface of the atoms near each other');
+	# as a set: a residue's partners are listed in the order the grid's cells
+	# are walked, which a box of another size walks in another order, and
+	# structure_contacts() promises no order beyond that
+	my $pairs = sub {
+		return [ sort map { "$_->{chain1}/$_->{residue1} $_->{chain2}/$_->{residue2} $_->{distance}" }
+		         @{ $_[0]{features}{contacts} } ];
+	};
+	is_deeply($pairs->($odd), $pairs->($plain), 'nor any contact, or its distance');
+	is_deeply($odd->{features}{hbonds}, $plain->{features}{hbonds}, 'nor any hydrogen bond');
+}
+
 done_testing();

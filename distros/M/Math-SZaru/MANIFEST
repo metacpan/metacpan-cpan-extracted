@@ -22,10 +22,6 @@ src/emitters/szltopheap.h
 src/emitters/szlunique.cc
 src/emitters/top.cc
 src/emitters/topheap.h
-src/myconfig.h
-src/myinit.h
-src/myxshead.h
-src/ppport.h
 src/public/hash_map.h
 src/public/hash_set.h
 src/public/hashutils.h
@@ -36,6 +32,10 @@ src/wscript
 t/100_uniqueestimator.t
 t/200_topestimator.t
 t/300_quantileestimator.t
+t/400_security_top.t
+t/410_security_quantile.t
+t/420_security_unique.t
+t/lib/SecTest.pm
 xsp/mytype.map
 xsp/SZaru.xsp
 xsp/typemap.xsp

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# -*- mode: sh; -*-
+# -*- mode: bash; -*-
 ########################################################################
 #  CI script suitable for GitHub actions and other runners
 ########################################################################
@@ -26,13 +26,18 @@ function install_build_deps {
     
     EXTRA_DEPS=(CPAN::Maker::Bootstrapper)
 
-    if [[ -n "$PERLCRITICRC" ]]; then
-        EXTRA_DEPS+=(Perl::Critic Perl::Critic::Policy::Compatibility::PodMinimumVersion)
-        EXTRA_DEPS+=(Perl::Critic::Policy::Community::PreferredAlternatives)
-    fi
+    if [[ "${LINT:-off}" =~ ^([Oo][Nn])$ ]]; then
+        if [[ -n "${PERLCRITICRC:-}" ]]; then
+            EXTRA_DEPS+=(
+                Perl::Critic
+                Perl::Critic::Community
+                Perl::Critic::Policy::Compatibility
+            )
+        fi
 
-    if [[ -n "$PERLTIDYRC" ]]; then
-        EXTRA_DEPS+=(Perl::Tidy)
+        if [[ -n "${PERLTIDYRC:-}" ]]; then
+            EXTRA_DEPS+=(Perl::Tidy)
+        fi
     fi
 
     $INSTALLER "${EXTRA_DEPS[@]}"
@@ -138,63 +143,69 @@ else
     INSTALLER="$INSTALLER ${RESOLVERS[@]}"
 fi
 
-########################################################################
-# Note that we deliberately do the robust build:
-# LINT=on, SCAN=on, PERLCRITIC=on, PERLTIDY=on
-#-----------------------------------------------------------------------
-# If your build does not work with these on, try turning them
-# off by uncommenting the lines below.
-#-----------------------------------------------------------------------
-# SYNTAX_CHECKING=off
-# SCAN=off
-# LINT=off
-########################################################################
+set -a
+test ! -e ./builder.env || . ./builder.env
 
-export PERLTIDYRC=$(find . -name '.perltidyrc' -o -name 'perltidyrc')
-export PERLCRITICRC=$(find . -name '.perlcriticrc' -o -name 'perlcriticrc')
+if [[ ! -v PERLTIDYRC ]]; then
+    PERLTIDYRC=$(find . \( -name '.perltidyrc' -o -name 'perltidyrc' \) -print -quit)
+fi
+
+if [[ ! -v PERLCRITICRC ]]; then
+    PERLCRITICRC=$(find . \( -name '.perlcriticrc' -o -name 'perlcriticrc' \) -print -quit)
+fi
+
+if [[ -n "${PERLTIDYRC:-}" && ! -f "$PERLTIDYRC" ]]; then
+    echo >&2 "ERROR: PERLTIDYRC does not exist: $PERLTIDYRC"
+    exit 1
+fi
+
+if [[ -n "${PERLCRITICRC:-}" && ! -f "$PERLCRITICRC" ]]; then
+    echo >&2 "ERROR: PERLCRITICRC does not exist: $PERLCRITICRC"
+    exit 1
+fi
+
+if [[ "${LINT:-off}" =~ ^([Oo][Nn])$ ]] &&
+       [[ -z "${PERLTIDYRC:-}" ]] &&
+       [[ -z "${PERLCRITICRC:-}" ]]; then
+    echo >&2 "ERROR: LINT=on but no perltidyrc or perlcriticrc was found"
+    exit 1
+fi
+
+PERL5LIB="$(pwd)/local/lib/perl5"
+
+set +a
+
 set +x
-                           echo "+-------------------------------------------------"
-                           echo "|      BUILD_DATE: $(date +'%Y-%m-%d %H:%M:%S')"
-                           echo "|     PROJECT_DIR: $(pwd)"
-                           echo "|            SCAN: ${SCAN:-on}"
-                           echo "| SYNTAX_CHECKING: ${SYNTAX_CHECKING:-on}"
-test -n "$PERLTIDYRC" &&   echo "|        PERLTIDY: ${PERLTIDYRC:-disabled}"
-test -n "$PERLCRITICRC" && echo "|      PERLCRITIC: ${PERLCRITICRC:-disabled}"
+
+{
+echo "+-------------------------------------------------"
+echo "|      BUILD_DATE: $(date +'%Y-%m-%d %H:%M:%S')"
+echo "|     PROJECT_DIR: $(pwd)"
+echo "|            SCAN: ${SCAN:-on}"
+echo "| SYNTAX_CHECKING: ${SYNTAX_CHECKING:-off}"
+echo "|            LINT: ${LINT:-off}"
+
+if [[ -n "${PERLTIDYRC:-}" ]]; then
+    echo "|        PERLTIDY: $PERLTIDYRC"
+fi
+
+if [[ -n "${PERLCRITICRC:-}" ]]; then
+    echo "|      PERLCRITIC: $PERLCRITICRC"
+fi
 
 if [[ "$INSTALLER" =~ cpanm ]]; then
-                           echo "|         MIRRORS: ${MIRRORS[@]}"
-                           echo "|  PERL_CPANM_OPT: ${PERL_CPANM_OPT:-}"
+    echo "|         MIRRORS: ${MIRRORS[*]}"
+    echo "|  PERL_CPANM_OPT: ${PERL_CPANM_OPT:-}"
 else
-                           echo "|       RESOLVERS: ${RESOLVERS[@]}"
+    echo "|       RESOLVERS: ${RESOLVERS[*]}"
 fi
-                           echo "+-------------------------------------------------"
+
+echo "+-------------------------------------------------"
+} >&2
+
 set -x
 
 install_build_deps
-
-########################################################################
-# Uncomment these to increase verbosity level of the build
-########################################################################
-# make-cpan-dist debug mode
-#-----------------------------------------------------------------------
-# DEBUG=1
-########################################################################
-
-########################################################################
-# make-cpan-dist.pl log level
-#-----------------------------------------------------------------------
-# LOG_LEVEL=trace
-########################################################################
-
-########################################################################
-# Full output of make steps
-#-----------------------------------------------------------------------
-# export NO_ECHO=""
-########################################################################
-set -a
-PERL5LIB="$(pwd)/local/lib/perl5"
-test ! -e ./builder.env || . ./builder.env
-set +a
 
 make clean
 make builder-pre

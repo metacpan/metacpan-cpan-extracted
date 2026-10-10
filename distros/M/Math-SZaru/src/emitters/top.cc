@@ -20,18 +20,24 @@ namespace SZaru {
 template <>
 TopEstimator<int32_t>* 
 TopEstimator<int32_t>::Create(uint32_t numTops) {
+  if (numTops == 0 || numTops > 1000000)
+    return NULL;
   return new TopEstimatorImpl<int32_t>(numTops);
 }
 
 template <>
 TopEstimator<int64_t>* 
 TopEstimator<int64_t>::Create(uint32_t numTops) {
+  if (numTops == 0 || numTops > 1000000)
+    return NULL;
   return new TopEstimatorImpl<int64_t>(numTops);
 }
 
 template <>
 TopEstimator<double>* 
 TopEstimator<double>::Create(uint32_t numTops) {
+  if (numTops == 0 || numTops > 1000000)
+    return NULL;
   return new TopEstimatorImpl<double>(numTops);
 }
 

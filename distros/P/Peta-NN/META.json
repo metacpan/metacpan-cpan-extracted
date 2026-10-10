@@ -1,0 +1,148 @@
+{
+   "abstract" : "a small neural network, defined, trained and saved in Perl",
+   "author" : [
+      "PetaMem s.r.o. <info@petamem.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.040, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Peta-NN",
+   "no_index" : {
+      "directory" : [
+         "examples",
+         "t"
+      ],
+      "package" : [
+         "Peta::NN::Backend::PDL::Imports"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "PDL" : "0",
+            "Parallel::ForkManager" : "0"
+         },
+         "requires" : {
+            "Exporter" : "0",
+            "POSIX" : "0",
+            "Storable" : "0",
+            "Time::HiRes" : "0",
+            "constant" : "0",
+            "feature" : "0",
+            "open" : "0",
+            "parent" : "0",
+            "perl" : "v5.36.0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Test::More" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Peta::NN" : {
+         "file" : "lib/Peta/NN.pm",
+         "version" : "0.2610090"
+      },
+      "Peta::NN::Backend" : {
+         "file" : "lib/Peta/NN/Backend.pm",
+         "version" : "0.2610090"
+      },
+      "Peta::NN::Backend::PDL" : {
+         "file" : "lib/Peta/NN/Backend/PDL.pm",
+         "version" : "0.2610090"
+      },
+      "Peta::NN::Backend::Plain" : {
+         "file" : "lib/Peta/NN/Backend/Plain.pm",
+         "version" : "0.2610090"
+      },
+      "Peta::NN::Backend::WebGPU" : {
+         "file" : "lib/Peta/NN/Backend/WebGPU.pm",
+         "version" : "0.2610090"
+      },
+      "Peta::NN::Chain" : {
+         "file" : "lib/Peta/NN/Chain.pm",
+         "version" : "0.2610090"
+      },
+      "Peta::NN::Codec" : {
+         "file" : "lib/Peta/NN/Codec.pm",
+         "version" : "0.2610090"
+      },
+      "Peta::NN::Data" : {
+         "file" : "lib/Peta/NN/Data.pm",
+         "version" : "0.2610090"
+      },
+      "Peta::NN::Fused" : {
+         "file" : "lib/Peta/NN/Fused.pm",
+         "version" : "0.2610090"
+      },
+      "Peta::NN::Inference" : {
+         "file" : "lib/Peta/NN/Inference.pm",
+         "version" : "0.2610090"
+      },
+      "Peta::NN::Job" : {
+         "file" : "lib/Peta/NN/Job.pm",
+         "version" : "0.2610090"
+      },
+      "Peta::NN::Layer::Activation" : {
+         "file" : "lib/Peta/NN/Layer/Activation.pm",
+         "version" : "0.2610090"
+      },
+      "Peta::NN::Layer::Dense" : {
+         "file" : "lib/Peta/NN/Layer/Dense.pm",
+         "version" : "0.2610090"
+      },
+      "Peta::NN::Layer::Embed" : {
+         "file" : "lib/Peta/NN/Layer/Embed.pm",
+         "version" : "0.2610090"
+      },
+      "Peta::NN::Model" : {
+         "file" : "lib/Peta/NN/Model.pm",
+         "version" : "0.2610090"
+      },
+      "Peta::NN::Optimizer" : {
+         "file" : "lib/Peta/NN/Optimizer.pm",
+         "version" : "0.2610090"
+      },
+      "Peta::NN::Parallel" : {
+         "file" : "lib/Peta/NN/Parallel.pm",
+         "version" : "0.2610090"
+      },
+      "Peta::NN::Pipeline" : {
+         "file" : "lib/Peta/NN/Pipeline.pm",
+         "version" : "0.2610090"
+      },
+      "Peta::NN::RNG" : {
+         "file" : "lib/Peta/NN/RNG.pm",
+         "version" : "0.2610090"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "web" : "https://metacpan.org/author/PETAMEM"
+      }
+   },
+   "version" : "0.2610090",
+   "x_generated_by_perl" : "v5.42.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
+   "x_spdx_expression" : "Artistic-2.0 OR BSD-2-Clause"
+}
+

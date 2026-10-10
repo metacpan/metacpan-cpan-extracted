@@ -1,5 +1,5 @@
 /* Filename: Lzma.xs
- * Author  : Paul Marquess, <pmqs@cpan.org>
+ * Author  : Paul Marquess, <pmqs@outlook.com>
  * Created : 14th March 2009
  * Version : 2.000
  *

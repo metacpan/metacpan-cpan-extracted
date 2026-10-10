@@ -4,7 +4,7 @@ use warnings;
 use ExtUtils::Typemaps;
 use ExtUtils::Typemaps::STL::Vector;
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 our @ISA = qw(ExtUtils::Typemaps::STL::Vector);
 

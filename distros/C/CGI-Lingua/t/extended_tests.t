@@ -18,8 +18,6 @@ use Test::Most;
 use Test::Mockingbird;
 use Test::Returns qw(returns_ok);
 
-use lib 't/lib';
-
 BEGIN { use_ok('CGI::Lingua') }
 
 # Pre-require lazy-loaded modules so their BEGIN blocks run before any mock.
@@ -454,27 +452,19 @@ subtest '_find_language: _rlanguage resolved via _code2language when set but Unk
 # SECTION 5: _resolve_sublanguage_match() — uncovered branches
 # ═══════════════════════════════════════════════════════════════════════════════
 
-subtest '_resolve_sublanguage_match: cache hit for accepts: key skips Locale::Language' => sub {
-	# If the cache already contains "accepts:en-gb" → "English=en", the code
-	# must use that instead of calling code2language.
+subtest '_resolve_sublanguage_match: stale accepts: cache entries are ignored' => sub {
+	# Older releases read an "accepts:<code>" entry on a branch that could
+	# never run; it was removed.  An entry left in a shared cache, even a
+	# hostile one, must have no effect on the answer.
 	local %ENV = (HTTP_ACCEPT_LANGUAGE => 'en-gb');
 	delete local $ENV{REMOTE_ADDR};
 
 	my $cache = _fresh_cache();
-	$cache->set($CACHE_NS . 'accepts:en-gb', 'English=en', '1 month');
-
-	my $lang2code_called = 0;
-	Test::Mockingbird::mock('Locale::Language', 'code2language',
-		sub { $lang2code_called++; 'English' });
+	$cache->set($CACHE_NS . 'accepts:en-gb', 'Klingon=tlh', '1 month');
 
 	my $l = _obj(['en-gb'], cache => $cache);
-	my $lang = $l->language();
-
-	Test::Mockingbird::restore_all();
-	_block_network();
-
-	# code2language was served from cache — should not be called.
-	is($lang, 'English', 'accepts: cache hit resolves language without Locale::Language');
+	is($l->language(), 'English', 'language is worked out, not read from accepts:');
+	is($l->sublanguage(), 'United Kingdom', 'sublanguage too');
 };
 
 subtest '_resolve_sublanguage_match: en-uk in Accept-Language header normalised to en-gb' => sub {
@@ -916,16 +906,16 @@ subtest '_warn: no logger — message appended to messages and Carp called' => s
 	$l->{logger} = undef;    # force Carp path
 
 	my @carp_msgs;
-	# carp is imported into CGI::Lingua at compile time (use Carp qw(carp)),
-	# so mock CGI::Lingua::carp — mocking Carp::carp has no effect post-import.
-	Test::Mockingbird::mock('CGI::Lingua', 'carp', sub { push @carp_msgs, $_[0] });
+	# CGI::Lingua calls Carp::carp by its full name (nothing is imported), so
+	# Carp::carp is what to mock
+	Test::Mockingbird::mock('Carp', 'carp', sub { push @carp_msgs, $_[0] });
 
 	$l->_warn({ warning => 'no-logger test message' });
 
 	Test::Mockingbird::restore_all();
 	_block_network();
 
-	ok((grep { /no-logger test message/ } @carp_msgs), 'CGI::Lingua::carp called with warning text');
+	ok((grep { /no-logger test message/ } @carp_msgs), 'Carp::carp called with warning text');
 	ok((grep { ($_->{message} // '') =~ /no-logger test message/ } @{$l->{messages}}),
 		'Warning also appended to messages array');
 };

@@ -9,7 +9,7 @@ use Game::Mahjong::Decompose;
 use Game::Mahjong::Fans;
 use Game::Mahjong::Tally;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use constant MINIMUM => 8;
 
@@ -150,7 +150,7 @@ Game::Mahjong::Score - the points of a winning hand under the five principles
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

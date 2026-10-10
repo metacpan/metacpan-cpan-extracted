@@ -3,7 +3,7 @@ use 5.20.0;
 use strict;
 use warnings;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use Mail::DKIM2::Common ();
 use Mail::DKIM2::MessageInstance;
@@ -24,9 +24,12 @@ Mail::DKIM2 - DKIM2 signing and verification for email
 
     use Mail::DKIM2;
 
-    # Sign: record the message in a Message-Instance (an originating hop
-    # adds m=1; a hop that changed a message adds the next m= with a Recipe,
-    # see Mail::DKIM2::MessageInstance), then add a DKIM2-Signature over it.
+    # $message is the outgoing message, CRLF line endings.
+
+    # Sign, as the originating hop: record the message in a Message-Instance
+    # (m=1), then add a DKIM2-Signature over it. (A hop that changes a
+    # message records the next m= with a Recipe; see
+    # Mail::DKIM2::MessageInstance.)
     my $mi = Mail::DKIM2::MessageInstance->calculate($message);
     $message = Mail::DKIM2::Common::fold_header('Message-Instance: ' . $mi->as_string)
              . "\r\n" . $message;
@@ -38,15 +41,15 @@ Mail::DKIM2 - DKIM2 signing and verification for email
         RcptTo   => ['<recipient@example.net>'],
     )->load($message);
     die $signer->result_detail unless $signer->result eq 'signed';
-    my $header = $signer->as_string;   # "DKIM2-Signature: i=1; ..."
+    $message = $signer->as_string . "\r\n" . $message;   # what goes out
 
-    # Verify: check every signature in the chain and the Message-Instance
-    # chain beneath it.
+    # Verify: every signature in the chain, and the Message-Instance chain
+    # beneath them.
     my $verifier = Mail::DKIM2::Verifier->new->load($message);
-    print $verifier->result_detail, "\n";   # pass (i=1..2 verified)
+    print $verifier->result_detail, "\n";   # pass (i=1..1 verified)
 
     # Streaming, for a milter or other filter that sees the message in
-    # pieces (CRLF line endings); one object per message:
+    # pieces; one object per message:
     my $v = Mail::DKIM2::Verifier->new;
     $v->PRINT($chunk) for @chunks;
     $v->CLOSE;

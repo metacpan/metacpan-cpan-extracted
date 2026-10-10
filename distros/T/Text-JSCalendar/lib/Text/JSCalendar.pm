@@ -402,11 +402,11 @@ Text::JSCalendar
 
 =head1 VERSION
 
-Version 0.05
+Version 0.07
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head1 SYNOPSIS
 
@@ -1842,12 +1842,16 @@ sub _argsToVEvents {
   if ($Args->{participants}) {
     foreach my $partid (sort keys %{$Args->{participants}}) {
       my $Attendee = $Args->{participants}{$partid};
-      my $Email = $Attendee->{email};
+      # jscalendarbis: a Participant's address is its calendarAddress URI;
+      # "email" is the JSCalendar 1.0 form, still accepted.
+      my $Uri = $Attendee->{calendarAddress}
+             // (defined $Attendee->{email} ? "mailto:$Attendee->{email}" : undef);
+      next unless defined $Uri;
 
       my %AttendeeProps;
       if ($Attendee->{"name"}) {
         $AttendeeProps{"CN"} = $Attendee->{"name"};
-        $namemap{lc "mailto:$Email"}= $Attendee->{"name"};
+        $namemap{lc $Uri} = $Attendee->{"name"};
       }
 
       my $roles = ref($Attendee->{roles}) eq 'HASH'
@@ -1886,7 +1890,7 @@ sub _argsToVEvents {
 
       $AttendeeProps{PARTSTAT} = uc $Attendee->{"participationStatus"} if $Attendee->{"participationStatus"};
 
-      $VEvent->add_property(attendee => [ "MAILTO:$Email", \%AttendeeProps ]);
+      $VEvent->add_property(attendee => [ $Uri, \%AttendeeProps ]);
     }
   }
   if ($Args->{organizerCalendarAddress}) {

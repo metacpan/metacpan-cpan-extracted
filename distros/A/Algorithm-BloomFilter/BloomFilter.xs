@@ -21,7 +21,7 @@ O_OBJECT
 INPUT
 
 O_OBJECT
-  if ( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG) )
+  if ( sv_isobject($arg) && sv_isa($arg, \"Algorithm::BloomFilter\") && (SvTYPE(SvRV($arg)) == SVt_PVMG) )
     $var = ($type)SvIV((SV*)SvRV( $arg ));
   else
     croak( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
@@ -73,27 +73,22 @@ serialize(bloom_t *bl)
   CODE:
     if (0 != bl_serialize(bl, &out, &len))
       croak("Failed to serialize bloom filter - OOM?");
-#ifdef newSV_type
-    /* Avoid copying the string again */
-    RETVAL = newSV_type(SVt_PV);
-    SvPV_set(RETVAL, out);
-    SvLEN_set(RETVAL, (STRLEN)len);
-    SvCUR_set(RETVAL, (STRLEN)len);
-    SvPOK_on(RETVAL);
-#else
     RETVAL = newSVpvn(out, len);
     free(out);
-#endif
   OUTPUT: RETVAL
 
-bloom_t *
+SV *
 deserialize(const char *CLASS, SV *blob)
   PREINIT:
     char *str;
     STRLEN len;
+    bloom_t *bl;
   CODE:
     str = SvPVbyte(blob, len);
-    RETVAL = bl_deserialize(str, len, bl_siphash);
+    bl = bl_deserialize(str, len, bl_siphash);
+    if (!bl)
+      XSRETURN_UNDEF;
+    RETVAL = sv_setref_pv(newSV(0), CLASS, (void *)bl);
   OUTPUT: RETVAL
 
 void

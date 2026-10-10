@@ -7,7 +7,7 @@ use CHI;
 use Log::Abstraction;
 use Test::Most;
 use Test::Mockingbird;
-use Test::Needs 'LWP::Simple';
+use Test::Needs 'LWP::Simple', 'JSON::Parse';	# time_zone() needs both to read ip-api.com
 use Test::RequiresInternet ('ip-api.com' => 'http');
 
 BEGIN { use_ok('CGI::Lingua') }
