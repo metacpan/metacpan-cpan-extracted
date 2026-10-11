@@ -1,8 +1,10 @@
 use strict;
 use warnings;
 
+use lib 't/lib';
 use Test::Most;
 use Test::Log::Abstraction;
+use Capture qw(capture_diag);
 
 # prove -v exports TEST_VERBOSE=1; these tests control verbosity explicitly
 $ENV{'TEST_VERBOSE'} = 0;
@@ -71,6 +73,79 @@ $ENV{'VERBOSE'} = 0;
 	my $logger = Test::Log::Abstraction->new(diag => 'none');
 	$logger->debug({});
 	is($logger->messages()->[0]->{'message'}, '{}', 'empty hashref rendered');
+}
+
+# A lone array reference is a list of message parts, as in Log::Abstraction
+{
+	my $logger = Test::Log::Abstraction->new(diag => 'none');
+	$logger->info(['part one, ', 'part two']);
+	is($logger->messages()->[0]->{'message'}, 'part one, part two', 'lone arrayref flattened');
+}
+
+# A trailing newline is removed, as in Log::Abstraction
+{
+	my $logger = Test::Log::Abstraction->new(diag => 'none');
+	$logger->warn("line\n");
+	is($logger->messages()->[0]->{'message'}, 'line', 'trailing newline chomped');
+}
+
+# Fields are copied: changing the caller's hash later cannot rewrite history
+{
+	my $logger = Test::Log::Abstraction->new(diag => 'none');
+	my %fields = (user => 'njh');
+	$logger->info('login', \%fields);
+	$fields{'user'} = 'someone else';
+	is($logger->messages()->[0]->{'fields'}->{'user'}, 'njh', 'fields copied at log time');
+	isnt($logger->messages()->[0]->{'fields'}, \%fields, 'fields are not the caller hash');
+
+	$logger->info('no fields', {});
+	ok(!exists($logger->messages()->[1]->{'fields'}), 'empty fields hash dropped');
+}
+
+# Regression: a self-referential structure used to recurse forever
+{
+	my $logger = Test::Log::Abstraction->new(diag => 'none');
+	my $loop = { name => 'loop' };
+	$loop->{'self'} = $loop;
+	my @list = (1);
+	push @list, \@list;
+	my $ok = eval { $logger->info($loop); $logger->info('list ', \@list); 1 };
+	ok($ok, 'cyclic structures do not die') or diag($@);
+	is($logger->messages()->[0]->{'message'}, '{name => loop, self => (cycle)}', 'hash cycle marked');
+	is($logger->messages()->[1]->{'message'}, 'list [1, (cycle)]', 'array cycle marked');
+
+	# A repeated, but not cyclic, reference is rendered in full each time
+	my $shared = [2];
+	$logger->info('shared ', [$shared, $shared]);
+	is($logger->messages()->[2]->{'message'}, 'shared [[2], [2]]', 'shared reference is not a cycle');
+}
+
+# Objects keep their own stringification
+{
+	package Local::Stringy;
+	use overload '""' => sub { 'stringy!' }, fallback => 1;
+	sub new { return bless {}, shift }
+
+	package main;
+	my $logger = Test::Log::Abstraction->new(diag => 'none');
+	$logger->warn('object: ', Local::Stringy->new());
+	is($logger->messages()->[0]->{'message'}, 'object: stringy!', 'overloaded object stringified');
+}
+
+# Logging must not change $@ or $!, which an error handler may be about to
+# use.  diag => 'all' takes the printing path too.
+{
+	my $logger = Test::Log::Abstraction->new(diag => 'all');
+	my ($at, $errno);
+	capture_diag {
+		eval { die "original error\n" };
+		local $! = 2;
+		$logger->error('handling: ', $@);
+		($at, $errno) = ($@, $! + 0);
+	};
+	is($at, "original error\n", '$@ preserved across a log call');
+	is($errno, 2, '$! preserved across a log call');
+	is($logger->messages()->[0]->{'message'}, 'handling: original error', '$@ was logged');
 }
 
 done_testing();

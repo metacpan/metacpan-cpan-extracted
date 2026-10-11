@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+  xmlns="http://www.loc.gov/MARC21/slim">
+
+<record>
+  <leader>02539njm a2200565 a 4500</leader>
+  <controlfield tag="001">cpz19990608258</controlfield>
+  <controlfield tag="003">CZ PrNK</controlfield>
+  <controlfield tag="005">20181024132911.0</controlfield>
+  <controlfield tag="007">ss lsnjlcmpnnu</controlfield>
+  <controlfield tag="008">000414p19981993xr rcnne          n cze  </controlfield>
+  <datafield tag="015" ind1=" " ind2=" ">
+    <subfield code="a">cnb000608258</subfield>
+  </datafield>
+  <datafield tag="028" ind1="0" ind2="3">
+    <subfield code="a">7243 8 21825 4 2</subfield>
+    <subfield code="b">Monitor-EMI</subfield>
+  </datafield>
+  <datafield tag="028" ind1="0" ind2="3">
+    <subfield code="a">7243 4 98444 4 5</subfield>
+    <subfield code="b">Monitor-EMI</subfield>
+  </datafield>
+  <datafield tag="028" ind1="0" ind2="3">
+    <subfield code="a">010176 4 331</subfield>
+    <subfield code="b">Monitor records</subfield>
+  </datafield>
+  <datafield tag="028" ind1="0" ind2="3">
+    <subfield code="a">660322 4331</subfield>
+    <subfield code="b">Monitor-EMI</subfield>
+  </datafield>
+  <datafield tag="040" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+    <subfield code="b">cze</subfield>
+  </datafield>
+  <datafield tag="045" ind1=" " ind2=" ">
+    <subfield code="a">x9x9</subfield>
+  </datafield>
+  <datafield tag="048" ind1=" " ind2=" ">
+    <subfield code="a">od</subfield>
+    <subfield code="a">cd</subfield>
+    <subfield code="b">vu</subfield>
+  </datafield>
+  <datafield tag="048" ind1=" " ind2=" ">
+    <subfield code="a">od</subfield>
+    <subfield code="a">ca</subfield>
+    <subfield code="b">vu</subfield>
+  </datafield>
+  <datafield tag="048" ind1=" " ind2=" ">
+    <subfield code="a">od</subfield>
+    <subfield code="b">vu</subfield>
+  </datafield>
+  <datafield tag="072" ind1=" " ind2="7">
+    <subfield code="a">78.011.26</subfield>
+    <subfield code="x">Populární hudba. Populární písně. Populární taneční hudba</subfield>
+    <subfield code="2">Konspekt</subfield>
+    <subfield code="9">9</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">78.03.011.26</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">78.036.011.26</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">784.71</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">784.71- 044.357</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">(086.7)</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="100" ind1="1" ind2=" ">
+    <subfield code="a">Landa, Daniel,</subfield>
+    <subfield code="d">1968-</subfield>
+    <subfield code="7">jn20000710404</subfield>
+    <subfield code="4">cmp</subfield>
+    <subfield code="4">lyr</subfield>
+    <subfield code="4">prf</subfield>
+  </datafield>
+  <datafield tag="245" ind1="1" ind2="0">
+    <subfield code="a">3x Daniel Landa</subfield>
+    <subfield code="h">[zvukový záznam] :</subfield>
+    <subfield code="b">valčík : chcíply dobrý víly : pozdrav z fronty /</subfield>
+    <subfield code="c">[hudba, texty, zpěv] Daniel Landa</subfield>
+  </datafield>
+  <datafield tag="246" ind1="3" ind2=" ">
+    <subfield code="a">Třikrát Daniel Landa</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="a">Praha :</subfield>
+    <subfield code="b">Monitor-EMI,</subfield>
+    <subfield code="c">p1998</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">3 zvukové kazety :</subfield>
+    <subfield code="b">analog, Dolby HX Pro</subfield>
+  </datafield>
+  <datafield tag="306" ind1=" " ind2=" ">
+    <subfield code="a">003511</subfield>
+    <subfield code="a">003617</subfield>
+    <subfield code="a">003843</subfield>
+  </datafield>
+  <datafield tag="490" ind1="1" ind2=" ">
+    <subfield code="a">3x</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Durata: 35:11; 36:17; 38:43</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Objednací čísla: 7243 4 98444 4 5 (010176 4 331/660322 4331/7243 8 21825 4 2)</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Nahrávky z let 1993, 1995 a 1997</subfield>
+  </datafield>
+  <datafield tag="505" ind1="0" ind2="0">
+    <subfield code="t">Valčík --</subfield>
+    <subfield code="t">Jó, ulice --</subfield>
+    <subfield code="t">Krysař --</subfield>
+    <subfield code="t">Půlnoční rock --</subfield>
+    <subfield code="t">Ona --</subfield>
+    <subfield code="t">Chlapeček z periferie --</subfield>
+    <subfield code="t">Vlkodlakům --</subfield>
+    <subfield code="t">Kytky pro tebe --</subfield>
+    <subfield code="t">Čas odejít --</subfield>
+    <subfield code="t">Přízraky --</subfield>
+    <subfield code="t">Ktož jste boží bojovníci --</subfield>
+    <subfield code="t">Chcíply dobrý víly --</subfield>
+    <subfield code="t">Tradice --</subfield>
+    <subfield code="t">Motýlek --</subfield>
+    <subfield code="t">Andílek --</subfield>
+    <subfield code="t">Holky a mašiny (West team motoman) --</subfield>
+    <subfield code="t">Zombice --</subfield>
+    <subfield code="t">Zapalte hranici --</subfield>
+    <subfield code="t">Vodrhovačka --</subfield>
+    <subfield code="t">Ztracení hoši --</subfield>
+    <subfield code="t">Včera mě někdo-- --</subfield>
+    <subfield code="t">Pozdrav z fronty --</subfield>
+    <subfield code="t">Andělé --</subfield>
+    <subfield code="t">Muži s padáky --</subfield>
+    <subfield code="t">Jezdci v oblacích --</subfield>
+    <subfield code="t">1938 --</subfield>
+    <subfield code="t">O marnosti --</subfield>
+    <subfield code="t">Čerti --</subfield>
+    <subfield code="t">Moravské pole --</subfield>
+    <subfield code="t">Milostná --</subfield>
+    <subfield code="t">Militia christi --</subfield>
+    <subfield code="t">Gang</subfield>
+  </datafield>
+  <datafield tag="511" ind1="0" ind2=" ">
+    <subfield code="a">Doprovázejí různí instrumentalisté a sbory</subfield>
+  </datafield>
+  <datafield tag="530" ind1=" " ind2=" ">
+    <subfield code="a">Vydáno také na kompaktních deskách</subfield>
+  </datafield>
+  <datafield tag="648" ind1=" " ind2="7">
+    <subfield code="a">1991-2000</subfield>
+    <subfield code="7">ch460587</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">populární hudba</subfield>
+    <subfield code="7">ph124352</subfield>
+    <subfield code="y">1991-2000</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">rock</subfield>
+    <subfield code="7">ph125174</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">protestsongy</subfield>
+    <subfield code="7">ph224426</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">populární hudba</subfield>
+    <subfield code="7">fd992599</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">rock</subfield>
+    <subfield code="7">fd992602</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">protestsongy</subfield>
+    <subfield code="7">fd1097653</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">zvukové kazety</subfield>
+    <subfield code="7">fd186720</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="830" ind1=" " ind2="0">
+    <subfield code="a">3x</subfield>
+  </datafield>
+  <datafield tag="910" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="a">000608258</subfield>
+  </datafield>
+</record>
+
+</collection>

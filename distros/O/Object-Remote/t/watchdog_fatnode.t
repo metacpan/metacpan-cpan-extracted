@@ -2,12 +2,16 @@ use strictures 1;
 use Test::More;
 
 $ENV{OBJECT_REMOTE_TEST_LOGGER} = 1;
+my $timeout_factor = $ENV{PERL_TEST_TIME_OUT_FACTOR} || 1;
+$timeout_factor = 1 if $timeout_factor < 1;
 
 use Object::Remote::Connector::Local;
 
 $SIG{ALRM} = sub { die "alarm signal\n" };
 
-my $fatnode_text = Object::Remote::Connector::Local->new(timeout => 1)->fatnode_text;
+my $fatnode_text = Object::Remote::Connector::Local
+    ->new(timeout => 1*$timeout_factor)
+    ->fatnode_text;
 
 #this simulates a node that has hung before it reaches
 #the watchdog initialization - it's an edge case that

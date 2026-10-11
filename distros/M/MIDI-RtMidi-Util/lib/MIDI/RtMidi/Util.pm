@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Handy Utilities for Real-time MIDI
 
-our $VERSION = '0.0500';
+our $VERSION = '0.0501';
 
 use v5.40;
 # use Data::Dumper::Compact qw(ddc);
@@ -107,11 +107,13 @@ MIDI::RtMidi::Util - Handy Utilities for Real-time MIDI
 
 =head1 VERSION
 
-version 0.0500
+version 0.0501
 
 =head1 SYNOPSIS
 
-  use MIDI::RtMidi::Util qw(out_port stop_device input_ports output_ports);
+  use MIDI::RtMidi::Util qw(
+    input_ports output_ports in_port out_port stop_device stop_all_notes
+  );
 
   my $ports = input_ports(); # e.g. ['USB MIDI Interface', ...]
   $ports = output_ports();

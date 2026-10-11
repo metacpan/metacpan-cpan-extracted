@@ -2,7 +2,7 @@
 requires 'perl', '5.016';
 
 on runtime => sub {
-    requires 'Git::Hooks', '>= 3.000000';
+    requires 'Git::Hooks', '>= 4.000000';
     requires 'Log::Any';
     requires 'Const::Fast';
     requires 'Path::Tiny';

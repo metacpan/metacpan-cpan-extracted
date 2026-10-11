@@ -6,6 +6,7 @@ use warnings;
 use Getopt::Long ();
 use Digest::SHA ();
 
+use Game::Schnapsen::Bot;
 use Game::Schnapsen::Terminal;
 
 my %o = (mode => 'bot', level => 2, seat => 'p1');
@@ -16,6 +17,7 @@ Getopt::Long::GetOptions(
     'seat=s'    => \$o{seat},
     'seed=s'    => \$o{seed},
     'ascii'     => \$o{ascii},
+    'pick!'     => \$o{pick},
     'colour!'   => \$o{colour},
     'color!'    => \$o{colour},
     'help'      => \$o{help},
@@ -28,16 +30,39 @@ usage(1, "mode must be bot, hotseat or watch\n")
     unless $o{mode} =~ /\A(?:bot|hotseat|watch)\z/;
 usage(1, "seat must be p1 or p2\n") unless $o{seat} =~ /\A p[12] \z/x;
 
+my $levels = Game::Schnapsen::Bot->levels;
+usage(1, "level must be 1 to $levels\n")
+    unless $o{level} =~ /\A\d+\z/ && $o{level} >= 1 && $o{level} <= $levels;
+
 my $seed = defined $o{seed} ? Digest::SHA::sha256($o{seed}) : undef;
 
-Game::Schnapsen::Terminal->new(
+my $ui = Game::Schnapsen::Terminal->new(
     variant => $o{variant},
     mode    => $o{mode},
     level   => $o{level},
     seat    => $o{seat},
     ($o{ascii} ? (ascii => 1) : ()),
     (defined $o{colour} ? (colour => $o{colour}) : ()),
-)->play(defined $seed ? (seed => $seed) : ());
+    (defined $o{pick} ? (picking => $o{pick} ? 1 : 0) : ()),
+);
+
+for my $signal (qw/ INT TERM HUP /) {
+    $SIG{$signal} = sub {
+        $ui->leave_raw;
+        $SIG{ $_[0] } = 'DEFAULT';
+        kill $_[0], $$;
+    };
+}
+
+my $game = eval { $ui->play(defined $seed ? (seed => $seed) : ()) };
+my $died = $@;
+$ui->leave_raw;
+die $died if $died;
+
+exit 1 unless ref $game && $game->over;
+exit 0 if $o{mode} ne 'bot';
+exit 0 if ($game->winner // '') eq $o{seat};
+exit 1;
 
 sub usage {
     my ($status, $message) = @_;
@@ -56,6 +81,7 @@ schnapsen - Schnapsen and Sixty-Six at a prompt
     --seed tuesday         deal the same match every time
     --ascii                letters instead of the suit pips
     --nocolour             no colour (NO_COLOR does the same)
+    --nopick               type the cards out instead of pointing at them
 
 --variant has no default, because the two are different games and picking one
 silently would make the other an afterthought. They differ in thirteen places:
@@ -74,6 +100,19 @@ At the prompt, name a card to play it: KH, TH, or 10H for the same card. Then
 Claiming is typed in full. A claim that turns out to be false loses the deal, and
 the screen already shows you your own count, so it is not put a keystroke away
 from anything else.
+
+On a terminal the left and right keys walk your own hand instead, and the line
+under it says what the card under the cursor would do to the trick: whether it
+takes it, what the trick is worth, and what that puts you on. Enter plays it.
+The moves that are not cards keep their own keys, x c m o d, because a card is
+a thing in your hand and those are not. t goes back to typing, ? lists the
+keys. Needs Term::ReadKey; without it the cards are typed.
+
+The card you drew at the end of the last trick is drawn in a heavier frame, so
+you can see what is new without counting the hand.
+
+Exit status is 0 if you won, or if nobody was playing a seat, 1 if you lost or
+stopped early, and 1 for an option the game will not take.
 USAGE
     exit $status;
 }

@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 require Shared::Arena;
 
@@ -82,9 +82,12 @@ skipped by a reader rather than shown torn.
     my $row = $sb->take;
 
 Claim a row for this process, reclaiming a dead worker's row if the board is
-full. Returns the row index, or C<undef> when every row belongs to a live
-worker. Idempotent - call it again in the same process and it returns the row
-you already hold. Call it once at worker start, after the fork.
+full. Returns the row index, or C<undef> when it could not: every row belongs
+to a live worker, or another process held the claim for the whole of a bounded
+wait. Asking again is right for the second and useless for the first, and
+C<< $arena->_last_err >> says which. Idempotent - call it again in the same
+process and it returns the row you already hold. Call it once at worker start,
+after the fork.
 
 C<update>, C<incr> and C<status> call C<take> for you if you have not, so in
 practice you can just start writing.

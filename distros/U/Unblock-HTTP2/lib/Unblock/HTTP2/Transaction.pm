@@ -4,8 +4,9 @@ use strict;
 use warnings;
 use Carp qw(croak);
 use Scalar::Util qw(blessed weaken);
+use Uniform::HTTP::Response;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 my %TERMINAL = map { $_ => 1 } qw(complete cancelled error);
 
@@ -88,7 +89,15 @@ sub end {
 }
 
 sub send_informational {
-    my ($self, $response) = @_;
+    my ($self, @arg) = @_;
+    my $response;
+    if (@arg == 1 && ref($arg[0])) {
+        $response = $arg[0];
+    }
+    else {
+        croak 'send_informational(): fields must be key/value pairs' if @arg % 2;
+        $response = Uniform::HTTP::Response->new(@arg);
+    }
     croak 'send_informational(): Transaction is already terminal' if $self->is_terminal;
 
     my $connection = $self->{connection}
@@ -99,7 +108,21 @@ sub send_informational {
 }
 
 sub respond {
-    my ($self, $response, %option) = @_;
+    my ($self, @arg) = @_;
+    my ($response, %option);
+    if (@arg && ref($arg[0])) {
+        $response = shift @arg;
+        croak 'respond(): options must be key/value pairs' if @arg % 2;
+        %option = @arg;
+    }
+    else {
+        croak 'respond(): fields must be key/value pairs' if @arg % 2;
+        my %field = @arg;
+        for my $name (qw(stream_body on_drain on_error)) {
+            $option{$name} = delete $field{$name} if exists $field{$name};
+        }
+        $response = Uniform::HTTP::Response->new(%field);
+    }
     croak 'respond(): Transaction is already terminal' if $self->is_terminal;
 
     my $connection = $self->{connection}
@@ -290,6 +313,23 @@ __END__
 
 Unblock::HTTP2::Transaction - one HTTP/2 request/response transaction
 
+=head1 SYNOPSIS
+
+    # Inside a Server on_request callback:
+    my ($tx, $request) = @_;
+    $tx->send_informational(status => 103);
+    $tx->respond(status => 200, body => "hello\n");
+
+    # Alternatively, to stream a different response:
+    $tx->respond(status => 200, stream_body => 1);
+    $tx->write($chunk);
+    $tx->end($final_chunk);
+
+The second example is an alternative to the first, not a second response
+on the same Transaction. C<respond()>, C<send_informational()>, and
+Client C<request()> accept named HTTP fields directly; creating a Uniform
+message by hand is optional.
+
 =head1 DESCRIPTION
 
 A Transaction represents one HTTP request/response exchange carried by one
@@ -306,7 +346,8 @@ For a streaming local body:
     $transaction->end($last_chunk);
 
 C<write()> always accepts the bytes. A false return means the cooperative
-high-water mark was reached. Wait for C<on_drain> before producing more.
+high-water mark was reached, or an attached host has become congested.
+Wait for C<on_drain> before producing more.
 
 Incoming body bytes are consumed automatically after the body callback returns.
 
@@ -321,14 +362,17 @@ C<unconsumed_bytes()> reports body bytes still waiting for stream-level credit.
 
 A server Transaction can send an informational response with:
 
-    $transaction->send_informational($response);
+    $transaction->send_informational(status => 103);
 
 The final response uses:
 
-    $transaction->respond($response);
+    $transaction->respond(status => 200, body => "hello\n");
+
+Both calls accept a canonical Uniform::HTTP::Response object too.
 
 Pass C<stream_body =E<gt> 1> to C<respond()> to produce the response body with
-C<write()> and C<end()>.
+C<write()> and C<end()>. C<on_drain> and C<on_error> are response options,
+not HTTP fields.
 
 =head1 RESETS
 
@@ -366,7 +410,8 @@ Transaction becomes terminal.
 
 =head1 SEE ALSO
 
-L<Unblock::HTTP2>, L<Unblock::HTTP2::Client>, L<Unblock::HTTP2::Server>
+L<Unblock::HTTP2>, L<Unblock::HTTP2::Client>,
+L<Unblock::HTTP2::Server>, L<Unblock::HTTP2::Integration>
 
 =head1 LICENSE
 

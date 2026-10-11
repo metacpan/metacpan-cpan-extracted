@@ -1,18 +1,14 @@
 use strict;
 use warnings;
 
+use lib 't/lib';
 use Test::Most;
 use Test::Log::Abstraction;
-use Test::Builder;
+use Capture qw(capture_diag);
 
-# Capture the always-printed notice so it does not litter this test's TAP.
-# failure_output($fh) returns the handle it just set, so fetch the original
-# first, without an argument.
-my $captured = '';
-my $sink;
-open($sink, '>', \$captured) or die "cannot capture: $!";
-my $original = Test::Builder->new->failure_output;
-Test::Builder->new->failure_output($sink);
+# prove -v exports TEST_VERBOSE=1, which would print every message
+$ENV{'TEST_VERBOSE'} = 0;
+$ENV{'VERBOSE'} = 0;
 
 # An unknown method - typically a typo'd level - is captured under that name
 # and always noticed, never fatal
@@ -20,10 +16,10 @@ Test::Builder->new->failure_output($sink);
 	my $logger = Test::Log::Abstraction->new(diag => 'none');
 
 	my $warnings;
-	my $ok = do {
+	my $ok;
+	my $out = capture_diag {
 		local $SIG{'__WARN__'} = sub { $warnings .= $_[0] };
-		$logger->notalevel('oops');
-		1;
+		$ok = eval { $logger->notalevel('oops'); 1 };
 	};
 
 	ok($ok, 'unknown method does not die') or diag($@);
@@ -31,14 +27,14 @@ Test::Builder->new->failure_output($sink);
 	is($logger->count(), 1, 'unknown method message captured');
 	is($logger->messages()->[0]->{'level'}, 'notalevel', 'captured under the called name');
 	is($logger->messages()->[0]->{'message'}, 'oops', 'arguments captured');
-	like($captured, qr/no method 'notalevel'/, 'notice always printed');
+	like($out, qr/no method 'notalevel'/, "notice always printed, even with diag => 'none'");
+	is(scalar(capture_diag { is($logger->typo('x'), $logger, 'AUTOLOAD returns $self') } =~ tr/\n//), 1, 'one notice per call');
 }
 
 # Regression: the old Locale-Places t/lib/MyLogger.pm had
 #   sub error { error(@_) }
 # which recursed forever.  error(undef) must record once and return.
 {
-	$captured = '';
 	my $logger = Test::Log::Abstraction->new(diag => 'none');
 
 	my $warnings;
@@ -55,16 +51,21 @@ Test::Builder->new->failure_output($sink);
 	is($logger->messages()->[0]->{'message'}, 'undef', 'message is undef');
 }
 
-# DESTROY must not record anything
+# DESTROY is a real method, so destruction never reaches AUTOLOAD.  Calling
+# it directly proves that: through AUTOLOAD it would record and print.
 {
-	$captured = '';
 	my $logger = Test::Log::Abstraction->new(diag => 'none');
-	undef $logger;
-	is($logger, undef, 'logger destroyed');
-	unlike($captured, qr/DESTROY/, 'DESTROY does not hit AUTOLOAD output');
+	my $out = capture_diag { $logger->DESTROY() };
+	is($out, '', 'DESTROY prints nothing');
+	is($logger->count(), 0, 'DESTROY records nothing');
+	ok(defined(&Test::Log::Abstraction::DESTROY), 'DESTROY is defined');
 }
 
-Test::Builder->new->failure_output($original);
-close($sink);
+# An unknown class method croaks: there is no capture to record it in
+{
+	throws_ok { Test::Log::Abstraction->notalevel('x') }
+		qr/notalevel\(\) must be called on an object, not on the class at \Q${\ __FILE__}\E/,
+		'unknown class method croaks at the caller';
+}
 
 done_testing();

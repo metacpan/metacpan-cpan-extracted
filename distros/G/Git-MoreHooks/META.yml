@@ -2,11 +2,23 @@
 abstract: 'More plugins (Git hooks) for package Git::Hooks.'
 author:
   - "'Mikko Koivunalho <mikkoi@cpan.org>'"
-build_requires: {}
+build_requires:
+  Git::Hooks::Test: '0'
+  Git::Repository: '0'
+  Log::Any::Adapter: '0'
+  Test2::Require::Module: '0'
+  Test2::Suite: '1.302200'
+  Test2::Tools::GenTemp: '1.302200'
+  Test2::V0: '1.302200'
+  Test2::V1: '1.302200'
+  Test::Git: '0'
+  Test::Requires::Git: '0'
+  perl: '5.013002'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  perl: '5.013002'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.040, CPAN::Meta::Converter version 2.150010'
 keywords:
   - git
   - git-hooks
@@ -15,38 +27,40 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Git-MoreHooks
-provides:
-  Git::MoreHooks:
-    file: lib/Git/MoreHooks.pm
-    version: '0.019'
-  Git::MoreHooks::CheckCommitAuthorFromMailmap:
-    file: lib/Git/MoreHooks/CheckCommitAuthorFromMailmap.pm
-    version: '0.019'
-  Git::MoreHooks::CheckCommitBase:
-    file: lib/Git/MoreHooks/CheckCommitBase.pm
-    version: '0.019'
-  Git::MoreHooks::CheckIndent:
-    file: lib/Git/MoreHooks/CheckIndent.pm
-    version: '0.019'
-  Git::MoreHooks::CheckPerl:
-    file: lib/Git/MoreHooks/CheckPerl.pm
-    version: '0.019'
-  Git::MoreHooks::GitRepoAdmin:
-    file: lib/Git/MoreHooks/GitRepoAdmin.pm
-    version: '0.019'
-  Git::MoreHooks::ScanCtags:
-    file: lib/Git/MoreHooks/ScanCtags.pm
-    version: '0.019'
-  Git::MoreHooks::TriggerJenkins:
-    file: lib/Git/MoreHooks/TriggerJenkins.pm
-    version: '0.019'
 requires:
-  perl: '5.010'
+  Carp: '0'
+  Config::Tiny: '0'
+  Const::Fast: '0'
+  Cwd: '0'
+  Encode: '0'
+  English: '0'
+  File::Find: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  Git::Hooks: v4.0.0
+  Git::Repository::Log: '0'
+  List::MoreUtils: '0'
+  List::Util: '0'
+  Log::Any: '0'
+  Module::Load: '0'
+  Params::Validate: '0'
+  Path::Tiny: '0'
+  Perl::Tags::Hybrid: '0'
+  Perl::Tags::Naive::Lib: '0'
+  Perl::Tags::Naive::Moose: '0'
+  Perl::Tags::PPI: '0'
+  Text::Glob: '0'
+  Try::Tiny: '0'
+  feature: '0'
+  perl: '5.013002'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
 resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Git-MoreHooks
   homepage: https://metacpan.org/release/Git-MoreHooks
   repository: git://github.com/mikkoi/git-morehooks.git
-version: '0.019'
+version: '0.020'
 x_contributors:
   - 'Gustavo L. de M. Chaves <gnustavo@cpan.org>'
 x_generated_by_perl: v5.34.1

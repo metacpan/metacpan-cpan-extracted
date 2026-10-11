@@ -19,6 +19,7 @@ CheckCommitAuthorFromMailmap
 CheckCommitBase
 CheckIndent
 CheckPerl
+CheckTrailers
 Gerrit
 Git
 GitRepoAdmin
@@ -53,6 +54,7 @@ aws
 cas
 committer
 committers
+ctags
 de
 dir
 filename

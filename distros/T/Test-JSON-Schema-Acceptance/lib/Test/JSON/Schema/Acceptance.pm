@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-package Test::JSON::Schema::Acceptance; # git description: v1.038-4-g8b3b4d1
+package Test::JSON::Schema::Acceptance; # git description: v1.039-5-g4db4bbc
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Acceptance testing for JSON-Schema based validators
 
-our $VERSION = '1.039';
+our $VERSION = '1.040';
 
 use 5.020;
 use Moo;
@@ -576,7 +576,7 @@ Test::JSON::Schema::Acceptance - Acceptance testing for JSON-Schema based valida
 
 =head1 VERSION
 
-version 1.039
+version 1.040
 
 =head1 SYNOPSIS
 
@@ -942,7 +942,7 @@ Ben Hutton (@relequestual) <relequest@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Daniel Perrett
+=for stopwords Karen Etheridge Daniel Perrett Richard Leach
 
 =over 4
 
@@ -953,6 +953,10 @@ Karen Etheridge <ether@cpan.org>
 =item *
 
 Daniel Perrett <dp13@sanger.ac.uk>
+
+=item *
+
+Richard Leach <richardleach@users.noreply.github.com>
 
 =back
 

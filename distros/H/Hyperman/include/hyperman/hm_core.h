@@ -11,6 +11,13 @@
 #define HM_SWEEP_SECS   5.0    /* timeout sweep interval                    */
 #define HM_HIDX_STACK   64     /* header-line index on the stack before
                                   falling back to the loop's growable one  */
+#define HM_WB_HIWAT     (1 << 20)  /* queued response bytes a connection may
+                                      hold before hm_process stops serving
+                                      its pipeline until the client reads  */
+#define HM_WB_KEEP      (1 << 20)  /* a pooled connection keeps a write
+                                      buffer up to this; larger ones are
+                                      freed, so one big response does not
+                                      pin its buffer for the pool's life  */
 
 #include "hm_win.h"     /* the socket/IO shim: hm_os_*, hm_iovec, hm_memmem.
                            First, so every later header sees the platform
@@ -82,6 +89,8 @@ typedef struct {
     void *quic;           /* hm_quic_srv *, or NULL                   */
     void *quic_ctx;       /* the QUIC-side SSL_CTX                    */
     char *altsvc;         /* precomputed Alt-Svc value, or NULL       */
+    int   starved;        /* accept hit EMFILE: read interest is off
+                           * until a short timer puts it back        */
 } hm_listener;
 
 struct hm_conn {
@@ -136,6 +145,22 @@ struct hm_conn {
                                    * stack, because the headers stay in rbuf
                                    * and hm_process re-reads them on every
                                    * readable event until the body is whole */
+    unsigned char is_head;        /* the request being answered is a HEAD:
+                                   * the headers go out, the body does not */
+    unsigned char in_app;         /* a synchronous handler for this
+                                   * connection is on the C stack. A ->get
+                                   * inside it pumps this same loop, so a
+                                   * close asked for meanwhile is deferred
+                                   * to the frame that called the app   */
+    unsigned char close_deferred; /* hm_close was asked for while in_app */
+    unsigned char read_paused;    /* read interest dropped while in_app with
+                                   * a full buffer (hm_read_pause)       */
+    unsigned char backlogged;     /* hm_process stopped on a full write
+                                   * buffer; the drain re-queues it     */
+    size_t   chunk_pos;     /* chunked body: octets validated so far, so
+                             * a re-scan starts at the last chunk boundary
+                             * rather than at the first chunk           */
+    size_t   chunk_dec;     /* decoded octets up to chunk_pos           */
     hm_bsrc  bsrc;          /* streaming body being dripped, if any */
     int      last_status;   /* last response status/bytes (logging) */
     size_t   last_blen;
@@ -241,6 +266,8 @@ struct hm_loop {
     size_t      log_len, log_cap;
     time_t      log_ts_sec;         /* second the cached stamp below is for  */
     char        log_ts[32];         /* "dd/Mon/YYYY:HH:MM:SS +ZZZZ", 1Hz     */
+    time_t      date_sec;           /* second the Date header below is for   */
+    char        date_hdr[40];       /* "Date: <IMF-fixdate>\r\n", 1Hz        */
     UV          requests;           /* requests dispatched (stats)  */
     UV          accepts;            /* connections accepted (stats) */
     UV          denied;             /* connections dropped at accept, denylist */
@@ -336,6 +363,7 @@ static void hm_wb_put(hm_conn *c, const char *p, size_t n);
 static void hm_again_push(hm_loop *loop, hm_conn *c);
 static void hm_h2_free(pTHX_ void *h2);   /* defined in hm_http2.h */
 static void hm_readable(pTHX_ hm_conn *c);
+static void hm_read_resume(hm_loop *loop, hm_conn *c);
 
 /* ABI v6 stream handles, defined in hm_stream.h (included below, after the
  * HTTP/1 and HTTP/2 halves it sits on top of). The two counters are read on
@@ -660,7 +688,10 @@ static SV *hm_slurp_body(pTHX_ SV *body) {
             call_method("close", G_DISCARD | G_EVAL);
             FREETMPS; LEAVE;
         }
-    } else if (SvROK(body)) {
+    } else if (SvROK(body) && (SvTYPE(SvRV(body)) == SVt_PVGV
+                               || SvTYPE(SvRV(body)) == SVt_PVIO)) {
+        /* sv_2io croaks on anything that is not a handle, and this is not
+         * under an eval: a body of [200, [], {}] would unwind the loop */
         IO *io = sv_2io(body);
         if (io && IoIFP(io)) {
             char buf[8192];
@@ -879,6 +910,26 @@ static SV *hm_500_resp(pTHX_ const char *msg) {
 
 /* ---- connections --------------------------------------------------------- */
 
+/* Return a connection struct to the pool, or free it when the pool is full.
+ * The buffers ride along so the steady state allocates nothing - but only
+ * at their ordinary sizes. A read buffer grown for a 15MB body, or a write
+ * buffer grown for one slow client, would otherwise stay that size for as
+ * long as the pool held the struct, and a thousand of them is the whole
+ * ceiling resident for nothing. */
+static void hm_pool_conn(hm_loop *loop, hm_conn *c) {
+    if (c->rbuf && c->rcap > HM_RBUF)    { free(c->rbuf); c->rbuf = NULL; c->rcap = 0; }
+    if (c->wbuf && c->wcap > HM_WB_KEEP) { free(c->wbuf); c->wbuf = NULL; c->wcap = 0; }
+    if (loop->pool_n < HM_POOL_MAX) {
+        c->pool_next = loop->pool;
+        loop->pool = c;
+        loop->pool_n++;
+    } else {
+        if (c->wbuf) free(c->wbuf);
+        if (c->rbuf) free(c->rbuf);
+        free(c);
+    }
+}
+
 static void hm_lru_unlink(hm_loop *loop, hm_conn *c) {
     if (c->lru_prev) c->lru_prev->lru_next = c->lru_next;
     else if (loop->lru_head == c) loop->lru_head = c->lru_next;
@@ -998,6 +1049,22 @@ static void hm_rearm_read(hm_loop *loop, hm_conn *c) {
 }
 
 static void hm_close(pTHX_ hm_loop *loop, hm_conn *c) {
+    /* A synchronous handler for this connection is on the stack: its ->get
+     * pumped this loop and the loop found the peer gone, or the sweep found
+     * it idle. The frame that called the app still holds c and will finish
+     * with it (hm_process's consumed/memmove, hm_queue_response), so the
+     * struct cannot be pooled - the next accept would hand it to a new
+     * client and the first client's response would land on the second's
+     * socket. Stop reading, mark it, and let that frame close it. */
+    if (c->in_app) {
+        if (!c->close_deferred) {
+            c->close_deferred = 1;
+            loop->be->remove_io(loop->be, c->fd,
+                                HM_EV_READ | (c->writing ? HM_EV_WRITE : 0));
+            c->writing = 0;
+        }
+        return;
+    }
     /* Stream handles open on this connection die with it. They are told
      * first, while the connection is still consistent, and they are only
      * marked dead - the handle itself belongs to whoever opened it until
@@ -1044,16 +1111,11 @@ static void hm_close(pTHX_ hm_loop *loop, hm_conn *c) {
     if (c->peer_port_sv) { SvREFCNT_dec(c->peer_port_sv); c->peer_port_sv = NULL; }
     if (c->sname_sv)     { SvREFCNT_dec(c->sname_sv);     c->sname_sv = NULL; }
     if (c->sport_sv)     { SvREFCNT_dec(c->sport_sv);     c->sport_sv = NULL; }
-    if (c->h2)     { hm_h2_free(aTHX_ c->h2); c->h2 = NULL; }
-    if (loop->pool_n < HM_POOL_MAX) {
-        c->pool_next = loop->pool;
-        loop->pool = c;
-        loop->pool_n++;
-    } else {
-        if (c->wbuf) free(c->wbuf);
-        if (c->rbuf) free(c->rbuf);
-        free(c);
-    }
+    /* Detached from the connection BEFORE it is torn down: freeing the
+     * session cancels every stream's parked Future, and a continuation
+     * that fires on that cancel looks the stream up through c->h2. */
+    if (c->h2)     { void *h2 = c->h2; c->h2 = NULL; hm_h2_free(aTHX_ h2); }
+    hm_pool_conn(loop, c);
     if (loop->stopping && loop->nconns == 0) loop->stop = 1;
     /* client went away while awaiting: cancel the response Future so
      * in-flight async work can abort (propagates up the then-chain) */
@@ -1133,15 +1195,7 @@ static void hm_conn_release(pTHX_ hm_loop *loop, hm_conn *c) {
     if (c->peer_port_sv) { SvREFCNT_dec(c->peer_port_sv); c->peer_port_sv = NULL; }
     if (c->sname_sv)     { SvREFCNT_dec(c->sname_sv);     c->sname_sv = NULL; }
     if (c->sport_sv)     { SvREFCNT_dec(c->sport_sv);     c->sport_sv = NULL; }
-    if (loop->pool_n < HM_POOL_MAX) {
-        c->pool_next = loop->pool;
-        loop->pool = c;
-        loop->pool_n++;
-    } else {
-        if (c->wbuf) free(c->wbuf);
-        if (c->rbuf) free(c->rbuf);
-        free(c);
-    }
+    hm_pool_conn(loop, c);
     if (loop->stopping && loop->nconns == 0) loop->stop = 1;
     /* the request's own Future, if any, is simply dropped - the app owns
      * the socket now, so there is nothing left to cancel it for */
@@ -1469,23 +1523,30 @@ static HV *hm_build_env(pTHX_ char *head, size_t headlen,
     hm_env_store(env, HMK_QUERY_STRING,    newSVpvn(qs, qs_l));
     hm_env_store(env, HMK_SERVER_PROTOCOL, newSVpvn(proto, plen));
     hm_env_store(env, HMK_SCRIPT_NAME,     newSVpvs(""));
+    c->is_head = (mlen == 4 && memcmp(method, "HEAD", 4) == 0);
     if (!c->sname_sv) {
         c->sname_sv = newSVpv(c->lst && c->lst->host ? c->lst->host : "0.0.0.0", 0);
         c->sport_sv = newSViv(c->lst ? c->lst->port : 0);
     }
-    hm_env_store(env, HMK_SERVER_NAME, SvREFCNT_inc(c->sname_sv));
-    hm_env_store(env, HMK_SERVER_PORT, SvREFCNT_inc(c->sport_sv));
+    /* Copies, not the cached SVs themselves. `$env->{REMOTE_ADDR} = $ip`
+     * - which is what a reverse-proxy middleware does - assigns INTO the
+     * value SV, and a shared one would then carry the forwarded address
+     * into every later request on this keep-alive connection, before any
+     * middleware had run on them. newSVsv shares the buffer copy-on-write
+     * on perls that can, so the copy costs an SV head and no string. */
+    hm_env_store(env, HMK_SERVER_NAME, newSVsv(c->sname_sv));
+    hm_env_store(env, HMK_SERVER_PORT, newSVsv(c->sport_sv));
     if (c->peer[0]) {
         if (!c->peer_sv) {
             c->peer_sv      = newSVpv(c->peer, 0);
             c->peer_host_sv = newSVpv(c->peer, 0);
         }
-        hm_env_store(env, HMK_REMOTE_ADDR, SvREFCNT_inc(c->peer_sv));
-        hm_env_store(env, HMK_REMOTE_HOST, SvREFCNT_inc(c->peer_host_sv));
+        hm_env_store(env, HMK_REMOTE_ADDR, newSVsv(c->peer_sv));
+        hm_env_store(env, HMK_REMOTE_HOST, newSVsv(c->peer_host_sv));
     }
     if (c->peer_port) {
         if (!c->peer_port_sv) c->peer_port_sv = newSViv(c->peer_port);
-        hm_env_store(env, HMK_REMOTE_PORT, SvREFCNT_inc(c->peer_port_sv));
+        hm_env_store(env, HMK_REMOTE_PORT, newSVsv(c->peer_port_sv));
     }
     hm_env_store(env, HMK_PSGI_VERSION,      SvREFCNT_inc(hm_env_version));
     hm_env_store(env, HMK_PSGI_URL_SCHEME,
@@ -1495,13 +1556,15 @@ static HV *hm_build_env(pTHX_ char *head, size_t headlen,
     hm_env_store(env, HMK_PSGI_RUN_ONCE,     SvREFCNT_inc(hm_env_zero));
     hm_env_store(env, HMK_PSGI_STREAMING,    SvREFCNT_inc(hm_env_one));
     hm_env_store(env, HMK_PSGI_NONBLOCKING,  SvREFCNT_inc(hm_env_one));
-    hm_env_store(env, HMK_PSGI_ERRORS,       SvREFCNT_inc(hm_env_errors));
+    /* A copy: `$env->{'psgi.errors'} = $fh` is an assignment INTO the slot's
+     * SV, and the shared one is read-only, so an application redirecting
+     * its errors died with "Modification of a read-only value". */
+    hm_env_store(env, HMK_PSGI_ERRORS,       newSVsv(hm_env_errors));
 
     /* psgix.loop: this worker's loop, so apps/clients can create loop
      * Futures; psgix.io: the client socket, dup'd so an app that
      * hijacks it keeps the socket alive after we close our fd. */
-    if (!c->loop->self_sv) c->loop->self_sv = hm_loop_to_sv(aTHX_ c->loop);
-    hm_env_store(env, HMK_PSGIX_LOOP, SvREFCNT_inc(c->loop->self_sv));
+    hm_env_store(env, HMK_PSGIX_LOOP, hm_loop_to_sv(aTHX_ c->loop));
     if (!c->io_sv) c->io_sv = hm_fh_for_fd(aTHX_ c->fd);
     hm_env_store(env, HMK_PSGIX_IO, SvREFCNT_inc(c->io_sv));
     /* psgix.hyperman.conn: [fd, generation id] - the ticket an app hands
@@ -1551,13 +1614,22 @@ static HV *hm_build_env(pTHX_ char *head, size_t headlen,
          * hyphen position, exactly as the old raw-name compare required. */
         {
             size_t i;
+            int underscore = 0;
             memcpy(keybuf, "HTTP_", 5);
             for (i = 0; i < nk; i++) {
                 unsigned char ch = (unsigned char)p[i];
                 if (ch >= 'a' && ch <= 'z') ch -= 32;
                 else if (ch == '-') ch = '_';
+                else if (ch == '_') underscore = 1;
                 keybuf[5 + i] = (char)ch;
             }
+            /* A wire name with an underscore folds to the same env key as
+             * the hyphenated name, so "X_Forwarded_For" would land in
+             * HTTP_X_FORWARDED_FOR beside - or instead of - the header a
+             * proxy in front vetted. Proxies strip the hyphenated form and
+             * pass the underscored one untouched, which is the whole
+             * attack. Dropped, as nginx and Apache do. */
+            if (underscore) continue;
         }
         /* Accept-Encoding is answered on this one pass and remembered as a
          * bit on the connection: hm_queue_response has no env to consult by
@@ -1651,6 +1723,7 @@ static SV *hm_call_app(pTHX_ hm_loop *loop, SV *env_rv) {
     } else if (count > 0) {
         (void)POPs;
     }
+    hm_warn_died(aTHX_ "application");
     PUTBACK;
     FREETMPS; LEAVE;
     return resp;
@@ -1673,6 +1746,7 @@ static SV *hm_call_app0(pTHX_ hm_loop *loop, HV *env) {
     } else if (count > 0) {
         (void)POPs;
     }
+    hm_warn_died(aTHX_ "application");
     PUTBACK;
     FREETMPS; LEAVE;
     return resp;
@@ -1746,6 +1820,64 @@ static void hm_log_quoted(hm_loop *loop, const char *p, size_t n) {
     if (run) hm_log_raw(loop, p + n - run, run);
 }
 
+/* The Date header (RFC 9110 6.6.1, IMF-fixdate), recomputed at most once a
+ * second. Formatted by hand: strftime's %a and %b follow the locale, and
+ * the wire wants English. 37 bytes, always: "Date: " + 29 + CRLF. */
+#define HM_DATE_LEN 37
+static const char *hm_date_header(hm_loop *loop) {
+    if (loop->now != loop->date_sec) {
+        static const char days[] = "SunMonTueWedThuFriSat";
+        static const char mons[] = "JanFebMarAprMayJunJulAugSepOctNovDec";
+        struct tm tm;
+        time_t t = loop->now;
+        char *d = loop->date_hdr;
+        if (!hm_gmtime_r(&t, &tm)) return NULL;
+        memcpy(d, "Date: ", 6); d += 6;
+        memcpy(d, days + tm.tm_wday * 3, 3); d += 3;
+        *d++ = ','; *d++ = ' ';
+        *d++ = (char)('0' + tm.tm_mday / 10); *d++ = (char)('0' + tm.tm_mday % 10);
+        *d++ = ' ';
+        memcpy(d, mons + tm.tm_mon * 3, 3); d += 3;
+        *d++ = ' ';
+        {
+            int y = tm.tm_year + 1900;
+            *d++ = (char)('0' + y / 1000 % 10); *d++ = (char)('0' + y / 100 % 10);
+            *d++ = (char)('0' + y / 10 % 10);   *d++ = (char)('0' + y % 10);
+        }
+        *d++ = ' ';
+        *d++ = (char)('0' + tm.tm_hour / 10); *d++ = (char)('0' + tm.tm_hour % 10);
+        *d++ = ':';
+        *d++ = (char)('0' + tm.tm_min / 10);  *d++ = (char)('0' + tm.tm_min % 10);
+        *d++ = ':';
+        *d++ = (char)('0' + tm.tm_sec / 10);  *d++ = (char)('0' + tm.tm_sec % 10);
+        memcpy(d, " GMT\r\n", 6);
+        loop->date_sec = loop->now;
+    }
+    return loop->date_hdr;
+}
+
+/* Does an app-supplied header name or value carry a byte that would end
+ * the field early? A CR, LF or NUL in either splits the response, so a
+ * response carrying one is refused as a 500 rather than serialised: the
+ * server is the last place the bug can be caught. */
+static int hm_hdr_bytes_ok(const char *p, STRLEN n) {
+    return !memchr(p, '\r', n) && !memchr(p, '\n', n) && !memchr(p, '\0', n);
+}
+static int hm_headers_ok(pTHX_ AV *hav) {
+    SSize_t i, hn;
+    if (!hav) return 1;
+    hn = av_len(hav) + 1;
+    for (i = 0; i < hn; i++) {
+        SV **e = av_fetch(hav, i, 0);
+        STRLEN l;
+        const char *p;
+        if (!e || !*e) continue;
+        p = SvPV(*e, l);
+        if (!hm_hdr_bytes_ok(p, l)) return 0;
+    }
+    return 1;
+}
+
 /* Cached apache-style timestamp, recomputed at most once per second. */
 static const char *hm_log_time(hm_loop *loop) {
     if (loop->now != loop->log_ts_sec) {
@@ -1779,7 +1911,11 @@ static void hm_log_clf(pTHX_ hm_loop *loop, SV *env_rv, int status, ssize_t blen
 
     s = hm_env_str(aTHX_ env, "REMOTE_ADDR", 11, &n); hm_log_tok(loop, s, n);
     hm_log_raw(loop, " - ", 3);                        /* %l always '-' */
-    s = hm_env_str(aTHX_ env, "REMOTE_USER", 11, &n); hm_log_tok(loop, s, n);
+    /* REMOTE_USER is whatever an auth layer set it to, from a name the
+     * client chose: escaped like the quoted fields, or a newline in it
+     * splits the line. */
+    s = hm_env_str(aTHX_ env, "REMOTE_USER", 11, &n);
+    if (s && n) hm_log_quoted(loop, s, n); else hm_log_raw(loop, "-", 1);
     hm_log_raw(loop, " [", 2);
     ts = hm_log_time(loop); hm_log_raw(loop, ts, strlen(ts));
     hm_log_raw(loop, "] \"", 3);
@@ -1855,7 +1991,7 @@ static int hm_queue_response(pTHX_ hm_conn *c, SV *resp) {
     SV **s0, **s1, **s2;
     SV *fh_body = NULL;
     AV *bav = NULL;
-    int status = 500, has_len = 0, has_conn = 0;
+    int status = 500, has_len = 0, has_conn = 0, has_date = 0;
     int gz_out = 0;
     size_t blen = 0;
     size_t hdr_start = c->wlen;
@@ -1876,8 +2012,18 @@ static int hm_queue_response(pTHX_ hm_conn *c, SV *resp) {
     s0 = av_fetch(rav, 0, 0);
     s1 = av_fetch(rav, 1, 0);
     s2 = av_fetch(rav, 2, 0);
-    if (s0) status = (int)SvIV(*s0);
-    if (s1 && SvROK(*s1) && SvTYPE(SvRV(*s1)) == SVt_PVAV) hav = (AV *)SvRV(*s1);
+    if (s0 && *s0) status = (int)SvIV(*s0);
+    if (s1 && *s1 && SvROK(*s1) && SvTYPE(SvRV(*s1)) == SVt_PVAV) hav = (AV *)SvRV(*s1);
+    if (!hm_headers_ok(aTHX_ hav)) {
+        PerlIO_printf(PerlIO_stderr(),
+                      "Hyperman: response header carries CR, LF or NUL; refused\n");
+        hm_wb_put(c, HM_ERR500, sizeof(HM_ERR500) - 1);
+        c->keepalive = 0;
+        c->last_status = 500;
+        c->last_blen = 21;
+        return 0;
+    }
+    if (s2 && !*s2) s2 = NULL;
 
     /* body length (first pass, no copy) */
     if (s2 && SvROK(*s2) && SvTYPE(SvRV(*s2)) == SVt_PVAV) {
@@ -1928,6 +2074,14 @@ static int hm_queue_response(pTHX_ hm_conn *c, SV *resp) {
             const char *ks;
             if (!k || !*k) continue;
             ks = SvPV(*k, kl);
+            /* A response that sets a cookie is one a BREACH-style attacker
+             * would want compressed beside a reflected input; left alone,
+             * as the no-transform contract for a Set-Cookie response. */
+            if (kl == 10 && (ks[0] | 32) == 's'
+                && hm_strncasecmp(ks, "Set-Cookie", 10) == 0) {
+                enc_seen = 1;
+                break;
+            }
             if ((ks[0] | 32) != 'c') continue;
             if (kl == 16 && hm_strncasecmp(ks, "Content-Encoding", 16) == 0) {
                 enc_seen = 1;
@@ -1981,8 +2135,12 @@ static int hm_queue_response(pTHX_ hm_conn *c, SV *resp) {
             SV **k = av_fetch(hav, i, 0);
             SV **v = av_fetch(hav, i + 1, 0);
             STRLEN kl, vl;
-            const char *ks = SvPV(*k, kl);
-            const char *vs = SvPV(*v, vl);
+            const char *ks, *vs;
+            if (!k || !*k || !v || !*v) continue;   /* a hole in the array */
+            ks = SvPV(*k, kl);
+            vs = SvPV(*v, vl);
+            if (kl == 4 && (ks[0] | 32) == 'd' && hm_strncasecmp(ks, "Date", 4) == 0)
+                has_date = 1;
             /* both interesting names start with 'c', so one folded-byte test
              * skips the case-blind scans for every other header */
             if ((ks[0] | 32) == 'c') {
@@ -2050,6 +2208,20 @@ static int hm_queue_response(pTHX_ hm_conn *c, SV *resp) {
             line[ln++] = '\r'; line[ln++] = '\n';
             hm_wb_put(c, line, (size_t)ln);
         }
+        /* HEAD: the headers of the GET, including its Content-Length, and
+         * not one body byte - which the app, like most apps, produced
+         * anyway. Sending it would be read as the start of the next
+         * response on this connection. */
+        if (!no_entity && c->is_head) {
+            if (fh_body) { SvREFCNT_dec(fh_body); fh_body = NULL; }
+            if (c->bsrc.kind) hm_bsrc_release(aTHX_ &c->bsrc);
+            bav = NULL; bn = 0; blen = 0;
+            c->last_blen = 0;
+        }
+    }
+    if (!has_date) {
+        const char *dh = hm_date_header(loop);
+        if (dh) hm_wb_put(c, dh, HM_DATE_LEN);
     }
     if (!has_conn)
         hm_wb_put(c, c->keepalive ? "Connection: keep-alive\r\n" : "Connection: close\r\n",
@@ -2241,6 +2413,9 @@ static int hm_flush(pTHX_ hm_conn *c) {
         if (loop->conns[fd] != c)      return -1;
         if (c->wlen || c->bsrc.kind)   return 0;
     }
+    /* hm_process stopped on a full write buffer with requests still in the
+     * read buffer: the client has now read, so serve the next of them. */
+    if (c->backlogged) { c->backlogged = 0; hm_again_push(loop, c); }
     if (!c->keepalive && !c->awaiting) { hm_close(aTHX_ loop, c); return -1; }
     /* requests that pipelined in behind the stream were parked; pick them
      * up on the next loop turn */
@@ -2260,6 +2435,11 @@ static void hm_deliver(pTHX_ int fd, UV id, SV *resp) {
     hm_loop *loop = hm_cur_loop;
     hm_conn *c = (loop && fd >= 0 && fd < HM_MAXFD) ? loop->conns[fd] : NULL;
     if (!(c && c->id == id)) return;
+    /* Only a parked connection is owed a response. A responder called a
+     * second time, or the 500 for a streaming handler that died AFTER it
+     * had already answered, would otherwise be serialised onto a live
+     * keep-alive connection as the reply to its next request. */
+    if (!c->awaiting) return;
     /* detached from inside a Future continuation (async work before an
      * upgrade): the app owns the socket, so drop the response it resolved
      * with and forget the connection */
@@ -2313,6 +2493,8 @@ static void hm_start_stream(pTHX_ int fd, UV id, int status, SV *headers) {
     hm_loop *loop = hm_cur_loop;
     hm_conn *c = (loop && fd >= 0 && fd < HM_MAXFD) ? loop->conns[fd] : NULL;
     char line[64];
+    AV *hav = NULL;
+    int has_date = 0;
     if (!(c && c->id == id)) return;
     c->keepalive = 0;
     if (c->env_sv) {
@@ -2320,25 +2502,44 @@ static void hm_start_stream(pTHX_ int fd, UV id, int status, SV *headers) {
         SvREFCNT_dec(c->env_sv);
         c->env_sv = NULL;
     }
+    if (headers && SvROK(headers) && SvTYPE(SvRV(headers)) == SVt_PVAV)
+        hav = (AV *)SvRV(headers);
+    if (!hm_headers_ok(aTHX_ hav)) {
+        PerlIO_printf(PerlIO_stderr(),
+                      "Hyperman: response header carries CR, LF or NUL; refused\n");
+        hm_wb_put(c, HM_ERR500, sizeof(HM_ERR500) - 1);
+        c->last_status = 500;
+        c->last_blen = 21;
+        c->awaiting = 0;          /* nothing more is owed on this connection */
+        hm_flush(aTHX_ c);
+        return;
+    }
     {
         size_t sll;
         const char *sl = hm_status_line(status, &sll, line);
         hm_wb_put(c, sl, sll);
     }
-    if (headers && SvROK(headers) && SvTYPE(SvRV(headers)) == SVt_PVAV) {
-        AV *hav = (AV *)SvRV(headers);
+    if (hav) {
         SSize_t i, hn = av_len(hav) + 1;
         for (i = 0; i + 1 < hn; i += 2) {
             SV **k = av_fetch(hav, i, 0);
             SV **v = av_fetch(hav, i + 1, 0);
             STRLEN kl, vl;
-            const char *ks = SvPV(*k, kl);
-            const char *vs = SvPV(*v, vl);
+            const char *ks, *vs;
+            if (!k || !*k || !v || !*v) continue;
+            ks = SvPV(*k, kl);
+            vs = SvPV(*v, vl);
+            if (kl == 4 && (ks[0] | 32) == 'd' && hm_strncasecmp(ks, "Date", 4) == 0)
+                has_date = 1;
             hm_wb_put(c, ks, kl);
             hm_wb_put(c, ": ", 2);
             hm_wb_put(c, vs, vl);
             hm_wb_put(c, "\r\n", 2);
         }
+    }
+    if (!has_date) {
+        const char *dh = hm_date_header(loop);
+        if (dh) hm_wb_put(c, dh, HM_DATE_LEN);
     }
     /* A 101 is an upgrade: the caller's own Upgrade and Connection headers
      * are the response, and "close" would contradict them. The connection
@@ -2354,6 +2555,7 @@ static void hm_stream_write(pTHX_ int fd, UV id, SV *data) {
     if (c && c->id == id) {
         STRLEN l;
         const char *p = SvPV(data, l);
+        if (c->is_head && !c->tunnel) return;   /* HEAD: headers only */
         hm_wb_put(c, p, l);
         c->loop->bytes_out += l;
         hm_flush(aTHX_ c);
@@ -2571,6 +2773,22 @@ static void hm_process(pTHX_ hm_conn *c) {
         if (c->awaiting) break;   /* parked; resumes via hm_deliver */
         if (c->bsrc.kind) break;  /* a body is still streaming out; the
                                      flush that finishes it re-queues us */
+        /* Responses the client has not read yet. A pipeline that never
+         * reads would otherwise have every request in the read buffer
+         * answered into a write buffer that only grows: hold the rest until
+         * the drain re-queues this connection (hm_flush, backlogged). */
+        if (c->wlen - c->woff > HM_WB_HIWAT) { c->backlogged = 1; break; }
+
+        /* RFC 9112 2.2: at least one empty line before the request line is
+         * ignored. Stripped here so the request line is the first line and
+         * not an empty one with the real request line read as a header. */
+        if (c->rlen >= 2 && c->rbuf[0] == '\r' && c->rbuf[1] == '\n') {
+            size_t k = 0;
+            while (k + 1 < c->rlen && c->rbuf[k] == '\r' && c->rbuf[k + 1] == '\n') k += 2;
+            memmove(c->rbuf, c->rbuf + k, c->rlen - k);
+            c->rlen -= k;
+            if (c->rlen == 0) break;
+        }
 
         char *end = (char *)hm_memmem(c->rbuf, c->rlen, "\r\n\r\n", 4);
         if (!end) break;
@@ -2633,8 +2851,9 @@ static void hm_process(pTHX_ hm_conn *c) {
         size_t body_consumed;   /* wire octets after the headers this request uses */
         if (clen < 0) {         /* chunked: validate, then decode in place */
             size_t enc = 0, dec = 0;
-            int r = hm_chunked_scan(c->rbuf + bodystart, c->rlen - bodystart,
-                                    &enc, &dec, loop->max_read);
+            int r = hm_chunked_scan_from(c->rbuf + bodystart, c->rlen - bodystart,
+                                         &enc, &dec, loop->max_read,
+                                         &c->chunk_pos, &c->chunk_dec);
             if (r == HM_CHUNKED_TOOBIG) {   /* well framed, just too large */
                 static const char e413[] =
                     "HTTP/1.1 413 Payload Too Large\r\nContent-Length: 0\r\n"
@@ -2746,9 +2965,17 @@ static void hm_process(pTHX_ hm_conn *c) {
                     c->nreqs++;
                     loop->requests++;
                 }
-                if (hm_h2_start_upgrade(aTHX_ c, se, sl, env, is_head) < 0) {
-                    hm_close(aTHX_ loop, c);
-                    return;
+                {
+                    int rc;
+                    c->in_app = 1;      /* the upgrade dispatches stream 1 */
+                    rc = hm_h2_start_upgrade(aTHX_ c, se, sl, env, is_head);
+                    c->in_app = 0;
+                    if (rc < 0 || c->close_deferred) {
+                        c->close_deferred = 0;
+                        hm_close(aTHX_ loop, c);
+                        return;
+                    }
+                    hm_read_resume(loop, c);
                 }
                 hm_h2_input(aTHX_ c);   /* client's h2 preface + frames, + flush */
                 return;
@@ -2760,6 +2987,7 @@ static void hm_process(pTHX_ hm_conn *c) {
                                clen, c, hidx, nhl);
         SV *env_rv = NULL;
         SV *resp;
+        c->in_app = 1;          /* see hm_close: a close meanwhile is deferred */
         if (c->lst && c->lst->redirect_https) {   /* built-in :80 -> :443 bounce */
             resp = hm_redirect_response(aTHX_ env, c->lst->redirect_https);
             if (hm_logging(loop)) env_rv = newRV_noinc((SV *)env);
@@ -2770,6 +2998,17 @@ static void hm_process(pTHX_ hm_conn *c) {
         } else {
             resp = hm_call_app0(aTHX_ loop, env);
         }
+        c->in_app = 0;
+        if (c->close_deferred) {
+            /* The peer left, or the sweep gave up on it, while the handler
+             * ran. Nothing it returned has anywhere to go. */
+            c->close_deferred = 0;
+            if (env_rv) SvREFCNT_dec(env_rv);
+            if (resp)   SvREFCNT_dec(resp);
+            hm_close(aTHX_ loop, c);
+            return;
+        }
+        hm_read_resume(loop, c);
 
         /* The app called detach: the socket is its own now. Drop whatever it
          * returned (the sentinel), forget the connection, and do not touch c
@@ -2823,6 +3062,7 @@ static void hm_process(pTHX_ hm_conn *c) {
         memmove(c->rbuf, c->rbuf + consumed, c->rlen - consumed);
         c->rlen -= consumed;
         c->req_start = 0;
+        c->chunk_pos = c->chunk_dec = 0;
         c->cont_sent = 0;       /* the next request on this connection asks
                                  * for itself */
         served++;
@@ -2886,10 +3126,40 @@ static int hm_tunnel_bytes(pTHX_ hm_conn *c) {
     return loop->conns[c->fd] == c;
 }
 
+/* Stop and restart reading a connection whose buffer is full while a frame
+ * on the stack still holds pointers into it (hm_readable, below). The
+ * watcher is persistent and level-triggered, so leaving the bytes in the
+ * socket without this would wake the loop every turn until the frame
+ * returned. Readiness mode only: a completion-mode read is armed from the
+ * top of a loop turn (hm_run_again), never from under a frame. */
+static void hm_read_pause(hm_loop *loop, hm_conn *c) {
+    if (c->read_paused) return;
+    c->read_paused = 1;
+    loop->be->remove_io(loop->be, c->fd, HM_EV_READ);
+}
+static void hm_read_resume(hm_loop *loop, hm_conn *c) {
+    if (!c->read_paused) return;
+    c->read_paused = 0;
+    loop->be->add_io(loop->be, c->fd, HM_EV_READ, 0);
+}
+
 static void hm_readable(pTHX_ hm_conn *c) {
     hm_loop *loop = c->loop;
     for (;;) {
         if (c->rlen == c->rcap) {
+            /* A synchronous handler on the stack (in_app) may be nghttp2
+             * reading frames out of this very buffer, or hm_process holding
+             * offsets into it: growing it here would move it from under
+             * them. Leave the rest in the socket until that frame returns. */
+            if (c->in_app) { hm_read_pause(loop, c); break; }
+            /* HTTP/2: the buffer holds frames, not a request, and nghttp2
+             * parses them incrementally - a frame larger than the buffer is
+             * consumed across reads. Hand over what is here and let the
+             * level-triggered watcher bring the rest. The request ceiling
+             * is per stream there (hm_h2_cb_data_chunk); applied to this
+             * buffer it closed every upload over 16KB on a server whose
+             * max_body was below that. */
+            if (c->h2) break;
             /* grow for large bodies; unbounded headers are rejected */
             if (c->rcap >= loop->max_read
                 || (c->rlen >= 65536 && !hm_memmem(c->rbuf, c->rlen, "\r\n\r\n", 4))) {
@@ -2996,8 +3266,50 @@ static void hm_readable(pTHX_ hm_conn *c) {
         }
     }
     hm_lru_touch(loop, c);
-    if (!c->tunnel) hm_process(aTHX_ c);   /* a tunnel carries no requests */
+    /* A tunnel carries no requests. A connection whose synchronous handler
+     * is on the stack (its ->get pumped this loop) keeps the new bytes in
+     * rbuf for the hm_process frame already running on it: a second frame
+     * would consume the pipeline from under the first one's offsets. */
+    if (!c->tunnel && !c->in_app) hm_process(aTHX_ c);
     if (loop->conns[c->fd] == c) hm_flush(aTHX_ c);
+}
+
+static hm_tw *hm_add_timer_watch_c(hm_loop *loop, double secs,
+                                   hm_abi_timer_cb cb, void *ud);
+
+/* accept(2) failed for want of a descriptor. The listener is level-readable
+ * and stays so, so simply returning would wake the loop again at once and
+ * spin the worker at 100% CPU until the table had room. Reclaim an idle
+ * keep-alive connection when there is one; otherwise stop listening for a
+ * tenth of a second and come back. */
+typedef struct { hm_loop *loop; hm_listener *lst; } hm_starve;
+static void hm_accept_rearm(pTHX_ void *ud) {
+    hm_starve *s = (hm_starve *)ud;
+    s->lst->starved = 0;
+    if (!s->loop->stopping && s->lst->fd >= 0)
+        s->loop->be->add_io(s->loop->be, s->lst->fd, HM_EV_READ, 0);
+    free(s);
+}
+static void hm_accept_starved(pTHX_ hm_loop *loop, hm_listener *lst) {
+    hm_conn *c = loop->lru_head;           /* oldest activity first */
+    while (c) {
+        if (!c->awaiting && !c->in_app && !c->h2 && !c->tunnel && !c->tls_hs
+            && c->rlen == 0 && c->wlen == c->woff && !c->bsrc.kind
+            && c->nreqs > 0) {
+            hm_close(aTHX_ loop, c);
+            return;
+        }
+        c = c->lru_next;
+    }
+    if (lst->starved) return;
+    {
+        hm_starve *s = (hm_starve *)hm_xmalloc(sizeof(*s));
+        s->loop = loop;
+        s->lst  = lst;
+        lst->starved = 1;
+        loop->be->remove_io(loop->be, lst->fd, HM_EV_READ);
+        (void)hm_add_timer_watch_c(loop, 0.1, hm_accept_rearm, s);
+    }
 }
 
 static void hm_accept(pTHX_ hm_loop *loop, hm_listener *lst) {
@@ -3010,7 +3322,11 @@ static void hm_accept(pTHX_ hm_loop *loop, hm_listener *lst) {
         char peer[INET6_ADDRSTRLEN];
         int  peer_port;
         int fd = hm_os_accept(lst->fd, (struct sockaddr *)&ss, &slen);
-        if (fd < 0) break;                     /* EAGAIN: drained */
+        if (fd < 0) {                          /* EAGAIN: drained */
+            if (errno == EMFILE || errno == ENFILE)
+                hm_accept_starved(aTHX_ loop, lst);
+            break;
+        }
         if (fd >= HM_MAXFD) { hm_os_close(fd); continue; }
         /* Denylist: format the peer and drop a blocked IP HERE, before a
          * connection object is allocated or a byte is read - the cheapest
@@ -3096,7 +3412,8 @@ static void hm_io_event(pTHX_ hm_loop *loop, int fd, int mask, hm_iow *slot) {
         dSP;
         ENTER; SAVETMPS; PUSHMARK(SP);
         PUTBACK;
-        call_sv(sv, G_DISCARD);
+        call_sv(sv, G_DISCARD | G_EVAL);
+        hm_warn_died(aTHX_ "watch_io callback");
         FREETMPS; LEAVE;
     } else {
         slot->sv = NULL;                    /* one-shot */
@@ -3113,7 +3430,9 @@ static void hm_sweep(pTHX_ hm_loop *loop) {
     loop->now = now;
     while (c) {
         hm_conn *next = c->lru_next;
-        if (!c->awaiting) {
+        /* in_app: a synchronous handler is running for it (and pumping
+         * this loop); its request is in progress, not idle */
+        if (!c->awaiting && !c->in_app) {
             double idle = difftime(now, c->last_active);
             int slow = c->req_start &&
                        difftime(now, c->req_start) > loop->header_timeout;
@@ -3148,7 +3467,8 @@ static void hm_on_signal(pTHX_ hm_loop *loop) {
     c = loop->lru_head;
     while (c) {
         hm_conn *next = c->lru_next;
-        if (!c->awaiting && c->rlen == 0 && c->wlen == c->woff && c->nreqs > 0)
+        if (!c->awaiting && !c->in_app && c->rlen == 0 && c->wlen == c->woff
+            && c->nreqs > 0)
             hm_close(aTHX_ loop, c);
         c = next;
     }
@@ -3173,7 +3493,8 @@ static void hm_run_deferred(pTHX_ hm_loop *loop) {
         dSP;
         PUSHMARK(SP);
         PUTBACK;
-        call_sv(cb, G_DISCARD);
+        call_sv(cb, G_DISCARD | G_EVAL);
+        hm_warn_died(aTHX_ "deferred callback");
     }
     FREETMPS; LEAVE;
 }
@@ -3188,7 +3509,7 @@ static void hm_run_again(pTHX_ hm_loop *loop) {
     for (i = 0; i < n; i++) {
         hm_conn *c = loop->conns[loop->again[i].fd];
         if (c && c->id == loop->again[i].id && !c->awaiting
-            && !c->bsrc.kind) {
+            && !c->in_app && !c->bsrc.kind) {
             hm_process(aTHX_ c);
             if (loop->conns[c->fd] == c) {
                 hm_flush(aTHX_ c);
@@ -3241,7 +3562,8 @@ static void hm_dispatch(pTHX_ hm_loop *loop, hm_event *ev) {
                 dSP;
                 ENTER; SAVETMPS; PUSHMARK(SP);
                 PUTBACK;
-                call_sv(sv, G_DISCARD);
+                call_sv(sv, G_DISCARD | G_EVAL);
+                hm_warn_died(aTHX_ "timer callback");
                 FREETMPS; LEAVE;
             }
             SvREFCNT_dec(sv);
@@ -3534,7 +3856,14 @@ static void hm_loop_free(pTHX_ hm_loop *loop) {
             hm_os_close(loop->listeners[i].udp_fd);
     }
     if (loop->listeners) free(loop->listeners);
-    if (loop->self_sv) SvREFCNT_dec(loop->self_sv);
+    /* A weak copy of the wrapper (hm_loop_to_sv): dropping it frees the RV
+     * alone and runs no DESTROY. */
+    if (loop->self_sv) {
+        SV *self = loop->self_sv;
+        loop->self_sv    = NULL;
+        loop->perl_owned = 0;
+        SvREFCNT_dec(self);
+    }
     if (loop->log_cb)  SvREFCNT_dec(loop->log_cb);
     if (loop->app) SvREFCNT_dec(loop->app);
     SvREFCNT_dec((SV *)loop->deferred);
@@ -4681,9 +5010,20 @@ static hm_loop *hm_loop_from_sv(pTHX_ SV *sv) {
     return INT2PTR(hm_loop *, SvIV(SvRV(sv)));
 }
 
+/* The Perl wrapper for a loop. ONE blessed referent per loop, however many
+ * times this is asked: Hyperman::Loop->new, psgix.loop, Hyperman->loop and
+ * the ABI's sv_of_loop used to each mint their own, and the first wrapper
+ * whose refcount hit zero freed a Perl-owned loop under every other one.
+ * The loop keeps a WEAK copy, so holding the wrapper is what keeps the loop,
+ * and the loop holding its own wrapper keeps nothing alive. */
 static SV *hm_loop_to_sv(pTHX_ hm_loop *loop) {
-    SV *rv = newRV_noinc(newSViv(PTR2IV(loop)));
+    SV *rv;
+    if (loop->self_sv && SvROK(loop->self_sv)) return newSVsv(loop->self_sv);
+    rv = newRV_noinc(newSViv(PTR2IV(loop)));
     sv_bless(rv, gv_stashpv("Hyperman::Loop", GV_ADD));
+    if (loop->self_sv) SvREFCNT_dec(loop->self_sv);   /* a cleared weak ref */
+    loop->self_sv = newSVsv(rv);
+    sv_rvweaken(loop->self_sv);
     return rv;
 }
 

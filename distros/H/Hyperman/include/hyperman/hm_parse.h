@@ -74,13 +74,38 @@ static int hm_parse_index(const char *head, size_t headlen, long *clen,
     const char *hend = head + headlen;
     int seen_cl = 0, seen_te = 0, chunked = 0, n = 0;
     long cl = 0;
+    /* Line terminators are CRLF and nothing else (RFC 9112 2.2). A bare LF
+     * is not a terminator here, so a front end that honours one would frame
+     * a different request from the same bytes; a bare CR likewise. Either
+     * is 400. The one memchr pass over the block is the whole cost. */
+    {
+        const char *q = head;
+        while (q < hend && (q = (const char *)memchr(q, '\n', hend - q))) {
+            if (q == head || q[-1] != '\r') return 400;
+            q++;
+        }
+    }
+    /* The request line must exist and hold a method and a target. An empty
+     * line here is a client that led with CRLF beyond the one hm_process
+     * strips, or a line with no SP at all. */
+    {
+        size_t ll = line_end ? (size_t)(line_end - head) : headlen;
+        if (ll == 0 || !memchr(head, ' ', ll)) return 400;
+        if (line_end && (line_end + 1 >= hend || line_end[1] != '\n')) return 400;
+    }
     while (p < hend) {
         const char *eol = (const char *)memchr(p, '\r', hend - p);
         size_t len = eol ? (size_t)(eol - p) : (size_t)(hend - p);
         const char *colon = (const char *)memchr(p, ':', len);
+        if (eol && (eol + 1 >= hend || eol[1] != '\n')) return 400;
         if (colon && colon > p) {
             size_t nk = (size_t)(colon - p);
             const char *v = colon + 1, *vend = p + len;
+            /* No whitespace between a field name and its colon (RFC 9112
+             * 5.1): "Content-Length : 5" would otherwise be stored under a
+             * name with a trailing space and frame the body as empty,
+             * leaving the body to be read as the next request. */
+            if (colon[-1] == ' ' || colon[-1] == '\t') return 400;
             while (v < vend && (*v == ' ' || *v == '\t')) v++;
             if (idx && n < idx_cap) {
                 idx[n].off  = (unsigned)(p - head);
@@ -136,13 +161,25 @@ static int hm_frame_length(const char *head, size_t headlen, long *clen) {
  * should send less. Folding them together (as this did before 0.25) told
  * every oversize chunked upload to go and fix its syntax. */
 #define HM_CHUNKED_TOOBIG (-2)
-static int hm_chunked_scan(const char *buf, size_t avail,
-                           size_t *encoded, size_t *decoded, size_t max) {
-    size_t pos = 0, dec = 0;
+/* A chunk-size line is at most this many hex digits. Sixteen cover a 64-bit
+ * size; anything longer is leading zeros, which a client can send by the
+ * megabyte to keep the scanner busy on one chunk. */
+#define HM_CHUNK_DIGITS_MAX 16
+
+/* The scan, resumable: *rpos / *rdec name the last chunk boundary already
+ * validated (octets consumed, data octets so far) and are advanced to the
+ * newest one before returning 0, so a body arriving in many segments costs
+ * each chunk one look rather than one per segment. Pass zeros to start. */
+static int hm_chunked_scan_from(const char *buf, size_t avail,
+                                size_t *encoded, size_t *decoded, size_t max,
+                                size_t *rpos, size_t *rdec) {
+    size_t pos = *rpos, dec = *rdec;
+    if (pos > avail) { pos = 0; dec = 0; }               /* stale: restart */
     for (;;) {
         size_t i = pos;
         unsigned long long size = 0;
         int ndig = 0;
+        *rpos = pos; *rdec = dec;
         while (i < avail && buf[i] != '\r' && buf[i] != ';') {
             int ch = (unsigned char)buf[i], v;
             if      (ch >= '0' && ch <= '9') v = ch - '0';
@@ -150,8 +187,9 @@ static int hm_chunked_scan(const char *buf, size_t avail,
             else if (ch >= 'A' && ch <= 'F') v = ch - 'A' + 10;
             else return -1;                              /* bad hex digit */
             if (size > (ULLONG_MAX >> 4)) return -1;     /* size overflow */
+            if (++ndig > HM_CHUNK_DIGITS_MAX) return -1; /* digit flood  */
             size = (size << 4) | (unsigned)v;
-            ndig++; i++;
+            i++;
         }
         /* No digits. Malformed only if the bytes to say so are HERE: a
          * chunk-size line that has not arrived yet is indistinguishable from
@@ -180,6 +218,12 @@ static int hm_chunked_scan(const char *buf, size_t avail,
         dec += (size_t)size;
         pos = i + (size_t)size + 2;
     }
+}
+
+static int hm_chunked_scan(const char *buf, size_t avail,
+                           size_t *encoded, size_t *decoded, size_t max) {
+    size_t pos = 0, dec = 0;
+    return hm_chunked_scan_from(buf, avail, encoded, decoded, max, &pos, &dec);
 }
 
 /* Compact a chunked body already validated by hm_chunked_scan to its decoded

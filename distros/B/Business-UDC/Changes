@@ -1,3 +1,15 @@
+0.09 2026-10-11T11:24:24+02:00
+ - Add another case for whitespace issue ( = ).
+ - Add another case for whitespace issue (- 044).
+ - Add check for extra closing parenthesis.
+ - Add check for opening/closing parenthesis.
+ - Add support for (...) tokenization.
+ - Add support for [] in ALPHA_SPEC.
+ - Add support for '::' operator.
+ - Add support for common auxiliaries of place.
+ - Split errors with whitespace to two types (for ALPHA_SPEC).
+ - Update author email.
+
 0.08 2026-05-08T09:46:06+02:00
  - Add processing of WHITESPACE in Tokenizer. And move error with
    whitespace from Tokenizer to Parser.

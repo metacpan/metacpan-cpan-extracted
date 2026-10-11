@@ -194,7 +194,7 @@ json-schema-eval - A command-line interface to JSON::Schema::Modern::evaluate()
 
 =head1 VERSION
 
-version 0.650
+version 0.651
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.

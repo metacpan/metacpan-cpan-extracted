@@ -4,11 +4,11 @@ use base qw(MARC::Validator::Abstract);
 use strict;
 use warnings;
 
-use Business::UDC 0.08;
+use Business::UDC 0.09;
 use Data::MARC::Validator::Report::Error 0.02;
 use Data::MARC::Validator::Report::Plugin::Errors 0.02;
 
-our $VERSION = 0.22;
+our $VERSION = 0.23;
 
 sub module_name {
 	my $self = shift;
@@ -67,6 +67,30 @@ sub process {
 			} elsif ($udc_error eq 'Bad dot character in number.') {
 				push @record_errors, Data::MARC::Validator::Report::Error->new(
 					'error' => "Field 080a has bad dot character.",
+					'params' => {
+						'field_080_a' => $field_080a,
+						'character' => $udc_error_params{'character'},
+					},
+				);
+			} elsif ($udc_error eq "Missing opening parenthesis '('.") {
+				push @record_errors, Data::MARC::Validator::Report::Error->new(
+					'error' => "Field 080a has missing opening parenthesis '('.",
+					'params' => {
+						'field_080_a' => $field_080a,
+						'character' => $udc_error_params{'character'},
+					},
+				);
+			} elsif ($udc_error eq "Missing closing parenthesis ')'.") {
+				push @record_errors, Data::MARC::Validator::Report::Error->new(
+					'error' => "Field 080a has missing closing parenthesis ')'.",
+					'params' => {
+						'field_080_a' => $field_080a,
+						'character' => $udc_error_params{'character'},
+					},
+				);
+			} elsif ($udc_error eq "Extra closing parenthesis ')'.") {
+				push @record_errors, Data::MARC::Validator::Report::Error->new(
+					'error' => "Field 080a has extra closing parenthesis ')'.",
 					'params' => {
 						'field_080_a' => $field_080a,
 						'character' => $udc_error_params{'character'},

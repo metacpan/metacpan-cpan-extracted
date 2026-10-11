@@ -8,7 +8,7 @@ use Digest::SHA ();
 use Game::Xiangqi::Engine ':all';
 use Game::Xiangqi::Notation;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 my $N = 'Game::Xiangqi::Notation';
 
@@ -86,6 +86,19 @@ what makes it beatable by a person.
 B<The re-spaced ladder has not itself been played.> Until it has, this section
 describes the measurement the current spacing was derived from and not a
 measurement of the current spacing.
+
+=head2 The ladder repeats a rung on purpose
+
+C<@LADDER> has four entries and B<three distinct budgets>: the middle one is
+written twice. The draw is one rung per game out of the list, so a doubled entry
+is simply an opponent that comes up twice as often, which is what the middle of a
+ladder should do. It is not a typo and it is not a rung to measure: F<xt/bot-ladder.t>
+plays the B<distinct> budgets against each other and skips the repeat.
+
+The consequence for a consumer is that two rung indices name one opponent, so
+C<--level 1> and C<--level 2> of F<bin/xiangqi> play the same game. The number of
+rungs a consumer may offer is C<scalar @LADDER> and not the number of distinct
+budgets in it.
 
 =head2 The seat is in the tie-break
 

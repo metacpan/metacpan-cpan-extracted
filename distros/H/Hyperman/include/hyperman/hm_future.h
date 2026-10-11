@@ -110,6 +110,20 @@ static AV *hmf_values_av(pTHX_ SV *self) {
  *
  * SAVETMPS sets a new floor rather than freeing what the caller mortalised
  * before calling in, so a caller's own temporaries are untouched. */
+/* After a G_EVAL call: say what died, on psgi.errors' stream. Every callback
+ * the loop runs is trapped, so an exception never unwinds through the C
+ * loop (which would skip loop->running-- and leave this queue half drained)
+ * - but it must not be silent either, or an app bug becomes a 500 with no
+ * line in any log. */
+static void hm_warn_died(pTHX_ const char *what) {
+    STRLEN l;
+    const char *m;
+    if (!SvTRUE(ERRSV)) return;
+    m = SvPV(ERRSV, l);
+    PerlIO_printf(PerlIO_stderr(), "Hyperman: %s died: %.*s%s", what, (int)l, m,
+                  (l && m[l - 1] == '\n') ? "" : "\n");
+}
+
 static void hmf_pump(pTHX) {
     if (hm_fq_active) return;
     ENTER;
@@ -123,7 +137,8 @@ static void hmf_pump(pTHX) {
         PUSHMARK(SP);
         XPUSHs(fut);
         PUTBACK;
-        call_sv(cb, G_DISCARD);
+        call_sv(cb, G_DISCARD | G_EVAL);
+        hm_warn_died(aTHX_ "on_ready callback");
     }
     FREETMPS;
     LEAVE;
@@ -369,6 +384,9 @@ XS_INTERNAL(hm_xs_chain_cb) {
     IV st;
     if (!cl || items < 1) XSRETURN_EMPTY;
     next = cl->a;
+    /* Cancelled while the inner future was still running: nothing to
+     * deliver into, and settling it again would flip CANCELLED to DONE. */
+    if (hmf_state(aTHX_ next) != HMF_PENDING) XSRETURN_EMPTY;
     st = hm_any_state(aTHX_ g);
     if (st == HMF_DONE || st == HMF_FAILED) {
         AV *vals = newAV();
@@ -385,6 +403,9 @@ static void hmf_chain_into(pTHX_ SV *next, AV *vals) {
     SV **first = av_len(vals) >= 0 ? av_fetch(vals, 0, 0) : NULL;
     if (first && hm_is_awaitable(aTHX_ *first)) {
         SV *cb = hm_closure(aTHX_ hm_xs_chain_cb, next, NULL, NULL, NULL, 0, 0);
+        /* The returned future is now what `next` waits on, so cancelling
+         * `next` must reach it - the same link then() made to its input. */
+        hmf_set_upstream(aTHX_ next, *first);
         hm_any_on_ready(aTHX_ *first, cb);
         SvREFCNT_dec(cb);
         SvREFCNT_dec((SV *)vals);
@@ -422,6 +443,10 @@ XS_INTERNAL(hm_xs_then_cb) {
         XSRETURN_EMPTY;
     }
 
+    /* `next` was cancelled after this fire was queued (the upstream had
+     * already settled, so the cancel had nothing to propagate to): the
+     * user's callback must not run and the state must not change. */
+    if (hmf_state(aTHX_ next) != HMF_PENDING) XSRETURN_EMPTY;
     if (st == HMF_DONE || st == HMF_FAILED) {
         SV *user = (st == HMF_DONE) ? cl->b : cl->c;
         AV *vals = hmf_values_av(aTHX_ f);
@@ -461,6 +486,7 @@ XS_INTERNAL(hm_xs_transform_cb) {
     if (!cl || items < 1) XSRETURN_EMPTY;
     f = ST(0);
     next = cl->a;
+    if (hmf_state(aTHX_ next) != HMF_PENDING) XSRETURN_EMPTY;   /* cancelled */
     st = hmf_state(aTHX_ f);
     if (st == HMF_DONE || st == HMF_FAILED) {
         SV *mapper = (st == HMF_DONE) ? cl->b : cl->c;
@@ -715,6 +741,7 @@ XS_INTERNAL(hm_xs_fromcpan_cb) {
     IV st;
     if (!cl || items < 1) XSRETURN_EMPTY;
     o = ST(0);
+    if (hmf_state(aTHX_ cl->a) != HMF_PENDING) XSRETURN_EMPTY;
     st = hm_any_state(aTHX_ o);
     if (st == HMF_DONE || st == HMF_FAILED) {
         AV *out = newAV();

@@ -1,4 +1,16 @@
 Revision history for Game-Durak
 
+0.02    2026-10-10
+        - The hand is now chosen with the arrow keys.
+        - Fix: --seat 7 died with a raw engine message and exit 25, because
+          the seat was not checked until a view was asked for.
+        - Fix: --level took any number and was silently clamped. The ladder
+          a consumer may offer is five; Bot->levels is the engine's three,
+          and validating against that would refuse levels 4 and 5.
+        - Fix: a bad option died with exit 255 and never showed the usage.
+        - Fix: bin/durak, bin/ladder and bin/soak carried a development
+          `use lib "$FindBin::Bin/../lib"`. bin/durak is installed, so that
+          shipped, and it adds a directory that is not where the modules go.
+
 0.01    2026-09-25
         First version.

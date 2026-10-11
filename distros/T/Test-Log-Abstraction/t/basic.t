@@ -130,13 +130,42 @@ $ENV{'VERBOSE'} = 0;
 	is($logger->verbose(), 0, 'verbose turned off');
 }
 
+# Level methods return the logger, as Log::Abstraction's do, so they chain
+{
+	my $logger = Test::Log::Abstraction->new(diag => 'none');
+	is($logger->info('one'), $logger, 'level method returns $self');
+	$logger->debug('two')->notice('three');
+	is($logger->count(), 3, 'chained calls all recorded');
+}
+
+# messages() returns a copy, so a test cannot corrupt the capture through it
+{
+	my $logger = Test::Log::Abstraction->new(diag => 'none');
+	$logger->warn('kept');
+	my $copy = $logger->messages();
+	push @{$copy}, { level => 'fake', message => 'injected' };
+	@{$copy} = ();
+	is($logger->count(), 1, 'changing the returned array does not change the capture');
+	isnt($logger->messages(), $logger->messages(), 'each call returns a new array');
+}
+
+# Assertion arguments are validated: an array reference is not a pattern
+{
+	my $logger = Test::Log::Abstraction->new(diag => 'none');
+	throws_ok { $logger->like(['x']) } qr/invalid argument: .*pattern/, 'like() rejects an array reference';
+	throws_ok { $logger->unlike({}) } qr/invalid argument: .*pattern/, 'unlike() rejects a hash reference';
+	throws_ok { $logger->has_level([]) } qr/invalid argument: .*level/, 'has_level() rejects a reference';
+	$logger->warn('a.c');
+	ok($logger->like('a.c', 'string pattern'), 'like() accepts a string pattern');
+}
+
 # Message is a method on the logger, not a global
 {
-	my $a = Test::Log::Abstraction->new(diag => 'none');
-	my $b = Test::Log::Abstraction->new(diag => 'none');
-	$a->warn('only in a');
-	is($a->count(), 1, 'logger A captured');
-	is($b->count(), 0, 'logger B isolated from A');
+	my $first = Test::Log::Abstraction->new(diag => 'none');
+	my $second = Test::Log::Abstraction->new(diag => 'none');
+	$first->warn('only in first');
+	is($first->count(), 1, 'first logger captured');
+	is($second->count(), 0, 'second logger isolated from first');
 }
 
 done_testing();

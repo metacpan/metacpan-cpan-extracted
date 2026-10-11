@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 require Shared::Arena;
 
@@ -96,7 +96,9 @@ then recovers it.
     my $held          = $lease->acquire(ttl => 10);   # override this take
 
 Take the lease, or extend it if we already hold it. True when this process holds
-it afterwards, false when another process holds a current one.
+it afterwards, false when another process holds a current one, or, rarely, when
+another process held the lease's lock for the whole of a short bounded wait.
+L</mine> takes no lock and says whether this process still holds it.
 
 In list context the second value is true when this acquire B<took over> a holder
 that had lapsed or died, rather than starting from a free lease - so a caller

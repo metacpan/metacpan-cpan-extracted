@@ -29,6 +29,7 @@ run(class, ...)
 
         memset(&cfg, 0, sizeof(cfg));
         cfg.log_fd = -1;
+        cfg.http3_max_conns = 1024;   /* an explicit 0 lifts the cap */
         /* -1 is "the caller said nothing", which is NOT the same as
          * completion => 0. The memset above would otherwise read as an
          * explicit request to turn completion-mode reads off on every

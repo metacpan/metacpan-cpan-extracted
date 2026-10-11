@@ -7,9 +7,26 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
 t/00-load.t
+t/api.t
+t/assert.t
 t/autoload.t
 t/basic.t
+t/data-flow.t
 t/diag.t
+t/domain.t
+t/edge_cases.t
+t/function.t
+t/i18n.t
+t/integration.t
+t/lib/Capture.pm
+t/locales.t
+t/logic.t
+t/path.t
+t/performance.t
+t/regex.t
+t/transaction.t
+t/transition.t
 t/render.t
+t/unit.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -36,9 +36,9 @@ From CPAN:
 cpanm Unblock::HTTP2
 ```
 
-Unblock::HTTP2 0.10 requires Perl 5.16 or newer.
+Unblock::HTTP2 0.11 requires Perl 5.16 or newer.
 
-Version 0.10 intentionally breaks the earlier 0.04 API:
+Version 0.10 intentionally broke the earlier 0.04 API:
 `Transaction->inform()` was replaced by `Transaction->send_informational()`.
 There is no compatibility alias.
 
@@ -75,7 +75,26 @@ binding inspects outgoing canonical objects without a Perl FastPath view and
 builds received canonical objects from validated native header spans. Uniform
 subclasses and framework adapters continue to use the portable message API.
 
-The basic transport contract is byte-in, byte-out:
+An event-framework stream can attach directly to Client or Server:
+
+```perl
+$self->{http2} = Unblock::HTTP2::Server->new(
+    transport  => $self,
+    on_request => $on_request,
+);
+```
+
+The framework stream implements `unblock_send($bytes)`,
+`unblock_finish()`, and `unblock_abort($reason)`. It feeds
+`$http->input($bytes)` on network reads and handles EOF with
+`$http->input_eof`. If the host becomes congested after accepting
+a buffer, it calls `$http->resume_output` when ready.
+
+**Output is automatic.** A response produced much later from a timer also
+gets handed to the framework without another socket read.
+
+The original manual transport contract remains available when
+no host is attached:
 
 ```perl
 $engine->input($bytes_from_transport);
@@ -93,30 +112,30 @@ nghttp2 output through a native sink callback. The transport keeps ownership of
 input storage, and outbound buffers are borrowed only for the duration of the
 sink callback. Client and Server use the same ABI.
 
-The normal `input()` and `output()` methods remain the portable path.
+The portable `input()` method is available in both modes. With an
+attached host, output delivery is automatic. Without one, `output()`
+remains the low-level portable output path.
 Native integrations can discover the installed ABI with `definition()`,
 `native_include_dir()`, `header_path()`, and `c_header()`.
 
-See `docs/INTEGRATION.md` for the native transport contract and ownership
-rules.
+Read `perldoc Unblock::HTTP2::Integration`, `docs/INTEGRATION.md`, and
+`docs/COOKBOOK.md` for the framework integration contract and runnable
+IO::Async, AnyEvent, and Linux::Event examples.
 
 Unblock::HTTP2 never waits for network activity itself.
 
 ## Client
 
 ```perl
-use Uniform::HTTP::Request;
 use Unblock::HTTP2::Client;
 
 my $client = Unblock::HTTP2::Client->new;
 
 my $transaction = $client->request(
-    Uniform::HTTP::Request->new(
-        method    => 'GET',
-        target    => '/',
-        scheme    => 'https',
-        authority => 'example.com',
-    ),
+    method    => 'GET',
+    target    => '/',
+    scheme    => 'https',
+    authority => 'example.com',
 
     on_response => sub {
         my ($transaction, $response) = @_;
@@ -141,19 +160,12 @@ carried by an HTTP/2 stream.
 ## Server
 
 ```perl
-use Uniform::HTTP::Response;
 use Unblock::HTTP2::Server;
 
 my $server = Unblock::HTTP2::Server->new(
     on_request => sub {
         my ($transaction, $request) = @_;
-
-        $transaction->respond(
-            Uniform::HTTP::Response->new(
-                status => 200,
-                body   => "hello\n",
-            ),
-        );
+        $transaction->respond(status => 200, body => "hello\n");
     },
 );
 ```
@@ -166,7 +178,8 @@ arrived.
 
 Buffered bodies can live directly on the Uniform message object.
 
-For a streaming local body:
+For a streaming local body (using an existing request object, or using
+the named-field request() form above):
 
 ```perl
 my $transaction = $client->request(
@@ -185,7 +198,8 @@ $transaction->end($last_chunk);
 The same `write()` and `end()` API is used for a streaming server response.
 
 `write()` always accepts the bytes. A false return means the transaction reached
-its cooperative high-water mark. Pause production until `on_drain` runs.
+its cooperative high-water mark or the attached framework host is congested.
+Pause production until `on_drain` runs.
 
 Incoming body bytes are automatically credited back to the peer after the body
 callback returns. A slow consumer can take manual flow-control ownership with:
@@ -203,13 +217,8 @@ Unblock sends them as HTTP/2 trailing HEADERS.
 A server can send an informational response before the final response:
 
 ```perl
-$transaction->send_informational(
-    Uniform::HTTP::Response->new(
-        status => 103,
-    ),
-);
-
-$transaction->respond($final_response);
+$transaction->send_informational(status => 103);
+$transaction->respond(status => 200, body => "ready\n");
 ```
 
 ## CONNECT
@@ -320,6 +329,7 @@ CI covers:
 - current Perl on macOS
 - Strawberry Perl on Windows
 - `distcheck` and `disttest` against the generated distribution
+- optional IO::Async and AnyEvent example client/server smoke tests on Linux
 - a staged-install NativeABI smoke test that compiles an external C consumer
   against the installed public header
 
@@ -335,6 +345,7 @@ included in the CPAN distribution.
 ## More documentation
 
 - `Unblock::HTTP2::Client` - client connection API
+- `Unblock::HTTP2::Integration` - framework integration API and ownership
 - `Unblock::HTTP2::Server` - server connection API
 - `Unblock::HTTP2::Transaction` - per-transaction API
 - `Unblock::HTTP2::NativeABI` - optional native transport ABI
@@ -345,7 +356,7 @@ included in the CPAN distribution.
 
 ## Status
 
-Unblock::HTTP2 0.10 is feature-complete for its intended role as a reusable,
+Unblock::HTTP2 0.11 is feature-complete for its intended role as a reusable,
 event-loop-neutral HTTP/2 engine.
 
 Future work can focus on bug fixes, interoperability, performance, or optional

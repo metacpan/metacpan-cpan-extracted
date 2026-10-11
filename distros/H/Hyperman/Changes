@@ -1,5 +1,40 @@
 Revision history for Hyperman
 
+0.56	2026-10-11
+        - SECURITY: max_body bounds HTTP/2 and HTTP/3 bodies too.
+        - SECURITY: request header blocks are bounded at 64KB on h2 and h3.
+        - SECURITY: FIX a use-after-free when an h2 response closed the
+          connection from inside an nghttp2 callback.
+        - SECURITY: FIX a connection closed under a synchronous handler
+          that awaits being pooled and reused while the handler ran.
+        - SECURITY: REMOTE_ADDR, SERVER_NAME and psgi.errors are
+          per-request copies, not the connection's shared values.
+        - SECURITY: request headers with an underscore in the name are dropped.
+        - SECURITY: whitespace before a header colon, a bare LF or CR, an
+          empty request line and a chunk-size line over 16 digits are 400.
+        - SECURITY: a response header carrying CR, LF or NUL is a 500.
+        - SECURITY: queued responses per connection are capped at 1MB on
+          HTTP/1.1 pipelines and h2 sessions.
+        - SECURITY: RST_STREAM cancels the stream's parked Future.
+        - SECURITY: :scheme and :authority no longer set psgi.url_scheme
+          or SERVER_NAME; a Host beside :authority is ignored.
+        - SECURITY: http3_max_conns defaults to 1024.
+        - HTTP/2 over TLS reports HTTPS and SSL_* as HTTP/1.1 does.
+        - HEAD is answered without a body.
+        - Every response carries a Date header.
+        - Compression skips a response that sets a cookie.
+        - EMFILE at accept no longer spins the worker.
+        - Perl callbacks from the loop are trapped and reported.
+        - FIX a cancelled derived Future being settled by its continuation.
+        - FIX a second Hyperman::Loop wrapper freeing a Perl-owned loop.
+        - FIX an HTTP/1 Writer dropped without close leaking its connection.
+        - FIX an h2 upload over 16KB closing the connection under a small max_body.
+        - FIX the h3 responder writing from inside an ngtcp2 callback.
+        - A pooled connection frees buffers grown past 16KB / 1MB.
+        - A chunked body is scanned from its last validated chunk per read.
+        - REMOTE_USER is escaped in the access log.
+        - t/56 and t/57 cover the above.
+
 0.55	2026-10-05
         - A oneshot timer the backend delivers before its deadline is
           re-armed for the remainder instead of fired

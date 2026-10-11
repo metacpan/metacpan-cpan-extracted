@@ -1,5 +1,14 @@
 Revision history for Robots-Validate:
 
+v0.4.8    2026-10-10 13:51:19+01:00 Europe/London
+  [Enhancements]
+  - Added or updated the robot rules for the following:
+    - bl.uk_lddc_bot
+    - deepcrawl
+    - GreenFaceLabsCensus
+    - ibaaBot
+    - PartnexRadarBot
+
 v0.4.7    2026-10-04 18:19:49+01:00 Europe/London
   [Enhancements]
   - Added or updated the robot rules for the following:

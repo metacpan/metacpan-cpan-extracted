@@ -13,7 +13,7 @@ use Readonly;
 
 Readonly::Array our @EXPORT_OK => qw(parse);
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 sub parse {
 	my $input = shift;
@@ -26,13 +26,16 @@ sub parse {
 	}
 
 	my $tokens = tokenize($input);
+	_check_parentheses($tokens);
+	my $has_alpha_spec = any { $_->{'type'} eq 'ALPHA_SPEC' } @{$tokens};
 	my $normalized_tokens = [];
 	foreach my $tok_hr (@{$tokens}) {
 		my %parse_tok = %{$tok_hr};
-		_check_whitespace_token(\%parse_tok);
+		_check_whitespace_token(\%parse_tok, $has_alpha_spec);
 		_check_apos_aux_tokens(\%parse_tok);
 		_check_aux_time_tokens(\%parse_tok);
 		_check_number_token(\%parse_tok);
+		_check_aux_group_token(\%parse_tok);
 		_normalize_alpha_spec_token(\%parse_tok);
 		push @{$normalized_tokens}, \%parse_tok;
 	}
@@ -56,17 +59,78 @@ sub parse {
 	};
 }
 
+sub _check_parentheses {
+	my $tokens = shift;
+	my $left;
+	my $previous;
+
+	foreach my $tok (@{$tokens}) {
+		if ($tok->{'type'} eq 'LPAREN') {
+			$left = $tok;
+			$previous = $tok;
+			next;
+		}
+		if ($tok->{'type'} eq 'RPAREN') {
+			if (! $left) {
+				my $message = $previous && $previous->{'type'} eq 'AUX_GROUP'
+					? "Extra closing parenthesis ')'."
+					: "Missing opening parenthesis '('.";
+				err $message,
+					'position' => $tok->{'pos'},
+					'character' => ')',
+				;
+			}
+			$left = undef;
+		}
+		$previous = $tok;
+	}
+
+	if ($left) {
+		err "Missing closing parenthesis ')'.",
+			'position' => $left->{'pos'},
+			'character' => '(',
+		;
+	}
+
+	return;
+}
+
 sub _check_whitespace_token {
-	my $tok = shift;
+	my ($tok, $has_alpha_spec) = @_;
 
 	if ($tok->{'type'} ne 'WHITESPACE') {
 		return;
 	}
 
-	err "Whitespace is not allowed in UDC string.",
+	my $message = $has_alpha_spec
+		? 'Whitespace is not allowed in UDC string with alphabetical specification.'
+		: 'Whitespace is not allowed in UDC string.';
+	err $message,
 		'position' => $tok->{'pos'},
 		'character' => substr($tok->{'value'}, 0, 1),
 	;
+}
+
+sub _check_aux_group_token {
+	my ($tok, $position_offset) = @_;
+	$position_offset //= 0;
+
+	return if $tok->{'type'} ne 'AUX_GROUP';
+
+	my $inner_tokens = $tok->{'tokens'};
+	my $inner_position_offset = 0;
+
+	foreach my $inner_tok (@{$inner_tokens}) {
+		if ($inner_tok->{'type'} eq 'AUX_GROUP') {
+			_check_aux_group_token($inner_tok, $inner_position_offset);
+			next;
+		}
+
+		_check_aux_time_tokens($inner_tok, $inner_position_offset);
+		_check_number_token($inner_tok, $inner_position_offset);
+	}
+
+	return;
 }
 
 sub _check_apos_aux_tokens {
@@ -89,7 +153,8 @@ sub _check_apos_aux_tokens {
 }
 
 sub _check_aux_time_tokens {
-	my $tok = shift;
+	my ($tok, $position_offset) = @_;
+	$position_offset //= 0;
 
 	if ($tok->{'type'} ne 'AUX_TIME') {
 		return;
@@ -99,7 +164,7 @@ sub _check_aux_time_tokens {
 	if ($left ne '"') {
 		err 'Bad quotation mark character.',
 			'character' => $left,
-			'position' => $tok->{'pos'},
+			'position' => $position_offset + $tok->{'pos'},
 		;
 	}
 
@@ -107,7 +172,7 @@ sub _check_aux_time_tokens {
 	if ($right ne '"') {
 		err 'Bad quotation mark character.',
 			'character' => $right,
-			'position' => $tok->{'pos'} + length($tok->{'value'}) - $right_length,
+			'position' => $position_offset + $tok->{'pos'} + length($tok->{'value'}) - $right_length,
 		;
 	}
 
@@ -115,7 +180,8 @@ sub _check_aux_time_tokens {
 }
 
 sub _check_number_token {
-	my $tok = shift;
+	my ($tok, $position_offset) = @_;
+	$position_offset //= 0;
 
 	if ($tok->{'type'} ne 'NUMBER') {
 		return;
@@ -125,7 +191,7 @@ sub _check_number_token {
 	}
 
 	err 'Bad dot character in number.',
-		'position' => $tok->{'pos'} + index($tok->{'value'}, ','),
+		'position' => $position_offset + $tok->{'pos'} + index($tok->{'value'}, ','),
 		'character' => ',',
 	;
 }

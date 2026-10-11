@@ -1,0 +1,43 @@
+Revision history for File-Slurp-Remote
+
+0.47	Sat Oct 10 09:36:13 PM EDT 2026
+	[ Bug Fixes ]
+	- Add missing 'package File::Slurp::Remote' so PAUSE can index the distribution
+	- Take VERSION_FROM from lib/File/Slurp/Remote.pm
+
+0.46	Sat Oct 10 09:24:24 PM EDT 2026
+	[ Bug Fixes ]
+	- Fix module NAME field in Makefile.PL
+
+0.45	Tue Sep 22 11:39:52 AM EDT 2026
+	[ Bug Fixes ]
+	- New release, new number 0.45 fixes RT#131984 since something was up with 0.44
+	[ Enhancements ]
+	- Use GitHub Actions
+
+= 2026/09/22 - 0.43
+
+New maintainer - nhorne@cpan.org
+Fix packaging error: CanonicalHostnames wasn't in the MANIFEST.
+
+= 2011/06/15 - 0.42
+
+Add File::Slurp::Remote::CanonicalHostnames.  It is tested by
+the regression suite in Proc::JobQueue.
+
+= 2009/09/25 - 0.41
+
+= 2009/08/03 - 0.4 
+
+Allow ssh/scp commands to be overridden.
+
+Add t/remote_slurp.t
+
+Change File::Slurp::Remote::BrokenDNS so that it uses DNS when it can.
+Setting $ENV{BROKEN_DNS_WORKAROUND} restores the old behavior.
+
+Bugfixes for reading/writing local compressed files.
+
+= 2009/07/23 - 0.3
+
+Initial revision

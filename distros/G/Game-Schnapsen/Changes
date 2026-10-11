@@ -1,4 +1,24 @@
 Revision history for Game-Schnapsen
 
+0.02    2026-10-10
+        - Point at the card you mean: the arrow keys walk your hand and the
+          line under it says whether the card takes the trick, what the trick
+          is worth, and what that puts you on. The moves that are not cards
+          keep their own keys.
+        - The card you drew at the end of the last trick is drawn in a
+          heavier frame.
+        - Fix: --level took any number. The variant, the mode and the seat
+          were all refused; the level was not.
+        - Fix: every drawn row ended in the padding that keeps the next card
+          in line.
+        - Fix: the hand's label row padded by the length of a string that
+          already held colour codes, so with colour on, which is the default
+          on a terminal, the labels did not line up under their cards.
+        - The ten is drawn as 10 rather than T. T is the engine's rank
+          letter, which keeps a card id two characters; it was never a
+          thing to show a player. Both spellings are still accepted.
+        - Fix: an answer or a refusal landed on the prompt's own line off a
+          terminal.
+
 0.01    2026-09-15
         First version.

@@ -1,5 +1,5 @@
 {
-   "abstract" : "Portable non-blocking HTTP/1 protocol engine",
+   "abstract" : "Portable non-blocking HTTP/1.0 and HTTP/1.1 engine",
    "author" : [
       "Joshua S. Day <HAX@cpan.org>"
    ],
@@ -64,6 +64,6 @@
          "web" : "https://github.com/haxmeister/perl-Unblock-HTTP1"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

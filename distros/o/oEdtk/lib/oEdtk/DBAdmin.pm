@@ -7,7 +7,6 @@ use POSIX			qw(strftime);
 use Scalar::Util 	qw(looks_like_number);
 use strict;
 use Text::CSV;
-use File::Temp	qw(tempfile);
 use Encode		qw(encode find_encoding);
 use warnings;
 use Data::Dumper qw(Dumper);
@@ -21,7 +20,7 @@ use Data::Dumper qw(Dumper);
 # SHOW CREATE DATABASE oEdtk;
 
 use Exporter;
-our $VERSION		= 2.1104; #version lc Mysql / PG / Oracle / SQLite
+our $VERSION		= 2.1106; #version lc Mysql / PG / Oracle / SQLite
 our $VERSION_TXT 	= $VERSION =~ s/\./_/gr;
 our @ISA			= qw(Exporter);
 our @EXPORT_OK		= qw(
@@ -63,8 +62,9 @@ my $CONNECT_COUNT=0;
 our %_csv_import_type_cache;
 
 # PostgreSQL bulk-load tuning (used by _load_csv_pg_copy / _pg_load_tx).
-use constant PG_COPY_SYNC_OFF => 'SET LOCAL synchronous_commit = off';  # relax fsync for this transaction only
-use constant PG_COPY_ANALYZE  => 'ANALYZE %s';                            # refresh planner stats after a bulk load
+use constant PG_COPY_SYNC_OFF   => 'SET LOCAL synchronous_commit = off';  # relax fsync for this transaction only
+use constant PG_COPY_ANALYZE    => 'ANALYZE %s';                            # refresh planner stats after a bulk load
+use constant PG_COPY_BLOCK_SIZE => 1 << 20;                                # bytes fed per pg_putcopydata call
 
 
 sub move_table (@){
@@ -251,6 +251,95 @@ sub _pg_csv_field {
 	return $quo . $esc . $quo;
 }
 
+# ============================================================
+# PRIVATE : clean then serialize one CSV record for COPY. The per-column
+# cleaning flags are passed positionally ($blank_to_null and $col_size,
+# precomputed from the column metadata) so no hash lookup or closure runs per
+# value ; the result matches the _make_clean_val contract (truncation, and
+# '' => NULL for numeric/date columns). Fields are serialized with
+# _pg_csv_field. Debug logs are guarded so their message is not built when the
+# level is disabled.
+# ============================================================
+sub _pg_csv_row {
+	my ($data, $cols, $sep, $quo, $blank_to_null, $col_size) = @_;
+	my @out;
+	for my $i (0 .. $#{$cols}) {
+		my $v = $data->[$i];
+		if (defined $v) {
+			if ($v eq '') {
+				if ($blank_to_null->[$i]) {
+					&logger(7, "clean_val: col '$cols->[$i]' numerique/date, '' => undef")
+						if $LOGGERLEVEL >= 7;
+					$v = undef;
+				}
+			} elsif ($col_size->[$i] && length($v) > $col_size->[$i]) {
+				&logger(6, "clean_val: col '$cols->[$i]' tronquee de "
+					. length($v) . " a $col_size->[$i] cars")
+					if $LOGGERLEVEL >= 6;
+				$v = substr($v, 0, $col_size->[$i]);
+			}
+		}
+		push @out, _pg_csv_field($v, $sep, $quo);
+	}
+	return join($sep, @out);
+}
+
+# ============================================================
+# PRIVATE : build the COPY ... FROM STDIN byte supplier for one CSV source.
+# The returned coderef yields up to PG_COPY_BLOCK_SIZE bytes of cleaned,
+# client_encoding-encoded CSV per call, or undef at end of stream, and dies on
+# a CSV parse error (the message carries the line number). Rows are cleaned and
+# serialized by _pg_csv_row; $$count_ref is incremented per data record (the
+# header is skipped). A fresh supplier is built for each COPY attempt so the
+# one retry path (a rare deferral failure) re-reads the source. Encode is
+# concatenative, so encoding whole blocks is equivalent to encoding each row.
+# ============================================================
+sub _pg_csv_supplier {
+	my ($fi, $params, $cols, $blank_to_null, $col_size, $count_ref, $enc) = @_;
+	my $sep = $params->{'sep_char'};
+	my $quo = $params->{'quote_char'};
+
+	open(my $fh, '<', $fi) or die "ERROR: Cannot open file \"$fi\": $!\n";
+	my $csv = Text::CSV->new({ binary     => 1,
+	                           sep_char   => $sep,
+	                           quote_char => $quo });
+	unless ($csv->getline($fh)) {     # skip the header record
+		close($fh);
+		die "ERROR: cannot read header of \"$fi\"\n";
+	}
+
+	my $closed = 0;
+	return sub {
+		return undef if $closed;
+		my $eof   = 0;
+		my $bytes = 0;
+		my @rows;
+		# Collect whole rows and join() them once per block. Appending to a scalar
+		# and resetting it every block is quadratic and dominated the load ; join()
+		# allocates the whole block in a single pass.
+		while ($bytes < PG_COPY_BLOCK_SIZE) {
+			my $data = $csv->getline($fh);
+			if (!defined $data) {
+				unless ($csv->eof) {
+					die "CSV parse error near line " . ($$count_ref + 1)
+						. " in \"$fi\": " . ($csv->error_diag // 'unknown') . "\n";
+				}
+				$eof = 1;
+				last;
+			}
+			my $row = _pg_csv_row($data, $cols, $sep, $quo, $blank_to_null, $col_size);
+			push @rows, $row;
+			$bytes += length($row) + 1;    # +1 for the newline added by join()
+			$$count_ref++;
+		}
+		if ($eof) { $closed = 1; close($fh); }
+		return undef unless @rows;
+		my $chunk = join("\n", @rows) . "\n";
+		$chunk = encode($enc, $chunk) if defined $enc;
+		return $chunk;
+	};
+}
+
 # Map a PostgreSQL client_encoding name to an Encode name.
 # Text::CSV (binary=>1) returns decoded characters, so values must be
 # re-encoded to the session client_encoding before COPY reads the bytes.
@@ -297,18 +386,22 @@ sub _count_csv_rows {
 }
 
 # ============================================================
-# PRIVATE : run a COPY ... FROM STDIN, aborting it best-effort on failure.
-# Returns the driver error message, or undef on success.
+# PRIVATE : run a COPY ... FROM STDIN, feeding it from $next_block -- a
+# coderef that returns the next chunk of serialized bytes (undef at end of
+# stream) and dies on a producer error (e.g. a CSV parse error). Feeding whole
+# blocks instead of one line per call keeps the per-record overhead out of the
+# COPY loop. The COPY is aborted best-effort on failure.
+# Returns the error message, or undef on success.
 # ============================================================
 sub _pg_copy_stdin {
-	my ($dbh, $sql, $tmpfh) = @_;
+	my ($dbh, $sql, $next_block) = @_;
 	my $emsg;
 	my $copy_live = 0;
 	eval {
 		$dbh->do($sql);
 		$copy_live = 1;
-		while (my $line = <$tmpfh>) {
-			defined $dbh->pg_putcopydata($line)
+		while (defined(my $chunk = $next_block->())) {
+			defined $dbh->pg_putcopydata($chunk)
 				or die ($dbh->errstr || "pg_putcopydata failed");
 		}
 		$copy_live = 0;              # pg_putcopyend always ends the COPY
@@ -335,12 +428,13 @@ sub _pg_quote_ident {
 # ============================================================
 # PRIVATE : list the DDL a bulk COPY may drop up-front and rebuild
 # afterwards, so every inserted row does not have to maintain it.
-# Only standalone secondary indexes and unique / foreign-key constraints
-# are returned : primary keys, and any index a foreign key depends on, are
-# left untouched. Returns { drop => [sql...], create => [sql...] }.
+# Standalone secondary indexes and unique / foreign-key constraints are always
+# returned ; the primary key is returned only when $defer_pk is true. Any index
+# a foreign key depends on -- including a primary key referenced by an external
+# foreign key -- is left untouched. Returns { drop => [sql...], create => [sql...] }.
 # ============================================================
 sub _pg_deferrable_ddl {
-	my ($dbh, $table) = @_;
+	my ($dbh, $table, $defer_pk) = @_;
 	my ($oid) = $dbh->selectrow_array("SELECT to_regclass(?)::oid", undef, $table);
 	return { drop => [], create => [] } unless $oid;
 
@@ -361,14 +455,14 @@ sub _pg_deferrable_ddl {
 		push @create, $def;
 	}
 
-	# Unique and foreign-key constraints on this table, except a unique
-	# constraint whose index a foreign key depends on.
+	# Unique and foreign-key constraints on this table -- plus the primary key
+	# when $defer_pk is set -- except any whose index a foreign key depends on.
 	my $cons = $dbh->selectall_arrayref(
 		"SELECT c.conname, pg_get_constraintdef(c.oid) FROM pg_constraint c"
-		. " WHERE c.conrelid = ? AND c.contype IN ('u','f')"
-		. "   AND NOT (c.contype = 'u' AND EXISTS (SELECT 1 FROM pg_constraint k"
-		. "                                        WHERE k.conindid = c.conindid"
-		. "                                          AND k.contype = 'f'))",
+		. " WHERE c.conrelid = ? AND c.contype IN ('u','f'" . ($defer_pk ? ",'p'" : "") . ")"
+		. "   AND NOT (c.contype IN ('u','p') AND EXISTS (SELECT 1 FROM pg_constraint k"
+		. "                                             WHERE k.conindid = c.conindid"
+		. "                                               AND k.contype = 'f'))",
 		undef, $oid);
 	foreach my $r (@$cons) {
 		my ($cname, $cdef) = @$r;
@@ -381,16 +475,16 @@ sub _pg_deferrable_ddl {
 }
 
 # ============================================================
-# PRIVATE : load the cleaned temp file into $tablename inside one
-# transaction, optionally after dropping the deferrable DDL and relaxing
-# synchronous_commit for that transaction only (SET LOCAL). Rebuilds the
-# DDL and commits ; a failure rolls the data AND the DDL back. A
-# caller-managed transaction (AutoCommit already off) is left open.
-# Returns ('ok',''), ('defer',$err) when the DDL could not be dropped,
-# or ('fail',$err) on any other error.
+# PRIVATE : load into $tablename inside one transaction from $make_supplier
+# (called once per attempt to obtain a fresh COPY byte supplier), optionally
+# after dropping the deferrable DDL and relaxing synchronous_commit for that
+# transaction only (SET LOCAL). Rebuilds the DDL and commits ; a failure rolls
+# the data AND the DDL back. A caller-managed transaction (AutoCommit already
+# off) is left open. Returns ('ok',''), ('defer',$err) when the DDL could not be
+# dropped, or ('fail',$err) on any other error.
 # ============================================================
 sub _pg_load_tx {
-	my ($dbh, $tablename, $sql, $tmpfh, $ddl) = @_;
+	my ($dbh, $tablename, $sql, $make_supplier, $ddl) = @_;
 	my $own   = $dbh->{AutoCommit} ? 1 : 0;
 	my $phase = 'begin';
 	my $ok = eval {
@@ -402,8 +496,7 @@ sub _pg_load_tx {
 			$dbh->do($s) or die($dbh->errstr || "drop failed: $s");
 		}
 		$phase = 'copy';
-		seek($tmpfh, 0, 0) or die("cannot rewind temp file: $!");
-		my $err = _pg_copy_stdin($dbh, $sql, $tmpfh);
+		my $err = _pg_copy_stdin($dbh, $sql, $make_supplier->());
 		die $err if defined $err;
 		$phase = 'rebuild';
 		foreach my $s (@{ $ddl->{create} }) {
@@ -423,9 +516,10 @@ sub _pg_load_tx {
 # ============================================================
 # PRIVATE : bulk load a CSV file into a PostgreSQL table with
 # COPY ... FROM STDIN (native equivalent of LOAD DATA LOCAL INFILE).
-# The CSV is cleaned through clean_val into a temp file first, so
-# truncation and '' => NULL (numeric/date) match the row-by-row path.
-# $norm_id comes from _norm_identifiers (PostgreSQL identifiers are lowercase).
+# Rows are cleaned through the same _get_col_meta / _make_clean_val contract
+# (truncation, '' => NULL for numeric/date) and streamed straight into COPY, so
+# no temporary file is written. $norm_id comes from _norm_identifiers
+# (PostgreSQL identifiers are lowercase).
 # Returns ($count, " lines inserted") on success, (-1, "...") on failure.
 # ============================================================
 sub _load_csv_pg_copy ($$$$$) {
@@ -439,51 +533,25 @@ sub _load_csv_pg_copy ($$$$$) {
 	my $enc = _pg_encoding_name(eval { $dbh->selectrow_array('SHOW client_encoding') });
 	&logger(7, "_load_csv_pg_copy: client_encoding=".($enc // 'raw'));
 
+	# Read the header record for column names and insertion order.
+	# getline (not parse) so a quoted field may span several physical lines.
+	open(my $fh, '<', $fi) or return (-1, &logger(3, "_load_csv_pg_copy: cannot open \"$fi\": $!"));
 	my $csv = Text::CSV->new({ binary     => 1,
 	                           sep_char   => $sep,
 	                           quote_char => $quo });
-
-	# Read the header record for column names and insertion order.
-	# getline (not parse) so a quoted field may span several physical lines.
-	open(my $fh, '<', $fi) or die "ERROR: Cannot open file \"$fi\": $!\n";
 	my $hdr = $csv->getline($fh);
 	unless ($hdr) {
 		close($fh);
 		return (-1, &logger(3, "_load_csv_pg_copy: cannot read header of \"$fi\""));
 	}
+	close($fh);
 	my @cols = map { $norm_id->($_) } @$hdr;
 
-	# Same metadata and cleaner as the row-by-row path.
-	my $col_meta  = _get_col_meta($dbh, $tablename, $norm_id);
-	my $clean_val = _make_clean_val($col_meta);
-
-	# Build a cleaned copy of the CSV in a temp file.
-	my ($tmpfh, $tmpname) = tempfile('edtk_csv_XXXXXX', SUFFIX => '.csv', UNLINK => 1);
-	binmode($tmpfh);
-	&logger(7, "_load_csv_pg_copy: cleaned temp file $tmpname");
-	my ($count, $rv) = (0, undef);
-	while (1) {
-		my $data = $csv->getline($fh);
-		if (!defined $data) {
-			last if $csv->eof;
-			$rv = "CSV parse error near line ".($count + 1).": ".($csv->error_diag // 'unknown');
-			last;
-		}
-		my @clean = map { $clean_val->($cols[$_], $data->[$_]) } 0..$#cols;
-		my $row = join($sep, map { _pg_csv_field($_, $sep, $quo) } @clean);
-		$row = encode($enc, $row) if defined $enc;
-		print $tmpfh $row, "\n";
-		$count++;
-	}
-	close($fh);
-	if ($rv) {
-		close($tmpfh);
-		return (-1, &logger(3, "_load_csv_pg_copy: $rv in \"$fi\""));
-	}
-	seek($tmpfh, 0, 0) or do {
-		close($tmpfh);
-		return (-1, &logger(3, "_load_csv_pg_copy: cannot rewind temp file: $!"));
-	};
+	# Same column metadata as the row-by-row path, flattened into positional
+	# arrays so the per-row loop does no hash lookup.
+	my $col_meta      = _get_col_meta($dbh, $tablename, $norm_id);
+	my @blank_to_null = map { ($col_meta->{$_} // {})->{blank_to_null} ? 1 : 0 } @cols;
+	my @col_size      = map { ($col_meta->{$_} // {})->{size} // 0 } @cols;
 
 	# COPY ... FROM STDIN : NULL '' makes an unquoted empty field a NULL.
 	my $sql = "COPY $tablename (" . join(',', @cols) . ")"
@@ -491,30 +559,38 @@ sub _load_csv_pg_copy ($$$$$) {
 	        . " QUOTE '" . $quo . "', NULL '')";
 	&logger(7, $sql);
 
+	# $make_supplier returns a fresh byte supplier for each COPY attempt so the
+	# single retry path re-reads the source ; $count is reset on every attempt.
+	my $count = 0;
+	my $make_supplier = sub {
+		$count = 0;
+		_pg_csv_supplier($fi, $params, \@cols, \@blank_to_null, \@col_size, \$count, $enc);
+	};
+
 	# Default path (pg_copy_optimize unset or true) : load inside one
 	# transaction, dropping the target table's secondary indexes and unique /
-	# FK constraints for the duration of the COPY, relaxing synchronous_commit
-	# for that transaction only and refreshing the planner statistics at the
-	# end. If the DDL cannot be dropped, the load is retried once without
-	# deferral. Passing pg_copy_optimize => 0 keeps the historical plain COPY.
+	# foreign-key constraints (plus the primary key when pg_copy_defer_pk is
+	# set) for the duration of the COPY, relaxing synchronous_commit for that
+	# transaction only and refreshing the planner statistics at the end. If the
+	# DDL cannot be dropped, the load is retried once without deferral. Passing
+	# pg_copy_optimize => 0 keeps the historical plain COPY.
 	my ($status, $emsg) = ('ok', '');
 	if ($params->{'pg_copy_optimize'} // 1) {
-		my $ddl = eval { _pg_deferrable_ddl($dbh, $tablename) };
+		my $ddl = eval { _pg_deferrable_ddl($dbh, $tablename, $params->{'pg_copy_defer_pk'}) };
 		&logger(4, "_load_csv_pg_copy: deferral lookup failed: $@") unless $ddl;
 		$ddl ||= { drop => [], create => [] };
-		($status, $emsg) = _pg_load_tx($dbh, $tablename, $sql, $tmpfh, $ddl);
+		($status, $emsg) = _pg_load_tx($dbh, $tablename, $sql, $make_supplier, $ddl);
 		if ($status eq 'defer') {
 			&logger(4, "_load_csv_pg_copy: deferral unavailable ($emsg), retrying without it");
-			($status, $emsg) = _pg_load_tx($dbh, $tablename, $sql, $tmpfh,
+			($status, $emsg) = _pg_load_tx($dbh, $tablename, $sql, $make_supplier,
 			                               { drop => [], create => [] });
 		}
 	} else {
-		my $err = _pg_copy_stdin($dbh, $sql, $tmpfh);
+		my $err = _pg_copy_stdin($dbh, $sql, $make_supplier->());
 		($status, $emsg) = defined $err ? ('fail', $err) : ('ok', '');
 	}
 
 	if ($status ne 'ok') {
-		close($tmpfh);
 		chomp($emsg //= '');
 		return (-1, &logger(3, "_load_csv_pg_copy: COPY into $tablename failed: $emsg"));
 	}
@@ -522,7 +598,6 @@ sub _load_csv_pg_copy ($$$$$) {
 	# Refresh the planner statistics for the freshly loaded table (best effort).
 	eval { $dbh->do(sprintf(PG_COPY_ANALYZE, $tablename)); 1 }
 		or &logger(4, "_load_csv_pg_copy: ANALYZE $tablename failed: $@");
-	close($tmpfh);
 
 	&logger(4, "bulk insert into $tablename via COPY ... FROM STDIN: $count rows");
 	return ($count, " lines inserted");
@@ -717,7 +792,7 @@ sub csv_import_deprecated_3 ($$$;$){
         # Troncature si la valeur dépasse la taille max déclarée
         if ($m->{size} && length($val) > $m->{size}) {
             my $truncated = substr($val, 0, $m->{size});
-            &logger(5, "clean_val: col '$col' tronquee de ".length($val)." a $m->{size} cars");
+            &logger(6, "clean_val: col '$col' tronquee de ".length($val)." a $m->{size} cars");
             return $truncated;
         }
 
@@ -835,7 +910,7 @@ sub csv_import_deprecated_2 ($$$;$){
         # Troncature si la valeur dépasse la taille max déclarée (Postgres strict)
         if ($m->{size} && length($val) > $m->{size}) {
             my $truncated = substr($val, 0, $m->{size});
-            &logger(5, "clean_val: col '$col_uc' tronquee de ".length($val)." a $m->{size} cars");
+            &logger(6, "clean_val: col '$col_uc' tronquee de ".length($val)." a $m->{size} cars");
             return $truncated;
         }
 
@@ -1034,7 +1109,7 @@ sub _make_clean_val {
 
         if ($m->{size} && length($val) > $m->{size}) {
             my $truncated = substr($val, 0, $m->{size});
-            &logger(5, "clean_val: col '$col' tronquee de ".length($val)." a $m->{size} cars");
+            &logger(6, "clean_val: col '$col' tronquee de ".length($val)." a $m->{size} cars");
             return $truncated;
         }
 

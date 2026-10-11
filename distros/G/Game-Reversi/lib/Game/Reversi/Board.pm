@@ -3,7 +3,7 @@ package Game::Reversi::Board;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use constant SIZE  => 8;
 use constant CELLS => 64;
@@ -121,7 +121,7 @@ Game::Reversi::Board - the 64 squares, the eight rays, and what outflanks what
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

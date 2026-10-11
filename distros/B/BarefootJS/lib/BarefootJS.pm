@@ -1,5 +1,5 @@
 package BarefootJS;
-our $VERSION = "0.39.4";
+our $VERSION = "0.39.5";
 use strict;
 use warnings;
 use utf8;
@@ -695,6 +695,9 @@ sub string ($self, $value) {
     # `.flat(0)`'s shallow copy stringified afterwards (#2262, shared
     # with Mojolicious/Xslate via this runtime).
     return CORE::join(',', map { $self->string($_) } @$value) if ref($value) eq 'ARRAY';
+    # A number prints as JS `Number::toString` does, not with Perl's `%.15g`
+    # (#3380); a string passes through unchanged.
+    return BarefootJS::Evaluator::_format_number($value + 0) if BarefootJS::Evaluator::_is_number($value);
     return "$value";
 }
 
@@ -2145,7 +2148,7 @@ package BarefootJS::Date;
 # compartment where `$BarefootJS::VERSION` is not visible and collapses to
 # 0. scripts/sync-perl-versions.ts bumps every `our $VERSION` line in the
 # file, so this stays in lockstep with the package version above.
-our $VERSION = "0.39.4";
+our $VERSION = "0.39.5";
 
 sub new {
     my ($class, $epoch_ms) = @_;

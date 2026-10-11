@@ -10,7 +10,7 @@ WriteMakefile(
     }, # e.g., Module::Name => 1.1
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/Statistics/CaseResampling.pm', # retrieve abstract from module
-       AUTHOR         => 'Steffen Mueller <smueller@cpan.org>') : ()),
+       AUTHOR         => 'Steffen Mueller <cpan@steffen-mueller.net>') : ()),
     LIBS              => [''], # e.g., '-lm'
     #DEFINE            => '-O2', # e.g., '-DHAVE_SOMETHING'
     INC               => '-I.', # e.g., '-I. -I/usr/include/other'

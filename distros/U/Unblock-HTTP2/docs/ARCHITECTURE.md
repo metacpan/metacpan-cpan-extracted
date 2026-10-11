@@ -29,15 +29,31 @@ Incoming bytes are passed to:
 $engine->input($bytes);
 ```
 
-Outgoing bytes are drained with:
+The recommended Perl integration attaches a framework stream to the Client
+or Server. The stream implements three host methods:
+
+```text
+unblock_send($bytes)
+unblock_finish()
+unblock_abort($reason)
+```
+
+Unblock automatically delivers outgoing bytes through `unblock_send()`,
+including data generated from delayed response callbacks. The framework owns
+the output queue and must accept each complete buffer before returning.
+
+Without an attached host, a low-level adapter can drain bytes manually:
 
 ```perl
 while ($engine->want_write) {
     my $bytes = $engine->output;
     last unless length $bytes;
-    ...
+    $framework->write($bytes);
 }
 ```
+
+Do not mix the two modes. See `Unblock::HTTP2::Integration` for complete
+ownership, backpressure, shutdown, and EOF rules.
 
 `want_read()` reports whether the HTTP/2 session still expects protocol input.
 It does not register a watcher or read from a socket.
@@ -105,7 +121,7 @@ Buffered bodies can live on the Uniform message.
 
 Streaming local bodies use `write()` and `end()`.
 
-The default cooperative queue thresholds are:
+The default cooperative body queue thresholds are:
 
 ```text
 high water  65536 bytes
@@ -113,7 +129,10 @@ low water   32768 bytes
 ```
 
 `write()` accepts the bytes even when it returns false. A false return tells
-the producer to pause until `on_drain` runs.
+the producer to pause until `on_drain` runs. An attached host can also report
+congestion from `unblock_send()` after accepting a complete wire buffer; it
+then calls `resume_output()` when ready. This host-level signal also pauses
+streaming body producers.
 
 Incoming body bytes are automatically consumed after the body callback returns.
 

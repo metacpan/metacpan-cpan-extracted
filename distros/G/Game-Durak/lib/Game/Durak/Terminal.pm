@@ -10,7 +10,7 @@ use Game::Durak::Bot ();
 use Game::Durak::Card qw(name_of long_name_of suit_of rank_of face_of);
 use Game::Durak::Table ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 my %SUIT = (
     S => { wide => "\x{2660}", ascii => 'S', colour => '37' },
@@ -40,6 +40,27 @@ has paint  => (is => 'ro', isa => Any);
 has width  => (is => 'ro', isa => Int);
 has height => (is => 'ro', isa => Int);
 has _painting => (is => 'rw', isa => Any);
+
+has raw => (is => 'rw', isa => Any, default => 0);
+
+has keysource => (is => 'rw', isa => Any);
+
+has pending => (is => 'rw', isa => ArrayRef, default => sub { [] });
+
+has _picking => (is => 'rw', isa => Any, init_arg => 'picking');
+
+our %SEQUENCE = (
+    'A' => 'up', 'B' => 'down', 'C' => 'right', 'D' => 'left',
+    'H' => 'home', 'F' => 'end',
+    '1~' => 'home', '4~' => 'end', '5~' => 'page_up', '6~' => 'page_down',
+    '7~' => 'home', '8~' => 'end',
+);
+
+our %CONTROL = (
+    "\r" => 'enter', "\n" => 'enter', "\t" => 'tab',
+    "\x7f" => 'backspace', "\x08" => 'backspace',
+    "\x03" => 'interrupt', "\x04" => 'eof',
+);
 has _table => (is => 'rw', isa => Any);
 has _said  => (is => 'rw', isa => Any);
 
@@ -118,6 +139,7 @@ sub show {
     my $lines  = $self->frame($view,
         header => (defined $o{header} ? $o{header} : $self->headline($table->width - 2)),
         footer => $footer,
+        (defined $o{cursor} ? (cursor => $o{cursor}) : ()),
     );
     print {$handle} "\e[H", join("\n", @$lines);
     print {$handle} sprintf "\e[%d;%dH", $table->height, length($footer) + 3;
@@ -156,9 +178,16 @@ sub card {
 }
 
 sub hand_line {
-    my ($self, $hand) = @_;
+    my ($self, $hand, $cursor) = @_;
     my $n = 0;
-    return join '  ', map { ++$n . ') ' . $self->card($_) } @$hand;
+
+    return join '  ', map { ++$n . ') ' . $self->card($_) } @$hand
+        unless defined $cursor;
+
+    return join ' ', map {
+        $n++;
+        ($cursor == $n ? '>' : ' ') . $n . ') ' . $self->card($_);
+    } @$hand;
 }
 
 sub bout_line {
@@ -170,7 +199,7 @@ sub bout_line {
 }
 
 sub table {
-    my ($self, $view) = @_;
+    my ($self, $view, %o) = @_;
 
     my @lines;
     push @lines, '';
@@ -183,7 +212,7 @@ sub table {
     push @lines, '';
     push @lines, '  ' . $self->bout_line($view->{bout});
     push @lines, '';
-    push @lines, '  ' . $self->hand_line($view->{hand});
+    push @lines, '  ' . $self->hand_line($view->{hand}, $o{cursor});
     return join "\n", @lines;
 }
 
@@ -222,12 +251,182 @@ sub prompt_for {
     return join '  ', @what;
 }
 
+sub keys_available {
+    my ($self) = @_;
+    return 1 if $self->keysource;
+    return 0 unless eval { -t $self->_in };
+    return eval { require Term::ReadKey; 1 } ? 1 : 0;
+}
+
+sub picking {
+    my ($self, @set) = @_;
+    $self->_picking($set[0] ? 1 : 0) if @set;
+    return $self->_picking ? 1 : 0 if defined $self->_picking;
+    return $self->keys_available;
+}
+
+sub enter_raw {
+    my ($self) = @_;
+    return $self if $self->raw;
+    if ($self->keysource) { $self->raw(1); return $self }
+    return undef unless $self->keys_available;
+    return undef unless eval { Term::ReadKey::ReadMode(3, $self->_in); 1 };
+    $self->raw(1);
+    return $self;
+}
+
+sub leave_raw {
+    my ($self) = @_;
+    return $self unless $self->raw;
+    eval { Term::ReadKey::ReadMode(0, $self->_in) } unless $self->keysource;
+    $self->raw(0);
+    return $self;
+}
+
+sub read_char {
+    my ($self, $wait) = @_;
+    my $pending = $self->pending;
+    return shift @$pending if @$pending;
+    return $self->keysource->($wait) if $self->keysource;
+    my $char = Term::ReadKey::ReadKey($wait ? 0 : -1, $self->_in);
+    return $char if defined $char || $wait;
+    select undef, undef, undef, 0.05;
+    return Term::ReadKey::ReadKey(-1, $self->_in);
+}
+
+sub read_key {
+    my ($self) = @_;
+    my $char = $self->read_char(1);
+    return undef unless defined $char;
+    return $CONTROL{$char} if $CONTROL{$char};
+    return $self->read_sequence if $char eq "\e";
+    return $char;
+}
+
+sub read_sequence {
+    my ($self) = @_;
+    my $opener = $self->read_char(0);
+    return 'escape' unless defined $opener;
+    unless ($opener eq '[' || $opener eq 'O') {
+        unshift @{ $self->pending }, $opener;
+        return 'escape';
+    }
+    my $tail = '';
+    while (length $tail < 8) {
+        my $char = $self->read_char(0);
+        last unless defined $char;
+        $tail .= $char;
+        last if $char =~ /[A-Za-z~]/;
+    }
+    return $SEQUENCE{$tail} || 'escape';
+}
+
+sub card_line {
+    my ($self, $view, $card) = @_;
+
+    my ($move) = grep { defined $_->{card} && $_->{card} == $card }
+        @{ $view->{legal} };
+    return $self->card($card) . ': not one you can play' unless $move;
+
+    my $trump = suit_of($card) eq $view->{trump} ? ', a trump' : '';
+    my $bout = $view->{bout};
+
+    if ($move->{kind} eq 'defend') {
+        my $beats = defined $bout && defined $bout->{unbeaten}
+            ? ' the ' . $self->card($bout->{unbeaten}) : ' the attack';
+        return $self->card($card) . ": beats$beats$trump";
+    }
+
+    my $room = defined $bout ? ($bout->{cap} - $bout->{size}) : 0;
+    my $with = $room > 1 ? sprintf ', %d more could follow', $room - 1
+             : $room == 1 ? ', the last this bout can hold' : '';
+
+    return $self->card($card) . ": they must beat it$trump$with";
+}
+
+sub pick_keys {
+    return 'arrows to choose, enter to play, ? for the keys';
+}
+
+sub pick_help {
+    return (
+        'arrows walk the cards you may play, enter plays the one under the cursor',
+        'the line above says what it would do',
+        't take, d done, x exchange, r resign, q quit',
+    );
+}
+
+sub pick_move {
+    my ($self, $view) = @_;
+
+    my $at_list = $self->playable($view);
+    my @slot = @$at_list;
+
+    my %by;
+    push @{ $by{ $_->{kind} } }, $_ for @{ $view->{legal} };
+
+    my $at = 0;
+    my @notice;
+
+    while (1) {
+        my $card = @slot ? $view->{hand}[ $slot[$at] - 1 ] : undef;
+
+        $self->told(@notice) if @notice;
+        @notice = ();
+        $self->told($self->card_line($view, $card)) if defined $card;
+
+        $self->position($view,
+            cursor => (defined $card ? $slot[$at] : undef),
+            footer => $self->pick_keys);
+
+        my $key = $self->read_key;
+        return { kind => 'quit' }
+            if !defined $key || $key eq 'eof' || $key eq 'interrupt'
+            || $key eq 'q';
+
+        if (@slot && ($key eq 'left' || $key eq 'up')) {
+            $at = ($at - 1) % @slot;
+            next;
+        }
+        if (@slot && ($key eq 'right' || $key eq 'down' || $key eq 'tab')) {
+            $at = ($at + 1) % @slot;
+            next;
+        }
+        if (@slot && ($key eq 'home')) { $at = 0;       next }
+        if (@slot && ($key eq 'end'))  { $at = $#slot;  next }
+
+        if (@slot && ($key eq 'enter' || $key eq ' ')) {
+            my ($move) = grep { defined $_->{card} && $_->{card} == $card }
+                @{ $view->{legal} };
+            return $move if $move;
+            @notice = ('you cannot play that one');
+            next;
+        }
+
+        if ($key eq 't' && $by{take}) { return $by{take}[0] }
+        if ($key eq 'd' && $by{done}) { return $by{done}[0] }
+        if ($key eq 'x' && $by{swap}) { return $by{swap}[0] }
+        if ($key eq 'r') { return { kind => 'resign' } }
+
+        if ($key =~ /\A[1-9]\z/) {
+            my ($found) = grep { $slot[$_] == $key } 0 .. $#slot;
+            if (defined $found) { $at = $found; next }
+            @notice = ("you cannot play card $key");
+            next;
+        }
+
+        if ($key eq '?') { @notice = $self->pick_help; next }
+
+        @notice = ('that key does nothing here');
+    }
+}
+
 sub move_for {
     my ($self, $view, $said) = @_;
 
     return undef unless defined $said;
     $said =~ s/\A\s+|\s+\z//g;
-    return { kind => 'quit' } if lc $said eq 'q';
+    return { kind => 'quit' } if lc $said eq 'q' || lc $said eq 'quit';
 
     my %by;
     push @{ $by{ $_->{kind} } }, $_ for @{ $view->{legal} };
@@ -348,16 +547,24 @@ sub run {
             next;
         }
 
-        $self->position($view);
+        my $move;
+        if ($self->picking && $self->enter_raw) {
+            $move = $self->pick_move($view);
+            last unless $move;
+        }
+        else {
+            $self->picking(0);
+            $self->position($view);
 
-        my $handle = $self->_in;
-        my $said   = <$handle>;
-        last unless defined $said;
+            my $handle = $self->_in;
+            my $said   = <$handle>;
+            last unless defined $said;
 
-        my $move = $self->move_for($view, $said);
-        unless ($move) {
-            $self->told('that is not one of the answers');
-            next;
+            $move = $self->move_for($view, $said);
+            unless ($move) {
+                $self->told('that is not one of the answers');
+                next;
+            }
         }
 
         last if $move->{kind} eq 'quit';
@@ -371,6 +578,7 @@ sub run {
         $self->told($self->narration($game->view($me), @events));
     }
 
+    $self->leave_raw;
     $self->close_screen($game);
 
     return $game->result;
@@ -394,13 +602,16 @@ sub open_screen {
 }
 
 sub position {
-    my ($self, $view) = @_;
+    my ($self, $view, %o) = @_;
 
-    return $self->show($view, footer => $self->prompt_for($view))
+    my $footer = defined $o{footer} ? $o{footer} : $self->prompt_for($view);
+
+    return $self->show($view, footer => $footer,
+        (defined $o{cursor} ? (cursor => $o{cursor}) : ()))
         if $self->_paint;
 
-    $self->say($self->table($view));
-    $self->say('  ' . $self->prompt_for($view));
+    $self->say($self->table($view, %o));
+    $self->say('  ' . $footer);
     return;
 }
 
@@ -433,7 +644,7 @@ Game::Durak::Terminal - a deal of durak at a terminal
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 
@@ -549,6 +760,60 @@ What the seat may do, as a line, and the move a line of input means, or undef
 when it means nothing. C<move_for> only ever returns a move that is in the
 view's C<legal>, which is why an illegal move at the terminal is a reprompt
 and not a refusal.
+
+=head2 picking
+
+Whether a card is pointed at rather than numbered at a prompt. Settable,
+because a failed C<enter_raw> turns it off for the rest of the deal. Unset, it
+follows L</keys_available>.
+
+=head2 keys_available, enter_raw, leave_raw
+
+Whether there is anything to read keys with, and cbreak on and off. B<cbreak
+rather than raw>, so an interrupt stays an interrupt. F<bin/durak> calls
+C<leave_raw> from a signal handler and after an C<eval> round the deal, because
+a program that dies in cbreak leaves the shell with no echo.
+
+=head2 keysource, pending, raw
+
+A coderef returning ONE character in place of L<Term::ReadKey>, characters read
+and given back, and the cbreak state. C<keysource> is what lets F<t/21> drive
+the key loop with no terminal and no L<Term::ReadKey> installed; one character
+a call, because a source handing back C<"\e[C"> whole never becomes a right
+arrow.
+
+=head2 read_char, read_key, read_sequence
+
+One character, one keystroke as a name, and the tail of an escape sequence. A
+name is always longer than one character, so it never collides with one.
+
+=head2 pick_move, pick_keys, pick_help
+
+The key loop, its one-line legend and its key list. C<pick_move> returns a move
+for L<Game::Durak/apply> exactly as L</move_for> does, so the loop in L</run>
+does not care which of the two answered.
+
+B<The cursor walks only the playable cards.> Most of a Durak hand is unplayable
+most of the time: an attack is capped by the ranks already on the table and a
+defence by what it has to beat, so a cursor crawling the whole hand would sit
+mostly on cards that refuse. They are the positions L</playable> already lists.
+
+The moves that are not cards keep their own keys, C<t>, C<d>, C<x> and C<r>,
+for the reason L<Game::Schnapsen::Terminal> gives: a card is a thing in your
+hand and taking the table is not, so they do not belong in the same row.
+
+=head2 card_line
+
+What the card under the cursor would do, as the line above the table:
+
+    9S: they must beat it, a trump, 4 more could follow
+    JS: beats the 9S
+
+Both halves come out of the view the engine already handed over, the bout's
+cap and its unbeaten attack, so nothing here recomputes a rule. The trump is
+called out because spending one is the cost a player is weighing, and the room
+left in the bout because the last card it can hold is a different decision
+from the first.
 
 =head2 narration, narrate
 

@@ -3,13 +3,15 @@ use Test::More;
 use Errno qw(EPIPE);
 
 $ENV{OBJECT_REMOTE_TEST_LOGGER} = 1;
+my $timeout_factor = $ENV{PERL_TEST_TIME_OUT_FACTOR} || 1;
+$timeout_factor = 1 if $timeout_factor < 1;
 
 use Object::Remote::Connection;
 use Object::Remote::FromData;
 
 $SIG{ALRM} = sub {  fail("Watchdog killed remote process in time"); die "test failed" };
 
-my $conn = Object::Remote->connect("-", watchdog_timeout => 1);
+my $conn = Object::Remote->connect("-", watchdog_timeout => $timeout_factor);
 
 my $remote = HangClass->new::on($conn);
 

@@ -5,7 +5,7 @@ use warnings;
 
 use Game::Reversi::Board;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub count {
 	my ($class, $board) = @_;
@@ -43,7 +43,7 @@ Game::Reversi::Scoring - what a finished game is worth
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

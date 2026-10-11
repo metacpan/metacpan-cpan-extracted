@@ -1,0 +1,16 @@
+Revision history for Perl extension Math-Geometry-HexGrid.
+
+0.01  2026-10-10
+  - Initial release.
+  - High-performance ANSI C99 core (hexgrid.c / hexgrid.h) for hex grid math:
+    - Odd-r offset and cube coordinate conversions (hex_oddr_to_cube, hex_cube_to_oddr)
+    - Hexagonal Manhattan distance (hex_distance)
+    - 6-direction adjacent neighbor lookup (hex_neighbor, hex_neighbors)
+    - Collinear raycasting and alignment detection (hex_is_collinear, hex_collinear_ray)
+  - XS bindings providing subroutines and native C methods for coordinate operations.
+  - Dual Perl API:
+    - Functional interface via Math::Geometry::HexGrid exports
+    - Object-oriented immutable coordinate class Math::Geometry::HexGrid::Hex
+      with overloaded equality (==, !=) and stringification ("")
+  - Comprehensive documentation and test suite validated against multi-language
+    golden conformance fixtures.

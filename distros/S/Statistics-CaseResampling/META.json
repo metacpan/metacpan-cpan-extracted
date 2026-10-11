@@ -1,7 +1,7 @@
 {
    "abstract" : "Efficient resampling and calculation of medians with confidence intervals",
    "author" : [
-      "Steffen Mueller <smueller@cpan.org>"
+      "Steffen Mueller <cpan@steffen-mueller.net>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
@@ -37,6 +37,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.17",
+   "version" : "0.18",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

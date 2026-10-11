@@ -23,6 +23,21 @@ typedef unsigned __int64   uint64_t;
 #  define PERL_UNUSED_ARG(x) ((void)x)
 #endif
 
+/* HeUTF8, mPUSHs and mXPUSHs arrived in 5.10.1, and MIN_PERL_VERSION is 5.010:
+ * an OmniOS smoker's 5.10.0 refused to compile fz_build.h and read.xs for want
+ * of the first two. These are ppport.h's definitions; this header follows
+ * perl.h in Frozen.xs, so each is defined only where perl has not. */
+#ifndef HeUTF8
+#  define HeUTF8(he) ((HeKLEN(he) == HEf_SVKEY) \
+                      ? SvUTF8(HeKEY_sv(he)) : (U32)HeKUTF8(he))
+#endif
+#ifndef mPUSHs
+#  define mPUSHs(s) PUSHs(sv_2mortal(s))
+#endif
+#ifndef mXPUSHs
+#  define mXPUSHs(s) XPUSHs(sv_2mortal(s))
+#endif
+
 #ifdef malloc
 #  undef malloc
 #endif

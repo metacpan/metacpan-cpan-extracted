@@ -62,6 +62,19 @@
 #define SA_SB_EMPTY 0u
 #define SA_SB_LIVE  1u
 
+/* What sa_sb_take answers when it has no row to give. Two answers, because
+ * they ask two different things of the caller: FULL means every row is a live
+ * worker's and the board was sized too small; BUSY means the claim stripe was
+ * held for the whole of a bounded wait, and asking again will work. */
+#define SA_SB_FULL (-1)
+#define SA_SB_BUSY (-2)
+
+static const char *sa_sb_refusal(int rc) {
+    return rc == SA_SB_BUSY
+         ? "the claim was held by another process for the whole of a bounded wait"
+         : "the board is full";
+}
+
 typedef struct {
     volatile uint32_t state;      /* SA_SB_EMPTY / SA_SB_LIVE               */
     volatile uint32_t version;    /* odd while the owner is writing         */
@@ -215,25 +228,29 @@ static sa_sb *sa_sb_bind(sa_region *arena, sa_reg *e,
 static void sa_sb_free(sa_sb *b) { free(b); }
 
 /* Claim a row for this process, reclaiming a dead worker's row when the board
- * is full. Returns the row index, or -1 when every row belongs to a live
- * worker. Idempotent: called again in the same process it returns the row it
- * already holds.
+ * is full. Returns the row index, SA_SB_FULL when every row belongs to a live
+ * worker, or SA_SB_BUSY when the claim stripe was held for the whole wait.
+ * Idempotent: called again in the same process it returns the row it already
+ * holds.
  *
  * The stripe lock serialises claimers - the ONE place this tenant locks - so a
- * row is never handed to two workers at once. */
+ * row is never handed to two workers at once. A claim happens once per worker,
+ * at start, so it waits for the stripe as a carve does and not on sa_at_lock's
+ * spin: an OpenBSD smoker had five children claim at once, one lost the spin
+ * to the other four, and that read as a full board with eleven rows empty. */
 static int sa_sb_take(sa_sb *b) {
     sa_sb_hdr *h;
     uint64_t me, hash;
     uint32_t i;
     int dead = -1;
 
-    if (!b) return -1;
+    if (!b) return SA_SB_FULL;
     if (b->mine >= 0) return b->mine;
     h  = b->hdr;
     me = sa_getpid();
     hash = sa_at_fnv("\0scoreboard-claim", 17);
 
-    if (!sa_at_lock(h->locks, hash)) return -1;
+    if (!sa_lock_wait(h->locks, hash)) return SA_SB_BUSY;
 
     /* Already ours from an earlier take in this same process? */
     for (i = 0; i < b->nslots; i++) {
@@ -254,7 +271,7 @@ static int sa_sb_take(sa_sb *b) {
         if (dead < 0 && !sa_pid_alive(sa_at_load64_acq(&s->pid)))
             dead = (int)i;
     }
-    if (dead < 0) { sa_at_unlock(h->locks, hash); return -1; }
+    if (dead < 0) { sa_at_unlock(h->locks, hash); return SA_SB_FULL; }
     {
         sa_sb_slot *s = &b->slots[dead];
         uint64_t ep = sa_at_load64_acq(&s->epoch) + 1;
@@ -375,7 +392,7 @@ static sa_sb *sa_sb_bind(sa_region *arena, sa_reg *e,
     return NULL;
 }
 static void sa_sb_free(sa_sb *b) { free(b); }
-static int sa_sb_take(sa_sb *b) { (void)b; return -1; }
+static int sa_sb_take(sa_sb *b) { (void)b; return SA_SB_FULL; }
 static sa_sb_slot *sa_sb_begin(sa_sb *b) { (void)b; return NULL; }
 static void sa_sb_end(sa_sb *b, sa_sb_slot *s) { (void)b; (void)s; }
 static void sa_sb_set_gauge(sa_sb_slot *s, int idx, uint64_t v) {

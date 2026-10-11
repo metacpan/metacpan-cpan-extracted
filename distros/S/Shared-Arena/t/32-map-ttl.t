@@ -283,14 +283,22 @@ SKIP: {
 # look against the parent's store, and a look that came after the deadline is
 # reported as late (exit 3) rather than as a miss, and the parent runs the whole
 # thing again.
+#
+# AND THE SECOND LOOK HAS TO LAND AFTER IT, BY THE CLOCK THE DEADLINE IS ON. A
+# deadline is a moment on the wall clock, so "after" is that clock's word and
+# not the sleep's: a wall clock stepped back during the sleep leaves the
+# deadline still ahead and the entry correctly present, which says nothing
+# about the map. A Linux smoker's did exactly that, and its child read a 200ms
+# ban as live after a 300ms sleep. That look is reported as unmeasured (exit 4)
+# and run again, like the late one.
 
 SKIP: {
     skip 'fork is POSIX-only here', 2 if $^O eq 'MSWin32';
 
     my $m = $arena->map('pool', slots => 64, slot_size => 128);
-    my $rc;
+    my ($rc, $t0);
     for my $try (1 .. 5) {
-        my $t0 = Time::HiRes::time();
+        $t0 = Time::HiRes::time();
         $m->store('ban', 'yes', ttl_ms => 200);
 
         my $pid = fork;
@@ -301,17 +309,25 @@ SKIP: {
             my $late = (Time::HiRes::time() - $t0) * 1000 >= 200;
             select undef, undef, undef, 0.3;
             # ...and gone after, from a deadline the parent set.
+            my $past = (Time::HiRes::time() - $t0) * 1000 >= 200;
             my $gone = $m->exists('ban') ? 0 : 1;
-            exit(!$live && $late ? 3 : $live && $gone ? 0 : 1);
+            exit(!$live && $late ? 3
+               : $live && $gone  ? 0
+               : $live && !$past ? 4
+               :                   1);
         }
         waitpid($pid, 0);
         $rc = $? >> 8;
-        last unless $rc == 3;
-        note "the child's first look came after the 200ms deadline (try $try): again";
+        last unless $rc == 3 || $rc == 4;
+        note $rc == 3
+            ? "the child's first look came after the 200ms deadline (try $try): again"
+            : "the clock went back during the child's sleep (try $try): again";
     }
     is($rc, 0, 'a child sees the deadline the parent set, live then gone');
 
-    # And by now the parent agrees.
+    # And by now the parent agrees: "now" on the clock the deadline is on.
+    select undef, undef, undef, 0.01
+        while (Time::HiRes::time() - $t0) * 1000 < 200;
     ok(!$m->exists('ban'), 'the parent sees it gone too');
 }
 

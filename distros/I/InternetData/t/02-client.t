@@ -4,6 +4,7 @@ use warnings;
 use lib 't/lib';
 
 use File::Temp ();
+use Mojo::Headers;
 use Mojo::IOLoop;
 use Mojo::JSON qw(false true);
 use Mojo::UserAgent;
@@ -49,6 +50,94 @@ subtest 'a keyless client builds and sends no credential at all' => sub {
         ok(!exists $request->{headers}{Authorization}, 'no empty Authorization without a key');
         is_deeply($request->{query}, {}, 'and no apikey query parameter');
     }
+};
+
+subtest 'a blank key is no key, and the blanks around a key are no part of it' => sub {
+    my $origin = InternetDataTest::Origin->new(sub {
+        shift->render(json => { databases => [] });
+    });
+
+    for my $key ('   ', "\t", " \r\n ") {
+        $origin->reset;
+        InternetData->new(base_url => $origin->url, api_key => $key)->database->list;
+        my ($request) = $origin->requests;
+        ok(!exists $request->{headers}{Authorization}, 'no Authorization for a blank key');
+    }
+    for my $key ("secret-key\n", "secret-key\r\n", " \tsecret-key ") {
+        $origin->reset;
+        InternetData->new(base_url => $origin->url, api_key => $key)->database->list;
+        my ($request) = $origin->requests;
+        is($request->{headers}{Authorization}, 'Bearer secret-key', 'sent without its blanks');
+    }
+};
+
+subtest 'a key holding a control character is refused where it is set' => sub {
+    # Mojo refused a CR or LF in the header with a raw string from every call,
+    # and sent any other control character on the wire.
+    my $origin = InternetDataTest::Origin->new(sub {
+        shift->render(json => { databases => [] });
+    });
+    for my $key ("secret\r\nX-Injected: 1", "sec\nret", "sec\x01ret", "secret\x7f", "sec\tret") {
+        my $client = eval { InternetData->new(base_url => $origin->url, api_key => $key) };
+        ok(!defined $client, 'refused');
+        like($@, qr/api_key holds a control character/, 'naming the cause');
+        unlike($@, qr/sec/, 'and not the key');
+    }
+    is($origin->count, 0, 'with nothing sent');
+};
+
+subtest 'an empty result code gives way to the status' => sub {
+    for my $case ([{ rc => 'UNAUTHORIZED_ID' }, 'UNAUTHORIZED_ID'], [{ rc => '' }, 'request failed with status 403'],
+                  [{ rc => undef }, 'request failed with status 403'], [{}, 'request failed with status 403']) {
+        my ($body, $want) = @$case;
+        my $origin = InternetDataTest::Origin->new(sub {
+            shift->render(json => $body, status => 403);
+        });
+        eval { InternetData->new(base_url => $origin->url, api_key => 'k')->database->list };
+        is($@->kind, 'forbidden', 'a 403');
+        is($@->message, $want, "reads as '$want'");
+    }
+};
+
+subtest 'a Retry-After is digits or an HTTP date in GMT, and nothing else' => sub {
+    # Mojo::Date read ISO 8601, any zone as GMT and an unknown month as January,
+    # and the digits took a fraction.
+    my @at = gmtime(time + 60);
+    my @days = qw(Sun Mon Tue Wed Thu Fri Sat);
+    my @weekdays = qw(Sunday Monday Tuesday Wednesday Thursday Friday Saturday);
+    my @mons = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
+    my ($s, $mi, $h, $d, $mo, $y, $wd) = @at;
+    $y += 1900;
+    my $clock = sprintf('%02d:%02d:%02d', $h, $mi, $s);
+    my $imf = sprintf('%s, %02d %s %d %s', $days[$wd], $d, $mons[$mo], $y, $clock);
+    my $next = $y + 1;
+    my @cases = (
+        ['0', 'rate_limited'], ['120', 'rate_limited'], [' 7 ', 'rate_limited'], ["$imf GMT", 'rate_limited'],
+        [sprintf('%s, %02d-%s-%02d %s GMT', $weekdays[$wd], $d, $mons[$mo], $y % 100, $clock), 'rate_limited'],
+        [sprintf('%s %s %2d %s %d', $days[$wd], $mons[$mo], $d, $clock, $y), 'rate_limited'],
+        ["$imf +0000", 'quota_exceeded'], ["$imf +0500", 'quota_exceeded'], ["$imf EST", 'quota_exceeded'],
+        ["$imf PST", 'quota_exceeded'], ["$imf gmt", 'quota_exceeded'],
+        [sprintf('%d-%02d-%02dT%sZ', $y, $mo + 1, $d, $clock), 'quota_exceeded'],
+        [sprintf('Foo, %02d %s %d %s GMT', $d, $mons[$mo], $y, $clock), 'quota_exceeded'],
+        [sprintf('%s, %02d Xyz %d %s GMT', $days[$wd], $d, $y, $clock), 'quota_exceeded'],
+        [sprintf('%02d %s %d %s GMT', $d, $mons[$mo], $y, $clock), 'quota_exceeded'],
+        ["Tue, 31 Nov $next 08:49:37 GMT", 'quota_exceeded'], ["Mon, 30 Feb $next 08:49:37 GMT", 'quota_exceeded'],
+        ["Fri, 01 Jan $next 25:00:00 GMT", 'quota_exceeded'], ["Fri, 01 Jan $next 08:61:00 GMT", 'quota_exceeded'],
+        ['1.5', 'quota_exceeded'], ['+1', 'quota_exceeded'], ['-1', 'quota_exceeded'], ['0x10', 'quota_exceeded'],
+        ['1_0', 'quota_exceeded'], ['1e3', 'quota_exceeded'], ['tomorrow', 'quota_exceeded'], ['', 'quota_exceeded'],
+    );
+    for my $case (@cases) {
+        my ($value, $kind) = @$case;
+        my $headers = Mojo::Headers->new;
+        $headers->header('Retry-After' => $value);
+        is(InternetData::Error->from_response(429, $headers, {})->kind, $kind, "'$value' is $kind");
+    }
+    my $headers = Mojo::Headers->new;
+    $headers->header('Retry-After' => "$imf GMT");
+    my $wait = InternetData::Error->from_response(429, $headers, {})->retry_after;
+    ok($wait >= 55 && $wait <= 60, "a date is the seconds until it, in GMT ($wait)");
+    $headers->header('Retry-After' => 'Sun, 06 Nov 1994 08:49:37 GMT');
+    is(InternetData::Error->from_response(429, $headers, {})->retry_after, 0, 'a date already past is no wait');
 };
 
 subtest 'responses are unwrapped at the right depth' => sub {
@@ -115,8 +204,10 @@ subtest 'a 2xx a database call cannot read as its answer is a retried server_err
     my @bodies = (
         ['<html>gateway</html>', 'text/html'], ['{"databases":[', 'application/json'],
         ['', 'application/json'], ['[]', 'application/json'],
-        ['{}', 'application/json', 'list', 'checksums', 'downloads'],
+        ['{}', 'application/json'],
         ['{"databases":{},"checksums":[],"downloads":"x"}', 'application/json', 'list', 'checksums', 'downloads'],
+        # metadata IS the answer, so an object without its id is none.
+        ['{"id":null,"updated":"2026-10-10"}', 'application/json', 'metadata'],
     );
     for my $case (@bodies) {
         ($body, $type, my @only) = @$case;
@@ -142,7 +233,7 @@ subtest 'the query a call makes says what it asked for' => sub {
         my %body = (
             '/api/v2/database/downloads' => { downloads => [] },
             '/api/v2/database/checksum' => { checksums => {} },
-            '/api/v2/database/metadata' => {},
+            '/api/v2/database/metadata' => { id => 'bogon_asn_v1' },
             '/api/v2/database/list' => { databases => [] },
         );
         $c->render(json => $body{ $c->req->url->path->to_string });

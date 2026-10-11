@@ -109,6 +109,16 @@
                 "valid": true
             },
             {
+                "description": "a private-use character in a literal is valid",
+                "data": "a\ue000b",
+                "valid": true
+            },
+            {
+                "description": "a supplementary private-use character in a literal is valid",
+                "data": "a\udb80\udc00b",
+                "valid": true
+            },
+            {
                 "description": "reserved expansion operator",
                 "data": "{+var}",
                 "valid": true
@@ -149,6 +159,11 @@
                 "valid": true
             },
             {
+                "description": "combined prefix and explode modifiers are invalid",
+                "data": "{var:1*}",
+                "valid": false
+            },
+            {
                 "description": "a variable list with more than one varspec is valid",
                 "data": "{x,y}",
                 "valid": true
@@ -157,6 +172,11 @@
                 "description": "a dotted variable name is valid",
                 "data": "{a.b}",
                 "valid": true
+            },
+            {
+                "description": "a trailing dot in a variable name is invalid",
+                "data": "{a.}",
+                "valid": false
             },
             {
                 "description": "a double dot in a variable name is invalid",

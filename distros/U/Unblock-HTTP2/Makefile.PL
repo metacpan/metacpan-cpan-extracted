@@ -18,6 +18,7 @@ my $dist_version = MM->parse_version('lib/Unblock/HTTP2.pm');
 my @public_modules = qw(
     Unblock::HTTP2
     Unblock::HTTP2::Client
+    Unblock::HTTP2::Integration
     Unblock::HTTP2::NativeABI
     Unblock::HTTP2::Server
     Unblock::HTTP2::Transaction

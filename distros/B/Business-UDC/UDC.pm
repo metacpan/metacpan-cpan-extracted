@@ -7,7 +7,7 @@ use Business::UDC::Parser qw(parse);
 use English;
 use Error::Pure::Utils qw(err_get);
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 # Constructor.
 sub new {
@@ -188,7 +188,7 @@ L<https://github.com/michal-josef-spacek/Business-UDC>
 
 =head1 AUTHOR
 
-Michal Josef Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:michal.josef.spacek@gmail.com>
 
 L<http://skim.cz>
 
@@ -207,6 +207,6 @@ the Czech Republic (DKRVO 2024–2028), Area 11: Linked Open Data.
 
 =head1 VERSION
 
-0.08
+0.09
 
 =cut

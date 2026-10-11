@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+  xmlns="http://www.loc.gov/MARC21/slim">
+
+<record>
+  <leader>00733nam a22002291  4500</leader>
+  <controlfield tag="001">bk197003749</controlfield>
+  <controlfield tag="003">CZ PrNK</controlfield>
+  <controlfield tag="005">19970818000000.0</controlfield>
+  <controlfield tag="008">970818s1970    xr                  dut  </controlfield>
+  <datafield tag="015" ind1=" " ind2=" ">
+    <subfield code="a">cnb000452844</subfield>
+  </datafield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="a">(OCoLC)42103449</subfield>
+  </datafield>
+  <datafield tag="040" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+    <subfield code="b">cze</subfield>
+    <subfield code="c">ULG001</subfield>
+    <subfield code="d">ABA001</subfield>
+  </datafield>
+  <datafield tag="041" ind1="1" ind2=" ">
+    <subfield code="a">dut</subfield>
+    <subfield code="h">cze</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">885-93-343.4 = 393</subfield>
+    <subfield code="2">undef</subfield>
+  </datafield>
+  <datafield tag="245" ind1="0" ind2="0">
+    <subfield code="a">Doornroosje /</subfield>
+    <subfield code="c">[Barev.] tekeningen door V. Kubašta</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="a">Prague :</subfield>
+    <subfield code="b">Artia,</subfield>
+    <subfield code="c">1970</subfield>
+    <subfield code="e">([Velký Šenov :</subfield>
+    <subfield code="f">SG])</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">[12] s. ;</subfield>
+    <subfield code="c">4°</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Z čes. orig. O Šípkové Růžence přel. do holand.</subfield>
+  </datafield>
+  <datafield tag="700" ind1="1" ind2=" ">
+    <subfield code="a">Kubašta, Vojtěch,</subfield>
+    <subfield code="d">1914-1992</subfield>
+    <subfield code="7">jk01070261</subfield>
+    <subfield code="4">ill</subfield>
+  </datafield>
+  <datafield tag="910" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+  </datafield>
+  <datafield tag="964" ind1=" " ind2=" ">
+    <subfield code="a">Pohádky - obrázky plastické - vyd. holand.</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="a">000452844</subfield>
+  </datafield>
+</record>
+
+</collection>

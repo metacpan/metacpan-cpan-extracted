@@ -1,11 +1,10 @@
-#!/usr/bin/perl;
+#!/usr/bin/env perl
 
 use strict;
 use warnings;
 use FindBin;
 use Test::More;
-use File::Temp;
-use File::Slurp;
+use File::Temp qw(tempdir);
 
 BEGIN { unshift(@INC, "$FindBin::Bin/../lib") unless $ENV{HARNESS_ACTIVE}; }
 	

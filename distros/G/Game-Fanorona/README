@@ -1,0 +1,93 @@
+Game-Fanorona
+
+Fanorona, the board game of Madagascar: forty-five points joined by lines,
+nine across and five up, with twenty-two stones a side. A stone steps along a
+line to the next point. Step up to an enemy stone, or straight away from one,
+and that stone is taken with every enemy stone in an unbroken row beyond it.
+Taking is compulsory, and a stone that has taken may go on taking in the same
+move.
+
+This distribution is the game, an opponent for it, and a program to play it
+in a terminal.
+
+    use Game::Fanorona;
+
+    my $game = Game::Fanorona->new;
+    $game->play('d3-e3A') or die $game->error->message;
+    print $game->turn, "\n";
+    print "$_->{string} takes @{ $_->{takes} }\n" for $game->steps;
+
+Or, from a shell:
+
+    fanorona
+    fanorona --side black --level 5
+    fanorona --variant telo
+
+    5  X---X---X---X---X---X---X---X---X    Black X  22 left  taken 0
+       | \ | / | \ | / | \ | / | \ | / |
+    4  X---X---X---X---X---X---X---X---X
+       | / | \ | / | \ | / | \ | / | \ |
+    3  X---O---X--[O]-(+)--X---O---X---O
+       | \ | / | \ | / | \ | / | \ | / |
+    2  O---O---O---O---O---O---O---O---O
+       | / | \ | / | \ | / | \ | / | \ |
+    1  O---O---O---O---O---O---O---O---O    White O  22 left  taken 0
+       a   b   c   d   e   f   g   h   i
+
+In a terminal the cursor walks the stones that can move. With one picked up,
+the arrow keys walk the points it may step to, in all eight directions, and
+the board shows the position as the move would leave it before the move is
+played.
+
+The three traditional boards are here by name: sivy, nine by five; dimy, five
+by five; and telo, three by three.
+
+The game has no single rule book. Game::Fanorona says which texts these rules
+were taken from and which four things this distribution had to choose: that a
+side with no move has lost, that the third occurrence of a position is a
+draw, that sixty moves running with nothing taken is a draw, and how the two
+smaller boards are set up.
+
+The engine is C, with no floating point in it. The opponent is bounded by the
+number of positions it may look at and never by the clock, so it makes the
+same move on every machine.
+
+
+INSTALLATION
+
+A C compiler is needed. To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+It requires Object::Proto::Sugar, and perl 5.14 or later. Term::ReadKey is
+recommended: with it the terminal program is played with the arrow keys, and
+without it by typing.
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Game::Fanorona
+    perldoc fanorona
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Game-Fanorona
+
+    Search CPAN
+        https://metacpan.org/release/Game-Fanorona
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION <email@lnation.org>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)

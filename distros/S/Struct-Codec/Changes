@@ -1,5 +1,8 @@
 Revision history for Struct::Codec
 
+0.09	2026-10-11
+        - Builds on 5.10.0: HeUTF8 is defined where perl lacks it.
+
 0.08	2026-09-20
         - t/34-pointers.t asked for 2**40 to be an integer, which it is not
           where ivsize is 4.

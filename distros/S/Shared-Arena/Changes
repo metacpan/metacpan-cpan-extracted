@@ -1,5 +1,14 @@
 Revision history for Shared::Arena
 
+0.15	2026-10-11
+        - FIXES a scoreboard row and a lease bind refused as "full" for a held
+          stripe: both wait as a carve does and answer busy.
+        - Lease acquire, renew and release wait for a held stripe as a map
+          write does.
+        - Intervals read CLOCK_MONOTONIC where Makefile.PL finds one running,
+          so a wall-clock step neither stalls nor refills a rate bucket.
+        - FIXES t/32-map-ttl.t timing a deadline by its sleep.
+
 0.14	2026-10-05
         - FIXES a map write dropped under contention: a store, incr or delete
           whose stripe was held burned 100k test-and-sets and gave up. A

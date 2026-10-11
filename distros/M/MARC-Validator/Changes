@@ -1,3 +1,10 @@
+0.23 2026-10-11T11:27:59+02:00
+ - Add another case of whitespace issue in 080a ( = ).
+ - Add another case of whitespace issue in 080a (- 044).
+ - Add check for extra closing parenthesis.
+ - Add check for opening/closing parenthesis.
+ - Rewrite doc to use of =head1 EXAMPLES.
+
 0.22 2026-06-17T07:58:03+02:00
  - Add error for bad dot in 080a field.
  - Add error use case for bad apostrophe '´'.

@@ -110,6 +110,10 @@ ENVIRONMENT
         Object::Remote::Logging.
 
 KNOWN ISSUES
+    Windows support
+        Windows is not supported: it lacks support for non-blocking I/O for
+        pipes.
+
     Large data structures
         Object::Remote communication is encapsalated with JSON and values
         passed to remote objects will be serialized with it. When sending

@@ -395,8 +395,15 @@ static struct tm *hm_localtime_r(const time_t *t, struct tm *out) {
     *out = *p;
     return out;
 }
+static struct tm *hm_gmtime_r(const time_t *t, struct tm *out) {
+    struct tm *p = gmtime(t);
+    if (!p) return NULL;
+    *out = *p;
+    return out;
+}
 #else
 #define hm_localtime_r localtime_r
+#define hm_gmtime_r    gmtime_r
 #endif
 
 #endif /* HM_WIN_H */

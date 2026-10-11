@@ -1,12 +1,11 @@
 use v5.42;
 use feature 'class';
 no warnings 'experimental::class';
-
-class At::Error 1.1 {
+class At::Error v1.7.0 {
     use Carp qw[];
     use overload
         bool => sub {0},
-        '""' => sub ( $s, $u, $q ) { $s->message };
+    '""' => sub ( $s, $u, $q ) { $s->message };
     field $message     : param : reader;
     field $description : param : reader //= ();
     field $fatal       : param : reader //= 0;
@@ -62,8 +61,7 @@ class At::Error 1.1 {
             At::Error->new( message => $msg, description => $desc, fatal => $is_fatal );
         };
     }
-}
-1;
+} 1;
 __END__
 
 =pod

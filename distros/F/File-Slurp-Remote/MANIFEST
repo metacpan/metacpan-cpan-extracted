@@ -1,11 +1,15 @@
-CHANGELOG
-lib/File/Slurp/Remote/BrokenDNS.pm
+Changes
+cpanfile
 lib/File/Slurp/Remote.pm
-lib/File/Slurp/Remote/SmartOpen.pm
+lib/File/Slurp/Remote/BrokenDNS.pm
 lib/File/Slurp/Remote/CanonicalHostnames.pm
+lib/File/Slurp/Remote/SmartOpen.pm
 lib/Tie/Function/Examples.pm
 Makefile.PL
 MANIFEST
-META.yml
+MANIFEST.SKIP
+README.md
 t/remote_slurp.t
 t/tiefunc.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

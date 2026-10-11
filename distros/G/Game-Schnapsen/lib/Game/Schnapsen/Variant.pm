@@ -7,7 +7,7 @@ use Exporter 'import';
 
 use Game::Schnapsen::Error ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 our @EXPORT_OK = qw(variants is_variant check_variant spec_for fields
                     deck_size hand_size ranks exchange_rank
                     exchange_needs_trick
@@ -114,7 +114,7 @@ Game::Schnapsen::Variant - the thirteen places the two games differ
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

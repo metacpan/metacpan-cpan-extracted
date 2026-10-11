@@ -16,7 +16,7 @@ use Game::Reversi::Notation;
 use Game::Reversi::Scoring;
 use Game::Reversi::Result;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 has variant => (
 	is      => 'ro',
@@ -353,7 +353,7 @@ Game::Reversi - the board game of 1883, with its own opening
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

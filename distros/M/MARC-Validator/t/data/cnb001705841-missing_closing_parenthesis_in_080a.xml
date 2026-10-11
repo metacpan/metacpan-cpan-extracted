@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+  xmlns="http://www.loc.gov/MARC21/slim">
+
+<record>
+  <leader>01013nam a2200313 a 4500</leader>
+  <controlfield tag="001">nkc20071705841</controlfield>
+  <controlfield tag="003">CZ PrNK</controlfield>
+  <controlfield tag="005">20071212154606.0</controlfield>
+  <controlfield tag="007">ta</controlfield>
+  <controlfield tag="008">071024s2007    xr a   f f    001 0 cze  </controlfield>
+  <datafield tag="015" ind1=" " ind2=" ">
+    <subfield code="a">cnb001705841</subfield>
+  </datafield>
+  <datafield tag="020" ind1=" " ind2=" ">
+    <subfield code="a">978-80-239-8710-2</subfield>
+    <subfield code="q">(váz.)</subfield>
+  </datafield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="a">(OCoLC)190778264</subfield>
+  </datafield>
+  <datafield tag="040" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+    <subfield code="b">cze</subfield>
+  </datafield>
+  <datafield tag="072" ind1=" " ind2="7">
+    <subfield code="a">616</subfield>
+    <subfield code="x">Patologie. Klinická medicína</subfield>
+    <subfield code="2">Konspekt</subfield>
+    <subfield code="9">14</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">616.132.2-008.6</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">(035</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="100" ind1="1" ind2=" ">
+    <subfield code="a">Studenčan, Martin,</subfield>
+    <subfield code="d">1962-</subfield>
+    <subfield code="7">mzk2007417605</subfield>
+    <subfield code="4">aut</subfield>
+  </datafield>
+  <datafield tag="245" ind1="1" ind2="0">
+    <subfield code="a">Akutní koronární syndrom /</subfield>
+    <subfield code="c">Martin Studenčan</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="a">Praha :</subfield>
+    <subfield code="b">Sport Media Group,</subfield>
+    <subfield code="c">2007</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">191 s. :</subfield>
+    <subfield code="b">barev. il. ;</subfield>
+    <subfield code="c">24 cm</subfield>
+  </datafield>
+  <datafield tag="504" ind1=" " ind2=" ">
+    <subfield code="a">Obsahuje bibliografii a rejstřík</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">akutní koronární syndromy</subfield>
+    <subfield code="7">ph214635</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="9">
+    <subfield code="a">acute coronary syndromes</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">příručky</subfield>
+    <subfield code="7">fd133209</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="9">
+    <subfield code="a">handbooks and manuals</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="901" ind1=" " ind2=" ">
+    <subfield code="b">9788023987102</subfield>
+    <subfield code="f">[1. vyd.]</subfield>
+    <subfield code="o">20071212</subfield>
+  </datafield>
+  <datafield tag="910" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="a">001705841</subfield>
+  </datafield>
+</record>
+
+</collection>

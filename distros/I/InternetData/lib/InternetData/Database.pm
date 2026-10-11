@@ -7,7 +7,7 @@ use Carp ();
 
 use InternetData::Error;
 
-our $VERSION = '1.9.1';
+our $VERSION = '1.9.2';
 
 # The formats a database is published in. Anything else is refused before it
 # reaches the API, whose 400 would cost a round trip and name nothing to act on.
@@ -211,10 +211,11 @@ sub _transfer_p {
     });
 }
 
-# The member each call returns from one level down, and what it must be; a call
-# not named here returns the whole answer.
+# The member each call returns from one level down, and what it must be; or, for
+# a call returning the whole answer, the members it may not go without.
 my %UNWRAP = (
     list => [databases => 'ARRAY'],
+    metadata => [undef, undef, 'id'],
     checksums => [checksums => 'HASH'],
     downloads => [downloads => 'ARRAY'],
 );

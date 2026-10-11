@@ -7,13 +7,12 @@ use Test2::V0;
 use Git::MoreHooks::CheckIndent;
 
 {
-    my $file = <<'FILE_END';
-First line.
-    Space indented line (tabsize 4).
-	Tab indented line.
-Last line.
-    Space indented line after last line.
-FILE_END
+    my $file =
+        sprintf "First line.\n"
+        . sprintf "    Space indented line (tabsize 4).\n"
+        . sprintf "\tTab indented line.\n"
+        . sprintf "Last line.\n"
+        . sprintf "    Space indented line after last line.\n";
 
     my %results = Git::MoreHooks::CheckIndent::check_for_indent(
         'file_as_string' => $file,
@@ -24,12 +23,11 @@ FILE_END
 }
 
 {
-    my $file = <<'FILE_END';
-    Space indented line (tabsize 4).
-	Tab indented line.
-			Tab indented line (indents: 3).
-      Space indented line (tabsize 6).
-FILE_END
+    my $file =
+        sprintf "    Space indented line (tabsize 4).\n"
+        . sprintf "\tTab indented line.\n"
+        . sprintf "\t\t\tTab indented line (indents: 3).\n"
+        . sprintf "      Space indented line (tabsize 6).\n";
 
     my %results = Git::MoreHooks::CheckIndent::check_for_indent(
         'file_as_string' => $file,

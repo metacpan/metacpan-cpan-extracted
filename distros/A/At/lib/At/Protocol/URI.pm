@@ -1,4 +1,4 @@
-package At::Protocol::URI 1.0 {    # https://github.com/bluesky-social/atproto/blob/main/packages/syntax/src/aturi.ts
+package At::Protocol::URI v1.7.0 {    # https://github.com/bluesky-social/atproto/blob/main/packages/syntax/src/aturi.ts
     use v5.42;
     no warnings qw[experimental::builtin experimental::try];
     use At::Error            qw[register throw];

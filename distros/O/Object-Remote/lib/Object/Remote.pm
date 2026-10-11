@@ -6,7 +6,7 @@ use Object::Remote::Handle;
 use Object::Remote::Logging qw( :log );
 use Module::Runtime qw(use_module);
 
-our $VERSION = '0.005002'; # v0.5.2
+our $VERSION = '0.005003'; # v0.5.3
 
 sub new::on {
   my ($class, $on, @args) = @_;
@@ -171,6 +171,10 @@ See L<Object::Remote::Logging>.
 =head1 KNOWN ISSUES
 
 =over 4
+
+=item Windows support
+
+Windows is not supported: it lacks support for non-blocking I/O for pipes.
 
 =item Large data structures
 

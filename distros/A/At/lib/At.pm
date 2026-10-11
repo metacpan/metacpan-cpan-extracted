@@ -6,7 +6,7 @@ no warnings 'experimental::class', 'experimental::builtin', 'experimental::for_l
 #~ |------3-33-----------------------------|
 #~ |-5-55------4-44-5-55----353--3-33-/1~--|
 #~ |---------------------335---33----------|
-class At 1.6 {
+class At v1.7.0 {
     use Carp qw[];
     use experimental 'try';
     use File::ShareDir::Tiny qw[dist_dir];
@@ -603,8 +603,7 @@ class At 1.6 {
             warnings::warnif( At => "Approaching rate limit for $type ($rate->{remaining} remaining)." );
         }
     }
-}
-1;
+} 1;
 __END__
 
 =pod
@@ -897,11 +896,11 @@ and spec-compliant proof generation (omitting C<ath> during refresh).
 
 =head2 C<login( $handle, $app_password )>
 
-Performs legacy password-based authentication. B<Deprecated: Use OAuth instead.>
+Performs legacy password-based authentication. B<Deprecated: Use OAuth instead.> Returns the user agent object.
 
 =head2 C<resume( $access_jwt, $refresh_jwt, [ $token_type, $dpop_key_jwk, $client_id, $handle, $pds ] )>
 
-Resumes a previous session using stored tokens and metadata.
+Resumes a previous session using stored tokens and metadata. Returns the user agent object on success.
 
 =head2 C<get( $method, [ \%params ] )>
 

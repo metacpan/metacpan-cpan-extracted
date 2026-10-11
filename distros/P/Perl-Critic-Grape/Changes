@@ -1,5 +1,8 @@
 Revision history for Perl::Critic::Grape
 
+0.1.1 - 2026-10-10
+	- viv ProhibitUnnecessaryRefs
+
 0.1.0 - 2026-09-07
 	- viv RequireConsistentReturn
 	- RequireSigils directcast support, default reject blockwise casting of single symbols

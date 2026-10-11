@@ -286,11 +286,11 @@ and spec-compliant proof generation (omitting `ath` during refresh).
 
 ## `login( $handle, $app_password )`
 
-Performs legacy password-based authentication. **Deprecated: Use OAuth instead.**
+Performs legacy password-based authentication. **Deprecated: Use OAuth instead.** Returns the user agent object.
 
 ## `resume( $access_jwt, $refresh_jwt, [ $token_type, $dpop_key_jwk, $client_id, $handle, $pds ] )`
 
-Resumes a previous session using stored tokens and metadata.
+Resumes a previous session using stored tokens and metadata. Returns the user agent object on success.
 
 ## `get( $method, [ \%params ] )`
 

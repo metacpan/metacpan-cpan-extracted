@@ -1,5 +1,23 @@
 Revision history for Unblock-HTTP1
 
+0.11  2026-10-10
+    - Add an optional framework-hosted Client and Server mode using
+      transport => $stream. HTTP output is delivered automatically through
+      unblock_send(), unblock_finish(), and unblock_abort().
+    - Make delayed responses work without an extra event-loop output pump,
+      and expose resume_output() for framework backpressure.
+    - Accept named request fields in Client->request() and named response
+      fields in Transaction->respond() and send_informational(). Canonical
+      Uniform::HTTP objects remain supported.
+    - Clarify clean EOF, delayed response, graceful finish, transport abort,
+      and Upgrade/CONNECT handoff ordering.
+    - Preserve low-level manual output mode and NativeABI v1 input semantics;
+      fix native borrowed-input output synchronization for attached hosts.
+    - Add runnable IO::Async, AnyEvent, and Linux::Event integration examples
+      and a cookbook. Linux::Event is optional and Linux-only.
+    - Add attached-transport regression tests and broaden the public POD.
+      Keep Perl 5.16 and Uniform::HTTP 0.06 as requirements.
+
 0.10  2026-10-04
     - Harmonize the public API vocabulary with Unblock::HTTP2 and
       Unblock::HTTP3 while keeping HTTP/1-specific behavior natural.

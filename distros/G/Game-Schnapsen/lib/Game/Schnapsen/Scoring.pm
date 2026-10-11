@@ -7,7 +7,7 @@ use Exporter 'import';
 
 use Game::Schnapsen::Variant ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 our @EXPORT_OK = qw(scale deal_result
                     TARGET_POINTS SCHNEIDER_AT LAST_TRICK_BONUS
                     PENALTY PENALTY_SCHWARZ);
@@ -113,7 +113,7 @@ Game::Schnapsen::Scoring - what a deal was worth, and to whom
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

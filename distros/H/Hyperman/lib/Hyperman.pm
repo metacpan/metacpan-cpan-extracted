@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.55';
+our $VERSION = '0.56';
 
 require XSLoader;
 XSLoader::load('Hyperman', $VERSION);
@@ -78,8 +78,8 @@ interfaces (F<xs/>).
         http3          => 0,           # serve HTTP/3 over QUIC on the same
                                        # port; needs the ngtcp2/nghttp3 build
                                        # and a certificate
-        http3_max_conns => 0,          # QUIC connection ceiling per worker
-                                       # (0 = unlimited)
+        http3_max_conns => 1024,       # QUIC connection ceiling per worker
+                                       # (the default; 0 lifts it)
         tls_cert       => $cert_pem,   # serve HTTPS (needs the OpenSSL build,
         tls_key        => $key_pem,    # Hyperman->has_tls); both required
         tls_ca         => $ca_pem,     # verify client certs against this CA
@@ -192,7 +192,10 @@ full control; that path calls back into Perl for every response.
 
 C<max_body> is the largest request Hyperman will accept - B<headers plus
 body>. Over it, the request is answered C<413 Payload Too Large> and the
-connection is closed. The default is B<16MB>.
+connection is closed. The default is B<16MB>. On HTTP/2 and HTTP/3 the same
+ceiling applies to each stream's body: the stream is answered 413 and the
+rest of it is dropped unread, while the connection carries on. A request
+header block is bounded at 64KB on every transport.
 
     Hyperman->run(app => $app, max_body => 64 * 1024 * 1024);
 
@@ -229,6 +232,42 @@ run-time option. B<On Windows every body takes the file>, whatever its size.
 divert on and the decoder wants the octets contiguous, so a
 C<Transfer-Encoding: chunked> request still accumulates in memory and is still
 bounded by C<max_body>.
+
+=back
+
+=head2 What the server does to a request and a response
+
+Rules every transport applies, so an application need not:
+
+=over 4
+
+=item * A C<HEAD> request is answered with the headers the C<GET> would have
+carried, C<Content-Length> included, and no body - whatever the application
+returned.
+
+=item * Every response carries a C<Date> header unless the application set
+one.
+
+=item * A request header whose name contains an underscore is dropped. It
+would land in C<$env> under the same C<HTTP_*> key as the hyphenated name,
+which is how a header a proxy in front has vetted gets overwritten by one it
+did not look at.
+
+=item * Whitespace before a header's colon, a bare LF or CR inside the header
+block, an empty request line and a chunk-size line longer than sixteen
+digits are answered C<400> and the connection is closed. Each is a framing
+ambiguity another intermediary might resolve the other way.
+
+=item * A response header name or value carrying CR, LF or NUL is refused:
+the client gets a C<500> and a line goes to C<STDERR>. Such a header splits
+the response, and the server is the last place that can be caught.
+
+=item * C<REMOTE_ADDR>, C<REMOTE_HOST>, C<SERVER_NAME>, C<SERVER_PORT> and
+C<psgi.errors> are fresh values on every request, so a middleware that
+assigns to one of them affects that request only.
+
+=item * A connection that pipelines requests without reading its responses
+holds at most 1MB of them; the rest are served as it drains.
 
 =back
 
@@ -403,6 +442,13 @@ multiplexed streams, HPACK, and flow control, with each stream dispatched to
 the app like any request (sync, C<Hyperman::Future>, or C<psgi.streaming>
 responses all work). HTTP/1.1 remains the default on the same port.
 
+The environment is the HTTP/1.1 one: C<psgi.url_scheme> says what the
+connection is, not what the client's C<:scheme> claimed; C<HTTP_HOST> comes
+from C<:authority>; and over TLS the C<HTTPS> and C<SSL_*> keys are set
+exactly as they are for an HTTP/1.1 request. A stream the client resets
+before its response is ready has that response's Future cancelled, as a
+closed HTTP/1.1 connection does.
+
 =head2 HTTP/3
 
 With C<< http3 => 1 >> alongside C<tls_cert>/C<tls_key>, the listener also
@@ -465,8 +511,11 @@ a client still talking across a restart - is answered with a B<Stateless
 Reset>, so the client gives up now instead of retrying to its idle timeout.
 That reply is always smaller than the packet that provoked it.
 
-C<http3_max_conns> caps live QUIC connections per worker (0, the default,
-is unlimited); past it, new handshakes are dropped rather than queued.
+C<http3_max_conns> caps live QUIC connections per worker (1024 by default;
+0 lifts the cap); past it, new handshakes are dropped rather than queued.
+Each accepted Initial costs an SSL object and a transport state that live
+until the idle timeout, and no descriptor is consumed, so without a cap
+there is nothing that stops a flood of them.
 C<< Hyperman->stats >> reports C<h3_conns> (handshakes completed),
 C<h3_live> (open now) and C<datagrams>.
 

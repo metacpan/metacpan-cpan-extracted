@@ -1,118 +1,95 @@
-# Integration
+# Connecting Unblock::HTTP2 to an event loop
 
-Unblock::HTTP2 does not own sockets, TLS, or an event loop.
+Unblock::HTTP2 does not own sockets, TLS, ALPN, or event loops.
 
-A transport normally moves bytes between its connection object and an
-Unblock::HTTP2 Client or Server.
+Start with the installed documentation:
 
-## Portable path
+    perldoc Unblock::HTTP2::Integration
 
-The portable interface is:
+For a runnable Linux::Event example, see examples/linux-event-server.pl.
+That example separates ADAPTER CODE from APPLICATION CODE.
 
-```perl
-$engine->input($bytes);
+## Application side
 
-while ($engine->want_write) {
-    my $bytes = $engine->output;
-    last unless length $bytes;
-    $transport->write($bytes);
-}
-```
+No explicit Uniform::HTTP objects are necessary:
 
-This works with pure Perl and with any framework.
+    $tx->respond(status => 200, body => "hello\n");
 
-## Native path
+    $client->request(
+        method    => 'GET',
+        target    => '/',
+        scheme    => 'https',
+        authority => 'example.test',
+        on_response => sub {
+            my ($tx, $response) = @_;
+            print $response->status, "\n";
+        },
+    );
 
-XS-backed transports can use `Unblock::HTTP2::NativeABI`.
+Uniform::HTTP::Request and Uniform::HTTP::Response objects still work.
 
-ABI version 1 has the same basic input lifecycle used by
-`Unblock::HTTP1::NativeABI`:
+## Small framework interface
 
-```text
-create
-input
-eof
-destroy
-```
+Your framework stream creates one Client or Server:
 
-HTTP/2 adds:
+    $self->{http2} = Unblock::HTTP2::Server->new(
+        transport  => $self,
+        on_request => $on_request,
+    );
 
-```text
-output
-want_read
-want_write
-```
+It implements:
 
-Use:
+    unblock_send($bytes)      # accept ALL wire bytes into its queue
+    unblock_finish()          # flush queued bytes, then close
+    unblock_abort($reason)    # close immediately
 
-```perl
-my $definition = Unblock::HTTP2::NativeABI::definition();
-my $include_dir = Unblock::HTTP2::NativeABI::native_include_dir();
-my $header_path = Unblock::HTTP2::NativeABI::header_path();
-my $header = Unblock::HTTP2::NativeABI::c_header();
-```
+It calls:
 
-The definition provides the ABI version, structure size, and address of the
-native operations table. The other discovery methods expose the installed
-header and its include directory.
+    $http->input($bytes);            # decrypted network input
+    $http->input_eof;                # peer closed input
+    $http->transport_error($error);  # fatal transport failure
 
-A native consumer must check both `abi_version` and `struct_size` before
-dereferencing the operations table.
+Output is handed off automatically; no output polling is necessary.
+A response written later by a timer also sends automatically.
 
-An XS adapter should create one native context for each Client or Server and
-keep it for the lifetime of that HTTP/2 connection.
+unblock_send() must accept the entire buffer or throw. A defined false
+return signals congestion AFTER acceptance. Call $http->resume_output
+when the host can accept more output. Returning undef means the host
+queues everything and provides no congestion signal.
 
-## Input ownership
+The engine holds the host weakly. The framework owns the socket, TLS,
+write queue and connection lifetime.
 
-Native input receives a borrowed pointer and length.
+## HTTP/2 differences from HTTP/1
 
-The caller owns the input buffer. Unblock::HTTP2 does not retain the pointer
-after the input call returns.
+One attached Client or Server multiplexes many Transactions on one
+connection. Cancelling a Transaction resets that stream, not the whole
+transport. Server response timing does not depend on input reads.
 
-libnghttp2 keeps partial frame parsing state internally. A fragmented HTTP/2
-frame can therefore be supplied as separate borrowed input windows.
+HTTP/2 messages are never completed by TCP EOF. input_eof closes the
+session and fails any unfinished Transactions. Use GOAWAY via drain()
+or goaway() for HTTP/2 connection draining.
 
-## Output ownership
+Flow control remains per-stream and per-connection. A false return
+from Transaction->write() means the body bytes were accepted but
+production must pause until on_drain.
 
-Native output calls a transport-provided sink with borrowed libnghttp2 output
-bytes.
+## Manual output
 
-The sink must copy or write those bytes before returning. The pointer must not
-be retained.
+The low-level API remains for callers that do not attach a host:
 
-The sink can return the pause result after accepting a chunk. This stops the
-current drain without losing that chunk. Resume output when the transport can
-accept more data.
+    $http->input($bytes);
+    while ($http->want_write) {
+        my $bytes = $http->output;
+        last unless length $bytes;
+        $framework->write($bytes);
+    }
 
-An event transport should normally append these chunks to its existing native
-send queue. A sink callback is not intended to imply one network syscall per
-nghttp2 chunk. The purpose of this path is to copy directly from nghttp2 into
-transport-owned native storage instead of first building an intermediate Perl
-output string.
+Do not call output() when a transport is attached.
 
-## What stays in Unblock
+## Native input and output
 
-Using the native transport ABI does not move HTTP/2 behavior into the adapter.
-
-Unblock::HTTP2 still owns:
-
-- HTTP/2 framing and HPACK through libnghttp2
-- stream and connection state
-- Uniform::HTTP construction
-- flow control
-- SETTINGS
-- PING and GOAWAY
-- resets
-- trailers
-- informational responses
-- transaction lifecycle
-
-The adapter only moves bytes and maps transport readiness.
-
-## Fallback
-
-The native ABI is optional.
-
-If the adapter does not use XS, does not support ABI version 1, or does not
-want the native path, use the normal `input()`, `output()`, `want_read()`,
-and `want_write()` methods.
+XS integrations may use Unblock::HTTP2::NativeABI version 1 instead of the
+portable interface. Its borrowed-buffer ownership and sink pause rules
+are unchanged by the attached-transport API. Never use both Perl attached
+output and the native output sink on the same session.

@@ -4,9 +4,18 @@ use strict;
 use warnings;
 use Carp qw(croak);
 use utf8 ();
+use Scalar::Util qw(weaken);
 
 sub _init_engine {
     my ($self, %option) = @_;
+    my $transport = delete $option{transport};
+    if (defined $transport) {
+        croak 'new(): transport must be an object' unless ref $transport;
+        for my $method (qw(unblock_send unblock_finish unblock_abort)) {
+            croak "new(): transport must implement $method()"
+                unless $transport->can($method);
+        }
+    }
     my %known = map { $_ => 1 } qw(
         max_head_size
         max_headers
@@ -32,6 +41,14 @@ sub _init_engine {
         unless $self->{max_headers} >= 1 && $self->{max_headers} <= 256;
     croak 'new(): low_water must not exceed high_water'
         if $self->{low_water} > $self->{high_water};
+    $self->{transport} = $transport;
+    weaken($self->{transport}) if defined $transport;
+    $self->{transport_attached} = defined($transport) ? 1 : 0;
+    $self->{transport_blocked} = 0;
+    $self->{transport_syncing} = 0;
+    $self->{transport_finished} = 0;
+    $self->{transport_aborted} = 0;
+    $self->{switch_notice} = undef;
     $self->{input} = '';
     $self->{output} = '';
     $self->{closed} = 0;
@@ -44,7 +61,7 @@ sub _init_engine {
 
 sub is_closed { $_[0]{closed} ? 1 : 0 }
 sub is_switched { $_[0]{switched} ? 1 : 0 }
-sub want_read { !$_[0]{closed} && !$_[0]{switched} ? 1 : 0 }
+sub want_read { !$_[0]{closed} && !$_[0]{switched} && !$_[0]{eof} ? 1 : 0 }
 sub want_write { length($_[0]{output}) ? 1 : 0 }
 
 sub input {
@@ -54,22 +71,27 @@ sub input {
     my $copy = "$bytes";
     croak 'input(): bytes must be a byte string' unless utf8::downgrade($copy, 1);
     return 0 unless length $copy;
-    croak 'input(): cannot be called recursively from an engine callback' if $self->{driving};
+    croak 'input(): cannot be called recursively from an engine callback or host send'
+        if $self->{driving} || $self->{transport_syncing};
+    croak 'input(): read side is already at EOF' if $self->{eof};
     if ($self->{switched}) {
         $self->{remainder} .= $copy;
         return length $copy;
     }
     croak 'input(): connection is closed' if $self->{closed};
     $self->{input} .= $copy;
-    local $self->{driving} = 1;
-    $self->_drive;
+    {
+        local $self->{driving} = 1;
+        $self->_drive;
+    }
+    $self->_transport_sync if $self->{transport_attached};
     return length $copy;
 }
 
 sub _input_borrowed {
     my ($self, $window, $length, $head, $message) = @_;
-    croak '_input_borrowed(): cannot be called recursively from an engine callback'
-        if $self->{driving};
+    croak '_input_borrowed(): cannot be called recursively from an engine callback or host send'
+        if $self->{driving} || $self->{transport_syncing};
     return (4, 0, 0) if $self->{switched};
     return (3, 0, 0) if $self->{closed};
     if (length $self->{input}) {
@@ -77,14 +99,17 @@ sub _input_borrowed {
             unless ref($window)
                 && $window->isa('Unblock::HTTP1::_Native::BorrowedWindow');
         $self->{input} .= $window->slice(0, $length);
-        local $self->{driving} = 1;
-        $self->_drive;
+        {
+            local $self->{driving} = 1;
+            $self->_drive;
+        }
+        $self->_transport_sync if $self->{transport_attached};
 
         my $status = $self->{closed} ? 3 : $self->{switched} ? 4 : 0;
         return ($status, $length, $self->_borrowed_native_head_ready);
     }
 
-    my ($status, $consumed);
+    my ($status, $consumed, $head_ready);
     {
         local $self->{borrowed_input} = $window;
         local $self->{borrowed_length} = $length;
@@ -108,9 +133,10 @@ sub _input_borrowed {
             $status = 0;
         }
         $consumed = $self->{borrowed_offset};
-        my $head_ready = $self->_borrowed_native_head_ready;
-        return ($status, $consumed, $head_ready);
+        $head_ready = $self->_borrowed_native_head_ready;
     }
+    $self->_transport_sync if $self->{transport_attached};
+    return ($status, $consumed, $head_ready);
 }
 
 sub _borrowed_input_eof {
@@ -185,15 +211,21 @@ sub _borrowed_native_head_ready { 0 }
 sub input_eof {
     my ($self) = @_;
     return $self if $self->{eof};
-    croak 'input_eof(): cannot be called recursively from an engine callback' if $self->{driving};
+    croak 'input_eof(): cannot be called recursively from an engine callback or host send'
+        if $self->{driving} || $self->{transport_syncing};
     $self->{eof} = 1;
-    local $self->{driving} = 1;
-    $self->_on_eof;
+    {
+        local $self->{driving} = 1;
+        $self->_on_eof;
+    }
+    $self->_transport_sync if $self->{transport_attached};
     return $self;
 }
 
 sub output {
     my ($self, $max) = @_;
+    croak 'output(): manual output is unavailable with an attached transport'
+        if $self->{transport_attached};
     croak 'output(): cannot be called recursively from an engine callback' if $self->{driving};
     return '' unless length $self->{output};
     my $take = length $self->{output};
@@ -221,15 +253,98 @@ sub close {
     return $self if $self->{closed};
     $self->{closed} = 1;
     $self->_fail_all(defined($error) && length($error) ? "$error" : 'HTTP/1 connection closed');
+    $self->_transport_sync if $self->{transport_attached};
     return $self;
 }
 
 sub _queue_output {
     my ($self, $bytes) = @_;
     return unless defined $bytes && length $bytes;
+    croak '_queue_output(): host send callback must not re-enter the engine'
+        if $self->{transport_syncing};
     $self->{output} .= $bytes;
+    $self->_transport_sync if $self->{transport_attached} && !$self->{driving};
     return;
 }
+
+# Only a whole-buffer acceptance transfers ownership to the host. A false
+# return indicates congestion, not rejection. The host later resumes us.
+sub _transport_sync {
+    my ($self) = @_;
+    return unless $self->{transport_attached};
+    return if $self->{transport_syncing} || $self->{driving};
+    return if $self->{transport_aborted} || $self->{transport_finished};
+    my $host = $self->{transport};
+    return $self->transport_error('HTTP/1 transport was destroyed') unless $host;
+
+    {
+        local $self->{transport_syncing} = 1;
+        while (!$self->{transport_blocked} && length $self->{output}) {
+            # No producer may re-enter during host send. Move this complete
+            # buffer out once; a thrown send aborts rather than retransmits.
+            my $bytes = $self->{output};
+            $self->{output} = '';
+            my ($accepted, $ready);
+            $accepted = eval { $ready = $host->unblock_send($bytes); 1 };
+            if (!$accepted) {
+                my $error = "$@" || 'unblock_send() failed';
+                $self->_transport_abort($error);
+                return;
+            }
+            $self->{transport_blocked} = 1 if defined($ready) && !$ready;
+        }
+    }
+
+    if (!length($self->{output}) && $self->{switch_notice}) {
+        my $notice = delete $self->{switch_notice};
+        $self->_deliver_switch_notice(@$notice);
+    }
+    return if $self->{transport_aborted};
+    if ($self->{closed} && !length($self->{output}) && !$self->{switched}) {
+        $self->{transport_finished} = 1;
+        my $ok = eval { $host->unblock_finish(); 1 };
+        $self->_transport_abort("$@" || 'unblock_finish() failed') unless $ok;
+    }
+    return;
+}
+
+sub _transport_abort {
+    my ($self, $reason) = @_;
+    return if $self->{transport_aborted};
+    $self->{transport_aborted} = 1;
+    $self->{output} = '';
+    $self->{closed} = 1;
+    $self->{switch_notice} = undef;
+    $self->_fail_all($reason);
+    if (my $host = $self->{transport}) {
+        eval { $host->unblock_abort($reason) };
+    }
+    return;
+}
+
+sub transport_error {
+    my ($self, $reason) = @_;
+    $reason = 'transport error' unless defined($reason) && length($reason);
+    $self->_transport_abort("$reason");
+    return $self;
+}
+
+sub resume_output {
+    my ($self) = @_;
+    croak 'resume_output(): no attached transport' unless $self->{transport_attached};
+    croak 'resume_output(): cannot be called recursively from host send'
+        if $self->{transport_syncing};
+    return $self if $self->{transport_finished} || $self->{transport_aborted};
+    $self->{transport_blocked} = 0;
+    $self->_transport_sync if $self->{transport_attached};
+    if (!$self->{transport_blocked} && length($self->{output}) <= $self->{low_water}) {
+        $self->_maybe_drain;
+        $self->_transport_sync if $self->{transport_attached};
+    }
+    return $self;
+}
+
+sub _deliver_switch_notice { return }
 
 sub _mark_switched {
     my ($self) = @_;
@@ -250,6 +365,7 @@ sub _after_output {
 
 sub _stream_ok {
     my ($self) = @_;
+    return 0 if $self->{transport_blocked};
     return length($self->{output}) < $self->{high_water} ? 1 : 0;
 }
 

@@ -1,0 +1,32 @@
+use strict;
+use warnings;
+
+# this test was generated with Dist::Zilla::Plugin::Test::NoTabs 0.15
+
+use Test::More 0.88;
+use Test::NoTabs;
+
+my @files = (
+    'lib/Git/MoreHooks.pm',
+    'lib/Git/MoreHooks/CheckCommitAuthorFromMailmap.pm',
+    'lib/Git/MoreHooks/CheckCommitBase.pm',
+    'lib/Git/MoreHooks/CheckIndent.pm',
+    'lib/Git/MoreHooks/CheckPerl.pm',
+    'lib/Git/MoreHooks/CheckTrailers.pm',
+    'lib/Git/MoreHooks/GitRepoAdmin.pm',
+    'lib/Git/MoreHooks/ScanCtags.pm',
+    'lib/Git/MoreHooks/TriggerJenkins.pm',
+    't/CheckCommitAuthorFromMailmap-hooks.t',
+    't/CheckCommitAuthorFromMailmap-load.t',
+    't/CheckIndent-functions.t',
+    't/CheckPerl-functions.t',
+    't/CheckPerl-hooks.t',
+    't/CheckTrailers-functions.t',
+    't/CheckTrailers-hooks.t',
+    't/CheckTrailers-load.t',
+    't/GitRepoAdmin-functions.t',
+    't/GitRepoAdmin-load.t'
+);
+
+notabs_ok($_) foreach @files;
+done_testing;

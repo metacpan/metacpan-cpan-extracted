@@ -12,6 +12,15 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 no if "$]" >= 5.041009, feature => 'smartmatch';
 
+# Detect the line number reporting behaviour of this version of perl
+our $use_block_end;
+BEGIN {
+    sub X { my (undef, undef, $line) = caller;
+                $use_block_end++ if ($line != shift); }
+    X __LINE__, # $use_block_end = 0
+    sub { }     # $use_block_end = 1
+};
+
 use Test2::API 'intercept';
 use Test2::V0 qw(!bag !bool), -no_pragmas => 1;
 use if $ENV{AUTHOR_TESTING}, 'Test2::Warnings';
@@ -32,7 +41,7 @@ my $events = intercept(
     $accepter->acceptance(sub ($schema, $data_string) {
       return $parser->validate_json_string($data_string, $schema);
     # we didn't adjust level, so test appears to originate where the subref ends
-    }); $line = __LINE__;
+    }); $line = __LINE__ - ($use_block_end ? 0 : 3);
   }
 );
 

@@ -7,7 +7,10 @@ use Moo::Role;
 
 requires '_open2_for';
 
-has timeout => (is => 'ro', default => sub { 10 });
+my $timeout_factor = $ENV{PERL_TEST_TIME_OUT_FACTOR} || 1;
+$timeout_factor = 1 if $timeout_factor < 1;
+
+has timeout => (is => 'ro', default => sub { 10 * $timeout_factor });
 
 BEGIN { router()->exclude_forwarding; }
 

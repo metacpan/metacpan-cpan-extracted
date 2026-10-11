@@ -89,9 +89,11 @@ sar_scoreboard(self, name, ...)
 MODULE = Shared::Arena    PACKAGE = Shared::Arena::Scoreboard    PREFIX = sasb_
 
 # Claim a row for this process, reclaiming a dead worker's row if the board is
-# full. Returns the row index, or undef when every row belongs to a live worker.
-# Idempotent - call it again in the same process and it returns the row it
-# already holds. Call it once at worker start, after the fork.
+# full. Returns the row index, or undef when every row belongs to a live worker
+# or the claim stripe stayed held through the wait; _last_err on the arena says
+# which, as it does for a refused carve. Idempotent - call it again in the same
+# process and it returns the row it already holds. Call it once at worker
+# start, after the fork.
 SV *
 sasb_take(self)
         SV *self
@@ -104,8 +106,10 @@ sasb_take(self)
 #if SA_HAVE_ATOMICS
         idx = sa_sb_take(b);
 #else
-        idx = -1;
+        idx = SA_SB_FULL;
 #endif
+        if (idx < 0)
+            b->arena->last_err = (idx == SA_SB_BUSY) ? SA_E_BUSY : SA_E_FULL;
         RETVAL = (idx < 0) ? &PL_sv_undef : newSViv(idx);
     OUTPUT:
         RETVAL
@@ -135,12 +139,14 @@ sasb_update(self, ...)
     PREINIT:
         sa_sb *b;
         sa_sb_slot *s;
+        int rc;
         I32 i;
     CODE:
         b = SA_SELF(sa_sb, self);
         if (!b) croak("Shared::Arena::Scoreboard: this board is released");
-        if (b->mine < 0 && sa_sb_take(b) < 0)
-            croak("Shared::Arena::Scoreboard: the board is full, no row to write");
+        if (b->mine < 0 && (rc = sa_sb_take(b)) < 0)
+            croak("Shared::Arena::Scoreboard: %s, no row to write",
+                  sa_sb_refusal(rc));
 #if SA_HAVE_ATOMICS
         s = sa_sb_begin(b);
         if (s) {
@@ -173,12 +179,14 @@ sasb_incr(self, ...)
     PREINIT:
         sa_sb *b;
         sa_sb_slot *s;
+        int rc;
         I32 i;
     CODE:
         b = SA_SELF(sa_sb, self);
         if (!b) croak("Shared::Arena::Scoreboard: this board is released");
-        if (b->mine < 0 && sa_sb_take(b) < 0)
-            croak("Shared::Arena::Scoreboard: the board is full, no row to write");
+        if (b->mine < 0 && (rc = sa_sb_take(b)) < 0)
+            croak("Shared::Arena::Scoreboard: %s, no row to write",
+                  sa_sb_refusal(rc));
 #if SA_HAVE_ATOMICS
         s = sa_sb_begin(b);
         if (s) {
@@ -204,13 +212,15 @@ sasb_status(self, str)
     PREINIT:
         sa_sb *b;
         sa_sb_slot *s;
+        int rc;
         const char *p;
         STRLEN len;
     CODE:
         b = SA_SELF(sa_sb, self);
         if (!b) croak("Shared::Arena::Scoreboard: this board is released");
-        if (b->mine < 0 && sa_sb_take(b) < 0)
-            croak("Shared::Arena::Scoreboard: the board is full, no row to write");
+        if (b->mine < 0 && (rc = sa_sb_take(b)) < 0)
+            croak("Shared::Arena::Scoreboard: %s, no row to write",
+                  sa_sb_refusal(rc));
         p = SvPV(str, len);
 #if SA_HAVE_ATOMICS
         s = sa_sb_begin(b);

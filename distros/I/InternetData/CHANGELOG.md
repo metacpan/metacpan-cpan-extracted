@@ -2,6 +2,13 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 1.6.1 are described by their release commits.
 
+## 1.9.2 - 2026-10-11
+
+### Fixes
+
+- Read Retry-After as digits or an RFC 9110 date in GMT, nothing else ([`d85cdbe`](https://github.com/internetdata/sdk-perl/commit/d85cdbed725ffa537dba13b02e1e5f99ecc240dd))
+- Trim the key and refuse a control character in it; require metadata's id ([`82389e0`](https://github.com/internetdata/sdk-perl/commit/82389e0a975a342ae6e939f1bc3935968d0663f9))
+
 ## 1.9.1 - 2026-10-10
 
 ### Fixes

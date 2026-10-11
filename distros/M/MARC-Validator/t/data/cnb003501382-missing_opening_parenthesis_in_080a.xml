@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+  xmlns="http://www.loc.gov/MARC21/slim">
+
+<record>
+  <leader>01870nim a2200541 i 4500</leader>
+  <controlfield tag="001">cpz20233501382</controlfield>
+  <controlfield tag="003">CZ PrNK</controlfield>
+  <controlfield tag="005">20250428092128.0</controlfield>
+  <controlfield tag="007">sd fungnnmmned</controlfield>
+  <controlfield tag="008">230216t20222021xr nnnng       f  n cze  </controlfield>
+  <datafield tag="015" ind1=" " ind2=" ">
+    <subfield code="a">cnb003501382</subfield>
+  </datafield>
+  <datafield tag="024" ind1="3" ind2=" ">
+    <subfield code="a">8595693406397</subfield>
+  </datafield>
+  <datafield tag="040" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+    <subfield code="b">cze</subfield>
+    <subfield code="e">rda</subfield>
+  </datafield>
+  <datafield tag="041" ind1="1" ind2=" ">
+    <subfield code="d">cze</subfield>
+    <subfield code="h">pol</subfield>
+  </datafield>
+  <datafield tag="072" ind1=" " ind2="7">
+    <subfield code="a">821.162.1</subfield>
+    <subfield code="x">Polská literatura</subfield>
+    <subfield code="2">Konspekt</subfield>
+    <subfield code="9">25</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">821.162.1-31</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">(0:82-311.6)</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">(0:82-312.9)</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">086.7)08</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">(086.76)</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="100" ind1="1" ind2=" ">
+    <subfield code="a">Sapkowski, Andrzej,</subfield>
+    <subfield code="d">1948-</subfield>
+    <subfield code="7">jn20000604794</subfield>
+    <subfield code="4">aut</subfield>
+  </datafield>
+  <datafield tag="240" ind1="1" ind2="0">
+    <subfield code="a">Boży bojownicy.</subfield>
+    <subfield code="l">Česky</subfield>
+    <subfield code="7">aun20221160741</subfield>
+  </datafield>
+  <datafield tag="245" ind1="1" ind2="0">
+    <subfield code="a">Boží bojovníci /</subfield>
+    <subfield code="c">Andrzej Sapkowski ; z polského originálu Boży bojownicy ... přeložil Stanislav Komárek</subfield>
+  </datafield>
+  <datafield tag="264" ind1=" " ind2="1">
+    <subfield code="a">[Praha] :</subfield>
+    <subfield code="b">Tympanum, s.r.o.,</subfield>
+    <subfield code="c">2022</subfield>
+  </datafield>
+  <datafield tag="264" ind1=" " ind2="4">
+    <subfield code="c">℗2021</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">3 audiodisky (27 hod.) ;</subfield>
+    <subfield code="c">12 cm</subfield>
+  </datafield>
+  <datafield tag="306" ind1=" " ind2=" ">
+    <subfield code="a">270000</subfield>
+  </datafield>
+  <datafield tag="336" ind1=" " ind2=" ">
+    <subfield code="a">mluvené slovo</subfield>
+    <subfield code="b">spw</subfield>
+    <subfield code="2">rdacontent</subfield>
+  </datafield>
+  <datafield tag="337" ind1=" " ind2=" ">
+    <subfield code="a">audio</subfield>
+    <subfield code="b">s</subfield>
+    <subfield code="2">rdamedia</subfield>
+  </datafield>
+  <datafield tag="338" ind1=" " ind2=" ">
+    <subfield code="a">audiodisk</subfield>
+    <subfield code="b">sd</subfield>
+    <subfield code="2">rdacarrier</subfield>
+  </datafield>
+  <datafield tag="344" ind1=" " ind2=" ">
+    <subfield code="a">digital</subfield>
+    <subfield code="b">optical</subfield>
+    <subfield code="2">rda</subfield>
+  </datafield>
+  <datafield tag="347" ind1=" " ind2=" ">
+    <subfield code="a">audio soubor</subfield>
+    <subfield code="b">MP3</subfield>
+    <subfield code="2">rda</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Název z disku</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Podle stejnojmenné knihy vydané nakladatelstvím Leonardo v roce 1999</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Nezkrácená verze na 3 mp3 CD</subfield>
+  </datafield>
+  <datafield tag="508" ind1=" " ind2=" ">
+    <subfield code="a">Režie Jan Koukal</subfield>
+  </datafield>
+  <datafield tag="511" ind1="0" ind2=" ">
+    <subfield code="a">Čte Ernesto Čekan</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">polské romány</subfield>
+    <subfield code="7">fd133084</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">historické romány</subfield>
+    <subfield code="7">fd132414</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">fantasy romány</subfield>
+    <subfield code="7">fd184199</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">audioknihy</subfield>
+    <subfield code="7">fd119452</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">kompaktní disky</subfield>
+    <subfield code="7">fd201991</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="700" ind1="1" ind2=" ">
+    <subfield code="a">Komárek, Stanislav,</subfield>
+    <subfield code="d">1960-</subfield>
+    <subfield code="7">jx20050105011</subfield>
+    <subfield code="4">trl</subfield>
+  </datafield>
+  <datafield tag="700" ind1="1" ind2=" ">
+    <subfield code="a">Koukal, Jan</subfield>
+    <subfield code="7">jo20251260254</subfield>
+    <subfield code="4">drt</subfield>
+  </datafield>
+  <datafield tag="700" ind1="1" ind2=" ">
+    <subfield code="a">Čekan, Ernesto,</subfield>
+    <subfield code="d">1972-</subfield>
+    <subfield code="7">xx0065004</subfield>
+    <subfield code="4">nrt</subfield>
+  </datafield>
+  <datafield tag="787" ind1="0" ind2="8">
+    <subfield code="i">Z cyklu:</subfield>
+    <subfield code="t">Husitská trilogie</subfield>
+    <subfield code="g">2</subfield>
+  </datafield>
+  <datafield tag="910" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="a">003501382</subfield>
+  </datafield>
+</record>
+
+</collection>

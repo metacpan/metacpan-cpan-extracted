@@ -360,6 +360,169 @@ subtest 'bad options are refused by the constructor, all of them' => sub {
 
 	ok(eval { Game::Reversi::Terminal->new(variant => 'othello', colour => 'w'); 1 },
 		'while the real ones are accepted');
+
+	# THE ONE THIS DISTRIBUTION IS CITED FOR, and it was only half fixed. Four
+	# other dists' POD names Game::Reversi for validating its variant three
+	# calls deeper and dying with a raw Perl message and a useless exit
+	# status. The variant was brought forward into BUILD; the LEVEL was left
+	# where it was, in the Bot, which is not built until `start`, so it was
+	# outside bin/reversi's eval and died exactly the same way one option
+	# along.
+	ok(!eval { Game::Reversi::Terminal->new(level => 9); 1 },
+		'an impossible level is refused by the constructor');
+	like($@, qr/there is no level 9/, 'and says so plainly');
+	unlike($@, qr/Bot\.pm line/,
+		'without naming a file and a line three calls deeper');
+	done_testing();
+};
+
+# The key loop, driven by `keysource` so nothing here needs a tty or
+# Term::ReadKey. ONE character a call: a source handing back "\e[C" whole
+# never becomes a right arrow.
+sub picker {
+	my ($keys, %o) = @_;
+	open my $in, '<', \(my $script = "quit\n") or die $!;
+	my $text = '';
+	open my $out, '>', \$text or die $!;
+	my @chars = split //, $keys;
+
+	my $t = Game::Reversi::Terminal->new(
+		in => $in, out => $out, variant => 'othello', seed => 'pick',
+		level => 1, ascii => 1, ansi => 0, picking => 1,
+		keysource => sub { shift @chars },
+		%o,
+	);
+	my $game = Game::Reversi->new(variant => 'othello', seed => 'pick');
+	$t->game($game);
+	return ($t, $game, \$text);
+}
+
+subtest 'a key at a time, named' => sub {
+	my ($t) = picker("k\e[A\e[B\e[C\e[D\e[5~\eOH\r\t\x7f\x03\x04 q\e\e[6~");
+
+	my @got;
+	while (defined(my $key = $t->read_key)) {
+		push @got, $key eq ' ' ? 'space' : $key;
+	}
+
+	is_deeply(\@got, [ qw/ k up down right left page_up home enter tab backspace
+		interrupt eof space q escape page_down / ],
+		'a character comes back as itself and a sequence as a name');
+	done_testing();
+};
+
+subtest 'an escape does not eat the key behind it' => sub {
+	my ($t) = picker("\eq");
+	is($t->read_key, 'escape', 'the escape is an escape');
+	is($t->read_key, 'q', 'and the keystroke behind it survives');
+	done_testing();
+};
+
+# THE CURSOR WALKS THE STARRED SQUARES AND NOTHING ELSE. In Go every point is
+# a candidate; here between one and fifteen squares play at all, so a cursor
+# that crawled the other fifty would spend its time on squares that refuse.
+subtest 'the cursor walks only the squares that play' => sub {
+	my ($t, $game, $text) = picker("\e[C\e[Cq");
+	$t->enter_raw;
+	$t->pick_square($game, 'b');
+
+	my @named = $$text =~ /^\s+([a-h][1-8]): turns/mg;
+	cmp_ok(scalar @named, '>=', 3, 'the cursor visited three squares');
+
+	my %legal = map { Game::Reversi::Board->name_of($_->square) => 1 }
+		@{ $game->legal('b') };
+	my @wrong = grep { !$legal{$_} } @named;
+	is_deeply(\@wrong, [], 'and every one of them was a legal move')
+		or diag "visited: @named";
+
+	# It has to be a REAL subset, or "every visited square is legal" is true
+	# of a cursor that never moved.
+	cmp_ok(scalar keys %legal, '<', 20, 'the legal set is small, as Reversi is');
+	done_testing();
+};
+
+# THE LINE UNDER THE BOARD IS THE MOVE IT WOULD MAKE, and the oracle is the
+# engine: the square is played on a CLONE and the clone is asked.
+subtest 'the line under the board is what the move would turn' => sub {
+	my ($t, $game, $text) = picker('q');
+
+	my $legal = $game->legal('b');
+	my $first = (sort { $a <=> $b } map { $_->square } @$legal)[0];
+	my $line = $t->square_line($game, 'b', $first);
+
+	like($line, qr/turns \d+ discs?/, 'it says how many it turns');
+	like($line, qr/you would be \d+ to \d+/, 'and what the score would become');
+
+	# The oracle, independently: play it for real in a second game.
+	my $real = Game::Reversi->new(variant => 'othello', seed => 'pick');
+	my $move = $real->play('b', $first);
+	my $count = $real->counts;
+	like($line, qr/turns \Q@{[ $move->turned ]}\E disc/,
+		'and the count is the one the engine really makes');
+	like($line, qr/\Q$count->{b}\E to \Q$count->{w}\E/,
+		'as is the score');
+
+	# NOTHING IS PLAYED by a preview.
+	is_deeply($game->counts, { b => 2, w => 2 }, 'the board is untouched');
+	done_testing();
+};
+
+subtest 'the marks say what the last move did' => sub {
+	my ($t, $game) = picker('q');
+
+	my $legal = $game->legal('b');
+	my $move = $game->play('b', $legal->[0]->square);
+	$t->remember($move);
+
+	my $drawn = join "\n", $t->board_text($game, undef, $t->since);
+
+	like($drawn, qr/\[X\]/, 'the square it was placed on is bracketed');
+	like($drawn, qr/\bx\b/, 'and a disc it turned is drawn ringed');
+
+	# BOTH ARE CHARACTERS. This board was rendered with ansi off, so anything
+	# visible here survives --ascii, NO_COLOR and a redirected handle.
+	is($t->ansi, 0, 'with no colour at all in it');
+	cmp_ok($move->turned, '>', 0, 'and the move really did turn something');
+	done_testing();
+};
+
+subtest 'enter plays the square under the cursor' => sub {
+	my ($t, $game, $text) = picker("\r");
+	$t->enter_raw;
+	my $quit = $t->pick_square($game, 'b');
+
+	is($quit, 0, 'the turn was taken');
+	like($$text, qr/you play [a-h][1-8]/, 'and it says what it played');
+	is($game->counts->{b} + $game->counts->{w}, 5, 'a disc went down');
+	done_testing();
+};
+
+subtest 'q gives up, and a dud key says so' => sub {
+	my ($stop, $game) = picker('q');
+	$stop->enter_raw;
+	is($stop->pick_square($game, 'b'), 1, 'q stops');
+
+	my ($dud, $g2, $text) = picker('zq');
+	$dud->enter_raw;
+	$dud->pick_square($g2, 'b');
+	like($$text, qr/that key does nothing here/, 'and a dud key says so');
+	done_testing();
+};
+
+# Without Term::ReadKey and without a keysource there is nothing to read keys
+# with, and the fallback is the typed game rather than a failure.
+subtest 'no key source at all falls back to typing' => sub {
+	open my $in, '<', \(my $script = "quit\n") or die $!;
+	my $text = '';
+	open my $out, '>', \$text or die $!;
+	my $t = Game::Reversi::Terminal->new(
+		in => $in, out => $out, variant => 'othello', seed => 'fall',
+		level => 1, ascii => 1, ansi => 0, picking => 1);
+
+	is($t->keys_available, 0, 'nothing to read keys with');
+	$t->start;
+	like($text, qr/  > /, 'so the typed prompt was used');
+	is($t->picking, 0, 'and it does not try the keys again');
 	done_testing();
 };
 

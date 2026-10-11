@@ -45,6 +45,11 @@ typedef struct hm_h3_stream {
     int      resp_status;    /* streaming: stashed until close         */
     SV      *resp_headers;
     int      awaiting;       /* parked on a Future                     */
+    SV      *resp_f;         /* that Future: cancelled if the stream is
+                              * reset before it settles                */
+    size_t   hdr_bytes;      /* decoded request header octets so far   */
+    unsigned char refused;   /* body over max_body: 413 sent, the rest
+                              * of the stream is dropped unread        */
     unsigned char fin;       /* the request stream ended               */
     unsigned char dispatched;
     struct hm_h3_stream *next;
@@ -53,6 +58,8 @@ typedef struct hm_h3_stream {
 static void hm_h3_respond(pTHX_ hm_qconn *qc, hm_h3_stream *st, SV *resp);
 static int  hm_h3_resume(pTHX_ hm_qconn *qc, int64_t sid);
 static void hm_h3_dispatch(pTHX_ hm_qconn *qc, hm_h3_stream *st);
+static void hm_h3_submit_status(pTHX_ hm_qconn *qc, hm_h3_stream *st,
+                                int status, const char *ctype);
 
 static int hm_h3_available(void) { return 1; }
 
@@ -92,7 +99,22 @@ static void hm_h3_src_free(pTHX_ hm_h3_stream *st) {
 
 static void hm_h3_stream_free(pTHX_ hm_qconn *qc, hm_h3_stream *st) {
     hm_h3_stream **pp = (hm_h3_stream **)&qc->h3_streams;
+    SV *pending = st->resp_f;
+    st->resp_f = NULL;
     while (*pp) { if (*pp == st) { *pp = st->next; break; } pp = &(*pp)->next; }
+    /* Reset while its response was still being made: cancel the Future,
+     * as the h2 and HTTP/1 paths do, so the work behind it can stop. */
+    if (pending) {
+        if (st->awaiting) {
+            dSP;
+            ENTER; SAVETMPS; PUSHMARK(SP);
+            XPUSHs(pending);
+            PUTBACK;
+            call_method("cancel", G_DISCARD | G_EVAL);
+            FREETMPS; LEAVE;
+        }
+        SvREFCNT_dec(pending);
+    }
     if (st->env)          SvREFCNT_dec((SV *)st->env);
     if (st->env_rv)       SvREFCNT_dec(st->env_rv);
     if (st->body)         SvREFCNT_dec(st->body);
@@ -149,8 +171,7 @@ static void hm_h3_env_init(pTHX_ hm_qconn *qc, HV *env) {
      * psgix.hyperman.conn: that names a descriptor an application may take
      * over, and HTTP/3 has nothing to put behind it - which is what makes
      * Hyperman::detach croak here, as it already does on HTTP/2. */
-    if (!loop->self_sv) loop->self_sv = hm_loop_to_sv(aTHX_ loop);
-    hv_stores(env, "psgix.loop",        SvREFCNT_inc(loop->self_sv));
+    hv_stores(env, "psgix.loop",        hm_loop_to_sv(aTHX_ loop));
 }
 
 /* ---- nghttp3 callbacks --------------------------------------------------- */
@@ -179,6 +200,11 @@ static int hm_h3_cb_recv_header(nghttp3_conn *conn, int64_t stream_id,
     if (!st || !st->env) return 0;
     n = nghttp3_rcbuf_get_buf(name);
     v = nghttp3_rcbuf_get_buf(value);
+    /* The decoded block is bounded here as on h2 (hm_h2_cb_header): the
+     * nghttp3 setting advertises the ceiling, this enforces it. */
+    st->hdr_bytes += n.len + v.len + 32;
+    if (st->hdr_bytes > HM_H2_MAX_HEADER_LIST)
+        return NGHTTP3_ERR_CALLBACK_FAILURE;
     /* The h2 implementation, shared rather than copied: HTTP/3's
      * pseudo-headers are HTTP/2's and QPACK yields the same lowercase pairs. */
     hm_h2_add_header(aTHX_ st->env, (const char *)n.base, n.len,
@@ -214,9 +240,26 @@ static int hm_h3_cb_recv_data(nghttp3_conn *conn, int64_t stream_id,
      * would grow forever. */
     if (!hm_stream_deliver(aTHX_ qc->srv->lst->udp_fd, qc->id, stream_id,
                            (const char *)data, (STRLEN)datalen, 0)
-        && st) {
-        if (!st->body) st->body = newSVpvs("");
-        sv_catpvn(st->body, (const char *)data, datalen);
+        && st && !st->refused) {
+        /* max_body, as on the other two transports. The window below is
+         * credited back whatever happens, so this is the only ceiling. */
+        if ((st->body ? SvCUR(st->body) : 0) + datalen
+            > qc->srv->loop->max_read) {
+            st->refused = 1;
+            if (st->body) { SvREFCNT_dec(st->body); st->body = NULL; }
+            if (st->env && !st->dispatched) {
+                SvREFCNT_dec((SV *)st->env);
+                st->env = NULL;
+                if (st->resp_body) SvREFCNT_dec(st->resp_body);
+                st->resp_body = newSVpvs("Payload Too Large");
+                st->blen = 17;
+                hm_h3_submit_status(aTHX_ qc, st, 413, "text/plain");
+            }
+            nghttp3_conn_shutdown_stream_read(conn, stream_id);
+        } else {
+            if (!st->body) st->body = newSVpvs("");
+            sv_catpvn(st->body, (const char *)data, datalen);
+        }
     }
     /* Flow control is ngtcp2's here, not nghttp3's - the opposite of h2,
      * where nghttp2 owned it and there was nothing to do. Forgetting this
@@ -245,7 +288,7 @@ static int hm_h3_cb_end_stream(nghttp3_conn *conn, int64_t stream_id,
     hm_qconn *qc = (hm_qconn *)conn_user_data;
     hm_h3_stream *st = (hm_h3_stream *)stream_user_data;
     (void)conn; (void)stream_id;
-    if (!st || st->dispatched) return 0;
+    if (!st || st->dispatched || st->refused) return 0;
     st->fin = 1;
     hm_h3_dispatch(aTHX_ qc, st);
     return 0;
@@ -368,15 +411,18 @@ static nghttp3_ssize hm_h3_read_data(nghttp3_conn *conn, int64_t stream_id,
 static void hm_h3_submit_response(pTHX_ hm_qconn *qc, hm_h3_stream *st,
                                   int status, AV *hav) {
     SSize_t hn = hav ? av_len(hav) + 1 : 0;
-    size_t maxnv = 1 + (size_t)(hn / 2);
+    /* :status, every pair, and Date: the bound on the array the loop
+     * fills, grown with every unconditional header (see hm_http2.h) */
+    size_t maxnv = 2 + (size_t)(hn / 2);
     nghttp3_nv *nva = (nghttp3_nv *)hm_xmalloc(maxnv * sizeof(nghttp3_nv));
     char **freelist = (char **)hm_xmalloc(maxnv * sizeof(char *));
     size_t nfree = 0, n = 0;
     char sbuf[8];
-    int sl;
+    int sl, has_date = 0;
     nghttp3_data_reader dr;
     SSize_t i;
 
+    if (status < 100 || status > 999) status = 500;   /* sbuf is 8 bytes */
     sl = snprintf(sbuf, sizeof(sbuf), "%d", status);
     nva[n].name = (uint8_t *)":status"; nva[n].namelen = 7;
     nva[n].value = (uint8_t *)sbuf; nva[n].valuelen = (size_t)sl;
@@ -387,7 +433,7 @@ static void hm_h3_submit_response(pTHX_ hm_qconn *qc, hm_h3_stream *st,
         SV **v = av_fetch(hav, i + 1, 0);
         STRLEN kl, vl; const char *ks, *vs;
         char *lname; STRLEN j;
-        if (!k || !v) continue;
+        if (!k || !*k || !v || !*v) continue;
         ks = SvPV(*k, kl); vs = SvPV(*v, vl);
         lname = (char *)hm_xmalloc(kl ? kl : 1);
         for (j = 0; j < kl; j++) {
@@ -397,10 +443,20 @@ static void hm_h3_submit_response(pTHX_ hm_qconn *qc, hm_h3_stream *st,
         /* HTTP/3 forbids the same set HTTP/2 does, so this is hm_http2.h's
          * predicate rather than a second copy of the list. */
         if (hm_h2_hopbyhop(lname, kl)) { free(lname); continue; }
+        if (kl == 4 && memcmp(lname, "date", 4) == 0) has_date = 1;
         freelist[nfree++] = lname;
         nva[n].name = (uint8_t *)lname; nva[n].namelen = kl;
         nva[n].value = (uint8_t *)vs;   nva[n].valuelen = vl;
         nva[n].flags = NGHTTP3_NV_FLAG_NONE; n++;
+    }
+    if (!has_date) {
+        const char *dh = hm_date_header(qc->srv->loop);
+        if (dh) {
+            nva[n].name = (uint8_t *)"date"; nva[n].namelen = 4;
+            nva[n].value = (uint8_t *)(dh + 6);
+            nva[n].valuelen = HM_DATE_LEN - 8;
+            nva[n].flags = NGHTTP3_NV_FLAG_NONE; n++;
+        }
     }
 
     st->status   = status;
@@ -409,7 +465,11 @@ static void hm_h3_submit_response(pTHX_ hm_qconn *qc, hm_h3_stream *st,
     dr.read_data = hm_h3_read_data;
     /* nva is copied by nghttp3 unless NO_COPY is asked for, so the freelist
      * below is safe - the same contract hm_h2_submit_response relies on. */
-    nghttp3_conn_submit_response((nghttp3_conn *)qc->h3, st->id, nva, n, &dr);
+    if (nghttp3_conn_submit_response((nghttp3_conn *)qc->h3, st->id,
+                                     nva, n, &dr) != 0)
+        /* refused: the stream is reset rather than left silent */
+        (void)nghttp3_conn_close_stream((nghttp3_conn *)qc->h3, st->id,
+                                        NGHTTP3_H3_INTERNAL_ERROR);
     /* NOT counted here. The h2 path adds the body length at submit
      * because that is its only chance, but on QUIC every datagram is
      * counted as it is actually sent - adding it here as well counts
@@ -605,6 +665,7 @@ XS_INTERNAL(hm_xs_h3park_cb) {
         SvREFCNT_dec((SV *)vals);
     }
     st->awaiting = 0;
+    if (st->resp_f) { SvREFCNT_dec(st->resp_f); st->resp_f = NULL; }
     hm_h3_respond(aTHX_ qc, st, resp);
     if (hm_logging(qc->srv->loop) && st->env_rv)
         hm_access_log(aTHX_ qc->srv->loop, st->env_rv, st->status,
@@ -646,6 +707,7 @@ static void hm_h3_dispatch(pTHX_ hm_qconn *qc, hm_h3_stream *st) {
                             (IV)qc->srv->lst->udp_fd, qc->id);
         st->awaiting = 1;
         st->env_rv = SvREFCNT_inc(env_rv);
+        st->resp_f = SvREFCNT_inc(resp);     /* cancelled on a reset */
         hm_any_on_ready(aTHX_ resp, cb);
         SvREFCNT_dec(cb);
         SvREFCNT_dec(resp);
@@ -694,6 +756,9 @@ static int hm_h3_session_start(pTHX_ hm_qconn *qc) {
     nghttp3_settings_default(&settings);
     settings.qpack_max_dtable_capacity = 4096;
     settings.qpack_blocked_streams     = 100;
+    /* The default is 2^62-1, which is no bound at all against QPACK
+     * expansion; the same 64KB HTTP/1.1 and h2 allow. */
+    settings.max_field_section_size    = HM_H2_MAX_HEADER_LIST;
     /* RFC 9220 Extended CONNECT, the HTTP/3 spelling of the HTTP/2 setting
      * in hm_h2_submit_our_settings. Same purpose: a client will not try a
      * WebSocket over h3 unless the server has said it understands

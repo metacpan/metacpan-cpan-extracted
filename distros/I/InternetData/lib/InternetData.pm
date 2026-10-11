@@ -14,7 +14,7 @@ use InternetData::Database;
 use InternetData::Error;
 use InternetData::Oauth;
 
-our $VERSION = '1.9.1';
+our $VERSION = '1.9.2';
 
 use constant DEFAULT_BASE_URL => 'https://internetdata.io';
 
@@ -40,8 +40,20 @@ sub new {
     Carp::croak('InternetData->new: timeout must be a number of seconds, 0 or more')
         unless Scalar::Util::looks_like_number($timeout) && $timeout >= 0;
 
+    # Trimmed, so a key read from a file loses its newline, and blanks alone are
+    # no key. Mojo refuses a CR or LF in a header with a raw string from every
+    # call and sends any other control character, so one left inside is refused
+    # here, naming the cause and not the key.
+    my $api_key = $args{api_key};
+    if (defined $api_key) {
+        $api_key =~ s/\A\s+|\s+\z//g;
+        $api_key = undef unless length $api_key;
+    }
+    Carp::croak('InternetData->new: api_key holds a control character')
+        if defined $api_key && $api_key =~ /[\x00-\x1f\x7f]/;
+
     my $self = bless {
-        api_key => $args{api_key},
+        api_key => $api_key,
         base_url => _base_url($args{base_url}),
         retries => $retries,
         # Held as a number: Mojo tests the bound for truth before arming it, and a
@@ -201,7 +213,7 @@ sub _retry_delay {
 # as a retried server_error, like any other 2xx that cannot be read, rather than
 # reaching the caller as undef.
 sub _json_p {
-    my ($self, $url, $timeout, $member, $type) = @_;
+    my ($self, $url, $timeout, $member, $type, @required) = @_;
     return $self->_get_p($url, $timeout)->then(sub {
         my $res = shift->res;
         die InternetData::Error->from_response($res->code, $res->headers, $res->json)
@@ -211,6 +223,11 @@ sub _json_p {
             kind => 'server_error', status => $res->code,
             message => 'the API did not answer with a JSON object',
         ) unless ref $body eq 'HASH';
+        for my $key (@required) {
+            die InternetData::Error->new(
+                kind => 'server_error', status => $res->code, message => "the API answered with no $key",
+            ) unless defined $body->{$key};
+        }
         return $body unless defined $member;
         return $body->{$member} if ref $body->{$member} eq $type;
         die InternetData::Error->new(
@@ -231,11 +248,10 @@ sub _headers {
     # One scheme. The v1 endpoints on this same host take `?apikey=` with a
     # different key vocabulary, so sending a v2 key that way would make it look
     # plausible on the version it does not belong to, and query strings end up in
-    # logs. An empty key counts as none at all: that is what an unset
+    # logs. A blank key is none at all (see new): that is what an unset
     # `${{ secrets.X }}` interpolates to, and `Bearer ` is a worse answer than no
     # header.
-    $headers{Authorization} = "Bearer $self->{api_key}"
-        if defined $self->{api_key} && length $self->{api_key};
+    $headers{Authorization} = "Bearer $self->{api_key}" if defined $self->{api_key};
     return \%headers;
 }
 
@@ -334,8 +350,10 @@ L<InternetData::Oauth>, reached as L</oauth>.
 
 A console-issued key carrying the C<db.download> scope. Keys are default-deny,
 so an existing key does not reach these endpoints until the scope is added to
-it. Optional: omit it, or pass an empty string, and no C<Authorization> header
-is sent. Every database endpoint published today answers C<401> without one.
+it. Optional: omit it, or pass an empty or blank one, and no C<Authorization>
+header is sent. Every database endpoint published today answers C<401> without
+one. The key is trimmed, so one read from a file with its newline works; a key
+still holding a control character croaks here.
 
 =item base_url
 

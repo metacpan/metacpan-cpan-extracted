@@ -10,8 +10,7 @@ use Crypt::PRNG;
 use experimental 'try';
 use feature 'class';
 no warnings 'experimental::class';
-
-class At::UserAgent 1.6 {
+class At::UserAgent v1.7.0 {
     field $accessJwt  : reader : param = undef;
     field $refreshJwt : reader : param = undef;
     field $token_type : reader : param = 'Bearer';
@@ -46,6 +45,7 @@ class At::UserAgent 1.6 {
         else {
             $self->_set_auth_header(undef);
         }
+        $self;
     }
 
     method _generate_dpop_proof( $url, $method, $skip_ath = 0 ) {
@@ -71,8 +71,7 @@ class At::UserAgent 1.6 {
     method get              ( $url, $req = undef ) { die "Abstract" }
     method post             ( $url, $req = undef ) { die "Abstract" }
     method websocket        ( $url, $cb )          { die "Abstract" }
-}
-class    #
+    } class    #
     At::UserAgent::Tiny : isa(At::UserAgent) {
     use HTTP::Tiny;
     field $agent : param
@@ -377,7 +376,7 @@ The L<Crypt::PK::ECC> key used for DPoP signing.
 
 =head2 C<set_tokens( $access, $refresh, $type, $key )>
 
-Sets the current authentication tokens and keys.
+Sets the current authentication tokens and keys. Returns the user agent object.
 
 =head2 C<get( $url, [ \%options ] )>
 

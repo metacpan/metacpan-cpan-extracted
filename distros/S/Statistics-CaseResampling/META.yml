@@ -1,7 +1,7 @@
 ---
 abstract: 'Efficient resampling and calculation of medians with confidence intervals'
 author:
-  - 'Steffen Mueller <smueller@cpan.org>'
+  - 'Steffen Mueller <cpan@steffen-mueller.net>'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
@@ -19,5 +19,5 @@ no_index:
     - inc
 requires:
   List::Util: '0'
-version: '0.17'
+version: '0.18'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

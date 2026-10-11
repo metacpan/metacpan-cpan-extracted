@@ -1,5 +1,15 @@
 Revision history for Game-Xiangqi
 
+0.03    2026-10-11
+        - A move is now chosen with the arrow keys
+        - FIX: --ansi could only be turned on. --no-ansi now turns it off, so
+          the uncoloured board no longer needs NO_COLOR in the environment.
+        - FIX: --level took a number between the last rung and the smallest
+          budget and read it as a budget: --level 4 meant four nodes. It is
+          refused now, naming both ranges.
+        - FIX: a move the bot offered and the game refused was ignored, and the
+          loop then asked the same bot the same question for ever.
+
 0.02    2026-10-02
         - FIX: `shift ?` in Terminal.pm parsed as ?PATTERN? before perl 5.22,
           so the module did not compile and t/19, t/20 and t/21 failed.

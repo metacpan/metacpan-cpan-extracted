@@ -16,7 +16,7 @@ use Scalar::Util ();
 use InternetData::Error;
 use InternetData::OauthError;
 
-our $VERSION = '1.9.1';
+our $VERSION = '1.9.2';
 
 use constant DEVICE_CODE_GRANT => 'urn:ietf:params:oauth:grant-type:device_code';
 # The only PKCE method the server accepts.

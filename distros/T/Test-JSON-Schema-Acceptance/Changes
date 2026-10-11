@@ -1,5 +1,11 @@
 Revision history for Test-JSON-Schema-Acceptance
 
+1.040     2026-10-11 01:06:25Z
+        - adjust tests to handle a change in perl 5.45.4 (see perl issue
+          #24845) (PR #26, Richard Leach)
+        - updated test suite:
+          https://github.com/json-schema-org/JSON-Schema-Test-Suite/compare/f6fd52a0a95472e079cbfc6ef7f089702b80e045...7de0e6a06031ede80028583dd45d0cd41105ae5b
+
 1.039     2026-09-09 22:03:38Z
         - new "skip_tests" feature, using the same format as "todo_tests"
         - updated test suite:

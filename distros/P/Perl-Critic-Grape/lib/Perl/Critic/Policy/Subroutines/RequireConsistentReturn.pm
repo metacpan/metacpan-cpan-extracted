@@ -8,7 +8,7 @@ use Readonly;
 use Perl::Critic::Utils qw/:severities :classification/;
 use base 'Perl::Critic::Policy';
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.1.1';
 
 Readonly::Scalar my $DESC=>q{Don't use an implicit return in a subroutine with explicit returns.};
 Readonly::Scalar my $EXPL=>undef;
@@ -117,7 +117,7 @@ sub prepare_to_scan_document {
 	my ($self,$doc)=@_;
 	if(!$cachekey) { return 1 }
 	$$self{$cachekey}={cache=>{}};
-	my ($cache)=@{$$self{$cachekey}}{qw/cache/};
+	my $cache=$$self{$cachekey}{cache};
 	foreach my $sub (@{ $doc->find('PPI::Statement::Sub')||[] }) {
 		my $block=$sub->block();
 		if(!$block) { next }
@@ -146,7 +146,7 @@ sub violates {
 		if($first->isa('PPI::Token::Word')    &&$terminators{$first->content()}) { return }
 		if($first->isa('PPI::Token::Operator')&&$terminators{$first->content()}) { return }
 	}
-	return $self->invalid($elem);
+	return $self->invalid($elem->schild(0));
 }
 
 #-----------------------------------------------------------------------------

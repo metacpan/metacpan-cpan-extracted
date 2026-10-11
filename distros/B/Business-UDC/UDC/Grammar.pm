@@ -97,6 +97,12 @@ Readonly::Hash our %OPERATORS => (
 		associativity => 'left',
 		right_types => [qw(AUX_GROUP AUX_LANG AUX_TIME NUMBER)],
 	},
+	'::' => {
+		name => 'fixed_relation',
+		precedence => 20,
+		associativity => 'left',
+		right_types => [qw(AUX_GROUP AUX_LANG AUX_TIME NUMBER)],
+	},
 	'/' => {
 		name => 'consecutive_extension',
 		precedence => 15,
@@ -105,7 +111,7 @@ Readonly::Hash our %OPERATORS => (
 	},
 );
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 sub can_be_standalone {
 	my $type = shift;

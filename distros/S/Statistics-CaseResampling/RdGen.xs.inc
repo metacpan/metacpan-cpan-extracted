@@ -2,6 +2,13 @@
 MODULE = Statistics::CaseResampling		PACKAGE = Statistics::CaseResampling::RdGen PREFIX=mt_
 PROTOTYPES: DISABLE
 
+int
+mt_CLONE_SKIP(...)
+  CODE:
+    RETVAL = 1;
+  OUTPUT:
+    RETVAL
+
 Statistics::CaseResampling::RdGen
 mt_setup(seed)
   U32     seed

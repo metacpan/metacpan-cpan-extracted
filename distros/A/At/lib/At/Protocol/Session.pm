@@ -1,8 +1,8 @@
 use v5.42;
 use feature 'class';
 no warnings 'experimental::class';
-
-class At::Protocol::Session 1.3 {
+#
+class At::Protocol::Session v1.7.0 {
     field $accessJwt : param : reader //= ();
     field $did          : param : reader;
     field $handle       : param : reader = ();
@@ -27,16 +27,19 @@ class At::Protocol::Session 1.3 {
 
     method _raw {
         +{  accessJwt  => $accessJwt,
-            did        => $did . "",
+            did        => $did . '',
             refreshJwt => $refreshJwt,
-            defined $handle ? ( handle => $handle . "" ) : (),
+            defined $handle ? ( handle => $handle . '' ) : (),
             token_type => $token_type,
-            defined $dpop_key_jwk ? ( dpop_key_jwk => $dpop_key_jwk ) : (), defined $client_id ? ( client_id => $client_id ) : (),
-            defined $pds          ? ( pds => $pds . "" )  : (), defined $scope  ? ( scope => $scope ) : (), defined $email ? ( email => $email ) : (),
-            defined $status       ? ( status => $status ) : (), defined $active ? ( active => $active ) : (),
+            defined $dpop_key_jwk   ? ( dpop_key_jwk => $dpop_key_jwk ) : (), defined $client_id ? ( client_id => $client_id ) : (),
+            defined $pds            ? ( pds => $pds . "" ) : (), defined $scope ? ( scope => $scope ) : (), defined $email ? ( email => $email ) : (),
+            defined $emailConfirmed ? ( emailConfirmed => $emailConfirmed )    : (),
+            defined $emailAuthFactor ? ( emailAuthFactor => $emailAuthFactor ) : (), defined $status ? ( status => $status ) : (),
+            defined $active          ? ( active          => $active )          : (), defined $didDoc ? ( didDoc => $didDoc ) : ()
         };
     }
-}
+};
+#
 1;
 __END__
 
@@ -90,9 +93,30 @@ Typically 'Bearer' for legacy sessions or 'DPoP' for OAuth sessions.
 
 The scopes granted to this session.
 
-=head2 C<email()>, C<emailConfirmed()>
+=head2 C<email()>, C<emailConfirmed()>, C<emailAuthFactor()>
 
-User's email information, if available.
+User email information, if available. C<emailAuthFactor()> reports whether email-based two-factor authentication is
+enabled for the account.
+
+=head2 C<dpop_key_jwk()>
+
+The JWK of the DPoP key associated with an OAuth session, when present.
+
+=head2 C<client_id()>
+
+The OAuth client ID used to establish an OAuth session, when present.
+
+=head2 C<pds()>
+
+The PDS host that issued the session, when known.
+
+=head2 C<status()>, C<active()>
+
+Account status information returned by the server, when present.
+
+=head2 C<didDoc()>
+
+The DID document associated with the session, when returned by the server.
 
 =head1 LICENSE
 

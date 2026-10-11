@@ -10,10 +10,11 @@ use Unicode::UTF8 qw(decode_utf8);
 
 Readonly::Array our @EXPORT_OK => qw(tokenize);
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 sub tokenize {
-	my ($input) = @_;
+	my ($input, $position_offset) = @_;
+	$position_offset //= 0;
 	my @tokens;
 	my $left_double_quote = decode_utf8('“');
 	my $right_double_quote = decode_utf8('”');
@@ -24,7 +25,7 @@ sub tokenize {
 	while (pos($input) < length($input)) {
 		my $start = pos($input);
 
-		if ($input =~ /\G( +(?=\p{L})\p{L}(?:[\p{L}\p{N}._#,]|\+(?! )|\/(?! )|-(?!\d)| +(?=[\p{L}\p{N}._]))* *)/gcu) {
+		if ($input =~ /\G( +(?=\p{L})\p{L}(?:[\p{L}\p{N}._#,]|\[[^\]]+\]|\+(?! )|\/(?! )|-(?!\d)| +(?=[\p{L}\p{N}._\[]))* *)/gcu) {
 			_push_token(\@tokens, 'ALPHA_SPEC', $1, $start, 1);
 			next;
 		}
@@ -59,8 +60,13 @@ sub tokenize {
 			next;
 		}
 
-		if ($input =~ /\G([:+\/])/gc) {
+		if ($input =~ /\G(::|[+:\/])/gc) {
 			_push_token(\@tokens, 'OP', $1, $start);
+			next;
+		}
+
+		if ($input =~ /\G(-)(?=\s)/gc) {
+			_push_token(\@tokens, 'FORM', $1, $start, 1);
 			next;
 		}
 
@@ -69,8 +75,27 @@ sub tokenize {
 			next;
 		}
 
-		if ($input =~ /\G(\([^)]+\))/gc) {
-			_push_token(\@tokens, 'AUX_GROUP', $1, $start, 1);
+		if (substr($input, $start, 1) eq '(') {
+			my $end = _find_parenthesis_end($input, $start);
+			if (defined $end) {
+				my $value = substr($input, $start, $end - $start);
+				my $inner = substr($value, 1, length($value) - 2);
+				my $inner_tokens = tokenize($inner, $position_offset + $start + 1);
+				_offset_token_positions($inner_tokens, $start + 1);
+				pos($input) = $end;
+				_push_token(\@tokens, 'AUX_GROUP', $value, $start, 1);
+				$tokens[-1]->{'tokens'} = $inner_tokens;
+				next;
+			}
+		}
+
+		if ($input =~ /\G(\()/gc) {
+			_push_token(\@tokens, 'LPAREN', $1, $start, 1);
+			next;
+		}
+
+		if ($input =~ /\G(\))/gc) {
+			_push_token(\@tokens, 'RPAREN', $1, $start, 1);
 			next;
 		}
 
@@ -84,12 +109,17 @@ sub tokenize {
 			next;
 		}
 
+		if ($input =~ /\G(=+)(?=\s)/gc) {
+			_push_token(\@tokens, 'AUX_LANG', $1, $start, 1);
+			next;
+		}
+
 		if ($input =~ /\G(=+(?:[A-Za-z]+|\d+(?:\.\d+)*))/gc) {
 			_push_token(\@tokens, 'AUX_LANG', $1, $start);
 			next;
 		}
 
-		if ($input =~ /\G(\p{L}(?:[\p{L}\p{N}._#,]|\+(?! )|\/(?! )|-(?!\d)| +(?=[\p{L}\p{N}._]))* *)/gcu) {
+		if ($input =~ /\G(\p{L}(?:[\p{L}\p{N}._#,]|\[[^\]]+\]|\+(?! )|\/(?! )|-(?!\d)| +(?=[\p{L}\p{N}._\[]))* *)/gcu) {
 			_push_token(\@tokens, 'ALPHA_SPEC', $1, $start, 1);
 			next;
 		}
@@ -103,11 +133,41 @@ sub tokenize {
 
 		my $bad = substr($input, $start, 20);
 		err "Unrecognized input near '$bad'.",
-			'position' => $start,
+			'position' => $position_offset + $start,
 		;
 	}
 
-	return \@tokens;
+	return _merge_bracketed_alpha_specs(\@tokens);
+}
+
+sub _find_parenthesis_end {
+	my ($input, $start) = @_;
+	my $depth = 0;
+
+	for (my $pos = $start; $pos < length($input); $pos++) {
+		my $character = substr($input, $pos, 1);
+		if ($character eq '(') {
+			$depth++;
+		} elsif ($character eq ')') {
+			$depth--;
+			return $pos + 1 if $depth == 0;
+		}
+	}
+
+	return;
+}
+
+sub _offset_token_positions {
+	my ($tokens, $offset) = @_;
+
+	foreach my $token (@{$tokens}) {
+		$token->{'pos'} += $offset;
+		if ($token->{'tokens'}) {
+			_offset_token_positions($token->{'tokens'}, $offset);
+		}
+	}
+
+	return;
 }
 
 sub _check_whitespace {
@@ -139,6 +199,32 @@ sub _push_token {
 	};
 
 	return;
+}
+
+sub _merge_bracketed_alpha_specs {
+	my $tokens_ar = shift;
+
+	my @merged;
+	while (@{$tokens_ar}) {
+		my $token = shift @{$tokens_ar};
+
+		if (@merged
+			&& $merged[-1]->{'type'} eq 'ALPHA_SPEC'
+			&& $token->{'type'} eq 'LBRACK'
+			&& @{$tokens_ar} >= 2
+			&& $tokens_ar->[0]->{'type'} eq 'ALPHA_SPEC'
+			&& $tokens_ar->[1]->{'type'} eq 'RBRACK') {
+
+			my $inner = shift @{$tokens_ar};
+			shift @{$tokens_ar};
+			$merged[-1]->{'value'} .= '['.$inner->{'value'}.']';
+			next;
+		}
+
+		push @merged, $token;
+	}
+
+	return \@merged;
 }
 
 

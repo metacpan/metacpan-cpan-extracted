@@ -8,7 +8,7 @@ use Object::Proto::Sugar -types;
 
 use Game::Durak::Search qw(best LEVELS);
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 our @LADDER = (1, 1, 2, 3, 3);
 
@@ -16,6 +16,8 @@ has level => (is => 'ro', isa => Int);
 has seed  => (is => 'ro', isa => Str);
 
 sub levels { return LEVELS }
+
+sub ladder { return scalar @LADDER }
 
 sub level_for {
     my ($class, $asked) = @_;
@@ -53,7 +55,7 @@ Game::Durak::Bot - a seat at a level, playing from a view
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 
@@ -133,7 +135,18 @@ because a consumer's levels are not this module's to police.
 
 =head2 levels
 
-Three, from L<Game::Durak::Search>.
+Three, from L<Game::Durak::Search>. B<The engine's rungs, not a consumer's
+levels>: see L</ladder>, and do not validate a C<--level> against this.
+
+=head2 ladder
+
+Five: how many levels L</level_for> maps, which is the range a consumer may
+offer. The two numbers are different on purpose and confusing them is easy in
+exactly one direction, because L</level_for> B<clamps> rather than dies, so a
+caller that checked against L</levels> would quietly refuse the documented
+levels four and five while a caller that checked nothing would quietly hand
+level nine the top rung. F<bin/durak> did the second and then, briefly, the
+first.
 
 =head1 SEE ALSO
 

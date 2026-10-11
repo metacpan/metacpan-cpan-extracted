@@ -59,22 +59,31 @@ write(self, data)
         }
     }
 
-# Only the stream-handle form owns anything C-side. The other two shapes are
-# a pair of integers naming a connection the server owns, so this is a no-op
-# for them - and a writer dropped without ->close still ends its body, which
-# is the same promise a lexical filehandle makes.
+# A writer dropped without ->close still ends its body, the promise a lexical
+# filehandle makes. The stream-handle form owns a C handle to close. The
+# HTTP/1.1 pair names a connection parked on this writer: without the close
+# it would stay awaiting, with keep-alive off, for ever - the sweep skips a
+# parked connection and the drain never closes one. The h2 and h3 shapes
+# buffer until close and are left alone: ending those here would submit a
+# response the application may not have finished.
 void
 DESTROY(self)
     SV *self
     CODE:
     {
         AV *w = (AV *)SvRV(self);
-        if (av_len(w) == 2) {
+        SSize_t n = av_len(w);
+        if (n == 2) {
             SV **h = av_fetch(w, 0, 0);
             if (h && SvIV(*h)) {
                 hm_stream_close_h(aTHX_ INT2PTR(void *, SvIV(*h)));
                 sv_setiv(*h, 0);
             }
+        } else if (n == 1) {
+            SV **f = av_fetch(w, 0, 0);
+            SV **i = av_fetch(w, 1, 0);
+            if (f && i && hm_cur_loop)
+                hm_stream_close(aTHX_ (int)SvIV(*f), SvUV(*i));
         }
     }
 

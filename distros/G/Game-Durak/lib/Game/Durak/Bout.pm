@@ -7,7 +7,7 @@ use Object::Proto::Sugar -types;
 
 use Game::Durak::Card ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 has attacker => (is => 'ro', isa => Int);
 has defender => (is => 'ro', isa => Int);
@@ -99,7 +99,7 @@ Game::Durak::Bout - one attack and its defence, laid out on the table
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

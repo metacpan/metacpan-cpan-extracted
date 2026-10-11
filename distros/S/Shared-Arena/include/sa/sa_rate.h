@@ -60,6 +60,11 @@
  * timestamp another process already stored, and unsigned subtraction reads
  * that as forty-nine days of refill. See sa_rate_refill.
  *
+ * The clock is sa_now_us, monotonic where the build has one (sa_time.h). A
+ * wall-clock step on the host is otherwise a step in every bucket's clock at
+ * once: back by 0.6s, and for 0.6s nothing refills; forward by an hour, and
+ * every bucket is full.
+ *
  * ---- when the table is full --------------------------------------------------
  *
  * Open addressing, and no free list - the arena has no free anywhere and this

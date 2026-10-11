@@ -247,26 +247,47 @@ static sa_reg *sa_find(sa_region *r, const char *name, size_t nlen) {
  * hammering the lock byte from eight waiters is what keeps the holder from
  * reaching its own unlock. See sa_at_trylock.
  *
- * For rare operations only - carving a region, publishing a block. Anything on
- * a per-request path should use sa_at_lock and take the refusal. */
+ * For rare operations only - carving a region, publishing a block, a worker
+ * claiming its row. A per-request path takes sa_lock_wait_brief below. */
 #define SA_LOCK_ROUNDS    110
 #define SA_LOCK_STALL_US  50
 #define SA_LOCK_STALL_MAX 20000
 
-static int sa_lock_wait(volatile unsigned char *locks, uint64_t h) {
+/* The escalation with its budget as arguments: one shape, two budgets, so a
+ * path that cannot afford two seconds does not grow its own copy of the loop
+ * with its own guess in it. */
+static int sa_lock_wait_for(volatile unsigned char *locks, uint64_t h,
+                            int rounds, uint32_t stall_max) {
     int round;
     uint32_t us = SA_LOCK_STALL_US;
 
     if (sa_at_lock(locks, h)) return 1;
-    for (round = 0; round < SA_LOCK_ROUNDS; round++) {
+    for (round = 0; round < rounds; round++) {
         sa_stall(us);
         if (sa_at_trylock(locks, h)) return 1;
-        if (us < SA_LOCK_STALL_MAX) {
+        if (us < stall_max) {
             us *= 2;
-            if (us > SA_LOCK_STALL_MAX) us = SA_LOCK_STALL_MAX;
+            if (us > stall_max) us = stall_max;
         }
     }
     return 0;
+}
+
+static int sa_lock_wait(volatile unsigned char *locks, uint64_t h) {
+    return sa_lock_wait_for(locks, h, SA_LOCK_ROUNDS, SA_LOCK_STALL_MAX);
+}
+
+/* The per-request budget: sleeps doubling from 50us to a 2ms ceiling, about
+ * fifteen milliseconds over its rounds. Enough to cover an ordinary preemption
+ * of the holder, which is the only thing that was ever wrong, and short enough
+ * that a store, an incr or a lease renew stalled behind a descheduled holder
+ * does not do more damage waiting than the lost answer would have. The map's
+ * write path and the lease's acquire, renew and release take this one. */
+#define SA_LOCK_BRIEF_ROUNDS 12
+#define SA_LOCK_BRIEF_MAX    2000
+
+static int sa_lock_wait_brief(volatile unsigned char *locks, uint64_t h) {
+    return sa_lock_wait_for(locks, h, SA_LOCK_BRIEF_ROUNDS, SA_LOCK_BRIEF_MAX);
 }
 
 static sa_reg *sa_carve(sa_region *r, const char *name, size_t nlen,

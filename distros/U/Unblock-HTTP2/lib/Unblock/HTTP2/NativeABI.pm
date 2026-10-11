@@ -76,9 +76,14 @@ Unblock::HTTP2::NativeABI - Native transport ABI for Unblock::HTTP2
 This module exposes the optional native transport ABI used by XS-backed
 transports and event frameworks.
 
-The ordinary C<input()> and C<output()> methods remain the portable interface.
-A native integration can instead feed borrowed input buffers directly and drain
-outbound nghttp2 buffers through a native sink callback.
+Most Perl frameworks can use the attached-transport interface: create a
+Client or Server with C<transport =E<gt> $host>, feed input with C<input()>,
+and let Unblock automatically call the host's C<unblock_send()> method.
+Without an attached host, C<input()> and C<output()> remain the
+manual portable interface.
+
+A native integration can instead feed borrowed input buffers directly and
+drain outbound nghttp2 buffers through a native sink callback.
 
 The ABI works with both C<Unblock::HTTP2::Client> and
 C<Unblock::HTTP2::Server>.
@@ -182,7 +187,10 @@ the connection and returns C<INPUT_CLOSED>.
 =head1 FALLBACK
 
 The native ABI is an optimization. A framework that does not use XS, cannot
-consume ABI version 1, or chooses not to use the fast path should continue to
-use C<input()>, C<output()>, C<want_read()>, and C<want_write()>.
+consume ABI version 1, or chooses not to use the fast path can attach a
+Perl transport object as described in L<Unblock::HTTP2::Integration>.
+An adapter that deliberately manages output manually can instead use
+C<input()>, C<output()>, C<want_read()>, and C<want_write()>.
+Do not combine native output draining with the attached Perl host.
 
 =cut

@@ -6,7 +6,7 @@ use warnings;
 use Game::Reversi::Board;
 use Game::Reversi::Opening;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub next_turn {
 	my ($class, $board, $just_moved) = @_;
@@ -67,7 +67,7 @@ Game::Reversi::Rules - whose turn, when a turn is forfeited, and when it ends
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

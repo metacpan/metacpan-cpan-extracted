@@ -1,5 +1,23 @@
 Revision history for Unblock-HTTP2
 
+0.11  2026-10-10
+    - Add optional attached-transport integration for Client and Server.
+      Frameworks provide unblock_send(), unblock_finish(), unblock_abort().
+      Output is delivered automatically without manual output pumping.
+    - Add input_eof(), transport_error(), and resume_output().
+    - Preserve HTTP/2 multiplexing, stream resets, and output backpressure.
+    - Support named fields in request(), respond(), and send_informational()
+      while keeping canonical Uniform::HTTP messages supported.
+    - Add Integration POD, a cookbook, Linux::Event, IO::Async and AnyEvent
+      examples, and regression tests for host congestion, deferred responses,
+      control frames, EOF, callback reentrancy, and fatal transport failures.
+    - Treat fatal application control callback errors as transport aborts,
+      distinct from explicit graceful close().
+    - Exercise the IO::Async and AnyEvent client/server examples in Linux CI.
+    - Update the public module SYNOPSIS sections to lead with the new
+      attached transport and named-field API.
+    - Preserve NativeABI version 1 without changing the public C header.
+
 0.10  2026-10-04
     - Make a deliberate breaking API harmonization pass across Unblock::HTTP2.
     - Rename Transaction->inform() to Transaction->send_informational().

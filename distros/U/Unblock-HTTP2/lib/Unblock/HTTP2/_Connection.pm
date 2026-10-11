@@ -3,10 +3,10 @@ package Unblock::HTTP2::_Connection;
 use strict;
 use warnings;
 use Carp qw(croak);
-use Scalar::Util qw(blessed);
+use Scalar::Util qw(blessed weaken);
 use utf8 ();
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 my @SETTING_NAMES = qw(
     header_table_size
@@ -39,6 +39,14 @@ sub _initialize_connection {
     croak 'HTTP/2 session must be an object'
         unless blessed($session);
 
+    my $transport = delete $option{transport};
+    if (defined $transport) {
+        croak 'new(): transport must be an object' unless blessed($transport);
+        for my $method (qw(unblock_send unblock_finish unblock_abort)) {
+            croak "new(): transport must implement $method()"
+                unless $transport->can($method);
+        }
+    }
     my $role = delete $option{role};
     my $callbacks = delete($option{callbacks}) || {};
 
@@ -49,6 +57,16 @@ sub _initialize_connection {
     croak 'unknown HTTP/2 connection options: ' . join(', ', sort keys %option)
         if %option;
 
+    $self->{transport}          = $transport;
+    weaken($self->{transport}) if defined $transport;
+    $self->{transport_attached} = defined($transport) ? 1 : 0;
+    $self->{transport_blocked}  = 0;
+    $self->{transport_syncing}  = 0;
+    $self->{transport_finished} = 0;
+    $self->{transport_aborted}  = 0;
+    $self->{transport_graceful} = 0;
+    $self->{transport_pending}  = '';
+    $self->{input_eof}          = 0;
     $self->{session}          = $session;
     $self->{role}             = $role;
     $self->{callbacks}        = $callbacks;
@@ -86,7 +104,7 @@ sub transaction_for_stream_id {
 
 sub want_read {
     my ($self) = @_;
-    return 0 if $self->{closed} || !$self->{session};
+    return 0 if $self->{closed} || !$self->{session} || $self->{input_eof};
     return $self->{session}->want_read ? 1 : 0;
 }
 
@@ -100,6 +118,9 @@ sub input {
     my ($self, $bytes) = @_;
 
     croak 'input(): connection is closed' if $self->{closed};
+    croak 'input(): read side is already at EOF' if $self->{input_eof};
+    croak 'input(): cannot be called from unblock_send()'
+        if $self->{transport_syncing};
     croak 'input(): bytes must be a scalar' if ref($bytes);
     return 0 unless defined($bytes) && length($bytes);
     croak 'input(): cannot be called from an HTTP/2 session callback'
@@ -130,10 +151,18 @@ sub input {
     }
 
     $self->_after_session_call;
+    $self->_transport_sync if $self->{transport_attached};
     return $consumed;
 }
 
 sub output {
+    my ($self) = @_;
+    croak 'output(): manual output is unavailable with an attached transport'
+        if $self->{transport_attached};
+    return $self->_output_raw;
+}
+
+sub _output_raw {
     my ($self) = @_;
 
     croak 'output(): connection is closed' if $self->{closed};
@@ -166,6 +195,133 @@ sub output {
     return $bytes;
 }
 
+
+# nghttp2 generates wire buffers on demand. An attached transport accepts
+# each complete buffer into its own output queue before reporting congestion.
+sub _transport_sync {
+    my ($self) = @_;
+    return unless $self->{transport_attached};
+    return if $self->{transport_syncing} || $self->{in_session_call};
+    return if $self->{transport_aborted} || $self->{transport_finished};
+    return if $self->{transport_blocked};
+
+    my $host = $self->{transport};
+    return $self->_transport_abort('HTTP/2 transport was destroyed')
+        unless $host;
+
+    {
+        local $self->{transport_syncing} = 1;
+        while (!$self->{transport_blocked}) {
+            my $bytes;
+            if (length $self->{transport_pending}) {
+                $bytes = $self->{transport_pending};
+                $self->{transport_pending} = '';
+            }
+            elsif (!$self->{closed} && $self->{session}
+                    && $self->{session}->want_write) {
+                my $ok = eval { $bytes = $self->_output_raw; 1 };
+                unless ($ok) {
+                    $self->_transport_abort("$@" || 'HTTP/2 output failed');
+                    return;
+                }
+            }
+            else {
+                last;
+            }
+            last unless defined($bytes) && length($bytes);
+
+            my $ready;
+            my $ok = eval { $ready = $host->unblock_send($bytes); 1 };
+            unless ($ok) {
+                $self->_transport_abort("$@" || 'unblock_send() failed');
+                return;
+            }
+            $self->{transport_blocked} = 1 if defined($ready) && !$ready;
+        }
+    }
+
+    if ($self->{closed} && $self->{transport_graceful}
+            && !length($self->{transport_pending})
+            && !$self->{transport_blocked}
+            && !$self->{transport_finished}
+            && !$self->{transport_aborted}) {
+        $self->{transport_finished} = 1;
+        my $ok = eval { $host->unblock_finish(); 1 };
+        $self->_transport_abort("$@" || 'unblock_finish() failed') unless $ok;
+    }
+    return;
+}
+
+sub resume_output {
+    my ($self) = @_;
+    croak 'resume_output(): no attached transport'
+        unless $self->{transport_attached};
+    croak 'resume_output(): cannot be called from unblock_send()'
+        if $self->{transport_syncing};
+    return $self if $self->{transport_finished} || $self->{transport_aborted};
+    $self->{transport_blocked} = 0;
+    $self->_transport_sync;
+    if (!$self->{transport_blocked} && !$self->{closed}) {
+        # Producers can have paused because the host, rather than their own
+        # stream queue, was congested. Wake only those below low water.
+        for my $id (keys %{ $self->{providers} || {} }) {
+            my $provider = $self->{providers}{$id};
+            next unless $provider->{blocked};
+            next unless length($provider->{queue}) < 32_768;
+            $provider->{blocked} = 0;
+            $self->_queue_drain($id);
+        }
+        $self->_after_session_call;
+        $self->_transport_sync;
+    }
+    return $self;
+}
+
+sub _transport_abort {
+    my ($self, $reason) = @_;
+    return if $self->{transport_aborted};
+    $self->{transport_aborted} = 1;
+    $self->{transport_pending} = '';
+    $self->{transport_graceful} = 0;
+    $self->_finish_close($reason) unless $self->{closed};
+    if (my $host = $self->{transport}) {
+        eval { $host->unblock_abort($reason) };
+    }
+    return;
+}
+
+sub transport_error {
+    my ($self, $reason) = @_;
+    $reason = 'transport error' unless defined($reason) && length($reason);
+    $self->_transport_abort("$reason");
+    return $self;
+}
+
+sub input_eof {
+    my ($self) = @_;
+    return $self if $self->{input_eof} || $self->{closed};
+    croak 'input_eof(): cannot be called during HTTP/2 input or host send'
+        if $self->{in_session_call} || $self->{transport_syncing};
+    $self->{input_eof} = 1;
+    # Unlike HTTP/1, EOF never completes an HTTP/2 response body.
+    $self->close('HTTP/2 transport reached EOF');
+    return $self;
+}
+
+# Retain unsent wire output across explicit close, even while a host is paused.
+sub _stage_final_output {
+    my ($self) = @_;
+    return unless $self->{transport_attached} && $self->{session};
+    return if $self->{staging_final_output};
+    local $self->{staging_final_output} = 1;
+    while ($self->{session} && $self->{session}->want_write) {
+        my $bytes = $self->_output_raw;
+        last unless defined($bytes) && length($bytes);
+        $self->{transport_pending} .= $bytes;
+    }
+    return;
+}
+
 sub _register_transaction {
     my ($self, $transaction) = @_;
     $self->{transactions}{ $transaction->stream_id } = $transaction;
@@ -196,6 +352,7 @@ sub _reset_stream {
 
     $self->{session}->submit_rst_stream($transaction->stream_id, 0 + $error_code);
     $transaction->_mark_cancelled(0 + $error_code, 0);
+    $self->_transport_sync if $self->{transport_attached};
     return;
 }
 
@@ -207,6 +364,7 @@ sub _consume_stream_body {
     return unless $bytes;
 
     $self->{session}->consume_stream($transaction->stream_id, $bytes);
+    $self->_transport_sync if $self->{transport_attached};
     return;
 }
 
@@ -266,6 +424,7 @@ sub goaway {
         debug_data     => $debug_data,
     };
     $self->{draining} = 1 if exists $self->{draining};
+    $self->_transport_sync if $self->{transport_attached};
 
     return $self;
 }
@@ -283,6 +442,7 @@ sub ping {
         unless length($bytes) == 8;
 
     $self->{session}->submit_ping($bytes);
+    $self->_transport_sync if $self->{transport_attached};
     return $self;
 }
 
@@ -319,6 +479,7 @@ sub _update_stream_priority {
         unless $enabled == 1;
 
     $self->{session}->submit_priority_update($transaction->stream_id, $bytes);
+    $self->_transport_sync if $self->{transport_attached};
     return;
 }
 
@@ -395,6 +556,7 @@ sub update_settings {
     }
 
     $self->_submit_settings('update_settings()', $input);
+    $self->_transport_sync if $self->{transport_attached};
     return $self;
 }
 
@@ -555,7 +717,15 @@ sub _invoke_control_callback {
 
     my $error = "$name callback failed";
     $error .= ": $@" if length $@;
-    $self->close($error);
+    # An application control callback exception is fatal, not an explicit
+    # graceful close. Defer teardown until libnghttp2 has returned when the
+    # callback runs from inside a native receive/send call.
+    if ($self->{in_session_call}) {
+        $self->{close_pending} = $error;
+    }
+    else {
+        $self->_finish_close($error);
+    }
     return 0;
 }
 
@@ -602,6 +772,7 @@ sub close {
     $error = 'HTTP/2 connection closed'
         unless defined($error) && length($error);
 
+    $self->{transport_graceful} = 1 if $self->{transport_attached};
     if ($self->{in_session_call}) {
         $self->{close_pending} = "$error";
         return $self;
@@ -614,6 +785,10 @@ sub _finish_close {
     my ($self, $error) = @_;
     return $self if $self->{closed};
 
+    if ($self->{transport_graceful} && !$self->{transport_aborted}) {
+        my $ok = eval { $self->_stage_final_output; 1 };
+        $self->{transport_graceful} = 0 unless $ok;
+    }
     $self->{closed} = 1;
     $self->{close_reason} = "$error";
 
@@ -626,6 +801,14 @@ sub _finish_close {
     $self->{transactions} = {};
     $self->{pending_drain} = {};
     $self->{session} = undef;
+    if ($self->{transport_attached}) {
+        if ($self->{transport_graceful}) {
+            $self->_transport_sync;
+        }
+        elsif (!$self->{transport_aborted}) {
+            $self->_transport_abort($error);
+        }
+    }
     return $self;
 }
 

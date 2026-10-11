@@ -1,5 +1,25 @@
 Revision history for oEdtk
 
+2.1106      2026-10-10
+    - oEdtk::DBAdmin: fix a quadratic hot spot in the PostgreSQL COPY path. _pg_csv_supplier used to accumulate each 1 MiB block by string concatenation and then reset the buffer, a pattern that is quadratic in the block size and dominated the whole load — it even made this "optimized" loader slower than the previous temporary-file one. Blocks are now built by collecting the cleaned rows in an array and joining them once per block. Measured on a 2 002 280-row fixture the load drops from 722.7 s to 195.8 s (3.7x faster); the 50 057-row fixture goes from 19.0 s to 5.7 s.
+    - tests: new fixture generator tracker/dev/build/tests/data/tracker-test-Metadata-heavy2M.pl, which rebuilds a two-million-row CSV from tracker-test-Metadata-heavy.csv by repeating it and rewriting ED_SEQDOC so the edtk_metadata primary key stays unique (all other columns are copied byte for byte). The generated CSV (~670 MB) is listed in .gitignore and rebuilt on demand.
+    - oEdtk::DBAdmin: $VERSION 2.1105 → 2.1106.
+    - oEdtk.pm: $VERSION 2.1105 → 2.1106.
+
+2.1105      2026-10-09
+    - oEdtk::DBAdmin: PostgreSQL COPY ... FROM STDIN bulk load no longer writes a temporary cleaned copy of the CSV: rows are cleaned and serialized on the fly and streamed straight into COPY through the new private helper _pg_csv_supplier. Per-row cleaning is fused with serialization in the new private helper _pg_csv_row, which takes positional column metadata, so no closure or hash lookup runs per value; the re-encode to the session client_encoding is applied once per block (Encode is concatenative). COPY data is now fed in whole blocks (new constant PG_COPY_BLOCK_SIZE, 1 MiB) instead of one line per pg_putcopydata call, and the File::Temp dependency is dropped.
+    - oEdtk::DBAdmin: _pg_deferrable_ddl accepts a new $defer_pk flag; passing pg_copy_defer_pk => 1 to csv_import also drops and rebuilds the target table's primary key around the COPY. A primary key referenced by an external foreign key is still left untouched, and if any deferred DDL cannot be dropped the load falls back to the non-deferred path.
+    - oEdtk::DBAdmin: $VERSION 2.1104 → 2.1105.
+    - oEdtk.pm: $VERSION 2.1104 → 2.1105.
+
+2.1104      2026-10-08
+    - oEdtk::DBAdmin: the bulk CSV loaders now log an informational line stating that the insertion is done in bulk, which method is used, and how many rows were injected. All three paths report it — MySQL LOAD DATA INFILE, MySQL LOAD DATA LOCAL INFILE and PostgreSQL COPY ... FROM STDIN. The row count is derived from the CSV normalization pass; the two MySQL INFILE paths count records through the new private helper _count_csv_rows (Text::CSV getline, used so a quoted field may span several physical lines). Return values are unchanged.
+    - oEdtk::DBAdmin: PostgreSQL COPY ... FROM STDIN performance — the load now runs inside a single transaction and, before the COPY, drops the target table's secondary indexes and unique / foreign-key constraints so they are rebuilt in one bulk pass afterwards instead of being maintained row by row during the load. The objects to defer are collected from pg_catalog by the new private helper _pg_deferrable_ddl; primary keys, and any index on which a foreign key depends, are left untouched.
+    - oEdtk::DBAdmin: the COPY transaction relaxes synchronous_commit (SET LOCAL synchronous_commit = off) so the commit does not wait for the WAL flush — transaction-scoped and reversible, with no change to the schema — and runs ANALYZE on the target table afterwards to refresh the planner statistics. New constants PG_COPY_SYNC_OFF and PG_COPY_ANALYZE.
+    - oEdtk::DBAdmin: the optimized load is atomic — a failure rolls back both the data and the deferred DDL, and if a DDL object cannot be dropped the load is retried once without deferral (a caller-managed transaction with AutoCommit already off is left open). Passing pg_copy_optimize => 0 to csv_import keeps the historical plain COPY. The COPY itself was extracted into the new private helper _pg_copy_stdin; new private helper _pg_quote_ident.
+    - oEdtk::DBAdmin: $VERSION 2.1101 → 2.1104.
+    - oEdtk.pm: $VERSION 2.1102 → 2.1104.
+
 2.1102      2026-10-06
     - oEdtk::DBAdmin: new csv_import fast path for PostgreSQL using COPY ... FROM STDIN, the native equivalent of the MySQL LOAD DATA LOCAL INFILE path. It is selected automatically for the Pg driver when the import mode is not "merge"; rows are first cleaned through the same _get_col_meta / _make_clean_val pipeline into a temporary file, so truncation and '' => NULL conversion match the row-by-row path. New private helpers _load_csv_pg_copy, _pg_csv_field and _pg_encoding_name.
     - oEdtk::DBAdmin: _load_csv_pg_copy reads records with Text::CSV getline (instead of parse) so that a quoted field may span several physical lines; COPY runs with FORMAT csv, the current separator/quote characters and NULL '' so an unquoted empty field is read back as NULL.

@@ -4,258 +4,177 @@
 [![CPAN](https://img.shields.io/cpan/v/Unblock-HTTP1.svg)](https://metacpan.org/release/Unblock-HTTP1)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-Unblock::HTTP1 is a non-blocking HTTP/1 protocol engine for Perl.
+Unblock::HTTP1 is a non-blocking HTTP/1.0 and HTTP/1.1 protocol engine for Perl.
 
-It handles HTTP/1.0 and HTTP/1.1 parsing, serialization, framing, streaming
-bodies, persistent connections, informational responses, trailers, Upgrade,
-and CONNECT.
+It parses requests, serializes responses, handles HTTP message boundaries,
+streaming bodies, keep-alive, trailers, Upgrade, and CONNECT.
 
-It does not open sockets, perform DNS or TLS, choose an event loop, or manage
-connection pools.
-
-```text
-application or HTTP library
-        |
-  Uniform::HTTP messages
-        |
-   Unblock::HTTP1
-        |
-   byte transport
-```
-
-The transport can be Linux::Event, IO::Async, AnyEvent, Mojolicious, a blocking
-socket, an in-memory test connection, or something else.
+It does not open sockets, do DNS or TLS, run an event loop, or manage
+connection pools. It can be hosted by IO::Async, AnyEvent, Linux::Event,
+Mojolicious, native transport code, or another event framework.
 
 ## Installation
 
-From CPAN:
+    cpanm Unblock::HTTP1
 
-```text
-cpanm Unblock::HTTP1
-```
-
-Unblock::HTTP1 0.10 requires Perl 5.16 or newer and Uniform::HTTP 0.06 or newer.
-
-Version 0.10 intentionally joins the common Unblock HTTP API vocabulary while
-the distributions are still young. No compatibility aliases are carried.
+Version 0.11 requires Perl 5.16 and Uniform::HTTP 0.06 or newer.
+Linux::Event, IO::Async and AnyEvent are optional host frameworks.
 
 ## Start here
 
-The public API is built around three objects:
+The three application classes are:
 
-- `Unblock::HTTP1::Client` - one client HTTP/1 connection
-- `Unblock::HTTP1::Server` - one server HTTP/1 connection
-- `Unblock::HTTP1::Transaction` - one request/response exchange
+- Unblock::HTTP1::Client - one client-side connection
+- Unblock::HTTP1::Server - one server-side connection
+- Unblock::HTTP1::Transaction - one request and response exchange
 
-HTTP messages are normal `Uniform::HTTP::Request` and
-`Uniform::HTTP::Response` objects.
+A transaction uses the shared Unblock vocabulary: respond(), write(),
+end(), send_informational(), state(), error(), is_complete(),
+is_cancelled(), is_error(), and is_terminal().
 
-The application-facing vocabulary is intentionally shared with the other
-Unblock HTTP engines:
+The easiest server response:
 
-```text
-Client->new
-Server->new
-request()
-respond()
-write()
-end()
-send_informational()
-```
+    $tx->respond(
+        status => 200,
+        body   => "Hello World!\n",
+    );
 
-Transactions use the common lifecycle vocabulary:
+The easiest client request:
 
-```text
-state()
-error()
-is_complete()
-is_cancelled()
-is_error()
-is_terminal()
-```
-
-The basic transport contract is byte-in, byte-out:
-
-```perl
-$engine->input($bytes_from_transport);
-
-while ($engine->want_write) {
-    my $bytes = $engine->output;
-    last unless length $bytes;
-    $transport->write($bytes);
-}
-```
-
-Unblock::HTTP1 never waits for network activity itself.
-
-## Client
-
-```perl
-use Uniform::HTTP::Request;
-use Unblock::HTTP1::Client;
-
-my $client = Unblock::HTTP1::Client->new;
-
-my $transaction = $client->request(
-    Uniform::HTTP::Request->new(
+    $client->request(
         method    => 'GET',
         target    => '/',
-        authority => 'example.com',
-    ),
+        authority => 'example.test',
+        on_response => sub {
+            my ($tx, $response) = @_;
+            print $response->status, "\n";
+        },
+    );
 
-    on_response => sub {
-        my ($transaction, $response) = @_;
-        print $response->status, "\n";
-    },
+These calls still create and use canonical Uniform::HTTP::Request and
+Uniform::HTTP::Response messages internally. Existing Uniform objects
+continue to work directly:
 
-    on_body => sub {
-        my ($transaction, $response, $bytes) = @_;
-        process_bytes($bytes);
-    },
+    $client->request($request);
+    $tx->respond($response);
 
-    on_complete => sub {
-        my ($transaction) = @_;
-        print "done\n";
-    },
-);
-```
+## Connect to an event framework
 
-A Client serializes requests on one connection. It does not silently enable
-HTTP/1 pipelining.
+Create one Client or Server per framework connection:
 
-## Server
+    $self->{http1} = Unblock::HTTP1::Server->new(
+        transport  => $self,
+        on_request => $on_request,
+    );
 
-```perl
-use Uniform::HTTP::Response;
-use Unblock::HTTP1::Server;
+The framework object implements only three host methods:
 
-my $server = Unblock::HTTP1::Server->new(
-    on_request => sub {
-        my ($transaction, $request) = @_;
+    unblock_send($bytes)      # accept complete output into framework queue
+    unblock_finish()          # graceful close after queued output
+    unblock_abort($reason)    # immediate failure close
 
-        $transaction->respond(
-            Uniform::HTTP::Response->new(
-                status => 200,
-                body   => "hello\n",
-            ),
-        );
-    },
-);
-```
+The framework feeds incoming events to the engine:
 
-Request bodies arrive through `on_body`. `on_request_end` runs after the
-complete request body and trailers have arrived.
+    $http->input($bytes);
+    $http->input_eof;
+    $http->transport_error($reason);
 
-## Streaming bodies
+The engine delivers output automatically. A delayed response from a timer
+or database callback also triggers output without another framework read
+event.
 
-For a streaming client request:
+An integration that exposes congestion returns false from unblock_send()
+AFTER accepting the whole buffer, and later calls $http->resume_output.
+If the framework simply queues all output, it may return undef.
 
-```perl
-my $transaction = $client->request(
-    $request,
-    stream_body => 1,
-);
+The engine holds a weak reference to the host. The framework owns its
+sockets, output queue, and loop.
 
-$transaction->write($chunk);
-$transaction->end($last_chunk);
-```
+**Full working server and client examples:**
 
-For a streaming server response:
+- examples/io-async-server.pl
+- examples/io-async-client.pl
+- examples/anyevent-server.pl
+- examples/anyevent-client.pl
+- examples/linux-event-server.pl
 
-```perl
-$transaction->respond(
-    $response,
-    stream_body => 1,
-);
+The examples separate adapter code from application code. The Linux::Event
+server demonstrates the same host API using a Stream subclass and a
+separate application subclass. Linux::Event is not a required dependency.
 
-$transaction->write($chunk);
-$transaction->end($last_chunk);
-```
+For complete instructions, read:
 
-HTTP/1.1 uses chunked framing when needed. HTTP/1.0 streaming requires an
-explicit Content-Length.
+    perldoc Unblock::HTTP1::Integration
 
-`write()` returns false when the engine output queue reaches its high-water
-mark. `on_drain` fires after the queue falls below its low-water mark.
+The repository also includes docs/INTEGRATION.md and docs/COOKBOOK.md.
 
-## Informational responses
+## Connection and message behavior
 
-A server Transaction can send a 1xx response before its final response:
+A Client queues requests serially on one connection; it does not silently
+enable HTTP/1 pipelining. A Server can receive pipelined request bytes and
+process them in HTTP order.
 
-```perl
-$transaction->send_informational($response);
-$transaction->respond($final_response);
-```
+A server's on_request runs after the request head has arrived.
+on_body delivers decoded request body fragments. on_request_end runs when the
+full request, including trailers, is complete.
 
-## Upgrade and CONNECT
+For a streaming response:
 
-A 101 response or successful CONNECT ends HTTP framing on the connection.
+    $tx->respond(status => 200, stream_body => 1);
+    $tx->write($chunk);
+    $tx->end($final_bytes);
 
-The engine then reports:
+write() and end() accept bytes even when they return false for backpressure.
+Use on_drain to resume producing data.
 
-```perl
-$engine->is_switched
-```
+A clean read EOF is not the same as fatal transport failure. After a
+fully received request, the server can still send a delayed response, then
+close gracefully.
 
-Bytes already read after the HTTP boundary are preserved:
+A 101 Upgrade response or successful CONNECT switches away from HTTP.
+take_remainder() returns already-received bytes belonging to the next
+protocol. An attached server invokes on_switch after the full outgoing
+HTTP handshake has been accepted into the framework's write queue.
 
-```perl
-my $bytes = $engine->take_remainder;
-```
+## Manual and native integration
 
-The caller can pass those bytes to the next protocol implementation.
+For advanced consumers, the original low-level output interface remains:
 
-## Native integration
+    $http->input($bytes);
+    while ($http->want_write) {
+        $transport->write($http->output);
+    }
 
-The normal `input()` method remains the portable path.
+This is for engines built WITHOUT an attached transport. Do not mix manual
+output draining and automatic output ownership.
 
-XS-backed transports can optionally use `Unblock::HTTP1::NativeABI` to feed
-borrowed native input buffers directly. The transport keeps ownership of the
-input storage and Unblock reports the permanently consumed prefix.
+XS-backed transports can use Unblock::HTTP1::NativeABI v1 to pass borrowed
+native input. The ABI is input-side and remains transport neutral. It
+supports the same HTTP callbacks and can construct canonical Uniform
+messages through Uniform::HTTP 0.06's native FastPath.
 
-Canonical Uniform::HTTP 0.06 messages use the Uniform native construction path
-on this route.
+The installed C header is:
 
-Native integrations can discover the installed ABI with:
+    Unblock/HTTP1/NativeABI/unblock_http1_native_abi.h
 
-```perl
-my $definition = Unblock::HTTP1::NativeABI::definition();
-my $include_dir = Unblock::HTTP1::NativeABI::native_include_dir();
-my $header_path = Unblock::HTTP1::NativeABI::header_path();
-my $header = Unblock::HTTP1::NativeABI::c_header();
-```
+ABI discovery:
 
-The installed public header is:
-
-```text
-Unblock/HTTP1/NativeABI/unblock_http1_native_abi.h
-```
-
-HTTP/1 keeps its native ABI focused on borrowed input. It does not add
-HTTP/2-specific native output operations merely for API symmetry.
-
-See `docs/INTEGRATION.md` for the transport contract and ownership rules.
+    Unblock::HTTP1::NativeABI::definition()
+    Unblock::HTTP1::NativeABI::native_include_dir()
+    Unblock::HTTP1::NativeABI::header_path()
+    Unblock::HTTP1::NativeABI::c_header()
 
 ## Limits
 
-Default limits are:
+Defaults:
 
-```text
-maximum HTTP head:             65536 bytes
-maximum header fields:         100
-maximum chunk extension bytes: 16384 per message
-output high water:             65536 bytes
-output low water:              32768 bytes
-```
+    max_head_size              65536 bytes
+    max_headers                100
+    max_chunk_extension_size   16384 bytes
+    high_water                 65536 bytes
+    low_water                  32768 bytes
 
-The limits can be changed when constructing a Client or Server.
-
-## Protocol status
-
-The HTTP/1 protocol engine is complete for its declared scope and has
-cross-platform CI coverage on Linux, macOS, and Windows, including Perl 5.16.
-
-See `docs/PROTOCOL_STATUS.md` for the detailed protocol checklist.
+See docs/PROTOCOL_STATUS.md for the protocol feature checklist.
 
 ## License
 

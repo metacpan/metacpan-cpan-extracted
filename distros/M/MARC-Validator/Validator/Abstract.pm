@@ -8,7 +8,7 @@ use Data::MARC::Validator::Report::Plugin 0.02;
 use Error::Pure qw(err);
 use Mo::utils 0.06 qw(check_bool check_required);
 
-our $VERSION = 0.22;
+our $VERSION = 0.23;
 
 # Constructor.
 sub new {
@@ -293,7 +293,9 @@ Returns string.
          (only in this abstract class)
          MARC::Validator::Abstract is abstract class.
 
-=head1 EXAMPLE
+=head1 EXAMPLES
+
+=head2 EXAMPLE
 
 =for comment filename=example_plugin.pl
 
@@ -584,6 +586,6 @@ the Czech Republic (DKRVO 2024–2028), Area 11: Linked Open Data.
 
 =head1 VERSION
 
-0.22
+0.23
 
 =cut

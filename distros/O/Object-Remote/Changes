@@ -1,5 +1,10 @@
 Revision history for Object-Remote
 
+0.005003 - 2026-10-10
+  - declare Windows unsupported due to lack of non-blocking pipes
+  - fix path extraction for the remote fat node on Windows
+  - add leniency on timeouts for slow CPANTESTERS
+
 0.005002 - 2026-10-09
   - fix spelling errors reported by Debian
   - reap child processes when the connection object goes out of scope (RT#129951)

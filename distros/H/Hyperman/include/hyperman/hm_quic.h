@@ -134,6 +134,9 @@ struct hm_qconn {
     unsigned char handshake_done;      /* off srv->handshaking once true  */
     unsigned char closing;             /* CONNECTION_CLOSE sent           */
     unsigned char draining;
+    unsigned char in_read;             /* inside ngtcp2_conn_read_pkt: the
+                                        * write half waits for it to return
+                                        * (hm_quic_write)                 */
 };
 
 /* One per listener, not per loop: a CID minted on listener A must not be
@@ -601,7 +604,10 @@ static int hm_quic_packet(pTHX_ hm_loop *loop, hm_listener *lst,
     path.remote.addr    = (ngtcp2_sockaddr *)peer;
     path.remote.addrlen = peerlen;
 
-    if (ngtcp2_conn_read_pkt(qc->conn, &path, &pi, pkt, len, hm_now_ns()) != 0) {
+    qc->in_read = 1;
+    rv = ngtcp2_conn_read_pkt(qc->conn, &path, &pi, pkt, len, hm_now_ns());
+    qc->in_read = 0;
+    if (rv != 0) {
         hm_quic_conn_free(aTHX_ qc);
         return 0;
     }
@@ -1168,6 +1174,11 @@ static int hm_quic_write(pTHX_ hm_qconn *qc) {
     uint8_t buf[1452];                     /* a conservative path MTU */
     ngtcp2_path_storage ps;
     ngtcp2_pkt_info pi;
+    /* Called from inside a read_pkt callback (the application answered a
+     * stream synchronously): ngtcp2 forbids writev_stream there, and the
+     * error paths below would free the connection read_pkt is still
+     * executing on. hm_quic_packet writes once read_pkt has returned. */
+    if (qc->in_read) return 0;
     for (;;) {
         nghttp3_vec vec[16];
         ngtcp2_ssize n, wrote = 0;

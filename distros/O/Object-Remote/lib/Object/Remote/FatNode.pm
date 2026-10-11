@@ -24,6 +24,9 @@ my $extra_libs = join '', map {
     "  -I'$lib'\n";
 } @extra_libs;
 
+
+### NOTE: The command above can't have single quotes:
+##     single quotes are not compatible with Windows
 my $command = qq(
   $^X
   $extra_libs
@@ -42,8 +45,10 @@ my $command = qq(
   -mMoo::HandleMoose::_TypeMap
   -mJSON::PP
   -mDevel::GlobalDestruction
-  -e 'print join "\\n", \%INC'
+  -e "print join(\\"\\n\\", \%INC)"
 );
+### NOTE: The command above can't have single quotes:
+##     single quotes are not compatible with Windows
 
 $command =~ s/\n/ /g;
 

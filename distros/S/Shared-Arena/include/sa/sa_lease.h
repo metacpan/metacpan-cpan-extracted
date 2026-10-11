@@ -180,7 +180,12 @@ static sa_lease_slot *sa_lease_slot_for(sa_lease_hdr *h, const char *name,
     n = h->nleases > SA_LEASES_MAX ? SA_LEASES_MAX : h->nleases;
     hash = sa_at_fnv(name, nlen);
 
-    if (!sa_at_lock(h->locks, hash)) { if (err) *err = SA_E_FULL; return NULL; }
+    /* A bind happens once per worker, at start, so it waits for the stripe as
+     * a carve does. A stripe still held after that is BUSY and not FULL: an
+     * OpenBSD smoker had six children bind one name at once, and one lost
+     * sa_at_lock's spin to the other five and was told the table had no room,
+     * with every slot but a handful free. */
+    if (!sa_lock_wait(h->locks, hash)) { if (err) *err = SA_E_BUSY; return NULL; }
 
     for (i = 0; i < n; i++) {
         sa_lease_slot *s = &slots[i];
@@ -253,9 +258,11 @@ static int sa_lease_acquire(sa_lease *lh, uint64_t ttl_ms, int *stole)
     me  = sa_getpid();
     now = sa_now_ms();
 
-    /* A wedged stripe biases safe: not acquiring can never create a second
-     * holder, and the deadline recovers the lease later. */
-    if (!sa_at_lock(h->locks, lh->hash)) return SA_LEASE_LOST;
+    /* A held stripe is waited out on the per-request budget - the holder is
+     * doing three stores and was merely descheduled - and a stripe still held
+     * after that biases safe: not acquiring can never create a second holder,
+     * and the deadline recovers the lease later. */
+    if (!sa_lock_wait_brief(h->locks, lh->hash)) return SA_LEASE_LOST;
 
     owner = sa_at_load64_acq(&s->owner);
     exp   = sa_at_load64_acq(&s->expires);
@@ -303,9 +310,11 @@ static int sa_lease_renew(sa_lease *lh, uint64_t ttl_ms)
     me  = sa_getpid();
     now = sa_now_ms();
 
-    /* A wedged stripe biases safe: renew returns "lost", so the caller steps
-     * down and the deadline hands the lease on. */
-    if (!sa_at_lock(h->locks, lh->hash)) return SA_LEASE_LOST;
+    /* The same wait as acquire. A stripe still held after it biases safe:
+     * renew returns "lost", so the caller steps down and the deadline hands
+     * the lease on. A caller that would rather not step down on a blip asks
+     * sa_lease_mine, which takes no lock. */
+    if (!sa_lock_wait_brief(h->locks, lh->hash)) return SA_LEASE_LOST;
 
     if (sa_at_load64_acq(&s->owner) == me
         && sa_at_load64_acq(&s->gen) == lh->gen) {
@@ -331,7 +340,7 @@ static int sa_lease_release(sa_lease *lh)
     h = lh->hdr;
     me = sa_getpid();
 
-    if (!sa_at_lock(h->locks, lh->hash)) return 0;
+    if (!sa_lock_wait_brief(h->locks, lh->hash)) return 0;
     if (sa_at_load64_acq(&s->owner) == me
         && sa_at_load64_acq(&s->gen) == lh->gen) {
         sa_at_store64_rel(&s->owner, 0);

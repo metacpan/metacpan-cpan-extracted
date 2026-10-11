@@ -1,4 +1,4 @@
-package At::Protocol::NSID 1.0 {    # https://github.com/bluesky-social/atproto/blob/main/packages/syntax/src/nsid.ts
+package At::Protocol::NSID v1.7.0 {    # https://github.com/bluesky-social/atproto/blob/main/packages/syntax/src/nsid.ts
     use v5.42;
     no warnings qw[experimental::builtin experimental::try];
     use At::Error qw[register throw];

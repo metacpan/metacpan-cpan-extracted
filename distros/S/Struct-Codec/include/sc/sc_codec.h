@@ -1,6 +1,14 @@
 #ifndef SC_CODEC_H
 #define SC_CODEC_H
 
+/* HeUTF8 arrived in 5.10.1 and the floor is 5.010: an OmniOS smoker's 5.10.0
+ * refused Frozen for want of it and would refuse sc_enc_key the same way. This
+ * is ppport.h's definition, taken only where perl.h has not provided one. */
+#ifndef HeUTF8
+#  define HeUTF8(he) ((HeKLEN(he) == HEf_SVKEY) \
+                      ? SvUTF8(HeKEY_sv(he)) : (U32)HeKUTF8(he))
+#endif
+
 /* sc_codec.h - the encoder and the decoder. Needs perl.h and sc_format.h.
  *
  * ---- the encoder's seen table is the design ---------------------------------

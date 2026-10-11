@@ -3,20 +3,35 @@
 use strict;
 use warnings;
 
-use FindBin ();
-use lib "$FindBin::Bin/../lib";
-
 use Getopt::Long;
 
+use Game::Durak::Bot;
 use Game::Durak::Terminal;
 
 my %opt = (level => 3, seat => 1);
 GetOptions(\%opt, 'level=i', 'seat=i', 'seed=s', 'ascii', 'colour!',
-           'paint!', 'width=i', 'height=i', 'help')
-    or die "bad options\n";
+           'paint!', 'pick!', 'width=i', 'height=i', 'help')
+    or usage(2);
 
-if ($opt{help}) {
-    print <<"USAGE";
+usage(0) if $opt{help};
+
+my $levels = Game::Durak::Bot->ladder;
+bad("--seat must be 1 or 2, not '$opt{seat}'")
+    unless $opt{seat} =~ /\A[12]\z/;
+bad("--level must be 1 to $levels, not '$opt{level}'")
+    unless $opt{level} =~ /\A[0-9]+\z/
+    && $opt{level} >= 1 && $opt{level} <= $levels;
+
+sub bad {
+    my ($why) = @_;
+    print {\*STDERR} "durak: $why\n";
+    exit 2;
+}
+
+sub usage {
+    my ($status) = @_;
+    my $fh = $status ? \*STDERR : \*STDOUT;
+    print {$fh} <<"USAGE";
 usage: $0 [--level 1-5] [--seat 1|2] [--seed STRING] [--ascii] [--no-colour]
           [--no-paint] [--width N] [--height N]
 
@@ -28,8 +43,21 @@ The table is drawn on one painted screen at a terminal and printed as plain
 lines when the output is a pipe or a file. --paint and --no-paint say so
 either way, and --width and --height fit the screen to a window that is not
 eighty by twenty-four.
+
+At a terminal the arrow keys walk the cards you may play and the line above
+the table says what the one under the cursor would do: whether they must beat
+it, which attack it beats, whether it is a trump, and how much room the bout
+has left. Enter plays it. The moves that are not cards keep their own keys.
+Needs Term::ReadKey; --no-pick, or no terminal, numbers them at a prompt
+instead.
+
+At the prompt, a number plays that card. t takes, d is done, x exchanges the
+trump, r resigns and q (or quit) stops.
+
+Exit status is 0 if you won or the deal was stopped, 1 if you were the fool,
+2 for an option the game will not take.
 USAGE
-    exit 0;
+    exit $status;
 }
 
 my $said = defined $opt{seed} ? $opt{seed}
@@ -45,13 +73,25 @@ my $terminal = Game::Durak::Terminal->new(
     paint  => $opt{paint},
     width  => $opt{width},
     height => $opt{height},
+    (defined $opt{pick} ? (picking => $opt{pick} ? 1 : 0) : ()),
 );
+
+for my $signal (qw/ INT TERM HUP /) {
+    $SIG{$signal} = sub {
+        $terminal->leave_raw;
+        $SIG{ $_[0] } = 'DEFAULT';
+        kill $_[0], $$;
+    };
+}
 
 my $result = $terminal->run;
 exit 0 unless $result;
 
 $terminal->say('');
 $terminal->say("the seed was $said");
+
+exit 1 if ref $result eq 'HASH'
+    && defined $result->{fool} && $result->{fool} == $opt{seat};
 exit 0;
 
 __END__

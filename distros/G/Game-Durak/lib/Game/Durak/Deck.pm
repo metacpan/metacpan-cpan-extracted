@@ -8,7 +8,7 @@ use Exporter 'import';
 
 use Game::Durak::Card ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 our @EXPORT_OK = qw(order_for deal_for first_attacker HAND_SIZE SEATS);
 
 use constant HAND_SIZE => 6;
@@ -100,7 +100,7 @@ Game::Durak::Deck - the seeded deal, and the talon with the trump underneath it
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

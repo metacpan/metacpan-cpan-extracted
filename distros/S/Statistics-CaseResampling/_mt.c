@@ -70,7 +70,8 @@ struct mt *mt_setup_array( uint32_t *array, int n )
 
 void mt_free(struct mt *self)
 {
-    free(self);
+    if (self)
+        free(self);
 }
 
 /* Returns a pseudorandom number which is uniformly distributed in [0,1) */

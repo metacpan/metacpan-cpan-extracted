@@ -1,4 +1,18 @@
 Revision history for Game-Reversi
 
+0.02    2026-10-10
+	- Fix: Terminal.pm POD declares =encoding utf8, so t/pod.t passes.
+	- Fix: --level took any number. The variant was brought into BUILD when
+	  that bug was found; the level was left in the Bot, three calls deeper,
+	  and died with a file and a line at exit 25.
+	- Point at the move you mean: the arrow keys walk the squares marked *
+	  and the line under the board says what the move would turn and what
+	  the score would become.
+	- The square the last move went on is bracketed and the discs it turned
+	  are drawn ringed, so what just happened is readable with --ascii and
+	  with colour off.
+	- Fix: a refusal or a redrawn board landed on the prompt's own line off
+	  a terminal.
+
 0.01    2026-09-15
 	First version

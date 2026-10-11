@@ -43,7 +43,7 @@
 \.tmp$
 \.#
 \.rej$
-\.yml$
+schemas\.yml$
 \.swp$
 
 # Avoid OS-specific files/dirs
@@ -57,6 +57,7 @@
 \bcover_html\b
 \bcoverage_history\b
 \bcovered\b
+nytprof.out
 
 # Avoid MYMETA files
 ^MYMETA\.
@@ -69,3 +70,16 @@
 Test-.*
 .test-script-*
 typescript
+mutation.json
+^xt/mutant_\d
+CLAUDE.md
+\.claude
+\.circleci
+
+# Super-linter per-repo tuning files - not for distribution
+^\.perlcriticrc$
+^\.jscpd\.json$
+^\.markdown-lint\.yml$
+# Super-linter tuning files - not for distribution
+^\.prettierignore$
+^\.textlintrc$

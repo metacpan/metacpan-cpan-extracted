@@ -7,7 +7,7 @@ use Object::Proto::Sugar -types;
 
 use Game::Durak::Card qw(face_of suit_of);
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 my %SUIT = (
     S => { wide => "\x{2660}", ascii => 'S', ink => 'black' },
@@ -145,15 +145,18 @@ sub back {
 }
 
 sub fan_of {
-    my ($self, $id) = @_;
+    my ($self, $id, $ring) = @_;
     my $art = $self->_art;
+    my ($tl, $bl, $h, $v) = $ring
+        ? @{$art}{qw(ring_tl ring_bl ring_h ring_v)}
+        : @{$art}{qw(tl bl h v)};
     return [
-        $art->{tl} . ($art->{h} x 3),
-        sprintf('%s%-3s', $art->{v}, defined $id ? face_of($id) : ''),
-        sprintf('%s%-3s', $art->{v},
+        $tl . ($h x 3),
+        sprintf('%s%-3s', $v, defined $id ? face_of($id) : ''),
+        sprintf('%s%-3s', $v,
                 defined $id ? $self->suit_glyph(suit_of($id)) : ''),
-        $art->{v} . '   ',
-        $art->{bl} . ($art->{h} x 3),
+        $v . '   ',
+        $bl . ($h x 3),
     ];
 }
 
@@ -185,15 +188,19 @@ sub fan {
 
     my $pitch = $self->pitch_for($col, $count);
 
+    my $cursor = defined $o{cursor} ? $o{cursor} : -1;
+
     my $at = $col;
     for my $i (0 .. $count - 1) {
         my $id = $cards->[$i];
         my $last = $i == $count - 1;
+        my $on = $i == $cursor;
         my $paint = !$face   ? 'back'
                   : $lit->{$i} || !%$lit ? $self->ink_of($id)
                   : 'grey';
         my $box = !$face ? ($last ? $self->back : $self->fan_back)
-                :          ($last ? $self->card($id) : $self->fan_of($id));
+                :          ($last ? $self->card($id, $on)
+                                  : $self->fan_of($id, $on));
         $self->lay($grid, $box, $row, $at, $paint);
         $at += $pitch;
     }
@@ -271,7 +278,8 @@ sub screen {
         $self->put($grid, $numbers, 2 + $i * $pitch, sprintf('%-2d', $n),
                    $lit->{$i} ? 'pick' : 'quiet');
     }
-    $self->fan($grid, $numbers + 1, 2, $hand, lit => $lit);
+    $self->fan($grid, $numbers + 1, 2, $hand, lit => $lit,
+               (defined $o{cursor} ? (cursor => $o{cursor} - 1) : ()));
 
     $self->band($grid, $self->height - 1, 'bar');
     $self->put($grid, $self->height - 1, 1,
@@ -328,7 +336,7 @@ Game::Durak::Table - the terminal's table, drawn as a grid of characters
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

@@ -11,7 +11,7 @@ use Game::Schnapsen::Deal ();
 use Game::Schnapsen::Error ();
 use Game::Schnapsen::Variant ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 has variant => (is => 'ro', isa => Str);
 has seed    => (is => 'ro', isa => Str);
@@ -137,7 +137,7 @@ Game::Schnapsen - Schnapsen and Sixty-Six, two games and one engine
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

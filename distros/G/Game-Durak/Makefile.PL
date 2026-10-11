@@ -30,6 +30,16 @@ my %WriteMakefileArgs = (
         # system is the one non-core prerequisite in the distribution.
         q{Object::Proto::Sugar} => q{0.05},
     },
+    META_MERGE => {
+        q{meta-spec} => { version => 2 },
+        prereqs => {
+            runtime => {
+                recommends => {
+                    q{Term::ReadKey} => q{0},
+                },
+            },
+        },
+    },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Game-Durak-*' },
 );

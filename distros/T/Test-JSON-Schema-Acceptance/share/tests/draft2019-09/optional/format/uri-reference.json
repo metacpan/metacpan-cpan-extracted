@@ -118,6 +118,18 @@
                 "valid": false
             },
             {
+                "description": "incomplete percent-encoding triplet",
+                "comment": "RFC 3986, Section 2.1: pct-encoded = \"%\" HEXDIG HEXDIG.",
+                "data": "/%A",
+                "valid": false
+            },
+            {
+                "description": "lone percent sign is invalid",
+                "comment": "RFC 3986, Section 2.1: pct-encoded = \"%\" HEXDIG HEXDIG.",
+                "data": "/%",
+                "valid": false
+            },
+            {
                 "description": "a double quote in a path",
                 "comment": "RFC 3986, Appendix A: pchar = unreserved / pct-encoded / sub-delims / \":\" / \"@\", and the double quote is in none of them.",
                 "data": "/a\"b",
@@ -164,12 +176,6 @@
                 "comment": "RFC 3986, Appendix A: no production admits %x0A.",
                 "data": "/p\n",
                 "valid": false
-            },
-            {
-                "description": "an uppercase version character in an IPvFuture literal",
-                "comment": "RFC 3986, Section 3.2.2 gives IPvFuture = \"v\" 1*HEXDIG \".\" 1*( unreserved / sub-delims / \":\" ), and RFC 5234, Section 2.3 makes ABNF literals case-insensitive.",
-                "data": "//[V1.fe]/p",
-                "valid": true
             }
         ]
     }

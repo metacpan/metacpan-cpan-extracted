@@ -1,5 +1,9 @@
 Revision history for JSON-Schema-Modern
 
+0.651     2026-10-11 00:17:02Z
+          - JSON::Schema::Modern::Utilities::parse_media_type is now a public
+            sub
+
 0.650     2026-09-17 23:38:51Z
           - fix syntax error on older perls
 

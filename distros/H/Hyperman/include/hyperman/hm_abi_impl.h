@@ -19,8 +19,7 @@ static void *hm_abi_loop_of_sv(pTHX_ SV *loop_sv) {
  * consumer never holds a second independently-destroyed wrapper. */
 static SV *hm_abi_sv_of_loop(pTHX_ void *vl) {
     hm_loop *loop = (hm_loop *)vl;
-    if (!loop->self_sv) loop->self_sv = hm_loop_to_sv(aTHX_ loop);
-    return SvREFCNT_inc(loop->self_sv);
+    return hm_loop_to_sv(aTHX_ loop);
 }
 
 static void hm_abi_io_watch(pTHX_ void *vl, int fd, int mask,

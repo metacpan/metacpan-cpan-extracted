@@ -1,5 +1,35 @@
 Revision history for Git-MoreHooks
 
+0.020     2026-10-11 00:32:16+02:00 Europe/Stockholm
+            * Add Git::Mailmap to TestSuggests prereqs.
+            * Add more debugging to TriggerJenkins.
+            * Remove Test::DistManifest because .test.requires.git.lock file.
+            * Remove dependency to perl 5.030.
+            * Remove literal tabs from test file.
+            * Remove unused sub arguments in ScanCtags.
+            * Remove `say` from ScanCtags.
+            * Reactivate pod-spell stopwords in dist.ini.
+            * Remove B::Lint check from CheckPerl. It was never active.
+            * Disable synopsis checking in ScanCtags.
+            * Remove specific Perl version dependency from ScanCtags.
+            * Remove Git::Hooks version dependency from libs and add to dist.ini.
+            * Remove whitespace in EOL in CheckPerl.
+            * Convert dist.ini to use @MIKKOI bundle.
+            * Configure Perl requirements.
+            * Add GitHub Actions workflows and dependabot.
+            * Update README.md .weavefilerc.
+            * Update Contribution policy.
+            * Add Software::Policies / MaintainerSuccession.
+            * Add CheckTrailers. Enforces a commit message trailer policy:
+                a deny list, a require list and an optional required order.
+                Ships with no trailer names configured and does nothing until
+                a repository names its own.
+            * GitRepoAdmin: a repository with no .git-repo-admin directory no
+                longer throws. The state means the hooks are not installed
+                there yet, which reaches every clone before anybody runs
+                client-hooks.sh --install, and this plugin runs from
+                post-merge, so throwing meant git pull died.
+
 0.019     2026-09-06 22:37:51+02:00 Europe/Stockholm
             * Add ScanCtags.
 

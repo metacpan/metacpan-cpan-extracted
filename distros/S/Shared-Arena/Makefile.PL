@@ -152,19 +152,41 @@ C
 if ($^O ne 'MSWin32') {
     # Run, not just linked: a header can name the clock on a kernel whose
     # syscall refuses it, and the fallback is silent only when the probe was
-    # honest about that.
-    my $coarse = <<'C';
+    # honest about that. clock_gettime itself lives in librt on a glibc older
+    # than 2.17, so a clock is tried bare and then with -lrt.
+    my $clock = sub {
+        my ($id) = @_;
+        return <<"C";
 #include <time.h>
 int main(void) {
-#ifdef CLOCK_REALTIME_COARSE
+#ifdef $id
     struct timespec ts;
-    return clock_gettime(CLOCK_REALTIME_COARSE, &ts) == 0 ? 0 : 1;
+    return clock_gettime($id, &ts) == 0 ? 0 : 1;
 #else
     return 1;
 #endif
 }
 C
-    if (probe('coarse', $coarse, '', 1)) {
+    };
+    my $rt = '';
+    # The interval clock, which the rate limiter stores in the arena: a wall
+    # clock stepped back on the host stopped a bucket refilling for the length
+    # of the step on a smoker. See sa_time.h.
+    if (probe('mono', $clock->('CLOCK_MONOTONIC'), '', 1)) {
+        $DEFINE .= ' -DSA_HAVE_MONOTONIC_CLOCK';
+        print "clock_gettime(CLOCK_MONOTONIC): yes, intervals read it.\n";
+    }
+    elsif (probe('monort', $clock->('CLOCK_MONOTONIC'), '-lrt', 1)) {
+        $rt = '-lrt';
+        $LIBS .= ' -lrt' unless $LIBS =~ /-lrt\b/;
+        $DEFINE .= ' -DSA_HAVE_MONOTONIC_CLOCK';
+        print "clock_gettime(CLOCK_MONOTONIC): needs -lrt (old glibc): "
+            . "linking it.\n";
+    }
+    else {
+        print "clock_gettime(CLOCK_MONOTONIC): no, gettimeofday.\n";
+    }
+    if (probe('coarse', $clock->('CLOCK_REALTIME_COARSE'), $rt, 1)) {
         $DEFINE .= ' -DSA_HAVE_COARSE_CLOCK';
         print "clock_gettime(CLOCK_REALTIME_COARSE): yes, deadlines read it.\n";
     }

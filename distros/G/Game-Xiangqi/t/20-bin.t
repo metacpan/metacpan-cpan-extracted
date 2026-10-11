@@ -3,6 +3,7 @@ use warnings;
 use Test::More;
 use lib 't/lib';
 
+use Game::Xiangqi::Bot;
 use Game::Xiangqi::Test::Handle;
 
 # REQUIRED, NOT SHELLED OUT. `bin/xiangqi` ends with `exit main(@ARGV) unless
@@ -46,9 +47,31 @@ subtest '--help is status 0 and carries the exit legend' => sub {
     like($r->{out}, qr/1\s+you lost/,           '  1 is a loss');
     like($r->{out}, qr/2\s+a bad option/,       '  2 is a bad option');
 
-    for my $opt (qw(--level --red --seat --seed --fen --moves --wxf --ascii --ansi --ucci)) {
+    for my $opt (qw(--level --red --seat --seed --fen --moves --wxf --ascii --ansi
+                    --pick --ucci)) {
         like($r->{out}, qr/\Q$opt\E/, "  and $opt is documented");
     }
+};
+
+subtest 'colour and the picker can both be turned OFF from the command line' => sub {
+    # 0.02 SHIPPED `ansi` WITHOUT THE BANG, so Getopt::Long took --ansi and refused
+    # --no-ansi, and the only way to reach the uncoloured board the Terminal has
+    # always been able to draw was to set NO_COLOR in the environment. An option
+    # that can only be turned on is half an option.
+    for my $off (qw(--no-ansi --noansi --no-pick --nopick)) {
+        my $r = run($off);
+        is($r->{status}, 0, "$off is taken");
+        is($r->{err}, '', "  and says nothing on stderr");
+    }
+
+    # AND OFF REALLY MEANS OFF, which the status alone does not show.
+    my $plain = run('--no-ansi');
+    unlike($plain->{out}, qr/\e\[/, '--no-ansi really drew no escapes');
+    my $lit = run('--ansi');
+    like($lit->{out}, qr/\e\[/, '  while --ansi drew them');
+
+    # --no-pick leaves the typed prompt, which is the one a pipe can answer.
+    like(run('--no-pick')->{out}, qr/a move is ICCS/, '--no-pick offers typing');
 };
 
 subtest 'a bad option is status 2, on stderr, and never status 0' => sub {
@@ -108,6 +131,26 @@ subtest '--level takes a rung index or a budget outright' => sub {
 
     my $neg = run('--level', '-1');
     is($neg->{status}, 2, 'a negative level is refused');
+
+    # THE DEAD ZONE BETWEEN THE TWO PUBLIC NUMBERS. The ladder has four rungs, so
+    # 0 to 3 are rungs and the smallest honest budget is the bottom rung's own; a
+    # number in between is neither, and 0.02 read it as a budget of four nodes
+    # without saying so. Clamping or guessing hides WHICH of the two numbers the
+    # caller got wrong, which is the trap Game::Durak shipped in its own --level.
+    my @ladder = @Game::Xiangqi::Bot::LADDER;
+    cmp_ok(scalar @ladder, '<', $ladder[0],
+           'there really is a gap between the last rung and the first budget');
+
+    for my $dead (scalar @ladder, $ladder[0] - 1) {
+        my $r = run('--level', $dead);
+        is($r->{status}, 2, "--level $dead is refused rather than guessed at");
+        like($r->{err}, qr/neither a rung nor a budget/, '  and said which it needs');
+        like($r->{err}, qr/\b0 to @{[ $#ladder ]}\b/, '  naming the rung range');
+        like($r->{err}, qr/\b$ladder[0] nodes or more\b/, '  and the budget floor');
+    }
+
+    is(run('--level', $#ladder)->{status}, 0, 'the last rung is still a rung');
+    is(run('--level', $ladder[0])->{status}, 0, 'and the floor is still a budget');
 };
 
 subtest '--ucci speaks the protocol and draws nothing' => sub {

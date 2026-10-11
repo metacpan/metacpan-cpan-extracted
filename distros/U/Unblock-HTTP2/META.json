@@ -60,23 +60,27 @@
    "provides" : {
       "Unblock::HTTP2" : {
          "file" : "lib/Unblock/HTTP2.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Unblock::HTTP2::Client" : {
          "file" : "lib/Unblock/HTTP2/Client.pm",
-         "version" : "0.10"
+         "version" : "0.11"
+      },
+      "Unblock::HTTP2::Integration" : {
+         "file" : "lib/Unblock/HTTP2/Integration.pm",
+         "version" : "0.11"
       },
       "Unblock::HTTP2::NativeABI" : {
          "file" : "lib/Unblock/HTTP2/NativeABI.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Unblock::HTTP2::Server" : {
          "file" : "lib/Unblock/HTTP2/Server.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Unblock::HTTP2::Transaction" : {
          "file" : "lib/Unblock/HTTP2/Transaction.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
@@ -91,6 +95,6 @@
          "web" : "https://github.com/haxmeister/perl-Unblock-HTTP2"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

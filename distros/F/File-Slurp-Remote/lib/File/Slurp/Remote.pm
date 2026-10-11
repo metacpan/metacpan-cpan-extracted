@@ -1,5 +1,4 @@
-
-use File::Slurp::Remote;
+package File::Slurp::Remote;
 
 use strict;
 use warnings;
@@ -13,7 +12,7 @@ use File::Temp qw(tempdir);
 our @ISA = qw(Exporter);
 our @EXPORT = (@File::Slurp::EXPORT, qw(write_remote_file read_remote_file));
 
-our $VERSION = 0.42;
+our $VERSION = 0.47;
 
 my $tmpdir = tempdir(CLEANUP => 1);
 
@@ -80,3 +79,7 @@ Copyright (C) 2011 Google Inc.
 This package may be used and redistributed under the terms of either
 the Artistic 2.0 or LGPL 2.1 license.
 
+=head1 SUPPORT
+
+Module now maintained by
+Nigel Horne, C<< <njh at nigelhorne.com> >>

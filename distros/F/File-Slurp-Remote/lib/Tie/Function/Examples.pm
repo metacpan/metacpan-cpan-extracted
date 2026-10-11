@@ -1,4 +1,3 @@
-
 package Tie::Function::Examples;
 
 @ISA = qw(Tie::StdHash Exporter);
@@ -10,7 +9,7 @@ use Carp;
 use strict;
 use warnings;
 
-our $VERSION = 0.44;
+our $VERSION = 0.47;
 
 use strict;
 

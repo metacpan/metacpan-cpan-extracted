@@ -7,7 +7,7 @@ use Getopt::Long;
 use Game::Reversi::Terminal;
 
 my %opt = (level => 3, variant => 'historic', colour => 'b', seed => 'reversi');
-GetOptions(\%opt, 'level=i', 'variant=s', 'colour=s', 'seed=s', 'ascii', 'help|h')
+GetOptions(\%opt, 'level=i', 'variant=s', 'colour=s', 'seed=s', 'ascii', 'pick!', 'help|h')
 	or usage(2);
 usage(0) if $opt{help};
 
@@ -18,16 +18,30 @@ my $terminal = eval {
 	Game::Reversi::Terminal->new(
 		level => $opt{level}, variant => $opt{variant},
 		colour => $opt{colour}, seed => $opt{seed},
-		ascii => $opt{ascii});
+		ascii => $opt{ascii},
+		(defined $opt{pick} ? (picking => $opt{pick} ? 1 : 0) : ()));
 };
 if (!$terminal) {
 	my $why = $@ || "could not start\n";
 	$why =~ s/ at \S+ line \d+\.?\n?\z//;
+	$why =~ s/\AGame::Reversi(?:::\w+)*: //;
+	chomp $why;
 	print STDERR "reversi: $why\n";
 	exit 2;
 }
 
-my $result = $terminal->start;
+for my $signal (qw/ INT TERM HUP /) {
+	$SIG{$signal} = sub {
+		$terminal->leave_raw;
+		$SIG{ $_[0] } = 'DEFAULT';
+		kill $_[0], $$;
+	};
+}
+
+my $result = eval { $terminal->start };
+my $died = $@;
+$terminal->leave_raw;
+die $died if $died;
 exit 0 unless $result;
 exit 0 if !defined $result->winner;
 exit 0 if $result->winner eq $opt{colour};
@@ -49,6 +63,15 @@ reversi - play Reversi in a terminal
   --colour   b to play dark and move first, w to play light. Default b.
   --seed     makes a game reproducible, and decides how the bot opens.
   --ascii    X and O on a plain grid, for a terminal without box characters.
+  --nopick   type the squares out instead of pointing at them.
+
+  On a terminal the arrow keys walk the squares marked *, which are the only
+  ones that play, and the line under the board says what the move would turn
+  and what the score would become. Enter plays it, t goes back to typing and
+  ? lists the keys. Needs Term::ReadKey; without it the squares are typed.
+
+  The square the last move went on is bracketed and the discs it turned are
+  drawn ringed, so both are visible with --ascii and with colour off.
 
   Exit status is 0 if you won or tied, 1 if you lost, 2 for a bad option.
 USAGE

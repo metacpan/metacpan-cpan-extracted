@@ -1,5 +1,8 @@
 Revision history for Frozen
 
+0.09    2026-10-11
+        - Builds on 5.10.0: HeUTF8 and mPUSHs are defined where perl lacks them.
+
 0.08    2026-09-16
         - a perl before 5.36 sets the public string flag when it stringifies
           a number, so a stringified 5 carries the flags of a numified "5"

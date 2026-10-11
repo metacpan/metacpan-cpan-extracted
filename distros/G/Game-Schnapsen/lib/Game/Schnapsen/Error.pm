@@ -5,7 +5,7 @@ use warnings;
 
 use Object::Proto::Sugar -types;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 my %MESSAGE = (
     bad_variant   => 'that is not a game this engine plays',
@@ -47,7 +47,7 @@ Game::Schnapsen::Error - what the rules refuse, as a code
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

@@ -2,6 +2,8 @@ use strict;
 use warnings FATAL => 'all';
 use 5.008;
 
+die "Windows not supported due to lack of non-blocking pipes\n" if $^O eq 'Win32';
+
 my %META = (
   name => 'Object-Remote',
   license => 'perl_5',

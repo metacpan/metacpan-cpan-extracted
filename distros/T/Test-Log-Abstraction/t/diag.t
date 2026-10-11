@@ -1,43 +1,20 @@
 use strict;
 use warnings;
 
+use lib 't/lib';
 use Test::Most;
 use Test::Log::Abstraction;
-use Test::Builder;
+use Capture qw(capture_diag);
 
 # prove -v exports TEST_VERBOSE=1, which would override every diag rule
 # under test here; these tests control verbosity explicitly.
 $ENV{'TEST_VERBOSE'} = 0;
 $ENV{'VERBOSE'} = 0;
 
-# Capture Test::Builder's failure output (where diag() writes) so we can
-# assert on what the logger prints without polluting this test's own TAP.
-my $tb = Test::Builder->new;
-my $captured = '';
-
-sub capture(&) {
-	my $code = shift;
-
-	$captured = '';
-	my $sink;
-	open($sink, '>', \$captured) or die "cannot capture: $!";
-	# failure_output($fh) returns the handle it just set, so fetch the
-	# original first, without an argument
-	my $original = $tb->failure_output;
-	$tb->failure_output($sink);
-	my $ok = eval { $code->(); 1 };
-	my $err = $@;
-	$tb->failure_output($original);
-	close($sink);
-	die $err if(!$ok);
-
-	return $captured;
-}
-
 # Default: warning and above print, below does not
 {
 	my $logger = Test::Log::Abstraction->new();
-	my $out = capture {
+	my $out = capture_diag {
 		$logger->debug('quiet debug');
 		$logger->info('quiet info');
 		$logger->notice('quiet notice');
@@ -56,21 +33,21 @@ sub capture(&) {
 # diag => 'none': nothing prints unless verbose
 {
 	my $logger = Test::Log::Abstraction->new(diag => 'none');
-	my $out = capture {
+	my $out = capture_diag {
 		$logger->error('silent error');
 		$logger->emergency('silent emergency');
 	};
 	is($out, '', "diag => 'none' prints nothing");
 
 	$logger->verbose(1);
-	$out = capture { $logger->error('now verbose') };
+	$out = capture_diag { $logger->error('now verbose') };
 	like($out, qr/now verbose/, 'verbose overrides the diag rule');
 }
 
 # diag => 'all': everything prints
 {
 	my $logger = Test::Log::Abstraction->new(diag => 'all');
-	my $out = capture {
+	my $out = capture_diag {
 		$logger->trace('all trace');
 		$logger->debug('all debug');
 		$logger->info('all info');
@@ -83,7 +60,7 @@ sub capture(&) {
 # diag => 'error': threshold - error and more severe print, warn does not
 {
 	my $logger = Test::Log::Abstraction->new(diag => 'error');
-	my $out = capture {
+	my $out = capture_diag {
 		$logger->warn('below threshold');
 		$logger->error('at threshold');
 		$logger->alert('above threshold');
@@ -96,7 +73,7 @@ sub capture(&) {
 # diag => [levels]: exactly those levels print
 {
 	my $logger = Test::Log::Abstraction->new(diag => [qw(info crit)]);
-	my $out = capture {
+	my $out = capture_diag {
 		$logger->info('wanted info');
 		$logger->warn('unwanted warn');
 		$logger->crit('wanted crit');

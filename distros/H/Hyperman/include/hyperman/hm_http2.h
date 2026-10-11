@@ -33,6 +33,11 @@ typedef struct hm_h2_stream {
     int      resp_status;    /* streaming: stashed until close        */
     SV      *resp_headers;   /* streaming: stashed headers arrayref   */
     int      awaiting;       /* parked on a Future                    */
+    SV      *resp_f;         /* that Future, held so a RST_STREAM can
+                              * cancel it the way an HTTP/1 close does */
+    size_t   hdr_bytes;      /* request header octets so far (bounded) */
+    unsigned char refused;   /* over the body ceiling: 413 sent, the
+                              * rest of the stream is dropped unread   */
     unsigned char producing; /* an open stream handle is feeding this:
                               * the end of resp_body is not the end of
                               * the body, so the provider defers       */
@@ -44,7 +49,16 @@ typedef struct hm_h2_sess {
     nghttp2_session *session;
     hm_conn         *conn;
     hm_h2_stream    *streams;   /* singly-linked, for cleanup */
+    int              in_recv;   /* inside nghttp2_session_mem_recv: no
+                                 * send, no close, no second recv until
+                                 * it returns (hm_h2_input)        */
 } hm_h2_sess;
+
+/* The request header block a stream may carry, in octets (name + value +
+ * RFC 9113's 32 per field), the bound SETTINGS_MAX_HEADER_LIST_SIZE
+ * advertises and the header callback enforces. HTTP/1.1 refuses a block
+ * over 64KB too (hm_readable), so the two transports agree. */
+#define HM_H2_MAX_HEADER_LIST 65536
 
 static int  hm_h2_flush_send(pTHX_ hm_h2_sess *s);
 static void hm_h2_respond(pTHX_ hm_h2_sess *s, hm_h2_stream *st, SV *resp);
@@ -92,8 +106,12 @@ static void hm_h2_env_init(pTHX_ hm_h2_sess *s, HV *env) {
      * sends for a streamed upload, having no Transfer-Encoding to use - can
      * be read to EOF safely. */
     hv_stores(env, "psgix.input.buffered", newSViv(1));
-    if (!loop->self_sv) loop->self_sv = hm_loop_to_sv(aTHX_ loop);
-    hv_stores(env, "psgix.loop",        SvREFCNT_inc(loop->self_sv));
+    hv_stores(env, "psgix.loop",        hm_loop_to_sv(aTHX_ loop));
+    /* HTTPS, SSL_PROTOCOL, SSL_CIPHER and the SSL_CLIENT_* set, exactly as
+     * the HTTP/1.1 builder reports them. ALPN h2 is the browser path, so an
+     * mTLS application that read SSL_CLIENT_S_DN over HTTP/1.1 lost the
+     * client's identity the moment a browser connected. */
+    if (s->conn->ssl) hm_tls_env(aTHX_ s->conn, env);
 }
 
 /* Request headers into $env. Takes the HV rather than a stream, because it
@@ -107,12 +125,13 @@ static void hm_h2_add_header(pTHX_ HV *env,
     if (nl && nm[0] == ':') {                       /* pseudo-headers */
         if (nl == 7 && memcmp(nm, ":method", 7) == 0)
             hv_stores(env, "REQUEST_METHOD", newSVpvn(vl, vlen));
-        else if (nl == 7 && memcmp(nm, ":scheme", 7) == 0)
-            hv_store(env, "psgi.url_scheme", 15, newSVpvn(vl, vlen), 0);
-        else if (nl == 10 && memcmp(nm, ":authority", 10) == 0) {
+        /* :scheme is the CLIENT'S claim. psgi.url_scheme already says what
+         * this connection is (hm_h2_env_init, from c->ssl), and an
+         * application deciding on https-ness must not be told "https" by a
+         * cleartext peer. Ignored, as :authority does not set SERVER_NAME:
+         * that is the listener's name, on HTTP/1.1 too. */
+        else if (nl == 10 && memcmp(nm, ":authority", 10) == 0)
             hv_stores(env, "HTTP_HOST",   newSVpvn(vl, vlen));
-            hv_stores(env, "SERVER_NAME", newSVpvn(vl, vlen));
-        }
         else if (nl == 9 && memcmp(nm, ":protocol", 9) == 0) {
             /* RFC 8441 / RFC 9220 Extended CONNECT: the only pseudo-header
              * that has no HTTP/1.1 counterpart. It is what distinguishes a
@@ -136,6 +155,12 @@ static void hm_h2_add_header(pTHX_ HV *env,
         hv_stores(env, "CONTENT_LENGTH", newSVpvn(vl, vlen));
     } else if (nl == 12 && hm_strncasecmp(nm, "content-type", 12) == 0) {
         hv_stores(env, "CONTENT_TYPE", newSVpvn(vl, vlen));
+    } else if (nl == 4 && hm_strncasecmp(nm, "host", 4) == 0
+               && hv_exists(env, "HTTP_HOST", 9)) {
+        /* :authority already named the host. A Host field beside it would
+         * be JOINED onto HTTP_HOST ("a, b"), which no application expects
+         * and which lets a client pick which of two names a vhost sees.
+         * RFC 9113 8.3.1: the authority is the one that counts. */
     } else if (nl + 5 < 300) {
         char keybuf[300];
         size_t i;
@@ -145,6 +170,8 @@ static void hm_h2_add_header(pTHX_ HV *env,
             unsigned char ch = (unsigned char)nm[i];
             if (ch >= 'a' && ch <= 'z') ch -= 32;
             else if (ch == '-') ch = '_';
+            else if (ch == '_') return;   /* aliases the hyphenated name;
+                                           * dropped as on HTTP/1.1 */
             keybuf[5 + i] = (char)ch;
         }
         {   /* common headers store through the process-lifetime shared key
@@ -276,18 +303,22 @@ static int hm_h2_hopbyhop(const char *n, size_t l) {
 static void hm_h2_submit_response(pTHX_ hm_h2_sess *s, hm_h2_stream *st,
                                   int status, AV *hav) {
     SSize_t hn = hav ? av_len(hav) + 1 : 0;
-    /* :status, every header pair, and one more slot for Alt-Svc. The
+    /* :status, every header pair, Date, and one more slot for Alt-Svc. The
      * count has to cover every nv this function can write - it is the
-     * bound on a heap array being filled by a loop. */
-    size_t maxnv = 2 + (size_t)(hn / 2);
+     * bound on a heap array being filled by a loop, and adding a header
+     * without widening it was once a heap overflow. */
+    size_t maxnv = 3 + (size_t)(hn / 2);
     nghttp2_nv *nva = (nghttp2_nv *)hm_xmalloc(maxnv * sizeof(nghttp2_nv));
     char **freelist = (char **)hm_xmalloc(maxnv * sizeof(char *));
     size_t nfree = 0, n = 0;
     char sbuf[8];
-    int sl;
+    int sl, has_date = 0;
     nghttp2_data_provider prd;
     SSize_t i;
 
+    /* A status outside three digits is the application's bug; it must not
+     * become an over-read of sbuf, which is exactly 8 bytes. */
+    if (status < 100 || status > 999) status = 500;
     sl = snprintf(sbuf, sizeof(sbuf), "%d", status);
     nva[n].name = (uint8_t *)":status"; nva[n].namelen = 7;
     nva[n].value = (uint8_t *)sbuf; nva[n].valuelen = (size_t)sl;
@@ -298,7 +329,7 @@ static void hm_h2_submit_response(pTHX_ hm_h2_sess *s, hm_h2_stream *st,
         SV **v = av_fetch(hav, i + 1, 0);
         STRLEN kl, vl; const char *ks, *vs;
         char *lname; STRLEN j;
-        if (!k || !v) continue;
+        if (!k || !*k || !v || !*v) continue;
         ks = SvPV(*k, kl); vs = SvPV(*v, vl);
         lname = (char *)hm_xmalloc(kl ? kl : 1);
         for (j = 0; j < kl; j++) {
@@ -306,10 +337,20 @@ static void hm_h2_submit_response(pTHX_ hm_h2_sess *s, hm_h2_stream *st,
             lname[j] = (ch >= 'A' && ch <= 'Z') ? (char)(ch + 32) : (char)ch;
         }
         if (hm_h2_hopbyhop(lname, kl)) { free(lname); continue; }
+        if (kl == 4 && memcmp(lname, "date", 4) == 0) has_date = 1;
         freelist[nfree++] = lname;
         nva[n].name = (uint8_t *)lname; nva[n].namelen = kl;
         nva[n].value = (uint8_t *)vs;   nva[n].valuelen = vl;
         nva[n].flags = NGHTTP2_NV_FLAG_NONE; n++;
+    }
+    if (!has_date) {
+        const char *dh = hm_date_header(s->conn->loop);
+        if (dh) {
+            nva[n].name = (uint8_t *)"date"; nva[n].namelen = 4;
+            nva[n].value = (uint8_t *)(dh + 6);        /* past "Date: " */
+            nva[n].valuelen = HM_DATE_LEN - 8;         /* ... and CRLF  */
+            nva[n].flags = NGHTTP2_NV_FLAG_NONE; n++;
+        }
     }
 
     /* Alt-Svc, the same advertisement the HTTP/1.1 path makes: an h2 client
@@ -325,8 +366,14 @@ static void hm_h2_submit_response(pTHX_ hm_h2_sess *s, hm_h2_stream *st,
     st->resp_off = 0;
     prd.source.ptr = st;
     prd.read_callback = hm_h2_data_read;
-    nghttp2_submit_response(s->session, st->id, nva, n, &prd);   /* copies nv */
-    s->conn->loop->bytes_out += st->blen;
+    if (nghttp2_submit_response(s->session, st->id, nva, n, &prd) != 0) {
+        /* refused (a closed stream, an invalid field): the client gets a
+         * reset rather than silence, and the bytes are not counted */
+        nghttp2_submit_rst_stream(s->session, NGHTTP2_FLAG_NONE, st->id,
+                                  NGHTTP2_INTERNAL_ERROR);
+    } else {
+        s->conn->loop->bytes_out += st->blen;
+    }
 
     for (n = 0; n < nfree; n++) free(freelist[n]);
     free(freelist);
@@ -486,9 +533,11 @@ static void hm_h2_deliver(pTHX_ int fd, UV gen, int32_t sid, SV *resp) {
     hm_h2_stream *st;
     if (!(c && c->id == gen && c->h2)) return;
     s = (hm_h2_sess *)c->h2;
+    if (!s->session) return;
     st = (hm_h2_stream *)nghttp2_session_get_stream_user_data(s->session, sid);
     if (!st) return;
     st->awaiting = 0;
+    if (st->resp_f) { SvREFCNT_dec(st->resp_f); st->resp_f = NULL; }
     hm_h2_respond(aTHX_ s, st, resp);
     if (hm_logging(loop) && st->env_rv)
         hm_access_log(aTHX_ loop, st->env_rv, st->status, (ssize_t)st->blen);
@@ -582,6 +631,7 @@ static void hm_h2_dispatch(pTHX_ hm_h2_sess *s, hm_h2_stream *st) {
                             sv_2mortal(newSViv(st->id)), (IV)c->fd, c->id);
         st->awaiting = 1;
         st->env_rv = SvREFCNT_inc(env_rv);
+        st->resp_f = SvREFCNT_inc(resp);     /* cancelled on RST_STREAM */
         hm_any_on_ready(aTHX_ resp, cb);
         SvREFCNT_dec(cb);
         SvREFCNT_dec(resp);
@@ -612,8 +662,19 @@ static ssize_t hm_h2_cb_send(nghttp2_session *ses, const uint8_t *data,
                              size_t length, int flags, void *ud) {
     dTHX;
     hm_h2_sess *s = (hm_h2_sess *)ud;
+    hm_conn *c = s->conn;
     (void)ses; (void)flags;
-    hm_wb_put(s->conn, (const char *)data, length);
+    /* Backpressure. nghttp2 keeps producing for as long as the peer's flow
+     * window allows, and a peer that opens its windows wide and then stops
+     * reading would have every file it asked for read into this buffer.
+     * Past the high-water mark the frame is left with nghttp2; the drain
+     * (hm_flush, backlogged) re-queues the connection and session_send
+     * picks it up where it stopped. */
+    if (c->wlen - c->woff > HM_WB_HIWAT) {
+        c->backlogged = 1;
+        return NGHTTP2_ERR_WOULDBLOCK;
+    }
+    hm_wb_put(c, (const char *)data, length);
     return (ssize_t)length;
 }
 
@@ -647,9 +708,17 @@ static int hm_h2_cb_header(nghttp2_session *ses, const nghttp2_frame *frame,
     (void)ud; (void)flags;
     st = (hm_h2_stream *)nghttp2_session_get_stream_user_data(
              ses, frame->hd.stream_id);
-    if (st && st->env)
+    if (st && st->env) {
+        /* HPACK expands: a 4KB dynamic-table entry costs one byte on the
+         * wire each time it is referenced, so the wire size bounds nothing.
+         * Count the decoded field block and reset the stream past the
+         * advertised ceiling, before it is joined into $env. */
+        st->hdr_bytes += namelen + valuelen + 32;
+        if (st->hdr_bytes > HM_H2_MAX_HEADER_LIST)
+            return NGHTTP2_ERR_TEMPORAL_CALLBACK_FAILURE;
         hm_h2_add_header(aTHX_ st->env, (const char *)name, namelen,
                          (const char *)value, valuelen);
+    }
     return 0;
 }
 
@@ -661,13 +730,36 @@ static int hm_h2_cb_data_chunk(nghttp2_session *ses, uint8_t flags,
     hm_h2_stream *st;
     (void)flags;
     st = (hm_h2_stream *)nghttp2_session_get_stream_user_data(ses, sid);
-    if (!st) return 0;
+    if (!st || st->refused) return 0;
     /* A stream handle with a read callback takes these bytes instead. An
      * Extended CONNECT stream has no end, so buffering it into psgi.input
      * would grow without bound and nothing would ever read it. */
     if (hm_stream_deliver(aTHX_ s->conn->fd, s->conn->id, (int64_t)sid,
                           (const char *)data, (STRLEN)len, 0))
         return 0;
+    /* max_body, the same ceiling HTTP/1.1 enforces on its read buffer.
+     * nghttp2 credits the flow window back on its own, so without this a
+     * client could stream a body for as long as it liked into psgi.input,
+     * on a hundred streams at once. */
+    if ((st->body ? SvCUR(st->body) : 0) + len > s->conn->loop->max_read) {
+        st->refused = 1;
+        if (st->body) { SvREFCNT_dec(st->body); st->body = NULL; }
+        if (st->env) {
+            /* not yet dispatched: answer 413 and never dispatch it */
+            SvREFCNT_dec((SV *)st->env);
+            st->env = NULL;
+            if (st->resp_body) SvREFCNT_dec(st->resp_body);
+            st->resp_body = newSVpvs("Payload Too Large");
+            st->blen = 17;
+            hm_h2_submit_status(aTHX_ s, st, 413, "text/plain");
+        } else {
+            /* already with the application (an Extended CONNECT stream
+             * nothing is reading): nothing to answer, so reset it */
+            nghttp2_submit_rst_stream(ses, NGHTTP2_FLAG_NONE, sid,
+                                      NGHTTP2_ENHANCE_YOUR_CALM);
+        }
+        return 0;
+    }
     if (!st->body) st->body = newSVpvn((const char *)data, len);
     else           sv_catpvn(st->body, (const char *)data, len);
     return 0;
@@ -711,7 +803,26 @@ static int hm_h2_cb_frame_recv(nghttp2_session *ses,
 
 static void hm_h2_stream_free(pTHX_ hm_h2_sess *s, hm_h2_stream *st) {
     hm_h2_stream **pp = &s->streams;
+    SV *pending = st->resp_f;
+    st->resp_f = NULL;
     while (*pp) { if (*pp == st) { *pp = st->next; break; } pp = &(*pp)->next; }
+    /* The stream went (RST_STREAM, or the connection) while its response
+     * was still being made: cancel the Future, as hm_close does for an
+     * HTTP/1 connection, so the work behind it can stop. Without this a
+     * client opening and resetting streams in a loop keeps unbounded work
+     * in flight whatever MAX_CONCURRENT_STREAMS says. The continuation it
+     * fires finds no stream under this id and returns. */
+    if (pending) {
+        if (st->awaiting) {
+            dSP;
+            ENTER; SAVETMPS; PUSHMARK(SP);
+            XPUSHs(pending);
+            PUTBACK;
+            call_method("cancel", G_DISCARD | G_EVAL);
+            FREETMPS; LEAVE;
+        }
+        SvREFCNT_dec(pending);
+    }
     if (st->env)          SvREFCNT_dec((SV *)st->env);
     if (st->env_rv)       SvREFCNT_dec(st->env_rv);
     if (st->body)         SvREFCNT_dec(st->body);
@@ -742,6 +853,12 @@ static int hm_h2_cb_stream_close(nghttp2_session *ses, int32_t sid,
 
 static int hm_h2_flush_send(pTHX_ hm_h2_sess *s) {
     hm_conn *c = s->conn;
+    /* Inside nghttp2_session_mem_recv (a callback dispatched the app, and
+     * the app answered): sending now would be re-entering nghttp2, and a
+     * write error would close the connection and free the session the
+     * library is still executing on. hm_h2_input flushes once mem_recv
+     * has returned. */
+    if (s->in_recv) return 0;
     if (nghttp2_session_send(s->session) != 0) {
         hm_close(aTHX_ c->loop, c);
         return -1;
@@ -777,7 +894,7 @@ static int hm_h2_new_session(pTHX_ hm_conn *c) {
 }
 
 static void hm_h2_submit_our_settings(hm_h2_sess *s) {
-    nghttp2_settings_entry iv[2];
+    nghttp2_settings_entry iv[3];
     iv[0].settings_id = NGHTTP2_SETTINGS_MAX_CONCURRENT_STREAMS;
     iv[0].value = 100;
     /* RFC 8441 Extended CONNECT. Without this a client will not attempt a
@@ -785,7 +902,10 @@ static void hm_h2_submit_our_settings(hm_h2_sess *s) {
      * there is no other way to say the server understands :protocol. */
     iv[1].settings_id = NGHTTP2_SETTINGS_ENABLE_CONNECT_PROTOCOL;
     iv[1].value = 1;
-    nghttp2_submit_settings(s->session, NGHTTP2_FLAG_NONE, iv, 2);
+    /* Advisory to the peer; hm_h2_cb_header is what enforces it. */
+    iv[2].settings_id = NGHTTP2_SETTINGS_MAX_HEADER_LIST_SIZE;
+    iv[2].value = HM_H2_MAX_HEADER_LIST;
+    nghttp2_submit_settings(s->session, NGHTTP2_FLAG_NONE, iv, 3);
 }
 
 static int hm_h2_start(pTHX_ hm_conn *c) {
@@ -841,8 +961,10 @@ static int hm_h2_start_upgrade(pTHX_ hm_conn *c, const char *settings,
     int n = hm_b64url_decode(settings, slen, sbuf, sizeof(sbuf));
     hm_h2_sess *s;
     hm_h2_stream *st;
-    if (n < 0) return -1;
-    if (hm_h2_new_session(aTHX_ c) < 0) return -1;
+    /* env is ours from here: on the early failures nothing else holds it,
+     * once it is on the stream the session's teardown frees it */
+    if (n < 0) { SvREFCNT_dec((SV *)env); return -1; }
+    if (hm_h2_new_session(aTHX_ c) < 0) { SvREFCNT_dec((SV *)env); return -1; }
     s = (hm_h2_sess *)c->h2;
     st = (hm_h2_stream *)hm_xcalloc(1, sizeof(hm_h2_stream));
     st->id = 1;
@@ -861,22 +983,49 @@ static void hm_h2_free(pTHX_ void *h2) {
     hm_h2_sess *s = (hm_h2_sess *)h2;
     if (!s) return;
     if (s->session) nghttp2_session_del(s->session);   /* fires stream_close */
+    s->session = NULL;
     while (s->streams) hm_h2_stream_free(aTHX_ s, s->streams);
     free(s);
 }
 
-/* Feed buffered bytes to the session, flush output, close if finished. */
+/* Feed buffered bytes to the session, flush output, close if finished.
+ *
+ * mem_recv dispatches the application from inside its callbacks, and an
+ * application that awaits pumps this loop, which can read more of this
+ * very connection. So, for the duration of the call: the connection is
+ * in_app (hm_close defers, hm_readable will not grow the buffer nghttp2
+ * is reading, and will not call back in here), the session is in_recv
+ * (hm_h2_flush_send does nothing), and bytes that arrive meanwhile are
+ * fed by the next turn of the loop below rather than by a second frame. */
 static void hm_h2_input(pTHX_ hm_conn *c) {
     hm_h2_sess *s = (hm_h2_sess *)c->h2;
-    ssize_t rv = nghttp2_session_mem_recv(s->session,
-                     (const uint8_t *)c->rbuf, c->rlen);
-    if (rv < 0) { hm_close(aTHX_ c->loop, c); return; }
-    if ((size_t)rv < c->rlen) memmove(c->rbuf, c->rbuf + rv, c->rlen - rv);
-    c->rlen -= (size_t)rv;
+    hm_loop *loop = c->loop;
+    int fd = c->fd;
+    if (s->in_recv) return;
+    while (c->rlen > 0) {
+        size_t before = c->rlen;
+        ssize_t rv;
+        s->in_recv++;
+        c->in_app = 1;
+        rv = nghttp2_session_mem_recv(s->session, (const uint8_t *)c->rbuf, before);
+        c->in_app = 0;
+        s->in_recv--;
+        if (loop->conns[fd] != c) return;        /* gone underneath */
+        if (c->close_deferred) {
+            c->close_deferred = 0;
+            hm_close(aTHX_ loop, c);
+            return;
+        }
+        hm_read_resume(loop, c);
+        if (rv < 0) { hm_close(aTHX_ loop, c); return; }
+        if ((size_t)rv < c->rlen) memmove(c->rbuf, c->rbuf + rv, c->rlen - rv);
+        c->rlen -= (size_t)rv;
+        if ((size_t)rv < before) break;          /* a partial frame remains */
+    }
     if (hm_h2_flush_send(aTHX_ s) < 0) return;
     if (!nghttp2_session_want_read(s->session)
         && !nghttp2_session_want_write(s->session))
-        hm_close(aTHX_ c->loop, c);
+        hm_close(aTHX_ loop, c);
 }
 
 /* On a new connection with http2 enabled: is this the h2 preface?

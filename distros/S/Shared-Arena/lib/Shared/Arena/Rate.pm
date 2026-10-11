@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 require Shared::Arena;
 
@@ -103,6 +103,9 @@ Signed rather than unsigned because two processes read the clock at slightly
 different moments, so a caller can find a timestamp in its key's slot that is
 LATER than its own reading. Measured unsigned, that one millisecond is forty
 nine days of refill, and the bucket comes back full.
+
+B<The clock is monotonic> where the build has one, so a step in the machine's
+wall clock neither refills a bucket nor stops it refilling.
 
 =head2 One limiter is one policy
 

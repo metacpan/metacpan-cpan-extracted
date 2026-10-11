@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Business::UDC::Tokenizer qw(tokenize);
-use Test::More 'tests' => 35;
+use Test::More 'tests' => 37;
 use Test::NoWarnings;
 use Unicode::UTF8 qw(decode_utf8);
 
@@ -123,9 +123,108 @@ is_deeply(
 			'pos' => 0,
 			'type' => 'AUX_GROUP',
 			'value' => '(47+57)',
+			'tokens' => [
+				{
+					'pos' => 1,
+					'type' => 'NUMBER',
+					'value' => '47',
+				},
+				{
+					'pos' => 3,
+					'type' => 'OP',
+					'value' => '+',
+				},
+				{
+					'pos' => 4,
+					'type' => 'NUMBER',
+					'value' => '57',
+				},
+			],
 		},
 	],
 	'Tokenize group ((47+57)).',
+);
+
+# Test.
+$ret_ar = tokenize('913((6-11)+(5-13)+(9-15))');
+is_deeply(
+	$ret_ar,
+	[
+		{
+			'pos' => 0,
+			'type' => 'NUMBER',
+			'value' => '913',
+		},
+		{
+			'pos' => 3,
+			'type' => 'AUX_GROUP',
+			'value' => '((6-11)+(5-13)+(9-15))',
+			'tokens' => [
+				{
+					'pos' => 4,
+					'type' => 'AUX_GROUP',
+					'value' => '(6-11)',
+					'tokens' => [
+						{
+							'pos' => 5,
+							'type' => 'NUMBER',
+							'value' => '6',
+						},
+						{
+							'pos' => 6,
+							'type' => 'FORM',
+							'value' => '-11',
+						},
+					],
+				},
+				{
+					'pos' => 10,
+					'type' => 'OP',
+					'value' => '+',
+				},
+				{
+					'pos' => 11,
+					'type' => 'AUX_GROUP',
+					'value' => '(5-13)',
+					'tokens' => [
+						{
+							'pos' => 12,
+							'type' => 'NUMBER',
+							'value' => '5',
+						},
+						{
+							'pos' => 13,
+							'type' => 'FORM',
+							'value' => '-13',
+						},
+					],
+				},
+				{
+					'pos' => 17,
+					'type' => 'OP',
+					'value' => '+',
+				},
+				{
+					'pos' => 18,
+					'type' => 'AUX_GROUP',
+					'value' => '(9-15)',
+					'tokens' => [
+						{
+							'pos' => 19,
+							'type' => 'NUMBER',
+							'value' => '9',
+						},
+						{
+							'pos' => 20,
+							'type' => 'FORM',
+							'value' => '-15',
+						},
+					],
+				},
+			],
+		},
+	],
+	'Tokenize nested parentheses in group (913((6-11)+(5-13)+(9-15))).',
 );
 
 # Test.
@@ -324,6 +423,28 @@ is_deeply(
 			'pos' => 23,
 			'type' => 'AUX_GROUP',
 			'value' => '(0:8-94)',
+			'tokens' => [
+				{
+					'pos' => 24,
+					'type' => 'NUMBER',
+					'value' => '0',
+				},
+				{
+					'pos' => 25,
+					'type' => 'OP',
+					'value' => ':',
+				},
+				{
+					'pos' => 26,
+					'type' => 'NUMBER',
+					'value' => '8',
+				},
+				{
+					'pos' => 27,
+					'type' => 'FORM',
+					'value' => '-94',
+				},
+			],
 		},
 	],
 	'Tokenize string with space on the end of name (92 Fučík,J. "1942/1943"(0:8-94)).',
@@ -348,6 +469,11 @@ is_deeply(
 			'pos' => 5,
 			'type' => 'AUX_GROUP',
 			'value' => '(075.8)',
+			'tokens' => [{
+				'pos' => 6,
+				'type' => 'NUMBER',
+				'value' => '075.8',
+			}],
 		},
 	],
 	'Tokenize string with space on the end of name (1 DM (075.8)).',
@@ -367,11 +493,25 @@ is_deeply(
 			'pos' => 6,
 			'type' => 'AUX_GROUP',
 			'value' => '(437.1 Kozel)',
+			'tokens' => [{
+				'pos' => 7,
+				'type' => 'NUMBER',
+				'value' => '437.1',
+			}, {
+				'pos' => 12,
+				'type' => 'ALPHA_SPEC',
+				'value' => ' Kozel',
+			}],
 		},
 		{
 			'pos' => 19,
 			'type' => 'AUX_GROUP',
 			'value' => '(083.85)',
+			'tokens' => [{
+				'pos' => 20,
+				'type' => 'NUMBER',
+				'value' => '083.85',
+			}],
 		},
 	],
 	'Tokenize string with name in group (728.82(437.1 Kozel)(083.85)).',
@@ -544,6 +684,11 @@ is_deeply(
 			'pos' => 7,
 			'type' => 'AUX_GROUP',
 			'value' => '(966.2)',
+			'tokens' => [{
+				'pos' => 8,
+				'type' => 'NUMBER',
+				'value' => '966.2',
+			}],
 		},
 		{
 			'pos' => 14,
@@ -555,7 +700,7 @@ is_deeply(
 );
 
 # Test.
-$ret_ar = tokenize("94(437.13 Jičín)''1939/1945''");
+	$ret_ar = tokenize(decode_utf8("94(437.13 Jičín)''1939/1945''"));
 is_deeply(
 	$ret_ar,
 	[
@@ -567,10 +712,19 @@ is_deeply(
 		{
 			'pos' => 2,
 			'type' => 'AUX_GROUP',
-			'value' => '(437.13 Jičín)',
+			'value' => decode_utf8('(437.13 Jičín)'),
+			'tokens' => [{
+				'pos' => 3,
+				'type' => 'NUMBER',
+				'value' => '437.13',
+			}, {
+				'pos' => 9,
+				'type' => 'ALPHA_SPEC',
+				'value' => decode_utf8(' Jičín'),
+			}],
 		},
 		{
-			'pos' => 18,
+			'pos' => 16,
 			'type' => 'AUX_TIME',
 			'value' => "''1939/1945''",
 		},
@@ -592,6 +746,11 @@ is_deeply(
 			'pos' => 5,
 			'type' => 'AUX_GROUP',
 			'value' => '(075.8)',
+			'tokens' => [{
+				'pos' => 6,
+				'type' => 'NUMBER',
+				'value' => '075.8',
+			}],
 		},
 	],
 	qq(Tokenize string with bad quotation marks ("17''(075.8)).),
@@ -609,6 +768,75 @@ is_deeply(
 		},
 	],
 	'Tokenize bad UDC string, which is ALPHA_SPEC only (populárně-naučné publikace).',
+);
+
+# Test.
+$ret_ar = tokenize(decode_utf8('323.22/.28(437):92 Thälmann, [E.]:321.64(049)'));
+is_deeply(
+	$ret_ar,
+	[
+		{
+			'pos' => 0,
+			'type' => 'NUMBER',
+			'value' => '323.22',
+		},
+		{
+			'pos' => 6,
+			'type' => 'OP',
+			'value' => '/',
+		},
+		{
+			'pos' => 7,
+			'type' => 'AUX_DOT',
+			'value' => '.28',
+		},
+		{
+			'pos' => 10,
+			'type' => 'AUX_GROUP',
+			'value' => '(437)',
+			'tokens' => [{
+				'pos' => 11,
+				'type' => 'NUMBER',
+				'value' => '437',
+			}],
+		},
+		{
+			'pos' => 15,
+			'type' => 'OP',
+			'value' => ':',
+		},
+		{
+			'pos' => 16,
+			'type' => 'NUMBER',
+			'value' => '92',
+		},
+		{
+			'pos' => 18,
+			'type' => 'ALPHA_SPEC',
+			'value' => decode_utf8(' Thälmann, [E.]'),
+		},
+		{
+			'pos' => 33,
+			'type' => 'OP',
+			'value' => ':',
+		},
+		{
+			'pos' => 34,
+			'type' => 'NUMBER',
+			'value' => '321.64',
+		},
+		{
+			'pos' => 40,
+			'type' => 'AUX_GROUP',
+			'value' => '(049)',
+			'tokens' => [{
+				'pos' => 41,
+				'type' => 'NUMBER',
+				'value' => '049',
+			}],
+		},
+	],
+	'Tokenize string with bracketed initials in name (323.22/.28(437):92 Thälmann, [E.]:321.64(049)).',
 );
 
 # Test.
@@ -630,6 +858,11 @@ is_deeply(
 			'pos' => 7,
 			'type' => 'AUX_GROUP',
 			'value' => '(123)',
+			'tokens' => [{
+				'pos' => 8,
+				'type' => 'NUMBER',
+				'value' => '123',
+			}],
 		},
 	],
 	"Tokenize string with whitespace (78.089 (123)).",
@@ -684,6 +917,11 @@ is_deeply(
 			'pos' => 22,
 			'type' => 'AUX_GROUP',
 			'value' => '(082)',
+			'tokens' => [{
+				'pos' => 23,
+				'type' => 'NUMBER',
+				'value' => '082',
+			}],
 		},
 	],
 	"Tokenize string with whitespace (677.062 +65.01] :687.1(082)).",
@@ -703,6 +941,15 @@ is_deeply(
 			'pos' => 2,
 			'type' => 'AUX_GROUP',
 			'value' => decode_utf8('(437.13 Jičín)'),
+			'tokens' => [{
+				'pos' => 3,
+				'type' => 'NUMBER',
+				'value' => '437.13',
+			}, {
+				'pos' => 9,
+				'type' => 'ALPHA_SPEC',
+				'value' => decode_utf8(' Jičín'),
+			}],
 		},
 		{
 			'pos' => 16,
@@ -732,6 +979,15 @@ is_deeply(
 			'pos' => 2,
 			'type' => 'AUX_GROUP',
 			'value' => decode_utf8('(437.13 Jičín)'),
+			'tokens' => [{
+				'pos' => 3,
+				'type' => 'NUMBER',
+				'value' => '437.13',
+			}, {
+				'pos' => 9,
+				'type' => 'ALPHA_SPEC',
+				'value' => decode_utf8(' Jičín'),
+			}],
 		},
 		{
 			'pos' => 16,

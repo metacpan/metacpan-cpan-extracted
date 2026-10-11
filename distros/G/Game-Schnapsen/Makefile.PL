@@ -11,6 +11,7 @@ my %WriteMakefileArgs = (
     LICENSE          => 'artistic_2',
     EXE_FILES        => [ 'bin/schnapsen' ],
     MIN_PERL_VERSION => '5.008003',
+    macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
     },
@@ -21,6 +22,16 @@ my %WriteMakefileArgs = (
         # Digest::SHA is core and is all the deal needs. Object::Proto::Sugar
         # is the house object system and is the one non-core prerequisite.
         'Object::Proto::Sugar' => '0.05',
+    },
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        prereqs => {
+            runtime => {
+                recommends => {
+                    'Term::ReadKey' => '0',
+                },
+            },
+        },
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Game-Schnapsen-*' },

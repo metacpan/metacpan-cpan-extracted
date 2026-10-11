@@ -11,11 +11,16 @@ use Game::Reversi::Bot;
 use Game::Reversi::Notation;
 use Game::Reversi::Opening;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 my %GLYPH = (
 	b => { wide => "\x{25CF}", ascii => 'X' },
 	w => { wide => "\x{25CB}", ascii => 'O' },
+);
+
+my %TURNED = (
+	b => { wide => "\x{25C9}", ascii => 'x' },
+	w => { wide => "\x{25CE}", ascii => 'o' },
 );
 my %NAME  = (b => 'dark', w => 'light');
 
@@ -27,7 +32,8 @@ my %LINE = (
 	           t => '+', b => '+', l => '+', r => '+', x => '+' },
 );
 
-my %INK = (b => "\e[1m", w => "\e[2m", '*' => "\e[33m", grid => "\e[2m");
+my %INK = (b => "\e[1m", w => "\e[2m", '*' => "\e[33m", grid => "\e[2m",
+           turned => "\e[1;32m", placed => "\e[1;36m", cursor => "\e[1;7m");
 my $OFF = "\e[0m";
 
 has in => (
@@ -76,6 +82,29 @@ has game => (
 	isa => Any
 );
 
+has last_move => (is => 'rw');
+
+has raw => (is => 'rw', default => 0);
+
+has keysource => (is => 'rw');
+
+has pending => (is => 'rw', default => sub { [] });
+
+has _picking => (is => 'rw', init_arg => 'picking', private => 1);
+
+our %SEQUENCE = (
+	'A' => 'up', 'B' => 'down', 'C' => 'right', 'D' => 'left',
+	'H' => 'home', 'F' => 'end',
+	'1~' => 'home', '4~' => 'end', '5~' => 'page_up', '6~' => 'page_down',
+	'7~' => 'home', '8~' => 'end',
+);
+
+our %CONTROL = (
+	"\r" => 'enter', "\n" => 'enter', "\t" => 'tab',
+	"\x7f" => 'backspace', "\x08" => 'backspace',
+	"\x03" => 'interrupt', "\x04" => 'eof',
+);
+
 has _wants_ansi => (
 	is       => 'rw',
 	init_arg => 'ansi',
@@ -94,6 +123,10 @@ sub BUILD {
 		unless $self->colour eq 'b' || $self->colour eq 'w';
 	die "Game::Reversi::Terminal: there is no variant '" . $self->variant . "'"
 		unless Game::Reversi::Opening->describes($self->variant);
+
+	die 'Game::Reversi::Terminal: there is no level ' . $self->level
+		unless grep { $_ == $self->level } Game::Reversi::Bot->levels;
+
 	return $self;
 }
 
@@ -124,6 +157,9 @@ sub _ask {
 	my $in = $self->in;
 	my $line = <$in>;
 	return undef unless defined $line;
+
+	print {$fh} "\n";
+
 	$line =~ s/\A\s+|\s+\z//g;
 	return lc $line;
 }
@@ -134,10 +170,12 @@ sub glyph {
 }
 
 sub board_text {
-	my ($self, $game, $colour) = @_;
+	my ($self, $game, $colour, %o) = @_;
 	my %legal = map { $_->square => 1 }
 	            @{ defined $colour ? $game->legal($colour) : [] };
+	my %flipped = map { $_ => 1 } @{ $o{flips} || [] };
 	my $line = $LINE{ $self->ascii ? 'ascii' : 'wide' };
+	my $kind = $self->ascii ? 'ascii' : 'wide';
 
 	my $files = '     ' . join '   ', 'a' .. 'h';
 	my $rule = sub {
@@ -153,9 +191,8 @@ sub board_text {
 		for my $col (0 .. 7) {
 			my $square = $row * 8 + $col;
 			my $cell = $game->board->[$square];
-			push @cells, ' ' . (defined $cell ? $self->_paint($self->glyph($cell), $cell)
-			           : $legal{$square} ? $self->_paint('*', '*')
-			           : ' ') . ' ';
+			push @cells, $self->_cell($square, $cell, $kind, \%legal,
+				\%flipped, %o);
 		}
 		my $bar = $self->_paint($line->{v}, 'grid');
 		push @lines, " $rank " . $bar . join($bar, @cells) . $bar . " $rank";
@@ -163,6 +200,41 @@ sub board_text {
 	}
 	push @lines, $rule->(@{$line}{qw/bl b br/}), $files;
 	return @lines;
+}
+
+sub since {
+	my ($self) = @_;
+	my $move = $self->last_move or return ();
+	return (last => $move->square, flips => $move->flips);
+}
+
+sub remember {
+	my ($self, $move) = @_;
+	$self->last_move(ref $move && $move->can('square') ? $move : undef);
+	return $self;
+}
+
+sub _cell {
+	my ($self, $square, $cell, $kind, $legal, $flipped, %o) = @_;
+
+	my $cursor = defined $o{cursor} && $o{cursor} == $square;
+	my $placed = defined $o{last} && $o{last} == $square;
+
+	if ($cursor) {
+		my $face = defined $cell ? $self->glyph($cell)
+			: $o{to_play} ? $GLYPH{ $o{to_play} }{$kind} : '*';
+		return $self->_paint('>' . $face . '<', 'cursor');
+	}
+
+	return $self->_paint('[' . $self->glyph($cell) . ']', 'placed')
+		if $placed && defined $cell;
+
+	return ' ' . $self->_paint($TURNED{$cell}{$kind}, 'turned') . ' '
+		if defined $cell && $flipped->{$square};
+
+	return ' ' . (defined $cell ? $self->_paint($self->glyph($cell), $cell)
+		: $legal->{$square} ? $self->_paint('*', '*')
+		: ' ') . ' ';
 }
 
 sub start {
@@ -191,7 +263,8 @@ sub start {
 		else {
 			my $move = $bot->choose($game, $turn);
 			last unless $move;
-			$game->play($turn, $move->square);
+			my $done = $game->play($turn, $move->square);
+			$self->remember($done);
 			$self->_say('', $NAME{$turn} . ' plays ' . $move->name
 				. ', turning ' . $move->turned
 				. ($move->turned == 1 ? ' disc' : ' discs'))
@@ -221,12 +294,196 @@ sub _intro {
 	return;
 }
 
+sub keys_available {
+	my ($self) = @_;
+	return 1 if $self->keysource;
+	return 0 unless eval { -t $self->in };
+	return eval { require Term::ReadKey; 1 } ? 1 : 0;
+}
+
+sub picking {
+	my ($self, @set) = @_;
+	$self->_picking($set[0] ? 1 : 0) if @set;
+	return 0 if $self->quiet;
+	return $self->_picking ? 1 : 0 if defined $self->_picking;
+	return $self->keys_available;
+}
+
+sub enter_raw {
+	my ($self) = @_;
+	return $self if $self->raw;
+	if ($self->keysource) { $self->raw(1); return $self }
+	return undef unless $self->keys_available;
+	return undef unless eval { Term::ReadKey::ReadMode(3, $self->in); 1 };
+	$self->raw(1);
+	return $self;
+}
+
+sub leave_raw {
+	my ($self) = @_;
+	return $self unless $self->raw;
+	eval { Term::ReadKey::ReadMode(0, $self->in) } unless $self->keysource;
+	$self->raw(0);
+	return $self;
+}
+
+sub read_char {
+	my ($self, $wait) = @_;
+	my $pending = $self->pending;
+	return shift @$pending if @$pending;
+	return $self->keysource->($wait) if $self->keysource;
+	my $char = Term::ReadKey::ReadKey($wait ? 0 : -1, $self->in);
+	return $char if defined $char || $wait;
+	select undef, undef, undef, 0.05;
+	return Term::ReadKey::ReadKey(-1, $self->in);
+}
+
+sub read_key {
+	my ($self) = @_;
+	my $char = $self->read_char(1);
+	return undef unless defined $char;
+	return $CONTROL{$char} if $CONTROL{$char};
+	return $self->read_sequence if $char eq "\e";
+	return $char;
+}
+
+sub read_sequence {
+	my ($self) = @_;
+	my $opener = $self->read_char(0);
+	return 'escape' unless defined $opener;
+	unless ($opener eq '[' || $opener eq 'O') {
+		unshift @{ $self->pending }, $opener;
+		return 'escape';
+	}
+	my $tail = '';
+	while (length $tail < 8) {
+		my $char = $self->read_char(0);
+		last unless defined $char;
+		$tail .= $char;
+		last if $char =~ /[A-Za-z~]/;
+	}
+	return $SEQUENCE{$tail} || 'escape';
+}
+
+sub interactive {
+	my ($self) = @_;
+	my $out = $self->out or return 0;
+	return (eval { -t $out }) ? 1 : 0;
+}
+
+sub clear {
+	my ($self) = @_;
+	return $self unless $self->interactive;
+	my $fh = $self->out;
+	print {$fh} "\e[2J\e[3J\e[H";
+	return $self;
+}
+
+sub square_line {
+	my ($self, $game, $me, $square) = @_;
+
+	my $name = Game::Reversi::Board->name_of($square);
+	my $trial = $game->clone;
+	my $move = $trial->play($me, $square);
+
+	return "$name: " . $move->message
+		if ref $move && $move->isa('Game::Reversi::Error');
+
+	return "$name: placed, turning nothing yet" if $move->phase eq 'place';
+
+	my $count = $trial->counts;
+	return sprintf '%s: turns %d %s, and you would be %d to %d',
+		$name, $move->turned, ($move->turned == 1 ? 'disc' : 'discs'),
+		$count->{$me}, $count->{ $me eq 'b' ? 'w' : 'b' };
+}
+
+sub pick_help {
+	return (
+		'arrows walk the squares marked *, which are the only ones that play.',
+		'the line under the board says what the move would turn.',
+		'enter plays it, t goes back to typing, q gives up.',
+	);
+}
+
+sub pick_square {
+	my ($self, $game, $me) = @_;
+
+	my @legal = sort { $a <=> $b } map { $_->square } @{ $game->legal($me) };
+	return $self->_typed_turn($game, $me) unless @legal;
+
+	my $at = 0;
+	if (my $last = $self->last_move) {
+		my ($near) = sort { abs($a - $last->square) <=> abs($b - $last->square) }
+			0 .. $#legal;
+		$at = $near if defined $near;
+	}
+
+	my @notice;
+
+	while (1) {
+		my $count = $game->counts;
+		$self->clear;
+		$self->_say('', $self->board_text($game, $me, $self->since,
+			cursor => $legal[$at], to_play => $me));
+		$self->_say('  discs: ' . $self->glyph(q{b}) . ' ' . $count->{b}
+			. '   ' . $self->glyph(q{w}) . ' ' . $count->{w});
+		$self->_say('  ' . $self->square_line($game, $me, $legal[$at]));
+		$self->_say('  ' . $_) for @notice;
+		@notice = ();
+		$self->_say('  ' . $self->_paint(
+			'arrows to choose, enter to play, ? for the keys', 'grid'));
+
+		my $key = $self->read_key;
+		return 1 if !defined $key || $key eq 'eof' || $key eq 'interrupt';
+
+		if ($key eq 'left' || $key eq 'up') { $at = ($at - 1) % @legal; next }
+		if ($key eq 'right' || $key eq 'down' || $key eq 'tab') {
+			$at = ($at + 1) % @legal;
+			next;
+		}
+		if ($key eq 'home') { $at = 0;        next }
+		if ($key eq 'end')  { $at = $#legal;  next }
+
+		if ($key eq 'enter' || $key eq ' ') {
+			my $played = $game->play($me, $legal[$at]);
+			if (ref $played && $played->isa('Game::Reversi::Error')) {
+				@notice = ($played->message . '.');
+				next;
+			}
+			$self->remember($played);
+			$self->_say('  you play ' . $played->name
+				. ($played->phase eq 'play'
+					? ', turning ' . $played->turned
+					  . ($played->turned == 1 ? ' disc' : ' discs')
+					: ''));
+			return 0;
+		}
+
+		if ($key eq 'q') { return 1 }
+		if ($key eq 't') { $self->picking(0); return $self->_typed_turn($game, $me) }
+		if ($key eq '?') { @notice = $self->pick_help; next }
+
+		@notice = ('that key does nothing here. ? for the ones that do');
+	}
+}
+
 sub _human_turn {
+	my ($self, $game, $me) = @_;
+
+	if ($self->picking) {
+		return $self->pick_square($game, $me) if $self->enter_raw;
+		$self->picking(0);
+	}
+
+	return $self->_typed_turn($game, $me);
+}
+
+sub _typed_turn {
 	my ($self, $game, $me) = @_;
 
 	while (1) {
 		my $count = $game->counts;
-		$self->_say('', $self->board_text($game, $me));
+		$self->_say("", $self->board_text($game, $me, $self->since));
 		$self->_say(
 			'  discs: ' . $self->glyph(q{b}) . ' ' . $count->{b} . '   '
 				. $self->glyph(q{w}) . ' ' . $count->{w},
@@ -255,6 +512,7 @@ sub _human_turn {
 		}
 
 		my $played = $game->play($me, $square);
+		$self->remember($played) unless ref $played && $played->isa("Game::Reversi::Error");
 		if (ref $played && $played->isa('Game::Reversi::Error')) {
 			$self->_say('  ' . $played->message . '.');
 			next;
@@ -329,13 +587,15 @@ sub _finish {
 
 __END__
 
+=encoding utf8
+
 =head1 NAME
 
 Game::Reversi::Terminal - a playable game on two filehandles
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 
@@ -406,6 +666,63 @@ Colour is off unless the output is a terminal, and off regardless if C<NO_COLOR>
 is set to anything non-empty. An explicit C<ansi> option overrides the terminal
 check but not C<NO_COLOR>, because somebody who set that meant it.
 
+=head2 Every option is validated in the constructor, including the level
+
+This distribution is the cautionary tale four of its siblings' POD cite: it
+validated its variant three calls deeper than the constructor and shipped a
+C<--variant draughts> that died with a raw Perl message and a useless exit
+status.
+
+That was fixed for the variant and B<left for the level>, which lived in
+L<Game::Reversi::Bot> and so was not checked until C<start> built one, outside
+F<bin/reversi>'s C<eval>. C<--level 9> died with a file and a line number at
+exit 25, one option along from the bug this dist is quoted for. Both are
+checked in C<BUILD> now, and F<t/20-terminal.t> asserts the level refusal
+carries no file and no line.
+
+=head2 What the last move did, in characters
+
+Every cell is three characters wide, which is a glyph and a character either
+side of it to spend. They are spent rather than left as padding: the square
+the last move was placed on is B<bracketed>, C<[●]>, and the discs it turned
+are drawn B<ringed>, C<◉> and C<◎>, against C<●> and C<○> for discs that were
+already there.
+
+B<That is not decoration in this game.> The flipped discs are the move. The
+narration said "turning 3 discs" and the board that followed said neither
+which disc was new nor which three had changed hands, so the one thing a
+Reversi player needs to see was the one thing not drawn.
+
+Both marks are characters, so they survive C<--ascii>, C<NO_COLOR> and a
+redirected handle. Colour is laid over them as a second telling, never as the
+only one.
+
+=head2 You point at the move you mean
+
+On a terminal with L<Term::ReadKey> installed the arrow keys walk a cursor
+over the board, return plays the square it is on, C<t> goes back to typing,
+C<?> lists the keys and C<q> gives up. Without L<Term::ReadKey>, off a
+terminal, or under C<--nopick>, the squares are typed as before.
+
+B<The cursor walks the starred squares and nothing else>, in reading order.
+That is the difference from L<Game::Go::Terminal>, where every point is a
+candidate and the cursor is free: measured over 2400 turns, Reversi offers
+between one and fifteen legal moves and eight or fewer on 71% of turns. They
+are already marked on the board, so a cursor crawling the other fifty squares
+would spend most of its time on squares that refuse.
+
+=head2 What the square under the cursor says
+
+One line, from the engine rather than from arithmetic here:
+
+    d3: turns 3 discs, and you would be 5 to 2
+
+The square is played on a B<clone> and the clone is asked, so nothing moves
+and the numbers are the ones the game will really produce. A clone is 0.003 ms,
+so the line is recomputed on every keystroke without anybody noticing, and
+F<t/20-terminal.t> checks both halves against a second game that plays the move
+for real.
+
 =head1 METHODS
 
 =head2 new
@@ -433,6 +750,54 @@ The options, as properties. C<colour> is the side the person is playing.
 =head2 glyph
 
 The disc a colour is drawn as, which C<ascii> decides.
+
+=head2 last_move, remember, since
+
+The move just played, the setter for it, and that move as the C<last> and
+C<flips> pair L</board_text> marks from.
+
+=head2 interactive, clear
+
+Whether C<out> is a terminal, and the screen clear the picker does before each
+frame. The board is nineteen lines, so a picker that scrolled one of them per
+keystroke would be unreadable.
+
+=head2 picking
+
+Whether a square is pointed at rather than typed. Settable, because a failed
+C<enter_raw> and the C<t> key turn it off for the rest of the game. Unset, it
+follows L</keys_available>.
+
+=head2 keys_available, enter_raw, leave_raw
+
+Whether there is anything to read keys with, and cbreak on and off. B<cbreak
+rather than raw>, so an interrupt stays an interrupt. F<bin/reversi> calls
+C<leave_raw> from a signal handler and after an C<eval> round the game, because
+a program that dies in cbreak leaves the shell with no echo.
+
+=head2 keysource, pending, raw
+
+A coderef returning ONE character in place of L<Term::ReadKey>, characters read
+and given back, and the cbreak state. C<keysource> is what lets F<t/20> drive
+the key loop with no terminal and no L<Term::ReadKey> installed; one character
+a call, because a source handing back C<"\e[C"> whole never becomes a right
+arrow.
+
+=head2 read_char, read_key, read_sequence
+
+One character, one keystroke as a name, and the tail of an escape sequence. A
+name is always longer than one character so it never collides with one, and an
+opener that turns out not to open a sequence goes back on L</pending>.
+
+=head2 pick_square, pick_help
+
+The cursor loop and its key list. C<pick_square> returns true to give up and
+false when a turn was taken, the same contract as the typed turn.
+
+=head2 square_line
+
+What playing a square would do, as the one line printed under the board. Played
+on a clone; the game is not touched.
 
 =head2 board_text
 

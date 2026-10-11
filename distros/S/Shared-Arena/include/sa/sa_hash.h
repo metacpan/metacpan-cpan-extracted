@@ -438,25 +438,10 @@ static int sa_hash_fetch(sa_hash *m, const char *key, uint32_t klen,
  * About ten milliseconds covers an ordinary preemption, which is all that was
  * ever wrong here, and still bounded because a process that died holding the
  * stripe must not wedge everybody after it. That refusal is SA_H_WBUSY, so a
- * caller that does want to insist can, and knows it is worth insisting. */
-#define SA_HW_ROUNDS    12
-#define SA_HW_STALL_US  50
-#define SA_HW_STALL_MAX 2000
-
+ * caller that does want to insist can, and knows it is worth insisting. The
+ * loop is sa_arena.h's sa_lock_wait_brief, the same one the lease takes. */
 static int sa_hash_wait(volatile unsigned char *locks, uint64_t h) {
-    int round;
-    uint32_t us = SA_HW_STALL_US;
-
-    if (sa_at_lock(locks, h)) return 1;
-    for (round = 0; round < SA_HW_ROUNDS; round++) {
-        sa_stall(us);
-        if (sa_at_trylock(locks, h)) return 1;
-        if (us < SA_HW_STALL_MAX) {
-            us *= 2;
-            if (us > SA_HW_STALL_MAX) us = SA_HW_STALL_MAX;
-        }
-    }
-    return 0;
+    return sa_lock_wait_brief(locks, h);
 }
 
 static int sa_hash_store_ttl(sa_hash *m, const char *key, uint32_t klen,

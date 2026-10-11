@@ -4,6 +4,8 @@ requires 'perl', '5.010';
 # and is all the deal needs.
 requires 'Object::Proto::Sugar', '0.05';
 
+recommends 'Term::ReadKey', '0';
+
 on test => sub {
     requires 'Test::More', '0';
 };

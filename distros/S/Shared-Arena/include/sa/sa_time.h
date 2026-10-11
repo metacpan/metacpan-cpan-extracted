@@ -16,18 +16,29 @@
  * A deadline says what was actually meant: wait this long, sleeping rather than
  * spinning, and give up when the time is gone however many turns that took.
  *
- * ---- gettimeofday, and not clock_gettime -----------------------------------
+ * ---- CLOCK_MONOTONIC where the build found one, gettimeofday where not ------
  *
- * clock_gettime is the better clock and it lives in librt on glibc before 2.17,
- * which means a probe, a link flag, and a build that fails on the one machine
- * that has neither. gettimeofday is in libc everywhere this builds and needs
- * none of that.
+ * clock_gettime lives in librt on glibc before 2.17, which means a probe, a
+ * link flag, and a build that fails on the one machine that has neither. So
+ * Makefile.PL probes for CLOCK_MONOTONIC by RUNNING it, bare and then with
+ * -lrt, and defines SA_HAVE_MONOTONIC_CLOCK when it answers. gettimeofday is in
+ * libc everywhere this builds and stays as the fallback.
  *
- * The price is that it is not monotonic: a clock stepped backwards during a
- * wait makes that wait longer. Every caller therefore keeps a generous
- * iteration backstop as well, so the worst a stepped clock can do is turn a
- * bounded wait into a differently bounded one. It cannot turn it into a hang,
- * which is the property rule 5 is actually about.
+ * The fallback is not monotonic: a clock stepped backwards during a wait makes
+ * that wait longer. Every caller therefore keeps a generous iteration backstop
+ * as well, so the worst a stepped clock can do is turn a bounded wait into a
+ * differently bounded one. It cannot turn it into a hang, which is the
+ * property rule 5 is actually about.
+ *
+ * It matters for more than a wait. The rate limiter STORES this clock's reading
+ * in the arena beside the tokens, so a step in the clock is a step in every
+ * bucket's clock at once. A Linux smoker's wall clock went back about 0.6s
+ * between a bucket being emptied and being read, and the bucket read as
+ * refilling nothing for 0.6s - correctly, by its own arithmetic, since no time
+ * had passed. A monotonic clock cannot be stepped. It is one clock for every
+ * process on the machine, and an arena is a shared-memory segment that does
+ * not outlive a boot, so a reading one process stores is on the clock the next
+ * one reads.
  */
 
 #ifdef _WIN32
@@ -39,24 +50,31 @@
 
 #include <stdint.h>
 
-/* Microseconds from some fixed point. Only differences are ever used. */
+/* Microseconds from some fixed point - boot, where the clock is monotonic.
+ * Only differences are ever used. */
 static uint64_t sa_now_us(void) {
 #ifdef _WIN32
     return (uint64_t)GetTickCount64() * 1000u;
 #else
     struct timeval tv;
+#  ifdef SA_HAVE_MONOTONIC_CLOCK
+    struct timespec ts;
+    if (clock_gettime(CLOCK_MONOTONIC, &ts) == 0)
+        return (uint64_t)ts.tv_sec * 1000000u + (uint64_t)(ts.tv_nsec / 1000);
+#  endif
     if (gettimeofday(&tv, NULL) != 0) return 0;
     return (uint64_t)tv.tv_sec * 1000000u + (uint64_t)tv.tv_usec;
 #endif
 }
 
 /* Milliseconds since the epoch. A WALL clock, deliberately, and a different
- * one from sa_now_us above: a deadline is set by one process and read by
- * another, and the only clock two processes certainly agree on is the one the
- * machine keeps. sa_now_us is a monotonic tick for measuring intervals within
- * a process; this is a shared timestamp for comparing deadlines across them.
- * A step in it moves every deadline together, which costs at worst one round of
- * early or late expiry - the cache and the map's TTL both rely on that. */
+ * one from sa_now_us above: a deadline is a moment, set by one process, read by
+ * another and shown to an operator, and the epoch is the one origin every
+ * reader of it agrees on. sa_now_us is a tick for measuring intervals; this is
+ * a timestamp for comparing deadlines. A step in it moves every deadline
+ * together, which costs at worst one round of early or late expiry - the cache
+ * and the map's TTL both accept that, and their tests measure their sleeps on
+ * this same clock because of it. */
 static uint64_t sa_now_ms(void) {
 #ifdef _WIN32
     FILETIME ft;

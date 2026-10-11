@@ -12,6 +12,11 @@ cs_select(double* sample, I32 n, U32 k) {
   U32 i, ir, j, l, mid;
   double a, tmp;
 
+  if (n <= 0)
+    return 0.;
+  if (k >= (U32)n)
+    k = (U32)(n - 1);
+
   l = 0;
   ir = n-1;
   while(1) {
@@ -56,7 +61,10 @@ cs_select(double* sample, I32 n, U32 k) {
 double
 cs_median(double* sample, I32 n)
 {
-  U32 k = n/2 - !(n & 1);
+  U32 k;
+  if (n <= 0)
+    return 0.;
+  k = n/2 - !(n & 1);
   return cs_select(sample, n, k);
 }
 
@@ -64,7 +72,12 @@ cs_median(double* sample, I32 n)
 double
 cs_first_quartile(double* sample, I32 n)
 {
-  U32 k = (U32)((n/4) + 1);
+  U32 k;
+  if (n <= 0)
+    return 0.;
+  k = (U32)(n / 4);
+  if (k >= (U32)n)
+    k = (U32)(n - 1);
   return cs_select(sample, n, k);
 }
 
@@ -72,7 +85,12 @@ cs_first_quartile(double* sample, I32 n)
 double
 cs_third_quartile(double* sample, I32 n)
 {
-  U32 k = (U32)((n*3/4) + 1);
+  U32 k;
+  if (n <= 0)
+    return 0.;
+  k = (U32)(n * 3 / 4);
+  if (k >= (U32)n)
+    k = (U32)(n - 1);
   return cs_select(sample, n, k);
 }
 

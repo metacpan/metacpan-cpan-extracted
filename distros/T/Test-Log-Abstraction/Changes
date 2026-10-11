@@ -1,5 +1,99 @@
 Revision history for Test-Log-Abstraction
 
+0.002.0	Sat Oct 10 09:04:27 PM EDT 2026
+	Level methods called with no arguments now match Log::Abstraction:
+		warn() and more serious levels store nothing; trace() to notice()
+		store an empty message
+	The minimum Perl is now 5.26, which Params::Validate::Strict needs; CI
+		now tests 5.26 and 5.30 as well
+	Added t/transition.t: every edge of the POD state diagram, and the
+		transitions it does not allow
+	Added t/transaction.t: the lifecycle end to end, and new, cloning, log
+		calls and assertions broken part way are all or nothing
+	Security: invalid level, diag and method names repeated in errors and
+		warnings are now escaped and cut to 200 characters, as validator
+		errors already were; a newline in one could forge a TAP line when
+		STDERR is merged into the TAP stream
+	Tests: a broken error-length cap no longer prints megabytes of failure
+		output (it looked like a hang under mutation testing)
+	Regex audit: the placeholder pattern no longer backtracks over leading
+		zeros (about 240 times faster on hostile templates); the location
+		patterns in error text are linear by construction rather than by
+		luck of the optimiser; the dense placeholder and lang patterns are
+		commented.  Added t/regex.t
+	Performance: like() and has_level() stop at the first match (about 48
+		times faster when it is near the start); unlike() builds its list of
+		matches only to explain a failure; plain values are rendered without
+		an eval; the level table is a locked hash instead of a tied Readonly
+		one.  A log call is about 20% faster.  Added t/performance.t
+	_template() searched the English tables twice for an English logger;
+		it now searches once (found by path analysis).  Added t/path.t: one
+		test per path through every routine
+	t/logic.t: complete truth tables for every compound condition (checked
+		both directly and through De Morgan's law), the logger invariant
+		checked before, during and after each operation, and contradictory
+		inputs shown to be refused before anything changes
+	Simplified the decisions in new(), _args(), _diag_rule(), _diags(),
+		count(), level() and AUTOLOAD: each test is made once, cheap tests
+		first, with no unreachable checks; behaviour is unchanged.  Added
+		t/logic.t, one proof per outcome of each decision
+	POD: the rule for which messages are printed is stated exactly
+	Fixed (found by t/domain.t): "invalid argument" explanations could
+		name a line inside this module; lang => 'AUTO' was rejected though
+		'auto' is case-insensitive; empty() did not validate its test name
+	POD: each method's API SPECIFICATION lists its valid and invalid input
+		domains and their boundaries
+	Fixed: a malformed UTF-8 message warned on Perl 5.36 and earlier
+	Tests: run child processes without a forking pipe open, use file names
+		Windows allows, and only test timeouts where they can fire, so the
+		suite runs on Windows
+	Fixed (found by t/data-flow.t): new() kept the caller's diag list and
+		i18n tables by reference, so changing them later changed the logger
+		and broke its clones; an undefined output handle warned.  Removed
+		dead stores and a redundant assignment in _object, level,
+		_resolve_lang, _plural and _format
+	Fixed (found by t/edge_cases.t): output that failed (ENOSPC, EIO) leaked
+		$! into the caller; an empty method name warned and was stored as
+		'undef'; an undefined PerlIO layer warned; "invalid argument" errors
+		showed the validator's internal file and line and repeated hostile
+		values in full - they are now one line of at most 200 characters
+	Added t/integration.t: end-to-end workflows, including parity with the
+		real Log::Abstraction, permission drops and upstream failures
+	POD: shows how to pass Object::Configure settings to new()
+	Fixed (found by t/unit.t): like(), unlike(), has_level(), count() and
+		new() cleared the caller's $@; flush() did not check its invocant
+	POD: documents that $@, $!, $_ and alarm() are left alone, and lists
+		every "must be called on an object" error
+	Fixed (found by t/function.t): a self-referential i18n template looped
+		forever; an object whose "" dies, or a tied hash that dies, made a
+		log call die; logging data nested over 100 deep warned; methods
+		called on undef, a plain reference or another class's object died
+		with Perl's own error; a bad pattern string gave Perl's regex error;
+		clones shared their fields with the original; $/ changed how the
+		trailing newline was removed; %c and %d mis-rendered non-numbers
+		and infinity; French plural rules were wrong for negative counts;
+		several hostile inputs warned instead of being handled
+	diag => 'ALL' and 'None' are accepted, as level names are
+	count() validates its argument
+	Fixed: French and German notices were printed as Latin-1, not UTF-8
+	Documentation rewritten in plain English, with COMMON PITFALLS,
+		ENCODING, FORMAL SPECIFICATION and STATE DIAGRAM sections
+	Fixed: a clone ignored a new diag option; an option called 'messages'
+		replaced the capture; a self-referential structure recursed forever;
+		Test::Log::Abstraction::new(%opts) took the first option as the class;
+		class-method calls died with "Can't use string as a HASH ref"
+	Fixed: logging no longer changes $@ or $!, and fields are copied at log
+		time, as in Log::Abstraction
+	Added level(), is_<level>(), flush() and lang(); level methods return
+		the logger; messages() returns a copy
+	Added failure diagnostics listing the captured messages
+	Added translatable messages (en, de, fr, zh) with lang, country and
+		i18n options, and %config defaults
+	Arguments are validated with Params::Validate::Strict; internals are
+		private (Sub::Private) or protected (Sub::Protected)
+	A lone array reference is a list of message parts and a trailing
+		newline is removed, as in Log::Abstraction
+
 0.001.0
 	First draft: test double for Log::Abstraction that captures messages
 	so tests can assert on them, replacing per-dist t/lib/MyLogger.pm

@@ -1,0 +1,178 @@
+package App::perlmv::scriptlet::with_number;
+
+use 5.010001;
+use strict;
+use warnings;
+
+use POSIX ();
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2026-08-05'; # DATE
+our $DIST = 'App-perlmv-scriptlet-with_number'; # DIST
+our $VERSION = '0.001'; # VERSION
+
+our $SCRIPTLET = {
+    summary => 'Rename filenames with number',
+    description => <<'MARKDOWN',
+
+
+MARKDOWN
+    args => {
+        digits => {
+            summary => 'Number of digits to use (1 means 1,2,3,..., 2 means 01,02,03,...); the default is to autodetect',
+            schema => 'posint*',
+            req => 1,
+        },
+        start => {
+            summary => 'Number to start from',
+            schema => 'float*',
+            default => 1,
+        },
+        inc => {
+            summary => 'Increment from one number to the next',
+            schema => 'float*',
+            default => 1,
+        },
+    },
+    code => sub {
+        package
+            App::perlmv::code;
+
+        use vars qw($ARGS $FILES $TESTING $i);
+
+        my $start  = $ARGS->{start} // 1;
+        my $inc = $ARGS->{inc} // 1;
+
+        my $auto_digits;
+        {
+            my $largest_number = $start + (@$FILES-1)*$inc;
+            $largest_number = 1 if $largest_number <= 0;
+            $auto_digits = POSIX::ceil(log($largest_number)/log(10));
+        }
+
+        $ARGS //= {};
+        my $digits = $ARGS->{digits} // $auto_digits;
+
+        $i //= 0;
+        $i++ unless $TESTING;
+
+        my $num  = $start + ($i-1)*$inc;
+        my $fnum = sprintf("%0${digits}d", $num);
+        $fnum;
+    },
+};
+
+1;
+
+# ABSTRACT: Rename filenames with number
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+App::perlmv::scriptlet::with_number - Rename filenames with number
+
+=head1 VERSION
+
+This document describes version 0.001 of App::perlmv::scriptlet::with_number (from Perl distribution App-perlmv-scriptlet-with_number), released on 2026-08-05.
+
+=head1 SYNOPSIS
+
+The default is sorted ascibetically:
+
+ % perlmv with-number foo bar.txt baz.mp3
+
+ 1.txt
+ 2.mp3
+ 3
+
+Don't sort (C<-T> perlmv option), use two digits:
+
+ % perlmv with-number -T -a digits=2 foo bar.txt baz.mp3
+
+ 01
+ 02.txt
+ 03.mp3
+
+=head1 DESCRIPTION
+
+=head1 prefix:SEE ALSO
+
+Other scriptlets: B<prefix-with-number>.
+
+=head1 SCRIPTLET ARGUMENTS
+
+Arguments can be passed using the C<-a> (C<--arg>) L<perlmv> option, e.g. C<< -a name=val >>.
+
+=head2 digits
+
+Required. Number of digits to use (1 means 1,2,3,..., 2 means 01,02,03,...); the default is to autodetect. 
+
+=head2 inc
+
+Increment from one number to the next. 
+
+=head2 start
+
+Number to start from. 
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-perlmv-scriptlet-with_number>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-perlmv-scriptlet-with_number>.
+
+=head1 SEE ALSO
+
+L<perlmv> (from L<App::perlmv>)
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords perlancar
+
+perlancar <perlancar@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-perlmv-scriptlet-with_number>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut
