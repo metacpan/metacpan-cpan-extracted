@@ -5,7 +5,7 @@ use feature 'say';
 use parent 'CPAN::MetaCurator::Database';
 use warnings qw(FATAL utf8); # Fatalize encoding glitches.
 
-our $VERSION = '1.29';
+our $VERSION = '1.33';
 
 # -----------------------------------------------
 
@@ -175,6 +175,10 @@ sub drop_all_tables
 1;
 
 =pod
+
+=head1 NAME
+
+CPAN::MetaCurator::Create - Manage the cpan.metacurator.sqlite database
 
 =head1 Machine-Readable Change Log
 

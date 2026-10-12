@@ -7,7 +7,8 @@ requires 'CGI::Lingua', '0.85';
 requires 'CHI';
 requires 'Carp';
 requires 'DBI';
-requires 'Database::Abstraction', '0.44';
+requires 'DB_File';   # Used in DataSource.pm for Berkeley DB magic-byte detection
+requires 'Database::Abstraction', '0.48';   # 0.48 added limit/offset support in selectall_arrayref
 requires 'Database::Join', '0.004.0';
 requires 'File::Path', '2.07';   # For remove_tree in Dashboard.pm at runtime
 requires 'File::Spec', '3.40';
@@ -15,8 +16,8 @@ requires 'File::Temp', '0.22';
 requires 'HTML::D3', '0.18';
 requires 'HTML::TableExtract';
 requires 'IPC::System::Simple';   # For autodie (:all) in DataSource.pm at runtime
-requires 'LWP::UserAgent';
-requires 'LWP::UserAgent::Cached';
+requires 'LWP::UserAgent';   # Needed for Test::Mojo HTTP testing; LWP::UserAgent::Cached is used by D::A url fetch path
+requires 'LWP::UserAgent::Cached';   # Used by Database::Abstraction for URL-backed tables (import_url)
 requires 'List::Util', '1.40';
 requires 'Mojo::Base';
 requires 'Mojo::JSON';
@@ -26,6 +27,7 @@ requires 'Net::SFTP::Foreign';
 requires 'Params::Get';
 requires 'Params::Validate::Strict', '0.39';
 requires 'Readonly';
+requires 'Scalar::Util';   # Used in DataSource.pm (blessed, looks_like_number)
 requires 'Socket', '2.010';
 requires 'Spreadsheet::ParseXLSX';
 requires 'Sub::Protected';

@@ -6,7 +6,7 @@ use strict;
 use Carp qw(croak cluck);
 use File::Spec;
 
-our $VERSION = '5.26.4';
+our $VERSION = '5.26.5';
 my $CREATED  = '2018-10-08';
 
 sub new {
@@ -375,18 +375,89 @@ sub del_table {
     return 1;
 }
 
+# Helper: Returns key validation closure according to table ID type and mode
+# 1. use_simple mode: validates only according to use_simple rules (no control chars, 1-255 bytes, non-empty, no fallback)
+# 2. ascii id_type: validates printable ASCII characters only (0x20 - 0x7E, 1-255 bytes)
+# 3. num id_type (default): validates positive numeric integers (> 0, or >= 0 for .aut)
+sub _get_key_validator {
+    my ( $self, $tid ) = @_;
+    my $adb = $self->{_adb};
+
+    my $table_info = $adb->table_info($tid);
+    my $is_simple  = $adb->config('simple') || ( $table_info && $table_info->{use_simple} );
+    my $id_type    = $table_info ? ( $table_info->{id_type} || 'num' ) : 'num';
+
+    if ($is_simple) {
+        # use_simple modu:
+        # Anahtar kontrolü SADECE use_simple şartlarına göre yapılır.
+        # Hatalı kayıt atlanır, fallback yapılmaz.
+        return sub {
+            my ( $k, $sfx ) = @_;
+            return 0 unless defined $k && length($k) > 0;
+            return 0 if length($k) > 255;
+            return 0 if $k =~ /[\x00-\x1f\x7f]/;
+            return 0 unless $k =~ /\S/;
+            return 1;
+        };
+    }
+    elsif ( $id_type eq 'ascii' ) {
+        # ascii id_type:
+        # ASCII'ye uygun olan kayıtları al, uygun olmayanları atla.
+        return sub {
+            my ( $k, $sfx ) = @_;
+            return 0 unless defined $k && length($k) > 0;
+            return 0 if length($k) > 255;
+            return 0 unless $k =~ /^[\x20-\x7e]+$/;
+            return 0 unless $k =~ /\S/;
+            return 1;
+        };
+    }
+    else {
+        # num id_type (veya varsayılan ilişkisel sayısal mod):
+        # ID no 'num' olmayan kayıtları atla.
+        # Kayıt ID'si kesinlikle pozitif tam sayı (> 0) olmalıdır.
+        # .aut dosyasında sayaç tabanı 0 olabileceğinden >= 0 kabul edilir.
+        return sub {
+            my ( $k, $sfx ) = @_;
+            return 0 unless defined $k && length($k) > 0;
+            return 0 unless $k =~ /^[0-9]+$/;
+            return 0 unless ( ( defined $sfx && $sfx eq 'aut' ) ? $k >= 0 : $k > 0 );
+            return 1;
+        };
+    }
+}
 
 sub dump {
-    my ( $self, %opts ) = @_;
+    my ( $self, @args ) = @_;
     my $adb = $self->{_adb} or return;
 
     require Archive::Tar;
     require Digest::SHA;
     require JSON::PP;
-    require File::Spec;
+    require MIME::Base64;
     require File::Path;
 
-    # 1. Determine target tables
+    my %opts;
+    if ( @args == 1 && ref( $args[0] ) eq 'HASH' ) {
+        %opts = %{ $args[0] };
+    }
+    elsif ( @args % 2 == 1 && !ref( $args[0] ) ) {
+        my $first = shift @args;
+        %opts = @args;
+        if ( defined $first && length $first ) {
+            if ( $first =~ /\.(?:amberdb|tar\.gz|tgz)$/i || $first =~ m{[/\\]} ) {
+                $opts{file} //= $first;
+            }
+            else {
+                $opts{table} //= $first;
+            }
+        }
+    }
+    else {
+        %opts = @args;
+    }
+
+    # 1. Determine target tables (all tables if not specified)
     my @tables;
     if ( $opts{tables} && ref( $opts{tables} ) eq 'ARRAY' ) {
         @tables = @{ $opts{tables} };
@@ -425,7 +496,7 @@ sub dump {
 
     my $manifest = {
         format          => "AmberDB Archive",
-        format_version  => 1,
+        format_version  => 2,
         amberdb_version => $AmberDB::VERSION || $VERSION,
         created_at      => "$date_iso " . sprintf( "%02d:%02d:%02d", (localtime)[2], (localtime)[1], (localtime)[0] ),
         dbase_dir       => $adb->path('dbase_dir'),
@@ -469,9 +540,21 @@ sub dump {
         }
     }
 
+    my $base_dir = $adb->path('dbase_dir') || ".";
+    $base_dir =~ s{\\}{/}g;
+    $base_dir =~ s{/$}{};
+
+    my $db_ext = $adb->{db_ext} || "db";
+    my %sfx_map = (
+        $db_ext => "dumpdb",
+        "del"   => "dumpdel",
+        "aut"   => "dumpaut",
+        "cnt"   => "dumpcnt",
+    );
+
     foreach my $tid (@tables) {
         my $tpath = $adb->table_path($tid);
-        my $db_file = "$tpath." . ( $adb->{db_ext} || "db" );
+        my $db_file = "$tpath.$db_ext";
         next unless -e $db_file;
 
         my $table_manifest = {
@@ -491,33 +574,38 @@ sub dump {
             $table_manifest->{schema} = "schema/$tid.table";
         }
 
-        # B. Count records from .db table safely
-        my $count = scalar( $adb->table_keys($tid) ) || 0;
-        $table_manifest->{records} = $count;
+        # Tablo ID tipine göre anahtar kontrolü (use_simple, ascii, num)
+        my $key_validator = $self->_get_key_validator($tid);
 
-        # C. Collect data files (.db, .del, .aut, .cnt)
-        # Suffixes that represent data, NOT derived indexes
-        my @suffixes = ( ( $adb->{db_ext} || "db" ), "del", "aut", "cnt" );
-        my $base_dir = $adb->path('dbase_dir') || ".";
-        $base_dir =~ s{\\}{/}g;
-        $base_dir =~ s{/$}{};
-
-        foreach my $sfx (@suffixes) {
+        # B. Export Data Files (.db, .del, .aut, .cnt) as Base64 text dump
+        foreach my $sfx ( keys %sfx_map ) {
             my $fpath = "$tpath.$sfx";
             if ( -e $fpath ) {
-                open my $dfh, "<:raw", $fpath or next;
-                local $/ = undef;
-                my $dcontent = <$dfh>;
-                close $dfh;
+                next unless $adb->table_read($fpath);
 
+                my $dcontent   = "";
+                my $valid_keys = 0;
+                $adb->recs_scan(
+                    $fpath,
+                    sub {
+                        my ( $k, $v ) = @_;
+                        return unless $key_validator->( $k, $sfx );
+                        my $b64 = MIME::Base64::encode_base64( $v, "" );
+                        $dcontent .= "$k\t$b64\n";
+                        $valid_keys++;
+                    }
+                );
+                $adb->table_close($fpath);
+
+                my $dump_sfx = $sfx_map{$sfx};
                 my $norm_fpath = $fpath;
                 $norm_fpath =~ s{\\}{/}g;
-                my $arch_path = $norm_fpath;
-                if ( $norm_fpath =~ m{^\Q$base_dir\E/(.+)$} ) {
-                    $arch_path = $1;
+                my $arch_path;
+                if ( $norm_fpath =~ m{^\Q$base_dir\E/(.+)\.\Q$sfx\E$} ) {
+                    $arch_path = "$1.$dump_sfx";
                 }
                 else {
-                    $arch_path = "table/$tid.$sfx";
+                    $arch_path = "table/$tid.$dump_sfx";
                 }
 
                 $tar->add_data( $arch_path, $dcontent );
@@ -525,34 +613,11 @@ sub dump {
 
                 my $sha256 = Digest::SHA::sha256_hex($dcontent);
                 $table_manifest->{sha256}->{$arch_path} = $sha256;
+
+                if ( $sfx eq $db_ext ) {
+                    $table_manifest->{records} = $valid_keys;
+                }
             }
-        }
-
-        # D. Collect Authoritative String Dictionary (.unq)
-        my @unq_files = -e "${tpath}.unq" ? ("${tpath}.unq") : ();
-        foreach my $fpath (@unq_files) {
-            next unless -e $fpath;
-            open my $dfh, "<:raw", $fpath or next;
-            local $/ = undef;
-            my $dcontent = <$dfh>;
-            close $dfh;
-
-            my $norm_fpath = $fpath;
-            $norm_fpath =~ s{\\}{/}g;
-            my $arch_path = $norm_fpath;
-            if ( $norm_fpath =~ m{^\Q$base_dir\E/(.+)$} ) {
-                $arch_path = $1;
-            }
-            else {
-                my ($fname) = $fpath =~ m{([^/\\]+)$};
-                $arch_path = "table/$fname";
-            }
-
-            $tar->add_data( $arch_path, $dcontent );
-            push @{ $table_manifest->{files} }, $arch_path;
-
-            my $sha256 = Digest::SHA::sha256_hex($dcontent);
-            $table_manifest->{sha256}->{$arch_path} = $sha256;
         }
 
         $manifest->{tables}->{$tid} = $table_manifest;
@@ -573,12 +638,25 @@ sub dump {
 }
 
 # Restores a .amberdb archive into target database, validates checksums,
-# and deterministically rebuilds all binary indexes via set_index.
+# writes data files via native DB_File, and deterministically rebuilds all indexes.
 # my $res = $tools->restore( file => 'backup.amberdb', [force => 1], [reindex => 1] );
 # ---------------------------------------------------------------------
 sub restore {
-    my ( $self, %opts ) = @_;
+    my ( $self, @args ) = @_;
     my $adb = $self->{_adb} or return;
+
+    my %opts;
+    if ( @args == 1 && ref( $args[0] ) eq 'HASH' ) {
+        %opts = %{ $args[0] };
+    }
+    elsif ( @args % 2 == 1 && !ref( $args[0] ) ) {
+        my $first = shift @args;
+        %opts = @args;
+        $opts{file} //= $first if defined $first && length $first;
+    }
+    else {
+        %opts = @args;
+    }
 
     my $file = $opts{file} or do {
         cluck "[DB_RESTORE] Missing required parameter 'file'.\n";
@@ -589,7 +667,7 @@ sub restore {
     require Archive::Tar;
     require Digest::SHA;
     require JSON::PP;
-    require File::Spec;
+    require MIME::Base64;
     require File::Path;
 
     my $tar = Archive::Tar->new();
@@ -619,11 +697,6 @@ sub restore {
 
     my $force = $opts{force} || $opts{overwrite};
     unless ($force) {
-        # Check if existing schema or data files exist.
-        # NOTE: Avoid calling table_path() here because it triggers
-        # table_info() -> dbase_info() which caches empty hashes for
-        # schemas that don't exist yet on the target, poisoning the
-        # cache for the rest of the restore operation.
         my $has_existing = 0;
         my $db_ext = $adb->{db_ext} || "db";
         foreach my $tid ( keys %{ $manifest->{tables} || {} } ) {
@@ -670,6 +743,13 @@ sub restore {
     $base_dir =~ s{\\}{/}g;
     $base_dir =~ s{/$}{};
 
+    my %restore_sfx_map = (
+        dumpdb  => ( $adb->{db_ext} || "db" ),
+        dumpdel => "del",
+        dumpaut => "aut",
+        dumpcnt => "cnt",
+    );
+
     foreach my $tid ( sort keys %{ $manifest->{tables} || {} } ) {
         next if ( %table_filter && !$table_filter{$tid} );
 
@@ -689,7 +769,11 @@ sub restore {
             }
         }
 
-        # B. Restore Data Files (.db, .del, .aut, .cnt)
+        # Clear cached schema so table_info reloads newly restored schema
+        delete $adb->{_table}->{$tid};
+        my $key_validator = $self->_get_key_validator($tid);
+
+        # B. Restore Data Files (.dumpdb, .dumpdel, .dumpaut, .dumpcnt or legacy .db)
         my $tpath = $adb->table_path($tid);
 
         foreach my $arch_path ( @{ $tinfo->{files} || [] } ) {
@@ -705,19 +789,60 @@ sub restore {
                 }
             }
 
-            # Native archive path: e.g. table/products.db or 2026/sales.db
-            my $target_file = "$base_dir/$arch_path";
+            if ( $arch_path =~ m{\.(dump(?:db|del|aut|cnt))$} ) {
+                my $dsfx = $1;
+                my $target_sfx = $restore_sfx_map{$dsfx} || ( $adb->{db_ext} || "db" );
 
-            if ( my ($tdir) = $target_file =~ m{^(.*)[/\\]} ) {
-                $adb->make_path($tdir);
+                my $target_file;
+                if ($tpath) {
+                    $target_file = "$tpath.$target_sfx";
+                }
+                else {
+                    my $rel_path = $arch_path;
+                    $rel_path =~ s{\.dump(?:db|del|aut|cnt)$}{.$target_sfx};
+                    $target_file = "$base_dir/$rel_path";
+                }
+
+                if ( my ($tdir) = $target_file =~ m{^(.*)[/\\]} ) {
+                    $adb->make_path($tdir);
+                }
+
+                if ( -e $target_file ) {
+                    $adb->table_close($target_file);
+                    unlink $target_file;
+                }
+
+                my $db_handle = $adb->table_write($target_file);
+                unless ($db_handle) {
+                    cluck "[DB_RESTORE] Cannot open target table $target_file for writing: $!\n";
+                    return;
+                }
+
+                for my $line ( split /\r?\n/, $dcontent ) {
+                    next unless length $line;
+                    my ( $k, $b64 ) = split /\t/, $line, 2;
+                    next unless defined $k;
+                    next unless $key_validator->( $k, $target_sfx );
+                    my $v = defined $b64 ? MIME::Base64::decode_base64($b64) : '';
+                    my $k_enc = $adb->utf_encode("$k");
+                    $db_handle->put( $k_enc, $v );
+                }
+                $adb->table_close($target_file);
             }
+            else {
+                # Legacy raw binary fallback
+                my $target_file = "$base_dir/$arch_path";
+                if ( my ($tdir) = $target_file =~ m{^(.*)[/\\]} ) {
+                    $adb->make_path($tdir);
+                }
 
-            open my $dfh, ">:raw", $target_file or do {
-                cluck "[DB_RESTORE] Cannot write data file $target_file: $!\n";
-                return;
-            };
-            print $dfh $dcontent;
-            close $dfh;
+                open my $dfh, ">:raw", $target_file or do {
+                    cluck "[DB_RESTORE] Cannot write data file $target_file: $!\n";
+                    return;
+                };
+                print $dfh $dcontent;
+                close $dfh;
+            }
         }
 
         push @restored_tables, $tid;
@@ -727,18 +852,27 @@ sub restore {
     my $reindex = defined $opts{reindex} ? $opts{reindex} : 1;
     if ($reindex) {
         foreach my $tid (@restored_tables) {
-            do { my $idx = $self->can('set_index') ? $self : do { require AmberDB::Tools::Index; AmberDB::Tools::Index->new($adb); }; $idx->set_index($tid); };
+            eval {
+                my $idx = $self->can('set_index') ? $self : do {
+                    require AmberDB::Tools::Index;
+                    AmberDB::Tools::Index->new($adb);
+                };
+                $idx->set_index($tid);
+            };
+            if ($@) {
+                cluck "[DB_RESTORE] Reindexing failed for table '$tid': $@\n";
+            }
         }
     }
 
     $self->{say} .= "Restored " . scalar(@restored_tables) . " tables from $file.\n";
 
     return {
-        ok             => 1,
-        file           => $file,
-        tables         => \@restored_tables,
-        manifest       => $manifest,
-        reindexed      => $reindex ? 1 : 0,
+        ok        => 1,
+        file      => $file,
+        tables    => \@restored_tables,
+        manifest  => $manifest,
+        reindexed => $reindex ? 1 : 0,
     };
 }
 

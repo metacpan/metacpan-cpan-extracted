@@ -11,8 +11,9 @@ use Game::Schnapsen::Bot ();
 use Game::Schnapsen::Card qw(rank_of suit_of points_of name_of id_of long_name_of);
 use Game::Schnapsen::Declare qw(marriages_in);
 use Game::Schnapsen::Variant ();
+use Getopt::Long ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our %FRAME = (
     plain => {
@@ -728,6 +729,118 @@ sub play {
     return $g;
 }
 
+sub _usage {
+    return <<'USAGE';
+schnapsen - Schnapsen and Sixty-Six at a prompt
+
+    schnapsen --variant schnapsen     the Austrian game, 20 cards, 7 down to 0
+    schnapsen --variant sixtysix      the German parent, 24 cards, 0 up to 7
+
+    --seat p2              play the bot as p2
+    --mode hotseat         two people at one keyboard
+    --mode watch           two bots, and you read
+    --level 1              a weaker opponent (1 or 2)
+    --seed tuesday         deal the same match every time
+    --ascii                letters instead of the suit pips
+    --nocolour             no colour (NO_COLOR does the same)
+    --nopick               type the cards out instead of pointing at them
+
+--variant has no default, because the two are different games and picking one
+silently would make the other an afterthought. They differ in thirteen places:
+the pack, the card that exchanges for the trump, whether a marriage may be
+declared late, what the last trick is worth, which way the score runs, and more.
+
+At the prompt, name a card to play it: KH, TH, or 10H for the same card. Then
+
+    m H       declare a marriage in hearts, and lead one of the two
+    x         exchange your lowest trump for the turn-up
+    c         close the talon
+    out       claim 66 and end the deal
+    d         draw (sixtysix, where you may close before drawing instead)
+    ?         what is legal right now
+
+Claiming is typed in full. A claim that turns out to be false loses the deal, and
+the screen already shows you your own count, so it is not put a keystroke away
+from anything else.
+
+On a terminal the left and right keys walk your own hand instead, and the line
+under it says what the card under the cursor would do to the trick: whether it
+takes it, what the trick is worth, and what that puts you on. Enter plays it.
+The moves that are not cards keep their own keys, x c m o d, because a card is
+a thing in your hand and those are not. t goes back to typing, ? lists the
+keys. Needs Term::ReadKey; without it the cards are typed.
+
+The card you drew at the end of the last trick is drawn in a heavier frame, so
+you can see what is new without counting the hand.
+
+Exit status is 0 if you won, or if nobody was playing a seat, 1 if you lost or
+stopped early, and 2 for an option the game will not take.
+USAGE
+}
+
+sub run {
+    my ($class, @argv) = @_;
+    my %o = (mode => 'bot', level => 2, seat => 'p1');
+
+    my $ok = eval {
+        local $SIG{__WARN__} = sub { print STDERR "schnapsen: $_[0]" };
+        Getopt::Long::GetOptionsFromArray(\@argv,
+            'variant=s' => \$o{variant},
+            'mode=s'    => \$o{mode},
+            'level=i'   => \$o{level},
+            'seat=s'    => \$o{seat},
+            'seed=s'    => \$o{seed},
+            'ascii'     => \$o{ascii},
+            'pick!'     => \$o{pick},
+            'colour!'   => \$o{colour},
+            'color!'    => \$o{colour},
+            'help'      => \$o{help},
+        );
+    };
+    if (!$ok) { print STDERR _usage(); return 2 }
+    if ($o{help}) { print _usage(); return 0 }
+    if (@argv) { print STDERR "schnapsen: not an option: $argv[0]\n", _usage(); return 2 }
+
+    my $levels = Game::Schnapsen::Bot->levels;
+    my $refused
+        = !(defined $o{variant} && $o{variant} =~ /\A(?:schnapsen|sixtysix)\z/)
+                                                   ? '--variant must be schnapsen or sixtysix'
+        : $o{mode} !~ /\A(?:bot|hotseat|watch)\z/ ? 'mode must be bot, hotseat or watch'
+        : $o{seat} !~ /\A p[12] \z/x              ? 'seat must be p1 or p2'
+        : !($o{level} =~ /\A\d+\z/ && $o{level} >= 1 && $o{level} <= $levels)
+                                                   ? "level must be 1 to $levels"
+        : undef;
+    if (defined $refused) { print STDERR "schnapsen: $refused\n", _usage(); return 2 }
+
+    my $seed = defined $o{seed} ? Digest::SHA::sha256($o{seed}) : undef;
+
+    my $ui = $class->new(
+        variant => $o{variant},
+        mode    => $o{mode},
+        level   => $o{level},
+        seat    => $o{seat},
+        ($o{ascii} ? (ascii => 1) : ()),
+        (defined $o{colour} ? (colour => $o{colour}) : ()),
+        (defined $o{pick} ? (picking => $o{pick} ? 1 : 0) : ()),
+    );
+
+    local @SIG{qw(INT TERM HUP)};
+    for my $sig (qw(INT TERM HUP)) {
+        $SIG{$sig} = sub { $ui->leave_raw; $SIG{$sig} = 'DEFAULT'; kill $sig, $$ };
+    }
+
+    my $game = eval { $ui->play(defined $seed ? (seed => $seed) : ()) };
+    my $died = $@;
+    $ui->leave_raw;
+    die $died if $died;
+
+    return 1 unless ref $game && $game->over;
+    return 0 if $o{mode} ne 'bot';
+    return 0 if ($game->winner // '') eq $o{seat};
+    return 1;
+}
+
+
 1;
 
 __END__
@@ -740,7 +853,7 @@ Game::Schnapsen::Terminal - the whole of the input and output
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 
@@ -865,6 +978,22 @@ without saying so. C<play> refuses instead.
 Runs a match to the end and returns the L<Game::Schnapsen>, or an error if it
 could not be built. Without a seed it makes one.
 
+=head2 run
+
+    exit Game::Schnapsen::Terminal->run(@ARGV);
+
+The whole command line program as a class method: parses the options
+F<bin/schnapsen> documents, builds the terminal, plays a match, and B<returns
+the exit status rather than calling C<exit>>: C<0> if your seat won or nobody at
+the keyboard was playing a seat, C<1> if you lost or stopped early, C<2> for a
+bad option, a leftover word, a missing C<--variant> or a refused value, with the
+reason and the usage on C<STDERR>. C<--help> prints the usage on C<STDOUT> and
+returns C<0>. Signal handlers are local to the call and the terminal is left in
+cooked mode on every way out, so a launcher such as L<Game::Terminal> can call it
+in its own process and carry on afterwards. Colour is off when C<NO_COLOR> is
+set, as it is off a terminal.
+
+
 =head2 game, out, in, mode, level, seat, variant, ascii, colour
 
 What it was built with. C<game> is set by C<play>.
@@ -882,6 +1011,10 @@ a string that already carries escape codes counts the escapes, so with colour
 on the labels lost their padding entirely and stopped lining up under the cards
 they name. Colour is on by default on a terminal, so that was the case every
 real player saw.
+
+=head2 rank_text
+
+The rank of a card as it is printed: C<10> for the ten, the letter for the rest.
 
 =head2 card_art, card_back, fan, pretty
 

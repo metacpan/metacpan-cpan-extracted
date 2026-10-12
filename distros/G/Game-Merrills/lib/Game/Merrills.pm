@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Carp ();
 use Object::Proto::Sugar -types;
@@ -16,7 +16,7 @@ use Game::Merrills::Rules;
 use Game::Merrills::Error;
 use Game::Merrills::Result;
 
-use constant NO_MILL_PLIES => 100;
+use constant NO_MILL_PLIES => 120;
 
 our $NO_MILL_LIMIT = NO_MILL_PLIES;
 
@@ -443,7 +443,7 @@ Game::Merrills - Nine Men's Morris as an engine
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
@@ -793,15 +793,17 @@ played on one, or taken back, leave the other alone.
 
 =head2 NO_MILL_PLIES
 
-100. The number of moves in a row, counting both sides, that may pass with no
+120. The number of moves in a row, counting both sides, that may pass with no
 mill closed before the game is drawn.
 
-The number was measured. Over 2,000 games between two players that take a
-mill when they can and block one when they must, with no limit at all, 99 in
-100 of the games that ended by themselves never went more than 61 moves
-without a mill, and none went more than 89. A limit of 100 would have cut
-short none of them. The measurement ships as F<xt/draw-measure.t>, which
-fails if this number is ever set below what it finds.
+The number was measured, twice. Over 2,000 games between two simple players
+that take a mill when they can and block one when they must, with no limit
+at all, none of the games that ended by themselves went more than 89 moves
+without a mill. This module's own bot is more patient: of 431 of its games
+that ended by themselves, six went more than 100 moves without a mill before
+somebody won, and one went more than 120. So 100 was too few and 120 is what
+ships. F<xt/draw-measure.t> holds the number above what the simple players
+need.
 
 =head1 PACKAGE VARIABLES
 

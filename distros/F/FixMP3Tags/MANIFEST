@@ -1,0 +1,21 @@
+.perlcriticrc
+.perltidyrc
+.pre-commit-config.yaml
+bin/fix-mp3-tags
+Changes
+CODEOWNERS
+CONTRIBUTING.md
+cpanfile
+lib/FixMP3Tags.pm
+lib/FixMP3Tags/Processor.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/00-basic.t
+t/01-processor.t
+t/02-user-patterns.t
+t/03-processing.t
+xt/author/kwalitee.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

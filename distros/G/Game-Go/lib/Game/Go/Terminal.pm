@@ -11,8 +11,9 @@ use Game::Go::Bot;
 use Game::Go::Rules;
 use Game::Go::Notation;
 use Game::Go::Scoring;
+use Getopt::Long ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our %STONE = (
 	wide => {
@@ -776,6 +777,100 @@ sub _finish {
 	return;
 }
 
+sub _usage {
+	return <<'USAGE';
+go - play Go against the bot
+
+  go [options]
+
+  --size N       9, 13 or 19            (default 9)
+  --level N      1 to 5                 (default 2)
+  --colour C     black or white         (default black)
+  --komi N       a multiple of 0.5      (default 6.5, or 0.5 with a handicap)
+  --handicap N   2 to 9 on 19x19, 2 to 5 on the smaller boards
+  --seed S       the seed the bot plays from
+  --ascii        X and O rather than stones
+  --no-pick      type the points out instead of pointing at them
+  --help
+
+Columns are A to T with I left out, and rows are numbered from the bottom, so
+the bottom left point is A1. Two passes STOP play; the game is not over until
+both players have agreed which stones are dead.
+
+On a terminal the arrow keys walk a cursor over the board and the point under
+it is bracketed, showing the stone you would play there. The line under the
+board says what that move would do: what it takes, how many liberties it
+would have, or why it cannot be played. Enter plays it, p passes, r resigns,
+t goes back to typing and ? lists the keys. Needs Term::ReadKey; without it,
+or off a terminal, the points are typed.
+
+The last move is a ringed stone and a point a capture has just emptied is an
+x, so both are visible with --ascii and with colour off.
+
+Exit status is 0 for a win, 1 for a loss, 2 for a bad option.
+USAGE
+}
+
+sub run {
+	my ($class, @argv) = @_;
+	my %opt = (
+		size     => 9,
+		level    => 2,
+		colour   => 'black',
+		handicap => 0,
+		seed     => 'terminal',
+	);
+
+	my $ok = eval {
+		local $SIG{__WARN__} = sub { print STDERR "go: $_[0]" };
+		Getopt::Long::GetOptionsFromArray(\@argv, \%opt,
+			'size=i', 'level=i', 'colour|color=s', 'komi=s',
+			'handicap=i', 'seed=s', 'ascii', 'pick!', 'help|h',
+		);
+	};
+	if (!$ok) { print STDERR _usage(); return 2 }
+	if ($opt{help}) { print _usage(); return 0 }
+	if (@argv) { print STDERR "go: not an option: $argv[0]\n", _usage(); return 2 }
+
+	my $terminal = eval {
+		$class->new(
+			in     => \*STDIN,
+			out    => \*STDOUT,
+			size   => $opt{size},
+			level  => $opt{level},
+			colour => $opt{colour},
+			(defined $opt{komi} ? (komi => $opt{komi}) : ()),
+			handicap => $opt{handicap},
+			seed     => $opt{seed},
+			ascii    => ($opt{ascii} ? 1 : 0),
+			(defined $opt{pick} ? (picking => $opt{pick} ? 1 : 0) : ()),
+		);
+	};
+	if (!$terminal) {
+		my $why = $@ || "could not start\n";
+		$why =~ s/\AGame::Go::Terminal: //;
+		print STDERR "go: $why";
+		return 2;
+	}
+
+	local @SIG{qw(INT TERM HUP)};
+	for my $sig (qw(INT TERM HUP)) {
+		$SIG{$sig} = sub { $terminal->leave_raw; $SIG{$sig} = 'DEFAULT'; kill $sig, $$ };
+	}
+
+	my $result = eval { $terminal->start };
+	my $died = $@;
+	$terminal->leave_raw;
+	die $died if $died;
+
+	my $game = $terminal->game;
+	return 0 unless defined $game->winner;
+
+	my $human = lc($opt{colour}) =~ /\Aw/ ? Game::Go::WHITE : Game::Go::BLACK;
+	return $game->winner == $human ? 0 : 1;
+}
+
+
 1;
 
 __END__
@@ -788,7 +883,7 @@ Game::Go::Terminal - a playable game on two filehandles
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 
@@ -925,6 +1020,21 @@ convention, and otherwise colour is used only when C<out> is a terminal.
 
 Plays the game and B<returns> the L<Game::Go::Result>. It never calls C<exit>: a
 module that exits cannot be tested in process.
+
+=head2 run
+
+	exit Game::Go::Terminal->run(@ARGV);
+
+The whole command line program as a class method: parses the options F<bin/go>
+documents, builds the terminal, plays, and B<returns the exit status rather than
+calling C<exit>>: C<0> for a win or a game with no winner, C<1> for a loss, C<2>
+for a bad option, a leftover word or a value the terminal refuses, with the
+reason and the usage on C<STDERR>. C<--help> prints the usage on C<STDOUT> and
+returns C<0>. Signal handlers are local to the call and the terminal is left in
+cooked mode on every way out, so a launcher such as L<Game::Terminal> can call it
+in its own process and carry on afterwards. Colour is off when C<NO_COLOR> is
+set, as it is off a terminal.
+
 
 =head2 board_text
 

@@ -34,14 +34,14 @@ File::Find::find(sub {
 
 # ---- THE PERL FLOOR, AND WHAT IS EVIDENCE FOR IT -----------------------------
 #
-# 5.010 is the SYNTACTIC floor and it is inherited from the siblings rather
-# than measured here.
+# 5.014 is the floor, and it is MEASURED: Object::Proto::Sugar does not install
+# below it (5.10.1 stops at Devel::CallParser, 5.12 at BEGIN::Lift).
 #
-#   tested:   perl 5.42.0, darwin-thread-multi-2level, 9 Oct 2026: the suite
-#             as it stands at phase 01
-#   inferred: 5.10 upwards, from the syntax alone
-#
-# The span between the floor and 5.42 IS INFERRED AND HAS NOT BEEN TESTED.
+#   tested:   the tarball built and tested from nothing in Docker, 9 Oct 2026,
+#             on perl 5.14.4, 5.20.3 (and a -DDEBUGGING build), 5.22.4, 5.26.3,
+#             5.30, 5.36 (plain, ithreads, a 32-bit IV build and a long double
+#             build), 5.40, 5.42 and 5.44, and on 5.42.0 darwin
+#   untested: Windows, and the BSDs
 #
 # ---- THE C FLOOR --------------------------------------------------------------
 #
@@ -98,7 +98,7 @@ my %WriteMakefileArgs = (
     VERSION_FROM     => 'lib/Game/RoyalUr.pm',
     ABSTRACT_FROM    => 'lib/Game/RoyalUr.pm',
     LICENSE          => 'artistic_2',
-    MIN_PERL_VERSION => '5.010',
+    MIN_PERL_VERSION => '5.014',
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
         'ExtUtils::Depends'   => '0.404',

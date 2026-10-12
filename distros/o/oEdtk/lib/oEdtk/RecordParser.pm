@@ -4,9 +4,9 @@ use strict;
 use warnings;
 use Data::Dumper;
 use Scalar::Util qw(blessed);
-our $VERSION		= 0.7006;
+our $VERSION		= 2.1109;
 
-# METTRE AU POINT PARAMÉTRAGE
+# FINE-TUNE PARAMETRIZATION
 my $_denormalized_record = "OPTION";
 # my $_denormalized_split_motif=; 
 
@@ -178,9 +178,9 @@ sub next {
 #				if ($line =~ /^$mute_record.(.*)/) {
 #					($id, $data) = ($self->{'mute_id'}, "   ".$1);
 #		
-#				} elsif ($line =~ /^$line_record.{$key_offset}(.{$key_size})(.*)$/) { 	# xxxxx evoluer ici pour prendre les clefs de record sur 2 car / 4 car voir plus + revoir longueur paramétrable des entêtes et des clefs 
-#					# on fixe l'identifiant du record et on passe le record, clef comprise : 
-#					#  le fields_offset est géré dans l'objet record
+#				} elsif ($line =~ /^$line_record.{$key_offset}(.{$key_size})(.*)$/) { 	# xxxxx to evolve here to take record keys on 2 chars / 4 chars or more + revisit the parametrizable length of headers and keys 
+#					# set the record identifier and pass the record, key included: 
+#					#  the fields_offset is handled in the record object
 #					$data = $1.$2;
 #					$id = $1;
 #					$id =~s/\s*//g;
@@ -195,7 +195,7 @@ sub next {
 		}
 	} while ($id ne $denormalized && !defined($records->{$id}));
 	# DENORMALIZED RECORD SHOULD BE AT THE END OF DATA STREAM
-	# A REVOIR
+	# TO REVIEW
 
 	if ($id eq $denormalized) {
 #		my @data = split(/(?:$denormalized_split_motif)+/, $data);

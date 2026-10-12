@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.55';
+our $VERSION = '0.57';
 
 1;
 
@@ -56,6 +56,21 @@ this serves. Anything that is not a regular file is a 404 too, unless it
 is a directory and L</index> or L</list> has given the mount something to
 do with one.
 
+A path with a segment that begins with a dot is a B<404> as well:
+F<.env>, F<.htaccess> and everything under F<.git> are where a directory
+keeps what it was never meant to publish, and a mount pointed at a
+project root would otherwise hand them out. F<.well-known> is the
+exception, since that directory exists to be served; dotfiles inside it
+are still refused. L</dotfiles> turns the rule off.
+
+Symbolic links are followed. A link inside the directory is served as
+whatever it points at, wherever that is, so the directory's contents are
+trusted the way the directory is.
+
+The C<ETag> is built from the file's modification time and size, with the
+time's nanoseconds as a third field where the filesystem records them, so
+a file rewritten in place to the same size gets a new one.
+
 =head2 Directories
 
 A directory is not a file, so on its own it is a 404. C<index> names a
@@ -77,7 +92,8 @@ listing is C<no-store>: it is stale the moment anything in the directory
 changes, and unlike one file's bytes there is no cheap validator for
 "what this directory holds". Filenames are escaped for both the link text
 and the C<href>, so a file called C<< <script>.txt >> is a link and not a
-script.
+script. The links work from both spellings of the directory's URL, and a
+name the mount would refuse to serve is not listed.
 
 C<index> is tried before C<list>: a directory holding an index file is
 that file's URL and nothing else. With neither option the directory is
@@ -186,6 +202,10 @@ directory index turns into a way out of the directory.
 Render a listing for a directory that has no index file. B<Off> unless
 asked for - what a directory holds is not usually something a site means
 to publish.
+
+=item dotfiles
+
+Serve, and list, names that begin with a dot. B<Off> unless asked for.
 
 =item dev
 

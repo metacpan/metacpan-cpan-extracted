@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="744" height="489" viewBox="0 0 744 489" role="img" aria-label="perl examples/widgets/bar-chart.pl">
+<title>perl examples/widgets/bar-chart.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="712" height="454" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="712" height="454" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="712" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="372" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/widgets/bar-chart.pl</text>
+<rect x="16.5" y="16.5" width="711" height="453" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="615" y="204" width="45" height="198" fill="#d95926"/>
+<rect x="462" y="240" width="45" height="162" fill="#d95926"/>
+<rect x="570" y="240" width="45" height="162" fill="#3987e5"/>
+<rect x="309" y="258" width="45" height="144" fill="#d95926"/>
+<rect x="156" y="276" width="45" height="126" fill="#d95926"/>
+<rect x="264" y="276" width="45" height="126" fill="#3987e5"/>
+<rect x="417" y="276" width="45" height="126" fill="#3987e5"/>
+<rect x="111" y="294" width="45" height="108" fill="#3987e5"/>
+<rect x="75" y="194" width="621" height="1" fill="#32323d"/>
+<rect x="570" y="229" width="45" height="11" fill="#3987e5"/>
+<rect x="462" y="236" width="45" height="4" fill="#d95926"/>
+<rect x="309" y="242" width="45" height="16" fill="#d95926"/>
+<rect x="264" y="263" width="45" height="13" fill="#3987e5"/>
+<rect x="75" y="266" width="45" height="1" fill="#32323d"/>
+<rect x="156" y="266" width="108" height="1" fill="#32323d"/>
+<rect x="354" y="266" width="63" height="1" fill="#32323d"/>
+<rect x="507" y="266" width="63" height="1" fill="#32323d"/>
+<rect x="660" y="266" width="36" height="1" fill="#32323d"/>
+<rect x="417" y="274" width="45" height="2" fill="#3987e5"/>
+<rect x="111" y="290" width="45" height="4" fill="#3987e5"/>
+<rect x="75" y="338" width="36" height="1" fill="#32323d"/>
+<rect x="201" y="338" width="63" height="1" fill="#32323d"/>
+<rect x="354" y="338" width="63" height="1" fill="#32323d"/>
+<rect x="507" y="338" width="63" height="1" fill="#32323d"/>
+<rect x="660" y="338" width="36" height="1" fill="#32323d"/>
+<rect x="111" y="402" width="45" height="9" fill="#3987e5"/>
+<rect x="156" y="402" width="45" height="9" fill="#d95926"/>
+<rect x="264" y="402" width="45" height="9" fill="#3987e5"/>
+<rect x="309" y="402" width="45" height="9" fill="#d95926"/>
+<rect x="417" y="402" width="45" height="9" fill="#3987e5"/>
+<rect x="462" y="402" width="45" height="9" fill="#d95926"/>
+<rect x="570" y="402" width="45" height="9" fill="#3987e5"/>
+<rect x="615" y="402" width="45" height="9" fill="#d95926"/>
+<rect x="75" y="410" width="36" height="1" fill="#5c5c64"/>
+<rect x="201" y="410" width="63" height="1" fill="#5c5c64"/>
+<rect x="354" y="410" width="63" height="1" fill="#5c5c64"/>
+<rect x="507" y="410" width="63" height="1" fill="#5c5c64"/>
+<rect x="660" y="410" width="36" height="1" fill="#5c5c64"/>
+</g>
+<g class="terminal">
+<text x="48" y="92" textLength="162" class="b" fill="#f3f3f4">Revenue by quarter</text>
+<text x="52.5" y="128" text-anchor="middle" fill="#3987e5">■</text>
+<text x="66" y="128" textLength="36" fill="#d0d0d3">2025</text>
+<text x="133.5" y="128" text-anchor="middle" fill="#d95926">■</text>
+<text x="147" y="128" textLength="36" fill="#d0d0d3">2026</text>
+<text x="48" y="164" textLength="99" fill="#96969c">million EUR</text>
+<text x="624" y="182" textLength="36" fill="#d0d0d3">72.2</text>
+<text x="48" y="200" textLength="18" fill="#96969c">75</text>
+<text x="471" y="218" textLength="144" fill="#d0d0d3">61.0        63.4</text>
+<text x="318" y="236" textLength="36" fill="#d0d0d3">58.3</text>
+<text x="165" y="254" textLength="144" fill="#d0d0d3">47.1        51.2</text>
+<text x="426" y="254" textLength="36" fill="#d0d0d3">48.0</text>
+<text x="48" y="272" textLength="18" fill="#96969c">50</text>
+<text x="120" y="272" textLength="36" fill="#d0d0d3">42.5</text>
+<text x="48" y="344" textLength="18" fill="#96969c">25</text>
+<text x="57" y="416" textLength="9" fill="#96969c">0</text>
+<text x="147" y="434" textLength="477" fill="#96969c">Q1               Q2               Q3               Q4</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

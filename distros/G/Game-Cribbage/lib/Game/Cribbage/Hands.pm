@@ -67,7 +67,7 @@ sub init {
 sub add_starter_card {
 	my ($self, $player, $card) = @_;
 	$self->starter($card);
-	
+
 	my $scored = 0;
 	if ($card->symbol =~ m/^J$/) {
 		$scored = Game::Cribbage::Play::Score->new(
@@ -95,7 +95,7 @@ sub find_player_card {
 			for (@{$self->$p->cards}) {
 				if ($_->match($card)) {
 					$card = $_;
-					$player = $p;			
+					$player = $p;
 					last;
 				}
 			}
@@ -140,7 +140,7 @@ sub play_card {
 
 sub cannot_play_a_card {
 	my ($self, $player) = @_;
-	
+
 	my $hand = ref $player ? $player->player : $player;
 	if ($self->play->next_to_play ne $hand) {
 		return Game::Cribbage::Error->new( message => 'It is not the turn of ' . $hand );
@@ -263,11 +263,11 @@ sub next_play {
 
 	$self->cannot_play({});
 	# now we know cards can't be played confirm we have cards left to Play another 'play'.
-	if (!$available_cards) { 
-		$game->end_hands(); 
+	if (!$available_cards) {
+		$game->end_hands();
 		return undef;
 	}
-	
+
 	my $scored;
 	if (!$self->play->scored->[-1] || !$self->play->scored->[-1]->go) {
 		$scored = $self->play->end_play();
@@ -335,7 +335,7 @@ Game::Cribbage::Hands - a single hands cycle within a round
 
 =head1 VERSION
 
-Version 0.15
+Version 0.17
 
 =cut
 

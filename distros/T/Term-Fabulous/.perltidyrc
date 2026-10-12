@@ -1,0 +1,38 @@
+# perltidy configuration for Term::Fabulous
+#
+# Tabs for indentation, long lines, perltidy's default spacing inside
+# parentheses and brackets. Run perltidy through tools/tidy:
+#
+#   perl tools/tidy lib/Term/Fabulous/Widget/Button.pm
+#   perl tools/tidy --check $(git ls-files '*.pm' '*.pl' '*.t')
+#
+# perltidy alone joins the opening brace of a class or role whose
+# attributes span several lines onto the last attribute line, and reads
+# "ADJUST :params (" as a label; tools/tidy works around both.
+
+# Line length and indentation: one tab per level, continuation lines one
+# more tab.
+--maximum-line-length=200
+--entab-leading-whitespace=4
+--indent-columns=4
+--continuation-indentation=4
+
+# Object::Pad attributes stay tight to their colon (:param, :reader, :isa).
+--nowant-right-space='A'
+
+# C-style for loops: "for ( my $i = 0; $i < $n; $i++ )".
+--nospace-for-semicolon
+
+# Long expressions break before operators ("= ...", "? ...", ". ...").
+--break-before-all-operators
+
+# Keep list line breaks the author chose.
+--break-at-old-comma-breakpoints
+
+# Do not align side comments, qw() lists or trailing if/unless/or/and
+# clauses across lines.
+--novalign-side-comments
+--valign-exclusion-list='q if unless or and'
+
+# Write files in UTF-8.
+--character-encoding=utf8

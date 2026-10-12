@@ -629,14 +629,16 @@ subtest 'DataSource.selectall_arrayref -- returns arrayref of hashrefs' => sub {
 # ---  GET /view error rendering  --------------------------------------------
 
 subtest 'GET /view/:table -- fetch_all error renders home with error_table_open' => sub {
-	# When the DataSource backend throws during fetch_all, the controller must
-	# catch the exception (inside its eval block) and re-render the home page
-	# with the error_table_open message rather than propagating a 500.
-	mock 'Database::BI::Model::DataSource::fetch_all' => sub {
+	# When the DataSource backend throws during selectall_arrayref (the paginated
+	# data fetch), the controller must catch the exception (inside its eval block)
+	# and re-render the home page with the error_table_open message rather than
+	# propagating a 500.  (The controller calls count() then selectall_arrayref()
+	# rather than fetch_all() since pagination was introduced.)
+	mock 'Database::BI::Model::DataSource::selectall_arrayref' => sub {
 		die "Simulated backend failure\n";
 	};
 	$t->get_ok("/view/$SALES_TABLE")
-	  ->status_is(200, 'renders 200 (home page) when fetch_all throws')
+	  ->status_is(200, 'renders 200 (home page) when selectall_arrayref throws')
 	  ->content_type_like(qr{text/html}, 'response is HTML')
 	  ->content_like(qr/Could not open table/i, 'error_table_open message present');
 	restore_all();
@@ -646,16 +648,18 @@ subtest 'GET /view/:table -- fetch_all error renders home with error_table_open'
 # ---  GET /open error rendering  --------------------------------------------
 
 subtest 'GET /open?path= -- fetch_all error renders home with error_file_open' => sub {
-	# open_file wraps open_table+fetch_all in eval; a DataSource throw must
-	# surface as error_file_open on the home page, not as a 500.
+	# open_file wraps open_table+count+selectall_arrayref in eval; a DataSource
+	# throw must surface as error_file_open on the home page, not as a 500.
+	# (The controller calls count() then selectall_arrayref() since pagination
+	# was introduced; fetch_all() is no longer called on this path.)
 	SKIP: {
 		skip 'data/sales.csv not found', 4 unless -f $SALES_CSV;
 		my $enc = url_escape($SALES_CSV);
-		mock 'Database::BI::Model::DataSource::fetch_all' => sub {
+		mock 'Database::BI::Model::DataSource::selectall_arrayref' => sub {
 			die "Simulated read error\n";
 		};
 		$t->get_ok("/open?path=$enc")
-		  ->status_is(200, 'renders 200 (home page) when fetch_all throws')
+		  ->status_is(200, 'renders 200 (home page) when selectall_arrayref throws')
 		  ->content_type_like(qr{text/html}, 'response is HTML')
 		  ->content_like(qr/Could not open/i, 'error_file_open message present');
 		restore_all();

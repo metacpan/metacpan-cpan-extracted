@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.55';
+our $VERSION = '0.57';
 
 1;
 
@@ -87,7 +87,10 @@ refreshes every time the session is written, so an active session does not
 expire out from under someone.
 
 =item * C<path> (default C</>), C<domain>, C<secure>, C<httponly> (default on),
-C<samesite> (default C<Lax>) - the cookie attributes.
+C<samesite> (default C<Lax>) - the cookie attributes. Left unset, C<secure>
+follows the request: the cookie is C<Secure> when it is set over https and
+not otherwise. C<< secure => 1 >> or C<< secure => 0 >> fixes it either way.
+None of them may contain a C<;> or a control character.
 
 =item * C<store> - keep the session server-side, with only an id in the cookie.
 See L</store>.
@@ -155,8 +158,15 @@ a per-user token or counter in your own table and check it in a guard.
 =head2 session_rotate
 
 Give the session a new id and delete the entry under the old one. Call it when
-privilege changes, which means a login. Without a store it is a no-op. See
-L<Punk::Context/session_rotate> for the fixation attack it prevents.
+privilege changes. L<< C<< $c->login >>|Punk::Auth/login >> calls it for you,
+so it is for an elevation that is not a login. Without a store it is a no-op.
+See L<Punk::Context/session_rotate> for the fixation attack it prevents.
+
+=head2 An empty session is not written
+
+A session that arrived with no cookie and was never given a key sets no
+cookie and writes no store entry, however many guards and csrf checks read
+it. A visitor gets a session when something is put in one.
 
 =head2 flash
 

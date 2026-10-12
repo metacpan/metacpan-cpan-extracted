@@ -1,0 +1,92 @@
+#!/usr/bin/env perl
+
+# Draws the example picture examples/images/translucent_circles.png: a
+# 16x16 picture of three overlapping translucent circles, red, green and
+# blue. Where circles overlap, their colors mix and the picture is less
+# transparent; around them it is fully transparent. Every pixel averages
+# SUBSAMPLES x SUBSAMPLES points, so the edges of the circles are smooth.
+# The circles are composited "over" each other in linear light, with
+# premultiplied alpha. Needs Imager with PNG support.
+#
+#     perl tools/translucent-circles                    # writes examples/images/translucent_circles.png
+#     perl tools/translucent-circles --output FILE.png
+#
+# See tools/README.md.
+#
+# Copyright (C) 2026 davenonymous.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the same terms as Perl itself.
+
+use v5.32;
+use warnings;
+use feature 'signatures';
+no warnings 'experimental::signatures';
+
+use FindBin;
+use Getopt::Long qw(GetOptions);
+use Imager;
+
+use constant SIZE       => 16;
+use constant SUBSAMPLES => 16;
+use constant RADIUS     => 5.2;
+use constant ALPHA      => 0.55;
+
+# Drawn in this order, each over the ones before: center x, center y, color.
+my @CIRCLES = ( [ 8, 5.6, [ 235, 40, 40 ] ], [ 5.4, 10.2, [ 40, 205, 70 ] ], [ 10.6, 10.2, [ 40, 90, 245 ] ] );
+
+sub to_linear ($channel) {
+	my $value = $channel / 255;
+	return $value <= 0.04045 ? $value / 12.92 : ( ( $value + 0.055 ) / 1.055 )**2.4;
+}
+
+sub to_srgb ($linear) {
+	my $value = $linear <= 0.0031308 ? 12.92 * $linear : 1.055 * $linear**( 1 / 2.4 ) - 0.055;
+	return int( 255 * $value + 0.5 );
+}
+
+# The premultiplied linear color and the alpha of one point:
+# [ red, green, blue, alpha ].
+sub point_color ( $x, $y, $circles ) {
+	my @point = ( 0, 0, 0, 0 );
+	foreach my $circle (@$circles) {
+		my ( $center_x, $center_y, $linear ) = @$circle;
+		next if ( $x - $center_x )**2 + ( $y - $center_y )**2 >= RADIUS**2;
+		@point = ( ( map { $linear->[$_] * ALPHA + $point[$_] * ( 1 - ALPHA ) } 0 .. 2 ), ALPHA + $point[3] * ( 1 - ALPHA ) );
+	}
+	return @point;
+}
+
+# The color of the pixel at ($x, $y), or undef where it is transparent.
+sub pixel_color ( $x, $y, $circles ) {
+	my @sum = ( 0, 0, 0, 0 );
+	foreach my $sub_y ( 0 .. SUBSAMPLES - 1 ) {
+		foreach my $sub_x ( 0 .. SUBSAMPLES - 1 ) {
+			my @point = point_color( $x + ( $sub_x + 0.5 ) / SUBSAMPLES, $y + ( $sub_y + 0.5 ) / SUBSAMPLES, $circles );
+			$sum[$_] += $point[$_] foreach 0 .. 3;
+		}
+	}
+	my $alpha   = $sum[3] / SUBSAMPLES**2;
+	my $opacity = int( 255 * $alpha + 0.5 );
+	return undef if $opacity == 0;
+	return [ ( map { to_srgb( $sum[$_] / $sum[3] ) } 0 .. 2 ), $opacity ];
+}
+
+sub translucent_circles () {
+	my @circles = map {
+		[ $_->[0], $_->[1], [ map { to_linear($_) } @{ $_->[2] } ] ]
+	} @CIRCLES;
+	my $image = Imager->new( xsize => SIZE, ysize => SIZE, channels => 4 );
+	foreach my $y ( 0 .. SIZE - 1 ) {
+		foreach my $x ( 0 .. SIZE - 1 ) {
+			my $color = pixel_color( $x, $y, \@circles ) // next;
+			$image->setpixel( x => $x, y => $y, color => $color );
+		}
+	}
+	return $image;
+}
+
+GetOptions( 'output=s' => \my $output ) or die "usage: tools/translucent-circles [--output FILE.png]\n";
+$output //= "$FindBin::Bin/../examples/images/translucent_circles.png";
+translucent_circles()->write( file => $output, type => 'png' ) or die "translucent-circles: cannot write $output: " . Imager->errstr . "\n";
+say "translucent-circles: wrote $output";

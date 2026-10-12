@@ -10,8 +10,10 @@ use Object::Proto::Sugar -types;
 use Game::Xiangqi;
 use Game::Xiangqi::Engine ':all';
 use Game::Xiangqi::Notation;
+use Game::Xiangqi::Bot;
+use Getopt::Long ();
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 my $N = 'Game::Xiangqi::Notation';
 
@@ -687,6 +689,121 @@ sub _ucci_go {
     return $N->iccs_of($mv);
 }
 
+sub _usage {
+    return <<'USAGE';
+xiangqi - Chinese chess on a terminal
+
+usage: xiangqi [options]
+
+  --level N      node budget for the bot, or a rung index into the ladder
+  --red SEAT     p1 or p2; whoever is Red moves first
+  --seat SEAT    which seat you play (default p1)
+  --seed STR     up to thirty-two bytes, for a reproducible game
+  --fen FEN      start from a position instead of the opening
+  --moves LIST   replay these ICCS moves first, comma or space separated
+  --wxf          show WXF notation beside the coordinates
+  --ascii        Latin letters instead of the characters
+  --ansi         colour; --no-ansi turns it off (NO_COLOR beats both)
+  --pick         choose a move with the arrow keys; --no-pick to type it
+  --ucci         speak UCCI on stdin and stdout, and draw nothing
+  --help         this
+
+exit status:
+  0   you won, or the game drew, or you quit
+  1   you lost
+  2   a bad option
+
+With a terminal and Term::ReadKey the arrow keys walk the pieces that have a
+move and then that piece's points, with the caption saying what each one does.
+Without either, or with --no-pick, a move is typed as ICCS: the from point then
+the to point, like h2e2, and "help" lists the rest.
+
+The engine is bounded in NODES and never in seconds, so the same position
+answers the same on a busy machine as on an idle one.
+USAGE
+}
+
+sub run {
+    my ($class, @argv) = @_;
+    my %opt = (seat => 'p1', red => 'p1');
+
+    my $ok = eval {
+        local $SIG{__WARN__} = sub { print STDERR "xiangqi: $_[0]" };
+        Getopt::Long::GetOptionsFromArray(\@argv, \%opt,
+            'level=i', 'red=s', 'seat=s', 'seed=s', 'fen=s', 'moves=s',
+            'wxf', 'ascii', 'ansi!', 'pick!', 'ucci', 'help');
+    };
+    if (!$ok) { print STDERR _usage(); return 2 }
+    if ($opt{help}) { print _usage(); return 0 }
+    if (@argv)      { print STDERR "xiangqi: not an option: $argv[0]\n", _usage(); return 2 }
+
+    for my $k (qw(red seat)) {
+        next if $opt{$k} eq 'p1' || $opt{$k} eq 'p2';
+        print STDERR "xiangqi: --$k takes p1 or p2, not '$opt{$k}'\n";
+        return 2;
+    }
+
+    my @ladder = @Game::Xiangqi::Bot::LADDER;
+    my $level;
+    if (defined $opt{level}) {
+        if ($opt{level} < 0) { print STDERR "xiangqi: --level must not be negative\n"; return 2 }
+        if ($opt{level} >= scalar @ladder && $opt{level} < $ladder[0]) {
+            printf STDERR
+                "xiangqi: --level %d is neither a rung nor a budget: a rung is 0 to %d, "
+                . "and a budget is %d nodes or more\n",
+                $opt{level}, $#ladder, $ladder[0];
+            return 2;
+        }
+        $level = $opt{level} < scalar @ladder ? $ladder[ $opt{level} ] : $opt{level};
+    }
+
+    my $terminal = $class->new(
+        ascii   => $opt{ascii},
+        wxf     => $opt{wxf},
+        colour  => defined $opt{ansi} ? $opt{ansi} : undef,
+        picking => $opt{pick},
+        level   => $level,
+        seat    => $opt{seat},
+    );
+
+    return $terminal->ucci if $opt{ucci};
+
+    my $seed = defined $opt{seed} ? $opt{seed} : 'xiangqi-terminal-default-seed32';
+    $seed = substr($seed . ('.' x 32), 0, 32);
+
+    my %new = (seed => $seed, red => $opt{red});
+    if (defined $opt{fen}) {
+        my ($pos, $err) = Game::Xiangqi::Engine->of_fen($opt{fen});
+        if (!$pos) { print STDERR "xiangqi: --fen refused, code $err\n"; return 2 }
+        $new{position} = $pos;
+    }
+
+    my $game = eval { Game::Xiangqi->new(%new) };
+    if (!$game) { print STDERR "xiangqi: could not start a game\n"; return 2 }
+
+    if (defined $opt{moves}) {
+        for my $mv (grep { length } split /[\s,]+/, $opt{moves}) {
+            my $refusal = $game->play($mv);
+            next unless $refusal;
+            print STDERR "xiangqi: --moves refused at '$mv': ", $refusal->code, "\n";
+            return 2;
+        }
+    }
+
+    $terminal->game($game);
+
+    local @SIG{qw(INT TERM HUP)};
+    for my $sig (qw(INT TERM HUP)) {
+        $SIG{$sig} = sub { $terminal->leave_raw; $SIG{$sig} = 'DEFAULT'; kill $sig, $$ };
+    }
+
+    my $status = eval { $terminal->start };
+    my $died = $@;
+    $terminal->leave_raw;
+    die $died if $died;
+    return $status;
+}
+
 1;
 
 __END__
@@ -857,6 +974,18 @@ The same, printed to C<out>. Returns the terminal.
 Plays a game against the bot on C<in> and C<out> until somebody quits or the game
 ends. B<Returns the exit status and never calls C<exit>>: C<0> if you won, drew or
 quit, C<1> if you lost, C<2> if a game could not be built.
+
+=head2 run
+
+    exit Game::Xiangqi::Terminal->run(@ARGV);
+
+The whole command line program as a class method: parses the options F<bin/xiangqi>
+documents, builds the game and the terminal, plays, and B<returns the exit status
+rather than calling C<exit>>: C<0> if you won, drew or quit, C<1> if you lost, C<2>
+for a bad option, with the usage on C<STDERR>. C<--help> prints the usage on
+C<STDOUT> and returns C<0>. Signal handlers are local to the call and the terminal
+is left in cooked mode on every way out, so a launcher such as L<Game::Terminal>
+can call it in its own process and carry on afterwards.
 
 =head2 board_lines, with the marks
 

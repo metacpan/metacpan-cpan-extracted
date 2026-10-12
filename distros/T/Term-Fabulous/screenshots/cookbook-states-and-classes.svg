@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="708" height="237" viewBox="0 0 708 237" role="img" aria-label="perl examples/cookbook/states-and-classes.pl">
+<title>perl examples/cookbook/states-and-classes.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="676" height="202" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="676" height="202" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="676" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="354" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/cookbook/states-and-classes.pl</text>
+<rect x="16.5" y="16.5" width="675" height="201" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="30" y="60" width="180" height="18" fill="#1e2332"/>
+<rect x="30" y="78" width="180" height="18" fill="#3c5a8c"/>
+<rect x="30" y="96" width="180" height="18" fill="#1e2332"/>
+</g>
+<g class="terminal">
+<text x="39" y="74" textLength="36" fill="#e6e6e6">Open</text>
+<text x="39" y="92" textLength="36" fill="#e6e6e6">Save</text>
+<text x="39" y="110" textLength="36" fill="#e6e6e6">Quit</text>
+<text x="30" y="128" textLength="585" fill="#d4d8e0">open  states: focused            classes: menu-item state_focused</text>
+<text x="30" y="146" textLength="594" fill="#d4d8e0">save  states: selected           classes: menu-item state_selected</text>
+<text x="30" y="164" textLength="522" fill="#d4d8e0">quit  states:                    classes: danger menu-item</text>
+<text x="30" y="182" textLength="297" fill="#d4d8e0">Save selected: 1, Open focused: 1</text>
+<text x="30" y="200" textLength="225" fill="#d4d8e0">add_state('focused') dies</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

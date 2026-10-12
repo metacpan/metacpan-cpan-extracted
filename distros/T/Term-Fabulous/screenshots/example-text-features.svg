@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="471" viewBox="0 0 780 471" role="img" aria-label="perl examples/text-features.pl">
+<title>perl examples/text-features.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="748" height="436" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="748" height="436" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="748" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="390" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/text-features.pl</text>
+<rect x="16.5" y="16.5" width="747" height="435" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="192" y="78" width="216" height="72" fill="#232a3c"/>
+<rect x="426" y="78" width="234" height="54" fill="#232a3c"/>
+<rect x="192" y="168" width="99" height="72" fill="#232a3c"/>
+<rect x="192" y="294" width="63" height="72" fill="#232a3c"/>
+<rect x="192" y="384" width="270" height="18" fill="#232a3c"/>
+</g>
+<g class="terminal">
+<text x="48" y="92" textLength="81" fill="#96a0b4">wrap_mode</text>
+<text x="192" y="92" textLength="423" fill="#e6e6e6">words: breaks at spaces   newlines: breaks only</text>
+<text x="192" y="110" textLength="414" fill="#e6e6e6">where a line does not     at newlines; the box</text>
+<text x="192" y="128" textLength="468" fill="#e6e6e6">fit,                      grows to the longest line.</text>
+<text x="192" y="146" textLength="144" fill="#e6e6e6">and at newlines.</text>
+<text x="48" y="182" textLength="117" fill="#96a0b4">line_height 2</text>
+<text x="192" y="182" textLength="90" fill="#e6e6e6">First line</text>
+<text x="192" y="218" textLength="99" fill="#e6e6e6">Second line</text>
+<text x="48" y="272" textLength="54" fill="#96a0b4">styles</text>
+<text x="192" y="272" textLength="45" fill="#e6e6e6">plain</text>
+<text x="255" y="272" textLength="36" class="b" fill="#e6e6e6">bold</text>
+<text x="309" y="272" textLength="54" class="i" fill="#e6e6e6">italic</text>
+<text x="381" y="272" textLength="81" fill="#e6e6e6">underline</text>
+<text x="480" y="272" textLength="81" class="b i" fill="#e6e6e6">all three</text>
+<text x="48" y="308" textLength="126" fill="#96a0b4">wide and emoji</text>
+<text x="192" y="308" textLength="63" fill="#e6e6e6">abcdef|</text>
+<text x="201" y="326" text-anchor="middle" fill="#e6e6e6">日</text>
+<text x="219" y="326" text-anchor="middle" fill="#e6e6e6">本</text>
+<text x="237" y="326" text-anchor="middle" fill="#e6e6e6">語</text>
+<text x="246" y="326" textLength="9" fill="#e6e6e6">|</text>
+<text x="201" y="344" text-anchor="middle" fill="#e6e6e6">🙂</text>
+<text x="219" y="344" text-anchor="middle" fill="#e6e6e6">🎉</text>
+<text x="228" y="344" textLength="27" fill="#e6e6e6">ok|</text>
+<text x="196.5" y="362" text-anchor="middle" fill="#e6e6e6">é</text>
+<text x="205.5" y="362" text-anchor="middle" fill="#e6e6e6">é</text>
+<text x="214.5" y="362" text-anchor="middle" fill="#e6e6e6">é</text>
+<text x="219" y="362" textLength="36" fill="#e6e6e6">xyz|</text>
+<text x="48" y="398" textLength="117" fill="#96a0b4">control chars</text>
+<text x="192" y="398" textLength="135" fill="#e6e6e6">tab: end, bell:</text>
+<text x="331.5" y="398" text-anchor="middle" fill="#e6e6e6">�</text>
+<text x="336" y="398" textLength="81" fill="#e6e6e6">, escape:</text>
+<text x="421.5" y="398" text-anchor="middle" fill="#e6e6e6">�</text>
+<text x="426" y="398" textLength="36" fill="#e6e6e6">[31m</text>
+</g>
+<g shape-rendering="crispEdges">
+<rect x="381" y="273" width="81" height="1" fill="#e6e6e6"/>
+<rect x="480" y="273" width="81" height="1" fill="#e6e6e6"/>
+</g>
+</svg>

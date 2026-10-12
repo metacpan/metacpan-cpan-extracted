@@ -1,0 +1,42 @@
+Term-Chess
+
+Chess on a terminal, against a bot. The rules are Chess::Plisco's and the
+opponent is Plisco's own search, bounded in nodes and never in seconds; this
+distribution is the board, the arrow-key picker, the typed prompt and the
+`chess` command. With Term::ReadKey the arrow keys walk the pieces that have a
+move and then that piece's squares, with a caption saying what each move does;
+without it a move is typed as coordinates or standard notation.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Term::Chess
+    chess --help
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Term-Chess
+
+    Search CPAN
+        https://metacpan.org/release/Term-Chess
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION <email@lnation.org>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)

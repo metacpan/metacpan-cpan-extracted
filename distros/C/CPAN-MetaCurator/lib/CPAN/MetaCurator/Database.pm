@@ -15,8 +15,10 @@ use DBIx::Simple;
 use Data::Dumper::Concise; # For Dumper().
 
 use File::Spec;
+use File::Slurper 'read_lines';
 
 use Mew;
+use Mojo::JSON qw/from_json/;
 
 use Text::CSV::Encoded;
 
@@ -46,7 +48,7 @@ has -pad => (HashRef, default => sub{return {} }, chained => 1);
 
 has -time_option => (Str, default => sub{return ''}, chained => 1);
 
-our $VERSION = '1.29';
+our $VERSION = '1.33';
 
 # -----------------------------------------------
 
@@ -68,6 +70,13 @@ sub build_pad
 	# Read all tables into the pad.
 
 	for (@{$self -> table_names}) {$$pad{$_} = $self -> read_table($_) };
+
+	$$pad{module_names} = {};
+
+	for my $item (@{$$pad{modules} })
+	{
+		$$pad{module_names}{$$item{name} } = $item;
+	}
 
 	# Constants. Eg: encoding.
 	# The constants table used to contain page_name=html/cpan.metacurator.tree.html.
@@ -118,6 +127,24 @@ sub build_pad
 	return $pad;
 
 } # End of build_pad.
+
+# -----------------------------------------------
+
+sub get_special_para_names_regexp
+{
+	my($self, $pad)		= @_;
+	$$pad{constants}	= $self -> read_table('constants');
+
+	my($special_para_names);
+
+	for my $row (@{$$pad{constants} })
+	{
+		$special_para_names = $$row{value} if ($$row{name} eq 'special_para_names');
+	}
+
+	return qr/($special_para_names)/o;
+
+} # End of get_special_para_names_regexp.
 
 # -----------------------------------------------
 
@@ -250,20 +277,6 @@ sub read_csv_file
 
 # --------------------------------------------------
 
-sub read_table
-{
-	my($self, $table_name)	= @_;
-	my($sql)				= "select * from $table_name";
-	my($set)				= $self -> db -> query($sql) || die $self -> db -> error;
-
-	# Return an arrayref of hashrefs.
-
-	return [$set -> hashes];
-
-} # End of read_table.
-
-# --------------------------------------------------
-
 sub read_metapackager_table
 {
 	my($self, $pad)	= @_;
@@ -303,6 +316,36 @@ sub read_1_record
 
 # --------------------------------------------------
 
+sub read_table
+{
+	my($self, $table_name)	= @_;
+	my($sql)				= "select * from $table_name";
+	my($set)				= $self -> db -> query($sql) || die $self -> db -> error;
+
+	# Return an arrayref of hashrefs.
+
+	return [$set -> hashes];
+
+} # End of read_table.
+
+# --------------------------------------------------
+
+sub read_tiddlers_file
+{
+	my($self) = @_;
+
+	$self -> init_config;
+	$self -> init_db;
+
+	my($file_name)	= File::Spec -> catfile($self -> home_path, $self -> tiddlers_path);
+	my($data)		= join('', read_lines($file_name, 'UTF-8') );
+
+	return from_json $data;
+
+} # End of read_tiddlers_file.
+
+# --------------------------------------------------
+
 sub update_table
 {
 	my($self, $table_name, $id, $columns)	= @_;
@@ -318,6 +361,10 @@ sub update_table
 1;
 
 =pod
+
+=head1 NAME
+
+CPAN::MetaCurator::Database - Manage the cpan.metacurator.sqlite database
 
 =head1 Machine-Readable Change Log
 

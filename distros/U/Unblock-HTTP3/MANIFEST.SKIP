@@ -16,3 +16,4 @@
 ^MISSING_FEATURES\.md$
 ^docs/(?:INTEROPERABILITY|RELEASE-.*)\.md$
 ^xt(?:/|$)
+^Handoff\.md$

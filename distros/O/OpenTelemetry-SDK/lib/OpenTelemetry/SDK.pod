@@ -13,8 +13,8 @@ OpenTelemetry::SDK - An implementation of the OpenTelemetry SDK for Perl
     require OpenTelemetry::SDK;
     OpenTelemetry::SDK->import;
 
-    # Load any integrations you may want
-    use OpenTelemetry::Integration qw( HTTP::Tiny );
+    # Load any instrumentation libraries you may want
+    use OpenTelemetry::Instrumentation qw( HTTP::Tiny );
 
     # You can also configure some parts of the SDK manually
     # like passing in your own tracer provider...
@@ -118,6 +118,32 @@ skip this method entirely and create your own pipelines:
 
 If no argument is set, the provider will default to an internally constructed
 L<OpenTelemetry::SDK::Trace::TracerProvider>.
+
+This method returns the globally installed provider.
+
+=head3 configure_logger_provider
+
+    $provider = OpenTelemetry::SDK->configure_logger_provider(
+        $provider // undef, # Optional
+    );
+
+This method optionally takes an instance of a logger provider and configures
+it with the appropriate log record processors and exporters. The provider
+passed as an argument must implement the logger provider API. If it does not,
+it will be ignored and a warning will be logged.
+
+This method is useful if you want to apply the default configuration to a
+custom logger provider. If you want to customise this even further, you can
+skip this method entirely and create your own pipelines:
+
+    my $exporter  = My::Exporter->new( ... );
+    my $processor = My::Processor->new( exporter => $exporter, ... );
+    my $provider  = My::Provider->new( ... );
+    $provider->add_log_record_processor($processor);
+    OpenTelemetry->logger_provider = $provider;
+
+If no argument is set, the provider will default to an internally constructed
+L<OpenTelemetry::SDK::Logs::LoggerProvider>.
 
 This method returns the globally installed provider.
 
@@ -371,6 +397,35 @@ latter will apply to link attributes as well.
 See L<OpenTelemetry::SDK::Trace::SpanLimits> for more details.
 
 This variable is non-standard.
+
+=item OTEL_LOGS_EXPORTER
+
+Log exporter to be used. Default: C<otlp>.
+
+This can be set to a comma-separated list of values, to set multiple
+exporters. They will be deduplicated before configuration takes place.
+
+Possible values (and the classes that represent them) are listed below:
+
+=over
+
+=item C<otlp>
+
+L<OpenTelemetry::Exporter::OTLP>
+
+=item C<zipkin>
+
+L<OpenTelemetry::Exporter::Zipkin> (NYI)
+
+=item C<console>
+
+L<OpenTelemetry::SDK::Exporter::Console>
+
+This value is non-standard.
+
+=item none
+
+=back
 
 =item OTEL_RESOURCE_ATTRIBUTES
 

@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="708" height="291" viewBox="0 0 708 291" role="img" aria-label="perl examples/cookbook/follow-links.pl">
+<title>perl examples/cookbook/follow-links.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="676" height="256" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="676" height="256" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="676" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="354" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/cookbook/follow-links.pl</text>
+<rect x="16.5" y="16.5" width="675" height="255" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="354" y="150" width="126" height="18" fill="#98c379"/>
+<rect x="111" y="186" width="36" height="18" fill="#282d3a"/>
+</g>
+<g class="terminal">
+<text x="48" y="92" textLength="36" class="b" fill="#dcdfe4">Keys</text>
+<text x="48" y="128" textLength="531" fill="#dcdfe4">Tab selects the first link of a page, Left and Right select</text>
+<text x="48" y="146" textLength="522" fill="#dcdfe4">the others, Enter follows the selected one. Backspace goes</text>
+<text x="48" y="164" textLength="297" fill="#dcdfe4">back to the page before, or click</text>
+<text x="354" y="164" textLength="126" fill="#101216">the start page</text>
+<text x="480" y="164" textLength="9" fill="#dcdfe4">.</text>
+<text x="48" y="200" textLength="36" fill="#98c379">Back</text>
+<text x="111" y="200" textLength="36" fill="#ebeef3">Quit</text>
+<text x="48" y="236" textLength="243" fill="#96a0b4">You are on the page 'keys'.</text>
+</g>
+<g shape-rendering="crispEdges">
+<rect x="48" y="201" width="36" height="1" fill="#98c379"/>
+<rect x="111" y="201" width="36" height="1" fill="#ebeef3"/>
+</g>
+</svg>

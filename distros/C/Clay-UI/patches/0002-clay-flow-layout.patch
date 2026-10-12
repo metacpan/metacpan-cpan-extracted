@@ -1,0 +1,677 @@
+--- a/src/clay/clay.h
++++ b/src/clay/clay.h
+@@ -274,8 +274,20 @@
+     CLAY_LEFT_TO_RIGHT,
+     // Lays out child elements from top to bottom with increasing y.
+     CLAY_TOP_TO_BOTTOM,
++    // Lays out child elements from left to right, starting a new line below whenever the next child
++    // would not fit into the remaining width ("flow" layout). Lines are separated by lineGap.
++    CLAY_LEFT_TO_RIGHT_WRAP,
+ } Clay_LayoutDirection;
+ 
++// Controls how the lines of a CLAY_LEFT_TO_RIGHT_WRAP container use height they do not need.
++typedef CLAY_PACKED_ENUM {
++    // (Default) Every line gets an equal share of the container's leftover height; SIZING_GROW
++    // children grow with their line.
++    CLAY_LINE_SIZING_GROW,
++    // Lines are as tall as their tallest child; childAlignment.y places the block of lines.
++    CLAY_LINE_SIZING_FIT,
++} Clay_LineSizing;
++
+ // Controls the alignment along the x axis (horizontal) of child elements.
+ typedef CLAY_PACKED_ENUM {
+     // (Default) Aligns child elements to the left hand side of this element, offset by padding.width.left
+@@ -366,6 +378,8 @@
+     uint16_t childGap; // Controls the gap in pixels between child elements along the layout axis (horizontal gap for LEFT_TO_RIGHT, vertical gap for TOP_TO_BOTTOM).
+     Clay_ChildAlignment childAlignment; // Controls how child elements are aligned on each axis.
+     Clay_LayoutDirection layoutDirection; // Controls the direction in which child elements will be automatically laid out.
++    uint16_t lineGap; // Controls the vertical gap in pixels between the lines of a CLAY_LEFT_TO_RIGHT_WRAP container.
++    Clay_LineSizing lineSizing; // Controls whether the lines of a CLAY_LEFT_TO_RIGHT_WRAP container grow into its leftover height.
+ } Clay_LayoutConfig;
+ 
+ CLAY__WRAPPER_STRUCT(Clay_LayoutConfig);
+@@ -1219,6 +1233,14 @@
+ 
+ CLAY__ARRAY_DEFINE(Clay__SizingGroupEntry, Clay__SizingGroupEntryArray)
+ 
++// The line state of a child of a CLAY_LEFT_TO_RIGHT_WRAP container.
++typedef struct {
++    bool startsLine; // True for the first child of every line.
++    float height;    // The height of the line this child starts; only meaningful if startsLine.
++} Clay__FlowLine;
++
++CLAY__ARRAY_DEFINE(Clay__FlowLine, Clay__FlowLineArray)
++
+ typedef struct {
+     Clay_Dimensions dimensions;
+     Clay_String line;
+@@ -1421,6 +1443,10 @@
+     // the copies of exiting elements Clay_EndLayout appends after them keep the sizes of their last frame, and
+     // equalizing with those would carry last frame's grown sizes into this one.
+     int32_t declaredElementsLength;
++    // Per layout element: its line state in its CLAY_LEFT_TO_RIGHT_WRAP
++    // parent. The X sizing pass writes where lines start and the Y sizing
++    // pass how tall they are; later passes read both, so all of them agree.
++    Clay__FlowLineArray flowLines;
+ };
+ 
+ Clay_Context* Clay__Context_Allocate_Arena(Clay_Arena *arena) {
+@@ -1928,7 +1954,9 @@
+ 
+     // Attach children to the current open element
+     openLayoutElement->children.elements = &context->layoutElementChildren.internalArray[context->layoutElementChildren.length];
+-    if (layoutConfig->layoutDirection == CLAY_LEFT_TO_RIGHT) {
++    // A wrap container prefers a single line, but can wrap down to its widest child
++    bool canWrap = layoutConfig->layoutDirection == CLAY_LEFT_TO_RIGHT_WRAP;
++    if (layoutConfig->layoutDirection == CLAY_LEFT_TO_RIGHT || canWrap) {
+         openLayoutElement->dimensions.width = leftRightPadding;
+         openLayoutElement->minDimensions.width = leftRightPadding;
+         for (int32_t i = 0; i < openLayoutElement->children.length; i++) {
+@@ -1938,7 +1966,9 @@
+             openLayoutElement->dimensions.height = CLAY__MAX(openLayoutElement->dimensions.height, child->dimensions.height + topBottomPadding);
+             // Minimum size of child elements doesn't matter to clip containers as they can shrink and hide their contents
+             if (!elementHasClipHorizontal) {
+-                openLayoutElement->minDimensions.width += child->minDimensions.width;
++                openLayoutElement->minDimensions.width = canWrap
++                    ? CLAY__MAX(openLayoutElement->minDimensions.width, child->minDimensions.width + leftRightPadding)
++                    : openLayoutElement->minDimensions.width + child->minDimensions.width;
+             }
+             if (!elementHasClipVertical) {
+                 openLayoutElement->minDimensions.height = CLAY__MAX(openLayoutElement->minDimensions.height, child->minDimensions.height + topBottomPadding);
+@@ -1947,7 +1977,7 @@
+         }
+         float childGap = (float)(CLAY__MAX(openLayoutElement->children.length - 1, 0) * layoutConfig->childGap);
+         openLayoutElement->dimensions.width += childGap;
+-        if (!elementHasClipHorizontal) {
++        if (!elementHasClipHorizontal && !canWrap) {
+             openLayoutElement->minDimensions.width += childGap;
+         }
+     }
+@@ -2292,6 +2322,7 @@
+     context->sizingGroupSlots = Clay__int32_tArray_Allocate_Arena(sizingGroupSlotCount, arena);
+     context->sizingGroupOfElement = Clay__int32_tArray_Allocate_Arena(maxElementCount, arena);
+     context->sizingGroupSizeOfElement = Clay__DimensionsArray_Allocate_Arena(maxElementCount, arena);
++    context->flowLines = Clay__FlowLineArray_Allocate_Arena(maxElementCount, arena);
+ }
+ 
+ void Clay__InitializePersistentMemory(Clay_Context* context) {
+@@ -2329,6 +2360,311 @@
+     }
+ }
+ 
++// Grows the SIZING_GROW containers listed in growContainers by up to sizeToDistribute along one
++// axis, smallest first, so they end up as equal as their max sizes allow. Containers that reach
++// their max are removed from the list.
++void Clay__GrowContainersAlongAxis(Clay__int32_tArray *growContainers, float sizeToDistribute, bool xAxis) {
++    Clay_Context* context = Clay_GetCurrentContext();
++    while (sizeToDistribute > CLAY__EPSILON && growContainers->length > 0) {
++        float smallest = CLAY__MAXFLOAT;
++        float secondSmallest = CLAY__MAXFLOAT;
++        float widthToAdd = sizeToDistribute;
++        for (int childIndex = 0; childIndex < growContainers->length; childIndex++) {
++            Clay_LayoutElement *child = Clay_LayoutElementArray_Get(&context->layoutElements, Clay__int32_tArray_GetValue(growContainers, childIndex));
++            float childSize = xAxis ? child->dimensions.width : child->dimensions.height;
++            if (Clay__FloatEqual(childSize, smallest)) { continue; }
++            if (childSize < smallest) {
++                secondSmallest = smallest;
++                smallest = childSize;
++            }
++            if (childSize > smallest) {
++                secondSmallest = CLAY__MIN(secondSmallest, childSize);
++                widthToAdd = secondSmallest - smallest;
++            }
++        }
++
++        widthToAdd = CLAY__MIN(widthToAdd, sizeToDistribute / growContainers->length);
++
++        for (int childIndex = 0; childIndex < growContainers->length; childIndex++) {
++            Clay_LayoutElement *child = Clay_LayoutElementArray_Get(&context->layoutElements, Clay__int32_tArray_GetValue(growContainers, childIndex));
++            float *childSize = xAxis ? &child->dimensions.width : &child->dimensions.height;
++            Clay_SizingAxis childSizing = Clay__GetElementSizing(child, xAxis);
++            float maxSize = childSizing.size.minMax.max;
++            float previousWidth = *childSize;
++            if (Clay__FloatEqual(*childSize, smallest)) {
++                *childSize += widthToAdd;
++                if (*childSize >= maxSize) {
++                    *childSize = maxSize;
++                    Clay__int32_tArray_RemoveSwapback(growContainers, childIndex--);
++                }
++                sizeToDistribute -= (*childSize - previousWidth);
++            }
++        }
++    }
++}
++
++// ---------------------------------------------------------------------------
++// Flow layout (CLAY_LEFT_TO_RIGHT_WRAP). The X sizing pass breaks the
++// children of a wrap container into lines greedily, using their preferred
++// widths, and records the first child of every line in context->flowLines;
++// the Y sizing pass records each line's height there, and every later pass
++// walks the same lines. Within a line, SIZING_GROW children share the
++// line's free width and stretch to the line's height. Exiting children
++// never start a line and take no space, as in the other layout directions.
++// ---------------------------------------------------------------------------
++
++// The size and minimum size of an element's content along one axis, padding included.
++typedef struct {
++    float size;
++    float minSize;
++} Clay__AxisExtent;
++
++// True if a parent may shrink this child below its preferred size along the axis when content
++// overflows (see the compression in Clay__SizeContainersAlongAxis).
++bool Clay__IsCompressible(Clay_LayoutElement *child, bool xAxis) {
++    Clay__SizingType sizingType = Clay__GetElementSizing(child, xAxis).type;
++    if (sizingType == CLAY__SIZING_TYPE_PERCENT || sizingType == CLAY__SIZING_TYPE_FIXED) return false;
++    return !child->isTextElement || child->textConfig.wrapMode == CLAY_TEXT_WRAP_WORDS;
++}
++
++// The offset of the first child at or after fromOffset that starts a line, or the child count if
++// no later line exists.
++int32_t Clay__FlowNextLineStart(Clay_LayoutElement *parent, int32_t fromOffset) {
++    Clay_Context* context = Clay_GetCurrentContext();
++    for (int32_t childOffset = fromOffset; childOffset < parent->children.length; ++childOffset) {
++        if (context->flowLines.internalArray[parent->children.elements[childOffset]].startsLine) return childOffset;
++    }
++    return parent->children.length;
++}
++
++// The width (children plus the gaps between them) and height of the line made of the children
++// [firstOffset, endOffset).
++Clay_Dimensions Clay__FlowLineSize(Clay_LayoutElement *parent, int32_t firstOffset, int32_t endOffset) {
++    Clay_Context* context = Clay_GetCurrentContext();
++    Clay_Dimensions lineSize = CLAY__DEFAULT_STRUCT;
++    int32_t placedChildren = 0;
++    for (int32_t childOffset = firstOffset; childOffset < endOffset; ++childOffset) {
++        Clay_LayoutElement *child = Clay_LayoutElementArray_Get(&context->layoutElements, parent->children.elements[childOffset]);
++        if (child->exiting) continue;
++        lineSize.width += child->dimensions.width;
++        lineSize.height = CLAY__MAX(lineSize.height, child->dimensions.height);
++        placedChildren++;
++    }
++    lineSize.width += (float)(CLAY__MAX(placedChildren - 1, 0) * parent->config.layout.childGap);
++    return lineSize;
++}
++
++// The size of all lines of a wrap container together, padding excluded.
++Clay_Dimensions Clay__FlowContentSize(Clay_LayoutElement *parent) {
++    Clay_Dimensions contentSize = CLAY__DEFAULT_STRUCT;
++    int32_t lineCount = 0;
++    for (int32_t lineStart = Clay__FlowNextLineStart(parent, 0), lineEnd; lineStart < parent->children.length; lineStart = lineEnd) {
++        lineEnd = Clay__FlowNextLineStart(parent, lineStart + 1);
++        Clay_Dimensions lineSize = Clay__FlowLineSize(parent, lineStart, lineEnd);
++        contentSize.width = CLAY__MAX(contentSize.width, lineSize.width);
++        contentSize.height += lineSize.height;
++        lineCount++;
++    }
++    contentSize.height += (float)(CLAY__MAX(lineCount - 1, 0) * parent->config.layout.lineGap);
++    return contentSize;
++}
++
++// The extent of a wrap container along one axis. Along X it prefers a single line and can wrap
++// down to its widest child; along Y it spans the lines the X sizing pass broke it into, so it
++// must only be asked for Y after that pass.
++Clay__AxisExtent Clay__FlowExtentAlongAxis(Clay_LayoutElement *parent, bool xAxis) {
++    Clay_Context* context = Clay_GetCurrentContext();
++    Clay_LayoutConfig *layoutConfig = &parent->config.layout;
++    if (!xAxis) {
++        float padding = (float)(layoutConfig->padding.top + layoutConfig->padding.bottom);
++        float size = padding + Clay__FlowContentSize(parent).height;
++        return CLAY__INIT(Clay__AxisExtent) { .size = size, .minSize = parent->config.clip.vertical ? padding : size };
++    }
++    float padding = (float)(layoutConfig->padding.left + layoutConfig->padding.right);
++    Clay__AxisExtent extent = { .size = padding, .minSize = padding };
++    for (int32_t childOffset = 0; childOffset < parent->children.length; ++childOffset) {
++        Clay_LayoutElement *child = Clay_LayoutElementArray_Get(&context->layoutElements, parent->children.elements[childOffset]);
++        extent.size += child->dimensions.width;
++        if (!parent->config.clip.horizontal) {
++            extent.minSize = CLAY__MAX(extent.minSize, child->minDimensions.width + padding);
++        }
++    }
++    extent.size += (float)(CLAY__MAX(parent->children.length - 1, 0) * layoutConfig->childGap);
++    return extent;
++}
++
++// Shares freeWidth between the SIZING_GROW children of the line [firstOffset, endOffset).
++void Clay__GrowFlowLine(Clay_LayoutElement *parent, int32_t firstOffset, int32_t endOffset, float freeWidth, Clay__int32_tArray *growBuffer) {
++    Clay_Context* context = Clay_GetCurrentContext();
++    if (freeWidth <= CLAY__EPSILON) return;
++    growBuffer->length = 0;
++    for (int32_t childOffset = firstOffset; childOffset < endOffset; ++childOffset) {
++        int32_t childIndex = parent->children.elements[childOffset];
++        Clay_LayoutElement *child = Clay_LayoutElementArray_Get(&context->layoutElements, childIndex);
++        if (child->exiting || Clay__GetElementSizing(child, true).type != CLAY__SIZING_TYPE_GROW) continue;
++        Clay__int32_tArray_Add(growBuffer, childIndex);
++    }
++    Clay__GrowContainersAlongAxis(growBuffer, freeWidth, true);
++}
++
++// Breaks the children of a wrap container into lines that fit its inner width, records where
++// each line starts and grows each line's SIZING_GROW children into its free width. A child wider
++// than the container is compressed like any overflowing child, unless the container clips
++// horizontally; it then sits alone on its line.
++void Clay__SizeFlowChildrenX(Clay_LayoutElement *parent, Clay__int32_tArray *growBuffer) {
++    Clay_Context* context = Clay_GetCurrentContext();
++    Clay_LayoutConfig *layoutConfig = &parent->config.layout;
++    float innerWidth = parent->dimensions.width - (float)(layoutConfig->padding.left + layoutConfig->padding.right);
++    float childGap = (float)layoutConfig->childGap;
++    int32_t lineStart = -1;
++    float lineWidth = 0;
++    for (int32_t childOffset = 0; childOffset < parent->children.length; ++childOffset) {
++        int32_t childIndex = parent->children.elements[childOffset];
++        Clay_LayoutElement *child = Clay_LayoutElementArray_Get(&context->layoutElements, childIndex);
++        context->flowLines.internalArray[childIndex].startsLine = false;
++        if (child->exiting) continue;
++        if (!parent->config.clip.horizontal && child->dimensions.width > innerWidth && Clay__IsCompressible(child, true)) {
++            child->dimensions.width = CLAY__MAX(child->minDimensions.width, innerWidth);
++        }
++        bool fitsOnLine = lineStart >= 0 && lineWidth + childGap + child->dimensions.width <= innerWidth + CLAY__EPSILON;
++        if (fitsOnLine) {
++            lineWidth += childGap + child->dimensions.width;
++            continue;
++        }
++        if (lineStart >= 0) {
++            Clay__GrowFlowLine(parent, lineStart, childOffset, innerWidth - lineWidth, growBuffer);
++        }
++        context->flowLines.internalArray[childIndex].startsLine = true;
++        lineStart = childOffset;
++        lineWidth = child->dimensions.width;
++    }
++    if (lineStart >= 0) {
++        Clay__GrowFlowLine(parent, lineStart, parent->children.length, innerWidth - lineWidth, growBuffer);
++    }
++}
++
++// The number of lines the X sizing pass broke a wrap container into.
++int32_t Clay__FlowLineCount(Clay_LayoutElement *parent) {
++    int32_t lineCount = 0;
++    for (int32_t lineStart = Clay__FlowNextLineStart(parent, 0); lineStart < parent->children.length; lineStart = Clay__FlowNextLineStart(parent, lineStart + 1)) {
++        lineCount++;
++    }
++    return lineCount;
++}
++
++// The height every line of a wrap container gains on top of its tallest child: an equal share of
++// the container's leftover height with CLAY_LINE_SIZING_GROW, nothing with CLAY_LINE_SIZING_FIT.
++float Clay__FlowExtraHeightPerLine(Clay_LayoutElement *parent) {
++    Clay_LayoutConfig *layoutConfig = &parent->config.layout;
++    if (layoutConfig->lineSizing != CLAY_LINE_SIZING_GROW) return 0;
++    int32_t lineCount = Clay__FlowLineCount(parent);
++    if (lineCount == 0) return 0;
++    float innerHeight = parent->dimensions.height - (float)(layoutConfig->padding.top + layoutConfig->padding.bottom);
++    float leftoverHeight = innerHeight - Clay__FlowContentSize(parent).height;
++    return CLAY__MAX(0, leftoverHeight) / (float)lineCount;
++}
++
++// Records the height of every line of a wrap container and stretches the line's SIZING_GROW
++// children to it.
++void Clay__SizeFlowChildrenY(Clay_LayoutElement *parent) {
++    Clay_Context* context = Clay_GetCurrentContext();
++    float extraHeightPerLine = Clay__FlowExtraHeightPerLine(parent);
++    for (int32_t lineStart = Clay__FlowNextLineStart(parent, 0), lineEnd; lineStart < parent->children.length; lineStart = lineEnd) {
++        lineEnd = Clay__FlowNextLineStart(parent, lineStart + 1);
++        float lineHeight = Clay__FlowLineSize(parent, lineStart, lineEnd).height + extraHeightPerLine;
++        context->flowLines.internalArray[parent->children.elements[lineStart]].height = lineHeight;
++        for (int32_t childOffset = lineStart; childOffset < lineEnd; ++childOffset) {
++            Clay_LayoutElement *child = Clay_LayoutElementArray_Get(&context->layoutElements, parent->children.elements[childOffset]);
++            Clay_SizingAxis sizing = Clay__GetElementSizing(child, false);
++            if (child->exiting || sizing.type != CLAY__SIZING_TYPE_GROW) continue;
++            child->dimensions.height = CLAY__MAX(child->minDimensions.height, CLAY__MIN(lineHeight, sizing.size.minMax.max));
++        }
++    }
++}
++
++// The size of all lines of a wrap container with the heights the Y sizing pass recorded,
++// padding excluded.
++Clay_Dimensions Clay__FlowLaidOutContentSize(Clay_LayoutElement *parent) {
++    Clay_Context* context = Clay_GetCurrentContext();
++    Clay_Dimensions contentSize = CLAY__DEFAULT_STRUCT;
++    int32_t lineCount = 0;
++    for (int32_t lineStart = Clay__FlowNextLineStart(parent, 0), lineEnd; lineStart < parent->children.length; lineStart = lineEnd) {
++        lineEnd = Clay__FlowNextLineStart(parent, lineStart + 1);
++        contentSize.width = CLAY__MAX(contentSize.width, Clay__FlowLineSize(parent, lineStart, lineEnd).width);
++        contentSize.height += context->flowLines.internalArray[parent->children.elements[lineStart]].height;
++        lineCount++;
++    }
++    contentSize.height += (float)(CLAY__MAX(lineCount - 1, 0) * parent->config.layout.lineGap);
++    return contentSize;
++}
++
++// Where the next child of a wrap container goes while its children are positioned.
++typedef struct {
++    float nextX;
++    float lineTop;
++    float lineHeight;
++    bool hasLine;
++} Clay__FlowCursor;
++
++// The cursor before the first child of a wrap container. childAlignment.y places the block of
++// lines when they do not fill the container.
++Clay__FlowCursor Clay__FlowBeginPlacement(Clay_LayoutElement *parent) {
++    Clay_LayoutConfig *layoutConfig = &parent->config.layout;
++    float extraSpace = parent->dimensions.height - (float)(layoutConfig->padding.top + layoutConfig->padding.bottom) - Clay__FlowLaidOutContentSize(parent).height;
++    switch (layoutConfig->childAlignment.y) {
++        case CLAY_ALIGN_Y_TOP: extraSpace = 0; break;
++        case CLAY_ALIGN_Y_CENTER: extraSpace /= 2; break;
++        default: break;
++    }
++    return CLAY__INIT(Clay__FlowCursor) { .nextX = (float)layoutConfig->padding.left, .lineTop = (float)layoutConfig->padding.top + CLAY__MAX(0, extraSpace) };
++}
++
++// Returns the position of the child at childOffset relative to its wrap container and moves the
++// cursor past it. childAlignment.x aligns every line on its own, childAlignment.y aligns each
++// child within its line.
++Clay_Vector2 Clay__FlowPlaceChild(Clay_LayoutElement *parent, int32_t childOffset, Clay__FlowCursor *cursor) {
++    Clay_Context* context = Clay_GetCurrentContext();
++    Clay_LayoutConfig *layoutConfig = &parent->config.layout;
++    int32_t childIndex = parent->children.elements[childOffset];
++    Clay_LayoutElement *child = Clay_LayoutElementArray_Get(&context->layoutElements, childIndex);
++    if (context->flowLines.internalArray[childIndex].startsLine) {
++        if (cursor->hasLine) {
++            cursor->lineTop += cursor->lineHeight + (float)layoutConfig->lineGap;
++        }
++        cursor->hasLine = true;
++        float lineWidth = Clay__FlowLineSize(parent, childOffset, Clay__FlowNextLineStart(parent, childOffset + 1)).width;
++        cursor->lineHeight = context->flowLines.internalArray[childIndex].height;
++        float extraSpace = parent->dimensions.width - (float)(layoutConfig->padding.left + layoutConfig->padding.right) - lineWidth;
++        switch (layoutConfig->childAlignment.x) {
++            case CLAY_ALIGN_X_LEFT: extraSpace = 0; break;
++            case CLAY_ALIGN_X_CENTER: extraSpace /= 2; break;
++            default: break;
++        }
++        cursor->nextX = (float)layoutConfig->padding.left + CLAY__MAX(0, extraSpace);
++    }
++    Clay_Vector2 position = { cursor->nextX, cursor->lineTop };
++    // An exiting child placed before the first line (exiting children go first unless their exit ordering says
++    // otherwise) aligns within that line, so it never moves above it. Without any line, the empty block of lines
++    // already sits where childAlignment.y puts it, and the child aligns around that point.
++    float lineHeight = cursor->lineHeight;
++    if (!cursor->hasLine) {
++        int32_t firstLineStart = Clay__FlowNextLineStart(parent, childOffset);
++        lineHeight = firstLineStart < parent->children.length
++            ? context->flowLines.internalArray[parent->children.elements[firstLineStart]].height
++            : 0;
++    }
++    float spaceAroundChild = lineHeight - child->dimensions.height;
++    switch (layoutConfig->childAlignment.y) {
++        case CLAY_ALIGN_Y_TOP: break;
++        case CLAY_ALIGN_Y_CENTER: position.y += spaceAroundChild / 2; break;
++        case CLAY_ALIGN_Y_BOTTOM: position.y += spaceAroundChild; break;
++    }
++    if (!child->exiting) {
++        cursor->nextX += child->dimensions.width + (float)layoutConfig->childGap;
++    }
++    return position;
++}
++
+ // Writes out the location of text elements to layout elements buffer 1
+ void Clay__SizeContainersAlongAxis(bool xAxis, float deltaTime, Clay__int32_tArray* textElementsOut, Clay__int32_tArray* aspectRatioElementsOut) {
+     Clay_Context* context = Clay_GetCurrentContext();
+@@ -2451,6 +2787,15 @@
+                 }
+             }
+ 
++            if (parentLayoutConfig->layoutDirection == CLAY_LEFT_TO_RIGHT_WRAP) {
++                if (xAxis) {
++                    Clay__SizeFlowChildrenX(parent, &resizableContainerBuffer);
++                } else {
++                    Clay__SizeFlowChildrenY(parent);
++                }
++                continue;
++            }
++
+             if (sizingAlongAxis) {
+                 float sizeToDistribute = parentSize - parentPadding - innerContentSize;
+                 // The content is too large, compress the children as much as possible
+@@ -2504,42 +2849,7 @@
+                             Clay__int32_tArray_RemoveSwapback(&resizableContainerBuffer, childIndex--);
+                         }
+                     }
+-                    while (sizeToDistribute > CLAY__EPSILON && resizableContainerBuffer.length > 0) {
+-                        float smallest = CLAY__MAXFLOAT;
+-                        float secondSmallest = CLAY__MAXFLOAT;
+-                        float widthToAdd = sizeToDistribute;
+-                        for (int childIndex = 0; childIndex < resizableContainerBuffer.length; childIndex++) {
+-                            Clay_LayoutElement *child = Clay_LayoutElementArray_Get(&context->layoutElements, Clay__int32_tArray_GetValue(&resizableContainerBuffer, childIndex));
+-                            float childSize = xAxis ? child->dimensions.width : child->dimensions.height;
+-                            if (Clay__FloatEqual(childSize, smallest)) { continue; }
+-                            if (childSize < smallest) {
+-                                secondSmallest = smallest;
+-                                smallest = childSize;
+-                            }
+-                            if (childSize > smallest) {
+-                                secondSmallest = CLAY__MIN(secondSmallest, childSize);
+-                                widthToAdd = secondSmallest - smallest;
+-                            }
+-                        }
+-
+-                        widthToAdd = CLAY__MIN(widthToAdd, sizeToDistribute / resizableContainerBuffer.length);
+-
+-                        for (int childIndex = 0; childIndex < resizableContainerBuffer.length; childIndex++) {
+-                            Clay_LayoutElement *child = Clay_LayoutElementArray_Get(&context->layoutElements, Clay__int32_tArray_GetValue(&resizableContainerBuffer, childIndex));
+-                            float *childSize = xAxis ? &child->dimensions.width : &child->dimensions.height;
+-                            Clay_SizingAxis childSizing = Clay__GetElementSizing(child, xAxis);
+-                            float maxSize = childSizing.size.minMax.max;
+-                            float previousWidth = *childSize;
+-                            if (Clay__FloatEqual(*childSize, smallest)) {
+-                                *childSize += widthToAdd;
+-                                if (*childSize >= maxSize) {
+-                                    *childSize = maxSize;
+-                                    Clay__int32_tArray_RemoveSwapback(&resizableContainerBuffer, childIndex--);
+-                                }
+-                                sizeToDistribute -= (*childSize - previousWidth);
+-                            }
+-                        }
+-                    }
++                    Clay__GrowContainersAlongAxis(&resizableContainerBuffer, sizeToDistribute, xAxis);
+                 }
+             // Sizing along the non layout axis ("off axis")
+             } else {
+@@ -2610,6 +2920,47 @@
+     }
+ }
+ 
++// Adds the betweenChildren borders of a wrap container: a vertical bar centered in the childGap
++// between neighbours on a line, and a horizontal bar centered in every lineGap, spanning the
++// container. A vertical bar spans its line's band, which reaches halfway into the lineGaps around
++// the line and to the container's edge above the first line and below the last one.
++void Clay__AddFlowBetweenChildrenBorders(Clay_LayoutElement *parent, Clay_BoundingBox boundingBox, Clay_Vector2 scrollOffset) {
++    Clay_Context* context = Clay_GetCurrentContext();
++    Clay_LayoutConfig *layoutConfig = &parent->config.layout;
++    Clay_BorderElementConfig *borderConfig = &parent->config.border;
++    float barWidth = (float)borderConfig->width.betweenChildren;
++    float halfChildGap = (float)layoutConfig->childGap / 2;
++    float halfLineGap = (float)layoutConfig->lineGap / 2;
++    Clay_Vector2 origin = { boundingBox.x + scrollOffset.x, boundingBox.y + scrollOffset.y };
++    Clay__FlowCursor cursor = Clay__FlowBeginPlacement(parent);
++    float bandTop = 0;
++    float bandBottom = 0;
++    for (int32_t i = 0; i < parent->children.length; ++i) {
++        int32_t childIndex = parent->children.elements[i];
++        Clay_LayoutElement *child = Clay_LayoutElementArray_Get(&context->layoutElements, childIndex);
++        bool isFirstLine = !cursor.hasLine;
++        Clay_Vector2 position = Clay__FlowPlaceChild(parent, i, &cursor);
++        Clay_BoundingBox bar;
++        if (context->flowLines.internalArray[childIndex].startsLine) {
++            bool isLastLine = Clay__FlowNextLineStart(parent, i + 1) == parent->children.length;
++            bandTop = isFirstLine ? 0 : cursor.lineTop - halfLineGap;
++            bandBottom = isLastLine ? parent->dimensions.height : cursor.lineTop + cursor.lineHeight + halfLineGap;
++            if (isFirstLine) continue;
++            bar = CLAY__INIT(Clay_BoundingBox) { origin.x, origin.y + bandTop - barWidth / 2, parent->dimensions.width, barWidth };
++        } else {
++            if (child->exiting) continue;
++            bar = CLAY__INIT(Clay_BoundingBox) { origin.x + position.x - halfChildGap - barWidth / 2, origin.y + bandTop, barWidth, bandBottom - bandTop };
++        }
++        Clay__AddRenderCommand(CLAY__INIT(Clay_RenderCommand) {
++            .boundingBox = bar,
++            .renderData = { .rectangle = { .backgroundColor = borderConfig->color } },
++            .userData = parent->config.userData,
++            .id = Clay__HashNumber(parent->id, parent->children.length + 1 + i).id,
++            .commandType = CLAY_RENDER_COMMAND_TYPE_RECTANGLE,
++        });
++    }
++}
++
+ bool Clay__ElementIsOffscreen(Clay_BoundingBox *boundingBox) {
+     Clay_Context* context = Clay_GetCurrentContext();
+     if (context->disableCulling) {
+@@ -2740,6 +3091,42 @@
+     return changed;
+ }
+ 
++// The extent of a LEFT_TO_RIGHT or TOP_TO_BOTTOM container along one axis, aggregated from its
++// children exactly as Clay__CloseElement does.
++Clay__AxisExtent Clay__StackExtentAlongAxis(Clay_LayoutElement* element, bool xAxis) {
++    Clay_Context* context = Clay_GetCurrentContext();
++    Clay_LayoutConfig* layoutConfig = &element->config.layout;
++    bool alongAxis = (xAxis && layoutConfig->layoutDirection == CLAY_LEFT_TO_RIGHT)
++                  || (!xAxis && layoutConfig->layoutDirection == CLAY_TOP_TO_BOTTOM);
++    bool clipped = xAxis ? element->config.clip.horizontal : element->config.clip.vertical;
++    float padding = xAxis ? (float)(layoutConfig->padding.left + layoutConfig->padding.right)
++                          : (float)(layoutConfig->padding.top + layoutConfig->padding.bottom);
++    float content = alongAxis ? padding : 0;
++    float minContent = alongAxis ? padding : 0;
++    // Exiting copies take no space, as in Clay__SizeContainersAlongAxis: they keep the size of their last frame.
++    int32_t laidOutChildren = 0;
++    for (int32_t j = 0; j < element->children.length; ++j) {
++        Clay_LayoutElement* child = Clay_LayoutElementArray_Get(&context->layoutElements, element->children.elements[j]);
++        if (child->exiting) continue;
++        laidOutChildren++;
++        float childSize = xAxis ? child->dimensions.width : child->dimensions.height;
++        float childMin = xAxis ? child->minDimensions.width : child->minDimensions.height;
++        if (alongAxis) {
++            content += childSize;
++            if (!clipped) minContent += childMin;
++        } else {
++            content = CLAY__MAX(content, childSize + padding);
++            if (!clipped) minContent = CLAY__MAX(minContent, childMin + padding);
++        }
++    }
++    if (alongAxis) {
++        float childGaps = (float)(CLAY__MAX(laidOutChildren - 1, 0) * layoutConfig->childGap);
++        content += childGaps;
++        if (!clipped) minContent += childGaps;
++    }
++    return CLAY__INIT(Clay__AxisExtent) { .size = content, .minSize = minContent };
++}
++
+ // Re-aggregates the size and minimum size of every FIT or GROW container
+ // on this axis from its children, exactly as Clay__CloseElement does, and
+ // raises the container to the result (never lowers it). Walks elements in
+@@ -2758,40 +3145,14 @@
+         if (sizing.type == CLAY__SIZING_TYPE_FIXED || sizing.type == CLAY__SIZING_TYPE_PERCENT) continue;
+         if (!xAxis && element->config.aspectRatio.aspectRatio != 0) continue;
+ 
+-        Clay_LayoutConfig* layoutConfig = &element->config.layout;
+-        bool alongAxis = (xAxis && layoutConfig->layoutDirection == CLAY_LEFT_TO_RIGHT)
+-                      || (!xAxis && layoutConfig->layoutDirection == CLAY_TOP_TO_BOTTOM);
+-        bool clipped = xAxis ? element->config.clip.horizontal : element->config.clip.vertical;
+-        float padding = xAxis ? (float)(layoutConfig->padding.left + layoutConfig->padding.right)
+-                              : (float)(layoutConfig->padding.top + layoutConfig->padding.bottom);
+-        float content = alongAxis ? padding : 0;
+-        float minContent = alongAxis ? padding : 0;
+-        // Exiting copies take no space, as in Clay__SizeContainersAlongAxis: they keep the size of their last frame.
+-        int32_t laidOutChildren = 0;
+-        for (int32_t j = 0; j < element->children.length; ++j) {
+-            Clay_LayoutElement* child = Clay_LayoutElementArray_Get(&context->layoutElements, element->children.elements[j]);
+-            if (child->exiting) continue;
+-            laidOutChildren++;
+-            float childSize = xAxis ? child->dimensions.width : child->dimensions.height;
+-            float childMin = xAxis ? child->minDimensions.width : child->minDimensions.height;
+-            if (alongAxis) {
+-                content += childSize;
+-                if (!clipped) minContent += childMin;
+-            } else {
+-                content = CLAY__MAX(content, childSize + padding);
+-                if (!clipped) minContent = CLAY__MAX(minContent, childMin + padding);
+-            }
+-        }
+-        if (alongAxis) {
+-            float childGaps = (float)(CLAY__MAX(laidOutChildren - 1, 0) * layoutConfig->childGap);
+-            content += childGaps;
+-            if (!clipped) minContent += childGaps;
+-        }
++        Clay__AxisExtent extent = element->config.layout.layoutDirection == CLAY_LEFT_TO_RIGHT_WRAP
++            ? Clay__FlowExtentAlongAxis(element, xAxis)
++            : Clay__StackExtentAlongAxis(element, xAxis);
+ 
+         float* dim    = xAxis ? &element->dimensions.width    : &element->dimensions.height;
+         float* minDim = xAxis ? &element->minDimensions.width : &element->minDimensions.height;
+-        float newDim = CLAY__MIN(CLAY__MAX(content, sizing.size.minMax.min), sizing.size.minMax.max);
+-        float newMin = CLAY__MIN(CLAY__MAX(minContent, sizing.size.minMax.min), sizing.size.minMax.max);
++        float newDim = CLAY__MIN(CLAY__MAX(extent.size, sizing.size.minMax.min), sizing.size.minMax.max);
++        float newMin = CLAY__MIN(CLAY__MAX(extent.minSize, sizing.size.minMax.min), sizing.size.minMax.max);
+         if (newDim > *dim) {
+             *dim = newDim;
+             changed = true;
+@@ -2977,6 +3338,12 @@
+             }
+             contentHeight += (float)(CLAY__MAX(currentElement->children.length - 1, 0) * layoutConfig->childGap);
+             currentElement->dimensions.height = CLAY__MIN(CLAY__MAX(contentHeight, layoutConfig->sizing.height.size.minMax.min), layoutConfig->sizing.height.size.minMax.max);
++        } else if (layoutConfig->layoutDirection == CLAY_LEFT_TO_RIGHT_WRAP) {
++            // The lines the children wrapped into decide the height, and parents may not compress it below that
++            Clay__AxisExtent heightExtent = Clay__FlowExtentAlongAxis(currentElement, false);
++            Clay_SizingMinMax heightLimits = layoutConfig->sizing.height.size.minMax;
++            currentElement->dimensions.height = CLAY__MIN(CLAY__MAX(heightExtent.size, heightLimits.min), heightLimits.max);
++            currentElement->minDimensions.height = CLAY__MAX(currentElement->minDimensions.height, CLAY__MIN(CLAY__MAX(heightExtent.minSize, heightLimits.min), heightLimits.max));
+         }
+     }
+ 
+@@ -3147,7 +3514,9 @@
+                             float halfGap = layoutConfig->childGap / 2;
+                             float halfWidth = borderConfig->width.betweenChildren / 2;
+                             Clay_Vector2 borderOffset = { (float)layoutConfig->padding.left - halfGap, (float)layoutConfig->padding.top - halfGap };
+-                            if (layoutConfig->layoutDirection == CLAY_LEFT_TO_RIGHT) {
++                            if (layoutConfig->layoutDirection == CLAY_LEFT_TO_RIGHT_WRAP) {
++                                Clay__AddFlowBetweenChildrenBorders(currentElement, currentElementBoundingBox, scrollOffset);
++                            } else if (layoutConfig->layoutDirection == CLAY_LEFT_TO_RIGHT) {
+                                 for (int32_t i = 0; i < currentElement->children.length; ++i) {
+                                     Clay_LayoutElement *childElement = Clay_LayoutElementArray_Get(&context->layoutElements, currentElement->children.elements[i]);
+                                     if (i > 0) {
+@@ -3390,6 +3759,7 @@
+ 
+             // On-axis alignment
+             Clay_Dimensions contentSizeCurrent = {};
++            Clay__FlowCursor flowCursor = CLAY__DEFAULT_STRUCT;
+             if (layoutConfig->layoutDirection == CLAY_LEFT_TO_RIGHT) {
+                 for (int32_t i = 0; i < currentElement->children.length; ++i) {
+                     Clay_LayoutElement *childElement = Clay_LayoutElementArray_Get(&context->layoutElements, currentElement->children.elements[i]);
+@@ -3422,6 +3792,9 @@
+                 }
+                 extraSpace = CLAY__MAX(0, extraSpace);
+                 currentElementTreeNode->nextChildOffset.y += extraSpace;
++            } else if (layoutConfig->layoutDirection == CLAY_LEFT_TO_RIGHT_WRAP) {
++                contentSizeCurrent = Clay__FlowLaidOutContentSize(currentElement);
++                flowCursor = Clay__FlowBeginPlacement(currentElement);
+             }
+ 
+             if (scrollContainerData) {
+@@ -3434,7 +3807,9 @@
+                 Clay_LayoutElement *childElement = Clay_LayoutElementArray_Get(&context->layoutElements, currentElement->children.elements[i]);
+                 Clay_LayoutElementHashMapItem* childMapItem = Clay__GetHashMapItem(childElement->id);
+                 // Alignment along non layout axis
+-                if (layoutConfig->layoutDirection == CLAY_LEFT_TO_RIGHT) {
++                if (layoutConfig->layoutDirection == CLAY_LEFT_TO_RIGHT_WRAP) {
++                    currentElementTreeNode->nextChildOffset = Clay__FlowPlaceChild(currentElement, i, &flowCursor);
++                } else if (layoutConfig->layoutDirection == CLAY_LEFT_TO_RIGHT) {
+                     currentElementTreeNode->nextChildOffset.y = currentElement->config.layout.padding.top;
+                     float whiteSpaceAroundChild = currentElement->dimensions.height - (float)(layoutConfig->padding.top + layoutConfig->padding.bottom) - childElement->dimensions.height;
+                     switch (layoutConfig->childAlignment.y) {
+@@ -3470,7 +3845,7 @@
+                 if (!childElement->exiting) {
+                     if (layoutConfig->layoutDirection == CLAY_LEFT_TO_RIGHT) {
+                         currentElementTreeNode->nextChildOffset.x += childElement->dimensions.width + (float)layoutConfig->childGap;
+-                    } else {
++                    } else if (layoutConfig->layoutDirection == CLAY_TOP_TO_BOTTOM) {
+                         currentElementTreeNode->nextChildOffset.y += childElement->dimensions.height + (float)layoutConfig->childGap;
+                     }
+                 }
+@@ -3941,7 +4316,7 @@
+                         // .layoutDirection
+                         CLAY_TEXT(CLAY_STRING("Layout Direction"), infoTitleConfig);
+                         Clay_LayoutConfig *layoutConfig = &selectedItem->layoutElement->config.layout;
+-                        CLAY_TEXT(layoutConfig->layoutDirection == CLAY_TOP_TO_BOTTOM ? CLAY_STRING("TOP_TO_BOTTOM") : CLAY_STRING("LEFT_TO_RIGHT"), infoTextConfig);
++                        CLAY_TEXT(layoutConfig->layoutDirection == CLAY_TOP_TO_BOTTOM ? CLAY_STRING("TOP_TO_BOTTOM") : layoutConfig->layoutDirection == CLAY_LEFT_TO_RIGHT_WRAP ? CLAY_STRING("LEFT_TO_RIGHT_WRAP") : CLAY_STRING("LEFT_TO_RIGHT"), infoTextConfig);
+                         // .sizing
+                         CLAY_TEXT(CLAY_STRING("Sizing"), infoTitleConfig);
+                         CLAY_AUTO_ID({ .layout = { .layoutDirection = CLAY_LEFT_TO_RIGHT } }) {

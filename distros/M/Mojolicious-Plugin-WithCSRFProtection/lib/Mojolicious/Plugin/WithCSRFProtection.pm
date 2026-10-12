@@ -4,7 +4,7 @@ package Mojolicious::Plugin::WithCSRFProtection;
 
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 sub register {
     my ( $self, $app ) = @_;
@@ -25,12 +25,20 @@ sub register {
         with_csrf_protection => sub {
             my ( $route, $c ) = @_;
 
-            my $csrf = $c->req->headers->header('X-CSRF-Token')
-                || $c->param('csrf_token');
+            if ( $Mojolicious::VERSION >= 9.48 ) {
+                if ( $c->validation->csrf_protect->has_error('csrf_token') ) {
+                    $c->reply->bad_csrf unless $c->stash->{'mojo.finished'};
+                    return;
+                }
+            }
+            else {
+                my $csrf = $c->req->headers->header('X-CSRF-Token')
+                    || $c->param('csrf_token');
 
-            unless ( $csrf && $csrf eq $c->csrf_token ) {
-                $c->reply->bad_csrf unless $c->stash->{'mojo.finished'};
-                return;
+                unless ( $csrf && $csrf eq $c->csrf_token ) {
+                    $c->reply->bad_csrf unless $c->stash->{'mojo.finished'};
+                    return;
+                }
             }
 
             return 1;
@@ -40,9 +48,10 @@ sub register {
     $routes->add_shortcut(
         with_csrf_protection => sub {
             my ($route) = @_;
-            if ($Mojolicious::VERSION >= 9) {
+            if ( $Mojolicious::VERSION >= 9 ) {
                 return $route->requires( with_csrf_protection => 1 );
-            } else {
+            }
+            else {
                 return $route->over( with_csrf_protection => 1 );
             }
         }

@@ -85,6 +85,17 @@ ok(length $loop->backend, 'backend selected: ' . $loop->backend);
     ok($wf->is_done, 'writable future resolves on writable pipe');
 }
 
+# ---- a watch replacing a pending readiness future cancels it -------------
+{
+    pipe(my $r, my $w) or die "pipe: $!";
+    my $f = $loop->readable_f($r);
+    my $watcher = $loop->watch_io($r, 'r', sub { $loop->stop });
+    ok($f->is_cancelled, 'readable_f replaced by watch_io on the same fd is cancelled, not dropped');
+    my $err = do { local $@; eval { $f->get }; $@ };
+    like($err, qr/cancel/i, '...so a ->get on it dies instead of pumping the loop for ever');
+    $loop->unwatch_io($watcher);
+}
+
 # ---- persistent watch_io + unwatch_io ------------------------------------
 {
     pipe(my $r, my $w) or die "pipe: $!";

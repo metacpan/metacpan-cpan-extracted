@@ -389,4 +389,57 @@ sub header {
         'pointing the mount at nothing fails at to_app, not on a request';
 }
 
+# ---- a source is never an asset ----------------------------------------------
+{
+    require File::Temp;
+    my $tree = File::Temp->newdir;
+    mkdir "$tree/guide"; mkdir "$tree/.secret"; mkdir "$tree/img";
+    my %file = (
+        'index.md'       => "# Root\n\nhello\n",
+        'guide/index.md' => "# Guide\n\nguide\n",
+        'guide/intro.md' => "# Intro\n\nintro\n",
+        'draft.md'       => "---\ndraft: 1\ntitle: Hidden\n---\n# Hidden\n\nsecret draft\n",
+        '.env'           => "MD_SECRET\n",
+        '.secret/k.txt'  => "DOTDIR\n",
+        'img/.hidden'    => "HIDDEN\n",
+        'img/logo.txt'   => "LOGO\n",
+        'notes.mdx'      => "MDX\n",
+    );
+    for my $f (sort keys %file) {
+        open my $fh, '>', "$tree/$f" or die "$f: $!";
+        print {$fh} $file{$f};
+        close $fh;
+    }
+    my $src = do {
+        package MDSrc;
+        use Punk;
+        markdown '/docs' => "$tree", title => 'T';
+        MDSrc->to_app;
+    };
+    my $read = sub {
+        my $r = shift;
+        return $r->[2][0] // '' if ref $r->[2] eq 'ARRAY';
+        local $/;
+        my $fh = $r->[2];
+        return scalar <$fh>;
+    };
+    for my $p ('/docs/index.md', '/docs/guide/index.md', '/docs/draft.md',
+               '/docs/draft.MD', '/docs/INDEX.Md', '/docs/.env',
+               '/docs/.secret/k.txt', '/docs/img/.hidden') {
+        my $r = hit($src, path => $p);
+        is $r->[0], 404, "$p is not served";
+        unlike $read->($r), qr/secret draft|MD_SECRET|DOTDIR|HIDDEN|^# /m,
+            '...and none of the source is in the 404';
+    }
+    is hit($src, path => '/docs/draft')->[0], 404, 'a draft has no page either';
+    my $r = hit($src, path => '/docs/guide/intro.md');
+    is $r->[0], 301, 'a published page under its .md name still redirects';
+    is header($r, 'Location'), '/docs/guide/intro', '...to the page';
+    $r = hit($src, path => '/docs/img/logo.txt');
+    is $r->[0], 200, 'an ordinary asset beside the documents is served';
+    is $read->($r), "LOGO\n", '...with its bytes';
+    is hit($src, path => '/docs/notes.mdx')->[0], 200,
+        'a name that merely starts like .md is an asset';
+}
+
 done_testing();

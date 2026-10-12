@@ -4,7 +4,9 @@ use warnings;
 use Socket qw(inet_aton pack_sockaddr_in);
 use Test2::V0;
 
+use Unblock::HTTP3::Client;
 use Unblock::HTTP3::Connection;
+use Unblock::HTTP3::Server;
 use Uniform::HTTP::Request;
 use Uniform::HTTP::Response;
 use Unblock::HTTP3::Transaction;
@@ -21,8 +23,8 @@ sub make_connection {
     );
 
     return $role eq 'client'
-        ? Unblock::HTTP3::Connection->client(quic => $endpoint->connection)
-        : Unblock::HTTP3::Connection->server(quic => $endpoint->connection);
+        ? Unblock::HTTP3::Client->new(quic => $endpoint->connection)
+        : Unblock::HTTP3::Server->new(quic => $endpoint->connection);
 }
 
 my $client = make_connection('client');
@@ -151,7 +153,7 @@ my $response_mismatch = make_tx(
 );
 
 like(
-    dies { $response_mismatch->send_response },
+    dies { $response_mismatch->respond($response_mismatch->response) },
     qr/does not match 3 body bytes/,
     'buffered response body must match Content-Length',
 );
@@ -171,7 +173,7 @@ for my $case (
     );
 
     like(
-        dies { $tx->send_response },
+        dies { $tx->respond($tx->response) },
         qr/Content-Length is not allowed/,
         "$label rejects Content-Length",
     );

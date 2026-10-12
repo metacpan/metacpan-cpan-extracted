@@ -1,0 +1,398 @@
+#!/usr/bin/env perl
+
+# tools/pod2markdown - convert the documentation into Markdown pages.
+#
+# Writes docs/NAME.md from every lib/NAME.pm and lib/NAME.pod, for
+# reading on GitHub. Pod::Markdown with five changes: links between the
+# pages of this distribution point to their Markdown files, URLs of
+# files on GitHub at a release tag point to the master branch, the
+# indentation that all lines of a verbatim block share is removed, each
+# verbatim block is fenced with the language set by the last
+# '=for highlighter' paragraph, and tables in 'text' blocks become
+# Markdown tables. See the pod at the end.
+#
+# Copyright 2026 davenonymous
+#
+# Released under the same zlib/libpng license as Clay itself and the rest
+# of this distribution; see src/clay/LICENSE.md.
+
+use v5.22;
+use warnings;
+use feature 'signatures';
+no warnings 'experimental::signatures';
+
+use File::Basename qw(dirname);
+use File::Find qw(find);
+use File::Path qw(make_path);
+use Getopt::Long qw(GetOptions);
+use Pod::Usage qw(pod2usage);
+
+use constant {
+	LIB_DIRECTORY  => 'lib',
+	DOCS_DIRECTORY => 'docs',
+	MAIN_POD_FILE  => 'lib/Clay/UI.pm',
+};
+
+package My::Pod::Markdown {
+	use parent 'Pod::Markdown';
+	use feature 'signatures';
+	no warnings 'experimental::signatures';
+
+	use File::Basename qw(dirname);
+	use File::Spec;
+
+	use constant DEFAULT_LANGUAGE => 'perl';
+
+	die "Pod::Markdown has no _indent_verbatim(); this script needs an update\n"
+		unless Pod::Markdown->can('_indent_verbatim');
+
+	# $markdown_file is the file being written; %$markdown_files maps the
+	# module names of the local pages to their Markdown files.
+	sub new ($class, $markdown_file, $markdown_files) {
+		my $self = $class->SUPER::new(output_encoding => 'UTF-8');
+		$self->accept_targets('highlighter');
+		$self->{highlighter_language} = DEFAULT_LANGUAGE;
+		$self->{markdown_directory}   = dirname($markdown_file);
+		$self->{markdown_files}       = $markdown_files;
+		return $self;
+	}
+
+	# Links to a local page point to its Markdown file, relative to the
+	# file being written, with a fragment as GitHub creates it.
+	sub format_perldoc_url ($self, $name, $section) {
+		my $target = defined $name ? $self->{markdown_files}{$name} : undef;
+		return $self->SUPER::format_perldoc_url($name, $section) unless defined $target;
+
+		my $url = File::Spec::Unix->abs2rel($target, $self->{markdown_directory});
+		$url .= '#' . $self->format_fragment_markdown($section) if defined $section && length $section;
+		return $url;
+	}
+
+	# '=for highlighter language=NAME' (or just NAME) sets the language
+	# of the following verbatim blocks, as on MetaCPAN. Its text is
+	# collected here instead of being written to the output.
+	sub start_for ($self, $attr) {
+		return $self->SUPER::start_for($attr) unless $attr->{target} eq 'highlighter';
+		$self->{highlighter_text} = '';
+		return;
+	}
+
+	sub end_for ($self, @args) {
+		return $self->SUPER::end_for(@args) unless defined $self->{highlighter_text};
+		my $setting = delete $self->{highlighter_text};
+		my ($language) = $setting =~ /\A\s*(?:language=)?([\w+#-]+)\s*\z/
+			or die "invalid '=for highlighter' setting '$setting'\n";
+		$self->{highlighter_language} = $language;
+		return;
+	}
+
+	sub start_Data ($self, @args) {
+		return if defined $self->{highlighter_text};
+		return $self->SUPER::start_Data(@args);
+	}
+
+	sub end_Data ($self, @args) {
+		return if defined $self->{highlighter_text};
+		return $self->SUPER::end_Data(@args);
+	}
+
+	sub handle_text ($self, $text) {
+		if (defined $self->{highlighter_text}) {
+			$self->{highlighter_text} .= $text;
+			return;
+		}
+		return $self->SUPER::handle_text($text);
+	}
+
+	# A fenced block without the indentation its lines share. In a text
+	# block, every table (see markdown_table) becomes a Markdown table.
+	sub _indent_verbatim ($self, $paragraph) {
+		my @lines    = split /\n/, $paragraph;
+		my ($indent) = sort { $a <=> $b } map { /\A( *)/; length $1 } grep { /\S/ } @lines;
+		$indent //= 0;
+		my $code = join "\n", map { length > $indent ? substr($_, $indent) : '' } @lines;
+		return "```$self->{highlighter_language}\n$code\n```" unless $self->{highlighter_language} eq 'text';
+
+		my @parts = map { is_table($_) ? markdown_table(without_escapes($_)) : "```text\n$_\n```" } split /\n\s*\n/, $code;
+		return join "\n\n", @parts;
+	}
+
+	# Pod::Markdown escapes every '<' and '&' of a verbatim block as
+	# "\0c<\0" and "\0c&\0" until the document is complete; a table needs
+	# the plain text to find its columns.
+	sub without_escapes ($text) {
+		return $text =~ s/\0c?([&<])\0/$1/gr;
+	}
+
+	# A table is a header line followed by a line of dash runs, one run
+	# per column, separated by spaces.
+	sub is_table ($text) {
+		my @lines = split /\n/, $text;
+		return @lines >= 3 && $lines[1] =~ /\A-+(?: +-+)*\z/;
+	}
+
+	# Each cell is the text above or below its column's dash run; text
+	# outside the runs is an error. Columns whose cells are all numbers
+	# are right-aligned. Identifiers and single punctuation characters in
+	# the first column become code; '&' and '<' in other cells become
+	# entities.
+	sub markdown_table ($text) {
+		my ($header, $dashes, @rows) = split /\n/, $text;
+		my @spans;
+		while ($dashes =~ /(-+)/g) {
+			push @spans, [ $-[1], $+[1] - $-[1] ];
+		}
+		my @table   = map { table_cells($_, \@spans) } $header, @rows;
+		my @numeric = map {
+			my $column = $_;
+			!grep { $_->[$column] !~ /\A[0-9.]+\z/ } @table[ 1 .. $#table ];
+		} 0 .. $#spans;
+		foreach my $row (@table[ 1 .. $#table ]) {
+			$row->[0] = join ', ', map { "`$_`" } split /, /, $row->[0]
+				if $row->[0] =~ /\A(?:[a-z_]+(?:, [a-z_]+)*|[[:punct:]])\z/;
+		}
+
+		foreach my $row (@table) {
+			foreach my $cell (@$row) {
+				$cell =~ s/&/&amp;/g, $cell =~ s/</&lt;/g unless $cell =~ /\A`/;
+				$cell =~ s/\|/\\|/g;
+			}
+		}
+		my @widths = map {
+			my $column   = $_;
+			my ($widest) = sort { $b <=> $a } 3, map { length $_->[$column] } @table;
+			$widest;
+		} 0 .. $#spans;
+
+		my @markdown = (
+			table_row($table[0], \@widths, \@numeric),
+			table_row([ map { $numeric[$_] ? '-' x ($widths[$_] - 1) . ':' : '-' x $widths[$_] } 0 .. $#spans ], \@widths, []),
+			map { table_row($_, \@widths, \@numeric) } @table[ 1 .. $#table ],
+		);
+		return join "\n", @markdown;
+	}
+
+	sub table_cells ($line, $spans) {
+		my $outside = $line;
+		my @cells;
+		foreach my $span (@$spans) {
+			my ($start, $length) = @$span;
+			my $cell = length $line > $start ? substr($line, $start, $length) : '';
+			substr($outside, $start, $length) = ' ' x $length if length $outside > $start;
+			$cell =~ s/\A\s+|\s+\z//g;
+			push @cells, $cell;
+		}
+		die "table text outside the columns: '$line'\n" if $outside =~ /\S/;
+		return \@cells;
+	}
+
+	# One table row with every cell padded to its column's width, so that
+	# the columns line up in the Markdown source too. Cells of
+	# right-aligned columns, header included, are padded on the left.
+	sub table_row ($cells, $widths, $right_aligned) {
+		my @padded = map {
+			my $padding = ' ' x ($widths->[$_] - length $cells->[$_]);
+			$right_aligned->[$_] ? $padding . $cells->[$_] : $cells->[$_] . $padding;
+		} 0 .. $#$cells;
+		return '| ' . join(' | ', @padded) . ' |';
+	}
+}
+
+package main;
+
+# The pod points to the figures and the PDF at the tag of the release,
+# because MetaCPAN shows images with relative paths as gray placeholders
+# (tools/make-images keeps the tag up to date). That tag does not exist
+# on GitHub before the release; the Markdown pages point to the files in
+# the master branch instead.
+use constant {
+	RAW_URL_BASE  => 'https://raw.githubusercontent.com/davenonymous/perl-clay-xs/',
+	BLOB_URL_BASE => 'https://github.com/davenonymous/perl-clay-xs/blob/',
+};
+
+my %options;
+GetOptions(\%options, 'check', 'help')
+	or pod2usage(2);
+pod2usage(1) if $options{help};
+pod2usage('no arguments expected') if @ARGV;
+
+my @pages          = documentation_pages();
+my %markdown_files = map { $_->[0] => $_->[2] } @pages;
+my $outdated       = 0;
+foreach my $page (@pages) {
+	my (undef, $pod_file, $markdown_file) = @$page;
+	$outdated += store_markdown(convert($pod_file, $markdown_file, \%markdown_files), $markdown_file, $options{check});
+}
+my %is_page_file = map { $_ => 1 } values %markdown_files;
+$outdated += remove_markdown($_, $options{check}) foreach grep { !$is_page_file{$_} } existing_docs_files();
+exit($options{check} && $outdated ? 1 : 0);
+
+# Every page: its module name, its pod file and its Markdown file, all
+# paths relative to the top directory of the distribution. The pod of
+# lib/NAME.pm or lib/NAME.pod becomes docs/NAME.md.
+sub documentation_pages () {
+	my @pod_files;
+	find({ no_chdir => 1, wanted => sub { push @pod_files, $_ if /\.(?:pm|pod)\z/ } }, LIB_DIRECTORY);
+	die "no pod files found in lib/; run this from the top directory of the distribution\n"
+		unless grep { $_ eq MAIN_POD_FILE } @pod_files;
+
+	return map {
+		my ($path) = m{\Alib/(.+)\.(?:pm|pod)\z};
+		[ $path =~ s{/}{::}gr, $_, DOCS_DIRECTORY . "/$path.md" ];
+	} sort @pod_files;
+}
+
+sub existing_docs_files () {
+	return () unless -d DOCS_DIRECTORY;
+	my @files;
+	find({ no_chdir => 1, wanted => sub { push @files, $_ if -f } }, DOCS_DIRECTORY);
+	return sort @files;
+}
+
+sub convert ($pod_file, $markdown_file, $markdown_files) {
+	my $markdown = '';
+	my $parser   = My::Pod::Markdown->new($markdown_file, $markdown_files);
+	$parser->output_string(\$markdown);
+	$parser->parse_file($pod_file);
+	die "$pod_file: no pod found\n" unless length $markdown;
+	return master_branch_urls($markdown);
+}
+
+# A URL of a file on GitHub at a tag, such as RAW_URL_BASE/v0.05/images/NAME.png
+# or BLOB_URL_BASE/v0.05/images/NAME.pdf, becomes the URL of the same file in
+# the master branch.
+sub master_branch_urls ($markdown) {
+	return $markdown =~ s{(\Q@{[RAW_URL_BASE]}\E|\Q@{[BLOB_URL_BASE]}\E)v[0-9][^/]*/}{${1}master/}gr;
+}
+
+# Writes the Markdown unless the file already holds it. Returns 1 when
+# the file was (or, with --check, would be) changed.
+sub store_markdown ($markdown, $file, $check_only) {
+	my $current = '';
+	if (open my $in, '<:raw', $file) {
+		local $/;
+		$current = <$in>;
+		close $in;
+	}
+	return 0 if $current eq $markdown;
+
+	if ($check_only) {
+		say "out of date: $file";
+		return 1;
+	}
+	make_path(dirname($file));
+	open my $out, '>:raw', $file or die "cannot write $file: $!\n";
+	print {$out} $markdown;
+	close $out or die "cannot write $file: $!\n";
+	say "wrote $file";
+	return 1;
+}
+
+# Removes a file in docs/ that no pod file produces any more. Returns 1.
+sub remove_markdown ($file, $check_only) {
+	if ($check_only) {
+		say "no pod file for: $file";
+		return 1;
+	}
+	unlink $file or die "cannot remove $file: $!\n";
+	say "removed $file";
+	return 1;
+}
+
+__END__
+
+=head1 NAME
+
+pod2markdown - convert the Clay::XS and Clay::UI documentation into Markdown
+
+=head1 SYNOPSIS
+
+  perl tools/pod2markdown [--check]
+
+=head1 DESCRIPTION
+
+Converts the pod of every module and pod file under F<lib> into a
+Markdown page in F<docs>, run from the top directory of the
+distribution:
+
+  lib/Clay/UI.pm           -> docs/Clay/UI.md
+  lib/Clay/UI/Grid.pm      -> docs/Clay/UI/Grid.md
+  lib/Clay/Manual.pod      -> docs/Clay/Manual.md
+
+and so on for every other file. The pages are for reading on GitHub;
+F<docs> is not shipped (see F<MANIFEST.SKIP>). Files whose content
+would not change are left alone, and files in F<docs> that no pod file
+produces any more are removed. The conversion is done by
+L<Pod::Markdown>, with five changes:
+
+=over
+
+=item *
+
+A link to one of these pages, such as
+C<< LE<lt>Clay::Manual/TEXTE<gt> >>, points to its Markdown file,
+relative to the file that contains the link, for example
+C<Manual.md#text> from F<docs/Clay/UI.md>. Other links point to
+MetaCPAN as usual.
+
+=item *
+
+A URL of a file on GitHub at a tag, such as
+C<https://raw.githubusercontent.com/davenonymous/perl-clay-xs/v0.05/images/child-alignment.png>
+or
+C<https://github.com/davenonymous/perl-clay-xs/blob/v0.05/images/example-16-invoice-pdf.pdf>,
+becomes the URL of the same file in the C<master> branch. The pod
+points to the tag of the release, because MetaCPAN shows images with
+relative paths as gray placeholders, but that tag does not exist on
+GitHub before the release. F<tools/make-images> keeps the tag in the
+pod up to date.
+
+=item *
+
+The indentation that all lines of a verbatim block share is removed, so
+the code starts at the left edge of the Markdown code block.
+
+=item *
+
+Each verbatim block is fenced with a language name for syntax
+highlighting. A paragraph
+
+  =for highlighter language=sh
+
+sets the language of all following verbatim blocks of the page, until
+the next such paragraph; C<=for highlighter sh> works too. This is the
+marker MetaCPAN uses for its own highlighting. Blocks before the first
+marker are C<perl>.
+
+=item *
+
+In a C<text> block, every table becomes a Markdown table. A table is a
+group of lines without blank lines between them: a header line, a line
+of dash runs separated by spaces, one run per column, and the rows. The
+text of each cell must lie within the width of its column's dash run;
+otherwise the script stops with an error. Columns that hold only
+numbers are right-aligned, and identifiers such as option names and
+single punctuation characters in the first column are formatted as
+code. Every cell is padded to the width of its column, so the columns
+also line up in the Markdown source. Other groups of lines in the block
+stay a C<text> code block.
+
+  Key     Default
+  ------  -------
+  width   fit
+  wrap    words
+
+=back
+
+=head1 OPTIONS
+
+=over
+
+=item --check
+
+Write nothing; list the Markdown files that are out of date or would be
+removed and exit with status 1 if there are any.
+
+=back
+
+=cut

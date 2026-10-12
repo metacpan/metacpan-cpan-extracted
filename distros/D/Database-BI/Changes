@@ -1,5 +1,61 @@
 Revision history for Database-BI
 
+0.011.0	Sun Oct 11 09:20:48 PM EDT 2026
+    [ Enhancements ]
+    - Added schema browser (GET /tables) for multi-table SQLite databases.
+      Opening a SQLite file with more than one internal table now shows a
+      card grid listing every table with its columns rather than silently
+      opening the first table.  Clicking a card opens that table via the
+      existing /open view.  The schema page is inserted into the breadcrumb
+      trail so users can navigate back to it.
+    - Added ?it=<table> parameter to GET /open, allowing a specific internal
+      table to be opened from a multi-table SQLite file.
+    - Added sqlite_tables() accessor to DataSource, returning the list of
+      internal table names discovered during construction.
+    - Added internal_table constructor option to DataSource, letting callers
+      request a specific internal SQLite table instead of the auto-detected
+      first match.
+    - Added data/store.db: sample SQLite database with three joinable tables
+      (customer, product, sales) for development and demonstration.
+    - Fixed: multi-table symlink for .db-extension SQLite files now uses
+      .sql as the symlink extension so Database::Abstraction opens it via
+      the DBI/SQLite backend rather than falling through to the CSV reader.
+    NOTE: /tables tests currently cover SQLite only.  MySQL, PostgreSQL,
+    and other multi-table driver tests will be added in a future release
+    once the corresponding Database::Abstraction drivers are available.
+    - Server-side pagination for /view/:table and /open.  Both routes now accept
+      ?page=N (1-based, default 1) and ?per_page=M (default 200, max 2000).
+      The controller uses the N+1 trick: it requests per_page+1 rows via
+      LIMIT/OFFSET and treats the extra row as a "has next page" sentinel rather
+      than issuing a COUNT(*) query.  This is critical for multi-GB SQLite files
+      (e.g. openaddresses.db) where COUNT(*) would block the server for minutes.
+      A pagination bar (Prev / current page / Next) is shown when at least two
+      pages exist.  All URL parameters (filters, dedup, per_page, etc.) are
+      preserved across page navigations.
+    - BerkeleyDB files larger than 100 MB now return an informative error page
+      instead of causing disk thrashing.  Files whose magic bytes identify them as
+      BerkeleyDB but whose DB_File tie() fails (e.g. Berkeley DB version 9 files
+      opened with libdb-5.3) would previously fall through to D::A's CSV path,
+      causing a full read of the binary file.  DataSource now detects the magic
+      bytes in _detect_file_info, refuses files above 100 MB immediately, and
+      returns error_unsupported_db for smaller files where tie() fails.
+    - Three-level breadcrumb for chart pages.  When a bar, line-graph, pie,
+      or heatmap chart is launched from a table view that was itself reached
+      from the schema browser (/tables), the chart page now shows the full
+      navigation chain (e.g. Home > Store schema > Table view > Chart) rather
+      than the previous two-level "Home > Back to table".  The dashboard
+      panel forms forward the current page's back_url as back2=/back2_label=
+      parameters; the chart controllers promote them to the outer breadcrumb
+      level so all four levels are rendered correctly.
+    - SQLite hover tooltip on the home-page file picker.  Hovering over a
+      database card in the "Choose a database" list now shows a dark popover
+      with the file type (e.g. "SQLite database - 3 tables"), last-modified
+      date, and file size.  GET /api/stat now returns a table_count integer
+      for SQLite-extension files (.sql, .sqlite, .sqlite3, .db); the count
+      is omitted for Berkeley DB .db files or other non-SQLite payloads.
+      The home-page db-cards now carry data-path attributes so the JS fetch
+      can call /api/stat on first mouseenter (lazy, not on page load).
+
 0.010.0	Tue Oct  6 11:29:33 AM EDT 2026
     [ Enhancements ]
     - Added Folder view (GET /folder): browse any data file grouped by the

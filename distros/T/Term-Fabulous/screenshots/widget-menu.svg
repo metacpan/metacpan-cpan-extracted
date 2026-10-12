@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="636" height="345" viewBox="0 0 636 345" role="img" aria-label="perl examples/widgets/menu.pl">
+<title>perl examples/widgets/menu.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="604" height="310" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="604" height="310" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="604" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="318" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/widgets/menu.pl</text>
+<rect x="16.5" y="16.5" width="603" height="309" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="102" y="132" width="288" height="36" fill="#1e2128"/>
+<rect x="102" y="168" width="9" height="18" fill="#1e2128"/>
+<rect x="111" y="168" width="270" height="18" fill="#61afef"/>
+<rect x="381" y="168" width="9" height="18" fill="#1e2128"/>
+<rect x="102" y="186" width="288" height="108" fill="#1e2128"/>
+<rect x="30" y="294" width="576" height="18" fill="#1e2128"/>
+<rect x="111" y="140" width="270" height="1" fill="#61afef"/>
+<rect x="106" y="150" width="1" height="126" fill="#61afef"/>
+<rect x="385" y="150" width="1" height="126" fill="#61afef"/>
+<rect x="111" y="194" width="270" height="1" fill="#787e8a"/>
+<rect x="111" y="248" width="270" height="1" fill="#787e8a"/>
+<rect x="111" y="284" width="270" height="1" fill="#61afef"/>
+</g>
+<polyline points="106.5 150 106.5 145 106.538 144.413 106.653 143.835 106.843 143.278 107.103 142.75 107.43 142.261 107.818 141.818 108.261 141.43 108.75 141.103 109.278 140.843 109.835 140.653 110.413 140.538 111 140.5 111 140.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="385.5 150 385.5 145 385.462 144.413 385.347 143.835 385.157 143.278 384.897 142.75 384.57 142.261 384.182 141.818 383.739 141.43 383.25 141.103 382.722 140.843 382.165 140.653 381.587 140.538 381 140.5 381 140.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="106.5 276 106.5 280 106.538 280.587 106.653 281.165 106.843 281.722 107.103 282.25 107.43 282.739 107.818 283.182 108.261 283.57 108.75 283.897 109.278 284.157 109.835 284.347 110.413 284.462 111 284.5 111 284.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="385.5 276 385.5 280 385.462 280.587 385.347 281.165 385.157 281.722 384.897 282.25 384.57 282.739 384.182 283.182 383.739 283.57 383.25 283.897 382.722 284.157 382.165 284.347 381.587 284.462 381 284.5 381 284.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<g class="terminal">
+<text x="66" y="92" textLength="72" fill="#dcdfe4">.profile</text>
+<text x="66" y="110" textLength="81" fill="#dcdfe4">notes.txt</text>
+<text x="66" y="128" textLength="72" fill="#dcdfe4">todo.txt</text>
+<text x="48" y="146" textLength="54" fill="#dcdfe4">&gt; budg</text>
+<text x="66" y="164" textLength="36" fill="#dcdfe4">lett</text>
+<text x="138" y="164" textLength="36" fill="#dcdfe4">Open</text>
+<text x="327" y="164" textLength="45" fill="#787e8a">Enter</text>
+<text x="66" y="182" textLength="36" fill="#dcdfe4">phot</text>
+<text x="138" y="182" textLength="234" fill="#101216">Rename...               F2</text>
+<text x="138" y="218" textLength="27" fill="#dcdfe4">Cut</text>
+<text x="318" y="218" textLength="54" fill="#787e8a">Ctrl+X</text>
+<text x="138" y="236" textLength="45" fill="#6c7078">Paste</text>
+<text x="318" y="236" textLength="54" fill="#787e8a">Ctrl+V</text>
+<text x="124.5" y="272" text-anchor="middle" fill="#dcdfe4">✓</text>
+<text x="138" y="272" textLength="153" fill="#dcdfe4">Show hidden files</text>
+<text x="327" y="272" textLength="45" fill="#787e8a">Alt+h</text>
+<text x="39" y="308" textLength="423" fill="#dcdfe4">Right-click a file, or press Shift+F10, for its</text>
+<text x="466.5" y="308" text-anchor="middle" fill="#dcdfe4">…</text>
+<text x="489" y="308" textLength="108" fill="#787e8a">Ctrl+C quits</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

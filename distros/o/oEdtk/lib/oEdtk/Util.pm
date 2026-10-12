@@ -3,15 +3,15 @@ package oEdtk::Util;
 use strict;
 use warnings;
 
-our $VERSION	= 0.01;
+our $VERSION	= 2.1109;
 our @ISA	= qw(Exporter);
 our @EXPORT_OK	= qw(_uc_hash_keys);
 
-# Conversion de toutes les clefs d'un hash en majuscule, utile
-# car PostgreSQL retourne les noms de colonnes en minuscule.
+# Convert all hash keys to uppercase, useful
+# because PostgreSQL returns column names in lowercase.
 #
-# XXX Cette fonction n'est plus utilisée maintenant qu'on set
-# l'option 'FetchHashKeyName' à 'NAME_uc' dans DBAdmin.pm.
+# XXX This function is no longer used now that we set
+# the 'FetchHashKeyName' option to 'NAME_uc' in DBAdmin.pm.
 sub _uc_hash_keys {
 	my $hash = shift;
 

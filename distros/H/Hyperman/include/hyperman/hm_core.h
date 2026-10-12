@@ -23,6 +23,14 @@
                            First, so every later header sees the platform
                            headers it pulls; a passthrough on POSIX. */
 #include "hm_parse.h"   /* hm_hline, hm_parse_index, hm_chunked_* */
+#include "hm_proxy.h"   /* the PROXY protocol header, v1 and v2  */
+#ifndef _WIN32
+#include <pwd.h>        /* user => 'name' (hm_resolve_drop)        */
+#include <grp.h>        /* group => 'name'                          */
+#include <netdb.h>      /* getaddrinfo (hm_resolve)                 */
+#include <sys/un.h>     /* path => listeners                        */
+#include <sys/stat.h>
+#endif
 #include "hm_abi.h"     /* public C ABI: hm_abi table + callback typedefs */
 
 #if defined(HM_HAVE_SENDFILE_LINUX)
@@ -91,6 +99,10 @@ typedef struct {
     char *altsvc;         /* precomputed Alt-Svc value, or NULL       */
     int   starved;        /* accept hit EMFILE: read interest is off
                            * until a short timer puts it back        */
+    int   is_unix;        /* a path listener: no peer address, no
+                           * TCP options, SERVER_PORT 0              */
+    int   proxy_protocol; /* a connection starts with a PROXY header
+                           * (hm_proxy_readable), before any TLS     */
 } hm_listener;
 
 struct hm_conn {
@@ -155,8 +167,23 @@ struct hm_conn {
     unsigned char close_deferred; /* hm_close was asked for while in_app */
     unsigned char read_paused;    /* read interest dropped while in_app with
                                    * a full buffer (hm_read_pause)       */
+    unsigned char pp_wait;        /* awaiting the PROXY header: nothing
+                                   * else reads this socket until it is
+                                   * parsed (hm_proxy_readable)         */
+    char     proxy_addr[INET6_ADDRSTRLEN]; /* the proxy that connected, once
+                                   * the header named the real client */
+    int      proxy_port;
     unsigned char backlogged;     /* hm_process stopped on a full write
                                    * buffer; the drain re-queues it     */
+    unsigned char req_11;         /* the request on the plate is HTTP/1.1 */
+    unsigned char stream_mode;    /* a streamed body's framing (HM_SM_*) */
+    unsigned char stream_done;    /* a streamed body ended with keep-alive
+                                   * on: the drain serves the pipeline   */
+    UV       stream_serial; /* streamed responses begun on this conn; a
+                             * Writer carries the one it belongs to, so a
+                             * writer kept past its response cannot end
+                             * the next one                              */
+    UV       stream_left;   /* HM_SM_LENGTH: body octets still owed      */
     size_t   chunk_pos;     /* chunked body: octets validated so far, so
                              * a re-scan starts at the last chunk boundary
                              * rather than at the first chunk           */
@@ -168,6 +195,11 @@ struct hm_conn {
     int      peer_port;               /* REMOTE_PORT, filled at accept    */
     time_t   last_active;
     time_t   req_start;     /* first byte of an incomplete request  */
+    time_t   last_rx;       /* last read that delivered bytes: the body
+                             * phase is timed from here, not from the
+                             * request's first byte                  */
+    unsigned char body_phase; /* headers complete, body still arriving:
+                             * hm_sweep applies body_timeout        */
     /* A body being drained to a temp file rather than accumulated in rbuf.
      * -1 when not spilling. The fd becomes psgi.input and the handle owns it
      * from that moment; the file is unlinked at creation, so nothing is left
@@ -221,6 +253,30 @@ typedef struct {
 
 typedef struct { int fd; UV id; } hm_again;
 
+/* One piece of an access-log line. The format string is compiled to these
+ * once, in the parent, so writing a line is a walk over an array and never a
+ * parse: a literal run, an $env value (the key SV carries its hash), or one
+ * of the computed fields. */
+#define HM_LT_LIT      0   /* literal bytes                                 */
+#define HM_LT_ENV      1   /* $env->{key}, escaped; "-" when absent         */
+#define HM_LT_DASH     2   /* %l: always "-"                                */
+#define HM_LT_STATUS   3   /* %s, %>s                                       */
+#define HM_LT_BYTES    4   /* %b: body bytes, "-" when there were none      */
+#define HM_LT_BYTES0   5   /* %B: body bytes, "0" when there were none      */
+#define HM_LT_TIME     6   /* %t: [dd/Mon/YYYY:HH:MM:SS +ZZZZ]              */
+#define HM_LT_TIME_ISO 7   /* json: YYYY-MM-DDTHH:MM:SS+ZZZZ                */
+#define HM_LT_REQLINE  8   /* %r: METHOD URI PROTO                          */
+#define HM_LT_QUERY    9   /* %q: ?query, or nothing                        */
+#define HM_LT_PID     10   /* %P                                            */
+#define HM_LT_DUR_US  11   /* %D: microseconds since the request was built  */
+#define HM_LT_DUR_S   12   /* %T: whole seconds of the same                 */
+typedef struct {
+    int     kind;
+    char   *lit;        /* HM_LT_LIT: owned                                */
+    size_t  litlen;
+    SV     *key;        /* HM_LT_ENV: a shared-string SV, hash precomputed */
+} hm_logtok;
+
 struct hm_loop {
     int         pid;                /* the process that created this loop
                                      (hm_os_getpid: MSVC has no pid_t) */
@@ -253,6 +309,7 @@ struct hm_loop {
     time_t      now;
     double      idle_timeout;
     double      header_timeout;
+    double      body_timeout;       /* a body stalled this long is closed */
     int         max_pipeline;       /* fairness: requests per conn per wakeup */
     size_t      max_read;           /* request size ceiling (headers + body) */
     int         compress;          /* gzip responses (0 = off, the default) */
@@ -268,6 +325,12 @@ struct hm_loop {
     char        log_ts[32];         /* "dd/Mon/YYYY:HH:MM:SS +ZZZZ", 1Hz     */
     time_t      date_sec;           /* second the Date header below is for   */
     char        date_hdr[40];       /* "Date: <IMF-fixdate>\r\n", 1Hz        */
+    hm_logtok  *logtok;             /* the compiled access_log_format        */
+    int         nlogtok;
+    int         log_json;           /* values escaped for JSON, not CLF      */
+    int         log_wants_t0;       /* the format reads %D/%T: stamp requests */
+    time_t      log_iso_sec;        /* second the ISO stamp below is for     */
+    char        log_iso[40];        /* "YYYY-MM-DDTHH:MM:SS+ZZZZ", 1Hz        */
     UV          requests;           /* requests dispatched (stats)  */
     UV          accepts;            /* connections accepted (stats) */
     UV          denied;             /* connections dropped at accept, denylist */
@@ -337,6 +400,7 @@ static hm_listener *hm_listener_for_udp(hm_loop *loop, int fd) {
 }
 
 static SV      *hm_empty_input;     /* shared empty psgi.input */
+static SV      *hm_empty_input_sv(pTHX);   /* ... checked still open */
 #ifndef _WIN32
 static pid_t    hm_children[1024];  /* the supervisor's pool (POSIX only) */
 static time_t   hm_child_start[1024];
@@ -629,6 +693,24 @@ static SV *hm_new_input(pTHX_ const char *body, STRLEN len) {
     IoTYPE(io) = IoTYPE_RDONLY;
     return newRV_noinc((SV *)gv);
 #endif
+}
+
+/* The shared empty psgi.input, as every bodyless request gets it: one glob
+ * for the whole worker, because a fresh :scalar handle per request is a
+ * glob, an IO and a layer for a body that is not there. One check keeps the
+ * sharing honest: an application that closed it (or re-opened it over
+ * something else) left a handle with no input stream, and the next request
+ * would read a closed filehandle. A new one replaces it then. */
+static SV *hm_empty_input_sv(pTHX) {
+    if (hm_empty_input && SvROK(hm_empty_input)) {
+        SV *gv = SvRV(hm_empty_input);
+        IO *io = SvTYPE(gv) == SVt_PVGV ? GvIO((GV *)gv) : NULL;
+        if (io && IoIFP(io)) return SvREFCNT_inc(hm_empty_input);
+        SvREFCNT_dec(hm_empty_input);
+        hm_empty_input = NULL;
+    }
+    hm_empty_input = hm_new_input(aTHX_ "", 0);
+    return SvREFCNT_inc(hm_empty_input);
 }
 
 /* psgix.io: a dup of the client socket, so an app that hijacks it keeps
@@ -1016,7 +1098,7 @@ static int hm_arm_recv(hm_loop *loop, hm_conn *c) {
     if (!loop->completion || !loop->be->submit_recv) return 0;
     /* TLS reads belong to OpenSSL: the bytes on the socket are ciphertext and
      * the engine may already hold plaintext this would never see. */
-    if (c->ssl || c->recv_inflight || c->detached) return 0;
+    if (c->ssl || c->recv_inflight || c->detached || c->pp_wait) return 0;
     if (c->rlen == c->rcap) {
         /* Grow BEFORE the kernel is given the pointer. Never while a read is
          * outstanding, which is why this cannot live in the completion. */
@@ -1233,8 +1315,21 @@ static hm_conn *hm_new_conn(hm_loop *loop, int fd, hm_listener *lst) {
     loop->conns[fd] = c;
     loop->nconns++;
     hm_set_nonblock(fd);
-    { int one = 1; hm_os_setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &one, sizeof(one)); }
-    if (lst && lst->tls_ctx) {
+    if (!(lst && lst->is_unix)) {
+        int one = 1;
+        hm_os_setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &one, sizeof(one));
+    }
+    if (lst && lst->proxy_protocol) {
+        /* The PROXY header comes first, on the raw socket, before TLS can
+         * wrap it and before any request byte is read. Readiness reads for
+         * life (recv_fallback), the header-phase timeout from now, and no
+         * TLS until hm_proxy_readable has the client's address. */
+        c->pp_wait = 1;
+        c->recv_fallback = 1;
+        c->req_start = loop->now;
+        loop->be->add_io(loop->be, fd, HM_EV_READ, 0);
+    }
+    else if (lst && lst->tls_ctx) {
         /* TLS wraps first: the handshake is driven off readiness, and
          * hm_arm_recv would decline a TLS connection anyway. */
         loop->be->add_io(loop->be, fd, HM_EV_READ, 0);
@@ -1374,7 +1469,8 @@ enum {
     HMK_PSGI_MULTIPROCESS, HMK_PSGI_RUN_ONCE, HMK_PSGI_STREAMING,
     HMK_PSGI_NONBLOCKING, HMK_PSGI_ERRORS, HMK_PSGIX_LOOP, HMK_PSGIX_IO,
     HMK_PSGI_INPUT, HMK_PSGIX_INPUT_BUFFERED, HMK_CONTENT_LENGTH,
-    HMK_CONTENT_TYPE, HMK_PSGIX_HM_CONN, HMK_PSGIX_HM_STREAM, HMK_COUNT
+    HMK_CONTENT_TYPE, HMK_PSGIX_HM_CONN, HMK_PSGIX_HM_STREAM, HMK_PSGIX_PROXY_ADDR,
+    HMK_COUNT
 };
 static const char *const hm_env_key_name[HMK_COUNT] = {
     "REQUEST_METHOD", "REQUEST_URI", "PATH_INFO", "QUERY_STRING",
@@ -1384,7 +1480,8 @@ static const char *const hm_env_key_name[HMK_COUNT] = {
     "psgi.multiprocess", "psgi.run_once", "psgi.streaming",
     "psgi.nonblocking", "psgi.errors", "psgix.loop", "psgix.io",
     "psgi.input", "psgix.input.buffered", "CONTENT_LENGTH",
-    "CONTENT_TYPE", "psgix.hyperman.conn", "psgix.hyperman.stream"
+    "CONTENT_TYPE", "psgix.hyperman.conn", "psgix.hyperman.stream",
+    "psgix.proxy_addr"
 };
 static SV *hm_env_key[HMK_COUNT];
 static SV *hm_env_zero, *hm_env_one;   /* read-only 0/1 flag values      */
@@ -1560,6 +1657,8 @@ static HV *hm_build_env(pTHX_ char *head, size_t headlen,
      * SV, and the shared one is read-only, so an application redirecting
      * its errors died with "Modification of a read-only value". */
     hm_env_store(env, HMK_PSGI_ERRORS,       newSVsv(hm_env_errors));
+    if (c->loop->log_wants_t0)                /* %D / %T in the log format */
+        (void)hv_stores(env, "psgix.request_start", newSVnv((NV)hm_now_ns() / 1e9));
 
     /* psgix.loop: this worker's loop, so apps/clients can create loop
      * Futures; psgix.io: the client socket, dup'd so an app that
@@ -1585,9 +1684,12 @@ static HV *hm_build_env(pTHX_ char *head, size_t headlen,
     }
     hm_env_store(env, HMK_PSGIX_HM_CONN,   SvREFCNT_inc(c->cid_sv));
     hm_env_store(env, HMK_PSGIX_HM_STREAM, SvREFCNT_inc(c->cid_sv));
+    if (c->proxy_addr[0])                   /* the address that connected */
+        hm_env_store(env, HMK_PSGIX_PROXY_ADDR, newSVpv(c->proxy_addr, 0));
     if (c->ssl) hm_tls_env(aTHX_ c, env);
 
     c->keepalive = (plen == 8 && memcmp(proto, "HTTP/1.1", 8) == 0);
+    c->req_11    = c->keepalive;   /* before Connection: close can clear it */
     /* Per request, not per connection: a keep-alive connection may send a
      * different Accept-Encoding on its next request, and the response path
      * has no env to read by the time it needs this. One bit, set below. */
@@ -1693,12 +1795,12 @@ static HV *hm_build_env(pTHX_ char *head, size_t headlen,
         c->spill_fd = -1;
         c->spill_got = 0;
         hm_env_store(env, HMK_PSGI_INPUT,
-                     in ? in : SvREFCNT_inc(hm_empty_input));
+                     in ? in : hm_empty_input_sv(aTHX));
     }
     else if (clen > 0)
         hm_env_store(env, HMK_PSGI_INPUT, hm_new_input(aTHX_ body, (STRLEN)clen));
     else
-        hm_env_store(env, HMK_PSGI_INPUT, SvREFCNT_inc(hm_empty_input));
+        hm_env_store(env, HMK_PSGI_INPUT, hm_empty_input_sv(aTHX));
     hm_env_store(env, HMK_PSGIX_INPUT_BUFFERED, SvREFCNT_inc(hm_env_one));
 
     return env;
@@ -1878,6 +1980,36 @@ static int hm_headers_ok(pTHX_ AV *hav) {
     return 1;
 }
 
+/* The same escape, for a value inside a JSON string. */
+static void hm_log_json_esc(hm_loop *loop, const char *p, size_t n) {
+    static const char hex[] = "0123456789abcdef";
+    size_t i, run = 0;
+    if (!p) return;
+    for (i = 0; i < n; i++) {
+        unsigned char ch = (unsigned char)p[i];
+        if (ch == '"' || ch == '\\' || ch < 0x20) {
+            char e[6];
+            if (run) { hm_log_raw(loop, p + i - run, run); run = 0; }
+            if (ch == '"' || ch == '\\') {
+                e[0] = '\\'; e[1] = (char)ch; hm_log_raw(loop, e, 2);
+            } else {
+                e[0] = '\\'; e[1] = 'u'; e[2] = '0'; e[3] = '0';
+                e[4] = hex[ch >> 4]; e[5] = hex[ch & 0xf];
+                hm_log_raw(loop, e, 6);
+            }
+        } else {
+            run++;
+        }
+    }
+    if (run) hm_log_raw(loop, p + n - run, run);
+}
+
+/* A value from $env, escaped the way this log's format wants. */
+static void hm_log_esc(hm_loop *loop, const char *p, size_t n) {
+    if (loop->log_json) hm_log_json_esc(loop, p, n);
+    else                hm_log_quoted(loop, p, n);
+}
+
 /* Cached apache-style timestamp, recomputed at most once per second. */
 static const char *hm_log_time(hm_loop *loop) {
     if (loop->now != loop->log_ts_sec) {
@@ -1890,6 +2022,167 @@ static const char *hm_log_time(hm_loop *loop) {
     return loop->log_ts;
 }
 
+/* The ISO 8601 stamp the JSON format carries, cached the same way. */
+static const char *hm_log_time_iso(hm_loop *loop) {
+    if (loop->now != loop->log_iso_sec) {
+        struct tm tm;
+        time_t t = loop->now;
+        hm_localtime_r(&t, &tm);
+        strftime(loop->log_iso, sizeof(loop->log_iso), "%Y-%m-%dT%H:%M:%S%z", &tm);
+        loop->log_iso_sec = loop->now;
+    }
+    return loop->log_iso;
+}
+
+/* ---- the access-log format compiler ----------------------------------------
+ * Apache's directives, the ones a PSGI server can honour:
+ *   %h %a REMOTE_ADDR   %l "-"           %u REMOTE_USER    %t [time]
+ *   %r request line     %s %>s status    %b bytes or "-"   %B bytes or 0
+ *   %D microseconds     %T seconds       %p SERVER_PORT    %m METHOD
+ *   %U PATH_INFO        %q ?query        %H SERVER_PROTOCOL %v SERVER_NAME
+ *   %P pid              %{Name}i request header   %{Name}e any $env key
+ *   %% a literal percent sign
+ * Returns 0, or -1 with the offending directive in err. Every value is
+ * escaped (CLF or JSON), so no directive is a way to forge a line. */
+#define HM_LOG_COMBINED "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\""
+
+static void hm_logtok_push(hm_logtok **toks, int *n, int *cap, hm_logtok t) {
+    if (*n == *cap) {
+        *cap = *cap ? *cap * 2 : 16;
+        *toks = (hm_logtok *)hm_xrealloc(*toks, (size_t)*cap * sizeof(hm_logtok));
+    }
+    (*toks)[(*n)++] = t;
+}
+static void hm_logtok_lit(hm_logtok **toks, int *n, int *cap, const char *p, size_t l) {
+    hm_logtok t;
+    if (!l) return;
+    if (*n && (*toks)[*n - 1].kind == HM_LT_LIT) {   /* extend the last run */
+        hm_logtok *last = &(*toks)[*n - 1];
+        last->lit = (char *)hm_xrealloc(last->lit, last->litlen + l);
+        memcpy(last->lit + last->litlen, p, l);
+        last->litlen += l;
+        return;
+    }
+    t.kind = HM_LT_LIT; t.lit = (char *)hm_xmalloc(l); memcpy(t.lit, p, l);
+    t.litlen = l; t.key = NULL;
+    hm_logtok_push(toks, n, cap, t);
+}
+static void hm_logtok_env(pTHX_ hm_logtok **toks, int *n, int *cap,
+                          const char *key, size_t klen) {
+    hm_logtok t;
+    t.kind = HM_LT_ENV; t.lit = NULL; t.litlen = 0;
+    t.key  = newSVpvn_share(key, (I32)klen, 0);    /* hash computed once */
+    hm_logtok_push(toks, n, cap, t);
+}
+static void hm_logtok_kind(hm_logtok **toks, int *n, int *cap, int kind) {
+    hm_logtok t;
+    t.kind = kind; t.lit = NULL; t.litlen = 0; t.key = NULL;
+    hm_logtok_push(toks, n, cap, t);
+}
+
+static int hm_logfmt_compile(pTHX_ const char *fmt, hm_logtok **out, int *nout,
+                             int *wants_t0, char *err, size_t errlen) {
+    hm_logtok *toks = NULL;
+    int n = 0, cap = 0;
+    const char *p = fmt, *lit = fmt;
+    *wants_t0 = 0;
+    while (*p) {
+        char d;
+        if (*p != '%') { p++; continue; }
+        hm_logtok_lit(&toks, &n, &cap, lit, (size_t)(p - lit));
+        p++;
+        if (*p == '>') p++;                        /* %>s is %s */
+        if (*p == '{') {
+            const char *name = p + 1, *end = strchr(name, '}');
+            char key[300];
+            size_t nl, i;
+            if (!end || end[1] != 'i' && end[1] != 'e') {
+                snprintf(err, errlen, "%%{...}%c", end ? end[1] : '?');
+                goto bad;
+            }
+            nl = (size_t)(end - name);
+            if (nl == 0 || nl + 6 > sizeof(key)) { snprintf(err, errlen, "%%{%.*s}", (int)nl, name); goto bad; }
+            if (end[1] == 'i') {
+                memcpy(key, "HTTP_", 5);
+                for (i = 0; i < nl; i++) {
+                    unsigned char ch = (unsigned char)name[i];
+                    if (ch >= 'a' && ch <= 'z') ch -= 32;
+                    else if (ch == '-') ch = '_';
+                    key[5 + i] = (char)ch;
+                }
+                hm_logtok_env(aTHX_ &toks, &n, &cap, key, nl + 5);
+            } else {
+                hm_logtok_env(aTHX_ &toks, &n, &cap, name, nl);
+            }
+            p = end + 2;
+            lit = p;
+            continue;
+        }
+        d = *p;
+        switch (d) {
+        case '%': hm_logtok_lit(&toks, &n, &cap, "%", 1); break;
+        case 'h': case 'a': hm_logtok_env(aTHX_ &toks, &n, &cap, "REMOTE_ADDR", 11); break;
+        case 'l': hm_logtok_kind(&toks, &n, &cap, HM_LT_DASH); break;
+        case 'u': hm_logtok_env(aTHX_ &toks, &n, &cap, "REMOTE_USER", 11); break;
+        case 't': hm_logtok_kind(&toks, &n, &cap, HM_LT_TIME); break;
+        case 'r': hm_logtok_kind(&toks, &n, &cap, HM_LT_REQLINE); break;
+        case 's': hm_logtok_kind(&toks, &n, &cap, HM_LT_STATUS); break;
+        case 'b': hm_logtok_kind(&toks, &n, &cap, HM_LT_BYTES); break;
+        case 'B': hm_logtok_kind(&toks, &n, &cap, HM_LT_BYTES0); break;
+        case 'D': hm_logtok_kind(&toks, &n, &cap, HM_LT_DUR_US); *wants_t0 = 1; break;
+        case 'T': hm_logtok_kind(&toks, &n, &cap, HM_LT_DUR_S);  *wants_t0 = 1; break;
+        case 'p': hm_logtok_env(aTHX_ &toks, &n, &cap, "SERVER_PORT", 11); break;
+        case 'm': hm_logtok_env(aTHX_ &toks, &n, &cap, "REQUEST_METHOD", 14); break;
+        case 'U': hm_logtok_env(aTHX_ &toks, &n, &cap, "PATH_INFO", 9); break;
+        case 'q': hm_logtok_kind(&toks, &n, &cap, HM_LT_QUERY); break;
+        case 'H': hm_logtok_env(aTHX_ &toks, &n, &cap, "SERVER_PROTOCOL", 15); break;
+        case 'v': hm_logtok_env(aTHX_ &toks, &n, &cap, "SERVER_NAME", 11); break;
+        case 'P': hm_logtok_kind(&toks, &n, &cap, HM_LT_PID); break;
+        default:
+            snprintf(err, errlen, "%%%c", d ? d : '?');
+            goto bad;
+        }
+        p++;
+        lit = p;
+    }
+    hm_logtok_lit(&toks, &n, &cap, lit, (size_t)(p - lit));
+    *out = toks; *nout = n;
+    return 0;
+bad:
+    {
+        int i;
+        for (i = 0; i < n; i++) {
+            if (toks[i].lit) free(toks[i].lit);
+            if (toks[i].key) SvREFCNT_dec(toks[i].key);
+        }
+        if (toks) free(toks);
+    }
+    return -1;
+}
+
+/* The JSON shape: one object per line, fixed keys, numbers unquoted. */
+static void hm_logfmt_json(pTHX_ hm_logtok **out, int *nout) {
+    hm_logtok *toks = NULL;
+    int n = 0, cap = 0;
+#define HM_JL(s) hm_logtok_lit(&toks, &n, &cap, s, sizeof(s) - 1)
+#define HM_JE(k) hm_logtok_env(aTHX_ &toks, &n, &cap, k, sizeof(k) - 1)
+    HM_JL("{\"time\":\"");         hm_logtok_kind(&toks, &n, &cap, HM_LT_TIME_ISO);
+    HM_JL("\",\"remote_addr\":\""); HM_JE("REMOTE_ADDR");
+    HM_JL("\",\"user\":\"");       HM_JE("REMOTE_USER");
+    HM_JL("\",\"method\":\"");     HM_JE("REQUEST_METHOD");
+    HM_JL("\",\"uri\":\"");        HM_JE("REQUEST_URI");
+    HM_JL("\",\"protocol\":\"");   HM_JE("SERVER_PROTOCOL");
+    HM_JL("\",\"status\":");       hm_logtok_kind(&toks, &n, &cap, HM_LT_STATUS);
+    HM_JL(",\"bytes\":");          hm_logtok_kind(&toks, &n, &cap, HM_LT_BYTES);
+    HM_JL(",\"referer\":\"");      HM_JE("HTTP_REFERER");
+    HM_JL("\",\"user_agent\":\""); HM_JE("HTTP_USER_AGENT");
+    HM_JL("\",\"duration_us\":");  hm_logtok_kind(&toks, &n, &cap, HM_LT_DUR_US);
+    HM_JL("}");
+#undef HM_JL
+#undef HM_JE
+    *out = toks; *nout = n;
+}
+
 static const char *hm_env_str(pTHX_ HV *env, const char *key, I32 klen, STRLEN *lenp) {
     SV **s = hv_fetch(env, key, klen, 0);
     if (s && *s && SvOK(*s)) return SvPV(*s, *lenp);
@@ -1897,47 +2190,96 @@ static const char *hm_env_str(pTHX_ HV *env, const char *key, I32 klen, STRLEN *
     return NULL;
 }
 
-/* Build one Combined Log Format line into the loop's log buffer:
+/* One $env value into the line, escaped; the "absent" spelling differs
+ * between the two shapes ("-" in CLF, an empty string in JSON). */
+static void hm_log_env_val(pTHX_ hm_loop *loop, HV *env, const hm_logtok *t) {
+    HE *he = hv_fetch_ent(env, t->key, 0, 0);
+    SV *v = he ? HeVAL(he) : NULL;
+    if (v && SvOK(v)) {
+        STRLEN n;
+        const char *s = SvPV(v, n);
+        if (n) { hm_log_esc(loop, s, n); return; }
+    }
+    if (!loop->log_json) hm_log_raw(loop, "-", 1);
+}
+
+/* Build one access-log line into the loop's log buffer by walking the
+ * compiled format. The default compiles to Combined:
  *   host - user [time] "METHOD URI PROTO" status bytes "referer" "ua" */
-static void hm_log_clf(pTHX_ hm_loop *loop, SV *env_rv, int status, ssize_t blen) {
+static void hm_log_line(pTHX_ hm_loop *loop, SV *env_rv, int status, ssize_t blen) {
     HV *env;
-    const char *s; STRLEN n;
     char num[32];
-    int ln;
-    const char *ts;
+    int ln, i;
 
     if (!(env_rv && SvROK(env_rv) && SvTYPE(SvRV(env_rv)) == SVt_PVHV)) return;
     env = (HV *)SvRV(env_rv);
 
-    s = hm_env_str(aTHX_ env, "REMOTE_ADDR", 11, &n); hm_log_tok(loop, s, n);
-    hm_log_raw(loop, " - ", 3);                        /* %l always '-' */
-    /* REMOTE_USER is whatever an auth layer set it to, from a name the
-     * client chose: escaped like the quoted fields, or a newline in it
-     * splits the line. */
-    s = hm_env_str(aTHX_ env, "REMOTE_USER", 11, &n);
-    if (s && n) hm_log_quoted(loop, s, n); else hm_log_raw(loop, "-", 1);
-    hm_log_raw(loop, " [", 2);
-    ts = hm_log_time(loop); hm_log_raw(loop, ts, strlen(ts));
-    hm_log_raw(loop, "] \"", 3);
-    s = hm_env_str(aTHX_ env, "REQUEST_METHOD", 14, &n); hm_log_quoted(loop, s, n);
-    hm_log_raw(loop, " ", 1);
-    s = hm_env_str(aTHX_ env, "REQUEST_URI", 11, &n);
-    if (s) hm_log_quoted(loop, s, n); else hm_log_raw(loop, "-", 1);
-    hm_log_raw(loop, " ", 1);
-    s = hm_env_str(aTHX_ env, "SERVER_PROTOCOL", 15, &n); hm_log_quoted(loop, s, n);
-    hm_log_raw(loop, "\" ", 2);
-    ln = (int)hm_itoa(num, (long)status); hm_log_raw(loop, num, (size_t)ln);
-    hm_log_raw(loop, " ", 1);
-    if (blen >= 0) { ln = (int)hm_utoa(num, (unsigned long)blen);
-                     hm_log_raw(loop, num, (size_t)ln); }
-    else           hm_log_raw(loop, "-", 1);
-    hm_log_raw(loop, " \"", 2);
-    s = hm_env_str(aTHX_ env, "HTTP_REFERER", 12, &n);
-    if (s) hm_log_quoted(loop, s, n); else hm_log_raw(loop, "-", 1);
-    hm_log_raw(loop, "\" \"", 3);
-    s = hm_env_str(aTHX_ env, "HTTP_USER_AGENT", 15, &n);
-    if (s) hm_log_quoted(loop, s, n); else hm_log_raw(loop, "-", 1);
-    hm_log_raw(loop, "\"\n", 2);
+    for (i = 0; i < loop->nlogtok; i++) {
+        const hm_logtok *t = &loop->logtok[i];
+        switch (t->kind) {
+        case HM_LT_LIT:  hm_log_raw(loop, t->lit, t->litlen); break;
+        case HM_LT_ENV:  hm_log_env_val(aTHX_ loop, env, t); break;
+        case HM_LT_DASH: hm_log_raw(loop, "-", 1); break;
+        case HM_LT_STATUS:
+            ln = (int)hm_itoa(num, (long)status); hm_log_raw(loop, num, (size_t)ln);
+            break;
+        case HM_LT_BYTES:
+            if (blen >= 0) { ln = (int)hm_utoa(num, (unsigned long)blen);
+                             hm_log_raw(loop, num, (size_t)ln); }
+            else if (loop->log_json) hm_log_raw(loop, "null", 4);
+            else                     hm_log_raw(loop, "-", 1);
+            break;
+        case HM_LT_BYTES0:
+            ln = (int)hm_utoa(num, blen >= 0 ? (unsigned long)blen : 0UL);
+            hm_log_raw(loop, num, (size_t)ln);
+            break;
+        case HM_LT_TIME: {
+            const char *ts = hm_log_time(loop);
+            hm_log_raw(loop, "[", 1); hm_log_raw(loop, ts, strlen(ts)); hm_log_raw(loop, "]", 1);
+            break;
+        }
+        case HM_LT_TIME_ISO: {
+            const char *ts = hm_log_time_iso(loop);
+            hm_log_raw(loop, ts, strlen(ts));
+            break;
+        }
+        case HM_LT_REQLINE: {
+            const char *s; STRLEN n;
+            s = hm_env_str(aTHX_ env, "REQUEST_METHOD", 14, &n);
+            if (s && n) hm_log_esc(loop, s, n); else hm_log_raw(loop, "-", 1);
+            hm_log_raw(loop, " ", 1);
+            s = hm_env_str(aTHX_ env, "REQUEST_URI", 11, &n);
+            if (s && n) hm_log_esc(loop, s, n); else hm_log_raw(loop, "-", 1);
+            hm_log_raw(loop, " ", 1);
+            s = hm_env_str(aTHX_ env, "SERVER_PROTOCOL", 15, &n);
+            if (s && n) hm_log_esc(loop, s, n); else hm_log_raw(loop, "-", 1);
+            break;
+        }
+        case HM_LT_QUERY: {
+            const char *s; STRLEN n;
+            s = hm_env_str(aTHX_ env, "QUERY_STRING", 12, &n);
+            if (s && n) { hm_log_raw(loop, "?", 1); hm_log_esc(loop, s, n); }
+            break;
+        }
+        case HM_LT_PID:
+            ln = (int)hm_itoa(num, (long)hm_os_getpid()); hm_log_raw(loop, num, (size_t)ln);
+            break;
+        case HM_LT_DUR_US:
+        case HM_LT_DUR_S: {
+            SV **t0 = hv_fetch(env, "psgix.request_start", 19, 0);
+            if (t0 && *t0 && SvOK(*t0)) {
+                double el = (double)hm_now_ns() / 1e9 - SvNV(*t0);
+                unsigned long v = el < 0 ? 0UL
+                    : (unsigned long)(t->kind == HM_LT_DUR_US ? el * 1e6 : el);
+                ln = (int)hm_utoa(num, v); hm_log_raw(loop, num, (size_t)ln);
+            }
+            else if (loop->log_json) hm_log_raw(loop, "null", 4);
+            else                     hm_log_raw(loop, "-", 1);
+            break;
+        }
+        }
+    }
+    hm_log_raw(loop, "\n", 1);
 
     if (loop->log_len >= HM_LOG_FLUSH_AT) hm_log_flush(loop);
 }
@@ -1947,7 +2289,7 @@ static void hm_log_clf(pTHX_ hm_loop *loop, SV *env_rv, int status, ssize_t blen
  * are swallowed so they cannot take the loop down. */
 static void hm_access_log(pTHX_ hm_loop *loop, SV *env_rv, int status, ssize_t blen) {
     dSP;
-    if (loop->log_fd >= 0) { hm_log_clf(aTHX_ loop, env_rv, status, blen); return; }
+    if (loop->log_fd >= 0) { hm_log_line(aTHX_ loop, env_rv, status, blen); return; }
     if (!loop->log_cb) return;
     ENTER; SAVETMPS; PUSHMARK(SP);
     XPUSHs(env_rv);
@@ -2015,8 +2357,7 @@ static int hm_queue_response(pTHX_ hm_conn *c, SV *resp) {
     if (s0 && *s0) status = (int)SvIV(*s0);
     if (s1 && *s1 && SvROK(*s1) && SvTYPE(SvRV(*s1)) == SVt_PVAV) hav = (AV *)SvRV(*s1);
     if (!hm_headers_ok(aTHX_ hav)) {
-        PerlIO_printf(PerlIO_stderr(),
-                      "Hyperman: response header carries CR, LF or NUL; refused\n");
+        hm_errlog("Hyperman: response header carries CR, LF or NUL; refused\n");
         hm_wb_put(c, HM_ERR500, sizeof(HM_ERR500) - 1);
         c->keepalive = 0;
         c->last_status = 500;
@@ -2310,6 +2651,11 @@ static int hm_flush(pTHX_ hm_conn *c) {
     int src_done = 0;
     if (c->wlen == 0 && !c->bsrc.kind) {
         if (!c->keepalive && !c->awaiting) { hm_close(aTHX_ loop, c); return -1; }
+        if (c->stream_done) {                    /* a streamed body ended
+                                                  * with nothing to flush  */
+            c->stream_done = 0;
+            if (c->rlen > 0 || loop->completion) hm_again_push(loop, c);
+        }
         return 0;
     }
     for (;;) {
@@ -2423,6 +2769,7 @@ static int hm_flush(pTHX_ hm_conn *c) {
      * completion mode the SAME push is what re-arms the read, which is why
      * an empty buffer is scheduled too. Without that a connection that
      * streamed a body would never be read from again. */
+    if (c->stream_done) { c->stream_done = 0; src_done = 1; }
     if (src_done && (c->rlen > 0 || loop->completion)) hm_again_push(loop, c);
     return 0;
 }
@@ -2487,16 +2834,35 @@ static void hm_deliver(pTHX_ int fd, UV id, SV *resp) {
         hm_again_push(loop, c);
 }
 
+/* How a streamed HTTP/1.1 body is framed, decided once in hm_start_stream:
+ *   EOF     - Connection: close, the body ends when the connection does. The
+ *             only framing there was before 0.57, and still the one for
+ *             HTTP/1.0, a request that asked to close, a 101 tunnel, an app
+ *             that wrote its own Transfer-Encoding, and a draining server.
+ *   CHUNKED - Transfer-Encoding: chunked, keep-alive kept. Every write is one
+ *             chunk, close sends the last one, and the pipeline resumes.
+ *   LENGTH  - the app gave Content-Length: bytes are counted; an overrun or
+ *             a short body breaks the framing, so the connection closes.
+ *   NOBODY  - 1xx, 204, 304: headers only, keep-alive kept. */
+#define HM_SM_EOF     0
+#define HM_SM_CHUNKED 1
+#define HM_SM_LENGTH  2
+#define HM_SM_NOBODY  3
+
 /* Send status+headers for a streaming response; body follows via
- * hm_stream_write/hm_stream_close. EOF-delimited, so the conn closes. */
+ * hm_stream_write/hm_stream_close. */
 static void hm_start_stream(pTHX_ int fd, UV id, int status, SV *headers) {
     hm_loop *loop = hm_cur_loop;
     hm_conn *c = (loop && fd >= 0 && fd < HM_MAXFD) ? loop->conns[fd] : NULL;
     char line[64];
     AV *hav = NULL;
-    int has_date = 0;
+    int has_date = 0, has_conn = 0, conn_close = 0, has_te = 0, has_len = 0;
+    UV clen = 0;
     if (!(c && c->id == id)) return;
-    c->keepalive = 0;
+    c->stream_serial++;
+    c->stream_mode = HM_SM_EOF;
+    c->stream_left = 0;
+    c->stream_done = 0;
     if (c->env_sv) {
         hm_access_log(aTHX_ loop, c->env_sv, status, -1);
         SvREFCNT_dec(c->env_sv);
@@ -2505,8 +2871,7 @@ static void hm_start_stream(pTHX_ int fd, UV id, int status, SV *headers) {
     if (headers && SvROK(headers) && SvTYPE(SvRV(headers)) == SVt_PVAV)
         hav = (AV *)SvRV(headers);
     if (!hm_headers_ok(aTHX_ hav)) {
-        PerlIO_printf(PerlIO_stderr(),
-                      "Hyperman: response header carries CR, LF or NUL; refused\n");
+        hm_errlog("Hyperman: response header carries CR, LF or NUL; refused\n");
         hm_wb_put(c, HM_ERR500, sizeof(HM_ERR500) - 1);
         c->last_status = 500;
         c->last_blen = 21;
@@ -2531,6 +2896,17 @@ static void hm_start_stream(pTHX_ int fd, UV id, int status, SV *headers) {
             vs = SvPV(*v, vl);
             if (kl == 4 && (ks[0] | 32) == 'd' && hm_strncasecmp(ks, "Date", 4) == 0)
                 has_date = 1;
+            else if (kl == 10 && (ks[0] | 32) == 'c'
+                     && hm_strncasecmp(ks, "Connection", 10) == 0) {
+                has_conn = 1;
+                if (hm_ci_contains(vs, vl, "close")) conn_close = 1;
+            }
+            else if (kl == 14 && (ks[0] | 32) == 'c'
+                     && hm_strncasecmp(ks, "Content-Length", 14) == 0)
+                has_len = 1;
+            else if (kl == 17 && (ks[0] | 32) == 't'
+                     && hm_strncasecmp(ks, "Transfer-Encoding", 17) == 0)
+                has_te = 1;
             hm_wb_put(c, ks, kl);
             hm_wb_put(c, ": ", 2);
             hm_wb_put(c, vs, vl);
@@ -2541,34 +2917,98 @@ static void hm_start_stream(pTHX_ int fd, UV id, int status, SV *headers) {
         const char *dh = hm_date_header(loop);
         if (dh) hm_wb_put(c, dh, HM_DATE_LEN);
     }
+    if (has_len && !hm_hav_clen(aTHX_ hav, &clen)) has_len = 0;  /* unparseable */
+    {
+        int no_entity = (status < 200 || status == 204 || status == 304);
+        if (status == 101 || loop->stopping || !c->req_11 || !c->keepalive
+            || conn_close || has_te) {
+            c->stream_mode = HM_SM_EOF;
+            c->keepalive = 0;
+        } else if (no_entity) {
+            c->stream_mode = HM_SM_NOBODY;
+        } else if (has_len) {
+            c->stream_mode = HM_SM_LENGTH;
+            c->stream_left = clen;
+        } else {
+            c->stream_mode = HM_SM_CHUNKED;
+            hm_wb_put(c, "Transfer-Encoding: chunked\r\n", 28);
+        }
+    }
     /* A 101 is an upgrade: the caller's own Upgrade and Connection headers
      * are the response, and "close" would contradict them. The connection
      * still ends when the handle closes - keepalive is off above. */
-    if (status == 101) hm_wb_put(c, "\r\n", 2);
-    else               hm_wb_put(c, "Connection: close\r\n\r\n", 21);
+    if (status == 101)                    hm_wb_put(c, "\r\n", 2);
+    else if (c->stream_mode == HM_SM_EOF) hm_wb_put(c, "Connection: close\r\n\r\n", 21);
+    else {
+        if (!has_conn) hm_wb_put(c, "Connection: keep-alive\r\n", 24);
+        hm_wb_put(c, "\r\n", 2);
+    }
     hm_flush(aTHX_ c);
 }
 
-static void hm_stream_write(pTHX_ int fd, UV id, SV *data) {
-    hm_loop *loop = hm_cur_loop;
-    hm_conn *c = (loop && fd >= 0 && fd < HM_MAXFD) ? loop->conns[fd] : NULL;
-    if (c && c->id == id) {
-        STRLEN l;
-        const char *p = SvPV(data, l);
-        if (c->is_head && !c->tunnel) return;   /* HEAD: headers only */
-        hm_wb_put(c, p, l);
-        c->loop->bytes_out += l;
-        hm_flush(aTHX_ c);
+/* `serial` names the streamed response a Writer was handed out for; 0 skips
+ * the check (the ABI stream handle has a registry of its own for that). A
+ * writer kept past its response, or closed twice, must not touch the
+ * response that followed on the same keep-alive connection. */
+/* Queue body bytes on a streamed HTTP/1.1 response, framed as the mode says.
+ * Shared by the Writer (hm_stream_write) and the ABI stream handle
+ * (hm_stream.h), so the two cannot disagree about the framing. Returns the
+ * octets queued: 0 when nothing was (HEAD, no body, past the end), and the
+ * caller then has nothing to flush. */
+static STRLEN hm_stream_body_put(pTHX_ hm_conn *c, const char *p, STRLEN l) {
+    if (!c->awaiting && !c->tunnel) return 0;   /* the body has ended     */
+    if (c->is_head && !c->tunnel) return 0;     /* HEAD: headers only     */
+    if (c->stream_mode == HM_SM_NOBODY) return 0;
+    if (c->stream_mode == HM_SM_LENGTH) {
+        if (l > c->stream_left) {                /* overrun: the framing is
+                                                  * broken, end the conn  */
+            l = (STRLEN)c->stream_left;
+            c->keepalive = 0;
+        }
+        c->stream_left -= l;
     }
+    if (!l) return 0;                            /* a zero chunk ends a body */
+    if (c->stream_mode == HM_SM_CHUNKED) {
+        char sz[24];
+        int n = snprintf(sz, sizeof(sz), "%lx\r\n", (unsigned long)l);
+        hm_wb_put(c, sz, (size_t)n);
+        hm_wb_put(c, p, l);
+        hm_wb_put(c, "\r\n", 2);
+    } else {
+        hm_wb_put(c, p, l);
+    }
+    c->loop->bytes_out += l;
+    return l;
 }
 
-static void hm_stream_close(pTHX_ int fd, UV id) {
+static void hm_stream_write(pTHX_ int fd, UV id, UV serial, SV *data) {
     hm_loop *loop = hm_cur_loop;
     hm_conn *c = (loop && fd >= 0 && fd < HM_MAXFD) ? loop->conns[fd] : NULL;
-    if (c && c->id == id) {
-        c->awaiting = 0;
-        hm_flush(aTHX_ c);   /* closes when drained (keepalive is off) */
-    }
+    STRLEN l;
+    const char *p;
+    if (!(c && c->id == id)) return;
+    if (serial && c->stream_serial != serial) return;
+    p = SvPV(data, l);
+    if (hm_stream_body_put(aTHX_ c, p, l)) hm_flush(aTHX_ c);
+}
+
+static void hm_stream_close(pTHX_ int fd, UV id, UV serial) {
+    hm_loop *loop = hm_cur_loop;
+    hm_conn *c = (loop && fd >= 0 && fd < HM_MAXFD) ? loop->conns[fd] : NULL;
+    if (!(c && c->id == id)) return;
+    if (serial && c->stream_serial != serial) return;
+    if (!c->awaiting) return;                    /* closed already         */
+    if (c->stream_mode == HM_SM_CHUNKED && !c->is_head)
+        hm_wb_put(c, "0\r\n\r\n", 5);
+    else if (c->stream_mode == HM_SM_LENGTH && c->stream_left && !c->is_head)
+        c->keepalive = 0;                        /* short body: cannot keep
+                                                  * the connection in frame */
+    c->stream_mode = HM_SM_EOF;
+    c->stream_left = 0;
+    c->awaiting = 0;
+    if (c->keepalive) c->stream_done = 1;        /* hm_flush: serve the
+                                                  * pipeline when drained  */
+    hm_flush(aTHX_ c);   /* closes when drained if keepalive is off */
 }
 
 /* The parked-Future continuation: when the response Future resolves,
@@ -2613,7 +3053,7 @@ XS_INTERNAL(hm_xs_park_cb) {
         hm_any_values(aTHX_ f, st, errs);
         e = av_len(errs) >= 0 ? av_fetch(errs, 0, 0) : NULL;
         if (e && SvOK(*e)) msg = SvPV(*e, l);
-        PerlIO_printf(PerlIO_stderr(), "Hyperman: async response failed: %s%s",
+        hm_errlog("Hyperman: async response failed: %s%s",
                       msg, (*msg && msg[strlen(msg)-1] == '\n') ? "" : "\n");
         SvREFCNT_dec((SV *)errs);
     }
@@ -2664,6 +3104,14 @@ XS_INTERNAL(hm_xs_responder) {
                         s1 ? *s1 : NULL);
         av_push(w, newSViv(fd));
         av_push(w, newSVuv(id));
+        /* the serial of the response just begun, read back from the conn
+         * (hm_start_stream is a no-op on a stale ticket, so 0 then) */
+        {
+            hm_conn *c = (hm_cur_loop && fd >= 0 && fd < HM_MAXFD)
+                       ? hm_cur_loop->conns[fd] : NULL;
+            av_push(w, newSVuv(c && c->id == id ? c->stream_serial : 0));
+        }
+        av_push(w, newSVpvs("h1"));
         wrv = newRV_noinc((SV *)w);
         sv_bless(wrv, gv_stashpv("Hyperman::Writer", GV_ADD));
         ST(0) = sv_2mortal(wrv);
@@ -2872,6 +3320,7 @@ static void hm_process(pTHX_ hm_conn *c) {
                 break;
             }
             if (r == 0) {                                /* need more bytes */
+                c->body_phase = 1;
                 if (c->rlen - bodystart >= loop->max_read) {   /* too big to fit */
                     static const char e413[] =
                         "HTTP/1.1 413 Payload Too Large\r\nContent-Length: 0\r\n"
@@ -2924,6 +3373,7 @@ static void hm_process(pTHX_ hm_conn *c) {
                     }
                 }
                 if (c->spill_got < (long)clen) {           /* await more */
+                    c->body_phase = 1;
                     hm_send_continue(c, expect);
                     break;
                 }
@@ -2935,6 +3385,7 @@ static void hm_process(pTHX_ hm_conn *c) {
             }
         hm_no_spill:
             if (c->rlen - bodystart < (size_t)clen) {        /* await full body */
+                c->body_phase = 1;
                 hm_send_continue(c, expect);
                 break;
             }
@@ -3062,6 +3513,7 @@ static void hm_process(pTHX_ hm_conn *c) {
         memmove(c->rbuf, c->rbuf + consumed, c->rlen - consumed);
         c->rlen -= consumed;
         c->req_start = 0;
+        c->body_phase = 0;
         c->chunk_pos = c->chunk_dec = 0;
         c->cont_sent = 0;       /* the next request on this connection asks
                                  * for itself */
@@ -3160,6 +3612,9 @@ static void hm_readable(pTHX_ hm_conn *c) {
              * buffer it closed every upload over 16KB on a server whose
              * max_body was below that. */
             if (c->h2) break;
+            /* The same, one read earlier: the preface is in the buffer but
+             * hm_process has not run to detect it. Let it. */
+            if (hm_h2_preface_pending(c)) break;
             /* grow for large bodies; unbounded headers are rejected */
             if (c->rcap >= loop->max_read
                 || (c->rlen >= 65536 && !hm_memmem(c->rbuf, c->rlen, "\r\n\r\n", 4))) {
@@ -3201,6 +3656,7 @@ static void hm_readable(pTHX_ hm_conn *c) {
         ssize_t n = hm_cread(c, c->rbuf + c->rlen, want);
         if (n > 0) {
             c->rlen += (size_t)n;
+            c->last_rx = loop->now;
             /* A tunnel (a 101 stream handle): the bytes are the handle's,
              * not a request. Handed up read by read, so the buffer never
              * grows toward the ceiling that ends an oversize request. The
@@ -3276,6 +3732,64 @@ static void hm_readable(pTHX_ hm_conn *c) {
 
 static hm_tw *hm_add_timer_watch_c(hm_loop *loop, double secs,
                                    hm_abi_timer_cb cb, void *ud);
+static void hm_tls_handshake(pTHX_ hm_conn *c);
+
+/* The first bytes on a proxy_protocol listener. PEEK, so the header can be
+ * parsed without taking anything behind it off the socket: a ClientHello or
+ * an h2 preface in the same segment stays in the kernel for hm_tls_wrap and
+ * hm_h2_detect, which then run exactly as on a listener without a proxy.
+ * Only a complete header is consumed, by a read of exactly its length. A
+ * partial one is re-peeked when the level-triggered watcher fires again;
+ * one that never completes is closed by hm_sweep after header_timeout. */
+static void hm_proxy_readable(pTHX_ hm_conn *c) {
+    hm_loop *loop = c->loop;
+    unsigned char buf[HM_PP_MAX];
+    hm_pp_result r;
+    ssize_t n;
+    long len;
+    n = hm_os_recv_peek(c->fd, buf, sizeof(buf));
+    if (n == 0) { hm_close(aTHX_ loop, c); return; }
+    if (n < 0) {
+        if (errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR) return;
+        hm_close(aTHX_ loop, c); return;
+    }
+    len = hm_pp_parse(buf, (size_t)n, &r);
+    if (len == 0) return;                               /* more to come */
+    if (len < 0) { hm_close(aTHX_ loop, c); return; }   /* not a PROXY header */
+    /* take exactly the header; what follows is the client's first bytes */
+    {
+        ssize_t got = hm_os_recv(c->fd, buf, (size_t)len);
+        if (got != len) { hm_close(aTHX_ loop, c); return; }
+    }
+    c->pp_wait = 0;
+    c->req_start = 0;
+    /* The proxy's own address is kept for $env; the client's replaces the
+     * peer, so REMOTE_ADDR, the access log, the rate limiter and the
+     * denylist all see the client from here on. */
+    memcpy(c->proxy_addr, c->peer, sizeof(c->proxy_addr));
+    c->proxy_port = c->peer_port;
+    if (r.family) {
+        c->peer[0] = '\0';
+        (void)inet_ntop(r.family, r.src, c->peer, (socklen_t)sizeof(c->peer));
+        c->peer_port = r.src_port;
+        /* the denylist, again, now for the real client; the accept-time
+         * check saw the proxy */
+        if (hm_sa_deny_check(c->peer)) {
+            loop->denied++;
+            hm_close(aTHX_ loop, c);
+            return;
+        }
+    }
+    /* distinct clients counts clients, not proxies, so the accept path
+     * skipped it on this listener */
+    if (hm_sa_hll && c->peer[0]) hm_sa_hll_add(c->peer);
+    if (c->lst && c->lst->tls_ctx) {
+        hm_tls_wrap(c, c->lst->tls_ctx);
+        hm_tls_handshake(aTHX_ c);
+    } else {
+        hm_readable(aTHX_ c);
+    }
+}
 
 /* accept(2) failed for want of a descriptor. The listener is level-readable
  * and stays so, so simply returning would wake the loop again at once and
@@ -3335,7 +3849,7 @@ static void hm_accept(pTHX_ hm_loop *loop, hm_listener *lst) {
         if (hm_sa_deny_check(peer)) { hm_os_close(fd); loop->denied++; continue; }
         /* Distinct clients, opt-in: with the sketch off this is one load of
          * a NULL, with it on a hash and a CAS-max on the peer string. */
-        if (hm_sa_hll) hm_sa_hll_add(peer);
+        if (hm_sa_hll && peer[0] && !lst->proxy_protocol) hm_sa_hll_add(peer);
         c = hm_new_conn(loop, fd, lst);
         memcpy(c->peer, peer, sizeof(c->peer));
         c->peer_port = peer_port;
@@ -3434,8 +3948,16 @@ static void hm_sweep(pTHX_ hm_loop *loop) {
          * this loop); its request is in progress, not idle */
         if (!c->awaiting && !c->in_app) {
             double idle = difftime(now, c->last_active);
+            /* Two guards for two phases. The header block is timed from the
+             * request's first byte, which is the slowloris guard. Once the
+             * headers are complete and a body is arriving, the clock is
+             * progress: a body that has not delivered a byte for
+             * body_timeout is dead, however long it has been coming - and
+             * an upload slower than max_body in header_timeout is not. */
             int slow = c->req_start &&
-                       difftime(now, c->req_start) > loop->header_timeout;
+                       (c->body_phase
+                        ? difftime(now, c->last_rx)   > loop->body_timeout
+                        : difftime(now, c->req_start) > loop->header_timeout);
             if (idle > loop->idle_timeout || slow)
                 hm_close(aTHX_ loop, c);
         }
@@ -3575,8 +4097,7 @@ static void hm_dispatch(pTHX_ hm_loop *loop, hm_event *ev) {
             /* With a scoreboard the supervisor prints every row itself and
              * never forwards USR1; this line is the no-arena fallback. */
             if (!hm_sa_board_live())
-                fprintf(stderr,
-                    "Hyperman worker %d: requests=%lu accepts=%lu conns=%d "
+                hm_errlog("Hyperman worker %d: requests=%lu accepts=%lu conns=%d "
                     "bytes_out=%lu backend=%s%s\n",
                     hm_os_getpid(),
                     (unsigned long)loop->requests, (unsigned long)loop->accepts,
@@ -3613,6 +4134,7 @@ static void hm_dispatch(pTHX_ hm_loop *loop, hm_event *ev) {
             return;
         }
         c->rlen += (size_t)ev->res;
+        c->last_rx = loop->now;
         c->last_active = loop->now;
         hm_lru_touch(loop, c);
         /* A tunnel carries no requests: its bytes go to the handle. The
@@ -3653,7 +4175,8 @@ static void hm_dispatch(pTHX_ hm_loop *loop, hm_event *ev) {
             return;
         }
         if ((c = loop->conns[fd])) {
-            if (c->tls_hs)              hm_tls_handshake(aTHX_ c);
+            if (c->pp_wait)             hm_proxy_readable(aTHX_ c);
+            else if (c->tls_hs)         hm_tls_handshake(aTHX_ c);
             else                        hm_readable(aTHX_ c);
         }
         else if (loop->io_r[fd].sv || loop->io_r[fd].c_cb)
@@ -3753,6 +4276,7 @@ static hm_loop *hm_loop_new(pTHX_ const char *backend_name) {
     loop->now = time(NULL);
     loop->idle_timeout   = 60.0;
     loop->header_timeout = 30.0;
+    loop->body_timeout   = 60.0;
     loop->max_pipeline   = 32;
     loop->max_read       = 16 * 1024 * 1024;   /* request ceiling */
     loop->compress       = 0;                  /* off by default */
@@ -3926,6 +4450,18 @@ static void hm_add_timer_watch(pTHX_ hm_loop *loop, double secs, SV *sv, int kin
         loop->be->add_timer(loop->be, secs, 1, tw);
 }
 
+/* Let go of whatever a watcher slot held. A one-shot future that was still
+ * pending is CANCELLED, not dropped: a `->get` waiting on it would otherwise
+ * pump the loop for a readiness nothing is watching for any more. */
+static void hm_iow_release(pTHX_ hm_iow *slot) {
+    SV *sv = slot->sv;
+    if (!sv) return;
+    slot->sv = NULL;
+    if (!slot->is_cb && hmf_is_future(aTHX_ sv) && hmf_state(aTHX_ sv) == HMF_PENDING)
+        hmf_cancel(aTHX_ sv);
+    SvREFCNT_dec(sv);
+}
+
 static void hm_add_io_watch(pTHX_ hm_loop *loop, int fd, const char *mode,
                             SV *sv, int is_cb) {
     hm_iow *slot;
@@ -3933,7 +4469,7 @@ static void hm_add_io_watch(pTHX_ hm_loop *loop, int fd, const char *mode,
     if (fd < 0 || fd >= HM_MAXFD) croak("Hyperman: bad fd %d", fd);
     if (mode[0] == 'w') { slot = &loop->io_w[fd]; mask = HM_EV_WRITE; }
     else                { slot = &loop->io_r[fd]; mask = HM_EV_READ;  }
-    if (slot->sv) SvREFCNT_dec(slot->sv);
+    hm_iow_release(aTHX_ slot);
     slot->sv    = SvREFCNT_inc(sv);
     slot->is_cb = (unsigned char)is_cb;
     slot->c_cb  = NULL;
@@ -3948,7 +4484,7 @@ static void hm_add_io_watch_c(pTHX_ hm_loop *loop, int fd, int mask,
     hm_iow *slot;
     if (fd < 0 || fd >= HM_MAXFD) croak("Hyperman: bad fd %d", fd);
     slot = (mask & HM_EV_WRITE) ? &loop->io_w[fd] : &loop->io_r[fd];
-    if (slot->sv) { SvREFCNT_dec(slot->sv); slot->sv = NULL; }
+    hm_iow_release(aTHX_ slot);
     slot->is_cb = 0;
     slot->c_cb  = cb;
     slot->c_ud  = ud;
@@ -3966,8 +4502,7 @@ static void hm_del_io_watch(pTHX_ hm_loop *loop, int fd, int mask) {
     if (!HM_LOOP_INHERITED(loop))
         loop->be->remove_io(loop->be, fd,
                             (mask & HM_EV_WRITE) ? HM_EV_WRITE : HM_EV_READ);
-    if (slot->sv) SvREFCNT_dec(slot->sv);
-    slot->sv    = NULL;
+    hm_iow_release(aTHX_ slot);
     slot->is_cb = 0;
     slot->c_cb  = NULL;
     slot->c_ud  = NULL;
@@ -4004,11 +4539,109 @@ static hm_loop *hm_need_loop(void) {
 /* ---- listener + process model -------------------------------------------- */
 
 /* Create, bind, and listen a non-blocking TCP socket. Returns fd or -1. */
-static int hm_make_listener(const char *host, int port, int reuseport) {
-    struct sockaddr_in addr;
+/* Resolve a listen address ONCE, at startup: an IPv4 or IPv6 literal (with
+ * or without brackets), a hostname, or nothing for every IPv4 interface.
+ * getaddrinfo's first answer is taken. Failure is an error string for the
+ * croak and never a silent fallback: a host that did not parse used to bind
+ * INADDR_ANY, which exposed the service on every interface for a typo. */
+static int hm_resolve(const char *host, int port, int socktype,
+                      struct sockaddr_storage *out, socklen_t *outlen,
+                      char *err, size_t errlen) {
+    struct addrinfo hints, *res = NULL;
+    char hbuf[256], pbuf[16];
+    const char *h = host;
+    int rc;
+    if (!h || !*h) h = "0.0.0.0";
+    if (h[0] == '[') {
+        size_t l = strlen(h);
+        if (l < 3 || h[l - 1] != ']' || l - 2 >= sizeof(hbuf)) {
+            snprintf(err, errlen, "malformed bracketed address");
+            return -1;
+        }
+        memcpy(hbuf, h + 1, l - 2);
+        hbuf[l - 2] = '\0';
+        h = hbuf;
+    }
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family   = AF_UNSPEC;
+    hints.ai_socktype = socktype;
+    hints.ai_flags    = AI_NUMERICSERV | AI_PASSIVE;
+    snprintf(pbuf, sizeof(pbuf), "%d", port);
+    rc = getaddrinfo(h, pbuf, &hints, &res);
+    if (rc != 0 || !res) {
+        snprintf(err, errlen, "%s", rc ? gai_strerror(rc) : "no address");
+        if (res) freeaddrinfo(res);
+        return -1;
+    }
+    if (res->ai_addrlen > sizeof(*out)) { freeaddrinfo(res); snprintf(err, errlen, "address too long"); return -1; }
+    memcpy(out, res->ai_addr, res->ai_addrlen);
+    *outlen = (socklen_t)res->ai_addrlen;
+    freeaddrinfo(res);
+    return 0;
+}
+
+/* A unix-domain address. sun_path is 104 bytes on macOS and 108 on Linux,
+ * and a path that does not fit is refused rather than truncated. */
+static int hm_resolve_unix(const char *path, struct sockaddr_storage *out,
+                           socklen_t *outlen, char *err, size_t errlen) {
+#ifdef _WIN32
+    (void)path; (void)out; (void)outlen;
+    snprintf(err, errlen, "unix-domain listeners are not supported on Windows");
+    return -1;
+#else
+    struct sockaddr_un *un = (struct sockaddr_un *)out;
+    size_t l = strlen(path);
+    if (l == 0 || l >= sizeof(un->sun_path)) {
+        snprintf(err, errlen, "path is empty or longer than %d bytes",
+                 (int)sizeof(un->sun_path) - 1);
+        return -1;
+    }
+    memset(out, 0, sizeof(*out));
+    un->sun_family = AF_UNIX;
+    memcpy(un->sun_path, path, l + 1);
+    *outlen = (socklen_t)(offsetof(struct sockaddr_un, sun_path) + l + 1);
+    return 0;
+#endif
+}
+
+/* An IPv6 listener is v6 ONLY, so `::` and `0.0.0.0` can both be listed on
+ * one port; without it the second bind fails on Linux and the v4-mapped
+ * addresses the dual-stack socket would report differ by platform. */
+static void hm_v6only(int fd, const struct sockaddr *sa) {
+#ifdef IPV6_V6ONLY
+    if (sa->sa_family == AF_INET6) {
+        int one = 1;
+        hm_os_setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, &one, sizeof(one));
+    }
+#else
+    (void)fd; (void)sa;
+#endif
+}
+
+static int hm_make_listener(const struct sockaddr *sa, socklen_t salen, int reuseport) {
     int one = 1;
-    int fd = hm_os_socket(PF_INET, SOCK_STREAM, 0);
+    int fd;
+#ifndef _WIN32
+    /* A path listener: a socket file left by an earlier run is replaced; a
+     * regular file at the path is somebody else's and is refused. */
+    if (sa->sa_family == AF_UNIX) {
+        const char *p = ((const struct sockaddr_un *)sa)->sun_path;
+        struct stat st;
+        if (stat(p, &st) == 0) {
+            if (!S_ISSOCK(st.st_mode)) { errno = EEXIST; return -1; }
+            (void)unlink(p);
+        }
+    }
+#endif
+    fd = hm_os_socket(sa->sa_family, SOCK_STREAM, 0);
     if (fd < 0) return -1;
+#ifndef _WIN32
+    /* Not into anything the application execs. A re-exec successor is the
+     * one program meant to inherit it, and hm_reexec clears this for that
+     * child alone. */
+    (void)fcntl(fd, F_SETFD, fcntl(fd, F_GETFD, 0) | FD_CLOEXEC);
+#endif
+    hm_v6only(fd, sa);
 #ifdef _WIN32
     /* SO_REUSEADDR on Windows lets a second bind STEAL a live listener,
      * which is the opposite of the Unix meaning we want here (rebind a
@@ -4024,12 +4657,7 @@ static int hm_make_listener(const char *host, int port, int reuseport) {
 #else
     (void)reuseport;
 #endif
-    memset(&addr, 0, sizeof(addr));
-    addr.sin_family = AF_INET;
-    addr.sin_port   = htons((unsigned short)port);
-    addr.sin_addr.s_addr = inet_addr(host);
-    if (addr.sin_addr.s_addr == INADDR_NONE) addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    if (hm_os_bind(fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+    if (hm_os_bind(fd, sa, salen) < 0) {
         hm_os_close(fd); return -1;
     }
     if (hm_os_listen(fd, SOMAXCONN) < 0) { hm_os_close(fd); return -1; }
@@ -4045,11 +4673,14 @@ static int hm_make_listener(const char *host, int port, int reuseport) {
  * reuseport hash is over the 4-tuple, so a client that migrates lands on a
  * different worker than the one holding its connection. That is why
  * migration is deferred rather than half-supported. */
-static int hm_make_udp_listener(const char *host, int port, int reuseport) {
-    struct sockaddr_in addr;
+static int hm_make_udp_listener(const struct sockaddr *sa, socklen_t salen, int reuseport) {
     int one = 1;
-    int fd = hm_os_socket(PF_INET, SOCK_DGRAM, 0);
+    int fd = hm_os_socket(sa->sa_family, SOCK_DGRAM, 0);
     if (fd < 0) return -1;
+#ifndef _WIN32
+    (void)fcntl(fd, F_SETFD, fcntl(fd, F_GETFD, 0) | FD_CLOEXEC);
+#endif
+    hm_v6only(fd, sa);
 #ifdef _WIN32
     hm_os_setsockopt(fd, SOL_SOCKET, SO_EXCLUSIVEADDRUSE, &one, sizeof(one));
 #else
@@ -4061,12 +4692,7 @@ static int hm_make_udp_listener(const char *host, int port, int reuseport) {
 #else
     (void)reuseport;
 #endif
-    memset(&addr, 0, sizeof(addr));
-    addr.sin_family = AF_INET;
-    addr.sin_port   = htons((unsigned short)port);
-    addr.sin_addr.s_addr = inet_addr(host);
-    if (addr.sin_addr.s_addr == INADDR_NONE) addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    if (hm_os_bind(fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+    if (hm_os_bind(fd, sa, salen) < 0) {
         hm_os_close(fd); return -1;
     }
     hm_set_nonblock(fd);
@@ -4089,13 +4715,25 @@ static volatile sig_atomic_t hm_sup_term = 0;
 static volatile sig_atomic_t hm_sup_hup  = 0;
 static volatile sig_atomic_t hm_sup_usr1 = 0;
 static volatile sig_atomic_t hm_sup_tick = 0;   /* ALRM: the liveness look */
+static volatile sig_atomic_t hm_sup_usr2 = 0;   /* re-exec a successor     */
+/* The successor supervisor a USR2 started, until it has taken over (it
+ * TERMs us) or died trying (the reaper clears it). */
+static pid_t hm_resup_pid = 0;
+/* What this process was started as, for the exec: $^X and perl's argv from
+ * the first argument on. Copied at BOOT, because `$0 = ...` on Linux writes
+ * over the memory PL_origargv points into. */
+static char **hm_boot_argv = NULL;
+/* Set in a successor: the supervisor that handed its sockets over and is
+ * told to drain once this pool is up. */
+static pid_t hm_resup_old = 0;
 /* An alarm the caller had pending when run() was called: the deadline it asked
  * for, and whether it has come due. The supervisor's tick owns SIGALRM, so the
  * caller's is carried rather than cancelled. */
 static time_t hm_sup_alarm_at = 0;
 static int    hm_sup_alarmed  = 0;
 static void hm_sup_sig(int sig) {
-    if (sig == SIGHUP || sig == SIGUSR2) hm_sup_hup = 1;
+    if      (sig == SIGHUP)              hm_sup_hup  = 1;
+    else if (sig == SIGUSR2)             hm_sup_usr2 = 1;
     else if (sig == SIGUSR1)             hm_sup_usr1 = 1;
     else if (sig == SIGALRM)             hm_sup_tick = 1;
     else if (sig == SIGCHLD)             ;   /* no-op: just wakes sigsuspend() */
@@ -4122,7 +4760,7 @@ static void hm_sup_watch_board(void) {
         if (kill(pid, 0) != 0) continue;      /* gone: the reaper's business */
         if (rd.updated == hm_child_seen[i]) {
             if (++hm_child_stale[i] == HM_SUP_WEDGED_TICKS)
-                fprintf(stderr, "Hyperman: worker %d is alive but has not "
+                hm_errlog("Hyperman: worker %d is alive but has not "
                         "updated its scoreboard row for %d seconds: wedged?\n",
                         (int)pid, HM_SUP_TICK_SECS * HM_SUP_WEDGED_TICKS);
         }
@@ -4142,6 +4780,10 @@ static void hm_sup_watch_board(void) {
 typedef struct {
     const char *host;
     int         port;
+    const char *path;               /* a unix-domain listener instead of host:port */
+    int         mode_set, mode;     /* its file mode, when given                 */
+    int         inherit;            /* adopt this one from LISTEN_FDS            */
+    int         proxy_protocol;     /* every connection opens with a PROXY header */
     const char *tls_cert, *tls_key, *tls_ca;
     int         tls_verify;
     SV         *tls_sni;
@@ -4151,6 +4793,9 @@ typedef struct {
     int         fd;                 /* bound fd (parent), or -1 under reuseport */
     int         udp_fd;             /* the QUIC socket, same rules; -1 if no h3 */
     void       *tls_ctx;            /* built SSL_CTX*, or NULL for plain        */
+    struct sockaddr_storage sa;     /* host:port resolved once, in the parent;  */
+    socklen_t   salen;              /* what every bind, incl. a reuseport
+                                     * rebind in a worker, binds             */
 } hm_listener_spec;
 
 /* Validate one listener's options at run() time (before any bind/fork). */
@@ -4182,6 +4827,15 @@ static void hm_check_listener(pTHX_ const hm_listener_spec *s) {
     }
     if (s->redirect_https && (s->tls_cert || s->tls_key))
         croak("Hyperman->run: redirect_https on a TLS listener makes no sense");
+    if (s->path) {
+        if (s->http3)
+            croak("Hyperman->run: http3 needs an IP listener; a path listener "
+                  "has no UDP twin");
+    }
+    if (s->proxy_protocol && s->http3)
+        warn("Hyperman->run: proxy_protocol applies to the TCP side of this "
+             "listener only; QUIC has no byte stream before its handshake and "
+             "reports real datagram sources");
 }
 
 /* Overlay per-listener options from a `listen => [ {..} ]` hashref onto a spec
@@ -4194,6 +4848,22 @@ static void hm_listener_from_hv(pTHX_ HV *h, hm_listener_spec *s) {
         STRLEN klen; const char *k = HePV(he, klen); SV *v = HeVAL(he);
         if      (strEQ(k, "port"))     s->port = (int)SvIV(v);
         else if (strEQ(k, "host"))     { if (SvOK(v)) s->host = SvPV_nolen(v); }
+        else if (strEQ(k, "path"))     { if (SvOK(v)) s->path = SvPV_nolen(v); }
+        else if (strEQ(k, "inherit"))  s->inherit = SvTRUE(v) ? 1 : 0;
+        else if (strEQ(k, "proxy_protocol")) s->proxy_protocol = SvTRUE(v) ? 1 : 0;
+        else if (strEQ(k, "mode")) {
+            if (SvOK(v)) {
+                if (SvIOK(v) || SvNOK(v)) s->mode = (int)SvIV(v);
+                else {
+                    char *end;
+                    const char *m = SvPV_nolen(v);
+                    s->mode = (int)strtol(m, &end, 8);
+                    if (*m == '\0' || *end != '\0')
+                        croak("Hyperman->run: mode '%s' is not an octal number", m);
+                }
+                s->mode_set = 1;
+            }
+        }
         else if (strEQ(k, "tls_cert")) s->tls_cert = SvOK(v) ? SvPV_nolen(v) : NULL;
         else if (strEQ(k, "tls_key"))  s->tls_key  = SvOK(v) ? SvPV_nolen(v) : NULL;
         else if (strEQ(k, "tls_ca"))   s->tls_ca   = SvOK(v) ? SvPV_nolen(v) : NULL;
@@ -4211,6 +4881,10 @@ static void hm_listener_from_hv(pTHX_ HV *h, hm_listener_spec *s) {
         else croak("Hyperman->run: unknown listen option '%s'", k);
     }
     if (s->redirect_https == 1) s->redirect_https = 443;
+    /* A path listener is seeded with the top-level host and port like every
+     * other spec; the path is the address, so those defaults are dropped
+     * rather than read as a contradiction. */
+    if (s->path) { s->host = NULL; s->port = 0; }
 }
 
 /* Everything a worker needs; one struct so spawn plumbing stays sane. */
@@ -4218,7 +4892,7 @@ typedef struct {
     SV         *app;
     hm_listener_spec *lspecs;       /* one or more listeners                 */
     int         nlspecs;
-    double      idle_t, header_t, grace;
+    double      idle_t, header_t, body_t, grace;
     int         max_pipe, reuseport, affinity, nworkers;
     int         completion;        /* -1 = say nothing, 0/1 = force        */
     int         compress;
@@ -4230,6 +4904,23 @@ typedef struct {
     SV         *log_cb;              /* access_log coderef, or NULL          */
     int         log_fd;             /* fast access-log fd, or -1            */
     const char *log_path;           /* access_log file to open (parent), or NULL */
+    const char *log_format;         /* access_log_format, NULL = Combined   */
+    hm_logtok  *logtok;             /* ... compiled, before the fork         */
+    int         nlogtok, log_json, log_wants_t0;
+    int         err_fd;             /* error_log fd, or -1 = stderr         */
+    const char *err_path;           /* error_log file to open (parent), or NULL */
+    /* Privileges, dropped in the parent after every bind and before the
+     * first fork (hm_drop_privileges). Names are resolved FIRST, before the
+     * bind, so an unknown user is a croak with the port still free. */
+    const char *drop_user;          /* user => name or uid, or NULL          */
+    const char *drop_group;         /* group => name or gid, or NULL         */
+    const char *pid_path;           /* pid_file, or NULL                     */
+    int         listen_fds;         /* adopt every listener from LISTEN_FDS  */
+    int         umask_set;          /* umask => given                        */
+    unsigned    umask_val;
+    int         drop_uid_set, drop_gid_set;
+    long        drop_uid, drop_gid;
+    char        drop_name[64];      /* the user's name, for initgroups      */
     SV         *deny;               /* arrayref of IPs to denylist, or NULL */
     unsigned    deny_cap, rate_cap; /* arena table sizes, 0 = default        */
     unsigned    bus_slots, bus_slot_size, bus_groups;  /* 0 = default        */
@@ -4254,7 +4945,10 @@ static int hm_worker_listeners(hm_loop *loop, const hm_worker_cfg *cfg,
         l->fd = fds ? fds[i] : s->fd;
         if (l->fd < 0) return -1;
         l->udp_fd = fds ? fds[cfg->nlspecs + i] : s->udp_fd;
-        l->host = strdup(s->host && *s->host ? s->host : "0.0.0.0");
+        l->is_unix = s->path ? 1 : 0;
+        l->proxy_protocol = s->proxy_protocol;
+        l->host = strdup(s->path ? s->path
+                         : s->host && *s->host ? s->host : "0.0.0.0");
         l->port = s->port;
         l->tls_ctx = s->tls_ctx;
         l->http2 = s->http2;
@@ -4334,7 +5028,7 @@ static int hm_tls_reload(pTHX_ hm_loop *loop, SV *sni) {
         if (!fresh) continue;                   /* keep what we are serving */
 
         if (want > 0 && hm_tls_sni_count(fresh) < want) {
-            fprintf(stderr, "Hyperman TLS: reload built %d of %d SNI hosts; "
+            hm_errlog("Hyperman TLS: reload built %d of %d SNI hosts; "
                             "keeping the running certificates\n",
                     hm_tls_sni_count(fresh), want);
             hm_tls_ctx_free(fresh);
@@ -4355,7 +5049,7 @@ static int hm_tls_reload(pTHX_ hm_loop *loop, SV *sni) {
                                                  l->tls_ca, l->tls_verify,
                                                  tk, tklen);
             if (!qfresh) {
-                fprintf(stderr, "Hyperman TLS: reload could not rebuild the "
+                hm_errlog("Hyperman TLS: reload could not rebuild the "
                                 "QUIC context; keeping both running "
                                 "certificates\n");
                 hm_tls_ctx_free(fresh);
@@ -4411,6 +5105,13 @@ static void hm_board_tick(pTHX_ void *ud) {
         (void)hm_add_timer_watch_c(loop, 1.0, hm_board_tick, loop);
 }
 
+/* The polling fallback's tick: drain the ring, re-arm. */
+static void hm_bus_poll_cb(pTHX_ void *ud) {
+    hm_loop *loop = (hm_loop *)ud;
+    (void)hm_sa_bus_dispatch();
+    if (!loop->stop) (void)hm_add_timer_watch_c(loop, 0.05, hm_bus_poll_cb, loop);
+}
+
 static void hm_bus_worker_attach(pTHX_ hm_loop *loop) {
     int fd;
     if (!hm_sa_bus_live()) return;
@@ -4442,12 +5143,14 @@ static void hm_bus_worker_attach(pTHX_ hm_loop *loop) {
         fd = hm_sa_bus_waker_fd();
     }
     if (fd < 0) {
-        /* Say so. A worker that cannot be woken still serves requests, and the
-         * bus degrades to what it is without a ring, but an operator reading
-         * "pool" in a cache's statistics would otherwise be told this pool is
-         * coherent when one of its members cannot hear a word. */
-        warn("Hyperman: worker %ld has no wakeup descriptor and will not "
-             "receive published messages; raise the waker count", (long)getpid());
+        /* No descriptor: the slots were all held, or this process attached
+         * the arena by name (a re-exec successor's pool does) and the pipes
+         * in it belong to another process. Poll the ring instead, every
+         * fifty milliseconds. Slower to notice a message than a poke, never
+         * deaf. */
+        hm_errlog("Hyperman: worker %d has no wakeup descriptor; polling the "
+                  "bus every 50ms instead", hm_os_getpid());
+        (void)hm_add_timer_watch_c(loop, 0.05, hm_bus_poll_cb, loop);
         return;
     }
     hm_add_io_watch_c(aTHX_ loop, fd, HM_EV_READ, hm_bus_wake_cb, NULL);
@@ -4461,6 +5164,7 @@ static void hm_worker(pTHX_ const hm_worker_cfg *cfg, const int *fds) {
     if (!loop) croak("Hyperman: cannot create event loop");
     if (cfg->idle_t   > 0) loop->idle_timeout   = cfg->idle_t;
     if (cfg->header_t > 0) loop->header_timeout = cfg->header_t;
+    if (cfg->body_t   > 0) loop->body_timeout   = cfg->body_t;
     if (cfg->max_pipe > 0) loop->max_pipeline   = cfg->max_pipe;
     if (cfg->grace    > 0) loop->shutdown_grace = cfg->grace;
     loop->max_requests = cfg->max_requests;
@@ -4475,6 +5179,10 @@ static void hm_worker(pTHX_ const hm_worker_cfg *cfg, const int *fds) {
     loop->http3_max_conns = cfg->http3_max_conns;
     loop->compress_types = cfg->compress_types
                            ? SvREFCNT_inc(cfg->compress_types) : NULL;
+    loop->logtok       = cfg->logtok;        /* compiled once, in the parent */
+    loop->nlogtok      = cfg->nlogtok;
+    loop->log_json     = cfg->log_json;
+    loop->log_wants_t0 = cfg->log_wants_t0;
     if (hm_worker_listeners(loop, cfg, fds) < 0) {
         hm_loop_free(aTHX_ loop);
         _exit(1);
@@ -4581,13 +5289,13 @@ static pid_t hm_spawn(pTHX_ const hm_worker_cfg *cfg, int widx) {
                   ? stackfds
                   : (int *)hm_xmalloc(sizeof(int) * 2 * n);
             for (i = 0; i < n; i++) {
-                fds[i] = hm_make_listener(cfg->lspecs[i].host,
-                                          cfg->lspecs[i].port, 1);
+                fds[i] = hm_make_listener((struct sockaddr *)&cfg->lspecs[i].sa,
+                                          cfg->lspecs[i].salen, 1);
                 if (fds[i] < 0) _exit(1);
                 fds[n + i] = -1;
                 if (cfg->lspecs[i].http3) {
-                    fds[n + i] = hm_make_udp_listener(cfg->lspecs[i].host,
-                                                      cfg->lspecs[i].port, 1);
+                    fds[n + i] = hm_make_udp_listener((struct sockaddr *)&cfg->lspecs[i].sa,
+                                                      cfg->lspecs[i].salen, 1);
                     if (fds[n + i] < 0) _exit(1);
                 }
             }
@@ -4606,8 +5314,413 @@ static pid_t hm_spawn(pTHX_ const hm_worker_cfg *cfg, int widx) {
 /* The full server: validate + bind, then either run in-process (1 worker)
  * or supervise a pool (respawn with backoff, HUP/USR2 recycle, USR1 stats,
  * TERM/INT bounded drain). */
+/* ---- privileges and the pid file ----------------------------------------- */
+
+static int hm_all_digits(const char *s) {
+    if (!*s) return 0;
+    for (; *s; s++) if (*s < '0' || *s > '9') return 0;
+    return 1;
+}
+
+/* Turn user/group names into ids. Called before anything is bound: a typo
+ * in `user` must not leave a server listening as root. */
+static void hm_resolve_drop(pTHX_ hm_worker_cfg *cfg) {
+    if (!cfg->drop_user && !cfg->drop_group && !cfg->umask_set && !cfg->pid_path)
+        return;
+#ifdef _WIN32
+    croak("Hyperman->run: user, group, umask and pid_file are not supported "
+          "on Windows");
+#else
+    cfg->drop_name[0] = '\0';
+    if (cfg->drop_user) {
+        if (hm_all_digits(cfg->drop_user)) {
+            struct passwd *pw;
+            cfg->drop_uid = atol(cfg->drop_user);
+            cfg->drop_uid_set = 1;
+            pw = getpwuid((uid_t)cfg->drop_uid);
+            if (pw) {
+                strncpy(cfg->drop_name, pw->pw_name, sizeof(cfg->drop_name) - 1);
+                if (!cfg->drop_group) { cfg->drop_gid = (long)pw->pw_gid; cfg->drop_gid_set = 1; }
+            }
+        } else {
+            struct passwd *pw = getpwnam(cfg->drop_user);
+            if (!pw) croak("Hyperman->run: user '%s': no such user", cfg->drop_user);
+            cfg->drop_uid = (long)pw->pw_uid;
+            cfg->drop_uid_set = 1;
+            strncpy(cfg->drop_name, pw->pw_name, sizeof(cfg->drop_name) - 1);
+            if (!cfg->drop_group) { cfg->drop_gid = (long)pw->pw_gid; cfg->drop_gid_set = 1; }
+        }
+    }
+    if (cfg->drop_group) {
+        if (hm_all_digits(cfg->drop_group)) {
+            cfg->drop_gid = atol(cfg->drop_group);
+        } else {
+            struct group *gr = getgrnam(cfg->drop_group);
+            if (!gr) croak("Hyperman->run: group '%s': no such group", cfg->drop_group);
+            cfg->drop_gid = (long)gr->gr_gid;
+        }
+        cfg->drop_gid_set = 1;
+    }
+#endif
+}
+
+/* Group first, then the user: once the uid is gone the gid cannot follow.
+ * Each step is checked and a failure CROAKS - a server that could not drop
+ * must not go on serving as root as if it had. */
+static void hm_drop_privileges(pTHX_ const hm_worker_cfg *cfg) {
+#ifndef _WIN32
+    if (cfg->umask_set) umask((mode_t)cfg->umask_val);
+    if (cfg->drop_gid_set) {
+        if (cfg->drop_name[0]) {
+            if (initgroups(cfg->drop_name, (gid_t)cfg->drop_gid) < 0)
+                croak("Hyperman->run: initgroups(%s): %s", cfg->drop_name, strerror(errno));
+        } else {
+            gid_t g = (gid_t)cfg->drop_gid;
+            if (setgroups(1, &g) < 0)
+                croak("Hyperman->run: setgroups: %s", strerror(errno));
+        }
+        if (setgid((gid_t)cfg->drop_gid) < 0)
+            croak("Hyperman->run: setgid(%ld): %s", cfg->drop_gid, strerror(errno));
+    }
+    if (cfg->drop_uid_set) {
+        if (setuid((uid_t)cfg->drop_uid) < 0)
+            croak("Hyperman->run: setuid(%ld): %s", cfg->drop_uid, strerror(errno));
+        if (cfg->drop_uid != 0 && (getuid() != (uid_t)cfg->drop_uid
+                                   || geteuid() != (uid_t)cfg->drop_uid))
+            croak("Hyperman->run: still not uid %ld after setuid", cfg->drop_uid);
+    }
+#else
+    (void)cfg;
+#endif
+}
+
+/* The pid file is written whole and renamed into place, so a reader never
+ * sees it empty, and removed at exit ONLY if it still holds this pid: two
+ * supervisors overlap during a re-exec reload, and the one leaving must not
+ * take the other's file with it. */
+static void hm_write_pidfile(pTHX_ const char *path) {
+    char tmp[1024], num[32];
+    int fd, n;
+    if (!path) return;
+    n = snprintf(tmp, sizeof(tmp), "%s.%d.tmp", path, hm_os_getpid());
+    if (n <= 0 || n >= (int)sizeof(tmp))
+        croak("Hyperman->run: pid_file path too long");
+    fd = hm_os_open_file(tmp, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0644);
+    if (fd < 0) croak("Hyperman->run: pid_file '%s': %s", tmp, strerror(errno));
+    n = (int)hm_itoa(num, (long)hm_os_getpid());
+    num[n++] = '\n';
+    if (hm_os_write_file(fd, num, (size_t)n) != n) {
+        hm_os_close(fd);
+        croak("Hyperman->run: pid_file '%s': write: %s", tmp, strerror(errno));
+    }
+    hm_os_close(fd);
+    if (rename(tmp, path) < 0)
+        croak("Hyperman->run: pid_file '%s': rename: %s", path, strerror(errno));
+}
+
+static void hm_unlink_pidfile(const char *path) {
+    char buf[32];
+    int fd, n;
+    if (!path) return;
+    fd = hm_os_open_file(path, O_RDONLY, 0);
+    if (fd < 0) return;
+    n = (int)read(fd, buf, sizeof(buf) - 1);
+    hm_os_close(fd);
+    if (n <= 0) return;
+    buf[n] = '\0';
+    if (atol(buf) == (long)hm_os_getpid()) (void)unlink(path);
+}
+
+/* Remove a variable from the C environment AND perl's %ENV, which is a hash
+ * of its own, filled at startup: unsetenv alone leaves the application
+ * reading the old value from the hash. Deleting through the hash updates
+ * the C side via its magic; the explicit unsetenv covers a perl built
+ * without that. */
+static void hm_env_unset(pTHX_ const char *name) {
+    HV *penv = GvHV(PL_envgv);
+    if (penv) (void)hv_delete(penv, name, (I32)strlen(name), G_DISCARD);
+#ifndef _WIN32
+    unsetenv(name);
+#endif
+}
+
+/* Socket activation: a service manager that bound the sockets hands them
+ * over as fds 3.., naming the count in LISTEN_FDS and this pid in
+ * LISTEN_PID. Specs marked `inherit` (or all of them under listen_fds) take
+ * them in order instead of binding. Each one is checked to be a listening
+ * socket of the family the spec resolved to, and both variables are removed
+ * at once so no worker - and no server an application forks - adopts them
+ * again. The same helper will seat a re-exec successor (08). */
+static void hm_adopt_fds(pTHX_ hm_worker_cfg *cfg) {
+    const char *nfds = getenv("LISTEN_FDS"), *lpid = getenv("LISTEN_PID");
+    int i, n, next = 3, want = 0;
+    for (i = 0; i < cfg->nlspecs; i++)
+        if (cfg->listen_fds || cfg->lspecs[i].inherit) want++;
+    if (!want) return;
+#ifdef _WIN32
+    croak("Hyperman->run: socket activation is not supported on Windows");
+#else
+    if (!nfds || !lpid)
+        croak("Hyperman->run: a listener asks to inherit a socket but LISTEN_FDS "
+              "and LISTEN_PID are not set");
+    if (atol(lpid) != (long)hm_os_getpid())
+        croak("Hyperman->run: LISTEN_PID is %s, this is %d: the sockets were "
+              "not handed to this process", lpid, hm_os_getpid());
+    if (cfg->reuseport)
+        croak("Hyperman->run: an inherited socket cannot be rebound per worker; "
+              "drop reuseport");
+    n = atoi(nfds);
+    for (i = 0; i < cfg->nlspecs; i++) {
+        hm_listener_spec *s = &cfg->lspecs[i];
+        struct sockaddr_storage got;
+        socklen_t gl = sizeof(got);
+        int fd, acc = 0;
+        socklen_t al = sizeof(acc);
+        if (!(cfg->listen_fds || s->inherit)) continue;
+        if (next - 3 >= n)
+            croak("Hyperman->run: LISTEN_FDS=%d but listener %d wants one too", n, i);
+        fd = next++;
+        if (s->http3)
+            croak("Hyperman->run: an inherited listener cannot carry http3");
+        if (getsockname(fd, (struct sockaddr *)&got, &gl) < 0)
+            croak("Hyperman->run: inherited fd %d: getsockname: %s", fd, strerror(errno));
+        if (got.ss_family != s->sa.ss_family)
+            croak("Hyperman->run: inherited fd %d is address family %d, listener %d "
+                  "resolved to %d", fd, (int)got.ss_family, i, (int)s->sa.ss_family);
+        if (getsockopt(fd, SOL_SOCKET, SO_ACCEPTCONN, &acc, &al) == 0 && !acc)
+            croak("Hyperman->run: inherited fd %d is not a listening socket", fd);
+        hm_set_nonblock(fd);
+        s->fd = fd;
+    }
+    hm_env_unset(aTHX_ "LISTEN_FDS");
+    hm_env_unset(aTHX_ "LISTEN_PID");
+    hm_env_unset(aTHX_ "LISTEN_FDNAMES");
+#endif
+}
+
+/* ---- re-exec reload (USR2) -------------------------------------------------
+ *
+ * HUP reforks the pool from this process, which still holds the application
+ * as it was compiled at boot. USR2 starts a NEW supervisor - a fresh perl, a
+ * fresh compile of the application - that takes the bound listeners over,
+ * forks its own pool, and only then asks this one to drain. The listen fds
+ * are held by one process or the other the whole time, so no connection is
+ * refused. A successor that fails to start changes nothing here; this
+ * supervisor keeps serving and says so.
+ *
+ * What crosses the exec: the listener fds, named in HYPERMAN_REEXEC by the
+ * host:port (or path) each was bound for, so the successor's configuration
+ * may reorder or add listeners; the arena NAME, when there is one, so both
+ * pools share the one arena during the overlap; and the old supervisor's
+ * pid, to TERM. An anonymous arena is not shared: it is a private mapping
+ * with no name to attach to, and the successor starts a fresh one (the
+ * denylist and the rate counters begin again at the handoff). */
+
+#ifndef _WIN32
+static void hm_reexec(pTHX_ const hm_worker_cfg *cfg, const sigset_t *orig) {
+    char env[4096];
+    size_t n = 0;
+    int i, k;
+    pid_t pid;
+    SV *perl;
+    if (hm_resup_pid > 0 && kill(hm_resup_pid, 0) == 0) {
+        hm_errlog("Hyperman: USR2 ignored: successor %d is still starting",
+                  (int)hm_resup_pid);
+        return;
+    }
+    if (!hm_boot_argv || !hm_boot_argv[0]) {
+        hm_errlog("Hyperman: USR2 ignored: no argv to re-exec with");
+        return;
+    }
+    k = snprintf(env + n, sizeof(env) - n, "sup=%d", hm_os_getpid());
+    if (k < 0 || (size_t)k >= sizeof(env) - n) return;
+    n += (size_t)k;
+    if (cfg->arena_name && cfg->arena_name_len) {
+        k = snprintf(env + n, sizeof(env) - n, ";arena=%.*s",
+                     (int)cfg->arena_name_len, cfg->arena_name);
+        if (k < 0 || (size_t)k >= sizeof(env) - n) return;
+        n += (size_t)k;
+    }
+    for (i = 0; i < cfg->nlspecs; i++) {
+        const hm_listener_spec *s = &cfg->lspecs[i];
+        if (s->fd < 0) continue;                  /* reuseport: nothing held */
+        if (s->path)
+            k = snprintf(env + n, sizeof(env) - n, ";u=%s|%d", s->path, s->fd);
+        else
+            k = snprintf(env + n, sizeof(env) - n, ";l=%s|%d|%d|%d",
+                         s->host && *s->host ? s->host : "0.0.0.0", s->port,
+                         s->fd, s->udp_fd);
+        if (k < 0 || (size_t)k >= sizeof(env) - n) {
+            hm_errlog("Hyperman: USR2 ignored: too many listeners to hand over");
+            return;
+        }
+        n += (size_t)k;
+    }
+    perl = get_sv("\030", 0);                     /* $^X */
+    if (!perl || !SvOK(perl)) return;
+    pid = fork();
+    if (pid < 0) {
+        hm_errlog("Hyperman: USR2: fork: %s", strerror(errno));
+        return;
+    }
+    if (pid == 0) {
+        /* The supervisor runs with its signals BLOCKED and the mask survives
+         * exec, as does a pending alarm: a successor born with either would
+         * never wake in its own sigsuspend. */
+        sigprocmask(SIG_SETMASK, orig, NULL);
+        alarm(0);
+        signal(SIGTERM, SIG_DFL); signal(SIGINT,  SIG_DFL);
+        signal(SIGHUP,  SIG_DFL); signal(SIGUSR1, SIG_DFL);
+        signal(SIGUSR2, SIG_DFL); signal(SIGCHLD, SIG_DFL);
+        signal(SIGALRM, SIG_DFL);
+        for (i = 0; i < cfg->nlspecs; i++) {
+            const hm_listener_spec *s = &cfg->lspecs[i];
+            if (s->fd >= 0)     (void)fcntl(s->fd,     F_SETFD, 0);
+            if (s->udp_fd >= 0) (void)fcntl(s->udp_fd, F_SETFD, 0);
+        }
+        setenv("HYPERMAN_REEXEC", env, 1);
+        execv(SvPV_nolen(perl), hm_boot_argv);
+        _exit(127);
+    }
+    hm_resup_pid = pid;
+    hm_errlog("Hyperman: USR2: successor %d started; serving until it takes over",
+              (int)pid);
+}
+
+/* The successor's half: HYPERMAN_REEXEC names the sockets and the arena.
+ * Runs after the addresses are resolved and before anything binds. */
+static void hm_adopt_env(pTHX_ hm_worker_cfg *cfg) {
+    const char *raw = getenv("HYPERMAN_REEXEC");
+    char *buf, *tok, *save = NULL;
+    int i;
+    if (!raw || !*raw) return;
+    buf = strdup(raw);
+    if (!buf) return;
+    hm_env_unset(aTHX_ "HYPERMAN_REEXEC");
+    for (i = 0; i < cfg->nlspecs; i++) { cfg->lspecs[i].fd = -1; cfg->lspecs[i].udp_fd = -1; }
+    for (tok = strtok_r(buf, ";", &save); tok; tok = strtok_r(NULL, ";", &save)) {
+        if (strncmp(tok, "sup=", 4) == 0) {
+            hm_resup_old = (pid_t)atol(tok + 4);
+        } else if (strncmp(tok, "arena=", 6) == 0) {
+            if (!cfg->arena_name || !cfg->arena_name_len) {
+                cfg->arena_name     = strdup(tok + 6);    /* process lifetime */
+                cfg->arena_name_len = strlen(tok + 6);
+            }
+        } else if (strncmp(tok, "l=", 2) == 0 || strncmp(tok, "u=", 2) == 0) {
+            int unix_ = tok[0] == 'u';
+            char *f1, *f2, *f3, *f4, *s2 = NULL;
+            int fd = -1, udp = -1, port = 0, matched = 0;
+            const char *name;
+            f1 = strtok_r(tok + 2, "|", &s2);
+            f2 = strtok_r(NULL, "|", &s2);
+            f3 = strtok_r(NULL, "|", &s2);
+            f4 = strtok_r(NULL, "|", &s2);
+            if (!f1 || !f2) continue;
+            name = f1;
+            if (unix_) { fd = atoi(f2); }
+            else { if (!f3) continue; port = atoi(f2); fd = atoi(f3); udp = f4 ? atoi(f4) : -1; }
+            /* reuseport pools rebind per worker and hold nothing to adopt */
+            if (!cfg->reuseport) {
+                for (i = 0; i < cfg->nlspecs; i++) {
+                    hm_listener_spec *s = &cfg->lspecs[i];
+                    if (s->fd >= 0) continue;
+                    if (unix_ ? (s->path && strcmp(s->path, name) == 0)
+                              : (!s->path && s->port == port
+                                 && strcmp(s->host && *s->host ? s->host : "0.0.0.0", name) == 0)) {
+                        struct sockaddr_storage got;
+                        socklen_t gl = sizeof(got);
+                        int acc = 0;
+                        socklen_t al = sizeof(acc);
+                        if (getsockname(fd, (struct sockaddr *)&got, &gl) < 0
+                            || got.ss_family != s->sa.ss_family
+                            || (getsockopt(fd, SOL_SOCKET, SO_ACCEPTCONN, &acc, &al) == 0 && !acc))
+                            croak("Hyperman->run: re-exec: handed fd %d for %s is not "
+                                  "the listener it was said to be", fd, name);
+                        hm_set_nonblock(fd);
+                        (void)fcntl(fd, F_SETFD, fcntl(fd, F_GETFD, 0) | FD_CLOEXEC);
+                        s->fd = fd;
+                        if (udp >= 0 && s->http3) {
+                            hm_set_nonblock(udp);
+                            (void)fcntl(udp, F_SETFD, fcntl(udp, F_GETFD, 0) | FD_CLOEXEC);
+                            s->udp_fd = udp;
+                        } else if (udp >= 0) {
+                            hm_os_close(udp);
+                        }
+                        matched = 1;
+                        break;
+                    }
+                }
+            }
+            if (!matched) {                     /* a listener the new config dropped */
+                if (fd >= 0)  hm_os_close(fd);
+                if (udp >= 0) hm_os_close(udp);
+            }
+        }
+    }
+    free(buf);
+    hm_errlog("Hyperman: re-exec successor %d: sockets adopted from supervisor %d",
+              hm_os_getpid(), (int)hm_resup_old);
+}
+
+/* The successor's pool is up: tell the old supervisor to drain. Waited for a
+ * scoreboard row per child (ten seconds at most), or one second flat when
+ * there is no board, so the old pool is not torn down ahead of the new one
+ * answering. */
+static void hm_reexec_takeover(const pid_t *kids, int nkids) {
+    int i, tries;
+    if (hm_resup_old <= 0) return;
+    if (hm_sa_board_live()) {
+        for (tries = 0; tries < 100; tries++) {
+            int ready = 1;
+            for (i = 0; i < nkids; i++) {
+                sa_sb_reading rd;
+                if (hm_sa_board_row_of((uint64_t)kids[i], &rd) < 0) { ready = 0; break; }
+            }
+            if (ready) break;
+            poll(NULL, 0, 100);
+        }
+    } else {
+        poll(NULL, 0, 1000);
+    }
+    if (kill(hm_resup_old, SIGTERM) == 0)
+        hm_errlog("Hyperman: re-exec: pool up, supervisor %d asked to drain",
+                  (int)hm_resup_old);
+    hm_resup_old = 0;
+}
+#endif /* !_WIN32 */
+
 static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
     int workers = cfg->nworkers;
+
+    /* Before the arena, before the bind: an unknown user or group is refused
+     * while nothing is held, and on Windows the whole family is. */
+    hm_resolve_drop(aTHX_ cfg);
+    /* Likewise every listen address: a host that does not resolve is a
+     * croak here, never a bind of INADDR_ANY in its place. */
+    {
+        int i;
+        char err[128];
+        for (i = 0; i < cfg->nlspecs; i++) {
+            hm_listener_spec *s = &cfg->lspecs[i];
+            s->fd = -1;         /* calloc'd, and 0 is a descriptor */
+            s->udp_fd = -1;
+            if (s->path) {
+                if (cfg->reuseport)
+                    croak("Hyperman->run: reuseport cannot rebind a path listener "
+                          "per worker (each rebind would unlink the other's socket)");
+                if (hm_resolve_unix(s->path, &s->sa, &s->salen, err, sizeof(err)) < 0)
+                    croak("Hyperman->run: listen path '%s': %s", s->path, err);
+            }
+            else if (hm_resolve(s->host, s->port, SOCK_STREAM, &s->sa, &s->salen,
+                                err, sizeof(err)) < 0)
+                croak("Hyperman->run: listen host '%s': %s",
+                      s->host ? s->host : "", err);
+        }
+    }
+#ifndef _WIN32
+    hm_adopt_env(aTHX_ cfg);        /* a re-exec successor: the old sockets */
+#endif
+    hm_adopt_fds(aTHX_ cfg);
 
     if (!hm_empty_input)
         hm_empty_input = hm_new_input(aTHX_ "", 0);   /* inherited by workers */
@@ -4669,7 +5782,10 @@ static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
      * default: the board is mirrored by a timer, the sketch is opt-in. */
     {
         int err = 0;
-        if (hm_sa_board_open((uint32_t)(workers > 0 ? workers + 1 : 2), &err) < 0)
+        /* Two generations' worth, like the wakers: a re-exec successor's
+         * pool shares this board with the pool it replaces until that one
+         * has drained, and a row is not reclaimable while its worker lives. */
+        if (hm_sa_board_open((uint32_t)(workers > 0 ? 2 * workers + 2 : 2), &err) < 0)
             warn("Hyperman: could not carve the worker scoreboard in the arena "
                  "(Shared::Arena error %d): pool_stats is empty; raise "
                  "arena_size", err);
@@ -4713,6 +5829,29 @@ static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
         }
     }
 
+    /* The access-log format, compiled once here so an unknown directive is a
+     * croak before the fork and a line is a walk over an array after it. The
+     * tokens are process-lifetime: every worker reads the parent's copy. */
+    if (cfg->log_format && strcmp(cfg->log_format, "json") == 0) {
+        hm_logfmt_json(aTHX_ &cfg->logtok, &cfg->nlogtok);
+        cfg->log_json = 1;
+        cfg->log_wants_t0 = 1;
+    } else {
+        char err[64];
+        if (hm_logfmt_compile(aTHX_ cfg->log_format ? cfg->log_format : HM_LOG_COMBINED,
+                              &cfg->logtok, &cfg->nlogtok, &cfg->log_wants_t0,
+                              err, sizeof(err)) < 0)
+            croak("Hyperman->run: access_log_format: unknown directive %s", err);
+    }
+    /* The error log, likewise opened once and inherited. */
+    if (cfg->err_path && cfg->err_fd < 0) {
+        cfg->err_fd = hm_os_open_file(cfg->err_path,
+                           O_WRONLY | O_CREAT | O_APPEND | O_CLOEXEC, 0644);
+        if (cfg->err_fd < 0)
+            croak("Hyperman: open error_log '%s': %s", cfg->err_path, strerror(errno));
+    }
+    if (cfg->err_fd >= 0) hm_err_fd = cfg->err_fd;
+
     /* Open the access-log file once in the parent so all workers share (and
      * O_APPEND to) the same fd - whole-line writes stay atomic between them. */
     if (cfg->log_path && cfg->log_fd < 0) {
@@ -4727,14 +5866,18 @@ static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
         int i;
         for (i = 0; i < cfg->nlspecs; i++) {
             hm_listener_spec *s = &cfg->lspecs[i];
-            s->fd = hm_make_listener(s->host, s->port, cfg->reuseport);
+            if (s->fd >= 0) continue;           /* adopted from LISTEN_FDS */
+            s->fd = hm_make_listener((struct sockaddr *)&s->sa, s->salen, cfg->reuseport);
             if (s->fd < 0)
-                croak("Hyperman: bind %s:%d: %s", s->host, s->port, strerror(errno));
-            /* Assigned on every spec, not only the h3 ones: the struct is
-             * memset to zero and 0 is a legitimate descriptor. */
+                croak("Hyperman: bind %s%s:%d: %s", s->path ? s->path : "",
+                      s->path ? "" : s->host, s->port, strerror(errno));
+#ifndef _WIN32
+            if (s->path && s->mode_set && chmod(s->path, (mode_t)s->mode) < 0)
+                croak("Hyperman: chmod %s: %s", s->path, strerror(errno));
+#endif
             s->udp_fd = -1;
             if (s->http3) {
-                s->udp_fd = hm_make_udp_listener(s->host, s->port, cfg->reuseport);
+                s->udp_fd = hm_make_udp_listener((struct sockaddr *)&s->sa, s->salen, cfg->reuseport);
                 if (s->udp_fd < 0)
                     croak("Hyperman: bind udp %s:%d: %s", s->host, s->port,
                           strerror(errno));
@@ -4746,6 +5889,22 @@ static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
         }
     }
 
+    /* Everything that needed root is held: the ports, the logs, the arena.
+     * Record who we are, then stop being root, before the first fork so
+     * every worker is born as the configured user. Under reuseport the
+     * workers rebind their ports themselves, which needs the privilege for a
+     * port below 1024; that pairing is refused rather than half-honoured. */
+    if (cfg->reuseport && cfg->drop_uid_set) {
+        int i;
+        for (i = 0; i < cfg->nlspecs; i++)
+            if (cfg->lspecs[i].port < 1024)
+                croak("Hyperman->run: user => with reuseport => 1 cannot rebind "
+                      "port %d as the dropped user; drop reuseport or use a "
+                      "port above 1023", cfg->lspecs[i].port);
+    }
+    hm_write_pidfile(aTHX_ cfg->pid_path);
+    hm_drop_privileges(aTHX_ cfg);
+
     if (workers == 1) {
         /* dev mode: run the worker in this process, no supervisor. reuseport
          * needs a real bound fd here since there is no per-worker rebind. */
@@ -4753,12 +5912,12 @@ static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
             int i;
             for (i = 0; i < cfg->nlspecs; i++) {
                 hm_listener_spec *s = &cfg->lspecs[i];
-                s->fd = hm_make_listener(s->host, s->port, 1);
+                s->fd = hm_make_listener((struct sockaddr *)&s->sa, s->salen, 1);
                 if (s->fd < 0)
                     croak("Hyperman: bind %s:%d: %s", s->host, s->port,
                           strerror(errno));
                 if (s->http3) {
-                    s->udp_fd = hm_make_udp_listener(s->host, s->port, 1);
+                    s->udp_fd = hm_make_udp_listener((struct sockaddr *)&s->sa, s->salen, 1);
                     if (s->udp_fd < 0)
                         croak("Hyperman: bind udp %s:%d: %s", s->host, s->port,
                               strerror(errno));
@@ -4766,6 +5925,7 @@ static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
             }
         }
         hm_worker(aTHX_ cfg, NULL);
+        hm_unlink_pidfile(cfg->pid_path);
         return;
     }
 
@@ -4794,6 +5954,10 @@ static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
             hm_child_widx[hm_nchildren]  = i;
             hm_children[hm_nchildren++] = pid;
         }
+
+        /* A successor: the pool is forked and serving on the adopted sockets;
+         * the supervisor that handed them over can drain now. */
+        hm_reexec_takeover(hm_children, hm_nchildren);
 
         memset(&sa, 0, sizeof(sa));
         sa.sa_handler = hm_sup_sig;      /* no SA_RESTART: waitpid must EINTR */
@@ -4854,8 +6018,14 @@ static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
                 if (hm_sup_term) {
                     for (i = 0; i < hm_nchildren; i++)
                         kill(hm_children[i], SIGTERM);
-                    /* workers self-bound their drain with shutdown_grace */
-                    while (waitpid(-1, &st, 0) > 0) { }
+                    /* workers self-bound their drain with shutdown_grace.
+                     * Waited for BY PID: a re-exec successor is a child of
+                     * this process too, and it does not exit - it is the
+                     * one that asked us to; waitpid(-1) would wait for it
+                     * for ever. */
+                    for (i = 0; i < hm_nchildren; i++) {
+                        while (waitpid(hm_children[i], &st, 0) < 0 && errno == EINTR) { }
+                    }
                     break;
                 }
 
@@ -4882,6 +6052,11 @@ static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
                     }
                     hm_sup_watch_board();
                     alarm(HM_SUP_TICK_SECS);
+                }
+
+                if (hm_sup_usr2) {
+                    hm_sup_usr2 = 0;
+                    hm_reexec(aTHX_ cfg, &orig);
                 }
 
                 if (hm_sup_hup) {
@@ -4928,6 +6103,17 @@ static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
                     int live = 0;
                     int dead_widx = 0;
                     time_t started = 0;
+                    if (pid == hm_resup_pid) {
+                        /* It never took over (a successor that did would have
+                         * TERMed us first). Nothing here changed, so nothing
+                         * is undone: this pool serves on. */
+                        hm_errlog("Hyperman: re-exec successor %d exited (%s %d) "
+                                  "before taking over; still serving", (int)pid,
+                                  WIFEXITED(st) ? "status" : "signal",
+                                  WIFEXITED(st) ? WEXITSTATUS(st) : WTERMSIG(st));
+                        hm_resup_pid = 0;
+                        continue;
+                    }
                     for (i = 0; i < hm_nchildren; i++) {
                         if (hm_children[i] == pid) {
                             started   = hm_child_start[i];
@@ -4991,6 +6177,7 @@ static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
             }
 
             sigprocmask(SIG_SETMASK, &orig, NULL);
+            hm_unlink_pidfile(cfg->pid_path);
 
             /* The pool is down because the caller's own alarm came due, so
              * finish the job the alarm was set to do. */

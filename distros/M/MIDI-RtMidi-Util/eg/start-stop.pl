@@ -1,8 +1,8 @@
 #!/usr/bin/env perl
 
-# Open and start an available system midi port.
+# Open and start an available system midi port. Stop with CTRL+C.
 
-use v5.36;
+use v5.40;
 use Data::Dumper::Compact qw(ddc);
 use IO::Async::Loop ();
 use IO::Async::Timer::Periodic ();
@@ -19,19 +19,25 @@ my $clock_interval  = 60 / $bpm / $clocks_per_beat;
 my $midi_out = out_port($port);
 $midi_out->start;
 
-$SIG{INT} = sub {
-    say "\nStop";
-    stop_device($midi_out);
-    stop_all_notes($midi_out);
-    exit;
-};
-
 my $loop = IO::Async::Loop->new;
+
+$loop->watch_signal(INT => sub {
+    say "\nStop";
+    try {
+        stop_device($device);
+        stop_all_notes($device);
+    }
+    catch ($e) {
+        warn "Can't halt MIDI out device '$device': $e\n";
+    }
+    $loop->stop;
+});
 
 my $timer = IO::Async::Timer::Periodic->new(
     interval => $clock_interval,
     on_tick  => sub {
         $midi_out->clock;
+        say 'Hello!';
     },
 );
 

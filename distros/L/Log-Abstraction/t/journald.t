@@ -238,4 +238,53 @@ subtest 'journald-only hash logger does not produce config-error croak' => sub {
 	});
 };
 
+# ---------------------------------------------------------------------------
+# 8. The socket is opened once and reused; a failed send gets a new one
+# ---------------------------------------------------------------------------
+
+subtest 'the socket is reused between messages' => sub {
+	socket(my $recv, AF_UNIX, SOCK_DGRAM, 0) or die "socket: $!";
+	bind($recv, sockaddr_un($SOCKPATH)) or die "bind: $!";
+
+	my $logger = Log::Abstraction->new(
+		level  => 'debug',
+		logger => { journald => { socket => $SOCKPATH } },
+	);
+	my ($backend) = @{$logger->{_backends}};
+	$logger->info('one');
+	my $sock = $backend->{_socket};
+	ok($sock, 'the socket is kept after a message');
+	$logger->info('two');
+	is($backend->{_socket}, $sock, 'and used for the next one');
+
+	my @messages;
+	for(1 .. 2) {
+		my $data = '';
+		recv($recv, $data, 65536, MSG_DONTWAIT);
+		push @messages, { parse_journald($data) }->{MESSAGE};
+	}
+	is_deeply(\@messages, ['one', 'two'], 'both messages arrived');
+
+	# journald goes away: the send fails, carps once, and drops the socket
+	close $recv;
+	unlink $SOCKPATH;
+	my @warnings;
+	{
+		local $SIG{__WARN__} = sub { push @warnings, @_ };
+		$logger->info('lost');
+	}
+	is(scalar(@warnings), 1, 'a failed send carps');
+	ok(!$backend->{_socket}, 'and closes the socket');
+
+	# journald comes back, with a new socket file
+	my $data = with_receiver(sub { $logger->info('three') });
+	is({ parse_journald($data) }->{MESSAGE}, 'three', 'the next message gets a new socket and arrives');
+	ok($backend->{_socket}, 'which is kept');
+
+	my $clone = $logger->new();
+	$data = with_receiver(sub { $clone->info('clone') });
+	isnt($clone->{_backends}[0]{_socket}, $backend->{_socket}, 'a clone has its own socket');
+};
+
+
 done_testing();

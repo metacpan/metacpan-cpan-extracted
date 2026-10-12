@@ -96,6 +96,36 @@ my $base = "http://127.0.0.1:$port";
     like $out, qr/\Ahttp\|/, 'the connection and worker are fine afterwards';
 }
 
+{
+    # The preface, SETTINGS, HEADERS and a 32KB body in ONE write, more than
+    # the 16KB read buffer: the buffer fills before the server has looked at
+    # the first byte. 0.56 answered that with an HTTP/1 413 and a close
+    # (curl 8.2x sends exactly this burst; the FreeBSD smokers saw '000').
+    my $s = IO::Socket::INET->new(PeerAddr => "127.0.0.1:$port") or die $!;
+    my $frame = sub { my ($type, $flags, $sid, $payload) = @_;
+        substr(pack('N', length $payload), 1) . pack('CCN', $type, $flags, $sid) . $payload };
+    my $lit = sub { my ($n, $v) = @_; "\x00" . chr(length $n) . $n . chr(length $v) . $v };
+    my $hdrs = join '', $lit->(':method', 'POST'), $lit->(':scheme', 'http'),
+                        $lit->(':path', '/upload'), $lit->(':authority', "127.0.0.1:$port"),
+                        $lit->('content-length', '32768');
+    my $burst = "PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n"
+              . $frame->(4, 0, 0, '')
+              . $frame->(1, 0x4, 1, $hdrs)
+              . $frame->(0, 0, 1, 'z' x 16384)
+              . $frame->(0, 0x1, 1, 'z' x 16384);
+    syswrite $s, $burst or die $!;
+    my $got = '';
+    while (length $got < 4096) {
+        my $n = sysread $s, $got, 4096, length $got;
+        last unless $n;
+        last if $got =~ /\x03413/;
+    }
+    close $s;
+    unlike $got, qr/\AHTTP\//, 'a one-burst h2c upload over max_body is not answered as HTTP/1';
+    like $got, qr/\x03413/, '...it gets an h2 413';
+}
+
+
 SKIP: {
     skip 'no TLS in this build, or no openssl CLI', 2 unless $have_tls;
     my $out = `curl -sk --http2 "https://127.0.0.1:$tport/env" 2>/dev/null`;

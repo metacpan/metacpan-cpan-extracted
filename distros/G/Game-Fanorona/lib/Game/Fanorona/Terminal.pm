@@ -5,6 +5,7 @@ use strict;
 use warnings;
 
 use Carp ();
+use Getopt::Long ();
 use Object::Proto::Sugar;
 
 use Game::Fanorona;
@@ -12,7 +13,7 @@ use Game::Fanorona::Bot;
 use Game::Fanorona::Variant;
 use Game::Fanorona::Notation qw(parse_position move_points);
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 our (@COMMANDS, @KEYS, %SEQUENCE, %CONTROL, %DIRECTION, %GROUND, %INK, %GLYPH, %FRAME, %ENDING, @RULES, @LEVEL);
 
@@ -1323,6 +1324,81 @@ sub _begin {
     },
 );
 
+sub _usage {
+    return <<'USAGE';
+fanorona - the board game of Madagascar, in a terminal
+
+  fanorona [options]
+
+  --side WHO       white (the default, and White moves first), black, both, or neither
+  --level N        how hard the program plays: 1 to 5, 3 by default
+  --variant NAME   the board: sivy (nine by five, the default), dimy or telo
+  --load FILE      carry on with a saved game
+  --no-colour      letters and lines instead of a painted board
+  --no-pick        type moves instead of choosing them with the arrow keys
+  --no-unicode     letters for the stones, with colour kept
+  --version        the version, and stop
+  --help           this, and stop
+
+In a terminal, moves are chosen on the board with the arrow keys; press ? for
+the keys. Anywhere else, type a move as the points the stone stands on, like
+d2-e3A, or help.
+USAGE
+}
+
+sub run {
+    my ($class, @argv) = @_;
+
+    my %given;
+    my $parsed = Getopt::Long::GetOptionsFromArray(
+        \@argv, \%given,
+        'level=i', 'side=s', 'variant=s', 'load=s',
+        'colour|color!', 'pick!', 'unicode!', 'version', 'help',
+    );
+
+    if (!$parsed || @argv) {
+        print STDERR "fanorona: I do not know '@argv'.\n" if $parsed && @argv;
+        print STDERR _usage();
+        return 2;
+    }
+    if ($given{help}) {
+        print _usage();
+        return 0;
+    }
+    if ($given{version}) {
+        print "fanorona $Game::Fanorona::VERSION\n";
+        return 0;
+    }
+
+    my %with;
+    $with{level}   = $given{level}   if defined $given{level};
+    $with{human}   = $given{side}    if defined $given{side};
+    $with{variant} = $given{variant} if defined $given{variant};
+    $with{colour}  = $given{colour}  if defined $given{colour};
+    $with{picking} = $given{pick}    if defined $given{pick};
+    $with{unicode} = $given{unicode} if defined $given{unicode};
+    $with{menu}    = 1 unless grep { defined $given{$_} } qw(side level variant load);
+
+    my $terminal = eval { $class->new(%with) };
+    if (!$terminal) {
+        (my $why = $@) =~ s/ at \S+ line \d+\.?\s*\z//;
+        $why =~ s/\AGame::Fanorona(?:::\w+)*: //;
+        print STDERR "fanorona: $why.\n";
+        return 2;
+    }
+
+    local @SIG{qw(INT TERM HUP)};
+    for my $sig (qw(INT TERM HUP)) {
+        $SIG{$sig} = sub { $terminal->_leave_raw; $SIG{$sig} = 'DEFAULT'; kill $sig, $$ };
+    }
+
+    if (defined $given{load}) {
+        return 2 unless $terminal->load($given{load});
+    }
+
+    return $terminal->start;
+}
+
 1;
 
 __END__
@@ -1335,7 +1411,7 @@ Game::Fanorona::Terminal - fanorona in a terminal, by arrow key or by typed move
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 
@@ -1516,6 +1592,22 @@ true value when it should wait for one. It returns one character, or C<undef>
 at the end. This is how the tests press keys.
 
 =back
+
+=head2 run
+
+    exit Game::Fanorona::Terminal->run(@ARGV);
+
+The whole command line program as a class method: parses the options the
+C<fanorona> program documents, builds the terminal, plays, and B<returns the
+exit status rather than calling C<exit>>: C<0> when the game was left in the
+ordinary way, C<2> for a bad option, a stray word, a refused value or a file
+that could not be loaded, with the reason and the usage on C<STDERR>.
+C<--help> and C<--version> print to C<STDOUT> and return C<0>. Given none of
+C<--side>, C<--level>, C<--variant> and C<--load>, and a terminal whose keys
+it can read, it begins by asking for the three. Signal handlers are local to
+the call and the keyboard is given back on every way out, so a launcher such
+as L<Game::Terminal> can call it in its own process and carry on afterwards.
+Colour is off under C<NO_COLOR> as well as off a terminal.
 
 =head2 start
 

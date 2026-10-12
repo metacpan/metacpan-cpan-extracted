@@ -1,0 +1,565 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Term::Fabulous::Cookbook - Recipes for common Term::Fabulous tasks
+
+=head1 HOW TO USE THIS COOKBOOK
+
+The cookbook is a collection of recipes: short, complete solutions to
+common tasks, each with a program you can run and change. The recipes
+are grouped by topic into fifteen pages. L</THE RECIPES> below lists
+every page with every recipe on it. Each page lists its own recipes at
+the top and links to the previous and the next page, so you can also
+read the cookbook from start to end.
+
+The cookbook shows I<how> to do something. The concepts behind the
+recipes (layout, colors, events, focus, forms, charts, tables, KDL
+layouts) are explained in L<Term::Fabulous::Manual>, and every class
+has a reference page of its own. The recipes link to the exact sections
+they rely on.
+
+=head2 How a recipe is written
+
+Every recipe solves one task. Its title names the task in plain words,
+often followed in parentheses by the classes, options or keywords it
+uses, so a search for the task or the class finds it: search this index (with C</> in
+C<perldoc Term::Fabulous::Cookbook>, or with the browser on MetaCPAN),
+or the page of the topic.
+
+A recipe starts with one sentence on its goal, introduced with "Goal:".
+Then it shows a complete program or a snippet, a picture of the
+program running (or the text it prints), and a list that explains the
+lines that matter, with links to the reference documentation.
+
+A snippet is not a complete program. It shows the lines that change
+the program of another recipe and names that recipe with a link. When
+a snippet uses C<$root> or C<$ui>, these are the root widget and the
+L<Term::Fabulous> object of that program.
+
+=head2 Running the programs
+
+You need not copy the programs: every complete program is shipped as a
+file in the distribution, and each recipe names its file. Most are in
+the F<examples/cookbook> directory and start with this header:
+
+	use v5.32;
+	use warnings;
+	use feature 'signatures';
+	no warnings 'experimental::signatures';
+
+Programs with non-ASCII text in their source add C<use utf8> after
+C<use warnings>.
+
+A few recipes show a demo program from the F<examples> directory,
+which holds the programs of L<Term::Fabulous::Examples>. Those start
+with C<use experimental 'signatures'> instead of
+C<use feature 'signatures'>, and with a C<use lib "$FindBin::Bin/../lib/">
+line.
+
+Run a program with C<perl FILE> in a terminal that uses a UTF-8 locale
+and supports 24-bit colors (see L<Term::Fabulous::Manual/REQUIREMENTS>),
+after installing Term::Fabulous. In an unpacked copy of the
+distribution that is built but not installed (C<perl Makefile.PL &&
+make>), add C<-Mblib>:
+
+=for highlighter language=sh
+
+	perl -Mblib examples/cookbook/minimal-program.pl
+
+Interactive programs take over the terminal (all of it, or a few
+rows below the shell's output in inline mode); Ctrl+C ends every one of
+them. Programs that only print something, such as a report
+made with L<Term::Fabulous::Static> or the results of a test, print
+and end on their own.
+
+The pictures are taken from the shipped files by running them in a
+terminal of the size shown, after the input the recipe describes, so
+they show exactly what the code does. They appear in the HTML version
+of the documentation, for example on MetaCPAN, but not in C<perldoc>;
+programs that print text show that text in the recipe as well.
+
+=head1 THE RECIPES
+
+The pages, in reading order, each with its recipes:
+
+=over
+
+=item L<Term::Fabulous::Cookbook::GettingStarted>
+
+A first program, quitting and text:
+
+=over
+
+=item *
+
+L<A minimal program to start from|Term::Fabulous::Cookbook::GettingStarted/A minimal program to start from>
+
+=item *
+
+L<Quit with q or Escape|Term::Fabulous::Cookbook::GettingStarted/Quit with q or Escape>
+
+=item *
+
+L<Show non-ASCII text (umlauts, CJK, combining accents)|Term::Fabulous::Cookbook::GettingStarted/Show non-ASCII text (umlauts, CJK, combining accents)>
+
+=item *
+
+L<Wrap, align and space text|Term::Fabulous::Cookbook::GettingStarted/Wrap, align and space text>
+
+=item *
+
+L<Let the terminal handle the mouse (select and copy text)|Term::Fabulous::Cookbook::GettingStarted/Let the terminal handle the mouse (select and copy text)>
+
+=back
+
+=item L<Term::Fabulous::Cookbook::KeyboardAndMouse>
+
+Key bindings, buttons, links and clicks on text:
+
+=over
+
+=item *
+
+L<Bind a key to an action|Term::Fabulous::Cookbook::KeyboardAndMouse/Bind a key to an action>
+
+=item *
+
+L<Add buttons for the mouse and the keyboard (Button)|Term::Fabulous::Cookbook::KeyboardAndMouse/Add buttons for the mouse and the keyboard (Button)>
+
+=item *
+
+L<Follow links in a text (RichText links)|Term::Fabulous::Cookbook::KeyboardAndMouse/Follow links in a text (RichText links)>
+
+=item *
+
+L<React to a click on a word (TextClick)|Term::Fabulous::Cookbook::KeyboardAndMouse/React to a click on a word (TextClick)>
+
+=back
+
+=item L<Term::Fabulous::Cookbook::LiveData>
+
+Timers, logs and the output of commands:
+
+=over
+
+=item *
+
+L<Update the screen from a timer (a clock)|Term::Fabulous::Cookbook::LiveData/Update the screen from a timer (a clock)>
+
+=item *
+
+L<Add lines to a scrolling log (ScrollBox)|Term::Fabulous::Cookbook::LiveData/Add lines to a scrolling log (ScrollBox)>
+
+=item *
+
+L<Scroll a ScrollBox from code (keep a log at the newest line)|Term::Fabulous::Cookbook::LiveData/Scroll a ScrollBox from code (keep a log at the newest line)>
+
+=item *
+
+L<Show the output of a running command|Term::Fabulous::Cookbook::LiveData/Show the output of a running command>
+
+=back
+
+=item L<Term::Fabulous::Cookbook::Forms>
+
+Forms, dialogs and input widgets:
+
+=over
+
+=item *
+
+L<A login form (centered dialog, masked password)|Term::Fabulous::Cookbook::Forms/A login form (centered dialog, masked password)>
+
+=item *
+
+L<Check the values of a form (required, validator)|Term::Fabulous::Cookbook::Forms/Check the values of a form (required, validator)>
+
+=item *
+
+L<Write your own checks and restrict typing (accept, pattern, code)|Term::Fabulous::Cookbook::Forms/Write your own checks and restrict typing (accept, pattern, code)>
+
+=item *
+
+L<Ask a question in a dialog (Dialog widget)|Term::Fabulous::Cookbook::Forms/Ask a question in a dialog (Dialog widget)>
+
+=item *
+
+L<Confirm before quitting (Prompt)|Term::Fabulous::Cookbook::Forms/Confirm before quitting (Prompt)>
+
+=item *
+
+L<Ask for a number and check it (Prompt, validator)|Term::Fabulous::Cookbook::Forms/Ask for a number and check it (Prompt, validator)>
+
+=item *
+
+L<Open and save a file (FileDialog)|Term::Fabulous::Cookbook::Forms/Open and save a file (FileDialog)>
+
+=item *
+
+L<Ask for a color (ColorPicker in a Prompt)|Term::Fabulous::Cookbook::Forms/Ask for a color (ColorPicker in a Prompt)>
+
+=item *
+
+L<Ask for input below the shell's output (inline mode)|Term::Fabulous::Cookbook::Forms/Ask for input below the shell's output (inline mode)>
+
+=item *
+
+L<Choose from options in Perl (Dropdown, RadioGroup, Slider)|Term::Fabulous::Cookbook::Forms/Choose from options in Perl (Dropdown, RadioGroup, Slider)>
+
+=item *
+
+L<Read all values of a form|Term::Fabulous::Cookbook::Forms/Read all values of a form>
+
+=item *
+
+L<Find widgets by id|Term::Fabulous::Cookbook::Forms/Find widgets by id>
+
+=item *
+
+L<Build a form from a KDL file (text fields, radio buttons, dropdown, slider, checkbox)|Term::Fabulous::Cookbook::Forms/Build a form from a KDL file (text fields, radio buttons, dropdown, slider, checkbox)>
+
+=item *
+
+L<Disable inputs until a checkbox is checked|Term::Fabulous::Cookbook::Forms/Disable inputs until a checkbox is checked>
+
+=item *
+
+L<Show a status line that follows the focus (OnFocus)|Term::Fabulous::Cookbook::Forms/Show a status line that follows the focus (OnFocus)>
+
+=item *
+
+L<Change the Tab order (HasFocusOrder)|Term::Fabulous::Cookbook::Forms/Change the Tab order (HasFocusOrder)>
+
+=item *
+
+L<Copy and paste through the clipboard|Term::Fabulous::Cookbook::Forms/Copy and paste through the clipboard>
+
+=back
+
+=item L<Term::Fabulous::Cookbook::Menus>
+
+Menu bars, context menus, status bars, help screens and document tabs:
+
+=over
+
+=item *
+
+L<Give a program a menu bar (MenuBar, Commands)|Term::Fabulous::Cookbook::Menus/Give a program a menu bar (MenuBar, Commands)>
+
+=item *
+
+L<Open a menu with a right click or the Menu key (Menu)|Term::Fabulous::Cookbook::Menus/Open a menu with a right click or the Menu key (Menu)>
+
+=item *
+
+L<Show messages and state in a status bar (StatusBar)|Term::Fabulous::Cookbook::Menus/Show messages and state in a status bar (StatusBar)>
+
+=item *
+
+L<Show the keys in a help screen (KeyReference)|Term::Fabulous::Cookbook::Menus/Show the keys in a help screen (KeyReference)>
+
+=item *
+
+L<Keep several documents open in tabs (DocumentTabs)|Term::Fabulous::Cookbook::Menus/Keep several documents open in tabs (DocumentTabs)>
+
+=back
+
+=item L<Term::Fabulous::Cookbook::Layout>
+
+Layout, borders, colors and themes:
+
+=over
+
+=item *
+
+L<Line up labels with equal widths (width_group)|Term::Fabulous::Cookbook::Layout/Line up labels with equal widths (width_group)>
+
+=item *
+
+L<Use a different border style on each side|Term::Fabulous::Cookbook::Layout/Use a different border style on each side>
+
+=item *
+
+L<Switch themes at run time (built-in themes and a theme file)|Term::Fabulous::Cookbook::Layout/Switch themes at run time (built-in themes and a theme file)>
+
+=item *
+
+L<Design a theme against your own screen (the theme editor)|Term::Fabulous::Cookbook::Layout/Design a theme against your own screen (the theme editor)>
+
+=item *
+
+L<Mark widgets with states and classes|Term::Fabulous::Cookbook::Layout/Mark widgets with states and classes>
+
+=item *
+
+L<Change the layout with the terminal size (Start and Resize events)|Term::Fabulous::Cookbook::Layout/Change the layout with the terminal size (Start and Resize events)>
+
+=back
+
+=item L<Term::Fabulous::Cookbook::Tables>
+
+Show, format, edit and print tables:
+
+=over
+
+=item *
+
+L<Show a list of hashes in a table (sort, select, open a row)|Term::Fabulous::Cookbook::Tables/Show a list of hashes in a table (sort, select, open a row)>
+
+=item *
+
+L<Format cells: dates, numbers, sizes and flags (mutators)|Term::Fabulous::Cookbook::Tables/Format cells: dates, numbers, sizes and flags (mutators)>
+
+=item *
+
+L<Edit the data of a table (widget cells, add and remove rows and columns)|Term::Fabulous::Cookbook::Tables/Edit the data of a table (widget cells, add and remove rows and columns)>
+
+=item *
+
+L<Let the user choose the visible columns (column chooser)|Term::Fabulous::Cookbook::Tables/Let the user choose the visible columns (column chooser)>
+
+=item *
+
+L<Describe a table in a KDL layout (columns, lines, sort, groups)|Term::Fabulous::Cookbook::Tables/Describe a table in a KDL layout (columns, lines, sort, groups)>
+
+=item *
+
+L<Print a table as a report (Static)|Term::Fabulous::Cookbook::Tables/Print a table as a report (Static)>
+
+=back
+
+=item L<Term::Fabulous::Cookbook::TableRows>
+
+Sort, filter, group, nest and page table rows:
+
+=over
+
+=item *
+
+L<Sort rows, also with your own comparison|Term::Fabulous::Cookbook::TableRows/Sort rows, also with your own comparison>
+
+=item *
+
+L<Let the user filter rows (filter row and search box)|Term::Fabulous::Cookbook::TableRows/Let the user filter rows (filter row and search box)>
+
+=item *
+
+L<Filter rows from Perl (numbers, dates, text, raw or shown values)|Term::Fabulous::Cookbook::TableRows/Filter rows from Perl (numbers, dates, text, raw or shown values)>
+
+=item *
+
+L<Group rows by a column (collapsible group headers)|Term::Fabulous::Cookbook::TableRows/Group rows by a column (collapsible group headers)>
+
+=item *
+
+L<Show nested data as a tree (expand and collapse rows)|Term::Fabulous::Cookbook::TableRows/Show nested data as a tree (expand and collapse rows)>
+
+=item *
+
+L<Split many rows into pages (pager and page sizes)|Term::Fabulous::Cookbook::TableRows/Split many rows into pages (pager and page sizes)>
+
+=back
+
+=item L<Term::Fabulous::Cookbook::TableStyles>
+
+Column sizes, lines and colors of tables:
+
+=over
+
+=item *
+
+L<Size, align and wrap columns (widths, wrapping, widget titles)|Term::Fabulous::Cookbook::TableStyles/Size, align and wrap columns (widths, wrapping, widget titles)>
+
+=item *
+
+L<Lines and colors per row, column and cell (conditional formatting)|Term::Fabulous::Cookbook::TableStyles/Lines and colors per row, column and cell (conditional formatting)>
+
+=item *
+
+L<A table with colored rows and titles (block frame, no grid lines)|Term::Fabulous::Cookbook::TableStyles/A table with colored rows and titles (block frame, no grid lines)>
+
+=item *
+
+L<Compare the line options of a table (frames, grid lines, block frames)|Term::Fabulous::Cookbook::TableStyles/Compare the line options of a table (frames, grid lines, block frames)>
+
+=back
+
+=item L<Term::Fabulous::Cookbook::Charts>
+
+One for each chart type:
+
+=over
+
+=item *
+
+L<Draw a line chart with labels and points (LineChart)|Term::Fabulous::Cookbook::Charts/Draw a line chart with labels and points (LineChart)>
+
+=item *
+
+L<Grouped, stacked and horizontal bars (BarChart)|Term::Fabulous::Cookbook::Charts/Grouped, stacked and horizontal bars (BarChart)>
+
+=item *
+
+L<Show shares as a pie or donut (PieChart, DonutChart)|Term::Fabulous::Cookbook::Charts/Show shares as a pie or donut (PieChart, DonutChart)>
+
+=item *
+
+L<A scatter plot with trend lines (ScatterPlot)|Term::Fabulous::Cookbook::Charts/A scatter plot with trend lines (ScatterPlot)>
+
+=item *
+
+L<Stacked areas and shares of 100% (AreaChart)|Term::Fabulous::Cookbook::Charts/Stacked areas and shares of 100% (AreaChart)>
+
+=item *
+
+L<How values are distributed (Histogram)|Term::Fabulous::Cookbook::Charts/How values are distributed (Histogram)>
+
+=item *
+
+L<Compare profiles on radar and polar area charts (RadarChart, PolarAreaChart)|Term::Fabulous::Cookbook::Charts/Compare profiles on radar and polar area charts (RadarChart, PolarAreaChart)>
+
+=item *
+
+L<Show sparklines in table cells (Sparkline)|Term::Fabulous::Cookbook::Charts/Show sparklines in table cells (Sparkline)>
+
+=back
+
+=item L<Term::Fabulous::Cookbook::ChartTechniques>
+
+Time axes, live data, transforms, KDL layouts and printed reports with charts:
+
+=over
+
+=item *
+
+L<Plot values over time (time axis, from and to, a dashed forecast)|Term::Fabulous::Cookbook::ChartTechniques/Plot values over time (time axis, from and to, a dashed forecast)>
+
+=item *
+
+L<A live chart that follows new data (append, max_points, span)|Term::Fabulous::Cookbook::ChartTechniques/A live chart that follows new data (append, max_points, span)>
+
+=item *
+
+L<Show values of very different sizes (logarithmic axis)|Term::Fabulous::Cookbook::ChartTechniques/Show values of very different sizes (logarithmic axis)>
+
+=item *
+
+L<Smooth noisy data and index it to 100 (transforms)|Term::Fabulous::Cookbook::ChartTechniques/Smooth noisy data and index it to 100 (transforms)>
+
+=item *
+
+L<Describe charts in a KDL layout (series, slices, transforms)|Term::Fabulous::Cookbook::ChartTechniques/Describe charts in a KDL layout (series, slices, transforms)>
+
+=item *
+
+L<Print charts in a report (Static)|Term::Fabulous::Cookbook::ChartTechniques/Print charts in a report (Static)>
+
+=back
+
+=item L<Term::Fabulous::Cookbook::ChartStyles>
+
+Curves, markers, colors, line styles and hover of charts:
+
+=over
+
+=item *
+
+L<Connect points with curves and easings (curve)|Term::Fabulous::Cookbook::ChartStyles/Connect points with curves and easings (curve)>
+
+=item *
+
+L<Draw with Braille, blocks or box lines (marker)|Term::Fabulous::Cookbook::ChartStyles/Draw with Braille, blocks or box lines (marker)>
+
+=item *
+
+L<Light backgrounds, palettes and colors of your own|Term::Fabulous::Cookbook::ChartStyles/Light backgrounds, palettes and colors of your own>
+
+=item *
+
+L<Line styles, gaps, bar widths, stack groups and grid lines|Term::Fabulous::Cookbook::ChartStyles/Line styles, gaps, bar widths, stack groups and grid lines>
+
+=item *
+
+L<Show details of the point under the pointer (SeriesHover, highlight)|Term::Fabulous::Cookbook::ChartStyles/Show details of the point under the pointer (SeriesHover, highlight)>
+
+=back
+
+=item L<Term::Fabulous::Cookbook::Canvases>
+
+Draw on a canvas:
+
+=over
+
+=item *
+
+L<Paint with the mouse (Canvas, clicks and drags)|Term::Fabulous::Cookbook::Canvases/Paint with the mouse (Canvas, clicks and drags)>
+
+=item *
+
+L<Plot data on a pixel canvas (PixelCanvas)|Term::Fabulous::Cookbook::Canvases/Plot data on a pixel canvas (PixelCanvas)>
+
+=item *
+
+L<Show a picture file (Image, fit)|Term::Fabulous::Cookbook::Canvases/Show a picture file (Image, fit)>
+
+=item *
+
+L<Embed a logo in the program (Image, base64)|Term::Fabulous::Cookbook::Canvases/Embed a logo in the program (Image, base64)>
+
+=item *
+
+L<Show a photo in sixel graphics (Sixel)|Term::Fabulous::Cookbook::Canvases/Show a photo in sixel graphics (Sixel)>
+
+=back
+
+=item L<Term::Fabulous::Cookbook::Output>
+
+Reports and tests without a terminal:
+
+=over
+
+=item *
+
+L<Render a report to a file or pipe (Static)|Term::Fabulous::Cookbook::Output/Render a report to a file or pipe (Static)>
+
+=item *
+
+L<Test a widget without a terminal|Term::Fabulous::Cookbook::Output/Test a widget without a terminal>
+
+=back
+
+=item L<Term::Fabulous::Cookbook::Extending>
+
+Your own widgets and events:
+
+=over
+
+=item *
+
+L<Write a custom input widget (a toggle switch)|Term::Fabulous::Cookbook::Extending/Write a custom input widget (a toggle switch)>
+
+=item *
+
+L<Make a widget usable from KDL|Term::Fabulous::Cookbook::Extending/Make a widget usable from KDL>
+
+=item *
+
+L<Fire your own events|Term::Fabulous::Cookbook::Extending/Fire your own events>
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+L<Term::Fabulous> (the main module), L<Term::Fabulous::Manual> (concepts
+and reference overview), the widget classes under
+C<Term::Fabulous::Widget::>, L<Term::Fabulous::Layout> (KDL layouts),
+L<Term::Fabulous::Static> (rendering to text), and
+L<Term::Fabulous::Examples> (all example programs of the distribution,
+with pictures).
+
+=cut

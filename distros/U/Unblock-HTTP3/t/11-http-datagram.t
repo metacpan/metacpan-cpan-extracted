@@ -9,7 +9,9 @@ use Time::HiRes qw(time);
 
 use Net::QUIC;
 use Net::QUIC::Driver;
+use Unblock::HTTP3::Client;
 use Unblock::HTTP3::Connection;
+use Unblock::HTTP3::Server;
 use Uniform::HTTP::Request;
 
 is($Net::QUIC::VERSION, '0.04', 'HTTP Datagrams use released Net::QUIC 0.04');
@@ -168,12 +170,12 @@ ok(
     'QUIC/TLS handshake completes with DATAGRAM transport enabled',
 );
 
-my $client_h3 = Unblock::HTTP3::Connection->client(
+my $client_h3 = Unblock::HTTP3::Client->new(
     quic                  => $client_quic,
     enable_http_datagrams => 1,
 );
 
-my $server_h3 = Unblock::HTTP3::Connection->server(
+my $server_h3 = Unblock::HTTP3::Server->new(
     quic                    => $server_quic,
     enable_extended_connect => 1,
     enable_http_datagrams   => 1,

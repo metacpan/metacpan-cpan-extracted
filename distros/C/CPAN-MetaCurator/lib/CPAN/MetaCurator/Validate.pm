@@ -10,7 +10,7 @@ use Data::Dumper::Concise; # For Dumper().
 use File::Slurper 'read_lines';
 use File::Spec;
 
-our $VERSION = '1.29';
+our $VERSION = '1.33';
 
 # -----------------------------------------------
 
@@ -75,6 +75,10 @@ sub validate
 1;
 
 =pod
+
+=head1 NAME
+
+CPAN::MetaCurator::Validate - Manage the cpan.metacurator.sqlite database
 
 =head1 Machine-Readable Change Log
 

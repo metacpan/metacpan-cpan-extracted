@@ -2,11 +2,12 @@ use strict;
 use warnings;
 package YAML::PP::Writer::File;
 
-our $VERSION = 'v0.41.0'; # VERSION
+our $VERSION = 'v0.42.0'; # VERSION
 
 use Scalar::Util qw/ openhandle /;
 
-use base qw/ YAML::PP::Writer /;
+use YAML::PP::Writer;
+our @ISA = qw/ YAML::PP::Writer /;
 
 use Carp qw/ croak /;
 

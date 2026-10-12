@@ -1,5 +1,5 @@
 package oEdtk::Doc;
-our $VERSION = '0.05';
+our $VERSION = '2.1109';
 
 use Scalar::Util qw(blessed);
 use overload '""' => \&dump;

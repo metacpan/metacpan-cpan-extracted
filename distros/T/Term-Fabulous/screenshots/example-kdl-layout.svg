@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="708" height="345" viewBox="0 0 708 345" role="img" aria-label="perl examples/kdl-layout.pl">
+<title>perl examples/kdl-layout.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="676" height="310" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="676" height="310" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="676" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="354" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/kdl-layout.pl</text>
+<rect x="16.5" y="16.5" width="675" height="309" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="30" y="60" width="648" height="18" fill="#282e40"/>
+<rect x="210" y="96" width="459" height="180" fill="#1c212d"/>
+<rect x="57" y="150" width="126" height="18" fill="#2c3346"/>
+<rect x="57" y="186" width="126" height="18" fill="#2c3346"/>
+<rect x="57" y="222" width="126" height="18" fill="#2c3346"/>
+<rect x="48" y="104" width="144" height="1" fill="#61afef"/>
+<rect x="219" y="104" width="441" height="1" fill="#98c379"/>
+<rect x="43" y="114" width="1" height="144" fill="#61afef"/>
+<rect x="196" y="114" width="1" height="144" fill="#61afef"/>
+<rect x="214" y="114" width="1" height="144" fill="#98c379"/>
+<rect x="664" y="114" width="1" height="144" fill="#98c379"/>
+<rect x="57" y="150" width="9" height="18" fill="#2c3346"/>
+<rect x="57" y="186" width="9" height="18" fill="#e5c07b"/>
+<rect x="57" y="222" width="9" height="18" fill="#2c3346"/>
+<rect x="48" y="266" width="144" height="1" fill="#61afef"/>
+<rect x="219" y="266" width="441" height="1" fill="#98c379"/>
+</g>
+<polyline points="43.5 114 43.5 109 43.538 108.413 43.653 107.835 43.843 107.278 44.103 106.75 44.43 106.261 44.818 105.818 45.261 105.43 45.75 105.103 46.278 104.843 46.835 104.653 47.413 104.538 48 104.5 48 104.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="196.5 114 196.5 109 196.462 108.413 196.347 107.835 196.157 107.278 195.897 106.75 195.57 106.261 195.182 105.818 194.739 105.43 194.25 105.103 193.722 104.843 193.165 104.653 192.587 104.538 192 104.5 192 104.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="214.5 114 214.5 109 214.538 108.413 214.653 107.835 214.843 107.278 215.103 106.75 215.43 106.261 215.818 105.818 216.261 105.43 216.75 105.103 217.278 104.843 217.835 104.653 218.413 104.538 219 104.5 219 104.5" fill="none" stroke="#98c379" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="664.5 114 664.5 109 664.462 108.413 664.347 107.835 664.157 107.278 663.897 106.75 663.57 106.261 663.182 105.818 662.739 105.43 662.25 105.103 661.722 104.843 661.165 104.653 660.587 104.538 660 104.5 660 104.5" fill="none" stroke="#98c379" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="43.5 258 43.5 262 43.538 262.587 43.653 263.165 43.843 263.722 44.103 264.25 44.43 264.739 44.818 265.182 45.261 265.57 45.75 265.897 46.278 266.157 46.835 266.347 47.413 266.462 48 266.5 48 266.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="196.5 258 196.5 262 196.462 262.587 196.347 263.165 196.157 263.722 195.897 264.25 195.57 264.739 195.182 265.182 194.739 265.57 194.25 265.897 193.722 266.157 193.165 266.347 192.587 266.462 192 266.5 192 266.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="214.5 258 214.5 262 214.538 262.587 214.653 263.165 214.843 263.722 215.103 264.25 215.43 264.739 215.818 265.182 216.261 265.57 216.75 265.897 217.278 266.157 217.835 266.347 218.413 266.462 219 266.5 219 266.5" fill="none" stroke="#98c379" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="664.5 258 664.5 262 664.462 262.587 664.347 263.165 664.157 263.722 663.897 264.25 663.57 264.739 663.182 265.182 662.739 265.57 662.25 265.897 661.722 266.157 661.165 266.347 660.587 266.462 660 266.5 660 266.5" fill="none" stroke="#98c379" stroke-width="1" stroke-linejoin="round"/>
+<g class="terminal">
+<text x="39" y="74" textLength="135" fill="#ffffff">Server overview</text>
+<text x="588" y="74" textLength="81" fill="#e5c07b">3 servers</text>
+<text x="57" y="128" textLength="63" fill="#61afef">Servers</text>
+<text x="228" y="128" textLength="90" fill="#98c379">Server: db</text>
+<text x="75" y="164" textLength="27" fill="#dcdcdc">web</text>
+<text x="228" y="164" textLength="369" fill="#dcdcdc">PostgreSQL 16, 41 days up, 38 connections</text>
+<text x="75" y="200" textLength="18" fill="#dcdcdc">db</text>
+<text x="75" y="236" textLength="36" fill="#dcdcdc">mail</text>
+<text x="84" y="308" textLength="531" fill="#96a0b4">Click a server, or Tab to it and press Enter. Ctrl+C quits.</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

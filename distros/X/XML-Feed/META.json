@@ -53,39 +53,39 @@
    "provides" : {
       "XML::Feed" : {
          "file" : "lib/XML/Feed.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.0.2"
       },
       "XML::Feed::Content" : {
          "file" : "lib/XML/Feed/Content.pm",
-         "version" : "0.65"
+         "version" : "v1.0.1"
       },
       "XML::Feed::Enclosure" : {
          "file" : "lib/XML/Feed/Enclosure.pm",
-         "version" : "0.65"
+         "version" : "v1.0.1"
       },
       "XML::Feed::Entry" : {
          "file" : "lib/XML/Feed/Entry.pm",
-         "version" : "0.65"
+         "version" : "v1.0.1"
       },
       "XML::Feed::Entry::Format::Atom" : {
          "file" : "lib/XML/Feed/Entry/Format/Atom.pm",
-         "version" : "0.65"
+         "version" : "v1.0.1"
       },
       "XML::Feed::Entry::Format::RSS" : {
          "file" : "lib/XML/Feed/Entry/Format/RSS.pm",
-         "version" : "0.65"
+         "version" : "v1.0.1"
       },
       "XML::Feed::Format::Atom" : {
          "file" : "lib/XML/Feed/Format/Atom.pm",
-         "version" : "0.65"
+         "version" : "v1.0.1"
       },
       "XML::Feed::Format::RSS" : {
          "file" : "lib/XML/Feed/Format/RSS.pm",
-         "version" : "0.65"
+         "version" : "v1.0.1"
       },
       "XML::Feed::Util" : {
          "file" : "lib/XML/Feed/Util.pm",
-         "version" : "0.65"
+         "version" : "v1.0.1"
       }
    },
    "release_status" : "stable",
@@ -102,9 +102,9 @@
          "web" : "https://github.com/davorg-cpan/xml-feed"
       }
    },
-   "version" : "v1.0.0",
+   "version" : "v1.0.2",
    "x_contributors" : [
-      "Dave Cross <davecross@cpan.org>",
+      "Dave Cross <dave@perlhacks.com>",
       "Jakob Voss <voss@gbv.de>",
       "Tatsuhiko Miyagawa <miyagawa@bulknews.net>",
       "Simon Wistow <simon@thegestalt.org>",

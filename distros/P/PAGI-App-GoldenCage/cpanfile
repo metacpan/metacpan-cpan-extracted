@@ -9,4 +9,5 @@ requires 'Net::Async::HTTP' => '0';
 requires 'IO::Async::SSL' => '0';
 requires 'Gzip::Faster' => '0';
 requires 'UUID' => '0';
+requires 'HTML::Entities' => '0';
 

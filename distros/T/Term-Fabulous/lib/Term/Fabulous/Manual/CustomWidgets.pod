@@ -1,0 +1,596 @@
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Term::Fabulous::Manual::CustomWidgets - Writing your own widgets
+
+=head1 DESCRIPTION
+
+This page is part of L<Term::Fabulous::Manual>. Previous page: L<Term::Fabulous::Manual::Programs>. Next page: L<Term::Fabulous::Manual::Troubleshooting>.
+
+This page explains how to write widget classes of your own: a container
+with a fixed structure (derived from Box), a widget that draws itself
+(derived from Display), an input widget (derived from Input) and a box
+that takes the focus and reacts to the mouse (a Box with the Clay::UI
+interaction roles). It lists the methods each base class lets you
+override, explains how a widget tells Term::Fabulous that it must be
+drawn again, and shows how to fire events of your own, how to make a
+widget usable from KDL layout files and how to test it.
+
+Complete programs are in the cookbook, on
+L<Term::Fabulous::Cookbook::Extending>:
+L<a custom input widget|Term::Fabulous::Cookbook::Extending/Write a custom input widget (a toggle switch)>,
+L<a widget usable from KDL|Term::Fabulous::Cookbook::Extending/Make a widget usable from KDL>
+and L<events of your own|Term::Fabulous::Cookbook::Extending/Fire your own events>.
+
+=head1 WRITING YOUR OWN WIDGETS
+
+Your own widgets are classes derived from one of the Term::Fabulous
+widget classes. Choose the base class by what the widget does:
+
+=over
+
+=item L<Term::Fabulous::Widget::Box>
+
+for a container with a fixed structure or a fixed look, for example a
+"card" with a title and a body. Build the children in C<ADJUST>. See
+L</A container widget>.
+
+=item L<Term::Fabulous::Widget::Display>
+
+for a widget that draws itself cell by cell from its own state, such as
+a gauge, a meter or a game board; the built-in
+L<Term::Fabulous::Widget::Divider>, the charts and the scrollbar are
+ones. See
+L</A widget that draws itself>.
+
+=item L<Term::Fabulous::Widget::Input>
+
+for an interactive widget that edits a value: you get focus handling,
+the four colors (from the theme unless given), the disabled state,
+C<Change> events and painting at
+the right time. See L</An input widget>.
+
+=item A Box with the Clay::UI interaction roles
+
+for a container that takes the focus or reacts to hover and clicks,
+like L<Term::Fabulous::Widget::Button>. See
+L</A box that takes the focus and reacts to the mouse>.
+
+=item Any built-in widget
+
+to change one detail of it, for example which keys a
+L<Term::Fabulous::Widget::TextField> uses: override its C<handle_key>
+(see L<Term::Fabulous::Widget::Input/SUBCLASS INTERFACE>).
+
+=back
+
+=head2 Object::Pad in brief
+
+Term::Fabulous classes are written with L<Object::Pad>, a module that
+adds class syntax to Perl. Your classes must use it too, since only an
+Object::Pad class can derive from another one. The parts used on this
+page:
+
+=over
+
+=item C<use Object::Pad 0.825;>
+
+loads the class syntax. Term::Fabulous needs version 0.825 or later.
+
+=item C<class My::Card :isa(Parent) :strict(params) { ... }>
+
+declares a class derived from C<Parent>. C<:strict(params)> makes C<new>
+die on unknown parameters, as all Term::Fabulous classes do.
+C<:does(Role)> composes a role, a set of methods and fields shared by
+several classes.
+
+=item C<field $title :param;>
+
+declares an instance variable, set from the constructor parameter of
+the same name (C<< My::Card->new( title => 'x' ) >>). Without a default
+(C<field $title :param = 'Untitled';>) the parameter is required.
+C<:reader> adds a method that returns the field.
+
+=item C<ADJUST { ... }>
+
+runs during construction, after the fields are set; C<$self> is the new
+object.
+
+=item C<method name (...) { ... }>
+
+declares a method; C<$self> is available inside. C<:override> marks a
+method that replaces one of the parent class (Object::Pad then checks
+that the parent has it), C<:common> a class method, in which C<$class>
+is available instead of C<$self>.
+
+=back
+
+=head2 A container widget
+
+Derive from L<Term::Fabulous::Widget::Box> and build the children in
+C<ADJUST>. The widget takes every parameter of a Box (C<layout>,
+C<background_color>, ...), and its users can still add children of
+their own:
+
+	use Object::Pad 0.825;
+
+	class My::Card :isa(Term::Fabulous::Widget::Box) :strict(params) {
+		use Clay::XS qw(CLAY_TOP_TO_BOTTOM);
+		use Term::Fabulous::Enum::BorderStyle;
+		use Term::Fabulous::Widget::Text;
+
+		field $title :param;
+
+		ADJUST {
+			$self->layout( { %{ $self->layout }, layout_direction => CLAY_TOP_TO_BOTTOM } );
+			$self->bordered(1);
+			$self->border_color( [ 120, 170, 255, 255 ] );
+			$self->$_( Term::Fabulous::Enum::BorderStyle->Solid ) foreach qw(border_style_right border_style_bottom border_style_left);
+			$self->border_style_top( Term::Fabulous::Enum::BorderStyle->Heavy );
+			$self->add_child( Term::Fabulous::Widget::Text->new( text => $title, text_color => [ 255, 220, 120, 255 ] ) );
+		}
+	}
+
+	my $card = My::Card->new( title => 'Status' );
+	$card->add_child( Term::Fabulous::Widget::Text->new( text => 'All systems go', text_color => [ 220, 220, 220, 255 ] ) );
+
+The card draws a heavy line on top and thin lines on the other sides:
+
+=for highlighter language=text
+
+	┏━━━━━━━━━━━━━━┓
+	│Status        │
+	│All systems go│
+	└──────────────┘
+
+The accessors a Box inherits (C<layout>, C<bordered>, ...) record
+the change themselves, so the next frame shows it. A container whose
+look depends on fields of its own must say so when they change; see
+L</Telling Term::Fabulous that something changed>.
+
+=head2 A widget that draws itself
+
+Derive from L<Term::Fabulous::Widget::Display> for a widget that draws
+cells from its own state. The layout decides the size of the widget;
+its buffer has 0 x 0 cells until the first frame lays it out (see
+L<Term::Fabulous::Widget::Canvas/Buffer size>). So do not draw in the
+constructor or in the setters: the setters record the new state and
+call C<mark_changed>, and the base class calls your C<paint> while the
+frame is drawn, after the buffer got its size, and only when something
+C<paint> depends on changed (the size, the state marked changed, and
+whatever L<C<paint_key>|Term::Fabulous::Widget::Display/paint_key>
+adds). C<natural_size> says how big the widget wants to be when the
+layout does not size it:
+
+=for highlighter language=perl
+
+	use Object::Pad 0.825;
+
+	class My::Gauge :isa(Term::Fabulous::Widget::Display) :strict(params) {
+		field $fraction :param = 0;
+
+		method fraction (@new) {
+			return $fraction unless @new;
+			$fraction = $new[0];
+			$self->mark_changed;    # a frame is due, and it paints
+			return $fraction;
+		}
+
+		method natural_size () { return ( 20, 1 ) }    # columns, rows
+
+		method paint () {
+			my $filled = int( $self->columns * $fraction + 0.5 );
+			$self->fill_attrs( 0,       0, $filled,                  "\x{2588}", $self->color_attr(0x61AFEF), undef );
+			$self->fill_attrs( $filled, 0, $self->columns - $filled, "\x{2591}", $self->color_attr(0x3A3F4B), undef );
+			return;
+		}
+	}
+
+	my $gauge = My::Gauge->new( fraction => 0.25 );
+	$gauge->fraction(0.5);    # from a timer, a listener, ...
+
+Paint with C<put_attrs> (L<Term::Fabulous::Widget::Canvas/put_attrs>)
+and the helpers C<paint_text>, C<fill_attrs> and C<color_attr> of
+L<Term::Fabulous::Widget::Display/SUBCLASS INTERFACE>, which take
+termbox2 attributes instead of colors and skip the color conversions.
+Cells written in C<paint> belong to the frame being drawn and make no
+further frame due. The widget receives C<Mouse> events for all its
+cells; the method L<C<cell_at>|Term::Fabulous::Widget::Canvas/cell_at>
+turns their position into a cell of the buffer.
+
+A widget that draws with the plain canvas methods (C<put>, C<put_text>,
+C<fill>, C<clear>; see L<Term::Fabulous::Widget::Canvas/METHODS>) can
+derive from L<Term::Fabulous::Widget::Canvas> directly and override
+L<refresh|Term::Fabulous::Widget::Canvas/refresh>, which the renderer
+calls for every canvas in every frame; it must then decide itself
+whether anything changed since it last drew.
+
+A canvas that is drawn from outside instead, by a listener for its
+C<CanvasResize> event (L<Term::Fabulous::Event::CanvasResize>), needs
+no class of its own; see L<Term::Fabulous::Manual::Charts/CANVASES>.
+
+=head2 An input widget
+
+Derive from L<Term::Fabulous::Widget::Input> for a widget that the user
+edits, like the built-in check box or slider. The base class takes the
+focus, follows Tab, shows the focus and the disabled state, ignores
+input while disabled, keeps the colors C<text_color>,
+C<disabled_color>, C<accent_color> and C<focus_background_color>, and
+calls your methods at the right time. These are the methods you write;
+the L<subclass interface of Input|Term::Fabulous::Widget::Input/SUBCLASS INTERFACE>
+describes each of them and the painting helpers in detail:
+
+=over
+
+=item C<natural_size> (required)
+
+Returns the columns and rows of content the widget needs when the
+layout does not size it.
+
+=item C<paint> (required)
+
+Draws the widget into its cleared buffer. It is called while a frame is
+drawn, only when something it depends on changed: the size, the focus,
+the disabled state, or anything you marked with C<mark_changed>.
+
+=item C<paint_key>
+
+The list of values C<paint> depends on. Extend it when C<paint> reads
+the state of other objects, which do not mark your widget changed.
+
+=item C<handle_key>, C<handle_mouse>
+
+Receive the C<KeyPress> and C<Mouse> events of the widget while it is
+enabled. Return true for an event the widget used: it then stops
+bubbling. Return false to let it go on to the ancestors, where
+application shortcuts can see it.
+
+=item C<activate>
+
+Called for a click: the left mouse button pressed and released over
+the widget.
+
+=item C<focus_changed>
+
+Called after the widget got or lost the focus, for what it does then
+besides painting.
+
+=item C<accepts_focus>
+
+Returns 0 for a widget that never takes the focus itself.
+
+=item C<layout_properties>
+
+The properties a KDL layout may set; see L</Using your widget in KDL>.
+
+=back
+
+Call C<< $self->fire_change($value) >> after the user changed the value,
+never when your program set it, so that C<Change> means the same for
+your widget as for the built-in ones (see
+L<Term::Fabulous::Event::Change>).
+
+The complete example, a toggle switch with keys, clicks, C<Change>
+events and KDL support, is the recipe
+L<Write a custom input widget|Term::Fabulous::Cookbook::Extending/Write a custom input widget (a toggle switch)>.
+
+=head2 Colors from the theme
+
+Every widget draws the colors, border styles and borders it was not given from
+the theme of its UI (L<Term::Fabulous::Manual::Looks/THEMES>). A
+widget class of your own takes part through
+L<Term::Fabulous::Role::Themed>, which every widget composes:
+
+=over
+
+=item *
+
+The widget's I<family> decides which slots it reads. A class inherits
+the family of its base class (a widget derived from Input reads the
+C<input> slots, a Box the C<box> slots); C<theme_family> names another
+one.
+
+=item *
+
+C<themed_params> lists the parameters the theme supplies when the
+program gives none, each with the slot and the state it reads and its
+I<kind>: C<color>, C<cell_color>, C<optional_color> (C<undef> for
+none), C<border_style>, ... (see
+L<Term::Fabulous::Role::Themed/themed_params>). The kind is all the
+role needs: it takes the parameter from the constructor, checks every
+value, and makes it a layout property. Do not declare such a parameter
+as a field, and do not list it in C<layout_properties>.
+
+=item *
+
+The accessor is one line: it reads C<look_value> and writes
+C<set_look>. C<paint> and the C<contribute_*> methods read the
+accessor or C<look_value>, never a copy, so that a theme switch shows
+at once. A widget that paints into a buffer of its own (a Display)
+repaints after a switch by itself.
+
+=item *
+
+A widget that copies looks into widgets it builds (a text color into
+its labels) does so in C<ADJUST>, after it built them, and again in
+C<looks_changed>, which the role calls with the names of the looks
+that may have changed: after C<set_look> and C<reset_look>, and with
+all of them when the theme of its UI changes. A widget whose looks
+live on its parts declares them in C<forwarded_looks> instead, and
+C<reset_look> reaches the parts.
+
+=back
+
+A gauge that reads its fill color from the C<progress> family:
+
+	use Object::Pad 0.825;
+
+	class My::Gauge :isa(Term::Fabulous::Widget::Display) :strict(params) {
+		field $fraction :param = 0;
+
+		method theme_family :common () { return 'progress' }
+
+		method themed_params :common () {
+			return ( $class->SUPER::themed_params, fill_color => [ 'color', 'normal', 'cell_color' ] );
+		}
+
+		method fill_color (@new) {
+			return @new ? $self->set_look( fill_color => $new[0] ) : $self->look_value('fill_color');
+		}
+
+		method natural_size () { return ( 20, 1 ) }
+
+		method paint () {
+			my $filled = int( $self->columns * $fraction + 0.5 );
+			$self->fill_attrs( 0,       0, $filled,                  "\x{2588}", $self->color_attr( $self->fill_color ), undef );
+			$self->fill_attrs( $filled, 0, $self->columns - $filled, "\x{2591}", $self->color_attr( $self->look('track') ), undef );
+			return;
+		}
+	}
+
+	my $gauge = My::Gauge->new( fraction => 0.25 );                 # the theme's progress.color
+	my $red   = My::Gauge->new( fraction => 0.25, fill_color => '#ff0000' );    # its own
+	$red->reset_look('fill_color');                                   # the theme's again
+
+A slot the family does not have dies the first time the class is used,
+naming the family. The slots of every family are listed in
+L<Term::Fabulous::Theme/Families, slots and states>; a widget whose
+look needs none of them, such as a canvas drawn by its program, needs
+nothing here.
+
+=head2 A box that takes the focus and reacts to the mouse
+
+The focus, hover and press states come from roles of L<Clay::UI>.
+Compose them into a Box to make a container interactive:
+
+=over
+
+=item L<Clay::UI::Role::Interaction::Focusable>
+
+The widget can take the keyboard focus: Tab stops at it, a left click
+on a cell it paints focuses it, it receives C<KeyPress>, C<OnFocus> and
+C<OnBlur>, and it gets C<can_focus> and C<is_focused>. Override
+C<accepts_focus> to return 0 for a class that should never take the
+focus.
+
+=item L<Clay::UI::Role::Interaction::Hoverable>
+
+The widget gets C<is_hovered> and the C<OnHoverStart> and
+C<OnHoverStopped> events.
+
+=item L<Clay::UI::Role::Interaction::Pressable>
+
+Includes Hoverable. The widget gets C<is_pressed> and the C<OnPress>
+and C<OnRelease> events for the left mouse button.
+
+=item L<Clay::UI::Role::Interaction::Disableable>
+
+The widget gets C<disabled> and C<is_enabled>. A disabled widget
+cannot take the focus and is not pressed.
+
+=back
+
+The events are described in the
+L<event reference|Term::Fabulous::Manual::Events/Event reference>.
+The look comes from a I<contributor>: a method whose name starts with
+C<contribute_>. Clay::UI calls all of them when it builds the widget's
+configuration for a frame, in alphabetical order of their names, so a
+name after C<contribute_background> and C<contribute_border> can change
+what those set (see L<Clay::UI::Role::Core::Element/to_config>). A
+change of the focus, hover or press state makes the next frame due by
+itself.
+
+This tile turns lighter while the pointer is over it, lighter still
+while it has the focus, and fires C<Activate> for a click or C<Enter>,
+like a Button:
+
+	use Object::Pad 0.825;
+	use Clay::UI::Role::Interaction::Focusable;
+	use Clay::UI::Role::Interaction::Pressable;
+
+	class My::Tile
+		:isa(Term::Fabulous::Widget::Box)
+		:does(Clay::UI::Role::Interaction::Focusable)
+		:does(Clay::UI::Role::Interaction::Pressable)
+		:strict(params)
+	{
+		use Clay::UI::Enum::Result;
+		use Scalar::Util qw(refaddr weaken);
+		use Term::Fabulous::Event::Activate;
+
+		ADJUST {
+			weaken( my $weak_self = $self );    # a listener must not keep its widget alive
+			$self->on(
+				OnRelease => sub ($event) {
+					$weak_self->activate if refaddr( $event->target ) == refaddr($weak_self);
+					return Clay::UI::Enum::Result->CONTINUE;
+				}
+			);
+			$self->on(
+				KeyPress => sub ($event) {
+					return Clay::UI::Enum::Result->CONTINUE unless ( $event->main_key_name // '' ) eq 'Enter';
+					$weak_self->activate;
+					return;    # used: stop here
+				}
+			);
+		}
+
+		method activate () {
+			return $self->fire_event( Term::Fabulous::Event::Activate->new );
+		}
+
+		# Sorts after contribute_background, so it overrides the background.
+		method contribute_tile_look ($config) {
+			$config->{background_color} = [ 60, 90, 160, 255 ]  if $self->is_hovered;
+			$config->{background_color} = [ 90, 130, 210, 255 ] if $self->is_focused;
+			return;
+		}
+	}
+
+	my $tile = My::Tile->new( background_color => [ 40, 45, 60, 255 ] );
+	$tile->on( Activate => sub ($event) { open_details(); return } );
+
+The listeners check C<< $event->target >>, because events of the
+children bubble through the widget too. They hold a weak reference to
+the widget: a listener that refers to its own widget directly keeps it
+alive forever.
+
+Two more methods change how Term::Fabulous draws a widget and its
+children. L<Term::Fabulous::Widget::Button> uses both:
+
+=over
+
+=item C<reverse_video>
+
+Every L<Term::Fabulous::Widget> has it; it returns 0. While it returns
+1, the renderer draws the widget's cells with the foreground and
+background colors swapped, its children included. Override it to show
+a state:
+C<< method reverse_video :override () { return $self->is_pressed ? 1 : 0 } >>.
+
+=item C<child_text_color>
+
+Not defined by default. A L<Term::Fabulous::Widget::Text> asks its
+nearest ancestor that has this method, passing the color it was given
+(or C<undef>), and draws its text in what the method returns; when it
+returns C<undef>, the Text uses its given color or the theme's text
+color. Return a gray while the widget is disabled, and the given color
+or a theme look (C<< $self->look('text', $self->look_state) >>)
+otherwise, as L<Term::Fabulous::Widget::Button> does.
+
+=back
+
+=head2 Telling Term::Fabulous that something changed
+
+Term::Fabulous draws a frame only when something changed. A widget that
+keeps state of its own, which its drawing or its size depends on, must
+say so whenever that state changes: it calls C<< $self->mark_changed >>
+(see L<Clay::UI::Role::Core::Element/mark_changed>) in every setter of
+that state. Otherwise a change made from a timer shows only when
+something else causes a frame.
+
+=over
+
+=item *
+
+The accessors of the base classes (C<layout>, C<background_color>,
+C<text>, ...) call it themselves.
+
+=item *
+
+The drawing methods of a Canvas (C<put>, C<fill>, C<clear>, ...) call
+it, except while C<refresh> runs.
+
+=item *
+
+A Display (and so an Input) does not paint in its setters: they call
+C<mark_changed>, and the frame that it makes due calls C<paint> (see
+L<Term::Fabulous::Widget::Display/Painting>).
+
+=back
+
+=head2 Events of your own
+
+A widget can tell its users what happened with an event of its own,
+fired with C<fire_event>, for example a C<Progress> event or a
+C<Selected> event with the chosen item. Such events bubble like the
+built-in ones. See
+L<firing your own events|Term::Fabulous::Manual::Events/Firing your own events>
+and the recipe
+L<Fire your own events|Term::Fabulous::Cookbook::Extending/Fire your own events>.
+
+=head2 Using your widget in KDL
+
+A widget class can be used in KDL layout files once it composes
+L<Term::Fabulous::Role::CanParseLayout>; classes derived from Box
+already do. The class method C<layout_properties> declares the
+properties a layout may set and how each is read: C<'scalar'>,
+C<'boolean'>, C<'color'>, or a code reference for a property with a
+structure of its own. Keep the inherited properties:
+
+	method layout_properties :common () {
+		return ( $class->SUPER::layout_properties, title => 'scalar', collapsed => 'boolean', accent => 'color' );
+	}
+
+A layout applies each property after the widget was constructed,
+through the accessor of the same name (C<< $widget->title('...') >>),
+so every property needs an accessor that reads and writes, and checks
+the value as it does for a program. A layout builds every widget with
+C<< new( id =E<gt> ... ) >> alone, so a class with a required parameter (a
+C<:param> field without a default) cannot be used in a layout; give
+every field a default.
+
+L<Term::Fabulous::Layout> loads the classes a layout names with
+C<require>. A class in its own F<.pm> file in C<@INC> needs nothing
+more; a class defined inside the program needs a line such as
+C<< $INC{'My/ToggleSwitch.pm'} = __FILE__; >> before the layout is built.
+
+The method
+L<C<layout_properties>|Term::Fabulous::Role::CanParseLayout/layout_properties>
+of L<Term::Fabulous::Role::CanParseLayout> has the details and the
+helpers for structured properties, and the recipe
+L<Make a widget usable from KDL|Term::Fabulous::Cookbook::Extending/Make a widget usable from KDL>
+is a complete example.
+
+=head2 Testing your widget
+
+L<Term::Fabulous::Terminal::Memory> runs a program without a terminal:
+C<step> handles the input and draws a frame, and the terminal object
+types keys, clicks and reports what the screen shows. Tests of a widget
+can check both what it draws and the events it fires:
+
+	use Test2::V0;
+	use Term::Fabulous;
+	use Term::Fabulous::Terminal::Memory;
+
+	my $terminal = Term::Fabulous::Terminal::Memory->new( width => 30, height => 3 );
+	my $ui       = Term::Fabulous->new( root => $root, width => 30, height => 3, terminal => $terminal );
+
+	my @activated;
+	$tile->on( Activate => sub ($event) { push @activated, $event->target; return } );
+
+	$ui->step;                    # opens the terminal, draws the first frame
+	$terminal->press_key('Tab');  # focuses the tile
+	$terminal->press_key('Enter');
+	$ui->step;
+	is scalar @activated, 1, 'Enter activates the tile';
+
+See L<testing|Term::Fabulous::Manual::Programs/TESTING> on the page about
+programs, and the recipe
+L<Test a widget without a terminal|Term::Fabulous::Cookbook::Output/Test a widget without a terminal>.
+
+=head1 SEE ALSO
+
+This page is part of L<Term::Fabulous::Manual>. Previous page: L<Term::Fabulous::Manual::Programs>. Next page: L<Term::Fabulous::Manual::Troubleshooting>.
+
+L<Term::Fabulous::Cookbook::Extending>, L<Term::Fabulous::Widget::Box>,
+L<Term::Fabulous::Widget::Canvas>, L<Term::Fabulous::Widget::Display>,
+L<Term::Fabulous::Widget::Input>,
+L<Term::Fabulous::Widget::Button>, L<Term::Fabulous::Role::CanParseLayout>,
+L<Term::Fabulous::Manual::Events>.
+
+=cut

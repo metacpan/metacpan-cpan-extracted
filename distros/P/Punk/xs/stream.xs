@@ -119,8 +119,14 @@ drain(self)
     CODE:
     {
         punk_stream *st = pst_of(aTHX_ self);
-        if (st->state == PST_OPEN && st->mode == PST_MODE_DETACH
-            && st->wlen > st->woff) {
+        /* Pending while there is something the transport has not taken: our
+         * own buffer on a detached socket, the server's on a stream handle,
+         * which says so by answering a write with "full". Without the second
+         * half every TLS and HTTP/2 response drained at once, and a slow
+         * client had the whole export buffered for it. */
+        if (st->state == PST_OPEN
+            && ((st->mode == PST_MODE_DETACH && st->wlen > st->woff)
+                || (st->mode == PST_MODE_HSTREAM && st->full))) {
             if (!st->drain_f) {
                 punk_future *pf = pf_new(aTHX);
                 st->drain_f = pf_bless(aTHX_ pf, "Punk::Future");

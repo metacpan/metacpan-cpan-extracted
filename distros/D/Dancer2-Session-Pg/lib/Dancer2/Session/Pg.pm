@@ -38,7 +38,7 @@ use constant {
     DEFAULT_STATEMENT_TIMEOUT_MS => 2000,
 };
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 with 'Dancer2::Core::Role::SessionFactory';
 
@@ -667,8 +667,8 @@ sub _decrypt {
         );
     };
     return $self->_unreadable(
-        sprintf '%s did not authenticate it -- the encryption_key has'
-          . ' changed, the row was altered, or the payload belongs to a different session id',
+        sprintf '%s did not authenticate it -- the key of its slot in encryption_keys'
+          . ' has changed, the row was altered, or the payload belongs to a different session id',
         $cipher->cipher_name
     ) if !defined $plain;
 
@@ -2314,7 +2314,7 @@ error. That is deliberate: the alternative is handing the application a structur
 whose integrity has not been established.
 
 It is also reported, once per engine per distinct reason, through the engine's
-C<log_cb>. Fail-closed without a trace is how a changed C<encryption_key> becomes
+C<log_cb>. Fail-closed without a trace is how a changed key in C<encryption_keys> becomes
 "users keep getting logged out" with nothing written down anywhere; once per
 reason rather than once per request is so the log stays readable when somebody is
 poking at cookies.

@@ -1,0 +1,195 @@
+=encoding UTF-8
+
+=head1 NAME
+
+OpenTelemetry::Processor::Batch - A base class for OpenTelemetry batch processors
+
+=head1 SYNOPSIS
+
+    ...
+
+=head1 DESCRIPTION
+
+This is a base class for processors that operate on batches of records. It
+is intended to implement the core behaviours that are needed regardless of
+whether this is processing trace spans, log records, or metrics.
+
+This processor is intended to be used in production environments where
+performance is important. It will maintain a queue of records to export, and
+periodically exports these in batches in a parallel process, which should
+allow the main process to continue executing without any delay added by
+the export step.
+
+The worker processes that do the exporting run in a L<IO::Async::Function>
+and will therefore use whatever event loop is returned by L<IO::Async::Loop>.
+Please refer to the documentation of those modules for details on how to
+control this.
+
+=head1 METHODS
+
+This class implements the L<OpenTelemetry::Processor> role. Please consult
+that module's documentation for details on the behaviours it provides.
+
+=head2 new
+
+    $processor = OpenTelemetry::Processor::Batch->new(
+        exporter         => $span_exporter,
+        batch_size       => $batch_size // OTEL_BSP_MAX_EXPORT_BATCH_SIZE,
+        exporter_timeout => $timeout    // OTEL_BSP_EXPORT_TIMEOUT,
+        max_queue_size   => $queue_size // OTEL_BSP_MAX_QUEUE_SIZE,
+        schedule_delay   => $delay      // OTEL_BSP_SCHEDULE_DELAY,
+    );
+
+The constructor takes a mandatory C<exporter> parameter that must be set to an
+instance of a class that implements the L<OpenTelemetry::Exporter> role.
+
+It also accepts the following optional parameters:
+
+=over
+
+=item C<batch_size>
+
+The size of the batch of spans to send to the exporter. If not set, this will
+read the default value from the
+L<"OTEL_BSP_MAX_EXPORT_BATCH_SIZE"|OpenTelemetry::SDK/OTEL_BSP_MAX_EXPORT_BATCH_SIZE>
+environment variable, which in turn defaults to 512.
+
+=item C<exporter_timeout>
+
+The number of milliseconds to send to L<OpenTelemetry::Exporter/export>. If
+not set, this will read the default value from the
+L<"OTEL_BSP_EXPORT_TIMEOUT"|OpenTelemetry::SDK/OTEL_BSP_EXPORT_TIMEOUT>
+environment variable, which in turn defaults to 30000.
+
+=item C<max_queue_size>
+
+The maximum size of the internal queue. If not set, this will read the
+default value from the
+L<"OTEL_BSP_MAX_QUEUE_SIZE"|OpenTelemetry::SDK/OTEL_BSP_MAX_QUEUE_SIZE>
+environment variable, which in turn defaults to 2048.
+
+If an attempt is made to queue a record when the queue is full, the older
+records will be removed from the queue until there is enough space for the
+newer ones. If this happens, the code will call L</report_dropped> with
+the C<buffer-full> reason and the number of records that were dropped.
+
+=item C<schedule delay>
+
+The minimum delay in milliseconds between calls to
+L<OpenTelemetry::Exporter/export>. If not set, this will read the default
+value from the
+L<"OTEL_BSP_SCHEDULE_DELAY"|OpenTelemetry::SDK/OTEL_BSP_SCHEDULE_DELAY>
+environment variable, which in turn defaults to 5000.
+
+Note: this is not yet implemented.
+
+=back
+
+=head2 process
+
+    $processor->process( @records );
+
+Takes a list of records that are ready for processing. Once called, this
+method will queue them for eventual processing. Once enough records have
+been queued, a batch of them will be sent to the configured exporter.
+
+Since this processor works only when a batch is ready, it can sometimes make
+for more complicated debugging. For a simpler processor that handles each
+record as it becomes ready and blocks during the export step, see
+L<OpenTelemetry::Processor::Simple>.
+
+=head2 report_dropped
+
+    $processor = $processor->report_dropped( $reason, $count );
+
+Reports the number of dropped records for the specified reason. The reason
+must be usable as a string, and the count must be usable as a number.
+
+The method in this class does nothing, but subclasses can extend it.
+
+This method returns the calling instance, and is suitable for chaining.
+
+=head2 report_result
+
+    $result = $processor->report_result( $result, $count );
+
+Takes an L<export result|OpenTelemetry::Constants/Export Results> and the
+number of records that that result applies to, and reports this result.
+
+It returns the export result, so it is suitable to be used when returning
+from an exporting function.
+
+The method in this class does nothing. It is expected to be extended by
+subclasses.
+
+=head2 force_flush
+
+    $result = await $processor->force_flush( $timeout );
+
+Empties the internal queue by sending any unexported records to the exporter.
+
+Takes an optional timeout in seconds. If this has been set, any records
+remaining after the time has run out will be dropped and the number of dropped
+spans will be reported with L</report_dropped> with the C<force-flush> reason.
+
+This method will also call L<"force_flush"|OpenTelemetry::Exporter/force_flush>
+on the configured exporter. It returns a L<Future> that will hold the result
+of that operation.
+
+=head2 shutdown
+
+    $result = await $processor->shutdown( $timeout );
+
+Calls L<"shutdown"|OpenTelemetry::Exporter/shutdown> on the configured
+exporter and returns a L<Future> that will hold the result of that operation.
+
+Once the processor has been shutdown, any additional calls to L</shutdown>,
+L</force_flush> will do nothing and immediately return a success result.
+
+=head1 METRICS
+
+This processor generates the metrics described below as part of its operation.
+At the time of writing, these metrics are non-standard, but their inclusion
+in the standard
+L<is being discussed|https://github.com/open-telemetry/semantic-conventions/issues/83>.
+
+Metrics are reported using L<Metrics::Any>. Please consult the documentation
+of that module to learn how to redirect where they are sent to.
+
+=over
+
+=item C<otel.processor.batch.buffer_use>
+
+Set to the size of the internal queue divided by the L</max_queue_size>
+immediately before a batch is picked up for processing.
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item L<Future>
+
+=item L<IO::Async::Function>
+
+=item L<IO::Async::Loop>.
+
+=item L<Metrics::Any>
+
+=item L<OpenTelemetry::Constants>
+
+=item L<OpenTelemetry::Exporter>
+
+=item L<OpenTelemetry::Processor>
+
+=item L<OpenTelemetry::Processor::Simple>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2025 by José Joaquín Atria.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.

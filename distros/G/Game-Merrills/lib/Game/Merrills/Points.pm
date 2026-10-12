@@ -3,7 +3,7 @@ package Game::Merrills::Points;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use constant {
 	POINTS => 24,
@@ -124,7 +124,7 @@ Game::Merrills::Points - the 24 points, the lines between them and the 16 mills
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 

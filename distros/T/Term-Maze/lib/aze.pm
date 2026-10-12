@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use Term::Maze;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 sub import {
   my ( $class, $cols, $rows ) = @_;
@@ -23,7 +23,7 @@ aze - Mazes in the terminal
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 

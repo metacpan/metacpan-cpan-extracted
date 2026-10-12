@@ -37,7 +37,7 @@ sub shuffle {
 				Game::Cribbage::Deck::Card->new(
 					suit => $suit,
 					symbol => $_,
-					id => $i	
+					id => $i
 				);
 		}
 	}
@@ -77,7 +77,7 @@ sub draw {
 
 sub force_draw {
 	my ($self, $card) = @_;
-	
+
 	my $i = 0;
 	for (@{$self->deck}) {
 		if ($_->suit eq $card->{suit} && $_->symbol =~ m/^$card->{symbol}$/) {
@@ -131,7 +131,7 @@ Game::Cribbage::Deck - deck of cards
 
 =head1 VERSION
 
-Version 0.15
+Version 0.17
 
 =cut
 

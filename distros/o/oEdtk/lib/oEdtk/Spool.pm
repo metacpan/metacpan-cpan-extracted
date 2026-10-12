@@ -5,10 +5,10 @@ use warnings;
 
 use oEdtk::Main 0.42;
 
-our $VERSION = 0.019;
+our $VERSION = 2.1109;
 
-# Le nombre maximal de caractères que l'on emet avant d'insérer
-# un saut de ligne.
+# The maximum number of characters we emit before inserting
+# a newline.
 my $LINE_CUTOFF = 85;
 
 sub new {
@@ -23,20 +23,20 @@ sub new {
 	return $self;
 }
 
-# Format du flux d'entrée ligne par ligne.
+# Input stream format, line by line.
 #
-# Les 4 premiers caractères de la ligne déterminent le cas.
+# The first four characters of the line determine the case.
 #
-# cas n°1:
+# case 1:
 #   /^(\d{3}) (.*)$/
 #
 #   $1 = resource
 #   $2 = data
 #
-# cas n°2, dans une ressource:
+# case 2, inside a resource:
 #   /^   (\d)(.*)$/
 #
-#   $1 = saut canal
+#   $1 = channel jump
 #   $2 = data 
 sub parse {
 	my $self = shift;
@@ -44,7 +44,7 @@ sub parse {
 	my $fh = $self->{'input'};
 
 	$self->{'XCORP'} = oe_corporation_get();
-	# Lecture du fichier d'entrée ligne par ligne.
+	# Read the input file line by line.
 	while (my $line=<$fh>) {
 		chomp ($line);
 
@@ -53,30 +53,30 @@ sub parse {
 			next;
 		}
 
-		# Récupération des 4 premiers caractères.
+		# Get the first four characters.
 		die "ERROR: unexpected line format: \"$line\" at line $.\n"
 		    unless $line =~ /^(.{3})([0-9+\- ]?)(.*)$/;
 		my ($header, $jump, $data) = ($1, $2, $3);
-# PROBLEME, sur 2 lignes comme ci-dessous
+# PROBLEM, on 2 lines like the ones below
 	#026   *** LAURIANE         20/09/1984 01 REFERENCES DECOMPTE: 07/01/2009RO181  0002*
 	#   2  *** MAELENN          02/12/1993 11 REFERENCES DECOMPTE: 30/12/2008RO422  0002*
-# jump ne doit pas être vide dans le premier cas sinon $data contient 1 caractère de plus la première fois, dans le second cas il contient un caractère de moins 
-# ce qui décale le découpage dans l'appli pricipale
+# jump must not be empty in the first case, otherwise $data has 1 more character the first time; in the second case it has one character less 
+# which shifts the splitting in the main application
 
-#	Mise en place d'une ligne de préfixe technique, utilisée uniquement pour alimenter des state
+#	Introduce a technical prefix line, used only to populate state
 #004              EDT XCORP M0001
 
-		if ($header =~ /^[0-9a-zA-Z]{3}$/) { # Cas numéro 1.
+		if ($header =~ /^[0-9a-zA-Z]{3}$/) { # Case number 1.
 			$self->{'prev_inres'} = $self->{'inres'};
 			$self->{'inres'} = $header;
 			$self->{'jump'} = $jump;
 
 			if ($data =~ /^\s{1,13}EDT XCORP/) {
 				# warn "EDT XCORP >$data<\n";
-				# Réinitialisation de la state. >             EDT XCORP M0001<
+				# Reinitialize the state. >             EDT XCORP M0001<
 				$self->{'numln'} = 0;
 				$self->{'jumpln'}= 0;
-				# reste à faire, gérer des states par paire :
+				# TODO: handle states in pairs:
 				# EDT XCORP VALUE STATE2 VALUE2 STATE3 VALUE3 etc.
 				$data =~ s/^(\s{1,13}EDT\s)(.*)/$2/;
 				while ($data) {
@@ -87,11 +87,11 @@ sub parse {
 				next;
 								
 			} else {
-				# Réinitialisation de la state.
+				# Reinitialize the state.
 				$self->{'numln'} = 1;
 				$self->{'jumpln'}= 1;
 			}
-			# Réinitialisation de la state.
+			# Reinitialize the state.
 			$self->{'state'} = {};
 			$processfn->($self, $data);
 
@@ -111,7 +111,7 @@ sub parse {
 	}
 }
 
-# Emission d'un tag Compuset.
+# Emit a Compuset tag.
 sub emit {
 	my ($self, $name, $val) = @_;
 	my $fh = $self->{'output'};

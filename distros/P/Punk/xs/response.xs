@@ -69,7 +69,10 @@ headers(self)
         RETVAL
 
 # header(Name => $v, ...) appends and chains; header('Name') reads the
-# first case-insensitive match.
+# first case-insensitive match. A name or value carrying CR, LF or NUL is
+# refused before anything is appended: those bytes end a header, and one
+# built from request input would otherwise be a second header of the
+# client's choosing.
 SV *
 header(self, ...)
         SV *self
@@ -78,6 +81,16 @@ header(self, ...)
         AV *headers = punk_res_headers(aTHX_ punk_res_av(aTHX_ self));
         if (items > 2) {
             int i;
+            for (i = 1; i < items; i++) {
+                STRLEN l, j;
+                const char *p;
+                if (!SvOK(ST(i))) continue;
+                p = SvPV_const(ST(i), l);
+                for (j = 0; j < l; j++)
+                    if (p[j] == '\r' || p[j] == '\n' || p[j] == '\0')
+                        croak("Punk::Response: a header %s may not contain "
+                              "CR, LF or NUL", (i & 1) ? "name" : "value");
+            }
             for (i = 1; i < items; i++)
                 av_push(headers, newSVsv(ST(i)));
             RETVAL = newSVsv(self);

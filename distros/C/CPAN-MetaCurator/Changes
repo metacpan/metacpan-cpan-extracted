@@ -1,5 +1,22 @@
 Revision history for perl module CPAN::MetaCurator
 
+1.33  2026-10-11
+	- Patch Export.pm's build_dag_tree() to handle the 2 special topics, ChangeLog[12].
+
+1.32  2026-09-15
+	- New sub Search.fix_camel_case() to ensure all topics are embedded in [[...]]
+	- Start debugging Export's export_tree() to fix issue with text linking mindlessly to
+		cpan.metacurator.tree.html even if the text contains a URI.
+	- Remove ChangeLog[12] from data/cpan.metacurator.constants.csv so we can output them in the Wiki.
+
+1.31  2026-09-07
+	- New program: report.pl. Will report on various things. 1 option will simply list topics.
+	- Patch Search.pm to process files emitted by parse.metacpan.recent.pl.
+
+1.30  2026-08-26
+	- Remove Unclassified from the stats produced with cpan.metacurator.tree.html.
+		Turns out they were topic names counted multiple times.
+
 1.29  2026-07-31
 	- Rearrange code in Export.pm so Validate.pm can share sub build_dag_tree().
 	- Rewrite Validate.pm to use new code in Export.pm.

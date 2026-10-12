@@ -10,9 +10,8 @@ OpenTelemetry::SDK::Trace::Span::Processor::Simple - A basic OpenTelemetry span 
 
 =head1 DESCRIPTION
 
-This is a simple span processor that receives read-only
-L<OpenTelemetry::Trace::Span> instances and forwards them to an exporter as
-readable instances of L<OpenTelemetry::SDK::Trace::Span::Readable>.
+This is a simple processor that receives spans to process and forwards
+them to an exporter.
 
 This processor will mostly be useful for testing. It could be suitable for
 use in production environments in cases where custom attributes should be
@@ -20,18 +19,10 @@ added to spans based on code scopes, etc.
 
 =head1 METHODS
 
-This class implements the L<OpenTelemetry::Trace::Span::Processor> role.
-Please consult that module's documentation for details on the behaviours it
-provides.
-
-=head2 new
-
-    $processor = OpenTelemetry::SDK::Trace::Processor::Simple->new(
-        exporter => $span_exporter,
-    );
-
-The constructor takes a mandatory C<exporter> parameter that must be set to an
-instance of a class that implements the L<OpenTelemetry::Exporter> role.
+This class inherits from L<OpenTelemetry::Processor::Simple> and implements
+the L<OpenTelemetry::Trace::Span::Processor> role. Please consult
+the documentation of those modules for details on the behaviours they provide.
+The description below will only refer to those behaviours that differ.
 
 =head2 on_start
 
@@ -46,35 +37,8 @@ Called when a span is started. In this class, this method does nothing.
 Called when a span is ended, with the span that has just ended as its only
 parameter. This should be called I<after> the span has been ended.
 
-This method internally passes the span to L</process>, described in more
-detail below.
-
-=head2 process
-
-    $processor->process( @spans );
-
-Takes a list of spans that are ready for processing. Once called, this method
-will convert them into a readable instances and pass them to the configured
-exporter.
-
-This processor handles each span as it becomes ready and blocks during the
-export step. For a non-blocking processor that batches spans for eventual
-processing (and is therefore more suitable for production environments), see
-L<OpenTelemetry::SDK::Trace::Processor::Batch>.
-
-=head2 force_flush
-
-    $result = await $processor->force_flush( $timeout );
-
-Calls L<"force_flush"|OpenTelemetry::Exporter/force_flush> on the configured
-exporter and returns a L<Future> that will hold the result of that operation.
-
-=head2 shutdown
-
-    $result = await $processor->shutdown( $timeout );
-
-Calls L<"shutdown"|OpenTelemetry::Exporter/shutdown> on the configured
-exporter and returns a L<Future> that will hold the result of that operation.
+This method internally passes the span to
+L<OpenTelemetry::Processor::Simple/process>.
 
 =head1 SEE ALSO
 

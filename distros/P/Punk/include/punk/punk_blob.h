@@ -826,8 +826,8 @@ XS_INTERNAL(pb_send_cb) {
     SV *id = items > 1 ? ST(1) : NULL;
     STRLEN l = 0;
     const char *s = (id && SvOK(id)) ? SvPV_const(id, l) : NULL;
-    SV *path, *argv[24];
-    int n = 0, i, have_type = 0, have_cc = 0, have_fn = 0, inline_ok = 0;
+    SV *path, **argv;
+    int n = 1, i, have_type = 0, have_cc = 0, have_fn = 0, inline_ok = 0;
     int public_ = 0;
 
     if (!(store && c)) XSRETURN_EMPTY;
@@ -850,6 +850,12 @@ XS_INTERNAL(pb_send_cb) {
         if (r) SvREFCNT_dec(r);
     }
 
+    /* send_file's arguments: the path, every option the caller gave, and
+     * the ten at most that are added below. Sized from the call, because a
+     * fixed array is a stack overflow the caller's argument count chooses. */
+    Newx(argv, items + 12, SV *);
+    SAVEFREEPV(argv);
+
     for (i = 2; i + 1 < items; i += 2) {
         const char *k = SvPV_nolen(ST(i));
         if (strEQ(k, "type"))          have_type = 1;
@@ -857,10 +863,8 @@ XS_INTERNAL(pb_send_cb) {
         else if (strEQ(k, "filename")) have_fn = 1;
         else if (strEQ(k, "inline"))   inline_ok = SvTRUE(ST(i + 1)) ? 1 : 0;
         else if (strEQ(k, "public"))   { public_ = SvTRUE(ST(i + 1)) ? 1 : 0; continue; }
-        if (n + 2 < (int)(sizeof argv / sizeof argv[0])) {
-            argv[n++] = ST(i);
-            argv[n++] = ST(i + 1);
-        }
+        argv[n++] = ST(i);
+        argv[n++] = ST(i + 1);
     }
 
     if (!have_type) {
@@ -897,13 +901,8 @@ XS_INTERNAL(pb_send_cb) {
         int pn = pb_path(aTHX_ store, is, il, buf, sizeof buf);
         path = sv_2mortal(newSVpvn(buf, pn));
     }
-    {
-        SV *full[26];
-        int j;
-        full[0] = path;
-        for (j = 0; j < n; j++) full[j + 1] = argv[j];
-        ST(0) = sv_2mortal(pcx_call_meth(aTHX_ c, "send_file", full, n + 1, 1));
-    }
+    argv[0] = path;
+    ST(0) = sv_2mortal(pcx_call_meth(aTHX_ c, "send_file", argv, n, 1));
     XSRETURN(1);
 }
 

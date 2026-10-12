@@ -331,9 +331,10 @@ static int hm_stream_write_h(pTHX_ void *h, const char *buf, STRLEN len) {
             return HM_ABI_STREAM_GONE;
         }
     } else if (len) {
-        hm_wb_put(c, buf, len);
-        c->loop->bytes_out += len;
-        hm_flush(aTHX_ c);
+        /* The same framing the Writer gets (chunked, counted or raw): one
+         * function decides, so a handle and a writer on the same connection
+         * cannot disagree. */
+        if (hm_stream_body_put(aTHX_ c, buf, len)) hm_flush(aTHX_ c);
     }
     /* Either flush can close the connection; re-read it rather than trusting
      * the pointer we came in with. */
@@ -354,7 +355,7 @@ static int hm_stream_close_h(pTHX_ void *h) {
         if (!hm_stream_h2_feed(aTHX_ c, s->sid, NULL, 0, 1))
             r = HM_ABI_STREAM_GONE;
     } else {
-        hm_stream_close(aTHX_ s->fd, s->cid);   /* unparks, then drains */
+        hm_stream_close(aTHX_ s->fd, s->cid, 0);   /* unparks, then drains */
     }
     free(s);
     return r;

@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="636" height="345" viewBox="0 0 636 345" role="img" aria-label="perl examples/widgets/menu-bar.pl">
+<title>perl examples/widgets/menu-bar.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="604" height="310" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="604" height="310" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="604" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="318" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/widgets/menu-bar.pl</text>
+<rect x="16.5" y="16.5" width="603" height="309" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="30" y="60" width="54" height="18" fill="#1e2128"/>
+<rect x="84" y="60" width="54" height="18" fill="#61afef"/>
+<rect x="138" y="60" width="468" height="18" fill="#1e2128"/>
+<rect x="30" y="78" width="54" height="180" fill="#242830"/>
+<rect x="84" y="78" width="207" height="18" fill="#1e2128"/>
+<rect x="291" y="78" width="315" height="180" fill="#242830"/>
+<rect x="84" y="96" width="9" height="18" fill="#1e2128"/>
+<rect x="93" y="96" width="189" height="18" fill="#61afef"/>
+<rect x="282" y="96" width="9" height="18" fill="#1e2128"/>
+<rect x="84" y="114" width="207" height="144" fill="#1e2128"/>
+<rect x="30" y="258" width="576" height="36" fill="#242830"/>
+<rect x="30" y="294" width="576" height="18" fill="#1e2128"/>
+<rect x="93" y="86" width="189" height="1" fill="#61afef"/>
+<rect x="88" y="96" width="1" height="144" fill="#61afef"/>
+<rect x="286" y="96" width="1" height="144" fill="#61afef"/>
+<rect x="93" y="140" width="189" height="1" fill="#787e8a"/>
+<rect x="93" y="212" width="189" height="1" fill="#787e8a"/>
+<rect x="93" y="248" width="189" height="1" fill="#61afef"/>
+</g>
+<polyline points="88.5 96 88.5 91 88.538 90.413 88.653 89.835 88.843 89.278 89.103 88.75 89.43 88.261 89.818 87.818 90.261 87.43 90.75 87.103 91.278 86.843 91.835 86.653 92.413 86.538 93 86.5 93 86.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="286.5 96 286.5 91 286.462 90.413 286.347 89.835 286.157 89.278 285.897 88.75 285.57 88.261 285.182 87.818 284.739 87.43 284.25 87.103 283.722 86.843 283.165 86.653 282.587 86.538 282 86.5 282 86.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="88.5 240 88.5 244 88.538 244.587 88.653 245.165 88.843 245.722 89.103 246.25 89.43 246.739 89.818 247.182 90.261 247.57 90.75 247.897 91.278 248.157 91.835 248.347 92.413 248.462 93 248.5 93 248.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="286.5 240 286.5 244 286.462 244.587 286.347 245.165 286.157 245.722 285.897 246.25 285.57 246.739 285.182 247.182 284.739 247.57 284.25 247.897 283.722 248.157 283.165 248.347 282.587 248.462 282 248.5 282 248.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<g class="terminal">
+<text x="39" y="74" textLength="36" fill="#dcdfe4">File</text>
+<text x="93" y="74" textLength="36" fill="#101216">Edit</text>
+<text x="147" y="74" textLength="90" fill="#dcdfe4">View  Help</text>
+<text x="516" y="74" textLength="81" fill="#787e8a">notes.txt</text>
+<text x="30" y="92" textLength="54" fill="#dcdfe4">Shoppi</text>
+<text x="102" y="110" textLength="171" fill="#101216">Undo         Ctrl+Z</text>
+<text x="30" y="128" textLength="54" fill="#dcdfe4">- brea</text>
+<text x="102" y="128" textLength="36" fill="#6c7078">Redo</text>
+<text x="219" y="128" textLength="54" fill="#787e8a">Ctrl+Y</text>
+<text x="30" y="146" textLength="54" fill="#dcdfe4">- appl</text>
+<text x="30" y="164" textLength="54" fill="#dcdfe4">- coff</text>
+<text x="102" y="164" textLength="27" fill="#6c7078">Cut</text>
+<text x="219" y="164" textLength="54" fill="#787e8a">Ctrl+X</text>
+<text x="30" y="182" textLength="54" fill="#dcdfe4">- milk</text>
+<text x="102" y="182" textLength="36" fill="#6c7078">Copy</text>
+<text x="219" y="182" textLength="54" fill="#787e8a">Ctrl+C</text>
+<text x="102" y="200" textLength="45" fill="#dcdfe4">Paste</text>
+<text x="219" y="200" textLength="54" fill="#787e8a">Ctrl+V</text>
+<text x="102" y="236" textLength="90" fill="#dcdfe4">Select all</text>
+<text x="219" y="236" textLength="54" fill="#787e8a">Ctrl+A</text>
+<text x="39" y="308" textLength="306" fill="#dcdfe4">F10 opens the menus, Ctrl+Q quits.</text>
+<text x="408" y="308" textLength="72" fill="#61afef">modified</text>
+<text x="498" y="308" textLength="99" fill="#dcdfe4">Ln 6, Col 7</text>
+</g>
+<g shape-rendering="crispEdges">
+<rect x="39" y="75" width="9" height="1" fill="#dcdfe4"/>
+<rect x="93" y="75" width="9" height="1" fill="#101216"/>
+<rect x="147" y="75" width="9" height="1" fill="#dcdfe4"/>
+<rect x="201" y="75" width="9" height="1" fill="#dcdfe4"/>
+</g>
+</svg>

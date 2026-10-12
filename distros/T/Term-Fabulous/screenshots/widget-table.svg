@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="870" height="525" viewBox="0 0 870 525" role="img" aria-label="perl examples/widgets/table.pl">
+<title>perl examples/widgets/table.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="838" height="490" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="838" height="490" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="838" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="435" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/widgets/table.pl</text>
+<rect x="16.5" y="16.5" width="837" height="489" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="48" y="78" width="675" height="36" fill="#242832"/>
+<rect x="48" y="114" width="63" height="18" fill="#1e2128"/>
+<rect x="111" y="114" width="153" height="18" fill="#242830"/>
+<rect x="264" y="114" width="18" height="18" fill="#1e2128"/>
+<rect x="282" y="114" width="72" height="18" fill="#242830"/>
+<rect x="354" y="114" width="18" height="18" fill="#1e2128"/>
+<rect x="372" y="114" width="72" height="18" fill="#242830"/>
+<rect x="444" y="114" width="18" height="18" fill="#1e2128"/>
+<rect x="462" y="114" width="99" height="18" fill="#242830"/>
+<rect x="561" y="114" width="18" height="18" fill="#1e2128"/>
+<rect x="579" y="114" width="54" height="18" fill="#242830"/>
+<rect x="633" y="114" width="90" height="18" fill="#1e2128"/>
+<rect x="48" y="132" width="675" height="18" fill="#263e5c"/>
+<rect x="48" y="150" width="675" height="18" fill="#1a1f29"/>
+<rect x="48" y="168" width="675" height="18" fill="#343a48"/>
+<rect x="48" y="186" width="675" height="18" fill="#1a1f29"/>
+<rect x="48" y="222" width="675" height="18" fill="#1a1f29"/>
+<rect x="48" y="258" width="675" height="18" fill="#1a1f29"/>
+<rect x="48" y="294" width="675" height="36" fill="#1a1f29"/>
+<rect x="48" y="330" width="27" height="18" fill="#2c313c"/>
+<rect x="84" y="330" width="27" height="18" fill="#2c313c"/>
+<rect x="228" y="330" width="27" height="18" fill="#2c313c"/>
+<rect x="264" y="330" width="27" height="18" fill="#2c313c"/>
+<rect x="444" y="330" width="36" height="18" fill="#242830"/>
+<rect x="48" y="78" width="675" height="9" fill="#586070"/>
+<rect x="48" y="87" width="5" height="234" fill="#586070"/>
+<rect x="719" y="87" width="4" height="234" fill="#586070"/>
+<rect x="48" y="321" width="675" height="9" fill="#586070"/>
+</g>
+<g class="terminal">
+<text x="66" y="110" textLength="459" class="b" fill="#ebeef3">[-]  Name               Team      Role      Started</text>
+<text x="538.5" y="110" text-anchor="middle" class="b" fill="#ebeef3">▾</text>
+<text x="579" y="110" textLength="126" class="b" fill="#ebeef3">Salary  Remote</text>
+<text x="115.5" y="128" text-anchor="middle" fill="#787e8a">…</text>
+<text x="286.5" y="128" text-anchor="middle" fill="#787e8a">…</text>
+<text x="376.5" y="128" text-anchor="middle" fill="#787e8a">…</text>
+<text x="466.5" y="128" text-anchor="middle" fill="#787e8a">…</text>
+<text x="583.5" y="128" text-anchor="middle" fill="#787e8a">…</text>
+<text x="66" y="146" textLength="567" fill="#dcdfe4">[x]  Frances Allen      Platform  Engineer  12 Feb 2024  68,000</text>
+<text x="66" y="164" textLength="621" fill="#dcdfe4">[ ]  Ken Thompson       Core      Engineer  09 Jan 2023  70,000   yes</text>
+<text x="66" y="182" textLength="621" fill="#dcdfe4">[x]  Radia Perlman      Network   Engineer  29 Aug 2022  76,000   yes</text>
+<text x="66" y="200" textLength="567" fill="#dcdfe4">[ ]  Grace Hopper       Web       Lead      15 Nov 2021  92,500</text>
+<text x="66" y="218" textLength="621" fill="#dcdfe4">[ ]  Katherine Johnson  Research  Engineer  08 Mar 2021  83,000   yes</text>
+<text x="66" y="236" textLength="621" fill="#dcdfe4">[ ]  Tim Berners-Lee    Web       Engineer  05 Oct 2020  74,500   yes</text>
+<text x="66" y="254" textLength="567" fill="#dcdfe4">[ ]  Dennis Ritchie     Core      Engineer  11 May 2020  78,000</text>
+<text x="66" y="272" textLength="621" fill="#dcdfe4">[ ]  Hedy Lamarr        Network   Lead      02 Dec 2019  88,000   yes</text>
+<text x="66" y="290" textLength="621" fill="#dcdfe4">[ ]  Ada Lovelace       Core      Engineer  04 Mar 2019  81,000   yes</text>
+<text x="66" y="308" textLength="567" fill="#dcdfe4">[ ]  Barbara Liskov     Platform  Lead      17 Sep 2018  95,500</text>
+<text x="57" y="344" textLength="9" fill="#8c929e">«</text>
+<text x="97.5" y="344" text-anchor="middle" fill="#8c929e">‹</text>
+<text x="120" y="344" textLength="99" fill="#dcdfe4">Page 1 of 2</text>
+<text x="241.5" y="344" text-anchor="middle" fill="#dcdfe4">›</text>
+<text x="273" y="344" textLength="9" fill="#dcdfe4">»</text>
+<text x="318" y="344" textLength="117" fill="#8c929e">Rows per page</text>
+<text x="444" y="344" textLength="18" fill="#dcdfe4">10</text>
+<text x="475.5" y="344" text-anchor="middle" fill="#61afef">▾</text>
+<text x="507" y="344" textLength="9" fill="#8c929e">1</text>
+<text x="520.5" y="344" text-anchor="middle" fill="#8c929e">–</text>
+<text x="525" y="344" textLength="72" fill="#8c929e">10 of 14</text>
+<text x="48" y="380" textLength="342" fill="#96a0b4">Selected: Radia Perlman, Frances Allen</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="381" viewBox="0 0 780 381" role="img" aria-label="perl examples/scroll-box.pl">
+<title>perl examples/scroll-box.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="748" height="346" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="748" height="346" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="748" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="390" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/scroll-box.pl</text>
+<rect x="16.5" y="16.5" width="747" height="345" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="48" y="114" width="333" height="216" fill="#1e2332"/>
+<rect x="399" y="114" width="333" height="216" fill="#1e2332"/>
+<rect x="57" y="122" width="315" height="1" fill="#78a0dc"/>
+<rect x="408" y="122" width="315" height="1" fill="#78a0dc"/>
+<rect x="52" y="132" width="1" height="180" fill="#78a0dc"/>
+<rect x="367" y="132" width="1" height="18" fill="#464c5a"/>
+<rect x="376" y="132" width="1" height="180" fill="#78a0dc"/>
+<rect x="403" y="132" width="1" height="180" fill="#78a0dc"/>
+<rect x="718" y="132" width="1" height="18" fill="#464c5a"/>
+<rect x="727" y="132" width="1" height="180" fill="#78a0dc"/>
+<rect x="367" y="150" width="2" height="18" fill="#61afef"/>
+<rect x="718" y="150" width="2" height="36" fill="#61afef"/>
+<rect x="367" y="168" width="1" height="144" fill="#464c5a"/>
+<rect x="718" y="186" width="1" height="126" fill="#464c5a"/>
+<rect x="57" y="320" width="315" height="1" fill="#78a0dc"/>
+<rect x="408" y="320" width="315" height="1" fill="#78a0dc"/>
+</g>
+<polyline points="52.5 132 52.5 127 52.538 126.413 52.653 125.835 52.843 125.278 53.103 124.75 53.43 124.261 53.818 123.818 54.261 123.43 54.75 123.103 55.278 122.843 55.835 122.653 56.413 122.538 57 122.5 57 122.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="376.5 132 376.5 127 376.462 126.413 376.347 125.835 376.157 125.278 375.897 124.75 375.57 124.261 375.182 123.818 374.739 123.43 374.25 123.103 373.722 122.843 373.165 122.653 372.587 122.538 372 122.5 372 122.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="403.5 132 403.5 127 403.538 126.413 403.653 125.835 403.843 125.278 404.103 124.75 404.43 124.261 404.818 123.818 405.261 123.43 405.75 123.103 406.278 122.843 406.835 122.653 407.413 122.538 408 122.5 408 122.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="727.5 132 727.5 127 727.462 126.413 727.347 125.835 727.157 125.278 726.897 124.75 726.57 124.261 726.182 123.818 725.739 123.43 725.25 123.103 724.722 122.843 724.165 122.653 723.587 122.538 723 122.5 723 122.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="52.5 312 52.5 316 52.538 316.587 52.653 317.165 52.843 317.722 53.103 318.25 53.43 318.739 53.818 319.182 54.261 319.57 54.75 319.897 55.278 320.157 55.835 320.347 56.413 320.462 57 320.5 57 320.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="376.5 312 376.5 316 376.462 316.587 376.347 317.165 376.157 317.722 375.897 318.25 375.57 318.739 375.182 319.182 374.739 319.57 374.25 319.897 373.722 320.157 373.165 320.347 372.587 320.462 372 320.5 372 320.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="403.5 312 403.5 316 403.538 316.587 403.653 317.165 403.843 317.722 404.103 318.25 404.43 318.739 404.818 319.182 405.261 319.57 405.75 319.897 406.278 320.157 406.835 320.347 407.413 320.462 408 320.5 408 320.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="727.5 312 727.5 316 727.462 316.587 727.347 317.165 727.157 317.722 726.897 318.25 726.57 318.739 726.182 319.182 725.739 319.57 725.25 319.897 724.722 320.157 724.165 320.347 723.587 320.462 723 320.5 723 320.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
+<g class="terminal">
+<text x="48" y="92" textLength="495" fill="#dcdcdc">Scroll the boxes with the mouse wheel  (Ctrl+C to quit)</text>
+<text x="66" y="146" textLength="72" fill="#c8d2e6">Line  16</text>
+<text x="426" y="146" textLength="90" fill="#c8d2e6">7^2 =   49</text>
+<text x="66" y="164" textLength="72" fill="#c8d2e6">Line  17</text>
+<text x="426" y="164" textLength="90" fill="#c8d2e6">8^2 =   64</text>
+<text x="66" y="182" textLength="72" fill="#c8d2e6">Line  18</text>
+<text x="426" y="182" textLength="90" fill="#c8d2e6">9^2 =   81</text>
+<text x="66" y="200" textLength="72" fill="#c8d2e6">Line  19</text>
+<text x="417" y="200" textLength="99" fill="#c8d2e6">10^2 =  100</text>
+<text x="66" y="218" textLength="72" fill="#c8d2e6">Line  20</text>
+<text x="417" y="218" textLength="99" fill="#c8d2e6">11^2 =  121</text>
+<text x="66" y="236" textLength="72" fill="#c8d2e6">Line  21</text>
+<text x="417" y="236" textLength="99" fill="#c8d2e6">12^2 =  144</text>
+<text x="66" y="254" textLength="72" fill="#c8d2e6">Line  22</text>
+<text x="417" y="254" textLength="99" fill="#c8d2e6">13^2 =  169</text>
+<text x="66" y="272" textLength="72" fill="#c8d2e6">Line  23</text>
+<text x="417" y="272" textLength="99" fill="#c8d2e6">14^2 =  196</text>
+<text x="66" y="290" textLength="72" fill="#c8d2e6">Line  24</text>
+<text x="417" y="290" textLength="99" fill="#c8d2e6">15^2 =  225</text>
+<text x="66" y="308" textLength="72" fill="#c8d2e6">Line  25</text>
+<text x="417" y="308" textLength="99" fill="#c8d2e6">16^2 =  256</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

@@ -93,7 +93,7 @@ is(oEdtk::DBAdmin::_table_exists($dbh, 't_dst'), 0,
 
 # --- _get_col_meta : norm_id is mandatory -----------------------------------
 eval { oEdtk::DBAdmin::_get_col_meta($dbh, 't_ins', undef) };
-like($@, qr/norm_id manquant/, '_get_col_meta dies when norm_id is missing');
+like($@, qr/norm_id missing/, '_get_col_meta dies when norm_id is missing');
 
 # --- paths not portable to SQLite (documented, not exercised) --------------
 SKIP: {

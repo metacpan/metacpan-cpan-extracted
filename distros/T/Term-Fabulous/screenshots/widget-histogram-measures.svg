@@ -1,0 +1,129 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="633" viewBox="0 0 960 633" role="img" aria-label="perl examples/widgets/histogram-measures.pl">
+<title>perl examples/widgets/histogram-measures.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="928" height="598" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="928" height="598" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="928" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="480" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/widgets/histogram-measures.pl</text>
+<rect x="16.5" y="16.5" width="927" height="597" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="255" y="150" width="36" height="18" fill="#3987e5"/>
+<rect x="705" y="150" width="36" height="18" fill="#3987e5"/>
+<rect x="255" y="168" width="90" height="18" fill="#3987e5"/>
+<rect x="705" y="168" width="90" height="18" fill="#3987e5"/>
+<rect x="228" y="186" width="117" height="18" fill="#3987e5"/>
+<rect x="678" y="186" width="117" height="18" fill="#3987e5"/>
+<rect x="201" y="204" width="171" height="36" fill="#3987e5"/>
+<rect x="651" y="204" width="171" height="36" fill="#3987e5"/>
+<rect x="138" y="240" width="270" height="18" fill="#3987e5"/>
+<rect x="588" y="240" width="270" height="18" fill="#3987e5"/>
+<rect x="831" y="384" width="81" height="18" fill="#199e70"/>
+<rect x="264" y="402" width="27" height="36" fill="#199e70"/>
+<rect x="795" y="402" width="117" height="18" fill="#199e70"/>
+<rect x="768" y="420" width="144" height="18" fill="#199e70"/>
+<rect x="264" y="438" width="81" height="18" fill="#199e70"/>
+<rect x="741" y="438" width="171" height="36" fill="#199e70"/>
+<rect x="237" y="456" width="108" height="18" fill="#199e70"/>
+<rect x="210" y="474" width="171" height="36" fill="#199e70"/>
+<rect x="714" y="474" width="198" height="36" fill="#199e70"/>
+<rect x="210" y="510" width="198" height="18" fill="#199e70"/>
+<rect x="687" y="510" width="225" height="18" fill="#199e70"/>
+<rect x="147" y="528" width="261" height="18" fill="#199e70"/>
+<rect x="660" y="528" width="252" height="18" fill="#199e70"/>
+<rect x="84" y="122" width="378" height="1" fill="#32323d"/>
+<rect x="534" y="122" width="378" height="1" fill="#32323d"/>
+<rect x="255" y="137" width="36" height="13" fill="#3987e5"/>
+<rect x="705" y="137" width="36" height="13" fill="#3987e5"/>
+<rect x="318" y="161" width="27" height="7" fill="#3987e5"/>
+<rect x="768" y="161" width="27" height="7" fill="#3987e5"/>
+<rect x="291" y="166" width="27" height="2" fill="#3987e5"/>
+<rect x="741" y="166" width="27" height="2" fill="#3987e5"/>
+<rect x="228" y="179" width="27" height="7" fill="#3987e5"/>
+<rect x="678" y="179" width="27" height="7" fill="#3987e5"/>
+<rect x="201" y="193" width="27" height="11" fill="#3987e5"/>
+<rect x="345" y="193" width="27" height="11" fill="#3987e5"/>
+<rect x="651" y="193" width="27" height="11" fill="#3987e5"/>
+<rect x="795" y="193" width="27" height="11" fill="#3987e5"/>
+<rect x="84" y="194" width="117" height="1" fill="#32323d"/>
+<rect x="372" y="194" width="90" height="1" fill="#32323d"/>
+<rect x="534" y="194" width="117" height="1" fill="#32323d"/>
+<rect x="822" y="194" width="90" height="1" fill="#32323d"/>
+<rect x="372" y="229" width="36" height="11" fill="#3987e5"/>
+<rect x="822" y="229" width="36" height="11" fill="#3987e5"/>
+<rect x="174" y="233" width="27" height="7" fill="#3987e5"/>
+<rect x="624" y="233" width="27" height="7" fill="#3987e5"/>
+<rect x="138" y="238" width="36" height="2" fill="#3987e5"/>
+<rect x="588" y="238" width="36" height="2" fill="#3987e5"/>
+<rect x="408" y="247" width="27" height="11" fill="#3987e5"/>
+<rect x="858" y="247" width="27" height="11" fill="#3987e5"/>
+<rect x="111" y="258" width="351" height="9" fill="#3987e5"/>
+<rect x="561" y="258" width="351" height="9" fill="#3987e5"/>
+<rect x="93" y="374" width="369" height="1" fill="#32323d"/>
+<rect x="543" y="374" width="288" height="1" fill="#32323d"/>
+<rect x="885" y="375" width="27" height="9" fill="#199e70"/>
+<rect x="858" y="377" width="27" height="7" fill="#199e70"/>
+<rect x="831" y="382" width="27" height="2" fill="#199e70"/>
+<rect x="264" y="391" width="27" height="11" fill="#199e70"/>
+<rect x="795" y="393" width="36" height="9" fill="#199e70"/>
+<rect x="543" y="410" width="225" height="1" fill="#32323d"/>
+<rect x="768" y="411" width="27" height="9" fill="#199e70"/>
+<rect x="318" y="422" width="27" height="16" fill="#199e70"/>
+<rect x="291" y="427" width="27" height="11" fill="#199e70"/>
+<rect x="237" y="445" width="27" height="11" fill="#199e70"/>
+<rect x="543" y="446" width="198" height="1" fill="#32323d"/>
+<rect x="210" y="461" width="27" height="13" fill="#199e70"/>
+<rect x="345" y="461" width="36" height="13" fill="#199e70"/>
+<rect x="714" y="463" width="27" height="11" fill="#199e70"/>
+<rect x="93" y="464" width="117" height="1" fill="#32323d"/>
+<rect x="381" y="464" width="81" height="1" fill="#32323d"/>
+<rect x="543" y="482" width="171" height="1" fill="#32323d"/>
+<rect x="687" y="497" width="27" height="13" fill="#199e70"/>
+<rect x="381" y="506" width="27" height="4" fill="#199e70"/>
+<rect x="174" y="512" width="36" height="16" fill="#199e70"/>
+<rect x="660" y="517" width="27" height="11" fill="#199e70"/>
+<rect x="543" y="518" width="117" height="1" fill="#32323d"/>
+<rect x="147" y="519" width="27" height="9" fill="#199e70"/>
+<rect x="408" y="530" width="27" height="16" fill="#199e70"/>
+<rect x="624" y="537" width="36" height="9" fill="#199e70"/>
+<rect x="120" y="544" width="27" height="2" fill="#199e70"/>
+<rect x="435" y="544" width="27" height="2" fill="#199e70"/>
+<rect x="120" y="546" width="342" height="9" fill="#199e70"/>
+<rect x="597" y="546" width="315" height="9" fill="#199e70"/>
+<rect x="543" y="554" width="27" height="1" fill="#5c5c64"/>
+<rect x="547" y="554" width="1" height="10" fill="#5c5c64"/>
+</g>
+<g class="terminal">
+<text x="48" y="92" textLength="585" class="b" fill="#f3f3f4">measure count (default)                           measure percent</text>
+<text x="48" y="128" textLength="27" fill="#96969c">100</text>
+<text x="498" y="128" textLength="27" fill="#96969c">20%</text>
+<text x="57" y="200" textLength="18" fill="#96969c">50</text>
+<text x="498" y="200" textLength="27" fill="#96969c">10%</text>
+<text x="66" y="272" textLength="9" fill="#96969c">0</text>
+<text x="507" y="272" textLength="18" fill="#96969c">0%</text>
+<text x="75" y="290" textLength="828" fill="#96969c">50      75     100     125     150     175        50      75     100     125     150     175</text>
+<text x="48" y="344" textLength="693" class="b" fill="#f3f3f4">measure density                                   measure percent, cumulative</text>
+<text x="48" y="380" textLength="36" fill="#96969c">0.02</text>
+<text x="498" y="380" textLength="36" fill="#96969c">100%</text>
+<text x="507" y="416" textLength="27" fill="#96969c">80%</text>
+<text x="507" y="452" textLength="27" fill="#96969c">60%</text>
+<text x="48" y="470" textLength="36" fill="#96969c">0.01</text>
+<text x="507" y="488" textLength="27" fill="#96969c">40%</text>
+<text x="507" y="524" textLength="27" fill="#96969c">20%</text>
+<text x="48" y="560" textLength="36" fill="#96969c">0.00</text>
+<text x="516" y="560" textLength="18" fill="#96969c">0%</text>
+<text x="84" y="578" textLength="819" fill="#96969c">50     75      100     125     150    175         50     75      100     125     150    175</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

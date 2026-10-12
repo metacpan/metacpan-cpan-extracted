@@ -2,9 +2,9 @@ use strict;
 use warnings;
 package YAML::PP::Schema::JSON;
 
-our $VERSION = 'v0.41.0'; # VERSION
+our $VERSION = 'v0.42.0'; # VERSION
 
-use base 'Exporter';
+use Exporter 'import';
 our @EXPORT_OK = qw/
     represent_int represent_float represent_literal represent_bool
     represent_undef

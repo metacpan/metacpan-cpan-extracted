@@ -6,13 +6,14 @@ use warnings;
 
 use Carp ();
 use Digest::SHA ();
+use Getopt::Long ();
 use Object::Proto::Sugar;
 
 use Game::Brandubh;
 use Game::Brandubh::Bot;
 use Game::Brandubh::Notation qw(square_name square_parse);
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 our (@COMMANDS, %SEQUENCE, %CONTROL, %KEY, %GROUND, %INK, %GLYPH, %ENDING);
 
@@ -1170,6 +1171,89 @@ sub rules_lines {
     ];
 }
 
+sub _usage {
+    return <<'USAGE';
+brandubh - the Irish tafl game, in a terminal
+
+  brandubh [options]
+
+  --side WHO       attackers (the default), defenders, both, or none
+  --level N        how hard the program plays: 1, 2 (the default) or 3
+  --variant TEXT   the rule set, for example 'custom repeat=2'
+  --seed HEX       sixty-four hexadecimal characters; the same seed plays the same game
+  --load FILE      carry on with a saved game
+  --no-colour      letters and lines instead of a painted board
+  --no-pick        type moves instead of choosing them with the arrow keys
+  --no-unicode     letters for the pieces, with colour kept
+  --version        the version, and stop
+  --help           this, and stop
+
+In a terminal, moves are chosen on the board with the arrow keys; press ? for
+the keys. Anywhere else, type a move as two squares, like d1d3, or help.
+USAGE
+}
+
+sub run {
+    my ($class, @argv) = @_;
+
+    my %given;
+    my $parsed = Getopt::Long::GetOptionsFromArray(
+        \@argv, \%given,
+        'level=i', 'side=s', 'seed=s', 'variant=s', 'load=s',
+        'colour|color!', 'pick!', 'unicode!', 'version', 'help',
+    );
+
+    if (!$parsed || @argv) {
+        print STDERR "brandubh: I do not know '@argv'.\n" if $parsed && @argv;
+        print STDERR _usage();
+        return 2;
+    }
+    if ($given{help}) {
+        print _usage();
+        return 0;
+    }
+    if ($given{version}) {
+        print "brandubh $Game::Brandubh::VERSION\n";
+        return 0;
+    }
+
+    my %with;
+    $with{level}   = $given{level}   if defined $given{level};
+    $with{human}   = $given{side}    if defined $given{side};
+    $with{variant} = $given{variant} if defined $given{variant};
+    $with{colour}  = $given{colour}  if defined $given{colour};
+    $with{picking} = $given{pick}    if defined $given{pick};
+    $with{unicode} = $given{unicode} if defined $given{unicode};
+    $with{menu}    = 1 unless defined $given{side} || defined $given{level} || defined $given{load};
+
+    if (defined $given{seed}) {
+        if ($given{seed} !~ /\A[0-9a-fA-F]{64}\z/) {
+            print STDERR "brandubh: a seed is sixty-four hexadecimal characters.\n";
+            return 2;
+        }
+        $with{seed} = pack 'H*', $given{seed};
+    }
+
+    my $terminal = eval { $class->new(%with) };
+    if (!$terminal) {
+        (my $why = $@) =~ s/ at \S+ line \d+\.?\s*\z//;
+        $why =~ s/\AGame::Brandubh(?:::\w+)*: //;
+        print STDERR "brandubh: $why.\n";
+        return 2;
+    }
+
+    local @SIG{qw(INT TERM HUP)};
+    for my $sig (qw(INT TERM HUP)) {
+        $SIG{$sig} = sub { $terminal->leave_raw; $SIG{$sig} = 'DEFAULT'; kill $sig, $$ };
+    }
+
+    if (defined $given{load}) {
+        return 2 unless $terminal->load($given{load});
+    }
+
+    return $terminal->start;
+}
+
 1;
 
 __END__
@@ -1182,7 +1266,7 @@ Game::Brandubh::Terminal - brandubh in a terminal, with the arrow keys
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 
@@ -1369,6 +1453,22 @@ keyboard. For tests.
 =back
 
 B<Croaks> on a side or a level that is not one.
+
+=head2 run
+
+    exit Game::Brandubh::Terminal->run(@ARGV);
+
+The whole command line program as a class method: parses the options the
+C<brandubh> program documents, builds the terminal, plays, and B<returns the
+exit status rather than calling C<exit>>: C<0> when the game was left in the
+ordinary way, C<2> for a bad option, a stray word, a refused value or a file
+that could not be loaded, with the reason and the usage on C<STDERR>.
+C<--help> and C<--version> print to C<STDOUT> and return C<0>. Given none of
+C<--side>, C<--level> and C<--load>, and a terminal whose keys it can read, it
+begins by asking which side, how hard and how to play. Signal handlers are
+local to the call and the terminal is left in cooked mode on every way out, so
+a launcher such as L<Game::Terminal> can call it in its own process and carry
+on afterwards. Colour is off under C<NO_COLOR> as well as off a terminal.
 
 =head2 start
 

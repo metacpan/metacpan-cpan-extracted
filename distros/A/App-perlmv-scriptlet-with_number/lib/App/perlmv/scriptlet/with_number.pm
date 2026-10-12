@@ -9,7 +9,7 @@ use POSIX ();
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2026-08-05'; # DATE
 our $DIST = 'App-perlmv-scriptlet-with_number'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our $SCRIPTLET = {
     summary => 'Rename filenames with number',
@@ -40,6 +40,8 @@ MARKDOWN
 
         use vars qw($ARGS $FILES $TESTING $i);
 
+        my $ext = /(\.\w+)\z/ ? $1 : '';
+
         my $start  = $ARGS->{start} // 1;
         my $inc = $ARGS->{inc} // 1;
 
@@ -58,7 +60,7 @@ MARKDOWN
 
         my $num  = $start + ($i-1)*$inc;
         my $fnum = sprintf("%0${digits}d", $num);
-        $fnum;
+        "$fnum$ext";
     },
 };
 
@@ -78,7 +80,7 @@ App::perlmv::scriptlet::with_number - Rename filenames with number
 
 =head1 VERSION
 
-This document describes version 0.001 of App::perlmv::scriptlet::with_number (from Perl distribution App-perlmv-scriptlet-with_number), released on 2026-08-05.
+This document describes version 0.002 of App::perlmv::scriptlet::with_number (from Perl distribution App-perlmv-scriptlet-with_number), released on 2026-08-05.
 
 =head1 SYNOPSIS
 

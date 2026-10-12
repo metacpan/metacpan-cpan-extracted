@@ -5,6 +5,11 @@
  * reader (pq_decode); a base64url session value passes through unchanged.
  * Options: path (default /), domain, max_age (seconds), samesite, secure,
  * httponly. An undef value emits a deletion cookie (Max-Age=0, past Expires).
+ *
+ * The value is encoded; the name and the path, domain and samesite attributes
+ * are not, so they are refused outright when they carry a `;` or a control
+ * character. An attribute built from request input would otherwise be a way
+ * to append attributes, or a header.
  */
 
 #ifndef PUNK_COOKIE_H
@@ -29,12 +34,43 @@ static void pk_cookie_encode(pTHX_ SV *out, const char *v, STRLEN vl) {
     }
 }
 
-static SV *pk_build_cookie(pTHX_ SV *name, SV *value, HV *opts) {
-    SV *out = newSVpvs("");
+/* is `v` safe to write into a Set-Cookie verbatim? */
+static int pk_cookie_safe(pTHX_ SV *v) {
+    STRLEN l, i;
+    const char *p = SvPV_const(v, l);
+    for (i = 0; i < l; i++) {
+        unsigned char c = (unsigned char)p[i];
+        if (c < 0x20 || c == 0x7f || c == ';') return 0;
+    }
+    return 1;
+}
+
+static void pk_cookie_check(pTHX_ const char *what, SV *v) {
+    if (!pk_cookie_safe(aTHX_ v))
+        croak("Punk: a cookie %s may not contain ';' or a control "
+              "character", what);
+}
+
+/* `secure_default` decides the Secure attribute when the options do not say:
+ * the session passes whether the request arrived over https. */
+static SV *pk_build_cookie_ex(pTHX_ SV *name, SV *value, HV *opts,
+                              int secure_default) {
+    SV *out;
     STRLEN nl;
     const char *n = SvPV_const(name, nl);
     int deleting = !(value && SvOK(value));
     SV **o;
+    static const char *const attrs[] = { "path", "domain", "samesite", NULL };
+    int i;
+    if (!nl) croak("Punk: a cookie needs a name");
+    pk_cookie_check(aTHX_ "name", name);
+    if (memchr(n, '=', nl))
+        croak("Punk: a cookie name may not contain '='");
+    for (i = 0; opts && attrs[i]; i++) {
+        o = hv_fetch(opts, attrs[i], (I32)strlen(attrs[i]), 0);
+        if (o && *o && SvOK(*o)) pk_cookie_check(aTHX_ attrs[i], *o);
+    }
+    out = newSVpvs("");
     sv_catpvn(out, n, nl);
     sv_catpvs(out, "=");
     if (!deleting) {
@@ -61,12 +97,17 @@ static SV *pk_build_cookie(pTHX_ SV *name, SV *value, HV *opts) {
     if (o && *o && SvOK(*o)) { sv_catpvs(out, "; SameSite="); sv_catsv(out, *o); }
 
     o = opts ? hv_fetchs(opts, "secure", 0) : NULL;
-    if (o && *o && SvTRUE(*o)) sv_catpvs(out, "; Secure");
+    if ((o && *o && SvOK(*o)) ? SvTRUE(*o) : secure_default)
+        sv_catpvs(out, "; Secure");
 
     o = opts ? hv_fetchs(opts, "httponly", 0) : NULL;
     if (o && *o && SvTRUE(*o)) sv_catpvs(out, "; HttpOnly");
 
     return out;
+}
+
+static SV *pk_build_cookie(pTHX_ SV *name, SV *value, HV *opts) {
+    return pk_build_cookie_ex(aTHX_ name, value, opts, 0);
 }
 
 #endif /* PUNK_COOKIE_H */

@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased]
+
+## [1.0.2] - 2026-10-11
+
+### Fixed
+
+* Remove cpan.org email address
+
+## [v1.0.1] - 2026-09-08
+
+### Fixed
+
+* Typo in Pod (thanks @stefanhaerter)
+* Validate the `format` argument against a list of known formatters before
+  using it to build and load a class name, preventing code injection via a
+  malicious format string
+
 ## [v1.0.0] - 2025-11-17
 
 ### Added

@@ -33,7 +33,7 @@ QMail::QueueHandler->new->run;
 
 =head1 AUTHOR
 
-Dave Cross E<lt>davecross@cpan.orgE<gt>
+Dave Cross E<lt>dave@perlhacks.comE<gt>
 
 Based on original version by Michele Beltrame E<lt>mb@italpro.netE<gt>
 

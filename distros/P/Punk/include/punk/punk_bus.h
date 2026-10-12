@@ -72,23 +72,37 @@ static int punk_bus_live(pTHX) {
  * byte a room name cannot contain, and "cannot" is a promise about somebody
  * else's strings that this has no business making.
  *
- *     [u16 name length][name][the encoded WebSocket frame]
+ *     [u16 name length][name][u32 pid][u64 connection][the encoded frame]
+ *
+ * The pid and connection name the one member a broadcast leaves out, or are
+ * zero. A connection lives in one worker, so its address means something
+ * only there - and forked workers lay their memory out alike, so the same
+ * address in another worker is somebody else. The pid says which worker the
+ * address belongs to; every other worker delivers to all of its members.
  */
+#define PUNK_BUS_ROOM_SKIP_LEN 12
 #define PUNK_BUS_ROOM_TOPIC     "punk:ws"
 #define PUNK_BUS_ROOM_TOPIC_LEN 7
 
 /* Pack a room broadcast. Mortal SV. */
-static SV *punk_bus_room_pack(pTHX_ SV *name, SV *frame) {
+static SV *punk_bus_room_pack(pTHX_ SV *name, SV *frame, void *skip) {
     STRLEN nl, fl;
     const char *np = SvPV_const(name, nl);
     const char *fp = SvPV_const(frame, fl);
     SV *out;
-    unsigned char hdr[2];
+    unsigned char hdr[2], who[PUNK_BUS_ROOM_SKIP_LEN];
+    U32 pid = skip ? (U32)PerlProc_getpid() : 0;
+    UV  addr = PTR2UV(skip);
+    int i;
     if (nl > 0xFFFF) return NULL;
     hdr[0] = (unsigned char)((nl >> 8) & 0xFF);
     hdr[1] = (unsigned char)(nl & 0xFF);
+    for (i = 0; i < 4; i++) who[i] = (unsigned char)(pid >> (24 - 8 * i));
+    for (i = 0; i < 8; i++)
+        who[4 + i] = (unsigned char)(((uint64_t)addr >> (56 - 8 * i)) & 0xFF);
     out = sv_2mortal(newSVpvn((const char *)hdr, 2));
     sv_catpvn(out, np, nl);
+    sv_catpvn(out, (const char *)who, sizeof who);
     sv_catpvn(out, fp, fl);
     return out;
 }
@@ -104,10 +118,11 @@ static SV *punk_bus_room_pack(pTHX_ SV *name, SV *frame) {
  * MUST NOT CROAK: reached from the event loop with no Perl frame to unwind
  * into. Everything here is either C or a call that cannot die.
  */
-static void punk_bus_room_cb(pTHX_ const char *topic, STRLEN tlen,
+static void punk_bus_room_cb_in(pTHX_ const char *topic, STRLEN tlen,
                              const char *payload, STRLEN plen, void *ud) {
     SV *name, *frame, *room;
     STRLEN nl;
+    void *skip = NULL;
     PERL_UNUSED_ARG(topic);
     PERL_UNUSED_ARG(tlen);
     PERL_UNUSED_ARG(ud);
@@ -115,10 +130,22 @@ static void punk_bus_room_cb(pTHX_ const char *topic, STRLEN tlen,
     if (plen < 2) return;
     nl = ((STRLEN)(unsigned char)payload[0] << 8)
        |  (STRLEN)(unsigned char)payload[1];
-    if (plen < 2 + nl) return;             /* truncated: refuse to guess */
+    /* truncated: refuse to guess */
+    if (plen < 2 + nl + PUNK_BUS_ROOM_SKIP_LEN) return;
+
+    {   /* the member left out, when it is one of ours */
+        const unsigned char *w = (const unsigned char *)payload + 2 + nl;
+        U32 pid = 0;
+        uint64_t addr = 0;
+        int i;
+        for (i = 0; i < 4; i++) pid  = (pid << 8) | w[i];
+        for (i = 0; i < 8; i++) addr = (addr << 8) | w[4 + i];
+        if (pid && pid == (U32)PerlProc_getpid()) skip = INT2PTR(void *, (UV)addr);
+    }
 
     name  = sv_2mortal(newSVpvn(payload + 2, nl));
-    frame = sv_2mortal(newSVpvn(payload + 2 + nl, plen - 2 - nl));
+    frame = sv_2mortal(newSVpvn(payload + 2 + nl + PUNK_BUS_ROOM_SKIP_LEN,
+                                plen - 2 - nl - PUNK_BUS_ROOM_SKIP_LEN));
 
     /* named() creates the room on first use, which is right: a worker that
      * has never seen this room has no members in it, and fanning to an empty
@@ -133,7 +160,14 @@ static void punk_bus_room_cb(pTHX_ const char *topic, STRLEN tlen,
     sv_2mortal(room);
     if (!SvOK(room)) return;
 
-    PUNK_BUS_LAST_FAN += pwr_fan(aTHX_ room, frame, NULL);
+    PUNK_BUS_LAST_FAN += pwr_fan_skip(aTHX_ room, frame, skip);
+}
+
+static void punk_bus_room_cb(pTHX_ const char *topic, STRLEN tlen,
+                             const char *payload, STRLEN plen, void *ud) {
+    PK_LOOP_ENTER;
+    punk_bus_room_cb_in(aTHX_ topic, tlen, payload, plen, ud);
+    PK_LOOP_LEAVE;
 }
 
 /* Register this worker's subscriptions. Called from the worker hook, so it
@@ -160,7 +194,7 @@ static void punk_bus_attach(pTHX) {
  * the local send it always did.
  *
  * That is the whole "one delivery path" rule, expressed as a return value. */
-static int punk_bus_room_publish(pTHX_ SV *name, SV *frame) {
+static int punk_bus_room_publish(pTHX_ SV *name, SV *frame, SV *except) {
     const hm_abi *A = punk_hm(aTHX);
     SV *packed;
     STRLEN pl;
@@ -173,7 +207,8 @@ static int punk_bus_room_publish(pTHX_ SV *name, SV *frame) {
      * anyway. */
     if (!PUNK_BUS_READY) return 0;
     if (!A || A->abi_version < PUNK_BUS_ABI_MIN || !A->bus_publish) return 0;
-    packed = punk_bus_room_pack(aTHX_ name, frame);
+    packed = punk_bus_room_pack(aTHX_ name, frame,
+                 (except && SvOK(except)) ? PWR_ADDR(except) : NULL);
     if (!packed) return 0;
     pp = SvPV_const(packed, pl);
     /* A refusal (too big for a slot) is NOT success: the caller falls back to

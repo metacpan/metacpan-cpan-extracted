@@ -8,7 +8,7 @@ use Object::Proto::Sugar -types;
 
 use Game::Go::Rules;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our @KINDS;
 BEGIN {
@@ -78,7 +78,7 @@ Game::Go::Move - one move, of one kind
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

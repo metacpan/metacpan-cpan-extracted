@@ -29,6 +29,32 @@ static HV *pauth_cfg(pTHX_ SV *c) {
         ? (HV *)SvRV(*s) : NULL;
 }
 
+/* Is this a user id? Defined, not empty and not "0": an id a backend handed
+ * back empty must not read as somebody being signed in. */
+static int pauth_id_ok(pTHX_ SV *id) {
+    STRLEN l;
+    const char *p;
+    if (!(id && SvOK(id))) return 0;
+    p = SvPV_const(id, l);
+    return l > 0 && !(l == 1 && *p == '0');
+}
+
+/* A `verified` column is true unless it is false to Perl or spells false the
+ * way a database driver does: PostgreSQL's 'f' is a true string. */
+static int pauth_truthy(pTHX_ SV *v) {
+    STRLEN l;
+    const char *p;
+    if (!(v && SvOK(v))) return 0;
+    if (SvROK(v)) return SvTRUE(v) ? 1 : 0;
+    p = SvPV_const(v, l);
+    if (!l || (l == 1 && *p == '0')) return 0;
+    if (l == 1 && (*p == 'f' || *p == 'F' || *p == 'n' || *p == 'N')) return 0;
+    if (l == 5 && foldEQ(p, "false", 5)) return 0;
+    if (l == 2 && foldEQ(p, "no", 2)) return 0;
+    if (l == 3 && foldEQ(p, "off", 3)) return 0;
+    return SvTRUE(v) ? 1 : 0;
+}
+
 /* the signed-in user id from the session, or NULL. Returns +1. */
 static SV *pauth_session_id(pTHX_ SV *c, HV *cfg) {
     STRLEN kl;
@@ -37,7 +63,7 @@ static SV *pauth_session_id(pTHX_ SV *c, HV *cfg) {
     SV *out = NULL;
     if (sess && SvROK(sess) && SvTYPE(SvRV(sess)) == SVt_PVHV) {
         SV **e = hv_fetch((HV *)SvRV(sess), key, (I32)kl, 0);
-        if (e && *e && SvOK(*e)) out = newSVsv(*e);
+        if (e && *e && pauth_id_ok(aTHX_ *e)) out = newSVsv(*e);
     }
     if (sess) SvREFCNT_dec(sess);
     return out;
@@ -251,7 +277,7 @@ static SV *pauth_check(pTHX_ SV *c, HV *cfg, HV *opts) {
         STRLEN vl;
         const char *vf = pauth_field(aTHX_ cfg, "verified", "verified", &vl);
         SV **e = hv_fetch((HV *)SvRV(user), vf, (I32)vl, 0);
-        if (!(e && *e && SvTRUE(*e))) {
+        if (!(e && *e && pauth_truthy(aTHX_ *e))) {
             SvREFCNT_dec(user);
             return pauth_denial(aTHX_ c, cfg, opts);
         }

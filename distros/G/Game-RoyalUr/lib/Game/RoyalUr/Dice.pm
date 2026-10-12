@@ -9,7 +9,7 @@ use Digest::SHA ();
 use Exporter 'import';
 use Scalar::Util ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 our @EXPORT_OK = qw(throw_for marked roll_of roll_for opening_for);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
@@ -92,7 +92,7 @@ Game::RoyalUr::Dice - the dice of the Royal Game of Ur, as a pure function of a 
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

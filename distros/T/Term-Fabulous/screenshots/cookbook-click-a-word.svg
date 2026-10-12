@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="291" viewBox="0 0 780 291" role="img" aria-label="perl examples/cookbook/click-a-word.pl">
+<title>perl examples/cookbook/click-a-word.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="748" height="256" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="748" height="256" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="748" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="390" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/cookbook/click-a-word.pl</text>
+<rect x="16.5" y="16.5" width="747" height="255" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+</g>
+<g class="terminal">
+<text x="48" y="92" textLength="360" fill="#dcdfe4">Every widget draws into the cells of the</text>
+<text x="48" y="110" textLength="378" fill="#dcdfe4">terminal. A wide grapheme takes two cells.</text>
+<text x="48" y="146" textLength="9" fill="#dcdfe4">A</text>
+<text x="66" y="146" textLength="36" class="b" fill="#e5c07b">span</text>
+<text x="111" y="146" textLength="351" fill="#dcdfe4">changes the look of part of a text; the</text>
+<text x="48" y="164" textLength="378" fill="#dcdfe4">click reports the spans under the pointer.</text>
+<text x="48" y="200" textLength="369" fill="#98c379">terminal: the program that shows this one</text>
+<text x="48" y="236" textLength="666" fill="#96a0b4">right button at column 5, row 4: offset 3, word span (2 to 6), spans [2-6]</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

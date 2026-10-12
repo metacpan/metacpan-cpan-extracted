@@ -8,8 +8,9 @@ use Game::Checkers;
 use Game::Checkers::Bot;
 use Game::Checkers::Notation;
 use Game::Checkers::Squares;
+use Getopt::Long ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our %COMMAND;
 
@@ -825,6 +826,189 @@ sub show_help {
 	return 0;
 }
 
+sub _usage {
+	return <<'USAGE';
+checkers [options]
+
+  --level N          the strength of the bot, 1 to 5, 3 by default. Give it
+                     twice with --bot-vs-bot for one level a side.
+  --side SIDE        black, white or random. Black moves first.
+  --hotseat          two people at one keyboard, no bot.
+  --bot-vs-bot       watch two bots play.
+  --fen STRING       start from a position instead of the opening.
+  --load FILE        read a PDN game and play on from the end of it.
+  --replay FILE      step through a PDN game, one move a keypress.
+  --analyse          print the bot's move for the position and stop.
+  --seed N           the seed the bot varies its easy levels with.
+  --ascii            letters instead of the draughts symbols.
+  --no-colour        no ANSI colour. NO_COLOR in the environment does the same.
+  --no-pick          type the moves out instead of choosing them with the keys.
+  --version, --help
+
+On a terminal the legal moves are listed under the board: the up and down keys
+choose one, enter plays it, and the board shows where it goes. Press ? for the
+other keys, or : to type a command.
+
+Typing a move works everywhere, and is all there is when the input is not a
+terminal or Term::ReadKey is not installed. A move is its squares, read off the
+edge of the board: a3-b4 to slide, c3xe5xg7 to jump. Type help for the commands.
+
+Exit status is 0 if you won, drew or quit, 1 if you lost, 2 for a bad option.
+USAGE
+}
+
+sub _side {
+	my ($side) = @_;
+	$side = lc $side;
+	return $side if $side eq 'black' || $side eq 'white';
+	return int(rand 2) ? 'black' : 'white' if $side eq 'random';
+	return undef;
+}
+
+sub _build_game {
+	my ($option) = @_;
+	return Game::Checkers->from_pdn(_read_pdn($option->{load})) if $option->{load};
+	return Game::Checkers->new($option->{fen} ? (fen => $option->{fen}) : ());
+}
+
+sub _read_pdn {
+	my ($file) = @_;
+	open my $handle, '<', $file or die "cannot read $file: $!\n";
+	my $pdn = do { local $/; <$handle> };
+	close $handle;
+	return $pdn;
+}
+
+sub _analyse {
+	my ($game, $level, $seed) = @_;
+	my $bot = Game::Checkers::Bot->new(level => $level, seed => $seed);
+	my $move = $bot->choose($game);
+	unless ($move) {
+		print 'no move: ', ($game->result ? $game->result->stringify : 'no legal move'), "\n";
+		return;
+	}
+	my $search = $bot->last_search;
+	printf "move %s\nscore %s\ndepth %d\nnodes %d\nline %s\n",
+		$move->notation,
+		defined $search->{score} ? $search->{score} : 'forced',
+		$search->{depth},
+		$search->{nodes},
+		join ' ', @{$search->{pv}};
+	return;
+}
+
+sub _replay {
+	my ($class, $pdn, $option) = @_;
+	my $whole = Game::Checkers->from_pdn($pdn);
+	my $game = Game::Checkers->new(fen => $whole->fen);
+	my $terminal = $class->new(
+		game => $game,
+		human => 'both',
+		ascii => $option->{ascii},
+		picking => 0,
+		(defined $option->{colour} ? (colour => $option->{colour}) : ())
+	);
+	for my $move (@{$whole->history}) {
+		$terminal->render;
+		$terminal->read_line('Press enter for ' . $move->coord_notation . ' ');
+		$game->move($move->notation);
+	}
+	$terminal->render;
+	return;
+}
+
+sub run {
+	my ($class, @argv) = @_;
+	my %option = (
+		level => [],
+		side => 'black',
+		ascii => 0,
+		seed => 0,
+	);
+
+	my $ok = eval {
+		local $SIG{__WARN__} = sub { print STDERR "checkers: $_[0]" };
+		Getopt::Long::GetOptionsFromArray(
+			\@argv,
+			\%option,
+			'level=i@',
+			'side=s',
+			'hotseat',
+			'bot-vs-bot',
+			'fen=s',
+			'load=s',
+			'replay=s',
+			'seed=i',
+			'ascii',
+			'colour!',
+			'pick!',
+			'analyse',
+			'version',
+			'help'
+		);
+	};
+	if (!$ok) { print STDERR _usage(); return 2 }
+	if ($option{help}) { print _usage(); return 0 }
+	if (@argv) { print STDERR "checkers: not an option: $argv[0]\n", _usage(); return 2 }
+
+	if ($option{version}) {
+		print "checkers, Game::Checkers $Game::Checkers::VERSION\n";
+		return 0;
+	}
+
+	my @level = @{$option{level}};
+	push @level, 3 while @level < 2;
+	if (grep { $_ < 1 || $_ > 5 } @level) {
+		print STDERR "checkers: level must be 1 to 5\n";
+		return 2;
+	}
+
+	my $game = _build_game(\%option);
+
+	if ($option{analyse}) {
+		_analyse($game, $level[0], $option{seed});
+		return 0;
+	}
+
+	if (my $file = $option{replay}) {
+		$class->_replay(_read_pdn($file), \%option);
+		return 0;
+	}
+
+	my $human = $option{hotseat} ? 'both'
+		: $option{'bot-vs-bot'} ? 'none'
+		: _side($option{side});
+	if (!defined $human) {
+		print STDERR "checkers: side must be black, white or random\n";
+		return 2;
+	}
+
+	my $terminal = $class->new(
+		game => $game,
+		human => $human,
+		($human eq 'both' ? () : (
+			bot => Game::Checkers::Bot->new(level => $level[0], seed => $option{seed})
+		)),
+		ascii => $option{ascii},
+		(defined $option{colour} ? (colour => $option{colour}) : ()),
+		(defined $option{pick} ? (picking => $option{pick}) : ())
+	);
+
+	local @SIG{qw(INT TERM HUP)};
+	for my $sig (qw(INT TERM HUP)) {
+		$SIG{$sig} = sub { $terminal->leave_raw; $SIG{$sig} = 'DEFAULT'; kill $sig, $$ };
+	}
+
+	my $result = eval { $terminal->start };
+	my $died = $@;
+	$terminal->leave_raw;
+	die $died if $died;
+	return 0 unless $result;
+	return 0 if $result->is_draw || $human eq 'both' || $human eq 'none';
+	return $result->winner eq $human ? 0 : 1;
+}
+
+
 1;
 
 __END__
@@ -835,7 +1019,7 @@ Game::Checkers::Terminal - the game at a prompt
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
@@ -1052,6 +1236,21 @@ long enough to restore it before raising it again. A shell is never left in raw
 mode.
 
 	my $result = $terminal->start;
+
+=head2 run
+
+	exit Game::Checkers::Terminal->run(@ARGV);
+
+The whole command line program as a class method: parses the options
+F<bin/checkers> documents, builds the game and the terminal, plays, and
+B<returns the exit status rather than calling C<exit>>: C<0> if you won, drew or
+quit, or nobody at the keyboard was playing a side, C<1> if you lost, C<2> for a
+bad option, a leftover word or a refused value, with the reason and the usage on
+C<STDERR>. C<--help> and C<--version> print to C<STDOUT> and return C<0>;
+C<--analyse> and C<--replay> return C<0> once they have printed. Signal handlers
+are local to the call and the terminal is left in cooked mode on every way out,
+so a launcher such as L<Game::Terminal> can call it in its own process and carry
+on afterwards. Colour is off when C<NO_COLOR> is set, as it is off a terminal.
 
 =head2 turns
 

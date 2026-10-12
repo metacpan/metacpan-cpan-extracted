@@ -32,7 +32,7 @@ sub add_player_if_not_exists {
 	my ($self, %player) = @_;
 	my $exists = $self->get_player(%player);
 	if (!$exists) {
-		$self->add_player(%player); 
+		$self->add_player(%player);
 		$exists = $self->get_player(%player);
 		return ($exists, 0);
 	}
@@ -390,7 +390,7 @@ Game::Cribbage::Board - top-level game orchestration object
 
 =head1 VERSION
 
-Version 0.15
+Version 0.17
 
 =cut
 

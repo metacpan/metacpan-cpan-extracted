@@ -1,0 +1,25 @@
+Changes
+cpanfile
+lib/Test/NoShadow.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/00-load.t
+t/data/checkouts/RepoA/lib/Acme/Dup.pm
+t/data/checkouts/RepoA/lib/Acme/OnlyA.pm
+t/data/checkouts/RepoA/lib/Acme/Versioned.pm
+t/data/checkouts/RepoA/lib/Acme/Widget.pm
+t/data/checkouts/RepoA/t/lib/Acme/Dup.pm
+t/data/checkouts/RepoB/lib/Acme/Widget.pm
+t/data/checkouts/RepoC/lib/Acme/Widget.pm
+t/data/clean/Solo/lib/Acme/Solo.pm
+t/find-shadows.t
+t/inc.t
+t/lib.t
+t/pod.t
+t/shadowed.t
+t/strict.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

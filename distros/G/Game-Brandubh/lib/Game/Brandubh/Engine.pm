@@ -8,7 +8,7 @@ use Carp ();
 use Exporter 'import';
 use Object::Proto::Sugar;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 require XSLoader;
 XSLoader::load('Game::Brandubh', $VERSION);
@@ -192,7 +192,7 @@ Game::Brandubh::Engine - the brandubh board: squares, pieces, the side to move
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

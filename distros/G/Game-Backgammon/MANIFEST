@@ -1,7 +1,9 @@
 Changes
 MANIFEST
 Makefile.PL
+README
 bin/backgammon
+ignore.txt
 lib/Game/Backgammon.pm
 lib/Game/Backgammon/Board.pm
 lib/Game/Backgammon/Bot.pm
@@ -29,5 +31,6 @@ t/11-pick.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+xt/boilerplate.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

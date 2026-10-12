@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.55';
+our $VERSION = '0.57';
 
 
 1;
@@ -68,7 +68,16 @@ hop-by-hop and HTTP/2 and HTTP/3 forbid it, so it is sent on HTTP/1 and not
 on a multiplexed transport, and framing is the transport's own.
 
 Backpressure is bounded by C<write_buffer_limit> as for websockets: a client
-that will not read is closed rather than allowed to buffer without limit.
+that will not read is closed rather than allowed to buffer without limit. The
+default is 16 MB, as it is for a websocket; C<0> lifts it.
+
+A string passed to C<send> or C<event> becomes one C<data:> line per line of
+the string, and a line ends at CR, LF or CRLF, which is where it ends for the
+client. Text from a user can therefore be relayed as it is: nothing in it can
+start a field of its own.
+
+A C<HEAD> request to an C<sse> route is answered with the stream's headers
+and no body, and the handler is not run.
 
 =head1 THE ROUTE
 

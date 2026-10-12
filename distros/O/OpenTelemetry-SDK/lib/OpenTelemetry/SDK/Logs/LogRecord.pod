@@ -1,0 +1,154 @@
+=encoding UTF-8
+
+=head1 NAME
+
+OpenTelemetry::SDK::Logs::LogRecord - A log entry that can be emitted
+
+=head1 SYNOPSIS
+
+    ...
+
+=head1 DESCRIPTION
+
+An instance of this class represents a log entry, that can be emitted to
+external collectors via the L<OpenTelemetry::SDK>.
+
+It is in many ways equivalent to L<OpenTelemetry::SDK::Trace::Span> but for
+logs instead of traces. It is intended for internal representation of emitted
+logs, and is not meant for regular use. The only supported way to create a
+log record is through L<OpenTelemetry::SDK::Logs::Logger/emit_record>. Refer
+to that method's documentation for more details.
+
+=head1 METHODS
+
+=head2 attributes
+
+    my $atribute_clone = $record->attributes;
+
+Returns a copy of this log record's attributes as a hash reference. Note that
+unlike the attributes of e.g. L<OpenTelemetry::Trace::Span> objects and the like,
+the OpenTelemetry spec is more lenient when it comes to log record attributes,
+in that these can contain arbitrary data structures.
+
+=head2 timestamp
+
+    $timestamp = $record->timestamp;
+
+A user-provided timestamp for when the logged event took place. May be undefined.
+
+See L<https://opentelemetry.io/docs/specs/otel/logs/data-model/#field-timestamp>.
+
+=head2 observed_timestamp
+
+    $timestamp = $record->observed_timestamp;
+
+The time at which this log record was observed by the OpenTelemetry system.
+
+See L<https://opentelemetry.io/docs/specs/otel/logs/data-model/#field-observedtimestamp>.
+
+=head2 severity_text
+
+    $string = $record->severity_text;
+
+A string representation of the logged event's severity. This is also sometimes
+referred to as "log level".
+
+See L<https://opentelemetry.io/docs/specs/otel/logs/data-model/#field-severitytext>.
+
+=head2 severity_number
+
+    $integer = $record->severity_number;
+
+A numeric representation of the logged event's severity.
+
+See L<https://opentelemetry.io/docs/specs/otel/logs/data-model/#field-severitynumber>.
+
+=head2 resource
+
+    $resource = $record->resource;
+
+The L<OpenTelemetry::SDK::Resource> object associated with this log record.
+
+See also L<https://opentelemetry.io/docs/specs/otel/logs/data-model/#field-resource>.
+
+=head2 instrumentation_scope
+
+    $scope = $record->instrumentation_scope;
+
+The L<OpenTelemetry::InstrumentationScope> object associated with this log
+record.
+
+See also L<https://opentelemetry.io/docs/specs/otel/logs/data-model/#field-instrumentationscope>.
+
+=head2 body
+
+    $body_clone = $record->body;
+
+Provides a read-only clone of the body of this log record. Note that
+importantly the body of an OpenTelemetry is not restricted to being a string,
+and may be any data type, including undefined.
+
+See L<https://opentelemetry.io/docs/specs/otel/logs/data-model/#field-body>.
+
+=head2 dropped_attributes
+
+    $count = $record->dropped_attributes;
+
+Returns the number of attributes that were dropped when trying to add them to
+this log record. This number is currently always zero.
+
+=head2 trace_flags
+
+    $flags = $record->trace_flags;
+
+The trace flags in the context where this record was emitted, as an instance
+of L<OpenTelemetry::Propagator::TraceContext::TraceFlags>.
+
+=head2 trace_state
+
+    $state = $record->trace_state;
+
+The trace state in the context where this record was emitted, as an instance
+of L<OpenTelemetry::Propagator::TraceContext::TraceState>.
+
+=head2 trace_id
+
+    $bytes = $record->trace_id;
+
+A 16-byte binary ID for the trace this log record belongs to, if any.
+
+=head2 hex_trace_id
+
+    $string = $record->hex_trace_id;
+
+A hexadecimal representation of the value returned by L</trace_id>.
+
+=head2 span_id
+
+   $bytes = $record->span_id;
+
+If this log record represents an event that took place within a span, then this
+value may be set to the 8-byte binary ID of that span.
+
+=head2 hex_span_id
+
+    $string = $record->hex_span_id;
+
+A hexadecimal representation of the value returned by L</span_id>.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<OpenTelemetry::Logs::Logger>
+
+=item L<OpenTelemetry::SDK::Logs::Logger>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2026 by José Joaquín Atria.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.

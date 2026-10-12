@@ -13,7 +13,7 @@ use Mew;
 
 has logo_path => (Str, default => '', chained => 1);
 
-our $VERSION = '1.29';
+our $VERSION = '1.33';
 
 # ------------------------------------------------
 
@@ -61,6 +61,10 @@ sub load_template
 1;
 
 =pod
+
+=head1 NAME
+
+CPAN::MetaCurator::HTML - Manage the cpan.metacurator.sqlite database
 
 =head1 Machine-Readable Change Log
 

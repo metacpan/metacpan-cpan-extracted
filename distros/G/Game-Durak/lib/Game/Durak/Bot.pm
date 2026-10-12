@@ -8,7 +8,7 @@ use Object::Proto::Sugar -types;
 
 use Game::Durak::Search qw(best LEVELS);
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our @LADDER = (1, 1, 2, 3, 3);
 
@@ -55,7 +55,7 @@ Game::Durak::Bot - a seat at a level, playing from a view
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,62 @@
+// Solarized Light (https://ethanschoonover.com/solarized) for
+// Term::Fabulous: the warm base3 paper for the screen, base2 for the
+// surfaces, the gray-blue bases for text and blue as the accent. It
+// starts from the built-in light theme. The background token is the
+// screen behind the widgets, painted before every frame, so the theme
+// is readable on a dark terminal too.
+
+theme "solarized-light" extends="light"
+
+palette {
+	background "#fdf6e3"
+	surface "#eee8d5"
+	surface_raised "#e4ddc8"
+	surface_field "#fffbf0"
+	surface_low "#f5efdc"
+	group_background "#eee8d5"
+	border "#93a1a1"
+	line "#d3cbb7"
+	outline "#93a1a1"
+	text "#657b83"
+	text_bright "#586e75"
+	text_muted "#93a1a1"
+	text_dim "#839496"
+	text_inverse "#fdf6e3"
+	placeholder "#93a1a1"
+	disabled "#b5b1a4"
+	accent "#268bd2"
+	focus_background "#e9e2cd"
+	hover_background "#f0eada"
+	hover_low "#f3eddb"
+	control_hover "#e1dac4"
+	selected "#dde8e5"
+	selection "#b9d6e8"
+	track "#e1dac4"
+	track_scroll "#d3cbb7"
+	button_face "#eee8d5"
+	success "#859900"
+	warning "#b58900"
+	danger "#dc322f"
+}
+
+// Boxes the program gives a border (bordered) get a round frame in
+// base1.
+box {
+	border style=Round color="border"
+}
+
+// Buttons sit on the base2 surface; the primary one is drawn in the
+// Solarized blue.
+button {
+	background "button_face"
+	border style=Round
+	variant "primary" {
+		border color="accent"
+		text "accent"
+	}
+}
+
+// Dividers in the orange of the palette.
+divider {
+	line color="#cb4b16"
+}

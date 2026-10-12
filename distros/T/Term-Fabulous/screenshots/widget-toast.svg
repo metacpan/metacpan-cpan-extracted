@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="870" height="489" viewBox="0 0 870 489" role="img" aria-label="perl examples/widgets/toast.pl">
+<title>perl examples/widgets/toast.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="838" height="454" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="838" height="454" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="838" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="435" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/widgets/toast.pl</text>
+<rect x="16.5" y="16.5" width="837" height="453" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="48" y="78" width="360" height="54" fill="#1c212d"/>
+<rect x="453" y="78" width="333" height="72" fill="#1c212d"/>
+<rect x="48" y="132" width="18" height="18" fill="#1c212d"/>
+<rect x="66" y="132" width="324" height="18" fill="#242830"/>
+<rect x="390" y="132" width="18" height="18" fill="#1c212d"/>
+<rect x="48" y="150" width="360" height="90" fill="#1c212d"/>
+<rect x="453" y="168" width="378" height="72" fill="#1c212d"/>
+<rect x="453" y="258" width="324" height="72" fill="#1c212d"/>
+<rect x="480" y="366" width="351" height="72" fill="#e06c75"/>
+<rect x="57" y="86" width="342" height="1" fill="#46556e"/>
+<rect x="462" y="86" width="315" height="1" fill="#61afef"/>
+<rect x="52" y="96" width="1" height="126" fill="#46556e"/>
+<rect x="403" y="96" width="1" height="126" fill="#46556e"/>
+<rect x="457" y="96" width="1" height="36" fill="#61afef"/>
+<rect x="781" y="96" width="1" height="36" fill="#61afef"/>
+<rect x="462" y="140" width="315" height="1" fill="#61afef"/>
+<rect x="75" y="176" width="306" height="1" fill="#e5c07b"/>
+<rect x="462" y="176" width="360" height="1" fill="#98c379"/>
+<rect x="70" y="186" width="1" height="18" fill="#e5c07b"/>
+<rect x="385" y="186" width="1" height="18" fill="#e5c07b"/>
+<rect x="457" y="186" width="1" height="36" fill="#98c379"/>
+<rect x="826" y="186" width="1" height="36" fill="#98c379"/>
+<rect x="75" y="212" width="306" height="1" fill="#e5c07b"/>
+<rect x="57" y="230" width="342" height="1" fill="#46556e"/>
+<rect x="462" y="230" width="360" height="1" fill="#98c379"/>
+<rect x="462" y="266" width="306" height="1" fill="#e5c07b"/>
+<rect x="457" y="276" width="1" height="36" fill="#e5c07b"/>
+<rect x="772" y="276" width="1" height="36" fill="#e5c07b"/>
+<rect x="462" y="320" width="306" height="1" fill="#e5c07b"/>
+<rect x="489" y="374" width="333" height="1" fill="#e06c75"/>
+<rect x="484" y="384" width="1" height="36" fill="#e06c75"/>
+<rect x="826" y="384" width="1" height="36" fill="#e06c75"/>
+<rect x="489" y="428" width="333" height="1" fill="#e06c75"/>
+</g>
+<polyline points="52.5 96 52.5 91 52.538 90.413 52.653 89.835 52.843 89.278 53.103 88.75 53.43 88.261 53.818 87.818 54.261 87.43 54.75 87.103 55.278 86.843 55.835 86.653 56.413 86.538 57 86.5 57 86.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="403.5 96 403.5 91 403.462 90.413 403.347 89.835 403.157 89.278 402.897 88.75 402.57 88.261 402.182 87.818 401.739 87.43 401.25 87.103 400.722 86.843 400.165 86.653 399.587 86.538 399 86.5 399 86.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="457.5 96 457.5 91 457.538 90.413 457.653 89.835 457.843 89.278 458.103 88.75 458.43 88.261 458.818 87.818 459.261 87.43 459.75 87.103 460.278 86.843 460.835 86.653 461.413 86.538 462 86.5 462 86.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="781.5 96 781.5 91 781.462 90.413 781.347 89.835 781.157 89.278 780.897 88.75 780.57 88.261 780.182 87.818 779.739 87.43 779.25 87.103 778.722 86.843 778.165 86.653 777.587 86.538 777 86.5 777 86.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="457.5 132 457.5 136 457.538 136.587 457.653 137.165 457.843 137.722 458.103 138.25 458.43 138.739 458.818 139.182 459.261 139.57 459.75 139.897 460.278 140.157 460.835 140.347 461.413 140.462 462 140.5 462 140.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="781.5 132 781.5 136 781.462 136.587 781.347 137.165 781.157 137.722 780.897 138.25 780.57 138.739 780.182 139.182 779.739 139.57 779.25 139.897 778.722 140.157 778.165 140.347 777.587 140.462 777 140.5 777 140.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="70.5 186 70.5 181 70.538 180.413 70.653 179.835 70.843 179.278 71.103 178.75 71.43 178.261 71.818 177.818 72.261 177.43 72.75 177.103 73.278 176.843 73.835 176.653 74.413 176.538 75 176.5 75 176.5" fill="none" stroke="#e5c07b" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="385.5 186 385.5 181 385.462 180.413 385.347 179.835 385.157 179.278 384.897 178.75 384.57 178.261 384.182 177.818 383.739 177.43 383.25 177.103 382.722 176.843 382.165 176.653 381.587 176.538 381 176.5 381 176.5" fill="none" stroke="#e5c07b" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="457.5 186 457.5 181 457.538 180.413 457.653 179.835 457.843 179.278 458.103 178.75 458.43 178.261 458.818 177.818 459.261 177.43 459.75 177.103 460.278 176.843 460.835 176.653 461.413 176.538 462 176.5 462 176.5" fill="none" stroke="#98c379" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="826.5 186 826.5 181 826.462 180.413 826.347 179.835 826.157 179.278 825.897 178.75 825.57 178.261 825.182 177.818 824.739 177.43 824.25 177.103 823.722 176.843 823.165 176.653 822.587 176.538 822 176.5 822 176.5" fill="none" stroke="#98c379" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="70.5 204 70.5 208 70.538 208.587 70.653 209.165 70.843 209.722 71.103 210.25 71.43 210.739 71.818 211.182 72.261 211.57 72.75 211.897 73.278 212.157 73.835 212.347 74.413 212.462 75 212.5 75 212.5" fill="none" stroke="#e5c07b" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="385.5 204 385.5 208 385.462 208.587 385.347 209.165 385.157 209.722 384.897 210.25 384.57 210.739 384.182 211.182 383.739 211.57 383.25 211.897 382.722 212.157 382.165 212.347 381.587 212.462 381 212.5 381 212.5" fill="none" stroke="#e5c07b" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="52.5 222 52.5 226 52.538 226.587 52.653 227.165 52.843 227.722 53.103 228.25 53.43 228.739 53.818 229.182 54.261 229.57 54.75 229.897 55.278 230.157 55.835 230.347 56.413 230.462 57 230.5 57 230.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="403.5 222 403.5 226 403.462 226.587 403.347 227.165 403.157 227.722 402.897 228.25 402.57 228.739 402.182 229.182 401.739 229.57 401.25 229.897 400.722 230.157 400.165 230.347 399.587 230.462 399 230.5 399 230.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="457.5 222 457.5 226 457.538 226.587 457.653 227.165 457.843 227.722 458.103 228.25 458.43 228.739 458.818 229.182 459.261 229.57 459.75 229.897 460.278 230.157 460.835 230.347 461.413 230.462 462 230.5 462 230.5" fill="none" stroke="#98c379" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="826.5 222 826.5 226 826.462 226.587 826.347 227.165 826.157 227.722 825.897 228.25 825.57 228.739 825.182 229.182 824.739 229.57 824.25 229.897 823.722 230.157 823.165 230.347 822.587 230.462 822 230.5 822 230.5" fill="none" stroke="#98c379" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="457.5 276 457.5 271 457.538 270.413 457.653 269.835 457.843 269.278 458.103 268.75 458.43 268.261 458.818 267.818 459.261 267.43 459.75 267.103 460.278 266.843 460.835 266.653 461.413 266.538 462 266.5 462 266.5" fill="none" stroke="#e5c07b" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="772.5 276 772.5 271 772.462 270.413 772.347 269.835 772.157 269.278 771.897 268.75 771.57 268.261 771.182 267.818 770.739 267.43 770.25 267.103 769.722 266.843 769.165 266.653 768.587 266.538 768 266.5 768 266.5" fill="none" stroke="#e5c07b" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="457.5 312 457.5 316 457.538 316.587 457.653 317.165 457.843 317.722 458.103 318.25 458.43 318.739 458.818 319.182 459.261 319.57 459.75 319.897 460.278 320.157 460.835 320.347 461.413 320.462 462 320.5 462 320.5" fill="none" stroke="#e5c07b" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="772.5 312 772.5 316 772.462 316.587 772.347 317.165 772.157 317.722 771.897 318.25 771.57 318.739 771.182 319.182 770.739 319.57 770.25 319.897 769.722 320.157 769.165 320.347 768.587 320.462 768 320.5 768 320.5" fill="none" stroke="#e5c07b" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="484.5 384 484.5 379 484.538 378.413 484.653 377.835 484.843 377.278 485.103 376.75 485.43 376.261 485.818 375.818 486.261 375.43 486.75 375.103 487.278 374.843 487.835 374.653 488.413 374.538 489 374.5 489 374.5" fill="none" stroke="#e06c75" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="826.5 384 826.5 379 826.462 378.413 826.347 377.835 826.157 377.278 825.897 376.75 825.57 376.261 825.182 375.818 824.739 375.43 824.25 375.103 823.722 374.843 823.165 374.653 822.587 374.538 822 374.5 822 374.5" fill="none" stroke="#e06c75" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="484.5 420 484.5 424 484.538 424.587 484.653 425.165 484.843 425.722 485.103 426.25 485.43 426.739 485.818 427.182 486.261 427.57 486.75 427.897 487.278 428.157 487.835 428.347 488.413 428.462 489 428.5 489 428.5" fill="none" stroke="#e06c75" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="826.5 420 826.5 424 826.462 424.587 826.347 425.165 826.157 425.722 825.897 426.25 825.57 426.739 825.182 427.182 824.739 427.57 824.25 427.897 823.722 428.157 823.165 428.347 822.587 428.462 822 428.5 822 428.5" fill="none" stroke="#e06c75" stroke-width="1" stroke-linejoin="round"/>
+<g class="terminal">
+<text x="66" y="110" textLength="63" fill="#61afef">Profile</text>
+<text x="471" y="110" textLength="9" fill="#61afef">i</text>
+<text x="489" y="110" textLength="144" class="b" fill="#61afef">Update available</text>
+<text x="763.5" y="110" text-anchor="middle" fill="#dcdfe4">✕</text>
+<text x="489" y="128" textLength="261" fill="#dcdfe4">Version 2.1 can be installed.</text>
+<text x="66" y="146" textLength="81" fill="#787e8a">Your name</text>
+<text x="84" y="200" textLength="9" fill="#e5c07b">!</text>
+<text x="102" y="200" textLength="225" fill="#dcdfe4">You have unsaved changes.</text>
+<text x="475.5" y="200" text-anchor="middle" fill="#98c379">✓</text>
+<text x="489" y="200" textLength="45" class="b" fill="#98c379">Saved</text>
+<text x="808.5" y="200" text-anchor="middle" fill="#dcdfe4">✕</text>
+<text x="489" y="218" textLength="306" fill="#dcdfe4">Your changes were written to disk.</text>
+<text x="48" y="272" textLength="405" fill="#96a0b4">1 to 4: show a toast of each kind, i: an impo</text>
+<text x="471" y="290" textLength="9" fill="#e5c07b">!</text>
+<text x="489" y="290" textLength="144" class="b" fill="#e5c07b">Disk almost full</text>
+<text x="754.5" y="290" text-anchor="middle" fill="#dcdfe4">✕</text>
+<text x="489" y="308" textLength="252" fill="#dcdfe4">93% of the volume is in use.</text>
+<text x="502.5" y="398" text-anchor="middle" fill="#101216">✗</text>
+<text x="516" y="398" textLength="135" class="b" fill="#101216">Connection lost</text>
+<text x="808.5" y="398" text-anchor="middle" fill="#101216">✕</text>
+<text x="516" y="416" textLength="279" fill="#101216">Reconnecting in the background.</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

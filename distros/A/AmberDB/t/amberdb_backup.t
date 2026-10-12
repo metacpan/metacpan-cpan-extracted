@@ -115,7 +115,7 @@ subtest "2. Native Database Archive Dump (.amberdb)" => sub {
     # Validate returned in-memory manifest structure
     ok( defined $manifest, "dump() returned manifest hashref" );
     is( $manifest->{format}, 'AmberDB Archive', "Manifest format is 'AmberDB Archive'" );
-    is( $manifest->{format_version}, 1, "Format version is 1" );
+    is( $manifest->{format_version}, 2, "Format version is 2" );
     is( $manifest->{dbases}->{catalog}, 'schema/catalog.dbase', "Manifest records catalog.dbase" );
     ok( exists $manifest->{tables}->{catalog_product}, "Manifest contains catalog_product table metadata" );
     is( $manifest->{tables}->{catalog_product}->{records}, 3, "Manifest records 3 records for catalog_product" );
@@ -135,8 +135,8 @@ subtest "3. Archive Package Inspection & Integrity" => sub {
     ok( grep { $_ eq 'manifest.json' } @files, "Archive contains manifest.json" );
     ok( grep { $_ eq 'schema/catalog.dbase' } @files, "Archive contains schema/catalog.dbase" );
     ok( grep { $_ eq 'schema/catalog_product.table' } @files, "Archive contains schema/catalog_product.table" );
-    ok( grep { $_ eq 'table/catalog_product.db' } @files, "Archive contains table/catalog_product.db" );
-    ok( grep { $_ eq 'table/catalog_product.unq' } @files, "Archive contains table/catalog_product.unq" );
+    ok( grep { $_ eq 'table/catalog_product.dumpdb' } @files, "Archive contains table/catalog_product.dumpdb" );
+    ok( grep { $_ eq 'table/orders.dumpdb' } @files, "Archive contains table/orders.dumpdb" );
 
     # Verify that derived index files are NOT packaged in the archive
     my @inx_files = grep { /\.inx$|\.src$|\.fac$|\.fld$|\.srt$/ } @files;
@@ -145,7 +145,7 @@ subtest "3. Archive Package Inspection & Integrity" => sub {
     # Validate embedded manifest checksum
     my $manifest_content = $tar->get_content('manifest.json');
     my $manifest = JSON::PP::decode_json($manifest_content);
-    my $sha = $manifest->{tables}->{catalog_product}->{sha256}->{'table/catalog_product.db'};
+    my $sha = $manifest->{tables}->{catalog_product}->{sha256}->{'table/catalog_product.dumpdb'};
     ok( defined $sha && length($sha) == 64, "Manifest contains valid 64-character SHA-256 hash" );
 };
 

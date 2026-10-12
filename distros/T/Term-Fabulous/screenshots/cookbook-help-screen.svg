@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="708" height="561" viewBox="0 0 708 561" role="img" aria-label="perl examples/cookbook/help-screen.pl">
+<title>perl examples/cookbook/help-screen.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="676" height="526" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="676" height="526" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="676" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="354" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/cookbook/help-screen.pl</text>
+<rect x="16.5" y="16.5" width="675" height="525" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="30" y="60" width="54" height="468" fill="#0b0b11"/>
+<rect x="84" y="60" width="540" height="72" fill="#1c212d"/>
+<rect x="624" y="60" width="54" height="468" fill="#0b0b11"/>
+<rect x="84" y="132" width="27" height="18" fill="#1c212d"/>
+<rect x="111" y="132" width="9" height="18" fill="#dcdfe4"/>
+<rect x="120" y="132" width="477" height="18" fill="#343a48"/>
+<rect x="597" y="132" width="27" height="18" fill="#1c212d"/>
+<rect x="84" y="150" width="540" height="18" fill="#1c212d"/>
+<rect x="84" y="168" width="27" height="54" fill="#1c212d"/>
+<rect x="111" y="168" width="477" height="36" fill="#242832"/>
+<rect x="588" y="168" width="36" height="54" fill="#1c212d"/>
+<rect x="111" y="204" width="477" height="18" fill="#1c2029"/>
+<rect x="84" y="222" width="540" height="90" fill="#1c212d"/>
+<rect x="84" y="312" width="27" height="18" fill="#1c212d"/>
+<rect x="111" y="312" width="477" height="18" fill="#1c2029"/>
+<rect x="588" y="312" width="36" height="18" fill="#1c212d"/>
+<rect x="84" y="330" width="540" height="36" fill="#1c212d"/>
+<rect x="84" y="366" width="27" height="18" fill="#1c212d"/>
+<rect x="111" y="366" width="477" height="18" fill="#1c2029"/>
+<rect x="588" y="366" width="36" height="18" fill="#1c212d"/>
+<rect x="84" y="384" width="540" height="144" fill="#1c212d"/>
+<rect x="93" y="68" width="522" height="1" fill="#61afef"/>
+<rect x="88" y="78" width="1" height="432" fill="#61afef"/>
+<rect x="619" y="78" width="1" height="432" fill="#61afef"/>
+<rect x="111" y="194" width="477" height="1" fill="#586070"/>
+<rect x="120" y="446" width="63" height="1" fill="#46556e"/>
+<rect x="115" y="456" width="1" height="18" fill="#46556e"/>
+<rect x="187" y="456" width="1" height="18" fill="#46556e"/>
+<rect x="120" y="482" width="63" height="1" fill="#46556e"/>
+<rect x="93" y="518" width="522" height="1" fill="#61afef"/>
+</g>
+<polyline points="88.5 78 88.5 73 88.538 72.413 88.653 71.835 88.843 71.278 89.103 70.75 89.43 70.261 89.818 69.818 90.261 69.43 90.75 69.103 91.278 68.843 91.835 68.653 92.413 68.538 93 68.5 93 68.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="619.5 78 619.5 73 619.462 72.413 619.347 71.835 619.157 71.278 618.897 70.75 618.57 70.261 618.182 69.818 617.739 69.43 617.25 69.103 616.722 68.843 616.165 68.653 615.587 68.538 615 68.5 615 68.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="115.5 456 115.5 451 115.538 450.413 115.653 449.835 115.843 449.278 116.103 448.75 116.43 448.261 116.818 447.818 117.261 447.43 117.75 447.103 118.278 446.843 118.835 446.653 119.413 446.538 120 446.5 120 446.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="187.5 456 187.5 451 187.462 450.413 187.347 449.835 187.157 449.278 186.897 448.75 186.57 448.261 186.182 447.818 185.739 447.43 185.25 447.103 184.722 446.843 184.165 446.653 183.587 446.538 183 446.5 183 446.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="115.5 474 115.5 478 115.538 478.587 115.653 479.165 115.843 479.722 116.103 480.25 116.43 480.739 116.818 481.182 117.261 481.57 117.75 481.897 118.278 482.157 118.835 482.347 119.413 482.462 120 482.5 120 482.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="187.5 474 187.5 478 187.462 478.587 187.347 479.165 187.157 479.722 186.897 480.25 186.57 480.739 186.182 481.182 185.739 481.57 185.25 481.897 184.722 482.157 184.165 482.347 183.587 482.462 183 482.5 183 482.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="88.5 510 88.5 514 88.538 514.587 88.653 515.165 88.843 515.722 89.103 516.25 89.43 516.739 89.818 517.182 90.261 517.57 90.75 517.897 91.278 518.157 91.835 518.347 92.413 518.462 93 518.5 93 518.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="619.5 510 619.5 514 619.462 514.587 619.347 515.165 619.157 515.722 618.897 516.25 618.57 516.739 618.182 517.182 617.739 517.57 617.25 517.897 616.722 518.157 616.165 518.347 615.587 518.462 615 518.5 615 518.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<g class="terminal">
+<text x="48" y="92" textLength="36" fill="#6e6f72">To d</text>
+<text x="111" y="110" textLength="198" class="b" fill="#dcdfe4">Keys of the to-do list</text>
+<text x="48" y="128" textLength="27" fill="#305777">[x]</text>
+<text x="48" y="146" textLength="27" fill="#6e6f72">[ ]</text>
+<text x="111" y="146" textLength="9" fill="#343a48">S</text>
+<text x="120" y="146" textLength="198" fill="#787e8a">earch keys and actions</text>
+<text x="48" y="164" textLength="27" fill="#6e6f72">[ ]</text>
+<text x="48" y="182" textLength="27" fill="#305777">[x]</text>
+<text x="120" y="182" textLength="198" class="b" fill="#ebeef3">Keys            Action</text>
+<text x="124.5" y="218" text-anchor="middle" class="b" fill="#61afef">▾</text>
+<text x="138" y="218" textLength="90" class="b" fill="#61afef">Everywhere</text>
+<text x="120" y="236" textLength="180" fill="#dcdfe4">F1              Keys</text>
+<text x="120" y="254" textLength="225" fill="#dcdfe4">Ctrl+A          Check all</text>
+<text x="120" y="272" textLength="243" fill="#dcdfe4">Ctrl+D          Remove done</text>
+<text x="120" y="290" textLength="252" fill="#dcdfe4">Alt+s           Sort by name</text>
+<text x="120" y="308" textLength="180" fill="#dcdfe4">Ctrl+Q          Quit</text>
+<text x="124.5" y="326" text-anchor="middle" class="b" fill="#61afef">▾</text>
+<text x="138" y="326" textLength="72" class="b" fill="#61afef">The list</text>
+<text x="120" y="344" textLength="396" fill="#dcdfe4">Tab, Shift+Tab  The next, the previous to-do</text>
+<text x="120" y="362" textLength="378" fill="#dcdfe4">Space, Enter    Check or uncheck the to-do</text>
+<text x="124.5" y="380" text-anchor="middle" class="b" fill="#61afef">▾</text>
+<text x="138" y="380" textLength="81" class="b" fill="#61afef">This help</text>
+<text x="120" y="398" textLength="432" fill="#dcdfe4">Typing          Show only the keys with the text</text>
+<text x="120" y="416" textLength="270" fill="#dcdfe4">Escape          Close the help</text>
+<text x="129" y="470" textLength="45" fill="#dcdfe4">Close</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

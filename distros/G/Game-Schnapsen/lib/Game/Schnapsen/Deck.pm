@@ -9,7 +9,7 @@ use Exporter 'import';
 use Game::Schnapsen::Card ();
 use Game::Schnapsen::Variant ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 our @EXPORT_OK = qw(pack_for order_for deal_for talon_at draw_count);
 
 my %PACK;
@@ -82,7 +82,7 @@ Game::Schnapsen::Deck - the seeded deal, and the talon as the tail of it
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

@@ -106,10 +106,16 @@ static void pk_ar_job_free(pTHX_ pk_ar_job *j) {
     Safefree(j);
 }
 
-static void pk_ar_timer_cb(pTHX_ void *ud) {
+static void pk_ar_timer_cb_in(pTHX_ void *ud) {
     pk_ar_job *j = (pk_ar_job *)ud;
     pk_ar_run(aTHX_ j->c, j->resp, j->cbs);
     pk_ar_job_free(aTHX_ j);
+}
+
+static void pk_ar_timer_cb(pTHX_ void *ud) {
+    PK_LOOP_ENTER;
+    pk_ar_timer_cb_in(aTHX_ ud);
+    PK_LOOP_LEAVE;
 }
 
 /* The psgix.cleanup handler: the server calls it with the env, which this

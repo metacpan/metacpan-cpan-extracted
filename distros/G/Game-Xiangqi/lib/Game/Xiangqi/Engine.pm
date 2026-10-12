@@ -8,7 +8,7 @@ use Carp ();
 use Exporter 'import';
 use Object::Proto::Sugar;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 require XSLoader;
 XSLoader::load('Game::Xiangqi', $VERSION);

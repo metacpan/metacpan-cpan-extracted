@@ -105,6 +105,42 @@ static SV *oa_split_tokens(pTHX_ const char *p, STRLEN l,
  * no `=` in the exploded form, is skipped rather than guessed at: the schema
  * refuses the result afterwards, which is a better error than an invented one.
  */
+/* The spellings of a list delimiter on the wire: a space reaches a URL only
+ * encoded (or as `+` in a query), a tab likewise, a pipe either way. */
+static const char *const *oa_delim_tokens(char d, int plus) {
+    static const char *const sp_q[] = { "%20", "+", " ", NULL };
+    static const char *const sp_p[] = { "%20", " ", NULL };
+    static const char *const pi[]   = { "%7C", "%7c", "|", NULL };
+    static const char *const tb[]   = { "%09", "\t", NULL };
+    static const char *const co[]   = { ",", NULL };
+    if (d == ' ')  return plus ? sp_q : sp_p;
+    if (d == '|')  return pi;
+    if (d == '\t') return tb;
+    return co;
+}
+
+/* A Swagger 2.0 Items Object may itself be an array with its own delimiter,
+ * so `1|2,3|4` is [[1,2],[3,4]]. Each piece of a list split at level `lvl` is
+ * split again, in place, into an arrayref; the pieces are already decoded, so
+ * the inner delimiter is matched literally. */
+static void oa_split_nested(pTHX_ oa_param *pp, SV *listrv, int lvl) {
+    AV *av;
+    SSize_t i, n;
+    if (!pp || lvl >= pp->ndepth || !listrv || !SvROK(listrv)) return;
+    av = (AV *)SvRV(listrv);
+    n = av_len(av) + 1;
+    for (i = 0; i < n; i++) {
+        SV **e = av_fetch(av, i, 0);
+        SV *sub;
+        STRLEN l; const char *p;
+        if (!e || !*e || SvROK(*e)) continue;
+        p = SvPV_const(*e, l);
+        sub = oa_split(aTHX_ p, l, pp->idelim[lvl], 0, 0);
+        oa_split_nested(aTHX_ pp, sub, lvl + 1);
+        av_store(av, i, sub);
+    }
+}
+
 static SV *oa_obj_from_pairs(pTHX_ SV *listrv) {
     AV *av = (AV *)SvRV(listrv);
     HV *h = newHV();
@@ -181,7 +217,12 @@ static SV *oa_style_path(pTHX_ oa_param *pp, const char *vp, STRLEN vl) {
         return sv_2mortal(oa_pct_decode(aTHX_ vp, vl, 0));
 
     {
-        SV *rv = sv_2mortal(oa_split(aTHX_ vp, vl, delim, 1, 0));
+        /* a delimiter the style cannot spell is matched in its wire
+         * spellings, and each piece may be a list of its own */
+        SV *rv = sv_2mortal(pp->delim
+            ? oa_split_tokens(aTHX_ vp, vl, oa_delim_tokens(pp->delim, 0), 0)
+            : oa_split(aTHX_ vp, vl, delim, 1, 0));
+        oa_split_nested(aTHX_ pp, rv, 0);
         /* exploded matrix repeats the name: `;id=a;id=b` */
         if (pp->style == OA_ST_MATRIX && pp->explode && np) {
             AV *av = (AV *)SvRV(rv);
@@ -409,7 +450,12 @@ static HV *oa_parse_query(pTHX_ oa_op *o, const char *qs, STRLEN ql) {
 
                 /* a style whose list arrives in ONE value */
                 if (pp && pp->is_array) {
-                    if (pp->style == OA_ST_SPACE) {
+                    if (pp->delim) {
+                        v = oa_split_tokens(aTHX_ rawv, rawvl,
+                                            oa_delim_tokens(pp->delim, 1), 1);
+                        delimited = 1;
+                    }
+                    else if (pp->style == OA_ST_SPACE) {
                         v = oa_split_tokens(aTHX_ rawv, rawvl, tok_space, 1);
                         delimited = 1;
                     }
@@ -423,6 +469,7 @@ static HV *oa_parse_query(pTHX_ oa_op *o, const char *qs, STRLEN ql) {
                     }
                 }
                 if (delimited) {
+                    oa_split_nested(aTHX_ pp, v, 0);
                     (void)hv_store(out, kp, (I32)kl, v, 0);
                     s = e + 1;
                     continue;
@@ -443,6 +490,13 @@ static HV *oa_parse_query(pTHX_ oa_op *o, const char *qs, STRLEN ql) {
                         av = newAV();
                         (void)hv_store(out, kp, (I32)kl,
                                        newRV_noinc((SV *)av), 0);
+                    }
+                    if (pp->ndepth) {   /* each repeated value is itself a list */
+                        STRLEN vl2; const char *vp2 = SvPV_const(v, vl2);
+                        SV *sub = oa_split(aTHX_ vp2, vl2, pp->idelim[0], 0, 0);
+                        oa_split_nested(aTHX_ pp, sub, 1);
+                        SvREFCNT_dec(v);
+                        v = sub;
                     }
                     av_push(av, v);
                 } else {
@@ -574,7 +628,14 @@ static SV *oa_form_decode(pTHX_ SV *text, SV *encoding) {
                     int isform  = !sp2 || (sl2 ==  4 && memEQ(sp2, "form", 4));
                     int isspace = sp2 && sl2 == 14 && memEQ(sp2, "spaceDelimited", 14);
                     int ispipe  = sp2 && sl2 == 13 && memEQ(sp2, "pipeDelimited", 13);
-                    if (isform && !exploded)
+                    /* a tab-separated member (Swagger 2.0 tsv) has no 3.x
+                     * style; it travels as the x-oa-collectionFormat extension */
+                    int istab   = oa_cf_delim(aTHX_ oa_get(aTHX_ eh, "x-oa-collectionFormat")) == '\t';
+                    if (istab) {
+                        static const char *const tok_tb[] = { "%09", "\t", NULL };
+                        v = oa_split_tokens(aTHX_ rawv, rawvl, tok_tb, 1);
+                    }
+                    else if (isform && !exploded)
                         v = oa_split(aTHX_ rawv, rawvl, ',', 1, 1);
                     else if (isspace) {
                         static const char *const tok_sp[] = { "%20", "+", " ", NULL };
@@ -904,7 +965,8 @@ static int oa_validate_op(pTHX_ oa_api *a, oa_op *o,
              * value is not percent-encoded, so it is split but not decoded */
             if (pp->is_array) {
                 STRLEN hl; const char *hp = SvPV_const(val, hl);
-                val = sv_2mortal(oa_split(aTHX_ hp, hl, ',', 0, 0));
+                val = sv_2mortal(oa_split(aTHX_ hp, hl, pp->delim ? pp->delim : ',', 0, 0));
+                oa_split_nested(aTHX_ pp, val, 0);
             }
             /* an object is comma separated too, and explode decides whether
              * the pieces are `k,v` pairs or their own `k=v` */
@@ -942,7 +1004,8 @@ static int oa_validate_op(pTHX_ oa_api *a, oa_op *o,
                  * kept raw by oa_parse_cookies, so split without decoding */
                 if (pp->is_array) {
                     STRLEN cl2; const char *cp2 = SvPV_const(val, cl2);
-                    val = sv_2mortal(oa_split(aTHX_ cp2, cl2, ',', 0, 0));
+                    val = sv_2mortal(oa_split(aTHX_ cp2, cl2, pp->delim ? pp->delim : ',', 0, 0));
+                    oa_split_nested(aTHX_ pp, val, 0);
                 }
                 /* an object cookie is assembled the way a header one is:
                  * comma separated, `k,v` pairs or `k=v` when exploded */

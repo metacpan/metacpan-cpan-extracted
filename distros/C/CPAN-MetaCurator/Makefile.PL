@@ -57,7 +57,6 @@ my(%params) =
 		'Mew'						=> 1.002004,
 		'Mojo::JSON'				=> undef,
 		'Mojo::Log'					=> undef,
-		'Moo'						=> 2.005005,
 		'open'						=> 1.13,
 		'parent'					=> 0.242,
 		'Path::Tiny'				=> 0.146,

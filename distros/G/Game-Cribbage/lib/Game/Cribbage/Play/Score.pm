@@ -57,7 +57,7 @@ Game::Cribbage::Play::Score - score object for a single card play
 
 =head1 VERSION
 
-Version 0.15
+Version 0.17
 
 =cut
 

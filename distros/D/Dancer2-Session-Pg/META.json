@@ -61,8 +61,6 @@
             "Devel::Cover::Report::Coveralls" : "0",
             "Dist::Zilla::App::Command::cover" : "0",
             "Dist::Zilla::App::Command::podpreview" : "0.004",
-            "Git::Hooks" : "v4.0.0",
-            "Git::MoreHooks" : "0.019",
             "Perl::Critic" : "0",
             "Perl::Critic::Bangs" : "0",
             "Perl::Critic::Community" : "0",
@@ -125,7 +123,7 @@
          "web" : "https://github.com/mikkoi/dancer2-session-pg"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_generated_by_perl" : "v5.34.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.28",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

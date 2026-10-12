@@ -57,16 +57,19 @@ ngtcp2 and TLS remain below Net::QUIC.
 
 Uniform::HTTP 0.06 is the runtime HTTP message layer.
 
-Unblock::HTTP3 uses exact canonical `Uniform::HTTP::Request` and
-`Uniform::HTTP::Response` objects directly. HTTP/3-specific lifecycle and
-priority state belongs to `Unblock::HTTP3::Transaction`, not to HTTP message
-subclasses.
+Unblock::HTTP3 accepts the portable Uniform HTTP request and response
+contract. Exact canonical `Uniform::HTTP::Request` and
+`Uniform::HTTP::Response` objects use the native fast path. Adapters and
+subclasses stay on the portable Perl path.
 
-A client submits a canonical `Uniform::HTTP::Request` directly.
-Unblock::HTTP3 validates the request for HTTP/3 when it is sent. This keeps
-Uniform neutral: it can represent temporarily incomplete or cross-field-invalid
-message combinations while the selected protocol engine remains responsible
-for deciding what is legal on its wire.
+HTTP/3-specific lifecycle and priority state belongs to
+`Unblock::HTTP3::Transaction`, not to HTTP message objects.
+
+A client submits a Uniform-compatible request directly. Unblock::HTTP3
+validates the request for HTTP/3 when it is sent. This keeps Uniform neutral:
+it can represent temporarily incomplete or cross-field-invalid message
+combinations while the selected protocol engine remains responsible for
+deciding what is legal on its wire.
 
 An application-created Uniform request may leave `version` undefined. If a
 message carries an explicit version, Unblock::HTTP3 requires it to be `3`
@@ -88,14 +91,14 @@ in XS. On receive, decoded nghttp3 header blocks stay in native connection
 state until Unblock::HTTP3 has applied HTTP/3 semantic checks, then XS builds
 the exact canonical Uniform object directly from validated native byte spans.
 
-The native path does not create a second HTTP object model. Uniform still owns
-the final Perl Request and Response objects and their normal lifecycle.
+The native path does not create a second HTTP object model. Received messages
+are still exact canonical Uniform Request and Response objects.
 
 Unblock::HTTP3 also exposes an optional outward native consumer ABI for XS
-HTTP libraries and event-framework adapters. That ABI operates on the normal
-Connection and Transaction objects and returns the same canonical Uniform
-messages. It is separate from the inward Uniform native FastPath used by
-Unblock::HTTP3 itself.
+HTTP libraries and event-framework adapters. That ABI operates on exact
+Unblock::HTTP3::Client, Server, and Transaction objects and returns the same
+canonical Uniform messages. It is separate from the inward Uniform native
+FastPath used by Unblock::HTTP3 itself.
 
 The consumer ABI deliberately does not expose libnghttp3 or replace the QUIC
 transport boundary. Net::QUIC remains responsible for QUIC and TLS.
@@ -188,7 +191,7 @@ settings remembered from the resumed session.
 The client saves:
 
     Net::QUIC::Connection->early_data_state
-    Unblock::HTTP3::Connection->peer_settings_state
+    Unblock::HTTP3::Client->peer_settings_state
 
 and restores them to the matching layers on the returning connection.
 

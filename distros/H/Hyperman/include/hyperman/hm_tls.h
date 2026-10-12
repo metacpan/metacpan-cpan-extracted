@@ -317,15 +317,15 @@ static SSL_CTX *hm_tls_ctx_one(const char *cert, const char *key,
     (void)tkey; (void)tkeylen;
 #endif
     if (SSL_CTX_use_certificate_chain_file(ctx, cert) <= 0) {
-        fprintf(stderr, "Hyperman TLS: cannot load certificate '%s'\n", cert);
+        hm_errlog("Hyperman TLS: cannot load certificate '%s'\n", cert);
         ERR_print_errors_fp(stderr); SSL_CTX_free(ctx); return NULL;
     }
     if (SSL_CTX_use_PrivateKey_file(ctx, key, SSL_FILETYPE_PEM) <= 0) {
-        fprintf(stderr, "Hyperman TLS: cannot load private key '%s'\n", key);
+        hm_errlog("Hyperman TLS: cannot load private key '%s'\n", key);
         ERR_print_errors_fp(stderr); SSL_CTX_free(ctx); return NULL;
     }
     if (!SSL_CTX_check_private_key(ctx)) {
-        fprintf(stderr, "Hyperman TLS: certificate and key do not match\n");
+        hm_errlog("Hyperman TLS: certificate and key do not match\n");
         SSL_CTX_free(ctx); return NULL;
     }
 #ifdef HM_HAVE_ALPN
@@ -347,7 +347,7 @@ static SSL_CTX *hm_tls_ctx_one(const char *cert, const char *key,
     if (verify != HM_TLS_VERIFY_NONE) {
         int flags = SSL_VERIFY_PEER;
         if (ca && SSL_CTX_load_verify_locations(ctx, ca, NULL) <= 0) {
-            fprintf(stderr, "Hyperman TLS: cannot load CA '%s'\n", ca);
+            hm_errlog("Hyperman TLS: cannot load CA '%s'\n", ca);
             ERR_print_errors_fp(stderr); SSL_CTX_free(ctx); return NULL;
         }
         if (ca) {   /* tell the client which CAs we accept */
@@ -451,7 +451,7 @@ static void *hm_tls_ctx_build(pTHX_ const char *cert, const char *key,
                 if (k && SvOK(*k)) hk = SvPV_nolen(*k);
             }
             if (!hc || !hk) {
-                fprintf(stderr, "Hyperman TLS: SNI host '%s' needs cert and key\n", host);
+                hm_errlog("Hyperman TLS: SNI host '%s' needs cert and key\n", host);
                 continue;
             }
             hctx = hm_tls_ctx_one(hc, hk, ca, verify, alpn_h2, tkey, tkeylen, 0);

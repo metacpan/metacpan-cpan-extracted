@@ -20,11 +20,11 @@ WriteMakefile(
         resources   => {
             repository => {
                 type => 'git',
-                url => 'git://github.com/davorg/qmail-queuehandler.git',
-                web => 'https://github.com/davorg/qmail-queuehandler',
+                url => 'git://github.com/davorg-cpan/qmail-queuehandler.git',
+                web => 'https://github.com/davorg-cpan/qmail-queuehandler',
             },
             bugtracker => {
-                web => 'https://github.com/davorg/qmail-queuehandler/issues',
+                web => 'https://github.com/davorg-cpan/qmail-queuehandler/issues',
             },
         },
     },

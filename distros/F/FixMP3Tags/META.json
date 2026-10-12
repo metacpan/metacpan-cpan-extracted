@@ -1,0 +1,58 @@
+{
+   "abstract" : "Fix MP3 tags from directory structure",
+   "author" : [
+      "vr-ski 166657596+vr-ski@users.noreply.github.com"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "freebsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "FixMP3Tags",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.22"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "MP3::Tag" : "1.16",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.90"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/vr-ski/fix-mp3-tags/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/vr-ski/fix-mp3-tags.git",
+         "web" : "https://github.com/vr-ski/fix-mp3-tags"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

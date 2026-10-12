@@ -1,0 +1,35 @@
+---
+abstract: 'widget layer over Clay::XS: build a widget tree, lay it out, turn pointer input into events'
+author:
+  - 'davenonymous <perl@davenonymous.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  JSON::PP: '0'
+  Test2::V0: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '7.12'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Clay-UI
+no_index:
+  directory:
+    - t
+    - inc
+    - tools
+    - images
+requires:
+  Exporter: '5.57'
+  List::Util: '1.45'
+  Object::Pad: '0.800'
+  Object::PadX::Enum: '0.01'
+  XSLoader: '0'
+  perl: '5.026'
+resources:
+  bugtracker: https://github.com/davenonymous/perl-clay-xs/issues
+  repository: https://github.com/davenonymous/perl-clay-xs.git
+version: '0.06'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

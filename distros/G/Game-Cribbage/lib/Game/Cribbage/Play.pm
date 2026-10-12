@@ -25,11 +25,11 @@ has [qw/cards scored/] => (
 	default => []
 );
 
-sub test_card {
+sub test_card_score {
 	my ($self, $player, $card) = @_;
 
 	my $total = $self->calculate_total([@{$self->cards}, $card], 0);
-	
+
 	if ($total > 31) {
 		return Game::Cribbage::Error->new(
 			message => 'Total count would be greater than 31 if ' . $card->stringify . ' was to be played',
@@ -46,11 +46,21 @@ sub test_card {
 
 	$self->calculate_run($score, $card);
 
-	$total = $self->calculate_total([@{$self->cards}, $card], 0);
-
 	$self->calculate_hits($score, $total);
 
-	return $score->score;
+	$score->score;
+
+	return $score;
+}
+
+sub test_card {
+	my ($self, $player, $card) = @_;
+
+	my $score = $self->test_card_score($player, $card);
+
+	return $score if ref $score eq 'Game::Cribbage::Error';
+
+	return $score->total_score;
 }
 
 sub card {
@@ -97,7 +107,7 @@ sub force_card {
 			return 0;
 		}
 	}
-	
+
 	return $self->card($player, $card);
 }
 
@@ -137,7 +147,7 @@ sub calculate_pair {
 }
 
 sub calculate_run {
-	my ($self, $score, $card) = @_; 
+	my ($self, $score, $card) = @_;
 	my @cards = map { $_->card } @{$self->cards};
 	my @values = map { $_->run_value } (@cards, $card);
 	my $length = scalar @values - 1;
@@ -199,7 +209,7 @@ Game::Cribbage::Play - a single play sequence (cards up to 31)
 
 =head1 VERSION
 
-Version 0.15
+Version 0.17
 
 =cut
 
@@ -278,6 +288,23 @@ over 31.  Does B<not> commit the card to the play.
 		# Error - cannot play
 	} else {
 		# $result is the score (0 or more)
+	}
+
+=head2 test_card_score
+
+The same test, returning the L<Game::Cribbage::Play::Score> B<object> rather
+than its total, or the same L<Game::Cribbage::Error> when the card would take
+the total over 31.  C<test_card> is a thin wrapper over this.
+
+The object is what a caller needs to say B<why> a card scores: C<pair>, C<run>,
+C<fifteen>, C<pegged> and C<flipped> are each set on it, and a total alone
+cannot tell a pair from a fifteen.  Nothing is committed to the play either way.
+
+	my $score = $play->test_card_score($player, $card);
+	if (!ref $score or ref $score eq 'Game::Cribbage::Error') {
+		# cannot play it
+	} elsif ($score->fifteen) {
+		# it makes fifteen
 	}
 
 =head2 card

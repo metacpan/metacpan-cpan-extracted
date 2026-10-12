@@ -23,6 +23,21 @@ my %WriteMakefileArgs = (
 	'ntheory' => 0,
 	'Array::Diff' => 0
     },
+    # Term::ReadKey IS A RECOMMENDATION AND NOT A PREREQUISITE, which is a
+    # decision and not an omission. The arrow-key picker in Terminal.pm needs
+    # it; nothing else in the distribution does, the board and the scoring
+    # never read a key at all, and the terminal falls back to a typed prompt
+    # when the module is missing or when `in` is not a terminal.
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        prereqs => {
+            runtime => {
+                recommends => {
+                    'Term::ReadKey' => '0',
+                },
+            },
+        },
+    },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Game-Cribbage-*' },
 );

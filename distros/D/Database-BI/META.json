@@ -37,7 +37,8 @@
             "CHI" : "0",
             "Carp" : "0",
             "DBI" : "0",
-            "Database::Abstraction" : "0.44",
+            "DB_File" : "0",
+            "Database::Abstraction" : "0.48",
             "Database::Join" : "v0.4.0",
             "File::Path" : "2.07",
             "File::Spec" : "3.40",
@@ -56,6 +57,7 @@
             "Params::Get" : "0",
             "Params::Validate::Strict" : "0.39",
             "Readonly" : "0",
+            "Scalar::Util" : "0",
             "Socket" : "2.010",
             "Spreadsheet::ParseXLSX" : "0",
             "Sub::Protected" : "0",
@@ -90,6 +92,6 @@
          "web" : "https://github.com/nigelhorne/Database-BI"
       }
    },
-   "version" : "v0.010.0",
+   "version" : "v0.011.0",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

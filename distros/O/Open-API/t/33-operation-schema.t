@@ -214,6 +214,29 @@ SKIP: {
     ok($same, 'the 3.0 and 3.1 twins present the same inputs');
 }
 
+# ---- the 2.0 twin ----------------------------------------------------------
+# The official petstore-expanded and its hand-written 3.0 twin (t/43 compares
+# the whole document; this is the tools' view of it)
+my $v20  = eval { Open::API->new(spec => "$FindBin::Bin/spec/petstore-2.0.json") };
+my $v20t = eval { Open::API->new(spec => "$FindBin::Bin/spec/petstore-2.0-twin-30.json") };
+SKIP: {
+    skip 'petstore 2.0 twins not both present', 1 unless $v20 && $v20t;
+    my $same = 1;
+    for my $op (@{ $v20->operations }) {
+        my $id = $op->{operationId};
+        next unless defined $id;
+        my $a = $v20->operation_schema($id)  or next;
+        my $b = $v20t->operation_schema($id) or next;
+        my @pa = sort keys %{ $a->{properties} || {} };
+        my @pb = sort keys %{ $b->{properties} || {} };
+        $same = 0, diag("$id properties: @pa vs @pb") if "@pa" ne "@pb";
+        my $ra = join ',', sort @{ $a->{required} || [] };
+        my $rb = join ',', sort @{ $b->{required} || [] };
+        $same = 0, diag("$id required: $ra vs $rb") if $ra ne $rb;
+    }
+    ok($same, 'the 2.0 and 3.0 twins present the same inputs');
+}
+
 # ---- a $ref pointing INTO a component schema -------------------------------
 #
 # `#/components/schemas/A/properties/b` is a pointer into A, not a schema

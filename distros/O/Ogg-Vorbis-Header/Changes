@@ -26,3 +26,7 @@ Revision history for Perl extension Ogg::Vorbis::Header.
 
 0.11  Mon Jan 04 13:36:00 GMT 2021
   - Add bugtracker details to metadata
+
+0.12  Sun Oct 11 12:42:00 GMT 2026
+  - Remove CPAN email address
+  - Fix C bug surfaced by newer gcc

@@ -1,0 +1,998 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Term::Fabulous::Manual::Looks - Text, colors and borders
+
+=head1 DESCRIPTION
+
+This page is part of L<Term::Fabulous::Manual>. Previous page: L<Term::Fabulous::Manual::Layout>. Next page: L<Term::Fabulous::Manual::Events>.
+
+This page explains how widgets look: how a Text widget shows text
+(character strings, wrapping, alignment, line height, bold, italic and
+underlined text, wide characters and control characters), how colors
+are written and how translucent colors are blended, how borders are
+drawn (border styles, per-side styles, widths, colors and borders that
+join the lines around them), and how a theme colors every widget at
+once (the built-in themes, theme files, variants, switching at run
+time). Every feature is shown in a picture, with the Perl code and,
+where a layout file can set it, the form it takes in a
+L<KDL layout file|Term::Fabulous::Manual::KDL/KDL LAYOUT FILES>.
+
+The reference pages for this topic are
+L<Term::Fabulous::Widget::Text>, L<Term::Fabulous::Color>,
+L<Term::Fabulous::Enum::WebColor>, L<Term::Fabulous::Enum::BorderStyle>,
+L<Term::Fabulous::Role::HasBorderStyle> and L<Term::Fabulous::Theme>.
+Complete programs are in L<Term::Fabulous::Cookbook::GettingStarted>
+(non-ASCII text, wrapping and alignment) and
+L<Term::Fabulous::Cookbook::Layout> (per-side border styles, switching
+themes).
+
+=head1 TEXT
+
+L<Term::Fabulous::Widget::Text> shows text in one color. Text wraps at
+spaces when it is wider than the room its parent gives it, and a C<"\n">
+in the text starts a new line.
+
+	my $label = Term::Fabulous::Widget::Text->new(
+		text       => 'Disk usage: 42%',
+		text_color => [ 230, 230, 230, 255 ],
+	);
+	$label->text('Disk usage: 43%');    # shown in the next frame
+
+In a KDL layout file:
+
+=for highlighter language=kdl
+
+	Text "usage" {
+		text "Disk usage: 42%"
+		text_color "#e6e6e6"
+	}
+
+Without a C<text_color>, a Text is drawn in the theme's text color
+(L</THEMES>): a light gray in the built-in C<dark> theme, a dark gray
+in C<light>. To use the terminal's default text color instead, pass
+C<[0, 0, 0, 0]> (see L</Alpha and the terminal default color>).
+
+A Text widget has no background, border or padding of its own; put it in
+a L<Term::Fabulous::Widget::Box> for those. The program
+F<examples/text-features.pl> shows the text features described in this
+section side by side; the panels behind the texts show how much room each Text
+takes:
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-text-features.svg" alt="Text wrapped at spaces in a narrow panel and text broken only at newlines; a two-line text with line height 2; plain, bold, italic, underlined and combined styles; Latin, Japanese, emoji and combining accents ending in the same column; a tab shown as a space and control characters shown as replacement characters"></p>
+
+=end html
+
+=head2 Text is character strings
+
+B<The C<text> of a Text widget is a Perl character string>, like all text
+in Term::Fabulous: the input widgets (C<value>, C<label>, C<placeholder>,
+options), the canvas drawing methods, L<Term::Fabulous::Editor>,
+L<Term::Fabulous::Unicode> and
+C<< Term::Fabulous::Layout->new( string => ... ) >>. With C<use utf8;>,
+non-ASCII literals in your source work directly:
+
+=for highlighter language=perl
+
+	use utf8;                 # this source file contains non-ASCII text
+
+	my $greeting = Term::Fabulous::Widget::Text->new(
+		text       => 'Grüße aus München',
+		text_color => [ 255, 255, 255, 255 ],
+	);
+	$greeting->text('Schöne Grüße');
+
+Text that comes from outside the program (files, command output,
+sockets, C<@ARGV>) is bytes. Decode it first with
+C<Encode::decode('UTF-8', ...)>; otherwise each byte shows as a
+character of its own, so "ü" shows as two wrong characters:
+
+	use Encode qw(decode);
+
+	chomp( my $hostname = `hostname` );    # bytes
+	$label->text( decode( 'UTF-8', $hostname ) );
+
+Text in a KDL layout file is already a character string and is passed
+to the Text widget as is. The recipe
+L<Show non-ASCII text|Term::Fabulous::Cookbook::GettingStarted/Show non-ASCII text (umlauts, CJK, combining accents)>
+is a complete program.
+
+=head2 Wrapping
+
+The C<wrap_mode> parameter of a Text widget decides where lines break.
+Import the constants from L<Clay::XS>:
+
+=over
+
+=item C<CLAY_TEXT_WRAP_WORDS> (the default)
+
+Breaks at spaces when the text is wider than the room it gets, and at
+every C<"\n">. The first panel of the picture at the start of
+L</TEXT> shows it: a text in a box 24 columns wide, wrapped at spaces.
+
+=item C<CLAY_TEXT_WRAP_NEWLINES>
+
+Breaks only at C<"\n">. The Text is as wide as its longest line: a parent
+with C<fit> sizing grows to it (the second panel in the picture), while
+a line that is wider than a fixed-size parent runs past the parent's
+right edge and is cut off only at the edge of the terminal or of an
+enclosing L<Term::Fabulous::Widget::ScrollBox>.
+
+=item C<CLAY_TEXT_WRAP_NONE>
+
+The same as C<CLAY_TEXT_WRAP_NEWLINES>: C<"\n"> still starts a new
+line, and nothing else does. The layout engine Clay lays out both modes
+alike (it only distinguishes C<CLAY_TEXT_WRAP_WORDS> from the others), so
+use C<CLAY_TEXT_WRAP_NEWLINES>; to show text on one line, remove its
+newlines.
+
+=back
+
+	use Clay::XS qw(CLAY_TEXT_WRAP_NEWLINES);
+
+	my $listing = Term::Fabulous::Widget::Text->new(
+		text       => join( "\n", @lines ),
+		text_color => [ 230, 230, 230, 255 ],
+		wrap_mode  => CLAY_TEXT_WRAP_NEWLINES,
+	);
+
+Only spaces are break points. A word longer than the available width
+is not broken, and neither is text without spaces, such as a Japanese
+sentence: it runs past the right edge of its parent and is cut off only
+at the edge of the terminal or of an enclosing ScrollBox. A tab is not a
+break point either (see L</Control characters>).
+
+In a KDL layout file, write C<wrap_mode newlines> (C<words>,
+C<newlines> or C<none>).
+
+=head2 Alignment
+
+C<text_alignment> aligns each line within the width of the Text widget:
+C<CLAY_TEXT_ALIGN_LEFT> (the default), C<CLAY_TEXT_ALIGN_CENTER> or
+C<CLAY_TEXT_ALIGN_RIGHT>, from L<Clay::XS>.
+
+	use Clay::XS qw(CLAY_TEXT_ALIGN_CENTER);
+
+	my $notice = Term::Fabulous::Widget::Text->new(
+		text           => "Saved.\nThe file was written to disk.",
+		text_color     => [ 230, 230, 230, 255 ],
+		text_alignment => CLAY_TEXT_ALIGN_CENTER,
+	);
+
+The Text widget is as wide as its longest line (or as the room it
+gets, when it wraps), so alignment is visible on text with several
+lines. The picture of L<Term::Fabulous::Widget::Text> shows the same
+wrapped sentence aligned left, centered and aligned right:
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-text.svg" alt="Colored words, a sentence wrapped left-aligned, centered and right-aligned, and text in five scripts"></p>
+
+=end html
+
+To center a single line, or any widget, in a wider box, use the box's
+C<child_alignment> (see
+L<Term::Fabulous::Manual::Layout/Aligning and centering children>). In
+a KDL layout file, write C<text_alignment center> (C<left>, C<center>
+or C<right>). The recipe
+L<Wrap, align and space text|Term::Fabulous::Cookbook::GettingStarted/Wrap, align and space text>
+prints every wrap mode and alignment.
+
+=head2 Line height
+
+C<line_height> is the number of rows each line of text takes, an
+integer. The default, 0, means one row, like 1. With a larger value the
+line is drawn in the middle row of its rows (the upper middle row when
+the number is even), so C<line_height =E<gt> 2> leaves an empty row
+below every line:
+
+	my $spaced = Term::Fabulous::Widget::Text->new(
+		text        => "First line\nSecond line",
+		text_color  => [ 230, 230, 230, 255 ],
+		line_height => 2,
+	);
+
+In a KDL layout file, write C<line_height 2>.
+
+=head2 Bold, italic and underline
+
+The boolean parameters C<bold>, C<italic> and C<underline> draw the
+characters of a Text widget in these styles; they can be combined, and
+they take no space. The terminal draws them with its font, so a font
+without an italic face shows italic text upright.
+
+	my $warning = Term::Fabulous::Widget::Text->new(
+		text       => 'Unsaved changes',
+		text_color => [ 255, 200, 80, 255 ],
+		bold       => 1,
+	);
+	$warning->underline(1);    # shown in the next frame
+
+In a KDL layout file:
+
+=for highlighter language=kdl
+
+	Text {
+		text "Unsaved changes"
+		text_color "#ffc850"
+		bold #true
+		underline #true
+	}
+
+These are the only text styles a Text widget has, and they apply to
+the whole text. For a bold word inside a sentence, a colored phrase or
+reverse video, use a RichText.
+
+=head2 Styled spans inside one text
+
+A L<Term::Fabulous::Widget::RichText> is a Text whose I<spans> give
+ranges of its characters a look of their own: style bits (bold, italic,
+underline, reverse, dim, blink, strike, overline, conceal), a text
+color and a background. The text wraps and aligns exactly like a Text;
+a span simply continues on the next line. The shortest way to write
+one is markup in the syntax of Python's C<rich> library:
+
+	my $hint = Term::Fabulous::Widget::RichText->new(
+		markup => 'Press [bold]Enter[/] to save, [bold #e06c75]Esc[/] to leave.',
+	);
+
+A tag opens a span with a style string, C<[/]> closes the innermost
+open span, C<[/bold]> the matching one, and C<\[> is a literal bracket.
+A style string is words in any order: the bit names above, C<not bold>
+to clear a bit inside an outer span, a color (a CSS name in any case,
+or any color string of L<Term::Fabulous::Color>), C<on COLOR> for the
+background, and C<default> for the terminal's own color. See
+L<Term::Fabulous::Text::Style> for the words and
+L<Term::Fabulous::Text::Markup> for the tags.
+
+Spans can also be given as character ranges, or added later:
+
+	my $line = Term::Fabulous::Widget::RichText->new(
+		text  => 'error: config.kdl not found',
+		spans => [ [ 0, 6, 'bold #e06c75' ] ],
+	);
+	$line->stylize( 'underline', 7, 17 );    # the file name, shown in the next frame
+
+Later spans win where spans overlap, and setting C<text> drops them.
+In a KDL layout file:
+
+=for highlighter language=kdl
+
+	RichText {
+		markup "Press [bold]Enter[/] to save"
+	}
+
+=for highlighter language=perl
+
+The widget's own C<text_color>, C<bold>, C<italic> and C<underline> are
+the base look that the spans change. The program
+F<examples/widgets/rich-text.pl> shows markup, spans, every style word
+and a wrapped paragraph side by side.
+
+=head2 Links inside a text
+
+A RichText can also hold I<links>, ranges of its text that the user
+follows with a click, or with C<Tab>, C<Left>/C<Right> and C<Enter>. The
+widget fires L<LinkActivate|Term::Fabulous::Event::LinkActivate> with
+the link's target and leaves the rest to the program:
+
+	my $help = Term::Fabulous::Widget::RichText->new(
+		markup => 'Read the [link=faq]FAQ[/link] or [link=https://perl.org]perl.org[/link].',
+	);
+	$help->on( LinkActivate => sub ($event) { show_page( $event->link ); return } );
+
+Links are drawn over the spans in the theme's link look: underlined in
+the accent color, highlighted under the pointer and when selected. A
+theme changes the look with the slots C<text.link> (the color of the
+words) and C<text.link.background>, each in the states normal,
+C<hovered> and C<selected>, such as
+C<< 'text.link.selected' => 'text_inverse' >>. See
+L<Term::Fabulous::Widget::RichText/Looks> for the defaults and a
+picture, and
+L<Term::Fabulous::Cookbook::KeyboardAndMouse/Follow links in a text (RichText links)>
+for a program with links in colors of its own.
+
+=head2 Wide characters and emoji
+
+A terminal cell holds one character. Some characters, most CJK
+characters and many emoji, take two cells. Term::Fabulous measures text
+the same way termbox2 draws it (with termbox2's own width tables, see
+L<Term::Fabulous::Unicode>), so wide characters line up as long as the
+locale is UTF-8 and the terminal agrees with termbox2 about each
+character's width. In the picture at the start of L</TEXT>, four lines
+of Latin letters, Japanese, emoji and combining accents all end in the
+same column.
+
+Characters made of several code points (a I<grapheme cluster>), such as
+a letter with a combining accent or a flag, are kept together and take
+the width of the whole cluster: C<"e\x{301}"> (an e and a combining
+acute accent) takes one cell. An emoji presentation selector (U+FE0F),
+a zero-width joiner or a pair of regional indicators makes a cluster two
+cells wide. Use
+L<string_columns|Term::Fabulous::Unicode/string_columns> from
+L<Term::Fabulous::Unicode> to find out
+how many columns a string takes, for example to pad a label:
+
+=for highlighter language=perl
+
+	use Term::Fabulous::Unicode qw(string_columns);
+
+	my $columns = string_columns('日本語');    # 6
+
+=head2 Control characters
+
+Control characters in text are never sent to the terminal, because they
+could move the cursor or change terminal settings. A tab becomes one
+space; every other control character (U+0000 to U+001F except tab and
+newline, U+007F to U+009F) is shown as U+FFFD, the replacement
+character. That includes a carriage return: remove the C<"\r"> of
+Windows line ends (C<s/\r\n/\n/g>) before you show such text. In Text
+widgets, a newline starts a new line, as described in L</Wrapping>.
+The last line of the picture at the start of L</TEXT> shows a tab, a
+bell character and an escape sequence. See
+L<Term::Fabulous::Unicode/sanitize_text> for the exact rules.
+
+=head2 Font parameters
+
+The parameters C<font_id>, C<font_size> and C<letter_spacing> exist
+because L<Clay::UI::Text> supports graphical fonts. They have no effect
+in a terminal, where every character is drawn in the terminal's font.
+
+=head1 COLORS
+
+Colors are red, green, blue and alpha (opacity) channels, each from 0 to
+255. Term::Fabulous always draws with 24-bit colors.
+
+=head2 Color formats
+
+Every color a widget takes, and every color argument of the canvas
+drawing methods, accepts the same formats: anything
+C<< Term::Fabulous::Color->new( color => ... ) >> accepts.
+
+=over
+
+=item Perl code
+
+=for highlighter language=text
+
+	Format                   Example                          Alpha
+	-----------------------  -------------------------------  ---------------
+	hex string               '#ff8800' or 'ff8800'            255
+	hex string with alpha    '#ff880080'                      the last pair
+	rgb() string             'rgb(255, 136, 0)'               255
+	rgba() string            'rgba(255, 136, 0, 0.5)'         the 4th value
+	hsl() string             'hsl(32, 100%, 50%)'             255
+	hsla() string            'hsla(32, 100%, 50%, 50%)'       the 4th value
+	web color name           'DarkOrange' or 'darkorange'     255
+	array reference          [ 255, 136, 0 ] or [ ..., 128 ]  255 or the 4th
+	hash reference           { r => 255, g => 136, b => 0 }   255 or a/alpha
+	packed integer           0xFF8800                         255
+	Term::Fabulous::Color    Term::Fabulous::Color->hex(...)  its alpha
+	named color (WebColor)   WebColor->DarkOrange             255
+
+A hash takes either the keys C<r>, C<g>, C<b> (and C<a>) or C<red>,
+C<green>, C<blue> (and C<alpha>). The alpha of C<rgba()> and C<hsla()>
+can be a channel value (C<128>), a fraction with a decimal point
+(C<0.5>) or a percentage (C<50%>); see L<Term::Fabulous::Color/new> for
+all rules. A web color name is one of the 148 CSS named colors, in any
+case (L<Term::Fabulous::Color/A string> has the grammar,
+L<Term::Fabulous::Enum::WebColor/COLORS> the names). Three-digit hex
+(C<'#f80'>) is not accepted. An invalid color dies with the name of the
+parameter:
+
+	Term::Fabulous::Widget::Box: background_color must be a color, got 'redd' (unrecognized color string 'redd')
+
+Colors in some of these formats:
+
+=for highlighter language=perl
+
+	use Term::Fabulous::Enum::WebColor;
+
+	my $box = Term::Fabulous::Widget::Box->new(
+		background_color => '#14192b',
+		border_color     => Term::Fabulous::Enum::WebColor->SteelBlue,    # or 'SteelBlue'
+	);
+	my $text = Term::Fabulous::Widget::Text->new( text => 'Hello', text_color => 'hsl(210, 20%, 90%)' );
+
+The widgets store their colors as an array reference C<[r, g, b, a]>,
+whatever format was given, and their accessors return that array:
+C<< $box->background_color >> returns C<[20, 25, 43, 255]> above.
+
+=item KDL layout files
+
+Every property whose name ends in C<_color>, and the C<color> of a
+C<border> node, takes a string in any of the string formats above:
+
+=for highlighter language=kdl
+
+	background_color "#14192b"
+	text_color "rgb(220, 220, 220)"
+	border color="hsl(210, 80%, 60%)"
+	text_color "SteelBlue"
+
+The L<table of named colors|Term::Fabulous::Enum::WebColor/COLORS>
+lists the web color names.
+
+=back
+
+The program F<examples/colors.pl> shows one orange in six formats, the
+color functions of L</Working with colors>, red backgrounds with less
+and less alpha, and the terminal's default text color:
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-colors.svg" alt="Six orange swatches written in different formats; a blue darkened, lightened and blended with white in steps; red swatches with alpha 255, 192, 128, 64 and 0 over a light panel; a line in the terminal's default text color"></p>
+
+=end html
+
+=head2 Named colors
+
+L<Term::Fabulous::Enum::WebColor> has the 148 named colors of CSS as
+L<Term::Fabulous::Color> objects. Give one, or its name as a string in
+any case (C<'MidnightBlue'>, C<'midnightblue'>), wherever a color is
+expected, or derive new colors from it:
+
+=for highlighter language=perl
+
+	use Term::Fabulous::Enum::WebColor;
+
+	my $box = Term::Fabulous::Widget::Box->new( background_color => Term::Fabulous::Enum::WebColor->MidnightBlue );
+	my $same = Term::Fabulous::Widget::Box->new( background_color => 'MidnightBlue' );
+	my $by_name = Term::Fabulous::Enum::WebColor->from_name('Tomato');    # undef for unknown names
+
+F<examples/web-colors.pl> shows all of them; see the picture on
+L<Term::Fabulous::Enum::WebColor>.
+
+=head2 Alpha and the terminal default color
+
+Alpha has three meanings:
+
+=over
+
+=item Alpha 0
+
+"No color": the terminal's default color is used (the color the
+terminal shows when a program sets none). A box with
+C<background_color =E<gt> [0, 0, 0, 0]>, or without a background color,
+paints no background, so whatever is behind it shows, text and borders
+included. A C<text_color> or C<border_color> with alpha 0 draws in the
+terminal's default text color.
+
+=item Alpha 255
+
+The color is drawn opaque.
+
+=item Alpha 1 to 254
+
+Translucent. A C<background_color> with such an alpha is blended, cell
+by cell, with whatever was drawn below the widget, like a sheet of
+tinted glass: C<[0, 0, 0, 128]> dims the area below to half its
+brightness. What happens to the text and borders below is up to the
+widget's L<glyphs_show_through|Term::Fabulous::Widget/glyphs_show_through>.
+Off, the default, covers them with spaces in the blended color. On,
+they stay visible through the background, with their colors tinted the
+same way, until the widget draws its own content over them.
+
+Only backgrounds are blended. Text colors, border colors, the colors of
+the input widgets and the cell colors of a canvas with such an alpha
+are drawn opaque.
+
+=back
+
+	my $dimmer = Term::Fabulous::Widget::Box->new(
+		background_color    => [ 0, 0, 0, 128 ],    # half-transparent black
+		glyphs_show_through => 1,                   # the text below stays readable
+	);
+
+In a KDL layout file: C<background_color "rgba(0, 0, 0, 0.5)"> and
+C<glyphs_show_through #true>.
+
+The terminal default color cannot be blended, because only the terminal
+knows which color it shows for it. Where the color below a translucent
+background is the default, the background is drawn opaque, and a glyph
+showing through with the default text color keeps it.
+F<examples/translucency.pl> shows all of this, with translucent boxes
+orbiting over a screen of text:
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-translucency.svg" alt="A green, a red and a blue translucent box over a screen of text; the text shows through the green and the blue one"></p>
+
+=end html
+
+Black is a real color: C<[0, 0, 0, 255]> is drawn as black, not as the
+terminal's default.
+
+=head2 Working with colors
+
+L<Term::Fabulous::Color> parses colors and derives new ones, which is
+useful for themes. Colors are immutable; every method returns a new
+object.
+
+	use Term::Fabulous::Color;
+
+	my $accent  = Term::Fabulous::Color->hex('#3b82f6');
+	my $hover   = $accent->lighten(0.1);                                     # 10 percentage points lighter
+	my $pressed = $accent->darken(0.1);                                      # 10 percentage points darker
+	my $muted   = $accent->blend( Term::Fabulous::Color->rgb( 128, 128, 128 ), 0.5 );    # halfway to gray
+	my $glass   = $accent->with_alpha(128);                                  # translucent
+
+	$box->background_color($hover);
+	my ( $r, $g, $b, $a ) = $pressed->to_rgba;
+	my $hex = $muted->hexString;                                             # '#5e81bbff'
+
+The other constructors are C<rgb>, C<rgba>, C<hsl> and C<hsla>; the
+other methods read channels (C<red>, C<to_hsl>, C<rgb_int>, ...) and
+write ANSI escape sequences (C<ansi>, C<fg_sgr>, ...). See
+L<Term::Fabulous::Color> for all of them. To color every widget at
+once, and to switch all the colors at run time, use a theme
+(L</THEMES>).
+
+=head1 BORDERS
+
+Every widget except L<Term::Fabulous::Widget::Text> can have a border:
+boxes, buttons, scroll boxes, dialogs, toasts, canvases, charts, the
+input widgets, accordions, progress bars, spinners and images. (A table draws its frame and its lines itself; see
+L<Term::Fabulous::Manual::TableStyles/Lines between and around the cells>.)
+Three parameters control it:
+
+=over
+
+=item C<bordered>
+
+Which sides have a border: a true value for all four sides, or a hash
+reference such as C<< { left =E<gt> 1, top =E<gt> 1 } >> for some of
+them (the sides it leaves out have none). Without it, the theme
+decides for the widget's family: the built-in themes give dialogs,
+toasts and menus a border and no other widget. See
+L</Borders and space> and
+L</Borders from the theme>.
+
+=item C<border_style>
+
+A L<Term::Fabulous::Enum::BorderStyle> item, or its name such as
+C<'Round'>, that decides the characters of all four sides;
+C<border_style_top>, C<border_style_right>, C<border_style_bottom> and
+C<border_style_left> set one side each. See
+L</Border styles> and L</Use a different border style on each side>.
+
+=item C<border_color>
+
+The color of the border characters, in the formats described in
+L</Color formats>. Without one, the border is drawn in the theme's
+border color (the C<border> token of the built-in themes).
+
+=back
+
+	use Term::Fabulous::Enum::BorderStyle;
+
+	my $panel = Term::Fabulous::Widget::Box->new(
+		bordered     => 1,
+		border_style => Term::Fabulous::Enum::BorderStyle->Round,
+		border_color => [ 120, 170, 255, 255 ],
+	);
+
+In a KDL layout file, the style and the color are attributes of the
+C<border> node, and C<bordered> is a property of its own:
+
+=for highlighter language=kdl
+
+	Box "panel" {
+		border style=Round color="#78aaff"
+		bordered #true
+	}
+
+A border needs C<bordered> (or the theme's C<border.enabled>): a style
+or a color alone draws nothing. A side with a border but no style
+takes the style the theme gives the widget's family, C<Round> for
+every family in the built-in themes; a theme that sets a family's
+style to C<none> has such a side drawn with spaces (the C<Blank>
+style).
+
+=head2 Border styles
+
+L<Term::Fabulous::Enum::BorderStyle> has 20 styles: C<Ascii>,
+C<Blank>, C<Block>, C<DarkShade>, C<Dashed>, C<Double>, C<Heavy>,
+C<Hidden>, C<Hkey>, C<Inner>, C<LightShade>, C<MediumShade>, C<Outer>,
+C<Panel>, C<Round>, C<Solid>, C<Tall>, C<Thick>, C<Vkey> and C<Wide>.
+Each is a class method that returns the style object; to look one up by
+name (for example from a configuration file), use C<from_name>:
+
+=for highlighter language=perl
+
+	my $style = Term::Fabulous::Enum::BorderStyle->from_name('Double')
+		// die "unknown border style\n";
+
+C<Hidden> switches a side off: it draws nothing and takes no space,
+whatever C<bordered> says. Some styles (C<Block>, C<Panel>, C<Tall>, C<Wide>,
+C<Inner>) draw half of their characters on the background outside the
+widget, so that the border blends into the parent; they look best when
+the widget and its parent have different background colors.
+F<examples/border-showcase.pl> shows all styles:
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-border-showcase.svg" alt="Twenty boxes, one in each border style, labeled with the style's name"></p>
+
+=end html
+
+=head2 Use a different border style on each side
+
+The four side parameters set the style of one side each. A side
+parameter wins over C<border_style> for its side, also when both are
+given to C<new>; C<border_style> fills the sides that have no style of
+their own. The side accessors change one side afterwards:
+
+	my $card = Term::Fabulous::Widget::Box->new(
+		bordered          => 1,
+		border_style      => Term::Fabulous::Enum::BorderStyle->Solid,    # all four sides ...
+		border_style_left => Term::Fabulous::Enum::BorderStyle->Thick,    # ... except the left one
+	);
+	$card->border_style_top( Term::Fabulous::Enum::BorderStyle->Double );    # then change the top
+
+In a KDL layout file, the side styles are the attributes C<style-top>,
+C<style-right>, C<style-bottom> and C<style-left> of the C<border> node:
+
+=for highlighter language=kdl
+
+	border style=Solid style-left=Thick style-top=Double
+
+The top and bottom sides own the corners: where the top or bottom row
+meets a drawn left or right side, the corner glyph comes from the style
+of the top or bottom side. There is no C<border_style> accessor; to
+change all four sides, call the four side accessors. The recipe
+L<Use a different border style on each side|Term::Fabulous::Cookbook::Layout/Use a different border style on each side> is a
+complete program.
+
+=head2 Borders and space
+
+A border is one line of characters on each side that has one, drawn on
+the outermost cells of the widget, inside its box, and it takes room in
+the layout: Term::Fabulous adds a cell to the padding of every side
+with a border, so the content always starts inside the border, and the
+C<padding> of the widget's C<layout> is extra room between the border
+and the content. A widget with C<fit> sizing grows by the border. See
+also L<Term::Fabulous::Manual::Layout/Borders take space>.
+
+C<bordered> takes one true or false value for all four sides, or a hash with any of the keys C<left>, C<right>, C<top> and
+C<bottom> and true or false values: a side the hash leaves out has no
+border, and an unknown key dies. A side with the C<Hidden> style takes
+no space, even where the widget has a border, so the content reaches
+that edge of the widget; use it to switch off one side of a border the
+theme gives all four sides.
+
+=for highlighter language=perl
+
+	my $rule = Term::Fabulous::Widget::Box->new(    # a line above and at the left only
+		bordered     => { left => 1, top => 1 },
+		border_style => Term::Fabulous::Enum::BorderStyle->Solid,
+	);
+
+In a KDL layout file: C<bordered left=#true top=#true>.
+
+F<examples/border-options.pl> shows a border on two sides, per-side
+styles, a border with a cell of padding inside, a C<Hidden> side and
+the two parameters of L</Joining borders>:
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-border-options.svg" alt="Six bordered panels: a border on the left and top only; a solid border with a double top and a thick left side; a round border with a cell of padding inside; a round border with a hidden bottom side; a title box and a body box sharing one line; a round border drawn on the parent's background"></p>
+
+=end html
+
+=head2 Border colors
+
+The characters of a border are drawn in the C<border_color>. Their
+background is usually the widget's own background. Some styles use the
+background just outside the widget, or reverse video, for some
+characters so that the border blends with its surroundings; the
+L<location codes|Term::Fabulous::Enum::BorderStyle/locations> of the
+border styles say which. Change the color like any other color:
+
+	$panel->border_color('#ff5050');    # shown in the next frame
+
+A widget that was given no C<border_color> or no C<border_style> takes
+them from the theme, where the theme has them for the widget's family
+(a button, a dialog, a toast, ...); see L</THEMES>. The built-in
+themes draw the border of a Box in their C<border> token and in the
+C<Round> style, so a Box given C<bordered> alone gets a round frame.
+
+=head2 Borders from the theme
+
+A widget that is not given C<bordered> has a border when the theme's
+C<border.enabled> says so for its family. The built-in themes give
+dialogs, toasts and menus a border and no other widget. A theme can
+give one to buttons, to the inputs in three families that are set one
+by one (C<input> for check boxes, radio buttons, sliders, star ratings
+and segmented controls, C<text_input> for text fields and text areas,
+and C<dropdown>), to menu bars, and to accordions, progress bars,
+spinners and images. A theme can also take the border away from menus.
+This theme file frames every text field and text area:
+
+=for highlighter language=kdl
+
+	text_input {
+		border enabled=#true
+	}
+
+The C<box> family (plain boxes, scroll boxes, canvases, charts and every
+widget that names no family of its own) has no C<border.enabled>,
+because widgets build their parts out of boxes; nor do tab bars,
+scrollbars and dividers, which draw lines of their own, or status bars
+and document tabs (the C<document_tabs> family), which are one row
+high. These widgets
+have a border only when the program gives them one. A table draws its
+frame itself. C<bordered> given to a widget wins over the theme,
+C<< bordered =E<gt> 0 >> included, and C<< reset_look('bordered') >>
+returns it to the theme. See L<Term::Fabulous::Theme/Borders>.
+
+=head2 Joining borders
+
+Two more parameters let a border join the lines around it. Both are set
+in Perl code only; KDL layout files have no property for them.
+
+=over
+
+=item C<border_corners>
+
+Replaces the glyph of any corner, for example C<├> instead of C<┌>
+where a line comes in from above. The class method
+L<junction|Term::Fabulous::Enum::BorderStyle/junction> of
+L<Term::Fabulous::Enum::BorderStyle> returns the glyph where
+lines of given styles meet: a line, a corner, a T or a cross, also
+where lines of different styles meet (a light line into a heavy one).
+
+=item C<outer_border_sides>
+
+Draws some sides on the background just outside the widget instead of
+the widget's own, so the border looks like part of its surroundings and
+a colored widget starts inside it (the last panel in the picture of
+L</Borders and space>).
+
+=back
+
+This box sits directly below a box that has a border on its left, right
+and top sides; its top corners join the side lines of the upper box, so
+the two boxes share one line (the middle panel of the second row in the
+picture of L</Borders and space>):
+
+	my $solid = Term::Fabulous::Enum::BorderStyle->Solid;
+	my $body  = Term::Fabulous::Widget::Box->new(
+		bordered       => 1,
+		border_style   => $solid,
+		border_corners => {
+			top_left  => Term::Fabulous::Enum::BorderStyle->junction( up => $solid, right => $solid, down => $solid ),    # ├
+			top_right => Term::Fabulous::Enum::BorderStyle->junction( up => $solid, left  => $solid, down => $solid ),    # ┤
+		},
+	);
+
+L<Term::Fabulous::Widget::Table> draws its grid lines this way. See
+L<Term::Fabulous::Role::HasBorderStyle> for the exact rules.
+
+=head1 THEMES
+
+A I<theme> decides the colors and the borders of every widget that does
+not set them itself: the text color of a Text, the background of a text
+field, the border color of a focused button, whether a text field has a
+border at all, the lines of a table. Term::Fabulous comes with two
+themes, C<dark> (the colors the pictures on these pages show) and
+C<light>. A theme also decides the background of the screen: every frame
+first paints the whole screen in the theme's C<background> token, so a
+theme looks the same on any terminal, and C<light> is readable on a dark
+one. A theme is set per UI and can be switched at any time:
+
+	my $ui = Term::Fabulous->new( root => $root, width => 80, height => 24, theme => 'light' );
+	$ui->theme('dark');    # every widget takes the new colors in the next frame
+
+L<Term::Fabulous::Static> takes the same parameter, but paints no
+screen background: its lines go into whatever the terminal shows.
+Without a theme, a UI uses C<dark>. The program F<examples/themes.pl>
+shows the same panel under both built-in themes and under the theme
+files in F<examples/themes/> (F2 switches); here under C<light> and
+under the C<ocean> theme file:
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-themes-light.svg" alt="The panel in the light theme: dark text on a near-white screen, a white text field holding Ada, a checked check box, a blue progress bar at 65 percent, a Save button and a Cancel button with a red border"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-themes-ocean.svg" alt="The panel in the ocean theme: teal accents on a deep blue screen, a text field holding Ada, a checked check box, a progress bar at 65 percent, a Save button in the accent and a Cancel button with a red border"></p>
+
+=end html
+
+=head2 What a theme colors
+
+A theme has two layers. The I<palette> is a set of named colors, the
+I<tokens>: C<background>, C<surface>, C<border>, C<text>,
+C<text_muted>, C<accent>, C<focus_background>, C<success>, C<warning>,
+C<danger> and some twenty more (the full list is in
+L<Term::Fabulous::Theme/Tokens>). C<background> is the screen itself:
+a theme that wants the terminal's own background gives it a color
+with alpha 0 (see L</Alpha and the terminal default color>). Above
+it, every kind of widget, a
+I<family>, has I<slots>, one for each part the theme decides: a
+button has C<background>, C<border.color>, C<border.style>,
+C<border.enabled> (whether it has a border, see
+L</Borders from the theme>) and C<text>; an input has C<text>, C<accent>, C<placeholder>, C<selection>
+and more; a table has C<header.background>, C<cursor>, C<line.color>,
+... Each slot defaults to a token, so a theme that changes the
+C<accent> token changes the focus borders, the check marks, the
+scrollbar thumbs and the group headers of tables at once, while a
+theme that sets C<button.border.color> changes buttons only.
+
+A slot can have a different value in a I<state> of the widget:
+C<hovered>, C<focused>, C<pressed>, C<disabled>, C<selected>,
+C<active> or C<invalid>, where the widget shows such a state.
+C<button.border.color> in the C<focused> state is the accent by
+default, C<input.text> and C<input.border.color> in the C<invalid>
+state are the C<danger> token; a state a theme does not set looks like
+the normal state.
+L<Term::Fabulous::Theme/Families, slots and states> lists every
+family with its slots and their states, and the parameter of each
+widget class says which slot it reads (for example
+L<Term::Fabulous::Widget::Button/new>).
+
+=head2 Your own colors win
+
+A color, a border style or C<bordered> given to a widget, in C<new>,
+through an accessor or in a layout file, stays whatever the theme
+says. So a
+program that colors its widgets as the earlier sections describe
+looks the same under every theme, and a program that leaves the
+colors to the theme follows it. The reader of a themed parameter
+returns the color in use, the given one or the theme's. To return a
+given color to the theme, call L<Term::Fabulous::Widget/reset_look>
+with the parameter's name:
+
+	$button->border_color('#ff5050');    # red under every theme
+	$button->reset_look('border_color');  # the theme's again
+
+C<undef> is not the way back: most color accessors die for it, with a
+message that names C<reset_look> (C<undef> switches a look off where a
+widget allows that, such as a button's C<focus_border_color>).
+C<reset_look> also takes the looks a widget hands to its parts: the
+colors of a L<Term::Fabulous::Widget::Tabs> (kept by its bar) and the
+scrollbar colors of a L<Term::Fabulous::Widget::ScrollBox> (kept by
+both scrollbars).
+
+Only the colors, the border styles and whether a widget has a border
+are themed. Layout, text and the
+glyphs of a widget (the marks of a check box, the frames of a
+spinner) are the widget's own.
+
+=head2 Variants and classes
+
+A theme may define I<variants> of a family, named after the classes a
+widget can be given (L<Term::Fabulous::Widget/classes>): a button with
+C<< classes => ['primary'] >> draws with the C<primary> variant of the
+C<button> family where the theme has one, and like every other button
+where it has none. A variant sets any slots and states of its family;
+the rest stay the family's. A widget with several classes takes the
+variants of all of them, later classes winning where two set the same
+slot. The classes can be changed at run time
+(C<< $button->classes(['primary', 'wide']) >>), and a layout file
+sets them with C<classes "primary" "wide">. Text widgets have
+classes too, so a theme can define C<text.muted> or C<text.heading>.
+
+=head2 Theme files
+
+A theme is a KDL file (L<https://kdl.dev>, the language of the layout
+files) with a C<theme> node that names the theme and the built-in
+theme it starts from, a C<palette> node, and one node per family. In
+a family node, C<name "value"> sets a slot (a token name or any color
+string), C<border style=Round color="border"> sets C<border.style>
+and C<border.color> at once, a node named after a state holds the
+slots of that state, and C<variant "NAME"> holds a variant:
+
+=for highlighter language=kdl
+
+	theme "ocean" extends="dark"
+
+	palette {
+		background "#0b1a24"
+		accent "#5fd3c0"
+		surface "#10242f"
+		text "#d8e8ee"
+	}
+
+	button {
+		border style=Round
+		focused { border color="accent" }
+		variant "primary" {
+			border color="accent"
+			text "accent"
+		}
+	}
+
+	divider {
+		line style=Double
+	}
+
+C<none> switches a color or a style off, and C<reverse> (for
+C<button.background> in the C<pressed> state) draws the button in
+reverse video. A few slots cannot be switched off, because their
+widget draws with the value, such as the scrollbar's C<track> and
+C<thumb> and the tab bar's C<line style>, which also needs a style
+with joints; L<Term::Fabulous::Theme/Values> lists them. Unknown
+tokens, families, slots, states and styles die with the known names,
+and so does C<none> for such a slot, or a token or slot set twice. The program loads the file and gives the theme
+to the UI:
+
+=for highlighter language=perl
+
+	use Term::Fabulous::Theme;
+
+	my $ocean = Term::Fabulous::Theme->from_file('ocean.kdl');
+	my $ui    = Term::Fabulous->new( root => $root, width => 80, height => 24, theme => $ocean );
+
+F<examples/themes/ocean.kdl> is a complete theme file (F<examples/themes/>
+holds three more: C<nord>, C<dracula> and C<solarized-light>), and the recipe
+L<Switch themes at run time|Term::Fabulous::Cookbook::Layout/Switch themes at run time (built-in themes and a theme file)>
+a complete program. The grammar is described in
+L<Term::Fabulous::Theme/THEME FILES>.
+
+=head2 The theme editor
+
+The distribution comes with a program to make and change theme files:
+C<fabulous-theme-editor>. It opens theme files in tabs, shows a widget
+of every family (or the screens of your program) in the theme you edit,
+and lists every setting with its value and where the value comes from;
+a change in the form or in the text of the file shows at once, and
+every change can be undone. A mistake in the text is shown with its
+line.
+
+=for highlighter language=text
+
+	fabulous-theme-editor examples/themes/ocean.kdl
+
+=for highlighter language=perl
+
+L<Term::Fabulous::ThemeEditor> describes the editor and how to start it
+from Perl, for example with a preview of your own program's screens
+(the recipe
+L<Design a theme against your own screen|Term::Fabulous::Cookbook::Layout/Design a theme against your own screen (the theme editor)>).
+To check theme files or change them from a script, with their lines
+and comments kept, use L<Term::Fabulous::Theme::Document>.
+
+=head2 Themes in Perl
+
+A theme can be built in Perl as well, with the same parts: the theme
+it extends, palette tokens, slots (under C<family.slot> or
+C<family.slot.state> keys) and variants:
+
+	my $theme = Term::Fabulous::Theme->new(
+		name     => 'ocean',
+		extends  => 'dark',
+		palette  => { accent => '#5fd3c0', surface => '#10242f' },
+		slots    => { 'button.border.style' => 'Round', 'button.border.color.focused' => 'accent' },
+		variants => { 'button.primary' => { 'border.color' => 'accent', text => 'accent' } },
+	);
+
+A theme may extend another theme object, so a program can derive a
+variation of a theme it loaded. L<Term::Fabulous::Color> helps with
+the colors (L</Working with colors>): C<< $accent->lighten(0.1) >> is
+a color like any other. See L<Term::Fabulous::Theme/CONSTRUCTORS>.
+
+=head2 Widgets of your own
+
+A widget class of your own inherits the family of its base class, so
+a widget derived from L<Term::Fabulous::Widget::Input> draws with the
+C<input> slots, and declares which of its parameters the theme
+supplies. L<Term::Fabulous::Manual::CustomWidgets/Colors from the theme>
+explains it, and L<Term::Fabulous::Role::Themed> is the reference.
+
+=head1 SEE ALSO
+
+This page is part of L<Term::Fabulous::Manual>. Previous page: L<Term::Fabulous::Manual::Layout>. Next page: L<Term::Fabulous::Manual::Events>.
+
+L<Term::Fabulous::Widget::Text>, L<Term::Fabulous::Color>,
+L<Term::Fabulous::Enum::WebColor>, L<Term::Fabulous::Enum::BorderStyle>,
+L<Term::Fabulous::Role::HasBorderStyle>, L<Term::Fabulous::Theme>,
+L<Term::Fabulous::Role::Themed>, L<Term::Fabulous::Unicode>,
+L<Term::Fabulous::Cookbook::GettingStarted>,
+L<Term::Fabulous::Cookbook::Layout>.
+
+=cut

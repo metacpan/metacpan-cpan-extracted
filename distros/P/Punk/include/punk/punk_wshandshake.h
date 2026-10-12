@@ -105,17 +105,28 @@ static const char *pw_env(pTHX_ HV *env, const char *k, STRLEN *len) {
     *len = 0; return "";
 }
 
-/* case-insensitive substring test (needle is already lowercase) */
+/* Is `needle` (already lowercase) one of the comma-separated tokens of a
+ * header value, compared without case? A token, not a substring:
+ * `Upgrade: notwebsocket` is not an upgrade to websocket. A protocol may
+ * carry a version after a slash, which is still that protocol. */
 static int pw_ci_has(const char *hay, STRLEN hlen, const char *needle) {
-    STRLEN nl = strlen(needle), i, j;
+    STRLEN nl = strlen(needle), i = 0;
     if (nl == 0) return 1;
-    for (i = 0; i + nl <= hlen; i++) {
+    while (i < hlen) {
+        STRLEN s, e, j;
+        while (i < hlen && (hay[i] == ' ' || hay[i] == '\t' || hay[i] == ','))
+            i++;
+        s = i;
+        while (i < hlen && hay[i] != ',') i++;
+        e = i;
+        while (e > s && (hay[e - 1] == ' ' || hay[e - 1] == '\t')) e--;
+        if (e - s < nl) continue;
         for (j = 0; j < nl; j++) {
-            char ch = hay[i + j];
+            char ch = hay[s + j];
             if (ch >= 'A' && ch <= 'Z') ch = (char)(ch + 32);
             if (ch != needle[j]) break;
         }
-        if (j == nl) return 1;
+        if (j == nl && (e - s == nl || hay[s + nl] == '/')) return 1;
     }
     return 0;
 }

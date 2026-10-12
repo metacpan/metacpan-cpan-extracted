@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Future::AsyncAwait" => 0,
     "Gzip::Faster" => 0,
+    "HTML::Entities" => 0,
     "IO::Async::SSL" => 0,
     "Net::Async::HTTP" => 0,
     "PAGI::Tools" => "0.002002",
@@ -27,7 +28,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test2::V0" => "1.302204"
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,6 +38,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Future::AsyncAwait" => 0,
   "Gzip::Faster" => 0,
+  "HTML::Entities" => 0,
   "IO::Async::SSL" => 0,
   "Net::Async::HTTP" => 0,
   "PAGI::Tools" => "0.002002",

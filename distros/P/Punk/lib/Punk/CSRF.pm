@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.55';
+our $VERSION = '0.57';
 
 1;
 
@@ -108,7 +108,9 @@ collide because each is the natural word in its own context, and renaming
 this one would break every application that sets it.
 
 =item * C<exempt> - path prefixes that skip the check, for endpoints
-authenticated another way (a payment provider's webhook).
+authenticated another way (a payment provider's webhook). A prefix matches
+whole segments: C</hooks> covers C</hooks> and C</hooks/stripe> and not
+C</hooksadmin>.
 
 =item * C<on_error> - called with the context instead of the default C<403>;
 return a response.
@@ -135,12 +137,16 @@ opens every websocket
 this way once the server has advertised the setting, so a CSRF refusal here
 would refuse them all.
 
-A request carrying an C<Authorization> header is skipped: it is authenticated
-by something the browser does not attach automatically, so it is not a CSRF
-target. Cookie-authenticated API calls are still checked.
+A request carrying an C<Authorization> header is skipped when a script had to
+attach it, a C<Bearer> token being the usual case: it is authenticated by
+something the browser does not send by itself, so it is not a CSRF target.
+C<Basic>, C<Digest>, C<Negotiate> and C<NTLM> are not skipped, because a
+browser that holds those credentials does send them by itself, cross-site,
+exactly as it does a cookie. Cookie-authenticated API calls are still checked.
 
-The token is looked for in the header first, then the form field. Comparison
-is constant time.
+The token is looked for in the header first, then the form field of a
+urlencoded body. It is never read from the query string, where it would be
+copied into access logs and C<Referer> headers. Comparison is constant time.
 
 =head1 CONTEXT METHODS
 

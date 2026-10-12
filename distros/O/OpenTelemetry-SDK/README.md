@@ -77,7 +77,7 @@ use OpenTelemetry::SDK;
 # You can also use instrumentation libraries to automatically enable telemetry
 # for specific code:
 #
-# use OpenTelemetry::Integration 'HTTP::Tiny';
+# use OpenTelemetry::Instrumentation 'HTTP::Tiny';
 #
 # Or configure the SDK programmatically, if your use case requires it:
 #

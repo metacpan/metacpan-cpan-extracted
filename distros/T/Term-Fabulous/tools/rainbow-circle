@@ -1,0 +1,87 @@
+#!/usr/bin/env perl
+
+# Draws the example picture examples/images/rainbow_circle.png: a 16x16
+# circle of six concentric rainbow bands, red outside and violet in the
+# middle. The bands blend into each other, the outer edge is hard: every
+# pixel averages SUBSAMPLES x SUBSAMPLES points in linear light, counting
+# only the points inside the circle, and is opaque exactly when its
+# center is inside it. Needs Imager with PNG support.
+#
+#     perl tools/rainbow-circle                    # writes examples/images/rainbow_circle.png
+#     perl tools/rainbow-circle --output FILE.png
+#
+# See tools/README.md.
+#
+# Copyright (C) 2026 davenonymous.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the same terms as Perl itself.
+
+use v5.32;
+use warnings;
+use feature 'signatures';
+no warnings 'experimental::signatures';
+
+use FindBin;
+use Getopt::Long qw(GetOptions);
+use Imager;
+
+use constant SIZE       => 16;
+use constant SUBSAMPLES => 16;
+
+# Outside in. rainbow_circle reverses them, so that the index of a band
+# is its distance from the center in band widths.
+my @BANDS = ( [ 228, 3, 3 ], [ 255, 140, 0 ], [ 255, 237, 0 ], [ 0, 128, 38 ], [ 0, 77, 255 ], [ 117, 7, 135 ] );
+
+sub to_linear ($channel) {
+	my $value = $channel / 255;
+	return $value <= 0.04045 ? $value / 12.92 : ( ( $value + 0.055 ) / 1.055 )**2.4;
+}
+
+sub to_srgb ($linear) {
+	my $value = $linear <= 0.0031308 ? 12.92 * $linear : 1.055 * $linear**( 1 / 2.4 ) - 0.055;
+	return int( 255 * $value + 0.5 );
+}
+
+sub distance_from_center ( $x, $y ) {
+	my $center = SIZE / 2;
+	return sqrt( ( $x - $center )**2 + ( $y - $center )**2 );
+}
+
+# The color of the pixel at ($x, $y), or undef outside the circle.
+sub pixel_color ( $x, $y, $linear_bands ) {
+	my $radius = SIZE / 2;
+	return undef if distance_from_center( $x + 0.5, $y + 0.5 ) >= $radius;
+
+	my $band_width = $radius / @$linear_bands;
+	my ( @sum, $count );
+	foreach my $sub_y ( 0 .. SUBSAMPLES - 1 ) {
+		foreach my $sub_x ( 0 .. SUBSAMPLES - 1 ) {
+			my $distance = distance_from_center( $x + ( $sub_x + 0.5 ) / SUBSAMPLES, $y + ( $sub_y + 0.5 ) / SUBSAMPLES );
+			next if $distance >= $radius;
+			my $band = $linear_bands->[ int( $distance / $band_width ) ];
+			$sum[$_] += $band->[$_] foreach 0 .. 2;
+			$count++;
+		}
+	}
+	return [ ( map { to_srgb( $sum[$_] / $count ) } 0 .. 2 ), 255 ];
+}
+
+sub rainbow_circle () {
+	my @linear_bands = reverse map {
+		[ map { to_linear($_) } @$_ ]
+	} @BANDS;
+	my $image = Imager->new( xsize => SIZE, ysize => SIZE, channels => 4 );
+	foreach my $y ( 0 .. SIZE - 1 ) {
+		foreach my $x ( 0 .. SIZE - 1 ) {
+			my $color = pixel_color( $x, $y, \@linear_bands ) // next;
+			$image->setpixel( x => $x, y => $y, color => $color );
+		}
+	}
+	return $image;
+}
+
+GetOptions( 'output=s' => \my $output ) or die "usage: tools/rainbow-circle [--output FILE.png]\n";
+$output //= "$FindBin::Bin/../examples/images/rainbow_circle.png";
+rainbow_circle()->write( file => $output, type => 'png' ) or die "rainbow-circle: cannot write $output: " . Imager->errstr . "\n";
+say "rainbow-circle: wrote $output";

@@ -13,7 +13,7 @@ use Unblock::HTTP3::_Native ();
 use Unblock::HTTP3::Transaction ();
 use Net::QUIC::Connection ();
 
-our $VERSION = '0.03';
+our $VERSION = '0.12';
 
 my $H3_DATAGRAM_ERROR = 0x33;
 my $H3_CLOSED_CRITICAL_STREAM = 0x0104;
@@ -831,7 +831,7 @@ sub _assert_request_semantics {
         authority   => $request->authority,
         target      => $request->target,
         protocol    => $request->protocol,
-        host_values => $request->header_values('host'),
+        host_values => _message_header_values($request, 'host'),
     );
 
     croak "$operation: $error"
@@ -902,16 +902,6 @@ sub _serialize_origins {
     return $payload;
 }
 
-sub client {
-    my ($class, %args) = @_;
-    return $class->_new('client', %args);
-}
-
-sub server {
-    my ($class, %args) = @_;
-    return $class->_new('server', %args);
-}
-
 sub _new {
     my ($class, $role, %args) = @_;
 
@@ -977,6 +967,18 @@ sub _new {
         )
         : undef;
     my $on_extension_settings = delete $args{on_extension_settings};
+    my %callbacks;
+    for my $name (qw(on_request on_body on_request_end on_error)) {
+        next unless exists $args{$name};
+        my $callback = delete $args{$name};
+        croak "new(): $name must be a code reference"
+            if defined($callback) && ref($callback) ne 'CODE';
+        $callbacks{$name} = $callback if defined $callback;
+    }
+
+    croak 'new(): request callbacks are only valid for a server connection'
+        if $role ne 'server' && keys %callbacks;
+
     my $extension_stream_handlers =
         _normalize_extension_stream_handlers(
             delete $args{extension_stream_handlers},
@@ -1170,6 +1172,7 @@ sub _new {
         peer_settings_initialized  => defined($remembered_peer_settings) ? 1 : 0,
         peer_settings_parser       => {},
         on_extension_settings      => $on_extension_settings,
+        callbacks                  => \%callbacks,
         control_settings_rewritten => 0,
         control_settings_delta     => 0,
         control_settings_pending   => undef,
@@ -1515,7 +1518,7 @@ sub _fail_connection {
 
     for my $transaction (values %{ $self->{transactions} }) {
         next if $transaction->is_terminal;
-        $transaction->_mark_error($message);
+        $transaction->_mark_error($message, $code);
     }
 
     $self->{quic}->close($code);
@@ -1529,15 +1532,26 @@ sub request {
 
     croak 'request() is only available on a client HTTP/3 connection'
         unless $self->{role} eq 'client';
-    croak 'request() requires a canonical Uniform::HTTP::Request'
-        unless ref($request) eq 'Uniform::HTTP::Request';
+    croak 'request() requires the Uniform HTTP request contract'
+        unless _request_contract($request);
+
+    my %callbacks;
+    for my $name (qw(
+        on_informational on_response on_body on_complete on_error on_drain
+    )) {
+        next unless exists $option{$name};
+        my $callback = delete $option{$name};
+        croak "request(): $name must be a code reference"
+            if defined($callback) && ref($callback) ne 'CODE';
+        $callbacks{$name} = $callback if defined $callback;
+    }
 
     _assert_http3_version($request, 'request()');
 
     my $is_connect = $request->method eq 'CONNECT' ? 1 : 0;
     my $is_extended_connect =
         $is_connect && defined($request->protocol) ? 1 : 0;
-    my $stream_body;
+    my $stream_body = 0;
     my $receive_body = $self->{receive_body_mode};
     my $receive_options = {};
     my $datagrams = exists $option{datagrams}
@@ -1579,24 +1593,33 @@ sub request {
         croak 'request(): CONNECT cannot use a buffered request body'
             if $request->has_buffered_body;
         croak 'request(): CONNECT cannot use request trailers'
-            if $request->has_trailers;
+            if $request->trailer_count;
 
         $receive_body = 'stream';
-        $stream_body = {};
+        $stream_body = 1;
     }
 
     if (exists $option{stream_body}) {
         my $configured = delete $option{stream_body};
 
-        croak 'request(): stream_body must be a hash reference'
-            unless ref($configured) eq 'HASH';
+        croak 'request(): stream_body must be zero or one'
+            if !defined($configured)
+                || ref($configured)
+                || "$configured" !~ /\A[01]\z/;
 
-        $stream_body = { %$configured };
+        $stream_body = $configured ? 1 : 0;
 
-        croak 'request(): stream_body cannot be combined with a scalar Request body'
-            if $request->has_buffered_body;
-
+        croak 'request(): CONNECT requires stream_body => 1'
+            if $is_connect && !$stream_body;
+        croak 'request(): stream_body cannot be combined with a buffered body'
+            if $stream_body && $request->has_buffered_body;
     }
+
+    $receive_body = 'stream'
+        if defined $callbacks{on_body};
+
+    croak 'request(): on_drain requires stream_body'
+        if defined($callbacks{on_drain}) && !$stream_body;
 
     if (exists $option{receive_body}) {
         my $value = delete $option{receive_body};
@@ -1623,7 +1646,7 @@ sub request {
         $request,
         'request()',
     );
-    my $request_streaming = defined($stream_body) ? 1 : 0;
+    my $request_streaming = $stream_body ? 1 : 0;
 
     $self->_assert_request_content_length(
         $request,
@@ -1658,9 +1681,28 @@ sub request {
         request           => $request,
         request_streaming => $request_streaming,
         early_data        => $sending_early,
+        callbacks         => \%callbacks,
     );
 
     $transaction->_enable_datagrams if $datagrams;
+
+    if ($receive_body eq 'stream' && defined $callbacks{on_body}) {
+        croak 'request(): on_body cannot be combined with receive_body on_data'
+            if exists $receive_options->{on_data};
+
+        my %common_receive = %$receive_options;
+        $common_receive{on_data} = sub {
+            my ($reader, $bytes) = @_;
+            my $response = $transaction->response;
+            my $result = $transaction->_invoke(
+                'on_body',
+                $response,
+                $bytes,
+            );
+            die $result unless $result eq '1';
+        };
+        $receive_options = \%common_receive;
+    }
 
     $transaction->_configure_receive_body(
         'response',
@@ -1670,8 +1712,14 @@ sub request {
 
     $self->{transactions}{$stream_id} = $transaction;
 
-    if (defined $stream_body) {
-        $transaction->request_body(%$stream_body);
+    if ($stream_body && defined $callbacks{on_drain}) {
+        $transaction->request_body(
+            on_drain => sub {
+                my ($body) = @_;
+                my $result = $transaction->_invoke('on_drain');
+                die $result unless $result eq '1';
+            },
+        );
     }
 
     $self->_maybe_complete_transaction($stream_id);
@@ -1695,6 +1743,117 @@ sub next_informational {
     return shift @{ $self->{ready_informational} };
 }
 
+sub _request_contract {
+    my ($request) = @_;
+    return unless blessed($request);
+
+    for my $method (qw(
+        method target scheme authority protocol version
+        header_count header_name header_value
+        trailer_count trailer_name trailer_value
+        has_buffered_body body
+    )) {
+        return unless $request->can($method);
+    }
+
+    return 1;
+}
+
+sub _response_contract {
+    my ($response) = @_;
+    return unless blessed($response);
+
+    for my $method (qw(
+        status version
+        header_count header_name header_value
+        trailer_count trailer_name trailer_value
+        has_buffered_body body
+    )) {
+        return unless $response->can($method);
+    }
+
+    return 1;
+}
+
+sub _message_header_values {
+    my ($message, $wanted) = @_;
+
+    $wanted = lc $wanted;
+    my @values;
+
+    for my $index (0 .. $message->header_count - 1) {
+        my $name = lc $message->header_name($index);
+        push @values, $message->header_value($index)
+            if $name eq $wanted;
+    }
+
+    return \@values;
+}
+
+sub _portable_headers {
+    my ($message, $context) = @_;
+    my @fields;
+
+    for my $index (0 .. $message->header_count - 1) {
+        my $name = lc $message->header_name($index);
+        my $value = $message->header_value($index);
+        _validate_wire_field($context, $name, $value);
+        push @fields, [ $name, $value ];
+    }
+
+    return \@fields;
+}
+
+sub _portable_trailers {
+    my ($message) = @_;
+    my @fields;
+
+    for my $index (0 .. $message->trailer_count - 1) {
+        my $name = lc $message->trailer_name($index);
+        my $value = $message->trailer_value($index);
+        push @fields, @{ _wire_trailers([ [ $name, $value ] ]) };
+    }
+
+    return \@fields;
+}
+
+sub _portable_request_fields {
+    my ($request) = @_;
+
+    my @fields = ([ ':method', $request->method ]);
+    my $method = $request->method;
+    my $protocol = $request->protocol;
+
+    if ($method eq 'CONNECT' && !defined $protocol) {
+        push @fields, [ ':authority', $request->authority ];
+    } else {
+        push @fields, [ ':protocol', $protocol ]
+            if defined $protocol;
+        push @fields,
+            [ ':scheme', $request->scheme ],
+            [ ':authority', $request->authority ],
+            [ ':path', $request->target ];
+    }
+
+    push @fields, @{ _portable_headers($request, 'request') };
+    return \@fields;
+}
+
+sub _portable_response_fields {
+    my ($response) = @_;
+
+    my @fields = ([ ':status', '' . $response->status ]);
+    push @fields, @{ _portable_headers($response, 'response') };
+    return \@fields;
+}
+
+sub _assert_response_contract {
+    my ($self, $response, $operation) = @_;
+    croak "$operation: requires the Uniform HTTP response contract"
+        unless _response_contract($response);
+    return $response;
+}
+
 sub _assert_http3_version {
     my ($message, $operation) = @_;
 
@@ -1710,7 +1869,7 @@ sub _assert_http3_version {
 sub _declared_content_length {
     my ($message, $operation) = @_;
 
-    my $values = $message->header_values('content-length');
+    my $values = _message_header_values($message, 'content-length');
     return unless @$values;
 
     croak "$operation: multiple Content-Length fields are not allowed"
@@ -1877,17 +2036,31 @@ sub _send_informational_response {
         'send_informational()',
     );
 
-    $self->_assert_peer_field_section_size_value(
-        $self->{native}->uniform_response_field_section_size($response),
-        'send_informational()',
-    );
+    if (ref($response) eq 'Uniform::HTTP::Response') {
+        $self->_assert_peer_field_section_size_value(
+            $self->{native}->uniform_response_field_section_size($response),
+            'send_informational()',
+        );
 
-    $self->{native}->submit_uniform_info(
-        $transaction->stream_id,
-        $response,
-    );
+        $self->{native}->submit_uniform_info(
+            $transaction->stream_id,
+            $response,
+        );
 
-    $response->freeze;
+        $response->freeze;
+    } else {
+        my $fields = _portable_response_fields($response);
+
+        $self->_assert_peer_field_section_size_value(
+            _field_section_size($fields),
+            'send_informational()',
+        );
+
+        $self->{native}->submit_info(
+            $transaction->stream_id,
+            $fields,
+        );
+    }
 
     $self->_drain_output;
     return $response;
@@ -1915,7 +2088,7 @@ sub _capsule_protocol_response_error {
 sub _assert_capsule_protocol_response {
     my ($response, $operation) = @_;
 
-    my $values = $response->header_values('capsule-protocol');
+    my $values = _message_header_values($response, 'capsule-protocol');
     return unless @$values;
     return if $response->status >= 200 && $response->status < 300;
 
@@ -1967,15 +2140,15 @@ sub _assert_response_message_allowed {
     croak "$operation: $reason"
         if $response->has_buffered_body
             || $transaction->_response_is_streaming
-            || $response->has_trailers;
+            || $response->trailer_count;
 
     return;
 }
 
-sub _send_transaction_response {
-    my ($self, $transaction) = @_;
+sub _respond_transaction {
+    my ($self, $transaction, $response, %option) = @_;
 
-    croak 'send_response() requires a server HTTP/3 connection'
+    croak 'respond() requires a server HTTP/3 connection'
         unless $self->{role} eq 'server';
     croak 'Transaction does not belong to this HTTP/3 connection'
         unless blessed($transaction)
@@ -1985,24 +2158,71 @@ sub _send_transaction_response {
     croak 'response has already been sent for this Transaction'
         if $self->{response_sent}{ $transaction->stream_id };
 
-    my $response = $transaction->response
-        or croak 'Transaction has no response';
+    $self->_assert_response_contract(
+        $response,
+        'respond()',
+    );
 
-    _assert_http3_version($response, 'send_response()');
+    my $stream_body = exists($option{stream_body})
+        ? delete($option{stream_body})
+        : 0;
+    croak 'respond(): stream_body must be zero or one'
+        if !defined($stream_body)
+            || ref($stream_body)
+            || "$stream_body" !~ /\A[01]\z/;
+    $stream_body = $stream_body ? 1 : 0;
+
+    my $on_drain = delete $option{on_drain};
+    my $on_error = delete $option{on_error};
+
+    croak 'respond(): on_drain must be a coderef'
+        if defined($on_drain) && ref($on_drain) ne 'CODE';
+    croak 'respond(): on_error must be a coderef'
+        if defined($on_error) && ref($on_error) ne 'CODE';
+    croak 'respond(): unknown options: ' . join(', ', sort keys %option)
+        if %option;
+    croak 'respond(): on_drain requires stream_body'
+        if $on_drain && !$stream_body;
+    croak 'respond(): stream_body cannot be combined with a buffered body'
+        if $stream_body && $response->has_buffered_body;
+
+    $transaction->{response} = $response;
+    $transaction->{response_body} = undef;
+    $transaction->{response_streaming} = 0;
+
+    if ($stream_body) {
+        my %stream_option;
+
+        if ($on_drain) {
+            $transaction->_set_callback('on_drain', $on_drain);
+            $stream_option{on_drain} = sub {
+                my ($body) = @_;
+                my $result = $transaction->_invoke('on_drain');
+                die $result unless $result eq '1';
+            };
+        }
+
+        $transaction->response_body(%stream_option);
+    }
+
+    $transaction->_set_callback('on_error', $on_error)
+        if $on_error;
+
+    _assert_http3_version($response, 'respond()');
 
     $self->_assert_response_message_allowed(
         $transaction,
         $response,
-        'send_response()',
+        'respond()',
     );
     $self->_assert_response_content_length(
         $transaction,
         $response,
-        'send_response()',
+        'respond()',
     );
     _assert_capsule_protocol_response(
         $response,
-        'send_response()',
+        'respond()',
     );
 
     croak 'final response status must be 200 through 599'
@@ -2025,7 +2245,38 @@ sub _send_transaction_response {
 
     $transaction->_mark_response_started;
     $self->_maybe_complete_transaction($transaction->stream_id);
-    return $response;
+    return $transaction;
+}
+
+sub _write_stream_body {
+    my ($self, $transaction, $bytes, $final, $operation) = @_;
+
+    croak "$operation(): Transaction does not belong to this HTTP/3 connection"
+        unless blessed($transaction)
+            && $transaction->isa('Unblock::HTTP3::Transaction')
+            && defined($self->{transactions}{ $transaction->stream_id })
+            && $self->{transactions}{ $transaction->stream_id } == $transaction;
+
+    my $body;
+
+    if ($self->{role} eq 'client') {
+        croak "$operation(): Transaction has no streaming Request body"
+            unless $transaction->_request_is_streaming;
+        $body = $transaction->request_body;
+    } else {
+        croak "$operation(): Transaction has no streaming Response body"
+            unless $transaction->_response_is_streaming
+                && $transaction->is_response_started;
+        $body = $transaction->{response_body}
+            or croak "$operation(): Transaction has no streaming Response body";
+    }
+
+    return $final
+        ? do {
+            $body->complete($bytes);
+            1;
+        }
+        : $body->write($bytes);
 }
 
 sub _write_transaction_body {
@@ -2367,7 +2618,7 @@ sub _reject_datagram_stream {
     }
 
     $self->{native}->discard_body($id);
-    $transaction->_mark_error($reason);
+    $transaction->_mark_error($reason, $H3_DATAGRAM_ERROR);
     return;
 }
 
@@ -2921,6 +3172,14 @@ sub _promote_accepted_early_transactions {
         }
 
         push @{ $self->{ready_transactions} }, $transaction;
+
+        if (defined $self->{callbacks}{on_request}) {
+            my $result = $transaction->_invoke(
+                'on_request',
+                $transaction->request,
+            );
+            die $result unless $result eq '1';
+        }
     }
 
     return 1;
@@ -3830,16 +4089,30 @@ sub _finish_headers {
             request    => $message,
             response   => $response,
             early_data => $stream_is_early,
+            callbacks  => $self->{callbacks},
         );
 
         my $request_receive_mode = $is_connect
+            || defined($self->{callbacks}{on_body})
             ? 'stream'
             : $self->{receive_body_mode};
 
+        my %request_receive_options;
+        if (defined $self->{callbacks}{on_body}) {
+            $request_receive_options{on_data} = sub {
+                my ($reader, $bytes) = @_;
+                my $result = $transaction->_invoke(
+                    'on_body',
+                    $transaction->request,
+                    $bytes,
+                );
+                die $result unless $result eq '1';
+            };
+        }
         $transaction->_configure_receive_body(
             'request',
             $request_receive_mode,
-            {},
+            \%request_receive_options,
         );
         $transaction->_ensure_receive_reader('request')
             if $request_receive_mode eq 'stream';
@@ -3860,6 +4133,14 @@ sub _finish_headers {
 
             $transaction->_enable_datagrams if $datagrams;
             push @{ $self->{ready_transactions} }, $transaction;
+
+            if (defined $self->{callbacks}{on_request}) {
+                my $result = $transaction->_invoke(
+                    'on_request',
+                    $transaction->request,
+                );
+                die $result unless $result eq '1';
+            }
         }
     } else {
         my $status = $self->{native}->header_pseudo($id, ':status');
@@ -3898,10 +4179,21 @@ sub _finish_headers {
 
             $transaction->_push_informational($message);
             push @{ $self->{ready_informational} }, $transaction;
+            my $result = $transaction->_invoke(
+                'on_informational',
+                $message,
+            );
+            die $result unless $result eq '1';
             return;
         }
 
         $transaction->_set_response($message);
+        my $response_result = $transaction->_invoke(
+            'on_response',
+            $message,
+        );
+        die $response_result unless $response_result eq '1';
+
         $transaction->_ensure_receive_reader('response');
 
         if (
@@ -4068,25 +4360,41 @@ sub _submit_request {
         unless $self->{role} eq 'client';
     croak 'HTTP/3 connection has not been started'
         unless $self->{started};
-    croak 'request must be a canonical Uniform::HTTP::Request'
-        unless ref($request) eq 'Uniform::HTTP::Request';
+    croak 'request must implement the Uniform HTTP request contract'
+        unless _request_contract($request);
     croak 'HTTP/3 peer has begun graceful shutdown'
         if defined $self->{remote_shutdown_id};
     croak 'HTTP/3 connection is shutting down'
         if $self->{shutdown_notice_sent} || $self->{shutdown_started};
 
-    $self->_assert_peer_field_section_size_value(
-        $self->{native}->uniform_request_field_section_size($request),
-        'request()',
-    );
+    my ($portable_fields, $portable_trailers);
 
-    my $trailer_size =
-        $self->{native}->uniform_trailer_field_section_size($request);
+    if (ref($request) eq 'Uniform::HTTP::Request') {
+        $self->_assert_peer_field_section_size_value(
+            $self->{native}->uniform_request_field_section_size($request),
+            'request()',
+        );
 
-    $self->_assert_peer_field_section_size_value(
-        $trailer_size,
-        'request trailers',
-    ) if $trailer_size;
+        my $trailer_size =
+            $self->{native}->uniform_trailer_field_section_size($request);
+
+        $self->_assert_peer_field_section_size_value(
+            $trailer_size,
+            'request trailers',
+        ) if $trailer_size;
+    } else {
+        $portable_fields = _portable_request_fields($request);
+        $portable_trailers = _portable_trailers($request);
+
+        $self->_assert_peer_field_section_size_value(
+            _field_section_size($portable_fields),
+            'request()',
+        );
+        $self->_assert_peer_field_section_size_value(
+            _field_section_size($portable_trailers),
+            'request trailers',
+        ) if @$portable_trailers;
+    }
 
     my $stream = $self->{quic}->open_bidi_stream;
     return unless defined $stream;
@@ -4096,13 +4404,30 @@ sub _submit_request {
 
     $streaming = $streaming ? 1 : 0;
 
-    $self->{native}->submit_uniform_request(
-        $id,
-        $request,
-        $streaming,
-    );
+    if (ref($request) eq 'Uniform::HTTP::Request') {
+        $self->{native}->submit_uniform_request(
+            $id,
+            $request,
+            $streaming,
+        );
+        $request->freeze;
+    } else {
+        my $body = $request->has_buffered_body
+            ? $request->body
+            : undef;
 
-    $request->freeze;
+        $self->{native}->submit_request(
+            $id,
+            $portable_fields,
+            $body,
+            $streaming,
+        );
+
+        $self->{native}->submit_trailers(
+            $id,
+            $portable_trailers,
+        ) if @$portable_trailers;
+    }
     $self->{outgoing}{$id} = $request;
 
     $self->_drain_output;
@@ -4117,23 +4442,39 @@ sub _submit_response {
         unless $self->{role} eq 'server';
     croak 'HTTP/3 connection has not been started'
         unless $self->{started};
-    croak 'response must be a canonical Uniform::HTTP::Response'
-        unless ref($response) eq 'Uniform::HTTP::Response';
+    croak 'response must implement the Uniform HTTP response contract'
+        unless _response_contract($response);
     croak 'unknown HTTP/3 request stream'
         unless defined $self->{streams}{$stream_id};
 
-    $self->_assert_peer_field_section_size_value(
-        $self->{native}->uniform_response_field_section_size($response),
-        'send_response()',
-    );
+    my ($portable_fields, $portable_trailers);
 
-    my $trailer_size =
-        $self->{native}->uniform_trailer_field_section_size($response);
+    if (ref($response) eq 'Uniform::HTTP::Response') {
+        $self->_assert_peer_field_section_size_value(
+            $self->{native}->uniform_response_field_section_size($response),
+            'respond()',
+        );
 
-    $self->_assert_peer_field_section_size_value(
-        $trailer_size,
-        'response trailers',
-    ) if $trailer_size;
+        my $trailer_size =
+            $self->{native}->uniform_trailer_field_section_size($response);
+
+        $self->_assert_peer_field_section_size_value(
+            $trailer_size,
+            'response trailers',
+        ) if $trailer_size;
+    } else {
+        $portable_fields = _portable_response_fields($response);
+        $portable_trailers = _portable_trailers($response);
+
+        $self->_assert_peer_field_section_size_value(
+            _field_section_size($portable_fields),
+            'respond()',
+        );
+        $self->_assert_peer_field_section_size_value(
+            _field_section_size($portable_trailers),
+            'response trailers',
+        ) if @$portable_trailers;
+    }
 
     my $transaction = $self->{transactions}{$stream_id};
     my $streaming = defined($transaction)
@@ -4141,13 +4482,30 @@ sub _submit_response {
         ? 1
         : 0;
 
-    $self->{native}->submit_uniform_response(
-        $stream_id,
-        $response,
-        $streaming,
-    );
+    if (ref($response) eq 'Uniform::HTTP::Response') {
+        $self->{native}->submit_uniform_response(
+            $stream_id,
+            $response,
+            $streaming,
+        );
+        $response->freeze;
+    } else {
+        my $body = $response->has_buffered_body
+            ? $response->body
+            : undef;
 
-    $response->freeze;
+        $self->{native}->submit_response(
+            $stream_id,
+            $portable_fields,
+            $body,
+            $streaming,
+        );
+
+        $self->{native}->submit_trailers(
+            $stream_id,
+            $portable_trailers,
+        ) if @$portable_trailers;
+    }
 
     $self->_drain_output;
     return $response;
@@ -4250,439 +4608,97 @@ __END__
 
 =head1 NAME
 
-Unblock::HTTP3::Connection - one HTTP/3 connection over Net::QUIC
-
-=head1 SYNOPSIS
-
-    use Unblock::HTTP3::Connection;
-    use Uniform::HTTP::Request;
-
-    my $h3 = Unblock::HTTP3::Connection->client(
-        quic => $quic,
-    );
-
-    $h3->start;
-
-    my $tx = $h3->request(
-        Uniform::HTTP::Request->new(
-            method    => 'GET',
-            target    => '/',
-            scheme    => 'https',
-            authority => 'example.com',
-        ),
-    );
+Unblock::HTTP3::Connection - shared HTTP/3 connection implementation
 
 =head1 DESCRIPTION
 
-One C<Unblock::HTTP3::Connection> wraps one L<Net::QUIC::Connection>.
+This package contains the shared implementation inherited by
+L<Unblock::HTTP3::Client> and L<Unblock::HTTP3::Server>.
 
-Unblock::HTTP3 owns HTTP/3 connection state, control streams, QPACK integration,
-request streams, HTTP/3 errors, and HTTP/3 extensions. Net::QUIC owns QUIC and
-TLS. The event-loop adapter owns the UDP socket and timer.
+Applications should construct one of those public classes with C<new()>.
+C<Unblock::HTTP3::Connection> has no public constructor.
 
-L<Uniform::HTTP> supplies common request and response semantics.
+One Client or Server wraps one existing L<Net::QUIC::Connection>. Unblock::HTTP3
+owns HTTP/3 state. Net::QUIC owns QUIC and TLS. The caller owns the UDP socket,
+timer, and event loop.
 
-=head1 CONSTRUCTORS
+=head1 COMMON OPTIONS
 
-=head2 client
+C<quic> is required.
 
-    my $h3 = Unblock::HTTP3::Connection->client(
-        quic => $quic,
-    );
+Common constructor options include:
 
-Creates client-side HTTP/3 state.
+    send_buffer_limit
+    max_field_section_size
+    max_buffered_body_bytes
+    max_streaming_body_bytes
+    receive_body
+    qpack_max_table_capacity
+    qpack_blocked_streams
+    enable_http_datagrams
+    extension_settings
+    on_extension_settings
+    extension_stream_handlers
 
-=head2 server
+Server-specific options include:
 
-    my $h3 = Unblock::HTTP3::Connection->server(
-        quic => $quic,
-    );
+    enable_extended_connect
+    origins
+    datagram_request
+    quic_max_bidi_streams
+    remembered_local_settings
+    on_request
+    on_body
+    on_request_end
+    on_error
 
-Creates server-side HTTP/3 state.
+Client-specific options include C<remembered_peer_settings>.
 
-=head1 OPTIONS
+=head1 COMMON METHODS
 
-C<quic> is required and must be a L<Net::QUIC::Connection>.
+C<start()> starts HTTP/3 processing.
 
-Common options are:
+C<role()> returns C<client> or C<server>.
 
-=over 4
+C<quic()> returns the wrapped Net::QUIC connection.
 
-=item C<send_buffer_limit>
+C<started()>, C<failed()>, C<error()>, and C<error_code()> expose connection
+state.
 
-Maximum buffered HTTP/3 output bytes. The default is 4 MiB.
+C<next_transaction()> and C<next_informational()> provide the optional pull
+interface.
 
-=item C<max_field_section_size>
+Settings, extension streams, HTTP Datagrams, ORIGIN, graceful shutdown, and
+0-RTT state remain available through the existing HTTP/3-specific methods.
 
-Maximum decoded header or trailer field-section size. The default is 65536
-bytes.
+=head1 CLIENT REQUESTS
 
-=item C<max_buffered_body_bytes>
+L<Unblock::HTTP3::Client/request> accepts the Uniform HTTP request contract.
 
-Maximum body size retained in a buffered Request or Response. The default is
-64 MiB.
-
-=item C<max_streaming_body_bytes>
-
-Maximum queued incoming streaming body bytes. The default is 4 MiB.
-
-=item C<receive_body>
-
-C<buffered> by default. Use C<stream> to receive bodies through
-L<Unblock::HTTP3::Body::Reader>.
-
-=item C<qpack_max_table_capacity>
-
-Local QPACK dynamic-table capacity. The default is 4096.
-
-=item C<qpack_blocked_streams>
-
-Local QPACK blocked-stream limit. The default is 100.
-
-=item C<enable_extended_connect>
-
-Server only. Advertises Extended CONNECT support.
-
-=item C<enable_http_datagrams>
-
-Advertises RFC 9297 HTTP Datagram support. The Net::QUIC connection must also
-have QUIC DATAGRAM receive support.
-
-=item C<origins>
-
-Server only. Array reference of RFC 6454 ASCII origin serializations to send in
-the RFC 9412 ORIGIN frame. An empty array sends an explicit empty ORIGIN frame.
-Omit the option to send no ORIGIN frame.
-
-=item C<datagram_request>
-
-Server-only callback used to decide whether an incoming request uses HTTP
-Datagrams. It receives the Connection and Request.
-
-=item C<max_buffered_datagram_bytes>
-
-Maximum total bytes retained in Transaction Datagram queues. The default is
-1 MiB.
-
-=item C<max_buffered_datagrams>
-
-Maximum number of retained HTTP Datagrams. The default is 1024.
-
-=item C<quic_max_bidi_streams>
-
-Server-only synchronization value for libnghttp3 request stream validation.
-The default is 100, matching Net::QUIC 0.04. If the QUIC server uses a
-different C<transport-E<gt>{max_bidi_streams}> value, pass the same value here.
-
-=item C<extension_settings>
-
-Hash reference of additional HTTP/3 SETTINGS identifiers and values.
-
-=item C<on_extension_settings>
-
-Callback run after peer extension SETTINGS are accepted. It receives the
-Connection and a hash reference of peer extension SETTINGS. Dying from the
-callback rejects the settings with C<H3_SETTINGS_ERROR>.
-
-=item C<extension_stream_handlers>
-
-Hash reference mapping extension unidirectional stream types to callbacks.
-
-=item C<remembered_peer_settings>
-
-Client-only opaque value previously returned by C<peer_settings_state>. Used
-for HTTP/3 0-RTT.
-
-=item C<remembered_local_settings>
-
-Server-only opaque value previously returned by C<local_settings_state>. Used
-to validate HTTP/3 settings when accepting 0-RTT.
-
-=back
-
-=head1 METHODS
-
-=head2 start
-
-Starts HTTP/3 processing and creates the required control and QPACK streams.
-
-Normally QUIC is already ready. A returning client with remembered peer
-SETTINGS may start while QUIC early data is pending. A server with remembered
-local SETTINGS may start early and parse 0-RTT request bytes internally.
-
-Server 0-RTT Transactions are not returned by C<next_transaction> and the
-C<datagram_request> application callback is not run until the QUIC handshake
-has completed and the early data has not been rejected.
-
-Returns the Connection.
-
-=head2 request
-
-    my $tx = $h3->request($request);
-
-Client only. Submits a canonical L<Uniform::HTTP::Request> and returns a
-L<Unblock::HTTP3::Transaction>.
-
-Useful per-request options are:
+Useful request options include:
 
     stream_body
     receive_body
     datagrams
     early_data
-
-C<stream_body> configures an outgoing streaming request body.
-
-C<receive_body> configures streaming response receipt.
-
-C<datagrams =E<gt> 1> marks the request as using HTTP Datagram semantics.
-
-C<early_data =E<gt> 1> explicitly permits submission before the QUIC handshake
-finishes. 0-RTT is replayable. Unblock::HTTP3 does not retry an early request
-automatically if QUIC rejects it.
-
-=head2 next_transaction
-
-Returns the next ready Transaction, or undef when none is queued.
-
-On a server this is a newly received request. A request received in 0-RTT is
-withheld until the QUIC handshake completes and the early data has not been
-rejected.
-
-On a client this is an existing Transaction whose final response headers have
-arrived.
-
-=head2 next_informational
-
-Client only. Returns a Transaction which has received a new 1xx response.
-Retrieve the response with C<< $tx->next_informational >>.
-
-=head2 role
-
-Returns C<client> or C<server>.
-
-=head2 quic
-
-Returns the wrapped L<Net::QUIC::Connection>.
-
-=head2 nghttp3_version
-
-Returns the runtime libnghttp3 version string.
-
-=head2 started
-
-True after C<start> succeeds.
-
-=head2 failed
-
-True after a fatal local HTTP/3 error.
-
-=head2 error
-
-Returns the saved error text after C<failed> becomes true.
-
-=head2 error_code
-
-Returns the HTTP/3 application error code associated with C<error>, or undef
-when no fatal HTTP/3 error has been recorded.
-
-=head2 receive_body_mode
-
-    my $mode = $h3->receive_body_mode;
-    $h3->receive_body_mode('stream');
-
-Gets or changes the default receive mode for future Transactions. Valid values
-are C<buffered> and C<stream>.
-
-=head2 max_field_section_size
-
-Returns the configured field-section limit.
-
-=head2 max_buffered_body_bytes
-
-Returns the configured buffered-body limit.
-
-=head2 max_streaming_body_bytes
-
-Returns the configured queued streaming-body limit.
-
-=head2 qpack_max_table_capacity
-
-Returns the configured QPACK table capacity.
-
-=head2 qpack_blocked_streams
-
-Returns the configured QPACK blocked-stream limit.
-
-=head2 extended_connect_enabled
-
-True when this server advertises Extended CONNECT support.
-
-=head2 peer_extended_connect_enabled
-
-True when the peer advertised Extended CONNECT support.
-
-=head2 http_datagrams_enabled
-
-True when this endpoint advertises SETTINGS_H3_DATAGRAM.
-
-=head2 peer_http_datagrams_enabled
-
-True when the peer advertised SETTINGS_H3_DATAGRAM.
-
-=head2 can_send_http_datagrams
-
-True when HTTP Datagrams are negotiated and Net::QUIC currently permits QUIC
-DATAGRAM transmission.
-
-=head2 can_receive_http_datagrams
-
-True when HTTP Datagrams are negotiated and local QUIC DATAGRAM receive support
-is active.
-
-=head2 datagram_receive_drops
-
-Returns the number of incoming HTTP Datagram payloads dropped because bounded
-Transaction receive queues were full.
-
-=head2 local_settings_state
-
-Returns an opaque byte string representing this endpoint's advertised HTTP/3
-SETTINGS. Store it without modifying it.
-
-=head2 peer_settings_state
-
-Returns an opaque byte string representing the current peer HTTP/3 SETTINGS
-after C<peer_settings_received> becomes true. Before that it returns undef.
-
-A client should save this with Net::QUIC's early-data state from the same
-connection when it intends to attempt 0-RTT later.
-
-=head2 using_remembered_peer_settings
-
-True while a returning client is still using remembered server SETTINGS before
-the new server SETTINGS frame arrives.
-
-=head2 peer_settings_received
-
-True after the peer SETTINGS frame has been accepted.
-
-=head2 peer_origins
-
-Returns undef until a complete RFC 9412 ORIGIN frame has been received.
-
-After that, returns a copy of the cumulative valid origin entries advertised by
-the server. An explicit empty ORIGIN frame therefore returns an empty array
-reference rather than undef. Invalid origin entries are ignored as required by
-RFC 8336.
-
-=head2 early_data_status
-
-Returns Net::QUIC's early-data status:
-
-    none
-    pending
-    accepted
-    rejected
-
-Calling this method also applies any required HTTP/3 rollback after QUIC rejects
-early data.
-
-=head2 extension_settings
-
-Returns a copy of the local extension SETTINGS.
-
-=head2 extension_setting
-
-    my $value = $h3->extension_setting($id);
-    $h3->extension_setting($id, $value);
-
-Gets or sets one extension SETTING. Values may only be changed before
-C<start>.
-
-Core, HTTP/3-reserved, and GREASE setting identifiers cannot be assigned
-extension semantics.
-
-=head2 peer_extension_settings
-
-Returns a copy of peer extension SETTINGS.
-
-=head2 peer_extension_setting
-
-    my $value = $h3->peer_extension_setting($id);
-
-Returns one peer extension SETTING, or undef if it was not advertised.
-
-=head2 extension_stream_handler
-
-    $h3->extension_stream_handler(
-        $type,
-        sub {
-            my ($connection, $stream) = @_;
-            ...
-        },
-    );
-
-Registers one incoming extension unidirectional stream handler before
-C<start>.
-
-=head2 open_extension_stream
-
-    my $stream = $h3->open_extension_stream($type);
-
-Opens an outgoing HTTP/3 extension unidirectional stream.
-
-Returns L<Unblock::HTTP3::Extension::Stream>, or undef when QUIC
-unidirectional stream credit is exhausted.
-
-=head2 shutdown_notice
-
-Sends the first graceful HTTP/3 shutdown notice. Returns the Connection.
-
-=head2 shutdown
-
-Begins final graceful HTTP/3 shutdown. Returns the Connection.
-
-The application or event-loop adapter decides how long to allow between
-C<shutdown_notice> and C<shutdown>.
-
-=head2 shutdown_notice_sent
-
-True after the first graceful shutdown notice has been submitted.
-
-=head2 shutdown_started
-
-True after final graceful shutdown has started.
-
-=head2 remote_shutdown_id
-
-Returns the most recent shutdown identifier received from the peer, or undef
-before the peer begins graceful shutdown.
-
-=head2 drained
-
-Server only. True when graceful shutdown has no request streams left to
-process.
-
-=head1 NOTES
-
-Unblock::HTTP3 does not own the event loop. Network and timer activity continue
-to be driven through Net::QUIC.
-
-HTTP/3 Server Push is not exposed because the libnghttp3 version used by this
-release does not implement it.
+    on_informational
+    on_response
+    on_body
+    on_complete
+    on_error
+    on_drain
+
+C<stream_body =E<gt> 1> enables the common C<write()> and C<end()> Transaction
+body API. A hash reference remains available for advanced Body::Stream
+configuration.
 
 =head1 SEE ALSO
 
-L<Unblock::HTTP3>, L<Unblock::HTTP3::Transaction>,
-L<Uniform::HTTP::Request>, L<Uniform::HTTP::Response>, L<Net::QUIC>,
-L<Uniform::HTTP>
-
-=head1 AUTHOR
-
-Joshua S. Day
+L<Unblock::HTTP3>, L<Unblock::HTTP3::Client>, L<Unblock::HTTP3::Server>,
+L<Unblock::HTTP3::Transaction>
 
 =head1 LICENSE
 
-This software is available under the MIT License.
+MIT License.
 
 =cut

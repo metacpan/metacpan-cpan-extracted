@@ -4,75 +4,11 @@ use 5.014;
 use strict;
 use warnings;
 
-use Getopt::Long ();
-use Game::Fanorona;
 use Game::Fanorona::Terminal;
 
-my %given;
-my $parsed = Getopt::Long::GetOptionsFromArray(
-    \@ARGV, \%given,
-    'level=i', 'side=s', 'variant=s', 'load=s',
-    'colour|color!', 'pick!', 'unicode!', 'version', 'help',
-);
+our $VERSION = '0.02';
 
-if (!$parsed || @ARGV) {
-    print STDERR "fanorona: I do not know '@ARGV'.\n" if $parsed && @ARGV;
-    print STDERR usage();
-    exit 2;
-}
-if ($given{help}) {
-    print usage();
-    exit 0;
-}
-if ($given{version}) {
-    print "fanorona $Game::Fanorona::VERSION\n";
-    exit 0;
-}
-
-my %with;
-$with{level}   = $given{level}   if defined $given{level};
-$with{human}   = $given{side}    if defined $given{side};
-$with{variant} = $given{variant} if defined $given{variant};
-$with{colour}  = $given{colour}  if defined $given{colour};
-$with{picking} = $given{pick}    if defined $given{pick};
-$with{unicode} = $given{unicode} if defined $given{unicode};
-$with{menu}    = 1 unless grep { defined $given{$_} } qw(side level variant load);
-
-my $terminal = eval { Game::Fanorona::Terminal->new(%with) };
-if (!$terminal) {
-    (my $why = $@) =~ s/ at \S+ line \d+\.?\s*\z//;
-    $why =~ s/\AGame::Fanorona(?:::\w+)*: //;
-    print STDERR "fanorona: $why.\n";
-    exit 2;
-}
-
-if (defined $given{load}) {
-    exit 2 unless $terminal->load($given{load});
-}
-
-exit $terminal->start;
-
-sub usage {
-    return <<'USAGE';
-fanorona - the board game of Madagascar, in a terminal
-
-  fanorona [options]
-
-  --side WHO       white (the default, and White moves first), black, both, or neither
-  --level N        how hard the program plays: 1 to 5, 3 by default
-  --variant NAME   the board: sivy (nine by five, the default), dimy or telo
-  --load FILE      carry on with a saved game
-  --no-colour      letters and lines instead of a painted board
-  --no-pick        type moves instead of choosing them with the arrow keys
-  --no-unicode     letters for the stones, with colour kept
-  --version        the version, and stop
-  --help           this, and stop
-
-In a terminal, moves are chosen on the board with the arrow keys; press ? for
-the keys. Anywhere else, type a move as the points the stone stands on, like
-d2-e3A, or help.
-USAGE
-}
+exit Game::Fanorona::Terminal->run(@ARGV);
 
 __END__
 

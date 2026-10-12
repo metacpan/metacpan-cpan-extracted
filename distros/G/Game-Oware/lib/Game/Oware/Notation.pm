@@ -5,7 +5,7 @@ use warnings;
 
 use Game::Oware::Board;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 my @LETTER = ('A' .. 'F', 'a' .. 'f');
 
@@ -118,7 +118,7 @@ Game::Oware::Notation - house letters, transcripts, and boards as text
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

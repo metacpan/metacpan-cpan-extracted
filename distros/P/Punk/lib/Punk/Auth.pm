@@ -6,7 +6,7 @@ use warnings;
 use Punk ();
 use Punk::Auth::Password;
 
-our $VERSION = '0.55';
+our $VERSION = '0.57';
 
 # The whole battery is C (punk_auth.h + xs/auth.xs): the guard fast path,
 # current_user and the await seam, check_password with the dummy-verify
@@ -97,6 +97,11 @@ also reads an C<auth:> block from F<config/punk.yml>.
     under '/staff' => auth_guard(role => 'admin', on_denied => '404');
     auth_guard(verified => 1);
 
+C<< verified => 1 >> reads the user's verified field as a boolean and as a
+database driver may spell one: C<0>, the empty string, C<f>, C<false>, C<n>,
+C<no> and C<off> are unverified, in any case. Anything else that is true,
+a timestamp included, is verified.
+
 C<auth_guard> returns an ordinary guard: a reference return short-circuits,
 anything else continues. Denial negotiates on the request's C<Accept> - a
 client asking for C<text/html> is redirected to C<login_path> with
@@ -130,6 +135,15 @@ Record the signed-in user in the session (a row hashref uses its id field).
 This is the one primitive the federation half shares: a
 L<Punk::OAuth2|https://metacpan.org/pod/Punk::OAuth2> C<on_login> body ends
 in C<< $c->login($user) >>.
+
+A stored session is given a new id, as L<Punk::Context/session_rotate> does,
+so an id planted in the browser before the login is not the name of the
+session after it. Call C<login> once, when the user signs in, and not on
+every request. After a C<logout> in the same request the login wins:
+C<< $c->logout->login($other) >> switches user.
+
+The id may not be empty or C<0>; C<login> croaks on one, and a session that
+holds one is nobody to C<auth_id> and C<auth_guard>.
 
 =head2 logout
 

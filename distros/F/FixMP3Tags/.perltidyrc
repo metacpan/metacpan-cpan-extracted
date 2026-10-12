@@ -1,0 +1,14 @@
+# Perl Tidy configuration
+-l=78
+-i=4
+-ci=4
+-se
+-et=4
+-w
+-bl
+-pt=2
+-bt=2
+-sbt=2
+-bbt=2
+-nsfs
+-noll

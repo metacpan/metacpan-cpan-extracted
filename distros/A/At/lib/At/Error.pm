@@ -1,7 +1,7 @@
 use v5.42;
 use feature 'class';
 no warnings 'experimental::class';
-class At::Error v1.7.0 {
+class At::Error v1.8.0 {
     use Carp qw[];
     use overload
         bool => sub {0},

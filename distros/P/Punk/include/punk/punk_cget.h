@@ -46,7 +46,9 @@ static int pcg_cond_method(const char *method, STRLEN mlen) {
 static SV *pcg_quote(pTHX_ SV *v) {
     STRLEN l;
     const char *p = SvPV_const(v, l);
-    if (l >= 2 && p[0] == '"' && p[l - 1] == '"') return newSVpvn(p, l);
+    /* already quoted: the quotes are kept and what is between them is
+     * filtered exactly as an unquoted value is */
+    if (l >= 2 && p[0] == '"' && p[l - 1] == '"') { p++; l -= 2; }
     {
         SV *out = newSVpvs("\"");
         STRLEN i;

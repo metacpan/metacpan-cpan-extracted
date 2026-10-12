@@ -7,7 +7,7 @@ use Moo;
 use Carp                qw( croak );
 use Crypt::AuthEnc::GCM ();
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 # The key length is the only thing that distinguishes the three, and it decides
 # the stored id -- so these three numbers are as permanent as the ids are.

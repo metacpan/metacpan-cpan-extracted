@@ -1,5 +1,7 @@
 # QMail::QueueHandler
 
+[![Build Status](https://github.com/davorg-cpan/symbol-approx-sub/actions/workflows/perltest.yml/badge.svg?branch=master)](https://github.com/davorg-cpan/symbol-approx-sub/actions/workflows/perltest.yml) [![Coverage Status](https://coveralls.io/repos/github/davorg-cpan/symbol-approx-sub/badge.svg?branch=master)](https://coveralls.io/github/davorg-cpan/symbol-approx-sub?branch=master)
+
 Perl library for dealing with QMail queues
 
 ## Introduction

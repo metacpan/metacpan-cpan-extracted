@@ -14,7 +14,7 @@ use Game::Schnapsen::Trick qw(winner_of value_of legal_follows);
 use Game::Schnapsen::Declare qw(marriages_in exchange_card);
 use Game::Schnapsen::Scoring qw(deal_result);
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 has variant => (is => 'ro', isa => Str);
 has seed    => (is => 'ro', isa => Str);
@@ -440,7 +440,7 @@ Game::Schnapsen::Deal - one deal, its talon, and its two phases
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

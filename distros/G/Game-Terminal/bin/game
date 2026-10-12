@@ -1,0 +1,149 @@
+#!/usr/bin/env perl
+use 5.014;
+use strict;
+use warnings;
+
+use Getopt::Long ();
+use Game::Terminal;
+
+our $VERSION = '0.01';
+
+exit main(@ARGV) unless caller;
+
+sub usage {
+	my $rows = join '', map {
+		sprintf "  %-11s %-6s %-4s %s\n", $_->{key}, $_->{family}, $_->{players}, $_->{blurb}
+	} Game::Terminal::games();
+	return <<"USAGE";
+game - one command for every terminal game
+
+usage: game                      the menu: choose a game, set its options, play
+       game <name> [options]     start that game; the options are the game's own
+       game list                 every game, with its version or "not installed"
+       game help <name>          that game's own --help
+       game --help | --version
+
+options, before the name:
+  --ascii        plain characters, in whatever words the game uses for that
+  --no-colour    no colour, by setting NO_COLOR for the game
+  --no-pick      type moves instead of choosing them with the arrow keys
+
+the games:
+$rows
+exit status:
+  the game's own: 0 won, drew or quit, 1 lost, 2 a bad option
+  2   a bad option to game itself, or a name that is no game
+  3   the game died
+
+A name is matched after lowercasing and dropping punctuation, and the
+aliases work too: draughts, othello, ur, morris, tafl, weiqi, baduk,
+chinesechess, awale, rummy, crib, 66. NO_COLOR in the environment turns
+colour off everywhere.
+USAGE
+}
+
+sub list {
+	for my $row (Game::Terminal::games()) {
+		my $version = Game::Terminal::version_of($row);
+		printf "%-11s %-6s %-4s %-46s %s\n", $row->{key}, $row->{family}, $row->{players},
+			$row->{blurb}, defined $version ? "$row->{class} $version" : 'not installed';
+	}
+	return 0;
+}
+
+sub main {
+	my @argv = @_;
+	my %opt;
+	my $saved = Getopt::Long::Configure(qw(bundling no_ignore_case pass_through require_order));
+	my $ok = eval {
+		local $SIG{__WARN__} = sub { print STDERR "game: $_[0]" };
+		Getopt::Long::GetOptionsFromArray(\@argv, \%opt,
+			'ascii', 'colour|color!', 'pick!', 'version|v', 'help|h');
+	};
+	Getopt::Long::Configure($saved);
+	if (!$ok || (@argv && $argv[0] =~ m/^-./)) {
+		print STDERR "game: not an option: $argv[0]\n" if $ok;
+		print STDERR usage();
+		return 2;
+	}
+	if ($opt{version}) { print "game, Game::Terminal $Game::Terminal::VERSION\n"; return 0 }
+	if ($opt{help})    { print usage(); return 0 }
+
+	my %common = (ascii => $opt{ascii} ? 1 : 0, colour => $opt{colour}, pick => $opt{pick});
+	my $word = shift @argv;
+
+	if (!defined $word) {
+		require Game::Terminal::Menu;
+		return Game::Terminal::Menu->new(common => \%common)->start;
+	}
+	if ($word eq 'list') { return list() }
+	if ($word eq 'help') {
+		$word = shift @argv;
+		if (!defined $word) { print usage(); return 0 }
+		@argv = ('--help');
+	}
+
+	my $row = Game::Terminal::find($word);
+	if (!$row) {
+		my @near = Game::Terminal::nearest($word);
+		print STDERR "game: no such game '$word'." . (@near ? " Did you mean $near[0]?" : '') . "\n";
+		return 2;
+	}
+	if (!Game::Terminal::installed($row)) {
+		print STDERR "game: $row->{key} needs $row->{module}: cpanm $row->{module}\n";
+		return 2;
+	}
+
+	my @flags = Game::Terminal::flags_for($row, \%common);
+	my ($status, $error) = Game::Terminal::launch($row, [ @flags, @argv ],
+		no_colour => (defined $common{colour} && !$common{colour}) ? 1 : 0);
+	if (defined $error) {
+		print STDERR "game: $row->{key} died: $error\n";
+		return 3;
+	}
+	return defined $status && $status =~ m/^\d+$/ ? $status : 0;
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+game - one command for every terminal game
+
+=head1 SYNOPSIS
+
+    game                        # the menu: arrows, enter, q
+    game checkers --level 3     # the same as: checkers --level 3
+    game sixtysix               # Schnapsen in the Sixty-Six variant
+    game list
+    game help oware
+    game --no-colour --no-pick durak
+
+=head1 DESCRIPTION
+
+Lists the terminal games of the C<Game> namespace and L<Term::Maze>, and
+starts any of them. With no arguments it draws a menu (L<Game::Terminal::Menu>): choose a game
+with the arrow keys, set its options on the screen that follows (the level,
+your side, a variant, a seed, or anything else as on the command line), and
+enter on Play starts it. The menu is drawn again when the game ends, with the
+options still set. With a name it starts that game at once, inside this process,
+through the game's own C<run> method, and everything after the name is the
+game's own command line.
+
+C<--ascii> and C<--no-pick> are spelt in each game's words before being
+passed on; C<--no-colour> sets C<NO_COLOR> for the game, since two of the
+games use C<--colour> to mean a side. They are read only before the name.
+
+=head1 EXIT STATUS
+
+    the game's own: 0 won, drew or quit, 1 lost, 2 a bad option
+    2   a bad option to game itself, or a name that is no game
+    3   the game died, with the message on stderr
+
+=head1 SEE ALSO
+
+L<Game::Terminal>, L<Game::Terminal::Menu>
+
+=cut

@@ -17,7 +17,7 @@ has scored => (
 	builder => 1
 );
 
-sub _build_scored { 
+sub _build_scored {
 	return {
 		fifteen => 2,
 		pair => 2,
@@ -80,7 +80,7 @@ sub calculate_run {
 	# is only found when each card is one below the last.
 	@cards = sort { $b->run_value <=> $a->run_value } @cards;
 	my @values = map { $_->run_value } @cards;
-	
+
 	my %map;
 	foreach my $n (1 .. @values) {
 		forcomb {
@@ -104,7 +104,7 @@ sub calculate_run {
         		}
 		} @values, $n;
 	}
-	
+
 	if ($map{five}) {
 		$self->run($map{five});
 	} elsif ($map{four}) {
@@ -167,7 +167,7 @@ sub calculate_total {
 	for (keys %{$scored}) {
 		if (scalar @{$self->$_}) {
 			if ($_ eq 'run') {
-				$score += scalar @{$self->$_} * scalar @{$self->$_->[0]} 
+				$score += scalar @{$self->$_} * scalar @{$self->$_->[0]}
 					if $self->$_->[0];
 			} else {
 				$score += $scored->{$_} * scalar @{$self->$_};
@@ -187,7 +187,7 @@ Game::Cribbage::Score - hand scoring calculator
 
 =head1 VERSION
 
-Version 0.15
+Version 0.17
 
 =cut
 

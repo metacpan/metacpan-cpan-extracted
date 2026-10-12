@@ -6,7 +6,7 @@ use warnings;
 
 use Object::Proto::Sugar;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 has from => (is => 'ro');
 
@@ -49,7 +49,7 @@ Game::Fanorona::Move - one whole move: a stone, its steps, and what each took
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="492" height="147" viewBox="0 0 492 147" role="img" aria-label="perl examples/cookbook/width-group.pl">
+<title>perl examples/cookbook/width-group.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="460" height="112" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="460" height="112" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="460" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="246" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/cookbook/width-group.pl</text>
+<rect x="16.5" y="16.5" width="459" height="111" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+</g>
+<g class="terminal">
+<text x="30" y="74" textLength="45" fill="#96a0b4">Name:</text>
+<text x="147" y="74" textLength="108" fill="#ffffff">Ada Lovelace</text>
+<text x="30" y="92" textLength="99" fill="#96a0b4">Occupation:</text>
+<text x="147" y="92" textLength="117" fill="#ffffff">Mathematician</text>
+<text x="30" y="110" textLength="45" fill="#96a0b4">Born:</text>
+<text x="147" y="110" textLength="36" fill="#ffffff">1815</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

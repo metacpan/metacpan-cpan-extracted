@@ -1,5 +1,17 @@
 Revision history for Open-API
 
+0.15    2026-10-11
+	- Swagger 2.0 documents are accepted: brought to 3.0 shape at load
+	  (include/oa_swagger2.h) and then through the 3.0 pass.
+	- A 2.0 section of the compliance catalogue, every object of the
+	  specification, and the official 2.0 example documents vendored.
+	- x-oa-collectionFormat: tab, space and pipe delimited lists in a
+	  path or header, and nested array delimiters, readable from 3.x too.
+	- A (name, in) duplicated within one parameter list is refused.
+	- A response header declared as an array is split before it is
+	  checked; it never was.
+	- A Paths Object may carry x- extensions beside its paths.
+
 0.14    2026-09-16
 	- A security requirement naming scopes on a scheme that is not
 	  oauth2 or openIdConnect is refused under 3.0 only. 3.1 allows the

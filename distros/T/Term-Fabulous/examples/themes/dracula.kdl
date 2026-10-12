@@ -1,0 +1,55 @@
+// Dracula (https://draculatheme.com) for Term::Fabulous: the dark
+// purple-gray screen, the foreground white, purple as the accent and
+// the pink for a primary button. The background token is the screen
+// behind the widgets, painted before every frame.
+
+theme "dracula" extends="dark"
+
+palette {
+	background "#282a36"
+	surface "#2f3241"
+	surface_raised "#44475a"
+	surface_field "#343746"
+	surface_low "#30333f"
+	group_background "#343746"
+	border "#6272a4"
+	line "#44475a"
+	outline "#6272a4"
+	text "#f8f8f2"
+	text_bright "#ffffff"
+	text_muted "#6272a4"
+	text_dim "#a4a9c4"
+	text_inverse "#282a36"
+	placeholder "#6272a4"
+	disabled "#5a5f7a"
+	accent "#bd93f9"
+	focus_background "#44475a"
+	hover_background "#363949"
+	hover_low "#313443"
+	control_hover "#4d5170"
+	selected "#3d4159"
+	selection "#44475a"
+	track "#44475a"
+	track_scroll "#44475a"
+	button_face "#44475a"
+	success "#50fa7b"
+	warning "#f1fa8c"
+	danger "#ff5555"
+}
+
+// Boxes the program gives a border (bordered) get a frame in the
+// comment blue-gray.
+box {
+	border style=Solid color="border"
+}
+
+// The primary button is pink and brightens to the foreground white
+// while it has the focus.
+button {
+	border style=Solid
+	variant "primary" {
+		border color="#ff79c6"
+		text "#ff79c6"
+		focused { border color="text_bright" }
+	}
+}

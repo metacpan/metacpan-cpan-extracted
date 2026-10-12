@@ -1,0 +1,71 @@
+termbox2.h is upstream termbox2 (MIT licensed) with the patches in patches/
+applied:
+
+  https://github.com/termbox/termbox2
+  commit cdf62e9990d8b200768780080fb10a4e2f680051 (2026-09-03, version 2.7.0-dev)
+  https://raw.githubusercontent.com/termbox/termbox2/cdf62e9990d8b200768780080fb10a4e2f680051/termbox2.h
+
+  patches/0001-platform-layer.patch
+      Moves the operating system calls of tb_init_file, tb_init_rwfd,
+      tb_deinit, wait_event, bytebuf_flush and tb_strerror into static
+      functions at the end of the implementation (open_tty, init_fds,
+      wait_input, write_output, now_ms, ...); init_term_attrs,
+      init_resize_handler and update_term_size stay where they are.
+      Pure refactoring on POSIX systems.
+
+  patches/0002-windows-console.patch
+      Adds a Windows definition of each of those functions: the Windows
+      console in virtual terminal mode, read through ReadConsoleInputW.
+
+Each patch file starts with a description of what it does and why. The
+compile-time options Term::Fabulous builds the header with live in
+tf_termbox.h; termbox2.c is the one translation unit that defines TB_IMPL.
+
+Updating termbox2
+-----------------
+
+1. Download the new upstream termbox2.h over src/termbox2.h.
+2. Apply the patches in order from src/:
+
+       patch termbox2.h patches/0001-platform-layer.patch
+       patch termbox2.h patches/0002-windows-console.patch
+
+   When a hunk no longer applies, port it by hand: upstream may have
+   moved a system call into or out of the functions the platform layer
+   replaces (tb_init_file, tb_init_rwfd, init_term_attrs,
+   init_resize_handler, update_term_size, tb_deinit, wait_event,
+   bytebuf_flush, tb_strerror, tb_set_input_mode, load_terminfo and
+   load_builtin_caps). Then regenerate the patches: 0001 is the
+   difference between upstream and the header without its _WIN32 parts,
+   0002 the rest.
+3. Rebuild and run t/termbox.t and t/terminal-termbox.t here, then
+   build and test on Windows (see the WINDOWS section of
+   lib/Term/Fabulous/Termbox.pm). The checks below apply as well.
+
+The Term::Fabulous input parser in termbox2.c (Alt keys, SGR mouse
+reports, kitty keyboard protocol key reports) hooks in through
+tb_set_func(TB_FUNC_EXTRACT_PRE) and reads the input buffer global.in
+directly. Upstream marks tb_set_func and TB_FUNC_EXTRACT_PRE for removal
+in version 3.x (ABI version 3, see the "Deprecation notice" in
+termbox2.h). Before taking a 3.x release, port tf_install_input_parser()
+to its replacement, then run t/termbox.t: it feeds raw escape sequences
+through the parser.
+
+Inline mode (tf_init_inline_rwfd() in termbox2.c) repeats the steps of
+tb_init_rwfd() with termbox2's static init functions and empties the
+TB_CAP_ENTER_CA, TB_CAP_EXIT_CA and TB_CAP_CLEAR_SCREEN entries of
+global.caps. The terminal queries (tf_cursor_position(),
+tf_kitty_keyboard_query(), tf_sixel_query()) wait with wait_input() of
+the platform layer, with a NULL resized argument so that a resize stays
+pending for tb_peek_event, and append to global.in; tf_cells_differ()
+and tf_invalidate_cells() read and write the cells of global.back and
+global.front through termbox2's static cellbuf_get(), cell_cmp() and
+cell_set() (tf_invalidate_cells() marks a cell the way tb_present()
+marks the hidden cells of a wide glyph), and tf_reset_attrs() resets
+global.last_fg and global.last_bg. tf_input_ended() and
+tf_window_cell_size() ask the operating system questions termbox2 never
+asks (FIONREAD, TIOCGWINSZ) and have POSIX and Windows versions of their
+own. After updating termbox2.h, compare tb_init_rwfd() with
+tf_init_inline_rwfd() and check that tb_deinit() and resize_cellbufs()
+still take the screen only through those capabilities; the "inline
+mode" subtest of t/termbox.t checks the output.

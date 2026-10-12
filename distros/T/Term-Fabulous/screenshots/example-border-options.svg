@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="381" viewBox="0 0 780 381" role="img" aria-label="perl examples/border-options.pl">
+<title>perl examples/border-options.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="748" height="346" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="748" height="346" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="748" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="390" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/border-options.pl</text>
+<rect x="16.5" y="16.5" width="747" height="345" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="48" y="78" width="198" height="54" fill="#232a3c"/>
+<rect x="273" y="78" width="198" height="90" fill="#232a3c"/>
+<rect x="498" y="78" width="198" height="126" fill="#232a3c"/>
+<rect x="48" y="222" width="198" height="54" fill="#232a3c"/>
+<rect x="273" y="222" width="198" height="108" fill="#232a3c"/>
+<rect x="507" y="240" width="180" height="36" fill="#232a3c"/>
+<rect x="276" y="85" width="1" height="11" fill="#8cb4e6"/>
+<rect x="276" y="85" width="192" height="1" fill="#8cb4e6"/>
+<rect x="467" y="85" width="1" height="11" fill="#8cb4e6"/>
+<rect x="52" y="86" width="1" height="46" fill="#8cb4e6"/>
+<rect x="52" y="86" width="194" height="1" fill="#8cb4e6"/>
+<rect x="507" y="86" width="180" height="1" fill="#8cb4e6"/>
+<rect x="278" y="87" width="1" height="9" fill="#8cb4e6"/>
+<rect x="278" y="87" width="188" height="1" fill="#8cb4e6"/>
+<rect x="465" y="87" width="1" height="9" fill="#8cb4e6"/>
+<rect x="273" y="96" width="9" height="54" fill="#8cb4e6"/>
+<rect x="466" y="96" width="1" height="63" fill="#8cb4e6"/>
+<rect x="502" y="96" width="1" height="90" fill="#8cb4e6"/>
+<rect x="691" y="96" width="1" height="90" fill="#8cb4e6"/>
+<rect x="277" y="150" width="1" height="9" fill="#8cb4e6"/>
+<rect x="277" y="158" width="190" height="1" fill="#8cb4e6"/>
+<rect x="507" y="194" width="180" height="1" fill="#8cb4e6"/>
+<rect x="57" y="230" width="180" height="1" fill="#8cb4e6"/>
+<rect x="277" y="230" width="1" height="91" fill="#8cb4e6"/>
+<rect x="277" y="230" width="190" height="1" fill="#8cb4e6"/>
+<rect x="466" y="230" width="1" height="91" fill="#8cb4e6"/>
+<rect x="507" y="230" width="180" height="1" fill="#8cb4e6"/>
+<rect x="52" y="240" width="1" height="36" fill="#8cb4e6"/>
+<rect x="241" y="240" width="1" height="36" fill="#8cb4e6"/>
+<rect x="502" y="240" width="1" height="36" fill="#8cb4e6"/>
+<rect x="691" y="240" width="1" height="36" fill="#8cb4e6"/>
+<rect x="277" y="266" width="190" height="1" fill="#8cb4e6"/>
+<rect x="507" y="284" width="180" height="1" fill="#8cb4e6"/>
+<rect x="277" y="320" width="190" height="1" fill="#8cb4e6"/>
+</g>
+<polyline points="502.5 96 502.5 91 502.538 90.413 502.653 89.835 502.843 89.278 503.103 88.75 503.43 88.261 503.818 87.818 504.261 87.43 504.75 87.103 505.278 86.843 505.835 86.653 506.413 86.538 507 86.5 507 86.5" fill="none" stroke="#8cb4e6" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="691.5 96 691.5 91 691.462 90.413 691.347 89.835 691.157 89.278 690.897 88.75 690.57 88.261 690.182 87.818 689.739 87.43 689.25 87.103 688.722 86.843 688.165 86.653 687.587 86.538 687 86.5 687 86.5" fill="none" stroke="#8cb4e6" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="502.5 186 502.5 190 502.538 190.587 502.653 191.165 502.843 191.722 503.103 192.25 503.43 192.739 503.818 193.182 504.261 193.57 504.75 193.897 505.278 194.157 505.835 194.347 506.413 194.462 507 194.5 507 194.5" fill="none" stroke="#8cb4e6" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="691.5 186 691.5 190 691.462 190.587 691.347 191.165 691.157 191.722 690.897 192.25 690.57 192.739 690.182 193.182 689.739 193.57 689.25 193.897 688.722 194.157 688.165 194.347 687.587 194.462 687 194.5 687 194.5" fill="none" stroke="#8cb4e6" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="52.5 240 52.5 235 52.538 234.413 52.653 233.835 52.843 233.278 53.103 232.75 53.43 232.261 53.818 231.818 54.261 231.43 54.75 231.103 55.278 230.843 55.835 230.653 56.413 230.538 57 230.5 57 230.5" fill="none" stroke="#8cb4e6" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="241.5 240 241.5 235 241.462 234.413 241.347 233.835 241.157 233.278 240.897 232.75 240.57 232.261 240.182 231.818 239.739 231.43 239.25 231.103 238.722 230.843 238.165 230.653 237.587 230.538 237 230.5 237 230.5" fill="none" stroke="#8cb4e6" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="502.5 240 502.5 235 502.538 234.413 502.653 233.835 502.843 233.278 503.103 232.75 503.43 232.261 503.818 231.818 504.261 231.43 504.75 231.103 505.278 230.843 505.835 230.653 506.413 230.538 507 230.5 507 230.5" fill="none" stroke="#8cb4e6" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="691.5 240 691.5 235 691.462 234.413 691.347 233.835 691.157 233.278 690.897 232.75 690.57 232.261 690.182 231.818 689.739 231.43 689.25 231.103 688.722 230.843 688.165 230.653 687.587 230.538 687 230.5 687 230.5" fill="none" stroke="#8cb4e6" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="502.5 276 502.5 280 502.538 280.587 502.653 281.165 502.843 281.722 503.103 282.25 503.43 282.739 503.818 283.182 504.261 283.57 504.75 283.897 505.278 284.157 505.835 284.347 506.413 284.462 507 284.5 507 284.5" fill="none" stroke="#8cb4e6" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="691.5 276 691.5 280 691.462 280.587 691.347 281.165 691.157 281.722 690.897 282.25 690.57 282.739 690.182 283.182 689.739 283.57 689.25 283.897 688.722 284.157 688.165 284.347 687.587 284.462 687 284.5 687 284.5" fill="none" stroke="#8cb4e6" stroke-width="1" stroke-linejoin="round"/>
+<g class="terminal">
+<text x="57" y="110" textLength="72" fill="#e6e6e6">bordered</text>
+<text x="282" y="110" textLength="117" fill="#e6e6e6">Solid, with a</text>
+<text x="57" y="128" textLength="117" fill="#e6e6e6">{ left, top }</text>
+<text x="282" y="128" textLength="144" fill="#e6e6e6">Double top and a</text>
+<text x="516" y="128" textLength="117" fill="#e6e6e6">Round, with a</text>
+<text x="282" y="146" textLength="135" fill="#e6e6e6">Thick left side</text>
+<text x="516" y="146" textLength="135" fill="#e6e6e6">cell of padding</text>
+<text x="516" y="164" textLength="153" fill="#e6e6e6">inside the border</text>
+<text x="57" y="254" textLength="117" fill="#e6e6e6">Round, with a</text>
+<text x="282" y="254" textLength="81" fill="#e6e6e6">Title box</text>
+<text x="507" y="254" textLength="162" fill="#e6e6e6">outer_border_sides</text>
+<text x="57" y="272" textLength="162" fill="#e6e6e6">Hidden bottom side</text>
+<text x="507" y="272" textLength="153" fill="#e6e6e6">on all four sides</text>
+<text x="282" y="290" textLength="135" fill="#e6e6e6">Body box joined</text>
+<text x="282" y="308" textLength="153" fill="#e6e6e6">by border_corners</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

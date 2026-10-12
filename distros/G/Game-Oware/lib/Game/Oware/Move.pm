@@ -7,7 +7,7 @@ use Object::Proto::Sugar -types;
 
 use Game::Oware::Board;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 has seat => (
 	is  => 'ro',
@@ -115,7 +115,7 @@ Game::Oware::Move - one sowing, and what it took
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

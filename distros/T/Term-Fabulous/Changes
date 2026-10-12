@@ -1,0 +1,51 @@
+Revision history for Term::Fabulous
+
+0.02    2026-10-12
+        - Term::Fabulous runs on Windows: termbox2 gets a Windows console
+          backend (src/patches), reached through the console in virtual
+          terminal mode, and run polls the terminal for events there,
+          since Perl's select watches only sockets on Windows. The
+          warning about a locale whose character set is not UTF-8 now
+          comes from the real terminal when it opens, not from run, so
+          programs on a memory terminal no longer see it; the Windows
+          console is switched to UTF-8 and does not warn.
+        - Term::Fabulous::Termbox: tf_input_ended replaces
+          tf_readable_bytes and answers the end-of-input question for
+          every platform.
+        - run polls a terminal that offers no read handles at the rate of
+          the new termbox_input_poll_interval reader (1/60 second); such
+          a terminal's input was never read by run before.
+        - Fixes from CPAN Testers: a terminal that hung up is recognized
+          on FreeBSD too (ENXIO besides EIO); the time axis test no
+          longer depends on the language of the locale.
+        - Data::Checks and Object::Pad::FieldAttr::Checked are no longer
+          prerequisites; nothing has used them since the architecture
+          review of 2026-10-05. Without them, no XS extension of
+          Object::Pad is needed, which matters on Windows, where such
+          extensions cannot be built.
+
+0.01    2026-10-11
+        - First release. Full-screen terminal user interfaces from a
+          tree of widgets, built in Perl or in a KDL layout file, laid
+          out by Clay (through Clay::UI) and drawn with 24-bit colors
+          through termbox2. Key presses, mouse clicks, wheel scrolling
+          and resizes arrive as events; keyboard focus moves with Tab
+          and the mouse.
+        - Widgets: boxes, text and rich text with styled spans, scroll
+          boxes and virtual lists, text fields and areas, buttons,
+          check boxes, radio groups, dropdowns, sliders, star ratings,
+          segmented controls, tables, tabs, accordions, dividers,
+          dialogs, toasts, progress bars, spinners, canvases, pixel
+          canvases, images and sixel pictures.
+        - Charts drawn from data: line, area, bar and scatter charts,
+          histograms, sparklines, pie, donut, polar area and radar
+          charts.
+        - Application widgets: menus, a menu bar, a status bar, prompts,
+          a command table with key bindings, a key reference, file
+          dialogs, color pickers and document tabs.
+        - Themes in KDL files, with a theme editor.
+        - An inline mode that uses a few rows below the shell's output
+          instead of the whole screen.
+        - Term::Fabulous::Static prints a widget tree once as text, with
+          or without colors, and Term::Fabulous::Terminal::Memory runs
+          whole programs in tests without a terminal.

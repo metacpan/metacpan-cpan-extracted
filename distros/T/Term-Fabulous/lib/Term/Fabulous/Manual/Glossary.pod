@@ -1,0 +1,487 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Term::Fabulous::Manual::Glossary - The terms used in the Term::Fabulous documentation
+
+=head1 DESCRIPTION
+
+This page is part of L<Term::Fabulous::Manual>. Previous page: L<Term::Fabulous::Manual::Troubleshooting>.
+
+The terms the Term::Fabulous documentation uses, in alphabetical order,
+each with a link to the section that explains it. A term with several
+meanings lists them all; a word in parentheses names the area a term
+belongs to, such as (table) or (KDL).
+
+=head1 GLOSSARY
+
+=over
+
+=item alias (KDL)
+
+The short name a KDL layout gives a widget class in its C<use>
+instructions (C<use Term::Fabulous::Widget::Box as Box>); widget nodes
+use it as their name. See
+L<Term::Fabulous::Manual::KDL/Declaring widget classes>.
+
+=item ancestor
+
+A widget's parent, the parent's parent, and so on up to the root.
+
+=item application object
+
+The L<Term::Fabulous> object of a program: it holds the widget tree,
+opens the terminal and runs the event loop (L<C<run>|Term::Fabulous/run>).
+
+=item bubbling
+
+An event, after the listeners of its target ran, is passed on to the
+target's ancestors. See L<Term::Fabulous::Manual::Events/Return values and bubbling>.
+
+=item canvas
+
+A widget you draw into yourself: a L<Term::Fabulous::Widget::Canvas>
+cell by cell, a L<Term::Fabulous::Widget::PixelCanvas> pixel by pixel.
+See L<Term::Fabulous::Manual::Charts/CANVASES>. A canvas that paints
+itself from its own state is a L<Term::Fabulous::Widget::Display>.
+
+=item cell
+
+The word has three meanings, which the context tells apart:
+
+=over
+
+=item 1.
+
+One character position of the terminal. Wide characters take two
+cells. Sizes, padding and positions are counted in cells.
+
+=item 2.
+
+On a canvas, one position of its buffer: a character with a
+foreground and a background color. See
+L<Term::Fabulous::Manual::Charts/Drawing cells>.
+
+=item 3.
+
+In a table, the place where a row and a column meet, with the value
+the column takes from the row. See
+L<Term::Fabulous::Manual::Tables/Table terms>.
+
+=back
+
+=item cell context (table)
+
+The hash reference a table passes to a column's C<cell>,
+C<update_cell> and C<cell_style> code: the raw value, the display
+text, a copy of the row, the row id, the column and the table. See
+L<Term::Fabulous::Manual::Tables/CELL WIDGETS>.
+
+=item character string
+
+Decoded Perl text, where each character is one Unicode code point.
+Compare "UTF-8 byte string".
+
+=item chart
+
+A canvas that draws itself from data: line, area, bar, scatter,
+histogram, sparkline, pie, donut, polar area and radar charts. See
+L<Term::Fabulous::Manual::Charts/CHARTS>.
+
+=item Clay
+
+The layout engine Term::Fabulous uses; see L<Clay::XS> and L<Clay::UI>.
+
+=item column, row
+
+=over
+
+=item 1.
+
+The horizontal and vertical position of a terminal cell or a canvas
+cell, counted from 0 at the top-left corner.
+
+=item 2.
+
+In a table, a row is one hash reference of your data, shown as one
+line, and a column is one L<Term::Fabulous::Widget::Table::Column>
+object, which picks a value out of each row. See
+L<Term::Fabulous::Manual::Tables/Table terms>.
+
+=back
+
+=item column chooser (table)
+
+A list with a check box per column that lets the user show and hide
+the columns of a table. See
+L<Term::Fabulous::Manual::Tables/Choosing the visible columns>.
+
+=item command
+
+One thing the user can do, with a label, keys and code: a
+L<Term::Fabulous::Command>, usually kept in a
+L<Term::Fabulous::Commands> table that runs it by its keys and shows it
+in menus. See L<Term::Fabulous::Manual::Menus/COMMANDS>.
+
+=item content box
+
+The area of a widget inside its border and padding, where its children
+(or a canvas's cells) are placed.
+
+=item context menu
+
+A menu of what can be done with the thing under the pointer, opened
+with a right click, the Menu key or Shift+F10. In Term::Fabulous, a
+L<Term::Fabulous::Widget::Menu> opened as a popup. See
+L<Term::Fabulous::Manual::Menus/CONTEXT MENUS>.
+
+=item contributor
+
+A method of a widget whose name starts with C<contribute_>. Clay::UI
+calls all of them, in alphabetical order, to build the widget's
+configuration (colors, border, layout) for a frame. See
+L<Term::Fabulous::Manual::CustomWidgets/A box that takes the focus and reacts to the mouse>.
+
+=item cursor (table)
+
+The line of a L<Term::Fabulous::Widget::Table> the keyboard works on,
+highlighted while the table has the focus. Not the same as the
+selection. See L<Term::Fabulous::Manual::TableRows/The cursor>.
+
+=item debounced
+
+Delayed until the input has stopped changing for a short time; used for
+terminal resizes, see L<Term::Fabulous::Manual::Events/Event reference>.
+
+=item display text (table)
+
+The text a table cell shows: its raw value after the column's mutators.
+See L<Term::Fabulous::Manual::Tables/DISPLAY TEXT AND MUTATORS>.
+
+=item event
+
+Something that happened, as an object: a key press, a click, a changed
+value. Events are fired on a widget, run its listeners and then bubble.
+See L<Term::Fabulous::Manual::Events/EVENTS>.
+
+=item event loop
+
+The L<IO::Async::Loop> that L<C<< $ui->run >>|Term::Fabulous/run>
+runs: it waits for input, draws frames and runs timers. See
+L<Term::Fabulous::Manual::Programs/THE EVENT LOOP>.
+
+=item family (theme)
+
+The kind of a widget as the theme sees it: C<button>, C<input>, C<table>, ... Each family has slots. See L<Term::Fabulous::Manual::Looks/What a theme colors>.
+
+=item filter expression (table)
+
+The text in a field of a table's filter row, such as C<< >=2019 >> or
+C<!ann>; its notation depends on the column's type. See
+L<Term::Fabulous::Manual::TableRows/The filter row>.
+
+=item focus
+
+Which widget receives key presses. See L<Term::Fabulous::Manual::Events/FOCUS>.
+
+=item frame
+
+=over
+
+=item 1.
+
+One complete layout and drawing of the screen. L<Term::Fabulous> checks
+30 times per second whether a frame is needed and draws one when
+something changed, so a change "shows in the next frame" within 1/30
+second.
+
+=item 2.
+
+Of a table, the lines around it, set with its C<border> parameter. See
+L<Term::Fabulous::Manual::TableStyles/Lines between and around the cells>.
+
+=back
+
+=item grapheme cluster
+
+What a reader sees as one character, even if it consists of several
+Unicode code points (a letter with combining accents, a flag emoji).
+Cursor movement and canvas cells work with clusters.
+
+=item group, group header (table)
+
+The rows of a table that share the value of a group column
+(C<group_by>), and the line above them that shows the value and the
+number of rows; the user opens and closes a group there. See
+L<Term::Fabulous::Manual::TableRows/GROUPING>.
+
+=item hoverable, pressable, focusable
+
+Widgets that track whether the pointer is over them, whether they are
+pressed, and whether they can take the keyboard focus. They compose the
+L<Clay::UI> roles of these names: Button and the input widgets all
+three, Table and RadioGroup focusable (Table also hoverable), charts
+hoverable. See
+L<Term::Fabulous::Manual::CustomWidgets/A box that takes the focus and reacts to the mouse>.
+
+=item inline mode, inline region
+
+A way to run a program in a few rows below the shell's output instead
+of the whole screen; the rows are the inline region. See
+L<Term::Fabulous/INLINE MODE>.
+
+=item interaction tracker
+
+The L<Clay::UI::Interaction> object of the UI, C<< $ui->interaction >>:
+it knows which widget has the focus, which is hovered and which is
+pressed, and moves the focus from code. See
+L<Term::Fabulous::Manual::Events/Moving the focus>.
+
+=item KDL
+
+A configuration language (L<https://kdl.dev>) in which widget trees can
+be written. See L<Term::Fabulous::Manual::KDL/KDL LAYOUT FILES>.
+
+=item key name
+
+The readable name of a key press, such as C<q>, C<Enter> or
+C<Ctrl+Left>, as the method
+L<C<key_name>|Term::Fabulous::Event::KeyPress/key_name> of a KeyPress
+event returns it. See L<Term::Fabulous::Manual::Events/Key names>.
+
+=item kitty keyboard protocol
+
+A way for terminals to report keys that the older encodings cannot
+tell apart. See L<Term::Fabulous::Event::KeyPress/THE KITTY KEYBOARD PROTOCOL>.
+
+=item layout
+
+The sizes and positions of the widgets, which Clay works out for every
+frame from each widget's C<layout> hash. See
+L<Term::Fabulous::Manual::Layout/LAYOUT>.
+
+=item line (table)
+
+One entry of a table's view: a data row or a group header. Pages count
+lines. See L<Term::Fabulous::Manual::Tables/Table terms>.
+
+=item listener
+
+A code reference registered with C<< $widget->on( $event_name => $code ) >>.
+See L<Term::Fabulous::Manual::Events/Listening to events>.
+
+=item mnemonic
+
+The underlined letter of a menu title, which opens the menu together
+with Alt. See L<Term::Fabulous::Manual::Menus/Opening the menus>.
+
+=item mutator
+
+A code reference that turns a table cell's raw value into its display
+text, for example epoch seconds into a date; see
+L<Term::Fabulous::Widget::Table::Mutator>.
+
+=item node (KDL)
+
+One element of a KDL document: a name, optional values and an optional
+block of child nodes in braces. In a layout, a node whose name starts
+with an uppercase letter is a widget, any other node a property. See
+L<Term::Fabulous::Manual::KDL/Widget nodes and ids>.
+
+=item notifier
+
+L<IO::Async>'s word for anything that runs in its event loop: timers,
+sockets, child processes, signal handlers.
+
+=item padding
+
+Empty space inside a widget, between its edge (or border) and its
+children, in cells per side; in a table, C<cell_padding> is the space
+inside every cell. See L<Term::Fabulous::Manual::Layout/Padding>.
+
+=item pager (table)
+
+The bar below a table with pages: buttons to turn the pages, the page
+number, a list of page sizes and a count of the lines. See
+L<Term::Fabulous::Manual::TableRows/PAGES>.
+
+=item palette (chart)
+
+The list of colors a chart gives its series or slices in turn:
+C<default>, C<classic>, C<pastel>, C<vivid> or colors of your own. See
+L<Term::Fabulous::Manual::Charts/Colors, palettes and themes>.
+
+=item pixel (PixelCanvas)
+
+Half a terminal cell: a L<Term::Fabulous::Widget::PixelCanvas> shows two
+pixels per cell, one above the other. See
+L<Term::Fabulous::Manual::Charts/Drawing pixels>.
+
+=item property (KDL)
+
+A node inside a widget node that sets one property of that widget,
+such as C<sizing> or C<text>. See
+L<Term::Fabulous::Manual::KDL/Properties>.
+
+=item raw value (table)
+
+The value a table column reads from a row (or computes from it). Tables
+sort by it and filter by it unless told otherwise. See
+L<Term::Fabulous::Manual::Tables/How a table works>.
+
+=item root widget
+
+The widget passed as C<root> to C<< Term::Fabulous->new >>; the top of the
+widget tree.
+
+=item row id (table)
+
+The name of a row of a L<Term::Fabulous::Widget::Table>, used by every
+method and event. See L<Term::Fabulous::Manual::Tables/Row ids>.
+
+=item selection (table)
+
+The set of rows of a table that the user or the program marked; not the
+same as the cursor. See L<Term::Fabulous::Manual::TableRows/Selection>.
+
+=item series (chart)
+
+A named list of data points a chart draws in one color: a line, an area,
+a group of bars or a set of points. Pie charts have slices instead. See
+L<Term::Fabulous::Manual::Charts/Series and data>.
+
+=item sizing
+
+The rule for a widget's width or height in its C<layout>: C<fit> (as
+small as the content), C<grow> (take the room left over), C<fixed> (a
+number of cells) or C<percent> (a share of the parent). See
+L<Term::Fabulous::Manual::Layout/Sizing>.
+
+=item sizing group
+
+Widgets with the same C<width_group> (or C<height_group>) number get the
+same width (or height); see L<Term::Fabulous::Manual::Layout/Equal sizes across the tree>.
+
+=item slice (chart)
+
+One part of a pie, donut or polar area chart: a unique label and a
+value. The slices are the chart's series. See
+L<Term::Fabulous::Manual::Charts/Series and data>.
+
+=item slot (theme)
+
+One part of a widget family that a theme decides, a color, a border style or whether there is a border: C<button.border.color>, C<input.placeholder>, C<divider.line.style>, C<text_input.border.enabled>. A slot has a value for the normal state and may have one for each state the widget shows (C<focused>, C<disabled>, ...). It defaults to a token, a style name, or C<true> or C<false>. See L<Term::Fabulous::Theme/Families, slots and states>.
+
+=item style hash (table)
+
+A hash reference of looks and lines for a column, a row or a cell of a
+table, such as C<< { text_color => '#ff0000', bold => 1 } >>. See
+L<Term::Fabulous::Manual::TableStyles/Style hashes>.
+
+=item subpixel (chart)
+
+One of the dots or blocks a chart draws per terminal cell, for example
+the 2 x 4 Braille dots of a line or the eighth blocks of a bar. See
+L<Term::Fabulous::Manual::Charts/How a chart is drawn>.
+
+=item swatch
+
+A named value a L<Term::Fabulous::Widget::ColorPicker> offers in a
+list, with the color it stands for: a color of its own, a theme's
+token name, or C<none> for no color. See
+L<Term::Fabulous::Manual::Forms/Color pickers>.
+
+=item target
+
+The widget an event was fired on.
+
+=item termbox2
+
+The C library that controls the terminal; see L<Term::Fabulous::Termbox>.
+
+=item terminal (object)
+
+The object through which L<Term::Fabulous> reads input and draws: the
+real terminal (L<Term::Fabulous::Terminal::Termbox>) or a terminal in
+memory for tests (L<Term::Fabulous::Terminal::Memory>). See
+L<Term::Fabulous::Role::Terminal>.
+
+=item terminal default color
+
+The text and background color the terminal uses when a program does not
+set one. Colors with alpha 0 select it.
+
+=item theme
+
+The colors, border styles and borders every widget draws with when it is not given its own: a palette of tokens and the slots of every widget family, with variants. Set per UI (C<< Term::Fabulous->new( theme => ... ) >>) and switched at run time; built-in: C<dark> and C<light>; written in theme files or in Perl. See L<Term::Fabulous::Manual::Looks/THEMES> and L<Term::Fabulous::Theme>.
+
+=item theme (chart)
+
+Whether a chart draws its text, axes and grid with a C<dark> or a
+C<light> ink, and which steps of its palette it uses; C<auto> (the
+default) chooses by the background. See
+L<Term::Fabulous::Manual::Charts/Colors, palettes and themes>.
+
+=item theme file
+
+A KDL file that describes a theme: a C<theme> node, a C<palette> node and one node per widget family. Loaded with L<Term::Fabulous::Theme/from_file>. See L<Term::Fabulous::Theme/THEME FILES>.
+
+=item toggle
+
+A command for a setting that is on or off, which a menu shows with a
+check mark while it is on. See
+L<Term::Fabulous::Manual::Menus/Settings that are on or off>.
+
+=item token (theme)
+
+A named color of a theme's palette, such as C<accent>, C<surface> or C<text>, which the slots default to. The C<background> token is the screen behind the widgets, which every frame paints first. See L<Term::Fabulous::Theme/Tokens>.
+
+=item tree row, child row (table)
+
+In a table with C<children_key>, a row can have child rows, shown
+indented below it while it is open. See
+L<Term::Fabulous::Manual::TableRows/TREES>.
+
+=item UTF-8 byte string
+
+Text encoded as UTF-8, where non-ASCII characters take several bytes, as
+produced by C<encode('UTF-8', $text)>.
+
+=item variant (theme)
+
+Slots of a widget family that apply to the widgets whose C<classes> name the variant: a C<primary> variant of C<button> styles the buttons with C<< classes => ['primary'] >>. See L<Term::Fabulous::Manual::Looks/Variants and classes>.
+
+=item view (table)
+
+The lines a table shows: its rows after filtering, grouping, sorting and
+flattening. See L<Term::Fabulous::Manual::Tables/How a table works>.
+
+=item widget
+
+An object that is drawn on the screen and can react to events: a box,
+text, a button, an input, a table, a chart. See
+L<Term::Fabulous::Manual::Layout/The widgets>.
+
+=item widget id
+
+The optional C<id> string of a widget, unique in its tree. Clay keeps
+per-widget state (such as a scroll position) by it, and C<find_by_id>
+finds the widget by it. See L<Term::Fabulous::Manual::Layout/Widget ids>.
+
+=item widget tree
+
+The root widget, its children, their children, and so on.
+
+=back
+
+The table guide defines a few more words of its own (open and closed
+rows, group path, row data, "passes the filters") in
+L<its list of table terms|Term::Fabulous::Manual::Tables/Table terms>.
+
+=head1 SEE ALSO
+
+This page is part of L<Term::Fabulous::Manual>. Previous page: L<Term::Fabulous::Manual::Troubleshooting>.
+
+=cut

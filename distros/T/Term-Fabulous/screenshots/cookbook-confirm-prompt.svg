@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="381" viewBox="0 0 780 381" role="img" aria-label="perl examples/cookbook/confirm-prompt.pl">
+<title>perl examples/cookbook/confirm-prompt.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="748" height="346" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="748" height="346" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="748" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="390" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/cookbook/confirm-prompt.pl</text>
+<rect x="16.5" y="16.5" width="747" height="345" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="30" y="60" width="720" height="36" fill="#0b0b11"/>
+<rect x="30" y="96" width="90" height="18" fill="#0b0b11"/>
+<rect x="120" y="96" width="540" height="198" fill="#1c212d"/>
+<rect x="660" y="96" width="90" height="18" fill="#0b0b11"/>
+<rect x="30" y="114" width="18" height="216" fill="#0b0b11"/>
+<rect x="48" y="114" width="72" height="180" fill="#121418"/>
+<rect x="660" y="114" width="72" height="180" fill="#121418"/>
+<rect x="732" y="114" width="18" height="216" fill="#0b0b11"/>
+<rect x="48" y="294" width="684" height="36" fill="#121418"/>
+<rect x="30" y="330" width="720" height="18" fill="#0b0b11"/>
+<rect x="129" y="104" width="522" height="1" fill="#61afef"/>
+<rect x="124" y="114" width="1" height="162" fill="#61afef"/>
+<rect x="655" y="114" width="1" height="162" fill="#61afef"/>
+<rect x="156" y="212" width="54" height="1" fill="#46556e"/>
+<rect x="246" y="212" width="126" height="1" fill="#61afef"/>
+<rect x="151" y="222" width="1" height="18" fill="#46556e"/>
+<rect x="214" y="222" width="1" height="18" fill="#46556e"/>
+<rect x="241" y="222" width="1" height="18" fill="#61afef"/>
+<rect x="376" y="222" width="1" height="18" fill="#61afef"/>
+<rect x="156" y="248" width="54" height="1" fill="#46556e"/>
+<rect x="246" y="248" width="126" height="1" fill="#61afef"/>
+<rect x="129" y="284" width="522" height="1" fill="#61afef"/>
+</g>
+<polyline points="124.5 114 124.5 109 124.538 108.413 124.653 107.835 124.843 107.278 125.103 106.75 125.43 106.261 125.818 105.818 126.261 105.43 126.75 105.103 127.278 104.843 127.835 104.653 128.413 104.538 129 104.5 129 104.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="655.5 114 655.5 109 655.462 108.413 655.347 107.835 655.157 107.278 654.897 106.75 654.57 106.261 654.182 105.818 653.739 105.43 653.25 105.103 652.722 104.843 652.165 104.653 651.587 104.538 651 104.5 651 104.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="151.5 222 151.5 217 151.538 216.413 151.653 215.835 151.843 215.278 152.103 214.75 152.43 214.261 152.818 213.818 153.261 213.43 153.75 213.103 154.278 212.843 154.835 212.653 155.413 212.538 156 212.5 156 212.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="214.5 222 214.5 217 214.462 216.413 214.347 215.835 214.157 215.278 213.897 214.75 213.57 214.261 213.182 213.818 212.739 213.43 212.25 213.103 211.722 212.843 211.165 212.653 210.587 212.538 210 212.5 210 212.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="241.5 222 241.5 217 241.538 216.413 241.653 215.835 241.843 215.278 242.103 214.75 242.43 214.261 242.818 213.818 243.261 213.43 243.75 213.103 244.278 212.843 244.835 212.653 245.413 212.538 246 212.5 246 212.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="376.5 222 376.5 217 376.462 216.413 376.347 215.835 376.157 215.278 375.897 214.75 375.57 214.261 375.182 213.818 374.739 213.43 374.25 213.103 373.722 212.843 373.165 212.653 372.587 212.538 372 212.5 372 212.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="151.5 240 151.5 244 151.538 244.587 151.653 245.165 151.843 245.722 152.103 246.25 152.43 246.739 152.818 247.182 153.261 247.57 153.75 247.897 154.278 248.157 154.835 248.347 155.413 248.462 156 248.5 156 248.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="214.5 240 214.5 244 214.462 244.587 214.347 245.165 214.157 245.722 213.897 246.25 213.57 246.739 213.182 247.182 212.739 247.57 212.25 247.897 211.722 248.157 211.165 248.347 210.587 248.462 210 248.5 210 248.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="241.5 240 241.5 244 241.538 244.587 241.653 245.165 241.843 245.722 242.103 246.25 242.43 246.739 242.818 247.182 243.261 247.57 243.75 247.897 244.278 248.157 244.835 248.347 245.413 248.462 246 248.5 246 248.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="376.5 240 376.5 244 376.462 244.587 376.347 245.165 376.157 245.722 375.897 246.25 375.57 246.739 375.182 247.182 374.739 247.57 374.25 247.897 373.722 248.157 373.165 248.347 372.587 248.462 372 248.5 372 248.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="124.5 276 124.5 280 124.538 280.587 124.653 281.165 124.843 281.722 125.103 282.25 125.43 282.739 125.818 283.182 126.261 283.57 126.75 283.897 127.278 284.157 127.835 284.347 128.413 284.462 129 284.5 129 284.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="655.5 276 655.5 280 655.462 280.587 655.347 281.165 655.157 281.722 654.897 282.25 654.57 282.739 654.182 283.182 653.739 283.57 653.25 283.897 652.722 284.157 652.165 284.347 651.587 284.462 651 284.5 651 284.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<g class="terminal">
+<text x="48" y="92" textLength="405" fill="#6e6f72">Type some notes. Ctrl+Q asks before quitting.</text>
+<text x="48" y="128" textLength="72" fill="#6e6f72">Buy milk</text>
+<text x="147" y="146" textLength="45" class="b" fill="#dcdfe4">Quit?</text>
+<text x="147" y="182" textLength="306" fill="#dcdfe4">Your notes are not saved anywhere.</text>
+<text x="165" y="236" textLength="36" fill="#dcdfe4">Quit</text>
+<text x="255" y="236" textLength="108" fill="#dcdfe4">Keep writing</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

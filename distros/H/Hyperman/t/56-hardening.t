@@ -78,6 +78,45 @@ if (!$pid) {
                     # $w goes out of scope here without ->close
                 };
             }
+            if ($p eq '/stream') {
+                return sub {
+                    my $respond = shift;
+                    my $w = $respond->([ 200, [ 'Content-Type' => 'text/plain' ] ]);
+                    $w->write($_) for qw(one two three);
+                    $w->write('');                  # a zero-length write is not a chunk
+                    $w->close;
+                    $w->write('late');              # after close: dropped
+                    $w->close;                      # twice: harmless
+                };
+            }
+            if ($p eq '/streamlen') {
+                return sub {
+                    my $respond = shift;
+                    my $w = $respond->([ 200, [ 'Content-Type' => 'text/plain',
+                                                 'Content-Length' => 5 ] ]);
+                    $w->write('hello');
+                    $w->write('overrun');           # past the declared length
+                    $w->close;
+                };
+            }
+            if ($p eq '/streamshort') {
+                return sub {
+                    my $respond = shift;
+                    my $w = $respond->([ 200, [ 'Content-Type' => 'text/plain',
+                                                 'Content-Length' => 10 ] ]);
+                    $w->write('hi');
+                    $w->close;                      # short of the declared length
+                };
+            }
+            if ($p eq '/closein') {
+                close $env->{'psgi.input'};
+                return [ 200, [ 'Content-Type' => 'text/plain' ], [ 'closed' ] ];
+            }
+            if ($p eq '/readin') {
+                my $n = $env->{'psgi.input'}->read(my $b, 10);
+                return [ 200, [ 'Content-Type' => 'text/plain' ],
+                         [ defined $n ? "read=$n" : "undef:$!" ] ];
+            }
             if ($p eq '/cookie') {
                 return [ 200, [ 'Content-Type' => 'text/plain',
                                 'Set-Cookie'   => 'sid=abc; Path=/' ], [ $BIG ] ];
@@ -136,6 +175,35 @@ sub read_response {
     }
     my $body = $buf;
     my $cl = $h{'content-length'};
+    if (($h{'transfer-encoding'} // '') =~ /chunked/i) {
+        # decode chunks off the socket; what follows the last chunk is the
+        # next response on this keep-alive connection
+        my $out = '';
+        eval {
+            local $SIG{ALRM} = sub { die "timeout\n" };
+            alarm 5;
+            for (;;) {
+                until ($body =~ /\r\n/) {
+                    my $n = $s->sysread(my $c, 4096);
+                    last unless $n;
+                    $body .= $c;
+                }
+                $body =~ s/\A([0-9a-fA-F]+)[^\r\n]*\r\n// or die "bad chunk size line\n";
+                my $len = hex $1;
+                until (length($body) >= $len + 2) {
+                    my $n = $s->sysread(my $c, 4096);
+                    last unless $n;
+                    $body .= $c;
+                }
+                if ($len == 0) { $body =~ s/\A\r\n//; last }
+                $out .= substr($body, 0, $len);
+                substr($body, 0, $len + 2) = '';
+            }
+            alarm 0;
+        };
+        $pending{fileno $s} = $body if length $body;
+        return ($status, \%h, $out);
+    }
     eval {
         local $SIG{ALRM} = sub { die "timeout\n" };
         alarm 5;
@@ -261,9 +329,76 @@ sub raw {
     my $t0 = Time::HiRes::time();
     my ($st, $h, $body) = read_response($s);
     is $st, 200, 'a streaming response began';
-    is $body, 'partial', 'the dropped writer ended the body (EOF arrived)';
+    like $h->{'transfer-encoding'}, qr/chunked/, '...framed as chunked on HTTP/1.1';
+    is $body, 'partial', 'the dropped writer ended the body (the last chunk arrived)';
     cmp_ok Time::HiRes::time() - $t0, '<', 4, '...promptly, not at the read timeout';
+    $s->syswrite("GET /echo HTTP/1.1\r\nHost: t\r\n\r\n");
+    ($st, $h, $body) = read_response($s);
+    like $body, qr/\AGET\|/, 'the connection served the next request after the dropped writer';
     close $s;
+}
+
+# ---- chunked streaming keeps the connection -------------------------------
+{
+    my $s = connect_to();
+    $s->syswrite("GET /stream HTTP/1.1\r\nHost: t\r\n\r\n"
+               . "GET /echo HTTP/1.1\r\nHost: t\r\n\r\n");
+    my ($st, $h, $body) = read_response($s);
+    is $st, 200, 'streamed response: 200';
+    like $h->{'transfer-encoding'}, qr/chunked/, 'streamed response is chunked';
+    is $h->{connection}, 'keep-alive', '...and keeps the connection';
+    is $body, 'onetwothree', 'the chunks decode to the body; the empty write was no chunk';
+    ($st, $h, $body) = read_response($s);
+    is $st, 200, 'the pipelined request behind the stream was answered';
+    like $body, qr/\AGET\|/, '...on the same connection';
+    close $s;
+}
+{
+    my $s = connect_to();
+    $s->syswrite("HEAD /stream HTTP/1.1\r\nHost: t\r\n\r\n"
+               . "GET /echo HTTP/1.1\r\nHost: t\r\n\r\n");
+    my ($st, $h) = read_response($s, 0);
+    is $st, 200, 'HEAD of a streamed route is answered';
+    my ($st2, $h2, $body2) = read_response($s);
+    is $st2, 200, 'no chunk followed the HEAD headers: the next response framed correctly';
+    like $body2, qr/\AGET\|/, '...and it was the pipelined GET';
+    close $s;
+}
+{
+    my ($st, $h, $body) = raw("GET /stream HTTP/1.0\r\nHost: t\r\n\r\n");
+    is $st, 200, 'HTTP/1.0 streamed response';
+    ok !exists $h->{'transfer-encoding'}, '...is not chunked';
+    is $h->{connection}, 'close', '...and closes';
+    is $body, 'onetwothree', '...with the body read to EOF';
+}
+{
+    my $s = connect_to();
+    $s->syswrite("GET /streamlen HTTP/1.1\r\nHost: t\r\n\r\n");
+    my ($st, $h, $body) = read_response($s);
+    is $h->{'content-length'}, '5', 'a declared Content-Length is sent as given';
+    is $body, 'hello', 'exactly the declared bytes went out; the overrun was cut';
+    $s->syswrite("GET /echo HTTP/1.1\r\nHost: t\r\n\r\n");
+    my ($st2) = read_response($s);
+    is $st2, 'none', 'the overrun closed the connection: nothing can follow a broken frame';
+    close $s;
+}
+{
+    my $s = connect_to();
+    $s->syswrite("GET /streamshort HTTP/1.1\r\nHost: t\r\n\r\n");
+    my ($st, $h, $body) = read_response($s);
+    is $body, 'hi', 'a body short of its Content-Length ends at EOF';
+    $s->syswrite("GET /echo HTTP/1.1\r\nHost: t\r\n\r\n");
+    my ($st2) = read_response($s);
+    is $st2, 'none', '...and the connection is closed rather than left out of frame';
+    close $s;
+}
+
+# ---- a closed psgi.input does not break the next bodyless request ----------
+{
+    my (undef, undef, $b1) = raw("GET /closein HTTP/1.1\r\nHost: t\r\n\r\n");
+    is $b1, 'closed', 'a handler closed the shared empty psgi.input';
+    my (undef, undef, $b2) = raw("GET /readin HTTP/1.1\r\nHost: t\r\n\r\n");
+    is $b2, 'read=0', 'the next request still reads an open, empty psgi.input';
 }
 
 # ---- compression leaves a Set-Cookie response alone -------------------------

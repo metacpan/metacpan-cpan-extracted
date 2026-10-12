@@ -1,0 +1,107 @@
+#!/usr/bin/env perl
+
+# Draws the example picture examples/images/mandelbrot.png: a 480x320
+# detail of the Mandelbrot set in the seahorse valley, its spirals in
+# smooth bands of a cyclic palette, the set itself in deep navy. Every
+# pixel averages SUBSAMPLES x SUBSAMPLES points in linear light, and the
+# band of a point is its escape time made continuous, so neighboring
+# pixels differ only a little: a picture with fine detail and smooth
+# gradients that half blocks cannot show. Needs Imager with PNG support;
+# takes some seconds.
+#
+#     perl tools/mandelbrot                    # writes examples/images/mandelbrot.png
+#     perl tools/mandelbrot --output FILE.png
+#
+# See tools/README.md.
+#
+# Copyright (C) 2026 davenonymous.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the same terms as Perl itself.
+
+use v5.32;
+use warnings;
+use feature 'signatures';
+no warnings 'experimental::signatures';
+
+use FindBin;
+use Getopt::Long qw(GetOptions);
+use Imager;
+
+use constant WIDTH          => 480;
+use constant HEIGHT         => 320;
+use constant SUBSAMPLES     => 2;
+use constant CENTER_REAL    => -0.7436;
+use constant CENTER_IMAG    => 0.1318;
+use constant SPAN_REAL      => 0.0135;    # the width of the picture in the complex plane
+use constant MAX_ITERATIONS => 800;
+use constant ESCAPE_RADIUS  => 256;    # large, so that the continuous escape time is smooth
+
+# Colors the bands run through, in a cycle of BAND_LENGTH iterations; the
+# set itself is INSIDE.
+my @PALETTE = ( [ 8, 18, 64 ], [ 32, 107, 203 ], [ 237, 255, 255 ], [ 255, 170, 0 ], [ 140, 30, 10 ] );
+use constant BAND_LENGTH => 24;
+my @INSIDE = ( 6, 8, 30 );
+
+sub to_linear ($channel) {
+	my $value = $channel / 255;
+	return $value <= 0.04045 ? $value / 12.92 : ( ( $value + 0.055 ) / 1.055 )**2.4;
+}
+
+sub to_srgb ($linear) {
+	my $value = $linear <= 0.0031308 ? 12.92 * $linear : 1.055 * $linear**( 1 / 2.4 ) - 0.055;
+	return int( 255 * $value + 0.5 );
+}
+
+# The escape time of c as a real number, undef for a point of the set.
+sub escape_time ( $c_real, $c_imag ) {
+	my ( $real, $imag ) = ( 0, 0 );
+	foreach my $iteration ( 1 .. MAX_ITERATIONS ) {
+		( $real, $imag ) = ( $real * $real - $imag * $imag + $c_real, 2 * $real * $imag + $c_imag );
+		my $magnitude = $real * $real + $imag * $imag;
+		return $iteration + 1 - log( log($magnitude) / 2 ) / log(2) if $magnitude > ESCAPE_RADIUS * ESCAPE_RADIUS;
+	}
+	return undef;
+}
+
+# The palette color, in linear light, at a continuous escape time.
+sub band_color ( $time, $linear_palette ) {
+	my $position = ( $time / BAND_LENGTH ) * @$linear_palette;
+	my $index    = int($position) % @$linear_palette;
+	my $fraction = $position - int($position);
+	my ( $from, $to ) = ( $linear_palette->[$index], $linear_palette->[ ( $index + 1 ) % @$linear_palette ] );
+	return map { $from->[$_] + ( $to->[$_] - $from->[$_] ) * $fraction } 0 .. 2;
+}
+
+sub pixel_color ( $x, $y, $linear_palette, $linear_inside ) {
+	my $step = SPAN_REAL / WIDTH;
+	my @sum  = ( 0, 0, 0 );
+	foreach my $sub_y ( 0 .. SUBSAMPLES - 1 ) {
+		foreach my $sub_x ( 0 .. SUBSAMPLES - 1 ) {
+			my $c_real = CENTER_REAL + ( $x + ( $sub_x + 0.5 ) / SUBSAMPLES - WIDTH / 2 ) * $step;
+			my $c_imag = CENTER_IMAG - ( $y + ( $sub_y + 0.5 ) / SUBSAMPLES - HEIGHT / 2 ) * $step;
+			my $time   = escape_time( $c_real, $c_imag );
+			my @color  = defined $time ? band_color( $time, $linear_palette ) : @$linear_inside;
+			$sum[$_] += $color[$_] foreach 0 .. 2;
+		}
+	}
+	return map { to_srgb( $_ / SUBSAMPLES**2 ) } @sum;
+}
+
+sub mandelbrot () {
+	my @linear_palette = map {
+		[ map { to_linear($_) } @$_ ]
+	} @PALETTE;
+	my @linear_inside = map { to_linear($_) } @INSIDE;
+	my $image         = Imager->new( xsize => WIDTH, ysize => HEIGHT, channels => 3 );
+	foreach my $y ( 0 .. HEIGHT - 1 ) {
+		my @row = map { pixel_color( $_, $y, \@linear_palette, \@linear_inside ) } 0 .. WIDTH - 1;
+		$image->setsamples( y => $y, data => \@row, type => '8bit' );
+	}
+	return $image;
+}
+
+GetOptions( 'output=s' => \my $output ) or die "usage: tools/mandelbrot [--output FILE.png]\n";
+$output //= "$FindBin::Bin/../examples/images/mandelbrot.png";
+mandelbrot()->write( file => $output, type => 'png' ) or die "mandelbrot: cannot write $output: " . Imager->errstr . "\n";
+say "mandelbrot: wrote $output";

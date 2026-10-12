@@ -67,7 +67,8 @@ $t->get_ok('/file')->status_is(200)
   ->header_is('Content-Length' => length $bytes)
   ->header_is('Accept-Ranges'  => 'bytes')
   ->content_is($bytes);
-like $t->header('ETag'), qr/^"[0-9a-f]+-[0-9a-f]+"$/, 'strong hex ETag';
+like $t->header('ETag'), qr/^"[0-9a-f]+-[0-9a-f]+(?:-[0-9a-f]+)?"$/,
+    'strong hex ETag';
 like $t->header('Last-Modified'), qr/GMT$/, 'Last-Modified is an HTTP date';
 ok !defined $t->header('Content-Disposition'),
     'no disposition unless asked for';

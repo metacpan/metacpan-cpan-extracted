@@ -1,0 +1,107 @@
+#!/usr/bin/env perl
+
+# Takes a screenshot of any Term::Fabulous program, as SVG or PNG:
+#
+#     perl -Mblib tools/screenshot --output form.svg examples/form.pl
+#     perl -Mblib tools/screenshot --size 100x30 --scale 2 --output demo.png examples/showcase.pl
+#     perl -Mblib tools/screenshot --steps 'key "Tab"; type "Ada"' --output login.svg \
+#         examples/cookbook/login-form.pl
+#     perl -Mblib tools/screenshot --size 80x8 --shell '$ perl inline-prompt.pl' \
+#         --output prompt.png examples/cookbook/inline-prompt.pl
+#
+# See tools/README.md.
+
+use v5.32;
+use warnings;
+use feature 'signatures';
+no warnings 'experimental::signatures';
+
+use FindBin;
+use lib "$FindBin::Bin/lib";
+
+use Encode qw(encode);
+use Getopt::Long qw(GetOptions);
+use Term::Fabulous::Screenshot::Render::SVG qw(render_svg);
+use Term::Fabulous::Screenshot::Runner;
+use Term::Fabulous::Screenshot::Scenario;
+use Term::Fabulous::Screenshot::Scene;
+use Term::Fabulous::Screenshot::Theme;
+
+sub usage () {
+	return <<'USAGE';
+Usage: perl -Mblib tools/screenshot [options] --output FILE SCRIPT [ARGUMENT ...]
+
+Runs SCRIPT in a pseudo terminal, gives it the input of --steps, and
+writes what the terminal shows as an image. A program that prints and
+ends (a Term::Fabulous::Static report) is shown with its output.
+
+  --output FILE   the image to write; .svg or .png (required)
+  --size CxR      the terminal size in columns and rows (default: 80x24)
+  --steps KDL     input before the screenshot, as in screenshots/screenshots.kdl,
+                  for example 'key "Tab"; type "Ada"; click 10 4; wait 2'
+  --title TEXT    the window title (default: perl SCRIPT ARGUMENT ...)
+  --shell LINE    a line a shell printed before the program started, shown
+                  above an inline region; repeat it for more lines
+  --clock TIME    the time the program's clock starts at, in UTC
+                  (default: 2026-06-01T09:41:00Z)
+  --scale N       pixels per unit of a PNG (default: 2, sharp on high-resolution screens)
+USAGE
+}
+
+sub main () {
+	my %option = ( size => '80x24', scale => 2 );
+	GetOptions( \%option, 'output=s', 'size=s', 'steps=s', 'title=s', 'clock=s', 'shell=s@', 'scale=i', 'help' ) or die usage();
+	if ( $option{help} ) {
+		print usage();
+		return 0;
+	}
+	my ( $script, @arguments ) = @ARGV;
+	die usage() unless defined $script && defined $option{output};
+	my ($format) = $option{output} =~ /\.(svg|png)\z/i or die "screenshot: the output must end in .svg or .png\n";
+	my ( $columns, $rows ) = $option{size} =~ /\A(\d+)x(\d+)\z/ or die "screenshot: --size must look like 80x24\n";
+
+	my ($scenario) = Term::Fabulous::Screenshot::Scenario->from_string( scenario_kdl( $script, \@arguments, $columns, $rows, \%option ), 'the command line' );
+	my $screen = Term::Fabulous::Screenshot::Runner->new->capture(
+		script    => $scenario->script,
+		arguments => $scenario->arguments,
+		columns   => $scenario->columns,
+		rows      => $scenario->rows,
+		epoch     => $scenario->epoch,
+		shell     => $scenario->shell,
+		steps     => $scenario->harness_steps,
+	);
+
+	my $theme = Term::Fabulous::Screenshot::Theme->new;
+	if ( lc $format eq 'svg' ) {
+		write_file( $option{output}, encode( 'UTF-8', render_svg( Term::Fabulous::Screenshot::Scene->new( screen => $screen, theme => $theme, title => $scenario->title ) ) ) );
+	}
+	else {
+		require Term::Fabulous::Screenshot::Render::PNG;
+		my $scene = Term::Fabulous::Screenshot::Scene->new( screen => $screen, theme => $theme, title => $scenario->title, scale => $option{scale} );
+		write_file( $option{output}, Term::Fabulous::Screenshot::Render::PNG->new->render($scene) );
+	}
+	say "screenshot: wrote $option{output}";
+	return 0;
+}
+
+# The command line as a scenario, so it is parsed and checked like the
+# scenario file.
+sub scenario_kdl ( $script, $arguments, $columns, $rows, $option ) {
+	my $quote    = sub ($text) { '"' . ( $text =~ s/(["\\])/\\$1/gr =~ s/([\x00-\x1f\x7f])/sprintf '\\u{%x}', ord $1/ger ) . '"' };
+	my @settings = ( 'script ' . $quote->($script), "size $columns $rows" );
+	push @settings, 'args ' . join( ' ', map { $quote->($_) } @$arguments ) if @$arguments;
+	push @settings, 'title ' . $quote->( $option->{title} ) if defined $option->{title};
+	push @settings, 'clock ' . $quote->( $option->{clock} ) if defined $option->{clock};
+	push @settings, 'shell ' . join( ' ', map { $quote->($_) } @{ $option->{shell} } ) if $option->{shell};
+	push @settings, "steps { $option->{steps} }" if defined $option->{steps};
+	return sprintf "screenshot \"command-line\" {\n%s\n}\n", join "\n", @settings;
+}
+
+sub write_file ( $path, $bytes ) {
+	open my $handle, '>:raw', $path or die "screenshot: cannot write $path: $!\n";
+	print {$handle} $bytes;
+	close $handle or die "screenshot: cannot write $path: $!\n";
+	return;
+}
+
+exit main();

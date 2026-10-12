@@ -5,7 +5,7 @@ use warnings;
 
 use Game::Checkers::Squares;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our (@TAG_ORDER, %STANDARD, %RESULT);
 BEGIN {
@@ -210,7 +210,7 @@ Game::Checkers::Notation - moves, positions and games as text
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 

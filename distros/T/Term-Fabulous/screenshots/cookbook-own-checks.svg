@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="708" height="435" viewBox="0 0 708 435" role="img" aria-label="perl examples/cookbook/own-checks.pl">
+<title>perl examples/cookbook/own-checks.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="676" height="400" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="676" height="400" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="676" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="354" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/cookbook/own-checks.pl</text>
+<rect x="16.5" y="16.5" width="675" height="399" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="174" y="78" width="180" height="18" fill="#242830"/>
+<rect x="174" y="132" width="180" height="18" fill="#242830"/>
+<rect x="174" y="168" width="180" height="18" fill="#242830"/>
+<rect x="174" y="222" width="180" height="18" fill="#242830"/>
+<rect x="174" y="276" width="360" height="18" fill="#343a48"/>
+<rect x="174" y="294" width="72" height="18" fill="#343a48"/>
+<rect x="246" y="294" width="9" height="18" fill="#e06c75"/>
+<rect x="255" y="294" width="279" height="18" fill="#343a48"/>
+<rect x="174" y="312" width="360" height="18" fill="#343a48"/>
+</g>
+<g class="terminal">
+<text x="48" y="92" textLength="108" fill="#96a0b4">Product code</text>
+<text x="174" y="92" textLength="45" fill="#e06c75">ABC12</text>
+<text x="174" y="110" textLength="423" fill="#e06c75">Three letters and three digits, such as ABC123.</text>
+<text x="48" y="146" textLength="36" fill="#96a0b4">Name</text>
+<text x="174" y="146" textLength="117" fill="#dcdfe4">José Saramago</text>
+<text x="48" y="182" textLength="99" fill="#96a0b4">Even number</text>
+<text x="174" y="182" textLength="9" fill="#e06c75">7</text>
+<text x="174" y="200" textLength="252" fill="#e06c75">Please enter an even number.</text>
+<text x="48" y="236" textLength="99" fill="#96a0b4">Mail server</text>
+<text x="174" y="236" textLength="117" fill="#e06c75">mail.perl.org</text>
+<text x="174" y="254" textLength="297" fill="#e06c75">Please use a host in example.com.</text>
+<text x="48" y="290" textLength="45" fill="#96a0b4">Hosts</text>
+<text x="174" y="290" textLength="135" fill="#e06c75">db1.example.com</text>
+<text x="174" y="308" textLength="72" fill="#e06c75">bad_host</text>
+<text x="174" y="344" textLength="297" fill="#e06c75">Line 2: Please enter a host name.</text>
+<text x="48" y="380" textLength="378" fill="#96a0b4">Tab moves to the next field, Escape quits.</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

@@ -35,9 +35,14 @@ my $app = PAGI::App::GoldenCage->new(
 	logger => sub { push @sizes, shift },
 );
 
-my $client = PAGI::Test::Client->new(app => $app->to_app);
+my $client = PAGI::Test::Client->new(
+	app => $app->to_app,
+	lifespan => 1,
+);
 my $link = $app->generate_link;
 like $link, qr{/test/[0-9a-f-]{36}}, 'link ok';
+
+$client->start;
 
 my $res = $client->get($link);
 is_status $res, 200, 'code ok';

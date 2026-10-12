@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="435" viewBox="0 0 780 435" role="img" aria-label="perl examples/cookbook/table-kdl.pl">
+<title>perl examples/cookbook/table-kdl.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="748" height="400" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="748" height="400" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="748" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="390" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/cookbook/table-kdl.pl</text>
+<rect x="16.5" y="16.5" width="747" height="399" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="57" y="132" width="531" height="36" fill="#242832"/>
+<rect x="57" y="168" width="531" height="18" fill="#1c2029"/>
+<rect x="57" y="186" width="531" height="36" fill="#263e5c"/>
+<rect x="57" y="240" width="531" height="18" fill="#343a48"/>
+<rect x="57" y="258" width="531" height="36" fill="#1c2029"/>
+<rect x="57" y="312" width="531" height="18" fill="#1c2029"/>
+<rect x="52" y="122" width="2" height="218" fill="#5c6370"/>
+<rect x="52" y="122" width="542" height="2" fill="#5c6370"/>
+<rect x="340" y="122" width="1" height="38" fill="#5c6370"/>
+<rect x="592" y="122" width="2" height="218" fill="#5c6370"/>
+<rect x="52" y="158" width="542" height="2" fill="#5c6370"/>
+<rect x="340" y="186" width="1" height="54" fill="#5c6370"/>
+<rect x="340" y="276" width="1" height="64" fill="#5c6370"/>
+<rect x="52" y="338" width="542" height="2" fill="#5c6370"/>
+</g>
+<g class="terminal">
+<text x="48" y="92" textLength="612" fill="#dcdcdc">Stock by category. Space selects, Enter on a group header closes it.</text>
+<text x="66" y="146" textLength="162" class="b" fill="#ebeef3">[-]  SKU      Item</text>
+<text x="354" y="146" textLength="27" class="b" fill="#61afef">Qty</text>
+<text x="394.5" y="146" text-anchor="middle" class="b" fill="#61afef">▾</text>
+<text x="453" y="146" textLength="126" class="b" fill="#ebeef3">Price  Updated</text>
+<text x="70.5" y="182" text-anchor="middle" class="b" fill="#e5c07b">▾</text>
+<text x="84" y="182" textLength="180" class="b" fill="#e5c07b">Category: Cables (3)</text>
+<text x="66" y="200" textLength="261" fill="#dcdfe4">[x]  CAB-001  USB-C cable 1 m</text>
+<text x="372" y="200" textLength="27" class="b" fill="#61afef">140</text>
+<text x="426" y="200" textLength="144" fill="#dcdfe4">9.90 EUR  28 May</text>
+<text x="66" y="218" textLength="252" fill="#dcdfe4">[x]  CAB-010  HDMI cable 2 m</text>
+<text x="381" y="218" textLength="18" class="b" fill="#61afef">62</text>
+<text x="417" y="218" textLength="153" fill="#dcdfe4">14.00 EUR  12 May</text>
+<text x="66" y="236" textLength="261" fill="#dcdfe4">[ ]  CAB-002  USB-C cable 2 m</text>
+<text x="381" y="236" textLength="18" class="b" fill="#61afef">35</text>
+<text x="417" y="236" textLength="153" fill="#dcdfe4">12.50 EUR  30 May</text>
+<text x="70.5" y="254" text-anchor="middle" class="b" fill="#e5c07b">▸</text>
+<text x="84" y="254" textLength="198" class="b" fill="#e5c07b">Category: Displays (2)</text>
+<text x="70.5" y="272" text-anchor="middle" class="b" fill="#e5c07b">▾</text>
+<text x="84" y="272" textLength="171" class="b" fill="#e5c07b">Category: Input (3)</text>
+<text x="66" y="290" textLength="261" fill="#dcdfe4">[ ]  MOU-001  Mouse, wireless</text>
+<text x="381" y="290" textLength="18" class="b" fill="#61afef">51</text>
+<text x="417" y="290" textLength="153" fill="#dcdfe4">29.90 EUR  31 May</text>
+<text x="66" y="308" textLength="225" fill="#dcdfe4">[ ]  KEY-002  Keyboard US</text>
+<text x="381" y="308" textLength="18" class="b" fill="#61afef">24</text>
+<text x="417" y="308" textLength="153" fill="#dcdfe4">49.00 EUR  21 May</text>
+<text x="66" y="326" textLength="225" fill="#dcdfe4">[ ]  KEY-001  Keyboard DE</text>
+<text x="381" y="326" textLength="18" class="b" fill="#61afef">18</text>
+<text x="417" y="326" textLength="153" fill="#dcdfe4">49.00 EUR  21 May</text>
+<text x="48" y="380" textLength="369" fill="#96a0b4">Selected: USB-C cable 1 m, HDMI cable 2 m</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

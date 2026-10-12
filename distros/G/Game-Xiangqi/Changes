@@ -1,5 +1,8 @@
 Revision history for Game-Xiangqi
 
+0.04    2026-10-11
+        - Add Game::Xiangqi::Terminal->run(@argv), which returns the exit status
+
 0.03    2026-10-11
         - A move is now chosen with the arrow keys
         - FIX: --ansi could only be turned on. --no-ansi now turns it off, so

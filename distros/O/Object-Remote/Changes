@@ -1,5 +1,9 @@
 Revision history for Object-Remote
 
+0.005004 - 2026-10-11
+  - fix Windows value for $^O (it's MSWin32, not Win32)
+  - add documentation for connections over Unix sockets
+
 0.005003 - 2026-10-10
   - declare Windows unsupported due to lack of non-blocking pipes
   - fix path extraction for the remote fat node on Windows

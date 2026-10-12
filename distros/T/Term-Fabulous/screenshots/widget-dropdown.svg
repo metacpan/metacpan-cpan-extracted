@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="636" height="345" viewBox="0 0 636 345" role="img" aria-label="perl examples/widgets/dropdown.pl">
+<title>perl examples/widgets/dropdown.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="604" height="310" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="604" height="310" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="604" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="318" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/widgets/dropdown.pl</text>
+<rect x="16.5" y="16.5" width="603" height="309" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="165" y="78" width="162" height="18" fill="#242830"/>
+<rect x="165" y="114" width="144" height="18" fill="#242830"/>
+<rect x="165" y="150" width="72" height="18" fill="#343a48"/>
+<rect x="165" y="168" width="90" height="90" fill="#1e2128"/>
+<rect x="165" y="258" width="9" height="18" fill="#1e2128"/>
+<rect x="174" y="258" width="72" height="18" fill="#61afef"/>
+<rect x="246" y="258" width="9" height="18" fill="#1e2128"/>
+<rect x="165" y="276" width="90" height="36" fill="#1e2128"/>
+<rect x="174" y="176" width="72" height="1" fill="#61afef"/>
+<rect x="169" y="186" width="1" height="108" fill="#61afef"/>
+<rect x="250" y="186" width="1" height="108" fill="#61afef"/>
+<rect x="174" y="302" width="72" height="1" fill="#61afef"/>
+</g>
+<polyline points="169.5 186 169.5 181 169.538 180.413 169.653 179.835 169.843 179.278 170.103 178.75 170.43 178.261 170.818 177.818 171.261 177.43 171.75 177.103 172.278 176.843 172.835 176.653 173.413 176.538 174 176.5 174 176.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="250.5 186 250.5 181 250.462 180.413 250.347 179.835 250.157 179.278 249.897 178.75 249.57 178.261 249.182 177.818 248.739 177.43 248.25 177.103 247.722 176.843 247.165 176.653 246.587 176.538 246 176.5 246 176.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="169.5 294 169.5 298 169.538 298.587 169.653 299.165 169.843 299.722 170.103 300.25 170.43 300.739 170.818 301.182 171.261 301.57 171.75 301.897 172.278 302.157 172.835 302.347 173.413 302.462 174 302.5 174 302.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="250.5 294 250.5 298 250.462 298.587 250.347 299.165 250.157 299.722 249.897 300.25 249.57 300.739 249.182 301.182 248.739 301.57 248.25 301.897 247.722 302.157 247.165 302.347 246.587 302.462 246 302.5 246 302.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<g class="terminal">
+<text x="48" y="92" textLength="99" fill="#96a0b4">placeholder</text>
+<text x="165" y="92" textLength="144" fill="#787e8a">Choose a country</text>
+<text x="322.5" y="92" text-anchor="middle" fill="#61afef">▾</text>
+<text x="48" y="128" textLength="72" fill="#96a0b4">selected</text>
+<text x="165" y="128" textLength="54" fill="#dcdfe4">France</text>
+<text x="304.5" y="128" text-anchor="middle" fill="#61afef">▾</text>
+<text x="48" y="164" textLength="36" fill="#96a0b4">open</text>
+<text x="165" y="164" textLength="45" fill="#dcdfe4">Green</text>
+<text x="232.5" y="164" text-anchor="middle" fill="#61afef">▾</text>
+<text x="183" y="200" textLength="27" fill="#dcdfe4">Red</text>
+<text x="183" y="218" textLength="54" fill="#dcdfe4">Orange</text>
+<text x="183" y="236" textLength="54" fill="#dcdfe4">Yellow</text>
+<text x="183" y="254" textLength="45" fill="#61afef">Green</text>
+<text x="183" y="272" textLength="36" fill="#101216">Blue</text>
+<text x="183" y="290" textLength="54" fill="#dcdfe4">Violet</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

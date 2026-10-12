@@ -4,10 +4,10 @@ use warnings;
 
 use Config::IniFiles;
 use Exporter;
-our $VERSION	= 0.7012;
+our $VERSION	= 2.1109;
 our @ISA		= qw(Exporter);
 
-# Création d'un dictionnaire à partir d'un fichier INI.
+# Create a dictionary from an INI file.
 sub new {
 	my ($class, $path, $options) = @_;
 
@@ -21,7 +21,7 @@ sub new {
 
 	my $dico = $ini{$section};
 	if ($invert) {
-		# Inversion du hash.
+		# Invert the hash.
 		my %tr = ();
 		while (my ($key, $val) = each %$dico) {
 			if (ref($val) eq 'ARRAY') {
@@ -44,14 +44,14 @@ sub new {
 		dico        => $dico
 	};
 
-# 	warn "INFO : objet Dict $class $self ($section $path) créé...\n";
+# 	warn "INFO : Dict object $class $self ($section $path) created...\n";
 	return bless $self, $class;
 }
 
 
 sub translate {
-	# passer en option 'check' pour demander une vérification de la présence de la valeur dans le dictionnaire
-	# si la valeur est absente du dictionnaire, retourne 'undef'
+	# pass the 'check' option to request a check that the value is present in the dictionary
+	# if the value is absent from the dictionary, returns 'undef'
 	my ($self, $word, $check) = @_;
 
 	my $key = $word;

@@ -1,10 +1,14 @@
 ---
-abstract: 'A clone of the classic snake game using raylib'
+abstract: 'the classic snake game, as an engine'
 author:
   - 'LNATION <email@lnation.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  Test::More: '0'
+  File::Temp: '0'
+  FindBin: '0'
+  IPC::Open3: '0'
+  Symbol: '0'
+  Test::More: '0.98'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -18,8 +22,20 @@ no_index:
   directory:
     - t
     - inc
-requires:
+recommends:
   Raylib::FFI: '0.02'
-  perl: '5.006'
-version: '0.11'
+  Term::ReadKey: '0'
+requires:
+  Carp: '0'
+  Digest::SHA: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  Getopt::Long: '0'
+  Object::Proto: '1.00'
+  Object::Proto::Sugar: '1.00'
+  Time::HiRes: '0'
+  perl: '5.014'
+resources:
+  repository: https://github.com/ThisUsedToBeAnEmail/Game-Snake.git
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

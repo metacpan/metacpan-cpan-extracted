@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="708" height="525" viewBox="0 0 708 525" role="img" aria-label="perl examples/widgets/key-reference.pl">
+<title>perl examples/widgets/key-reference.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="676" height="490" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="676" height="490" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="676" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="354" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/widgets/key-reference.pl</text>
+<rect x="16.5" y="16.5" width="675" height="489" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="30" y="60" width="36" height="414" fill="#121418"/>
+<rect x="66" y="60" width="576" height="72" fill="#1c212d"/>
+<rect x="642" y="60" width="36" height="414" fill="#121418"/>
+<rect x="66" y="132" width="27" height="18" fill="#1c212d"/>
+<rect x="93" y="132" width="36" height="18" fill="#343a48"/>
+<rect x="129" y="132" width="9" height="18" fill="#dcdfe4"/>
+<rect x="138" y="132" width="477" height="18" fill="#343a48"/>
+<rect x="615" y="132" width="27" height="18" fill="#1c212d"/>
+<rect x="66" y="150" width="576" height="18" fill="#1c212d"/>
+<rect x="66" y="168" width="27" height="54" fill="#1c212d"/>
+<rect x="93" y="168" width="513" height="36" fill="#242832"/>
+<rect x="606" y="168" width="36" height="54" fill="#1c212d"/>
+<rect x="93" y="204" width="513" height="18" fill="#1c2029"/>
+<rect x="66" y="222" width="576" height="72" fill="#1c212d"/>
+<rect x="66" y="294" width="27" height="18" fill="#1c212d"/>
+<rect x="93" y="294" width="513" height="18" fill="#1c2029"/>
+<rect x="606" y="294" width="36" height="18" fill="#1c212d"/>
+<rect x="66" y="312" width="576" height="180" fill="#1c212d"/>
+<rect x="30" y="474" width="36" height="18" fill="#0f1014"/>
+<rect x="642" y="474" width="36" height="18" fill="#0f1014"/>
+<rect x="75" y="68" width="558" height="1" fill="#61afef"/>
+<rect x="70" y="78" width="1" height="396" fill="#61afef"/>
+<rect x="637" y="78" width="1" height="396" fill="#61afef"/>
+<rect x="93" y="194" width="513" height="1" fill="#586070"/>
+<rect x="102" y="410" width="63" height="1" fill="#46556e"/>
+<rect x="97" y="420" width="1" height="18" fill="#46556e"/>
+<rect x="169" y="420" width="1" height="18" fill="#46556e"/>
+<rect x="102" y="446" width="63" height="1" fill="#46556e"/>
+<rect x="75" y="482" width="558" height="1" fill="#61afef"/>
+</g>
+<polyline points="70.5 78 70.5 73 70.538 72.413 70.653 71.835 70.843 71.278 71.103 70.75 71.43 70.261 71.818 69.818 72.261 69.43 72.75 69.103 73.278 68.843 73.835 68.653 74.413 68.538 75 68.5 75 68.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="637.5 78 637.5 73 637.462 72.413 637.347 71.835 637.157 71.278 636.897 70.75 636.57 70.261 636.182 69.818 635.739 69.43 635.25 69.103 634.722 68.843 634.165 68.653 633.587 68.538 633 68.5 633 68.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="97.5 420 97.5 415 97.538 414.413 97.653 413.835 97.843 413.278 98.103 412.75 98.43 412.261 98.818 411.818 99.261 411.43 99.75 411.103 100.278 410.843 100.835 410.653 101.413 410.538 102 410.5 102 410.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="169.5 420 169.5 415 169.462 414.413 169.347 413.835 169.157 413.278 168.897 412.75 168.57 412.261 168.182 411.818 167.739 411.43 167.25 411.103 166.722 410.843 166.165 410.653 165.587 410.538 165 410.5 165 410.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="97.5 438 97.5 442 97.538 442.587 97.653 443.165 97.843 443.722 98.103 444.25 98.43 444.739 98.818 445.182 99.261 445.57 99.75 445.897 100.278 446.157 100.835 446.347 101.413 446.462 102 446.5 102 446.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="169.5 438 169.5 442 169.462 442.587 169.347 443.165 169.157 443.722 168.897 444.25 168.57 444.739 168.182 445.182 167.739 445.57 167.25 445.897 166.722 446.157 166.165 446.347 165.587 446.462 165 446.5 165 446.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="70.5 474 70.5 478 70.538 478.587 70.653 479.165 70.843 479.722 71.103 480.25 71.43 480.739 71.818 481.182 72.261 481.57 72.75 481.897 73.278 482.157 73.835 482.347 74.413 482.462 75 482.5 75 482.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="637.5 474 637.5 478 637.462 478.587 637.347 479.165 637.157 479.722 636.897 480.25 636.57 480.739 636.182 481.182 635.739 481.57 635.25 481.897 634.722 482.157 634.165 482.347 633.587 482.462 633 482.5 633 482.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<g class="terminal">
+<text x="30" y="74" textLength="36" fill="#6e6f72">Shop</text>
+<text x="30" y="110" textLength="36" fill="#6e6f72">- br</text>
+<text x="93" y="110" textLength="216" class="b" fill="#dcdfe4">Keys of the notes editor</text>
+<text x="30" y="128" textLength="36" fill="#6e6f72">- ap</text>
+<text x="30" y="146" textLength="36" fill="#6e6f72">- co</text>
+<text x="93" y="146" textLength="36" fill="#dcdfe4">ctrl</text>
+<text x="102" y="182" textLength="270" class="b" fill="#ebeef3">Keys                    Action</text>
+<text x="106.5" y="218" text-anchor="middle" class="b" fill="#61afef">▾</text>
+<text x="120" y="218" textLength="90" class="b" fill="#61afef">Everywhere</text>
+<text x="102" y="236" textLength="288" fill="#dcdfe4">Ctrl+N                  New note</text>
+<text x="102" y="254" textLength="252" fill="#dcdfe4">Ctrl+S                  Save</text>
+<text x="102" y="272" textLength="306" fill="#dcdfe4">Ctrl+A                  Select all</text>
+<text x="102" y="290" textLength="252" fill="#dcdfe4">Ctrl+Q                  Quit</text>
+<text x="106.5" y="308" text-anchor="middle" class="b" fill="#61afef">▾</text>
+<text x="120" y="308" textLength="36" class="b" fill="#61afef">Text</text>
+<text x="102" y="326" textLength="306" fill="#dcdfe4">Ctrl+Z, Ctrl+Y          Undo, redo</text>
+<text x="102" y="344" textLength="360" fill="#dcdfe4">Ctrl+C, Ctrl+X, Ctrl+V  Copy, cut, paste</text>
+<text x="102" y="362" textLength="504" fill="#dcdfe4">Ctrl+Left, Ctrl+Right   A word to the left, to the right</text>
+<text x="111" y="434" textLength="45" fill="#dcdfe4">Close</text>
+<text x="39" y="488" textLength="18" fill="#6e6f72">F1</text>
+<text x="642" y="488" textLength="27" fill="#3c3f45">txt</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

@@ -3,7 +3,7 @@
 <style>
   /* Allow rotated X-axis labels on the leftmost tick to render outside the SVG
      boundary without being clipped.
-     Problem: D3 rotates labels -45° with text-anchor:end, so the leftmost label
+     Problem: D3 rotates labels -45 deg with text-anchor:end, so the leftmost label
      extends to a negative SVG x-coordinate.  overflow:visible on the SVG lets
      the ink escape the SVG box, but the parent .graph-container has
      overflow-x:auto, which creates a scroll context that clips child ink
@@ -54,7 +54,7 @@
   .chart-source a { color: inherit; }
 </style>
 
-<p class="back-link"><a href="/">&larr; Home</a> &rsaquo; <a href="[% back_url | html %]">[% back_label || 'Back' | html %]</a></p>
+<p class="back-link"><a href="/">&larr; Home</a> &rsaquo; <a href="[% back_url | html %]">[% back_label || 'Back' | html %]</a>[%- IF back2_url -%] &rsaquo; <a href="[% back2_url | html %]">[% back2_label || 'Back' | html %]</a>[%- END -%]</p>
 
 <h2 class="graph-title">[% title | html %]</h2>
 
@@ -79,7 +79,7 @@
 <script>
 (function () {
   // Widen the SVG viewBox so the first rotated X-axis label is not cropped.
-  // D3 rotates labels -45° with text-anchor:end; the leftmost label extends
+  // D3 rotates labels -45 deg with text-anchor:end; the leftmost label extends
   // to a negative SVG x-coordinate.  A viewBox starting at -pad makes that
   // region part of the SVG viewport, bypassing all container overflow rules.
   // Run inside setTimeout(0) so D3's duration=0 transitions have completed
@@ -181,7 +181,7 @@
 
 [% IF ref_min_y.defined %]
 <script>
-// Reference lines — drawn using the D3 `y` scale and `chart` group that
+// Reference lines -- drawn using the D3 `y` scale and `chart` group that
 // render_zoomable_line_chart_snippet declares at the top level of its <script>
 // block (not inside an IIFE), so they are accessible here.
 (function () {
@@ -215,7 +215,7 @@
 
   function drawRefLines() {
     // `chart` and `y` and `width` are declared by HTML::D3's snippet at the
-    // top level of its <script> block — they are visible in this scope.
+    // top level of its <script> block -- they are visible in this scope.
     if (typeof chart === 'undefined' || typeof y === 'undefined') return;
     chart.selectAll('.bi-ref-line').remove();
     chart.selectAll('.bi-ref-label').remove();
@@ -244,14 +244,14 @@
     colorDots();
   }
 
-  // Patch `redraw` (a function declaration — globally patchable) so that
+  // Patch `redraw` (a function declaration -- globally patchable) so that
   // reference lines recalculate whenever the chart updates.
   //
   // Why recalculate REF from newData?  HTML::D3 uses
   //   y.domain([0, d3.max(newData, d => d.value)]).nice()
   // so the y-domain minimum is always 0.  When the user zooms into a region
   // whose maximum is smaller than the full-dataset REF values, those values
-  // fall above the visible domain and their pixel position is negative — i.e.
+  // fall above the visible domain and their pixel position is negative -- i.e.
   // off-screen above the chart.  Recalculating from newData keeps the lines
   // inside the visible domain after every zoom or reset.
   //

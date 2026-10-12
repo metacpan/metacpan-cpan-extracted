@@ -42,13 +42,13 @@ use DBI;
 #use JSON;
 use Exporter;
 
-our $VERSION		= 2.1061;
+our $VERSION		= 2.1109;
 our @ISA			= qw(Exporter);
 our @EXPORT_OK		= qw(stats_iddest stats_week stats_month);
 #my  @JSON_TRACE;
 
 sub new {
-	# exemple d'appel
+	# example call
 	# 	$TRK = oEdtk::Tracking->new($ARGV[1] // "input file",  
 	#		user => "utest",
 	#		entity => "Society", 
@@ -159,7 +159,7 @@ sub new {
 			}
 	}
 
-	$self->track('Job', 1, join (' ', @ARGV)); # conserver le join pour placer tous les parametres libres dans la zone de message
+	$self->track('Job', 1, join (' ', @ARGV)); # keep the join to place all the free parameters in the message area
 	if (defined $cfg->{'EDTK_TRACK_SIG'} && $cfg->{'EDTK_TRACK_SIG'}!~/no/i) {
 		$_TRACK_SIG = $cfg->{'EDTK_TRACK_SIG'};
 		&logger (6, "tracking catchs SIG messages = '$_TRACK_SIG' (see EDTK_TRACK_SIG : 'warn' for all, 'halt' for die only)");
@@ -181,7 +181,7 @@ sub new {
 
 
 sub track {
-	# exemple d'appel
+	# example call
 	# $TRK->track('Spool', 1, "K0val", "K1val", "K2val", "Knval" );
 	my ($self, $job, $count, @data) = @_;
 
@@ -221,14 +221,14 @@ sub track {
 
 
 	foreach my $i (0 .. $#data) {
-		# ajout d'une colonne message pour gérer les messages et les warning 
-		# pour assurer la compatibilité avec l'existant on va inverser
-		# les data pour mettre le message en tête en attendant le job_evt
-		##################  PBM  DONNEES NON ALIMENTEES A REGARDER 
+		# add a message column to handle messages and warnings 
+		# to ensure compatibility with what exists, we reverse
+		# the data to put the message first while waiting for job_evt
+		##################  PBM  DATA NOT POPULATED, TO REVIEW 
 		my $val = $data[$i] // "";
 		$values->{'ED_MESSAGE'}	= $val . " " . ($values->{'ED_MESSAGE'} // "");
 
-		# s'il n'y a qu'une data, on s'assure de ne pas la mettre inutilement dans une colonne utilisateur
+		# if there is only one data item, make sure not to put it needlessly in a user column
 		if ($#data > 0) {
 			if (defined($data[$i]) && length($data[$i]) > 128) {
 				&logger (4, "\"$data[$i]\" truncated to 128 characters");
@@ -240,7 +240,7 @@ sub track {
 	}
 
 	if ($job eq 'W' || $job eq 'H') { # Halt or Warn event
-		# si le job_evt est 'Warning' ou 'Halt' on gère les messages et la source
+		# if job_evt is 'Warning' or 'Halt' we handle the messages and the source
 		chomp $values->{'ED_MESSAGE'};
 		$values->{'ED_MESSAGE'}	=~ s/\s+/ /g;
 		$values->{'ED_MESSAGE'}	=~ s/^(.{256}).*$/$1/;
@@ -294,10 +294,10 @@ sub end {
 } 
 
 
-# Pour chaque application, pour chaque entité juridique, et pour chaque semaine
-# le nombre de documents dans le tracking.
+# For each application, for each legal entity, and for each week
+# the number of documents in the tracking.
 sub stats_week {
-	# passer les options par clefs de hash...
+	# pass the options as hash keys...
 	my ($dbh, $cfg, $start, $end, $excluded_users) = @_;
 
 	my $table = $cfg->{'EDTK_STATS_TRACKING'};
@@ -345,7 +345,7 @@ sub stats_week {
 
 
 sub stats_iddest {
-	# passer les options par clefs de hash...
+	# pass the options as hash keys...
 	my ($dbh, $cfg, $start, $end, $excluded_users, $ed_app) = @_;
 
 	my $table = $cfg->{'EDTK_STATS_TRACKING'};
@@ -402,8 +402,8 @@ sub stats_iddest {
 }
 
 
-# Pour chaque application, pour chaque E.R., pour chaque entité juridique
-# et pour chaque mois, le nombre de documents dans le tracking.
+# For each application, for each E.R., for each legal entity
+# and for each month, the number of documents in the tracking.
 sub stats_month {
 	my ($dbh, $cfg, $start, $end, $excluded_users) = @_;
 

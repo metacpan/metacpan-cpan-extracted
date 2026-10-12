@@ -1,4 +1,7 @@
 Revision history for Game-RoyalUr
 
+0.02    2026-10-11
+        - Add Game::RoyalUr::Terminal->run(@argv), which returns the exit status
+
 0.01    2026-10-09
         - First release.

@@ -6,7 +6,7 @@ use warnings;
 use Object::Proto::Sugar -types;
 use Game::Checkers::Squares;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use constant {
 	RM_FROM => 0,
@@ -106,7 +106,7 @@ Game::Checkers::Move - one move, with everything it did
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 

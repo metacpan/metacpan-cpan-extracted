@@ -1,0 +1,205 @@
+#!/usr/bin/perl
+
+use 5.022;
+use warnings;
+
+use Getopt::Long qw(GetOptions);
+use Crypter;
+use Pod::Usage qw(pod2usage);
+
+use FindBin qw($Bin);
+use lib "$Bin/../lib/";
+
+my %args = process_command_line(qw/i|input=s f|obfuscate=s g|pwdgen n|noise d o|output=s s|salt=s p|password=s h|help/);
+
+my $stdin = ($ARGV[-1] // '') eq '-';
+my $stdout;
+
+my $file = $args{input} // $ARGV[-1] // '';
+my $output = $args{output};
+
+if ($ARGV[-2] && -f $ARGV[-2] && !$args{input} && !$output) {
+	$file = $ARGV[-2];
+	$output = $ARGV[-1];
+}
+
+if ($args{password}) {
+	$stdout = ($ARGV[-1] // '') eq '-' || !$output;
+	$stdin = ($ARGV[-2] // '') eq '-'|| !$file;
+}
+
+if ($args{pwdgen}) {
+	my $rand = new Strong::Random;
+	my $pwd = join'', map +(0..9,'a'..'z','A'..'Z')[$rand->rand(10+26*2)], 1..64;
+	say $pwd;
+	exit;
+} elsif ($args{noise}) {
+	my $rand = new Strong::Random;
+	while(1) {
+		print chr rand($rand->rand(256));
+	}
+}
+
+
+my $uncrypt = $args{d};
+my $salt = $args{salt};
+my $obfuscate = $args{obfuscate};
+my $password = $args{password};
+
+unless ($salt) {
+	my $rand = new Strong::Random;
+	$salt = join'', map +(0..9,'a'..'z','A'..'Z')[$rand->rand(10+26*2)], 1..64;
+}
+
+usage() if !$stdout && !$output && !$uncrypt;
+
+if ($uncrypt) {
+	die "Not input file $file" if !-f $file && !$stdin;
+	die "No keyfile " . $file . '.key' if !$password && !-f $file . '.key';
+
+	my $input = '';
+	
+	my $key;
+	
+
+	unless ($password) {
+		my $fh;
+		open $fh, $file . '.key';
+		$key = join '', <$fh>;
+		close $fh;
+	}
+
+	my $fo;
+	if (!$stdout && $output) {
+		open $fo, '>', $output;
+	} else {
+		$fo = \*STDOUT;
+	}
+	binmode $fo;
+
+	my $fh;
+	if ($file) {
+		open $fh, $file;
+		binmode $fh;
+	} else {
+		$fh = \*STDIN;
+	}
+	
+	my $crypter = new Crypter(
+		password 	=> $password, 
+		obfuscate	=> $obfuscate,
+	);
+	
+	$crypter->uncrypt(input => $fh, output => $fo, keys => $key);
+
+
+	if (!$stdin) {
+		close $fo;
+	}
+
+} else {
+	die "Not input file $file" if !$stdin && !-f $file;
+
+
+	my $fo;
+	if (!$stdout) {
+		open $fo, '>', $output;
+	} else {
+		$fo = \*STDOUT;
+	}
+	binmode $fo;
+
+	my $fi;
+	if (!$stdin) {
+		open $fi, $file;
+	} else {
+		$fi = \*STDIN;
+	}
+	binmode $fi;
+	
+	my $crypter = new Crypter(
+		password 	=> $password, 
+		salt 		=> $salt, 
+		obfuscate 	=> $obfuscate,
+	);
+	my $keys = $crypter->crypt(input => $fi, output => $fo);
+
+	close $fi unless !$stdin;
+	close $fo;
+
+	unless (defined $password) {
+		my $fh;
+		open $fh, '>', $output .'.key';
+		print $fh $keys;
+		close $fh;
+	}
+}
+
+sub usage {
+	my $file = @_ ? "$_[0]" : (caller)[1];
+	open my $handle, '>', \my $output;
+	pod2usage -exitval => 'noexit', -input => $file, -output => $handle;
+	$output =~ s/^.*\n|\n$//;
+	$output =~ s/\n$//g;
+	say $output;
+	exit;
+}
+
+
+# Usefull util for parsing command-line
+sub process_command_line {
+	my @opts  = @_;  # Get params
+	
+	# Prepare from GetOptions syntax option to key-names
+	my $prepare = sub {
+		my $opt = shift;
+		$opt =~ s/\=s$//;
+		$opt =~ s/^\w\|(\w+)$/$1/;
+		return $opt;
+	};
+	
+	my %args = ();
+	GetOptions(map {$_ => \$args{$prepare->($_)}} @opts);
+	
+	# Show usage, it catchet --help command-line param
+	usage() if $args{help};
+	
+	return %args;
+}
+
+1;
+=encoding utf8
+
+=head1 NAME
+
+crypter - Console tool for crypting data
+
+=head1 SYNOPSIS
+
+    Usage: crypter [OPTIONS] [INPUT] [OUTPUT] [-] [-]
+    
+        crypter -p password input.txt output.txt
+        crypter -p password -d -
+        crypter -d -p password crypted.txt
+        crypter -g
+        crypter -n
+    
+    Options:
+    
+        -p, --password      Password
+        -i, --input         Input file, or STDIN
+        -o, --output        Output file, or STDOUT
+        -f, --obfuscate     Obfuscation Level (default=0)
+        -d                  Uncrypt file flag
+        -s, --salt          Salt for generation random
+        -g, --pwdgen        Password Generator
+        -n, --noise         Noise Generator
+        -h, --help          Help
+
+=AUTHOR
+
+Crypter developed by Ivan Trunaev, Russia, 2026
+
+Contacts <ivan@trunaev.ru>
+
+=cut

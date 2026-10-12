@@ -858,23 +858,25 @@ subtest '_level_number() - names, numbers and junk' => sub {
 };
 
 # ============================================================
-# 21. _wants() - the per-backend level gate
+# 21. Backend wants() - the per-backend level gate
 # ============================================================
 # A backend level only narrows what the logger already lets through: no level
 # means everything, otherwise the message must be at least as severe.
-subtest '_wants() - per-backend level gate' => sub {
-	ok(Log::Abstraction::_wants('debug', undef), 'no backend level lets everything through');
-	ok(Log::Abstraction::_wants('error', 'warning'), 'more severe than the backend level passes');
-	ok(Log::Abstraction::_wants('warn', 'warning'), 'equal to the backend level passes');
-	ok(!Log::Abstraction::_wants('info', 'warning'), 'less severe than the backend level is dropped');
-	ok(Log::Abstraction::_wants('error', $LEVEL{error}), 'a numeric backend level works');
-	ok(!Log::Abstraction::_wants('emergency', 'bogus'), 'an unknown backend level lets nothing through');
+subtest 'Backend wants() - per-backend level gate' => sub {
+	my $event = sub { return { priority => $LEVEL{ $_[0] } } };
+	my $none = Log::Abstraction::Backend::Array->new(array => []);
+	my $warning = Log::Abstraction::Backend::Array->new(array => [], level => $LEVEL{warning});
+	ok($none->wants($event->('debug')), 'no backend level lets everything through');
+	ok($warning->wants($event->('error')), 'more severe than the backend level passes');
+	ok($warning->wants($event->('warning')), 'equal to the backend level passes');
+	ok(!$warning->wants($event->('info')), 'less severe than the backend level is dropped');
 
-	# _wants must use _level_number rather than its own parsing
+	# _build_backends turns a level name into a number with _level_number
 	my @seen;
 	my $g = mock_scoped 'Log::Abstraction::_level_number' => sub { push @seen, $_[0]; return $LEVEL{error} };
-	ok(Log::Abstraction::_wants('critical', 'anything'), 'delegates to _level_number');
-	is_deeply(\@seen, ['anything'], '_level_number got the backend level');
+	my $logger = Log::Abstraction->new(logger => { array => { array => [], level => 'anything' } });
+	is($logger->{_backends}[0]{level}, $LEVEL{error}, 'backend level from _level_number');
+	ok(grep({ defined && $_ eq 'anything' } @seen), '_level_number got the backend level');
 };
 
 # ============================================================
@@ -1216,9 +1218,9 @@ subtest '_write_line() - handles: encoding layers respected, I/O errors silent' 
 };
 
 # ============================================================
-# 33. _journald_send() - native protocol framing
+# 33. Journald _send() - native protocol framing
 # ============================================================
-subtest '_journald_send() - text and binary framing' => sub {
+subtest 'Journald _send() - text and binary framing' => sub {
 	my $ok = eval { socket(my $probe, AF_UNIX, SOCK_DGRAM, 0) or die "$!\n"; close $probe; 1 };
 	plan skip_all => 'Unix domain sockets not available' unless($ok);
 
@@ -1229,7 +1231,7 @@ subtest '_journald_send() - text and binary framing' => sub {
 	my $chars = "caf\x{e9}";
 	utf8::upgrade($chars);
 	my ($logger) = array_logger();
-	Log::Abstraction::_journald_send($logger, $sockpath, MESSAGE => "two\nlines", PRIORITY => $LEVEL{info}, NAME => $chars);
+	Log::Abstraction::Backend::Journald::_send($logger, $sockpath, MESSAGE => "two\nlines", PRIORITY => $LEVEL{info}, NAME => $chars);
 
 	my $data = '';
 	recv($recv, $data, 65536, MSG_DONTWAIT);
@@ -1243,7 +1245,7 @@ subtest '_journald_send() - text and binary framing' => sub {
 	is($data, $want, 'sorted fields; newline value binary-framed; characters UTF-8 encoded');
 
 	throws_ok(
-		sub { Log::Abstraction::_journald_send($logger, File::Spec->catfile($TMPDIR, 'nobody.socket'), MESSAGE => 'x') },
+		sub { Log::Abstraction::Backend::Journald::_send($logger, File::Spec->catfile($TMPDIR, 'nobody.socket'), MESSAGE => 'x') },
 		qr/^Can't send to \Q$TMPDIR\E/,
 		'a missing socket croaks (the caller turns this into one carp)'
 	);
@@ -1337,9 +1339,9 @@ subtest '_log() - per-backend levels and max_messages' => sub {
 	is_deeply([ map { $_->{message} } @{$logger->messages()} ], [qw(e i)], 'history keeps only the newest max_messages');
 };
 
-subtest '_log() - journald backend builds fields for _journald_send' => sub {
+subtest '_log() - journald backend builds fields for _send' => sub {
 	my @sent;
-	my $g = mock_scoped 'Log::Abstraction::_journald_send' => sub { my ($self, $path, %f) = @_; push @sent, [ $path, \%f ] };
+	my $g = mock_scoped 'Log::Abstraction::Backend::Journald::_send' => sub { my ($self, $path, %f) = @_; push @sent, [ $path, \%f ] };
 	my $logger = Log::Abstraction->new(
 		logger => { journald => { socket => '/fake/socket', identifier => 'ident', extra_key => 'v' } },
 		level  => 'debug',
@@ -1422,7 +1424,7 @@ subtest 'critical(), alert(), emergency() - levels and croak_on_error' => sub {
 # that includes the backends' own evals and I/O.
 subtest 'logging preserves $_, $@ and $!' => sub {
 	my $path = File::Spec->catfile($TMPDIR, 'globals.log');
-	my $g = mock_scoped 'Log::Abstraction::_journald_send' => sub { $@ = 'inner'; $! = 1; die "no journal\n" };
+	my $g = mock_scoped 'Log::Abstraction::Backend::Journald::_send' => sub { $@ = 'inner'; $! = 1; die "no journal\n" };
 	my $logger = Log::Abstraction->new(
 		file   => $path,
 		logger => { array => [], journald => {} },
@@ -1501,6 +1503,8 @@ subtest 'no memory cycles; loggers and clones are freed' => sub {
 	my $clone = $logger->new(level => 'info');
 	$clone->info('three');
 
+	# Devel::Cycle warns "Unhandled type: GLOB" on the open log file
+	$_->reopen() for($logger, $clone);
 	memory_cycle_ok($logger, 'logger has no cycles after logging');
 	memory_cycle_ok($clone, 'clone has no cycles');
 

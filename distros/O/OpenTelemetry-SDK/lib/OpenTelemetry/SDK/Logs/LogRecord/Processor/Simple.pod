@@ -1,0 +1,51 @@
+=encoding UTF-8
+
+=head1 NAME
+
+OpenTelemetry::SDK::Logs::LogRecord::Processor::Simple - A basic OpenTelemetry log record processor
+
+=head1 SYNOPSIS
+
+    ...
+
+=head1 DESCRIPTION
+
+This is a simple processor that receives log records to process and forwards
+them to an exporter.
+
+This processor will mostly be useful for testing. It could be suitable for
+use in production environments in cases where custom attributes should be
+added to log records based on code scopes, etc.
+
+=head1 METHODS
+
+This class inherits from L<OpenTelemetry::Processor::Simple> and implements
+the L<OpenTelemetry::Logs::LogRecord::Processor> role. Please consult
+the documentation of those modules for details on the behaviours they provide.
+The description below will only refer to those behaviours that differ.
+
+=head2 on_emit
+
+    $processor->on_emit($log_record);
+
+Called when a log_record is emitted. This method internally passes the log
+record to L<OpenTelemetry::Processor::Simple/process>.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<OpenTelemetry::Logs::LogRecord>
+
+=item L<OpenTelemetry::Logs::LogRecord::Processor>
+
+=item L<OpenTelemetry::Processor::Simple>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2025 by José Joaquín Atria.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.

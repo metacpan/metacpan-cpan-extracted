@@ -174,4 +174,103 @@ sub get {
         sprintf('supervisor exited in %.1fs despite a hung request (grace=1s)', $dt));
 }
 
+# ---- pid_file and umask ---------------------------------------------------
+{
+    my ($p3) = free_ports(1);
+    my $pidfile = "$dir/server.pid";
+    my $kid = fork;
+    die "fork: $!" unless defined $kid;
+    if ($kid == 0) {
+        quiet_child(stderr => $err);
+        require Hyperman;
+        Hyperman->run(
+            app => sub {
+                my $env = shift;
+                if ($env->{PATH_INFO} eq '/mk') {
+                    open my $fh, '>', "$dir/made" or return [ 500, [], [ "$!" ] ];
+                    close $fh;
+                    return [ 200, [], [ sprintf '%04o', (stat "$dir/made")[2] & 07777 ] ];
+                }
+                [ 200, [], [ 'ok' ] ];
+            },
+            host => '127.0.0.1', port => $p3, workers => 2,
+            pid_file => $pidfile, umask => 0077,
+        );
+        exit 0;
+    }
+    my $got;
+    for (1 .. 50) {
+        my $s = IO::Socket::INET->new(PeerAddr => '127.0.0.1', PeerPort => $p3, Proto => 'tcp')
+            or (Time::HiRes::sleep(0.1), next);
+        $s->print("GET /mk HTTP/1.0\r\n\r\n");
+        local $/; my $r = <$s>; $got = $1 if defined $r && $r =~ /\r\n\r\n(.*)\z/s;
+        last;
+    }
+    is($got, '0600', 'umask 0077 applied: a file the worker made is 0600');
+    ok(-e $pidfile, 'pid_file exists while the server runs');
+    open my $pf, '<', $pidfile; my $content = <$pf> // ''; close $pf;
+    chomp $content;
+    is($content, $kid, 'pid_file holds the supervisor pid');
+    kill 'TERM', $kid;
+    waitpid $kid, 0;
+    ok(!-e $pidfile, 'pid_file removed at exit');
+}
+
+# ---- an unknown user is refused before anything is bound ----------------
+{
+    my ($p4) = free_ports(1);
+    my $kid = fork;
+    die "fork: $!" unless defined $kid;
+    if ($kid == 0) {
+        open STDERR, '>', "$dir/user.err";
+        open STDOUT, '>', '/dev/null';
+        require Hyperman;
+        eval { Hyperman->run(app => sub { [200, [], ['x']] }, host => '127.0.0.1',
+                             port => $p4, workers => 1, user => 'no-such-user-hm-xyz') };
+        print STDERR "CROAK: $@" if $@;
+        exit 3;
+    }
+    waitpid $kid, 0;
+    is($? >> 8, 3, 'run() croaked on an unknown user');
+    open my $fh, '<', "$dir/user.err"; local $/; my $e = <$fh> // '';
+    like($e, qr/user 'no-such-user-hm-xyz': no such user/, '...naming it');
+    my $probe = IO::Socket::INET->new(LocalAddr => '127.0.0.1', LocalPort => $p4,
+                                      Proto => 'tcp', Listen => 1, ReuseAddr => 1);
+    ok($probe, '...and the port was never bound');
+    close $probe if $probe;
+}
+
+# ---- the real drop, only as root ---------------------------------------
+SKIP: {
+    skip 'the setuid case runs only as root', 2 unless $< == 0;
+    my ($p5) = free_ports(1);
+    my $nobody = getpwnam('nobody');
+    skip 'no "nobody" user on this box', 2 unless defined $nobody;
+    my $kid = fork;
+    die "fork: $!" unless defined $kid;
+    if ($kid == 0) {
+        quiet_child(stderr => $err);
+        require Hyperman;
+        Hyperman->run(app => sub { [200, [], ["uid=$< euid=$>"]] }, host => '127.0.0.1',
+                      port => $p5, workers => 2, user => 'nobody');
+        exit 0;
+    }
+    my $got;
+    for (1 .. 50) {
+        my $s = IO::Socket::INET->new(PeerAddr => '127.0.0.1', PeerPort => $p5, Proto => 'tcp')
+            or (Time::HiRes::sleep(0.1), next);
+        $s->print("GET / HTTP/1.0\r\n\r\n");
+        local $/; my $r = <$s>; $got = $1 if defined $r && $r =~ /\r\n\r\n(.*)\z/s;
+        last;
+    }
+    is($got, "uid=$nobody euid=$nobody", 'the worker runs as nobody');
+    my $sup_uid = (stat "/proc/$kid")[4];
+    SKIP: {
+        skip 'no /proc', 1 unless defined $sup_uid;
+        is($sup_uid, $nobody, 'the supervisor runs as nobody too');
+    }
+    kill 'TERM', $kid;
+    waitpid $kid, 0;
+}
+
 done_testing;

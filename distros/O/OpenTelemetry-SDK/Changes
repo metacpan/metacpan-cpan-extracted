@@ -1,5 +1,22 @@
 Revision history for OpenTelemetry-SDK
 
+0.100     2026-10-11 23:18:42 BST
+
+    * Add documentation for the new OTEL_LOGS_EXPORTER environment
+      variable (quietly supported since 0.029), and the missing POD
+      for OpenTelemetry::SDK::Logs::LogRecord.
+
+0.029     2026-10-03 22:40:32 BST (TRIAL RELEASE)
+
+    * EXPERIMENTAL: Add support for logs
+    * BREAKING CHANGE: The batch exporter metrics have changed name.
+      The metrics stored under 'otel.bsp' are now stored under
+      'otel.processor.batch'. Their meanings and values remain the same.
+      Please refer to the documentation of
+      OpenTelemetry::SDK::Trace::Span::Processor::Batch and
+      OpenTelemetry::SDK::Logs::LogRecord::Processor::Batch for more
+      details.
+
 0.028     2025-08-22 22:24:54 BST
 
     * Add initial support for programmatic configuration

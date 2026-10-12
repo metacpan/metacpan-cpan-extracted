@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="291" viewBox="0 0 780 291" role="img" aria-label="perl examples/widgets/text.pl">
+<title>perl examples/widgets/text.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="748" height="256" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="748" height="256" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="748" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="390" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/widgets/text.pl</text>
+<rect x="16.5" y="16.5" width="747" height="255" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="156" y="114" width="162" height="90" fill="#1e2332"/>
+<rect x="345" y="114" width="162" height="90" fill="#1e2332"/>
+<rect x="534" y="114" width="162" height="90" fill="#1e2332"/>
+</g>
+<g class="terminal">
+<text x="48" y="92" textLength="54" fill="#96a0b4">colors</text>
+<text x="156" y="92" textLength="27" fill="#e06c75">Red</text>
+<text x="201" y="92" textLength="54" fill="#d19a66">Orange</text>
+<text x="273" y="92" textLength="54" fill="#e5c07b">Yellow</text>
+<text x="345" y="92" textLength="45" fill="#98c379">Green</text>
+<text x="408" y="92" textLength="36" fill="#56b6c2">Cyan</text>
+<text x="462" y="92" textLength="36" fill="#61afef">Blue</text>
+<text x="516" y="92" textLength="54" fill="#c678dd">Violet</text>
+<text x="48" y="128" textLength="63" fill="#96a0b4">wrapped</text>
+<text x="156" y="128" textLength="540" fill="#dcdcdc">Text wraps at          Text wraps at           Text wraps at</text>
+<text x="156" y="146" textLength="540" fill="#dcdcdc">spaces to the          spaces to the           spaces to the</text>
+<text x="156" y="164" textLength="540" fill="#dcdcdc">width of its box,    width of its box,     width of its box,</text>
+<text x="156" y="182" textLength="540" fill="#dcdcdc">and each line can    and each line can     and each line can</text>
+<text x="156" y="200" textLength="540" fill="#dcdcdc">be aligned.             be aligned.              be aligned.</text>
+<text x="48" y="236" textLength="90" fill="#96a0b4">any script</text>
+<text x="156" y="236" textLength="162" fill="#ffffff">Grüße · Ελληνικά ·</text>
+<text x="336" y="236" text-anchor="middle" fill="#ffffff">こ</text>
+<text x="354" y="236" text-anchor="middle" fill="#ffffff">ん</text>
+<text x="372" y="236" text-anchor="middle" fill="#ffffff">に</text>
+<text x="390" y="236" text-anchor="middle" fill="#ffffff">ち</text>
+<text x="408" y="236" text-anchor="middle" fill="#ffffff">は</text>
+<text x="426" y="236" textLength="9" fill="#ffffff">·</text>
+<text x="453" y="236" text-anchor="middle" fill="#ffffff">안</text>
+<text x="471" y="236" text-anchor="middle" fill="#ffffff">녕</text>
+<text x="489" y="236" text-anchor="middle" fill="#ffffff">하</text>
+<text x="507" y="236" text-anchor="middle" fill="#ffffff">세</text>
+<text x="525" y="236" text-anchor="middle" fill="#ffffff">요</text>
+<text x="543" y="236" textLength="9" fill="#ffffff">·</text>
+<text x="570" y="236" text-anchor="middle" fill="#ffffff">🙂</text>
+<text x="588" y="236" text-anchor="middle" fill="#ffffff">🎉</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

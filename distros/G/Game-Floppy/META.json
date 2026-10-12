@@ -1,5 +1,5 @@
 {
-   "abstract" : "Floppy bird using raylib",
+   "abstract" : "Floppy bird, as an engine",
    "author" : [
       "LNATION <email@lnation.org>"
    ],
@@ -31,18 +31,40 @@
          }
       },
       "runtime" : {
-         "requires" : {
+         "recommends" : {
             "Raylib::FFI" : "0.02",
-            "perl" : "5.006"
+            "Term::ReadKey" : "0"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "Digest::SHA" : "0",
+            "File::Basename" : "0",
+            "File::Spec" : "0",
+            "Getopt::Long" : "0",
+            "Object::Proto" : "1.00",
+            "Object::Proto::Sugar" : "1.00",
+            "Time::HiRes" : "0",
+            "perl" : "5.014"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0"
+            "File::Temp" : "0",
+            "FindBin" : "0",
+            "IPC::Open3" : "0",
+            "Symbol" : "0",
+            "Test::More" : "0.98"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.08",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ThisUsedToBeAnEmail/Game-Floppy.git",
+         "web" : "https://github.com/ThisUsedToBeAnEmail/Game-Floppy"
+      }
+   },
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

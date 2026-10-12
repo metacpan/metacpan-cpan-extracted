@@ -81,14 +81,19 @@ my $named = caller_for(Named->to_app);
 {
     my ($res, $h) = $named->(origin => 'https://evil.example');
     is($res->[0], 200, 'an unlisted origin still gets the response');
-    is(scalar keys %$h, 0,
+    is(scalar(grep { /\AAccess-Control-/ } keys %$h), 0,
         '...but no CORS headers, so the browser will not hand it over');
+    is_deeply($h->{Vary}, ['Origin'],
+        '...and Vary: Origin, so a cache does not serve it to a listed one');
 }
 
 {
     my ($res, $h) = $named->();
-    is($res->[0], 200, 'a same-origin request is untouched');
-    is(scalar keys %$h, 0, 'and carries no CORS headers at all');
+    is($res->[0], 200, 'a same-origin request is served');
+    is(scalar(grep { /\AAccess-Control-/ } keys %$h), 0,
+        'and carries no CORS headers');
+    is_deeply($h->{Vary}, ['Origin'],
+        '...but varies on the origin it did not send');
 }
 
 # ---- preflight ----------------------------------------------------------------
@@ -269,7 +274,38 @@ SKIP: {
     my (undef, $no)  = $d->(origin => 'https://shop.evil.com');
     is($yes->{'Access-Control-Allow-Origin'}[0], 'https://shop.example.com',
         'a coderef may allow an origin, and it is echoed');
-    is(scalar keys %$no, 0, '...and refuse another');
+    is(scalar(grep { /\AAccess-Control-/ } keys %$no), 0,
+        '...and refuse another');
+    is_deeply($no->{Vary}, ['Origin'], 'a refusal by coderef varies too');
+}
+
+# ---- a flat star never varies -------------------------------------------------
+
+{
+    package Star;
+    use Punk;
+    cors;
+    get '/books' => sub { $_[0]->json({ ok => 1 }) };
+    package StarList;
+    use Punk;
+    cors origins => ['*'];
+    get '/books' => sub { $_[0]->json({ ok => 1 }) };
+    package Pathed;
+    use Punk;
+    cors origins => ['https://app.example.com'], paths => ['/api'];
+    get '/api/x' => sub { $_[0]->json({ ok => 1 }) };
+    get '/page'  => sub { $_[0]->text('page') };
+}
+{
+    for my $pkg (qw(Star StarList)) {
+        my (undef, $h) = caller_for($pkg->to_app)->();
+        is(scalar keys %$h, 0, "$pkg: no origin and a flat star adds nothing");
+    }
+    my $p = caller_for(Pathed->to_app);
+    my (undef, $in)  = $p->(path => '/api/x');
+    my (undef, $out) = $p->(path => '/page');
+    is_deeply($in->{Vary}, ['Origin'], 'Vary is added under `paths`');
+    is(scalar keys %$out, 0, '...and nowhere else');
 }
 
 # ---- the other two response shapes --------------------------------------------

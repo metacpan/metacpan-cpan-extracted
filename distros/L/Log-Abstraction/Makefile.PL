@@ -23,12 +23,14 @@ WriteMakefile(
 		'Config::Abstraction' => 0.40,
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 		'File::Basename' => 0,
+		'IO::Handle' => 0,	# autoflush on open log files
 		# Params::Get (via Config::Abstraction) uses autodie qw(:all) but
 		# doesn't declare IPC::System::Simple, which that needs
 		'IPC::System::Simple' => 0,
 		'JSON::PP' => 0,
 		'Log::Log4perl' => 0,
 		'Params::Get' => 0.15,
+		'parent' => 0,	# the Log::Abstraction::Backend::* classes
 		'POSIX' => 0,
 		'Readonly' => 0,
 		'Readonly::Values::Syslog' => 0.04,
@@ -61,6 +63,11 @@ WriteMakefile(
 		FILES => 'Log-Abstraction-*'
 	}, META_MERGE => {	# https://perldoc.perl.org/CPAN::Meta::Spec
 		'meta-spec' => { version => 2 },
+		# The backend classes are internal: for use by Log::Abstraction only
+		no_index => {
+			namespace => ['Log::Abstraction::Backend'],
+			package => ['Log::Abstraction::Backend'],
+		},
 		prereqs => {
 			develop => {
 				requires => {
@@ -83,7 +90,8 @@ WriteMakefile(
 			},
 			runtime => {
 				recommends => {
-					'Log::Any' => 0,	# Log::Any::Adapter::Abstraction
+					'Log::Any' => 0,	# Log::Any::Adapter::Abstraction, log_any backend
+					'Log::Dispatch' => 0,	# log_dispatch backend
 					'Email::Simple' => 0,	# sendmail backend
 					'Email::Sender::Simple' => 0,
 					'Email::Sender::Transport::SMTP' => 0,
@@ -105,5 +113,7 @@ WriteMakefile(
 			}
 		},
 	},
-	MIN_PERL_VERSION	=> '5.014'	# Readonly::Values::Syslog needs v5.14
+	# Params::Validate::Strict (needed by Return::Set, Sub::Private and
+	# Config::Abstraction) needs 5.26
+	MIN_PERL_VERSION	=> '5.026'
 );

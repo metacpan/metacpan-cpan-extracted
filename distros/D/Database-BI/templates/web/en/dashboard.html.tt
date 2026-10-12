@@ -63,6 +63,49 @@
     border-left-color: #f0c040;
     color: #f0d890;
   }
+  /* Pagination bar */
+  .pagination {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.3rem;
+    margin: 0.8rem 0;
+  }
+  .page-btn {
+    display: inline-block;
+    padding: 0.3rem 0.65rem;
+    border: 1px solid #bbb;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    color: #333;
+    background: #fff;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  a.page-btn:hover { background: #f0f0f0; border-color: #888; }
+  .page-btn-cur {
+    background: #0066cc;
+    color: #fff;
+    border-color: #0055aa;
+    font-weight: 600;
+    cursor: default;
+  }
+  .page-btn-dis { color: #aaa; background: #f8f8f8; cursor: default; }
+  .page-info { font-size: 0.82rem; color: #555; margin-left: 0.5rem; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .page-btn {
+      background: #1e1e1e; color: #ccc; border-color: #555;
+    }
+    :root:not([data-theme="light"]) a.page-btn:hover { background: #2a2a2a; }
+    :root:not([data-theme="light"]) .page-btn-cur { background: #1a6bbf; color: #fff; }
+    :root:not([data-theme="light"]) .page-btn-dis { background: #1a1a1a; color: #666; }
+    :root:not([data-theme="light"]) .page-info { color: #999; }
+  }
+  :root[data-theme="dark"] .page-btn { background: #1e1e1e; color: #ccc; border-color: #555; }
+  :root[data-theme="dark"] a.page-btn:hover { background: #2a2a2a; }
+  :root[data-theme="dark"] .page-btn-cur { background: #1a6bbf; color: #fff; }
+  :root[data-theme="dark"] .page-btn-dis { background: #1a1a1a; color: #666; }
+  :root[data-theme="dark"] .page-info { color: #999; }
 </style>
 
 [%- IF back_url -%]
@@ -326,7 +369,8 @@
 </div>
 
 <div class="graph-panel" id="graph-panel" hidden>
-  <form id="graph-form" method="get" action="/graph">
+  <form id="graph-form" method="get" action="/graph"
+        data-parent-back="[% back_url | html %]" data-parent-back-label="[% back_label | html %]">
     <input type="hidden" name="l" value="[% left_spec | html %]">
     [%- FOREACH jspec IN current_joins -%]
     <input type="hidden" name="j" value="[% jspec | html %]">
@@ -341,6 +385,8 @@
     <input type="hidden" name="d" value="1">
     [%- END -%]
     <input type="hidden" name="back" id="graph-back-inp" value="">
+    <input type="hidden" name="back2" id="graph-back2-inp" value="">
+    <input type="hidden" name="back2_label" id="graph-back2-label-inp" value="">
 
     <h3 class="graph-panel-title">&#x1F4C8; Line graph</h3>
 
@@ -378,7 +424,8 @@
 </div>
 
 <div class="graph-panel" id="pie-panel" hidden>
-  <form id="pie-form" method="get" action="/pie">
+  <form id="pie-form" method="get" action="/pie"
+        data-parent-back="[% back_url | html %]" data-parent-back-label="[% back_label | html %]">
     <input type="hidden" name="l" value="[% left_spec | html %]">
     [%- FOREACH jspec IN current_joins -%]
     <input type="hidden" name="j" value="[% jspec | html %]">
@@ -390,6 +437,8 @@
     <input type="hidden" name="d" value="1">
     [%- END -%]
     <input type="hidden" name="back" id="pie-back-inp" value="">
+    <input type="hidden" name="back2" id="pie-back2-inp" value="">
+    <input type="hidden" name="back2_label" id="pie-back2-label-inp" value="">
 
     <h3 class="graph-panel-title">&#x25D4; Pie chart</h3>
 
@@ -433,7 +482,8 @@
 </div>
 
 <div class="graph-panel" id="heatmap-panel" hidden>
-  <form id="heatmap-form" method="get" action="/heatmap">
+  <form id="heatmap-form" method="get" action="/heatmap"
+        data-parent-back="[% back_url | html %]" data-parent-back-label="[% back_label | html %]">
     <input type="hidden" name="l" value="[% left_spec | html %]">
     [%- FOREACH jspec IN current_joins -%]
     <input type="hidden" name="j" value="[% jspec | html %]">
@@ -445,6 +495,8 @@
     <input type="hidden" name="d" value="1">
     [%- END -%]
     <input type="hidden" name="back" id="heatmap-back-inp" value="">
+    <input type="hidden" name="back2" id="heatmap-back2-inp" value="">
+    <input type="hidden" name="back2_label" id="heatmap-back2-label-inp" value="">
 
     <h3 class="graph-panel-title">&#x229F; Heatmap</h3>
 
@@ -501,7 +553,8 @@
 </div>
 
 <div class="graph-panel" id="bar-panel" hidden>
-  <form id="bar-form" method="get" action="/bar">
+  <form id="bar-form" method="get" action="/bar"
+        data-parent-back="[% back_url | html %]" data-parent-back-label="[% back_label | html %]">
     <input type="hidden" name="l" value="[% left_spec | html %]">
     [%- FOREACH jspec IN current_joins -%]
     <input type="hidden" name="j" value="[% jspec | html %]">
@@ -513,6 +566,8 @@
     <input type="hidden" name="d" value="1">
     [%- END -%]
     <input type="hidden" name="back" id="bar-back-inp" value="">
+    <input type="hidden" name="back2" id="bar-back2-inp" value="">
+    <input type="hidden" name="back2_label" id="bar-back2-label-inp" value="">
 
     <h3 class="graph-panel-title">&#x1F4CA; Bar chart</h3>
 
@@ -615,6 +670,29 @@
   </tbody>
 </table>
 </div>
+
+[% SET pnum = page ? page : 0 %]
+[% IF pnum > 1 OR has_next %]
+[% SET sep = (page_base_url.search('\?') >= 0) ? '&amp;' : '?' %]
+<nav class="pagination" aria-label="Page navigation">
+  [% IF pnum > 1 %]
+  <a class="page-btn" href="[% page_base_url | html %][% sep %]page=[% pnum - 1 %]&amp;per_page=[% per_page %]">&laquo; Prev</a>
+  [% ELSE %]
+  <span class="page-btn page-btn-dis">&laquo; Prev</span>
+  [% END %]
+
+  <span class="page-btn page-btn-cur">[% page %]</span>
+
+  [% IF has_next %]
+  <a class="page-btn" href="[% page_base_url | html %][% sep %]page=[% pnum + 1 %]&amp;per_page=[% per_page %]">Next &raquo;</a>
+  [% ELSE %]
+  <span class="page-btn page-btn-dis">Next &raquo;</span>
+  [% END %]
+
+  <span class="page-info">Page [% page %][% IF per_page %] &mdash; [% per_page %] rows/page[% END %]</span>
+</nav>
+[% END %]
+
 [% ELSE %]
 <p class="empty-state">No records found in <strong>[% table | html %]</strong>.</p>
 [% END %]
@@ -1553,7 +1631,10 @@ function parseAccounting(v) {
   var btnDo     = document.getElementById('btn-do-graph');
   var xSel      = document.getElementById('graph-x-sel');
   var ySel      = document.getElementById('graph-y-sel');
-  var backInp   = document.getElementById('graph-back-inp');
+  var backInp       = document.getElementById('graph-back-inp');
+  var back2Inp      = document.getElementById('graph-back2-inp');
+  var back2LabelInp = document.getElementById('graph-back2-label-inp');
+  var graphForm     = document.getElementById('graph-form');
 
   var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'folder-panel'].map(function (id) {
     return document.getElementById(id);
@@ -1633,6 +1714,13 @@ function parseAccounting(v) {
   btnOpen.addEventListener('click', function () {
     otherPanels.forEach(function (p) { p.hidden = true; });
     backInp.value = window.location.href;
+    // Propagate this page's back-link as back2 so the chart page can build a
+    // three-level breadcrumb (e.g. Home > Store schema > Table view > Graph).
+    if (back2Inp && graphForm) {
+      var pb = graphForm.getAttribute('data-parent-back') || '';
+      back2Inp.value = pb;
+      if (back2LabelInp) back2LabelInp.value = pb ? (graphForm.getAttribute('data-parent-back-label') || '') : '';
+    }
     var n = buildYSelect();
     applyYAutoSelect(n);
     panel.hidden  = !panel.hidden;
@@ -1661,7 +1749,10 @@ function parseAccounting(v) {
   var btnDo     = document.getElementById('btn-do-pie');
   var catSel    = document.getElementById('pie-cat-sel');
   var valSel    = document.getElementById('pie-val-sel');
-  var backInp   = document.getElementById('pie-back-inp');
+  var backInp       = document.getElementById('pie-back-inp');
+  var back2Inp      = document.getElementById('pie-back2-inp');
+  var back2LabelInp = document.getElementById('pie-back2-label-inp');
+  var pieForm       = document.getElementById('pie-form');
 
   var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'heatmap-panel', 'bar-panel', 'folder-panel'].map(function (id) {
     return document.getElementById(id);
@@ -1711,6 +1802,11 @@ function parseAccounting(v) {
   btnOpen.addEventListener('click', function () {
     otherPanels.forEach(function (p) { p.hidden = true; });
     backInp.value = window.location.href;
+    if (back2Inp && pieForm) {
+      var pb = pieForm.getAttribute('data-parent-back') || '';
+      back2Inp.value = pb;
+      if (back2LabelInp) back2LabelInp.value = pb ? (pieForm.getAttribute('data-parent-back-label') || '') : '';
+    }
     buildPieValSelect();
     panel.hidden = !panel.hidden;
     checkPie();
@@ -1738,7 +1834,10 @@ function parseAccounting(v) {
   var btnDo     = document.getElementById('btn-do-heatmap');
   var xSel      = document.getElementById('heatmap-x-sel');
   var ySel      = document.getElementById('heatmap-y-sel');
-  var backInp   = document.getElementById('heatmap-back-inp');
+  var backInp       = document.getElementById('heatmap-back-inp');
+  var back2Inp      = document.getElementById('heatmap-back2-inp');
+  var back2LabelInp = document.getElementById('heatmap-back2-label-inp');
+  var heatmapForm   = document.getElementById('heatmap-form');
 
   var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'bar-panel', 'folder-panel'].map(function (id) {
     return document.getElementById(id);
@@ -1778,6 +1877,11 @@ function parseAccounting(v) {
   btnOpen.addEventListener('click', function () {
     otherPanels.forEach(function (p) { p.hidden = true; });
     backInp.value = window.location.href;
+    if (back2Inp && heatmapForm) {
+      var pb = heatmapForm.getAttribute('data-parent-back') || '';
+      back2Inp.value = pb;
+      if (back2LabelInp) back2LabelInp.value = pb ? (heatmapForm.getAttribute('data-parent-back-label') || '') : '';
+    }
     buildHeatmapValSelect();
     panel.hidden = !panel.hidden;
     checkHeatmap();
@@ -1800,8 +1904,11 @@ function parseAccounting(v) {
 
   var btnCancel = document.getElementById('btn-cancel-bar');
   var btnDo     = document.getElementById('btn-do-bar');
-  var catSel    = document.getElementById('bar-cat-sel');
-  var backInp   = document.getElementById('bar-back-inp');
+  var catSel        = document.getElementById('bar-cat-sel');
+  var backInp       = document.getElementById('bar-back-inp');
+  var back2Inp      = document.getElementById('bar-back2-inp');
+  var back2LabelInp = document.getElementById('bar-back2-label-inp');
+  var barForm       = document.getElementById('bar-form');
 
   var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'folder-panel'].map(function (id) {
     return document.getElementById(id);
@@ -1841,6 +1948,11 @@ function parseAccounting(v) {
   btnOpen.addEventListener('click', function () {
     otherPanels.forEach(function (p) { p.hidden = true; });
     backInp.value = window.location.href;
+    if (back2Inp && barForm) {
+      var pb = barForm.getAttribute('data-parent-back') || '';
+      back2Inp.value = pb;
+      if (back2LabelInp) back2LabelInp.value = pb ? (barForm.getAttribute('data-parent-back-label') || '') : '';
+    }
     buildBarValSelect();
     panel.hidden = !panel.hidden;
     checkBar();

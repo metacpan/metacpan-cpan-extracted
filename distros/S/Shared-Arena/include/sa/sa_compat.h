@@ -51,4 +51,21 @@
  * throughout and 5.010 is the floor, which is where <stdint.h> became safe to
  * assume for the platforms this claims. */
 
+/* ---- 5.010 is 5.10.0, and three macros the XS uses are 5.10.1's -------------
+ *
+ * mXPUSHs (map, hist, scoreboard), with HeUTF8 and mPUSHs beside it, arrived in
+ * 5.10.1. An OmniOS smoker's 5.10.0 refused Frozen for want of the latter two
+ * and would refuse this dist the same way. These are ppport.h's definitions,
+ * each taken only where perl.h has not already provided it. */
+#ifndef HeUTF8
+#  define HeUTF8(he) ((HeKLEN(he) == HEf_SVKEY) \
+                      ? SvUTF8(HeKEY_sv(he)) : (U32)HeKUTF8(he))
+#endif
+#ifndef mPUSHs
+#  define mPUSHs(s) PUSHs(sv_2mortal(s))
+#endif
+#ifndef mXPUSHs
+#  define mXPUSHs(s) XPUSHs(sv_2mortal(s))
+#endif
+
 #endif /* SA_COMPAT_H */

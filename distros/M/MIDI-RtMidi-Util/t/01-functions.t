@@ -111,14 +111,34 @@ subtest program_changer => sub {
     my $dev = Local::MockDevice->new;
     program_changer($dev);
     is_deeply [ $dev->calls ],
-        [ [ control_change => 0, 0, 0 ], [ program_change => 0, 0 ] ],
-        'defaults: bank MSB 0, no LSB, program 0 on channel 0';
+        [ [ program_change => 0, 0 ] ],
+        'defaults: no bank select, program 0 on channel 0';
+
+    $dev = Local::MockDevice->new;
+    program_changer($dev, 5, 3);
+    is_deeply [ $dev->calls ],
+        [ [ program_change => 3, 5 ] ],
+        'no bank arguments: only the program change is sent';
 
     $dev = Local::MockDevice->new;
     program_changer($dev, 5, 3, 1);
     is_deeply [ $dev->calls ],
-        [ [ control_change => 3, 0, 1 ], [ program_change => 3, 5 ] ],
-        'program, channel and MSB are passed through';
+        [
+            [ control_change => 3,  0, 1 ],
+            [ control_change => 3, 32, 0 ],
+            [ program_change => 3,  5 ],
+        ],
+        'MSB only: LSB defaults to 0 so the 14-bit bank is deterministic';
+
+    $dev = Local::MockDevice->new;
+    program_changer($dev, 5, 3, undef, 7);
+    is_deeply [ $dev->calls ],
+        [
+            [ control_change => 3,  0, 0 ],
+            [ control_change => 3, 32, 7 ],
+            [ program_change => 3,  5 ],
+        ],
+        'LSB only: MSB defaults to 0';
 
     $dev = Local::MockDevice->new;
     program_changer($dev, 5, 3, 1, 7);
@@ -128,17 +148,17 @@ subtest program_changer => sub {
             [ control_change => 3, 32, 7 ],
             [ program_change => 3,  5 ],
         ],
-        'a bank LSB is sent as CC 32 before the program change';
+        'MSB and LSB are sent as CC 0 and CC 32 before the program change';
 
     $dev = Local::MockDevice->new;
-    program_changer($dev, 5, 3, 1, 0);
+    program_changer($dev, 5, 3, 0, 0);
     is_deeply [ $dev->calls ],
         [
-            [ control_change => 3,  0, 1 ],
+            [ control_change => 3,  0, 0 ],
             [ control_change => 3, 32, 0 ],
             [ program_change => 3,  5 ],
         ],
-        'a bank LSB of 0 is still sent';
+        'explicit bank 0/0 is still sent';
 
     for my $method (qw(control_change program_change)) {
         my $bad = Local::MockDevice->new(fail_on => $method);

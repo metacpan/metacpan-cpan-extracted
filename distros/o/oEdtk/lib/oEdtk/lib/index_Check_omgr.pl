@@ -21,7 +21,7 @@ my $dbh = db_connect($cfg, 'EDTK_DBI_STATS',
 my $rows = omgr_check_seqlot_ref($dbh, $ARGV[0], $ARGV[1]);
 
 if ($#$rows<0) {
-	warn "INFO : pas de donnees associees.\n";
+	warn "INFO : no associated data.\n";
 	exit;
 }
 

@@ -172,6 +172,8 @@ static void hm_h3_env_init(pTHX_ hm_qconn *qc, HV *env) {
      * over, and HTTP/3 has nothing to put behind it - which is what makes
      * Hyperman::detach croak here, as it already does on HTTP/2. */
     hv_stores(env, "psgix.loop",        hm_loop_to_sv(aTHX_ loop));
+    if (loop->log_wants_t0)
+        hv_stores(env, "psgix.request_start", newSVnv((NV)hm_now_ns() / 1e9));
 }
 
 /* ---- nghttp3 callbacks --------------------------------------------------- */
@@ -685,7 +687,7 @@ static void hm_h3_dispatch(pTHX_ hm_qconn *qc, hm_h3_stream *st) {
             hv_stores(env, "psgi.input",
                       hm_new_input(aTHX_ SvPVX(st->body), SvCUR(st->body)));
         else
-            hv_stores(env, "psgi.input", SvREFCNT_inc(hm_empty_input));
+            hv_stores(env, "psgi.input", hm_empty_input_sv(aTHX));
     }
     /* The stream ticket, built here because it needs the stream id. */
     {

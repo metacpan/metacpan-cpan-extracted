@@ -25,7 +25,7 @@ my $fmt  = shift (@$rows);
 my $head = shift (@$rows);
 
 if ($#$rows<0) {
-	warn "INFO : pas de statistiques pour cette periode.\n";
+	warn "INFO : no statistics for this period.\n";
 	exit;
 }
 

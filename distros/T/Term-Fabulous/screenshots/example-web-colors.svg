@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="633" viewBox="0 0 960 633" role="img" aria-label="perl examples/web-colors.pl">
+<title>perl examples/web-colors.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="928" height="598" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="928" height="598" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="928" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="480" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/web-colors.pl</text>
+<rect x="16.5" y="16.5" width="927" height="597" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="615" y="78" width="108" height="18" fill="#242830"/>
+<rect x="48" y="132" width="198" height="36" fill="#800000"/>
+<rect x="264" y="132" width="198" height="36" fill="#8b0000"/>
+<rect x="480" y="132" width="198" height="36" fill="#a52a2a"/>
+<rect x="696" y="132" width="198" height="36" fill="#b22222"/>
+<rect x="48" y="204" width="198" height="36" fill="#ff0000"/>
+<rect x="264" y="204" width="198" height="36" fill="#cd5c5c"/>
+<rect x="480" y="204" width="198" height="36" fill="#bc8f8f"/>
+<rect x="696" y="204" width="198" height="36" fill="#f08080"/>
+<rect x="48" y="276" width="198" height="36" fill="#fffafa"/>
+<rect x="264" y="276" width="198" height="36" fill="#fa8072"/>
+<rect x="480" y="276" width="198" height="36" fill="#ffe4e1"/>
+<rect x="696" y="276" width="198" height="36" fill="#ff6347"/>
+<rect x="48" y="348" width="198" height="36" fill="#e9967a"/>
+<rect x="264" y="348" width="198" height="36" fill="#ff4500"/>
+<rect x="480" y="348" width="198" height="36" fill="#ff7f50"/>
+<rect x="696" y="348" width="198" height="36" fill="#ffa07a"/>
+<rect x="48" y="420" width="198" height="36" fill="#a0522d"/>
+<rect x="264" y="420" width="198" height="36" fill="#8b4513"/>
+<rect x="480" y="420" width="198" height="36" fill="#d2691e"/>
+<rect x="696" y="420" width="198" height="36" fill="#fff5ee"/>
+<rect x="48" y="492" width="198" height="36" fill="#f4a460"/>
+<rect x="264" y="492" width="198" height="36" fill="#ffdab9"/>
+<rect x="480" y="492" width="198" height="36" fill="#cd853f"/>
+<rect x="696" y="492" width="198" height="36" fill="#faf0e6"/>
+<rect x="48" y="564" width="198" height="36" fill="#ff8c00"/>
+<rect x="264" y="564" width="198" height="36" fill="#ffe4c4"/>
+<rect x="480" y="564" width="198" height="36" fill="#d2b48c"/>
+<rect x="696" y="564" width="198" height="36" fill="#deb887"/>
+<rect x="925" y="114" width="2" height="90" fill="#61afef"/>
+<rect x="925" y="204" width="1" height="396" fill="#464c5a"/>
+</g>
+<g class="terminal">
+<text x="48" y="92" textLength="468" fill="#dcdcdc">148 web colors. Wheel or arrow keys scroll, q quits.</text>
+<text x="534" y="92" textLength="63" fill="#a0aabe">Sort by</text>
+<text x="615" y="92" textLength="27" fill="#dcdfe4">Hue</text>
+<text x="718.5" y="92" text-anchor="middle" fill="#61afef">▾</text>
+<text x="57" y="146" textLength="711" fill="#ffffff">#800000                 #8b0000                 #a52a2a                 #b22222</text>
+<text x="48" y="182" textLength="729" fill="#c8d2e6">Maroon                  DarkRed                 Brown                   FireBrick</text>
+<text x="57" y="218" textLength="279" fill="#ffffff">#ff0000                 #cd5c5c</text>
+<text x="489" y="218" textLength="279" fill="#000000">#bc8f8f                 #f08080</text>
+<text x="48" y="254" textLength="738" fill="#c8d2e6">Red                     IndianRed               RosyBrown               LightCoral</text>
+<text x="57" y="290" textLength="495" fill="#000000">#fffafa                 #fa8072                 #ffe4e1</text>
+<text x="705" y="290" textLength="63" fill="#ffffff">#ff6347</text>
+<text x="48" y="326" textLength="702" fill="#c8d2e6">Snow                    Salmon                  MistyRose               Tomato</text>
+<text x="57" y="362" textLength="63" fill="#000000">#e9967a</text>
+<text x="273" y="362" textLength="63" fill="#ffffff">#ff4500</text>
+<text x="489" y="362" textLength="279" fill="#000000">#ff7f50                 #ffa07a</text>
+<text x="48" y="398" textLength="747" fill="#c8d2e6">DarkSalmon              OrangeRed               Coral                   LightSalmon</text>
+<text x="57" y="434" textLength="495" fill="#ffffff">#a0522d                 #8b4513                 #d2691e</text>
+<text x="705" y="434" textLength="63" fill="#000000">#fff5ee</text>
+<text x="48" y="470" textLength="720" fill="#c8d2e6">Sienna                  SaddleBrown             Chocolate               SeaShell</text>
+<text x="57" y="506" textLength="279" fill="#000000">#f4a460                 #ffdab9</text>
+<text x="489" y="506" textLength="63" fill="#ffffff">#cd853f</text>
+<text x="705" y="506" textLength="63" fill="#000000">#faf0e6</text>
+<text x="48" y="542" textLength="693" fill="#c8d2e6">SandyBrown              PeachPuff               Peru                    Linen</text>
+<text x="57" y="578" textLength="711" fill="#000000">#ff8c00                 #ffe4c4                 #d2b48c                 #deb887</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

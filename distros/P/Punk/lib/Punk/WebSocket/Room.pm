@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.55';
+our $VERSION = '0.57';
 1;
 
 __END__
@@ -84,7 +84,11 @@ How many.
 =head2 broadcast_binary($bytes, $except?)
 
 Send to every open member, optionally skipping one connection (usually the
-sender). Returns the number sent.
+sender). Returns the number sent by this worker.
+
+Under several workers the broadcast reaches the members every worker holds,
+with or without C<$except>: the skipped connection belongs to one worker,
+which leaves it out, and the others deliver to everyone they have.
 
 =head2 close_all($code = 1000, $reason = '')
 

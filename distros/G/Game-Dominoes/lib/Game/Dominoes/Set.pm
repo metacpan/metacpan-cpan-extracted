@@ -8,7 +8,7 @@ use Exporter 'import';
 
 use Game::Dominoes::Tile;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 our @EXPORT_OK = qw(tiles tile_of order_for PIPS SIZE);
 
 use constant SIZE => 28;
@@ -66,7 +66,7 @@ Game::Dominoes::Set - the 28 tiles of a double six set, and the seeded shuffle
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

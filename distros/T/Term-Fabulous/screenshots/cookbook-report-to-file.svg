@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="528" height="201" viewBox="0 0 528 201" role="img" aria-label="perl examples/cookbook/report-to-file.pl">
+<title>perl examples/cookbook/report-to-file.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="496" height="166" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="496" height="166" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="496" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="264" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/cookbook/report-to-file.pl</text>
+<rect x="16.5" y="16.5" width="495" height="165" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="39" y="68" width="342" height="1" fill="#78b4f0"/>
+<rect x="34" y="78" width="1" height="72" fill="#78b4f0"/>
+<rect x="385" y="78" width="1" height="72" fill="#78b4f0"/>
+<rect x="39" y="158" width="342" height="1" fill="#78b4f0"/>
+</g>
+<polyline points="34.5 78 34.5 73 34.538 72.413 34.653 71.835 34.843 71.278 35.103 70.75 35.43 70.261 35.818 69.818 36.261 69.43 36.75 69.103 37.278 68.843 37.835 68.653 38.413 68.538 39 68.5 39 68.5" fill="none" stroke="#78b4f0" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="385.5 78 385.5 73 385.462 72.413 385.347 71.835 385.157 71.278 384.897 70.75 384.57 70.261 384.182 69.818 383.739 69.43 383.25 69.103 382.722 68.843 382.165 68.653 381.587 68.538 381 68.5 381 68.5" fill="none" stroke="#78b4f0" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="34.5 150 34.5 154 34.538 154.587 34.653 155.165 34.843 155.722 35.103 156.25 35.43 156.739 35.818 157.182 36.261 157.57 36.75 157.897 37.278 158.157 37.835 158.347 38.413 158.462 39 158.5 39 158.5" fill="none" stroke="#78b4f0" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="385.5 150 385.5 154 385.462 154.587 385.347 155.165 385.157 155.722 384.897 156.25 384.57 156.739 384.182 157.182 383.739 157.57 383.25 157.897 382.722 158.157 382.165 158.347 381.587 158.462 381 158.5 381 158.5" fill="none" stroke="#78b4f0" stroke-width="1" stroke-linejoin="round"/>
+<g class="terminal">
+<text x="48" y="92" textLength="225" fill="#ffc850">Sales per region (in EUR)</text>
+<text x="48" y="110" textLength="135" fill="#e6e6e6">East       1530</text>
+<text x="48" y="128" textLength="135" fill="#e6e6e6">North      1250</text>
+<text x="48" y="146" textLength="135" fill="#e6e6e6">South       980</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

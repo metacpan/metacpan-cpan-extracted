@@ -1,0 +1,600 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Term::Fabulous::Manual::Charts - Canvases and charts
+
+=head1 DESCRIPTION
+
+This page is part of L<Term::Fabulous::Manual>. Previous page: L<Term::Fabulous::Manual::Menus>. Next page: L<Term::Fabulous::Manual::Tables>.
+
+This page covers the two ways to draw graphics in the terminal. A
+I<canvas> (L</CANVASES>) is a widget you draw into yourself, cell by
+cell or pixel by pixel: for plots of your own, maps, games and
+animations. A I<chart> (L</CHARTS>) is a canvas that draws itself from
+data: line, area, bar, scatter, histogram, sparkline, pie, donut, polar
+area and radar charts with titles, legends, axes and hover. The page
+explains the ideas and shows a short example for each; the class pages
+have every parameter, and the cookbook pages
+L<Term::Fabulous::Cookbook::Canvases>, L<Term::Fabulous::Cookbook::Charts>,
+L<Term::Fabulous::Cookbook::ChartTechniques> and
+L<Term::Fabulous::Cookbook::ChartStyles> have complete programs.
+
+=head1 CANVASES
+
+=head2 Canvas or PixelCanvas
+
+A L<Term::Fabulous::Widget::Canvas> is a box that holds a grid of cells
+you draw into: one character (more exactly, one grapheme cluster) with
+a foreground and a background color per cell. Use it for anything that
+is not text in boxes: a map, a game board, a plot of your own.
+
+A L<Term::Fabulous::Widget::PixelCanvas> is a canvas you draw on in
+pixels instead of characters. It shows two pixels per cell, one above
+the other, with the half block characters; as a terminal cell is about
+twice as high as it is wide, the pixels come out roughly square. It
+draws lines, rectangles and circles. Both canvases have every parameter
+of a L<Term::Fabulous::Widget::Box>, so they can have a background, a
+border and padding.
+
+F<examples/canvas.pl> animates three waves on a canvas:
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-canvas.svg" alt="Three waves in red, blue and green on a canvas, drawn with half blocks"></p>
+
+=end html
+
+=head2 The canvas size
+
+The layout decides the canvas size, like for any box; give the canvas a
+C<sizing> (C<sizing_grow> to fill the room, C<sizing_fixed> for a known
+size), otherwise it has no room at all. The cell buffer has as many
+columns and rows as the canvas's content box (inside border and
+padding). Before the first frame the buffer is empty (0 by 0 cells).
+Whenever the layout gives the canvas a new size (the first frame, a
+terminal resize, a layout change), the canvas fires C<CanvasResize>
+(L<Term::Fabulous::Event::CanvasResize>) just before that frame is
+drawn. Draw in that listener, then the drawing always fits:
+
+	use Clay::XS qw(sizing_grow);
+	use Term::Fabulous::Widget::Canvas;
+
+	my $canvas = Term::Fabulous::Widget::Canvas->new(
+		background_color => [ 10, 10, 20, 255 ],
+		layout           => { sizing => { width => sizing_grow(), height => sizing_grow() } },
+	);
+	$canvas->on(
+		CanvasResize => sub ($event) {
+			$canvas->clear;
+			$canvas->put_text( 0, 0, 'Size: ' . $event->columns . 'x' . $event->rows, '#ffcc00' );
+			$canvas->fill( 0, 1, $event->columns, 1, '-', 0x808080 );
+			return;
+		}
+	);
+
+Drawing outside the buffer, including everything drawn before the first
+frame, is silently dropped. Cells that are still inside a new size keep
+their contents. C<< $canvas->columns >> and C<< $canvas->rows >> tell the
+current size; draw again from them whenever your data changes.
+
+=head2 Drawing cells
+
+C<put> sets one cell, C<put_text> writes a string from a cell to the
+right (without wrapping), C<fill> fills a rectangle with one character,
+C<erase> unsets one cell and C<clear> unsets them all. An unset cell
+shows the canvas's background (or that of its nearest ancestor with
+one, or the screen color). The drawing methods return the canvas, so calls chain, and a
+change appears in the next frame, also when it is drawn from a timer.
+
+	$canvas->put( 5, 2, '@', 0xFFFF00 );                    # one cell, yellow
+	$canvas->put_text( 0, 0, 'Score: 100', '#ffffff', '#202040' );
+	$canvas->fill( 0, 3, 10, 2, '#', [ 0, 200, 0 ] );       # 10x2 block
+	$canvas->fill( 12, 3, 4, 2, ' ', undef, '#3987e5' );    # a solid colored rectangle
+	$canvas->clear->put_text( 0, 0, 'Game over' );
+
+Coordinates count from 0 at the top-left cell of the buffer and may be
+fractional (they are rounded down), so a plotter can pass computed
+positions directly. Colors take every format listed for canvas cells in
+L<the color formats|Term::Fabulous::Manual::Looks/Color formats>, the fastest being a
+packed C<0xRRGGBB> integer; C<undef> means "no color of its own": the
+cell shows the canvas background, or the terminal's default text color.
+
+Text drawn on a canvas is a character string, like the text of a Text
+widget. A wide character (most CJK characters and many emoji) covers
+two cells. C<< $canvas->cell( $x, $y ) >> reads a cell back. The details
+are in L<the methods of Canvas|Term::Fabulous::Widget::Canvas/METHODS>.
+
+=head2 Drawing pixels
+
+A PixelCanvas is C<pixel_width> pixels wide (its columns) and
+C<pixel_height> pixels high (twice its rows). C<set_pixel> and
+C<unset_pixel> change one pixel, C<fill_rect> and C<draw_rect> draw a
+filled or an outlined rectangle, C<draw_line> a line and C<draw_circle>
+the outline of a circle; C<pixel> reads one back. Shapes may extend
+past the edges; the pixels outside are dropped.
+
+	use Clay::XS qw(sizing_grow);
+	use Term::Fabulous::Widget::PixelCanvas;
+
+	my $image = Term::Fabulous::Widget::PixelCanvas->new(
+		background_color => [ 0, 0, 0, 255 ],
+		layout           => { sizing => { width => sizing_grow(), height => sizing_grow() } },
+	);
+	$image->on(
+		CanvasResize => sub ($event) {
+			my ( $width, $height ) = ( $image->pixel_width, $image->pixel_height );
+			$image->clear;
+			$image->draw_rect( 0, 0, $width, $height, 0x808080 );
+			$image->draw_line( 0, $height - 1, $width - 1, 0, 0x00FF00 );
+			$image->draw_circle( $width / 2, $height / 2, $height / 3, '#ff8800' );
+			$image->fill_rect( 2, 2, 6, 4, [ 40, 80, 200 ] );
+			return;
+		}
+	);
+
+The cell methods still work on a pixel canvas, for example to write a
+label over an image. F<examples/pixel-paint.pl> draws such shapes and
+lets you paint with the mouse:
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-pixel-paint.svg" alt="A pixel canvas with a frame, a line, a circle, a filled rectangle and a red wave painted with the mouse"></p>
+
+=end html
+
+=head2 The mouse on a canvas
+
+A canvas does nothing with the mouse by itself. Listen for C<Mouse>
+events (buttons and the wheel) or C<MouseMove> events (the pointer
+moving with no button held), and translate the event's terminal
+position with C<cell_at> into a cell of the buffer, or with C<pixel_at>
+into a pixel of a pixel canvas. Both return the empty list when the
+pointer is outside the buffer, for example on the border:
+
+	use Clay::UI::Enum::Result;
+	use Term::Fabulous::Termbox qw(TB_KEY_MOUSE_LEFT);
+
+	$canvas->on(
+		Mouse => sub ($event) {
+			return Clay::UI::Enum::Result->CONTINUE unless $event->key == TB_KEY_MOUSE_LEFT;
+			my ( $x, $y ) = $canvas->cell_at($event) or return Clay::UI::Enum::Result->CONTINUE;
+			$canvas->put( $x, $y, '*', 0xFFFF00 );
+			return;
+		}
+	);
+
+A cell holds two pixels, but the terminal reports the mouse per cell:
+C<pixel_at> returns the upper pixel of the cell, and the one below it
+(C<$y + 1>) is under the pointer as well. Mouse events in general are
+described in L<the mouse section of the events page|Term::Fabulous::Manual::Events/MOUSE>.
+
+=head2 Efficient updates
+
+A canvas remembers which cells changed since it was last drawn: cells
+that hold something else now, not cells that were only written again
+with what they held. As long as it stays in the same place and nothing
+is drawn over it, each frame sends only its changed cells to the
+terminal. So you may simply clear the canvas and draw everything again
+for every frame of an animation: only the difference reaches the
+terminal. A canvas is drawn in full in its first frame, after it moved
+or changed size, while it is scrolled, and while other widgets overlap
+it (L<Term::Fabulous::Render::Canvas>).
+
+=head2 Canvas recipes
+
+=over
+
+=item *
+
+L<Term::Fabulous::Cookbook::Canvases/Paint with the mouse (Canvas, clicks and drags)>
+
+=item *
+
+L<Term::Fabulous::Cookbook::Canvases/Plot data on a pixel canvas (PixelCanvas)>
+
+=back
+
+=head1 CHARTS
+
+The chart widgets are canvases that draw themselves: give them data, and
+they lay out a title, a legend, axes and the plot in whatever room the
+layout gives them, and draw again whenever the data, an option or their
+size changes.
+
+	use Term::Fabulous::Widget::LineChart;
+
+	my $chart = Term::Fabulous::Widget::LineChart->new(
+		title  => 'Requests per second',
+		labels => [qw(Mon Tue Wed Thu Fri Sat)],
+		curve  => 'monotone',
+		y_axis => { title => 'req/s', min => 0 },
+		series => [
+			{ name => 'api', data => [ 120, 135, 160, 158, 171 ] },
+			{ name => 'web', data => [ 80, 82, 95, 110, 104 ], line_style => 'dashed' },
+		],
+	);
+	$chart->append( undef, { api => 180, web => 99 } );    # the next point of both series: Sat
+
+F<examples/widgets/line-chart.pl> draws such a chart:
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-line-chart.svg" alt="A line chart of monthly active users on web, iOS and Android with smooth curves, a legend at the top and the y axis titled thousands"></p>
+
+=end html
+
+=head2 Which chart for which data
+
+F<examples/chart-gallery.pl> shows every chart widget with a little data
+of the kind it suits:
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-chart-gallery.svg" alt="A gallery of ten small charts: a line chart, a stacked area chart, a bar chart, a scatter plot, a histogram, a pie chart, a donut chart, a polar area chart, a radar chart, and line, area and bar sparklines"></p>
+
+=end html
+
+=over
+
+=item L<Term::Fabulous::Widget::LineChart>
+
+Values that change along a continuous x: over time, over a measured
+quantity. Several series compare well as lines.
+
+=item L<Term::Fabulous::Widget::AreaChart>
+
+Like a line chart, with the area under each line filled; stacked areas
+show how parts add up to a total over time, and C<< stacked =E<gt>
+'percent' >> how their shares change.
+
+=item L<Term::Fabulous::Widget::BarChart>
+
+Values per category (months, products, regions): grouped bars to
+compare series per category, stacked bars for parts of a total,
+horizontal bars for long category labels.
+
+=item L<Term::Fabulous::Widget::ScatterPlot>
+
+Pairs of numbers, one point per observation, to see whether two
+quantities go together; with a trend line if you like.
+
+=item L<Term::Fabulous::Widget::Histogram>
+
+How a set of numbers is distributed: the chart counts the values into
+bins of equal width and draws a bar per bin.
+
+=item L<Term::Fabulous::Widget::Sparkline>
+
+A trend the size of a word, one row high and without axes, next to a
+number in a dashboard, a list or a table cell.
+
+=item L<Term::Fabulous::Widget::PieChart> and L<Term::Fabulous::Widget::DonutChart>
+
+Parts of one whole, up to about six of them. A donut has room in the
+middle for the total or a text.
+
+=item L<Term::Fabulous::Widget::PolarAreaChart>
+
+Values of one kind over categories that form a cycle (weekdays, months,
+directions): every slice has the same angle and reaches as far out as
+its value.
+
+=item L<Term::Fabulous::Widget::RadarChart>
+
+Profiles: several values per series on axes around a center, to compare
+the shape of a handful of series over three to about eight axes that
+share a scale.
+
+=back
+
+Line, area, bar and scatter charts are one widget,
+L<Term::Fabulous::Widget::XYChart>, with a different default I<series
+type>; a chart may mix the types, for example bars with a line for the
+target. The histogram and the sparkline are XY charts too. Pie, donut
+and polar area charts are one widget with different defaults
+(L<Term::Fabulous::Widget::PieChart>). What all charts share (title,
+legend, palettes, themes, hover) is on L<Term::Fabulous::Widget::Chart>.
+
+=head2 Series and data
+
+A I<series> is a named list of data points drawn in one color: a line,
+an area, a group of bars or a set of points. An XY chart takes its
+series as an array of hashes; each point is a plain y value (the x is
+the point's position or the label there), an C<[ x, y ]> pair, or a hash
+with C<x> and C<y>. x values may be numbers, labels or dates, and the
+chart reads from them what kind of x axis it has: category, linear,
+logarithmic or time (L<Term::Fabulous::Widget::XYChart/AXES>). C<undef>
+is a gap.
+
+	my $chart = Term::Fabulous::Widget::BarChart->new(
+		labels => [qw(Q1 Q2 Q3 Q4)],
+		series => [
+			{ name => 'Sold',     data => [ 90, 140, 165, 190 ] },
+			{ name => 'Returned', data => [ 14, 11, 17, 12 ], color => '#e66767' },
+		],
+	);
+
+The data is kept as given, and may be replaced, extended or appended to
+at any time with the methods of L<Term::Fabulous::Role::HasSeries>
+(C<set_data>, C<add_points>, C<append>, C<remove_series>,
+C<hide_series>, ...). Every change shows in the next frame, and only the
+cells that changed go to the terminal, so a chart can take many updates
+per second; C<max_points> keeps only the newest points of a live series.
+A series' C<transform> prepares its data before it is drawn: smoothing,
+running totals, rates, indexing, resampling
+(L<Term::Fabulous::Chart::Transform>). The keys of a series are listed
+in L<the series keys of XYChart|Term::Fabulous::Widget::XYChart/Series keys>.
+
+	$chart->set_data( Sold => [ 95, 140, 170, 201 ] );
+	$chart->hide_series('Returned');
+
+The other charts take their data in their own form. A pie, donut or
+polar area chart has I<slices>, each with a unique label and a value;
+the slices are its series:
+
+	my $pie = Term::Fabulous::Widget::PieChart->new(
+		data => [ [ Rent => 1200 ], [ Food => 450 ], [ Car => 300 ] ],
+	);
+	$pie->set_value( Food => 480 );    # change a slice, or add it when it is new
+	$pie->remove_slice('Car');
+
+A radar chart has series like an XY chart, with one value per axis
+(C<labels>); a histogram has series of plain numbers, the observations
+it counts; a sparkline has just C<values>. Their pages describe the
+forms: L<Term::Fabulous::Widget::PieChart/Data>,
+L<Term::Fabulous::Widget::RadarChart/Data>,
+L<Term::Fabulous::Widget::Histogram>,
+L<Term::Fabulous::Widget::Sparkline>.
+
+=head2 How a chart lays itself out
+
+A chart without a C<sizing> in its C<layout> grows to the room its
+parent leaves, in both directions (a sparkline is one row high and grows
+in width). Inside that room it places, from the top: the title (in the
+first row), the legend (at the top or at the bottom, or in a column
+beside the plot), and the plot. An XY chart puts the y axis labels at
+the left and the x axis labels below the plot, with the axis titles
+when given. The value axis picks round ticks that land exactly on rows,
+so a grid line always lies beside its label; rows the ticks leave over
+become a margin below the axis.
+
+A chart adapts to small sizes rather than failing: a legend that does
+not fit shows C<+N more>, a chart under three rows has no title, tick
+labels are thinned out until they do not touch, and a chart without
+room for a plot draws only what fits. Give a chart a fixed size where
+the layout has no room to share, for example in a report:
+
+	use Clay::XS qw(sizing_grow sizing_fixed);
+
+	my $chart = Term::Fabulous::Widget::BarChart->new(
+		layout => { sizing => { width => sizing_grow(), height => sizing_fixed(12) } },
+		...
+	);
+
+=head2 Titles and legends
+
+The C<title> is drawn in bold in the first row; C<title_align> puts it
+at the left (the default), in the center or at the right. The legend
+lists the series (or the slices) with their colors. By default
+(C<< legend =E<gt> 'auto' >>) a chart shows it only when there are at
+least two entries, at the top for charts with axes and radar charts,
+and at the right for pie, donut and polar area charts; C<top>,
+C<bottom>, C<left>, C<right> and C<none> choose for yourself.
+
+	my $chart = Term::Fabulous::Widget::BarChart->new(
+		title       => 'Active users per quarter',
+		title_align => 'center',
+		legend      => 'bottom',
+		...
+	);
+
+F<examples/widgets/chart.pl> shows the positions:
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-chart.svg" alt="Four bar charts of the same data: the legend at the top, at the bottom under a centered title, at the right with the iOS series highlighted and the others faded, and at the left of a chart on a light panel with a right-aligned title"></p>
+
+=end html
+
+A pie chart's legend also shows each slice's share or value
+(C<legend_values>). The details are in
+L<the title and legend section of Chart|Term::Fabulous::Widget::Chart/Title and legend>.
+
+=head2 Colors, palettes and themes
+
+Every series (or slice) gets the next color of the chart's C<palette>
+when it is added, and keeps it while other series come and go; a
+C<color> of its own wins. There are four named palettes: C<default>,
+whose colors stay apart for readers with color vision deficiencies,
+C<classic>, C<pastel> and C<vivid>; or give an array of colors of your
+own (L<Term::Fabulous::Chart::Palette>).
+
+	my $chart = Term::Fabulous::Widget::LineChart->new(
+		palette => 'vivid',                       # or [ '#3987e5', '#d95926', ... ]
+		series  => [ { name => 'web', data => \@web }, { name => 'api', data => \@api, color => '#ff6347' } ],
+	);
+
+A chart has no background of its own by default: it draws on the
+background of its nearest ancestor with an opaque one, or on the screen
+color of the theme (see L<Term::Fabulous::Widget/background_below>).
+Its title, legend text, tick labels, axis and grid lines are mixed from
+that background and a light or dark ink, so a chart suits any panel and
+any theme. The
+C<theme> chooses the ink and the palette steps; C<auto> (the default)
+picks the C<light> theme on a light background by itself, as the chart
+on the light panel in the picture above does. C<title_color>,
+C<text_color>, C<label_color>, C<axis_color> and C<grid_color> set those
+colors yourself. See L<Term::Fabulous::Widget::Chart/Colors and themes>
+and the recipe
+L<Term::Fabulous::Cookbook::ChartStyles/Light backgrounds, palettes and colors of your own>:
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-colors.svg" alt="A line chart on a light panel with dark labels, next to a bar chart with a plan, actual and target series in colors of their own"></p>
+
+=end html
+
+=head2 How a chart is drawn
+
+A chart draws into I<subpixels>, several per cell, and turns each cell
+into one character with two colors: Braille dots for lines and points
+(2 x 4 per cell), eighth blocks for bars and areas, quadrant blocks for
+pie slices. The C<marker> of a series (or of a pie chart) chooses other
+characters: half blocks, quadrants, sextants, box-drawing lines
+(L<Term::Fabulous::Widget::XYChart/Rendering styles>). Translucent fills
+are mixed with the background below them, so overlapping areas and
+histograms stay visible. F<examples/cookbook/chart-styles.pl> compares
+the markers:
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-styles.svg" alt="Nine small charts of the same data drawn with different markers: lines in Braille, half blocks, quadrants, sextants and box lines, an area in blocks, and bars in quadrants, blocks and Braille"></p>
+
+=end html
+
+=head2 Hover and SeriesHover
+
+Charts have no tooltips. While the mouse pointer is on a series (its
+line, area, bars, points or legend entry) or on a slice, the chart
+emphasizes it and fades the others (C<hover_fade>), and fires a
+C<SeriesHover> event (L<Term::Fabulous::Event::SeriesHover>) with the
+series, the nearest data point's index, its label and its value. A
+program shows the details its own way, for example in a status line:
+
+	use Term::Fabulous::Widget::Text;
+
+	my $status = Term::Fabulous::Widget::Text->new( text => '' );
+	$chart->on(
+		SeriesHover => sub ($event) {
+			my $text = !defined $event->series ? ''
+				: defined $event->index        ? sprintf( '%s, %s: %s', $event->series, $event->label, $event->value )
+				:                                $event->series;    # a legend entry
+			$status->text($text);
+			return;
+		}
+	);
+
+When the pointer leaves the series, the chart fires one more event,
+without a series; so it does when the program removes or hides the
+series (or slice) under the pointer. C<< $chart->highlight($name) >> emphasizes a series
+from the program, for example the one selected in a list;
+C<< hover =E<gt> 0 >> turns the hover effects and events off.
+F<examples/cookbook/chart-hover.pl> shows the hovered point below the
+chart:
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-hover.svg" alt="A stacked area chart of closed issues per week with the Frontend series emphasized under the mouse pointer, the other series faded, and a status line saying: Frontend closed 12 issues in week W8"></p>
+
+=end html
+
+The recipe
+L<Show details of the point under the pointer|Term::Fabulous::Cookbook::ChartStyles/Show details of the point under the pointer (SeriesHover, highlight)>
+explains the program.
+
+=head2 Charts in KDL layouts
+
+Every chart has KDL properties: its parameters, and its data as nodes
+(C<series> nodes with C<data> for XY and radar charts, C<slice> nodes
+for pie charts, C<values> for a sparkline). A layout can hold a complete
+chart, or only its frame, with the data added from Perl after the
+layout is built (L<Term::Fabulous::Manual::KDL/KDL LAYOUT FILES>):
+
+	use Term::Fabulous::Layout;
+
+	my $layout = Term::Fabulous::Layout->new( string => <<'KDL' );
+	use Term::Fabulous::Widget::Box as Box
+	use Term::Fabulous::Widget::BarChart as BarChart
+	use Term::Fabulous::Widget::DonutChart as DonutChart
+
+	Box "root" {
+		layout gap=4
+		sizing width=grow height=grow
+		BarChart "sales" {
+			title "Sales"
+			labels "Q1" "Q2" "Q3" "Q4"
+			series "Sold" { data 90 140 165 190; }
+		}
+		DonutChart "channels" {
+			title "Sold by channel"
+			slice "Shop" 312
+			slice "Partners" 158
+		}
+	}
+	KDL
+	my $root = $layout->build;
+	$root->find_by_id('channels')->set_value( Web => 431 );    # data from the program
+
+The KDL forms of every property are on the class pages, in the
+section KDL PROPERTIES (L<Term::Fabulous::Widget::Chart/KDL PROPERTIES>
+for the common ones), and the recipe
+L<Describe charts in a KDL layout|Term::Fabulous::Cookbook::ChartTechniques/Describe charts in a KDL layout (series, slices, transforms)>
+builds a complete screen from a layout.
+
+=head2 Charts in reports
+
+Charts render through L<Term::Fabulous::Static> like every widget, so a
+program can print a bar chart or a sparkline as text
+(L<rendering without a terminal|Term::Fabulous::Manual::Programs/RENDERING WITHOUT A TERMINAL>).
+On a terminal the output has colors. In a file or a pipe it has none,
+and a chart still reads well: cells that a bar or an area fills
+completely print as full blocks (C<█>), the ends of the bars as
+partial blocks, and the labels as text. A
+report has no screen to fill, so give a chart a fixed height:
+
+	use Clay::XS qw(sizing_grow sizing_fixed);
+	use Term::Fabulous::Static;
+	use Term::Fabulous::Widget::BarChart;
+
+	my $chart = Term::Fabulous::Widget::BarChart->new(
+		title        => 'Disk usage (%)',
+		horizontal   => 1,
+		value_labels => 1,
+		labels       => [ '/', '/home', '/var' ],
+		y_axis       => { min => 0, max => 100 },
+		series       => [ { name => 'used', data => [ 71, 88, 46 ] } ],
+		layout       => { sizing => { width => sizing_grow(), height => sizing_fixed(7) } },
+	);
+	Term::Fabulous::Static->new( root => $chart, width => 60 )->print;
+
+F<examples/cookbook/chart-report.pl> (the recipe
+L<Print charts in a report|Term::Fabulous::Cookbook::ChartTechniques/Print charts in a report (Static)>)
+prints a bar chart and a sparkline:
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-report.svg" alt="A printed report with a horizontal bar chart of disk usage per file system and a line of text with a bar sparkline of the load of the last 18 hours"></p>
+
+=end html
+
+=head2 Chart recipes
+
+L<Term::Fabulous::Cookbook::Charts> has a complete program for every
+chart type. L<Term::Fabulous::Cookbook::ChartTechniques> has programs
+for the techniques they share: time axes, live data, logarithmic axes,
+transforms, KDL layouts and reports;
+L<Term::Fabulous::Cookbook::ChartStyles> for curves, markers, colors,
+line styles and hover.
+
+=head1 SEE ALSO
+
+This page is part of L<Term::Fabulous::Manual>. Previous page: L<Term::Fabulous::Manual::Menus>. Next page: L<Term::Fabulous::Manual::Tables>.
+
+The class pages: L<Term::Fabulous::Widget::Canvas>,
+L<Term::Fabulous::Widget::PixelCanvas>, L<Term::Fabulous::Widget::Chart>,
+L<Term::Fabulous::Widget::XYChart>, L<Term::Fabulous::Widget::LineChart>,
+L<Term::Fabulous::Widget::AreaChart>, L<Term::Fabulous::Widget::BarChart>,
+L<Term::Fabulous::Widget::ScatterPlot>, L<Term::Fabulous::Widget::Histogram>,
+L<Term::Fabulous::Widget::Sparkline>, L<Term::Fabulous::Widget::PieChart>,
+L<Term::Fabulous::Widget::DonutChart>, L<Term::Fabulous::Widget::PolarAreaChart>,
+L<Term::Fabulous::Widget::RadarChart>, L<Term::Fabulous::Event::SeriesHover>,
+L<Term::Fabulous::Event::CanvasResize>, L<Term::Fabulous::Chart::Palette>.
+
+The recipes: L<Term::Fabulous::Cookbook::Canvases>,
+L<Term::Fabulous::Cookbook::Charts>, L<Term::Fabulous::Cookbook::ChartTechniques>,
+L<Term::Fabulous::Cookbook::ChartStyles>.
+
+=cut

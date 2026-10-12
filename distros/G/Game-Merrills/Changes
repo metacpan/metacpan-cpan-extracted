@@ -1,4 +1,7 @@
 Revision history for Game-Merrills
 
+0.02    2026-10-11
+	- Add Game::Merrills::Terminal->run(@argv), which returns the exit status
+
 0.01    2026-10-08
 	- First version

@@ -1,8 +1,14 @@
 # ChangeLog
 
+## 2.0.5 - 2026-10-11
+
+### Changed
+
+* Update my email address
+
 ## 2.0.4 - 2021-01-13
 
-###
+### Added
 
 * Details of bugtracker
 * GitHub CI

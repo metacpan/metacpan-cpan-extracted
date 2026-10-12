@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="453" viewBox="0 0 780 453" role="img" aria-label="perl examples/widgets/virtual-list.pl">
+<title>perl examples/widgets/virtual-list.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="748" height="418" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="748" height="418" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="748" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="390" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/widgets/virtual-list.pl</text>
+<rect x="16.5" y="16.5" width="747" height="417" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="48" y="68" width="684" height="1" fill="#46556e"/>
+<rect x="43" y="78" width="1" height="306" fill="#46556e"/>
+<rect x="727" y="78" width="1" height="288" fill="#464c5a"/>
+<rect x="736" y="78" width="1" height="306" fill="#46556e"/>
+<rect x="727" y="366" width="2" height="18" fill="#61afef"/>
+<rect x="48" y="392" width="684" height="1" fill="#46556e"/>
+</g>
+<polyline points="43.5 78 43.5 73 43.538 72.413 43.653 71.835 43.843 71.278 44.103 70.75 44.43 70.261 44.818 69.818 45.261 69.43 45.75 69.103 46.278 68.843 46.835 68.653 47.413 68.538 48 68.5 48 68.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="736.5 78 736.5 73 736.462 72.413 736.347 71.835 736.157 71.278 735.897 70.75 735.57 70.261 735.182 69.818 734.739 69.43 734.25 69.103 733.722 68.843 733.165 68.653 732.587 68.538 732 68.5 732 68.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="43.5 384 43.5 388 43.538 388.587 43.653 389.165 43.843 389.722 44.103 390.25 44.43 390.739 44.818 391.182 45.261 391.57 45.75 391.897 46.278 392.157 46.835 392.347 47.413 392.462 48 392.5 48 392.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="736.5 384 736.5 388 736.462 388.587 736.347 389.165 736.157 389.722 735.897 390.25 735.57 390.739 735.182 391.182 734.739 391.57 734.25 391.897 733.722 392.157 733.165 392.347 732.587 392.462 732 392.5 732 392.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<g class="terminal">
+<text x="57" y="92" textLength="585" fill="#dcdfe4">the scrollbar and the wheel see the whole document. Two invisible</text>
+<text x="57" y="110" textLength="648" fill="#dcdfe4">spacers stand in for the items above and below, so the scrollbar and the</text>
+<text x="57" y="128" textLength="261" fill="#dcdfe4">wheel see the whole document.</text>
+<text x="57" y="164" textLength="45" fill="#797b83">49994</text>
+<text x="120" y="164" textLength="576" fill="#dcdfe4">An item is built once; its height is estimated until it has been</text>
+<text x="57" y="182" textLength="639" fill="#dcdfe4">laid out, then measured. An item is built once; its height is estimated</text>
+<text x="57" y="200" textLength="621" fill="#dcdfe4">until it has been laid out, then measured. An item is built once; its</text>
+<text x="57" y="218" textLength="558" fill="#dcdfe4">height is estimated until it has been laid out, then measured.</text>
+<text x="57" y="254" textLength="45" fill="#797b83">49995</text>
+<text x="120" y="254" textLength="567" fill="#dcdfe4">The item at the top of the viewport stays where it is while the</text>
+<text x="57" y="272" textLength="225" fill="#dcdfe4">heights around it change.</text>
+<text x="57" y="308" textLength="45" fill="#797b83">49996</text>
+<text x="120" y="308" textLength="558" fill="#dcdfe4">A VirtualList keeps its items as data and builds a widget only</text>
+<text x="57" y="326" textLength="630" fill="#dcdfe4">for the items near the viewport. A VirtualList keeps its items as data</text>
+<text x="57" y="344" textLength="513" fill="#dcdfe4">and builds a widget only for the items near the viewport.</text>
+<text x="57" y="380" textLength="45" fill="#797b83">49997</text>
+<text x="120" y="380" textLength="576" fill="#dcdfe4">Two invisible spacers stand in for the items above and below, so</text>
+<text x="39" y="416" textLength="702" fill="#96a0b4">Paragraphs 49993-49997 of 50000, 19 built  |  Home End PgUp PgDn, Ctrl+C quits</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

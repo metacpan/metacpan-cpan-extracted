@@ -8,8 +8,9 @@ use Object::Proto::Sugar -types;
 use Game::Backgammon;
 use Game::Backgammon::Board ();
 use Game::Backgammon::Bot;
+use Getopt::Long ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 my %CHECKER = (
 	white => { ascii => 'O', wide => "\x{25CB}", colour => '1;37', ink => '1;38;5;231' },
@@ -576,7 +577,7 @@ sub offer_lines {
 	return \@lines;
 }
 
-sub run {
+sub start {
 	my ($self) = @_;
 	$self->game(Game::Backgammon->new(seed => $self->_seed)) unless $self->game;
 	$self->picking(0) if $self->picking && !$self->_enter_raw;
@@ -616,6 +617,94 @@ sub _seed {
 	return length($bytes) == 32 ? $bytes : Digest::SHA::sha256(rand() . $$ . time);
 }
 
+sub _usage {
+	return <<'USAGE';
+backgammon [--mode bot|hotseat|watch] [--level 1-3] [--seat white|black]
+           [--view white|black] [--ascii] [--no-colour] [--no-pick]
+
+  bot       play the computer (the default)
+  hotseat   two people at one keyboard
+  watch     the computer against itself
+
+  --view    pin the board to one side's numbering. By default it is drawn
+            from the side on roll, because a turn is written in the mover's
+            own numbers and the board should agree with the list.
+  --ascii   O and X instead of the round checkers.
+  --no-pick choose a whole turn by number from the list, as 0.01 did, rather
+            than one checker at a time with the keys.
+  --help    this
+
+The board is the usual one: your home board is the bottom right quarter and
+you run into it anticlockwise, the bar is the middle column and the tray the
+one on the right.
+
+On a terminal a turn is built one checker at a time: the moves you can make
+with the dice you have left are listed, up and down choose one and enter plays
+it, backspace takes the last one back, and the board shows where the checker
+under the cursor is going. A roll that can be played three hundred ways is
+still only a handful of choices at each step. v turns the board round and q
+stops. Without a terminal, or with --no-pick, every legal turn is numbered and
+you pick one.
+
+Exit status is 0 when the game ended or was stopped, 2 for an option the game
+will not take.
+USAGE
+}
+
+sub run {
+	my ($class, @argv) = @_;
+	my %o = (mode => 'bot', level => 3, seat => 'white', view => '', ascii => 0);
+	my ($colour, $pick, $help);
+
+	my $ok = eval {
+		local $SIG{__WARN__} = sub { print STDERR "backgammon: $_[0]" };
+		Getopt::Long::GetOptionsFromArray(\@argv,
+			'mode=s'  => \$o{mode},
+			'level=i' => \$o{level},
+			'seat=s'  => \$o{seat},
+			'view=s'  => \$o{view},
+			'ascii'   => \$o{ascii},
+			'colour!' => \$colour,
+			'pick!'   => \$pick,
+			'help'    => \$help,
+		);
+	};
+	if (!$ok) { print STDERR _usage(); return 2 }
+	if ($help) { print _usage(); return 0 }
+	if (@argv) { print STDERR "backgammon: not an option: $argv[0]\n", _usage(); return 2 }
+
+	my %refused = (
+		mode  => [ qr/\A(?:bot|hotseat|watch)\z/, 'bot, hotseat or watch' ],
+		seat  => [ qr/\A(?:white|black)\z/, 'white or black' ],
+		view  => [ qr/\A(?:white|black|)\z/, 'white or black' ],
+		level => [ qr/\A[123]\z/, '1 to 3' ],
+	);
+	for my $k (qw(mode seat view level)) {
+		next if $o{$k} =~ $refused{$k}[0];
+		print STDERR "backgammon: --$k takes $refused{$k}[1], not '$o{$k}'\n", _usage();
+		return 2;
+	}
+
+	my $terminal = $class->new(
+		%o,
+		(defined $colour ? (colour => $colour) : ()),
+		(defined $pick ? (picking => $pick) : ()),
+	);
+
+	local @SIG{qw(INT TERM HUP)};
+	for my $sig (qw(INT TERM HUP)) {
+		$SIG{$sig} = sub { $terminal->_leave_raw; $SIG{$sig} = 'DEFAULT'; kill $sig, $$ };
+	}
+
+	my $result;
+	my $played = eval { $result = $terminal->start; 1 };
+	my $died = $@;
+	$terminal->_leave_raw;
+	die $died unless $played;
+	return 1 if $result && $terminal->mode eq 'bot' && $result->winner ne $terminal->seat;
+	return 0;
+}
+
 1;
 
 __END__
@@ -628,7 +717,7 @@ Game::Backgammon::Terminal - the game at a prompt
 
     use Game::Backgammon::Terminal;
 
-    Game::Backgammon::Terminal->new(mode => 'bot', level => 3)->run;
+    Game::Backgammon::Terminal->new(mode => 'bot', level => 3)->start;
 
 =head1 DESCRIPTION
 
@@ -786,10 +875,24 @@ Clears the screen, but only for a person.
 
 Play one turn. Returns true while the game is still on.
 
-=head2 run
+=head2 start
 
 Play until the game ends or the player stops. Returns the
 L<Game::Backgammon::Result>, or undef if it was stopped.
+
+=head2 run
+
+    exit Game::Backgammon::Terminal->run(@ARGV);
+
+The whole command line program as a class method: parses the options
+F<bin/backgammon> documents, builds the terminal, plays, and returns the exit
+status rather than calling C<exit>: C<0> when the game ended or was stopped,
+C<2> for a bad option or a refused value, with the reason and the usage on
+C<STDERR>. C<--help> prints the usage on C<STDOUT> and returns C<0>. Signal
+handlers are local to the call and the terminal is left in cooked mode on
+every way out, so a launcher such as L<Game::Terminal> can call it in its own
+process and carry on afterwards. Colour is off under C<NO_COLOR> as well as
+off a terminal.
 
 =head2 say_to(@what)
 

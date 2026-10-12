@@ -5,16 +5,22 @@ MANIFEST
 MANIFEST.SKIP
 Makefile.PL
 README.md
+docs/APPLICATION-API.md
 docs/ARCHITECTURE.md
 docs/NATIVE-ABI.md
 docs/RFC-COMPLIANCE.md
+examples/linux-event-client.pl
+examples/linux-event-server.pl
 lib/Unblock/HTTP3.pm
 lib/Unblock/HTTP3/Body/Reader.pm
 lib/Unblock/HTTP3/Body/Stream.pm
 lib/Unblock/HTTP3/Capsule.pm
 lib/Unblock/HTTP3/Capsule/Parser.pm
 lib/Unblock/HTTP3/Capsule/Stream.pm
+lib/Unblock/HTTP3/Client.pm
+lib/Unblock/HTTP3/Integration.pm
 lib/Unblock/HTTP3/Connection.pm
+lib/Unblock/HTTP3/Server.pm
 lib/Unblock/HTTP3/Extension/Stream.pm
 lib/Unblock/HTTP3/NativeABI.pm
 lib/Unblock/HTTP3/NativeABI/unblock_http3_consumer.h
@@ -44,5 +50,8 @@ t/17-critical-stream-lifecycle.t
 t/18-client-protocol-errors.t
 t/19-cookie-coalescing.t
 t/20-native-consumer-abi.t
+t/21-api-harmonization.t
+t/22-named-arguments.t
+t/23-pause-indexing.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

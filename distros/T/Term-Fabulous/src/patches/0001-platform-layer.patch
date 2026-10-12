@@ -1,0 +1,424 @@
+Move every operating system call of termbox2 behind a platform layer
+
+termbox2 talks to the operating system in a dozen places: it opens the
+terminal, puts it into raw mode and back, asks for its size, waits for
+input with select(2) and reads it, writes its output, catches SIGWINCH
+through a pipe, reads the clock and spells out errors with strerror_r.
+This patch gathers the calls of tb_init_file, tb_init_rwfd, tb_deinit,
+wait_event, tb_set_input_mode, bytebuf_flush and tb_strerror into static
+functions at the end of the implementation, with one POSIX definition
+each:
+
+  open_tty, init_fds, restore_term_attrs, deinit_resize_handler,
+  close_opened_fds, enable_mouse_input, wait_input, write_output,
+  get_term_name, now_ms, format_last_error
+
+init_term_attrs, init_resize_handler and update_term_size, which already
+are functions of their own, stay where they are; the next patch gives
+them Windows definitions in place. The callers use the functions above
+instead of the system. The behaviour on POSIX systems does not change;
+the tb_init_file path now goes through tb_init_rwfd like every other,
+and tb_deinit closes both descriptors tb_init_file opened when they
+differ. The comments on
+tb_init and tb_get_fds already describe the Windows backend that the
+next patch adds on top of this layer.
+
+Term::Fabulous builds its own additions (src/termbox2.c) on these
+functions, so that they share termbox2's platform code.
+--- a/termbox2.h
++++ b/termbox2.h
+@@ -42,11 +42,12 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
++#include <sys/stat.h>
++#include <sys/types.h>
++
+ #include <sys/ioctl.h>
+ #include <sys/select.h>
+-#include <sys/stat.h>
+ #include <sys/time.h>
+-#include <sys/types.h>
+ #include <termios.h>
+ #include <unistd.h>
+ 
+@@ -464,6 +465,17 @@
+  * other functions. `tb_init` is equivalent to `tb_init_file("/dev/tty")`.
+  * After successful initialization, the library must be finalized using
+  * `tb_shutdown`.
++ *
++ * On Windows, the terminal is the console: `tb_init_file("/dev/tty")` (and so
++ * `tb_init`) opens `CONIN$` for input and `CONOUT$` for output, any other
++ * path is opened as a file that serves both. `tb_init_rwfd` takes C runtime
++ * file descriptors, as returned by `_open` or `_fileno`; a descriptor whose
++ * handle is a console is driven through the console API, any other
++ * (a pipe, a file) is read and written as a stream. One descriptor cannot
++ * serve both directions of the console, so `tb_init_fd` works only with
++ * descriptors that are not consoles. The console is switched to UTF-8 and
++ * to virtual terminal mode for input and output while termbox is
++ * initialized; keys arrive as the escape sequences an xterm would send.
+  */
+ int tb_init(void);
+ int tb_init_file(const char *path);
+@@ -667,6 +679,10 @@
+ /* Internal termbox fds that can be used with `poll(2)`, `select(2)`, etc.
+  * externally. Callers must invoke `tb_poll_event` or `tb_peek_event` if
+  * fds become readable.
++ *
++ * On Windows, `ttyfd` is the input descriptor and `resizefd` is -1: resizes
++ * arrive as console input records, and a console descriptor cannot be
++ * watched with `select`. Poll with `tb_peek_event` instead.
+  */
+ int tb_get_fds(int *ttyfd, int *resizefd);
+ 
+@@ -2293,7 +2309,6 @@
+ static int send_init_escape_codes(void);
+ static int send_clear(void);
+ static int update_term_size(void);
+-static int update_term_size_via_esc(void);
+ static int init_cellbuf(void);
+ static int tb_deinit(void);
+ static int load_terminfo(void);
+@@ -2311,7 +2326,6 @@
+ static int extract_esc_cap(struct tb_event *event);
+ static int extract_esc_mouse(struct tb_event *event);
+ static int resize_cellbufs(void);
+-static void handle_resize(int sig);
+ static int send_attr(uintattr_t fg, uintattr_t bg);
+ static int send_sgr(uint32_t fg, uint32_t bg, int fg_is_default,
+     int bg_is_default);
+@@ -2340,19 +2354,34 @@
+ static int tb_iswprint_ex(uint32_t ch, int *width);
+ static int tb_cluster_width(uint32_t *ch, size_t nch);
+ 
++/* The platform layer: the functions that talk to the operating system, each
++ * defined once per operating system. init_term_attrs, init_resize_handler
++ * and update_term_size, declared above, belong to it as well and keep their
++ * place; the rest is defined at the end of this file. */
++static int open_tty(const char *path, int *rfd, int *wfd);
++static int init_fds(int rfd, int wfd);
++static int restore_term_attrs(void);
++static int deinit_resize_handler(void);
++static int close_opened_fds(void);
++static int enable_mouse_input(int enabled);
++static int wait_input(int timeout_ms, int *resized);
++static int write_output(int fd, const char *buf, size_t len);
++static const char *get_term_name(void);
++static int64_t now_ms(void);
++static void format_last_error(void);
++static int update_term_size_via_esc(void);
++static void handle_resize(int sig);
++
+ int tb_init(void) {
+     return tb_init_file("/dev/tty");
+ }
+ 
+ int tb_init_file(const char *path) {
++    int rv, rfd, wfd;
+     if (global.initialized) return TB_ERR_INIT_ALREADY;
+-    int ttyfd = open(path, O_RDWR);
+-    if (ttyfd < 0) {
+-        global.last_errno = errno;
+-        return TB_ERR_INIT_OPEN;
+-    }
++    if_err_return(rv, open_tty(path, &rfd, &wfd));
+     global.ttyfd_open = 1;
+-    return tb_init_fd(ttyfd);
++    return tb_init_rwfd(rfd, wfd);
+ }
+ 
+ int tb_init_fd(int ttyfd) {
+@@ -2363,11 +2392,9 @@
+     int rv;
+ 
+     tb_reset();
+-    global.ttyfd = isatty(rfd) ? rfd : (wfd != rfd && isatty(wfd) ? wfd : -1);
+-    global.rfd = rfd;
+-    global.wfd = wfd;
+ 
+     do {
++        if_err_break(rv, init_fds(rfd, wfd));
+         if_err_break(rv, init_term_attrs());
+         if_err_break(rv, init_term_caps());
+         if_err_break(rv, init_cap_trie());
+@@ -2570,6 +2597,7 @@
+ }
+ 
+ int tb_set_input_mode(int mode) {
++    int rv;
+     if_not_init_return();
+ 
+     if (mode == TB_INPUT_CURRENT) return global.input_mode;
+@@ -2590,6 +2618,7 @@
+         bytebuf_puts(&global.out, TB_HARDCAP_EXIT_MOUSE);
+         bytebuf_flush(&global.out, global.wfd);
+     }
++    if_err_return(rv, enable_mouse_input(mode & TB_INPUT_MOUSE));
+ 
+     global.input_mode = mode;
+     return TB_OK;
+@@ -2852,7 +2881,7 @@
+         case TB_ERR_RESIZE_POLL:
+         case TB_ERR_RESIZE_READ:
+         default:
+-            strerror_r(global.last_errno, global.errbuf, sizeof(global.errbuf));
++            format_last_error();
+             return (const char *)global.errbuf;
+     }
+ }
+@@ -3192,20 +3221,9 @@
+         bytebuf_puts(&global.out, TB_HARDCAP_EXIT_MOUSE);
+         bytebuf_flush(&global.out, global.wfd);
+     }
+-    if (global.has_orig_tios && global.ttyfd >= 0) {
+-        tcsetattr(global.ttyfd, TCSAFLUSH, &global.orig_tios);
+-    }
+-    if (global.ttyfd_open) {
+-        close(global.ttyfd >= 0 ? global.ttyfd : global.rfd);
+-        global.ttyfd_open = 0;
+-    }
+-
+-    struct sigaction sa;
+-    memset(&sa, 0, sizeof(sa));
+-    sa.sa_handler = SIG_DFL;
+-    sigaction(SIGWINCH, &sa, NULL);
+-    if (global.resize_pipefd[0] >= 0) close(global.resize_pipefd[0]);
+-    if (global.resize_pipefd[1] >= 0) close(global.resize_pipefd[1]);
++    restore_term_attrs();
++    close_opened_fds();
++    deinit_resize_handler();
+ 
+     cellbuf_free(&global.back);
+     cellbuf_free(&global.front);
+@@ -3227,7 +3245,7 @@
+     // See terminfo(5) "Fetching Compiled Descriptions" for a description of
+     // this behavior. Some of these paths are compile-time ncurses options, so
+     // best guesses are used here.
+-    const char *term = getenv("TERM");
++    const char *term = get_term_name();
+     if (!term) return TB_ERR;
+ 
+     // If TERMINFO is set, try that directory first
+@@ -3384,7 +3402,7 @@
+ 
+ static int load_builtin_caps(void) {
+     int i, j;
+-    const char *term = getenv("TERM");
++    const char *term = get_term_name();
+ 
+     if (!term) return TB_ERR_NO_TERM;
+ 
+@@ -3457,53 +3475,15 @@
+ }
+ 
+ static int wait_event(struct tb_event *event, int timeout) {
+-    int rv;
+-    char buf[TB_OPT_READ_BUF];
++    int rv, resized;
+ 
+     memset(event, 0, sizeof(*event));
+     if_ok_return(rv, extract_event(event));
+ 
+-    fd_set fds;
+-    struct timeval tv;
+-    tv.tv_sec = timeout / 1000;
+-    tv.tv_usec = (timeout - (tv.tv_sec * 1000)) * 1000;
+-
+     do {
+-        FD_ZERO(&fds);
+-        FD_SET(global.rfd, &fds);
+-        FD_SET(global.resize_pipefd[0], &fds);
+-
+-        int maxfd = global.resize_pipefd[0] > global.rfd
+-                        ? global.resize_pipefd[0]
+-                        : global.rfd;
+-
+-        int select_rv =
+-            select(maxfd + 1, &fds, NULL, NULL, (timeout < 0) ? NULL : &tv);
+-
+-        if (select_rv < 0) {
+-            // Let EINTR/EAGAIN bubble up
+-            global.last_errno = errno;
+-            return TB_ERR_POLL;
+-        } else if (select_rv == 0) {
+-            return TB_ERR_NO_EVENT;
+-        }
+-
+-        int tty_has_events = (FD_ISSET(global.rfd, &fds));
+-        int resize_has_events = (FD_ISSET(global.resize_pipefd[0], &fds));
+-
+-        if (tty_has_events) {
+-            ssize_t read_rv = read(global.rfd, buf, sizeof(buf));
+-            if (read_rv < 0) {
+-                global.last_errno = errno;
+-                return TB_ERR_READ;
+-            } else if (read_rv > 0) {
+-                bytebuf_nputs(&global.in, buf, read_rv);
+-            }
+-        }
++        if_err_return(rv, wait_input(timeout, &resized));
+ 
+-        if (resize_has_events) {
+-            int ignore = 0;
+-            read(global.resize_pipefd[0], &ignore, sizeof(ignore));
++        if (resized) {
+             // TODO: Harden against errors encountered mid-resize
+             if_err_return(rv, update_term_size());
+             if_err_return(rv, resize_cellbufs());
+@@ -4209,13 +4189,9 @@
+ }
+ 
+ static int bytebuf_flush(struct bytebuf *b, int fd) {
++    int rv;
+     if (b->len <= 0) return TB_OK;
+-    ssize_t write_rv = write(fd, b->buf, b->len);
+-    if (write_rv < 0 || (size_t)write_rv != b->len) {
+-        // Note, errno will be 0 on partial write
+-        global.last_errno = errno;
+-        return TB_ERR;
+-    }
++    if_err_return(rv, write_output(fd, b->buf, b->len));
+     b->len = 0;
+     return TB_OK;
+ }
+@@ -4247,6 +4223,140 @@
+     return TB_OK;
+ }
+ 
++/* The rest of the platform layer (init_term_attrs, init_resize_handler and
++ * update_term_size have their per-system definitions above, where upstream
++ * keeps them). The functions below open the terminal, restore it, wait for
++ * and read its input, write its output, read the clock and spell out
++ * errors. `wait_input` is the heart of it: it waits
++ * up to `timeout_ms` milliseconds (forever when negative) for input, appends
++ * the bytes that arrived to `global.in` and returns `TB_OK`, or
++ * `TB_ERR_NO_EVENT` when the time ran out. A terminal at end of file wakes
++ * it with nothing to append. With `resized` set, a window size change wakes
++ * it too and sets `*resized`; with `resized` NULL, size changes stay pending
++ * for a later call. */
++
++
++static int open_tty(const char *path, int *rfd, int *wfd) {
++    int fd = open(path, O_RDWR);
++    if (fd < 0) {
++        global.last_errno = errno;
++        return TB_ERR_INIT_OPEN;
++    }
++    *rfd = fd;
++    *wfd = fd;
++    return TB_OK;
++}
++
++static int init_fds(int rfd, int wfd) {
++    global.ttyfd = isatty(rfd) ? rfd : (wfd != rfd && isatty(wfd) ? wfd : -1);
++    global.rfd = rfd;
++    global.wfd = wfd;
++    return TB_OK;
++}
++
++static int restore_term_attrs(void) {
++    if (global.has_orig_tios && global.ttyfd >= 0) {
++        tcsetattr(global.ttyfd, TCSAFLUSH, &global.orig_tios);
++    }
++    return TB_OK;
++}
++
++static int deinit_resize_handler(void) {
++    struct sigaction sa;
++    memset(&sa, 0, sizeof(sa));
++    sa.sa_handler = SIG_DFL;
++    sigaction(SIGWINCH, &sa, NULL);
++    if (global.resize_pipefd[0] >= 0) close(global.resize_pipefd[0]);
++    if (global.resize_pipefd[1] >= 0) close(global.resize_pipefd[1]);
++    return TB_OK;
++}
++
++static int close_opened_fds(void) {
++    if (!global.ttyfd_open) return TB_OK;
++    close(global.rfd);
++    if (global.wfd != global.rfd) close(global.wfd);
++    global.ttyfd_open = 0;
++    return TB_OK;
++}
++
++/* The escape sequences of `tb_set_input_mode` switch mouse reporting. */
++static int enable_mouse_input(int enabled) {
++    (void)enabled;
++    return TB_OK;
++}
++
++static int wait_input(int timeout_ms, int *resized) {
++    int rv, maxfd, select_rv;
++    char buf[TB_OPT_READ_BUF];
++    fd_set fds;
++    struct timeval tv;
++
++    if (resized) *resized = 0;
++
++    FD_ZERO(&fds);
++    FD_SET(global.rfd, &fds);
++    maxfd = global.rfd;
++    if (resized) {
++        FD_SET(global.resize_pipefd[0], &fds);
++        if (global.resize_pipefd[0] > maxfd) maxfd = global.resize_pipefd[0];
++    }
++
++    tv.tv_sec = timeout_ms / 1000;
++    tv.tv_usec = (timeout_ms % 1000) * 1000;
++    select_rv = select(maxfd + 1, &fds, NULL, NULL, timeout_ms < 0 ? NULL : &tv);
++
++    if (select_rv < 0) {
++        // Let EINTR/EAGAIN bubble up
++        global.last_errno = errno;
++        return TB_ERR_POLL;
++    } else if (select_rv == 0) {
++        return TB_ERR_NO_EVENT;
++    }
++
++    if (FD_ISSET(global.rfd, &fds)) {
++        ssize_t read_rv = read(global.rfd, buf, sizeof(buf));
++        if (read_rv < 0) {
++            global.last_errno = errno;
++            return TB_ERR_READ;
++        } else if (read_rv > 0) {
++            if_err_return(rv, bytebuf_nputs(&global.in, buf, (size_t)read_rv));
++        }
++    }
++
++    if (resized && FD_ISSET(global.resize_pipefd[0], &fds)) {
++        int ignore = 0;
++        read(global.resize_pipefd[0], &ignore, sizeof(ignore));
++        *resized = 1;
++    }
++
++    return TB_OK;
++}
++
++static int write_output(int fd, const char *buf, size_t len) {
++    ssize_t write_rv = write(fd, buf, len);
++    if (write_rv < 0 || (size_t)write_rv != len) {
++        // Note, errno will be 0 on partial write
++        global.last_errno = errno;
++        return TB_ERR;
++    }
++    return TB_OK;
++}
++
++static const char *get_term_name(void) {
++    return getenv("TERM");
++}
++
++static int64_t now_ms(void) {
++    struct timeval now;
++    gettimeofday(&now, NULL);
++    return (int64_t)now.tv_sec * 1000 + now.tv_usec / 1000;
++}
++
++static void format_last_error(void) {
++    strerror_r(global.last_errno, global.errbuf, sizeof(global.errbuf));
++}
++
++
+ int tb_iswprint(uint32_t ch) {
+ #ifdef TB_OPT_LIBC_WCHAR
+     return iswprint((wint_t)ch);

@@ -4,6 +4,7 @@ use warnings;
 use Socket qw(inet_aton pack_sockaddr_in);
 use Test2::V0;
 
+use Unblock::HTTP3::Client;
 use Unblock::HTTP3::Connection;
 use Uniform::HTTP::Request;
 use Unblock::HTTP3::_Native;
@@ -24,7 +25,7 @@ isa_ok($quic, ['Net::QUIC::Connection']);
 
 like(
     dies {
-        Unblock::HTTP3::Connection->client(
+        Unblock::HTTP3::Client->new(
             quic                  => $quic,
             enable_http_datagrams => 1,
         );
@@ -33,7 +34,7 @@ like(
     'HTTP/3 cannot advertise DATAGRAM without QUIC DATAGRAM transport',
 );
 
-my $http3 = Unblock::HTTP3::Connection->client(
+my $http3 = Unblock::HTTP3::Client->new(
     quic => $quic,
 );
 
@@ -53,7 +54,7 @@ is(
     'HTTP/3 defaults to 100 QPACK blocked streams',
 );
 
-my $static_qpack = Unblock::HTTP3::Connection->client(
+my $static_qpack = Unblock::HTTP3::Client->new(
     quic                     => $quic,
     qpack_max_table_capacity => 0,
     qpack_blocked_streams    => 0,
@@ -73,7 +74,7 @@ is(
 
 like(
     dies {
-        Unblock::HTTP3::Connection->client(
+        Unblock::HTTP3::Client->new(
             quic                     => $quic,
             qpack_max_table_capacity => '4611686018427387904',
         );

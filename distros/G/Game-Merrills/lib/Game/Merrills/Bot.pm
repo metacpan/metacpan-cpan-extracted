@@ -4,12 +4,13 @@ use strict;
 use warnings;
 
 use Object::Proto::Sugar -types;
+use Game::Merrills ();
 use Game::Merrills::Points;
 use Game::Merrills::Notation;
 use Game::Merrills::Rules;
 use Game::Merrills::Move;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use constant {
 	WIN => 10_000,
@@ -30,7 +31,7 @@ use constant {
 	HAND_BLACK => Game::Merrills::Rules::HAND_BLACK,
 };
 
-our (%LEVEL, $MAN, $MILL, $OPEN_TWO, $REACH, $RUNNING, $BLOCKED, $MOBILITY, $JUNCTION);
+our (%LEVEL, $MAN, $OPEN_TWO, $REACH, $MOBILITY, $JUNCTION);
 
 BEGIN {
 	%LEVEL = (
@@ -42,11 +43,8 @@ BEGIN {
 	);
 
 	$MAN = 100;
-	$MILL = 12;
 	$OPEN_TWO = 8;
 	$REACH = 10;
-	$RUNNING = 30;
-	$BLOCKED = 6;
 	$MOBILITY = 2;
 	$JUNCTION = 3;
 }
@@ -399,16 +397,10 @@ sub _evaluate {
 	}
 	my $placing = $hand{1} || $hand{-1};
 
-	my (@closed, @open);
+	my @open;
 	for my $mill (@{$MILLS}) {
 		my ($one, $two, $three) = @{$position}[ @{$mill} ];
 		my $sum = $one + $two + $three;
-		if ($sum == 3 || $sum == -3) {
-			my $side = $sum > 0 ? 1 : -1;
-			$score{$side} += $MILL;
-			$closed[$_] = $side for @{$mill};
-			next;
-		}
 		next unless ($sum == 2 || $sum == -2) && !($one && $two && $three);
 		my ($empty) = grep { !$position->[$_] } @{$mill};
 		push @open, [ $sum > 0 ? 1 : -1, $empty, $mill ];
@@ -425,15 +417,13 @@ sub _evaluate {
 			$score{$side} += $REACH;
 			next;
 		}
-		my ($reach, $running) = (0, 0);
+		my $reach = 0;
 		for my $near (@{ $ADJACENT->[$empty] }) {
 			next unless $position->[$near] == $side;
 			next if grep { $_ == $near } @{$mill};
 			$reach = 1;
-			$running = 1 if ($closed[$near] || 0) == $side;
 		}
 		$score{$side} += $REACH if $reach;
-		$score{$side} += $RUNNING if $running;
 	}
 
 	for my $point (0 .. 23) {
@@ -444,7 +434,6 @@ sub _evaluate {
 		}
 		my $free = grep { !$position->[$_] } @{ $ADJACENT->[$point] };
 		$score{$side} += $MOBILITY * $free;
-		$score{$side} -= $BLOCKED unless $free || ($flying && $count{$side} == 3);
 	}
 
 	$score{$_} += $MAN * ($count{$_} + $hand{$_}) for 1, -1;
@@ -463,7 +452,7 @@ Game::Merrills::Bot - a player that chooses its own moves, at five strengths
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
@@ -513,27 +502,25 @@ Men, on the board and in hand. Far the largest part.
 
 =item *
 
-Mills that stand closed.
-
-=item *
-
 Two men in a row with the third point empty, and more when a man is placed to
 step in and close it.
 
 =item *
 
-The running mill: a man that can step out of one mill straight into another,
-so that every move closes one of the two.
-
-=item *
-
-Room to move, and enemy men that have none, once every man is placed.
+Room to move, once every man is placed.
 
 =item *
 
 While men are still being placed, the points where most lines meet.
 
 =back
+
+That is all of it, and the list is short on purpose. Closed mills, men with
+no move and the running mill were each given a worth of their own and each
+was measured to change nothing: a bot with the term played no better than the
+same bot without it, at the weakest level over 800 games and at level 3 over
+96. What those things are worth the bot finds by looking ahead to the men
+they win.
 
 A side reduced to two men, or left with no move, has lost, and a loss sooner
 counts for more than a loss later. A position that would be a draw by
@@ -558,6 +545,12 @@ gives a different game. From level 3 up the seed changes nothing.
 =head2 level
 
 Read only number, 1 to 5, weakest first. Defaults to 3. Anything else dies.
+
+Each level was measured to beat the one below it, a draw counting half: 2
+scores 79% against 1 and 3 scores 79% against 2 over 400 games each, 4 scores
+67% against 3 over 200, and 5 scores 64% against 4 over 96. Good play at this
+game draws, so the gaps narrow at the top. A level 5 move takes several
+seconds.
 
 	my $bot = Game::Merrills::Bot->new(level => 1);
 
@@ -642,7 +635,7 @@ for the levels the seed varies. Dies when the level is not one.
 
 What each level is allowed.
 
-=item C<$MAN>, C<$MILL>, C<$OPEN_TWO>, C<$REACH>, C<$RUNNING>, C<$BLOCKED>, C<$MOBILITY>, C<$JUNCTION>
+=item C<$MAN>, C<$OPEN_TWO>, C<$REACH>, C<$MOBILITY>, C<$JUNCTION>
 
 What each thing the bot likes is worth. They are variables so that they can
 be tried at other values.

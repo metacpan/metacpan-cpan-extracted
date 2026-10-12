@@ -8,7 +8,7 @@ open(my $devnull, '>', \my $out_buf) or die $!;
 
 # We'll swap STDOUT temporarily for each group of terminal calls
 
-use Game::Cribbage;
+use Game::Cribbage::Terminal;
 use Game::Cribbage::Board;
 use Game::Cribbage::Deck::Card;
 
@@ -40,8 +40,8 @@ sub make_board {
 
 # --- Constructor and property accessors ---
 {
-    my $game = Game::Cribbage->new();
-    isa_ok($game, 'Game::Cribbage', 'Game::Cribbage->new creates object');
+    my $game = Game::Cribbage::Terminal->new();
+    isa_ok($game, 'Game::Cribbage::Terminal', 'Game::Cribbage::Terminal->new creates object');
 
     ok(!$game->dealer, 'dealer defaults to false');
     ok(!$game->crib_set, 'crib_set defaults to false');
@@ -61,7 +61,7 @@ sub make_board {
 
 # --- Terminal utility functions (capture stdout) ---
 {
-    my $game = Game::Cribbage->new();
+    my $game = Game::Cribbage::Terminal->new();
 
     with_captured_stdout {
         $game->reset_cursor();
@@ -96,7 +96,7 @@ sub make_board {
 
 # --- draw_dealer ---
 {
-    my $game = Game::Cribbage->new();
+    my $game = Game::Cribbage::Terminal->new();
 
     # Without dealer set (undef) - returns early
     with_captured_stdout {
@@ -121,7 +121,7 @@ sub make_board {
 
 # --- draw_starter ---
 {
-    my $game = Game::Cribbage->new();
+    my $game = Game::Cribbage::Terminal->new();
 
     # Without starter card - returns early
     with_captured_stdout {
@@ -139,7 +139,7 @@ sub make_board {
 
 # --- draw_crib ---
 {
-    my $game = Game::Cribbage->new();
+    my $game = Game::Cribbage::Terminal->new();
 
     # crib_set = 0 - returns early
     $game->dealer(0);
@@ -166,7 +166,7 @@ sub make_board {
 
 # --- render_card ---
 {
-    my $game = Game::Cribbage->new();
+    my $game = Game::Cribbage::Terminal->new();
     for my $suit (qw/H D S C/) {
         for my $sym ('A', '10', 'K', '5') {
             my $card = make_card(suit => $suit, symbol => $sym);
@@ -180,7 +180,7 @@ sub make_board {
 
 # --- render_opponent_cards ---
 {
-    my $game = Game::Cribbage->new();
+    my $game = Game::Cribbage::Terminal->new();
 
     # num = 0 - returns early
     with_captured_stdout {
@@ -197,7 +197,7 @@ sub make_board {
 
 # --- render_player_cards ---
 {
-    my $game = Game::Cribbage->new();
+    my $game = Game::Cribbage::Terminal->new();
     my @cards = (
         make_card(suit => 'H', symbol => 'K'),
         make_card(suit => 'D', symbol => '5'),
@@ -220,7 +220,7 @@ sub make_board {
 
 # --- draw_scores ---
 {
-    my $game = Game::Cribbage->new();
+    my $game = Game::Cribbage::Terminal->new();
 
     # Without board - returns early
     with_captured_stdout {
@@ -246,7 +246,7 @@ sub make_board {
 
 # --- render_run_play ---
 {
-    my $game = Game::Cribbage->new();
+    my $game = Game::Cribbage::Terminal->new();
     my $board = make_board();
     $game->board($board);
 
@@ -266,7 +266,7 @@ sub make_board {
 
 # --- draw_cards ---
 {
-    my $game = Game::Cribbage->new();
+    my $game = Game::Cribbage::Terminal->new();
     my $board = make_board();
     $game->board($board);
     eval { $game->draw_cards() };

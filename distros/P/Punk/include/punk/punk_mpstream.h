@@ -147,6 +147,45 @@ static void pq_mp_consume(pTHX_ SV *buf, STRLEN n) {
     SvPVX(buf)[have - n] = '\0';
 }
 
+/* Let go of whatever the sink still holds: close the descriptor, remove the
+ * file, free the buffer. A part that was handed on has cleared the fields it
+ * gave away, so this takes only what nobody else owns. */
+static void pq_sink_drop(pTHX_ pq_sink *s) {
+    if (s->fd >= 0) { (void)PerlLIO_close(s->fd); s->fd = -1; }
+    if (s->path) {
+        (void)PerlLIO_unlink(SvPVX(s->path));
+        SvREFCNT_dec(s->path);
+        s->path = NULL;
+    }
+    if (s->sv) { SvREFCNT_dec(s->sv); s->sv = NULL; }
+}
+
+static int pq_sink_free(pTHX_ SV *sv, MAGIC *mg) {
+    PERL_UNUSED_ARG(mg);
+    if (SvPOK(sv) && SvCUR(sv) == sizeof(pq_sink))
+        pq_sink_drop(aTHX_ (pq_sink *)SvPVX(sv));
+    return 0;
+}
+static MGVTBL pq_sink_vtbl = { NULL, NULL, NULL, NULL, pq_sink_free,
+                               NULL, NULL, NULL };
+
+/* The sink for a walk, owned by a mortal.
+ *
+ * The walk croaks from inside pq_mp_fill when the body passes its ceiling,
+ * with a part half read: a descriptor open, a temp file the request has not
+ * been told about, a buffer nobody else points at. A sink on the C stack is
+ * gone by then and takes none of it with it. This one is freed with the
+ * temporaries, on that path and on the ordinary one alike. */
+static pq_sink *pq_sink_guard(pTHX) {
+    SV *g = sv_2mortal(newSV(sizeof(pq_sink)));
+    pq_sink *s = (pq_sink *)SvPVX(g);
+    SvPOK_on(g);
+    SvCUR_set(g, sizeof(pq_sink));
+    s->sv = NULL; s->fd = -1; s->path = NULL; s->len = 0; s->is_file = 0;
+    sv_magicext(g, NULL, PERL_MAGIC_ext, &pq_sink_vtbl, NULL, 0);
+    return s;
+}
+
 /* Removing the temp files.
  *
  * Attached as magic to the list itself, so it fires when the REQUEST is
@@ -193,6 +232,7 @@ static IV pq_parse_multipart_stream(pTHX_ PerlIO *fp, IV clen, IV max,
     pq_mp_lim lim;
     IV parts = 0;
     UV seq = 0;
+    pq_sink *sink = pq_sink_guard(aTHX);
 
     lim.left = clen > 0 ? clen : -1;
     lim.got  = 0;
@@ -218,8 +258,6 @@ static IV pq_parse_multipart_stream(pTHX_ PerlIO *fp, IV clen, IV max,
         const char *hend = NULL;
         const char *disp = NULL, *ctype = NULL, *name = NULL, *fname = NULL;
         STRLEN displ = 0, ctypel = 0, namel = 0, fnamel = 0;
-        pq_sink sink;
-
         /* "--" here is the closing delimiter; CRLF starts another part */
         while (SvCUR(buf) < 2)
             if (!pq_mp_fill(aTHX_ fp, buf, PQ_MP_CHUNK, &lim)) return parts;
@@ -270,8 +308,8 @@ static IV pq_parse_multipart_stream(pTHX_ PerlIO *fp, IV clen, IV max,
 
             pq_mp_consume(aTHX_ buf, (STRLEN)((hend + 4) - SvPVX(buf)));
 
-            sink.sv = NULL; sink.fd = -1; sink.path = NULL;
-            sink.len = 0;   sink.is_file = fsv ? 1 : 0;
+            pq_sink_drop(aTHX_ sink);
+            sink->len = 0;   sink->is_file = fsv ? 1 : 0;
             seq++;
 
             /* the content, up to the next delimiter */
@@ -281,31 +319,27 @@ static IV pq_parse_multipart_stream(pTHX_ PerlIO *fp, IV clen, IV max,
                     ? ninstr(b, b + SvCUR(buf), (char *)ND, (char *)ND + NDl)
                     : NULL;
                 if (hit) {
-                    pq_sink_write(aTHX_ &sink, b, (STRLEN)(hit - b), dir, seq);
+                    pq_sink_write(aTHX_ sink, b, (STRLEN)(hit - b), dir, seq);
                     pq_mp_consume(aTHX_ buf, (STRLEN)(hit - b) + NDl);
                     break;
                 }
                 if (SvCUR(buf) > keep) {
                     STRLEN flush = SvCUR(buf) - keep;
-                    pq_sink_write(aTHX_ &sink, b, flush, dir, seq);
+                    pq_sink_write(aTHX_ sink, b, flush, dir, seq);
                     pq_mp_consume(aTHX_ buf, flush);
                 }
                 if (!pq_mp_fill(aTHX_ fp, buf, PQ_MP_CHUNK, &lim)) {
                     /* truncated: the part never ended */
-                    pq_sink_write(aTHX_ &sink, SvPVX(buf), SvCUR(buf), dir, seq);
+                    pq_sink_write(aTHX_ sink, SvPVX(buf), SvCUR(buf), dir, seq);
                     pq_mp_consume(aTHX_ buf, SvCUR(buf));
                     break;
                 }
             }
-            if (sink.fd >= 0) { PerlLIO_close(sink.fd); sink.fd = -1; }
+            if (sink->fd >= 0) { PerlLIO_close(sink->fd); sink->fd = -1; }
 
             parts++;
             if (!nsv) {                       /* a part with no name is noise */
-                if (sink.sv) SvREFCNT_dec(sink.sv);
-                if (sink.path) {
-                    (void)PerlLIO_unlink(SvPVX(sink.path));
-                    SvREFCNT_dec(sink.path);
-                }
+                pq_sink_drop(aTHX_ sink);
                 continue;
             }
 
@@ -316,25 +350,28 @@ static IV pq_parse_multipart_stream(pTHX_ PerlIO *fp, IV clen, IV max,
                 (void)hv_stores(up, "filename", newSVsv(fsv));
                 (void)hv_stores(up, "type", tsv ? newSVsv(tsv)
                                     : newSVpvs("application/octet-stream"));
-                (void)hv_stores(up, "size",    newSVuv(sink.len));
-                if (sink.path) {
+                (void)hv_stores(up, "size",    newSVuv(sink->len));
+                if (sink->path) {
                     /* on disk: the path, and the request owns its removal.
                      * The upload keeps a reference to its own slot in that
                      * list, so save()'s rename can clear it - see
                      * pq_tmp_free on why unlinking a moved file would be
                      * worse than leaking one. */
-                    (void)hv_stores(up, "path", newSVsv(sink.path));
+                    (void)hv_stores(up, "path", newSVsv(sink->path));
                     if (tempfiles) {
-                        SV *slot = newSVsv(sink.path);
+                        SV *slot = newSVsv(sink->path);
                         av_push(tempfiles, slot);
                         (void)hv_stores(up, "tmpslot", newRV_inc(slot));
                     }
-                    SvREFCNT_dec(sink.path);
+                    /* the request's now, or the upload's: not the sink's
+                     * to unlink */
+                    SvREFCNT_dec(sink->path);
+                    sink->path = NULL;
                 }
                 else {
                     (void)hv_stores(up, "content",
-                                    sink.sv ? sink.sv : newSVpvs(""));
-                    sink.sv = NULL;
+                                    sink->sv ? sink->sv : newSVpvs(""));
+                    sink->sv = NULL;
                 }
                 obj = sv_bless(newRV_noinc((SV *)up),
                                gv_stashpvs("Punk::Upload", GV_ADD));
@@ -343,11 +380,11 @@ static IV pq_parse_multipart_stream(pTHX_ PerlIO *fp, IV clen, IV max,
             else {
                 /* a field: it stays in memory, because a form value is
                  * something the application is about to read */
-                if (sink.path) {
+                if (sink->path) {
                     /* it outgrew the threshold anyway - read it back rather
                      * than hand a form value a path nobody expects */
                     SV *v = newSVpvs("");
-                    int fd = PerlLIO_open(SvPVX(sink.path), O_RDONLY);
+                    int fd = PerlLIO_open(SvPVX(sink->path), O_RDONLY);
                     if (fd >= 0) {
                         char tmp[PQ_MP_CHUNK];
                         SSize_t n;
@@ -355,15 +392,12 @@ static IV pq_parse_multipart_stream(pTHX_ PerlIO *fp, IV clen, IV max,
                             sv_catpvn(v, tmp, (STRLEN)n);
                         PerlLIO_close(fd);
                     }
-                    (void)PerlLIO_unlink(SvPVX(sink.path));
-                    SvREFCNT_dec(sink.path);
                     pq_hv_add(aTHX_ form, SvPVX(nsv), SvCUR(nsv), v);
-                    if (sink.sv) SvREFCNT_dec(sink.sv);
                 }
                 else {
                     pq_hv_add(aTHX_ form, SvPVX(nsv), SvCUR(nsv),
-                              sink.sv ? sink.sv : newSVpvs(""));
-                    sink.sv = NULL;
+                              sink->sv ? sink->sv : newSVpvs(""));
+                    sink->sv = NULL;
                 }
             }
         }

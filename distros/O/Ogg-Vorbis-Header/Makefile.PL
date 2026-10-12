@@ -1,4 +1,45 @@
 use Inline::MakeMaker;
+
+print $^O, "\n";
+
+if ($^O eq 'linux') {
+  warn <<'EOFTEXT';
+This module is a wrapper around the libogg and libvorbis libraries. These
+libraries (along with their development tools - which are also required)
+should be available as prebuilt packages for your Linux installation.
+For example, if you're using Ubuntu, you can install them with the command:
+
+  $ sudo apt-get install libinline-perl libogg-dev libvorbis-dev
+
+Otherwise, you can get them from https://xiph.org/.
+
+If your build fails with messages about missing libraries (or missing C
+header files) then this is probably the reason). Please install the missing
+libraries and try again.
+
+EOFTEXT
+} else {
+  warn <<'EOFTEXT';
+This module is a wrapper around the libogg and libvorbis libraries. You
+will need to install these libraries (along with their development tools)
+before you can successfully build and install this module. The libraries
+are available from https://xiph.org/.
+
+If your build fails with messages about missing libraries (or missing C
+header files) then this is probably the reason). Please install the missing
+libraries and try again.
+
+If you would like to help the maintainer of this module to support this module
+on your operating system, then please contact him at dave@perlhacks.com.
+
+In order to continue attempting to build this module, please set the
+environment variable PERL_BUILD_OGG_VORBIS_HEADER to 1 and rerun this command.
+
+EOFTEXT
+
+  exit unless $ENV{PERL_BUILD_OGG_VORBIS_HEADER};
+}
+
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 WriteMakefile(
@@ -17,11 +58,11 @@ WriteMakefile(
       resources => {
         repository => {
           type => 'git',
-          url  => 'https://github.com/davorg/Ogg-Vorbis-Header.git',
-          web  => 'https://github.com/davorg/Ogg-Vorbis-Header',
+          url  => 'https://github.com/davorg-cpan/Ogg-Vorbis-Header.git',
+          web  => 'https://github.com/davorg-cpan/Ogg-Vorbis-Header',
         },
         bugtracker => {
-          web  => 'https://github.com/davorg/Ogg-Vorbis-Header/issues',
+          web  => 'https://github.com/davorg-cpan/Ogg-Vorbis-Header/issues',
         },
       },
     },

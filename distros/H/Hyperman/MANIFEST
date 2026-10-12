@@ -22,6 +22,7 @@ include/hyperman/hm_future.h
 include/hyperman/hm_http2.h
 include/hyperman/hm_http3.h
 include/hyperman/hm_parse.h
+include/hyperman/hm_proxy.h
 include/hyperman/hm_quic.h
 include/hyperman/hm_sa_abuse.h
 include/hyperman/hm_sa.h
@@ -92,6 +93,11 @@ t/54-recycle-protocols.t
 t/55-future-temps.t
 t/56-hardening.t
 t/57-h2-hardening.t
+t/58-log-formats.t
+t/59-ipv6.t
+t/60-unix.t
+t/61-proxy-protocol.t
+t/62-reexec.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

@@ -316,19 +316,35 @@ static SV *pq_body(pTHX_ AV *req) {
                 /* into the slot before the first read: the ceiling croaks
                  * from inside the loop, and the request must still own what
                  * has been read by then rather than leak it */
-                SV *raw = newSV((len > 0 ? (STRLEN)len : PQ_STREAM_CHUNK) + 1);
+                /* Sized for what arrives, not for what was declared. The
+                 * length is a header, and reserving it before a byte has
+                 * been read lets one request line ask for any amount of
+                 * memory it likes. */
+                SV *raw = newSV((len > 0 && len < PQ_STREAM_CHUNK
+                                     ? (STRLEN)len : PQ_STREAM_CHUNK) + 1);
                 IV got = 0;
                 SvPOK_on(raw);
                 SvCUR_set(raw, 0);
                 *SvPVX(raw) = '\0';
                 (void)av_store(req, PQ_BODY, raw);
                 for (;;) {
-                    STRLEN want = (len >= 0) ? (STRLEN)(len - got)
-                                             : (STRLEN)PQ_STREAM_CHUNK;
+                    STRLEN want = (STRLEN)PQ_STREAM_CHUNK;
                     SSize_t n;
                     char *d;
+                    if (len >= 0 && len - got < (IV)want)
+                        want = (STRLEN)(len - got);
                     if (!want) break;
-                    d = SvGROW(raw, (STRLEN)got + want + 1);
+                    if ((STRLEN)got + want + 1 > SvLEN(raw)) {
+                        /* doubling, so a large body is not copied once per
+                         * window, and never past the declared length */
+                        STRLEN need = (STRLEN)got + want + 1;
+                        STRLEN grow = SvLEN(raw) * 2;
+                        if (len >= 0 && grow > (STRLEN)len + 1)
+                            grow = (STRLEN)len + 1;
+                        if (grow < need) grow = need;
+                        (void)SvGROW(raw, grow);
+                    }
+                    d = SvPVX(raw);
                     n = PerlIO_read(fp, d + got, want);
                     if (n <= 0) break;
                     got += (IV)n;

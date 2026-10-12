@@ -1,0 +1,1121 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Term::Fabulous::Manual::Events - Events, keyboard, focus, mouse and scrolling
+
+=head1 DESCRIPTION
+
+This page is part of L<Term::Fabulous::Manual>. Previous page: L<Term::Fabulous::Manual::Looks>. Next page: L<Term::Fabulous::Manual::Forms>.
+
+This page explains how a program reacts to the user. L</EVENTS> covers
+listeners, bubbling and return values, and lists every event with the
+widget it is fired on and its fields. L</KEYBOARD> explains which
+widget receives a key, the names of the keys (including the additional
+keys of the kitty keyboard protocol) and application shortcuts.
+L</FOCUS> covers the Tab order, focusing from code and custom focus
+orders. L</MOUSE> describes what the terminal reports and how clicks,
+hover and presses reach the widgets, and L</SCROLLING> the scroll box.
+
+Related pages: the recipes on L<Term::Fabulous::Cookbook::KeyboardAndMouse>,
+such as
+L<Bind a key to an action|Term::Fabulous::Cookbook::KeyboardAndMouse/Bind a key to an action>;
+the class pages of the events (L<Term::Fabulous::Event::KeyPress>,
+L<Term::Fabulous::Event::Mouse>, ...); and
+L<Term::Fabulous::Widget::Button> and
+L<Term::Fabulous::Widget::Dialog>. Writing widgets that take the focus
+or fire events of their own is covered in
+L<Term::Fabulous::Manual::CustomWidgets>.
+
+=head1 EVENTS
+
+Events tell your code that something happened: a key was pressed, the
+mouse was clicked, the terminal was resized, the user changed an input
+field. Every event has a name, such as C<KeyPress> or C<Change>, and is an
+object with fields that describe what happened.
+
+=head2 Listening to events
+
+Register a I<listener> with C<on>, giving the event name and a code
+reference. The listener receives the event object:
+
+	$field->on(
+		Change => sub ($event) {
+			say 'The text is now: ', $event->value;
+			return;
+		}
+	);
+
+You can register any number of listeners for the same event on the same
+widget; they run in the order they were registered. C<on> returns the
+widget, so calls can be chained. There is no method to remove a listener;
+if a listener must become inactive, let it check a flag.
+
+Several examples in this manual print with C<say> to keep them short.
+While C<run> is active, the terminal shows the user interface (full
+screen, or in some rows below the shell's output in inline mode), and
+printing to STDOUT writes over it. Real programs show
+messages in a widget (for example a status line made of a Text widget)
+or write them to a log file.
+
+The example program F<examples/event-monitor.pl> logs every event that
+reaches the root widget, with its target and its details. Run it to see
+which events a key press or a click produces, and in which order:
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-event-monitor.svg" alt="The event monitor after Tab, typing Ada, Enter, F5, Tab and a click on the OK button: the log lists KeyPress, OnFocus, Change, Submit, OnBlur, Mouse, OnHoverStart, OnPress, Activate and OnRelease events with their targets"></p>
+
+=end html
+
+Every event object has these fields in addition to its own (see
+L<Clay::UI::Events::Event>):
+
+=over
+
+=item C<name>
+
+The event name, for example C<'KeyPress'>.
+
+=item C<target>
+
+The widget the event was fired on, for example the focused input field.
+
+=item C<current_target>
+
+The widget whose listener is running right now. It differs from C<target>
+when the event has bubbled up from a child (see below).
+
+=item C<bubble_mode>
+
+How the event travels to the ancestors: a L<Clay::UI::Enum::Bubble>
+value, C<IF_CONTINUE> for nearly all events (see below), C<NEVER> for the
+hover events.
+
+=item C<handled_by>
+
+The widget at which the event stopped bubbling, or C<undef> while it has
+not stopped (and when it reached the root unstopped). The method
+C<result> returns C<< Clay::UI::Enum::Result->HANDLED >> when
+C<handled_by> is set, C<CONTINUE> otherwise.
+
+=back
+
+=head2 Return values and bubbling
+
+An event is I<fired on> one widget, its target. After the target's
+listeners have run, the event I<bubbles>: it is passed to the parent,
+then to the parent's parent, and so on up to the root. This lets one
+listener on a container handle the events of all its children, for
+example a C<Change> listener on a form box that sees every input inside
+it.
+
+B<What a listener returns decides whether the event bubbles further:>
+
+=over
+
+=item *
+
+C<< return Clay::UI::Enum::Result->CONTINUE; >> passes the event on to
+the parent.
+
+=item *
+
+Anything else stops it after the current widget: a plain C<return;>,
+C<< return Clay::UI::Enum::Result->HANDLED; >>, or whatever value the
+last statement of the listener happens to produce.
+
+=back
+
+The decision is made per widget: all listeners of the current widget
+run, and the event moves on to the parent only if B<every> one of them
+returned C<CONTINUE>. A widget without listeners for the event passes it
+on unchanged.
+
+	use Clay::UI::Enum::Result;
+
+	# Handle Ctrl+S here, let every other key bubble on.
+	$editor_box->on(
+		KeyPress => sub ($event) {
+			return Clay::UI::Enum::Result->CONTINUE unless ( $event->key_name // '' ) eq 'Ctrl+S';
+			save_document();
+			return Clay::UI::Enum::Result->HANDLED;
+		}
+	);
+
+Because Perl returns the value of the last statement when there is no
+C<return>, always end a listener with an explicit C<return>. Otherwise
+whether the event bubbles depends on an accident.
+
+The widgets follow the same rule: they stop the keys and clicks they
+use, and pass on the rest. That is why an application shortcut on the
+root still works while a text field has the focus, as long as the text
+field does not use that key (see L</Application shortcuts>). The
+listeners that the built-in widgets add to themselves run before the
+listeners you add, because they were registered first.
+
+Two events never bubble: C<OnHoverStart> and C<OnHoverStopped> are only
+seen by the widget they are fired on. Their bubble mode is C<NEVER>. A
+third mode, C<ALWAYS>, makes an event of your own reach every ancestor
+whatever the listeners return (see L</Firing your own events>).
+
+=head2 Event reference
+
+All events Term::Fabulous and Clay::UI fire. The table is an overview;
+the sections below it describe each event.
+
+=for highlighter language=text
+
+	Event            Fired on                          Bubbles
+	---------------  --------------------------------  ----------------
+	KeyPress         focused widget, else the root     yes
+	Mouse            widget painted under the pointer  yes
+	MouseMove        widget painted under the pointer  yes
+	Start            the root                          (no parent)
+	Resize           the root                          (no parent)
+	CanvasResize     the canvas                        yes
+	Change           input, radio group, color picker  yes
+	ValidityChange   the input                         yes
+	Submit           the text field or color picker    yes
+	Activate         the Button                        yes
+	Close            the Dialog, Toast or popup Menu   (no parent then)
+	Answer           the Prompt or FileDialog          (no parent then)
+	Choose           the Menu                          yes, not popups
+	Select           Accordion, Tabs, DocumentTabs     yes
+	TabClose         the DocumentTabs                  yes
+	TabAdd           the DocumentTabs                  yes
+	SeriesHover      the chart                         yes
+	OnFocus, OnBlur  the widget                        yes
+	OnPress          innermost pressable widget        yes
+	OnRelease        innermost pressable widget        yes
+	OnHoverStart     the widget                        never
+	OnHoverStopped   the widget                        never
+	OnScroll         the scroll box                    yes
+	CursorMove, ...  the Table (see below)             yes
+
+"Yes" means: as long as the listeners on the way return C<CONTINUE>
+(see L</Return values and bubbling>).
+
+=head3 Terminal input
+
+=over
+
+=item C<KeyPress> (L<Term::Fabulous::Event::KeyPress>)
+
+A key was pressed. Fired on the focused widget, or on the root widget
+when nothing has the focus. Fields: C<key>, C<char>, C<modifiers> (the
+raw termbox2 values); methods C<key_name>, C<main_key_name> and
+C<text>. See L</KEYBOARD>.
+
+=item C<Mouse> (L<Term::Fabulous::Event::Mouse>)
+
+A mouse button was pressed or released, the mouse was dragged, or the
+wheel was turned. Fired on the topmost widget painted under the pointer
+(see L</MOUSE>). Fields: C<key> (which button or wheel direction),
+C<x>, C<y> (the cell), C<modifiers> (Shift, Alt, Ctrl and the motion
+flag of a drag), C<released_button> (which button a release released);
+methods C<use_wheel> and C<wheel_used> (see L</SCROLLING>).
+
+=item C<MouseMove> (L<Term::Fabulous::Event::MouseMove>)
+
+The pointer moved with no button held. Fired on the topmost widget
+painted under the pointer, like C<Mouse>. Fields: C<x>, C<y>,
+C<modifiers>.
+
+=back
+
+=head3 The program and the terminal
+
+=over
+
+=item C<Start> (L<Term::Fabulous::Event::Start>)
+
+C<run> opened the terminal. Fired on the root widget once per C<run>
+(by C<step> instead, when C<step> opens the terminal), from inside the
+running loop, before the first frame and before any input event, when
+C<< $ui->width >> and C<< $ui->height >> already hold the terminal size.
+A listener can use C<< $ui->loop >>, to add timers or to stop the loop
+right away. Timers the program queued on the loop before C<run> may run
+before it. Fields: C<width>, C<height>.
+
+=item C<Resize> (L<Term::Fabulous::Event::Resize>)
+
+The terminal changed size. Fired on the root widget, twice per resize:
+first before the new size is applied (C<is_pre_event> is true), then
+after it (C<is_post_event> is true). Fields: C<width>, C<height> in
+cells. Resizes are I<debounced>: while the user is still dragging the
+window edge, nothing is fired; the events come 1/10 second after the
+last size change. The layout adapts to the new size by itself; listen to
+C<Resize> when your program wants to change something more, for example
+hide a sidebar on narrow terminals. Here C<$body> holds the main area
+and, to its right, C<$sidebar>, a box:
+
+=for highlighter language=perl
+
+	$root->on(
+		Resize => sub ($event) {
+			return unless $event->is_post_event;
+			my $wide  = $event->width >= 60;
+			my $shown = defined $sidebar->parent;
+			$body->add_child($sidebar)    if $wide  && !$shown;
+			$body->remove_child($sidebar) if !$wide && $shown;
+			return;
+		}
+	);
+
+To hide the sidebar, the listener removes it from the tree; to show it
+again, it adds it back. C<add_child> appends, so this keeps the order
+only because the sidebar is the last child. Do not hide a box with
+C<sizing_fixed(0)> instead: Clay reads a maximum of 0 as "no maximum",
+so the box keeps the size of its content (see
+L<sizing|Term::Fabulous::Manual::Layout/Sizing>).
+
+The starting size does not fire C<Resize>; it fires C<Start>, so a
+program that lays itself out by the terminal size listens to both (see
+L<Term::Fabulous::Cookbook::Layout/Change the layout with the terminal size (Start and Resize events)>).
+
+=back
+
+=head3 Events of the widgets
+
+=over
+
+=item C<CanvasResize> (L<Term::Fabulous::Event::CanvasResize>)
+
+A canvas (or a widget built on it: a pixel canvas, a chart, an input
+widget) got a new size from the layout. Fired on the canvas before the
+frame that shows the new size. Fields: C<columns>, C<rows>. See
+L<Term::Fabulous::Manual::Charts/CANVASES>.
+
+=item C<Change> (L<Term::Fabulous::Event::Change>)
+
+The user changed the value of an input widget. Fired on the input (for
+radio buttons, on their L<Term::Fabulous::Widget::RadioGroup>). Field:
+C<value>. A L<Term::Fabulous::Widget::ColorPicker> fires it on itself,
+with its new value, when the user types a color, moves a slider or
+picks a swatch. Not fired when your code sets a value with C<value> or
+C<checked>; the methods that act like the user, such as
+C<< $checkbox->toggle >>, C<< $group->choose($button) >> and
+C<< $dropdown->choose($index) >>, do fire it.
+
+=item C<ValidityChange> (L<Term::Fabulous::Event::ValidityChange>)
+
+The message an input widget has about its value changed: the value
+became invalid, valid, or invalid for another reason. Fired on the
+input right after the C<Change> it follows, and by
+C<< $input->validate >>. Fields: C<is_valid>, C<error>. See
+L<Term::Fabulous::Manual::Forms/Checking input>.
+
+=item C<Submit> (L<Term::Fabulous::Event::Submit>)
+
+The user pressed C<Enter> in a L<Term::Fabulous::Widget::TextField>.
+Field: C<value>, the text. A L<Term::Fabulous::Widget::ColorPicker>
+fires it on itself, with its value, for C<Enter> in its field or on a
+swatch.
+
+=item C<Activate> (L<Term::Fabulous::Event::Activate>)
+
+The user activated a L<Term::Fabulous::Widget::Button>: clicked it, or
+pressed C<Enter> or C<Space> while it had the focus. Also fired by
+C<< $button->activate >>. Fired on the button. No fields.
+
+=item C<Close> (L<Term::Fabulous::Event::Close>)
+
+A L<Term::Fabulous::Widget::Dialog> was closed, by C<Escape> or from
+code, a L<Term::Fabulous::Widget::Toast> went away, by its timeout,
+its close mark or from code, or a L<Term::Fabulous::Widget::Menu> that
+was opened as a popup closed. Fired on the dialog, the toast or the
+menu, after it has left the screen, so only listeners on it see it. No
+fields.
+
+=item C<Answer> (L<Term::Fabulous::Event::Answer>)
+
+A L<Term::Fabulous::Widget::Prompt> was answered: the user pressed one
+of its buttons or C<Escape>, or the program called C<answer> or
+C<close>. Or a L<Term::Fabulous::Widget::FileDialog> was answered: the
+user chose a file or a folder, or cancelled. Fired on the prompt or the
+file dialog after it closed and gave the focus back, so only listeners
+on it see it. Fields: C<button>, the id of the button (C<cancel> for
+Escape; for a file dialog C<open>, C<save>, C<choose> or C<cancel>),
+C<values>, the values of the prompt's fields (for a file dialog
+C<path>, the chosen path), and C<dismissed>, true when no button
+answered.
+
+=item C<Choose> (L<Term::Fabulous::Event::Choose>)
+
+The user chose an item of a L<Term::Fabulous::Widget::Menu>, or of a
+menu of a L<Term::Fabulous::Widget::MenuBar>: pressed C<Enter> or
+C<Space> on it, or clicked it. Also fired by C<< $menu->choose >>.
+Fired on the menu after a popup closed and before the item's command
+runs. Bubbles, except from a popup, which has left the tree. Fields:
+C<command>, the L<Term::Fabulous::Command> of the item, and C<index>.
+
+=item C<Select> (L<Term::Fabulous::Event::Select>)
+
+The user opened or closed an item of a
+L<Term::Fabulous::Widget::Accordion>: clicked its header, or pressed
+C<Enter> or C<Space> on it. Also fired by C<< $accordion->choose >>.
+Fired on the accordion. Or the user chose another tab of a
+L<Term::Fabulous::Widget::Tabs>: clicked it, or pressed an arrow key,
+C<Home>, C<End>, C<Ctrl+PageUp> or C<Ctrl+PageDown>. Also fired by
+C<< $tabs->choose >>. Fired on the Tabs, with the page as the item; a
+L<Term::Fabulous::Widget::Tabs::Bar> on its own fires it with the tab.
+Or the user clicked a tab of a L<Term::Fabulous::Widget::DocumentTabs>,
+or an arrow at its end; the item is then the tab's hash. Fields:
+C<item>, C<index>, C<open>.
+
+=item C<TabClose> (L<Term::Fabulous::Event::TabClose>)
+
+The user clicked the close mark of a tab of a
+L<Term::Fabulous::Widget::DocumentTabs>, or clicked the tab with the
+middle button. Fired on the DocumentTabs, which removes nothing itself.
+Fields: C<item>, the tab's hash, and C<index>.
+
+=item C<TabAdd> (L<Term::Fabulous::Event::TabAdd>)
+
+The user clicked the C<+> button at the end of a
+L<Term::Fabulous::Widget::DocumentTabs>. Fired on the DocumentTabs. No
+fields.
+
+=item C<TextClick> (L<Term::Fabulous::Event::TextClick>)
+
+A mouse button was pressed on a character of a
+L<Term::Fabulous::Widget::Text> or L<Term::Fabulous::Widget::RichText>.
+Fired on the text, after the C<Mouse> event of the press. Fields:
+C<button>, C<x>, C<y>, C<offset>, C<word>, C<word_start>, C<word_end>,
+C<spans>, C<link>, C<link_index>. See L</Clicks on text and links>.
+
+=item C<LinkActivate> (L<Term::Fabulous::Event::LinkActivate>)
+
+The user followed a link of a L<Term::Fabulous::Widget::RichText>:
+clicked it, or pressed C<Enter> while the RichText had the focus and
+the link was selected. Also fired by C<< $rich_text->activate_link >>.
+Fired on the RichText. Fields: C<link> (the link's target), C<index>,
+C<start>, C<end>.
+
+=item C<SeriesHover> (L<Term::Fabulous::Event::SeriesHover>)
+
+The pointer moved onto another part of a chart (a line, a bar, a
+slice, a legend entry) or off all of them. Fired on the chart. Fields:
+C<series>, C<index>, C<label>, C<value>, C<x>. See
+L<Term::Fabulous::Widget::Chart/Hover and emphasis>.
+
+=back
+
+=head3 Focus, press, hover and scroll events
+
+These events come from L<Clay::UI>. Term::Fabulous hands the pointer to
+Clay::UI with every frame (up to 30 times a second), and Clay::UI fires
+the press, hover and scroll events while it draws that frame, shortly
+after the C<Mouse> or C<MouseMove> event of the same input. The focus
+events come at once, when the focus moves.
+
+=over
+
+=item C<OnFocus>, C<OnBlur> (L<Clay::UI::Events::OnFocus>, L<Clay::UI::Events::OnBlur>)
+
+A widget got or lost the keyboard focus. Fired on that widget, C<OnBlur>
+first. No fields. See L</FOCUS>.
+
+=item C<OnPress>, C<OnRelease> (L<Clay::UI::Events::OnPress>, L<Clay::UI::Events::OnRelease>)
+
+The left mouse button went down over a pressable widget (a Button, an
+input widget), and went up again over the same widget. A press followed
+by a release on the same widget is a click; there is no separate click
+event. Fired on the innermost enabled pressable widget under the
+pointer. Fields: C<x>, C<y>, the center of the cell (for example
+C<3.5>), and C<button> (always 1).
+
+=item C<OnHoverStart>, C<OnHoverStopped> (L<Clay::UI::Events::OnHoverStart>, L<Clay::UI::Events::OnHoverStopped>)
+
+The pointer came over a hoverable widget (a Button, an input widget, a
+chart, a table), or left it. Fired on that widget; never bubble. No
+fields.
+
+=item C<OnScroll> (L<Clay::UI::Events::OnScroll>)
+
+A L<Term::Fabulous::Widget::ScrollBox> scrolled (also the one inside a
+L<Term::Fabulous::Widget::Table>; the event bubbles to the table).
+Fired on the scroll box. Fields: C<delta_x>, C<delta_y>, how far the
+content moved, in cells (C<delta_y> is -3 for one wheel notch down, 3
+for one notch up; less at the end of the content). Notches turned
+between two frames add up to one event.
+
+=back
+
+=head3 Table events
+
+A L<Term::Fabulous::Widget::Table> fires these events on itself when the
+user acts on it; changes from your program fire none (see
+L<Term::Fabulous::Manual::Tables/TABLES>):
+
+=over
+
+=item C<CursorMove> (L<Term::Fabulous::Event::CursorMove>)
+
+The user moved the table's cursor. Fields: C<row_id> (C<undef> on a
+group header), C<group_path>.
+
+=item C<SelectionChange> (L<Term::Fabulous::Event::SelectionChange>)
+
+The user changed which rows are selected. Fields: C<selected_ids>,
+C<added_ids>, C<removed_ids>.
+
+=item C<RowActivate> (L<Term::Fabulous::Event::RowActivate>)
+
+The user pressed C<Enter> on a row or double-clicked it. Fields:
+C<row_id>, C<row> (a copy of the row's data).
+
+=item C<SortChange> (L<Term::Fabulous::Event::SortChange>)
+
+The user sorted by a column. Field: C<sort>, the new sort.
+
+=item C<FilterChange> (L<Term::Fabulous::Event::FilterChange>)
+
+The user typed into a field of the table's filter row. Fields:
+C<column>, C<text>, C<error>.
+
+=item C<PageChange> (L<Term::Fabulous::Event::PageChange>)
+
+The user turned the page or chose another page size. Fields: C<page>,
+C<page_size>.
+
+=item C<Expand>, C<Collapse> (L<Term::Fabulous::Event::Expand>, L<Term::Fabulous::Event::Collapse>)
+
+The user opened or closed a tree row or a group. Fields: C<row_id> for
+a row, C<group_path> for a group.
+
+=item C<ColumnsChange> (L<Term::Fabulous::Event::ColumnsChange>)
+
+The user showed or hid a column in the column chooser. Field:
+C<visible>, the keys of the visible columns.
+
+=back
+
+=head2 Firing your own events
+
+Any widget can fire events with C<fire_event>. Events bubble like the
+built-in ones. For a simple event, create a L<Clay::UI::Events::Event>
+with a name:
+
+	use Clay::UI::Events::Event;
+
+	$root->on( Saved => sub ($event) { $status->text('Saved.'); return } );
+	$panel->fire_event( Clay::UI::Events::Event->new( name => 'Saved' ) );
+
+For an event with fields of its own, subclass it with L<Object::Pad> (its class syntax is explained in
+L<Object::Pad in brief|Term::Fabulous::Manual::CustomWidgets/Object::Pad in brief>):
+
+	use Object::Pad 0.825;
+
+	class My::Event::Progress :isa(Clay::UI::Events::Event) {
+		field $percent :param :reader;
+		method event_name :common { 'Progress' }
+	}
+
+	$panel->fire_event( My::Event::Progress->new( percent => 40 ) );
+
+C<fire_event> returns C<< Clay::UI::Enum::Result->HANDLED >> when a
+listener stopped the event, and C<CONTINUE> when none did. An event
+object can be fired only once; firing it again dies with C<event
+already dispatched; build a fresh event to fire again>, so create a new
+one for every dispatch. To make an event that only the target sees,
+pass C<< bubble_mode =E<gt> Clay::UI::Enum::Bubble->NEVER >> to C<new>;
+to make one that reaches every ancestor whatever the listeners return,
+pass C<< Clay::UI::Enum::Bubble->ALWAYS >> (C<use Clay::UI::Enum::Bubble;>).
+A complete program is the recipe
+L<Fire your own events|Term::Fabulous::Cookbook::Extending/Fire your own events>.
+
+=head1 KEYBOARD
+
+=head2 Which widget receives key presses
+
+Every key press becomes a C<KeyPress> event, fired on the widget that has
+the keyboard focus. When no widget has the focus, it is fired on the root
+widget. From there it bubbles up as described in
+L</Return values and bubbling>, so a listener on the root sees every key
+that the focused widget and its ancestors did not stop.
+
+=head2 Key names
+
+C<< $event->key_name >> returns a readable name for the key and its
+modifiers, which makes key bindings easy to write:
+
+	use Clay::UI::Enum::Result;
+
+	my %action_for = (
+		'Ctrl+S' => \&save,
+		'F1'     => \&show_help,
+		'Escape' => \&close_dialog,
+		'q'      => \&quit,
+	);
+	$root->on(
+		KeyPress => sub ($event) {
+			my $action = $action_for{ $event->key_name // '' }
+				or return Clay::UI::Enum::Result->CONTINUE;
+			$action->();
+			return;
+		}
+	);
+
+A key name is the name of the key with the names of the modifiers in
+front, joined with C<+>, always in the order C<Ctrl>, C<Alt>, C<Shift>,
+C<Super>, C<Hyper>, C<Meta>: C<Ctrl+W>, C<Ctrl+Shift+Left>,
+C<Alt+Enter>. The keys are named:
+
+=over
+
+=item *
+
+by the typed character, for keys that type one: C<a>, C<A>, C<?>,
+C<7>, C<E<uuml>>;
+
+=item *
+
+C<Space>, C<Enter>, C<Tab>, C<BackTab> (Shift+Tab), C<Escape>,
+C<Backspace>, C<Insert>, C<Delete>, C<Home>, C<End>, C<PageUp>,
+C<PageDown>, C<Left>, C<Right>, C<Up>, C<Down>, C<F1> to C<F12>;
+
+=item *
+
+after C<Ctrl+>, by the uppercase letter (C<Ctrl+A> to C<Ctrl+Z>) or the
+symbol: C<Ctrl+Space> (also sent for Ctrl+@ and Ctrl+2), C<Ctrl+\>,
+C<Ctrl+]>, C<Ctrl+^>, C<Ctrl+_>;
+
+=item *
+
+only from terminals that speak the kitty keyboard protocol (see below):
+C<F13> to C<F35>, C<CapsLock>, C<ScrollLock>, C<NumLock>,
+C<PrintScreen>, C<Pause>, C<Menu>, the keypad keys (C<Keypad0> to
+C<Keypad9>, C<KeypadEnter>, C<KeypadAdd>, C<KeypadLeft>, ...) and the
+media keys (C<MediaPlayPause>, C<RaiseVolume>, ...).
+
+=back
+
+C<key_name> returns C<undef> for keys without a name. The
+L<complete list of key names|Term::Fabulous::Event::KeyPress/KEY NAMES>
+is on the KeyPress page.
+
+What a terminal can report is limited, and the names reflect it, unless
+the terminal speaks the kitty keyboard protocol (see below):
+
+=over
+
+=item *
+
+C<Ctrl> plus a letter arrives as one control byte. Most of them are named
+C<Ctrl+A> to C<Ctrl+Z>, but four are the same bytes as other keys and get
+their names: C<Ctrl+H> arrives as C<Backspace>, C<Ctrl+I> as C<Tab>,
+C<Ctrl+M> as C<Enter> and C<Ctrl+[> as C<Escape>. C<Ctrl+Shift+W> is the
+same byte as C<Ctrl+W>.
+
+=item *
+
+C<Shift> plus a character arrives as the shifted character (C<A>,
+C<?>), without a C<Shift+> prefix.
+
+=item *
+
+C<Alt> plus a key is named C<Alt+x>, C<Alt+Enter>, C<Alt+E<uuml>> and
+so on. Terminals send it as C<Escape> followed by the key in one go,
+which is how Term::Fabulous tells it from a real C<Escape>; only
+C<Alt+[> and C<Alt+O> cannot be bound, because they begin the escape
+sequences of other keys.
+
+=item *
+
+Modifiers on the special keys (arrows, C<Home>, C<End>, C<Insert>,
+C<Delete>, C<PageUp>, C<PageDown>, C<F1> to C<F12>) work in most
+terminals: C<Alt+Down>, C<Ctrl+Left>, C<Shift+Home>, C<Ctrl+Shift+F5>.
+
+=back
+
+Terminals that speak the
+L<kitty keyboard protocol|https://sw.kovidgoyal.net/kitty/keyboard-protocol/>
+lift these limits. L<run|Term::Fabulous/run> switches the protocol on when the terminal has it
+(the C<kitty_keyboard> parameter of L<Term::Fabulous/new> turns that
+off, and L<kitty_keyboard_active|Term::Fabulous/kitty_keyboard_active>
+tells whether it is on). Then
+every Ctrl combination has its own name (C<Ctrl+I>, C<Ctrl+Shift+W>,
+C<Ctrl+Enter>, C<Ctrl+1>), C<Shift+Enter> is reported, C<Alt+[> can be
+bound, the modifiers C<Super+>, C<Hyper+> and C<Meta+> follow C<Shift+>,
+and the kitty keys listed above are reported. Keys typed without a
+modifier keep their names. Bindings that should treat the keypad keys
+like the main keyboard keys compare C<< $event->main_key_name >>
+instead (C<KeypadEnter> is C<Enter> there), as the built-in widgets do.
+See L<Term::Fabulous::Event::KeyPress/THE KITTY KEYBOARD PROTOCOL>.
+
+For typing, use C<< $event->text >>: it returns the typed character as a
+character string, or C<undef> for keys that do not type anything and for
+keys pressed with C<Ctrl>, C<Alt>, C<Super>, C<Hyper> or C<Meta>. See
+L<Term::Fabulous::Event::KeyPress> for the complete details, and for the
+raw C<key>, C<char> and C<modifiers> fields. To see the name of a key
+on your terminal, run F<examples/event-monitor.pl> and press it.
+
+=head2 Application shortcuts
+
+Put application-wide shortcuts in a C<KeyPress> listener on the root
+widget. The listener sees every key that was not used by the focused
+widget. The input widgets use the keys they need for editing (letters,
+arrows, C<Backspace>, ...) and pass on the rest, so keys like C<Escape>,
+C<F1> to C<F12> and C<Ctrl> combinations they do not use reach the root.
+Each input page lists the keys it uses under KEYS. An open
+L<Term::Fabulous::Widget::Dialog> is the exception: it stops every key,
+so the shortcuts behind it do not fire while it is open.
+
+There is no way to see a key before the focused input widget handles it:
+an input's own key handling runs before any listener you add to it, and
+you cannot stop it. To change which keys an input uses, derive a class
+from it and override C<handle_key> (see
+L<Term::Fabulous::Widget::Input/SUBCLASS INTERFACE>).
+
+=head2 Keys Term::Fabulous handles itself
+
+=over
+
+=item C<Ctrl+C>
+
+Fires its C<KeyPress> (key code 3) and then stops the loop, so C<run>
+returns. Listeners cannot prevent this. Term::Fabulous looks at the key
+code only, so C<Ctrl+Alt+C> and (with the kitty keyboard protocol)
+C<Ctrl+Shift+C> stop the loop as well. To clean up, put the code after
+C<< $ui->run >>. A program that must ask before it quits, or that wants
+C<Ctrl+C> for something else (copy, say), passes
+C<< stop_on_ctrl_c =E<gt> 0 >> to L<Term::Fabulous/new>: C<Ctrl+C> is then an
+ordinary key, and the program quits on a key of its own.
+
+=item C<Tab> and C<Shift+Tab>
+
+Fire their C<KeyPress> and then move the focus to the next or previous
+widget (see L</FOCUS>). Listeners see the key but cannot prevent the move.
+As with C<Ctrl+C>, the key code decides: C<Alt+Tab> moves the focus like
+C<Tab>, while C<Ctrl+Tab> (reported only with the kitty keyboard
+protocol) does not.
+
+The one exception is a focused widget that keeps the keys itself: when
+the widget the key was fired on has a C<captures_tab> method and it
+returns true, the focus stays where it is. A widget of your own (a code
+editor that indents with C<Tab>, say) defines it:
+
+	class My::CodeArea :isa(Term::Fabulous::Widget::TextArea) {
+		method captures_tab () { return 1 }
+
+		method handle_key :override ($event) {
+			my $name = $event->main_key_name // '';
+			return $self->apply_edit( $self->editor->insert("\t") ) if $name eq 'Tab';
+			return $self->SUPER::handle_key($event);
+		}
+	}
+
+Such a widget must offer another way out, since C<Tab> no longer
+leaves it: the mouse, or a key your program binds to move the focus
+(C<< $ui->interaction->focus_next >>).
+
+=back
+
+=head1 FOCUS
+
+The I<focused> widget receives the key presses. At most one widget has the
+focus at a time. Widgets that can take the focus are the
+L<Term::Fabulous::Widget::Button>, the input widgets, the
+L<Term::Fabulous::Widget::RadioGroup> (one focus stop for all of its
+buttons; the radio buttons themselves do not take the focus) and the
+L<Term::Fabulous::Widget::Table>. Widgets of your own can take it too
+(see L<Term::Fabulous::Manual::CustomWidgets/A box that takes the focus and reacts to the mouse>).
+
+=head2 Moving the focus
+
+The focus moves:
+
+=over
+
+=item *
+
+with C<Tab> (next) and C<Shift+Tab> (previous), in tree order: the order
+in which the widgets appear when you walk the tree depth first, parents
+before their children. Widgets that cannot take the focus right now are
+skipped. The order wraps around at the end.
+
+=item *
+
+when the user presses the left mouse button: the clicked widget, or its
+nearest ancestor that can take the focus, gets it. On text, the
+clicked widget is the Text itself, so a click on a
+L<Term::Fabulous::Widget::RichText> with links focuses it. Clicking where no
+widget can take the focus clears the focus. Dragging and the other
+buttons do not move the focus.
+
+A widget can keep the focus where it is when the user clicks it. It
+does so with a method C<keeps_focus_on_click> that returns true, and
+the widgets inside it then keep the focus as well. A
+L<Term::Fabulous::Widget::MenuBar> works this way: a click on a menu
+title opens the menu, and the text field the user was typing in still
+has the focus when the menu closes. Use it for widgets that act on the
+focused widget rather than take its place, such as a toolbar:
+
+	class My::Toolbar :isa(Term::Fabulous::Widget::Box) {
+		method keeps_focus_on_click () { return 1 }
+	}
+
+=item *
+
+from your code, through the I<interaction tracker> of the UI
+(L<Clay::UI::Interaction>):
+
+	$ui->interaction->set_focused_widget($name_field);   # focus a widget
+	$ui->interaction->set_focused_widget(undef);         # clear the focus
+	$ui->interaction->focus_next;                        # like Tab
+	$ui->interaction->focus_previous;                    # like Shift+Tab (BackTab)
+	my $focused = $ui->interaction->get_focused_widget;  # undef if none
+
+C<set_focused_widget> dies for a widget that cannot take the focus right
+now (for example a disabled input), with a message that ends in
+C<target is not currently focusable (can_focus returned false)>. You can
+call it before C<run>, for example to start with the cursor in the
+first field.
+
+=back
+
+To take a widget out of the focus order, pass C<can_focus =E<gt> 0> to
+C<new> (or C<can_focus #false> in a layout file), or call
+C<< $widget->can_focus(0) >> later; Tab skips it, a click does not focus
+it, and C<set_focused_widget> dies for it. A widget that has the focus
+when it stops being able to take it loses the focus at once (C<OnBlur>).
+Disabled widgets (the inputs, the radio groups and the Buttons, through
+L<Clay::UI::Role::Interaction::Disableable>) cannot take the focus:
+while C<< $widget->disabled(1) >> is in force, C<can_focus> reads 0, and
+Clay::UI does not press them either. Once the widget is enabled again
+C<can_focus> reads what it was last set to, also when that was set
+while the widget was disabled. To ask whether a widget can take the
+focus now, ask the tracker:
+C<< $ui->interaction->can_take_focus($widget) >>.
+
+=head2 Reacting to focus changes
+
+C<OnFocus> and C<OnBlur> are fired on the widget that gets and loses the
+focus, C<OnBlur> first. They bubble, so a container can follow the focus
+of all its children; compare C<< $event->target >> with the container if
+it should only react to its own focus. C<< $widget->is_focused >> tells
+whether a widget has the focus now. The recipe
+L<Show a status line that follows the focus|Term::Fabulous::Cookbook::Forms/Show a status line that follows the focus (OnFocus)>
+shows a help line for the focused field.
+
+The input widgets show their focus themselves (a different background and
+a cursor). A L<Term::Fabulous::Widget::Button> draws its border in its
+C<focus_border_color> while it has the focus. For another look, use
+these listeners:
+
+	use Clay::UI::Enum::Result;
+
+	$button->on( OnFocus => sub ($event) { $button->background_color( [ 60, 90, 160, 255 ] ); return Clay::UI::Enum::Result->CONTINUE } );
+	$button->on( OnBlur  => sub ($event) { $button->background_color( [ 40, 45, 60, 255 ] );  return Clay::UI::Enum::Result->CONTINUE } );
+
+A L<Term::Fabulous::Widget::Dialog> keeps the focus inside itself while
+it is open: Tab and Shift+Tab cycle through its widgets only, keys do
+not reach the widgets and key bindings behind it, a click outside the
+dialog focuses the dialog's backdrop instead of a widget behind it, a
+focused widget that is disabled or removed hands the focus to the
+backdrop, and when the dialog closes the focus goes back to the widget
+that had it before.
+
+=head2 Custom focus order
+
+The default order follows the tree. To change it for part of the tree,
+compose L<Clay::UI::Role::Interaction::HasFocusOrder> into a container
+class and implement C<get_next_focus> and C<get_previous_focus>. When
+the focus moves (with Tab, Shift+Tab, C<focus_next> or
+C<focus_previous>), the nearest ancestor of the focused widget that
+composes the role decides where it goes: its method returns the widget
+to focus, or C<undef> to keep the focus where it is. A returned widget
+that cannot take the focus right now (a disabled one) also keeps it
+where it is; anything that is not a focusable widget of the same UI
+dies. The helpers C<default_next_focus> and C<default_previous_focus>
+return what the default order would pick, for everything you do not
+want to change. Given C<< within => $self >>, they step through the
+focusable widgets inside the container only, wrapping around: that
+keeps Tab inside it, the way a Dialog does. To ask whether the focus is
+inside a widget, use C<< $ui->interaction->has_focus_within($widget) >>.
+
+This form moves the focus through its fields in a fixed order, whatever
+order they have in the tree:
+
+	use Object::Pad 0.825;
+	use Clay::UI::Role::Interaction::HasFocusOrder;
+
+	class My::Form :isa(Term::Fabulous::Widget::Box) :does(Clay::UI::Role::Interaction::HasFocusOrder) {
+		use List::Util qw(first);
+
+		field @order;    # the fields, in focus order
+
+		method set_order (@fields) { @order = @fields; return $self }
+
+		method _step ($direction) {
+			my $focused = $self->ui->interaction->get_focused_widget;
+			my $index   = first { $order[$_] == ( $focused // 0 ) } 0 .. $#order;
+			return $order[0] unless defined $index;
+			return $order[ ( $index + $direction ) % @order ];
+		}
+
+		method get_next_focus ()     { return $self->_step(1) }
+		method get_previous_focus () { return $self->_step(-1) }
+	}
+
+	my $form = My::Form->new;
+	$form->add_child( $street, $city, $zip );
+	$form->set_order( $street, $zip, $city );
+
+The role takes over only while the focused widget is inside the
+container (or, when nothing has the focus, if the container is the root).
+A complete program is the recipe
+L<Change the Tab order|Term::Fabulous::Cookbook::Forms/Change the Tab order (HasFocusOrder)>.
+
+=head1 MOUSE
+
+Mouse support is on by default; pass C<mouse =E<gt> 0> to
+C<< Term::Fabulous->new >> to leave the mouse to the terminal, so the user
+can select and copy text as usual (see
+L<Term::Fabulous::Cookbook::GettingStarted/Let the terminal handle the mouse (select and copy text)>).
+Inline mode (L<Term::Fabulous/INLINE MODE>) has no mouse support.
+
+=head2 What the terminal reports
+
+Term::Fabulous asks the terminal to report every mouse event: a button
+pressed or released, the pointer moving (with or without a button held)
+and the wheel turning (also a horizontal wheel), with the Shift, Alt and
+Ctrl keys held at the time. Hover effects (C<OnHoverStart>,
+C<OnHoverStopped>, C<is_hovered>) follow the pointer as it moves.
+Terminals report positions in cells; Term::Fabulous reads them in full,
+so terminals wider than 255 columns work.
+
+=head2 Mouse events
+
+Every report with a button or the wheel becomes a C<Mouse> event
+(L<Term::Fabulous::Event::Mouse>) with these fields:
+
+=over
+
+=item C<key>
+
+What happened, as a termbox2 constant: C<TB_KEY_MOUSE_LEFT>,
+C<TB_KEY_MOUSE_MIDDLE>, C<TB_KEY_MOUSE_RIGHT> (a button was pressed, or
+is held during a drag), C<TB_KEY_MOUSE_RELEASE> (a button was released),
+C<TB_KEY_MOUSE_WHEEL_UP>, C<TB_KEY_MOUSE_WHEEL_DOWN>, and for a
+horizontal wheel C<TF_KEY_MOUSE_WHEEL_LEFT> and
+C<TF_KEY_MOUSE_WHEEL_RIGHT>. Import the constants from
+L<Term::Fabulous::Termbox>:
+
+	use Term::Fabulous::Termbox qw(TB_KEY_MOUSE_LEFT TB_KEY_MOUSE_RELEASE TB_MOD_MOTION);
+
+=item C<x>, C<y>
+
+The cell under the pointer, counted from 0 at the top-left corner of the
+terminal.
+
+=item C<modifiers>
+
+A bit mask: C<TB_MOD_MOTION> is set while dragging, and C<TB_MOD_SHIFT>,
+C<TB_MOD_ALT> and C<TB_MOD_CTRL> for the keys held during the click.
+
+=item C<released_button>
+
+For C<TB_KEY_MOUSE_RELEASE>: the button that was released
+(C<TB_KEY_MOUSE_LEFT>, C<TB_KEY_MOUSE_MIDDLE> or C<TB_KEY_MOUSE_RIGHT>),
+or C<undef> when the terminal did not say.
+
+=back
+
+A report of the pointer moving with no button held becomes a
+C<MouseMove> event (L<Term::Fabulous::Event::MouseMove>) with C<x>, C<y>
+and C<modifiers>, fired on the same widget a C<Mouse> event would go to.
+Terminals send a move for every cell the pointer crosses, so keep these
+listeners cheap.
+
+The event is fired on the topmost widget that drew something in that cell
+in the last frame: its background, its border or its canvas. Text widgets
+do not receive C<Mouse> and C<MouseMove> events; a click on text goes to
+the box behind it, and then fires C<TextClick> on the text (see
+L</Clicks on text and links>).
+A box without a background color and without a border draws nothing, so
+clicks go through it to the widget behind it. When no widget drew the
+cell, the event is fired on the root widget. A left press moves the
+focus (see L</Moving the focus>) before its C<Mouse> event is fired.
+
+	use Clay::UI::Enum::Result;
+	use Term::Fabulous::Termbox qw(TB_KEY_MOUSE_LEFT TB_MOD_MOTION);
+
+	$box->on(
+		Mouse => sub ($event) {
+			return Clay::UI::Enum::Result->CONTINUE unless $event->key == TB_KEY_MOUSE_LEFT;
+			my $dragging = $event->modifiers & TB_MOD_MOTION;
+			say sprintf '%s at %d,%d', $dragging ? 'drag' : 'press', $event->x, $event->y;
+			return;
+		}
+	);
+
+A canvas converts the event's coordinates into its own cells with
+C<cell_at> (and a pixel canvas into pixels with C<pixel_at>); see
+L<Term::Fabulous::Manual::Charts/CANVASES> and the recipe
+L<Paint with the mouse|Term::Fabulous::Cookbook::Canvases/Paint with the mouse (Canvas, clicks and drags)>.
+
+=head2 Clicks, hover and press
+
+For buttons, C<Mouse> events are too low level. Widgets that compose
+L<Clay::UI::Role::Interaction::Pressable> (Button and the input widgets)
+get C<OnPress> when the left button goes down over them and C<OnRelease>
+when it goes up over the same widget. A L<Term::Fabulous::Widget::Button>
+turns a complete click, and C<Enter> or C<Space> while it has the focus,
+into one C<Activate> event, which is what most programs want:
+
+	$ok_button->on( Activate => sub ($event) { submit_form(); return } );
+
+Use C<OnRelease> for a mouse-only action; the user can still cancel a
+click by releasing the button somewhere else.
+
+C<< $button->is_pressed >> is true while the button is held down over the
+widget, and C<< $button->is_hovered >> while the pointer is over it. A
+Button inverts its colors while it is pressed and draws its border in
+C<focus_border_color> while it has the focus; see
+L<Term::Fabulous::Widget::Button>. Hovering changes no built-in look except on charts and tables (see
+L<hover on charts|Term::Fabulous::Widget::Chart/Hover and emphasis> and
+the C<hover> parameter of L<Term::Fabulous::Widget::Table>); for a hover look of your
+own, listen to C<OnHoverStart> and C<OnHoverStopped>.
+
+A press on a pressable widget fires both C<Mouse> and C<OnPress>.
+C<Mouse> comes first, as soon as the terminal reports the press;
+C<OnPress> follows when the next frame is drawn. A press and a release
+reported before the same frame (a quick tap) each get a frame of their
+own, so no click is too fast to be seen. Only the left button presses:
+releasing another button while the left one is held does not end the
+press. The two events can go to different widgets: C<Mouse> goes to the
+widget that drew the cell, C<OnPress> to the innermost pressable widget
+whose box contains the pointer, even if it draws nothing there. A
+disabled widget is not pressed.
+
+=head2 Clicks on text and links
+
+A button press on a character of a text (the left, middle or right
+button; not a drag, a release or the wheel) fires C<TextClick> on the
+L<Term::Fabulous::Widget::Text> after the C<Mouse> event, which still
+goes to the widget behind the text. The event says which character was
+clicked (C<offset> in the text, also on a wrapped line), the word it
+belongs to, and for a L<Term::Fabulous::Widget::RichText> the spans and
+the link there. It bubbles, so a container can react to clicks on any
+text inside it:
+
+	$article->on(
+		TextClick => sub ($event) {
+			look_up( $event->word ) if defined $event->word;
+			return;
+		}
+	);
+
+A left click on a link of a RichText then selects the link and fires
+C<LinkActivate> on the RichText; the pointer over a link gives it its
+hovered look. See L<Term::Fabulous::Widget::RichText/LINKS> for links,
+their looks and their keys. The recipes
+L<Term::Fabulous::Cookbook::KeyboardAndMouse/Follow links in a text (RichText links)>
+and
+L<Term::Fabulous::Cookbook::KeyboardAndMouse/React to a click on a word (TextClick)>
+are complete programs.
+
+=head1 SCROLLING
+
+A L<Term::Fabulous::Widget::ScrollBox> is a box whose content may be
+larger than the box. The content is cut off at the box's edges, and the
+mouse wheel scrolls it:
+
+	use Clay::XS qw(sizing_grow CLAY_TOP_TO_BOTTOM);
+	use Term::Fabulous::Widget::ScrollBox;
+	use Term::Fabulous::Widget::Text;
+
+	my $log = Term::Fabulous::Widget::ScrollBox->new(
+		id     => 'log',                      # required
+		layout => {
+			layout_direction => CLAY_TOP_TO_BOTTOM,
+			sizing           => { width => sizing_grow(), height => sizing_grow() },
+		},
+	);
+	$log->add_child( Term::Fabulous::Widget::Text->new( text => "Line $_", text_color => [ 220, 220, 220, 255 ] ) )
+		foreach 1 .. 500;
+
+Details:
+
+=over
+
+=item *
+
+The C<id> is required, because the scroll position is stored by id.
+
+=item *
+
+Each notch of the mouse wheel scrolls the scroll box under the pointer by
+three rows. Scroll boxes scroll vertically by default; C<vertical =E<gt> 0>
+switches vertical scrolling off. C<horizontal =E<gt> 1> lets content be
+wider than the box; a horizontal wheel (or a sideways tilt of the
+wheel) scrolls it by three columns per notch.
+
+A wheel notch scrolls the scroll box under the pointer unless a widget
+used it to scroll itself: a TextArea, a Slider or an open Dropdown list
+that moved calls C<use_wheel> on the C<Mouse> event
+(L<Term::Fabulous::Event::Mouse/use_wheel>), and the enclosing scroll
+box then stays put. One that is already at its end leaves the notch to
+the scroll box. Your own listeners do not change this: what they
+return only decides whether the C<Mouse> event bubbles on.
+
+=item *
+
+The scroll box fires C<OnScroll> when its position changed.
+
+=item *
+
+Adding children does not move the view; it stays where the user scrolled
+to. To read or set the scroll position from code, ask the application
+object: C<< $ui->scroll_state($box) >> returns
+C<{ position, viewport, content }>, and
+C<< $ui->scroll_to( $box, { y => -10 } ) >> scrolls ten rows down from
+the top (see L<Term::Fabulous/bounding_box, scroll_state, scroll_to>).
+The recipe
+L<Scroll a ScrollBox from code|Term::Fabulous::Cookbook::LiveData/Scroll a ScrollBox from code (keep a log at the newest line)>
+uses them to keep a log at its newest line.
+
+=item *
+
+A scrollbar in the last column inside the border shows how far the box
+is scrolled, and one in the last row when it scrolls sideways; the
+content keeps clear of them. A click on a scrollbar scrolls so that the
+thumb is centered under the pointer, and dragging with the left button
+keeps doing so. C<< scrollbar =E<gt> 0 >> removes them; C<track_color>
+and C<thumb_color> color them (see
+L<Term::Fabulous::Widget::Scrollbar>).
+
+=item *
+
+Scrolled content passes under the border, which is drawn on top of it.
+
+=item *
+
+To position the content yourself, set C<child_offset> to
+C<{ x =E<gt> 0, y =E<gt> -$rows }> (negative values move the content up);
+set it back to C<undef> to give control back to the mouse wheel. See
+L<Term::Fabulous::Widget::ScrollBox>.
+
+=back
+
+There is no keyboard scrolling for ScrollBox. A
+L<Term::Fabulous::Widget::TextArea> scrolls its own text, with keys,
+wheel and a scrollbar; the scroll box around it scrolls only when the
+area is already at its end. A L<Term::Fabulous::Widget::Table> scrolls its rows
+with the keys, the wheel and its own scrollbar.
+
+=head1 SEE ALSO
+
+This page is part of L<Term::Fabulous::Manual>. Previous page: L<Term::Fabulous::Manual::Looks>. Next page: L<Term::Fabulous::Manual::Forms>.
+
+L<Term::Fabulous::Cookbook::KeyboardAndMouse>,
+L<Term::Fabulous::Event::KeyPress>, L<Term::Fabulous::Event::Mouse>,
+L<Term::Fabulous::Widget::Button>, L<Term::Fabulous::Widget::Dialog>,
+L<Clay::UI::Events::Event>, L<Clay::UI::Interaction>.
+
+=cut

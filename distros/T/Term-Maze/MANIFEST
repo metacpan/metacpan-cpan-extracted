@@ -1,12 +1,15 @@
+bin/maze
 Changes
 ignore.txt
 lib/aze.pm
 lib/Term/Maze.pm
 lib/Term/Maze.xs
 Makefile.PL
+MANIFEST.SKIP
 MANIFEST			This list of files
 README
 t/00-load.t
+t/01-run.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

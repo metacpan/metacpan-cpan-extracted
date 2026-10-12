@@ -1,0 +1,50 @@
+// A theme file for Term::Fabulous: see Term::Fabulous::Theme and
+// Term::Fabulous::Manual::Looks. examples/themes.pl and the cookbook
+// recipe examples/cookbook/theme-switch.pl load it with
+// Term::Fabulous::Theme->from_file.
+//
+// A theme starts from a built-in one (dark or light) and changes
+// palette tokens, slots of widget families, and variants. The
+// background token is the screen behind the widgets: every frame
+// paints it first, so the theme looks the same on any terminal.
+
+theme "ocean" extends="dark"
+
+// The palette: every widget look that is not set below follows these,
+// and the background is the screen.
+palette {
+	background "#0b1a24"
+	surface "#10242f"
+	surface_field "#143040"
+	surface_raised "#183545"
+	border "#2b5a70"
+	outline "#2b5a70"
+	line "#2b5a70"
+	text "#d8e8ee"
+	text_dim "#8fb3c2"
+	text_muted "#7fa3b2"
+	placeholder "#5f8594"
+	accent "#5fd3c0"
+	focus_background "#1a3a48"
+	hover_background "#153240"
+	success "#9ad46b"
+	warning "#f0c674"
+	danger "#f27e7e"
+}
+
+// Buttons with a border get round ones; a button with
+// classes => ['primary'] is drawn in the accent and brightens while it
+// has the focus.
+button {
+	border style=Round
+	variant "primary" {
+		border color="accent"
+		text "accent"
+		focused { border color="text" }
+	}
+}
+
+// Dividers draw a double line.
+divider {
+	line style=Double
+}

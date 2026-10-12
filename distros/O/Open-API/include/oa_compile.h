@@ -60,6 +60,12 @@ typedef struct oa_param {
      * unencoded, so this is read by the URL builder, never by the validator -
      * a server decodes either spelling to the same value. */
     int allow_reserved;
+    /* A list delimiter a style cannot spell, from Swagger 2.0 through the
+     * x-oa-collectionFormat extension (plan_openapi_v2 D5): `delim` overrides
+     * the style's delimiter at the top level (0 means "by style"), `idelim`
+     * holds the delimiter of each nested array level beneath it (a 2.0 Items
+     * Object carries its own collectionFormat), `ndepth` how many there are. */
+    char delim; char idelim[4]; int ndepth;
 } oa_param;
 /* `kind` is OA_MT_*: which decoder the DECLARED type wants, decided once at
  * compile time. A range defers that to the request's own type. handle NULL
@@ -403,6 +409,43 @@ static int oa_sv_truthy(pTHX_ SV *sv) {
         return SvTRUE(rv) ? 1 : 0;
     }
     return SvTRUE(sv) ? 1 : 0;
+}
+
+/* The document's declared version: `openapi` for 3.0[.x] and 3.1[.x],
+ * `swagger` for 2.0. ONE reader, shared by the load-time gate and the
+ * compiler, so the two cannot disagree about which rules apply (the scopes
+ * rule reads it, and 2.0 has 3.0's sentence). Croaks on anything else. */
+#define OA_V20 20
+#define OA_V30 30
+#define OA_V31 31
+
+static int oa_doc_version(pTHX_ HV *h) {
+    SV *ov = oa_get(aTHX_ h, "openapi");
+    SV *sv = oa_get(aTHX_ h, "swagger");
+    STRLEN l; const char *p;
+    if (ov && sv)
+        croak("Open::API: spec declares both 'openapi' and 'swagger'");
+    if (ov) {
+        p = SvPV_const(ov, l);
+        if (!(l >= 3 && memEQ(p, "3.", 2) && (l == 3 || p[3] == '.')
+              && (p[2] == '1' || p[2] == '0')))
+            croak("Open::API supports OpenAPI 3.0 and 3.1 (got %.*s)", (int)l, p);
+        return (p[2] == '1') ? OA_V31 : OA_V30;
+    }
+    if (sv) {
+        /* "The value MUST be \"2.0\"": a string. A YAML `swagger: 2.0` is a
+         * number and stringifies as 2, so it is refused by name rather than
+         * read as a version that would admit 2.1 tomorrow. */
+        if (SvROK(sv) || !SvPOK(sv) || SvNIOK(sv))
+            croak("Open::API: 'swagger' must be the string \"2.0\" "
+                  "(quote it in YAML)");
+        p = SvPV_const(sv, l);
+        if (!(l == 3 && memEQ(p, "2.0", 3)))
+            croak("Open::API supports Swagger 2.0 (got swagger %.*s)", (int)l, p);
+        return OA_V20;
+    }
+    croak("Open::API: spec has no 'openapi' version field (and no 'swagger')");
+    return 0; /* not reached */
 }
 
 /* A Components Object key: the specification fixes the alphabet. */
@@ -977,6 +1020,42 @@ static int oa_param_same(pTHX_ HV *x, HV *y) {
     return sv_eq(xn, yn) && sv_eq(xi, yi);
 }
 
+/* The delimiter an x-oa-collectionFormat value names, or 0 when absent or
+ * not one of the four. csv is a comma, the style's own default. */
+static char oa_cf_delim(pTHX_ SV *cf) {
+    STRLEN l; const char *p;
+    if (!cf || SvROK(cf) || !SvOK(cf)) return 0;
+    p = SvPV_const(cf, l);
+    if (l == 3 && memEQ(p, "ssv", 3))   return ' ';
+    if (l == 3 && memEQ(p, "tsv", 3))   return '\t';
+    if (l == 5 && memEQ(p, "pipes", 5)) return '|';
+    if (l == 3 && memEQ(p, "csv", 3))   return ',';
+    return 0;
+}
+
+/* The nested array levels under an array schema: each `items` that is itself
+ * an array adds a level whose delimiter is its own x-oa-collectionFormat, or
+ * a comma. Bounded by the size of idelim, which matches the Items nesting the
+ * pre-pass accepts. */
+static void oa_nested_delims(pTHX_ oa_param *pp, SV *schema) {
+    HV *h = oa_hv_of(schema);
+    pp->ndepth = 0;
+    while (h && pp->ndepth < 4) {
+        HV *ih = oa_hv_of(oa_get(aTHX_ h, "items"));
+        SV *t;
+        STRLEN tl; const char *tp;
+        char d;
+        if (!ih) break;
+        t = oa_get(aTHX_ ih, "type");
+        if (!t || SvROK(t)) break;
+        tp = SvPV_const(t, tl);
+        if (!(tl == 5 && memEQ(tp, "array", 5))) break;
+        d = oa_cf_delim(aTHX_ oa_get(aTHX_ ih, "x-oa-collectionFormat"));
+        pp->idelim[pp->ndepth++] = d ? d : ',';
+        h = ih;
+    }
+}
+
 /* Merge path-item + operation parameter lists (operation wins on name+in),
  * then compile each into the op's per-location arrays. */
 static void oa_compile_params(pTHX_ oa_api *a, oa_op *o, AV *item_params,
@@ -986,25 +1065,44 @@ static void oa_compile_params(pTHX_ oa_api *a, oa_op *o, AV *item_params,
     int counts[OA_IN_N] = { 0, 0, 0, 0 };
     int fill[OA_IN_N]   = { 0, 0, 0, 0 };
 
-    /* path-item level first */
+    /* path-item level first. "The list MUST NOT include duplicated
+     * parameters. A unique parameter is defined by a combination of a name and
+     * location" - the same sentence in every version. The merge below used to
+     * let a repeat within ONE list win silently. */
     if (item_params) {
         SSize_t n = av_len(item_params) + 1, j;
         for (j = 0; j < n && nm < 64; j++) {
             SV **e = av_fetch(item_params, j, 0);
             HV *ph = e ? oa_hv_of(*e) : NULL;
-            if (ph) merged[nm++] = ph;
+            int k;
+            if (!ph) continue;
+            for (k = 0; k < nm; k++)
+                if (oa_param_same(aTHX_ merged[k], ph))
+                    croak("Open::API: %s: path item parameter '%s' (in %s) is "
+                          "declared twice in one list", SvPV_nolen(o->op_id),
+                          SvPV_nolen(oa_get(aTHX_ ph, "name")),
+                          SvPV_nolen(oa_get(aTHX_ ph, "in")));
+            merged[nm++] = ph;
         }
     }
     /* operation level: replace same (name,in), else append */
     if (op_params) {
         SSize_t n = av_len(op_params) + 1, j;
+        int from_item = nm;
         for (j = 0; j < n; j++) {
             SV **e = av_fetch(op_params, j, 0);
             HV *ph = e ? oa_hv_of(*e) : NULL;
             int k, hit = 0;
             if (!ph) continue;
             for (k = 0; k < nm; k++)
-                if (oa_param_same(aTHX_ merged[k], ph)) { merged[k] = ph; hit = 1; break; }
+                if (oa_param_same(aTHX_ merged[k], ph)) {
+                    if (k >= from_item)
+                        croak("Open::API: %s: parameter '%s' (in %s) is declared "
+                              "twice in one list", SvPV_nolen(o->op_id),
+                              SvPV_nolen(oa_get(aTHX_ ph, "name")),
+                              SvPV_nolen(oa_get(aTHX_ ph, "in")));
+                    merged[k] = ph; hit = 1; break;
+                }
             if (!hit) {
                 if (nm >= 64) croak("Open::API: more than 64 parameters on %s",
                                     SvPV_nolen(o->op_id));
@@ -1071,6 +1169,11 @@ static void oa_compile_params(pTHX_ oa_api *a, oa_op *o, AV *item_params,
             }
             pp->explode = ex ? (oa_sv_truthy(aTHX_ ex) ? 1 : 0)
                              : (pp->style == OA_ST_FORM ? 1 : 0);
+        }
+        {   /* the delimiters a style cannot spell (D5): a tab anywhere, a
+             * space or pipe in a path or header, and each nested level's */
+            pp->delim = oa_cf_delim(aTHX_ oa_get(aTHX_ ph, "x-oa-collectionFormat"));
+            oa_nested_delims(aTHX_ pp, schema);
         }
         {   /* reported to consumers; the specification gives it no effect on
              * validation, so it is carried rather than enforced */
@@ -1258,7 +1361,10 @@ static void oa_compile_responses(pTHX_ oa_api *a, oa_op *o, SV *resps) {
                 hrows[hn].p.name     = oa_keep(aTHX_ a, newSVpvn(hk, (STRLEN)hkl));
                 hrows[hn].p.required = (hr && oa_sv_truthy(aTHX_ hr)) ? 1 : 0;
                 hrows[hn].p.ctype    = NULL;
-                hrows[hn].p.is_array = 0;
+                /* an array header is split before the check, like a request
+                 * header; until this was read the row said "not an array" and
+                 * a schema of type array failed on every value */
+                hrows[hn].p.is_array = hs ? oa_schema_is_array(aTHX_ a, hs, 0) : 0;
                 /* these rows come from realloc, NOT calloc: every field has
                  * to be assigned or it reads uninitialised memory */
                 hrows[hn].p.is_object   = 0;
@@ -1268,6 +1374,8 @@ static void oa_compile_responses(pTHX_ oa_api *a, oa_op *o, SV *resps) {
                 hrows[hn].p.deprecated     = 0;
                 hrows[hn].p.allow_empty    = 0;
                 hrows[hn].p.allow_reserved = 0;
+                hrows[hn].p.delim = oa_cf_delim(aTHX_ oa_get(aTHX_ hobj, "x-oa-collectionFormat"));
+                oa_nested_delims(aTHX_ &hrows[hn].p, hs);
                 hrows[hn].p.handle   = hs
                     ? oa_compile_schema(aTHX_ a, hs, 1, OA_DIR_RESP) : NULL;
                 hn++;
@@ -1461,12 +1569,21 @@ static SV *oa_server_prefix_of(pTHX_ oa_api *a, AV *srv) {
     SV *out;
     if (!url) return NULL;
     up = SvPV_const(url, ul);
-    for (i = 0; i + 2 < ul; i++) {           /* past scheme://host */
-        if (up[i] == ':' && up[i + 1] == '/' && up[i + 2] == '/') {
-            STRLEN j = i + 3;
-            while (j < ul && up[j] != '/') j++;
-            pathstart = j;
-            break;
+    /* past scheme://host, or past //host: a 2.0 document with a host and no
+     * schemes converts to a scheme-relative server URL, and scanning only for
+     * `://` would take the whole of `//host/v2` as the prefix */
+    if (ul >= 2 && up[0] == '/' && up[1] == '/') {
+        STRLEN j = 2;
+        while (j < ul && up[j] != '/') j++;
+        pathstart = j;
+    } else {
+        for (i = 0; i + 2 < ul; i++) {
+            if (up[i] == ':' && up[i + 1] == '/' && up[i + 2] == '/') {
+                STRLEN j = i + 3;
+                while (j < ul && up[j] != '/') j++;
+                pathstart = j;
+                break;
+            }
         }
     }
     out = sv_2mortal(newSVpvs(""));
@@ -1492,48 +1609,10 @@ static SV *oa_server_prefix_of(pTHX_ oa_api *a, AV *srv) {
 }
 
 static void oa_set_server_prefix(pTHX_ oa_api *a) {
-    HV *doc  = oa_hv_of(a->spec);
-    AV *srv  = doc ? oa_av_of(oa_get(aTHX_ doc, "servers")) : NULL;
-    SV **e   = srv ? av_fetch(srv, 0, 0) : NULL;
-    HV *s0   = (e && *e) ? oa_hv_of(*e) : NULL;
-    SV *url  = s0 ? oa_get(aTHX_ s0, "url") : NULL;
-    HV *vars = s0 ? oa_hv_of(oa_get(aTHX_ s0, "variables")) : NULL;
-    STRLEN ul, i, pathstart = 0;
-    const char *up;
-    SV *out;
-    if (!url) return;
-    up = SvPV_const(url, ul);
-
-    /* past scheme://host, when there is one */
-    for (i = 0; i + 2 < ul; i++) {
-        if (up[i] == ':' && up[i + 1] == '/' && up[i + 2] == '/') {
-            STRLEN j = i + 3;
-            while (j < ul && up[j] != '/') j++;
-            pathstart = j;
-            break;
-        }
-    }
-
-    out = sv_2mortal(newSVpvs(""));
-    for (i = pathstart; i < ul; i++) {
-        if (up[i] == '{') {
-            STRLEN j = i + 1;
-            while (j < ul && up[j] != '}') j++;
-            if (j < ul) {
-                SV **dv = vars ? hv_fetch(vars, up + i + 1,
-                                          (I32)(j - i - 1), 0) : NULL;
-                HV *vh  = (dv && *dv) ? oa_hv_of(*dv) : NULL;
-                SV *def = vh ? oa_get(aTHX_ vh, "default") : NULL;
-                if (def) sv_catsv(out, def);
-                i = j;
-                continue;
-            }
-        }
-        sv_catpvn(out, up + i, 1);
-    }
-    while (SvCUR(out) && SvPVX(out)[SvCUR(out) - 1] == '/')
-        SvCUR_set(out, SvCUR(out) - 1);      /* a trailing / is not prefix */
-    if (SvCUR(out)) a->prefix = oa_keep(aTHX_ a, newSVsv(out));
+    HV *doc = oa_hv_of(a->spec);
+    AV *srv = doc ? oa_av_of(oa_get(aTHX_ doc, "servers")) : NULL;
+    SV *p   = oa_server_prefix_of(aTHX_ a, srv);
+    if (p) a->prefix = p;
 }
 
 /* The order the router walks the operation table in.
@@ -1608,16 +1687,11 @@ static void oa_compile(pTHX_ oa_api *a) {
     t->by_id = newHV();
     a->ops   = t;
 
-    /* The normaliser up-converts a 3.0 document's schemas but leaves its
-     * `openapi` string alone, so the version is still readable here - and the
-     * security requirement rules differ between 3.0 and 3.1. The string has
-     * already been checked to be 3.0[.x] or 3.1[.x]. */
-    {
-        SV *ov = oa_get(aTHX_ doc, "openapi");
-        STRLEN ol;
-        const char *op = ov ? SvPV_const(ov, ol) : "";
-        t->v30 = (ov && ol >= 3 && op[2] == '0');
-    }
+    /* The normaliser converts a 2.0 or 3.0 document's schemas but leaves its
+     * version string alone, so the version is still readable here - and the
+     * security requirement rules differ between 3.0 and 3.1, with 2.0 on
+     * 3.0's side. Read through the gate's own reader so they cannot drift. */
+    t->v30 = (oa_doc_version(aTHX_ doc) <= OA_V30);
 
     oa_compile_schemes(aTHX_ a, t);
     {
@@ -1640,6 +1714,9 @@ static void oa_compile(pTHX_ oa_api *a) {
             I32 tkl; const char *tpl = hv_iterkey(phe, &tkl);
             SV *canon = sv_2mortal(newSVpvs(""));
             STRLEN q;
+            /* a Paths Object may carry ^x- extensions beside its paths, in
+             * every version of the specification; they are not paths */
+            if (tkl >= 2 && tpl[0] == 'x' && tpl[1] == '-') continue;
             /* a path field name MUST begin with a forward slash: it is
              * appended to a server URL, and one that does not would silently
              * join onto the host instead */
@@ -1672,6 +1749,7 @@ static void oa_compile(pTHX_ oa_api *a) {
         AV *item_params;
         int m;
         if (!item) continue;
+        if (tkl >= 2 && tpl[0] == 'x' && tpl[1] == '-') continue;  /* an extension */
         item_params = oa_av_of(oa_get(aTHX_ item, "parameters"));
 
         for (m = 0; oa_methods[m]; m++) {

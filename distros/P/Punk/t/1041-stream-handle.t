@@ -81,6 +81,31 @@ require IO::Socket::INET;
         });
     };
 
+    # More than the connection will take at once, then ask to be told when
+    # it has gone. What is recorded is whether each drain was pending when it
+    # was handed back: on this transport it used to come back settled every
+    # time, so the loop below never waited and the whole body sat in the
+    # server's buffer for a slow client.
+    get '/big' => sub {
+        $_[0]->stream('application/octet-stream', sub {
+            my ($c, $w) = @_;
+            my $states = '';
+            if (my $n = $c->param('n')) {       # a plain body of n bytes
+                $w->write('x' x $n);
+                $w->write("\n-\n");
+                return $w->close;
+            }
+            for (1 .. 3) {
+                $w->write('x' x 2_000_000);
+                my $f = $w->drain;
+                $states .= $f->is_ready ? 'r' : 'p';
+                $f->get;
+            }
+            $w->write("\n$states\n");
+            $w->close;
+        });
+    };
+
     get '/attach' => sub {
         $_[0]->stream('text/csv', {
             status  => 201,
@@ -183,6 +208,23 @@ sub fetch {
         is($body, "a,b\n1,2\n", '...and the body is byte-exact, unframed');
     }
 
+  SKIP: {
+        # Hyperman up to 0.58 ends an h2 stream on the first DATA frame sent
+        # after the close, so a body over 16384 bytes is cut there. That is
+        # the server's to fix; this only checks that the handler's own loop
+        # - write, drain, wait - still ends with the whole body on a server
+        # that sends one. Whether drain is ever PENDING over h2 is the
+        # server's too: it reports pressure from the connection's buffer,
+        # and an h2 body waits in the stream's. The TLS block below is where
+        # that is asserted.
+        my $probe = `curl -s --max-time 10 $h2 '$base/big?n=20000' 2>/dev/null`;
+        skip 'this Hyperman truncates an HTTP/2 stream body over 16384 bytes',
+            1 unless length($probe) == 20_000 + 3;
+        my $out = `curl -s --max-time 20 $h2 '$base/big' 2>/dev/null`;
+        is(length $out, 6_000_000 + 5,
+           'a write, drain, wait loop delivers the whole body over h2');
+    }
+
     {   # the options survive the header list the same way they survive
         # pst_head's byte string
         my ($head, $body) = fetch("$base/attach", $h2);
@@ -277,7 +319,7 @@ sub fetch {
 # to be a 503; the stream handle serves it.
 
 SKIP: {
-    my $n = 4;
+    my $n = 6;
     skip 'OpenSSL support not built', $n unless Hyperman->has_tls;
     my $openssl = `which openssl 2>/dev/null`;
     chomp $openssl;
@@ -307,6 +349,20 @@ SKIP: {
         my ($head, $body) = fetch("$base/events", '-k --http1.1');
         like($head, qr{^HTTP/1\.1 200}, 'SSE is served over TLS');
         is($body, "data: one\n\ndata: two\n\n", '...and the events arrive');
+    }
+
+    {   # Backpressure on the stream handle. The client is held to 4 MB a
+        # second and each write is 2 MB, so the server is holding output when
+        # drain is asked for - and drain has to say so, or the loop in the
+        # handler never waits and the server buffers the whole export.
+        my $out = `curl -sk --http1.1 --max-time 20 --limit-rate 4M '$base/big' 2>/dev/null`;
+        my ($states) = $out =~ /\n([rp]{3})\n\z/;
+        is(length $out, 6_000_000 + 5,
+           'a body larger than the connection takes at once arrives whole');
+        like($states // '', qr/p/,
+             '...and drain was pending while the server held it, so the '
+           . 'producer waited instead of buffering the lot')
+            or diag 'drain states: ' . ($states // 'none');
     }
 
     kill 'TERM', $pid;

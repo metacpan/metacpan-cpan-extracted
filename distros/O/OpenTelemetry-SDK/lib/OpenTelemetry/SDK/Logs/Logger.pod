@@ -1,0 +1,35 @@
+=encoding UTF-8
+
+=head1 NAME
+
+OpenTelemetry::SDK::Logs::Logger - A logger for the OpenTelemetry SDK
+
+=head1 SYNOPSIS
+
+    use OpenTelemetry;
+    use OpenTelemetry::SDK;
+
+    my $logger = OpenTelemetry->logger_provider->logger;
+    $logger->emit_record(...);
+
+
+=head1 DESCRIPTION
+
+This module provides a class that extends L<OpenTelemetry::Logs::Logger>
+and can be used to emit instances of L<OpenTelemetry::SDK::Logs::LogRecord>.
+
+The only supported way to create instances of this class is via
+L<OpenTelemetry::SDK::Logs::LoggerProvider>. Please refer to that module's
+documentation for more details.
+
+=head1 METHODS
+
+This class extends L<OpenTelemetry::Logs::Logger> and exposes the same API
+as in that module. Please refer to that module's documentation for details.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2024 by José Joaquín Atria.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.

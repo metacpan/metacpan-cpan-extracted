@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.55';
+our $VERSION = '0.57';
 
 1;
 
@@ -61,7 +61,10 @@ A request carrying a trailing slash or a C<.md> suffix is redirected to the
 canonical form, so a document never has two addresses. Anything in the tree
 that is not markdown is served as a static file with the same caching,
 conditional-request and sendfile behaviour L<Punk::Static> gives it, which is
-what makes a relative C<< ![](diagram.png) >> in a document work.
+what makes a relative C<< ![](diagram.png) >> in a document work. A file
+ending in C<.md> is never served that way, so a draft or an index cannot be
+read as its source, and neither is anything whose name, or whose directory's
+name, begins with a dot.
 
 =head1 FRONT MATTER
 

@@ -9,7 +9,7 @@ use Sys::Hostname;
 use oEdtk::logger		qw(logger $LOGGERLEVEL $WARN2LOGGER);
 
 use Exporter;
-our $VERSION	= 1.9061;
+our $VERSION	= 2.1109;
 our @ISA		= qw(Exporter);
 our @EXPORT_OK	= qw(config_read get_ini_path);
 my  $_INI_PATH;

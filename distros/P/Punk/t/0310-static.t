@@ -91,7 +91,7 @@ is(hit($app, path => '/static/app.css')->[0], 200,
 
     my $r = hit($app, path => '/static/data.bin');
     my %h = @{ $r->[1] };
-    like($h{ETag}, qr/^"[0-9a-f]+-64"$/,
+    like($h{ETag}, qr/^"[0-9a-f]+-64(?:-[0-9a-f]+)?"$/,
         'a strong hex ETag, sized like the file');
     is($h{'Accept-Ranges'}, 'bytes', 'ranges are advertised');
 

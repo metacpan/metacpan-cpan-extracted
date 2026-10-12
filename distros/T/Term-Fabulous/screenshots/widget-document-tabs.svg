@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="708" height="345" viewBox="0 0 708 345" role="img" aria-label="perl examples/widgets/document-tabs.pl">
+<title>perl examples/widgets/document-tabs.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="676" height="310" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="676" height="310" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="676" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="354" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/widgets/document-tabs.pl</text>
+<rect x="16.5" y="16.5" width="675" height="309" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="30" y="60" width="396" height="18" fill="#1e2128"/>
+<rect x="426" y="60" width="144" height="18" fill="#343a48"/>
+<rect x="570" y="60" width="108" height="18" fill="#1e2128"/>
+<rect x="30" y="294" width="648" height="18" fill="#1e2128"/>
+</g>
+<g class="terminal">
+<text x="39" y="74" textLength="81" fill="#96a0b4">notes.txt</text>
+<text x="133.5" y="74" text-anchor="middle" fill="#61afef">●</text>
+<text x="147" y="74" textLength="117" fill="#96a0b4">×  config.kdl</text>
+<text x="273" y="74" textLength="9" fill="#e06c75">!</text>
+<text x="291" y="74" textLength="126" fill="#96a0b4">×  todo.md   ×</text>
+<text x="435" y="74" textLength="90" class="b" fill="#dcdfe4">budget.csv</text>
+<text x="538.5" y="74" text-anchor="middle" fill="#61afef">●</text>
+<text x="552" y="74" textLength="9" class="b" fill="#dcdfe4">×</text>
+<text x="574.5" y="74" text-anchor="middle" fill="#61afef">▸</text>
+<text x="588" y="74" textLength="9" fill="#61afef">+</text>
+<text x="48" y="110" textLength="90" fill="#dcdfe4">item,price</text>
+<text x="48" y="128" textLength="81" fill="#dcdfe4">milk,1.20</text>
+<text x="48" y="146" textLength="90" fill="#dcdfe4">bread,2.50</text>
+<text x="48" y="290" textLength="531" fill="#96a0b4">Alt+PageUp, Alt+PageDown switch; Alt+w closes; Ctrl+N adds.</text>
+<text x="39" y="308" textLength="153" fill="#dcdfe4">Closed README.md.</text>
+<text x="561" y="308" textLength="108" fill="#787e8a">Ctrl+C quits</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

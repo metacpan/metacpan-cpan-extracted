@@ -7,7 +7,7 @@ use Punk::Request;
 use Punk::Response;
 use Punk ();
 
-our $VERSION = '0.55';
+our $VERSION = '0.57';
 
 1;
 
@@ -221,7 +221,8 @@ where they were learned: CVE-2026-75628.
 
 A finished download response, returned by the handler like any other.
 The source is a file path or a reference to a scalar of bytes. The whole
-download story is handled here: C<ETag> (strong, from mtime and size) and
+download story is handled here: C<ETag> (strong, from mtime and size, and
+the mtime's nanoseconds where the filesystem has them) and
 C<Last-Modified> with C<304> answers to C<If-None-Match> /
 C<If-Modified-Since>; a single byte C<Range> served as C<206> with
 C<Content-Range> (C<416> when unsatisfiable, and a multi-range or
@@ -238,14 +239,17 @@ C<filename> extension, else C<application/octet-stream>), C<filename>
 when it is not ASCII), C<inline> (disposition C<inline> instead),
 C<ranges =E<gt> 0> (ignore C<Range> and stop advertising
 C<Accept-Ranges>), C<mtime> / C<etag> (override the validators; C<mtime>
-is what gives a scalar source one), C<cache_control> (a freshness
+is what gives a scalar source one, and C<etag> is any length, quoted for
+you unless it already is or is a weak C<W/"...">), C<cache_control> (a freshness
 lifetime, sent on the C<304> as well as the C<200> - a C<304> that
 omitted it would leave the stored copy with the lifetime that has just
 run out), and C<missing =E<gt> 'not_found'> (answer the house 404 for an
 unreadable path instead of croaking).
 
 The path is served as given - if any part of it came from the request,
-the traversal guard is yours.
+the traversal guard is yours. The one thing refused for you is a NUL byte:
+a path containing one croaks, or is the 404 under
+C<missing =E<gt> 'not_found'>.
 
 =head2 stream($content_type, $cb) / stream($content_type, \%opts, $cb)
 
@@ -361,7 +365,9 @@ otherwise the response is a C<406>. Every outcome carries C<Vary: Accept>.
 =head2 header($name => $value)
 
 Set response status / add a response header; chainable. With no
-arguments C<status> returns the pending status.
+arguments C<status> returns the pending status. C<header> croaks on a name or
+value containing CR, LF or NUL, so a value taken from the request cannot
+start a header of its own.
 
 =head2 cookie($name)
 
@@ -371,6 +377,11 @@ With one argument, read a request cookie. With a value, set a C<Set-Cookie> on
 the response (an C<undef> value deletes it); options C<path> (default C</>),
 C<domain>, C<max_age>, C<secure>, C<httponly>, C<samesite>, C<signed>. The
 options may also be given as one trailing hashref; the set form chains.
+
+The value is percent-encoded. The name, C<path>, C<domain> and C<samesite>
+are written as given, so setting a cookie croaks when one of them contains a
+C<;> or a control character, or the name an C<=>. Validate anything that came
+from the request before it reaches one of them.
 
 =head3 Signed cookies
 
@@ -418,19 +429,20 @@ in front of you. Chainable.
 
 =head2 session_rotate
 
-    post '/login' => sub {
+    post '/sudo' => sub {
         my ($c) = @_;
         ...
         $c->session_rotate;                 # a new id, the same session
-        $c->session->{user_id} = $user->id;
-        $c->redirect('/');
+        $c->session->{elevated} = time;
+        $c->redirect('/admin');
     };
 
 Keep the session, give it a new id, and delete the entry under the old one.
 Chainable.
 
 Call it at the privilege boundary, which is a login or an elevation, and
-nowhere else. Session fixation is the attack it prevents: somebody plants a
+nowhere else. L<< C<< $c->login >>|Punk::Auth/login >> does it itself; an
+application that signs users in by writing the session directly has to. Session fixation is the attack it prevents: somebody plants a
 known id in a victim's browser and waits for them to log in, and if logging in
 writes the user into the session the attacker planted, the attacker's id is now
 an authenticated session.

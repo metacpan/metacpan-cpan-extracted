@@ -30,7 +30,7 @@
             "ExtUtils::Depends" : "0.404",
             "ExtUtils::MakeMaker" : "0",
             "Frozen" : "0.07",
-            "Shared::Arena" : "0.12"
+            "Shared::Arena" : "0.16"
          }
       },
       "runtime" : {
@@ -48,6 +48,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.56",
+   "version" : "0.58",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

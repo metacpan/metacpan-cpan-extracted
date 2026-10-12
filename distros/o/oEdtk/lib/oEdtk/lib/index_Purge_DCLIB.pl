@@ -16,7 +16,7 @@ if (defined $ARGV[0] && $ARGV[0] =~/-h/i) {
 }
 
 
-# PURGE DES DCLIB (DE PLUS DE EDTK_DCLIB_PURGE_WEEKS_KEPT SEMAINES) SI ELLES NE SONT PAS EN ATTENTE D'UN SEQLOT
+# PURGE THE DCLIBs (OLDER THAN EDTK_DCLIB_PURGE_WEEKS_KEPT WEEKS) IF THEY ARE NOT WAITING FOR A SEQLOT
 my $cfg = config_read('EDTK_DB', 'MAIL');
 my $dbh = db_connect($cfg, 'EDTK_DBI_DSN');
 my $dir = $cfg->{'EDTK_DIR_OUTMNGR'};
@@ -28,15 +28,15 @@ foreach my $doclib (@old) {
 }
 
 
-#-- RECHERCHE DES DOCUMENTS EN ATTENTE DE LOTISSEMENT --
+#-- FIND DOCUMENTS WAITING FOR BATCHING --
 my $rows = omgr_lot_pending($dbh);
 
 my @body;
-push (@body, "Lot(s) en attente de lotissement :\n ");
+push (@body, "Lot(s) waiting for batching:\n ");
 foreach my $row (@$rows) {
 	push (@body, " - @$row\n");
 }
-push (@body, "   FIN\n");
+push (@body, "   END\n");
 
 my ($sec,$min,$hour,$day,$month,$year) = localtime();
 my $date = sprintf("%02d/%02d/%d", $day, $month + 1, $year + 1900);

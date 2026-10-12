@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1050" height="399" viewBox="0 0 1050 399" role="img" aria-label="perl examples/cookbook/table-widths.pl">
+<title>perl examples/cookbook/table-widths.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="1018" height="364" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="1018" height="364" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="1018" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="525" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/cookbook/table-widths.pl</text>
+<rect x="16.5" y="16.5" width="1017" height="363" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="57" y="96" width="927" height="36" fill="#242832"/>
+<rect x="57" y="132" width="927" height="36" fill="#343a48"/>
+<rect x="57" y="86" width="927" height="1" fill="#586070"/>
+<rect x="106" y="86" width="1" height="217" fill="#586070"/>
+<rect x="286" y="86" width="1" height="217" fill="#586070"/>
+<rect x="601" y="86" width="1" height="217" fill="#586070"/>
+<rect x="754" y="86" width="1" height="217" fill="#586070"/>
+<rect x="808" y="86" width="1" height="217" fill="#586070"/>
+<rect x="889" y="86" width="1" height="217" fill="#586070"/>
+<rect x="52" y="96" width="1" height="198" fill="#586070"/>
+<rect x="988" y="96" width="1" height="198" fill="#586070"/>
+<rect x="52" y="122" width="937" height="1" fill="#586070"/>
+<rect x="52" y="176" width="937" height="1" fill="#586070"/>
+<rect x="52" y="230" width="937" height="1" fill="#586070"/>
+<rect x="57" y="302" width="927" height="1" fill="#586070"/>
+</g>
+<polyline points="52.5 96 52.5 91 52.538 90.413 52.653 89.835 52.843 89.278 53.103 88.75 53.43 88.261 53.818 87.818 54.261 87.43 54.75 87.103 55.278 86.843 55.835 86.653 56.413 86.538 57 86.5 57 86.5" fill="none" stroke="#586070" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="988.5 96 988.5 91 988.462 90.413 988.347 89.835 988.157 89.278 987.897 88.75 987.57 88.261 987.182 87.818 986.739 87.43 986.25 87.103 985.722 86.843 985.165 86.653 984.587 86.538 984 86.5 984 86.5" fill="none" stroke="#586070" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="52.5 294 52.5 298 52.538 298.587 52.653 299.165 52.843 299.722 53.103 300.25 53.43 300.739 53.818 301.182 54.261 301.57 54.75 301.897 55.278 302.157 55.835 302.347 56.413 302.462 57 302.5 57 302.5" fill="none" stroke="#586070" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="988.5 294 988.5 298 988.462 298.587 988.347 299.165 988.157 299.722 987.897 300.25 987.57 300.739 987.182 301.182 986.739 301.57 986.25 301.897 985.722 302.157 985.165 302.347 984.587 302.462 984 302.5 984 302.5" fill="none" stroke="#586070" stroke-width="1" stroke-linejoin="round"/>
+<g class="terminal">
+<text x="84" y="110" textLength="9" class="b" fill="#ebeef3">#</text>
+<text x="120" y="110" textLength="36" class="b" fill="#ebeef3">Item</text>
+<text x="300" y="110" textLength="45" class="b" fill="#ebeef3">Notes</text>
+<text x="615" y="110" textLength="63" class="b" fill="#ebeef3">Ship to</text>
+<text x="768" y="110" textLength="27" class="b" fill="#ebeef3">Qty</text>
+<text x="822" y="110" textLength="45" class="b" fill="#ebeef3">Price</text>
+<text x="907.5" y="110" text-anchor="middle" fill="#e5c07b">★</text>
+<text x="921" y="110" textLength="54" class="b" fill="#ebeef3">Rating</text>
+<text x="66" y="146" textLength="36" fill="#dcdfe4">1041</text>
+<text x="120" y="146" textLength="81" fill="#dcdfe4">Desk lamp</text>
+<text x="300" y="146" textLength="225" fill="#dcdfe4">Leave at the reception if</text>
+<text x="615" y="146" textLength="108" fill="#dcdfe4">Ada Lovelace</text>
+<text x="777" y="146" textLength="9" fill="#dcdfe4">2</text>
+<text x="831" y="146" textLength="45" fill="#dcdfe4">39.90</text>
+<text x="934.5" y="146" text-anchor="middle" fill="#dcdfe4">★</text>
+<text x="943.5" y="146" text-anchor="middle" fill="#dcdfe4">★</text>
+<text x="952.5" y="146" text-anchor="middle" fill="#dcdfe4">★</text>
+<text x="961.5" y="146" text-anchor="middle" fill="#dcdfe4">★</text>
+<text x="970.5" y="146" text-anchor="middle" fill="#dcdfe4">★</text>
+<text x="300" y="164" textLength="216" fill="#dcdfe4">nobody answers the door.</text>
+<text x="615" y="164" textLength="54" fill="#dcdfe4">London</text>
+<text x="66" y="200" textLength="36" fill="#dcdfe4">1042</text>
+<text x="120" y="200" textLength="99" fill="#dcdfe4">Monitor arm</text>
+<text x="300" y="200" textLength="90" fill="#dcdfe4">Gift wrap.</text>
+<text x="615" y="200" textLength="108" fill="#dcdfe4">Grace Hopper</text>
+<text x="777" y="200" textLength="9" fill="#dcdfe4">1</text>
+<text x="822" y="200" textLength="54" fill="#dcdfe4">129.00</text>
+<text x="943.5" y="200" text-anchor="middle" fill="#dcdfe4">★</text>
+<text x="952.5" y="200" text-anchor="middle" fill="#dcdfe4">★</text>
+<text x="961.5" y="200" text-anchor="middle" fill="#dcdfe4">★</text>
+<text x="970.5" y="200" text-anchor="middle" fill="#dcdfe4">★</text>
+<text x="615" y="218" textLength="54" fill="#dcdfe4">Boston</text>
+<text x="66" y="254" textLength="36" fill="#dcdfe4">1043</text>
+<text x="120" y="254" textLength="99" fill="#dcdfe4">USB-C cable</text>
+<text x="300" y="254" textLength="252" fill="#dcdfe4">Customer asked for the black</text>
+<text x="615" y="254" textLength="126" fill="#dcdfe4">Linus Torvalds</text>
+<text x="768" y="254" textLength="18" fill="#dcdfe4">12</text>
+<text x="840" y="254" textLength="36" fill="#dcdfe4">8.50</text>
+<text x="952.5" y="254" text-anchor="middle" fill="#dcdfe4">★</text>
+<text x="961.5" y="254" text-anchor="middle" fill="#dcdfe4">★</text>
+<text x="970.5" y="254" text-anchor="middle" fill="#dcdfe4">★</text>
+<text x="300" y="272" textLength="261" fill="#dcdfe4">ones; call before shipping if</text>
+<text x="615" y="272" textLength="72" fill="#dcdfe4">Portland</text>
+<text x="300" y="290" textLength="117" fill="#dcdfe4">out of stock.</text>
+<text x="48" y="344" textLength="864" fill="#6e788c">Resize the terminal: Item takes the width left over, Notes stays a third of the table and wraps.</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

@@ -3,7 +3,7 @@ use Object::Pad ':experimental(init_expr)';
 
 package OpenTelemetry::SDK::Trace::TracerProvider;
 
-our $VERSION = '0.028';
+our $VERSION = '0.100';
 
 use OpenTelemetry;
 
@@ -13,7 +13,7 @@ class OpenTelemetry::SDK::Trace::TracerProvider :isa(OpenTelemetry::Trace::Trace
     use List::Util 'any';
     use Mutex;
     use OpenTelemetry::Common qw( config timeout_timestamp maybe_timeout );
-    use OpenTelemetry::Constants -trace_export;
+    use OpenTelemetry::Constants -export;
     use OpenTelemetry::Propagator::TraceContext::TraceFlags;
     use OpenTelemetry::SDK::InstrumentationScope;
     use OpenTelemetry::SDK::Resource;
@@ -149,16 +149,6 @@ class OpenTelemetry::SDK::Trace::TracerProvider :isa(OpenTelemetry::Trace::Trace
                 $args{version}  = $args{name}->VERSION;
             };
 
-            unless ( $args{name} ) {
-                $logger->warn(
-                        'Invalid name when retrieving tracer. Setting to empty string',
-                        { value => $args{name} },
-                    );
-
-                $args{name} //= '';
-                delete $args{version};
-            }
-
             OpenTelemetry::SDK::InstrumentationScope
                 ->new( %args{qw( name version attributes )} );
         };
@@ -186,13 +176,13 @@ class OpenTelemetry::SDK::Trace::TracerProvider :isa(OpenTelemetry::Trace::Trace
     method $atomic_call_on_processors ( $method, $timeout ) {
         my $start = timeout_timestamp;
 
-        my $result = TRACE_EXPORT_SUCCESS;
+        my $result = EXPORT_RESULT_SUCCESS;
 
         for my $processor ( @processors ) {
             my $remaining = maybe_timeout $timeout, $start;
 
             if ( $timeout && ! $remaining ) {
-                $result = TRACE_EXPORT_TIMEOUT;
+                $result = EXPORT_RESULT_TIMEOUT;
                 last;
             }
 
@@ -200,12 +190,11 @@ class OpenTelemetry::SDK::Trace::TracerProvider :isa(OpenTelemetry::Trace::Trace
             $result = $res if $res > $result;
         }
 
-
         return $result;
     }
 
     async method shutdown ( $timeout = undef ) {
-        return TRACE_EXPORT_SUCCESS if $stopped;
+        return EXPORT_RESULT_SUCCESS if $stopped;
 
         $lock->enter(
             sub {
@@ -216,7 +205,7 @@ class OpenTelemetry::SDK::Trace::TracerProvider :isa(OpenTelemetry::Trace::Trace
     }
 
     async method force_flush ( $timeout = undef ) {
-        return TRACE_EXPORT_SUCCESS if $stopped;
+        return EXPORT_RESULT_SUCCESS if $stopped;
 
         $lock->enter(
             sub {
@@ -225,21 +214,21 @@ class OpenTelemetry::SDK::Trace::TracerProvider :isa(OpenTelemetry::Trace::Trace
         );
     }
 
+
     method add_span_processor ($processor) {
         $lock->enter( sub {
-            return $logger
-                ->warn('Attempted to add a span processor to a TraceProvider after shutdown')
+            return $logger->warn('Attempted to add a span processor to a TracerProvider after shutdown')
                 if $stopped;
 
-            return $logger
-                ->warn('Attempted to add an object that does not do the OpenTelemetry::Trace::Span::Processor role as a span processor to a TraceProvider')
+            my $candidate = ref $processor;
+
+            return $logger->warn("Attempted to add a $candidate object as a span processor to a TracerProvider, but it does not do the OpenTelemetry::Trace::Span::Processor")
                 unless $processor->DOES('OpenTelemetry::Trace::Span::Processor');
 
             my %seen = map { ref, 1 } @processors;
-            my $candidate = ref $processor;
 
-            return $logger
-                ->warn("Attempted to add a $candidate span processor to a TraceProvider more than once") if $seen{$candidate};
+            return $logger->warn("Attempted to add a $candidate span processor to a TracerProvider more than once")
+                if $seen{$candidate};
 
             push @processors, $processor;
         });

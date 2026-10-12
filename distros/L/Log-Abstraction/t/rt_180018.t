@@ -70,9 +70,10 @@ sub write_file {
 subtest 'the private subs exist' => sub {
 	cmp_ok(Sub::Private->VERSION, '>=', 0.06, 'Sub::Private is at least 0.06');
 	for my $sub (qw(_log _high_priority _validate_file_path _format_message _write_line
-			_journald_send _sanitize_email_header _level_number _to_json _field_string _fields_text)) {
+			_build_backends _sanitize_email_header _level_number _to_json _field_string _fields_text)) {
 		ok(defined(&{"Log::Abstraction::$sub"}), "$sub is defined");
 	}
+	ok(defined(&Log::Abstraction::Backend::Journald::_send), 'Log::Abstraction::Backend::Journald::_send is defined');
 };
 
 subtest 'every logging method reaches _log' => sub {

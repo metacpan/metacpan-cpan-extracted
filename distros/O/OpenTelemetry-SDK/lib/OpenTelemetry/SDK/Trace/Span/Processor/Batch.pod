@@ -20,72 +20,12 @@ periodically exports these in batches in a parallel process, which should
 allow the main process to continue executing without any delay added by
 exporting the spans.
 
-The worker processes that do the exporting run in a L<IO::Async::Function>
-and will therefore use whatever event loop is returned by L<IO::Async::Loop>.
-Please refer to the documentation of those modules for details on how to
-control this.
-
 =head1 METHODS
 
-This class implements the L<OpenTelemetry::Trace::Span::Processor> role.
-Please consult that module's documentation for details on the behaviours it
-provides.
-
-=head2 new
-
-    $processor = OpenTelemetry::SDK::Trace::Processor::Simple->new(
-        exporter         => $span_exporter,
-        batch_size       => $batch_size // OTEL_BSP_MAX_EXPORT_BATCH_SIZE,
-        exporter_timeout => $timeout    // OTEL_BSP_EXPORT_TIMEOUT,
-        max_queue_size   => $queue_size // OTEL_BSP_MAX_QUEUE_SIZE,
-        schedule_delay   => $delay      // OTEL_BSP_SCHEDULE_DELAY,
-    );
-
-The constructor takes a mandatory C<exporter> parameter that must be set to an
-instance of a class that implements the L<OpenTelemetry::Exporter> role.
-
-It also accepts the following optional parameters:
-
-=over
-
-=item C<batch_size>
-
-The size of the batch of spans to send to the exporter. If not set, this will
-read the default value from the
-L<"OTEL_BSP_MAX_EXPORT_BATCH_SIZE"|OpenTelemetry::SDK/OTEL_BSP_MAX_EXPORT_BATCH_SIZE>
-environment variable, which in turn defaults to 512.
-
-=item C<exporter_timeout>
-
-The number of milliseconds to send to L<OpenTelemetry::Exporter/export>. If
-not set, this will read the default value from the
-L<"OTEL_BSP_EXPORT_TIMEOUT"|OpenTelemetry::SDK/OTEL_BSP_EXPORT_TIMEOUT>
-environment variable, which in turn defaults to 30000.
-
-=item C<max_queue_size>
-
-The maximum size of the internal span queue. If not set, this will read the
-default value from the
-L<"OTEL_BSP_MAX_QUEUE_SIZE"|OpenTelemetry::SDK/OTEL_BSP_MAX_QUEUE_SIZE>
-environment variable, which in turn defaults to 2048.
-
-If an attempt is made to queue a span when the queue is full, the older
-spans will be removed from the queue until there is enough space for the
-newer spans. The number of dropped spans will be reported to the
-C<otel.bsp.spans.dropped> metric with the C<buffer-full> reason. See
-L</METRICS> for more details on this and other reported metrics.
-
-=item C<schedule delay>
-
-The minimum delay in milliseconds between calls to
-L<OpenTelemetry::Exporter/export>. If not set, this will read the default
-value from the
-L<"OTEL_BSP_SCHEDULE_DELAY"|OpenTelemetry::SDK/OTEL_BSP_SCHEDULE_DELAY>
-environment variable, which in turn defaults to 5000.
-
-Note: this is not yet implemented.
-
-=back
+This class inherits from L<OpenTelemetry::Processor::Batch> and implements
+the L<OpenTelemetry::Trace::Span::Processor> role. Please consult
+the documentation of those modules for details on the behaviours they provide.
+The description below will only refer to those behaviours that differ.
 
 =head2 on_start
 
@@ -100,49 +40,8 @@ Called when a span is started. In this class, this method does nothing.
 Called when a span is ended, with the span that has just ended as its only
 parameter. This should be called I<after> the span has been ended.
 
-This method internally passes the span to L</process>, described in more
-detail below.
-
-=head2 process
-
-    $processor->process( @spans );
-
-Takes a list of spans that are ready for processing. Once called, this method
-will convert them into a readable instances and queue them for eventual
-exporting. Once enough spans have been queued, a batch of them will be sent
-to the configured exporter.
-
-This processor batches spans for eventual processing, which can sometimes make
-for more complicated debugging. For a simpler processor that handles each span
-as it becomes ready and blocks during the export step, see
-L<OpenTelemetry::SDK::Trace::Processor::Simple>.
-
-=head2 force_flush
-
-    $result = await $processor->force_flush( $timeout );
-
-Empties the internal queue by sending any unexported spans to the exporter.
-
-Takes an optional timeout in seconds. If this has been set, any spans
-remaining after the time has run out will be dropped and the number of dropped
-spans will be reported to the C<otel.bsp.spans.dropped> metric with the
-C<force-flush> reason. See L</METRICS> for more details on this and other
-reported metrics.
-
-This method will also call L<"force_flush"|OpenTelemetry::Exporter/force_flush>
-on the configured exporter. It returns a L<Future> that will hold the result
-of that operation.
-
-=head2 shutdown
-
-    $result = await $processor->shutdown( $timeout );
-
-Calls L<"shutdown"|OpenTelemetry::Exporter/shutdown> on the configured
-exporter and returns a L<Future> that will hold the result of that operation.
-
-Once the processor has been shutdown, any additional calls to L</shutdown>,
-L</force_flush> will do nothing and immediately return a success result. Calls
-to L</on_end> and L</on_start> will immediately return and do nothing.
+This method internally passes the span to
+L<OpenTelemetry::Processor::Batch/process>.
 
 =head1 METRICS
 
@@ -153,19 +52,18 @@ L<is being discussed|https://github.com/open-telemetry/semantic-conventions/issu
 
 =over
 
-=item C<otel.bsp.buffer.utilization>
-
-Set to the size of the internal queue divided by the L</max_queue_size>
-immediately before a batch is picked up for processing.
-
-=item C<otel.bsp.failure>
+=item C<otel.processor.batch.failure>
 
 Incremented every time the span processing failed irrecoverably.
 
-=item C<otel.bsp.spans.dropped>
+=item C<otel.processor.batch.success>
+
+Incremented every time the span processing completed successfully.
+
+=item C<otel.processor.batch.spans.dropped>
 
 The number of spans that have been dropped and not successfully exported. This
-could be because they were never set to the exporter, of because the exporter
+could be because they were never set to the exporter, or because the exporter
 reported some error.
 
 Reported with the following attributes:
@@ -197,13 +95,9 @@ The processor was shutdown and some spans remained in its internal queue.
 
 =back
 
-=item C<otel.bsp.spans.processed>
+=item C<otel.processor.batch.spans.processed>
 
 The number of spans successfully processed.
-
-=item C<otel.bsp.success>
-
-Incremented every time the span processing completed successfully.
 
 =back
 
@@ -213,17 +107,13 @@ Incremented every time the span processing completed successfully.
 
 =item L<Future>
 
-=item L<IO::Async>
-
 =item L<OpenTelemetry::Exporter>
 
 =item L<OpenTelemetry::SDK::Trace::Span::Readable>
 
 =item L<OpenTelemetry::Trace::Span>
 
-=item L<OpenTelemetry::Trace::Span::Processor>
-
-=item L<OpenTelemetry::Trace::Span::Processor::Simple>
+=item L<OpenTelemetry::Processor::Batch>
 
 =back
 

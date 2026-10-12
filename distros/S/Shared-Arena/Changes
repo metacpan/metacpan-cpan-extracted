@@ -1,5 +1,10 @@
 Revision history for Shared::Arena
 
+0.16	2026-10-11
+        - Builds on 5.10.0: mXPUSHs is defined where perl lacks it.
+        - FIXES the Windows build: GetTickCount64 did not link under MSVC or
+          Strawberry. Intervals read QueryPerformanceCounter.
+
 0.15	2026-10-11
         - FIXES a scoreboard row and a lease bind refused as "full" for a held
           stripe: both wait as a carve does and answer busy.

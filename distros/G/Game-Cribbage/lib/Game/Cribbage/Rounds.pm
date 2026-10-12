@@ -28,7 +28,7 @@ sub next_round {
 		die 'DISPLAY THE RESULT FOR THE GAME';
 	}
 	my $round = Game::Cribbage::Round->new(
-		number => scalar @{$self->history} + 1,	
+		number => scalar @{$self->history} + 1,
 		%args
 	)->init($game);
 	push @{$self->history}, $round;
@@ -46,7 +46,7 @@ Game::Cribbage::Rounds - collection of rounds for a full cribbage game
 
 =head1 VERSION
 
-Version 0.15
+Version 0.17
 
 =cut
 

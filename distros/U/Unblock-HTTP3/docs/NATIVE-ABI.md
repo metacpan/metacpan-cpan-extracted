@@ -12,15 +12,15 @@ path while keeping the normal Unblock::HTTP3 objects and semantics.
 
 A native consumer can:
 
-- keep one persistent context for an Unblock::HTTP3::Connection
-- service the Connection
+- keep one persistent context for an exact Unblock::HTTP3::Client or Server
+- service the Client or Server
 - submit a normal client Request
 - poll ready Transactions
 - poll informational response events
 - access canonical Uniform Request and Response objects directly
 - read Transaction stream ID and state
 - send normal and informational server responses
-- inspect Connection failure state
+- inspect Client or Server failure state
 
 The ABI does not expose libnghttp3 structures.
 
@@ -40,6 +40,14 @@ The header is:
 
     Unblock/HTTP3/NativeABI/unblock_http3_consumer.h
 
+The complete installed header path is available through:
+
+    Unblock::HTTP3::NativeABI::header_path()
+
+The header text is available through:
+
+    Unblock::HTTP3::NativeABI::c_header()
+
 The operations table is available through:
 
     my $definition =
@@ -51,9 +59,9 @@ table.
 ABI version 1 is append-only. New optional operations may be added at the end
 of the structure. An incompatible layout change requires a new ABI version.
 
-ABI version 1 accepts exact `Unblock::HTTP3::Connection` and
-`Unblock::HTTP3::Transaction` objects. Subclasses should use the portable
-Perl API.
+ABI version 1 accepts exact `Unblock::HTTP3::Client`,
+`Unblock::HTTP3::Server`, and `Unblock::HTTP3::Transaction` objects. Subclasses
+and adapters use the portable Perl API.
 
 A C consumer casts the discovered address only after those checks:
 
@@ -83,7 +91,7 @@ Transaction states are:
 
 ## Connection context
 
-Call `create` once for each Unblock::HTTP3::Connection.
+Call `create` once for each exact Unblock::HTTP3::Client or Server.
 
 Keep that context for the lifetime of the integration rather than creating it
 for every event.

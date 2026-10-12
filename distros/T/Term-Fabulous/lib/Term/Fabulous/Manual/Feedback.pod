@@ -1,0 +1,400 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Term::Fabulous::Manual::Feedback - Progress bars, spinners, toasts, status bars, prompts and file dialogs
+
+=head1 DESCRIPTION
+
+This page is part of L<Term::Fabulous::Manual>. Previous page: L<Term::Fabulous::Manual::Forms>. Next page: L<Term::Fabulous::Manual::Menus>.
+
+This page covers the widgets that tell the user what the program is
+doing: a L<progress bar|/PROGRESS BARS> for a task whose extent is
+known, or not, a L<spinner|/SPINNERS> for one that just takes a
+while, L<toasts|/TOASTS AND ALERTS> for messages that must not
+interrupt the user, and a L<status bar|/STATUS BARS> for messages and
+the program's state at the bottom of the screen. They take no input.
+The program sets their state, from a timer, a process or a listener,
+and they draw themselves. The ones that move do so on the application's
+clock, without a timer of their own (see L</ANIMATION>).
+
+The section L</PROMPTS> is about the other direction: a prompt stops
+the user to ask a question, and reports the answer. L</FILE DIALOGS>
+are prompts of a special kind, which ask for a file to open or save,
+or for a folder.
+
+The reference pages are the class pages: L<Term::Fabulous::Widget::ProgressBar>,
+L<Term::Fabulous::Widget::Spinner>, L<Term::Fabulous::Widget::Toast>,
+L<Term::Fabulous::Widget::StatusBar>, L<Term::Fabulous::Widget::Prompt>
+and L<Term::Fabulous::Widget::FileDialog>.
+The class the first two share, L<Term::Fabulous::Widget::Display>, is
+the base of every widget that paints itself from its own state, and
+the one to derive from for a feedback widget of your own
+(L<Term::Fabulous::Manual::CustomWidgets/A widget that draws itself>).
+
+=head1 PROGRESS BARS
+
+A L<Term::Fabulous::Widget::ProgressBar> shows a value between C<min>
+and C<max> as a bar filled from the left, with the percentage (or a
+label of your own) next to it. The program sets the value as the work
+goes on:
+
+	use Term::Fabulous::Widget::ProgressBar;
+
+	my $progress = Term::Fabulous::Widget::ProgressBar->new(
+		max    => $total_bytes,
+		layout => { sizing => { width => sizing_grow() } },
+	);
+	$progress->value($bytes_so_far);    # from a timer or a process
+
+The picture shows the forms a bar can take
+(F<examples/widgets/progress-bar.pl>):
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-progress-bar.svg" alt="Progress bars: a block bar at 42 percent, one with the value inside, a thin line bar, a striped bar, a bar of three colored segments, an indeterminate bar with its runner, and a two-row ASCII bar"></p>
+
+=end html
+
+=over
+
+=item *
+
+B<Styles.> C<block> (the default) fills cells with blocks and moves in
+eighths of a cell; C<line> draws a thin line like a slider's track;
+C<ascii> uses C<#> and C<->. C<fill_glyph>, C<track_glyph> and
+C<stripe_glyph> replace the glyphs of a style. A layout that makes the
+bar more than one row high gives a thicker bar.
+
+=item *
+
+B<The label.> The percentage by default, right of the bar;
+C<< value_position => 'left' >> or C<'inside'> move it, and
+C<value_format> formats it as a C<sprintf> string of the percentage or
+with code that gets the value, for C<12 of 50 MB>. C<show_value =E<gt> 0>
+hides it.
+
+=item *
+
+B<Stripes.> C<striped> alternates two glyphs along the filled part,
+and C<animated> moves them: the bar then shows that the task is still
+running even while its value does not change.
+
+=item *
+
+B<Indeterminate.> A task whose extent is not known yet gets
+C<< indeterminate => 1 >>: a runner bounces from end to end and the
+label is hidden. Switch it off, set C<max> and the value once the
+extent is known.
+
+=item *
+
+B<Segments.> C<segments> stack several values in one bar, each in its
+own color: the used, reserved and free parts of a disk, the passed,
+failed and skipped tests. C<separated> leaves a cell of track between
+them, and the bar's C<value> is their sum.
+
+=back
+
+The colors are C<color> (the filled part), C<track_color>,
+C<text_color> and, for a label inside the bar, C<inside_text_color>;
+the program changes C<color> to show a state, for example red below a
+threshold. In KDL:
+
+=for highlighter language=kdl
+
+	ProgressBar "download" {
+		max 2048
+		value 860
+		style "line"
+		sizing width=grow
+	}
+
+=head1 SPINNERS
+
+A L<Term::Fabulous::Widget::Spinner> shows that the program is busy
+with something it cannot measure: connecting, waiting, loading. It
+cycles through the frames of its style next to a label:
+
+=for highlighter language=perl
+
+	use Term::Fabulous::Widget::Spinner;
+
+	my $spinner = Term::Fabulous::Widget::Spinner->new( label => 'Connecting' );
+	$status_row->add_child($spinner);
+	# later:
+	$spinner->stop;
+	$status_row->remove_child($spinner);
+
+The styles come in three sizes: one cell (C<dots>, the default, made
+of Braille patterns; C<line>, C<arc>, C<circle>, C<arrow>, C<box>,
+C<pulse>, C<bar>), a few cells (C<dots3>, C<bounce>, C<wave>) and
+three rows (C<ring>). C<frames> of your own, of one or several rows,
+replace the style's, and C<interval> sets the pace. C<stop> freezes
+the spinner at its first frame; a stopped spinner costs nothing. The
+picture shows every style (F<examples/widgets/spinner.pl>):
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-spinner.svg" alt="Spinners in every style, each with its name: dots, line, arc, circle, arrow, box, pulse and bar in one cell, dots3, bounce and wave in several, and the three-row ring; a stopped one and one with frames of its own"></p>
+
+=end html
+
+In KDL:
+
+=for highlighter language=kdl
+
+	Spinner "busy" {
+		style "arc"
+		label "Loading"
+	}
+
+=head1 TOASTS AND ALERTS
+
+A L<Term::Fabulous::Widget::Toast> is a short message in a corner of
+the screen that goes away by itself: a box with an icon, a title, a
+message and a close mark, in the color of its kind (C<info>,
+C<success>, C<warning> or C<danger>). C<show> floats it over
+everything else, where it lines up below the toasts shown there
+before, and takes it away after C<timeout> seconds; a click on the
+close mark or C<hide> takes it away at once. Toasts take no focus and
+no keys:
+
+=for highlighter language=perl
+
+	use Term::Fabulous::Widget::Toast;
+
+	$save->on( Activate => sub ($event) {
+		save();
+		Term::Fabulous::Widget::Toast->new( kind => 'success', title => 'Saved', message => 'Written to disk.' )->show($ui);
+		return;
+	} );
+
+An C<important> toast is filled with its color, for messages that must
+not be missed; C<< timeout => undef >> keeps a toast until it is
+closed; C<position> chooses the corner (or the top or bottom center),
+and every corner stacks its own toasts. The same widget is an I<alert>
+when it is added to the layout as a child instead of being shown: it
+then stays where it is put, with or without a close mark. The picture
+shows toasts of every kind, an important one and an alert box
+(F<examples/widgets/toast.pl>):
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-toast.svg" alt="Toasts stacked in the top right corner: an info, a success and a warning toast with titles, messages and close marks, a filled danger toast in the bottom right corner, and an alert box inside the form"></p>
+
+=end html
+
+A toast fires C<Close> (L<Term::Fabulous::Event::Close>) when it goes,
+whichever way. In KDL a toast is an alert box inside its parent:
+
+=for highlighter language=kdl
+
+	Toast "unsaved" {
+		kind "warning"
+		message "You have unsaved changes."
+		closable #false
+	}
+
+=head1 STATUS BARS
+
+A L<Term::Fabulous::Widget::StatusBar> is one row, usually the last
+row of the screen. On its left it shows a I<message>: what just
+happened, or what a key does now. On its right it shows I<parts>,
+short texts about the state of the program, such as the position of the
+cursor or a marker for unsaved changes.
+
+A message has one of the kinds a toast has, which gives it its color:
+C<info> for plain news (drawn like normal text), C<success>, C<warning>
+and C<danger>. Parts have these kinds as well, plus C<dim> for a hint
+that should not draw the eye and C<accent> for one that should:
+
+=for highlighter language=perl
+
+	use Term::Fabulous::Widget::StatusBar;
+
+	my $status = Term::Fabulous::Widget::StatusBar->new(
+		message => 'Ready.',
+		timeout => 5,
+		parts   => sub { ( ( $modified ? [ 'modified', 'accent' ] : () ), "Line $line", [ 'F1 help', 'dim' ] ) },
+	);
+	$root->add_child( $content, $status );
+
+	$status->message( 'Saved notes.txt.', 'success' );
+
+A message stays until the next one replaces it, or for C<timeout>
+seconds when the bar has a timeout. The parts may be a list, which the
+program sets again when the state changes, or a code reference, which
+the bar calls whenever a frame is drawn. A code reference keeps the
+parts up to date without any code that updates them, because a frame
+is drawn after every key and every click. When the message and the
+parts do not fit side by side, the message is cut and ends in an
+ellipsis. The picture shows status bars of the kinds C<success>,
+C<warning> and C<danger> (F<examples/widgets/status-bar.pl>):
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-status-bar.svg" alt="A list of files with the cursor on budget.csv and, at the bottom, a status bar with the green message Saved budget.csv. and the parts file 3 of 6 and Ctrl+C quits. Above the list, status bars with a success message, a yellow warning with a blue modified part, and a red error with a red read-only part"></p>
+
+=end html
+
+A toast and a status bar both report what happened. A toast floats
+over the screen and draws the eye, so it suits news the user must not
+miss. A status bar does not move anything on the screen, so it suits
+the steady stream of small news that an editor or a browser of files
+produces. The recipe
+L<Term::Fabulous::Cookbook::Menus/Show messages and state in a status bar (StatusBar)>
+is a complete program. A status bar can also be part of a KDL layout
+file, with C<message>, C<kind> and C<timeout>:
+
+=for highlighter language=kdl
+
+	StatusBar "status" {
+		message "Ready."
+		timeout 5
+	}
+
+=head1 PROMPTS
+
+A L<Term::Fabulous::Widget::Prompt> is a dialog that asks the user
+something and waits for the answer: whether to delete a file, what to
+call it, or simply that something went wrong. It has a title, a
+message, optional input fields and a row of buttons. Like every
+L<Term::Fabulous::Widget::Dialog>, it opens over the screen and keeps
+the keyboard focus until it closes.
+
+The three most common prompts take one call each.
+L<alert|Term::Fabulous::Widget::Prompt/alert> says something and has an
+OK button, L<confirm|Term::Fabulous::Widget::Prompt/confirm> asks a
+question with OK and Cancel, and L<ask|Term::Fabulous::Widget::Prompt/ask>
+asks for one value:
+
+=for highlighter language=perl
+
+	use Term::Fabulous::Widget::Prompt;
+
+	Term::Fabulous::Widget::Prompt->confirm(
+		$ui,
+		title   => 'Delete notes.txt?',
+		message => 'It cannot be restored.',
+		ok      => 'Delete',
+		focus   => 'cancel',
+	)->on( Answer => sub ($event) {
+		unlink 'notes.txt' if $event->button eq 'ok';
+		return;
+	} );
+
+When the user presses a button, the prompt closes, gives the focus back
+to the widget that had it, and fires C<Answer>
+(L<Term::Fabulous::Event::Answer>) with the id of the button and the
+values of the fields. C<Escape> answers with the button C<cancel>.
+
+A prompt of your own takes any input widgets as its fields, each with a
+name and a label. The inputs check their own values, with C<required>
+and C<validator> (see L<Term::Fabulous::Manual::Forms/Checking input>),
+and a button marked as I<primary> asks them before it answers. While a
+value is wrong, the prompt stays open, says which field is wrong and
+why, and moves the focus to that field. A C<check> of the whole prompt
+catches what involves more than one field. The picture shows a prompt
+whose e-mail field holds an address that is not valid
+(F<examples/widgets/prompt.pl>):
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-prompt.svg" alt="A New contact prompt over the dimmed list of contacts: Name holds Ada Lovelace, E-mail holds ada@engine in red, and the red line E-mail: Please enter an e-mail address. sits above the Add and Cancel buttons"></p>
+
+=end html
+
+The recipes
+L<Term::Fabulous::Cookbook::Forms/Confirm before quitting (Prompt)> and
+L<Term::Fabulous::Cookbook::Forms/Ask for a number and check it (Prompt, validator)>
+are complete programs. For a dialog that is not a question, build a
+L<Term::Fabulous::Widget::Dialog> and fill it with any widgets.
+
+=head1 FILE DIALOGS
+
+A L<Term::Fabulous::Widget::FileDialog> asks the user for a file to
+open, a name to save a file under, or a folder. It lists the folders
+and files of a folder, with their sizes and the times they were last
+modified, and has a field for a name or a path. The user walks through
+the folders with C<Enter> and C<Backspace> or the mouse, picks an entry
+with the cursor, or types a name. Like a prompt, it opens over the
+screen, keeps the focus while it is open, and reports the result with
+one C<Answer> event after it closed:
+
+=for highlighter language=perl
+
+	use Term::Fabulous::Widget::FileDialog;
+
+	Term::Fabulous::Widget::FileDialog->new(
+		mode      => 'open',
+		directory => $notes_folder,
+		filters   => [ [ 'Notes' => '*.txt *.md' ], [ 'All files' => '*' ] ],
+	)->on( Answer => sub ($event) {
+		open_note( $event->value('path') ) if $event->button eq 'open';
+		return;
+	} )->open($ui);
+
+The C<mode> decides what the user chooses. In C<open> mode it is a file
+that exists, in C<save> mode a name in a folder that exists, and in
+C<folder> mode a folder; the list then shows folders only. The button
+of the answer is the mode's, C<open>, C<save> or C<choose>, and
+C<< $event->value('path') >> is the absolute path, as bytes: exactly
+what the file system uses, ready for C<open>. The list shows the names
+decoded from UTF-8. C<Cancel> answers C<cancel>, and so does
+C<Escape>, which also sets C<dismissed>.
+
+I<Filters> decide which files the list shows. Each has a label and
+patterns such as C<*.txt *.md>; with two or more, a dropdown below the
+field switches between them. Folders always show, and names that start
+with a dot show only while the C<Show hidden files> checkbox is
+checked. In save mode, the dialog starts in the field with the name
+selected up to its extension, C<default_extension> adds an extension
+to a name without a dot, and an existing file is replaced only after
+a question, which starts on C<Cancel>. The file the document already
+has, given as C<current_file>, is the exception: saving to it again
+asks nothing. The picture shows the
+dialog to open a note, with the cursor on a file
+(F<examples/widgets/file-dialog.pl>):
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-file-dialog.svg" alt="An Open a file dialog over a dimmed notes program: the folder line ends in Documents/Projects/analytical-engine/notes, the list shows two folders and four notes with their sizes and modification times, the cursor is on reading-list.txt, which is also in the File field, and below it are the Notes filter, the Show hidden files checkbox and the Open and Cancel buttons"></p>
+
+=end html
+
+The dialog only chooses a path. It checks that a file to open is there,
+and that the folder of a file to save is there and the file is not a
+folder, but reading and writing are up to the program. The recipe
+L<Term::Fabulous::Cookbook::Forms/Open and save a file (FileDialog)>
+is a complete program.
+
+=head1 ANIMATION
+
+Spinners, and progress bars that are C<indeterminate> or C<animated>,
+move by themselves. They need no timer: a moving widget reads the application's
+clock (L<Term::Fabulous/now>) and asks for a frame at the moment its
+next frame is due (L<Term::Fabulous/request_frame_at>); Term::Fabulous
+draws it at the next tick of its frame timer, and nothing is drawn in
+between. In a test, the C<clock> parameter of L<Term::Fabulous/new>
+moves the animation on, and the screenshot tools of
+L<Term::Fabulous::Examples> run it on a virtual clock. A widget of your
+own animates the same way; see
+L<Term::Fabulous::Widget::Display/ANIMATION>.
+
+=head1 SEE ALSO
+
+This page is part of L<Term::Fabulous::Manual>. Previous page: L<Term::Fabulous::Manual::Forms>. Next page: L<Term::Fabulous::Manual::Menus>.
+
+The class pages: L<Term::Fabulous::Widget::ProgressBar>,
+L<Term::Fabulous::Widget::Spinner>, L<Term::Fabulous::Widget::Toast>,
+L<Term::Fabulous::Widget::StatusBar>, L<Term::Fabulous::Widget::Prompt>,
+L<Term::Fabulous::Widget::FileDialog>, L<Term::Fabulous::Widget::Display>.
+L<Term::Fabulous::Manual::Programs/Timers and other asynchronous work>
+for the timers that drive a bar, and
+L<Term::Fabulous::Cookbook::LiveData> for complete programs that update
+the screen while they work.
+
+=cut

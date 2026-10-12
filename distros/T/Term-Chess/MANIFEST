@@ -1,0 +1,27 @@
+bin/chess
+Changes
+ignore.txt
+lib/Term/Chess.pm
+lib/Term/Chess/Bot.pm
+lib/Term/Chess/Error.pm
+lib/Term/Chess/Game.pm
+lib/Term/Chess/Watcher.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-game.t
+t/02-bot.t
+t/03-terminal.t
+t/04-pick.t
+t/05-bin.t
+t/06-no-io.t
+t/07-perft.t
+t/lib/Term/Chess/Test/Handle.pm
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+xt/bot-ladder.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

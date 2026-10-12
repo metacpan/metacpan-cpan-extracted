@@ -90,3 +90,67 @@ sub DEMOLISH {
 }
 
 1;
+
+=head1 NAME
+
+Object::Remote::ConnectionServer - Listen for incoming Object::Remote connections
+
+=head1 SYNOPSIS
+
+  use Object::Remote::ConnectionServer;
+
+  my $server = Object::Remote::ConnectionServer->new(
+    listen_on => '/tmp/object-remote.sock',
+  );
+
+  $server->run;
+
+=head1 DESCRIPTION
+
+C<Object::Remote::ConnectionServer> creates a server-side listener for
+incoming L<Object::Remote> connections from L<Object::Remote::Connector::UNIX>.
+
+The C<listen_on> attribute is coerced into a listening
+L<IO::Socket::UNIX> handle if it is given a pathname.  When a connection
+arrives, it is accepted and passed to C<Object::Remote::Connection> using
+the same handle for both input and output.
+
+The server registers itself with the current L<Object::Remote> event loop
+during construction and remains active until the object is destroyed or the
+loop is stopped.
+
+=head1 ATTRIBUTES
+
+=head2 listen_on
+
+A listening socket or a pathname for a Unix domain socket.
+
+If a pathname is provided, any existing socket at that path is removed and
+a new C<IO::Socket::UNIX> listener is created.
+
+=head2 connection_args
+
+Array reference of additional arguments passed to
+L<Object::Remote::Connection> when a client connects.
+
+Defaults to an empty array reference.
+
+=head2 connection_callback
+
+Code reference invoked on the newly created connection object after it is
+constructed.
+
+Defaults to an identity-style callback that returns the connection object
+unchanged.
+
+=head1 METHODS
+
+=head2 run
+
+Runs the current L<Object::Remote> event loop while the server is wanted.
+
+=head1 SEE ALSO
+
+L<Object::Remote>, L<Object::Remote::Connection>, L<IO::Socket::UNIX>
+
+=cut

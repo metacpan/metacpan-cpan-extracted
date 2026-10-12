@@ -6,7 +6,7 @@ use Object::Remote::Handle;
 use Object::Remote::Logging qw( :log );
 use Module::Runtime qw(use_module);
 
-our $VERSION = '0.005003'; # v0.5.3
+our $VERSION = '0.005004'; # v0.5.4
 
 sub new::on {
   my ($class, $on, @args) = @_;
@@ -112,6 +112,8 @@ to block until an asynchronous call completes or fails.
   my $conn = Object::Remote->connect('user@myserver'); # connection over ssh
 
   my $conn = Object::Remote->connect('root@'); # connection over sudo
+
+  my $conn = Object::Remote->connect('/run/object-remote.sock'); # connection over Unix socket
 
 =head2 new::on
 

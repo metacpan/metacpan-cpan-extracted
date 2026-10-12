@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="291" viewBox="0 0 780 291" role="img" aria-label="perl examples/custom-widget.pl">
+<title>perl examples/custom-widget.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="748" height="256" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="748" height="256" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="748" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="390" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/custom-widget.pl</text>
+<rect x="16.5" y="16.5" width="747" height="255" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="48" y="150" width="135" height="18" fill="#343a48"/>
+</g>
+<g class="terminal">
+<text x="48" y="92" textLength="612" fill="#dcdcdc">Tab moves, Space, Enter, Left, Right or a click switch. Ctrl+C ends.</text>
+<text x="48" y="128" textLength="45" fill="#61afef">[ ON]</text>
+<text x="102" y="128" textLength="45" fill="#dcdfe4">Wi-Fi</text>
+<text x="48" y="164" textLength="45" fill="#61afef">[ ON]</text>
+<text x="102" y="164" textLength="81" fill="#dcdfe4">Bluetooth</text>
+<text x="48" y="200" textLength="171" fill="#dcdfe4">[OFF] Airplane mode</text>
+<text x="48" y="236" textLength="189" fill="#96a0b4">Bluetooth switched on</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

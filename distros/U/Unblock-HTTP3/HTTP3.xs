@@ -2245,7 +2245,7 @@ typedef struct {
     HV *connection_hv;
     CV *service_cv;
     CV *request_cv;
-    CV *send_response_cv;
+    CV *respond_cv;
     CV *send_informational_cv;
     void *interpreter;
 } unblock_http3_consumer_context;
@@ -2305,6 +2305,42 @@ unblock_http3_consumer_exact_object(
 
     if (stash == NULL || SvSTASH(SvRV(object)) != stash) {
         croak("Unblock::HTTP3 native ABI requires exact class %s", class_name);
+    }
+
+    return (HV *)SvRV(object);
+}
+
+static HV *
+unblock_http3_consumer_exact_connection(
+    pTHX_ SV *object
+)
+{
+    HV *client_stash;
+    HV *server_stash;
+    HV *object_stash;
+
+    if (
+        object == NULL
+        || !SvROK(object)
+        || SvTYPE(SvRV(object)) != SVt_PVHV
+        || !SvOBJECT(SvRV(object))
+        || SvMAGICAL(SvRV(object))
+    ) {
+        croak("Unblock::HTTP3 native ABI requires a plain blessed hash object");
+    }
+
+    client_stash = gv_stashpv("Unblock::HTTP3::Client", 0);
+    server_stash = gv_stashpv("Unblock::HTTP3::Server", 0);
+    object_stash = SvSTASH(SvRV(object));
+
+    if (
+        (client_stash == NULL || object_stash != client_stash)
+        && (server_stash == NULL || object_stash != server_stash)
+    ) {
+        croak(
+            "Unblock::HTTP3 native ABI requires exact class "
+            "Unblock::HTTP3::Client or Unblock::HTTP3::Server"
+        );
     }
 
     return (HV *)SvRV(object);
@@ -2464,9 +2500,8 @@ unblock_http3_consumer_create(
 {
     unblock_http3_consumer_context *context;
 
-    (void)unblock_http3_consumer_exact_object(
-        aTHX_ connection,
-        "Unblock::HTTP3::Connection"
+    (void)unblock_http3_consumer_exact_connection(
+        aTHX_ connection
     );
 
     Newxz(context, 1, unblock_http3_consumer_context);
@@ -2477,8 +2512,8 @@ unblock_http3_consumer_create(
         get_cv("Unblock::HTTP3::Connection::_service", 0);
     context->request_cv =
         get_cv("Unblock::HTTP3::Connection::request", 0);
-    context->send_response_cv =
-        get_cv("Unblock::HTTP3::Transaction::send_response", 0);
+    context->respond_cv =
+        get_cv("Unblock::HTTP3::Transaction::respond", 0);
     context->send_informational_cv =
         get_cv("Unblock::HTTP3::Transaction::send_informational", 0);
     context->interpreter =
@@ -2487,7 +2522,7 @@ unblock_http3_consumer_create(
     if (
         context->service_cv == NULL
         || context->request_cv == NULL
-        || context->send_response_cv == NULL
+        || context->respond_cv == NULL
         || context->send_informational_cv == NULL
     ) {
         SvREFCNT_dec(context->connection);
@@ -2737,7 +2772,7 @@ unblock_http3_consumer_require_transaction_owner(
 }
 
 static void
-unblock_http3_consumer_send_response(
+unblock_http3_consumer_respond(
     pTHX_
     void *opaque,
     SV *transaction
@@ -2745,16 +2780,34 @@ unblock_http3_consumer_send_response(
 {
     unblock_http3_consumer_context *context =
         unblock_http3_consumer_require_context(aTHX_ opaque);
+    HV *transaction_hv;
+    SV *response;
 
     unblock_http3_consumer_require_transaction_owner(
         aTHX_ context,
         transaction
     );
 
-    unblock_http3_consumer_call_void_1(
+    transaction_hv = unblock_http3_consumer_exact_object(
+        aTHX_ transaction,
+        "Unblock::HTTP3::Transaction"
+    );
+    response = unblock_http3_consumer_fetch(
+        aTHX_ transaction_hv,
+        "response",
+        8,
+        1
+    );
+
+    if (!SvOK(response)) {
+        croak("HTTP/3 Transaction has no response");
+    }
+
+    unblock_http3_consumer_call_void_2(
         aTHX_
-        context->send_response_cv,
-        transaction
+        context->respond_cv,
+        transaction,
+        response
     );
 }
 
@@ -2870,7 +2923,7 @@ unblock_http3_consumer_destroy(
     context->connection_hv = NULL;
     context->service_cv = NULL;
     context->request_cv = NULL;
-    context->send_response_cv = NULL;
+    context->respond_cv = NULL;
     context->send_informational_cv = NULL;
     context->interpreter = NULL;
 
@@ -2892,7 +2945,7 @@ unblock_http3_consumer_operations = {
     &unblock_http3_consumer_transaction_response,
     &unblock_http3_consumer_transaction_stream_id,
     &unblock_http3_consumer_transaction_state,
-    &unblock_http3_consumer_send_response,
+    &unblock_http3_consumer_respond,
     &unblock_http3_consumer_send_informational,
     &unblock_http3_consumer_failed,
     &unblock_http3_consumer_error_code,

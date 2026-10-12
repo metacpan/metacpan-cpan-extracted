@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="708" height="633" viewBox="0 0 708 633" role="img" aria-label="perl examples/widgets/file-dialog.pl">
+<title>perl examples/widgets/file-dialog.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="676" height="598" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="676" height="598" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="676" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="354" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/widgets/file-dialog.pl</text>
+<rect x="16.5" y="16.5" width="675" height="597" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="30" y="60" width="648" height="54" fill="#0b0b11"/>
+<rect x="30" y="114" width="54" height="414" fill="#0b0b11"/>
+<rect x="84" y="114" width="540" height="90" fill="#1c212d"/>
+<rect x="624" y="114" width="54" height="414" fill="#0b0b11"/>
+<rect x="84" y="204" width="36" height="36" fill="#1c212d"/>
+<rect x="120" y="204" width="459" height="36" fill="#242832"/>
+<rect x="579" y="204" width="45" height="36" fill="#1c212d"/>
+<rect x="84" y="240" width="540" height="72" fill="#1c212d"/>
+<rect x="84" y="312" width="36" height="18" fill="#1c212d"/>
+<rect x="120" y="312" width="459" height="18" fill="#343a48"/>
+<rect x="579" y="312" width="45" height="18" fill="#1c212d"/>
+<rect x="84" y="330" width="540" height="54" fill="#1c212d"/>
+<rect x="84" y="384" width="72" height="18" fill="#1c212d"/>
+<rect x="156" y="384" width="441" height="18" fill="#242830"/>
+<rect x="597" y="384" width="27" height="18" fill="#1c212d"/>
+<rect x="84" y="402" width="27" height="18" fill="#1c212d"/>
+<rect x="111" y="402" width="99" height="18" fill="#242830"/>
+<rect x="210" y="402" width="414" height="18" fill="#1c212d"/>
+<rect x="84" y="420" width="540" height="108" fill="#1c212d"/>
+<rect x="30" y="528" width="648" height="54" fill="#0b0b11"/>
+<rect x="30" y="582" width="648" height="18" fill="#0f1014"/>
+<rect x="93" y="122" width="522" height="1" fill="#61afef"/>
+<rect x="88" y="132" width="1" height="378" fill="#61afef"/>
+<rect x="619" y="132" width="1" height="378" fill="#61afef"/>
+<rect x="120" y="194" width="468" height="1" fill="#61afef"/>
+<rect x="115" y="204" width="1" height="162" fill="#61afef"/>
+<rect x="592" y="204" width="1" height="162" fill="#61afef"/>
+<rect x="120" y="230" width="459" height="1" fill="#586070"/>
+<rect x="120" y="374" width="468" height="1" fill="#61afef"/>
+<rect x="120" y="446" width="54" height="1" fill="#46556e"/>
+<rect x="210" y="446" width="72" height="1" fill="#46556e"/>
+<rect x="115" y="456" width="1" height="18" fill="#46556e"/>
+<rect x="178" y="456" width="1" height="18" fill="#46556e"/>
+<rect x="205" y="456" width="1" height="18" fill="#46556e"/>
+<rect x="286" y="456" width="1" height="18" fill="#46556e"/>
+<rect x="120" y="482" width="54" height="1" fill="#46556e"/>
+<rect x="210" y="482" width="72" height="1" fill="#46556e"/>
+<rect x="93" y="518" width="522" height="1" fill="#61afef"/>
+</g>
+<polyline points="88.5 132 88.5 127 88.538 126.413 88.653 125.835 88.843 125.278 89.103 124.75 89.43 124.261 89.818 123.818 90.261 123.43 90.75 123.103 91.278 122.843 91.835 122.653 92.413 122.538 93 122.5 93 122.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="619.5 132 619.5 127 619.462 126.413 619.347 125.835 619.157 125.278 618.897 124.75 618.57 124.261 618.182 123.818 617.739 123.43 617.25 123.103 616.722 122.843 616.165 122.653 615.587 122.538 615 122.5 615 122.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="115.5 204 115.5 199 115.538 198.413 115.653 197.835 115.843 197.278 116.103 196.75 116.43 196.261 116.818 195.818 117.261 195.43 117.75 195.103 118.278 194.843 118.835 194.653 119.413 194.538 120 194.5 120 194.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="592.5 204 592.5 199 592.462 198.413 592.347 197.835 592.157 197.278 591.897 196.75 591.57 196.261 591.182 195.818 590.739 195.43 590.25 195.103 589.722 194.843 589.165 194.653 588.587 194.538 588 194.5 588 194.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="115.5 366 115.5 370 115.538 370.587 115.653 371.165 115.843 371.722 116.103 372.25 116.43 372.739 116.818 373.182 117.261 373.57 117.75 373.897 118.278 374.157 118.835 374.347 119.413 374.462 120 374.5 120 374.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="592.5 366 592.5 370 592.462 370.587 592.347 371.165 592.157 371.722 591.897 372.25 591.57 372.739 591.182 373.182 590.739 373.57 590.25 373.897 589.722 374.157 589.165 374.347 588.587 374.462 588 374.5 588 374.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="115.5 456 115.5 451 115.538 450.413 115.653 449.835 115.843 449.278 116.103 448.75 116.43 448.261 116.818 447.818 117.261 447.43 117.75 447.103 118.278 446.843 118.835 446.653 119.413 446.538 120 446.5 120 446.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="178.5 456 178.5 451 178.462 450.413 178.347 449.835 178.157 449.278 177.897 448.75 177.57 448.261 177.182 447.818 176.739 447.43 176.25 447.103 175.722 446.843 175.165 446.653 174.587 446.538 174 446.5 174 446.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="205.5 456 205.5 451 205.538 450.413 205.653 449.835 205.843 449.278 206.103 448.75 206.43 448.261 206.818 447.818 207.261 447.43 207.75 447.103 208.278 446.843 208.835 446.653 209.413 446.538 210 446.5 210 446.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="286.5 456 286.5 451 286.462 450.413 286.347 449.835 286.157 449.278 285.897 448.75 285.57 448.261 285.182 447.818 284.739 447.43 284.25 447.103 283.722 446.843 283.165 446.653 282.587 446.538 282 446.5 282 446.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="115.5 474 115.5 478 115.538 478.587 115.653 479.165 115.843 479.722 116.103 480.25 116.43 480.739 116.818 481.182 117.261 481.57 117.75 481.897 118.278 482.157 118.835 482.347 119.413 482.462 120 482.5 120 482.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="178.5 474 178.5 478 178.462 478.587 178.347 479.165 178.157 479.722 177.897 480.25 177.57 480.739 177.182 481.182 176.739 481.57 176.25 481.897 175.722 482.157 175.165 482.347 174.587 482.462 174 482.5 174 482.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="205.5 474 205.5 478 205.538 478.587 205.653 479.165 205.843 479.722 206.103 480.25 206.43 480.739 206.818 481.182 207.261 481.57 207.75 481.897 208.278 482.157 208.835 482.347 209.413 482.462 210 482.5 210 482.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="286.5 474 286.5 478 286.462 478.587 286.347 479.165 286.157 479.722 285.897 480.25 285.57 480.739 285.182 481.182 284.739 481.57 284.25 481.897 283.722 482.157 283.165 482.347 282.587 482.462 282 482.5 282 482.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="88.5 510 88.5 514 88.538 514.587 88.653 515.165 88.843 515.722 89.103 516.25 89.43 516.739 89.818 517.182 90.261 517.57 90.75 517.897 91.278 518.157 91.835 518.347 92.413 518.462 93 518.5 93 518.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="619.5 510 619.5 514 619.462 514.587 619.347 515.165 619.157 515.722 618.897 516.25 618.57 516.739 618.182 517.182 617.739 517.57 617.25 517.897 616.722 518.157 616.165 518.347 615.587 518.462 615 518.5 615 518.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<g class="terminal">
+<text x="48" y="92" textLength="45" class="b" fill="#6e6f72">Notes</text>
+<text x="48" y="128" textLength="36" fill="#6e6f72">No n</text>
+<text x="111" y="164" textLength="99" class="b" fill="#dcdfe4">Open a file</text>
+<text x="111" y="182" textLength="486" fill="#dcdfe4">Folder: .../Documents/Projects/analytical-engine/notes</text>
+<text x="129" y="218" textLength="369" class="b" fill="#ebeef3">Name                       Size  Modified</text>
+<text x="129" y="254" textLength="27" fill="#dcdfe4">../</text>
+<text x="129" y="272" textLength="441" fill="#dcdfe4">archive/                         2026-02-14 10:30</text>
+<text x="129" y="290" textLength="441" fill="#dcdfe4">drafts/                          2026-05-28 10:30</text>
+<text x="129" y="308" textLength="441" fill="#dcdfe4">ideas.md                1.1 KiB  2026-05-30 10:30</text>
+<text x="129" y="326" textLength="441" fill="#dcdfe4">reading-list.txt          444 B  2026-04-02 10:30</text>
+<text x="129" y="344" textLength="441" fill="#dcdfe4">shopping.txt               99 B  2026-05-31 10:30</text>
+<text x="129" y="362" textLength="441" fill="#dcdfe4">todo.txt                  725 B  2026-06-01 10:30</text>
+<text x="111" y="398" textLength="189" fill="#dcdfe4">File reading-list.txt</text>
+<text x="111" y="416" textLength="45" fill="#dcdfe4">Notes</text>
+<text x="205.5" y="416" text-anchor="middle" fill="#61afef">▾</text>
+<text x="228" y="416" textLength="189" fill="#dcdfe4">[ ] Show hidden files</text>
+<text x="129" y="470" textLength="36" fill="#dcdfe4">Open</text>
+<text x="219" y="470" textLength="54" fill="#dcdfe4">Cancel</text>
+<text x="39" y="596" textLength="450" fill="#6e6f72">o opens a note, s saves it as, f chooses a folder.</text>
+<text x="561" y="596" textLength="108" fill="#3c3f45">Ctrl+C quits</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

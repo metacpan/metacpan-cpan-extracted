@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Carp ();
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 require XSLoader;
 XSLoader::load('Open::API', $VERSION);
@@ -21,11 +21,11 @@ __END__
 
 =head1 NAME
 
-Open::API - OpenAPI 3.0 and 3.1 server and client
+Open::API - OpenAPI 2.0, 3.0 and 3.1 server and client
 
 =head1 VERSION
 
-Version 0.14
+Version 0.15
 
 =head1 SYNOPSIS
 
@@ -52,7 +52,8 @@ Version 0.14
 
 =head1 DESCRIPTION
 
-C<Open::API> loads an OpenAPI 3.0 or 3.1 document once and compiles every
+C<Open::API> loads an OpenAPI 3.0 or 3.1 document, or a Swagger 2.0 one, once
+and compiles every
 parameter, header, cookie and body schema through L<JSON::Schema::Fast> at
 startup. Each request is then routed and validated on a C hot path.
 
@@ -73,8 +74,13 @@ A 3.0 Schema Object is a different dialect - an extended subset of JSON Schema
 Wright draft-00 - so a 3.0 document is rewritten into 3.1 shape once, at load,
 before anything else sees it. L</spec> then returns the normalised document,
 which means the validator, the mock generator, the docs UI and any consumer
-walking C<< $api->spec >> all deal in one schema dialect. Any other C<openapi>
-version, including Swagger 2.0, croaks at load.
+walking C<< $api->spec >> all deal in one schema dialect.
+
+A Swagger 2.0 document (C<< swagger: "2.0" >>, the string) is accepted too. Its
+Schema Object is a draft-04 subset of 3.0's, so the document is first brought
+to 3.0 shape and then through the same rewrite, all at load; see
+L</SWAGGER 2.0> for what that means. Any other C<openapi> or C<swagger> value
+croaks at load, as does a document declaring both.
 
 What the up-conversion does, per Schema Object:
 
@@ -114,10 +120,68 @@ Values are never rewritten. C<example>, C<default> and C<enum> hold arbitrary
 user JSON that may itself contain a key called C<nullable> or C<items>, so the
 walk descends only through positions where a Schema Object can actually appear.
 
-The normalised document keeps its original C<openapi> string - a document
-should not lie about what it was - so the conversion is idempotent:
-C<< Open::API->new(spec => $api->spec) >> is a no-op. Use L</openapi_version>
-to tell the dialects apart.
+The normalised document keeps its original C<openapi> string (or its C<swagger>
+string) - a document should not lie about what it was - so the conversion is
+idempotent: C<< Open::API->new(spec => $api->spec) >> is a no-op. Use
+L</openapi_version> to tell the dialects apart.
+
+=head1 SWAGGER 2.0
+
+A Swagger 2.0 document is rewritten into 3.0 shape at load, and the 3.0 rules
+above then apply to its schemas. L</spec> returns the result, 3.1-shaped like
+everything else, with C<swagger: "2.0"> still on it. What moves where:
+
+=over 4
+
+=item * C<host>, C<basePath> and C<schemes> become C<servers>: one Server
+Object per scheme, C<scheme://host/basePath>. A host with no C<schemes> gives
+the scheme-relative C<//host/basePath>; a C<basePath> alone is a relative URL.
+The base path is honoured by routing only with C<< servers => 1 >> (see
+L</new>), exactly as a 3.x server prefix is.
+
+=item * C<definitions>, C<parameters>, C<responses> and C<securityDefinitions>
+become the matching C<components> sections, and every C<$ref> into them is
+rewritten (C<#/definitions/Pet> becomes C<#/components/schemas/Pet>). A body
+parameter definition becomes a component request body.
+
+=item * C<basic> becomes C<< http/basic >>; an oauth2 C<flow> becomes the
+matching entry of C<flows> (C<application> is C<clientCredentials>,
+C<accessCode> is C<authorizationCode>), carrying its URLs and scopes.
+
+=item * A body parameter becomes the operation's request body, keyed by the
+effective C<consumes>; formData parameters become one form body, keyed by the
+form types in C<consumes>, with an Encoding Object entry per array member and
+C<type: file> as a binary string. A response C<schema> is keyed by the
+effective C<produces>, a response C<examples> map becomes each media type's
+C<example>, and a Header Object's inline type becomes its C<schema>.
+
+=item * A parameter's inline type keywords (C<type>, C<format>, C<items>,
+C<enum>, the bounds, ...) become its C<schema>. C<collectionFormat> becomes
+C<style> and C<explode> where 3.x can say it (csv on a query array is
+C<< form, explode: false >>, since 2.0's default is not exploded while 3.x's
+is; C<multi> is exploded; C<ssv> and C<pipes> are the delimited query styles)
+and the C<x-oa-collectionFormat> extension where it cannot: C<tsv> anywhere,
+C<ssv> and C<pipes> in a path or header, and each level of a nested Items
+Object. The extension is read on a 3.x document too, so a 3.1 document may
+declare a tab-separated or nested list directly.
+
+=back
+
+Where 2.0 declares no media type the conversion chooses one: a body with no
+C<consumes> is C<application/json>, formData is
+C<application/x-www-form-urlencoded> (or C<multipart/form-data> when a member
+is a file), and a response schema with no C<produces> is C<application/json>.
+An operation-level C<consumes: []> clears the root list and falls to that
+default.
+
+Everything the specification says MUST is refused at load: a missing C<paths>
+or C<responses>, a host carrying a scheme or a path, a body beside formData or
+two bodies, a type array in a schema, a discriminator property not in
+C<required>, a C<2XX> response key (3.0's, not 2.0's), apiKey in a cookie, an
+oauth2 scheme without its flow, URLs or scopes. What it does not say is left
+alone: C<nullable> is not a 2.0 keyword and is dropped (draft-04 ignores what
+it does not know), while C<oneOf>, C<anyOf> and C<not> are honoured if present
+although 2.0 does not define them, and every C<x-> extension travels untouched.
 
 =head1 DISCRIMINATOR
 
@@ -195,7 +259,9 @@ C<servers> is optional and off by default. With it, the path prefix carried by
 the first Server Object's URL is stripped before routing, and any
 C<{variable}> in that URL is expanded from its declared default - so a
 document whose server is C<https://host/api/v1> answers C<GET /api/v1/pets>
-for a path written C</pets>.
+for a path written C</pets>. A scheme-relative URL (C<//host/api/v1>, which a
+Swagger 2.0 C<host> with no C<schemes> converts to) yields its path the same
+way.
 
 It is off by default deliberately. An application that already mounts itself
 so that C<PATH_INFO> arrives without the prefix would start seeing every
@@ -235,16 +301,18 @@ way round: pass a structure and it travels as JSON.
 =head2 spec
 
 The decoded OpenAPI document, normalised: 3.1-shaped whatever version it
-declared, with any C<discriminator> expanded. See L</OPENAPI VERSIONS> and
-L</DISCRIMINATOR>.
+declared (3.1, 3.0 or Swagger 2.0), with any C<discriminator> expanded. See
+L</OPENAPI VERSIONS>, L</SWAGGER 2.0> and L</DISCRIMINATOR>.
 
 =head2 openapi_version
 
-    my $v = $api->openapi_version;   # '3.0.3' or '3.1.0'
+    my $v = $api->openapi_version;   # '3.0.3', '3.1.0' or '2.0'
 
-The C<openapi> version the document declares. A 3.0 document keeps its own
-version string after up-conversion, so this reports the dialect it was written
-in even though L</spec> is 3.1-shaped throughout.
+The version the document declares: its C<openapi> string, or C<'2.0'> for a
+Swagger document (which declares C<swagger>, not C<openapi>; the method name is
+historical). A 3.0 or 2.0 document keeps its own version string after
+conversion, so this reports the dialect it was written in even though L</spec>
+is 3.1-shaped throughout.
 
 =head2 operations
 

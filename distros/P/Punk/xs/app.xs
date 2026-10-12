@@ -820,6 +820,13 @@ auth(self, ...)
                     SvREFCNT_dec((SV *)cfg);
                     croak("Punk: auth iterations must be positive");
                 }
+                if (it && *it && SvOK(*it)
+                    && (SvIV(*it) < PWD_MIN_ITERATIONS
+                        || SvIV(*it) > PWD_MAX_ITERATIONS)) {
+                    SvREFCNT_dec((SV *)cfg);
+                    croak("Punk: auth iterations must be between %d and %d",
+                          PWD_MIN_ITERATIONS, PWD_MAX_ITERATIONS);
+                }
             }
             /* sqitch => 1: the schema the defaults expect, shipped as the
              * Sqitch project `punk_auth` under lib/Punk/Auth/sqitch and
@@ -1134,6 +1141,19 @@ session(self, ...)
                       "the cookie is signed with an empty key and anyone can "
                       "forge it. Try `session secret => secret('session_key')"
                       "`, which fails closed when the key is missing");
+            }
+        }
+        {   /* the write-back runs where a croak is trapped, so a cookie
+             * attribute it would refuse is refused here instead */
+            static const char *const attrs[] = { "cookie", "path", "domain",
+                                                 "samesite", NULL };
+            for (i = 0; attrs[i]; i++) {
+                SV **ap = hv_fetch(cfg, attrs[i], (I32)strlen(attrs[i]), 0);
+                if (ap && *ap && SvOK(*ap) && !pk_cookie_safe(aTHX_ *ap)) {
+                    SvREFCNT_dec((SV *)cfg);
+                    croak("Punk: session `%s` may not contain ';' or a "
+                          "control character", attrs[i]);
+                }
             }
         }
         (void)hv_stores(h, "session", newRV_noinc((SV *)cfg));

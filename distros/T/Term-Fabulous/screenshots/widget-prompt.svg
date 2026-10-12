@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="708" height="489" viewBox="0 0 708 489" role="img" aria-label="perl examples/widgets/prompt.pl">
+<title>perl examples/widgets/prompt.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="676" height="454" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="676" height="454" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="676" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="354" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/widgets/prompt.pl</text>
+<rect x="16.5" y="16.5" width="675" height="453" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="30" y="60" width="648" height="36" fill="#0b0b11"/>
+<rect x="30" y="96" width="72" height="324" fill="#0b0b11"/>
+<rect x="102" y="96" width="504" height="126" fill="#1c212d"/>
+<rect x="606" y="96" width="72" height="324" fill="#0b0b11"/>
+<rect x="102" y="222" width="90" height="18" fill="#1c212d"/>
+<rect x="192" y="222" width="387" height="18" fill="#242830"/>
+<rect x="579" y="222" width="27" height="18" fill="#1c212d"/>
+<rect x="102" y="240" width="504" height="18" fill="#1c212d"/>
+<rect x="102" y="258" width="90" height="18" fill="#1c212d"/>
+<rect x="192" y="258" width="90" height="18" fill="#343a48"/>
+<rect x="282" y="258" width="9" height="18" fill="#e06c75"/>
+<rect x="291" y="258" width="288" height="18" fill="#343a48"/>
+<rect x="579" y="258" width="27" height="18" fill="#1c212d"/>
+<rect x="102" y="276" width="504" height="144" fill="#1c212d"/>
+<rect x="30" y="420" width="648" height="36" fill="#0b0b11"/>
+<rect x="111" y="104" width="486" height="1" fill="#61afef"/>
+<rect x="106" y="114" width="1" height="288" fill="#61afef"/>
+<rect x="601" y="114" width="1" height="288" fill="#61afef"/>
+<rect x="138" y="338" width="45" height="1" fill="#46556e"/>
+<rect x="219" y="338" width="72" height="1" fill="#46556e"/>
+<rect x="133" y="348" width="1" height="18" fill="#46556e"/>
+<rect x="187" y="348" width="1" height="18" fill="#46556e"/>
+<rect x="214" y="348" width="1" height="18" fill="#46556e"/>
+<rect x="295" y="348" width="1" height="18" fill="#46556e"/>
+<rect x="138" y="374" width="45" height="1" fill="#46556e"/>
+<rect x="219" y="374" width="72" height="1" fill="#46556e"/>
+<rect x="111" y="410" width="486" height="1" fill="#61afef"/>
+</g>
+<polyline points="106.5 114 106.5 109 106.538 108.413 106.653 107.835 106.843 107.278 107.103 106.75 107.43 106.261 107.818 105.818 108.261 105.43 108.75 105.103 109.278 104.843 109.835 104.653 110.413 104.538 111 104.5 111 104.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="601.5 114 601.5 109 601.462 108.413 601.347 107.835 601.157 107.278 600.897 106.75 600.57 106.261 600.182 105.818 599.739 105.43 599.25 105.103 598.722 104.843 598.165 104.653 597.587 104.538 597 104.5 597 104.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="133.5 348 133.5 343 133.538 342.413 133.653 341.835 133.843 341.278 134.103 340.75 134.43 340.261 134.818 339.818 135.261 339.43 135.75 339.103 136.278 338.843 136.835 338.653 137.413 338.538 138 338.5 138 338.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="187.5 348 187.5 343 187.462 342.413 187.347 341.835 187.157 341.278 186.897 340.75 186.57 340.261 186.182 339.818 185.739 339.43 185.25 339.103 184.722 338.843 184.165 338.653 183.587 338.538 183 338.5 183 338.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="214.5 348 214.5 343 214.538 342.413 214.653 341.835 214.843 341.278 215.103 340.75 215.43 340.261 215.818 339.818 216.261 339.43 216.75 339.103 217.278 338.843 217.835 338.653 218.413 338.538 219 338.5 219 338.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="295.5 348 295.5 343 295.462 342.413 295.347 341.835 295.157 341.278 294.897 340.75 294.57 340.261 294.182 339.818 293.739 339.43 293.25 339.103 292.722 338.843 292.165 338.653 291.587 338.538 291 338.5 291 338.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="133.5 366 133.5 370 133.538 370.587 133.653 371.165 133.843 371.722 134.103 372.25 134.43 372.739 134.818 373.182 135.261 373.57 135.75 373.897 136.278 374.157 136.835 374.347 137.413 374.462 138 374.5 138 374.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="187.5 366 187.5 370 187.462 370.587 187.347 371.165 187.157 371.722 186.897 372.25 186.57 372.739 186.182 373.182 185.739 373.57 185.25 373.897 184.722 374.157 184.165 374.347 183.587 374.462 183 374.5 183 374.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="214.5 366 214.5 370 214.538 370.587 214.653 371.165 214.843 371.722 215.103 372.25 215.43 372.739 215.818 373.182 216.261 373.57 216.75 373.897 217.278 374.157 217.835 374.347 218.413 374.462 219 374.5 219 374.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="295.5 366 295.5 370 295.462 370.587 295.347 371.165 295.157 371.722 294.897 372.25 294.57 372.739 294.182 373.182 293.739 373.57 293.25 373.897 292.722 374.157 292.165 374.347 291.587 374.462 291 374.5 291 374.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="106.5 402 106.5 406 106.538 406.587 106.653 407.165 106.843 407.722 107.103 408.25 107.43 408.739 107.818 409.182 108.261 409.57 108.75 409.897 109.278 410.157 109.835 410.347 110.413 410.462 111 410.5 111 410.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="601.5 402 601.5 406 601.462 406.587 601.347 407.165 601.157 407.722 600.897 408.25 600.57 408.739 600.182 409.182 599.739 409.57 599.25 409.897 598.722 410.157 598.165 410.347 597.587 410.462 597 410.5 597 410.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<g class="terminal">
+<text x="48" y="92" textLength="72" class="b" fill="#6e6f72">Contacts</text>
+<text x="48" y="128" textLength="45" fill="#6e6f72">Grace</text>
+<text x="48" y="146" textLength="54" fill="#6e6f72">Alan T</text>
+<text x="129" y="146" textLength="99" class="b" fill="#dcdfe4">New contact</text>
+<text x="129" y="182" textLength="441" fill="#dcdfe4">The name is required. The e-mail address may stay</text>
+<text x="129" y="200" textLength="54" fill="#dcdfe4">empty.</text>
+<text x="129" y="236" textLength="171" fill="#dcdfe4">Name   Ada Lovelace</text>
+<text x="129" y="272" textLength="54" fill="#dcdfe4">E-mail</text>
+<text x="192" y="272" textLength="90" fill="#e06c75">ada@engine</text>
+<text x="129" y="308" textLength="351" fill="#e06c75">E-mail: Please enter an e-mail address.</text>
+<text x="147" y="362" textLength="27" fill="#dcdfe4">Add</text>
+<text x="228" y="362" textLength="54" fill="#dcdfe4">Cancel</text>
+<text x="48" y="434" textLength="495" fill="#6e6f72">n adds a contact, d deletes the last one, Ctrl+C quits.</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

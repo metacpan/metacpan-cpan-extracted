@@ -1,5 +1,8 @@
 Revision history for Game-Reversi
 
+0.03    2026-10-11
+	- Add Game::Reversi::Terminal->run(@argv), which returns the exit status
+
 0.02    2026-10-10
 	- Fix: Terminal.pm POD declares =encoding utf8, so t/pod.t passes.
 	- Fix: --level took any number. The variant was brought into BUILD when

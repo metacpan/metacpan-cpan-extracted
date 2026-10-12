@@ -80,7 +80,9 @@ is($made, 20, 'twenty requests answered');
 
 # From OUTSIDE the pool, by name: the whole point of arena_name.
 my $arena = Shared::Arena->attach($NAME);
-ok($arena, 'attached to the server arena by name');
+ok($arena, 'attached to the server arena by name')
+    or diag("the server log was:\n" . slurp("$errlog") . "\n/dev/shm/$NAME "
+            . (-e "/dev/shm/$NAME" ? "exists" : "is absent"));
 
 # Converge: the rows are mirrored once a second, so poll until the live rows'
 # requests account for every request made (the /rows and /pool requests below

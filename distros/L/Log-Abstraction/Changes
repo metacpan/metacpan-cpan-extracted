@@ -1,10 +1,61 @@
 Revision history for Log-Abstraction
 
-0.39	Tue Oct  6 08:17:42 PM EDT 2026
+0.40	Sun Oct 11 02:48:00 PM EDT 2026
+	[ Enhancements ]
+	- New log_any and log_dispatch backends in the logger hash send
+	  messages on to Log::Any (a category name or a Log::Any logger) and
+	  Log::Dispatch, with their own level and format like the other
+	  backends.  Log::Any gets structured fields as data.  A message that
+	  comes back through Log::Any::Adapter::Abstraction isn't forwarded
+	  again, so a set-up pointing at itself doesn't loop.
+	- A Log::Any logger or Log::Dispatch object given as the logger is used
+	  the same way.  Before, Log::Dispatch croaked on trace() (it has no
+	  trace method), and both joined the message's parts with spaces.
+	- Log files written by path are kept open between messages instead of
+	  being opened and closed for every line.  A file renamed or deleted
+	  (e.g. by logrotate) is noticed on the next write.  Except on Windows,
+	  a SIGHUP makes every logger reopen its files (see API Changes).  In
+	  case no SIGHUP is sent, they are reopened every reopen_interval
+	  seconds, a new option: default 300, -1 for only on SIGHUP, and 0 to
+	  close the file after every message as before.  The new reopen()
+	  method closes them.
+	- The journald backend keeps its socket open between messages instead
+	  of creating one for every message.  A failed send closes it, and the
+	  next message opens a new one.
+	- New sendmail option async: the email is sent by a forked child, so
+	  the log call doesn't wait for the SMTP server.  A failure is carped
+	  by the child, and the message is lost rather than held.  On Windows
+	  the email is sent in the log call as before.
+	[ API Changes ]
+	- The minimum Perl is now 5.26.  Params::Validate::Strict, which
+	  Return::Set, Sub::Private and Config::Abstraction need, requires it,
+	  so the dependencies couldn't be installed on older perls anyway.
+	- Except on Windows, the first logger to open a log file installs a
+	  $SIG{HUP} handler, which calls any handler already set.  So SIGHUP
+	  no longer ends the program while such a logger exists; the previous
+	  handler is put back when the last one is destroyed.  Use
+	  reopen_interval => 0 for the old behaviour.
+	- Log files are now held open, and on Windows another program can't
+	  rename or delete an open file; call reopen() first, or use
+	  reopen_interval => 0.
+	- Each backend is now a Log::Abstraction::Backend::* object, built once
+	  by new() instead of worked out again for every message.
+	- new() croaks on a logger hash with none of the backend keys, and on a
+	  logger that is an unsupported kind of reference.  Before, the first
+	  message croaked ("Don't know how to deal with the <level> message",
+	  "configuration error, no handler written for the <level> message").
+	[ Bug Fixes ]
+	- The syslog hash given to new() is no longer changed: the first
+	  message renamed its 'server' key 'host'.
+	[ Tests ]
+	- New t/producers.t, t/backends.t, t/file_handles.t and
+	  t/sendmail_async.t.
+
+0.39	2026-10-06T20:17:42-04:00
 	[ Bug Fixes ]
 	- Remove recursion issue when running mutant tests
 
-0.38	Tue Oct  6 02:15:21 PM EDT 2026
+0.38	2026-10-06T14:15:21-04:00
 	[ Enhancements ]
 	- sendmail digest: with digest => 1, messages that min_interval holds
 	  back are sent, oldest first, with the next email instead of being
@@ -34,7 +85,7 @@ Revision history for Log-Abstraction
 	  truncated to .000.  It now steps by 0.125:
 	  https://www.cpantesters.org/cpan/report/0332021c-c0f8-11f1-80bb-2ae0940ca041
 
-0.37	Sun Oct  4 09:43:19 PM EDT 2026
+0.37	2026-10-04T21:43:19-04:00
 	[ Bug Fixes ]
 	- journald: a datagram bigger than the system's Unix-socket send
 	  buffer failed with "Message too long" (EMSGSIZE) and the message
@@ -58,7 +109,7 @@ Revision history for Log-Abstraction
 	  so the test doesn't hit the system's own limit (it failed on macOS,
 	  which caps Unix datagrams at 2KB, with ENOBUFS).
 
-0.36	Sat Oct  3 09:35:44 PM EDT 2026
+0.36	2026-10-03T21:35:44-04:00
 	[ Enhancements ]
 	- Structured fields: every logging method accepts a hashref of
 	  fields after the message, e.g. $log->info('login', { user_id => 42 }).

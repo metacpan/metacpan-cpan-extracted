@@ -10,7 +10,7 @@ use oEdtk::Config	qw(config_read);
 
 use Exporter;
 
-our $VERSION 	= 0.463;
+our $VERSION 	= 2.1109;
 our @ISA 	= qw(Exporter);
 our @EXPORT 	= qw(prod_Xls_Init
 		     prod_Xls_New		prod_Xls_Insert_Val
@@ -23,7 +23,7 @@ our @EXPORT 	= qw(prod_Xls_Init
 my $LOCAL_REF_WORKBOOK;
 my $CFG = config_read();
 
- # METHODES ASSOCIEES A LA GESTION DU FORMAT EXCEL
+ # METHODS ASSOCIATED WITH EXCEL FORMAT HANDLING
  my $MAX_ROW_BY_FIC =$CFG->{'EDTK_XLS_MAX_ROW'};
  my $XLSCOL = 0;
  my $XLSROW = 0;
@@ -42,12 +42,12 @@ my $CFG = config_read();
  my ($FILENAME_REF, $XLS_NAME, $HEADER_LEFT,$HEADER_CENTER,$HEADER_RIGHT);
 
 sub prod_Xls_Init(;$$$){
-	# INITIALISATION DE LA FEUILLE EXCEL
-	# ARGUMENTS : [TEXTE EN-TÊTE GAUCHE], [TEXTE EN-TÊTE CENTRE], [TEXTE EN-TÊTE DROIT]
+	# EXCEL SHEET INITIALIZATION
+	# ARGUMENTS: [LEFT HEADER TEXT], [CENTER HEADER TEXT], [RIGHT HEADER TEXT]
     	($HEADER_LEFT,$HEADER_CENTER,$HEADER_RIGHT) =@_;
-	$HEADER_RIGHT		||="Édition du &D";
+	$HEADER_RIGHT		||="Edition on &D";
 
-	# EN FONCTION DU NOMBRE D'ÉLÉMENTS ON FABRIQUE L'INDICE DU PROCHAIN FICHIER
+	# BASED ON THE NUMBER OF ELEMENTS, BUILD THE NEXT FILE INDEX
 	my $item = sprintf ("%03s", $#TAB_LISTE_XLS+2);
 
 	eval {
@@ -63,13 +63,13 @@ sub prod_Xls_Init(;$$$){
 	push (@TAB_LISTE_XLS, $XLS_NAME);
 #	if ($#TAB_LISTE_XLS==0) {$FILENAME_REF=$XLS_NAME;}
 
-	# CREATION D'UN FICHIER EXCEL
+	# CREATE AN EXCEL FILE
 	my $workbook = Spreadsheet::WriteExcel->new($XLS_NAME)
-		or die "echec a l'ouverture de $XLS_NAME, code retour $!\n";
+		or die "failed to open $XLS_NAME, return code $!\n";
 	$LOCAL_REF_WORKBOOK=\$workbook;
 
-	# AJOUT D'UNE FEUILLE EXCEL
-	my $worksheet =$workbook->add_worksheet($0=~/([\w-]+)\.pl$/); # CREATION D'UNE FEUILLE DANS LE CLASSEUR, CETTE FEUILLE POPRTE LE NOM DE L'APPLI PERL SANS L'EXTENSION .PL
+	# ADD AN EXCEL SHEET
+	my $worksheet =$workbook->add_worksheet($0=~/([\w-]+)\.pl$/); # CREATE A SHEET IN THE WORKBOOK; THIS SHEET CARRIES THE PERL APP NAME WITHOUT THE .PL EXTENSION
 	&prod_Xls_Set_Format();
 	&prod_Xls_Set_Sheet($worksheet);
 
@@ -77,9 +77,9 @@ sub prod_Xls_Init(;$$$){
 }
 
 sub prod_Xls_New (;$$){
-	# deux paramètres optionnels
-	# 	- "HEAD" pour répéter la tête de tableau
-#	#	- une racine de nom de fichier (s'intègre à la gestion des ruptures automatiques de fichiers)
+	# two optional parameters
+	# 	- "HEAD" to repeat the table head
+#	#	- a file name root (integrates with automatic file breaking)
 	if ($TAB_LISTE_XLS[0]){
 		my $option1=shift;
 		$option1 ||="";
@@ -87,19 +87,19 @@ sub prod_Xls_New (;$$){
 			&prod_Xls_Head;
 		}
 
-		# CRÉATION D'UN NOUVEAU FICHIER XLS
-		# ON RÉCUPÈRE LE NOM DU FICHIER DANS LE TABLEAU S'IL N'EST PAS PASSE EN PARAMETRE
+		# CREATE A NEW XLS FILE
+		# GET THE FILE NAME FROM THE ARRAY IF NOT PASSED AS A PARAMETER
 #		my $xls_name;
 #		if ($xls_name=shift) {$FILENAME_REF=$xls_name;}
 #		$xls_name ||=$FILENAME_REF;
 
-		# EN FONCTION DU NOMBRE D'ÉLÉMENTS ON FABRIQUE L'INDICE DU PROCHAIN FICHIER
+		# BASED ON THE NUMBER OF ELEMENTS, BUILD THE NEXT FILE INDEX
 #		my $item= sprintf ("%03s", $#TAB_LISTE_XLS+2);
 
-		# ON CRÉE LE NOM DU FICHIER
+		# BUILD THE FILE NAME
 #		$xls_name=~s/(.+\.).*$/$1$item.xls/;
 
-		# CRÉATION DU NOUVEAU FICHIER AVEC SES PROPRIÉTÉS PAR DÉFAUT
+		# CREATE THE NEW FILE WITH ITS DEFAULT PROPERTIES
 		$SHEET  =0;
 		$XLSROW =0;
 
@@ -112,7 +112,7 @@ sub prod_Xls_New (;$$){
 
 
 sub prod_Xls_Col_Init{
-	# INITIALISATION ET DÉFINITION DES PROPRIÉTÉS STYLES ET LARGEUR DES COLONNES
+	# INITIALIZE AND DEFINE THE STYLE AND WIDTH PROPERTIES OF THE COLUMNS
 	my $paire	="";
 	my $cpt	=0;
 	while (my $paire =shift){
@@ -151,25 +151,25 @@ sub prod_Xls_Set_Sheet($) {
 	my $doc_HEADER_LEFT		='&L&10&"Arial,Bold"'.$HEADER_LEFT;
 	my $doc_HEADER_CENTER	='&C&10&"Arial,Bold"'.$HEADER_CENTER;
 	my $doc_HEADER_RIGHT 	='&R&10&"Arial,Bold"'.$HEADER_RIGHT;
-	my $ref		 		='&L&6Réf/doc : &A - Edité le &D - &P - &F'.'&R&10Page &P/&N';
+	my $ref		 		='&L&6Ref/doc : &A - Edited &D - &P - &F'.'&R&10Page &P/&N';
 
-	$worksheet ->set_paper(0);		# FORMAT D'IMPRESSION (PRINTER DEFAULT))
-	$worksheet ->set_landscape();		# SET_PORTRAIT() # A METTRE EN VARIABLE
-	$worksheet ->set_margins_LR(0.4);	# EN INCH
-	$worksheet ->set_margins_TB(0.65);	# EN INCH
-	$worksheet ->fit_to_pages(1, 0);	# ADAPTE L'IMPRESSION À LA LARGEUR DE LA PAGE
+	$worksheet ->set_paper(0);		# PRINT FORMAT (PRINTER DEFAULT))
+	$worksheet ->set_landscape();		# SET_PORTRAIT() # TO BE PUT IN A VARIABLE
+	$worksheet ->set_margins_LR(0.4);	# IN INCHES
+	$worksheet ->set_margins_TB(0.65);	# IN INCHES
+	$worksheet ->fit_to_pages(1, 0);	# FIT THE PRINT TO THE PAGE WIDTH
 	$worksheet ->set_header("$doc_HEADER_LEFT$doc_HEADER_CENTER$doc_HEADER_RIGHT", 0.4);
 	$worksheet ->set_footer($ref, 0.4);
 	$worksheet ->center_horizontally();
 	$worksheet ->hide_gridlines();
-	$worksheet ->freeze_panes(1, 0); 	# FRACTIONNE LA PREMIÈRE LIGNE POUR VISUALISATION
-	$worksheet ->repeat_rows(0);		# RANG À RÉPÉTER EN TÊTE DE PAGE POUR L'IMPRESSION # A METTRE EN VARIABLE
+	$worksheet ->freeze_panes(1, 0); 	# FREEZE THE FIRST ROW FOR VIEWING
+	$worksheet ->repeat_rows(0);		# ROW TO REPEAT AT THE TOP OF EACH PAGE FOR PRINTING # TO BE PUT IN A VARIABLE
 
-	# DEFINITION DES FORMATS DE CHACUNE DES COLONNES
-	$worksheet ->set_column(0, $MAXCOL, 10, $XLS_FORMAT{'AL'});	# FORMAT PAR DEFAUT
+	# DEFINE THE FORMAT OF EACH COLUMN
+	$worksheet ->set_column(0, $MAXCOL, 10, $XLS_FORMAT{'AL'});	# DEFAULT FORMAT
 
 	my $i=0;
-	# SI LES COLONNES SONT DÉFINIES EN STYLES ET EN LARGEUR, ON PREND EN COMPTE LES PROPRIÉTÉS
+	# IF THE COLUMNS ARE DEFINED WITH STYLES AND WIDTH, TAKE THE PROPERTIES INTO ACCOUNT
 	while ( $TAB_COL_SIZE[$i][0] ){
 		$worksheet ->set_column($i, $i, $TAB_COL_SIZE[$i][1],  $XLS_FORMAT{$TAB_COL_SIZE[$i][0]});
 		$i++;
@@ -178,29 +178,29 @@ sub prod_Xls_Set_Sheet($) {
 }
 
 sub prod_Xls_Insert_Val{
-	# AJOUT DE LA OU LES VALEURS TRANSMISES AU TABLEAU DE VALEURS LOCAL
+	# ADD THE PASSED VALUE(S) TO THE LOCAL VALUE ARRAY
 
 	@TAB_VALUE=(@TAB_VALUE, @_);
 	1;
 }
 
 sub prod_Xls_Edit_Ligne (;$$){
-	# LA FONCTION PEUT RECEVOIR EN PARAMÈTRE
-	#	$format = UNE INSTRUCTUCTION DE FORMATTAGE UNIQUE POUR LA LIGNE COURANTE
-	#	$f_tete_col = "HEAD" DESIGNE UNE TETE DE COLONNE A REPETER SUR CHAQUE PAGE
+	# THE FUNCTION CAN RECEIVE AS PARAMETERS
+	#	$format = A SINGLE FORMATTING INSTRUCTION FOR THE CURRENT ROW
+	#	$f_tete_col = "HEAD" DESIGNATES A COLUMN HEAD TO REPEAT ON EACH PAGE
 	my $oldFormat	=0;
 	my $format	=shift; 				# OPTION
 	my $f_tete_Col	=shift; 				# OPTION
 	$f_tete_Col 	||="";
 
-	# ON ÉDITE PAS LES LIGNES SANS VALORISATIONS (COMPLÈTEMENT VIDES)
+	# DO NOT OUTPUT ROWS WITHOUT VALUES (COMPLETELY EMPTY)
 	if ($#TAB_VALUE == -1) {
-		return "OK", $XLSROW; 	# Sortie
+		return "OK", $XLSROW; 	# Exit
 	}
 
 	my $worksheet	=${$LOCAL_REF_WORKBOOK}->sheets($SHEET);
 	my $statut	="OK";
-	my $col 		=0; 					# CETTE VARIABLE PERMET DE REPARTIR DE LA PREMIÈRE COLONNE DANS LALIGNE
+	my $col 		=0; 					# THIS VARIABLE ALLOWS RESTARTING FROM THE FIRST COLUMN IN THE ROW
 	my $format_unique =0;
 	if ($format) {
 		 $format_unique = 1;
@@ -211,16 +211,16 @@ sub prod_Xls_Edit_Ligne (;$$){
 		@TAB_HEAD=("START_HEAD_$format", @TAB_VALUE, "STOP_HEAD");
 	}
 
-	# TRAITEMENT DES VALEURS DU TABLEAU, UNE PAR UNE
-	#  CELLULE PAR CELLULE, Y COMPRIS LES VALEURS UNDEF
+	# PROCESS THE ARRAY VALUES ONE BY ONE
+	#  CELL BY CELL, INCLUDING UNDEF VALUES
 	while ($#TAB_VALUE > -1) {
 		my $valeur=shift(@TAB_VALUE);
-		if ($format_unique) {			# l'ensemble de la ligne est formattée avec le format transmis en paramètre
-		} elsif ($TAB_COL_SIZE[$col][0]) {	# format pré défini
+		if ($format_unique) {			# the whole row is formatted with the format passed as a parameter
+		} elsif ($TAB_COL_SIZE[$col][0]) {	# predefined format
 			$format=$TAB_COL_SIZE[$col][0];
 
 		} else {
-			$format = "AC";			# format par défaut
+			$format = "AC";			# default format
 		}
 
 		if ($valeur =~/NEW_PAGE/) {
@@ -239,13 +239,13 @@ sub prod_Xls_Edit_Ligne (;$$){
 			} else {
 				$format_unique=0;
         		}
-			# OUVERTURE D'UN NOUVEAU FICHIER EXCEL
+			# OPEN A NEW EXCEL FILE
 			if ($XLSROW != 0) {
 				&prod_Xls_New();
 			}
 		} elsif (ref $format eq 'HASH') {
-			# enrichissement du format de mise en forme de la cellule
-			# attention les valeurs modifiées ne sont pas sauvegardées
+			# enrich the cell formatting format
+			# note: modified values are not saved
 			my $xlsfmt = ${$LOCAL_REF_WORKBOOK}->add_format();
 			if ($TAB_COL_SIZE[$col][0]) {
 				$xlsfmt->copy($XLS_FORMAT{$TAB_COL_SIZE[$col][0]});
@@ -258,7 +258,7 @@ sub prod_Xls_Edit_Ligne (;$$){
 			$worksheet->write_number($XLSROW, $col, $valeur, $XLS_FORMAT{$format});
 			$col++;
 		} else {
-			$valeur=~s/\ +/ /g;	# on ne substitue que les blancs par les caractères tq cr lf
+			$valeur=~s/\ +/ /g;	# only spaces are replaced by characters such as cr lf
 			$worksheet->write_string($XLSROW, $col, $valeur, $XLS_FORMAT{$format});
 			$col++;
 		}
@@ -282,14 +282,14 @@ sub prod_Xls_Edit_Ligne (;$$){
 
 sub prod_Xls_Head(){
 	if (!(@TAB_HEAD)) {
-		@TAB_HEAD =("START_HEAD", "Suite...", "STOP_HEAD");
+		@TAB_HEAD =("START_HEAD", "Continued...", "STOP_HEAD");
 	}
 	&prod_Xls_Insert_Val (@TAB_HEAD);
 	1;
 }
 
 sub prod_Xls_Set_Format(){
-	#  DEFINITION DES FORMATS PAR DEFAUT
+	#  DEFINE THE DEFAULT FORMATS
 	$XLS_FORMAT{'T1'} =${$LOCAL_REF_WORKBOOK}->add_format();
 	$XLS_FORMAT{'T1'} ->set_bold(1);
 	$XLS_FORMAT{'T1'} ->set_align('center');
@@ -334,44 +334,44 @@ sub prod_Xls_Set_Format(){
 	$XLS_FORMAT{'AL'} ->set_align('left');
 	$XLS_FORMAT{'AL'} ->set_border(1);
 	$XLS_FORMAT{'AL'} ->set_size($FNTSZ3);
-	$XLS_FORMAT{'AL'} ->set_num_format('@'); # POUR EMPECHER EXCEL DE RECONVERTIR LES VALEURS NUMÉRIQUES EN NUMÉRIQUES
+	$XLS_FORMAT{'AL'} ->set_num_format('@'); # TO PREVENT EXCEL FROM CONVERTING NUMERIC VALUES BACK TO NUMBERS
 	$XLS_FORMAT{'AL'}->set_text_wrap();
 
 	$XLS_FORMAT{'AR'} =${$LOCAL_REF_WORKBOOK}->add_format();
 	$XLS_FORMAT{'AR'} ->set_align('right');
 	$XLS_FORMAT{'AR'} ->set_border(1);
 	$XLS_FORMAT{'AR'} ->set_size($FNTSZ3);
-	$XLS_FORMAT{'AR'} ->set_num_format('@'); # POUR EMPECHER EXCEL DE RECONVERTIR LES VALEURS NUMÉRIQUES EN NUMÉRIQUES
+	$XLS_FORMAT{'AR'} ->set_num_format('@'); # TO PREVENT EXCEL FROM CONVERTING NUMERIC VALUES BACK TO NUMBERS
 	$XLS_FORMAT{'AR'}->set_text_wrap();
 
 	$XLS_FORMAT{'AC'} =${$LOCAL_REF_WORKBOOK}->add_format();
 	$XLS_FORMAT{'AC'} ->set_align('center');
 	$XLS_FORMAT{'AC'} ->set_border(1);
 	$XLS_FORMAT{'AC'} ->set_size($FNTSZ3);
-	$XLS_FORMAT{'AC'} ->set_num_format('@'); # POUR EMPECHER EXCEL DE RECONVERTIR LES VALEURS NUMÉRIQUES EN NUMÉRIQUES
+	$XLS_FORMAT{'AC'} ->set_num_format('@'); # TO PREVENT EXCEL FROM CONVERTING NUMERIC VALUES BACK TO NUMBERS
 
 	$XLS_FORMAT{'Ac'} =${$LOCAL_REF_WORKBOOK}->add_format();
 	$XLS_FORMAT{'Ac'} ->set_align('center');
 	$XLS_FORMAT{'Ac'} ->set_border(1);
 	$XLS_FORMAT{'Ac'} ->set_size($FNTSZ3);
-	$XLS_FORMAT{'Ac'} ->set_num_format('@'); # POUR EMPECHER EXCEL DE RECONVERTIR LES VALEURS NUMÉRIQUES EN NUMÉRIQUES
+	$XLS_FORMAT{'Ac'} ->set_num_format('@'); # TO PREVENT EXCEL FROM CONVERTING NUMERIC VALUES BACK TO NUMBERS
 	$XLS_FORMAT{'Ac'}->set_text_wrap();
 
 	$XLS_FORMAT{'NR'} =${$LOCAL_REF_WORKBOOK}->add_format();
 	$XLS_FORMAT{'NR'} ->set_size($FNTSZ3);
-	$XLS_FORMAT{'NR'} ->set_num_format('# ### ##0.00'); # UN MONTANT DOIT ÊTRE PASSÉ AU FORMAT US
+	$XLS_FORMAT{'NR'} ->set_num_format('# ### ##0.00'); # A MONETARY AMOUNT MUST BE PASSED IN US FORMAT
 	$XLS_FORMAT{'NR'} ->set_align('right');
 	$XLS_FORMAT{'NR'} ->set_border(1);
 
 	$XLS_FORMAT{'NC'} =${$LOCAL_REF_WORKBOOK}->add_format();
 	$XLS_FORMAT{'NC'} ->set_size($FNTSZ3);
-	$XLS_FORMAT{'NC'} ->set_num_format('# ### ##0.00'); # UN MONTANT DOIT ÊTRE PASSÉ AU FORMAT US
+	$XLS_FORMAT{'NC'} ->set_num_format('# ### ##0.00'); # A MONETARY AMOUNT MUST BE PASSED IN US FORMAT
 	$XLS_FORMAT{'NC'} ->set_align('center');
 	$XLS_FORMAT{'NC'} ->set_border(1);
 
 	$XLS_FORMAT{'NL'} =${$LOCAL_REF_WORKBOOK}->add_format();
 	$XLS_FORMAT{'NL'} ->set_size($FNTSZ3);
-	$XLS_FORMAT{'NL'} ->set_num_format('# ### ##0.00'); # UN MONTANT DOIT ÊTRE PASSÉ AU FORMAT US
+	$XLS_FORMAT{'NL'} ->set_num_format('# ### ##0.00'); # A MONETARY AMOUNT MUST BE PASSED IN US FORMAT
 	$XLS_FORMAT{'NL'} ->set_align('left');
 	$XLS_FORMAT{'NL'} ->set_border(1);
 
@@ -384,11 +384,11 @@ sub prod_Xls_Liste_Output (){
 
 sub  prod_Xls_Close(;$$) {
 	my $fi =shift;
-	# EDITION EVENTUELLE DE LA DERNIERE LIGNE ET PURGE DU TAMPON
+	# POSSIBLE OUTPUT OF THE LAST ROW AND FLUSH OF THE BUFFER
 	prod_Xls_Edit_Ligne();
 
 	my $cwd = getcwd();
-	# ON INDIQUE LA LISTE DES FICHIERS EXCEL PRODUITS
+	# PRINT THE LIST OF EXCEL FILES PRODUCED
 	foreach (prod_Xls_Liste_Output()) {
 		print "$cwd/$_\n";
 	}
@@ -396,7 +396,7 @@ sub  prod_Xls_Close(;$$) {
 	${$LOCAL_REF_WORKBOOK}->close() or die "ERR. closing file, return code $!\nDIE";
 
 	if ($fi) {
-		close (IN)  or die "ERR. fermeture $fi, return code $!\nDIE";
+		close (IN)  or die "ERR. closing $fi, return code $!\nDIE";
 	}
 
 	undef $LOCAL_REF_WORKBOOK;

@@ -8,7 +8,7 @@ BEGIN {
 		use Term::ReadKey;
 		use oEdtk::trackEdtk	qw(env_Var_Completion);
 
-		$VERSION		= 0.0032;
+		$VERSION		= 2.1109;
 		@ISA			= qw(Exporter);
 		@EXPORT		= qw(
 						clear_Screen	start_Screen	stop_Screen
@@ -20,12 +20,12 @@ BEGIN {
 
 
 sub clear_Screen(){
-	my $command="clear"; # par défaut
+	my $command="clear"; # default
 	if ($^O eq "MSWin32"){
 		$command="cls";
 	} else {
-		# tester...
-		warn "INFO OS $^O, tuiEdtk::clear_Screen en attente retour d'expérience\n";
+		# TODO test...
+		warn "INFO OS $^O, tuiEdtk::clear_Screen awaiting feedback\n";
 	}
 
 	system($command) == 0
@@ -78,7 +78,7 @@ exit 1;
 }
 
 sub show_INIEDTK() {
-	# en fonction de HOSTNAME déterminer l'éditeur par défaut
+	# determine the default editor based on HOSTNAME
 	my $wait =10*$ENV{EDTK_WAITRUN};
 	my $iniedtk=$ENV{EDTK_INIEDTK};
 	env_Var_Completion($iniedtk);
@@ -104,11 +104,11 @@ sub start_Screen(){
 
 	print STDOUT << "EOF";
 
-	Lanceur application $ENV{EDTK_PRGNAME}
+	Application launcher $ENV{EDTK_PRGNAME}
 	______________________________________
 	
-Lancement auto dans $ENV{EDTK_WAITRUN}s, ou taper <enter>.
-Parametres :
+Auto start in $ENV{EDTK_WAITRUN}s, or press <enter>.
+Parameters :
  application  $ENV{EDTK_PRGNAME}
  data         $ENV{EDTK_FDATAIN}.$ENV{EDTK_EXT_DATA}
  output       $ENV{EDTK_FDATAOUT}
@@ -118,7 +118,7 @@ Options :
 	<1> Run: $ENV{EDTK_PRGNAME}.$ENV{EDTK_EXT_PERL} 
 	<A> Administration
 
-Pour modifier une option, taper sa valeur ou <enter> par defaut.
+To change an option, type its value or <enter> for the default.
 EOF
 	my $key =&readKey_Wait();
 	$key ||="";
@@ -292,7 +292,7 @@ sub VCS_commit(;$) {
 	my $comment=shift;
 	$comment||="";
 	
-	# potentiellement problème de localisation de la branch, si execution en dehors de la branche
+	# potential branch location problem if run outside the branch
 	my $base	=$ENV{EDTK_DIR_BASE};
 	env_Var_Completion($base);
 	chdir $base;
@@ -316,7 +316,7 @@ sub VCS_commit(;$) {
 }
 
 sub VCS_missing() {
-	# potentiellement problème de localisation de la branch, si execution en dehors de la branche
+	# potential branch location problem if run outside the branch
 	my $other_branch	=$ENV{EDTK_VCS_LOCATION};
 	env_Var_Completion($other_branch);
 	my $base			=$ENV{EDTK_DIR_BASE};
@@ -343,7 +343,7 @@ sub VCS_missing() {
 sub VCS_add() {
 	my $wait =10*$ENV{EDTK_WAITRUN};
 
-	# potentiellement problème de localisation de la branch, si execution en dehors de la branche
+	# potential branch location problem if run outside the branch
 	my $base	=$ENV{EDTK_DIR_BASE};
 	env_Var_Completion($base);
 	chdir $base;
@@ -388,7 +388,7 @@ sub VCS_add() {
 sub VCS_update() {
 	#&VCS_merge();
 
-	# potentiellement problème de localisation de la branch, si execution en dehors de la branche
+	# potential branch location problem if run outside the branch
 	my $base	=$ENV{EDTK_DIR_BASE};
 	env_Var_Completion($base);
 	chdir $base;
@@ -439,7 +439,7 @@ sub VCS_log() {
 	my $loc	=$ENV{EDTK_DIR_BASE};
 	env_Var_Completion($loc);
 	
-	# à faire : sélectionner qlog ou glog en fonction de l'environnement
+	# TODO: select qlog or glog depending on the environment
 	my @args	=("bzr", "qlog", $loc);
 
 	eval {
@@ -543,19 +543,19 @@ exit 1;
 END {}
 1;
 
-# CETTE MÉTHODE DE COMMENTAIRE EST INTERESSANTE MAIS POLLUE POD
+# THIS COMMENTING METHOD IS INTERESTING BUT POLLUTES POD
 
 # =begin comment
 
 # http://perl.enstimac.fr/DocFr/perldiag.html
 
 # http://perl.enstimac.fr/DocFr/perlfaq8.html
-# Comment lire simplement une touche sans attendre un appui sur ``entrée'' ?
+# How to read a key without waiting for a press on ``enter'' ?
 
 # 	use HotKey;
 # 	$key = readkey();
 
-# Utilisez la directive diagnostics qui transforme les messages d'erreurs normaux de perl en un discours un peu plus long sur le sujet.
+# Use the diagnostics pragma which turns normal Perl error messages into a longer discussion of the subject.
 # 	use diagnostics;
 
 #   BEGIN {
@@ -565,14 +565,14 @@ END {}
 
 
 
-# Comment gérer mon propre répertoire de modules/bibliothèques ?
-# Lorsque vous fabriquez les modules, utilisez les options PREFIX et LIB à la phase de génération de Makefiles :
+# How to manage my own modules/libraries directory?
+# When building modules, use the PREFIX and LIB options at the Makefile generation step:
 #     perl Makefile.PL PREFIX=/mydir/perl LIB=/mydir/perl/lib
 
-# puis, ou bien positionnez la variable d'environnement PERL5LIB avant de lancer les scripts utilisant ces modules/bibliothèques (voir la page de manuel perlrun), ou bien utilisez :
+# then either set the PERL5LIB environment variable before running the scripts that use these modules/libraries (see the perlrun man page), or use:
 #    use lib '/mydir/perl/lib';
 #
-# si on ne connait pas le répertoire à l'avance...
+# if the directory is not known in advance...
 #    use FindBin qw($Bin);
 #    use lib "$Bin/myPm";
 

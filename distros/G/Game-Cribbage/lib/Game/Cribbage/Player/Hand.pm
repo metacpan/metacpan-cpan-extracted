@@ -122,7 +122,7 @@ sub card_exists {
 			return 1;
 		}
 	}
-	
+
 	if ($self->crib) {
 		for (@{ $self->crib }) {
 			my $found = $_->match($card);
@@ -131,7 +131,7 @@ sub card_exists {
 			}
 		}
 	}
-	
+
 	return 0;
 };
 
@@ -242,7 +242,7 @@ Game::Cribbage::Player::Hand - a player's hand of cards within a hands cycle
 
 =head1 VERSION
 
-Version 0.15
+Version 0.17
 
 =cut
 

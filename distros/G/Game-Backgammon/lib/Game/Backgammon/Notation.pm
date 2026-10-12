@@ -7,7 +7,7 @@ use Game::Backgammon::Move;
 use Game::Backgammon::Turn;
 use Exporter 'import';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 our @EXPORT_OK = qw(parse_turn print_turn);
 
 sub _place {

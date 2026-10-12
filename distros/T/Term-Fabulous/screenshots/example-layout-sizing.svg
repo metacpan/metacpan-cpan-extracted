@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="744" height="399" viewBox="0 0 744 399" role="img" aria-label="perl examples/layout-sizing.pl">
+<title>perl examples/layout-sizing.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="712" height="364" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="712" height="364" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="712" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="372" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/layout-sizing.pl</text>
+<rect x="16.5" y="16.5" width="711" height="363" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="237" y="78" width="198" height="18" fill="#61afef"/>
+<rect x="435" y="78" width="261" height="18" fill="#282e40"/>
+<rect x="237" y="114" width="270" height="18" fill="#61afef"/>
+<rect x="507" y="114" width="189" height="18" fill="#282e40"/>
+<rect x="237" y="150" width="180" height="18" fill="#98c379"/>
+<rect x="417" y="150" width="279" height="18" fill="#282e40"/>
+<rect x="237" y="186" width="225" height="18" fill="#98c379"/>
+<rect x="462" y="186" width="234" height="18" fill="#282e40"/>
+<rect x="237" y="222" width="459" height="18" fill="#e5c07b"/>
+<rect x="237" y="258" width="270" height="18" fill="#e5c07b"/>
+<rect x="507" y="258" width="189" height="18" fill="#282e40"/>
+<rect x="237" y="294" width="180" height="18" fill="#98c379"/>
+<rect x="417" y="294" width="279" height="18" fill="#e5c07b"/>
+<rect x="237" y="330" width="225" height="18" fill="#e5c07b"/>
+<rect x="462" y="330" width="234" height="18" fill="#61afef"/>
+</g>
+<g class="terminal">
+<text x="48" y="92" textLength="108" fill="#dcdcdc">sizing_fit()</text>
+<text x="246" y="92" textLength="180" fill="#141923">as wide as this text</text>
+<text x="48" y="128" textLength="126" fill="#dcdcdc">sizing_fit(30)</text>
+<text x="246" y="128" textLength="99" fill="#141923">at least 30</text>
+<text x="48" y="164" textLength="144" fill="#dcdcdc">sizing_fixed(20)</text>
+<text x="246" y="164" textLength="90" fill="#141923">20 columns</text>
+<text x="48" y="200" textLength="171" fill="#dcdcdc">sizing_percent(0.5)</text>
+<text x="246" y="200" textLength="153" fill="#141923">half of the track</text>
+<text x="48" y="236" textLength="117" fill="#dcdcdc">sizing_grow()</text>
+<text x="246" y="236" textLength="135" fill="#141923">the whole track</text>
+<text x="48" y="272" textLength="162" fill="#dcdcdc">sizing_grow(0, 30)</text>
+<text x="246" y="272" textLength="126" fill="#141923">grows up to 30</text>
+<text x="48" y="308" textLength="162" fill="#dcdcdc">fixed(20) + grow()</text>
+<text x="246" y="308" textLength="252" fill="#141923">20 columns          the rest</text>
+<text x="48" y="344" textLength="135" fill="#dcdcdc">grow() + grow()</text>
+<text x="246" y="344" textLength="315" fill="#141923">one half                 other half</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

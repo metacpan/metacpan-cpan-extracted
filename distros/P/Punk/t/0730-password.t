@@ -80,9 +80,35 @@ ok(Punk::Auth::Password::needs_rehash('garbage'), 'unparseable: rehash');
 
 # ---- explicit iterations argument ---------------------------------------------
 
-my $cheap = Punk::Auth::Password::hash('pw', 500);
-like($cheap, qr/^pbkdf2-sha256\$500\$/, 'an explicit cost beats the package var');
+my $cheap = Punk::Auth::Password::hash('pw', 1_500);
+like($cheap, qr/^pbkdf2-sha256\$1500\$/, 'an explicit cost beats the package var');
 ok(Punk::Auth::Password::verify('pw', $cheap), 'and verifies');
+
+# ---- the stored string does not choose its own cost ---------------------------
+
+{
+    for my $n (999, 10_000_001) {
+        my $err = '';
+        eval { Punk::Auth::Password::hash('pw', $n) } or $err = $@;
+        like($err, qr/iterations must be between 1000 and 10000000/,
+            "hash refuses $n iterations");
+    }
+    my ($salt, $key) = $cheap =~ /\$1500\$([^\$]+)\$(.+)\z/;
+    ok(!Punk::Auth::Password::verify('pw', "pbkdf2-sha256\$999\$$salt\$$key"),
+        'a stored cost below the floor never verifies');
+    ok(!Punk::Auth::Password::verify('pw',
+            "pbkdf2-sha256\$4000000000\$$salt\$$key"),
+        'nor one above the ceiling, and it returns at once');
+    ok(Punk::Auth::Password::needs_rehash("pbkdf2-sha256\$999\$$salt\$$key"),
+        '...and both ask for a rehash');
+
+    # a one-byte key that IS the first byte of the right one
+    require MIME::Base64;
+    my $short = MIME::Base64::encode_base64(
+        substr(MIME::Base64::decode_base64($key), 0, 1), '');
+    ok(!Punk::Auth::Password::verify('pw', "pbkdf2-sha256\$1500\$$salt\$$short"),
+        'a truncated key never verifies, though its bytes match');
+}
 {
     my $err = '';
     eval { Punk::Auth::Password::hash('pw', -1) } or $err = $@;

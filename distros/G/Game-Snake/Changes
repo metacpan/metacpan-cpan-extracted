@@ -1,7 +1,14 @@
 Revision history for Game-Snake
 
-0.01    Date/time
-        First version, released on an unsuspecting world.
+0.12    2026-10-11
+        - Rewritten as an engine: Game::Snake plays the game and draws nothing.
+        - Game::Snake::Terminal and bin/snake: the game in a terminal.
+        - Game::Snake::Bot: two levels, greedy and flood-fill; snake --watch.
+        - Game::Snake::Raylib: the window of 0.11, now optional (perl 5.38+).
+        - Raylib::FFI and Term::ReadKey are recommended, not required.
 
-0.11	2026-07-18
-	Remove PAX headers
+0.11    2026-07-18
+        - Remove PAX headers
+
+0.01    2024-12-29
+        - First version.

@@ -234,6 +234,43 @@ is($body, 'chunk1;chunk2;chunk3;',
 is(body_h1('/perl-stream'), 'perl1;perl2',
    'HTTP/1.1: the Perl door writes the same body through the same registry');
 
+# Without Connection: close the same body is chunked and the connection is
+# kept: a second request on the socket is answered. Decoded by hand so the
+# framing itself is what is asserted.
+{
+    my $s = connect_h1();
+    syswrite $s, "GET /c-stream HTTP/1.1\r\nHost: 127.0.0.1\r\n\r\n"
+               . "GET /perl-stream HTTP/1.1\r\nHost: 127.0.0.1\r\n\r\n";
+    my $resp = '';
+    eval {
+        local $SIG{ALRM} = sub { die "timeout\n" };
+        alarm 5;
+        until ($resp =~ /\r\n0\r\n\r\n.*\r\n0\r\n\r\n/s) {
+            my $n = sysread $s, my $buf, 65536;
+            last if !defined $n || $n == 0;
+            $resp .= $buf;
+        }
+        alarm 0;
+    };
+    close $s;
+    my @parts = split /\r\n\r\n/, $resp;
+    like($parts[0] || '', qr{^Transfer-Encoding: chunked}mi,
+         'HTTP/1.1 keep-alive: the C seam\'s body is chunked');
+    like($parts[0] || '', qr{^Connection: keep-alive}mi,
+         '...and the connection is kept');
+    my $decoded = '';
+    my $raw = $parts[1] || '';
+    while ($raw =~ s/\A([0-9a-f]+)\r\n//i) {
+        my $len = hex $1;
+        last if $len == 0;
+        $decoded .= substr($raw, 0, $len);
+        substr($raw, 0, $len + 2) = '';
+    }
+    is($decoded, 'chunk1;chunk2;chunk3;', '...and decodes to the same body');
+    like($resp, qr{\r\n0\r\n\r\nHTTP/1\.1 200 }s,
+         '...and the pipelined second request was answered on the same socket');
+}
+
 like(body_h1('/perl-stream-sync'), qr/has not deferred/,
      'a synchronous handler is refused rather than corrupting its response');
 

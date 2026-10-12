@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="564" height="309" viewBox="0 0 564 309" role="img" aria-label="perl examples/cookbook/table-report.pl">
+<title>perl examples/cookbook/table-report.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="532" height="274" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="532" height="274" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="532" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="282" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/cookbook/table-report.pl</text>
+<rect x="16.5" y="16.5" width="531" height="273" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="30" y="96" width="441" height="36" fill="#242832"/>
+<rect x="30" y="132" width="441" height="18" fill="#16191f"/>
+<rect x="30" y="150" width="441" height="18" fill="#1c2029"/>
+<rect x="30" y="168" width="441" height="18" fill="#16191f"/>
+<rect x="30" y="186" width="441" height="18" fill="#1c2029"/>
+<rect x="30" y="204" width="441" height="18" fill="#16191f"/>
+<rect x="30" y="222" width="441" height="54" fill="#1c2029"/>
+<rect x="30" y="96" width="441" height="9" fill="#586070"/>
+<rect x="30" y="105" width="5" height="162" fill="#586070"/>
+<rect x="467" y="105" width="4" height="162" fill="#586070"/>
+<rect x="39" y="229" width="423" height="1" fill="#586070"/>
+<rect x="39" y="231" width="423" height="1" fill="#586070"/>
+<rect x="30" y="267" width="441" height="9" fill="#586070"/>
+</g>
+<g class="terminal">
+<text x="30" y="74" textLength="234" fill="#e6e6e6">Sales, second quarter 2026</text>
+<text x="48" y="128" textLength="306" class="b" fill="#e5c07b">Product          Units     Revenue</text>
+<text x="367.5" y="128" text-anchor="middle" class="b" fill="#e5c07b">▾</text>
+<text x="372" y="128" textLength="81" class="b" fill="#e5c07b">2   Share</text>
+<text x="48" y="146" textLength="405" fill="#dcdfe4">Office chair        87  26,013.00 EUR   34.0%</text>
+<text x="48" y="164" textLength="405" fill="#dcdfe4">Standing desk       34  20,366.00 EUR   26.6%</text>
+<text x="48" y="182" textLength="405" fill="#dcdfe4">Desk lamp          412  16,068.00 EUR   21.0%</text>
+<text x="48" y="200" textLength="405" fill="#dcdfe4">Monitor arm        156   9,204.00 EUR   12.0%</text>
+<text x="48" y="218" textLength="405" fill="#dcdfe4">Cable organizer  1,208   4,820.00 EUR    6.3%</text>
+<text x="48" y="254" textLength="405" class="b" fill="#dcdfe4">Total            1,897  76,471.00 EUR  100.0%</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

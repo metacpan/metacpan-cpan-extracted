@@ -24,7 +24,7 @@ WriteMakefile(
 		'CHI'			=> 0,
 		'CGI::Info'	=> 0,
 		'CGI::Lingua'		=> '0.85',
-		'Database::Abstraction'	=> '0.44',
+		'Database::Abstraction'	=> '0.48',	# 0.48 added limit/offset support in selectall_arrayref
 		'Database::Join'	=> '0.004.0',
 		'DBI'		=> 0,
 		'Net::SFTP::Foreign' => 0,
@@ -37,8 +37,10 @@ WriteMakefile(
 		'Mojo::JSON' => 0,
 		'HTML::D3' => 0.18,
 		'HTML::TableExtract'	=> 0,
-		'LWP::UserAgent'		=> 0,
-		'LWP::UserAgent::Cached'	=> 0,
+		'LWP::UserAgent'		=> 0,		# Needed for Test::Mojo HTTP testing; LWP::UserAgent::Cached is used by D::A url fetch path
+		'LWP::UserAgent::Cached'	=> 0,		# Used by Database::Abstraction for URL-backed tables (import_url)
+		'Scalar::Util'			=> 0,		# Used in DataSource.pm (blessed, looks_like_number)
+		'DB_File'			=> 0,		# Used in DataSource.pm for Berkeley DB magic-byte detection
 		'Mojolicious'	=> '9.49',
 		'Mojolicious::Plugin::TemplateToolkit' => 0,
 		'Params::Get'	=> 0,

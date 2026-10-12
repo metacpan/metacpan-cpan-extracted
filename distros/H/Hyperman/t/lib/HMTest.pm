@@ -9,7 +9,7 @@ use IO::Socket::INET ();
 use POSIX ();
 
 our @ISA       = 'Exporter';
-our @EXPORT_OK = qw(free_ports quiet_child server_guard server_status
+our @EXPORT_OK = qw(free_ports free_ports6 quiet_child server_guard server_status
                     server_reap slurp);
 
 # SIGPIPE, for the test process itself.
@@ -51,6 +51,28 @@ sub free_ports {
             Proto     => 'tcp',
             Listen    => 5,
             ReuseAddr => 1,
+        ) or last;
+        push @sock, $s;
+        push @port, $s->sockport;
+    }
+    close $_ for @sock;
+    return @port == $n ? @port : ();
+}
+
+# The same on the IPv6 loopback, through IO::Socket::IP (core since 5.20).
+# An empty list means the box has no usable ::1, and the caller skips.
+sub free_ports6 {
+    my $n = shift || 1;
+    return () unless eval { require IO::Socket::IP; 1 };
+    my (@sock, @port);
+    for (1 .. $n) {
+        my $s = IO::Socket::IP->new(
+            LocalHost => '::1',
+            LocalPort => 0,
+            Proto     => 'tcp',
+            Listen    => 5,
+            ReuseAddr => 1,
+            V6Only    => 1,
         ) or last;
         push @sock, $s;
         push @port, $s->sockport;

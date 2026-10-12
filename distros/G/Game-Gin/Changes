@@ -1,5 +1,9 @@
 Revision history for Game-Gin
 
+0.03    2026-10-11
+        - Add Game::Gin::Terminal->run(@argv), which returns the exit status
+        - A bad option or a refused value is exit status 2, not 1
+
 0.02    2026-10-08
         - Point at the card you mean: the arrow keys walk your hand and the
           line under the fan says what throwing it would leave you.

@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="636" height="255" viewBox="0 0 636 255" role="img" aria-label="perl examples/widgets/text-field.pl">
+<title>perl examples/widgets/text-field.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="604" height="220" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="604" height="220" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="604" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="318" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/widgets/text-field.pl</text>
+<rect x="16.5" y="16.5" width="603" height="219" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="165" y="78" width="36" height="18" fill="#343a48"/>
+<rect x="201" y="78" width="9" height="18" fill="#dcdfe4"/>
+<rect x="210" y="78" width="63" height="18" fill="#264f78"/>
+<rect x="273" y="78" width="180" height="18" fill="#343a48"/>
+<rect x="165" y="114" width="288" height="18" fill="#242830"/>
+<rect x="165" y="150" width="288" height="18" fill="#242830"/>
+<rect x="165" y="186" width="288" height="18" fill="#242830"/>
+</g>
+<g class="terminal">
+<text x="48" y="92" textLength="63" fill="#96a0b4">focused</text>
+<text x="165" y="92" textLength="27" fill="#dcdfe4">Ada</text>
+<text x="201" y="92" textLength="9" fill="#264f78">L</text>
+<text x="210" y="92" textLength="63" fill="#dcdfe4">ovelace</text>
+<text x="48" y="128" textLength="99" fill="#96a0b4">placeholder</text>
+<text x="165" y="128" textLength="144" fill="#787e8a">name@example.com</text>
+<text x="48" y="164" textLength="54" fill="#96a0b4">masked</text>
+<text x="165" y="164" textLength="117" fill="#dcdfe4">*************</text>
+<text x="48" y="200" textLength="72" fill="#96a0b4">disabled</text>
+<text x="165" y="200" textLength="108" fill="#6c7078">Not editable</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

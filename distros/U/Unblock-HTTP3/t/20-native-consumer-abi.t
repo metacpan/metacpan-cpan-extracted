@@ -6,6 +6,7 @@ use Test2::V0;
 
 use Uniform::HTTP::Request;
 use Uniform::HTTP::Response;
+use Unblock::HTTP3::Client;
 use Unblock::HTTP3::Connection;
 use Unblock::HTTP3::NativeABI;
 use Unblock::HTTP3::Transaction;
@@ -47,7 +48,18 @@ like(
     'native ABI exposes direct canonical request access',
 );
 
-my $fake_connection = bless {}, 'Unblock::HTTP3::Connection';
+like(
+    Unblock::HTTP3::NativeABI::c_header(),
+    qr/\(\*respond\)\s*\(/,
+    'native ABI uses the common respond vocabulary',
+);
+unlike(
+    Unblock::HTTP3::NativeABI::c_header(),
+    qr/\(\*send_response\)\s*\(/,
+    'native ABI does not retain the old send_response name',
+);
+
+my $fake_connection = bless {}, 'Unblock::HTTP3::Client';
 
 ok(
     Unblock::HTTP3::_Native::_consumer_context_probe(
@@ -113,7 +125,7 @@ my $queue_connection = bless {
     error               => 'native ABI test failure',
     ready_transactions  => [ $transaction ],
     ready_informational => [ $transaction ],
-}, 'Unblock::HTTP3::Connection';
+}, 'Unblock::HTTP3::Client';
 
 my $queue_probe =
     Unblock::HTTP3::_Native::_consumer_queue_probe(

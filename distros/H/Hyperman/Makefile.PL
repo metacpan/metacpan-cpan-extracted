@@ -689,9 +689,7 @@ my %WriteMakefileArgs = (
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
         'ExtUtils::Depends'   => '0.404',
-        # EU::Depends reads the provider's Install/Files.pm at configure time,
-        # and Shared::Arena's names Frozen as its own dependency.
-        'Shared::Arena'       => '0.12',
+        'Shared::Arena'       => '0.16',
         'Frozen'              => '0.07',
     },
     TEST_REQUIRES => {

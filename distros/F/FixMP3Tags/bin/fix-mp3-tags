@@ -1,0 +1,117 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use utf8;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use FixMP3Tags::Processor;
+
+FixMP3Tags::Processor->run();
+
+__END__
+
+=head1 NAME
+
+fix-mp3-tags - Set MP3 ID3v2 tags from directory and filename information
+
+=head1 SYNOPSIS
+
+    fix-mp3-tags [OPTIONS]
+    fix-mp3-tags --dry-run --directory /path/to/music
+    fix-mp3-tags --file "Artist/2025.11'Album/01.Track_Name.mp3"
+
+=head1 DESCRIPTION
+
+Scans a music directory recursively, or processes one MP3 file, and derives the
+artist and album from parent directory names and the track number and title from
+filenames in the C<NN.SongName.mp3> form. If a date can be extracted from the
+album directory name, the year is also written to the tag.
+
+The program replaces the existing ID3v2 tag with a new tag containing the values
+it derives. Other existing ID3v2 frames may be lost. Back up your files and use
+C<--dry-run> to review the detected values before writing tags.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-d>, B<--directory> I<DIR>
+
+Recursively process MP3 files below I<DIR>. Defaults to the current directory.
+
+=item B<-f>, B<--file> I<FILE>
+
+Process one MP3 file. Its parent directories and filename must follow the
+expected artist/album/track structure.
+
+=item B<-q>, B<--quiet>
+
+Suppress routine progress output. Errors remain visible.
+
+=item B<-p>, B<--pattern> I<REGEX>
+
+Use a custom regular expression to parse the album directory name. Capture
+group 1 should be the year, group 2 the month, and group 3 the album name.
+Quote the expression so your shell passes it as one argument. This feature is
+experimental.
+
+=item B<-n>, B<--dry-run>
+
+Show the values that would be written, without changing any tags.
+
+=item B<-v>, B<--version>
+
+Print the program version and exit.
+
+=item B<-h>, B<--help>
+
+Print the command-line help and exit.
+
+=back
+
+=head1 EXAMPLES
+
+Preview a directory before making changes:
+
+    fix-mp3-tags --dry-run --directory /path/to/music
+
+Process one track:
+
+    fix-mp3-tags --file "Artist/2025.11'Album/01.Track_Name.mp3"
+
+Use a custom pattern for album directories named like C<2025-11 Album Name>:
+
+    fix-mp3-tags --pattern '^([0-9]{4})-([0-9]{2})\s+(.+)$'
+
+=head1 AUTHOR
+
+vr-ski
+
+=head1 LICENSE
+
+Copyright (c) 2026 vr-ski.
+
+BSD 2-Clause License
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+=cut

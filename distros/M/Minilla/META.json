@@ -4,7 +4,7 @@
       "Tokuhiro Matsuno < tokuhirom@gmail.com >"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.2.0",
+   "generated_by" : "Minilla/v3.3.0",
    "license" : [
       "perl_5"
    ],
@@ -106,7 +106,7 @@
    "provides" : {
       "Minilla" : {
          "file" : "lib/Minilla.pm",
-         "version" : "v3.3.1"
+         "version" : "v3.3.2"
       },
       "Minilla::CLI" : {
          "file" : "lib/Minilla/CLI.pm"
@@ -274,7 +274,7 @@
          "web" : "https://github.com/tokuhirom/Minilla"
       }
    },
-   "version" : "v3.3.1",
+   "version" : "v3.3.2",
    "x_contributors" : [
       "Alex Kapranoff <alex@kapranoff.ru>",
       "Alex Kapranoff <kappa@yandex.ru>",
@@ -304,6 +304,7 @@
       "Klaus Eichner <klaus03@gmail.com>",
       "Manni Heumann <github@lxxi.org>",
       "Masahiro Nagano <kazeburo@gmail.com>",
+      "Masayuki Matsuki <y.songmu@gmail.com>",
       "Nathaniel Nutter <iam@nnutter.com>",
       "Oleg Gashev <oleg@gashev.net>",
       "Peter Oliver <git@mavit.org.uk>",
@@ -313,7 +314,6 @@
       "Shohei YOSHIDA <syohex@gmail.com>",
       "Shoichi Kaji <skaji@cpan.org>",
       "Shoichi Kaji <skaji@outlook.com>",
-      "Songmu <y.songmu@gmail.com>",
       "TAGOMORI Satoshi <tagomoris@gmail.com>",
       "Takumi Akiyama <t.akiym@gmail.com>",
       "Tatsuhiko Miyagawa <miyagawa@bulknews.net>",

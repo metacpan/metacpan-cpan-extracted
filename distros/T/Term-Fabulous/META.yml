@@ -1,0 +1,576 @@
+---
+abstract: 'Full-screen terminal user interfaces with layouts, widgets, keyboard and mouse'
+author:
+  - 'davenonymous <perl@davenonymous.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test2::V0: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '7.12'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Term-Fabulous
+no_index:
+  directory:
+    - t
+    - inc
+    - examples
+    - tools
+    - screenshots
+provides:
+  Term::Fabulous:
+    file: lib/Term/Fabulous.pm
+    version: '0.02'
+  Term::Fabulous::Chart::Curve:
+    file: lib/Term/Fabulous/Chart/Curve.pm
+    version: '0.02'
+  Term::Fabulous::Chart::Easing:
+    file: lib/Term/Fabulous/Chart/Easing.pm
+    version: '0.02'
+  Term::Fabulous::Chart::Format:
+    file: lib/Term/Fabulous/Chart/Format.pm
+    version: '0.02'
+  Term::Fabulous::Chart::Marker:
+    file: lib/Term/Fabulous/Chart/Marker.pm
+    version: '0.02'
+  Term::Fabulous::Chart::Palette:
+    file: lib/Term/Fabulous/Chart/Palette.pm
+    version: '0.02'
+  Term::Fabulous::Chart::Radial:
+    file: lib/Term/Fabulous/Chart/Radial.pm
+    version: '0.02'
+  Term::Fabulous::Chart::Raster:
+    file: lib/Term/Fabulous/Chart/Raster.pm
+    version: '0.02'
+  Term::Fabulous::Chart::Scale:
+    file: lib/Term/Fabulous/Chart/Scale.pm
+    version: '0.02'
+  Term::Fabulous::Chart::Scale::Category:
+    file: lib/Term/Fabulous/Chart/Scale/Category.pm
+    version: '0.02'
+  Term::Fabulous::Chart::Scale::Linear:
+    file: lib/Term/Fabulous/Chart/Scale/Linear.pm
+    version: '0.02'
+  Term::Fabulous::Chart::Scale::Log:
+    file: lib/Term/Fabulous/Chart/Scale/Log.pm
+    version: '0.02'
+  Term::Fabulous::Chart::Scale::Time:
+    file: lib/Term/Fabulous/Chart/Scale/Time.pm
+    version: '0.02'
+  Term::Fabulous::Chart::Series:
+    file: lib/Term/Fabulous/Chart/Series.pm
+    version: '0.02'
+  Term::Fabulous::Chart::Surface:
+    file: lib/Term/Fabulous/Chart/Surface.pm
+    version: '0.02'
+  Term::Fabulous::Chart::Transform:
+    file: lib/Term/Fabulous/Chart/Transform.pm
+    version: '0.02'
+  Term::Fabulous::Check:
+    file: lib/Term/Fabulous/Check.pm
+    version: '0.02'
+  Term::Fabulous::Color:
+    file: lib/Term/Fabulous/Color.pm
+    version: '0.02'
+  Term::Fabulous::Command:
+    file: lib/Term/Fabulous/Command.pm
+    version: '0.02'
+  Term::Fabulous::Commands:
+    file: lib/Term/Fabulous/Commands.pm
+    version: '0.02'
+  Term::Fabulous::Editor:
+    file: lib/Term/Fabulous/Editor.pm
+    version: '0.02'
+  Term::Fabulous::Enum::BorderStyle:
+    file: lib/Term/Fabulous/Enum/BorderStyle.pm
+    version: '0.02'
+  Term::Fabulous::Enum::WebColor:
+    file: lib/Term/Fabulous/Enum/WebColor.pm
+    version: '0.02'
+  Term::Fabulous::Event::Activate:
+    file: lib/Term/Fabulous/Event/Activate.pm
+    version: '0.02'
+  Term::Fabulous::Event::Answer:
+    file: lib/Term/Fabulous/Event/Answer.pm
+    version: '0.02'
+  Term::Fabulous::Event::CanvasResize:
+    file: lib/Term/Fabulous/Event/CanvasResize.pm
+    version: '0.02'
+  Term::Fabulous::Event::Change:
+    file: lib/Term/Fabulous/Event/Change.pm
+    version: '0.02'
+  Term::Fabulous::Event::Choose:
+    file: lib/Term/Fabulous/Event/Choose.pm
+    version: '0.02'
+  Term::Fabulous::Event::Close:
+    file: lib/Term/Fabulous/Event/Close.pm
+    version: '0.02'
+  Term::Fabulous::Event::Collapse:
+    file: lib/Term/Fabulous/Event/Collapse.pm
+    version: '0.02'
+  Term::Fabulous::Event::ColumnsChange:
+    file: lib/Term/Fabulous/Event/ColumnsChange.pm
+    version: '0.02'
+  Term::Fabulous::Event::CursorMove:
+    file: lib/Term/Fabulous/Event/CursorMove.pm
+    version: '0.02'
+  Term::Fabulous::Event::Expand:
+    file: lib/Term/Fabulous/Event/Expand.pm
+    version: '0.02'
+  Term::Fabulous::Event::FilterChange:
+    file: lib/Term/Fabulous/Event/FilterChange.pm
+    version: '0.02'
+  Term::Fabulous::Event::KeyPress:
+    file: lib/Term/Fabulous/Event/KeyPress.pm
+    version: '0.02'
+  Term::Fabulous::Event::LinkActivate:
+    file: lib/Term/Fabulous/Event/LinkActivate.pm
+    version: '0.02'
+  Term::Fabulous::Event::Mouse:
+    file: lib/Term/Fabulous/Event/Mouse.pm
+    version: '0.02'
+  Term::Fabulous::Event::MouseMove:
+    file: lib/Term/Fabulous/Event/MouseMove.pm
+    version: '0.02'
+  Term::Fabulous::Event::PageChange:
+    file: lib/Term/Fabulous/Event/PageChange.pm
+    version: '0.02'
+  Term::Fabulous::Event::Resize:
+    file: lib/Term/Fabulous/Event/Resize.pm
+    version: '0.02'
+  Term::Fabulous::Event::RowActivate:
+    file: lib/Term/Fabulous/Event/RowActivate.pm
+    version: '0.02'
+  Term::Fabulous::Event::Select:
+    file: lib/Term/Fabulous/Event/Select.pm
+    version: '0.02'
+  Term::Fabulous::Event::SelectionChange:
+    file: lib/Term/Fabulous/Event/SelectionChange.pm
+    version: '0.02'
+  Term::Fabulous::Event::SeriesHover:
+    file: lib/Term/Fabulous/Event/SeriesHover.pm
+    version: '0.02'
+  Term::Fabulous::Event::SortChange:
+    file: lib/Term/Fabulous/Event/SortChange.pm
+    version: '0.02'
+  Term::Fabulous::Event::Start:
+    file: lib/Term/Fabulous/Event/Start.pm
+    version: '0.02'
+  Term::Fabulous::Event::Submit:
+    file: lib/Term/Fabulous/Event/Submit.pm
+    version: '0.02'
+  Term::Fabulous::Event::TabAdd:
+    file: lib/Term/Fabulous/Event/TabAdd.pm
+    version: '0.02'
+  Term::Fabulous::Event::TabClose:
+    file: lib/Term/Fabulous/Event/TabClose.pm
+    version: '0.02'
+  Term::Fabulous::Event::TextClick:
+    file: lib/Term/Fabulous/Event/TextClick.pm
+    version: '0.02'
+  Term::Fabulous::Event::ValidityChange:
+    file: lib/Term/Fabulous/Event/ValidityChange.pm
+    version: '0.02'
+  Term::Fabulous::Layout:
+    file: lib/Term/Fabulous/Layout.pm
+    version: '0.02'
+  Term::Fabulous::OptionList:
+    file: lib/Term/Fabulous/OptionList.pm
+    version: '0.02'
+  Term::Fabulous::Range:
+    file: lib/Term/Fabulous/Range.pm
+    version: '0.02'
+  Term::Fabulous::Render:
+    file: lib/Term/Fabulous/Render.pm
+    version: '0.02'
+  Term::Fabulous::Render::Attr:
+    file: lib/Term/Fabulous/Render/Attr.pm
+    version: '0.02'
+  Term::Fabulous::Render::Border:
+    file: lib/Term/Fabulous/Render/Border.pm
+    version: '0.02'
+  Term::Fabulous::Render::Canvas:
+    file: lib/Term/Fabulous/Render/Canvas.pm
+    version: '0.02'
+  Term::Fabulous::Render::Frame:
+    file: lib/Term/Fabulous/Render/Frame.pm
+    version: '0.02'
+  Term::Fabulous::Render::Geometry:
+    file: lib/Term/Fabulous/Render/Geometry.pm
+    version: '0.02'
+  Term::Fabulous::Render::Rectangle:
+    file: lib/Term/Fabulous/Render/Rectangle.pm
+    version: '0.02'
+  Term::Fabulous::Render::Target::Grid:
+    file: lib/Term/Fabulous/Render/Target/Grid.pm
+    version: '0.02'
+  Term::Fabulous::Render::Target::Mask:
+    file: lib/Term/Fabulous/Render/Target/Mask.pm
+    version: '0.02'
+  Term::Fabulous::Render::Target::Sixel:
+    file: lib/Term/Fabulous/Render/Target/Sixel.pm
+    version: '0.02'
+  Term::Fabulous::Render::Text:
+    file: lib/Term/Fabulous/Render/Text.pm
+    version: '0.02'
+  Term::Fabulous::Role::CanParseLayout:
+    file: lib/Term/Fabulous/Role/CanParseLayout.pm
+    version: '0.02'
+  Term::Fabulous::Role::HasBorderStyle:
+    file: lib/Term/Fabulous/Role/HasBorderStyle.pm
+    version: '0.02'
+  Term::Fabulous::Role::HasOptions:
+    file: lib/Term/Fabulous/Role/HasOptions.pm
+    version: '0.02'
+  Term::Fabulous::Role::HasRange:
+    file: lib/Term/Fabulous/Role/HasRange.pm
+    version: '0.02'
+  Term::Fabulous::Role::HasSeries:
+    file: lib/Term/Fabulous/Role/HasSeries.pm
+    version: '0.02'
+  Term::Fabulous::Role::Terminal:
+    file: lib/Term/Fabulous/Role/Terminal.pm
+    version: '0.02'
+  Term::Fabulous::Role::Themed:
+    file: lib/Term/Fabulous/Role/Themed.pm
+    version: '0.02'
+  Term::Fabulous::Role::Validatable:
+    file: lib/Term/Fabulous/Role/Validatable.pm
+    version: '0.02'
+  Term::Fabulous::Roving:
+    file: lib/Term/Fabulous/Roving.pm
+    version: '0.02'
+  Term::Fabulous::Static:
+    file: lib/Term/Fabulous/Static.pm
+    version: '0.02'
+  Term::Fabulous::Termbox:
+    file: lib/Term/Fabulous/Termbox.pm
+    version: '0.02'
+  Term::Fabulous::Termbox::Event:
+    file: lib/Term/Fabulous/Termbox/Event.pm
+    version: '0.02'
+  Term::Fabulous::Terminal::Memory:
+    file: lib/Term/Fabulous/Terminal/Memory.pm
+    version: '0.02'
+  Term::Fabulous::Terminal::Termbox:
+    file: lib/Term/Fabulous/Terminal/Termbox.pm
+    version: '0.02'
+  Term::Fabulous::Terminal::Termbox::Cells:
+    file: lib/Term/Fabulous/Terminal/Termbox/Cells.pm
+    version: '0.02'
+  Term::Fabulous::Text::Markup:
+    file: lib/Term/Fabulous/Text/Markup.pm
+    version: '0.02'
+  Term::Fabulous::Text::Style:
+    file: lib/Term/Fabulous/Text/Style.pm
+    version: '0.02'
+  Term::Fabulous::TextView:
+    file: lib/Term/Fabulous/TextView.pm
+    version: '0.02'
+  Term::Fabulous::Theme:
+    file: lib/Term/Fabulous/Theme.pm
+    version: '0.02'
+  Term::Fabulous::Theme::Document:
+    file: lib/Term/Fabulous/Theme/Document.pm
+    version: '0.02'
+  Term::Fabulous::ThemeEditor:
+    file: lib/Term/Fabulous/ThemeEditor.pm
+    version: '0.02'
+  Term::Fabulous::ThemeEditor::Form:
+    file: lib/Term/Fabulous/ThemeEditor/Form.pm
+    version: '0.02'
+  Term::Fabulous::ThemeEditor::KdlArea:
+    file: lib/Term/Fabulous/ThemeEditor/KdlArea.pm
+    version: '0.02'
+  Term::Fabulous::ThemeEditor::Preview:
+    file: lib/Term/Fabulous/ThemeEditor/Preview.pm
+    version: '0.02'
+  Term::Fabulous::ThemeEditor::SettingsList:
+    file: lib/Term/Fabulous/ThemeEditor/SettingsList.pm
+    version: '0.02'
+  Term::Fabulous::ThemeEditor::Tab:
+    file: lib/Term/Fabulous/ThemeEditor/Tab.pm
+    version: '0.02'
+  Term::Fabulous::ThemeEditor::UI:
+    file: lib/Term/Fabulous/ThemeEditor/UI.pm
+    version: '0.02'
+  Term::Fabulous::ThemeEditor::ValueDialog:
+    file: lib/Term/Fabulous/ThemeEditor/ValueDialog.pm
+    version: '0.02'
+  Term::Fabulous::Unicode:
+    file: lib/Term/Fabulous/Unicode.pm
+    version: '0.02'
+  Term::Fabulous::Validator:
+    file: lib/Term/Fabulous/Validator.pm
+    version: '0.02'
+  Term::Fabulous::Viewport:
+    file: lib/Term/Fabulous/Viewport.pm
+    version: '0.02'
+  Term::Fabulous::Widget:
+    file: lib/Term/Fabulous/Widget.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Accordion:
+    file: lib/Term/Fabulous/Widget/Accordion.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Accordion::Item:
+    file: lib/Term/Fabulous/Widget/Accordion/Item.pm
+    version: '0.02'
+  Term::Fabulous::Widget::AreaChart:
+    file: lib/Term/Fabulous/Widget/AreaChart.pm
+    version: '0.02'
+  Term::Fabulous::Widget::BarChart:
+    file: lib/Term/Fabulous/Widget/BarChart.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Box:
+    file: lib/Term/Fabulous/Widget/Box.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Button:
+    file: lib/Term/Fabulous/Widget/Button.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Canvas:
+    file: lib/Term/Fabulous/Widget/Canvas.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Chart:
+    file: lib/Term/Fabulous/Widget/Chart.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Checkbox:
+    file: lib/Term/Fabulous/Widget/Checkbox.pm
+    version: '0.02'
+  Term::Fabulous::Widget::ColorPicker:
+    file: lib/Term/Fabulous/Widget/ColorPicker.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Dialog:
+    file: lib/Term/Fabulous/Widget/Dialog.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Dialog::Backdrop:
+    file: lib/Term/Fabulous/Widget/Dialog/Backdrop.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Display:
+    file: lib/Term/Fabulous/Widget/Display.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Divider:
+    file: lib/Term/Fabulous/Widget/Divider.pm
+    version: '0.02'
+  Term::Fabulous::Widget::DocumentTabs:
+    file: lib/Term/Fabulous/Widget/DocumentTabs.pm
+    version: '0.02'
+  Term::Fabulous::Widget::DonutChart:
+    file: lib/Term/Fabulous/Widget/DonutChart.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Dropdown:
+    file: lib/Term/Fabulous/Widget/Dropdown.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Dropdown::List:
+    file: lib/Term/Fabulous/Widget/Dropdown/List.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Element:
+    file: lib/Term/Fabulous/Widget/Element.pm
+    version: '0.02'
+  Term::Fabulous::Widget::FileDialog:
+    file: lib/Term/Fabulous/Widget/FileDialog.pm
+    version: '0.02'
+  Term::Fabulous::Widget::FileDialog::FolderLine:
+    file: lib/Term/Fabulous/Widget/FileDialog/FolderLine.pm
+    version: '0.02'
+  Term::Fabulous::Widget::FocusableText:
+    file: lib/Term/Fabulous/Widget/FocusableText.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Histogram:
+    file: lib/Term/Fabulous/Widget/Histogram.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Image:
+    file: lib/Term/Fabulous/Widget/Image.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Input:
+    file: lib/Term/Fabulous/Widget/Input.pm
+    version: '0.02'
+  Term::Fabulous::Widget::KeyReference:
+    file: lib/Term/Fabulous/Widget/KeyReference.pm
+    version: '0.02'
+  Term::Fabulous::Widget::LineChart:
+    file: lib/Term/Fabulous/Widget/LineChart.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Menu:
+    file: lib/Term/Fabulous/Widget/Menu.pm
+    version: '0.02'
+  Term::Fabulous::Widget::MenuBar:
+    file: lib/Term/Fabulous/Widget/MenuBar.pm
+    version: '0.02'
+  Term::Fabulous::Widget::PieChart:
+    file: lib/Term/Fabulous/Widget/PieChart.pm
+    version: '0.02'
+  Term::Fabulous::Widget::PixelCanvas:
+    file: lib/Term/Fabulous/Widget/PixelCanvas.pm
+    version: '0.02'
+  Term::Fabulous::Widget::PolarAreaChart:
+    file: lib/Term/Fabulous/Widget/PolarAreaChart.pm
+    version: '0.02'
+  Term::Fabulous::Widget::ProgressBar:
+    file: lib/Term/Fabulous/Widget/ProgressBar.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Prompt:
+    file: lib/Term/Fabulous/Widget/Prompt.pm
+    version: '0.02'
+  Term::Fabulous::Widget::RadarChart:
+    file: lib/Term/Fabulous/Widget/RadarChart.pm
+    version: '0.02'
+  Term::Fabulous::Widget::RadioButton:
+    file: lib/Term/Fabulous/Widget/RadioButton.pm
+    version: '0.02'
+  Term::Fabulous::Widget::RadioGroup:
+    file: lib/Term/Fabulous/Widget/RadioGroup.pm
+    version: '0.02'
+  Term::Fabulous::Widget::RichText:
+    file: lib/Term/Fabulous/Widget/RichText.pm
+    version: '0.02'
+  Term::Fabulous::Widget::ScatterPlot:
+    file: lib/Term/Fabulous/Widget/ScatterPlot.pm
+    version: '0.02'
+  Term::Fabulous::Widget::ScrollBox:
+    file: lib/Term/Fabulous/Widget/ScrollBox.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Scrollbar:
+    file: lib/Term/Fabulous/Widget/Scrollbar.pm
+    version: '0.02'
+  Term::Fabulous::Widget::SegmentedControl:
+    file: lib/Term/Fabulous/Widget/SegmentedControl.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Sixel:
+    file: lib/Term/Fabulous/Widget/Sixel.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Slider:
+    file: lib/Term/Fabulous/Widget/Slider.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Sparkline:
+    file: lib/Term/Fabulous/Widget/Sparkline.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Spinner:
+    file: lib/Term/Fabulous/Widget/Spinner.pm
+    version: '0.02'
+  Term::Fabulous::Widget::StarRating:
+    file: lib/Term/Fabulous/Widget/StarRating.pm
+    version: '0.02'
+  Term::Fabulous::Widget::StatusBar:
+    file: lib/Term/Fabulous/Widget/StatusBar.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Table:
+    file: lib/Term/Fabulous/Widget/Table.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Table::Borders:
+    file: lib/Term/Fabulous/Widget/Table/Borders.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Table::Cell:
+    file: lib/Term/Fabulous/Widget/Table/Cell.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Table::Column:
+    file: lib/Term/Fabulous/Widget/Table/Column.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Table::ColumnChooser:
+    file: lib/Term/Fabulous/Widget/Table/ColumnChooser.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Table::Filter:
+    file: lib/Term/Fabulous/Widget/Table/Filter.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Table::Frame:
+    file: lib/Term/Fabulous/Widget/Table/Frame.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Table::Grid:
+    file: lib/Term/Fabulous/Widget/Table/Grid.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Table::HeaderView:
+    file: lib/Term/Fabulous/Widget/Table/HeaderView.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Table::Model:
+    file: lib/Term/Fabulous/Widget/Table/Model.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Table::Mutator:
+    file: lib/Term/Fabulous/Widget/Table/Mutator.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Table::Pager:
+    file: lib/Term/Fabulous/Widget/Table/Pager.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Table::Style:
+    file: lib/Term/Fabulous/Widget/Table/Style.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Table::Toggle:
+    file: lib/Term/Fabulous/Widget/Table/Toggle.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Table::Value:
+    file: lib/Term/Fabulous/Widget/Table/Value.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Tabs:
+    file: lib/Term/Fabulous/Widget/Tabs.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Tabs::Bar:
+    file: lib/Term/Fabulous/Widget/Tabs/Bar.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Tabs::Button:
+    file: lib/Term/Fabulous/Widget/Tabs/Button.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Tabs::Line:
+    file: lib/Term/Fabulous/Widget/Tabs/Line.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Tabs::Page:
+    file: lib/Term/Fabulous/Widget/Tabs/Page.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Text:
+    file: lib/Term/Fabulous/Widget/Text.pm
+    version: '0.02'
+  Term::Fabulous::Widget::TextArea:
+    file: lib/Term/Fabulous/Widget/TextArea.pm
+    version: '0.02'
+  Term::Fabulous::Widget::TextField:
+    file: lib/Term/Fabulous/Widget/TextField.pm
+    version: '0.02'
+  Term::Fabulous::Widget::TextInput:
+    file: lib/Term/Fabulous/Widget/TextInput.pm
+    version: '0.02'
+  Term::Fabulous::Widget::TextNode:
+    file: lib/Term/Fabulous/Widget/TextNode.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Toast:
+    file: lib/Term/Fabulous/Widget/Toast.pm
+    version: '0.02'
+  Term::Fabulous::Widget::Toast::Stack:
+    file: lib/Term/Fabulous/Widget/Toast/Stack.pm
+    version: '0.02'
+  Term::Fabulous::Widget::VirtualList:
+    file: lib/Term/Fabulous/Widget/VirtualList.pm
+    version: '0.02'
+  Term::Fabulous::Widget::XYChart:
+    file: lib/Term/Fabulous/Widget/XYChart.pm
+    version: '0.02'
+recommends:
+  Imager: '0'
+  Imager::File::SIXEL: '0'
+requires:
+  Clay::UI: '0.06'
+  Clay::XS: '0.05'
+  Encode: '0'
+  Exporter: '0'
+  Feature::Compat::Try: '0'
+  I18N::Langinfo: '0'
+  IO::Async: '0'
+  List::Util: '1.33'
+  MIME::Base64: '0'
+  Object::Pad: '0.825'
+  Object::PadX::Enum: '0'
+  POSIX: '0'
+  Scalar::Util: '0'
+  Socket: '0'
+  Text::KDL::XS: '0.002'
+  Time::HiRes: '0'
+  Time::Local: '1.30'
+  Unicode::GCString: '0'
+  XSLoader: '0'
+  perl: '5.032001'
+resources:
+  bugtracker: https://github.com/davenonymous/perl-term-fabulous/issues
+  homepage: https://github.com/davenonymous/perl-term-fabulous
+  repository: https://github.com/davenonymous/perl-term-fabulous.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

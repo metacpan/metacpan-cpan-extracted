@@ -1,9 +1,23 @@
 # t/compliance/expected-fail.txt: requirements from the OpenAPI specification
 # that this build is known not to meet, one case id per line with the reason.
 #
-# IT IS EMPTY, over 104 cases. That is load-bearing rather than decorative:
-# with nothing listed, ANY case that stops meeting its requirement fails the
-# run immediately, because run.t treats an unlisted failure as an error.
+# FOR 3.0 AND 3.1 IT IS EMPTY, over 1291 cases. That is load-bearing rather than
+# decorative: with nothing listed, ANY case that stops meeting its requirement
+# fails the run immediately, because run.t treats an unlisted failure as an
+# error.
+#
+# FOR SWAGGER 2.0 IT IS EMPTY TOO (11 October 2026). The 2.0 catalogue was
+# authored BEFORE the conversion code (plan_openapi_v2 phase 02), from the
+# fetched specification, and every id it produced that the build did not yet
+# meet was listed here with the phase that owned it: 554 lines on the day it
+# was written (03 the root 50, 04 the operation 39, 05 the parameter and the
+# Items 74, 06 the schema 369 of which 354 were the vendored JSON Schema suite
+# in its two 2.0 placements, 07 the consumers 22). The phases removed lines;
+# the promote rule failed a line removed early or left late by name; and the
+# list was empty again the same day, after phase 06. Nothing was excused: each
+# line was a feature, and each was built. The vendored placements were listed
+# one per case like everything else, because a wildcard would have weakened
+# the contract that an unlisted failure is an error.
 #
 # The rules run.t enforces:
 #

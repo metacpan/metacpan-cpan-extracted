@@ -6,7 +6,7 @@ no warnings 'experimental::class', 'experimental::builtin', 'experimental::for_l
 #~ |------3-33-----------------------------|
 #~ |-5-55------4-44-5-55----353--3-33-/1~--|
 #~ |---------------------335---33----------|
-class At v1.7.0 {
+class At v1.8.0 {
     use Carp qw[];
     use experimental 'try';
     use File::ShareDir::Tiny qw[dist_dir];
@@ -77,6 +77,14 @@ class At v1.7.0 {
         return $dpop_key;
     }
 
+    # Build a DPoP header for an OAuth token endpoint request. Evaluates the
+    # proof in scalar context so a missing key yields no header (and no warning).
+    method _dpop_headers ( $url, $method, $skip_ath = 0 ) {
+        return {} unless $http->token_type eq 'DPoP';
+        my $proof = $http->_generate_dpop_proof( $url, $method, $skip_ath );
+        return defined $proof ? { DPoP => $proof } : {};
+    }
+
     method oauth_discover ($handle) {
         my $res = $self->resolve_handle($handle);
         if ( builtin::blessed($res) && $res->isa('At::Error') ) { $res->throw; }
@@ -124,14 +132,9 @@ class At v1.7.0 {
             aud                   => $discovery->{pds},
         };
         say '[DEBUG] [At] PAR request: ' . JSON::PP->new->ascii->encode($par_content) if $ENV{DEBUG};
-        my ($par_res) = $http->post(
-            $par_endpoint => {
-                headers  => { DPoP => $http->_generate_dpop_proof( $par_endpoint, 'POST', 1 ) },
-                encoding => 'form',
-                content  => $par_content,
-                skip_ath => 1
-            }
-        );
+        my ($par_res)
+            = $http->post( $par_endpoint =>
+                { headers => $self->_dpop_headers( $par_endpoint, 'POST', 1 ), encoding => 'form', content => $par_content, skip_ath => 1 } );
         die 'PAR failed: ' . ( $par_res . '' )                                     if builtin::blessed $par_res;
         say '[DEBUG] [At] PAR response: ' . JSON::PP->new->ascii->encode($par_res) if $ENV{DEBUG};
         my $auth_uri = URI->new( $discovery->{metadata}{authorization_endpoint} );
@@ -145,7 +148,7 @@ class At v1.7.0 {
         my $key            = $self->_get_dpop_key();
         my ($token_res)    = $http->post(
             $token_endpoint => {
-                headers  => { DPoP => $http->_generate_dpop_proof( $token_endpoint, 'POST', 1 ) },
+                headers  => $self->_dpop_headers( $token_endpoint, 'POST', 1 ),
                 encoding => 'form',
                 content  => {
                     grant_type    => 'authorization_code',
@@ -179,8 +182,11 @@ class At v1.7.0 {
         return unless $session && $session->refreshJwt && $session->token_type eq 'DPoP';
         my $discovery = $self->oauth_discover( $session->handle );
         return unless $discovery;
-        my $token_endpoint  = $discovery->{metadata}{token_endpoint};
-        my $key             = $self->_get_dpop_key();
+        my $token_endpoint = $discovery->{metadata}{token_endpoint};
+        my $key            = $self->_get_dpop_key();
+
+        # Bind the DPoP key to the agent so the proof below is actually signed.
+        $http->set_tokens( undef, undef, 'DPoP', $key );
         my $refresh_content = {
             grant_type    => 'refresh_token',
             refresh_token => $session->refreshJwt,
@@ -188,14 +194,9 @@ class At v1.7.0 {
             aud           => $discovery->{pds},
         };
         say '[DEBUG] [At] Refresh request: ' . JSON::PP->new->ascii->encode($refresh_content) if $ENV{DEBUG};
-        my ($token_res) = $http->post(
-            $token_endpoint => {
-                headers  => { DPoP => $http->_generate_dpop_proof( $token_endpoint, 'POST', 1 ) },
-                encoding => 'form',
-                content  => $refresh_content,
-                skip_ath => 1
-            }
-        );
+        my ($token_res)
+            = $http->post( $token_endpoint =>
+                { headers => $self->_dpop_headers( $token_endpoint, 'POST', 1 ), encoding => 'form', content => $refresh_content, skip_ath => 1 } );
         die 'Refresh failed: ' . ( $token_res . '' ) if builtin::blessed $token_res;
         $session = At::Protocol::Session->new(
             did          => $token_res->{sub},
@@ -235,8 +236,34 @@ class At v1.7.0 {
             $key->import_key( \$dpop_key_jwk );
             $dpop_key = $key;
         }
-        if ( $refresh && time > $access->{exp} && time < $refresh->{exp} ) {
-            if ( $token_type eq 'DPoP' ) { return $self->oauth_refresh(); }
+
+        # OAuth refresh tokens are typically opaque (un-decodable), so fall back
+        # to a refresh attempt whenever the access token has expired and any
+        # refresh token is present.
+        my $access_expired = defined $access->{exp} && time > $access->{exp};
+        my $can_refresh    = $refreshJwt            && ( !$refresh || !defined $refresh->{exp} || time < $refresh->{exp} );
+        if ( $access_expired && $can_refresh ) {
+            if ( $token_type eq 'DPoP' ) {
+
+                # Seed the session first so oauth_refresh() can read handle/client_id/pds
+                $session = At::Protocol::Session->new(
+                    did          => $access->{sub},
+                    accessJwt    => $accessJwt,
+                    refreshJwt   => $refreshJwt,
+                    token_type   => $token_type,
+                    dpop_key_jwk => $dpop_key_jwk,
+                    client_id    => $client_id,
+                    handle       => $handle,
+                    pds          => $pds,
+                    scope        => $scope
+                );
+                my $refreshed = $self->oauth_refresh();
+
+                # Do not leave an expired session in place if the refresh bailed;
+                # callers should see "no session" and re-authenticate instead.
+                $session = () unless $refreshed;
+                return $refreshed;
+            }
             else {
                 my $res = $self->post( 'com.atproto.server.refreshSession' => { refreshJwt => $refreshJwt } );
                 if   ( $res && !builtin::blessed($res) ) { $session = At::Protocol::Session->new(%$res); }

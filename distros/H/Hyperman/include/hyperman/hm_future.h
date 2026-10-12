@@ -110,7 +110,40 @@ static AV *hmf_values_av(pTHX_ SV *self) {
  *
  * SAVETMPS sets a new floor rather than freeing what the caller mortalised
  * before calling in, so a caller's own temporaries are untouched. */
-/* After a G_EVAL call: say what died, on psgi.errors' stream. Every callback
+#include <stdarg.h>
+
+/* The server's own messages: a dying handler, a refused response, a wedged
+ * worker, a TLS reload that failed. One writer, so `error_log` can point them
+ * all somewhere other than the inherited stderr. A whole line per call,
+ * stamped like the access log and with the pid, written with one write(2) so
+ * lines from several workers do not interleave. -1 means stderr. */
+static int hm_err_fd = -1;
+static void hm_errlog(const char *fmt, ...) {
+    char buf[1024];
+    size_t n = 0;
+    struct tm tm;
+    time_t t = time(NULL);
+    va_list ap;
+    int k;
+    if (hm_localtime_r(&t, &tm))
+        n = strftime(buf, sizeof(buf), "[%d/%b/%Y:%H:%M:%S %z] ", &tm);
+    k = snprintf(buf + n, sizeof(buf) - n, "[%d] ", hm_os_getpid());
+    if (k > 0) n += (size_t)k;
+    va_start(ap, fmt);
+    k = vsnprintf(buf + n, sizeof(buf) - n, fmt, ap);
+    va_end(ap);
+    if (k > 0) n += (size_t)k;
+    if (n > sizeof(buf) - 2) n = sizeof(buf) - 2;
+    if (n == 0 || buf[n - 1] != '\n') buf[n++] = '\n';
+    {
+        int fd = hm_err_fd >= 0 ? hm_err_fd : 2;
+        ssize_t w;
+        do { w = hm_os_write_file(fd, buf, n); } while (w < 0 && errno == EINTR);
+        (void)w;
+    }
+}
+
+/* After a G_EVAL call: say what died, on the error log. Every callback
  * the loop runs is trapped, so an exception never unwinds through the C
  * loop (which would skip loop->running-- and leave this queue half drained)
  * - but it must not be silent either, or an app bug becomes a 500 with no
@@ -120,8 +153,7 @@ static void hm_warn_died(pTHX_ const char *what) {
     const char *m;
     if (!SvTRUE(ERRSV)) return;
     m = SvPV(ERRSV, l);
-    PerlIO_printf(PerlIO_stderr(), "Hyperman: %s died: %.*s%s", what, (int)l, m,
-                  (l && m[l - 1] == '\n') ? "" : "\n");
+    hm_errlog("Hyperman: %s died: %.*s", what, (int)l, m);
 }
 
 static void hmf_pump(pTHX) {
@@ -253,6 +285,44 @@ static void hmf_set_upstream(pTHX_ SV *derived, SV *upstream) {
     av_store((AV *)SvRV(derived), 3, w);
 }
 
+static void hmf_cancel(pTHX_ SV *self);
+static IV   hm_any_state(pTHX_ SV *f);
+
+/* Cancel one awaitable of any class: ours directly, a foreign one through
+ * its method, trapped so a class without `cancel` cannot unwind the loop. */
+static void hm_any_cancel(pTHX_ SV *f) {
+    if (hmf_is_future(aTHX_ f)) { hmf_cancel(aTHX_ f); return; }
+    if (!(SvROK(f) && SvOBJECT(SvRV(f)))) return;
+    {
+        dSP;
+        ENTER; SAVETMPS; PUSHMARK(SP);
+        XPUSHs(f);
+        PUTBACK;
+        call_method("cancel", G_DISCARD | G_EVAL);
+        FREETMPS; LEAVE;
+    }
+}
+
+/* Cancel every still-pending member of a combinator's input list, over a
+ * snapshot: a cancellation fires that member's callbacks, one of which is
+ * the combinator's own, which clears this very list. */
+static void hmf_cancel_list(pTHX_ AV *list) {
+    SSize_t i, n = av_len(list) + 1;
+    SV **snap;
+    if (n <= 0) return;
+    snap = (SV **)hm_xmalloc(sizeof(SV *) * (size_t)n);
+    for (i = 0; i < n; i++) {
+        SV **e = av_fetch(list, i, 0);
+        snap[i] = e && *e ? SvREFCNT_inc(*e) : NULL;
+    }
+    for (i = 0; i < n; i++) {
+        if (snap[i] && hm_any_state(aTHX_ snap[i]) == HMF_PENDING)
+            hm_any_cancel(aTHX_ snap[i]);
+    }
+    for (i = 0; i < n; i++) if (snap[i]) SvREFCNT_dec(snap[i]);
+    free(snap);
+}
+
 static void hmf_cancel(pTHX_ SV *self) {
     AV *av;
     SV **up;
@@ -260,10 +330,17 @@ static void hmf_cancel(pTHX_ SV *self) {
     av = (AV *)SvRV(self);
     hmf_settle(aTHX_ self, HMF_CANCELLED, NULL, 0);
     /* propagate up a then-chain: cancelling a derived future cancels its
-     * still-pending upstream */
+     * still-pending upstream - one future, or a combinator's whole list */
     up = av_fetch(av, 3, 0);
-    if (up && SvROK(*up) && hmf_is_future(aTHX_ *up)
-        && hmf_state(aTHX_ *up) == HMF_PENDING) {
+    if (!up || !SvROK(*up)) return;
+    /* a future is a blessed array too: ask that first, and only an UNBLESSED
+     * array is a combinator's input list */
+    if (!hmf_is_future(aTHX_ *up)) {
+        if (SvTYPE(SvRV(*up)) == SVt_PVAV && !SvOBJECT(SvRV(*up)))
+            hmf_cancel_list(aTHX_ (AV *)SvRV(*up));
+        return;
+    }
+    if (hmf_state(aTHX_ *up) == HMF_PENDING) {
         dSP;
         ENTER; SAVETMPS; PUSHMARK(SP);
         XPUSHs(*up);
@@ -664,6 +741,15 @@ XS_INTERNAL(hm_xs_comb_cb) {
         break;
     }
     }
+    /* The result has settled: the inputs still running lost (wait_any's
+     * others, the rest after needs_all's failure or needs_any's success)
+     * and are cancelled, as CPAN Future does; and the list is emptied, which
+     * breaks the cycle input -> callback -> list -> input that otherwise
+     * kept every input alive for as long as the slowest one. */
+    if (hmf_state(aTHX_ res) != HMF_PENDING) {
+        hmf_cancel_list(aTHX_ list);
+        av_clear(list);
+    }
     XSRETURN_EMPTY;
 }
 
@@ -689,6 +775,8 @@ static SV *hmf_combine(pTHX_ SV *classname, SV **futs, SSize_t n, IV mode) {
         for (i = 0; i < n; i++) av_push(list, SvREFCNT_inc(futs[i]));
         list_rv = sv_2mortal(newRV_noinc((SV *)list));
         count = sv_2mortal(newSViv(n));
+        /* cancelling the result cancels what it waits on (hmf_cancel) */
+        av_store((AV *)SvRV(res), 3, newSVsv(list_rv));
         for (i = 0; i < n; i++) {
             SV *cb = hm_closure(aTHX_ hm_xs_comb_cb, res, count, list_rv,
                                 NULL, mode, 0);

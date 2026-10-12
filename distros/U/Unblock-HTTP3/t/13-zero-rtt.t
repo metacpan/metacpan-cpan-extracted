@@ -9,7 +9,9 @@ use Time::HiRes qw(time);
 
 use Net::QUIC;
 use Net::QUIC::Driver;
+use Unblock::HTTP3::Client;
 use Unblock::HTTP3::Connection;
+use Unblock::HTTP3::Server;
 use Uniform::HTTP::Request;
 
 is($Net::QUIC::VERSION, '0.04',
@@ -181,7 +183,7 @@ sub run_until {
 
 sub h3_client {
     my ($quic, %extra) = @_;
-    return Unblock::HTTP3::Connection->client(
+    return Unblock::HTTP3::Client->new(
         quic                  => $quic,
         enable_http_datagrams => 1,
         extension_settings    => { 84 => 7 },
@@ -191,7 +193,7 @@ sub h3_client {
 
 sub h3_server {
     my ($quic, %extra) = @_;
-    return Unblock::HTTP3::Connection->server(
+    return Unblock::HTTP3::Server->new(
         quic                    => $quic,
         enable_extended_connect => 1,
         enable_http_datagrams   => 1,
@@ -273,7 +275,7 @@ my $early_client_tx = $second_client_h3->request(
     $early_request,
     early_data  => 1,
     datagrams   => 1,
-    stream_body => {},
+    stream_body => 1,
 );
 
 ok($early_client_tx->early_data,
@@ -356,7 +358,7 @@ is(
 );
 
 $early_server_tx->response->status(204);
-$early_server_tx->send_response;
+$early_server_tx->respond($early_server_tx->response);
 
 ok(
     run_until(sub {
@@ -444,7 +446,7 @@ is($retry_server_tx->request->target, '/retry',
     'replacement request is cleanly decoded after rollback');
 
 $retry_server_tx->response->status(204);
-$retry_server_tx->send_response;
+$retry_server_tx->respond($retry_server_tx->response);
 
 ok(
     run_until(sub {

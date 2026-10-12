@@ -1,0 +1,30 @@
+xt/ - the author tests
+======================
+
+None of these runs under `make test`. They read the tree as it is, so build
+first and give prove the lib: `prove -l xt/` (there is no XS object to find).
+
+  xt/boilerplate.t       README, Changes and every module carry none of the
+                         text Module::Starter wrote, and the newest entry of
+                         Changes is the version of the distribution.
+  xt/attribute-names.t   no attribute of a class shares a name with a method
+                         of that class. An attribute replaces a method without
+                         a word.
+  xt/sort-variables.t    no file declares a lexical $a or $b, so no sort block
+                         can be looking at one.
+  xt/no-em-dash.t        no text file of the manifest has an em dash, an en
+                         dash or a curly quote in it.
+  xt/ascii.t             every text file of the manifest is ASCII. The wide
+                         glyphs of the terminal are written as byte escapes.
+  xt/test-warnings.t     no test file, and not the program, warns when it is
+                         compiled.
+  xt/soak.t              two thousand games of the bot through the engine and
+                         two hundred through the terminal: every game ends,
+                         the same seed plays the same game, nothing warns.
+                         FLOPPY_SOAK turns it on; FLOPPY_SOAK_GAMES sets the
+                         count.
+
+The three that live in t/ and are skipped without RELEASE_TESTING are
+t/manifest.t, t/pod.t and t/pod-coverage.t.
+
+    RELEASE_TESTING=1 prove -l t/ xt/

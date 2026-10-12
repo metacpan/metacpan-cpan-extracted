@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk (); 
 
-our $VERSION = '0.55';
+our $VERSION = '0.57';
 
 sub _chain {
     my ($future, $cfg, $allow) = @_;
@@ -114,6 +114,11 @@ C<Vary: Origin> goes on every response whose C<Allow-Origin> depends on the
 request's origin - anything but a flat C<'*'>. Without it a shared cache
 will happily serve one origin's response to another, which is a
 cache-poisoning bug wearing a CORS costume.
+
+That includes the responses that are granted nothing: a request with no
+C<Origin>, and one whose origin was refused. A cache that kept either without
+the C<Vary> would serve it to an allowed origin, whose browser would then
+refuse it.
 
 =head1 SEE ALSO
 

@@ -1,5 +1,8 @@
 Revision history for Game-Dominoes
 
+0.03    2026-10-11
+	- Add Game::Dominoes::Terminal->run(@argv), which returns the exit status
+
 0.02    2026-10-07
 	- Terminal.pm POD declares =encoding utf8
 	- Pick a move with the arrow keys, previewing the table it would make

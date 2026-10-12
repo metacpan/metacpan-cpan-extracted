@@ -82,15 +82,20 @@ my @CASES = (
       'an object header is k,v pairs (sorted, so the bytes are stable)' ],
     [ 'header', $OBJ, 1, { R => '1', G => '2' }, 'G=2,R=1',
       'an exploded object header is k=v' ],
+    # a Swagger 2.0 tsv header travels as the x-oa-collectionFormat extension;
+    # a header has no inspection point, so the TAB is read off the socket
+    [ 'header', $ARR, 0, [ 'a', 'b' ], "a\tb",
+      'a tab-separated header (the 2.0 tsv extension) carries a real tab', 'tsv' ],
 );
 
 my ($port, $pid) = listener(scalar @CASES, 'X-H');
 my $failed = 0;
 
 for my $c (@CASES) {
-    my ($in, $schema, $explode, $value, $want, $name) = @$c;
+    my ($in, $schema, $explode, $value, $want, $name, $ext) = @$c;
     my %p = (name => 'X-H', in => $in, schema => $schema);
     $p{explode} = $explode ? \1 : \0;
+    $p{'x-oa-collectionFormat'} = $ext if $ext;
     my $api = api_for(%p);
     my $cli = Open::API::Client->new(api => $api,
                                      base_url => "http://127.0.0.1:$port");

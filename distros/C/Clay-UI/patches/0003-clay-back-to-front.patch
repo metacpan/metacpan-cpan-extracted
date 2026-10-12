@@ -1,0 +1,138 @@
+--- a/src/clay/clay.h
++++ b/src/clay/clay.h
+@@ -277,6 +277,9 @@
+     // Lays out child elements from left to right, starting a new line below whenever the next child
+     // would not fit into the remaining width ("flow" layout). Lines are separated by lineGap.
+     CLAY_LEFT_TO_RIGHT_WRAP,
++    // Lays out all child elements on top of each other ("stack" layout), each one placed by
++    // childAlignment on both axes. Later children are drawn over earlier ones; childGap is unused.
++    CLAY_BACK_TO_FRONT,
+ } Clay_LayoutDirection;
+ 
+ // Controls how the lines of a CLAY_LEFT_TO_RIGHT_WRAP container use height they do not need.
+@@ -2004,6 +2007,22 @@
+             openLayoutElement->minDimensions.height += childGap;
+         }
+     }
++    else if (layoutConfig->layoutDirection == CLAY_BACK_TO_FRONT) {
++        // Both axes behave like the off axis of the other directions: the largest child decides
++        for (int32_t i = 0; i < openLayoutElement->children.length; i++) {
++            int32_t childIndex = Clay__int32_tArray_GetValue(&context->layoutElementChildrenBuffer, (int)context->layoutElementChildrenBuffer.length - openLayoutElement->children.length + i);
++            Clay_LayoutElement *child = Clay_LayoutElementArray_Get(&context->layoutElements, childIndex);
++            openLayoutElement->dimensions.width = CLAY__MAX(openLayoutElement->dimensions.width, child->dimensions.width + leftRightPadding);
++            openLayoutElement->dimensions.height = CLAY__MAX(openLayoutElement->dimensions.height, child->dimensions.height + topBottomPadding);
++            if (!elementHasClipHorizontal) {
++                openLayoutElement->minDimensions.width = CLAY__MAX(openLayoutElement->minDimensions.width, child->minDimensions.width + leftRightPadding);
++            }
++            if (!elementHasClipVertical) {
++                openLayoutElement->minDimensions.height = CLAY__MAX(openLayoutElement->minDimensions.height, child->minDimensions.height + topBottomPadding);
++            }
++            Clay__int32_tArray_Add(&context->layoutElementChildren, childIndex);
++        }
++    }
+ 
+     context->layoutElementChildrenBuffer.length -= openLayoutElement->children.length;
+ 
+@@ -2665,6 +2684,46 @@
+     return position;
+ }
+ 
++// ---------------------------------------------------------------------------
++// Stack layout (CLAY_BACK_TO_FRONT). Both axes are sized like the off axis
++// of the other directions: the container fits its largest child, and
++// SIZING_GROW children fill its inner size. Every child is placed on its own
++// by childAlignment, so children overlap and later ones are drawn on top.
++// ---------------------------------------------------------------------------
++
++// The size of a stack container's largest child on each axis, padding excluded.
++Clay_Dimensions Clay__BackToFrontContentSize(Clay_LayoutElement *parent) {
++    Clay_Context* context = Clay_GetCurrentContext();
++    Clay_Dimensions contentSize = CLAY__DEFAULT_STRUCT;
++    for (int32_t childOffset = 0; childOffset < parent->children.length; ++childOffset) {
++        Clay_LayoutElement *child = Clay_LayoutElementArray_Get(&context->layoutElements, parent->children.elements[childOffset]);
++        if (child->exiting) continue;
++        contentSize.width = CLAY__MAX(contentSize.width, child->dimensions.width);
++        contentSize.height = CLAY__MAX(contentSize.height, child->dimensions.height);
++    }
++    return contentSize;
++}
++
++// Returns the position of a child relative to its stack container, aligned within the
++// container's inner area by childAlignment on both axes.
++Clay_Vector2 Clay__BackToFrontPlaceChild(Clay_LayoutElement *parent, Clay_LayoutElement *child) {
++    Clay_LayoutConfig *layoutConfig = &parent->config.layout;
++    Clay_Vector2 position = { (float)layoutConfig->padding.left, (float)layoutConfig->padding.top };
++    float spaceBesideChild = parent->dimensions.width - (float)(layoutConfig->padding.left + layoutConfig->padding.right) - child->dimensions.width;
++    float spaceAroundChild = parent->dimensions.height - (float)(layoutConfig->padding.top + layoutConfig->padding.bottom) - child->dimensions.height;
++    switch (layoutConfig->childAlignment.x) {
++        case CLAY_ALIGN_X_LEFT: break;
++        case CLAY_ALIGN_X_CENTER: position.x += spaceBesideChild / 2; break;
++        case CLAY_ALIGN_X_RIGHT: position.x += spaceBesideChild; break;
++    }
++    switch (layoutConfig->childAlignment.y) {
++        case CLAY_ALIGN_Y_TOP: break;
++        case CLAY_ALIGN_Y_CENTER: position.y += spaceAroundChild / 2; break;
++        case CLAY_ALIGN_Y_BOTTOM: position.y += spaceAroundChild; break;
++    }
++    return position;
++}
++
+ // Writes out the location of text elements to layout elements buffer 1
+ void Clay__SizeContainersAlongAxis(bool xAxis, float deltaTime, Clay__int32_tArray* textElementsOut, Clay__int32_tArray* aspectRatioElementsOut) {
+     Clay_Context* context = Clay_GetCurrentContext();
+@@ -3091,8 +3150,8 @@
+     return changed;
+ }
+ 
+-// The extent of a LEFT_TO_RIGHT or TOP_TO_BOTTOM container along one axis, aggregated from its
+-// children exactly as Clay__CloseElement does.
++// The extent of a LEFT_TO_RIGHT, TOP_TO_BOTTOM or BACK_TO_FRONT container along one axis,
++// aggregated from its children exactly as Clay__CloseElement does.
+ Clay__AxisExtent Clay__StackExtentAlongAxis(Clay_LayoutElement* element, bool xAxis) {
+     Clay_Context* context = Clay_GetCurrentContext();
+     Clay_LayoutConfig* layoutConfig = &element->config.layout;
+@@ -3322,7 +3381,7 @@
+ 
+         // DFS node has been visited, this is on the way back up to the root
+         Clay_LayoutConfig *layoutConfig = &currentElement->config.layout;
+-        if (layoutConfig->layoutDirection == CLAY_LEFT_TO_RIGHT) {
++        if (layoutConfig->layoutDirection == CLAY_LEFT_TO_RIGHT || layoutConfig->layoutDirection == CLAY_BACK_TO_FRONT) {
+             // Resize any parent containers that have grown in height along their non layout axis
+             for (int32_t j = 0; j < currentElement->children.length; ++j) {
+                 Clay_LayoutElement *childElement = Clay_LayoutElementArray_Get(&context->layoutElements, currentElement->children.elements[j]);
+@@ -3532,7 +3591,7 @@
+                                     }
+                                     borderOffset.x += (childElement->dimensions.width + (float)layoutConfig->childGap);
+                                 }
+-                            } else {
++                            } else if (layoutConfig->layoutDirection == CLAY_TOP_TO_BOTTOM) {
+                                 for (int32_t i = 0; i < currentElement->children.length; ++i) {
+                                     Clay_LayoutElement *childElement = Clay_LayoutElementArray_Get(&context->layoutElements, currentElement->children.elements[i]);
+                                     if (i > 0) {
+@@ -3795,6 +3854,8 @@
+             } else if (layoutConfig->layoutDirection == CLAY_LEFT_TO_RIGHT_WRAP) {
+                 contentSizeCurrent = Clay__FlowLaidOutContentSize(currentElement);
+                 flowCursor = Clay__FlowBeginPlacement(currentElement);
++            } else if (layoutConfig->layoutDirection == CLAY_BACK_TO_FRONT) {
++                contentSizeCurrent = Clay__BackToFrontContentSize(currentElement);
+             }
+ 
+             if (scrollContainerData) {
+@@ -3809,6 +3870,8 @@
+                 // Alignment along non layout axis
+                 if (layoutConfig->layoutDirection == CLAY_LEFT_TO_RIGHT_WRAP) {
+                     currentElementTreeNode->nextChildOffset = Clay__FlowPlaceChild(currentElement, i, &flowCursor);
++                } else if (layoutConfig->layoutDirection == CLAY_BACK_TO_FRONT) {
++                    currentElementTreeNode->nextChildOffset = Clay__BackToFrontPlaceChild(currentElement, childElement);
+                 } else if (layoutConfig->layoutDirection == CLAY_LEFT_TO_RIGHT) {
+                     currentElementTreeNode->nextChildOffset.y = currentElement->config.layout.padding.top;
+                     float whiteSpaceAroundChild = currentElement->dimensions.height - (float)(layoutConfig->padding.top + layoutConfig->padding.bottom) - childElement->dimensions.height;
+@@ -4316,7 +4379,7 @@
+                         // .layoutDirection
+                         CLAY_TEXT(CLAY_STRING("Layout Direction"), infoTitleConfig);
+                         Clay_LayoutConfig *layoutConfig = &selectedItem->layoutElement->config.layout;
+-                        CLAY_TEXT(layoutConfig->layoutDirection == CLAY_TOP_TO_BOTTOM ? CLAY_STRING("TOP_TO_BOTTOM") : layoutConfig->layoutDirection == CLAY_LEFT_TO_RIGHT_WRAP ? CLAY_STRING("LEFT_TO_RIGHT_WRAP") : CLAY_STRING("LEFT_TO_RIGHT"), infoTextConfig);
++                        CLAY_TEXT(layoutConfig->layoutDirection == CLAY_TOP_TO_BOTTOM ? CLAY_STRING("TOP_TO_BOTTOM") : layoutConfig->layoutDirection == CLAY_LEFT_TO_RIGHT_WRAP ? CLAY_STRING("LEFT_TO_RIGHT_WRAP") : layoutConfig->layoutDirection == CLAY_BACK_TO_FRONT ? CLAY_STRING("BACK_TO_FRONT") : CLAY_STRING("LEFT_TO_RIGHT"), infoTextConfig);
+                         // .sizing
+                         CLAY_TEXT(CLAY_STRING("Sizing"), infoTitleConfig);
+                         CLAY_AUTO_ID({ .layout = { .layoutDirection = CLAY_LEFT_TO_RIGHT } }) {

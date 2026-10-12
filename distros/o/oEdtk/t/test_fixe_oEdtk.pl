@@ -3,27 +3,27 @@ use oEdtk::Main		0.42;
 use oEdtk::libXls;
 
 #################################################################################
-# CORPS PRINCIPAL DE L'APPLICATION :
+# MAIN BODY OF THE APPLICATION:
 #################################################################################
 
 sub run() {
-	# OUVERTURE DES FLUX
-	&fXlsOpen("cp_fr_fixe.dat"); # A REMPLACER CF PACKAGE
+	# OPENING THE STREAMS
+	&fXlsOpen("cp_fr_fixe.dat"); # TO BE REPLACED SEE PACKAGE
 
-	# INITIALISATION ET CARTOGRAPHIE DE L'APPLICATION
+	# APPLICATION INITIALIZATION AND MAPPING
 	&initApp();
-	# INITIALISATION PROPRE AU DOCUMENT
+	# DOCUMENT-SPECIFIC INITIALIZATION
 	&initDoc();
 
 	while (my $ligne=<IN> && $.<2000 ) {
 		chomp ($ligne);
 
 		if 		(oe_trt_ref_rec('X',$ligne,0,)){
-				# FIN traitement enregistrement 
+				# END record processing 
 
 		} else {
-			# SI AUCUN TYPE D'ENREGISTREMENT N'EST RECONNU
-			print STDERR "LIGNE INCONNUE : $ligne\n";
+			# IF NO RECORD TYPE IS RECOGNIZED
+			print STDERR "UNKNOWN LINE: $ligne\n";
 		}
 		prod_Xls_Edit_Ligne();
 	}
@@ -33,12 +33,12 @@ sub run() {
 
 
 #################################################################################
-# FONCTIONS SPECIFIQUES A L'APPLICATION
+# APPLICATION-SPECIFIC FUNCTIONS
 #################################################################################
 sub initApp{
-	# DECLARATIONS DES VARIABLES PROPRES A L'APPLICATION
+	# DECLARATIONS OF APPLICATION-SPECIFIC VARIABLES
 
-	# CARTOGRAPHIE APPLICATIVE 
+	# APPLICATION MAPPING 
 	oe_rec_motif 	('X', 'A13 A35 A11 A8 A*');
 	oe_rec_process	('X', \&trtEnr);
 
@@ -47,31 +47,31 @@ sub initApp{
 
 sub initDoc {
 	###########################################################################
-	# CONFIGURATION DU DOCUMENT EXCEL
+	# EXCEL DOCUMENT CONFIGURATION
 	###########################################################################
 	#
-	# 	OPTIONNEL : FORMATAGE PAR DEFAUT DES COLONNES DU TABLEAU EXCEL 
-	# 	(AC7 = Alpha Center 7 de large ; Ac7 = Alpha Center Wrap... ; NR7 = Numérique Right...  ) 
+	# 	OPTIONAL: DEFAULT FORMATTING OF THE EXCEL TABLE COLUMNS 
+	# 	(AC7 = Alpha Center 7 wide ; Ac7 = Alpha Center Wrap... ; NR7 = Numeric Right...  ) 
 	prod_Xls_Col_Init('AC8', 'AL28.2', 'AC5.5', 'AC8.3', 'AL26.5');
 	#
 	###########################################################################
-	# 	REQUIS !
-	# 	OUVERTURE ET CONFIGURATION DU DOCUMENT
-	#	prod_Xls_Init permet d'ouvrir un fichier XLS
-	# 		le paramètre 1 est obligatoire (nom fichier)
-	#		les paramètres suivants sont optionnels
+	# 	REQUIRED!
+	# 	OPENING AND CONFIGURATION OF THE DOCUMENT
+	#	prod_Xls_Init opens an XLS file
+	# 		parameter 1 is mandatory (file name)
+	#		the following parameters are optional
 	###########################################################################	
 	prod_Xls_Init("oEdtk","LISTE CODE POSTAUX", "FRANCE");
 
-	# INITIALISATIONS PROPRES A LA MISE EN FORME DU DOCUMENT
-	# PRÉPARATION DES TITRES DE COLONNES
-	#prod_Xls_Insert_Val("TITRE 1");
-	#prod_Xls_Insert_Val("TITRE 2");
-	#prod_Xls_Insert_Val("TITRE 3");
+	# DOCUMENT FORMATTING SPECIFIC INITIALIZATIONS
+	# PREPARATION OF THE COLUMN HEADERS
+	#prod_Xls_Insert_Val("TITLE 1");
+	#prod_Xls_Insert_Val("TITLE 2");
+	#prod_Xls_Insert_Val("TITLE 3");
 	#etc.
 
-	#EDITION DE LA TETE DE COLONNE (les paramètres sont optionnels)
-	# 	le paramètre 1 est le style pour la ligne, 'HEAD' déclare la ligne en tête de tableau
+	#COLUMN HEADER OUTPUT (the parameters are optional)
+	# 	parameter 1 is the style for the line, 'HEAD' declares the line as a table header
 	#prod_Xls_Edit_Ligne('T2','HEAD');
 
 1;
@@ -79,23 +79,23 @@ sub initDoc {
 
 
 sub trtEnr() {
-	# PRÉPARATION DES DONNÉES DE L'ENREGISTREMENT
+	# PREPARATION OF THE RECORD DATA
 	prod_Xls_Insert_Val($DATATAB[0]);
 	prod_Xls_Insert_Val($DATATAB[1]);
 	prod_Xls_Insert_Val($DATATAB[2]);
 	prod_Xls_Insert_Val($DATATAB[3]);
 	prod_Xls_Insert_Val($DATATAB[4]);
 	
-	# pour le test on dispose des intitulés sur la première ligne du fichier
+	# for the test the headers are on the first line of the file
 	if ($.==1) { prod_Xls_Edit_Ligne('T2','HEAD'); }
 
 1;
 }
 
-sub fXlsOpen ($){  # A REMPLACER CF PACKAGE
+sub fXlsOpen ($){  # TO BE REPLACED SEE PACKAGE
 	my $fi =shift;
 
-	open (IN,  "$fi")	or die "echec a l'ouverture de $fi, code retour $!\n";
+	open (IN,  "$fi")	or die "failed to open $fi, return code $!\n";
 1;
 }
 

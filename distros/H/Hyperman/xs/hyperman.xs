@@ -4,6 +4,23 @@ PROTOTYPES: DISABLE
 
 BOOT:
     hm_fq = newAV();
+    /* What to exec on USR2: perl's own argv from the first argument on. $^X
+     * supplies the interpreter at exec time. Copied now, because `$0 = ...`
+     * on Linux writes over the memory PL_origargv points into. */
+    {
+        int i, n = PL_origargc;
+        if (n > 0 && PL_origargv) {
+            hm_boot_argv = (char **)hm_xmalloc(sizeof(char *) * (size_t)(n + 1));
+            for (i = 0; i < n; i++) {
+                const char *a = PL_origargv[i] ? PL_origargv[i] : "";
+                hm_boot_argv[i] = (char *)hm_xmalloc(strlen(a) + 1);
+                memcpy(hm_boot_argv[i], a, strlen(a) + 1);
+            }
+            hm_boot_argv[n] = NULL;
+            /* argv[0] becomes the interpreter path at exec; keep the name
+             * perl was invoked under as its argv[0] */
+        }
+    }
     /* Shared::Arena's table, once. NULL when it is absent or too old, and
      * every arena door then fails open. */
     hm_sa_resolve(aTHX);
@@ -29,6 +46,7 @@ run(class, ...)
 
         memset(&cfg, 0, sizeof(cfg));
         cfg.log_fd = -1;
+        cfg.err_fd = -1;
         cfg.http3_max_conns = 1024;   /* an explicit 0 lifts the cap */
         /* -1 is "the caller said nothing", which is NOT the same as
          * completion => 0. The memset above would otherwise read as an
@@ -49,6 +67,7 @@ run(class, ...)
             else if (strEQ(key, "workers"))        cfg.nworkers = (int)SvIV(val);
             else if (strEQ(key, "idle_timeout"))   cfg.idle_t = SvNV(val);
             else if (strEQ(key, "header_timeout")) cfg.header_t = SvNV(val);
+            else if (strEQ(key, "body_timeout"))   cfg.body_t   = SvNV(val);
             else if (strEQ(key, "max_pipeline"))   cfg.max_pipe = (int)SvIV(val);
             else if (strEQ(key, "reuseport"))      cfg.reuseport = SvTRUE(val) ? 1 : 0;
             /* Completion-mode reads. On by default wherever the backend can
@@ -102,6 +121,49 @@ run(class, ...)
                     }
                 }
             }
+            else if (strEQ(key, "user"))     { if (SvOK(val)) cfg.drop_user  = SvPV_nolen(val); }
+            else if (strEQ(key, "group"))    { if (SvOK(val)) cfg.drop_group = SvPV_nolen(val); }
+            else if (strEQ(key, "pid_file")) { if (SvOK(val)) cfg.pid_path   = SvPV_nolen(val); }
+            else if (strEQ(key, "listen_fds")) cfg.listen_fds = SvTRUE(val) ? 1 : 0;
+            else if (strEQ(key, "umask")) {
+                /* a number as perl parsed it (0077 is already 63), or a string
+                 * of octal digits as a shell would write it ("077") */
+                if (SvOK(val)) {
+                    if (SvIOK(val) || SvNOK(val)) cfg.umask_val = (unsigned)SvUV(val);
+                    else {
+                        char *end;
+                        const char *s = SvPV_nolen(val);
+                        cfg.umask_val = (unsigned)strtoul(s, &end, 8);
+                        if (*s == '\0' || *end != '\0')
+                            croak("Hyperman->run: umask '%s' is not an octal number", s);
+                    }
+                    cfg.umask_set = 1;
+                }
+            }
+            else if (strEQ(key, "access_log_format")) {
+                if (SvOK(val)) cfg.log_format = SvPV_nolen(val);
+            }
+            else if (strEQ(key, "error_log")) {
+                /* a filehandle or a path; the server's own messages go there
+                 * instead of stderr. psgi.errors is the application's and is
+                 * not moved. */
+                if (SvOK(val)) {
+                    SV *g = (SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVGV)
+                            ? SvRV(val) : val;
+                    if (SvTYPE(g) == SVt_PVGV) {
+                        IO     *io = GvIO((GV *)g);
+                        PerlIO *fp = io ? (IoOFP(io) ? IoOFP(io) : IoIFP(io)) : NULL;
+                        int raw = fp ? PerlIO_fileno(fp) : -1;
+                        if (raw < 0)
+                            croak("Hyperman->run: error_log handle has no fileno");
+                        cfg.err_fd = dup(raw);
+                        if (cfg.err_fd < 0)
+                            croak("Hyperman->run: dup error_log fd: %s", strerror(errno));
+                    } else {
+                        cfg.err_path = SvPV_nolen(val);
+                    }
+                }
+            }
             else if (strEQ(key, "max_requests_per_worker"))
                                                    cfg.max_requests = SvUV(val);
             /* Response compression. Off by default: a server that starts
@@ -134,6 +196,7 @@ run(class, ...)
             else if (strEQ(key, "affinity"))       cfg.affinity = SvTRUE(val) ? 1 : 0;
             else if (strEQ(key, "http2"))          dfl.http2 = SvTRUE(val) ? 1 : 0;
             else if (strEQ(key, "http3"))          dfl.http3 = SvTRUE(val) ? 1 : 0;
+            else if (strEQ(key, "proxy_protocol")) dfl.proxy_protocol = SvTRUE(val) ? 1 : 0;
             else if (strEQ(key, "http3_max_conns")) cfg.http3_max_conns = SvUV(val);
             else if (strEQ(key, "tls_cert"))       dfl.tls_cert = SvOK(val) ? SvPV_nolen(val) : NULL;
             else if (strEQ(key, "tls_key"))        dfl.tls_key  = SvOK(val) ? SvPV_nolen(val) : NULL;
@@ -732,6 +795,17 @@ on_worker_start(class, cb)
         RETVAL
 
 # ---- compat shim selftest -----------------------------------------------
+
+# Hyperman->_proxy_selftest: drive hm_proxy.h's parser from C over hostile
+# inputs (t/61). 0 = every step passed, else the number of the first failure.
+IV
+_proxy_selftest(class)
+    SV *class
+    CODE:
+        PERL_UNUSED_VAR(class);
+        RETVAL = hm_proxy_selftest();
+    OUTPUT:
+        RETVAL
 
 # Hyperman->_croak_sv_selftest($sv): raise $sv through hm_compat.h's own
 # croak_sv shim, whether or not this perl has a native croak_sv to shadow

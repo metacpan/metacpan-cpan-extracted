@@ -6,7 +6,7 @@ use Carp qw(croak cluck);
 use File::Spec;
 use parent 'AmberDB::Base';
 
-our $VERSION = '5.26.4';
+our $VERSION = '5.26.5';
 my $CREATED  = '2026-09-06';
 
 # Whitelist of inheritable group-level configuration keys from .dbase to member tables
@@ -834,6 +834,11 @@ sub table_attr {
 
     $table = $self->sanitize_table($table);
     return unless defined $table && length $table;
+
+    # Ensure full table schema is loaded before querying or modifying attributes
+    unless ( $self->{_table}->{$table} && $self->{_table}->{$table}->{_has_schema} ) {
+        $self->table_info($table);
+    }
 
     # 1. No extra arguments: return shallow copy of table attributes
     if ( !@args ) {

@@ -117,7 +117,7 @@ for my $data (@test) {
 	my $board = Game::Cribbage::Board->new();
 
 	$board->add_player(name => $data->{player1}->{name});
-	$board->add_player(name => $data->{player2}->{name});	
+	$board->add_player(name => $data->{player2}->{name});
 
 	$board->start_game();
 
@@ -147,7 +147,7 @@ for my $data (@test) {
 
 	my $p1 = join " | ", map {$_->stringify} @{$current->player1->cards};
 	my $p2 = join " | ", map {$_->stringify} @{$current->player2->cards};
-	
+
 	is(scalar @{$current->player1->cards}, 6, 'player1 has 6 cards ' . $p1);
 	is(scalar @{$current->player2->cards}, 6, 'player2 has 6 cards ' . $p2);
 
@@ -162,7 +162,7 @@ for my $data (@test) {
 	is(scalar @{$current->player2->cards}, 4, 'player2 now has 4 cards ' . $p2);
 	is(scalar @{$current->player2->crib}, 4, 'player2 has a crib of 4 cards ' . $c1);
 	is(scalar @{$current->player1->crib}, 0, 'player1 should not have a crib');
-	
+
 	ok(1, 'Here we would allow splitting of the deck but for testing just use a default card');
 
 	$board->rounds->current_round->add_starter_card(
@@ -187,9 +187,9 @@ for my $data (@test) {
 	is_deeply($board->score->player2, { current => 0, last => 0}, 'player2 should still have 0 points');
 
 	is($board->current_play_score, 15, 'The current run score is 15');
- 
+
 	ok($board->play_card($player2, 3), 'player2 plays card ' . $board->get_card($player2, 3)->stringify);
-	
+
 	is($board->current_play_score, 17, 'The current run score is 17');
 
 	ok($board->play_card($player1, 0), 'player1 plays card ' . $board->get_card($player1, 0)->stringify);

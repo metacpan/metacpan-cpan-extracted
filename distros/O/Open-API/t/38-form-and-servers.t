@@ -197,6 +197,18 @@ my $URL = [ { url => 'https://h.test/api/v1' } ];
     is($sub, undef, 'a path merely sharing the prefix as a substring is not stripped');
 }
 
+# A scheme-relative URL, `//host/path`, is a relative URL 3.x allows and the
+# shape a Swagger 2.0 `host` with no `schemes` converts to. The prefix scan
+# used to look only for `://`, so the WHOLE of `//h.test/api/v1` became the
+# prefix and nothing routed.
+{
+    my $on = srv_api([ { url => '//h.test/api/v1' } ], 1);
+    my ($pre) = $on->match(GET => '/api/v1/pets');
+    is($pre, 'p', 'servers => 1: a scheme-relative server URL yields its path as the prefix');
+    my ($whole) = $on->match(GET => '/h.test/api/v1/pets');
+    is($whole, undef, '...and not the host as part of it');
+}
+
 {
     my $tm = srv_api([ { url => 'https://{host}/v1',
                          variables => { host => { default => 'h.test' } } } ], 1);

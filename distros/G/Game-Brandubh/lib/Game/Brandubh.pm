@@ -23,7 +23,7 @@ use Game::Brandubh::Error;
 use Game::Brandubh::Result;
 use Digest::SHA ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 my $E = 'Game::Brandubh::Engine';
 my $X = 'Game::Brandubh::Error';
@@ -492,7 +492,7 @@ Game::Brandubh - the Irish 7 by 7 tafl game: a king, four defenders, eight attac
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

@@ -2,9 +2,9 @@ use strict;
 use warnings;
 package YAML::PP::Perl;
 
-our $VERSION = 'v0.41.0'; # VERSION
+our $VERSION = 'v0.42.0'; # VERSION
 
-use base 'Exporter';
+use Exporter 'import';
 use base 'YAML::PP';
 our @EXPORT_OK = qw/ Load Dump LoadFile DumpFile /;
 

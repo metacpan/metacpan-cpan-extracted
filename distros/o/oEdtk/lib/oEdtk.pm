@@ -5,8 +5,8 @@ BEGIN {
 		use vars 	qw($VERSION $YEAR @ISA @EXPORT @EXPORT_OK); # %EXPORT_TAGS);
 		use strict;
 
-		# a.ammr a.a année écoulées, mm mois, r release
-		$VERSION	= 2.1106;
+		# a.ammr a.a elapsed years, mm months, r release
+		$VERSION	= 2.1109;
 		$YEAR	= '2026';
 		@ISA		= qw(Exporter);
 		@EXPORT	= qw(oEdtk_release);
@@ -79,7 +79,7 @@ here.
         # Reading the input line by line
         while (my $ligne=<IN>) {
             chomp ($ligne);
-            # testing if $line maok, pas de soucitch pre declared records
+            # testing if $line matches pre declared records
             if (oe_process_ref_rec(0, 3, $ligne)) {
             } else {
                 # If not, record is ignored

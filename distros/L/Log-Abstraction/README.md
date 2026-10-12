@@ -4,7 +4,7 @@ Log::Abstraction - Logging Abstraction Layer
 
 ## Version
 
-0.39
+0.40
 
 ## Synopsis
 
@@ -146,8 +146,8 @@ when ["flush"](#flush) is called, or when the logger is destroyed (which calls
 Every backend can have its own `level` and `format`, as well as the
 logger's.  `syslog`, `journald` and `sendmail` are hashes already, so
 they take them as keys.  `file`, `fd` and `array`, inside a `logger` hash
-or at the top level, may be given as a hash holding the destination under
-the backend's own name:
+or at the top level, and `log_any` and `log_dispatch`, may be given as a
+hash holding the destination under the backend's own name:
 
 ```perl
 my $log = Log::Abstraction->new(
@@ -169,11 +169,54 @@ applied first, so a backend's level can only narrow it: set the logger's
 ["format"](#format), which it overrides.  For `file` and `fd` it is the line
 written.  For the others, which by default get the message as it is, it
 replaces the message: the `array` entry's `message`, the text sent to
-syslog, the journal's `MESSAGE` field and the email body.
+syslog, Log::Any or Log::Dispatch, the journal's `MESSAGE` field and the
+email body.
 
 The plain forms (`file => $path`, `fd => $handle`,
-`array => \@array`) still work and have no level or format of their
+`array => \@array`, `log_any => $category`,
+`log_dispatch => $dispatcher`) still work and have no level or format of their
 own.  A blessed handle object is a destination, not the hash form.
+
+### Forwarding to Log::Any and Log::Dispatch
+
+[Log::Any::Adapter::Abstraction](https://metacpan.org/pod/Log%3A%3AAny%3A%3AAdapter%3A%3AAbstraction) brings messages from [Log::Any](https://metacpan.org/pod/Log%3A%3AAny) into
+`Log::Abstraction`.  The `log_any` and `log_dispatch` backends go the
+other way, sending messages on to an application's existing [Log::Any](https://metacpan.org/pod/Log%3A%3AAny) or
+[Log::Dispatch](https://metacpan.org/pod/Log%3A%3ADispatch) set-up, alongside any other backends:
+
+```perl
+my $log = Log::Abstraction->new(
+    level  => 'debug',
+    logger => {
+        log_any      => 'MyApp',          # a category, or a Log::Any logger
+        log_dispatch => $dispatcher,      # a Log::Dispatch object
+        file         => '/var/log/myapp.log',
+    },
+);
+```
+
+Levels keep their names, except that `warn` becomes `warning`, and
+Log::Dispatch, which has nothing below `debug`, gets `trace` messages as
+`debug`.  Log::Any gets ["Structured fields"](#structured-fields) as its trailing hashref, so a
+structured adapter receives them as data; Log::Dispatch has no fields, so
+they are appended to the message as text.  With its own `format` (see
+["Per-backend level and format"](#per-backend-level-and-format)) a backend gets the formatted line instead.
+
+A `Log::Any` category name is looked up with
+`Log::Any->get_logger(category => $name)` (which needs [Log::Any](https://metacpan.org/pod/Log%3A%3AAny)
+installed) when the first message is sent, and follows later
+`Log::Any::Adapter->set()` calls.  If Log::Any or Log::Dispatch dies,
+`Carp::carp` is called and the other backends still get the message.
+
+A `Log::Any::Proxy` or `Log::Dispatch` object given as the `logger`
+itself is used in the same way, rather than as an object whose method is
+called for each level: neither has a method for every level, and both
+would join the arguments with spaces.
+
+A message that reaches a `Log::Abstraction` while it is being forwarded
+(e.g. through [Log::Any::Adapter::Abstraction](https://metacpan.org/pod/Log%3A%3AAny%3A%3AAdapter%3A%3AAbstraction)) is logged by that logger's
+other backends but not forwarded again, so a set-up that points back at
+itself doesn't loop.
 
 ### File Rotation
 
@@ -200,10 +243,31 @@ same file, use **logrotate** instead.
 
 #### Logrotate
 
-The file is opened, appended to and closed for every message, never held
-open, so **logrotate**'s default (rename the file and let the application
-create a new one) works without `copytruncate`, and without sending the
-process a `SIGHUP`: the next message is written to the new file.
+The file is kept open between messages, but before each write the logger
+checks that the path still names the same file (device and inode), so
+**logrotate**'s default (rename the file and let the application create a new
+one) works without `copytruncate`, and without sending the process a
+`SIGHUP`: the next message is written to a new file.
+
+A `postrotate` script that sends the process a `SIGHUP` works too: except
+on Windows, the first time a logger opens a file, `Log::Abstraction` sets
+`$SIG{HUP}` to a handler that makes every logger open its files again on
+the next write.  A handler that was already set (a code reference or a sub
+name) is called after it.  This means a `SIGHUP` no longer ends the
+program, as it does by default, while a logger that has opened a file
+exists.  When the last of them is destroyed, the handler that was there
+before is put back.  A handler that the program sets later replaces
+`Log::Abstraction`'s (and isn't changed when the loggers are destroyed);
+it can call ["reopen"](#reopen) itself.
+
+In case a `SIGHUP` isn't sent, every file is also closed and opened again
+every 5 minutes, by default.  `reopen_interval` changes how often, makes
+`SIGHUP` the only way (`-1`), or closes the file after every message
+(`0`), as before version 0.40.
+
+On Windows an open file can't be renamed or deleted, so a file the logger is
+writing can only be rotated by the logger itself (which closes it first), or
+after calling ["reopen"](#reopen), and then only until the next message.
 
 ## Methods
 
@@ -311,8 +375,11 @@ called on an object.  It may also be called as a plain function,
 
     - A code reference -- called with a hashref `{ class, file, line, level, message, ctx, fields }`
     (`ctx` and `fields` only when there are any)
-    - An object -- method matching the level name is called on it
-    - A hash reference -- may contain `file`, `array`, `fd`, `syslog`, `journald`, and/or `sendmail` keys,
+    - An object -- method matching the level name is called on it; a
+    [Log::Any](https://metacpan.org/pod/Log%3A%3AAny) logger or a [Log::Dispatch](https://metacpan.org/pod/Log%3A%3ADispatch) object is used as the `log_any` or
+    `log_dispatch` backend (see ["Forwarding to Log::Any and Log::Dispatch"](#forwarding-to-log-any-and-log-dispatch))
+    - A hash reference -- may contain `file`, `array`, `fd`, `syslog`, `journald`, `sendmail`,
+    `log_any` and/or `log_dispatch` keys,
     each of which may have its own `level` and `format` (see ["Per-backend level and format"](#per-backend-level-and-format))
     - An array reference -- `{ level, message }` hashrefs are pushed onto it, with a
     `fields` key when the call has ["Structured fields"](#structured-fields)
@@ -322,13 +389,26 @@ called on an object.  It may also be called as a plain function,
 
     The `sendmail` sub-hash supports:
     `host`, `port`, `to`, `from`, `subject`, `level`, `format`,
-    `min_interval`, `digest`, `digest_max`.  `to` is required.  With `format`, the email body is the
+    `min_interval`, `digest`, `digest_max`, `async`.  `to` is required.  With `format`, the email body is the
     formatted line rather than the message.  `level` may be a level name or a syslog number (0-7);
     without it, every message is emailed.
     At most one email is sent per `min_interval` seconds per instance; the
     messages in between are dropped, unless `digest` is set, which sends them
     with the next email (see ["Email digests"](#email-digests)).  If delivery fails,
     `Carp::carp` is called and the other backends still receive the message.
+
+    Sending an email waits for the SMTP server, which can take seconds.  With
+    `async => 1`, the email is sent by a child process (made with
+    `fork`), and the log call returns at once.  The `host` and `port` are
+    still checked first.  The logger can't know whether the child succeeded:
+    the child carps a failure itself, and the message (and any digest sent
+    with it) is lost rather than held.  Emails sent close together are sent at
+    the same time, so they may arrive in any order.  The finished children are
+    reaped the next time an email is sent and when a logger is destroyed; a program that
+    reaps every child itself (e.g. `waitpid(-1, ...)` in a `$SIG{CHLD}`
+    handler) may see them.  On Windows, whose `fork` is emulated with threads,
+    when `fork` fails, and for the email sent when perl exits, the email is
+    sent in the log call as without `async`.
 
     The `syslog` sub-hash supports the keys below.  The message is passed to
     `syslog()` through a `%s` format, so `%` sequences in it, such as `%m`,
@@ -355,13 +435,28 @@ called on an object.  It may also be called as a plain function,
     `[truncated]` appended.
     Delivery failures are silent apart from a single `Carp::carp` (repeated only
     after a later send has succeeded); the application is never crashed by a
-    journald error.
+    journald error.  The socket is opened for the first message and reused for
+    the next ones; after a failed send it is closed, and the next message opens a
+    new one.  Each datagram is addressed to the socket path, so delivery
+    continues after journald restarts.
 
 - `redact`
 
     Patterns to remove from every message before it is logged: a `qr//`, a
     string (compiled as a regular expression; a config file can't hold a
     `qr//`), or an array reference of them.  See ["Redaction"](#redaction).
+
+- `reopen_interval`
+
+    Log files written by path are kept open between messages.  Every this many
+    seconds (default 300, i.e. 5 minutes) each one is closed and opened again on
+    its next write, in case a rotation tool changed the file without renaming it
+    and without sending a `SIGHUP` (see ["logrotate"](#logrotate)).
+
+    `0` closes the file after every message, so it is never held open, and no
+    `SIGHUP` handler is installed for it.  `-1` never reopens the file because
+    of time: only a `SIGHUP`, ["reopen"](#reopen), or the file being renamed or deleted
+    does.  (Windows has no `SIGHUP`.)
 
 - `rotate_interval`
 
@@ -442,6 +537,11 @@ or in a `logger` hash) and `script_name` is not supplied.  Loads
 `Log::Log4perl` if no backend (`logger`, `file`, `fd` or `array`) is
 specified.
 
+Builds one [Log::Abstraction::Backend](https://metacpan.org/pod/Log%3A%3AAbstraction%3A%3ABackend) object for each place messages go
+to.  The arguments are not changed: in particular, the `syslog` hash keeps
+its `facility`, `level` and `format` keys, and a `server` key is not
+renamed `host` (before 0.40, the first message did both).
+
 #### Example
 
 ```perl
@@ -468,6 +568,7 @@ my $clone = $logger->new(level => 'info');
     logger         => { optional => 1 },
     max_messages   => { type => 'integer', min => 0, optional => 1 },
     redact         => { optional => 1 },    # regex, string, or arrayref of them
+    reopen_interval => { type => 'integer', min => -1, optional => 1 },
     rotate_interval => { type => 'string', regex => qr/^(hourly|daily|weekly|monthly)$/i, optional => 1 },
     rotate_keep    => { type => 'integer', min => 0, optional => 1 },
     rotate_size    => { type => 'string',  regex => qr/^\s*[1-9]\d*\s*[kmg]?b?\s*$/i, optional => 1 },
@@ -512,6 +613,9 @@ Error                                     Meaning / Action
   not '<v>'"
 "<class>: rotate_keep must be a           rotate_keep is negative or not a number.
   non-negative integer, not '<v>'"
+"<class>: reopen_interval must be a       reopen_interval is not a whole number
+  number of seconds, 0 or -1, not '<v>'"  of seconds, 0 (close after every
+                                          message) or -1 (only on SIGHUP).
 "<class>: timestamp_format must be a      timestamp_format is undef, empty or a
   non-empty string"                       reference.
 "<class>: timestamp_precision must be     timestamp_precision is not a whole
@@ -530,15 +634,28 @@ Error                                     Meaning / Action
                                           gives "invalid syslog level", as above.)
 "<class>: the <backend> format must be   A backend's 'format' is undef, empty or
   a non-empty string"                     a reference.
-"<class>: the <backend> hash needs a      The hash form of file, fd or array has
-  '<backend>' key"                        no destination (e.g. file => { level =>
-                                          'info' } without a 'file' key).
+"<class>: the <backend> hash needs a      The hash form of file, fd, array, log_any
+  '<backend>' key"                        or log_dispatch has no destination (e.g.
+                                          file => { level => 'info' } without a
+                                          'file' key).
 "<class>: the sendmail backend needs      The sendmail sub-hash has no 'to' key.
   a 'to' address"
 "<class>: sendmail digest_max must be a   digest_max is zero, negative or not a
   positive integer, not '<v>'"            number.
 "<class>: invalid journald field name     An extra journald key, upper-cased, is not
   '<k>'"                                  [A-Z0-9_] or starts with '_'.
+"<class>: the logger hash has none of     The logger hash has nowhere to send
+  the keys array, fd, file, journald,     messages.  (Before 0.40, the first
+  log_any, log_dispatch, sendmail,        message croaked "Don't know how to deal
+  syslog"                                 with the <level> message".)
+"<class>: the logger can't be a <TYPE>    logger is a reference of an unsupported
+  reference"                              type, e.g. a SCALAR or GLOB reference.
+"<class>: log_any must be a Log::Any      log_any is neither a Log::Any logger
+  logger or a category name"              (Log::Any::Proxy) nor a non-empty string.
+"<class>: log_any needs Log::Any to be    log_any is a category name but Log::Any
+  installed"                              can't be loaded.
+"<class>: log_dispatch must be a          log_dispatch is not an object with a
+  Log::Dispatch object"                   log() method.
 ```
 
 The following are not raised by `new()` but later, by the logging methods
@@ -559,13 +676,8 @@ Croak                                     Meaning / Action
                                           other than A-Z a-z 0-9 . -
 "<class>: Invalid SMTP port: <port>"      The sendmail 'port' is not an integer in
                                           1-65535.
-"<class>: Don't know how to deal with     A logger hash has none of the keys file,
-  the <level> message"                    array, fd, syslog, journald or sendmail.
 "<class>: <object class> doesn't know     An object logger has no method for this
   how to deal with the <level> message"   level.  (notice falls back to info.)
-"<class>: configuration error, no         logger is a reference of an unsupported
-  handler written for the <level>         type, e.g. a SCALAR or GLOB reference.
-  message"
 
 Carp                                      Meaning / Action
 ----------------------------------------  -----------------------------------------
@@ -575,6 +687,8 @@ Carp                                      Meaning / Action
 "<class>: journald send failed: <error>"  The journald socket could not be reached.
                                           Given once, then not again until a send
                                           succeeds.
+"<class>: Log::Any failed: <error>"       Log::Any (or its adapter) died.  The other
+"<class>: Log::Dispatch failed: <error>"  backends still receive the message.
 ```
 
 #### Pseudocode
@@ -594,14 +708,16 @@ FUNCTION new(class_or_obj, args...)
 
   IF called on a blessed instance (clone form):
     CROAK on an invalid timestamp_format or timestamp_precision
-    CROAK on an invalid rotate_size, rotate_interval or rotate_keep, and
-      normalise rotate_size to bytes
+    CROAK on an invalid rotate_size, rotate_interval, rotate_keep or
+      reopen_interval, and normalise rotate_size to bytes
     CROAK on an invalid redact pattern; compile redact to one regex
     shallow-clone self merged with override args
     validate and store new level integer if level given in args
     copy message history list
-    start the clone with no held email digest
+    start the clone with no held email digest, no open files, and not
+      counted as a user of the SIGHUP handler
     count the clone as a user of an open syslog connection
+    build the clone's own backends
     RETURN clone
 
   IF syslog requested (top level or in a logger hash) and script_name
@@ -626,14 +742,19 @@ FUNCTION new(class_or_obj, args...)
   CROAK if timestamp_format is empty or not a string, or
     timestamp_precision is not an integer 0-9
   CROAK if rotate_size is not a positive size, rotate_interval is not
-    hourly/daily/weekly/monthly, or rotate_keep is not a non-negative
-    integer; normalise rotate_size to bytes
+    hourly/daily/weekly/monthly, or rotate_keep or reopen_interval is not
+    a non-negative integer; normalise rotate_size to bytes
   CROAK if a redact pattern is not a regex or non-empty string, doesn't
     compile, or matches the empty string; compile redact to one regex
 
   FOR each backend (top-level file/fd/array, and the logger hash's
-  file/fd/array/syslog/sendmail/journald) given as a hash:
-    CROAK if a file/fd/array hash lacks its destination key (its own name)
+  file/fd/array/syslog/sendmail/journald/log_any/log_dispatch):
+    IF log_any: CROAK unless a Log::Any::Proxy, or a category name with
+      Log::Any installed
+    IF log_dispatch: CROAK unless an object with a log() method
+    SKIP the rest unless given as a hash
+    CROAK if a file/fd/array/log_any/log_dispatch hash lacks its
+      destination key (its own name)
     CROAK if its 'level' is not a level name or 0-7
     CROAK if its 'format' is undef, empty or not a string
 
@@ -641,8 +762,11 @@ FUNCTION new(class_or_obj, args...)
     CROAK if a sendmail sub-hash has no 'to' address, or a digest_max
       that isn't a positive integer
     CROAK if an extra journald key is not a valid journald field name
+    CROAK if it has none of the backend keys
 
-  RETURN bless { messages => [], merged args, level => numeric } as class
+  self = bless { messages => [], merged args, level => numeric } as class
+  self->{_backends} = _build_backends()  (CROAK on an unsupported logger)
+  RETURN self
 
 END FUNCTION
 ```
@@ -855,7 +979,9 @@ The logger, for method chaining.
 #### Side Effects
 
 May send an email, which starts the `min_interval` interval again.  A
-delivery failure is carped and the messages stay held.  Croaks if the
+delivery failure is carped and the messages stay held.  With `async`, the
+email is sent by a child process and the messages are no longer held: a
+failure is carped by the child, and the messages are lost.  Croaks if the
 `sendmail` `host` or `port` is invalid.
 
 #### Example
@@ -865,6 +991,58 @@ $logger->error('disk full');    # emailed
 $logger->error('disk still full');    # held: within min_interval
 $logger->flush();                # emailed now
 ```
+
+#### Api Specification
+
+##### Input
+
+```
+{} (no arguments)
+```
+
+##### Output
+
+```perl
+{ type => 'object', class => 'Log::Abstraction' }
+```
+
+### Reopen
+
+```
+$logger->reopen();
+```
+
+Closes the log files the logger holds open, so that the next message opens
+them again.  Log files written by path (see ["File rotation"](#file-rotation)) are kept open
+between messages; call this after something outside the program has renamed,
+moved or truncated them.  It isn't usually needed: a file that has been
+renamed or deleted is noticed on the next write, a `SIGHUP` reopens every
+logger's files (except on Windows, see ["logrotate"](#logrotate)), and every file is
+reopened when `reopen_interval` has passed (unless it is `-1`).  File
+handles passed as `fd` are not closed.  It does nothing if no files are
+open.
+
+A file is also closed when writing to it fails (e.g. the disk is full), so
+that the next message opens it again.
+
+A program that sets its own `$SIG{HUP}` after logging has started replaces
+the module's handler, and can call this from its own:
+
+```perl
+$SIG{HUP} = sub { $logger->reopen(); reload_config() };
+```
+
+#### Arguments
+
+None.
+
+#### Returns
+
+The logger, for method chaining.
+
+#### Side Effects
+
+Closes the logger's log files.
 
 #### Api Specification
 
@@ -1441,15 +1619,6 @@ callback as described above.
 
 ## Limitations
 
-- **Syslog hash mutation**
-
-    The `syslog` sub-hash passed to `new()` is mutated in-place on the first
-    log call: `facility`, `level` and `format` are temporarily removed before
-    `setlogsock()` is called, then restored; `server` is permanently renamed
-    to `host`.  Sharing a syslog hashref between two `Log::Abstraction`
-    instances is not supported and produces undefined behaviour on the second
-    instance.
-
 - **trace is the same threshold as debug**
 
     syslog has no priority below debug, so `trace` and `debug` share one
@@ -1470,17 +1639,32 @@ callback as described above.
 
 - **Structured fields are text in most backends**
 
-    Only the history, array, CODE-ref, JSON and journald backends keep
-    ["Structured fields"](#structured-fields) as data.  Text formats, syslog, email and object
-    loggers get them as `key=value` text appended to the message, and a custom
-    `format` has no token for them on their own.
+    Only the history, array, CODE-ref, JSON, journald and Log::Any backends
+    keep ["Structured fields"](#structured-fields) as data.  Text formats, syslog, email,
+    Log::Dispatch and object loggers get them as `key=value` text appended to
+    the message, and a custom `format` has no token for them on their own.
 
-- **Single-threaded email throttle**
+- **Process-wide state, and no thread safety**
 
-    The `min_interval` throttle and `digest` for the `sendmail` backend and
-    the `_syslog_opened` first-open flag are stored on the object without mutex
-    protection.  Under Perl ithreads or other concurrency models, objects shared
-    between threads are not safe.
+    Some state belongs to the whole process, not to a logger: the syslog
+    connection (above), the `$SIG{HUP}` handler (see ["logrotate"](#logrotate)), and the
+    list of `async` email children still to be reaped.  The per-logger state
+    (open log files, the `min_interval` throttle and `digest`, the
+    first-open syslog flag) is stored on the object without locking.  Under
+    Perl ithreads or other concurrency models, objects shared between threads
+    are not safe.
+
+- **Asynchronous email uses fork**
+
+    The `sendmail` `async` option sends each email from a child made with
+    `fork`.  That may not suit every program: under mod\_perl the child is a
+    copy of the Apache process; with ithreads only the calling thread is
+    copied; and in an event loop ([AnyEvent](https://metacpan.org/pod/AnyEvent), [IO::Async](https://metacpan.org/pod/IO%3A%3AAsync), [Mojo::IOLoop](https://metacpan.org/pod/Mojo%3A%3AIOLoop))
+    the child is reaped by this module, not by the loop's child watcher.  A
+    program that reaps every child itself (e.g. `waitpid(-1, ...)` in a
+    `$SIG{CHLD}` handler) sees these children too.  The child's success or
+    failure isn't reported back: a failure is carped by the child and the
+    message is lost.  Without `async` the email is sent in the log call.
 
 - **OpenTelemetry not yet supported**
 
@@ -1503,7 +1687,17 @@ Nigel Horne `njh@nigelhorne.com`
 - [Log::Any](https://metacpan.org/pod/Log%3A%3AAny) and [Log::Any::Adapter::Abstraction](https://metacpan.org/pod/Log%3A%3AAny%3A%3AAdapter%3A%3AAbstraction)
 
     Route messages from any `Log::Any`-using CPAN module through
-    `Log::Abstraction` with a single `Log::Any::Adapter->set()` call.
+    `Log::Abstraction` with a single `Log::Any::Adapter->set()` call,
+    or send messages on to Log::Any with the `log_any` backend.
+
+- [Log::Abstraction::Backend](https://metacpan.org/pod/Log%3A%3AAbstraction%3A%3ABackend)
+
+    The classes that send messages to each kind of backend.
+
+- [Log::Dispatch](https://metacpan.org/pod/Log%3A%3ADispatch)
+
+    Send messages on to a `Log::Dispatch` object with the `log_dispatch`
+    backend (see ["Forwarding to Log::Any and Log::Dispatch"](#forwarding-to-log-any-and-log-dispatch)).
 
 - [Test Dashboard](https://nigelhorne.github.io/Log-Abstraction/coverage/)
 
@@ -1656,10 +1850,40 @@ is_<lvl> ≡ IsLevel[lvl? := lvl]
 │ ΔLogState
 │ result! : LogState
 ├─────────────────────────────────────────────────────────────
-│ digest ≠ ⟨⟩ ∧ sent(digest) ⟹ digest' = ⟨⟩ ∧ last_email_sent' = now
-│ digest ≠ ⟨⟩ ∧ ¬sent(digest) ⟹ digest' = digest
+│ digest ≠ ⟨⟩ ∧ (sent(digest) ∨ async ∧ forked) ⟹
+│     digest' = ⟨⟩ ∧ last_email_sent' = now
+│ digest ≠ ⟨⟩ ∧ ¬sent(digest) ∧ ¬(async ∧ forked) ⟹ digest' = digest
 │ digest = ⟨⟩ ⟹ digest' = digest
 │ messages' = messages
+│ result! = self
+└─────────────────────────────────────────────────────────────
+```
+
+### Reopen
+
+```
+INTERVAL == ℤ                     reopen_interval: seconds, 0 or -1
+HANDLE   == { fh; dev; ino; sighup : ℕ; opened : ℕ }
+
+┌─ OpenFiles ─────────────────────────────────────────────────
+│ handles         : PATH ⇸ HANDLE
+│ reopen_interval : INTERVAL
+├─────────────────────────────────────────────────────────────
+│ reopen_interval ≥ -1
+│ reopen_interval = 0 ⟹ handles = ∅   (between log calls)
+└─────────────────────────────────────────────────────────────
+
+A handle h on path p is used for the next write iff
+  stat(p) = (h.dev, h.ino) ∧ h.sighup = sighup_count
+  ∧ (reopen_interval = -1 ∨ now - h.opened < reopen_interval)
+and is otherwise closed and p opened again.
+
+┌─ Reopen ────────────────────────────────────────────────────
+│ ΔOpenFiles
+│ result! : LogState
+├─────────────────────────────────────────────────────────────
+│ handles' = ∅
+│ reopen_interval' = reopen_interval
 │ result! = self
 └─────────────────────────────────────────────────────────────
 ```

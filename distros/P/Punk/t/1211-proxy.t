@@ -259,4 +259,63 @@ boot_fails 'proxy; proxy trust => 2', qr/already declared/,
     is $@, '', "trust => 'all' is allowed under PUNK_ENV=development";
 }
 
+# ---- a network list is one trust decision -------------------------------------
+# A peer outside the trusted networks is not the proxy, so nothing it says
+# about the request is believed: not the client address, and not the scheme,
+# host or port either.
+{
+    package CidrAll;
+    use Punk;
+    proxy trust => ['10.0.0.0/8', 'fd00::/8'];
+    get '/env' => \&main::echo;
+}
+{
+    my $call = caller_for(CidrAll->to_app);
+    my %claims = (xff => '1.2.3.4', proto => 'https',
+                  host => 'evil.attacker.net', port => 443);
+
+    for my $peer ('8.8.8.8', '11.0.0.1', '2001:db8::1', 'not-an-address', '') {
+        my $d = body_of($call->(peer => $peer, %claims));
+        is $d->{host}, 'localhost', "peer '$peer': X-Forwarded-Host is ignored";
+        is $d->{scheme}, 'http', '...X-Forwarded-Proto too';
+        is $d->{https}, undef, '...so HTTPS is not set';
+        is $d->{port}, 80, '...nor the port';
+        is $d->{remote_addr}, $peer, '...and the address is the peer';
+        is $d->{peer_addr}, $peer, '...which punk.peer_addr still records';
+    }
+    for my $one ([ proto => 'https', scheme => 'http' ],
+                 [ host => 'evil.attacker.net', host => 'localhost' ],
+                 [ port => 8443, port => 80 ]) {
+        my ($hdr, $val, $key, $want) = @$one;
+        my $d = body_of($call->(peer => '8.8.8.8', $hdr => $val));
+        is $d->{$key}, $want, "an untrusted peer's $hdr alone changes nothing";
+    }
+
+    for my $peer ('10.0.0.1', '10.255.255.254', 'fd00::1') {
+        my $d = body_of($call->(peer => $peer, %claims));
+        is $d->{host}, 'evil.attacker.net',
+            "peer '$peer' is the proxy: its host is believed";
+        is $d->{scheme}, 'https', '...and its scheme';
+        is $d->{https}, 'on', '...with HTTPS';
+        is $d->{port}, 443, '...and its port';
+        is $d->{remote_addr}, '1.2.3.4', '...and its client';
+    }
+    my $d = body_of($call->(peer => '10.0.0.1', proto => 'https'));
+    is $d->{scheme}, 'https', 'a trusted peer needs no X-Forwarded-For for the rest';
+}
+{
+    package HopAll;
+    use Punk;
+    proxy trust => 1;
+    get '/env' => \&main::echo;
+}
+{
+    my $d = body_of(caller_for(HopAll->to_app)->(
+        peer => '8.8.8.8', xff => '1.2.3.4', proto => 'https',
+        host => 'app.example.com'));
+    is $d->{host}, 'app.example.com',
+        'a hop count trusts whoever connected, as it always did';
+    is $d->{scheme}, 'https', '...scheme included';
+}
+
 done_testing;

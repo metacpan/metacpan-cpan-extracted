@@ -6,7 +6,13 @@ MODULE = Hyperman		PACKAGE = Hyperman::Writer
 # Payload shapes, discriminated on length because a writer is a blessed AV
 # and not three classes:
 #
-#   [fd, id]                        HTTP/1.1, EOF-delimited (Connection: close)
+#   [fd, id, serial, "h1"]          HTTP/1.1: chunked and keep-alive when the
+#                                   request allows, else EOF-delimited. The
+#                                   serial names the response on that
+#                                   connection, so a writer kept past it
+#                                   cannot end the one that followed
+#   [fd, id]                        the pre-0.57 HTTP/1.1 shape, kept so a
+#                                   writer built by hand still works
 #   [fd, gen, stream_id, "h2"]      HTTP/2, buffered until close
 #   [udp_fd, qid, stream_id, "h3"]  HTTP/3, the same shape over QUIC
 #   [handle, serial, "stream"]      an ABI v6 stream handle (hm_stream.h),
@@ -44,7 +50,9 @@ write(self, data)
             SV **g = av_fetch(w, 1, 0);
             SV **s = av_fetch(w, 2, 0);
             if (f && g && s) {
-                if (hm_writer_tag_is(aTHX_ w, "h3", 2))
+                if (hm_writer_tag_is(aTHX_ w, "h1", 2))
+                    hm_stream_write(aTHX_ (int)SvIV(*f), SvUV(*g), SvUV(*s), data);
+                else if (hm_writer_tag_is(aTHX_ w, "h3", 2))
                     hm_h3_writer_write(aTHX_ (int)SvIV(*f), SvUV(*g),
                                        (int64_t)SvIV(*s), data);
                 else
@@ -55,7 +63,7 @@ write(self, data)
             SV **f = av_fetch(w, 0, 0);
             SV **i = av_fetch(w, 1, 0);
             if (f && i)
-                hm_stream_write(aTHX_ (int)SvIV(*f), SvUV(*i), data);
+                hm_stream_write(aTHX_ (int)SvIV(*f), SvUV(*i), 0, data);
         }
     }
 
@@ -83,7 +91,13 @@ DESTROY(self)
             SV **f = av_fetch(w, 0, 0);
             SV **i = av_fetch(w, 1, 0);
             if (f && i && hm_cur_loop)
-                hm_stream_close(aTHX_ (int)SvIV(*f), SvUV(*i));
+                hm_stream_close(aTHX_ (int)SvIV(*f), SvUV(*i), 0);
+        } else if (n >= 3 && hm_writer_tag_is(aTHX_ w, "h1", 2)) {
+            SV **f = av_fetch(w, 0, 0);
+            SV **g = av_fetch(w, 1, 0);
+            SV **s = av_fetch(w, 2, 0);
+            if (f && g && s && hm_cur_loop)
+                hm_stream_close(aTHX_ (int)SvIV(*f), SvUV(*g), SvUV(*s));
         }
     }
 
@@ -107,7 +121,9 @@ close(self)
             SV **g = av_fetch(w, 1, 0);
             SV **s = av_fetch(w, 2, 0);
             if (f && g && s) {
-                if (hm_writer_tag_is(aTHX_ w, "h3", 2))
+                if (hm_writer_tag_is(aTHX_ w, "h1", 2))
+                    hm_stream_close(aTHX_ (int)SvIV(*f), SvUV(*g), SvUV(*s));
+                else if (hm_writer_tag_is(aTHX_ w, "h3", 2))
                     hm_h3_writer_close(aTHX_ (int)SvIV(*f), SvUV(*g),
                                        (int64_t)SvIV(*s));
                 else
@@ -118,7 +134,7 @@ close(self)
             SV **f = av_fetch(w, 0, 0);
             SV **i = av_fetch(w, 1, 0);
             if (f && i)
-                hm_stream_close(aTHX_ (int)SvIV(*f), SvUV(*i));
+                hm_stream_close(aTHX_ (int)SvIV(*f), SvUV(*i), 0);
         }
     }
 

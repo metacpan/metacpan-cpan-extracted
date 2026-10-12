@@ -460,6 +460,7 @@ t/04_at_did.t
 t/05_at_nsid.t
 t/06_lexicon_loading.t
 t/07_firehose.t
+t/08_resume.t
 t/20_internals_at_error.t
 t/interop-test-files/README.md
 t/interop-test-files/crypto/signature-fixtures.json

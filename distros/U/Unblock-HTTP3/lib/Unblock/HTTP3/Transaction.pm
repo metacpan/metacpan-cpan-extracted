@@ -12,7 +12,7 @@ use Uniform::HTTP::Response 0.06 ();
 use Unblock::HTTP3 ();
 use Unblock::HTTP3::_Native ();
 
-our $VERSION = '0.03';
+our $VERSION = '0.12';
 
 my %TERMINAL = map { $_ => 1 } qw(complete cancelled error);
 my $BUFFERED_BODY_RETAIN_BYTES = 16_384;
@@ -83,6 +83,38 @@ sub _parse_priority_field {
     };
 }
 
+sub _request_contract {
+    my ($request) = @_;
+    return unless blessed($request);
+
+    for my $method (qw(
+        method target scheme authority protocol version
+        header_count header_name header_value
+        trailer_count trailer_name trailer_value
+        has_buffered_body body
+    )) {
+        return unless $request->can($method);
+    }
+
+    return 1;
+}
+
+sub _response_contract {
+    my ($response) = @_;
+    return unless blessed($response);
+
+    for my $method (qw(
+        status version
+        header_count header_name header_value
+        trailer_count trailer_name trailer_value
+        has_buffered_body body
+    )) {
+        return unless $response->can($method);
+    }
+
+    return 1;
+}
+
 sub _new {
     my ($class, %args) = @_;
 
@@ -90,6 +122,7 @@ sub _new {
     my $stream_id  = delete $args{stream_id};
     my $request    = delete $args{request};
     my $response   = delete $args{response};
+    my $callbacks  = delete($args{callbacks}) || {};
     my $request_streaming = delete $args{request_streaming} ? 1 : 0;
     my $early_data = delete $args{early_data} ? 1 : 0;
 
@@ -100,11 +133,13 @@ sub _new {
         unless defined($stream_id)
             && !ref($stream_id)
             && $stream_id =~ /\A[0-9]+\z/;
-    croak 'Transaction requires a canonical Uniform::HTTP::Request'
-        unless ref($request) eq 'Uniform::HTTP::Request';
-    croak 'Transaction response must be a canonical Uniform::HTTP::Response'
+    croak 'Transaction requires the Uniform HTTP request contract'
+        unless _request_contract($request);
+    croak 'Transaction response must implement the Uniform HTTP response contract'
         if defined($response)
-            && ref($response) ne 'Uniform::HTTP::Response';
+            && !_response_contract($response);
+    croak 'Transaction callbacks must be a hash reference'
+        unless ref($callbacks) eq 'HASH';
     croak 'unknown Transaction option: ' . join(', ', sort keys %args)
         if %args;
 
@@ -113,6 +148,7 @@ sub _new {
         stream_id  => 0 + $stream_id,
         request    => $request,
         response                => $response,
+        callbacks               => { %$callbacks },
         informational           => [],
         request_body            => undef,
         response_body            => undef,
@@ -120,6 +156,7 @@ sub _new {
         response_receive_mode    => 'buffered',
         request_receive_options  => {},
         response_receive_options => {},
+        request_end_callback_called => 0,
         request_streaming         => $request_streaming,
         early_data                => $early_data,
         response_streaming        => 0,
@@ -442,10 +479,44 @@ sub is_cancelled {
     return $self->{state} eq 'cancelled' ? 1 : 0;
 }
 
+sub is_error {
+    my ($self, @args) = @_;
+    croak 'is_error() does not accept arguments' if @args;
+    return $self->{state} eq 'error' ? 1 : 0;
+}
+
 sub is_terminal {
     my ($self, @args) = @_;
     croak 'is_terminal() does not accept arguments' if @args;
     return $TERMINAL{ $self->{state} } ? 1 : 0;
+}
+
+sub _set_callback {
+    my ($self, $name, $callback) = @_;
+
+    croak "_set_callback(): callback must be a code reference or undef"
+        if defined($callback) && ref($callback) ne 'CODE';
+
+    if (defined $callback) {
+        $self->{callbacks}{$name} = $callback;
+    } else {
+        delete $self->{callbacks}{$name};
+    }
+
+    return $self;
+}
+
+sub _invoke {
+    my ($self, $name, @args) = @_;
+
+    my $callback = $self->{callbacks}{$name} or return 1;
+
+    my $ok = eval {
+        $callback->($self, @args);
+        1;
+    };
+
+    return $ok ? 1 : $@;
 }
 
 sub next_informational {
@@ -456,12 +527,28 @@ sub next_informational {
 }
 
 sub send_informational {
-    my ($self, $response) = @_;
+    my ($self, @arg) = @_;
+
+    my $response;
+    if (@arg && ref($arg[0])) {
+        croak 'send_informational(): response object does not take options'
+            unless @arg == 1;
+        $response = $arg[0];
+    } else {
+        croak 'send_informational(): fields must be key/value pairs'
+            if @arg % 2;
+        $response = Uniform::HTTP::Response->new(@arg);
+    }
 
     croak 'send_informational(): Transaction is already terminal'
         if $self->is_terminal;
-    croak 'send_informational(): response must be a canonical Uniform::HTTP::Response'
-        unless ref($response) eq 'Uniform::HTTP::Response';
+    my $connection = $self->{connection}
+        or croak 'send_informational(): Transaction no longer has a connection';
+
+    $connection->_assert_response_contract(
+        $response,
+        'send_informational()',
+    );
     croak 'send_informational(): status must be 100 through 199, excluding 101'
         unless $response->status >= 100
             && $response->status <= 199
@@ -470,9 +557,6 @@ sub send_informational {
         if $response->has_buffered_body;
     croak 'send_informational(): informational responses cannot have trailers'
         if $response->has_trailers;
-
-    my $connection = $self->{connection}
-        or croak 'send_informational(): Transaction no longer has a connection';
 
     $connection->_send_informational_response(
         $self,
@@ -614,7 +698,7 @@ sub response_body {
     );
 
     $self->{response_streaming} = 1;
-    $response->mark_incomplete;
+    $response->mark_incomplete if $response->can('mark_incomplete');
 
     require Unblock::HTTP3::Body::Stream;
 
@@ -628,22 +712,74 @@ sub response_body {
     return $body;
 }
 
-sub send_response {
-    my ($self) = @_;
+sub respond {
+    my ($self, @arg) = @_;
 
-    croak 'send_response(): Transaction is already terminal'
+    my ($response, %option);
+    if (@arg && ref($arg[0])) {
+        $response = shift @arg;
+        croak 'respond(): options must be key/value pairs' if @arg % 2;
+        %option = @arg;
+    } else {
+        croak 'respond(): fields must be key/value pairs' if @arg % 2;
+        my %field = @arg;
+        for my $name (qw(stream_body on_drain on_error)) {
+            $option{$name} = delete $field{$name} if exists $field{$name};
+        }
+        $response = Uniform::HTTP::Response->new(%field);
+    }
+
+    croak 'respond(): Transaction is already terminal'
         if $self->is_terminal;
 
     my $connection = $self->{connection}
-        or croak 'send_response(): Transaction no longer has a connection';
+        or croak 'respond(): HTTP/3 connection is no longer available';
 
-    my $response = $self->{response}
-        or croak 'send_response(): Transaction has no Response';
+    $connection->_respond_transaction(
+        $self,
+        $response,
+        %option,
+    );
 
-    croak 'send_response(): Response has an incremental body; use response_body()'
-        if $self->{response_streaming};
+    return $self;
+}
 
-    $connection->_send_transaction_response($self);
+sub write {
+    my ($self, $bytes) = @_;
+
+    croak 'write(): Transaction is already terminal'
+        if $self->is_terminal;
+
+    my $connection = $self->{connection}
+        or croak 'write(): HTTP/3 connection is no longer available';
+
+    return $connection->_write_stream_body(
+        $self,
+        $bytes,
+        0,
+        'write',
+    );
+}
+
+sub end {
+    my ($self, @args) = @_;
+
+    croak 'end(): accepts at most one final byte string'
+        if @args > 1;
+    croak 'end(): Transaction is already terminal'
+        if $self->is_terminal;
+
+    my $connection = $self->{connection}
+        or croak 'end(): HTTP/3 connection is no longer available';
+
+    my $bytes = @args ? $args[0] : '';
+    $connection->_write_stream_body(
+        $self,
+        $bytes,
+        1,
+        'end',
+    );
+
     return $self;
 }
 
@@ -713,6 +849,10 @@ sub _consume_received_body {
 sub _received_body_complete {
     my ($self, $kind) = @_;
 
+    $self->_invoke_request_end
+        if $kind eq 'request'
+            && $self->{request_receive_mode} eq 'stream';
+
     my $connection = $self->{connection};
     $connection->_maybe_complete_transaction($self->{stream_id})
         if defined $connection;
@@ -773,7 +913,8 @@ sub _write_body {
 
     die $error unless $ok;
 
-    $message->mark_complete if $final;
+    $message->mark_complete
+        if $final && $message->can('mark_complete');
     return $can_continue;
 }
 
@@ -882,6 +1023,26 @@ sub _finish_received_message {
     $message->freeze_trailers;
     $message->freeze;
     $message->mark_complete;
+
+    $self->_invoke_request_end
+        if $kind eq 'request'
+            && $self->{request_receive_mode} eq 'buffered';
+
+    return;
+}
+
+sub _invoke_request_end {
+    my ($self) = @_;
+
+    return if $self->{request_end_callback_called};
+    $self->{request_end_callback_called} = 1;
+
+    my $result = $self->_invoke(
+        'on_request_end',
+        $self->{request},
+    );
+    die $result unless $result eq '1';
+
     return;
 }
 
@@ -931,8 +1092,8 @@ sub _cancel_body_producers {
 sub _push_informational {
     my ($self, $response) = @_;
 
-    croak 'informational response must be a canonical Uniform::HTTP::Response'
-        unless ref($response) eq 'Uniform::HTTP::Response';
+    croak 'informational response must implement the Uniform HTTP response contract'
+        unless _response_contract($response);
 
     push @{ $self->{informational} }, $response;
     return $response;
@@ -945,8 +1106,8 @@ sub _set_response {
         if $self->is_terminal;
     croak 'Transaction already has a response'
         if defined $self->{response};
-    croak 'Transaction response must be a canonical Uniform::HTTP::Response'
-        unless ref($response) eq 'Uniform::HTTP::Response';
+    croak 'Transaction response must implement the Uniform HTTP response contract'
+        unless _response_contract($response);
 
     $self->{response} = $response;
     return $response;
@@ -960,6 +1121,9 @@ sub _mark_complete {
     $self->_discard_datagrams;
     $self->_discard_received_body_buffers;
     $self->{state} = 'complete';
+
+    my $result = $self->_invoke('on_complete');
+    die $result unless $result eq '1';
 
     return $self;
 }
@@ -977,7 +1141,7 @@ sub _mark_cancelled {
 }
 
 sub _mark_error {
-    my ($self, $error) = @_;
+    my ($self, $error, $error_code) = @_;
     return $self if $self->is_terminal;
 
     $self->_cancel_body_producers;
@@ -985,6 +1149,13 @@ sub _mark_error {
     $self->_discard_received_body_buffers;
     $self->{state} = 'error';
     $self->{error} = defined($error) ? "$error" : 'HTTP/3 transaction failed';
+
+    my $result = $self->_invoke(
+        'on_error',
+        $self->{error},
+        $error_code,
+    );
+    die $result unless $result eq '1';
 
     return $self;
 }
@@ -995,235 +1166,119 @@ __END__
 
 =head1 NAME
 
-Unblock::HTTP3::Transaction - one HTTP/3 request and response
-
-=head1 SYNOPSIS
-
-    my $tx = $h3->request($request);
-
-    my $request  = $tx->request;
-    my $response = $tx->response;
-
-    if ($tx->is_terminal) {
-        ...
-    }
+Unblock::HTTP3::Transaction - one HTTP/3 request and response transaction
 
 =head1 DESCRIPTION
 
-A Transaction represents one HTTP/3 request stream.
+A Transaction represents one HTTP request/response exchange carried by one
+HTTP/3 request stream.
 
-It keeps the Request, final Response, streaming body objects, informational
-responses, Datagram state, priority, and lifecycle state together. Applications
-normally do not need to match responses with raw QUIC stream IDs.
+C<request()> returns the Uniform request. C<response()> returns the final
+Uniform response when one is available.
 
-=head1 METHODS
+=head1 COMMON API
 
-=head2 stream_id
+The application-facing API intentionally matches the other Unblock HTTP
+engines:
 
-Returns the HTTP/3 request stream ID.
+    respond
+    write
+    end
+    send_informational
 
-=head2 request
+A server sends a final response with named fields:
 
-Returns the L<Uniform::HTTP::Request> associated with this Transaction.
+    $transaction->respond(status => 200, body => "hello\n");
 
-=head2 response
+An existing Uniform-compatible Response object is also accepted:
 
-Returns the final L<Uniform::HTTP::Response> when one is available.
+    $transaction->respond($response);
 
-On a server, the Transaction receives a mutable Response when the request is
-created.
+For a streaming response:
 
-=head2 local_reset_code
-
-Returns the RESET_STREAM application error code explicitly requested by the
-local HTTP/3 layer for this request stream, or undef when none was requested.
-
-A peer STOP_SENDING can cause QUIC itself to send the required RESET_STREAM.
-That transport-generated response is not reported here. The peer request is
-reported by L</remote_stop_sending_code>.
-
-=head2 remote_reset_code
-
-Returns the RESET_STREAM application error code received from the peer for this
-request stream, or undef when none has been received.
-
-=head2 local_stop_sending_code
-
-Returns the STOP_SENDING application error code sent locally for this request
-stream, or undef when none has been sent.
-
-=head2 remote_stop_sending_code
-
-Returns the STOP_SENDING application error code received from the peer for this
-request stream, or undef when none has been received.
-
-=head2 is_aborted
-
-True when any local or remote RESET_STREAM or STOP_SENDING code has been
-recorded for the Transaction.
-
-These are HTTP/3 transport diagnostics. They are intentionally kept on the
-Transaction instead of the canonical Uniform Request or Response objects.
-
-=head2 protocol
-
-Returns the Extended CONNECT protocol identifier, or undef for an ordinary
-request or basic CONNECT tunnel.
-
-=head2 is_extended_connect
-
-True when the request is Extended CONNECT.
-
-=head2 early_data
-
-True when this Transaction's request was carried in QUIC 0-RTT.
-
-0-RTT can be replayed and must be treated accordingly by the application.
-
-=head2 priority
-
-    my $priority = $tx->priority;
-
-    $tx->priority(
-        urgency     => 0,
-        incremental => 1,
+    $transaction->respond(
+        $response,
+        stream_body => 1,
     );
 
-Gets or changes the live RFC 9218 priority.
+    $transaction->write($chunk);
+    $transaction->end($last_chunk);
 
-Urgency is 0 through 7, where 0 is most urgent. Incremental is 0 or 1.
+A client request opened with C<stream_body =E<gt> 1> uses the same C<write()>
+and C<end()> methods.
 
-On a client, changing priority sends PRIORITY_UPDATE. On a server, it changes
-the local response scheduling priority.
+C<send_informational(status =E<gt> 103)> sends a server-side 1xx response
+before the final response. It also accepts a Uniform-compatible Response
+object. HTTP/3 does not use status 101.
 
-=head2 request_body
+=head1 ADVANCED BODY API
 
-Returns the request body stream object when the Transaction is configured for
-streaming.
+C<request_body()> and C<response_body()> expose
+L<Unblock::HTTP3::Body::Stream> or L<Unblock::HTTP3::Body::Reader> when explicit
+HTTP/3 body control is needed.
 
-On a client this is a writable L<Unblock::HTTP3::Body::Stream>.
+The common Transaction methods are a convenience layer over those body
+objects, not a replacement for them.
 
-On a server this is a readable L<Unblock::HTTP3::Body::Reader>.
+=head1 STATE
 
-=head2 response_body
+Useful lifecycle methods are:
 
-Returns the response body stream object when the Transaction is configured for
-streaming.
-
-On a server this is a writable L<Unblock::HTTP3::Body::Stream>.
-
-On a client this is a readable L<Unblock::HTTP3::Body::Reader>.
-
-=head2 send_response
-
-Server only. Sends the final buffered or bodyless Response.
-
-For a streaming response body, use C<response_body> instead.
-
-=head2 send_informational
-
-    $tx->send_informational(
-        Uniform::HTTP::Response->new(
-            status => 103,
-        ),
-    );
-
-Server only. Sends a 1xx response before the final Response. Status 101 is not
-used by HTTP/3.
-
-=head2 next_informational
-
-Client only. Returns the next received informational Response, or undef.
-
-=head2 is_response_started
-
-True after final response headers have started sending.
-
-=head2 capsules
-
-    my $capsules = $tx->capsules;
-
-Creates or returns a L<Unblock::HTTP3::Capsule::Stream> for an Extended CONNECT
-Transaction.
-
-The higher-level protocol is responsible for deciding whether Capsule Protocol
-use has been negotiated.
-
-=head2 datagrams_enabled
-
-True when this Transaction has HTTP Datagram semantics.
-
-=head2 send_datagram
-
-    my $accepted = $tx->send_datagram($bytes);
-
-Sends one RFC 9297 HTTP Datagram.
-
-A false return means the unreliable payload was not accepted for transmission.
-The caller decides whether to retry or drop it.
-
-=head2 next_datagram
-
-Returns the next queued HTTP Datagram payload, or undef.
-
-=head2 on_datagram
-
-    $tx->on_datagram(sub {
-        my ($tx, $bytes) = @_;
-        ...
-    });
-
-Installs or replaces the receive callback. Passing undef removes it.
-
-Queued Datagrams are drained to a newly installed callback.
-
-=head2 max_datagram_payload_size
-
-Returns the current maximum HTTP Datagram payload size for this Transaction.
-Returns zero when a Datagram cannot currently be sent.
-
-=head2 cancel
-
-Cancels the request stream with C<H3_REQUEST_CANCELLED>. Returns the
-Transaction.
-
-=head2 state
-
-Returns one of:
-
-    active
-    complete
-    cancelled
+    state
     error
+    is_complete
+    is_cancelled
+    is_error
+    is_terminal
 
-=head2 error
+C<state()> returns C<active>, C<complete>, C<cancelled>, or C<error>.
 
-Returns the Transaction error text when C<state> is C<error>.
+=head1 HTTP/3 STATE
 
-=head2 is_complete
+C<stream_id()> returns the HTTP/3 request stream ID.
 
-True when C<state> is C<complete>.
+C<priority()> gets or changes RFC 9218 priority state.
 
-=head2 is_cancelled
+C<local_reset_code()>, C<remote_reset_code()>,
+C<local_stop_sending_code()>, and C<remote_stop_sending_code()> preserve
+HTTP/3 stream diagnostics.
 
-True when C<state> is C<cancelled>.
+C<is_aborted()> is true when any RESET_STREAM or STOP_SENDING condition has
+been recorded.
 
-=head2 is_terminal
+C<protocol()> and C<is_extended_connect()> expose Extended CONNECT state.
 
-True when the Transaction is complete, cancelled, or in error.
+C<early_data()> reports whether the request used QUIC 0-RTT.
+
+=head1 INFORMATIONAL RESPONSES
+
+C<next_informational()> returns the next queued informational Response for
+users of the pull interface.
+
+=head1 CAPSULES AND DATAGRAMS
+
+C<capsules()> returns the generic RFC 9297 Capsule stream for an Extended
+CONNECT Transaction.
+
+HTTP Datagram methods include:
+
+    datagrams_enabled
+    send_datagram
+    next_datagram
+    on_datagram
+    max_datagram_payload_size
+
+=head1 CANCELLATION
+
+C<cancel()> cancels the HTTP/3 request stream with H3_REQUEST_CANCELLED.
 
 =head1 SEE ALSO
 
-L<Unblock::HTTP3::Connection>, L<Uniform::HTTP::Request>,
-L<Uniform::HTTP::Response>, L<Unblock::HTTP3::Body::Stream>,
-L<Unblock::HTTP3::Body::Reader>, L<Unblock::HTTP3::Capsule::Stream>
-
-=head1 AUTHOR
-
-Joshua S. Day
+L<Unblock::HTTP3>, L<Unblock::HTTP3::Client>, L<Unblock::HTTP3::Server>,
+L<Unblock::HTTP3::Body::Stream>, L<Unblock::HTTP3::Body::Reader>
 
 =head1 LICENSE
 
-This software is available under the MIT License.
+MIT License.
 
 =cut

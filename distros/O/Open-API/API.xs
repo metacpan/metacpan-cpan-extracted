@@ -22,6 +22,7 @@ static int OA_FRJ_TRIED = 0;
 static const frj_abi *oa_frj(pTHX);   /* defined below; used by the headers */
 
 #include "oa_compile.h"   /* needs the JSF table above */
+#include "oa_swagger2.h"  /* Swagger 2.0 -> 3.0 shape, before the 3.0 pass */
 #include "oa_normalize.h" /* 3.0 -> 3.1 + discriminator (needs oa_get/oa_methods) */
 #include "oa_tools.h"     /* the document's own schema and prose per operation */
 #include "oa_route.h"
@@ -239,28 +240,19 @@ static SV *oa_load_spec(pTHX_ SV *spec) {
     return doc;
 }
 
-/* Classify the document's OpenAPI version: doc must be a hashref whose
- * `openapi` is 3.0[.x] or 3.1[.x]. Croaks on anything else. */
-#define OA_V30 30
-#define OA_V31 31
-
+/* Classify the document's version (oa_doc_version in oa_compile.h: `openapi`
+ * 3.0[.x] or 3.1[.x], or `swagger` "2.0") and check the root structure every
+ * version shares. Croaks on anything else. */
 static int oa_check_version(pTHX_ SV *doc) {
-    HV *h; SV **v;
-    STRLEN l; const char *p;
+    HV *h;
     int ver;
     if (!doc || !SvROK(doc) || SvTYPE(SvRV(doc)) != SVt_PVHV)
         croak("Open::API: spec did not decode to an object/hashref");
     h = (HV *)SvRV(doc);
-    v = hv_fetchs(h, "openapi", 0);
-    if (!v || !*v || !SvOK(*v))
-        croak("Open::API: spec has no 'openapi' version field");
     /* The version is settled FIRST: the License identifier/url exclusion is a
-     * 3.1 rule, so the checks below need to know which dialect this is. */
-    p = SvPV_const(*v, l);
-    if (!(l >= 3 && memEQ(p, "3.", 2) && (l == 3 || p[3] == '.')
-          && (p[2] == '1' || p[2] == '0')))
-        croak("Open::API supports OpenAPI 3.0 and 3.1 (got %.*s)", (int)l, p);
-    ver = (p[2] == '1') ? OA_V31 : OA_V30;
+     * 3.1 rule and the components key alphabet a 3.x one, so the checks below
+     * need to know which dialect this is. */
+    ver = oa_doc_version(aTHX_ h);
 
     /* `info` is REQUIRED, and so are its own `title` and `version`. Nothing
      * here reads them, but a document without them is not an OpenAPI
@@ -381,8 +373,11 @@ static int oa_check_version(pTHX_ SV *doc) {
     }
 
     /* Components keys are drawn from a fixed alphabet. A key outside it
-     * cannot be named by a $ref, so the component is unreachable. */
-    {
+     * cannot be named by a $ref, so the component is unreachable. 3.x only:
+     * 2.0 fixes no alphabet for `definitions`, and a converted 2.0 document
+     * fed back through new() carries them as components, so checking them
+     * there would refuse this build's own output on the second pass. */
+    if (ver >= OA_V30) {
         static const char *const sections[] = {
             "schemas", "responses", "parameters", "examples", "requestBodies",
             "headers", "securitySchemes", "links", "callbacks", "pathItems",
@@ -411,7 +406,7 @@ static int oa_check_version(pTHX_ SV *doc) {
     {
         static const char std[] = "https://json-schema.org/draft/2020-12/schema";
         SV **dv = hv_fetchs(h, "jsonSchemaDialect", 0);
-        if (dv && *dv && SvOK(*dv)) {
+        if (ver >= OA_V30 && dv && *dv && SvOK(*dv)) {
             STRLEN dl;
             const char *dp = SvPV_const(*dv, dl);
             if (!(dl == sizeof(std) - 1 && memEQ(dp, std, sizeof(std) - 1)))
@@ -433,8 +428,11 @@ static int oa_check_version(pTHX_ SV *doc) {
 static SV *oa_new_from_spec(pTHX_ const char *cls, SV *spec, int servers) {
     SV *doc = oa_load_spec(aTHX_ spec);
     oa_api *a;
-    doc = sv_2mortal(oa_normalize(aTHX_ doc,
-                                  oa_check_version(aTHX_ doc) == OA_V30));
+    int ver = oa_check_version(aTHX_ doc);
+    /* A 2.0 document is first brought to 3.0 SHAPE (oa_swagger2.h), and the
+     * 3.0 pass then does the schema work it already does for 3.0. */
+    if (ver == OA_V20) doc = sv_2mortal(oa_swagger2_to_30(aTHX_ doc));
+    doc = sv_2mortal(oa_normalize(aTHX_ doc, ver <= OA_V30));
     a = oa_api_new(aTHX);
     if (!a) croak("Open::API: out of memory");
     a->spec = newSVsv(doc);
@@ -662,9 +660,11 @@ spec(self)
     OUTPUT:
         RETVAL
 
-# The document's declared `openapi` version. A 3.0 document keeps its own
-# version string after up-conversion, so this tells a caller which dialect the
-# spec was written in even though ->spec is 3.1-shaped throughout.
+# The document's declared version: its `openapi` string, or "2.0" for a
+# Swagger document (which declares `swagger`, not `openapi`). A 2.0 or 3.0
+# document keeps its own version string after conversion, so this tells a
+# caller which dialect the spec was written in even though ->spec is
+# 3.1-shaped throughout.
 SV *
 openapi_version(self)
         SV *self
@@ -673,6 +673,7 @@ openapi_version(self)
         oa_api *a = oa_api_of(aTHX_ self);
         HV *h = a->spec ? oa_hv_of(a->spec) : NULL;
         SV *v = h ? oa_get(aTHX_ h, "openapi") : NULL;
+        if (!v && h) v = oa_get(aTHX_ h, "swagger");
         RETVAL = v ? newSVsv(v) : &PL_sv_undef;
     }
     OUTPUT:

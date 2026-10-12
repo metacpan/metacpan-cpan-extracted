@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Handy Utilities for Real-time MIDI
 
-our $VERSION = '0.0501';
+our $VERSION = '0.0504';
 
 use v5.40;
 # use Data::Dumper::Compact qw(ddc);
@@ -80,10 +80,12 @@ sub output_ports () {
 }
 
 
-sub program_changer ($device, $program = 0, $channel = 0, $msb_bank = 0, $lsb_bank = undef) {
+sub program_changer ($device, $program=0, $channel=0, $msb_bank=undef, $lsb_bank=undef) {
     try {
-        $device->control_change($channel, 0, $msb_bank);
-        $device->control_change($channel, 32, $lsb_bank) if defined $lsb_bank;
+        if (defined $msb_bank || defined $lsb_bank) {
+            $device->control_change($channel, 0, $msb_bank // 0);
+            $device->control_change($channel, 32, $lsb_bank // 0);
+        }
         $device->program_change($channel, $program);
     }
     catch ($e) {
@@ -107,7 +109,7 @@ MIDI::RtMidi::Util - Handy Utilities for Real-time MIDI
 
 =head1 VERSION
 
-version 0.0501
+version 0.0504
 
 =head1 SYNOPSIS
 
@@ -129,7 +131,7 @@ version 0.0501
 
 =head1 DESCRIPTION
 
-C<MIDI::RtMidi::Util> is a junk drawer for Real-time MIDI utilities.
+C<MIDI::RtMidi::Util> is a junk drawer for real-time MIDI utilities.
 
 =head1 FUNCTIONS
 
@@ -139,7 +141,7 @@ C<MIDI::RtMidi::Util> is a junk drawer for Real-time MIDI utilities.
 
 Open and return a named L<MIDI::RtMidi::FFI::Device> C<RtMidiIn> device.
 
-This function takes a unique part of an open port name as its argument.
+This function takes a unique part of an open MIDI port name as its argument.
 
 =head2 out_port
 
@@ -147,7 +149,7 @@ This function takes a unique part of an open port name as its argument.
 
 Open and return a named L<MIDI::RtMidi::FFI::Device> C<RtMidiOut> device.
 
-This function takes a unique part of an open port name as its argument.
+This function takes a unique part of an open MIDI port name as its argument.
 
 =head2 stop_device
 
@@ -177,9 +179,13 @@ Return an array-reference of open MIDI output port names.
 
   program_changer($device, $program, $channel, $msb_bank, $lsb_bank);
 
-Send a bank select (CC 0 MSB, and CC 32 LSB when given) followed by a
-program change.  All arguments but the device are optional and default
-to C<0> (the LSB is skipped if it is not defined).
+Send bank select messages (CC#0 MSB and CC#32 LSB when given) followed by a
+C<program_change> message. The C<program> and C<channel> arguments default to
+C<0>. The C<msb_bank> and C<lsb_bank> arguments default to C<undef>.
+
+Note that some devices B<remember> the C<lsb_bank> and so, in order for the
+C<program_change> message to be recognized the C<lsb_bank> must be changed from
+the previous setting.
 
 =head1 SEE ALSO
 

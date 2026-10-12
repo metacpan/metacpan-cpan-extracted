@@ -74,7 +74,55 @@ if (!$pid) {
 }
 END { local $?; if ($pid) { kill 'TERM', $pid; waitpid $pid, 0 } }
 
+# A second server, from the Swagger 2.0 petstore (the OpenAPI Initiative's own
+# petstore-expanded), forked HERE, before the first Fetch exists: a child
+# forked after it inherits the agent's event loop and its exit tears the
+# parent's loop down (the t/16 lesson). The client built from the same 2.0
+# document calls it at the end of this file.
+my $SPEC20 = "$FindBin::Bin/spec/petstore-2.0.json";
+my $port20 = free_port();
+my $pid20  = fork // die "fork: $!";
+if (!$pid20) {
+    open STDERR, '>', '/dev/null';
+    my $api  = Open::API->new(spec => $SPEC20);
+    my %pets = ( 1 => { id => 1, name => 'rex', tag => 'dog' } );
+    my $next = 2;
+    my $app  = Open::API::Plack->new(api => $api, handlers => {
+        findPets => sub {
+            my ($p) = @_;
+            my @all = map { $pets{$_} } sort keys %pets;
+            if (my $tags = $p->{query}{tags}) {
+                my %want = map { $_ => 1 } @$tags;
+                @all = grep { $want{ $_->{tag} || '' } } @all;
+            }
+            my $lim = $p->{query}{limit};
+            splice @all, $lim if defined $lim && @all > $lim;
+            \@all;
+        },
+        addPet => sub {
+            my ($p) = @_;
+            my $pet = { id => $next++, %{ $p->{body} } };
+            $pets{ $pet->{id} } = $pet;
+            $pet;
+        },
+        'find pet by id' => sub {
+            my ($p) = @_;
+            $pets{ $p->{path}{id} }
+                || [ 404, ['Content-Type' => 'application/json'], ['{"code":404,"message":"gone"}'] ];
+        },
+        deletePet => sub {
+            my ($p) = @_;
+            delete $pets{ $p->{path}{id} };
+            [ 204, [], [''] ];
+        },
+    })->to_app;
+    Hyperman->run(app => $app, host => '127.0.0.1', port => $port20, workers => 1);
+    exit 0;
+}
+END { local $?; if ($pid20) { kill 'TERM', $pid20; waitpid $pid20, 0 } }
+
 wait_up($port) or die "server did not start";
+wait_up($port20) or die "the 2.0 server did not start";
 
 my $client = Open::API::Client->new(
     spec     => $SPEC,
@@ -143,6 +191,33 @@ my $client = Open::API::Client->new(
     my $res = $vc->getPet(petId => 1)->get;
     is($res->{status}, 200, 'validate => 1: good response passes');
     ok(!$res->{error}, 'no validation error on a conforming response');
+}
+
+# ---- the same round trip from a Swagger 2.0 document -------------------------------
+# One 2.0 document drives both sides over real HTTP: the body parameter goes out
+# as JSON under the declared consumes, the csv query array goes out comma
+# separated and comes back split, and an operationId with spaces is reached
+# through call().
+{
+    my $c20 = Open::API::Client->new(spec => $SPEC20,
+                                     base_url => "http://127.0.0.1:$port20",
+                                     validate => 1);
+    my $res = $c20->addPet(body => { name => 'fido', tag => 'dog' })->get;
+    is($res->{status}, 200, '2.0: addPet round-trips over HTTP');
+    is($res->{data}{name}, 'fido', '2.0: the created pet comes back');
+    my $newid = $res->{data}{id};
+
+    $res = $c20->call('find pet by id', id => $newid)->get;
+    is($res->{status}, 200, '2.0: an operationId with spaces is reachable through call()');
+    is($res->{data}{name}, 'fido', '2.0: the new pet is retrievable');
+    ok(!$res->{error}, '2.0: the response validates against the converted Pet schema');
+
+    $res = $c20->findPets(tags => [ 'dog' ], limit => 1)->get;
+    is($res->{status}, 200, '2.0: findPets with a csv tags array and a limit');
+    is(scalar @{ $res->{data} }, 1, '2.0: the csv array reached the handler as a list and the limit applied');
+
+    $res = $c20->deletePet(id => $newid)->get;
+    is($res->{status}, 204, '2.0: deletePet 204');
 }
 
 done_testing();

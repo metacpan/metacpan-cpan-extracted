@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="291" viewBox="0 0 780 291" role="img" aria-label="perl examples/layout-padding.pl">
+<title>perl examples/layout-padding.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="748" height="256" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="748" height="256" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="748" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="390" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/layout-padding.pl</text>
+<rect x="16.5" y="16.5" width="747" height="255" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="48" y="114" width="81" height="18" fill="#61afef"/>
+<rect x="273" y="114" width="117" height="18" fill="#3c445c"/>
+<rect x="516" y="114" width="117" height="36" fill="#3c445c"/>
+<rect x="48" y="132" width="81" height="18" fill="#98c379"/>
+<rect x="273" y="132" width="18" height="18" fill="#3c445c"/>
+<rect x="291" y="132" width="81" height="18" fill="#61afef"/>
+<rect x="372" y="132" width="18" height="18" fill="#3c445c"/>
+<rect x="48" y="150" width="81" height="18" fill="#e5c07b"/>
+<rect x="273" y="150" width="117" height="18" fill="#3c445c"/>
+<rect x="516" y="150" width="18" height="54" fill="#3c445c"/>
+<rect x="534" y="150" width="81" height="18" fill="#61afef"/>
+<rect x="615" y="150" width="18" height="54" fill="#3c445c"/>
+<rect x="273" y="168" width="18" height="18" fill="#3c445c"/>
+<rect x="291" y="168" width="81" height="18" fill="#98c379"/>
+<rect x="372" y="168" width="18" height="18" fill="#3c445c"/>
+<rect x="534" y="168" width="81" height="18" fill="#98c379"/>
+<rect x="273" y="186" width="117" height="18" fill="#3c445c"/>
+<rect x="534" y="186" width="81" height="18" fill="#e5c07b"/>
+<rect x="273" y="204" width="18" height="18" fill="#3c445c"/>
+<rect x="291" y="204" width="81" height="18" fill="#e5c07b"/>
+<rect x="372" y="204" width="18" height="18" fill="#3c445c"/>
+<rect x="516" y="204" width="117" height="36" fill="#3c445c"/>
+<rect x="273" y="222" width="117" height="18" fill="#3c445c"/>
+<rect x="525" y="122" width="99" height="1" fill="#ffffff"/>
+<rect x="520" y="132" width="1" height="90" fill="#ffffff"/>
+<rect x="628" y="132" width="1" height="90" fill="#ffffff"/>
+<rect x="525" y="230" width="99" height="1" fill="#ffffff"/>
+</g>
+<polyline points="520.5 132 520.5 127 520.538 126.413 520.653 125.835 520.843 125.278 521.103 124.75 521.43 124.261 521.818 123.818 522.261 123.43 522.75 123.103 523.278 122.843 523.835 122.653 524.413 122.538 525 122.5 525 122.5" fill="none" stroke="#ffffff" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="628.5 132 628.5 127 628.462 126.413 628.347 125.835 628.157 125.278 627.897 124.75 627.57 124.261 627.182 123.818 626.739 123.43 626.25 123.103 625.722 122.843 625.165 122.653 624.587 122.538 624 122.5 624 122.5" fill="none" stroke="#ffffff" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="520.5 222 520.5 226 520.538 226.587 520.653 227.165 520.843 227.722 521.103 228.25 521.43 228.739 521.818 229.182 522.261 229.57 522.75 229.897 523.278 230.157 523.835 230.347 524.413 230.462 525 230.5 525 230.5" fill="none" stroke="#ffffff" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="628.5 222 628.5 226 628.462 226.587 628.347 227.165 628.157 227.722 627.897 228.25 627.57 228.739 627.182 229.182 626.739 229.57 626.25 229.897 625.722 230.157 625.165 230.347 624.587 230.462 624 230.5 624 230.5" fill="none" stroke="#ffffff" stroke-width="1" stroke-linejoin="round"/>
+<g class="terminal">
+<text x="48" y="92" textLength="576" fill="#dcdcdc">no padding               padding left/right 2,      bordered and</text>
+<text x="48" y="110" textLength="594" fill="#dcdcdc">child_gap 0              top/bottom 1, child_gap 1  padding_all(1)</text>
+<text x="57" y="128" textLength="63" fill="#141923">child 1</text>
+<text x="57" y="146" textLength="306" fill="#141923">child 2                    child 1</text>
+<text x="57" y="164" textLength="63" fill="#141923">child 3</text>
+<text x="543" y="164" textLength="63" fill="#141923">child 1</text>
+<text x="300" y="182" textLength="63" fill="#141923">child 2</text>
+<text x="543" y="182" textLength="63" fill="#141923">child 2</text>
+<text x="543" y="200" textLength="63" fill="#141923">child 3</text>
+<text x="300" y="218" textLength="63" fill="#141923">child 3</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

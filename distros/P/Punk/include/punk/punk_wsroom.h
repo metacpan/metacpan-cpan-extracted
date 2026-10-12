@@ -77,10 +77,9 @@ static void pwr_live(pTHX_ HV *members, AV *out) {
 
 /* Encode once (via _encode_text / _encode_binary), queue to every open member
  * bar `except`; returns the number sent. */
-static IV pwr_fan(pTHX_ SV *self, SV *frame, SV *except) {
+static IV pwr_fan_skip(pTHX_ SV *self, SV *frame, void *skip) {
     HV *members = pwr_members(aTHX_ self);
     AV *live = (AV *)sv_2mortal((SV *)newAV());
-    void *skip = (except && SvOK(except)) ? PWR_ADDR(except) : NULL;
     IV sent = 0;
     SSize_t i, n;
     pwr_live(aTHX_ members, live);
@@ -96,6 +95,11 @@ static IV pwr_fan(pTHX_ SV *self, SV *frame, SV *except) {
         sent++;
     }
     return sent;
+}
+
+static IV pwr_fan(pTHX_ SV *self, SV *frame, SV *except) {
+    return pwr_fan_skip(aTHX_ self, frame,
+                        (except && SvOK(except)) ? PWR_ADDR(except) : NULL);
 }
 
 #endif /* PUNK_WSROOM_H */

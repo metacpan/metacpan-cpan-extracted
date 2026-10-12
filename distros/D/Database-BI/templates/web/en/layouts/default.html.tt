@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>[% title | html %] — Database::BI</title>
+  <title>[% title | html %] &#x2014; Database::BI</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -76,8 +76,8 @@
       vertical-align: middle;
       opacity: 0.4;
     }
-    thead th[aria-sort="ascending"]::after  { content: '▲'; opacity: 1; }
-    thead th[aria-sort="descending"]::after { content: '▼'; opacity: 1; }
+    thead th[aria-sort="ascending"]::after  { content: '\25B2'; opacity: 1; }
+    thead th[aria-sort="descending"]::after { content: '\25BC'; opacity: 1; }
 
     tbody tr:nth-child(even) { background: #f8f9fc; }
     tbody tr:hover           { background: #eef1fb; }
@@ -240,7 +240,7 @@
       outline-offset: -1px;
     }
 
-    /* Selected column highlight — body cells */
+    /* Selected column highlight -- body cells */
     tbody td.col-selected,
     tfoot td.col-selected {
       background: rgba(192, 57, 43, 0.08) !important;
@@ -248,7 +248,7 @@
       outline-offset: -1px;
     }
 
-    /* Delete-selected toolbar button — destructive red accent */
+    /* Delete-selected toolbar button -- destructive red accent */
     .btn-delete-sel {
       flex-shrink: 0;
       padding: 0.3rem 0.9rem;
@@ -262,7 +262,7 @@
     }
     .btn-delete-sel:hover { background: #fdecea; }
 
-    /* "Combine data" button — same shape as Merge, teal accent */
+    /* "Combine data" button -- same shape as Merge, teal accent */
     .btn-combine {
       flex-shrink: 0;
       padding: 0.3rem 0.9rem;
@@ -277,7 +277,7 @@
     .btn-combine:hover:not(:disabled) { background: #e6f4f0; }
     .btn-combine:disabled { opacity: 0.4; cursor: default; }
 
-    /* Combine-data panel — teal-tinted background to distinguish from merge */
+    /* Combine-data panel -- teal-tinted background to distinguish from merge */
     .combine-panel {
       background: #f0f8f5;
       border: 1px solid #a8d0c0;
@@ -1285,7 +1285,7 @@
       }
 
       overlay.classList.add('loading');
-      overlayTxt.textContent = 'Opening…';
+      overlayTxt.textContent = 'Opening...';
 
       var fd = new FormData();
       fd.append('file', file);

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Exporter;
-our $VERSION	= 0.8035;
+our $VERSION	= 2.1109;
 our @ISA	= qw(Exporter);
 our @EXPORT_OK	= qw(
 			EDMS_edidx_build
@@ -31,14 +31,14 @@ use POSIX		qw(strftime);
 use Text::CSV;
 use XML::Writer;
 
-# use PDF;		# ajouter dans les prerequis
+# use PDF;		# add to the prerequisites
 
 
 # Utility function to construct filenames.
 sub EDMS_idldoc_seqpg($$) {
 	my ($idldoc, $page) = @_;
 
-	# Modifié suite au problème de . dans le nom de fichier pour Docubase
+	# Changed because of the problem with '.' in file names for Docubase
 	# $idldoc =~ s/\./_/;
 	return sprintf("${idldoc}_%07d", $page);
 }
@@ -137,7 +137,7 @@ return EDMS_process($app, $idldoc, $doc_name, $idx_name, $outdir);
 # Process document(s) with its index in a way suitable for the edms software.
 sub EDMS_process($$$$;$) {
 	my ($app, $idldoc, $doc, $index, $outdir) = @_;
-	# Remplace les - et les . par des _ car Docubase ne peut pas importer de fichier comprenant des . dans leur nom
+	# Replace - and . with _ because Docubase cannot import files that have . in their names
 	$idldoc	=~ s/[-\.]/_/g;
 	$app		=~ s/[-\.]/_/g;
 
@@ -171,7 +171,7 @@ sub EDMS_process($$$$;$) {
 		#	die "ERROR: Could not split pages from $doc to $output !\n";
 		#}
 
-		# Modifié suite au problème des points dans les noms de fichiers pour docubase
+		# Changed because of the problem with dots in file names for docubase
 		my $rv = system($cfg->{'EDMS_BIN_PDFTK'} . " $doc burst output ${app}_${idldoc}_%07d.pdf ");
 
 		if ($rv != 0) {
@@ -181,7 +181,7 @@ sub EDMS_process($$$$;$) {
 	} else {
 		#warn "DEBUG: document $doc is not pdf file\n";
 		my $cible = _docubase_file_name($doc);
-		move ($doc, $cible) or die "ERROR: echec move $cible ($doc)\n";
+		move ($doc, $cible) or die "ERROR: failed to move $cible ($doc)\n";
 		push (@outfiles, $cible);
 	}
 
@@ -245,7 +245,7 @@ sub EDMS_import($@) {
 sub EDMS_idx_process($$$$&) {
 	my ($app, $idx, $idldoc, $keys, $sub) = @_;
 
-	my @idxcols = map { $$_[0] } @INDEX_COLS[0..28]; # il faudrait peut être pousser jusqu'à 30 (ED_CODRUPT) voir plus
+	my @idxcols = map { $$_[0] } @INDEX_COLS[0..28]; # maybe it should go up to 30 (ED_CODRUPT) or more
 
 	open(my $fh, '<', $idx) or die "ERROR: Cannot open \"$idx\": $!\n";
 	my $csv = Text::CSV->new({ binary => 1, sep_char => ';' });
@@ -333,7 +333,7 @@ sub EDMS_idx_create_csv($$$$$) {
 		$vals->{'EDMS_PROCESS_DT'} = strftime($datefmt, 0, 0, 0, $day, $month - 1, $year - 1900);
 
 		# owner id for group acces in edms
-		# la règle de gestion ne devrait pas etre ici, à faire évoluer
+		# the business rule should not be here, to be changed
 		if ($vals->{'ED_IDEMET'} =~/^\D{1}\d{3}/) {
 			$vals->{'ED_OWNER'} = $vals->{'ED_IDEMET'};
 		} else {
@@ -400,7 +400,7 @@ sub EDMS_merge_docs($$$$) {
 	my $output = "$pages[0].tmp";
 
 	if (defined $cfg->{'EDMS_BIN_GS'} && $cfg->{'EDMS_BIN_GS'} ne "") {
-		#  les pdf créés avec pdftk sont trop lourds, changement de mode opératoire ...
+		#  PDFs created with pdftk are too heavy, changing the operating mode ...
 		my $gs = system ($cfg->{'EDMS_BIN_GS'} . " -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=$output @pages ");
 		if ($gs != 0) {
 			die "ERROR: Could not concatenate pages $firstpg to $lastpg!\n";
@@ -426,9 +426,9 @@ sub EDMS_edidx_build (\%){
 	my $cfg 	= config_read('EDOCMNGR');
 
 # EDMS_INDEX_COLS		=ED_REFIDDOC,ED_CORP,ED_SOURCE,EDMS_IDLDOC_SEQPG,ED_DTEDTION,ED_CLEGED1,ED_IDDEST,ED_NOMDEST,ED_VILLDEST,ED_IDEMET,ED_CLEGED2,ED_CLEGED3,ED_CLEGED4,ED_OWNER,EDMS_FILENAME
-# clefs d'index requises 	: ED_REFIDDOC, ED_CORP, ED_SOURCE, ED_IDDEST, ED_NOMDEST, ED_IDEMET, ED_OWNER, ED_CORP
-# clefs optionnelles		: ED_DTEDTION, ED_CLEGED1, ED_VILLDEST, ED_CLEGED2, ED_CLEGED3, ED_CLEGED4
-# clefs (re)calculées		: ED_DTEDTION, EDMS_IDLDOC_SEQPG, EDMS_FILENAME
+# required index keys 	: ED_REFIDDOC, ED_CORP, ED_SOURCE, ED_IDDEST, ED_NOMDEST, ED_IDEMET, ED_OWNER, ED_CORP
+# optional keys		: ED_DTEDTION, ED_CLEGED1, ED_VILLDEST, ED_CLEGED2, ED_CLEGED3, ED_CLEGED4
+# computed/(re)computed keys		: ED_DTEDTION, EDMS_IDLDOC_SEQPG, EDMS_FILENAME
 
 	# REQUIRED KEYS
 	if (!defined $$refOpt{'ED_REFIDDOC'} or $$refOpt{'ED_REFIDDOC'} eq ""){

@@ -6,13 +6,9 @@ use lib 't/lib';
 use Game::Xiangqi::Bot;
 use Game::Xiangqi::Test::Handle;
 
-# REQUIRED, NOT SHELLED OUT. `bin/xiangqi` ends with `exit main(@ARGV) unless
-# caller`, so loading it from a test defines `main` and runs nothing. A script that
-# cannot be called as a function can only be tested through a pipe, which means
-# every assertion in this file would be about a shell as well as about the program.
-require './bin/xiangqi';
+use Game::Xiangqi::Terminal;
 
-can_ok('main', 'main');
+can_ok('Game::Xiangqi::Terminal', 'run');
 
 # Everything the program says, and the status it says it with.
 sub run {
@@ -29,7 +25,7 @@ sub run {
         local *STDOUT = $o;                          ## no critic
         local *STDERR = $e;                          ## no critic
         local *STDIN  = $in->fh;                     ## no critic
-        main(@argv);
+        Game::Xiangqi::Terminal->run(@argv);
     };
     return { status => $status, out => $out, err => $err };
 }

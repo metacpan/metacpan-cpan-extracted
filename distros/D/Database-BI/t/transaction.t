@@ -2735,4 +2735,126 @@ subtest 'Transaction 43 -- Folder view lifecycle' => sub {
 	  ->status_is(400, 'Phase 5: 21-char prefix rejected by DoS guard');
 };
 
+# ======================================================================
+# Transaction 44 -- Multi-table SQLite schema browser lifecycle
+#
+# Lifecycle:
+#  Phase 0: create a temp multi-table SQLite file (2 tables: items, tags)
+#  Phase 1: /open?path=... without ?it= redirects to /tables
+#  Phase 2: /tables?l=path:... returns 200 with both tables listed
+#  Phase 3: table cards contain correct ?it=<table> open links
+#  Phase 4: /open?path=...&it=items opens just the items table
+#  Phase 5: breadcrumb on items page links back to /tables
+#  Phase 6: /tables?l=table:store (data_dir file store.db) renders 3 tables
+#  Phase 7: /view/store redirects to /tables (multi-table data_dir file)
+#  Phase 8: /tables with missing/bad spec returns 404
+# ======================================================================
+
+subtest 'Transaction 44 -- Multi-table SQLite schema browser lifecycle' => sub {
+	SKIP: {
+		eval { DBI->install_driver('SQLite') }
+			or skip 'DBD::SQLite not available', 31;
+
+		plan tests => 31;
+
+		my $dir = tempdir(CLEANUP => 1);
+
+		# ------------------------------------------------------------------
+		# Phase 0: create a 2-table SQLite file in a tempdir.
+		# ------------------------------------------------------------------
+		my $db_path = Mojo::File->new($dir)->child('shop.db')->to_string;
+		{
+			my $dbh = DBI->connect("dbi:SQLite:dbname=$db_path", undef, undef,
+				{ RaiseError => 1, PrintError => 0 });
+			$dbh->do('CREATE TABLE items (id INTEGER PRIMARY KEY, label TEXT, price REAL)');
+			$dbh->do(q{INSERT INTO items VALUES (1, 'Widget', 9.99)});
+			$dbh->do(q{INSERT INTO items VALUES (2, 'Gadget', 24.99)});
+			$dbh->do('CREATE TABLE tags (id INTEGER PRIMARY KEY, item_id INTEGER, tag TEXT)');
+			$dbh->do(q{INSERT INTO tags VALUES (1, 1, 'hardware')});
+			$dbh->do(q{INSERT INTO tags VALUES (2, 2, 'electronics')});
+			$dbh->disconnect;
+		}
+		ok(-f $db_path, 'Phase 0: multi-table SQLite file created');
+
+		# ------------------------------------------------------------------
+		# Phase 1: /open without ?it= must redirect to /tables.
+		# ------------------------------------------------------------------
+		$t->get_ok('/open?path=' . url_escape($db_path))
+		  ->status_is(302, 'Phase 1: /open of multi-table db redirects');
+		my $loc = $t->tx->res->headers->location // '';
+		like($loc, qr{/tables\?l=path%3A}, 'Phase 1: redirect points to /tables with path: spec');
+
+		# ------------------------------------------------------------------
+		# Phase 2: /tables?l=path:... renders 200 and lists both tables.
+		# ------------------------------------------------------------------
+		$t->get_ok('/tables?l=' . url_escape("path:$db_path"))
+		  ->status_is(200, 'Phase 2: /tables returns 200')
+		  ->content_like(qr/Tables in/i, 'Phase 2: "Tables in" heading present')
+		  ->content_like(qr/items/,      'Phase 2: items table card present')
+		  ->content_like(qr/tags/,       'Phase 2: tags table card present');
+
+		# ------------------------------------------------------------------
+		# Phase 3: each table card href contains ?it=<tablename>.
+		# ------------------------------------------------------------------
+		$t->content_like(qr/it=items/, 'Phase 3: items card href has ?it=items');
+		$t->content_like(qr/it=tags/,  'Phase 3: tags card href has ?it=tags');
+
+		# columns should be listed in the cards
+		$t->content_like(qr/label/,    'Phase 3: items column "label" listed');
+		$t->content_like(qr/item_id/,  'Phase 3: tags column "item_id" listed');
+
+		# ------------------------------------------------------------------
+		# Phase 4: /open?path=...&it=items opens just the items table.
+		# The back= param mirrors what the /tables page generates so that
+		# the breadcrumb can link back to the schema browser.
+		# ------------------------------------------------------------------
+		my $back_to_tables = '/tables?l=' . url_escape("path:$db_path");
+		$t->get_ok('/open?path=' . url_escape($db_path)
+				. '&it=items'
+				. '&back=' . url_escape($back_to_tables)
+				. '&back_label=' . url_escape('shop schema'))
+		  ->status_is(200, 'Phase 4: /open?it=items returns 200')
+		  ->content_like(qr/Widget/,  'Phase 4: items data row "Widget" visible')
+		  ->content_like(qr/Gadget/,  'Phase 4: items data row "Gadget" visible')
+		  ->content_unlike(qr/hardware/, 'Phase 4: tags data not shown on items page');
+
+		# ------------------------------------------------------------------
+		# Phase 5: breadcrumb on items page links back to /tables.
+		# ------------------------------------------------------------------
+		$t->content_like(qr{href="/tables\?l=}, 'Phase 5: back link to /tables present');
+
+		# ------------------------------------------------------------------
+		# Phase 6: /tables?l=table:store renders the 3-table data/store.db.
+		# ------------------------------------------------------------------
+		SKIP: {
+			skip 'data/store.db not found', 5 unless -f 'data/store.db';
+			$t->get_ok('/tables?l=table:store')
+			  ->status_is(200, 'Phase 6: /tables?l=table:store returns 200')
+			  ->content_like(qr/customer/, 'Phase 6: customer table listed')
+			  ->content_like(qr/product/,  'Phase 6: product table listed')
+			  ->content_like(qr/sales/,    'Phase 6: sales table listed');
+		}
+
+		# ------------------------------------------------------------------
+		# Phase 7: GET /view/store redirects to /tables (store.db in data_dir).
+		# ------------------------------------------------------------------
+		SKIP: {
+			skip 'data/store.db not found', 3 unless -f 'data/store.db';
+			$t->get_ok('/view/store')
+			  ->status_is(302, 'Phase 7: /view/store redirects for multi-table db');
+			like($t->tx->res->headers->location // '',
+				qr{/tables\?l=table%3Astore},
+				'Phase 7: redirect target is /tables?l=table:store');
+		}
+
+		# ------------------------------------------------------------------
+		# Phase 8: bad/missing spec returns 404.
+		# ------------------------------------------------------------------
+		$t->get_ok('/tables')
+		  ->status_is(404, 'Phase 8: /tables without l= returns 404');
+		$t->get_ok('/tables?l=bad:spec')
+		  ->status_is(404, 'Phase 8: /tables with invalid spec returns 404');
+	}
+};
+
 done_testing();

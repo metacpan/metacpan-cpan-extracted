@@ -1,0 +1,1074 @@
+#!/usr/bin/env perl
+
+# tools/make-images - render the figures shown in the documentation.
+#
+# Every figure in images/ is a small Clay::UI tree laid out by Clay and
+# drawn with Imager, so each picture shows exactly what Clay computes for
+# the declarations it illustrates. The outputs of the examples that write
+# a PNG or a PDF are rendered as well. The script then checks that the
+# pod shows exactly the files it renders and points every image URL in
+# the pod to the tag of the current release. See the pod at the end.
+#
+# Copyright 2026 davenonymous
+#
+# Released under the same zlib/libpng license as Clay itself and the rest
+# of this distribution; see src/clay/LICENSE.md.
+
+use v5.22;
+use warnings;
+use feature 'signatures';
+no warnings 'experimental::signatures';
+
+use File::Find qw(find);
+use File::Spec;
+use File::Temp qw(tempdir);
+use Getopt::Long qw(GetOptions);
+use Imager;
+use List::Util qw(max);
+use Object::Pad 0.800;
+use Pod::Usage qw(pod2usage);
+
+use Clay::XS qw(:all);
+use Clay::UI;
+use Clay::UI::Box;
+use Clay::UI::Grid;
+use Clay::UI::Grid::Cell;
+use Clay::UI::Role::Layout::HasLayout;
+use Clay::UI::Role::Layout::HasScroll;
+use Clay::UI::Role::Style::HasBackground;
+use Clay::UI::Role::Style::HasBorder;
+use Clay::UI::Text;
+
+# MetaCPAN shows images in the pod only with absolute URLs, so the pod
+# points to the raw files in the repository at the tag of the release;
+# the PDF is linked to the GitHub page that shows it in the browser.
+use constant {
+	REPOSITORY => 'davenonymous/perl-clay-xs',
+	TAG_PREFIX => 'v',
+};
+use constant IMAGE_URL_BASE => 'https://raw.githubusercontent.com/' . REPOSITORY;
+use constant FILE_URL_BASE  => 'https://github.com/' . REPOSITORY . '/blob';
+
+use constant {
+	PAGE_PADDING => 16,
+	CAPTION_SIZE => 12,
+	LABEL_SIZE   => 13,
+	TEXT_SIZE    => 14,
+};
+
+my %options = (output => 'images');
+GetOptions(\%options, 'output=s', 'check', 'help')
+	or pod2usage(2);
+pod2usage(1) if $options{help};
+
+# ---------------------------------------------------------------------------
+# Widget classes
+# ---------------------------------------------------------------------------
+
+class Fig::Box  :strict(params) :does(Clay::UI::Box)  {}
+class Fig::Text :strict(params) :does(Clay::UI::Text) {}
+class Fig::Grid :strict(params) :does(Clay::UI::Grid) {}
+
+class Fig::Scroll :strict(params)
+	:does(Clay::UI::Role::Layout::HasScroll)
+	:does(Clay::UI::Role::Layout::HasLayout)
+	:does(Clay::UI::Role::Style::HasBackground)
+	:does(Clay::UI::Role::Style::HasBorder)
+{}
+
+# A box with an aspect ratio: Clay::UI has no attribute for aspectRatio,
+# so a contribute_ method writes the key (see Clay::XS::Structs).
+class Fig::Aspect :strict(params) :does(Clay::UI::Box) {
+	field $ratio :param;
+
+	method contribute_aspect_ratio ($config) {
+		$config->{aspect_ratio} = $ratio;
+		return;
+	}
+}
+
+# ---------------------------------------------------------------------------
+# Palette and widget helpers
+# ---------------------------------------------------------------------------
+
+my %color = (
+	page      => [255, 255, 255, 255],
+	container => [226, 232, 240, 255],
+	outline   => [148, 163, 184, 255],
+	blue      => [96,  165, 250, 255],
+	green     => [52,  211, 153, 255],
+	amber     => [251, 191, 36,  255],
+	red       => [248, 113, 113, 255],
+	violet    => [167, 139, 250, 255],
+	ink       => [30,  41,  59,  255],
+	muted     => [100, 116, 139, 255],
+	white     => [255, 255, 255, 255],
+);
+my @accents = @color{qw(blue green amber red violet)};
+
+sub fixed ($width, $height) {
+	return { width => sizing_fixed($width), height => sizing_fixed($height) };
+}
+
+sub text ($string, %override) {
+	return Fig::Text->new(
+		text       => $string,
+		font_size  => TEXT_SIZE,
+		text_color => $color{ink},
+		%override,
+	);
+}
+
+sub caption ($string, %override) {
+	return text($string, font_size => CAPTION_SIZE, text_color => $color{muted}, %override);
+}
+
+# A coloured box with a centred label.
+sub labelled_box ($label, $fill, %layout) {
+	my $box = Fig::Box->new(
+		layout => {
+			child_alignment => { x => CLAY_ALIGN_X_CENTER, y => CLAY_ALIGN_Y_CENTER },
+			%layout,
+		},
+		background_color => $fill,
+		corner_radius    => 3,
+	);
+	$box->add_child(text($label, font_size => LABEL_SIZE, text_color => $color{white}))
+		if length $label;
+	return $box;
+}
+
+# The grey area that stands for a parent element in every figure.
+sub container (%args) {
+	my $layout = delete $args{layout} // {};
+	return Fig::Box->new(
+		layout           => $layout,
+		background_color => $color{container},
+		border_color     => $color{outline},
+		border_width     => 1,
+		%args,
+	);
+}
+
+# A column with a caption above its content, so that figures with
+# several variants label each one.
+sub panel ($title, @content) {
+	my $column = Fig::Box->new(
+		layout => { layout_direction => CLAY_TOP_TO_BOTTOM, child_gap => 6 },
+	);
+	$column->add_child(caption($title), @content);
+	return $column;
+}
+
+# The root of every figure: a white page with a row (or column) of
+# panels and PAGE_PADDING around them.
+sub page (%layout) {
+	return Fig::Box->new(
+		layout => {
+			sizing    => { width => sizing_grow(), height => sizing_grow() },
+			padding   => padding_all(PAGE_PADDING),
+			child_gap => 24,
+			%layout,
+		},
+		background_color => $color{page},
+	);
+}
+
+# ---------------------------------------------------------------------------
+# The figures
+#
+# Each figure is one PNG. `build` returns the root widget and a list of
+# annotations drawn with Imager after the layout, positioned from the
+# bounding boxes Clay computed (see draw_annotations). `prepare` runs
+# between a first and the final render, for state such as a scroll
+# position that needs a completed frame.
+# ---------------------------------------------------------------------------
+
+my @figures = (
+	{
+		name   => 'layout-direction',
+		width  => 560,
+		height => 190,
+		build  => \&build_layout_direction,
+	},
+	{
+		name   => 'sizing',
+		width  => 560,
+		height => 150,
+		build  => \&build_sizing,
+	},
+	{
+		name   => 'padding-and-child-gap',
+		width  => 560,
+		height => 140,
+		build  => \&build_padding_and_child_gap,
+	},
+	{
+		name   => 'child-alignment',
+		width  => 560,
+		height => 300,
+		build  => \&build_child_alignment,
+	},
+	{
+		name   => 'flow-layout',
+		width  => 560,
+		height => 210,
+		build  => \&build_flow_layout,
+	},
+	{
+		name   => 'stack-layout',
+		width  => 560,
+		height => 190,
+		build  => \&build_stack_layout,
+	},
+	{
+		name   => 'floating',
+		width  => 620,
+		height => 260,
+		build  => \&build_floating,
+	},
+	{
+		name    => 'clipping-and-scrolling',
+		width   => 560,
+		height  => 270,
+		build   => \&build_clipping_and_scrolling,
+		prepare => sub ($ui, $state) { $ui->scroll_to($state->{scroll}, { y => -44 }) },
+	},
+	{
+		name   => 'aspect-ratio',
+		width  => 560,
+		height => 190,
+		build  => \&build_aspect_ratio,
+	},
+	{
+		name   => 'sizing-groups',
+		width  => 560,
+		height => 170,
+		build  => \&build_sizing_groups,
+	},
+	{
+		name   => 'grid',
+		width  => 560,
+		height => 190,
+		build  => \&build_grid,
+	},
+	{
+		name   => 'text-wrapping',
+		width  => 560,
+		height => 290,
+		build  => \&build_text_wrapping,
+	},
+);
+
+# The outputs of the examples that write a file; each is run with the
+# output path as its first argument.
+my @example_outputs = (
+	{ name => 'example-06-png-render',  script => 'examples/06-png-render.pl',  extension => 'png' },
+	{ name => 'example-15-og-card',     script => 'examples/15-og-card.pl',     extension => 'png' },
+	{ name => 'example-16-invoice-pdf', script => 'examples/16-invoice-pdf.pl', extension => 'pdf' },
+);
+
+sub build_layout_direction ($state) {
+	my $page = page();
+	for my $direction ([ 'CLAY_LEFT_TO_RIGHT (the default)', CLAY_LEFT_TO_RIGHT ], [ 'CLAY_TOP_TO_BOTTOM', CLAY_TOP_TO_BOTTOM ]) {
+		my ($title, $constant) = @$direction;
+		my $parent = container(layout => {
+			sizing           => fixed(248, 124),
+			padding          => padding_all(8),
+			child_gap        => 8,
+			layout_direction => $constant,
+		});
+		$parent->add_child(map { labelled_box($_ + 1, $accents[$_], sizing => fixed(56, 28)) } 0 .. 2);
+		$page->add_child(panel($title, $parent));
+	}
+	return ($page, []);
+}
+
+# The worked example of Clay::Manual, "Sizing": the labels under the
+# children show the widths Clay computed.
+sub build_sizing ($state) {
+	my $page = page(layout_direction => CLAY_TOP_TO_BOTTOM, child_gap => 6);
+	my $row = container(layout => {
+		sizing    => fixed(300, 56),
+		padding   => padding_all(10),
+		child_gap => 10,
+	});
+	my @children = (
+		[ 'GROW',        sizing_grow() ],
+		[ 'FIXED 50',    sizing_fixed(50) ],
+		[ 'PERCENT 0.5', sizing_percent(0.5) ],
+		[ "GROW\nmax 30",  sizing_grow(0, 30) ],
+	);
+	my @boxes = map { labelled_box('', $accents[$_], sizing => { width => $children[$_][1], height => sizing_grow() }) } 0 .. $#children;
+	$row->add_child(@boxes);
+	$page->add_child(caption('a 300 wide row with padding 10 and childGap 10'), $row);
+
+	my @annotations = (
+		map {
+			my ($label, $box) = ($children[$_][0], $boxes[$_]);
+			{ under => $box, text => sub ($bbox) { sprintf "%s\n%g", $label, $bbox->{width} } };
+		} 0 .. $#children
+	);
+	return ($page, \@annotations);
+}
+
+sub build_padding_and_child_gap ($state) {
+	my $page = page();
+	my $parent = container(layout => {
+		padding   => { left => 16, right => 16, top => 8, bottom => 8 },
+		child_gap => 4,
+	});
+	my @boxes = map { labelled_box($_ + 1, $accents[$_], sizing => fixed(64, 40)) } 0 .. 2;
+	$parent->add_child(@boxes);
+	$page->add_child($parent);
+
+	my @annotations = (
+		{ hspan => [ $parent, 'left', $boxes[0], 'left' ],    text => 'padding left 16', align => 'left' },
+		{ hspan => [ $boxes[0], 'right', $boxes[1], 'left' ], text => 'childGap 4', level => 1 },
+		{ vspan => [ $parent, 'top', $boxes[2], 'top' ],      text => 'padding top 8' },
+	);
+	return ($page, \@annotations);
+}
+
+sub build_child_alignment ($state) {
+	my $page = page(layout_direction => CLAY_TOP_TO_BOTTOM, child_gap => 10);
+	my @x_values = ([ 'LEFT', CLAY_ALIGN_X_LEFT ], [ 'CENTER', CLAY_ALIGN_X_CENTER ], [ 'RIGHT', CLAY_ALIGN_X_RIGHT ]);
+	my @y_values = ([ 'TOP', CLAY_ALIGN_Y_TOP ], [ 'CENTER', CLAY_ALIGN_Y_CENTER ], [ 'BOTTOM', CLAY_ALIGN_Y_BOTTOM ]);
+	for my $y (@y_values) {
+		my $row = Fig::Box->new(layout => { child_gap => 24 });
+		for my $x (@x_values) {
+			my $cell = container(layout => {
+				sizing          => fixed(160, 56),
+				padding         => padding_all(4),
+				child_alignment => { x => $x->[1], y => $y->[1] },
+			});
+			$cell->add_child(labelled_box('', $color{blue}, sizing => fixed(36, 20)));
+			$row->add_child(panel("x $x->[0], y $y->[0]", $cell));
+		}
+		$page->add_child($row);
+	}
+	return ($page, []);
+}
+
+sub build_flow_layout ($state) {
+	my $page = page();
+	my @tags = qw(layout flow wrap childGap lineGap tags toolbar gallery);
+	for my $sizing ([ 'lineSizing GROW (the default)', CLAY_LINE_SIZING_GROW ], [ 'lineSizing FIT', CLAY_LINE_SIZING_FIT ]) {
+		my ($title, $constant) = @$sizing;
+		my $parent = container(layout => {
+			sizing           => fixed(248, 140),
+			padding          => padding_all(8),
+			child_gap        => 6,
+			line_gap         => 6,
+			layout_direction => CLAY_LEFT_TO_RIGHT_WRAP,
+			line_sizing      => $constant,
+		});
+		my $index = 0;
+		$parent->add_child(map {
+			labelled_box($_, $accents[ $index++ % @accents ],
+				sizing  => { height => sizing_grow() },
+				padding => { left => 8, right => 8, top => 3, bottom => 3 });
+		} @tags);
+		$page->add_child(panel($title, $parent));
+	}
+	return ($page, []);
+}
+
+# A stack: a picture, a badge in its top right corner and a caption bar
+# along its bottom. Every child is a transparent GROW box whose
+# child_alignment places the badge or the bar.
+sub build_stack_layout ($state) {
+	my $page = page();
+	my $stack = container(layout => {
+		sizing           => fixed(248, 140),
+		layout_direction => CLAY_BACK_TO_FRONT,
+	});
+	my $picture = labelled_box('picture', $color{blue}, sizing => { width => sizing_grow(), height => sizing_grow() });
+	my $badge_layer = Fig::Box->new(layout => {
+		sizing          => { width => sizing_grow(), height => sizing_grow() },
+		padding         => padding_all(8),
+		child_alignment => { x => CLAY_ALIGN_X_RIGHT, y => CLAY_ALIGN_Y_TOP },
+	});
+	$badge_layer->add_child(labelled_box('3', $color{red}, sizing => fixed(28, 28)));
+	my $bar_layer = Fig::Box->new(layout => {
+		sizing          => { width => sizing_grow(), height => sizing_grow() },
+		child_alignment => { x => CLAY_ALIGN_X_LEFT, y => CLAY_ALIGN_Y_BOTTOM },
+	});
+	$bar_layer->add_child(labelled_box('caption bar', [30, 41, 59, 200], sizing => { width => sizing_grow() }, padding => padding_all(6)));
+	$stack->add_child($picture, $badge_layer, $bar_layer);
+
+	my $legend = Fig::Box->new(layout => { layout_direction => CLAY_TOP_TO_BOTTOM, child_gap => 4 });
+	$legend->add_child(map { caption($_) } (
+		'child 1: the picture, GROW on both axes',
+		'child 2: a layer aligned x RIGHT, y TOP',
+		'          holding the badge',
+		'child 3: a layer aligned y BOTTOM',
+		'          holding the caption bar',
+	));
+	$page->add_child(panel('layout_direction CLAY_BACK_TO_FRONT', $stack), panel('', $legend));
+	return ($page, []);
+}
+
+# Three floating children of one button: a tooltip above it, a menu
+# below it and a badge on its corner. The legend names the attach
+# points of each; the siblings of the button keep their places.
+sub build_floating ($state) {
+	my $page = page(layout_direction => CLAY_TOP_TO_BOTTOM, child_gap => 8);
+	my $row = container(layout => { padding => padding_all(10), child_gap => 10 });
+	my @buttons = map { labelled_box($_, $color{outline}, sizing => fixed(90, 36)) } 'Edit', 'View', 'Help';
+	$row->add_child(@buttons);
+	my $anchor = $buttons[1];
+
+	my $tooltip = labelled_box('tooltip', $color{ink}, padding => { left => 8, right => 8, top => 4, bottom => 4 });
+	$tooltip->floating({
+		attach_to     => CLAY_ATTACH_TO_PARENT,
+		attach_points => { element => CLAY_ATTACH_POINT_CENTER_BOTTOM, parent => CLAY_ATTACH_POINT_CENTER_TOP },
+		offset        => { x => 0, y => -6 },
+		z_index       => 10,
+	});
+
+	my $menu = Fig::Box->new(
+		layout => {
+			sizing           => { width => sizing_fixed(130) },
+			padding          => padding_all(6),
+			child_gap        => 4,
+			layout_direction => CLAY_TOP_TO_BOTTOM,
+		},
+		background_color => $color{white},
+		border_color     => $color{ink},
+		border_width     => 1,
+		floating         => {
+			attach_to     => CLAY_ATTACH_TO_PARENT,
+			attach_points => { element => CLAY_ATTACH_POINT_LEFT_TOP, parent => CLAY_ATTACH_POINT_LEFT_BOTTOM },
+			offset        => { x => 0, y => 4 },
+			z_index       => 10,
+		},
+	);
+	$menu->add_child(
+		caption('menu'),
+		labelled_box('Zoom in',  $color{green}, sizing => { width => sizing_grow() }, padding => padding_all(4)),
+		labelled_box('Zoom out', $color{green}, sizing => { width => sizing_grow() }, padding => padding_all(4)),
+	);
+
+	my $badge = labelled_box('2', $color{red}, sizing => fixed(22, 22));
+	$badge->floating({
+		attach_to     => CLAY_ATTACH_TO_PARENT,
+		attach_points => { element => CLAY_ATTACH_POINT_CENTER_CENTER, parent => CLAY_ATTACH_POINT_RIGHT_TOP },
+		z_index       => 20,
+	});
+	$anchor->add_child($tooltip, $menu, $badge);
+
+	my $legend = Fig::Box->new(layout => { layout_direction => CLAY_TOP_TO_BOTTOM, child_gap => 4 });
+	$legend->add_child(map { caption($_) } (
+		'tooltip: element CENTER_BOTTOM',
+		'at parent CENTER_TOP, offset y -6',
+		'',
+		'menu: element LEFT_TOP',
+		'at parent LEFT_BOTTOM, offset y 4',
+		'',
+		'badge: element CENTER_CENTER',
+		'at parent RIGHT_TOP',
+	));
+	my $side_by_side = Fig::Box->new(layout => { child_gap => 24 });
+	$side_by_side->add_child($row, $legend);
+	$page->add_child(
+		caption('three floating children of the "View" button; its siblings keep their places'),
+		Fig::Box->new(layout => { sizing => { height => sizing_fixed(24) } }),
+		$side_by_side,
+	);
+	return ($page, []);
+}
+
+sub build_clipping_and_scrolling ($state) {
+	my $page = page();
+	my @rows = map { "row $_" } 1 .. 8;
+	my $overflowing = container(layout => {
+		sizing           => fixed(200, 110),
+		padding          => padding_all(8),
+		child_gap        => 4,
+		layout_direction => CLAY_TOP_TO_BOTTOM,
+	});
+	$overflowing->add_child(map { labelled_box($rows[$_], $accents[ $_ % @accents ], sizing => fixed(184, 20)) } 0 .. $#rows);
+
+	my $scroll = Fig::Scroll->new(
+		id       => 'list',
+		vertical => 1,
+		layout   => {
+			sizing           => fixed(200, 110),
+			padding          => padding_all(8),
+			child_gap        => 4,
+			layout_direction => CLAY_TOP_TO_BOTTOM,
+		},
+		background_color => $color{container},
+		border_color     => $color{outline},
+		border_width     => 1,
+	);
+	$scroll->add_child(map { labelled_box($rows[$_], $accents[ $_ % @accents ], sizing => fixed(184, 20)) } 0 .. $#rows);
+	$state->{scroll} = $scroll;
+
+	$page->add_child(
+		panel('no clip: the content overflows the element', $overflowing),
+		panel('clip vertical, scrolled to y -44', $scroll),
+	);
+	return ($page, []);
+}
+
+sub build_aspect_ratio ($state) {
+	my $page = page(layout_direction => CLAY_TOP_TO_BOTTOM, child_gap => 8);
+	my $row = Fig::Box->new(layout => { child_gap => 24 });
+	$page->add_child(caption('width FIXED 120, height derived from aspectRatio'), $row);
+	for my $ratio ([ '16 / 9', 16 / 9 ], [ '1', 1 ], [ '4 / 3', 4 / 3 ]) {
+		my ($label, $value) = @$ratio;
+		my $box = Fig::Aspect->new(
+			ratio  => $value,
+			layout => {
+				sizing          => { width => sizing_fixed(120) },
+				child_alignment => { x => CLAY_ALIGN_X_CENTER, y => CLAY_ALIGN_Y_CENTER },
+			},
+			background_color => $color{blue},
+			corner_radius    => 3,
+		);
+		$box->add_child(text($label, font_size => LABEL_SIZE, text_color => $color{white}));
+		$row->add_child(panel("aspectRatio $label", $box));
+	}
+	return ($page, []);
+}
+
+sub build_sizing_groups ($state) {
+	my $page = page();
+	for my $variant ([ 'no sizing group', 0 ], [ 'labels with width_group 1', 1 ]) {
+		my ($title, $group) = @$variant;
+		my $form = Fig::Box->new(layout => { layout_direction => CLAY_TOP_TO_BOTTOM, child_gap => 6 });
+		for my $field_name ('Name', 'E-mail address', 'City') {
+			my $row   = Fig::Box->new(layout => { child_gap => 8, child_alignment => { y => CLAY_ALIGN_Y_CENTER } });
+			my $label = container(
+				layout      => { padding => { left => 6, right => 6, top => 4, bottom => 4 } },
+				width_group => $group,
+			);
+			$label->add_child(text($field_name));
+			$row->add_child($label, labelled_box('', $color{blue}, sizing => fixed(120, 26)));
+			$form->add_child($row);
+		}
+		$page->add_child(panel($title, $form));
+	}
+	return ($page, []);
+}
+
+sub build_grid ($state) {
+	my $page = page();
+	my $grid = Fig::Grid->new(id => 'people', cell_gap => 0, border_color => $color{outline}, border_width => 1);
+	my $header = sub ($string) {
+		my $cell = Clay::UI::Grid::Cell->new(
+			background_color => $color{ink},
+			layout           => { padding => { left => 8, right => 8, top => 5, bottom => 5 } },
+		);
+		$cell->add_child(text($string, text_color => $color{white}));
+		return $cell;
+	};
+	my $cell = sub ($string, %layout) {
+		my $cell = Clay::UI::Grid::Cell->new(layout => { padding => { left => 8, right => 8, top => 5, bottom => 5 }, %layout });
+		$cell->add_child(text($string));
+		return $cell;
+	};
+	my $amount = sub ($string) { $cell->($string, child_alignment => { x => CLAY_ALIGN_X_RIGHT }) };
+	$grid->append_row([ map { $header->($_) } 'Name', 'E-mail', 'Amount' ]);
+	$grid->append_row([ $cell->('Alice'), $cell->('alice@example.com'), $amount->('1234.00') ]);
+	$grid->append_row([ $cell->('Bob'),   $cell->('bob@example.com'),   $amount->('7.50') ]);
+	my $spanning = Clay::UI::Grid::Cell->new(
+		background_color => $color{container},
+		layout           => { padding => { left => 8, right => 8, top => 5, bottom => 5 } },
+	);
+	$spanning->add_child(text('Guests (a spanning row)', text_color => $color{muted}));
+	$grid->append_spanning_row($spanning);
+	$grid->append_row([ $cell->('Carol'), $cell->('carol@example.com'), $amount->('88.00') ]);
+	$page->add_child(panel('Clay::UI::Grid: every column as wide as its widest cell', $grid));
+	return ($page, []);
+}
+
+# The same text in a 200 wide parent under each wrap mode; the panels
+# are stacked so that the overflow of the lower two stays visible.
+sub build_text_wrapping ($state) {
+	my $page = page(layout_direction => CLAY_TOP_TO_BOTTOM, child_gap => 12);
+	my $sample = "Clay wraps this text to the width\nof its parent element.";
+	for my $mode ([ 'CLAY_TEXT_WRAP_WORDS (the default)', CLAY_TEXT_WRAP_WORDS ], [ 'CLAY_TEXT_WRAP_NEWLINES', CLAY_TEXT_WRAP_NEWLINES ], [ 'CLAY_TEXT_WRAP_NONE', CLAY_TEXT_WRAP_NONE ]) {
+		my ($title, $constant) = @$mode;
+		my $column = container(layout => { sizing => { width => sizing_fixed(200) }, padding => padding_all(6) });
+		$column->add_child(text($sample, wrap_mode => $constant));
+		$page->add_child(panel($title, $column));
+	}
+	return ($page, []);
+}
+
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
+
+my $tag = TAG_PREFIX . $Clay::UI::VERSION;
+my @names = (
+	(map { "$_->{name}.png" } @figures),
+	(map { "$_->{name}.$_->{extension}" } @example_outputs),
+);
+my $outdated = update_pod_pictures(pod_files('lib'), $tag, $options{check}, @names);
+
+my $font = label_font();
+for my $figure (@figures) {
+	my $image = render_figure($figure, $font);
+	$outdated += store_image($image, File::Spec->catfile($options{output}, "$figure->{name}.png"), $options{check});
+}
+my $scratch = tempdir(CLEANUP => 1);
+for my $output (@example_outputs) {
+	my $content = run_example($output->{script}, File::Spec->catfile($scratch, "$output->{name}.$output->{extension}"));
+	my $file = File::Spec->catfile($options{output}, "$output->{name}.$output->{extension}");
+	$outdated += store_if_changed($file, $content, $options{check});
+}
+exit($options{check} && $outdated ? 1 : 0);
+
+# ---------------------------------------------------------------------------
+# Pod checks
+# ---------------------------------------------------------------------------
+
+sub pod_files ($directory) {
+	my @files;
+	find({ no_chdir => 1, wanted => sub { push @files, $_ if /\.(?:pm|pod)\z/ } }, $directory);
+	return [ sort @files ];
+}
+
+# Dies unless the pod files together show exactly the files this script
+# renders: a PNG through an <img src="IMAGE_URL_BASE/TAG/images/NAME.png">
+# tag preceded by a "=for text Figure: images/NAME.png" paragraph for
+# readers without HTML, any other file through a link to
+# FILE_URL_BASE/TAG/images/NAME.EXT. Then points every such URL to $tag.
+# Returns the number of pod files that were (or, with $check_only, would
+# be) changed.
+sub update_pod_pictures ($pod_files, $tag, $check_only, @names) {
+	my $image_url = qr{<img src="\Q@{[IMAGE_URL_BASE]}\E/[^"/]+/images/([^"/]+\.png)"};
+	my $file_url  = qr{\Q@{[FILE_URL_BASE]}\E/[^\s/>]+/images/([^\s/>]+)};
+	my (%shown, %updated_pods);
+	for my $pod_file (@$pod_files) {
+		my $pod = read_file($pod_file);
+		my @bad_tags = grep { !/^$image_url/ } $pod =~ m{(<img\b[^>]*>)}g;
+		die map {"$pod_file: $_ does not start with <img src=\"@{[IMAGE_URL_BASE]}/TAG/images/NAME.png\"\n"} @bad_tags if @bad_tags;
+		for my $name ($pod =~ m{$image_url}g) {
+			die "$pod_file: no '=for text Figure: images/$name' paragraph for the <img> that shows it\n"
+				unless $pod =~ m{^=for text Figure: images/\Q$name\E\b}m;
+			$shown{$name} = 1;
+		}
+		$shown{$_} = 1 for $pod =~ m{$file_url}g;
+
+		(my $updated = $pod) =~ s{(<img src="\Q@{[IMAGE_URL_BASE]}\E/)[^"/]+/}{$1$tag/}g;
+		$updated =~ s{(\Q@{[FILE_URL_BASE]}\E/)[^\s/>]+/}{$1$tag/}g;
+		$updated_pods{$pod_file} = $updated if $updated ne $pod;
+	}
+	my %rendered = map { $_ => 1 } @names;
+	my @problems = (
+		(map {"the pod shows images/$_, which this script does not render\n"} grep { !$rendered{$_} } sort keys %shown),
+		(map {"no pod shows images/$_\n"} grep { !$shown{$_} } @names),
+	);
+	die @problems if @problems;
+
+	store_file($_, $updated_pods{$_}, $check_only) for sort keys %updated_pods;
+	return scalar keys %updated_pods;
+}
+
+# ---------------------------------------------------------------------------
+# Layout and rendering
+# ---------------------------------------------------------------------------
+
+sub label_font () {
+	die "Imager was built without FreeType support; it is needed for the text\n"
+		unless $Imager::formats{ft2};
+	open(my $match, '-|', 'fc-match', '--format=%{file}', 'DejaVu Sans:style=Book')
+		or die "cannot run fc-match: $!\n";
+	my $file = <$match>;
+	close($match);
+	die "fc-match found no font\n" unless defined $file && -f $file;
+	return Imager::Font->new(file => $file, aa => 1)
+		// die Imager->errstr, "\n";
+}
+
+sub measure_with ($font) {
+	return sub ($string, $config, $userdata) {
+		my $size = $config->{fontSize};
+		my $bbox = $font->bounding_box(string => drawable($string), size => $size);
+		return { width => $bbox->advance_width, height => $bbox->font_height };
+	};
+}
+
+# A text command may still hold newlines (CLAY_TEXT_WRAP_NONE keeps the
+# whole text on one line); the font has no glyph for them, so they are
+# drawn, and measured, as spaces.
+sub drawable ($string) {
+	(my $copy = $string) =~ tr/\n/ /;
+	return $copy;
+}
+
+# Lays the figure out (twice when it has a prepare step), draws the
+# render commands and then the annotations.
+sub render_figure ($figure, $font) {
+	my %state;
+	my ($root, $annotations) = $figure->{build}->(\%state);
+	my $ui = Clay::UI->new(
+		width        => $figure->{width},
+		height       => $figure->{height},
+		root         => $root,
+		measure_text => measure_with($font),
+	);
+	my $commands = $ui->render;
+	if ($figure->{prepare}) {
+		$figure->{prepare}->($ui, \%state);
+		$commands = $ui->render;
+	}
+
+	my $image = Imager->new(xsize => $figure->{width}, ysize => $figure->{height}, channels => 3);
+	$image->box(filled => 1, color => imager_color($color{page}));
+	my $renderer = Renderer->new(image => $image, font => $font);
+	$renderer->draw($commands);
+	draw_annotations($image, $font, $ui, $annotations);
+	return $image;
+}
+
+sub imager_color ($rgba) {
+	my @channels = ref $rgba eq 'HASH' ? @$rgba{qw(r g b a)} : @$rgba;
+	return Imager::Color->new(@channels);
+}
+
+# Draws a RECTANGLE, BORDER, TEXT or SCISSOR command list with Imager.
+# Rounded corners go through an antialiased polygon mask; clipping draws
+# into a layer and copies only the clipped region (nested clips
+# intersect).
+class Renderer {
+	use List::Util qw(min max);
+	use POSIX qw(floor ceil);
+	use Clay::XS qw(:all);
+
+	field $image :param;
+	field $font  :param;
+	field @clips;
+
+	use constant PI => 4 * atan2(1, 1);
+
+	method draw ($commands) {
+		for my $command (@$commands) {
+			my $type = $command->{commandType};
+			if    ($type == CLAY_RENDER_COMMAND_TYPE_RECTANGLE)     { $self->rectangle($command) }
+			elsif ($type == CLAY_RENDER_COMMAND_TYPE_BORDER)        { $self->border($command) }
+			elsif ($type == CLAY_RENDER_COMMAND_TYPE_TEXT)          { $self->text($command) }
+			elsif ($type == CLAY_RENDER_COMMAND_TYPE_SCISSOR_START) { $self->push_clip($command->{boundingBox}) }
+			elsif ($type == CLAY_RENDER_COMMAND_TYPE_SCISSOR_END)   { pop @clips }
+		}
+		return;
+	}
+
+	method push_clip ($box) {
+		my $outer = $clips[-1] // { left => 0, top => 0, right => $image->getwidth, bottom => $image->getheight };
+		push @clips, {
+			left   => max($outer->{left},   floor($box->{x})),
+			top    => max($outer->{top},    floor($box->{y})),
+			right  => min($outer->{right},  ceil($box->{x} + $box->{width})),
+			bottom => min($outer->{bottom}, ceil($box->{y} + $box->{height})),
+		};
+		return;
+	}
+
+	# Runs $paint on the image, or on a transparent layer whose clipped
+	# region is then composed onto the image.
+	method paint ($paint) {
+		return $paint->($image) unless @clips;
+		my $clip = $clips[-1];
+		return if $clip->{right} <= $clip->{left} || $clip->{bottom} <= $clip->{top};
+		my $layer = Imager->new(xsize => $image->getwidth, ysize => $image->getheight, channels => 4);
+		$paint->($layer);
+		$image->rubthrough(
+			src => $layer->crop(left => $clip->{left}, top => $clip->{top}, right => $clip->{right}, bottom => $clip->{bottom}),
+			tx  => $clip->{left},
+			ty  => $clip->{top},
+		);
+		return;
+	}
+
+	method rectangle ($command) {
+		my ($box, $data) = @$command{qw(boundingBox renderData)};
+		my @radii = corner_radii($data->{cornerRadius}, $box->{width}, $box->{height});
+		$self->paint(sub ($target) {
+			fill_outlines($target, $data->{backgroundColor},
+				rounded_rect_outline($box->{x}, $box->{y}, $box->{width}, $box->{height}, @radii));
+		});
+		return;
+	}
+
+	# A border lies inside the bounding box: the ring between the box's
+	# outline and an inner outline inset by each edge's width.
+	method border ($command) {
+		my ($box, $data) = @$command{qw(boundingBox renderData)};
+		my $width = $data->{width};
+		my ($tl, $tr, $br, $bl) = corner_radii($data->{cornerRadius}, $box->{width}, $box->{height});
+		my $inner_width  = $box->{width}  - $width->{left} - $width->{right};
+		my $inner_height = $box->{height} - $width->{top}  - $width->{bottom};
+		my $outer = rounded_rect_outline($box->{x}, $box->{y}, $box->{width}, $box->{height}, $tl, $tr, $br, $bl);
+		my @outlines = ($outer);
+		if ($inner_width > 0 && $inner_height > 0) {
+			push @outlines, rounded_rect_outline(
+				$box->{x} + $width->{left}, $box->{y} + $width->{top}, $inner_width, $inner_height,
+				max(0, $tl - max($width->{left},  $width->{top})),
+				max(0, $tr - max($width->{right}, $width->{top})),
+				max(0, $br - max($width->{right}, $width->{bottom})),
+				max(0, $bl - max($width->{left},  $width->{bottom})),
+			);
+		}
+		$self->paint(sub ($target) { fill_outlines($target, $data->{color}, @outlines) });
+		return;
+	}
+
+	# Clay's text box starts at the top of the line; Imager places the
+	# baseline, so the text moves down by the font's ascent.
+	method text ($command) {
+		my ($box, $data) = @$command{qw(boundingBox renderData)};
+		my $size   = $data->{fontSize};
+		my $string = main::drawable($data->{stringContents});
+		my $ascent = $font->bounding_box(string => $string, size => $size)->global_ascent;
+		$self->paint(sub ($target) {
+			$target->string(
+				font  => $font,
+				text  => $string,
+				x     => $box->{x},
+				y     => $box->{y} + $ascent,
+				size  => $size,
+				color => main::imager_color($data->{textColor}),
+				aa    => 1,
+			);
+		});
+		return;
+	}
+
+	# Clay reports four corner radii; they are clamped (as CSS does) so
+	# that neighbouring corners never overlap.
+	sub corner_radii ($radius, $width, $height) {
+		my @radii = map { max(0, $radius->{$_} // 0) } qw(topLeft topRight bottomRight bottomLeft);
+		my ($tl, $tr, $br, $bl) = @radii;
+		my $scale = min(1,
+			map { $_->[0] > 0 ? $_->[1] / $_->[0] : 1 }
+				[ $tl + $tr, $width ], [ $bl + $br, $width ], [ $tl + $bl, $height ], [ $tr + $br, $height ]);
+		return map { $_ * $scale } @radii;
+	}
+
+	# The outline of a rounded rectangle as [ \@x, \@y ], clockwise, for
+	# Imager's polypolygon; corners with radius 0 stay square.
+	sub rounded_rect_outline ($x, $y, $width, $height, @radii) {
+		my ($tl, $tr, $br, $bl) = @radii;
+		my @corners = (
+			[ $x + $tl,          $y + $tl,           $tl, 180 ],
+			[ $x + $width - $tr, $y + $tr,           $tr, 270 ],
+			[ $x + $width - $br, $y + $height - $br, $br, 0 ],
+			[ $x + $bl,          $y + $height - $bl, $bl, 90 ],
+		);
+		my (@xs, @ys);
+		for my $corner (@corners) {
+			my ($cx, $cy, $r, $start) = @$corner;
+			my $steps = $r > 0 ? max(4, ceil($r / 2)) : 0;
+			for my $step (0 .. $steps) {
+				my $angle = ($start + 90 * $step / max(1, $steps)) * PI / 180;
+				push @xs, $cx + $r * cos $angle;
+				push @ys, $cy + $r * sin $angle;
+			}
+		}
+		return [ \@xs, \@ys ];
+	}
+
+	# Imager's polypolygon does not blend translucent colours, so the
+	# outlines become an antialiased coverage mask through which a block
+	# of the colour is composed. With 'evenodd', an inner outline cuts a
+	# hole.
+	sub fill_outlines ($target, $rgba, @outlines) {
+		my @xs = map { @{ $_->[0] } } @outlines;
+		my @ys = map { @{ $_->[1] } } @outlines;
+		my ($left, $top) = (floor(min @xs), floor(min @ys));
+		my ($width, $height) = (ceil(max @xs) - $left, ceil(max @ys) - $top);
+		return if $width < 1 || $height < 1;
+
+		my $mask = Imager->new(xsize => $width, ysize => $height, channels => 1);
+		$mask->polypolygon(
+			points => [ map { [ [ map { $_ - $left } @{ $_->[0] } ], [ map { $_ - $top } @{ $_->[1] } ] ] } @outlines ],
+			filled => 1,
+			mode   => 'evenodd',
+			color  => Imager::Color->new(255, 255, 255),
+		);
+		my $paint = Imager->new(xsize => $width, ysize => $height, channels => 4);
+		$paint->box(filled => 1, color => main::imager_color($rgba));
+		$target->compose(src => $paint, mask => $mask, tx => $left, ty => $top);
+		return;
+	}
+}
+
+# Annotations are drawn after the layout from the bounding boxes Clay
+# computed, in the caption colour:
+#   { under => $widget, text => $string | sub ($bbox), align => 'left' }
+#       text centred (or left-aligned) below the widget;
+#   { hspan => [ $widget_a, $edge_a, $widget_b, $edge_b ], text => ...,
+#     align => 'left', level => 1 }
+#       a horizontal bracket between two vertical edges ('left' or
+#       'right'), labelled below (centred, or left-aligned at its
+#       start); `level` moves the bracket down by that many label
+#       heights so neighbouring labels do not collide;
+#   { vspan => [ $widget_a, $edge_a, $widget_b, $edge_b ], text => ... }
+#       a vertical bracket between two horizontal edges ('top' or
+#       'bottom'), labelled to the right.
+sub draw_annotations ($image, $font, $ui, $annotations) {
+	my $ink = imager_color($color{muted});
+	for my $annotation (@$annotations) {
+		if (my $widget = $annotation->{under}) {
+			my $bbox = $ui->bounding_box($widget) // die "annotated widget was not laid out\n";
+			my $string = ref $annotation->{text} ? $annotation->{text}->($bbox) : $annotation->{text};
+			my $x = ($annotation->{align} // 'center') eq 'left' ? $bbox->{x} : $bbox->{x} + $bbox->{width} / 2;
+			draw_caption_lines($image, $font, $ink, $string, $x, $bbox->{y} + $bbox->{height} + 4, $annotation->{align} // 'center');
+		}
+		elsif (my $hspan = $annotation->{hspan}) {
+			my ($x1, $x2) = (edge_x($ui, @$hspan[0, 1]), edge_x($ui, @$hspan[2, 3]));
+			my $level = $annotation->{level} // 0;
+			my $align = $annotation->{align} // 'center';
+			my $y = max(map { my $b = $ui->bounding_box($_); $b->{y} + $b->{height} } @$hspan[0, 2]) + 6 + $level * (CAPTION_SIZE + 22);
+			$image->line(x1 => $x1, y1 => $y, x2 => $x2, y2 => $y, color => $ink, aa => 1);
+			$image->line(x1 => $_, y1 => $y - 3, x2 => $_, y2 => $y + 3, color => $ink) for $x1, $x2;
+			draw_caption_lines($image, $font, $ink, $annotation->{text}, $align eq 'left' ? $x1 : ($x1 + $x2) / 2, $y + 5, $align);
+		}
+		elsif (my $vspan = $annotation->{vspan}) {
+			my ($y1, $y2) = (edge_y($ui, @$vspan[0, 1]), edge_y($ui, @$vspan[2, 3]));
+			my $x = max(map { my $b = $ui->bounding_box($_); $b->{x} + $b->{width} } @$vspan[0, 2]) + 6;
+			$image->line(x1 => $x, y1 => $y1, x2 => $x, y2 => $y2, color => $ink, aa => 1);
+			$image->line(x1 => $x - 3, y1 => $_, x2 => $x + 3, y2 => $_, color => $ink) for $y1, $y2;
+			draw_caption_lines($image, $font, $ink, $annotation->{text}, $x + 6, ($y1 + $y2) / 2 - CAPTION_SIZE / 2, 'left');
+		}
+		else {
+			die "unknown annotation: @{[ join ', ', sort keys %$annotation ]}\n";
+		}
+	}
+	return;
+}
+
+sub edge_x ($ui, $widget, $edge) {
+	my $bbox = $ui->bounding_box($widget) // die "annotated widget was not laid out\n";
+	return $edge eq 'left' ? $bbox->{x} : $bbox->{x} + $bbox->{width};
+}
+
+sub edge_y ($ui, $widget, $edge) {
+	my $bbox = $ui->bounding_box($widget) // die "annotated widget was not laid out\n";
+	return $edge eq 'top' ? $bbox->{y} : $bbox->{y} + $bbox->{height};
+}
+
+sub draw_caption_lines ($image, $font, $ink, $string, $x, $y, $align) {
+	my $ascent = $font->bounding_box(string => 'Xg', size => CAPTION_SIZE)->global_ascent;
+	for my $line (split /\n/, $string) {
+		my $width = $font->bounding_box(string => $line, size => CAPTION_SIZE)->advance_width;
+		$image->string(
+			font  => $font,
+			text  => $line,
+			x     => $align eq 'center' ? $x - $width / 2 : $x,
+			y     => $y + $ascent,
+			size  => CAPTION_SIZE,
+			color => $ink,
+			aa    => 1,
+		);
+		$y += CAPTION_SIZE + 3;
+	}
+	return;
+}
+
+# ---------------------------------------------------------------------------
+# Example outputs and files
+# ---------------------------------------------------------------------------
+
+# Runs an example with the same perl and library paths as this script
+# and returns the file it wrote.
+sub run_example ($script, $output) {
+	my @command = ($^X, (map {"-I$_"} grep { !ref } @INC), $script, $output);
+	system(@command) == 0
+		or die "$script failed with status " . ($? >> 8) . "\n";
+	die "$script did not write $output\n" unless -s $output;
+	return read_file($output);
+}
+
+# Writes the image unless the file already holds the same PNG data.
+sub store_image ($image, $file, $check_only) {
+	my $png = '';
+	$image->write(data => \$png, type => 'png') or die $image->errstr, "\n";
+	return store_if_changed($file, $png, $check_only);
+}
+
+# Returns 1 when the file was (or, with $check_only, would be) changed.
+sub store_if_changed ($file, $content, $check_only) {
+	my $current = -e $file ? read_file($file) : '';
+	return 0 if $current eq $content;
+
+	store_file($file, $content, $check_only);
+	return 1;
+}
+
+sub read_file ($file) {
+	open(my $in, '<:raw', $file) or die "cannot read $file: $!\n";
+	local $/;
+	my $content = <$in>;
+	close($in);
+	return $content;
+}
+
+# Writes $content to $file, or with $check_only reports it as out of date.
+sub store_file ($file, $content, $check_only) {
+	if ($check_only) {
+		say "out of date: $file";
+		return;
+	}
+	open(my $out, '>:raw', $file) or die "cannot write $file: $!\n";
+	print {$out} $content;
+	close($out) or die "cannot write $file: $!\n";
+	say "wrote $file";
+	return;
+}
+
+__END__
+
+=head1 NAME
+
+make-images - render the figures shown in the Clay::UI documentation
+
+=head1 SYNOPSIS
+
+  perl -Mblib tools/make-images [--output DIRECTORY] [--check]
+
+=head1 DESCRIPTION
+
+Lays every figure out with Clay::UI, draws the render commands with
+Imager and writes the figures as PNG files into F<images/>; runs the
+examples that write a PNG or a PDF and stores their outputs there too.
+Files whose content would not change are left alone. Run it from the
+top directory of the distribution after C<make>.
+
+Before rendering anything, it checks that the pod files under F<lib/>
+together show exactly the files it renders: a figure through a tag like
+C<< <img src="https://raw.githubusercontent.com/davenonymous/perl-clay-xs/v0.04/images/NAME.png"> >>
+preceded by a C<=for text Figure: images/NAME.png ...> paragraph for
+readers without HTML, and a PDF through a link to
+C<https://github.com/davenonymous/perl-clay-xs/blob/v0.04/images/NAME.pdf>.
+It stops with an error otherwise. It then points every such URL to the
+tag C<vVERSION> of the current C<$Clay::UI::VERSION>, so that each
+release on MetaCPAN shows its own pictures once the tag is pushed to
+GitHub. MetaCPAN shows images in the pod only with absolute URLs.
+
+Needs Imager with PNG and FreeType support and fontconfig's C<fc-match>
+to find the DejaVu Sans font, and whatever the examples it runs need
+(see their headers).
+
+=head1 OPTIONS
+
+=over
+
+=item --output DIRECTORY
+
+Where to write the files, F<images> by default.
+
+=item --check
+
+Write nothing; list the files and pod files that are out of date and
+exit with status 1 if there are any.
+
+=back
+
+=cut

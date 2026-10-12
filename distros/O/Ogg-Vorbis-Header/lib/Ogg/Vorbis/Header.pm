@@ -4,14 +4,14 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use Inline C => 'DATA',
   LIBS => '-logg -lvorbis -lvorbisfile',
   INC => '-I/inc',
   AUTO_INCLUDE => '#include "inc/vcedit.h"',
   AUTO_INCLUDE => '#include "inc/vcedit.c"',
-  VERSION => '0.11',
+  VERSION => '0.12',
   NAME => 'Ogg::Vorbis::Header';
 
 # constructors
@@ -446,7 +446,7 @@ SV* _new(char *class, char *path)
  * Michael Smith.  They also borrow quite a bit from vorbiscomment
  * (vcomment.c) by Michael Smith and Ralph Giles.
  */
-int write_vorbis (SV *obj)
+SV *write_vorbis (SV *obj)
 {
   vcedit_state *state;
   vorbis_comment *vc;
@@ -463,7 +463,7 @@ int write_vorbis (SV *obj)
 
   /* Skip if comments hasn't been opened */
   if (! hv_exists(hash, "COMMENTS", 8)) {
-    return 0;
+    return newSViv(0);
   }
 
   /* Set up the input and output paths */
@@ -555,7 +555,7 @@ int write_vorbis (SV *obj)
   unlink(outpath);
   free(outpath);
 
-  return 1;
+  return newSViv(1);
 }
 
 /* We strdup'd the internal path string so we need to free it */

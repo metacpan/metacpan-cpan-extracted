@@ -9,7 +9,7 @@ use Game::Checkers::Notation;
 use Game::Checkers::Rules;
 use Game::Checkers::Move;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use constant {
 	MATE => 10_000,
@@ -444,7 +444,7 @@ Game::Checkers::Bot - an opponent, at five strengths
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 

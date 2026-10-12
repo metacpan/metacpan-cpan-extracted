@@ -1,0 +1,70 @@
+{
+   "abstract" : "widget layer over Clay::XS: build a widget tree, lay it out, turn pointer input into events",
+   "author" : [
+      "davenonymous <perl@davenonymous.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "zlib"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Clay-UI",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "tools",
+         "images"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.12"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Markdown" : "3.400"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "5.57",
+            "List::Util" : "1.45",
+            "Object::Pad" : "0.800",
+            "Object::PadX::Enum" : "0.01",
+            "XSLoader" : "0",
+            "perl" : "5.026"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "JSON::PP" : "0",
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/davenonymous/perl-clay-xs/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/davenonymous/perl-clay-xs.git",
+         "web" : "https://github.com/davenonymous/perl-clay-xs"
+      }
+   },
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

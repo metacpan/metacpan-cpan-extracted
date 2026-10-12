@@ -1,0 +1,38 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Term::Maze;
+
+our $VERSION = '0.05';
+
+exit Term::Maze->run(@ARGV);
+
+__END__
+=head1 NAME
+
+maze - mazes in the terminal
+
+=head1 SYNOPSIS
+
+    maze                          # a 40 by 20 maze
+    maze --width 20 --height 8    # a small one
+    maze 40 20                    # the same two numbers, bare
+
+=head1 DESCRIPTION
+
+Draws a maze and lets you walk it with WASD or HJKL. The screen, the keys and
+the maze itself all live in L<Term::Maze>; this is the command and nothing
+else. C<q> or escape quits, and the terminal is put back the way it was on
+every way out.
+
+=head1 EXIT STATUS
+
+    0   you reached the exit, or you quit
+    2   a bad option
+
+=head1 SEE ALSO
+
+L<Term::Maze>, L<aze>
+
+=cut

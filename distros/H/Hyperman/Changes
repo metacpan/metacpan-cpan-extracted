@@ -1,5 +1,32 @@
 Revision history for Hyperman
 
+0.58	2026-10-12
+        - FIXES t/59-ipv6.t on a resolver that answers nonexistent.invalid.
+        - t/50-scoreboard.t says why when the attach by name fails.
+
+0.57	2026-10-11
+        - Streamed HTTP/1.1 responses are chunked and keep the connection.
+        - access_log_format: Apache directives or json, compiled once.
+        - error_log: the server's own messages, stamped, to a file or handle.
+        - psgix.request_start when the log format measures durations.
+        - user, group, umask, pid_file: drop privileges after the bind.
+        - IPv6 listeners and hostnames; an unresolvable host is refused.
+        - Unix-domain listeners (path, mode) and LISTEN_FDS socket activation.
+        - proxy_protocol: v1 and v2 headers read before TLS, per listener.
+        - A request line must be METHOD target HTTP/d.d; anything else is 400.
+        - USR2 re-execs the supervisor: a fresh compile adopts the sockets and
+          the named arena, then the old pool drains. HUP is unchanged.
+        - Listener sockets are close-on-exec.
+        - body_timeout: a body is timed by progress, apart from the headers.
+        - QUIC caps half-open handshakes per source address at 32.
+        - Combinators cancel their losers and their inputs when cancelled.
+        - A watch replacing a pending readable_f/writable_f cancels it.
+        - A closed psgi.input no longer breaks later bodyless requests.
+        - FIX: an h2c preface sent in one burst with an oversize body got a
+          plain-text 413 and a close instead of an h2 413 (FreeBSD smokers).
+        - FIX: an h2 413 for an oversize body now ends the stream with
+          RST_STREAM NO_ERROR (curl on FreeBSD saw no status at all).
+
 0.56	2026-10-11
         - SECURITY: max_body bounds HTTP/2 and HTTP/3 bodies too.
         - SECURITY: request header blocks are bounded at 64KB on h2 and h3.

@@ -1,5 +1,73 @@
 Revision history for Punk
 
+0.57    2026-10-12
+        - SECURITY: an upload refused at `max_body` part way through left
+          its temp file, its descriptor and its buffers behind.
+        - SECURITY: `proxy trust => [networks]` took X-Forwarded-Proto,
+          -Host and -Port from a peer outside them.
+        - FIX: `$c->origin` leaked a string on every call.
+        - FIX: a request body is no longer allocated at its declared
+          Content-Length before it is read.
+        - FIX: a quoted `etag` validator is stripped of control bytes.
+        - FIX: `etag => 1` encodes JSON with its keys in order, so the tag
+          is the same in every worker.
+        - `header` croaks on a name or value with CR, LF or NUL.
+        - Add Punk::Upload `basename`.
+        - SECURITY: every WebSocket message a worker received stayed
+          allocated until the worker exited.
+        - SECURITY: a CR in an SSE `send` or `event` string started a new
+          field on the client.
+        - SECURITY: a `before_request` hook that answers a request no
+          longer answers an Extended CONNECT; that is the fixed 404.
+        - FIX: a WebSocket connection could be read after it was freed when
+          a close arrived on an HTTP/2 or TLS stream.
+        - FIX: `$w->drain` is pending on the stream handle while the server
+          is holding output; it was always settled.
+        - FIX: `broadcast($message, $except)` reaches every worker.
+        - FIX: a fast sender of small WebSocket messages was closed 1009.
+        - FIX: a self-rescheduling `defer` grew the worker on every tick.
+        - FIX: HEAD on an `sse` route or a `$c->stream` route sent a body.
+        - An SSE stream's write buffer is 16MB unless `write_buffer_limit`
+          says otherwise.
+        - A WebSocket frame length that is not minimal is a protocol error.
+        - `Upgrade` and `Connection` are matched as tokens.
+
+0.56    2026-10-11
+        - SECURITY: `$c->login` gives a stored session a new id. An id
+          planted in a browser before the login was signed in after it.
+        - SECURITY: an empty session that arrived with no cookie is not
+          written. Every anonymous guard denial and csrf refusal wrote a
+          store entry.
+        - FIX: `$c->logout->login($user)` signs the user in.
+        - FIX: csrf `exempt` matches whole path segments.
+        - FIX: cors sends `Vary: Origin` on a refused or originless response.
+        - The session and csrf cookies are `Secure` over https unless
+          `secure` is set.
+        - csrf no longer reads the form token from the query string.
+        - csrf checks a request with Basic, Digest, Negotiate or NTLM
+          `Authorization`.
+        - `login` croaks on an empty or 0 id.
+        - `auth_guard(verified => 1)` reads f, false, n, no and off as false.
+        - A cookie name, path, domain or samesite croaks on `;` or a control
+          character.
+        - Punk::Auth::Password refuses iterations outside 1000 to 10000000
+          and a stored key that is not 32 bytes.
+        - SECURITY: a markdown mount served drafts, index sources and
+          dotfiles as assets.
+        - SECURITY: `send_file` croaks on a path with a NUL, which opened
+          one file under another's content type.
+        - FIX: `send_file(etag => ...)` of 46 characters or more was a 500.
+        - FIX: `send_file` passes a weak `W/"..."` etag through.
+        - FIX: `blob_send` aborted the worker given eight or more options.
+        - FIX: a static file rewritten to the same size in the same second
+          was served stale, and one rewritten inside the stat TTL was sent
+          with the old Content-Length.
+        - FIX: directory listing links at the URL without a trailing slash.
+        - FIX: an empty If-None-Match no longer disables If-Modified-Since.
+        - A static mount answers 404 for a dotfile, `.well-known` excepted.
+        - Add the static `dotfiles` option.
+        - A file ETag carries the mtime's nanoseconds as a third field.
+
 0.55    2026-10-02
         - SECURITY (CVE-2026-104380): an Extended CONNECT on HTTP/2 or
           HTTP/3 was routed as a GET to any route, API operation or mount,

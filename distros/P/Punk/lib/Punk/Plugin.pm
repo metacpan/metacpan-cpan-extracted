@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.55';
+our $VERSION = '0.57';
 
 sub new { bless {}, $_[0] }
 
@@ -64,7 +64,12 @@ uses the class as written.
 =head2 What the hook phases can and cannot see
 
 C<before_request> runs before routing, so it sees every request - including
-the ones that 404, 405, or are answered by a static mount.
+the ones that 404, 405, or are answered by a static mount. A hook there that
+answers a request itself, a maintenance page or a cache in front, does not
+answer a websocket upgrade over HTTP/2 or HTTP/3 (an Extended CONNECT): that
+gets the fixed C<404> every path that is not a websocket route gives, so the
+hook's status cannot be read from another origin as a socket opening or
+failing.
 C<before_dispatch> runs after a route matches, which is the right phase for
 anything done on the client's behalf. C<after_dispatch> runs on the way out.
 

@@ -7,7 +7,7 @@ use Object::Proto::Sugar -types;
 use Game::Checkers::Piece;
 use Game::Checkers::Notation;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use constant {
 	EMPTY => 0,
@@ -131,7 +131,7 @@ Game::Checkers::Board - the 32 playing squares and what stands on them
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 

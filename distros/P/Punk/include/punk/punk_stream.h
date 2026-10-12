@@ -53,6 +53,8 @@ typedef struct punk_stream {
     SV    *writer;                /* the psgi.streaming $writer (STREAM mode) */
     SV    *self_rv;               /* strong self while live */
     SV    *drain_f;               /* the pending drain future, or NULL */
+    int    full;                  /* HSTREAM: the server said stop, and
+                                     has not yet said go              */
     SV    *reqid;                 /* psgix.request_id for the death report */
     SV    *defer_c, *defer_code, *defer_head;   /* the deferred detach start */
     hm_abi_timer *defer_tw;
@@ -125,9 +127,15 @@ static void pst_flush(pTHX_ punk_stream *st) {
     if (st->state == PST_CLOSING) pst_teardown(aTHX_ st);   /* fully sent */
 }
 
-static void pst_on_writable(pTHX_ int fd, int mask, void *ud) {
+static void pst_on_writable_in(pTHX_ int fd, int mask, void *ud) {
     PERL_UNUSED_ARG(fd); PERL_UNUSED_ARG(mask);
     pst_flush(aTHX_ (punk_stream *)ud);
+}
+
+static void pst_on_writable(pTHX_ int fd, int mask, void *ud) {
+    PK_LOOP_ENTER;
+    pst_on_writable_in(aTHX_ fd, mask, ud);
+    PK_LOOP_LEAVE;
 }
 
 /* ---- the stream handle's two callbacks ------------------------------------- */
@@ -135,10 +143,17 @@ static void pst_on_writable(pTHX_ int fd, int mask, void *ud) {
 /* Output that was over the high-water mark has gone out. This is what makes
  * $w->drain mean the same thing on the handle as on the detach transport:
  * settled with 1 when everything written so far has actually left. */
-static void pst_on_hdrain(pTHX_ void *h, void *ud) {
+static void pst_on_hdrain_in(pTHX_ void *h, void *ud) {
     punk_stream *st = (punk_stream *)ud;
     PERL_UNUSED_ARG(h);
+    st->full = 0;
     pst_settle_drain(aTHX_ st, 1);
+}
+
+static void pst_on_hdrain(pTHX_ void *h, void *ud) {
+    PK_LOOP_ENTER;
+    pst_on_hdrain_in(aTHX_ h, ud);
+    PK_LOOP_LEAVE;
 }
 
 /* The stream died before it was closed - an HTTP/2 RST_STREAM on this one
@@ -147,14 +162,20 @@ static void pst_on_hdrain(pTHX_ void *h, void *ud) {
  * on a multiplexed transport it is not, and a producer that is not told goes
  * on generating a body for nobody. Teardown settles the drain future with 0,
  * so a handler awaiting it stops rather than blocking for ever. */
-static void pst_on_habort(pTHX_ void *h, void *ud) {
+static void pst_on_habort_in(pTHX_ void *h, void *ud) {
     punk_stream *st = (punk_stream *)ud;
     PERL_UNUSED_ARG(h);
     pst_teardown(aTHX_ st);
 }
 
+static void pst_on_habort(pTHX_ void *h, void *ud) {
+    PK_LOOP_ENTER;
+    pst_on_habort_in(aTHX_ h, ud);
+    PK_LOOP_LEAVE;
+}
+
 /* the client closing early is the only thing we read for */
-static void pst_on_readable(pTHX_ int fd, int mask, void *ud) {
+static void pst_on_readable_in(pTHX_ int fd, int mask, void *ud) {
     punk_stream *st = (punk_stream *)ud;
     char scratch[512];
     ssize_t n;
@@ -165,6 +186,12 @@ static void pst_on_readable(pTHX_ int fd, int mask, void *ud) {
         return;
     if (n < 0) pst_teardown(aTHX_ st);
     /* n > 0: bytes on a response stream are the client's mistake; ignored */
+}
+
+static void pst_on_readable(pTHX_ int fd, int mask, void *ud) {
+    PK_LOOP_ENTER;
+    pst_on_readable_in(aTHX_ fd, mask, ud);
+    PK_LOOP_LEAVE;
 }
 
 /* queue raw bytes (already framed) to the socket transports */
@@ -198,9 +225,13 @@ static void pst_write_body(pTHX_ punk_stream *st, const char *bytes, size_t len)
         else if (r == HM_ABI_STREAM_FULL) {
             /* over the high-water mark: on_drain settles the drain future,
              * which is how $w->drain becomes real backpressure here */
+            st->full = 1;
             (void)st->abi->stream_on_drain(aTHX_ st->sh, pst_on_hdrain, st);
         }
-        else pst_settle_drain(aTHX_ st, 1);       /* all of it is away */
+        else {                                    /* all of it is away */
+            st->full = 0;
+            pst_settle_drain(aTHX_ st, 1);
+        }
         if (keep) SvREFCNT_dec(keep);             /* st may be gone now */
         return;
     }
@@ -420,7 +451,7 @@ static void pst_run_handler(pTHX_ SV *code, SV *c, SV *self) {
  * The self-reference is held across the run: the handler can tear the stream
  * down (client gone), and teardown drops the stream's own reference - the
  * last one, here. The SSE heartbeat learned this the hard way. */
-static void pst_start_cb(pTHX_ void *ud) {
+static void pst_start_cb_in(pTHX_ void *ud) {
     punk_stream *st = (punk_stream *)ud;
     SV *keep = st->self_rv ? SvREFCNT_inc(st->self_rv) : NULL;
     SV *c = st->defer_c, *code = st->defer_code, *head = st->defer_head;
@@ -439,6 +470,12 @@ static void pst_start_cb(pTHX_ void *ud) {
     SvREFCNT_dec(code);
     SvREFCNT_dec(head);
     if (keep) SvREFCNT_dec(keep);           /* st may be gone after this */
+}
+
+static void pst_start_cb(pTHX_ void *ud) {
+    PK_LOOP_ENTER;
+    pst_start_cb_in(aTHX_ ud);
+    PK_LOOP_LEAVE;
 }
 
 /* The response head as a structured header list rather than the pst_head byte
@@ -537,6 +574,19 @@ static SV *punk_stream_start(pTHX_ SV *c, SV *ct, HV *opts, SV *code) {
     SV **x, *rid;
     int chunked = 1;
     if (!envh) return pw_err(aTHX_ 500, "bad stream dispatch\n", NULL, NULL);
+
+    /* HEAD is the headers and nothing else. The streaming transports write
+     * to the connection themselves, where nothing blanks a body the way the
+     * dispatcher does for an ordinary response, so the handler is not run. */
+    x = hv_fetchs(envh, "REQUEST_METHOD", 0);
+    if (x && *x && SvOK(*x) && SvCUR(*x) == 4
+        && memEQ(SvPVX(*x), "HEAD", 4)) {
+        AV *resp = newAV();
+        av_push(resp, newSViv(pst_opt_status(aTHX_ opts)));
+        av_push(resp, newRV_noinc((SV *)pst_header_av(aTHX_ ct, opts)));
+        av_push(resp, newRV_noinc((SV *)newAV()));
+        return newRV_noinc((SV *)resp);
+    }
 
     /* Chunked framing is an HTTP/1.1 thing and only an HTTP/1.1 thing.
      * HTTP/1.0 has no chunked transfer coding; HTTP/2 and HTTP/3 forbid the

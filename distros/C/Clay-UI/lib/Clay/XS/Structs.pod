@@ -1,0 +1,1916 @@
+=pod
+
+=head1 NAME
+
+Clay::XS::Structs - every struct and field Clay::XS accepts
+
+=head1 SYNOPSIS
+
+    use v5.22;
+    use warnings;
+    use feature 'signatures';
+    no warnings 'experimental::signatures';
+    use Clay::XS qw(:all);
+
+    my $ctx = Clay_Initialize(Clay_MinMemorySize(), [800, 600],
+        sub ($error, $userdata) { warn "Clay: $error->{errorText}\n" });
+    Clay_SetMeasureTextFunction(sub ($text, $config, $userdata) {
+        return [ 8 * length $text, $config->{fontSize} ];
+    });
+
+    my $card = {
+        layout => {
+            sizing          => { width => sizing_fixed(240), height => sizing_fit() },
+            padding         => padding_all(12),
+            childGap        => 8,
+            childAlignment  => { x => CLAY_ALIGN_X_CENTER },
+            layoutDirection => CLAY_TOP_TO_BOTTOM,
+        },
+        backgroundColor => [250, 250, 250, 255],
+        cornerRadius    => 6,
+        border          => { color => [200, 200, 200, 255], width => border_outside(1) },
+    };
+    check_struct('Clay_ElementDeclaration', $card);    # strict check, no frame needed
+
+    Clay_BeginLayout();
+    Clay__OpenElementWithId(Clay_GetElementId('card'));
+    Clay__ConfigureOpenElement($card);
+    Clay__OpenTextElement('Hello', { fontSize => 16, textColor => [0, 0, 0, 255] });
+    Clay__CloseElement();
+    my $commands = Clay_EndLayout();
+
+=head1 QUICK INDEX
+
+Element declaration keys (the hash passed to C<Clay__ConfigureOpenElement>)
+and where they are described. The Clay::UI column names the widget
+attribute that sets the key (see L</Clay::UI spelling>); "-" means
+Clay::UI has no attribute for it.
+
+=for highlighter language=text
+
+    Key                         Section                    Clay::UI attribute
+    --------------------------  -------------------------  ------------------------------
+    layout                      layout                     layout (HasLayout)
+    layout.sizing               sizing                     layout => { sizing }
+    layout.padding              padding                    layout => { padding }
+    layout.childGap             childGap                   layout => { child_gap }
+    layout.childAlignment       childAlignment             layout => { child_alignment }
+    layout.layoutDirection      layoutDirection            layout => { layout_direction }
+    layout.lineGap              lineGap                    layout => { line_gap }
+    layout.lineSizing           lineSizing                 layout => { line_sizing }
+    backgroundColor             backgroundColor            background_color
+    overlayColor                overlayColor               -
+    cornerRadius                cornerRadius               corner_radius
+    aspectRatio                 aspectRatio                -
+    image.imageData             image                      -
+    floating.*                  floating                   floating (HasFloating)
+    custom.customData           custom                     -
+    clip.horizontal             clip                       horizontal (HasScroll)
+    clip.vertical               clip                       vertical (HasScroll)
+    clip.childOffset            clip                       child_offset (HasScroll)
+    border.color                border                     border_color
+    border.width                border                     border_width
+    transition.*                transition                 -
+    sizingGroup.width           sizingGroup                width_group (HasSizingGroup)
+    sizingGroup.height          sizingGroup                height_group (HasSizingGroup)
+    userData                    userData                   reserved by Clay::UI
+
+Every struct C<check_struct> knows and its keys, in the order the
+struct error messages list them. The text element config (the hash
+passed to C<Clay__OpenTextElement>) is described in
+L</TEXT ELEMENT CONFIG>, C<Clay_TransitionCallbackArguments> in
+L</RETURNED HASHES>, the parts of a declaration in
+L</ELEMENT DECLARATION> and the rest in L</OTHER STRUCTS>. The
+C<enter> and C<exit> parts of a transition have no C type name of their
+own.
+
+    Struct                              Keys
+    ----------------------------------  ---------------------------------------
+    Clay_ElementDeclaration             layout backgroundColor overlayColor
+                                        cornerRadius aspectRatio image floating
+                                        custom clip border transition
+                                        sizingGroup userData
+    Clay_LayoutConfig                   sizing padding childGap childAlignment
+                                        layoutDirection lineGap lineSizing
+    Clay_Sizing                         width height
+    Clay_SizingAxis                     min max type percent
+    Clay_Padding                        left right top bottom
+    Clay_ChildAlignment                 x y
+    Clay_Color                          r g b a
+    Clay_CornerRadius                   topLeft topRight bottomLeft bottomRight
+    Clay_AspectRatioElementConfig       aspectRatio
+    Clay_ImageElementConfig             imageData
+    Clay_FloatingElementConfig          offset expand parentId zIndex
+                                        attachPoints pointerCaptureMode
+                                        attachTo clipTo
+    Clay_FloatingAttachPoints           element parent
+    Clay_CustomElementConfig            customData
+    Clay_ClipElementConfig              horizontal vertical childOffset
+    Clay_BorderElementConfig            color width
+    Clay_BorderWidth                    left right top bottom betweenChildren
+    Clay_TransitionElementConfig        duration properties interactionHandling
+                                        enter exit
+    Clay_TransitionElementConfig.enter  trigger hasSetInitial
+    Clay_TransitionElementConfig.exit   trigger siblingOrdering hasSetFinal
+    Clay_SizingGroup                    width height
+    Clay_TextElementConfig              userData textColor fontId fontSize
+                                        letterSpacing lineHeight wrapMode
+                                        textAlignment
+    Clay_Vector2                        x y
+    Clay_Dimensions                     width height
+    Clay_BoundingBox                    x y width height
+    Clay_TransitionData                 boundingBox backgroundColor
+                                        overlayColor borderColor borderWidth
+    Clay_TransitionCallbackArguments    transitionState initial target current
+                                        elapsedTime duration properties
+
+Hashes Clay::XS returns or passes to callbacks that no function takes,
+see L</RETURNED HASHES>:
+
+    element id hash  Clay_ElementData  Clay_ScrollContainerData
+    Clay_PointerData  error hash  render command
+
+=head1 DESCRIPTION
+
+This page lists every struct that L<Clay::XS> functions take or return,
+with every field: its Perl type, the values it accepts, its default and
+what it does to the layout or to the render commands. The source of
+truth for names and ranges is the struct schema tables in
+F<src/marshal.c>; the meaning of each field comes from Clay's F<clay.h>.
+
+A "declaration" is the hashref passed to C<Clay__ConfigureOpenElement>;
+it is a C<Clay_ElementDeclaration>. A "render command" is one hash in
+the arrayref C<Clay_EndLayout> returns (see L<Clay::XS/RENDER COMMANDS>).
+
+=head2 Writing structs in Perl
+
+=over 4
+
+=item *
+
+A struct is a hash reference whose keys are the exact C field names
+from F<clay.h>, in camelCase: C<backgroundColor>, C<layoutDirection>,
+C<childGap>. Nested structs are nested hashes:
+C<< { layout => { padding => { left => 8 } } } >>.
+
+=item *
+
+C<Clay_Color>, C<Clay_Vector2> and C<Clay_Dimensions> also accept an
+array reference with the fields in order: C<[r, g, b, a]>, C<[x, y]>,
+C<[width, height]>. Missing array elements are 0, so C<[255, 0, 0]> is a
+colour with alpha 0.
+
+=item *
+
+C<cornerRadius> and C<aspectRatio> also accept a plain number:
+C<< cornerRadius => 8 >> sets all four corners, C<< aspectRatio => 1.5 >>
+means C<< aspectRatio => { aspectRatio => 1.5 } >>.
+
+=item *
+
+A missing key, or a key whose value is undef, keeps the zero value: 0
+for numbers, false for booleans, the first constant (value 0) for enums.
+This is what a C designated initialiser does, and Clay's defaults are
+themselves zero, so C<{}> is a valid declaration: a box with C<FIT>
+sizing on both axes, laid out left to right, drawing nothing. A nested
+struct that is present starts from zero too: C<< backgroundColor => { r
+=> 255 } >> has C<g>, C<b> and C<a> 0.
+
+=item *
+
+When a struct is passed to Clay (C<Clay__ConfigureOpenElement>,
+C<Clay__OpenTextElement> and the other functions), unknown keys and extra
+array elements are ignored. C<check_struct> (see L<Clay::XS/CHECKING
+STRUCTS>) is strict: it croaks for unknown keys, for arrays of the wrong
+length and for references used as booleans. Use it to catch a misspelt
+key such as C<childgap>.
+
+=back
+
+=head2 Value types and ranges
+
+Every value is checked when it crosses into Clay, at any nesting depth.
+The field descriptions below use these types:
+
+=over 4
+
+=item float
+
+Any number that is finite as a C C<float> (absolute value up to about
+3.4e38). NaN, infinities and non-numeric strings croak. Unless a key's
+entry gives a range, signs are not checked: Clay accepts negative values
+and computes with them. The one exception to finiteness is the C<max> of
+a sizing axis, which may also be C<+Inf> (see L</sizing>).
+
+=item U16
+
+An integer in C<0 .. 65535>. Values outside C<0 .. 65535> and
+non-integers (C<1.5>) croak; C<1.0> is accepted. Padding, C<childGap>,
+C<lineGap>, border widths, C<fontId>, C<fontSize>, C<letterSpacing> and
+C<lineHeight> are U16 and range-checked this way.
+
+Colour channels, corner radii and C<percent> are floats with a range:
+channels lie in C<0 .. 255>, radii are not negative and C<percent> lies
+in C<0 .. 1>, so C<< { r => 300 } >>, a negative radius or a C<percent>
+of 2 croak (C<expected a number in 0..255>, C<< expected a number >= 0 >>).
+
+=item U32
+
+An integer in C<0 .. 4294967295>.
+
+=item int16
+
+An integer in C<-32768 .. 32767>.
+
+=item enum
+
+An integer in C<0 .. N>, where N is the value of the field's last
+constant. Use the exported constants (C<CLAY_TOP_TO_BOTTOM>, ...); every
+field lists its constants with their values.
+
+=item boolean
+
+Any Perl value, read as true or false. C<check_struct> rejects references
+(they are always true, so almost always a mistake).
+
+=item opaque integer
+
+C<userData>, C<imageData> and C<customData>: an unsigned integer that fits
+a pointer (C<0 .. 2**64 - 1> on a 64-bit perl). Clay treats it as an
+opaque pointer and hands it back unchanged in render commands. A
+C<refaddr> value fits. Integers above 2**53 are exact only as Perl
+integers or decimal strings, not as floats. Clay::XS takes no reference
+to anything, so keep the object an integer stands for alive yourself.
+
+=back
+
+A value that does not fit croaks a C<Clay::XS::StructError> object (see
+L<Clay::XS/STRUCT ERRORS>). It names the path to the field:
+
+    Clay_ElementDeclaration.layout.padding.left: expected an integer in 0..65535, got '-8'
+    Clay_ElementDeclaration.floating.zIndex: expected an integer in -32768..32767, got '32768'
+    Clay_ElementDeclaration.layout: expected a hash reference, got 'x'
+
+=head2 Clay::UI spelling
+
+L<Clay::UI> widgets take the same structs, with two differences:
+
+=over 4
+
+=item *
+
+Keys may be written in snake_case: C<child_gap>, C<layout_direction>,
+C<child_alignment>, C<background_color>, C<corner_radius>, C<top_left>,
+C<between_children>, C<attach_to>, C<attach_points>, C<parent_id>,
+C<z_index>, C<pointer_capture_mode>, C<clip_to>, C<child_offset>,
+C<overlay_color>, C<aspect_ratio>, C<image_data>, C<custom_data>.
+Clay::UI turns every key
+into camelCase before it reaches Clay::XS, so the camelCase spelling
+works too, but one hash must not hold both spellings of a key (that
+dies with C<key 'child_gap' camelizes to 'childGap', which is already present in the same hash>).
+
+=item *
+
+A declaration is not one hash: each top-level key is set through its
+own widget attribute, provided by a role the widget class composes.
+Values are checked with C<check_struct> when they are set, and errors
+use the snake_case path, for example
+C<Clay::UI: 'layout.child_gap' expected an integer in 0..65535, got '-1'>.
+
+=back
+
+Which attribute carries which part of the declaration:
+
+=over 4
+
+=item C<layout> (Clay::UI spelling)
+
+The C<layout> attribute of L<Clay::UI::Role::Layout::HasLayout> takes a
+whole C<Clay_LayoutConfig>:
+C<< layout => { sizing => { width => sizing_grow() }, child_gap => 8 } >>.
+
+=item C<backgroundColor> (Clay::UI spelling)
+
+The C<background_color> attribute of
+L<Clay::UI::Role::Style::HasBackground>, a C<Clay_Color>.
+
+=item C<border> (Clay::UI spelling)
+
+Two attributes of L<Clay::UI::Role::Style::HasBorder>: C<border_color> (a
+C<Clay_Color>) and C<border_width>. C<border_width> takes a
+C<Clay_BorderWidth> hash, or a number that sets the four outer sides
+(C<betweenChildren> stays 0).
+
+=item C<cornerRadius> (Clay::UI spelling)
+
+The C<corner_radius> attribute of
+L<Clay::UI::Role::Style::HasCornerRadius>: a number for all four corners
+or a C<Clay_CornerRadius> hash.
+
+=item C<floating> (Clay::UI spelling)
+
+The C<floating> attribute of L<Clay::UI::Role::Layout::HasFloating>, a
+whole C<Clay_FloatingElementConfig>.
+
+=item C<clip> (Clay::UI spelling)
+
+Three attributes of L<Clay::UI::Role::Layout::HasScroll>: C<horizontal>
+(default 0), C<vertical> (default 1) and C<child_offset> (default: the
+scroll offset Clay tracks for the element, from C<Clay_GetScrollOffset>).
+A widget composing HasScroll is a scroll container; it also receives
+OnScroll events.
+
+=item C<sizingGroup> (Clay::UI spelling)
+
+Two attributes of L<Clay::UI::Role::Layout::HasSizingGroup>:
+C<width_group> and C<height_group>, integers in C<0 .. 2**20 - 1>
+(higher ids are reserved for L<Clay::UI::Grid>).
+
+=item text element config
+
+The parameters of L<Clay::UI::Text>: C<text>, C<font_id>, C<font_size>,
+C<text_color>, C<letter_spacing>, C<line_height>, C<wrap_mode>,
+C<text_alignment>. Two defaults differ from Clay's zero values:
+C<font_size> is 16 and C<text_color> is C<[0, 0, 0, 255]>.
+
+=item C<userData> (Clay::UI spelling)
+
+Reserved. Clay::UI sets C<userData> on every element and text element to
+a number that identifies the widget, so C<< $ui->widget_for($cmd->{userData}) >>
+finds the widget of a render command. A widget whose config sets
+C<user_data> (or C<userData>) dies in C<render>.
+
+=back
+
+L<Clay::UI::Box> composes HasLayout, HasBackground, HasBorder,
+HasCornerRadius and HasFloating. Every element widget already has
+C<width_group> and C<height_group>: L<Clay::UI::Role::Core::Element>
+composes HasSizingGroup. Only HasScroll (for C<clip>) must be composed
+yourself where you need it.
+
+=head2 Keys Clay::UI has no attribute for
+
+No Clay::UI role sets C<overlayColor>, C<aspectRatio>, C<image>,
+C<custom> or C<transition>. To use them, give the widget class a method
+whose name starts with C<contribute_>. Clay::UI calls every such method
+of the class (and of its roles and superclasses) with the config hash
+of the frame, in alphabetical order of the method names, and passes the
+result to Clay (see L<Clay::UI::Role::Core::Element/to_config>). The
+method writes its key into the hash, in either spelling, and returns
+nothing:
+
+=for highlighter language=perl
+
+    use Object::Pad;
+    use Clay::UI::Box;
+
+    class My::Picture :strict(params) :does(Clay::UI::Box) {
+    	use Clay::XS qw(CLAY_TRANSITION_PROPERTY_BACKGROUND_COLOR);
+
+    	field $image_handle :param;          # an integer your renderer understands
+    	field $ratio        :param = 1.5;
+
+    	method contribute_image ($config) {
+    		$config->{image} = { image_data => $image_handle };
+    		return;
+    	}
+    	method contribute_aspect_ratio ($config) {
+    		$config->{aspect_ratio} = $ratio;
+    		return;
+    	}
+    	method contribute_overlay_color ($config) {
+    		$config->{overlay_color} = [255, 255, 255, 64];
+    		return;
+    	}
+    	method contribute_transition ($config) {
+    		$config->{transition} = {
+    			duration   => 0.2,
+    			properties => CLAY_TRANSITION_PROPERTY_BACKGROUND_COLOR,
+    		};
+    		return;
+    	}
+    }
+
+Rules for such a method:
+
+=over 4
+
+=item *
+
+The methods run in alphabetical order of their names. Do not write a
+key that another C<contribute_> method of the class also writes: such
+code depends on that order. For example, do not combine your own
+C<contribute_background_color> with the C<background_color> attribute
+(HasBackground's C<contribute_background> writes C<background_color>
+too). The one exception is C<layout>, which HasLayout and
+L<Clay::UI::Grid> merge into: add your own C<layout> keys by merging
+into the existing hash, using keys no other method sets.
+
+=item *
+
+The method name must not clash with a C<contribute_> method of a role
+the class composes: C<contribute_layout>, C<contribute_background>,
+C<contribute_border>, C<contribute_corner_radius>,
+C<contribute_floating>, C<contribute_clip>, C<contribute_sizing_group>,
+and C<contribute_grid_defaults> (in a class composing
+L<Clay::UI::Grid>).
+Object::Pad dies on a clash (C<Method 'contribute_background' clashes with the one provided by role Clay::UI::Role::Style::HasBackground>).
+
+=item *
+
+Nothing checks the values when your fields are set. Clay::XS checks
+them in the layout pass, where unknown keys are ignored; a bad value
+dies from C<render>. Call C<check_struct> in your constructor or setters
+to catch mistakes early.
+
+=item *
+
+A setter that changes what such a method writes must call
+C<< $self->mark_changed >>, so renderers that skip unchanged frames see
+the change (see L<Clay::UI::Revision>).
+
+=item *
+
+Do not write C<user_data>: it is reserved (see above).
+
+=item *
+
+Transitions need the same element id in every frame: give the widget an
+C<id>. Install the transition handlers with C<Clay_SetTransitionHandlers>
+right after C<< Clay::UI->new >>, while the UI's context is the current
+one.
+
+=back
+
+=head1 ELEMENT DECLARATION
+
+C<Clay_ElementDeclaration> is the hash passed to
+C<Clay__ConfigureOpenElement>, once per element, right after the element
+is opened:
+
+    Clay__OpenElementWithId(Clay_GetElementId('sidebar'));
+    Clay__ConfigureOpenElement({
+        layout          => { sizing => { width => sizing_fixed(200), height => sizing_grow() } },
+        backgroundColor => [30, 30, 40, 255],
+    });
+    # ... children ...
+    Clay__CloseElement();
+
+Its keys are described below, one section each. An element without any
+drawing key (C<backgroundColor>, C<border>, C<image>, C<custom>,
+C<overlayColor>, C<clip>) produces no render command; it only positions
+its children.
+
+The render commands of one element come in this order: C<OVERLAY_COLOR_START>
+(from C<overlayColor>), C<IMAGE>, C<CUSTOM>, C<SCISSOR_START> (from
+C<clip>), C<RECTANGLE> (from C<backgroundColor>), the commands of the
+children, C<BORDER> and the C<betweenChildren> rectangles,
+C<OVERLAY_COLOR_END>, C<SCISSOR_END>.
+
+=head2 layout
+
+C<layout> is a C<Clay_LayoutConfig>: how big the element is and how its
+children are placed inside it.
+
+    layout => {
+        sizing          => { width => sizing_grow(), height => sizing_fit() },
+        padding         => { left => 16, right => 16, top => 8, bottom => 8 },
+        childGap        => 8,
+        childAlignment  => { x => CLAY_ALIGN_X_LEFT, y => CLAY_ALIGN_Y_CENTER },
+        layoutDirection => CLAY_LEFT_TO_RIGHT,
+    }
+
+Default (missing): C<FIT> sizing on both axes, no padding, no gap,
+children aligned left and top, laid out left to right. Clay::UI:
+the C<layout> attribute, keys in snake_case.
+
+=head3 sizing
+
+C<sizing> is a C<Clay_Sizing>: C<< { width => $axis, height => $axis } >>,
+one C<Clay_SizingAxis> per axis. Each axis has a sizing type and the
+numbers that type uses:
+
+    { type => CLAY__SIZING_TYPE_FIT,     min => $px, max => $px }
+    { type => CLAY__SIZING_TYPE_GROW,    min => $px, max => $px }
+    { type => CLAY__SIZING_TYPE_FIXED,   min => $px, max => $px }
+    { type => CLAY__SIZING_TYPE_PERCENT, percent => $fraction }
+
+Build axes with the helpers rather than by hand; each returns such a
+hash:
+
+    sizing_fit($min, $max)     # both optional, default 0
+    sizing_grow($min, $max)    # both optional, default 0
+    sizing_fixed($size)        # min and max both $size
+    sizing_percent($fraction)  # 0.5 is 50 %
+
+=head4 sizing.width
+
+C<width> is the C<Clay_SizingAxis> of the x axis, default FIT with no
+limits. Clay::UI: C<< layout => { sizing => { width => ... } } >>.
+
+=head4 sizing.height
+
+C<height> is the C<Clay_SizingAxis> of the y axis, default FIT with no
+limits. Clay::UI: C<< layout => { sizing => { height => ... } } >>.
+
+=head4 Sizing axis fields
+
+The keys of one C<Clay_SizingAxis> hash:
+
+=over 4
+
+=item type
+
+An enum, default C<CLAY__SIZING_TYPE_FIT> (0). A missing C<type> means
+FIT. The four sizing types are described below.
+
+=item min
+
+A float, default 0. The element is never smaller than C<min> pixels on
+this axis, not even when its parent is too small for its children.
+
+=item max
+
+A float, default 0. The element is never larger than C<max> pixels. A
+C<max> of 0 or less means no maximum, so the default has none.
+C<+Inf> (and any number above the C<float> range) is accepted and means
+no maximum as well: C<sizing_fit(0, 9**9**9)>.
+
+=item percent
+
+A float in C<0 .. 1>, default 0. Used only by PERCENT; other values
+croak (see PERCENT below).
+
+=back
+
+The type decides which keys are read: a PERCENT axis reads only
+C<percent>, the other types read only C<min> and C<max>.
+C<check_struct> croaks for a key the type does not use, for example
+C<Clay_SizingAxis: expected only the keys type, percent, got the unknown key 'min'>.
+
+=head4 FIT (CLAY__SIZING_TYPE_FIT, 0)
+
+The element is as big as its content: the children plus padding plus
+the gaps between them (for a text element, the measured text). This is
+the default. The result is clamped to C<min> .. C<max>. When the parent
+is too small, FIT elements may be compressed, but never below C<min>
+and never below what their own content can shrink to.
+
+    sizing => { width => sizing_fit(), height => sizing_fit(40) }   # at least 40 px tall
+
+=head4 GROW (CLAY__SIZING_TYPE_GROW, 1)
+
+The element starts at its content size and then grows to fill the free
+space of its parent on this axis. Several GROW siblings share the free
+space, growing the smallest first, until they reach their C<max>. On the
+parent's off axis (the vertical axis of a left-to-right parent), a GROW
+child takes the parent's full inner size.
+
+    # A 300 px wide row: 'a' gets 190 px, 'b' stops at its max of 50 px
+    Clay__OpenElementWithId(Clay_GetElementId('row'));
+    Clay__ConfigureOpenElement({ layout => { sizing => { width => sizing_fixed(300) }, childGap => 10 } });
+    for my $child ([a => sizing_grow()], [b => sizing_grow(0, 50)], [c => sizing_fixed(40)]) {
+        my ($name, $width) = @$child;
+        Clay__OpenElementWithId(Clay_GetElementId($name));
+        Clay__ConfigureOpenElement({ layout => { sizing => { width => $width } } });
+        Clay__CloseElement();
+    }
+    Clay__CloseElement();
+
+=head4 FIXED (CLAY__SIZING_TYPE_FIXED, 3)
+
+The element is exactly C<sizing_fixed($size)> pixels: Clay clamps the
+content size to C<min> .. C<max>, and C<sizing_fixed> sets both to
+C<$size>. A FIXED element neither grows nor is compressed. A hand-built
+FIXED axis with only C<min> set is as big as its content, at least
+C<min>. For the same reason C<sizing_fixed(0)> behaves like
+C<sizing_fit()> (a C<max> of 0 means no maximum): the element is as
+big as its content. Use C<sizing_fixed(1)> for an element that should
+take (almost) no space.
+
+=head4 PERCENT (CLAY__SIZING_TYPE_PERCENT, 2)
+
+The element is C<percent> times the parent's inner size on this axis:
+the parent's size minus its padding and, on the layout axis, minus all
+C<childGap>s between its children. C<percent> is a fraction: 0.5 is
+50 %. Two C<sizing_percent(0.5)> children of a 200 px wide parent with 10
+px padding on each side and a C<childGap> of 20 are 80 px wide each.
+
+C<percent> must lie in C<0 .. 1>: other values croak
+(C<sizing_percent(1.5)> croaks
+C<sizing_percent: percent: expected a number in 0..1, got '1.5'>), so
+Clay's C<CLAY_ERROR_TYPE_PERCENTAGE_OVER_1> is never reached from Perl.
+
+=head3 padding
+
+C<padding> is a C<Clay_Padding>:
+C<< { left => $px, right => $px, top => $px, bottom => $px } >>, each a
+U16, default 0: values outside C<0 .. 65535> or non-integers croak
+(C<Clay_ElementDeclaration.layout.padding.left: expected an integer in 0..65535, got '-8'>). Padding is the space between the element's edge and its
+children; it adds to a FIT element's size. C<padding_all($px)> builds a
+hash with all four sides set.
+
+    padding => padding_all(16)
+    padding => { left => 16, right => 16, top => 8, bottom => 8 }
+
+Clay::UI: C<< layout => { padding => ... } >>.
+
+=head3 childGap
+
+C<childGap> is a U16 (values outside C<0 .. 65535> or non-integers
+croak), default 0: the space in pixels between neighbouring children
+along the layout axis (horizontal for C<CLAY_LEFT_TO_RIGHT> and
+C<CLAY_LEFT_TO_RIGHT_WRAP>, vertical for C<CLAY_TOP_TO_BOTTOM>). It adds
+to a FIT element's size. C<CLAY_BACK_TO_FRONT> ignores it.
+
+    layout => { childGap => 8 }
+
+Clay::UI: C<< layout => { child_gap => 8 } >>.
+
+=head3 childAlignment
+
+C<childAlignment> is a C<Clay_ChildAlignment>, C<< { x => $enum, y => $enum } >>:
+where the children sit inside the element when they do not fill it.
+
+On the layout axis the children move as a block; on the off axis each
+child is aligned on its own (see L<Clay::XS/Terms> for both terms). Alignment respects the padding. In a
+C<CLAY_LEFT_TO_RIGHT_WRAP> container, C<x> aligns every line on its own
+and C<y> aligns each child within its line (see L<Clay::XS/FLOW LAYOUT>).
+In a C<CLAY_BACK_TO_FRONT> container, both apply to every child.
+
+    # a 20x20 child of a 100x100 element ends up at (40, 80)
+    childAlignment => { x => CLAY_ALIGN_X_CENTER, y => CLAY_ALIGN_Y_BOTTOM }
+
+Clay::UI: C<< layout => { child_alignment => { x => ..., y => ... } } >>.
+
+=head4 childAlignment.x
+
+C<x> is an enum: C<CLAY_ALIGN_X_LEFT> (0, default), C<CLAY_ALIGN_X_RIGHT>
+(1), C<CLAY_ALIGN_X_CENTER> (2).
+
+=head4 childAlignment.y
+
+C<y> is an enum: C<CLAY_ALIGN_Y_TOP> (0, default), C<CLAY_ALIGN_Y_BOTTOM>
+(1), C<CLAY_ALIGN_Y_CENTER> (2).
+
+=head3 layoutDirection
+
+C<layoutDirection> is an enum: how the children are arranged.
+
+=over 4
+
+=item C<CLAY_LEFT_TO_RIGHT> (0, default)
+
+In a row, left to right. The layout axis is horizontal.
+
+=item C<CLAY_TOP_TO_BOTTOM> (1)
+
+In a column, top to bottom. The layout axis is vertical.
+
+=item C<CLAY_LEFT_TO_RIGHT_WRAP> (2)
+
+Left to right, starting a new line below whenever the next child does
+not fit into the remaining width ("flow" layout); lines are C<lineGap>
+apart. See L<Clay::XS/FLOW LAYOUT>.
+
+=item C<CLAY_BACK_TO_FRONT> (3)
+
+On top of each other ("stack" layout): every child is placed inside the
+padding by C<childAlignment>, later children are drawn over earlier
+ones, C<childGap> is ignored. See L<Clay::XS/STACK LAYOUT>.
+
+=back
+
+    layout => { layoutDirection => CLAY_TOP_TO_BOTTOM, childGap => 4 }
+
+Clay::UI: C<< layout => { layout_direction => CLAY_TOP_TO_BOTTOM } >>.
+
+=head3 lineGap
+
+C<lineGap> is a U16 (values outside C<0 .. 65535> or non-integers
+croak), default 0: the vertical space in pixels between the lines of a
+C<CLAY_LEFT_TO_RIGHT_WRAP> container. Other directions ignore it.
+
+    # 100 px wide: 'a' (60 px) on line 1; 'b' (60 px) and 'c' (30 px) on line 2, 7 px lower
+    layout => { layoutDirection => CLAY_LEFT_TO_RIGHT_WRAP, childGap => 5, lineGap => 7,
+                sizing => { width => sizing_fixed(100) } }
+
+Clay::UI: C<< layout => { line_gap => 7 } >>.
+
+=head3 lineSizing
+
+C<lineSizing> is an enum: what a C<CLAY_LEFT_TO_RIGHT_WRAP> container
+taller than its lines does with the leftover height. Other directions
+ignore it.
+
+=over 4
+
+=item C<CLAY_LINE_SIZING_GROW> (0, default)
+
+Every line gets an equal share of the leftover height; GROW children
+grow with their line.
+
+=item C<CLAY_LINE_SIZING_FIT> (1)
+
+Every line is as tall as its tallest child; C<childAlignment.y> places
+the block of lines in the container.
+
+=back
+
+Clay::UI: C<< layout => { line_sizing => CLAY_LINE_SIZING_FIT } >>.
+
+=head2 backgroundColor
+
+C<backgroundColor> is a C<Clay_Color> (see L</Clay_Color>), default
+C<[0, 0, 0, 0]>. When its alpha (C<a>) is above 0, the element produces a
+C<RECTANGLE> render command with the element's bounding box, this colour
+and the C<cornerRadius>. An alpha of 0 draws nothing. It does not affect
+the layout.
+
+C<IMAGE> and C<CUSTOM> render commands carry the colour as well (a tint,
+for images), but the C<RECTANGLE> command is produced in addition to them
+when the alpha is above 0, and it comes after them: drawn in order, the
+rectangle covers the image. Put the background on a parent element
+instead.
+
+    backgroundColor => [40, 50, 60, 255]
+
+Clay::UI: the C<background_color> attribute.
+
+=head2 overlayColor
+
+C<overlayColor> is a C<Clay_Color>, default C<[0, 0, 0, 0]>. When its
+alpha is above 0, the element's commands are wrapped in an
+C<OVERLAY_COLOR_START> and an C<OVERLAY_COLOR_END> render command, both
+with C<< renderData => { color => ... } >> and an empty bounding box.
+The renderer should blend everything drawn in between (the element and
+all its children) towards the colour's RGB, by the colour's alpha, like
+GLSL's C<mix(color, overlay.rgb, overlay.a)>: alpha 0 changes nothing,
+alpha 255 replaces every colour. Fading an element in or out is a common
+use. It does not affect the layout.
+
+    overlayColor => [255, 255, 255, 128]    # wash out the subtree by half
+
+Clay::UI: no attribute; a C<contribute_> method writes it as
+C<overlay_color> (or C<overlayColor>); see L</Keys Clay::UI has no
+attribute for>.
+
+=head2 cornerRadius
+
+C<cornerRadius> is a C<Clay_CornerRadius> (see L</Clay_CornerRadius>) or a
+number for all four corners, default 0 (square corners). It is the
+radius in pixels of the rounded corners of the element's C<RECTANGLE>,
+C<BORDER>, C<IMAGE> and C<CUSTOM> render commands; a radius of half the
+element's size draws a circle. Clay only passes it to the renderer; it
+does not affect the layout.
+
+    cornerRadius => 8
+    cornerRadius => { topLeft => 8, topRight => 8 }    # bottom corners square
+    cornerRadius => corner_radius_all(8)
+
+Clay::UI: the C<corner_radius> attribute.
+
+=head2 aspectRatio
+
+C<aspectRatio> is a C<Clay_AspectRatioElementConfig>,
+C<< { aspectRatio => $float } >>, or that float alone; default 0 (off).
+A non-zero value keeps the element's width divided by its height at that
+ratio: once the width is known, Clay sets the height to
+C<width / aspectRatio>, even when the height has a size of its own (the
+width wins). An element with a height but no width gets
+C<height * aspectRatio> as its width. Use it for images that scale with
+the layout.
+
+Clay sizes all widths before any height, so the width must come from
+the width sizing (FIXED, GROW, PERCENT or the content of a FIT element)
+or from a FIXED height. An element whose width comes from nothing (FIT
+with no content) and that has no FIXED height comes out 0x0: for
+example an empty element with C<< height => sizing_grow() >> or with no
+sizing at all. A
+GROW height with a width works: C<< width => sizing_fixed(100), height
+=> sizing_grow() >> with C<< aspectRatio => 2 >> gives 100x50.
+
+    # 300 px wide (GROW in a 300 px parent), so 200 px tall
+    { layout => { sizing => { width => sizing_grow() } }, aspectRatio => 1.5 }
+
+Clay::UI: no attribute; a C<contribute_> method writes it as
+C<aspect_ratio> (or C<aspectRatio>); see L</Keys Clay::UI has no
+attribute for>.
+
+=head2 image
+
+C<image> is a C<Clay_ImageElementConfig>, C<< { imageData => $integer } >>.
+
+=head3 imageData
+
+C<imageData> is an opaque integer, default 0. When it is not 0, the
+element produces an C<IMAGE> render command whose C<renderData> holds
+C<imageData>, the C<backgroundColor> (the renderer decides whether to use
+it as a tint; C<[0, 0, 0, 0]> should mean "untinted") and the
+C<cornerRadius>. With C<imageData> 0 there is no C<IMAGE> command. Clay
+does not know the image's size: give the element a size, and an
+C<aspectRatio> to keep its proportions. The C<backgroundColor> travels
+only in the C<IMAGE> command: an image element emits no C<RECTANGLE>.
+
+    # imageData 1 is a key into your renderer's own image table,
+    # for example: my %images = (1 => $logo_image);
+    { layout => { sizing => { width => sizing_fixed(64) } }, aspectRatio => 1,
+      image => { imageData => 1 } }
+
+Clay::UI: no attribute; a C<contribute_> method writes it as
+C<< image => { image_data => ... } >> (or C<imageData>); see L</Keys
+Clay::UI has no attribute for>.
+
+=head2 floating
+
+C<floating> is a C<Clay_FloatingElementConfig>. A floating element is
+taken out of the normal layout: it does not change its parent's size or
+its siblings' positions, it is placed relative to another element (the
+element it is attached to), and it is drawn as its own layer, above or
+below other content by its C<zIndex>. Tooltips, menus and dialogs float.
+Its own size and its children are laid out as usual.
+
+=for text Figure: images/floating.png in the distribution.
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-clay-xs/v0.06/images/floating.png" alt="A row of three buttons Edit, View and Help. The View button has a dark tooltip above it, a white menu with the entries Zoom in and Zoom out hanging below it and a red badge on its top right corner; Edit and Help stay where they are. The legend gives the attach points: tooltip, element CENTER_BOTTOM at parent CENTER_TOP with offset y -6; menu, element LEFT_TOP at parent LEFT_BOTTOM with offset y 4; badge, element CENTER_CENTER at parent RIGHT_TOP."></p>
+
+=end html
+
+    floating => {
+        attachTo     => CLAY_ATTACH_TO_PARENT,
+        attachPoints => { element => CLAY_ATTACH_POINT_CENTER_BOTTOM,
+                          parent  => CLAY_ATTACH_POINT_CENTER_TOP },
+        offset       => [0, -4],
+        zIndex       => 10,
+    }
+
+Floating is off unless C<attachTo> is set: with the default
+C<CLAY_ATTACH_TO_NONE> every other field is ignored. Clay::UI: the
+C<floating> attribute, keys in snake_case (C<attach_to>, C<attach_points>,
+C<z_index>, C<parent_id>, C<pointer_capture_mode>, C<clip_to>).
+
+=head3 attachTo
+
+C<attachTo> is an enum: which element the floating element is attached
+to.
+
+=over 4
+
+=item C<CLAY_ATTACH_TO_NONE> (0, default)
+
+Not floating.
+
+=item C<CLAY_ATTACH_TO_PARENT> (1)
+
+The parent it is declared in.
+
+=item C<CLAY_ATTACH_TO_ELEMENT_WITH_ID> (2)
+
+The element whose id is in C<parentId>.
+
+=item C<CLAY_ATTACH_TO_ROOT> (3)
+
+The root of the layout (the whole layout area). With C<offset> this
+gives absolute positioning.
+
+=back
+
+Clay::UI: C<< floating => { attach_to => ... } >>.
+
+=head3 attachPoints
+
+C<attachPoints> is a C<Clay_FloatingAttachPoints>,
+C<< { element => $enum, parent => $enum } >>: a point on the floating
+element (C<element>) is placed on a point of the element it is attached
+to (C<parent>). Both default to C<CLAY_ATTACH_POINT_LEFT_TOP>, so by
+default the two top-left corners meet. The points are the outer box
+corners, edge centres and centre; padding is not taken into account.
+The values:
+
+=for highlighter language=text
+
+    CLAY_ATTACH_POINT_LEFT_TOP       0    CLAY_ATTACH_POINT_CENTER_BOTTOM  5
+    CLAY_ATTACH_POINT_LEFT_CENTER    1    CLAY_ATTACH_POINT_RIGHT_TOP      6
+    CLAY_ATTACH_POINT_LEFT_BOTTOM    2    CLAY_ATTACH_POINT_RIGHT_CENTER   7
+    CLAY_ATTACH_POINT_CENTER_TOP     3    CLAY_ATTACH_POINT_RIGHT_BOTTOM   8
+    CLAY_ATTACH_POINT_CENTER_CENTER  4
+
+    # a 10x10 tooltip centred above the top-right corner of its 100x100 parent at (50, 50):
+    # the tooltip ends up at (145, 40)
+    attachPoints => { element => CLAY_ATTACH_POINT_CENTER_BOTTOM,
+                      parent  => CLAY_ATTACH_POINT_RIGHT_TOP }
+
+Clay::UI: C<< floating => { attach_points => { element => ..., parent => ... } } >>.
+
+=head4 attachPoints.element
+
+C<element> is an enum (C<0 .. 8>, values above), default
+C<CLAY_ATTACH_POINT_LEFT_TOP>: the point on the floating element.
+
+=head4 attachPoints.parent
+
+C<parent> is an enum (C<0 .. 8>, values above), default
+C<CLAY_ATTACH_POINT_LEFT_TOP>: the point on the element it is attached
+to.
+
+=head3 floating.offset
+
+C<offset> is a C<Clay_Vector2>, default C<[0, 0]>: moved by this many
+pixels after the attach points are lined up.
+
+=for highlighter language=perl
+
+    offset => { x => 5, y => 6 }
+
+Clay::UI: C<< floating => { offset => ... } >>.
+
+=head3 expand
+
+C<expand> is a C<Clay_Dimensions>, default C<[0, 0]>: the floating
+element's box grows by C<width> pixels on the left and on the right and
+by C<height> pixels at the top and at the bottom. The bigger box is what
+the element's render commands and C<Clay_GetElementData> report, and
+its children are placed from the bigger box's top-left corner.
+
+    expand => [10, 10]    # a 40x40 element at (0, 0) is drawn as 60x60 at (-10, -10)
+
+Clay::UI: C<< floating => { expand => ... } >>.
+
+=head3 parentId
+
+C<parentId> is a U32, default 0: the id of the element to attach to when
+C<attachTo> is C<CLAY_ATTACH_TO_ELEMENT_WITH_ID>. Pass the numeric C<id>
+or the whole element id hash from C<Clay_GetElementId>; Clay::XS uses
+its C<id>. Other C<attachTo> values ignore it.
+
+    floating => { attachTo => CLAY_ATTACH_TO_ELEMENT_WITH_ID,
+                  parentId => Clay_GetElementId('menu-button') }
+
+The target may be declared anywhere in the same frame, before or after
+the floating element. When the frame declares no element with that id,
+Clay reports C<CLAY_ERROR_TYPE_FLOATING_CONTAINER_PARENT_NOT_FOUND> to
+the error handler at the end of the frame.
+
+Clay::UI: C<< floating => { parent_id => ... } >>.
+
+=head3 zIndex
+
+C<zIndex> is an int16, default 0: the drawing order of the floating
+element and all its children. Clay sorts floating elements by ascending
+C<zIndex> before it produces render commands, so drawing the commands
+in order puts higher values on top; the normal (non-floating) layout is
+at 0, so negative values draw below it. Render commands of the floating
+element and its children carry its C<zIndex> in their C<zIndex> key,
+except C<BORDER>, C<SCISSOR_END> and the C<betweenChildren>
+C<RECTANGLE> commands, which always carry 0.
+
+    zIndex => 10
+
+Clay::UI: C<< floating => { z_index => ... } >>.
+
+=head3 pointerCaptureMode
+
+C<pointerCaptureMode> is an enum: whether the floating element hides the
+elements below it from the pointer functions (C<Clay_PointerOver>,
+C<Clay_GetPointerOverIds>, hover callbacks).
+
+=over 4
+
+=item C<CLAY_POINTER_CAPTURE_MODE_CAPTURE> (0, default)
+
+The pointer stops here: elements below it are not reported.
+
+=item C<CLAY_POINTER_CAPTURE_MODE_PASSTHROUGH> (1)
+
+Elements below it are reported as well.
+
+=back
+
+Clay::UI: C<< floating => { pointer_capture_mode => ... } >>.
+
+=head3 clipTo
+
+C<clipTo> is an enum: whether the floating element is clipped by the
+C<clip> rectangle of the element it is attached to.
+
+=over 4
+
+=item C<CLAY_CLIP_TO_NONE> (0, default)
+
+Not clipped; it is drawn in full, even outside a scroll container.
+
+=item C<CLAY_CLIP_TO_ATTACHED_PARENT> (1)
+
+Clipped like the element it is attached to: its commands are wrapped in
+a C<SCISSOR_START> / C<SCISSOR_END> pair with that clip rectangle.
+
+=back
+
+Clay::UI: C<< floating => { clip_to => ... } >>.
+
+=head2 custom
+
+C<custom> is a C<Clay_CustomElementConfig>, C<< { customData => $integer } >>,
+for things Clay cannot describe (a chart, a 3D view, a video).
+
+=head3 customData
+
+C<customData> is an opaque integer, default 0. When it is not 0, the
+element produces a C<CUSTOM> render command whose C<renderData> holds
+C<customData>, the C<backgroundColor> and the C<cornerRadius>. The
+renderer draws it however it likes, inside the command's bounding box.
+
+    custom => { customData => $chart_number }
+
+Clay::UI: no attribute; a C<contribute_> method writes it as
+C<< custom => { custom_data => ... } >> (or C<customData>); see
+L</Keys Clay::UI has no attribute for>.
+
+=head2 clip
+
+C<clip> is a C<Clay_ClipElementConfig>: clips the children to the
+element's box on one or both axes and makes the element a scroll
+container.
+
+    clip => { vertical => 1, childOffset => Clay_GetScrollOffset() }
+
+A clipping element produces a C<SCISSOR_START> render command (with its
+bounding box and C<< renderData => { horizontal, vertical } >>) before
+its children and a C<SCISSOR_END> after them; the renderer should only
+draw inside the box in between. Clay remembers a scroll position for
+every clipping element across frames, moved by
+C<Clay_UpdateScrollContainers> (mouse wheel, dragging) and by
+C<set_scroll_position>; read it with C<Clay_GetScrollContainerData>
+(see L</Clay_ScrollContainerData>). Clay::UI: the HasScroll attributes
+listed below.
+
+=head3 horizontal
+
+C<horizontal> is a boolean, default false: clip, and allow scrolling, on
+the x axis. On a clipping axis the children may be larger than the
+element: they are not compressed to fit it. Clay::UI: the C<horizontal> attribute of HasScroll, default 0.
+
+=head3 vertical
+
+C<vertical> is a boolean, default false: clip, and allow scrolling, on
+the y axis. Clay::UI: the C<vertical> attribute of HasScroll, default 1.
+
+=head3 childOffset
+
+C<childOffset> is a C<Clay_Vector2>, default C<[0, 0]>: every child is
+moved by this many pixels. This is how scrolling is shown: pass
+C<Clay_GetScrollOffset()> (the scroll position Clay tracks for the open
+element) to let Clay scroll, or your own offset to scroll yourself. Use
+negative values: C<< { y => -30 } >> shows the content 30 pixels further
+down. With external scroll handling on
+(C<Clay_SetExternalScrollHandlingEnabled>), Clay does not apply it.
+Clay::UI: the C<child_offset> attribute of HasScroll; unset, Clay::UI
+passes C<Clay_GetScrollOffset()>.
+
+=head2 border
+
+C<border> is a C<Clay_BorderElementConfig>, C<< { color => ..., width => ... } >>:
+lines along the element's edges and, optionally, between its children.
+Borders do not affect the layout: they are drawn inside the element's
+box, over its padding and, without padding, over its children.
+
+    border => { color => [200, 200, 200, 255], width => border_outside(1) }
+
+Clay::UI: the C<border_color> and C<border_width> attributes.
+
+=head3 border.color
+
+C<color> is a C<Clay_Color>, default C<[0, 0, 0, 0]>: the colour of all
+borders of the element.
+
+=head3 border.width
+
+C<width> is a C<Clay_BorderWidth> (see L</Clay_BorderWidth>),
+C<< { left, right, top, bottom, betweenChildren } >>, each a U16 in
+pixels, default 0: values outside C<0 .. 65535> or non-integers croak.
+
+When any of the five is above 0 and C<color> has an alpha above 0, the
+element produces a C<BORDER> render command after its children, with
+its bounding box and C<< renderData => { color, cornerRadius, width } >>;
+the renderer draws the four sides inset into the box.
+
+C<betweenChildren> draws a line in the C<childGap> between neighbouring
+children: vertical lines for C<CLAY_LEFT_TO_RIGHT>, horizontal lines for
+C<CLAY_TOP_TO_BOTTOM>, both for C<CLAY_LEFT_TO_RIGHT_WRAP> (see
+L<Clay::XS/FLOW LAYOUT>), nothing for C<CLAY_BACK_TO_FRONT>. Each line is
+a separate C<RECTANGLE> render command in the border colour, produced
+only when C<color> has an alpha above 0, so the renderer needs no
+special code for them.
+
+    width => border_all(2)          # all four sides and between children
+    width => border_outside(2)      # the four sides only
+    width => { bottom => 3 }        # an underline
+
+Clay::UI: C<border_width>, a hash (C<between_children>) or a number for
+the four sides.
+
+=head2 transition
+
+C<transition> is a C<Clay_TransitionElementConfig>: animates changes of the
+element's position, size and colours between frames, and its appearing
+(enter) and disappearing (exit). The element needs the same id in every
+frame. The animation itself is computed by the per-context handlers
+installed with C<Clay_SetTransitionHandlers> (see L<Clay::XS/CALLBACKS>).
+Without handlers the key has no effect: the element changes at once, as
+in C with a NULL handler (see L<Clay::XS/FUNCTIONS: TRANSITIONS>).
+
+    transition => {
+        duration   => 0.25,
+        properties => CLAY_TRANSITION_PROPERTY_BACKGROUND_COLOR | CLAY_TRANSITION_PROPERTY_POSITION,
+        enter      => { hasSetInitial => 1 },
+        exit       => { hasSetFinal => 1 },
+    }
+
+Any C<transition> hash, even C<{}>, makes Clay track the element for
+transitions while the context has transition handlers (Clay::XS installs
+its C handler only then); without the key the element has no
+transitions. Clay::UI: no attribute, but a
+C<contribute_> method can add the key; install the handlers with
+C<Clay_SetTransitionHandlers> right after C<< Clay::UI->new >> (see
+L</Keys Clay::UI has no attribute for>).
+
+=head3 duration
+
+C<duration> is a float, default 0: the length of a transition in
+seconds. Clay only passes it to the handler (as C<duration>), next to
+the time elapsed so far (C<elapsedTime>, the sum of the C<$delta_time>
+values given to C<Clay_EndLayout>); the handler decides when the
+transition is complete.
+
+=head3 properties
+
+C<properties> is a bit set, an integer in C<0 .. 511>, default 0
+(nothing is animated): the properties to animate. Combine constants with
+C<|>. A property that changes but is not listed takes its new value at
+once.
+
+=for highlighter language=text
+
+    CLAY_TRANSITION_PROPERTY_NONE                0
+    CLAY_TRANSITION_PROPERTY_X                   1
+    CLAY_TRANSITION_PROPERTY_Y                   2
+    CLAY_TRANSITION_PROPERTY_POSITION            3    X | Y
+    CLAY_TRANSITION_PROPERTY_WIDTH               4
+    CLAY_TRANSITION_PROPERTY_HEIGHT              8
+    CLAY_TRANSITION_PROPERTY_DIMENSIONS         12    WIDTH | HEIGHT
+    CLAY_TRANSITION_PROPERTY_BOUNDING_BOX       15    POSITION | DIMENSIONS
+    CLAY_TRANSITION_PROPERTY_BACKGROUND_COLOR   16
+    CLAY_TRANSITION_PROPERTY_OVERLAY_COLOR      32
+    CLAY_TRANSITION_PROPERTY_CORNER_RADIUS      64
+    CLAY_TRANSITION_PROPERTY_BORDER_COLOR      128
+    CLAY_TRANSITION_PROPERTY_BORDER_WIDTH      256
+    CLAY_TRANSITION_PROPERTY_BORDER            384    BORDER_COLOR | BORDER_WIDTH
+
+The animated values are those of L</Clay_TransitionData>: bounding box,
+background colour, overlay colour, border colour and border width. The
+corner radius is not among them, so C<CLAY_TRANSITION_PROPERTY_CORNER_RADIUS>
+is accepted but animates nothing.
+
+=head3 interactionHandling
+
+C<interactionHandling> is an enum: whether the pointer functions see the
+element while it moves.
+
+=over 4
+
+=item C<CLAY_TRANSITION_DISABLE_INTERACTIONS_WHILE_TRANSITIONING_POSITION> (0, default)
+
+The element and its children are skipped by C<Clay_PointerOver>,
+C<Clay_GetPointerOverIds> and hover callbacks while it enters, exits, or
+animates its position.
+
+=item C<CLAY_TRANSITION_ALLOW_INTERACTIONS_WHILE_TRANSITIONING_POSITION> (1)
+
+The element is skipped only while it exits.
+
+=back
+
+=head3 enter
+
+C<enter> is a hash, C<< { trigger => $enum, hasSetInitial => $boolean } >>:
+the transition of an element that appears. It has no C type name, so
+C<check_struct> cannot check it alone (check the whole
+C<Clay_TransitionElementConfig>).
+
+=over 4
+
+=item hasSetInitial
+
+A boolean, default false. True gives the element an enter transition:
+in the frame it appears, Clay calls the C<$set_initial> handler of
+C<Clay_SetTransitionHandlers> with the element's state, and animates
+from the state the handler returns to the real one. False: the element
+appears at once.
+
+=item enter.trigger
+
+An enum: C<CLAY_TRANSITION_ENTER_SKIP_ON_FIRST_PARENT_FRAME> (0,
+default) skips the enter transition when the parent appears in the same
+frame (a list shown for the first time does not animate all its items);
+C<CLAY_TRANSITION_ENTER_TRIGGER_ON_FIRST_PARENT_FRAME> (1) runs it
+anyway.
+
+=back
+
+=head3 exit
+
+C<exit> is a hash,
+C<< { trigger => $enum, siblingOrdering => $enum, hasSetFinal => $boolean } >>:
+the transition of an element that is no longer declared. Like C<enter>,
+it has no C type name.
+
+=over 4
+
+=item hasSetFinal
+
+A boolean, default false. True gives the element an exit transition: in
+the first frame it is missing, Clay calls the C<$set_final> handler with
+its last state and keeps drawing the element (with its children, at a
+fixed size) while it animates to the state the handler returns. False:
+the element disappears at once.
+
+=item exit.trigger
+
+An enum: C<CLAY_TRANSITION_EXIT_SKIP_WHEN_PARENT_EXITS> (0, default)
+skips the exit transition when the parent disappears in the same frame;
+C<CLAY_TRANSITION_EXIT_TRIGGER_WHEN_PARENT_EXITS> (1) runs it anyway.
+
+=item siblingOrdering
+
+An enum: where an exiting element is drawn relative to its former
+siblings. C<CLAY_EXIT_TRANSITION_ORDERING_UNDERNEATH_SIBLINGS> (0,
+default) below them, C<CLAY_EXIT_TRANSITION_ORDERING_NATURAL_ORDER> (1)
+in its old place in the order, C<CLAY_EXIT_TRANSITION_ORDERING_ABOVE_SIBLINGS>
+(2) above them.
+
+=back
+
+=head2 sizingGroup
+
+C<sizingGroup> is a C<Clay_SizingGroup>, C<< { width => $id, height => $id } >>,
+added by this distribution's patch to Clay. Elements that share a
+non-zero group id on an axis get the same size on that axis: the largest
+content size in the group, before GROW space is shared out. Each member
+stays within its own C<max>. Only FIT and GROW axes take part; FIXED and
+PERCENT sizes do not depend on content. Groups work across the whole
+tree (form labels in different rows, columns of a grid) and may nest;
+nesting that forms a cycle on one axis is reported as
+C<CLAY_ERROR_TYPE_SIZING_GROUP_CYCLE>. See L<Clay::XS/SIZING GROUPS>.
+
+=for highlighter language=perl
+
+    # four elements in a column, all with sizingGroup => { width => 1 }:
+    # content 30 px -> 80; content 80 px -> 80; sizing_fit(0, 50) -> 50; sizing_fixed(10) -> 10
+    sizingGroup => { width => 1 }
+
+Clay::UI: the C<width_group> and C<height_group> attributes of
+HasSizingGroup.
+
+=head3 sizingGroup.width
+
+C<width> is a U32, default 0 (no group): the group id on the x axis.
+
+=head3 sizingGroup.height
+
+C<height> is a U32, default 0 (no group): the group id on the y axis.
+Width and height ids are separate: width group 1 and height group 1 are
+different groups.
+
+=head2 userData
+
+C<userData> is an opaque integer, default 0. Clay copies it into every
+render command of the element (C<< $cmd->{userData} >>), so the renderer
+can find your own data for it; commands without one carry 0. The
+C<SCISSOR_END> command of a clipping element always carries 0.
+
+    userData => refaddr($object)    # keep $object alive yourself
+
+Clay::UI: reserved; Clay::UI sets it to identify the widget (use
+C<< $ui->widget_for($cmd->{userData}) >>).
+
+=head1 TEXT ELEMENT CONFIG
+
+C<Clay_TextElementConfig> is the hash passed to C<Clay__OpenTextElement>
+with the text:
+
+    Clay__OpenTextElement('Hello, world', {
+        fontId    => 0,
+        fontSize  => 16,
+        textColor => [0, 0, 0, 255],
+        wrapMode  => CLAY_TEXT_WRAP_WORDS,
+    });
+
+A text element is a leaf. Clay measures the text with the function
+installed by C<Clay_SetMeasureTextFunction>, which receives this hash
+(with all eight keys) for every word it measures; the element is as big
+as the measured text, wrapped into lines when it does not fit. Every
+line becomes one C<TEXT> render command whose C<renderData> holds the
+line (C<stringContents>), where the line starts in the text
+(C<stringOffset>, in characters), C<textColor>, C<fontId>, C<fontSize>,
+C<letterSpacing> and C<lineHeight>. The whole hash may be undef or
+C<{}>: all zero.
+
+Clay::UI: the parameters of L<Clay::UI::Text>, in snake_case (C<font_id>,
+C<font_size>, C<text_color>, C<letter_spacing>, C<line_height>,
+C<wrap_mode>, C<text_alignment>); C<font_size> defaults to 16 and
+C<text_color> to C<[0, 0, 0, 255]> there.
+
+=head2 textColor
+
+C<textColor> is a C<Clay_Color>, default C<[0, 0, 0, 0]> (fully
+transparent): the colour of the text. Clay only passes it to the
+renderer.
+
+    textColor => [33, 33, 33, 255]
+
+=head2 fontId
+
+C<fontId> is a U16 (values outside C<0 .. 65535> or non-integers croak),
+default 0: a number naming a font. Clay does not interpret it; your
+measure function and your renderer map it to a font.
+
+    # Your own convention, for example: fontId 0 = regular, 1 = bold.
+    # The measure function and the renderer look the font up by this number.
+    Clay__OpenTextElement('Title', { fontId => 1, fontSize => 24 });
+
+=head2 fontSize
+
+C<fontSize> is a U16 (values outside C<0 .. 65535> or non-integers
+croak), default 0: the font size. Clay does not interpret it; your
+measure function and renderer do (usually as pixels).
+
+=head2 letterSpacing
+
+C<letterSpacing> is a U16 (values outside C<0 .. 65535> or non-integers
+croak), default 0: extra horizontal space in pixels between characters.
+Clay does not add it; the measure function must include it in the widths
+it returns, and the renderer must draw with it.
+
+=head2 lineHeight
+
+C<lineHeight> is a U16 (values outside C<0 .. 65535> or non-integers
+croak), default 0: the height in pixels of each line. With 0, a line is
+as tall as the measure function says. Above 0, every line is
+C<lineHeight> tall, so the element is C<lines * lineHeight> tall; the
+C<TEXT> render command of each line is C<lineHeight> tall and the lines
+stack from the element's top, so the boxes stay inside the element and
+the renderer centres the glyphs in them.
+The C<lineHeight> in C<renderData> is the configured value (0 when
+unset).
+
+    lineHeight => 24    # 16 px font, 24 px line pitch
+
+=head2 wrapMode
+
+C<wrapMode> is an enum: when the text breaks into several lines.
+
+=over 4
+
+=item C<CLAY_TEXT_WRAP_WORDS> (0, default)
+
+At spaces when the text is wider than its element, and at newlines. The
+element can be compressed down to its longest word.
+
+=item C<CLAY_TEXT_WRAP_NEWLINES> (1)
+
+Only at newlines. The element is never compressed below its widest
+line.
+
+=item C<CLAY_TEXT_WRAP_NONE> (2)
+
+Never wraps: the whole text is one line and one C<TEXT> command,
+newline characters included (the measure function sees them as ordinary
+characters of one string).
+
+=back
+
+=head2 textAlignment
+
+C<textAlignment> is an enum: how the lines of wrapped text are aligned
+inside the text element's box: C<CLAY_TEXT_ALIGN_LEFT> (0, default),
+C<CLAY_TEXT_ALIGN_CENTER> (1), C<CLAY_TEXT_ALIGN_RIGHT> (2). A single
+line is as wide as its element, so this does nothing to it; place the
+text element with the parent's C<childAlignment> instead.
+
+=head2 userData (text element)
+
+C<userData> is an opaque integer, default 0, copied into every C<TEXT>
+render command of the element, like the element declaration's
+L</userData>. Clay::UI: reserved.
+
+=head1 OTHER STRUCTS
+
+The small structs used inside the declarations and by function
+arguments. Each can be checked with C<check_struct> under its name.
+
+=head2 Clay_Color
+
+C<Clay_Color> is C<< { r => $float, g => $float, b => $float, a => $float } >>
+or C<[r, g, b, a]>; every channel defaults to 0. The channels run from 0
+to 255 (other values croak); Clay only passes them to the renderer,
+except that an alpha (C<a>) of 0 suppresses the
+C<backgroundColor> rectangle, the C<overlayColor> commands and the
+C<betweenChildren> lines.
+
+    [255, 128, 0, 255]
+    { r => 255, g => 128, b => 0, a => 255 }
+
+=over 4
+
+=item r
+
+Red, a float, default 0.
+
+=item g
+
+Green, a float, default 0.
+
+=item b
+
+Blue, a float, default 0.
+
+=item a
+
+Alpha (opacity), a float, default 0. 0 is fully transparent; by
+convention 255 is opaque.
+
+=back
+
+The channels are floats in C<0 .. 255>; other values croak
+C<expected a number in 0..255>.
+
+=head2 Clay_Vector2
+
+C<Clay_Vector2> is C<< { x => $float, y => $float } >> or C<[x, y]>, default
+C<[0, 0]>: a position or offset in pixels. Used by C<floating.offset>,
+C<clip.childOffset>, C<Clay_SetPointerState>,
+C<Clay_UpdateScrollContainers>, C<set_scroll_position> and the
+query-scroll callback's result; returned by C<Clay_GetScrollOffset>.
+
+=head2 Clay_Dimensions
+
+C<Clay_Dimensions> is C<< { width => $float, height => $float } >> or
+C<[width, height]>, default C<[0, 0]>. Used by C<floating.expand>,
+C<Clay_Initialize>, C<Clay_SetLayoutDimensions> and the measure
+callback's result; returned by C<Clay_GetLayoutDimensions>.
+
+=head2 Clay_BoundingBox
+
+C<Clay_BoundingBox> is
+C<< { x => $float, y => $float, width => $float, height => $float } >>
+(a hash only, no array form): a rectangle in pixels, relative to the
+top-left corner of the layout. Render commands, C<Clay_GetElementData>
+and L</Clay_TransitionData> use it.
+
+=head2 Clay_CornerRadius
+
+C<Clay_CornerRadius> is
+C<< { topLeft => $float, topRight => $float, bottomLeft => $float, bottomRight => $float } >>
+or one number for all four, each default 0. See L</cornerRadius>.
+C<corner_radius_all($r)> returns the hash.
+
+=over 4
+
+=item topLeft
+
+The radius of the top left corner, a float, default 0.
+
+=item topRight
+
+The radius of the top right corner, a float, default 0.
+
+=item bottomLeft
+
+The radius of the bottom left corner, a float, default 0.
+
+=item bottomRight
+
+The radius of the bottom right corner, a float, default 0.
+
+=back
+
+Radii are floats of at least 0 (a negative radius croaks
+C<< expected a number >= 0 >>). Clay::UI spells them C<top_left>, C<top_right>,
+C<bottom_left>, C<bottom_right>.
+
+=head2 Clay_Padding
+
+C<Clay_Padding> is C<< { left, right, top, bottom } >>, each a U16, default
+0: values outside C<0 .. 65535> or non-integers croak. See L</padding>.
+C<padding_all($px)> returns the hash.
+
+=over 4
+
+=item left
+
+The space in pixels between the element's left edge and its children.
+
+=item right
+
+The space in pixels between the element's right edge and its children.
+
+=item top
+
+The space in pixels between the element's top edge and its children.
+
+=item bottom
+
+The space in pixels between the element's bottom edge and its children.
+
+=back
+
+=head2 Clay_BorderWidth
+
+C<Clay_BorderWidth> is C<< { left, right, top, bottom, betweenChildren } >>,
+each a U16 in pixels, default 0: values outside C<0 .. 65535> or
+non-integers croak. See L</border.width>. C<border_all($px)> sets all
+five, C<border_outside($px)> the four sides with C<betweenChildren> 0.
+
+=over 4
+
+=item left, right, top, bottom
+
+The width of the border along that edge, drawn inside the element's
+box. These four keys have the same names as those of L</Clay_Padding>.
+
+=item betweenChildren
+
+The width of the lines drawn in the C<childGap> between neighbouring
+children (see L</border.width>). Clay::UI spells it
+C<between_children>.
+
+=back
+
+=head2 Clay_ChildAlignment
+
+C<Clay_ChildAlignment> is C<< { x => $enum, y => $enum } >>. See
+L</childAlignment>.
+
+=head2 Clay_SizingAxis
+
+C<Clay_SizingAxis> is C<< { type, min, max } >> or
+C<< { type => CLAY__SIZING_TYPE_PERCENT, percent } >>. See L</sizing>.
+C<sizing_fit>, C<sizing_grow>, C<sizing_fixed> and C<sizing_percent>
+return one.
+
+=head2 Clay_Sizing
+
+C<Clay_Sizing> is C<< { width => $axis, height => $axis } >>, two
+L</Clay_SizingAxis> hashes, each default FIT with no limits.
+
+=head2 Clay_SizingGroup
+
+C<Clay_SizingGroup> is C<< { width => $id, height => $id } >>, each a U32,
+default 0. See L</sizingGroup>.
+
+=head2 Clay_FloatingAttachPoints
+
+C<Clay_FloatingAttachPoints> is C<< { element => $enum, parent => $enum } >>,
+each C<0 .. 8>. See L</attachPoints>.
+
+=head2 Clay_TransitionData
+
+C<Clay_TransitionData> is the state a transition animates:
+
+    {
+        boundingBox     => { x, y, width, height },     # Clay_BoundingBox
+        backgroundColor => { r, g, b, a },              # Clay_Color
+        overlayColor    => { r, g, b, a },
+        borderColor     => { r, g, b, a },
+        borderWidth     => { left, right, top, bottom, betweenChildren },
+    }
+
+=over 4
+
+=item boundingBox
+
+A L</Clay_BoundingBox>: the element's position and size. Animated by
+the X, Y, WIDTH and HEIGHT properties.
+
+=item backgroundColor (Clay_TransitionData)
+
+A L</Clay_Color>, animated by C<CLAY_TRANSITION_PROPERTY_BACKGROUND_COLOR>.
+
+=item overlayColor (Clay_TransitionData)
+
+A L</Clay_Color>, animated by C<CLAY_TRANSITION_PROPERTY_OVERLAY_COLOR>.
+
+=item borderColor
+
+A L</Clay_Color>, animated by C<CLAY_TRANSITION_PROPERTY_BORDER_COLOR>.
+
+=item borderWidth
+
+A L</Clay_BorderWidth>, animated by C<CLAY_TRANSITION_PROPERTY_BORDER_WIDTH>.
+
+=back
+
+The transition handlers receive such hashes and C<$set_initial> /
+C<$set_final> return one (see L<Clay::XS/CALLBACKS>). A returned hash
+may be partial: keys it leaves out keep their previous value. A
+sub-hash that is present starts from zero, so return a whole colour,
+not just one channel.
+
+=head2 Clay_TransitionElementConfig
+
+C<Clay_TransitionElementConfig> is the L</transition> key of a declaration:
+C<< { duration, properties, interactionHandling, enter => { trigger,
+hasSetInitial }, exit => { trigger, siblingOrdering, hasSetFinal } } >>.
+C's function pointer fields (C<handler>, C<setInitialState>,
+C<setFinalState>) are not keys: the handler is installed while the
+context has Perl transition handlers, and the two booleans stand for the
+state functions.
+
+=head2 Clay_ElementDeclaration
+
+See L</ELEMENT DECLARATION>.
+
+=head2 Clay_LayoutConfig
+
+See L</layout>.
+
+=head2 Clay_TextElementConfig
+
+See L</TEXT ELEMENT CONFIG>.
+
+=head2 Clay_AspectRatioElementConfig, Clay_ImageElementConfig, Clay_CustomElementConfig
+
+See L</aspectRatio>, L</image> and L</custom>.
+
+=head2 Clay_FloatingElementConfig, Clay_ClipElementConfig, Clay_BorderElementConfig
+
+See L</floating>, L</clip> and L</border>.
+
+=head1 RETURNED HASHES
+
+Hashes Clay::XS functions return or pass to callbacks. They are fresh
+copies; changing them changes nothing in Clay.
+
+=head2 element id hash
+
+C<Clay_GetElementId>, C<Clay_GetElementIdWithIndex>, C<Clay__HashString>,
+C<Clay__HashStringWithOffset> and C<Clay_GetPointerOverIds> return
+element ids (C<Clay_ElementId>) as hashes:
+
+    { id => 2466489830, offset => 0, baseId => 2466489830, stringId => 'x' }
+
+=over 4
+
+=item id
+
+U32: the hash Clay identifies the element by. Render commands carry it
+in their C<id> key; C<Clay_GetOpenElementId> returns it alone.
+
+=item offset
+
+U32: the index given to C<Clay_GetElementIdWithIndex> or
+C<Clay__HashStringWithOffset>, 0 otherwise.
+
+=item baseId
+
+U32: the hash of the string and seed, before the offset was applied
+(equal to C<id> when C<offset> is 0).
+
+=item stringId
+
+The string the id was made from, as a character string. Present only for
+ids made from a non-empty string; ids of elements opened with
+C<Clay__OpenElement> have none.
+
+=back
+
+Functions taking an element id (C<Clay__OpenElementWithId>,
+C<Clay_GetElementData>, C<Clay_PointerOver>,
+C<Clay_GetScrollContainerData>, C<set_scroll_position>) want such a
+hash; they read C<id>, C<offset> and C<baseId> (U32 each).
+C<Clay__OpenElementWithId> also keeps a private copy of C<stringId>,
+which Clay reports back in C<Clay_GetPointerOverIds> and shows in its
+debug view; the other functions ignore C<stringId>.
+C<floating.parentId> takes the hash or the number.
+
+=head2 Clay_ElementData
+
+C<Clay_GetElementData($id)> returns:
+
+    { boundingBox => { x, y, width, height }, found => 1 }
+
+=over 4
+
+=item boundingBox (Clay_ElementData)
+
+A L</Clay_BoundingBox>: where the element was in the last completed
+frame (a floating element's box includes its C<expand>).
+
+=item found
+
+1 when an element with that id exists, 0 otherwise (then the box is
+all 0).
+
+=back
+
+=head2 Clay_ScrollContainerData
+
+C<Clay_GetScrollContainerData($id)> returns:
+
+    {
+        scrollPosition            => { x, y },          # current scroll offset
+        scrollContainerDimensions => { width, height }, # the element's box size
+        contentDimensions         => { width, height }, # its children plus padding
+        config                    => { horizontal, vertical, childOffset => { x, y } },
+        found                     => 1,
+    }
+
+=over 4
+
+=item scrollPosition
+
+A L</Clay_Vector2>: the current scroll offset. In C it is a pointer you
+write through; here it is a copy, and C<set_scroll_position> writes the
+position.
+
+=item scrollContainerDimensions
+
+A L</Clay_Dimensions>: the size of the container's box.
+
+=item contentDimensions
+
+A L</Clay_Dimensions>: the size of the container's children plus its
+padding.
+
+=item config
+
+The element's L</clip> config: C<horizontal>, C<vertical> and
+C<childOffset>. The key may be absent: it is there between frames when
+the last completed frame declared the container, and during a frame
+once the container has been declared in it; before that (and when
+C<found> is 0) it is left out, because Clay would read it from an
+element slot that may hold another element (see
+L<Clay::XS/Clay_GetScrollContainerData>).
+
+=item found (Clay_ScrollContainerData)
+
+1 when the id names an element declared with C<clip> in a completed
+frame; otherwise 0, and everything else is 0 too.
+
+=back
+
+=head2 Clay_PointerData
+
+C<Clay_GetPointerState()> returns, and hover callbacks receive:
+
+    { position => { x, y }, state => CLAY_POINTER_DATA_... }
+
+=over 4
+
+=item position
+
+A L</Clay_Vector2>: the last position given to C<Clay_SetPointerState>.
+
+=item state
+
+One of C<CLAY_POINTER_DATA_PRESSED_THIS_FRAME> (0),
+C<CLAY_POINTER_DATA_PRESSED> (1), C<CLAY_POINTER_DATA_RELEASED_THIS_FRAME>
+(2), C<CLAY_POINTER_DATA_RELEASED> (3).
+
+=back
+
+=head2 error hash
+
+The error handler given to C<Clay_Initialize> receives
+C<Clay_ErrorData> as:
+
+    { errorType => CLAY_ERROR_TYPE_..., errorText => 'human-readable text' }
+
+=over 4
+
+=item errorType
+
+One of the C<CLAY_ERROR_TYPE_...> constants (see L<Clay::XS/Error types>).
+
+=item errorText
+
+Clay's message, a human-readable string.
+
+=back
+
+=head2 render command
+
+C<Clay_EndLayout> returns an arrayref of render commands:
+
+    {
+        id          => $u32,                    # element id (derived ids for lines, borders)
+        commandType => CLAY_RENDER_COMMAND_TYPE_...,
+        zIndex      => $int16,                  # see zIndex
+        boundingBox => { x, y, width, height },
+        userData    => $integer,                # see userData; 0 when unset
+        renderData  => { ... },                 # depends on commandType
+    }
+
+C<renderData> by C<commandType>:
+
+=for highlighter language=text
+
+    RECTANGLE (1)              backgroundColor, cornerRadius
+    BORDER (2)                 color, cornerRadius, width (Clay_BorderWidth)
+    TEXT (3)                   stringContents, stringOffset, textColor, fontId,
+                               fontSize, letterSpacing, lineHeight
+    IMAGE (4)                  backgroundColor, cornerRadius, imageData
+    SCISSOR_START (5)          horizontal, vertical
+    SCISSOR_END (6)            horizontal, vertical
+    OVERLAY_COLOR_START (7)    color
+    OVERLAY_COLOR_END (8)      color
+    CUSTOM (9)                 backgroundColor, cornerRadius, customData
+    NONE (0)                   (empty)
+
+See L<Clay::XS/RENDER COMMANDS>.
+
+=head2 Clay_TransitionCallbackArguments
+
+The transition handler installed with C<Clay_SetTransitionHandlers>
+receives, and C<Clay_EaseOut> takes, a
+C<Clay_TransitionCallbackArguments> hash (C<check_struct> knows it under
+that name):
+
+=for highlighter language=perl
+
+    {
+        transitionState => CLAY_TRANSITION_STATE_...,   # IDLE 0, ENTERING 1,
+                                                        # TRANSITIONING 2, EXITING 3
+        initial         => \%transition_data,           # state when it started
+        target          => \%transition_data,           # state it moves to
+        current         => \%transition_data,           # update this one
+        elapsedTime     => $seconds,
+        duration        => $seconds,                    # the element's duration
+        properties      => $bits,                       # the properties being animated
+    }
+
+=over 4
+
+=item transitionState
+
+One of C<CLAY_TRANSITION_STATE_IDLE> (0), C<CLAY_TRANSITION_STATE_ENTERING>
+(1), C<CLAY_TRANSITION_STATE_TRANSITIONING> (2),
+C<CLAY_TRANSITION_STATE_EXITING> (3).
+
+=item initial
+
+A L</Clay_TransitionData>: the state when the transition started.
+
+=item target
+
+A L</Clay_TransitionData>: the state the transition moves to.
+
+=item current
+
+A L</Clay_TransitionData>: the state to draw now. The handler updates
+it.
+
+=item elapsedTime
+
+Seconds since the transition started (the sum of the C<$delta_time>
+values given to C<Clay_EndLayout>), a number >= 0. Clay interpolates
+with the ratio of C<elapsedTime> to C<duration>; a negative time would
+move it outside 0..1 and border widths outside their range.
+
+=item duration (Clay_TransitionCallbackArguments)
+
+The element's transition L</duration> in seconds.
+
+=item properties (Clay_TransitionCallbackArguments)
+
+The element's transition L</properties>: the bits of the properties
+being animated.
+
+=back
+
+C<Clay_EaseOut> returns C<< { complete => $bool, current => \%transition_data } >>:
+
+=over 4
+
+=item complete
+
+1 when C<elapsedTime> has reached C<duration> (or C<duration> is 0 or less), 0
+otherwise.
+
+=item current (Clay_EaseOut result)
+
+A L</Clay_TransitionData>: the argument's C<current> with every property
+selected in C<properties> eased from C<initial> towards C<target>.
+
+=back
+
+=head1 SEE ALSO
+
+L<Clay::XS> (functions, callbacks, render commands, C<check_struct>),
+L<Clay::UI> (the widget layer), L<Clay::Manual>, L<Clay::Cookbook>, L<Clay::UI::Text>,
+L<Clay::UI::Role::Core::Element>, F<src/marshal.c> (the struct schemas),
+F<src/clay/clay.h> (Clay's own field comments, generated by C<make>).
+
+=cut

@@ -20,7 +20,7 @@ sub run_with {
 	my $text = '';
 	my $out = Capture->handle(\$text);
 	my $t = Game::Mahjong::Terminal->new(seed => $o{seed} || 'terminal', level => $o{level} || 1, seat => 0, in => $in, out => $out, colour => $o{colour} || 0, glyphs => $o{glyphs} || 0, auto => $o{auto} || 0, ascii => $o{ascii} || 0, clear => 0);
-	my $g = $t->run;
+	my $g = $t->start;
 	# NOTHING IS DECODED HERE, because nothing was encoded: Capture keeps the
 	# characters the terminal printed. See t/lib/Capture.pm for the smoker
 	# report that made it so.

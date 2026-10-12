@@ -35,13 +35,11 @@
       "runtime" : {
          "requires" : {
             "CLI::Simple" : "v2.1.1",
-            "CLI::Simple::Constants" : "v2.1.1",
-            "CLI::Simple::Utils" : "v2.1.1",
             "IO::Scalar" : "2.113",
             "JSON" : "4.10",
+            "List::Util" : "1.33",
             "Pod::Find" : "0",
             "Progress::Any" : "0.220",
-            "Progress::Any::Output" : "0.220",
             "Progress::Any::Output::TermProgressBarColor" : "0",
             "Readonly" : "2.05",
             "perl" : "5.010"
@@ -54,11 +52,11 @@
    "provides" : {
       "Module::ScanDeps::FindRequires" : {
          "file" : "lib/Module/ScanDeps/FindRequires.pm",
-         "version" : "v1.9.1"
+         "version" : "v1.9.5"
       },
       "Module::ScanDeps::Static" : {
          "file" : "lib/Module/ScanDeps/Static.pm",
-         "version" : "v1.9.1"
+         "version" : "v1.9.5"
       }
    },
    "release_status" : "stable",
@@ -73,6 +71,6 @@
          "web" : "https://github.com/rlauer6/Module-ScanDeps-Static"
       }
    },
-   "version" : "v1.9.1",
+   "version" : "v1.9.5",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

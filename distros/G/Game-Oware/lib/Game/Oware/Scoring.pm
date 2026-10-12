@@ -5,7 +5,7 @@ use warnings;
 
 use Game::Oware::Board;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use constant TO_WIN  => 25;
 use constant DRAW_AT => 24;
@@ -90,7 +90,7 @@ Game::Oware::Scoring - what has been captured, and what the result was
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

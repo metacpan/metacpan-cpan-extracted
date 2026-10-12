@@ -156,4 +156,68 @@ is probe(max => 64 * 1024 * 1024, declare => 20 * 1024 * 1024), 'accepted',
 is probe(max => 64 * 1024 * 1024, declare => 70 * 1024 * 1024), 413,
    '...and the raised ceiling is itself enforced';
 
+# ---- body_timeout is progress, header_timeout is the first byte -----------
+
+# A server with a one-second header guard. Trickle a body one byte at a
+# time: under a long body_timeout it completes (the header guard alone would
+# have killed it, since the upload takes longer than a second); under a short
+# one a pause longer than the timeout ends it; and trickling the HEADERS at
+# the same pace is still cut by header_timeout.
+sub trickle {
+    my (%o) = @_;
+    my ($port) = free_ports(1);
+    return 'no-port' unless $port;
+    my $kid = fork;
+    die "fork: $!" unless defined $kid;
+    if ($kid == 0) {
+        quiet_child();
+        require Hyperman;
+        Hyperman->run(
+            app => sub {
+                my $env = shift;
+                my $b = '';
+                $env->{'psgi.input'}->read($b, $env->{CONTENT_LENGTH} || 0)
+                    if $env->{CONTENT_LENGTH};
+                [ 200, ['Content-Type','text/plain'], [ 'got ' . length $b ] ];
+            },
+            host => '127.0.0.1', port => $port, workers => 1,
+            header_timeout => 1, body_timeout => $o{body_timeout},
+        );
+        exit 0;
+    }
+    my $s;
+    for (1 .. 40) {
+        $s = IO::Socket::INET->new(PeerAddr => '127.0.0.1', PeerPort => $port, Proto => 'tcp') and last;
+        Time::HiRes::sleep(0.1);
+    }
+    return 'no-conn' unless $s;
+    $s->autoflush(1);
+    for my $p (@{ $o{pieces} }) {
+        $s->syswrite($p) or last;
+        Time::HiRes::sleep($o{gap});
+    }
+    my $r = eval {
+        local $SIG{ALRM} = sub { die "timeout\n" };
+        alarm 6;
+        local $/;
+        my $x = <$s>;
+        alarm 0;
+        $x;
+    };
+    alarm 0;
+    close $s;
+    kill 'TERM', $kid; waitpid $kid, 0;
+    return defined $r && $r =~ m{\AHTTP/1\.\d (\d\d\d)} ? "$1:" . ($r =~ /\r\n\r\n(.*)\z/s ? $1 : '')
+         : defined $r && length $r ? 'garbage' : 'closed';
+}
+my $hdr = "POST / HTTP/1.0\r\nHost: t\r\nContent-Length: 4\r\n\r\n";   # 1.0: the server closes after answering
+is trickle(body_timeout => 10, gap => 0.7, pieces => [ $hdr, 'a', 'b', 'c', 'd' ]), '200:got 4',
+   'a body trickled over 2.8s completes under header_timeout 1 when body_timeout is 10';
+is trickle(body_timeout => 1, gap => 2.5, pieces => [ $hdr, 'a', 'b' ]), 'closed',
+   'a body that pauses longer than body_timeout is closed';
+# the sweep runs every five seconds, so the header trickle must outlast one
+my @slow_hdr = map { "$_\r\n" } ("POST / HTTP/1.0", "Host: t", "X-A: 1", "X-B: 2", "X-C: 3", "X-D: 4", "X-E: 5", "X-F: 6", "X-G: 7", "X-H: 8", "Content-Length: 1", "");
+is trickle(body_timeout => 10, gap => 0.6, pieces => [ @slow_hdr, 'x' ]), 'closed',
+   'headers trickled over 7s past header_timeout 1 are cut, whatever body_timeout says';
+
 done_testing;

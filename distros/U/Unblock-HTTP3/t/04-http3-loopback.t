@@ -9,7 +9,9 @@ use Test2::V0;
 use Time::HiRes qw(time);
 
 use Unblock::HTTP3::Capsule;
+use Unblock::HTTP3::Client;
 use Unblock::HTTP3::Connection;
+use Unblock::HTTP3::Server;
 use Net::QUIC;
 use Net::QUIC::Driver;
 use Uniform::HTTP::Request;
@@ -187,12 +189,17 @@ ok(
 
 my $client_extension_settings_calls = 0;
 my $server_extension_settings_calls = 0;
+my $server_request_callback_count = 0;
+my $server_request_end_callback_count = 0;
+my $server_error_callback_count = 0;
+my $server_error_callback_code;
+my $server_callback_last_transaction;
 my $client_extension_stream;
 my $client_extension_stream_data = '';
 my $client_extension_stream_ended = 0;
 my $server_extension_stream;
 
-my $client_h3 = Unblock::HTTP3::Connection->client(
+my $client_h3 = Unblock::HTTP3::Client->new(
     quic              => $client_quic,
     send_buffer_limit => 4096,
     extension_settings => {
@@ -231,12 +238,29 @@ my $client_h3 = Unblock::HTTP3::Connection->client(
         },
     },
 );
-my $server_h3 = Unblock::HTTP3::Connection->server(
+my $server_h3 = Unblock::HTTP3::Server->new(
     quic                    => $server_quic,
     send_buffer_limit       => 4096,
     max_field_section_size  => 1024,
     max_buffered_body_bytes => 1024,
     enable_extended_connect => 1,
+    on_request => sub {
+        my ($transaction, $request) = @_;
+        ++$server_request_callback_count;
+        $server_callback_last_transaction = $transaction;
+        return;
+    },
+    on_request_end => sub {
+        my ($transaction, $request) = @_;
+        ++$server_request_end_callback_count;
+        return;
+    },
+    on_error => sub {
+        my ($transaction, $error, $error_code) = @_;
+        ++$server_error_callback_count;
+        $server_error_callback_code = $error_code;
+        return;
+    },
     extension_settings      => {
         4662 => 13,
     },
@@ -598,7 +622,7 @@ $outgoing_response->status(200);
 $outgoing_response->add_header(cookie => 'response-one=1');
 $outgoing_response->add_header('x-response' => 'preserved');
 $outgoing_response->add_header(cookie => 'response-two=2');
-$server_transaction->send_response;
+$server_transaction->respond($server_transaction->response);
 
 my $incoming_response;
 
@@ -709,7 +733,7 @@ my $body_response = $body_server_tx->response;
 
 $body_response->header('content-type', 'text/plain');
 $body_response->body($response_body);
-$body_server_tx->send_response;
+$body_server_tx->respond($body_server_tx->response);
 
 my $received_body_response;
 
@@ -752,16 +776,16 @@ my $stream_request = Uniform::HTTP::Request->new(
 my $stream_request_cancelled = 0;
 my $stream_request_tx = $client_h3->request(
     $stream_request,
-    stream_body => {
-        on_cancel => sub {
-            ++$stream_request_cancelled;
-        },
-    },
+    stream_body => 1,
 );
 
 isa_ok($stream_request_tx, ['Unblock::HTTP3::Transaction']);
 
-my $request_producer = $stream_request_tx->request_body;
+my $request_producer = $stream_request_tx->request_body(
+    on_cancel => sub {
+        ++$stream_request_cancelled;
+    },
+);
 isa_ok($request_producer, ['Unblock::HTTP3::Body::Stream']);
 
 ok(
@@ -790,7 +814,7 @@ ok(
     'server receives incremental request body as one complete message',
 );
 
-$stream_request_server_tx->send_response;
+$stream_request_server_tx->respond($stream_request_server_tx->response);
 
 ok(
     run_until(sub {
@@ -925,7 +949,7 @@ my $receive_stream_request = Uniform::HTTP::Request->new(
 
 my $receive_stream_client_tx = $client_h3->request(
     $receive_stream_request,
-    stream_body => {},
+    stream_body => 1,
 );
 
 my $receive_request_writer = $receive_stream_client_tx->request_body;
@@ -977,7 +1001,7 @@ is(
 is($request_reader->pending_bytes, 0,
     'server reader returns all queued receive credit');
 
-$receive_stream_server_tx->send_response;
+$receive_stream_server_tx->respond($receive_stream_server_tx->response);
 
 ok(
     run_until(sub {
@@ -1001,7 +1025,7 @@ my $stream_trailer_request = Uniform::HTTP::Request->new(
 
 my $stream_trailer_client_tx = $client_h3->request(
     $stream_trailer_request,
-    stream_body => {},
+    stream_body => 1,
 );
 
 my $stream_trailer_request_body =
@@ -1127,7 +1151,7 @@ is(
 my $trailer_response = $trailer_server_tx->response;
 $trailer_response->body('response with trailers');
 $trailer_response->add_trailer('x-response-checksum', 'def456');
-$trailer_server_tx->send_response;
+$trailer_server_tx->respond($trailer_server_tx->response);
 
 my $received_trailer_response;
 
@@ -1185,7 +1209,7 @@ ok(
 for my $tx (reverse @multi_server_tx) {
     my $path = $tx->request->target;
     $tx->response->body("response:$path");
-    $tx->send_response;
+    $tx->respond($tx->response);
 }
 
 ok(
@@ -1250,7 +1274,7 @@ is($uniform_server_tx->request->target, '/uniform-direct',
     'plain Uniform request semantics survive the HTTP/3 wire path');
 
 $uniform_server_tx->response->status(204);
-$uniform_server_tx->send_response;
+$uniform_server_tx->respond($uniform_server_tx->response);
 
 ok(
     run_until(sub {
@@ -1271,7 +1295,7 @@ my $uniform_stream_request = Uniform::HTTP::Request->new(
 
 my $uniform_stream_client_tx = $client_h3->request(
     $uniform_stream_request,
-    stream_body => {},
+    stream_body => 1,
 );
 my $uniform_stream_writer = $uniform_stream_client_tx->request_body;
 
@@ -1311,7 +1335,7 @@ ok($uniform_stream_client_tx->request->is_complete,
     'outgoing Uniform Request becomes complete when body production finishes');
 
 $uniform_stream_server_tx->response->status(204);
-$uniform_stream_server_tx->send_response;
+$uniform_stream_server_tx->respond($uniform_stream_server_tx->response);
 
 ok(
     run_until(sub {
@@ -1473,7 +1497,7 @@ is($unsupported_server_tx->protocol, 'unsupported-protocol',
     'application can inspect an unsupported protocol identifier');
 
 $unsupported_server_tx->response->status(501);
-$unsupported_server_tx->send_response;
+$unsupported_server_tx->respond($unsupported_server_tx->response);
 
 ok(
     run_until(sub {
@@ -1808,7 +1832,7 @@ ok(
 );
 
 $rejected_server_tx->response->status(403);
-$rejected_server_tx->send_response;
+$rejected_server_tx->respond($rejected_server_tx->response);
 
 ok(
     run_until(sub {
@@ -1990,7 +2014,7 @@ ok(
     'server accepts another request after malformed stream rejection',
 );
 
-$after_malformed_server_tx->send_response;
+$after_malformed_server_tx->respond($after_malformed_server_tx->response);
 
 ok(
     run_until(sub {
@@ -1998,6 +2022,116 @@ ok(
             && $after_malformed_server_tx->is_complete;
     }),
     'connection remains usable after H3_MESSAGE_ERROR stream reset',
+);
+
+my @callback_informational;
+my $callback_response_status;
+my $callback_response_body = '';
+my $callback_complete_count = 0;
+my $callback_error_count = 0;
+
+my $callback_client_tx = $client_h3->request(
+    method    => 'GET',
+    target    => '/callback-api',
+    scheme    => 'https',
+    authority => 'localhost',
+    on_informational => sub {
+        my ($transaction, $response) = @_;
+        push @callback_informational, $response->status;
+        return;
+    },
+    on_response => sub {
+        my ($transaction, $response) = @_;
+        $callback_response_status = $response->status;
+        return;
+    },
+    on_body => sub {
+        my ($transaction, $response, $bytes) = @_;
+        $callback_response_body .= $bytes;
+        return;
+    },
+    on_complete => sub {
+        my ($transaction) = @_;
+        ++$callback_complete_count;
+        return;
+    },
+    on_error => sub {
+        my ($transaction, $error, $error_code) = @_;
+        ++$callback_error_count;
+        return;
+    },
+);
+
+my $callback_server_tx;
+
+ok(
+    run_until(sub {
+        $callback_server_tx ||= $server_h3->next_transaction;
+        return $callback_server_tx
+            && $callback_server_tx->request->is_complete;
+    }),
+    'server receives callback API request',
+);
+
+is(
+    refaddr($server_callback_last_transaction),
+    refaddr($callback_server_tx),
+    'server on_request receives the public Transaction',
+);
+ok(
+    $server_request_end_callback_count > 0,
+    'server on_request_end runs without changing buffered receive mode',
+);
+
+$callback_server_tx->send_informational(status => 103);
+
+$callback_server_tx->respond(
+    status => 200,
+    headers => [
+        [ 'content-type', 'text/plain' ],
+    ],
+    stream_body => 1,
+);
+
+ok(
+    $callback_server_tx->write('callback-'),
+    'common Transaction write accepts callback response bytes',
+);
+$callback_server_tx->end('body');
+
+ok(
+    run_until(sub {
+        return $callback_client_tx->is_complete
+            && $callback_server_tx->is_complete
+            && $callback_complete_count == 1;
+    }),
+    'client callback API completes a real HTTP/3 exchange',
+);
+
+is(
+    \@callback_informational,
+    [ 103 ],
+    'client on_informational receives the 1xx response',
+);
+is(
+    $callback_response_status,
+    200,
+    'client on_response receives final response headers',
+);
+is(
+    $callback_response_body,
+    'callback-body',
+    'client on_body receives streamed response bytes',
+);
+is(
+    $callback_complete_count,
+    1,
+    'client on_complete runs once',
+);
+is(
+    $callback_error_count,
+    0,
+    'client on_error does not run on a successful exchange',
 );
 
 my $oversized_request = Uniform::HTTP::Request->new(
@@ -2028,6 +2162,15 @@ like(
     $server_h3->error,
     qr/buffered body exceeds configured limit/,
     'body limit records a useful HTTP/3 error',
+);
+ok(
+    $server_error_callback_count > 0,
+    'server on_error receives HTTP/3 transaction failure',
+);
+is(
+    $server_error_callback_code,
+    0x0107,
+    'server on_error receives the HTTP/3 error code',
 );
 
 close $client_socket;

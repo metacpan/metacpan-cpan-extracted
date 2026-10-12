@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="381" viewBox="0 0 780 381" role="img" aria-label="perl examples/cookbook/table-filter-perl.pl">
+<title>perl examples/cookbook/table-filter-perl.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="748" height="346" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="748" height="346" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="748" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="390" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/cookbook/table-filter-perl.pl</text>
+<rect x="16.5" y="16.5" width="747" height="345" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="48" y="114" width="621" height="36" fill="#242832"/>
+<rect x="48" y="150" width="621" height="18" fill="#343a48"/>
+<rect x="48" y="168" width="621" height="18" fill="#1c2029"/>
+<rect x="48" y="114" width="621" height="9" fill="#586070"/>
+<rect x="48" y="123" width="5" height="90" fill="#586070"/>
+<rect x="665" y="123" width="4" height="90" fill="#586070"/>
+<rect x="48" y="213" width="621" height="9" fill="#586070"/>
+</g>
+<g class="terminal">
+<text x="48" y="92" textLength="540" fill="#96a0b4">Keys 1 to 5 choose a filter, 0 shows all rows. Ctrl+C quits.</text>
+<text x="66" y="146" textLength="585" class="b" fill="#ebeef3">Invoice  Customer        Placed       Status      Total      Paid</text>
+<text x="66" y="164" textLength="585" fill="#dcdfe4">A-1003   Byron &amp; Sons    03 May 2026  open     2,300.00  1,000.00</text>
+<text x="66" y="182" textLength="585" fill="#dcdfe4">A-1004   Hollerith Ltd   11 May 2026  open        99.90      0.00</text>
+<text x="66" y="200" textLength="585" fill="#dcdfe4">A-1006   Boole Partners  27 May 2026  overdue  1,720.00    200.00</text>
+<text x="48" y="254" textLength="531" fill="#e5c07b">4: Starts with B or is a Ltd, and is not paid (3 of 7 rows)</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

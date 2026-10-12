@@ -6,7 +6,7 @@ use warnings;
 
 use Game::Mahjong::Tiles;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 my %HONOUR = (
 	E => 'we', S => 'ws', W => 'ww', N => 'wn',
@@ -177,7 +177,7 @@ Game::Mahjong::Notation - the hand strings the tests and the terminal speak
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

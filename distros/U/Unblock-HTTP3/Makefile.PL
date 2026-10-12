@@ -90,6 +90,7 @@ WriteMakefile(
             package => [
                 'Unblock::HTTP3::_Bytes',
                 'Unblock::HTTP3::_Native',
+                'Unblock::HTTP3::Connection',
             ],
         },
         provides => {
@@ -121,9 +122,17 @@ WriteMakefile(
                 file    => 'lib/Unblock/HTTP3/Extension/Stream.pm',
                 version => MM->parse_version('lib/Unblock/HTTP3/Extension/Stream.pm'),
             },
-            'Unblock::HTTP3::Connection' => {
-                file    => 'lib/Unblock/HTTP3/Connection.pm',
-                version => MM->parse_version('lib/Unblock/HTTP3/Connection.pm'),
+            'Unblock::HTTP3::Integration' => {
+                file    => 'lib/Unblock/HTTP3/Integration.pm',
+                version => MM->parse_version('lib/Unblock/HTTP3/Integration.pm'),
+            },
+            'Unblock::HTTP3::Client' => {
+                file    => 'lib/Unblock/HTTP3/Client.pm',
+                version => MM->parse_version('lib/Unblock/HTTP3/Client.pm'),
+            },
+            'Unblock::HTTP3::Server' => {
+                file    => 'lib/Unblock/HTTP3/Server.pm',
+                version => MM->parse_version('lib/Unblock/HTTP3/Server.pm'),
             },
             'Unblock::HTTP3::NativeABI' => {
                 file    => 'lib/Unblock/HTTP3/NativeABI.pm',

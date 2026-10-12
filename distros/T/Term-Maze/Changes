@@ -12,3 +12,7 @@ Revision history for Term-Maze
 0.04 	2025-08-14
 	- Add support for HJKL movement keys, Thanks James Wright for the suggestion.
 
+0.05    2026-10-11
+        - run takes --width, --height and --help as well as two integers, and returns the exit status
+        - The terminal mode is restored on every way out
+        - q and escape quit

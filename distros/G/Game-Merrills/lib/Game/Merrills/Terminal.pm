@@ -8,8 +8,9 @@ use Game::Merrills;
 use Game::Merrills::Bot;
 use Game::Merrills::Notation;
 use Game::Merrills::Points;
+use Getopt::Long ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use constant {
 	PITCH => 4,
@@ -1206,6 +1207,210 @@ sub show_help {
 	return 0;
 }
 
+sub _usage {
+	my @levels = Game::Merrills::Bot->levels;
+	my $levels = "$levels[0] to $levels[-1]";
+	my $limit = Game::Merrills::NO_MILL_PLIES;
+
+	return <<"USAGE";
+merrills - play Nine Men's Morris
+
+Usage: merrills [options]
+
+  -l, --level N       the bot's strength, $levels (default 3)
+  -s, --side SIDE     the side you play: white, black or random (default white)
+      --hotseat       two people at one keyboard, and no bot
+      --bot-vs-bot    watch two bots; give --level twice for white and black
+      --position STR  begin from a position, as the position command prints it
+      --load FILE     carry on a game that the save command wrote
+      --replay FILE   show such a game a move at a time
+      --seed N        makes a game repeatable: the same seed, the same game
+      --no-flying     a side down to three men still moves along the lines
+  -a, --ascii         letters and dashes, for a terminal without the glyphs
+      --colour        paint the board even off a terminal; --no-colour never
+      --no-pick       type the moves out instead of choosing them with the keys
+  -v, --version       print the version
+  -h, --help          this
+
+White moves first. Place your nine men in turn, then move them along the
+lines. Three in a row is a mill and takes a man: one in a mill is safe while
+any stands outside one. Down to three men, you fly. Two men, or no move, and
+you have lost. A position three times, or $limit moves without a mill, is a
+draw.
+
+On a terminal a move is chosen with the arrow keys, a step at a time: the
+man, where it goes, the man it takes. The board is drawn as the move would
+leave it, so a mill is seen before it is closed. Needs Term::ReadKey; without
+it, or off a terminal, moves are typed: d2 to place, d2-d3 to move, d2-d3xa1
+to take. Type help in the game for the commands.
+
+The board marks what the last move did with shapes, so they survive
+--no-colour and a file: (W) the man that moved, (.) where it came from, (x)
+where a man was taken.
+
+Levels $levels[-2] and $levels[-1] look a good deal further and take noticeably longer a move.
+A level's effort is counted in positions and never in seconds, so a busy
+machine plays the same game as an idle one.
+
+Exit status is 0 if you won or drew, 1 if you lost, 2 for a bad option.
+USAGE
+}
+
+sub _reason {
+	my ($why) = @_;
+	$why = 'could not start' unless defined $why && length $why;
+	$why =~ s/ at \S+ line \d+\.?\s*\z//;
+	$why =~ s/\s+\z//;
+	return $why;
+}
+
+sub _bad {
+	my ($why) = @_;
+	print STDERR "merrills: $why\n\n", _usage();
+	return 2;
+}
+
+sub run {
+	my ($class, @argv) = @_;
+	my $saved = Getopt::Long::Configure(qw(no_ignore_case));
+	my $status = $class->_run(\@argv);
+	Getopt::Long::Configure($saved);
+	return $status;
+}
+
+sub _run {
+	my ($class, $argv) = @_;
+	my %opt = (
+		level => [],
+		side => 'white',
+		flying => 1,
+		ascii => 0,
+	);
+
+	Getopt::Long::GetOptionsFromArray($argv, \%opt,
+		'level|l=s@',
+		'side|s=s',
+		'hotseat',
+		'bot-vs-bot',
+		'position=s',
+		'load=s',
+		'replay=s',
+		'seed=s',
+		'flying!',
+		'ascii|a',
+		'colour|color!',
+		'pick!',
+		'version|v',
+		'help|h',
+	) or do { print STDERR _usage(); return 2 };
+
+	if ($opt{help}) { print _usage(); return 0 }
+
+	if ($opt{version}) {
+		print "merrills $Game::Merrills::VERSION\n";
+		return 0;
+	}
+
+	return _bad("there is nothing to do with '$argv->[0]': options begin with --") if @{$argv};
+
+	my @levels = Game::Merrills::Bot->levels;
+	my %is_level = map { $_ => 1 } @levels;
+	my @level = @{ $opt{level} };
+	for my $level (@level) {
+		return _bad("--level takes a number from $levels[0] to $levels[-1], not '$level'")
+			unless $is_level{$level};
+	}
+	return _bad('--level can be given twice at most, once a side') if @level > 2;
+	return _bad('--level twice is for --bot-vs-bot, where each side has a bot')
+		if @level == 2 && !$opt{'bot-vs-bot'};
+	return _bad('--hotseat is two people and --bot-vs-bot is none: choose one')
+		if $opt{hotseat} && $opt{'bot-vs-bot'};
+	return _bad('--hotseat has no bot for --level to set') if $opt{hotseat} && @level;
+	return _bad("--side is white, black or random, not '$opt{side}'")
+		unless $opt{side} =~ m/^(?:white|black|random)$/;
+	return _bad("--seed takes a whole number, not '$opt{seed}'")
+		if defined $opt{seed} && $opt{seed} !~ m/^[0-9]+$/;
+
+	my @sources = grep { defined $opt{$_} } qw/position load replay/;
+	return _bad('--' . join(' and --', @sources) . ' each say where the game begins: give one')
+		if @sources > 1;
+
+	my $seed = defined $opt{seed} ? $opt{seed} : (time ^ $$) % 1_000_000;
+	my $side = $opt{side} eq 'random' ? ($seed % 2 ? 'black' : 'white') : $opt{side};
+	@level = (3) unless @level;
+	@level = (@level, @level) if @level == 1;
+
+	my ($game, $record);
+	if (defined $opt{position}) {
+		$game = eval { Game::Merrills->new(position => $opt{position}, flying => $opt{flying}) }
+			or return _bad('--position: ' . _reason($@));
+	}
+	elsif (defined(my $file = defined $opt{load} ? $opt{load} : $opt{replay})) {
+		open my $handle, '<', $file or return _bad("cannot read $file: $!");
+		$record = do { local $/; <$handle> };
+		close $handle;
+		$game = eval { Game::Merrills->from_text($record, flying => $opt{flying}) }
+			or return _bad("$file is not a game that plays: " . _reason($@));
+	}
+	else {
+		$game = Game::Merrills->new(flying => $opt{flying});
+	}
+
+	my ($human, $bot, $who);
+	if (defined $opt{replay}) {
+		$human = 'both';
+	}
+	elsif ($opt{hotseat}) {
+		$human = 'both';
+		$who = 'White and Black: two people at one keyboard.';
+	}
+	elsif ($opt{'bot-vs-bot'}) {
+		$human = 'none';
+		$bot = {
+			white => Game::Merrills::Bot->new(level => $level[0], seed => $seed),
+			black => Game::Merrills::Bot->new(level => $level[1], seed => $seed + 1),
+		};
+		$who = "White: the bot at level $level[0]. Black: the bot at level $level[1].";
+	}
+	else {
+		$human = $side;
+		$bot = Game::Merrills::Bot->new(level => $level[0], seed => $seed);
+		$who = sprintf '%s: you. %s: the bot at level %d.',
+			ucfirst $side, $side eq 'white' ? 'Black' : 'White', $level[0];
+	}
+	$who .= ' No flying.' if defined $who && !$opt{flying};
+
+	my $terminal = $class->new(
+		game => $game,
+		human => $human,
+		ascii => $opt{ascii} ? 1 : 0,
+		(defined $bot ? (bot => $bot) : ()),
+		(exists $opt{colour} ? (colour => $opt{colour} ? 1 : 0) : ()),
+		(exists $opt{pick} ? (picking => $opt{pick} ? 1 : 0) : ()),
+	);
+
+	local @SIG{qw(INT TERM HUP)};
+	for my $sig (qw(INT TERM HUP)) {
+		$SIG{$sig} = sub { $terminal->leave_raw; $SIG{$sig} = 'DEFAULT'; kill $sig, $$ };
+	}
+
+	my $result;
+	if (defined $opt{replay}) {
+		$result = eval { $terminal->replay($record) };
+	}
+	else {
+		$terminal->say($who);
+		$result = eval { $terminal->start };
+	}
+	my $died = $@;
+	$terminal->leave_raw;
+	die $died if $died;
+
+	return 0 unless $result;
+	return 0 if $result->is_draw || $human eq 'both' || $human eq 'none' || defined $opt{replay};
+	return $result->winner eq $human ? 0 : 1;
+}
+
 1;
 
 __END__
@@ -1216,7 +1421,7 @@ Game::Merrills::Terminal - the game at a prompt, on a drawn board
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
@@ -1487,6 +1692,22 @@ Sets the output handle to carry what the current C<ascii> setting needs.
 Called whenever that setting changes. Returns the terminal.
 
 	$terminal->layer;
+
+=head2 run
+
+	exit Game::Merrills::Terminal->run(@ARGV);
+
+The whole command line program as a class method: parses the options
+F<bin/merrills> documents, builds the game and the terminal, plays or replays,
+and returns the exit status rather than calling C<exit>: C<0> if you won,
+drew or quit, C<1> if you lost, C<2> for a bad option, a leftover word or a
+refused value, with the reason and the usage on C<STDERR>. C<--help> and
+C<--version> print to C<STDOUT> and return C<0>. Options are read from the
+arguments passed in, never from C<@ARGV>, and the Getopt configuration the
+parse needs is restored before it returns. Signal handlers are local to the
+call and the terminal is left in cooked mode on every way out, so a launcher
+such as L<Game::Terminal> can call it in its own process and carry on
+afterwards. Colour is off under C<NO_COLOR> as well as off a terminal.
 
 =head2 start
 

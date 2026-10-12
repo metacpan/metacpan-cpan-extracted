@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="708" height="309" viewBox="0 0 708 309" role="img" aria-label="perl examples/cookbook/scrolling-log.pl">
+<title>perl examples/cookbook/scrolling-log.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="676" height="274" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="676" height="274" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="676" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="354" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/cookbook/scrolling-log.pl</text>
+<rect x="16.5" y="16.5" width="675" height="273" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="39" y="60" width="630" height="216" fill="#1e2332"/>
+<rect x="48" y="68" width="612" height="1" fill="#78a0dc"/>
+<rect x="43" y="78" width="1" height="180" fill="#78a0dc"/>
+<rect x="655" y="78" width="2" height="144" fill="#61afef"/>
+<rect x="664" y="78" width="1" height="180" fill="#78a0dc"/>
+<rect x="655" y="222" width="1" height="36" fill="#464c5a"/>
+<rect x="48" y="266" width="612" height="1" fill="#78a0dc"/>
+</g>
+<polyline points="43.5 78 43.5 73 43.538 72.413 43.653 71.835 43.843 71.278 44.103 70.75 44.43 70.261 44.818 69.818 45.261 69.43 45.75 69.103 46.278 68.843 46.835 68.653 47.413 68.538 48 68.5 48 68.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="664.5 78 664.5 73 664.462 72.413 664.347 71.835 664.157 71.278 663.897 70.75 663.57 70.261 663.182 69.818 662.739 69.43 662.25 69.103 661.722 68.843 661.165 68.653 660.587 68.538 660 68.5 660 68.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="43.5 258 43.5 262 43.538 262.587 43.653 263.165 43.843 263.722 44.103 264.25 44.43 264.739 44.818 265.182 45.261 265.57 45.75 265.897 46.278 266.157 46.835 266.347 47.413 266.462 48 266.5 48 266.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="664.5 258 664.5 262 664.462 262.587 664.347 263.165 664.157 263.722 663.897 264.25 663.57 264.739 663.182 265.182 662.739 265.57 662.25 265.897 661.722 266.157 661.165 266.347 660.587 266.462 660 266.5 660 266.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
+<g class="terminal">
+<text x="57" y="92" textLength="207" fill="#c8d2e6">09:41:00 event number 1</text>
+<text x="57" y="110" textLength="207" fill="#c8d2e6">09:41:01 event number 2</text>
+<text x="57" y="128" textLength="207" fill="#c8d2e6">09:41:01 event number 3</text>
+<text x="57" y="146" textLength="207" fill="#c8d2e6">09:41:02 event number 4</text>
+<text x="57" y="164" textLength="207" fill="#c8d2e6">09:41:02 event number 5</text>
+<text x="57" y="182" textLength="207" fill="#c8d2e6">09:41:03 event number 6</text>
+<text x="57" y="200" textLength="207" fill="#c8d2e6">09:41:03 event number 7</text>
+<text x="57" y="218" textLength="207" fill="#c8d2e6">09:41:04 event number 8</text>
+<text x="57" y="236" textLength="207" fill="#c8d2e6">09:41:04 event number 9</text>
+<text x="57" y="254" textLength="216" fill="#c8d2e6">09:41:05 event number 10</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

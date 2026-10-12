@@ -1,0 +1,90 @@
+// The screen of examples/kdl-layout.pl: a title bar, a sidebar, a main
+// panel and a status line. The program loads this file with
+// Term::Fabulous::Layout->new( file => ... ) and finds the widgets it
+// changes by their ids.
+
+use Term::Fabulous::Widget::Box as Box
+use Term::Fabulous::Widget::Text as Text
+use Term::Fabulous::Widget::Button as Button
+
+Box "root" {
+	layout direction=down
+	sizing width=grow height=grow
+
+	// The title bar: the title on the left, a summary pushed to the right
+	// by a growing box between them.
+	Box "title-bar" {
+		sizing width=grow
+		padding left=1 right=1
+		background_color "rgb(40, 46, 64)"
+		Text { text "Server overview"; text_color "#ffffff"; }
+		Box { sizing width=grow; }
+		Text "summary" { text "3 servers"; text_color "#e5c07b"; }
+	}
+
+	Box "body" {
+		layout gap=1
+		sizing width=grow height=grow
+		padding left=1 right=1 top=1 bottom=1
+
+		// A sidebar of fixed width with one button per server. A button
+		// shows the focus with the color of its thick left border.
+		Box "sidebar" {
+			layout direction=down gap=1
+			sizing width="fixed(18)" height=grow
+			padding left=1 right=1
+			border style=Round color="#61afef"
+			bordered #true
+			Text { text "Servers"; text_color "#61afef"; }
+			Button "web" {
+				sizing width=grow
+				padding left=1
+				border style=Thick color="#2c3346"
+				bordered left=#true
+				focus_border_color "#e5c07b"
+				background_color "#2c3346"
+				Text { text "web"; text_color "#dcdcdc"; }
+			}
+			Button "db" {
+				sizing width=grow
+				padding left=1
+				border style=Thick color="#2c3346"
+				bordered left=#true
+				focus_border_color "#e5c07b"
+				background_color "#2c3346"
+				Text { text "db"; text_color "#dcdcdc"; }
+			}
+			Button "mail" {
+				sizing width=grow
+				padding left=1
+				border style=Thick color="#2c3346"
+				bordered left=#true
+				focus_border_color "#e5c07b"
+				background_color "#2c3346"
+				Text { text "mail"; text_color "#dcdcdc"; }
+			}
+		}
+
+		// The main panel takes the rest of the width.
+		Box "details" {
+			layout direction=down gap=1
+			sizing width=grow height=grow
+			padding left=1 right=1
+			border style=Round color="hsl(95, 38%, 62%)"
+			bordered #true
+			background_color "#1c212d"
+			Text "details-title" { text "Pick a server on the left."; text_color "#98c379"; }
+			Text "details-text" { text ""; text_color "#dcdcdc"; }
+		}
+	}
+
+	// The status line, centered.
+	Box {
+		sizing width=grow
+		child_alignment x=center
+		Text "status" {
+			text "Click a server, or Tab to it and press Enter. Ctrl+C quits."
+			text_color "#96a0b4"
+		}
+	}
+}

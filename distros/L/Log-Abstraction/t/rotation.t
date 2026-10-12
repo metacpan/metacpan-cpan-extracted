@@ -163,6 +163,8 @@ subtest 'a failed rotation still writes the line' => sub {
 };
 
 subtest 'logrotate: a renamed file is replaced without SIGHUP' => sub {
+	plan skip_all => "an open file can't be renamed on $^O" if($^O eq 'MSWin32');
+
 	my $path = new_path();
 	my $log = logger($path);
 	$log->info('before');

@@ -54,7 +54,16 @@
  * Only differences are ever used. */
 static uint64_t sa_now_us(void) {
 #ifdef _WIN32
-    return (uint64_t)GetTickCount64() * 1000u;
+    /* QueryPerformanceCounter and not GetTickCount64: the latter is declared
+     * only for _WIN32_WINNT >= 0x0600, which perl's own headers do not set, so
+     * it compiled as an implicit int and failed at link. This one is declared
+     * everywhere, is one counter for every process, and cannot be stepped. The
+     * division is split so the product does not overflow after days of uptime. */
+    LARGE_INTEGER c, f;
+    if (!QueryPerformanceFrequency(&f) || f.QuadPart <= 0) return 0;
+    if (!QueryPerformanceCounter(&c)) return 0;
+    return (uint64_t)(c.QuadPart / f.QuadPart) * 1000000u
+         + (uint64_t)(c.QuadPart % f.QuadPart) * 1000000u / (uint64_t)f.QuadPart;
 #else
     struct timeval tv;
 #  ifdef SA_HAVE_MONOTONIC_CLOCK

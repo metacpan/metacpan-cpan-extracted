@@ -1,19 +1,20 @@
+#!/usr/bin/env perl
+
 use strict;
 use warnings;
 
-use lib qw{ . lib };
+use lib qw( . lib );
 
 use Test::More;
 use Data::Dumper;
 
-plan tests => 3;
-
 use_ok qw( Module::ScanDeps::Static );
 
 our $CODE = <<'END_OF_CODE';
+# use these
 use Buz::Baz 1.0;
 use Foo::Bar;
-
+# require those
 require Carp;
 END_OF_CODE
 
@@ -50,6 +51,10 @@ subtest 'use' => sub {
 
     is( $require->{'Buz::Baz'}, q{1.0}, 'version of Buz::Baz is 1.0' )
       or diag( Dumper \@dependencies );
+
+    my ($found) = grep { $_ =~ /(?:these|those)/xsm } @dependencies;
+
+    ok( !$found, 'skips dependency signals in commments' );
   };
 
   Module::ScanDeps::Static->main();
@@ -84,6 +89,8 @@ subtest 'require' => sub {
 
   Module::ScanDeps::Static->main();
 };
+
+done_testing;
 
 1;
 

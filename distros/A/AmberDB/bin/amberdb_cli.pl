@@ -24,6 +24,12 @@ BEGIN {
     my $abs_lib = eval { abs_path($lib_dir) } // $lib_dir;
     unshift @INC, $abs_lib if -d $abs_lib;
     unshift @INC, $lib_dir if -d $lib_dir && $lib_dir ne $abs_lib;
+
+    # Auto-detect local project lib directory if running from project root (e.g. ./lib)
+    for my $cand ( './lib', '../lib' ) {
+        my $abs_cand = eval { abs_path($cand) };
+        unshift @INC, $abs_cand if defined $abs_cand && -d $abs_cand;
+    }
 }
 
 use AmberDB;
@@ -189,10 +195,8 @@ if ( !defined $target_db ) {
     }
 }
 
-# 4. Argümandan veya oturumdan gelmiyorsa: doğrudan yerel ./dbstore kullanılır (fallback yok)
-if ( !defined $target_db || !length $target_db ) {
-    $target_db = "dbstore";
-}
+# 4. Argümandan veya oturumdan gelmiyorsa: doğrudan yerel ./dbstore kullanılır
+$target_db //= "dbstore";
 $target_db = resolve_abs_path($target_db);
 
 # Datadir ataması (DİKKAT: Henüz diskte dizin oluşturulmaz! Sadece insert veya setup anında oluşturulur)
@@ -2287,8 +2291,12 @@ if ( $action eq 'import' || $action eq 'csv2tie' ) {
 if ( $action eq 'dump' ) {
     my $table = delete $method_args{table} // shift @pos_args;
     my $file  = delete $method_args{file};
-    my $ok    = $tools->dump( $table, ( $file ? ( file => $file ) : () ), %method_args );
-    output_result( { status => ( $ok ? 'ok' : 'error' ), action => 'dump', table => $table, log => $tools->{say} }, $opt_format );
+    my $ok    = $tools->dump(
+        ( defined $table && length $table ? ( table => $table ) : () ),
+        ( defined $file  && length $file  ? ( file  => $file )  : () ),
+        %method_args
+    );
+    output_result( { status => ( $ok ? 'ok' : 'error' ), action => 'dump', ( defined $table ? ( table => $table ) : () ), ( defined $file ? ( file => $file ) : () ), log => $tools->{say} }, $opt_format );
     exit 0;
 }
 
@@ -2300,7 +2308,11 @@ if ( $action eq 'restore' ) {
     my $file = delete $method_args{file} // shift @pos_args;
     die "[AMBERDB_ERROR] 'file' parameter required for restore\n" unless defined $file;
 
-    my $ok = $tools->restore( $file, %method_args );
+    my $ok = $tools->restore(
+        file => $file,
+        ( $opt_force ? ( force => 1 ) : () ),
+        %method_args
+    );
     output_result( { status => ( $ok ? 'ok' : 'error' ), action => 'restore', file => $file, log => $tools->{say} }, $opt_format );
     exit 0;
 }

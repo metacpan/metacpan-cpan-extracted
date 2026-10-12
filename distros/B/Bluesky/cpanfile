@@ -1,4 +1,4 @@
-requires 'At';
+requires 'At', 'v1.8.0';
 requires 'HTTP::Tiny';
 requires 'Mozilla::CA';
 requires 'Path::Tiny';

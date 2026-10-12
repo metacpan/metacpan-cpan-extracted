@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="708" height="255" viewBox="0 0 708 255" role="img" aria-label="perl examples/cookbook/choose-options.pl">
+<title>perl examples/cookbook/choose-options.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="676" height="220" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="676" height="220" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="676" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="354" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/cookbook/choose-options.pl</text>
+<rect x="16.5" y="16.5" width="675" height="219" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="48" y="78" width="162" height="18" fill="#242830"/>
+<rect x="48" y="150" width="243" height="18" fill="#343a48"/>
+<rect x="48" y="158" width="126" height="2" fill="#61afef"/>
+<rect x="183" y="158" width="45" height="1" fill="#5a606e"/>
+</g>
+<g class="terminal">
+<text x="48" y="92" textLength="54" fill="#dcdfe4">France</text>
+<text x="205.5" y="92" text-anchor="middle" fill="#61afef">▾</text>
+<text x="48" y="128" textLength="108" fill="#dcdfe4">( ) Standard</text>
+<text x="174" y="128" textLength="9" fill="#61afef">(</text>
+<text x="187.5" y="128" text-anchor="middle" fill="#61afef">•</text>
+<text x="192" y="128" textLength="9" fill="#61afef">)</text>
+<text x="210" y="128" textLength="180" fill="#dcdfe4">Express  ( ) Pick up</text>
+<text x="178.5" y="164" text-anchor="middle" fill="#dcdfe4">●</text>
+<text x="237" y="164" textLength="54" fill="#dcdfe4">15.0 %</text>
+<text x="48" y="200" textLength="63" fill="#96c8ff">tip: 15</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

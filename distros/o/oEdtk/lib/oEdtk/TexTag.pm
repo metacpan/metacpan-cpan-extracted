@@ -1,6 +1,6 @@
 package oEdtk::TexTag;
 
-our $VERSION = '0.08';
+our $VERSION = '2.1109';
 my $_FLAG_DIGITS = 1;
 
 
@@ -24,7 +24,7 @@ sub new {
 		value 	=> $val
 	};
 	bless $self, $class;
-#	warn "INFO : objet TexTag $self créé...\n";
+#	warn "INFO : TexTag object $self created...\n";
 	return $self;
 }
 
@@ -46,7 +46,7 @@ sub emit {
 			foreach (@{$self->{'value'}}) {
 #				my $val = escape($_);
 				my $val = oEdtk::TexDoc::escape($_); # NOT CLEAN ! 
-#				warn "INFO : Appel à oEdtk::Doc::escape dans TexTag $val\n";
+#				warn "INFO : call to oEdtk::Doc::escape in TexTag $val\n";
 				$macro .= "\\edListAdd{$self->{'name'}}{$val}";
 			}
 			return $macro;
@@ -67,7 +67,7 @@ sub emit {
 			$value =~ s/\s+/ /g;
 #			$value = escape($value);
 			$value = oEdtk::TexDoc::escape($value);
-#			warn "INFO : Appel à oEdtk::Doc::escape dans TexTag $value\n";
+#			warn "INFO : call to oEdtk::Doc::escape in TexTag $value\n";
 		}
 
 		return "\\long\\gdef\\$name\{$value\}";
@@ -80,11 +80,11 @@ sub emit {
 use oEdtk::Config (config_read);
 use oEdtk::Dict;
 my $_CFG		= config_read();
-# ON OUVRE LE DICTIONNAIRE EN STATIQUE POUR ÉVITER LES ACCÈS MULTIPLES AU FICHIER CORRESPONDANT
+# OPEN THE DICTIONARY STATICALLY TO AVOID MULTIPLE ACCESSES TO THE CORRESPONDING FILE
 my $_DICO_CHAR	= oEdtk::Dict->new($_CFG->{'EDTK_DICO_XLAT'}, , { section => 'LATEX' });
 
 # http://woufeil.developpez.com/tutoriels/perl/poo/
-sub escape_0 { # NOT CLEAN passer par l'héritage ! TexTag->TexDoc
+sub escape_0 { # NOT CLEAN use inheritance! TexTag->TexDoc
 	my $str = shift;
 	# ESCAPE SPECIAL CARACTERS FOR TEXTAGS
 
@@ -106,10 +106,10 @@ sub escape_0 { # NOT CLEAN passer par l'héritage ! TexTag->TexDoc
 	}
 	$new =~s/([%&\$_#])/\\$1/g;
 #	warn "INFO : \$_DICO_CHAR = $_DICO_CHAR\n";
-# xxx la ligne qui suit provoque une erreur après la fin de programme
+# xxx the following line causes an error after program end
 #	$new = $_DICO_CHAR->substitue($new);
 
-	# \\"{} => PROVOQUE DES ERREURS TEX DANS LE PROCESSUS D'INDEXATION (POUR INJECTION EN SGBD)
+	# \\"{} => CAUSES TEX ERRORS DURING THE INDEXING PROCESS (FOR DB INSERTION)
 	$new =~ s/\\\"\{\}/\\textquotestraightdblbase{}/g;
 	$new =~ s/\\\"/\\textquotestraightdblbase{}/g;
 	# 01...@A...yz{}|~ 1°
@@ -120,7 +120,7 @@ sub escape_0 { # NOT CLEAN passer par l'héritage ! TexTag->TexDoc
 #END {
 #	undef $_DICO_CHAR;
 #	undef $_CFG;
-#	warn "INFO : Objet TexTag supprimé !\n";
+#	warn "INFO : TexTag object deleted!\n";
 #}
 
 1;

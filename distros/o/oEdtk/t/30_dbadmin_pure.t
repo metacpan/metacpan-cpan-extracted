@@ -99,6 +99,15 @@ is(oEdtk::DBAdmin::_sql_fixup({ Driver => { Name => 'Oracle' } }, 'create table 
 is(oEdtk::DBAdmin::_sql_fixup({ Driver => { Name => 'mysql' } }, 'select 1 from t', 1),
 	'SELECT 1 FROM T',
 	'_sql_fixup upper-cases MySQL statements when mysqlCasse is set');
+# MariaDB reports Driver.Name 'MariaDB' and is deliberately left untouched: some
+# MySQL-clients rely on case-sensitive processing, so no forced case is applied.
+is(oEdtk::DBAdmin::_sql_fixup({ Driver => { Name => 'MariaDB' } }, 'select 1 from t', 1),
+	'select 1 from t',
+	'_sql_fixup leaves MariaDB statements untouched (no forced case)');
+# INSERT/REPLACE are excluded from the forced case even for MySQL.
+is(oEdtk::DBAdmin::_sql_fixup({ Driver => { Name => 'mysql' } }, 'insert into t values (1)', 1),
+	'insert into t values (1)',
+	'_sql_fixup never upper-cases INSERT/REPLACE for MySQL');
 
 # --- oEdtk::Util::_uc_hash_keys : in-place key upper-casing ------------------
 my %h = (aa => 1, BB => 2);

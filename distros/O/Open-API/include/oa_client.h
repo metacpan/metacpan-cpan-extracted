@@ -126,6 +126,36 @@ static void oa_cli_val(pTHX_ SV *out, SV *v, int reserved) {
     oa_pct_encode_res(aTHX_ out, p, l, reserved);
 }
 
+/* a list delimiter as it goes into a URL: a space and a tab percent-encoded,
+ * a comma and a pipe literal (the 3.x pipeDelimited row has it literal) */
+static const char *oa_cli_delim_url(char d) {
+    return d == ' ' ? "%20" : d == '\t' ? "%09" : d == '|' ? "|" : ",";
+}
+
+/* One element of a list. When the parameter declares nested levels (a Swagger
+ * 2.0 Items Object with its own collectionFormat) and the element is itself an
+ * arrayref, its members are joined with that level's delimiter, recursively;
+ * `url` says whether values and delimiters are percent-encoded (path, query)
+ * or literal (header, cookie). */
+static void oa_cli_elem(pTHX_ oa_param *pp, SV *elem, SV *out, int lvl, int url, int res) {
+    AV *av = (lvl < pp->ndepth) ? oa_av_of(elem) : NULL;
+    if (av) {
+        SSize_t i, n = av_len(av) + 1;
+        char d = pp->idelim[lvl];
+        for (i = 0; i < n; i++) {
+            SV **e = av_fetch(av, i, 0);
+            if (i) {
+                if (url) sv_catpv(out, oa_cli_delim_url(d));
+                else     sv_catpvn(out, &d, 1);
+            }
+            if (e && *e) oa_cli_elem(aTHX_ pp, *e, out, lvl + 1, url, res);
+        }
+        return;
+    }
+    if (url) oa_cli_val(aTHX_ out, elem, res);
+    else if (SvOK(elem)) sv_catsv(out, elem);
+}
+
 /* Serialize `val` for a PATH segment per pp->style. `out` already ends at the
  * '/' this segment follows. */
 static void oa_cli_ser_path(pTHX_ oa_param *pp, SV *val, SV *out) {
@@ -164,16 +194,18 @@ static void oa_cli_ser_path(pTHX_ oa_param *pp, SV *val, SV *out) {
             SV **e = av_fetch(av, i, 0);
             if (i) {
                 /* label and simple keep a comma unless exploded; matrix
-                 * exploded repeats `;name=` per element */
-                if (pp->explode) sv_catpv(out, esep);
-                else             sv_catpvs(out, ",");
+                 * exploded repeats `;name=` per element; a delimiter the
+                 * style cannot spell (pp->delim) replaces the comma */
+                if (pp->explode)    sv_catpv(out, esep);
+                else if (pp->delim) sv_catpv(out, oa_cli_delim_url(pp->delim));
+                else                sv_catpvs(out, ",");
             }
             if (pp->style == OA_ST_MATRIX && pp->explode) {
                 if (i) { /* the `;` was written above */ }
                 oa_pct_encode_into(aTHX_ out, np, nl);
                 sv_catpvs(out, "=");
             }
-            if (e && *e) oa_cli_val(aTHX_ out, *e, 0);
+            if (e && *e) oa_cli_elem(aTHX_ pp, *e, out, 0, 1, 0);
         }
         return;
     }
@@ -213,7 +245,8 @@ static void oa_cli_ser_query(pTHX_ oa_param *pp, SV *val, SV *url, int *first) {
     HV *hv = (!av && SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVHV)
            ? (HV *)SvRV(val) : NULL;
     int res = pp->allow_reserved;
-    const char *dsep = pp->style == OA_ST_SPACE ? "%20"
+    const char *dsep = pp->delim                ? oa_cli_delim_url(pp->delim)
+                     : pp->style == OA_ST_SPACE ? "%20"
                      : pp->style == OA_ST_PIPE  ? "|" : ",";
 
     if (!av && !hv) {                                   /* a scalar */
@@ -235,7 +268,7 @@ static void oa_cli_ser_query(pTHX_ oa_param *pp, SV *val, SV *url, int *first) {
                 sv_catpvn(url, *first ? "?" : "&", 1); *first = 0;
                 oa_pct_encode_into(aTHX_ url, np, nl);
                 sv_catpvs(url, "=");
-                oa_cli_val(aTHX_ url, *e, res);
+                oa_cli_elem(aTHX_ pp, *e, url, 0, 1, res);
             }
             return;
         }
@@ -245,7 +278,7 @@ static void oa_cli_ser_query(pTHX_ oa_param *pp, SV *val, SV *url, int *first) {
         for (i = 0; i < n; i++) {
             SV **e = av_fetch(av, i, 0);
             if (i) sv_catpv(url, dsep);
-            if (e && *e) oa_cli_val(aTHX_ url, *e, res);
+            if (e && *e) oa_cli_elem(aTHX_ pp, *e, url, 0, 1, res);
         }
         return;
     }
@@ -304,10 +337,11 @@ static void oa_cli_ser_flat(pTHX_ oa_param *pp, SV *val, SV *out) {
     if (!av && !hv) { sv_catsv(out, val); return; }
     if (av) {
         SSize_t i, n = av_len(av) + 1;
+        char d = pp->delim ? pp->delim : ',';
         for (i = 0; i < n; i++) {
             SV **e = av_fetch(av, i, 0);
-            if (i) sv_catpvs(out, ",");
-            if (e && *e && SvOK(*e)) sv_catsv(out, *e);
+            if (i) sv_catpvn(out, &d, 1);
+            if (e && *e) oa_cli_elem(aTHX_ pp, *e, out, 0, 0, 0);
         }
         return;
     }
@@ -678,7 +712,30 @@ static oa_body *oa_cli_pick_body(oa_op *o) {
  * Members are sorted for the same reason the URL builder sorts them: hash
  * order is randomised and a body that changes between runs is not one a test
  * or a signature can rely on. */
-static SV *oa_cli_form_encode(pTHX_ oa_op *o, SV *val) {
+/* The delimiter an Encoding Object entry gives an array member, as a URL
+ * spelling, or NULL when the member is repeated (`form` exploded, the
+ * default). The entry's style/explode is the server's reading too
+ * (oa_form_decode), so the two halves cannot drift apart on it. */
+static const char *oa_cli_form_delim(pTHX_ SV *encoding, const char *kp, STRLEN kl) {
+    HV *enc = oa_hv_of(encoding), *eh;
+    SV **es, *st, *ex;
+    STRLEN sl = 0; const char *sp = NULL;
+    int exploded;
+    if (!enc) return NULL;
+    es = hv_fetch(enc, kp, (I32)kl, 0);
+    eh = (es && *es) ? oa_hv_of(*es) : NULL;
+    if (!eh) return NULL;
+    if (oa_cf_delim(aTHX_ oa_get(aTHX_ eh, "x-oa-collectionFormat")) == '\t') return "%09";
+    st = oa_get(aTHX_ eh, "style");
+    ex = oa_get(aTHX_ eh, "explode");
+    if (st) sp = SvPV_const(st, sl);
+    if (sp && sl == 14 && memEQ(sp, "spaceDelimited", 14)) return "%20";
+    if (sp && sl == 13 && memEQ(sp, "pipeDelimited", 13))  return "|";
+    exploded = ex ? (oa_sv_truthy(aTHX_ ex) ? 1 : 0) : 1;
+    return exploded ? NULL : ",";
+}
+
+static SV *oa_cli_form_encode(pTHX_ oa_op *o, SV *val, SV *encoding) {
     SV *out = sv_2mortal(newSVpvs(""));
     HV *hv;
     AV *keys;
@@ -702,7 +759,20 @@ static SV *oa_cli_form_encode(pTHX_ oa_op *o, SV *val) {
         av = oa_av_of(*v);
         if (av) {
             SSize_t j, m = av_len(av) + 1;
-            for (j = 0; j < m; j++) {
+            const char *dsep = oa_cli_form_delim(aTHX_ encoding, kp, kl);
+            if (dsep) {                     /* one value, delimited */
+                if (!first) sv_catpvs(out, "&");
+                first = 0;
+                oa_pct_encode_into(aTHX_ out, kp, kl);
+                sv_catpvs(out, "=");
+                for (j = 0; j < m; j++) {
+                    SV **e = av_fetch(av, j, 0);
+                    if (j) sv_catpv(out, dsep);
+                    if (e && *e && SvOK(*e)) oa_cli_val(aTHX_ out, *e, 0);
+                }
+                continue;
+            }
+            for (j = 0; j < m; j++) {       /* repeated keys */
                 SV **e = av_fetch(av, j, 0);
                 if (!e || !*e || !SvOK(*e)) continue;
                 if (!first) sv_catpvs(out, "&");
@@ -786,7 +856,7 @@ static SV *oa_cli_build_body(pTHX_ oa_op *o, HV *params, SV **ctype) {
         oa_cli_bad(aTHX_ o, "body", NULL, bsv, b->handle);
 
     if (b->kind == OA_MT_FORM) {
-        out = oa_cli_form_encode(aTHX_ o, bsv);
+        out = oa_cli_form_encode(aTHX_ o, bsv, b->encoding);
         *ctype = sv_2mortal(newSVpvs("application/x-www-form-urlencoded"));
         return out;
     }

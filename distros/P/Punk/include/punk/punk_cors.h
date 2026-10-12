@@ -126,6 +126,31 @@ static SV *pco_allow_origin(pTHX_ HV *cfg, SV *origin) {
     }
 }
 
+/* Does the answer depend on the request's origin? Everything but a flat '*'
+ * does, and then every response on a CORS path says `Vary: Origin` - the
+ * refused and the originless ones too, or a shared cache keeps one of those
+ * and serves it to an origin that was allowed. */
+static int pco_varies(pTHX_ HV *cfg) {
+    SV *spec = pco_get(aTHX_ cfg, "origins");
+    STRLEN sl;
+    const char *s;
+    if (!spec) return 0;
+    if (SvROK(spec) && SvTYPE(SvRV(spec)) == SVt_PVAV) {
+        AV *av = (AV *)SvRV(spec);
+        SSize_t i, n = av_len(av) + 1;
+        for (i = 0; i < n; i++) {
+            SV **e = av_fetch(av, i, 0);
+            if (!(e && *e && SvOK(*e))) continue;
+            s = SvPV_const(*e, sl);
+            return !(sl == 1 && *s == '*');
+        }
+        return 1;
+    }
+    if (SvROK(spec)) return 1;
+    s = SvPV_const(spec, sl);
+    return !(sl == 1 && *s == '*');
+}
+
 static int pco_credentials(pTHX_ HV *cfg) {
     SV *v = pco_get(aTHX_ cfg, "credentials");
     return (v && SvTRUE(v)) ? 1 : 0;
@@ -346,6 +371,13 @@ static SV *pco_preflight(pTHX_ HV *state, HV *env) {
 /* Push the response headers onto an existing header AV. */
 static void pco_add(pTHX_ AV *headers, HV *cfg, SV *allow) {
     SV *expose;
+    if (!(allow && SvOK(allow))) {
+        /* no origin, or one that was refused: nothing is granted, and the
+         * response still has to be kept apart from one that was */
+        av_push(headers, newSVpvs("Vary"));
+        av_push(headers, newSVpvs("Origin"));
+        return;
+    }
     pco_common(aTHX_ headers, cfg, allow);
     expose = pco_get(aTHX_ cfg, "expose");
     if (expose) {
@@ -442,10 +474,13 @@ static void pco_decorate(pTHX_ HV *state, HV *env, SV **resp) {
     if (!(cfg_sv && SvROK(cfg_sv) && SvTYPE(SvRV(cfg_sv)) == SVt_PVHV)) return;
     cfg = (HV *)SvRV(cfg_sv);
     origin = pco_env(aTHX_ env, "HTTP_ORIGIN");
-    if (!origin) return;                 /* not a cross-origin request */
     if (!pco_path_ok(aTHX_ cfg, env)) return;
-    allow = pco_allow_origin(aTHX_ cfg, origin);
-    if (!allow) return;                  /* refused: send nothing, not a lie */
+    allow = origin ? pco_allow_origin(aTHX_ cfg, origin) : NULL;
+    if (!allow) {
+        /* not cross-origin, or refused: grant nothing, not a lie */
+        if (!pco_varies(aTHX_ cfg)) return;
+        allow = newSV(0);
+    }
     sv_2mortal(allow);
 
     if (!(*resp && SvROK(*resp))) return;

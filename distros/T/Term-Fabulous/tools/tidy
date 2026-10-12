@@ -1,0 +1,119 @@
+#!/usr/bin/env perl
+
+# Runs perltidy with the .perltidyrc of this distribution on the given
+# files and rewrites the ones that change. With --check, writes nothing
+# and exits with status 1 if any file is not tidy.
+#
+#     perl tools/tidy lib/Term/Fabulous/Widget/Button.pm t/widget-button.t
+#     perl tools/tidy --check $(git ls-files '*.pm' '*.pl' '*.t')
+#
+# perltidy alone joins the opening brace of a class or role whose
+# attributes span several lines onto the last attribute line. This
+# script puts that brace back on a line of its own:
+#
+#     class Term::Fabulous::Widget::Accordion
+#         :isa(Term::Fabulous::Widget::Box)
+#         :strict(params)
+#     {
+#
+# perltidy also reads "ADJUST :params (" as a label before a call: it
+# pads the colon, ends the block with a semicolon and indents the rest
+# of the class one level deeper. This script shows perltidy such a
+# block as a method with a signature and puts the ADJUST back:
+#
+#     ADJUST :params ( :$text = '' ) {
+#
+# See tools/README.md.
+#
+# Copyright (C) 2026 davenonymous.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the same terms as Perl itself.
+
+use v5.32;
+use warnings;
+use feature 'signatures';
+no warnings 'experimental::signatures';
+
+use FindBin;
+use Getopt::Long qw(GetOptions);
+use Perl::Tidy ();
+
+use constant PERLTIDYRC => "$FindBin::Bin/../.perltidyrc";
+
+# An ADJUST block with named parameters, and the method perltidy sees in
+# its place, named so that no code of this distribution uses it. This
+# script tidies itself, so the method declaration must not appear in it
+# as a whole: the postfilter would rewrite it.
+use constant ADJUST_PARAMS_STAND_IN => 'ADJUST__PARAMS__';
+my $ADJUST_PARAMS           = qr/\bADJUST[ \t]+:params[ \t]*\(/;
+my $ADJUST_PARAMS_AS_METHOD = qr/\bmethod[ \t]+\Q${\ ADJUST_PARAMS_STAND_IN}\E[ \t]*\(/;
+
+# A class or role header followed by attribute lines, the last of which
+# perltidy ended with the opening brace.
+my $JOINED_CLASS_BRACE = qr/
+	^ ( [ \t]* ) ( (?:class|role) \b [^\n{]* \n (?: [ \t]+ : [^\n]* \n )* [ \t]+ : [^\n]*? ) [ ] \{ $
+/mx;
+
+sub unjoin_class_braces ($code) {
+	return $code =~ s/$JOINED_CLASS_BRACE/$1$2\n$1\{/gr;
+}
+
+sub hide_adjust_params ($code) {
+	return $code =~ s/$ADJUST_PARAMS/method ${\ ADJUST_PARAMS_STAND_IN} (/gr;
+}
+
+sub restore_adjust_params ($code) {
+	return $code =~ s/$ADJUST_PARAMS_AS_METHOD/ADJUST :params (/gr;
+}
+
+sub restore_source_syntax ($code) {
+	return unjoin_class_braces( restore_adjust_params($code) );
+}
+
+sub read_raw ($file) {
+	open my $handle, '<:raw', $file or die "tidy: cannot read $file: $!\n";
+	my $content = do { local $/; <$handle> };
+	close $handle;
+	return $content;
+}
+
+sub write_raw ( $file, $content ) {
+	open my $handle, '>:raw', $file or die "tidy: cannot write $file: $!\n";
+	print {$handle} $content or die "tidy: cannot write $file: $!\n";
+	close $handle or die "tidy: cannot write $file: $!\n";
+	return;
+}
+
+sub tidied ($file) {
+	my $source = read_raw($file);
+	my ( $tidied, $errors );
+	my $failed = Perl::Tidy::perltidy(
+		source      => \$source,
+		destination => \$tidied,
+		stderr      => \$errors,
+		errorfile   => \$errors,
+		perltidyrc  => PERLTIDYRC,
+		argv        => [],
+		prefilter   => \&hide_adjust_params,
+		postfilter  => \&restore_source_syntax,
+	);
+	die "tidy: perltidy failed on $file:\n$errors" if $failed;
+	return ( $source, $tidied );
+}
+
+GetOptions( 'check' => \my $check ) or die "usage: tools/tidy [--check] FILE...\n";
+die "usage: tools/tidy [--check] FILE...\n" unless @ARGV;
+die "tidy: cannot find " . PERLTIDYRC . "\n" unless -f PERLTIDYRC;
+
+my @untidy;
+foreach my $file (@ARGV) {
+	my ( $source, $tidied ) = tidied($file);
+	next if $tidied eq $source;
+	push @untidy, $file;
+	write_raw( $file, $tidied ) unless $check;
+}
+
+exit 0 unless $check && @untidy;
+say STDERR "not tidy: $_" foreach @untidy;
+exit 1;

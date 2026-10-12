@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="636" height="291" viewBox="0 0 636 291" role="img" aria-label="perl examples/cookbook/chart-report.pl">
+<title>perl examples/cookbook/chart-report.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="604" height="256" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="604" height="256" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="604" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="318" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/cookbook/chart-report.pl</text>
+<rect x="16.5" y="16.5" width="603" height="255" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="93" y="96" width="315" height="18" fill="#3987e5"/>
+<rect x="93" y="114" width="387" height="18" fill="#3987e5"/>
+<rect x="93" y="132" width="99" height="18" fill="#3987e5"/>
+<rect x="93" y="150" width="198" height="18" fill="#3987e5"/>
+<rect x="264" y="240" width="9" height="18" fill="#3987e5"/>
+<rect x="88" y="78" width="1" height="18" fill="#5f5f5e"/>
+<rect x="178" y="78" width="1" height="18" fill="#353535"/>
+<rect x="268" y="78" width="1" height="18" fill="#353535"/>
+<rect x="358" y="78" width="1" height="18" fill="#353535"/>
+<rect x="448" y="78" width="1" height="36" fill="#353535"/>
+<rect x="538" y="78" width="1" height="126" fill="#353535"/>
+<rect x="89" y="96" width="4" height="72" fill="#3987e5"/>
+<rect x="480" y="114" width="5" height="18" fill="#3987e5"/>
+<rect x="268" y="132" width="1" height="18" fill="#353535"/>
+<rect x="358" y="132" width="1" height="72" fill="#353535"/>
+<rect x="448" y="132" width="1" height="72" fill="#353535"/>
+<rect x="291" y="150" width="5" height="18" fill="#3987e5"/>
+<rect x="88" y="168" width="1" height="36" fill="#5f5f5e"/>
+<rect x="178" y="168" width="1" height="36" fill="#353535"/>
+<rect x="268" y="168" width="1" height="36" fill="#353535"/>
+<rect x="273" y="242" width="9" height="16" fill="#3987e5"/>
+<rect x="309" y="245" width="9" height="13" fill="#3987e5"/>
+<rect x="255" y="247" width="9" height="11" fill="#3987e5"/>
+<rect x="282" y="247" width="9" height="11" fill="#3987e5"/>
+<rect x="318" y="247" width="9" height="11" fill="#3987e5"/>
+<rect x="300" y="249" width="9" height="9" fill="#3987e5"/>
+<rect x="363" y="249" width="9" height="9" fill="#3987e5"/>
+<rect x="246" y="251" width="9" height="7" fill="#3987e5"/>
+<rect x="291" y="251" width="9" height="7" fill="#3987e5"/>
+<rect x="327" y="251" width="18" height="7" fill="#3987e5"/>
+<rect x="354" y="251" width="9" height="7" fill="#3987e5"/>
+<rect x="372" y="251" width="9" height="7" fill="#3987e5"/>
+<rect x="219" y="254" width="27" height="4" fill="#3987e5"/>
+<rect x="345" y="254" width="9" height="4" fill="#3987e5"/>
+</g>
+<g class="terminal">
+<text x="30" y="74" textLength="126" class="b" fill="#f4f4f4">Disk usage (%)</text>
+<text x="66" y="110" textLength="9" fill="#989898">/</text>
+<text x="417" y="110" textLength="18" fill="#d1d1d1">71</text>
+<text x="30" y="128" textLength="45" fill="#989898">/home</text>
+<text x="498" y="128" textLength="18" fill="#d1d1d1">88</text>
+<text x="39" y="146" textLength="36" fill="#989898">/srv</text>
+<text x="201" y="146" textLength="18" fill="#d1d1d1">23</text>
+<text x="39" y="164" textLength="36" fill="#989898">/var</text>
+<text x="309" y="164" textLength="18" fill="#d1d1d1">46</text>
+<text x="84" y="218" textLength="468" fill="#989898">0        20        40        60        80        100</text>
+<text x="30" y="254" textLength="180" fill="#e6e6e6">Load, last 18 hours:</text>
+<text x="390" y="254" textLength="63" fill="#e6e6e6">now 0.8</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

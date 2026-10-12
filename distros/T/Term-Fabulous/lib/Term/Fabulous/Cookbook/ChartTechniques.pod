@@ -1,0 +1,738 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Term::Fabulous::Cookbook::ChartTechniques - Recipes: time axes, live data, transforms, KDL and reports with charts
+
+=head1 DESCRIPTION
+
+This page is part of L<Term::Fabulous::Cookbook>. Previous page: L<Term::Fabulous::Cookbook::Charts>. Next page: L<Term::Fabulous::Cookbook::ChartStyles>.
+
+This page shows techniques for the data of charts and for the places a
+chart is used, whatever its type: time axes, live data that scrolls,
+logarithmic axes, transforms that smooth or index data, charts in KDL
+layouts and charts in printed reports. Each recipe is a complete
+program with a picture and notes. The previous page,
+L<Term::Fabulous::Cookbook::Charts>, introduces each chart type with a
+recipe of its own; start there if you have not drawn a chart yet. The
+next page, L<Term::Fabulous::Cookbook::ChartStyles>, changes how charts
+look and react: curves, markers, colors, line styles and hover.
+
+Most recipes use L<Term::Fabulous::Widget::LineChart>,
+L<Term::Fabulous::Widget::AreaChart> and
+L<Term::Fabulous::Widget::BarChart>, whose axes, series options and
+data methods are described on L<Term::Fabulous::Widget::XYChart>.
+Titles, legends and colors are common to all charts and described on
+L<Term::Fabulous::Widget::Chart>. The concepts are explained in
+L<the charts chapter of the manual|Term::Fabulous::Manual::Charts/CHARTS>,
+and the data steps have a page of their own:
+L<Term::Fabulous::Chart::Transform>.
+
+The recipes on this page:
+
+=over
+
+=item *
+
+L</Plot values over time (time axis, from and to, a dashed forecast)>
+
+=item *
+
+L</A live chart that follows new data (append, max_points, span)>
+
+=item *
+
+L</Show values of very different sizes (logarithmic axis)>
+
+=item *
+
+L</Smooth noisy data and index it to 100 (transforms)>
+
+=item *
+
+L</Describe charts in a KDL layout (series, slices, transforms)>
+
+=item *
+
+L</Print charts in a report (Static)>
+
+=back
+
+=head1 Plot values over time (time axis, from and to, a dashed forecast)
+
+Goal: plot hourly measurements over four days on a time axis, continue
+them with a dashed forecast, and shade a stretch of time.
+
+This program is shipped as F<examples/cookbook/chart-time-series.pl>.
+
+=for code-from examples/cookbook/chart-time-series.pl
+
+	use v5.32;
+	use warnings;
+	use utf8;
+	use feature 'signatures';
+	no warnings 'experimental::signatures';
+
+	use POSIX qw(strftime);
+	use Term::Fabulous;
+	use Term::Fabulous::Widget::Box;
+	use Term::Fabulous::Widget::LineChart;
+	use Clay::XS qw(sizing_grow);
+
+	my $root = Term::Fabulous::Widget::Box->new(
+		layout => {
+			sizing  => { width => sizing_grow(), height => sizing_grow() },
+			padding => { left  => 2, right => 2, top => 1, bottom => 1 },
+		},
+	);
+
+	# Hourly temperatures: measured until noon on June 3rd, forecast from
+	# then on. The x values are date strings (local time; a trailing Z means
+	# UTC); epoch seconds or DateTime objects work as well.
+	my $now = '2026-06-03 12:00Z';
+	my ( @measured, @forecast );
+	foreach my $hour ( 0 .. 4 * 24 ) {
+		my $time  = strftime( '%Y-%m-%d %H:%MZ', gmtime( 1780272000 + 3600 * $hour ) );
+		my $value = 17 + 6 * sin( ( $hour - 9 ) * 3.14159 / 12 ) + 2 * sin( $hour / 17 );
+		push @measured, [ $time, $value ] if $hour <= 2 * 24 + 12;
+		push @forecast, [ $time, $value + 1.5 * ( $hour - 2 * 24 - 12 ) / 36 ] if $hour >= 2 * 24 + 12;    # drifts away from the measurements
+	}
+
+	my $chart = Term::Fabulous::Widget::LineChart->new(
+		title  => 'Temperature in Lisbon',
+		curve  => 'monotone',
+		x_axis => { type  => 'time', utc    => 1, min => '2026-06-01 00:00Z', max => '2026-06-05 00:00Z' },
+		y_axis => { title => '°C',   format => '%d°' },
+		series => [
+			{ name => 'Measured', data => \@measured },
+			{ name => 'Forecast', data => \@forecast, line_style => 'dashed' },
+
+			# The same data, drawn only from the start of the 2nd to noon of the 3rd.
+			{ name => 'Heat warning', data => \@measured, type => 'area', from => '2026-06-02 00:00Z', to => $now, fill_opacity => 0.25, color => '#e66767' },
+		],
+	);
+	$root->add_child($chart);
+
+	Term::Fabulous->new( root => $root, width => 90, height => 24 )->run;
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-time-series.svg" alt="Hourly temperatures over four days on a time axis: a solid measured line, a dashed forecast from noon of June 3rd on, and a red shaded area under the measurements from June 2nd to that noon"></p>
+
+=end html
+
+=over
+
+=item *
+
+With C<[ x, y ]> points whose x values are dates, the x axis is a time
+axis. C<< type => 'time' >> says so; the default C<auto> would also
+recognize the date strings. An x value can be a number of epoch
+seconds, a date string or an object with an C<epoch> method, such as a
+L<DateTime>. A date string without a zone is local time; a trailing
+C<Z> means UTC.
+
+=item *
+
+C<< utc => 1 >> writes the tick labels in UTC instead of local time, so
+the chart looks the same everywhere. C<min> and C<max> fix the ends of
+the axis, here midnight to midnight over four days, whatever the data
+covers. The chart chooses ticks that suit the span; a C<format> in the
+C<x_axis> writes them with your own C<strftime> format. See
+L<Term::Fabulous::Widget::XYChart/Time axes>.
+
+=item *
+
+The forecast is a series of its own, with
+C<< line_style => 'dashed' >>, starting at the hour the measurements
+end. C<dotted> is the third line style; see
+L<Term::Fabulous::Widget::XYChart/Line styles>.
+
+=item *
+
+C<from> and C<to> limit where a series is drawn, in x values. The
+"Heat warning" series uses the measured data again, as a red C<area>
+with a light C<fill_opacity>, drawn only from the start of June 2nd to
+noon of June 3rd: a way to shade a stretch of time. A line or the top
+of an area is cut exactly at C<from> and C<to>, with the ends
+interpolated between the points. Points outside are kept in the
+series, but not drawn, and they do not count for the axes. See
+L<Term::Fabulous::Widget::XYChart/From, to and span>.
+
+=item *
+
+A line chart's series are lines unless they say otherwise: any series
+can be a C<line>, C<area>, C<bar> or C<scatter> series. Areas are drawn
+below lines, so the shading stays under the measured line.
+
+=item *
+
+C<< curve => 'monotone' >> smooths the lines of all series; see
+L<Term::Fabulous::Cookbook::ChartStyles/Connect points with curves and easings (curve)>. As in
+the line chart recipe
+(L<Term::Fabulous::Cookbook::Charts/Draw a line chart with labels and points (LineChart)>),
+the program needs C<use utf8> for the degree sign.
+
+=back
+
+=head1 A live chart that follows new data (append, max_points, span)
+
+Goal: a chart of the last minute of network traffic that moves on as
+new measurements arrive, four times a second.
+
+This program is shipped as F<examples/cookbook/chart-live.pl>.
+
+=for code-from examples/cookbook/chart-live.pl
+
+	use v5.32;
+	use warnings;
+	use feature 'signatures';
+	no warnings 'experimental::signatures';
+
+	use IO::Async::Loop;
+	use IO::Async::Timer::Periodic;
+	use Term::Fabulous;
+	use Term::Fabulous::Widget::Box;
+	use Term::Fabulous::Widget::LineChart;
+	use Term::Fabulous::Widget::Text;
+	use Clay::XS qw(sizing_grow CLAY_TOP_TO_BOTTOM);
+	use Time::HiRes ();
+
+	my $root = Term::Fabulous::Widget::Box->new(
+		layout => {
+			layout_direction => CLAY_TOP_TO_BOTTOM,
+			sizing           => { width => sizing_grow(), height => sizing_grow() },
+			padding          => { left  => 2, right => 2, top => 1, bottom => 1 },
+			child_gap        => 1,
+		},
+	);
+
+	# The last minute: the x axis always spans 60 seconds up to the newest
+	# point, and each series keeps at most 240 points.
+	my $chart = Term::Fabulous::Widget::LineChart->new(
+		title      => 'Network traffic',
+		x_axis     => { type => 'time', span => 60, format => '%H:%M:%S' },
+		y_axis     => { min  => 0, title => 'Mbit/s' },
+		max_points => 240,
+		series     => [ { name => 'Received', type => 'area', line => 1 }, { name => 'Sent' } ],
+	);
+	my $status = Term::Fabulous::Widget::Text->new( text => 'Waiting for data', text_color => [ 150, 160, 180, 255 ] );
+	$root->add_child( $chart, $status );
+
+	# Made-up measurements, four per second.
+	my $tick = 0;
+
+	sub measure () {
+		$tick++;
+		return ( 65 + 20 * sin( $tick / 23 ) + 8 * sin( $tick / 3.1 ) + 4 * sin( $tick * 1.7 ), 18 + 6 * sin( $tick / 11 ) + 3 * sin( $tick * 2.3 ) );
+	}
+
+	my $timer = IO::Async::Timer::Periodic->new(
+		interval => 0.25,
+		on_tick  => sub {
+			my ( $received, $sent ) = measure();
+
+			# One point for each series, both at this moment.
+			$chart->append( Time::HiRes::time(), { Received => $received, Sent => $sent } );
+			$status->text( sprintf 'Now: %.1f Mbit/s in, %.1f Mbit/s out', $received, $sent );
+			return;
+		},
+	);
+	$timer->start;
+	IO::Async::Loop->new->add($timer);
+
+	Term::Fabulous->new( root => $root, width => 80, height => 22 )->run;
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-live.svg" alt="A live chart of network traffic: received traffic as a filled area with a line on top and sent traffic as a line fill the right half of a one-minute time axis after 30 seconds, with a status line of the newest values below"></p>
+
+=end html
+
+The picture shows the program after it ran for 30 seconds.
+
+=over
+
+=item *
+
+The series start without data: a name and a type are enough. Received
+is an area with C<< line => 1 >>, which draws a line along its top; an
+area has none unless asked to. Sent is a line, the default type of a
+line chart.
+
+=item *
+
+C<< $chart->append( $x, { name => $value, ... } ) >> adds one point to
+each series named in the hash, all at the same x: the way to feed
+several series from one measurement. Here the x value is C<time>, the
+current epoch seconds. C<add_points> adds points to one series. See
+L<Term::Fabulous::Widget::XYChart/Live data>.
+
+=item *
+
+C<< span => 60 >> makes the time axis show the 60 seconds up to the
+newest point, so the chart moves on with every new point. C<format>
+writes the tick labels with C<strftime>.
+
+=item *
+
+C<< max_points => 240 >> keeps the newest 240 points of each series and
+drops older ones; without it, the data grows as long as the program
+runs. Make it about the span times the rate (60 seconds times 4 per
+second), so the memory holds what the chart shows; points older than
+the span are neither drawn nor counted for the y axis, whatever
+C<max_points> keeps.
+
+=item *
+
+C<< min => 0 >> on the y axis keeps its bottom at 0. Without it, the
+bottom of the axis follows the lowest value shown and jumps whenever a
+low value scrolls in or out. The top still follows the highest value;
+give the axis a C<max> as well to fix it.
+
+=item *
+
+The timer only changes the data: the chart is drawn again in the next
+frame, and only the cells that changed are sent to the terminal. The
+timer is set up as in L<the clock recipe|Term::Fabulous::Cookbook::LiveData/Update the screen from a timer (a clock)>.
+
+=back
+
+=head1 Show values of very different sizes (logarithmic axis)
+
+Goal: show series that grow from a few to tens of thousands so that the
+early years and the smaller series stay readable.
+
+This program is shipped as F<examples/cookbook/chart-log-scale.pl>.
+
+=for code-from examples/cookbook/chart-log-scale.pl
+
+	use v5.32;
+	use warnings;
+	use feature 'signatures';
+	no warnings 'experimental::signatures';
+
+	use Term::Fabulous;
+	use Term::Fabulous::Widget::Box;
+	use Term::Fabulous::Widget::LineChart;
+	use Clay::XS qw(sizing_grow);
+
+	my $root = Term::Fabulous::Widget::Box->new(
+		layout => {
+			sizing    => { width => sizing_grow(), height => sizing_grow() },
+			padding   => { left  => 2, right => 2, top => 1, bottom => 1 },
+			child_gap => 4,
+		},
+	);
+
+	# Values from a few to many thousands: on a linear axis the small ones
+	# lie flat on the floor...
+	my @series = (
+		{ name => 'Downloads', data => [ 12, 40, 150, 610, 2400, 9800, 31000, 88000 ] },
+		{ name => 'Issues',    data => [ 2,  5,  14,  30,  71,   160,  390,   900 ] },
+	);
+	my @years = 2019 .. 2026;
+	$root->add_child( Term::Fabulous::Widget::LineChart->new( title => 'Linear axis', labels => \@years, points => 1, series => \@series ) );
+
+	# ... on a logarithmic one every factor of ten takes the same room, and
+	# steady growth is a straight line.
+	$root->add_child(
+		Term::Fabulous::Widget::LineChart->new(
+			title  => 'Logarithmic axis',
+			labels => \@years,
+			points => 1,
+			y_axis => { type => 'log' },
+			series => \@series,
+		)
+	);
+
+	Term::Fabulous->new( root => $root, width => 100, height => 20 )->run;
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-log-scale.svg" alt="The same two series twice: on a linear axis the issues and the early downloads lie flat on the bottom, on a logarithmic axis both rise as nearly straight lines"></p>
+
+=end html
+
+=over
+
+=item *
+
+On the linear axis at the left, the largest value sets the scale: all
+values below a few thousand lie on the floor, and the issues cannot be
+told from 0.
+
+=item *
+
+C<< type => 'log' >> in the C<y_axis> makes every power of ten take the
+same height. Growth by the same factor every year becomes a straight
+line, and series of very different sizes are both readable. The ticks
+are at the powers of ten, written with SI prefixes from a thousand on
+(C<1k>, C<10k>); C<< base => 2 >> puts them at the powers of 2 instead.
+
+=item *
+
+A logarithmic axis cannot show 0 or negative values: a line has a gap
+there, and bars and points are left out. C<undef> in the data leaves a
+gap as well. See L<Term::Fabulous::Widget::XYChart/Logarithmic axes>.
+
+=item *
+
+Readers take a logarithmic axis for a linear one unless they are told:
+say so in the title or the axis title, as here.
+
+=item *
+
+The x axis can be logarithmic too, for numeric x values:
+C<< x_axis => { type => 'log' } >>.
+
+=back
+
+=head1 Smooth noisy data and index it to 100 (transforms)
+
+Goal: show the trend in noisy daily figures, and compare the growth of
+two prices of very different size on one axis.
+
+This program is shipped as F<examples/cookbook/chart-transform.pl>.
+
+=for code-from examples/cookbook/chart-transform.pl
+
+	use v5.32;
+	use warnings;
+	use feature 'signatures';
+	no warnings 'experimental::signatures';
+
+	use Term::Fabulous;
+	use Term::Fabulous::Widget::Box;
+	use Term::Fabulous::Widget::LineChart;
+	use Clay::XS qw(sizing_grow CLAY_TOP_TO_BOTTOM);
+
+	my $root = Term::Fabulous::Widget::Box->new(
+		layout => {
+			layout_direction => CLAY_TOP_TO_BOTTOM,
+			sizing           => { width => sizing_grow(), height => sizing_grow() },
+			padding          => { left  => 2, right => 2, top => 1, bottom => 1 },
+			child_gap        => 1,
+		},
+	);
+
+	# Noisy daily visits for 120 days, with a weekly rhythm.
+	srand 3;
+	my @visits = map { 300 + 2 * $_ + 60 * sin( $_ * 6.283 / 7 ) + ( rand() - 0.5 ) * 160 } 0 .. 119;
+
+	# The same data three times: as it is, and smoothed two ways. The data
+	# given stays as it is; only what is drawn is prepared.
+	$root->add_child(
+		Term::Fabulous::Widget::LineChart->new(
+			title  => 'Daily visits',
+			series => [
+				{ name => 'Raw',            data => \@visits, color     => '#3a4152' },
+				{ name => '7-day average',  data => \@visits, transform => [ [ 'moving_average', 7 ] ] },
+				{ name => 'Smoothed (0.1)', data => \@visits, transform => [ [ 'exponential',    0.1 ] ], line_style => 'dashed' },
+			],
+		)
+	);
+
+	# Two prices of very different size, both indexed to 100 at the start,
+	# so their growth compares on one axis.
+	my @shares = map { 1200 + 4 * $_ + 80 * sin( $_ / 9 ) } 0 .. 119;
+	my @bonds  = map { 96 + 0.05 * $_ + 2 * sin( $_ / 15 ) } 0 .. 119;
+	$root->add_child(
+		Term::Fabulous::Widget::LineChart->new(
+			title     => 'Growth since day 1 (day 1 = 100)',
+			transform => [ [ 'index', 100 ] ],
+			curve     => 'monotone',
+			series    => [ { name => 'Shares', data => \@shares }, { name => 'Bonds', data => \@bonds } ],
+		)
+	);
+
+	Term::Fabulous->new( root => $root, width => 90, height => 30 )->run;
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-transform.svg" alt="Daily visits as a dim raw line with a 7-day moving average and a dashed exponentially smoothed line over it, and below it share and bond prices both indexed to 100 at day 1"></p>
+
+=end html
+
+=over
+
+=item *
+
+The C<transform> of a series lists steps that run on its points before
+they are drawn. The data you give stays as it is, and the steps run
+again whenever it changes, so live data stays prepared the same way.
+Write the steps as a list, even a single step with arguments:
+C<< [ [ 'moving_average', 7 ] ] >>. See
+L<Term::Fabulous::Chart::Transform/Steps> for all steps.
+
+=item *
+
+The three series of the first chart share C<@visits>. The raw data is
+drawn in a dim color close to the background, as context; the
+smoothed lines stand out over it.
+
+=item *
+
+C<< [ 'moving_average', 7 ] >> is the mean of the last 7 days: it
+removes the weekly rhythm, but it lags about three days behind the
+data. C<< [ 'moving_average', 7, 'center' ] >> averages the days around
+each point instead and does not lag.
+
+=item *
+
+C<< [ 'exponential', 0.1 ] >> is exponential smoothing: each smoothed
+value moves a tenth of the way from the smoothed value before it
+towards the new data value. A smaller factor smooths more and lags
+more.
+The dashed C<line_style> tells it apart from the moving average.
+
+=item *
+
+A C<transform> given to the chart applies to every series without one
+of its own. C<< [ 'index', 100 ] >> makes each value relative to the
+first, which becomes 100: the shares start at 1200 and the bonds at 96,
+and both start at 100 in the chart, so 110 means 10% above day 1. This
+is how to compare series of very different sizes on one axis; a chart
+has no second y axis.
+
+=item *
+
+Other steps sum up (C<cumulative>), turn counters into rates (C<rate>),
+group points into intervals (C<resample>), scale to 0 to 1
+(C<normalize>) or remove spikes (C<median>); a code reference is a step
+of your own. L<The section on preparing data in XYChart|Term::Fabulous::Widget::XYChart/Preparing data> describes
+where transforms run.
+
+=back
+
+=head1 Describe charts in a KDL layout (series, slices, transforms)
+
+Goal: describe a bar chart and a donut chart in a KDL layout, with
+their data, and add data to them from Perl.
+
+This program is shipped as F<examples/cookbook/chart-kdl.pl>.
+
+=for code-from examples/cookbook/chart-kdl.pl
+
+	use v5.32;
+	use warnings;
+	use feature 'signatures';
+	no warnings 'experimental::signatures';
+
+	use Term::Fabulous;
+	use Term::Fabulous::Layout;
+
+	my $layout = Term::Fabulous::Layout->new( string => <<'KDL' );
+	use Term::Fabulous::Widget::Box as Box
+	use Term::Fabulous::Widget::BarChart as BarChart
+	use Term::Fabulous::Widget::DonutChart as DonutChart
+
+	Box "root" {
+		layout gap=4
+		sizing width=grow height=grow
+		padding left=2 right=2 top=1 bottom=1
+
+		BarChart "sales" {
+			sizing width="percent(60)" height=grow
+			title "Sales and returns"
+			labels "Q1" "Q2" "Q3" "Q4"
+			value_labels #true
+			y_axis title="units" grid="dotted"
+			series "Sold" color="#3987e5" { data 90 140 165 190; }
+			series "Returned" color="#e66767" { data 14 11 17 12; }
+			series "Trend" type="line" line_style="dashed" color="#c98500" {
+				data 90 140 165 190
+				transform "moving_average" 2
+			}
+		}
+
+		DonutChart "channels" {
+			title "Sold by channel"
+			legend "bottom"
+			slice "Shop" 312
+			slice "Partners" 158
+			slice "Phone" 97
+		}
+	}
+	KDL
+
+	my $root = $layout->build;
+
+	# Data from the program goes to the widgets the layout named.
+	$root->find_by_id('channels')->set_value( Web => 431 );
+
+	Term::Fabulous->new( root => $root, width => 100, height => 22 )->run;
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-kdl.svg" alt="A bar chart of sold and returned units per quarter with value labels and a dashed trend line, built from KDL, next to a donut chart of sales by channel that includes the Web slice added from Perl"></p>
+
+=end html
+
+=over
+
+=item *
+
+C<use Term::Fabulous::Widget::BarChart as BarChart> makes the chart
+available in the layout. The parameters of a chart are nodes in its
+block: C<title "...">, C<legend "bottom">, C<value_labels #true>.
+C<labels> takes the labels as arguments, and C<x_axis> and C<y_axis>
+take the keys of the axis hash as properties.
+
+=item *
+
+A C<series> node takes the series' name as its argument and its
+options as properties (C<color>, C<type>, C<line_style>, ...). Inside
+its block, C<data> holds the values, C<point> an C<[ x, y ]> pair, and
+every C<transform> node adds one step with its arguments. A C<;> ends a
+node, so a short block fits on one line.
+
+=item *
+
+The C<Trend> series is a dashed line over the bars: the moving average
+of each quarter and the one before it, computed from the same numbers
+as C<Sold>. C<value_labels> applies only to the bars.
+
+=item *
+
+A C<DonutChart> (and any pie) takes its data as C<slice> nodes: a label
+and a value, and an optional C<color> property.
+
+=item *
+
+Within a chart node, the labels and the axes are applied before the
+series, wherever they stand, so the series' values are read the way the
+axes say. L<The KDL properties of XYChart|Term::Fabulous::Widget::XYChart/KDL PROPERTIES> and
+L<those of PieChart|Term::Fabulous::Widget::PieChart/KDL PROPERTIES> list all nodes.
+
+=item *
+
+From Perl, C<find_by_id> finds a chart by the name the layout gave it.
+C<set_value> changes the value of a slice, or adds a slice when the
+label is new, as C<Web> here. Charts with axes take new data with
+C<set_data>, C<add_points> and C<append>.
+
+=item *
+
+The bar chart takes 60% of the width (C<sizing width="percent(60)">),
+and the donut grows to the rest. For a table in KDL, see
+L<Term::Fabulous::Cookbook::Tables/Describe a table in a KDL layout (columns, lines, sort, groups)>;
+the layout language is described in L<Term::Fabulous::Layout>.
+
+=back
+
+=head1 Print charts in a report (Static)
+
+Goal: print a bar chart and a sparkline as part of a report, without
+an event loop, to the terminal, a pipe or a file.
+
+This program is shipped as F<examples/cookbook/chart-report.pl>.
+
+=for code-from examples/cookbook/chart-report.pl
+
+	use v5.32;
+	use warnings;
+	use feature 'signatures';
+	no warnings 'experimental::signatures';
+
+	use Term::Fabulous::Static;
+	use Term::Fabulous::Widget::BarChart;
+	use Term::Fabulous::Widget::Box;
+	use Term::Fabulous::Widget::Sparkline;
+	use Term::Fabulous::Widget::Text;
+	use Clay::XS qw(sizing_grow sizing_fixed CLAY_TOP_TO_BOTTOM);
+
+	my %disk = ( '/' => 71, '/home' => 88, '/var' => 46, '/srv' => 23 );
+	my @load = ( 0.4, 0.6, 0.5, 0.9, 1.4, 2.1, 1.8, 1.2, 0.9, 1.1, 1.6, 1.3, 0.8, 0.7, 0.6, 0.9, 1.0, 0.8 );
+
+	my $root = Term::Fabulous::Widget::Box->new( layout => { layout_direction => CLAY_TOP_TO_BOTTOM, sizing => { width => sizing_grow() }, child_gap => 1 } );
+
+	# A chart in a report needs a fixed height: there is no screen to fill.
+	$root->add_child(
+		Term::Fabulous::Widget::BarChart->new(
+			title        => 'Disk usage (%)',
+			horizontal   => 1,
+			value_labels => 1,
+			labels       => [ sort keys %disk ],
+			y_axis       => { min => 0, max => 100 },
+			series       => [ { name => 'used', data => [ map { $disk{$_} } sort keys %disk ] } ],
+			layout       => { sizing => { width => sizing_grow(), height => sizing_fixed(9) } },
+		)
+	);
+
+	# Text is black unless it has a text_color, which a dark terminal does
+	# not show: give it a color, as the chart does for its labels.
+	my $line = Term::Fabulous::Widget::Box->new( layout => { child_gap => 1 } );
+	$line->add_child(
+		Term::Fabulous::Widget::Text->new( text => 'Load, last 18 hours:', text_color => [ 230, 230, 230, 255 ] ),
+		Term::Fabulous::Widget::Sparkline->new( type => 'bar', values => \@load, layout => { sizing => { width => sizing_fixed(18) } } ),
+		Term::Fabulous::Widget::Text->new( text => sprintf( 'now %.1f', $load[-1] ), text_color => [ 230, 230, 230, 255 ] ),
+	);
+	$root->add_child($line);
+
+	# Colors on a terminal, plain characters in a pipe or file.
+	Term::Fabulous::Static->new( root => $root, width => 60 )->print;
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-report.svg" alt="The printed report: horizontal bars of the disk usage of four file systems with their percentages, and a line with the load of the last 18 hours as a bar sparkline"></p>
+
+=end html
+
+=over
+
+=item *
+
+L<Term::Fabulous::Static> lays out and draws the widget tree once and
+prints it; the program ends right after. On a terminal the output has
+colors; in a pipe or a file it is plain text. See
+L<Term::Fabulous::Cookbook::Output/Render a report to a file or pipe (Static)>.
+
+=item *
+
+A chart grows to the room it gets, but a report has no screen height
+to fill: give the chart a fixed height, here C<sizing_fixed(9)>. The
+root box has no height of its own, so the report is as high as what it
+holds.
+
+=item *
+
+In a horizontal bar chart, the C<y_axis> still describes the values,
+although it is drawn along the bottom: C<min> and C<max> fix it to 0
+to 100 percent, so a full disk would fill its row.
+
+=item *
+
+The labels and the values come from the same hash, both in the order
+of C<sort keys %disk>; Perl's hash order is random, so sort once and
+use that order for both.
+
+=item *
+
+A L<Term::Fabulous::Widget::Sparkline> is a chart one row high,
+without axes, legend or title. Its width is fixed to 18 columns, one
+per value: a bar takes at least one cell, and with more values than
+columns, the bars show the newest values that fit.
+
+=back
+
+=head1 SEE ALSO
+
+This page is part of L<Term::Fabulous::Cookbook>. Previous page: L<Term::Fabulous::Cookbook::Charts>. Next page: L<Term::Fabulous::Cookbook::ChartStyles>.
+
+L<Term::Fabulous::Widget::XYChart> - axes, series options and data
+methods of line, area, bar and scatter charts.
+
+L<Term::Fabulous::Chart::Transform> - the steps that prepare series
+data.
+
+L<Term::Fabulous::Static> - printing widgets without an event loop.
+
+L<Term::Fabulous::Cookbook::Charts> - one recipe per chart type.
+
+L<Term::Fabulous::Cookbook::ChartStyles> - curves, markers, colors,
+line styles and hover.
+
+=cut

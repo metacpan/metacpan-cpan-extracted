@@ -9,7 +9,9 @@ use Time::HiRes qw(time);
 
 use Net::QUIC;
 use Net::QUIC::Driver;
+use Unblock::HTTP3::Client;
 use Unblock::HTTP3::Connection;
+use Unblock::HTTP3::Server;
 use Unblock::HTTP3::_Native;
 
 is($Net::QUIC::VERSION, '0.04', 'ORIGIN loopback uses released Net::QUIC 0.04');
@@ -199,7 +201,7 @@ ok(
 
 like(
     dies {
-        Unblock::HTTP3::Connection->client(
+        Unblock::HTTP3::Client->new(
             quic    => $client_quic,
             origins => [],
         );
@@ -210,7 +212,7 @@ like(
 
 like(
     dies {
-        Unblock::HTTP3::Connection->server(
+        Unblock::HTTP3::Server->new(
             quic    => $server_quic,
             origins => [ 'https://example.test/path' ],
         );
@@ -219,11 +221,11 @@ like(
     'server rejects a URI that is not an origin serialization',
 );
 
-my $client_h3 = Unblock::HTTP3::Connection->client(
+my $client_h3 = Unblock::HTTP3::Client->new(
     quic => $client_quic,
 );
 
-my $server_h3 = Unblock::HTTP3::Connection->server(
+my $server_h3 = Unblock::HTTP3::Server->new(
     quic => $server_quic,
     origins => [
         'https://example.test',

@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="636" height="273" viewBox="0 0 636 273" role="img" aria-label="perl examples/widgets/segmented-control.pl">
+<title>perl examples/widgets/segmented-control.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="604" height="238" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="604" height="238" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="604" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="318" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/widgets/segmented-control.pl</text>
+<rect x="16.5" y="16.5" width="603" height="237" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="174" y="78" width="54" height="18" fill="#343a48"/>
+<rect x="228" y="78" width="54" height="18" fill="#61afef"/>
+<rect x="282" y="78" width="135" height="18" fill="#343a48"/>
+<rect x="174" y="96" width="135" height="18" fill="#61afef"/>
+<rect x="237" y="114" width="45" height="18" fill="#61afef"/>
+<rect x="174" y="150" width="99" height="18" fill="#61afef"/>
+<rect x="246" y="186" width="54" height="18" fill="#6c7078"/>
+<rect x="223" y="78" width="1" height="18" fill="#5a606e"/>
+<rect x="286" y="78" width="1" height="18" fill="#5a606e"/>
+<rect x="358" y="78" width="1" height="18" fill="#5a606e"/>
+<rect x="313" y="96" width="1" height="18" fill="#5a606e"/>
+<rect x="457" y="96" width="1" height="18" fill="#5a606e"/>
+<rect x="232" y="114" width="1" height="18" fill="#5a606e"/>
+<rect x="286" y="114" width="1" height="18" fill="#5a606e"/>
+<rect x="241" y="186" width="1" height="18" fill="#6c7078"/>
+</g>
+<g class="terminal">
+<text x="48" y="92" textLength="63" fill="#96a0b4">focused</text>
+<text x="183" y="92" textLength="27" fill="#dcdfe4">Day</text>
+<text x="237" y="92" textLength="36" fill="#101216">Week</text>
+<text x="300" y="92" textLength="45" fill="#dcdfe4">Month</text>
+<text x="372" y="92" textLength="36" fill="#dcdfe4">Year</text>
+<text x="48" y="110" textLength="90" fill="#96a0b4">full width</text>
+<text x="219" y="110" textLength="36" fill="#101216">List</text>
+<text x="363" y="110" textLength="36" fill="#dcdfe4">Grid</text>
+<text x="507" y="110" textLength="27" fill="#dcdfe4">Map</text>
+<text x="48" y="128" textLength="108" fill="#96a0b4">one disabled</text>
+<text x="183" y="128" textLength="36" fill="#dcdfe4">Free</text>
+<text x="246" y="128" textLength="27" fill="#101216">Pro</text>
+<text x="300" y="128" textLength="90" fill="#6c7078">Enterprise</text>
+<text x="48" y="146" textLength="72" fill="#96a0b4">vertical</text>
+<text x="192" y="146" textLength="63" fill="#dcdfe4">General</text>
+<text x="192" y="164" textLength="63" fill="#101216">Network</text>
+<text x="201" y="182" textLength="45" fill="#dcdfe4">Users</text>
+<text x="48" y="200" textLength="72" fill="#96a0b4">disabled</text>
+<text x="183" y="200" textLength="45" fill="#6c7078">Light</text>
+<text x="255" y="200" textLength="36" fill="#101216">Dark</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

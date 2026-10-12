@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="309" viewBox="0 0 780 309" role="img" aria-label="perl examples/buttons-and-keys.pl">
+<title>perl examples/buttons-and-keys.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="748" height="274" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="748" height="274" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="748" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="390" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/buttons-and-keys.pl</text>
+<rect x="16.5" y="16.5" width="747" height="273" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="48" y="150" width="108" height="54" fill="#2b3a55"/>
+<rect x="174" y="150" width="108" height="54" fill="#2b3a55"/>
+<rect x="300" y="150" width="81" height="54" fill="#455d88"/>
+<rect x="57" y="158" width="90" height="1" fill="#61afef"/>
+<rect x="183" y="158" width="90" height="1" fill="#5a6b8c"/>
+<rect x="309" y="158" width="63" height="1" fill="#5a6b8c"/>
+<rect x="52" y="168" width="1" height="18" fill="#61afef"/>
+<rect x="151" y="168" width="1" height="18" fill="#61afef"/>
+<rect x="178" y="168" width="1" height="18" fill="#5a6b8c"/>
+<rect x="277" y="168" width="1" height="18" fill="#5a6b8c"/>
+<rect x="304" y="168" width="1" height="18" fill="#5a6b8c"/>
+<rect x="376" y="168" width="1" height="18" fill="#5a6b8c"/>
+<rect x="57" y="194" width="90" height="1" fill="#61afef"/>
+<rect x="183" y="194" width="90" height="1" fill="#5a6b8c"/>
+<rect x="309" y="194" width="63" height="1" fill="#5a6b8c"/>
+</g>
+<polyline points="52.5 168 52.5 163 52.538 162.413 52.653 161.835 52.843 161.278 53.103 160.75 53.43 160.261 53.818 159.818 54.261 159.43 54.75 159.103 55.278 158.843 55.835 158.653 56.413 158.538 57 158.5 57 158.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="151.5 168 151.5 163 151.462 162.413 151.347 161.835 151.157 161.278 150.897 160.75 150.57 160.261 150.182 159.818 149.739 159.43 149.25 159.103 148.722 158.843 148.165 158.653 147.587 158.538 147 158.5 147 158.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="178.5 168 178.5 163 178.538 162.413 178.653 161.835 178.843 161.278 179.103 160.75 179.43 160.261 179.818 159.818 180.261 159.43 180.75 159.103 181.278 158.843 181.835 158.653 182.413 158.538 183 158.5 183 158.5" fill="none" stroke="#5a6b8c" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="277.5 168 277.5 163 277.462 162.413 277.347 161.835 277.157 161.278 276.897 160.75 276.57 160.261 276.182 159.818 275.739 159.43 275.25 159.103 274.722 158.843 274.165 158.653 273.587 158.538 273 158.5 273 158.5" fill="none" stroke="#5a6b8c" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="304.5 168 304.5 163 304.538 162.413 304.653 161.835 304.843 161.278 305.103 160.75 305.43 160.261 305.818 159.818 306.261 159.43 306.75 159.103 307.278 158.843 307.835 158.653 308.413 158.538 309 158.5 309 158.5" fill="none" stroke="#5a6b8c" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="376.5 168 376.5 163 376.462 162.413 376.347 161.835 376.157 161.278 375.897 160.75 375.57 160.261 375.182 159.818 374.739 159.43 374.25 159.103 373.722 158.843 373.165 158.653 372.587 158.538 372 158.5 372 158.5" fill="none" stroke="#5a6b8c" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="52.5 186 52.5 190 52.538 190.587 52.653 191.165 52.843 191.722 53.103 192.25 53.43 192.739 53.818 193.182 54.261 193.57 54.75 193.897 55.278 194.157 55.835 194.347 56.413 194.462 57 194.5 57 194.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="151.5 186 151.5 190 151.462 190.587 151.347 191.165 151.157 191.722 150.897 192.25 150.57 192.739 150.182 193.182 149.739 193.57 149.25 193.897 148.722 194.157 148.165 194.347 147.587 194.462 147 194.5 147 194.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="178.5 186 178.5 190 178.538 190.587 178.653 191.165 178.843 191.722 179.103 192.25 179.43 192.739 179.818 193.182 180.261 193.57 180.75 193.897 181.278 194.157 181.835 194.347 182.413 194.462 183 194.5 183 194.5" fill="none" stroke="#5a6b8c" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="277.5 186 277.5 190 277.462 190.587 277.347 191.165 277.157 191.722 276.897 192.25 276.57 192.739 276.182 193.182 275.739 193.57 275.25 193.897 274.722 194.157 274.165 194.347 273.587 194.462 273 194.5 273 194.5" fill="none" stroke="#5a6b8c" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="304.5 186 304.5 190 304.538 190.587 304.653 191.165 304.843 191.722 305.103 192.25 305.43 192.739 305.818 193.182 306.261 193.57 306.75 193.897 307.278 194.157 307.835 194.347 308.413 194.462 309 194.5 309 194.5" fill="none" stroke="#5a6b8c" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="376.5 186 376.5 190 376.462 190.587 376.347 191.165 376.157 191.722 375.897 192.25 375.57 192.739 375.182 193.182 374.739 193.57 374.25 193.897 373.722 194.157 373.165 194.347 372.587 194.462 372 194.5 372 194.5" fill="none" stroke="#5a6b8c" stroke-width="1" stroke-linejoin="round"/>
+<g class="terminal">
+<text x="48" y="92" textLength="126" fill="#96a0b4">Time: 09:41:03</text>
+<text x="48" y="128" textLength="90" fill="#dcdcdc">Counter: 3</text>
+<text x="66" y="182" textLength="72" fill="#dcdcdc">Increase</text>
+<text x="192" y="182" textLength="72" fill="#dcdcdc">Decrease</text>
+<text x="318" y="182" textLength="45" fill="#dcdcdc">Reset</text>
+<text x="48" y="236" textLength="675" fill="#dcdcdc">Tab focuses a button, Enter or Space presses it, or click one. + - r change</text>
+<text x="48" y="254" textLength="351" fill="#dcdcdc">the counter, q, Escape or Ctrl+Q quits.</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

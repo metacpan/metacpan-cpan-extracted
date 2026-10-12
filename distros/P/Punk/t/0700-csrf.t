@@ -37,7 +37,7 @@ sub hit {
     my $env = {
         REQUEST_METHOD => $a{method} // 'GET',
         PATH_INFO      => $a{path}   // '/',
-        QUERY_STRING   => '',
+        QUERY_STRING   => $a{query}  // '',
         SERVER_NAME    => 'localhost', SERVER_PORT => 80,
         HTTP_HOST      => 'localhost', 'psgi.url_scheme' => 'http',
         'psgi.input'   => $in,
@@ -145,6 +145,21 @@ my $token = $first->{body};
     my $bearer = hit(method => 'POST', path => '/save', body => 'a=1',
                      auth => 'Bearer abc123');
     is($bearer->{status}, 200, 'an Authorization header skips the check');
+
+    # A browser attaches these by itself, cross-site, exactly as it does a
+    # cookie - so they are no evidence a script built the request.
+    for my $ambient ('Basic dXNlcjpwYXNz', 'basic dXNlcjpwYXNz',
+                     'Digest username="u"', 'Negotiate YII=', 'NTLM TlRM',
+                     'Bearer', '   ') {
+        my $r = hit(method => 'POST', path => '/save', body => 'a=1',
+                    auth => $ambient);
+        is($r->{status}, 403, "Authorization: '$ambient' does not skip it");
+    }
+    for my $explicit ('bearer abc123', 'Token abc', 'DPoP abc') {
+        my $r = hit(method => 'POST', path => '/save', body => 'a=1',
+                    auth => $explicit);
+        is($r->{status}, 200, "Authorization: '$explicit' does");
+    }
 }
 
 # ---- both ways in -------------------------------------------------------------
@@ -156,6 +171,18 @@ my $token = $first->{body};
     is($field->{status}, 200, 'the token may arrive in the form field');
     is($field->{body}, 'saved:field',
         '...and the body still reaches the handler afterwards');
+}
+
+{   # The query string is not a way in: a token there is a token in every
+    # access log and Referer the URL reaches.
+    my $tok = hit()->{body};
+    my $q = hit(method => 'POST', path => '/save', body => 'a=query',
+                query => "_csrf=$tok");
+    is($q->{status}, 403, 'a token in the query string is refused');
+    my $both = hit(method => 'POST', path => '/save',
+                   body => "_csrf=$tok&a=both", query => '_csrf=wrong');
+    is($both->{status}, 200,
+        '...and one there does not shadow the one in the form');
 }
 
 {   # A multipart body must not be pulled into memory hunting for the field -
@@ -195,6 +222,35 @@ my $token = $first->{body};
     };
     is($ex->($env->('/hooks/stripe'))->[0], 200, 'an exempt prefix is skipped');
     is($ex->($env->('/other'))->[0], 403, 'everything else is still checked');
+}
+
+{
+    package SegmentApp;
+    use Punk;
+    session secret => 'k';
+    csrf exempt => [ '/hooks', '/cb/' ];
+    post '/hooks'             => sub { $_[0]->text('root') };
+    post '/hooks/stripe'      => sub { $_[0]->text('hook') };
+    post '/hooksadmin/delete' => sub { $_[0]->text('admin') };
+    post '/cb/x'              => sub { $_[0]->text('cb') };
+    post '/cb'                => sub { $_[0]->text('cbroot') };
+}
+{
+    my $seg = SegmentApp->to_app;
+    my $post = sub {
+        my ($p) = @_;
+        open my $in, '<', \'';
+        return $seg->({ REQUEST_METHOD => 'POST', PATH_INFO => $p,
+                        QUERY_STRING => '', SERVER_NAME => 'l',
+                        SERVER_PORT => 80, HTTP_HOST => 'l',
+                        'psgi.url_scheme' => 'http', 'psgi.input' => $in })->[0];
+    };
+    is($post->('/hooks'), 200, 'an exempt path covers itself');
+    is($post->('/hooks/stripe'), 200, '...and what is under it');
+    is($post->('/hooksadmin/delete'), 403,
+        '...and not a sibling that only shares its spelling');
+    is($post->('/cb/x'), 200, 'a prefix with a trailing slash covers what is under it');
+    is($post->('/cb'), 403, '...and not the path without the slash');
 }
 
 # ---- configuration ------------------------------------------------------------

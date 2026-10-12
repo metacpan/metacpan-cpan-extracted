@@ -1,5 +1,5 @@
 {
-   "abstract" : "Nine Men's Morris as an engine, with a terminal game on top",
+   "abstract" : "Nine Men's Morris as an engine",
    "author" : [
       "LNATION <email@lnation.org>"
    ],
@@ -46,6 +46,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

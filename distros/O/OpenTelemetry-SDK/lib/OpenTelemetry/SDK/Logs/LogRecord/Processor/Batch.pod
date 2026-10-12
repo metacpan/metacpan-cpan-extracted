@@ -1,0 +1,113 @@
+=encoding UTF-8
+
+=head1 NAME
+
+OpenTelemetry::SDK::Logs::LogRecord::Processor::Batch - A batched OpenTelemetry log record processor
+
+=head1 SYNOPSIS
+
+    ...
+
+=head1 DESCRIPTION
+
+This is a batched log record processor that receives
+L<OpenTelemetry::SDK::Logs::LogRecord> instances and forwards them to an
+exporter when they are emitted.
+
+This processor is intended to be used in production environments where
+performance is important. It will maintain a queue of log records to export,
+and periodically exports these in batches in a parallel process, which should
+allow the main process to continue executing without any delay added by
+exporting the log records.
+
+=head1 METHODS
+
+This class inherits from L<OpenTelemetry::Processor::Batch> and implements
+the L<OpenTelemetry::Logs::LogRecord::Processor> role. Please consult
+the documentation of those modules for details on the behaviours they provide.
+The description below will only refer to those behaviours that differ.
+
+=head2 on_emit
+
+    $processor->on_emit( $log_record );
+
+Called when a log record is emitted. This method internally passes the log
+record to L<OpenTelemetry::Processor::Batch/process>.
+
+=head1 METRICS
+
+This processor generates a number of metrics to keep track of its regular
+operation. At the time of writing, these metrics are non-standard, but their
+inclusion in the standard
+L<is being discussed|https://github.com/open-telemetry/semantic-conventions/issues/83>.
+
+=over
+
+=item C<otel.processor.batch.failure>
+
+Incremented every time the log record processing failed irrecoverably.
+
+=item C<otel.processor.batch.success>
+
+Incremented every time the log record processing completed successfully.
+
+=item C<otel.processor.batch.logs.dropped>
+
+The number of log records that have been dropped and not successfully
+exported. This could be because they were never set to the exporter, or
+because the exporter reported some error.
+
+Reported with the following attributes:
+
+=over
+
+=item C<reason>
+
+=over
+
+=item C<buffer-full>
+
+The internal queue is full and can receive no more log records.
+
+=item C<export-failure>
+
+The exporter reported an error while exporting the log records.
+
+=item C<force-flush>
+
+The internal queue was flushed and not all queued log records could be
+exported in the specified time.
+
+=item C<terminating>
+
+The processor was shutdown and some log records remained in its internal
+queue.
+
+=back
+
+=back
+
+=item C<otel.processor.batch.logs.processed>
+
+The number of log records successfully processed.
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item L<OpenTelemetry::Logs::LogRecord::Processor>
+
+=item L<OpenTelemetry::Processor::Batch>
+
+=item L<OpenTelemetry::SDK::Logs::LogRecord>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by José Joaquín Atria.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.

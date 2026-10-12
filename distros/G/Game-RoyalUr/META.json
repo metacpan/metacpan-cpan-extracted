@@ -46,7 +46,7 @@
             "Scalar::Util" : "0",
             "XSLoader" : "0",
             "constant" : "0",
-            "perl" : "5.010"
+            "perl" : "5.014"
          }
       },
       "test" : {
@@ -64,6 +64,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

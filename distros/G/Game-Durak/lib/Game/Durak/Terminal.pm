@@ -9,8 +9,9 @@ use Game::Durak ();
 use Game::Durak::Bot ();
 use Game::Durak::Card qw(name_of long_name_of suit_of rank_of face_of);
 use Game::Durak::Table ();
+use Getopt::Long ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 my %SUIT = (
     S => { wide => "\x{2660}", ascii => 'S', colour => '37' },
@@ -522,7 +523,7 @@ sub start {
     return $game;
 }
 
-sub run {
+sub play {
     my ($self) = @_;
 
     my $game = $self->game || $self->start;
@@ -634,6 +635,94 @@ sub close_screen {
 }
 
 
+sub _usage {
+    return <<'USAGE';
+usage: durak [--level 1-5] [--seat 1|2] [--seed STRING] [--ascii] [--no-colour]
+             [--no-paint] [--width N] [--height N]
+
+A deal of Podkidnoy Durak against the bot. You are the seat given by --seat
+and the bot plays the other one. The seed decides the deal, and the same seed
+deals the same cards every time.
+
+The table is drawn on one painted screen at a terminal and printed as plain
+lines when the output is a pipe or a file. --paint and --no-paint say so
+either way, and --width and --height fit the screen to a window that is not
+eighty by twenty-four.
+
+At a terminal the arrow keys walk the cards you may play and the line above
+the table says what the one under the cursor would do: whether they must beat
+it, which attack it beats, whether it is a trump, and how much room the bout
+has left. Enter plays it. The moves that are not cards keep their own keys.
+Needs Term::ReadKey; --no-pick, or no terminal, numbers them at a prompt
+instead.
+
+At the prompt, a number plays that card. t takes, d is done, x exchanges the
+trump, r resigns and q (or quit) stops.
+
+Exit status is 0 if you won or the deal was stopped, 1 if you were the fool,
+2 for an option the game will not take.
+USAGE
+}
+
+sub run {
+    my ($class, @argv) = @_;
+    my %opt = (level => 3, seat => 1);
+
+    my $ok = eval {
+        local $SIG{__WARN__} = sub { print STDERR "durak: $_[0]" };
+        Getopt::Long::GetOptionsFromArray(\@argv, \%opt,
+            'level=i', 'seat=i', 'seed=s', 'ascii', 'colour!',
+            'paint!', 'pick!', 'width=i', 'height=i', 'help');
+    };
+    if (!$ok) { print STDERR _usage(); return 2 }
+    if ($opt{help}) { print _usage(); return 0 }
+    if (@argv) { print STDERR "durak: not an option: $argv[0]\n", _usage(); return 2 }
+
+    my $levels = Game::Durak::Bot->ladder;
+    unless ($opt{seat} =~ /\A[12]\z/) {
+        print STDERR "durak: --seat must be 1 or 2, not '$opt{seat}'\n";
+        return 2;
+    }
+    unless ($opt{level} =~ /\A[0-9]+\z/ && $opt{level} >= 1 && $opt{level} <= $levels) {
+        print STDERR "durak: --level must be 1 to $levels, not '$opt{level}'\n";
+        return 2;
+    }
+
+    my $said = defined $opt{seed} ? $opt{seed}
+             : join q{}, map { chr 97 + int rand 26 } 1 .. 32;
+    my $seed = sprintf q{%-32.32s}, $said;
+
+    my $terminal = $class->new(
+        seed   => $seed,
+        level  => $opt{level},
+        seat   => $opt{seat},
+        ascii  => $opt{ascii},
+        colour => $opt{colour},
+        paint  => $opt{paint},
+        width  => $opt{width},
+        height => $opt{height},
+        (defined $opt{pick} ? (picking => $opt{pick} ? 1 : 0) : ()),
+    );
+
+    local @SIG{qw(INT TERM HUP)};
+    for my $sig (qw(INT TERM HUP)) {
+        $SIG{$sig} = sub { $terminal->leave_raw; $SIG{$sig} = 'DEFAULT'; kill $sig, $$ };
+    }
+
+    my $result = eval { $terminal->play };
+    my $died = $@;
+    $terminal->leave_raw;
+    die $died if $died;
+    return 0 unless $result;
+
+    $terminal->say('');
+    $terminal->say("the seed was $said");
+
+    return 1 if ref $result eq 'HASH'
+        && defined $result->{fool} && $result->{fool} == $opt{seat};
+    return 0;
+}
+
 1;
 
 __END__
@@ -644,14 +733,14 @@ Game::Durak::Terminal - a deal of durak at a terminal
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 
     my $terminal = Game::Durak::Terminal->new(
         seed => $thirty_two_bytes, level => 3, seat => 1,
     );
-    my $result = $terminal->run;
+    my $result = $terminal->play;
 
 =head1 DESCRIPTION
 
@@ -731,10 +820,24 @@ plain lines, and into the next frame's header when it is painting.
 Builds the game from the seed and keeps it. Dies for a seed the engine
 refuses, because a terminal with no game is not a game.
 
-=head2 run
+=head2 play
 
 Plays until the deal ends or the reader says so, and returns the result
 hashref, or undef when somebody quit.
+
+=head2 run
+
+    exit Game::Durak::Terminal->run(@ARGV);
+
+The whole command line program as a class method: parses the options
+F<bin/durak> documents, builds the terminal, plays the deal, prints the seed
+at the end, and returns the exit status rather than calling C<exit>: C<0> if
+you won or the deal was stopped, C<1> if you were the fool, C<2> for a bad
+option or a refused value, with the usage on C<STDERR>. C<--help> prints the
+usage on C<STDOUT> and returns C<0>. Signal handlers are local to the call and
+the terminal is left in cooked mode on every way out, so a launcher such as
+L<Game::Terminal> can call it in its own process and carry on afterwards.
+Colour is off under C<NO_COLOR> as well as off a terminal.
 
 =head2 table, hand_line, bout_line, card, card_suit
 

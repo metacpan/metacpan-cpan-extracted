@@ -10,7 +10,7 @@ use Object::Proto::Sugar;
 
 use Game::Brandubh::Engine ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use constant {
     ONGOING         => 0,
@@ -166,7 +166,7 @@ Game::Brandubh::Rules - a game of brandubh: the moves made, and how it ends
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

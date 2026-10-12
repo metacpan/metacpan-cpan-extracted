@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="345" viewBox="0 0 780 345" role="img" aria-label="perl examples/cookbook/follow-log.pl">
+<title>perl examples/cookbook/follow-log.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="748" height="310" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="748" height="310" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="748" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="390" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/cookbook/follow-log.pl</text>
+<rect x="16.5" y="16.5" width="747" height="309" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="39" y="96" width="702" height="216" fill="#1e2332"/>
+<rect x="48" y="104" width="684" height="1" fill="#78a0dc"/>
+<rect x="43" y="114" width="1" height="180" fill="#78a0dc"/>
+<rect x="727" y="114" width="1" height="126" fill="#464c5a"/>
+<rect x="736" y="114" width="1" height="180" fill="#78a0dc"/>
+<rect x="727" y="240" width="2" height="54" fill="#61afef"/>
+<rect x="48" y="284" width="297" height="2" fill="#61afef"/>
+<rect x="345" y="284" width="378" height="1" fill="#464c5a"/>
+<rect x="48" y="302" width="684" height="1" fill="#78a0dc"/>
+</g>
+<polyline points="43.5 114 43.5 109 43.538 108.413 43.653 107.835 43.843 107.278 44.103 106.75 44.43 106.261 44.818 105.818 45.261 105.43 45.75 105.103 46.278 104.843 46.835 104.653 47.413 104.538 48 104.5 48 104.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="736.5 114 736.5 109 736.462 108.413 736.347 107.835 736.157 107.278 735.897 106.75 735.57 106.261 735.182 105.818 734.739 105.43 734.25 105.103 733.722 104.843 733.165 104.653 732.587 104.538 732 104.5 732 104.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="43.5 294 43.5 298 43.538 298.587 43.653 299.165 43.843 299.722 44.103 300.25 44.43 300.739 44.818 301.182 45.261 301.57 45.75 301.897 46.278 302.157 46.835 302.347 47.413 302.462 48 302.5 48 302.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="736.5 294 736.5 298 736.462 298.587 736.347 299.165 736.157 299.722 735.897 300.25 735.57 300.739 735.182 301.182 734.739 301.57 734.25 301.897 733.722 302.157 733.165 302.347 732.587 302.462 732 302.5 732 302.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
+<g class="terminal">
+<text x="39" y="74" textLength="666" fill="#e6e6e6">Wheel or Up/Down scroll, Left/Right scroll sideways, Home goes to the top,</text>
+<text x="39" y="92" textLength="252" fill="#e6e6e6">End follows the newest line.</text>
+<text x="48" y="128" textLength="81" fill="#c8d2e6">Line   27</text>
+<text x="48" y="146" textLength="81" fill="#c8d2e6">Line   28</text>
+<text x="48" y="164" textLength="81" fill="#c8d2e6">Line   29</text>
+<text x="48" y="182" textLength="675" fill="#c8d2e6">Line   30 -----------------------------------------------------------------</text>
+<text x="48" y="200" textLength="81" fill="#c8d2e6">Line   31</text>
+<text x="48" y="218" textLength="81" fill="#c8d2e6">Line   32</text>
+<text x="48" y="236" textLength="81" fill="#c8d2e6">Line   33</text>
+<text x="48" y="254" textLength="81" fill="#c8d2e6">Line   34</text>
+<text x="48" y="272" textLength="675" fill="#c8d2e6">Line   35 -----------------------------------------------------------------</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

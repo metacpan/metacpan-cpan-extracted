@@ -137,7 +137,7 @@ like($$other_told, qr/a draw, and no fool/, 'a drawn deal says so');
 # A whole deal through run, with an input that always answers something.
 my $said = join q{}, map { "$_\n" } ((1 .. 6, q{t}, q{d}, q{x}) x 120);
 my ($player, $shown) = terminal(said => $said, seed => seed32('durak-terminal'), level => 3);
-my $result = $player->run;
+my $result = $player->play;
 
 ok($result, 'the deal ended');
 like($$shown, qr/durak: the loser is the fool/, 'the terminal introduced itself');
@@ -395,7 +395,7 @@ subtest 'no key source at all falls back to typing' => sub {
     my ($t, $said) = terminal(said => "q\n", paint => 0, picking => 1,
         seed => seed32('fall'), level => 1, seat => 1);
     is($t->keys_available, 0, 'nothing to read keys with');
-    $t->run;
+    $t->play;
     like($$said, qr/a card/, 'so the typed prompt was printed');
     is($t->picking, 0, 'and it does not try the keys again');
 };

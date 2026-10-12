@@ -92,4 +92,17 @@ SKIP: {
     ok(@deps > 0, 'Install::Files records the upstream ABI deps');
 }
 
-done_testing;
+# ---- the table over a Swagger 2.0 document ---------------------------------
+# Nothing in the ABI reads the version: it drives the compiled table, and a
+# 2.0 document compiles to the same table its 3.0 twin does.
+{
+    my $api20 = Open::API->new(spec => "$FindBin::Bin/spec/petstore-2.0.json");
+    my ($op) = Open::API::_abi_selftest($api20, 'GET', '/pets/1', undef);
+    is($op, 'find pet by id', '2.0: route through the table resolves the operationId');
+    my ($mop) = $api20->match('GET', '/pets/1');
+    is($op, $mop, '2.0: ABI route agrees with native match');
+    my (undef, $allow) = Open::API::_abi_selftest($api20, 'PATCH', '/pets', undef);
+    is_deeply([ sort @$allow ], [ 'GET', 'POST' ], '2.0: 405 hands back the Allow list');
+}
+
+done_testing();

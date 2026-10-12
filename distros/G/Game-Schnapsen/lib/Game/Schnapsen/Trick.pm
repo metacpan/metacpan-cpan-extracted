@@ -7,7 +7,7 @@ use Exporter 'import';
 
 use Game::Schnapsen::Card qw(suit_of power_of points_of);
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 our @EXPORT_OK = qw(winner_of value_of legal_follows follow_band);
 
 sub winner_of {
@@ -60,7 +60,7 @@ Game::Schnapsen::Trick - who wins a trick, and what may answer a lead
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

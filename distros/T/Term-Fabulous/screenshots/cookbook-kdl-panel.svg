@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="528" height="255" viewBox="0 0 528 255" role="img" aria-label="perl examples/cookbook/kdl-panel.pl">
+<title>perl examples/cookbook/kdl-panel.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="496" height="220" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="496" height="220" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="496" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="264" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/cookbook/kdl-panel.pl</text>
+<rect x="16.5" y="16.5" width="495" height="219" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="39" y="68" width="342" height="1" fill="#46556e"/>
+<rect x="34" y="78" width="1" height="36" fill="#46556e"/>
+<rect x="385" y="78" width="1" height="36" fill="#46556e"/>
+<rect x="39" y="122" width="342" height="1" fill="#46556e"/>
+<rect x="33" y="157" width="1" height="57" fill="#e5c07b"/>
+<rect x="33" y="157" width="354" height="1" fill="#e5c07b"/>
+<rect x="386" y="157" width="1" height="57" fill="#e5c07b"/>
+<rect x="35" y="159" width="1" height="53" fill="#e5c07b"/>
+<rect x="35" y="159" width="350" height="1" fill="#e5c07b"/>
+<rect x="384" y="159" width="1" height="53" fill="#e5c07b"/>
+<rect x="35" y="211" width="350" height="1" fill="#e5c07b"/>
+<rect x="33" y="213" width="354" height="1" fill="#e5c07b"/>
+</g>
+<polyline points="34.5 78 34.5 73 34.538 72.413 34.653 71.835 34.843 71.278 35.103 70.75 35.43 70.261 35.818 69.818 36.261 69.43 36.75 69.103 37.278 68.843 37.835 68.653 38.413 68.538 39 68.5 39 68.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="385.5 78 385.5 73 385.462 72.413 385.347 71.835 385.157 71.278 384.897 70.75 384.57 70.261 384.182 69.818 383.739 69.43 383.25 69.103 382.722 68.843 382.165 68.653 381.587 68.538 381 68.5 381 68.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="34.5 114 34.5 118 34.538 118.587 34.653 119.165 34.843 119.722 35.103 120.25 35.43 120.739 35.818 121.182 36.261 121.57 36.75 121.897 37.278 122.157 37.835 122.347 38.413 122.462 39 122.5 39 122.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="385.5 114 385.5 118 385.462 118.587 385.347 119.165 385.157 119.722 384.897 120.25 384.57 120.739 384.182 121.182 383.739 121.57 383.25 121.897 382.722 122.157 382.165 122.347 381.587 122.462 381 122.5 381 122.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<g class="terminal">
+<text x="48" y="92" textLength="63" fill="#61afef">Network</text>
+<text x="48" y="110" textLength="288" fill="#dcdcdc">Connected to the office network.</text>
+<text x="48" y="182" textLength="36" fill="#ffc850">Disk</text>
+<text x="48" y="200" textLength="81" fill="#dcdcdc">42 % used</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

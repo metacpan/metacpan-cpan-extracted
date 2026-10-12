@@ -270,19 +270,25 @@ static SV *pcf_submitted(pTHX_ SV *c, HV *cfg) {
         IV  max = pcf_cfg_iv(aTHX_ cfg, "max_body", 65536);
         const char *field;
         STRLEN fl;
-        SV *req, *argv[1], *got;
+        SV *req, *form, **e;
         if (!ct) return NULL;
         if (!strnEQ(SvPVX(ct), "application/x-www-form-urlencoded", 33))
             return NULL;
         if (cl && SvIV(cl) > max) return NULL;
 
         field = ps_cfg_str(aTHX_ cfg, "field", "_csrf", &fl);
+        /* The form table and nothing else. `param` looks in the query string
+         * first, and a token accepted from there is a token in access logs
+         * and Referer headers. */
         req = pcx_force(aTHX_ pcx_av(aTHX_ c), PCX_REQ, "Punk::Request",
                         pcx_get(aTHX_ pcx_av(aTHX_ c), PCX_ENV));
-        argv[0] = sv_2mortal(newSVpvn(field, fl));
-        got = pcx_call_meth(aTHX_ req, "param", argv, 1, 1);
-        if (got) sv_2mortal(got);
-        return (got && SvOK(got) && SvCUR(got)) ? got : NULL;
+        form = pcx_call_meth(aTHX_ req, "form", NULL, 0, 1);
+        if (form) sv_2mortal(form);
+        if (!(form && SvROK(form) && SvTYPE(SvRV(form)) == SVt_PVHV))
+            return NULL;
+        e = hv_fetch((HV *)SvRV(form), field, (I32)fl, 0);
+        if (!(e && *e && SvOK(*e) && !SvROK(*e) && SvCUR(*e))) return NULL;
+        return sv_2mortal(newSVsv(*e));
     }
 }
 
@@ -312,9 +318,36 @@ static int pcf_exempt(pTHX_ HV *cfg, SV *path) {
         const char *xv;
         if (!(x && *x && SvOK(*x))) continue;
         xv = SvPV_const(*x, xl);
-        if (xl <= pl && memEQ(p, xv, xl)) return 1;   /* prefix match */
+        /* on a segment boundary: '/hooks' covers /hooks and /hooks/x and
+         * not /hooksadmin. A prefix written with its own trailing slash
+         * already ends on one. */
+        if (xl && xv[xl - 1] == '/') {
+            if (xl <= pl && memEQ(p, xv, xl)) return 1;
+        }
+        else if (ps_under(p, pl, xv, xl)) return 1;
     }
     return 0;
+}
+
+/* Is this Authorization header one a script had to attach? Bearer and the
+ * like are; Basic, Digest, Negotiate and NTLM are not - a browser that has
+ * the credentials sends them by itself on a cross-site request, exactly as it
+ * does a cookie, so they exempt nothing. */
+static int pcf_explicit_auth(pTHX_ SV *auth) {
+    static const char *const ambient[] = { "basic", "digest", "negotiate",
+                                           "ntlm", NULL };
+    STRLEN l, sl = 0;
+    const char *p;
+    int i;
+    if (!auth) return 0;
+    p = SvPV_const(auth, l);
+    while (l && (*p == ' ' || *p == '\t')) { p++; l--; }
+    while (sl < l && p[sl] != ' ' && p[sl] != '\t') sl++;
+    if (!sl || sl == l) return 0;        /* no scheme, or no credentials */
+    for (i = 0; ambient[i]; i++)
+        if (strlen(ambient[i]) == sl && foldEQ(p, ambient[i], (I32)sl))
+            return 0;
+    return 1;
 }
 
 /* The 403, in the shape everything else in Punk answers errors with. */
@@ -363,7 +396,8 @@ static SV *pcf_check(pTHX_ SV *c) {
     }
 
     /* Not riding on cookies, so not a CSRF target. */
-    if (pcf_env_str(aTHX_ c, "HTTP_AUTHORIZATION")) return NULL;
+    if (pcf_explicit_auth(aTHX_ pcf_env_str(aTHX_ c, "HTTP_AUTHORIZATION")))
+        return NULL;
     if (pcf_exempt(aTHX_ cfg, pcf_env_str(aTHX_ c, "PATH_INFO"))) return NULL;
 
     given = pcf_submitted(aTHX_ c, cfg);
@@ -423,7 +457,8 @@ static void pcf_writeback(pTHX_ SV *c, SV *resp) {
     cookie_name = ps_cfg_str(aTHX_ cfg, "cookie", "csrf", &nl);
     name = sv_2mortal(newSVpvn(cookie_name, nl));
     av_push(headers, newSVpvs("Set-Cookie"));
-    av_push(headers, pk_build_cookie(aTHX_ name, tok, ckopts));
+    av_push(headers, pk_build_cookie_ex(aTHX_ name, tok, ckopts,
+                                        ps_secure_default(aTHX_ c)));
 }
 
 #endif /* PUNK_CSRF_H */

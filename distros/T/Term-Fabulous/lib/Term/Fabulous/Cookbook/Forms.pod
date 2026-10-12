@@ -1,0 +1,2114 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Term::Fabulous::Cookbook::Forms - Recipes: forms, dialogs and input widgets
+
+=head1 DESCRIPTION
+
+This page is part of L<Term::Fabulous::Cookbook>. Previous page: L<Term::Fabulous::Cookbook::LiveData>. Next page: L<Term::Fabulous::Cookbook::Menus>.
+
+The recipes on this page build forms: they read text, choices and
+numbers from the user, check and collect the values, open a dialog over
+the screen, ask a question below the shell's output, and control the
+keyboard focus. Most recipes are complete programs, shipped in
+F<examples/cookbook/> (one in F<examples/>), with a screenshot and
+notes on every feature they use; the others are short snippets for one
+of these programs.
+
+The recipes use the input widgets
+L<Term::Fabulous::Widget::TextField>, L<Term::Fabulous::Widget::TextArea>,
+L<Term::Fabulous::Widget::Checkbox>, L<Term::Fabulous::Widget::RadioGroup>
+with L<Term::Fabulous::Widget::RadioButton>,
+L<Term::Fabulous::Widget::Dropdown> and L<Term::Fabulous::Widget::Slider>,
+the checks of L<Term::Fabulous::Validator>,
+the dialog L<Term::Fabulous::Widget::Dialog>, the prompt
+L<Term::Fabulous::Widget::Prompt>, the file dialog
+L<Term::Fabulous::Widget::FileDialog>, the color picker
+L<Term::Fabulous::Widget::ColorPicker>, the clipboard of
+L<Term::Fabulous::Editor>, and L<Term::Fabulous::Layout> for a form
+described in KDL.
+
+L<Term::Fabulous::Manual::Forms> explains the input widgets and
+L<what they have in common|Term::Fabulous::Manual::Forms/FORMS AND INPUT WIDGETS>:
+values, the C<Change> event, disabling, colors and size.
+L<The focus chapter of the manual|Term::Fabulous::Manual::Events/FOCUS> explains the keyboard focus and
+the Tab order, and L<Term::Fabulous::Manual::KDL> the KDL
+layout files.
+
+The recipes on this page:
+
+=over
+
+=item *
+
+L</A login form (centered dialog, masked password)>
+
+=item *
+
+L</Check the values of a form (required, validator)>
+
+=item *
+
+L</Write your own checks and restrict typing (accept, pattern, code)>
+
+=item *
+
+L</Ask a question in a dialog (Dialog widget)>
+
+=item *
+
+L</Confirm before quitting (Prompt)>
+
+=item *
+
+L</Ask for a number and check it (Prompt, validator)>
+
+=item *
+
+L</Open and save a file (FileDialog)>
+
+=item *
+
+L</Ask for a color (ColorPicker in a Prompt)>
+
+=item *
+
+L</Ask for input below the shell's output (inline mode)>
+
+=item *
+
+L</Choose from options in Perl (Dropdown, RadioGroup, Slider)>
+
+=item *
+
+L</Read all values of a form>
+
+=item *
+
+L</Find widgets by id>
+
+=item *
+
+L</Build a form from a KDL file (text fields, radio buttons, dropdown, slider, checkbox)>
+
+=item *
+
+L</Disable inputs until a checkbox is checked>
+
+=item *
+
+L</Show a status line that follows the focus (OnFocus)>
+
+=item *
+
+L</Change the Tab order (HasFocusOrder)>
+
+=item *
+
+L</Copy and paste through the clipboard>
+
+=back
+
+=head1 A login form (centered dialog, masked password)
+
+Goal: a centered dialog with a user name, a masked password and a
+check box, which checks that both fields are filled in when the user
+presses Enter.
+
+This program is shipped as F<examples/cookbook/login-form.pl>.
+
+=for code-from examples/cookbook/login-form.pl
+
+	use v5.32;
+	use warnings;
+	use feature 'signatures';
+	no warnings 'experimental::signatures';
+
+	use Term::Fabulous;
+	use Term::Fabulous::Enum::BorderStyle;
+	use Term::Fabulous::Widget::Box;
+	use Term::Fabulous::Widget::Checkbox;
+	use Term::Fabulous::Widget::Text;
+	use Term::Fabulous::Widget::TextField;
+	use Clay::XS qw(sizing_grow sizing_fixed CLAY_TOP_TO_BOTTOM CLAY_ALIGN_X_CENTER CLAY_ALIGN_Y_CENTER);
+
+	my $root = Term::Fabulous::Widget::Box->new(
+		layout => {
+			sizing          => { width => sizing_grow(),       height => sizing_grow() },
+			child_alignment => { x     => CLAY_ALIGN_X_CENTER, y      => CLAY_ALIGN_Y_CENTER },
+		},
+	);
+
+	my $dialog = Term::Fabulous::Widget::Box->new(
+		background_color => [ 28, 33, 45, 255 ],
+		bordered         => 1,
+		border_color     => [ 97, 175, 239, 255 ],
+		border_style     => Term::Fabulous::Enum::BorderStyle->Round,
+		layout           => {
+			layout_direction => CLAY_TOP_TO_BOTTOM,
+			sizing           => { width => sizing_fixed(44) },
+			padding          => { left  => 1, right => 1, top => 1, bottom => 1 },
+			child_gap        => 1,
+		},
+	);
+	$root->add_child($dialog);
+
+	sub text ( $string, $color = [ 220, 220, 220, 255 ] ) {
+		return Term::Fabulous::Widget::Text->new( text => $string, text_color => $color );
+	}
+
+	my $user = Term::Fabulous::Widget::TextField->new(
+		id               => 'user',
+		placeholder      => 'User name',
+		required         => 1,
+		required_message => 'Please enter your user name.',
+		accept           => 'a-zA-Z0-9_.-',
+		layout           => { sizing => { width => sizing_grow() } },
+	);
+	my $password = Term::Fabulous::Widget::TextField->new(
+		id               => 'password',
+		placeholder      => 'Password',
+		required         => 1,
+		required_message => 'Please enter your password.',
+		mask             => '*',
+		layout           => { sizing => { width => sizing_grow() } },
+	);
+	my $remember = Term::Fabulous::Widget::Checkbox->new( id => 'remember', label => 'Remember me' );
+	my $message  = text( 'Enter in a field logs in.', [ 150, 160, 180, 255 ] );
+	$dialog->add_child( text('Log in'), $user, $password, $remember, $message );
+
+	my $ui = Term::Fabulous->new( root => $root, width => 80, height => 24 );
+
+	sub log_in () {
+		if ( my @invalid = $dialog->invalid_inputs ) {
+			$message->text( $invalid[0]->error );
+			$ui->interaction->set_focused_widget( $invalid[0] );
+			return;
+		}
+		$message->text( sprintf 'Welcome, %s!%s', $user->value, $remember->checked ? ' (remembered)' : '' );
+		return;
+	}
+
+	# Enter in either field fires Submit on that field; both bubble to the dialog.
+	$dialog->on( Submit => sub ($event) { log_in(); return } );
+
+	$ui->interaction->set_focused_widget($user);
+	$ui->run;
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-login-form.svg" alt="A centered login dialog with a user name, a masked password, a checked box and the welcome message"></p>
+
+=end html
+
+=over
+
+=item *
+
+L<Term::Fabulous::Widget::TextField> with C<mask =E<gt> '*'> shows a star
+for every character. C<value> still returns the real text.
+
+=item *
+
+Pressing Enter in a text field fires L<Term::Fabulous::Event::Submit> on
+it. Events bubble up the tree, so one listener on the dialog box
+handles Enter in both fields. The check box fires no C<Submit>: Enter
+and Space toggle it.
+
+=item *
+
+Both fields are C<required>, with a message of their own. An empty
+required field is invalid, so C<< $dialog->invalid_inputs >> lists it,
+even though it looks like any empty field: it still shows its
+placeholder in gray, because these fields have no border to draw in
+red (see L<Term::Fabulous::Widget::Input/Invalid values>). The
+C<Submit> listener shows the first invalid field's C<error> and moves
+the focus to it; see L<Term::Fabulous::Manual::Forms/Checking input>
+and the next recipe.
+
+=item *
+
+C<accept> restricts what the user can type into the user name to the
+characters of a login name: letters, digits, C<_>, C<.> and C<->.
+Typing any other character does nothing. A validator
+(C<< validator => 'email' >>, say) would check the whole value instead;
+see L</Write your own checks and restrict typing (accept, pattern, code)>.
+
+=item *
+
+The inputs size themselves: a text field is one row high and
+C<preferred_columns> (default 20) wide unless the C<layout> says
+otherwise. Here C<sizing_grow()> makes the fields as wide as the dialog.
+
+=item *
+
+C<< $ui->interaction->set_focused_widget($widget) >> moves the keyboard
+focus from code: here to the first field at the start, and to the
+first invalid field when the input is incomplete. See
+L<Term::Fabulous::Manual::Events/Moving the focus>.
+
+=item *
+
+This dialog is the whole screen. For a dialog that opens over a running
+screen and closes again, use L<Term::Fabulous::Widget::Dialog>; see
+L</Ask a question in a dialog (Dialog widget)>.
+
+=back
+
+=head1 Check the values of a form (required, validator)
+
+Goal: a sign-up form that insists on some fields, checks e-mail
+addresses, URLs, host names, IP addresses, times, numbers and dates,
+shows what is wrong next to each field while the user types, and
+refuses to be sent until everything is right.
+
+This program is shipped as F<examples/cookbook/check-form.pl>.
+
+=for code-from examples/cookbook/check-form.pl
+
+	use v5.32;
+	use warnings;
+	use feature 'signatures';
+	no warnings 'experimental::signatures';
+
+	use Term::Fabulous;
+	use Term::Fabulous::Validator;
+	use Term::Fabulous::Widget::Box;
+	use Term::Fabulous::Widget::Checkbox;
+	use Term::Fabulous::Widget::Dropdown;
+	use Term::Fabulous::Widget::Text;
+	use Term::Fabulous::Widget::TextField;
+	use Clay::XS qw(sizing_grow CLAY_TOP_TO_BOTTOM);
+
+	my $root = Term::Fabulous::Widget::Box->new(
+		layout => {
+			layout_direction => CLAY_TOP_TO_BOTTOM,
+			sizing           => { width => sizing_grow(), height => sizing_grow() },
+			padding          => { left  => 2, right => 2, top => 1, bottom => 1 },
+			child_gap        => 1,
+		},
+	);
+	my $form = Term::Fabulous::Widget::Box->new( layout => { layout_direction => CLAY_TOP_TO_BOTTOM } );
+	$root->add_child($form);
+
+	# One row per input: a label, the input and a message beside it, which
+	# the ValidityChange listener below fills in. The width groups line up
+	# the inputs and the messages.
+	my %message_of;
+
+	sub row ( $label, $input ) {
+		my $label_box = Term::Fabulous::Widget::Box->new( width_group => 1 );
+		$label_box->add_child( Term::Fabulous::Widget::Text->new( text => $label, text_color => [ 150, 160, 180, 255 ] ) );
+		my $input_box = Term::Fabulous::Widget::Box->new( width_group => 2 );
+		$input_box->add_child($input);
+		$message_of{ $input->id } = Term::Fabulous::Widget::Text->new( text => ' ', text_color => [ 224, 108, 117, 255 ] );
+		my $row = Term::Fabulous::Widget::Box->new( layout => { child_gap => 2 } );
+		$row->add_child( $label_box, $input_box, $message_of{ $input->id } );
+		$form->add_child($row);
+		return $input;
+	}
+
+	sub text_field ( $id, %parameters ) {
+		return Term::Fabulous::Widget::TextField->new( id => $id, preferred_columns => 22, %parameters );
+	}
+
+	# Required fields, and fields checked by a named validator. An optional
+	# field may stay empty; its validator only checks what the user typed.
+	row( 'Name', text_field( 'name', required => 1, required_message => 'Please tell us your name.' ) );
+	row( 'E-mail', text_field( 'email', required => 1, validator => 'email', placeholder => 'name@example.com' ) );
+
+	row( 'Website', text_field( 'website', validator => 'url',      placeholder => 'https://...' ) );
+	row( 'Server',  text_field( 'server',  validator => 'hostname', placeholder => 'db.example.com' ) );
+	row( 'Address', text_field( 'address', validator => 'ip',       placeholder => '192.0.2.1 or 2001:db8::1' ) );
+	row( 'Alarm',   text_field( 'alarm',   validator => 'time',     placeholder => 'HH:MM' ) );
+
+	# Validators with options are objects. integer, number and date also
+	# restrict what the user can type: integer lets through only digits and
+	# the minus sign.
+	my $port_validator     = Term::Fabulous::Validator->integer( min => 1, max => 65535 );
+	my $price_validator    = Term::Fabulous::Validator->number( min => 0 );
+	my $birthday_validator = Term::Fabulous::Validator->date( message => 'Please enter your birthday as YYYY-MM-DD.' );
+	row( 'Port',     text_field( 'port',     validator => $port_validator,     value       => '8080' ) );
+	row( 'Price',    text_field( 'price',    validator => $price_validator,    placeholder => '9.99' ) );
+	row( 'Birthday', text_field( 'birthday', validator => $birthday_validator, placeholder => 'YYYY-MM-DD' ) );
+
+	# A dropdown without a choice and an unchecked check box count as empty.
+	row( 'Color', Term::Fabulous::Widget::Dropdown->new( id => 'color', required => 1, options => [qw(Red Green Blue)], placeholder => 'Choose one' ) );
+
+	row( 'Terms', Term::Fabulous::Widget::Checkbox->new( id => 'terms', required => 1, required_message => 'Please accept the terms.', label => 'I accept the terms' ) );
+
+	my $status = Term::Fabulous::Widget::Text->new( text => 'Enter in a text field sends the form.' );
+	$root->add_child($status);
+
+	# Every input reports a change of its message; the event bubbles up to
+	# the form. A valid value reports undef as its error.
+	$form->on(
+		ValidityChange => sub ($event) {
+			$message_of{ $event->target->id }->text( $event->error // ' ' );
+			return;
+		}
+	);
+
+	my $ui = Term::Fabulous->new( root => $root, width => 80, height => 24 );
+
+	# Enter in a text field fires Submit, which bubbles up to the form. An
+	# input that was never changed has reported nothing yet: validate makes
+	# it report its message now.
+	$form->on(
+		Submit => sub ($event) {
+			my @invalid = $form->invalid_inputs;
+			if ( !@invalid ) {
+				$status->text('Thank you, the form is complete.');
+				return;
+			}
+			$_->validate foreach @invalid;
+			$status->text( sprintf '%d fields need your attention.', scalar @invalid );
+			$ui->interaction->set_focused_widget( $invalid[0] );
+			return;
+		}
+	);
+
+	$ui->run;
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-check-form.svg" alt="A form of eleven inputs; ada@example, perl.org, 192.0.2.300, 70000 and 2026-02-29 are red with a message beside each, the empty color dropdown and the unchecked terms box have messages too, and the status line says 7 fields need your attention"></p>
+
+=end html
+
+The picture shows the form after the user typed a value into every
+text field and pressed Enter in the last one. The fields with an
+accepted value (C<Ada>, C<db.example.com>, C<07:30>, C<9.99>) look
+normal; the others are red and have a message. The C<x> typed into the
+port was dropped, because an C<integer> field only takes digits and a
+minus sign.
+
+=over
+
+=item *
+
+C<< required => 1 >> makes an empty value invalid. What counts as
+empty depends on the widget: an empty text, a dropdown without a
+choice, an unchecked check box. Its message is C<required_message>,
+by default C<Please fill in this field.>
+
+=item *
+
+C<validator> checks a value that is not empty. A string names one of
+the built-in validators: C<email>, C<integer>, C<number>, C<url>,
+C<hostname>, C<ip>, C<date> and C<time>. A field that is not
+C<required> may stay empty, whatever its validator says: the website,
+server, address and alarm fields are optional. A field that must be
+filled in and must be an e-mail address needs both, like the e-mail
+field here.
+
+=item *
+
+The validators that take options, such as the range of C<integer> and
+C<number> or a message of your own, are built as objects with
+L<Term::Fabulous::Validator>. Each message names what is expected,
+including the range: C<Please enter a whole number between 1 and 65535.>
+C<integer>, C<number>, C<date> and C<time> also restrict typing to the
+characters their values are made of; see
+L<Term::Fabulous::Widget::TextInput/accept>.
+
+=item *
+
+An input checks its value after every change the user makes. When the
+result differs from what it reported last, it fires
+L<ValidityChange|Term::Fabulous::Event::ValidityChange>, which bubbles
+up to the form: C<< $event->error >> is the new message, or C<undef>
+once the value is fine. One listener on the form keeps all messages up
+to date.
+
+=item *
+
+C<< $form->invalid_inputs >> lists the invalid inputs inside a widget,
+in the order of the widget tree: here from the top of the form down. An input that the user never touched has
+not reported anything yet, even when it is invalid (the color dropdown
+and the terms box here). C<< $input->validate >> makes it report now;
+the C<Submit> listener calls it for every invalid input, and then moves
+the focus to the first one.
+
+=item *
+
+The invalid look of the inputs (red text, a red check box) comes from
+the theme, see L<Term::Fabulous::Widget::Input/Invalid values>. The
+messages are ordinary Text widgets: where and how they are shown is up
+to the program.
+
+=item *
+
+A KDL layout takes C<required #true>, C<required_message "...">,
+C<validator "email"> and, for a text input, C<accept "0-9"> as properties
+(see L<Term::Fabulous::Widget::Input/KDL PROPERTIES>); validators with
+options and patterns are set from Perl.
+
+=back
+
+=head1 Write your own checks and restrict typing (accept, pattern, code)
+
+Goal: fields that accept only some characters, checks the built-in
+validators do not have (a product code, an even number, a host in one
+domain), and a check of every line of a text area.
+
+This program is shipped as F<examples/cookbook/own-checks.pl>.
+
+=for code-from examples/cookbook/own-checks.pl
+
+	use v5.32;
+	use warnings;
+	use feature 'signatures';
+	no warnings 'experimental::signatures';
+
+	use Term::Fabulous;
+	use Term::Fabulous::Validator;
+	use Term::Fabulous::Widget::Box;
+	use Term::Fabulous::Widget::Text;
+	use Term::Fabulous::Widget::TextArea;
+	use Term::Fabulous::Widget::TextField;
+	use Clay::XS qw(sizing_grow CLAY_TOP_TO_BOTTOM);
+
+	my $root = Term::Fabulous::Widget::Box->new(
+		layout => {
+			layout_direction => CLAY_TOP_TO_BOTTOM,
+			sizing           => { width => sizing_grow(), height => sizing_grow() },
+			padding          => { left  => 2, right => 2, top => 1, bottom => 1 },
+			child_gap        => 1,
+		},
+	);
+
+	# A label, the input and its message below it.
+	sub row ( $label, $input ) {
+		my $label_box = Term::Fabulous::Widget::Box->new( width_group => 1 );
+		$label_box->add_child( Term::Fabulous::Widget::Text->new( text => $label, text_color => [ 150, 160, 180, 255 ] ) );
+		my $message = Term::Fabulous::Widget::Text->new( text => ' ', text_color => [ 224, 108, 117, 255 ] );
+		my $column  = Term::Fabulous::Widget::Box->new( layout => { layout_direction => CLAY_TOP_TO_BOTTOM } );
+		$column->add_child( $input, $message );
+		my $row = Term::Fabulous::Widget::Box->new( layout => { child_gap => 2 } );
+		$row->add_child( $label_box, $column );
+		$root->add_child($row);
+
+		$input->on( ValidityChange => sub ($event) { $message->text( $event->error // ' ' ); return } );
+		return $input;
+	}
+
+	# accept with a character class body: only capital letters and digits
+	# can be typed; a pattern checks the whole value, with its own message.
+	row(
+		'Product code',
+		Term::Fabulous::Widget::TextField->new(
+			accept     => 'A-Z0-9',
+			max_length => 6,
+			validator  => Term::Fabulous::Validator->pattern( qr/\A[A-Z]{3}[0-9]{3}\z/, message => 'Three letters and three digits, such as ABC123.' ),
+		)
+	);
+
+	# accept with a regular expression, tested on every typed character:
+	# letters of any script, blanks, hyphens and apostrophes.
+	row( 'Name', Term::Fabulous::Widget::TextField->new( accept => qr/[\p{L} '-]/, placeholder => 'José Saramago' ) );
+
+	# A code reference returns what is wrong with the value, or nothing.
+	row(
+		'Even number',
+		Term::Fabulous::Widget::TextField->new(
+			validator => sub ($value) {
+				return 'Please enter a whole number.' unless $value =~ /\A-?[0-9]+\z/;
+				return 'Please enter an even number.' if $value % 2;
+				return;
+			},
+		)
+	);
+
+	# A list: every validator must pass, the first message wins.
+	row(
+		'Mail server',
+		Term::Fabulous::Widget::TextField->new(
+			validator   => [ 'hostname', Term::Fabulous::Validator->pattern( qr/\.example\.com\z/i, message => 'Please use a host in example.com.' ) ],
+			placeholder => 'mail.example.com',
+		)
+	);
+
+	# A validator object can check values outside of a widget too: here
+	# each line of a text area.
+	my $hostname = Term::Fabulous::Validator->hostname;
+	row(
+		'Hosts',
+		Term::Fabulous::Widget::TextArea->new(
+			preferred_rows => 3,
+			validator      => sub ($value) {
+				my @lines = split /\n/, $value;
+				foreach my $number ( 1 .. @lines ) {
+					my $error = $hostname->check( $lines[ $number - 1 ] ) // next;
+					return "Line $number: $error";
+				}
+				return;
+			},
+		)
+	);
+
+	$root->add_child( Term::Fabulous::Widget::Text->new( text => 'Tab moves to the next field, Escape quits.', text_color => [ 150, 160, 180, 255 ] ) );
+
+	my $ui = Term::Fabulous->new( root => $root, width => 80, height => 24 );
+	$root->on( KeyPress => sub ($event) { $ui->loop->stop if ( $event->key_name // '' ) eq 'Escape'; return } );
+	$ui->run;
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-own-checks.svg" alt="Five fields with messages below them: ABC12 with Three letters and three digits, such as ABC123; the name José Saramago without a message; 7 with Please enter an even number; mail.perl.org with Please use a host in example.com; and a text area of two hosts with Line 2: Please enter a host name"></p>
+
+=end html
+
+The picture shows the program after the user typed C<abcABC12> into the
+product code, C<José2 Saramago> into the name, C<7>, C<mail.perl.org>
+and two lines of hosts. The lower-case C<abc> and the C<2> were
+dropped while typing; every other field shows its message.
+
+=over
+
+=item *
+
+C<accept> decides which characters the user can type or paste into a
+text input. A string is what goes between the brackets of a character
+class in a regular expression: C<'A-Z0-9'> means C<[A-Z0-9]>,
+C<'^0-9'> everything but digits. A regular expression (C<qr/[\p{L} '-]/>)
+is matched against each typed character, and a code reference gets
+each character and returns true to let it in. A rejected key does
+nothing; pasted text keeps only its accepted characters. Setting
+C<value> from Perl to a text with a rejected character dies.
+
+=item *
+
+C<accept> and C<validator> do different jobs: C<accept> looks at one
+character at a time while the user types, C<validator> looks at the
+whole value. The product code needs both: C<accept> keeps out
+lower-case letters, and the pattern says that C<ABC12> is not complete
+yet.
+
+=item *
+
+A regular expression as a C<validator> must match the whole value, so
+anchor it with C<\A> and C<\z>. Given directly
+(C<< validator => qr/.../ >>) its message is C<Please match the
+expected format.>; C<< Term::Fabulous::Validator->pattern >> takes a
+C<message> of your own.
+
+=item *
+
+A code reference gets the value and returns what is wrong with it: a
+message string, or nothing (C<return;>) for a valid value. It is never
+called with an empty value.
+
+=item *
+
+An array reference of validators checks them in order; all must pass,
+and the first one that fails gives the message. The mail server must be
+a host name and end in C<.example.com>.
+
+=item *
+
+A L<Term::Fabulous::Validator> object works without a widget too:
+C<< $validator->check($value) >> returns the message or C<undef>. The
+text area checks each of its lines with the C<hostname> validator and
+names the first bad line.
+
+=item *
+
+Each input here has its own C<ValidityChange> listener that writes the
+message below it; compare the single listener on the form in
+L</Check the values of a form (required, validator)>.
+
+=back
+
+=head1 Ask a question in a dialog (Dialog widget)
+
+Goal: a "Really quit?" dialog that opens over the screen when the user
+presses Ctrl+Q, keeps the keyboard focus inside itself, and closes on Escape
+or a button.
+
+This recipe builds the dialog from its parts, which shows how a dialog
+works. For a question with a few buttons, a
+L<Term::Fabulous::Widget::Prompt> does the same in one call: see the
+next recipe, L</Confirm before quitting (Prompt)>.
+
+This program is shipped as F<examples/cookbook/confirm-dialog.pl>.
+
+=for code-from examples/cookbook/confirm-dialog.pl
+
+	use v5.32;
+	use warnings;
+	use feature 'signatures';
+	no warnings 'experimental::signatures';
+
+	use Term::Fabulous;
+	use Term::Fabulous::Widget::Box;
+	use Term::Fabulous::Widget::Button;
+	use Term::Fabulous::Widget::Dialog;
+	use Term::Fabulous::Widget::Text;
+	use Term::Fabulous::Widget::TextArea;
+	use Term::Fabulous::Enum::BorderStyle;
+	use Clay::UI::Enum::Result;
+	use Clay::XS qw(sizing_grow sizing_fixed CLAY_TOP_TO_BOTTOM);
+
+	sub text ( $string, $color = [ 220, 220, 220, 255 ] ) {
+		return Term::Fabulous::Widget::Text->new( text => $string, text_color => $color );
+	}
+
+	my $root = Term::Fabulous::Widget::Box->new(
+		layout => {
+			layout_direction => CLAY_TOP_TO_BOTTOM,
+			sizing           => { width => sizing_grow(), height => sizing_grow() },
+			padding          => { left  => 2, right => 2, top => 1, bottom => 1 },
+			child_gap        => 1,
+		},
+	);
+	my $notes = Term::Fabulous::Widget::TextArea->new( id => 'notes', layout => { sizing => { width => sizing_grow(), height => sizing_grow() } } );
+	$root->add_child( text('Type some notes. Ctrl+Q asks before quitting.'), $notes );
+
+	my $ui = Term::Fabulous->new( root => $root, width => 80, height => 24 );
+
+	# The dialog is built once and opened as often as needed. Its look
+	# (border, background, padding) comes with the widget.
+	my $dialog = Term::Fabulous::Widget::Dialog->new( id => 'confirm', layout => { sizing => { width => sizing_fixed(44) } } );
+
+	sub button ( $caption, $action ) {
+		my $button = Term::Fabulous::Widget::Button->new(
+			background_color => [ 43, 58, 85, 255 ],
+			bordered         => 1,
+			border_color     => [ 28, 33, 45, 255 ],    # the dialog background: only the focus shows
+			border_style     => Term::Fabulous::Enum::BorderStyle->Round,
+			layout           => { padding => { left => 1, right => 1 } },
+		);
+		$button->add_child( text($caption) );
+		$button->on( Activate => sub ($event) { $action->(); return } );
+		return $button;
+	}
+
+	my $buttons = Term::Fabulous::Widget::Box->new( layout => { child_gap => 2 } );
+	$buttons->add_child(
+		button( 'Quit',   sub { $ui->loop->stop } ),
+		button( 'Cancel', sub { $dialog->close } ),
+	);
+	$dialog->add_child( text('Really quit? Unsaved notes are lost.'), $buttons );
+
+	$root->on(
+		KeyPress => sub ($event) {
+			return Clay::UI::Enum::Result->CONTINUE unless ( $event->key_name // '' ) eq 'Ctrl+Q';
+			$dialog->open($ui);
+			return;
+		}
+	);
+
+	$ui->interaction->set_focused_widget($notes);
+	$ui->run;
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-confirm-dialog.svg" alt="The Really quit? dialog with Quit and Cancel buttons over the dimmed notes; Quit has the focus and a blue border"></p>
+
+=end html
+
+=over
+
+=item *
+
+C<< $dialog->open($ui) >> adds the dialog to the screen: centered, on
+top of everything, behind a translucent backdrop that dims the rest.
+The first focusable widget inside it (the Quit button) gets the focus,
+Tab and Shift+Tab cycle through the dialog's widgets only, and clicks
+outside it reach nothing behind it. See L<Term::Fabulous::Widget::Dialog>.
+
+=item *
+
+A button shows the focus only through its border, which turns blue
+(C<focus_border_color>). So the buttons get a rounded border in the
+color of the dialog's background, which does not stand out until the
+button has the focus. In the picture, the blue border shows that Enter would
+press Quit. See L<Term::Fabulous::Widget::Button/focus_border_color>.
+
+=item *
+
+Escape closes the dialog (C<close_on_escape>, on by default), and so
+does C<< $dialog->close >>; the Cancel button calls it. Closing puts the
+focus back on the text area and fires
+L<Close|Term::Fabulous::Event::Close> on the dialog.
+
+=item *
+
+The Ctrl+Q shortcut lives on the root. The text area types letters
+such as q itself, so they never reach the root, but it passes Ctrl+Q
+on. While the dialog is open, no key gets past it: the backdrop stops
+every key the dialog's widgets do not use, so the shortcuts of the
+program behind the dialog are off until it closes.
+
+=item *
+
+The text area keeps its text while the dialog is open and after it
+closes: the dialog is added to and removed from the tree, nothing else
+changes. The dialog itself keeps its children between openings.
+
+=back
+
+=head1 Confirm before quitting (Prompt)
+
+Goal: ask "Quit?" before the program ends, in one call, and start on
+the button that does no harm.
+
+This program is shipped as F<examples/cookbook/confirm-prompt.pl>.
+
+=for code-from examples/cookbook/confirm-prompt.pl
+
+	use v5.32;
+	use warnings;
+	use feature 'signatures';
+	no warnings 'experimental::signatures';
+
+	use Term::Fabulous;
+	use Term::Fabulous::Widget::Box;
+	use Term::Fabulous::Widget::Prompt;
+	use Term::Fabulous::Widget::Text;
+	use Term::Fabulous::Widget::TextArea;
+	use Clay::UI::Enum::Result;
+	use Clay::XS qw(sizing_grow CLAY_TOP_TO_BOTTOM);
+
+	my $root = Term::Fabulous::Widget::Box->new(
+		layout => {
+			layout_direction => CLAY_TOP_TO_BOTTOM,
+			sizing           => { width => sizing_grow(), height => sizing_grow() },
+			padding          => { left  => 2, right => 2, top => 1, bottom => 1 },
+			child_gap        => 1,
+		},
+	);
+	my $notes = Term::Fabulous::Widget::TextArea->new( layout => { sizing => { width => sizing_grow(), height => sizing_grow() } } );
+	$root->add_child( Term::Fabulous::Widget::Text->new( text => 'Type some notes. Ctrl+Q asks before quitting.' ), $notes );
+
+	my $ui = Term::Fabulous->new( root => $root, width => 80, height => 24 );
+
+	$root->on(
+		KeyPress => sub ($event) {
+			return Clay::UI::Enum::Result->CONTINUE unless ( $event->key_name // '' ) eq 'Ctrl+Q';
+			Term::Fabulous::Widget::Prompt->confirm(
+				$ui,
+				title   => 'Quit?',
+				message => 'Your notes are not saved anywhere.',
+				ok      => 'Quit',
+				cancel  => 'Keep writing',
+				focus   => 'cancel',
+			)->on(
+				Answer => sub ($event) {
+					$ui->loop->stop if $event->button eq 'ok';
+					return;
+				}
+			);
+			return;
+		}
+	);
+
+	$ui->interaction->set_focused_widget($notes);
+	$ui->run;
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-confirm-prompt.svg" alt="A Quit? prompt with the message Your notes are not saved anywhere. and the buttons Quit and Keep writing over the dimmed notes. Keep writing has the focus"></p>
+
+=end html
+
+=over
+
+=item *
+
+C<< Term::Fabulous::Widget::Prompt->confirm >> builds a prompt with a
+title, a message and two buttons, opens it, and returns it. The buttons
+have the ids C<ok> and C<cancel>, and C<ok> and C<cancel> set their
+labels. The prompt is a L<Term::Fabulous::Widget::Dialog>, so it keeps
+the focus while it is open, as the dialog of the previous recipe does.
+
+=item *
+
+C<< focus => 'cancel' >> puts the focus on Keep writing, so a hasty
+C<Enter> keeps the notes. Without it, the first button would start
+with the focus.
+
+=item *
+
+The prompt reports the answer with an C<Answer> event
+(L<Term::Fabulous::Event::Answer>), and C<on> returns the prompt, so
+the listener follows the call. C<< $event->button >> is the id of the
+button. C<Escape> answers C<cancel> too, so the program needs no code
+for it.
+
+=item *
+
+When the C<Answer> listener runs, the prompt is closed and the focus is
+back on the text area, so the user can go on writing.
+
+=back
+
+=head1 Ask for a number and check it (Prompt, validator)
+
+Goal: ask for a number of minutes in a prompt, accept only whole
+numbers from 1 to 120, and keep the prompt open with a message until
+the value is right.
+
+This program is shipped as F<examples/cookbook/ask-prompt.pl>.
+
+=for code-from examples/cookbook/ask-prompt.pl
+
+	use v5.32;
+	use warnings;
+	use feature 'signatures';
+	no warnings 'experimental::signatures';
+
+	use Term::Fabulous;
+	use Term::Fabulous::Widget::Box;
+	use Term::Fabulous::Widget::Prompt;
+	use Term::Fabulous::Widget::Text;
+	use Clay::UI::Enum::Result;
+	use Clay::XS qw(sizing_grow CLAY_TOP_TO_BOTTOM);
+
+	my $minutes = 25;
+
+	my $root = Term::Fabulous::Widget::Box->new(
+		layout => {
+			layout_direction => CLAY_TOP_TO_BOTTOM,
+			sizing           => { width => sizing_grow(), height => sizing_grow() },
+			padding          => { left  => 2, right => 2, top => 1, bottom => 1 },
+			child_gap        => 1,
+		},
+	);
+	my $session = Term::Fabulous::Widget::Text->new( text => "The next session lasts $minutes minutes." );
+	$root->add_child( $session, Term::Fabulous::Widget::Text->new( text => 't changes it, q quits.' ) );
+
+	my $ui = Term::Fabulous->new( root => $root, width => 80, height => 24 );
+
+	# The field checks that it holds a whole number; the check of the
+	# prompt runs after it and keeps the number in range.
+	sub ask_minutes () {
+		Term::Fabulous::Widget::Prompt->ask(
+			$ui,
+			title     => 'Session length',
+			message   => 'How many minutes should the next session last?',
+			label     => 'Minutes',
+			value     => $minutes,
+			required  => 1,
+			validator => 'integer',
+			check     => sub ($values) { return $values->{value} >= 1 && $values->{value} <= 120 ? undef : 'A session lasts 1 to 120 minutes.' },
+			width     => 52,
+		)->on(
+			Answer => sub ($event) {
+				return if $event->button ne 'ok';
+				$minutes = $event->value('value');
+				$session->text("The next session lasts $minutes minutes.");
+				return;
+			}
+		);
+		return;
+	}
+
+	$root->on(
+		KeyPress => sub ($event) {
+			my $key = $event->key_name // '';
+			if ( $key eq 't' ) {
+				ask_minutes();
+				return;
+			}
+			if ( $key eq 'q' ) {
+				$ui->loop->stop;
+				return;
+			}
+			return Clay::UI::Enum::Result->CONTINUE;
+		}
+	);
+
+	$ui->run;
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-ask-prompt.svg" alt="A Session length prompt asking How many minutes should the next session last?, with 300 typed in the Minutes field, the red message A session lasts 1 to 120 minutes. and the buttons OK and Cancel"></p>
+
+=end html
+
+=over
+
+=item *
+
+C<< Term::Fabulous::Widget::Prompt->ask >> builds a prompt with one text
+field, named C<value>, and the buttons C<ok> and C<cancel>. The field
+starts with the text of C<value>, all of it selected, so typing
+replaces it.
+
+=item *
+
+C<required> and C<validator> go to the text field and work as in a form
+(see L</Check the values of a form (required, validator)>): the field
+must not be empty and must hold a whole number. C<Enter> in the field
+presses OK, and OK checks the field before it answers. While something
+is wrong, the prompt stays open, shows the label of the field and what
+is wrong with it in red, and puts the cursor back in the field.
+
+=item *
+
+C<check> runs after the field found nothing wrong. It gets the values
+of all fields, so it can check a range, as here, or compare two fields.
+It returns what is wrong, as a sentence, or C<undef> when everything is
+fine.
+
+=item *
+
+C<< $event->value('value') >> is the text of the field when the user
+pressed OK.
+
+=back
+
+=head1 Open and save a file (FileDialog)
+
+Goal: a notes editor that opens a file with a file dialog, saves it
+again with one key, and asks for a name when the note has none yet or
+the user wants another one.
+
+This program is shipped as F<examples/cookbook/open-and-save.pl>. It
+starts in a folder of sample notes that it makes in a temporary
+directory and deletes when it ends, so it never writes your files.
+
+=for code-from examples/cookbook/open-and-save.pl
+
+	use v5.32;
+	use warnings;
+	use feature 'signatures';
+	no warnings 'experimental::signatures';
+
+	use Term::Fabulous;
+	use Term::Fabulous::Commands;
+	use Term::Fabulous::Widget::Box;
+	use Term::Fabulous::Widget::FileDialog;
+	use Term::Fabulous::Widget::StatusBar;
+	use Term::Fabulous::Widget::TextArea;
+	use Clay::XS qw(sizing_grow CLAY_TOP_TO_BOTTOM);
+	use Encode qw(decode);
+	use File::Basename qw(basename dirname);
+	use File::Path qw(make_path);
+	use File::Temp;
+	use Time::Local qw(timegm);
+
+	# A folder of sample notes in a temporary directory, deleted when the
+	# program ends. The days are fixed and the folder is deep enough that
+	# the dialog shows only the end of its path, so the picture is the same
+	# on every run.
+	my $temporary = File::Temp->newdir;
+	my $samples   = "$temporary/home/grace/Documents/garden-club/season-2026/notes";
+	make_path($samples);
+	foreach my $sample ( [ 'groceries.txt', "Milk\nBread\nApples\n", 28 ], [ 'ideas.md', "# Ideas\n\nA clock that runs backwards.\n", 30 ], [ 'garden.txt', "Water the tomatoes.\n" x 5, 31 ] ) {
+		my ( $name, $text, $day ) = @$sample;
+		write_text( "$samples/$name", $text ) or die "Cannot write $samples/$name: $!\n";
+		my $time = timegm( 0, 30, 10, $day, 4, 2026 );    # 10:30 on a day in May 2026
+		utime $time, $time, "$samples/$name";
+	}
+
+	my $notes  = Term::Fabulous::Widget::TextArea->new( wrap => 1, layout => { sizing => { width => sizing_grow(), height => sizing_grow() } } );
+	my $path   = undef;    # the file of the note; undef until it has one
+	my $status = Term::Fabulous::Widget::StatusBar->new(
+		message => 'Ctrl+O opens, Ctrl+S saves, Alt+s saves as, Ctrl+Q quits.',
+		parts   => sub { [ defined $path ? name_of($path) : 'untitled', 'dim' ] },
+	);
+	my $root = Term::Fabulous::Widget::Box->new( layout => { layout_direction => CLAY_TOP_TO_BOTTOM, sizing => { width => sizing_grow(), height => sizing_grow() } } );
+	$root->add_child( $notes, $status );
+
+	my $ui = Term::Fabulous->new( root => $root, width => 80, height => 24 );
+
+	# A path is bytes, as the file system and the dialog's answer have it;
+	# the status bar shows the file's name decoded.
+	sub name_of ($file) {
+		return decode( 'UTF-8', basename($file), Encode::FB_PERLQQ | Encode::LEAVE_SRC );
+	}
+
+	# Both return false when the file cannot be read or written; $! says why.
+	sub read_text ($file) {
+		open my $in, '<:encoding(UTF-8)', $file or return;
+		my $text = do { local $/; <$in> };
+		close $in;
+		return $text;
+	}
+
+	sub write_text ( $file, $text ) {
+		open my $out, '>:encoding(UTF-8)', $file or return;
+		print {$out} $text;
+		return close $out;
+	}
+
+	sub open_note ($file) {
+		my $text = read_text($file);
+		if ( !defined $text ) {
+			$status->message( 'Cannot read ' . name_of($file) . ": $!", 'danger' );
+			return;
+		}
+		$notes->value($text);
+		$path = $file;
+		$status->message( 'Opened ' . name_of($file) . '.', 'success' );
+		return;
+	}
+
+	sub save_note ($file) {
+		if ( !write_text( $file, $notes->value ) ) {
+			$status->message( 'Cannot write ' . name_of($file) . ": $!", 'danger' );
+			return;
+		}
+		$path = $file;
+		$status->message( 'Saved ' . name_of($file) . '.', 'success' );
+		return;
+	}
+
+	# The dialogs start in the folder of the note, or in the samples.
+	sub folder () {
+		return defined $path ? dirname($path) : $samples;
+	}
+
+	sub ask_to_open () {
+		Term::Fabulous::Widget::FileDialog->new(
+			mode      => 'open',
+			directory => folder(),
+			filters   => [ [ 'Notes' => '*.txt *.md' ], [ 'All files' => '*' ] ],
+			list_rows => 5,
+			width     => 60,
+		)->on(
+			Answer => sub ($event) {
+				open_note( $event->value('path') ) if $event->button eq 'open';
+				return;
+			}
+		)->open($ui);
+		return;
+	}
+
+	sub ask_to_save () {
+		Term::Fabulous::Widget::FileDialog->new(
+			mode              => 'save',
+			directory         => folder(),
+			name              => defined $path ? basename($path) : 'untitled.txt',
+			current_file      => $path,
+			default_extension => 'txt',
+			list_rows         => 5,
+			width             => 60,
+		)->on(
+			Answer => sub ($event) {
+				save_note( $event->value('path') ) if $event->button eq 'save';
+				return;
+			}
+		)->open($ui);
+		return;
+	}
+
+	my $commands = Term::Fabulous::Commands->new(
+		commands => [
+			{ id => 'open',    label => 'Open...',    keys => ['Ctrl+O'], run => \&ask_to_open },
+			{ id => 'save',    label => 'Save',       keys => ['Ctrl+S'], run => sub { defined $path ? save_note($path) : ask_to_save() } },
+			{ id => 'save_as', label => 'Save as...', keys => ['Alt+s'],  run => \&ask_to_save },
+			{ id => 'quit',    label => 'Quit',       keys => ['Ctrl+Q'], run => sub { $ui->loop->stop } },
+		],
+	);
+	$commands->listen($root);
+
+	$ui->interaction->set_focused_widget($notes);
+	$ui->run;
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-open-and-save.svg" alt="An Open a file dialog over the empty notes editor: the folder line ends in garden-club/season-2026/notes, the list shows garden.txt, groceries.txt and ideas.md with sizes and dates, the cursor is on groceries.txt, which is also in the File field, and below are the Notes filter, the Show hidden files checkbox and the Open and Cancel buttons"></p>
+
+=end html
+
+=over
+
+=item *
+
+C<< Term::Fabulous::Widget::FileDialog->new >> builds the dialog and
+C<open> shows it; C<on> returns the dialog, so the three calls make one
+statement. The dialog reports the result with an C<Answer> event
+(L<Term::Fabulous::Event::Answer>), as a prompt does: the button is the
+mode, C<open> or C<save>, and C<< $event->value('path') >> is the
+absolute path. C<Cancel> and C<Escape> answer C<cancel>, which the
+listeners simply ignore.
+
+=item *
+
+The path is a byte string, exactly what the file system uses, so it
+goes to C<open> as it is. To show a file's name, C<name_of> decodes it
+from UTF-8 (a byte that is no UTF-8 becomes C<\xHH>).
+
+=item *
+
+In the open dialog, the cursor on a file puts its name into the
+C<File> field, and C<Enter> or a double click opens it. C<Enter> on a
+folder, or C<Backspace>, walks through the folders. The two filters
+make a dropdown: C<Notes> shows the text and Markdown files, C<All
+files> all of them. Folders always show.
+
+=item *
+
+The dialog only chooses the path. Reading and writing the file is up to
+the program: C<read_text> and C<write_text> return false when they
+fail, and the status bar says what went wrong.
+
+=item *
+
+C<Ctrl+S> saves to the note's file without a question once it has one;
+only an untitled note opens the save dialog. C<Alt+s> always opens it.
+The save dialog starts in the C<File> field with the name selected up
+to its extension, so typing a new name keeps C<.txt>; moving through
+the list leaves the name alone. A name typed without a dot gets
+C<.txt> (C<default_extension>).
+
+=item *
+
+The save dialog asks before it replaces a file that exists, with a
+second prompt above it, which starts on C<Cancel>. C<current_file>
+names the file the note already has, so saving under its own name asks
+nothing; for an untitled note it is C<undef>, and every existing file
+is asked for.
+
+=item *
+
+The commands and their keys are in a L<Term::Fabulous::Commands> table
+(see L<Term::Fabulous::Cookbook::Menus/Give a program a menu bar (MenuBar, Commands)>),
+which a menu bar could show as well.
+
+=back
+
+=head1 Ask for a color (ColorPicker in a Prompt)
+
+Goal: a setting for a color, changed in a prompt where the user picks a
+named color, types one, or moves sliders, and OK only takes a color
+that is valid.
+
+This program is shipped as F<examples/cookbook/color-prompt.pl>.
+
+=for code-from examples/cookbook/color-prompt.pl
+
+	use v5.32;
+	use warnings;
+	use feature 'signatures';
+	no warnings 'experimental::signatures';
+
+	use Term::Fabulous;
+	use Term::Fabulous::Widget::Box;
+	use Term::Fabulous::Widget::ColorPicker;
+	use Term::Fabulous::Widget::Prompt;
+	use Term::Fabulous::Widget::Text;
+	use Clay::UI::Enum::Result;
+	use Clay::XS qw(sizing_grow sizing_fixed CLAY_TOP_TO_BOTTOM);
+
+	my $color = '#e5c07b';    # the setting: the color of the highlight
+
+	my $root = Term::Fabulous::Widget::Box->new(
+		layout => {
+			layout_direction => CLAY_TOP_TO_BOTTOM,
+			sizing           => { width => sizing_grow(), height => sizing_grow() },
+			padding          => { left  => 2, right => 2, top => 1, bottom => 1 },
+			child_gap        => 1,
+		},
+	);
+	my $sample = Term::Fabulous::Widget::Box->new( background_color => $color, layout => { sizing => { width => sizing_fixed(24), height => sizing_fixed(3) } } );
+	my $label  = Term::Fabulous::Widget::Text->new( text => "Highlight color: $color" );
+	$root->add_child( $label, $sample, Term::Fabulous::Widget::Text->new( text => 'c changes the color, q quits.' ) );
+
+	my $ui = Term::Fabulous->new( root => $root, width => 80, height => 24 );
+
+	sub ask_color () {
+		my $picker = Term::Fabulous::Widget::ColorPicker->new(
+			value     => $color,
+			alpha     => 0,
+			list_rows => 6,
+			swatches  => [
+				[ '#e5c07b', 'Sand',  '#e5c07b' ],
+				[ '#61afef', 'Sky',   '#61afef' ],
+				[ '#98c379', 'Mint',  '#98c379' ],
+				[ '#e06c75', 'Rose',  '#e06c75' ],
+				[ '#c678dd', 'Lilac', '#c678dd' ],
+				[ '#56b6c2', 'Teal',  '#56b6c2' ],
+			],
+		);
+		Term::Fabulous::Widget::Prompt->new(
+			title   => 'Highlight color',
+			message => 'Pick a color, type one or move the sliders.',
+			fields  => [ { name => 'color', label => 'Color',  input   => $picker } ],
+			buttons => [ { id   => 'ok',    label => 'Use it', primary => 1 }, { id => 'cancel', label => 'Cancel' } ],
+			width   => 66,
+		)->on(
+			Answer => sub ($event) {
+				return if $event->button ne 'ok';
+				$color = $event->value('color');
+				$sample->background_color( $picker->rgba );
+				$label->text("Highlight color: $color");
+				return;
+			}
+		)->open($ui);
+		return;
+	}
+
+	$root->on(
+		KeyPress => sub ($event) {
+			my $key = $event->key_name // '';
+			if ( $key eq 'c' ) {
+				ask_color();
+				return;
+			}
+			if ( $key eq 'q' ) {
+				$ui->loop->stop;
+				return;
+			}
+			return Clay::UI::Enum::Result->CONTINUE;
+		}
+	);
+
+	$ui->run;
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-color-prompt.svg" alt="A Highlight color prompt over the dimmed setting: on the left the label Color and a framed list of six named colors with samples, Mint selected; on the right the field with #98c379 and a green sample, the RGB/HSL switch on RGB and the red, green and blue sliders at 152, 195 and 121; the buttons Use it and Cancel below"></p>
+
+=end html
+
+=over
+
+=item *
+
+A L<Term::Fabulous::Widget::ColorPicker> is one field of a
+L<Term::Fabulous::Widget::Prompt>, like a text field would be. The
+answer's C<< $event->value('color') >> is the picker's value. Its
+C<label> stands in front of it and starts the error line, so the user
+reads "Color: Please enter a color without transparency." and not the
+field's name. The picker is built anew for every prompt, so it starts
+with the current setting.
+
+=item *
+
+Each swatch is C<[ $value, $label, $color ]>. Here the value is the
+color itself, so it shows in the field when the user picks it. A
+swatch's value may also be a name the program understands, such as a
+theme's token, with the color only for the sample.
+
+=item *
+
+The value is what the user chose, as text: a swatch's value, a color
+typed as C<#rrggbb>, C<rgb(...)> or a name, or the color of the sliders
+as C<#rrggbb>. The label shows it as it is. To paint with it, the
+listener asks C<< $picker->rgba >>, which gives every kind as numbers.
+
+=item *
+
+C<< alpha => 0 >> leaves out the alpha slider, and the field refuses a
+translucent color: a highlight should hide what is behind it.
+
+=item *
+
+The prompt focuses the swatch list when it opens. C<Tab> moves on to
+the field, the RGB/HSL switch and the sliders. While the field holds
+text that is no color, C<Use it> and C<Enter> keep the prompt open and
+show what is wrong, as for any field with a validator (see
+L</Ask for a number and check it (Prompt, validator)>).
+
+=back
+
+=head1 Ask for input below the shell's output (inline mode)
+
+Goal: a prompt that asks for a name in three rows below what the shell
+showed before, instead of taking the whole screen, and leaves its
+answer there when the program goes on.
+
+This program is shipped as F<examples/cookbook/inline-prompt.pl>.
+
+=for code-from examples/cookbook/inline-prompt.pl
+
+	use v5.32;
+	use warnings;
+	use feature 'signatures';
+	no warnings 'experimental::signatures';
+
+	use Term::Fabulous;
+	use Term::Fabulous::Widget::Box;
+	use Term::Fabulous::Widget::Text;
+	use Term::Fabulous::Widget::TextField;
+	use Clay::XS qw(sizing_grow CLAY_TOP_TO_BOTTOM);
+
+	my $root = Term::Fabulous::Widget::Box->new(
+		layout => {
+			layout_direction => CLAY_TOP_TO_BOTTOM,
+			sizing           => { width => sizing_grow(), height => sizing_grow() },
+			padding          => { left  => 1,             right  => 1 },
+		},
+	);
+	my $name = Term::Fabulous::Widget::TextField->new( id => 'name', placeholder => 'Your name', layout => { sizing => { width => sizing_grow() } } );
+	my $help = Term::Fabulous::Widget::Text->new( text => 'Enter answers, Escape cancels.', text_color => [ 150, 160, 180, 255 ] );
+	$root->add_child( Term::Fabulous::Widget::Text->new( text => 'What is your name?', text_color => [ 230, 230, 230, 255 ] ), $name, $help );
+
+	# Three rows below the shell's output instead of the whole screen.
+	my $ui = Term::Fabulous->new( root => $root, width => 80, height => 3, inline => 3 );
+	$ui->interaction->set_focused_widget($name);
+
+	my $answered = 0;
+	$root->on(
+		Submit => sub ($event) {
+			$answered = 1;
+			$help->text('Thank you!');    # drawn before run returns, and left on the screen
+			$ui->loop->stop;
+			return;
+		}
+	);
+	$root->on(
+		KeyPress => sub ($event) {
+			my $key = $event->key_name // return;
+			$ui->loop->stop if $key eq 'Escape';
+			return;
+		}
+	);
+
+	$ui->run;
+	say $answered ? 'Hello, ' . $name->value . '!' : 'Cancelled.';
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-inline-prompt.svg" alt="The inline prompt in the three rows below a shell's earlier output: the question, a text field holding Ada Lovelace and a help line"></p>
+
+=end html
+
+=over
+
+=item *
+
+C<< inline => 3 >> makes L<C<run>|Term::Fabulous/run> draw into three rows
+starting at the cursor's line (the line below it when text precedes
+the cursor on its line); the terminal scrolls up first when they
+do not fit below it. The layout is as wide as the terminal and three
+rows high, so C<height> in C<new> only matters before C<run>. See
+L<Term::Fabulous/INLINE MODE>.
+
+=item *
+
+Enter in the text field fires C<Submit>, which bubbles to the root.
+The listener changes the help line and stops the loop; C<run> draws
+that change before it returns, and the three rows stay on the screen
+with the cursor below them, so the C<say> after C<run> prints on the
+next line.
+
+=item *
+
+Inline mode has no mouse support, so the terminal keeps the mouse
+for selecting and copying text, as with C<< mouse => 0 >>.
+
+=back
+
+=head1 Choose from options in Perl (Dropdown, RadioGroup, Slider)
+
+Goal: let the user pick one of several options, from a list that opens
+and from radio buttons, and a number from a range, all built in Perl.
+
+This program is shipped as F<examples/cookbook/choose-options.pl>.
+
+=for code-from examples/cookbook/choose-options.pl
+
+	use v5.32;
+	use warnings;
+	use feature 'signatures';
+	no warnings 'experimental::signatures';
+
+	use Term::Fabulous;
+	use Term::Fabulous::Widget::Box;
+	use Term::Fabulous::Widget::Dropdown;
+	use Term::Fabulous::Widget::RadioButton;
+	use Term::Fabulous::Widget::RadioGroup;
+	use Term::Fabulous::Widget::Slider;
+	use Term::Fabulous::Widget::Text;
+	use Clay::XS qw(sizing_grow CLAY_TOP_TO_BOTTOM CLAY_LEFT_TO_RIGHT);
+
+	my $root = Term::Fabulous::Widget::Box->new(
+		layout => {
+			layout_direction => CLAY_TOP_TO_BOTTOM,
+			sizing           => { width => sizing_grow(), height => sizing_grow() },
+			padding          => { left  => 2, right => 2, top => 1, bottom => 1 },
+			child_gap        => 1,
+		},
+	);
+
+	# Options are labels, [ label, value ] pairs or { label, value } hashes.
+	my $country = Term::Fabulous::Widget::Dropdown->new(
+		id          => 'country',
+		placeholder => 'Choose a country',
+		options     => [ [ 'Germany' => 'DE' ], [ 'France' => 'FR' ], [ 'Italy' => 'IT' ], { label => 'United Kingdom', value => 'GB' } ],
+	);
+
+	# The group holds the value; each button says which value it stands for.
+	my $shipping = Term::Fabulous::Widget::RadioGroup->new( id => 'shipping', value => 'standard', layout => { layout_direction => CLAY_LEFT_TO_RIGHT, child_gap => 2 } );
+	$shipping->add_child( Term::Fabulous::Widget::RadioButton->new( label => $_->[0], value => $_->[1] ) )
+		foreach [ 'Standard' => 'standard' ], [ 'Express' => 'express' ], [ 'Pick up' => 'pickup' ];
+
+	# value_format may be a code reference.
+	my $tip = Term::Fabulous::Widget::Slider->new(
+		id           => 'tip',
+		min          => 0,
+		max          => 20,
+		step         => 2.5,
+		value        => 10,
+		value_format => sub ($percent) { sprintf '%4.1f %%', $percent },
+	);
+
+	my $status = Term::Fabulous::Widget::Text->new( text => 'Nothing chosen yet.', text_color => [ 150, 200, 255, 255 ] );
+	$root->add_child( $country, $shipping, $tip, $status );
+
+	$root->on(
+		Change => sub ($event) {
+			$status->text( sprintf '%s: %s', $event->target->id, $event->value // 'none' );
+			return;
+		}
+	);
+
+	# Choosing from code fires no Change; the user's choices do.
+	$country->value('FR');
+
+	my $ui = Term::Fabulous->new( root => $root, width => 80, height => 24 );
+	$ui->interaction->set_focused_widget($country);
+	$ui->run;
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-choose-options.svg" alt="A dropdown showing France, radio buttons with Express chosen, a slider at 15 percent and the status line"></p>
+
+=end html
+
+=over
+
+=item *
+
+A L<Term::Fabulous::Widget::Dropdown> shows the selected option's label;
+its C<value> is the option's value. Enter, Space, Alt+Down, F4 or a
+click open the list. While the list is closed, Up and Down select the
+previous or next option directly (this fires C<Change>); while it is
+open, they move the highlight, and Enter or Space chooses. Typing
+letters jumps to the next option that starts with them.
+
+=item *
+
+A L<Term::Fabulous::Widget::RadioGroup> holds the value and takes the
+focus for all its buttons, so Tab moves past the whole group in one
+step; the arrow keys choose a button. The buttons can be anywhere
+inside the group, also in nested boxes.
+
+=item *
+
+A L<Term::Fabulous::Widget::Slider> keeps its value on the grid C<min>,
+C<min + step>, ...; C<value_format> may be a C<sprintf> format or a
+code reference that formats the value.
+
+=item *
+
+All three fire C<Change> on themselves when the user changes the value,
+and the event bubbles to the root, where one listener shows it. Setting
+the value from code (C<< $country->value('FR') >>) fires nothing.
+
+=back
+
+=head1 Read all values of a form
+
+Goal: collect the values of all input widgets of a form into a hash,
+for example to save them. This snippet works with any form; the example
+output below is for the program of
+L</Build a form from a KDL file (text fields, radio buttons, dropdown, slider, checkbox)>
+(F<examples/kdl-form.pl>).
+
+	# { id => value } of every input widget at or below $node that has an id.
+	# A radio group counts as one input; its buttons are skipped.
+	sub form_values ( $node, $values = {} ) {
+		my $is_input = $node->isa('Term::Fabulous::Widget::Input') || $node->isa('Term::Fabulous::Widget::RadioGroup');
+		$values->{ $node->id } = $node->value
+			if $is_input && defined $node->id && !$node->isa('Term::Fabulous::Widget::RadioButton');
+		if ( $node->can('children') ) {
+			form_values( $_, $values ) foreach @{ $node->children };
+		}
+		return $values;
+	}
+
+Added to F<examples/kdl-form.pl> and called right after
+C<< $layout->build >>, C<form_values($root)> returns:
+
+	{
+		name       => '',
+		password   => '',
+		size       => 'm',
+		color      => undef,
+		volume     => 30,
+		newsletter => 0,
+	}
+
+=over
+
+=item *
+
+Every input widget (subclasses of L<Term::Fabulous::Widget::Input>) and
+L<Term::Fabulous::Widget::RadioGroup> have a C<value> reader. Text
+inputs return their text, a check box 1 or 0, a slider a number, a
+dropdown the value of the selected option (C<undef> while none is
+selected) and a radio group the value of its selected button.
+
+=item *
+
+Radio buttons are inputs too, but their C<value> is the value they give
+their group when selected, not a state; the group holds the state.
+
+=item *
+
+Only widgets with an C<id> are collected; give the inputs ids, as in
+C<< Term::Fabulous::Widget::TextField->new( id => 'name' ) >> or
+C<TextField "name"> in KDL.
+
+=back
+
+=head1 Find widgets by id
+
+Goal: get hold of a widget by the id you gave it, typically after
+building the tree from a KDL layout, which returns only the root.
+
+	my $volume = $root->find_by_id('volume');
+	say $volume->value;
+
+Here C<$root> is the root of the form of
+L</Build a form from a KDL file (text fields, radio buttons, dropdown, slider, checkbox)>,
+which has a slider with the id C<volume>; that program finds all its
+inputs this way.
+
+=over
+
+=item *
+
+L<C<find_by_id>|Term::Fabulous::Widget/find_by_id> searches the widget itself and
+everything below it, depth first, and returns the first widget whose
+id is the argument, or C<undef> when there is none. Text widgets with
+an id are found too. Call it on any widget to search only its part of
+the tree.
+
+=item *
+
+For the direct children only, a box has
+L<get_children_with|Term::Fabulous::Widget/get_children_with>:
+C<< $box->get_children_with( sub ($child) { ... } ) >> returns the
+list of children for which the code returns true. The code gets each
+child both as its argument and in C<$_>, so
+C<< $box->get_children_with( sub { ( $_->id // '' ) eq 'name' } ) >>
+works too (C<id> is C<undef> for a widget without an id).
+
+=item *
+
+Search once and keep the result instead of searching in every event;
+C<find_by_id> walks the tree on every call.
+
+=back
+
+=head1 Build a form from a KDL file (text fields, radio buttons, dropdown, slider, checkbox)
+
+Goal: describe the form in a KDL layout instead of Perl code, then find
+the inputs by id, react to changes and print all values when the program
+ends. This program is also shipped as F<examples/kdl-form.pl>.
+
+=for code-from examples/kdl-form.pl
+
+	# A form of input widgets described in KDL. The program finds the inputs
+	# by their ids, shows every change in a status line and prints the values
+	# when it ends.
+	#
+	#     perl examples/kdl-form.pl
+
+	use v5.32;
+	use warnings;
+	use strict;
+	use experimental 'signatures';
+	no warnings 'experimental::signatures';
+
+	use FindBin;
+	use lib "$FindBin::Bin/../lib/";
+
+	use Term::Fabulous;
+	use Term::Fabulous::Layout;
+
+	my $layout = Term::Fabulous::Layout->new( string => <<'KDL' );
+	use Term::Fabulous::Widget::Box as Box
+	use Term::Fabulous::Widget::Text as Text
+	use Term::Fabulous::Widget::TextField as TextField
+	use Term::Fabulous::Widget::Checkbox as Checkbox
+	use Term::Fabulous::Widget::RadioGroup as RadioGroup
+	use Term::Fabulous::Widget::RadioButton as RadioButton
+	use Term::Fabulous::Widget::Dropdown as Dropdown
+	use Term::Fabulous::Widget::Slider as Slider
+
+	Box "root" {
+		layout direction=down gap=1
+		sizing width=grow height=grow
+		padding left=2 right=2 top=1 bottom=1
+
+		Text { text "Fill in the form. Tab moves on, F2 shows the values, Ctrl+C ends."; text_color "#dcdcdc"; }
+
+		Box "form" {
+			layout direction=down gap=1
+			sizing width=grow
+			padding left=1 right=1
+			border style=Round color="#61afef"
+			bordered #true
+			background_color "#1c212d"
+
+			Box {
+				layout gap=1
+				Box { width_group 1; Text { text "Name"; text_color "#96a0b4"; } }
+				TextField "name" { placeholder "Your name"; preferred_columns 30; required #true; }
+			}
+			Box {
+				layout gap=1
+				Box { width_group 1; Text { text "Password"; text_color "#96a0b4"; } }
+				TextField "password" { mask "*"; preferred_columns 30; }
+			}
+			Box {
+				layout gap=1
+				Box { width_group 1; Text { text "Size"; text_color "#96a0b4"; } }
+				RadioGroup "size" {
+					layout direction=right gap=2
+					value "m"
+					RadioButton { label "Small"; value "s"; }
+					RadioButton { label "Medium"; value "m"; }
+					RadioButton { label "Large"; value "l"; }
+				}
+			}
+			Box {
+				layout gap=1
+				Box { width_group 1; Text { text "Color"; text_color "#96a0b4"; } }
+				Dropdown "color" {
+					placeholder "Pick a color"
+					options "Red" "Green" "Blue"
+					option "Dark blue" value="navy"
+				}
+			}
+			Box {
+				layout gap=1
+				Box { width_group 1; Text { text "Volume"; text_color "#96a0b4"; } }
+				Slider "volume" { step 5; value 30; value_format "%d%%"; }
+			}
+			Box {
+				layout gap=1
+				Box { width_group 1; Text { text "Newsletter"; text_color "#96a0b4"; } }
+				Checkbox "newsletter" { label "Send me the newsletter"; }
+			}
+		}
+
+		Text "status" { text "Nothing changed yet."; text_color "#dcdcdc"; }
+	}
+	KDL
+
+	my $root = $layout->build;
+
+	my %input  = map { $_ => $root->find_by_id($_) } qw(name password size color volume newsletter);
+	my $status = $root->find_by_id('status');
+
+	# The password is shown as stars, here and in the status line.
+	sub shown_value ( $id, $value ) {
+		return '*' x length $value if $id eq 'password';
+		return $value // '(none)';
+	}
+
+	sub values_text () {
+		return join ', ', map { sprintf '%s=%s', $_, shown_value( $_, $input{$_}->value ) } sort keys %input;
+	}
+
+	# Change events bubble from every input up to the form box.
+	$root->find_by_id('form')->on(
+		Change => sub ($event) {
+			my $id = $event->target->id;
+			$status->text( sprintf '%s is now %s', $id, shown_value( $id, $event->value ) );
+			return;
+		}
+	);
+
+	$root->on(
+		KeyPress => sub ($event) {
+			return unless ( $event->key_name // '' ) eq 'F2';
+			my ($invalid) = $root->invalid_inputs;
+			$status->text( defined $invalid ? sprintf( '%s: %s', $invalid->id, $invalid->error ) : values_text() );
+			return;
+		}
+	);
+
+	my $ui = Term::Fabulous->new( width => 80, height => 24, root => $root );
+	$ui->interaction->set_focused_widget( $input{name} );
+	$ui->run;
+
+	say values_text();
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-kdl-form.svg" alt="The KDL form filled in, with all values shown in the status line after F2"></p>
+
+=end html
+
+=over
+
+=item *
+
+A layout starts with C<use Module::Name as Alias> lines for the widget
+classes it uses, followed by exactly one root widget. Nodes that start
+with an uppercase letter are widgets; their optional string argument
+is the widget id. Nodes that start with a lowercase letter are
+properties of the widget around them. See
+L<Term::Fabulous::Manual::KDL/KDL LAYOUT FILES> and L<Term::Fabulous::Layout>.
+
+=item *
+
+Several properties can share a line when separated by semicolons:
+C<Text { text "Name"; text_color "#96a0b4"; }>.
+
+=item *
+
+Colors in KDL are strings in any format L<Term::Fabulous::Color>
+understands, such as C<"#61afef"> or C<"rgb(97, 175, 239)">. Text in
+KDL is a character string and is used as is.
+
+=item *
+
+Properties are applied in the order they appear. Give what a value
+depends on first: the dropdown's options before a C<value>, the
+slider's range before its C<value>.
+
+=item *
+
+C<required #true> on the name makes an empty name invalid: the status
+line shows the message of the first invalid input on F2, and
+C<< $form->invalid_inputs >> would list it (see
+L<Term::Fabulous::Manual::Forms/Checking input>). KDL takes the name of
+a validator too: C<validator "email">.
+
+=item *
+
+To load the layout from a file, use
+C<< Term::Fabulous::Layout->new( file => 'form.kdl' ) >>; the file is
+read as UTF-8.
+
+=item *
+
+Every C<Change> event bubbles from the input to the form box, so one
+listener reports all changes; C<< $event->target >> is the input that
+changed. The password is shown as stars in the status line and in the
+printed values.
+
+=item *
+
+The labels sit in boxes with C<width_group 1>, so they all get the
+width of the widest label; see L<Term::Fabulous::Cookbook::Layout/Line up labels with equal widths (width_group)>.
+
+=item *
+
+C<run> returns when the user presses Ctrl+C; the values are printed
+after the terminal has been restored.
+
+=back
+
+=head1 Disable inputs until a checkbox is checked
+
+Goal: a text field that can only be used while a check box is checked.
+
+This program is shipped as F<examples/cookbook/disable-inputs.pl>.
+
+=for code-from examples/cookbook/disable-inputs.pl
+
+	use v5.32;
+	use warnings;
+	use feature 'signatures';
+	no warnings 'experimental::signatures';
+
+	use Term::Fabulous;
+	use Term::Fabulous::Widget::Box;
+	use Term::Fabulous::Widget::Checkbox;
+	use Term::Fabulous::Widget::TextField;
+	use Clay::UI::Enum::Result;
+	use Clay::XS qw(sizing_grow CLAY_TOP_TO_BOTTOM);
+
+	my $root = Term::Fabulous::Widget::Box->new(
+		layout => {
+			layout_direction => CLAY_TOP_TO_BOTTOM,
+			sizing           => { width => sizing_grow(), height => sizing_grow() },
+			padding          => { left  => 2, right => 2, top => 1, bottom => 1 },
+			child_gap        => 1,
+		},
+	);
+
+	my $company = Term::Fabulous::Widget::Checkbox->new( id => 'company', label => 'I order for a company' );
+	my $vat_id  = Term::Fabulous::Widget::TextField->new( id => 'vat_id', placeholder => 'VAT number', disabled => 1 );
+	$root->add_child( $company, $vat_id );
+
+	$company->on(
+		Change => sub ($event) {
+			$vat_id->disabled( !$event->value );
+			return Clay::UI::Enum::Result->CONTINUE;    # let ancestors see the change too
+		}
+	);
+
+	my $ui = Term::Fabulous->new( root => $root, width => 80, height => 24 );
+	$ui->interaction->set_focused_widget($company);
+	$ui->run;
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-disable-inputs.svg" alt="An unchecked check box and the grayed out VAT number field below it"></p>
+
+=end html
+
+=over
+
+=item *
+
+C<< $input->disabled(1) >> grays the input out (it is drawn in its
+C<disabled_color>), makes it ignore keys and the mouse, removes the
+focus from it at once and makes Tab skip it. C<< disabled(0) >> undoes
+all of that. Buttons can be disabled the same way. The flag comes from
+L<Clay::UI::Role::Interaction::Disableable>, so
+C<< $widget->DOES('Clay::UI::Role::Interaction::Disableable') >> tells
+whether a widget has it. See L<Term::Fabulous::Widget::Input/disabled>.
+
+=item *
+
+C<Change> carries the check box's new state in C<value> (1 or 0). It is
+fired when the user toggles the box and when the program calls
+C<toggle>, which acts as the user does; setting C<checked> from the
+program fires nothing.
+
+=item *
+
+The listener returns C<CONTINUE> so that a form-wide C<Change> listener
+on an ancestor still sees the change.
+
+=back
+
+=head1 Show a status line that follows the focus (OnFocus)
+
+Goal: show a help text for the input that currently has the focus.
+
+This program is shipped as F<examples/cookbook/focus-help-line.pl>.
+
+=for code-from examples/cookbook/focus-help-line.pl
+
+	use v5.32;
+	use warnings;
+	use feature 'signatures';
+	no warnings 'experimental::signatures';
+
+	use Term::Fabulous;
+	use Term::Fabulous::Widget::Box;
+	use Term::Fabulous::Widget::Slider;
+	use Term::Fabulous::Widget::Text;
+	use Term::Fabulous::Widget::TextArea;
+	use Term::Fabulous::Widget::TextField;
+	use Clay::XS qw(sizing_grow sizing_fixed CLAY_TOP_TO_BOTTOM);
+
+	my %help_by_id = (
+		title  => 'A short title, at most 40 characters.',
+		notes  => 'Enter starts a new line; Ctrl+Z undoes.',
+		rating => 'Left and Right change the rating.',
+	);
+
+	my $root = Term::Fabulous::Widget::Box->new(
+		layout => {
+			layout_direction => CLAY_TOP_TO_BOTTOM,
+			sizing           => { width => sizing_grow(), height => sizing_grow() },
+			padding          => { left  => 2, right => 2, top => 1, bottom => 1 },
+			child_gap        => 1,
+		},
+	);
+	my $status = Term::Fabulous::Widget::Text->new( text => 'Press Tab to start.', text_color => [ 150, 200, 255, 255 ] );
+	$root->add_child(
+		Term::Fabulous::Widget::TextField->new( id => 'title', placeholder => 'Title', max_length => 40 ),
+		Term::Fabulous::Widget::TextArea->new( id => 'notes', placeholder => 'Notes', layout => { sizing => { width => sizing_grow(), height => sizing_fixed(5) } } ),
+		Term::Fabulous::Widget::Slider->new( id => 'rating', min => 1, max => 5, value => 3 ),
+		$status,
+	);
+
+	# OnFocus is fired on the widget that gets the focus and bubbles up to
+	# the root, because the inputs' own OnFocus listeners return CONTINUE.
+	$root->on(
+		OnFocus => sub ($event) {
+			$status->text( $help_by_id{ $event->target->id } // '' );
+			return;
+		}
+	);
+
+	Term::Fabulous->new( root => $root, width => 80, height => 24 )->run;
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-focus-help-line.svg" alt="A title, notes being typed, a slider and the help line for the notes"></p>
+
+=end html
+
+=over
+
+=item *
+
+C<OnFocus> is fired on the widget that gets the focus. It bubbles to
+the ancestors because the input widgets' own C<OnFocus> listeners
+return C<CONTINUE>, so a single listener on the root hears about every
+focus change. C<< $event->target >> is the widget that got the focus.
+C<OnBlur> works the same way for the widget that lost it.
+
+=item *
+
+The same pattern works for C<Change> (show the value that changed) and
+C<Submit>.
+
+=back
+
+=head1 Change the Tab order (HasFocusOrder)
+
+Goal: make Tab visit the inputs in an order that differs from their
+order on the screen.
+
+This program is shipped as F<examples/cookbook/tab-order.pl>.
+
+=for code-from examples/cookbook/tab-order.pl
+
+	use v5.32;
+	use warnings;
+	use feature 'signatures';
+	no warnings 'experimental::signatures';
+
+	use Object::Pad 0.825;
+
+	use Term::Fabulous;
+	use Term::Fabulous::Widget::Box;
+	use Term::Fabulous::Widget::TextField;
+	use Clay::UI::Role::Interaction::HasFocusOrder;
+	use Clay::XS qw(sizing_grow);
+
+	# A box that decides the Tab order of everything inside it. It must be
+	# the root: with nothing focused, only the root is asked.
+	class My::OrderedBox :isa(Term::Fabulous::Widget::Box) :does(Clay::UI::Role::Interaction::HasFocusOrder) :strict(params) {
+		field @order;
+
+		method focus_order (@widgets) {
+			@order = @widgets;
+			return $self;
+		}
+
+		method _neighbour ($direction) {
+			my $focused = $self->ui->interaction->get_focused_widget;
+			my ($index) = grep { defined $focused && $order[$_] == $focused } 0 .. $#order;
+			return $order[ $direction > 0 ? 0 : -1 ] unless defined $index;
+			return $order[ ( $index + $direction ) % @order ];
+		}
+
+		method get_next_focus ()     { return $self->_neighbour(1) }
+		method get_previous_focus () { return $self->_neighbour(-1) }
+	}
+
+	my %field = map { $_ => Term::Fabulous::Widget::TextField->new( id => $_, placeholder => ucfirst, preferred_columns => 12 ) } qw(street city zip);
+	my $root  = My::OrderedBox->new(
+		layout => { sizing => { width => sizing_grow(), height => sizing_grow() }, padding => { left => 2, top => 1 }, child_gap => 2 },
+	);
+
+	# Shown left to right as street, city, zip; Tab goes street, zip, city.
+	$root->add_child( @field{qw(street city zip)} );
+	$root->focus_order( @field{qw(street zip city)} );
+
+	Term::Fabulous->new( root => $root, width => 80, height => 24 )->run;
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-tab-order.svg" alt="Three text fields side by side: Street filled in, City still empty, and the Zip field focused with 12345 typed, because Tab went from Street straight to Zip"></p>
+
+=end html
+
+The picture shows the program after Tab, typing a street, Tab and
+typing a zip code: the second Tab skipped the city field in the middle.
+
+=over
+
+=item *
+
+By default Tab visits the focusable widgets in tree order (depth
+first, in the order they were added) and wraps around at the end.
+
+=item *
+
+A widget that composes L<Clay::UI::Role::Interaction::HasFocusOrder>
+decides the order for the widgets inside it: its C<get_next_focus> and
+C<get_previous_focus> return the widget to focus, or C<undef> to keep
+the focus where it is. While nothing has the focus, only the root is
+asked, so make the ordering box the root (or let the program focus a
+widget inside it first).
+
+=item *
+
+A widget returned while it cannot take the focus (for example a
+disabled input) leaves the focus where it is. See
+L<Term::Fabulous::Manual::Events/Custom focus order>.
+
+=item *
+
+C<My::OrderedBox> keeps the list given to C<focus_order> and returns the
+widget after (Tab) or before (Shift+Tab) the focused one, wrapping
+around at both ends. With nothing focused, Tab gives the first widget of
+the list and Shift+Tab the last.
+
+=back
+
+=head1 Copy and paste through the clipboard
+
+Goal: exchange text between the program and the text inputs' clipboard.
+In the snippet, C<$field> is any L<Term::Fabulous::Widget::TextField> or
+L<Term::Fabulous::Widget::TextArea> of your program.
+
+	use Term::Fabulous::Editor;
+
+	# Put text on the clipboard; Ctrl+V or Shift+Insert in any text input pastes it.
+	Term::Fabulous::Editor->clipboard('order-4711');
+
+	# Read what the user copied with Ctrl+Insert or cut with Ctrl+X.
+	my $copied = Term::Fabulous::Editor->clipboard;
+
+	# Copy the whole text of a field from code, and show the selection.
+	$field->editor->select_all;
+	$field->editor->copy;
+	$field->mark_changed;
+
+=over
+
+=item *
+
+All text inputs of the process share one clipboard, a character
+string held by L<Term::Fabulous::Editor>. It is not connected to the
+desktop clipboard; to connect it, read and write it in your own key
+binding, for example with an external tool.
+
+=item *
+
+Ctrl+C is not copy: it ends the program. Copy is Ctrl+Insert, cut is
+Ctrl+X or Shift+Delete, paste is Ctrl+V or Shift+Insert. See
+L<Term::Fabulous::Widget::TextInput/KEYS>.
+
+=item *
+
+C<< $field->editor >> gives access to the cursor, the selection and
+undo of a text input. After changing them from code, call
+C<< $field->mark_changed >> so that a frame is drawn: the field scrolls
+to the cursor and shows the change in it.
+
+=back
+
+=head1 SEE ALSO
+
+This page is part of L<Term::Fabulous::Cookbook>. Previous page: L<Term::Fabulous::Cookbook::LiveData>. Next page: L<Term::Fabulous::Cookbook::Menus>.
+
+L<Term::Fabulous::Manual::Forms> - the guide to the input widgets and
+what they have in common.
+
+L<Term::Fabulous::Manual::Events> - events, the keyboard focus and the
+Tab order.
+
+L<Term::Fabulous::Widget::Dialog> - dialogs that open over the screen.
+
+L<Term::Fabulous::Widget::Prompt> - questions and small forms in a dialog.
+
+L<Term::Fabulous::Manual::KDL> - layouts described in KDL files.
+
+=cut

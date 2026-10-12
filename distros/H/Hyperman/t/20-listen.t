@@ -78,12 +78,19 @@ like($r3, qr{Location:\s*https://example\.test:8443/foo\?x=1}i,
 unlike($r3, qr/port:/, 'the app is never invoked on a redirect listener');
 
 # A Host header carrying a bare LF must not inject a header into the 301
-# response (response-splitting via the reflected Location).
+# response (response-splitting via the reflected Location). Since 0.56 a
+# bare LF anywhere in the header block is a 400 before any listener logic
+# runs, so the request never reaches the redirect at all.
 my $inj = req($p3, "GET /x HTTP/1.0\r\nHost: good.test\x0aSet-Cookie: pwned=1\r\n\r\n");
-like($inj,   qr{^HTTP/1\.1 301}, 'redirect still answers 301 on a malformed Host');
+like($inj,   qr{^HTTP/1\.1 400}, 'a bare LF in the header block is refused as 400');
 unlike($inj, qr/Set-Cookie/i,   'bare-LF Host does not inject a response header');
-like($inj,   qr{Location:\s*https://good\.test:8443/x\b},
-     'reflected Host is truncated at the injected LF');
+unlike($inj, qr{Location:},     'and nothing was reflected');
+# A Host whose port is the only oddity is still reflected, truncated at the
+# port, which is the case the truncation guards.
+my $odd = req($p3, "GET /x HTTP/1.0\r\nHost: good.test:99 junk\r\n\r\n");
+like($odd, qr{^HTTP/1\.1 301}, 'a Host with trailing junk still gets a 301');
+like($odd, qr{Location:\s*https://good\.test:8443/x\b},
+     'reflected Host is truncated at its port');
 
 kill 'TERM', $pid;
 waitpid $pid, 0;

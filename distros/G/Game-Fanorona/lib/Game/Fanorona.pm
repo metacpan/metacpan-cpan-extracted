@@ -23,7 +23,7 @@ use Game::Fanorona::Notation qw(
     format_position format_game parse_game
 );
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 my @WORD = (undef, 'white', 'black');
 my %SIDE = (white => WHITE, black => BLACK);
@@ -487,11 +487,11 @@ __END__
 
 =head1 NAME
 
-Game::Fanorona - the board game of Madagascar: play it, and play it again
+Game::Fanorona - the board game of Madagascar
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 
@@ -534,6 +534,8 @@ Under it are L<Game::Fanorona::Rules>, L<Game::Fanorona::Engine> and
 L<Game::Fanorona::Notation>, which say exactly what the rules are, which of
 them are traditional and which are this distribution's own, and how a move is
 written.
+
+It is the engine behind the Fanorona at L<https://peer2peergames.com>.
 
 =head2 Sides and points
 

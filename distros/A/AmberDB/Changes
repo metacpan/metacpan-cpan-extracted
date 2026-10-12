@@ -1,5 +1,18 @@
 Revision history for AmberDB
 
+5.26.5  2026-10-10
+        - [CROSS-PLATFORM ARCHIVE RESTORE & DUMP SYSTEM]
+          * Refactored backup archive dump and restore (AmberDB::Tools::Maintain) to support cross-platform portable exports (.dumpdb, .dumpdel, .dumpaut, .dumpcnt) utilizing TSV and Base64 serialization, eliminating Berkeley DB endianness/binary incompatibilities across operating systems and Perl builds.
+          * Rewrote restore() and dump() to strictly use encapsulated AmberDB table_write(), table_read(), recs_scan(), and table_close() methods, fully eliminating raw DB_File and tie/untie usage.
+          * Enhanced restore() argument parsing to accept single-string file path ($tools->restore('backup.amberdb')), hashref, or key-value pairs.
+          * Added automatic schema cache invalidation (delete $adb->{_table}->{$tid}) upon restoring tables to ensure subsequent schema introspection reloads cleanly.
+          * Added resilient error handling with eval surrounding index rebuilds during restore.
+
+        - [TABLE COUNT & LOCK PATH ROBUSTNESS]
+          * Added definedness guard for raw index key string in AmberDB::table_count.
+          * Standardized lock directory resolution via $self->path("lock_dir") in flock_open.
+          * Extended $adb->path() to support setter operations ($adb->path({ backup_dir => '...' }) and $adb->path(key => 'val')).
+
 5.26.4  2026-10-01
         - [IMPROVEMENTS] 
           * The reindex vacuum bug has been resolved.

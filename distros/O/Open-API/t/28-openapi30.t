@@ -5,7 +5,7 @@ use warnings;
 use Test::More;
 use Open::API;
 
-# OpenAPI 3.0 up-conversion (include/oa_upconvert.h).
+# OpenAPI 3.0 up-conversion (include/oa_normalize.h, once oa_upconvert.h).
 #
 # A 3.0 Schema Object is a different dialect from a 3.1 one, so a 3.0 document
 # is rewritten into 3.1 shape at load. These tests assert through the public

@@ -155,13 +155,16 @@ broadcast(self, message, except = &PL_sv_undef)
          * so a bug in the shared one would be invisible to anybody testing on
          * a single worker.
          *
-         * `except` is deliberately not honoured across the pool: it names a
-         * connection object, and a connection belongs to one worker. It still
-         * applies locally, which is where the sender actually is. */
+         * `except` travels with it: a connection belongs to one worker, so
+         * the frame names that worker and the connection, this worker's
+         * subscriber leaves it out, and every other worker delivers to all
+         * of its members. Leaving `except` off the bus instead meant the
+         * usual chat broadcast, everyone but the sender, reached this worker
+         * alone. */
         {
             SV **np = hv_fetchs(pwr_hv(aTHX_ self), "name", 0);
-            if (SvOK(except) || !np || !*np
-                || !punk_bus_room_publish(aTHX_ *np, frame))
+            if (!np || !*np
+                || !punk_bus_room_publish(aTHX_ *np, frame, except))
                 RETVAL = newSViv(pwr_fan(aTHX_ self, frame, except));
             else
                 /* what THIS worker delivered. The rest of the pool is served

@@ -1,0 +1,42 @@
+Game-Terminal
+
+One command, game, for every terminal game in the Game namespace and
+Term::Maze. On its own it draws a menu of the games and starts the one you
+choose with the arrow keys, and shows the menu again when the game ends.
+Given a name it starts that game at once, passing the rest of the command
+line through, so game checkers --level 3 is checkers --level 3. Each game
+runs inside the same process through its Terminal class's run method.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Game::Terminal
+    perldoc game
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Game-Terminal
+
+    Search CPAN
+        https://metacpan.org/release/Game-Terminal
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)

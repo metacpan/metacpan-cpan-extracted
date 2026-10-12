@@ -6,7 +6,7 @@ use warnings;
 
 use Object::Proto::Sugar -types;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 has n => (is => 'ro', isa => Int, required => 1);
 
@@ -51,7 +51,7 @@ Game::Mahjong::Fan - one scoring element: its number, points, sentence and check
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

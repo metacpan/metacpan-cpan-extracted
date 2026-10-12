@@ -13,8 +13,9 @@ use Game::Oware::Notation;
 use Game::Oware::Rules;
 use Game::Oware::Scoring;
 use Game::Oware::Variant ();
+use Getopt::Long ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 # The glyph tables. NOTE: this file is NOT under `use utf8`, so the wide
 # glyphs are byte strings and `length` on anything built from them is a byte
@@ -1078,6 +1079,136 @@ sub _times {
 	return "for the ${count}th time";
 }
 
+sub _defaults {
+	return (
+		level   => 3,
+		variant => 'abapa',
+		seat    => 'p1',
+		seed    => '',
+		quiet   => 0,
+		ascii   => 0,
+	);
+}
+
+sub _usage {
+	my %opt = _defaults();
+
+	my @levels   = Game::Oware::Bot->levels;
+	my @variants = Game::Oware::Variant::variants();
+
+	my $levels   = $levels[0] . ' to ' . $levels[-1];
+	my $variants = join ' or ', @variants;
+
+	return <<"USAGE";
+oware - play Oware against a bot
+
+Usage: oware [options]
+
+  -l, --level N      bot level, $levels (default $opt{level})
+  -s, --seat SEAT    the seat you play, p1 or p2 (default $opt{seat})
+  -V, --variant V    $variants (default $opt{variant})
+      --seed STRING  the seed, so a game can be replayed
+  -q, --quiet        only the result: no banner, narration or board
+  -a, --ascii        plain box drawing, for a terminal without the glyphs
+      --ansi         force colour on, --no-ansi forces it off
+      --no-pick      type the moves out instead of choosing them with the keys
+  -v, --version      print the version
+  -h, --help         this
+
+On a terminal the legal moves are listed under the board and chosen with the
+arrow keys: the board above the list is the one the move under the cursor
+would produce, so a capture is seen before it is played. Enter sows it, a
+house letter jumps to that house, t goes back to typing and ? prints the
+rules. Needs Term::ReadKey; without it, or off a terminal, the moves are
+typed out as a letter at a time.
+
+The board marks what the last move did: - emptied, + gained a seed, * where
+the last seed landed, x captured, ! capture forfeited. Those are characters
+rather than colours, so they survive --no-ansi and a redirected handle.
+
+Levels $levels[-2] and $levels[-1] search a great deal deeper and take noticeably
+longer a move. The budget is in nodes rather than seconds, so a loaded
+machine plays the same game as an idle one.
+
+Exit status is 0 if you won or drew, 1 if you lost, 2 for a bad option.
+USAGE
+}
+
+sub run {
+	my ($class, @argv) = @_;
+	my $saved = Getopt::Long::Configure(qw(bundling no_ignore_case));
+	my $status = $class->_run(\@argv);
+	Getopt::Long::Configure($saved);
+	return $status;
+}
+
+sub _run {
+	my ($class, $argv) = @_;
+	my %opt = _defaults();
+
+	Getopt::Long::GetOptionsFromArray($argv, \%opt,
+		'level|l=i',
+		'variant|V=s',
+		'seat|s=s',
+		'seed=s',
+		'quiet|q',
+		'ascii|a',
+		'ansi!',
+		'pick!',
+		'version|v',
+		'help|h',
+	) or do { print STDERR _usage(); return 2 };
+
+	if ($opt{help}) { print _usage(); return 0 }
+
+	if ($opt{version}) {
+		print "oware $Game::Oware::VERSION\n";
+		return 0;
+	}
+
+	if (@{$argv}) {
+		print STDERR "oware: there is nothing to do with '$argv->[0]': options begin with --\n", _usage();
+		return 2;
+	}
+
+	my $terminal = eval {
+		$class->new(
+			level   => $opt{level},
+			variant => $opt{variant},
+			seat    => $opt{seat},
+			seed    => $opt{seed},
+			quiet   => $opt{quiet} ? 1 : 0,
+			ascii   => $opt{ascii} ? 1 : 0,
+			(exists $opt{ansi} ? (ansi => $opt{ansi} ? 1 : 0) : ()),
+			(exists $opt{pick} ? (picking => $opt{pick} ? 1 : 0) : ()),
+		);
+	};
+
+	unless ($terminal) {
+		my $why = $@ || 'could not start';
+		$why =~ s/ at \S+ line \d+\.?\s*\z//;
+		$why =~ s/\A[\w:]+: //;
+		chomp $why;
+		print STDERR "oware: $why\n";
+		return 2;
+	}
+
+	local @SIG{qw(INT TERM HUP)};
+	for my $sig (qw(INT TERM HUP)) {
+		$SIG{$sig} = sub { $terminal->leave_raw; $SIG{$sig} = 'DEFAULT'; kill $sig, $$ };
+	}
+
+	my $result = eval { $terminal->start };
+	my $died = $@;
+	$terminal->leave_raw;
+	die $died if $died;
+
+	return 0 unless $result;
+	return 0 if !defined $result->winner;
+	return 0 if $result->winner eq $opt{seat};
+	return 1;
+}
+
 1;
 
 __END__
@@ -1088,7 +1219,7 @@ Game::Oware::Terminal - a playable game on two filehandles
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 
@@ -1473,6 +1604,22 @@ B<There is no single-letter shortcut for C<board>.> C<b> and C<B> are houses,
 and the first draft of this module accepted C<b> as the command, so typing a
 perfectly ordinary move redrew the board instead of playing it. C<q> and C<h>
 are safe because no house is called either.
+
+=head2 run
+
+	exit Game::Oware::Terminal->run(@ARGV);
+
+The whole command line program as a class method: parses the options
+F<bin/oware> documents, builds the terminal, plays, and returns the exit status
+rather than calling C<exit>: C<0> if you won, drew or quit, C<1> if you lost,
+C<2> for a bad option, a leftover word or a refused value, with the reason on
+C<STDERR>. C<--help> and C<--version> print to C<STDOUT> and return C<0>.
+Options are read from the arguments passed in, never from C<@ARGV>, and the
+Getopt configuration the parse needs is restored before it returns. Signal
+handlers are local to the call and the terminal is left in cooked mode on every
+way out, so a launcher such as L<Game::Terminal> can call it in its own process
+and carry on afterwards. Colour is off under C<NO_COLOR> as well as off a
+terminal.
 
 =head2 start
 

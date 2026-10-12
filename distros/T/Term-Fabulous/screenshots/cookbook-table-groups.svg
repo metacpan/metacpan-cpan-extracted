@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="816" height="489" viewBox="0 0 816 489" role="img" aria-label="perl examples/cookbook/table-groups.pl">
+<title>perl examples/cookbook/table-groups.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="784" height="454" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="784" height="454" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="784" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="408" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/cookbook/table-groups.pl</text>
+<rect x="16.5" y="16.5" width="783" height="453" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="48" y="114" width="495" height="36" fill="#242832"/>
+<rect x="48" y="150" width="495" height="18" fill="#282d3a"/>
+<rect x="48" y="186" width="495" height="18" fill="#1c2029"/>
+<rect x="48" y="222" width="495" height="18" fill="#1c2029"/>
+<rect x="48" y="240" width="495" height="18" fill="#343a48"/>
+<rect x="48" y="258" width="495" height="18" fill="#282d3a"/>
+<rect x="48" y="294" width="495" height="18" fill="#1c2029"/>
+<rect x="48" y="312" width="495" height="18" fill="#282d3a"/>
+<rect x="48" y="348" width="495" height="36" fill="#1c2029"/>
+<rect x="48" y="114" width="495" height="9" fill="#586070"/>
+<rect x="48" y="123" width="5" height="252" fill="#586070"/>
+<rect x="539" y="123" width="4" height="252" fill="#586070"/>
+<rect x="48" y="375" width="495" height="9" fill="#586070"/>
+</g>
+<g class="terminal">
+<text x="48" y="92" textLength="711" fill="#96a0b4">On a group header, Left closes it, Right opens it, Enter or a click toggles it.</text>
+<text x="66" y="146" textLength="441" class="b" fill="#ebeef3">Name               Role       Started      Salary</text>
+<text x="520.5" y="146" text-anchor="middle" class="b" fill="#ebeef3">▾</text>
+<text x="70.5" y="164" text-anchor="middle" class="b" fill="#e5c07b">▾</text>
+<text x="84" y="164" textLength="297" class="b" fill="#e5c07b">Core: 4 people, $319,000 per year</text>
+<text x="66" y="182" textLength="459" fill="#dcdfe4">Linus Torvalds     Engineer   01 Jun 2017   $90,000</text>
+<text x="66" y="200" textLength="459" fill="#dcdfe4">Ada Lovelace       Engineer   04 Mar 2019   $81,000</text>
+<text x="66" y="218" textLength="459" fill="#dcdfe4">Dennis Ritchie     Engineer   11 May 2020   $78,000</text>
+<text x="66" y="236" textLength="459" fill="#dcdfe4">Ken Thompson       Engineer   09 Jan 2023   $70,000</text>
+<text x="70.5" y="254" text-anchor="middle" class="b" fill="#e5c07b">▸</text>
+<text x="84" y="254" textLength="324" class="b" fill="#e5c07b">Network: 2 people, $164,000 per year</text>
+<text x="70.5" y="272" text-anchor="middle" class="b" fill="#e5c07b">▾</text>
+<text x="84" y="272" textLength="333" class="b" fill="#e5c07b">Platform: 2 people, $194,500 per year</text>
+<text x="66" y="290" textLength="459" fill="#dcdfe4">Margaret Hamilton  Architect  22 Feb 2016   $99,000</text>
+<text x="66" y="308" textLength="459" fill="#dcdfe4">Barbara Liskov     Lead       17 Sep 2018   $95,500</text>
+<text x="70.5" y="326" text-anchor="middle" class="b" fill="#e5c07b">▾</text>
+<text x="84" y="326" textLength="288" class="b" fill="#e5c07b">Web: 2 people, $167,000 per year</text>
+<text x="66" y="344" textLength="459" fill="#dcdfe4">Grace Hopper       Lead       15 Nov 2021   $92,500</text>
+<text x="66" y="362" textLength="459" fill="#dcdfe4">Tim Berners-Lee    Engineer   05 Oct 2020   $74,500</text>
+<text x="48" y="416" textLength="216" fill="#e5c07b">Closed the group Network</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="435" viewBox="0 0 780 435" role="img" aria-label="perl examples/cookbook/table-pages.pl">
+<title>perl examples/cookbook/table-pages.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="748" height="400" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="748" height="400" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="748" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="390" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/cookbook/table-pages.pl</text>
+<rect x="16.5" y="16.5" width="747" height="399" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="48" y="78" width="585" height="36" fill="#242832"/>
+<rect x="48" y="132" width="585" height="18" fill="#1c2029"/>
+<rect x="48" y="150" width="585" height="18" fill="#343a48"/>
+<rect x="48" y="168" width="585" height="18" fill="#1c2029"/>
+<rect x="48" y="204" width="585" height="18" fill="#1c2029"/>
+<rect x="48" y="240" width="585" height="18" fill="#1c2029"/>
+<rect x="48" y="276" width="585" height="36" fill="#1c2029"/>
+<rect x="48" y="312" width="27" height="18" fill="#2c313c"/>
+<rect x="84" y="312" width="27" height="18" fill="#2c313c"/>
+<rect x="237" y="312" width="27" height="18" fill="#2c313c"/>
+<rect x="273" y="312" width="27" height="18" fill="#2c313c"/>
+<rect x="453" y="312" width="36" height="18" fill="#242830"/>
+<rect x="48" y="78" width="585" height="9" fill="#586070"/>
+<rect x="48" y="87" width="5" height="216" fill="#586070"/>
+<rect x="629" y="87" width="4" height="216" fill="#586070"/>
+<rect x="48" y="303" width="585" height="9" fill="#586070"/>
+</g>
+<g class="terminal">
+<text x="66" y="110" textLength="549" class="b" fill="#ebeef3">Order  Placed             Customer           State      Total</text>
+<text x="66" y="128" textLength="549" fill="#dcdfe4">10021  10 Jan 2026 23:49  Acme Corp          open     $772.99</text>
+<text x="66" y="146" textLength="549" fill="#dcdfe4">10022  11 Jan 2026 11:14  Stark Industries   paid     $852.18</text>
+<text x="66" y="164" textLength="549" fill="#dcdfe4">10023  11 Jan 2026 22:39  Umbrella           shipped   $31.37</text>
+<text x="66" y="182" textLength="549" fill="#dcdfe4">10024  12 Jan 2026 10:05  Globex             open     $110.56</text>
+<text x="66" y="200" textLength="549" fill="#dcdfe4">10025  12 Jan 2026 21:30  Wayne Enterprises  paid     $189.75</text>
+<text x="66" y="218" textLength="549" fill="#dcdfe4">10026  13 Jan 2026 08:55  Hooli              shipped  $268.94</text>
+<text x="66" y="236" textLength="549" fill="#dcdfe4">10027  13 Jan 2026 20:20  Initech            open     $348.13</text>
+<text x="66" y="254" textLength="549" fill="#dcdfe4">10028  14 Jan 2026 07:46  Acme Corp          paid     $427.32</text>
+<text x="66" y="272" textLength="549" fill="#dcdfe4">10029  14 Jan 2026 19:11  Stark Industries   shipped  $506.51</text>
+<text x="66" y="290" textLength="549" fill="#dcdfe4">10030  15 Jan 2026 06:36  Umbrella           open     $585.70</text>
+<text x="57" y="326" textLength="9" fill="#dcdfe4">«</text>
+<text x="97.5" y="326" text-anchor="middle" fill="#dcdfe4">‹</text>
+<text x="120" y="326" textLength="108" fill="#dcdfe4">Page 3 of 30</text>
+<text x="250.5" y="326" text-anchor="middle" fill="#dcdfe4">›</text>
+<text x="282" y="326" textLength="9" fill="#dcdfe4">»</text>
+<text x="327" y="326" textLength="117" fill="#8c929e">Rows per page</text>
+<text x="453" y="326" textLength="18" fill="#dcdfe4">10</text>
+<text x="484.5" y="326" text-anchor="middle" fill="#61afef">▾</text>
+<text x="516" y="326" textLength="18" fill="#8c929e">21</text>
+<text x="538.5" y="326" text-anchor="middle" fill="#8c929e">–</text>
+<text x="543" y="326" textLength="81" fill="#8c929e">30 of 300</text>
+<text x="48" y="362" textLength="432" fill="#96a0b4">Page 3 of 30, 10 per page: orders 10021 to 10030</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

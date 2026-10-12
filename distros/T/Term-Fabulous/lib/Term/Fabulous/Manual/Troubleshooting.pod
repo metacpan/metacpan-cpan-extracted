@@ -1,0 +1,145 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Term::Fabulous::Manual::Troubleshooting - Solutions to common problems
+
+=head1 DESCRIPTION
+
+This page is part of L<Term::Fabulous::Manual>. Previous page: L<Term::Fabulous::Manual::CustomWidgets>. Next page: L<Term::Fabulous::Manual::Glossary>.
+
+This page lists common problems, each under a heading that describes
+the symptom or quotes the error message, with the cause and the
+solution. When a program dies, search this page for the start of its
+message. The limits of Term::Fabulous itself are listed under
+L<LIMITATIONS|Term::Fabulous/LIMITATIONS> on the main page.
+
+=head1 TROUBLESHOOTING
+
+=head2 "tb_init failed: No such device or address"
+
+L<C<< $ui->run >>|Term::Fabulous/run> needs a terminal: the process has no controlling
+terminal, for example in a cron job, a service or a CI run. Print the
+widget tree as text with L<Term::Fabulous::Static> there instead (see
+L<Term::Fabulous::Manual::Programs/RENDERING WITHOUT A TERMINAL>), and
+test programs with L<Term::Fabulous::Terminal::Memory> (see
+L<Term::Fabulous::Manual::Programs/TESTING>).
+
+=head2 "the terminal did not report its cursor position"
+
+L<Inline mode|Term::Fabulous/INLINE MODE> asks the terminal where its
+cursor is (C<ESC [ 6 n>) and waits a second for the answer. The
+terminal, or a program between it and yours, does not answer. Use a
+terminal that does (xterm-compatible terminals and tmux do), or run in
+full-screen mode.
+
+=head2 "the locale's character set is not UTF-8"
+
+L<C<< $ui->run >>|Term::Fabulous/run> warns when the locale is not UTF-8, because
+wide characters are then misaligned. See
+L</Wide characters (CJK, emoji) shift the rest of the line>.
+
+=head2 My text does not show (invisible text)
+
+The default C<text_color> of a Text widget is opaque black, which is
+invisible on a dark background. Always pass a C<text_color>, or
+C<[0, 0, 0, 0]> for the terminal's default text color. See L<Term::Fabulous::Manual::Looks/TEXT>.
+
+=head2 "the widget tree has more elements than max_element_count (8192) allows"
+
+The widget tree is too large for Clay's element table: by default at
+most 8190 widgets fit in a frame. Pass a larger C<max_element_count> to
+C<< Term::Fabulous->new >>, or show fewer widgets at a time, for example
+by building only the visible part of a long list, or by drawing many
+small items on a canvas instead. See L<Term::Fabulous/new>.
+
+=head2 A table shows no cursor
+
+The cursor of a L<Term::Fabulous::Widget::Table> is drawn only while the
+table, or a widget in one of its cells, has the keyboard focus. Give it
+the focus with C<Tab>, a click, or
+C<< $ui->interaction->set_focused_widget($table) >>. See
+L<Term::Fabulous::Manual::TableRows/The cursor>.
+
+=head2 "a table needs an id"
+
+L<Term::Fabulous::Widget::Table> dies with
+C<Term::Fabulous::Widget::Table: a table needs an id (its body keeps its scroll position by it)>
+when it is made without an C<id>. Give every table an C<id> that is
+unique in the widget tree, for example
+C<< Term::Fabulous::Widget::Table->new( id => 'staff', ... ) >>.
+See L<Term::Fabulous::Manual::Tables/TABLES>.
+
+=head2 Garbled characters in a Text widget, input, canvas or KDL layout
+
+All of these take character strings. If your source code contains
+non-ASCII characters, add C<use utf8;>. If the text comes from a file,
+a command or C<@ARGV>, decode it first (C<decode('UTF-8', $bytes)>); see
+L<Term::Fabulous::Manual::Looks/Text is character strings>.
+
+=head2 Wide characters (CJK, emoji) shift the rest of the line
+
+The locale is not UTF-8 (C<run> warns about it), or the terminal
+disagrees with the C library about the character's width. Set a UTF-8
+locale, for example C<export LANG=C.UTF-8> (C<locale -a> lists the
+installed locales).
+
+=head2 Colors are wrong or look washed out
+
+The terminal does not support 24-bit colors. Use a terminal that does;
+inside tmux, enable truecolor (C<set -as terminal-features ",*:RGB">).
+
+=head2 A KeyPress listener on the root never sees some keys
+
+The focused widget used them, or one of its listeners (or one on a widget
+between it and the root) did not return
+C<< Clay::UI::Enum::Result->CONTINUE >>. See
+L<Term::Fabulous::Manual::Events/Return values and bubbling>.
+
+=head2 A Mouse listener never fires
+
+The widget draws nothing at the clicked cell (no background color, no
+border), so the click goes to the widget behind it, or it is a Text
+widget. Give the box a background color, or listen on an ancestor.
+
+=head2 Hover effects do not follow the mouse
+
+The terminal does not report mouse movement (mode 1003), or a terminal
+multiplexer between it and the program drops the reports. Clicks, drags
+and the wheel still work. See L<Term::Fabulous::Manual::Events/What the terminal reports>.
+
+=head2 A change from a timer does not show
+
+Term::Fabulous draws a frame only when it knows that something changed.
+The widget methods tell it; state a widget of your own keeps itself does
+not. Call C<mark_changed> on the widget after changing it, or
+C<< $ui->invalidate >>. See
+L<Telling Term::Fabulous that something changed|Term::Fabulous::Manual::CustomWidgets/Telling Term::Fabulous that something changed>.
+
+=head2 Unrecognised parameters for ... constructor
+
+Every Term::Fabulous class rejects constructor parameters it does not
+know, to catch typos. Check the spelling against the class's
+documentation.
+
+=head2 The program dies with "is still attached to a parent"
+
+A widget has one parent at a time, so C<add_child> dies with
+C<Clay::UI: widget ... is still attached to a parent; remove it first>
+for a widget that has one. Remove it from its current parent before
+adding it elsewhere; see L<Term::Fabulous::Manual::Layout/Changing the tree>.
+
+=head2 "'root' is already the root of another Clay::UI"
+
+A widget tree belongs to one L<Term::Fabulous> or
+L<Term::Fabulous::Static> object at a time. Keep one object and call
+its methods again (C<run>, C<render_lines>) instead of creating a
+second one for the same root; see L<Term::Fabulous/new>.
+
+=head1 SEE ALSO
+
+This page is part of L<Term::Fabulous::Manual>. Previous page: L<Term::Fabulous::Manual::CustomWidgets>. Next page: L<Term::Fabulous::Manual::Glossary>.
+
+=cut

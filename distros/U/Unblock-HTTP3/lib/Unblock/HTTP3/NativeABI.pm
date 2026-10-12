@@ -9,7 +9,7 @@ use File::Spec ();
 use Unblock::HTTP3 ();
 use Unblock::HTTP3::_Native ();
 
-our $VERSION = '0.03';
+our $VERSION = '0.12';
 
 use constant ABI_VERSION   => 1;
 use constant TX_ACTIVE     => 0;
@@ -65,19 +65,20 @@ __END__
 
 =head1 NAME
 
-Unblock::HTTP3::NativeABI - Native consumer ABI for Unblock::HTTP3
+Unblock::HTTP3::NativeABI - native consumer ABI for Unblock::HTTP3
 
 =head1 DESCRIPTION
 
 This module exposes the optional native consumer ABI for XS event frameworks
 and HTTP libraries.
 
-The normal Perl API remains the portable interface. Native consumers may keep
-one persistent ABI context for a C<Unblock::HTTP3::Connection> and use C
-function pointers for the common connection and transaction path.
+The ordinary Perl API remains the portable interface. A native integration can
+keep one persistent context for an exact L<Unblock::HTTP3::Client> or
+L<Unblock::HTTP3::Server> and avoid repeated Perl method lookup on the common
+connection and transaction path.
 
-The ABI does not expose libnghttp3 structures or private Unblock::HTTP3
-storage. QUIC transport ownership remains with Net::QUIC.
+The ABI does not expose libnghttp3 structures or take ownership of the QUIC
+transport.
 
 =head1 DISCOVERY
 
@@ -90,15 +91,11 @@ The returned hash contains:
     struct_size
     operations_address
 
-C<provider> keeps the XS provider loaded and may be called again to obtain the
+C<provider> keeps the XS provider loaded and can be called again to obtain the
 current operations address.
 
 Consumers must check both C<abi_version> and C<struct_size> before
 dereferencing operations.
-
-ABI version 1 accepts exact C<Unblock::HTTP3::Connection> and
-C<Unblock::HTTP3::Transaction> objects. Subclasses should use the portable
-Perl API.
 
 =head1 HEADER
 
@@ -110,26 +107,33 @@ Its include directory is available through:
 
     Unblock::HTTP3::NativeABI::native_include_dir()
 
+The complete installed path is available through:
+
+    Unblock::HTTP3::NativeABI::header_path()
+
 C<c_header()> returns the same header text for build systems that prefer to
 generate a private copy.
 
 =head1 ABI VERSION 1
 
-ABI version 1 provides operations to:
+ABI version 1 accepts exact C<Unblock::HTTP3::Client>,
+C<Unblock::HTTP3::Server>, and C<Unblock::HTTP3::Transaction> objects.
+Subclasses and adapters use the portable Perl API.
 
-    create and destroy a persistent Connection context
-    service a Connection
+It provides native operations to:
+
+    create and destroy a Client or Server context
+    service the Client or Server
     submit a normal client request
     poll ready Transactions
-    poll informational response events
-    access canonical Request and Response objects
-    access Transaction stream ID and state
+    poll informational responses
+    inspect Transaction Request and Response objects
+    inspect Transaction stream ID and state
     send normal and informational server responses
-    inspect Connection failure state
+    inspect connection failure state
 
-C<request()> uses the normal request defaults. Advanced Perl-only request
-options such as streaming body configuration remain available through the
-portable API.
+Callback configuration and advanced body objects remain on the portable Perl
+API.
 
 =head1 OWNERSHIP
 
@@ -141,10 +145,9 @@ C<transaction_request()>, C<transaction_response()>, and C<error()> return
 borrowed SV pointers. They remain valid only while the owning object remains
 alive and unchanged.
 
-C<request()> returns NULL when the ordinary request path returns undef,
-including temporary QUIC stream-credit backpressure. Poll operations return
-NULL when no item is ready. C<transaction_response()> returns NULL until a
-response exists.
+C<request()> returns NULL when the normal request path returns undef, including
+temporary QUIC stream-credit backpressure. Poll operations return NULL when no
+item is ready. C<transaction_response()> returns NULL until a response exists.
 
 Canonical Request and Response objects may be inspected with the
 Uniform::HTTP 0.06 native FastPath.
@@ -158,5 +161,14 @@ ithreads. Create a fresh context after an interpreter clone.
 
 The native ABI is an optimization. Consumers that cannot use ABI version 1
 should continue to use the ordinary Perl API.
+
+=head1 SEE ALSO
+
+L<Unblock::HTTP3>, L<Unblock::HTTP3::Client>, L<Unblock::HTTP3::Server>,
+L<Unblock::HTTP3::Transaction>
+
+=head1 LICENSE
+
+MIT License.
 
 =cut

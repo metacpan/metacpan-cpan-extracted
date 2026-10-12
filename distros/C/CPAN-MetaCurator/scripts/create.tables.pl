@@ -8,9 +8,9 @@ use warnings qw(FATAL utf8);
 
 use Data::Dumper::Concise; # For Dumper.
 
-use Getopt::Long;
-
 use CPAN::MetaCurator::Create;
+
+use Getopt::Long;
 
 use Pod::Usage; # For pod2usage().
 

@@ -26,6 +26,11 @@
 #define PWD_SALT_LEN   16
 #define PWD_KEY_LEN    32
 #define PWD_DEFAULT_ITERATIONS 60000
+/* What a cost may be, minted or stored. The stored string is not trusted to
+ * choose its own: below the floor it is a downgrade somebody wrote into the
+ * column, above the ceiling it is a login that never returns. */
+#define PWD_MIN_ITERATIONS 1000
+#define PWD_MAX_ITERATIONS 10000000
 
 /* ---- standard base64 (padded - the MIME::Base64 wire form) ---------------- */
 
@@ -132,6 +137,10 @@ static SV *pwd_hash(pTHX_ const unsigned char *pass, STRLEN plen,
     unsigned char salt[PWD_SALT_LEN], key[PWD_KEY_LEN];
     SV *out, *b64;
     if (!iterations) iterations = PWD_DEFAULT_ITERATIONS;
+    /* refused here, because verify would refuse the string it made */
+    if (iterations < PWD_MIN_ITERATIONS || iterations > PWD_MAX_ITERATIONS)
+        croak("Punk::Auth::Password: iterations must be between %d and %d",
+              PWD_MIN_ITERATIONS, PWD_MAX_ITERATIONS);
     pk_random_bytes(aTHX_ salt, sizeof salt);
     pwd_pbkdf2(pass, plen, salt, sizeof salt, iterations, key, sizeof key);
     out = newSVpvf(PWD_SCHEME "$%u$", (unsigned)iterations);
@@ -162,6 +171,7 @@ static int pwd_parse(const char *s, STRLEN len, U32 *iterations,
         it = nit; q++;
     }
     if (q == p || !it || q >= end || *q != '$') return 0;
+    if (it < PWD_MIN_ITERATIONS || it > PWD_MAX_ITERATIONS) return 0;
     p = q + 1;
     q = (const char *)memchr(p, '$', (size_t)(end - p));
     if (!q || q == p || q + 1 >= end) return 0;
@@ -169,7 +179,7 @@ static int pwd_parse(const char *s, STRLEN len, U32 *iterations,
     if (n <= 0) return 0;
     *saltlen = (size_t)n;
     n = pwd_b64_decode(q + 1, (size_t)(end - q - 1), key, keymax);
-    if (n <= 0) return 0;
+    if (n != PWD_KEY_LEN) return 0;
     *keylen = (size_t)n;
     *iterations = it;
     return 1;
@@ -200,6 +210,8 @@ static void pwd_dummy_verify(pTHX_ const unsigned char *pass, STRLEN plen,
     static const unsigned char salt[PWD_SALT_LEN] = "punk.dummy.salt!";
     unsigned char key[PWD_KEY_LEN];
     if (!iterations) iterations = PWD_DEFAULT_ITERATIONS;
+    if (iterations < PWD_MIN_ITERATIONS) iterations = PWD_MIN_ITERATIONS;
+    if (iterations > PWD_MAX_ITERATIONS) iterations = PWD_MAX_ITERATIONS;
     pwd_pbkdf2(pass, plen, salt, sizeof salt, iterations, key, sizeof key);
 }
 

@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="708" height="471" viewBox="0 0 708 471" role="img" aria-label="perl examples/cookbook/table-tree.pl">
+<title>perl examples/cookbook/table-tree.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="676" height="436" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="676" height="436" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="676" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="354" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/cookbook/table-tree.pl</text>
+<rect x="16.5" y="16.5" width="675" height="435" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="48" y="114" width="477" height="36" fill="#242832"/>
+<rect x="48" y="168" width="477" height="18" fill="#1c2029"/>
+<rect x="48" y="204" width="477" height="18" fill="#1c2029"/>
+<rect x="48" y="240" width="477" height="18" fill="#343a48"/>
+<rect x="48" y="276" width="477" height="18" fill="#1c2029"/>
+<rect x="48" y="312" width="477" height="18" fill="#1c2029"/>
+<rect x="48" y="114" width="477" height="9" fill="#586070"/>
+<rect x="48" y="123" width="5" height="234" fill="#586070"/>
+<rect x="521" y="123" width="4" height="234" fill="#586070"/>
+<rect x="48" y="357" width="477" height="9" fill="#586070"/>
+</g>
+<g class="terminal">
+<text x="48" y="92" textLength="567" fill="#96a0b4">Right opens a folder, Left closes it. Click a marker to toggle.</text>
+<text x="66" y="146" textLength="369" class="b" fill="#ebeef3">Name                       Size  Modified</text>
+<text x="70.5" y="164" text-anchor="middle" fill="#dcdfe4">▾</text>
+<text x="84" y="164" textLength="423" fill="#dcdfe4">project/                       2026-06-01 10:41</text>
+<text x="88.5" y="182" text-anchor="middle" fill="#dcdfe4">▾</text>
+<text x="102" y="182" textLength="405" fill="#dcdfe4">src/                         2026-06-01 09:45</text>
+<text x="120" y="200" textLength="387" fill="#dcdfe4">main.pl           2.8 KiB  2026-06-01 09:45</text>
+<text x="106.5" y="218" text-anchor="middle" fill="#dcdfe4">▸</text>
+<text x="120" y="218" textLength="387" fill="#dcdfe4">lib/                       2026-05-31 09:40</text>
+<text x="88.5" y="236" text-anchor="middle" fill="#dcdfe4">▸</text>
+<text x="102" y="236" textLength="405" fill="#dcdfe4">t/                           2026-05-30 10:50</text>
+<text x="88.5" y="254" text-anchor="middle" fill="#dcdfe4">▾</text>
+<text x="102" y="254" textLength="405" fill="#dcdfe4">releases/                    2026-05-26 00:00</text>
+<text x="120" y="272" textLength="387" fill="#dcdfe4">app-1.0.tar.gz   47.1 KiB  2026-01-01 00:00</text>
+<text x="120" y="290" textLength="387" fill="#dcdfe4">app-1.1.tar.gz   50.7 KiB  2026-03-01 00:00</text>
+<text x="120" y="308" textLength="387" fill="#dcdfe4">app-2.0.tar.gz  199.6 KiB  2026-05-26 00:00</text>
+<text x="102" y="326" textLength="405" fill="#dcdfe4">README.md           6.2 KiB  2026-05-29 10:00</text>
+<text x="102" y="344" textLength="405" fill="#dcdfe4">Makefile.PL           912 B  2026-05-05 16:00</text>
+<text x="48" y="398" textLength="315" fill="#e5c07b">Opened /project/releases: 3 entries</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

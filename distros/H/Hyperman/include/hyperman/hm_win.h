@@ -144,6 +144,12 @@ static ssize_t hm_os_recv(int fd, void *buf, size_t n) {
     return r;
 }
 
+static ssize_t hm_os_recv_peek(int fd, void *buf, size_t n) {
+    int r = recv(HM_SOCK(fd), (char *)buf, (int)n, MSG_PEEK);
+    if (r == SOCKET_ERROR) { hm_os_seterrno(); return -1; }
+    return r;
+}
+
 static ssize_t hm_os_send(int fd, const void *buf, size_t n) {
     int r = send(HM_SOCK(fd), (const char *)buf, (int)n, 0);
     if (r == SOCKET_ERROR) { hm_os_seterrno(); return -1; }
@@ -306,6 +312,7 @@ static ssize_t hm_os_writev(int fd, hm_iovec *iov, int n) {
 #define hm_os_getsockname(fd, sa, len)          getsockname((fd), (sa), (len))
 #define hm_os_close(fd)                         close((fd))
 #define hm_os_recv(fd, b, n)                    read((fd), (b), (n))
+#define hm_os_recv_peek(fd, b, n)               recv((fd), (b), (n), MSG_PEEK)
 #define hm_os_send(fd, b, n)                    write((fd), (b), (n))
 #define hm_os_writev(fd, iov, n)                writev((fd), (iov), (n))
 #define hm_os_getpid()                          ((int)getpid())

@@ -704,4 +704,51 @@ PROG
     }
 }
 
+# ---- any number of options ---------------------------------------------------
+# blob_send copied the caller's options into a fixed array and then appended
+# its own, so enough pairs wrote past the end of it. Forked, because what that
+# looked like was the process aborting.
+{
+    my $many_root = File::Temp::tempdir(CLEANUP => 1);
+    for my $pairs (7, 8, 14, 40) {
+        pipe(my $rd, my $wr) or die "pipe: $!";
+        my $pid = fork;
+        die "fork: $!" unless defined $pid;
+        if (!$pid) {
+            close $rd;
+            my $out = eval {
+                my $pkg = "Many$pairs";
+                eval qq{
+                    package $pkg;
+                    use Punk;
+                    plugin 'Blob' => { root => \$many_root, namespace => 'many' };
+                    get '/b' => sub {
+                        my \$c = shift;
+                        my \$id = \$c->blob_put('hello');
+                        \$c->blob_send(\$id, (inline => 1) x \$pairs,
+                                       type => 'text/plain',
+                                       filename => 'last.txt');
+                    };
+                    1;
+                } or die \$@;
+                my $r = $pkg->to_app->({ REQUEST_METHOD => 'GET',
+                    PATH_INFO => '/b', SCRIPT_NAME => '', QUERY_STRING => '' });
+                my %h = @{ $r->[1] };
+                join '|', $r->[0], $h{'Content-Type'},
+                          $h{'Content-Disposition'} // '-';
+            };
+            print {$wr} defined $out ? $out : "died: $@";
+            close $wr;
+            require POSIX;
+            POSIX::_exit(0);
+        }
+        close $wr;
+        my $got = do { local $/; <$rd> };
+        waitpid $pid, 0;
+        is $? & 127, 0, "blob_send with $pairs repeated options does not abort";
+        is $got, '200|text/plain|inline; filename="last.txt"',
+            '...and the options after them still arrive';
+    }
+}
+
 done_testing;

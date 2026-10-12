@@ -1,15 +1,58 @@
 Game-Floppy
 
-The README is used to introduce the module and provide instructions on
-how to install the module, any machine dependencies it may have (for
-example C compilers and installed libraries) and any other information
-that should be provided before the module is installed.
+A one-button bird through a field of tubes: it falls, a flap lifts it, and it
+dies on a tube, on the ground or off the top. Passing a tube scores 100.
 
-A README file is required for CPAN modules since CPAN extracts the README
-file from a module distribution so that people browsing the archive
-can use it to get an idea of the module's uses. It is usually a good idea
-to provide version information here so that people can decide whether
-fixes for the module are worth downloading.
+This distribution is the game as an engine, a bot that flies it at three
+levels, a program to play it in a terminal, and the raylib window of earlier
+releases, kept and made optional.
+
+    use Game::Floppy;
+
+    my $game = Game::Floppy->new(seed => 'anything');
+    while ($game->status ne 'finished') {
+        $game->flap if $game->bird->{y} > $game->height / 2;
+        $game->tick;
+    }
+    print $game->result->stringify, "\n";
+
+Or, from a shell:
+
+    floppy
+    floppy --watch --level 3
+    floppy --raylib
+
+     Floppy   score 0   best 0
+    +------------------------------------+
+    |    #####                           |
+    |    #####                           |
+    |    #####                           |
+    |                                    |
+    |                                    |
+    |                         =====      |
+    |     o                   #####      |
+    |    o@o                  #####      |
+    |    =====                #####      |
+    |    #####                #####      |
+    |    #####                #####      |
+    |    #####                #####      |
+    +------------------------------------+
+     space, up, enter, w or k flap; p pauses; q quits
+
+Space, up, Enter, w or k flap; p pauses; q quits; after a death, space plays
+again. The field is 516 by 400 pixels at twenty ticks a second, as release
+0.08 drew it; the terminal scales it to a view that keeps its shape, and what
+you see is what collides. Term::ReadKey reads the keys; without it the game
+says so, and floppy --watch, which reads nothing, works anywhere.
+
+The engine prints nothing, reads nothing and calls neither rand nor the
+clock: every tube's gap comes from the seed, so the same seed and the same
+flaps are the same game twice. The bot's three levels were measured against
+each other over hundreds of games.
+
+floppy --raylib opens the window of release 0.08, drawn from the same three
+sprites, when Raylib::FFI is installed. Raylib::FFI needs perl 5.38 or later;
+the rest of this distribution needs 5.14.
 
 
 INSTALLATION
@@ -27,14 +70,12 @@ After installing, you can find documentation for this module with the
 perldoc command.
 
     perldoc Game::Floppy
+    perldoc Game::Floppy::Terminal
 
 You can also look for information at:
 
     RT, CPAN's request tracker (report bugs here)
         https://rt.cpan.org/NoAuth/Bugs.html?Dist=Game-Floppy
-
-    CPAN Ratings
-        https://cpanratings.perl.org/d/Game-Floppy
 
     Search CPAN
         https://metacpan.org/release/Game-Floppy
@@ -47,4 +88,3 @@ This software is Copyright (c) 2024 by LNATION.
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
-

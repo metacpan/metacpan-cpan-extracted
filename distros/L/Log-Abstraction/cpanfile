@@ -1,16 +1,18 @@
 # Generated from Makefile.PL using makefilepl2cpanfile
 
-requires 'perl', '5.014';
+requires 'perl', '5.026';
 
 requires 'Carp';
 requires 'Config::Abstraction', '0.40';
 requires 'ExtUtils::MakeMaker', '6.64';   # Minimum version for TEST_REQUIRES
 requires 'File::Basename';
+requires 'IO::Handle';   # autoflush on open log files
 requires 'IPC::System::Simple';
 requires 'JSON::PP';
 requires 'Log::Log4perl';
 requires 'POSIX';
 requires 'Params::Get', '0.15';
+requires 'parent';   # the Log::Abstraction::Backend::* classes
 requires 'Readonly';
 requires 'Readonly::Values::Syslog', '0.04';
 requires 'Return::Set', '0.04';
@@ -24,7 +26,8 @@ requires 'autodie';
 recommends 'Email::Sender::Simple';
 recommends 'Email::Sender::Transport::SMTP';
 recommends 'Email::Simple';   # sendmail backend
-recommends 'Log::Any';   # Log::Any::Adapter::Abstraction
+recommends 'Log::Any';   # Log::Any::Adapter::Abstraction, log_any backend
+recommends 'Log::Dispatch';   # log_dispatch backend
 
 on 'test' => sub {
 	requires 'Config';

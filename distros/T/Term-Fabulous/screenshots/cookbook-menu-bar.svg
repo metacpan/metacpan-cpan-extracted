@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="636" height="273" viewBox="0 0 636 273" role="img" aria-label="perl examples/cookbook/menu-bar.pl">
+<title>perl examples/cookbook/menu-bar.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="604" height="238" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="604" height="238" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="604" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="318" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/cookbook/menu-bar.pl</text>
+<rect x="16.5" y="16.5" width="603" height="237" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="30" y="60" width="54" height="18" fill="#1e2128"/>
+<rect x="84" y="60" width="54" height="18" fill="#61afef"/>
+<rect x="138" y="60" width="468" height="18" fill="#1e2128"/>
+<rect x="84" y="78" width="207" height="18" fill="#1e2128"/>
+<rect x="84" y="96" width="9" height="18" fill="#1e2128"/>
+<rect x="93" y="96" width="189" height="18" fill="#61afef"/>
+<rect x="282" y="96" width="9" height="18" fill="#1e2128"/>
+<rect x="84" y="114" width="207" height="18" fill="#1e2128"/>
+<rect x="93" y="86" width="189" height="1" fill="#61afef"/>
+<rect x="88" y="96" width="1" height="18" fill="#61afef"/>
+<rect x="286" y="96" width="1" height="18" fill="#61afef"/>
+<rect x="93" y="122" width="189" height="1" fill="#61afef"/>
+</g>
+<polyline points="88.5 96 88.5 91 88.538 90.413 88.653 89.835 88.843 89.278 89.103 88.75 89.43 88.261 89.818 87.818 90.261 87.43 90.75 87.103 91.278 86.843 91.835 86.653 92.413 86.538 93 86.5 93 86.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="286.5 96 286.5 91 286.462 90.413 286.347 89.835 286.157 89.278 285.897 88.75 285.57 88.261 285.182 87.818 284.739 87.43 284.25 87.103 283.722 86.843 283.165 86.653 282.587 86.538 282 86.5 282 86.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="88.5 114 88.5 118 88.538 118.587 88.653 119.165 88.843 119.722 89.103 120.25 89.43 120.739 89.818 121.182 90.261 121.57 90.75 121.897 91.278 122.157 91.835 122.347 92.413 122.462 93 122.5 93 122.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="286.5 114 286.5 118 286.462 118.587 286.347 119.165 286.157 119.722 285.897 120.25 285.57 120.739 285.182 121.182 284.739 121.57 284.25 121.897 283.722 122.157 283.165 122.347 282.587 122.462 282 122.5 282 122.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<g class="terminal">
+<text x="39" y="74" textLength="36" fill="#dcdfe4">List</text>
+<text x="93" y="74" textLength="36" fill="#101216">View</text>
+<text x="552" y="74" textLength="45" fill="#787e8a">To-do</text>
+<text x="48" y="110" textLength="27" fill="#61afef">[x]</text>
+<text x="106.5" y="110" text-anchor="middle" fill="#101216">✓</text>
+<text x="120" y="110" textLength="153" fill="#101216">Show done   Alt+d</text>
+<text x="48" y="128" textLength="27" fill="#dcdfe4">[ ]</text>
+<text x="48" y="146" textLength="144" fill="#dcdfe4">[ ] Fix the bike</text>
+<text x="48" y="164" textLength="27" fill="#61afef">[x]</text>
+<text x="84" y="164" textLength="126" fill="#dcdfe4">Book the train</text>
+<text x="48" y="182" textLength="144" fill="#dcdfe4">[ ] Answer Grace</text>
+</g>
+<g shape-rendering="crispEdges">
+<rect x="39" y="75" width="9" height="1" fill="#dcdfe4"/>
+<rect x="93" y="75" width="9" height="1" fill="#101216"/>
+</g>
+</svg>

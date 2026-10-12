@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="870" height="309" viewBox="0 0 870 309" role="img" aria-label="perl examples/cookbook/chart-sparklines.pl">
+<title>perl examples/cookbook/chart-sparklines.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="838" height="274" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="838" height="274" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="838" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="435" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/cookbook/chart-sparklines.pl</text>
+<rect x="16.5" y="16.5" width="837" height="273" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="48" y="78" width="666" height="36" fill="#242832"/>
+<rect x="642" y="114" width="9" height="18" fill="#197257"/>
+<rect x="48" y="132" width="405" height="18" fill="#1c2029"/>
+<rect x="453" y="132" width="18" height="18" fill="#954b4e"/>
+<rect x="471" y="132" width="243" height="18" fill="#1c2029"/>
+<rect x="660" y="150" width="9" height="18" fill="#197257"/>
+<rect x="678" y="150" width="9" height="18" fill="#197257"/>
+<rect x="48" y="168" width="630" height="18" fill="#1c2029"/>
+<rect x="678" y="168" width="9" height="18" fill="#1b765a"/>
+<rect x="687" y="168" width="27" height="18" fill="#1c2029"/>
+<rect x="48" y="186" width="666" height="18" fill="#1c2029"/>
+<rect x="48" y="78" width="666" height="9" fill="#586070"/>
+<rect x="48" y="87" width="5" height="108" fill="#586070"/>
+<rect x="710" y="87" width="4" height="108" fill="#586070"/>
+<rect x="606" y="116" width="27" height="16" fill="#197257"/>
+<rect x="651" y="116" width="9" height="16" fill="#197257"/>
+<rect x="633" y="119" width="9" height="13" fill="#197257"/>
+<rect x="660" y="119" width="9" height="13" fill="#197257"/>
+<rect x="516" y="121" width="9" height="11" fill="#197257"/>
+<rect x="534" y="121" width="36" height="11" fill="#197257"/>
+<rect x="597" y="121" width="9" height="11" fill="#197257"/>
+<rect x="669" y="121" width="9" height="11" fill="#197257"/>
+<rect x="525" y="123" width="9" height="9" fill="#197257"/>
+<rect x="570" y="123" width="27" height="9" fill="#197257"/>
+<rect x="507" y="125" width="9" height="7" fill="#197257"/>
+<rect x="678" y="125" width="9" height="7" fill="#197257"/>
+<rect x="453" y="130" width="9" height="2" fill="#197257"/>
+<rect x="471" y="130" width="9" height="2" fill="#197257"/>
+<rect x="489" y="130" width="18" height="2" fill="#197257"/>
+<rect x="471" y="134" width="9" height="16" fill="#954b4e"/>
+<rect x="480" y="137" width="90" height="13" fill="#954b4e"/>
+<rect x="570" y="139" width="9" height="11" fill="#954b4e"/>
+<rect x="579" y="141" width="9" height="9" fill="#954b4e"/>
+<rect x="588" y="143" width="9" height="7" fill="#954b4e"/>
+<rect x="597" y="146" width="9" height="4" fill="#954b4e"/>
+<rect x="606" y="148" width="9" height="2" fill="#954b4e"/>
+<rect x="633" y="148" width="9" height="2" fill="#954b4e"/>
+<rect x="660" y="148" width="27" height="2" fill="#954b4e"/>
+<rect x="561" y="152" width="27" height="16" fill="#197257"/>
+<rect x="642" y="152" width="18" height="16" fill="#197257"/>
+<rect x="669" y="152" width="9" height="16" fill="#197257"/>
+<rect x="543" y="155" width="18" height="13" fill="#197257"/>
+<rect x="588" y="155" width="9" height="13" fill="#197257"/>
+<rect x="624" y="155" width="18" height="13" fill="#197257"/>
+<rect x="525" y="157" width="18" height="11" fill="#197257"/>
+<rect x="597" y="157" width="27" height="11" fill="#197257"/>
+<rect x="516" y="159" width="9" height="9" fill="#197257"/>
+<rect x="498" y="164" width="18" height="4" fill="#197257"/>
+<rect x="462" y="166" width="9" height="2" fill="#197257"/>
+<rect x="480" y="166" width="18" height="2" fill="#197257"/>
+<rect x="669" y="170" width="9" height="16" fill="#1b765a"/>
+<rect x="660" y="175" width="9" height="11" fill="#1b765a"/>
+<rect x="570" y="177" width="54" height="9" fill="#1b765a"/>
+<rect x="633" y="177" width="27" height="9" fill="#1b765a"/>
+<rect x="561" y="179" width="9" height="7" fill="#1b765a"/>
+<rect x="624" y="179" width="9" height="7" fill="#1b765a"/>
+<rect x="507" y="182" width="54" height="4" fill="#1b765a"/>
+<rect x="453" y="184" width="27" height="2" fill="#1b765a"/>
+<rect x="498" y="184" width="9" height="2" fill="#1b765a"/>
+<rect x="48" y="195" width="666" height="9" fill="#586070"/>
+</g>
+<g class="terminal">
+<text x="66" y="110" textLength="432" class="b" fill="#ebeef3">Symbol  Name                Last  30 days  Trend</text>
+<text x="66" y="128" textLength="369" fill="#dcdfe4">ACME    Acme Corp.        111.84    +1.4%</text>
+<text x="66" y="146" textLength="369" fill="#dcdfe4">GLBX    Globex             41.66   -14.2%</text>
+<text x="66" y="164" textLength="369" fill="#dcdfe4">INIT    Initech           257.09   +13.2%</text>
+<text x="66" y="182" textLength="369" fill="#dcdfe4">UMBR    Umbrella Holding   87.71   +14.2%</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

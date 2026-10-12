@@ -223,20 +223,20 @@ subtest '_log() — hash-ref logger: silent no-op when file cannot be opened' =>
 # 5. _log() — hash-ref logger: none of file/syslog/sendmail → croak
 # ============================================================
 
-subtest '_log() — hash-ref logger with no actionable key croaks' => sub {
-	plan tests => 1;
+subtest 'new() — hash-ref logger with no actionable key croaks' => sub {
+	plan tests => 2;
 
-	# The croak guard fires when none of file/array/syslog/sendmail/fd
-	# produce output. Guard uses !exists($logger->{'sendmail'}) to avoid
-	# autovivification from the earlier exists($logger->{'sendmail'})&&exists(to) check.
-	my $logger = Log::Abstraction->new(
-		logger => { unrecognised_key => 1 },
-		level  => 'debug',
+	# A logger hash with none of the backend keys has nowhere to send
+	# messages, which new() reports (before 0.40, the first message croaked)
+	throws_ok(
+		sub { Log::Abstraction->new(logger => { unrecognised_key => 1 }, level => 'debug') },
+		qr/the logger hash has none of the keys array, fd, file, journald, log_any, log_dispatch, sendmail, syslog/,
+		'hash-ref logger with no valid key croaks'
 	);
 	throws_ok(
-		sub { $logger->debug('trigger') },
-		qr/Don.t know how to deal/i,
-		'hash-ref logger with no valid key croaks'
+		sub { Log::Abstraction->new(logger => {}) },
+		qr/the logger hash has none of the keys/,
+		'so does an empty hash'
 	);
 };
 

@@ -4,11 +4,11 @@ package oEdtk::libDev ;
 #
 
 BEGIN {
-		use oEdtk::logger	1.032;
+		use oEdtk::logger	2.1109;
 		use oEdtk::Main	0.42;
 		use oEdtk::trackEdtk 	qw (ini_Edtk_Conf conf_To_Env env_Var_Completion);
 		use Config::IniFiles;
-		# use File::Copy; 	# a prevoir pour mettre le dev dans le contexte de la prod
+		# use File::Copy; 	# to be provided to run dev in the prod context
 		use File::Basename;
 		use Date::Calc 		qw(Gmtime Today Compress);
 
@@ -46,11 +46,11 @@ our $NOK =-1;
 # CODE - DOC AT THE END
 #
 
-# limiter l'esportation de ces fonctions (export OK)
+# limit the export of these functions (export OK)
 
 sub check_EDTK_DIR () {
-	# controle l'environnement Edtk, 
-	# en particulier l'existance des Directories EDTK_DIR déclarés dans l'environnement 
+	# check the Edtk environment, 
+	# in particular the existence of the EDTK_DIR directories declared in the environment 
 	while ((my $cle, my $valeur) = each (%ENV)){
 		if ($cle=~/EDTK\_DIR/) {
 			#print "$cle => $valeur\n";
@@ -62,8 +62,8 @@ sub check_EDTK_DIR () {
 }
 
 sub tree_Directory_Completion ($){
-	# complète si nécessaire l'arborescence entière du chemin passé en paramètre
-	# en créant les répertoires du chemin transmis en paramètre
+	# complete, if needed, the whole tree of the path passed as a parameter
+	# by creating the directories of the path passed as a parameter
 	my $tree=shift;
 	#print $tree."\n";
 
@@ -125,7 +125,7 @@ sub run_Edtk_dev() {
 			#warn "INFO : data extraction seem good\n";
 		}
 
-		# contrôler l'appariement des balises
+		# check tag matching
 		if (c7_Control_Bal($work_file) eq $NOK) {
 			warn "ERROR: return $? in c7_Control_Bal\n";
 			&wait_Enter();
@@ -156,10 +156,10 @@ sub run_Edtk_dev() {
 		}
 
 	} else {
-		# Cas LaTeX
+		# LaTeX case
 		$doclean = 0;
 		$ENV{EDTK_DOC_OUTPUT}= "$ENV{EDTK_FDATAOUT}.$ENV{EDTK_EXT_WORK}";
-# xxxxxxxx vérifier mais on en a pluls besoin maintenant que c'est rodé (plus la peine de vérifier les intermédiaires)
+# xxxxxxxx check, but we no longer need it now that it works (no need to check the intermediate files)
 #		$ENV{EDTK_EXT_DEFAULT}=$ENV{EDTK_EXT_WORK};
 
 		chdir($ENV{EDTK_DIR_APPTMP})
@@ -179,7 +179,7 @@ sub run_Edtk_dev() {
 
 	warn "INFO : ".oe_now_time()." -END- \n";
 
-	# si tout c correctement deroulé, vidage des tmp
+	# if everything ran correctly, empty the tmp dir
 	# $| = 1; # autoflush
 	if ($doclean) {
 		warn "INFO : clean temp\n";
@@ -191,8 +191,8 @@ sub run_Edtk_dev() {
 }
 
 sub prep_Edtk_Data ($;$$) {
-	# déclenchement du traitement d'extraction de données 
-	# dans le contexte du lancement automatisé run_Edtk_dev
+	# trigger the data extraction process 
+	# in the context of the automated run run_Edtk_dev
 	my $command	="$ENV{EDTK_DIR_APP}/$ENV{EDTK_PRGNAME}/$ENV{EDTK_PRGNAME}.$ENV{EDTK_EXT_PERL}";
 	my $arg1	=shift;
 	my $arg2	=shift || "";
@@ -221,7 +221,7 @@ sub prep_Edtk_Data ($;$$) {
 
 
 sub wait_Enter() {
-	print "\nPause, taper <enter> pour continuer...\n";
+	print "\nPause, press <enter> to continue...\n";
 	until (<STDIN>) {
 	}
 1;
@@ -229,17 +229,17 @@ sub wait_Enter() {
 
 	
 sub delSp(\$){
-	#suppression des espaces
-	# le parametre est une reference implicite, exemple : delSp($chaine)
-	# retourne le nombre de caracteres retires
+	#remove spaces
+	# the parameter is an implicit reference, example: delSp($chaine)
+	# returns the number of removed characters
 	my $rChaine =shift;
 	return ${$rChaine} =~s/\s//go;
 }
 
-sub IdUniqueSur6 () { # fonction déprécié
-	#formatage d'un Id sur 6 caractères alphanumériques
-	# reçoit en paramètre la référence à un identifiant
-	# gestion des doublons en interne à l'exécution de la fonction
+sub IdUniqueSur6 () { # deprecated function
+	#format an id to 6 alphanumeric characters
+	# receives as a parameter the reference to an identifier
+	# duplicate handling internal to the function run
 	my $rId =shift;
 	my %hListeId;
 	my $cpt =0;
@@ -254,14 +254,14 @@ sub IdUniqueSur6 () { # fonction déprécié
 
 
 {
-my $appelIUS7=0; 			# variable constante propre a la fonction
+my $appelIUS7=0; 			# constant variable local to the function
 	sub IdUniqueSur7 () {
-		# definition d'un identifiant unique sur 7 caracteres
-		# les 6 premiers caracteres de la clef transmises sont extraits
-		# si l'id est deja connu, on prend les 4 premiers et on ajoute un compteur sur 3 (correspond a la séquence des appels)
-		# s'il est n'est toujours pas unique, on prend les 3 premiers caracteres et on complète le compteur sur 3 par un caractere
-		# recoit : - une reference a une clef
-		#          - optionnel : une reference a une valeur de compteur (3 numerique)
+		# define a unique identifier over 7 characters
+		# the first 6 characters of the passed key are extracted
+		# if the id is already known, take the first 4 and append a 3-digit counter (matches the call sequence)
+		# if it is still not unique, take the first 3 characters and pad the 3-digit counter with a character
+		# receives: - a reference to a key
+		#          - optional: a reference to a counter value (3 digits)
 
 		my ($refId, $rInit)=@_;
 		if ($rInit) {$appelIUS7=${$rInit}} else {$appelIUS7++};
@@ -271,20 +271,20 @@ my $appelIUS7=0; 			# variable constante propre a la fonction
 		if (exists ($hListeId{${$refId}})){
 			${$refId}=sprintf ("%-4.4s%0.3d",${$refId}, $appelIUS7);
 
-			my $cpt=97;    # pour le caractere "a"
+			my $cpt=97;    # for the character "a"
 			while (exists ($hListeId{${$refId}})) {
 				${$refId}=sprintf ("%-3.3s%0.3d%1.1s",${$refId}, $appelIUS7, chr($cpt++));
-				die &logger ($NOK,"impossible de creer une clef unique") if ($cpt >= 123);
+				die &logger ($NOK,"cannot create a unique key") if ($cpt >= 123);
 
 				# use Log::Log4perl;
 				# Log::Log4perl->init("log.conf"); => read log.conf
 				# $logger = Log::Log4perl->get_logger("");
-				# $logger->logdie("impossible de creer une clef unique") if ($cpt >= 123);
+				# $logger->logdie("cannot create a unique key") if ($cpt >= 123);
 				# $logger->trace("...");  # Log a trace message
 				# $logger->debug("...");  # Log a debug message
 				# $logger->info("...");   # Log a info message
-				# $logger->warn("...");   # Log a warn message	/ $logger->error_warn("..."); (comprend l'appel à warn() )
-				# $logger->error("...");  # Log a error message	/ $logger->logdie ("..."); (comprend l'appel à die() )
+				# $logger->warn("...");   # Log a warn message	/ $logger->error_warn("..."); (includes the call to warn())
+				# $logger->error("...");  # Log a error message	/ $logger->logdie ("..."); (includes the call to die())
 				# $logger->fatal("...");  # Log a fatal message
 			}
 		}
@@ -294,19 +294,19 @@ my $appelIUS7=0; 			# variable constante propre a la fonction
 }
 	
 sub lastLong($) {
-	# selectionne le terme alpha le plus significatif de la chaine transmise en reference
-	# exemple d'appel : $mot=&lastLong ($chaine);
-	# les caractères séparateurs sont des espaces, des _ ou des -
+	# select the most significant alpha token of the string passed by reference
+	# example call: $mot=&lastLong ($chaine);
+	# the separator characters are spaces, _ or -
 
 	my $chaine =shift;
 	$chaine =~s/-/ /g;
 	$chaine =~s/_/ /g;
 	oe_trimp_space($chaine);
 
-	# Si MOTIF contient des parenthèses (et donc des sous-motifs), un élément supplémentaire est créé 
-	# dans le tableau résultat pour chaque chaîne reconnue par le sous-motif.
+	# If PATTERN contains parentheses (and therefore subpatterns), an extra element is created 
+	# in the result array for each string matched by the subpattern.
 	#    split(/([,-])/, "1-10,20", 3);
-	# produit la liste de valeurs
+	# produces the list of values
 	#    (1, '-', 10, ',', 20)
 	# http://perl.enstimac.fr/DocFr/perlfunc.html#item_split
 	my @mots =split(" ",$chaine); 
@@ -324,8 +324,8 @@ return $motLong;
 }
 	
 sub lastCourt ($) {
-	# selectionne le terme alpha le plus court de la chaine transmise en reference
-	# exemple d'appel : $mot=&lastCourt ($chaine);
+	# select the shortest alpha token of the string passed by reference
+	# example call: $mot=&lastCourt ($chaine);
 	my $chaine =shift;
 	$chaine=~s/-/ /g;
 	$chaine=~s/_/ /g;
@@ -346,32 +346,32 @@ return $motCourt;
 }
 
 sub clean_full_dir ($;$){
-	# le unlink tout seul ne fonctionne pas sous windows avec des wildcards ???
-	# cette fonction fait le ménage dans le répertoire passé en paramètre
-	# et dans les sous répertoires
+	# unlink alone does not work on windows with wildcards ???
+	# this function cleans the directory passed as a parameter
+	# and the subdirectories
 	my ($membre, $option, $key, @listRep);
 	$membre =shift;
 	$option =shift;
 	$option ||="";
 
-	# construction du motif de recherche pour l'expression reguliere
+	# build the search pattern for the regular expression
 	my $suppr_motif;
 	$suppr_motif =".*";
-	# print "suppr. -> $suppr_motif -> $membre\n";
+	# print "del. -> $suppr_motif -> $membre\n";
 
-	# gestion des séparateurs de répertoire
-	# le séparateur standard perl (sous *nix / windows ...) -> /
+	# handle directory separators
+	# the standard perl separator (on *nix / windows ...) -> /
 	$membre.="/";
-	# le séparateur fourni sous Dos est converti \ -> /
+	# the separator supplied on Dos is converted \ -> /
 	$membre =~s/\\+/\//g;
-	# suppression des répétitions /+ -> /
+	# remove repeated /+ -> /
 	$membre =~s/\/+/\//g;
 
 	unshift (@listRep, $membre);
 
 	$key =pop @listRep;
 	ITEMS: for (;$key;){
-		# comme listRep est interactif foreach ne tient pas compte des valeurs ajoutees dans listRep
+		# since listRep is interactive foreach ignores values added to listRep
 		# print "path= <$key> < \@listRep=>@listRep<\n";
 
 		eval {
@@ -385,9 +385,9 @@ sub clean_full_dir ($;$){
 		$membre= readdir(DIR);
 		for (;$membre;){
 			if ($membre ne "." && $membre ne ".."){
-				# si le membre est un repertoire
+				# if the member is a directory
 				if (-d $key.$membre){
-					# print "$key$membre \t (repertoire)\n";
+					# print "$key$membre \t (directory)\n";
 					push (@listRep, "$key$membre/");
 
 				} else {
@@ -395,20 +395,20 @@ sub clean_full_dir ($;$){
 					# print "$file\n";
 					if ($file =~m{$suppr_motif}){
 						if ($option ne "--dry-run") {
-							warn "INFO : suppresion de $file\n" if ($option eq "--verbose");
+							warn "INFO : deleting $file\n" if ($option eq "--verbose");
 							unlink ($file);
 						} else {
 							warn "INFO : --dry-run : $file\n";
 						}
 					}
-				} #fin de if
-			} #fin de if
+				} #end of if
+			} #end of if
 			$membre= readdir(DIR);
-		} #fin de for
+		} #end of for
 
 		closedir DIR;
 		$key =pop @listRep;
-	} #fin de for
+	} #end of for
 
 	#close OUT;
 
@@ -423,19 +423,19 @@ sub file_list ($$;$){
 	$opt ||="";
 	
 
-	# gestion des séparateurs de répertoire
-	# le séparateur standard perl (sous *nix / windows ...) -> /
+	# handle directory separators
+	# the standard perl separator (on *nix / windows ...) -> /
 	$membre.="/";
-	# le séparateur fourni sous Dos est converti \ -> /
+	# the separator supplied on Dos is converted \ -> /
 	$membre =~s/\\+/\//g;
-	# suppression des répétitions /+ -> /
+	# remove repeated /+ -> /
 	$membre =~s/\/+/\//g;
 	
 	unshift (@listRep, $membre);
 
 	$key =pop @listRep;
 	ITEMS: for (;$key;){
-		# comme listRep est interactif foreach ne tient pas compte des valeurs ajoutees dans listRep
+		# since listRep is interactive foreach ignores values added to listRep
 		# print "path= <$key> < \@listRep=>@listRep<\n";
 
 		eval {
@@ -449,9 +449,9 @@ sub file_list ($$;$){
 		$membre= readdir(DIR);
 		for (;$membre;){
 			if ($membre ne "." && $membre ne ".."){
-				# si le membre est un repertoire
+				# if the member is a directory
 				if (-d $key.$membre){
-					# print "$key$membre \t (repertoire)\n";
+					# print "$key$membre \t (directory)\n";
 					push (@listRep, "$key$membre/");
 
 				} else {
@@ -460,14 +460,14 @@ sub file_list ($$;$){
 					if ($file =~m{$motif}){
 						push (@listFile, $file);
 					}
-				} #fin de if
-			} #fin de if
+				} #end of if
+			} #end of if
 			$membre= readdir(DIR);
-		} #fin de for
+		} #end of for
 
 		closedir DIR;
 		$key =pop @listRep;
-	} #fin de for
+	} #end of for
 
 	#close OUT;
 

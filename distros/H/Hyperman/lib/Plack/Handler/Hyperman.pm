@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Hyperman ();
 
-our $VERSION = '0.56';
+our $VERSION = '0.58';
 
 sub new {
     my ($class, %args) = @_;
@@ -14,8 +14,10 @@ sub new {
 sub _parse_listen {
     my $spec = shift;
     return $spec if ref $spec eq 'HASH';
-    die "Plack::Handler::Hyperman: UNIX socket listeners are not supported "
-      . "(got '$spec')\n" if $spec =~ m{/};
+    return { path => $spec } if $spec =~ m{/};        # a unix-domain socket
+    if ($spec =~ /\A\[([^\]]+)\]:(\d+)\z/) {        # [::1]:8080
+        return { host => $1, port => $2 + 0 };
+    }
     if ($spec =~ /\A(.*):(\d+)\z/) {
         return { (length $1 ? (host => $1) : ()), port => $2 + 0 };
     }
@@ -32,9 +34,10 @@ sub run {
                   : 0),                            # 0 = ncpu
         map { defined $self->{$_} ? ($_ => $self->{$_}) : () }
             qw(reuseport completion max_requests_per_worker shutdown_grace affinity
-               idle_timeout header_timeout max_pipeline http2 http3 http3_max_conns redirect_https
+               idle_timeout header_timeout body_timeout max_pipeline http2 http3 http3_max_conns redirect_https
                compress compress_min_length compress_level max_body
-               access_log deny_capacity rate_capacity
+               access_log access_log_format error_log deny_capacity rate_capacity
+               user group umask pid_file listen_fds proxy_protocol
                bus_slots bus_slot_size bus_groups arena_name arena_size
                distinct_clients
                tls_cert tls_key tls_ca tls_verify tls_sni),

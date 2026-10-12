@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="636" height="615" viewBox="0 0 636 615" role="img" aria-label="perl examples/widgets/input-validation.pl">
+<title>perl examples/widgets/input-validation.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="604" height="580" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="604" height="580" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="604" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="318" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/widgets/input-validation.pl</text>
+<rect x="16.5" y="16.5" width="603" height="579" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="228" y="78" width="63" height="18" fill="#343a48"/>
+<rect x="291" y="78" width="9" height="18" fill="#e06c75"/>
+<rect x="300" y="78" width="144" height="18" fill="#343a48"/>
+<rect x="228" y="114" width="216" height="18" fill="#242830"/>
+<rect x="228" y="150" width="216" height="18" fill="#242830"/>
+<rect x="228" y="186" width="234" height="54" fill="#242830"/>
+<rect x="228" y="258" width="216" height="18" fill="#242830"/>
+<rect x="228" y="294" width="216" height="54" fill="#242830"/>
+<rect x="228" y="402" width="144" height="18" fill="#242830"/>
+<rect x="228" y="438" width="216" height="18" fill="#242830"/>
+<rect x="228" y="474" width="234" height="54" fill="#242830"/>
+<rect x="228" y="546" width="216" height="18" fill="#242830"/>
+<rect x="237" y="194" width="216" height="1" fill="#e06c75"/>
+<rect x="232" y="204" width="1" height="18" fill="#e06c75"/>
+<rect x="457" y="204" width="1" height="18" fill="#e06c75"/>
+<rect x="237" y="230" width="216" height="1" fill="#e06c75"/>
+<rect x="237" y="302" width="198" height="1" fill="#e06c75"/>
+<rect x="232" y="312" width="1" height="18" fill="#e06c75"/>
+<rect x="439" y="312" width="1" height="18" fill="#e06c75"/>
+<rect x="237" y="338" width="198" height="1" fill="#e06c75"/>
+<rect x="237" y="482" width="216" height="1" fill="#e5c07b"/>
+<rect x="232" y="492" width="1" height="18" fill="#e5c07b"/>
+<rect x="457" y="492" width="1" height="18" fill="#e5c07b"/>
+<rect x="237" y="518" width="216" height="1" fill="#e5c07b"/>
+</g>
+<polyline points="232.5 204 232.5 199 232.538 198.413 232.653 197.835 232.843 197.278 233.103 196.75 233.43 196.261 233.818 195.818 234.261 195.43 234.75 195.103 235.278 194.843 235.835 194.653 236.413 194.538 237 194.5 237 194.5" fill="none" stroke="#e06c75" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="457.5 204 457.5 199 457.462 198.413 457.347 197.835 457.157 197.278 456.897 196.75 456.57 196.261 456.182 195.818 455.739 195.43 455.25 195.103 454.722 194.843 454.165 194.653 453.587 194.538 453 194.5 453 194.5" fill="none" stroke="#e06c75" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="232.5 222 232.5 226 232.538 226.587 232.653 227.165 232.843 227.722 233.103 228.25 233.43 228.739 233.818 229.182 234.261 229.57 234.75 229.897 235.278 230.157 235.835 230.347 236.413 230.462 237 230.5 237 230.5" fill="none" stroke="#e06c75" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="457.5 222 457.5 226 457.462 226.587 457.347 227.165 457.157 227.722 456.897 228.25 456.57 228.739 456.182 229.182 455.739 229.57 455.25 229.897 454.722 230.157 454.165 230.347 453.587 230.462 453 230.5 453 230.5" fill="none" stroke="#e06c75" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="232.5 312 232.5 307 232.538 306.413 232.653 305.835 232.843 305.278 233.103 304.75 233.43 304.261 233.818 303.818 234.261 303.43 234.75 303.103 235.278 302.843 235.835 302.653 236.413 302.538 237 302.5 237 302.5" fill="none" stroke="#e06c75" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="439.5 312 439.5 307 439.462 306.413 439.347 305.835 439.157 305.278 438.897 304.75 438.57 304.261 438.182 303.818 437.739 303.43 437.25 303.103 436.722 302.843 436.165 302.653 435.587 302.538 435 302.5 435 302.5" fill="none" stroke="#e06c75" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="232.5 330 232.5 334 232.538 334.587 232.653 335.165 232.843 335.722 233.103 336.25 233.43 336.739 233.818 337.182 234.261 337.57 234.75 337.897 235.278 338.157 235.835 338.347 236.413 338.462 237 338.5 237 338.5" fill="none" stroke="#e06c75" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="439.5 330 439.5 334 439.462 334.587 439.347 335.165 439.157 335.722 438.897 336.25 438.57 336.739 438.182 337.182 437.739 337.57 437.25 337.897 436.722 338.157 436.165 338.347 435.587 338.462 435 338.5 435 338.5" fill="none" stroke="#e06c75" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="232.5 492 232.5 487 232.538 486.413 232.653 485.835 232.843 485.278 233.103 484.75 233.43 484.261 233.818 483.818 234.261 483.43 234.75 483.103 235.278 482.843 235.835 482.653 236.413 482.538 237 482.5 237 482.5" fill="none" stroke="#e5c07b" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="457.5 492 457.5 487 457.462 486.413 457.347 485.835 457.157 485.278 456.897 484.75 456.57 484.261 456.182 483.818 455.739 483.43 455.25 483.103 454.722 482.843 454.165 482.653 453.587 482.538 453 482.5 453 482.5" fill="none" stroke="#e5c07b" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="232.5 510 232.5 514 232.538 514.587 232.653 515.165 232.843 515.722 233.103 516.25 233.43 516.739 233.818 517.182 234.261 517.57 234.75 517.897 235.278 518.157 235.835 518.347 236.413 518.462 237 518.5 237 518.5" fill="none" stroke="#e5c07b" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="457.5 510 457.5 514 457.462 514.587 457.347 515.165 457.157 515.722 456.897 516.25 456.57 516.739 456.182 517.182 455.739 517.57 455.25 517.897 454.722 518.157 454.165 518.347 453.587 518.462 453 518.5 453 518.5" fill="none" stroke="#e5c07b" stroke-width="1" stroke-linejoin="round"/>
+<g class="terminal">
+<text x="48" y="92" textLength="135" fill="#96a0b4">typing, focused</text>
+<text x="228" y="92" textLength="63" fill="#e06c75">ada@exa</text>
+<text x="48" y="128" textLength="45" fill="#96a0b4">valid</text>
+<text x="228" y="128" textLength="135" fill="#dcdfe4">ada@example.com</text>
+<text x="48" y="164" textLength="63" fill="#96a0b4">invalid</text>
+<text x="228" y="164" textLength="36" fill="#e06c75">ada@</text>
+<text x="48" y="200" textLength="135" fill="#96a0b4">invalid, border</text>
+<text x="237" y="218" textLength="36" fill="#e06c75">ada@</text>
+<text x="48" y="272" textLength="135" fill="#96a0b4">required, empty</text>
+<text x="228" y="272" textLength="81" fill="#787e8a">Your name</text>
+<text x="48" y="308" textLength="144" fill="#96a0b4">required, border</text>
+<text x="237" y="326" textLength="81" fill="#787e8a">Your name</text>
+<text x="48" y="380" textLength="162" fill="#96a0b4">required check box</text>
+<text x="228" y="380" textLength="198" fill="#e06c75">[ ] I accept the terms</text>
+<text x="48" y="416" textLength="153" fill="#96a0b4">required dropdown</text>
+<text x="228" y="416" textLength="126" fill="#787e8a">Choose a color</text>
+<text x="367.5" y="416" text-anchor="middle" fill="#61afef">▾</text>
+<text x="48" y="452" textLength="117" fill="#96a0b4">invalid_color</text>
+<text x="228" y="452" textLength="36" fill="#c678dd">ada@</text>
+<text x="48" y="488" textLength="117" fill="#96a0b4">theme variant</text>
+<text x="237" y="506" textLength="36" fill="#e5c07b">ada@</text>
+<text x="48" y="560" textLength="72" fill="#96a0b4">disabled</text>
+<text x="228" y="560" textLength="36" fill="#6c7078">ada@</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

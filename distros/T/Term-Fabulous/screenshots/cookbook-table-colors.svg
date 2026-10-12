@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="636" height="345" viewBox="0 0 636 345" role="img" aria-label="perl examples/cookbook/table-colors.pl">
+<title>perl examples/cookbook/table-colors.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="604" height="310" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="604" height="310" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="604" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="318" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/cookbook/table-colors.pl</text>
+<rect x="16.5" y="16.5" width="603" height="309" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="48" y="78" width="468" height="36" fill="#2c3340"/>
+<rect x="48" y="132" width="468" height="18" fill="#1c2029"/>
+<rect x="48" y="150" width="468" height="18" fill="#343a48"/>
+<rect x="48" y="168" width="468" height="18" fill="#1c2029"/>
+<rect x="48" y="204" width="468" height="36" fill="#1c2029"/>
+<rect x="48" y="78" width="468" height="9" fill="#4b5568"/>
+<rect x="48" y="87" width="5" height="144" fill="#4b5568"/>
+<rect x="512" y="87" width="4" height="144" fill="#4b5568"/>
+<rect x="48" y="231" width="468" height="9" fill="#4b5568"/>
+</g>
+<g class="terminal">
+<text x="75" y="110" textLength="414" class="b" fill="#e5c07b">Planet     Moons    Radius (km)    Day (hours)</text>
+<text x="75" y="128" textLength="414" fill="#dcdfe4">Mercury        0          2,440        4,222.6</text>
+<text x="75" y="146" textLength="414" fill="#dcdfe4">Venus          0          6,052        2,802.0</text>
+<text x="75" y="164" textLength="414" fill="#dcdfe4">Earth          1          6,371           24.0</text>
+<text x="75" y="182" textLength="414" fill="#dcdfe4">Mars           2          3,390           24.7</text>
+<text x="75" y="200" textLength="414" fill="#dcdfe4">Jupiter       95         69,911            9.9</text>
+<text x="75" y="218" textLength="414" fill="#dcdfe4">Saturn       146         58,232           10.7</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

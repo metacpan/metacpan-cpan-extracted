@@ -89,10 +89,20 @@ static int psf_parse_range(const char *v, STRLEN len, UV size,
 }
 
 /* ---- validators ------------------------------------------------------------
- * The ETag is strong and nginx-shaped: "<hex mtime>-<hex size>". */
+ * The ETag is strong and nginx-shaped: "<hex mtime>-<hex size>", with the
+ * mtime's nanoseconds as a third field when the filesystem keeps them. Without
+ * that field a file rewritten in place to the same size inside one second
+ * keeps its tag, and If-None-Match answers 304 for bytes the client has never
+ * seen. */
 
-static void psf_etag(char *out, size_t outlen, UV mtime, UV size) {
-    my_snprintf(out, outlen, "\"%" UVxf "-%" UVxf "\"", mtime, size);
+#define PSF_ETAG_MAX 64
+
+static void psf_etag(char *out, size_t outlen, UV mtime, UV ns, UV size) {
+    if (ns)
+        my_snprintf(out, outlen, "\"%" UVxf "-%" UVxf "-%" UVxf "\"",
+                    mtime, size, ns);
+    else
+        my_snprintf(out, outlen, "\"%" UVxf "-%" UVxf "\"", mtime, size);
 }
 
 /* Is `etag` in a comma-separated entity-tag list (If-None-Match)? Weak
@@ -113,7 +123,12 @@ static int psf_etag_in(const char *h, STRLEN hlen,
             while (q > p && (q[-1] == ' ' || q[-1] == '\t')) q--;
             if (q - p == 1 && *p == '*') return 1;
             if (q - p > 2 && p[0] == 'W' && p[1] == '/') p += 2;
-            if ((STRLEN)(q - p) == elen && memEQ(p, etag, elen)) return 1;
+            /* weak comparison both ways: our own tag may be a weak one */
+            if (elen > 2 && etag[0] == 'W' && etag[1] == '/') {
+                if ((STRLEN)(q - p) == elen - 2
+                    && memEQ(p, etag + 2, elen - 2)) return 1;
+            }
+            else if ((STRLEN)(q - p) == elen && memEQ(p, etag, elen)) return 1;
         }
         p = e;
     }
@@ -127,9 +142,12 @@ static int psf_not_modified(pTHX_ HV *env, const char *etag, STRLEN elen,
                             const char *date) {
     SV **e = hv_fetchs(env, "HTTP_IF_NONE_MATCH", 0);
     if (e && *e && SvOK(*e)) {
-        STRLEN l;
+        STRLEN l, i;
         const char *h = SvPV(*e, l);
-        return etag ? psf_etag_in(h, l, etag, elen) : 0;
+        /* an empty one is no condition at all, and must not switch off the
+         * date check the way a real one does */
+        for (i = 0; i < l && (h[i] == ' ' || h[i] == '\t'); i++) ;
+        if (i < l) return etag ? psf_etag_in(h, l, etag, elen) : 0;
     }
     e = hv_fetchs(env, "HTTP_IF_MODIFIED_SINCE", 0);
     if (e && *e && SvOK(*e) && date)
@@ -254,6 +272,8 @@ typedef struct psf_src {
     const char *bytes;         /* ... else the in-memory source        */
     UV          size;
     UV          mtime;
+    UV          mns;           /* its nanoseconds, 0 when unknown      */
+    UV          ctime;         /* 0 when unknown                       */
     int         has_mtime;     /* scalar sources only via the option   */
     /* The rest of the caller's stat, so the descriptor cache can tell
      * "the same path" from "the same FILE" without a syscall of its own.
@@ -262,6 +282,10 @@ typedef struct psf_src {
      * an unverifiable descriptor is worse than an open. */
     UV          dev, ino;
     int         has_id;
+    /* Set on the way out when the file opened was not the size the caller's
+     * stat said: a caller whose stat came from a cache retries with a fresh
+     * one rather than send a Content-Length the body will not match. */
+    int         changed;
 } psf_src;
 
 typedef struct psf_opts {
@@ -270,7 +294,8 @@ typedef struct psf_opts {
     int inline_;               /* disposition token                    */
     int has_disp;              /* emit Content-Disposition at all      */
     int ranges;                /* honour Range / advertise bytes       */
-    SV *etag;                  /* override, quoted or bare, or NULL    */
+    SV *etag;                  /* override: bare, quoted, or a weak
+                                  W/"..."; or NULL                     */
     SV *cache_control;         /* freshness lifetime, or NULL          */
     AV *extra;                 /* $c->header pairs (borrowed), or NULL */
 } psf_opts;
@@ -320,7 +345,7 @@ static SV *psf_wrap(pTHX_ IV status, AV *hdr, SV *body) {
  * between the caller's stat and the open here - the caller decides what
  * its missing-file answer looks like. */
 static SV *psf_respond(pTHX_ HV *env, psf_src *src, psf_opts *opt) {
-    char etagbuf[48], date[64];
+    char etagbuf[PSF_ETAG_MAX], date[64];
     const char *etag = NULL, *ldate = NULL;
     STRLEN elen = 0;
     const char *method;
@@ -334,17 +359,29 @@ static SV *psf_respond(pTHX_ HV *env, psf_src *src, psf_opts *opt) {
 
     /* validators */
     if (opt->etag && SvOK(opt->etag)) {
+        /* Any length: a SHA-256 in hex is the natural thing to pass and is
+         * 64 characters. Given already quoted, or as a weak tag, it goes out
+         * as it came; given bare it is quoted here. */
         STRLEN ol;
         const char *ov = SvPV(opt->etag, ol);
-        if (ol && ov[0] == '"')
-            my_snprintf(etagbuf, sizeof etagbuf, "%.*s", (int)ol, ov);
+        SV *tag;
+        if ((ol >= 2 && ov[0] == '"')
+            || (ol >= 4 && ov[0] == 'W' && ov[1] == '/' && ov[2] == '"'))
+            tag = newSVpvn(ov, ol);
         else
-            my_snprintf(etagbuf, sizeof etagbuf, "\"%.*s\"", (int)ol, ov);
-        etag = etagbuf;
-        elen = strlen(etagbuf);
+            tag = newSVpvf("\"%" SVf "\"", SVfARG(opt->etag));
+        sv_2mortal(tag);
+        etag = SvPV(tag, elen);
+        {
+            STRLEN i;
+            for (i = 0; i < elen; i++)
+                if ((U8)etag[i] < 0x20 || (U8)etag[i] == 0x7f)
+                    croak("Punk::Context::send_file: etag may not contain "
+                          "a control character");
+        }
     }
     else if (src->has_mtime) {
-        psf_etag(etagbuf, sizeof etagbuf, src->mtime, src->size);
+        psf_etag(etagbuf, sizeof etagbuf, src->mtime, src->mns, src->size);
         etag = etagbuf;
         elen = strlen(etagbuf);
     }
@@ -453,13 +490,27 @@ static SV *psf_respond(pTHX_ HV *env, psf_src *src, psf_opts *opt) {
              * was measured. */
             SV *cached = (src->has_id && !partial)
                 ? pfc_get(aTHX_ src->path, src->plen,
-                          src->dev, src->ino, src->mtime, src->size)
+                          src->dev, src->ino, src->mtime, src->mns,
+                          src->ctime, src->size)
                 : NULL;
             if (cached) { body = cached; goto have_body; }
             fp = PerlIO_open(src->path, "rb");
             if (!fp) {
                 SvREFCNT_dec((SV *)hdr);
                 return NULL;
+            }
+            /* The headers above were built from the caller's stat, and that
+             * may be a second old. The handle is the file as it is now: if it
+             * is not the size that was promised, promise nothing. */
+            {
+                Stat_t fst;
+                if (PerlLIO_fstat(PerlIO_fileno(fp), &fst) == 0
+                    && (UV)fst.st_size != src->size) {
+                    PerlIO_close(fp);
+                    SvREFCNT_dec((SV *)hdr);
+                    src->changed = 1;
+                    return NULL;
+                }
             }
             if (partial) {
                 if (PerlIO_seek(fp, (Off_t)off, SEEK_SET) < 0) {
@@ -572,12 +623,14 @@ static SV *ps_serve_file_opt(pTHX_ HV *env, const char *file, STRLEN flen,
     psf_src  s;
     psf_opts o;
     char sib[MAXPATHLEN + 8];
-    char etagbuf[52];
+    char etagbuf[PSF_ETAG_MAX + 8];
     AV *extra = NULL;
     const char *ae;
     STRLEN ael = 0;
-    int i;
+    int i, retried = 0;
+    SV *resp;
     PERL_UNUSED_ARG(is_head);
+  again:
     if (!pfc_stat(aTHX_ file, flen, &st) || !S_ISREG(st.st_mode)) return NULL;
     Zero(&s, 1, psf_src);
     Zero(&o, 1, psf_opts);
@@ -585,6 +638,8 @@ static SV *ps_serve_file_opt(pTHX_ HV *env, const char *file, STRLEN flen,
     s.plen      = flen;
     s.size      = (UV)st.st_size;
     s.mtime     = (UV)st.st_mtime;
+    s.mns       = PFC_MTIME_NS(st);
+    s.ctime     = (UV)st.st_ctime;
     s.has_mtime = 1;
     /* the rest of the stat we just did, for the descriptor cache to validate
      * against - no extra syscall, this one was already paid for */
@@ -628,6 +683,8 @@ static SV *ps_serve_file_opt(pTHX_ HV *env, const char *file, STRLEN flen,
             s.plen  = flen + enc->slen;
             s.size  = (UV)sst.st_size;
             s.mtime = (UV)sst.st_mtime;
+            s.mns   = PFC_MTIME_NS(sst);
+            s.ctime = (UV)sst.st_ctime;
             /* the sibling is a different file, so it carries its own identity
              * - reusing the original's would key the cache on one path and
              * validate it against another */
@@ -637,7 +694,7 @@ static SV *ps_serve_file_opt(pTHX_ HV *env, const char *file, STRLEN flen,
             /* an encoding-tagged ETag, so an identity client and this one
              * never collide in a shared cache even if the two files should
              * ever share an mtime and a size */
-            psf_etag(etagbuf, sizeof etagbuf, s.mtime, s.size);
+            psf_etag(etagbuf, sizeof etagbuf, s.mtime, s.mns, s.size);
             {
                 STRLEN el = strlen(etagbuf);
                 if (el > 1 && etagbuf[el - 1] == '"'
@@ -655,7 +712,17 @@ static SV *ps_serve_file_opt(pTHX_ HV *env, const char *file, STRLEN flen,
         }
     }
     o.extra = extra;
-    return psf_respond(aTHX_ env, &s, &o);
+    resp = psf_respond(aTHX_ env, &s, &o);
+    if (!resp && s.changed && !retried) {
+        /* The file is not the one the stat cache remembers. Ask again, once:
+         * a second disagreement is a file being written as we look, and the
+         * caller's 404 is as good an answer as any to that. */
+        pfc_expire(aTHX_ file, flen);
+        if (s.path != file) pfc_expire(aTHX_ s.path, s.plen);
+        retried = 1;
+        goto again;
+    }
+    return resp;
 }
 
 static SV *ps_serve_file(pTHX_ HV *env, const char *file, STRLEN flen,

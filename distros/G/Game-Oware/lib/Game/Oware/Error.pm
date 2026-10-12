@@ -5,7 +5,7 @@ use warnings;
 
 use Object::Proto::Sugar -types;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our (@FLAGS, %MESSAGE);
 
@@ -74,7 +74,7 @@ Game::Oware::Error - a refused move, returned rather than thrown
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

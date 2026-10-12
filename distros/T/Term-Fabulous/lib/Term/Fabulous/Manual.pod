@@ -1,0 +1,1133 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Term::Fabulous::Manual - The Term::Fabulous user guide
+
+=head1 HOW TO READ THIS MANUAL
+
+This manual explains how Term::Fabulous works and how you use it. This
+page is its starting point: it introduces the library, shows a first
+program and ends with the L</FEATURE INDEX>, which maps tasks to the
+sections, recipes and class pages that describe them. The topics
+themselves are on pages of their own, listed under L</CONTENTS>.
+
+=over
+
+=item To learn Term::Fabulous
+
+Read L</INTRODUCTION> and L</YOUR FIRST PROGRAM> on this page, then the
+topic pages in the order of L</CONTENTS>. Every topic page links to the
+previous and the next page at its top and bottom, so you can read the
+whole manual from start to end.
+
+=item To find something
+
+Look the task up in the L</FEATURE INDEX>. Every topic has its own
+heading, so you can also search a page: with C</> in C<perldoc>, or with
+the table of contents on MetaCPAN. Terms the manual uses are defined in
+L<Term::Fabulous::Manual::Glossary>.
+
+=back
+
+The manual is one of four kinds of documentation:
+
+=over
+
+=item The manual (this page and its topic pages)
+
+Explains the concepts: layout, text and colors, events, the keyboard,
+the mouse and the focus, forms, tables, charts, KDL layout files, the
+event loop, testing and writing widgets of your own.
+
+=item L<Term::Fabulous::Cookbook>
+
+Recipes: complete, runnable programs for common tasks, each with a
+picture and notes on the lines that matter. Its index page lists every
+recipe; the recipes themselves are on fifteen topic pages, from
+L<Term::Fabulous::Cookbook::GettingStarted> to
+L<Term::Fabulous::Cookbook::Extending>.
+
+=item L<Term::Fabulous::Examples>
+
+The example programs of the distribution, each with a picture: demo
+programs, one program per widget, and the programs of the cookbook.
+
+=item The class pages
+
+One reference page per class, such as L<Term::Fabulous> (the
+application object), L<Term::Fabulous::Widget::Box> or
+L<Term::Fabulous::Widget::TextField>. A class page lists every
+constructor parameter, method, event, key, mouse action and KDL
+property of the class. The
+L<list of modules|Term::Fabulous/MODULES> on the main page names all of
+them, grouped by purpose.
+
+=back
+
+=head2 Conventions
+
+Every example uses subroutine signatures. A complete program starts
+with this header, which works on every Perl that Term::Fabulous
+supports (5.32.1 and later):
+
+	use v5.32;
+	use warnings;
+	use feature 'signatures';
+	no warnings 'experimental::signatures';
+
+Shorter snippets leave the header out. A snippet may use variables from
+an earlier snippet of the same section, and usually C<$root> (the root
+widget) and C<$ui> (the L<Term::Fabulous> object).
+
+Code in these documents is indented. When you copy an example that
+contains a here-document (C<<< <<'KDL' >>>), remove the indentation from
+the line that ends it (C<KDL>): Perl recognizes the terminator only at
+the start of a line.
+
+=head1 CONTENTS
+
+The manual has these pages, in reading order:
+
+=over
+
+=item This page
+
+L</INTRODUCTION>: what Term::Fabulous does, the libraries it builds on,
+and how a frame is drawn. L</REQUIREMENTS>, L</YOUR FIRST PROGRAM> and
+the L</FEATURE INDEX>.
+
+=item L<Term::Fabulous::Manual::Layout>
+
+The widgets and the widget tree, widget ids, and how the layout engine
+sizes and places widgets: direction, sizing, padding, gaps, alignment,
+flow and stack layouts, floating widgets and equal sizes across the
+tree. Dividers between widgets, accordions whose sections open and
+close, tabs, and the tabs of the open documents of a program.
+
+=item L<Term::Fabulous::Manual::Looks>
+
+Text (character strings, wrapping, alignment, wide characters and
+emoji), colors (formats, alpha, the terminal's default colors, lighter
+and darker colors), borders and themes.
+
+=item L<Term::Fabulous::Manual::Events>
+
+Events and listeners, bubbling, the keyboard and key names, the focus,
+the mouse, hover and press, and scrolling.
+
+=item L<Term::Fabulous::Manual::Forms>
+
+The input widgets (text fields, text areas, check boxes, radio
+buttons, dropdowns, sliders, star ratings, segmented controls, color
+pickers), what
+they have in common, editing text, the clipboard, undo, and complete
+forms.
+
+=item L<Term::Fabulous::Manual::Feedback>
+
+The widgets that show what the program is doing: progress bars, with
+and without a known extent, spinners, toasts that appear in a corner
+and go away by themselves, status bars, and how widgets animate without
+timers. Also prompts, which ask the user a question and wait for the
+answer, and file dialogs, which ask for a file or a folder.
+
+=item L<Term::Fabulous::Manual::Menus>
+
+Commands and the keys that run them, menu bars, context menus, a help
+screen that lists the keys, and the shape of an application window
+with a menu bar and a status bar.
+
+=item L<Term::Fabulous::Manual::Charts>
+
+Canvases you draw on yourself, and the chart widgets that draw
+themselves from data.
+
+=item L<Term::Fabulous::Manual::Tables>
+
+The table widget: how it works, rows, columns, display text and
+mutators, widgets in cells, and the feature index of the table.
+
+=item L<Term::Fabulous::Manual::TableRows>
+
+Tables, continued: sorting, filtering, groups, trees, pages, the
+cursor and the selection.
+
+=item L<Term::Fabulous::Manual::TableStyles>
+
+Tables, continued: colors, styles, lines, padding, size, scrolling and
+printing a table.
+
+=item L<Term::Fabulous::Manual::KDL>
+
+Describing the widget tree in a KDL layout file instead of Perl code.
+
+=item L<Term::Fabulous::Manual::Programs>
+
+The event loop, timers and other asynchronous work, quitting, errors,
+output without a terminal, and testing.
+
+=item L<Term::Fabulous::Manual::CustomWidgets>
+
+Writing widgets of your own.
+
+=item L<Term::Fabulous::Manual::Troubleshooting>
+
+Solutions to common problems.
+
+=item L<Term::Fabulous::Manual::Glossary>
+
+The terms used in this documentation.
+
+=back
+
+=head1 INTRODUCTION
+
+Term::Fabulous builds terminal user interfaces in Perl: forms,
+dashboards, log viewers, data browsers, editors, games. You describe
+the screen as a tree of I<widgets>: boxes, text, buttons, input fields,
+tables, charts, scrollable areas and canvases. Term::Fabulous sizes and
+positions the widgets, draws them, and turns key presses, mouse clicks
+and terminal resizes into I<events> that your code reacts to.
+
+A program usually takes over the whole terminal while it runs and gives
+it back unchanged when it ends. It can also draw into a few rows below
+the shell's output instead, like a prompt (see
+L<Term::Fabulous/INLINE MODE>), or print a widget tree once as text,
+without any interaction (see
+L<Term::Fabulous::Manual::Programs/RENDERING WITHOUT A TERMINAL>).
+
+The parts of a program are always the same:
+
+=over
+
+=item The widget tree
+
+The widgets, built in Perl with C<new> and C<add_child>, or read from a
+KDL layout file. The top of the tree is the I<root widget>. See
+L<Term::Fabulous::Manual::Layout>.
+
+=item Listeners
+
+Code references registered with C<< $widget->on( EventName => sub {...} ) >>
+that run when an event happens: a key press, a click, a changed value.
+See L<Term::Fabulous::Manual::Events>.
+
+=item The application object
+
+A L<Term::Fabulous> object that holds the tree. Its C<run> method opens
+the terminal, runs the event loop and returns when the program should
+end.
+
+=back
+
+Three libraries do the heavy lifting:
+
+=over
+
+=item Clay
+
+A layout engine (used through L<Clay::XS> and L<Clay::UI>). It decides
+the position and size of every widget from rules such as "fill the
+remaining width" or "be as tall as the content". Term::Fabulous
+measures in terminal cells, so for Clay one unit is one cell.
+
+=item termbox2
+
+A small C library, compiled into L<Term::Fabulous::Termbox>, that
+switches the terminal into full-screen mode, reads keys and mouse
+input, and writes characters with 24-bit colors.
+
+=item IO::Async
+
+The event loop (L<IO::Async::Loop>). It waits for input, draws the
+screen when something changed, and runs your timers, sockets and child
+processes in the same loop.
+
+=back
+
+You do not need to know these libraries in detail. The manual explains
+everything you need from them and links to their documentation for the
+rest.
+
+=head2 How a frame is drawn
+
+A I<frame> is one complete layout and drawing of the screen. While L<run|Term::Fabulous/run> is active, Term::Fabulous checks 30 times per
+second whether anything changed since the last frame: a widget was
+changed through one of its methods, input arrived, the terminal was
+resized, or the program asked for a frame with
+L<invalidate|Term::Fabulous/invalidate>. When nothing changed, nothing is drawn.
+When something changed, a frame is drawn in three steps:
+
+=over
+
+=item 1.
+
+Clay lays out the widget tree for the current terminal size.
+
+=item 2.
+
+Term::Fabulous draws every widget into termbox2's screen buffer:
+backgrounds, borders, text and canvases.
+
+=item 3.
+
+termbox2 compares the buffer with what the terminal already shows and
+sends only the cells that changed.
+
+=back
+
+Because the whole screen is laid out again in every frame, there is no
+"redraw" method to call. Change a widget (its text, color, size or
+children), and the change is visible in the next frame, at most 1/30
+second later. The widget methods tell Term::Fabulous that a frame is
+needed; only a widget of your own that draws from state it keeps itself
+has to say so (see
+L<telling Term::Fabulous that something changed|Term::Fabulous::Manual::CustomWidgets/Telling Term::Fabulous that something changed>).
+
+Pointer movement is the one exception to "drawn at the next check":
+when frames take long to draw, a frame that only shows the pointer at a
+new position is drawn at most at every other check, so that moving the
+mouse cannot keep the program busy with nothing but redrawing.
+
+=head1 REQUIREMENTS
+
+=over
+
+=item *
+
+Perl 5.32.1 or later.
+
+=item *
+
+A C compiler. termbox2 ships with the distribution and is compiled into
+L<Term::Fabulous::Termbox> when Term::Fabulous is installed, with
+truecolor and grapheme cluster support always on; there is no separate
+library to install or find.
+
+=item *
+
+A terminal that understands 24-bit ("truecolor") colors. Most modern
+terminals do (xterm, GNOME Terminal, Konsole, kitty, iTerm2, Windows
+Terminal), and so does tmux with truecolor enabled (see
+L<Term::Fabulous::Manual::Troubleshooting/Colors are wrong or look washed out>).
+In a terminal without truecolor support, the colors come out wrong.
+
+=item *
+
+A UTF-8 locale, for example C<LANG=C.UTF-8> or C<LANG=en_US.UTF-8>
+(C<locale -a> lists the installed ones). Without it, wide characters
+such as CJK text and emoji cannot be placed correctly, and L<run|Term::Fabulous/run> warns about
+it when it starts.
+
+=item *
+
+For mouse support, a terminal that reports mouse events. Nearly all do;
+see L<Term::Fabulous::Manual::Events/MOUSE> for what is reported.
+
+=item *
+
+Optional: L<Imager>, for pictures in L<Term::Fabulous::Widget::Image>,
+with the image libraries (libpng, libjpeg, ...) of the formats you
+want to show. Installing Term::Fabulous does not require it; without
+it, an image widget shows a notice in its place.
+
+=item *
+
+Optional: L<Imager::File::SIXEL> with L<Imager>, for pictures in sixel
+graphics in L<Term::Fabulous::Widget::Sixel>, and a terminal that shows
+sixel graphics and reports the size of its cells. Without them, a sixel
+widget shows a notice in its place.
+
+=back
+
+=head1 YOUR FIRST PROGRAM
+
+This program shows a dark blue screen with a framed greeting in the
+middle and ends when you press C<q>, C<Escape> or C<Ctrl+C>. It is
+shipped as F<examples/cookbook/first-program.pl>; run it with
+C<perl examples/cookbook/first-program.pl> (see
+L<Term::Fabulous::Examples/RUNNING THE EXAMPLES>).
+
+=for code-from examples/cookbook/first-program.pl
+
+	use v5.32;
+	use warnings;
+	use feature 'signatures';
+	no warnings 'experimental::signatures';
+
+	use Clay::XS qw(sizing_grow CLAY_ALIGN_X_CENTER CLAY_ALIGN_Y_CENTER);
+	use Term::Fabulous;
+	use Term::Fabulous::Enum::BorderStyle;
+	use Term::Fabulous::Widget::Box;
+	use Term::Fabulous::Widget::Text;
+
+	# The root widget fills the whole terminal and centers its child.
+	my $root = Term::Fabulous::Widget::Box->new(
+		background_color => [ 20, 25, 45, 255 ],
+		layout           => {
+			sizing          => { width => sizing_grow(),       height => sizing_grow() },
+			child_alignment => { x     => CLAY_ALIGN_X_CENTER, y      => CLAY_ALIGN_Y_CENTER },
+		},
+	);
+
+	# A box with a rounded border, one cell of space left and right of the text.
+	my $frame = Term::Fabulous::Widget::Box->new(
+		bordered     => 1,
+		border_style => Term::Fabulous::Enum::BorderStyle->Round,
+		border_color => [ 120, 170, 255, 255 ],
+		layout       => { padding => { left => 1, right => 1 } },
+	);
+	$frame->add_child(
+		Term::Fabulous::Widget::Text->new(
+			text       => 'Hello, terminal! Press q to quit.',
+			text_color => [ 255, 255, 255, 255 ],
+		)
+	);
+	$root->add_child($frame);
+
+	my $ui = Term::Fabulous->new( root => $root, width => 80, height => 24 );
+
+	# Nothing has the keyboard focus, so key presses go to the root widget.
+	$root->on(
+		KeyPress => sub ($event) {
+			my $name = $event->key_name // '';
+			$ui->loop->stop if $name eq 'q' || $name eq 'Escape';
+			return;
+		}
+	);
+
+	$ui->run;    # returns when the loop stops
+	say 'Bye!';
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-first-program.svg" alt="The first program: a greeting in a box with a rounded blue border, centered on a dark blue screen"></p>
+
+=end html
+
+What happens here:
+
+=over
+
+=item *
+
+L<Term::Fabulous::Widget::Box> is the general container. It can have a
+background color, a border and any number of children.
+
+=item *
+
+The C<layout> hash tells Clay how to size and arrange the box and its
+children (see L<Term::Fabulous::Manual::Layout/LAYOUT>).
+C<sizing_grow()> means "take all the room the parent offers"; a box
+without C<sizing> is as big as its content. C<child_alignment> centers
+the children (see
+L<Term::Fabulous::Manual::Layout/Aligning and centering children>).
+
+=item *
+
+L<Term::Fabulous::Widget::Text> shows one piece of text. Colors are
+C<[red, green, blue, alpha]> arrays with values from 0 to 255; color
+strings such as C<'#78aaff'> work too (see
+L<Term::Fabulous::Manual::Looks/COLORS>). The border style comes from
+L<Term::Fabulous::Enum::BorderStyle> (see
+L<Term::Fabulous::Manual::Looks/BORDERS>).
+
+=item *
+
+C<< Term::Fabulous->new >> takes the root widget and an initial size.
+C<width> and C<height> are required, but C<run> replaces them with the
+real terminal size.
+
+=item *
+
+C<< $root->on( KeyPress => sub { ... } ) >> registers a I<listener>:
+code that runs when the event happens (see
+L<Term::Fabulous::Manual::Events/EVENTS>). Key presses go to the widget
+that has the keyboard focus, or to the root widget when no widget has
+it, as here. C<key_name> returns a readable name of the key, such as
+C<q>, C<Escape> or C<Ctrl+Left> (see
+L<Term::Fabulous::Manual::Events/KEYBOARD>).
+
+=item *
+
+C<< $ui->run >> opens the terminal, handles input and draws frames until
+the loop stops: when a listener calls C<< $ui->loop->stop >>, when the
+user presses C<Ctrl+C>, or when the process receives C<SIGINT>,
+C<SIGTERM> or C<SIGHUP>. Then it restores the terminal and returns, and
+the program prints C<Bye!> on the normal screen.
+
+=item *
+
+Quitting on C<Escape> does not catch C<Alt> plus a letter: terminals
+send that as C<Escape> followed by the letter, in one write, and
+Term::Fabulous names it C<Alt+x> (see
+L<Term::Fabulous::Manual::Events/Key names>).
+
+=back
+
+Where to go next: L<Term::Fabulous::Manual::Layout> explains the widget
+tree and the layout, and
+the recipe
+L<A minimal program to start from|Term::Fabulous::Cookbook::GettingStarted/A minimal program to start from>
+is a program to start your own from.
+
+=head1 FEATURE INDEX
+
+Where to find what, by task. Each entry names the section of the manual
+that explains the feature, the recipes that show it in a complete
+program, and the class pages with the reference.
+
+=head2 Programs and the event loop
+
+=over
+
+=item Start a full-screen application
+
+L</YOUR FIRST PROGRAM>, L<Term::Fabulous/run>,
+L<Term::Fabulous::Cookbook::GettingStarted/A minimal program to start from>.
+
+=item Quit the program on a key
+
+L<Term::Fabulous::Manual::Programs/Quitting>,
+L<Term::Fabulous::Cookbook::GettingStarted/Quit with q or Escape>.
+
+=item Ask for input below the shell's output instead of taking the whole screen (inline mode)
+
+L<Term::Fabulous/INLINE MODE>,
+L<Term::Fabulous::Cookbook::Forms/Ask for input below the shell's output (inline mode)>.
+
+=item Timers, animation, background work, sockets, child processes
+
+L<Term::Fabulous::Manual::Programs/Timers and other asynchronous work>,
+L<Term::Fabulous::Cookbook::LiveData/Update the screen from a timer (a clock)>,
+L<Term::Fabulous::Cookbook::LiveData/Show the output of a running command>.
+
+=item React to the terminal size and to resizes
+
+L<Term::Fabulous::Manual::Events/Event reference> (C<Start>, C<Resize>),
+L<Term::Fabulous::Event::Start>, L<Term::Fabulous::Event::Resize>,
+L<Term::Fabulous::Cookbook::Layout/Change the layout with the terminal size (Start and Resize events)>.
+
+=item Errors, crashes, restoring the terminal
+
+L<Term::Fabulous::Manual::Programs/Errors and terminal restore>.
+
+=item Draw a frame now, or after the next frame
+
+L<Term::Fabulous/invalidate>, L<Term::Fabulous::Render/after_draw>.
+
+=back
+
+=head2 Widgets, layout and the widget tree
+
+=over
+
+=item Which widgets there are
+
+L<Term::Fabulous::Manual::Layout/The widgets>, L<Term::Fabulous/MODULES>.
+
+=item Build, change and search the widget tree; widget ids
+
+L<Term::Fabulous::Manual::Layout/Building the tree>,
+L<Term::Fabulous::Manual::Layout/Widget ids>,
+L<Term::Fabulous::Manual::Layout/Changing the tree>,
+L<Term::Fabulous::Cookbook::Forms/Find widgets by id>,
+L<Term::Fabulous::Widget>.
+
+=item Arrange widgets in rows and columns; sizes, padding and gaps
+
+L<Term::Fabulous::Manual::Layout/LAYOUT>, L<Term::Fabulous::Widget::Box>.
+
+=item Center something
+
+L<Term::Fabulous::Manual::Layout/Aligning and centering children>,
+L<Term::Fabulous::Manual::Looks/Alignment>.
+
+=item Let widgets wrap onto the next line, or stack them on top of each other
+
+L<Term::Fabulous::Manual::Layout/Flow layout>,
+L<Term::Fabulous::Manual::Layout/Stack layout>.
+
+=item Place a widget over the others (floating widgets, overlays)
+
+L<Term::Fabulous::Manual::Layout/Floating widgets>,
+L<Term::Fabulous::Widget/floating>.
+
+=item Give widgets in different places the same width or height
+
+L<Term::Fabulous::Manual::Layout/Equal sizes across the tree>,
+L<Term::Fabulous::Cookbook::Layout/Line up labels with equal widths (width_group)>.
+
+=item Change the layout while the program runs
+
+L<Term::Fabulous::Manual::Layout/Changing the layout at run time>.
+
+=item Scroll content that is larger than its box; scroll it from code
+
+L<Term::Fabulous::Manual::Layout/Scrolling content>,
+L<Term::Fabulous::Manual::Events/SCROLLING>,
+L<Term::Fabulous::Widget::ScrollBox>,
+L<Term::Fabulous/bounding_box, scroll_state, scroll_to>,
+L<Term::Fabulous::Cookbook::LiveData/Add lines to a scrolling log (ScrollBox)>,
+L<Term::Fabulous::Cookbook::LiveData/Scroll a ScrollBox from code (keep a log at the newest line)>.
+
+=item Mark widgets with states and classes and style them by those
+
+L<Term::Fabulous::Widget/add_state>,
+L<Term::Fabulous::Cookbook::Layout/Mark widgets with states and classes>.
+
+=item Draw a line between widgets, with a heading on it
+
+L<Term::Fabulous::Manual::Layout/DIVIDERS>, L<Term::Fabulous::Widget::Divider>.
+
+=item Sections that open and close under their headers (an accordion)
+
+L<Term::Fabulous::Manual::Layout/ACCORDIONS>,
+L<Term::Fabulous::Widget::Accordion>, L<Term::Fabulous::Event::Select>.
+
+=item Pages behind a row of tabs, on any side of the page
+
+L<Term::Fabulous::Manual::Layout/TABS>, L<Term::Fabulous::Widget::Tabs>,
+L<Term::Fabulous::Widget::Tabs::Page>, L<Term::Fabulous::Event::Select>.
+
+=item A tab for each open document, with marks for unsaved changes and errors (document tabs)
+
+L<Term::Fabulous::Manual::Layout/Document tabs>,
+L<Term::Fabulous::Widget::DocumentTabs>,
+L<Term::Fabulous::Event::TabClose>, L<Term::Fabulous::Event::TabAdd>,
+L<Term::Fabulous::Cookbook::Menus/Keep several documents open in tabs (DocumentTabs)>.
+
+=back
+
+=head2 Text, colors and borders
+
+=over
+
+=item Show text; wrap, align and space it; bold, italic and underlined text
+
+L<Term::Fabulous::Manual::Looks/TEXT>,
+L<Term::Fabulous::Manual::Looks/Bold, italic and underline>,
+L<Term::Fabulous::Widget::Text>,
+L<Term::Fabulous::Cookbook::GettingStarted/Wrap, align and space text>.
+
+=item Non-ASCII text, wide characters, emoji, combining characters
+
+L<Term::Fabulous::Manual::Looks/Text is character strings>,
+L<Term::Fabulous::Manual::Looks/Wide characters and emoji>,
+L<Term::Fabulous::Unicode>,
+L<Term::Fabulous::Cookbook::GettingStarted/Show non-ASCII text (umlauts, CJK, combining accents)>.
+
+=item Colors and color strings; lighter, darker and mixed colors
+
+L<Term::Fabulous::Manual::Looks/COLORS>, L<Term::Fabulous::Color>.
+
+=item Themes: colors, border styles and borders for every widget, theme files, variants, switching at run time
+
+L<Term::Fabulous::Manual::Looks/THEMES>, L<Term::Fabulous::Theme>,
+L<Term::Fabulous::Cookbook::Layout/Switch themes at run time (built-in themes and a theme file)>,
+L<Term::Fabulous/theme>.
+
+=item Make and change themes in an editor with a live preview, check theme files from a script
+
+L<Term::Fabulous::Manual::Looks/The theme editor>,
+L<Term::Fabulous::ThemeEditor>, L<Term::Fabulous::Theme::Document>,
+L<Term::Fabulous::Cookbook::Layout/Design a theme against your own screen (the theme editor)>.
+
+=item Named colors (Tomato, SteelBlue, ...)
+
+L<Term::Fabulous::Enum::WebColor>.
+
+=item Transparent and translucent backgrounds; the terminal's default colors
+
+L<Term::Fabulous::Manual::Looks/Alpha and the terminal default color>.
+
+=item Borders on all or some sides, border styles, a different style per side
+
+L<Term::Fabulous::Manual::Looks/BORDERS>,
+L<Term::Fabulous::Manual::Looks/Borders and space>,
+L<Term::Fabulous::Manual::Looks/Borders from the theme>,
+L<Term::Fabulous::Enum::BorderStyle>,
+L<Term::Fabulous::Role::HasBorderStyle>,
+L<Term::Fabulous::Cookbook::Layout/Use a different border style on each side>.
+
+=back
+
+=head2 Events, keyboard, focus and mouse
+
+=over
+
+=item Listen to events; stop an event from reaching the parent widgets
+
+L<Term::Fabulous::Manual::Events/Listening to events>,
+L<Term::Fabulous::Manual::Events/Return values and bubbling>.
+
+=item The list of all events
+
+L<Term::Fabulous::Manual::Events/Event reference>, L<Term::Fabulous/EVENTS>.
+
+=item Fire events of your own
+
+L<Term::Fabulous::Manual::Events/Firing your own events>,
+L<Term::Fabulous::Cookbook::Extending/Fire your own events>.
+
+=item React to keys; key bindings and shortcuts
+
+L<Term::Fabulous::Manual::Events/KEYBOARD>,
+L<Term::Fabulous::Event::KeyPress/KEY NAMES>,
+L<Term::Fabulous::Cookbook::KeyboardAndMouse/Bind a key to an action>.
+
+=item Keys that only some terminals can tell apart (Ctrl+I and Tab, Super, F13 and up)
+
+L<Term::Fabulous::Event::KeyPress/THE KITTY KEYBOARD PROTOCOL>,
+L<Term::Fabulous/new> (C<kitty_keyboard>).
+
+=item Move or set the keyboard focus; react to focus changes
+
+L<Term::Fabulous::Manual::Events/FOCUS>,
+L<Term::Fabulous/KEYBOARD AND FOCUS>,
+L<Term::Fabulous::Cookbook::Forms/Show a status line that follows the focus (OnFocus)>.
+
+=item Change the Tab order
+
+L<Term::Fabulous::Manual::Events/Custom focus order>,
+L<Term::Fabulous::Cookbook::Forms/Change the Tab order (HasFocusOrder)>.
+
+=item Buttons, clicks, hover and press
+
+L<Term::Fabulous::Manual::Events/Clicks, hover and press>,
+L<Term::Fabulous::Widget::Button>,
+L<Term::Fabulous::Cookbook::KeyboardAndMouse/Add buttons for the mouse and the keyboard (Button)>.
+
+=item Low-level mouse handling: buttons, dragging, pointer movement
+
+L<Term::Fabulous::Manual::Events/MOUSE>, L<Term::Fabulous::Event::Mouse>,
+L<Term::Fabulous::Event::MouseMove>,
+L<Term::Fabulous::Cookbook::Canvases/Paint with the mouse (Canvas, clicks and drags)>.
+
+=item Mouse wheel
+
+L<Term::Fabulous::Manual::Events/SCROLLING>,
+L<Term::Fabulous/MOUSE WHEEL SCROLLING>.
+
+=item Let the terminal keep the mouse, so the user can select and copy text
+
+L<Term::Fabulous/new> (C<mouse>),
+L<Term::Fabulous::Cookbook::GettingStarted/Let the terminal handle the mouse (select and copy text)>.
+
+=item Dialogs and modal windows
+
+L<Term::Fabulous::Widget::Dialog>,
+L<Term::Fabulous::Cookbook::Forms/Ask a question in a dialog (Dialog widget)>.
+
+=item Ask a question, ask for a value, say that something happened (prompts)
+
+L<Term::Fabulous::Manual::Feedback/PROMPTS>,
+L<Term::Fabulous::Widget::Prompt>,
+L<Term::Fabulous::Cookbook::Forms/Confirm before quitting (Prompt)>,
+L<Term::Fabulous::Cookbook::Forms/Ask for a number and check it (Prompt, validator)>.
+
+=item Ask for a file to open or save, or for a folder (file dialogs)
+
+L<Term::Fabulous::Manual::Feedback/FILE DIALOGS>,
+L<Term::Fabulous::Widget::FileDialog>,
+L<Term::Fabulous::Cookbook::Forms/Open and save a file (FileDialog)>.
+
+=item Keep a widget from taking the focus when it is clicked (toolbars)
+
+L<Term::Fabulous::Manual::Events/Moving the focus>,
+L<Term::Fabulous/KEYBOARD AND FOCUS>.
+
+=back
+
+=head2 Forms and input
+
+=over
+
+=item The input widgets and what they have in common
+
+L<Term::Fabulous::Manual::Forms/FORMS AND INPUT WIDGETS>,
+L<Term::Fabulous::Widget::Input>.
+
+=item Text input, password fields, multi-line text
+
+L<Term::Fabulous::Manual::Forms/Text fields>,
+L<Term::Fabulous::Manual::Forms/Password fields>,
+L<Term::Fabulous::Manual::Forms/Text areas>,
+L<Term::Fabulous::Widget::TextField>, L<Term::Fabulous::Widget::TextArea>,
+L<Term::Fabulous::Cookbook::Forms/A login form (centered dialog, masked password)>.
+
+=item Check boxes, radio buttons, dropdowns, sliders, star ratings, segmented controls
+
+L<Term::Fabulous::Manual::Forms/THE INPUT WIDGETS ONE BY ONE>,
+L<Term::Fabulous::Cookbook::Forms/Choose from options in Perl (Dropdown, RadioGroup, Slider)>,
+L<Term::Fabulous::Widget::StarRating>, L<Term::Fabulous::Widget::SegmentedControl>.
+
+=item Choose a color: type it, move sliders or pick a named swatch (color pickers)
+
+L<Term::Fabulous::Manual::Forms/Color pickers>,
+L<Term::Fabulous::Widget::ColorPicker>,
+L<Term::Fabulous::Cookbook::Forms/Ask for a color (ColorPicker in a Prompt)>.
+
+=item Read the values of a form; react to changes and to Enter
+
+L<Term::Fabulous::Manual::Forms/Values>,
+L<Term::Fabulous::Manual::Forms/The Change and Submit events>,
+L<Term::Fabulous::Cookbook::Forms/Read all values of a form>.
+
+=item Disable inputs, make text read-only
+
+L<Term::Fabulous::Manual::Forms/Disabled inputs>,
+L<Term::Fabulous::Manual::Forms/Read-only text>,
+L<Term::Fabulous::Cookbook::Forms/Disable inputs until a checkbox is checked>.
+
+=item Editing keys, selection, clipboard, undo
+
+L<Term::Fabulous::Manual::Forms/EDITING TEXT>,
+L<Term::Fabulous::Manual::Forms/KEYS OF THE INPUT WIDGETS>,
+L<Term::Fabulous::Editor>,
+L<Term::Fabulous::Cookbook::Forms/Copy and paste through the clipboard>.
+
+=item Check what the user typed
+
+L<Term::Fabulous::Manual::Forms/Checking input>.
+
+=back
+
+=head2 Progress and feedback
+
+=over
+
+=item Show how much of a task is done; a bar for a task of unknown extent
+
+L<Term::Fabulous::Manual::Feedback/PROGRESS BARS>,
+L<Term::Fabulous::Widget::ProgressBar>.
+
+=item Show that the program is busy (a spinner)
+
+L<Term::Fabulous::Manual::Feedback/SPINNERS>,
+L<Term::Fabulous::Widget::Spinner>.
+
+=item Show a notification that goes away by itself (a toast); an alert box
+
+L<Term::Fabulous::Manual::Feedback/TOASTS AND ALERTS>,
+L<Term::Fabulous::Widget::Toast>.
+
+=item Show messages and the program's state in the last row (a status bar)
+
+L<Term::Fabulous::Manual::Feedback/STATUS BARS>,
+L<Term::Fabulous::Widget::StatusBar>,
+L<Term::Fabulous::Cookbook::Menus/Show messages and state in a status bar (StatusBar)>.
+
+=item Animate a widget without a timer
+
+L<Term::Fabulous::Manual::Feedback/ANIMATION>,
+L<Term::Fabulous::Widget::Display/ANIMATION>,
+L<Term::Fabulous/request_frame_at>.
+
+=back
+
+=head2 Commands and menus
+
+=over
+
+=item Keep the program's commands and their keys in one table
+
+L<Term::Fabulous::Manual::Menus/COMMANDS>,
+L<Term::Fabulous::Commands>, L<Term::Fabulous::Command>.
+
+=item Commands that cannot run now, and settings that are on or off
+
+L<Term::Fabulous::Manual::Menus/Commands that cannot run now>,
+L<Term::Fabulous::Manual::Menus/Settings that are on or off>.
+
+=item A menu bar at the top of the screen
+
+L<Term::Fabulous::Manual::Menus/MENU BARS>,
+L<Term::Fabulous::Widget::MenuBar>,
+L<Term::Fabulous::Cookbook::Menus/Give a program a menu bar (MenuBar, Commands)>.
+
+=item A menu that opens with a right click or the Menu key (a context menu)
+
+L<Term::Fabulous::Manual::Menus/CONTEXT MENUS>,
+L<Term::Fabulous::Widget::Menu>,
+L<Term::Fabulous::Cookbook::Menus/Open a menu with a right click or the Menu key (Menu)>.
+
+=item A help screen that lists the keys of the program (key references)
+
+L<Term::Fabulous::Manual::Menus/KEY REFERENCES>,
+L<Term::Fabulous::Widget::KeyReference>,
+L<Term::Fabulous::Cookbook::Menus/Show the keys in a help screen (KeyReference)>.
+
+=item A menu bar, the content and a status bar together
+
+L<Term::Fabulous::Manual::Menus/AN APPLICATION WINDOW>.
+
+=back
+
+=head2 Tables
+
+=over
+
+=item Show rows of data in a table
+
+L<Term::Fabulous::Manual::Tables/TABLES>,
+L<Term::Fabulous::Widget::Table>,
+L<Term::Fabulous::Cookbook::Tables/Show a list of hashes in a table (sort, select, open a row)>.
+
+=item Every table feature, by task
+
+The table's own feature index: L<Term::Fabulous::Manual::Tables/FEATURE INDEX>.
+
+=item Columns: widths, alignment, wrapping, computed columns, the visible columns
+
+L<Term::Fabulous::Manual::Tables/COLUMNS>,
+L<Term::Fabulous::Widget::Table::Column>,
+L<Term::Fabulous::Cookbook::TableStyles/Size, align and wrap columns (widths, wrapping, widget titles)>,
+L<Term::Fabulous::Cookbook::Tables/Let the user choose the visible columns (column chooser)>.
+
+=item Format dates, numbers and sizes in cells
+
+L<Term::Fabulous::Manual::Tables/DISPLAY TEXT AND MUTATORS>,
+L<Term::Fabulous::Widget::Table::Mutator>,
+L<Term::Fabulous::Cookbook::Tables/Format cells: dates, numbers, sizes and flags (mutators)>.
+
+=item Widgets in cells; edit the data of a table
+
+L<Term::Fabulous::Manual::Tables/CELL WIDGETS>,
+L<Term::Fabulous::Manual::Tables/Changing the data>,
+L<Term::Fabulous::Cookbook::Tables/Edit the data of a table (widget cells, add and remove rows and columns)>.
+
+=item Sort and filter rows
+
+L<Term::Fabulous::Manual::TableRows/SORTING>,
+L<Term::Fabulous::Manual::TableRows/FILTERING>,
+L<Term::Fabulous::Widget::Table::Filter>,
+L<Term::Fabulous::Cookbook::TableRows/Sort rows, also with your own comparison>,
+L<Term::Fabulous::Cookbook::TableRows/Let the user filter rows (filter row and search box)>,
+L<Term::Fabulous::Cookbook::TableRows/Filter rows from Perl (numbers, dates, text, raw or shown values)>.
+
+=item Group rows, trees of nested rows, pages
+
+L<Term::Fabulous::Manual::TableRows/GROUPING>,
+L<Term::Fabulous::Manual::TableRows/TREES>,
+L<Term::Fabulous::Manual::TableRows/PAGES>,
+L<Term::Fabulous::Cookbook::TableRows/Group rows by a column (collapsible group headers)>,
+L<Term::Fabulous::Cookbook::TableRows/Show nested data as a tree (expand and collapse rows)>,
+L<Term::Fabulous::Cookbook::TableRows/Split many rows into pages (pager and page sizes)>.
+
+=item The cursor, selecting rows, opening a row
+
+L<Term::Fabulous::Manual::TableRows/SELECTION AND CURSOR>.
+
+=item Colors, striped rows, lines and styles of rows, columns and cells
+
+L<Term::Fabulous::Manual::TableStyles/STYLES AND BORDERS>,
+L<Term::Fabulous::Cookbook::TableStyles/Lines and colors per row, column and cell (conditional formatting)>,
+L<Term::Fabulous::Cookbook::TableStyles/A table with colored rows and titles (block frame, no grid lines)>,
+L<Term::Fabulous::Cookbook::TableStyles/Compare the line options of a table (frames, grid lines, block frames)>.
+
+=item Print a table as a report
+
+L<Term::Fabulous::Manual::TableStyles/PRINTING A TABLE>,
+L<Term::Fabulous::Cookbook::Tables/Print a table as a report (Static)>.
+
+=back
+
+=head2 Canvases and charts
+
+=over
+
+=item Draw freely in character cells or pixels
+
+L<Term::Fabulous::Manual::Charts/CANVASES>,
+L<Term::Fabulous::Widget::Canvas>, L<Term::Fabulous::Widget::PixelCanvas>,
+L<Term::Fabulous::Cookbook::Canvases/Plot data on a pixel canvas (PixelCanvas)>.
+
+=item Show a picture (PNG, JPEG, GIF, ...)
+
+L<Term::Fabulous::Widget::Image>,
+L<Term::Fabulous::Cookbook::Canvases/Show a picture file (Image, fit)>,
+L<Term::Fabulous::Cookbook::Canvases/Embed a logo in the program (Image, base64)>.
+
+=item Show a picture in the terminal's own pixels (sixel graphics)
+
+L<Term::Fabulous::Widget::Sixel>,
+L<Term::Fabulous::Cookbook::Canvases/Show a photo in sixel graphics (Sixel)>.
+
+=item Charts that draw themselves from data
+
+L<Term::Fabulous::Manual::Charts/CHARTS>, L<Term::Fabulous::Widget::Chart>.
+
+=item Chart titles and legends
+
+L<Term::Fabulous::Manual::Charts/Titles and legends>,
+L<Term::Fabulous::Widget::Chart/Title and legend>.
+
+=item Line, area, bar and scatter charts
+
+L<Term::Fabulous::Widget::XYChart>,
+L<Term::Fabulous::Cookbook::Charts/Draw a line chart with labels and points (LineChart)>,
+L<Term::Fabulous::Cookbook::Charts/Grouped, stacked and horizontal bars (BarChart)>,
+L<Term::Fabulous::Cookbook::Charts/A scatter plot with trend lines (ScatterPlot)>.
+
+=item Axes: ranges, ticks, titles and number or date formats of the labels
+
+L<Term::Fabulous::Widget::XYChart/AXES>,
+L<Term::Fabulous::Widget::XYChart/Axis keys>,
+L<Term::Fabulous::Chart::Format>.
+
+=item Stacked bars and areas, shares of 100% (percent stacking)
+
+L<Term::Fabulous::Widget::XYChart/STACKING>,
+L<Term::Fabulous::Cookbook::Charts/Grouped, stacked and horizontal bars (BarChart)>,
+L<Term::Fabulous::Cookbook::Charts/Stacked areas and shares of 100% (AreaChart)>,
+L<Term::Fabulous::Cookbook::ChartStyles/Line styles, gaps, bar widths, stack groups and grid lines>.
+
+=item Time axes and logarithmic axes
+
+L<Term::Fabulous::Widget::XYChart/Time axes>,
+L<Term::Fabulous::Widget::XYChart/Logarithmic axes>,
+L<Term::Fabulous::Cookbook::ChartTechniques/Plot values over time (time axis, from and to, a dashed forecast)>,
+L<Term::Fabulous::Cookbook::ChartTechniques/Show values of very different sizes (logarithmic axis)>.
+
+=item Pie, donut, polar area and radar charts
+
+L<Term::Fabulous::Widget::PieChart>, L<Term::Fabulous::Widget::DonutChart>,
+L<Term::Fabulous::Widget::PolarAreaChart>, L<Term::Fabulous::Widget::RadarChart>,
+L<Term::Fabulous::Cookbook::Charts/Show shares as a pie or donut (PieChart, DonutChart)>,
+L<Term::Fabulous::Cookbook::Charts/Compare profiles on radar and polar area charts (RadarChart, PolarAreaChart)>.
+
+=item Histograms and sparklines
+
+L<Term::Fabulous::Widget::Histogram>, L<Term::Fabulous::Widget::Sparkline>,
+L<Term::Fabulous::Cookbook::Charts/How values are distributed (Histogram)>,
+L<Term::Fabulous::Cookbook::Charts/Show sparklines in table cells (Sparkline)>.
+
+=item Live charts; smoothing and other transforms of chart data
+
+L<Term::Fabulous::Widget::XYChart/DATA>, L<Term::Fabulous::Chart::Transform>,
+L<Term::Fabulous::Cookbook::ChartTechniques/A live chart that follows new data (append, max_points, span)>,
+L<Term::Fabulous::Cookbook::ChartTechniques/Smooth noisy data and index it to 100 (transforms)>.
+
+=item Curves, markers, line styles, palettes and light backgrounds
+
+L<Term::Fabulous::Widget::XYChart/LOOKS>, L<Term::Fabulous::Chart::Curve>,
+L<Term::Fabulous::Chart::Marker>, L<Term::Fabulous::Chart::Palette>,
+L<Term::Fabulous::Cookbook::ChartStyles/Connect points with curves and easings (curve)>,
+L<Term::Fabulous::Cookbook::ChartStyles/Draw with Braille, blocks or box lines (marker)>,
+L<Term::Fabulous::Cookbook::ChartStyles/Light backgrounds, palettes and colors of your own>,
+L<Term::Fabulous::Cookbook::ChartStyles/Line styles, gaps, bar widths, stack groups and grid lines>.
+
+=item Show what the pointer is on in a chart (hover)
+
+L<Term::Fabulous::Widget::Chart/Hover and emphasis>,
+L<Term::Fabulous::Event::SeriesHover>,
+L<Term::Fabulous::Cookbook::ChartStyles/Show details of the point under the pointer (SeriesHover, highlight)>.
+
+=back
+
+=head2 Layout files
+
+=over
+
+=item Describe the screen in a KDL file
+
+L<Term::Fabulous::Manual::KDL/KDL LAYOUT FILES>, L<Term::Fabulous::Layout>,
+L<Term::Fabulous::Cookbook::Forms/Build a form from a KDL file (text fields, radio buttons, dropdown, slider, checkbox)>.
+
+=item The KDL properties of each widget
+
+The KDL PROPERTIES section of every class page, for example
+L<Term::Fabulous::Widget::Box/KDL PROPERTIES>;
+the L<list of node types|Term::Fabulous::Layout/NODE TYPES> links to all
+of them.
+
+=item Tables and charts in a KDL file
+
+L<Term::Fabulous::Cookbook::Tables/Describe a table in a KDL layout (columns, lines, sort, groups)>,
+L<Term::Fabulous::Cookbook::ChartTechniques/Describe charts in a KDL layout (series, slices, transforms)>.
+
+=back
+
+=head2 Output without a terminal, tests and pictures
+
+=over
+
+=item Print boxes, tables and charts to STDOUT or a file (reports)
+
+L<Term::Fabulous::Manual::Programs/RENDERING WITHOUT A TERMINAL>,
+L<Term::Fabulous::Static>,
+L<Term::Fabulous::Cookbook::Output/Render a report to a file or pipe (Static)>,
+L<Term::Fabulous::Cookbook::Tables/Print a table as a report (Static)>,
+L<Term::Fabulous::Cookbook::ChartTechniques/Print charts in a report (Static)>.
+
+=item Test a program or a widget without a terminal
+
+L<Term::Fabulous::Manual::Programs/TESTING>,
+L<Term::Fabulous::Terminal::Memory>, L<Term::Fabulous/step>,
+L<Term::Fabulous::Cookbook::Output/Test a widget without a terminal>.
+
+=item Take a screenshot of your program
+
+L<Term::Fabulous::Examples/PICTURES OF YOUR OWN PROGRAMS>.
+
+=back
+
+=head2 Extending Term::Fabulous
+
+=over
+
+=item Write widgets of your own
+
+L<Term::Fabulous::Manual::CustomWidgets/WRITING YOUR OWN WIDGETS>,
+L<Term::Fabulous::Widget::Input>,
+L<Term::Fabulous::Cookbook::Extending/Write a custom input widget (a toggle switch)>.
+
+=item Use your own widgets in KDL layout files
+
+L<Term::Fabulous::Role::CanParseLayout>,
+L<Term::Fabulous::Cookbook::Extending/Make a widget usable from KDL>.
+
+=item Check property values the way the built-in widgets do
+
+L<Term::Fabulous::Check>.
+
+=item Run on another terminal, or write a terminal of your own
+
+L<Term::Fabulous/new> (C<terminal>), L<Term::Fabulous::Terminal::Termbox>,
+L<Term::Fabulous::Role::Terminal>.
+
+=item Use termbox2 directly
+
+L<Term::Fabulous::Termbox>.
+
+=back
+
+=head2 Help
+
+=over
+
+=item Something does not work
+
+L<Term::Fabulous::Manual::Troubleshooting/TROUBLESHOOTING>.
+
+=item A term in the documentation is unclear
+
+L<Term::Fabulous::Manual::Glossary>.
+
+=item What Term::Fabulous cannot do
+
+L<Term::Fabulous/LIMITATIONS>.
+
+=back
+
+=head1 SEE ALSO
+
+Next page: L<Term::Fabulous::Manual::Layout>.
+
+L<Term::Fabulous>, L<Term::Fabulous::Cookbook>,
+L<Term::Fabulous::Examples>, L<Clay::UI>, L<Clay::XS>,
+L<Term::Fabulous::Termbox>, L<IO::Async>, L<Object::Pad>.
+
+=cut

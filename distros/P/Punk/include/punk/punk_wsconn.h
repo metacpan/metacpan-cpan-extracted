@@ -273,10 +273,19 @@ static void pw_flush(pTHX_ punk_wsconn *ws) {
         pw_teardown(aTHX_ ws, 0, NULL, 0);
 }
 
-static void pw_on_writable(pTHX_ int fd, int mask, void *ud) {
+static void pw_on_writable_in(pTHX_ int fd, int mask, void *ud) {
     punk_wsconn *ws = (punk_wsconn *)ud;
     PERL_UNUSED_ARG(fd); PERL_UNUSED_ARG(mask);
     pw_flush(aTHX_ ws);
+}
+
+static void pw_on_writable(pTHX_ int fd, int mask, void *ud) {
+    punk_wsconn *ws_ = (punk_wsconn *)ud;
+    SV *keep = ws_->self_rv ? SvREFCNT_inc(ws_->self_rv) : NULL;
+    PK_LOOP_ENTER;
+    pw_on_writable_in(aTHX_ fd, mask, ud);
+    PK_LOOP_LEAVE;
+    if (keep) SvREFCNT_dec(keep);      /* ws may be gone after this */
 }
 
 static void pw_queue_frame(pTHX_ punk_wsconn *ws, unsigned char op,
@@ -358,10 +367,19 @@ static void pw_teardown(pTHX_ punk_wsconn *ws, uint16_t code,
     if (ws->self_rv) { SV *s = ws->self_rv; ws->self_rv = NULL; SvREFCNT_dec(s); }
 }
 
-static void pw_close_timeout(pTHX_ void *ud) {
+static void pw_close_timeout_in(pTHX_ void *ud) {
     punk_wsconn *ws = (punk_wsconn *)ud;
     ws->close_tw = NULL;
     pw_teardown(aTHX_ ws, PW_CLOSE_ABNORMAL, "close timeout", 13);
+}
+
+static void pw_close_timeout(pTHX_ void *ud) {
+    punk_wsconn *ws_ = (punk_wsconn *)ud;
+    SV *keep = ws_->self_rv ? SvREFCNT_inc(ws_->self_rv) : NULL;
+    PK_LOOP_ENTER;
+    pw_close_timeout_in(aTHX_ ud);
+    PK_LOOP_LEAVE;
+    if (keep) SvREFCNT_dec(keep);      /* ws may be gone after this */
 }
 
 /* ---- reading -------------------------------------------------------------
@@ -397,12 +415,14 @@ static void pw_process(pTHX_ punk_wsconn *ws) {
             if (pw_is_control(f.opcode)) {
                 if (f.opcode == PW_OP_PING) {
                     pw_queue_frame(aTHX_ ws, PW_OP_PONG, pl, pn);
-                    { SV *a[1]; a[0] = sv_2mortal(newSVpvn(pl, pn));
-                      (void)pw_emit(aTHX_ ws, "ping", a, 1); }
+                    { SV *a[1]; a[0] = newSVpvn(pl, pn);
+                      (void)pw_emit(aTHX_ ws, "ping", a, 1);
+                      SvREFCNT_dec(a[0]); }
                 }
                 else if (f.opcode == PW_OP_PONG) {
-                    SV *a[1]; a[0] = sv_2mortal(newSVpvn(pl, pn));
+                    SV *a[1]; a[0] = newSVpvn(pl, pn);
                     (void)pw_emit(aTHX_ ws, "pong", a, 1);
+                    SvREFCNT_dec(a[0]);
                 }
                 else {   /* close */
                     uint16_t code = PW_CLOSE_NO_STATUS;
@@ -490,11 +510,16 @@ static void pw_process(pTHX_ punk_wsconn *ws) {
                                            ws->fraglen);
                         SV *a[1];
                         if (is_text) SvUTF8_on(msg);
-                        a[0] = sv_2mortal(msg);
+                        a[0] = msg;
                         ws->frag_active = 0;
                         ws->fraglen     = 0;
                         (void)pw_emit(aTHX_ ws, is_text ? "message" : "binary",
                                       a, 1);
+                        /* Released here, not left to a temporaries frame:
+                         * this loop hands on every message a fast sender has
+                         * ready before it returns, and as mortals they would
+                         * all be alive at once. */
+                        SvREFCNT_dec(msg);
                     }
                 }
             }
@@ -533,22 +558,41 @@ static void pw_feed(pTHX_ punk_wsconn *ws, const char *buf, size_t len,
 }
 
 /* The ABI's read half (v8) delivers here. */
-static void pw_on_stream_data(pTHX_ void *h, const char *buf, STRLEN len,
+static void pw_on_stream_data_in(pTHX_ void *h, const char *buf, STRLEN len,
                               int fin, void *ud) {
     punk_wsconn *ws = (punk_wsconn *)ud;
     PERL_UNUSED_ARG(h);
     pw_feed(aTHX_ ws, buf, (size_t)len, fin);
 }
 
+static void pw_on_stream_data(pTHX_ void *h, const char *buf, STRLEN len,
+                              int fin, void *ud) {
+    punk_wsconn *ws_ = (punk_wsconn *)ud;
+    SV *keep = ws_->self_rv ? SvREFCNT_inc(ws_->self_rv) : NULL;
+    PK_LOOP_ENTER;
+    pw_on_stream_data_in(aTHX_ h, buf, len, fin, ud);
+    PK_LOOP_LEAVE;
+    if (keep) SvREFCNT_dec(keep);      /* ws may be gone after this */
+}
+
 /* The stream died under us - an h2 RST_STREAM, or the connection going. */
-static void pw_on_stream_abort(pTHX_ void *h, void *ud) {
+static void pw_on_stream_abort_in(pTHX_ void *h, void *ud) {
     punk_wsconn *ws = (punk_wsconn *)ud;
     PERL_UNUSED_ARG(h);
     if (ws->state != PW_ST_CLOSED)
         pw_teardown(aTHX_ ws, PW_CLOSE_ABNORMAL, NULL, 0);
 }
 
-static void pw_on_readable(pTHX_ int fd, int mask, void *ud) {
+static void pw_on_stream_abort(pTHX_ void *h, void *ud) {
+    punk_wsconn *ws_ = (punk_wsconn *)ud;
+    SV *keep = ws_->self_rv ? SvREFCNT_inc(ws_->self_rv) : NULL;
+    PK_LOOP_ENTER;
+    pw_on_stream_abort_in(aTHX_ h, ud);
+    PK_LOOP_LEAVE;
+    if (keep) SvREFCNT_dec(keep);      /* ws may be gone after this */
+}
+
+static void pw_on_readable_in(pTHX_ int fd, int mask, void *ud) {
     punk_wsconn *ws = (punk_wsconn *)ud;
     PERL_UNUSED_ARG(fd); PERL_UNUSED_ARG(mask);
     for (;;) {
@@ -561,7 +605,17 @@ static void pw_on_readable(pTHX_ int fd, int mask, void *ud) {
         }
         pw_buf_reserve(&ws->rbuf, &ws->rcap, ws->rlen + PW_READ_CHUNK);
         n = read(ws->fd, ws->rbuf + ws->rlen, PW_READ_CHUNK);
-        if (n > 0) { ws->rlen += (size_t)n; continue; }
+        if (n > 0) {
+            /* Processed as it arrives, not once the socket runs dry. The cap
+             * above is on what is buffered, and buffering everything a fast
+             * sender had ready counted whole frames that only needed handing
+             * on: megabytes of small valid messages were closed as one
+             * message too big. */
+            ws->rlen += (size_t)n;
+            pw_process(aTHX_ ws);
+            if (ws->state == PW_ST_CLOSED || ws->fd < 0) return;
+            continue;
+        }
         if (n == 0) {                       /* peer went away */
             pw_teardown(aTHX_ ws, PW_CLOSE_ABNORMAL, NULL, 0);
             return;
@@ -571,7 +625,15 @@ static void pw_on_readable(pTHX_ int fd, int mask, void *ud) {
         pw_teardown(aTHX_ ws, PW_CLOSE_ABNORMAL, NULL, 0);
         return;
     }
-    pw_process(aTHX_ ws);
+}
+
+static void pw_on_readable(pTHX_ int fd, int mask, void *ud) {
+    punk_wsconn *ws_ = (punk_wsconn *)ud;
+    SV *keep = ws_->self_rv ? SvREFCNT_inc(ws_->self_rv) : NULL;
+    PK_LOOP_ENTER;
+    pw_on_readable_in(aTHX_ fd, mask, ud);
+    PK_LOOP_LEAVE;
+    if (keep) SvREFCNT_dec(keep);      /* ws may be gone after this */
 }
 
 /* ---- construction and destruction ---------------------------------------- */

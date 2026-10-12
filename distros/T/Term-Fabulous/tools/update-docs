@@ -1,0 +1,249 @@
+#!/usr/bin/env perl
+
+# Brings the documentation in line with the code: copies the example
+# programs into the code blocks of the POD that show them, points the
+# screenshot URLs of the POD to the tag of the current release, and takes
+# the screenshots the POD shows again. With --check, writes nothing and
+# exits with status 1 if anything is out of date.
+#
+#     make docs          # or: perl -Mblib tools/update-docs
+#     make docs-check    # or: perl -Mblib tools/update-docs --check
+#
+# See tools/README.md.
+
+use v5.32;
+use warnings;
+use feature 'signatures';
+no warnings 'experimental::signatures';
+
+use FindBin;
+use lib "$FindBin::Bin/lib";
+
+use Feature::Compat::Try;
+use File::Find qw(find);
+use File::Spec;
+use File::Temp ();
+use ExtUtils::MakeMaker ();
+use Getopt::Long qw(GetOptions);
+use POSIX qw(_exit);
+use Term::Fabulous::Screenshot::PodSync qw(sync_code_blocks referenced_screenshots foreign_images screenshots_at_tag read_text write_text);
+use Term::Fabulous::Screenshot::Render::SVG qw(render_svg);
+use Term::Fabulous::Screenshot::Runner;
+use Term::Fabulous::Screenshot::Scenario;
+use Term::Fabulous::Screenshot::Scene;
+use Term::Fabulous::Screenshot::Theme;
+
+use constant SCENARIO_FILE   => 'screenshots/screenshots.kdl';
+use constant SCREENSHOT_DIR  => 'screenshots';
+use constant POD_DIRECTORIES => ('lib');
+use constant VERSION_FILE    => 'lib/Term/Fabulous.pm';
+
+sub usage () {
+	return <<'USAGE';
+Usage: perl -Mblib tools/update-docs [--check] [--jobs N] [NAME ...]
+
+Copies the example programs into the POD code blocks marked with
+'=for code-from FILE', points the screenshot URLs of the POD to the tag
+of the current \$VERSION and takes every screenshot of
+screenshots/screenshots.kdl again, writing screenshots/NAME.svg.
+
+  --check    write nothing; list what is out of date and exit with
+             status 1 if anything is
+  --jobs N   take N screenshots at a time (default: 4)
+  NAME ...   take only these screenshots (code blocks are always synced)
+
+Run it from a built distribution (perl Makefile.PL && make), so the
+programs use this Term::Fabulous, not an installed one.
+USAGE
+}
+
+sub main () {
+	my ( $check, $jobs, $help ) = ( 0, 4 );
+	GetOptions( 'check' => \$check, 'jobs=i' => \$jobs, 'help' => \$help ) or die usage();
+	if ($help) {
+		print usage();
+		return 0;
+	}
+	die "update-docs: --jobs must be at least 1\n" unless $jobs >= 1;
+
+	chdir "$FindBin::Bin/.." or die "update-docs: cannot change to the distribution directory: $!\n";
+	require_built_distribution();
+
+	my @pod_files = pod_files();
+	my @stale     = sync_all_code_blocks( \@pod_files, $check );
+
+	my @scenarios = Term::Fabulous::Screenshot::Scenario->from_file(SCENARIO_FILE);
+	push @stale, check_references( \@pod_files, \@scenarios );
+	push @stale, point_screenshots_to_release( \@pod_files, $check );
+
+	my %wanted  = map { $_ => 1 } @ARGV;
+	my @unknown = grep {
+		my $name = $_;
+		!grep { $_->name eq $name } @scenarios
+	} @ARGV;
+	die "update-docs: no screenshot named " . join( ', ', @unknown ) . " in " . SCENARIO_FILE . "\n" if @unknown;
+	my @selected = @ARGV ? grep { $wanted{ $_->name } } @scenarios : @scenarios;
+	push @stale, take_screenshots( \@selected, $jobs, $check );
+
+	return 0 unless @stale;
+	return 0 unless $check;
+	say STDERR "The documentation is out of date; run 'make docs':";
+	say STDERR "  $_" foreach @stale;
+	return 1;
+}
+
+# The programs must run against this distribution's build: blib/ holds
+# the compiled termbox2 binding, and an installed Term::Fabulous may be
+# older.
+sub require_built_distribution () {
+	my $blib_arch = File::Spec->rel2abs('blib/arch');
+	die "update-docs: blib/ is missing; run 'perl Makefile.PL && make' first\n" unless -d $blib_arch;
+	my ($first_termbox) = grep { -e "$_/Term/Fabulous/Termbox.pm" } @INC;
+	die "update-docs: Term::Fabulous would be loaded from " . ( $first_termbox // 'nowhere' ) . ", not from blib/; run it as 'perl -Mblib tools/update-docs' or 'make docs'\n"
+		unless defined $first_termbox && File::Spec->rel2abs($first_termbox) =~ m{/blib/lib\z};
+	return;
+}
+
+sub pod_files () {
+	my @files;
+	find( { no_chdir => 1, wanted => sub { push @files, $_ if /\.(?:pm|pod)\z/ } }, POD_DIRECTORIES );
+	my @sorted = sort @files;
+	return @sorted;
+}
+
+sub sync_all_code_blocks ( $pod_files, $check ) {
+	my @stale;
+	foreach my $pod_file (@$pod_files) {
+		my ( $pod, @changed ) = sync_code_blocks( read_text($pod_file), \&read_text );
+		next unless @changed;
+		push @stale, map { "$pod_file: the code block of $_" } @changed;
+		next if $check;
+		write_text( $pod_file, $pod );
+		say "code   $pod_file: updated the code of ", join( ', ', @changed );
+	}
+	return @stale;
+}
+
+# Every image the POD shows must be a screenshot, every screenshot must
+# have a scenario, and every scenario must be shown somewhere.
+sub check_references ( $pod_files, $scenarios ) {
+	my ( %shown_in, @foreign );
+	foreach my $pod_file (@$pod_files) {
+		my $pod = read_text($pod_file);
+		push @foreign,           map { "$pod_file: $_ is not a screenshot URL (see tools/README.md)" } foreign_images($pod);
+		push @{ $shown_in{$_} }, $pod_file foreach referenced_screenshots($pod);
+	}
+	die join( "\n", 'update-docs:', @foreign ) . "\n" if @foreign;
+	my %defined = map { $_->name => 1 } @$scenarios;
+	my @missing = map {
+		my $name = $_;
+		map { "$_: shows screenshots/$name.svg, which " . SCENARIO_FILE . " does not define" } @{ $shown_in{$name} }
+		}
+		grep { !$defined{$_} } sort keys %shown_in;
+	die join( "\n", 'update-docs:', @missing ) . "\n" if @missing;
+
+	my @unused = grep { !$shown_in{$_} } map { $_->name } @$scenarios;
+	die "update-docs: " . SCENARIO_FILE . " defines screenshots no POD shows: " . join( ', ', @unused ) . "\n" if @unused;
+	return;
+}
+
+# MetaCPAN shows each release with the screenshots of its own tag, which
+# exists on GitHub once the release is tagged and pushed.
+sub point_screenshots_to_release ( $pod_files, $check ) {
+	my $tag = 'v' . MM->parse_version(VERSION_FILE);
+	my @stale;
+	foreach my $pod_file (@$pod_files) {
+		my $pod     = read_text($pod_file);
+		my $updated = screenshots_at_tag( $pod, $tag );
+		next if $updated eq $pod;
+		push @stale, "$pod_file: the screenshot URLs do not point to $tag";
+		next if $check;
+		write_text( $pod_file, $updated );
+		say "urls   $pod_file: pointed the screenshots to $tag";
+	}
+	return @stale;
+}
+
+# Takes the screenshots in parallel worker processes; each renders its
+# SVG into a temporary directory, and the files that differ replace the
+# ones in screenshots/.
+sub take_screenshots ( $scenarios, $jobs, $check ) {
+	my $work_dir = File::Temp->newdir( 'tf-update-docs-XXXXXX', TMPDIR => 1 );
+	my @queue    = @$scenarios;
+	my ( %running, %exit_status_of );
+
+	# An interrupted run stops its workers; each worker's runner then kills
+	# the program it runs.
+	my $stop_workers = sub ($signal) {
+		kill 'TERM', keys %running;
+		1 while waitpid( -1, 0 ) > 0;
+		die "update-docs: interrupted by SIG$signal\n";
+	};
+	local $SIG{INT}  = $stop_workers;
+	local $SIG{TERM} = $stop_workers;
+	local $SIG{HUP}  = $stop_workers;
+
+	while ( @queue || %running ) {
+		while ( @queue && keys(%running) < $jobs ) {
+			my $scenario = shift @queue;
+			my $pid      = fork // die "update-docs: fork failed: $!\n";
+			screenshot_worker( $scenario, "$work_dir" ) if $pid == 0;
+			$running{$pid} = $scenario;
+		}
+		my $pid = waitpid( -1, 0 );
+		next unless $pid > 0 && $running{$pid};
+		$exit_status_of{ delete( $running{$pid} )->name } = $?;
+	}
+
+	my ( @stale, @failed );
+	foreach my $scenario (@$scenarios) {
+		my $name = $scenario->name;
+		if ( -e "$work_dir/$name.error" ) {
+			push @failed, "screenshot $name failed:\n" . read_text("$work_dir/$name.error");
+			next;
+		}
+		if ( $exit_status_of{$name} != 0 || !-e "$work_dir/$name.svg" ) {
+			push @failed, "screenshot $name failed: its worker ended with status $exit_status_of{$name} and no image";
+			next;
+		}
+		my $target  = SCREENSHOT_DIR . "/$name.svg";
+		my $exists  = -e $target;
+		my $new_svg = read_text("$work_dir/$name.svg");
+		next if $exists && read_text($target) eq $new_svg;
+
+		push @stale, $exists ? "$target is out of date" : "$target is missing";
+		next if $check;
+		write_text( $target, $new_svg );
+		say "image  $target: ", $exists ? 'updated' : 'created';
+	}
+	die join( "\n", @failed ) . "\n" if @failed;
+	return @stale;
+}
+
+# In a child process: takes one screenshot and writes NAME.svg, or
+# NAME.error with the reason. Never returns.
+sub screenshot_worker ( $scenario, $work_dir ) {    ## no critic (Subroutines::RequireFinalReturn) PPI does not parse try/catch
+	@SIG{qw(INT TERM HUP)} = ('DEFAULT') x 3;    # the parent's handlers are for the parent
+	my $name = $scenario->name;
+	try {
+		my $screen = Term::Fabulous::Screenshot::Runner->new->capture(
+			script    => $scenario->script,
+			arguments => $scenario->arguments,
+			columns   => $scenario->columns,
+			rows      => $scenario->rows,
+			epoch     => $scenario->epoch,
+			shell     => $scenario->shell,
+			steps     => $scenario->harness_steps,
+		);
+		my $scene = Term::Fabulous::Screenshot::Scene->new( screen => $screen, theme => Term::Fabulous::Screenshot::Theme->new, title => $scenario->title );
+		write_text( "$work_dir/$name.svg", render_svg($scene) );
+	}
+	catch ($error) {
+		try { write_text( "$work_dir/$name.error", $error ) }
+		catch ($write_error) { print STDERR "update-docs: screenshot $name failed: $error(and writing the error failed: $write_error)" }
+		_exit(1);
+	}
+	_exit(0);
+}
+
+exit main();

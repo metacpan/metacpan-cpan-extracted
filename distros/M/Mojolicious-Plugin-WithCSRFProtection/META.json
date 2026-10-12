@@ -4,7 +4,7 @@
       "Mark Fowler <mfowler@maxmind.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.23",
+   "generated_by" : "Minilla/v3.1.29",
    "license" : [
       "perl_5"
    ],
@@ -64,7 +64,7 @@
    "provides" : {
       "Mojolicious::Plugin::WithCSRFProtection" : {
          "file" : "lib/Mojolicious/Plugin/WithCSRFProtection.pm",
-         "version" : "1.02"
+         "version" : "1.03"
       }
    },
    "release_status" : "stable",
@@ -79,11 +79,11 @@
          "web" : "https://github.com/charsbar/Mojolicious-Plugin-WithCSRFProtection"
       }
    },
-   "version" : "1.02",
+   "version" : "1.03",
    "x_contributors" : [
       "Greg Oschwald <goschwald@maxmind.com>",
       "Kenichi Ishigaki <ishigaki@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_serialization_backend" : "JSON::PP version 4.18",
    "x_static_install" : 1
 }

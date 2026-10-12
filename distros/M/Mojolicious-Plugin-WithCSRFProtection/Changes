@@ -1,3 +1,6 @@
+1.03 2026-10-11T12:35:28Z
+  - Apply a fix for Mojolicious 9.48+
+
 1.02 2025-05-02T07:06:44Z
   - Skip rendering bad_csrf if mojo is finished
 

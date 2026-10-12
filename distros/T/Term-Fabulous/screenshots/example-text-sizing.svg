@@ -1,0 +1,204 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="327" viewBox="0 0 960 327" role="img" aria-label="perl examples/text-sizing.pl">
+<title>perl examples/text-sizing.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="928" height="292" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="928" height="292" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="928" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="480" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/text-sizing.pl</text>
+<rect x="16.5" y="16.5" width="927" height="291" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="48" y="114" width="270" height="162" fill="#232837"/>
+<rect x="336" y="114" width="171" height="162" fill="#232837"/>
+<rect x="525" y="114" width="198" height="162" fill="#232837"/>
+<rect x="741" y="114" width="171" height="162" fill="#232837"/>
+<rect x="57" y="122" width="252" height="1" fill="#b4c8dc"/>
+<rect x="345" y="122" width="153" height="1" fill="#b4c8dc"/>
+<rect x="534" y="122" width="180" height="1" fill="#b4c8dc"/>
+<rect x="750" y="122" width="153" height="1" fill="#b4c8dc"/>
+<rect x="52" y="132" width="1" height="126" fill="#b4c8dc"/>
+<rect x="313" y="132" width="1" height="126" fill="#b4c8dc"/>
+<rect x="340" y="132" width="1" height="126" fill="#b4c8dc"/>
+<rect x="502" y="132" width="1" height="126" fill="#b4c8dc"/>
+<rect x="529" y="132" width="1" height="126" fill="#b4c8dc"/>
+<rect x="718" y="132" width="1" height="126" fill="#b4c8dc"/>
+<rect x="745" y="132" width="1" height="126" fill="#b4c8dc"/>
+<rect x="907" y="132" width="1" height="126" fill="#b4c8dc"/>
+<rect x="57" y="266" width="252" height="1" fill="#b4c8dc"/>
+<rect x="345" y="266" width="153" height="1" fill="#b4c8dc"/>
+<rect x="534" y="266" width="180" height="1" fill="#b4c8dc"/>
+<rect x="750" y="266" width="153" height="1" fill="#b4c8dc"/>
+</g>
+<polyline points="52.5 132 52.5 127 52.538 126.413 52.653 125.835 52.843 125.278 53.103 124.75 53.43 124.261 53.818 123.818 54.261 123.43 54.75 123.103 55.278 122.843 55.835 122.653 56.413 122.538 57 122.5 57 122.5" fill="none" stroke="#b4c8dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="313.5 132 313.5 127 313.462 126.413 313.347 125.835 313.157 125.278 312.897 124.75 312.57 124.261 312.182 123.818 311.739 123.43 311.25 123.103 310.722 122.843 310.165 122.653 309.587 122.538 309 122.5 309 122.5" fill="none" stroke="#b4c8dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="340.5 132 340.5 127 340.538 126.413 340.653 125.835 340.843 125.278 341.103 124.75 341.43 124.261 341.818 123.818 342.261 123.43 342.75 123.103 343.278 122.843 343.835 122.653 344.413 122.538 345 122.5 345 122.5" fill="none" stroke="#b4c8dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="502.5 132 502.5 127 502.462 126.413 502.347 125.835 502.157 125.278 501.897 124.75 501.57 124.261 501.182 123.818 500.739 123.43 500.25 123.103 499.722 122.843 499.165 122.653 498.587 122.538 498 122.5 498 122.5" fill="none" stroke="#b4c8dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="529.5 132 529.5 127 529.538 126.413 529.653 125.835 529.843 125.278 530.103 124.75 530.43 124.261 530.818 123.818 531.261 123.43 531.75 123.103 532.278 122.843 532.835 122.653 533.413 122.538 534 122.5 534 122.5" fill="none" stroke="#b4c8dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="718.5 132 718.5 127 718.462 126.413 718.347 125.835 718.157 125.278 717.897 124.75 717.57 124.261 717.182 123.818 716.739 123.43 716.25 123.103 715.722 122.843 715.165 122.653 714.587 122.538 714 122.5 714 122.5" fill="none" stroke="#b4c8dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="745.5 132 745.5 127 745.538 126.413 745.653 125.835 745.843 125.278 746.103 124.75 746.43 124.261 746.818 123.818 747.261 123.43 747.75 123.103 748.278 122.843 748.835 122.653 749.413 122.538 750 122.5 750 122.5" fill="none" stroke="#b4c8dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="907.5 132 907.5 127 907.462 126.413 907.347 125.835 907.157 125.278 906.897 124.75 906.57 124.261 906.182 123.818 905.739 123.43 905.25 123.103 904.722 122.843 904.165 122.653 903.587 122.538 903 122.5 903 122.5" fill="none" stroke="#b4c8dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="52.5 258 52.5 262 52.538 262.587 52.653 263.165 52.843 263.722 53.103 264.25 53.43 264.739 53.818 265.182 54.261 265.57 54.75 265.897 55.278 266.157 55.835 266.347 56.413 266.462 57 266.5 57 266.5" fill="none" stroke="#b4c8dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="313.5 258 313.5 262 313.462 262.587 313.347 263.165 313.157 263.722 312.897 264.25 312.57 264.739 312.182 265.182 311.739 265.57 311.25 265.897 310.722 266.157 310.165 266.347 309.587 266.462 309 266.5 309 266.5" fill="none" stroke="#b4c8dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="340.5 258 340.5 262 340.538 262.587 340.653 263.165 340.843 263.722 341.103 264.25 341.43 264.739 341.818 265.182 342.261 265.57 342.75 265.897 343.278 266.157 343.835 266.347 344.413 266.462 345 266.5 345 266.5" fill="none" stroke="#b4c8dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="502.5 258 502.5 262 502.462 262.587 502.347 263.165 502.157 263.722 501.897 264.25 501.57 264.739 501.182 265.182 500.739 265.57 500.25 265.897 499.722 266.157 499.165 266.347 498.587 266.462 498 266.5 498 266.5" fill="none" stroke="#b4c8dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="529.5 258 529.5 262 529.538 262.587 529.653 263.165 529.843 263.722 530.103 264.25 530.43 264.739 530.818 265.182 531.261 265.57 531.75 265.897 532.278 266.157 532.835 266.347 533.413 266.462 534 266.5 534 266.5" fill="none" stroke="#b4c8dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="718.5 258 718.5 262 718.462 262.587 718.347 263.165 718.157 263.722 717.897 264.25 717.57 264.739 717.182 265.182 716.739 265.57 716.25 265.897 715.722 266.157 715.165 266.347 714.587 266.462 714 266.5 714 266.5" fill="none" stroke="#b4c8dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="745.5 258 745.5 262 745.538 262.587 745.653 263.165 745.843 263.722 746.103 264.25 746.43 264.739 746.818 265.182 747.261 265.57 747.75 265.897 748.278 266.157 748.835 266.347 749.413 266.462 750 266.5 750 266.5" fill="none" stroke="#b4c8dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="907.5 258 907.5 262 907.462 262.587 907.347 263.165 907.157 263.722 906.897 264.25 906.57 264.739 906.182 265.182 905.739 265.57 905.25 265.897 904.722 266.157 904.165 266.347 903.587 266.462 903 266.5 903 266.5" fill="none" stroke="#b4c8dc" stroke-width="1" stroke-linejoin="round"/>
+<g class="terminal">
+<text x="48" y="92" textLength="477" fill="#dcdcdc">Term::Fabulous automatic text layout (Ctrl+C to quit)</text>
+<text x="75" y="164" text-anchor="middle" fill="#ffffff">い</text>
+<text x="93" y="164" text-anchor="middle" fill="#ffffff">ろ</text>
+<text x="111" y="164" text-anchor="middle" fill="#ffffff">は</text>
+<text x="129" y="164" text-anchor="middle" fill="#ffffff">に</text>
+<text x="147" y="164" text-anchor="middle" fill="#ffffff">ほ</text>
+<text x="165" y="164" text-anchor="middle" fill="#ffffff">へ</text>
+<text x="183" y="164" text-anchor="middle" fill="#ffffff">と</text>
+<text x="201" y="164" text-anchor="middle" fill="#ffffff">　</text>
+<text x="219" y="164" text-anchor="middle" fill="#ffffff">ち</text>
+<text x="237" y="164" text-anchor="middle" fill="#ffffff">り</text>
+<text x="255" y="164" text-anchor="middle" fill="#ffffff">ぬ</text>
+<text x="273" y="164" text-anchor="middle" fill="#ffffff">る</text>
+<text x="291" y="164" text-anchor="middle" fill="#ffffff">を</text>
+<text x="363" y="164" text-anchor="middle" fill="#ffffff">동</text>
+<text x="381" y="164" text-anchor="middle" fill="#ffffff">해</text>
+<text x="408" y="164" text-anchor="middle" fill="#ffffff">물</text>
+<text x="426" y="164" text-anchor="middle" fill="#ffffff">과</text>
+<text x="547.5" y="164" text-anchor="middle" fill="#ffffff">ส</text>
+<text x="556.5" y="164" text-anchor="middle" fill="#ffffff">วั</text>
+<text x="565.5" y="164" text-anchor="middle" fill="#ffffff">ส</text>
+<text x="574.5" y="164" text-anchor="middle" fill="#ffffff">ดี</text>
+<text x="583.5" y="164" text-anchor="middle" fill="#ffffff">ช</text>
+<text x="592.5" y="164" text-anchor="middle" fill="#ffffff">า</text>
+<text x="601.5" y="164" text-anchor="middle" fill="#ffffff">ว</text>
+<text x="610.5" y="164" text-anchor="middle" fill="#ffffff">โ</text>
+<text x="619.5" y="164" text-anchor="middle" fill="#ffffff">ล</text>
+<text x="628.5" y="164" text-anchor="middle" fill="#ffffff">ก</text>
+<text x="759" y="164" textLength="81" fill="#ffffff">Grüße vom</text>
+<text x="858" y="164" text-anchor="middle" fill="#ffffff">🍻</text>
+<text x="75" y="182" text-anchor="middle" fill="#ffffff">わ</text>
+<text x="93" y="182" text-anchor="middle" fill="#ffffff">か</text>
+<text x="111" y="182" text-anchor="middle" fill="#ffffff">よ</text>
+<text x="129" y="182" text-anchor="middle" fill="#ffffff">た</text>
+<text x="147" y="182" text-anchor="middle" fill="#ffffff">れ</text>
+<text x="165" y="182" text-anchor="middle" fill="#ffffff">そ</text>
+<text x="183" y="182" text-anchor="middle" fill="#ffffff">　</text>
+<text x="201" y="182" text-anchor="middle" fill="#ffffff">つ</text>
+<text x="219" y="182" text-anchor="middle" fill="#ffffff">ね</text>
+<text x="237" y="182" text-anchor="middle" fill="#ffffff">な</text>
+<text x="255" y="182" text-anchor="middle" fill="#ffffff">ら</text>
+<text x="273" y="182" text-anchor="middle" fill="#ffffff">む</text>
+<text x="363" y="182" text-anchor="middle" fill="#ffffff">백</text>
+<text x="381" y="182" text-anchor="middle" fill="#ffffff">두</text>
+<text x="399" y="182" text-anchor="middle" fill="#ffffff">산</text>
+<text x="417" y="182" text-anchor="middle" fill="#ffffff">이</text>
+<text x="547.5" y="182" text-anchor="middle" fill="#ffffff">ฉั</text>
+<text x="556.5" y="182" text-anchor="middle" fill="#ffffff">น</text>
+<text x="565.5" y="182" text-anchor="middle" fill="#ffffff">รั</text>
+<text x="574.5" y="182" text-anchor="middle" fill="#ffffff">ก</text>
+<text x="583.5" y="182" text-anchor="middle" fill="#ffffff">ก</text>
+<text x="592.5" y="182" text-anchor="middle" fill="#ffffff">า</text>
+<text x="601.5" y="182" text-anchor="middle" fill="#ffffff">ร</text>
+<text x="610.5" y="182" text-anchor="middle" fill="#ffffff">เ</text>
+<text x="619.5" y="182" text-anchor="middle" fill="#ffffff">ขี</text>
+<text x="628.5" y="182" text-anchor="middle" fill="#ffffff">ย</text>
+<text x="637.5" y="182" text-anchor="middle" fill="#ffffff">น</text>
+<text x="646.5" y="182" text-anchor="middle" fill="#ffffff">โ</text>
+<text x="655.5" y="182" text-anchor="middle" fill="#ffffff">ป</text>
+<text x="664.5" y="182" text-anchor="middle" fill="#ffffff">ร</text>
+<text x="673.5" y="182" text-anchor="middle" fill="#ffffff">แ</text>
+<text x="682.5" y="182" text-anchor="middle" fill="#ffffff">ก</text>
+<text x="691.5" y="182" text-anchor="middle" fill="#ffffff">ร</text>
+<text x="700.5" y="182" text-anchor="middle" fill="#ffffff">ม</text>
+<text x="759" y="182" textLength="108" fill="#ffffff">Oktoberfest!</text>
+<text x="75" y="200" text-anchor="middle" fill="#ffffff">う</text>
+<text x="93" y="200" text-anchor="middle" fill="#ffffff">ゐ</text>
+<text x="111" y="200" text-anchor="middle" fill="#ffffff">の</text>
+<text x="129" y="200" text-anchor="middle" fill="#ffffff">お</text>
+<text x="147" y="200" text-anchor="middle" fill="#ffffff">く</text>
+<text x="165" y="200" text-anchor="middle" fill="#ffffff">や</text>
+<text x="183" y="200" text-anchor="middle" fill="#ffffff">ま</text>
+<text x="201" y="200" text-anchor="middle" fill="#ffffff">　</text>
+<text x="219" y="200" text-anchor="middle" fill="#ffffff">け</text>
+<text x="237" y="200" text-anchor="middle" fill="#ffffff">ふ</text>
+<text x="255" y="200" text-anchor="middle" fill="#ffffff">こ</text>
+<text x="273" y="200" text-anchor="middle" fill="#ffffff">え</text>
+<text x="291" y="200" text-anchor="middle" fill="#ffffff">て</text>
+<text x="363" y="200" text-anchor="middle" fill="#ffffff">마</text>
+<text x="381" y="200" text-anchor="middle" fill="#ffffff">르</text>
+<text x="399" y="200" text-anchor="middle" fill="#ffffff">고</text>
+<text x="426" y="200" text-anchor="middle" fill="#ffffff">닳</text>
+<text x="444" y="200" text-anchor="middle" fill="#ffffff">도</text>
+<text x="462" y="200" text-anchor="middle" fill="#ffffff">록</text>
+<text x="547.5" y="200" text-anchor="middle" fill="#ffffff">ภ</text>
+<text x="556.5" y="200" text-anchor="middle" fill="#ffffff">า</text>
+<text x="565.5" y="200" text-anchor="middle" fill="#ffffff">ษ</text>
+<text x="574.5" y="200" text-anchor="middle" fill="#ffffff">า</text>
+<text x="583.5" y="200" text-anchor="middle" fill="#ffffff">ไ</text>
+<text x="592.5" y="200" text-anchor="middle" fill="#ffffff">ท</text>
+<text x="601.5" y="200" text-anchor="middle" fill="#ffffff">ย</text>
+<text x="610.5" y="200" text-anchor="middle" fill="#ffffff">มี</text>
+<text x="619.5" y="200" text-anchor="middle" fill="#ffffff">ว</text>
+<text x="628.5" y="200" text-anchor="middle" fill="#ffffff">ร</text>
+<text x="637.5" y="200" text-anchor="middle" fill="#ffffff">ร</text>
+<text x="646.5" y="200" text-anchor="middle" fill="#ffffff">ณ</text>
+<text x="655.5" y="200" text-anchor="middle" fill="#ffffff">ยุ</text>
+<text x="664.5" y="200" text-anchor="middle" fill="#ffffff">ก</text>
+<text x="673.5" y="200" text-anchor="middle" fill="#ffffff">ต์</text>
+<text x="759" y="200" textLength="72" fill="#ffffff">Spaß mit</text>
+<text x="75" y="218" text-anchor="middle" fill="#ffffff">あ</text>
+<text x="93" y="218" text-anchor="middle" fill="#ffffff">さ</text>
+<text x="111" y="218" text-anchor="middle" fill="#ffffff">き</text>
+<text x="129" y="218" text-anchor="middle" fill="#ffffff">ゆ</text>
+<text x="147" y="218" text-anchor="middle" fill="#ffffff">め</text>
+<text x="165" y="218" text-anchor="middle" fill="#ffffff">み</text>
+<text x="183" y="218" text-anchor="middle" fill="#ffffff">し</text>
+<text x="201" y="218" text-anchor="middle" fill="#ffffff">　</text>
+<text x="219" y="218" text-anchor="middle" fill="#ffffff">ゑ</text>
+<text x="237" y="218" text-anchor="middle" fill="#ffffff">ひ</text>
+<text x="255" y="218" text-anchor="middle" fill="#ffffff">も</text>
+<text x="273" y="218" text-anchor="middle" fill="#ffffff">せ</text>
+<text x="291" y="218" text-anchor="middle" fill="#ffffff">す</text>
+<text x="363" y="218" text-anchor="middle" fill="#ffffff">하</text>
+<text x="381" y="218" text-anchor="middle" fill="#ffffff">느</text>
+<text x="399" y="218" text-anchor="middle" fill="#ffffff">님</text>
+<text x="417" y="218" text-anchor="middle" fill="#ffffff">이</text>
+<text x="547.5" y="218" text-anchor="middle" fill="#ffffff">ข</text>
+<text x="556.5" y="218" text-anchor="middle" fill="#ffffff">อ</text>
+<text x="565.5" y="218" text-anchor="middle" fill="#ffffff">ใ</text>
+<text x="574.5" y="218" text-anchor="middle" fill="#ffffff">ห้</text>
+<text x="583.5" y="218" text-anchor="middle" fill="#ffffff">โ</text>
+<text x="592.5" y="218" text-anchor="middle" fill="#ffffff">ช</text>
+<text x="601.5" y="218" text-anchor="middle" fill="#ffffff">ค</text>
+<text x="610.5" y="218" text-anchor="middle" fill="#ffffff">ดี</text>
+<text x="619.5" y="218" text-anchor="middle" fill="#ffffff">น</text>
+<text x="628.5" y="218" text-anchor="middle" fill="#ffffff">ะ</text>
+<text x="637.5" y="218" text-anchor="middle" fill="#ffffff">ค</text>
+<text x="646.5" y="218" text-anchor="middle" fill="#ffffff">รั</text>
+<text x="655.5" y="218" text-anchor="middle" fill="#ffffff">บ</text>
+<text x="759" y="218" textLength="117" fill="#ffffff">Umlauten äöüß</text>
+<text x="363" y="236" text-anchor="middle" fill="#ffffff">보</text>
+<text x="381" y="236" text-anchor="middle" fill="#ffffff">우</text>
+<text x="399" y="236" text-anchor="middle" fill="#ffffff">하</text>
+<text x="417" y="236" text-anchor="middle" fill="#ffffff">사</text>
+<text x="768" y="236" text-anchor="middle" fill="#ffffff">🎉</text>
+<text x="363" y="254" text-anchor="middle" fill="#ffffff">우</text>
+<text x="381" y="254" text-anchor="middle" fill="#ffffff">리</text>
+<text x="399" y="254" text-anchor="middle" fill="#ffffff">나</text>
+<text x="417" y="254" text-anchor="middle" fill="#ffffff">라</text>
+<text x="444" y="254" text-anchor="middle" fill="#ffffff">만</text>
+<text x="462" y="254" text-anchor="middle" fill="#ffffff">세</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

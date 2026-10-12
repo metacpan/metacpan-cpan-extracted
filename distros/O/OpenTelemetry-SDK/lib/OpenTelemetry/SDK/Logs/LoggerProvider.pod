@@ -1,0 +1,172 @@
+=encoding UTF-8
+
+=head1 NAME
+
+OpenTelemetry::SDK::Logs::LoggerProvider - Provides access to SDK OpenTelemetry Loggers
+
+=head1 SYNOPSIS
+
+    use OpenTelemetry;
+
+    # Read the globally set provider
+    my $provider = OpenTelemetry->logger_provider;
+    my $logger   = $provider->logger;
+    $logger->emit_record( body => 'Reticulating splines' );
+
+    # Set a global logger provider
+    OpenTelemetry->logger_provider = $another_provider;
+
+=head1 DESCRIPTION
+
+This module provides a subclass of L<OpenTelemetry::Logs::LoggerProvider>
+that can be used to generate instances of L<OpenTelemetry::SDK::Logs::Logger>
+to emit log records. Unlike the API Logger, these ones can be used to
+emit L<OpenTelemetry::SDK::Logs::LogRecord> to external collectors and
+processed.
+
+=head1 METHODS
+
+=head2 new
+
+    $provider = OpenTelemetry::SDK::Logs::LoggerProvider->new(
+        resource => $resource, # optional
+    );
+
+Creates a new instance of the logger provider. See
+L<OpenTelemetry/logger_provider> for a way to make this provider available to
+other parts of your application, or to retrieve the provider that has already
+been set.
+
+Takes the following named parameters:
+
+=over
+
+=item C<resource>
+
+An instance of L<OpenTelemetry::SDK::Resource> to be used as the base resource
+propagated by the log records emitted by the provided loggers. If none is set,
+a default one will be used.
+
+=back
+
+=head2 logger
+
+    $logger = $logger_provider->logger( %args )
+
+Takes a set of named parameters, and returns a logger that can be used to
+emit log records via L<OpenTelemetry::Logs::Logger/emit_record>. Accepts the
+same parameters described in L<OpenTelemetry::Logs::LoggerProvider/logger>:
+
+=over
+
+=item C<name>
+
+A name that uniquely identifies an
+L<instrumentation scope|OpenTelemetry::SDK::InstrumentationScope>. This can
+be the instrumentation library, a package name, etc. This value I<should> be
+set to a non-empty string. If not set, however, this class will set this to
+L<the name of the calling package|https://perldoc.perl.org/functions/caller>.
+
+=item C<version>
+
+Specifies the version of the
+L<instrumentation scope|OpenTelemetry::SDK::InstrumentationScope>, if one is
+available. If the L</name> parameter described above was not set, the version
+of the calling package will be used if defined, as returned by
+L<UNIVERSAL/VERSION>.
+
+=item C<attributes>
+
+A hash reference with a set of attributes for this
+L<instrumentation scope|OpenTelemetry::SDK::InstrumentationScope>.
+
+=item C<schema_url>
+
+The schema URL to be recorded in the emitted data.
+
+=back
+
+This logger provider will return an instance of
+L<OpenTelemetry::SDK::Logs::Logger> configured to use the
+L<OpenTelemetry::SDK::InstrumentationScope> identified by this L</name> and
+L</version>, and holding the specified L</attributes>. The L</schema_url> will
+be used L<merged|OpenTelemetry::SDK::Resource/merge> into the L</resource>
+that has been set for this provider, and the resulting
+L<OpenTelemetry::SDK::Resource> will be used by the provided logger.
+
+Loggers are identified by the combination of the L</name>, L</version>, and
+the L</schema_url> resulting from the merge described above. The generated
+logger instance will be cached internally, and any combination of parameters
+that would result in an equivalent set will receive that same logger instance.
+
+=head2 shutdown
+
+    $result = await $logger_provider->shutdown( $timeout // undef );
+
+Takes an optional timeout value and returns a L<Future> that will be done
+when this logger provider has completed shutting down. During this process,
+the L<"shutdown"|OpenTelemetry::Logs::LogRecord::Processor/shutdown> method
+will be called on every log record processor registered with this provider
+using L</add_log_record_processor>, described below.
+
+The value of the returned future will be one of the
+L<OpenTelemetry::Constants/Export Results>. If any of the propagated
+calls returns a failure code, the result will be a failure. If a timeout
+is provided and this runs out while shutting down the processors, the
+result will be a timeout. In this last case, some log record processors might
+not be shut down.
+
+=head2 force_flush
+
+    $result = await $logger_provider->force_flush( $timeout // undef );
+
+Takes an optional timeout value and returns a L<Future> that will be done
+when this logger provider has completed flushing. During this process,
+the L<"force_flush"|OpenTelemetry::Logs::LogRecord::Processor/force_flush>
+method will be called on every log record processor registered with this
+provider using L</add_log_record_processor>, described below.
+
+The value of the returned future will be one of the
+L<OpenTelemetry::Constants/Export Results>. If any of the propagated
+calls returns a failure code, the result will be a failure. If a timeout
+is provided and this runs out while flushing the processors, the result will
+be a timeout. In this last case, some log record processors might not be
+flushed.
+
+=head2 add_log_record_processor
+
+    $logger_provider = $logger_provider->add_log_record_processor($processor);
+
+Takes an instance of a class that implements the
+L<OpenTelemetry::Logs::LogRecord::Processor> role and registers it as a log
+record processor for log records created by the loggers this logger provider
+generates.
+
+This method is chainable.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<Future>
+
+=item L<OpenTelemetry::SDK::InstrumentationScope>
+
+=item L<OpenTelemetry::SDK::Resource>
+
+=item L<OpenTelemetry::SDK::Logs::LogRecord>
+
+=item L<OpenTelemetry::SDK::Logs::Logger>
+
+=item L<OpenTelemetry::Logs::Logger>
+
+=item L<OpenTelemetry::Logs::LoggerProvider>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2024 by José Joaquín Atria.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.

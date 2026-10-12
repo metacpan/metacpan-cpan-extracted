@@ -1,0 +1,55 @@
+#!/usr/bin/env perl
+use 5.014;
+use strict;
+use warnings;
+
+use Game::Floppy::Terminal;
+
+our $VERSION = '0.09';
+
+exit Game::Floppy::Terminal->run(@ARGV);
+
+__END__
+
+=head1 NAME
+
+floppy - a one-button bird through a field of tubes, in a terminal or a window
+
+=head1 SYNOPSIS
+
+    floppy                     # play, the view fitted to the window
+    floppy --watch --level 3   # watch the bot
+    floppy --raylib            # a window, when Raylib::FFI is installed
+    floppy --help
+
+=head1 DESCRIPTION
+
+Space, up, Enter, w or k flap; p pauses; q quits; after a death, space plays
+again. The bird falls, a flap lifts it, and it dies on a tube, on the ground
+or off the top. Passing a tube scores 100.
+
+The keys need L<Term::ReadKey>. Without it the game says so and exits 2;
+C<--watch> works anywhere.
+
+=head1 EXIT STATUS
+
+0 when a game ended or was quit; 2 for a bad option, or a game that could not
+start.
+
+=head1 SEE ALSO
+
+L<Game::Floppy::Terminal>, which this program is two lines over.
+
+=head1 AUTHOR
+
+LNATION, C<< <email at lnation.org> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2024 by LNATION.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

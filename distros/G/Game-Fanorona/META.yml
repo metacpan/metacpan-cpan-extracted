@@ -1,5 +1,5 @@
 ---
-abstract: 'the board game of Madagascar: play it, and play it again'
+abstract: 'the board game of Madagascar'
 author:
   - 'LNATION <email@lnation.org>'
 build_requires:
@@ -33,5 +33,5 @@ requires:
   XSLoader: '0'
   constant: '0'
   perl: '5.014'
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -201,6 +201,22 @@ $t->get_ok('/admin/panel', headers => { Accept => 'application/json' })
 $t->get_ok('/verified/v', headers => { Accept => 'application/json' })
   ->status_is(401, 'and unverified fails the verified guard');
 
+# A driver may hand a boolean back as a string, and 'f' is a true one.
+for my $spelling (qw(f F false FALSE no off n)) {
+    $t->post_ok('/signup', form => { email => "$spelling\@b.co",
+                                     password => 'pw-six-longer',
+                                     v => $spelling })->status_is(200);
+    $t->get_ok('/verified/v', headers => { Accept => 'application/json' })
+      ->status_is(401, "verified '$spelling' is not verified");
+}
+for my $spelling ('t', 'true', '2026-10-11 09:00:00') {
+    $t->post_ok('/signup', form => { email => "$spelling\@b.co",
+                                     password => 'pw-six-longer',
+                                     v => $spelling })->status_is(200);
+    $t->get_ok('/verified/v')
+      ->status_is(200, "verified '$spelling' is");
+}
+
 # ---- multiple roles, and roles outside the ladder ------------------------------
 
 {

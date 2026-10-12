@@ -321,7 +321,7 @@ json(self, data, status = &PL_sv_undef)
         AV *av  = pcx_av(aTHX_ self);
         AV *res = pcx_res_av(aTHX_ av);
         IV st = SvOK(status) ? SvIV(status) : pcx_res_status(aTHX_ res);
-        SV *bytes = punk_frj(aTHX)->encode(aTHX_ data, NULL);
+        SV *bytes = pcx_json(aTHX_ av, data);
         if (!st) st = 200;
         RETVAL = punk_triplet(aTHX_ st,
                     sv_2mortal(newSVpvs("application/json")),
@@ -788,11 +788,13 @@ header(self, ...)
         int set = (items > 2 || items == 1);
         int nargs = items - 1, i;
         SV **argv, *res, *r;
-        Newx(argv, nargs > 0 ? nargs : 1, SV *);   /* capture before stack work */
+        /* captured before the stack is reused, and in a mortal: the response
+         * croaks on a header it will not send, and this must go with it */
+        argv = (SV **)SvPVX(sv_2mortal(
+                   newSV((nargs > 0 ? nargs : 1) * sizeof(SV *))));
         for (i = 0; i < nargs; i++) argv[i] = ST(i + 1);
         res = pcx_force(aTHX_ av, PCX_RES, "Punk::Response", NULL);
         r = pcx_call_meth(aTHX_ res, "header", argv, nargs, set ? 0 : 1);
-        Safefree(argv);
         if (set)   RETVAL = newSVsv(self);
         else       RETVAL = r ? r : &PL_sv_undef;
     }
@@ -992,11 +994,12 @@ session_expire(self)
 # wholesale when its contents do. A stored session is not: the id survives the
 # login unless something changes it.
 #
-# It cannot be automatic. "Privilege changed" is application knowledge, and
-# every candidate for guessing it is wrong - rotating whenever the session
-# gains a key rotates on a shopping basket, rotating on every POST is a store
-# write per form submission, and watching for a key named `user_id` is a
-# convention nobody agreed to.
+# $c->login calls it, because a login is that boundary by definition, and
+# that is the only automatic call. "Privilege changed" is application
+# knowledge, and every candidate for guessing it is wrong - rotating whenever
+# the session gains a key rotates on a shopping basket, rotating on every POST
+# is a store write per form submission, and watching for a key named `user_id`
+# is a convention nobody agreed to.
 SV *
 session_rotate(self)
         SV *self
@@ -1004,20 +1007,15 @@ session_rotate(self)
     {
         AV *av = pcx_av(aTHX_ self);
         HV *stash = ps_stash(aTHX_ av);
-        SV **idp;
         /* Load first: the contents have to survive the rotation, and a
          * handler that rotates before touching $c->session would otherwise
          * leave the write-back with no session to write. */
         SV *sess = ps_load(aTHX_ self);
         SvREFCNT_dec(sess);
-        idp = hv_fetch(stash, PK_SESSION_SID, PK_SESSION_SID_LEN, 0);
-        /* The old id to retire, or undef when this session is new - which is
-         * the ordinary case for a login, and still marks the write-back as
-         * rotating so an unchanged session is written under the new name. */
-        (void)hv_store(stash, PK_SESSION_ROT, PK_SESSION_ROT_LEN,
-                       (idp && *idp && SvOK(*idp)) ? newSVsv(*idp) : newSV(0),
-                       0);
-        (void)hv_delete(stash, PK_SESSION_SID, PK_SESSION_SID_LEN, G_DISCARD);
+        /* The old id to retire, or undef when this session is new, which
+         * still marks the write-back as rotating so an unchanged session is
+         * written under the new name. */
+        ps_mark_rotate(aTHX_ self, ps_cfg(aTHX_ self), stash);
         RETVAL = newSVsv(self);
     }
     OUTPUT:

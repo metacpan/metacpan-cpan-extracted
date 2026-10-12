@@ -1,0 +1,28 @@
+---
+abstract: 'Fix MP3 tags from directory structure'
+author:
+  - 'vr-ski 166657596+vr-ski@users.noreply.github.com'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.90'
+configure_requires:
+  ExtUtils::MakeMaker: '7.22'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: FixMP3Tags
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  MP3::Tag: '1.16'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/vr-ski/fix-mp3-tags/issues
+  repository: https://github.com/vr-ski/fix-mp3-tags.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

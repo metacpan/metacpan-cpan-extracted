@@ -50,10 +50,10 @@ my $dbh = db_connect($cfg, 'EDTK_DBI_STATS',
 		
 	} elsif ($period=~ /^all$/i){
 		
-	} elsif ($period=~ /^(\d{3,15})$/){	# références au format YWW ou idldoc...
+	} elsif ($period=~ /^(\d{3,15})$/){	# references in YWW or idldoc format...
 		$idldocKey = sprintf("%d",$1 );
 
-	} elsif ($period=~ /^(\d{1,2})$/){ 	# références au format WW...
+	} elsif ($period=~ /^(\d{1,2})$/){ 	# references in WW format...
 		$idldocKey = sprintf("%1d%d", $year % 10, $1 );
 
 	} elsif ($period=~ /^week$/i){
@@ -62,7 +62,7 @@ my $dbh = db_connect($cfg, 'EDTK_DBI_STATS',
 	} else { 
 		$idldocKey = sprintf("%1d%02d", $year % 10, $week );
 	}
-	$idldocKey .="%"; # étrangement pour les cas week et \d2 on a le message suivant si on met % dans le sprintf : Invalid conversion in sprintf: end of string at C:\Sources\edtk_MNT\lib\index_Check_docs_omgr.pl line 44. 
+	$idldocKey .="%"; # strangely, for the week and \d2 cases we get the following message if we put % in the sprintf : Invalid conversion in sprintf: end of string at C:\Sources\edtk_MNT\lib\index_Check_docs_omgr.pl line 44. 
 	push (@sql_values, $idldocKey);
 
 	$select	= "SELECT COUNT (DISTINCT A.ED_IDLDOC||TO_CHAR(A.ED_SEQDOC,'FM0000000')) AS NB_DOCS, "
@@ -71,7 +71,7 @@ my $dbh = db_connect($cfg, 'EDTK_DBI_STATS',
 	$sql		= " FROM " . $cfg->{'EDTK_STATS_OUTMNGR'} . " A, " . $cfg->{'EDTK_STATS_TRACKING'} . " B, EDTK_ACQ C "
 				. " WHERE B.ED_SNGL_ID=A.ED_IDLDOC (+) AND B.ED_JOB_EVT='J' AND  B.ED_SNGL_ID LIKE ? "
 				. " AND A.ED_SEQLOT = C.ED_SEQLOT (+)";
-#				. " AND ROWNUM<1000 "; # le probleme c'est que ROWNUM contient le détail des lignes avant regroupement par lot
+#				. " AND ROWNUM<1000 "; # the problem is that ROWNUM holds the line detail before grouping by lot
 #				. " WHERE A.ED_IDLDOC=B.ED_SNGL_ID AND B.ED_JOB_EVT='J' AND A.ED_SEQLOT != 'ANO' AND A.ED_SEQLOT LIKE ? ";
 	$groupby  = " GROUP BY B.ED_APP, B.ED_SNGL_ID, A.ED_STATUS, C.ED_STATUS ";
 	$orderby	= " ORDER BY B.ED_APP, NB_DOCS, B.ED_SNGL_ID, A.ED_STATUS, C.ED_STATUS ASC";
@@ -112,7 +112,7 @@ my $dbh = db_connect($cfg, 'EDTK_DBI_STATS',
 	my $rows= $sth->fetchall_arrayref();
 		foreach my $row (@$rows) {
 		for (my $i=0; $i<=$#$row ; $i++){
-			$$row[$i] = $$row[$i] || ""; # DANS LE CAS DE SEQLOT IL PEUT ARRIVER QU'IL NE SOIT PAS ENCORE RENSEIGNE	
+			$$row[$i] = $$row[$i] || ""; # IN THE SEQLOT CASE IT MAY NOT BE FILLED IN YET	
 		}
 		# push (@tlist, printf ("%-16s %9s %9s %9s %8s %8s %7s %-10s %s\n", @$row));
 	}
@@ -124,13 +124,13 @@ my $dbh = db_connect($cfg, 'EDTK_DBI_STATS',
 
 
 if ($#$rows<0) {
-	warn "INFO : pas de donnees associees.\n";
+	warn "INFO : no associated data.\n";
 	exit;
 }
 
 foreach my $row (@$rows) {
 		for (my $i=0; $i<=$#$row ; $i++){
-			$$row[$i] = $$row[$i] || ""; # CERTAINES VALEURS PEUVENT NE PAS ÊTRE RENSEIGNÉES DANS CERTAINS CAS	
+			$$row[$i] = $$row[$i] || ""; # SOME VALUES MAY NOT BE FILLED IN IN SOME CASES	
 		}
 	printf "%9s %7s %-15s %-16s %s \n", @$row, ""; # 1391152325098839
 }

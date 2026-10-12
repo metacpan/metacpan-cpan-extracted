@@ -1,0 +1,51 @@
+The OpenAPI Initiative's official Swagger 2.0 example documents
+================================================================
+
+VENDORED, NOT AUTHORED HERE. The seven .json files are copied verbatim from
+
+    https://github.com/OAI/learn.openapis.org
+    examples/v2.0/json/{api-with-examples,petstore,petstore-expanded,
+                        petstore-minimal,petstore-simple,
+                        petstore-with-external-docs,uber}.json
+
+fetched 11 October 2026 from the `main` branch. That repository is the
+current home of the examples that used to live in OAI/OpenAPI-Specification
+under examples/v2.0/; the copies there at tag 3.0.3 are byte-identical
+(checked with cmp on petstore-expanded.json the same day). LICENSE beside
+them is learn.openapis.org's own (Creative Commons Attribution 4.0
+International) and must travel with them; the attribution is "the OpenAPI
+Initiative". Do not edit the .json files: they are an external corpus, and
+the value of a corpus is that nobody here gets to adjust it. To update,
+re-fetch from the URL above.
+
+Not vendored: examples/v2.0/json/petstore-separate/, a multi-file document
+whose $refs point at other files. Open::API refuses an external $ref in
+every version, so that document cannot load here by design.
+
+Why they are here
+-----------------
+
+Swagger 2.0 publishes no executable conformance suite, so the compliance
+catalogue in t/compliance/run.t is authored from the specification text.
+These documents are the one thing 2.0 has that was NOT written here: real
+documents by the specification's own authors. Each must load, route,
+synthesize every response (the mock walks the normalised document), have
+every synthesized body validate against its own schema, come out unchanged
+when its normalised form is fed back through new(), and carry no
+`#/definitions/` reference anywhere in ->spec.
+
+What each one brings:
+
+  petstore-expanded      #/definitions/ refs, a query array with
+                         collectionFormat csv, a body parameter, a `default`
+                         response, an operationId with spaces
+  petstore-simple        the same shape, simpler
+  petstore-with-external-docs
+                         externalDocs at root and on operations
+  petstore               a 201, a string path parameter, no body schema
+  petstore-minimal       no operationId on the one operation
+  uber                   five operations with no operationId, number
+                         parameters, root produces only
+  api-with-examples      the response `examples` map, statuses 300 and 203,
+                         no host/basePath/definitions, consumes without a
+                         body

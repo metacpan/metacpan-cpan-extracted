@@ -65,6 +65,8 @@ METHODS
 
       my $conn = Object::Remote->connect('root@'); # connection over sudo
 
+      my $conn = Object::Remote->connect('/run/object-remote.sock'); # connection over Unix socket
+
   new::on
       my $eval = Eval::WithLexicals->new::on($conn);
 

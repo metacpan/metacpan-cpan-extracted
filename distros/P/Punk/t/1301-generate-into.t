@@ -25,6 +25,15 @@ sub punk {
     return ($? >> 8, $out);
 }
 
+# `perl -c` on a generated file, captured: it reports on STDERR, which would
+# otherwise print the file's path into the harness output.
+sub compiles {
+    my ($file) = @_;
+    my $cmd = join ' ', map { quotemeta } $^X, @INCARGS, '-c', $file;
+    my $out = qx{$cmd 2>&1};
+    return $? == 0 && $out =~ /syntax OK/;
+}
+
 my $dir = File::Temp::tempdir(CLEANUP => 1);
 Punk::Generate->new(name => 'GenInto', dir => $dir)->run;
 
@@ -42,7 +51,7 @@ Punk::Generate->new(name => 'GenInto', dir => $dir)->run;
         'the package is the app class plus the name');
     like($src, qr/Web::Widget#index/, 'the wiring comment names the target');
     unlike($src, qr/\{%/, 'no unrendered template syntax');
-    is(system($^X, @INCARGS, '-c', $file) >> 8, 0, 'and it compiles');
+    ok(compiles($file), 'and it compiles');
 }
 {
     my ($rc, $out) = punk($dir, 'generate', 'controller', 'Widget');
@@ -77,8 +86,7 @@ Punk::Generate->new(name => 'GenInto', dir => $dir)->run;
     like($src, qr/^package GenInto::Model::Widget;$/m, 'the package');
     like($src, qr/^table 'gadgets';$/m, '--table is honoured');
     like($src, qr/^use Punk::Model;$/m, 'and it is a Punk::Model');
-    is(system($^X, @INCARGS, '-c', "$dir/lib/GenInto/Model/Widget.pm") >> 8, 0,
-        'and it compiles');
+    ok(compiles("$dir/lib/GenInto/Model/Widget.pm"), 'and it compiles');
 }
 {
     my ($rc, $out) = punk($dir, 'generate', 'model', 'Signup');

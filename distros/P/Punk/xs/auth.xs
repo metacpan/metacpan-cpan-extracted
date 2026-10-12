@@ -34,15 +34,25 @@ login(self, user)
         }
         else if (SvOK(user)) id = user;
         else croak("Punk: login needs a user row or id");
+        if (!pauth_id_ok(aTHX_ id))
+            croak("Punk: login needs a user id that is not empty and not 0");
 
         key = ps_cfg_str(aTHX_ cfg, "session_key", "user_id", &kl);
         sess = ps_load(aTHX_ self);
         if (sess && SvROK(sess) && SvTYPE(SvRV(sess)) == SVt_PVHV)
             (void)hv_store((HV *)SvRV(sess), key, (I32)kl, newSVsv(id), 0);
         if (sess) SvREFCNT_dec(sess);
-        {   /* a fresh login invalidates this request's memoized user */
+        {
             HV *stash = ps_stash(aTHX_ pcx_av(aTHX_ self));
+            /* a fresh login invalidates this request's memoized user */
             (void)hv_delete(stash, "punk.auth", 9, G_DISCARD);
+            /* A login is the privilege boundary, so a stored session gets a
+             * new id here: one planted in the browser before the login must
+             * not be the name of the session after it. */
+            ps_mark_rotate(aTHX_ self, ps_cfg(aTHX_ self), stash);
+            /* ...and it outranks a logout earlier in the same request, whose
+             * deletion cookie would otherwise be the only thing written. */
+            (void)hv_delete(stash, "punk.session.expire", 19, G_DISCARD);
         }
         RETVAL = newSVsv(self);
     }

@@ -107,6 +107,8 @@ static void hm_h2_env_init(pTHX_ hm_h2_sess *s, HV *env) {
      * be read to EOF safely. */
     hv_stores(env, "psgix.input.buffered", newSViv(1));
     hv_stores(env, "psgix.loop",        hm_loop_to_sv(aTHX_ loop));
+    if (loop->log_wants_t0)
+        hv_stores(env, "psgix.request_start", newSVnv((NV)hm_now_ns() / 1e9));
     /* HTTPS, SSL_PROTOCOL, SSL_CIPHER and the SSL_CLIENT_* set, exactly as
      * the HTTP/1.1 builder reports them. ALPN h2 is the browser path, so an
      * mTLS application that read SSL_CLIENT_S_DN over HTTP/1.1 lost the
@@ -582,7 +584,7 @@ XS_INTERNAL(hm_xs_h2park_cb) {
         hm_any_values(aTHX_ f, st, errs);
         e = av_len(errs) >= 0 ? av_fetch(errs, 0, 0) : NULL;
         if (e && SvOK(*e)) msg = SvPV(*e, l);
-        PerlIO_printf(PerlIO_stderr(), "Hyperman: async response failed: %s%s",
+        hm_errlog("Hyperman: async response failed: %s%s",
                       msg, (*msg && msg[strlen(msg)-1] == '\n') ? "" : "\n");
         SvREFCNT_dec((SV *)errs);
     }
@@ -608,7 +610,7 @@ static void hm_h2_dispatch(pTHX_ hm_h2_sess *s, hm_h2_stream *st) {
             hv_stores(env, "psgi.input",
                       hm_new_input(aTHX_ SvPVX(st->body), SvCUR(st->body)));
         else
-            hv_stores(env, "psgi.input", SvREFCNT_inc(hm_empty_input));
+            hv_stores(env, "psgi.input", hm_empty_input_sv(aTHX));
     }
     /* psgix.hyperman.stream: [fd, connection generation, stream id] - the
      * ticket ABI v6's stream_open takes. Deliberately not published as
@@ -621,6 +623,8 @@ static void hm_h2_dispatch(pTHX_ hm_h2_sess *s, hm_h2_stream *st) {
         av_store(tick, 1, newSVuv(c->id));
         av_store(tick, 2, newSViv(st->id));
         hv_stores(env, "psgix.hyperman.stream", newRV_noinc((SV *)tick));
+        if (c->proxy_addr[0])
+            hv_stores(env, "psgix.proxy_addr", newSVpv(c->proxy_addr, 0));
     }
     env_rv = newRV_noinc((SV *)env);
     resp = hm_call_app(aTHX_ loop, env_rv);
@@ -1040,6 +1044,18 @@ static int hm_h2_detect(pTHX_ hm_conn *c) {
     return 1;
 }
 
+/* hm_readable, with a FULL buffer on a fresh connection: is this an h2
+ * preface hm_process has not seen yet? A client that sends the preface,
+ * its frames and a whole body in one burst (curl 8.2x does) fills the
+ * buffer before hm_process runs once, and the HTTP/1 ceiling would then
+ * answer a plain-text 413 to a client waiting for SETTINGS (CPAN Testers,
+ * 0.56, FreeBSD: curl reported no status at all). */
+static int hm_h2_preface_pending(hm_conn *c) {
+    return c->lst && c->lst->http2 && c->nreqs == 0 && !c->h2
+        && c->rlen >= sizeof(HM_H2_PREFACE)
+        && memcmp(c->rbuf, HM_H2_PREFACE, sizeof(HM_H2_PREFACE)) == 0;
+}
+
 static int hm_h2_available(void) { return 1; }
 
 #else /* !HM_HAVE_NGHTTP2 */
@@ -1051,6 +1067,7 @@ static void hm_h2_writer_write(pTHX_ int fd, UV gen, int32_t sid, SV *d)
     { (void)fd; (void)gen; (void)sid; (void)d; }
 static void hm_h2_writer_close(pTHX_ int fd, UV gen, int32_t sid)
     { (void)fd; (void)gen; (void)sid; }
+static int  hm_h2_preface_pending(hm_conn *c) { (void)c; return 0; }
 static int  hm_h2_available(void) { return 0; }
 
 #endif /* HM_HAVE_NGHTTP2 */

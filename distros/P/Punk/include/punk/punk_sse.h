@@ -103,13 +103,19 @@ static void se_flush(pTHX_ punk_sse *sse) {
     }
 }
 
-static void se_on_writable(pTHX_ int fd, int mask, void *ud) {
+static void se_on_writable_in(pTHX_ int fd, int mask, void *ud) {
     PERL_UNUSED_ARG(fd); PERL_UNUSED_ARG(mask);
     se_flush(aTHX_ (punk_sse *)ud);
 }
 
+static void se_on_writable(pTHX_ int fd, int mask, void *ud) {
+    PK_LOOP_ENTER;
+    se_on_writable_in(aTHX_ fd, mask, ud);
+    PK_LOOP_LEAVE;
+}
+
 /* the client closing is the only thing we read for; a read of 0 tears down */
-static void se_on_readable(pTHX_ int fd, int mask, void *ud) {
+static void se_on_readable_in(pTHX_ int fd, int mask, void *ud) {
     punk_sse *sse = (punk_sse *)ud;
     char scratch[512];
     ssize_t n;
@@ -120,6 +126,12 @@ static void se_on_readable(pTHX_ int fd, int mask, void *ud) {
         return;
     if (n < 0) se_teardown(aTHX_ sse);
     /* n > 0: a client should not send on an SSE stream; ignore it */
+}
+
+static void se_on_readable(pTHX_ int fd, int mask, void *ud) {
+    PK_LOOP_ENTER;
+    se_on_readable_in(aTHX_ fd, mask, ud);
+    PK_LOOP_LEAVE;
 }
 
 /* queue bytes to the active backend */
@@ -165,7 +177,13 @@ static void se_write(pTHX_ punk_sse *sse, const char *bytes, size_t len) {
 /* ---- SSE field formatting ------------------------------------------------- */
 
 /* append `data:` lines for one payload (a ref -> JSON; a string -> one line
- * per newline), no terminating blank line */
+ * per line break), no terminating blank line.
+ *
+ * A line break is CR, LF or CRLF, because that is what ends a line for the
+ * EventSource parser reading this. Splitting on LF alone left a CR inside a
+ * `data:` line, where the client reads what follows it as a new field: text
+ * relayed from one user could set the event name and the last event id for
+ * everyone listening. */
 static void se_append_data(pTHX_ SV *out, SV *data) {
     if (SvROK(data)) {
         SV *json = punk_frj(aTHX)->encode(aTHX_ data, NULL);
@@ -178,10 +196,11 @@ static void se_append_data(pTHX_ SV *out, SV *data) {
         STRLEN l = 0, i, start = 0;
         const char *p = SvOK(data) ? SvPV_const(data, l) : "";
         for (i = 0; i <= l; i++) {
-            if (i == l || p[i] == '\n') {
+            if (i == l || p[i] == '\n' || p[i] == '\r') {
                 sv_catpvs(out, "data: ");
                 sv_catpvn(out, p + start, i - start);
                 sv_catpvs(out, "\n");
+                if (i + 1 < l && p[i] == '\r' && p[i + 1] == '\n') i++;
                 start = i + 1;
             }
         }
@@ -227,7 +246,7 @@ static void se_arm_heartbeat(pTHX_ punk_sse *sse);
  * handler that has already returned is the LAST one. So the reference is held
  * across the write: without it the re-arm below reads freed memory and hands
  * the loop a timer pointed at it. */
-static void se_heartbeat_cb(pTHX_ void *ud) {
+static void se_heartbeat_cb_in(pTHX_ void *ud) {
     punk_sse *sse = (punk_sse *)ud;
     SV *keep = sse->self_rv ? SvREFCNT_inc(sse->self_rv) : NULL;
     sse->hb_tw = NULL;
@@ -236,6 +255,12 @@ static void se_heartbeat_cb(pTHX_ void *ud) {
         se_arm_heartbeat(aTHX_ sse);
     }
     if (keep) SvREFCNT_dec(keep);                /* sse may be gone after this */
+}
+
+static void se_heartbeat_cb(pTHX_ void *ud) {
+    PK_LOOP_ENTER;
+    se_heartbeat_cb_in(aTHX_ ud);
+    PK_LOOP_LEAVE;
 }
 
 static void se_arm_heartbeat(pTHX_ punk_sse *sse) {
@@ -253,10 +278,16 @@ static void se_arm_heartbeat(pTHX_ punk_sse *sse) {
  * one stream while the connection carries on, and a producer that never hears
  * about it goes on generating events for nobody. The handle stays valid to
  * close, which is what teardown does with it. */
-static void se_on_abort(pTHX_ void *h, void *ud) {
+static void se_on_abort_in(pTHX_ void *h, void *ud) {
     punk_sse *sse = (punk_sse *)ud;
     PERL_UNUSED_ARG(h);
     se_teardown(aTHX_ sse);
+}
+
+static void se_on_abort(pTHX_ void *h, void *ud) {
+    PK_LOOP_ENTER;
+    se_on_abort_in(aTHX_ h, ud);
+    PK_LOOP_LEAVE;
 }
 
 static SV *se_cb(pTHX_ punk_sse *sse, const char *name) {
@@ -342,7 +373,9 @@ static punk_sse *se_new(pTHX_ int mode, HV *opts) {
     sse->mode = mode;
     sse->state = SSE_OPEN;
     sse->heartbeat = 15.0;
-    sse->write_buffer_limit = 0;
+    /* bounded unless told otherwise: a client that opens a stream and stops
+     * reading would otherwise have every event kept for it for ever */
+    sse->write_buffer_limit = PW_DEFAULT_WRITE_LIMIT;
     if (opts) {
         SV **h = hv_fetchs(opts, "heartbeat", 0);
         SV **w = hv_fetchs(opts, "write_buffer_limit", 0);
@@ -469,6 +502,18 @@ static SV *punk_sse_dispatch(pTHX_ SV *c, SV *rec, SV *env) {
     if (x && *x && SvROK(*x) && SvTYPE(SvRV(*x)) == SVt_PVHV) opts = (HV *)SvRV(*x);
     x = hv_fetchs(rech, K_CODE, 0);
     code = (x && *x) ? *x : &PL_sv_undef;
+
+    /* HEAD is the headers and nothing else: no stream is opened and the
+     * handler is not run. */
+    x = hv_fetchs(envh, "REQUEST_METHOD", 0);
+    if (x && *x && SvOK(*x) && SvCUR(*x) == 4
+        && memEQ(SvPVX(*x), "HEAD", 4)) {
+        AV *resp = newAV();
+        av_push(resp, newSViv(200));
+        av_push(resp, newRV_noinc((SV *)se_header_av(aTHX)));
+        av_push(resp, newRV_noinc((SV *)newAV()));
+        return newRV_noinc((SV *)resp);
+    }
 
     /* 1. Hyperman detach: stream on the worker loop.
      *

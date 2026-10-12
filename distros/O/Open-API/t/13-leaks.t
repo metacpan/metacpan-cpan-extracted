@@ -70,6 +70,50 @@ cmp_ok($growth, '<', 4096, 'less than 4 MB growth over 500 full cycles');
     cmp_ok($g30, '<', 4096, 'the 3.0 up-converter leaks nothing measurable');
 }
 
+# The Swagger 2.0 pre-pass builds a 3.0-shaped document before the 3.0 pass
+# builds its own, so every container it allocates needs an owner, and every
+# croak path in it allocates before it dies.
+{
+    my $SPEC20 = "$FindBin::Bin/spec/petstore-2.0.json";
+    my $ALL20  = "$FindBin::Bin/compliance/swagger2-everything.json";
+    for (1 .. 100) { Open::API->new(spec => $SPEC20); Open::API->new(spec => $ALL20) }
+
+    my $b20 = rss_kb();
+    for (1 .. 500) {
+        my $api = Open::API->new(spec => $SPEC20);
+        my ($ok) = $api->validate_request('find pet by id', { path => { id => '5' } });
+        $api->check_response('find pet by id',
+            [200, ['Content-Type' => 'application/json'], ['{"id":1,"name":"Rex"}']]);
+        die 'validate broke' unless $ok;
+        my $all = Open::API->new(spec => $ALL20);
+        my ($ok2) = $all->validate_request('listPets',
+            { query => 'tags=a,b&ids=1&ids=2&sp=x%20y&pi=p|q&tb=t%09u&grid=1|2,3|4&limit=5',
+              header => { 'x-trace' => 'a|b', 'x-flag' => 'true' } });
+        die 'validate broke (everything)' unless $ok2;
+    }
+    my $a20 = rss_kb();
+    my $g20 = $a20 - $b20;
+    diag("2.0 RSS before=$b20 kB after=$a20 kB growth=$g20 kB (500 cycles, two documents)");
+    cmp_ok($g20, '<', 4096, 'the 2.0 pre-pass leaks nothing measurable');
+
+    # the croaking paths: a document refused by a 2.0 MUST, many times over
+    my %bad = (
+        swagger => '2.0', info => { title => 'T', version => '1' },
+        host => 'https://nope', paths => { '/t' => { get => { operationId => 'op',
+            responses => { 200 => { description => 'ok' } } } } },
+    );
+    for (1 .. 100) { eval { Open::API->new(spec => \%bad) } }
+    my $bc = rss_kb();
+    for (1 .. 2000) {
+        my $api = eval { Open::API->new(spec => \%bad) };
+        die 'the bad document loaded' if $api;
+    }
+    my $ac = rss_kb();
+    my $gc = $ac - $bc;
+    diag("2.0 croak RSS before=$bc kB after=$ac kB growth=$gc kB (2000 refusals)");
+    cmp_ok($gc, '<', 4096, 'a refused 2.0 document leaks nothing measurable');
+}
+
 # The discriminator expansion allocates a chain per discriminated schema, and
 # the inheritance form inlines a whole converted child into it.
 {

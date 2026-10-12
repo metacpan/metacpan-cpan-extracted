@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.55';
+our $VERSION = '0.57';
 
 1;
 
@@ -53,7 +53,8 @@ Get/set; setters chain.
 =head2 header
 
 C<< header(Name => $value) >> appends and chains;
-C<< header('Name') >> reads (case-insensitive, first match).
+C<< header('Name') >> reads (case-insensitive, first match). A name or a
+value containing CR, LF or NUL croaks and nothing is appended.
 
 =head2 headers
 

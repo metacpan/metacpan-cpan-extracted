@@ -6,7 +6,7 @@ use warnings;
 
 use Exporter 'import';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 our @EXPORT_OK = qw(
     SETUP
@@ -208,7 +208,7 @@ Game::Brandubh::Notation - squares, moves, positions and whole games as strings
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

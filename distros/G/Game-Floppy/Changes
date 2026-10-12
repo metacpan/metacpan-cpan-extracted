@@ -1,9 +1,31 @@
 Revision history for Game-Floppy
 
-0.01    Date/time
-        First version, released on an unsuspecting world.
+0.09    2026-10-11
+        - Rewritten as an engine: Game::Floppy plays the game and draws nothing.
+        - Game::Floppy::Terminal and bin/floppy: the game in a terminal.
+        - Game::Floppy::Bot: three levels, measured; floppy --watch.
+        - Game::Floppy::Raylib: the window of 0.08, now optional (perl 5.38+).
 
-0.04    2025-01-04
+0.08    2026-07-18
+        - Remove PAX headers
+
+0.07    2025-02-10
+        - Released; no entry was written at the time.
+
+0.06    2025-02-10
+        - Released; no entry was written at the time.
+
+0.05    2025-01-16
+        - Released; no entry was written at the time.
+
+0.04    2025-01-03
         - Adds mouse support
 
+0.03    2025-01-01
+        - Released; no entry was written at the time.
 
+0.02    2025-01-01
+        - Released; no entry was written at the time.
+
+0.01    2025-01-01
+        - First version.

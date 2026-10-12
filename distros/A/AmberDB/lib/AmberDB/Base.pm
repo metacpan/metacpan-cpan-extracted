@@ -9,7 +9,7 @@ use Fcntl qw(:DEFAULT :flock);
 use Digest::SHA qw(sha256_hex);
 use parent qw(AmberDB::Locale AmberDB::Array);
 
-our $VERSION = '5.26.4';
+our $VERSION = '5.26.5';
 my $CREATED  = '2014-12-20';
 
 # ------------------------------------------------
@@ -278,11 +278,11 @@ sub set_datadir {
 
     # do not proceed if simple mode
     if ( $self->config('simple') ) {
-        $self->{_path}->{table_dir}   = $dbase_dir;
-        $self->{_path}->{schema_dir}  = $dbase_dir;
         $self->{_path}->{backup_dir}  = $dbase_dir;
         $self->{_path}->{buffer_dir}  = $dbase_dir;
         $self->{_path}->{journal_dir} = $dbase_dir;
+        $self->{_path}->{schema_dir}  = $dbase_dir;
+        $self->{_path}->{table_dir}   = $dbase_dir;
         $self->{_path}->{lock_dir}    = "$dbase_dir/lock";
         $self->{_path}->{session_dir} = "$dbase_dir/session";
         $self->{_path}->{config_dir}  = "$dbase_dir/config";
@@ -307,8 +307,6 @@ sub set_datadir {
             $self->{_connect}->{database} = $cfg->{database};
         }
     }
-
-
 
     unless ( $self->config('test') || $self->config('no_mkdir') || $^C ) {
         if ( defined $dbase_dir && $dbase_dir ne "." && $dbase_dir ne "" ) {
@@ -412,7 +410,9 @@ sub config {
     return $self;
 }
 
-# my $dbase_dir = $adb->path("dbase_dir");
+# my $dbase_dir = $adb->path("dbase_dir");         # getter
+# $adb->path({ backup_dir => "$tmpdir/backup" });  # setter
+# $adb->path( custom_path => "/opt/data" );        # setter
 # ------------------------------------------------
 sub path {
     my ( $self, @args ) = @_;

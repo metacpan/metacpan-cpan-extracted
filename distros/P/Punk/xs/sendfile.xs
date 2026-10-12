@@ -65,6 +65,20 @@ send_file(self, src, ...)
         }
         else {                                        /* a file path */
             s.path = SvPV(src, s.plen);
+            /* stat and open stop at a NUL and the content type does not, so
+             * `x.txt\0.html` would open one file and label it as another -
+             * and a caller that allowlists by extension would be opening
+             * whatever came before the NUL */
+            if (memchr(s.path, '\0', s.plen)) {
+                if (missing && SvOK(missing)) {
+                    RETVAL = punk_triplet(aTHX_ 404,
+                        sv_2mortal(newSVpvs("application/json")),
+                        newSVpvs("{\"errors\":[{\"message\":\"Not Found\"}]}"),
+                        NULL);
+                    goto done;
+                }
+                croak("Punk::Context::send_file: the path contains a NUL");
+            }
             if (PerlLIO_stat(s.path, &st) < 0 || !S_ISREG(st.st_mode)) {
                 if (missing && SvOK(missing)) {
                     RETVAL = punk_triplet(aTHX_ 404,
@@ -76,8 +90,11 @@ send_file(self, src, ...)
                 croak("Punk::Context::send_file: cannot read '%s'", s.path);
             }
             s.size  = (UV)st.st_size;
-            s.mtime = (mtime_opt && SvOK(mtime_opt))
-                          ? (UV)SvUV(mtime_opt) : (UV)st.st_mtime;
+            if (mtime_opt && SvOK(mtime_opt)) s.mtime = (UV)SvUV(mtime_opt);
+            else {
+                s.mtime = (UV)st.st_mtime;
+                s.mns   = PFC_MTIME_NS(st);
+            }
             s.has_mtime = 1;
             /* NOT eligible for the content cache, deliberately - has_id
              * stays 0 here.
@@ -100,6 +117,18 @@ send_file(self, src, ...)
         }
 
         resp = psf_respond(aTHX_ env, &s, &o);
+        if (!resp && s.changed && s.path
+            && PerlLIO_stat(s.path, &st) == 0 && S_ISREG(st.st_mode)) {
+            /* rewritten between the stat and the open: take the file as it
+             * is now, once */
+            s.size    = (UV)st.st_size;
+            s.changed = 0;
+            if (!(mtime_opt && SvOK(mtime_opt))) {
+                s.mtime = (UV)st.st_mtime;
+                s.mns   = PFC_MTIME_NS(st);
+            }
+            resp = psf_respond(aTHX_ env, &s, &o);
+        }
         if (!resp) {                     /* lost between stat and open */
             if (missing && SvOK(missing))
                 resp = punk_triplet(aTHX_ 404,
@@ -212,7 +241,7 @@ _etag(mtime, size)
     CODE:
     {
         char buf[48];
-        psf_etag(buf, sizeof buf, (UV)SvUV(mtime), (UV)SvUV(size));
+        psf_etag(buf, sizeof buf, (UV)SvUV(mtime), 0, (UV)SvUV(size));
         RETVAL = newSVpv(buf, 0);
     }
     OUTPUT:

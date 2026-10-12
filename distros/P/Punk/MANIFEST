@@ -294,10 +294,13 @@ t/0313-static-cache.t
 t/0314-static-index.t
 t/0315-static-filecache.t
 t/0316-static-stat-cache.t
+t/0317-static-dotfiles.t
 t/0400-sendfile-parse.t
 t/0401-sendfile.t
+t/0402-sendfile-validators.t
 t/0410-upload.t
 t/0411-upload-stream.t
+t/0412-request-hardening.t
 t/0420-blob.t
 t/0500-model.t
 t/0510-model-dbi.t
@@ -339,6 +342,7 @@ t/0912-session-stored.t
 t/0913-session-lifecycle.t
 t/0914-session-pool.t
 t/0915-session-store-synopsis.t
+t/0916-session-boundary.t
 t/1000-futures.t
 t/1001-future.t
 t/1002-awaitable.t
@@ -350,6 +354,7 @@ t/1013-after-response-live.t
 t/1014-ws-extended-connect.t
 t/1015-ws-tls.t
 t/1016-ws-connect-gate.t
+t/1017-ws-memory.t
 t/1020-sse.t
 t/1030-room-bus.t
 t/1031-sse-bus.t

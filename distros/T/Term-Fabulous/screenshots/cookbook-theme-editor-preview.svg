@@ -1,0 +1,170 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="633" viewBox="0 0 960 633" role="img" aria-label="perl examples/cookbook/theme-editor-preview.pl">
+<title>perl examples/cookbook/theme-editor-preview.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="928" height="598" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="928" height="598" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="928" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="480" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/cookbook/theme-editor-preview.pl</text>
+<rect x="16.5" y="16.5" width="927" height="597" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="30" y="60" width="900" height="18" fill="#eceef2"/>
+<rect x="30" y="78" width="153" height="18" fill="#dce4f4"/>
+<rect x="183" y="78" width="747" height="18" fill="#eceef2"/>
+<rect x="30" y="96" width="900" height="18" fill="#fafaf7"/>
+<rect x="30" y="114" width="765" height="18" fill="#fafaf7"/>
+<rect x="795" y="114" width="54" height="18" fill="#1e6ec8"/>
+<rect x="849" y="114" width="81" height="18" fill="#fafaf7"/>
+<rect x="30" y="132" width="18" height="432" fill="#fafaf7"/>
+<rect x="462" y="132" width="36" height="18" fill="#fafaf7"/>
+<rect x="498" y="132" width="288" height="18" fill="#ffffff"/>
+<rect x="786" y="132" width="144" height="18" fill="#fafaf7"/>
+<rect x="462" y="150" width="468" height="18" fill="#fafaf7"/>
+<rect x="462" y="168" width="36" height="36" fill="#fafaf7"/>
+<rect x="498" y="168" width="414" height="18" fill="#e4e7ee"/>
+<rect x="912" y="168" width="18" height="18" fill="#fafaf7"/>
+<rect x="66" y="186" width="180" height="18" fill="#242830"/>
+<rect x="498" y="186" width="405" height="18" fill="#c8d8f0"/>
+<rect x="903" y="186" width="27" height="18" fill="#fafaf7"/>
+<rect x="462" y="204" width="468" height="36" fill="#fafaf7"/>
+<rect x="66" y="222" width="9" height="18" fill="#dcdfe4"/>
+<rect x="75" y="222" width="171" height="18" fill="#343a48"/>
+<rect x="462" y="240" width="36" height="288" fill="#fafaf7"/>
+<rect x="498" y="240" width="405" height="18" fill="#e8ebf1"/>
+<rect x="903" y="240" width="27" height="18" fill="#fafaf7"/>
+<rect x="498" y="258" width="27" height="18" fill="#61afef"/>
+<rect x="525" y="258" width="405" height="270" fill="#fafaf7"/>
+<rect x="498" y="276" width="27" height="18" fill="#000000"/>
+<rect x="498" y="312" width="27" height="18" fill="#46556e"/>
+<rect x="498" y="330" width="27" height="18" fill="#2c313c"/>
+<rect x="498" y="348" width="27" height="18" fill="#3c4250"/>
+<rect x="498" y="366" width="27" height="18" fill="#e06c75"/>
+<rect x="498" y="384" width="27" height="18" fill="#6c7078"/>
+<rect x="498" y="402" width="27" height="18" fill="#343a48"/>
+<rect x="498" y="420" width="27" height="18" fill="#1c2029"/>
+<rect x="498" y="438" width="27" height="18" fill="#282d3a"/>
+<rect x="498" y="456" width="27" height="18" fill="#262a34"/>
+<rect x="498" y="474" width="27" height="18" fill="#586070"/>
+<rect x="498" y="492" width="27" height="18" fill="#5a606e"/>
+<rect x="498" y="510" width="27" height="18" fill="#787e8a"/>
+<rect x="462" y="528" width="468" height="36" fill="#fafaf7"/>
+<rect x="30" y="564" width="900" height="18" fill="#fafaf7"/>
+<rect x="30" y="582" width="900" height="18" fill="#eceef2"/>
+<rect x="39" y="104" width="432" height="1" fill="#1e6ec8"/>
+<rect x="489" y="104" width="432" height="1" fill="#a0aabe"/>
+<rect x="34" y="114" width="1" height="450" fill="#1e6ec8"/>
+<rect x="475" y="114" width="1" height="450" fill="#1e6ec8"/>
+<rect x="484" y="114" width="1" height="450" fill="#a0aabe"/>
+<rect x="853" y="114" width="1" height="18" fill="#afb6c4"/>
+<rect x="925" y="114" width="1" height="450" fill="#a0aabe"/>
+<rect x="57" y="140" width="378" height="1" fill="#46556e"/>
+<rect x="52" y="150" width="1" height="198" fill="#46556e"/>
+<rect x="439" y="150" width="1" height="198" fill="#46556e"/>
+<rect x="66" y="158" width="9" height="1" fill="#5a606e"/>
+<rect x="156" y="158" width="270" height="1" fill="#5a606e"/>
+<rect x="907" y="186" width="2" height="126" fill="#1e6ec8"/>
+<rect x="75" y="302" width="81" height="1" fill="#46556e"/>
+<rect x="192" y="302" width="72" height="1" fill="#46556e"/>
+<rect x="70" y="312" width="1" height="18" fill="#46556e"/>
+<rect x="160" y="312" width="1" height="18" fill="#46556e"/>
+<rect x="187" y="312" width="1" height="18" fill="#46556e"/>
+<rect x="268" y="312" width="1" height="18" fill="#46556e"/>
+<rect x="907" y="312" width="1" height="216" fill="#cdd1da"/>
+<rect x="75" y="338" width="81" height="1" fill="#46556e"/>
+<rect x="192" y="338" width="72" height="1" fill="#46556e"/>
+<rect x="57" y="356" width="378" height="1" fill="#46556e"/>
+<rect x="39" y="572" width="432" height="1" fill="#1e6ec8"/>
+<rect x="489" y="572" width="432" height="1" fill="#a0aabe"/>
+</g>
+<polyline points="34.5 114 34.5 109 34.538 108.413 34.653 107.835 34.843 107.278 35.103 106.75 35.43 106.261 35.818 105.818 36.261 105.43 36.75 105.103 37.278 104.843 37.835 104.653 38.413 104.538 39 104.5 39 104.5" fill="none" stroke="#1e6ec8" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="475.5 114 475.5 109 475.462 108.413 475.347 107.835 475.157 107.278 474.897 106.75 474.57 106.261 474.182 105.818 473.739 105.43 473.25 105.103 472.722 104.843 472.165 104.653 471.587 104.538 471 104.5 471 104.5" fill="none" stroke="#1e6ec8" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="484.5 114 484.5 109 484.538 108.413 484.653 107.835 484.843 107.278 485.103 106.75 485.43 106.261 485.818 105.818 486.261 105.43 486.75 105.103 487.278 104.843 487.835 104.653 488.413 104.538 489 104.5 489 104.5" fill="none" stroke="#a0aabe" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="925.5 114 925.5 109 925.462 108.413 925.347 107.835 925.157 107.278 924.897 106.75 924.57 106.261 924.182 105.818 923.739 105.43 923.25 105.103 922.722 104.843 922.165 104.653 921.587 104.538 921 104.5 921 104.5" fill="none" stroke="#a0aabe" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="52.5 150 52.5 145 52.538 144.413 52.653 143.835 52.843 143.278 53.103 142.75 53.43 142.261 53.818 141.818 54.261 141.43 54.75 141.103 55.278 140.843 55.835 140.653 56.413 140.538 57 140.5 57 140.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="439.5 150 439.5 145 439.462 144.413 439.347 143.835 439.157 143.278 438.897 142.75 438.57 142.261 438.182 141.818 437.739 141.43 437.25 141.103 436.722 140.843 436.165 140.653 435.587 140.538 435 140.5 435 140.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="70.5 312 70.5 307 70.538 306.413 70.653 305.835 70.843 305.278 71.103 304.75 71.43 304.261 71.818 303.818 72.261 303.43 72.75 303.103 73.278 302.843 73.835 302.653 74.413 302.538 75 302.5 75 302.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="160.5 312 160.5 307 160.462 306.413 160.347 305.835 160.157 305.278 159.897 304.75 159.57 304.261 159.182 303.818 158.739 303.43 158.25 303.103 157.722 302.843 157.165 302.653 156.587 302.538 156 302.5 156 302.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="187.5 312 187.5 307 187.538 306.413 187.653 305.835 187.843 305.278 188.103 304.75 188.43 304.261 188.818 303.818 189.261 303.43 189.75 303.103 190.278 302.843 190.835 302.653 191.413 302.538 192 302.5 192 302.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="268.5 312 268.5 307 268.462 306.413 268.347 305.835 268.157 305.278 267.897 304.75 267.57 304.261 267.182 303.818 266.739 303.43 266.25 303.103 265.722 302.843 265.165 302.653 264.587 302.538 264 302.5 264 302.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="70.5 330 70.5 334 70.538 334.587 70.653 335.165 70.843 335.722 71.103 336.25 71.43 336.739 71.818 337.182 72.261 337.57 72.75 337.897 73.278 338.157 73.835 338.347 74.413 338.462 75 338.5 75 338.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="160.5 330 160.5 334 160.462 334.587 160.347 335.165 160.157 335.722 159.897 336.25 159.57 336.739 159.182 337.182 158.739 337.57 158.25 337.897 157.722 338.157 157.165 338.347 156.587 338.462 156 338.5 156 338.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="187.5 330 187.5 334 187.538 334.587 187.653 335.165 187.843 335.722 188.103 336.25 188.43 336.739 188.818 337.182 189.261 337.57 189.75 337.897 190.278 338.157 190.835 338.347 191.413 338.462 192 338.5 192 338.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="268.5 330 268.5 334 268.462 334.587 268.347 335.165 268.157 335.722 267.897 336.25 267.57 336.739 267.182 337.182 266.739 337.57 266.25 337.897 265.722 338.157 265.165 338.347 264.587 338.462 264 338.5 264 338.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="52.5 348 52.5 352 52.538 352.587 52.653 353.165 52.843 353.722 53.103 354.25 53.43 354.739 53.818 355.182 54.261 355.57 54.75 355.897 55.278 356.157 55.835 356.347 56.413 356.462 57 356.5 57 356.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="439.5 348 439.5 352 439.462 352.587 439.347 353.165 439.157 353.722 438.897 354.25 438.57 354.739 438.182 355.182 437.739 355.57 437.25 355.897 436.722 356.157 436.165 356.347 435.587 356.462 435 356.5 435 356.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="34.5 564 34.5 568 34.538 568.587 34.653 569.165 34.843 569.722 35.103 570.25 35.43 570.739 35.818 571.182 36.261 571.57 36.75 571.897 37.278 572.157 37.835 572.347 38.413 572.462 39 572.5 39 572.5" fill="none" stroke="#1e6ec8" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="475.5 564 475.5 568 475.462 568.587 475.347 569.165 475.157 569.722 474.897 570.25 474.57 570.739 474.182 571.182 473.739 571.57 473.25 571.897 472.722 572.157 472.165 572.347 471.587 572.462 471 572.5 471 572.5" fill="none" stroke="#1e6ec8" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="484.5 564 484.5 568 484.538 568.587 484.653 569.165 484.843 569.722 485.103 570.25 485.43 570.739 485.818 571.182 486.261 571.57 486.75 571.897 487.278 572.157 487.835 572.347 488.413 572.462 489 572.5 489 572.5" fill="none" stroke="#a0aabe" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="925.5 564 925.5 568 925.462 568.587 925.347 569.165 925.157 569.722 924.897 570.25 924.57 570.739 924.182 571.182 923.739 571.57 923.25 571.897 922.722 572.157 922.165 572.347 921.587 572.462 921 572.5 921 572.5" fill="none" stroke="#a0aabe" stroke-width="1" stroke-linejoin="round"/>
+<g class="terminal">
+<text x="39" y="74" textLength="261" fill="#1e222a">File  Edit  View  Theme  Help</text>
+<text x="678" y="74" textLength="243" fill="#8c929e">Term::Fabulous theme editor</text>
+<text x="39" y="92" textLength="99" class="b" fill="#1e222a">sign-in.kdl</text>
+<text x="151.5" y="92" text-anchor="middle" fill="#1e6ec8">●</text>
+<text x="165" y="92" textLength="9" class="b" fill="#1e222a">×</text>
+<text x="192" y="92" textLength="9" fill="#1e6ec8">+</text>
+<text x="48" y="128" textLength="144" fill="#1e222a">Preview: sign-in</text>
+<text x="498" y="128" textLength="207" fill="#1e222a">Settings of sign-in.kdl</text>
+<text x="804" y="128" textLength="36" fill="#fafafa">Form</text>
+<text x="867" y="128" textLength="36" fill="#1e222a">Text</text>
+<text x="498" y="146" textLength="135" fill="#8c929e">Search (Ctrl+F)</text>
+<text x="804" y="146" textLength="108" fill="#1e222a">[ ] Only set</text>
+<text x="84" y="164" textLength="63" fill="#96a0b4">Sign in</text>
+<text x="534" y="182" textLength="342" class="b" fill="#0a0c10">Setting              Value        From</text>
+<text x="66" y="200" textLength="36" fill="#e06c75">ada@</text>
+<text x="538.5" y="200" text-anchor="middle" class="b" fill="#1e6ec8">▾</text>
+<text x="552" y="200" textLength="45" class="b" fill="#1e6ec8">Theme</text>
+<text x="714" y="200" textLength="45" fill="#6e7684">2 set</text>
+<text x="570" y="218" textLength="207" class="b" fill="#1e222a">name            sign-in</text>
+<text x="831" y="218" textLength="27" fill="#1e6ec8">set</text>
+<text x="66" y="236" textLength="9" fill="#343a48">P</text>
+<text x="75" y="236" textLength="63" fill="#787e8a">assword</text>
+<text x="570" y="236" textLength="180" class="b" fill="#1e222a">extends         dark</text>
+<text x="831" y="236" textLength="27" fill="#1e6ec8">set</text>
+<text x="538.5" y="254" text-anchor="middle" class="b" fill="#1e6ec8">▾</text>
+<text x="552" y="254" textLength="63" class="b" fill="#1e6ec8">Palette</text>
+<text x="66" y="272" textLength="189" fill="#dcdfe4">[ ] Keep me signed in</text>
+<text x="570" y="272" textLength="297" fill="#6e7684">accent          #61afef      dark</text>
+<text x="570" y="290" textLength="297" fill="#6e7684">backdrop        #00000080    dark</text>
+<text x="570" y="308" textLength="297" fill="#6e7684">background      #161622      dark</text>
+<text x="84" y="326" textLength="63" fill="#dcdfe4">Sign in</text>
+<text x="201" y="326" textLength="54" fill="#dcdfe4">Cancel</text>
+<text x="570" y="326" textLength="297" fill="#6e7684">border          #46556e      dark</text>
+<text x="570" y="344" textLength="297" fill="#6e7684">button_face     #2c313c      dark</text>
+<text x="570" y="362" textLength="297" fill="#6e7684">control_hover   #3c4250      dark</text>
+<text x="570" y="380" textLength="297" fill="#6e7684">danger          #e06c75      dark</text>
+<text x="570" y="398" textLength="297" fill="#6e7684">disabled        #6c7078      dark</text>
+<text x="570" y="416" textLength="297" fill="#6e7684">focus_backgrou~ #343a48      dark</text>
+<text x="570" y="434" textLength="297" fill="#6e7684">group_backgrou~ #1c2029      dark</text>
+<text x="570" y="452" textLength="297" fill="#6e7684">hover_backgrou~ #282d3a      dark</text>
+<text x="570" y="470" textLength="297" fill="#6e7684">hover_low       #262a34      dark</text>
+<text x="570" y="488" textLength="297" fill="#6e7684">line            #586070      dark</text>
+<text x="570" y="506" textLength="297" fill="#6e7684">outline         #5a606e      dark</text>
+<text x="570" y="524" textLength="297" fill="#6e7684">placeholder     #787e8a      dark</text>
+<text x="498" y="542" textLength="45" class="b" fill="#1e222a">Theme</text>
+<text x="543" y="542" textLength="333" fill="#1e222a">: 2 of 2 settings set. Enter opens or</text>
+<text x="498" y="560" textLength="378" fill="#1e222a">closes it, Delete resets it, Ctrl+C copies</text>
+<text x="39" y="596" textLength="648" fill="#1e222a">In the preview: Tab moves between the widgets, PageUp and PageDown scrol</text>
+<text x="691.5" y="596" text-anchor="middle" fill="#1e222a">…</text>
+<text x="714" y="596" textLength="72" fill="#1e6ec8">modified</text>
+<text x="804" y="596" textLength="36" fill="#1e222a">Form</text>
+<text x="858" y="596" textLength="63" fill="#8c929e">F1 keys</text>
+</g>
+<g shape-rendering="crispEdges">
+<rect x="39" y="75" width="9" height="1" fill="#1e222a"/>
+<rect x="93" y="75" width="9" height="1" fill="#1e222a"/>
+<rect x="147" y="75" width="9" height="1" fill="#1e222a"/>
+<rect x="201" y="75" width="9" height="1" fill="#1e222a"/>
+<rect x="264" y="75" width="9" height="1" fill="#1e222a"/>
+</g>
+</svg>

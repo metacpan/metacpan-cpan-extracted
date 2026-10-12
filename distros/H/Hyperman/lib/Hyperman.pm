@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.56';
+our $VERSION = '0.58';
 
 require XSLoader;
 XSLoader::load('Hyperman', $VERSION);
@@ -58,6 +58,7 @@ interfaces (F<xs/>).
                                        # dev mode (no supervisor)
         idle_timeout   => 60,          # close idle keep-alive conns (secs)
         header_timeout => 30,          # slow/partial request guard (secs)
+        body_timeout   => 60,          # a body that stalls this long is dropped
         max_pipeline   => 32,          # requests per conn per wakeup
         reuseport      => 0,           # per-worker listeners (SO_REUSEPORT;
                                        # Linux accept scaling - regressed on
@@ -97,6 +98,11 @@ interfaces (F<xs/>).
         arena_size     => 8_000_000,   # ... and its bytes (default: computed)
         distinct_clients => 0,         # count distinct peers at accept (see
                                        # "Pool state"; costs ~20ns an accept)
+        user           => 'www',       # drop to this user after binding
+        group          => 'www',       # ... and this group (default: the
+                                       # user's primary group)
+        umask          => 0077,        # set before the first fork
+        pid_file       => '/run/app.pid',
     );
 
 The event backend is chosen automatically (kqueue, io_uring, epoll, then poll) and can
@@ -170,6 +176,116 @@ reflect the listener the request arrived on. All listeners serve the one C<app>.
 Ports below 1024 (80, 443) still require the process to start as root or hold
 C<CAP_NET_BIND_SERVICE>.
 
+=head3 host: IPv4, IPv6, or a name
+
+    host => '127.0.0.1'      # one IPv4 interface
+    host => '::'             # every IPv6 interface
+    host => '[::1]'          # brackets are accepted
+    host => 'app.internal'   # a name, resolved once at startup
+
+A listener's host is resolved once, when the server starts, and bound as
+what it resolved to. An IPv6 listener is IPv6 only, so C<'::'> and
+C<'0.0.0.0'> can both be listed on one port. A host that does not resolve is
+refused before anything is bound; it is never replaced by every interface.
+C<REMOTE_ADDR> is the client's address in the listener's family (C<::1> for
+a loopback IPv6 client), and C<SERVER_NAME> is the host as it was given.
+Under C<plackup -s Hyperman>, C<--listen '[::1]:8080'> is the IPv6 spelling.
+
+=head3 path: a unix-domain listener
+
+    listen => [ { path => '/run/app.sock', mode => 0660 } ]
+
+A listener may be a filesystem path instead of a host and port, for a
+reverse proxy on the same machine (nginx: C<proxy_pass http://unix:/run/app.sock:;>).
+A stale socket file from an earlier run is replaced; a regular file at the
+path is refused. C<mode> sets the socket file's permissions (a number or an
+octal string). A path listener has no peer address, so C<REMOTE_ADDR>,
+C<REMOTE_HOST> and C<REMOTE_PORT> are absent from C<$env>, C<SERVER_NAME> is
+the path and C<SERVER_PORT> is 0; the denylist and the rate limiter, which
+key on the peer address, do not apply to it. TLS works on a path listener,
+HTTP/3 does not (QUIC is UDP over IP), and C<reuseport> is refused with one,
+because each worker's rebind would unlink the others' socket. Under
+C<plackup -s Hyperman>, a C<--listen> value containing a C</> is a path.
+
+=head3 inherit, listen_fds: socket activation
+
+    listen     => [ { host => '0.0.0.0', port => 80, inherit => 1 } ]
+    listen_fds => 1          # every listener is inherited
+
+A service manager that binds the sockets itself (systemd's C<.socket> units)
+hands them to the server as descriptors 3 and up, with C<LISTEN_FDS> naming
+how many and C<LISTEN_PID> naming the process they were handed to. A listener
+marked C<inherit> takes the next of them in order instead of binding, after
+checking it is a listening socket of the family the listener resolved to;
+C<listen_fds> marks them all. Both variables are removed from the environment
+at once, so a worker, or a server the application forks, never adopts them
+again. An inherited listener cannot carry C<http3>, and C<reuseport> is
+refused with one.
+
+    # app.socket
+    [Socket]
+    ListenStream=/run/app.sock
+    ListenStream=0.0.0.0:80
+    # app.service
+    [Service]
+    ExecStart=/usr/bin/plackup -s Hyperman --listen_fds 1 --listen /run/app.sock --listen 0.0.0.0:80 app.psgi
+
+=head3 Reloading: HUP and USR2
+
+    kill -HUP  $(cat /run/app.pid)    # refork the pool, same code
+    kill -USR2 $(cat /run/app.pid)    # a new supervisor, freshly compiled
+
+C<HUP> forks a fresh pool from the running supervisor and retires the old
+workers one for one: new processes, the application as it was compiled when
+the server started. It is the reload for a certificate change
+(C<tls_reload>) or a leaking worker, and the supervisor's pid does not
+change.
+
+C<USR2> is the reload for a code deploy. The supervisor starts a successor
+in a fresh perl, with the same interpreter and arguments it was started
+with, so the application is compiled again. The successor adopts the bound
+listeners from its environment instead of binding them, so the ports are
+never released and no connection is refused; it attaches the arena when
+C<arena_name> names one, so the denylist, the rate counters and the bus
+carry over (an anonymous arena cannot be attached, and the successor starts
+a fresh one); it forks its pool, waits for every worker to be on the
+scoreboard, and only then asks the old supervisor to drain with
+C<shutdown_grace>. The pid file then names the successor, so a service
+manager should watch the file rather than the process it started.
+
+A successor that fails to start - a compile error in the new code, a port
+the new configuration adds that is already taken - exits, the old supervisor
+logs it and keeps serving, and nothing has changed. A second C<USR2> while
+one is still starting is ignored and logged.
+
+The successor's workers attach the arena by name and cannot use the wakeup
+pipes the old pool created, so they poll the bus every fifty milliseconds
+instead of being poked: a published message reaches them a little later, and
+always.
+
+=head3 proxy_protocol
+
+    listen => [ { port => 8080, proxy_protocol => 1 } ]
+    proxy_protocol => 1       # for every listener
+
+Behind HAProxy or a load balancer that speaks the PROXY protocol, each
+connection opens with one header naming the real client. A listener with
+C<proxy_protocol> reads that header first, versions 1 and 2, before TLS and
+before any request byte, and from then on C<REMOTE_ADDR> and C<REMOTE_PORT>,
+the access log, the denylist and the rate limiter see the client rather than
+the proxy. The proxy's own address is in C<$env> as C<psgix.proxy_addr>.
+
+It is strict and per listener, which is what makes it safe: a connection on
+such a listener that does not begin with a PROXY header is closed, and a
+PROXY header sent to a listener without the option is an invalid request
+line and a 400, so no client can choose its own address by sending one. A
+header that names no address (v1 C<UNKNOWN>, v2 C<LOCAL>, or a family other
+than TCP over IP) leaves the accepted address in place. A header that never
+completes is closed by C<header_timeout>. The denylist is checked twice, for
+the proxy at accept and for the client once the header has been read, so a
+misbehaving proxy can be blocked too. With C<http3> the option applies to
+the TCP side only.
+
 =head3 access_log
 
 When C<access_log> is a path or an open filehandle, Hyperman formats an
@@ -187,6 +303,70 @@ at accept and is also visible to the app in C<$env>.
 
 Pass a coderef instead (C<< sub { my ($env, $status, $bytes) = @_ } >>) for
 full control; that path calls back into Perl for every response.
+
+=head3 access_log_format
+
+    access_log_format => '%h %l %u %t "%r" %>s %b "%{Referer}i" "%{User-Agent}i"'
+    access_log_format => 'json'
+
+What each line says, in Apache's directives. The default is the Combined
+line above. The format is read once when the server starts, so a directive
+it does not know is refused there and no request pays for the parsing.
+
+    %h %a   REMOTE_ADDR          %l      always "-"
+    %u      REMOTE_USER          %t      [dd/Mon/YYYY:HH:MM:SS +ZZZZ]
+    %r      METHOD URI PROTO     %s %>s  status
+    %b      bytes, "-" if unknown %B      bytes, 0 if unknown
+    %D      microseconds taken   %T      seconds taken
+    %p      SERVER_PORT          %v      SERVER_NAME
+    %m      REQUEST_METHOD       %U      PATH_INFO
+    %q      ?query, or nothing   %H      SERVER_PROTOCOL
+    %P      the worker's pid     %%      a percent sign
+    %{Name}i   a request header  %{Name}e   any $env key
+
+Every value is escaped, so no header or path can forge or split a line.
+C<%D> and C<%T> are measured from the moment the request was parsed, and
+only a format that uses them pays for the clock reading; the moment is also
+visible to the application as C<psgix.request_start>, seconds since the
+epoch.
+
+C<json> writes one object per line instead: C<time> (ISO 8601), C<remote_addr>,
+C<user>, C<method>, C<uri>, C<protocol>, C<status>, C<bytes>, C<referer>,
+C<user_agent> and C<duration_us>, with numbers unquoted and a missing value an
+empty string (or C<null> for the numbers).
+
+=head3 error_log
+
+    error_log => '/var/log/app/error.log'    # or an open filehandle
+
+Where the server's own messages go: a handler that died, a response header
+refused, a worker that stopped updating its scoreboard row, a certificate
+reload that failed. Each line carries a timestamp and the writing pid, and
+is written whole so workers do not interleave. Without it they go to
+C<STDERR>, as they always have. C<psgi.errors> is the application's stream
+and is not moved by this.
+
+=head3 user, group, umask, pid_file
+
+    Hyperman->run(app => $app, port => 80, user => 'www', pid_file => '/run/app.pid');
+
+A server started as root to bind a port below 1024 should not stay root.
+With C<user> (a name or a uid), the parent binds every listener, opens the
+logs and creates the arena, writes the pid file, and then drops to that user
+before the first worker is forked, so the supervisor and every worker run as
+it. C<group> names the group (default: the user's primary group), and the
+supplementary groups are set from the user's entry. A user or group that does
+not exist is refused before anything is bound, and a drop that fails is a
+croak, never a server that carries on as root.
+
+C<umask> is applied at the same point, as a number (C<0077>) or a string of
+octal digits. C<pid_file> is written whole and renamed into place, holds the
+supervisor's pid (the worker's own in single-worker mode), and is removed at
+exit if it still holds that pid.
+
+C<reuseport> with C<user> refuses a port below 1024, because the workers
+rebind it themselves and would do so as the dropped user. None of these four
+is supported on Windows.
 
 =head2 max_body: the request ceiling
 
@@ -270,6 +450,18 @@ assigns to one of them affects that request only.
 holds at most 1MB of them; the rest are served as it drains.
 
 =back
+
+=head3 header_timeout and body_timeout
+
+A request is timed in two phases. Until its header block is complete it has
+C<header_timeout> (30 seconds) from its first byte, which is what stops a
+client that trickles headers to hold a connection. Once the headers are in
+and a body is arriving, the clock measures progress instead: a body that has
+not delivered a byte for C<body_timeout> (60 seconds) is dropped, however
+long it has been coming, and an upload that keeps moving is never cut off
+for being large. A connection that has finished a request and sent nothing
+since is closed after C<idle_timeout>. All three are checked by a sweep that
+runs every five seconds, so each is honoured to within that.
 
 =head2 Expect: 100-continue
 
@@ -511,7 +703,9 @@ a client still talking across a restart - is answered with a B<Stateless
 Reset>, so the client gives up now instead of retrying to its idle timeout.
 That reply is always smaller than the packet that provoked it.
 
-C<http3_max_conns> caps live QUIC connections per worker (1024 by default;
+One source address may hold at most 32 half-open QUIC handshakes at a time;
+an Initial from an address at that limit is dropped, whatever the global
+count. C<http3_max_conns> caps live QUIC connections per worker (1024 by default;
 0 lifts the cap); past it, new handshakes are dropped rather than queued.
 Each accepted Initial costs an SSL object and a transport state that live
 until the idle timeout, and no descriptor is consumed, so without a cap
@@ -693,7 +887,7 @@ TLS, when output is still queued, or when it has already been detached.
 
 Detach is legal from a Future continuation - asynchronous authentication
 before an upgrade - but not from a C<psgi.streaming> responder, which has
-already forced C<Connection: close>, nor once response bytes are queued.
+already begun a response, nor once response bytes are queued.
 
 The equivalent for a C consumer is the table's C<conn_detach>.
 
@@ -734,6 +928,12 @@ C<< ->close >> ends the body; a writer that goes out of scope unclosed ends
 it too. Writing to a stream whose connection has gone is silently dropped
 rather than fatal - the C door returns the reason, and a Perl producer that
 needs to know has already lost the reader.
+
+On HTTP/1.1 a streamed body is sent chunked and the connection is kept for
+its next request, exactly as a C<psgi.streaming> responder's is. A
+C<Content-Length> in the headers is honoured instead, and an HTTP/1.0 client,
+a request that asked for C<Connection: close>, or a 101 upgrade gets an
+EOF-delimited body and a close, as before 0.57.
 
 The equivalent for a C consumer is the table's C<stream_open>; see
 L</Stream handles>.

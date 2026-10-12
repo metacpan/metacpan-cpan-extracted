@@ -1,0 +1,55 @@
+// Nord (https://www.nordtheme.com) for Term::Fabulous: the polar night
+// grays for the screen and the surfaces, snow storm for text, frost for
+// the accent and the aurora for the signal colors. The background token
+// is the screen behind the widgets, painted before every frame.
+
+theme "nord" extends="dark"
+
+palette {
+	background "#2e3440"
+	surface "#3b4252"
+	surface_raised "#434c5e"
+	surface_field "#3b4252"
+	surface_low "#353b49"
+	group_background "#3b4252"
+	border "#4c566a"
+	line "#4c566a"
+	outline "#4c566a"
+	text "#d8dee9"
+	text_bright "#eceff4"
+	text_muted "#8892a8"
+	text_dim "#a3adc2"
+	text_inverse "#2e3440"
+	placeholder "#616e88"
+	disabled "#616e88"
+	accent "#88c0d0"
+	focus_background "#434c5e"
+	hover_background "#3b4252"
+	hover_low "#39404f"
+	control_hover "#4c566a"
+	selected "#3f5368"
+	selection "#5e81ac"
+	track "#4c566a"
+	track_scroll "#4c566a"
+	button_face "#434c5e"
+	success "#a3be8c"
+	warning "#ebcb8b"
+	danger "#bf616a"
+}
+
+// Boxes the program gives a border (bordered) get a round frame in the
+// polar night gray.
+box {
+	border style=Round color="border"
+}
+
+// Buttons are flat on a raised surface; the primary one is drawn in
+// the frost blue.
+button {
+	background "button_face"
+	border style=Round color="border"
+	variant "primary" {
+		border color="accent"
+		text "accent"
+	}
+}

@@ -12,7 +12,7 @@ use Sub::Protected;
 use Params::Validate::Strict qw(validate_strict);
 use Params::Get		();
 
-our $VERSION = '0.010.0';
+our $VERSION = '0.011.0';
 
 =head1 NAME
 
@@ -20,7 +20,7 @@ Database::BI::Model::DataSource - Table-agnostic adapter around Database::Abstra
 
 =head1 VERSION
 
-0.007.0
+0.011.0
 
 =head1 SYNOPSIS
 
@@ -96,6 +96,42 @@ B<Select a specific table when a page has more than one HTML table:>
         html_table_index => 2,   # zero-based: 0 = first table, 2 = third table
     );
 
+B<Open one specific internal table from a multi-table SQLite database:>
+
+    # A SQLite file may contain more than one table.
+    # Use internal_table to say which one you want.
+    my $source = Database::BI::Model::DataSource->new(
+        directory      => '/var/data',
+        table          => 'store',          # looks for store.db, store.sql, etc.
+        internal_table => 'customer',       # open just the "customer" table inside
+    );
+    my $records = $source->fetch_all;
+
+B<Check whether a SQLite file has more than one table:>
+
+    my $source = Database::BI::Model::DataSource->new(
+        directory => '/var/data',
+        table     => 'store',
+    );
+    my $tbl_list = $source->sqlite_tables;   # undef unless it is a multi-table SQLite
+    if ($tbl_list && @{$tbl_list} > 1) {
+        # let the user choose which table to open
+        for my $name (@{$tbl_list}) {
+            printf "  table: %s\n", $name;
+        }
+    }
+
+B<Open a remote file over SSH (SFTP):>
+
+    # Requires Net::SFTP::Foreign.
+    my $source = Database::BI::Model::DataSource->new(
+        directory => '/remote/data',
+        table     => 'report',
+        host      => 'deploy@dbserver.example.com',
+        file_ext  => 'log',         # hint: try report.log first, then other exts
+    );
+    my $records = $source->fetch_all;
+
 B<Handle errors gracefully:>
 
     my $source = eval {
@@ -144,25 +180,64 @@ All user-visible strings and exception messages are keyed through the
 C<%MESSAGES> dictionary and routed via C<_msg()>, making every diagnostic
 replaceable by an i18n object at instantiation time.
 
-=head2 UTF-8 and Encoding
+=cut
 
-C<DataSource> passes cell values through as Perl character strings exactly
-as L<Database::Abstraction> and the underlying DBI driver return them.
-For CSV, TSV and PSV files smaller than 16 KB, L<Text::xSV::Slurp> is used and
-bytes are returned without re-encoding; for larger files the L<DBD::CSV>
-path is used.  In both cases the caller (the controller) is responsible
-for setting the correct C<Content-Type> header.
+=head1 ENCODING
 
-The C<table> argument and all column names must be B<ASCII-only>
-identifiers.  Full Unicode is supported inside B<cell values> -- the
-restriction applies only to structural metadata (column headers, table
-name), not to the data itself.
+=head2 What is safe to put in cell values
+
+Cell values (the actual data inside rows) are passed through as Perl
+character strings exactly as C<Database::Abstraction> and the underlying
+DBI driver return them.  Full Unicode -- including non-ASCII letters,
+accented characters, CJK ideographs, and emoji -- is supported in cell
+values, provided the source file is encoded in UTF-8 (or the encoding
+declared in its HTTP headers for URL-backed tables).
+
+=head2 What must stay ASCII
+
+The following structural items must contain B<only ASCII characters>:
+
+=over 4
+
+=item C<table> constructor argument
+
+The bare file stem used to look up the file on disk.  Non-ASCII characters
+are not valid SQL identifiers and will be silently replaced with underscores
+(C<_>) by the sanitization step in C<new()>.
+
+=item Column header names (CSV / TSV / PSV first line)
+
+Column names are used as hash keys and as SQL identifiers inside
+C<Database::Abstraction>.  Non-ASCII headers cause C<DBD::CSV> to
+fail or produce garbage keys.  If your source file has non-ASCII
+column headers, rename them before opening via C<DataSource>.
+
+=item C<host> argument
+
+The hostname or C<user@hostname> string for SFTP access.  Must match
+C<[A-Za-z0-9._@-]>; anything outside that character set is rejected by
+the host-validation regex and produces C<error_backend_init>.
+
+=back
+
+=head2 URL-backed tables
 
 URL-backed tables (the C<url =E<gt>> constructor path) are fetched with
-L<LWP::UserAgent::Cached>.  If the remote server declares a charset in
-its HTTP headers or HTML meta tag, L<Database::Abstraction> uses it to
-decode the response body.  If the declaration is absent or wrong, cell
-values may contain raw bytes rather than character strings.
+L<LWP::UserAgent::Cached>.  If the remote server declares a charset in its
+HTTP headers or in an HTML C<meta> tag, L<Database::Abstraction> uses it
+to decode the response body.  If the charset declaration is absent or wrong,
+cell values may arrive as raw bytes rather than character strings, and
+multi-byte sequences will look garbled.
+
+=head2 File-backed tables (CSV / TSV / PSV)
+
+For files smaller than 16 KB, L<Text::xSV::Slurp> reads bytes and returns
+them without re-encoding; for larger files the L<DBD::CSV> path is used
+instead.  In both cases C<DataSource> forces the slurp path (by passing
+C<max_slurp_size =E<gt> -s $file>) so that column names with spaces are
+preserved as-is.  The caller (the Mojolicious controller) is responsible
+for setting the correct C<Content-Type: text/html; charset=UTF-8> response
+header.
 
 =cut
 
@@ -185,6 +260,8 @@ Readonly our %MESSAGES => (
 	error_url_fetch			=> 'DataSource: failed to open HTML table at "%s": %s',
 	error_no_safe_id		=> 'DataSource: table "%s" has no column with a safe identifier name (letters, digits, underscore); rename at least one column header',
 	error_no_tables			=> 'DataSource: SQLite file "%s" contains no user-defined tables',
+	error_table_not_found		=> 'DataSource: SQLite file "%s" does not contain a table named "%s"',
+	error_unsupported_db		=> 'DataSource: "%s" is a Berkeley DB file but the installed DB_File library cannot open it (file may use a newer Berkeley DB format)',
 	warn_empty_result		=> 'DataSource: fetch_all returned no records for table "%s"',
 	warn_data_normalised		=> 'DataSource: result from backend was a hashref; converted to arrayref for table "%s"',
 );
@@ -262,14 +339,20 @@ Creates and returns a new C<Database::BI::Model::DataSource> instance.
 =head4 INPUT
 
 	{
-	    directory     => 'string',   # required; local dir, or remote dir when host is set
-	    table         => 'string',   # required; bare file stem (no extension)
-	    host          => 'string',   # optional; "hostname" or "user@hostname" for SFTP access
-	    file_ext      => 'string',   # optional; extension hint when remote file has non-standard suffix (e.g. "log")
-	    cache         => 'object',   # optional; CHI cache object for result caching
-	    cache_ttl_url => 'string',   # optional; CHI TTL string for URL-backed tables (default "15 min")
-	    i18n          => 'object',   # optional; must implement maketext($key, @args) for i18n
+	    directory      => 'string',   # required; local dir, or remote dir when host is set
+	    table          => 'string',   # required; bare file stem (no extension)
+	    host           => 'string',   # optional; "hostname" or "user@hostname" for SFTP access
+	    file_ext       => 'string',   # optional; extension hint when remote file has non-standard suffix (e.g. "log")
+	    internal_table => 'string',   # optional; name of a specific internal SQLite table to open
+	    cache          => 'object',   # optional; CHI cache object for result caching
+	    cache_ttl_url  => 'string',   # optional; CHI TTL string for URL-backed tables (default "15 min")
+	    i18n           => 'object',   # optional; must implement maketext($key, @args) for i18n
 	}
+
+C<internal_table> selects a named table inside a multi-table SQLite file.
+When omitted, C<DataSource> auto-selects the first user table whose name
+matches the filename stem; if no match, it picks the first table found.
+Supplying a name that does not exist in the file croaks C<error_table_not_found>.
 
 Accepts a flat key/value list, a hashref, or positional arguments via
 C<Params::Get>.
@@ -336,6 +419,8 @@ Returns C<$self> (a blessed hashref). Croaks on invalid arguments.
                                    * could not fetch any supported file from <host>:<dir>/<stem>.*
                                    * Database::Abstraction subclass could not be instantiated
   error_no_tables             -- SQLite file opened successfully but contains no user-defined tables
+  error_unsupported_db        -- .db file has BerkeleyDB magic bytes but DB_File could not open it
+                                 (file likely uses a newer BDB format than the installed libdb supports)
   error_fetch_failed          -- fetch_all raised an exception (wraps the underlying DBI/D::A error)
   error_url_invalid           -- URL passed to the url=> constructor path does not begin
                                  with http:// or https://
@@ -354,13 +439,14 @@ sub new {
 
 	my $args = validate_strict(
 		schema => {
-			directory     => { type => 'string' },
-			table         => { type => 'string' },
-			host          => { type => 'string', optional => 1, default => undef },
-			file_ext      => { type => 'string', optional => 1, default => undef },
-			i18n          => { type => 'object', optional => 1, default => undef, can => 'maketext' },
-			cache         => { type => 'object', optional => 1, default => undef },
-			cache_ttl_url => { type => 'string', optional => 1, default => '15 min' },
+			directory      => { type => 'string' },
+			table          => { type => 'string' },
+			host           => { type => 'string', optional => 1, default => undef },
+			file_ext       => { type => 'string', optional => 1, default => undef },
+			internal_table => { type => 'string', optional => 1, default => undef },
+			i18n           => { type => 'object', optional => 1, default => undef, can => 'maketext' },
+			cache          => { type => 'object', optional => 1, default => undef },
+			cache_ttl_url  => { type => 'string', optional => 1, default => '15 min' },
 		},
 		input => $raw,
 	);
@@ -391,15 +477,16 @@ sub new {
 		unless $safe_table =~ $TABLE_NAME_RE;
 
 	my $self = bless {
-		_directory    => $args->{directory},
-		_table        => $safe_table,
-		_raw_table    => $raw_table,
-		_host         => $args->{host},
-		_file_ext     => $args->{file_ext},
-		_i18n         => $args->{i18n},
-		_cache        => $args->{cache},
-		_cache_ttl_url => $args->{cache_ttl_url},
-		_db           => undef,
+		_directory      => $args->{directory},
+		_table          => $safe_table,
+		_raw_table      => $raw_table,
+		_host           => $args->{host},
+		_file_ext       => $args->{file_ext},
+		_internal_table => $args->{internal_table},
+		_i18n           => $args->{i18n},
+		_cache          => $args->{cache},
+		_cache_ttl_url  => $args->{cache_ttl_url},
+		_db             => undef,
 	}, $class;
 
 	$self->_init_backend();
@@ -708,8 +795,11 @@ sub _detect_file_info :Protected {
 	# the filename stem (dbname) differs from the table name inside the file --
 	# e.g. obituaries.sql whose internal table is called "deceased".  If the
 	# file is not a valid SQLite database (e.g. a Berkeley DB file) the eval
-	# fails and we return {} so _init_backend/D::A handles it natively.
+	# fails; for .db files we then check for BerkeleyDB magic so we can read
+	# the data directly (or return an error sentinel) instead of letting D::A
+	# fall through to its CSV path, which would read a large binary file as text.
 	# .sqlite and .sqlite3 are common alternative SQLite extensions -- treated identically to .sql.
+	my $non_sqlite_db;	# set to path when a .db file fails the SQLite probe
 	for my $ext (qw(sql sqlite sqlite3 db)) {
 		my $path = File::Spec->catfile($dir, "$table.$ext");
 		next unless -r $path;
@@ -728,7 +818,73 @@ sub _detect_file_info :Protected {
 		# defined $tables means the eval succeeded (even an empty list is valid)
 		return { sqlite_tables => ($tables // []), file_size => -s $path }
 			if defined $tables;
+		$non_sqlite_db = $path if $ext eq 'db';
 		last;	# file found but not SQLite -- do not try the other ext
+	}
+
+	# A .db file that is not SQLite: check for BerkeleyDB magic bytes.
+	# BerkeleyDB Hash/Btree/Queue files begin with a 32-bit magic number either
+	# at offset 0 (big-endian files) or at offset 12 (little-endian files).
+	# If found, try to open via DB_File under a 10-second alarm so a version-
+	# incompatible file does not block the server for minutes.
+	if (defined $non_sqlite_db) {
+		my $magic_ok = 0;
+		if (open(my $fh, '<:raw', $non_sqlite_db)) {
+			my $buf = '';
+			if (read($fh, $buf, 4) == 4) {
+				my %MAGIC = map { $_ => 1 }
+					(0x00061561, 0x00053162, 0x00042253, 0x00052444);
+				$magic_ok = 1 if $MAGIC{unpack('N', $buf)} || $MAGIC{unpack('V', $buf)};
+			}
+			unless ($magic_ok) {
+				if (seek $fh, 12, 0) {
+					my $b12 = '';
+					if (read($fh, $b12, 4) == 4) {
+						my $hex = substr(unpack('H*', $b12), 0, 4);
+						$magic_ok = 1 if $hex eq '6115' || $hex eq '1561';
+					}
+				}
+			}
+			close $fh;
+		}
+		if ($magic_ok) {
+			my $fsize = -s $non_sqlite_db;
+			# BerkeleyDB magic confirmed.  Attempt to read via DB_File,
+			# but only for reasonably-sized files (<= 100 MB).  Opening a
+			# multi-GB BerkeleyDB file with an incompatible library version
+			# causes multi-minute disk I/O that cannot be interrupted with
+			# alarm() (XS I/O in libdb-5.x ignores SIGALRM via SA_RESTART).
+			# For large files, return the unsupported sentinel immediately.
+			Readonly my $BDB_MAX_BYTES => 100 * 1024 * 1024;	# 100 MB
+			if (defined $fsize && $fsize > $BDB_MAX_BYTES) {
+				return { _unknown_binary_db => 1, file_size => $fsize };
+			}
+			my $data = eval {
+				require DB_File;
+				my %bdb;
+				# Capture the tie object so we can undef it before untie --
+				# DB_File warns "untie while N inner references" if the object
+				# reference count is > 0 when untie fires.
+				my $db_obj = tie %bdb, 'DB_File', $non_sqlite_db,
+					Fcntl::O_RDONLY(), 0644, $DB_File::DB_HASH;
+				return undef unless $db_obj;
+				my @rows = map { { entry => $_, value => $bdb{$_} } } sort keys %bdb;
+				undef $db_obj;
+				untie %bdb;
+				\@rows;
+			};
+			if (defined $data) {
+				return {
+					_headerless_data => $data,
+					columns          => ['entry', 'value'],
+					id               => 'entry',
+					file_size        => $fsize,
+				};
+			}
+			# tie failed: return a sentinel so _init_backend can show a proper
+			# error instead of letting D::A read the binary file as CSV text.
+			return { _unknown_binary_db => 1, file_size => $fsize };
+		}
 	}
 	return {};
 }
@@ -939,6 +1095,14 @@ sub _init_backend :Protected {
 		}
 	}
 
+	# BerkeleyDB file detected by magic bytes, but tie() failed (version
+	# incompatibility -- e.g. the file uses BDB format 9 but the installed
+	# libdb only supports an older format).  Croak now so D::A never falls
+	# through to its CSV path and reads the entire binary file as text.
+	if ($info->{_unknown_binary_db}) {
+		croak $self->_msg('error_unsupported_db', $raw_table);
+	}
+
 	# 0-byte file: skip D::A/DBI entirely.  D::A on an empty file falls through
 	# to DBD::CSV, whose error handling corrupts DBI's Errstr SV and triggers an
 	# XS assertion failure at cleanup on DEBUGGING perls (DBI 1.651, perl 5.44).
@@ -1014,26 +1178,48 @@ sub _init_backend :Protected {
 
 	# SQLite: _detect_file_info probed sqlite_master and returned the internal
 	# table names.  When $dbname (the filename stem or its safe alias) is not
-	# among those names, auto-select the first user table and create a symlink
-	# from <actual_table>.<ext> to the original file so D::A can issue SQL
-	# against the real table name without needing the filename to match.
+	# among those names, auto-select the first user table (or use the caller-
+	# supplied internal_table) and create a symlink from <target>.<ext> to the
+	# original file so D::A can issue SQL against the real table name.
 	# D::A uses 'dbname' to find the file and 'table' for the SELECT statement,
 	# so both must be set to the actual table name when a mismatch is corrected.
 	my $da_table = $table;	# D::A 'table' param -- controls the SQL table name
 	if (exists $info->{sqlite_tables}) {
 		my @tbls = @{ $info->{sqlite_tables} };
 		croak $self->_msg('error_no_tables', $raw_table) unless @tbls;
-		my ($match) = grep { $_ eq $dbname } @tbls;
-		unless (defined $match) {
-			my $actual   = $tbls[0];
+
+		# Store the full table list so callers (e.g. the tables_view action)
+		# can detect multi-table databases after construction.
+		$self->{_sqlite_tables} = \@tbls;
+
+		# Determine target table: caller-specified or auto-detected.
+		my $desired = $self->{_internal_table};
+		my $target;
+		if (defined $desired) {
+			my ($found) = grep { $_ eq $desired } @tbls;
+			croak $self->_msg('error_table_not_found', $raw_table, $desired)
+				unless defined $found;
+			$target = $desired;
+		} else {
+			my ($match) = grep { $_ eq $dbname } @tbls;
+			$target = defined $match ? $match : $tbls[0];
+		}
+
+		# When the target differs from dbname, create a symlink so D::A can
+		# find the file by target name and issue SELECT * FROM <target>.
+		# Always use a D::A-recognised SQLite extension (.sql, .sqlite, .sqlite3)
+		# for the symlink name -- D::A does not use the DBI/SQLite backend for
+		# .db files, so a customer.db symlink would be read as CSV.
+		if ($target ne $dbname) {
 			my ($src_ext) = grep { -f File::Spec->catfile($dir, "$raw_table.$_") }
 				qw(sql sqlite sqlite3 db);
 			$src_ext //= 'sql';
+			my $link_ext = ($src_ext eq 'db') ? 'sql' : $src_ext;
 			require File::Temp;
 			my $tmp     = File::Temp->newdir(CLEANUP => 1);
 			my $abs_src = File::Spec->rel2abs(
 				File::Spec->catfile($dir, "$raw_table.$src_ext"));
-			my $link = File::Spec->catfile("$tmp", "$actual.$src_ext");
+			my $link = File::Spec->catfile("$tmp", "$target.$link_ext");
 			{
 				no autodie;
 				symlink($abs_src, $link)
@@ -1041,8 +1227,8 @@ sub _init_backend :Protected {
 						"cannot create table-name symlink for '$raw_table.$src_ext': $!");
 			}
 			$self->{_tmpdir} = $tmp;
-			$dbname   = $actual;	# D::A uses this for the filename stem
-			$da_table = $actual;	# D::A uses this for SELECT * FROM <table>
+			$dbname   = $target;		# D::A uses this for the filename stem
+			$da_table = $target;		# D::A uses this for SELECT * FROM <table>
 			$da_dir   = "$tmp";
 		}
 	}
@@ -1111,13 +1297,102 @@ sub table_name {
 	return $self->{_table};
 }
 
+=head2 sqlite_tables
+
+Returns an arrayref of internal table names when the backing file is a
+multi-table SQLite database, or C<undef> for single-table and non-SQLite
+sources.  Set during C<_init_backend> after probing C<sqlite_master>.
+
+When the return value is a reference to a list with B<more than one
+element>, the caller should redirect the user to the schema browser
+(C</tables>) so they can pick which table to open, rather than
+silently opening the first one.
+
+Example:
+
+    my $tbls = $source->sqlite_tables;
+    if ($tbls && @{$tbls} > 1) {
+        # multiple tables -- let the user choose
+        print "Tables: ", join(', ', @{$tbls}), "\n";
+    }
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+None.
+
+=head4 OUTPUT
+
+    ARRAYREF of SCALAR    # ['customer', 'product', 'sales'] for a 3-table SQLite file
+    undef                 # for CSV, TSV, PSV, XML, URL-backed, and single-table SQLite
+
+The arrayref contains the names in the order returned by C<sqlite_master>
+(alphabetical).  It is set once during construction and never changes.
+
+=head3 MESSAGES
+
+None.
+
+=cut
+
+sub sqlite_tables {
+	my $self = shift;
+	return $self->{_sqlite_tables};
+}
+
 =head2 columns
 
 Returns an arrayref of column names in file order, or C<undef> when no order
-is available.  For CSV, TSV and PSV files the order comes from the file header.
-For SQLite and XML, falls back to the underlying C<Database::Abstraction>
-object's C<columns()> - useful when a C<DataSource> is passed directly to
+is available.
+
+=over 4
+
+=item CSV / TSV / PSV / XLSX
+
+Column names come from the file header (first row).  They are returned in
+the order they appear in the file.  For header-less files (detected
+automatically) the synthesized names (C<Date>, C<Amount>, C<Description>,
+etc.) are returned in the same synthesized order.
+
+=item SQLite / XML
+
+Falls back to the underlying C<Database::Abstraction> object's C<columns()>
+method.  This is useful when a C<DataSource> is passed directly to
 C<Database::Join> as a component database.
+
+=item URL-backed tables
+
+Always returns C<undef>.  C<Database::Abstraction> fetches URL data lazily,
+so calling C<_db-E<gt>columns()> here would trigger a live network request even
+when the data came from the CHI cache.  The controller derives column order
+from the data records instead (alphabetical fallback).
+
+=back
+
+Always check the return value before dereferencing:
+
+    my $cols = $source->columns;
+    if ($cols) {
+        print join(', ', @{$cols}), "\n";
+    } else {
+        # SQLite, XML, or URL: derive columns from the first data row
+    }
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+None.
+
+=head4 OUTPUT
+
+    ARRAYREF of SCALAR    # ['id', 'name', 'price', ...] -- original header order
+    undef                 # SQLite, XML, URL-backed tables
+
+=head3 MESSAGES
+
+None.
 
 =cut
 
@@ -1134,8 +1409,32 @@ sub columns {
 
 =head2 id_column
 
-Returns the name of the column used as the primary key / slurp-filter anchor.
+Returns the name of the column used as the primary key and as
+C<Database::Abstraction>'s row-existence anchor.
+
+For file-backed tables this is the first column in the CSV/TSV/PSV header
+whose name is a valid SQL identifier (letters, digits, underscores only,
+not starting with a digit) B<and> whose value in the first data row is
+non-empty.  C<DataSource> detects this automatically to avoid the
+C<Database::Abstraction> default of C<'entry'>, which would silently
+discard every row in a file that has no C<entry> column.
+
 Returns C<undef> for URL/HTML-table backends (no primary-key concept applies).
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+None.
+
+=head4 OUTPUT
+
+    SCALAR string    # e.g. 'id', 'date', 'sku' -- the first safe-identifier column
+    undef            # URL-backed (HTML table import) sources
+
+=head3 MESSAGES
+
+None.
 
 =cut
 
@@ -1146,8 +1445,27 @@ sub id_column {
 
 =head2 source_url
 
-Returns the source URL for URL/HTML-table-backed instances, or C<undef> for
-file-backed instances.
+Returns the source URL for URL/HTML-table-backed instances.
+Returns C<undef> for all file-backed instances (local files and SFTP-fetched
+remote files).
+
+Use this to distinguish a URL-backed C<DataSource> from a file-backed one
+when you need to decide whether to show a "re-fetch" button to the user.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+None.
+
+=head4 OUTPUT
+
+    SCALAR string    # 'https://example.com/data.html' -- the original URL
+    undef            # file-backed (local or SFTP) sources
+
+=head3 MESSAGES
+
+None.
 
 =cut
 
@@ -1158,9 +1476,29 @@ sub source_url {
 
 =head2 updated
 
-Returns the Unix mtime of the backing file, or C<undef> for URL-backed tables.
-C<Database::Join> calls C<updated()> on each component database to invalidate
-its SQLite spill cache when a source file changes on disk.
+Returns the Unix epoch timestamp (mtime) of the backing data file, or
+C<undef> for URL-backed tables and for sources whose file cannot be
+C<stat()>-ed.
+
+C<Database::Join> calls C<updated()> on each component database to
+detect whether its SQLite spill cache is stale.  When a source file changes
+on disk, the mtime increases, the join detects the change, and re-runs the
+join rather than serving stale cached data.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+None.
+
+=head4 OUTPUT
+
+    SCALAR integer   # Unix epoch seconds, e.g. 1728601234
+    undef            # URL-backed tables, or file cannot be stat()-ed
+
+=head3 MESSAGES
+
+None.
 
 =cut
 
@@ -1181,23 +1519,55 @@ sub updated {
 
 =head2 fetch_all
 
-Returns every record in the table as an arrayref of hashrefs.
+Returns every record in the table as an arrayref of hashrefs (one hashref
+per row; keys are the column names).
+
+This is the primary data-retrieval method.  It is equivalent to calling
+C<selectall_arrayref> with no arguments and normalising the result to an
+arrayref.  Prefer C<selectall_arrayref> when passing to C<Database::Join>
+(it is the method that C<Database::Join> calls internally).
+
+Filtering (C<eq>, C<contains>, C<gt>, C<lt>, etc.) is applied at the
+controller layer by C<Dashboard::_apply_filter_spec> after C<fetch_all>
+returns.  C<DataSource> itself is filter-unaware.
+
+Three fast-path shortcuts are checked before touching the DBI backend,
+in this order:
+
+=over 4
+
+=item 1.
+
+C<_file_is_empty> is set (0-byte or blank-first-line file) -- returns C<[]>
+immediately, no DBI connection.
+
+=item 2.
+
+C<_file_data> is set (pre-parsed header-less CSV, XLSX, or BerkeleyDB data) --
+returns the in-memory arrayref directly.
+
+=item 3.
+
+A matching CHI cache entry exists -- returns the cached arrayref without
+calling C<Database::Abstraction>.
+
+=back
 
 =head3 API SPECIFICATION
 
 =head4 INPUT
 
-None.  Filtering is performed at the controller layer (C<Dashboard::_apply_filter_spec>)
-after C<fetch_all> returns, not inside C<DataSource>.
+None.  Filtering is applied at the controller layer, not inside C<DataSource>.
 
 =head4 OUTPUT
 
-	ARRAYREF of HASHREF   # one hashref per row, keys are column names
-	                      # returns [] when the table exists but is empty
+    ARRAYREF of HASHREF   # one hashref per row; keys are column names
+    []                    # empty arrayref when the file is empty or has no data rows
 
-Croaks if the backend raises an exception. Carps (non-fatal) when the result
-set is empty so the caller can distinguish "open succeeded, no rows" from a
-silent failure.
+Croaks (via C<croak>) when the backend raises an exception.  Emits a
+warning via C<carp> (non-fatal) when the result set is empty, so the
+caller can distinguish "opened successfully, no data" from a silent
+failure.
 
 =head3 MESSAGES
 
@@ -1210,9 +1580,54 @@ silent failure.
 =head2 selectall_arrayref
 
 C<Database::Abstraction>-compatible alias that allows a C<DataSource> object
-to be passed directly to C<Database::Join> as a component database.  Passes
-any criteria through to the underlying backend; the BI viewer always calls it
-with no arguments.
+to be passed directly to C<Database::Join> as a component database.
+
+When called with no arguments (the normal path for a full-table scan),
+results are served from the CHI cache when available.  When called with
+arguments (e.g. C<limit =E<gt> N, offset =E<gt> M> for server-side
+pagination), the cache is bypassed -- narrowed results must not pollute
+the full-table cache entry.
+
+Three fast-path shortcuts are checked before touching the DBI backend:
+
+=over 4
+
+=item 1.
+
+C<_file_is_empty> is set -- returns C<[]> immediately.
+
+=item 2.
+
+C<_file_data> is set (pre-parsed headerless CSV / XLSX / BerkeleyDB) -- returns
+the in-memory rows directly.
+
+=item 3.
+
+A matching CHI cache entry exists for the full-table scan -- returns the
+cached arrayref.
+
+=back
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+Optional flat key/value list passed through to C<Database::Abstraction>:
+
+    limit  => N    # return at most N rows (used by pagination)
+    offset => M    # skip the first M rows (used by pagination)
+
+When no arguments are given, the full table is returned (and cached).
+
+=head4 OUTPUT
+
+    ARRAYREF of HASHREF   # one hashref per row; keys are column names
+    []                    # empty arrayref when the file is empty or no rows match
+
+=head3 MESSAGES
+
+None.  Errors from the DBI backend propagate as uncaught exceptions; wrap
+calls in C<eval> if you need to recover.
 
 =cut
 
@@ -1301,6 +1716,46 @@ sub fetch_all {
 	}
 
 	return $data;
+}
+
+=head2 count
+
+Returns the total number of rows in the table.
+
+For pre-parsed sources (header-less CSV, XLSX, BerkeleyDB) the count comes
+from the already-loaded in-memory slice and is instant (no I/O).  For
+empty-file sentinels it returns C<0> immediately.  For all DBI-backed
+sources (SQLite, large CSV via DBD::CSV) it delegates to
+C<Database::Abstraction::count()>, which issues a
+C<SELECT COUNT(*) FROM E<lt>tableE<gt>> query against the file.
+
+B<Warning: do not call C<count()> on a very large SQLite file> if you
+only need to know whether a next page exists.  The pagination controller
+uses the N+1 trick (fetch C<per_page + 1> rows via C<limit/offset>)
+specifically to avoid a C<COUNT(*)> on multi-gigabyte databases, which
+can block the server for minutes.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+None.
+
+=head4 OUTPUT
+
+    SCALAR non-negative integer   # total row count, 0 for empty files
+
+=head3 MESSAGES
+
+None.
+
+=cut
+
+sub count {
+	my ($self) = @_;
+	return 0 if $self->{_file_is_empty};
+	return scalar @{ $self->{_file_data} } if $self->{_file_data};
+	return $self->{_db}->count();
 }
 
 1;
@@ -1405,6 +1860,34 @@ to C<.xml>, a tab-delimited first line to C<.tsv>, a pipe-delimited line to
 C<.psv>, and everything else to C<.csv>.  The temp file is then renamed to
 the detected extension before further processing.
 
+=item B<Multi-table SQLite: opening without internal_table silently picks the first table>
+
+When a SQLite file contains more than one user-defined table and you call
+C<new()> without C<internal_table>, C<DataSource> auto-selects the first
+table whose name matches the filename stem; if there is no match, it picks
+whatever C<sqlite_master> lists first.  This is B<silent> -- you get data
+from a table you may not have intended to open.
+
+Always check C<sqlite_tables()> after construction if you are dealing
+with a SQLite file that might have multiple tables:
+
+    my $tbl_list = $source->sqlite_tables;
+    if ($tbl_list && @{$tbl_list} > 1) {
+        # warn the user or redirect to the schema browser
+    }
+
+=item B<The symlink used for .db-extension SQLite files is named .sql, not .db>
+
+C<Database::Abstraction> does not use its DBI/SQLite backend for files
+with a C<.db> extension -- it falls through to the CSV reader, which tries
+to read a SQLite binary file as text and fails with a parse error.
+
+When C<DataSource> detects a multi-table SQLite C<.db> file, it creates a
+temporary symlink named C<E<lt>tableE<gt>.sql> (not C<.db>) pointing to the
+original C<.db> file.  SQLite follows symlinks transparently, so the data is
+read correctly.  If you ever audit temporary directories and see C<*.sql>
+symlinks pointing at C<*.db> files, this is expected and intentional.
+
 =item B<DBD::CSV silently lowercases column names for files larger than 16 KB>
 
 C<Database::Abstraction> uses C<Text::xSV::Slurp> for files up to 16 KB and
@@ -1477,30 +1960,203 @@ Nigel Horne C<< <njh@nigelhorne.com> >>
 
 =head1 FORMAL SPECIFICATION
 
+The following specifications use a Z-calculus notation.
+C<undef> represents the undefined Perl value.
+C<seq T> means an ordered sequence of values of type T.
+C<\A...\z> denotes a Perl regular expression match.
+C<|S|> means the cardinality (size) of set or sequence S.
+
 =head2 new
 
   new == [directory : PATH; table : NAME;
           host? : HOST_STRING; file_ext? : EXT_STRING;
+          internal_table? : STRING;
           cache? : CHI_OBJECT; cache_ttl_url? : TTL_STRING;
           i18n? : I18N_OBJECT]
          pre  (host = undef => is_dir directory)
-              /\ (host /= undef => host =~ REMOTE_HOST_RE)
+              /\ (host /= undef => host =~ /\A(?:[a-zA-Z0-9][a-zA-Z0-9._-]*\@)?[a-zA-Z0-9][a-zA-Z0-9._-]*\z/)
               /\ table /= ""
+              /\ table =~ /[^\/\\\x00]/
          post result.class = DataSource
-              /\ (host = undef => result._db.class = Database::Abstraction)
+              /\ (host = undef => result._db.class = Database::Abstraction | result._file_data /= undef | result._file_is_empty)
               /\ (host /= undef => result._remote_tmpdir /= undef)
+              /\ (internal_table /= undef => internal_table in result._sqlite_tables)
 
 =head2 table_name
 
   table_name == lambda self . self._table
 
+  pre  self._table /= undef
+  post result : STRING /\ result =~ /\A[A-Za-z_][A-Za-z0-9_]*\z/
+
+=head2 sqlite_tables
+
+  sqlite_tables == lambda self . self._sqlite_tables
+
+  pre  true
+  post (result = undef /\ self._url /= undef)
+       \/ (result = undef /\ source is not SQLite)
+       \/ (result : seq STRING /\ forall t in result . t =~ /\A[A-Za-z_][A-Za-z0-9_]*\z/)
+
+=head2 columns
+
+  columns == lambda self .
+    if defined self._columns then self._columns
+    else if defined self._url then undef
+    else if defined self._db  then self._db.columns()
+    else undef
+
+  pre  true
+  post (result : seq STRING /\ |result| >= 1)
+       \/ (result = undef)
+
+=head2 id_column
+
+  id_column == lambda self . self._id_col
+
+  pre  true
+  post (result : STRING /\ result =~ /\A[a-zA-Z_][a-zA-Z0-9_]*\z/)
+       \/ (result = undef)
+
+=head2 source_url
+
+  source_url == lambda self . self._url
+
+  pre  true
+  post (result : STRING /\ result =~ /\Ahttps?:\/\//)
+       \/ (result = undef)
+
+=head2 updated
+
+  updated == lambda self .
+    if defined self._db /\ can(self._db, 'updated')  then self._db.updated()
+    else if defined self._file_path /\ -f self._file_path then (stat self._file_path)[9]
+    else undef
+
+  pre  true
+  post (result : N /\ result > 0) \/ (result = undef)
+
 =head2 fetch_all
 
   fetch_all == lambda self .
-    let rows = self._db.selectall_hashref() in
-    pre  self._db /= undef
-    post result : seq HASHREF
-         /\ #result >= 0
+    if self._file_is_empty                     then []
+    else if defined self._file_data            then self._file_data
+    else if cache_hit(self)                    then cache_get(self)
+    else
+      let rows = self._db.selectall_hashref() in
+      normalise(rows)
+
+  pre  self._file_is_empty \/ defined self._file_data \/ defined self._db
+  post result : seq HASHREF
+       /\ |result| >= 0
+
+=head2 selectall_arrayref
+
+  selectall_arrayref == lambda self args .
+    if self._file_is_empty                         then []
+    else if defined self._file_data /\ args = ()   then self._file_data
+    else if cache_hit(self) /\ args = ()           then cache_get(self)
+    else self._db.selectall_arrayref(args)
+
+  pre  self._file_is_empty \/ defined self._file_data \/ defined self._db
+  post result : seq HASHREF /\ |result| >= 0
+
+=head2 count
+
+  count == lambda self .
+    if self._file_is_empty     then 0
+    else if defined self._file_data then |self._file_data|
+    else self._db.count()
+
+  pre  self._file_is_empty \/ defined self._file_data \/ defined self._db
+  post result : N /\ result >= 0
+
+=head1 STATE DIAGRAM
+
+The lifecycle of a single C<DataSource> object from creation to destruction.
+Each state is stable until the trigger event listed to its right fires.
+
+    +------------------+
+    |     [START]      |  -- new() called
+    +------------------+
+             |
+             v
+    +------------------+  _detect_file_info + _init_backend run
+    |   INITIALISING   |  (SFTP download, BerkeleyDB probe, SQLite
+    |                  |   sqlite_master probe, CSV header parse,
+    |                  |   XLSX parse, or URL fetch)
+    +------------------+
+          /     \
+         /       \
+        v         v
+  +----------+  +-----------+
+  |  ERROR   |  |   READY   |
+  | (croaks) |  |           |
+  +----------+  +-----------+
+                 |         |
+                 |         |
+    fetch_all()  |         |  selectall_arrayref()
+    called       |         |  called
+                 v         v
+         +---------------+
+         |   FETCHING    |  DBI query or pre-loaded data returned;
+         |               |  result stored in CHI cache (if configured)
+         +---------------+
+                 |
+                 v
+         +---------------+
+         | DATA RETURNED |  arrayref of hashrefs delivered to caller
+         +---------------+
+                 |
+                 | (next call to fetch_all or selectall_arrayref)
+                 v
+         +---------------+
+         | CACHE CHECK   |  CHI cache hit? -> DATA RETURNED immediately
+         |               |  CHI cache miss? -> FETCHING
+         +---------------+
+
+    Special cases branching from INITIALISING:
+
+    1. File is 0 bytes or blank first line
+       -> _file_is_empty flag set -> READY (fetch_all returns [] instantly)
+
+    2. Header-less CSV / XLSX / BerkeleyDB
+       -> _file_data pre-loaded -> READY (fetch_all returns pre-loaded rows)
+
+    3. Multi-table SQLite without internal_table
+       -> _sqlite_tables set -> READY
+       -> caller inspects sqlite_tables() and may redirect to /tables
+          before calling fetch_all (which would open the auto-selected table)
+
+    4. Multi-table SQLite WITH internal_table
+       -> symlink created for named table -> READY -> fetch_all opens that table
+
+    5. SFTP remote file
+       -> Net::SFTP::Foreign::get() -> local tmpdir -> normal init -> READY
+       -> tmpdir kept alive via $self->{_remote_tmpdir} until DESTROY
+
+    Object lifetime ends when $self goes out of scope:
+
+    +---------------+
+    |   DESTROY     |  File::Temp tmpdirs auto-cleaned (symlinks removed,
+    |               |  SFTP tmpdir removed)
+    +---------------+
+
+    Valid state transitions summary:
+
+    [START]          -> INITIALISING     (new() invoked)
+    INITIALISING     -> ERROR            (croak on bad args, SFTP failure,
+                                          no safe id, no SQLite tables, etc.)
+    INITIALISING     -> READY            (all checks passed)
+    READY            -> FETCHING         (fetch_all / selectall_arrayref, cache miss)
+    READY            -> DATA RETURNED    (fetch_all, _file_is_empty or _file_data fast-path)
+    READY            -> CACHE CHECK      (fetch_all / selectall_arrayref, cache configured)
+    CACHE CHECK      -> DATA RETURNED    (cache hit)
+    CACHE CHECK      -> FETCHING         (cache miss)
+    FETCHING         -> DATA RETURNED    (DBI query completed)
+    DATA RETURNED    -> CACHE CHECK      (next call, cache configured)
+    DATA RETURNED    -> FETCHING         (next call, no cache)
+    READY / DATA RETURNED -> DESTROY     ($self goes out of scope)
 
 =head1 LICENCE AND COPYRIGHT
 

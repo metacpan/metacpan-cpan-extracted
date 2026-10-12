@@ -17,7 +17,7 @@ use Game::Go::Marking;
 use Game::Go::Scoring;
 use Game::Go::Result;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use constant {
 	EMPTY  => Game::Go::Rules::EMPTY,
@@ -698,7 +698,7 @@ Game::Go - the rules of Go, with the board in C
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

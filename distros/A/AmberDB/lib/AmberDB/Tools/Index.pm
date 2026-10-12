@@ -6,7 +6,7 @@ use strict;
 use Carp qw(croak cluck);
 use File::Spec;
 
-our $VERSION = '5.26.4';
+our $VERSION = '5.26.5';
 my $CREATED  = '2018-10-08';
 
 sub new {
@@ -492,16 +492,19 @@ sub set_fields {
     my $table_name = $table_info->{table} || $table_info->{id} || $tableid;
 
     # Preload unq into in-memory cache to eliminate per-record BDB disk lookups
-    if ( $adb->{_tie}->{$unq_path} ) {
-        my $tie = $adb->{_tie}->{$unq_path};
-        for my $k ( keys %$tie ) {
-            if ( $k =~ /^(\d+):s:(.*)$/s ) {
-                $adb->set_cache( $table_name, "$1:$2", $tie->{$k} );
+    if ( $adb->{_db}->{$unq_path} ) {
+        $adb->recs_scan(
+            $unq_path,
+            sub {
+                my ( $k, $v ) = @_;
+                if ( $k =~ /^(\d+):s:(.*)$/s ) {
+                    $adb->set_cache( $table_name, "$1:$2", $v );
+                }
+                elsif ( $k =~ /^(\d+):lastid$/ ) {
+                    $adb->set_cache( $table_name, "$1:lastid", $v );
+                }
             }
-            elsif ( $k =~ /^(\d+):lastid$/ ) {
-                $adb->set_cache( $table_name, "$1:lastid", $tie->{$k} );
-            }
-        }
+        );
     }
 
     my $total_rec = scalar @records;

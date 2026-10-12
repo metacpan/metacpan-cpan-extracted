@@ -61,7 +61,7 @@ __END__
 
 =head1 NAME
 
-check.module.names.pl - Check for presence of module names
+check.module.names.pl - Check the db for the presence/absence of the given module names
 
 =head1 SYNOPSIS
 
@@ -71,7 +71,7 @@ check.module.names.pl [options]
 	-help
 	-home_path string
 	-log_level info
-	-names_path string
+	-names_path Full_path_string
 
 All switches can be reduced to a single letter, except of course -he and -ho.
 
@@ -97,7 +97,7 @@ Available log levels are trace, debug, info, warn, error and fatal, in that orde
 
 Default: info.
 
-=item names_path String
+=item names_path Full_path_string
 
 The path which, when prefixed with home_path, specifies the file of module names.
 

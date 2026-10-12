@@ -11,8 +11,9 @@ PROTOTYPES: DISABLE
 # verbatim header value, overriding max_age), fingerprint (content-addressed
 # URLs, on by default), dev (re-check digests against the filesystem;
 # defaults from PUNK_ENV, and the compiler passes the app's own env), index
-# (the file a directory resolves to) and list (render a listing for a
-# directory that has no index).
+# (the file a directory resolves to), list (render a listing for a
+# directory that has no index) and dotfiles (serve and list names that begin
+# with a dot, which are otherwise a 404).
 SV *
 app(class, dir, ...)
         SV *class
@@ -24,7 +25,7 @@ app(class, dir, ...)
         HV *opts = NULL;
         SV **o;
         SV *cc = NULL, *index = NULL;
-        int list = 0;
+        int list = 0, dotfiles = 0;
         const char *d = SvPV_nolen(dir);
         /* fingerprinting is opt-in: it changes what a path MEANS - a URL
          * shaped like a fingerprint stops being a 404 and starts resolving
@@ -55,7 +56,7 @@ app(class, dir, ...)
         if (opts) {
             static const char *const known[] = {
                 "max_age", "cache_control", "fingerprint", "dev",
-                "index", "list", NULL
+                "index", "list", "dotfiles", NULL
             };
             HE *he;
             hv_iterinit(opts);
@@ -93,6 +94,8 @@ app(class, dir, ...)
             }
             o = hv_fetchs(opts, "list", 0);
             if (o && *o) list = SvTRUE(*o) ? 1 : 0;
+            o = hv_fetchs(opts, "dotfiles", 0);
+            if (o && *o) dotfiles = SvTRUE(*o) ? 1 : 0;
             /* cache_control is verbatim and wins; max_age is the spelling
              * that covers what almost everyone means by it */
             o = hv_fetchs(opts, "cache_control", 0);
@@ -110,7 +113,7 @@ app(class, dir, ...)
                    && strEQ(getenv("PUNK_ENV"), "development")) ? 1 : 0;
 
         cap = newAV();
-        av_extend(cap, PSC_LIST);
+        av_extend(cap, PSC_DOT);
         {   /* keep the directory without a trailing slash, so joining a
              * PATH_INFO (which always starts with one) cannot double it */
             STRLEN dlen;
@@ -131,6 +134,7 @@ app(class, dir, ...)
         (void)av_store(cap, PSC_DEV, dev ? newSViv(1) : newSV(0));
         (void)av_store(cap, PSC_INDEX, index ? index : newSV(0));
         (void)av_store(cap, PSC_LIST, list ? newSViv(1) : newSV(0));
+        (void)av_store(cap, PSC_DOT, dotfiles ? newSViv(1) : newSV(0));
         RETVAL = punk_closure(aTHX_ punk_static_cb, cap);
     }
     OUTPUT:

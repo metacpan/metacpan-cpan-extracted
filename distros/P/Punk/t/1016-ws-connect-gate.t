@@ -171,4 +171,48 @@ SKIP: {
     is_deeply(\@ran, [], '...with its handler never run');
 }
 
+# ---- a before_request hook that answers for itself ----------------------------
+# The hook chain runs ahead of the gate. One that answers a request - a
+# maintenance page, a cache in front - would answer the CONNECT too, and its
+# status would be the oracle again for every path it covers.
+{
+    my @hooked;
+    {
+        package HookApp;
+        use Punk;
+        hook before_request => sub {
+            my ($c) = @_;
+            my $p = $c->req->path;
+            push @hooked, $p;
+            return $c->text('maintenance', 503) if $p =~ m{^/down};
+            return $c->text('cached', 200)      if $p =~ m{^/cached};
+            return;
+        };
+        websocket '/chat'   => sub { return };
+        websocket '/down/ws' => sub { return };
+        get '/down/page'    => sub { $_[0]->text('page') };
+        get '/cached/page'  => sub { $_[0]->text('page') };
+        get '/open'         => sub { $_[0]->text('open') };
+    }
+    my $h = Punk::Test->new('HookApp');
+    $h->get_ok('/down/page')->status_is(503, 'the hook answers a GET with its own status');
+    $h->get_ok('/cached/page')->status_is(200, '...whatever that is');
+
+    for my $path ('/down/page', '/cached/page', '/down/ws', '/down/nothing') {
+        @hooked = ();
+        $h->request_ok('CONNECT', $path,
+            env  => { %WS, HTTP_ORIGIN => 'https://evil.example' },
+            name => "CONNECT $path")
+          ->status_is(404, "an Extended CONNECT the hook answers at $path is the fixed 404")
+          ->content_like(qr/Not Found/, '...with the fixed body, not the hook\'s');
+    }
+    $h->request_ok('CONNECT', '/open',
+        env => { %WS, HTTP_ORIGIN => 'https://evil.example' }, name => 'CONNECT /open')
+      ->status_is(404, 'one the hook lets through still meets the gate');
+    $h->request_ok('CONNECT', '/chat', env => { %WS }, name => 'CONNECT /chat')
+      ->status_isnt(404, 'and a websocket route the hook lets through is still reachable');
+    $h->request_ok('CONNECT', '/down/page', name => 'plain CONNECT')
+      ->status_is(503, 'a CONNECT that is not an upgrade gets the hook\'s answer as before');
+}
+
 done_testing;

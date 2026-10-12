@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="618" height="399" viewBox="0 0 618 399" role="img" aria-label="perl examples/static-report.pl">
+<title>perl examples/static-report.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="586" height="364" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="586" height="364" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="586" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="309" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/static-report.pl</text>
+<rect x="16.5" y="16.5" width="585" height="363" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="33" y="67" width="1" height="75" fill="#78b4f0"/>
+<rect x="33" y="67" width="534" height="1" fill="#78b4f0"/>
+<rect x="566" y="67" width="1" height="75" fill="#78b4f0"/>
+<rect x="35" y="69" width="1" height="71" fill="#78b4f0"/>
+<rect x="35" y="69" width="530" height="1" fill="#78b4f0"/>
+<rect x="564" y="69" width="1" height="71" fill="#78b4f0"/>
+<rect x="35" y="139" width="530" height="1" fill="#78b4f0"/>
+<rect x="33" y="141" width="534" height="1" fill="#78b4f0"/>
+<rect x="34" y="176" width="2" height="74" fill="#78b4f0"/>
+<rect x="34" y="176" width="533" height="2" fill="#78b4f0"/>
+<rect x="565" y="176" width="2" height="74" fill="#78b4f0"/>
+<rect x="34" y="248" width="533" height="2" fill="#78b4f0"/>
+<rect x="39" y="284" width="522" height="1" fill="#78b4f0"/>
+<rect x="34" y="294" width="1" height="54" fill="#78b4f0"/>
+<rect x="565" y="294" width="1" height="54" fill="#78b4f0"/>
+<rect x="39" y="356" width="522" height="1" fill="#78b4f0"/>
+</g>
+<polyline points="34.5 294 34.5 289 34.538 288.413 34.653 287.835 34.843 287.278 35.103 286.75 35.43 286.261 35.818 285.818 36.261 285.43 36.75 285.103 37.278 284.843 37.835 284.653 38.413 284.538 39 284.5 39 284.5" fill="none" stroke="#78b4f0" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="565.5 294 565.5 289 565.462 288.413 565.347 287.835 565.157 287.278 564.897 286.75 564.57 286.261 564.182 285.818 563.739 285.43 563.25 285.103 562.722 284.843 562.165 284.653 561.587 284.538 561 284.5 561 284.5" fill="none" stroke="#78b4f0" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="34.5 348 34.5 352 34.538 352.587 34.653 353.165 34.843 353.722 35.103 354.25 35.43 354.739 35.818 355.182 36.261 355.57 36.75 355.897 37.278 356.157 37.835 356.347 38.413 356.462 39 356.5 39 356.5" fill="none" stroke="#78b4f0" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="565.5 348 565.5 352 565.462 352.587 565.347 353.165 565.157 353.722 564.897 354.25 564.57 354.739 564.182 355.182 563.739 355.57 563.25 355.897 562.722 356.157 562.165 356.347 561.587 356.462 561 356.5 561 356.5" fill="none" stroke="#78b4f0" stroke-width="1" stroke-linejoin="round"/>
+<g class="terminal">
+<text x="48" y="92" textLength="117" fill="#ffc850">Double border</text>
+<text x="48" y="110" textLength="369" fill="#e6e6e6">Every panel is a Box with a border style;</text>
+<text x="48" y="128" textLength="243" fill="#e6e6e6">the lines are Text widgets.</text>
+<text x="48" y="200" textLength="108" fill="#ffc850">Heavy border</text>
+<text x="57" y="218" text-anchor="middle" fill="#e6e6e6">い</text>
+<text x="75" y="218" text-anchor="middle" fill="#e6e6e6">ろ</text>
+<text x="93" y="218" text-anchor="middle" fill="#e6e6e6">は</text>
+<text x="111" y="218" text-anchor="middle" fill="#e6e6e6">に</text>
+<text x="129" y="218" text-anchor="middle" fill="#e6e6e6">ほ</text>
+<text x="147" y="218" text-anchor="middle" fill="#e6e6e6">へ</text>
+<text x="165" y="218" text-anchor="middle" fill="#e6e6e6">と</text>
+<text x="57" y="236" text-anchor="middle" fill="#e6e6e6">ち</text>
+<text x="75" y="236" text-anchor="middle" fill="#e6e6e6">り</text>
+<text x="93" y="236" text-anchor="middle" fill="#e6e6e6">ぬ</text>
+<text x="111" y="236" text-anchor="middle" fill="#e6e6e6">る</text>
+<text x="129" y="236" text-anchor="middle" fill="#e6e6e6">を</text>
+<text x="48" y="308" textLength="108" fill="#ffc850">Round border</text>
+<text x="48" y="326" textLength="189" fill="#e6e6e6">Grüße vom Oktoberfest</text>
+<text x="48" y="344" textLength="198" fill="#e6e6e6">Spaß mit Umlauten äöüß</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

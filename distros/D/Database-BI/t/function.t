@@ -2361,5 +2361,280 @@ subtest 'Dashboard::_write_sqlite_db -- empty columns list croaks before file cr
 	}
 };
 
+# ============================================================================
+# PART 22: DataSource::sqlite_tables() -- 0.011.0 accessor
+#
+# sqlite_tables() returns $self->{_sqlite_tables}: undef for non-SQLite
+# sources, and an arrayref of internal table names for multi-table SQLite
+# databases.  The accessor must never touch _db or the filesystem on access.
+# ============================================================================
+
+subtest 'DataSource::sqlite_tables -- returns undef for a CSV DataSource' => sub {
+	SKIP: {
+		skip 'data/sales.csv not found', 1 unless -f File::Spec->catfile($DATA_DIR, 'sales.csv');
+		my $src = $DS->new(directory => $DATA_DIR, table => $SALES_CSV);
+		is $src->sqlite_tables, undef,
+			'sqlite_tables() returns undef for a plain CSV DataSource';
+	}
+};
+
+subtest 'DataSource::sqlite_tables -- returns undef when _sqlite_tables not set' => sub {
+	# A bare blessed hash with no _sqlite_tables key is the "not a SQLite multi-table
+	# DB" state.  The accessor must return undef, not die on missing key.
+	my $src = bless {}, $DS;
+	is $src->sqlite_tables, undef,
+		'sqlite_tables() returns undef when _sqlite_tables key is absent';
+};
+
+subtest 'DataSource::sqlite_tables -- returns the stored arrayref unchanged' => sub {
+	# Injecting _sqlite_tables directly verifies the accessor is a simple getter
+	# with no transformation or copy.
+	my $tbls = [qw(alpha beta gamma)];
+	my $src  = bless { _sqlite_tables => $tbls }, $DS;
+	is $src->sqlite_tables, $tbls,
+		'sqlite_tables() returns the exact same arrayref reference (no copy)';
+	is_deeply $src->sqlite_tables, [qw(alpha beta gamma)],
+		'sqlite_tables() contents match the injected arrayref';
+};
+
+subtest 'DataSource::sqlite_tables -- returns empty arrayref, not undef, when set to []' => sub {
+	# A DataSource that was built from a SQLite file with zero user tables stores
+	# [] (the no-tables case).  The accessor must return the empty arrayref, not
+	# undef -- callers check scalar(@{$src->sqlite_tables // []}) > 1 to decide
+	# whether to redirect; returning undef would silently suppress that check.
+	my $src = bless { _sqlite_tables => [] }, $DS;
+	my $got = $src->sqlite_tables;
+	ok defined $got, 'sqlite_tables() returns a defined value (empty arrayref) not undef';
+	is ref($got), 'ARRAY', 'returned value is an arrayref';
+	is scalar(@$got), 0, 'arrayref is empty';
+};
+
+# ============================================================================
+# PART 23: DataSource::new with internal_table -- 0.011.0 constructor param
+#
+# internal_table selects a specific table inside a multi-table SQLite file.
+# When absent, the first matching (or first) table is auto-selected.
+# When present but the name does not exist in the file, the constructor must
+# croak with the "error_table_not_found" message so the caller receives a
+# clear diagnostic rather than a silent wrong-table result.
+# ============================================================================
+
+subtest 'DataSource::new + internal_table -- opens the named table without croaking' => sub {
+	SKIP: {
+		eval { require DBI; DBI->install_driver('SQLite') }
+			or skip 'DBD::SQLite not available', 3;
+
+		my $dir  = File::Temp::tempdir(CLEANUP => 1);
+		my $path = File::Spec->catfile($dir, 'shop.sql');
+		{
+			my $dbh = DBI->connect("dbi:SQLite:dbname=$path", q{}, q{},
+				{ RaiseError => 1, PrintError => 0, AutoCommit => 1 });
+			$dbh->do('CREATE TABLE items (id INTEGER PRIMARY KEY, label TEXT)');
+			$dbh->do(q{INSERT INTO items VALUES (1, 'Widget')});
+			$dbh->do('CREATE TABLE tags  (id INTEGER PRIMARY KEY, name TEXT)');
+			$dbh->do(q{INSERT INTO tags VALUES (1, 'hardware')});
+			$dbh->disconnect;
+		}
+
+		# Specify the "tags" table explicitly -- without internal_table the
+		# first-matched or first table would be auto-selected.
+		my $src = eval {
+			$DS->new(directory => $dir, table => 'shop', internal_table => 'tags')
+		};
+		is $@, '', 'DataSource::new with valid internal_table does not croak';
+		ok defined $src, 'constructor returns a DataSource object';
+		my $rows = eval { $src->fetch_all };
+		is $@, '', 'fetch_all on internal_table-selected source does not croak';
+		ok scalar(@{ $rows // [] }) > 0,
+			'at least one row returned from the internal_table';
+	}
+};
+
+subtest 'DataSource::new + internal_table -- nonexistent table name croaks' => sub {
+	# The "error_table_not_found" guard must fire before D::A construction so the
+	# caller gets a diagnostic error instead of a silent empty result.
+	SKIP: {
+		eval { require DBI; DBI->install_driver('SQLite') }
+			or skip 'DBD::SQLite not available', 1;
+
+		my $dir  = File::Temp::tempdir(CLEANUP => 1);
+		my $path = File::Spec->catfile($dir, 'oneway.sql');
+		{
+			my $dbh = DBI->connect("dbi:SQLite:dbname=$path", q{}, q{},
+				{ RaiseError => 1, PrintError => 0, AutoCommit => 1 });
+			$dbh->do('CREATE TABLE items (id INTEGER PRIMARY KEY, label TEXT)');
+			$dbh->disconnect;
+		}
+
+		throws_ok {
+			$DS->new(directory => $dir, table => 'oneway',
+				internal_table => 'no_such_table_xyz')
+		} qr/no_such_table_xyz/,
+			'new() croaks mentioning the missing table name when internal_table is not found';
+	}
+};
+
+subtest 'DataSource::new -- multi-table SQLite populates sqlite_tables after construction' => sub {
+	# Verifies that _init_backend stores the full table list so the controller
+	# can detect the multi-table case and redirect to /tables.
+	SKIP: {
+		eval { require DBI; DBI->install_driver('SQLite') }
+			or skip 'DBD::SQLite not available', 3;
+
+		my $dir  = File::Temp::tempdir(CLEANUP => 1);
+		my $path = File::Spec->catfile($dir, 'multi.sql');
+		{
+			my $dbh = DBI->connect("dbi:SQLite:dbname=$path", q{}, q{},
+				{ RaiseError => 1, PrintError => 0, AutoCommit => 1 });
+			$dbh->do('CREATE TABLE alpha (id INTEGER)');
+			$dbh->do('CREATE TABLE beta  (id INTEGER)');
+			$dbh->disconnect;
+		}
+
+		my $src = eval { $DS->new(directory => $dir, table => 'multi') };
+		is $@, '', 'DataSource::new for multi-table SQLite does not croak';
+		my $tbls = $src->sqlite_tables;
+		ok defined $tbls, 'sqlite_tables() is defined after multi-table SQLite construction';
+		is ref($tbls), 'ARRAY', 'sqlite_tables() returns an arrayref';
+		ok scalar(@$tbls) >= 2,
+			'sqlite_tables() contains at least 2 entries for a 2-table SQLite file';
+	}
+};
+
+subtest 'DataSource::new -- single-table SQLite: sqlite_tables has exactly one entry' => sub {
+	# A single-table SQLite file (the normal case) should still populate
+	# _sqlite_tables so callers can distinguish "unknown" (undef, CSV/PSV) from
+	# "known single table" (array with one element).
+	SKIP: {
+		eval { require DBI; DBI->install_driver('SQLite') }
+			or skip 'DBD::SQLite not available', 2;
+
+		my $dir  = File::Temp::tempdir(CLEANUP => 1);
+		my $path = File::Spec->catfile($dir, 'single.sql');
+		{
+			my $dbh = DBI->connect("dbi:SQLite:dbname=$path", q{}, q{},
+				{ RaiseError => 1, PrintError => 0, AutoCommit => 1 });
+			$dbh->do('CREATE TABLE only_table (id INTEGER, val TEXT)');
+			$dbh->do(q{INSERT INTO only_table VALUES (1, 'row')});
+			$dbh->disconnect;
+		}
+
+		my $src  = eval { $DS->new(directory => $dir, table => 'single') };
+		my $tbls = $src->sqlite_tables;
+		ok defined $tbls, 'sqlite_tables() defined for single-table SQLite';
+		is scalar(@$tbls), 1, 'sqlite_tables() has exactly one entry for single-table SQLite';
+	}
+};
+
+# ============================================================================
+# PART 24: Dashboard::tables_view -- HTTP smoke tests (0.011.0 route)
+#
+# GET /tables requires the l= query param and a SQLite file.  All failure paths
+# must return 404 rather than 500.  Success renders the "Tables in ..." heading
+# with one card per internal table.  Tests use temp SQLite files so they are
+# self-contained and do not depend on data/store.db being present.
+# ============================================================================
+
+subtest 'GET /tables -- missing l= returns 404' => sub {
+	$t->get_ok('/tables')
+	  ->status_is(404, '/tables without l= returns 404 Not Found');
+};
+
+subtest 'GET /tables -- empty l= returns 404' => sub {
+	$t->get_ok('/tables?l=')
+	  ->status_is(404, '/tables with empty l= returns 404 Not Found');
+};
+
+subtest 'GET /tables -- unrecognised spec prefix returns 404' => sub {
+	$t->get_ok('/tables?l=url:http://example.com/data.html')
+	  ->status_is(404, '/tables with url: spec (not supported) returns 404');
+};
+
+subtest 'GET /tables -- path: to non-existent file returns 404' => sub {
+	use Mojo::Util qw(url_escape);
+	$t->get_ok('/tables?l=' . url_escape('path:/no/such/file/here.sql'))
+	  ->status_is(404, '/tables with non-existent path: returns 404');
+};
+
+subtest 'GET /tables -- path: to non-SQLite file (CSV) returns 404' => sub {
+	# Only SQLite extensions are accepted; a .csv file must be blocked.
+	use Mojo::Util qw(url_escape);
+	SKIP: {
+		my $abs = File::Spec->rel2abs(File::Spec->catfile($DATA_DIR, 'sales.csv'));
+		skip 'data/sales.csv not found', 1 unless -f $abs;
+		$t->get_ok('/tables?l=' . url_escape("path:$abs"))
+		  ->status_is(404, '/tables with CSV path: returns 404 (wrong file type)');
+	}
+};
+
+subtest 'GET /tables -- path: to multi-table SQLite returns 200 with table cards' => sub {
+	SKIP: {
+		eval { require DBI; DBI->install_driver('SQLite') }
+			or skip 'DBD::SQLite not available', 7;
+
+		use Mojo::Util qw(url_escape);
+		my $dir  = File::Temp::tempdir(CLEANUP => 1);
+		my $path = File::Spec->catfile($dir, 'browse.sql');
+		{
+			my $dbh = DBI->connect("dbi:SQLite:dbname=$path", q{}, q{},
+				{ RaiseError => 1, PrintError => 0, AutoCommit => 1 });
+			$dbh->do('CREATE TABLE customers (id INTEGER, name TEXT)');
+			$dbh->do('CREATE TABLE orders    (id INTEGER, customer_id INTEGER, total REAL)');
+			$dbh->disconnect;
+		}
+
+		my $spec = "path:$path";
+		$t->get_ok('/tables?l=' . url_escape($spec))
+		  ->status_is(200, '/tables?l=path:... returns 200 for a valid multi-table SQLite')
+		  ->content_like(qr/Tables in/i, 'response contains "Tables in" heading')
+		  ->content_like(qr/customers/, 'table card for "customers" present')
+		  ->content_like(qr/orders/,    'table card for "orders" present')
+		  ->content_like(qr/name/,      'column "name" from customers listed')
+		  ->content_like(qr/customer_id/, 'column "customer_id" from orders listed');
+	}
+};
+
+subtest 'GET /tables -- table card href contains &it=<name> param' => sub {
+	# The href on each card must encode ?it=<tablename> so clicking it opens
+	# that specific table via /open?it=...
+	SKIP: {
+		eval { require DBI; DBI->install_driver('SQLite') }
+			or skip 'DBD::SQLite not available', 2;
+
+		use Mojo::Util qw(url_escape);
+		my $dir  = File::Temp::tempdir(CLEANUP => 1);
+		my $path = File::Spec->catfile($dir, 'it_test.sql');
+		{
+			my $dbh = DBI->connect("dbi:SQLite:dbname=$path", q{}, q{},
+				{ RaiseError => 1, PrintError => 0, AutoCommit => 1 });
+			$dbh->do('CREATE TABLE foo (id INTEGER)');
+			$dbh->do('CREATE TABLE bar (id INTEGER)');
+			$dbh->disconnect;
+		}
+
+		$t->get_ok('/tables?l=' . url_escape("path:$path"))
+		  ->status_is(200, '/tables returns 200 for it_test.sql')
+		  ->content_like(qr/it=foo/, 'card href for "foo" table contains &it=foo')
+		  ->content_like(qr/it=bar/, 'card href for "bar" table contains &it=bar');
+	}
+};
+
+subtest 'GET /tables -- table:store spec works when data/store.db present' => sub {
+	SKIP: {
+		eval { require DBI; DBI->install_driver('SQLite') }
+			or skip 'DBD::SQLite not available', 2;
+		skip 'data/store.db not found', 2 unless -f 'data/store.db';
+
+		$t->get_ok('/tables?l=table:store')
+		  ->status_is(200, '/tables?l=table:store returns 200 when data/store.db exists')
+		  ->content_like(qr/Tables in/i, 'response includes "Tables in" heading');
+	}
+};
+
+subtest 'GET /tables -- table:no_such_xyz returns 404' => sub {
+	$t->get_ok('/tables?l=table:no_such_xyz')
+	  ->status_is(404, '/tables?l=table: with missing file returns 404');
+};
+
 done_testing();
 

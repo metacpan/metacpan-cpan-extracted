@@ -4,13 +4,13 @@ our $VERSION = '0.05';
 
 # A simple object that describes a Compuset tag.
 
-my $TAG_OPEN	= '<';		# une ouverture de balise compuset (open)
-my $TAG_CLOSE	= '>';		# une fermeture de balise compuset (close)
-my $TAG_MARKER	= '#';		# un marqueur de début de balise compuset
-my $TAG_ASSIGN	= '=';		# un marqueur d'attribution de valeur compuset
-my $TAG_COMMENT= '<SK>';		# un commentaire compuset (rem)
-my $COMMENT	= 'SK';		# un commentaire compuset (rem)
-my $TAG_L_SET	= '<SET>';	# attribution de variable : partie gauche
+my $TAG_OPEN	= '<';		# a compuset tag opening (open)
+my $TAG_CLOSE	= '>';		# a compuset tag closing (close)
+my $TAG_MARKER	= '#';		# a compuset tag start marker
+my $TAG_ASSIGN	= '=';		# a compuset value assignment marker
+my $TAG_COMMENT= '<SK>';		# a compuset comment (rem)
+my $COMMENT	= 'SK';		# a compuset comment (rem)
+my $TAG_L_SET	= '<SET>';	# variable assignment: left-hand side
 
 
 sub new {

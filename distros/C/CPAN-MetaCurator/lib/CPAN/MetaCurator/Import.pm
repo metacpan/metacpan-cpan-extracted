@@ -9,16 +9,14 @@ use Data::Dumper::Concise; # For Dumper().
 use DateTime::Tiny;
 
 use File::Spec;
-use File::Slurper 'read_lines';
 
 use Mew;
-use Mojo::JSON 'from_json';
 
 use Text::CSV::Encoded;
 
 has -constants_csv_path => (Str, default => sub{return 'data/cpan.metacurator.constants.csv'}, chained => 1);
 
-our $VERSION = '1.29';
+our $VERSION = '1.33';
 
 # -----------------------------------------------
 
@@ -135,20 +133,11 @@ sub populate_topics_table
 	$self -> logger -> info("Start populate_topics_table()");
 
 	# We have just populated the constants table, so read it to get the names of the special (TiddlyWiki) paragraphs.
-	# Typically: ChangeLog1|ChangeLog2|GettingStarted|MainMenu|TableOfContents.
+	# Typically: FAQ|GettingStarted|MainMenu|TableOfContents
 
-	my($root_id)		= $self -> insert_hashref($table_name, $record);
-	my($pad)			= $self -> pad; # For temporary use, during import.
-	$$pad{constants}	= $self -> read_table('constants');
-
-	my($special_para_names);
-
-	for my $row (@{$$pad{constants} })
-	{
-		$special_para_names = $$row{value} if ($$row{name} eq 'special_para_names');
-	}
-
-	my($regexp) = qr/($special_para_names)/o;
+	my($root_id)	= $self -> insert_hashref($table_name, $record);
+	my($pad)		= $self -> pad; # For temporary use, during import.
+	my($regexp)		= $self -> get_special_para_names_regexp($pad);
 
 	my($id);
 	my($text, $title, $temp_text, $temp_title);
@@ -168,8 +157,7 @@ sub populate_topics_table
 		$temp_text	= $text		|| '';
 		$temp_title	= $title	|| '';
 
-		$self -> logger -> debug("Skipping paragraph: temp_text: =>$temp_text<=. temp_title: =>$temp_title<=") if (! ($temp_text && $temp_title) );
-		$self -> logger -> info("populate_topics_table(). Missing text @ line: $index. title: $title. text: $text"),	next if ($text !~ m/^\"\"\"\no (.+)$/s);
+		#$self -> logger -> warn("Skipping paragraph: temp_text: =>$temp_text<=. temp_title: =>$temp_title<="), next if (! ($temp_text && $temp_title) );
 
 		$$record{parent_id}	= $root_id;
 		$text				= $1 if ($text =~ m/^\"\"\"\n(.+)$/s);
@@ -187,25 +175,13 @@ sub populate_topics_table
 
 # --------------------------------------------------
 
-sub read_tiddlers_file
-{
-	my($self) = @_;
-
-	$self -> init_config;
-	$self -> init_db;
-
-	my($file_name)	= File::Spec -> catfile($self -> home_path, $self -> tiddlers_path);
-	my($json)		= join('', read_lines($file_name, 'UTF-8') );
-
-	return from_json $json;
-
-} # End of read_tiddlers_file.
-
-# --------------------------------------------------
-
 1;
 
 =pod
+
+=head1 NAME
+
+CPAN::MetaCurator::Import - Manage the cpan.metacurator.sqlite database
 
 =head1 Machine-Readable Change Log
 

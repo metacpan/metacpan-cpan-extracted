@@ -20,7 +20,8 @@ use Open::API::Client;   # _request_url: the encode half of every style
         for $b->output, $b->failure_output, $b->todo_output;
 }
 
-# A compliance matrix for OpenAPI 3.0 and 3.1, walked object by object.
+# A compliance matrix for Swagger 2.0 and OpenAPI 3.0 and 3.1, walked object by
+# object.
 #
 # There is no official executable conformance suite for OpenAPI - unlike JSON
 # Schema or XML, nothing is published that can be fetched and run - so this
@@ -77,8 +78,18 @@ sub op_doc {
     return doc(paths => { $path => { $method => \%op } }, %top);
 }
 
+# OA_COMPLIANCE_WHY=1 reports the croak behind every refused document, with the
+# case id: a croaks()-shaped case passes whatever the REASON, and a document
+# refused for the wrong reason reads exactly like compliance.
+our $CURRENT_CASE = '';
 sub api   { my ($s, %o) = @_;
-            my $a = eval { Open::API->new(spec => $s, %o) }; return ($a, $@) }
+            my $a = eval { Open::API->new(spec => $s, %o) };
+            my $e = $@;
+            if (!$a && $ENV{OA_COMPLIANCE_WHY}) {
+                my $m = $e; $m =~ s/\s+at \S+ line \d+\.?\s*$//s; $m =~ s/\s+/ /g;
+                diag("why $CURRENT_CASE: $m");
+            }
+            return ($a, $e) }
 sub loads { my ($a) = api(shift); return $a ? 1 : 0 }
 sub croaks{ my ($a, $e) = api(shift); return $a ? 0 : 1 }
 
@@ -118,6 +129,50 @@ my $JSS_SKIPPED = 0;
 my $JSS_REF_SKIPPED = 0;
 my $JSS_30_SKIPPED = 0;
 my $JSS_30_REFSIB  = 0;
+my $JSS_20_SKIPPED = 0;   # not expressible as a 2.0 (draft-04 subset) schema
+my $JSS_20_REFSIB  = 0;   # $ref with assertion siblings: draft-04 ignores them
+
+# Is this schema expressible in 2.0's Schema Object? Structural, not a regex:
+# 2.0 lists its fields, and draft-04 has no boolean schemas, no type arrays,
+# boolean (not numeric) exclusive bounds, and a non-empty `required`.
+sub d4_expressible {
+    my ($s) = @_;
+    return 0 unless ref $s eq 'HASH';
+    for my $k (qw(oneOf anyOf not patternProperties dependencies additionalItems)) {
+        return 0 if exists $s->{$k};
+    }
+    return 0 if ref $s->{type} eq 'ARRAY';
+    for my $k (qw(exclusiveMinimum exclusiveMaximum)) {
+        next unless exists $s->{$k};
+        return 0 unless oa_bool_like($s->{$k});
+    }
+    return 0 if ref $s->{required} eq 'ARRAY' && !@{ $s->{required} };
+    if (exists $s->{properties}) {
+        return 0 unless ref $s->{properties} eq 'HASH';
+        for (values %{ $s->{properties} }) { return 0 unless d4_expressible($_) }
+    }
+    if (exists $s->{additionalProperties} && ref $s->{additionalProperties}) {
+        return 0 unless d4_expressible($s->{additionalProperties});
+    }
+    if (exists $s->{items}) {
+        my $it = $s->{items};
+        if (ref $it eq 'ARRAY') { for (@$it) { return 0 unless d4_expressible($_) } }
+        else                    { return 0 unless d4_expressible($it) }
+    }
+    if (exists $s->{allOf}) {
+        return 0 unless ref $s->{allOf} eq 'ARRAY';
+        for (@{ $s->{allOf} }) { return 0 unless d4_expressible($_) }
+    }
+    return 1;
+}
+
+# a decoded JSON boolean (File::Raw::JSON's blessed Boolean), never a number
+sub oa_bool_like {
+    my ($v) = @_;
+    return 0 unless ref $v;
+    return 1 if ref $v eq 'SCALAR';
+    return (ref($v) =~ /Bool/i) ? 1 : 0;
+}
 
 # 2020-12 keywords a 3.0 document cannot carry. A schema using one is not
 # expressible in that dialect, so the 3.0 twin below skips it.
@@ -247,6 +302,73 @@ sub jsonschema_cases {
                 };
             }
             $JSS_REF_SKIPPED++ if $self_ptr;
+
+            # ---- the 2.0 placements ---------------------------------------
+            #
+            # The same schema as a 2.0 body parameter against a 3.1
+            # requestBody (jsonschema20), and behind `#/definitions/S`
+            # (jsonschema20ref), which is the placement that exercises the
+            # 2.0 $ref rewrite as jsonschemaref exercises the $defs one. A
+            # 2.0 Schema Object is a draft-04 SUBSET, so beyond the 2020-12
+            # skip the group must be expressible in draft-04 as 2.0 lists it:
+            # no oneOf/anyOf/not/patternProperties/dependencies/
+            # additionalItems, no type array (2.0 refuses it, which is its
+            # own authored case), no numeric exclusive bound, no empty
+            # required, no boolean where draft-04 has only a schema. The twin
+            # proves the pre-pass and the 3.0 pass preserve a schema's
+            # MEANING; it cannot see a 2.0 SPELLING, which the authored
+            # swagger/schema/* cases are for.
+            if ($js =~ $JSS_2020_ONLY || !d4_expressible($schema)) {
+                $JSS_20_SKIPPED++;
+            }
+            elsif ($js =~ /"\$ref"/ && $js =~ $JSS_REF_SIBLING) {
+                $JSS_20_REFSIB++;
+            }
+            else {
+                for my $t (@{ $g->{tests} || [] }) {
+                    my $body = eval { file_json_encode($t->{data}) };
+                    next unless defined $body;
+                    my $tslug = jss_slug($t->{description});
+                    push @out, {
+                        id => "jsonschema20/$file/$gslug/$tslug",
+                        section => "JSON Schema 2020-12 Test Suite (vendored), "
+                                 . "2.0 and 3.1 twin: $why",
+                        requirement => "$g->{description}: $t->{description} gets "
+                                     . 'the same verdict as a 2.0 body parameter and a 3.1 requestBody',
+                        run => sub {
+                            my ($a31) = api(json_body_op($schema));
+                            my ($a20) = api(body20($schema));
+                            return 0 unless $a31 && $a20;
+                            my ($o31) = req($a31, header => $JSON, body => $body);
+                            my ($o20) = req($a20, header => $JSON, body => $body);
+                            return ((!!$o31) == (!!$o20)) ? 1 : 0;
+                        },
+                    };
+                    next if $self_ptr;
+                    push @out, {
+                        id => "jsonschema20ref/$file/$gslug/$tslug",
+                        section => "JSON Schema 2020-12 Test Suite (vendored), "
+                                 . "2.0 behind #/definitions/: $why",
+                        requirement => "$g->{description}: $t->{description} gets "
+                                     . 'the same verdict reached through definitions',
+                        run => sub {
+                            my ($a31) = api(json_body_op($schema));
+                            my ($a20) = api(doc20(
+                                definitions => { S => $schema },
+                                consumes    => [ 'application/json' ],
+                                paths => { '/t' => { post => {
+                                    operationId => 'op',
+                                    parameters  => [ { name => 'body', in => 'body', required => \1,
+                                                       schema => { '$ref' => '#/definitions/S' } } ],
+                                    responses   => { 200 => { description => 'ok' } } } } }));
+                            return 0 unless $a31 && $a20;
+                            my ($o31) = req($a31, header => $JSON, body => $body);
+                            my ($o20) = req($a20, header => $JSON, body => $body);
+                            return ((!!$o31) == (!!$o20)) ? 1 : 0;
+                        },
+                    };
+                }
+            }
 
             # ---- the 3.0 twin -------------------------------------------
             #
@@ -591,6 +713,434 @@ sub eq_deeply_ish {
     return $got eq $want ? 1 : 0;
 }
 
+# ---- Swagger 2.0 helpers -----------------------------------------------------
+#
+# 2.0 spells the root differently - `swagger: "2.0"` instead of `openapi`, the
+# definition sections at the root instead of under components - so it has its
+# own builders. The hoist list in op_doc20 is the 2.0 root alphabet, minus the
+# two names (`parameters`, `responses`) an Operation Object also carries; the
+# root forms of those are passed as root_parameters and root_responses. An
+# operation-level consumes/produces/schemes/security is op_consumes and so on.
+# The op_doc trap applies here too: a root key left inside the operation tests
+# the wrong object.
+
+sub doc20 {
+    my (%o) = @_;
+    my %d = (
+        swagger => '2.0',
+        info    => { title => 'T', version => '1.0.0' },
+        paths   => delete $o{paths} || {},
+    );
+    $d{$_} = $o{$_} for keys %o;
+    return \%d;
+}
+
+sub op_doc20 {
+    my (%o) = @_;
+    my $method = delete $o{method} || 'get';
+    my $path   = delete $o{path}   || '/t';
+    my %top;
+    for my $k (qw(host basePath schemes consumes produces definitions
+                  securityDefinitions security tags externalDocs)) {
+        $top{$k} = delete $o{$k} if exists $o{$k};
+    }
+    $top{parameters} = delete $o{root_parameters} if exists $o{root_parameters};
+    $top{responses}  = delete $o{root_responses}  if exists $o{root_responses};
+    my %op = (operationId => 'op', responses => { 200 => { description => 'ok' } });
+    for my $k (qw(consumes produces schemes security)) {
+        $op{$k} = delete $o{"op_$k"} if exists $o{"op_$k"};
+    }
+    %op = (%op, %o);
+    return doc20(paths => { $path => { $method => \%op } }, %top);
+}
+
+# a POST whose one body parameter carries $schema: the 2.0 twin of json_body_op
+sub body20 {
+    my ($schema, %o) = @_;
+    my $consumes = exists $o{consumes} ? delete $o{consumes} : [ 'application/json' ];
+    return op_doc20(
+        method     => 'post',
+        consumes   => $consumes,
+        parameters => [ { name => 'body', in => 'body', required => \1,
+                          schema => $schema } ],
+        %o,
+    );
+}
+
+# a formData operation: @fields are 2.0 formData Parameter Objects
+sub form20 {
+    my ($fields, %o) = @_;
+    my $consumes = exists $o{consumes} ? delete $o{consumes}
+                                       : [ 'application/x-www-form-urlencoded' ];
+    return op_doc20(method => 'post', consumes => $consumes,
+                    parameters => [ map { { in => 'formData', %$_ } } @$fields ],
+                    %o);
+}
+
+my $FORM = { 'content-type' => 'application/x-www-form-urlencoded' };
+
+# the loaded document, or the croak - for the cases that must check WHICH croak,
+# because a document refused for the wrong reason reads exactly like compliance
+sub api_err { my ($a, $e) = api(@_); return $a ? '' : ($e || 'refused') }
+
+# deep equality that understands the document's booleans: File::Raw::JSON
+# yields a blessed Boolean and the fixtures use \1 / \0, and both must compare
+# by truth, not by address (eq_deeply_ish refuses every scalar reference)
+sub deep_eq {
+    my ($x, $y) = @_;
+    return 0 if defined $x != defined $y;
+    return 1 unless defined $x;
+    my ($rx, $ry) = (ref $x, ref $y);
+    if ($rx eq 'HASH' || $ry eq 'HASH') {
+        return 0 unless $rx eq 'HASH' && $ry eq 'HASH';
+        return 0 unless keys(%$x) == keys(%$y);
+        for my $k (keys %$x) {
+            return 0 unless exists $y->{$k};
+            return 0 unless deep_eq($x->{$k}, $y->{$k});
+        }
+        return 1;
+    }
+    if ($rx eq 'ARRAY' || $ry eq 'ARRAY') {
+        return 0 unless $rx eq 'ARRAY' && $ry eq 'ARRAY' && @$x == @$y;
+        for my $i (0 .. $#$x) { return 0 unless deep_eq($x->[$i], $y->[$i]) }
+        return 1;
+    }
+    if ($rx || $ry) {
+        # a boolean of either spelling: compare truth
+        my $tx = $rx ? (($rx eq 'SCALAR' || $rx eq 'REF') ? !!$$x : !!$x) : !!$x;
+        my $ty = $ry ? (($ry eq 'SCALAR' || $ry eq 'REF') ? !!$$y : !!$y) : !!$y;
+        return $tx == $ty ? 1 : 0;
+    }
+    return $x eq $y ? 1 : 0;
+}
+
+# every string anywhere in a structure, through $cb
+sub walk_strings {
+    my ($v, $cb) = @_;
+    if (ref $v eq 'HASH')     { walk_strings($_, $cb) for values %$v }
+    elsif (ref $v eq 'ARRAY') { walk_strings($_, $cb) for @$v }
+    elsif (!ref $v && defined $v) { $cb->($v) }
+}
+
+# a 2.0-shaped reference anywhere a $ref KEY holds one. Only $ref values: a
+# string spelled like a pointer inside `default`, `example` or `enum` is user
+# data the rewrite must NOT touch (swagger/reference/position-aware pins that).
+sub has_2_0_ref {
+    my ($v) = @_;
+    if (ref $v eq 'HASH') {
+        for my $k (keys %$v) {
+            if ($k eq '$ref' && !ref $v->{$k} && defined $v->{$k}) {
+                return 1 if $v->{$k} =~ m{^\#/(?:definitions|parameters|responses)/};
+                next;
+            }
+            next if $k eq 'default' || $k eq 'example' || $k eq 'examples' || $k eq 'enum';
+            return 1 if has_2_0_ref($v->{$k});
+        }
+        return 0;
+    }
+    if (ref $v eq 'ARRAY') { for (@$v) { return 1 if has_2_0_ref($_) } }
+    return 0;
+}
+
+# The official 2.0 example documents, vendored in t/compliance/swagger2/ (see
+# the README there). Each must load, route every operation to itself,
+# synthesize every response into a body that validates against its own schema
+# (the t/27 property: the mock walks the normalised document), come out
+# unchanged when its normalised form is fed back through new(), and carry no
+# #/definitions/-style reference anywhere in ->spec, since the mock's generic
+# pointer resolver would follow one and the compiler would not.
+my $SW2_DIR = "$DIR/swagger2";
+
+# does any response in the document carry a schema under its content?
+sub has_response_schema {
+    my ($spec) = @_;
+    for my $item (values %{ $spec->{paths} || {} }) {
+        next unless ref $item eq 'HASH';
+        for my $op (values %$item) {
+            next unless ref $op eq 'HASH' && ref $op->{responses} eq 'HASH';
+            for my $r (values %{ $op->{responses} }) {
+                next unless ref $r eq 'HASH' && ref $r->{content} eq 'HASH';
+                for my $mt (values %{ $r->{content} }) {
+                    return 1 if ref $mt eq 'HASH' && $mt->{schema};
+                }
+            }
+        }
+    }
+    return 0;
+}
+
+sub swagger2_doc_cases {
+    my @out;
+    for my $path (sort glob("$SW2_DIR/*.json")) {
+        my ($name) = $path =~ m{([^/]+)\.json$};
+        my $sec = 'the official 2.0 example documents (vendored)';
+        push @out,
+        { id => "swagger2/$name/loads", section => $sec,
+          requirement => "$name.json loads",
+          run => sub { loads($path) } },
+        { id => "swagger2/$name/routes", section => $sec,
+          requirement => "$name.json: every operation routes to itself",
+          run => sub {
+              my ($a) = api($path);
+              return 0 unless $a;
+              my $n = 0;
+              for my $op (@{ $a->operations }) {
+                  my $p = $op->{path};
+                  $p =~ s/\{[^}]+\}/1/g;
+                  my ($id) = $a->match(uc $op->{method} => $p);
+                  return 0 unless defined $id && $id eq $op->{operationId};
+                  $n++;
+              }
+              return $n ? 1 : 0;
+          } },
+        { id => "swagger2/$name/synthesizes", section => $sec,
+          requirement => "$name.json: every synthesized response validates against its own schema",
+          run => sub {
+              my ($a) = api($path);
+              return 0 unless $a;
+              my $checked = 0;
+              for my $op (@{ $a->operations }) {
+                  my $id   = $op->{operationId};
+                  my $info = $a->operation_info($id);
+                  my @codes = (undef,
+                      map { $_->{status} =~ /^\d+$/ ? $_->{status} : () }
+                          grep { $_->{validated} } @{ $info->{responses} });
+                  my %seen;
+                  for my $code (@codes) {
+                      next if defined $code && $seen{$code}++;
+                      my $trip = $a->synthesize($id, defined $code ? { code => $code } : ());
+                      my $errs = $a->check_response($id, $trip, {});
+                      return 0 if ref $errs eq 'ARRAY' && @$errs;
+                  }
+                  $checked += $a->response_coverage($id)->{checked};
+              }
+              # a document that declares no response schema at all (the
+              # api-with-examples document) has nothing a body can be checked
+              # against; synthesizing every response without error is then
+              # the whole requirement, and the count guard would only say so
+              return ($checked > 0 || !has_response_schema($a->spec)) ? 1 : 0;
+          } },
+        { id => "swagger2/$name/idempotent", section => $sec,
+          requirement => "$name.json: new(spec => ->spec) yields the same document",
+          run => sub {
+              my ($a) = api($path);
+              return 0 unless $a;
+              my ($b) = api($a->spec);
+              return 0 unless $b;
+              return deep_eq($a->spec, $b->spec);
+          } },
+        { id => "swagger2/$name/no-definitions-left", section => $sec,
+          requirement => "$name.json: no #/definitions/, #/parameters/ or #/responses/ reference survives in ->spec",
+          run => sub {
+              my ($a) = api($path);
+              return 0 unless $a;
+              return has_2_0_ref($a->spec) ? 0 : 1;
+          } };
+    }
+    return @out;
+}
+
+# ---- 2.0 collectionFormat, the vectors ------------------------------------------
+#
+# 2.0 publishes no Style Examples table. What it publishes is the definition
+# of each collectionFormat, with a spelling beside it (Parameter Object,
+# collectionFormat): csv `foo,bar`, ssv `foo bar`, tsv `foo\tbar`, pipes
+# `foo|bar`, multi `foo=bar&foo=baz`. Those spellings are the vectors here,
+# applied to the three-value array the 3.x table uses. On the wire a space is
+# %20 and a tab %09 in a URL and literal in a header; a pipe travels literally,
+# as the 3.x pipeDelimited row has it.
+
+my %CF_SEP = (csv => ',', ssv => ' ', tsv => "\t", pipes => '|');
+my @CF_IN  = qw(query path header formData);
+my @CF_VAL = ('blue', 'black', 'brown');
+
+# the VALUE as it travels in a URL (a space is %20, a tab %09, a pipe literal)
+sub cf_url_value {
+    my ($fmt) = @_;
+    my $s = join($CF_SEP{$fmt}, @CF_VAL);
+    $s =~ s/ /%20/g; $s =~ s/\t/%09/g;
+    return $s;
+}
+
+# the keyed piece of a query string or a form body: `color=<value>`, or the
+# repeated keys multi means
+sub cf_url_piece {
+    my ($fmt) = @_;
+    return join('&', map { "color=$_" } @CF_VAL) if $fmt eq 'multi';
+    return 'color=' . cf_url_value($fmt);
+}
+
+sub cf_param {
+    my ($in, $fmt) = @_;
+    my %p = (name => 'color', in => $in, type => 'array', items => { type => 'string' });
+    $p{collectionFormat} = $fmt if $fmt;
+    $p{required} = \1 if $in eq 'path';
+    return \%p;
+}
+
+sub cf_doc {
+    my ($in, $fmt) = @_;
+    return form20([ cf_param($in, $fmt) ]) if $in eq 'formData';
+    return op_doc20(path => '/t/{color}', parameters => [ cf_param($in, $fmt) ])
+        if $in eq 'path';
+    return op_doc20(parameters => [ cf_param($in, $fmt) ]);
+}
+
+# the wire form, as the server receives it for each location
+sub cf_wire {
+    my ($in, $fmt) = @_;
+    my $piece = cf_url_piece($fmt);
+    return (query  => $piece)                              if $in eq 'query';
+    return (header => $FORM, body => $piece)               if $in eq 'formData';
+    return (path   => { color => ($fmt eq 'multi' ? '' : cf_url_value($fmt)) })
+        if $in eq 'path';
+    return (header => { color => join($CF_SEP{$fmt}, @CF_VAL) });   # literal
+}
+
+sub cf_slot { my ($in) = @_; return $in eq 'formData' ? 'body' : $in }
+
+sub cf20_cases {
+    my @out;
+    for my $in (@CF_IN) {
+        for my $fmt (qw(csv ssv tsv pipes multi)) {
+            my $legal = $fmt ne 'multi' || $in eq 'query' || $in eq 'formData';
+            if (!$legal) {
+                push @out, {
+                    id => "swagger/parameter/collectionFormat-multi-refused-$in",
+                    section => 'Parameter Object, collectionFormat',
+                    requirement => "multi \"is valid only for parameters in query or formData\": refused in $in",
+                    run => sub { croaks(cf_doc($in, 'multi')) },
+                };
+                next;
+            }
+            push @out, {
+                id => "swagger/parameter/collectionFormat-$fmt-$in",
+                section => 'Parameter Object, collectionFormat',
+                requirement => "$fmt in $in decodes to the array",
+                run => sub {
+                    my ($a) = api(cf_doc($in, $fmt));
+                    return 0 unless $a;
+                    my ($ok, $res) = req($a, cf_wire($in, $fmt));
+                    return 0 unless $ok;
+                    return eq_deeply_ish($res->{cf_slot($in)}{color}, \@CF_VAL);
+                },
+            };
+        }
+    }
+    # the default IS csv, and csv is NOT exploded: 3.x's query default is the
+    # reverse (form + explode: true), so a converter that leaves the default
+    # implicit reads `a=1&a=2` as the array and `a=1,2` as one string
+    push @out, {
+        id => 'swagger/parameter/csv-default-query',
+        section => 'Parameter Object, collectionFormat',
+        requirement => 'an array query parameter with no collectionFormat is csv: comma separated, not repeated keys',
+        run => sub {
+            my ($a) = api(cf_doc('query', undef));
+            return 0 unless $a;
+            my ($ok, $res) = req($a, query => 'color=blue,black,brown');
+            return 0 unless $ok && eq_deeply_ish($res->{query}{color}, \@CF_VAL);
+            my ($ok2, $res2) = req($a, query => 'color=blue&color=black');
+            return 1 unless $ok2;
+            return eq_deeply_ish($res2->{query}{color}, [ 'blue', 'black' ]) ? 0 : 1;
+        },
+    };
+    return @out;
+}
+
+# what the CLIENT writes for each format, query and path (a header has no
+# inspection point and formData bytes are pinned by the round trip only)
+sub cf20_client_cases {
+    my @out;
+    for my $in (qw(query path)) {
+        for my $fmt (qw(csv ssv tsv pipes multi)) {
+            next if $fmt eq 'multi' && $in ne 'query';
+            my $piece  = $in eq 'path' ? cf_url_value($fmt) : cf_url_piece($fmt);
+            my $expect = $in eq 'path' ? "/t/$piece" : "/t?$piece";
+            push @out, {
+                id => "swagger/client/collectionFormat-$fmt-$in",
+                section => 'Parameter Object, collectionFormat, encoding',
+                requirement => "the client writes $fmt in $in as $piece",
+                run => sub {
+                    my ($a) = api(cf_doc($in, $fmt));
+                    return 0 unless $a;
+                    my $c = eval { Open::API::Client->new(api => $a, base_url => 'http://h.test') };
+                    return 0 unless $c;
+                    my $u = eval { $c->_request_url('op', { color => \@CF_VAL }) };
+                    return 0 unless defined $u;
+                    $u =~ s{^http://h\.test}{};
+                    return $u eq $expect ? 1 : 0;
+                },
+            };
+        }
+    }
+    return @out;
+}
+
+# encode with the client, decode with the server, require the array back: the
+# case that catches the two halves drifting, where both byte cases stay green
+sub cf20_roundtrip_cases {
+    my @out;
+    for my $in (qw(query path formData)) {
+        for my $fmt (qw(csv ssv tsv pipes multi)) {
+            next if $fmt eq 'multi' && $in eq 'path';
+            push @out, {
+                id => "swagger/roundtrip/collectionFormat-$fmt-$in",
+                section => 'Parameter Object, collectionFormat, round trip',
+                requirement => "$fmt in $in: what the client writes, the server reads back",
+                run => sub {
+                    my ($a) = api(cf_doc($in, $fmt));
+                    return 0 unless $a;
+                    my $c = eval { Open::API::Client->new(api => $a, base_url => 'http://h.test') };
+                    return 0 unless $c;
+                    my ($good, $res);
+                    if ($in eq 'formData') {
+                        my ($b, $ct) = eval { $c->_request_body('op', { body => { color => \@CF_VAL } }) };
+                        return 0 unless defined $b && defined $ct;
+                        ($good, $res) = $a->validate_request(op =>
+                            { header => { 'content-type' => $ct }, body => $b });
+                    } else {
+                        my $u = eval { $c->_request_url('op', { color => \@CF_VAL }) };
+                        return 0 unless defined $u;
+                        if ($in eq 'path') {
+                            my ($seg) = $u =~ m{^http://h\.test/t/(.*)$};
+                            ($good, $res) = $a->validate_request(op =>
+                                { path => { color => defined $seg ? $seg : '' } });
+                        } else {
+                            my ($q) = $u =~ m{\?(.*)$};
+                            ($good, $res) = $a->validate_request(op =>
+                                { query => defined $q ? $q : '' });
+                        }
+                    }
+                    return 0 unless $good;
+                    return eq_deeply_ish($res->{cf_slot($in)}{color}, \@CF_VAL);
+                },
+            };
+        }
+    }
+    # nested Items: each level carries its own delimiter
+    my $nested = { name => 'm', in => 'query', type => 'array', collectionFormat => 'csv',
+                   items => { type => 'array', collectionFormat => 'pipes',
+                              items => { type => 'integer' } } };
+    push @out, {
+        id => 'swagger/roundtrip/items-nested',
+        section => 'Items Object, collectionFormat, round trip',
+        requirement => 'a nested array round-trips with csv outside and pipes inside',
+        run => sub {
+            my ($a) = api(op_doc20(parameters => [ $nested ]));
+            return 0 unless $a;
+            my $c = eval { Open::API::Client->new(api => $a, base_url => 'http://h.test') };
+            return 0 unless $c;
+            my $u = eval { $c->_request_url('op', { m => [ [1, 2], [3, 4] ] }) };
+            return 0 unless defined $u;
+            my ($q) = $u =~ m{\?(.*)$};
+            my ($good, $res) = $a->validate_request(op => { query => defined $q ? $q : '' });
+            return 0 unless $good;
+            return eq_deeply_ish($res->{query}{m}, [ [1, 2], [3, 4] ]);
+        },
+    };
+    return @out;
+}
+
 # ---- the catalogue ----------------------------------------------------------
 #
 # id            a stable name; expected-fail.txt keys on it
@@ -604,6 +1154,10 @@ se_cases(),
 se_client_cases(),
 se_roundtrip_cases(),
 jsonschema_cases(),
+swagger2_doc_cases(),
+cf20_cases(),
+cf20_client_cases(),
+cf20_roundtrip_cases(),
 
 # ---------------------------------------------------------------- OpenAPI Object
 { id => 'openapi/version-3.0', section => '4.1 OpenAPI Object',
@@ -2611,6 +3165,1271 @@ jsonschema_cases(),
       return 1;
   } },
 
+# ================================================================ Swagger 2.0
+#
+# Authored from plan_openapi_v2/spec/2.0-2026-10-11.md (the specification,
+# fetched, never recalled), object by object in the order the specification
+# defines them. Every case names its object and quotes or closely paraphrases
+# the sentence it tests. The 2.0 catalogue was written BEFORE the conversion
+# code and every id was listed in expected-fail.txt with its phase; the phases
+# remove lines, and the gate is the list being empty again.
+#
+# Two stances are stated once here rather than in every case. 2.0 defers to
+# JSON Schema draft-04, which ignores unknown keywords, and this distribution
+# does not lint unknown keys in any version; so a 2.0 document carrying oneOf
+# or `schema` on a query parameter is accepted (D6 in the plan's overview),
+# and no case below asserts otherwise. And a converted 2.0 document KEEPS
+# `swagger: "2.0"` and is fed back through new() unchanged (D2), so every
+# structural MUST is phrased in terms that survive conversion.
+
+# ---------------------------------------------------------------- Swagger Object
+
+{ id => 'swagger/version-string', section => '2.0 Swagger Object',
+  requirement => '"The value MUST be "2.0"": a swagger: "2.0" document loads',
+  run => sub { loads(doc20()) } },
+
+{ id => 'swagger/version-numeric-refused', section => '2.0 Swagger Object',
+  requirement => 'a numeric swagger version (a YAML 2.0) is refused by name',
+  run => sub { api_err(doc20(swagger => 2.0)) =~ /must be the string "2\.0"/ ? 1 : 0 } },
+
+{ id => 'swagger/both-keys-refused', section => '2.0 Swagger Object',
+  requirement => 'a document declaring both openapi and swagger is refused',
+  run => sub { api_err(doc20(openapi => '3.1.0')) =~ /both 'openapi' and 'swagger'/ ? 1 : 0 } },
+
+{ id => 'swagger/paths-required', section => '2.0 Swagger Object',
+  requirement => 'paths is REQUIRED',
+  run => sub {
+      my $d = doc20(); delete $d->{paths};
+      croaks($d);
+  } },
+
+{ id => 'swagger/host-no-scheme', section => '2.0 Swagger Object',
+  requirement => 'host "MUST be the host only and does not include the scheme"',
+  run => sub { croaks(op_doc20(host => 'https://h.test')) } },
+
+{ id => 'swagger/host-no-path', section => '2.0 Swagger Object',
+  requirement => 'host "does not include ... sub-paths"',
+  run => sub { croaks(op_doc20(host => 'h.test/v2')) } },
+
+{ id => 'swagger/host-port-allowed', section => '2.0 Swagger Object',
+  requirement => 'host "MAY include a port"',
+  run => sub {
+      my ($a) = api(op_doc20(host => 'h.test:8443', schemes => ['https']));
+      return 0 unless $a;
+      my $s = $a->spec->{servers};
+      return (ref $s eq 'ARRAY' && @$s == 1 && $s->[0]{url} eq 'https://h.test:8443') ? 1 : 0;
+  } },
+
+{ id => 'swagger/basePath-leading-slash', section => '2.0 Swagger Object',
+  requirement => 'basePath "MUST start with a leading slash (/)"',
+  run => sub { croaks(op_doc20(basePath => 'v2')) } },
+
+{ id => 'swagger/schemes-values', section => '2.0 Swagger Object',
+  requirement => 'schemes "Values MUST be from the list: http, https, ws, wss"',
+  run => sub { croaks(op_doc20(host => 'h.test', schemes => ['ftp'])) } },
+
+{ id => 'swagger/servers-from-host', section => '2.0 Swagger Object',
+  requirement => 'host, basePath and schemes become one server per scheme, in order',
+  run => sub {
+      my ($a) = api(op_doc20(host => 'h.test', basePath => '/v2', schemes => ['https', 'http']));
+      return 0 unless $a;
+      return deep_eq($a->spec->{servers},
+                     [ { url => 'https://h.test/v2' }, { url => 'http://h.test/v2' } ]);
+  } },
+
+{ id => 'swagger/servers-scheme-relative', section => '2.0 Swagger Object',
+  requirement => 'host with no schemes ("the one used to access the Swagger definition itself") is a scheme-relative server',
+  run => sub {
+      my ($a) = api(op_doc20(host => 'h.test', basePath => '/v2'));
+      return 0 unless $a;
+      return deep_eq($a->spec->{servers}, [ { url => '//h.test/v2' } ]);
+  } },
+
+{ id => 'swagger/servers-basepath-only', section => '2.0 Swagger Object',
+  requirement => 'basePath with no host is a relative server URL',
+  run => sub {
+      my ($a) = api(op_doc20(basePath => '/v2'));
+      return 0 unless $a;
+      return deep_eq($a->spec->{servers}, [ { url => '/v2' } ]);
+  } },
+
+{ id => 'swagger/servers-none', section => '2.0 Swagger Object',
+  requirement => 'with neither host, basePath nor schemes, no servers are invented',
+  run => sub {
+      my ($a) = api(op_doc20());
+      return 0 unless $a;
+      return exists $a->spec->{servers} ? 0 : 1;
+  } },
+
+{ id => 'swagger/basepath-routes-opt-in', section => '2.0 Swagger Object',
+  requirement => 'basePath prefixes every path ("The path is appended to the basePath"), honoured under servers => 1 as a 3.x server prefix is',
+  run => sub {
+      my $d = op_doc20(host => 'h.test', basePath => '/v2', schemes => ['https']);
+      my ($on)  = api($d, servers => 1);
+      my ($off) = api($d);
+      return 0 unless $on && $off;
+      # under the option the prefixed path routes; the bare path still routes
+      # too, as it does for a 3.x server prefix (an app mounted under the
+      # prefix sees PATH_INFO without it); without the option only the bare one
+      my ($i1) = $on->match(GET => '/v2/t');
+      my ($i2) = $off->match(GET => '/v2/t');
+      my ($i3) = $off->match(GET => '/t');
+      return (defined $i1 && $i1 eq 'op' && !defined $i2 && defined $i3) ? 1 : 0;
+  } },
+
+{ id => 'swagger/consumes-mime', section => '2.0 Swagger Object',
+  requirement => 'consumes "Value MUST be as described under Mime Types"',
+  run => sub { croaks(op_doc20(consumes => ['json'])) } },
+
+{ id => 'swagger/produces-mime', section => '2.0 Swagger Object',
+  requirement => 'produces "Value MUST be as described under Mime Types"',
+  run => sub { croaks(op_doc20(produces => ['json'])) } },
+
+{ id => 'swagger/extensions-preserved', section => '2.0 Swagger Object / Specification Extensions',
+  requirement => '^x- fields at the root and on a schema survive into ->spec uninterpreted',
+  run => sub {
+      my ($a) = api(doc20('x-corp' => { a => 1 },
+          definitions => { S => { type => 'string', 'x-nullable' => \1 } },
+          paths => { '/t' => { get => { operationId => 'op',
+                                        responses => { 200 => { description => 'ok' } } } } }));
+      return 0 unless $a;
+      return 0 unless ref $a->spec->{'x-corp'} eq 'HASH' && $a->spec->{'x-corp'}{a} == 1;
+      my $s = $a->spec->{components}{schemas}{S};
+      return ($s && exists $s->{'x-nullable'}) ? 1 : 0;
+  } },
+
+(map {
+    my ($key, $value, $dest) = @$_;
+    { id => "swagger/$key-moved", section => '2.0 Swagger Object',
+      requirement => "$key becomes components.$dest and the 2.0 key is gone",
+      run => sub {
+          my ($a) = api(op_doc20($key eq 'parameters' ? 'root_parameters'
+                               : $key eq 'responses'  ? 'root_responses' : $key, $value));
+          return 0 unless $a;
+          return 0 if exists $a->spec->{$key};
+          return (ref $a->spec->{components}{$dest} eq 'HASH'
+                  && exists $a->spec->{components}{$dest}{X}) ? 1 : 0;
+      } };
+} (
+    [ 'definitions',         { X => { type => 'string' } },                              'schemas' ],
+    [ 'parameters',          { X => { name => 'x', in => 'query', type => 'string' } },  'parameters' ],
+    [ 'responses',           { X => { description => 'x' } },                             'responses' ],
+    [ 'securityDefinitions', { X => { type => 'apiKey', name => 'k', in => 'header' } }, 'securitySchemes' ],
+)),
+
+{ id => 'swagger/root-keys-deleted', section => '2.0 Swagger Object',
+  requirement => 'host, basePath, schemes, consumes and produces are consumed, not copied beside their replacements',
+  run => sub {
+      my ($a) = api(op_doc20(host => 'h.test', basePath => '/v2', schemes => ['https'],
+                             consumes => ['application/json'], produces => ['application/json']));
+      return 0 unless $a;
+      for (qw(host basePath schemes consumes produces)) { return 0 if exists $a->spec->{$_} }
+      return 1;
+  } },
+
+{ id => 'swagger/normalisation-idempotent', section => '2.0 (this build)',
+  requirement => 'new(spec => ->spec) over a document using every rule yields the same document',
+  run => sub {
+      my ($a) = api("$DIR/swagger2-everything.json");
+      return 0 unless $a;
+      my ($b) = api($a->spec);
+      return 0 unless $b;
+      return deep_eq($a->spec, $b->spec) && $b->openapi_version eq '2.0' ? 1 : 0;
+  } },
+
+# ----------------------------------------- Info, Contact, License, Tag, External Docs
+
+{ id => 'swagger/info/title-required', section => '2.0 Info Object',
+  requirement => 'title is REQUIRED',
+  run => sub { croaks(doc20(info => { version => '1' })) } },
+
+{ id => 'swagger/info/version-required', section => '2.0 Info Object',
+  requirement => 'version is REQUIRED',
+  run => sub { croaks(doc20(info => { title => 'T' })) } },
+
+{ id => 'swagger/license/name-required', section => '2.0 License Object',
+  requirement => 'name is REQUIRED',
+  run => sub { croaks(doc20(info => { title => 'T', version => '1',
+                                      license => { url => 'https://h.test/l' } })) } },
+
+{ id => 'swagger/contact/email-format', section => '2.0 Contact Object',
+  requirement => 'email "MUST be in the format of an email address"',
+  run => sub { croaks(doc20(info => { title => 'T', version => '1',
+                                      contact => { email => 'not an address' } })) } },
+
+{ id => 'swagger/tag/name-unique', section => '2.0 Swagger Object (tags)',
+  requirement => '"Each tag name in the list MUST be unique"',
+  run => sub { croaks(op_doc20(tags => [ { name => 'a' }, { name => 'a' } ])) } },
+
+{ id => 'swagger/externaldocs/url-required', section => '2.0 External Documentation Object',
+  requirement => 'url is REQUIRED',
+  run => sub { croaks(op_doc20(externalDocs => { description => 'd' })) } },
+
+# ------------------------------------------------------------------ Paths Object
+
+{ id => 'swagger/paths/leading-slash', section => '2.0 Paths Object',
+  requirement => '"The field name MUST begin with a slash"',
+  run => sub { croaks(doc20(paths => { 't' => { get => {
+      operationId => 'op', responses => { 200 => { description => 'ok' } } } } })) } },
+
+{ id => 'swagger/paths/templates-differ-only-by-name', section => '2.0 Paths Object / Path Templating',
+  requirement => 'two paths differing only in their template variable names are one path twice',
+  run => sub {
+      my %op = (responses => { 200 => { description => 'ok' } },
+                parameters => [ { name => 'a', in => 'path', required => \1, type => 'string' } ]);
+      my %op2 = (%op, parameters => [ { name => 'b', in => 'path', required => \1, type => 'string' } ]);
+      croaks(doc20(paths => { '/t/{a}' => { get => { operationId => 'x', %op } },
+                              '/t/{b}' => { get => { operationId => 'y', %op2 } } }));
+  } },
+
+{ id => 'swagger/paths/extensions', section => '2.0 Paths Object',
+  requirement => 'an ^x- field under paths is not a path',
+  run => sub {
+      my $d = op_doc20();
+      $d->{paths}{'x-note'} = { anything => 1 };
+      my ($a) = api($d);
+      return 0 unless $a;
+      return @{ $a->operations } == 1 ? 1 : 0;
+  } },
+
+# -------------------------------------------------------------- Path Item Object
+
+{ id => 'swagger/pathitem/ref-unresolvable-refused', section => '2.0 Path Item Object',
+  requirement => 'a path item $ref that resolves to nothing is refused loudly, never dropped',
+  run => sub { croaks(doc20(paths => { '/t' => { '$ref' => '#/x/y' } })) } },
+
+{ id => 'swagger/pathitem/parameters-apply', section => '2.0 Path Item Object',
+  requirement => 'path item parameters "are applicable for all the operations described under this path"',
+  run => sub {
+      my $d = op_doc20();
+      $d->{paths}{'/t'}{parameters} = [ { name => 'q', in => 'query', required => \1, type => 'string' } ];
+      my ($a) = api($d);
+      return 0 unless $a;
+      my ($absent) = req($a, query => '');
+      my ($given)  = req($a, query => 'q=v');
+      return (!$absent && $given) ? 1 : 0;
+  } },
+
+{ id => 'swagger/pathitem/operation-overrides', section => '2.0 Path Item Object',
+  requirement => '"These parameters can be overridden at the operation level, but cannot be removed there"',
+  run => sub {
+      my $d = op_doc20(parameters => [ { name => 'q', in => 'query', type => 'string' } ]);
+      $d->{paths}{'/t'}{parameters} = [ { name => 'q', in => 'query', required => \1, type => 'string' } ];
+      my ($a) = api($d);
+      return 0 unless $a;
+      my ($absent) = req($a, query => '');
+      return $absent ? 1 : 0;          # the operation's optional q wins
+  } },
+
+{ id => 'swagger/pathitem/body-at-path-level', section => '2.0 Path Item Object',
+  requirement => 'a body parameter declared on the path item is the body of every operation under it',
+  run => sub {
+      my $d = op_doc20(method => 'post', consumes => ['application/json']);
+      $d->{paths}{'/t'}{parameters} = [ { name => 'b', in => 'body', required => \1,
+          schema => { type => 'object', required => ['a'], properties => { a => { type => 'string' } } } } ];
+      my ($a) = api($d);
+      return 0 unless $a;
+      my ($bad)  = req($a, header => $JSON, body => '{}');
+      my ($good) = req($a, header => $JSON, body => '{"a":"x"}');
+      return (!$bad && $good) ? 1 : 0;
+  } },
+
+{ id => 'swagger/pathitem/duplicate-name-in-refused', section => '2.0 Path Item Object',
+  requirement => '"The list MUST NOT include duplicated parameters. A unique parameter is defined by a combination of a name and location"',
+  run => sub { croaks(op_doc20(parameters => [
+      { name => 'a', in => 'query', type => 'string' },
+      { name => 'a', in => 'query', type => 'integer' } ])) } },
+
+{ id => 'pathitem/duplicate-name-in-refused', section => '4.5 Path Item Object',
+  requirement => 'the same rule in 3.x: a (name, in) duplicated within one list is refused',
+  run => sub { croaks(op_doc(parameters => [
+      { name => 'a', in => 'query', schema => { type => 'string' } },
+      { name => 'a', in => 'query', schema => { type => 'integer' } } ])) } },
+
+# -------------------------------------------------------------- Operation Object
+
+{ id => 'swagger/operation/responses-required', section => '2.0 Operation Object',
+  requirement => 'responses is REQUIRED',
+  run => sub { croaks(doc20(paths => { '/t' => { get => { operationId => 'op' } } })) } },
+
+{ id => 'swagger/operation/responses-non-empty', section => '2.0 Responses Object',
+  requirement => '"The Responses Object MUST contain at least one response code"',
+  run => sub { croaks(op_doc20(responses => {})) } },
+
+{ id => 'swagger/operation/operationId-unique', section => '2.0 Operation Object',
+  requirement => '"The id MUST be unique among all operations described in the API"',
+  run => sub { croaks(doc20(paths => {
+      '/a' => { get => { operationId => 'op', responses => { 200 => { description => 'ok' } } } },
+      '/b' => { get => { operationId => 'op', responses => { 200 => { description => 'ok' } } } } })) } },
+
+{ id => 'swagger/operation/deprecated', section => '2.0 Operation Object',
+  requirement => 'deprecated is carried',
+  run => sub {
+      my ($a) = api(op_doc20(deprecated => \1));
+      return 0 unless $a;
+      my $doc = eval { $a->operation_doc('op') } or return 0;
+      return $doc->{deprecated} ? 1 : 0;
+  } },
+
+{ id => 'swagger/operation/consumes-overrides', section => '2.0 Operation Object',
+  requirement => 'operation consumes "overrides the consumes definition at the Swagger Object"',
+  run => sub {
+      my ($a) = api(body20({ type => 'object' },
+          consumes => ['application/xml'], op_consumes => ['application/json']));
+      return 0 unless $a;
+      my ($json) = req($a, header => $JSON, body => '{}');
+      my ($xml)  = req($a, header => { 'content-type' => 'application/xml' }, body => '<a/>');
+      return ($json && !$xml) ? 1 : 0;
+  } },
+
+{ id => 'swagger/operation/consumes-empty-clears', section => '2.0 Operation Object',
+  requirement => '"An empty value MAY be used to clear the global definition": the body falls to the default, not to the root list',
+  run => sub {
+      my ($a) = api(body20({ type => 'object' },
+          consumes => ['application/xml'], op_consumes => []));
+      return 0 unless $a;
+      my ($json) = req($a, header => $JSON, body => '{}');
+      my ($xml)  = req($a, header => { 'content-type' => 'application/xml' }, body => '<a/>');
+      return ($json && !$xml) ? 1 : 0;
+  } },
+
+{ id => 'swagger/operation/produces-overrides', section => '2.0 Operation Object',
+  requirement => 'operation produces "overrides the produces definition at the Swagger Object"',
+  run => sub {
+      my ($a) = api(op_doc20(produces => ['application/xml'], op_produces => ['application/json'],
+          responses => { 200 => { description => 'ok', schema => { type => 'object' } } }));
+      return 0 unless $a;
+      my $c = $a->spec->{paths}{'/t'}{get}{responses}{200}{content};
+      return (ref $c eq 'HASH' && exists $c->{'application/json'}
+              && !exists $c->{'application/xml'}) ? 1 : 0;
+  } },
+
+{ id => 'swagger/operation/schemes', section => '2.0 Operation Object',
+  requirement => 'operation schemes "overrides the Swagger Object schemes definition": an operation-level server',
+  run => sub {
+      my ($a) = api(op_doc20(host => 'h.test', schemes => ['https'], op_schemes => ['wss']));
+      return 0 unless $a;
+      my $s = $a->spec->{paths}{'/t'}{get}{servers};
+      return deep_eq($s, [ { url => 'wss://h.test' } ]);
+  } },
+
+{ id => 'swagger/operation/schemes-without-host', section => '2.0 Operation Object',
+  requirement => 'operation schemes with no host render no URL and are dropped, and the document still loads',
+  run => sub {
+      my ($a) = api(op_doc20(op_schemes => ['wss']));
+      return 0 unless $a;
+      return exists $a->spec->{paths}{'/t'}{get}{servers} ? 0 : 1;
+  } },
+
+{ id => 'swagger/operation/security-empty-object-optional', section => '2.0 Security Requirement Object',
+  requirement => 'an empty requirement object among the alternatives makes security optional',
+  run => sub {
+      loads(op_doc20(securityDefinitions => { K => { type => 'apiKey', name => 'k', in => 'header' } },
+                     security => [ { K => [] }, {} ]));
+  } },
+
+{ id => 'swagger/operation/security-empty-array-removes', section => '2.0 Operation Object',
+  requirement => '"To remove a top-level security declaration, an empty array can be used"',
+  run => sub {
+      my ($a) = api(op_doc20(securityDefinitions => { K => { type => 'apiKey', name => 'X-K', in => 'header' } },
+                             security => [ { K => [] } ], op_security => []));
+      return 0 unless $a;
+      # undef is "may proceed": with no credential at all the operation admits
+      my $denied = $a->check_op_security('op', {}, { K => sub { 0 } });
+      return $denied ? 0 : 1;
+  } },
+
+# -------------------------------------------------------------- Parameter Object
+
+{ id => 'swagger/parameter/in-values', section => '2.0 Parameter Object',
+  requirement => 'in: "Possible values are query, header, path, formData or body": cookie is refused',
+  run => sub { croaks(op_doc20(parameters => [ { name => 'c', in => 'cookie', type => 'string' } ])) } },
+
+{ id => 'swagger/parameter/type-required-off-body', section => '2.0 Parameter Object',
+  requirement => 'type is REQUIRED for a non-body parameter: one with neither type nor schema is refused',
+  run => sub { croaks(op_doc20(parameters => [ { name => 'q', in => 'query' } ])) } },
+
+{ id => 'swagger/parameter/path-required-true', section => '2.0 Parameter Object',
+  requirement => '"If the parameter is in path, this property is required and its value MUST be true"',
+  run => sub { croaks(op_doc20(path => '/t/{id}', parameters => [
+      { name => 'id', in => 'path', type => 'integer', required => \0 } ])) } },
+
+{ id => 'swagger/parameter/items-required-for-array', section => '2.0 Parameter Object',
+  requirement => 'items is "Required if type is array"',
+  run => sub { croaks(op_doc20(parameters => [ { name => 'a', in => 'query', type => 'array' } ])) } },
+
+{ id => 'swagger/parameter/inline-type-integer', section => '2.0 Parameter Object',
+  requirement => 'the inline type of a query parameter is validated (type: integer)',
+  run => sub {
+      my ($a) = api(op_doc20(parameters => [ { name => 'v', in => 'query', type => 'integer' } ]));
+      return 0 unless $a;
+      my ($bad)  = req($a, query => 'v=x');
+      my ($good) = req($a, query => 'v=5');
+      return (!$bad && $good) ? 1 : 0;
+  } },
+
+# one case per draft-04 keyword the Parameter Object takes "directly from the
+# JSON Schema definition": a refusing and an accepting request each, so a
+# keyword the converter forgets to carry fails by name
+(map {
+    my ($kw, $extra, $bad, $good) = @$_;
+    { id => "swagger/parameter/inline-$kw", section => '2.0 Parameter Object',
+      requirement => "$kw on a non-body parameter is validated",
+      run => sub {
+          my ($a) = api(op_doc20(parameters => [ { name => 'v', in => 'query', %$extra } ]));
+          return 0 unless $a;
+          my ($b) = req($a, query => "v=$bad");
+          my ($g) = req($a, query => "v=$good");
+          return (!$b && $g) ? 1 : 0;
+      } };
+} (
+    [ 'enum',             { type => 'string', enum => ['a', 'b'] },                       'c',    'a' ],
+    [ 'maximum',          { type => 'integer', maximum => 5 },                            '6',    '5' ],
+    [ 'exclusiveMaximum', { type => 'integer', maximum => 5, exclusiveMaximum => \1 },    '5',    '4' ],
+    [ 'minimum',          { type => 'integer', minimum => 5 },                            '4',    '5' ],
+    [ 'exclusiveMinimum', { type => 'integer', minimum => 5, exclusiveMinimum => \1 },    '5',    '6' ],
+    [ 'maxLength',        { type => 'string', maxLength => 2 },                           'abc',  'ab' ],
+    [ 'minLength',        { type => 'string', minLength => 2 },                           'a',    'ab' ],
+    [ 'pattern',          { type => 'string', pattern => '^a' },                          'b',    'a' ],
+    [ 'maxItems',         { type => 'array', items => { type => 'string' }, maxItems => 1 }, 'a,b', 'a' ],
+    [ 'minItems',         { type => 'array', items => { type => 'string' }, minItems => 2 }, 'a',   'a,b' ],
+    [ 'uniqueItems',      { type => 'array', items => { type => 'string' }, uniqueItems => \1 }, 'a,a', 'a,b' ],
+    [ 'multipleOf',       { type => 'integer', multipleOf => 5 },                         '7',    '10' ],
+)),
+
+{ id => 'swagger/parameter/inline-format-carried', section => '2.0 Parameter Object',
+  requirement => 'format travels into the schema (a format is an annotation the validator does not refuse on)',
+  run => sub {
+      my ($a) = api(op_doc20(parameters => [ { name => 'v', in => 'query', type => 'string', format => 'date' } ]));
+      return 0 unless $a;
+      my $p = $a->spec->{paths}{'/t'}{get}{parameters}[0];
+      return ($p->{schema} && ($p->{schema}{format} || '') eq 'date') ? 1 : 0;
+  } },
+
+{ id => 'swagger/parameter/default-carried-not-injected', section => '2.0 Parameter Object',
+  requirement => 'default travels into the schema and is NOT injected into a request that omits the parameter',
+  run => sub {
+      my ($a) = api(op_doc20(parameters => [ { name => 'v', in => 'query', type => 'integer', default => 7 } ]));
+      return 0 unless $a;
+      my $p = $a->spec->{paths}{'/t'}{get}{parameters}[0];
+      return 0 unless $p->{schema} && ($p->{schema}{default} || 0) == 7;
+      my ($ok, $res) = req($a, query => '');
+      return ($ok && !exists $res->{query}{v}) ? 1 : 0;
+  } },
+
+{ id => 'swagger/parameter/type-file-not-in-formdata', section => '2.0 Parameter Object',
+  requirement => 'If type is file ... "the parameter MUST be in formData"',
+  run => sub { croaks(op_doc20(parameters => [ { name => 'f', in => 'query', type => 'file' } ])) } },
+
+{ id => 'swagger/parameter/type-file-needs-form-consumes', section => '2.0 Parameter Object',
+  requirement => 'If type is file, "the consumes MUST be either multipart/form-data, application/x-www-form-urlencoded or both"',
+  run => sub { api_err(form20([ { name => 'f', type => 'file' } ], consumes => ['application/json'])) =~ /file.*consumes|consumes.*file/i ? 1 : 0 } },
+
+{ id => 'swagger/parameter/type-file-binary', section => '2.0 Parameter Object',
+  requirement => 'a formData file under multipart loads as a binary string property',
+  run => sub {
+      my ($a) = api(form20([ { name => 'f', type => 'file', required => \1 } ],
+                           consumes => ['multipart/form-data']));
+      return 0 unless $a;
+      my $s = $a->spec->{paths}{'/t'}{post}{requestBody}{content}{'multipart/form-data'}{schema};
+      return 0 unless $s && ref $s->{properties} eq 'HASH';
+      my $f = $s->{properties}{f} or return 0;
+      return (($f->{type} || '') eq 'string' && ($f->{format} || '') eq 'binary') ? 1 : 0;
+  } },
+
+{ id => 'swagger/parameter/body-at-most-one', section => '2.0 Operation Object',
+  requirement => '"There can be one "body" parameter at most"',
+  run => sub { api_err(op_doc20(method => 'post', consumes => ['application/json'], parameters => [
+      { name => 'a', in => 'body', schema => { type => 'object' } },
+      { name => 'b', in => 'body', schema => { type => 'object' } } ])) =~ /one body parameter|at most one body/i ? 1 : 0 } },
+
+{ id => 'swagger/parameter/body-not-with-formdata', section => '2.0 Parameter Object',
+  requirement => 'form parameters "cannot be declared together with a body parameter"',
+  run => sub { api_err(op_doc20(method => 'post', consumes => ['application/x-www-form-urlencoded'], parameters => [
+      { name => 'a', in => 'body', schema => { type => 'object' } },
+      { name => 'b', in => 'formData', type => 'string' } ])) =~ /body.*formData|formData.*body/i ? 1 : 0 } },
+
+{ id => 'swagger/parameter/body-schema-required', section => '2.0 Parameter Object',
+  requirement => 'schema is REQUIRED on a body parameter',
+  run => sub { api_err(op_doc20(method => 'post', consumes => ['application/json'],
+                               parameters => [ { name => 'a', in => 'body' } ])) =~ /body.*schema|schema.*body/i ? 1 : 0 } },
+
+{ id => 'swagger/parameter/body-required', section => '2.0 Parameter Object',
+  requirement => 'a required body that is absent is refused; an optional one may be absent',
+  run => sub {
+      my ($req) = api(body20({ type => 'object' }));
+      my ($opt) = api(op_doc20(method => 'post', consumes => ['application/json'],
+          parameters => [ { name => 'b', in => 'body', schema => { type => 'object' } } ]));
+      return 0 unless $req && $opt;
+      my ($r) = req($req, header => $JSON);
+      my ($o) = req($opt, header => $JSON);
+      return (!$r && $o) ? 1 : 0;
+  } },
+
+{ id => 'swagger/parameter/body-description-carried', section => '2.0 Parameter Object',
+  requirement => 'the body parameter description is the request body description',
+  run => sub {
+      my ($a) = api(op_doc20(method => 'post', consumes => ['application/json'],
+          parameters => [ { name => 'b', in => 'body', description => 'the thing',
+                            schema => { type => 'object' } } ]));
+      return 0 unless $a;
+      my $rb = $a->spec->{paths}{'/t'}{post}{requestBody} or return 0;
+      return ($rb->{description} || '') eq 'the thing' ? 1 : 0;
+  } },
+
+{ id => 'swagger/parameter/allowEmptyValue-query', section => '2.0 Parameter Object',
+  requirement => 'allowEmptyValue "Sets the ability to pass empty-valued parameters" in query',
+  run => sub {
+      my ($with) = api(op_doc20(parameters => [ { name => 'v', in => 'query', type => 'integer', allowEmptyValue => \1 } ]));
+      my ($sans) = api(op_doc20(parameters => [ { name => 'v', in => 'query', type => 'integer' } ]));
+      return 0 unless $with && $sans;
+      my ($w) = req($with, query => 'v=');
+      my ($s) = req($sans, query => 'v=');
+      return ($w && !$s) ? 1 : 0;
+  } },
+
+{ id => 'swagger/parameter/allowEmptyValue-formdata', section => '2.0 Parameter Object',
+  requirement => 'allowEmptyValue is "valid only for either query or formData": an empty form value is accepted',
+  run => sub {
+      my ($with) = api(form20([ { name => 'v', type => 'integer', allowEmptyValue => \1 } ]));
+      my ($sans) = api(form20([ { name => 'v', type => 'integer' } ]));
+      return 0 unless $with && $sans;
+      my ($w) = req($with, header => $FORM, body => 'v=');
+      my ($s) = req($sans, header => $FORM, body => 'v=');
+      return ($w && !$s) ? 1 : 0;
+  } },
+
+{ id => 'swagger/parameter/items-nested', section => '2.0 Items Object',
+  requirement => 'a nested Items Object carries its own collectionFormat: 1|2,3|4 is [[1,2],[3,4]]',
+  run => sub {
+      my $p = { name => 'm', in => 'query', type => 'array', collectionFormat => 'csv',
+                items => { type => 'array', collectionFormat => 'pipes', items => { type => 'integer' } } };
+      my ($a) = api(op_doc20(parameters => [ $p ]));
+      return 0 unless $a;
+      my ($ok, $res) = req($a, query => 'm=1|2,3|4');
+      return 0 unless $ok;
+      return eq_deeply_ish($res->{query}{m}, [ [1, 2], [3, 4] ]);
+  } },
+
+{ id => 'swagger/parameter/items-nested-header', section => '2.0 Items Object',
+  requirement => 'the same nesting in a header',
+  run => sub {
+      my $p = { name => 'X-M', in => 'header', type => 'array', collectionFormat => 'csv',
+                items => { type => 'array', collectionFormat => 'pipes', items => { type => 'integer' } } };
+      my ($a) = api(op_doc20(parameters => [ $p ]));
+      return 0 unless $a;
+      my ($ok, $res) = req($a, header => { 'x-m' => '1|2,3|4' });
+      return 0 unless $ok;
+      return eq_deeply_ish($res->{header}{'X-M'}, [ [1, 2], [3, 4] ]);
+  } },
+
+{ id => 'swagger/parameter/ref-root-parameters', section => '2.0 Reference Object / Parameters Definitions Object',
+  requirement => 'a $ref to #/parameters/X resolves and the parameter applies',
+  run => sub {
+      my ($a) = api(op_doc20(
+          root_parameters => { Q => { name => 'q', in => 'query', required => \1, type => 'string' } },
+          parameters => [ { '$ref' => '#/parameters/Q' } ]));
+      return 0 unless $a;
+      my ($absent) = req($a, query => '');
+      my ($given)  = req($a, query => 'q=v');
+      return (!$absent && $given) ? 1 : 0;
+  } },
+
+{ id => 'swagger/parameter/ref-body-component', section => '2.0 Reference Object / Parameters Definitions Object',
+  requirement => 'a $ref to a body parameter definition is the operation body',
+  run => sub {
+      my ($a) = api(op_doc20(method => 'post', consumes => ['application/json'],
+          root_parameters => { B => { name => 'b', in => 'body', required => \1,
+              schema => { type => 'object', required => ['a'], properties => { a => { type => 'string' } } } } },
+          parameters => [ { '$ref' => '#/parameters/B' } ]));
+      return 0 unless $a;
+      my ($bad)  = req($a, header => $JSON, body => '{}');
+      my ($good) = req($a, header => $JSON, body => '{"a":"x"}');
+      return (!$bad && $good) ? 1 : 0;
+  } },
+
+{ id => 'swagger/parameter/ref-formdata-component', section => '2.0 Reference Object / Parameters Definitions Object',
+  requirement => 'two formData parameter definitions reached by $ref form one body',
+  run => sub {
+      my ($a) = api(op_doc20(method => 'post', consumes => ['application/x-www-form-urlencoded'],
+          root_parameters => { A => { name => 'a', in => 'formData', required => \1, type => 'string' },
+                               B => { name => 'b', in => 'formData', required => \1, type => 'string' } },
+          parameters => [ { '$ref' => '#/parameters/A' }, { '$ref' => '#/parameters/B' } ]));
+      return 0 unless $a;
+      my ($half) = req($a, header => $FORM, body => 'a=1');
+      my ($both) = req($a, header => $FORM, body => 'a=1&b=2');
+      return (!$half && $both) ? 1 : 0;
+  } },
+
+{ id => 'swagger/parameter/body-definition-is-request-body', section => '2.0 Parameters Definitions Object',
+  requirement => 'a body parameter definition becomes a component request body, not a component parameter',
+  run => sub {
+      my ($a) = api(op_doc20(method => 'post', consumes => ['application/json'],
+          root_parameters => { B => { name => 'b', in => 'body', schema => { type => 'object' } },
+                               Q => { name => 'q', in => 'query', type => 'string' } },
+          parameters => [ { '$ref' => '#/parameters/B' } ]));
+      return 0 unless $a;
+      my $c = $a->spec->{components} or return 0;
+      return 0 unless ref $c->{requestBodies} eq 'HASH' && $c->{requestBodies}{B}
+                   && ref $c->{requestBodies}{B}{content} eq 'HASH';
+      return 0 if ref $c->{parameters} eq 'HASH' && exists $c->{parameters}{B};
+      return (ref $c->{parameters} eq 'HASH' && $c->{parameters}{Q}) ? 1 : 0;
+  } },
+
+{ id => 'swagger/parameter/formdata-duplicate-refused', section => '2.0 Path Item Object / Operation Object',
+  requirement => 'two formData parameters with one name in one list are a duplicated parameter and are refused',
+  run => sub { croaks(form20([ { name => 'a', type => 'string' },
+                               { name => 'a', type => 'integer' } ])) } },
+
+{ id => 'swagger/parameter/ref-unresolvable', section => '2.0 Reference Object',
+  requirement => 'a $ref to a parameter definition that does not exist is refused',
+  run => sub { croaks(op_doc20(parameters => [ { '$ref' => '#/parameters/Nope' } ])) } },
+
+{ id => 'swagger/reference/external-refused', section => '2.0 Reference Object',
+  requirement => 'a $ref into another file is refused (this build resolves no external references, in any version)',
+  run => sub { api_err(body20({ '$ref' => 'other.json#/definitions/X' })) =~ /other\.json/ ? 1 : 0 } },
+
+# ---------------------------------------------------------------- Items Object
+
+{ id => 'swagger/items/type-required', section => '2.0 Items Object',
+  requirement => 'type is REQUIRED',
+  run => sub { croaks(op_doc20(parameters => [ { name => 'a', in => 'query', type => 'array', items => {} } ])) } },
+
+{ id => 'swagger/items/no-multi', section => '2.0 Items Object',
+  requirement => 'an Items Object collectionFormat is csv, ssv, tsv or pipes: multi is not a value',
+  run => sub { croaks(op_doc20(parameters => [ { name => 'a', in => 'query', type => 'array',
+      items => { type => 'array', collectionFormat => 'multi', items => { type => 'string' } } } ])) } },
+
+{ id => 'swagger/items/nested-depth-bound', section => '2.0 Items Object',
+  requirement => 'nesting to depth 4 is accepted and depth 5 is refused with a message, not a stack',
+  run => sub {
+      my $mk = sub { my ($d) = @_; my $s = { type => 'string' };
+                     $s = { type => 'array', items => $s } for 1 .. $d; $s };
+      my $four = $mk->(4); my $five = $mk->(5);
+      my ($ok4) = api(op_doc20(parameters => [ { name => 'a', in => 'query', %$four } ]));
+      my $e5 = api_err(op_doc20(parameters => [ { name => 'a', in => 'query', %$five } ]));
+      return ($ok4 && $e5) ? 1 : 0;
+  } },
+
+{ id => 'swagger/items/constraints-apply', section => '2.0 Items Object',
+  requirement => 'an Items Object constraint applies to each item',
+  run => sub {
+      my ($a) = api(op_doc20(parameters => [ { name => 'a', in => 'query', type => 'array',
+          items => { type => 'integer', maximum => 5 } } ]));
+      return 0 unless $a;
+      my ($bad)  = req($a, query => 'a=1,6');
+      my ($good) = req($a, query => 'a=1,5');
+      return (!$bad && $good) ? 1 : 0;
+  } },
+
+# ------------------------------------------------------------ Responses Object
+
+{ id => 'swagger/responses/default-selected', section => '2.0 Responses Object',
+  requirement => 'default "is used to cover all the HTTP codes that are not covered individually"',
+  run => sub {
+      my ($a) = api(op_doc20(produces => ['application/json'],
+          responses => { default => { description => 'any', schema => {
+              type => 'object', required => ['ok'], properties => { ok => { type => 'boolean' } } } } }));
+      return 0 unless $a;
+      my $errs = $a->check_response('op',
+          [ 418, [ 'Content-Type' => 'application/json' ], [ '{"wrong":1}' ] ]);
+      return (ref $errs eq 'ARRAY' && @$errs) ? 1 : 0;
+  } },
+
+{ id => 'swagger/responses/range-key-refused', section => '2.0 Responses Object',
+  requirement => 'response keys are HTTP status codes and default: a 2XX range (3.0) is refused under 2.0',
+  run => sub { croaks(op_doc20(responses => { '2XX' => { description => 'ok' } })) } },
+
+{ id => 'swagger/responses/extensions', section => '2.0 Responses Object',
+  requirement => 'an ^x- field under responses is not a status',
+  run => sub { loads(op_doc20(responses => { 200 => { description => 'ok' }, 'x-note' => 1 })) } },
+
+# ------------------------------------------------------------- Response Object
+
+{ id => 'swagger/response/description-required', section => '2.0 Response Object',
+  requirement => 'description is REQUIRED',
+  run => sub { croaks(op_doc20(responses => { 200 => {} })) } },
+
+{ id => 'swagger/response/schema-validated', section => '2.0 Response Object',
+  requirement => 'a response schema is applied to the body under the produces type',
+  run => sub {
+      my ($a) = api(op_doc20(produces => ['application/json'],
+          responses => { 200 => { description => 'ok', schema => {
+              type => 'object', required => ['id'], properties => { id => { type => 'integer' } } } } }));
+      return 0 unless $a;
+      my $bad = $a->check_response('op', [ 200, [ 'Content-Type' => 'application/json' ], [ '{}' ] ]);
+      my $ok  = $a->check_response('op', [ 200, [ 'Content-Type' => 'application/json' ], [ '{"id":1}' ] ]);
+      return (ref $bad eq 'ARRAY' && @$bad && (!$ok || !@$ok)) ? 1 : 0;
+  } },
+
+{ id => 'swagger/response/schema-default-produces', section => '2.0 Response Object',
+  requirement => 'with no produces anywhere a response schema is still applied (this build keys it as application/json)',
+  run => sub {
+      my ($a) = api(op_doc20(responses => { 200 => { description => 'ok', schema => {
+              type => 'object', required => ['id'], properties => { id => { type => 'integer' } } } } }));
+      return 0 unless $a;
+      my $bad = $a->check_response('op', [ 200, [ 'Content-Type' => 'application/json' ], [ '{}' ] ]);
+      return (ref $bad eq 'ARRAY' && @$bad) ? 1 : 0;
+  } },
+
+{ id => 'swagger/response/schema-per-produces', section => '2.0 Response Object',
+  requirement => 'a response schema is declared once and keyed by every produces type (the shape; a non-JSON row is not validated, as in 3.x)',
+  run => sub {
+      my ($a) = api(op_doc20(produces => ['application/json', 'application/xml'],
+          responses => { 200 => { description => 'ok', schema => { type => 'object' } } }));
+      return 0 unless $a;
+      my $r = $a->spec->{paths}{'/t'}{get}{responses}{200};
+      return 0 if exists $r->{schema};
+      my $c = $r->{content};
+      return (ref $c eq 'HASH' && $c->{'application/json'}{schema} && $c->{'application/xml'}{schema}) ? 1 : 0;
+  } },
+
+{ id => 'swagger/response/schema-type-file', section => '2.0 Response Object',
+  requirement => '"its root type value may also be file": a binary string under the produces type',
+  run => sub {
+      my ($a) = api(op_doc20(produces => ['application/octet-stream'],
+          responses => { 200 => { description => 'bytes', schema => { type => 'file' } } }));
+      return 0 unless $a;
+      my $s = $a->spec->{paths}{'/t'}{get}{responses}{200}{content}{'application/octet-stream'}{schema};
+      return ($s && ($s->{type} || '') eq 'string' && ($s->{format} || '') eq 'binary') ? 1 : 0;
+  } },
+
+{ id => 'swagger/response/no-schema-no-content', section => '2.0 Response Object',
+  requirement => '"If this field does not exist, it means no content is returned": no content entry is invented',
+  run => sub {
+      my ($a) = api(op_doc20(produces => ['application/json'],
+          responses => { 204 => { description => 'gone' } }));
+      return 0 unless $a;
+      return exists $a->spec->{paths}{'/t'}{get}{responses}{204}{content} ? 0 : 1;
+  } },
+
+{ id => 'swagger/response/headers-validated', section => '2.0 Response Object / Header Object',
+  requirement => 'a declared response header is checked against its type',
+  run => sub {
+      my ($a) = api(op_doc20(responses => { 200 => { description => 'ok',
+          headers => { 'X-R' => { type => 'integer' } } } }));
+      return 0 unless $a;
+      my $bad = $a->check_response('op', [ 200, [ 'X-R', 'x' ], [] ]);
+      my $ok  = $a->check_response('op', [ 200, [ 'X-R', '5' ], [] ]);
+      return (ref $bad eq 'ARRAY' && @$bad && (!$ok || !@$ok)) ? 1 : 0;
+  } },
+
+{ id => 'swagger/response/headers-array-csv', section => '2.0 Header Object',
+  requirement => 'a response header array is csv by default',
+  run => sub {
+      my ($a) = api(op_doc20(responses => { 200 => { description => 'ok',
+          headers => { 'X-R' => { type => 'array', items => { type => 'integer' } } } } }));
+      return 0 unless $a;
+      my $bad = $a->check_response('op', [ 200, [ 'X-R', 'a,b' ], [] ]);
+      my $ok  = $a->check_response('op', [ 200, [ 'X-R', '1,2' ], [] ]);
+      return (ref $bad eq 'ARRAY' && @$bad && (!$ok || !@$ok)) ? 1 : 0;
+  } },
+
+{ id => 'swagger/response/headers-collectionFormat-pipes', section => '2.0 Header Object',
+  requirement => 'a response header array with collectionFormat pipes splits on |',
+  run => sub {
+      my ($a) = api(op_doc20(responses => { 200 => { description => 'ok',
+          headers => { 'X-R' => { type => 'array', items => { type => 'integer' },
+                                  collectionFormat => 'pipes' } } } }));
+      return 0 unless $a;
+      my $bad = $a->check_response('op', [ 200, [ 'X-R', '1,2' ], [] ]);
+      my $ok  = $a->check_response('op', [ 200, [ 'X-R', '1|2' ], [] ]);
+      return (ref $bad eq 'ARRAY' && @$bad && (!$ok || !@$ok)) ? 1 : 0;
+  } },
+
+{ id => 'swagger/response/examples-map', section => '2.0 Response Object / Example Object',
+  requirement => 'examples is a map from a produces mime type to an example, and the mock serves it',
+  run => sub {
+      my ($a) = api(op_doc20(produces => ['application/json'],
+          responses => { 200 => { description => 'ok',
+              schema => { type => 'object', properties => { id => { type => 'integer' } } },
+              examples => { 'application/json' => { id => 7 } } } }));
+      return 0 unless $a;
+      my $t = eval { $a->synthesize('op') } or return 0;
+      my $body = eval { file_json_decode(join '', @{ $t->[2] }) };
+      return (ref $body eq 'HASH' && ($body->{id} || 0) == 7) ? 1 : 0;
+  } },
+
+{ id => 'swagger/example/mime-not-in-produces', section => '2.0 Example Object',
+  requirement => 'an example under a mime type the operation does not produce is carried without a schema and the document loads',
+  run => sub {
+      loads(op_doc20(produces => ['application/json'],
+          responses => { 200 => { description => 'ok', examples => { 'text/plain' => 'x' } } }));
+  } },
+
+# ----------------------------------------------------------------- Header Object
+
+{ id => 'swagger/header/type-to-schema', section => '2.0 Header Object',
+  requirement => 'a Header Object type becomes the header schema',
+  run => sub {
+      my ($a) = api(op_doc20(responses => { 200 => { description => 'ok',
+          headers => { 'X-R' => { type => 'integer', description => 'd' } } } }));
+      return 0 unless $a;
+      my $h = $a->spec->{paths}{'/t'}{get}{responses}{200}{headers}{'X-R'} or return 0;
+      return ($h->{schema} && ($h->{schema}{type} || '') eq 'integer' && !exists $h->{type}) ? 1 : 0;
+  } },
+
+{ id => 'swagger/header/collectionFormat-tsv', section => '2.0 Header Object',
+  requirement => 'a response header array with collectionFormat tsv splits on a tab',
+  run => sub {
+      my ($a) = api(op_doc20(responses => { 200 => { description => 'ok',
+          headers => { 'X-R' => { type => 'array', items => { type => 'integer' },
+                                  collectionFormat => 'tsv' } } } }));
+      return 0 unless $a;
+      my $bad = $a->check_response('op', [ 200, [ 'X-R', '1,2' ], [] ]);
+      my $ok  = $a->check_response('op', [ 200, [ 'X-R', "1\t2" ], [] ]);
+      return (ref $bad eq 'ARRAY' && @$bad && (!$ok || !@$ok)) ? 1 : 0;
+  } },
+
+{ id => 'swagger/header/no-multi', section => '2.0 Header Object',
+  requirement => 'a Header Object collectionFormat is csv, ssv, tsv or pipes: multi is refused',
+  run => sub { croaks(op_doc20(responses => { 200 => { description => 'ok',
+      headers => { 'X-R' => { type => 'array', items => { type => 'string' },
+                              collectionFormat => 'multi' } } } })) } },
+
+{ id => 'swagger/header/request-required', section => '2.0 Parameter Object (header)',
+  requirement => 'a required header parameter that is absent is refused',
+  run => sub {
+      my ($a) = api(op_doc20(parameters => [ { name => 'X-H', in => 'header', required => \1, type => 'string' } ]));
+      return 0 unless $a;
+      my ($absent) = req($a, header => {});
+      my ($given)  = req($a, header => { 'x-h' => 'v' });
+      return (!$absent && $given) ? 1 : 0;
+  } },
+
+# -------------------------------------------------------------- Reference Object
+
+{ id => 'swagger/reference/definitions-rewritten', section => '2.0 Reference Object / Definitions Object',
+  requirement => 'no #/definitions/, #/parameters/ or #/responses/ reference survives into ->spec',
+  run => sub {
+      my ($a) = api("$DIR/swagger2-everything.json");
+      return 0 unless $a;
+      return has_2_0_ref($a->spec) ? 0 : 1;
+  } },
+
+{ id => 'swagger/reference/position-aware', section => '2.0 Reference Object',
+  requirement => 'a key spelled $ref inside a default value is user data and is not rewritten',
+  run => sub {
+      my ($a) = api(op_doc20(definitions => { S => { type => 'object',
+          default => { '$ref' => '#/definitions/Nope' } } }));
+      return 0 unless $a;
+      my $d = $a->spec->{components}{schemas}{S}{default};
+      return (ref $d eq 'HASH' && ($d->{'$ref'} || '') eq '#/definitions/Nope') ? 1 : 0;
+  } },
+
+{ id => 'swagger/reference/pointer-escapes', section => '2.0 Reference Object / RFC 6901',
+  requirement => 'a JSON-pointer escape in a definition name (~1 for /) resolves',
+  run => sub {
+      my ($a) = api(body20({ '$ref' => '#/definitions/a~1b' },
+          definitions => { 'a/b' => { type => 'object', required => ['x'],
+                                      properties => { x => { type => 'string' } } } }));
+      return 0 unless $a;
+      my ($bad)  = req($a, header => $JSON, body => '{}');
+      my ($good) = req($a, header => $JSON, body => '{"x":"y"}');
+      return (!$bad && $good) ? 1 : 0;
+  } },
+
+{ id => 'swagger/reference/responses-rewritten', section => '2.0 Reference Object / Responses Definitions Object',
+  requirement => 'a $ref to #/responses/X resolves and the response is compiled',
+  run => sub {
+      my ($a) = api(op_doc20(produces => ['application/json'],
+          root_responses => { NotFound => { description => 'nf', schema => {
+              type => 'object', required => ['code'], properties => { code => { type => 'integer' } } } } },
+          responses => { 200 => { description => 'ok' }, 404 => { '$ref' => '#/responses/NotFound' } }));
+      return 0 unless $a;
+      my $bad = $a->check_response('op', [ 404, [ 'Content-Type' => 'application/json' ], [ '{}' ] ]);
+      return (ref $bad eq 'ARRAY' && @$bad) ? 1 : 0;
+  } },
+
+{ id => 'swagger/reference/definitions-ref-body', section => '2.0 Reference Object / Definitions Object',
+  requirement => 'a body schema $ref to #/definitions/X validates against X',
+  run => sub {
+      my ($a) = api(body20({ '$ref' => '#/definitions/X' },
+          definitions => { X => { type => 'object', required => ['a'], properties => { a => { type => 'string' } } } }));
+      return 0 unless $a;
+      my ($bad)  = req($a, header => $JSON, body => '{}');
+      my ($good) = req($a, header => $JSON, body => '{"a":"x"}');
+      return (!$bad && $good) ? 1 : 0;
+  } },
+
+{ id => 'swagger/reference/siblings-ignored', section => '2.0 Reference Object / draft-04',
+  requirement => 'draft-04: assertions beside a $ref are ignored',
+  run => sub {
+      my ($a) = api(body20({ type => 'object', properties => {
+              a => { '$ref' => '#/definitions/S', maxLength => 1 } } },
+          definitions => { S => { type => 'string' } }));
+      return 0 unless $a;
+      my ($ok) = req($a, header => $JSON, body => '{"a":"longer than one"}');
+      return $ok ? 1 : 0;
+  } },
+
+# ----------------------------------------------------------------- Schema Object
+
+{ id => 'swagger/schema/type-string-only', section => '2.0 Schema Object / Data Types',
+  requirement => 'type "Value MUST be a string. Multiple types via an array are not supported"',
+  run => sub { api_err(body20({ type => ['string', 'null'] })) =~ /type.*(?:string|array)/i ? 1 : 0 } },
+
+{ id => 'swagger/schema/discriminator-string', section => '2.0 Schema Object',
+  requirement => 'a string discriminator names the property that selects the inheriting schema',
+  run => sub {
+      my ($a) = api(body20({ '$ref' => '#/definitions/Pet' }, definitions => {
+          Pet => { type => 'object', discriminator => 'kind', required => ['kind'],
+                   properties => { kind => { type => 'string' } } },
+          Dog => { allOf => [ { '$ref' => '#/definitions/Pet' },
+                              { type => 'object', required => ['bark'],
+                                properties => { bark => { type => 'string' } } } ] } }));
+      return 0 unless $a;
+      my ($bad)  = req($a, header => $JSON, body => '{"kind":"Dog"}');
+      my ($good) = req($a, header => $JSON, body => '{"kind":"Dog","bark":"w"}');
+      return (!$bad && $good) ? 1 : 0;
+  } },
+
+{ id => 'swagger/schema/discriminator-property-missing', section => '2.0 Schema Object',
+  requirement => '"The property name used MUST be defined at this schema"',
+  run => sub { api_err(body20({ type => 'object', discriminator => 'kind', required => ['kind'] })) =~ /discriminator.*(?:defined|propert)/i ? 1 : 0 } },
+
+{ id => 'swagger/schema/discriminator-not-required', section => '2.0 Schema Object',
+  requirement => 'the discriminator property "MUST be in the required property list"',
+  run => sub { api_err(body20({ type => 'object', discriminator => 'kind',
+                               properties => { kind => { type => 'string' } } })) =~ /discriminator.*required/i ? 1 : 0 } },
+
+{ id => 'swagger/schema/nullable-dropped', section => '2.0 Schema Object (not a 2.0 keyword)',
+  requirement => 'nullable is not a 2.0 keyword: draft-04 ignores it, so null is refused and ->spec carries no nullable and no type array',
+  run => sub {
+      my ($a) = api(body20({ type => 'object', properties => { a => { type => 'string', nullable => \1 } } }));
+      return 0 unless $a;
+      my ($ok) = req($a, header => $JSON, body => '{"a":null}');
+      return 0 if $ok;
+      my $s = $a->spec->{paths}{'/t'}{post}{requestBody}{content}{'application/json'}{schema}{properties}{a};
+      return ($s && !exists $s->{nullable} && !ref $s->{type}) ? 1 : 0;
+  } },
+
+{ id => 'swagger/schema/readOnly-response-only', section => '2.0 Schema Object',
+  requirement => 'readOnly "MAY be sent as part of a response but MUST NOT be sent as part of the request"',
+  run => sub {
+      my ($a) = api(body20({ type => 'object', properties => {
+          id => { type => 'integer', readOnly => \1 }, n => { type => 'string' } } }));
+      return 0 unless $a;
+      my ($bad)  = req($a, header => $JSON, body => '{"n":"x","id":1}');
+      my ($good) = req($a, header => $JSON, body => '{"n":"x"}');
+      return (!$bad && $good) ? 1 : 0;
+  } },
+
+{ id => 'swagger/schema/exclusive-bool', section => '2.0 Schema Object / draft-04',
+  requirement => 'the draft-04 boolean exclusiveMinimum excludes the bound',
+  run => sub {
+      my ($a) = api(body20({ type => 'object', properties => {
+          a => { type => 'integer', minimum => 5, exclusiveMinimum => \1 } } }));
+      return 0 unless $a;
+      my ($lo) = req($a, header => $JSON, body => '{"a":5}');
+      my ($hi) = req($a, header => $JSON, body => '{"a":6}');
+      return (!$lo && $hi) ? 1 : 0;
+  } },
+
+{ id => 'swagger/schema/items-tuple', section => '2.0 Schema Object / draft-04',
+  requirement => 'a draft-04 tuple items becomes positional prefixItems',
+  run => sub {
+      my ($a) = api(body20({ type => 'array', items => [ { type => 'string' }, { type => 'integer' } ] }));
+      return 0 unless $a;
+      my $s = $a->spec->{paths}{'/t'}{post}{requestBody}{content}{'application/json'}{schema};
+      return (ref $s->{prefixItems} eq 'ARRAY' && @{ $s->{prefixItems} } == 2) ? 1 : 0;
+  } },
+
+{ id => 'swagger/schema/example-to-examples', section => '2.0 Schema Object',
+  requirement => 'a schema example is carried (as the 2020-12 examples list)',
+  run => sub {
+      my ($a) = api(body20({ type => 'string', example => 'x' }));
+      return 0 unless $a;
+      my $s = $a->spec->{paths}{'/t'}{post}{requestBody}{content}{'application/json'}{schema};
+      return (ref $s->{examples} eq 'ARRAY' && $s->{examples}[0] eq 'x') ? 1 : 0;
+  } },
+
+{ id => 'swagger/schema/format-byte', section => '2.0 Data Types',
+  requirement => 'format byte (base64) is carried as contentEncoding',
+  run => sub {
+      my ($a) = api(body20({ type => 'string', format => 'byte' }));
+      return 0 unless $a;
+      my $s = $a->spec->{paths}{'/t'}{post}{requestBody}{content}{'application/json'}{schema};
+      return ($s->{contentEncoding} || '') eq 'base64' ? 1 : 0;
+  } },
+
+{ id => 'swagger/schema/format-binary', section => '2.0 Data Types',
+  requirement => 'format binary is carried as contentMediaType',
+  run => sub {
+      my ($a) = api(body20({ type => 'string', format => 'binary' }));
+      return 0 unless $a;
+      my $s = $a->spec->{paths}{'/t'}{post}{requestBody}{content}{'application/json'}{schema};
+      return $s->{contentMediaType} ? 1 : 0;
+  } },
+
+{ id => 'swagger/schema/over-acceptance-stated', section => '2.0 Schema Object (this build, D6)',
+  requirement => 'oneOf is not a 2.0 field and is honoured if present: an over-acceptance by decision D6, documented, not compliance',
+  run => sub {
+      my ($a) = api(body20({ oneOf => [ { type => 'string' }, { type => 'integer' } ] }));
+      return 0 unless $a;
+      my ($str)  = req($a, header => $JSON, body => '"x"');
+      my ($bool) = req($a, header => $JSON, body => 'true');
+      return ($str && !$bool) ? 1 : 0;
+  } },
+
+{ id => 'swagger/schema/xml-object', section => '2.0 XML Object',
+  requirement => 'an XML Object on a property is carried; namespace "SHOULD be in the form of a URL"',
+  run => sub {
+      my ($a) = api(body20({ type => 'object', properties => { a => { type => 'string',
+          xml => { name => 'A', namespace => 'https://h.test/ns', prefix => 'p', attribute => \1 } } } }));
+      return 0 unless $a;
+      my $s = $a->spec->{paths}{'/t'}{post}{requestBody}{content}{'application/json'}{schema};
+      return ($s->{properties}{a}{xml} && $s->{properties}{a}{xml}{name} eq 'A') ? 1 : 0;
+  } },
+
+# ------------------------------------------ Security Definitions / Security Scheme
+
+{ id => 'swagger/security/basic', section => '2.0 Security Scheme Object',
+  requirement => 'type basic is HTTP Basic: the scheme compiles and a request without Authorization is denied',
+  run => sub {
+      my ($a) = api(op_doc20(securityDefinitions => { S => { type => 'basic' } },
+                             security => [ { S => [] } ]));
+      return 0 unless $a;
+      my $s = $a->spec->{components}{securitySchemes}{S} or return 0;
+      return 0 unless ($s->{type} || '') eq 'http' && ($s->{scheme} || '') eq 'basic';
+      my $denied  = $a->check_op_security('op', {}, { S => sub { 1 } });
+      my $allowed = $a->check_op_security('op', { HTTP_AUTHORIZATION => 'Basic dTpw' }, { S => sub { 1 } });
+      return ($denied && !$allowed) ? 1 : 0;
+  } },
+
+{ id => 'swagger/security/apiKey-query', section => '2.0 Security Scheme Object',
+  requirement => 'apiKey in query is supported',
+  run => sub { loads(op_doc20(securityDefinitions => { S => { type => 'apiKey', name => 'k', in => 'query' } },
+                              security => [ { S => [] } ])) } },
+
+{ id => 'swagger/security/apiKey-header', section => '2.0 Security Scheme Object',
+  requirement => 'apiKey in header is supported',
+  run => sub { loads(op_doc20(securityDefinitions => { S => { type => 'apiKey', name => 'X-K', in => 'header' } },
+                              security => [ { S => [] } ])) } },
+
+{ id => 'swagger/security/apiKey-cookie-refused', section => '2.0 Security Scheme Object',
+  requirement => 'apiKey in: "Valid values are query or header": cookie is refused',
+  run => sub { api_err(op_doc20(securityDefinitions => { S => { type => 'apiKey', name => 'k', in => 'cookie' } },
+                               security => [ { S => [] } ])) =~ /cookie/ ? 1 : 0 } },
+
+{ id => 'swagger/security/apiKey-name-required', section => '2.0 Security Scheme Object',
+  requirement => 'name is REQUIRED for apiKey',
+  run => sub { api_err(op_doc20(securityDefinitions => { S => { type => 'apiKey', in => 'header' } },
+                               security => [ { S => [] } ])) =~ /\bname\b/ ? 1 : 0 } },
+
+{ id => 'swagger/security/scheme-type-unknown', section => '2.0 Security Scheme Object',
+  requirement => 'type "Valid values are basic, apiKey or oauth2": anything else is refused',
+  run => sub { api_err(op_doc20(securityDefinitions => { S => { type => 'digest' } },
+                               security => [ { S => [] } ])) =~ /digest/ ? 1 : 0 } },
+
+{ id => 'swagger/security/oauth2-flow-required', section => '2.0 Security Scheme Object',
+  requirement => 'flow is REQUIRED for oauth2',
+  run => sub { api_err(op_doc20(securityDefinitions => { S => { type => 'oauth2', scopes => {} } },
+                               security => [ { S => [] } ])) =~ /\bflow\b/ ? 1 : 0 } },
+
+{ id => 'swagger/security/oauth2-flow-unknown', section => '2.0 Security Scheme Object',
+  requirement => 'flow "Valid values are implicit, password, application or accessCode"',
+  run => sub { api_err(op_doc20(securityDefinitions => { S => { type => 'oauth2', flow => 'device',
+      tokenUrl => 'https://h.test/t', scopes => {} } }, security => [ { S => [] } ])) =~ /\bflow\b.*device|device.*\bflow\b/ ? 1 : 0 } },
+
+(map {
+    my ($flow, $dest, $fields) = @$_;
+    { id => "swagger/security/oauth2-$flow", section => '2.0 Security Scheme Object',
+      requirement => "oauth2 flow $flow loads and is the 3.x $dest flow",
+      run => sub {
+          my ($a) = api(op_doc20(securityDefinitions => { S => { type => 'oauth2', flow => $flow,
+              scopes => { read => 'r' }, %$fields } }, security => [ { S => ['read'] } ]));
+          return 0 unless $a;
+          my $f = $a->spec->{components}{securitySchemes}{S}{flows} or return 0;
+          return (ref $f eq 'HASH' && exists $f->{$dest} && ref $f->{$dest}{scopes} eq 'HASH') ? 1 : 0;
+      } };
+} (
+    [ 'implicit',    'implicit',          { authorizationUrl => 'https://h.test/a' } ],
+    [ 'password',    'password',          { tokenUrl => 'https://h.test/t' } ],
+    [ 'application', 'clientCredentials', { tokenUrl => 'https://h.test/t' } ],
+    [ 'accessCode',  'authorizationCode', { authorizationUrl => 'https://h.test/a', tokenUrl => 'https://h.test/t' } ],
+)),
+
+(map {
+    my ($flow, $missing, $fields) = @$_;
+    { id => "swagger/security/oauth2-$missing-required-$flow", section => '2.0 Security Scheme Object',
+      requirement => "$missing is REQUIRED for the $flow flow (and the croak names it)",
+      run => sub { api_err(op_doc20(securityDefinitions => { S => { type => 'oauth2', flow => $flow,
+          scopes => {}, %$fields } }, security => [ { S => [] } ])) =~ /\b\Q$missing\E\b/ ? 1 : 0 } };
+} (
+    [ 'implicit',    'authorizationUrl', {} ],
+    [ 'accessCode',  'authorizationUrl', { tokenUrl => 'https://h.test/t' } ],
+    [ 'password',    'tokenUrl',         {} ],
+    [ 'application', 'tokenUrl',         {} ],
+    [ 'accessCode',  'tokenUrl',         { authorizationUrl => 'https://h.test/a' } ],
+)),
+
+{ id => 'swagger/security/oauth2-scopes-required', section => '2.0 Security Scheme Object',
+  requirement => 'scopes is REQUIRED for oauth2',
+  run => sub { api_err(op_doc20(securityDefinitions => { S => { type => 'oauth2', flow => 'implicit',
+      authorizationUrl => 'https://h.test/a' } }, security => [ { S => [] } ])) =~ /scopes/ ? 1 : 0 } },
+
+# ------------------------------------------------------ Security Requirement Object
+
+{ id => 'swagger/security-requirement/scopes-empty-off-oauth2', section => '2.0 Security Requirement Object',
+  requirement => '"For other security scheme types, the array MUST be empty" (and it is refused for THAT reason, not because the scheme was not found)',
+  run => sub {
+      api_err(op_doc20(securityDefinitions => { K => { type => 'apiKey', name => 'k', in => 'header' } },
+                       security => [ { K => ['s1'] } ])) =~ /must be an empty list/ ? 1 : 0;
+  } },
+
+{ id => 'swagger/security-requirement/oauth2-scopes-passed', section => '2.0 Security Requirement Object',
+  requirement => 'for oauth2 "the value is a list of scope names required for the execution", handed to the checker',
+  run => sub {
+      my ($a) = api(op_doc20(securityDefinitions => { S => { type => 'oauth2', flow => 'application',
+          tokenUrl => 'https://h.test/t', scopes => { read => 'r', write => 'w' } } },
+          op_security => [ { S => [ 'read', 'write' ] } ]));
+      return 0 unless $a;
+      my $got;
+      $a->check_op_security('op', { HTTP_AUTHORIZATION => 'Bearer t' },
+                            { S => sub { $got = $_[3]; 1 } });
+      return eq_deeply_ish($got, [ 'read', 'write' ]);
+  } },
+
+{ id => 'swagger/security-requirement/unknown-scheme-refused', section => '2.0 Security Requirement Object',
+  requirement => '"The name used for each property MUST correspond to a security scheme declared in the Security Definitions"',
+  run => sub { api_err(op_doc20(securityDefinitions => { K => { type => 'apiKey', name => 'k', in => 'header' } },
+                               security => [ { Nope => [] } ])) =~ /Nope/ ? 1 : 0 } },
+
+{ id => 'swagger/security-requirement/and-within', section => '2.0 Security Requirement Object',
+  requirement => 'two schemes in ONE requirement object must BOTH be satisfied',
+  run => sub {
+      my ($a) = api(op_doc20(securityDefinitions => {
+              A => { type => 'apiKey', name => 'X-A', in => 'header' },
+              B => { type => 'apiKey', name => 'X-B', in => 'header' } },
+          op_security => [ { A => [], B => [] } ]));
+      return 0 unless $a;
+      my $env  = { HTTP_X_A => 'ka', HTTP_X_B => 'kb' };
+      my $both = $a->check_op_security('op', $env, { A => sub { 1 }, B => sub { 1 } });
+      my $half = $a->check_op_security('op', $env, { A => sub { 1 }, B => sub { 0 } });
+      return (!$both && $half) ? 1 : 0;
+  } },
+
+{ id => 'swagger/security-requirement/or-across', section => '2.0 Security Requirement Object',
+  requirement => '"there is a logical OR between the security requirements"',
+  run => sub {
+      my ($a) = api(op_doc20(securityDefinitions => {
+              A => { type => 'apiKey', name => 'X-A', in => 'header' },
+              B => { type => 'apiKey', name => 'X-B', in => 'header' } },
+          op_security => [ { A => [] }, { B => [] } ]));
+      return 0 unless $a;
+      my $env     = { HTTP_X_A => 'ka', HTTP_X_B => 'kb' };
+      my $second  = $a->check_op_security('op', $env, { A => sub { 0 }, B => sub { 1 } });
+      my $neither = $a->check_op_security('op', $env, { A => sub { 0 }, B => sub { 0 } });
+      return (!$second && $neither) ? 1 : 0;
+  } },
+
+# ------------------------------------------------ the runtime surface, in 2.0 words
+
+{ id => 'swagger/body/json-validated', section => '2.0 Parameter Object (body)',
+  requirement => 'a JSON body is validated against the body parameter schema',
+  run => sub {
+      my ($a) = api(body20({ type => 'object', required => ['a'], properties => { a => { type => 'string' } } }));
+      return 0 unless $a;
+      my ($ok) = req($a, header => $JSON, body => '{}');
+      return $ok ? 0 : 1;
+  } },
+
+{ id => 'swagger/body/415-undeclared-type', section => '2.0 Operation Object (consumes)',
+  requirement => 'a body whose media type is not in consumes is refused',
+  run => sub {
+      my ($a) = api(body20({ type => 'object' }));
+      return 0 unless $a;
+      my ($ok) = req($a, header => { 'content-type' => 'application/xml' }, body => '<a/>');
+      return $ok ? 0 : 1;
+  } },
+
+{ id => 'swagger/body/urlencoded-validated', section => '2.0 Parameter Object (formData)',
+  requirement => 'an application/x-www-form-urlencoded body is validated against the formData parameters',
+  run => sub {
+      my ($a) = api(form20([ { name => 'a', type => 'string', required => \1 } ]));
+      return 0 unless $a;
+      my ($bad)  = req($a, header => $FORM, body => 'nope=1');
+      my ($good) = req($a, header => $FORM, body => 'a=1');
+      return (!$bad && $good) ? 1 : 0;
+  } },
+
+{ id => 'swagger/body/multipart-validated', section => '2.0 Parameter Object (formData)',
+  requirement => 'a multipart/form-data body is validated against the formData parameters',
+  run => sub {
+      my ($a) = api(form20([ { name => 'a', type => 'string', required => \1 } ],
+                           consumes => ['multipart/form-data']));
+      return 0 unless $a;
+      my $mp = { 'content-type' => 'multipart/form-data; boundary=xx' };
+      my ($bad)  = req($a, header => $mp,
+          body => "--xx\r\nContent-Disposition: form-data; name=\"nope\"\r\n\r\n1\r\n--xx--\r\n");
+      my ($good) = req($a, header => $mp,
+          body => "--xx\r\nContent-Disposition: form-data; name=\"a\"\r\n\r\n1\r\n--xx--\r\n");
+      return (!$bad && $good) ? 1 : 0;
+  } },
+
+{ id => 'swagger/body/formdata-type-validated', section => '2.0 Parameter Object (formData)',
+  requirement => 'a formData parameter type is validated',
+  run => sub {
+      my ($a) = api(form20([ { name => 'n', type => 'integer' } ]));
+      return 0 unless $a;
+      my ($bad)  = req($a, header => $FORM, body => 'n=x');
+      my ($good) = req($a, header => $FORM, body => 'n=5');
+      return (!$bad && $good) ? 1 : 0;
+  } },
+
+{ id => 'swagger/body/formdata-needs-form-consumes', section => '2.0 Parameter Object (formData)',
+  requirement => 'a formData parameter under a consumes list with no form type can never be carried and is refused',
+  run => sub { api_err(form20([ { name => 'a', type => 'string' } ], consumes => ['application/json'])) =~ /formData.*consumes|consumes.*formData/i ? 1 : 0 } },
+
+{ id => 'swagger/client/body-json', section => '2.0 Parameter Object (body), client',
+  requirement => 'the client sends a body parameter as application/json when consumes says so',
+  run => sub {
+      my ($a) = api(body20({ type => 'object' }));
+      return 0 unless $a;
+      my $c = eval { Open::API::Client->new(api => $a, base_url => 'http://h.test') };
+      return 0 unless $c;
+      my ($b, $ct) = eval { $c->_request_body('op', { body => { a => 'x' } }) };
+      return (defined $ct && $ct =~ m{^application/json} && defined $b && $b =~ /^\{/) ? 1 : 0;
+  } },
+
+{ id => 'swagger/client/body-form', section => '2.0 Parameter Object (formData), client',
+  requirement => 'the client sends formData as x-www-form-urlencoded, not JSON',
+  run => sub {
+      my ($a) = api(form20([ { name => 'a', type => 'string' } ]));
+      return 0 unless $a;
+      my $c = eval { Open::API::Client->new(api => $a, base_url => 'http://h.test') };
+      return 0 unless $c;
+      my ($b, $ct) = eval { $c->_request_body('op', { body => { a => 'x' } }) };
+      return (defined $ct && $ct =~ m{^application/x-www-form-urlencoded} && defined $b && $b !~ /^\{/) ? 1 : 0;
+  } },
+
+(map {
+    my ($slug, $consumes) = @$_;
+    { id => "swagger/roundtrip/body-$slug", section => '2.0 Parameter Object, client and server',
+      requirement => "a $slug body the client builds from a 2.0 document is accepted and decoded by its server",
+      run => sub {
+          my ($a) = $slug eq 'json'
+              ? api(body20({ type => 'object', required => ['a'],
+                             properties => { a => { type => 'string' }, b => { type => 'string' } } }))
+              : api(form20([ { name => 'a', type => 'string', required => \1 },
+                             { name => 'b', type => 'string' } ], consumes => [ $consumes ]));
+          return 0 unless $a;
+          my $c = eval { Open::API::Client->new(api => $a, base_url => 'http://h.test') };
+          return 0 unless $c;
+          my ($b, $ct) = eval { $c->_request_body('op', { body => { a => 'x', b => 'y' } }) };
+          return 0 unless defined $b && defined $ct;
+          my ($ok, $res) = $a->validate_request(op => { header => { 'content-type' => $ct }, body => $b });
+          return 0 unless $ok;
+          return eq_deeply_ish($res->{body}, { a => 'x', b => 'y' });
+      } };
+} (
+    [ 'json',       'application/json' ],
+    [ 'urlencoded', 'application/x-www-form-urlencoded' ],
+    [ 'multipart',  'multipart/form-data' ],
+)),
+
+
 );
 
 # ---- the expected-fail list -------------------------------------------------
@@ -2632,6 +4451,7 @@ my ($met, $gap, $promote) = (0, 0, 0);
 
 for my $c (@CASES) {
     my $id = $c->{id};
+    local $CURRENT_CASE = $id;
     my $ok = eval { $c->{run}->() ? 1 : 0 };
     my $err = $@;
     if ($err) {
@@ -2693,5 +4513,26 @@ cmp_ok($jss30_n, '>=', 250,
        'the vendored suite also ran as a 3.0/3.1 twin')
     or diag("  the twin is what exercises the 3.0 converter over every "
             . "schema; without it the 3.0 files here test 3.1 only");
+
+my $jss20_n    = grep { $_->{id} =~ m{^jsonschema20/} }    @CASES;
+my $jss20ref_n = grep { $_->{id} =~ m{^jsonschema20ref/} } @CASES;
+my $sw2_n      = grep { $_->{id} =~ m{^swagger2/.*/loads$} } @CASES;
+diag(sprintf("  2.0: %d as a 2.0/3.1 twin, %d behind #/definitions/; skipped: %d not "
+             . "expressible in 2.0 (draft-04 subset), %d where draft-04 ignores "
+             . "\$ref siblings; %d official 2.0 documents vendored",
+             $jss20_n, $jss20ref_n, $JSS_20_SKIPPED, $JSS_20_REFSIB, $sw2_n));
+# Floors for the 2.0 placements and the vendored corpus, set from the counts
+# measured when phase 02 of plan_openapi_v2 wrote them (see 02's Todo), well
+# under the real numbers so an upstream refresh does not break them, and high
+# enough that a missing directory or a broken filter cannot pass in silence.
+cmp_ok($jss20_n, '>=', 150,
+       'the vendored suite also ran as a 2.0/3.1 twin')
+    or diag("  the 2.0 twin is what exercises the pre-pass over every draft-04 schema");
+cmp_ok($jss20ref_n, '>=', 130,
+       'the vendored suite also ran behind #/definitions/')
+    or diag("  this placement is what exercises the 2.0 \$ref rewrite");
+cmp_ok($sw2_n, '>=', 5,
+       'the official 2.0 documents are present and each has its cases')
+    or diag("  t/compliance/swagger2/ is missing or unreadable");
 
 done_testing;

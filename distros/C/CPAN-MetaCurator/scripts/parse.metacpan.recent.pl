@@ -49,11 +49,11 @@ sub process
 		@fields			= split('-', $module);
 
 		pop @fields if ($fields[$#fields] =~ /TRIAL/);
-		pop @fields if ($fields[$#fields] =~ /v?[0-9]/);
+		pop @fields if ($fields[$#fields] =~ /^v?[0-9]/);
 
 		$module	= join('::', @fields);
 
-		print $fh "o $module\n";
+		print $fh "o $module:\n";
 		print $fh "- $description\n";
 		print $fh "- $uri$module\n";
 		print $fh "\n";
@@ -64,6 +64,8 @@ sub process
 } # End of process.
 
 # ----------------------------------------------
+
+say "parse.metacpan.recent.pl - Parse a HTML file from MetaCPAN/recent\n";
 
 my($option_parser) = Getopt::Long::Parser -> new();
 

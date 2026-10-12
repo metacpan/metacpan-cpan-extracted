@@ -4,7 +4,7 @@ BEGIN {
 		use Exporter   ();
 		use vars       qw($VERSION @ISA @EXPORT @EXPORT_OK); #backward compatibility for Perls under 5.6 
 
-		$VERSION     =1.6051;
+		$VERSION     =2.1109;
 		@ISA         = qw(Exporter);
 		@EXPORT      = qw(logger);
 		@EXPORT_OK   = qw($LOGGERLEVEL $WARN2LOGGER);
@@ -23,27 +23,27 @@ BEGIN {
 	my %hLABEL = ( 8 => '8-USER-', 7 => '7-DEBUG', 6 => '6-INFO-' , 5 => '5-PARSE' , 4 => '4-WARN-' , 3 => '3-ALERT' , 2 => '2-ALERT' , 1 => '1-ALERT' , 0 => '0-CRITC' , -1 => '-1 ERROR');
 
 	sub logger($$;$){
-		# APPEL : &logger($messLevel, $logMess[, $MODIFY]);
-		# APPEL : &logger($messLevel, $logMess[, 2]); # increase LOGGERLEVEL
-		# APPEL : &logger($messLevel, $logMess[, Warn]); # set LOGGERLEVEL to Warn
+		# CALL: &logger($messLevel, $logMess[, $MODIFY]);
+		# CALL: &logger($messLevel, $logMess[, 2]); # increase LOGGERLEVEL
+		# CALL: &logger($messLevel, $logMess[, Warn]); # set LOGGERLEVEL to Warn
 
-		# pour logger les erreurs bloquantes tout en utilisant la méthode die :
-		# open (IN, "<$nomfichier") or die &logger($NOK, "impossible d'ouvrir <$nomfichier>");
+		# to log blocking errors while using the die method:
+		# open (IN, "<$nomfichier") or die &logger($NOK, "unable to open <$nomfichier>");
 	
-		# LOGGERLEVEL definit la sensibilite de la log (attention : l\'option MODIFY peut le modifier)
-		# 8-> Debug (all), 7-> Information, 6-> Context, 5-> Suivi/Follow, 4-> Warning, \$NOK-> Error
-		# $. est le numero de ligne courant sur le filehandle courant
-		# $! valeur courante errno
-		# $0 nom du script perl
+		# LOGGERLEVEL defines the log sensitivity (note: the MODIFY option can change it)
+		# 8-> Debug (all), 7-> Information, 6-> Context, 5-> Follow, 4-> Warning, \$NOK-> Error
+		# $. is the current line number on the current filehandle
+		# $! current errno value
+		# $0 perl script name
 
 		my ($messLevel, $logMess, $MODIFY) =@_;
 		my $fileHandle	=0;
 		#my $FD=$!;
 		#$FD =~s/(Bad)\s(file\sdescriptor)/$1 or No $2/io;
-		$MODIFY	//=0;   # valeur  par defaut, à partir de la 5.10 //= remplace ||= 
+		$MODIFY	//=0;   # default value, from 5.10 //= replaces ||= 
 		$logMess//="";
 		chomp ($logMess);
-		my $now =strftime "%Y-%m-%d %H:%M:%S", localtime; # %j quantieme ?
+		my $now =strftime "%Y-%m-%d %H:%M:%S", localtime; # %j day of year?
 
 		#warn  "LOGGER - MODIFY $MODIFY - @{[%hLEVEL]} => Dump : ". Dumper \%hLEVEL;
 		# PID :

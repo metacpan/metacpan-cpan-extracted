@@ -5,6 +5,7 @@ use Socket qw(inet_aton pack_sockaddr_in);
 use Test2::V0;
 
 use Unblock::HTTP3::Connection;
+use Unblock::HTTP3::Server;
 use Uniform::HTTP::Request;
 use Uniform::HTTP::Response;
 use Unblock::HTTP3::Transaction;
@@ -17,7 +18,7 @@ my $endpoint = Net::QUIC::Endpoint->client(
     server_name => 'localhost',
 );
 
-my $h3 = Unblock::HTTP3::Connection->server(
+my $h3 = Unblock::HTTP3::Server->new(
     quic => $endpoint->connection,
 );
 
@@ -87,7 +88,7 @@ for my $case (
     $tx->response->body('not allowed');
 
     like(
-        dies { $tx->send_response },
+        dies { $tx->respond($tx->response) },
         qr/must not contain content/,
         "$label rejects a buffered response body",
     );
@@ -100,7 +101,7 @@ my $trailer_tx = make_tx(
 $trailer_tx->response->add_trailer('x-test', 'not-allowed');
 
 like(
-    dies { $trailer_tx->send_response },
+    dies { $trailer_tx->respond($trailer_tx->response) },
     qr/must not contain content/,
     'bodyless response semantics reject trailers',
 );

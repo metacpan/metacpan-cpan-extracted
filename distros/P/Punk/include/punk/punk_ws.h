@@ -146,6 +146,8 @@ static int pw_decode_frame(const char *buf, size_t len, pw_frame *f,
         if (len < 4) return PW_NEED_MORE;
         plen = ((uint64_t)(unsigned char)buf[2] << 8)
              |  (uint64_t)(unsigned char)buf[3];
+        /* the minimal encoding and no other (RFC 6455 5.2) */
+        if (plen < 126) return PW_E_PROTO;
         need = 4;
     }
     else if (plen == 127) {
@@ -154,6 +156,7 @@ static int pw_decode_frame(const char *buf, size_t len, pw_frame *f,
         for (i = 0; i < 8; i++)
             plen = (plen << 8) | (uint64_t)(unsigned char)buf[2 + i];
         if (plen & ((uint64_t)1 << 63)) return PW_E_PROTO;   /* MSB set */
+        if (plen <= 0xFFFF) return PW_E_PROTO;               /* not minimal */
         need = 10;
     }
 

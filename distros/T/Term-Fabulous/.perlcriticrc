@@ -1,0 +1,41 @@
+# perlcritic configuration for Term::Fabulous
+#
+#   perlcritic lib t examples tools
+
+severity = 4
+verbose  = %f:%l:%c: %m (%p, severity %s)\n
+
+# --- Policies that misread Object::Pad or signatures ---------------------
+
+# PPI does not see the "1;" after a class block.
+[-Modules::RequireEndWithOne]
+
+# Object::Pad methods named open, close or select are not the builtins.
+[-InputOutput::ProhibitTwoArgOpen]
+[-InputOutput::ProhibitOneArgSelect]
+[-Subroutines::ProhibitBuiltinHomonyms]
+
+# Every module turns off the signatures warning on perls before 5.36, and
+# the screenshot harness replaces core functions.
+[TestingAndDebugging::ProhibitNoWarnings]
+allow = experimental::signatures redefine once
+
+# --- Project idioms --------------------------------------------------------
+
+# Accessors and lookups return undef for "no value", called in scalar context.
+[-Subroutines::ProhibitExplicitReturnUndef]
+
+# use constant is the project's way to declare constants.
+[-ValuesAndExpressions::ProhibitConstantPragma]
+
+# Test and example scripts run in main without a package statement.
+[-Modules::RequireExplicitPackage]
+
+# Tests pin $ENV{TZ}, Term::Fabulous installs and restores signal handlers,
+# and examples register an inline class in %INC.
+[Variables::RequireLocalizedPunctuationVars]
+allow = %ENV %SIG %INC
+
+# PPI reads "map { { %$_, key => ... } }" as comma separated statements.
+[ValuesAndExpressions::ProhibitCommaSeparatedStatements]
+allow_last_statement_to_be_comma_separated_in_map_and_grep = 1

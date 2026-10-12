@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.55';
+our $VERSION = '0.57';
 
 # The runtime cost. Deliberately a package variable so a test suite can
 # `local $Punk::Auth::Password::ITERATIONS = 1_000;` and stay fast; the
@@ -59,13 +59,19 @@ Every function is also callable as a class method
 =head2 hash($plain, $iterations?)
 
 The stored string. Cost is the explicit argument, else the localizable
-C<$Punk::Auth::Password::ITERATIONS> (default 60_000).
+C<$Punk::Auth::Password::ITERATIONS> (default 60_000). It must be between
+1_000 and 10_000_000, or C<hash> croaks.
 
 =head2 verify($plain, $stored)
 
 True when the password matches. Constant-time over the derived key; an
 unparseable or undef stored value is simply false, so a user row with no
 password (an invited or federated-only account) can be handed straight in.
+
+A stored string does not get to choose its own cost. One whose iteration
+count is outside 1_000 to 10_000_000, or whose key is not 32 bytes, does not
+parse: whoever can write the column cannot downgrade a hash to one iteration
+or make a login run for hours.
 
 =head2 needs_rehash($stored, $iterations?)
 

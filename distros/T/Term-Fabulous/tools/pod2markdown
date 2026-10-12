@@ -1,0 +1,412 @@
+#!/usr/bin/env perl
+# Converts the documentation of Term::Fabulous into Markdown: README.md
+# from lib/Term/Fabulous.pm, and a page in docs/ for every other module
+# and pod file under lib/.
+#
+# Pod::Markdown with five changes: links between the pages of this
+# distribution point to their Markdown files, images in html blocks
+# point to their raw files in the master branch on GitHub, the
+# indentation that all lines of a verbatim block share is removed, each
+# verbatim block is fenced with the language set by the last
+# '=for highlighter' paragraph, and tables in 'text' blocks become
+# Markdown tables.
+#
+# Copyright (C) 2026 davenonymous.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the same terms as Perl itself.
+use v5.32;
+use warnings;
+use feature qw(signatures);
+no warnings qw(experimental::signatures);
+
+use File::Find qw(find);
+use File::Path qw(make_path);
+use File::Basename qw(dirname);
+use Getopt::Long qw(GetOptions);
+use Pod::Usage qw(pod2usage);
+
+use constant {
+	MAIN_POD_FILE  => 'lib/Term/Fabulous.pm',
+	README_FILE    => 'README.md',
+	DOCS_DIRECTORY => 'docs',
+};
+
+package My::Pod::Markdown {
+	use parent 'Pod::Markdown';
+	use feature qw(signatures);
+	no warnings qw(experimental::signatures);
+
+	use File::Basename qw(dirname);
+	use File::Spec;
+
+	use constant DEFAULT_LANGUAGE => 'perl';
+
+	# The pod points to the images at the tag of the release, which does
+	# not exist before the release; the Markdown files on GitHub show the
+	# images of the master branch instead.
+	use constant IMAGE_URL_BASE => 'https://raw.githubusercontent.com/davenonymous/perl-term-fabulous';
+
+	# Only README.md is shipped; on MetaCPAN its links to the pages in
+	# docs/ work only as links to GitHub.
+	use constant SHIPPED_MARKDOWN_FILE => 'README.md';
+	use constant MARKDOWN_URL_BASE     => 'https://github.com/davenonymous/perl-term-fabulous/blob/master';
+
+	die "Pod::Markdown has no _indent_verbatim(); this script needs an update\n"
+		unless Pod::Markdown->can('_indent_verbatim');
+
+	# $markdownFile is the file being written; %$markdownFiles maps the
+	# module names of the local pages to their Markdown files.
+	sub new( $class, $markdownFile, $markdownFiles ) {
+		my $self = $class->SUPER::new( output_encoding => 'UTF-8' );
+		$self->accept_targets('highlighter');
+		$self->{highlighterLanguage} = DEFAULT_LANGUAGE;
+		$self->{markdownFile}        = $markdownFile;
+		$self->{markdownDirectory}   = dirname($markdownFile);
+		$self->{markdownFiles}       = $markdownFiles;
+		return $self;
+	}
+
+	# Links to a local page point to its Markdown file, with a fragment
+	# as GitHub creates it: relative to the file being written, or on
+	# GitHub when the file is shipped and the page is not.
+	sub format_perldoc_url( $self, $name, $section ) {
+		my $target = defined $name ? $self->{markdownFiles}{$name} : undef;
+		return $self->SUPER::format_perldoc_url( $name, $section ) unless defined $target;
+
+		my $linksToUnshippedPage = $self->{markdownFile} eq SHIPPED_MARKDOWN_FILE && $target ne SHIPPED_MARKDOWN_FILE;
+		my $url
+			= $linksToUnshippedPage
+			? MARKDOWN_URL_BASE . "/$target"
+			: File::Spec::Unix->abs2rel( $target, $self->{markdownDirectory} );
+		$url .= '#' . $self->format_fragment_markdown($section) if defined $section && length $section;
+		return $url;
+	}
+
+	# '=for highlighter language=NAME' (or just NAME) sets the language
+	# of the following verbatim blocks, as on MetaCPAN. Its text is
+	# collected here instead of being written to the output.
+	sub start_for( $self, $attr ) {
+		$self->{inHtmlBlock} = 1 if $attr->{target} eq 'html';
+		return $self->SUPER::start_for($attr) unless $attr->{target} eq 'highlighter';
+		$self->{highlighterText} = '';
+		return;
+	}
+
+	sub end_for( $self, @args ) {
+		delete $self->{inHtmlBlock};
+		return $self->SUPER::end_for(@args) unless defined $self->{highlighterText};
+		my $setting = delete $self->{highlighterText};
+		my ($language) = $setting =~ /\A\s*(?:language=)?([\w+#-]+)\s*\z/
+			or die "invalid '=for highlighter' setting '$setting'\n";
+		$self->{highlighterLanguage} = $language;
+		return;
+	}
+
+	sub start_Data( $self, @args ) {
+		return if defined $self->{highlighterText};
+		return $self->SUPER::start_Data(@args);
+	}
+
+	sub end_Data( $self, @args ) {
+		return if defined $self->{highlighterText};
+		return $self->SUPER::end_Data(@args);
+	}
+
+	sub handle_text( $self, $text ) {
+		if ( defined $self->{highlighterText} ) {
+			$self->{highlighterText} .= $text;
+			return;
+		}
+		$text = masterImageUrls($text) if $self->{inHtmlBlock};
+		return $self->SUPER::handle_text($text);
+	}
+
+	# An image URL at a tag, such as IMAGE_URL_BASE/v0.01/screenshots/NAME.svg,
+	# becomes the URL of the same file in the master branch.
+	sub masterImageUrls($html) {
+		$html =~ s{(<img\b[^>]*?\bsrc="\Q@{[IMAGE_URL_BASE]}\E/)[^"/]+/}{$1master/}g;
+		return $html;
+	}
+
+	# A fenced block without the indentation its lines share. In a text
+	# block, every table (see markdownTable) becomes a Markdown table.
+	sub _indent_verbatim( $self, $paragraph ) {
+		my @lines    = split /\n/, $paragraph;
+		my ($indent) = sort { $a <=> $b } map { /\A( *)/; length $1 } grep { /\S/ } @lines;
+		$indent //= 0;
+		my $code = join "\n", map { length > $indent ? substr( $_, $indent ) : '' } @lines;
+		return "```$self->{highlighterLanguage}\n$code\n```" unless $self->{highlighterLanguage} eq 'text';
+
+		my @parts = map { isTable($_) ? markdownTable( withoutEscapes($_) ) : "```text\n$_\n```" } split /\n\s*\n/, $code;
+		return join "\n\n", @parts;
+	}
+
+	# Pod::Markdown escapes every '<' and '&' of a verbatim block as
+	# "\0c<\0" and "\0c&\0" until the document is complete; a table needs
+	# the plain text to find its columns.
+	sub withoutEscapes($text) {
+		return $text =~ s/\0c?([&<])\0/$1/gr;
+	}
+
+	# A table is a header line followed by a line of dash runs, one run
+	# per column, separated by spaces.
+	sub isTable($text) {
+		my @lines = split /\n/, $text;
+		return @lines >= 3 && $lines[1] =~ /\A-+(?: +-+)*\z/;
+	}
+
+	# Each cell is the text above or below its column's dash run; text
+	# outside the runs is an error. Columns whose cells are all numbers
+	# are right-aligned. Identifiers and single punctuation characters in
+	# the first column become code; '&' and '<' in other cells become
+	# entities.
+	sub markdownTable($text) {
+		my ( $header, $dashes, @rows ) = split /\n/, $text;
+		my @spans;
+		while ( $dashes =~ /(-+)/g ) {
+			push @spans, [ $-[1], $+[1] - $-[1] ];
+		}
+		my @table   = map { tableCells( $_, \@spans ) } $header, @rows;
+		my @numeric = map {
+			my $column = $_;
+			!grep { $_->[$column] !~ /\A[0-9.]+\z/ } @table[ 1 .. $#table ];
+		} 0 .. $#spans;
+		foreach my $row ( @table[ 1 .. $#table ] ) {
+			$row->[0] = join ', ', map { "`$_`" } split /, /, $row->[0]
+				if $row->[0] =~ /\A(?:[a-z_]+(?:, [a-z_]+)*|[[:punct:]])\z/;
+		}
+
+		foreach my $row (@table) {
+			foreach my $cell ( $row->@* ) {
+				$cell =~ s/&/&amp;/g, $cell =~ s/</&lt;/g unless $cell =~ /\A`/;
+				$cell =~ s/\|/\\|/g;
+			}
+		}
+		my @widths = map {
+			my $column   = $_;
+			my ($widest) = sort { $b <=> $a } 3, map { length $_->[$column] } @table;
+			$widest;
+		} 0 .. $#spans;
+
+		my @markdown = (
+			tableRow( $table[0],                                                                                   \@widths, \@numeric ),
+			tableRow( [ map { $numeric[$_] ? '-' x ( $widths[$_] - 1 ) . ':' : '-' x $widths[$_] } 0 .. $#spans ], \@widths, [] ),
+			map { tableRow( $_, \@widths, \@numeric ) } @table[ 1 .. $#table ],
+		);
+		return join "\n", @markdown;
+	}
+
+	sub tableCells( $line, $spans ) {
+		my $outside = $line;
+		my @cells;
+		foreach my $span ( $spans->@* ) {
+			my ( $start, $length ) = $span->@*;
+			my $cell = length $line > $start ? substr( $line, $start, $length ) : '';
+			substr( $outside, $start, $length ) = ' ' x $length if length $outside > $start;
+			$cell =~ s/\A\s+|\s+\z//g;
+			push @cells, $cell;
+		}
+		die "table text outside the columns: '$line'\n" if $outside =~ /\S/;
+		return \@cells;
+	}
+
+	# One table row with every cell padded to its column's width, so that
+	# the columns line up in the Markdown source too. Cells of
+	# right-aligned columns, header included, are padded on the left.
+	sub tableRow( $cells, $widths, $rightAligned ) {
+		my @padded = map {
+			my $padding = ' ' x ( $widths->[$_] - length $cells->[$_] );
+			$rightAligned->[$_] ? $padding . $cells->[$_] : $cells->[$_] . $padding;
+		} 0 .. $#$cells;
+		return '| ' . join( ' | ', @padded ) . ' |';
+	}
+}
+
+package main;    ## no critic (Modules::ProhibitMultiplePackages) the script after its Pod::Markdown subclass
+
+my %options;
+GetOptions( \%options, 'check', 'help' )
+	or pod2usage(2);
+pod2usage(1) if $options{help};
+pod2usage('no arguments expected') if @ARGV;
+
+my @pages         = documentationPages();
+my %markdownFiles = map { $_->[0] => $_->[2] } @pages;
+my $outdated      = 0;
+foreach my $page (@pages) {
+	my ( undef, $podFile, $markdownFile ) = $page->@*;
+	$outdated += storeMarkdown( convert( $podFile, $markdownFile, \%markdownFiles ), $markdownFile, $options{check} );
+}
+my %isPageFile = map { $_ => 1 } values %markdownFiles;
+$outdated += removeMarkdown( $_, $options{check} ) foreach grep { !$isPageFile{$_} } existingDocsFiles();
+exit( $options{check} && $outdated ? 1 : 0 );
+
+# Every page: its module name, its pod file and its Markdown file, all
+# paths relative to the top directory of the distribution. The pod of
+# lib/Term/Fabulous.pm becomes README.md, that of lib/NAME.pm or
+# lib/NAME.pod becomes docs/NAME.md.
+sub documentationPages() {
+	my @podFiles;
+	find( { no_chdir => 1, wanted => sub { push @podFiles, $_ if /\.(?:pm|pod)\z/ } }, 'lib' );
+	die "no pod files found in lib/; run this from the top directory of the distribution\n"
+		unless grep { $_ eq MAIN_POD_FILE } @podFiles;
+
+	return map {
+		my ($path) = m{\Alib/(.+)\.(?:pm|pod)\z};
+		my $markdownFile = $_ eq MAIN_POD_FILE ? README_FILE : DOCS_DIRECTORY . "/$path.md";
+		[ $path =~ s{/}{::}gr, $_, $markdownFile ];
+	} sort @podFiles;
+}
+
+sub existingDocsFiles() {
+	return () unless -d DOCS_DIRECTORY;
+	my @files;
+	find( { no_chdir => 1, wanted => sub { push @files, $_ if -f } }, DOCS_DIRECTORY );
+	my @sorted = sort @files;
+	return @sorted;
+}
+
+sub convert( $podFile, $markdownFile, $markdownFiles ) {
+	my $markdown = '';
+	my $parser   = My::Pod::Markdown->new( $markdownFile, $markdownFiles );
+	$parser->output_string( \$markdown );
+	$parser->parse_file($podFile);
+	die "$podFile: no pod found\n" unless length $markdown;
+	return $markdown;
+}
+
+# Writes the Markdown unless the file already holds it. Returns 1 when
+# the file was (or, with --check, would be) changed.
+sub storeMarkdown( $markdown, $file, $checkOnly ) {
+	my $current = '';
+	if ( open( my $in, '<:raw', $file ) ) {
+		local $/;
+		$current = <$in>;
+		close($in);
+	}
+	return 0 if $current eq $markdown;
+
+	if ($checkOnly) {
+		say "out of date: $file";
+		return 1;
+	}
+	make_path( dirname($file) );
+	open( my $out, '>:raw', $file ) or die "cannot write $file: $!\n";
+	print {$out} $markdown;
+	close($out) or die "cannot write $file: $!\n";
+	say "wrote $file";
+	return 1;
+}
+
+# Removes a file in docs/ that no pod file produces any more. Returns 1.
+sub removeMarkdown( $file, $checkOnly ) {
+	if ($checkOnly) {
+		say "no pod file for: $file";
+		return 1;
+	}
+	unlink($file) or die "cannot remove $file: $!\n";
+	say "removed $file";
+	return 1;
+}
+
+__END__
+
+=head1 NAME
+
+pod2markdown - convert the Term::Fabulous documentation into Markdown
+
+=head1 SYNOPSIS
+
+  perl tools/pod2markdown [--check]
+
+=head1 DESCRIPTION
+
+Converts the pod of every module and pod file under F<lib> into
+Markdown, run from the top directory of the distribution:
+
+  lib/Term/Fabulous.pm                   -> README.md
+  lib/Term/Fabulous/Widget/Box.pm        -> docs/Term/Fabulous/Widget/Box.md
+  lib/Term/Fabulous/Manual/Layout.pod    -> docs/Term/Fabulous/Manual/Layout.md
+
+and so on for every other file. Files whose content would not change
+are left alone, and files in F<docs> that no pod file produces any more
+are removed. The conversion is done by L<Pod::Markdown>, with five
+changes:
+
+=over
+
+=item *
+
+A link to one of these pages, such as
+C<< LE<lt>Term::Fabulous::Manual::Layout/SizingE<gt> >>, points to its
+Markdown file, relative to the file that contains the link, for example
+C<docs/Term/Fabulous/Manual/Layout.md#sizing>. Only F<README.md> is
+shipped with the distribution, so its links to the pages in F<docs>
+point to the files in the C<master> branch on GitHub instead, for
+example
+C<https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Manual/Layout.md#sizing>;
+MetaCPAN shows F<README.md> too. Other links point to MetaCPAN as
+usual.
+
+=item *
+
+In an C<html> block, an image URL of a raw file on GitHub at a tag,
+such as
+C<https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.01/screenshots/overview.svg>,
+becomes the URL of the same file in the C<master> branch, for example
+C<https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/master/screenshots/overview.svg>.
+The pod points to the tag of the release, because MetaCPAN shows images
+with relative paths as gray placeholders, but that tag does not exist
+on GitHub before the release. F<tools/update-docs> keeps the tag in the
+pod up to date.
+
+=item *
+
+The indentation that all lines of a verbatim block share is removed, so
+the code starts at the left edge of the Markdown code block.
+
+=item *
+
+Each verbatim block is fenced with a language name for syntax
+highlighting. A paragraph
+
+  =for highlighter language=sh
+
+sets the language of all following verbatim blocks of the page, until
+the next such paragraph; C<=for highlighter sh> works too. This is the
+marker MetaCPAN uses for its own highlighting. Blocks before the first
+marker are C<perl>.
+
+=item *
+
+In a C<text> block, every table becomes a Markdown table. A table is a
+group of lines without blank lines between them: a header line, a line
+of dash runs separated by spaces, one run per column, and the rows. The
+text of each cell must lie within the width of its column's dash run;
+otherwise the script stops with an error. Columns that hold only
+numbers are right-aligned, and identifiers such as option names and
+single punctuation characters in the first column are formatted as
+code. Every cell is padded to the width of its column, so the columns
+also line up in the Markdown source. Other groups of lines in the block
+stay a C<text> code block.
+
+  Key     Default
+  ------  -------
+  width   fit
+  wrap    words
+
+=back
+
+=head1 OPTIONS
+
+=over
+
+=item --check
+
+Write nothing; list the Markdown files that are out of date or would be
+removed and exit with status 1 if there are any.
+
+=back
+
+=cut

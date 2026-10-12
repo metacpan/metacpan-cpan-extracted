@@ -17,6 +17,12 @@
       "directory" : [
          "t",
          "inc"
+      ],
+      "namespace" : [
+         "Log::Abstraction::Backend"
+      ],
+      "package" : [
+         "Log::Abstraction::Backend"
       ]
    },
    "prereqs" : {
@@ -54,13 +60,15 @@
             "Email::Sender::Simple" : "0",
             "Email::Sender::Transport::SMTP" : "0",
             "Email::Simple" : "0",
-            "Log::Any" : "0"
+            "Log::Any" : "0",
+            "Log::Dispatch" : "0"
          },
          "requires" : {
             "Carp" : "0",
             "Config::Abstraction" : "0.4",
             "ExtUtils::MakeMaker" : "6.64",
             "File::Basename" : "0",
+            "IO::Handle" : "0",
             "IPC::System::Simple" : "0",
             "JSON::PP" : "0",
             "Log::Log4perl" : "0",
@@ -76,7 +84,8 @@
             "Time::HiRes" : "0",
             "Time::Local" : "0",
             "autodie" : "0",
-            "perl" : "5.014"
+            "parent" : "0",
+            "perl" : "5.026"
          }
       },
       "test" : {
@@ -113,6 +122,6 @@
          "x_repository" : "https://github.com/nigelhorne/Log-Abstraction"
       }
    },
-   "version" : "0.39",
+   "version" : "0.40",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

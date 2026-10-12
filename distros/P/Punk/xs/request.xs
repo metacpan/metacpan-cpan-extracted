@@ -258,6 +258,10 @@ form(self)
                 const char *boundary = pq_hdr_param(cts, cl, "boundary", &boundl);
                 HV *uploads = newHV();
                 built = newHV();
+                /* mortal across the walk, which croaks at the ceiling: the
+                 * parts read by then would otherwise be nobody's */
+                sv_2mortal((SV *)uploads);
+                sv_2mortal((SV *)built);
                 if (boundary && boundl) {
                     /* Streamed off psgi.input rather than slurped through
                      * ->body.
@@ -294,6 +298,8 @@ form(self)
                         (void)PerlIO_seek(fp, 0, SEEK_SET);
                     }
                 }
+                SvREFCNT_inc_simple_void_NN((SV *)uploads);
+                SvREFCNT_inc_simple_void_NN((SV *)built);
                 (void)pq_cached(aTHX_ req, PQ_UPLOADS, uploads);
             }
             else built = newHV();

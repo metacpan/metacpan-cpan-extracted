@@ -16,7 +16,7 @@ use oEdtk::TexDoc;
 
 use Exporter;
 
-our $VERSION	= 1.5041;
+our $VERSION	= 2.1109;
 our @ISA		= qw(Exporter);
 our @EXPORT_OK	= qw(
 	oe_status_to_msg
@@ -59,7 +59,7 @@ sub oe_cmd_run_bg($$) {
 			if ($? != 0) {
 				my $msg = oe_status_to_msg($?);
 				warn "INFO : LaTex process exited prematurely : $msg\n";
-				die  "ERROR: LaTeX process exited prematurely : $msg\n"; ##### xxxxxx capture des die par le tracker ...
+				die  "ERROR: LaTeX process exited prematurely : $msg\n"; ##### xxxxxx capture of die events by the tracker ...
 			}
 			$$ref = 0;
 		}
@@ -111,7 +111,7 @@ sub oe_compo_run($;$) {
 		$exe = $cfg->{'EDTK_COMPO_CMD_PDF'};
 	}
 
-	# XXXXXXXXXXXXX  C'EST ICI QU'ON CHANGE LE MODE D'EXECUTION EN MODE INCLUDE
+	# XXXXXXXXXXXXX  THIS IS WHERE WE SWITCH THE EXECUTION MODE TO INCLUDE MODE
 	# Usage: pdftex [OPTION]... [TEXNAME[.tex]] [COMMANDS]
 	#    or: pdftex [OPTION]... \FIRST-LINE
 	#    or: pdftex [OPTION]... &FMT ARGS
@@ -132,7 +132,7 @@ sub oe_compo_run($;$) {
 
 	my $param;
 	# if (defined $cfg->{'EDTK_COMPO_INCLUDE'} && $cfg->{'EDTK_COMPO_INCLUDE'}=~/yes/i) {
-	# 	# NE FONCTIONNE PAS, À REVOIR EN FONCTION DE pdftex --help
+	# 	# DOES NOT WORK, REVIEW ACCORDING TO pdftex --help
 	# 	$param = "./$app." . $cfg->{'EDTK_EXT_WORK'};
 	# } else { 
 		$param = $cfg->{'EDTK_DIR_SCRIPT'} . "/$app." . $cfg->{'EDTK_EXT_COMPO'}; 
@@ -321,10 +321,10 @@ sub oe_csv_to_doc($$) {
 sub oe_outmngr_output_run_tex($;$) {
 	my ($filter, $type) = @_;
 
-# Avec la distinction aplication de mise en forme et traitement de lotissement, le test suivant n'a plus de sens
+# With the distinction between composition applications and batching processing, the following test no longer makes sense
 #	if ($type !~ /[MTD]/) {
-#		# oe_outmngr_output_run : on ne passe dans index_output qu'en cas de Mass, Debug ou Test de lotissement
-#		warn "INFO : traitement OM '$type' -> lotissement suspendu\n";
+#		# oe_outmngr_output_run: we only go through index_output for Mass, Debug or batching Test
+#		warn "INFO : OM processing '$type' -> batching suspended\n";
 #		return 1;
 #	}
 
@@ -332,7 +332,7 @@ sub oe_outmngr_output_run_tex($;$) {
 	my $type_env= $cfg->{'EDTK_TYPE_ENV'};
 	my $basedir = $cfg->{'EDTK_DIR_OUTMNGR'};
 
-	warn "INFO : Appel omgr_export\n";
+	warn "INFO : Calling omgr_export\n";
 	my @lots = omgr_export(%$filter);
 
 	foreach (@lots) {
@@ -342,7 +342,7 @@ sub oe_outmngr_output_run_tex($;$) {
 		chdir($lotdir) or die "Cannot change directory to \"$lotdir\": $!\n";
 		warn "INFO : Preparing job ticket $lot for compo (doclibs = @doclibs)\n";
 
-		# Création du flux intermédiaire.
+		# Create the intermediate stream.
 		my $doc = oEdtk::TexDoc->new;
 		$doc->append(oe_csv_to_doc("$lot.job", 'edStartPg'));
 
@@ -383,8 +383,8 @@ sub oe_outmngr_output_run_tex($;$) {
 		my ($lot) = @$_;
 
 		print "$basedir/$lot.zip\n";
-		if ($type_env !~ /^De/i) { # on ne la fait pas pour les environnements de Dev ou Debug
-			warn "INFO : suppression des fichiers intermediaires ($type_env)\n";
+		if ($type_env !~ /^De/i) { # not done for the Dev or Debug environments
+			warn "INFO : removing intermediate files ($type_env)\n";
 			rmtree("$basedir/$lot");
 		}
 	}

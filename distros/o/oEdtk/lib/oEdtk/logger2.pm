@@ -14,21 +14,21 @@ BEGIN {
 		use Data::Dumper qw(Dumper);
 		use POSIX qw(strftime);
 
-		#réinitialiser $! à une valeur "propre" ou "neutre" qui dépend de la plate-forme
+		#reset $! to a "clean" or "neutral" value that depends on the platform
 		use IO::Handle;
-		STDERR->clearerr();  # Réinitialiser $! pour le gestionnaire STDERR
+		STDERR->clearerr();  # Reset $! for the STDERR handler
 	}
 
-#utilisation :
+#usage:
 #use logger qw(:DEFAULT);
 # logger (_LEVEL_, "message");
 
 {
 	our $LOGGERLEVEL = 1;
 	our $WARN2LOGGER = 0;
-	*LOGGER_OUT = *STDERR; # raison qui empêche la remontée des messages dans le tracking ?
+	*LOGGER_OUT = *STDERR; # why messages don't bubble up into tracking?
 
-	use constant _LEVEL_	=> -2; # en cas de mauvaise usage
+	use constant _LEVEL_	=> -2; # in case of misuse
 	use constant _HELP_		=> -2;
 	use constant _FAIL_		=> -1;
 	use constant _SUCCESS_	=> 0;
@@ -76,13 +76,13 @@ BEGIN {
 	sub logger(@){
 		my ($messLevel, $logMess, $modifier, @rcLogger) = @_;
 
-		# Normalisation : lettre -> niveau entier
+		# Normalization: letter -> integer level
 		if (defined $messLevel && $messLevel =~ /^([A-Z])$/i) {
 			my $key = uc($messLevel);
 			if (exists $hLETTER_LEVEL{$key}) {
 				$messLevel = $hLETTER_LEVEL{$key};
 			} else {
-				$messLevel = _LEVEL_; # niveau "mauvais usage"
+				$messLevel = _LEVEL_; # misuse level
 				logger_help(0);
 			}
 		}
@@ -92,12 +92,12 @@ BEGIN {
 		}
 		$LOGGERLEVEL = ($modifier || $LOGGERLEVEL);
 
-		# SI LE MESSAGE EST EN DEHORS DES LIMITES DEFINIES, ON NE PERD PAS DE TEMPS ON SORT
+		# IF THE MESSAGE IS OUTSIDE THE DEFINED LIMITS, WE DON'T WASTE TIME, WE EXIT
 		if ($messLevel > $LOGGERLEVEL && $messLevel ne _FAIL_) {
 			return $messLevel;
 
-		# SI LE MESSAGE EST UN FAIL ET QU'IL N'Y A PAS DE CODE RETOUR STANDARD, ON AFFECTE 
-		#  LE CODE 41 UNKNOWN ERROR 41
+		# IF THE MESSAGE IS A FAIL AND THERE IS NO STANDARD RETURN CODE, WE SET 
+		#  THE CODE 41 UNKNOWN ERROR 41
 		} elsif ($messLevel == _FAIL_){
 			if (!($!)) {
 				$! = 41;
@@ -125,7 +125,7 @@ BEGIN {
 		}
 
 		if ($messLevel == _FAIL_) {
-			# Pour die : on retourne UNE chaîne qui contient tout
+			# For die: we return a single string that contains everything
 			return wantarray ? @rcLogger : join('', @rcLogger);
 		}
 
@@ -170,11 +170,11 @@ EOF
 		print  "LIST OF APPLICATION RETURN CODES :\n";
 		printf("%0.3d: %s, %s\n", _SUCCESS_, $label_LEVEL[_SUCCESS_], "$PROG success" );
 		for ($! = 1; $! <= 133; $!++) {
-			# LES ERREURS DU SYSTEM
-			#$. est le numero de ligne courant sur le filehandle courant
-			#$! valeur courante errno
-			#$@ derniere erreur cpaturee par eval
-			#$0 nom du script perl
+			# SYSTEM ERRORS
+			#$. is the current line number on the current filehandle
+			#$! current errno value
+			#$@ last error captured by eval
+			#$0 perl script name
 			printf("%0.3d: %s\n", $!, $! );
 		}
 	}

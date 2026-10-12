@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.8.0] - 2026-10-11
+
+### Fixed
+- HTTP::Tiny user agent now retries on DPoP nonce mismatches and captures nonce headers case-insensitively.
+- `resume` now refreshes an expired OAuth (DPoP) access token even when the refresh token is opaque and clears the session if refresh fails instead of leaving an expired session in place.
+
 ## [v1.7.0] - 2026-10-11
 
 ### Changed
@@ -183,7 +189,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Original version.
 
-[Unreleased]: https://github.com/sanko/At.pm/compare/v1.7.0...HEAD
+[Unreleased]: https://github.com/sanko/At.pm/compare/v1.8.0...HEAD
+[v1.8.0]: https://github.com/sanko/At.pm/compare/v1.7.0...v1.8.0
 [v1.7.0]: https://github.com/sanko/At.pm/compare/1.6...v1.7.0
 [1.6]: https://github.com/sanko/At.pm/compare/1.5...1.6
 [1.5]: https://github.com/sanko/At.pm/compare/1.4...1.5

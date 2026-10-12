@@ -1,0 +1,28 @@
+Changes
+bin/game
+MANIFEST
+Makefile.PL
+README
+ignore.txt
+lib/Game/Terminal.pm
+lib/Game/Terminal/Menu.pm
+t/00-load.t
+t/01-roster.t
+t/02-find.t
+t/03-no-io.t
+t/04-installed.t
+t/05-launch.t
+t/06-keys.t
+t/07-menu.t
+t/08-bin-game.t
+t/09-configure.t
+t/lib/Game/Checkers/Terminal.pm
+t/lib/Game/Fake/Terminal.pm
+t/lib/Game/Terminal/Test/Handle.pm
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/all-games.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

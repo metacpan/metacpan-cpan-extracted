@@ -6,6 +6,7 @@ use FindBin ();
 use lib "$FindBin::Bin/lib";
 use Test::More;
 use IO::Socket::INET;
+use IO::Select;
 use Time::HiRes ();
 use PunkWSRef qw(encode_client decode_ref handshake_request);
 
@@ -57,7 +58,22 @@ if (!$pid) {
             # prove the connections really spread across the pool
             $_[0]->send("worker:$$");
         });
-        $ws->on(message => sub { $room->broadcast("said:$_[1]") });
+        $ws->on(message => sub {
+            my ($conn, $msg) = @_;
+            # everyone but the sender: the usual chat broadcast
+            return $room->broadcast("only:$1", $conn) if $msg =~ /^except:(.*)/;
+            $room->broadcast("said:$msg");
+        });
+        $ws->on(close   => sub { $room->leave($_[0]) });
+    };
+
+    # A room of two, for measuring what a broadcast costs the worker that
+    # only RECEIVES it from the bus.
+    websocket '/pair' => sub {
+        my ($c, $ws) = @_;
+        my $room = Punk::WebSocket::Room->named('pair');
+        $ws->on(open    => sub { $room->join($_[0]); $_[0]->send("worker:$$") });
+        $ws->on(message => sub { $room->broadcast($_[1]) });
         $ws->on(close   => sub { $room->leave($_[0]) });
     };
 
@@ -98,8 +114,10 @@ sub read_headers {
 }
 
 sub ws_connect {
+    my ($path) = @_;
     my $s = sock();
-    my ($req, $key) = handshake_request(host => $host, path => '/chat');
+    my ($req, $key) = handshake_request(host => $host,
+                                        path => $path // '/chat');
     syswrite $s, $req;
     my $hdr = read_headers($s);
     return $hdr =~ m{^HTTP/1\.1 101}i ? $s : undef;
@@ -160,7 +178,7 @@ sub read_frame {
     SKIP: {
         skip "every connection landed on one worker after $attempts attempts; "
            . "this machine will not spread them, so nothing here could "
-           . "distinguish a working bus from a single-worker room", 2
+           . "distinguish a working bus from a single-worker room", 6
             if $spread < 2;
 
         Time::HiRes::sleep(0.3);      # every on_open has run and joined
@@ -182,19 +200,86 @@ sub read_frame {
 
         # nobody heard it twice - the origin worker must not send locally AND
         # deliver from the bus
-        my $extra = 0;
-        for my $c (@clients) {
-            my $again = read_frame($c, 1);
-            $extra++ if defined $again;
-        }
+        # one second of silence across all of them at once: the number of
+        # clients depends on how the kernel spread them, and a second each
+        # made this the slowest file in the suite on an unlucky run
+        my $extra = () = IO::Select->new(@clients)->can_read(1);
         is($extra, 0,
             'and nobody heard it TWICE - the publishing worker does not also '
           . 'send locally, so there is one delivery path rather than two that '
           . 'can drift apart');
+
+        # The same with the sender left out. `except` names a connection, and
+        # a connection lives in one worker - so this used to be sent to that
+        # worker's members alone, and the rest of the room heard nothing.
+        for my $i (0, $#clients) {
+            syswrite $clients[$i],
+                encode_client(opcode => 1, payload => "except:from $i");
+            my @heard = grep { my $f = read_frame($clients[$_], 5);
+                               $f && ($f->{payload} // '') eq "only:from $i" }
+                        grep { $_ != $i } 0 .. $#clients;
+            is(scalar @heard, @clients - 1,
+                "a broadcast that leaves out client $i reaches every other "
+              . "client, on every worker")
+                or diag sprintf 'heard by %d of %d others', scalar @heard,
+                                @clients - 1;
+            # one second of silence across all of them, the sender included
+            my $sel = IO::Select->new(@clients);
+            my @noisy = $sel->can_read(1);
+            is(scalar @noisy, 0,
+                '...and neither the sender nor anyone a second time hears it');
+        }
     }
     note "connections spread over $spread worker(s) after $attempts attempts";
 
     close $_ for @clients;
+}
+
+# ---- what a broadcast costs the workers that receive it ----------------------
+# The publishing worker fans out inside its own message handler. Every other
+# worker is handed the frame by the event loop, in a callback with no
+# temporaries frame around it - where the room name and the frame, made
+# mortal, stayed allocated until the worker exited.
+SKIP: {
+    my $rss = sub {
+        my ($w) = @_;
+        my ($r) = (`ps -o rss= -p $w` // '') =~ /(\d+)/;
+        return defined $r ? int($r / 1024) : undef;
+    };
+    my (%sock, $tries);
+    while ($tries++ < 40 && keys %sock < 2) {
+        my $c = ws_connect('/pair') or next;
+        my $f = read_frame($c, 5);
+        my ($w) = ($f && ($f->{payload} // '')) =~ /^worker:(\d+)/;
+        if ($w && !$sock{$w}) { $sock{$w} = $c } else { close $c }
+        Time::HiRes::sleep(0.05);
+    }
+    skip 'could not put two clients on two workers', 2 if keys %sock < 2;
+    my ($pub, $rcv) = sort keys %sock;
+    skip 'cannot read a worker\'s resident size here', 2
+        unless defined $rss->($rcv);
+    Time::HiRes::sleep(0.3);
+
+    my $big = 'm' x 32_000;
+    my $batch = sub {
+        my ($tag) = @_;
+        syswrite $sock{$pub}, encode_client(opcode => 1, payload => $big)
+            for 1 .. 300;
+        syswrite $sock{$pub}, encode_client(opcode => 1, payload => $tag);
+        for my $w ($pub, $rcv) {            # both must read what they are sent
+            while (my $f = read_frame($sock{$w}, 10)) {
+                last if ($f->{payload} // '') eq $tag;
+            }
+        }
+    };
+    $batch->('warm');
+    my $before = $rss->($rcv);
+    $batch->("round$_") for 1 .. 4;
+    my $grew = $rss->($rcv) - $before;
+    ok(defined $before, 'the receiving worker was measured');
+    cmp_ok($grew, '<', 15,
+        "38 MB of broadcasts grew the worker that only received them by ${grew} MB");
+    close $_ for values %sock;
 }
 
 kill 'TERM', $pid;

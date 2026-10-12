@@ -8,7 +8,7 @@ use Email::Sender::Transport::SMTP;
 use oEdtk::Config			qw(config_read);
 
 use Exporter;
-our $VERSION	= 0.001;
+our $VERSION	= 2.1109;
 our @ISA	= qw(Exporter);
 our @EXPORT_OK	= qw(oe_send_mail);
 #http://search.cpan.org/~rjbs/Email-Sender-0.120002/lib/Email/Sender/Manual/QuickStart.pm

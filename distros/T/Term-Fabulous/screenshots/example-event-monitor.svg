@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="888" height="543" viewBox="0 0 888 543" role="img" aria-label="perl examples/event-monitor.pl">
+<title>perl examples/event-monitor.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="856" height="508" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="856" height="508" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="856" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="444" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/event-monitor.pl</text>
+<rect x="16.5" y="16.5" width="855" height="507" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="48" y="114" width="144" height="18" fill="#242830"/>
+<rect x="48" y="186" width="54" height="54" fill="#283c5a"/>
+<rect x="57" y="194" width="36" height="1" fill="#61afef"/>
+<rect x="52" y="204" width="1" height="18" fill="#61afef"/>
+<rect x="97" y="204" width="1" height="18" fill="#61afef"/>
+<rect x="57" y="230" width="36" height="1" fill="#61afef"/>
+</g>
+<polyline points="52.5 204 52.5 199 52.538 198.413 52.653 197.835 52.843 197.278 53.103 196.75 53.43 196.261 53.818 195.818 54.261 195.43 54.75 195.103 55.278 194.843 55.835 194.653 56.413 194.538 57 194.5 57 194.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="97.5 204 97.5 199 97.462 198.413 97.347 197.835 97.157 197.278 96.897 196.75 96.57 196.261 96.182 195.818 95.739 195.43 95.25 195.103 94.722 194.843 94.165 194.653 93.587 194.538 93 194.5 93 194.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="52.5 222 52.5 226 52.538 226.587 52.653 227.165 52.843 227.722 53.103 228.25 53.43 228.739 53.818 229.182 54.261 229.57 54.75 229.897 55.278 230.157 55.835 230.347 56.413 230.462 57 230.5 57 230.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="97.5 222 97.5 226 97.462 226.587 97.347 227.165 97.157 227.722 96.897 228.25 96.57 228.739 96.182 229.182 95.739 229.57 95.25 229.897 94.722 230.157 94.165 230.347 93.587 230.462 93 230.5 93 230.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<g class="terminal">
+<text x="48" y="92" textLength="45" fill="#96a0b4">Name:</text>
+<text x="219" y="92" textLength="297" fill="#e5c07b">Event          Target     Details</text>
+<text x="219" y="110" textLength="261" fill="#c8d2e1">KeyPress       root       Tab</text>
+<text x="48" y="128" textLength="27" fill="#dcdfe4">Ada</text>
+<text x="219" y="128" textLength="171" fill="#c8d2e1">OnFocus        name</text>
+<text x="219" y="146" textLength="297" fill="#c8d2e1">Change         name       value A</text>
+<text x="48" y="164" textLength="117" fill="#dcdfe4">[ ] Subscribe</text>
+<text x="219" y="164" textLength="306" fill="#c8d2e1">Change         name       value Ad</text>
+<text x="219" y="182" textLength="315" fill="#c8d2e1">Change         name       value Ada</text>
+<text x="219" y="200" textLength="333" fill="#c8d2e1">Submit         name       value 'Ada'</text>
+<text x="66" y="218" textLength="18" fill="#ffffff">OK</text>
+<text x="219" y="218" textLength="252" fill="#c8d2e1">KeyPress       name       F5</text>
+<text x="219" y="236" textLength="261" fill="#c8d2e1">KeyPress       name       Tab</text>
+<text x="219" y="254" textLength="171" fill="#c8d2e1">OnBlur         name</text>
+<text x="219" y="272" textLength="180" fill="#c8d2e1">OnFocus        agree</text>
+<text x="219" y="290" textLength="180" fill="#c8d2e1">OnBlur         agree</text>
+<text x="219" y="308" textLength="153" fill="#c8d2e1">OnFocus        ok</text>
+<text x="219" y="326" textLength="333" fill="#c8d2e1">Mouse          ok         left at 4,9</text>
+<text x="219" y="344" textLength="153" fill="#c8d2e1">OnHoverStart   ok</text>
+<text x="219" y="362" textLength="324" fill="#c8d2e1">OnPress        ok         at 4.5,9.5</text>
+<text x="219" y="380" textLength="360" fill="#c8d2e1">Mouse          ok         release at 4,9</text>
+<text x="219" y="398" textLength="153" fill="#c8d2e1">Activate       ok</text>
+<text x="219" y="416" textLength="324" fill="#c8d2e1">OnRelease      ok         at 4.5,9.5</text>
+<text x="219" y="434" textLength="153" fill="#c8d2e1">OnHoverStopped ok</text>
+<text x="219" y="452" textLength="216" fill="#788296">Pointer: 40,23 over root</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

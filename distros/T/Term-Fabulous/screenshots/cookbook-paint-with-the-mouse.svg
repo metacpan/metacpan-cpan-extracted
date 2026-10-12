@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="708" height="345" viewBox="0 0 708 345" role="img" aria-label="perl examples/cookbook/paint-with-the-mouse.pl">
+<title>perl examples/cookbook/paint-with-the-mouse.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="676" height="310" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="676" height="310" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="676" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="354" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/cookbook/paint-with-the-mouse.pl</text>
+<rect x="16.5" y="16.5" width="675" height="309" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="48" y="114" width="612" height="180" fill="#0a0c14"/>
+<rect x="57" y="122" width="594" height="1" fill="#78a0dc"/>
+<rect x="52" y="132" width="1" height="144" fill="#78a0dc"/>
+<rect x="655" y="132" width="1" height="144" fill="#78a0dc"/>
+<rect x="57" y="284" width="594" height="1" fill="#78a0dc"/>
+</g>
+<polyline points="52.5 132 52.5 127 52.538 126.413 52.653 125.835 52.843 125.278 53.103 124.75 53.43 124.261 53.818 123.818 54.261 123.43 54.75 123.103 55.278 122.843 55.835 122.653 56.413 122.538 57 122.5 57 122.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="655.5 132 655.5 127 655.462 126.413 655.347 125.835 655.157 125.278 654.897 124.75 654.57 124.261 654.182 123.818 653.739 123.43 653.25 123.103 652.722 122.843 652.165 122.653 651.587 122.538 651 122.5 651 122.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="52.5 276 52.5 280 52.538 280.587 52.653 281.165 52.843 281.722 53.103 282.25 53.43 282.739 53.818 283.182 54.261 283.57 54.75 283.897 55.278 284.157 55.835 284.347 56.413 284.462 57 284.5 57 284.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="655.5 276 655.5 280 655.462 280.587 655.347 281.165 655.157 281.722 654.897 282.25 654.57 282.739 654.182 283.182 653.739 283.57 653.25 283.897 652.722 284.157 652.165 284.347 651.587 284.462 651 284.5 651 284.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
+<g class="terminal">
+<text x="48" y="92" textLength="531" fill="#e6e6e6">Left button draws, right button erases. Drag to draw lines.</text>
+<text x="255" y="146" textLength="333" fill="#ffc832">******                          *****</text>
+<text x="237" y="164" textLength="378" fill="#ffc832">**      **                     ***     ***</text>
+<text x="219" y="182" textLength="405" fill="#ffc832">**          **                 **           *</text>
+<text x="66" y="200" textLength="9" fill="#50dc64">o</text>
+<text x="201" y="200" textLength="297" fill="#ffc832">**              **              *</text>
+<text x="75" y="218" textLength="414" fill="#ffc832">**           *                  **          **</text>
+<text x="93" y="236" textLength="378" fill="#ffc832">**      ***                     **      **</text>
+<text x="111" y="254" textLength="342" fill="#ffc832">******                          ******</text>
+<text x="66" y="272" textLength="45" fill="#50dc64">o o o</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

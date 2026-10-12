@@ -6,7 +6,7 @@ use warnings;
 
 use Object::Proto::Sugar -types;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 our @FLAGS;
 BEGIN {

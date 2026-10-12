@@ -412,6 +412,39 @@ static SV *ps_req_id(pTHX_ SV *c, HV *cfg) {
     }
 }
 
+/* Give the session a new name at the write-back: the id to retire goes
+ * under PK_SESSION_ROT and the current one is forgotten. session_rotate and
+ * login both land here.
+ *
+ * When the stash holds no id the cookie is asked. A logout followed by a
+ * login never loaded the session, and a second rotation in one request has
+ * already forgotten the id: either way the entry the request named still has
+ * to go. */
+static void ps_mark_rotate(pTHX_ SV *c, HV *cfg, HV *stash) {
+    SV **idp;
+    SV *old = NULL;
+    idp = hv_fetch(stash, PK_SESSION_SID, PK_SESSION_SID_LEN, 0);
+    if (idp && *idp && SvOK(*idp)) old = newSVsv(*idp);
+    else if (cfg && ps_cfg_store(aTHX_ cfg)) old = ps_req_id(aTHX_ c, cfg);
+    (void)hv_store(stash, PK_SESSION_ROT, PK_SESSION_ROT_LEN,
+                   old ? old : newSV(0), 0);
+    (void)hv_delete(stash, PK_SESSION_SID, PK_SESSION_SID_LEN, G_DISCARD);
+}
+
+/* Secure when the options do not say: on for a request that arrived over
+ * https, so a session cookie set there is never sent in the clear. */
+static int ps_secure_default(pTHX_ SV *c) {
+    SV *env = pcx_get(aTHX_ pcx_av(aTHX_ c), PCX_ENV);
+    SV **e;
+    STRLEN l;
+    const char *v;
+    if (!(env && SvROK(env) && SvTYPE(SvRV(env)) == SVt_PVHV)) return 0;
+    e = hv_fetchs((HV *)SvRV(env), "psgi.url_scheme", 0);
+    if (!(e && *e && SvOK(*e))) return 0;
+    v = SvPV_const(*e, l);
+    return l == 5 && memEQ(v, "https", 5);
+}
+
 /* $c->session: load (once) from the signed cookie and cache the hashref (+1) */
 static SV *ps_load(pTHX_ SV *c) {
     AV *av = pcx_av(aTHX_ c);
@@ -529,7 +562,7 @@ static SV *ps_load(pTHX_ SV *c) {
  * client's cookie still names the same session, whatever the session now
  * contains. */
 static SV *ps_store_writeback(pTHX_ HV *cfg, HV *stash, SV *store,
-                              SV *sess, SV *cname) {
+                              SV *sess, SV *cname, int secure) {
     SV **origp = hv_fetchs(stash, "punk.session.orig", 0);
     SV **idp   = hv_fetch(stash, PK_SESSION_SID, PK_SESSION_SID_LEN, 0);
     SV **rotp  = hv_fetch(stash, PK_SESSION_ROT, PK_SESSION_ROT_LEN, 0);
@@ -542,6 +575,15 @@ static SV *ps_store_writeback(pTHX_ HV *cfg, HV *stash, SV *store,
     int fresh, rotating = (rotp && *rotp) ? 1 : 0, sliding = 0;
 
     if (ttl <= 0) ttl = PK_SESSION_MAX_LIFETIME;
+
+    /* A session nobody named and nobody wrote to is not a session. Loading
+     * one is enough to reach here - a guard or a csrf check on a cookieless
+     * request does it - and writing it would hand every anonymous denial a
+     * store entry with the full lifetime, which is a way to fill the store,
+     * or to evict the real sessions from one with a budget. */
+    if (!rotating && !(idp && *idp && SvOK(*idp))
+        && HvUSEDKEYS((HV *)SvRV(sess)) == 0)
+        return NULL;
 
     /* Unchanged is the common case, and change detection stops being an
      * optimisation here: it is what keeps a read-mostly application off the
@@ -636,8 +678,9 @@ static SV *ps_store_writeback(pTHX_ HV *cfg, HV *stash, SV *store,
      * because a cookie that runs out while its entry lives is a logout the
      * sliding expiry exists to prevent. */
     if (!fresh && !sliding) return NULL;
-    return pk_build_cookie(aTHX_ cname,
-                           sv_2mortal(ps_id_seal(aTHX_ id, key, kl, ttl)), cfg);
+    return pk_build_cookie_ex(aTHX_ cname,
+                              sv_2mortal(ps_id_seal(aTHX_ id, key, kl, ttl)),
+                              cfg, secure);
 }
 
 /* the after-dispatch write-back: add a Set-Cookie to the triplet when the
@@ -652,6 +695,7 @@ static void ps_writeback(pTHX_ SV *c, SV *resp) {
     STRLEN nl;
     const char *cookie_name;
     SV *cname, *store, *setcookie = NULL;
+    int secure;
     if (!cfg || !st || !SvROK(st)) return;
     stash = (HV *)SvRV(st);
     sessp = hv_fetchs(stash, "punk.session", 0);
@@ -665,6 +709,7 @@ static void ps_writeback(pTHX_ SV *c, SV *resp) {
     cname = sv_2mortal(newSVpvn(cookie_name, nl));
     expp = hv_fetchs(stash, "punk.session.expire", 0);
     store = ps_cfg_store(aTHX_ cfg);
+    secure = ps_secure_default(aTHX_ c);
     if (expp && *expp && SvTRUE(*expp)) {
         /* Logging out of a stored session is a DELETE, and that is the whole
          * difference. A signed cookie is good until it expires no matter what
@@ -684,10 +729,11 @@ static void ps_writeback(pTHX_ SV *c, SV *resp) {
                 if (d) SvREFCNT_dec(d);
             }
         }
-        setcookie = pk_build_cookie(aTHX_ cname, &PL_sv_undef, cfg);
+        setcookie = pk_build_cookie_ex(aTHX_ cname, &PL_sv_undef, cfg, secure);
     }
     else if (store) {
-        setcookie = ps_store_writeback(aTHX_ cfg, stash, store, *sessp, cname);
+        setcookie = ps_store_writeback(aTHX_ cfg, stash, store, *sessp, cname,
+                                       secure);
         if (!setcookie) return;           /* stored, or refused, or unchanged */
     }
     else {
@@ -696,6 +742,10 @@ static void ps_writeback(pTHX_ SV *c, SV *resp) {
         SV *signed_val;
         origp = hv_fetchs(stash, "punk.session.orig", 0);
         if (origp && *origp && sv_eq(cur, *origp)) return; /* unchanged */
+        /* nothing came in and nothing was put in: no cookie to send */
+        if (origp && *origp && !SvCUR(*origp)
+            && HvUSEDKEYS((HV *)SvRV(*sessp)) == 0)
+            return;
         if (SvCUR(cur) > 4000) {
             /* the write-back is a trapped after-hook, so croaking would vanish;
              * warn and drop the cookie rather than silently truncate it */
@@ -731,7 +781,7 @@ static void ps_writeback(pTHX_ SV *c, SV *resp) {
             return;
         }
         signed_val = sv_2mortal(pk_session_sign(aTHX_ cur, key, kl));
-        setcookie = pk_build_cookie(aTHX_ cname, signed_val, cfg);
+        setcookie = pk_build_cookie_ex(aTHX_ cname, signed_val, cfg, secure);
     }
     av_push(headers, newSVpvs("Set-Cookie"));
     av_push(headers, setcookie);                           /* +1, list takes it */

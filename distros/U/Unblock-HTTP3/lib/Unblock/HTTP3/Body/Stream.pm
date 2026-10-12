@@ -9,7 +9,7 @@ use Scalar::Util qw(blessed weaken);
 use Unblock::HTTP3 ();
 use Unblock::HTTP3::_Bytes ();
 
-our $VERSION = '0.03';
+our $VERSION = '0.12';
 
 sub _new {
     my ($class, $transaction, $kind, %option) = @_;
@@ -42,6 +42,30 @@ sub _new {
     }, $class;
 
     weaken($self->{transaction});
+
+    return $self;
+}
+
+sub _configure {
+    my ($self, %option) = @_;
+
+    my $operation = $self->{kind} . '_body';
+
+    for my $name (qw(on_drain on_cancel)) {
+        next unless exists $option{$name};
+
+        my $callback = delete $option{$name};
+
+        croak "$operation(): $name must be a coderef"
+            if defined($callback) && ref($callback) ne 'CODE';
+        croak "$operation(): $name is already configured"
+            if defined($self->{$name});
+
+        $self->{$name} = $callback;
+    }
+
+    croak "$operation(): unknown option: " . join(', ', sort keys %option)
+        if %option;
 
     return $self;
 }

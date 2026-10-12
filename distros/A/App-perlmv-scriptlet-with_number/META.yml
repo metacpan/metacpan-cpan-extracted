@@ -19,7 +19,7 @@ name: App-perlmv-scriptlet-with_number
 provides:
   App::perlmv::scriptlet::with_number:
     file: lib/App/perlmv/scriptlet/with_number.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   POSIX: '0'
   perl: '5.010001'
@@ -30,7 +30,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-perlmv-scriptlet-with_number
   homepage: https://metacpan.org/release/App-perlmv-scriptlet-with_number
   repository: git://github.com/perlancar/perl-App-perlmv-scriptlet-with_number.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.042000'

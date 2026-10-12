@@ -1,5 +1,8 @@
 Revision history for Game-Checkers
 
+0.03    2026-10-11
+	- Add Game::Checkers::Terminal->run(@argv), which returns the exit status
+
 0.02    2026-10-06
 	- Pick a move with the arrow keys, not by typing it, in the terminal.
 	- The terminal board is checkered when colour is on.

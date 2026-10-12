@@ -1,7 +1,45 @@
-#!usr/bin/perl
+#!/usr/bin/env perl
+use strict;
+use warnings;
 
-use lib 'lib';
+use Game::Cribbage::Terminal;
 
-use Game::Cribbage;
+our $VERSION = "0.17";
 
-Game::Cribbage->new()->start();
+exit Game::Cribbage::Terminal->run(@ARGV);
+
+__END__
+
+=head1 NAME
+
+cribbage - cribbage on a terminal
+
+=head1 SYNOPSIS
+
+    cribbage              # arrow keys if the terminal has them
+    cribbage --no-pick    # type the card numbers instead
+
+=head1 DESCRIPTION
+
+A front end and nothing else: the screen lives in L<Game::Cribbage::Terminal>
+and the rules in L<Game::Cribbage::Board>.
+
+C<--pick> chooses cards with the arrow keys and C<--no-pick> types them. Left
+alone it picks when there is a terminal and L<Term::ReadKey> is installed and
+types when there is not, so a game played down a pipe needs no option at all.
+
+B<The terminal is put back the way it was> on the way out, from C<INT>, from
+C<TERM> and after a die, because a program that leaves a terminal in cbreak
+leaves the shell unusable.
+
+=head1 EXIT STATUS
+
+    0   you won, or you quit
+    1   you lost
+    2   a bad option
+
+=head1 SEE ALSO
+
+L<Game::Cribbage::Terminal>, L<Game::Cribbage>
+
+=cut

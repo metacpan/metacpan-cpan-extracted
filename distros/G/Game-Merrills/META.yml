@@ -1,5 +1,5 @@
 ---
-abstract: "Nine Men's Morris as an engine, with a terminal game on top"
+abstract: "Nine Men's Morris as an engine"
 author:
   - 'LNATION <email@lnation.org>'
 build_requires:
@@ -23,5 +23,5 @@ recommends:
 requires:
   Object::Proto::Sugar: '0.05'
   perl: '5.010'
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -17,5 +17,7 @@ t/00-module-scandeps-static.t
 t/00-scandeps.t
 t/01-scandeps.t
 t/02-new-compat.t
+t/03-suggests-recommends.t
+t/04-pragma-and-tiers.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

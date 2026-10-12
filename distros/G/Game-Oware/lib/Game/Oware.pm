@@ -16,7 +16,7 @@ use Game::Oware::Notation;
 use Game::Oware::Result;
 use Game::Oware::Variant ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 has variant => (
 	is      => 'ro',
@@ -400,7 +400,7 @@ Game::Oware - the African sow and capture game, Abapa rules
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

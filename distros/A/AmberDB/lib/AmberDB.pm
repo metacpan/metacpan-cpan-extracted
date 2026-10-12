@@ -24,7 +24,7 @@ use parent qw(
 our $DB_HASH;
 our $hash_info;
 
-our $VERSION = '5.26.4';
+our $VERSION = '5.26.5';
 my $CREATED  = '2005-01-28';
 
 
@@ -5121,7 +5121,7 @@ sub table_count {
                 return $cnt;
             }
             my ($raw) = $self->index_get( "$table_path.inx", "keys", "raw" );
-            if ( length($raw) >= 8 ) {
+            if ( defined $raw && length($raw) >= 8 ) {
                 $count = int( bytes::length($raw) / 8 );
                 $self->set_cache( $tableid, 'count', $count );
                 return $count;
@@ -5632,7 +5632,7 @@ sub flock_open {
     $tableid or return;
     $mode ||= "write";
 
-    my $lock_dir = $self->{_path}->{lock_dir} ||= ( ( $self->path('dbase_dir') || "." ) . "/lock" );
+    my $lock_dir = $self->path("lock_dir");
     unless ( -d $lock_dir ) {
         $self->make_path($lock_dir);
     }

@@ -69,7 +69,7 @@
          "web" : "https://github.com/p5sagit/Object-Remote"
       }
    },
-   "version" : "0.005003",
+   "version" : "0.005004",
    "x_authority" : "cpan:MSTROUT",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

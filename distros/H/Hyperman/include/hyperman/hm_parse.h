@@ -90,7 +90,21 @@ static int hm_parse_index(const char *head, size_t headlen, long *clen,
      * strips, or a line with no SP at all. */
     {
         size_t ll = line_end ? (size_t)(line_end - head) : headlen;
-        if (ll == 0 || !memchr(head, ' ', ll)) return 400;
+        const char *sp1, *sp2, *ver;
+        if (ll == 0) return 400;
+        /* METHOD SP request-target SP HTTP/d.d, and nothing else on the
+         * line (RFC 9112 3). A line with more tokens, or without the
+         * version, is not a request: a PROXY protocol header sent to a
+         * listener that did not ask for one reads as six tokens and used
+         * to be served as a request with method "PROXY". */
+        sp1 = (const char *)memchr(head, ' ', ll);
+        if (!sp1 || sp1 == head) return 400;
+        sp2 = (const char *)memchr(sp1 + 1, ' ', ll - (size_t)(sp1 + 1 - head));
+        if (!sp2 || sp2 == sp1 + 1) return 400;
+        ver = sp2 + 1;
+        if ((size_t)(head + ll - ver) != 8 || memcmp(ver, "HTTP/", 5) != 0
+            || ver[5] < '0' || ver[5] > '9' || ver[6] != '.'
+            || ver[7] < '0' || ver[7] > '9') return 400;
         if (line_end && (line_end + 1 >= hend || line_end[1] != '\n')) return 400;
     }
     while (p < hend) {

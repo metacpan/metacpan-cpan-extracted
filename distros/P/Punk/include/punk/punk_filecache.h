@@ -55,6 +55,20 @@
 #ifndef PUNK_FILECACHE_H
 #define PUNK_FILECACHE_H
 
+/* The fraction of a second in a stat's mtime, where the platform keeps one.
+ * A whole-second mtime cannot see a file rewritten in place, to the same
+ * size, inside the second it was last written in; this can. Where there is
+ * none it is 0 and that one rewrite stays invisible until the ctime moves. */
+#if defined(PUNK_STAT_MTIM)
+#  define PFC_MTIME_NS(st) ((UV)(st).st_mtim.tv_nsec)
+#elif defined(PUNK_STAT_MTIMESPEC)
+#  define PFC_MTIME_NS(st) ((UV)(st).st_mtimespec.tv_nsec)
+#elif defined(PUNK_STAT_MTIMENSEC)
+#  define PFC_MTIME_NS(st) ((UV)(st).st_mtimensec)
+#else
+#  define PFC_MTIME_NS(st) ((UV)0)
+#endif
+
 /* Budgets. Deliberately small: this is a hot-asset cache, not a CDN, and the
  * memory is per worker. A site whose CSS/JS/icons do not fit in 8MB is serving
  * them from the wrong place. */
@@ -77,6 +91,8 @@ typedef struct pfc_entry {
                                       hold only a stat, or only the fact
                                       that there is nothing here        */
     Stat_t    st;                  /* the last stat taken of this path  */
+    UV        vns, vctime;         /* the rest of val's identity: its
+                                      mtime's nanoseconds and its ctime */
     double    checked;             /* when st was taken                 */
     unsigned char exists;          /* 0 = a remembered absence          */
     uint32_t  klen;
@@ -247,6 +263,8 @@ static int pfc_same(const Stat_t *a, const Stat_t *b) {
     return (UV)a->st_dev == (UV)b->st_dev
         && (UV)a->st_ino == (UV)b->st_ino
         && (UV)a->st_mtime == (UV)b->st_mtime
+        && PFC_MTIME_NS(*a) == PFC_MTIME_NS(*b)
+        && (UV)a->st_ctime == (UV)b->st_ctime
         && (UV)a->st_size == (UV)b->st_size;
 }
 
@@ -301,16 +319,16 @@ static int pfc_stat(pTHX_ const char *path, STRLEN plen, Stat_t *out) {
 /* The file's bytes as an SV the caller owns (+1), or NULL to say "read it
  * yourself". NULL is never "the file is missing".
  *
- * dev/ino/mtime/size are the stat the caller is serving this request from -
- * fresh, or from pfc_stat within the TTL - and are the check that the bytes
- * held belong to that same file.
+ * dev/ino/mtime/ns/ctime/size are the stat the caller is serving this request
+ * from - fresh, or from pfc_stat within the TTL - and are the check that the
+ * bytes held belong to that same file.
  *
  * The returned SV is newSVsv of the held one, which on any perl with
  * copy-on-write strings (5.20+) is O(1) and shares the buffer until something
  * writes to it. On an older perl it is a real copy, correct and still cheaper
  * than the open it replaced. */
 static SV *pfc_get(pTHX_ const char *path, STRLEN plen,
-                   UV dev, UV ino, UV mtime, UV size) {
+                   UV dev, UV ino, UV mtime, UV ns, UV ctime, UV size) {
     punk_filecache *c = &PFC_CACHE;
     uint64_t h;
     pfc_entry *e;
@@ -328,7 +346,8 @@ static SV *pfc_get(pTHX_ const char *path, STRLEN plen,
         /* Is what we hold this file? A new inode is a replaced file; a changed
          * mtime or size is a rewritten one. */
         if ((UV)e->st.st_dev == dev && (UV)e->st.st_ino == ino
-            && (UV)e->st.st_mtime == mtime && (UV)e->st.st_size == size) {
+            && (UV)e->st.st_mtime == mtime && (UV)e->st.st_size == size
+            && e->vns == ns && e->vctime == ctime) {
             pfc_unlink_lru(c, e);
             pfc_push_front(c, e);
             c->hits++;
@@ -383,9 +402,24 @@ static SV *pfc_get(pTHX_ const char *path, STRLEN plen,
     e->st.st_ino   = (ino_t)ino;
     e->st.st_mtime = (time_t)mtime;
     e->st.st_size  = (Off_t)size;
+    e->vns    = ns;
+    e->vctime = ctime;
     e->val = SvREFCNT_inc(val);
     c->bytes += (size_t)size;
     return val;
+}
+
+/* Forget when this path was last statted, so the next pfc_stat asks the
+ * filesystem. For a caller that has just seen the file disagree with the
+ * stat it was handed. */
+static void pfc_expire(pTHX_ const char *path, STRLEN plen) {
+    punk_filecache *c = &PFC_CACHE;
+    pfc_entry *e;
+    PERL_UNUSED_CONTEXT;
+    if (c->disabled || !pfc_enabled() || plen == 0 || plen >= PFC_KEY_MAX)
+        return;
+    e = pfc_lookup(c, path, plen, pfc_hash(path, plen));
+    if (e) e->checked = 0;
 }
 
 #endif /* PUNK_FILECACHE_H */

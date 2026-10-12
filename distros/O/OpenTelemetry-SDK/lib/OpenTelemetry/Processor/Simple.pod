@@ -1,0 +1,105 @@
+=encoding UTF-8
+
+=head1 NAME
+
+OpenTelemetry::Processor::Simple - A basic OpenTelemetry processor
+
+=head1 SYNOPSIS
+
+    ...
+
+=head1 DESCRIPTION
+
+This is a simple processor that receives records to process and forwards
+them to an exporter.
+
+This processor will mostly be useful for testing. It could be suitable for
+use in production environments in cases where custom attributes should be
+added to records based on code scopes, etc.
+
+=head1 METHODS
+
+This class implements the L<OpenTelemetry::Processor> role. Please consult
+that module's documentation for details on the behaviours it provides.
+
+=head2 new
+
+    $processor = OpenTelemetry::Processor::Simple->new(
+        exporter => $span_exporter,
+    );
+
+The constructor takes a mandatory C<exporter> parameter that must be set to an
+instance of a class that implements the L<OpenTelemetry::Exporter> role.
+
+=head2 process
+
+    $processor->process( @records );
+
+Takes a list of records that are ready for processing. Once called, this method
+will pass them to the configured exporter.
+
+This processor handles each record as it becomes ready and blocks during the
+export step. For a non-blocking processor that batches records for eventual
+processing (and is therefore more suitable for production environments), see
+L<OpenTelemetry::Processor::Batch> or one of its subclasses.
+
+=head2 report_dropped
+
+    $processor = $processor->report_dropped( $reason, $count );
+
+Reports the number of dropped records for the specified reason. The reason
+must be usable as a string, and the count must be usable as a number.
+
+The method in this class does nothing, but subclasses can extend it.
+
+This method returns the calling instance, and is suitable for chaining.
+
+=head2 report_result
+
+    $result = $processor->report_result( $result, $count );
+
+Takes an L<export result|OpenTelemetry::Constants/Export Results> and the
+number of records that that result applies to, and reports this result.
+
+It returns the export result, so it is suitable to be used when returning
+from an exporting function.
+
+The method in this class does nothing. It is expected to be extended by
+subclasses.
+
+=head2 force_flush
+
+    $result = await $processor->force_flush( $timeout );
+
+Calls L<"force_flush"|OpenTelemetry::Exporter/force_flush> on the configured
+exporter and returns a L<Future> that will hold the result of that operation.
+
+=head2 shutdown
+
+    $result = await $processor->shutdown( $timeout );
+
+Calls L<"shutdown"|OpenTelemetry::Exporter/shutdown> on the configured
+exporter and returns a L<Future> that will hold the result of that operation.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<Future>
+
+=item L<OpenTelemetry::Constants>
+
+=item L<OpenTelemetry::Exporter>
+
+=item L<OpenTelemetry::Processor>
+
+=item L<OpenTelemetry::Processor::Batch>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2025 by José Joaquín Atria.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.

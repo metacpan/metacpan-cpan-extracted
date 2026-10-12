@@ -1,0 +1,1197 @@
+// The screenshots of the documentation.
+//
+// Every "screenshot" node runs one program in a terminal of the given
+// size, gives it the input of its steps, and writes what the terminal
+// then shows to screenshots/NAME.svg. The POD shows the images with
+// <img src="/screenshots/NAME.svg">.
+//
+//     make docs          # take the screenshots again, after changing a program
+//     make docs-check    # fails when a screenshot or a code block is out of date
+//
+// Time is virtual: the steps start 0.5 seconds after the program started
+// its event loop, every input is followed by 0.1 seconds, and the screen
+// is captured 0.5 seconds after the last step. "wait N" lets N seconds of
+// timers and animation pass. The clock starts at the time below, in UTC.
+// The syntax of all settings and steps is described in
+// tools/lib/Term/Fabulous/Screenshot/Scenario.pm.
+
+defaults {
+	size 80 24
+	clock "2026-06-01T09:41:00Z"
+}
+
+// --- The overview at the top of Term::Fabulous and README.md -------------
+
+screenshot "overview" {
+	script "examples/showcase.pl"
+	size 110 32
+	steps {
+		type "Ada Lovelace"
+		key "Tab"
+		type "ada@example.com"
+		wait 7
+		key "Tab" "Tab" "Tab" "Tab" "Tab" "Enter"
+		wait 1
+	}
+}
+
+// --- examples/ -------------------------------------------------------------
+
+screenshot "example-border-options" {
+	script "examples/border-options.pl"
+	size 80 16
+}
+
+screenshot "example-border-showcase" {
+	script "examples/border-showcase.pl"
+	size 100 32
+}
+
+screenshot "example-buttons-and-keys" {
+	script "examples/buttons-and-keys.pl"
+	size 80 12
+	steps {
+		key "Tab" "+" "+" "+"
+		move 30 6
+		wait 2
+	}
+}
+
+screenshot "example-canvas" {
+	script "examples/canvas.pl"
+	size 88 20
+	steps {
+		wait 2
+	}
+}
+
+screenshot "example-chart-gallery" {
+	script "examples/chart-gallery.pl"
+	size 120 40
+}
+
+screenshot "example-colors" {
+	script "examples/colors.pl"
+	size 80 13
+}
+
+screenshot "example-themes-dark" {
+	script "examples/themes.pl"
+	args "dark"
+	size 80 20
+	steps {
+		type "Ada"
+	}
+}
+
+screenshot "example-themes-light" {
+	script "examples/themes.pl"
+	args "light"
+	size 80 20
+	steps {
+		type "Ada"
+	}
+}
+
+screenshot "example-themes-ocean" {
+	script "examples/themes.pl"
+	args "ocean"
+	size 80 20
+	steps {
+		type "Ada"
+	}
+}
+
+screenshot "example-themes-nord" {
+	script "examples/themes.pl"
+	args "nord"
+	size 80 20
+	steps {
+		type "Ada"
+	}
+}
+
+screenshot "example-themes-dracula" {
+	script "examples/themes.pl"
+	args "dracula"
+	size 80 20
+	steps {
+		type "Ada"
+	}
+}
+
+screenshot "example-themes-solarized-light" {
+	script "examples/themes.pl"
+	args "solarized-light"
+	size 80 20
+	steps {
+		type "Ada"
+	}
+}
+
+// The theme editor on the theme files of examples/themes/: the form with
+// the cursor on the palette's accent; the dialog of a slot, its value
+// shown in the preview while it is chosen; text mode with a mistake.
+screenshot "example-theme-editor" {
+	script "examples/theme-editor.pl"
+	size 110 32
+	steps {
+		key "Alt+3" "Down" "Down" "Down" "Down"
+	}
+}
+
+screenshot "example-theme-editor-dialog" {
+	script "examples/theme-editor.pl"
+	size 110 32
+	steps {
+		key "Alt+3" "Ctrl+F"
+		type "button.border.co"
+		key "Enter" "Enter" "Down" "Down" "Down"
+	}
+}
+
+screenshot "example-theme-editor-text" {
+	script "examples/theme-editor.pl"
+	size 110 32
+	steps {
+		key "Alt+3" "F2" "Ctrl+End" "Enter"
+		type "button { text \"acent\" }"
+		wait 1
+	}
+}
+
+screenshot "example-custom-widget" {
+	script "examples/custom-widget.pl"
+	size 80 11
+	steps {
+		key "Tab" "Space"
+	}
+}
+
+screenshot "example-event-monitor" {
+	script "examples/event-monitor.pl"
+	size 92 25
+	steps {
+		key "Tab"
+		type "Ada"
+		key "Enter" "F5" "Tab"
+		click 4 9
+		move 40 23
+	}
+}
+
+screenshot "example-flow" {
+	script "examples/flow.pl"
+	size 60 14
+}
+
+screenshot "example-form" {
+	script "examples/form.pl"
+	size 80 23
+	steps {
+		type "Ada Lovelace"
+		key "Tab" "Tab"
+		type "Please call after 6 pm."
+		key "Tab" "Enter" "Down" "Down" "Enter"
+		key "Tab" "Tab" "Tab" "Tab" "Tab"
+		type "ada@"
+	}
+}
+
+screenshot "example-kdl-form" {
+	script "examples/kdl-form.pl"
+	size 80 20
+	steps {
+		type "Grace Hopper"
+		key "Tab"
+		type "cobol"
+		key "Tab" "Right" "Tab" "Tab" "Right" "Right" "Tab" "Space" "F2"
+	}
+}
+
+screenshot "example-kdl-layout" {
+	script "examples/kdl-layout.pl"
+	size 72 14
+	steps {
+		key "Tab" "Tab" "Enter"
+	}
+}
+
+screenshot "example-layout-alignment" {
+	script "examples/layout-alignment.pl"
+	size 80 19
+}
+
+screenshot "example-layout-direction" {
+	script "examples/layout-direction.pl"
+	size 72 18
+}
+
+screenshot "example-layout-floating" {
+	script "examples/layout-floating.pl"
+	size 60 14
+}
+
+screenshot "example-layout-padding" {
+	script "examples/layout-padding.pl"
+	size 80 11
+}
+
+screenshot "example-layout-sizing" {
+	script "examples/layout-sizing.pl"
+	size 76 17
+}
+
+screenshot "example-pixel-paint" {
+	script "examples/pixel-paint.pl"
+	size 96 22
+	steps {
+		key "2"
+		drag 8 12 9 13 10 14 11 15 12 15 13 16 14 16 15 16 16 16 17 16 18 16 19 16 20 15 21 14 22 14 23 13 24 12 25 12 26 11 27 10 28 10 29 9 30 9 31 9 32 9 33 9 34 9 35 10 36 10 37 11 38 12 39 12 40 13 41 13 42 14 43 15 44 16 45 16 46 16 47 16 48 16 49 16 50 16 51 15 52 15 53 14 54 13 55 12 56 12 57 11 58 11 59 10 60 9 61 9 62 9 63 9 64 9 65 9 66 9 67 10 68 11 69 11 70 12
+	}
+}
+
+screenshot "example-scroll-box" {
+	script "examples/scroll-box.pl"
+	size 80 16
+	steps {
+		wheel 20 6 direction="down" notches=5
+		wheel 60 6 direction="down" notches=2
+	}
+}
+
+screenshot "example-stack" {
+	script "examples/stack.pl"
+	size 64 18
+}
+
+screenshot "example-static-report" {
+	script "examples/static-report.pl"
+	size 62 24
+}
+
+screenshot "example-table-directory" {
+	script "examples/table-directory.pl"
+	size 120 30
+	steps {
+		key "Down" "Down" "Space" "Down" "Space" "Down"
+	}
+}
+
+screenshot "example-table-files" {
+	script "examples/table-files.pl"
+	size 90 24
+	steps {
+		key "Down" "Down" "Down" "Down" "Down" "Down" "Right"
+	}
+}
+
+screenshot "example-table-files-scrolling" {
+	script "examples/table-files.pl"
+	size 90 20
+	steps {
+		key "e"
+		key "Down" "Down" "Down" "Down" "Down" "Down" "Down" "Down" "Down" "Down" "Down" "Down" "Down"
+	}
+}
+
+screenshot "example-text-features" {
+	script "examples/text-features.pl"
+	size 80 21
+}
+
+screenshot "example-text-sizing" {
+	script "examples/text-sizing.pl"
+	size 100 13
+}
+
+screenshot "example-translucency" {
+	script "examples/translucency.pl"
+	size 80 24
+	steps {
+		wait 2.5
+	}
+}
+
+screenshot "example-web-colors" {
+	script "examples/web-colors.pl"
+	size 100 30
+}
+
+// --- examples/cookbook/: the programs of Term::Fabulous::Cookbook --------
+
+screenshot "cookbook-minimal-program" {
+	script "examples/cookbook/minimal-program.pl"
+	size 72 5
+}
+
+screenshot "cookbook-first-program" {
+	script "examples/cookbook/first-program.pl"
+	size 60 9
+}
+
+screenshot "cookbook-non-ascii-text" {
+	script "examples/cookbook/non-ascii-text.pl"
+	size 52 4
+}
+
+screenshot "cookbook-wrap-and-align-text" {
+	script "examples/cookbook/wrap-and-align-text.pl"
+	size 80 17
+}
+
+screenshot "cookbook-key-bindings" {
+	script "examples/cookbook/key-bindings.pl"
+	size 72 4
+	steps {
+		key "Ctrl+R"
+	}
+}
+
+screenshot "cookbook-follow-links" {
+	script "examples/cookbook/follow-links.pl"
+	size 72 11
+	steps {
+		key "Tab" "Enter" "Right"
+		move 10 7
+	}
+}
+
+screenshot "cookbook-click-a-word" {
+	script "examples/cookbook/click-a-word.pl"
+	size 80 11
+	steps {
+		click 4 2
+		click 5 4 button="right"
+	}
+}
+
+screenshot "cookbook-paint-with-the-mouse" {
+	script "examples/cookbook/paint-with-the-mouse.pl"
+	size 72 14
+	steps {
+		drag 4 7 5 8 6 8 7 9 8 9 9 10 10 10 11 10 12 10 13 10 14 10 15 9 16 9 17 9 18 8 19 7 20 7 21 6 22 6 23 5 24 5 25 4 26 4 27 4 28 4 29 4 30 4 31 5 32 5 33 6 34 6 35 7 36 7 37 8 38 8 39 9 40 9 41 10 42 10 43 10 44 10 45 10 46 10 47 9 48 9 49 8 50 8 51 7 52 6 53 6 54 5 55 5 56 5 57 4 58 4 59 4 60 4 61 4 62 5 63 5 64 5 65 6
+		click 4 11
+		click 6 11
+		click 8 11
+	}
+}
+
+screenshot "cookbook-clock" {
+	script "examples/cookbook/clock.pl"
+	size 48 7
+	steps {
+		wait 5
+	}
+}
+
+screenshot "cookbook-scrolling-log" {
+	script "examples/cookbook/scrolling-log.pl"
+	size 72 12
+	steps {
+		wait 6
+	}
+}
+
+screenshot "cookbook-follow-log" {
+	script "examples/cookbook/follow-log.pl"
+	size 80 14
+	steps {
+		wait 8
+	}
+}
+
+screenshot "cookbook-show-output" {
+	script "examples/cookbook/show-output.pl"
+	args "seq" "-f" "Line %g" "1" "40"
+	size 72 14
+	steps {
+		wait 1
+	}
+}
+
+screenshot "cookbook-login-form" {
+	script "examples/cookbook/login-form.pl"
+	size 64 15
+	steps {
+		type "ada"
+		key "Tab"
+		type "difference engine"
+		key "Tab" "Space" "BackTab" "Enter"
+	}
+}
+
+screenshot "cookbook-check-form" {
+	script "examples/cookbook/check-form.pl"
+	size 90 15
+	steps {
+		key "Tab"
+		type "Ada"
+		key "Tab"
+		type "ada@example"
+		key "Tab"
+		type "perl.org"
+		key "Tab"
+		type "db.example.com"
+		key "Tab"
+		type "192.0.2.300"
+		key "Tab"
+		type "07:30"
+		key "Tab" "Backspace" "Backspace" "Backspace" "Backspace"
+		type "x70000"
+		key "Tab"
+		type "9.99"
+		key "Tab"
+		type "2026-02-29"
+		key "Enter"
+	}
+}
+
+screenshot "cookbook-own-checks" {
+	script "examples/cookbook/own-checks.pl"
+	size 72 19
+	steps {
+		key "Tab"
+		type "abcABC12"
+		key "Tab"
+		type "José2 Saramago"
+		key "Tab"
+		type "7"
+		key "Tab"
+		type "mail.perl.org"
+		key "Tab"
+		type "db1.example.com"
+		key "Enter"
+		type "bad_host"
+	}
+}
+
+screenshot "cookbook-inline-prompt" {
+	script "examples/cookbook/inline-prompt.pl"
+	size 80 7
+	shell "$ ls" "notes.txt  report.csv  todo.md" "$ perl examples/cookbook/inline-prompt.pl"
+	steps {
+		type "Ada Lovelace"
+	}
+}
+
+screenshot "cookbook-confirm-dialog" {
+	script "examples/cookbook/confirm-dialog.pl"
+	size 72 14
+	steps {
+		type "Buy milk and a new punch card reader."
+		key "Ctrl+Q"
+	}
+}
+
+screenshot "cookbook-choose-options" {
+	script "examples/cookbook/choose-options.pl"
+	size 72 9
+	steps {
+		key "Tab" "Right" "Tab" "Right" "Right"
+	}
+}
+
+screenshot "cookbook-disable-inputs" {
+	script "examples/cookbook/disable-inputs.pl"
+	size 60 5
+}
+
+screenshot "cookbook-confirm-prompt" {
+	script "examples/cookbook/confirm-prompt.pl"
+	size 80 16
+	steps {
+		type "Buy milk and a new punch card reader."
+		key "Ctrl+Q"
+	}
+}
+
+screenshot "cookbook-ask-prompt" {
+	script "examples/cookbook/ask-prompt.pl"
+	size 72 18
+	steps {
+		key "t"
+		type "300"
+		key "Enter"
+	}
+}
+
+screenshot "cookbook-open-and-save" {
+	script "examples/cookbook/open-and-save.pl"
+	size 72 26
+	steps {
+		key "Ctrl+O" "Down" "Down"
+	}
+}
+
+screenshot "cookbook-color-prompt" {
+	script "examples/cookbook/color-prompt.pl"
+	size 72 24
+	steps {
+		key "c" "Down" "Down"
+	}
+}
+
+screenshot "cookbook-menu-bar" {
+	script "examples/cookbook/menu-bar.pl"
+	size 64 10
+	steps {
+		key "Alt+v"
+	}
+}
+
+screenshot "cookbook-context-menu" {
+	script "examples/cookbook/context-menu.pl"
+	size 64 14
+	steps {
+		key "Ctrl+Home" "Ctrl+Shift+Right" "Ctrl+Shift+Right"
+		click 24 5 button="right"
+	}
+}
+
+screenshot "cookbook-status-bar" {
+	script "examples/cookbook/status-bar.pl"
+	size 64 10
+	steps {
+		type "Rode my bike to the lake and back."
+		key "Ctrl+S"
+	}
+}
+
+screenshot "cookbook-help-screen" {
+	script "examples/cookbook/help-screen.pl"
+	size 72 26
+	steps {
+		key "F1"
+	}
+}
+
+screenshot "cookbook-document-tabs" {
+	script "examples/cookbook/document-tabs.pl"
+	size 72 12
+	steps {
+		key "Ctrl+End"
+		type "Coffee"
+		key "Ctrl+N"
+		type "Plant the tulips."
+	}
+}
+
+screenshot "cookbook-focus-help-line" {
+	script "examples/cookbook/focus-help-line.pl"
+	size 72 14
+	steps {
+		key "Tab"
+		type "Weekly report"
+		key "Tab"
+		type "Sales are up in the north."
+	}
+}
+
+screenshot "cookbook-tab-order" {
+	script "examples/cookbook/tab-order.pl"
+	size 48 3
+	steps {
+		key "Tab"
+		type "1 Main St"
+		key "Tab"
+		type "12345"
+	}
+}
+
+screenshot "cookbook-width-group" {
+	script "examples/cookbook/width-group.pl"
+	size 48 4
+}
+
+screenshot "cookbook-border-sides" {
+	script "examples/cookbook/border-sides.pl"
+	size 52 10
+}
+
+screenshot "cookbook-theme-switch" {
+	script "examples/cookbook/theme-switch.pl"
+	size 72 8
+	steps {
+		type "Light and readable"
+		key "F2" "F2"
+	}
+}
+
+screenshot "cookbook-theme-editor-preview" {
+	script "examples/cookbook/theme-editor-preview.pl"
+	size 100 30
+	steps {
+		key "F6"
+		type "ada@"
+		key "Tab"
+	}
+}
+
+screenshot "cookbook-states-and-classes" {
+	script "examples/cookbook/states-and-classes.pl"
+	size 72 9
+}
+
+screenshot "cookbook-resize-aware-layout" {
+	script "examples/cookbook/resize-aware-layout.pl"
+	size 80 8
+}
+
+screenshot "cookbook-resize-aware-layout-narrow" {
+	script "examples/cookbook/resize-aware-layout.pl"
+	size 60 10
+}
+
+screenshot "cookbook-pixel-canvas-plot" {
+	script "examples/cookbook/pixel-canvas-plot.pl"
+	size 80 16
+}
+
+screenshot "cookbook-picture-viewer" {
+	script "examples/cookbook/picture-viewer.pl"
+	size 80 23
+}
+
+screenshot "cookbook-embedded-logo" {
+	script "examples/cookbook/embedded-logo.pl"
+	size 56 13
+}
+
+screenshot "cookbook-sixel-viewer" {
+	script "examples/cookbook/sixel-viewer.pl"
+	size 80 23
+	steps {
+		key "h"
+	}
+}
+
+screenshot "cookbook-report-to-file" {
+	script "examples/cookbook/report-to-file.pl"
+	size 52 8
+}
+
+screenshot "cookbook-kdl-panel" {
+	script "examples/cookbook/kdl-panel.pl"
+	size 52 8
+}
+
+screenshot "cookbook-table-basics" {
+	script "examples/cookbook/table-basics.pl"
+	size 76 19
+	steps {
+		key "Down" "Space" "Down" "Down" "Space" "Down" "Enter"
+	}
+}
+
+screenshot "cookbook-table-format" {
+	script "examples/cookbook/table-format.pl"
+	size 100 15
+	steps {
+		key "Down"
+	}
+}
+
+screenshot "cookbook-table-sort" {
+	script "examples/cookbook/table-sort.pl"
+	size 96 17
+	steps {
+		key "Up" "Right" "Right" "Right" "Enter" "Left" "Space"
+	}
+}
+
+screenshot "cookbook-table-filter" {
+	script "examples/cookbook/table-filter.pl"
+	size 80 19
+	steps {
+		key "Tab" "Tab" "Tab" "Tab" "Tab"
+		type ">=80000"
+		key "BackTab"
+		type ">=2019"
+	}
+}
+
+screenshot "cookbook-table-filter-perl" {
+	script "examples/cookbook/table-filter-perl.pl"
+	size 80 16
+	steps {
+		type "4"
+	}
+}
+
+screenshot "cookbook-table-groups" {
+	script "examples/cookbook/table-groups.pl"
+	size 84 22
+	steps {
+		key "Down" "Down" "Down" "Down" "Down" "Left"
+	}
+}
+
+screenshot "cookbook-table-tree" {
+	script "examples/cookbook/table-tree.pl"
+	size 72 21
+	steps {
+		key "Down" "Down" "Down" "Down" "Down" "Right"
+	}
+}
+
+screenshot "cookbook-table-edit" {
+	script "examples/cookbook/table-edit.pl"
+	size 80 16
+	steps {
+		key "n" "Space" "Down" "Down" "Space" "a"
+		click 11 5
+		key "h"
+	}
+}
+
+screenshot "cookbook-table-pages" {
+	script "examples/cookbook/table-pages.pl"
+	size 80 19
+	steps {
+		key "Ctrl+PageDown" "Ctrl+PageDown" "Down" "Down"
+	}
+}
+
+screenshot "cookbook-table-lines" {
+	script "examples/cookbook/table-lines.pl"
+	size 48 21
+}
+
+screenshot "cookbook-table-columns" {
+	script "examples/cookbook/table-columns.pl"
+	size 92 16
+	steps {
+		key "F2" "Tab" "Tab" "Tab" "Space" "Tab" "Space"
+	}
+}
+
+screenshot "cookbook-table-kdl" {
+	script "examples/cookbook/table-kdl.pl"
+	size 80 19
+	steps {
+		key "Down" "Space" "Down" "Space" "Down" "Down" "Enter"
+	}
+}
+
+screenshot "cookbook-table-report" {
+	script "examples/cookbook/table-report.pl"
+	size 56 14
+}
+
+screenshot "cookbook-table-colors" {
+	script "examples/cookbook/table-colors.pl"
+	size 64 14
+	steps {
+		key "Down" "Down"
+	}
+}
+
+screenshot "cookbook-table-widths" {
+	script "examples/cookbook/table-widths.pl"
+	size 110 17
+}
+
+screenshot "cookbook-table-line-styles" {
+	script "examples/cookbook/table-line-styles.pl"
+	size 76 29
+}
+
+screenshot "cookbook-chart-line" {
+	script "examples/cookbook/chart-line.pl"
+	size 80 24
+}
+
+screenshot "cookbook-chart-bars" {
+	script "examples/cookbook/chart-bars.pl"
+	size 100 34
+}
+
+screenshot "cookbook-chart-pie" {
+	script "examples/cookbook/chart-pie.pl"
+	size 100 26
+}
+
+screenshot "cookbook-chart-scatter" {
+	script "examples/cookbook/chart-scatter.pl"
+	size 80 24
+}
+
+screenshot "cookbook-chart-stacked-areas" {
+	script "examples/cookbook/chart-stacked-areas.pl"
+	size 100 22
+}
+
+screenshot "cookbook-chart-histogram" {
+	script "examples/cookbook/chart-histogram.pl"
+	size 100 20
+}
+
+screenshot "cookbook-chart-radar" {
+	script "examples/cookbook/chart-radar.pl"
+	size 100 26
+}
+
+screenshot "cookbook-chart-time-series" {
+	script "examples/cookbook/chart-time-series.pl"
+	size 90 24
+}
+
+screenshot "cookbook-chart-live" {
+	script "examples/cookbook/chart-live.pl"
+	size 80 22
+	steps {
+		wait 30
+	}
+}
+
+screenshot "cookbook-chart-log-scale" {
+	script "examples/cookbook/chart-log-scale.pl"
+	size 100 20
+}
+
+screenshot "cookbook-chart-transform" {
+	script "examples/cookbook/chart-transform.pl"
+	size 90 30
+}
+
+screenshot "cookbook-chart-curves" {
+	script "examples/cookbook/chart-curves.pl"
+	size 100 26
+}
+
+screenshot "cookbook-chart-styles" {
+	script "examples/cookbook/chart-styles.pl"
+	size 100 32
+}
+
+screenshot "cookbook-chart-options" {
+	script "examples/cookbook/chart-options.pl"
+	size 100 30
+}
+
+screenshot "cookbook-chart-colors" {
+	script "examples/cookbook/chart-colors.pl"
+	size 100 22
+}
+
+screenshot "cookbook-chart-hover" {
+	script "examples/cookbook/chart-hover.pl"
+	size 80 24
+	steps {
+		move 50 12
+	}
+}
+
+screenshot "cookbook-chart-kdl" {
+	script "examples/cookbook/chart-kdl.pl"
+	size 100 22
+}
+
+screenshot "cookbook-chart-report" {
+	script "examples/cookbook/chart-report.pl"
+	size 64 16
+}
+
+screenshot "cookbook-chart-sparklines" {
+	script "examples/cookbook/chart-sparklines.pl"
+	size 90 12
+}
+
+// --- examples/widgets/: the previews of the widget pages ------------------
+
+screenshot "widget-box" {
+	script "examples/widgets/box.pl"
+	size 72 11
+}
+
+screenshot "widget-text" {
+	script "examples/widgets/text.pl"
+	size 80 11
+}
+
+screenshot "widget-rich-text" {
+	script "examples/widgets/rich-text.pl"
+	size 80 17
+	steps {
+		key "Tab" "Right"
+		move 43 13
+	}
+}
+
+screenshot "widget-virtual-list" {
+	script "examples/widgets/virtual-list.pl"
+	size 80 20
+	steps {
+		key "End"
+		wheel 40 10 direction="up" notches=4
+	}
+}
+
+screenshot "widget-button" {
+	script "examples/widgets/button.pl"
+	size 60 7
+	steps {
+		key "Enter"
+	}
+}
+
+screenshot "widget-checkbox" {
+	script "examples/widgets/checkbox.pl"
+	size 60 7
+}
+
+screenshot "widget-radio" {
+	script "examples/widgets/radio.pl"
+	size 64 9
+}
+
+screenshot "widget-dropdown" {
+	script "examples/widgets/dropdown.pl"
+	size 64 14
+	steps {
+		key "Enter" "Down"
+	}
+}
+
+screenshot "widget-slider" {
+	script "examples/widgets/slider.pl"
+	size 64 7
+}
+
+screenshot "widget-star-rating" {
+	script "examples/widgets/star-rating.pl"
+	size 60 7
+}
+
+screenshot "widget-segmented-control" {
+	script "examples/widgets/segmented-control.pl"
+	size 64 10
+}
+
+screenshot "widget-text-field" {
+	script "examples/widgets/text-field.pl"
+	size 64 9
+	steps {
+		type "Ada Lovelace"
+		key "Ctrl+Shift+Left"
+	}
+}
+
+screenshot "widget-input-validation" {
+	script "examples/widgets/input-validation.pl"
+	size 64 29
+	steps {
+		type "ada@exa"
+	}
+}
+
+screenshot "widget-text-area" {
+	script "examples/widgets/text-area.pl"
+	size 72 10
+}
+
+screenshot "widget-color-picker" {
+	script "examples/widgets/color-picker.pl"
+	size 72 22
+}
+
+screenshot "widget-dialog" {
+	script "examples/widgets/dialog.pl"
+	size 72 14
+}
+
+screenshot "widget-prompt" {
+	script "examples/widgets/prompt.pl"
+	size 72 22
+	steps {
+		key "n"
+		type "Ada Lovelace"
+		key "Tab"
+		type "ada@engine"
+		key "Enter"
+	}
+}
+
+screenshot "widget-file-dialog" {
+	script "examples/widgets/file-dialog.pl"
+	size 72 30
+	steps {
+		key "o" "Down" "Down" "Down" "Down"
+	}
+}
+
+screenshot "widget-key-reference" {
+	script "examples/widgets/key-reference.pl"
+	size 72 24
+	steps {
+		key "F1"
+		type "ctrl"
+	}
+}
+
+screenshot "widget-menu" {
+	script "examples/widgets/menu.pl"
+	size 64 14
+	steps {
+		click 8 4 button="right"
+		move 10 6
+	}
+}
+
+screenshot "widget-menu-bar" {
+	script "examples/widgets/menu-bar.pl"
+	size 64 14
+	steps {
+		key "Ctrl+End"
+		type "- milk"
+		key "Alt+e"
+	}
+}
+
+screenshot "widget-progress-bar" {
+	script "examples/widgets/progress-bar.pl"
+	size 72 10
+	steps {
+		wait 2
+	}
+}
+
+screenshot "widget-toast" {
+	script "examples/widgets/toast.pl"
+	size 90 22
+	steps {
+		key "1" "2" "3" "i"
+	}
+}
+
+screenshot "widget-status-bar" {
+	script "examples/widgets/status-bar.pl"
+	size 72 16
+	steps {
+		key "Down" "Down" "s"
+	}
+}
+
+screenshot "widget-spinner" {
+	script "examples/widgets/spinner.pl"
+	size 60 18
+	steps {
+		wait 1
+	}
+}
+
+screenshot "widget-image" {
+	script "examples/widgets/image.pl"
+	size 129 30
+}
+
+screenshot "widget-sixel" {
+	script "examples/widgets/sixel.pl"
+	size 100 17
+}
+
+screenshot "widget-divider" {
+	script "examples/widgets/divider.pl"
+	size 64 18
+}
+
+screenshot "widget-accordion" {
+	script "examples/widgets/accordion.pl"
+	size 84 16
+}
+
+screenshot "widget-tabs" {
+	script "examples/widgets/tabs.pl"
+	size 100 30
+}
+
+screenshot "widget-document-tabs" {
+	script "examples/widgets/document-tabs.pl"
+	size 72 14
+	steps {
+		click 13 0
+		click 47 0
+	}
+}
+
+screenshot "widget-table" {
+	script "examples/widgets/table.pl"
+	size 90 24
+	steps {
+		key "Space" "Down" "Down" "Space"
+	}
+}
+
+screenshot "widget-line-chart" {
+	script "examples/widgets/line-chart.pl"
+	size 76 22
+}
+
+screenshot "widget-area-chart" {
+	script "examples/widgets/area-chart.pl"
+	size 76 22
+}
+
+screenshot "widget-bar-chart" {
+	script "examples/widgets/bar-chart.pl"
+	size 76 22
+}
+
+screenshot "widget-scatter-plot" {
+	script "examples/widgets/scatter-plot.pl"
+	size 76 22
+}
+
+screenshot "widget-histogram" {
+	script "examples/widgets/histogram.pl"
+	size 76 22
+}
+
+screenshot "widget-sparkline" {
+	script "examples/widgets/sparkline.pl"
+	size 76 12
+	steps {
+		wait 3
+	}
+}
+
+screenshot "widget-pie-chart" {
+	script "examples/widgets/pie-chart.pl"
+	size 76 22
+}
+
+screenshot "widget-donut-chart" {
+	script "examples/widgets/donut-chart.pl"
+	size 76 22
+}
+
+screenshot "widget-polar-area-chart" {
+	script "examples/widgets/polar-area-chart.pl"
+	size 76 22
+}
+
+screenshot "widget-radar-chart" {
+	script "examples/widgets/radar-chart.pl"
+	size 76 22
+}
+
+screenshot "widget-chart" {
+	script "examples/widgets/chart.pl"
+	size 100 32
+}
+
+screenshot "widget-pie-chart-styles" {
+	script "examples/widgets/pie-chart-styles.pl"
+	size 90 32
+}
+
+screenshot "widget-donut-chart-centers" {
+	script "examples/widgets/donut-chart-centers.pl"
+	size 100 22
+}
+
+screenshot "widget-histogram-measures" {
+	script "examples/widgets/histogram-measures.pl"
+	size 100 30
+}

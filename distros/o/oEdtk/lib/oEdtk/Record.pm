@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Scalar::Util qw(blessed);
-our $VERSION	= 0.7005;
+our $VERSION	= 2.1109;
 
 sub debug {
 	my ($self)= @_;

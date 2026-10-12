@@ -60,6 +60,79 @@ use Punk::SSE;
        'every field is formatted byte-exact to the spec');
 }
 
+# ---- a line break is CR, LF or CRLF --------------------------------------------
+# The client ends a line at any of the three. A CR left inside a data: line
+# is where the next field starts for it, so text relayed from a user could
+# name the event and set the last event id for everyone listening.
+{
+    package CRApp;
+    use Punk;
+    sse '/stream' => sub {
+        my ($c, $s) = @_;
+        $s->send("user text\rid: 999\revent: admin\rdata: injected");
+        $s->send("a\r\nb");
+        $s->send("tail\r");
+        $s->send("x\n\ry");
+        $s->event(tick => "one\rtwo");
+        $s->close;
+    }, { blocking => 1 };
+    package main;
+
+    socketpair(my $ours, my $theirs, AF_UNIX, SOCK_STREAM, PF_UNSPEC) or die "socketpair: $!";
+    CRApp->to_app->({ REQUEST_METHOD => 'GET', PATH_INFO => '/stream',
+                      'psgix.io' => $theirs });
+    close $theirs;
+    my $raw = '';
+    eval { local $SIG{ALRM} = sub { die "to\n" }; alarm 2;
+           while (sysread $ours, my $c, 4096) { $raw .= $c } alarm 0 };
+    my (undef, $body) = split /\r\n\r\n/, $raw, 2;
+    unlike($body, qr/\r/, 'no CR reaches the wire');
+    is($body,
+       "data: user text\ndata: id: 999\ndata: event: admin\ndata: data: injected\n\n"
+     . "data: a\ndata: b\n\n"
+     . "data: tail\ndata: \n\n"
+     . "data: x\ndata: \ndata: y\n\n"
+     . "event: tick\ndata: one\ndata: two\n\n",
+       'CR and CRLF each end a data line, like LF');
+    my @fields = map { (split /:/, $_, 2)[0] } grep { length } split /\n/, $body;
+    is_deeply([ grep { $_ ne 'data' && $_ ne 'event' } @fields ], [],
+        '...so a client sees data lines and the one event it was sent, nothing else');
+    is(scalar(grep { $_ eq 'event' } @fields), 1, '...and only that one event name');
+}
+
+# ---- HEAD is the headers ------------------------------------------------------
+{
+    my $ran = 0;
+    package HeadApp;
+    use Punk;
+    sse '/events' => sub { $ran++; $_[1]->send('never') };
+    get '/csv' => sub {
+        $_[0]->stream('text/csv', { status => 201,
+            headers => [ 'X-Rows' => 3 ] }, sub { $ran++; $_[1]->write("a\n") });
+    };
+    package main;
+
+    my $app = HeadApp->to_app;
+    for my $env ({}, { 'psgi.streaming' => 1 }) {
+        my $how = %$env ? 'psgi.streaming' : 'a plain server';
+        my $r = $app->({ REQUEST_METHOD => 'HEAD', PATH_INFO => '/events', %$env });
+        is(ref $r, 'ARRAY', "HEAD on an sse route ($how) is a plain response");
+        is($r->[0], 200, '...a 200');
+        is({ @{ $r->[1] } }->{'Content-Type'}, 'text/event-stream',
+            '...with the stream\'s headers');
+        is(join('', @{ $r->[2] }), '', '...and no body');
+
+        $r = $app->({ REQUEST_METHOD => 'HEAD', PATH_INFO => '/csv', %$env });
+        is(ref $r, 'ARRAY', "HEAD on a \$c->stream route ($how) is a plain response");
+        is($r->[0], 201, '...with the status it would have had');
+        my %h = @{ $r->[1] };
+        is($h{'Content-Type'}, 'text/csv', '...its content type');
+        is($h{'X-Rows'}, 3, '...its headers');
+        is(join('', @{ $r->[2] }), '', '...and no body');
+    }
+    is($ran, 0, 'no handler ran for any of them');
+}
+
 # ---- psgi.streaming transport ------------------------------------------------
 {
     package SApp;
@@ -117,6 +190,19 @@ SKIP: {
             };
             $tick->();
         }, { heartbeat => 0.2 };
+        # 24 MB at a client that reads none of it. Past the buffer limit the
+        # stream is closed, which is what this reports; with no limit it
+        # would hold all of it for as long as the client stayed.
+        our $FLOOD = 'idle';
+        sse '/flood' => sub {
+            my ($c, $s) = @_;
+            $FLOOD = 'open';
+            $s->on(close => sub { $FLOOD = 'closed' });
+            my $chunk = 'x' x 1_000_000;
+            for (1 .. 24) { last unless $s->is_open; $s->send($chunk) }
+            $FLOOD = 'held' if $s->is_open;
+        }, { heartbeat => 0 };
+        get '/flooded' => sub { $_[0]->text($LApp::FLOOD) };
         get '/fast'   => sub { $_[0]->text('fast') };
         get '/closed' => sub { $_[0]->text($LApp::CLOSED) };
         # which event backend this box picked, so a failure names it: the
@@ -192,6 +278,22 @@ SKIP: {
           :                            "'$closed'",
             (waitpid($pid, POSIX::WNOHANG()) == 0 ? 'still running' : 'gone'),
             (defined $backend && length $backend ? $backend : '(unknown)');
+
+    {   # a client that opens a stream and never reads
+        my $fs = IO::Socket::INET->new(PeerAddr => $host) or die "connect: $!";
+        $fs->autoflush(1);
+        syswrite $fs, "GET /flood HTTP/1.1\r\nHost: x\r\n\r\n";
+        my $state;
+        for (1 .. 40) {
+            Time::HiRes::sleep(0.1);
+            $state = $plain->('/flooded');
+            last if defined $state && $state =~ /\A(?:closed|held)\z/;
+        }
+        is($state, 'closed',
+           'a stream whose client reads nothing is closed at the default '
+         . 'buffer limit, not held without one');
+        close $fs;
+    }
 
     kill 9, $pid; waitpid $pid, 0;
 }

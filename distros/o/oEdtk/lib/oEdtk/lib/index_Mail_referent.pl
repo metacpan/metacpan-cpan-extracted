@@ -16,7 +16,7 @@ if ($ARGV[0] =~/-h/i) {
 }
 
 
-# run statistics and send the advertissement by mail. 
+# run statistics and send the notification by mail. 
 my $cfg = config_read('EDTK_DB', 'MAIL');
 my $dbh = db_connect($cfg, 'EDTK_DBI_DSN',
     { AutoCommit => 1, RaiseError => 1 });
@@ -25,7 +25,7 @@ my $pdbh = db_connect($cfg, 'EDTK_DBI_PARAM');
 my $rows = omgr_stats_referent($dbh, $pdbh);
 
 if ($#$rows<0) {
-	my $subject="INFO : pas de validation de lot prevue dans la base de lotissement.\n";
+	my $subject="INFO : no lot validation planned in the lot management database.\n";
 	oe_send_mail($cfg->{'EDTK_MAIL_SENDER'}, $subject, $subject);
 	warn $subject;
 	exit;
@@ -35,7 +35,7 @@ my %hMail;
 foreach my $mail (@$rows) {
 	my $corp = @$mail[2] || " ";
 	$hMail{@$mail[0]} .= @$mail[1]."\t". $corp ."\n " ;	
-	warn "INFO : edition(s) en attente \n ". $hMail{@$mail[0]} ."\n";
+	warn "INFO : edition(s) pending \n ". $hMail{@$mail[0]} ."\n";
 }
 
 

@@ -1,0 +1,1214 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Term::Fabulous::Manual::Tables - Tables: how they work, rows, columns, display text and cell widgets
+
+=head1 DESCRIPTION
+
+This page is part of L<Term::Fabulous::Manual>. Previous page: L<Term::Fabulous::Manual::Charts>. Next page: L<Term::Fabulous::Manual::TableRows>.
+
+This page starts the table guide. It explains how a
+L<Term::Fabulous::Widget::Table> turns your data into the lines it
+shows, defines the terms the guide uses, and describes the rows, the
+columns, the display text of the cells (mutators) and widgets in cells.
+Its L</FEATURE INDEX> lists every table feature with the section that
+explains it, on all table pages.
+
+The table documentation has four parts:
+
+=over
+
+=item L<Term::Fabulous::Manual::Tables> (this page)
+
+How a table works, the terms, rows, columns, display text and mutators,
+widgets in cells, and the feature index of all table features.
+
+=item L<Term::Fabulous::Manual::TableRows>
+
+Sorting, filtering, grouping, trees, pages, the cursor and the
+selection.
+
+=item L<Term::Fabulous::Manual::TableStyles>
+
+Colors, styles, lines between and around the cells, padding, size,
+scrolling and printing.
+
+=item L<Term::Fabulous::Widget::Table>
+
+The reference: every parameter, method, key, mouse action, event and KDL
+property, with what it takes, returns and when it dies.
+
+=back
+
+Complete programs are in L<Term::Fabulous::Cookbook::Tables> (show,
+format, size and edit tables, choose columns, KDL, reports),
+L<Term::Fabulous::Cookbook::TableRows> (sort, filter, group, trees,
+pages) and L<Term::Fabulous::Cookbook::TableStyles> (lines and colors).
+F<examples/table-directory.pl> and F<examples/table-files.pl> (see
+L<Term::Fabulous::Examples>) are larger demos.
+
+=head1 TABLES
+
+L<Term::Fabulous::Widget::Table> shows a list of Perl hashes as rows and
+columns. You describe the columns once; the table handles everything the
+user does with the rows: moving through them with the keyboard and the
+mouse, sorting by a click on a column title, filtering, opening and
+closing groups and tree rows, turning pages and selecting rows. Your
+program reads and changes the data at any time through the table's
+methods, and learns about the user's actions through events.
+
+	use Term::Fabulous::Widget::Table;
+	use Term::Fabulous::Widget::Table::Mutator qw(date number);
+
+	my $table = Term::Fabulous::Widget::Table->new(
+		id        => 'staff',
+		row_id    => 'id',
+		selection => 'multiple',
+		columns   => [
+			{ key => 'name',    title => 'Name' },
+			{ key => 'started', title => 'Started', type => 'date',   mutator => date('%d %b %Y') },
+			{ key => 'salary',  title => 'Salary',  type => 'number', mutator => number( decimals => 0 ) },
+		],
+		rows => [
+			{ id => 1, name => 'Ada',   started => '2019-03-04', salary => 81000 },
+			{ id => 2, name => 'Grace', started => '2021-11-15', salary => 76500 },
+		],
+	);
+	$table->on( RowActivate => sub ($event) { $status->text( 'Open ' . $event->row->{name} ); return } );    # $status: a Text widget
+
+Every table needs an C<id>, unique in the widget tree. The rows scroll
+inside a widget of their own whose id is the table's id followed by
+C</body> (C<staff/body> here), and that widget keeps its scroll
+position by its id from frame to frame. Without an
+C<id>, C<new> dies with C<a table needs an id>.
+
+The picture shows F<examples/widgets/table.pl>, a table with a filter
+row, a sort, a multiple selection and pages:
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-table.svg" alt="A table of staff with a filter row, sorted by the start date, two rows selected with check boxes and a pager below"></p>
+
+=end html
+
+=head2 How a table works
+
+The words in I<italics> are defined in L</Table terms>.
+
+You give the table I<rows>: hash references such as
+C<< { id => 7, name => 'Ada', started => 1714739400 } >>. The table
+copies them; changing your hashes afterwards changes nothing. Every row
+has a I<row id>, which names it in all methods and events (see
+L</ROWS>).
+
+A I<column> picks one value out of each row, its I<raw value> (by
+default the row's entry under the column's key), and turns it into the
+I<display text>, the text the cell shows (with the column's
+I<mutators>, or as it is). Sorting and filtering use the raw value
+unless you say otherwise, so a date shown as C<3 May 2024> still sorts
+as a date (see L</COLUMNS> and L</DISPLAY TEXT AND MUTATORS>).
+
+From the rows, the table computes its I<view>, the I<lines> it shows,
+in five steps:
+
+=over
+
+=item 1.
+
+B<Filter>: rows that do not match every filter and the search are left
+out; in a tree, the parents of a matching row stay. See
+L<Term::Fabulous::Manual::TableRows/FILTERING>.
+
+=item 2.
+
+B<Group>: with C<group_by>, rows are put into groups by the values of
+the group columns, each with a group header line. See
+L<Term::Fabulous::Manual::TableRows/GROUPING>.
+
+=item 3.
+
+B<Sort>: rows are sorted within their group and, in a tree, within
+their parent row. Rows that compare equal keep the order you gave them.
+See L<Term::Fabulous::Manual::TableRows/SORTING>.
+
+=item 4.
+
+B<Flatten>: closed groups and closed tree rows hide what is inside
+them. See L<Term::Fabulous::Manual::TableRows/TREES>.
+
+=item 5.
+
+B<Page>: with a C<page_size>, the lines are cut into pages, and the
+table shows one page. See L<Term::Fabulous::Manual::TableRows/PAGES>.
+
+=back
+
+The I<cursor> marks one line of the current page: the line the keyboard
+works on. It is drawn only while the table has the keyboard focus. The
+I<selection> is a separate set of rows that the user or your program
+picked (C<< selection => 'single' >> or C<'multiple'>); it can contain
+rows that are not on the current page or are filtered out. See
+L<Term::Fabulous::Manual::TableRows/SELECTION AND CURSOR>.
+
+What the user does fires events on the table: C<CursorMove>,
+C<SelectionChange>, C<RowActivate> (C<Enter> or a double click on a
+row), C<SortChange>, C<FilterChange>, C<PageChange>, C<Expand>,
+C<Collapse> and C<ColumnsChange> (see
+L<Term::Fabulous::Widget::Table/EVENTS>). Changes your program makes
+through the table's methods (C<add_row>, C<sort_by>, C<select>, ...)
+fire no events, so a listener never has to tell the user's actions from
+its own. All changes show in the next frame: the table updates its
+widgets once per frame, however many changes were made.
+
+The table draws its own lines, joined into one grid: a frame, lines
+between the columns, optional lines between the rows, and a line below
+the column titles. Colors, lines and text styles can be set for the
+whole table, a column, a row or a single cell, also depending on the
+data (red negative numbers, gray rows of finished tasks). See
+L<Term::Fabulous::Manual::TableStyles/STYLES AND BORDERS>.
+
+Each cell that is shown is about two widgets, and every widget costs
+time in every frame. For more than a few hundred rows, use C<page_size>;
+see L<Term::Fabulous::Widget::Table/PERFORMANCE>.
+
+=head2 Table terms
+
+These terms are used on all pages of the table guide and in the
+reference.
+
+=over
+
+=item row
+
+One hash reference of your data, shown as one line of the table. The
+table stores a copy.
+
+=item row id
+
+The name of a row: the value of its C<row_id> entry, what a C<row_id>
+code reference returns, or a number the table counts up (see
+L</Row ids>). Ids are strings, unique within a table, and never change.
+
+=item row data
+
+The hash of a row as the table stores it, without its child rows.
+Methods such as C<row> return new copies of it. Your code (mutators,
+C<value>, C<cell>, filters, C<compare>, C<row_style>, ...) gets one copy
+per row that is shared by all of them until the row changes: read it,
+but do not change it.
+
+=item column key
+
+The name of a column, unique within a table. It is also the hash key
+the column reads from each row, unless the column has a C<value> code
+reference.
+
+=item raw value
+
+The value a column reads from a row. Sorting uses it; filters use it
+unless they say C<< on => 'display' >>.
+
+=item display text
+
+The text a cell shows: the raw value after the column's mutators,
+or the raw value itself. C<undef> shows as nothing.
+
+=item mutator
+
+A code reference that turns a raw value into display text, for example
+epoch seconds into C<2024-05-03>. See L</DISPLAY TEXT AND MUTATORS>.
+
+=item view
+
+The rows that pass the filters, grouped, sorted and flattened into
+lines; see L</How a table works>.
+
+=item line
+
+One entry of the view: a data row or a group header. Pages count lines,
+not rows.
+
+=item group, group path
+
+The rows that share the value of a group column. A group's I<path> is
+the list of the raw values of its group and the groups around it,
+outermost first: C<[ 'Sales' ]>, or C<[ 'Sales', 'Berlin' ]> with two
+group columns.
+
+=item tree row, child row
+
+In a tree (see L<Term::Fabulous::Manual::TableRows/TREES>), a row can
+have child rows, shown indented below it while it is I<expanded> (open).
+
+=item open, closed (expanded, collapsed)
+
+A tree row or a group is I<open> (expanded) while its rows are shown,
+and I<closed> (collapsed) while they are hidden. The method names use
+"expand" and "collapse".
+
+=item passes the filters
+
+A row I<passes the filters> when it matches all filters and the search,
+or, in a tree, when one of its child rows (at any depth) does; see
+L<Term::Fabulous::Manual::TableRows/Filters with groups and trees>. Rows
+that pass are in the view, also when they are inside a closed group or
+tree row.
+
+=item cursor
+
+The line the keyboard works on, highlighted while the table has the
+focus. Every view that has lines has exactly one cursor line.
+
+=item selection
+
+The set of rows that are selected, shown with the selected color and,
+with a selection column, with C<[x]> marks.
+
+=item style hash
+
+A hash reference of looks and lines, such as
+C<< { text_color => '#ff0000', bold => 1, border_bottom => 'Double' } >>,
+for a column, a row or a cell. See
+L<Term::Fabulous::Manual::TableStyles/Style keys>.
+
+=item grid line, frame
+
+The lines between the cells are grid lines; the lines around the table
+are its frame. See
+L<Term::Fabulous::Manual::TableStyles/Lines between and around the cells>.
+
+=back
+
+=head1 ROWS
+
+=for highlighter language=text
+
+	Parameters: rows, row_id
+	Methods:    rows, row, row_ids, row_count, has_row, value, display_value,
+	            filtered_row_ids, page_row_ids, add_row, add_rows, update_row,
+	            replace_row, set_value, remove_row, remove_rows, clear_rows
+
+The rows of a table are an array reference of hash references, given as
+the C<rows> parameter or later with the C<rows> method. A row can hold
+more entries than the table has columns; the extra entries are kept and
+passed to your code (mutators, cell widgets, filters), so a row can
+carry everything you need to know about it.
+
+=for highlighter language=perl
+
+	my $table = Term::Fabulous::Widget::Table->new(
+		id      => 'files',
+		row_id  => 'path',
+		columns => [ { key => 'name', title => 'Name' }, { key => 'size', title => 'Size', type => 'number' } ],
+		rows    => [
+			{ path => '/etc/hosts',  name => 'hosts',  size => 220,  owner => 'root' },
+			{ path => '/etc/passwd', name => 'passwd', size => 2780, owner => 'root' },
+		],
+	);
+
+	$table->rows( \@new_rows );    # replaces all rows
+
+The table copies every row hash when it receives it (one level deep: a
+nested array or hash inside a row is shared, not copied). Your hashes
+can be changed or reused afterwards without effect on the table.
+
+The recipe
+L<Show a list of hashes in a table|Term::Fabulous::Cookbook::Tables/Show a list of hashes in a table (sort, select, open a row)>
+is a complete program:
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-table-basics.svg" alt="A table of user accounts sorted by name, two rows selected with check boxes, and two status lines below: the selected logins and the account opened with Enter"></p>
+
+=end html
+
+=head2 Row ids
+
+Every row has an id, a string that names it in every method and event
+(C<< $table->row($id) >>, C<< $event->row_id >>, ...). The C<row_id>
+parameter says where it comes from:
+
+=over
+
+=item C<< row_id => 'path' >>
+
+The id is the row's entry under that key. Every row must have a
+non-empty value there, and no two rows may have the same one; otherwise
+the call that adds the rows dies, and no row is added.
+
+=item C<< row_id => sub ($row) { ... } >>
+
+The id is what the code reference returns for a copy of the row, for
+example C<< sub ($row) { "$row->{host}:$row->{port}" } >>. The same
+rules apply.
+
+=item no C<row_id> (the default)
+
+The table numbers the rows itself: 1, 2, 3 and so on, in the order they
+are added. The numbers keep counting up for the life of the table; a
+number is never given to a second row, even after its row was removed
+or C<rows> replaced all rows. C<add_row> and C<add_rows> return the new
+ids.
+
+=back
+
+Use a C<row_id> whenever your data has a natural key: then a row keeps
+its id when you replace all rows with C<rows>, and with it its
+selection (rows that are still there stay selected). A row's id never
+changes: C<update_row> and C<replace_row> die when the new data would
+give the row another id. C<row_id> can only be changed while the table
+has no rows.
+
+=head2 Reading rows
+
+	my $row   = $table->row(7);              # a copy of the row's data
+	my $all   = $table->rows;                # copies of all rows, as given (children nested)
+	my @ids   = $table->row_ids;             # every id, in data order
+	my $count = $table->row_count;
+	my $raw   = $table->value( 7, 'started' );            # 1714739400
+	my $text  = $table->display_value( 7, 'started' );    # '03 May 2024'
+	my @shown = $table->filtered_row_ids;    # the rows that pass the filters
+	my @page  = $table->page_row_ids;        # the data rows of the current page, in view order
+
+Everything these methods return is a copy; changing it does not change
+the table. Methods that take a row id die when there is no row with
+that id; check with C<has_row> first if you are not sure.
+
+=head2 Changing the data
+
+	my $id  = $table->add_row( { id => 8, name => 'Barbara', started => '2024-02-01', salary => 68000 } );
+	my @ids = $table->add_rows( \@more, index => 0 );         # at the top
+
+	$table->set_value( 8, salary => 70000 );                  # one cell (a column key)
+	$table->update_row( 8, { salary => 72000, team => 'Web' } );    # some entries (any keys)
+	$table->replace_row( 8, { id => 8, name => 'Barbara L.' } );    # all entries
+	$table->remove_row(8);
+	$table->remove_rows( 2, 3 );
+	$table->clear_rows;
+	$table->rows( \@fresh );                                  # all new rows
+
+=over
+
+=item *
+
+C<add_row> and C<add_rows> append rows at the end of the data, or at
+C<index> (0 is the top). In a tree, C<< parent => $id >> adds them as
+child rows of that row (see
+L<Term::Fabulous::Manual::TableRows/Changing a tree>). The position is
+the I<data order>; the table still shows the rows sorted, grouped and
+filtered as it is set up.
+
+=item *
+
+C<set_value> changes one entry of a row; the key must be a column key.
+C<update_row> merges a hash of changes into the row (any keys);
+C<replace_row> replaces the whole row data.
+
+=item *
+
+C<remove_row> and C<remove_rows> remove rows and, in a tree, all their
+child rows. Removed rows leave the selection, and their row and cell
+styles are forgotten.
+
+=item *
+
+C<rows> replaces all rows. Rows whose id stays keep their selection and
+their row and cell styles, and show their new data: a program that
+gives a table with C<row_id> fresh rows every second sees the new
+values. A row removed and added again with its id shows its new data
+as well.
+
+=item *
+
+None of these fire an event. The cursor stays on its row as long as
+the row is shown; when it is gone, the cursor moves to the line that
+takes its place (see L<Term::Fabulous::Manual::TableRows/The cursor>).
+
+=back
+
+Changing data that a column's mutator, C<value> code, C<cell_style> or
+cell widget depends on updates the cell: the table runs the code again
+for the changed row only. For a cell widget, see
+L</Updating cell widgets instead of rebuilding them>.
+
+=head1 COLUMNS
+
+=for highlighter language=text
+
+	Parameters: columns
+	Methods:    columns, column, column_keys, add_column, remove_column,
+	            move_column, update_column, visible_columns,
+	            is_column_visible, show_columns, hide_columns,
+	            set_visible_columns, open_column_chooser,
+	            close_column_chooser, is_column_chooser_open
+	Events:     ColumnsChange
+	KDL:        column "key" title=... type=... width=... ...
+
+The C<columns> parameter is an array reference with one hash reference
+per column, in the order they are shown. Only C<key> is required:
+
+=for highlighter language=perl
+
+	columns => [
+		{ key => 'name',    title => 'Name', width => 'grow' },
+		{ key => 'size',    title => 'Size', type => 'number', mutator => bytes() },
+		{ key => 'changed', title => 'Changed', type => 'date', mutator => datetime() },
+		{ key => 'note',    title => 'Note', width => 'fit(0, 40)', sortable => 0 },
+	],
+
+The table turns each hash into a L<Term::Fabulous::Widget::Table::Column>
+object. That class's page describes every column parameter in full;
+here is the overview:
+
+=for highlighter language=text
+
+	key            the column's name and, by default, the row entry it shows (required)
+	title          the header text (default: the key)
+	type           'string' (default), 'number' or 'date': alignment, sorting, filtering
+	value          sub ($row) { ... }: compute the raw value instead of reading the key
+	mutator        sub ( $value, $row ) { ... } or a list of them: the display text
+	align          'left', 'center' or 'right' (default: right for numbers, else left)
+	header_align   the same for the header cell (default: align)
+	width          'fit', 'fit(8)', 'fit(0, 30)', 'fixed(12)', 'grow', 'grow(10, 40)', 'percent(25)'
+	wrap           'words' (default), 'newlines' or 'none'
+	sortable       1 (default) or 0: may the user sort by it?
+	compare        'string', 'natural', 'number', 'date' or sub ( $a, $b, $row_a, $row_b ) { ... }
+	filterable     1 (default) or 0: does the filter row have a field for it?
+	filter_on      'display' or 'value': what its filter field compares
+	cell           sub ($cell) { ... }: a widget for each cell
+	update_cell    sub ( $widget, $cell ) { ... }: bring that widget up to date
+	header         sub ($column) { ... }: a widget for the header cell
+	cell_style     sub ($cell) { ... }: a style hash per cell (conditional formatting)
+	style          a style hash for all cells of the column
+	header_style   a style hash for the header cell
+	visible        1 (default) or 0: is the column shown at first?
+
+Unknown keys and invalid values die when the column is made. A message
+about an invalid value names the column
+(C<Term::Fabulous::Widget::Table::Column 'qty': align must be 'left', 'center' or 'right', got 'middle'>);
+one about an unknown key names the key
+(C<Unrecognised parameters for Term::Fabulous::Widget::Table::Column constructor: 'titel'>).
+
+=head2 Column widths
+
+C<width> sets how wide a column is, in terminal cells (character
+cells), including the cell padding (one cell left and right by default;
+see L<Term::Fabulous::Manual::TableStyles/Cell padding>):
+
+=for highlighter language=perl
+
+	width => 'fit'           # as wide as the widest cell of the column (the default)
+	width => 'fit(8)'        # the same, but at least 8 cells
+	width => 'fit(0, 30)'    # the same, but at most 30 cells; longer text wraps
+	width => 'fixed(12)'     # exactly 12 cells; longer text wraps
+	width => 'grow'          # a share of the width the table has left over
+	width => 'grow(10, 40)'  # the same, between 10 and 40 cells
+	width => 'percent(25)'   # a quarter of the table's width
+
+The header cell, the filter field and every cell of the column are
+measured together, so a C<fit> column is as wide as the widest of them.
+Only the cells that are shown count: the lines of the current page,
+without the rows inside closed groups and tree rows and without the
+rows the filters hide. The text typed into a filter field does not
+count. So a C<fit> column can change its width when the user turns a
+page, opens a group or filters; with no matching row at all, it shrinks
+to its title. Give it a C<fixed> or C<grow> width, or a minimum such as
+C<'fit(12)'>, to keep it steady; with a filter row, do that for every
+column the user filters, so that the field stays wide enough to type
+into. The widths also take the hash that the C<sizing_*> functions of
+L<Clay::XS> return, such as C<sizing_fixed(12)>.
+
+A C<grow> or C<percent> column only has room to grow when the table is
+wider than its columns need: give the table a width with its C<layout>,
+for example C<< layout => { sizing => { width => sizing_grow() } } >>
+(see L<Term::Fabulous::Manual::TableStyles/SIZE AND SCROLLING>). Several
+C<grow> columns share the leftover width. A C<grow> column takes the
+width the other columns leave over, within its limits, and its text
+wraps in that width. When the columns need more width than the table
+has, the rows scroll sideways (see
+L<Term::Fabulous::Manual::TableStyles/SIZE AND SCROLLING>).
+
+The recipe
+L<Size, align and wrap columns|Term::Fabulous::Cookbook::TableStyles/Size, align and wrap columns (widths, wrapping, widget titles)>
+shows the widths, the alignment and the wrapping of this and the next
+two sections. In the picture, C<#> is C<fixed(6)>, C<Item> grows into
+the width the other columns leave over, C<Notes> is C<percent(33)> and
+wraps at spaces, and C<Ship to> is C<fit(16)> and breaks only at the
+newlines of its text:
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-table-widths.svg" alt="An order table with a fixed number column, a growing Item column, a Notes column that takes a third of the width and wraps, an address column of two lines per row, a centered quantity, prices with a left-aligned title, and a Rating title with a star"></p>
+
+=end html
+
+=head2 Alignment
+
+C<align> places the content of the column's cells: C<'left'>,
+C<'center'> or C<'right'>. Number columns are right-aligned by default,
+all others left-aligned. C<header_align> does the same for the header
+cell and defaults to C<align>. In the picture above, C<Qty> is centered
+with its title, and the numbers of C<Price> are right-aligned under a
+left-aligned title:
+
+	{ key => 'quantity', title => 'Qty',   type => 'number', align => 'center' }
+	{ key => 'price',    title => 'Price', type => 'number', header_align => 'left' }
+
+=head2 Wrapping and row height
+
+Text that is wider than its column wraps onto more lines, and the row
+grows: every row is as high as its tallest cell, and rows of different
+heights can follow each other. C<wrap> decides how text breaks:
+
+	wrap => 'words'       # at spaces, and at newlines (the default)
+	wrap => 'newlines'    # only at newlines in the text
+	wrap => 'none'        # never; text that does not fit is cut off
+
+Wrapping needs a limit on the column's width (C<'fit(0, 30)'>,
+C<'fixed(12)'>, C<'grow'>, C<'percent(25)'>); a plain C<fit> column is
+always as wide as its longest line. Text with newlines is several lines
+high in every mode but C<none>. A cell widget (see L</CELL WIDGETS>)
+can be any number of lines high, too. The column title wraps the same
+way as the column's cells.
+
+	{ key => 'description', title => 'Description', width => 'fit(0, 36)' }    # wraps at 36 cells
+	{ key => 'address',     title => 'Address',     wrap => 'newlines' }       # "Street 1\n12345 Town"
+
+C<cell_padding> can also add empty terminal rows above and below the
+content of every cell; see
+L<Term::Fabulous::Manual::TableStyles/Cell padding>.
+
+=head2 Changing columns
+
+	$table->add_column( { key => 'email', title => 'E-mail' } );               # at the end
+	$table->add_column( { key => 'rank',  title => '#', type => 'number' }, index => 0 );    # first
+	$table->remove_column('email');
+	$table->move_column( rank => 2 );                          # now the third column
+	$table->update_column( salary => title => 'Pay', mutator => number( decimals => 2 ) );
+
+	my $column = $table->column('salary');                     # the Column object
+	say $column->title, ' (', $column->type, ')';
+	my @keys = $table->column_keys;                            # in order, hidden ones too
+
+A column is never changed in place. C<update_column> makes a new column
+from the old one's parameters and your changes (anything but C<key>)
+and puts it in the old one's place. Whether the column is shown does
+not change; C<visible> in the changes has no effect (use the methods of
+L</Choosing the visible columns>).
+
+Removing a column also removes it from the sort and the grouping, and
+removes every filter that compares it. The rows keep their entries
+under its key.
+
+=head2 Choosing the visible columns
+
+A hidden column is still part of the table: its values can be read,
+sorted by and filtered on. It only takes no space on the screen, and
+the search (see L<Term::Fabulous::Manual::TableRows/Searching all columns>)
+skips it.
+
+	columns => [ ..., { key => 'note', title => 'Note', visible => 0 } ],    # hidden at first
+
+	$table->hide_columns(qw(note email));
+	$table->show_columns('note');
+	$table->set_visible_columns(qw(name team salary));    # exactly these; their order stays
+	my @shown = $table->visible_columns;                   # the keys, in order
+	say 'hidden' unless $table->is_column_visible('email');
+
+The order of the columns is always the one of the C<columns> list (and
+C<move_column>); showing a column puts it back at its place.
+
+The user can choose the columns, too. A right click on a column title,
+or C<c> while the keyboard is in the header (press C<Up> on the first
+line; see L<Term::Fabulous::Widget::Table/KEYS>), opens the I<column
+chooser>: a small list with a check box per column over the table's top
+right corner. Checking or unchecking a box shows or hides the column at
+once and fires C<ColumnsChange>. C<Escape> closes the list, and so does
+moving the focus out of it. Your program can open and close it with
+C<open_column_chooser> and C<close_column_chooser>, for example from a
+key binding:
+
+	$table->on( ColumnsChange => sub ($event) {
+		save_setting( columns => $event->visible );    # [ 'name', 'team', ... ]
+		return;
+	} );
+	$root->on( KeyPress => sub ($event) {
+		$table->open_column_chooser if ( $event->key_name // '' ) eq 'F2';
+		return;
+	} );
+
+The recipe
+L<Let the user choose the visible columns|Term::Fabulous::Cookbook::Tables/Let the user choose the visible columns (column chooser)>
+is a complete program:
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-table-columns.svg" alt="A staff table with the column chooser open over its top right corner: City unchecked, E-mail checked, and the status line with the columns to save"></p>
+
+=end html
+
+=head1 DISPLAY TEXT AND MUTATORS
+
+=for highlighter language=text
+
+	Column parameters: mutator, value, type
+	Methods:           display_value, value
+	Modules:           Term::Fabulous::Widget::Table::Mutator,
+	                   Term::Fabulous::Widget::Table::Value
+
+A I<mutator> turns a cell's raw value into the text the cell shows. The
+table keeps both: it sorts and filters by the raw value (unless a
+filter says otherwise) and shows the display text. So a column of epoch
+seconds can show C<03 May 2024 14:30> and still sort by time, and a
+column of byte counts can show C<1.5 MiB> and still sort by size.
+
+The recipe
+L<Format cells: dates, numbers, sizes and flags|Term::Fabulous::Cookbook::Tables/Format cells: dates, numbers, sizes and flags (mutators)>
+formats every column of a backup report with mutators; its C<Rate>
+column is a computed column (see L</Computed columns>):
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-table-format.svg" alt="A table of backup jobs with formatted times, durations, sizes, file counts, percentages, transfer rates and check marks, sorted by size, and a line that shows the raw value and the display text of one size"></p>
+
+=end html
+
+L<Term::Fabulous::Widget::Table::Mutator> makes the common mutators:
+
+=for highlighter language=perl
+
+	use Term::Fabulous::Widget::Table::Mutator qw(datetime date number percent bytes duration boolean lookup truncate);
+
+	{ key => 'modified', type => 'date',   mutator => datetime( '%d %b %Y %H:%M', utc => 1 ) }    # 1714739400 -> 03 May 2024 12:30
+	{ key => 'born',     type => 'date',   mutator => date() }                         # '1815-12-10' -> 1815-12-10
+	{ key => 'price',    type => 'number', mutator => number( decimals => 2, prefix => '$' ) }    # 1234.5 -> $1,234.50
+	{ key => 'share',    type => 'number', mutator => percent( decimals => 1 ) }       # 0.153 -> 15.3%
+	{ key => 'size',     type => 'number', mutator => bytes() }                        # 1536 -> 1.5 KiB
+	{ key => 'uptime',   type => 'number', mutator => duration() }                     # 3725 -> 1h 02m
+	{ key => 'active',                     mutator => boolean( 'yes', 'no' ) }
+	{ key => 'state',                      mutator => lookup( { R => 'running', S => 'sleeping' } ) }
+	{ key => 'title',                      mutator => truncate(30) }                   # cut with an ellipsis
+
+Any code reference is a mutator. It is called with the raw value and a
+copy of the row's data, and returns the text:
+
+	{ key => 'temp', title => 'Temperature', type => 'number',
+	  mutator => sub ( $value, $row ) { defined $value ? sprintf( '%.1f %s', $value, $row->{unit} ) : '' } }
+
+Give an array reference of mutators to run them one after the other,
+each on the result of the one before:
+
+	mutator => [ number( decimals => 0 ), sub ( $text, $row ) { "$text pcs" } ]
+
+The table runs a column's mutators once per row and keeps the result
+until the row or the column changes. Read the result with
+C<< $table->display_value( $id, $key ) >> and the raw value with
+C<< $table->value( $id, $key ) >>.
+
+=head2 Computed columns
+
+A column does not have to show an entry of the row. With C<value>, it
+computes its raw value from the whole row:
+
+	{ key => 'total', title => 'Total', type => 'number',
+	  value => sub ($row) { $row->{price} * $row->{quantity} } }
+
+	{ key => 'items', title => 'Items', type => 'number',
+	  value => sub ($row) { scalar @{ $row->{lines} } } }
+
+The computed value is the raw value: the table sorts, filters and
+groups by it like any other, and the column's mutators turn it into the
+display text. The code gets a copy of the row's data and runs once per
+row; the table keeps the result until the row changes. The column's
+C<key> must still be unique, but need not exist in the rows. In the
+picture above, C<Rate> computes bytes per second from C<size> and
+C<seconds>.
+
+=head2 Dates and numbers
+
+The C<type> of a column decides how its raw values are read for sorting
+and filtering. A C<number> column reads numbers (C<'12.50'> is 12.5; a
+word is no number). A C<date> column reads:
+
+=over
+
+=item *
+
+epoch seconds, as numbers or digit strings (C<1714739400>; note that
+C<'2024'> is read as 2024 seconds, not as the year);
+
+=item *
+
+date strings: C<2024-05-03>, C<2024-05-03 14:30>, C<2024-05-03T14:30:15>,
+in local time, or in UTC with a trailing C<Z> after the time;
+
+=item *
+
+objects with an C<epoch> method (L<DateTime>, L<Time::Piece>).
+
+=back
+
+Values a column cannot read sort last in both directions. Give a date
+column C<< type => 'date' >>, so that it sorts and filters as dates.
+L<Term::Fabulous::Widget::Table::Value> exports the functions the
+table uses (C<number_of>, C<date_epoch>, C<date_interval>), so your own
+comparators and filters read values the same way.
+
+=head1 CELL WIDGETS
+
+=for highlighter language=text
+
+	Column parameters: cell, update_cell, header
+	Methods:           cell_widget
+
+By default a cell is a L<Term::Fabulous::Widget::Text> with the display
+text. A column's C<cell> code reference can return any widget instead:
+a L<Term::Fabulous::Widget::Button>, a
+L<Term::Fabulous::Widget::Checkbox>, a
+L<Term::Fabulous::Widget::TextField>, a
+L<Term::Fabulous::Widget::PixelCanvas>, or a
+L<Term::Fabulous::Widget::Box> with several children.
+
+=for highlighter language=perl
+
+	use Term::Fabulous::Widget::Button;
+	use Term::Fabulous::Widget::Text;
+
+	{ key => 'actions', title => '', sortable => 0, filterable => 0,
+	  cell => sub ($cell) {
+		my $button = Term::Fabulous::Widget::Button->new;
+		$button->add_child( Term::Fabulous::Widget::Text->new( text => 'Delete', text_color => '#ffffff' ) );
+		my $id = $cell->{id};
+		$button->on( Activate => sub ($event) { $cell->{table}->remove_row($id); return } );
+		return $button;
+	  } }
+
+The code gets one hash reference, the I<cell context>, with these
+keys:
+
+=for highlighter language=text
+
+	value     the raw value of the cell
+	display   the display text (after the mutators)
+	row       a copy of the row's data
+	id        the row id
+	column    the Term::Fabulous::Widget::Table::Column object
+	table     the table
+
+It must return a widget (anything else dies when the cell is built).
+The table puts the widget into the cell, which gives it the cell's
+background, padding and lines. A column's C<update_cell> and
+C<cell_style> get the same hash.
+
+The recipe
+L<Edit the data of a table|Term::Fabulous::Cookbook::Tables/Edit the data of a table (widget cells, add and remove rows and columns)>
+has a check box and a delete button in every row:
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-table-edit.svg" alt="A to-do table with check boxes, delete buttons and a note column, two tasks selected, a new task added and the status line below"></p>
+
+=end html
+
+=head2 When cell widgets are built
+
+The table builds cell widgets only for the rows of the current page,
+when they are first shown. It builds a row's cell widgets again when:
+
+=over
+
+=item *
+
+the row's data changed (C<set_value>, C<update_row>, ...), unless the
+column has an C<update_cell> (see below);
+
+=item *
+
+the column changed (C<update_column>), or the columns were added,
+removed, moved, shown or hidden;
+
+=item *
+
+the table's C<selection> mode, C<cell_padding>, C<tree_column> or
+C<children_key> changed;
+
+=item *
+
+the row comes back after it left the page: after a page turn, a filter
+that hid it, or a closed group or tree row.
+
+=back
+
+So keep what matters in the row data, not in the widget: a widget can
+be replaced by a new one at these moments, and then shows what the
+C<cell> code makes of the row data. C<< $table->cell_widget( $id, $key ) >>
+returns the widget a cell shows right now (also the default Text), or
+C<undef> when the row is not on the page or the table has not been
+drawn since the row was added.
+
+=head2 Updating cell widgets instead of rebuilding them
+
+For input widgets, building a new widget for every data change is
+wrong: the user's focus and what they are typing would be lost, often
+by a change the input itself made. Give the column an C<update_cell>
+code reference: the table then keeps the widget when the row's data
+changes and calls C<< update_cell->( $widget, $cell ) >> with the
+existing widget and the new cell context instead. C<update_cell> needs a
+C<cell>.
+
+=for highlighter language=perl
+
+	use Term::Fabulous::Widget::Checkbox;
+
+	{ key => 'done', title => 'Done', filterable => 0,
+	  cell => sub ($cell) {
+		my $box = Term::Fabulous::Widget::Checkbox->new( checked => $cell->{value} ? 1 : 0 );
+		my ( $table, $id ) = @{$cell}{qw(table id)};
+		$box->on( Change => sub ($event) { $table->set_value( $id, done => $event->value ? 1 : 0 ); return } );
+		return $box;
+	  },
+	  update_cell => sub ( $box, $cell ) { $box->checked( $cell->{value} ? 1 : 0 ) },
+	}
+
+Write the input's value back into the row (here with C<set_value>), so
+that sorting, filtering and the next C<cell> call see it.
+
+=head2 Keys and clicks in cell widgets
+
+Focusable widgets in cells are part of the focus order: C<Tab> reaches
+them, and a click focuses them. While a widget in a cell has the focus,
+it gets the keys first. Keys it does not use go to the table: C<Up>,
+C<Down>, C<PageUp> and the other movement keys move the table's cursor
+and give the focus back to the table. C<Enter> and C<Space> are left to
+the widget; they do not activate or select the row.
+
+When a cell widget that has the focus goes away, because its row was
+removed or left the page, or because the cell was built again (see
+L</When cell widgets are built>), the table takes the focus. So a
+button that deletes its own row leaves the keyboard in the table.
+
+A click on an input widget in a cell (anything focusable or pressable,
+such as a button, a check box or a text field) goes to that widget. The
+table moves its cursor to the row and otherwise leaves the click alone:
+with C<< selection => 'multiple' >> the selection stays as it is, and a
+double click does not activate the row. (With C<'single'>, the row is
+selected, because there the selection follows the cursor.)
+
+=head2 Widgets as column titles
+
+A column's C<header> code reference returns the widget of its header
+cell, instead of the title in bold. It gets the Column object. The sort
+marker is still shown right of it. The C<Rating> title in the picture
+under L</Column widths> is such a widget:
+
+	header => sub ($column) {
+		my $box = Term::Fabulous::Widget::Box->new( layout => { child_gap => 1 } );
+		$box->add_child(
+			Term::Fabulous::Widget::Text->new( text => "\x{2605}", text_color => '#e5c07b' ),
+			Term::Fabulous::Widget::Text->new( text => $column->title, bold => 1, text_color => '#ffffff' ),
+		);
+		return $box;
+	},
+
+The table builds it again when the column changes. The header styles'
+C<background_color> and lines apply to the cell as usual; their text
+color, C<bold>, C<italic> and C<underline> apply only to the default
+title, so give your widget its own.
+
+=head1 FEATURE INDEX
+
+Every table feature, the section of the table guide that explains it,
+and the names to look for. The exact contract of each name is in the
+reference: table parameters under
+L<CONSTRUCTOR|Term::Fabulous::Widget::Table/CONSTRUCTOR>, methods under
+L<METHODS|Term::Fabulous::Widget::Table/METHODS> and events under
+L<EVENTS|Term::Fabulous::Widget::Table/EVENTS> of
+L<Term::Fabulous::Widget::Table>, column parameters on
+L<Term::Fabulous::Widget::Table::Column>, filter options on
+L<Term::Fabulous::Widget::Table::Filter> and style keys in
+L<the list of style keys|Term::Fabulous::Manual::TableStyles/Style keys>.
+Where a recipe of the cookbook shows the feature in a complete program,
+the entry names it.
+
+=over
+
+=item Show rows of Perl hashes
+
+L</ROWS>: C<rows>, C<row_id>.
+Recipe: L<Show a list of hashes in a table|Term::Fabulous::Cookbook::Tables/Show a list of hashes in a table (sort, select, open a row)>.
+
+=item Name rows by an entry of the row or by code
+
+L</Row ids>: C<row_id>.
+
+=item Read rows and cell values
+
+L</Reading rows>: C<row>, C<rows>, C<row_ids>, C<has_row>, C<value>, C<display_value>.
+
+=item Change a cell or a row
+
+L</Changing the data>: C<set_value>, C<update_row>, C<replace_row>.
+
+=item Add and remove rows
+
+L</Changing the data>: C<add_row>, C<add_rows>, C<remove_row>, C<remove_rows>, C<clear_rows>.
+Recipe: L<Edit the data of a table|Term::Fabulous::Cookbook::Tables/Edit the data of a table (widget cells, add and remove rows and columns)>.
+
+=item Define columns
+
+L</COLUMNS>: C<columns>, C<key>, C<title>, C<type>, L<Term::Fabulous::Widget::Table::Column>.
+
+=item Column widths: fit, fixed, growing, percent
+
+L</Column widths>: C<width>.
+Recipe: L<Size, align and wrap columns|Term::Fabulous::Cookbook::TableStyles/Size, align and wrap columns (widths, wrapping, widget titles)>.
+
+=item Align the content of cells
+
+L</Alignment>: C<align>, C<header_align>.
+Recipe: L<Size, align and wrap columns|Term::Fabulous::Cookbook::TableStyles/Size, align and wrap columns (widths, wrapping, widget titles)>.
+
+=item Wrap text, rows of different heights
+
+L</Wrapping and row height>: C<wrap>, C<width>, C<cell_padding>.
+Recipe: L<Size, align and wrap columns|Term::Fabulous::Cookbook::TableStyles/Size, align and wrap columns (widths, wrapping, widget titles)>.
+
+=item Add, remove, move and change columns
+
+L</Changing columns>: C<add_column>, C<remove_column>, C<move_column>, C<update_column>.
+Recipe: L<Edit the data of a table|Term::Fabulous::Cookbook::Tables/Edit the data of a table (widget cells, add and remove rows and columns)>.
+
+=item Show and hide columns
+
+L</Choosing the visible columns>: C<visible>, C<show_columns>, C<hide_columns>, C<set_visible_columns>.
+
+=item Let the user pick the columns (column chooser)
+
+L</Choosing the visible columns>: C<open_column_chooser>, C<close_column_chooser>, C<ColumnsChange>.
+Recipe: L<Let the user choose the visible columns|Term::Fabulous::Cookbook::Tables/Let the user choose the visible columns (column chooser)>.
+
+=item Format values: dates, numbers, sizes, flags
+
+L</DISPLAY TEXT AND MUTATORS>: C<mutator>, L<Term::Fabulous::Widget::Table::Mutator>.
+Recipe: L<Format cells: dates, numbers, sizes and flags|Term::Fabulous::Cookbook::Tables/Format cells: dates, numbers, sizes and flags (mutators)>.
+
+=item Computed columns
+
+L</Computed columns>: C<value>.
+
+=item Read numbers and dates the way the table does
+
+L</Dates and numbers>: L<Term::Fabulous::Widget::Table::Value>.
+
+=item Any widget as a cell (buttons, check boxes, fields)
+
+L</CELL WIDGETS>: C<cell>, C<cell_widget>.
+Recipe: L<Edit the data of a table|Term::Fabulous::Cookbook::Tables/Edit the data of a table (widget cells, add and remove rows and columns)>.
+
+=item Keep input widgets in cells across data changes
+
+L</Updating cell widgets instead of rebuilding them>: C<update_cell>.
+
+=item Focus, keys and clicks in cell widgets
+
+L</Keys and clicks in cell widgets>.
+
+=item A widget as a column title
+
+L</Widgets as column titles>: C<header>.
+Recipe: L<Size, align and wrap columns|Term::Fabulous::Cookbook::TableStyles/Size, align and wrap columns (widths, wrapping, widget titles)>.
+
+=item Sort by a column
+
+L<Term::Fabulous::Manual::TableRows/SORTING>: C<sort>, C<sort_by>, C<clear_sort>, C<sortable>, C<SortChange>.
+Recipe: L<Sort rows, also with your own comparison|Term::Fabulous::Cookbook::TableRows/Sort rows, also with your own comparison>.
+
+=item Sort by several columns
+
+L<Term::Fabulous::Manual::TableRows/Sorting by several columns>: C<sort>, C<sort_by>.
+
+=item Natural, number and date order
+
+L<Term::Fabulous::Manual::TableRows/How values are compared>: C<compare>, C<type>.
+
+=item Custom sort functions
+
+L<Term::Fabulous::Manual::TableRows/Custom sort functions>: C<compare>.
+Recipe: L<Sort rows, also with your own comparison|Term::Fabulous::Cookbook::TableRows/Sort rows, also with your own comparison>.
+
+=item How groups and tree rows are sorted
+
+L<Term::Fabulous::Manual::TableRows/Sorting groups and trees>.
+
+=item Filter fields under the column titles (filter row)
+
+L<Term::Fabulous::Manual::TableRows/The filter row>: C<filter_row>, C<filter_text>, C<filter_error>, C<FilterChange>.
+Recipe: L<Let the user filter rows|Term::Fabulous::Cookbook::TableRows/Let the user filter rows (filter row and search box)>.
+
+=item Filter from Perl: text, numbers, dates, combinations
+
+L<Term::Fabulous::Manual::TableRows/Filters from Perl>: C<filter>, C<remove_filter>, L<Term::Fabulous::Widget::Table::Filter>.
+Recipe: L<Filter rows from Perl|Term::Fabulous::Cookbook::TableRows/Filter rows from Perl (numbers, dates, text, raw or shown values)>.
+
+=item Filter on the raw value or the shown text
+
+L<Term::Fabulous::Manual::TableRows/Raw value or display text>: C<filter_on>, C<on>.
+
+=item Search all columns
+
+L<Term::Fabulous::Manual::TableRows/Searching all columns>: C<search>.
+Recipe: L<Let the user filter rows|Term::Fabulous::Cookbook::TableRows/Let the user filter rows (filter row and search box)>.
+
+=item Filters with groups and trees
+
+L<Term::Fabulous::Manual::TableRows/Filters with groups and trees>.
+
+=item Texts of an empty or fully filtered table
+
+L<Term::Fabulous::Manual::TableRows/What a filtered table shows>: C<empty_text>, C<no_match_text>, C<filtered_row_ids>.
+
+=item Group rows by a column
+
+L<Term::Fabulous::Manual::TableRows/GROUPING>: C<group_by>, C<ungroup>.
+Recipe: L<Group rows by a column|Term::Fabulous::Cookbook::TableRows/Group rows by a column (collapsible group headers)>.
+
+=item Group header labels and looks
+
+L<Term::Fabulous::Manual::TableRows/Group headers>: C<group_label>, C<group_style>.
+
+=item Open and close groups
+
+L<Term::Fabulous::Manual::TableRows/Opening and closing groups>: C<expand_group>, C<collapse_group>, C<Expand>, C<Collapse>.
+
+=item Nested rows (a tree)
+
+L<Term::Fabulous::Manual::TableRows/TREES>: C<children_key>, C<tree_column>, C<tree_expanded>.
+Recipe: L<Show nested data as a tree|Term::Fabulous::Cookbook::TableRows/Show nested data as a tree (expand and collapse rows)>.
+
+=item Open and close tree rows
+
+L<Term::Fabulous::Manual::TableRows/Opening and closing tree rows>: C<expand>, C<collapse>, C<expand_all>, C<Expand>, C<Collapse>.
+
+=item Add and remove child rows
+
+L<Term::Fabulous::Manual::TableRows/Changing a tree>: C<add_row> with C<parent>, C<parent_of>, C<children_of>.
+
+=item Load child rows when a row opens (lazy loading)
+
+L<Term::Fabulous::Manual::TableRows/Loading child rows when a row opens>: C<Expand>.
+
+=item Pages and a pager
+
+L<Term::Fabulous::Manual::TableRows/PAGES>: C<page_size>, C<page_sizes>, C<pager>, C<page>, C<PageChange>.
+Recipe: L<Split many rows into pages|Term::Fabulous::Cookbook::TableRows/Split many rows into pages (pager and page sizes)>.
+
+=item The cursor
+
+L<Term::Fabulous::Manual::TableRows/The cursor>: C<cursor>, C<cursor_group>, C<scroll_to_row>, C<CursorMove>.
+
+=item Select rows: single or multiple selection
+
+L<Term::Fabulous::Manual::TableRows/Selection>: C<selection>, C<selection_column>, C<selected_ids>, C<SelectionChange>.
+Recipe: L<Show a list of hashes in a table|Term::Fabulous::Cookbook::Tables/Show a list of hashes in a table (sort, select, open a row)>.
+
+=item React to Enter or a double click on a row
+
+L<Term::Fabulous::Manual::TableRows/Activating a row>: C<RowActivate>.
+
+=item Colors
+
+L<Term::Fabulous::Manual::TableStyles/Colors>: C<text_color>, C<cursor_color>, C<selected_color>, and the other color parameters.
+
+=item Striped rows
+
+L<Term::Fabulous::Manual::TableStyles/Striped rows>: C<stripe_color>.
+
+=item Where style hashes go
+
+L<Term::Fabulous::Manual::TableStyles/Style hashes>.
+
+=item The keys of style hashes
+
+L<Term::Fabulous::Manual::TableStyles/Style keys>.
+
+=item Which style wins (precedence)
+
+L<Term::Fabulous::Manual::TableStyles/Which style wins>.
+
+=item Highlight rows or cells, also by their data
+
+L<Term::Fabulous::Manual::TableStyles/Styles of rows and cells>: C<row_style>, C<cell_style>, C<set_row_style>, C<set_cell_style>.
+Recipe: L<Lines and colors per row, column and cell|Term::Fabulous::Cookbook::TableStyles/Lines and colors per row, column and cell (conditional formatting)>.
+
+=item Lines around and between the cells
+
+L<Term::Fabulous::Manual::TableStyles/Lines between and around the cells>: C<border>, C<column_lines>, C<row_lines>, C<header_line>.
+Recipe: L<Compare the line options of a table|Term::Fabulous::Cookbook::TableStyles/Compare the line options of a table (frames, grid lines, block frames)>.
+
+=item Tables with colored rows and titles (block frames)
+
+L<Term::Fabulous::Manual::TableStyles/Tables with colored backgrounds>: C<< border => 'Outer' >>.
+Recipe: L<A table with colored rows and titles|Term::Fabulous::Cookbook::TableStyles/A table with colored rows and titles (block frame, no grid lines)>.
+
+=item Lines of one column, row or cell
+
+L<Term::Fabulous::Manual::TableStyles/Lines of columns, rows and cells>: C<border_top>, C<border_right>, C<border_bottom>, C<border_left>, C<row_lines> and C<column_lines> in style hashes.
+
+=item Space inside the cells
+
+L<Term::Fabulous::Manual::TableStyles/Cell padding>: C<cell_padding>.
+
+=item Hide the column titles or the scrollbar
+
+L<Term::Fabulous::Widget::Table/Parts shown>: C<header>, C<scrollbar>.
+
+=item Size of the table, scrolling
+
+L<Term::Fabulous::Manual::TableStyles/SIZE AND SCROLLING>: C<layout>, C<scrollbar>, C<scroll_to_row>.
+
+=item Keyboard
+
+L<Term::Fabulous::Widget::Table/KEYS>.
+
+=item Mouse
+
+L<Term::Fabulous::Widget::Table/MOUSE>: C<hover>, C<double_click_seconds>.
+
+=item Events
+
+L<Term::Fabulous::Widget::Table/EVENTS>.
+
+=item A table in a KDL layout file
+
+L<Term::Fabulous::Widget::Table/KDL PROPERTIES>.
+Recipe: L<Describe a table in a KDL layout|Term::Fabulous::Cookbook::Tables/Describe a table in a KDL layout (columns, lines, sort, groups)>.
+
+=item Print a table without a terminal (reports)
+
+L<Term::Fabulous::Manual::TableStyles/PRINTING A TABLE>: L<Term::Fabulous::Static>.
+Recipe: L<Print a table as a report|Term::Fabulous::Cookbook::Tables/Print a table as a report (Static)>.
+
+=item Many rows, speed, the widget limit
+
+L<Term::Fabulous::Widget::Table/PERFORMANCE>: C<page_size>, C<max_element_count>.
+
+=item The view's lines from Perl (the model)
+
+L<Term::Fabulous::Widget::Table::Model>: C<model>, C<lines>, C<page_lines>.
+
+=back
+
+=head1 SEE ALSO
+
+This page is part of L<Term::Fabulous::Manual>. Previous page: L<Term::Fabulous::Manual::Charts>. Next page: L<Term::Fabulous::Manual::TableRows>.
+
+L<Term::Fabulous::Widget::Table>, L<Term::Fabulous::Widget::Table::Column>,
+L<Term::Fabulous::Widget::Table::Mutator>,
+L<Term::Fabulous::Widget::Table::Value>,
+L<Term::Fabulous::Widget::Table::Model>,
+L<Term::Fabulous::Cookbook::Tables>.
+
+=cut

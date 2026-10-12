@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="636" height="255" viewBox="0 0 636 255" role="img" aria-label="perl examples/widgets/radio.pl">
+<title>perl examples/widgets/radio.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="604" height="220" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="604" height="220" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="604" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="318" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/widgets/radio.pl</text>
+<rect x="16.5" y="16.5" width="603" height="219" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="264" y="78" width="90" height="18" fill="#343a48"/>
+</g>
+<g class="terminal">
+<text x="48" y="92" textLength="72" fill="#96a0b4">in a row</text>
+<text x="165" y="92" textLength="81" fill="#dcdfe4">( ) Small</text>
+<text x="264" y="92" textLength="9" fill="#61afef">(</text>
+<text x="277.5" y="92" text-anchor="middle" fill="#61afef">•</text>
+<text x="282" y="92" textLength="9" fill="#61afef">)</text>
+<text x="300" y="92" textLength="153" fill="#dcdfe4">Medium  ( ) Large</text>
+<text x="48" y="128" textLength="99" fill="#96a0b4">in a column</text>
+<text x="165" y="128" textLength="189" fill="#dcdfe4">( ) Standard shipping</text>
+<text x="165" y="146" textLength="9" fill="#61afef">(</text>
+<text x="178.5" y="146" text-anchor="middle" fill="#61afef">•</text>
+<text x="183" y="146" textLength="9" fill="#61afef">)</text>
+<text x="201" y="146" textLength="144" fill="#dcdfe4">Express shipping</text>
+<text x="165" y="164" textLength="180" fill="#dcdfe4">( ) Pick up in store</text>
+<text x="48" y="200" textLength="72" fill="#96a0b4">disabled</text>
+<text x="165" y="200" textLength="9" fill="#6c7078">(</text>
+<text x="178.5" y="200" text-anchor="middle" fill="#6c7078">•</text>
+<text x="183" y="200" textLength="171" fill="#6c7078">) Card  ( ) Invoice</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

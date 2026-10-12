@@ -6,14 +6,16 @@ use warnings;
 
 use Object::Proto::Sugar -types;
 
+use Game::Mahjong;
 use Game::Mahjong::Tiles;
 use Game::Mahjong::Notation;
 use Game::Mahjong::Rules;
 use Game::Mahjong::Bot;
 use Game::Mahjong::Fans;
 use Game::Mahjong::Result;
+use Getopt::Long ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 has seed => (is => 'ro', isa => Str, required => 1);
 
@@ -817,7 +819,7 @@ sub _parse {
 	return $m;
 }
 
-sub run {
+sub start {
 	my ($self) = @_;
 	my $g = $self->rules;
 	$self->say($self->_c('bold', 'Mahjong, the competition rules: sixteen hands, eight points to win.'));
@@ -855,6 +857,100 @@ sub run {
 	return $g;
 }
 
+sub _usage {
+	return <<'USAGE';
+mahjong: a game against three bots under the Chinese Official rules
+
+  --seed STRING     the game (the same seed deals the same tiles); a fresh one by default
+  --level 1..3      the bots' strength, 2 by default
+  --seat 0..3       your seat, 0 by default (seat 0 deals the first hand)
+  --glyphs          put the Unicode Mahjong Tiles block on the tile faces
+  --ascii           draw the tile frames with + - | for a terminal without box drawing
+  --no-clear        do not clear the screen before each table
+  --no-colour       plain text (colour is on when standard output is a terminal
+                    and NO_COLOR is unset)
+  --no-pick         type the moves out instead of pointing at them
+  --auto            four bots, no prompt: watch a game
+  --help            this
+
+On a terminal the left and right keys walk your own rack and the tile under
+the cursor is the one you would throw. The line under it says what that
+leaves you: how far from a winning hand, and how many tiles would help.
+Enter throws it, the number keys still work, ? lists the keys and q stops.
+Needs Term::ReadKey; without it, or off a terminal, every move is typed.
+
+At a typed prompt: a number discards that tile, "help" lists the rest.
+
+Exit status is 0 if you won or the game was drawn, 1 if you lost or stopped
+early, 2 for an option the game will not take.
+USAGE
+}
+
+sub run {
+	my ($class, @argv) = @_;
+	my $tty = -t STDOUT ? 1 : 0;
+	my %o = (level => 2, seat => 0, colour => ($tty && !$ENV{NO_COLOR} ? 1 : 0), glyphs => 0, auto => 0,
+	         ascii => 0, clear => $tty);
+
+	my $ok = eval {
+		local $SIG{__WARN__} = sub { print STDERR "mahjong: $_[0]" };
+		Getopt::Long::GetOptionsFromArray(\@argv,
+			'seed=s'   => \$o{seed},
+			'level=i'  => \$o{level},
+			'seat=i'   => \$o{seat},
+			'glyphs!'  => \$o{glyphs},
+			'colour!'  => \$o{colour},
+			'color!'   => \$o{colour},
+			'auto'     => \$o{auto},
+			'ascii!'   => \$o{ascii},
+			'clear!'   => \$o{clear},
+			'pick!'    => \$o{pick},
+			'help|h'   => \$o{help},
+		);
+	};
+	if (!$ok) { print STDERR _usage(); return 2 }
+	if ($o{help}) { print _usage(); return 0 }
+	if (@argv) { print STDERR "mahjong: not an option: $argv[0]\n", _usage(); return 2 }
+
+	$o{seed} //= sprintf('%s-%d', scalar(localtime), $$);
+
+	my $t = eval {
+		$class->new(
+			seed => $o{seed}, level => $o{level}, seat => $o{seat},
+			in => \*STDIN, out => \*STDOUT, colour => $o{colour}, glyphs => $o{glyphs}, auto => $o{auto},
+			ascii => $o{ascii}, clear => $o{clear},
+			(defined $o{pick} ? (picking => $o{pick} ? 1 : 0) : ()),
+		);
+	};
+
+	unless ($t) {
+		my $why = $@ || 'could not start';
+		$why =~ s/ at \S+ line \d+\.?\s*\z//;
+		$why =~ s/\A[\w:]+: //;
+		chomp $why;
+		print STDERR "mahjong: $why\n";
+		return 2;
+	}
+
+	binmode $t->out, ':encoding(UTF-8)' unless $o{ascii};
+
+	local @SIG{qw(INT TERM HUP)};
+	for my $sig (qw(INT TERM HUP)) {
+		$SIG{$sig} = sub { $t->leave_raw; $SIG{$sig} = 'DEFAULT'; kill $sig, $$ };
+	}
+
+	my $g = eval { $t->start };
+	my $died = $@;
+	$t->leave_raw;
+	die $died if $died;
+
+	return 1 unless $t->finished;
+	return 0 if $o{auto};
+	return 0 unless defined $t->winner;
+	return 0 if $t->winner == $o{seat};
+	return 1;
+}
+
 1;
 
 __END__
@@ -865,13 +961,13 @@ Game::Mahjong::Terminal - a game against three bots at the keyboard
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 
     my $t = Game::Mahjong::Terminal->new(seed => 'evening', level => 2, seat => 0,
         in => \*STDIN, out => \*STDOUT, colour => -t STDOUT);
-    $t->run;
+    $t->start;
 
     mahjong --level 3 --glyphs        # from the shell
 
@@ -1038,9 +1134,24 @@ Whether the person left.
 
 =head1 METHODS
 
-=head2 run
+=head2 start
 
 Plays until the game ends or the person quits; returns the rules object.
+
+=head2 run
+
+    exit Game::Mahjong::Terminal->run(@ARGV);
+
+The whole command line program as a class method: parses the options
+F<bin/mahjong> documents, builds the terminal on C<STDIN> and C<STDOUT>, plays,
+and returns the exit status rather than calling C<exit>: C<0> if you won or the
+game was drawn, C<1> if you lost or stopped early, C<2> for a bad option or a
+refused value, with the usage on C<STDERR>. C<--help> prints the usage on
+C<STDOUT> and returns C<0>. Signal handlers are local to the call and the
+terminal is left in cooked mode on every way out, so a launcher such as
+L<Game::Terminal> can call it in its own process and carry on afterwards.
+Colour is off under C<NO_COLOR> as well as off a terminal, and C<out> is
+UTF-8 unless C<--ascii> was given.
 
 =head2 show_table, show_hand_end, show_game_end, narrate, help, show_fans
 

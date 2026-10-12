@@ -1,5 +1,10 @@
 Revision history for Perl extension Text-Markup.
 
+0.43 2026-10-11T39:36:34Z
+   - Fixed test failure for Text::Markdown::Discount v0.19.
+   - Require Text::Markdown::Discount v0.17, as we use flags added in that
+     version.
+
 0.42 2026-09-26T16:59:34Z
    - Fixed over-aggressive HTML encoding from Pod files in more recent
      releases of Pod::Simple::XHTML (#31).

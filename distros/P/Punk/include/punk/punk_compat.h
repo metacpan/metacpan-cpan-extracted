@@ -92,4 +92,17 @@ static void Punk_croak_sv(pTHX_ SV *sv) {
  * the books straight on every perl. See t/0012-immortal-refcount.t. */
 #define PUNK_SET_TRUE SvREFCNT_inc_simple_NN(&PL_sv_yes)
 
+/* A temporaries frame for a callback the event loop dispatches straight
+ * into C.
+ *
+ * Hyperman calls a C watcher, a C timer and a stream callback with no
+ * ENTER/SAVETMPS of its own, and its loop has no frame per tick. So a mortal
+ * made in one of those callbacks before anything opens a frame lands on the
+ * loop's own, which is released when the worker exits: every received
+ * websocket message stayed allocated for the life of the process. Every
+ * callback handed to the loop opens its own frame with these, whatever the
+ * server does about it. */
+#define PK_LOOP_ENTER  ENTER; SAVETMPS
+#define PK_LOOP_LEAVE  FREETMPS; LEAVE
+
 #endif /* PUNK_COMPAT_H */

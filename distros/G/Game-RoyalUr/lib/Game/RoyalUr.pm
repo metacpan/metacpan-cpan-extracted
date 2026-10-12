@@ -16,7 +16,7 @@ use Game::RoyalUr::Notation ();
 use Game::RoyalUr::Error;
 use Game::RoyalUr::Result;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 my $E = 'Game::RoyalUr::Engine';
 my $X = 'Game::RoyalUr::Error';
@@ -442,7 +442,7 @@ Game::RoyalUr - the Royal Game of Ur
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

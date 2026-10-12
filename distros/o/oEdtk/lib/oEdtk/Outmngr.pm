@@ -6,7 +6,7 @@ use warnings;
 use File::Basename;
 use Sys::Hostname;
 use Text::CSV;
-use Date::Calc		qw(Today Gmtime Week_of_Year Add_Delta_Days);
+use Date::Calc		qw(Today Gmtime Week_of_Year Add_Delta_Days Day_of_Week);
 use List::Util		qw(max sum);
 use oEdtk::Config	qw(config_read);
 use oEdtk::DBAdmin	qw(db_connect db_backup_agent create_table_OUTMNGR @INDEX_COLS);
@@ -15,7 +15,7 @@ use DBI;
 # use Sys::Hostname;
 
 use Exporter;
-our $VERSION	= 1.5051;		# release number : Y.YSSS -> Year, Sequence 
+our $VERSION	= 2.1109;		# release number : Y.YSSS -> Year, Sequence 
 our @ISA		= qw(Exporter);
 our @EXPORT_OK	= qw(
 			omgr_check_acquit
@@ -32,46 +32,46 @@ our @EXPORT_OK	= qw(
 			omgr_track_report
 		);
 
-# Le lot par défaut.
+# The default lot.
 use constant DEFLOT => 'DEF';
 use constant DEFFIL => 'DEF';
 
-# Description des traitements que l'on applique à nos lots de documents, avec
-# la liste des champs mis à jour à chaque étape.
+# Description of the processings applied to our document batches, with
+# the list of fields updated at each step.
 #
-# 1. On insère chaque ligne de l'index dans la table $cfg->{'EDTK_DBI_OUTMNGR'} en renseignant
-#    un certain nombre de champs supplémentaires, en utilisant les informations
-#    tirées des tables EDTK_REFIDDOC et EDTK_SUPPORTS.
+# 1. Insert each index line into the $cfg->{'EDTK_DBI_OUTMNGR'} table, filling in
+#    a number of extra fields, using the information
+#    taken from the EDTK_REFIDDOC and EDTK_SUPPORTS tables.
 #      ED_PORTADR, ED_CATDOC, ED_REFIMP, ED_TYPED, ED_FORMATP, ED_PGORIEN,
 #      ED_FORMDEF, ED_PAGEDEF, ED_FORMS, ED_NUMPGPLI
 #
-# 2. Une fois que toutes les lignes ont été insérées, on peut désormais faire
-#    des calculs supplémentaires et enrichir à nouveau nos entrées.
+# 2. Once all the lines have been inserted, we can now perform
+#    additional computations and enrich our entries again.
 #      ED_NBPGPLI, ED_NBPGDOC, ED_MODEDI
 #
-# 3. On peut maintenant sélectionner un lot pour nos documents.  On essaye
-#    chacun des lots séquentiellement, dans l'ordre de priorité défini dans la
-#    table EDTK_LOTS.  Si le lot matche des entrées, on assigne ces entrées au
-#    lot correspondant.
+# 3. We can now select a batch for our documents.  We try
+#    each batch in turn, in the priority order defined in the
+#    EDTK_LOTS table.  If the batch matches entries, we assign those entries to the
+#    matching batch.
 #      ED_IDLOT
 #
-# 4. Une fois qu'un lot a été assigné, on en déduit un manufacturier via la
-#    table EDTK_LOTS.  En fonction de ce manufacturier, on sélectionne une liste
-#    de filières de production possibles, dans l'ordre de priorité défini dans la
-#    table EDTK_FILIERES.  Comme pour l'étape 3, on essaye de matcher nos entrées
-#    avec chacune de ces filières, en fonction de leurs contraintes.
+# 4. Once a batch has been assigned, we infer a manufacturer from the
+#    EDTK_LOTS table.  Depending on that manufacturer, we select a list
+#    of possible production lines, in the priority order defined in the
+#    EDTK_FILIERES table.  As in step 3, we try to match our entries
+#    against each of these lines, according to their constraints.
 #      ED_IDFILIERE
 #
-# 5. La filière de production ayant été déterminée, on sait si l'on va imprimer
-#    en recto-verso ou juste en recto; on peut donc calculer de nouveaux champs
-#    supplémentaires.
+# 5. Once the production line has been determined, we know whether we will print
+#    double-sided or single-sided; we can therefore compute new
+#    additional fields.
 #      ED_PDSPLI, ED_NBFPLI
 #
-# 6. On peut finalement exporter nos entrées pour créer nos lots finaux à envoyer
-#    au manufacturier.  Pour cela, on sélectionne les couples (idlot,idfilière)
-#    uniques dans notre table $cfg->{'EDTK_DBI_OUTMNGR'}, et pour chacun de ces couples, on essaye
-#    de satisfaire les contraintes en nombre de plis/pages minimum et maximum.  Si
-#    c'est possible, on assigne un numéro de lot d'envoi unique aux documents.
+# 6. Finally we can export our entries to create our final batches to send
+#    to the manufacturer.  To do so, we select the (idlot,idfiliere) pairs
+#    unique in our $cfg->{'EDTK_DBI_OUTMNGR'} table, and for each of these pairs, we try
+#    to satisfy the minimum and maximum folded-item/page count constraints.  If
+#    possible, we assign a unique shipment batch number to the documents.
 #      ED_SEQLOT
 
 # READ AND PROCESS AN INDEX FILE, STORING IT IN THE DATABASE, WHILE COMPUTING SOME VALUES.
@@ -108,14 +108,14 @@ sub omgr_import($$$) {
 
 sub omgr_track_folds ($;$){
 	# EDIT LIST AND STATUS FROM START TO END
-	# LISTE DES LOTS PRODUITS JUSQU'A LA MISE SOUS PLIS
+	# LIST OF BATCHES PRODUCED UP TO MAILING
 	my $dbh = shift;
 	my $cfg = config_read('EDTK_DB', 'EDTK_STATS');
 	my $nb_j_historique = shift ||  $cfg->{'EDTK_STATS_DAYS_FROM'} || 10;
 	warn "INFO : omgr_track_folds for last $nb_j_historique days\n";
 	my ($sql);
 
-	# REQUETE POUR LE MAIL SUIVI METIER
+	# QUERY FOR THE BUSINESS-TRACKING MAIL
 	###########################################################################
 	# SELECT A.ED_REFIDDOC, COUNT (DISTINCT A.ED_IDLDOC||TO_CHAR(A.ED_SEQDOC,'FM0000000')) AS NB_DOCS,
 	#  A.ED_DTEDTION, COUNT (DISTINCT A.ED_SEQLOT||TO_CHAR(A.ED_IDPLI,'FM0000000')) AS NB_PLIS,
@@ -228,11 +228,11 @@ sub omgr_check_acquit($;$){
 	my $cfg = config_read('EDTK_DB', 'EDTK_STATS');
 	my $nb_j_historique = shift ||  $cfg->{'EDTK_STATS_DAYS_FROM'} || 100;
 
-	# a partir de la base d'acquittement check :
-	# 1 - vérifier le nb de pages par seqlot 
-	# 2 - vérifier le nb de plis par seqlot
-	# 3 - renseigner le statut dans acq
-	# 4 - renseigner la date de check
+	# from the acknowledgment database, check:
+	# 1 - check the number of pages per seqlot 
+	# 2 - check the number of folded items per seqlot
+	# 3 - fill in the status in acq
+	# 4 - fill in the check date
 
 #SELECT A.ED_SEQLOT, 
 #  COUNT (DISTINCT A.ED_SEQLOT||TO_CHAR(A.ED_IDPLI,'FM0000000')) AS NB_PLIS, B.ED_NBPLIS,
@@ -243,7 +243,7 @@ sub omgr_check_acquit($;$){
 	my ($sql, $num);
 	$sql = "SELECT A.ED_SEQLOT, "
 		. " COUNT (DISTINCT A.ED_SEQLOT||TO_CHAR(A.ED_IDPLI,'FM0000000')) AS NB_PLIS, B.ED_NBPLIS"
-	# cf $sqlnbfpli
+	# see $sqlnbfpli
 	#	. ", (CASE A.ED_MODEDI WHEN 'R' THEN 2 ELSE 1 END * SUM(A.ED_NBFPLI)) AS NB_FACES, B.ED_NBFACES"
 		. " FROM " . $cfg->{'EDTK_STATS_OUTMNGR'} . " A, EDTK_ACQ B"
 		. " WHERE A.ED_SEQLOT=B.ED_SEQLOT"
@@ -254,7 +254,7 @@ sub omgr_check_acquit($;$){
 	$sth->execute($nb_j_historique);
 
 	while (my $seqlot = $sth->fetchrow_hashref()) {
-	#	# ON MET À JOUR CHACUN DES SEQLOTS
+	#	# WE UPDATE EACH SEQLOT
 		$sql = "UPDATE EDTK_ACQ "
 			. " SET ED_DTCHECK = TO_CHAR(SYSDATE, 'IYYYMMDD'), ED_STATUS = "
 			. " CASE "
@@ -272,20 +272,20 @@ return $num;
 
 
 sub _omgr_insert($$$$$) {
-	# - INJECTION DES DONNÉES PAGE/PAGE DE L'INDEX COMPO EN BASE DE DONNÉES
-	# - COMPLÉTION DE L'INDEX AVEC LES INFOS DES TABLES DE PARAMÉTRAGE REFIDDOC ET SUPPORTS
-	# - CALCULS DES QUANTITÉS PAGES/SUPPORTS
-	# REVOIR LA GESTION DES ENCARTS   XXXXXXXXXX
+	# - INJECT THE COMPO INDEX PAGE/PAGE DATA INTO THE DATABASE
+	# - COMPLETE THE INDEX WITH THE INFO FROM THE REFIDDOC AND SUPPORTS SETUP TABLES
+	# - COMPUTE THE PAGE/SUPPORT QUANTITIES
+	# TODO REVIEW THE INSERT HANDLING   XXXXXXXXXX
 	my ($dbh, $pdbh, $app, $in, $corp) = @_;
 	my $cfg = config_read('EDTK_DB');
 
 
 ################################################################################
-# POUR GÉRER DYNAMIQUEMENT L'INDEX, LES OPÉRATIONS DE LECTURE CI-DESSOUS DEVRAIENT 
-# soit intégrer la boucle de lecture de l'index, soit être remplacée par des liens
+# TO MANAGE THE INDEX DYNAMICALLY, THE READ OPERATIONS BELOW SHOULD 
+# either be part of the index read loop, or be replaced by links
 ################################################################################
 #
-	# Récupération des paramètres de l'application documentaire.
+	# Retrieve the document application parameters.
 	my $doc = $pdbh->selectrow_hashref("SELECT * FROM EDTK_REFIDDOC WHERE ED_REFIDDOC = ? " .
 	    "AND (ED_CORP = ? OR ED_CORP = '%')", undef, $app, $corp);
 	die ("ERROR: die in _omgr_insert, message is " . $pdbh->errstr . "\n") if $pdbh->err;
@@ -293,7 +293,7 @@ sub _omgr_insert($$$$$) {
 		die "ERROR: Could not find document \"$app\" in EDTK_REFIDDOC\n";
 	}
 
-	# Récupération du support pour la première page et les suivantes.
+	# Retrieve the support for the first page and the following ones.
 	my $p1 = $pdbh->selectrow_hashref('SELECT * FROM EDTK_SUPPORTS WHERE ED_REFIMP = ?',
 	    undef, $doc->{'ED_REFIMP_P1'});
 	die ("ERROR: die in _omgr_insert, message is " . $pdbh->errstr . "\n") if $pdbh->err;
@@ -308,8 +308,8 @@ sub _omgr_insert($$$$$) {
 		die "ERROR: Could not find support \"$doc->{'ED_REFIMP_PS'}\" in EDTK_SUPPORTS\n";
 	}
 
-	# Récupération de la liste des encarts à joindre pour ce document,
-	# et en déduire le poids supplémentaire à ajouter à chaque pli
+	# Retrieve the list of inserts to join for this document,
+	# and deduce the extra weight to add to each folded item
 	my @encrefs = split(/,/, $doc->{'ED_REFIMP_REFIDDOC'} || "");
 	my $now = strftime("%Y%m%d", localtime());
 	my $sth = $pdbh->prepare('SELECT * FROM EDTK_SUPPORTS WHERE ED_REFIMP = ?')
@@ -318,7 +318,7 @@ sub _omgr_insert($$$$$) {
 	my @needed = ();
 
 	foreach my $encref (@encrefs) {
-		# L'ERREUR EST ICI : ON DEVRAIT AJOUTER DES LIGNES D'INDEX PAR ENCART AVEC TYPIMP = E dupliqué pour chaque encart à partir de la dernière ligne du document xxxxxx
+		# THE ERROR IS HERE: WE SHOULD ADD INDEX LINES PER INSERT WITH TYPIMP = E duplicated for each insert starting from the last line of the document xxxxxx
 		my $enc = $pdbh->selectrow_hashref($sth, undef, $encref) or die ("ERROR: in omgr for encref $encref " . $pdbh->errstr . "\n");
 		#warn "DEBUG: looking for encart ".$enc->{'ED_REFIMP'}." for $now\n";
 		if (defined($enc->{'ED_DEBVALID'}) && length($enc->{'ED_DEBVALID'}) > 0 && $enc->{'ED_DEBVALID'} ne '99999999') {
@@ -330,10 +330,10 @@ sub _omgr_insert($$$$$) {
 		$encpds += $enc->{'ED_POIDSUNIT'};
 		push(@needed, $encref);
 	}
-	my $listerefenc = join(', ', @needed) || "none"; # xxx réfléchir impact mise sous pli, en dur ou paramétrable dans table supports ?
+	my $listerefenc = join(', ', @needed) || "none"; # xxx TODO think about the mailing impact, hard-coded or configurable in the supports table ?
 	#warn "DEBUG: selected listerefenc => $listerefenc\n";
-# POUR GÉRER DYNAMIQUEMENT L'INDEX, LES OPÉRATIONS DE LECTURE CI-DESSUS DEVRAIENT 
-# soit intégrer la boucle de lecture de l'index, soit être remplacée par des liens
+# TO MANAGE THE INDEX DYNAMICALLY, THE READ OPERATIONS ABOVE SHOULD 
+# either be part of the index read loop, or be replaced by links
 ################################################################################
 
 
@@ -360,7 +360,7 @@ sub _omgr_insert($$$$$) {
 		my @data = $csv->fields();
 
 		# Truncate the CP field if necessary.
-		# Si le CP est supérieur à 10 caractères, il est tronqué à 10 en prenant les 4 premiers suivi des 6 derniers
+		# If the postal code is longer than 10 characters, it is truncated to 10 by keeping the first 4 followed by the last 6
 		if (length($data[4]) > 10) {
 			warn "INFO : \"$data[4]\" truncated to 10 characters\n";
 			$data[4] = substr($data[4], 0, 4) . substr($data[4], -6);
@@ -380,8 +380,8 @@ sub _omgr_insert($$$$$) {
 		my $first = $prevseq != $data[3];		# Is this the first page?
 		$idldoc = $data[1] unless defined $idldoc;
 
-		# XXX Ces deux valeurs sont identiques pour le moment car on a qu'un document
-		# par pli, mais ce ne sera pas le cas une fois que le regroupement sera implémenté.
+		# XXX These two values are identical for now because we have only one document
+		# per folded item, but this will not hold once batching is implemented.
 		if ($first) {
 			$numpgpli = 1;
 			$seqpgdoc = 1;
@@ -402,7 +402,7 @@ sub _omgr_insert($$$$$) {
 			ED_IDEMET		=> $data[8],
 			ED_DTEDTION		=> $data[9],
 			ED_TYPPROD		=> $data[10],
-			ED_PORTADR		=> $doc->{'ED_PORTADR'}, # vérifier qu'on peut le gérer comme ED_TYPPROD
+			ED_PORTADR		=> $doc->{'ED_PORTADR'}, # check whether we can handle it like ED_TYPPROD
 			ED_ADRLN1		=> $data[12],
 			ED_CLEGED1		=> $data[13],
 			ED_ADRLN2		=> $data[14],
@@ -424,8 +424,8 @@ sub _omgr_insert($$$$$) {
 			ED_CODRUPT		=> $data[30],
 			ED_SEQPGDOC		=> $seqpgdoc,
 			ED_POIDSUNIT	=> $first ? $p1->{'ED_POIDSUNIT'} : $ps->{'ED_POIDSUNIT'},
-			ED_NBENC		=> scalar @needed,				# ceci est un hack incompatible avec le regroupement de plis 
-			ED_ENCPDS		=> $encpds,					# ceci est un hack incompatible avec le regroupement de plis
+			ED_NBENC		=> scalar @needed,				# this is a hack incompatible with folded-item batching 
+			ED_ENCPDS		=> $encpds,					# this is a hack incompatible with folded-item batching
 			ED_BAC_INSERT	=> $first ? $p1->{'ED_BAC_INSERT'} : $ps->{'ED_BAC_INSERT'},
 			ED_TYPED		=> $doc->{'ED_TYPED'},
 			ED_MODEDI		=> $doc->{'ED_MODEDI'},
@@ -435,13 +435,13 @@ sub _omgr_insert($$$$$) {
 #			ED_PAGEDEF		=> $doc->{'ED_PAGEDEF'},
 #			ED_FORMS		=> $doc->{'ED_FORMS'},
 			#ED_IDPLI		=>
-			ED_NBDOCPLI		=> 1,		# XXX Sera différent de 1 quand on fera du regroupement
+			ED_NBDOCPLI		=> 1,		# XXX Will differ from 1 once we do batching
 			ED_NUMPGPLI		=> $numpgpli,
 			ED_LISTEREFENC	=> $listerefenc,
-			ED_TYPOBJ		=> 'I'		# XXX Il nous manque des données pour ce champ
+			ED_TYPOBJ		=> 'I'		# XXX We are missing data for this field
 		};
 
-		# On ne remplit le champ pré-imprimé que s'il n'est pas renseigné dans l'index.
+		# We only fill the pre-printed field if it is not set in the index.
 		if (length($entry->{'ED_REFIMP'}) == 0) {
 			$entry->{'ED_REFIMP'} = $first ? $doc->{'ED_REFIMP_P1'} : $doc->{'ED_REFIMP_PS'};
 		}
@@ -451,7 +451,7 @@ sub _omgr_insert($$$$$) {
 		    ") VALUES (" . join(',', ('?') x @cols) . ")";
 		my $sth = $dbh->prepare_cached($sql);
 # warn "INFO : insert Query = $sql\n";
-# warn "INFO : insert values = ". dump (%$entry) . "\n"; # bug d'insertion de certaines valeurs dans Postgres
+# warn "INFO : insert values = ". dump (%$entry) . "\n"; # bug inserting some values into Postgres
 		
 		eval {
 			$sth->execute(values(%$entry));
@@ -467,18 +467,18 @@ sub _omgr_insert($$$$$) {
 	}
 	close($fh);
 
-	# Mise à jour de ED_NBPGDOC.
+	# Update ED_NBPGDOC.
 	my $sql = 'UPDATE ' . $cfg->{'EDTK_DBI_OUTMNGR'} . ' i SET ED_NBPGDOC = '
 	    		. '(SELECT COUNT(*) FROM ' . $cfg->{'EDTK_DBI_OUTMNGR'}
 	    		. ' WHERE ED_IDLDOC = ? AND ED_SEQDOC = i.ED_SEQDOC) WHERE ED_IDLDOC = ?';
 	$dbh->do($sql, undef, $idldoc, $idldoc);
 
-	# Initialisation de ED_NBPGPLI à ED_NBPGDOC; sera différent si on fait du regroupement.
+	# Initialize ED_NBPGPLI to ED_NBPGDOC; will differ if we do batching.
 	$sql = 'UPDATE ' . $cfg->{'EDTK_DBI_OUTMNGR'} . ' i SET ED_NBPGPLI = ED_NBPGDOC ' .
 	    'WHERE ED_IDLDOC = ?';
 	$dbh->do($sql, undef, $idldoc);
 
-	# Maintenant que l'on a calculé ED_NBPGPLI on peut mettre ED_MODEDI à jour.
+	# Now that ED_NBPGPLI is computed we can update ED_MODEDI.
 	$sql = "UPDATE " . $cfg->{'EDTK_DBI_OUTMNGR'} . " SET " .
 	    "ED_MODEDI = " .
 	      "CASE ED_MODEDI WHEN 'S' THEN 'R' ELSE CASE ED_NBPGPLI WHEN 1 THEN 'R' ELSE 'V' END END " .
@@ -490,22 +490,22 @@ sub _omgr_insert($$$$$) {
 
 
 sub _omgr_lot($$$) {
-	# RAPPROCHEMENT ENTRE DOCUMENTS DE L'INDEX ET TABLE DES LOTS => AFFECTATION DU LOT
+	# MATCHING INDEX DOCUMENTS AGAINST THE BATCH TABLE => BATCH ASSIGNMENT
 	my ($dbh, $pdbh, $idldoc) = @_;
 	my $cfg = config_read('EDTK_DB');
 
-	# Sélection des lots appropriés.
+	# Select the appropriate batches.
 	my $sql = 'SELECT ED_IDLOT, ED_REFIDDOC, ED_CPDEST, ED_FILTER, ED_GROUPBY, ED_IDMANUFACT, ED_IDGPLOT ' .
 	    'FROM EDTK_LOTS ORDER BY ED_PRIORITE';
 	my $sth = $pdbh->prepare($sql);
 	$sth->execute();
 	while (my $lot = $sth->fetchrow_hashref()) {
-		# On essaye de matcher des documents avec ce lot.
+		# We try to match documents with this batch.
 		$sql		= 'UPDATE ' . $cfg->{'EDTK_DBI_OUTMNGR'} . ' SET ED_IDLOT = ? ' ;
 
-#XXX AJOUTER GESTION DES REFENC / LOT : AJOUT ED_REFENC À ED_LISTREFENC
+#XXX ADD REFENC / BATCH HANDLING: ADD ED_REFENC TO ED_LISTREFENC
 		# if (defined $lot->{'ED_REFENC'}) {
-		#	ajouter ED_REFENC à ED_LISTREFENC
+		#	add ED_REFENC to ED_LISTREFENC
 		# }
 
 		my $where = ' WHERE ED_IDLOT IS NULL AND ED_IDLDOC = ? ';
@@ -531,7 +531,7 @@ sub _omgr_lot($$$) {
 		}
 	}
 
-	# On assigne les entrées restantes au lot par défaut.
+	# Assign the remaining entries to the default batch.
 	my $num = $dbh->do("UPDATE " . $cfg->{'EDTK_DBI_OUTMNGR'} . " SET ED_IDLOT = ? " .
 	    "WHERE ED_IDLDOC = ? AND ED_IDLOT IS NULL", undef, DEFLOT, $idldoc);
 	if ($num > 0) {
@@ -543,11 +543,11 @@ sub _omgr_lot($$$) {
 sub _get_next_filiere ($$){
 	my ($pdbh, $filiere) = @_;
 
-	# Récupération des paramètres d'assignation de la filiere.
+	# Retrieve the assignment parameters of the production line.
 	my ($ed_priorite, $ed_idmanufact, $ed_typed, $ed_modedi, $ed_idgplot, $ed_nbbacprn) 
 			= $pdbh->selectrow_array('select ED_PRIORITE, ED_IDMANUFACT, ED_TYPED, ED_MODEDI, ED_IDGPLOT, ED_NBBACPRN from EDTK_FILIERES where ED_IDFILIERE =? ',
 	    			undef, $filiere) or die ("ERROR: in _get_next_filiere, message is " . $pdbh->errstr);
-	# Récupération du 1er élément de la liste ordonnée des filieres.
+	# Retrieve the first element of the ordered list of production lines.
 	my $next_filiere 
 			= $pdbh->selectrow_array('select ED_IDFILIERE from EDTK_FILIERES where ED_IDMANUFACT =? and ED_TYPED =? and ED_MODEDI =? and ED_NBBACPRN >=? and ED_ACTIF =? and ED_IDFILIERE !=? and ED_PRIORITE >? and (ED_IDGPLOT = ? or ED_IDGPLOT = ?) order by ED_PRIORITE',
 	    			undef, $ed_idmanufact, $ed_typed, $ed_modedi, $ed_nbbacprn, 'O', $filiere, $ed_priorite, $ed_idgplot, '%');
@@ -562,12 +562,12 @@ sub _omgr_filiere($$$$$$) {
 	my ($dbh, $pdbh, $app, $idldoc, $numencs, $encpds) = @_;
 	my $cfg = config_read('EDTK_DB');
 
-	# Récupération des paramètres de l'application documentaire.
+	# Retrieve the document application parameters.
 	my $doc = $pdbh->selectrow_hashref('SELECT * FROM EDTK_REFIDDOC WHERE ED_REFIDDOC = ?',
 	    undef, $app) or die ("ERROR: die in _omgr_filiere, message is " . $pdbh->errstr);
 
-#	# Récupération de la liste des encarts à joindre à ce document,
-#	# et en déduire le poids supplémentaire à ajouter à chaque pli.
+#	# Retrieve the list of inserts to join to this document,
+#	# and deduce the extra weight to add to each folded item.
 #	my @encarts = split(/,/, $doc->{'ED_REFIMP_REFIDDOC'});
 #	my $encpds = 0;
 #	my $sth = $pdbh->prepare('SELECT ED_POIDSUNIT FROM EDTK_SUPPORTS ' 
@@ -579,14 +579,14 @@ sub _omgr_filiere($$$$$$) {
 #		$encpds += $pref->[0];
 #	}
 
-	# Récupération du support pour la première page et les suivantes.
+	# Retrieve the support for the first page and the following ones.
 	my $p1 = $pdbh->selectrow_hashref('SELECT * FROM EDTK_SUPPORTS WHERE ED_REFIMP = ?',
 	    undef, $doc->{'ED_REFIMP_P1'}) or die ("ERROR: die in _omgr_filiere, message is " . $pdbh->errstr);
 	my $ps = $pdbh->selectrow_hashref('SELECT * FROM EDTK_SUPPORTS WHERE ED_REFIMP = ?',
 	    undef, $doc->{'ED_REFIMP_PS'}) or die ("ERROR: die in _omgr_filiere, message is " . $pdbh->errstr);
 
-	# On recherche toutes les entrées qui ont un lot assigné 
-	# mais pas encore de filière cf EDTK LOTS
+	# Look for all entries that have an assigned batch 
+	# but no production line yet, see EDTK LOTS
 	my $sql = 'SELECT DISTINCT ED_IDLOT FROM ' . $cfg->{'EDTK_DBI_OUTMNGR'} . 
 	    ' WHERE ED_IDLDOC = ? AND ED_IDLOT IS NOT NULL AND ED_IDFILIERE IS NULL';
 	my $lotids = $dbh->selectcol_arrayref($sql, undef, $idldoc);
@@ -595,18 +595,18 @@ sub _omgr_filiere($$$$$$) {
 		my $lot = $pdbh->selectrow_hashref('SELECT * FROM EDTK_LOTS WHERE ED_IDLOT = ?',
 		    undef, $lotid) or die ("ERROR: die in _omgr_filiere, message is " . $pdbh->errstr);
 
-		# On essaye maintenant de matcher les documents avec chacune des filières.
+		# Now we try to match the documents with each of the production lines.
 		my $sql = "SELECT * FROM EDTK_FILIERES WHERE ED_ACTIF = 'O' "
 		    . "AND (ED_IDMANUFACT IS NULL OR ED_IDMANUFACT = '' OR ED_IDMANUFACT = ?) "
 		    . "ORDER BY ED_PRIORITE ASC";
 		my $sth = $pdbh->prepare($sql) or die ("ERROR: die in _omgr_filiere, message is " . $pdbh->errstr);
 		$sth->execute($lot->{'ED_IDMANUFACT'});
 
-		# LES CONTRAINTES EN NOMBRE MINIMUM/MAXIMUM DE PAGES ET PLIS SONT VÉRIFIÉES
-		# UNIQUEMENT LORSQU'ON EXPORTE LES LOTS DANS OMGR_EXPORT() POUR PERMETTRE
-		# LE REGROUPEMENT.
+		# THE MINIMUM/MAXIMUM PAGE AND FOLDED-ITEM COUNT CONSTRAINTS ARE CHECKED
+		# ONLY WHEN EXPORTING THE BATCHES IN OMGR_EXPORT() TO ALLOW
+		# BATCHING.
 		while (my $fil = $sth->fetchrow_hashref()) {
-			# compatibilite ascendante
+			# backward compatibility
 			if (defined $fil->{'ED_IDGPLOT'} && length($fil->{'ED_IDGPLOT'}) > 0) {
 				if ($lot->{'ED_IDGPLOT'} ne $fil->{'ED_IDGPLOT'} and $fil->{'ED_IDGPLOT'} ne "%") {
 					next;
@@ -616,13 +616,13 @@ sub _omgr_filiere($$$$$$) {
 			if (defined $fil->{'ED_NBENCMAX'} && length($fil->{'ED_NBENCMAX'}) > 0) {
 				next if $numencs > $fil->{'ED_NBENCMAX'};
 			}
-			# La formule nous permettant de calculer le nombre de feuilles d'un pli.
-			# à faire évoluer pour le regroupement xxxxx
+			# The formula that lets us compute the number of sheets in a folded item.
+			# to be evolved for batching xxxxx
 			my $sqlnbfpli = "$numencs + "
 					. ($fil->{'ED_MODEDI'} eq 'V' ? 'CEIL(ED_NBPGPLI / 2)' : 'ED_NBPGPLI');
-			# La formule calculant le poids total du pli, et les valeurs associées.
-			# xxxx la formule est fausse car $sqlnbfpli décompte déjà les encarts
-			# xxxx  il faudrait faire la somme des poids des objets recto du plis (à condition de bien avoir 1 ligne / élément)
+			# The formula computing the total folded-item weight, and the associated values.
+			# xxxx the formula is wrong because $sqlnbfpli already counts the inserts
+			# xxxx  we should sum the weights of the front-side objects of the folded item (provided we really have 1 line / element)
 			my $sqlpdspli  = "$encpds + $p1->{'ED_POIDSUNIT'} + $ps->{'ED_POIDSUNIT'} * ($sqlnbfpli - 1)";
 
 			my $sql = "UPDATE " . $cfg->{'EDTK_DBI_OUTMNGR'} . " SET ED_IDFILIERE = ?, " .
@@ -641,7 +641,7 @@ sub _omgr_filiere($$$$$$) {
 			}
 			my $num = $dbh->do($sql, undef, @vals);
 			if ($num > 0) {
-				warn "INFO : Assigned $num pages to filiere \"$fil->{'ED_IDFILIERE'}\" " .
+				warn "INFO : Assigned $num pages to production line \"$fil->{'ED_IDFILIERE'}\" " .
 				    "($fil->{'ED_DESIGNATION'})\n";
 			}
 		}
@@ -663,10 +663,10 @@ sub omgr_export(%) {
 
 	my @done = ();
 	eval {
-		# Transformation des éventuels filtres utilisateurs en clause WHERE.
+		# Turn the optional user filters into a WHERE clause.
 		my $user_where = join(' AND ', map { "$_ = ?" } keys(%conds));
 
-		# Cette requête sélectionne les couples (idlot,idfiliere) contenant des plis non affectés.
+		# This query selects the (idlot,idfiliere) pairs containing unassigned folded items.
 		my $idsql = 'SELECT DISTINCT ED_IDLOT, ED_IDFILIERE, ED_CORP FROM ' . $cfg->{'EDTK_DBI_OUTMNGR'} .
 		    ' WHERE ED_IDLOT IS NOT NULL AND ED_IDFILIERE IS NOT NULL AND ED_SEQLOT IS NULL';
 		if (length($user_where) > 0) {
@@ -674,14 +674,14 @@ sub omgr_export(%) {
 		}
 		my $ids = $dbh->selectall_arrayref($idsql, undef, values(%conds));
 
-		foreach (@$ids) {    # il faut tenir compte de l'ordre de priorité des filières
+		foreach (@$ids) {    # we must take the production-line priority order into account
 			my ($idlot, $idfiliere, $idcorp) = @$_;
 
 			CHECK_FIL:
 			{
 				warn "INFO : Considering OMGR tuple : $idlot, $idfiliere, $idcorp\n";
-				# La clause WHERE que l'on réutilise dans la plupart des requêtes afin de ne
-				# traiter que les entrées qui nous intéressent.
+				# The WHERE clause that we reuse in most queries so as to
+				# process only the entries we care about.
 				my $where = 'WHERE ED_IDLOT = ? AND ED_IDFILIERE = ? AND ED_CORP = ? AND ED_SEQLOT IS NULL';
 				if (length($user_where) > 0) {
 					$where .= " AND $user_where";
@@ -693,13 +693,13 @@ sub omgr_export(%) {
 				my $lot = $pdbh->selectrow_hashref('SELECT * FROM EDTK_LOTS WHERE ED_IDLOT = ?',
 				    undef, $idlot);
 	
-				# On verrouille la table $cfg->{'EDTK_DBI_OUTMNGR'} pour s'assurer que des entrées ne soient pas
-				# ajoutées entre le moment ou on fait nos calculs et le moment ou on fait l'UPDATE.
+				# Lock the $cfg->{'EDTK_DBI_OUTMNGR'} table to make sure entries are not
+				# added between when we do our computations and when we run the UPDATE.
 				$dbh->do('LOCK TABLE ' . $cfg->{'EDTK_DBI_OUTMNGR'} . ' IN SHARE ROW EXCLUSIVE MODE');
 	
-				# Si le lot définit une colonne pour la valeur de ED_GROUPBY, on doit découper
-				# les lots d'envoi en fonction de cette colonne.  De plus, on découpe toujours
-				# par entité émettrice, format de papier, type de production et liste d'encarts.
+				# If the batch defines a column for the ED_GROUPBY value, we must split
+				# the shipment batches according to that column.  Moreover, we always split
+				# by issuing entity, paper format, production type and insert list.
 				my @gcols = ('ED_CORP', 'ED_FORMATP', 'ED_TYPPROD', 'ED_LISTEREFENC');
 	
 				if (defined($lot->{'ED_GROUPBY'}) && length($lot->{'ED_GROUPBY'}) > 0) {
@@ -710,7 +710,7 @@ sub omgr_export(%) {
 					. " $where", { Slice => {} }, @wvals);
 	
 				foreach my $gvals (@$groups) {
-					my $where2 = $where;	# vérifier qu'on l'utilise bien ...
+					my $where2 = $where;	# check that we really use it ...
 					my @wvals2 = @wvals;
 	
 					if (keys(%$gvals) > 0) {
@@ -724,7 +724,7 @@ sub omgr_export(%) {
 						$where2 .= ' AND ' . join(' AND ', map { "$_ = ?" } keys(%$gvals));
 					}
 	
-					# On calcule le nombre de plis de chaque taille.
+					# Compute the number of folded items of each size.
 					my $innersql = 'SELECT DISTINCT ED_IDLDOC, ED_SEQDOC, ED_NBPGPLI FROM ' .
 					    $cfg->{'EDTK_DBI_OUTMNGR'};
 	
@@ -733,16 +733,16 @@ sub omgr_export(%) {
 					my $res = $dbh->selectall_arrayref($sql, undef, @wvals2);
 					next if @$res == 0; 
 					
-					# Calcul du nombre total de plis et de pages à notre disposition.
+					# Compute the total number of folded items and pages available to us.
 					my $availplis= sum(map { $$_[0] } @$res);
 					my $availpgs = sum(map { $$_[0] * $$_[1] } @$res);
 	
-					# Aura-t-on besoin de repasser un traitement pour ce couple (idlot/idfiliere)
-					# et pour le groupe définit par les colonnes de @gcols?
+					# Will we need to run the processing again for this (idlot/idfiliere) pair
+					# and for the group defined by the @gcols columns?
 					my $more = 0;
 	
-					# Le nombre maximal de plis/pages que l'on peut prendre (soit la
-					# limite de la filière, soit l'intégralité disponible).
+					# The maximum number of folded items/pages we can take (either the
+					# production-line limit, or everything available).
 					if (defined($fil->{'ED_MAXPLIS'}) && $availplis > $fil->{'ED_MAXPLIS'}) {
 						$availplis = $fil->{'ED_MAXPLIS'};
 						$more = 1;
@@ -765,11 +765,11 @@ sub omgr_export(%) {
 					foreach (@$res) {
 						my ($numplis, $nbpgpli) = @$_;
 	
-						# Si on ne peut plus rajouter de plis ou de pages, on arrête.
+						# If we can no longer add folded items or pages, we stop.
 						last if $availplis == 0 || $availpgs == 0;
 						
-						# Il n'y a pas suffisamment de pages disponibles pour ajouter de
-						# pli de cette taille, on essaye donc avec de plus petits plis.
+						# There are not enough pages available to add a
+						# folded item of this size, so we try with smaller folded items.
 						next if $availpgs < $nbpgpli;
 	
 						my $nbplis = int($availpgs / $nbpgpli);
@@ -788,41 +788,41 @@ sub omgr_export(%) {
 						$selpgs += $nbpgs;
 					}
 	
-					# On vérifie qu'on a sélectionné suffisamment de pages et de plis pour
-					# remplir les limites basses de la filière si elles existent.
+					# Check that we selected enough pages and folded items to
+					# meet the lower limits of the production line, if any.
 					my $min_feuilles = $fil->{'ED_MINFEUIL_L'} || 1;
 					if ($selpgs < $min_feuilles) {
-						warn "INFO : Not enough pages for filiere \"$idfiliere\" : "
+						warn "INFO : Not enough pages for production line \"$idfiliere\" : "
 							."got $selpgs, need $min_feuilles\n";
-						$more = 1; # à vérifier qu'on en a bien besoin 
+						$more = 1; # TODO check that we really need it 
 						# _get_next_filiere($pdbh, $idfiliere);
-						# reset filiere avec relance eval ou completion liste @$ids ?  xxxxxxxxxxxxx
-						# cf 388 
+						# reset the production line with an eval restart or by completing the @$ids list?  xxxxxxxxxxxxx
+						# see 388 
 							my $sql = "UPDATE " . $cfg->{'EDTK_DBI_OUTMNGR'} . " SET ED_IDFILIERE = ? " .
 							    "WHERE ED_IDLOT = ? AND ED_IDFILIERE = ? AND ED_CORP = ? AND ED_SEQLOT IS NULL ";
 							my $next_filiere = _get_next_filiere($pdbh, $idfiliere);
 							my @vals= ($next_filiere, $idlot, $idfiliere, $idcorp);
 							my $num = $dbh->do($sql, undef, @vals);
-							$dbh->commit; # voir si on peut éviter pour bénéficier du rollback en cas de besoin de reprise
-							#warn "DEBUG: downgrade filiere to $next_filiere for $num pages\n";
+							$dbh->commit; # see whether we can avoid it to benefit from rollback when a retry is needed
+							#warn "DEBUG: downgrade production line to $next_filiere for $num pages\n";
 							$idfiliere = $next_filiere;
 						redo CHECK_FIL;
 					}
 	    				my $minplis = $fil->{'ED_MINPLIS'} || 1;
 					if ($selplis < $minplis) {
-						warn "INFO : Not enough plis for filiere \"$idfiliere\" : "
+						warn "INFO : Not enough folded items for production line \"$idfiliere\" : "
 							."got $selplis, need $minplis\n";
-						$more = 1; # à vérifier qu'on en a bien besoin
+						$more = 1; # TODO check that we really need it
 						# _get_next_filiere($pdbh, $idfiliere);
-						# reset filiere avec relance eval ou completion liste @$ids ?  xxxxxxxxxxxxx
-						# cf 388 
+						# reset the production line with an eval restart or by completing the @$ids list?  xxxxxxxxxxxxx
+						# see 388 
 							my $sql = "UPDATE " . $cfg->{'EDTK_DBI_OUTMNGR'} . " SET ED_IDFILIERE = ? " .
 							    "WHERE ED_IDLOT = ? AND ED_IDFILIERE = ? AND ED_CORP = ? AND ED_SEQLOT IS NULL ";
 							my $next_filiere = _get_next_filiere($pdbh, $idfiliere);
 							my @vals = ($next_filiere, $idlot, $idfiliere, $idcorp);
 							my $num = $dbh->do($sql, undef, @vals);
-							$dbh->commit;  # voir si on peut éviter pour bénéficier du rollback en cas de besoin de reprise
-							warn "INFO : downgrade filiere to $next_filiere for $num pages\n";
+							$dbh->commit;  # see whether we can avoid it to benefit from rollback when a retry is needed
+							warn "INFO : downgrade production line to $next_filiere for $num pages\n";
 							$idfiliere = $next_filiere;
 						redo CHECK_FIL;
 					}
@@ -830,7 +830,7 @@ sub omgr_export(%) {
 					my $seqlot = _get_seqlot($dbh);
 					my $name = "$gvals->{'ED_CORP'}.$lot->{'ED_IDMANUFACT'}.$seqlot.$lot->{'ED_LOTNAME'}.$fil->{'ED_IDFILIERE'}";
 	
-					# Préparation de l'ordre de tri pour cette filière.
+					# Prepare the sort order for this production line.
 					my $order;
 					if (defined $fil->{'ED_SORT'} && length($fil->{'ED_SORT'}) > 0) {
 						$order = $fil->{'ED_SORT'};
@@ -841,16 +841,16 @@ sub omgr_export(%) {
 						$order = "ED_IDLDOC, ED_SEQDOC";
 					}
 	
-					# La date d'aujourd'hui. 
+					# Today's date. 
 					my $dtlot = sprintf("%04d%02d%02d", Today());
 	
 					foreach (@plis) {
 						my ($nbplis, $nbpgpli) = @$_;
 	
 						#warn "DEBUG: Assigning $nbplis of $nbpgpli pages each to lot $seqlot\n";
-						# Cette requête sélectionne les N premiers plis non affectés
-						# d'une taille donnée, les plis étant uniquement identifiés avec
-						# un identifiant de lot de document + un identifiant de pli.
+						# This query selects the first N unassigned folded items
+						# of a given size, the folded items being identified only by
+						# a document batch id + a folded-item id.
 						$innersql = "SELECT j.ED_IDLDOC, j.ED_SEQDOC FROM (" .
 						  "SELECT i.ED_IDLDOC, i.ED_SEQDOC, ROW_NUMBER() " .
 						  "OVER (ORDER BY PGNUM) AS PLINUM FROM " .
@@ -858,8 +858,8 @@ sub omgr_export(%) {
 						    "FROM " . $cfg->{'EDTK_DBI_OUTMNGR'} . " $where2 AND ED_NBPGPLI = ?) i " .
 						  "WHERE ED_SEQPGDOC = 1) j WHERE PLINUM <= ?";
 	
-						# On assigne le lot à tous les plis sélectionnés. On en profite
-						# aussi pour positionner la date de création du lot.
+						# Assign the batch to all the selected folded items. We also take the
+						# opportunity to set the batch creation date.
 						$sql = "UPDATE " . $cfg->{'EDTK_DBI_OUTMNGR'} . " SET ED_SEQLOT = ?, ED_DTLOT = ? " .
 						    "WHERE (ED_IDLDOC, ED_SEQDOC) IN ($innersql)";
 						my $count = $dbh->do($sql, undef, $seqlot, $dtlot, @wvals2, $nbpgpli, $nbplis);
@@ -870,7 +870,7 @@ sub omgr_export(%) {
 					}
 					warn "INFO : Assigned $selpgs pages to lot \"$name\"\n";
 	
-					# Calcul des identifiants de pli.  XXX Devrait être fait autrement...
+					# Compute the folded-item ids.  XXX Should be done differently...
 					$sql = "SELECT ED_IDLDOC, ED_SEQDOC, " .
 					           "DENSE_RANK() OVER (ORDER BY ED_IDLDOC, ED_SEQDOC) AS ED_IDPLI " .
 						 "FROM " . $cfg->{'EDTK_DBI_OUTMNGR'} . " WHERE ED_SEQLOT = ? ORDER BY $order";
@@ -884,12 +884,12 @@ sub omgr_export(%) {
 						    $row->{'ED_SEQDOC'}, $seqlot);
 					}
 	
-					# Récupération de la liste des imprimés nécessaires pour ce lot.
+					# Retrieve the list of print items needed for this batch.
 					$sql = 'SELECT DISTINCT ED_REFIMP FROM ' . $cfg->{'EDTK_DBI_OUTMNGR'} .
 					    ' WHERE ED_SEQLOT = ?';
 					my @refimps = $dbh->selectrow_array($sql, undef, $seqlot);
 	
-					# Calcul du nombre total de feuilles dans le lot.
+					# Compute the total number of sheets in the batch.
 					$sql = "SELECT SUM(i.ED_NBFPLI) "
 						. " FROM (SELECT DISTINCT ED_IDLDOC, ED_SEQDOC, ED_NBFPLI "
 								. " FROM " . $cfg->{'EDTK_DBI_OUTMNGR'} 
@@ -899,7 +899,7 @@ sub omgr_export(%) {
 					if ($fil->{'ED_MODEDI'} ne 'R'){$nbfaceslot *= 2;}
 
 	
-					# Extraction des données.
+					# Extract the data.
 					my $lotdir = "$basedir/$name";
 					mkdir("$lotdir") or die "ERROR: Cannot create directory \"$lotdir\": $!\n";
 					my $file = "$name.idx";
@@ -910,7 +910,7 @@ sub omgr_export(%) {
 					$sth->execute($seqlot);
 	
 					open(my $fh, ">$lotdir/$file") or die ("ERROR: die in omgr_export, message is " . $!);
-					# Génération de la ligne de header.
+					# Generate the header line.
 					my $csv = Text::CSV->new({ binary => 1, eol => "\n", quote_space => 0 });
 					$csv->print($fh, [map { $$_[0] } @INDEX_COLS]);
 					my $doclib;
@@ -957,7 +957,7 @@ sub omgr_export(%) {
 						['ED_FORMATP',		$gvals->{'ED_FORMATP'}],
 						['ED_CONSIGNE',		$lot->{'ED_CONSIGNE'}],
 						['ED_LISTEREFENC',	$gvals->{'ED_LISTEREFENC'} 	|| ""],
-						['ED_LISTEREFIMP',	join(', ', @refimps) 		|| ""], # si je mets ce champs en dernier, je plante latex...
+						['ED_LISTEREFIMP',	join(', ', @refimps) 		|| ""], # if I put this field last, I crash latex...
 						['ED_DTLOT',		$dtlot]
 
 					);
@@ -970,8 +970,8 @@ sub omgr_export(%) {
 					$dbh->commit;
 					push(@done, [$name, $doclib]);
 	
-					# On reboucle le traitement si l'on a atteint les limites maximales en
-					# pages/plis et que l'on doit traiter d'autres lots.
+					# Loop the processing again if we reached the maximum limits in
+					# pages/folded items and we must process other batches.
 					redo if $more;
 				}
 			}
@@ -1003,22 +1003,22 @@ sub _omgr_purge_db($$) {
 	my $type = "";
 	my $sql;
 
-	if ($value =~ /^\d{6,7}$/) { # 381123 ou 1381123
+	if ($value =~ /^\d{6,7}$/) { # 381123 or 1381123
 		$type = "SEQLOT";
-		warn "INFO : suppr $type $value from EDTK_STATS_OUTMNGR\n";
+		warn "INFO : delete $type $value from EDTK_STATS_OUTMNGR\n";
 		$sql = 'DELETE FROM ' . $cfg->{'EDTK_STATS_OUTMNGR'} . ' WHERE ED_SEQLOT = ?';
-		$dbh->do($sql, undef, $value) or die "ERROR: suppr $type $value from EDTK_STATS_OUTMNGR\n";
+		$dbh->do($sql, undef, $value) or die "ERROR: delete $type $value from EDTK_STATS_OUTMNGR\n";
 
 	#} elsif (length ($value) == 16) { # 1282152443057128
 	} elsif ($value =~ /^\d{16}$/) { # 1282152443057128
 		$type = "SNGL_ID";	# EDTK_STATS_TRACKING
-		warn "INFO : suppr $type $value from EDTK_STATS_TRACKING\n";
+		warn "INFO : delete $type $value from EDTK_STATS_TRACKING\n";
 		$sql = 'DELETE FROM ' . $cfg->{'EDTK_STATS_TRACKING'} . ' WHERE ED_SNGL_ID = ?';
-		$dbh->do($sql, undef, $value) or die "ERROR: suppr $type $value from EDTK_STATS_TRACKING\n";
+		$dbh->do($sql, undef, $value) or die "ERROR: delete $type $value from EDTK_STATS_TRACKING\n";
 
-		warn "INFO : suppr $type $value from EDTK_STATS_OUTMNGR\n";
+		warn "INFO : delete $type $value from EDTK_STATS_OUTMNGR\n";
 		$sql = 'DELETE FROM '.$cfg->{'EDTK_STATS_OUTMNGR'}.' WHERE ED_IDLDOC = ?';
-		$dbh->do($sql, undef, $value) or die "ERROR: suppr $type $value from EDTK_STATS_OUTMNGR\n";
+		$dbh->do($sql, undef, $value) or die "ERROR: delete $type $value from EDTK_STATS_OUTMNGR\n";
 
 	} else {
 		die "ERROR: $value doesn't seem to be SNGL_ID or SEQLOT";	
@@ -1069,7 +1069,7 @@ sub omgr_check_seqlot_ref ($$;$){
 
 	my $rows = $sth->fetchall_arrayref();
 	if ($#$rows<0) {
-		warn "INFO : pas de donnees associees.\n";
+		warn "INFO : no associated data.\n";
 		exit;
 	}
 	my $fmt = "%7s %-16s %-16s %6s %-7s %7s %10s %8s %8s";
@@ -1122,7 +1122,7 @@ sub omgr_stats($$$$) {
 	} elsif ($period =~ /^\d+$/){
 		$key = $period;
 	} else {
-		warn "INFO : implémentation en attente évolution base\n";
+		warn "INFO : implementation awaiting database evolution\n";
 	}
 
 	my @head;
@@ -1133,10 +1133,10 @@ sub omgr_stats($$$$) {
 		@head= ("CORP", "LOT", "ID_SEQLOT", "PLIS", "DOCS", "FEUILLES", "PAGES", "FACES", "FIL.");
 		$sql = "SELECT ED_CORP, ED_IDLOT, ED_SEQLOT, ";
 	}	
-	$sql .="COUNT (DISTINCT ED_IDLDOC||TO_CHAR(ED_SEQDOC,'FM0000000')), ";	# NB PLIS # ne tient pas compte des éventuels regroupement à revoir : (DISTINCT TO_CHAR(ED_SEQLOT,'FM0000000')||TO_CHAR(ED_IDPLI,'FM0000000')) 
+	$sql .="COUNT (DISTINCT ED_IDLDOC||TO_CHAR(ED_SEQDOC,'FM0000000')), ";	# NB PLIS # does not account for possible batching, to review: (DISTINCT TO_CHAR(ED_SEQLOT,'FM0000000')||TO_CHAR(ED_IDPLI,'FM0000000')) 
 	$sql .="COUNT (DISTINCT ED_IDLDOC||TO_CHAR(ED_SEQDOC,'FM0000000')), ";	# NB DOCS
-	$sql .="SUM(ED_NBFPLI), "; 												# NB FEUILLES
-	$sql .="SUM(ED_NBPGDOC), ";												# NB FACES IMPRIMEES
+	$sql .="SUM(ED_NBFPLI), "; 												# NB SHEETS
+	$sql .="SUM(ED_NBPGDOC), ";												# NB PRINTED FACES
 	$sql .="CASE ED_MODEDI WHEN 'R' THEN 1 ELSE 2 END * SUM(ED_NBFPLI) ";	# NB FACES
 
 	if ($typeRqt !~/idlot/i) { 
@@ -1182,13 +1182,13 @@ sub omgr_stats($$$$) {
 
 
 sub omgr_lot_pending($) {
-	# RECHERCHE DES DOCUMENTS EN ATTENTE DE LOTISSEMENT
-	# c'est à dire les documents dont le seqlot est null
-	# Est utilisé par index_Purge_DCLIB
+	# SEARCH FOR DOCUMENTS PENDING BATCHING
+	# that is, the documents whose seqlot is null
+	# Used by index_Purge_DCLIB
 	my ($dbh) = @_;
 	my $cfg = config_read('EDTK_DB');
 
-	#-- RECHERCHE DES DOCUMENTS EN ATTENTE DE LOTISSEMENT -- 
+	#-- SEARCH FOR DOCUMENTS PENDING BATCHING -- 
 	my $ctrl_sql = 'SELECT ED_CORP, ED_REFIDDOC, ED_IDLDOC, ED_DTEDTION FROM ' . $cfg->{'EDTK_DBI_OUTMNGR'} 
 	    . ' WHERE ED_SEQLOT IS NULL'
 	    . ' GROUP BY ED_CORP, ED_REFIDDOC, ED_DTEDTION, ED_IDLDOC'
@@ -1277,9 +1277,23 @@ return @torm;
 sub _get_seqlot {
 	my $dbh = shift;
 
+	# SQLite has no SEQUENCE and no to_char(): read the counter table set up by
+	# create_lot_sequence (0..999, wrapping) and build the ISO week + day-of-week
+	# prefix in Perl. This is what lets SQLite serve as the main database in tests.
+	if ($dbh->{'Driver'}->{'Name'} =~ m/SQLite/i) {
+		my ($year, $month, $day) = Today();
+		my ($week) = Week_of_Year($year, $month, $day);
+		my $prefix = sprintf("%02d%d", $week, Day_of_Week($year, $month, $day));
+		$dbh->do("update edtk_idlot_seq set id_val = ( id_val + 1 ) % 1000")
+			or &logger (3, "SQL execute failed ".$dbh->errstr);
+		my ($seq) = $dbh->selectrow_array("select id_val from edtk_idlot_seq");
+		$seq = 0 unless defined $seq;
+		return sprintf("%s%03d", $prefix, $seq);
+	}
+
 	my $sql;
 	if ($dbh->{'Driver'}->{'Name'} eq 'Oracle') {
-		# sysdate produit le seqlot pour avoir l'année iso sur 1 caractère I 
+		# sysdate produces the seqlot so the iso year fits on 1 character I 
 		# http://www.techonthenet.com/oracle/functions/to_char.php
 		$sql = "SELECT to_char(sysdate, 'IIWD') || " .
 		    "to_char(EDTK_IDLOT.NEXTVAL, 'FM000') FROM dual";
@@ -1295,12 +1309,12 @@ sub _get_seqlot {
 
 
 sub _filled_rows(\@){
-	# pour s'assurer que chaque cellule contient au moins un blanc et éviter les warning de printf en cas de fusion avec une cellule non définie
+	# to make sure each cell holds at least a blank and avoid printf warnings when merging with an undefined cell
 	my $refRows  =shift;
 
 	foreach my $row (@$refRows) {
 		for (my $i=0; $i<=$#$row ; $i++){
-			$$row[$i] = $$row[$i] || ""; # DANS LE CAS DE SEQLOT IL PEUT ARRIVER QU'IL NE SOIT PAS ENCORE RENSEIGNE	
+			$$row[$i] = $$row[$i] || ""; # IN THE CASE OF SEQLOT IT MAY NOT BE SET YET	
 		}
 	}
 
@@ -1309,8 +1323,8 @@ return @{$refRows};
 
 
 sub _print_All_rTab($){
-	# EDITION DE L'ENSEMBLE DES DONNÉES D'UN TABLEAU PASSÉ EN REFÉRENCE
-	#  affichage du tableau en colonnes 
+	# PRINT ALL THE DATA OF A TABLE PASSED BY REFERENCE
+	#  display the table in columns 
 	my $rTab=shift;
 
 	for (my $i=0 ; $i<=$#{$rTab} ; $i++) {

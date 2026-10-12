@@ -34,31 +34,31 @@ optional_features:
 provides:
   At:
     file: lib/At.pm
-    version: v1.7.0
+    version: v1.8.0
   At::Error:
     file: lib/At/Error.pm
-    version: v1.7.0
+    version: v1.8.0
   At::Protocol::DID:
     file: lib/At/Protocol/DID.pm
-    version: v1.7.0
+    version: v1.8.0
   At::Protocol::Firehose:
     file: lib/At/Protocol/Firehose.pm
-    version: v1.7.0
+    version: v1.8.0
   At::Protocol::Handle:
     file: lib/At/Protocol/Handle.pm
-    version: v1.7.0
+    version: v1.8.0
   At::Protocol::NSID:
     file: lib/At/Protocol/NSID.pm
-    version: v1.7.0
+    version: v1.8.0
   At::Protocol::Session:
     file: lib/At/Protocol/Session.pm
-    version: v1.7.0
+    version: v1.8.0
   At::Protocol::URI:
     file: lib/At/Protocol/URI.pm
-    version: v1.7.0
+    version: v1.8.0
   At::UserAgent:
     file: lib/At/UserAgent.pm
-    version: v1.7.0
+    version: v1.8.0
 recommends:
   Mojo::UserAgent: '0'
 requires:
@@ -80,7 +80,7 @@ resources:
   homepage: https://github.com/sanko/At.pm
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/sanko/At.pm.git
-version: v1.7.0
+version: v1.8.0
 x_contributors:
   - 'Akiomi Kamakura <akiomik@gmail.com>'
   - 'Alberto Roura <mail@albertoroura.com>'

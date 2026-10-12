@@ -6,7 +6,7 @@ use warnings;
 
 use Game::Mahjong::Tiles;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our %FORM = (
 	1 => 'standard',
@@ -59,7 +59,7 @@ Game::Mahjong::Decompose - every way a hand is complete, and what it waits for
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

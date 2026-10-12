@@ -1,5 +1,10 @@
 Revision history for Game-Durak
 
+0.03    2026-10-11
+        - Add Game::Durak::Terminal->run(@argv), which returns the exit status
+        - Terminal's game loop is now play, not run
+        - The usage names durak, not the program's path
+
 0.02    2026-10-10
         - The hand is now chosen with the arrow keys.
         - Fix: --seat 7 died with a raw engine message and exit 25, because

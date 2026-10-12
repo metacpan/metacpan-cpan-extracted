@@ -409,15 +409,17 @@ subtest 'GET /open -- headers-only CSV renders with 0 data rows' => sub {
 };
 
 # ---------------------------------------------------------------------------
-# Section 9: Mocked upstream failures -- fetch_all croak is caught gracefully
+# Section 9: Mocked upstream failures -- selectall_arrayref croak is caught gracefully
 #
-# Strategy: use Test::Mockingbird to replace DataSource::fetch_all with a
-# croaking stub.  Verify the eval in the view action catches the croak and
+# Strategy: use Test::Mockingbird to replace DataSource::selectall_arrayref with
+# a croaking stub.  Verify the eval in the view action catches the croak and
 # renders the friendly error template (200, not 500).
+# (The controller calls count() then selectall_arrayref() since pagination was
+# introduced; fetch_all() is no longer called on the /view or /open paths.)
 # ---------------------------------------------------------------------------
 
 subtest 'GET /view/sales -- fetch_all croak is caught, friendly error rendered' => sub {
-	mock 'Database::BI::Model::DataSource::fetch_all' => sub {
+	mock 'Database::BI::Model::DataSource::selectall_arrayref' => sub {
 		die "Simulated upstream database failure\n"
 	};
 
@@ -433,7 +435,7 @@ subtest 'GET /open -- fetch_all croak is caught, friendly error rendered' => sub
 	my $path = Mojo::File->new($TMPDIR)->child('sales.csv');
 	$path->spew("id,name\n1,Widget\n");
 
-	mock 'Database::BI::Model::DataSource::fetch_all' => sub {
+	mock 'Database::BI::Model::DataSource::selectall_arrayref' => sub {
 		die "Simulated read failure\n"
 	};
 

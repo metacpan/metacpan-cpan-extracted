@@ -1,6 +1,6 @@
 package CPAN::MetaCurator;
 
-our $VERSION = '1.29';
+our $VERSION = '1.33';
 
 #-------------------------------------------------
 
@@ -23,7 +23,7 @@ Note: My web host and I use case-sensitive file systems.
 =item Edit Perl.Wiki as desired. Includes updating the release date. Save to ~/Downloads/
 =item cp ~/Downloads/Perl.Wiki.html to misc/
 =item git commit -am"Update Perl.Wiki V 1.xx"
-=item cp misc/Perl.Wiki.html to $DH/misc (/dev/shm/html/misc on my machine) for eye-ball check via FF
+=item cp misc/Perl.Wiki.html $DH/misc (/dev/shm/html/misc on my machine) for eye-ball check via FF
 =back
 
 =head2 Export Perl.Wiki.html
@@ -35,11 +35,23 @@ Note: My web host and I use case-sensitive file systems.
 =item mv ~/Downloads/tiddlers.json data/
 =back
 
+=head2 Restore cpan.metapackager.sqlite
+
+=over
+=item pushd ~/perl.modules/CPAN-MetaPackager
+=item cp data/cpan.metapackager.sqlite /tmp
+=item popd
+=back
+
 =head2 Rebuild Perl Wiki Tree
 
 =over
 =item 'Run' here means run from the bash command line
-=item Run: cp ~/backup/02packages.details.txt /tmp
+=item Run: cd ~/backup
+=item Run: wget https://www.cpan.org/modules/02packages.details.txt.gz
+=item Run: gunzip 02packages.details.txt.gz
+=item Run: cp 02packages.details.txt /tmp
+=item Run: cd ~/perl.modules/CPAN-MetaCurator
 =item Next, set INCLUDE_PACKAGES thus:
 =item If you have /tmp/cpan.metapackager.sqlite available use INCLUDE_PACKAGES=1 or 0 (default) otherwise
 =item Run: INCLUDE_PACKAGES=1
@@ -47,6 +59,7 @@ Note: My web host and I use case-sensitive file systems.
 =item Run: export INCLUDE_PACKAGES
 =item Run: scripts/build.db.sh - to import tiddlers.json file into database data/cpan.metacurator.sqlite
 =item Run: scripts/export.tree.sh - to export CPAN::MetaCurator database to html/cpan.metacurator.tree.html
+=item Run: git commit -am"Recreate html/cpan.metacurator.tree.html"
 =item Run: git push
 =back
 

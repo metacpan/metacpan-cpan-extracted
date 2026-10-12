@@ -513,6 +513,19 @@ static void pp_resolve(pTHX_ const pp_policy *p, HV *env) {
     (void)hv_stores(env, "punk.peer_addr",
                     peersv ? newSVsv(peersv) : newSVpvs(""));
 
+    /* ONE trust decision, and every rewrite below is behind it. A hop count
+     * or `all` trusts whoever connected, by declaration. A network list
+     * trusts a peer inside it and nobody else: the forwarded scheme, host
+     * and port from any other peer are a stranger's claims about a request
+     * that never went near the proxy. */
+    if (p->hops == 0) {
+        unsigned char a[16];
+        int isv4;
+        if (!(pp_parse_addr(peer, plen, a, &isv4, NULL, NULL)
+              && pp_trusted(p, a)))
+            return;
+    }
+
     e = p->for_key ? hv_fetch(env, p->for_key, (I32)p->for_len, 0) : NULL;
     if (e && *e && SvOK(*e)) {
         STRLEN xl, clen;

@@ -1,0 +1,16 @@
+# Perl Critic configuration
+severity = 5
+theme = core + pbp
+
+[-Variables::ProhibitPackageVars]
+[-Subroutines::ProhibitBuiltinHomonyms]
+[-InputOutput::RequireCheckedSyscalls]
+
+[TestingAndDebugging::RequireUseStrict]
+[TestingAndDebugging::RequireUseWarnings]
+
+[CodeLayout::RequireTidyCode]
+severity = 3
+
+[ValuesAndExpressions::ProhibitMagicNumbers]
+allowed_values = 0 1 2 3 4 5 10 12 100 1000

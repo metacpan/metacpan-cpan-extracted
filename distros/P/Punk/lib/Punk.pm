@@ -7,7 +7,7 @@ use warnings;
 our $VERSION;
 
 BEGIN {
-    $VERSION = '0.55';
+    $VERSION = '0.57';
     require XSLoader;
     XSLoader::load('Punk', $VERSION);
 }
@@ -111,6 +111,11 @@ matched is affected - a C<*splat> still captures a trailing slash as
 part of the remainder, and a mounted app still receives the path it was
 sent, since only it knows whether C</docs> and C</docs/> differ.
 
+The page is served, not redirected to, so it has two addresses. A relative
+link on it resolves one level deeper from the one with the slash, and a
+cookie's C<Path> is matched against whichever was asked for: link to assets
+with absolute paths on any page that may be reached both ways.
+
 =head3 Route options
 
 An optional trailing hashref carries route options; unknown keys croak at
@@ -158,7 +163,9 @@ L<Punk::Plugin::Sitemap> is registered.
 =item * C<etag> - conditional GET. A coderef returns a validator the
 application knows cheaply, and an unchanged one answers C<304> B<without
 running the handler>; C<1> hashes the rendered body instead, which saves
-the wire but not the server. Inert unless
+the wire but not the server, and makes C<< $c->json >> and a returned
+structure encode with their keys in order so the hash is the same in every
+worker. Inert unless
 L<Punk::Plugin::ConditionalGet> is registered.
 
 =item * C<last_modified> - the date validator, for the clients that only
@@ -584,7 +591,10 @@ address moved, because it described the proxy's socket.
 
 C<X-Forwarded-Proto> sets C<psgi.url_scheme> (and C<HTTPS>),
 C<X-Forwarded-Host> sets C<HTTP_HOST>, and C<X-Forwarded-Port> sets
-C<SERVER_PORT>, all under the same trust decision.
+C<SERVER_PORT>, all under the same trust decision. With a list of networks
+that decision is whether the connecting address is inside one of them: from
+any other address all four headers are ignored. A hop count or C<'all'>
+trusts whoever connected.
 
 B<Without this keyword, a limiter behind a proxy is not just approximate -
 it is a site-wide outage waiting to happen.> See L</The shared bucket>

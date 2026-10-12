@@ -13,10 +13,12 @@ use Module::Runtime;
 require OpenTelemetry::SDK;
 
 my $tracer_provider_mock = mock 'OpenTelemetry::SDK::Trace::TracerProvider';
+my $logger_provider_mock = mock 'OpenTelemetry::SDK::Logs::LoggerProvider';
 my         $require_mock = mock 'Module::Runtime';
 
 my $propagator      = my $original_propagator      = OpenTelemetry->propagator;
 my $tracer_provider = my $original_tracer_provider = OpenTelemetry->tracer_provider;
+my $logger_provider = my $original_logger_provider = OpenTelemetry->logger_provider;
 
 my $mock = mock OpenTelemetry => override => [
     propagator => sub :lvalue {
@@ -29,11 +31,17 @@ my $mock = mock OpenTelemetry => override => [
             get => sub { $tracer_provider },
             set => sub { $tracer_provider = shift };
     },
+    logger_provider => sub :lvalue {
+        sentinel
+            get => sub { $logger_provider },
+            set => sub { $logger_provider = shift };
+    },
 ];
 
 after_each Clear => sub {
     $propagator      = $original_propagator;
     $tracer_provider = $original_tracer_provider;
+    $logger_provider = $original_logger_provider;
 };
 
 describe Import => sub {
@@ -228,9 +236,8 @@ describe TracerProvider => sub {
                         object {
                             prop isa  => 'OpenTelemetry::SDK::Trace::Span::Processor::Simple';
                             call sub {
-                                Object::Pad::MOP::Class->for_class( ref $_[0] )
-                                    ->get_field('$exporter')
-                                    ->value($_[0]);
+                                my ($meta) = Object::Pad::MOP::Class->for_class( ref $_[0] )->superclasses;
+                                $meta->get_field('$exporter')->value($_[0]);
                             } => object {
                                 prop isa => 'OpenTelemetry::SDK::Exporter::Console';
                             };
@@ -306,7 +313,7 @@ describe TracerProvider => sub {
         };
 
         tests 'Good provider' => sub {
-            class Local::Provider::Good {
+            class Local::Trace::Provider::Good {
                 field @calls :reader;
                 method tracer             { push @calls, 'tracer' }
                 method force_flush        { push @calls, 'force_flush' }
@@ -316,12 +323,137 @@ describe TracerProvider => sub {
 
             no_messages {
                 my $provider = OpenTelemetry::SDK
-                    ->configure_tracer_provider(Local::Provider::Good->new);
+                    ->configure_tracer_provider(Local::Trace::Provider::Good->new);
                 is $provider => object {
-                    prop isa => 'Local::Provider::Good';
+                    prop isa => 'Local::Trace::Provider::Good';
                 } => 'Returns expected provider';
 
                 is [ $provider->calls ], ['add_span_processor'],
+                    'Configured provider';
+           }, 'Logged expected messages';
+       };
+    };
+};
+
+describe LoggerProvider => sub {
+    describe Environment => sub {
+        before_all Mock => sub {
+            $logger_provider_mock->override(
+                new => sub { mock {} => track => 1 },
+            );
+        };
+
+        after_all 'Clear mock' => sub {
+            $logger_provider_mock->reset_all;
+        };
+
+        my ( $env, $calls, $messages );
+
+        case Console => sub {
+            $env   = 'console';
+            $messages = [];
+            $calls = [
+                {
+                    sub_name => 'add_log_record_processor',
+                    sub_ref  => D,
+                    args     => [
+                        D,
+                        object {
+                            prop isa  => 'OpenTelemetry::SDK::Logs::LogRecord::Processor::Simple';
+                            call sub {
+                                my ($meta) = Object::Pad::MOP::Class->for_class( ref $_[0] )->superclasses;
+                                $meta->get_field('$exporter')->value($_[0]);
+                            } => object {
+                                prop isa => 'OpenTelemetry::SDK::Exporter::Console';
+                            };
+                        },
+                    ],
+                },
+            ];
+        };
+
+        case None => sub {
+            $env = 'none';
+            $calls = $messages = [];
+        };
+
+        case Unknown => sub {
+            $env = 'foo';
+            $messages = [
+                [ warning => OpenTelemetry => match qr/Unknown exporter 'foo'/ ],
+            ];
+            $calls = [];
+        };
+
+        it 'Works' => { flat => 1 } => sub {
+            local %ENV = ( OTEL_LOGS_EXPORTER => $env );
+
+            is messages {
+                OpenTelemetry::SDK->configure_logger_provider;
+            } => $messages, 'Logged expected messages';
+
+            my ($tracker) = mocked $logger_provider;
+            is $tracker->call_tracking, $calls,
+                'Installed correct exporter and processor';
+        };
+    };
+
+    describe Programmatic => sub {
+        local %ENV = ( OTEL_LOGS_EXPORTER => 'none' );
+
+        my ( @args, $messages, $return, $calls );
+
+        tests 'Bad provider' => sub {
+            is messages {
+                my $provider = OpenTelemetry::SDK
+                    ->configure_logger_provider(mock);
+
+                is $provider => object {
+                    prop isa => 'OpenTelemetry::SDK::Logs::LoggerProvider';
+                } => 'Returns expected provider';
+            } => [
+                [
+                    'warning',
+                    'OpenTelemetry',
+                    match qr/Attempted to configure .* but it does not implement/,
+                ],
+            ];
+        };
+
+        tests 'Unblessed provider' => sub {
+            is messages {
+                my $provider = OpenTelemetry::SDK
+                    ->configure_logger_provider('oops');
+
+                is $provider => object {
+                    prop isa => 'OpenTelemetry::SDK::Logs::LoggerProvider';
+                } => 'Returns expected provider';
+            } => [
+                [
+                    'warning',
+                    'OpenTelemetry',
+                    match qr/was not a blessed reference: oops/,
+                ],
+            ];
+        };
+
+        tests 'Good provider' => sub {
+            class Local::Log::Provider::Good {
+                field @calls :reader;
+                method logger                   { push @calls, 'logger' }
+                method force_flush              { push @calls, 'force_flush' }
+                method shutdown                 { push @calls, 'shutdown' }
+                method add_log_record_processor { push @calls, 'add_log_record_processor' }
+            }
+
+            no_messages {
+                my $provider = OpenTelemetry::SDK
+                    ->configure_logger_provider(Local::Log::Provider::Good->new);
+                is $provider => object {
+                    prop isa => 'Local::Log::Provider::Good';
+                } => 'Returns expected provider';
+
+                is [ $provider->calls ], ['add_log_record_processor'],
                     'Configured provider';
            }, 'Logged expected messages';
        };

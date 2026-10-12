@@ -6,7 +6,7 @@ use warnings;
 use Carp ();
 use Punk ();
 
-our $VERSION = '0.55';
+our $VERSION = '0.57';
 
 sub fh {
     my ($self) = @_;
@@ -30,8 +30,9 @@ Punk::Upload - an uploaded file from a multipart form
     post '/avatar' => sub {
         my ($c) = @_;
         my $up = $c->req->upload('avatar') or return $c->text('no file', 400);
-        $up->save("/var/uploads/" . $up->filename);
-        $c->json({ name => $up->filename, bytes => $up->size });
+        my $id = $c->model('Avatar')->create({ user_id => $c->auth_id })->{id};
+        $up->save("/var/uploads/$id");          # a name the server chose
+        $c->json({ name => $up->basename, bytes => $up->size });
     };
 
 =head1 DESCRIPTION
@@ -50,8 +51,15 @@ the bytes - so an upload costs a file and a few kilobytes, whatever its size.
 
 =head2 filename
 
-The client-supplied file name. B<Do not trust it as a path.> It is request
-bytes: it never names the temp file, and it should never name yours.
+The client-supplied file name, exactly as sent. B<Do not trust it as a
+path.> It is request bytes, C<../../etc/cron.d/x> included: it never names
+the temp file, and it should never name yours.
+
+=head2 basename
+
+The file name reduced to a name: what follows the last C</> or C<\>, without
+leading dots or control characters, or C<undef> when nothing is left. Safe to
+show or to store as a label. Save the file under a name of your own.
 
 =head2 name
 

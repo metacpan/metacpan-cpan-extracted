@@ -10,7 +10,7 @@ use Unblock::HTTP3 ();
 use Unblock::HTTP3::Capsule ();
 use Unblock::HTTP3::Capsule::Parser ();
 
-our $VERSION = '0.03';
+our $VERSION = '0.12';
 
 sub _new {
     my ($class, $transaction, %option) = @_;

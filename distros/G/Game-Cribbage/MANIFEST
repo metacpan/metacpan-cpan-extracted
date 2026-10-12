@@ -16,6 +16,7 @@ lib/Game/Cribbage/Round.pm
 lib/Game/Cribbage/Round/Score.pm
 lib/Game/Cribbage/Rounds.pm
 lib/Game/Cribbage/Score.pm
+lib/Game/Cribbage/Terminal.pm
 Makefile.PL
 MANIFEST			This list of files
 META.json			Module JSON meta-data (added by MakeMaker)
@@ -38,8 +39,9 @@ t/13-play-coverage.t
 t/14-round-hands-coverage.t
 t/15-cribbage-coverage.t
 t/16-fixes-0.15.t
+t/17-picker.t
+t/18-bin.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
-test.png
 xt/boilerplate.t

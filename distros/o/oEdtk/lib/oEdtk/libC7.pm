@@ -20,8 +20,8 @@ use oEdtk::Config 	qw (config_read);
 my $C7_EVENT_DEPTH	=7;
 my $NOK			=-1;
 
-sub c7EdtkComp () { 	# remplacé par c7_compo - PLUS UTILISÉ ? dépendance libedtkDev
-	# A FAIRE : documenter et full pramétrage (compusetEdtk.ini)
+sub c7EdtkComp () { 	# replaced by c7_compo - NO LONGER USED? dependency libedtkDev
+	# TODO: document and fully parameterize (compusetEdtk.ini)
 	my $output_Format	=shift;
 
 #	my $prim_style_file	="$ENV{EDTK_DIR_APP}/$ENV{EDTK_PRGNAME}/$ENV{EDTK_PRGNAME}$ENV{EDTK_FTYP_DFLT}.$ENV{EDTK_EXT_COMSET}";	
@@ -43,7 +43,7 @@ sub c7EdtkComp () { 	# remplacé par c7_compo - PLUS UTILISÉ ? dépendance libedtk
 	my $comp_file_def	 ="*\n";
 	$comp_file_def 	.="*	FILE DEFINITIONS FOR COMPUSET \n";
 	$comp_file_def 	.="*\n";
-	# ATTENTION COMPUSET NE SUPPORTE PAS LES TABULATIONS DANS SES FICHIERS DE COMMANDES
+	# WARNING: COMPUSET DOES NOT SUPPORT TABS IN ITS COMMAND FILES
 	$comp_file_def 	.=sprintf ("FILE  1, %s      ,primary input file\n",		$prim_style_file);
 	$comp_file_def 	.=sprintf ("FILE 18, %s      ,secondary input file\n",		$secd_input_file);
 	$comp_file_def 	.=sprintf ("FILE  2, %s      ,intermediate file output\n", 	$intermedte_file);
@@ -90,10 +90,10 @@ sub c7EdtkComp () { 	# remplacé par c7_compo - PLUS UTILISÉ ? dépendance libedtk
 1;
 }
 
-sub c7_compo ($$$;$$) {			# PLUS UTILISÉ ? dépendance Main.pm
+sub c7_compo ($$$;$$) {			# NO LONGER USED? dependency Main.pm
 	my $cfg =config_read('COMSET');
 
-	# A FAIRE : documenter et full pramétrage (compusetEdtk.ini)
+	# TODO: document and fully parameterize (compusetEdtk.ini)
 	my $output_format	=shift || "PDF";
 	my $prim_style_file	=shift;
 	my $secd_input_file	=shift;
@@ -121,7 +121,7 @@ sub c7_compo ($$$;$$) {			# PLUS UTILISÉ ? dépendance Main.pm
 	my $comp_file_def	 ="*\n";
 	$comp_file_def 	.="*	FILE DEFINITIONS FOR COMPUSET \n";
 	$comp_file_def 	.="*\n";
-	# ATTENTION COMPUSET NE SUPPORTE PAS LES TABULATIONS DANS SES FICHIERS DE COMMANDES
+	# WARNING: COMPUSET DOES NOT SUPPORT TABS IN ITS COMMAND FILES
 	$comp_file_def 	.=sprintf ("FILE  1, %s      ,primary input file\n",		$prim_style_file);
 	$comp_file_def 	.=sprintf ("FILE 18, %s      ,secondary input file\n",		$secd_input_file);
 	$comp_file_def 	.=sprintf ("FILE  2, %s      ,intermediate file output\n", 	$intermedte_file);
@@ -139,13 +139,13 @@ sub c7_compo ($$$;$$) {			# PLUS UTILISÉ ? dépendance Main.pm
 	$comp_file_def 	.=sprintf ("FILE 12, %s      ,index file 1\n",			$index_file_2);
 	$comp_file_def 	.=sprintf ("FILE 25, %s      ,CompuSet message database\n",	$c7_message_db);
 
-	# en environnement Windows les slash doivent être remplacés par des backslash
-	# sinon plantage (message "compuset ne trouve plus la clef hardware")
+	# in a Windows environment the slashes must be replaced by backslashes
+	# otherwise it crashes (message "compuset can no longer find the hardware key")
 	env_Var_Completion($comp_file_def); 
-	# remplacer par 
+	# replace with 
 	# $comp_file_def=~ms/\//\\/g;
 	
-	# par contre les slash suivants sont importants pour fermer le fichier de définition
+	# however the following slashes are important to close the definition file
 	$comp_file_def 	.="//                                           END OF FILE DEFINITIONS\n";
 
 	my $comp_file=$cfg->{'EDTK_DIR_APPTMP'}."/".$cfg->{'EDTK_PRGNAME'}.".comp";
@@ -174,10 +174,10 @@ sub c7_compo ($$$;$$) {			# PLUS UTILISÉ ? dépendance Main.pm
 1;
 }
 
-sub c7_emit ($$$$;$$) { 		# PLUS UTILISÉ ? dépendance Main.pm 
+sub c7_emit ($$$$;$$) { 		# NO LONGER USED? dependency Main.pm 
 	my $cfg =config_read('COMSET');
 
-	# A FAIRE : documenter et full pramétrage (compusetEdtk.ini)
+	# TODO: document and fully parameterize (compusetEdtk.ini)
 	my $output_format	=uc (shift) || "PDF";
 	my $prim_style_file	=shift;
 	my $secd_input_file	=shift;
@@ -224,7 +224,7 @@ sub c7_emit ($$$$;$$) { 		# PLUS UTILISÉ ? dépendance Main.pm
 	my $emitter_file_def 	="*\n";
 	$emitter_file_def 	.="*	FILE DEFINITIONS FOR PSTINT\n";
 	$emitter_file_def 	.="*\n";
-	# ATTENTION COMPUSET NE SUPPORTE PAS PLUSIEURS TABULATIONS DANS SES FICHIERS DE COMMANDES
+	# WARNING: COMPUSET DOES NOT SUPPORT SEVERAL TABS IN ITS COMMAND FILES
 	$emitter_file_def 	.=sprintf ("FILE  1, %s      ,intermediate file input\n",	$intermedte_file);
 	$emitter_file_def 	.=sprintf ("FILE  3, %s      ,null config file\n",		$null_conf_file);
 	$emitter_file_def 	.=sprintf ("FILE 14, %s      ,POST widths file\n",		$widths_file);
@@ -235,13 +235,13 @@ sub c7_emit ($$$$;$$) { 		# PLUS UTILISÉ ? dépendance Main.pm
 	$emitter_file_def 	.=sprintf ("FILE 11, %s      ,merge library 3\n",		$merge_lib_RW);
 	$emitter_file_def 	.=sprintf ("FILE 25, %s      ,CompuSet message database\n",	$c7_message_db);
 
-	# en environnement Windows les slash doivent être remplacés par des backslash
-	# sinon plantage (message "compuset ne trouve plus la clef hardware")
+	# in a Windows environment the slashes must be replaced by backslashes
+	# otherwise it crashes (message "compuset can no longer find the hardware key")
 	env_Var_Completion($emitter_file_def);
-	# remplacer par 
+	# replace with 
 	# $comp_file_def=~ms/\//\\/g;
 	
-	# par contre les slash suivants sont importants pour fermer le fichier de définition
+	# however the following slashes are important to close the definition file
 	$emitter_file_def 	.="//     END OF FILE DEFINITIONS \n";
 	$emitter_file_def 	.="*\n";		
 	$emitter_file_def 	.="*               INSERT OPTIONS HERE OR IN PDEF FILE\n";
@@ -275,8 +275,8 @@ sub c7_emit ($$$$;$$) { 		# PLUS UTILISÉ ? dépendance Main.pm
 }
 
 
-sub c7EdtkEmit {	# remplacé par c7_emit - # PLUS UTILISÉ ? dépendance libEdtkDev
-	# A FAIRE : documenter et full pramétrage (compusetEdtk.ini)
+sub c7EdtkEmit {	# replaced by c7_emit - # NO LONGER USED? dependency libEdtkDev
+	# TODO: document and fully parameterize (compusetEdtk.ini)
 	my $output_Format =shift;
 
 	my $prim_style_file	="$ENV{EDTK_DIR_SCRIPT}/$ENV{EDTK_PRGNAME}.$ENV{EDTK_EXT_COMSET}";	
@@ -298,7 +298,7 @@ sub c7EdtkEmit {	# remplacé par c7_emit - # PLUS UTILISÉ ? dépendance libEdtkDev
 	my $emitter_file_def 	="*\n";
 	$emitter_file_def 	.="*	FILE DEFINITIONS FOR PSTINT\n";
 	$emitter_file_def 	.="*\n";
-	# ATTENTION COMPUSET NE SUPPORTE PAS PLUSIEURS TABULATIONS DANS SES FICHIERS DE COMMANDES
+	# WARNING: COMPUSET DOES NOT SUPPORT SEVERAL TABS IN ITS COMMAND FILES
 	$emitter_file_def 	.=sprintf ("FILE  1, %s      ,intermediate file input\n",	$intermedte_file);
 	$emitter_file_def 	.=sprintf ("FILE  3, %s      ,null config file\n",		$null_conf_file);
 	$emitter_file_def 	.=sprintf ("FILE 14, %s      ,POST widths file\n",		$widths_file);
@@ -343,7 +343,7 @@ sub c7EdtkEmit {	# remplacé par c7_emit - # PLUS UTILISÉ ? dépendance libEdtkDev
 1;
 }
 
-sub show_C7_event ($) {		# PLUS UTILISÉ ? dépendance interne libEdtkC7
+sub show_C7_event ($) {		# NO LONGER USED? internal dependency libEdtkC7
 	my $log =shift;
 	my $ligne_count =0;
 	
@@ -351,7 +351,7 @@ sub show_C7_event ($) {		# PLUS UTILISÉ ? dépendance interne libEdtkC7
 	
 	warn "\n INFO extracted from log :\n";
 
-	# introduction de 'defined (IN)' dans le test pour élilminer le warning 'Value of <HANDLE> construct can be "0"; test with defined()'
+	# added 'defined (IN)' to the test to remove the warning 'Value of <HANDLE> construct can be "0"; test with defined()'
 	while (defined (IN) && (my $ligne = <IN>) && ($ligne_count lt $C7_EVENT_DEPTH)) { 
 		if ($ligne =~/-[EW]:/ or $ligne_count gt 1) {
 			warn $ligne;
@@ -361,7 +361,7 @@ sub show_C7_event ($) {		# PLUS UTILISÉ ? dépendance interne libEdtkC7
 1;
 }
 
-sub c7_Control_Bal ($){		# PLUS UTILISÉ ? dépendance libEdtkDev et interne libEdtkC7
+sub c7_Control_Bal ($){		# NO LONGER USED? dependency libEdtkDev and internal libEdtkC7
 	my $file =shift;
 	my $ctrl_depth_tags=$ENV{C7_DEPTH_TAGS};
 	$ctrl_depth_tags ||=1;
@@ -373,8 +373,8 @@ sub c7_Control_Bal ($){		# PLUS UTILISÉ ? dépendance libEdtkDev et interne libEd
 	my @lineNumbers;
 	my $buffMessage="";
  
-	# CONTROLE D'APPARIEMENT DU FICHIER DE DONNEES BALISEES
-	warn "INFO : Analyse de l'appariement des balises dans le fichier $file.\n";
+	# CHECK THE MATCHING OF THE TAGGED DATA FILE
+	warn "INFO : Tag matching analysis in the file $file.\n";
 	oe_open_fi_IN ($file);
 
 	while ($ligne=<IN>){
@@ -385,9 +385,9 @@ sub c7_Control_Bal ($){		# PLUS UTILISÉ ? dépendance libEdtkDev et interne libEd
 
 		if (abs($nbSomOpen - $nbSomClose) gt $ctrl_depth_tags){
 			push (@lineNumbers, $.);
-			warn "ERR. multiplication imbrications $nbSomOpen ouvertures / $nbSomClose fermetures";
-			warn "ERR. voir $file,";
-			warn "ERR. voir lignes @lineNumbers";
+			warn "ERR. too many nested tags: $nbSomOpen openings / $nbSomClose closings";
+			warn "ERR. see $file,";
+			warn "ERR. see lines @lineNumbers";
 			return $NOK;			
 		} elsif (abs($nbSomOpen - $nbSomClose) ge 1) {
 			push (@lineNumbers, $.);		
@@ -403,13 +403,13 @@ sub c7_Control_Bal ($){		# PLUS UTILISÉ ? dépendance libEdtkDev et interne libEd
 	}
 
 	if ($nbSomOpen ne $nbSomClose){
-		warn "ERROR : Le fichier balise n'est pas correctement apparie \n";
+		warn "ERROR : The tagged file is not correctly matched \n";
 		warn $buffMessage;   
 		return $NOK;
 	} elsif ($nbEcart ne 0) {
-		warn "INFO : Presence de super balises appariees sur plusieurs lignes \n";     
+		warn "INFO : Presence of super tags matched over several lines \n";     
 	} else {
-		warn "GOOD : Le fichier balise semble bien apparie ($nbSomOpen ouverture(s)/$nbSomClose fermeture(s)).\n";
+		warn "GOOD : The tagged file seems correctly matched ($nbSomOpen opening(s)/$nbSomClose closing(s)).\n";
 	}
 1;
 }

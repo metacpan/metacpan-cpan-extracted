@@ -31,6 +31,9 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Term::ReadKey" : "0"
+         },
          "requires" : {
             "Array::Diff" : "0",
             "List::Util" : "0",
@@ -46,6 +49,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.16",
+   "version" : "0.17",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -10,7 +10,7 @@ use Carp ();
 use Log::Abstraction;
 use Scalar::Util ();
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 =head1 NAME
 
@@ -18,7 +18,7 @@ Log::Any::Adapter::Abstraction - Log::Any adapter backed by Log::Abstraction
 
 =head1 VERSION
 
-0.39
+0.40
 
 =head1 SYNOPSIS
 
@@ -89,7 +89,7 @@ C<logger>, C<level>, C<file>, C<fd>, C<array>, C<format>, C<ctx>,
 C<script_name>, C<verbose>, C<carp_on_warn>, C<croak_on_error>,
 C<config_file>, C<max_messages>, C<redact>, C<timestamp_format>,
 C<timestamp_precision>, C<utc>, C<rotate_size>, C<rotate_interval>,
-C<rotate_keep>.  Used to build a fresh C<Log::Abstraction>
+C<rotate_keep>, C<reopen_interval>.  Used to build a fresh C<Log::Abstraction>
 instance when C<instance> is not supplied.
 
 =back
@@ -128,6 +128,7 @@ instance when C<instance> is not supplied.
       rotate_size    => { type => SCALAR, optional => 1 },
       rotate_interval => { type => SCALAR, optional => 1 },
       rotate_keep    => { type => INTEGER, min => 0, optional => 1 },
+      reopen_interval => { type => INTEGER, min => -1, optional => 1 },
   }
 
 =head4 Output
@@ -192,7 +193,7 @@ sub init {
 		logger level file fd array format ctx script_name verbose
 		carp_on_warn croak_on_error config_file max_messages redact
 		timestamp_format timestamp_precision utc
-		rotate_size rotate_interval rotate_keep
+		rotate_size rotate_interval rotate_keep reopen_interval
 	)) {
 		$new_args{$key} = $self->{$key} if exists $self->{$key};
 	}

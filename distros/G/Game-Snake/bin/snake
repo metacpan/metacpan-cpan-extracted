@@ -1,0 +1,56 @@
+#!/usr/bin/env perl
+use 5.014;
+use strict;
+use warnings;
+
+use Game::Snake::Terminal;
+
+our $VERSION = '0.12';
+
+exit Game::Snake::Terminal->run(@ARGV);
+
+__END__
+
+=head1 NAME
+
+snake - the classic snake game, in a terminal or a window
+
+=head1 SYNOPSIS
+
+    snake                      # play, the board fitted to the window
+    snake --cols 20 --rows 14  # a smaller board
+    snake --watch --level 3    # watch the bot
+    snake --raylib             # a window, when Raylib::FFI is installed
+    snake --help
+
+=head1 DESCRIPTION
+
+Steer with the arrows, wasd or hjkl; p pauses; q quits. The snake grows by
+one for each piece of food and speeds up as the score doubles. It dies at a
+wall or on its own body.
+
+The keys need L<Term::ReadKey>. Without it the game says so and exits 2;
+C<--watch> works anywhere.
+
+=head1 EXIT STATUS
+
+0 when a game ended or was quit; 2 for a bad option, or a game that could not
+start.
+
+=head1 SEE ALSO
+
+L<Game::Snake::Terminal>, which this program is two lines over.
+
+=head1 AUTHOR
+
+LNATION, C<< <email at lnation.org> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2024 by LNATION.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

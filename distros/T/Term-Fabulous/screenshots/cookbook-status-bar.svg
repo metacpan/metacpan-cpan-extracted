@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="636" height="273" viewBox="0 0 636 273" role="img" aria-label="perl examples/cookbook/status-bar.pl">
+<title>perl examples/cookbook/status-bar.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="604" height="238" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="604" height="238" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="604" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="318" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/cookbook/status-bar.pl</text>
+<rect x="16.5" y="16.5" width="603" height="237" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="30" y="60" width="306" height="18" fill="#343a48"/>
+<rect x="336" y="60" width="9" height="18" fill="#dcdfe4"/>
+<rect x="345" y="60" width="261" height="18" fill="#343a48"/>
+<rect x="30" y="78" width="576" height="144" fill="#343a48"/>
+<rect x="30" y="222" width="576" height="18" fill="#1e2128"/>
+</g>
+<g class="terminal">
+<text x="30" y="74" textLength="306" fill="#dcdfe4">Rode my bike to the lake and back.</text>
+<text x="39" y="236" textLength="144" fill="#98c379">Saved the entry.</text>
+<text x="534" y="236" textLength="63" fill="#787e8a">8 words</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

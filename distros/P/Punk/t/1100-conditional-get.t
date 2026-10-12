@@ -467,7 +467,7 @@ sub breq {
     my $r = hit($sapp, path => '/file');
     my %h = @{ $r->[1] };
     is $r->[0], 200, 'a send_file response through a body-ETag route serves';
-    like $h{ETag}, qr/^"[0-9a-f]+-[0-9a-f]+"$/,
+    like $h{ETag}, qr/^"[0-9a-f]+-[0-9a-f]+(?:-[0-9a-f]+)?"$/,
        '...keeping send_file own strong validator, not a weak hash of it';
     isnt ref $r->[2], 'ARRAY',
        '...and its filehandle body was not consumed to hash it';
@@ -795,6 +795,98 @@ SKIP: {
     is $h->{ETag}, $expect,
        'the tag is SHA-256 of the UNCOMPRESSED body, truncated - asserted '
        . 'against an independent hash so a compression move fails here';
+}
+
+# ---- a validator is one header value, quoted or not ----------------------------
+{
+    package Quoted;
+    use Punk;
+    use Punk::Plugin::ConditionalGet;
+    plugin 'ConditionalGet';
+    get '/inj'   => sub { $_[0]->text('x') },
+        { etag => sub { qq{"v1\r\nX-Inj: 1"} } };
+    get '/inner' => sub { $_[0]->text('x') },
+        { etag => sub { '"a"b"' } };
+    get '/plain' => sub { $_[0]->text('x') },
+        { etag => sub { '"v2"' } };
+}
+{
+    my $q = Quoted->to_app;
+    my %h = @{ hit($q, path => '/inj')->[1] };
+    is $h{ETag}, '"v1X-Inj:1"',
+        'a quoted validator loses its control bytes like an unquoted one';
+    ok !exists $h{'X-Inj'}, '...so it cannot become a second header';
+    %h = @{ hit($q, path => '/inner')->[1] };
+    is $h{ETag}, '"ab"', '...and a quote inside it';
+    %h = @{ hit($q, path => '/plain')->[1] };
+    is $h{ETag}, '"v2"', 'an ordinary quoted one is unchanged';
+    is hit($q, path => '/plain', env => { HTTP_IF_NONE_MATCH => '"v2"' })->[0],
+        304, '...and still matches';
+}
+
+# ---- a body ETag over JSON is the same in every process ------------------------
+# The tag is a hash of the rendered bytes, and a Perl hash renders in an order
+# that differs between processes. So the route encodes its JSON with the keys
+# in order - or every worker, host and restart hands out a tag of its own.
+{
+    package Canon;
+    use Punk;
+    use Punk::Plugin::ConditionalGet;
+    plugin 'ConditionalGet';
+    my %doc = map { ("key$_" => { map { ("in$_" => $_) } 1 .. 8 }) } 'a' .. 'z';
+    get '/json'    => sub { $_[0]->json(\%doc) },     { etag => 1 };
+    get '/hash'    => sub { return { %doc } },         { etag => 1 };
+    get '/coderef' => sub { $_[0]->json(\%doc) },     { etag => sub { 'v' } };
+    get '/plain'   => sub { $_[0]->json(\%doc) };
+}
+{
+    my $capp = Canon->to_app;
+    my $sorted = sub {
+        my ($body) = @_;
+        my @outer = $body =~ /"(key[a-z])":/g;
+        my ($first) = $body =~ /"keya":\{([^}]*)\}/;
+        my @inner = ($first // '') =~ /"(in\d)":/g;
+        return join(',', @outer) eq join(',', map { "key$_" } 'a' .. 'z')
+            && join(',', @inner) eq join(',', map { "in$_" } 1 .. 8);
+    };
+    for my $path ('/json', '/hash') {
+        my $r = hit($capp, path => $path);
+        my $body = join '', @{ $r->[2] };
+        ok $sorted->($body), "$path: an etag => 1 route encodes its keys in order";
+        my %h = @{ $r->[1] };
+        is hit($capp, path => $path,
+               env => { HTTP_IF_NONE_MATCH => $h{ETag} })->[0], 304,
+            '...and its own tag is a 304';
+    }
+
+    # two processes that disagree about hash order must agree about the tag
+    my $script = <<'EOS';
+use Punk ();
+{
+    package CanonChild;
+    use Punk;
+    use Punk::Plugin::ConditionalGet;
+    plugin 'ConditionalGet';
+    my %doc = map { ("key$_" => { map { ("in$_" => $_) } 1 .. 8 }) } 'a' .. 'z';
+    get '/json' => sub { $_[0]->json(\%doc) }, { etag => 1 };
+}
+open my $in, '<', \'';
+my $r = CanonChild->to_app->({ REQUEST_METHOD => 'GET', PATH_INFO => '/json',
+    QUERY_STRING => '', 'psgi.input' => $in });
+my %h = @{ $r->[1] };
+print $h{ETag};
+EOS
+    my @tags;
+    for my $seed (1, 2, 3) {
+        local $ENV{PERL_HASH_SEED} = $seed;
+        local $ENV{PERL_PERTURB_KEYS} = 'RANDOM';
+        my $cmd = join ' ', map { quotemeta } $^X, (map { "-I$_" } @INC),
+                                              '-e', $script;
+        push @tags, scalar qx{$cmd 2>&1};
+    }
+    like $tags[0], qr/\AW\/"[0-9a-f]{16}"\z/, 'a child process hands out a tag';
+    is $tags[1], $tags[0], '...and one with another hash seed hands out the same';
+    is $tags[2], $tags[0], '...and a third';
 }
 
 done_testing;

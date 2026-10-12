@@ -1,0 +1,9 @@
+Revision history for FixMP3Tags
+
+0.02  2026-10-11
+    - Added lead module FixMP3Tags.pm to satisfy PAUSE indexing requirements
+
+0.01  2026-10-11
+    - Initial release
+    - Basic MP3 tag fixing functionality
+    - User-defined pattern support

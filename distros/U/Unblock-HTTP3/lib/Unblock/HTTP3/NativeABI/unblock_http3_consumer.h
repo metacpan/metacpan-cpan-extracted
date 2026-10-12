@@ -36,7 +36,7 @@ typedef struct ub_http3_consumer_ops_v1_s {
     int64_t (*transaction_stream_id)(pTHX_ SV *transaction);
     uint32_t (*transaction_state)(pTHX_ SV *transaction);
 
-    void (*send_response)(pTHX_ void *context, SV *transaction);
+    void (*respond)(pTHX_ void *context, SV *transaction);
     void (*send_informational)(
         pTHX_
         void *context,

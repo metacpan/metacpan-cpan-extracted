@@ -3,7 +3,7 @@ package Hyperman::Future;
 use strict;
 use warnings;
 
-our $VERSION = '0.56';
+our $VERSION = '0.58';
 
 # An external event loop may install an awaiter here so ->get/->await on a
 # pending future pumps it; inside a running Hyperman loop it is not needed.
@@ -39,6 +39,10 @@ An asynchronous result object with an API compatible with CPAN L<Future>:
 C<done>/C<fail>/C<cancel>, C<on_ready>/C<on_done>/C<on_fail>/C<on_cancel>,
 C<then>/C<else>/C<followed_by>/C<transform>, C<get>/C<await>, and the
 convergent combinators C<wait_all>/C<wait_any>/C<needs_all>/C<needs_any>.
+When a combinator's result settles, the inputs still pending are cancelled
+(the ones C<wait_any> did not wait for, the rest after C<needs_all> fails or
+C<needs_any> succeeds), and cancelling the result cancels every pending
+input, as L<Future> does.
 
 C<on_cancel> takes either a code reference, called with the future when it is
 cancelled, or another future, which is cancelled with it. Registering on a

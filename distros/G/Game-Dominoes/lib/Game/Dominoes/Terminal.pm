@@ -10,8 +10,9 @@ use Game::Dominoes::Bot;
 use Game::Dominoes::Notation;
 use Game::Dominoes::Rules;
 use Game::Dominoes::Scoring;
+use Getopt::Long ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our @PIPS = (
 	[],
@@ -887,6 +888,168 @@ sub start {
 	return $game->result;
 }
 
+sub _usage {
+	return <<'USAGE';
+dominoes - draw dominoes with All Fives scoring
+
+  dominoes [options]
+
+  --players=N      2, 3 or 4 (default 2)
+  --seat=N         which seat the human takes (default 1)
+  --hotseat        every seat is a person, with a hand-over between turns
+  --bot-vs-bot     nobody is a person
+  --level=N        bot level 1 to 5, repeatable, one per bot seat
+  --target=N       default 250 at two seats, 200 at three or four
+  --scale=N        divide every score, for the cribbage board variation
+                   (use --scale=5 --target=61 together, never one alone)
+  --variant=S      all_fives, draw or block
+  --reserve=N      tiles at the back of the boneyard nobody may draw
+  --seed=S         reproduce a game exactly
+  --ascii          plain ASCII only
+  --compact        tiles as [6|4] on one line instead of drawn
+  --width=N        what the drawn table may use before it wraps (default 80)
+  --colour         force colour on or off (--nocolour)
+  --nopick         type the moves out instead of choosing them with the keys
+  --version        print the version
+  --help           this
+
+  Arms are L and R along the main line, U and D off the spinner.
+
+  On a terminal the legal moves are listed under the table and chosen with
+  the arrow keys: the table above the list is the one the move under the
+  cursor would make, with its new count and what it would score, so a
+  placement is seen before it is played. Enter plays it, v shows the table as
+  it stands, t goes back to typing and ? prints the commands. Needs
+  Term::ReadKey; without it, or off a terminal, the moves are typed out.
+
+  The tile each seat just played is marked on the table, because at four
+  seats three of them land between your turns.
+
+  Exit status is 0 if your seat won or nobody was playing a seat, 1 if you
+  lost or stopped early, 2 for a bad option.
+USAGE
+}
+
+sub _bad {
+	my ($why) = @_;
+	$why =~ s/ at \S+ line \d+\.?\s*\z//;
+	$why =~ s/\A[\w:]+: //;
+	chomp $why;
+	print {\*STDERR} "dominoes: $why\n";
+	return 2;
+}
+
+sub run {
+	my ($class, @argv) = @_;
+	my $saved = Getopt::Long::Configure(qw(bundling no_ignore_case));
+	my $status = $class->_run(\@argv);
+	Getopt::Long::Configure($saved);
+	return $status;
+}
+
+sub _run {
+	my ($class, $argv) = @_;
+	my %opt = (players => 2, seat => 1, level => [], variant => 'all_fives');
+
+	Getopt::Long::GetOptionsFromArray($argv,
+		'players=i'   => \$opt{players},
+		'seat=i'      => \$opt{seat},
+		'hotseat'     => \$opt{hotseat},
+		'bot-vs-bot'  => \$opt{botonly},
+		'level=i@'    => $opt{level},
+		'target=i'    => \$opt{target},
+		'scale=i'     => \$opt{scale},
+		'variant=s'   => \$opt{variant},
+		'seed=s'      => \$opt{seed},
+		'reserve=i'   => \$opt{reserve},
+		'ascii'       => \$opt{ascii},
+		'compact'     => \$opt{compact},
+		'width=i'     => \$opt{width},
+		'colour!'     => \$opt{colour},
+		'color!'      => \$opt{colour},
+		'pick!'       => \$opt{pick},
+		'version'     => \$opt{version},
+		'help|h|?'    => \$opt{help},
+	) or do { print {\*STDERR} _usage(); return 2 };
+
+	if ($opt{help}) { print _usage(); return 0 }
+
+	if ($opt{version}) {
+		print "dominoes (Game::Dominoes) $Game::Dominoes::VERSION\n";
+		return 0;
+	}
+
+	if (@{$argv}) {
+		print {\*STDERR} "dominoes: there is nothing to do with '$argv->[0]': options begin with --\n", _usage();
+		return 2;
+	}
+
+	return _bad('--players must be 2, 3 or 4') unless $opt{players} =~ /\A[234]\z/;
+	return _bad("--seat must be a seat from 1 to $opt{players}")
+		unless $opt{seat} =~ /\A\d+\z/
+		&& $opt{seat} >= 1 && $opt{seat} <= $opt{players};
+
+	my $seed = defined $opt{seed}
+		? substr(($opt{seed} x 32), 0, 32)
+		: pack('N8', map { int rand 2**32 } 1 .. 8);
+
+	my $game = eval {
+		Game::Dominoes->new(
+			seed    => $seed,
+			players => $opt{players},
+			variant => $opt{variant},
+			(defined $opt{target}  ? (target  => $opt{target})  : ()),
+			(defined $opt{scale}   ? (scale   => $opt{scale})   : ()),
+			(defined $opt{reserve} ? (reserve => $opt{reserve}) : ()),
+		);
+	};
+
+	return _bad($@ || 'could not deal') unless $game;
+
+	my @bot_seats =
+		  $opt{hotseat} ? ()
+		: $opt{botonly} ? ($game->seats)
+		:                 (grep { $_ != $opt{seat} } $game->seats);
+
+	my @levels = @{ $opt{level} };
+	my %bots;
+	my $i = 0;
+	for my $seat (@bot_seats) {
+		my $level = $levels[$i] // $levels[-1] // 3;
+		$bots{$seat} = Game::Dominoes::Bot->new(level => $level, seed => $seat * 7919);
+		$i++;
+	}
+
+	my $terminal = eval {
+		$class->new(
+			game => $game,
+			bots => \%bots,
+			(defined $opt{colour} ? (colour => $opt{colour}) : ()),
+			($opt{ascii} ? (ascii => 1) : ()),
+			($opt{compact} ? (compact => 1) : ()),
+			(defined $opt{width} ? (width => $opt{width}) : ()),
+			(defined $opt{pick} ? (picking => $opt{pick} ? 1 : 0) : ()),
+		);
+	};
+
+	return _bad($@ || 'could not start') unless $terminal;
+
+	local @SIG{qw(INT TERM HUP)};
+	for my $sig (qw(INT TERM HUP)) {
+		$SIG{$sig} = sub { $terminal->leave_raw; $SIG{$sig} = 'DEFAULT'; kill $sig, $$ };
+	}
+
+	my $result = eval { $terminal->start };
+	my $died = $@;
+	$terminal->leave_raw;
+	die $died if $died;
+
+	return 1 unless $result;
+	return 0 if $opt{hotseat} || $opt{botonly};
+	return 0 if grep { $_ == $opt{seat} } @{ $result->winners };
+	return 1;
+}
+
 1;
 
 __END__
@@ -899,7 +1062,7 @@ Game::Dominoes::Terminal - the interactive game, and the only module here that d
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 
@@ -1155,6 +1318,22 @@ Characters read and given back, which is how an escape that turns out not to
 open a sequence does not eat the keystroke behind it.
 
 =head1 FUNCTIONS
+
+=head2 run
+
+	exit Game::Dominoes::Terminal->run(@ARGV);
+
+The whole command line program as a class method: parses the options
+F<bin/dominoes> documents, deals the game, seats the bots, plays, and returns
+the exit status rather than calling C<exit>: C<0> if your seat won or nobody
+was playing a seat, C<1> if you lost or stopped early, C<2> for a bad option,
+a leftover word or a refused value, with the reason on C<STDERR>. C<--help>
+and C<--version> print to C<STDOUT> and return C<0>. Options are read from the
+arguments passed in, never from C<@ARGV>, and the Getopt configuration the
+parse needs is restored before it returns. Signal handlers are local to the
+call and the terminal is left in cooked mode on every way out, so a launcher
+such as L<Game::Terminal> can call it in its own process and carry on
+afterwards. Colour is off under C<NO_COLOR> as well as off a terminal.
 
 =head2 start
 

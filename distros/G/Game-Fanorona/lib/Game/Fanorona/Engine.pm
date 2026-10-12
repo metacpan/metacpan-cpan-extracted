@@ -10,7 +10,7 @@ use Object::Proto::Sugar;
 
 use Game::Fanorona::Move ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 require XSLoader;
 XSLoader::load('Game::Fanorona', $VERSION);
@@ -370,7 +370,7 @@ Game::Fanorona::Engine - the fanorona board: points, lines, stones, steps and wh
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

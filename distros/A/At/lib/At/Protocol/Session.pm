@@ -2,7 +2,7 @@ use v5.42;
 use feature 'class';
 no warnings 'experimental::class';
 #
-class At::Protocol::Session v1.7.0 {
+class At::Protocol::Session v1.8.0 {
     field $accessJwt : param : reader //= ();
     field $did          : param : reader;
     field $handle       : param : reader = ();

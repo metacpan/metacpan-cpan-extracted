@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="870" height="363" viewBox="0 0 870 363" role="img" aria-label="perl examples/cookbook/check-form.pl">
+<title>perl examples/cookbook/check-form.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="838" height="328" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="838" height="328" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="838" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="435" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/cookbook/check-form.pl</text>
+<rect x="16.5" y="16.5" width="837" height="327" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="138" y="78" width="198" height="18" fill="#242830"/>
+<rect x="138" y="96" width="99" height="18" fill="#343a48"/>
+<rect x="237" y="96" width="9" height="18" fill="#e06c75"/>
+<rect x="246" y="96" width="90" height="18" fill="#343a48"/>
+<rect x="138" y="114" width="198" height="126" fill="#242830"/>
+<rect x="138" y="240" width="108" height="18" fill="#242830"/>
+</g>
+<g class="terminal">
+<text x="48" y="92" textLength="36" fill="#96a0b4">Name</text>
+<text x="138" y="92" textLength="27" fill="#dcdfe4">Ada</text>
+<text x="48" y="110" textLength="54" fill="#96a0b4">E-mail</text>
+<text x="138" y="110" textLength="495" fill="#e06c75">ada@example             Please enter an e-mail address.</text>
+<text x="48" y="128" textLength="63" fill="#96a0b4">Website</text>
+<text x="138" y="128" textLength="648" fill="#e06c75">perl.org                Please enter a URL, such as https://example.com.</text>
+<text x="48" y="146" textLength="54" fill="#96a0b4">Server</text>
+<text x="138" y="146" textLength="126" fill="#dcdfe4">db.example.com</text>
+<text x="48" y="164" textLength="63" fill="#96a0b4">Address</text>
+<text x="138" y="164" textLength="459" fill="#e06c75">192.0.2.300             Please enter an IP address.</text>
+<text x="48" y="182" textLength="45" fill="#96a0b4">Alarm</text>
+<text x="138" y="182" textLength="45" fill="#dcdfe4">07:30</text>
+<text x="48" y="200" textLength="36" fill="#96a0b4">Port</text>
+<text x="138" y="200" textLength="648" fill="#e06c75">70000                   Please enter a whole number between 1 and 65535.</text>
+<text x="48" y="218" textLength="45" fill="#96a0b4">Price</text>
+<text x="138" y="218" textLength="36" fill="#dcdfe4">9.99</text>
+<text x="48" y="236" textLength="72" fill="#96a0b4">Birthday</text>
+<text x="138" y="236" textLength="585" fill="#e06c75">2026-02-29              Please enter your birthday as YYYY-MM-DD.</text>
+<text x="48" y="254" textLength="45" fill="#96a0b4">Color</text>
+<text x="138" y="254" textLength="90" fill="#787e8a">Choose one</text>
+<text x="241.5" y="254" text-anchor="middle" fill="#61afef">▾</text>
+<text x="354" y="254" textLength="234" fill="#e06c75">Please fill in this field.</text>
+<text x="48" y="272" textLength="45" fill="#96a0b4">Terms</text>
+<text x="138" y="272" textLength="432" fill="#e06c75">[ ] I accept the terms  Please accept the terms.</text>
+<text x="48" y="308" textLength="261" fill="#dcdfe4">7 fields need your attention.</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

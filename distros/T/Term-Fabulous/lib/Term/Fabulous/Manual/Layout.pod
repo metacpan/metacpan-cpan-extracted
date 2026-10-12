@@ -1,0 +1,1093 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Term::Fabulous::Manual::Layout - Widgets, the widget tree and layout
+
+=head1 DESCRIPTION
+
+This page is part of L<Term::Fabulous::Manual>. Previous page: L<Term::Fabulous::Manual>. Next page: L<Term::Fabulous::Manual::Looks>.
+
+This page explains how a screen is put together: the widgets, the tree
+they form, the ids that name them, and the C<layout> options that decide
+where each widget goes and how big it is. Every layout option is shown
+with a picture, with the Perl code and with the form it takes in a
+L<KDL layout file|Term::Fabulous::Manual::KDL/KDL LAYOUT FILES>. The
+last sections cover the widgets that structure a screen:
+L<dividers|/DIVIDERS>, L<accordions|/ACCORDIONS>, L<tabs|/TABS> and
+L<document tabs|/Document tabs>.
+
+The reference pages for this topic are L<Term::Fabulous::Widget> (the
+parameters and methods all container widgets share),
+L<Term::Fabulous::Widget::Box> and L<Term::Fabulous::Widget::ScrollBox>.
+Complete programs are in L<Term::Fabulous::Cookbook::Layout>.
+
+=head1 WIDGETS AND THE WIDGET TREE
+
+The screen is described by a tree of widgets. The
+L<root widget|Term::Fabulous::Manual::Glossary/root widget> is passed to
+C<< Term::Fabulous->new >>; every other widget is a child, grandchild
+and so on of the root. Children are drawn on top of their parent, in the
+order they were added.
+
+=head2 The widgets
+
+=over
+
+=item L<Term::Fabulous::Widget::Box>
+
+A container with an optional background, border and padding. Most
+layouts are boxes inside boxes.
+
+=item L<Term::Fabulous::Widget::Text>
+
+Text. It wraps at word boundaries when it does not fit. It cannot have
+children.
+
+=item L<Term::Fabulous::Widget::Button>
+
+A box that can take the keyboard focus and fires C<Activate> when it is
+clicked or Enter or Space is pressed on it. It shows the focus with its
+border color and the press with inverted colors.
+
+=item L<Term::Fabulous::Widget::Dialog>
+
+A box that opens over the whole screen, centered, behind a dimming
+backdrop; Tab stays inside it and Escape closes it.
+
+=item L<Term::Fabulous::Widget::ScrollBox>
+
+A box whose content can be larger than the box itself and is scrolled
+with the mouse wheel and its scrollbars (see L</Scrolling content>).
+
+=item L<Term::Fabulous::Widget::Divider>
+
+A horizontal or vertical line between widgets, with an optional text
+(see L</DIVIDERS>).
+
+=item L<Term::Fabulous::Widget::Accordion>
+
+Sections with headers that open and close, one at a time or several
+(see L</ACCORDIONS>).
+
+=item L<Term::Fabulous::Widget::Tabs>
+
+Pages behind a row of tabs, on any side of the page (see L</TABS>).
+
+=item L<Term::Fabulous::Widget::DocumentTabs>
+
+A row of tabs for the open documents of a program, which the program
+fills and steers (see L</Document tabs>).
+
+=item L<Term::Fabulous::Widget::Canvas>
+
+A box with a buffer of character cells you draw into freely: charts,
+maps, game boards.
+
+=item L<Term::Fabulous::Widget::PixelCanvas>
+
+A canvas that draws pixels, two per cell, with lines, rectangles and
+circles.
+
+=item L<Term::Fabulous::Widget::Table>
+
+Rows and columns of data: sorting, filtering, grouping, trees, pages,
+selection, any widget as a cell. See L<Term::Fabulous::Manual::Tables/TABLES>.
+
+=item The chart widgets
+
+L<Term::Fabulous::Widget::LineChart>, L<Term::Fabulous::Widget::AreaChart>,
+L<Term::Fabulous::Widget::BarChart>, L<Term::Fabulous::Widget::ScatterPlot>,
+L<Term::Fabulous::Widget::Histogram>, L<Term::Fabulous::Widget::Sparkline>,
+L<Term::Fabulous::Widget::PieChart>, L<Term::Fabulous::Widget::DonutChart>,
+L<Term::Fabulous::Widget::PolarAreaChart> and
+L<Term::Fabulous::Widget::RadarChart>: canvases that draw themselves
+from data. See L<Term::Fabulous::Manual::Charts/CHARTS>.
+
+=item The input widgets
+
+L<Term::Fabulous::Widget::TextField>, L<Term::Fabulous::Widget::TextArea>,
+L<Term::Fabulous::Widget::Checkbox>, L<Term::Fabulous::Widget::RadioGroup>
+with L<Term::Fabulous::Widget::RadioButton>,
+L<Term::Fabulous::Widget::Dropdown> and L<Term::Fabulous::Widget::Slider>.
+See L<Term::Fabulous::Manual::Forms/FORMS AND INPUT WIDGETS>.
+
+=back
+
+Every widget except Text is a Box with extra behavior, so everything
+this page says about boxes (layout, background, border, children) holds
+for all of them.
+
+=head2 Building the tree
+
+Create widgets with C<new> and attach them with C<add_child>, which takes
+one or more widgets and returns the parent, so calls can be chained:
+
+	my $header = Term::Fabulous::Widget::Box->new;
+	my $body   = Term::Fabulous::Widget::Box->new;
+	my $footer = Term::Fabulous::Widget::Box->new;
+	$root->add_child($header)->add_child( $body, $footer );
+
+You can build the whole tree before calling C<run>, or change it at any
+time while the program runs, for example from a listener. The change
+shows in the next frame.
+
+Instead of building the tree in Perl, you can also describe it in a KDL
+file and let L<Term::Fabulous::Layout> build it (see
+L<Term::Fabulous::Manual::KDL/KDL LAYOUT FILES>).
+
+=head2 Widget ids
+
+Every widget accepts an optional C<id>, a non-empty string:
+
+	my $log = Term::Fabulous::Widget::ScrollBox->new( id => 'log' );
+
+Ids serve three purposes. Clay uses them to keep per-widget state
+between frames (a L<Term::Fabulous::Widget::ScrollBox> therefore
+requires one). C<remove_child_with_id> removes children by id (except
+Text widgets, see L</Changing the tree>). And your own code uses them to find
+a widget again, or to tell widgets apart in a listener
+(C<< $event->target->id >>).
+
+Rules for ids:
+
+=over
+
+=item *
+
+Two widgets in the same tree must not have the same id. Drawing a frame
+with duplicate ids dies with
+C<Clay error: An element with this ID was already previously declared during this layout.>
+
+=item *
+
+Ids starting with C<anon:> are reserved: widgets without an id get an
+automatic one of that form. Passing such an id dies.
+
+=item *
+
+The id cannot be changed after construction.
+
+=back
+
+=head2 Finding widgets by id
+
+Every widget except Text has a C<find_by_id> method. It searches the
+widget itself and everything below it, depth first, and returns the
+first widget whose id is the argument (Text widgets included), or
+C<undef> when there is none:
+
+	my $status = $root->find_by_id('status');
+
+C<< $ui->find_by_id >> searches from the root. The search walks the tree
+on every call, so keep the result in a variable instead of searching in
+every event. This is how a program gets at the widgets of a
+L<KDL layout|Term::Fabulous::Manual::KDL/Finding widgets after the build>.
+See L<Term::Fabulous::Widget/find_by_id>.
+
+=head2 Changing the tree
+
+The methods that change the children (from
+L<Clay::UI::Role::Core::Container>):
+
+	$box->add_child(@widgets);                          # append, returns $box
+	$box->remove_child(@widgets);                       # remove these children
+	$box->remove_child_with_id('status');               # remove children with that id (not Text widgets)
+	$box->remove_children_with( sub ($child) { ... } ); # remove where the code returns true
+	$box->clear_children;                               # remove all children
+	my $children = $box->children;                      # arrayref (a copy)
+	my $is_child = $box->has_child($widget);            # 1 or 0
+	my $parent   = $widget->parent;                     # undef for the root
+
+C<remove_child> takes the widgets themselves and ignores those that
+are not children of the box; it dies for an id. C<remove_child_with_id>
+never removes Text widgets, even when they have that id; remove them
+with C<remove_child>, or with C<remove_children_with>, for example
+C<< $box->remove_children_with( sub ($child) { ( $child->id // '' ) eq 'status' } ) >>.
+
+B<A widget has at most one parent at a time.> Adding a widget that is
+still a child of another widget dies with
+C<Clay::UI: widget ... is still attached to a parent; remove it first>.
+Remove it from its parent first, then add it wherever you like, to the
+same parent or another one. A removed widget keeps its children and its
+state. The rule is enforced by L<Clay::UI::Role::Layout::HasParent>.
+
+Removing a widget that has the keyboard focus clears the focus first, and
+the widget receives C<OnBlur>.
+
+=head1 LAYOUT
+
+Every widget that can have children (Box and everything based on it)
+takes a C<layout> hash. Its keys decide how big the widget is and how it
+arranges its children. All sizes are in terminal
+L<cells|Term::Fabulous::Manual::Glossary/cell>.
+
+	use Clay::XS qw(sizing_grow sizing_fit CLAY_TOP_TO_BOTTOM CLAY_ALIGN_X_CENTER CLAY_ALIGN_Y_TOP);
+
+	my $box = Term::Fabulous::Widget::Box->new(
+		layout => {
+			layout_direction => CLAY_TOP_TO_BOTTOM,
+			sizing           => { width => sizing_grow(), height => sizing_fit() },
+			padding          => { left => 1, right => 1, top => 0, bottom => 0 },
+			child_gap        => 1,
+			child_alignment  => { x => CLAY_ALIGN_X_CENTER, y => CLAY_ALIGN_Y_TOP },
+		},
+	);
+
+The same box in a KDL layout:
+
+=for highlighter language=kdl
+
+	Box {
+		layout direction=down gap=1
+		sizing width=grow height=fit
+		padding left=1 right=1
+		child_alignment x=center y=top
+	}
+
+Every key is optional. An unknown key or a value of the wrong shape dies
+when the hash is set, naming the key, for example
+C<Clay::UI: 'layout' has unknown key 'gap' (known keys: sizing, padding, child_gap, child_alignment, layout_direction, line_gap, line_sizing)>.
+The helper functions and constants come from L<Clay::XS>; import the
+ones you use, or all of them with C<use Clay::XS qw(:all)>.
+
+=head2 The layout keys
+
+=for highlighter language=text
+
+	Perl key            KDL                          Section
+	------------------  ---------------------------  -------------------------------
+	layout_direction    layout direction=...         Direction, Flow, Stack
+	sizing              sizing width=... height=...  Sizing
+	padding             padding left=N ...           Padding
+	child_gap           layout gap=N                 Gap between children
+	child_alignment     child_alignment x=... y=...  Aligning and centering children
+	line_gap            layout line_gap=N            Flow layout
+	line_sizing         layout line_sizing=...       Flow layout
+
+Three more constructor parameters take part in the layout: C<floating>
+(see L</Floating widgets>), C<bordered> (see L</Borders take space>)
+and C<width_group>/C<height_group> (see L</Equal sizes across the tree>).
+
+=head2 Direction
+
+C<layout_direction> decides how the children are arranged:
+
+=over
+
+=item C<CLAY_LEFT_TO_RIGHT> (the default; KDL: C<right>)
+
+Children are placed next to each other, from left to right.
+
+=item C<CLAY_TOP_TO_BOTTOM> (KDL: C<down>)
+
+Children are stacked from top to bottom.
+
+=item C<CLAY_LEFT_TO_RIGHT_WRAP> (KDL: C<wrap>)
+
+Children are placed from left to right and wrap onto a new line when the
+row is full. See L</Flow layout>.
+
+=item C<CLAY_BACK_TO_FRONT> (KDL: C<stack>)
+
+Children are placed on top of each other, later ones over earlier ones.
+See L</Stack layout>.
+
+=back
+
+=for highlighter language=perl
+
+	use Clay::XS qw(CLAY_TOP_TO_BOTTOM);
+
+	my $column = Term::Fabulous::Widget::Box->new( layout => { layout_direction => CLAY_TOP_TO_BOTTOM } );
+
+In KDL: C<layout direction=down>. KDL also accepts the longer names
+C<ttb> and C<top_to_bottom>, C<ltr> and C<left_to_right>, C<ltr_wrap>
+and C<left_to_right_wrap>, C<back_to_front> and C<btf>.
+
+The picture shows the four directions with the same kind of children;
+the program is F<examples/layout-direction.pl>.
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-layout-direction.svg" alt="Four panels: three boxes side by side, three boxes in a column, seven boxes wrapped onto two lines, and three boxes of different sizes on top of each other"></p>
+
+=end html
+
+A column of form rows, each row a left-to-right box of a label and an
+input, is the typical combination.
+
+=head2 Sizing
+
+C<sizing> holds a C<width> and a C<height> rule. A missing rule is
+C<sizing_fit()>.
+
+=over
+
+=item C<sizing_fit()> (KDL: C<fit>)
+
+As small as the content: the children, the gaps between them, the
+padding and the border. Text counts with its unwrapped width, as far as
+the parent allows; when the parent is narrower, the text wraps.
+
+=item C<sizing_grow()> (KDL: C<grow>)
+
+Takes the room the parent has left after its other children got their
+size. Several growing siblings share that room so that they end up
+equally large, as far as their limits allow.
+
+=item C<sizing_fixed($cells)> (KDL: C<"fixed(N)">)
+
+Exactly C<$cells> columns or rows.
+
+=item C<sizing_percent($fraction)> (KDL: C<"percent(N)">)
+
+A fraction of the room inside the parent's padding, from 0 to 1:
+C<sizing_percent(0.5)> is half. A fraction above 1 makes drawing die
+with a C<Clay error>. B<In KDL the number is a percentage from 0 to
+100>: C<"percent(50)"> is half.
+
+=back
+
+C<sizing_fit> and C<sizing_grow> take an optional minimum and maximum
+in cells: C<sizing_grow(10, 40)> grows, but stays between 10 and 40
+cells; C<sizing_fit(30)> is at least 30 cells wide. A maximum of 0 or a
+missing maximum means no maximum. In KDL, write C<"grow(10, 40)">,
+C<"fit(30)"> or C<"fit(MIN, MAX)">; a minimum greater than the maximum
+dies. Values with parentheses must be quoted in KDL.
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-layout-sizing.svg" alt="Eight rows, each a track with colored boxes sized by fit, fit with a minimum, fixed, percent, grow, grow with a maximum, fixed plus grow, and two grow boxes"></p>
+
+=end html
+
+The picture shows each rule in a track as wide as the terminal; the
+program is F<examples/layout-sizing.pl>. A sidebar of 20 columns and a
+main area that takes the rest look like this:
+
+	use Clay::XS qw(sizing_grow sizing_fixed);
+
+	my $columns = Term::Fabulous::Widget::Box->new(
+		layout => { sizing => { width => sizing_grow(), height => sizing_grow() } },
+	);
+	my $sidebar = Term::Fabulous::Widget::Box->new(
+		background_color => [ 30, 30, 40, 255 ],
+		layout           => { sizing => { width => sizing_fixed(20), height => sizing_grow() } },
+	);
+	my $main = Term::Fabulous::Widget::Box->new(
+		layout => { sizing => { width => sizing_grow(), height => sizing_grow() } },
+	);
+	$columns->add_child( $sidebar, $main );
+
+In KDL:
+
+=for highlighter language=kdl
+
+	Box {
+		sizing width=grow height=grow
+		Box "sidebar" {
+			sizing width="fixed(20)" height=grow
+			background_color "rgb(30, 30, 40)"
+		}
+		Box "main" { sizing width=grow height=grow; }
+	}
+
+The root widget usually uses C<sizing_grow()> in both directions, so that
+it fills the terminal.
+
+When the children need more room than their parent has, Clay shrinks the
+C<fit> and C<grow> children (never below their minimum) and wraps text.
+Children that still do not fit, such as C<fixed> ones, stick out of the
+parent and are drawn beyond its edge. Only a
+L<Term::Fabulous::Widget::ScrollBox> cuts off its content at its edges
+(see L</Scrolling content>).
+
+=head2 Padding
+
+C<padding> is empty space inside the widget, between its edge (or
+border) and its children: a hash with any of the keys C<left>, C<right>,
+C<top> and C<bottom>, each a number of cells. Missing sides are 0.
+C<padding_all(1)> from L<Clay::XS> builds a hash with the same value on
+all four sides.
+
+=for highlighter language=perl
+
+	use Clay::XS qw(padding_all);
+
+	my $card = Term::Fabulous::Widget::Box->new(
+		background_color => [ 60, 68, 92, 255 ],
+		layout           => { padding => { left => 2, right => 2, top => 1, bottom => 1 } },
+	);
+	my $tight = Term::Fabulous::Widget::Box->new( layout => { padding => padding_all(1) } );
+
+In KDL: C<padding left=2 right=2 top=1 bottom=1>; there is no short form
+for all four sides.
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-layout-padding.svg" alt="Three boxes with the same three children: without padding and gap, with padding and a gap of one row, and with a border and one cell of padding"></p>
+
+=end html
+
+The picture shows the same three children without padding, with padding
+and a gap, and with a border and padding; the boxes have a background,
+so their padding is visible. The program is
+F<examples/layout-padding.pl>.
+
+=head2 Gap between children
+
+C<child_gap> is the number of empty cells between two neighboring
+children, in the layout direction: columns in a left-to-right box, rows
+in a top-to-bottom box. There is no gap before the first or after the
+last child; use padding for that.
+
+	my $toolbar = Term::Fabulous::Widget::Box->new( layout => { child_gap => 2 } );
+
+In KDL: C<layout gap=2>. C<child_gap> is accepted as a longer name for
+C<gap>; giving both dies.
+
+=head2 Borders take space
+
+A border is drawn on the outermost cells of a widget, inside its box.
+Term::Fabulous adds a cell to the padding of every side with a border,
+so the children always start inside the border: a box with
+C<bordered =E<gt> 1> and C<padding =E<gt> { left =E<gt> 1 }> has its
+first child at the third column (see the third box in the picture
+above). A box without a
+C<sizing> rule grows by the border, so its content keeps its size. A
+side with the C<Hidden> border style takes no space and draws nothing.
+See L<Term::Fabulous::Manual::Looks/BORDERS> for border styles and
+colors.
+
+=head2 Aligning and centering children
+
+C<child_alignment> positions the children inside the widget when they
+do not fill it: C<x> is one of C<CLAY_ALIGN_X_LEFT> (the default),
+C<CLAY_ALIGN_X_CENTER> and C<CLAY_ALIGN_X_RIGHT>; C<y> is one of
+C<CLAY_ALIGN_Y_TOP> (the default), C<CLAY_ALIGN_Y_CENTER> and
+C<CLAY_ALIGN_Y_BOTTOM>. Either key may be left out.
+
+	use Clay::XS qw(sizing_grow CLAY_ALIGN_X_RIGHT);
+
+	# A status bar: its text pushed to the right edge.
+	my $status = Term::Fabulous::Widget::Box->new(
+		layout => {
+			sizing          => { width => sizing_grow() },
+			child_alignment => { x => CLAY_ALIGN_X_RIGHT },
+		},
+	);
+
+In KDL, write C<child_alignment x=right>: C<x> is C<left>, C<center> or
+C<right>, C<y> is C<top>, C<center> or C<bottom>, and either may be left
+out.
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-layout-alignment.svg" alt="Nine boxes in a grid, each with one child placed at a different combination of left, center, right and top, center, bottom"></p>
+
+=end html
+
+The picture shows all nine combinations; the program is
+F<examples/layout-alignment.pl>. Alignment only moves children within
+room they do not use: a box with C<sizing_fit()> has no spare room, and a
+C<grow> child takes all of it. To push one child to the far end of a row
+and keep the others at the start, put a C<grow> box between them, as
+the title bar of F<examples/kdl-layout.pl> does.
+
+=head2 Flow layout
+
+With C<layout_direction =E<gt> CLAY_LEFT_TO_RIGHT_WRAP> a widget places
+its children from left to right, like C<CLAY_LEFT_TO_RIGHT>, but starts
+a new I<line> below whenever the next child does not fit into the
+remaining width. Tag lists, toolbars and button rows that should adapt
+to the terminal width need no code of their own:
+
+	use Clay::XS qw(sizing_grow CLAY_LEFT_TO_RIGHT_WRAP CLAY_LINE_SIZING_FIT);
+
+	my $tags = Term::Fabulous::Widget::Box->new(
+		layout => {
+			layout_direction => CLAY_LEFT_TO_RIGHT_WRAP,
+			sizing           => { width => sizing_grow() },
+			child_gap        => 1,
+			line_gap         => 0,
+			line_sizing      => CLAY_LINE_SIZING_FIT,
+		},
+	);
+	$tags->add_child( Term::Fabulous::Widget::Text->new( text => $_, text_color => [ 220, 220, 220, 255 ] ) )
+		foreach qw(perl terminal layout flow);
+
+In KDL:
+
+=for highlighter language=kdl
+
+	Box "tags" {
+		layout direction=wrap gap=1 line_gap=0 line_sizing=fit
+		sizing width=grow
+	}
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-flow.svg" alt="Twenty colored tags in a rounded box, wrapped onto several lines"></p>
+
+=end html
+
+The picture shows F<examples/flow.pl>, a tag list that rewraps when the
+terminal is resized. The rules:
+
+=over
+
+=item *
+
+C<child_gap> is the number of columns between neighbors on a line,
+C<line_gap> the number of rows between two lines (default 0).
+
+=item *
+
+Lines break at the children's preferred widths. A child wider than the
+widget gets a line of its own and is narrowed to fit.
+
+=item *
+
+Give the widget a C<grow>, C<fixed> or C<percent> width. With
+C<sizing_fit()> it prefers a single line and only wraps when its parent
+is too narrow for that line.
+
+=item *
+
+When the widget is taller than its lines, C<line_sizing> decides what
+happens to the leftover rows: C<CLAY_LINE_SIZING_GROW> (the default;
+KDL: C<grow>) shares them equally between the lines,
+C<CLAY_LINE_SIZING_FIT> (KDL: C<fit>) keeps every line as tall as its
+tallest child.
+
+=item *
+
+C<child_alignment> C<x> aligns every line on its own. C<y> aligns each
+child within its line and, with C<CLAY_LINE_SIZING_FIT>, the block of
+lines within the widget.
+
+=item *
+
+A C<grow> child takes the rest of its own line.
+
+=back
+
+Wrapping is horizontal only; there is no top-to-bottom variant.
+
+=head2 Stack layout
+
+With C<layout_direction =E<gt> CLAY_BACK_TO_FRONT> a widget places all
+its children on top of each other inside its padding. Later children
+are drawn over earlier ones, so a background, the content and a badge in
+the corner are three children in that order:
+
+=for highlighter language=perl
+
+	use Clay::XS qw(sizing_grow CLAY_BACK_TO_FRONT CLAY_ALIGN_X_RIGHT CLAY_ALIGN_Y_TOP);
+
+	my $card = Term::Fabulous::Widget::Box->new(
+		layout => {
+			layout_direction => CLAY_BACK_TO_FRONT,
+			child_alignment  => { x => CLAY_ALIGN_X_RIGHT, y => CLAY_ALIGN_Y_TOP },
+		},
+	);
+	$card->add_child(
+		Term::Fabulous::Widget::Box->new(
+			background_color => [ 30, 35, 50, 255 ],
+			layout           => { sizing => { width => sizing_grow(), height => sizing_grow() }, padding => { left => 1, top => 1 } },
+		)->add_child( Term::Fabulous::Widget::Text->new( text => 'Inbox', text_color => [ 255, 255, 255, 255 ] ) ),
+		Term::Fabulous::Widget::Box->new(
+			background_color => [ 224, 108, 117, 255 ],
+			layout           => { padding => { left => 1, right => 1 } },
+		)->add_child( Term::Fabulous::Widget::Text->new( text => '3', text_color => [ 20, 25, 35, 255 ] ) ),
+	);
+
+In KDL:
+
+=for highlighter language=kdl
+
+	Box "card" {
+		layout direction=stack
+		child_alignment x=right y=top
+		Box {
+			sizing width=grow height=grow
+			padding left=1 top=1
+			background_color "rgb(30, 35, 50)"
+			Text { text "Inbox"; text_color "#ffffff"; }
+		}
+		Box {
+			padding left=1 right=1
+			background_color "rgb(224, 108, 117)"
+			Text { text "3"; text_color "rgb(20, 25, 35)"; }
+		}
+	}
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-stack.svg" alt="Three bordered cards with colored badges in their top right corners above a log with a bordered message centered over it"></p>
+
+=end html
+
+The picture shows F<examples/stack.pl>: cards with badges and a message
+centered over a log. The rules:
+
+=over
+
+=item *
+
+With C<sizing_fit()> the stack is as wide as its widest child and as
+tall as its tallest one. C<grow> children fill it.
+
+=item *
+
+C<child_alignment> places every child on its own, on both axes. A stack
+has only one C<child_alignment>; to put children in different corners,
+wrap each one in a C<grow> stack with its own alignment.
+
+=item *
+
+C<child_gap> has no effect.
+
+=item *
+
+Where children overlap, the one drawn on top gets the C<Mouse> event,
+the focus and the C<OnPress>. Uncovered parts of the children below
+still receive the mouse as usual.
+
+=back
+
+Unlike L<floating widgets|/Floating widgets>, the children of a stack
+take part in the layout: the stack, and so its parent, grows with its
+largest child.
+
+=head2 Floating widgets
+
+A widget with a C<floating> hash is taken out of its parent's layout: it
+takes no room there and is drawn on top of the other widgets, at a
+position relative to its parent, to the whole screen or to any other
+widget. Menus, tooltips, badges and notifications are floating widgets.
+L<Term::Fabulous::Widget::Dialog> uses the same mechanism.
+
+=for highlighter language=perl
+
+	use Clay::XS qw(Clay_GetElementId CLAY_ATTACH_TO_ELEMENT_WITH_ID
+		CLAY_ATTACH_POINT_LEFT_TOP CLAY_ATTACH_POINT_LEFT_BOTTOM);
+
+	# A menu below the button with the id 'file-button'.
+	my $menu = Term::Fabulous::Widget::Box->new(
+		background_color => [ 40, 46, 64, 255 ],
+		floating         => {
+			attach_to     => CLAY_ATTACH_TO_ELEMENT_WITH_ID,
+			parent_id     => Clay_GetElementId('file-button')->{id},
+			attach_points => { element => CLAY_ATTACH_POINT_LEFT_TOP, parent => CLAY_ATTACH_POINT_LEFT_BOTTOM },
+			z_index       => 10,
+		},
+	);
+	$root->add_child($menu);
+
+In KDL the keys have shorter names and C<parent_id> takes the widget's
+id directly:
+
+=for highlighter language=kdl
+
+	Box "file-menu" {
+		floating attach_to=element parent_id="file-button" element=left_top parent=left_bottom z_index=10
+		background_color "rgb(40, 46, 64)"
+	}
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-layout-floating.svg" alt="A File menu open below its button over a panel, a red badge on the panel's top right corner and a green message in the bottom row of the screen"></p>
+
+=end html
+
+The picture shows F<examples/layout-floating.pl>: a menu attached to a
+button, a badge attached to its parent panel and a message attached to
+the root. The keys:
+
+=over
+
+=item C<attach_to>
+
+What the widget is positioned against: C<CLAY_ATTACH_TO_PARENT> (KDL:
+C<parent>, the default in KDL), C<CLAY_ATTACH_TO_ROOT> (C<root>, the
+whole screen) or C<CLAY_ATTACH_TO_ELEMENT_WITH_ID> (C<element>, the
+widget named by C<parent_id>). In Perl, a C<floating> hash without
+C<attach_to> does not make the widget float.
+
+=item C<parent_id>
+
+With C<CLAY_ATTACH_TO_ELEMENT_WITH_ID>: in Perl, the Clay element id
+number of the widget, C<< Clay_GetElementId($id)->{id} >>; in KDL, the
+widget's id string. The widget does not have to be an ancestor.
+
+=item C<attach_points>
+
+C<< { element => $point, parent => $point } >>: the point of the
+floating widget (C<element>) that is placed on the point of the widget
+it is attached to (C<parent>). Points are C<CLAY_ATTACH_POINT_LEFT_TOP>
+(the default), C<..._LEFT_CENTER>, C<..._LEFT_BOTTOM>,
+C<..._CENTER_TOP>, C<..._CENTER_CENTER>, C<..._CENTER_BOTTOM>,
+C<..._RIGHT_TOP>, C<..._RIGHT_CENTER> and C<..._RIGHT_BOTTOM>; in KDL
+C<element=...> and C<parent=...> with the names in lowercase
+(C<left_top>, C<center_center>, ...).
+
+=item C<offset>
+
+C<< { x => $columns, y => $rows } >> added to the position; negative
+values move left and up. KDL: C<offset_x=N offset_y=N>.
+
+=item C<z_index>
+
+An integer from -32768 to 32767; floating widgets with a higher value
+are drawn on top of those with a lower one.
+
+=item C<expand>, C<pointer_capture_mode>, C<clip_to>
+
+Rarely needed; see L<Term::Fabulous::Widget/floating>. C<expand> is not
+available in KDL; the other two are C<pointer_capture=...> and
+C<clip_to=...>.
+
+=back
+
+A floating widget is still a child of the widget you add it to: it is
+removed with it, and its events bubble to it. To show and hide a
+floating widget, add and remove it, as the File button of the example
+does. C<< $widget->floating(undef) >> puts a widget back into the
+normal layout.
+
+=head2 Scrolling content
+
+A L<Term::Fabulous::Widget::ScrollBox> is a box whose content may be
+larger than the box: what does not fit is cut off at the box's edges,
+and the mouse wheel scrolls it. A scrollbar in its last column (and in
+its last row when it scrolls sideways) shows how far, and scrolls when
+clicked or dragged; C<< scrollbar =E<gt> 0 >> removes it. Its size
+comes from its own C<sizing>, not from its content, so give it a
+C<grow>, C<fixed> or C<percent> height. It needs an id.
+
+=for highlighter language=perl
+
+	use Clay::XS qw(sizing_grow CLAY_TOP_TO_BOTTOM);
+
+	my $log = Term::Fabulous::Widget::ScrollBox->new(
+		id     => 'log',
+		layout => {
+			layout_direction => CLAY_TOP_TO_BOTTOM,
+			sizing           => { width => sizing_grow(), height => sizing_grow() },
+		},
+	);
+
+In KDL:
+
+=for highlighter language=kdl
+
+	ScrollBox "log" {
+		layout direction=down
+		sizing width=grow height=grow
+	}
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-scroll-box.svg" alt="Two framed boxes scrolled down, one with numbered lines, one with squares, each with a scrollbar in its last column whose thumb shows the visible part"></p>
+
+=end html
+
+The picture shows F<examples/scroll-box.pl> after a few turns of the
+mouse wheel. The
+L<scrolling section|Term::Fabulous::Manual::Events/SCROLLING> of the
+events page describes the wheel, sideways scrolling, the C<OnScroll>
+event and how to read and set the scroll position from code; the recipe
+L<Scroll a ScrollBox from code|Term::Fabulous::Cookbook::LiveData/Scroll a ScrollBox from code (keep a log at the newest line)>
+keeps a log at its newest line.
+
+A ScrollBox lays out every child in every frame, visible or not, and
+Clay measures every text it lays out (see
+L<Term::Fabulous/LIMITATIONS>), so a box with thousands of children
+scrolls slowly and one with more words than Clay's cache holds dies.
+For a long document or list, use a
+L<Term::Fabulous::Widget::VirtualList>: it takes the number of items
+and a C<build> callback that returns the widget of one item, builds
+only the items near the viewport and stands in for the rest with
+spacers, so the scrollbar and the wheel see the whole list while a
+frame costs what the visible part costs.
+
+=for highlighter language=perl
+
+	my $document = Term::Fabulous::Widget::VirtualList->new(
+		id     => 'document',
+		count  => scalar @paragraphs,
+		build  => sub ($index) { Term::Fabulous::Widget::RichText->new( markup => $paragraphs[$index] ) },
+		layout => { sizing => { width => sizing_grow(), height => sizing_grow() }, child_gap => 1 },
+	);
+
+=head2 Equal sizes across the tree
+
+Widgets in different parts of the tree can be made equally wide or high
+with a L<sizing group|Term::Fabulous::Manual::Glossary/sizing group>:
+give them the same positive C<width_group> (or C<height_group>) number.
+After Clay has computed their natural size, all members of a group get
+the size of the largest one. This lines up, for example, the labels of
+a form whose rows are separate boxes:
+
+=for highlighter language=perl
+
+	my $label_a = Term::Fabulous::Widget::Box->new( width_group => 1 );
+	my $label_b = Term::Fabulous::Widget::Box->new( width_group => 1 );
+
+In KDL: C<width_group 1>. The labels on the left of the
+L<sizing picture|/Sizing> are in one width group, which is why all
+tracks start in the same column; the form of
+F<examples/kdl-form.pl> does the same in KDL, and the recipe
+L<Line up labels with equal widths|Term::Fabulous::Cookbook::Layout/Line up labels with equal widths (width_group)>
+is a complete program.
+
+Only C<fit> and C<grow> sizes take part; C<fixed> and C<percent> sizes
+are left alone. Group numbers are integers from 1 to 1048575 (0 means no
+group). See L<Clay::UI::Role::Layout::HasSizingGroup> for the details.
+
+=head2 Changing the layout at run time
+
+C<layout> is an accessor. Reading it returns a copy of the current
+hash; writing replaces the whole hash. To change one key, copy the
+others:
+
+	$box->layout( { %{ $box->layout }, child_gap => 2 } );
+
+The new layout applies from the next frame on. The same is true for every
+other widget property: C<floating>, C<background_color>,
+C<bordered>, C<text> and so on are accessors that take effect in the
+next frame. (One exception: C<border_style> exists only as a constructor
+parameter; the accessors are per side, see
+L<Term::Fabulous::Widget/border_style_top>.)
+The recipe
+L<Change the layout with the terminal size|Term::Fabulous::Cookbook::Layout/Change the layout with the terminal size (Start and Resize events)>
+switches a layout between a row and a column when the terminal is
+resized.
+
+=head1 DIVIDERS
+
+A L<Term::Fabulous::Widget::Divider> draws a line between the widgets
+above and below it, or, vertical, between the widgets left and right of
+it. It can carry a text at the start, in the center or at the end of
+the line, which makes it a section heading that takes one row:
+
+	use Term::Fabulous::Widget::Divider;
+
+	$panel->add_child(
+		Term::Fabulous::Widget::Divider->new( text => 'Network', text_position => 'start', bold => 1 ),
+		$hostname_row,
+		$port_row,
+		Term::Fabulous::Widget::Divider->new,    # a plain line
+		$buttons,
+	);
+
+A divider grows along its line to the space its parent gives it and is
+one cell thick, so it needs no C<layout> in a column or a row that has
+a width or height; inside a box that fits its content, give it a fixed
+length. The line is drawn with the glyph of a
+L<border style|Term::Fabulous::Manual::Looks/Border styles> (C<Solid>
+by default; C<Double>, C<Heavy>, C<Dashed>, C<Ascii>, ...) or with a
+glyph of your own, in a color of its own, and the text has its own
+color and can be bold. A vertical divider writes its text downwards,
+one character per row. The picture shows the forms
+(F<examples/widgets/divider.pl>):
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-divider.svg" alt="Dividers: a plain line, texts at the start, the center and the end, double and heavy lines in colors, and a vertical divider with a text between two columns"></p>
+
+=end html
+
+In KDL:
+
+=for highlighter language=kdl
+
+	Divider { text "Network"; text_position "start"; bold #true; }
+	Divider { vertical #true; }
+
+=head1 ACCORDIONS
+
+A L<Term::Fabulous::Widget::Accordion> stacks sections that open and
+close under their headers, so that a long form or a settings page
+shows one part at a time. Each section is a
+L<Term::Fabulous::Widget::Accordion::Item> with a title and a body of
+any widgets; the body is part of the tree only while the item is open,
+so a closed section takes one row:
+
+=for highlighter language=perl
+
+	use Term::Fabulous::Widget::Accordion;
+	use Term::Fabulous::Widget::Accordion::Item;
+
+	my $settings = Term::Fabulous::Widget::Accordion->new;
+	foreach my $section ( [ General => \@general_rows ], [ Network => \@network_rows ] ) {
+		my $item = Term::Fabulous::Widget::Accordion::Item->new( title => $section->[0] );
+		$item->add_child( $section->[1]->@* );
+		$settings->add_child($item);
+	}
+	$settings->open(0);
+
+The user opens a section with a click on its header or with C<Enter>
+or C<Space> while the header has the focus; C<Up> and C<Down> move
+between the headers. Opening a section closes the open one unless the
+accordion has C<< multiple => 1 >>. The accordion fires
+L<Term::Fabulous::Event::Select> for every change the user makes, and
+C<open>, C<close>, C<open_all> and C<close_all> change it from the
+program. The toggle glyph sits before the title, as in a tree, or at
+the end of the header (C<toggle_position>), the items can have
+borders (C<item_borders>), and an item can be disabled. The picture shows
+both looks (F<examples/widgets/accordion.pl>):
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-accordion.svg" alt="Two accordions: one with the Network section open under General and a disabled Licenses section, one with borders, the toggles at the end and two sections open at once"></p>
+
+=end html
+
+In KDL, the items are C<Item> nodes inside the accordion:
+
+=for highlighter language=kdl
+
+	Accordion "settings" {
+		Item "general" { title "General"; open #true; Text { text "..."; } }
+		Item "network" { title "Network"; Text { text "..."; } }
+	}
+
+=head1 TABS
+
+A L<Term::Fabulous::Widget::Tabs> shows one of several pages at a
+time, chosen with a row of tabs, so that a settings screen or a tool
+window keeps every part at hand without scrolling. Each page is a
+L<Term::Fabulous::Widget::Tabs::Page> with a title and a body of any
+widgets; only the active page is part of the tree, so the others take
+no space and their widgets cannot take the focus:
+
+=for highlighter language=perl
+
+	use Term::Fabulous::Widget::Tabs;
+	use Term::Fabulous::Widget::Tabs::Page;
+
+	my $settings = Term::Fabulous::Widget::Tabs->new;
+	foreach my $section ( [ General => \@general_rows ], [ Network => \@network_rows ] ) {
+		my $page = Term::Fabulous::Widget::Tabs::Page->new( title => $section->[0] );
+		$page->add_child( $section->[1]->@* );
+		$settings->add_child($page);
+	}
+
+The tabs are drawn as boxes that join the border of the page: the
+active tab is one cell larger and open toward the page, so that the
+two are one shape, while the other tabs are closed by the page's line
+and look as if they stood behind it. The user switches with a click,
+with C<Left>, C<Right>, C<Up>, C<Down>, C<Home> and C<End> while the
+active tab has the focus (only the active tab takes the focus, so
+C<Tab> stops at the bar once), and with C<Ctrl+PageUp> and
+C<Ctrl+PageDown> from anywhere inside the Tabs. The Tabs fires
+L<Term::Fabulous::Event::Select> for every change the user makes;
+C<select> changes the page from the program.
+
+The bar can be on any side of the page (C<side>), the labels can be
+written from left to right or downwards (C<orientation>), the tabs can
+sit at the start, in the center or at the end of the bar
+(C<tab_alignment>), the lines come in any border style with joints
+(C<line_style>) and the border around the page can be left out
+(C<page_border>). The picture shows four of these forms
+(F<examples/widgets/tabs.pl>):
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-tabs.svg" alt="Four Tabs widgets: tabs along the top with the Network page shown and a disabled Licenses tab, a sidebar of tabs along the left side, a tab bar at the bottom in the Heavy style with the tabs in the center, and tall tabs with downward labels without a page border"></p>
+
+=end html
+
+In KDL, the pages are C<Page> nodes inside the Tabs:
+
+=for highlighter language=kdl
+
+	Tabs "settings" {
+		side "left"
+		Page "general" { title "General"; Text { text "..."; } }
+		Page "network" { title "Network"; active #true; Text { text "..."; } }
+	}
+
+The bar and its tabs are widgets of their own,
+L<Term::Fabulous::Widget::Tabs::Bar> and
+L<Term::Fabulous::Widget::Tabs::Button>, for a row of tabs that
+switches something that is not a page, for example whole layouts.
+
+=head2 Document tabs
+
+An editor that keeps several documents open shows a tab for each above
+the text, with the document's title, a dot while it has unsaved
+changes and a close mark. That row is a
+L<Term::Fabulous::Widget::DocumentTabs>. Unlike a Tabs, it holds no
+pages and no widgets: it shows a list of plain hashes, one per
+document, and the program shows the document itself. A code reference
+in place of the list is called whenever a frame is drawn, so the tabs
+always show the documents as they are now:
+
+=for highlighter language=perl
+
+	use Term::Fabulous::Widget::DocumentTabs;
+
+	my $tabs = Term::Fabulous::Widget::DocumentTabs->new(
+		tabs   => sub { map { { title => $_->{title}, modified => $_->{modified} } } @documents },
+		active => 0,
+	);
+	$tabs->on( Select   => sub ($event) { show_document( $event->index ); return } );
+	$tabs->on( TabClose => sub ($event) { close_document( $event->index ); return } );
+	$tabs->on( TabAdd   => sub ($event) { new_document(); return } );
+
+A tab may also have C<error>, which shows an exclamation mark in place
+of the dot, and C<< closable => 0 >>, which takes away its close mark.
+Other keys stay in the hash and come back in the events, so a tab can
+carry the path of its file.
+
+The tabs never change anything themselves. A click on a tab fires
+L<Select|Term::Fabulous::Event::Select> with the tab as the item, a
+click on a close mark or a middle click fires
+L<TabClose|Term::Fabulous::Event::TabClose>, and the C<+> button at
+the end fires L<TabAdd|Term::Fabulous::Event::TabAdd>. The program
+answers: it shows the document and sets
+L<active|Term::Fabulous::Widget::DocumentTabs/active>, asks whether to
+save a document before it closes it, or makes a new one. Setting
+C<active> fires nothing. When the tabs do not fit, the row scrolls so
+that the active tab is shown, and arrows at the ends lead to the hidden
+ones. Document tabs are one row high, react to the mouse only and never
+take the focus, so the program gives them keys of its own, such as
+C<Alt+PageDown> for the next document. The picture shows tabs with
+unsaved changes and an error, and an arrow to a tab that does not fit
+(F<examples/widgets/document-tabs.pl>):
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-document-tabs.svg" alt="A row of document tabs at the top: notes.txt with a blue dot for unsaved changes, config.kdl with a red exclamation mark for errors, todo.md, and the active tab budget.csv in bold on a lighter background with a blue dot, each with a close mark, then an arrow to a hidden tab and a plus button. Below, the text of budget.csv, a dim line with the keys that switch, close and add tabs, and a status bar with the message Closed README.md."></p>
+
+=end html
+
+The theme family C<document_tabs> colors them: C<background> and
+C<text>, each with an C<active> state for the active tab, C<modified>
+for the dot, C<error> for the exclamation mark and C<button> for the
+C<+> and the arrows (see
+L<Term::Fabulous::Theme/Families, slots and states>). Document tabs are
+built in Perl only, not in KDL layout files. The recipe
+L<Term::Fabulous::Cookbook::Menus/Keep several documents open in tabs (DocumentTabs)>
+is a complete program.
+
+=head1 SEE ALSO
+
+This page is part of L<Term::Fabulous::Manual>. Previous page: L<Term::Fabulous::Manual>. Next page: L<Term::Fabulous::Manual::Looks>.
+
+L<Term::Fabulous::Widget::Divider>, L<Term::Fabulous::Widget::Accordion>,
+L<Term::Fabulous::Widget::Tabs>, L<Term::Fabulous::Widget::DocumentTabs>,
+L<Term::Fabulous::Widget> (the parameters and methods of all container
+widgets), L<Term::Fabulous::Widget::Box>,
+L<Term::Fabulous::Widget::ScrollBox>,
+L<Term::Fabulous::Manual::KDL/KDL LAYOUT FILES>,
+L<Term::Fabulous::Cookbook::Layout>, L<Clay::XS> (the sizing functions
+and constants).
+
+=cut

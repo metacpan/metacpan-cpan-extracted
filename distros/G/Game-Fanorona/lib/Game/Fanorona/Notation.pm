@@ -6,7 +6,7 @@ use warnings;
 
 use Exporter 'import';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use constant {
     PAIKA      => 0,
@@ -364,7 +364,7 @@ Game::Fanorona::Notation - moves, positions and games of fanorona as text
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

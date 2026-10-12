@@ -1,0 +1,11 @@
+#
+# typemap for Clay::XS
+#
+# Maps the fixed-width integer types that appear as XS return types onto
+# Perl's UV system. Arguments are taken as SV * and range-checked by the
+# parsing helpers in src/marshal.c instead of being narrowed by a typemap.
+#
+
+TYPEMAP
+
+uint32_t               T_UV

@@ -2,9 +2,9 @@ use strict;
 use warnings;
 package YAML::PP::Common;
 
-our $VERSION = 'v0.41.0'; # VERSION
+our $VERSION = 'v0.42.0'; # VERSION
 
-use base 'Exporter';
+use Exporter 'import';
 
 my @p = qw/
     PRESERVE_ALL PRESERVE_ORDER PRESERVE_SCALAR_STYLE PRESERVE_FLOW_STYLE

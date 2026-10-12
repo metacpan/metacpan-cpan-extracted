@@ -10,8 +10,9 @@ use Game::Reversi::Board;
 use Game::Reversi::Bot;
 use Game::Reversi::Notation;
 use Game::Reversi::Opening;
+use Getopt::Long ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 my %GLYPH = (
 	b => { wide => "\x{25CF}", ascii => 'X' },
@@ -583,6 +584,82 @@ sub _finish {
 	return;
 }
 
+sub _usage {
+	return <<'USAGE';
+reversi - play Reversi in a terminal
+
+    reversi [--level 1..5] [--variant historic|othello]
+            [--colour b|w] [--seed STRING] [--ascii]
+
+  --level    how hard the opponent is, 1 to 5. Default 3.
+  --variant  historic, the real Reversi opening where the players place the
+             first four discs themselves, or othello, where those four are
+             already down. Default historic.
+  --colour   b to play dark and move first, w to play light. Default b.
+  --seed     makes a game reproducible, and decides how the bot opens.
+  --ascii    X and O on a plain grid, for a terminal without box characters.
+  --nopick   type the squares out instead of pointing at them.
+
+  On a terminal the arrow keys walk the squares marked *, which are the only
+  ones that play, and the line under the board says what the move would turn
+  and what the score would become. Enter plays it, t goes back to typing and
+  ? lists the keys. Needs Term::ReadKey; without it the squares are typed.
+
+  The square the last move went on is bracketed and the discs it turned are
+  drawn ringed, so both are visible with --ascii and with colour off.
+
+  Exit status is 0 if you won or tied, 1 if you lost, 2 for a bad option.
+USAGE
+}
+
+sub run {
+	my ($class, @argv) = @_;
+	my %opt = (level => 3, variant => 'historic', colour => 'b', seed => 'reversi');
+
+	my $ok = eval {
+		local $SIG{__WARN__} = sub { print STDERR "reversi: $_[0]" };
+		Getopt::Long::GetOptionsFromArray(\@argv, \%opt,
+			'level=i', 'variant=s', 'colour=s', 'seed=s', 'ascii', 'pick!', 'help|h');
+	};
+	if (!$ok) { print STDERR _usage(); return 2 }
+	if ($opt{help}) { print _usage(); return 0 }
+	if (@argv) { print STDERR "reversi: not an option: $argv[0]\n", _usage(); return 2 }
+
+	$opt{colour} = 'b' if lc $opt{colour} eq 'dark'  || lc $opt{colour} eq 'black';
+	$opt{colour} = 'w' if lc $opt{colour} eq 'light' || lc $opt{colour} eq 'white';
+
+	my $terminal = eval {
+		$class->new(
+			level => $opt{level}, variant => $opt{variant},
+			colour => $opt{colour}, seed => $opt{seed},
+			ascii => $opt{ascii},
+			(defined $opt{pick} ? (picking => $opt{pick} ? 1 : 0) : ()));
+	};
+	if (!$terminal) {
+		my $why = $@ || "could not start\n";
+		$why =~ s/ at \S+ line \d+\.?\n?\z//;
+		$why =~ s/\AGame::Reversi(?:::\w+)*: //;
+		chomp $why;
+		print STDERR "reversi: $why\n";
+		return 2;
+	}
+
+	local @SIG{qw(INT TERM HUP)};
+	for my $sig (qw(INT TERM HUP)) {
+		$SIG{$sig} = sub { $terminal->leave_raw; $SIG{$sig} = 'DEFAULT'; kill $sig, $$ };
+	}
+
+	my $result = eval { $terminal->start };
+	my $died = $@;
+	$terminal->leave_raw;
+	die $died if $died;
+	return 0 unless $result;
+	return 0 if !defined $result->winner;
+	return 0 if $result->winner eq $opt{colour};
+	return 1;
+}
+
+
 1;
 
 __END__
@@ -595,7 +672,7 @@ Game::Reversi::Terminal - a playable game on two filehandles
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 
@@ -809,6 +886,21 @@ the engine's job, and a person doing it by hand every turn will get it wrong.
 =head2 start
 
 Plays a game and returns its L<Game::Reversi::Result>.
+
+=head2 run
+
+	exit Game::Reversi::Terminal->run(@ARGV);
+
+The whole command line program as a class method: parses the options
+F<bin/reversi> documents, builds the terminal, plays, and B<returns the exit
+status rather than calling C<exit>>: C<0> if you won or tied, C<1> if you lost,
+C<2> for a bad option, a leftover word or a value the terminal refuses, with the
+reason and the usage on C<STDERR>. C<--help> prints the usage on C<STDOUT> and
+returns C<0>. Signal handlers are local to the call and the terminal is left in
+cooked mode on every way out, so a launcher such as L<Game::Terminal> can call it
+in its own process and carry on afterwards. Colour is off when C<NO_COLOR> is
+set, as it is off a terminal.
+
 
 =head1 AUTHOR
 

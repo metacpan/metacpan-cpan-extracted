@@ -7,7 +7,7 @@ use Text::Markup;
 use File::BOM qw(open_bom);
 use Text::WikiCreole;
 
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 
 sub import {
     # Replace the regex if passed one.

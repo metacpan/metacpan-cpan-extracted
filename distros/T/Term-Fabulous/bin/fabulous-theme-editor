@@ -1,0 +1,129 @@
+#!/usr/bin/env perl
+
+use v5.32;
+use warnings;
+
+use Getopt::Long qw(GetOptionsFromArray);
+use Pod::Usage qw(pod2usage);
+use Term::Fabulous::Theme;
+use Term::Fabulous::ThemeEditor;
+
+our $VERSION = '0.02';
+
+exit main(@ARGV);
+
+sub main {
+	my (@arguments) = @_;
+	my %option = ( 'ui-theme' => 'dark' );
+	GetOptionsFromArray( \@arguments, \%option, 'ui-theme=s', 'directory=s', 'help|h', 'man', 'version' ) or pod2usage( -exitval => 2, -verbose => 0 );
+	pod2usage( -exitval => 0, -verbose => 1 ) if $option{help};
+	pod2usage( -exitval => 0, -verbose => 2 ) if $option{man};
+	if ( $option{version} ) {
+		say "fabulous-theme-editor $VERSION (Term::Fabulous::ThemeEditor $Term::Fabulous::ThemeEditor::VERSION)";
+		return 0;
+	}
+
+	my $ui_theme = $option{'ui-theme'};
+	if ( !Term::Fabulous::Theme->builtin($ui_theme) ) {
+		die "fabulous-theme-editor: --ui-theme must be dark, light or a theme file, got '$ui_theme'\n" unless -f $ui_theme;
+		$ui_theme = Term::Fabulous::Theme->from_file($ui_theme);
+	}
+
+	my $editor = Term::Fabulous::ThemeEditor->new(
+		files    => \@arguments,
+		ui_theme => $ui_theme,
+		( defined $option{directory} ? ( directory => $option{directory} ) : () ),
+	);
+	$editor->run;
+	return $editor->recovered_files ? 1 : 0;
+}
+
+__END__
+
+=head1 NAME
+
+fabulous-theme-editor - Edit Term::Fabulous themes with a live preview
+
+=head1 SYNOPSIS
+
+	fabulous-theme-editor [OPTIONS] [FILE ...]
+
+	fabulous-theme-editor                          # a new theme
+	fabulous-theme-editor themes/ocean.kdl         # edit a theme file
+	fabulous-theme-editor my-theme.kdl             # a new file, made when you save
+	fabulous-theme-editor --ui-theme light *.kdl   # every theme here, in a light editor
+
+	Options:
+	  --ui-theme NAME|FILE   the theme the editor itself is drawn in (default: dark)
+	  --directory DIR        where the file dialogs start and new themes are recovered
+	                         (default: the current directory)
+	  --help, -h             this help
+	  --man                  the whole manual page
+	  --version              the version
+
+=head1 DESCRIPTION
+
+C<fabulous-theme-editor> opens theme files of L<Term::Fabulous>, the
+KDL files that L<Term::Fabulous::Theme/from_file> loads, each in a tab.
+The left side of the screen shows a widget of every family, drawn in
+the theme of the tab you are on, and you can try them out: type into
+the fields, open the dropdown, press the buttons, open the dialog. The
+right side shows the theme's settings, as a form or as the text of the
+file. Every change shows in the preview at once.
+
+Each FILE is opened in a tab; a FILE that does not exist becomes a new
+theme, written there when you save it. Without a FILE the editor starts
+with a new, untitled theme based on the built-in C<dark> theme.
+
+Press C<F1> in the editor for the list of all keys, and C<F10> (or
+C<Alt> with the underlined letter of a menu) for the menus. The editor
+and how to use it are described in L<Term::Fabulous::ThemeEditor>,
+which also shows how to start it from Perl, for example with a preview
+of your own program's screens.
+
+=head1 OPTIONS
+
+=over
+
+=item C<--ui-theme NAME|FILE>
+
+The theme the editor itself is drawn in: C<dark> (the default),
+C<light>, or a theme file. The preview always shows the theme being
+edited.
+
+=item C<--directory DIR>
+
+The folder the Open and Save as dialogs show first when the theme has
+no file yet, where a new theme's unsaved text is kept after a signal
+(see L</EXIT STATUS>), and against which the status line shortens
+paths. Default: the current directory.
+
+=item C<--help>, C<-h>, C<--man>, C<--version>
+
+Show the options, this page, or the version, and exit.
+
+=back
+
+=head1 EXIT STATUS
+
+0 when the editor ended normally. 1 when a signal (C<TERM>, C<INT> or
+C<HUP>) ended it while themes had unsaved changes and their text was
+written to C<FILE.unsaved> (for a new theme, C<untitled-N.kdl.unsaved>
+in the C<--directory> folder); the files are listed on the standard
+error. 2 for a wrong option. A C<--ui-theme> that is no built-in theme
+and no readable theme file, and a FILE that cannot be read or is not
+UTF-8 text, end the program at once with a message (status 255).
+
+=head1 SEE ALSO
+
+L<Term::Fabulous::ThemeEditor>, L<Term::Fabulous::Theme>,
+L<Term::Fabulous::Manual::Looks/THEMES>.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2026 davenonymous.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

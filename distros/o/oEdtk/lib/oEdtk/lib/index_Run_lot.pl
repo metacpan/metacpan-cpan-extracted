@@ -22,8 +22,8 @@ if (@ARGV % 2 != 0 or $ARGV[0] =~/-h/i) {
 	my @lots =oe_outmngr_output_run_tex({ @ARGV }, 'Mass');
 	
 	if (@lots == 0) {
-		my $sujet = "INFO : Aucun lot en attente de traitement\n";
-		my @body = ("traitement de lotissement effectué sur ", $cfg->{'EDTK_TYPE_ENV'}, " ($0), aucun lot en attente.");
+		my $sujet = "INFO : No lot pending processing\n";
+		my @body = ("lot management processing done on ", $cfg->{'EDTK_TYPE_ENV'}, " ($0), no lot pending.");
 		oe_send_mail($cfg->{'EDTK_MAIL_SENDER'} ,$sujet ,@body);
 		warn $sujet;
 		exit;

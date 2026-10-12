@@ -1,15 +1,51 @@
 Game-Snake
 
-The README is used to introduce the module and provide instructions on
-how to install the module, any machine dependencies it may have (for
-example C compilers and installed libraries) and any other information
-that should be provided before the module is installed.
+The classic snake game: a snake on a grid, heading one of four ways, eating
+to grow and speeding up as it does, dying at a wall or on its own body.
 
-A README file is required for CPAN modules since CPAN extracts the README
-file from a module distribution so that people browsing the archive
-can use it to get an idea of the module's uses. It is usually a good idea
-to provide version information here so that people can decide whether
-fixes for the module are worth downloading.
+This distribution is the game as an engine, a bot that plays it, a program
+to play it in a terminal, and the raylib window of earlier releases, kept
+and made optional.
+
+    use Game::Snake;
+
+    my $game = Game::Snake->new(seed => 'anything');
+    $game->turn('up');
+    $game->tick while $game->status ne 'finished';
+    print $game->result->stringify, "\n";
+
+Or, from a shell:
+
+    snake
+    snake --cols 20 --rows 14
+    snake --watch --level 2
+    snake --raylib
+
+     Snake   score 60   length 9   speed 4/s
+    +----------------------------+
+    |                          ()|
+    |                            |
+    |        ::##############>>  |
+    |                            |
+    |                            |
+    |                            |
+    |                            |
+    |                            |
+    +----------------------------+
+     arrows, wasd or hjkl steer; p pauses; q quits
+
+The arrows, wasd or hjkl steer, p pauses and q quits. The board is fitted to
+the window, at most 40 by 28. Term::ReadKey reads the keys; without it the
+game says so, and snake --watch, which reads nothing, works anywhere.
+
+The engine prints nothing, reads nothing and calls neither rand nor the
+clock: every placement of food comes from the seed, so the same seed and the
+same turns are the same game twice. The bot has two levels, greedy and
+flood-fill, measured against each other over hundreds of games.
+
+snake --raylib opens the window of release 0.11, drawn from the same sprite
+sheet, when Raylib::FFI is installed. Raylib::FFI needs perl 5.38 or later;
+the rest of this distribution needs 5.14.
 
 
 INSTALLATION
@@ -27,14 +63,12 @@ After installing, you can find documentation for this module with the
 perldoc command.
 
     perldoc Game::Snake
+    perldoc Game::Snake::Terminal
 
 You can also look for information at:
 
     RT, CPAN's request tracker (report bugs here)
         https://rt.cpan.org/NoAuth/Bugs.html?Dist=Game-Snake
-
-    CPAN Ratings
-        https://cpanratings.perl.org/d/Game-Snake
 
     Search CPAN
         https://metacpan.org/release/Game-Snake
@@ -47,4 +81,3 @@ This software is Copyright (c) 2024 by LNATION.
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
-

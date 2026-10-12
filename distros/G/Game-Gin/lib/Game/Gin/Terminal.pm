@@ -11,8 +11,10 @@ use Game::Gin ();
 use Game::Gin::Bot ();
 use Game::Gin::Card qw(name_of long_name_of id_of deadwood_of rank_of suit_of);
 use Game::Gin::Deadwood qw(best deadwood KNOCK_AT);
+use Game::Gin::Search ();
+use Getopt::Long ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our @RANK_TEXT = ('', 'A', 2 .. 9, '10', 'J', 'Q', 'K');
 
@@ -883,6 +885,103 @@ sub announce_result {
     return;
 }
 
+sub _usage {
+    return <<'USAGE';
+gin - gin rummy at a prompt
+
+    gin                        play the bot as p1
+    gin --seat p2              play the bot as p2
+    gin --mode hotseat         two people at one keyboard
+    gin --mode watch           two bots, and you read
+    gin --level 1              a weaker opponent (1 or 2)
+    gin --seed tuesday         deal the same game every time
+    gin --ascii                letters instead of the suit pips
+    gin --nocolour             no colour (NO_COLOR does the same)
+    gin --nopick               type the moves out instead of pointing at them
+
+Your hand is fanned like a hand of cards, with a bracket under each meld
+saying whether it is a set or a run and what the rest of it is costing you.
+
+On a terminal you point at the card you mean: the left and right keys walk
+your own hand, and the fan above shows what the hand WOULD be without the
+card under the cursor, remelded, with the deadwood that leaves you. Enter
+discards it, k discards and knocks when that is allowed, u takes the upcard,
+d draws, ? lists the keys and q stops. Needs Term::ReadKey; without it, or
+off a terminal, every move is typed.
+
+Typed instead: answer y or n for the upcard, d or t to draw or take, and name
+a card to discard it (KH). Add a ! to knock with it (KH!). What the card
+itself says is taken too, so the suit pip and 10H work as well as KH and TH.
+Type quit to stop, or help for the rest.
+
+The card you just drew or took is marked in your hand, and so is the upcard
+when your opponent took it rather than drawing.
+
+Exit status is 0 if your seat won, or if nobody was playing a seat, 1 if you
+lost or stopped early, and 2 for a bad option.
+USAGE
+}
+
+sub run {
+    my ($class, @argv) = @_;
+    my %o = (mode => 'bot', level => 2, seat => 'p1');
+
+    my $ok = eval {
+        local $SIG{__WARN__} = sub { print STDERR "gin: $_[0]" };
+        Getopt::Long::GetOptionsFromArray(\@argv,
+            'mode=s'  => \$o{mode},
+            'level=i' => \$o{level},
+            'seat=s'  => \$o{seat},
+            'seed=s'  => \$o{seed},
+            'ascii'   => \$o{ascii},
+            'colour!' => \$o{colour},
+            'color!'  => \$o{colour},
+            'pick!'   => \$o{pick},
+            'help'    => \$o{help},
+        );
+    };
+    if (!$ok) { print STDERR _usage(); return 2 }
+    if ($o{help}) { print _usage(); return 0 }
+    if (@argv) { print STDERR "gin: not an option: $argv[0]\n", _usage(); return 2 }
+
+    my $levels = Game::Gin::Search::LEVELS;
+    my $refused
+        = $o{mode} !~ /\A(?:bot|hotseat|watch)\z/ ? 'mode must be bot, hotseat or watch'
+        : $o{seat} !~ /\A p[12] \z/x              ? 'seat must be p1 or p2'
+        : !($o{level} =~ /\A\d+\z/ && $o{level} >= 1 && $o{level} <= $levels)
+                                                   ? "level must be 1 to $levels"
+        : undef;
+    if (defined $refused) { print STDERR "gin: $refused\n", _usage(); return 2 }
+
+    my $seed = defined $o{seed} ? Digest::SHA::sha256($o{seed}) : undef;
+
+    my $ui = $class->new(
+        mode  => $o{mode},
+        level => $o{level},
+        seat  => $o{seat},
+        ($o{ascii} ? (ascii => 1) : ()),
+        (defined $o{colour} ? (colour => $o{colour}) : ()),
+        (defined $o{pick} ? (picking => $o{pick} ? 1 : 0) : ()),
+    );
+
+    local @SIG{qw(INT TERM HUP)};
+    for my $sig (qw(INT TERM HUP)) {
+        $SIG{$sig} = sub { $ui->leave_raw; $SIG{$sig} = 'DEFAULT'; kill $sig, $$ };
+    }
+
+    my $game = eval { $ui->play(defined $seed ? (seed => $seed) : ()) };
+    my $died = $@;
+    $ui->leave_raw;
+    die $died if $died;
+
+    my $result = $game && $game->result;
+    return 1 unless $result;
+    return 0 if $o{mode} eq 'watch' || $o{mode} eq 'hotseat';
+    return 0 if ($result->{winner} // '') eq $o{seat};
+    return 1;
+}
+
+
 1;
 
 __END__
@@ -895,7 +994,7 @@ Game::Gin::Terminal - gin rummy at a prompt
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 
@@ -1059,6 +1158,22 @@ hand-over is removed rather than passing because the loop ran zero times.
 
 Plays a match to the end and returns the L<Game::Gin>. With no seed it makes
 one. Stops if input runs out rather than looping.
+
+=head2 run
+
+    exit Game::Gin::Terminal->run(@ARGV);
+
+The whole command line program as a class method: parses the options
+F<bin/gin> documents, builds the terminal, plays a match, and B<returns the
+exit status rather than calling C<exit>>: C<0> if your seat won or nobody at
+the keyboard was playing a seat, C<1> if you lost or stopped early, C<2> for a
+bad option, a leftover word or a refused value, with the reason and the usage
+on C<STDERR>. C<--help> prints the usage on C<STDOUT> and returns C<0>. Signal
+handlers are local to the call and the terminal is left in cooked mode on every
+way out, so a launcher such as L<Game::Terminal> can call it in its own process
+and carry on afterwards. Colour is off when C<NO_COLOR> is set, as it is off a
+terminal.
+
 
 =head2 render
 

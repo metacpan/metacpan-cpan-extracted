@@ -133,6 +133,32 @@ sub dec { Punk::WebSocket::_decode_frame(@_) }
     is((dec($msb))[0], -1, 'a 64-bit length with the MSB set is refused');
 }
 
+# ---- a length is written the short way and no other (RFC 6455 5.2) -----------
+{
+    my $mask = 'MASK';
+    my $body = sub { my $p = shift; my $o = $p;
+        substr($o, $_, 1) = chr(ord(substr $p, $_, 1) ^ ord(substr $mask, $_ % 4, 1))
+            for 0 .. length($p) - 1;
+        $o };
+    my $long16 = sub { my $p = shift;
+        pack('C', 0x82) . pack('C', 0x80 | 126) . pack('n', length $p) . $mask . $body->($p) };
+    my $long64 = sub { my $p = shift;
+        pack('C', 0x82) . pack('C', 0x80 | 127) . pack('Q>', length $p) . $mask . $body->($p) };
+
+    is((dec($long16->('hello')))[0], -1, 'five bytes in the 16-bit form is a protocol error');
+    is((dec($long16->('x' x 125)))[0], -1, '...and 125');
+    my @ok = dec($long16->('x' x 126));
+    is($ok[0], 4 + 4 + 126, '126 bytes in the 16-bit form is the short way');
+    is($ok[3], 'x' x 126, '...and decodes');
+    is((dec($long64->('hello')))[0], -1, 'five bytes in the 64-bit form is a protocol error');
+    is((dec($long64->('x' x 65535)))[0], -1, '...and 65535');
+    @ok = dec($long64->('x' x 65536));
+    is($ok[0], 10 + 4 + 65536, '65536 bytes in the 64-bit form is the short way');
+    is(length $ok[3], 65536, '...and decodes');
+    is((dec(encode_client(opcode => 2, payload => "x" x 125)))[0],
+       2 + 4 + 125, 'and the reference encoder\'s own frames still decode');
+}
+
 # ---- fix 1: UTF-8 validation (1007) -----------------------------------------
 {
     ok(Punk::WebSocket::_utf8_valid("plain ascii"), 'ascii is valid utf8');

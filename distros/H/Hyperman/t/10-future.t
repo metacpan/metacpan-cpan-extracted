@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 use Test::More;
+use Scalar::Util ();
 use Hyperman::Future;
 
 sub F { Hyperman::Future->new }
@@ -127,6 +128,49 @@ sub F { Hyperman::Future->new }
     my $f = F();
     $f->cancel;
     ok($f->is_cancelled && $f->is_ready, 'cancelled');
+}
+
+# ---- a settled combinator cancels its losers -----------------------------
+{
+    my ($a, $b, $c) = (F(), F(), F());
+    my $any = Hyperman::Future->wait_any($a, $b, $c);
+    $b->done('b');
+    ok($any->is_done, 'wait_any settled on the first');
+    ok($a->is_cancelled && $c->is_cancelled, 'and cancelled the two still running');
+}
+{
+    my ($a, $b) = (F(), F());
+    my $all = Hyperman::Future->needs_all($a, $b);
+    $a->fail("nope\n");
+    ok($b->is_cancelled, 'needs_all failing fast cancels the input still running');
+}
+{
+    my ($a, $b) = (F(), F());
+    my $any = Hyperman::Future->needs_any($a, $b);
+    $a->done('first');
+    ok($b->is_cancelled, 'needs_any succeeding cancels the other');
+}
+{
+    my ($a, $b) = (F(), F());
+    my $all = Hyperman::Future->wait_all($a, $b);
+    $a->done('a');
+    ok(!$b->is_ready, 'wait_all leaves the others running while it waits');
+    $all->cancel;
+    ok($all->is_cancelled, 'the result can be cancelled');
+    ok($b->is_cancelled, 'and cancelling it cancels the input still running');
+    ok($a->is_done, 'while an input that had settled is left as it was');
+}
+{
+    # the inputs are released once the result settles, not held until the
+    # slowest would have finished: the list that held them is emptied
+    my $slow = F();
+    my $fast = F();
+    my $any = Hyperman::Future->wait_any($fast, $slow);
+    $fast->done(1);
+    my $weak = $slow;
+    Scalar::Util::weaken($weak);
+    undef $slow; undef $any;
+    ok(!defined $weak, 'a loser is freed when the result and the caller let go of it');
 }
 
 done_testing;

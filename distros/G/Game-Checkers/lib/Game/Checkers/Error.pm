@@ -5,7 +5,7 @@ use warnings;
 
 use Object::Proto::Sugar -types;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our (@FLAGS, %MESSAGE);
 
@@ -91,7 +91,7 @@ Game::Checkers::Error - what a move was refused for
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 

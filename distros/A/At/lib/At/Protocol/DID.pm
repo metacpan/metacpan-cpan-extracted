@@ -1,4 +1,4 @@
-package At::Protocol::DID v1.7.0 {
+package At::Protocol::DID v1.8.0 {
     use v5.42;
     no warnings qw[experimental::try];
     use feature 'try';

@@ -1,5 +1,13 @@
 Revision history for PAGI-App-GoldenCage
 
+0.003 - 2026-10-11
+- Fix an issue with user agents in forked environment
+
+0.002 - 2026-10-11
+- Properly encode HTML entities of the snippet
+- set HTML encoding to UTF8
+- Add some vertical spacing for debugging purposes
+
 0.001 - 2026-10-11
 - First version
 

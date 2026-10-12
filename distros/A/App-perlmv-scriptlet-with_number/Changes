@@ -1,3 +1,8 @@
+0.002   2026-08-05  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Fix extension handling.
+
+
 0.001   2026-08-05  Released-By: PERLANCAR
 
         - First release.

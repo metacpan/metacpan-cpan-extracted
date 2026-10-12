@@ -7,7 +7,7 @@ use warnings;
 use Game::Go::Rules;
 use Game::Go::Result;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 my $B = Game::Go::Rules::BLACK;
 my $W = Game::Go::Rules::WHITE;
@@ -97,7 +97,7 @@ Game::Go::Scoring - Japanese territory, and the area score it is checked against
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

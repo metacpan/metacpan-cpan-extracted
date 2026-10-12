@@ -10,7 +10,7 @@ use Object::Proto::Sugar;
 
 use Game::RoyalUr::Engine qw(SIDE_LIGHT SIDE_DARK WON DRAWN BY_HOME BY_PLY_CAP);
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 my $E = 'Game::RoyalUr::Engine';
 
@@ -152,7 +152,7 @@ Game::RoyalUr::Rules - a position of the Royal Game of Ur, and how it changes
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

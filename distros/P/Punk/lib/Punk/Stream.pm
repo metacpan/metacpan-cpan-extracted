@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.55';
+our $VERSION = '0.57';
 
 
 1;
@@ -86,10 +86,16 @@ stream closed first (the client disconnected, or the buffer ceiling was
 hit). Awaiting it after each write bounds memory to one chunk, and on a
 Hyperman worker the await pumps the event loop - other requests are served
 while your stream waits for a slow client to read. On the stream handle it
-settles from the server's own drain, or at once when a write was taken
-without the connection backing up. On the blocking and C<psgi.streaming>
+is pending from the moment the server answers a write with "full" until the
+server's own drain, and settled at once when a write was taken without the
+connection backing up. Over HTTP/2 that depends on the server reporting
+pressure for the stream, which Hyperman up to 0.58 does not. On the blocking and C<psgi.streaming>
 transports writes are synchronous, so C<drain> comes back already settled and
 the same loop costs nothing.
+
+A C<HEAD> request to a route that calls C<< $c->stream >> is answered with
+the status and headers the stream would have had and no body; the callback
+is not run.
 
 =head1 THE CALL
 

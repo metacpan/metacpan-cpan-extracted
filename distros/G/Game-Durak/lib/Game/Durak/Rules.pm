@@ -8,7 +8,7 @@ use Exporter 'import';
 use Game::Durak::Card qw(rank_of beats);
 use Game::Durak::Deck qw(HAND_SIZE);
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 our @EXPORT_OK = qw(cap_for legal_attacks legal_beats forced closes);
 
 sub cap_for {
@@ -59,7 +59,7 @@ Game::Durak::Rules - what may be played, as arithmetic over a hand and a bout
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

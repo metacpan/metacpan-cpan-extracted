@@ -29,6 +29,15 @@ _quic_heap_selftest()
     OUTPUT:
         RETVAL
 
+# The per-source half-open table: one address cannot spend the Retry
+# threshold alone. Counts per address, falls on completion, frees its slot.
+IV
+_quic_src_selftest()
+    CODE:
+        RETVAL = hm_quic_src_selftest();
+    OUTPUT:
+        RETVAL
+
 # Address-validation tokens: Retry, NEW_TOKEN and stateless reset. Asserts the
 # property that matters - a token verifies for the address, connection id and
 # secret it was minted for, and for nothing else.

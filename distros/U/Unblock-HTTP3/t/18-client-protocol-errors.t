@@ -9,6 +9,7 @@ use Time::HiRes qw(time);
 
 use Net::QUIC;
 use Net::QUIC::Driver;
+use Unblock::HTTP3::Client;
 use Unblock::HTTP3::Connection;
 
 is(
@@ -202,7 +203,7 @@ sub make_pair {
         'raw server completes h3 TLS handshake with client',
     );
 
-    my $client_h3 = Unblock::HTTP3::Connection->client(
+    my $client_h3 = Unblock::HTTP3::Client->new(
         quic => $client_quic,
     );
 

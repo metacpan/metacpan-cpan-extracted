@@ -7,7 +7,7 @@ use Exporter 'import';
 
 use Game::Schnapsen::Card qw(suit_of rank_of id_of);
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 our @EXPORT_OK = qw(marriages_in marriage_value exchange_card
                     MARRIAGE MARRIAGE_TRUMP);
 
@@ -54,7 +54,7 @@ Game::Schnapsen::Declare - marriages and the trump exchange, as arithmetic
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

@@ -344,6 +344,13 @@ static SV *oa_check_response_cfg(pTHX_ oa_op *o, SV *trip, const oa_rvcfg *rv,
                 }
                 continue;
             }
+            /* an array header is split before the check, as a request header
+             * is - comma unless the row carries another delimiter */
+            if (pp->is_array && !SvROK(hv_)) {
+                STRLEN hl; const char *hp = SvPV_const(hv_, hl);
+                hv_ = sv_2mortal(oa_split(aTHX_ hp, hl, pp->delim ? pp->delim : ',', 0, 0));
+                oa_split_nested(aTHX_ pp, hv_, 0);
+            }
             if (!oa_check_param(aTHX_ pp, hv_, errs, "response"))
                 o->rv.hdr_invalid++;
         }

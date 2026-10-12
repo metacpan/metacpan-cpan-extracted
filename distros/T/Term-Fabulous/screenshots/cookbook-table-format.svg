@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="363" viewBox="0 0 960 363" role="img" aria-label="perl examples/cookbook/table-format.pl">
+<title>perl examples/cookbook/table-format.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="928" height="328" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="928" height="328" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="928" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="480" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/cookbook/table-format.pl</text>
+<rect x="16.5" y="16.5" width="927" height="327" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="48" y="114" width="774" height="36" fill="#242832"/>
+<rect x="48" y="168" width="774" height="18" fill="#343a48"/>
+<rect x="48" y="204" width="774" height="18" fill="#1c2029"/>
+<rect x="48" y="114" width="774" height="9" fill="#586070"/>
+<rect x="48" y="123" width="5" height="126" fill="#586070"/>
+<rect x="818" y="123" width="4" height="126" fill="#586070"/>
+<rect x="48" y="249" width="774" height="9" fill="#586070"/>
+</g>
+<g class="terminal">
+<text x="48" y="92" textLength="729" fill="#96a0b4">Sorted by size. Up, then Left/Right and Enter on a title sorts by another column.</text>
+<text x="66" y="146" textLength="423" class="b" fill="#ebeef3">Job        State    Started       Took     Size</text>
+<text x="502.5" y="146" text-anchor="middle" class="b" fill="#ebeef3">▾</text>
+<text x="543" y="146" textLength="261" class="b" fill="#ebeef3">Files  Changed      Rate  Enc</text>
+<text x="66" y="164" textLength="693" fill="#dcdfe4">photos     running  Mon 06:30   2h 01m  200.0 GiB   51,207     0.4%  28 MiB/s</text>
+<text x="66" y="182" textLength="72" fill="#dcdfe4">home dir</text>
+<text x="142.5" y="182" text-anchor="middle" fill="#dcdfe4">…</text>
+<text x="165" y="182" textLength="594" fill="#dcdfe4">done     Sun 22:30   1h 02m   45.0 GiB  182,340    15.3%  12 MiB/s</text>
+<text x="790.5" y="182" text-anchor="middle" fill="#dcdfe4">✔</text>
+<text x="66" y="200" textLength="693" fill="#dcdfe4">mail       done     Sun 23:00  14m 05s    9.0 GiB   96,112     2.1%  11 MiB/s</text>
+<text x="790.5" y="200" text-anchor="middle" fill="#dcdfe4">✔</text>
+<text x="66" y="218" textLength="72" fill="#dcdfe4">database</text>
+<text x="142.5" y="218" text-anchor="middle" fill="#dcdfe4">…</text>
+<text x="165" y="218" textLength="594" fill="#dcdfe4">failed   Sun 23:30   1m 01s  500.0 MiB       12   100.0%   8 MiB/s</text>
+<text x="66" y="236" textLength="693" fill="#dcdfe4">wiki       done     Mon 00:15      42s  150.0 MiB    2,311     8.7%   4 MiB/s</text>
+<text x="790.5" y="236" text-anchor="middle" fill="#dcdfe4">✔</text>
+<text x="48" y="290" textLength="630" fill="#e5c07b">Size of home directories: raw value 48318382080, display text 45.0 GiB</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

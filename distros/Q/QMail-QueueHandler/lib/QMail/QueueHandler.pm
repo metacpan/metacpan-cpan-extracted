@@ -22,7 +22,7 @@ use Term::ANSIColor;
 use Getopt::Std;
 use File::Basename;
 
-our $VERSION = '2.0.4';
+our $VERSION = '2.0.5';
 my $me       = basename $0;
 
 # Where qmail stores all of its files

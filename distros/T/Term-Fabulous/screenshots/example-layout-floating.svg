@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="345" viewBox="0 0 600 345" role="img" aria-label="perl examples/layout-floating.pl">
+<title>perl examples/layout-floating.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="568" height="310" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="568" height="310" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="568" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="300" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/layout-floating.pl</text>
+<rect x="16.5" y="16.5" width="567" height="309" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="48" y="78" width="54" height="18" fill="#3c445c"/>
+<rect x="111" y="78" width="54" height="18" fill="#3c445c"/>
+<rect x="48" y="96" width="99" height="108" fill="#282e40"/>
+<rect x="147" y="114" width="288" height="18" fill="#1e2332"/>
+<rect x="435" y="114" width="99" height="18" fill="#e06c75"/>
+<rect x="534" y="114" width="18" height="18" fill="#1e2332"/>
+<rect x="147" y="132" width="405" height="72" fill="#1e2332"/>
+<rect x="48" y="204" width="504" height="90" fill="#1e2332"/>
+<rect x="435" y="294" width="117" height="18" fill="#98c379"/>
+<rect x="52" y="104" width="1" height="91" fill="#e5c07b"/>
+<rect x="52" y="104" width="91" height="1" fill="#e5c07b"/>
+<rect x="142" y="104" width="1" height="91" fill="#e5c07b"/>
+<rect x="147" y="122" width="288" height="1" fill="#78a0dc"/>
+<rect x="534" y="122" width="9" height="1" fill="#78a0dc"/>
+<rect x="547" y="132" width="1" height="144" fill="#78a0dc"/>
+<rect x="52" y="194" width="91" height="1" fill="#e5c07b"/>
+<rect x="52" y="204" width="1" height="72" fill="#78a0dc"/>
+<rect x="57" y="284" width="486" height="1" fill="#78a0dc"/>
+</g>
+<polyline points="547.5 132 547.5 127 547.462 126.413 547.347 125.835 547.157 125.278 546.897 124.75 546.57 124.261 546.182 123.818 545.739 123.43 545.25 123.103 544.722 122.843 544.165 122.653 543.587 122.538 543 122.5 543 122.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="52.5 276 52.5 280 52.538 280.587 52.653 281.165 52.843 281.722 53.103 282.25 53.43 282.739 53.818 283.182 54.261 283.57 54.75 283.897 55.278 284.157 55.835 284.347 56.413 284.462 57 284.5 57 284.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="547.5 276 547.5 280 547.462 280.587 547.347 281.165 547.157 281.722 546.897 282.25 546.57 282.739 546.182 283.182 545.739 283.57 545.25 283.897 544.722 284.157 544.165 284.347 543.587 284.462 543 284.5 543 284.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
+<g class="terminal">
+<text x="57" y="92" textLength="99" fill="#dcdcdc">File   Edit</text>
+<text x="66" y="128" textLength="27" fill="#dcdcdc">New</text>
+<text x="444" y="128" textLength="81" fill="#141923">3 changes</text>
+<text x="66" y="146" textLength="63" fill="#dcdcdc">Open...</text>
+<text x="156" y="146" textLength="108" fill="#96a0b4">the document</text>
+<text x="66" y="164" textLength="36" fill="#dcdcdc">Save</text>
+<text x="156" y="164" textLength="108" fill="#96a0b4">the document</text>
+<text x="66" y="182" textLength="36" fill="#dcdcdc">Quit</text>
+<text x="156" y="182" textLength="108" fill="#96a0b4">the document</text>
+<text x="156" y="200" textLength="108" fill="#96a0b4">the document</text>
+<text x="66" y="218" textLength="198" fill="#96a0b4">Line 5 of the document</text>
+<text x="66" y="236" textLength="198" fill="#96a0b4">Line 6 of the document</text>
+<text x="444" y="308" textLength="99" fill="#141923">Saved 09:41</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

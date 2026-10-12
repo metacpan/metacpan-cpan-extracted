@@ -1,0 +1,194 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1050" height="669" viewBox="0 0 1050 669" role="img" aria-label="perl examples/theme-editor.pl">
+<title>perl examples/theme-editor.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="1018" height="634" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="1018" height="634" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="1018" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="525" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/theme-editor.pl</text>
+<rect x="16.5" y="16.5" width="1017" height="633" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="30" y="60" width="990" height="18" fill="#1e2128"/>
+<rect x="30" y="78" width="279" height="18" fill="#1e2128"/>
+<rect x="309" y="78" width="135" height="18" fill="#343a48"/>
+<rect x="444" y="78" width="576" height="18" fill="#1e2128"/>
+<rect x="948" y="114" width="54" height="18" fill="#61afef"/>
+<rect x="48" y="132" width="459" height="36" fill="#0b1a24"/>
+<rect x="543" y="132" width="459" height="414" fill="#343a48"/>
+<rect x="48" y="168" width="9" height="18" fill="#0b1a24"/>
+<rect x="57" y="168" width="18" height="18" fill="#5fd3c0"/>
+<rect x="75" y="168" width="162" height="18" fill="#0b1a24"/>
+<rect x="237" y="168" width="18" height="18" fill="#050d12"/>
+<rect x="255" y="168" width="252" height="270" fill="#0b1a24"/>
+<rect x="48" y="186" width="189" height="18" fill="#0b1a24"/>
+<rect x="237" y="186" width="18" height="18" fill="#2b5a70"/>
+<rect x="48" y="204" width="9" height="234" fill="#0b1a24"/>
+<rect x="57" y="204" width="18" height="18" fill="#2c313c"/>
+<rect x="75" y="204" width="162" height="234" fill="#0b1a24"/>
+<rect x="237" y="204" width="18" height="18" fill="#3c4250"/>
+<rect x="57" y="222" width="18" height="18" fill="#f27e7e"/>
+<rect x="237" y="222" width="18" height="18" fill="#6c7078"/>
+<rect x="57" y="240" width="18" height="18" fill="#1a3a48"/>
+<rect x="237" y="240" width="18" height="18" fill="#1c2029"/>
+<rect x="57" y="258" width="18" height="18" fill="#153240"/>
+<rect x="237" y="258" width="18" height="18" fill="#262a34"/>
+<rect x="57" y="276" width="18" height="18" fill="#2b5a70"/>
+<rect x="237" y="276" width="18" height="18" fill="#2b5a70"/>
+<rect x="57" y="294" width="18" height="18" fill="#5f8594"/>
+<rect x="237" y="294" width="18" height="18" fill="#263e5c"/>
+<rect x="57" y="312" width="18" height="18" fill="#264f78"/>
+<rect x="237" y="312" width="18" height="18" fill="#9ad46b"/>
+<rect x="57" y="330" width="18" height="18" fill="#10242f"/>
+<rect x="237" y="330" width="18" height="18" fill="#143040"/>
+<rect x="57" y="348" width="18" height="18" fill="#1e2128"/>
+<rect x="237" y="348" width="18" height="18" fill="#183545"/>
+<rect x="57" y="366" width="18" height="18" fill="#d8e8ee"/>
+<rect x="237" y="366" width="18" height="18" fill="#ebeef3"/>
+<rect x="57" y="384" width="18" height="18" fill="#8fb3c2"/>
+<rect x="237" y="384" width="18" height="18" fill="#101216"/>
+<rect x="57" y="402" width="18" height="18" fill="#7fa3b2"/>
+<rect x="237" y="402" width="18" height="18" fill="#3a3f4b"/>
+<rect x="57" y="420" width="18" height="18" fill="#464c5a"/>
+<rect x="237" y="420" width="18" height="18" fill="#f0c674"/>
+<rect x="48" y="438" width="459" height="162" fill="#0b1a24"/>
+<rect x="543" y="546" width="207" height="18" fill="#343a48"/>
+<rect x="750" y="546" width="9" height="18" fill="#dcdfe4"/>
+<rect x="759" y="546" width="243" height="18" fill="#343a48"/>
+<rect x="30" y="618" width="990" height="18" fill="#1e2128"/>
+<rect x="39" y="104" width="477" height="1" fill="#46556e"/>
+<rect x="534" y="104" width="477" height="1" fill="#61afef"/>
+<rect x="34" y="114" width="1" height="486" fill="#46556e"/>
+<rect x="520" y="114" width="1" height="486" fill="#46556e"/>
+<rect x="529" y="114" width="1" height="486" fill="#61afef"/>
+<rect x="943" y="114" width="1" height="18" fill="#5a606e"/>
+<rect x="1015" y="114" width="1" height="486" fill="#61afef"/>
+<rect x="502" y="132" width="2" height="72" fill="#5fd3c0"/>
+<rect x="997" y="132" width="1" height="234" fill="#464c5a"/>
+<rect x="57" y="139" width="9" height="1" fill="#2b5a70"/>
+<rect x="147" y="139" width="342" height="1" fill="#2b5a70"/>
+<rect x="57" y="141" width="9" height="1" fill="#2b5a70"/>
+<rect x="147" y="141" width="342" height="1" fill="#2b5a70"/>
+<rect x="502" y="204" width="1" height="396" fill="#464c5a"/>
+<rect x="997" y="366" width="2" height="198" fill="#61afef"/>
+<rect x="57" y="463" width="9" height="1" fill="#2b5a70"/>
+<rect x="183" y="463" width="306" height="1" fill="#2b5a70"/>
+<rect x="57" y="465" width="9" height="1" fill="#2b5a70"/>
+<rect x="183" y="465" width="306" height="1" fill="#2b5a70"/>
+<rect x="57" y="589" width="9" height="1" fill="#2b5a70"/>
+<rect x="183" y="589" width="306" height="1" fill="#2b5a70"/>
+<rect x="57" y="591" width="9" height="1" fill="#2b5a70"/>
+<rect x="183" y="591" width="306" height="1" fill="#2b5a70"/>
+<rect x="39" y="608" width="477" height="1" fill="#46556e"/>
+<rect x="534" y="608" width="477" height="1" fill="#61afef"/>
+</g>
+<polyline points="34.5 114 34.5 109 34.538 108.413 34.653 107.835 34.843 107.278 35.103 106.75 35.43 106.261 35.818 105.818 36.261 105.43 36.75 105.103 37.278 104.843 37.835 104.653 38.413 104.538 39 104.5 39 104.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="520.5 114 520.5 109 520.462 108.413 520.347 107.835 520.157 107.278 519.897 106.75 519.57 106.261 519.182 105.818 518.739 105.43 518.25 105.103 517.722 104.843 517.165 104.653 516.587 104.538 516 104.5 516 104.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="529.5 114 529.5 109 529.538 108.413 529.653 107.835 529.843 107.278 530.103 106.75 530.43 106.261 530.818 105.818 531.261 105.43 531.75 105.103 532.278 104.843 532.835 104.653 533.413 104.538 534 104.5 534 104.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="1015.5 114 1015.5 109 1015.462 108.413 1015.347 107.835 1015.157 107.278 1014.897 106.75 1014.57 106.261 1014.182 105.818 1013.739 105.43 1013.25 105.103 1012.722 104.843 1012.165 104.653 1011.587 104.538 1011 104.5 1011 104.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="34.5 600 34.5 604 34.538 604.587 34.653 605.165 34.843 605.722 35.103 606.25 35.43 606.739 35.818 607.182 36.261 607.57 36.75 607.897 37.278 608.157 37.835 608.347 38.413 608.462 39 608.5 39 608.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="520.5 600 520.5 604 520.462 604.587 520.347 605.165 520.157 605.722 519.897 606.25 519.57 606.739 519.182 607.182 518.739 607.57 518.25 607.897 517.722 608.157 517.165 608.347 516.587 608.462 516 608.5 516 608.5" fill="none" stroke="#46556e" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="529.5 600 529.5 604 529.538 604.587 529.653 605.165 529.843 605.722 530.103 606.25 530.43 606.739 530.818 607.182 531.261 607.57 531.75 607.897 532.278 608.157 532.835 608.347 533.413 608.462 534 608.5 534 608.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="1015.5 600 1015.5 604 1015.462 604.587 1015.347 605.165 1015.157 605.722 1014.897 606.25 1014.57 606.739 1014.182 607.182 1013.739 607.57 1013.25 607.897 1012.722 608.157 1012.165 608.347 1011.587 608.462 1011 608.5 1011 608.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<g class="terminal">
+<text x="39" y="74" textLength="261" fill="#dcdfe4">File  Edit  View  Theme  Help</text>
+<text x="768" y="74" textLength="243" fill="#787e8a">Term::Fabulous theme editor</text>
+<text x="39" y="92" textLength="261" fill="#96a0b4">dracula.kdl   ×  nord.kdl   ×</text>
+<text x="318" y="92" textLength="81" class="b" fill="#dcdfe4">ocean.kdl</text>
+<text x="408" y="92" textLength="9" fill="#e06c75">!</text>
+<text x="426" y="92" textLength="9" class="b" fill="#dcdfe4">×</text>
+<text x="453" y="92" textLength="207" fill="#96a0b4">solarized-light.kdl   ×</text>
+<text x="678" y="92" textLength="9" fill="#61afef">+</text>
+<text x="48" y="128" textLength="126" fill="#dcdfe4">Preview: ocean</text>
+<text x="183" y="128" textLength="252" class="b" fill="#e06c75">(stale: the text has errors)</text>
+<text x="543" y="128" textLength="387" fill="#dcdfe4">Settings of ocean.kdl                  Form</text>
+<text x="957" y="128" textLength="36" fill="#101216">Text</text>
+<text x="75" y="146" textLength="63" class="b" fill="#8fb3c2">Palette</text>
+<text x="552" y="146" text-anchor="middle" fill="#dcdfe4">　</text>
+<text x="561" y="146" textLength="234" fill="#dcdfe4">hover_background &quot;#153240&quot;</text>
+<text x="552" y="164" text-anchor="middle" fill="#dcdfe4">　</text>
+<text x="561" y="164" textLength="153" fill="#dcdfe4">success &quot;#9ad46b&quot;</text>
+<text x="84" y="182" textLength="252" fill="#d8e8ee">accent              backdrop</text>
+<text x="552" y="182" text-anchor="middle" fill="#dcdfe4">　</text>
+<text x="561" y="182" textLength="153" fill="#dcdfe4">warning &quot;#f0c674&quot;</text>
+<text x="84" y="200" textLength="234" fill="#d8e8ee">background          border</text>
+<text x="552" y="200" text-anchor="middle" fill="#dcdfe4">　</text>
+<text x="561" y="200" textLength="144" fill="#dcdfe4">danger &quot;#f27e7e&quot;</text>
+<text x="84" y="218" textLength="297" fill="#d8e8ee">button_face         control_hover</text>
+<text x="543" y="218" textLength="9" fill="#dcdfe4">}</text>
+<text x="84" y="236" textLength="252" fill="#d8e8ee">danger              disabled</text>
+<text x="84" y="254" textLength="324" fill="#d8e8ee">focus_background    group_background</text>
+<text x="543" y="254" textLength="441" fill="#dcdfe4">// Buttons with a border get round ones; a button</text>
+<text x="84" y="272" textLength="261" fill="#d8e8ee">hover_background    hover_low</text>
+<text x="543" y="272" textLength="450" fill="#dcdfe4">// classes =&gt; ['primary'] is drawn in the accent a</text>
+<text x="84" y="290" textLength="243" fill="#d8e8ee">line                outline</text>
+<text x="543" y="290" textLength="153" fill="#dcdfe4">// has the focus.</text>
+<text x="84" y="308" textLength="252" fill="#d8e8ee">placeholder         selected</text>
+<text x="543" y="308" textLength="72" fill="#dcdfe4">button {</text>
+<text x="84" y="326" textLength="243" fill="#d8e8ee">selection           success</text>
+<text x="552" y="326" text-anchor="middle" fill="#dcdfe4">　</text>
+<text x="561" y="326" textLength="162" fill="#dcdfe4">border style=Round</text>
+<text x="84" y="344" textLength="297" fill="#d8e8ee">surface             surface_field</text>
+<text x="552" y="344" text-anchor="middle" fill="#dcdfe4">　</text>
+<text x="561" y="344" textLength="171" fill="#dcdfe4">variant &quot;primary&quot; {</text>
+<text x="84" y="362" textLength="306" fill="#d8e8ee">surface_low         surface_raised</text>
+<text x="552" y="362" text-anchor="middle" fill="#dcdfe4">　</text>
+<text x="570" y="362" text-anchor="middle" fill="#dcdfe4">　</text>
+<text x="579" y="362" textLength="189" fill="#dcdfe4">border color=&quot;accent&quot;</text>
+<text x="84" y="380" textLength="279" fill="#d8e8ee">text                text_bright</text>
+<text x="552" y="380" text-anchor="middle" fill="#dcdfe4">　</text>
+<text x="570" y="380" text-anchor="middle" fill="#dcdfe4">　</text>
+<text x="579" y="380" textLength="117" fill="#dcdfe4">text &quot;accent&quot;</text>
+<text x="84" y="398" textLength="288" fill="#d8e8ee">text_dim            text_inverse</text>
+<text x="552" y="398" text-anchor="middle" fill="#dcdfe4">　</text>
+<text x="570" y="398" text-anchor="middle" fill="#dcdfe4">　</text>
+<text x="579" y="398" textLength="279" fill="#dcdfe4">focused { border color=&quot;text&quot; }</text>
+<text x="84" y="416" textLength="225" fill="#d8e8ee">text_muted          track</text>
+<text x="552" y="416" text-anchor="middle" fill="#dcdfe4">　</text>
+<text x="561" y="416" textLength="9" fill="#dcdfe4">}</text>
+<text x="84" y="434" textLength="243" fill="#d8e8ee">track_scroll        warning</text>
+<text x="543" y="434" textLength="9" fill="#dcdfe4">}</text>
+<text x="75" y="470" textLength="99" class="b" fill="#8fb3c2">Text (text)</text>
+<text x="543" y="470" textLength="279" fill="#dcdfe4">// Dividers draw a double line.</text>
+<text x="543" y="488" textLength="81" fill="#dcdfe4">divider {</text>
+<text x="57" y="506" textLength="324" fill="#d8e8ee">Plain text, as most widgets draw it.</text>
+<text x="552" y="506" text-anchor="middle" fill="#dcdfe4">　</text>
+<text x="561" y="506" textLength="153" fill="#dcdfe4">line style=Double</text>
+<text x="57" y="524" textLength="297" fill="#d8e8ee">Body text in the text color, with</text>
+<text x="363" y="524" textLength="54" fill="#5fd3c0">a link</text>
+<text x="426" y="524" textLength="27" fill="#d8e8ee">and</text>
+<text x="543" y="524" textLength="9" fill="#dcdfe4">}</text>
+<text x="57" y="542" textLength="99" fill="#5fd3c0">another one</text>
+<text x="156" y="542" textLength="324" fill="#d8e8ee">. Point at a link to see it hovered;</text>
+<text x="57" y="560" textLength="360" fill="#d8e8ee">Tab to the text and Right to select one.</text>
+<text x="543" y="560" textLength="207" fill="#dcdfe4">button { text &quot;acent&quot; }</text>
+<text x="543" y="578" textLength="72" class="b" fill="#e06c75">Line 52:</text>
+<text x="624" y="578" textLength="360" fill="#dcdfe4">button.text must be a color, got 'acent'</text>
+<text x="75" y="596" textLength="99" class="b" fill="#8fb3c2">Boxes (box)</text>
+<text x="543" y="596" textLength="315" fill="#dcdfe4">(unrecognized color string 'acent')</text>
+<text x="39" y="632" textLength="522" fill="#dcdfe4">Text mode: the file as it is; the preview follows your typ</text>
+<text x="565.5" y="632" text-anchor="middle" fill="#dcdfe4">…</text>
+<text x="588" y="632" textLength="63" fill="#e06c75">1 error</text>
+<text x="669" y="632" textLength="72" fill="#61afef">modified</text>
+<text x="759" y="632" textLength="171" fill="#dcdfe4">Ln 52, Col 24  Text</text>
+<text x="948" y="632" textLength="63" fill="#787e8a">F1 keys</text>
+</g>
+<g shape-rendering="crispEdges">
+<rect x="39" y="75" width="9" height="1" fill="#dcdfe4"/>
+<rect x="93" y="75" width="9" height="1" fill="#dcdfe4"/>
+<rect x="147" y="75" width="9" height="1" fill="#dcdfe4"/>
+<rect x="201" y="75" width="9" height="1" fill="#dcdfe4"/>
+<rect x="264" y="75" width="9" height="1" fill="#dcdfe4"/>
+<rect x="363" y="525" width="54" height="1" fill="#5fd3c0"/>
+<rect x="57" y="543" width="99" height="1" fill="#5fd3c0"/>
+</g>
+</svg>

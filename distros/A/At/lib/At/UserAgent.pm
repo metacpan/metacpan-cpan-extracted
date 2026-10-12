@@ -10,7 +10,7 @@ use Crypt::PRNG;
 use experimental 'try';
 use feature 'class';
 no warnings 'experimental::class';
-class At::UserAgent v1.7.0 {
+class At::UserAgent v1.8.0 {
     field $accessJwt  : reader : param = undef;
     field $refreshJwt : reader : param = undef;
     field $token_type : reader : param = 'Bearer';
@@ -83,7 +83,32 @@ class At::UserAgent v1.7.0 {
         my $res
             = $agent->get( $url . ( defined $req->{content} && keys %{ $req->{content} } ? '?' . $agent->www_form_urlencode( $req->{content} ) : '' ),
             { defined $req->{headers} ? ( headers => $req->{headers} ) : () } );
+        if ( $res->{headers} ) {
+            my $nonce;
+            foreach my $k ( keys %{ $res->{headers} } ) {
+                if ( lc($k) eq 'dpop-nonce' ) { $nonce = $res->{headers}{$k}; last; }
+            }
+            $self->dpop_nonce($nonce) if defined $nonce && $nonce ne '';
+        }
         $res->{content} = JSON::PP::decode_json( $res->{content} ) if $res->{content} && ( $res->{headers}{'content-type'} // '' ) =~ m[json];
+        unless ( $res->{success} ) {
+            my $body = $res->{content};
+            if ( ( $res->{status} == 401 || $res->{status} == 400 ) &&
+                !ref $body &&
+                $body =~ /use_dpop_nonce|dpop_nonce|required nonce|nonce in dpop|DPoP.*nonce/i ) {
+                my $retry_headers = { %{ $req->{headers} // {} } };
+                $retry_headers->{DPoP} = $self->_generate_dpop_proof( $url, 'GET', $req->{skip_ath} ) if $self->token_type eq 'DPoP';
+                $res
+                    = $agent->get(
+                    $url . ( defined $req->{content} && keys %{ $req->{content} } ? '?' . $agent->www_form_urlencode( $req->{content} ) : '' ),
+                    { headers => $retry_headers } );
+                if ( $res->{headers} ) {
+                    my $nonce = $res->{headers}{'dpop-nonce'} || $res->{headers}{'DPoP-Nonce'} || $res->{headers}{'dpop_nonce'};
+                    $self->dpop_nonce($nonce) if defined $nonce && $nonce ne '';
+                }
+                $res->{content} = JSON::PP::decode_json( $res->{content} ) if $res->{content} && ( $res->{headers}{'content-type'} // '' ) =~ m[json];
+            }
+        }
         unless ( $res->{success} ) {
             my $msg = $res->{reason} // 'Unknown error';
             if ( ref $res->{content} eq 'HASH' ) {
@@ -122,7 +147,30 @@ class At::UserAgent v1.7.0 {
         }
         my $res = $agent->post( $url,
             { defined $req->{headers} ? ( headers => $req->{headers} ) : (), defined $content ? ( content => $content ) : () } );
+        if ( $res->{headers} ) {
+            my $nonce;
+            foreach my $k ( keys %{ $res->{headers} } ) {
+                if ( lc($k) eq 'dpop-nonce' ) { $nonce = $res->{headers}{$k}; last; }
+            }
+            $self->dpop_nonce($nonce) if defined $nonce && $nonce ne '';
+        }
         $res->{content} = JSON::PP::decode_json( $res->{content} ) if $res->{content} && ( $res->{headers}{'content-type'} // '' ) =~ m[json];
+        unless ( $res->{success} ) {
+            my $body = $res->{content};
+            if ( ( $res->{status} == 401 || $res->{status} == 400 ) &&
+                !ref $body &&
+                $body =~ /use_dpop_nonce|dpop_nonce|required nonce|nonce in dpop|DPoP.*nonce/i ) {
+                my $retry_headers = { %{ $req->{headers} // {} } };
+                $retry_headers->{DPoP} = $self->_generate_dpop_proof( $url, 'POST', $req->{skip_ath} ) if $self->token_type eq 'DPoP';
+                my $retry_content = $content;
+                $res = $agent->post( $url, { headers => $retry_headers, defined $retry_content ? ( content => $retry_content ) : () } );
+                if ( $res->{headers} ) {
+                    my $nonce = $res->{headers}{'dpop-nonce'} || $res->{headers}{'DPoP-Nonce'} || $res->{headers}{'dpop_nonce'};
+                    $self->dpop_nonce($nonce) if defined $nonce && $nonce ne '';
+                }
+                $res->{content} = JSON::PP::decode_json( $res->{content} ) if $res->{content} && ( $res->{headers}{'content-type'} // '' ) =~ m[json];
+            }
+        }
         unless ( $res->{success} ) {
             my $msg = $res->{reason} // 'Unknown error';
             if ( ref $res->{content} eq 'HASH' ) {
@@ -175,7 +223,7 @@ class At::UserAgent v1.7.0 {
         }
         if ( $res->code == 401 || $res->code == 400 ) {
             my $body = $res->body // '';
-            if ( $body =~ /use_dpop_nonce/i ) {
+            if ( $body =~ /use_dpop_nonce|dpop_nonce|required nonce|nonce in dpop/i ) {
                 say "[DEBUG] [At] Retrying with fresh DPoP nonce..."                            if $ENV{DEBUG};
                 $headers->{DPoP} = $self->_generate_dpop_proof( $url, 'GET', $req->{skip_ath} ) if $self->token_type eq 'DPoP';
                 if ( $ENV{DEBUG} ) {
@@ -242,7 +290,7 @@ class At::UserAgent v1.7.0 {
         }
         if ( $res->code == 401 || $res->code == 400 ) {
             my $body = $res->body // '';
-            if ( $body =~ /use_dpop_nonce/i ) {
+            if ( $body =~ /use_dpop_nonce|dpop_nonce|required nonce|nonce in dpop/i ) {
                 say "[DEBUG] [At] Retrying with fresh DPoP nonce..."                             if $ENV{DEBUG};
                 $headers->{DPoP} = $self->_generate_dpop_proof( $url, 'POST', $req->{skip_ath} ) if $self->token_type eq 'DPoP';
                 if ( $ENV{DEBUG} ) {

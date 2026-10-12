@@ -7,7 +7,7 @@ use Object::Proto::Sugar -types;
 
 use Game::Schnapsen::Card ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 has cards => (is => 'rw', isa => ArrayRef);
 
@@ -56,7 +56,7 @@ Game::Schnapsen::Hand - one player's cards
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

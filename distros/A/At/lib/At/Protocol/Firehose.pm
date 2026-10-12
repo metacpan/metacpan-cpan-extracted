@@ -2,7 +2,7 @@ use v5.42;
 use feature 'class';
 use experimental 'try';
 no warnings 'experimental::class';
-class At::Protocol::Firehose v1.7.0 {
+class At::Protocol::Firehose v1.8.0 {
     use At::Error;
     use Codec::CBOR;
     field $at       : param;

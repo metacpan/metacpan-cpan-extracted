@@ -27,7 +27,9 @@ enum {
     PCX_MATCH   = 6,
     PCX_UA      = 7,  /* memoised $c->ua; the agent itself lives on the app */
     PCX_REQID   = 8,  /* Punk::Plugin::RequestId's id, when it is loaded     */
-    PCX_AFTER_RES = 9 /* $c->after_response's queue, vivified on first use   */
+    PCX_AFTER_RES = 9, /* $c->after_response's queue, vivified on first use  */
+    PCX_CANON   = 10  /* set when the route's body is hashed for an ETag:
+                         JSON is then encoded with its keys in order      */
 };
 
 static AV *pcx_av(pTHX_ SV *self) {
@@ -40,6 +42,21 @@ static AV *pcx_av(pTHX_ SV *self) {
 static SV *pcx_get(pTHX_ AV *av, I32 slot) {
     SV **e = av_fetch(av, slot, 0);
     return (e && *e && SvOK(*e)) ? *e : NULL;
+}
+
+/* JSON for a response body (+1). Keys in hash order, which is whatever this
+ * process happens to hold - unless the route's body is about to be hashed
+ * into an ETag, where an order that differs between workers, hosts and
+ * restarts is a validator that never matches. */
+static SV *pcx_json(pTHX_ AV *av, SV *data) {
+    SV *canon = pcx_get(aTHX_ av, PCX_CANON);
+    if (canon && SvTRUE(canon)) {
+        frj_opts o;
+        Zero(&o, 1, frj_opts);
+        o.canonical = 1;
+        return punk_frj(aTHX)->encode(aTHX_ data, &o);
+    }
+    return punk_frj(aTHX)->encode(aTHX_ data, NULL);
 }
 
 /* the Punk::Response AV at PCX_RES (its slots are the PS_* from
@@ -289,7 +306,7 @@ static SV *punk_coerce(pTHX_ SV *c, SV *ret) {
     {
         AV *res   = pcx_res_av(aTHX_ pcx_av(aTHX_ c));
         IV  st    = pcx_res_status(aTHX_ res);
-        SV *bytes = punk_frj(aTHX)->encode(aTHX_ ret, NULL);
+        SV *bytes = pcx_json(aTHX_ pcx_av(aTHX_ c), ret);
         if (!st) st = 200;
         return punk_triplet(aTHX_ st,
                    sv_2mortal(newSVpvs("application/json")),

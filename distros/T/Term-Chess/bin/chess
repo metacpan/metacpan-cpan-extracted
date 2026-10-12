@@ -1,0 +1,40 @@
+#!/usr/bin/env perl
+use 5.014;
+use strict;
+use warnings;
+
+use Term::Chess;
+
+our $VERSION = '0.01';
+
+exit Term::Chess->run(@ARGV);
+
+__END__
+
+=head1 NAME
+
+chess - chess on a terminal, against a bot
+
+=head1 SYNOPSIS
+
+    chess                        # play the bot from the opening
+    chess --level 0 --ascii      # the weakest rung, the FEN letters
+    chess --seat p2              # play Black
+    chess --fen 'FEN' --no-pick  # a position, typed moves
+
+=head1 DESCRIPTION
+
+A front end and nothing else: every decision it makes is an option, and the
+board, the picker and the typed prompt live in L<Term::Chess>. The rules are
+L<Chess::Plisco>'s and the opponent is Plisco's own search, bounded in nodes.
+
+C<--level> takes either a rung index into C<@Term::Chess::Bot::LADDER> or a
+node budget outright, and tells them apart by size. Left out, the game's seed
+draws a rung.
+
+=head1 EXIT STATUS
+
+C<0> if you won, the game drew, or you quit; C<1> if you lost; C<2> for a bad
+option or a refused value.
+
+=cut

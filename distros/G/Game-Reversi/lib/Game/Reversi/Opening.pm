@@ -7,7 +7,7 @@ use Game::Reversi::Board;
 use Game::Reversi::Move;
 use Game::Reversi::Error;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our @CENTRE;
 BEGIN {
@@ -99,7 +99,7 @@ Game::Reversi::Opening - the four discs the players place themselves
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

@@ -12,7 +12,7 @@ use Game::Durak::Error ();
 use Game::Durak::Rules qw(cap_for legal_attacks legal_beats forced closes);
 use Game::Durak::Result qw(out_seats result_for resign_for);
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 has seed       => (is => 'ro', isa => Str);
 has number     => (is => 'ro', isa => Int);
@@ -529,7 +529,7 @@ Game::Durak - Podkidnoy Durak, the Russian beating game
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

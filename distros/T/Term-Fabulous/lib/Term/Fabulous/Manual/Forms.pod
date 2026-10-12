@@ -1,0 +1,1189 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Term::Fabulous::Manual::Forms - Forms and input widgets
+
+=head1 DESCRIPTION
+
+This page is part of L<Term::Fabulous::Manual>. Previous page: L<Term::Fabulous::Manual::Events>. Next page: L<Term::Fabulous::Manual::Feedback>.
+
+This page is the guide to the input widgets: text fields, text areas,
+checkboxes, radio buttons, dropdowns, sliders, star ratings, segmented
+controls and the color picker. It first describes what all inputs have
+in common (value, C<Change> event, id, focus, disabled and read-only
+inputs, the visual states, size and checking input), then shows each
+input widget with a short example and a picture, explains how the text
+inputs are edited (keys, selection, clipboard, undo), and ends with
+complete forms: reading all values and building a form from a KDL
+layout file. The reference of each widget is on its class page;
+complete programs are in L<Term::Fabulous::Cookbook::Forms>.
+
+The page assumes you know how to build a widget tree
+(L<Term::Fabulous::Manual::Layout/WIDGETS AND THE WIDGET TREE>) and how
+listeners work (L<Term::Fabulous::Manual::Events/EVENTS>).
+
+=over
+
+=item *
+
+L</FORMS AND INPUT WIDGETS>: the widgets and what they share
+
+=item *
+
+L</THE INPUT WIDGETS ONE BY ONE>: text fields, password fields, text
+areas, checkboxes, radio buttons, dropdowns, sliders, star ratings,
+segmented controls, color pickers
+
+=item *
+
+L</EDITING TEXT>: keys, selection, clipboard, undo, editing from the
+program
+
+=item *
+
+L</KEYS OF THE INPUT WIDGETS>: all keys at a glance
+
+=item *
+
+L</COMPLETE FORMS>: a small form, reading all values, a form in KDL
+
+=back
+
+=head1 FORMS AND INPUT WIDGETS
+
+A form is a box with input widgets in it. Term::Fabulous has no form
+widget of its own: any L<Term::Fabulous::Widget::Box> holds inputs, and
+because the events of the inputs bubble up to it, one listener on the
+box sees every change.
+
+=head2 The input widgets
+
+=over
+
+=item L<Term::Fabulous::Widget::TextField>
+
+One line of text, optionally masked for passwords. Fires C<Submit> on
+C<Enter>. See L</Text fields>.
+
+=item L<Term::Fabulous::Widget::TextArea>
+
+Several lines of text, wrapped or scrolled sideways, with a scrollbar.
+See L</Text areas>.
+
+=item L<Term::Fabulous::Widget::Checkbox>
+
+On or off, with an optional "indeterminate" third look. See
+L</Checkboxes>.
+
+=item L<Term::Fabulous::Widget::RadioGroup> and L<Term::Fabulous::Widget::RadioButton>
+
+One choice of several, all visible. See L</Radio buttons>.
+
+=item L<Term::Fabulous::Widget::Dropdown>
+
+One choice of several, from a list that opens over the other widgets.
+See L</Dropdowns>.
+
+=item L<Term::Fabulous::Widget::Slider>
+
+A number from a range. See L</Sliders>.
+
+=item L<Term::Fabulous::Widget::StarRating>
+
+A number of stars, whole or half, editable or read-only. See
+L</Star ratings>.
+
+=item L<Term::Fabulous::Widget::SegmentedControl>
+
+One choice of a few, shown side by side as one bar. See
+L</Segmented controls>.
+
+=item L<Term::Fabulous::Widget::ColorPicker>
+
+A color, typed, set with sliders or picked from a list of named
+swatches. See L</Color pickers>.
+
+=back
+
+F<examples/form.pl> uses all of them in one form. The picture shows it
+after the user typed a name and a note, chose a color and started an
+e-mail address; the status line at the bottom shows the last C<Change>
+or, as here, what is wrong with a value (see L</Checking input>).
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-form.svg" alt="A form with name, password, notes, color, size, volume, newsletter, terms, e-mail and port; the e-mail field holds ada@ in red and the status line says email: Please enter an e-mail address."></p>
+
+=end html
+
+All input widgets except the radio group and the color picker are
+subclasses of
+L<Term::Fabulous::Widget::Input>, whose page describes the shared
+parameters and methods in full. The text field and the text area share
+a second base class, L<Term::Fabulous::Widget::TextInput>, with the
+editing keys, the placeholder and C<read_only>. A radio group is a box
+that holds radio buttons; it takes the focus and holds the value for
+all of them. A color picker is a box built from a text field, a
+switch, sliders and a table; its parts take the focus, and the picker
+holds the value.
+
+=head2 Values
+
+Every input has a C<value> method that reads its current value:
+
+=over
+
+=item *
+
+a text field or text area: its text, a character string (see
+L<Term::Fabulous::Manual::Looks/Text is character strings>);
+
+=item *
+
+a checkbox: 1 (checked) or 0;
+
+=item *
+
+a radio group: the value of the selected button, or C<undef>;
+
+=item *
+
+a dropdown: the value of the selected option, or C<undef>;
+
+=item *
+
+a slider: a number.
+
+=back
+
+To set the value from your program, call C<value> with an argument on a
+text field, text area, radio group, dropdown or slider, and C<checked>
+on a checkbox (a checkbox's C<value> is read only). A radio button's
+C<value> is different: it is the value the button gives its group when
+it is selected, and writing it does not select the button.
+
+	$name->value('Ada Lovelace');
+	$terms->checked(1);
+	$size->value('l');           # a radio group: selects the button with the value 'l'
+	$color->value('navy');       # a dropdown: selects the option with the value 'navy'
+	$volume->value(75);
+
+Setting a value from the program never fires C<Change>. Three methods
+act like the user instead and do fire it: C<< $checkbox->toggle >>,
+C<< $group->choose($button) >> and C<< $dropdown->choose($index) >>.
+
+=head2 The Change and Submit events
+
+An input fires a L<Term::Fabulous::Event::Change> when the user changes
+its value. C<< $event->value >> is the new value and
+C<< $event->target >> the input that changed. A radio group fires it on
+the group, not on the button.
+
+	use Clay::UI::Enum::Result;
+
+	$volume->on(
+		Change => sub ($event) {
+			say 'Volume: ', $event->value;
+			return Clay::UI::Enum::Result->CONTINUE;
+		}
+	);
+
+C<Change> bubbles to the ancestors of the input, unless a listener on
+the way stops it (see
+L<Term::Fabulous::Manual::Events/Return values and bubbling>), so one
+listener on the form box sees the changes of all inputs inside it. Tell
+the inputs apart by their id:
+
+	$form->on(
+		Change => sub ($event) {
+			$status->text( $event->target->id . ' is now ' . ( $event->value // 'nothing' ) );
+			return;
+		}
+	);
+
+A text field also fires a L<Term::Fabulous::Event::Submit> when the
+user presses C<Enter>, with the text as C<< $event->value >>. A text
+area uses C<Enter> for a new line and fires no C<Submit>. To react to
+C<Enter> in other inputs, listen for C<KeyPress> on the form (see
+L<Term::Fabulous::Manual::Events/Application shortcuts>).
+
+=head2 Ids
+
+Give every input an C<id> (C<< id => 'email' >> in Perl,
+C<TextField "email"> in KDL). The id identifies the input in a form-wide
+listener (C<< $event->target->id >>), and
+L<find_by_id|Term::Fabulous::Widget/find_by_id> finds it in the tree, which is how
+a program gets hold of the inputs of a form built from a layout file.
+Ids must be unique within a widget tree (see
+L<Term::Fabulous::Manual::Layout/Widget ids>).
+
+=head2 Focus
+
+The input that has the I<focus> (see
+L<Term::Fabulous::Manual::Glossary/focus>) receives the key presses.
+C<Tab> moves the focus to the next input, C<Shift+Tab> (C<BackTab>) to
+the previous one, and a click on an input focuses it. A radio group is
+one focus stop for all its buttons. To put the cursor into the first
+field when the program starts:
+
+	$ui->interaction->set_focused_widget($name);
+
+The focused input shows it: its content is painted on its
+C<focus_background_color>, and a text input shows a block cursor. Keys
+an input does not use, such as C<Tab>, C<Escape> and the function keys,
+bubble on to its ancestors, so application shortcuts keep working while
+the user types. The L<focus section|Term::Fabulous::Manual::Events/FOCUS> of the events
+page describes the focus order, C<can_focus> and how to change the
+order.
+
+=head2 Disabled inputs
+
+C<disabled> greys an input out: it is painted in its C<disabled_color>,
+ignores keys, clicks and the mouse wheel, and cannot take the focus, so
+C<Tab> skips it. An input that has the focus loses it when it is
+disabled. Buttons and radio groups have C<disabled> too; a radio
+button counts as disabled while its group is.
+
+	my $password = Term::Fabulous::Widget::TextField->new( id => 'password', mask => '*', disabled => 1 );
+
+	$terms->on(
+		Change => sub ($event) {
+			$password->disabled( !$event->value );    # enabled while the box is checked
+			return;
+		}
+	);
+
+The program can still set the value of a disabled input. See
+L<Term::Fabulous::Widget::Input/disabled> and the recipe
+L<Disable inputs until a checkbox is checked|Term::Fabulous::Cookbook::Forms/Disable inputs until a checkbox is checked>.
+
+=head2 Read-only text
+
+A text field or text area with C<< read_only => 1 >> keeps its normal
+look and can take the focus; the user can move the cursor, select and
+copy, but not change the text. Use it for text the user should be able
+to copy, such as a generated key or a log; use C<disabled> when the
+input should look unavailable. See
+L<Term::Fabulous::Widget::TextInput/read_only>.
+
+=head2 Visual states
+
+The inputs show their state themselves; you choose the colors:
+
+=over
+
+=item *
+
+B<Focused>: the content on C<focus_background_color>. A text input
+shows the cursor as a block (the character under it in reverse video),
+a slider paints its thumb in C<text_color>, and a radio group highlights
+the button the keyboard is on.
+
+=item *
+
+B<Disabled>: everything in C<disabled_color>.
+
+=item *
+
+B<Invalid>: while the value is empty but C<required>, or rejected by
+the C<validator>, the text is drawn in C<invalid_color> and the
+border, where there is one, in the theme's C<danger> color (a red in
+the built-in themes). An empty text field or dropdown has no text to
+color and keeps its gray placeholder. A disabled input shows the
+disabled look instead. See L</Checking input>.
+
+=item *
+
+B<Placeholder>: an empty text input, or a dropdown without a selection,
+shows its C<placeholder> in C<placeholder_color>.
+
+=item *
+
+B<Masked>: a text field with a C<mask> shows the mask character for
+every character of the text.
+
+=item *
+
+B<Selected text>: selected text in a text input is painted on
+C<selection_color>.
+
+=item *
+
+B<Checked, selected, open>: check marks, the selected radio button, the
+filled part of a slider, the dropdown's arrow and the border of its
+open list are painted in C<accent_color>.
+
+=back
+
+The colors are parameters and accessors of every input (C<text_color>,
+C<disabled_color>, C<invalid_color>, C<accent_color>,
+C<focus_background_color>, see
+L<Term::Fabulous::Widget::Input/CONSTRUCTOR>) and of some inputs only
+(C<placeholder_color>, C<selection_color>, C<track_color>,
+C<list_background_color>, C<highlight_text_color>). They take every
+L<color format|Term::Fabulous::Manual::Looks/Color formats>. The
+pictures in L</THE INPUT WIDGETS ONE BY ONE> show each widget in its
+states.
+
+Your program can ask for the state too: C<< $input->is_focused >>,
+C<< $input->is_enabled >>, C<< $input->is_valid >>, or
+C<< $input->has_state('focused') >> with the state names C<focused>,
+C<hovered>, C<pressed> and C<disabled> (see
+L<Term::Fabulous::Widget/has_state>; C<invalid> is not a widget state,
+ask C<is_valid>).
+
+=head2 Size
+
+Without a C<sizing> rule in its C<layout>, an input is exactly as big
+as its content: a text field is C<preferred_columns> wide (default 20)
+and one row high, a text area C<preferred_columns> by C<preferred_rows>
+(40 by 5), a checkbox or radio button as wide as its mark and label, a
+dropdown as wide as its longest label plus the arrow, a slider
+C<preferred_columns> plus its value label. A sizing rule in the
+C<layout> wins:
+
+	use Clay::XS qw(sizing_grow sizing_fixed);
+
+	# A text field that fills the width of its row:
+	Term::Fabulous::Widget::TextField->new( layout => { sizing => { width => sizing_grow() } } );
+
+	# A text area as wide as its parent and eight rows high:
+	Term::Fabulous::Widget::TextArea->new( layout => { sizing => { width => sizing_grow(), height => sizing_fixed(8) } } );
+
+To line up the labels of a form, put each label into a box of the same
+width group (see L<Term::Fabulous::Manual::Layout/Equal sizes across the tree>),
+as F<examples/kdl-form.pl> does. The L<size section|Term::Fabulous::Widget::Input/SIZE> of
+L<Term::Fabulous::Widget::Input> explains how to line up inputs of
+different natural widths.
+
+=head2 Checking input
+
+Two things keep input in shape. A text input can restrict what the
+user may type at all, with C<accept>; and every input can say whether
+its value is acceptable, with C<required> and C<validator>. They are
+separate on purpose: C<accept> is an editing rule, applied as the user
+types and pastes, C<validator> is a rule about the whole value.
+
+B<Restricting characters.> C<accept> takes the body of a character
+class (C<'0-9'>, C<'a-zA-Z '>, C<'^0-9'> for everything but digits), a
+regular expression every character must match (C<qr/\p{L}/>) or a
+code reference; see L<Term::Fabulous::Widget::TextInput/accept> for
+the details. A key the spec rejects
+does nothing; pasted text keeps its accepted characters and drops the
+rest, so pasting C<+49 170 1234> into a digits-only field inserts the
+digits. Setting C<value> from the program to a text with a rejected
+character dies: the restriction is for the user.
+
+	my $zip = Term::Fabulous::Widget::TextField->new( id => 'zip', accept => '0-9', max_length => 5 );
+
+B<Checking the value.> C<required =E<gt> 1> makes an empty value
+invalid: empty text, a dropdown without a selection, an unchecked
+checkbox. C<validator> checks a non-empty value: the name of a built-in
+validator (C<email>, C<integer>, C<number>, C<url>, C<hostname>,
+C<ip>, C<date>, C<time>), a regular expression the whole value must
+match, a code reference that returns what is wrong with the value (or
+nothing), a list of those, or a L<Term::Fabulous::Validator> object
+when a validator takes options. An empty value that is not required
+is always fine; the validator never sees it.
+
+	use Term::Fabulous::Validator;
+
+	my $name  = Term::Fabulous::Widget::TextField->new( id => 'name',  required  => 1 );
+	my $email = Term::Fabulous::Widget::TextField->new( id => 'email', validator => 'email', placeholder => 'name@example.com' );
+	my $port  = Term::Fabulous::Widget::TextField->new( id => 'port',  validator => Term::Fabulous::Validator->integer( min => 1, max => 65535 ) );
+	my $code  = Term::Fabulous::Widget::TextField->new( id => 'code',  validator => qr/\A[A-Z]{3}\z/ );
+	my $even  = Term::Fabulous::Widget::TextField->new( id => 'even',  validator => sub ($value) { $value % 2 ? 'Please enter an even number.' : undef } );
+	my $terms = Term::Fabulous::Widget::Checkbox->new( id => 'terms', label => 'I accept the terms', required => 1 );
+
+The validators that know their characters also restrict typing:
+C<integer> lets the user type digits and a minus sign only, unless the
+field has an C<accept> of its own.
+
+B<What the user sees.> An input whose value is invalid shows the
+invalid look at once, while the user types, not only when the user
+leaves the field: its text in C<invalid_color> and its border, where it
+has one, in the theme's C<danger> color. An empty text field or
+dropdown has no text to color and keeps its gray placeholder, so an
+empty required field looks invalid only when it has a border, which
+turns red. The picture shows every case (see
+L<Term::Fabulous::Widget::Input/Invalid values>):
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-input-validation.svg" alt="Eleven inputs: a focused e-mail field with ada@exa in red, a valid address in white, ada@ in red without and with a red border, an empty required field that looks normal and one whose border is red, a red unchecked check box, a dropdown showing its gray placeholder, ada@ in purple, ada@ in yellow with a yellow border, and a disabled field in gray"></p>
+
+=end html
+
+The input does not show the message; the message is yours to place.
+C<< $input->error >> is the message right now (C<undef> when
+the value is fine), C<< $input->is_valid >> the same as a boolean, and
+the input fires L<Term::Fabulous::Event::ValidityChange> after every
+C<Change> whose message differs from the last one reported:
+
+	use Term::Fabulous::Widget::Text;
+
+	my $hint = Term::Fabulous::Widget::Text->new( text => ' ', text_color => '#e06c75' );
+	$form->on(
+		ValidityChange => sub ($event) {
+			$hint->text( $event->error // ' ' );
+			return;
+		}
+	);
+
+B<Checking a whole form.> When the user submits, ask the form:
+C<< $form->invalid_inputs >> lists the inputs below a widget that are
+not valid, in layout order, so a C<Submit> listener (or a button) can
+stop and move the focus to the first one:
+
+	$form->on(
+		Submit => sub ($event) {
+			if ( my @invalid = $form->invalid_inputs ) {
+				$hint->text( $invalid[0]->error );
+				$ui->interaction->set_focused_widget( $invalid[0] );
+				return;
+			}
+			save( form_values($form) );
+			return;
+		}
+	);
+
+Setting a value from the program fires no C<ValidityChange>, as it
+fires no C<Change>; call C<< $input->validate >> to report it, or
+C<< $_->validate foreach $form->invalid_inputs >> once after building
+a form to show its initial state. The messages are in English by
+default; give your own with C<required_message> and the C<message>
+option of every validator (L<Term::Fabulous::Validator/CONSTRUCTORS>).
+
+The recipe
+L<A login form|Term::Fabulous::Cookbook::Forms/A login form (centered dialog, masked password)>
+checks a whole form this way when the user presses C<Enter>.
+L<Check the values of a form|Term::Fabulous::Cookbook::Forms/Check the values of a form (required, validator)>
+uses every built-in validator and shows each message next to its
+field, and
+L<Write your own checks and restrict typing|Term::Fabulous::Cookbook::Forms/Write your own checks and restrict typing (accept, pattern, code)>
+shows C<accept>, patterns, code and lists of validators.
+
+=head1 THE INPUT WIDGETS ONE BY ONE
+
+Every picture below comes from a program in F<examples/widgets/>, which
+shows the widget in its states; run it to try the keys. The class page
+of each widget is the reference: all parameters, methods, keys, mouse
+actions, events and KDL properties.
+
+=head2 Text fields
+
+A L<Term::Fabulous::Widget::TextField> holds one line of text. It
+scrolls sideways when the text is wider than the field, shows a
+C<placeholder> while it is empty, limits the text to C<max_length>
+characters if you set one, and fires C<Submit> on C<Enter>.
+
+	use Term::Fabulous::Widget::TextField;
+
+	my $name = Term::Fabulous::Widget::TextField->new(
+		id                => 'name',
+		placeholder       => 'Your name',
+		max_length        => 40,
+		preferred_columns => 30,
+	);
+	$name->on(
+		Submit => sub ($event) {
+			say 'Hello, ', $event->value;
+			return;
+		}
+	);
+
+The picture shows a focused field in which C<Lovelace> is selected, an
+empty field with a placeholder, a masked password and a disabled field
+(F<examples/widgets/text-field.pl>):
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-text-field.svg" alt="Four text fields: a focused field with Ada Lovelace typed and Lovelace selected, a placeholder, a masked password and a disabled field"></p>
+
+=end html
+
+In KDL:
+
+=for highlighter language=kdl
+
+	TextField "name" {
+		placeholder "Your name"
+		max_length 40
+		preferred_columns 30
+	}
+
+=head2 Password fields
+
+A text field with a C<mask> shows every character as the mask
+character. C<value> and the events still give the real text. A masked
+text cannot be copied or cut, and the word keys and the double click
+act on the whole text, so they do not reveal where its spaces are.
+
+=for highlighter language=perl
+
+	my $password = Term::Fabulous::Widget::TextField->new( id => 'password', mask => '*' );
+
+	$password->mask(undef);    # show the text, for example while a "Show password" box is checked
+
+In KDL: C<TextField "password" { mask "*"; }>. See
+L<Term::Fabulous::Widget::TextField/mask>.
+
+=head2 Text areas
+
+A L<Term::Fabulous::Widget::TextArea> holds several lines of text.
+C<Enter> starts a new line. Long lines wrap at spaces (or, with
+C<< wrap => 0 >>, the view scrolls sideways), and a scrollbar shows the
+position while the text has more rows than the area.
+
+	use Clay::XS qw(sizing_grow sizing_fixed);
+	use Term::Fabulous::Widget::TextArea;
+
+	my $notes = Term::Fabulous::Widget::TextArea->new(
+		id          => 'notes',
+		placeholder => 'Anything else?',
+		layout      => { sizing => { width => sizing_grow(), height => sizing_fixed(6) } },
+	);
+
+	my @lines = split /\n/, $notes->value, -1;
+
+The picture shows a focused text area with a wrapped line and a
+scrollbar (F<examples/widgets/text-area.pl>):
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-text-area.svg" alt="A text area with a shopping list, a wrapped long line and a scrollbar"></p>
+
+=end html
+
+In KDL:
+
+=for highlighter language=kdl
+
+	TextArea "notes" {
+		placeholder "Anything else?"
+		sizing width=grow height="fixed(6)"
+	}
+
+=head2 Checkboxes
+
+A L<Term::Fabulous::Widget::Checkbox> is on or off. C<Space>,
+C<Enter> or a click toggles it. Its C<value> is 1 or 0, and you set it
+with C<checked>. A checkbox can also be I<indeterminate>, a third look
+for a box that stands for a group of boxes of which only some are
+checked.
+
+=for highlighter language=perl
+
+	use Term::Fabulous::Widget::Checkbox;
+
+	my $news = Term::Fabulous::Widget::Checkbox->new(
+		id      => 'newsletter',
+		label   => 'Send me the newsletter',
+		checked => 1,
+	);
+	say $news->checked ? 'subscribed' : 'not subscribed';
+
+The picture shows a focused, an unchecked, a checked, an indeterminate
+and a disabled checkbox (F<examples/widgets/checkbox.pl>):
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-checkbox.svg" alt="Five check boxes: focused, unchecked, checked, indeterminate and disabled"></p>
+
+=end html
+
+In KDL:
+
+=for highlighter language=kdl
+
+	Checkbox "newsletter" {
+		label "Send me the newsletter"
+		checked #true
+	}
+
+=head2 Radio buttons
+
+A L<Term::Fabulous::Widget::RadioGroup> lets the user choose one of
+several L<Term::Fabulous::Widget::RadioButton>s, all visible at once.
+The buttons are children of the group (or deeper inside it, for example
+in a box). The group holds the value, takes the focus for all its
+buttons and fires C<Change>; the arrow keys move the selection, and a
+click selects a button. The buttons are laid out from top to bottom
+unless the group's C<layout> says otherwise.
+
+=for highlighter language=perl
+
+	use Clay::XS qw(CLAY_LEFT_TO_RIGHT);
+	use Term::Fabulous::Widget::RadioGroup;
+	use Term::Fabulous::Widget::RadioButton;
+
+	my $size = Term::Fabulous::Widget::RadioGroup->new(
+		id     => 'size',
+		value  => 'm',
+		layout => { layout_direction => CLAY_LEFT_TO_RIGHT, child_gap => 2 },
+	);
+	$size->add_child( Term::Fabulous::Widget::RadioButton->new( label => $_->[0], value => $_->[1] ) )
+		foreach [ Small => 's' ], [ Medium => 'm' ], [ Large => 'l' ];
+
+A button without a C<value> stands for its label. The picture shows a
+focused group in a row, a group in a column and a disabled group
+(F<examples/widgets/radio.pl>):
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-radio.svg" alt="Radio buttons in a row with Medium chosen, in a column with Express shipping chosen, and a disabled group"></p>
+
+=end html
+
+In KDL:
+
+=for highlighter language=kdl
+
+	RadioGroup "size" {
+		value "m"
+		layout direction=right gap=2
+		RadioButton { label "Small"; value "s"; }
+		RadioButton { label "Medium"; value "m"; }
+		RadioButton { label "Large"; value "l"; }
+	}
+
+=head2 Dropdowns
+
+A L<Term::Fabulous::Widget::Dropdown> shows the selected option and
+opens a list of all options on C<Enter>, C<Space>, C<Alt+Down>, C<F4> or
+a click. The list floats over the other widgets, below the dropdown, or
+above it when it does not fit below and there is more room above. Every option has a label (what
+the user sees) and a value (what C<value> and C<Change> give); an option
+given as a plain string is both. An option can be disabled
+(C<< { label => 'Archive', disabled => 1 } >>): it is shown greyed out
+and the user cannot choose it, as in a segmented control. C<Up> and
+C<Down> change the selection without opening the list, and typing the
+first letters of a label jumps to it.
+
+=for highlighter language=perl
+
+	use Term::Fabulous::Widget::Dropdown;
+
+	my $color = Term::Fabulous::Widget::Dropdown->new(
+		id          => 'color',
+		placeholder => 'Pick a color',
+		options     => [ 'Red', 'Green', [ 'Dark blue' => 'navy' ] ],
+	);
+	$color->value('navy');
+	say $color->selected_label;    # Dark blue
+
+The picture shows a dropdown with its placeholder, one with a
+selection, and a focused one with its list open
+(F<examples/widgets/dropdown.pl>):
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-dropdown.svg" alt="Three dropdowns: a placeholder, France selected, and an open list of colors with Blue highlighted"></p>
+
+=end html
+
+In KDL, C<options> adds options whose value is their label, and
+C<option> adds one option with a value of its own:
+
+=for highlighter language=kdl
+
+	Dropdown "color" {
+		placeholder "Pick a color"
+		options "Red" "Green"
+		option "Dark blue" value="navy"
+	}
+
+=head2 Sliders
+
+A L<Term::Fabulous::Widget::Slider> chooses a number between C<min> and
+C<max>, in steps of C<step>. The arrow keys move it by a step, C<PageUp>
+and C<PageDown> by a C<page_step>, C<Home> and C<End> to the ends; the
+mouse clicks, drags and turns the wheel. The value is shown right of the
+track, formatted with C<value_format>.
+
+=for highlighter language=perl
+
+	use Term::Fabulous::Widget::Slider;
+
+	my $volume = Term::Fabulous::Widget::Slider->new(
+		id           => 'volume',
+		min          => 0,
+		max          => 100,
+		step         => 5,
+		value        => 30,
+		value_format => '%d%%',
+	);
+
+The picture shows a focused slider, one that formats its value with a
+code reference, and a disabled one (F<examples/widgets/slider.pl>):
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-slider.svg" alt="Three sliders: focused at 65 percent, a temperature of 21.5 degrees, and a disabled one"></p>
+
+=end html
+
+In KDL:
+
+=for highlighter language=kdl
+
+	Slider "volume" {
+		step 5
+		value 30
+		value_format "%d%%"
+	}
+
+=head2 Star ratings
+
+A L<Term::Fabulous::Widget::StarRating> shows C<max> stars (five by
+default), the first C<value> of them filled, and lets the user choose
+with the arrow keys, the digits, a click on a star or the wheel; while
+the pointer hovers over a star, the stars up to it are previewed. With
+C<half> the value moves in half stars. C<read_only> shows a rating
+without letting the user change it, for lists and cards, and
+C<show_value> adds the value as text.
+
+=for highlighter language=perl
+
+	use Term::Fabulous::Widget::StarRating;
+
+	my $rating = Term::Fabulous::Widget::StarRating->new(
+		id         => 'rating',
+		value      => 3,
+		show_value => 1,
+	);
+
+The picture shows a focused rating, one with half stars, a read-only
+one, one out of ten without gaps and a disabled one
+(F<examples/widgets/star-rating.pl>):
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-star-rating.svg" alt="Star ratings: a focused one with three of five stars, one with half stars and its value, a read-only one, one out of ten with a gap of zero, and a disabled one"></p>
+
+=end html
+
+In KDL:
+
+=for highlighter language=kdl
+
+	StarRating "rating" {
+		value 3
+		show_value #true
+	}
+
+=head2 Segmented controls
+
+A L<Term::Fabulous::Widget::SegmentedControl> shows a few options side
+by side as one bar and highlights the selected one: what a radio group
+does, in one row and without marks. The options are given like a
+dropdown's (a label, C<[ label, value ]> or a hash, which may also
+disable the option). The arrow keys, C<Home>, C<End> and the digits
+choose, so does a click, and the selection changes at once. A
+C<vertical> control stacks the segments, and a control whose C<layout>
+makes it wider than its labels shares the space among the segments.
+
+=for highlighter language=perl
+
+	use Term::Fabulous::Widget::SegmentedControl;
+
+	my $period = Term::Fabulous::Widget::SegmentedControl->new(
+		id      => 'period',
+		options => [ [ Day => 'd' ], [ Week => 'w' ], [ Month => 'm' ] ],
+		value   => 'w',
+	);
+
+The picture shows a focused control, one stretched to the full width,
+one with a disabled segment, a vertical one and a disabled one
+(F<examples/widgets/segmented-control.pl>):
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-segmented-control.svg" alt="Segmented controls: a focused one with Week selected, one stretched to the full width, one with a disabled segment, a vertical one, and a disabled one"></p>
+
+=end html
+
+In KDL:
+
+=for highlighter language=kdl
+
+	SegmentedControl "period" {
+		options "Day" "Week" "Month"
+		value "Week"
+	}
+
+=head2 Color pickers
+
+A L<Term::Fabulous::Widget::ColorPicker> chooses a color in three ways:
+the user types it into a field (C<#rrggbb>, C<rgb(...)>, C<hsl(...)>,
+a color name), moves sliders, or picks a named I<swatch> from a list,
+when the program gives it one. A sample next to the field shows the
+color. The sliders show red, green and blue, or hue, saturation and
+lightness; a segmented control above them switches between the two.
+An alpha slider below them is left out with C<< alpha => 0 >>, which
+also makes the field refuse translucent colors.
+
+=for highlighter language=perl
+
+	use Term::Fabulous::Widget::ColorPicker;
+
+	my $accent = Term::Fabulous::Widget::ColorPicker->new(
+		id       => 'accent',
+		value    => '#61afef',
+		alpha    => 0,
+		swatches => [ [ '#61afef', 'Sky', '#61afef' ], [ '#98c379', 'Mint', '#98c379' ], [ none => 'No color' ] ],
+	);
+
+The value is a string: what the user typed, when it is a color, the
+color of the sliders as C<#rrggbb> (C<#rrggbbaa> with an alpha below
+255), or the value of the chosen swatch. A swatch is C<[ $value,
+$label, $color ]>, and its value need not be a color at all: a theme's
+token name, or C<none> for no color. C<< $picker->rgba >> gives the
+color as numbers, or C<undef> for a value without one.
+
+The picker fires C<Change> when the user changes the value and
+C<Submit> on C<Enter> in the field or on a swatch, both with itself as
+the target. The events of its parts stop inside it, so a listener on a
+form sees only the picker's. It is no L<Term::Fabulous::Widget::Input>,
+but it has C<validate>, C<error> and C<is_valid>, those of its field,
+so it can be a field of a L<Term::Fabulous::Widget::Prompt>: OK then
+keeps the prompt open while the field holds text that is no color, and
+puts the focus on the field (see
+L<Term::Fabulous::Cookbook::Forms/Ask for a color (ColorPicker in a Prompt)>).
+
+The picture shows a picker with swatches, the RGB sliders and the
+alpha slider, and one without swatches and alpha in HSL
+(F<examples/widgets/color-picker.pl>):
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-color-picker.svg" alt="Two color pickers. The upper one has a framed list of named swatches with color samples on the left, Orange selected, an empty field with a sample of the orange next to it, the RGB/HSL switch on RGB and the red, green, blue and alpha sliders at the orange. The lower one has no list and no alpha slider, its field shows #2e8b57 and its sliders show hue, saturation and lightness. Below each picker a line names the chosen value and its channels"></p>
+
+=end html
+
+In KDL, without swatches, which only Perl can give:
+
+=for highlighter language=kdl
+
+	ColorPicker "background" {
+		value "#282c34"
+		alpha #false
+		sliders "hsl"
+	}
+
+=head1 EDITING TEXT
+
+The text field and the text area are edited the same way. What follows is a summary; the reference is the
+L<keys|Term::Fabulous::Widget::TextInput/KEYS> and
+L<mouse|Term::Fabulous::Widget::TextInput/MOUSE> sections of
+L<Term::Fabulous::Widget::TextInput>.
+
+=head2 Editing keys
+
+=over
+
+=item *
+
+Typing inserts at the cursor and replaces the selection.
+
+=item *
+
+C<Left> and C<Right> move by a character, C<Ctrl+Left> and
+C<Ctrl+Right> by a word, C<Home> and C<End> to the start and end of the
+line, C<Ctrl+Home> and C<Ctrl+End> to the start and end of the text. In
+a text area, C<Up>, C<Down>, C<PageUp> and C<PageDown> move by rows.
+
+=item *
+
+C<Backspace> and C<Delete> delete a character, C<Ctrl+W> and
+C<Ctrl+Delete> a word, C<Ctrl+U> and C<Ctrl+K> everything to the start
+or the end of the line.
+
+=item *
+
+In a text field, C<Enter> fires C<Submit>; in a text area, it starts a
+new line.
+
+=back
+
+C<Tab> is never inserted; it moves the focus. The cursor moves by
+I<grapheme clusters> (see L<Term::Fabulous::Manual::Glossary/grapheme cluster>),
+so it never stops inside a character that is made of several code
+points, and wide characters such as CJK take two columns.
+
+=head2 Selecting text
+
+Hold C<Shift> with any movement key to select (C<Shift+Right>,
+C<Ctrl+Shift+Left>, C<Shift+End>, ...), or press C<Ctrl+A> to select
+everything. With the mouse, drag over the text, or double-click a word.
+Selected text is painted on the input's C<selection_color>, as in the
+picture of the text field above. Typing, C<Backspace> or a paste
+replaces the selection.
+
+=head2 The clipboard
+
+C<Ctrl+Insert> copies the selection, C<Ctrl+X> or C<Shift+Delete> cuts
+it, and C<Ctrl+V> or C<Shift+Insert> pastes. C<Ctrl+C> is not copy: it
+ends the program, unless the UI was made with
+C<< stop_on_ctrl_c =E<gt> 0 >> (see
+L<Term::Fabulous::Manual::Events/Keys Term::Fabulous handles itself>).
+
+The clipboard is one string shared by all text inputs of the program,
+not the clipboard of your desktop. Your program reads and writes it with
+L<clipboard|Term::Fabulous::Editor/clipboard> from L<Term::Fabulous::Editor>:
+
+=for highlighter language=perl
+
+	use Term::Fabulous::Editor;
+
+	Term::Fabulous::Editor->clipboard('order-4711');    # Ctrl+V now pastes this
+	my $copied = Term::Fabulous::Editor->clipboard;      # what the user copied last
+
+See the recipe
+L<Copy and paste through the clipboard|Term::Fabulous::Cookbook::Forms/Copy and paste through the clipboard>
+and, for a key that loads the desktop clipboard, the example
+L<Load the system clipboard on a key press|Term::Fabulous::Editor/Load the system clipboard on a key press>.
+
+=head2 Undo and redo
+
+C<Ctrl+Z> undoes the last change and C<Ctrl+Y> redoes it. Typing is
+undone one word (or one run of spaces) at a time; every other edit is
+one step. Up to 100 steps are kept. Setting the text with C<value>
+clears the history.
+
+=head2 Changing the text from the program
+
+C<value> replaces the whole text. For anything finer, use the
+L<Term::Fabulous::Editor> of the input, which holds the text, the
+cursor, the selection and the undo history. After changing it, call
+C<mark_changed> on the input so that a frame is drawn; the input then
+scrolls to the cursor and shows the change. Edits through the editor
+fire no C<Change>.
+
+	# Append a line at the end of a text area and show it:
+	my $editor = $log->editor;
+	$editor->move_document_end;
+	$editor->insert( $editor->is_empty ? $line : "\n$line" );
+	$log->mark_changed;
+
+	# Select the whole text of a field:
+	$name->editor->select_all;
+	$name->mark_changed;
+
+=head1 KEYS OF THE INPUT WIDGETS
+
+The keys each input uses while it has the focus. Keys an input does not
+use bubble to its ancestors. Each class page lists the details in its
+KEYS section.
+
+=for highlighter language=text
+
+	Widget        Keys
+	------------  --------------------------------------------------------------
+	TextField     typing, editing keys (see EDITING TEXT), Enter: Submit
+	TextArea      typing, editing keys, Up/Down/PageUp/PageDown (with Shift:
+	              select), Enter: new line
+	Checkbox      Space, Enter: toggle
+	RadioGroup    Up/Left, Down/Right: previous/next button (wraps around);
+	              Home, End: first/last button; Space, Enter: select the
+	              button the keyboard is on
+	Dropdown      closed: Enter, Space, Alt+Down, F4: open the list;
+	              Up, Down: previous/next option; Home, End: first/last
+	              option; letters: jump to a label
+	              open: Up, Down, PageUp, PageDown, Home, End: move the
+	              highlight; Enter, Space: choose; Escape: close;
+	              letters: jump to a label
+	Slider        Left/Down, Right/Up: one step; PageDown, PageUp: one
+	              page_step; Home, End: lowest, highest value
+	StarRating    Left/Down, Right/Up: one star (or half); Home, End: no
+	              stars, all stars; 0-9: that many stars
+	Segmented-    Left/Up, Right/Down: previous/next segment (wraps
+	Control       around); Home, End: first/last segment; 1-9: that segment
+
+The class pages: L<Term::Fabulous::Widget::TextInput/KEYS>,
+L<Term::Fabulous::Widget::TextField/KEYS>,
+L<Term::Fabulous::Widget::TextArea/KEYS>,
+L<Term::Fabulous::Widget::Checkbox/KEYS>,
+L<Term::Fabulous::Widget::RadioGroup/KEYS>,
+L<Term::Fabulous::Widget::Dropdown/KEYS>,
+L<Term::Fabulous::Widget::Slider/KEYS>,
+L<Term::Fabulous::Widget::StarRating/KEYS>,
+L<Term::Fabulous::Widget::SegmentedControl/KEYS>.
+
+=head1 COMPLETE FORMS
+
+=head2 A small form
+
+A complete program with a name field and a checkbox; one listener on the
+form box reports every change, and C<Enter> in the name field ends the
+program:
+
+=for highlighter language=perl
+
+	use v5.32;
+	use warnings;
+	use feature 'signatures';
+	no warnings 'experimental::signatures';
+
+	use Clay::XS qw(sizing_grow CLAY_TOP_TO_BOTTOM);
+	use Term::Fabulous;
+	use Term::Fabulous::Widget::Box;
+	use Term::Fabulous::Widget::Checkbox;
+	use Term::Fabulous::Widget::Text;
+	use Term::Fabulous::Widget::TextField;
+
+	my $form = Term::Fabulous::Widget::Box->new(
+		layout => {
+			layout_direction => CLAY_TOP_TO_BOTTOM,
+			sizing           => { width => sizing_grow(), height => sizing_grow() },
+			child_gap        => 1,
+		},
+	);
+	my $name   = Term::Fabulous::Widget::TextField->new( id => 'name', placeholder => 'Your name' );
+	my $terms  = Term::Fabulous::Widget::Checkbox->new( id => 'terms', label => 'I accept the terms' );
+	my $status = Term::Fabulous::Widget::Text->new(
+		text       => 'Type your name, then press Enter.',
+		text_color => [ 220, 220, 220, 255 ],
+	);
+	$form->add_child( $name, $terms, $status );
+
+	my $ui = Term::Fabulous->new( root => $form, width => 80, height => 24 );
+
+	# One listener for every input of the form.
+	$form->on(
+		Change => sub ($event) {
+			$status->text( $event->target->id . ' is now ' . $event->value );
+			return;
+		}
+	);
+	$name->on(
+		Submit => sub ($event) {
+			$ui->loop->stop;
+			return;
+		}
+	);
+
+	# Start with the cursor in the name field.
+	$ui->interaction->set_focused_widget($name);
+	$ui->run;
+
+	say 'Name: ', $name->value, ', terms accepted: ', $terms->value;
+
+=head2 Reading a whole form
+
+Every input has a C<value> reader, so a short function collects the
+values of all inputs with an id into a hash, for example to save them:
+
+	# { id => value } of every input at or below $node that has an id.
+	sub form_values ( $node, $values = {} ) {
+		my $is_input = $node->isa('Term::Fabulous::Widget::Input') || $node->isa('Term::Fabulous::Widget::RadioGroup');
+		$values->{ $node->id } = $node->value
+			if $is_input && defined $node->id && !$node->isa('Term::Fabulous::Widget::RadioButton');
+		if ( $node->can('children') ) {
+			form_values( $_, $values ) foreach @{ $node->children };
+		}
+		return $values;
+	}
+
+	my $values = form_values($form);    # { name => 'Ada', terms => 1, ... }
+
+Radio buttons are skipped: their group holds the state. The recipe
+L<Read all values of a form|Term::Fabulous::Cookbook::Forms/Read all values of a form> explains
+the function in detail; to fill a form from saved values, call C<value>
+(or C<checked> for a checkbox) on each input in the same way.
+
+=head2 A form in a KDL layout file
+
+A form can be described in KDL (see
+L<Term::Fabulous::Manual::KDL/KDL LAYOUT FILES>) and built with
+L<Term::Fabulous::Layout>. The program then finds the inputs by their
+ids. F<examples/kdl-form.pl> builds a form with every input widget
+except the text area, shows each change in a status line and the values
+of all inputs on C<F2>:
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-kdl-form.svg" alt="A form built from KDL with name, password, size, color, volume and newsletter, and a status line with all values"></p>
+
+=end html
+
+The recipe
+L<Build a form from a KDL file|Term::Fabulous::Cookbook::Forms/Build a form from a KDL file (text fields, radio buttons, dropdown, slider, checkbox)>
+shows and explains the program.
+
+=head2 More form recipes
+
+L<Term::Fabulous::Cookbook::Forms> has complete programs for:
+
+=over
+
+=item *
+
+L<a login form in a centered dialog|Term::Fabulous::Cookbook::Forms/A login form (centered dialog, masked password)>,
+which checks its input on C<Enter>;
+
+=item *
+
+L<asking a question in a dialog|Term::Fabulous::Cookbook::Forms/Ask a question in a dialog (Dialog widget)>;
+
+=item *
+
+L<opening and saving a file|Term::Fabulous::Cookbook::Forms/Open and save a file (FileDialog)>;
+
+=item *
+
+L<asking for a color|Term::Fabulous::Cookbook::Forms/Ask for a color (ColorPicker in a Prompt)>;
+
+=item *
+
+L<asking for input below the shell's output|Term::Fabulous::Cookbook::Forms/Ask for input below the shell's output (inline mode)>;
+
+=item *
+
+L<choosing from options in Perl|Term::Fabulous::Cookbook::Forms/Choose from options in Perl (Dropdown, RadioGroup, Slider)>;
+
+=item *
+
+L<disabling inputs until a checkbox is checked|Term::Fabulous::Cookbook::Forms/Disable inputs until a checkbox is checked>;
+
+=item *
+
+L<a status line that follows the focus|Term::Fabulous::Cookbook::Forms/Show a status line that follows the focus (OnFocus)>;
+
+=item *
+
+L<changing the Tab order|Term::Fabulous::Cookbook::Forms/Change the Tab order (HasFocusOrder)>;
+
+=item *
+
+L<copying and pasting through the clipboard|Term::Fabulous::Cookbook::Forms/Copy and paste through the clipboard>.
+
+=back
+
+To write an input widget of your own, see
+L<Term::Fabulous::Widget::Input/SUBCLASS INTERFACE> and
+L<Term::Fabulous::Manual::CustomWidgets>.
+
+=head1 SEE ALSO
+
+This page is part of L<Term::Fabulous::Manual>. Previous page: L<Term::Fabulous::Manual::Events>. Next page: L<Term::Fabulous::Manual::Feedback>.
+
+The class pages: L<Term::Fabulous::Widget::Input>,
+L<Term::Fabulous::Widget::TextInput>, L<Term::Fabulous::Widget::TextField>,
+L<Term::Fabulous::Widget::TextArea>, L<Term::Fabulous::Widget::Checkbox>,
+L<Term::Fabulous::Widget::RadioGroup>, L<Term::Fabulous::Widget::RadioButton>,
+L<Term::Fabulous::Widget::Dropdown>, L<Term::Fabulous::Widget::Slider>,
+L<Term::Fabulous::Widget::StarRating>,
+L<Term::Fabulous::Widget::SegmentedControl>,
+L<Term::Fabulous::Widget::ColorPicker>,
+L<Term::Fabulous::Editor>, L<Term::Fabulous::Validator>,
+L<Term::Fabulous::Event::Change>,
+L<Term::Fabulous::Event::ValidityChange>,
+L<Term::Fabulous::Event::Submit>.
+
+The recipes: L<Term::Fabulous::Cookbook::Forms>.
+
+=cut

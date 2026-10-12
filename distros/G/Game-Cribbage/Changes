@@ -1,5 +1,40 @@
 Revision history for Game-Cribbage
 
+0.17    2026-10-11
+        - Add Game::Cribbage::Terminal->run(@argv), which returns the exit status
+        - Colour is off under NO_COLOR and off a terminal
+        - Cards are now chosen with the arrow keys
+        - The screen moved to Game::Cribbage::Terminal. Game::Cribbage keeps
+          start() and nothing else; the render_*, draw_*, say, clear_screen,
+          print_header and print_footer methods are on Terminal now.
+        - in and out are read-write handles, so a game can be played and read
+          back by a test. Nothing in the module prints or reads directly.
+        - Play->test_card_score returns the Score object test_card reduces to
+          a total, so a caller can tell a pair from a fifteen.
+        - FIX: `print "\e[0"` was missing its m in three places, so a reset
+          swallowed the character after it.
+        - FIX: split_cards drew the bot's card with get($rand - 1) against a
+          0-based rand, so a rand of 0 took the LAST card of the deck; and its
+          "not the same card" guard compared a 1-based number with that index.
+        - FIX: starter took get($number) where the player pointed at
+          $number - 1, and checked the split against 52 rather than against
+          what is left after the deal.
+        - FIX: bin/cribbage had the shebang `#!usr/bin/perl` and a relative
+          `use lib 'lib'`, which an installed script must not carry. It takes
+          --pick/--no-pick and --help, returns an exit status, and puts the
+          terminal back from INT, TERM and a die.
+        - FIX: Game::Cribbage had no `use strict` or `use warnings`.
+        - FIX: Deck::Card's stringify was documented as `strigify`.
+        - FIX: the bot's cut for the starter drew from a hardcoded 39 where
+          forty cards are left, so the last card could never be turned. Both
+          draws now go through random_index, which a test can pin.
+        - t/pod-coverage.t and t/manifest.t were both red: the first on
+          Object::Proto's generated names, the second on build junk in the
+          tree. Both green.
+
+0.16    unreleased
+        - No entry was written for this version.
+
 0.15    2026-09-13
         - FIXES: a card that makes exactly 31 is playable; cannot_play_a_card and next_play refused it.
         - FIXES: play_card returns an Error for a card not held or already played, instead of dying.

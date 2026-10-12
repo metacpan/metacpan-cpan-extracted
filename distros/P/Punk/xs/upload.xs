@@ -55,6 +55,41 @@ filename(self)
     OUTPUT:
         RETVAL
 
+# The client's file name reduced to a name: what follows the last / or \,
+# without leading dots and without control bytes. undef when nothing is left.
+# Safe to show; a path is still better built from a name the server chose.
+SV *
+basename(self)
+        SV *self
+    CODE:
+    {
+        SV **v;
+        STRLEN l, i, start = 0;
+        const char *p;
+        if (!SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVHV)
+            croak("Punk::Upload: not an upload");
+        v = hv_fetchs((HV *)SvRV(self), "filename", 0);
+        RETVAL = newSV(0);
+        if (v && *v && SvOK(*v)) {
+            p = SvPV_const(*v, l);
+            for (i = 0; i < l; i++)
+                if (p[i] == '/' || p[i] == '\\') start = i + 1;
+            while (start < l && p[start] == '.') start++;
+            if (start < l) {
+                sv_setpvs(RETVAL, "");
+                for (i = start; i < l; i++) {
+                    unsigned char ch = (unsigned char)p[i];
+                    if (ch < 0x20 || ch == 0x7f) continue;
+                    sv_catpvn(RETVAL, (const char *)&ch, 1);
+                }
+                if (!SvCUR(RETVAL)) sv_setsv(RETVAL, &PL_sv_undef);
+                else if (SvUTF8(*v)) SvUTF8_on(RETVAL);
+            }
+        }
+    }
+    OUTPUT:
+        RETVAL
+
 IV
 size(self)
         SV *self

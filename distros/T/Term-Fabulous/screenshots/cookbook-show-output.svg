@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="708" height="345" viewBox="0 0 708 345" role="img" aria-label="perl examples/cookbook/show-output.pl seq -f 'Line %g' 1 40">
+<title>perl examples/cookbook/show-output.pl seq -f 'Line %g' 1 40</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="676" height="310" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="676" height="310" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="676" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="354" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/cookbook/show-output.pl seq -f 'Line %g' 1 40</text>
+<rect x="16.5" y="16.5" width="675" height="309" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="39" y="78" width="630" height="234" fill="#1e2332"/>
+<rect x="48" y="86" width="612" height="1" fill="#78a0dc"/>
+<rect x="43" y="96" width="1" height="198" fill="#78a0dc"/>
+<rect x="655" y="96" width="1" height="144" fill="#464c5a"/>
+<rect x="664" y="96" width="1" height="198" fill="#78a0dc"/>
+<rect x="655" y="240" width="2" height="54" fill="#61afef"/>
+<rect x="48" y="302" width="612" height="1" fill="#78a0dc"/>
+</g>
+<polyline points="43.5 96 43.5 91 43.538 90.413 43.653 89.835 43.843 89.278 44.103 88.75 44.43 88.261 44.818 87.818 45.261 87.43 45.75 87.103 46.278 86.843 46.835 86.653 47.413 86.538 48 86.5 48 86.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="664.5 96 664.5 91 664.462 90.413 664.347 89.835 664.157 89.278 663.897 88.75 663.57 88.261 663.182 87.818 662.739 87.43 662.25 87.103 661.722 86.843 661.165 86.653 660.587 86.538 660 86.5 660 86.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="43.5 294 43.5 298 43.538 298.587 43.653 299.165 43.843 299.722 44.103 300.25 44.43 300.739 44.818 301.182 45.261 301.57 45.75 301.897 46.278 302.157 46.835 302.347 47.413 302.462 48 302.5 48 302.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="664.5 294 664.5 298 664.462 298.587 664.347 299.165 664.157 299.722 663.897 300.25 663.57 300.739 663.182 301.182 662.739 301.57 662.25 301.897 661.722 302.157 661.165 302.347 660.587 302.462 660 302.5 660 302.5" fill="none" stroke="#78a0dc" stroke-width="1" stroke-linejoin="round"/>
+<g class="terminal">
+<text x="39" y="74" textLength="252" fill="#ffc850">Running: seq -f Line %g 1 40</text>
+<text x="48" y="110" textLength="63" fill="#c8d2e6">Line 31</text>
+<text x="48" y="128" textLength="63" fill="#c8d2e6">Line 32</text>
+<text x="48" y="146" textLength="63" fill="#c8d2e6">Line 33</text>
+<text x="48" y="164" textLength="63" fill="#c8d2e6">Line 34</text>
+<text x="48" y="182" textLength="63" fill="#c8d2e6">Line 35</text>
+<text x="48" y="200" textLength="63" fill="#c8d2e6">Line 36</text>
+<text x="48" y="218" textLength="63" fill="#c8d2e6">Line 37</text>
+<text x="48" y="236" textLength="63" fill="#c8d2e6">Line 38</text>
+<text x="48" y="254" textLength="63" fill="#c8d2e6">Line 39</text>
+<text x="48" y="272" textLength="63" fill="#c8d2e6">Line 40</text>
+<text x="48" y="290" textLength="450" fill="#ffc850">Finished with exit status 0. Press Ctrl+C to quit.</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

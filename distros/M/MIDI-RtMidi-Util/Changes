@@ -1,12 +1,22 @@
 Revision history for MIDI-RtMidi-Util
 
+0.0504 2026-10-11 12:52:50
+    - Add the eg/program_changer.pl program.
+
+0.0503 2026-10-11 12:48:33
+    - Improve the eg/start-stop.pl program.
+
+0.0502 2026-10-11 10:08:52
+    - Improve documentation.
+    - Fix the `program_changer()` logic.
+
 0.0501 2026-10-10 09:11:56
     - Fix synopsis.
 
 0.0500 2026-10-09 18:45:03
     - Add the `program_changer()` funtion.
     - Flesh-out missing tests.
-    - Fixed bugs surfaced by testing!
+    - Fix bugs surfaced by testing!
 
 0.0401 2026-09-11 13:29:00
     - Add the handy `stop_all_notes()` function.

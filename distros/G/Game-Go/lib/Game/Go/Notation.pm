@@ -6,7 +6,7 @@ use warnings;
 
 use Game::Go::Rules;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our @HUMAN_COLS;
 BEGIN {
@@ -89,7 +89,7 @@ Game::Go::Notation - the two coordinate alphabets, and the gap between them
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

@@ -15,6 +15,7 @@ include/oa_compile.h
 include/oa_mock.h
 include/oa_plack.h
 include/oa_route.h
+include/oa_swagger2.h
 include/oa_tools.h
 include/oa_types.h
 include/oa_normalize.h
@@ -69,6 +70,9 @@ t/37-style.t
 t/38-form-and-servers.t
 t/39-document-structure.t
 t/40-client-wire.t
+t/41-swagger2-load.t
+t/42-swagger2.t
+t/43-spec-twin-20.t
 t/compliance/jsonschema/LICENSE
 t/compliance/jsonschema/README
 t/compliance/jsonschema/allOf.json
@@ -88,6 +92,16 @@ t/compliance/jsonschema/required.json
 t/compliance/jsonschema/type.json
 t/compliance/expected-fail.txt
 t/compliance/run.t
+t/compliance/swagger2/LICENSE
+t/compliance/swagger2/README
+t/compliance/swagger2/api-with-examples.json
+t/compliance/swagger2/petstore-expanded.json
+t/compliance/swagger2/petstore-minimal.json
+t/compliance/swagger2/petstore-simple.json
+t/compliance/swagger2/petstore-with-external-docs.json
+t/compliance/swagger2/petstore.json
+t/compliance/swagger2/uber.json
+t/compliance/swagger2-everything.json
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
@@ -95,6 +109,8 @@ t/spec/mini.json
 t/spec/mini.yaml
 t/spec/mock.json
 t/spec/petstore-3.0.json
+t/spec/petstore-2.0.json
+t/spec/petstore-2.0-twin-30.json
 t/spec/petstore-3.1-twin.json
 t/spec/petstore.json
 t/spec/petstore.yaml

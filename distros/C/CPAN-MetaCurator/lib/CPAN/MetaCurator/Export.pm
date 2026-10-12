@@ -28,7 +28,39 @@ has jstree_html_path => (Str, default => sub{return ''}, chained => 1);
 our $leaf_id;
 our %seen;
 
-our $VERSION = '1.29';
+our $VERSION = '1.33';
+
+# --------------------------------------------------
+
+sub build_dag_item
+{
+	my($self, $item, $token) = @_;
+
+	my(@components);
+	my($text, $type);
+
+	@components	= split(' - ', $token);
+	$text		= ($#components < 1) ? $components[0] : $components[1];
+	$type		= switch ($components[0])
+	{
+		case /^\[?\[?[A-Za-z]+\d?\d?\]?\]?$/	{'topic'}
+		case /^http/							{'uri'}
+		default									{'text'}
+	};
+
+	match ($type : eq)
+	{
+		case('topic')	{
+							$$item{text} = ($components[0] =~ /^\[?\[?([A-Za-z]+\d?\d?)\]?\]?$/) ? $1 : $components[0];
+							$$item{text} = "[Topic] <button class='btn btn-info'>$$item{text}</button>"
+						}
+		case('uri')		{$$item{text} = "<a href = '" . escape_html($components[0]) . "' target = '_blank'>$text</a>"}
+		case('text')	{$$item{text} = $token}
+	}
+
+	return Tree::DAG_Node -> new({name => $$item{text}, attributes => {id => ++$leaf_id, description => '', uri => $$item{text}} });
+
+} # End of build_dag_item.
 
 # --------------------------------------------------
 
@@ -39,15 +71,13 @@ sub build_dag_tree
 	@lines			= grep{length} map{s/^\s+//; s/:\s*$//; $_} @lines;
 	my($index)		= -1;
 
-	my(@components);
-	my($entry);
 	my(%inside, $item);
 	my($leaf, $line, $line_count);
 	my($module);
 	my(%node_type, $note, $note_count);
 	my(@pre_pre);
 	my($see_also_root);
-	my($text, $token, $type);
+	my($token);
 
 	$inside{pre_pre}	= false;
 	$inside{see_also}	= false;
@@ -62,6 +92,11 @@ sub build_dag_tree
 
 		$self -> logger -> debug("Processing line $index: <$line>. token: $token");
 
+		# If the topic is ChangeLog[12]:
+		# $token ne '':
+		# a. Author
+		# b. V 1.23 many times
+		# Else it's a normal topic:
 		# $token ne '':
 		# a. See also
 		# b. An acronym
@@ -71,10 +106,10 @@ sub build_dag_tree
 		# e. <pre>
 		# f. </pre>
 
-		if ($token eq 'See also')
+		if ($token =~ /Author|See also/)
 		{
 			$inside{see_also}	= true;
-			$see_also_root		= Tree::DAG_Node -> new({name => 'See also', attributes => {id => ++$leaf_id, description => '', uri => ''} });
+			$see_also_root		= Tree::DAG_Node -> new({name => '&#8853; See also', attributes => {id => ++$leaf_id, description => '', uri => ''} });
 
 			$daughter -> add_daughter($see_also_root);
 		}
@@ -115,36 +150,17 @@ sub build_dag_tree
 			{
 				# Fix me. References to topics can be forward references.
 
-				@components	= split(' - ', $token);
-				$text		= ($#components < 1) ? $components[0] : $components[1];
-				$type		= switch ($components[0])
-				{
-					case /^\[?\[?[A-Za-z]+\d?\d?\]?\]?$/	{'topic'}
-					case /^http/							{'uri'}
-					default									{'text'}
-				};
-
-				match ($type : eq)
-				{
-					case('topic')	{
-										$$item{text} = ($components[0] =~ /^\[?\[?([A-Za-z]+\d?\d?)\]?\]?$/) ? $1 : $components[0];
-										$$item{text} = "[Topic] <button class='btn btn-info'>$$item{text}</button>"
-									}
-					case('uri')		{$$item{text} = "<a href = '" . escape_html($components[0]) . "' target = '_blank'>$text</a>"}
-					case('text')	{$$item{text} = $token}
-				}
-
-				$leaf = Tree::DAG_Node -> new({name => $$item{text}, attributes => {id => ++$leaf_id, description => '', uri => $$item{text}} });
+				$leaf = $self -> build_dag_item($item, $token);
 
 				$see_also_root -> add_daughter($leaf);
 			}
-			elsif ($line_count == 1)
+			elsif ( ($line_count == 1) && ($$topic{title} !~ /ChangeLog/) )
 			{
 				$$item{description} = $token;
 			}
-			elsif ($line_count == 2)
+			elsif ( ($line_count == 2) && ($$topic{title} !~ /ChangeLog/) )
 			{
-				$$item{text}	= $token;
+				$$item{text}	= $token; # Module name.
 				$leaf			= Tree::DAG_Node -> new({name => $module, attributes => {id => ++$leaf_id, description => $$item{description}, uri => $$item{text}} });
 
 				$daughter -> add_daughter($leaf);
@@ -155,14 +171,14 @@ sub build_dag_tree
 
 				if ($note_count == 1)
 				{
-					$note = Tree::DAG_Node -> new({name => "Notes for: $module", attributes => {id => ++$leaf_id, description => '', uri => ''} });
+					$note = Tree::DAG_Node -> new({name => "&#8853; Notes for: $module", attributes => {id => ++$leaf_id, description => '', uri => ''} });
 
 					$daughter -> add_daughter($note);
 				}
 
-				$entry = Tree::DAG_Node -> new({name => $token, attributes => {id => ++$leaf_id, description => '', uri => ''} });
+				$leaf = $self -> build_dag_item($item, $token);
 
-				$note -> add_daughter($entry);
+				$note -> add_daughter($leaf);
 			}
 		}
 	}
@@ -192,6 +208,31 @@ sub build_tree
 	return $root;
 
 } # End of build_tree.
+
+# --------------------------------------------------
+
+sub export_modules_table
+{
+	my($self) = @_;
+
+	$self -> init_config;
+	$self -> init_db;
+
+	my($database_path)		= File::Spec -> catfile($self -> home_path, $self -> database_path);
+	my($modules_csv_path)	= File::Spec -> catfile($self -> home_path, $self -> output_path);
+
+	$self -> logger -> info("Exporting modules table");
+	$self -> logger -> info("Reading: $database_path");
+	$self -> logger -> info("Writing: $modules_csv_path");
+
+	my($command)				= `echo ".h on\n.mode csv\nselect * from modules" | sqlite3 $database_path > $modules_csv_path`;
+	my($line_count)				= `wc -l $modules_csv_path`;
+	my($module_count, $name)	= split(' ', $line_count);
+	$module_count--; # Allow for header record.
+
+	$self -> logger -> info("Output record count (excluding header): $module_count");
+
+} # End of export_modules_table.
 
 # -----------------------------------------------
 
@@ -274,16 +315,16 @@ sub export_tree
 
 				$description	= $$attributes{description};
 				$uri			= $$attributes{uri} || '#';
-				$uri			= ($name =~ qr/Notes for|See also/) ? "&#8853; $name" : "<a href = '" . escape_html($uri) . "' target = '_blank'>$name - $description</a>";
+				$uri			= ($name =~ qr/Notes for|See also/) ? $name : "<a href = '" . escape_html($uri) . "' target = '_blank'>$name - $description</a>";
 
 				push @list, '<ul>'			if ($previous_depth == 1); # Open ul for subtree at this level.
 				push @list, '</li>'			if ($previous_depth == 2); # Close li opened at this depth.
 				push @list, '</ul></li>'	if ($previous_depth == 3); # Close ul & li opened in subtree below.
 				push @list, qq|\t<li data-jstree='{"opened": false}' id = '$$attributes{id}'>$uri|;
 			}
-			elsif ($$options{_depth} == 3) # 'Notes for ...' || 'See also' entries.
+			elsif ($$options{_depth} == 3) # 'Notes for' entries || 'See also' entries.
 			{
-				push @list, '<ul>'			if ($previous_depth == 2); # Open ul for subtree at this level.
+				push @list, '<ul>' if ($previous_depth == 2); # Open ul for subtree at this level.
 				push @list, qq|\t<li data-jstree='{"opened": false}' id = '$$attributes{id}'>$name</li>|;
 			}
 
@@ -320,31 +361,6 @@ sub export_tree
 } # End of export_tree.
 
 # --------------------------------------------------
-
-sub export_modules_table
-{
-	my($self) = @_;
-
-	$self -> init_config;
-	$self -> init_db;
-
-	my($database_path)		= File::Spec -> catfile($self -> home_path, $self -> database_path);
-	my($modules_csv_path)	= File::Spec -> catfile($self -> home_path, $self -> output_path);
-
-	$self -> logger -> info("Exporting modules table");
-	$self -> logger -> info("Reading: $database_path");
-	$self -> logger -> info("Writing: $modules_csv_path");
-
-	my($command)				= `echo ".h on\n.mode csv\nselect * from modules" | sqlite3 $database_path > $modules_csv_path`;
-	my($line_count)				= `wc -l $modules_csv_path`;
-	my($module_count, $name)	= split(' ', $line_count);
-	$module_count--; # Allow for header record.
-
-	$self -> logger -> info("Output record count (excluding header): $module_count");
-
-} # End of export_modules_table.
-
-# --------------------------------------------------
 # Some names might be acronyms & module names & topic names.
 # Example: RSS.
 
@@ -355,11 +371,9 @@ sub gather_statistics
 	$$node_type{acronym}	= $$topic{title} eq 'Acronyms'			? true : false;
 	$$node_type{topic}		= exists($$pad{topic_names}{$token})	? true : false;
 	$$node_type{known}		= exists($$pad{module_names}{$token})	? true : false;
-	$$node_type{unknown}	= ( (! $$node_type{acronym}) && (! $$node_type{known}) && (! $$node_type{topic}) ) ? true : false;
 
 	$$pad{count}{acronym}++	if ($$node_type{acronym});
 	$$pad{count}{known}++	if ($$node_type{known});
-	$$pad{count}{unknown}++	if ($$node_type{unknown} && ($token ne 'See also') );
 
 } # End of gather_statistics;
 
@@ -386,6 +400,10 @@ sub write_file
 1;
 
 =pod
+
+=head1 NAME
+
+CPAN::MetaCurator::Export - Manage the cpan.metacurator.sqlite database
 
 =head1 Machine-Readable Change Log
 

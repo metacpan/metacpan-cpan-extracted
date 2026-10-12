@@ -26,7 +26,12 @@ sub is_status
 
 my $app = PAGI::App::GoldenCage->new();
 
-my $client = PAGI::Test::Client->new(app => $app->to_app);
+my $client = PAGI::Test::Client->new(
+	app => $app->to_app,
+	lifespan => 1,
+);
+
+$client->start;
 
 my $res = $client->get($app->generate_link);
 is_status $res, 200, 'code ok';

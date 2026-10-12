@@ -891,8 +891,18 @@ XS_INTERNAL(punk_md_cb) {
     }
 
     /* an asset sitting in the tree: same stat / 304 / sendfile behaviour as
-     * the static mount, because it is literally the same function */
-    if (!ps_path_unsafe(path, plen)) {
+     * the static mount, because it is literally the same function.
+     *
+     * Never a source. Anything that reaches here ending in .md is a document
+     * the page table chose not to publish under that name - a draft, or an
+     * index whose page lives at the directory's URL - and serving the file
+     * would publish it anyway, front matter and all. The suffix is compared
+     * without case because some filesystems open draft.MD as draft.md. And
+     * never a dotfile, which the walk skipped for the same reason. */
+    if (!ps_path_unsafe(path, plen) && !ps_path_dotted(path, plen, 0)
+        && !(plen >= 3 && path[plen - 3] == '.'
+             && toLOWER((U8)path[plen - 2]) == 'm'
+             && toLOWER((U8)path[plen - 1]) == 'd')) {
         SV *dir = *av_fetch(cap, PMDC_DIR, 0);
         STRLEN dlen;
         const char *d = SvPV_const(dir, dlen);

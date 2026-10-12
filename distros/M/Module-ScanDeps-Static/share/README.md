@@ -3,10 +3,17 @@
 * [NAME](#name)
 * [SYNOPSIS](#synopsis)
 * [DESCRIPTION](#description)
+  * [Comparison to Other Scanners](#comparison-to-other-scanners)
 * [OPTIONS](#options)
   * [Examples](#examples)
 * [OPTION DETAILS](#option-details)
 * [WHAT IS A DEPENDENCY?](#what-is-a-dependency)
+  * [Dependency Tiers](#dependency-tiers)
+  * [Structural Classification](#structural-classification)
+  * [The `## scandeps:` Annotation](#the-##-scandeps-annotation)
+  * [Conflicting Classifications](#conflicting-classifications)
+  * [Self-Referential Modules](#self-referential-modules)
+  * [Dynamic Module Loading](#dynamic-module-loading)
 * [MINOR IMPROVEMENTS TO `perl.req`](#minor-improvements-to-perlreq)
 * [CAVEATS](#caveats)
 * [METHODS AND SUBROUTINES](#methods-and-subroutines)
@@ -18,6 +25,7 @@
   * [get\_dependencies](#get\dependencies)
   * [format\_text](#format\text)
   * [format\_json](#format\json)
+  * [format\_cpanfile](#format\cpanfile)
   * [is\_core](#is\core)
   * [min\_core\_version](#min\core\version)
   * [get\_module\_version](#get\module\version)
@@ -62,13 +70,112 @@ _Only direct dependencies are returned by this module. If you
 want a recursive search for dependencies, use `find-requires`
 included in this distribution._
 
+## Comparison to Other Scanners
+
+Two other CPAN scanners cover similar ground:
+[Perl::PrereqScanner](https://metacpan.org/pod/Perl%3A%3APrereqScanner), built on [PPI](https://metacpan.org/pod/PPI), and
+[Perl::PrereqScanner::NotQuiteLite](https://metacpan.org/pod/Perl%3A%3APrereqScanner%3A%3ANotQuiteLite) (here, "NQLite"), which uses its
+own lexer. The comparison below reflects hands-on testing against
+both, not just a reading of their documentation.
+
+**Speed.** This module is regex/line-based rather than a true
+tokenizer, and that's a deliberate trade-off, not an oversight - it's
+the source of most of the speed difference. On a representative
+414-line file, this module scans in roughly 1.7ms; NQLite takes
+roughly 6ms; PPI-based `Perl::PrereqScanner` takes roughly 45ms.
+PPI's own documentation acknowledges this cost directly, describing
+itself as "painful... with very large files." The trade-off cuts the
+other way too: a real tokenizer is structurally immune to a class of
+edge case (an unbalanced brace inside a string or heredoc, for
+example) that this module's regex approach can, in principle, still
+be fooled by, even though no such failure has been found in testing
+against real-world code.
+
+**Dependency classification.** All three tools distinguish a hard
+requirement from something merely conditional or optional, but this
+module is alone in giving the developer an explicit way to state that
+judgment rather than have it inferred. NQLite decides `recommends`
+vs. `suggests` purely from code structure - specifically, whether
+the call is a bare `eval` or one of two specific, by-name-recognized
+CPAN modules ([Module::Runtime](https://metacpan.org/pod/Module%3A%3ARuntime) and [Class::Load](https://metacpan.org/pod/Class%3A%3ALoad)) - with no way
+for a developer to say "no, that one's actually important" short of
+restructuring their code to match what the scanner looks for. This
+module instead classifies a guarded dependency as `suggests` by
+default (or `recommends` project-wide via `eval_recommends`), and
+lets a `## scandeps: recommends` or `## scandeps: suggests` comment
+immediately after the guarding statement override that default
+per-instance. Neither other tool has an equivalent escape hatch.
+
+This module also warns - rather than silently picking a winner - when
+a module is both a hard requirement in one place and merely
+recommended or suggested in another, since that's a real contradiction
+in the source worth surfacing to the developer, not something a
+scanner should resolve on its own.
+
+**Version numbers.** Both `Perl::PrereqScanner` and NQLite report
+every dependency's version as a fixed `0` placeholder - not "unknown",
+literally the string `0` regardless of what's actually installed or
+required. This module performs a real version lookup (see
+`--add-version`) and reports what it actually finds.
+
+Reporting a version number or `0` both have their advantages and
+disadvantages. Users of these scanners can always edit the output and
+modify the version number requirements, however this scanner opted to
+choose the currently installed version. This assumes you are
+developing your module against a known environment, and the idea is
+that while other versions of a module might work, the version in your
+working environment is known to work with your module. Selecting
+`0` means any version will do - but consider a module like
+`List::Util` running under Perl 5.10. While `List::Util` has been in
+core since 5.7.3, its feature list has grown significantly. You may be
+using features that were not present in that version of `List::Util`.
+Shipping with the minimum version of `List::Util` set to `0` is
+almost certainly going to fail on earlier versions of Perl.
+
+The true minimum - the exact release in which every feature your code
+actually relies on first appeared - would in principle be the most
+accurate answer. But determining that reliably would mean downgrading
+each dependency in turn and re-running your test suite against every
+prior release, which presumes you have test coverage specifically
+exercising the features you're relying on, for every dependency you
+use. That's not a reasonable expectation in practice - reporting the
+currently installed version is a deliberate trade-off in favor of a
+version **known** to work over one merely presumed to.
+
+**Self-referential modules.** Scanning a whole project can turn a
+sibling module into a false positive - file A's `use` of file B's
+`package` isn't an external dependency at all. NQLite handles this
+with `--private`, a manually maintained list of module names to
+exclude. This module's `--filter` does the same job automatically,
+by detecting `package` declarations across the batch being scanned,
+at the cost of only working when the sibling file is actually part of
+the same scan.
+
+**What this module doesn't attempt.** NQLite can infer a minimum Perl
+version from newer syntax (signatures, `say`, and similar) appearing
+in the source without an explicit `use v5.x` declaration; this module
+does not attempt that. NQLite also has an opt-in `CPAN::Common::Index`
+integration that can deduplicate module names belonging to the same
+distribution - deliberately not pursued here, since it requires a
+network round-trip (or a locally maintained mirror) per module found
+at scan time, in exchange for a purely cosmetic shortening of the
+output that changes nothing about what actually gets installed.
+Finally, no static scanner - this one included - can discover a
+dependency loaded through a genuinely dynamic mechanism (a module name
+computed at runtime and passed to something like [Module::Load](https://metacpan.org/pod/Module%3A%3ALoad));
+that's a fundamental limit of static analysis, not a gap specific to
+any one tool. See ["Dynamic Module Loading"](#dynamic-module-loading) below.
+
 # OPTIONS
 
     --add-version, -a        add version numbers to output
     --no-add-version         don't add version numbers to output
     --core                   include core modules (default)
     --no-core                don't include core modules
+    --cpanfile-file PATH     write a cpanfile combining all three tiers to PATH
+    --eval-recommends        classify unannotated eval-wrapped deps as recommends, not suggests
     --file-list, -L PATH     scan a batch of files listed one per line in PATH
+    --filter, -f             exclude modules that are this project's own packages
     --help, -h               help
     --include-require, -i    include 'require'd modules
     --no-include-require     don't include required modules
@@ -76,7 +183,11 @@ included in this distribution._
     --min-core-version, -m   minimum version of perl to consider core
     --path, -p PATH          file to scan (alternative to the positional argument)
     --raw, -r                raw output
+    --recommend-require, -R  classify indented (non-eval) conditional requires as recommends
+    --recommends-file PATH   write the recommends tier to PATH
+    --requires-file PATH     write the requires tier to PATH
     --separator, -s          separator for output (default: =>)
+    --suggests-file PATH     write the suggests tier to PATH
     --text, -t               output as text (default)
     --version, -v            version
 
@@ -105,6 +216,18 @@ recurse directories and create dependency files like `cpanfile`_.
 
     default: **--core**
 
+- --eval-recommends
+
+    Controls how an `eval`-wrapped `require`/`use` is classified when
+    it carries no explicit `## scandeps:` annotation (see
+    ["Dependency Tiers"](#dependency-tiers) below). By default such a dependency is
+    classified as `suggests`; setting this option flips the
+    project-wide default to `recommends` instead. An explicit
+    annotation always overrides this default regardless of its setting.
+
+    default: **--no-eval-recommends** (unannotated evals classify as
+    `suggests`)
+
 - --file-list, -L PATH
 
     Scan a batch of files in a single process instead of one file per
@@ -128,6 +251,61 @@ recurse directories and create dependency files like `cpanfile`_.
 - --help, -h
 
     Show usage.
+
+- --filter, -f
+
+    Exclude modules from the output that are themselves `package`
+    declarations found somewhere in the files being scanned. Useful with
+    `--file-list` to keep a project's own sibling modules from being
+    reported as external dependencies of each other.
+
+    There is no single right default independent of context: a single
+    file scanned on its own has no sibling in the batch to worry about,
+    but when `--file-list` is in use, a same-batch sibling should never
+    count as an external dependency of another file in the same batch.
+    So this defaults to **off** for a single file and **on** whenever
+    `--file-list` is given - but only when `--filter`/`--no-filter`
+    isn't explicitly set; an explicit setting always wins over this
+    context-dependent default, in either direction.
+
+- --requires-file PATH
+- --recommends-file PATH
+- --suggests-file PATH
+
+    Write the `requires`, `recommends`, or `suggests` tier
+    respectively to `PATH`, in the same format `--text` would produce
+    (regardless of whether `--json` or `--raw` is also in effect - each
+    of these is always plain "module version" text, one per line). Any
+    or all of the three may be given together; each is independent, and
+    omitting all three changes nothing about existing STDOUT/JSON output.
+    With `--file-list`, all files in the batch are scanned once and the
+    three tiers are populated together from that single pass, rather than
+    needing a separate scan per tier.
+
+- --cpanfile-file PATH
+
+    Write a single `cpanfile` to `PATH`, combining all three tiers in
+    native [cpanfile](https://metacpan.org/pod/Module%3A%3ACPANfile) DSL syntax:
+
+        requires 'Module::Name';
+        requires 'Module::Name', 'X.YZ';
+        recommends 'Module::Name', 'X.YZ';
+        suggests 'Module::Name', 'X.YZ';
+
+    A module's version is included only when one was actually detected
+    (see `--add-version`) - otherwise the unversioned form is written,
+    matching `cpanfile`'s own convention for "any version is acceptable".
+    A minimum Perl version, if one was declared in the scanned source, is
+    written the same way any other `requires` entry would be:
+    `requires 'perl', 'X.YZ';` - this is standard `cpanfile` syntax, not
+    a special case.
+
+    This applies the same filtering as every other output (`--core` /
+    `--no-core`, `--filter`) uniformly across all three tiers, and
+    verified to round-trip correctly through [Module::CPANfile](https://metacpan.org/pod/Module%3A%3ACPANfile) itself.
+    Independent of `--requires-file` / `--recommends-file` /
+    `--suggests-file` - any combination of these four file-output options
+    may be given together in a single scan.
 
 - --include-require, -i, --no-include-require
 
@@ -192,12 +370,27 @@ recurse directories and create dependency files like `cpanfile`_.
     Output the list with no quotes separated by a single whitespace
     character.
 
+- --recommend-require
+
+    By default, an indented (not left-flushed) `require` statement that
+    is not wrapped in `eval` is either treated as a hard requirement or
+    dropped entirely, depending on `--include-require` - see
+    ["--include-require, -i, --no-include-require"](#include-require-i-no-include-require). Setting this option
+    instead routes it to the `recommends` tier (see
+    ["Dependency Tiers"](#dependency-tiers)), regardless of `--include-require`'s setting.
+    Off by default - every existing case behaves exactly as it did before
+    this option existed.
+
+    default: **--no-recommend-require**
+
 # WHAT IS A DEPENDENCY?
 
 For the purposes of this module, dependencies are identified by
 looking for Perl modules and other Perl artifacts declared using
 `use`, `require`, `parent`, or `base`. The script will also
-consider Moo/Role::Tiny modules include using `with`.
+consider Moo/Role::Tiny modules included using `with`, and Moose
+inheritance declared using `extends` - both are treated identically
+to `use parent`/`use base`.
 
 If the module contains a `require` statement, by default the
 `require` must be flush up against the left edge of your script
@@ -206,6 +399,154 @@ the default behavior to avoid identifying `require` statements that
 are embedded in `if` statements. If you want to include all of
 the targets of `require` statements as dependencies, set the
 `include-require` option to a true value.
+
+## Dependency Tiers
+
+Every dependency found is classified into one of three tiers,
+matching the `requires`/`recommends`/`suggests` relationship types
+defined by [CPAN::Meta::Spec](https://metacpan.org/pod/CPAN%3A%3AMeta%3A%3ASpec):
+
+- requires
+
+    A bare, unconditional `use` or `require`, or a `with`/`extends`/
+    `parent`/`base` declaration. Nothing in the surrounding code
+    suggests the author considered this module might be absent.
+
+- recommends
+
+    A dependency the author explicitly guarded against being absent (see
+    ["Structural Classification"](#structural-classification) below), where the author's own
+    annotation or this module's default judges the guard to matter more
+    than a mere enhancement - see ["The `## scandeps:` Annotation"](#the-scandeps-annotation).
+
+- suggests
+
+    The weaker of the two soft tiers - a guarded dependency judged to be
+    a genuine enhancement rather than something most users would need.
+
+This module makes **no attempt** to infer which of `recommends` or
+`suggests` is correct by analyzing what a guarded dependency's
+failure path actually does (for example, whether it `die`s or
+degrades gracefully). That was a deliberate decision, not an
+oversight: whether a dependency is merely nice-to-have or genuinely
+important is a judgment about a project's own design, not a fact
+recoverable from code structure - the same code shape (`eval {
+require Foo }`) is written identically by an author who considers
+`Foo` essential and one who considers it optional. Guessing at that
+judgment and presenting the guess as if it were derived from parsing
+would be dishonest about what static analysis can actually know. Use
+the annotation below to state it explicitly instead.
+
+## Structural Classification
+
+Only a genuinely unconditional `use`/`require` is ever classified
+as `requires`. Anything the author has structurally guarded is
+pulled into one of the soft tiers:
+
+- `eval { require/use Foo }` or `eval "require/use Foo"`, in
+any form - single-line, multi-line, with or without a trailing
+`or die`/`or do { }` - is classified as `suggests` by default, or
+`recommends` if `--eval-recommends` is set (see
+["--eval-recommends"](#eval-recommends)). Either default can be overridden per-instance
+with an explicit annotation - see below.
+- An indented (not left-flushed), non-`eval` `require` - for
+example inside a bare `if` block - is treated as a hard requirement
+by default (or dropped entirely if `--include-require` is off), the
+same as it always has been. Set `--recommend-require` to instead
+route these to `recommends`. See
+["--recommend-require"](#recommend-require).
+
+## The `## scandeps:` Annotation
+
+Because the `recommends` vs. `suggests` distinction is a judgment
+call this module deliberately does not try to infer (see
+["Dependency Tiers"](#dependency-tiers)), an author can state that judgment explicitly
+with a comment:
+
+    eval { require Foo::Bar; };  ## scandeps: recommends
+
+    eval { require Foo::Bar; 1; } or die $@;  ## scandeps: suggests
+
+    eval {
+        require Foo::Bar;
+        1;
+    } or do {
+        warn "Foo::Bar unavailable, continuing without it\n";
+    };  ## scandeps: recommends
+
+The annotation must appear immediately after the semicolon that ends
+the whole statement - not the eval block's own closing brace, but
+wherever the statement as a whole actually terminates, which may be
+after a trailing `or die ...;` or `or do { ... };`. An explicit
+annotation always overrides both this module's structural default and
+the `--eval-recommends` setting.
+
+This annotation is only recognized on the brace form of `eval`
+(`eval { ... }`). It is not supported on the string form
+(`eval "..."`) - anyone still writing string `eval` for this
+purpose is not expected to participate in this feature.
+
+## Conflicting Classifications
+
+A single module can legitimately be a hard requirement in one file
+and guarded in another - both facts can be true of the same project
+at once. When that happens, this module does not silently pick a
+winner: it emits a warning to `STDERR` naming the conflicting
+module, and leaves `require`, `recommends`, and `suggests` exactly
+as found. Resolving the contradiction belongs in the project's own
+source, not in this tool - either the guarded usage no longer needs
+to hedge, since the module is guaranteed to be present anyway because
+of the other, unconditional usage, or the unconditional usage should
+really be conditional too.
+
+The same warning fires if a module appears in both `recommends` and
+`suggests` at once.
+
+## Self-Referential Modules
+
+When scanning a whole project (typically via `--file-list`), a
+module in one file may `use` a sibling module declared with
+`package` in another file in the same project - not a real external
+dependency at all. `--filter` excludes any module name that appears
+anywhere in the batch as a `package` declaration; see
+["--filter, -f"](#filter-f) for its (context-dependent) default.
+
+## Dynamic Module Loading
+
+This module performs _static_ analysis: it reads source as text and
+looks for recognizable patterns. It cannot execute your code, and so
+cannot know the value of a variable at runtime. A module loaded via a
+computed name - for example `Module::Load::load($module)` where
+`$module` is a variable - is invisible to this scanner and will
+never appear in `require`, `recommends`, or `suggests`, no matter
+how the code is structured.
+
+This is a real and legitimate use case for modules like
+[Module::Load](https://metacpan.org/pod/Module%3A%3ALoad), [Module::Runtime](https://metacpan.org/pod/Module%3A%3ARuntime), and [Class::Load](https://metacpan.org/pod/Class%3A%3ALoad): loading a
+plugin or driver whose name genuinely isn't known until the program
+runs. For that use case, invisibility to any static scanner is an
+unavoidable trade-off, not a defect in this module.
+
+It becomes an antipattern, though, when one of these modules is
+called with a name that _is_ known at write time:
+
+    Module::Load::load('Term::ANSIColor');
+
+The module name here is a literal string, not runtime data - a plain
+
+    eval { require Term::ANSIColor; };
+
+would behave identically at runtime, while remaining visible to this
+scanner and annotatable with `## scandeps:`. Reach for
+`Module::Load` and similar modules only when the module name is
+genuinely computed at runtime - for loading plugins or other modules
+that are already known to be part of your project's own architecture
+\- not as a general-purpose substitute for `require`.
+
+Do not expect this scanner to understand dynamic module loading. If a
+project genuinely depends on a module that can only be discovered at
+runtime, that dependency needs to be declared by hand (for example, in
+a `cpanfile` or `buildspec.yml`) - this module cannot discover it.
 
 # MINOR IMPROVEMENTS TO `perl.req`
 
@@ -415,6 +756,18 @@ returns a list of hash refs of the form `{ name => ..., version =>
 ... }`. Core modules are omitted when `core` is false. Any arguments
 are treated as a seed list and prepended to the results.
 
+## format\_cpanfile
+
+    $scanner->parse;
+    print $scanner->format_cpanfile;
+
+Returns a single `cpanfile` (see [Module::CPANfile](https://metacpan.org/pod/Module%3A%3ACPANfile)) combining all
+three tiers, using native `requires`/`recommends`/`suggests` DSL
+syntax. Versions are included only where actually detected (see
+`add_version`); otherwise the unversioned form is written. Applies
+the same `core`/`filter` filtering as `format_json`, since it's
+built on top of it rather than duplicating that logic.
+
 ## is\_core
 
     my $bool = $scanner->is_core($module);
@@ -477,7 +830,7 @@ false.
 
 # VERSION
 
-This documentation refers to version 1.8.2
+This documentation refers to version 1.9.5
 
 # AUTHOR
 

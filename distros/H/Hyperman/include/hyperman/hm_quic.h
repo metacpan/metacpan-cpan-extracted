@@ -67,6 +67,7 @@ static int hm_quic_available(void) { return 1; }
  * unsupported version, up to 255 - see hm_quic_triage). */
 #define HM_QUIC_CIDLEN     16
 #define HM_QUIC_CIDBUCKETS 1024        /* power of two */
+#define HM_QUIC_SRC_SLOTS  256         /* power of two: per-source half-open table */
 
 /* The worker index lives in the FIRST byte of every CID we mint. That is a
  * fixed offset from the start of a short-header packet, which is what a
@@ -151,6 +152,11 @@ struct hm_quic_srv {
     hm_qconn    *conns;                      /* every live connection     */
     int          nconns;
     int          handshaking;                /* half-open, drives Retry   */
+    /* Half-open handshakes BY SOURCE ADDRESS. The global threshold above
+     * can be spent by one source; this holds each to HM_QUIC_PER_SOURCE.
+     * Open addressing over the address bytes, a slot freed when its count
+     * reaches zero; with the table full the global rule applies alone. */
+    struct { uint8_t len; uint8_t addr[16]; uint16_t count; } src[HM_QUIC_SRC_SLOTS];
     void        *ssl_ctx;                    /* SSL_CTX *, QUIC-side      */
     /* The per-process secret behind stateless reset and Retry tokens.
      * Generated ONCE, before the fork, for the same reason the TLS
@@ -159,6 +165,75 @@ struct hm_quic_srv {
      * unverifiable. */
     uint8_t      secret[32];
 };
+
+/* Half-open handshakes one source address may hold at once. A NAT puts many
+ * clients behind one address, so this is generous; a flood from one address
+ * is what it stops. */
+#define HM_QUIC_PER_SOURCE 32
+
+/* The address bytes of a peer, without the port. */
+static int hm_quic_src_bytes(const struct sockaddr *sa, uint8_t *out) {
+    if (sa->sa_family == AF_INET) {
+        memcpy(out, &((const struct sockaddr_in *)sa)->sin_addr, 4);
+        return 4;
+    }
+    if (sa->sa_family == AF_INET6) {
+        memcpy(out, &((const struct sockaddr_in6 *)sa)->sin6_addr, 16);
+        return 16;
+    }
+    return 0;
+}
+
+static uint32_t hm_quic_hash(const uint8_t *d, size_t n);
+
+/* The slot for an address: its own, or the first empty one on the probe
+ * walk, or -1 when the table is full. */
+static int hm_quic_src_slot(hm_quic_srv *srv, const uint8_t *a, int len, int create) {
+    uint32_t h = hm_quic_hash(a, (size_t)len) & (HM_QUIC_SRC_SLOTS - 1);
+    int i;
+    for (i = 0; i < HM_QUIC_SRC_SLOTS; i++) {
+        int k = (int)((h + (uint32_t)i) & (HM_QUIC_SRC_SLOTS - 1));
+        if (srv->src[k].len == (uint8_t)len && memcmp(srv->src[k].addr, a, (size_t)len) == 0)
+            return k;
+        if (srv->src[k].len == 0) {
+            if (!create) return -1;
+            srv->src[k].len = (uint8_t)len;
+            memcpy(srv->src[k].addr, a, (size_t)len);
+            srv->src[k].count = 0;
+            return k;
+        }
+    }
+    return -1;
+}
+
+/* Count a half-open handshake against its source: the new count, or -1 for
+ * an address the table cannot hold (then only the global rule applies). */
+static int hm_quic_src_inc(hm_quic_srv *srv, const struct sockaddr *sa) {
+    uint8_t a[16];
+    int len = hm_quic_src_bytes(sa, a), k;
+    if (!len) return -1;
+    k = hm_quic_src_slot(srv, a, len, 1);
+    if (k < 0) return -1;
+    return (int)++srv->src[k].count;
+}
+static int hm_quic_src_count(hm_quic_srv *srv, const struct sockaddr *sa) {
+    uint8_t a[16];
+    int len = hm_quic_src_bytes(sa, a), k;
+    if (!len) return 0;
+    k = hm_quic_src_slot(srv, a, len, 0);
+    return k < 0 ? 0 : (int)srv->src[k].count;
+}
+/* The handshake completed or the connection went: one fewer for its source,
+ * and the slot freed at zero so the table does not fill with ghosts. */
+static void hm_quic_src_dec(hm_quic_srv *srv, const struct sockaddr *sa) {
+    uint8_t a[16];
+    int len = hm_quic_src_bytes(sa, a), k;
+    if (!len) return;
+    k = hm_quic_src_slot(srv, a, len, 0);
+    if (k < 0) return;
+    if (srv->src[k].count > 0) srv->src[k].count--;
+    if (srv->src[k].count == 0) srv->src[k].len = 0;
+}
 
 /* Filled before any worker forks; every srv copies it. */
 static uint8_t hm_quic_secret[32];
@@ -595,6 +670,12 @@ static int hm_quic_packet(pTHX_ hm_loop *loop, hm_listener *lst,
             return 0;
         }
 
+        /* One source may not hold more than its share of half-open
+         * handshakes, whatever the global count says: dropped, not Retried,
+         * because a Retry only costs the sender one round trip and it has
+         * already shown it will spend them. */
+        if (hm_quic_src_count(srv, peer) >= HM_QUIC_PER_SOURCE) return 0;
+
         qc = hm_quic_conn_new(aTHX_ srv, &vc, &hd, odcidp, peer, peerlen);
         if (!qc) return 0;
     }
@@ -628,6 +709,47 @@ static int hm_quic_packet(pTHX_ hm_loop *loop, hm_listener *lst,
 static uint32_t hm_quic_st_rand(uint32_t *s) {
     *s ^= *s << 13; *s ^= *s >> 17; *s ^= *s << 5;
     return *s;
+}
+
+/* The per-source table: counts climb per address and not across addresses,
+ * fall on completion, free their slot at zero, and a full table says -1
+ * rather than lying. 1 = every check passed. */
+static int hm_quic_src_selftest(void) {
+    hm_quic_srv *srv = (hm_quic_srv *)hm_xcalloc(1, sizeof(hm_quic_srv));
+    struct sockaddr_in a, b;
+    struct sockaddr_in6 c6;
+    int i, ok = 1;
+    memset(&a, 0, sizeof a); a.sin_family = AF_INET; a.sin_addr.s_addr = htonl(0xc0000201);
+    b = a; b.sin_addr.s_addr = htonl(0xc0000202);
+    b.sin_port = htons(9);                       /* a different port is the SAME source */
+    memset(&c6, 0, sizeof c6); c6.sin6_family = AF_INET6; c6.sin6_addr.s6_addr[15] = 1;
+    for (i = 1; i <= HM_QUIC_PER_SOURCE; i++)
+        if (hm_quic_src_inc(srv, (struct sockaddr *)&a) != i) ok = 0;
+    if (hm_quic_src_count(srv, (struct sockaddr *)&a) != HM_QUIC_PER_SOURCE) ok = 0;
+    if (hm_quic_src_count(srv, (struct sockaddr *)&b) != 0) ok = 0;   /* its own count */
+    a.sin_port = htons(4433);
+    if (hm_quic_src_count(srv, (struct sockaddr *)&a) != HM_QUIC_PER_SOURCE) ok = 0; /* port ignored */
+    if (hm_quic_src_inc(srv, (struct sockaddr *)&c6) != 1) ok = 0;
+    for (i = 0; i < HM_QUIC_PER_SOURCE; i++) hm_quic_src_dec(srv, (struct sockaddr *)&a);
+    if (hm_quic_src_count(srv, (struct sockaddr *)&a) != 0) ok = 0;
+    {   /* the slot was freed: the table holds exactly its capacity of others */
+        int n = 0;
+        for (i = 0; i < HM_QUIC_SRC_SLOTS; i++) if (srv->src[i].len) n++;
+        if (n != 1) ok = 0;                      /* only the v6 one */
+    }
+    {   /* fill it: the slot after capacity is -1, never a wrong count */
+        struct sockaddr_in f; int k;
+        memset(&f, 0, sizeof f); f.sin_family = AF_INET;
+        for (k = 0; k < HM_QUIC_SRC_SLOTS - 1; k++) {
+            f.sin_addr.s_addr = htonl(0x0a000000u + (uint32_t)k);
+            if (hm_quic_src_inc(srv, (struct sockaddr *)&f) != 1) { ok = 0; break; }
+        }
+        f.sin_addr.s_addr = htonl(0x0b000000u);
+        if (hm_quic_src_inc(srv, (struct sockaddr *)&f) != -1) ok = 0;
+        if (hm_quic_src_count(srv, (struct sockaddr *)&f) != 0) ok = 0;
+    }
+    free(srv);
+    return ok;
 }
 
 #define HM_QUIC_ST_CONNS 64
@@ -806,6 +928,34 @@ static int hm_quic_token_selftest(void) {
                 &got, token, (size_t)tlen, other, sizeof(other),
                 NGTCP2_PROTO_VER_V1, (const ngtcp2_sockaddr *)&a, sizeof(a),
                 &scid, HM_QUIC_RETRY_TIMEOUT, now) == 0) ok = 0;
+    }
+
+    /* and the address binding holds over IPv6 the same way: a token for
+     * [::1] verifies for [::1] and not for [::2] */
+    {
+        struct sockaddr_in6 a6, b6;
+        uint8_t t6[NGTCP2_CRYPTO_MAX_RETRY_TOKENLEN2];
+        ngtcp2_ssize t6len;
+        memset(&a6, 0, sizeof(a6));
+        a6.sin6_family = AF_INET6;
+        a6.sin6_port   = htons(4433);
+        a6.sin6_addr.s6_addr[15] = 1;               /* ::1 */
+        b6 = a6;
+        b6.sin6_addr.s6_addr[15] = 2;               /* ::2 */
+        t6len = ngtcp2_crypto_generate_retry_token2(
+                    t6, secret, sizeof(secret), NGTCP2_PROTO_VER_V1,
+                    (const ngtcp2_sockaddr *)&a6, sizeof(a6), &scid, &odcid, now);
+        if (t6len <= 0) ok = 0;
+        else {
+            if (ngtcp2_crypto_verify_retry_token2(
+                    &got, t6, (size_t)t6len, secret, sizeof(secret),
+                    NGTCP2_PROTO_VER_V1, (const ngtcp2_sockaddr *)&a6, sizeof(a6),
+                    &scid, HM_QUIC_RETRY_TIMEOUT, now) != 0) ok = 0;
+            if (ngtcp2_crypto_verify_retry_token2(
+                    &got, t6, (size_t)t6len, secret, sizeof(secret),
+                    NGTCP2_PROTO_VER_V1, (const ngtcp2_sockaddr *)&b6, sizeof(b6),
+                    &scid, HM_QUIC_RETRY_TIMEOUT, now) == 0) ok = 0;
+        }
     }
 
     /* nor a tampered one */
@@ -991,6 +1141,7 @@ static int hm_quic_cb_handshake_completed(ngtcp2_conn *conn, void *user_data) {
     if (!qc->handshake_done) {
         qc->handshake_done = 1;
         if (qc->srv->handshaking > 0) qc->srv->handshaking--;
+        hm_quic_src_dec(qc->srv, (const struct sockaddr *)&qc->peer);
     }
     /* NEW_TOKEN, so this client's next visit skips address validation
      * entirely - no Retry round trip even while the server is demanding one
@@ -1139,7 +1290,10 @@ static void hm_quic_conn_free(pTHX_ hm_qconn *qc) {
     for (pp = &srv->conns; *pp; pp = &(*pp)->next)
         if (*pp == qc) { *pp = qc->next; break; }
     srv->nconns--;
-    if (!qc->handshake_done && srv->handshaking > 0) srv->handshaking--;
+    if (!qc->handshake_done) {
+        if (srv->handshaking > 0) srv->handshaking--;
+        hm_quic_src_dec(srv, (const struct sockaddr *)&qc->peer);
+    }
     if (srv->loop->h3_live > 0) srv->loop->h3_live--;
     hm_h3_session_free(aTHX_ qc);
     if (qc->conn) ngtcp2_conn_del(qc->conn);
@@ -1372,6 +1526,7 @@ static hm_qconn *hm_quic_conn_new(pTHX_ hm_quic_srv *srv,
     srv->conns = qc;
     srv->nconns++;
     srv->handshaking++;
+    (void)hm_quic_src_inc(srv, peer);
     srv->loop->h3_live++;
     return qc;
 }
@@ -1523,6 +1678,7 @@ static int hm_quic_available(void) { return 0; }
 static const char *hm_quic_library(void) { return 0; }
 static int hm_quic_cid_selftest(void)  { return 0; }
 static int hm_quic_heap_selftest(void) { return 0; }
+static int hm_quic_src_selftest(void)  { return 0; }
 static int hm_quic_token_selftest(void) { return 0; }
 static void hm_quic_expire(pTHX_ hm_loop *loop) {
     PERL_UNUSED_CONTEXT; (void)loop;

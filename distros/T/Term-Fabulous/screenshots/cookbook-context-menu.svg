@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="636" height="345" viewBox="0 0 636 345" role="img" aria-label="perl examples/cookbook/context-menu.pl">
+<title>perl examples/cookbook/context-menu.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="604" height="310" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="604" height="310" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="604" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="318" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/cookbook/context-menu.pl</text>
+<rect x="16.5" y="16.5" width="603" height="309" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="48" y="114" width="99" height="18" fill="#264f78"/>
+<rect x="147" y="114" width="441" height="18" fill="#242830"/>
+<rect x="48" y="132" width="540" height="18" fill="#242830"/>
+<rect x="48" y="150" width="198" height="126" fill="#242830"/>
+<rect x="246" y="150" width="207" height="18" fill="#1e2128"/>
+<rect x="453" y="150" width="135" height="126" fill="#242830"/>
+<rect x="246" y="168" width="9" height="18" fill="#1e2128"/>
+<rect x="255" y="168" width="189" height="18" fill="#61afef"/>
+<rect x="444" y="168" width="9" height="18" fill="#1e2128"/>
+<rect x="246" y="186" width="207" height="90" fill="#1e2128"/>
+<rect x="48" y="276" width="540" height="18" fill="#242830"/>
+<rect x="255" y="158" width="189" height="1" fill="#61afef"/>
+<rect x="250" y="168" width="1" height="90" fill="#61afef"/>
+<rect x="448" y="168" width="1" height="90" fill="#61afef"/>
+<rect x="255" y="230" width="189" height="1" fill="#787e8a"/>
+<rect x="255" y="266" width="189" height="1" fill="#61afef"/>
+</g>
+<polyline points="250.5 168 250.5 163 250.538 162.413 250.653 161.835 250.843 161.278 251.103 160.75 251.43 160.261 251.818 159.818 252.261 159.43 252.75 159.103 253.278 158.843 253.835 158.653 254.413 158.538 255 158.5 255 158.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="448.5 168 448.5 163 448.462 162.413 448.347 161.835 448.157 161.278 447.897 160.75 447.57 160.261 447.182 159.818 446.739 159.43 446.25 159.103 445.722 158.843 445.165 158.653 444.587 158.538 444 158.5 444 158.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="250.5 258 250.5 262 250.538 262.587 250.653 263.165 250.843 263.722 251.103 264.25 251.43 264.739 251.818 265.182 252.261 265.57 252.75 265.897 253.278 266.157 253.835 266.347 254.413 266.462 255 266.5 255 266.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="448.5 258 448.5 262 448.462 262.587 448.347 263.165 448.157 263.722 447.897 264.25 447.57 264.739 447.182 265.182 446.739 265.57 446.25 265.897 445.722 266.157 445.165 266.347 444.587 266.462 444 266.5 444 266.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<g class="terminal">
+<text x="48" y="92" textLength="45" fill="#dcdfe4">Notes</text>
+<text x="48" y="128" textLength="324" fill="#dcdfe4">Select some words, then right-click,</text>
+<text x="48" y="146" textLength="315" fill="#dcdfe4">or press Shift+F10 or the Menu key.</text>
+<text x="264" y="182" textLength="171" fill="#101216">Cut          Ctrl+X</text>
+<text x="264" y="200" textLength="36" fill="#dcdfe4">Copy</text>
+<text x="381" y="200" textLength="54" fill="#787e8a">Ctrl+C</text>
+<text x="264" y="218" textLength="45" fill="#dcdfe4">Paste</text>
+<text x="381" y="218" textLength="54" fill="#787e8a">Ctrl+V</text>
+<text x="264" y="254" textLength="90" fill="#dcdfe4">Select all</text>
+<text x="381" y="254" textLength="54" fill="#787e8a">Ctrl+A</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

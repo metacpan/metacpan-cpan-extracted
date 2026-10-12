@@ -1,0 +1,10 @@
+bin/crypter
+lib/Crypter.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/00_compile.t
+t/01_test_Crypter.t
+t/02_test_crypter_console.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

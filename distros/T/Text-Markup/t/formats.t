@@ -31,6 +31,14 @@ my %expected_for = (
         $html =~ s/ü/\\xFC/ if WIN32;
         return $html;
     },
+    markdown => sub {
+        my $html = slurp catfile('t', 'html', "markdown.html");
+        if (eval { Text::Markdown::Discount->VERSION < 0.19}) {
+            $html =~ s/\n<dl>/<dl>/;
+            $html =~ s{</body>}{\n</body>};
+        }
+        return $html;
+    },
 );
 
 my %parsed_filter_for = (

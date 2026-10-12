@@ -14,7 +14,7 @@ sub import {
 # Disable the use of HTML::Entities.
 $Pod::Simple::XHTML::HAS_HTML_ENTITIES = 0;
 
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 
 sub parser {
     my ($file, $encoding, $opts) = @_;

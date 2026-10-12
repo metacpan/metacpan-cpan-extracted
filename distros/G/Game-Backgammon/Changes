@@ -1,5 +1,11 @@
 Revision history for Game-Backgammon
 
+0.03    2026-10-11
+    - Add Game::Backgammon::Terminal->run(@argv), which returns the exit status
+    - Terminal's game loop is now start, not run
+    - A bad option exits 2 with the usage on STDERR, not 255
+    - A game lost against the bot exits 1
+
 0.02    2026-10-07
     - Build a turn one checker at a time with the keys, instead of
       picking one of up to three hundred numbered turns.

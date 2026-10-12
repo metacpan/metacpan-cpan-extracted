@@ -166,4 +166,89 @@ sub body_json { file_json_decode($_[0][2][0]) }
     is(body_json($r)->{errors}[0]{in}, 'response', 'error marked in=response');
 }
 
+# ---- a Swagger 2.0 document serves like any other ---------------------------------
+# One document, converted at load; every status the app answers must come out
+# the same as it would from the 3.0 twin. Driven in-process, no server.
+{
+    my $api20 = Open::API->new(spec => {
+        swagger  => '2.0',
+        info     => { title => 'P', version => '1' },
+        consumes => [ 'application/json' ],
+        produces => [ 'application/json' ],
+        securityDefinitions => { B => { type => 'basic' } },
+        definitions => { NewPet => { type => 'object', required => ['name'],
+                                     properties => { name => { type => 'string' } } } },
+        paths => {
+            '/pets' => {
+                post => { operationId => 'addPet',
+                    parameters => [ { name => 'pet', in => 'body', required => \1,
+                                      schema => { '$ref' => '#/definitions/NewPet' } } ],
+                    responses => { 200 => { description => 'ok', schema => { '$ref' => '#/definitions/NewPet' } } } },
+                get  => { operationId => 'listPets',
+                    parameters => [ { name => 'limit', in => 'query', type => 'integer' } ],
+                    responses => { 200 => { description => 'ok' } } },
+            },
+            '/pets/{id}' => {
+                get => { operationId => 'getPet',
+                    parameters => [ { name => 'id', in => 'path', required => \1, type => 'integer' } ],
+                    responses => { 200 => { description => 'ok' } } },
+            },
+            '/secret' => {
+                get => { operationId => 'secret', security => [ { B => [] } ],
+                    responses => { 200 => { description => 'ok' } } },
+            },
+        },
+    });
+    my $app20 = Open::API::Plack->new(api => $api20,
+        handlers => {
+            addPet   => sub { my ($p) = @_; { name => $p->{body}{name} } },
+            listPets => sub { [] },
+            getPet   => sub { my ($p) = @_; { id => $p->{path}{id} } },
+            secret   => sub { { ok => 1 } },
+        },
+        security => { B => sub { $_[0] eq 'alice:pw' ? { u => 'alice' } : 0 } },
+    )->to_app;
+    my $r20 = sub {
+        my (%o) = @_;
+        my $body = defined $o{body} ? $o{body} : '';
+        open my $in, '<', \$body or die;
+        return $app20->({
+            REQUEST_METHOD => $o{method} || 'GET',
+            PATH_INFO      => $o{path}   || '/',
+            QUERY_STRING   => $o{query}  || '',
+            CONTENT_TYPE   => $o{ctype}  || ($body ne '' ? 'application/json' : ''),
+            CONTENT_LENGTH => length $body,
+            'psgi.input'   => $in,
+            %{ $o{env} || {} },
+        });
+    };
+    is($r20->(path => '/pets/7')->[0], 200, '2.0: a routed path with an integer id is 200');
+    is($r20->(path => '/pets/x')->[0], 400, '2.0: a non-integer id is a 400 (the inline type validates)');
+    is($r20->(path => '/nowhere')->[0], 404, '2.0: an unknown path is 404');
+    {
+        my $r = $r20->(method => 'PATCH', path => '/pets');
+        is($r->[0], 405, '2.0: an undeclared method is 405');
+        my %h = @{ $r->[1] };
+        is(join(',', sort split /,\s*/, $h{Allow}), 'GET,POST', '2.0: ...with Allow from the path item');
+    }
+    {   # 415 is the opt-in content negotiation (t/18); by default an undeclared
+        # body type is a 400 naming the content type, for 3.x and 2.0 alike
+        my $r = $r20->(method => 'POST', path => '/pets', body => '<a/>', ctype => 'application/xml');
+        is($r->[0], 400, '2.0: a body type not in consumes is refused');
+        like($r->[2][0], qr/undeclared request content type/, '2.0: ...naming the content type');
+    }
+    is($r20->(method => 'POST', path => '/pets', body => '{}')->[0], 400,
+       '2.0: a body missing a required property is 400');
+    {
+        my $r = $r20->(method => 'POST', path => '/pets', body => '{"name":"fido"}');
+        is($r->[0], 200, '2.0: a conforming body reaches the handler');
+        is(body_json($r)->{name}, 'fido', '2.0: ...which saw the decoded body');
+    }
+    is($r20->(path => '/secret')->[0], 401, '2.0: a basic scheme refuses a bare request');
+    is($r20->(path => '/secret', env => { HTTP_AUTHORIZATION => 'Basic YWxpY2U6cHc=' })->[0], 200,
+       '2.0: ...and admits the right credential');
+    is($r20->(path => '/secret', env => { HTTP_AUTHORIZATION => 'Basic Ym9iOm5vcGU=' })->[0], 401,
+       '2.0: ...and refuses the wrong one');
+}
+
 done_testing();

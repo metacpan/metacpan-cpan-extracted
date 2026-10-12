@@ -7,7 +7,7 @@ use Moo::Role;
 use Carp            qw( croak );
 use Module::Runtime qw( use_module );
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 requires qw( cipher_id cipher_name key_bytes iv_bytes tag_bytes seal unseal );
 

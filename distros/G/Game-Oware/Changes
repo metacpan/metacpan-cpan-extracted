@@ -1,5 +1,8 @@
 Revision history for Game-Oware
 
+0.03    2026-10-11
+	- Add Game::Oware::Terminal->run(@argv), which returns the exit status
+
 0.02    2026-10-07
 	- Pick a move with the arrow keys in the terminal, previewing the
 	  position the move would produce.

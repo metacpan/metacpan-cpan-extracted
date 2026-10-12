@@ -7,10 +7,7 @@ README.md
 cpanfile
 lib/Mojolicious/Plugin/WithCSRFProtection.pm
 minil.toml
-perlcriticrc
-perltidyrc
 t/basic.t
 t/custom.t
-tidyall.ini
 META.yml
 MANIFEST

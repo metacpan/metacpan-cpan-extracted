@@ -8,7 +8,7 @@ use Exporter 'import';
 use Game::Dominoes::Tile;
 use Game::Dominoes::Layout;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 our @EXPORT_OK = qw(
 	tile_text parse_tile
 	move_text parse_move
@@ -110,7 +110,7 @@ Game::Dominoes::Notation - tiles, plays and whole hands as text
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

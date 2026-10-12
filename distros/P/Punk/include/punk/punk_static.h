@@ -165,6 +165,27 @@ static int ps_path_unsafe(const char *p, STRLEN len) {
     return 0;
 }
 
+/* Does any segment begin with a dot? A dotfile is where a tree keeps what it
+ * was never meant to publish - .env, .git, .htaccess - so a mount refuses
+ * them unless it was told otherwise. `.well-known` is the one name with a
+ * dot that exists to be served (RFC 8615), and `well_known` lets it through;
+ * what is under it is still checked segment by segment. A bare `.` names the
+ * directory it is in and hides nothing; `..` is ps_path_unsafe's. */
+static int ps_path_dotted(const char *p, STRLEN len, int well_known) {
+    STRLEN i, seg = 0;
+    for (i = 0; i <= len; i++) {
+        if (i == len || p[i] == '/' || p[i] == '\\') {
+            STRLEN n = i - seg;
+            if (n > 1 && p[seg] == '.'
+                && !(well_known && n == 11
+                     && memEQ(p + seg, ".well-known", 11)))
+                return 1;
+            seg = i + 1;
+        }
+    }
+    return 0;
+}
+
 /* ---- directories -----------------------------------------------------------
  * A directory is not a file, so by itself it is a 404. Two options give it
  * one more chance first: `index` names a file inside it to serve in its
@@ -233,21 +254,59 @@ static void ps_url_esc(pTHX_ SV *out, const char *s, STRLEN len) {
  * `no-store`, because a listing is stale the moment anything in the
  * directory changes and there is no cheap validator for "what this directory
  * holds" the way there is for one file's bytes. */
-static SV *ps_listing(pTHX_ const char *file, STRLEN flen,
-                      const char *urlpath, STRLEN ulen, int is_head) {
+static SV *ps_listing(pTHX_ HV *env, const char *file, STRLEN flen,
+                      const char *urlpath, STRLEN ulen, int is_head,
+                      int dotfiles) {
     DIR *dh = PerlDir_open(file);
     Direntry_t *de;
     AV *ents, *resp, *headers, *body;
     SV *html;
     SSize_t i, n;
     char child[MAXPATHLEN + 1];
+    const char *pre = NULL;
+    STRLEN prel = 0;
+    int at_root = (ulen == 1 && urlpath[0] == '/');
 
     if (!dh) return NULL;
+
+    /* The hrefs are relative, and a relative href resolves against the
+     * directory of the URL the browser asked for - which is this directory
+     * only when that URL ended in a slash. Asked for without one, `/sub`
+     * resolves `x.txt` to `/x.txt`, a level too high. So the links carry the
+     * last segment themselves in that spelling. At the root of the mount
+     * PATH_INFO is `/` either way and only the request line can say which
+     * was asked for; the segment is then the mount's own, from SCRIPT_NAME. */
+    if (!at_root) {
+        if (ulen && urlpath[ulen - 1] != '/') {
+            pre = urlpath + ulen;
+            while (pre > urlpath && pre[-1] != '/') pre--;
+            prel = (STRLEN)(urlpath + ulen - pre);
+        }
+    }
+    else {
+        SV **ru = hv_fetchs(env, "REQUEST_URI", 0);
+        SV **sn = hv_fetchs(env, "SCRIPT_NAME", 0);
+        if (ru && *ru && SvOK(*ru) && sn && *sn && SvOK(*sn)) {
+            STRLEN rl, sl;
+            const char *r = SvPV_const(*ru, rl);
+            const char *s = SvPV_const(*sn, sl);
+            const char *q = (const char *)memchr(r, '?', rl);
+            if (q) rl = (STRLEN)(q - r);
+            if (rl && r[rl - 1] != '/' && sl && s[sl - 1] != '/') {
+                pre = s + sl;
+                while (pre > s && pre[-1] != '/') pre--;
+                prel = (STRLEN)(s + sl - pre);
+            }
+        }
+    }
+
     ents = (AV *)sv_2mortal((SV *)newAV());
     while ((de = PerlDir_read(dh))) {
         const char *nm = de->d_name;
         if (nm[0] == '.' && (nm[1] == '\0'
                              || (nm[1] == '.' && nm[2] == '\0'))) continue;
+        /* what the mount will not serve it does not advertise */
+        if (nm[0] == '.' && !dotfiles && !strEQ(nm, ".well-known")) continue;
         av_push(ents, newSVpv(nm, 0));
     }
     PerlDir_close(dh);
@@ -265,8 +324,10 @@ static SV *ps_listing(pTHX_ const char *file, STRLEN flen,
 
     /* The parent, except at the root of the mount, where there is none to
      * offer that is still inside it. */
-    if (!(ulen == 1 && urlpath[0] == '/'))
-        sv_catpvs(html, "<li><a href=\"..\">../</a></li>\n");
+    if (!at_root) {
+        if (prel) sv_catpvs(html, "<li><a href=\".\">../</a></li>\n");
+        else      sv_catpvs(html, "<li><a href=\"..\">../</a></li>\n");
+    }
 
     for (i = 0; i < n; i++) {
         SV **ep = av_fetch(ents, i, 0);
@@ -283,9 +344,11 @@ static SV *ps_listing(pTHX_ const char *file, STRLEN flen,
             child[flen + 1 + el] = '\0';
             if (PerlLIO_stat(child, &st) == 0 && S_ISDIR(st.st_mode)) isdir = 1;
         }
-        /* A relative href, so it works from both spellings of the directory
-         * URL without this having to know which one was asked for. */
         sv_catpvs(html, "<li><a href=\"");
+        if (prel) {
+            ps_url_esc(aTHX_ html, pre, prel);
+            sv_catpvs(html, "/");
+        }
         ps_url_esc(aTHX_ html, es, el);
         if (isdir) sv_catpvs(html, "/");
         sv_catpvs(html, "\">");
@@ -351,7 +414,8 @@ enum {
                       /* fingerprinting on this mount                    */
     PSC_DEV    = 4,   /* re-stat cached digests (development)             */
     PSC_INDEX  = 5,   /* the index filename, or undef: no directory index */
-    PSC_LIST   = 6    /* list a directory that has no index file          */
+    PSC_LIST   = 6,   /* list a directory that has no index file          */
+    PSC_DOT    = 7    /* serve and list dotfiles                          */
 };
 
 static SV *psc_cap(pTHX_ AV *cap, int slot) {
@@ -397,7 +461,8 @@ XS_INTERNAL(punk_static_cb) {
     if (e && *e && SvOK(*e)) path = SvPV_const(*e, plen);
     else { path = "/"; plen = 1; }
 
-    if (ps_path_unsafe(path, plen) || dlen + plen > MAXPATHLEN) {
+    if (ps_path_unsafe(path, plen) || dlen + plen > MAXPATHLEN
+        || (!psc_cap(aTHX_ cap, PSC_DOT) && ps_path_dotted(path, plen, 1))) {
         ST(0) = sv_2mortal(ps_plain(aTHX_ 404, "Not Found", NULL, NULL));
         XSRETURN(1);
     }
@@ -464,7 +529,9 @@ XS_INTERNAL(punk_static_cb) {
                 /* No index, or none wanted. A listing if this mount renders
                  * them; otherwise fall through, and the 404 below stands. */
                 if (listsv) {
-                    resp = ps_listing(aTHX_ file, flen, path, plen, is_head);
+                    resp = ps_listing(aTHX_ env, file, flen, path, plen,
+                                      is_head,
+                                      psc_cap(aTHX_ cap, PSC_DOT) ? 1 : 0);
                     if (resp) { ST(0) = sv_2mortal(resp); XSRETURN(1); }
                 }
             }

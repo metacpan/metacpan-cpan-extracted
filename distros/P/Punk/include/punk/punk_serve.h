@@ -283,8 +283,23 @@ static SV *ps_serve_one(pTHX_ HV *state, HV *env) {
         if (has_hooks) {
             SV *ret = &PL_sv_undef, *err = &PL_sv_undef;
             if (pd_run_chain(aTHX_ before_req, c, &ret, &err)) {
-                SV *out = punk_finish_c(aTHX_ app, c, ret, err, on_err,
-                                        method, mlen, after, env);
+                SV *out;
+                if (ext_connect) {
+                    /* A hook that answers for itself runs ahead of the gate
+                     * below, and its answer to an upgrade would be the
+                     * oracle that gate closes: a page elsewhere reading a
+                     * path's status as a websocket open or error. So an
+                     * Extended CONNECT it short-circuits gets the one fixed
+                     * answer every non-websocket path gives. */
+                    if (ret != &PL_sv_undef) SvREFCNT_dec(ret);
+                    if (err != &PL_sv_undef) SvREFCNT_dec(err);
+                    out = ps_err_triplet(aTHX_ 404, PS_ERR_404,
+                                         sizeof(PS_ERR_404) - 1, NULL);
+                    if (PK_OBS_WANT_RES) pk_obs_fire_res(aTHX_ c, out);
+                    return out;
+                }
+                out = punk_finish_c(aTHX_ app, c, ret, err, on_err,
+                                    method, mlen, after, env);
                 if (ret != &PL_sv_undef) SvREFCNT_dec(ret);
                 if (err != &PL_sv_undef) SvREFCNT_dec(err);
                 return out;
@@ -631,6 +646,13 @@ static SV *ps_serve_one(pTHX_ HV *state, HV *env) {
             SV *cg = ps_state(aTHX_ state, K_CGET);
             if (cg && SvTRUE(cg)) {
                 SV *cgout = NULL, *cgerr = NULL;
+                {   /* `etag => 1` hashes the body this route renders, so
+                     * the body has to come out the same way every time */
+                    SV **et = hv_fetchs(rech, K_ETAG, 0);
+                    if (et && *et && SvOK(*et) && !SvROK(*et) && SvTRUE(*et))
+                        (void)av_store(pcx_av(aTHX_ c), PCX_CANON,
+                                       newSViv(1));
+                }
                 if (pcg_check(aTHX_ c, rech, env, method, mlen,
                               &cgout, &cgerr)) {
                     if (cgerr) err = cgerr;      /* the app's 500 */

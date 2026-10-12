@@ -12,7 +12,7 @@ use Readonly;
 
 use Database::BI::Model::DataSource;
 
-our $VERSION = '0.010.0';
+our $VERSION = '0.011.0';
 
 # Default config values used by the Config plugin and referenced explicitly
 # in startup() so callers always get a resolved value.
@@ -33,7 +33,7 @@ Database::BI - Web-based Business Intelligence viewer for flat data files
 
 =head1 VERSION
 
-0.010.0
+0.011.0
 
 =head1 DESCRIPTION
 
@@ -188,7 +188,9 @@ Filesystem navigator.  Accepts C<?path=> to set the starting directory
 =item C<GET /open>
 
 Opens any supported file by absolute path (C<?path=>).  Accepts C<?f=>
-filters.
+filters.  When the file is a multi-table SQLite database, passing
+C<?it=E<lt>tableE<gt>> selects a specific internal table instead of the
+auto-detected first one.
 
 =item C<GET /join>
 
@@ -232,9 +234,12 @@ C<$HOME>).  Returns C<{ path, parent, dirs: [{name, path}] }>.
 =item C<GET /api/stat>
 
 Returns filesystem metadata for a file path (C<?path=>).
-Returns C<{ exists, path, mtime, size }>.  If the file does not exist,
-C<exists> is C<false> and the remaining fields are absent (HTTP 200).
-Returns HTTP 400 when C<path> is missing.
+Returns C<{ exists, path, mtime, size }>.  For SQLite files
+(C<.sql>, C<.sqlite>, C<.sqlite3>, C<.db>) an additional C<table_count>
+integer is included when the file is a valid SQLite database; the field
+is omitted for Berkeley DB or other non-SQLite payloads.
+If the file does not exist, C<exists> is C<false> and the remaining
+fields are absent (HTTP 200).  Returns HTTP 400 when C<path> is missing.
 
 =item C<POST /upload>
 
@@ -248,6 +253,14 @@ Fetches an HTML table from a public URL (C<?url=>) and renders it as a
 data grid.  An optional C<?t=> parameter (zero-based integer) selects
 which HTML table on the page to display when the page contains multiple
 tables.
+
+=item C<GET /tables>
+
+Schema browser for multi-table SQLite databases.  Accepts C<?l=E<lt>specE<gt>>
+(same C<table:name> or C<path:/abs/path> spec as C</join>).  Returns a card
+grid listing every internal table with its columns; each card links to
+C</open?path=...&it=E<lt>tableE<gt>>.  Redirects to 404 when the spec is
+absent, invalid, or the resolved file is not a multi-table SQLite database.
 
 =item C<GET /combine>
 
@@ -263,13 +276,16 @@ where a source file lacks a column.  Parameters:
 
 Renders a D3.js v7 zoomable line chart of any two columns.  Parameters:
 
-  l=<spec>    left table (required)
-  x=<col>     X-axis column name (required; any type, shown as labels)
-  y=<col>     Y-axis column name (required; must be numeric after stripping
-              currency symbols and commas; accounting-notation negatives like
-              (1,234.56) are handled automatically)
-  back=<url>  URL for the "Back to table" link (optional; default "/")
-  j=, f=, d=  pipeline params (same as /join)
+  l=<spec>           left table (required)
+  x=<col>            X-axis column name (required; any type, shown as labels)
+  y=<col>            Y-axis column name (required; must be numeric after stripping
+                     currency symbols and commas; accounting-notation negatives
+                     like (1,234.56) are handled automatically)
+  back=<url>         URL for the second breadcrumb link (optional; default "/")
+  back2=<url>        URL for the outermost breadcrumb link when three levels are
+                     needed (optional; e.g. /tables?l=... for the schema browser)
+  back2_label=<text> Label for the back2 link (optional; default "Back")
+  j=, f=, d=         pipeline params (same as /join)
 
 =item C<GET /pie>
 
@@ -277,27 +293,60 @@ Renders a D3.js v7 animated pie chart grouped by a category column.
 Clicking a slice or legend entry navigates to the table view filtered to
 that category.  Parameters:
 
-  l=<spec>    left table (required)
-  cat=<col>   category column to group by (required)
-  val=<col>   numeric column to sum per category (required)
-  donut=1     show a hole in the centre (optional)
-  back=<url>  URL for the "Back to table" link (optional; default "/")
-  f=          result filters applied before aggregating (repeatable)
+  l=<spec>           left table (required)
+  cat=<col>          category column to group by (required)
+  val=<col>          numeric column to sum per category (required)
+  donut=1            show a hole in the centre (optional)
+  back=<url>         URL for the second breadcrumb link (optional; default "/")
+  back2=<url>        URL for the outermost breadcrumb link (optional)
+  back2_label=<text> Label for the back2 link (optional; default "Back")
+  f=                 result filters applied before aggregating (repeatable)
 
 =item C<GET /heatmap>
 
 Renders a D3.js v7 grid heatmap with two categorical axes.  Each cell
 colour encodes a summed or counted numeric value.  Parameters:
 
-  l=<spec>      left table (required)
-  x=<col>       X-axis column name (required; categorical)
-  y=<col>       Y-axis column name (required; categorical)
-  val=<col>     numeric column to sum per cell (optional; omit to count rows)
-  scheme=<name> colour scheme: YlOrRd Blues Greens Purples RdPu YlGnBu
-                (optional; default YlOrRd)
-  show_val=1    print the value inside each cell (optional)
-  back=<url>    URL for the "Back to table" link (optional; default "/")
-  j=, f=, d=    pipeline params (same as /join)
+  l=<spec>           left table (required)
+  x=<col>            X-axis column name (required; categorical)
+  y=<col>            Y-axis column name (required; categorical)
+  val=<col>          numeric column to sum per cell (optional; omit to count rows)
+  scheme=<name>      colour scheme: YlOrRd Blues Greens Purples RdPu YlGnBu
+                     (optional; default YlOrRd)
+  show_val=1         print the value inside each cell (optional)
+  back=<url>         URL for the second breadcrumb link (optional; default "/")
+  back2=<url>        URL for the outermost breadcrumb link (optional)
+  back2_label=<text> Label for the back2 link (optional; default "Back")
+  j=, f=, d=         pipeline params (same as /join)
+
+=item C<GET /bar>
+
+Renders a D3.js v7 bar chart grouped by a categorical column.  Parameters:
+
+  l=<spec>           left table (required)
+  cat=<col>          category (X-axis) column (required)
+  val=<col>          numeric column to sum per category; omit or use __count__
+                     to count rows instead of summing (optional)
+  orient=h           horizontal bars (default: vertical)
+  sort=value|label   sort bars by descending value or ascending label
+  max=N              collapse bars beyond the top-N into an "Other" bar
+  back=<url>         URL for the second breadcrumb link (optional; default "/")
+  back2=<url>        URL for the outermost breadcrumb link (optional)
+  back2_label=<text> Label for the back2 link (optional; default "Back")
+  j=, f=, d=         pipeline params (same as /join)
+
+=item C<GET /folder>
+
+Hierarchical folder view.  Groups a data table by the letter-prefix of an
+order-number column (e.g. A10, CT4, B3) and shows one card per prefix group.
+Clicking a card with sub-prefixes drills down; clicking a leaf shows the
+matching data rows.  Parameters:
+
+  l=<spec>     left table (required)
+  col=<col>    order-code column (auto-detected when absent)
+  prefix=<str> current drill-down prefix (top level when absent)
+  back=<url>   URL for the back link (optional)
+  f=           result filters (repeatable)
 
 =item C<POST /uploads/clear>
 
@@ -688,12 +737,13 @@ sub startup ($self) {
 		}
 		my $dir = exists $opts{directory} ? $opts{directory} : $data_dir;
 		Database::BI::Model::DataSource->new(
-			directory     => $dir,
-			table         => $table,
-			cache         => $chi,
-			cache_ttl_url => $cache_ttl_url,
-			exists $opts{host}     ? (host     => $opts{host})     : (),
-			exists $opts{file_ext} ? (file_ext => $opts{file_ext}) : (),
+			directory      => $dir,
+			table          => $table,
+			cache          => $chi,
+			cache_ttl_url  => $cache_ttl_url,
+			exists $opts{host}           ? (host           => $opts{host})           : (),
+			exists $opts{file_ext}       ? (file_ext       => $opts{file_ext})       : (),
+			exists $opts{internal_table} ? (internal_table => $opts{internal_table}) : (),
 		);
 	});
 
@@ -717,6 +767,7 @@ sub startup ($self) {
 	$r->get('/heatmap')->to('Dashboard#heatmap_view');
 	$r->get('/bar')->to('Dashboard#bar_view');
 	$r->get('/folder')->to('Dashboard#folder_view');
+	$r->get('/tables')->to('Dashboard#tables_view');
 
 	# Evict stale upload subdirectories on every startup so the cache cannot
 	# grow unboundedly across server restarts.  Only entries whose mtime is

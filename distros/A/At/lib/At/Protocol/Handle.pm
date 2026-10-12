@@ -1,4 +1,4 @@
-package At::Protocol::Handle v1.7.0 {
+package At::Protocol::Handle v1.8.0 {
     use v5.42;
     use At::Error qw[register throw];
     use parent -norequire => 'Exporter';

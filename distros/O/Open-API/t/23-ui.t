@@ -189,6 +189,23 @@ my $api  = Open::API->new(spec => $SPEC);
     is($one->[2][0], $two->[2][0], 'the body bytes are the shared cache');
 }
 
+# ---- a Swagger 2.0 document renders like any other --------------------------------
+# The UI walks ->spec, which is 3.1-shaped whatever the document declared, and
+# labels the page from info (not from the version string), so nothing in it
+# knows the document was 2.0.
+{
+    my $api20 = Open::API->new(spec => "$FindBin::Bin/spec/petstore-2.0.json");
+    my $ui    = Open::API::UI->new(api => $api20);
+    my $html  = $ui->index_html;
+    like($html, qr/<title>Swagger Petstore<\/title>/, '2.0: title from info.title');
+    like($html, qr/<span class="oa-method">POST<\/span>/, '2.0: a method badge for addPet');
+    like($html, qr/id="op-findPets"/, '2.0: an operation anchor');
+    my $spec = $ui->spec_json;
+    like($spec, qr/"swagger"\s*:\s*"2\.0"/, '2.0: the served document keeps its swagger key');
+    like($spec, qr/"components"/, '2.0: ...and is 3.x-shaped beneath it');
+    unlike($spec, qr/"definitions"/, '2.0: no 2.0 section survives into the served document');
+}
+
 # ---- to_app ------------------------------------------------------------------
 {
     my $app = Open::API::UI->new(api => $api)->to_app;

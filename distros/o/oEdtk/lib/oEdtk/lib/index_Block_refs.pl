@@ -80,7 +80,7 @@ if 	($type eq 'idldoc') {
 		$where .="  AND ED_STATUS = ? ";
 		push (@values, $key2);
 
-	} elsif (defined $key2 && $key2 > 0 && $key1!~/\%$/){ # key2 est le numéro de page
+	} elsif (defined $key2 && $key2 > 0 && $key1!~/\%$/){ # key2 is the page number
 	#} elsif (defined $key2 && $key2 > 0 ){
 		$where .="  AND ED_SEQDOC  = (SELECT ED_SEQDOC FROM " . $cfg->{'EDTK_DBI_OUTMNGR'} . " WHERE ED_IDLDOC = ? AND ED_IDSEQPG = ? )";
 #		$where .="  AND ED_SEQDOC  = (SELECT ED_SEQDOC FROM EDTK_INDEX WHERE ED_IDLDOC = ? AND ED_IDSEQPG = ? )";
@@ -101,8 +101,8 @@ $sth->execute(@values);
 my $rows= $sth->fetchall_arrayref();
 
 if ($#$rows<0) {
-	warn "INFO : pas de donnees associees.\n";
-	# tracker l'action
+	warn "INFO : no associated data.\n";
+	# track the action
 	exit;
 }
 
@@ -128,7 +128,7 @@ my 	$updt = "UPDATE " . $cfg->{'EDTK_DBI_OUTMNGR'} . " SET ED_DTLOT = ?, ED_SEQL
 	$sth = $dbh->prepare($updt.$where);
 
 if ($event!~/^RESET$/i && $event!~/^STOP$/i) {
-	# pour tous les autres event on ne rejoue pas les docs, ils seront purgés (index_Purge_DCLIB)
+	# for all other events the docs are not replayed; they will be purged (index_Purge_DCLIB)
 	# warn "INFO : $updt \n $event, $event, $event, $event, @values\n";
 	$sth->execute($event, $event, $event, $event, @values);
 
@@ -139,7 +139,7 @@ if ($event!~/^RESET$/i && $event!~/^STOP$/i) {
 }
 
 
-# REVOIR LE TRACKING : METTRE UN VRAI TIMESTAMP, LA BONNE ED_APP
+# REVIEW THE TRACKING: SET A REAL TIMESTAMP, THE RIGHT ED_APP
 $sql = "INSERT INTO EDTK_TRACKING(ED_TSTAMP, ED_USER, ED_SEQ, ED_SNGL_ID, ED_APP, ED_JOB_EVT, ED_OBJ_COUNT, ED_CORP, ED_HOST, ED_K4_VAL) ";
 $sql .=" VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 my $trk = $dbh->prepare($sql);

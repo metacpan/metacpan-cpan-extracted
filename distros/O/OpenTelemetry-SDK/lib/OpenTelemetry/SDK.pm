@@ -1,7 +1,7 @@
 package OpenTelemetry::SDK;
 # ABSTRACT: An implementation of the OpenTelemetry SDK for Perl
 
-our $VERSION = '0.028';
+our $VERSION = '0.100';
 
 use strict;
 use warnings;
@@ -12,6 +12,7 @@ use Feature::Compat::Try;
 use Module::Runtime;
 use OpenTelemetry::Common 'config';
 use OpenTelemetry::Propagator::Composite;
+use OpenTelemetry::SDK::Logs::LoggerProvider;
 use OpenTelemetry::SDK::Trace::TracerProvider;
 use OpenTelemetry::X;
 use OpenTelemetry;
@@ -20,6 +21,12 @@ use Scalar::Util 'blessed';
 
 use isa 'OpenTelemetry::X';
 
+# TODO: These used to be private methods, but exposing them as part of
+# the OpenTelemetry::SDK interface made testing this a lot simpler.
+# It might be that exposing them to the user is actually desirable though,
+# since it might come in handy for keeping the default configuration
+# for _most_ things, but customising it for others. If so, we should
+# decide what the interface here will look like.
 sub configure_propagators ($, @args) {
     my $logger = OpenTelemetry::Common::internal_logger;
 
@@ -80,6 +87,75 @@ sub configure_propagators ($, @args) {
     # If we have multiple good ones, wrap them in a composite
     OpenTelemetry->propagator
         = OpenTelemetry::Propagator::Composite->new(@propagators),
+}
+
+sub configure_logger_provider ($, $provider = undef, @) {
+    my $logger = OpenTelemetry::Common::internal_logger;
+
+    state %map = (
+        jaeger  => '::Jaeger',
+        otlp    => '::OTLP::Logs',
+        zipkin  => '::Zipkin',
+        console => 'OpenTelemetry::SDK::Exporter::Console',
+    );
+
+    my @names = split ',',
+        ( config('LOGS_EXPORTER') // 'otlp' ) =~ s/\s//gr;
+
+    if ($provider) {
+        if ( ! blessed $provider ) {
+            $logger->warnf('Attempted to configure a logger provider that was not a blessed reference: %s', $provider );
+            undef $provider;
+        }
+        elsif (
+            !$provider->can('logger')
+         || !$provider->can('add_log_record_processor')
+         || !$provider->can('shutdown')
+         || !$provider->can('force_flush')
+        ) {
+            $logger->warnf("Attempted to configure a '%s' logger provider, but it does not implement the OpenTelemetry::SDK::Logs::LoggerProvider interface", ref $provider );
+            undef $provider;
+        }
+    }
+
+    $provider //= OpenTelemetry::SDK::Logs::LoggerProvider->new;
+
+    my %seen;
+    for my $name ( @names ) {
+        next if $name eq 'none';
+
+        unless ( $map{$name} ) {
+            $logger->warnf("Unknown exporter '%s' cannot be configured", $name);
+            next;
+        }
+
+        next if $seen{ $map{$name} }++;
+
+        my $exporter = $map{$name} =~ /^::/
+            ? ( 'OpenTelemetry::Exporter' . $map{$name} )
+            : $map{$name};
+
+        my $processor = 'OpenTelemetry::SDK::Logs::LogRecord::Processor::'
+            . ( $name eq 'console' ? 'Simple' : 'Batch' );
+
+        try {
+            Module::Runtime::require_module $exporter;
+            Module::Runtime::require_module $processor;
+
+            $provider->add_log_record_processor(
+                $processor->new( exporter => $exporter->new )
+            );
+        }
+        catch ($e) {
+            warn "Caught an error: $e";
+            $logger->warn(
+                'Error configuring log record processor',
+                { type => $name, error => "$e" },
+            )
+        }
+    }
+
+    OpenTelemetry->logger_provider = $provider;
 }
 
 sub configure_tracer_provider ($, $provider = undef, @) {
@@ -153,11 +229,11 @@ sub import ( $class ) {
     return if config('SDK_DISABLED');
 
     try {
-        # TODO: logger
         # TODO: error_handler
 
         configure_propagators(1);
         configure_tracer_provider(1);
+        configure_logger_provider(1);
     }
     catch ($e) {
         die $e if isa_OpenTelemetry_X $e;

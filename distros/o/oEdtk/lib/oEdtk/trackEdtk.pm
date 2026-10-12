@@ -12,7 +12,7 @@ BEGIN {
 		use Exporter;
 		use vars 		qw($VERSION @ISA  @EXPORT_OK); # @EXPORT %EXPORT_TAGS);
 	
-		$VERSION		= 0.8051; # à terme cette librairie devrait être reprise par oEdtk::Tracking
+		$VERSION		= 2.1109; # eventually this library should be taken over by oEdtk::Tracking
 		@ISA			= qw(Exporter);
 #		@EXPORT		= qw(
 #						);
@@ -32,12 +32,12 @@ BEGIN {
 
 	}
 
-	# 3 méthodes possibles d'alimentation (config edtk.ini -> EDTK_TRACK_MODE) :
-	# -1- DB  : suivi directement dans un SGBD (DB)-> ralentissement du traitement de prod (insérer les info de suivi en fin de traitement pour limiter l'impact => END du module ?)
-	# -2- FDB : suivi via SQLite -> pas de gestion de plusieurs accès en temps réel => créer 1 fichier db par process (procDB)-> organiser une consolidation des données 
-	# -3- LOG : fichiers de suivi à plat -> organiser une consolidation des données
+	# 3 possible ways to feed it (config edtk.ini -> EDTK_TRACK_MODE):
+	# -1- DB  : tracking directly in a DBMS (DB) -> slows down the production run (insert the tracking info at the end of the run to limit the impact => END of the module?)
+	# -2- FDB : tracking through SQLite -> no handling of several real-time accesses => create 1 db file per process (procDB) -> organize a data consolidation 
+	# -3- LOG : flat tracking files -> organize a data consolidation
 	#
-	# ? A VOIR : bug dans la création dynamique du fichier SQLite, on utilise pas le TSTAMP/PROCESS_ID ???
+	# ? TODO: bug in the dynamic creation of the SQLite file, TSTAMP/PROCESS_ID is not used ???
 
 	my $DBI_DNS		="";
 	my $DBI_USER	="";
@@ -64,14 +64,14 @@ BEGIN {
 
 
 sub ini_Edtk_Conf {
-	# recherche du fichier de configuration
-	# renvoi le chemin au fichier de configuration valide
+	# look for the configuration file
+	# return the path to the valid configuration file
 	my $iniEdtk 	=$INC{'oEdtk/trackEdtk.pm'};
 	$iniEdtk		=~s/(trackEdtk\.pm)//;
 	$iniEdtk 		.="iniEdtk/edtk.ini";
 	my $hostname	=uc ( hostname());
 
-	# OUVERTURE DU FICHIER DE CONFIGURATION
+	# OPEN THE CONFIGURATION FILE
 	my $tmpIniEdtk	=$iniEdtk;
 	my $confIni;
 	while ($tmpIniEdtk ne 'local'){
@@ -79,11 +79,11 @@ sub ini_Edtk_Conf {
 			$confIni	= Config::IniFiles->new( -file => $tmpIniEdtk, -default => 'DEFAULT');
 
 			$iniEdtk	=$tmpIniEdtk;
-			# recherche de la variable iniEdtk dans la section '$hostname' ou par défaut
-			#  dans la section 'DEFAULT' (cf méthode new)
+			# look for the iniEdtk variable in the '$hostname' section, or by default
+			#  in the 'DEFAULT' section (see the new method)
 			$tmpIniEdtk=$confIni->val( $hostname, 'iniEdtk' );
 
-		# si iniEdtk == fichier courant alors mettre la valeur à local (éviter les boucle infinies)
+		# if iniEdtk == current file then set the value to local (avoid infinite loops)
 		if ($tmpIniEdtk eq $iniEdtk) { last; }
 	}
 
@@ -93,9 +93,9 @@ return $iniEdtk;
 
 
 sub conf_To_Env ($;$) {
-	# charge les sections demandées du fic de config dans la configuration d'environnement
-	# en param, passer le chemin d'accès au fichier ini + la section à charger
-	# si la section HOSTNAME existe elle surcharge les valeurs de la section
+	# load the requested sections of the config file into the environment configuration
+	# as parameters, pass the path to the ini file + the section to load
+	# if the HOSTNAME section exists it overrides the values from the section
 	my $confIni=shift;
 	my $section=shift;
 	$section ||='DEFAULT';
@@ -107,33 +107,33 @@ sub conf_To_Env ($;$) {
 
 	my $hostname	=uc ( hostname());
 
-	# OUVERTURE DU FICHIER DE CONFIGURATION
+	# OPEN THE CONFIGURATION FILE
 	my %hConfIni;
 	tie %hConfIni, 'Config::IniFiles',( -file => $confIni );
 
-	# CHARGEMENT DES VALEURS DE LA SECTION
+	# LOAD THE VALUES FROM THE SECTION
 	my %hSection;
  	if (exists $hConfIni{$section}) {
 		%hSection =%{$hConfIni{$section}};
 	}
 
-	# CHARGEMENT EN SURCHARGE DES VALEURS PROPRES AU HOSTNAME
+	# LOAD THE HOSTNAME-SPECIFIC VALUES AS OVERRIDES
 	my %hHostname;
 	if (exists $hConfIni{$hostname}) {
 		undef %hSpecific;
 		%hHostname =%{$hConfIni{$hostname}};
 	} else {
-		warn "INFO machine '$hostname' inconnue dans la configuration";
+		warn "INFO machine '$hostname' unknown in the configuration";
 	}
  	%hConfig=(%hSection,%hHostname);
  
 	my $self = abs_path($0);
  	$self =~ /([\w\.\-]+)[\/\\]\w+\.\w+$/;
-	# DÉFINITION POUR L'ENVIRONNEMENT DE DÉV DE L'APPLICATION/PROGRAMME COURANT
+	# DEFINITION FOR THE DEV ENVIRONMENT OF THE CURRENT APPLICATION/PROGRAM
 	$hConfig{'EDTK_PRGNAME'} =$1;
 	#$hConfig{'EDTK_OPTJOB'}	=$EDTK_OPTJOB;
 
-	# mise en place des variables d'environnement
+	# set up the environment variables
 	while ((my $cle, my $valeur) = each (%hConfig)){
 		$valeur ||="";
 		$ENV{$cle}=$valeur;
@@ -143,11 +143,11 @@ sub conf_To_Env ($;$) {
 
 
 sub env_Var_Completion (\$){
-	# développe les chemins en remplaçant les variables d'environnement par les valeurs réelles
-	# tous les niveaux d'imbrication définis dans les variables d'environnement sont développés
-	# nécessite au préalable que les variables d'environnements soient définies
+	# expand the paths, replacing the environment variables with their real values
+	# every nesting level defined in the environment variables is expanded
+	# requires the environment variables to be defined beforehand
 	my $rScript =shift;
-	# il peut y avoir des variables dans les variables d'environnement elles mêmes
+	# there may be variables within the environment variables themselves
 	while (${$rScript}=~/\$/g) {
 		${$rScript}=~s/\$(\w+)/${ENV{$1}}/g;
 	}
@@ -157,13 +157,13 @@ sub env_Var_Completion (\$){
 
 
 ################################################################################
-# PARTIE DEFINITION SUIVI DE PRODUCTION
+# PRODUCTION TRACKING DEFINITION SECTION
 #
 #
 	my $DBH;
 	my %h_subInsert;
 	
-	# definition de la méthode d'insertion
+	# define the insertion method
 	$h_subInsert{'LOG'}=\&subInsert_Log;
 	$h_subInsert{'DB'} =\&subInsert_DB;
 	$h_subInsert{'FDB'}=\&subInsert_DB;
@@ -195,7 +195,7 @@ sub open_Tracking_Env(){
 		# log
 
 	} elsif ($ENV{EDTK_TRACK_MODE} =~/DB/i){
-		# DB connexion tracking
+		# DB connection tracking
 		open_DBI();
 
 	} else {
@@ -221,7 +221,7 @@ sub open_DBI(){
 					$ENV{EDTK_DBI_DSN_PASS}
 			#		,$dbargs
 				)
-			or die "ERR no connexion to $ENV{EDTK_DBI_DSN} " . DBI->errstr;
+			or die "ERR no connection to $ENV{EDTK_DBI_DSN} " . DBI->errstr;
 
 1;
 }
@@ -262,9 +262,9 @@ return $ED_SNGL_ID;
 
 sub track_Obj (;@){
 	# track_Obj ([$ED_OBJS, $ED_JOB_EVT, @ED_K_VAL])
-	#  $ED_OBJS (optionel) : nombre d'unité de l'objet (1 par defaut)
-	#  $ED_JOB_EVT (optio) : evenement en question (cf define_Job_Evt)
-	#  @ED_K_VAL(optionel) : valeurs des clefs optionnels définies avec init_Tracking (même ordre)
+	#  $ED_OBJS (optional) : number of units of the object (1 by default)
+	#  $ED_JOB_EVT (optional) : event in question (see define_Job_Evt)
+	#  @ED_K_VAL (optional) : values of the optional keys defined with init_Tracking (same order)
 
 	$ED_SEQ++;
 	$ED_OBJS 		=shift;
@@ -367,8 +367,8 @@ return $ED_K_NAME[$indice];
 
 
 sub subInsert_Log(){
-	# DANS LE CAS D'UN SUIVI SOUS FORME DE FICHIERS LOG
-	# à compléter avec l'utisation du remplaçant du Logger
+	# WHEN TRACKING IS DONE THROUGH LOG FILES
+	# TODO complete with the use of the Logger replacement
 
 	my $request	=join (", ", @TRACKED_OBJ);
 	warn "$request\n";
@@ -378,7 +378,7 @@ sub subInsert_Log(){
 
 
 sub subInsert_DB() {
-	# constructuction de la commande SQL pour insertion dans une base DBI (file/DB)
+	# build the SQL command to insert into a DBI database (file/DB)
 
 	my $request="insert into $ENV{EDTK_DBI_TRACKING}"; 
 	$request	.=" (";
@@ -388,7 +388,7 @@ sub subInsert_DB() {
 		$request	.=join (", ", @DB_USER_COL);	
 	}
 	$request	.=" ) values ('";
-#	FORMATAGE DE LA DATE POUR LES SGBD 
+#	DATE FORMATTING FOR THE DBMS 
 #	$request	.=sprintf ("to_date('%014.f', 'YYYYMMDDHH24MISS'), '", shift @TRACKED_OBJ);
 	$request	.=join ("', '", @TRACKED_OBJ);
 	$request	.="')";
@@ -398,16 +398,16 @@ sub subInsert_DB() {
 		warn "INFO ".$DBI::errstr."\n";
 	}	
 
-#	$DBH->commit();	# nécessaire si AutoCommit  vaut 0
+#	$DBH->commit();	# needed when AutoCommit is 0
 #	$DBH->disconnect();
 #	if ($DBH->err()) { warn "$DBI::errstr\n"; }
 1;
 }
 
 sub noSub(){
-	# FONCTION A VIDE POUR LES POINTEURS DE FONCTION %H_SUBINSERT
-	# pour éviter d'utiliser des tests dans des fonctions répétitives
-	# (faux switch/case)
+	# EMPTY FUNCTION FOR THE %H_SUBINSERT FUNCTION POINTERS
+	# to avoid using tests in repetitive functions
+	# (fake switch/case)
 return 1;
 }
 
@@ -421,7 +421,7 @@ sub test_exist_table(){
 					$ENV{EDTK_DBI_DSN_PASS}
 					,$dbargs
 				)
-			or die "ERR no connexion to $ENV{EDTK_DBI_DSN} " . DBI->errstr;
+			or die "ERR no connection to $ENV{EDTK_DBI_DSN} " . DBI->errstr;
 
 	my $request="select * from $ENV{EDTK_DBI_TABLENAME}";
 
@@ -466,25 +466,25 @@ sub create_Track_Table(){
 					$ENV{EDTK_DBI_DSN_USER},
 					$ENV{EDTK_DBI_DSN_PASS},
 					$dbargs)
-			or die "ERR no connexion to $ENV{EDTK_DBI_DSN} " . DBI->errstr;
+			or die "ERR no connection to $ENV{EDTK_DBI_DSN} " . DBI->errstr;
 
 	my $struct="CREATE TABLE $ENV{EDTK_DBI_TABLENAME} ";
 	$struct .="( ED_TSTAMP NUMBER(14)  NOT NULL";	# interesting for formated date and interval search
 #	$struct .="( ED_TSTAMP VARCHAR2(14)  NOT NULL";	# most used
 #	$struct .="( ED_TSTAMP DATE  NOT NULL";			# Not compatible
 #	$struct .=", ED_HOST VARCHAR2(15) NOT NULL";	# hostname
-#	$struct .=", ED_PROC VARCHAR2(6) NOT NULL";		# processus
+#	$struct .=", ED_PROC VARCHAR2(6) NOT NULL";		# process
 	$struct .=", ED_USER VARCHAR2(10) NOT NULL";	# job request user 
 	$struct .=", ED_SEQ NUMBER(9) NOT NULL";		# sequence
 	$struct .=", ED_SNGL_ID VARCHAR2(22) NOT NULL";	# Single ID
 	$struct .=", ED_APP VARCHAR2(15) NOT NULL";		# application name
-	$struct .=", ED_MOD_ED CHAR";					# mode d'edition (Batch, Tp, Web, Mail)
-	$struct .=", ED_JOB_EVT CHAR";					# niveau de l'événement dans le job(Spool, Document, Line, Warning, Error)
-	$struct .=", ED_OBJ_COUNT NUMBER(15)";			# nombre d'éléments/objets attachés à l'événement
+	$struct .=", ED_MOD_ED CHAR";					# edition mode (Batch, Tp, Web, Mail)
+	$struct .=", ED_JOB_EVT CHAR";					# event level within the job (Spool, Document, Line, Warning, Error)
+	$struct .=", ED_OBJ_COUNT NUMBER(15)";			# number of elements/objects attached to the event
 
 	for (my $i=0 ; $i lt $ENV{EDTK_MAX_USER_KEY} ; $i++) {
-		$struct .=", ED_K${i}_NAME VARCHAR2(5)";	# nom de clef $i
-		$struct .=", ED_K${i}_VAL VARCHAR2(30)";	# valeur clef $i
+		$struct .=", ED_K${i}_NAME VARCHAR2(5)";	# key name $i
+		$struct .=", ED_K${i}_VAL VARCHAR2(30)";	# key value $i
 	}
 	$struct .=")"; #, CONSTRAINT pk_$ENV{EDTK_DBI_TABLENAME} PRIMARY KEY (ED_TSTAMP, ED_PROC, ED_SEQ)";
 
@@ -500,7 +500,7 @@ sub create_Track_Table(){
 	#			INCREMENT BY 1;";
 	#$dbh->do("$seq");
 
-	$DBH->commit();	# nécessaire si AutoCommit  vaut 0
+	$DBH->commit();	# needed when AutoCommit is 0
 	$DBH->disconnect();
 1;
 }
@@ -519,10 +519,10 @@ sub drop_Track_Table(){
 
 
 sub fetchall_DBI(;$) {
-	# CONNEXION À UNE TABLE DBI POUR SELECT VERS UNE RÉFÉRENCE DE TABLEAU
-	# sélection de toutes les données correspondant à un critère
-	# option : requete à passer, exemple "SELECT * FROM TRACKING_OEDTK WHERE ED_MOD_ED = 'T'"
-	#		par defaut vaut 'SELECT * from $ENV{EDTK_DBI_TABLENAME}' 
+	# CONNECT TO A DBI TABLE TO SELECT INTO AN ARRAY REFERENCE
+	# select all the data matching a criterion
+	# option: query to pass, example "SELECT * FROM TRACKING_OEDTK WHERE ED_MOD_ED = 'T'"
+	#		by default it is 'SELECT * from $ENV{EDTK_DBI_TABLENAME}' 
 	my $request =shift;
 	$request ||="SELECT * from $ENV{EDTK_DBI_TABLENAME}";
 	
@@ -533,9 +533,9 @@ sub fetchall_DBI(;$) {
 	
 	my $rTab = $sth->fetchall_arrayref;
 	
-	$sth->{Active} = 1;	# resolution du bug SQLite "closing dbh with active statement" http://rt.cpan.org/Public/Bug/Display.html?id=9643
+	$sth->{Active} = 1;	# fix for the SQLite bug "closing dbh with active statement" http://rt.cpan.org/Public/Bug/Display.html?id=9643
 	$sth->finish();
-	#$DBH->commit();	# nécessaire si AutoCommit  vaut 0 ???
+	#$DBH->commit();	# needed when AutoCommit is 0 ???
 	if ($DBI::errstr) {
 		warn $DBI::errstr."\n";
 	}	
@@ -545,8 +545,8 @@ return $rTab;
 
 
 sub edit_All_rTab($){
-	# EDITION DE L'ENSEMBLE DES DONNÉES D'UN TABLEAU PASSÉ EN REFÉRENCE
-	#  affichage du tableau en colonnes 
+	# PRINT ALL THE DATA OF AN ARRAY PASSED BY REFERENCE
+	#  display the array in columns 
 	my $rTab=shift;
 
 	for (my $i=0 ; $i<=$#{$rTab} ; $i++) {
@@ -564,7 +564,7 @@ sub edit_All_rTab($){
 
 
 sub subClose_DB(){
-	$DBH->commit() if ($ENV{EDTK_DBI_AutoCommit} eq 0 );	# nécessaire si AutoCommit  vaut 0
+	$DBH->commit() if ($ENV{EDTK_DBI_AutoCommit} eq 0 );	# needed when AutoCommit is 0
 #	$DBH->disconnect();
 1;
 }
@@ -581,29 +581,29 @@ END {
 
 # NOTES 
 #
-# LISTE DES TABLES
+# LIST OF TABLES
 # select table_name from tabs;
 #
-# Lister les tables du schéma de l'utilisateur courant :
+# List the tables of the current user's schema:
 # SELECT table_name FROM user_tables;
 #
-# Lister les tables accessibles par l'utilisateur :
+# List the tables accessible by the user:
 # SELECT table_name FROM all_tables;
 #
-# Lister toutes les tables (il faut être ADMIN) :
+# List all the tables (ADMIN is required):
 # SELECT table_name FROM dba_tables; 
 #
-# DESCRIPTION DE LA TABLE :
-# desc matable; 	# retourne les champs et leurs types 
+# TABLE DESCRIPTION:
+# desc my_table; 	# returns the fields and their types 
 
 
 
-# EXEMPLES REQUETES - http://fadace.developpez.com/sgbdcmp/fonctions/
+# EXAMPLE QUERIES - http://fadace.developpez.com/sgbdcmp/fonctions/
 #
 # SELECT * FROM TRACKING_OEDTK WHERE ED_JOB_EVT='S';
 # SELECT * FROM TRACKING_OEDTK WHERE ED_MOD_ED='T';
-# SELECT SUM(ED_OBJ_COUNT) AS "OBJETS" FROM TRACKING_OEDTK WHERE ED_JOB_EVT='D';
-# SELECT COUNT(ED_OBJ_COUNT) AS "OBJETS" FROM TRACKING_OEDTK WHERE ED_JOB_EVT='D';
+# SELECT SUM(ED_OBJ_COUNT) AS "OBJECTS" FROM TRACKING_OEDTK WHERE ED_JOB_EVT='D';
+# SELECT COUNT(ED_OBJ_COUNT) AS "OBJECTS" FROM TRACKING_OEDTK WHERE ED_JOB_EVT='D';
 # SELECT DISTINCT ED_SNGL_ID FROM TRACKING_OEDTK;
 # SELECT COUNT (DISTINCT ED_SNGL_ID) FROM TRACKING_OEDTK ;
 # SELECT COUNT (DISTINCT ED_SNGL_ID) FROM TRACKING_OEDTK WHERE ED_JOB_EVT='D';

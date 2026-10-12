@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="453" viewBox="0 0 780 453" role="img" aria-label="perl examples/themes.pl dracula">
+<title>perl examples/themes.pl dracula</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="748" height="418" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="748" height="418" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="748" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="390" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/themes.pl dracula</text>
+<rect x="16.5" y="16.5" width="747" height="417" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="30" y="60" width="720" height="108" fill="#282a36"/>
+<rect x="30" y="168" width="36" height="18" fill="#282a36"/>
+<rect x="66" y="168" width="27" height="18" fill="#44475a"/>
+<rect x="93" y="168" width="9" height="18" fill="#f8f8f2"/>
+<rect x="102" y="168" width="432" height="18" fill="#44475a"/>
+<rect x="534" y="168" width="216" height="18" fill="#282a36"/>
+<rect x="30" y="186" width="720" height="234" fill="#282a36"/>
+<rect x="52" y="86" width="1" height="253" fill="#6272a4"/>
+<rect x="52" y="86" width="496" height="1" fill="#6272a4"/>
+<rect x="547" y="86" width="1" height="253" fill="#6272a4"/>
+<rect x="66" y="140" width="189" height="1" fill="#6272a4"/>
+<rect x="336" y="140" width="198" height="1" fill="#6272a4"/>
+<rect x="66" y="240" width="275" height="18" fill="#bd93f9"/>
+<rect x="345" y="240" width="144" height="18" fill="#2f313f"/>
+<rect x="70" y="284" width="1" height="37" fill="#ff79c6"/>
+<rect x="70" y="284" width="82" height="1" fill="#ff79c6"/>
+<rect x="151" y="284" width="1" height="37" fill="#ff79c6"/>
+<rect x="178" y="284" width="1" height="37" fill="#e06c75"/>
+<rect x="178" y="284" width="100" height="1" fill="#e06c75"/>
+<rect x="277" y="284" width="1" height="37" fill="#e06c75"/>
+<rect x="70" y="320" width="82" height="1" fill="#ff79c6"/>
+<rect x="178" y="320" width="100" height="1" fill="#e06c75"/>
+<rect x="52" y="338" width="496" height="1" fill="#6272a4"/>
+</g>
+<g class="terminal">
+<text x="66" y="110" textLength="378" fill="#f8f8f2">Theme: dracula (F2 switches, Ctrl+C quits)</text>
+<text x="264" y="146" textLength="63" fill="#a4a9c4">Account</text>
+<text x="66" y="182" textLength="27" fill="#f8f8f2">Ada</text>
+<text x="66" y="218" textLength="27" fill="#bd93f9">[x]</text>
+<text x="102" y="218" textLength="243" fill="#f8f8f2">Subscribe to the newsletter</text>
+<text x="507" y="254" textLength="27" fill="#f8f8f2">65%</text>
+<text x="93" y="308" textLength="36" fill="#ff79c6">Save</text>
+<text x="201" y="308" textLength="54" fill="#f8f8f2">Cancel</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

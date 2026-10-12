@@ -211,4 +211,30 @@ for my $case (
     ok($ok, 'origin sits beside the options that were already there') or diag $@;
 }
 
+# ---- Upgrade and Connection are token lists ------------------------------------
+{
+    my $o = Punk::Test->new('OrgApp');
+    my @no = ([ Upgrade => 'notwebsocket' ],
+              [ Upgrade => 'websocketx' ],
+              [ Upgrade => 'web socket' ],
+              [ Upgrade => '' ],
+              [ Connection => 'noupgrade' ],
+              [ Connection => 'keep-alive' ]);
+    for my $case (@no) {
+        $o->get_ok('/any', headers => upgrade(@$case),
+                   name => "$case->[0]: '$case->[1]'")
+          ->status_is(400, "$case->[0]: '$case->[1]' is not a websocket upgrade");
+    }
+    my @yes = ([ Upgrade => 'WebSocket' ],
+               [ Upgrade => 'h2c, websocket' ],
+               [ Upgrade => 'websocket/13' ],
+               [ Connection => 'keep-alive, Upgrade' ],
+               [ Connection => 'UPGRADE ,keep-alive' ]);
+    for my $case (@yes) {
+        $o->get_ok('/any', headers => upgrade(@$case),
+                   name => "$case->[0]: '$case->[1]'")
+          ->status_isnt(400, "$case->[0]: '$case->[1]' is");
+    }
+}
+
 done_testing;

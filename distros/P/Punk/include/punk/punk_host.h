@@ -115,8 +115,10 @@ static AV *pk_host_allow_av(pTHX_ SV *v, const char *what) {
 
 /* scheme://host[:port] of a stored origin, path dropped: the part that is
  * an origin in the browser's sense, which is what $c->origin promises. */
-static SV *pk_origin_bare(pTHX_ const char *o, STRLEN ol, STRLEN *hostoff,
-                          STRLEN *hostlen) {
+/* Where the host sits in a stored origin, and where the origin ends. No
+ * allocation: this runs on every request that asks for its origin. */
+static STRLEN pk_origin_span(const char *o, STRLEN ol, STRLEN *hostoff,
+                             STRLEN *hostlen) {
     STRLEN i = 0, start, end;
     while (i + 2 < ol && !(o[i] == ':' && o[i+1] == '/' && o[i+2] == '/')) i++;
     start = (i + 2 < ol) ? i + 3 : 0;
@@ -124,7 +126,12 @@ static SV *pk_origin_bare(pTHX_ const char *o, STRLEN ol, STRLEN *hostoff,
     while (end < ol && o[end] != '/') end++;
     if (hostoff) *hostoff = start;
     if (hostlen) *hostlen = end - start;
-    return newSVpvn(o, end);
+    return end;
+}
+
+static SV *pk_origin_bare(pTHX_ const char *o, STRLEN ol, STRLEN *hostoff,
+                          STRLEN *hostlen) {
+    return newSVpvn(o, pk_origin_span(o, ol, hostoff, hostlen));
 }
 
 /* The origin a request may be told it has.
@@ -193,7 +200,7 @@ static SV *pk_origin_of(pTHX_ SV *c, int *state) {
 
         if (valid) {
             /* the canonical host is always its own origin */
-            (void)pk_origin_bare(aTHX_ cp, cl, &choff, &chlen);
+            (void)pk_origin_span(cp, cl, &choff, &chlen);
             {
                 STRLEN cnl; const char *cport; STRLEN cportl;
                 pk_host_split(cp + choff, chlen, &cnl, &cport, &cportl);

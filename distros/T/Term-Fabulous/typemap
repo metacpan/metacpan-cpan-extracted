@@ -1,0 +1,3 @@
+TYPEMAP
+uintattr_t	T_UV
+uint32_t	T_UV

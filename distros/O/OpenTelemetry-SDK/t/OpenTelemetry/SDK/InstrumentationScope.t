@@ -45,6 +45,12 @@ subtest 'Empty name' => sub {
             'Created an instrumentation scope with an undefined or empty name',
         ],
     ], 'Warned about undefined name';
+
+    like messages {
+        is CLASS->new( name => '', version => 123 ), object {
+            call to_string => '[:]';
+        }, 'Dropped version if name is invalid';
+    } => [ [] ];
 };
 
 like dies { CLASS->new },

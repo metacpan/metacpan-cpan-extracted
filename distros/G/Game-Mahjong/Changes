@@ -1,5 +1,10 @@
 Revision history for Game-Mahjong
 
+0.03    2026-10-11
+	- Add Game::Mahjong::Terminal->run(@argv), which returns the exit status
+	- Terminal's game loop is now start, not run
+	- Colour is off under NO_COLOR
+
 0.02    2026-10-09
 	- Fix: t/32 failed on one perl 5.14.2 smoker, where output captured
 	  through an in-memory handle came back undecoded.

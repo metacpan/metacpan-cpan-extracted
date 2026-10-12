@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="453" viewBox="0 0 780 453" role="img" aria-label="perl examples/kdl-form.pl">
+<title>perl examples/kdl-form.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="748" height="418" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="748" height="418" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="748" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="390" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/kdl-form.pl</text>
+<rect x="16.5" y="16.5" width="747" height="417" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="48" y="114" width="684" height="18" fill="#1c212d"/>
+<rect x="48" y="132" width="117" height="18" fill="#1c212d"/>
+<rect x="165" y="132" width="270" height="18" fill="#242830"/>
+<rect x="435" y="132" width="297" height="18" fill="#1c212d"/>
+<rect x="48" y="150" width="684" height="18" fill="#1c212d"/>
+<rect x="48" y="168" width="117" height="18" fill="#1c212d"/>
+<rect x="165" y="168" width="270" height="18" fill="#242830"/>
+<rect x="435" y="168" width="297" height="18" fill="#1c212d"/>
+<rect x="48" y="186" width="684" height="54" fill="#1c212d"/>
+<rect x="48" y="240" width="117" height="18" fill="#1c212d"/>
+<rect x="165" y="240" width="126" height="18" fill="#242830"/>
+<rect x="291" y="240" width="441" height="18" fill="#1c212d"/>
+<rect x="48" y="258" width="684" height="54" fill="#1c212d"/>
+<rect x="48" y="312" width="117" height="18" fill="#1c212d"/>
+<rect x="165" y="312" width="234" height="18" fill="#343a48"/>
+<rect x="399" y="312" width="333" height="18" fill="#1c212d"/>
+<rect x="48" y="330" width="684" height="18" fill="#1c212d"/>
+<rect x="57" y="122" width="666" height="1" fill="#61afef"/>
+<rect x="52" y="132" width="1" height="198" fill="#61afef"/>
+<rect x="727" y="132" width="1" height="198" fill="#61afef"/>
+<rect x="165" y="284" width="72" height="2" fill="#61afef"/>
+<rect x="246" y="284" width="99" height="1" fill="#5a606e"/>
+<rect x="57" y="338" width="666" height="1" fill="#61afef"/>
+</g>
+<polyline points="52.5 132 52.5 127 52.538 126.413 52.653 125.835 52.843 125.278 53.103 124.75 53.43 124.261 53.818 123.818 54.261 123.43 54.75 123.103 55.278 122.843 55.835 122.653 56.413 122.538 57 122.5 57 122.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="727.5 132 727.5 127 727.462 126.413 727.347 125.835 727.157 125.278 726.897 124.75 726.57 124.261 726.182 123.818 725.739 123.43 725.25 123.103 724.722 122.843 724.165 122.653 723.587 122.538 723 122.5 723 122.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="52.5 330 52.5 334 52.538 334.587 52.653 335.165 52.843 335.722 53.103 336.25 53.43 336.739 53.818 337.182 54.261 337.57 54.75 337.897 55.278 338.157 55.835 338.347 56.413 338.462 57 338.5 57 338.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="727.5 330 727.5 334 727.462 334.587 727.347 335.165 727.157 335.722 726.897 336.25 726.57 336.739 726.182 337.182 725.739 337.57 725.25 337.897 724.722 338.157 724.165 338.347 723.587 338.462 723 338.5 723 338.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<g class="terminal">
+<text x="48" y="92" textLength="585" fill="#dcdcdc">Fill in the form. Tab moves on, F2 shows the values, Ctrl+C ends.</text>
+<text x="66" y="146" textLength="36" fill="#96a0b4">Name</text>
+<text x="165" y="146" textLength="108" fill="#dcdfe4">Grace Hopper</text>
+<text x="66" y="182" textLength="72" fill="#96a0b4">Password</text>
+<text x="165" y="182" textLength="45" fill="#dcdfe4">*****</text>
+<text x="66" y="218" textLength="36" fill="#96a0b4">Size</text>
+<text x="165" y="218" textLength="189" fill="#dcdfe4">( ) Small  ( ) Medium</text>
+<text x="372" y="218" textLength="9" fill="#61afef">(</text>
+<text x="385.5" y="218" text-anchor="middle" fill="#61afef">•</text>
+<text x="390" y="218" textLength="9" fill="#61afef">)</text>
+<text x="408" y="218" textLength="45" fill="#dcdfe4">Large</text>
+<text x="66" y="254" textLength="45" fill="#96a0b4">Color</text>
+<text x="165" y="254" textLength="108" fill="#787e8a">Pick a color</text>
+<text x="286.5" y="254" text-anchor="middle" fill="#61afef">▾</text>
+<text x="66" y="290" textLength="54" fill="#96a0b4">Volume</text>
+<text x="241.5" y="290" text-anchor="middle" fill="#61afef">●</text>
+<text x="363" y="290" textLength="27" fill="#dcdfe4">40%</text>
+<text x="66" y="326" textLength="90" fill="#96a0b4">Newsletter</text>
+<text x="165" y="326" textLength="27" fill="#61afef">[x]</text>
+<text x="201" y="326" textLength="198" fill="#dcdfe4">Send me the newsletter</text>
+<text x="48" y="380" textLength="630" fill="#dcdcdc">color=(none), name=Grace Hopper, newsletter=1, password=*****, size=l,</text>
+<text x="48" y="398" textLength="81" fill="#dcdcdc">volume=40</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

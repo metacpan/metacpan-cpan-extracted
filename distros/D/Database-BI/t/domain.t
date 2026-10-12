@@ -254,7 +254,8 @@ subtest 'open path BV-large-spaced-header: spaced col names survive > 16 KB file
 	ok length($content) > 16 * 1024, "bug 4: test file is > 16 KB (" . length($content) . " bytes)";
 
 	Mojo::File->new("$TMPDIR/largebankstmt.csv")->spew($content);
-	$t->get_ok('/open?path=' . url_escape("$TMPDIR/largebankstmt.csv"))
+	# Request all 400 rows on one page to verify the full dataset is accessible.
+	$t->get_ok('/open?path=' . url_escape("$TMPDIR/largebankstmt.csv") . '&per_page=400')
 		->status_is(200, 'bug 4: large CSV with spaced header opens without crash')
 		->content_like(qr/Account Number/, 'bug 4: original column header preserved in table')
 		->content_like(qr/ACC00001/,       'bug 4: first row data visible')

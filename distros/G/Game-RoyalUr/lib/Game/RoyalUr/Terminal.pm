@@ -6,6 +6,7 @@ use warnings;
 
 use Carp ();
 use Digest::SHA ();
+use Getopt::Long ();
 use Object::Proto::Sugar;
 
 use Game::RoyalUr;
@@ -13,7 +14,7 @@ use Game::RoyalUr::Bot;
 use Game::RoyalUr::Variant;
 use Game::RoyalUr::Notation ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 my (%CONTROL, %SEQUENCE, %STYLE, %GLYPH, %OTHER, @FILES);
 BEGIN {
@@ -819,6 +820,111 @@ sub start {
     return 0;
 }
 
+sub _usage {
+    return <<'USAGE';
+royalur - the Royal Game of Ur, in a terminal
+
+  royalur [options]
+
+  --mode HOW       bot (the default): you against the program
+                   hotseat: two people at one keyboard
+                   watch: the program against itself
+  --rules NAME     finkel (the default) or masters
+  --level N        how well the program plays, 1 upward; the top by default
+  --side WHICH     light (the default) or dark: your side against the program
+  --first WHO      light, dark, or roll (the default): throw the dice for it
+  --seed HEX       hexadecimal; the same seed throws the same dice
+  --pace SECONDS   how long a lost turn and the program's move stay up
+  --route          show the order the squares are visited in
+  --record FILE    write the game to FILE when you leave
+  --replay FILE    carry on from a game written by --record
+  --ascii          plain letters and lines, for a terminal with no Unicode
+  --unicode        line and shape characters, where they are not the default
+  --no-colour      no colour; nothing is lost without it
+  --no-pick        type moves instead of choosing them with the arrow keys
+  --version        the version, and stop
+  --help           this, and stop
+
+In a terminal, the pieces that can move are walked with the arrow keys and the
+board shows what each move would leave; press ? for the keys. Anywhere else,
+type a number from the list, a move such as hand-b1 or a2-d2, or help.
+USAGE
+}
+
+sub run {
+    my ($class, @argv) = @_;
+
+    my %given;
+    my $parsed = Getopt::Long::GetOptionsFromArray(
+        \@argv, \%given,
+        'mode=s', 'rules=s', 'level=i', 'side=s', 'first=s', 'seed=s', 'pace=s',
+        'record=s', 'replay=s', 'ascii', 'unicode!', 'route', 'colour|color!', 'pick!', 'version', 'help',
+    );
+
+    if (!$parsed || @argv) {
+        print STDERR "royalur: I do not know '@argv'.\n" if $parsed && @argv;
+        print STDERR _usage();
+        return 2;
+    }
+    if ($given{help}) {
+        print _usage();
+        return 0;
+    }
+    if ($given{version}) {
+        print "royalur $Game::RoyalUr::VERSION\n";
+        return 0;
+    }
+
+    my %with;
+    $with{$_} = $given{$_} for grep { defined $given{$_} } qw(mode rules level side first pace record route);
+    $with{colour}  = $given{colour} if defined $given{colour};
+    $with{picking} = $given{pick}   if defined $given{pick};
+    $with{unicode} = $given{unicode} if defined $given{unicode};
+    $with{unicode} = 0               if $given{ascii};
+
+    if (defined $given{seed}) {
+        if ($given{seed} !~ /\A(?:[0-9a-fA-F]{2})+\z/) {
+            print STDERR "royalur: a seed is hexadecimal, two characters a byte.\n";
+            return 2;
+        }
+        $with{seed} = pack 'H*', $given{seed};
+    }
+
+    if (defined $given{replay}) {
+        open my $fh, '<', $given{replay} or do {
+            print STDERR "royalur: I could not read '$given{replay}'.\n";
+            return 2;
+        };
+        my $text = do { local $/; <$fh> };
+        close $fh;
+        my ($game, $error) = Game::RoyalUr->replay($text);
+        if (!$game) {
+            my $detail = $error->detail;
+            print STDERR "royalur: '$given{replay}' is not a game I can replay: ", $error->message,
+                (defined $detail->{line} ? " (line $detail->{line})" : defined $detail->{ply} ? ' (turn ' . ($detail->{ply} + 1) . ')' : ''), ".\n";
+            return 2;
+        }
+        $with{game} = $game;
+        $with{rules} = $game->variant;
+        $with{seed} = $game->seed if defined $game->seed;
+    }
+
+    my $terminal = eval { $class->new(%with) };
+    if (!$terminal) {
+        (my $why = $@) =~ s/ at \S+ line \d+\.?\s*\z//;
+        $why =~ s/\AGame::RoyalUr(?:::\w+)*: //;
+        print STDERR "royalur: $why.\n";
+        return 2;
+    }
+
+    local @SIG{qw(INT TERM HUP)};
+    for my $sig (qw(INT TERM HUP)) {
+        $SIG{$sig} = sub { $terminal->_leave_raw; $SIG{$sig} = 'DEFAULT'; kill $sig, $$ };
+    }
+
+    return $terminal->start;
+}
+
 1;
 
 __END__
@@ -829,7 +935,7 @@ Game::RoyalUr::Terminal - the Royal Game of Ur, played in a terminal
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 
@@ -961,6 +1067,21 @@ A L<Game::RoyalUr> to play, in place of a new one.
 
 B<Croaks> on a mode, a side, a first, a level, a pace or rules it does not
 understand.
+
+=head2 run
+
+    exit Game::RoyalUr::Terminal->run(@ARGV);
+
+The whole command line program as a class method: parses the options the
+C<royalur> program documents, builds the terminal, plays, and B<returns the
+exit status rather than calling C<exit>>: C<0> when the game was left in the
+ordinary way, C<2> for a bad option, a stray word, a refused value or a file
+that could not be read or replayed, with the reason and the usage on
+C<STDERR>. C<--help> and C<--version> print to C<STDOUT> and return C<0>.
+Signal handlers are local to the call and the keyboard is given back on every
+way out, so a launcher such as L<Game::Terminal> can call it in its own
+process and carry on afterwards. Colour is off under C<NO_COLOR> as well as
+off a terminal.
 
 =head2 start
 

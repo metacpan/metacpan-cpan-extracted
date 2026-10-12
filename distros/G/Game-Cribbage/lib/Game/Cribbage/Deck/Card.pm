@@ -78,7 +78,7 @@ Game::Cribbage::Deck::Card - card
 
 =head1 VERSION
 
-Version 0.15
+Version 0.17
 
 =cut
 
@@ -95,8 +95,8 @@ Version 0.15
 
 	$card->value(); # 10
 
-	$card->run_value(); # 13 
-	
+	$card->run_value(); # 13
+
 
 =head1 PROPERTIES
 
@@ -150,7 +150,7 @@ Stringify the current card with suit followed by symbol.
 
 	$card->ui_stringify;
 
-=head2 strigify
+=head2 stringify
 
 Stringify the current card with symbol followed by suit.
 

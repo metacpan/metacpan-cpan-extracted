@@ -1,0 +1,213 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Everything 2.0 can spell",
+    "version": "1.0.0",
+    "description": "Hand-written for plan_openapi_v2 phase 02. One fixture that uses every rule the catalogue names, so that new(spec => ->spec) over it exercises every rule a second time. It exists to be converted, not to be an oracle; grown by each phase.",
+    "contact": { "name": "T", "email": "t@example.com", "url": "https://example.com/t" },
+    "license": { "name": "Artistic-2.0", "url": "https://opensource.org/licenses/Artistic-2.0" },
+    "x-info-ext": true
+  },
+  "host": "api.example.com:8443",
+  "basePath": "/v2",
+  "schemes": ["https", "http"],
+  "consumes": ["application/json"],
+  "produces": ["application/json", "application/xml"],
+  "tags": [ { "name": "pets", "description": "Pets", "externalDocs": { "url": "https://example.com/pets" } } ],
+  "externalDocs": { "description": "More", "url": "https://example.com/docs" },
+  "x-corp": { "a": 1 },
+  "securityDefinitions": {
+    "basicAuth": { "type": "basic", "description": "HTTP basic" },
+    "keyHeader": { "type": "apiKey", "name": "X-Key", "in": "header" },
+    "keyQuery":  { "type": "apiKey", "name": "key", "in": "query" },
+    "oauthImplicit": { "type": "oauth2", "flow": "implicit",
+      "authorizationUrl": "https://example.com/auth", "scopes": { "read": "read", "write": "write" } },
+    "oauthPassword": { "type": "oauth2", "flow": "password",
+      "tokenUrl": "https://example.com/token", "scopes": { "read": "read" } },
+    "oauthApplication": { "type": "oauth2", "flow": "application",
+      "tokenUrl": "https://example.com/token", "scopes": { "read": "read" } },
+    "oauthAccessCode": { "type": "oauth2", "flow": "accessCode",
+      "authorizationUrl": "https://example.com/auth", "tokenUrl": "https://example.com/token",
+      "scopes": { "read": "read" }, "x-scheme-ext": "kept" }
+  },
+  "security": [ { "keyHeader": [] }, { "oauthImplicit": ["read"] } ],
+  "parameters": {
+    "limitParam": { "name": "limit", "in": "query", "type": "integer", "format": "int32",
+                    "minimum": 1, "maximum": 100, "default": 20, "description": "page size" },
+    "petBody": { "name": "pet", "in": "body", "required": true, "description": "a pet to add",
+                 "schema": { "$ref": "#/definitions/NewPet" } },
+    "formName": { "name": "name", "in": "formData", "type": "string", "required": true },
+    "formTags": { "name": "tags", "in": "formData", "type": "array", "items": { "type": "string" },
+                  "collectionFormat": "multi" }
+  },
+  "responses": {
+    "NotFound": { "description": "not found", "schema": { "$ref": "#/definitions/Error" } },
+    "NoContent": { "description": "gone" }
+  },
+  "definitions": {
+    "Pet": {
+      "type": "object",
+      "discriminator": "petType",
+      "required": ["id", "name", "petType"],
+      "properties": {
+        "id": { "type": "integer", "format": "int64", "readOnly": true },
+        "name": { "type": "string", "minLength": 1, "maxLength": 64, "example": "Fido" },
+        "petType": { "type": "string" },
+        "tags": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "weight": { "type": "number", "minimum": 0, "exclusiveMinimum": true, "x-nullable": true },
+        "photo": { "type": "string", "format": "byte" },
+        "scan": { "type": "string", "format": "binary" },
+        "pair": { "type": "array", "items": [ { "type": "string" }, { "type": "integer" } ] },
+        "meta": { "type": "object", "additionalProperties": { "type": "string" },
+                  "xml": { "name": "Meta", "namespace": "https://example.com/ns", "prefix": "ex" } }
+      },
+      "example": { "id": 1, "name": "Fido", "petType": "Dog" }
+    },
+    "Dog": {
+      "allOf": [
+        { "$ref": "#/definitions/Pet" },
+        { "type": "object", "required": ["bark"], "properties": { "bark": { "type": "string" } } }
+      ]
+    },
+    "Cat": {
+      "allOf": [
+        { "$ref": "#/definitions/Pet" },
+        { "type": "object", "required": ["meow"], "properties": { "meow": { "type": "boolean" } } }
+      ]
+    },
+    "NewPet": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string" },
+        "tag": { "type": "string", "default": "none" },
+        "ref": { "$ref": "#/definitions/Pet", "description": "ignored beside a $ref in draft-04" },
+        "odd": { "type": "object", "default": { "$ref": "#/definitions/NotARef" } }
+      }
+    },
+    "Error": {
+      "type": "object", "required": ["code", "message"],
+      "properties": { "code": { "type": "integer", "maximum": 599, "exclusiveMaximum": false },
+                      "message": { "type": "string", "pattern": "^.+$" } }
+    },
+    "a/b": { "type": "string", "enum": ["x", "y"], "multipleOf": 1 }
+  },
+  "paths": {
+    "/pets": {
+      "parameters": [ { "$ref": "#/parameters/limitParam" } ],
+      "get": {
+        "operationId": "listPets",
+        "tags": ["pets"],
+        "summary": "List pets",
+        "produces": ["application/json"],
+        "parameters": [
+          { "name": "tags", "in": "query", "type": "array", "items": { "type": "string" },
+            "collectionFormat": "csv" },
+          { "name": "ids", "in": "query", "type": "array", "items": { "type": "integer" },
+            "collectionFormat": "multi" },
+          { "name": "sp", "in": "query", "type": "array", "items": { "type": "string" },
+            "collectionFormat": "ssv" },
+          { "name": "pi", "in": "query", "type": "array", "items": { "type": "string" },
+            "collectionFormat": "pipes" },
+          { "name": "tb", "in": "query", "type": "array", "items": { "type": "string" },
+            "collectionFormat": "tsv" },
+          { "name": "grid", "in": "query", "type": "array", "collectionFormat": "csv",
+            "items": { "type": "array", "collectionFormat": "pipes", "items": { "type": "integer" } } },
+          { "name": "q", "in": "query", "type": "string", "allowEmptyValue": true },
+          { "name": "X-Trace", "in": "header", "type": "array", "items": { "type": "string" },
+            "collectionFormat": "pipes" },
+          { "name": "X-Flag", "in": "header", "type": "boolean" }
+        ],
+        "responses": {
+          "200": {
+            "description": "pets",
+            "schema": { "type": "array", "items": { "$ref": "#/definitions/Pet" } },
+            "headers": {
+              "X-Total": { "type": "integer", "minimum": 0 },
+              "X-Ids": { "type": "array", "items": { "type": "integer" }, "collectionFormat": "pipes" }
+            },
+            "examples": { "application/json": [ { "id": 1, "name": "Fido", "petType": "Dog", "bark": "woof" } ] }
+          },
+          "404": { "$ref": "#/responses/NotFound" },
+          "default": { "description": "error", "schema": { "$ref": "#/definitions/Error" } },
+          "x-responses-ext": 1
+        },
+        "security": [ { "keyQuery": [] }, {} ]
+      },
+      "post": {
+        "operationId": "addPet",
+        "consumes": ["application/json", "application/xml"],
+        "parameters": [ { "$ref": "#/parameters/petBody" } ],
+        "responses": {
+          "201": { "description": "created", "schema": { "$ref": "#/definitions/Pet" } },
+          "default": { "$ref": "#/responses/NotFound" }
+        },
+        "security": [ { "basicAuth": [] }, { "oauthAccessCode": ["write"] } ],
+        "deprecated": false,
+        "x-op-ext": "kept"
+      }
+    },
+    "/pets/{petId}": {
+      "get": {
+        "operationId": "getPet",
+        "parameters": [
+          { "name": "petId", "in": "path", "required": true, "type": "integer", "format": "int64" },
+          { "name": "fields", "in": "query", "type": "array", "items": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "a pet", "schema": { "$ref": "#/definitions/Pet" } },
+          "404": { "$ref": "#/responses/NotFound" }
+        }
+      },
+      "delete": {
+        "operationId": "deletePet",
+        "schemes": ["https"],
+        "parameters": [
+          { "name": "petId", "in": "path", "required": true, "type": "integer" }
+        ],
+        "responses": { "204": { "$ref": "#/responses/NoContent" } }
+      }
+    },
+    "/pets/{petId}/photo": {
+      "post": {
+        "operationId": "uploadPhoto",
+        "consumes": ["multipart/form-data"],
+        "produces": ["image/png"],
+        "parameters": [
+          { "name": "petId", "in": "path", "required": true, "type": "integer" },
+          { "name": "file", "in": "formData", "type": "file", "required": true },
+          { "name": "caption", "in": "formData", "type": "string", "maxLength": 80 },
+          { "name": "labels", "in": "formData", "type": "array", "items": { "type": "string" },
+            "collectionFormat": "csv" }
+        ],
+        "responses": {
+          "200": { "description": "the photo", "schema": { "type": "file" } }
+        }
+      }
+    },
+    "/pets/{petId}/rename": {
+      "post": {
+        "operationId": "renamePet",
+        "consumes": [],
+        "parameters": [
+          { "name": "petId", "in": "path", "required": true, "type": "integer" },
+          { "$ref": "#/parameters/formName" },
+          { "$ref": "#/parameters/formTags" },
+          { "name": "note", "in": "formData", "type": "integer", "allowEmptyValue": true }
+        ],
+        "responses": { "200": { "description": "renamed" } }
+      }
+    },
+    "/plain/{a-b}": {
+      "get": {
+        "operationId": "plain",
+        "produces": [],
+        "parameters": [
+          { "name": "a-b", "in": "path", "required": true, "type": "string" }
+        ],
+        "responses": { "200": { "description": "text", "schema": { "type": "string" } } }
+      }
+    },
+    "x-paths-ext": { "note": "not a path" }
+  }
+}

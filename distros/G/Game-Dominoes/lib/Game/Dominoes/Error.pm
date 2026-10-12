@@ -5,7 +5,7 @@ use warnings;
 
 use Object::Proto::Sugar -types;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our (@FLAGS, %MESSAGE);
 
@@ -88,7 +88,7 @@ Game::Dominoes::Error - why a move was refused
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

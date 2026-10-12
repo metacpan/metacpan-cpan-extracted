@@ -1,5 +1,8 @@
 Revision history for Game-Go
 
+0.03    2026-10-11
+        - Add Game::Go::Terminal->run(@argv), which returns the exit status
+
 0.02    2026-10-10
         - The board is drawn as a board: grid lines and star points, with
           stones on the intersections.

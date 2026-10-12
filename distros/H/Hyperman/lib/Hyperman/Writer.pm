@@ -3,7 +3,7 @@ package Hyperman::Writer;
 use strict;
 use warnings;
 
-our $VERSION = '0.56';
+our $VERSION = '0.58';
 
 require Hyperman;   # all methods are XS (xs/writer.xs, include/hyperman/)
 
@@ -51,9 +51,12 @@ whose shape says which:
 
 =over 4
 
-=item * an EOF-delimited HTTP/1.1 connection, where closing the body closes
-the socket (there is no chunked response encoding: the response carries
-C<Connection: close> and the client reads to end of file);
+=item * an HTTP/1.1 connection. When the request was HTTP/1.1 and allowed
+keep-alive, the body is sent with C<Transfer-Encoding: chunked> (or counted
+against the C<Content-Length> the application gave) and the connection goes
+on to its next request after C<close>. Otherwise - HTTP/1.0, a request that
+said C<Connection: close>, a 101 upgrade - the response carries
+C<Connection: close> and the client reads to end of file;
 
 =item * an HTTP/2 stream, buffered until close and then submitted as one
 response;
@@ -87,9 +90,12 @@ when to pause. See L<Hyperman/Stream handles>.
 
     $w->close;
 
-End the body. On HTTP/1.1 that closes the connection, because the response
-was EOF-delimited; on HTTP/2 it ends that stream and leaves the connection
-serving its others.
+End the body. On HTTP/1.1 the connection stays open for its next request
+when the body was chunked or counted, and closes when it was EOF-delimited;
+on HTTP/2 it ends that stream and leaves the connection serving its others.
+A C<Content-Length> the application gave is held to: writing past it, or
+closing short of it, ends the connection, because the framing is broken and
+nothing after it could be trusted.
 
 Closing twice is harmless. A writer that goes out of scope without being
 closed is closed then, the way a lexical filehandle is - but close it

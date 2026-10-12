@@ -195,4 +195,87 @@ sub got {
        'and the object takes only the members nothing else claimed');
 }
 
+# ---- x-oa-collectionFormat: the delimiters no style can spell ------------------
+#
+# Swagger 2.0 has tab-separated lists anywhere, space- and pipe-separated lists
+# in a path or header, and nested arrays with a delimiter per level; 3.x can
+# say none of those (every path and header style is comma based), so the 2.0
+# converter carries them as this extension and the compiler reads it. It is
+# readable from a 3.1 document directly, which is how the compiler side is
+# pinned here without a 2.0 document. The response header check is in here
+# too: until 11 October 2026 it never split an array at all, so a 3.1 header
+# declared `type: array` failed on `1,2`.
+{
+    require Open::API::Client;
+    my $api = Open::API->new(spec => {
+        openapi => '3.1.0',
+        info    => { title => 'T', version => '1.0.0' },
+        paths   => {
+            '/t' => { get => {
+                operationId => 'op',
+                parameters  => [
+                    { name => 't', in => 'query', style => 'form', explode => \0,
+                      'x-oa-collectionFormat' => 'tsv',
+                      schema => { type => 'array', items => { type => 'string' } } },
+                    { name => 'm', in => 'query', style => 'form', explode => \0,
+                      schema => { type => 'array', items => {
+                          type => 'array', 'x-oa-collectionFormat' => 'pipes',
+                          items => { type => 'integer' } } } },
+                    { name => 'X-H', in => 'header', 'x-oa-collectionFormat' => 'ssv',
+                      schema => { type => 'array', items => { type => 'string' } } },
+                ],
+                responses => { 200 => { description => 'ok',
+                    headers => { 'X-R' => { schema => { type => 'array',
+                                                         items => { type => 'integer' } } },
+                                 'X-P' => { 'x-oa-collectionFormat' => 'pipes',
+                                            schema => { type => 'array',
+                                                        items => { type => 'integer' } } } } } },
+            } },
+            '/p/{v}' => { get => {
+                operationId => 'pp',
+                parameters  => [ { name => 'v', in => 'path', required => \1,
+                                   'x-oa-collectionFormat' => 'pipes',
+                                   schema => { type => 'array', items => { type => 'string' } } } ],
+                responses   => { 200 => { description => 'ok' } },
+            } },
+        } });
+
+    my ($ok, $res) = $api->validate_request(op => {
+        query => 't=a%09b&m=1|2,3|4', header => { 'x-h' => 'a b' } });
+    ok($ok, 'tab, pipe-in-comma and space delimited lists all decode');
+    is_deeply($res->{query}{t}, [ 'a', 'b' ], 'tsv: a tab splits a query list');
+    is_deeply($res->{query}{m}, [ [ 1, 2 ], [ 3, 4 ] ],
+       'nested: csv outside, pipes inside, each level its own delimiter');
+    is_deeply($res->{header}{'X-H'}, [ 'a', 'b' ], 'ssv: a space splits a header list');
+
+    ($ok, $res) = $api->validate_request(pp => { path => { v => 'a|b' } });
+    ok($ok, 'pipes in a path segment decode');
+    is_deeply($res->{path}{v}, [ 'a', 'b' ], '...into the list');
+
+    my $errs = $api->check_response('op', [ 200, [ 'X-R', '1,2', 'X-P', '3|4' ], [] ]);
+    ok(!$errs || !@$errs, 'a response header array is split (comma, and pipes by the extension)')
+        or diag explain $errs;
+    $errs = $api->check_response('op', [ 200, [ 'X-R', '1,x' ], [] ]);
+    ok($errs && @$errs, '...and each element is checked against the items schema');
+
+    my $c = Open::API::Client->new(api => $api, base_url => 'http://h.test');
+    my $u = $c->_request_url('op', { t => [ 'a', 'b' ], m => [ [ 1, 2 ], [ 3, 4 ] ] });
+    like($u, qr/\bt=a%09b\b/, 'the client writes a tab-separated list as %09');
+    like($u, qr/\bm=1\|2,3\|4\b/, 'the client joins a nested list level by level');
+    $u = $c->_request_url('pp', { v => [ 'a', 'b' ] });
+    is($u, 'http://h.test/p/a|b', 'the client writes a pipe-separated path segment');
+
+    # a cookie shares the header code path; 2.0 has no cookies, so only a 3.x
+    # document can reach the extension there, and this is it
+    my $ck = Open::API->new(spec => {
+        openapi => '3.1.0', info => { title => 'T', version => '1.0.0' },
+        paths => { '/t' => { get => { operationId => 'op',
+            parameters => [ { name => 'c', in => 'cookie', 'x-oa-collectionFormat' => 'pipes',
+                              schema => { type => 'array', items => { type => 'string' } } } ],
+            responses => { 200 => { description => 'ok' } } } } } });
+    ($ok, $res) = $ck->validate_request(op => { header => { cookie => 'c=a|b' } });
+    ok($ok, 'pipes in a cookie decode');
+    is_deeply($res->{cookie}{c}, [ 'a', 'b' ], '...into the list');
+}
+
 done_testing;

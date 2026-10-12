@@ -1,0 +1,73 @@
+#!/usr/bin/env perl
+
+# tools/stamp-versions - give every module of a dist directory the dist
+# version.
+#
+# Usage: tools/stamp-versions DISTDIR VERSION
+#
+# `make distdir` runs it on the fresh $(DISTVNAME) directory (see
+# MY::distdir in Makefile.PL), so `make disttest` and `make dist` see the
+# same files. In git only lib/Clay/UI.pm (VERSION_FROM) and
+# lib/Clay/XS.pm (XSLoader checks it) carry a $VERSION; every other
+# module starts with `package NAME;` and a blank line, and the blank line
+# becomes `our $VERSION = 'VERSION';`, so line numbers stay those of git.
+# A module that already carries a $VERSION must carry VERSION.
+#
+# Each file is rewritten through a new file renamed over the old one:
+# EUMM's manicopy hard-links the dist files to the working tree, and an
+# edit in place would stamp the source as well.
+#
+# Copyright 2026 davenonymous
+#
+# Released under the same zlib/libpng license as Clay itself and the rest
+# of this distribution; see src/clay/LICENSE.md.
+
+use v5.22;
+use warnings;
+use feature 'signatures';
+no warnings 'experimental::signatures';
+
+use File::Find qw(find);
+
+die "usage: $0 DISTDIR VERSION\n" unless @ARGV == 2;
+my ($dist_dir, $version) = @ARGV;
+die "$0: no lib directory in $dist_dir\n" unless -d "$dist_dir/lib";
+die "$0: '$version' is not a version number\n" unless $version =~ /\A[0-9]+\.[0-9_]+\z/;
+
+my @modules;
+find({ wanted => sub { push @modules, $File::Find::name if /\.pm\z/ }, no_chdir => 1 }, "$dist_dir/lib");
+
+stamp_module($_) for sort @modules;
+
+sub stamp_module ($path) {
+    my @lines = read_lines($path);
+
+    my @declared = grep { /^\s*our\s+\$VERSION\b/ } @lines;
+    if (@declared) {
+        die "$0: $path declares a version other than '$version': @declared"
+            unless @declared == 1 && $declared[0] =~ /^our \$VERSION\s*=\s*'\Q$version\E';\r?\n\z/;
+        return;
+    }
+
+    die "$0: $path does not start with a package line and a blank line\n"
+        unless @lines >= 2 && $lines[0] =~ /^package [\w:]+;\r?\n\z/ && $lines[1] =~ /^\r?\n\z/;
+    $lines[1] = "our \$VERSION = '$version';$lines[1]";
+    replace_file($path, @lines);
+}
+
+sub read_lines ($path) {
+    open my $in, '<:raw', $path or die "$0: cannot read $path: $!\n";
+    my @lines = <$in>;
+    close $in or die "$0: cannot read $path: $!\n";
+    return @lines;
+}
+
+sub replace_file ($path, @lines) {
+    my $temporary = "$path.stamp-tmp";
+    my $mode = (stat $path)[2] & 07777;
+    open my $out, '>:raw', $temporary or die "$0: cannot write $temporary: $!\n";
+    print {$out} @lines or die "$0: cannot write $temporary: $!\n";
+    close $out or die "$0: cannot write $temporary: $!\n";
+    chmod $mode, $temporary or die "$0: cannot chmod $temporary: $!\n";
+    rename $temporary, $path or die "$0: cannot replace $path: $!\n";
+}

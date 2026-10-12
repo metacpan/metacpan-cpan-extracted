@@ -26,7 +26,7 @@ sub capture {
         mode => $o{mode} // 'watch', level => $o{level} // 2,
         ($o{seat} ? (seat => $o{seat}) : ()),
     );
-    my $result = $ui->run;
+    my $result = $ui->start;
     close $fh;
     return ($out, $result, $ui);
 }

@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="708" height="489" viewBox="0 0 708 489" role="img" aria-label="perl examples/widgets/color-picker.pl">
+<title>perl examples/widgets/color-picker.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="676" height="454" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="676" height="454" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="676" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="354" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/widgets/color-picker.pl</text>
+<rect x="16.5" y="16.5" width="675" height="453" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="363" y="78" width="198" height="18" fill="#242830"/>
+<rect x="570" y="78" width="54" height="18" fill="#d19a66"/>
+<rect x="57" y="114" width="270" height="18" fill="#343a48"/>
+<rect x="363" y="114" width="45" height="18" fill="#61afef"/>
+<rect x="48" y="276" width="63" height="18" fill="#264f78"/>
+<rect x="111" y="276" width="135" height="18" fill="#242830"/>
+<rect x="255" y="276" width="54" height="18" fill="#2e8b57"/>
+<rect x="102" y="312" width="45" height="18" fill="#61afef"/>
+<rect x="57" y="86" width="279" height="1" fill="#61afef"/>
+<rect x="52" y="96" width="1" height="108" fill="#61afef"/>
+<rect x="66" y="96" width="27" height="18" fill="#e06c75"/>
+<rect x="340" y="96" width="1" height="108" fill="#61afef"/>
+<rect x="66" y="114" width="27" height="18" fill="#d19a66"/>
+<rect x="412" y="114" width="1" height="18" fill="#5a606e"/>
+<rect x="66" y="132" width="27" height="18" fill="#e5c07b"/>
+<rect x="381" y="140" width="189" height="2" fill="#61afef"/>
+<rect x="579" y="140" width="45" height="1" fill="#5a606e"/>
+<rect x="66" y="150" width="27" height="18" fill="#98c379"/>
+<rect x="381" y="158" width="144" height="2" fill="#61afef"/>
+<rect x="534" y="158" width="90" height="1" fill="#5a606e"/>
+<rect x="66" y="168" width="27" height="18" fill="#61afef"/>
+<rect x="381" y="176" width="90" height="2" fill="#61afef"/>
+<rect x="480" y="176" width="144" height="1" fill="#5a606e"/>
+<rect x="381" y="194" width="234" height="2" fill="#61afef"/>
+<rect x="57" y="212" width="279" height="1" fill="#61afef"/>
+<rect x="97" y="312" width="1" height="18" fill="#5a606e"/>
+<rect x="66" y="338" width="225" height="2" fill="#61afef"/>
+<rect x="300" y="338" width="324" height="1" fill="#5a606e"/>
+<rect x="66" y="356" width="279" height="2" fill="#61afef"/>
+<rect x="354" y="356" width="270" height="1" fill="#5a606e"/>
+<rect x="66" y="374" width="198" height="2" fill="#61afef"/>
+<rect x="273" y="374" width="351" height="1" fill="#5a606e"/>
+</g>
+<polyline points="52.5 96 52.5 91 52.538 90.413 52.653 89.835 52.843 89.278 53.103 88.75 53.43 88.261 53.818 87.818 54.261 87.43 54.75 87.103 55.278 86.843 55.835 86.653 56.413 86.538 57 86.5 57 86.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="340.5 96 340.5 91 340.462 90.413 340.347 89.835 340.157 89.278 339.897 88.75 339.57 88.261 339.182 87.818 338.739 87.43 338.25 87.103 337.722 86.843 337.165 86.653 336.587 86.538 336 86.5 336 86.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="52.5 204 52.5 208 52.538 208.587 52.653 209.165 52.843 209.722 53.103 210.25 53.43 210.739 53.818 211.182 54.261 211.57 54.75 211.897 55.278 212.157 55.835 212.347 56.413 212.462 57 212.5 57 212.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="340.5 204 340.5 208 340.462 208.587 340.347 209.165 340.157 209.722 339.897 210.25 339.57 210.739 339.182 211.182 338.739 211.57 338.25 211.897 337.722 212.157 337.165 212.347 336.587 212.462 336 212.5 336 212.5" fill="none" stroke="#61afef" stroke-width="1" stroke-linejoin="round"/>
+<g class="terminal">
+<text x="363" y="92" textLength="180" fill="#787e8a">#rrggbb or #rrggbbaa</text>
+<text x="120" y="110" textLength="27" fill="#dcdfe4">Red</text>
+<text x="120" y="128" textLength="54" fill="#dcdfe4">Orange</text>
+<text x="372" y="128" textLength="27" fill="#101216">RGB</text>
+<text x="426" y="128" textLength="27" fill="#dcdfe4">HSL</text>
+<text x="120" y="146" textLength="54" fill="#dcdfe4">Yellow</text>
+<text x="363" y="146" textLength="9" fill="#dcdfe4">R</text>
+<text x="574.5" y="146" text-anchor="middle" fill="#61afef">●</text>
+<text x="633" y="146" textLength="27" fill="#dcdfe4">209</text>
+<text x="120" y="164" textLength="45" fill="#dcdfe4">Green</text>
+<text x="363" y="164" textLength="9" fill="#dcdfe4">G</text>
+<text x="529.5" y="164" text-anchor="middle" fill="#61afef">●</text>
+<text x="633" y="164" textLength="27" fill="#dcdfe4">154</text>
+<text x="120" y="182" textLength="36" fill="#dcdfe4">Blue</text>
+<text x="363" y="182" textLength="9" fill="#dcdfe4">B</text>
+<text x="475.5" y="182" text-anchor="middle" fill="#61afef">●</text>
+<text x="633" y="182" textLength="27" fill="#dcdfe4">102</text>
+<text x="120" y="200" textLength="72" fill="#dcdfe4">No color</text>
+<text x="363" y="200" textLength="9" fill="#dcdfe4">A</text>
+<text x="619.5" y="200" text-anchor="middle" fill="#61afef">●</text>
+<text x="633" y="200" textLength="27" fill="#dcdfe4">255</text>
+<text x="48" y="254" textLength="315" fill="#dcdfe4">Chosen: orange (209, 154, 102, 255)</text>
+<text x="48" y="290" textLength="63" fill="#dcdfe4">#2e8b57</text>
+<text x="57" y="326" textLength="27" fill="#dcdfe4">RGB</text>
+<text x="111" y="326" textLength="27" fill="#101216">HSL</text>
+<text x="48" y="344" textLength="9" fill="#dcdfe4">H</text>
+<text x="295.5" y="344" text-anchor="middle" fill="#61afef">●</text>
+<text x="633" y="344" textLength="27" fill="#dcdfe4">146</text>
+<text x="48" y="362" textLength="9" fill="#dcdfe4">S</text>
+<text x="349.5" y="362" text-anchor="middle" fill="#61afef">●</text>
+<text x="642" y="362" textLength="18" fill="#dcdfe4">50</text>
+<text x="48" y="380" textLength="9" fill="#dcdfe4">L</text>
+<text x="268.5" y="380" text-anchor="middle" fill="#61afef">●</text>
+<text x="642" y="380" textLength="18" fill="#dcdfe4">36</text>
+<text x="48" y="416" textLength="306" fill="#dcdfe4">Chosen: #2e8b57 (46, 139, 87, 255)</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

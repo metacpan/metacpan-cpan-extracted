@@ -5,6 +5,7 @@ use Socket qw(inet_aton pack_sockaddr_in);
 use Test2::V0;
 
 use Net::QUIC::Endpoint;
+use Unblock::HTTP3::Client;
 use Unblock::HTTP3::Connection;
 
 my $remembered = {
@@ -135,7 +136,7 @@ my $endpoint = Net::QUIC::Endpoint->client(
     },
 );
 
-my $h3 = Unblock::HTTP3::Connection->client(
+my $h3 = Unblock::HTTP3::Client->new(
     quic                     => $endpoint->connection,
     enable_http_datagrams    => 1,
     extension_settings       => { 84 => 7 },

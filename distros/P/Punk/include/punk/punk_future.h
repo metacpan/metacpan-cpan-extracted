@@ -576,13 +576,19 @@ static void pf_run_into(pTHX_ SV *self, SV *cb, SV **args, int argc) {
 }
 
 /* a loop timer fired: run the defer callback if any, else settle done */
-static void pf_timer_cb(pTHX_ void *ud) {
+static void pf_timer_cb_in(pTHX_ void *ud) {
     punk_future *pf = (punk_future *)ud;
     SV *self = pf->self_rv;
     pf->timer = NULL;                       /* it fired; nothing to cancel */
     if (!self) return;
     if (pf->on_fire) pf_run_into(aTHX_ self, pf->on_fire, NULL, 0);
     else             pf_settle(aTHX_ pf, self, PF_DONE, newAV());
+}
+
+static void pf_timer_cb(pTHX_ void *ud) {
+    PK_LOOP_ENTER;
+    pf_timer_cb_in(aTHX_ ud);
+    PK_LOOP_LEAVE;
 }
 
 static void pf_arm_timer(pTHX_ punk_future *pf, SV *self, double secs) {

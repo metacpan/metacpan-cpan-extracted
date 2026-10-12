@@ -25,9 +25,9 @@ use HTML::Escape;
 use HTML::TreeBuilder;
 use lib;
 use Log::Handler;
+use Mew;
 use Mojo::JSON;
 use Mojo::Log;
-use Moo;
 use parent;
 use Path::Tiny;
 use Pod::Usage;
@@ -58,9 +58,9 @@ my(@modules) = qw
 	HTML::TreeBuilder
 	lib
 	Log::Handler
+	Mew
 	Mojo::JSON
 	Mojo::Log
-	Moo
 	parent
 	Path::Tiny
 	Pod::Usage

@@ -3,7 +3,7 @@ package Database::BI::Controller::Dashboard;
 use strict;
 use warnings;
 
-our $VERSION = '0.010.0';
+our $VERSION = '0.011.0';
 
 use Mojo::Base 'Mojolicious::Controller', -strict, -signatures;
 
@@ -82,10 +82,29 @@ Readonly my $MAX_UPLOAD_MIB      => 50;
 Readonly my $MAX_UPLOAD_BYTES    => $MAX_UPLOAD_MIB * 1_048_576;
 Readonly my $DEFAULT_JOIN_MAX_ROWS => 10_000;
 Readonly my $MAX_PREFIX_LEN        => 20;
+Readonly my $DEFAULT_PER_PAGE      => 200;
+Readonly my $MAX_PER_PAGE          => 2_000;
 
 # ---------------------------------------------------------------------------
 # Protected helpers
 # ---------------------------------------------------------------------------
+
+# _pagination($self) -> ($page, $per_page, $offset)
+#
+# Reads ?page= and ?per_page= from the current request, clamps them to sane
+# ranges, and returns the 1-based page number, the page size, and the
+# 0-based row offset.  Pagination is optional: when neither param is present
+# per_page defaults to DEFAULT_PER_PAGE.
+sub _pagination {
+	my ($self) = @_;
+	my $per_page = int($self->param('per_page') // $DEFAULT_PER_PAGE);
+	$per_page = 1         if $per_page < 1;
+	$per_page = $MAX_PER_PAGE if $per_page > $MAX_PER_PAGE;
+	my $page = int($self->param('page') // 1);
+	$page = 1 if $page < 1;
+	my $offset = ($page - 1) * $per_page;
+	return ($page, $per_page, $offset);
+}
 
 # _i18n($self, $key, @sprintf_args) -> $string
 #
@@ -280,7 +299,7 @@ sub _scan_data_dir :Protected ($self) {
 		my $base = $_->basename;
 		return unless $base =~ $EXT_RE;
 		(my $name = $base) =~ s/\.[^.]+\z//;
-		{ name => $name, file => $base }
+		{ name => $name, file => $base, path => $_->to_string }
 	})->to_array;
 }
 
@@ -939,8 +958,15 @@ sub view ($self) {
 		return $self->reply->not_found;
 	}
 
+	my ($page, $per_page, $offset) = $self->_pagination;
+
 	my ($source, $records);
-	eval { $source = $self->open_table($table); $records = $source->fetch_all };
+	eval {
+		$source  = $self->open_table($table);
+		# Fetch one extra row to detect whether a next page exists without
+		# issuing a COUNT(*) query (which blocks on multi-GB SQLite files).
+		$records = $source->selectall_arrayref(limit => $per_page + 1, offset => $offset);
+	};
 	if ($@) {
 		return $self->render(
 			template => "$platform/$language/home",
@@ -952,10 +978,24 @@ sub view ($self) {
 		);
 	}
 
+	# Multi-table SQLite: show the schema browser first so the user can choose
+	# which internal table to open.
+	if ($source && $source->sqlite_tables && @{ $source->sqlite_tables } > 1) {
+		return $self->redirect_to('/tables?l=' . url_escape("table:$table"));
+	}
+
+	$records //= [];
+	my $has_next = (@$records > $per_page) ? 1 : 0;
+	pop @$records if $has_next;
+
 	my @columns = _get_columns($source, $records);
 	my ($filtered, $filter_specs, $filters_json) = $self->_apply_filters($records);
 	my $dedup = $self->param('d') ? 1 : 0;
 	$filtered = _dedup_records($filtered, \@columns) if $dedup;
+
+	my $page_url = $self->req->url->clone;
+	$page_url->query->remove('page')->remove('per_page');
+	my $page_base_url = $page_url->to_string;
 
 	$self->render(
 		template         => "$platform/$language/dashboard",
@@ -976,6 +1016,10 @@ sub view ($self) {
 		back_url         => _safe_back_url($self->param('back2')),
 		back_label       => $self->param('back2_label') // 'Back',
 		export_url       => $self->_build_export_url("table:$table", [], $filter_specs, undef, $dedup),
+		page             => $page,
+		per_page         => $per_page,
+		has_next         => $has_next,
+		page_base_url    => $page_base_url,
 	);
 }
 
@@ -1148,6 +1192,8 @@ sub open_file ($self) {
 
 	return $self->reply->not_found unless defined $file_path;
 
+	my ($page, $per_page, $offset) = $self->_pagination;
+
 	# Remote path /../hostname/dir/file.ext: delegate opening to _open_spec
 	# and render the dashboard directly, bypassing the realpath/local-file path.
 	if ($file_path =~ m{\A/\.\./}) {
@@ -1157,7 +1203,9 @@ sub open_file ($self) {
 		my $filename = $label;
 		(my $table = $filename) =~ s/\.[^.]+\z//;
 		my $records;
-		eval { $records = $source->fetch_all };
+		eval {
+			$records = $source->selectall_arrayref(limit => $per_page + 1, offset => $offset);
+		};
 		if ($@) {
 			return $self->render(
 				template   => "$platform/$language/home",
@@ -1170,10 +1218,15 @@ sub open_file ($self) {
 				back_label => 'Home',
 			);
 		}
+		$records //= [];
+		my $has_next = (@$records > $per_page) ? 1 : 0;
+		pop @$records if $has_next;
 		my @columns  = _get_columns($source, $records);
 		my ($filtered, $filter_specs, $filters_json) = $self->_apply_filters($records);
 		my $dedup = $self->param('d') ? 1 : 0;
 		$filtered = _dedup_records($filtered, \@columns) if $dedup;
+		my $rpage_url = $self->req->url->clone;
+		$rpage_url->query->remove('page')->remove('per_page');
 		return $self->render(
 			template         => "$platform/$language/dashboard",
 			handler          => 'tt',
@@ -1196,6 +1249,10 @@ sub open_file ($self) {
 			filters_json     => $filters_json,
 			dedup            => $dedup,
 			export_url       => $self->_build_export_url($lspec, [], $filter_specs, undef, $dedup),
+			page             => $page,
+			per_page         => $per_page,
+			has_next         => $has_next,
+			page_base_url    => $rpage_url->to_string,
 		);
 	}
 
@@ -1209,8 +1266,21 @@ sub open_file ($self) {
 	my $filename = $file->basename;
 	my $lspec    = 'path:' . $file->to_string;
 
+	my $it = $self->param('it');	# optional: select a specific internal table
+
+	# Allow the tables view to override the default "Back to browser" link.
+	my $back_override = _safe_back_url($self->param('back'));
+	if ($back_override) {
+		$back = $back_override;
+	}
+	my $back_label_default = $back_override ? ($self->param('back_label') // 'Back') : 'Back to browser';
+
 	my ($source, $records);
-	eval { $source = $self->open_table($table, directory => $dir->to_string); $records = $source->fetch_all };
+	eval {
+		$source  = $self->open_table($table, directory => $dir->to_string,
+			defined $it ? (internal_table => $it) : ());
+		$records = $source->selectall_arrayref(limit => $per_page + 1, offset => $offset);
+	};
 	if ($@) {
 		# Provide a SQLite-specific hint when the error looks like a table-name
 		# mismatch or a missing-tables failure so the user knows what to do.
@@ -1221,24 +1291,38 @@ sub open_file ($self) {
 				. 'filename -- the application auto-detects and uses the first table found.';
 		}
 		return $self->render(
-			template   => "$platform/$language/home",
-			handler    => 'tt',
-			format     => 'html',
-			tables     => [],
-			title      => 'Error',
-			error      => $self->_i18n('error_file_open', $filename, $@),
-			hint       => $hint,
-			back_url   => $back,
-			back_label => 'Back to browser',
-			back2_url  => _safe_back_url($self->param('back2')),
+			template    => "$platform/$language/home",
+			handler     => 'tt',
+			format      => 'html',
+			tables      => [],
+			title       => 'Error',
+			error       => $self->_i18n('error_file_open', $filename, $@),
+			hint        => $hint,
+			back_url    => $back,
+			back_label  => $back_label_default,
+			back2_url   => _safe_back_url($self->param('back2')),
 			back2_label => $self->param('back2_label') // 'Back',
 		);
 	}
+
+	# Multi-table SQLite without a specific table selected: redirect to schema
+	# browser so the user can pick which internal table to open.
+	if (!defined $it && $source && $source->sqlite_tables
+			&& @{ $source->sqlite_tables } > 1) {
+		return $self->redirect_to('/tables?l=' . url_escape("path:${\$file->to_string}"));
+	}
+
+	$records //= [];
+	my $has_next = (@$records > $per_page) ? 1 : 0;
+	pop @$records if $has_next;
 
 	my @columns  = _get_columns($source, $records);
 	my ($filtered, $filter_specs, $filters_json) = $self->_apply_filters($records);
 	my $dedup = $self->param('d') ? 1 : 0;
 	$filtered = _dedup_records($filtered, \@columns) if $dedup;
+
+	my $lpage_url = $self->req->url->clone;
+	$lpage_url->query->remove('page')->remove('per_page');
 
 	$self->render(
 		template         => "$platform/$language/dashboard",
@@ -1246,10 +1330,10 @@ sub open_file ($self) {
 		format           => 'html',
 		records          => $filtered,
 		columns          => \@columns,
-		table            => $table,
-		title            => $filename,
+		table            => defined $it ? $it : $table,
+		title            => defined $it ? "$filename ($it)" : $filename,
 		back_url         => $back,
-		back_label       => 'Back to browser',
+		back_label       => $back_label_default,
 		back2_url        => _safe_back_url($self->param('back2')),
 		back2_label      => $self->param('back2_label') // 'Back',
 		file_path        => $file->to_string,
@@ -1262,6 +1346,10 @@ sub open_file ($self) {
 		filters_json     => $filters_json,
 		dedup            => $dedup,
 		export_url       => $self->_build_export_url($lspec, [], $filter_specs, undef, $dedup),
+		page             => $page,
+		per_page         => $per_page,
+		has_next         => $has_next,
+		page_base_url    => $lpage_url->to_string,
 	);
 }
 
@@ -2043,11 +2131,33 @@ sub stat_api ($self) {
 		unless defined $file && -f $file && $file->basename =~ $EXT_RE;
 
 	my @s = stat $file->to_string;
+
+	# For SQLite files, count user tables so the home-page tooltip can show
+	# "SQLite database - N tables". Silently omit the count if the file is
+	# not actually a SQLite file (e.g. a Berkeley DB .db file).
+	my $table_count;
+	if ($file->basename =~ /\.(?:sql|sqlite|sqlite3|db)\z/i) {
+		eval {
+			require DBI;
+			my $dbh = DBI->connect(
+				'dbi:SQLite:dbname=' . $file->to_string,
+				'', '',
+				{ RaiseError => 1, PrintError => 0, AutoCommit => 1 },
+			);
+			my $tbls = $dbh->selectcol_arrayref(
+				q{SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'}
+			);
+			$table_count = scalar @{ $tbls // [] };
+			$dbh->disconnect;
+		};
+	}
+
 	$self->render(json => {
 		exists => \1,
 		path   => $file->to_string,
 		mtime  => $s[9],
 		size   => $s[7],
+		(defined $table_count ? (table_count => $table_count) : ()),
 	});
 }
 
@@ -2217,9 +2327,11 @@ sub clear_uploads ($self) {
 #          data source cannot be opened, 200 with an error message when
 #          no plottable rows exist.
 sub graph_view ($self) {
-	my $x_col = $self->param('x') // '';
-	my $y_col = $self->param('y') // '';
-	my $back  = _safe_back_url($self->param('back')) // '/';
+	my $x_col     = $self->param('x') // '';
+	my $y_col     = $self->param('y') // '';
+	my $back      = _safe_back_url($self->param('back')) // '/';
+	my $back2     = _safe_back_url($self->param('back2'));
+	my $back2_lbl = $self->param('back2_label') // '';
 
 	return $self->render(text => 'Missing x or y column parameter', status => 400)
 		unless length($x_col) && length($y_col);
@@ -2275,8 +2387,9 @@ sub graph_view ($self) {
 		format           => 'html',
 		title            => $title,
 		graph_html       => $graph_html,
-		back_url         => $back,
-		back_label       => 'Back to table',
+		back_url         => ($back2 // $back),
+		back_label       => ($back2 ? ($back2_lbl || 'Back') : 'Back to table'),
+		($back2 ? (back2_url => $back, back2_label => 'Back to table') : ()),
 		point_count      => scalar @pairs,
 		ref_min_y        => $min_y,
 		ref_max_y        => $max_y,
@@ -2287,10 +2400,12 @@ sub graph_view ($self) {
 }
 
 sub pie_view ($self) {
-	my $cat_col     = $self->param('cat') // '';
-	my $val_col     = $self->param('val') // '';
-	my $donut       = $self->param('donut') ? 1 : 0;
-	my $back        = _safe_back_url($self->param('back')) // '/';
+	my $cat_col      = $self->param('cat') // '';
+	my $val_col      = $self->param('val') // '';
+	my $donut        = $self->param('donut') ? 1 : 0;
+	my $back         = _safe_back_url($self->param('back')) // '/';
+	my $back2        = _safe_back_url($self->param('back2'));
+	my $back2_lbl    = $self->param('back2_label') // '';
 	my @filter_specs = $self->every_param('f');
 
 	return $self->render(text => 'Missing cat or val column parameter', status => 400)
@@ -2370,8 +2485,9 @@ sub pie_view ($self) {
 		format           => 'html',
 		title            => $title,
 		pie_html         => $pie_html,
-		back_url         => $back,
-		back_label       => 'Back to table',
+		back_url         => ($back2 // $back),
+		back_label       => ($back2 ? ($back2_lbl || 'Back') : 'Back to table'),
+		($back2 ? (back2_url => $back, back2_label => 'Back to table') : ()),
 		slice_count      => scalar @slices,
 		cat_col          => $cat_col,
 		val_col          => $val_col,
@@ -2435,12 +2551,14 @@ Accepts the same C<l=>, C<j=>, C<f=> pipeline params as C</join>, plus:
 =cut
 
 sub heatmap_view ($self) {
-	my $x_col   = $self->param('x')        // '';
-	my $y_col   = $self->param('y')        // '';
-	my $val_col = $self->param('val')      // '';
-	my $scheme  = $self->param('scheme')   // 'YlOrRd';
-	my $show_v  = $self->param('show_val') ? 1 : 0;
-	my $back    = _safe_back_url($self->param('back')) // '/';
+	my $x_col     = $self->param('x')        // '';
+	my $y_col     = $self->param('y')        // '';
+	my $val_col   = $self->param('val')      // '';
+	my $scheme    = $self->param('scheme')   // 'YlOrRd';
+	my $show_v    = $self->param('show_val') ? 1 : 0;
+	my $back      = _safe_back_url($self->param('back')) // '/';
+	my $back2     = _safe_back_url($self->param('back2'));
+	my $back2_lbl = $self->param('back2_label') // '';
 
 	return $self->render(text => 'Missing x or y column parameter', status => 400)
 		unless length($x_col) && length($y_col);
@@ -2515,8 +2633,9 @@ sub heatmap_view ($self) {
 		title            => $title,
 		heatmap_html     => $heatmap_html,
 		cell_count       => scalar @triples,
-		back_url         => $back,
-		back_label       => 'Back to table',
+		back_url         => ($back2 // $back),
+		back_label       => ($back2 ? ($back2_lbl || 'Back') : 'Back to table'),
+		($back2 ? (back2_url => $back, back2_label => 'Back to table') : ()),
 		source_url       => $source_url,
 		source_accessed  => $source_accessed,
 	);
@@ -2577,12 +2696,14 @@ Accepts the same C<l=>, C<j=>, C<f=> pipeline params as C</join>, plus:
 =cut
 
 sub bar_view ($self) {
-	my $cat_col  = $self->param('cat')    // '';
-	my $val_col  = $self->param('val')    // '';
-	my $orient   = $self->param('orient') // 'vertical';
-	my $sort     = $self->param('sort')   // 'none';
-	my $max_bars = int($self->param('max') // 0);
-	my $back     = _safe_back_url($self->param('back')) // '/';
+	my $cat_col   = $self->param('cat')    // '';
+	my $val_col   = $self->param('val')    // '';
+	my $orient    = $self->param('orient') // 'vertical';
+	my $sort      = $self->param('sort')   // 'none';
+	my $max_bars  = int($self->param('max') // 0);
+	my $back      = _safe_back_url($self->param('back')) // '/';
+	my $back2     = _safe_back_url($self->param('back2'));
+	my $back2_lbl = $self->param('back2_label') // '';
 
 	return $self->render(text => 'Missing cat column parameter', status => 400)
 		unless length($cat_col);
@@ -2656,8 +2777,9 @@ sub bar_view ($self) {
 		bar_html        => $bar_html,
 		bar_count       => scalar @bars,
 		cat_col         => $cat_col,
-		back_url        => $back,
-		back_label      => 'Back to table',
+		back_url        => ($back2 // $back),
+		back_label      => ($back2 ? ($back2_lbl || 'Back') : 'Back to table'),
+		($back2 ? (back2_url => $back, back2_label => 'Back to table') : ()),
 		source_url      => $source_url,
 		source_accessed => $source_accessed,
 	);
@@ -2871,6 +2993,108 @@ sub folder_view ($self) {
 		back_url   => $back,
 		back_label => 'Back to table',
 		left_spec  => $left_spec,
+	);
+}
+
+=head2 tables_view
+
+C<GET /tables> -- Schema browser for multi-table databases (SQLite, etc.).
+Lists all internal tables with their columns; clicking a table opens it.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+  ?l=   string   Required.  Table spec: "table:name" (data_dir) or
+                 "path:/abs/path" (filesystem path).  The file must be a
+                 SQLite database.
+
+=head4 OUTPUT
+
+Renders C<tables.html.tt> with:
+
+  db_label   string   Short name / stem of the database file
+  tables     ARRAYREF of { name, columns => [...], href }
+  spec       string   The raw l= spec (for building back links)
+  back_url   string   URL to navigate back one level
+  back_label string   Label for the back link
+
+=cut
+
+sub tables_view ($self) {
+	my ($platform, $language) = $self->_resolve_template;
+	my $spec = $self->param('l');
+	return $self->reply->not_found unless defined $spec && length $spec;
+
+	my ($file_path, $db_label, $back_url, $back_label);
+
+	if ($spec =~ /\Atable:([A-Za-z0-9_]+)\z/) {
+		my $table_name = lc $1;
+		my $data_dir   = $self->app->home->child(
+			$self->app->config->{data_dir} // 'data');
+		for my $ext (qw(sql sqlite sqlite3 db)) {
+			my $p = $data_dir->child("$table_name.$ext");
+			if (-f $p) {
+				$file_path = $p->to_string;
+				last;
+			}
+		}
+		return $self->reply->not_found unless defined $file_path;
+		$db_label  = $table_name;
+		$back_url  = '/';
+		$back_label = 'Home';
+	} elsif ($spec =~ /\Apath:(.+)\z/) {
+		my $path_arg = $1;
+		my $file = eval { Mojo::File->new($path_arg)->realpath };
+		return $self->reply->not_found
+			unless defined $file && -f $file && $file->basename =~ /\.(?:sql|sqlite|sqlite3|db)\z/i;
+		$file_path  = $file->to_string;
+		($db_label  = $file->basename) =~ s/\.[^.]+\z//;
+		$back_url   = '/browse?path=' . url_escape($file->dirname->to_string);
+		$back_label = 'Back to browser';
+	} else {
+		return $self->reply->not_found;
+	}
+
+	my @tables;
+	eval {
+		require DBI;
+		my $dbh = DBI->connect(
+			"dbi:SQLite:dbname=$file_path", q{}, q{},
+			{ RaiseError => 1, PrintError => 0, AutoCommit => 1 });
+		my $tnames = $dbh->selectcol_arrayref(
+			q{SELECT name FROM sqlite_master }
+			. q{WHERE type='table' AND name NOT LIKE 'sqlite_%' }
+			. q{ORDER BY name});
+		for my $tname (@{ $tnames // [] }) {
+			my @cols;
+			my $sth = eval { $dbh->prepare("PRAGMA table_info(\"$tname\")") };
+			if ($sth) {
+				$sth->execute;
+				while (my $row = $sth->fetchrow_hashref) {
+					push @cols, $row->{name};
+				}
+			}
+			my $open_url = '/open?path=' . url_escape($file_path)
+				. '&it=' . url_escape($tname)
+				. '&back=' . url_escape('/tables?l=' . $spec)
+				. '&back_label=' . url_escape(ucfirst($db_label) . ' schema');
+			push @tables, { name => $tname, columns => \@cols, href => $open_url };
+		}
+		$dbh->disconnect;
+	};
+	return $self->reply->not_found if $@;
+
+	$self->render(
+		template   => "$platform/$language/tables",
+		handler    => 'tt',
+		format     => 'html',
+		title      => ucfirst($db_label) . ' -- Tables',
+		db_label   => $db_label,
+		tables     => \@tables,
+		spec       => $spec,
+		back_url   => $back_url,
+		back_label => $back_label,
 	);
 }
 

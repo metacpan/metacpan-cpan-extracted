@@ -1,0 +1,20 @@
+Program						Purpose
+build.db.sh					Runs drop.tables.pl, create.tables.pl, populate.sqlite.tables.pl
+check.module.names.pl		Runs Search.check() outputting known & unknown module names
+create.tables.pl			Create all db tables in data/modules.sqlite
+drop.tables.pl				Drop all db tables in data/modules.sqlite
+export.modules2csv.pl		Export modules table to data/modules.table.csv
+export.topics.pl			Export constants, modules & topics tables to /tmp/topics.txt
+export.tree.pl				Export the db to html/cpan.metacurator.tree.html
+export.tree.sh				Run export.tree.pl
+fix.camel.case.pl			Runs Search.fix_camel_case() to ensure all CamelCase words are embedded in [[...]]
+flowchart.pl				Demo outputs an image with 2 text-in-boxes: TiddlyWiki & JSON file
+parse.metacpan.recent.pl	Reads MetaCPAN.org/recent HTML file & outputs module name, description & pod url in Perl.Wiki's 3-line format
+populate.sqlite.tables.pl	Populate tables constants from data/cpan.metacurator.constants.csv & topics from data/tiddlers.json
+report.pl					Read data/tiddlers.json & report various things
+text.balanced.pl			Read data/topic.txt & report usage of <pre>...</pre>
+tiddly2html.pl				Converts a TiddlyWiki file 'data/in.txt' into a text file 'data/out.html'
+tiddly2text.pl				Converts a TiddlyWiki HTML file 'data/in.html' into a text file 'data/out.txt'
+validate.tree.pl			Runs CPAN::MetaCurator::Validate.validate(), which currently does very little
+validate.tree.sh			Runsvalidate.tree.pl
+zap.log.sh					Reset contents of log/development.log

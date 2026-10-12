@@ -1,6 +1,17 @@
 Changes
 cpanfile
 lib/Log/Abstraction.pm
+lib/Log/Abstraction/Backend.pm
+lib/Log/Abstraction/Backend/Array.pm
+lib/Log/Abstraction/Backend/Code.pm
+lib/Log/Abstraction/Backend/Fd.pm
+lib/Log/Abstraction/Backend/File.pm
+lib/Log/Abstraction/Backend/Journald.pm
+lib/Log/Abstraction/Backend/LogAny.pm
+lib/Log/Abstraction/Backend/LogDispatch.pm
+lib/Log/Abstraction/Backend/Object.pm
+lib/Log/Abstraction/Backend/Sendmail.pm
+lib/Log/Abstraction/Backend/Syslog.pm
 lib/Log/Any/Adapter/Abstraction.pm
 LICENSE
 Makefile.PL
@@ -12,6 +23,7 @@ t/10-compile.t
 t/20-new.t
 t/30-basics.t
 t/backend_options.t
+t/backends.t
 t/caller_depth.t
 t/changes.t
 t/code.t
@@ -25,6 +37,7 @@ t/eof.t
 t/eol.t
 t/error.t
 t/extended_tests.t
+t/file_handles.t
 t/function.t
 t/high_levels.t
 t/integration.t
@@ -43,6 +56,7 @@ t/pod-coverage.t
 t/pod-synopsis.t
 t/pod.t
 t/private_runtime.t
+t/producers.t
 t/redact.t
 t/regressions.t
 t/rotation.t
@@ -50,6 +64,7 @@ t/rt_178070.t
 t/rt_180018.t
 t/rt_181461.t
 t/sendmail.t
+t/sendmail_async.t
 t/sendmail_digest.t
 t/structured_fields.t
 t/subclass.t

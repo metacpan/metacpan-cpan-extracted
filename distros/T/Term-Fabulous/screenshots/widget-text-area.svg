@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="708" height="273" viewBox="0 0 708 273" role="img" aria-label="perl examples/widgets/text-area.pl">
+<title>perl examples/widgets/text-area.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="676" height="238" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="676" height="238" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="676" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="354" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/widgets/text-area.pl</text>
+<rect x="16.5" y="16.5" width="675" height="237" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="48" y="78" width="612" height="90" fill="#343a48"/>
+<rect x="48" y="168" width="234" height="18" fill="#343a48"/>
+<rect x="282" y="168" width="9" height="18" fill="#dcdfe4"/>
+<rect x="291" y="168" width="369" height="18" fill="#343a48"/>
+<rect x="655" y="78" width="1" height="18" fill="#464c5a"/>
+<rect x="655" y="96" width="2" height="90" fill="#61afef"/>
+</g>
+<g class="terminal">
+<text x="48" y="92" textLength="603" fill="#dcdfe4">- bread, butter and a big wheel of cheese for the party on Saturday</text>
+<text x="48" y="110" textLength="63" fill="#dcdfe4">evening</text>
+<text x="48" y="128" textLength="72" fill="#dcdfe4">- coffee</text>
+<text x="48" y="146" textLength="72" fill="#dcdfe4">- apples</text>
+<text x="48" y="164" textLength="207" fill="#dcdfe4">- birthday card for Ada</text>
+<text x="48" y="182" textLength="234" fill="#dcdfe4">- batteries for the remote</text>
+<text x="48" y="218" textLength="540" fill="#96a0b4">Long lines wrap at spaces; the scrollbar shows the position.</text>
+</g>
+<g shape-rendering="crispEdges">
+</g>
+</svg>

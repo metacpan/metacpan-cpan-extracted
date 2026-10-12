@@ -78,9 +78,12 @@ t/cli/release.t
 t/cli/release_check_branch.t
 t/cli/release_no_bump_versions.t
 t/cli/release_no_pause_file.t
+t/cli/release_noninteractive.t
 t/cli/release_notest.t
 t/cli/release_skip_prepare.t
 t/cli/release_with_hooks.t
+t/cli/subprocess.t
+t/cli/validation.t
 t/data/bsd.dat
 t/dist.t
 t/dist/Acme-FooXS.dat
@@ -132,6 +135,7 @@ t/project/unsupported.t
 t/project/xsutil.t
 t/release/bump_version.t
 t/release/changes.t
+t/release/upload_to_cpan.t
 t/release_test/config.t
 t/util.t
 t/work_dir/_rewrite_pod.t

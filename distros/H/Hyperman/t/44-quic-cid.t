@@ -25,6 +25,8 @@ is(Hyperman::_quic_cid_selftest(), 1,
  . 'retiring a connection takes its CIDs and nothing else, and a prefix '
  . 'sharing a bucket with a longer CID does not match it');
 
+is(Hyperman::_quic_src_selftest(), 1,
+   'per-source half-open table: counts per address, port ignored, slot freed at zero, full table says so');
 is(Hyperman::_quic_heap_selftest(), 1,
    'the expiry heap: pushes in random order drain monotonically, deadlines '
  . 'move both earlier and later, and every cached index agrees with its slot');

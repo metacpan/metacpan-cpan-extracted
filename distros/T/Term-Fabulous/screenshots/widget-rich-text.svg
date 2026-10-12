@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="399" viewBox="0 0 780 399" role="img" aria-label="perl examples/widgets/rich-text.pl">
+<title>perl examples/widgets/rich-text.pl</title>
+<style>
+.terminal text { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 15px; white-space: pre; }
+.terminal .b { font-weight: bold; }
+.terminal .i { font-style: italic; }
+.title { font-family: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-size: 13px; }
+</style>
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.3"/></filter>
+<clipPath id="window"><rect x="16" y="16" width="748" height="364" rx="10"/></clipPath>
+</defs>
+<rect x="16" y="16" width="748" height="364" rx="10" fill="#161622" filter="url(#shadow)"/>
+<rect x="16" y="16" width="748" height="34" fill="#1f2430" clip-path="url(#window)"/>
+<circle cx="36" cy="33" r="6" fill="#ff5f57"/>
+<circle cx="56" cy="33" r="6" fill="#febc2e"/>
+<circle cx="76" cy="33" r="6" fill="#28c840"/>
+<text class="title" x="390" y="33" text-anchor="middle" dominant-baseline="central" fill="#9aa3b5">perl examples/widgets/rich-text.pl</text>
+<rect x="16.5" y="16.5" width="747" height="363" rx="10" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+<g shape-rendering="crispEdges">
+<rect x="336" y="150" width="63" height="18" fill="#dcdfe4"/>
+<rect x="138" y="186" width="306" height="54" fill="#1e2332"/>
+<rect x="138" y="240" width="198" height="18" fill="#1e2332"/>
+<rect x="336" y="240" width="72" height="18" fill="#3a3f4b"/>
+<rect x="408" y="240" width="36" height="18" fill="#1e2332"/>
+<rect x="138" y="258" width="9" height="18" fill="#1e2332"/>
+<rect x="147" y="258" width="126" height="18" fill="#3a3f4b"/>
+<rect x="273" y="258" width="171" height="18" fill="#1e2332"/>
+<rect x="300" y="294" width="45" height="18" fill="#61afef"/>
+<rect x="381" y="294" width="72" height="18" fill="#282d3a"/>
+</g>
+<g class="terminal">
+<text x="48" y="92" textLength="54" fill="#96a0b4">markup</text>
+<text x="138" y="92" textLength="45" fill="#dcdfe4">Press</text>
+<text x="192" y="92" textLength="45" class="b" fill="#dcdfe4">Enter</text>
+<text x="246" y="92" textLength="72" fill="#dcdfe4">to save,</text>
+<text x="327" y="92" textLength="27" class="b" fill="#e06c75">Esc</text>
+<text x="363" y="92" textLength="81" fill="#dcdfe4">to leave.</text>
+<text x="453" y="92" textLength="225" fill="#797b83">Unsaved changes are lost.</text>
+<text x="48" y="128" textLength="45" fill="#96a0b4">spans</text>
+<text x="138" y="128" textLength="54" class="b" fill="#e06c75">error:</text>
+<text x="201" y="128" textLength="180" fill="#dcdfe4">config.kdl not found</text>
+<text x="390" y="128" textLength="108" class="i" fill="#d19a66">(3 warnings)</text>
+<text x="48" y="164" textLength="54" fill="#96a0b4">styles</text>
+<text x="138" y="164" textLength="36" class="b" fill="#dcdfe4">bold</text>
+<text x="183" y="164" textLength="54" class="i" fill="#dcdfe4">italic</text>
+<text x="246" y="164" textLength="81" fill="#dcdfe4">underline</text>
+<text x="336" y="164" textLength="63" fill="#161622">reverse</text>
+<text x="408" y="164" textLength="27" fill="#797b83">dim</text>
+<text x="444" y="164" textLength="135" fill="#dcdfe4">strike overline</text>
+<text x="588" y="164" textLength="36" class="b" fill="#dcdfe4">bold</text>
+<text x="633" y="164" textLength="72" fill="#dcdfe4">not bold</text>
+<text x="48" y="200" textLength="63" fill="#96a0b4">wrapped</text>
+<text x="147" y="200" textLength="261" fill="#dcdfe4">A span is a range of the text</text>
+<text x="147" y="218" textLength="207" fill="#dcdfe4">with a look of its own:</text>
+<text x="363" y="218" textLength="36" class="i" fill="#98c379">this</text>
+<text x="147" y="236" textLength="279" class="i" fill="#98c379">one is italic and green, and it</text>
+<text x="147" y="254" textLength="171" class="i" fill="#98c379">wraps with the text</text>
+<text x="318" y="254" textLength="90" fill="#dcdfe4">; this one</text>
+<text x="147" y="272" textLength="207" fill="#dcdfe4">is highlighted instead.</text>
+<text x="48" y="308" textLength="45" fill="#96a0b4">links</text>
+<text x="138" y="308" textLength="72" fill="#dcdfe4">Read the</text>
+<text x="219" y="308" textLength="27" fill="#61afef">FAQ</text>
+<text x="246" y="308" textLength="45" fill="#dcdfe4">, the</text>
+<text x="300" y="308" textLength="45" fill="#101216">guide</text>
+<text x="354" y="308" textLength="18" fill="#dcdfe4">or</text>
+<text x="381" y="308" textLength="72" fill="#ebeef3">perl.org</text>
+<text x="453" y="308" textLength="9" fill="#dcdfe4">.</text>
+<text x="48" y="344" textLength="72" fill="#96a0b4">followed</text>
+<text x="138" y="344" textLength="522" fill="#dcdfe4">Tab selects a link, Left and Right move, Enter follows it.</text>
+</g>
+<g shape-rendering="crispEdges">
+<rect x="201" y="129" width="90" height="1" fill="#dcdfe4"/>
+<rect x="507" y="150" width="72" height="1" fill="#dcdfe4"/>
+<rect x="444" y="159" width="54" height="1" fill="#dcdfe4"/>
+<rect x="246" y="165" width="81" height="1" fill="#dcdfe4"/>
+<rect x="219" y="309" width="27" height="1" fill="#61afef"/>
+<rect x="381" y="309" width="72" height="1" fill="#ebeef3"/>
+</g>
+</svg>

@@ -1,5 +1,5 @@
 package oEdtk::OmgrIdxDoc;
-our $VERSION = 0.8021;
+our $VERSION = 2.1109;
 
 use base 'oEdtk::Doc';
 use oEdtk::Config	qw(config_read);

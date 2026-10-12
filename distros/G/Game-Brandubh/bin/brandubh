@@ -4,83 +4,11 @@ use 5.010;
 use strict;
 use warnings;
 
-use Getopt::Long ();
-use Game::Brandubh;
 use Game::Brandubh::Terminal;
 
-my %given;
-my $parsed = Getopt::Long::GetOptionsFromArray(
-    \@ARGV, \%given,
-    'level=i', 'side=s', 'seed=s', 'variant=s', 'load=s',
-    'colour|color!', 'pick!', 'unicode!', 'version', 'help',
-);
+our $VERSION = '0.02';
 
-if (!$parsed || @ARGV) {
-    print STDERR "brandubh: I do not know '@ARGV'.\n" if $parsed && @ARGV;
-    print STDERR usage();
-    exit 2;
-}
-if ($given{help}) {
-    print usage();
-    exit 0;
-}
-if ($given{version}) {
-    print "brandubh $Game::Brandubh::VERSION\n";
-    exit 0;
-}
-
-my %with;
-$with{level}   = $given{level}   if defined $given{level};
-$with{human}   = $given{side}    if defined $given{side};
-$with{variant} = $given{variant} if defined $given{variant};
-$with{colour}  = $given{colour}  if defined $given{colour};
-$with{picking} = $given{pick}    if defined $given{pick};
-$with{unicode} = $given{unicode} if defined $given{unicode};
-$with{menu}    = 1 unless defined $given{side} || defined $given{level} || defined $given{load};
-
-if (defined $given{seed}) {
-    if ($given{seed} !~ /\A[0-9a-fA-F]{64}\z/) {
-        print STDERR "brandubh: a seed is sixty-four hexadecimal characters.\n";
-        exit 2;
-    }
-    $with{seed} = pack 'H*', $given{seed};
-}
-
-my $terminal = eval { Game::Brandubh::Terminal->new(%with) };
-if (!$terminal) {
-    (my $why = $@) =~ s/ at \S+ line \d+\.?\s*\z//;
-    $why =~ s/\AGame::Brandubh(?:::\w+)*: //;
-    print STDERR "brandubh: $why.\n";
-    exit 2;
-}
-
-if (defined $given{load}) {
-    exit 2 unless $terminal->load($given{load});
-}
-
-exit $terminal->start;
-
-sub usage {
-    return <<'USAGE';
-brandubh - the Irish tafl game, in a terminal
-
-  brandubh [options]
-
-  --side WHO       attackers (the default), defenders, both, or none
-  --level N        how hard the program plays: 1, 2 (the default) or 3
-  --variant TEXT   the rule set, for example 'custom repeat=2'
-  --seed HEX       sixty-four hexadecimal characters; the same seed plays the same game
-  --load FILE      carry on with a saved game
-  --no-colour      letters and lines instead of a painted board
-  --no-pick        type moves instead of choosing them with the arrow keys
-  --no-unicode     letters for the pieces, with colour kept
-  --version        the version, and stop
-  --help           this, and stop
-
-In a terminal, moves are chosen on the board with the arrow keys; press ? for
-the keys. Anywhere else, type a move as two squares, like d1d3, or help.
-USAGE
-}
+exit Game::Brandubh::Terminal->run(@ARGV);
 
 __END__
 
