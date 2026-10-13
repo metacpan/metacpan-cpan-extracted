@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package App::Spec::Schema;
 
-our $VERSION = 'v0.15.0'; # VERSION
+our $VERSION = 'v0.17.0'; # VERSION
 
 use base 'Exporter';
 our @EXPORT_OK = qw/ $SCHEMA /;

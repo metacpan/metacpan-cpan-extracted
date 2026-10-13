@@ -1,0 +1,65 @@
+#!/usr/bin/env perl
+use 5.016;
+use strict;
+use warnings;
+use Encode qw(encode);
+use Getopt::Long qw(GetOptions);
+use JSON::PP;
+use HTML::Anchor::Audit qw(audit_utf8);
+
+binmode STDOUT, ':raw';
+binmode STDERR, ':raw';
+my ($json, $help, $version, $max_bytes, $max_issues) = (0, 0, 0, 2097152, 500);
+Getopt::Long::Configure('no_auto_abbrev', 'no_ignore_case');
+my $ok = GetOptions('json' => \$json, 'help' => \$help, 'version' => \$version,
+    'max-bytes=i' => \$max_bytes, 'max-issues=i' => \$max_issues);
+if (!$ok || (!$help && !$version && !@ARGV) || $max_bytes < 1 || $max_issues < 1) {
+    print STDERR "Usage: html-anchor-audit [--json] [--max-bytes N] [--max-issues N] FILE...\n";
+    exit 2;
+}
+if ($help) {
+    print "Usage: html-anchor-audit [--json] [--max-bytes N] [--max-issues N] FILE...\n",
+        "Offline check of UTF-8 HTML fragment links; input files are never modified.\n",
+        "Exit: 0 clean, 1 diagnostics, 2 input or usage error.\n";
+    exit 0;
+}
+if ($version) { print "HTML::Anchor::Audit $HTML::Anchor::Audit::VERSION\n"; exit 0 }
+my (@files, $exit);
+$exit = 0;
+for my $file (@ARGV) {
+    my $entry = { file => $file };
+    eval {
+        die "URLs are not accepted\n" if $file =~ m{\A[A-Za-z][A-Za-z0-9+.-]*://};
+        die "Input must be a regular local file\n" if !-f $file;
+        open my $fh, '<:raw', $file or die "Cannot open file: $!\n";
+        my $bytes = '';
+        my $read = read($fh, $bytes, $max_bytes + 1);
+        die "Cannot read file: $!\n" if !defined($read);
+        close $fh or die "Cannot close file: $!\n";
+        die "Input exceeds max_bytes ($max_bytes)\n" if length($bytes) > $max_bytes;
+        $entry->{report} = audit_utf8($bytes, max_bytes => $max_bytes, max_issues => $max_issues);
+        $exit = 1 if $exit < 1 && $entry->{report}{statistics}{issue_count};
+        1;
+    } or do {
+        my $error = $@ || 'Unknown input error';
+        $error =~ s/\s+at \S+ line \d+\.?\s*\z//;
+        $error =~ s/\s+\z//;
+        $entry->{error} = $error;
+        $exit = 2;
+    };
+    push @files, $entry;
+    next if $json;
+    if ($entry->{error}) { print STDERR encode('UTF-8', "$file: $entry->{error}\n"); next }
+    for my $issue (@{ $entry->{report}{issues} }) {
+        my $label = $issue->{value};
+        $label =~ s/[\x00-\x1F\x7F]/?/g;
+        print encode('UTF-8', "$file:$issue->{line}:$issue->{column}: $issue->{code}: $label\n");
+    }
+    my $s = $entry->{report}{statistics};
+    print encode('UTF-8', "$file: $s->{issue_count} issue(s), $s->{checked_reference_count} checked, $s->{ignored_reference_count} ignored\n");
+    print "Diagnostic list truncated; use --max-issues to raise the limit.\n" if $s->{truncated};
+}
+if ($json) {
+    print JSON::PP->new->utf8->canonical->pretty->encode({ version => $HTML::Anchor::Audit::VERSION, files => \@files });
+}
+exit $exit;

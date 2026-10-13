@@ -15,6 +15,11 @@
 #   J. AUTOLOAD variants across multiple backends
 #   K. Logging propagation from db through query builder
 #   L. Optional-dependency graceful degradation (Test::Without::Module)
+#   V. aggregate() SQL path end-to-end (SQLite DSN)
+#   W. aggregate() Perl fold path end-to-end (JSON backend)
+#   X. Query builder group_by/measure/having end-to-end
+#   Y. aggregate() cross-backend consistency (SQL == Perl fold results)
+#   Z. aggregate() multi-instance isolation
 
 use strict;
 use warnings;
@@ -1832,6 +1837,863 @@ SKIP: {
 		# Either undef (if _open has not run yet) or a valid hashref:
 		ok(!defined($early) || ref($early) eq 'HASH',
 			'U11: dbi_source() on a never-queried object returns undef or valid hashref');
+	}
+}
+
+# ---------------------------------------------------------------------------
+# SECTION V — aggregate() SQL path end-to-end (SQLite DSN)
+#
+# Strategy: create a five-row SQLite fixture with a numeric 'score' column and
+# a categorical 'status' column, then exercise every documented aggregate
+# workflow: grouped sum/count/avg/min/max/count_distinct, grand total, WHERE
+# pre-filter, HAVING post-filter, sort_by, limit/offset, base_criteria,
+# no_fixate, and empty-set normalisation.  All these go through the SQL GROUP
+# BY path because the DSN-backed object has a live DBI handle.
+# ---------------------------------------------------------------------------
+
+note '';
+note '=== V. aggregate() SQL path end-to-end (SQLite) ===';
+
+SKIP: {
+	skip 'DBD::SQLite not available for aggregate SQL-path tests', 60
+		unless $have_sqlite;
+
+	Readonly my $V_ACTIVE   => 'active';
+	Readonly my $V_INACTIVE => 'inactive';
+	Readonly my $V_ACT_SUM  => 28.0;	# 9.5 + 8.5 + 10.0
+	Readonly my $V_INACT_SUM => 13.0;	# 7.0 + 6.0
+	Readonly my $V_GRAND_SUM => 41.0;	# all five rows
+	Readonly my $V_ACT_CNT  => 3;
+	Readonly my $V_INACT_CNT => 2;
+	Readonly my $V_TOTAL_CNT => 5;
+
+	my $v_dir  = tempdir(CLEANUP => 1);
+	my $v_file = File::Spec->catfile($v_dir, 'integ_v.sql');
+	my $v_dsn  = "dbi:SQLite:dbname=$v_file";
+
+	{
+		my $s = DBI->connect($v_dsn, undef, undef, { RaiseError => 1 });
+		$s->do('CREATE TABLE integ_v (entry TEXT PRIMARY KEY, score REAL, status TEXT)');
+		$s->do("INSERT INTO integ_v VALUES ('a', 9.5,  'active')");
+		$s->do("INSERT INTO integ_v VALUES ('b', 7.0,  'inactive')");
+		$s->do("INSERT INTO integ_v VALUES ('c', 8.5,  'active')");
+		$s->do("INSERT INTO integ_v VALUES ('d', 6.0,  'inactive')");
+		$s->do("INSERT INTO integ_v VALUES ('e', 10.0, 'active')");
+		$s->disconnect();
+	}
+
+	{ package Database::integ_v; use parent 'Database::Abstraction'; }
+	my $va = Database::integ_v->new(dsn => $v_dsn, no_entry => 1);
+
+	# V1 — returns an arrayref, never undef
+	{
+		my $r = $va->aggregate(
+			by       => ['status'],
+			measures => [{ col => 'score', fn => 'sum', as => 'total' }],
+		);
+		returns_is($r, { type => 'arrayref' }, 'V1: aggregate() always returns arrayref');
+		is(scalar @{$r}, 2, 'V1: two status groups in result');
+	}
+
+	# V2 — grouped sum values are correct
+	{
+		my $r = $va->aggregate(
+			by       => ['status'],
+			measures => [{ col => 'score', fn => 'sum', as => 'total' }],
+		);
+		my %g = map { $_->{'status'} => $_ } @{$r};
+		ok(abs($g{$V_ACTIVE}{'total'}   - $V_ACT_SUM)  < 1e-9, 'V2a: active sum = 28.0');
+		ok(abs($g{$V_INACTIVE}{'total'} - $V_INACT_SUM) < 1e-9, 'V2b: inactive sum = 13.0');
+	}
+
+	# V3 — grand total (no 'by'): one row with aggregate over all rows
+	{
+		my $r = $va->aggregate(
+			measures => [
+				{ col => 'score', fn => 'sum',   as => 'total' },
+				{                 fn => 'count', as => 'n'     },
+			],
+		);
+		is(scalar @{$r}, 1, 'V3: grand total → 1 row');
+		ok(abs($r->[0]{'total'} - $V_GRAND_SUM) < 1e-9, 'V3: grand sum = 41.0');
+		is($r->[0]{'n'}, $V_TOTAL_CNT, 'V3: grand count = 5');
+	}
+
+	# V4 — count(*) per group
+	{
+		my $r = $va->aggregate(
+			by       => ['status'],
+			measures => [{ fn => 'count', as => 'n' }],
+		);
+		my %g = map { $_->{'status'} => $_ } @{$r};
+		is($g{$V_ACTIVE}{'n'},   $V_ACT_CNT,  'V4a: active count(*) = 3');
+		is($g{$V_INACTIVE}{'n'}, $V_INACT_CNT, 'V4b: inactive count(*) = 2');
+	}
+
+	# V5 — avg per group (active: 28/3 ≈ 9.333)
+	{
+		my $r = $va->aggregate(
+			by       => ['status'],
+			measures => [{ col => 'score', fn => 'avg', as => 'mean' }],
+		);
+		my %g = map { $_->{'status'} => $_ } @{$r};
+		ok(abs($g{$V_ACTIVE}{'mean'} - ($V_ACT_SUM / $V_ACT_CNT)) < 1e-6,
+			'V5: active avg ≈ 9.333');
+	}
+
+	# V6 — min and max per group
+	{
+		my $r = $va->aggregate(
+			by       => ['status'],
+			measures => [
+				{ col => 'score', fn => 'min', as => 'lo' },
+				{ col => 'score', fn => 'max', as => 'hi' },
+			],
+		);
+		my %g = map { $_->{'status'} => $_ } @{$r};
+		is($g{$V_ACTIVE}{'lo'},    8.5,  'V6a: active min = 8.5');
+		is($g{$V_ACTIVE}{'hi'},   10.0,  'V6b: active max = 10.0');
+		is($g{$V_INACTIVE}{'lo'},  6.0,  'V6c: inactive min = 6.0');
+		is($g{$V_INACTIVE}{'hi'},  7.0,  'V6d: inactive max = 7.0');
+	}
+
+	# V7 — count_distinct: two distinct status values overall
+	{
+		my $r = $va->aggregate(
+			measures => [{ col => 'status', fn => 'count_distinct', as => 'ud' }],
+		);
+		is($r->[0]{'ud'}, 2, 'V7: count_distinct(status) = 2');
+	}
+
+	# V8 — WHERE pre-filter: only active rows reach GROUP BY
+	{
+		my $r = $va->aggregate(
+			by       => ['status'],
+			measures => [{ fn => 'count', as => 'n' }],
+			status   => $V_ACTIVE,
+		);
+		is(scalar @{$r}, 1, 'V8a: WHERE status=active → one group only');
+		is($r->[0]{'n'}, $V_ACT_CNT, 'V8b: filtered count = 3');
+	}
+
+	# V9 — empty result: criteria match no rows → [] not undef
+	{
+		my $r = $va->aggregate(
+			by       => ['status'],
+			measures => [{ fn => 'count', as => 'n' }],
+			status   => '__none__',
+		);
+		returns_is($r, { type => 'arrayref' }, 'V9a: no-match → arrayref (not undef)');
+		is(scalar @{$r}, 0, 'V9b: no-match → empty arrayref []');
+	}
+
+	# V10 — HAVING post-filter: only groups with sum > 20 pass (only active, sum=28)
+	{
+		my $r = $va->aggregate(
+			by       => ['status'],
+			measures => [{ col => 'score', fn => 'sum', as => 'total' }],
+			having   => { total => { '>' => 20 } },
+		);
+		is(scalar @{$r}, 1, 'V10a: HAVING sum>20 → only 1 group passes');
+		is($r->[0]{'status'}, $V_ACTIVE, 'V10b: only active group (sum=28) passes HAVING');
+	}
+
+	# V11 — default sort: by-columns ASC (active < inactive lexicographically)
+	{
+		my $r = $va->aggregate(
+			by       => ['status'],
+			measures => [{ fn => 'count', as => 'n' }],
+		);
+		is($r->[0]{'status'}, $V_ACTIVE,
+			'V11: default sort ASC → active before inactive');
+	}
+
+	# V12 — sort_by measure DESC: largest total first
+	{
+		my $r = $va->aggregate(
+			by       => ['status'],
+			measures => [{ col => 'score', fn => 'sum', as => 'total' }],
+			sort_by  => ['total', 'DESC'],
+		);
+		# active total (28) > inactive total (13) → active first in DESC
+		is($r->[0]{'status'}, $V_ACTIVE,
+			'V12: sort_by total DESC → active (larger total) is first');
+	}
+
+	# V13 — limit: returns at most N groups
+	{
+		my $r = $va->aggregate(
+			by       => ['status'],
+			measures => [{ fn => 'count', as => 'n' }],
+			limit    => 1,
+		);
+		is(scalar @{$r}, 1, 'V13: limit=1 → exactly 1 group returned');
+	}
+
+	# V14 — offset: skips first N groups (2 total, offset=1 → 1 remaining)
+	{
+		my $r = $va->aggregate(
+			by       => ['status'],
+			measures => [{ fn => 'count', as => 'n' }],
+			offset   => 1,
+		);
+		is(scalar @{$r}, 1, 'V14: offset=1 → 1 group after skip');
+	}
+
+	# V15 — no_fixate: result rows are mutable (not hash-key locked)
+	{
+		my $r = $va->aggregate(
+			measures  => [{ fn => 'count', as => 'n' }],
+			no_fixate => 1,
+		);
+		returns_is($r, { type => 'arrayref' }, 'V15a: no_fixate still returns arrayref');
+		lives_ok { $r->[0]{'__mut__'} = 1 }
+			'V15b: no_fixate row is mutable (not locked)';
+	}
+
+	# V16 — base_criteria: constructor filter AND-ed into every aggregate() call
+	{
+		my $vbc = Database::integ_v->new(
+			dsn           => $v_dsn,
+			no_entry      => 1,
+			base_criteria => { status => $V_ACTIVE },
+		);
+		my $r = $vbc->aggregate(
+			measures => [{ fn => 'count', as => 'n' }],
+		);
+		# base_criteria restricts to active rows; grand total should be 3
+		is($r->[0]{'n'}, $V_ACT_CNT,
+			'V16: base_criteria grand count = 3 (active only)');
+	}
+
+	# V17 — base_criteria: caller criterion wins on collision
+	{
+		my $vbc2 = Database::integ_v->new(
+			dsn           => $v_dsn,
+			no_entry      => 1,
+			base_criteria => { status => $V_ACTIVE },
+		);
+		my $r = $vbc2->aggregate(
+			measures => [{ fn => 'count', as => 'n' }],
+			status   => $V_INACTIVE,
+		);
+		# caller status=inactive overrides base_criteria status=active
+		is($r->[0]{'n'}, $V_INACT_CNT,
+			'V17: caller key wins over base_criteria on collision');
+	}
+
+	# V18 — empty-set normalisation: SUM(NULL group) normalised to 0
+	{
+		my $null_dir  = tempdir(CLEANUP => 1);
+		my $null_file = File::Spec->catfile($null_dir, 'null_v.sql');
+		my $null_dsn  = "dbi:SQLite:dbname=$null_file";
+		{
+			my $s = DBI->connect($null_dsn, undef, undef, { RaiseError => 1 });
+			$s->do('CREATE TABLE null_v (entry TEXT PRIMARY KEY, score REAL, grp TEXT)');
+			$s->do("INSERT INTO null_v VALUES ('x', NULL, 'g1')");
+			$s->disconnect();
+		}
+		{ package Database::null_v; use parent 'Database::Abstraction'; }
+		my $ndb = Database::null_v->new(dsn => $null_dsn, no_entry => 1);
+
+		my $r = $ndb->aggregate(
+			by       => ['grp'],
+			measures => [{ col => 'score', fn => 'sum', as => 'total' }],
+		);
+		is(scalar @{$r}, 1, 'V18a: NULL-score row creates one group');
+		is($r->[0]{'total'}, 0,
+			'V18b: SUM(NULL) normalised to 0 by empty-set normalisation');
+	}
+
+	# V19 — empty-set normalisation: AVG(NULL group) stays undef (not 0)
+	{
+		my $null_dir  = tempdir(CLEANUP => 1);
+		my $null_file = File::Spec->catfile($null_dir, 'null_v2.sql');
+		my $null_dsn  = "dbi:SQLite:dbname=$null_file";
+		{
+			my $s = DBI->connect($null_dsn, undef, undef, { RaiseError => 1 });
+			$s->do('CREATE TABLE null_v2 (entry TEXT PRIMARY KEY, score REAL, grp TEXT)');
+			$s->do("INSERT INTO null_v2 VALUES ('x', NULL, 'g1')");
+			$s->disconnect();
+		}
+		{ package Database::null_v2; use parent 'Database::Abstraction'; }
+		my $ndb2 = Database::null_v2->new(dsn => $null_dsn, no_entry => 1);
+
+		my $r = $ndb2->aggregate(
+			by       => ['grp'],
+			measures => [{ col => 'score', fn => 'avg', as => 'mean' }],
+		);
+		is(scalar @{$r}, 1, 'V19a: NULL-score row creates one group for avg');
+		ok(!defined($r->[0]{'mean'}),
+			'V19b: AVG(NULL) remains undef (not normalised to 0)');
+	}
+
+	# V20 — HAVING on a group-by column (not a measure alias)
+	{
+		my $r = $va->aggregate(
+			by       => ['status'],
+			measures => [{ fn => 'count', as => 'n' }],
+			having   => { status => $V_ACTIVE },
+		);
+		is(scalar @{$r}, 1, 'V20a: HAVING on group-by col → 1 group');
+		is($r->[0]{'status'}, $V_ACTIVE,
+			'V20b: HAVING group-by col → correct group');
+	}
+}
+
+# ---------------------------------------------------------------------------
+# SECTION W — aggregate() Perl fold path end-to-end (JSON backend)
+#
+# Strategy: a JSON fixture is used because JSON slurps into $self->{'data'}
+# without ever creating a DBI handle ($self->{$table} is undef).  aggregate()
+# therefore cannot emit SQL and must fold the rows entirely in Perl via
+# _fold_aggregate().  This exercises the Perl path independently of SQLite.
+# ---------------------------------------------------------------------------
+
+note '';
+note '=== W. aggregate() Perl fold path end-to-end (JSON backend) ===';
+
+SKIP: {
+	skip 'JSON::MaybeXS not available for aggregate Perl-fold tests', 20
+		unless do { local $@; eval { require JSON::MaybeXS; 1 } };
+
+	Readonly my $W_ACT_SUM  => 17;	# 9 + 8
+	Readonly my $W_INACT_SUM => 7;	# 7
+	Readonly my $W_GRAND_CNT => 3;
+
+	my $w_dir  = tempdir(CLEANUP => 1);
+	my $w_file = File::Spec->catfile($w_dir, 'integ_w.json');
+
+	{
+		open my $fh, '>', $w_file or die "Cannot write $w_file: $!";
+		print {$fh} '['."\n";
+		print {$fh} '  {"entry":"r1","score":9,"status":"active"},'."\n";
+		print {$fh} '  {"entry":"r2","score":7,"status":"inactive"},'."\n";
+		print {$fh} '  {"entry":"r3","score":8,"status":"active"}'."\n";
+		print {$fh} ']'."\n";
+		close $fh;
+	}
+
+	{ package Database::integ_w; use parent 'Database::Abstraction'; }
+	my $wa = Database::integ_w->new(directory => $w_dir);
+	$wa->count();	# trigger lazy slurp
+
+	# W1 — confirm we are on the Perl fold path (no DBI handle)
+	ok(!defined($wa->{'integ_w'}),
+		'W1: JSON backend has no DBI handle → Perl fold path confirmed');
+
+	# W2 — grand total count via Perl fold
+	{
+		my $r = $wa->aggregate(
+			measures => [{ fn => 'count', as => 'n' }],
+		);
+		is(scalar @{$r}, 1, 'W2a: Perl fold grand total → 1 row');
+		is($r->[0]{'n'}, $W_GRAND_CNT, 'W2b: Perl fold grand count = 3');
+	}
+
+	# W3 — grouped sum via Perl fold
+	{
+		my $r = $wa->aggregate(
+			by       => ['status'],
+			measures => [{ col => 'score', fn => 'sum', as => 'total' }],
+		);
+		my %g = map { $_->{'status'} => $_ } @{$r};
+		is(scalar @{$r}, 2, 'W3a: Perl fold: two status groups');
+		is($g{'active'}{'total'} + 0,   $W_ACT_SUM,  'W3b: active sum = 17');
+		is($g{'inactive'}{'total'} + 0, $W_INACT_SUM, 'W3c: inactive sum = 7');
+	}
+
+	# W4 — avg via Perl fold (active: 17/2 = 8.5)
+	{
+		my $r = $wa->aggregate(
+			by       => ['status'],
+			measures => [{ col => 'score', fn => 'avg', as => 'mean' }],
+		);
+		my %g = map { $_->{'status'} => $_ } @{$r};
+		ok(abs($g{'active'}{'mean'} - 8.5) < 1e-9,
+			'W4: Perl fold avg active = 8.5');
+	}
+
+	# W5 — min and max via Perl fold
+	{
+		my $r = $wa->aggregate(
+			by       => ['status'],
+			measures => [
+				{ col => 'score', fn => 'min', as => 'lo' },
+				{ col => 'score', fn => 'max', as => 'hi' },
+			],
+		);
+		my %g = map { $_->{'status'} => $_ } @{$r};
+		is($g{'active'}{'lo'} + 0, 8, 'W5a: Perl fold active min = 8');
+		is($g{'active'}{'hi'} + 0, 9, 'W5b: Perl fold active max = 9');
+	}
+
+	# W6 — WHERE criteria filter before Perl fold
+	{
+		my $r = $wa->aggregate(
+			by       => ['status'],
+			measures => [{ fn => 'count', as => 'n' }],
+			status   => 'active',
+		);
+		is(scalar @{$r}, 1, 'W6a: Perl fold criteria → 1 group');
+		is($r->[0]{'status'}, 'active', 'W6b: Perl fold criteria → correct group');
+	}
+
+	# W7 — Perl fold honours default sort (ASC on by-column)
+	{
+		my $r = $wa->aggregate(
+			by       => ['status'],
+			measures => [{ fn => 'count', as => 'n' }],
+		);
+		# 'active' < 'inactive' lexicographically
+		is($r->[0]{'status'}, 'active',
+			'W7: Perl fold default sort ASC → active before inactive');
+	}
+
+	# W8 — Perl fold honours limit
+	{
+		my $r = $wa->aggregate(
+			by       => ['status'],
+			measures => [{ fn => 'count', as => 'n' }],
+			limit    => 1,
+		);
+		is(scalar @{$r}, 1, 'W8: Perl fold limit=1 → 1 group');
+	}
+
+	# W9 — no_fixate on Perl fold path
+	{
+		my $r = $wa->aggregate(
+			measures  => [{ fn => 'count', as => 'n' }],
+			no_fixate => 1,
+		);
+		lives_ok { $r->[0]{'__mut__'} = 1 }
+			'W9: Perl fold no_fixate row is mutable';
+	}
+
+	# W10 — count_distinct via Perl fold
+	{
+		my $r = $wa->aggregate(
+			measures => [{ col => 'status', fn => 'count_distinct', as => 'ud' }],
+		);
+		is($r->[0]{'ud'}, 2, 'W10: Perl fold count_distinct(status) = 2');
+	}
+}
+
+# ---------------------------------------------------------------------------
+# SECTION X — Query builder group_by/measure/having end-to-end
+#
+# Strategy: verify that the fluent chain
+#   $db->query->group_by(...)->measure(...)->having(...)->all()
+# is semantically equivalent to direct aggregate() calls, and that first(),
+# each(), and chaining work correctly.
+# ---------------------------------------------------------------------------
+
+note '';
+note '=== X. Query builder aggregate end-to-end ===';
+
+SKIP: {
+	skip 'DBD::SQLite not available for Query builder aggregate tests', 30
+		unless $have_sqlite;
+
+	Readonly my $X_ACTIVE   => 'active';
+	Readonly my $X_INACTIVE => 'inactive';
+
+	my $x_dir  = tempdir(CLEANUP => 1);
+	my $x_file = File::Spec->catfile($x_dir, 'integ_x.sql');
+	my $x_dsn  = "dbi:SQLite:dbname=$x_file";
+
+	{
+		my $s = DBI->connect($x_dsn, undef, undef, { RaiseError => 1 });
+		$s->do('CREATE TABLE integ_x (entry TEXT PRIMARY KEY, score REAL, status TEXT)');
+		$s->do("INSERT INTO integ_x VALUES ('a', 9.5,  'active')");
+		$s->do("INSERT INTO integ_x VALUES ('b', 7.0,  'inactive')");
+		$s->do("INSERT INTO integ_x VALUES ('c', 8.5,  'active')");
+		$s->do("INSERT INTO integ_x VALUES ('d', 6.0,  'inactive')");
+		$s->do("INSERT INTO integ_x VALUES ('e', 10.0, 'active')");
+		$s->disconnect();
+	}
+
+	{ package Database::integ_x; use parent 'Database::Abstraction'; }
+	my $xa = Database::integ_x->new(dsn => $x_dsn, no_entry => 1);
+
+	# X1 — all() with measures delegates to aggregate(), returns arrayref
+	{
+		my $r = $xa->query
+			->group_by('status')
+			->measure('score', 'sum', 'total')
+			->all();
+		returns_is($r, { type => 'arrayref' }, 'X1a: query->all() aggregate returns arrayref');
+		is(scalar @{$r}, 2, 'X1b: query->all() aggregate: two status groups');
+		ok(exists($r->[0]{'total'}), 'X1c: query->all() aggregate: measure alias in row');
+	}
+
+	# X2 — all() result equals direct aggregate() result (two-front consistency)
+	{
+		my $q_out = $xa->query
+			->group_by('status')
+			->measure('score', 'sum', 'total')
+			->all();
+		my $d_out = $xa->aggregate(
+			by       => ['status'],
+			measures => [{ col => 'score', fn => 'sum', as => 'total' }],
+		);
+		my %qm = map { $_->{'status'} => $_->{'total'} } @{$q_out};
+		my %dm = map { $_->{'status'} => $_->{'total'} } @{$d_out};
+		ok(abs(($qm{$X_ACTIVE}   // 0) - ($dm{$X_ACTIVE}   // 0)) < 1e-9,
+			'X2a: query->all() active total matches direct aggregate()');
+		ok(abs(($qm{$X_INACTIVE} // 0) - ($dm{$X_INACTIVE} // 0)) < 1e-9,
+			'X2b: query->all() inactive total matches direct aggregate()');
+	}
+
+	# X3 — where() + group_by() + measure(): WHERE is applied before GROUP BY
+	{
+		my $r = $xa->query
+			->where(status => $X_ACTIVE)
+			->group_by('status')
+			->measure('score', 'sum', 'total')
+			->all();
+		is(scalar @{$r}, 1, 'X3a: where() + aggregate: one group only');
+		is($r->[0]{'status'}, $X_ACTIVE, 'X3b: where() + aggregate: correct group');
+	}
+
+	# X4 — having() post-filter: only the active group (sum=28) passes > 20
+	{
+		my $r = $xa->query
+			->group_by('status')
+			->measure('score', 'sum', 'total')
+			->having(total => { '>' => 20 })
+			->all();
+		is(scalar @{$r}, 1, 'X4a: having() post-filter → 1 group');
+		is($r->[0]{'status'}, $X_ACTIVE, 'X4b: having(): active group passes');
+	}
+
+	# X5 — order_by() interaction with aggregate: rows arrive in correct order
+	{
+		my $r = $xa->query
+			->group_by('status')
+			->measure('score', 'sum', 'total')
+			->order_by('status ASC')
+			->all();
+		is($r->[0]{'status'}, $X_ACTIVE,
+			'X5: order_by ASC → active before inactive');
+	}
+
+	# X6 — limit() interaction: returns at most N aggregate rows
+	{
+		my $r = $xa->query
+			->group_by('status')
+			->measure('score', 'sum', 'total')
+			->limit(1)
+			->all();
+		is(scalar @{$r}, 1, 'X6: limit(1) → exactly 1 aggregate row');
+	}
+
+	# X7 — first() with aggregate: returns one hashref (or undef for no-match)
+	{
+		my $row = $xa->query
+			->group_by('status')
+			->measure('score', 'sum', 'total')
+			->order_by('status ASC')
+			->first();
+		returns_is($row, { type => 'hashref' }, 'X7a: query->first() aggregate returns hashref');
+		is($row->{'status'}, $X_ACTIVE, 'X7b: query->first() returns first group (ASC)');
+	}
+
+	# X8 — first() with no-match criteria → undef
+	{
+		my $row = $xa->query
+			->where(status => '__none__')
+			->group_by('status')
+			->measure('score', 'sum', 'total')
+			->first();
+		returns_is($row, { type => 'void' },
+			'X8: query->first() no-match aggregate → undef');
+	}
+
+	# X9 — count() after measure() croaks with documented message
+	throws_ok {
+		$xa->query->measure('score', 'sum', 'total')->count()
+	} qr/count\(\) is not available once measure\(\) has been called/,
+	'X9: query->count() after measure() → documented croak';
+
+	# X10 — each() callback receives one hashref per group, return = count
+	{
+		my @visited;
+		my $n = $xa->query
+			->group_by('status')
+			->measure('score', 'sum', 'total')
+			->each(sub { push @visited, shift });
+		is($n, 2, 'X10a: query->each() aggregate returns visit count (2)');
+		is(scalar @visited, 2, 'X10b: callback invoked once per group');
+		returns_is($visited[0], { type => 'hashref' },
+			'X10c: each() callback receives hashref');
+	}
+
+	# X11 — Chaining is idempotent: repeated all() calls on the same builder
+	#        object produce the same result (builder state not mutated by all()).
+	{
+		my $q = $xa->query
+			->group_by('status')
+			->measure('score', 'sum', 'total');
+		my $r1 = $q->all();
+		my $r2 = $q->all();
+		is(scalar @{$r1}, scalar @{$r2},
+			'X11a: repeated all() calls return same row count');
+		my %g1 = map { $_->{'status'} => $_->{'total'} } @{$r1};
+		my %g2 = map { $_->{'status'} => $_->{'total'} } @{$r2};
+		ok(abs(($g1{$X_ACTIVE} // 0) - ($g2{$X_ACTIVE} // 0)) < 1e-9,
+			'X11b: repeated all() returns identical group totals');
+	}
+
+	# X12 — multiple measure() calls accumulate (not replace)
+	{
+		my $r = $xa->query
+			->group_by('status')
+			->measure('score', 'sum', 'total')
+			->measure(undef, 'count', 'n')
+			->all();
+		ok(exists($r->[0]{'total'}), 'X12a: first measure alias present');
+		ok(exists($r->[0]{'n'}),     'X12b: second measure alias present');
+	}
+
+	# X13 — group_by() replaces previous list (not appends)
+	{
+		my $q = $xa->query
+			->group_by('status', 'score')
+			->group_by('status');
+		is(scalar @{$q->{'_group_by'}}, 1,
+			'X13: group_by() replaces, not appends');
+		is($q->{'_group_by'}[0], 'status', 'X13: new group-by column stored');
+	}
+
+	# X14 — having() accumulates across multiple calls (AND semantics)
+	{
+		my $r = $xa->query
+			->group_by('status')
+			->measure('score', 'sum', 'total')
+			->measure(undef, 'count', 'n')
+			->having(total => { '>' => 20 })
+			->having(n     => { '>' => 1  })
+			->all();
+		# active: total=28 (>20), n=3 (>1) → passes
+		# inactive: total=13 (<20) → fails first HAVING → 1 group
+		is(scalar @{$r}, 1, 'X14a: two having() calls AND-ed together → 1 group');
+		is($r->[0]{'status'}, $X_ACTIVE, 'X14b: AND-ed HAVING: active group passes');
+	}
+}
+
+# ---------------------------------------------------------------------------
+# SECTION Y — aggregate() cross-backend consistency
+#
+# Strategy: create the same logical five-row dataset in two backends:
+#   1. SQLite DSN (SQL path: GROUP BY emitted)
+#   2. JSON file (Perl fold path: _fold_aggregate called)
+# Then verify that both backends produce identical aggregate results for the
+# same group_by / measures / criteria combination.  This is the canonical
+# cross-backend equivalence check for the aggregation layer.
+# ---------------------------------------------------------------------------
+
+note '';
+note '=== Y. aggregate() cross-backend consistency (SQL == Perl fold) ===';
+
+SKIP: {
+	my $have_json = do { local $@; eval { require JSON::MaybeXS; 1 } };
+	skip 'DBD::SQLite or JSON::MaybeXS not available for cross-backend aggregate test', 12
+		unless $have_sqlite && $have_json;
+
+	Readonly my $Y_ROWS => [
+		{ entry => 'a', score => 9.5,  status => 'active'   },
+		{ entry => 'b', score => 7.0,  status => 'inactive' },
+		{ entry => 'c', score => 8.5,  status => 'active'   },
+		{ entry => 'd', score => 6.0,  status => 'inactive' },
+		{ entry => 'e', score => 10.0, status => 'active'   },
+	];
+
+	# — SQLite backend (SQL path) —
+	my $y_sql_dir  = tempdir(CLEANUP => 1);
+	my $y_sql_file = File::Spec->catfile($y_sql_dir, 'integ_y.sql');
+	my $y_dsn      = "dbi:SQLite:dbname=$y_sql_file";
+	{
+		my $s = DBI->connect($y_dsn, undef, undef, { RaiseError => 1 });
+		$s->do('CREATE TABLE integ_y (entry TEXT PRIMARY KEY, score REAL, status TEXT)');
+		for my $row (@{$Y_ROWS}) {
+			$s->do("INSERT INTO integ_y VALUES (?, ?, ?)",
+				undef, $row->{'entry'}, $row->{'score'}, $row->{'status'});
+		}
+		$s->disconnect();
+	}
+	{ package Database::integ_y_sql; use parent 'Database::Abstraction'; }
+	my $y_sql = Database::integ_y_sql->new(dsn => $y_dsn, no_entry => 1, table => 'integ_y');
+
+	# — JSON backend (Perl fold path) —
+	my $y_json_dir  = tempdir(CLEANUP => 1);
+	my $y_json_file = File::Spec->catfile($y_json_dir, 'integ_y_json.json');
+	{
+		open my $fh, '>', $y_json_file or die "Cannot write $y_json_file: $!";
+		print {$fh} JSON::MaybeXS->new->encode($Y_ROWS);
+		close $fh;
+	}
+	{ package Database::integ_y_json; use parent 'Database::Abstraction'; }
+	my $y_json = Database::integ_y_json->new(directory => $y_json_dir);
+	$y_json->count();	# trigger slurp
+
+	# Y1 — both backends have same row count before aggregation
+	is($y_sql->count(),  5, 'Y1a: SQLite backend count = 5');
+	is($y_json->count(), 5, 'Y1b: JSON backend count = 5');
+
+	# Y2 — grouped sum: both backends produce same active/inactive totals
+	{
+		my $sql_r  = $y_sql->aggregate(
+			by       => ['status'],
+			measures => [{ col => 'score', fn => 'sum', as => 'total' }],
+		);
+		my $json_r = $y_json->aggregate(
+			by       => ['status'],
+			measures => [{ col => 'score', fn => 'sum', as => 'total' }],
+		);
+		my %sm = map { $_->{'status'} => $_->{'total'} } @{$sql_r};
+		my %jm = map { $_->{'status'} => $_->{'total'} } @{$json_r};
+
+		ok(abs(($sm{'active'}   // 0) - ($jm{'active'}   // 0)) < 1e-9,
+			'Y2a: active sum matches across SQLite and JSON backends');
+		ok(abs(($sm{'inactive'} // 0) - ($jm{'inactive'} // 0)) < 1e-9,
+			'Y2b: inactive sum matches across SQLite and JSON backends');
+	}
+
+	# Y3 — count(*): both backends return the same per-group count
+	{
+		my $sql_r  = $y_sql->aggregate(
+			by       => ['status'],
+			measures => [{ fn => 'count', as => 'n' }],
+		);
+		my $json_r = $y_json->aggregate(
+			by       => ['status'],
+			measures => [{ fn => 'count', as => 'n' }],
+		);
+		my %sm = map { $_->{'status'} => $_->{'n'} } @{$sql_r};
+		my %jm = map { $_->{'status'} => $_->{'n'} } @{$json_r};
+		is($sm{'active'},   $jm{'active'},
+			'Y3a: active count(*) same across backends');
+		is($sm{'inactive'}, $jm{'inactive'},
+			'Y3b: inactive count(*) same across backends');
+	}
+
+	# Y4 — WHERE filter: both backends agree when criteria is applied
+	{
+		my $sql_r  = $y_sql->aggregate(
+			measures => [{ fn => 'count', as => 'n' }],
+			status   => 'active',
+		);
+		my $json_r = $y_json->aggregate(
+			measures => [{ fn => 'count', as => 'n' }],
+			status   => 'active',
+		);
+		is($sql_r->[0]{'n'}, $json_r->[0]{'n'},
+			'Y4: filtered grand count same across backends');
+	}
+
+	# Y5 — number of result groups is the same on both backends
+	{
+		my $sql_r  = $y_sql->aggregate(
+			by       => ['status'],
+			measures => [{ fn => 'count', as => 'n' }],
+		);
+		my $json_r = $y_json->aggregate(
+			by       => ['status'],
+			measures => [{ fn => 'count', as => 'n' }],
+		);
+		is(scalar @{$sql_r}, scalar @{$json_r},
+			'Y5: same number of groups on both backends');
+	}
+
+	# Y6 — default sort: both backends return groups in ASC order
+	{
+		my $sql_r  = $y_sql->aggregate(
+			by       => ['status'],
+			measures => [{ fn => 'count', as => 'n' }],
+		);
+		my $json_r = $y_json->aggregate(
+			by       => ['status'],
+			measures => [{ fn => 'count', as => 'n' }],
+		);
+		is($sql_r->[0]{'status'}, $json_r->[0]{'status'},
+			'Y6: default sort order is the same across backends');
+	}
+}
+
+# ---------------------------------------------------------------------------
+# SECTION Z — aggregate() multi-instance isolation
+#
+# Two independent aggregate objects must not share state.  Operations on one
+# must not affect the other's results (mirrors Section C for regular queries).
+# ---------------------------------------------------------------------------
+
+note '';
+note '=== Z. aggregate() multi-instance isolation ===';
+
+SKIP: {
+	skip 'DBD::SQLite not available for aggregate multi-instance tests', 10
+		unless $have_sqlite;
+
+	my $z_dir  = tempdir(CLEANUP => 1);
+	my $z_file = File::Spec->catfile($z_dir, 'integ_z.sql');
+	my $z_dsn  = "dbi:SQLite:dbname=$z_file";
+
+	{
+		my $s = DBI->connect($z_dsn, undef, undef, { RaiseError => 1 });
+		$s->do('CREATE TABLE integ_z (entry TEXT PRIMARY KEY, score REAL, status TEXT)');
+		$s->do("INSERT INTO integ_z VALUES ('a', 9.5,  'active')");
+		$s->do("INSERT INTO integ_z VALUES ('b', 7.0,  'inactive')");
+		$s->do("INSERT INTO integ_z VALUES ('c', 8.5,  'active')");
+		$s->disconnect();
+	}
+
+	{ package Database::integ_z; use parent 'Database::Abstraction'; }
+
+	# Create two independent objects pointing at the same DSN.
+	my $z1 = Database::integ_z->new(dsn => $z_dsn, no_entry => 1);
+	my $z2 = Database::integ_z->new(
+		dsn           => $z_dsn,
+		no_entry      => 1,
+		base_criteria => { status => 'active' },
+	);
+
+	# Z1 — z2 base_criteria does not affect z1 result
+	{
+		my $r1 = $z1->aggregate(
+			measures => [{ fn => 'count', as => 'n' }],
+		);
+		my $r2 = $z2->aggregate(
+			measures => [{ fn => 'count', as => 'n' }],
+		);
+		is($r1->[0]{'n'}, 3, 'Z1a: z1 grand count = 3 (all rows)');
+		is($r2->[0]{'n'}, 2, 'Z1b: z2 grand count = 2 (active only via base_criteria)');
+	}
+
+	# Z2 — Independent query builders from the same object do not interfere
+	{
+		my $q1 = $z1->query->group_by('status')->measure('score', 'sum', 'total');
+		my $q2 = $z1->query->group_by('status')->measure(undef, 'count', 'n');
+
+		my $r1 = $q1->all();
+		my $r2 = $q2->all();
+
+		ok(exists($r1->[0]{'total'}), 'Z2a: q1 result has total key');
+		ok(!exists($r1->[0]{'n'}),    'Z2b: q1 result does not have n key');
+		ok(exists($r2->[0]{'n'}),     'Z2c: q2 result has n key');
+		ok(!exists($r2->[0]{'total'}),'Z2d: q2 result does not have total key');
+	}
+
+	# Z3 — destroying z2 does not corrupt z1's subsequent aggregate
+	{
+		undef $z2;
+		my $r1 = $z1->aggregate(
+			by       => ['status'],
+			measures => [{ fn => 'count', as => 'n' }],
+		);
+		is(scalar @{$r1}, 2, 'Z3a: z1 still returns 2 groups after z2 destroyed');
+		my %g = map { $_->{'status'} => $_ } @{$r1};
+		is($g{'active'}{'n'}, 2, 'Z3b: z1 active group count = 2 after z2 destroyed');
 	}
 }
 

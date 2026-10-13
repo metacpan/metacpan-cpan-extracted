@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use autodie qw(:all);
 
-our $VERSION = '0.002.0';
+our $VERSION = '0.002.1';
 
 use Carp qw(croak carp);
 use Readonly;

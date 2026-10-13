@@ -97,6 +97,11 @@ my %aov_d = ( y => [ 1 .. 8 ], a => [qw(x x y y x x y y)], b => [qw(p q p q p q 
     sub FIRSTKEY { die "no keys today\n" }
 }
 my @kw_g = ( 'a', 'a', 'b', bless( {}, 'DieStr' ) );
+{
+    package DieNum;
+    use overload '0+' => sub { die "number refused\n" }, 'fallback' => 1;
+}
+my $die_num = bless {}, 'DieNum';
 tie my %dying_row, 'DieFirstKey';
 my @c2c_aoh = ( { x => 1, y => 2 }, { x => 3, y => 5 }, \%dying_row );
 
@@ -189,6 +194,42 @@ my @cases = (
     [ 'col2col tied row whose FIRSTKEY dies',
         sub { Stats::LikeR::col2col( \@c2c_aoh, 'cor' ) },
         qr/no keys today/ ],
+
+    # -- 0.3217: a croak from perl code part-way through, which skipped the
+    #    hand-written frees. Each buffer is now SAVEFREEPV()d. Measured as RSS
+    #    over 40 such calls on the 0.3217 that preceded the fix, not by this
+    #    file: prop_test 31 MB, mcnemar_test 28 MB, dunn_test 38 MB, median
+    #    31 MB, hist 31 MB, bedroc 13 MB, density 38 MB and bw_ucv 1.3 MB; all
+    #    of them 0 after it.
+    [ 'prop_test value whose numeric overload dies',
+        sub { Stats::LikeR::prop_test( [ 5, 5, $die_num ], [ 10, 10, 10 ] ) },
+        qr/number refused/ ],
+    [ 'mcnemar_test cell whose numeric overload dies',
+        sub { Stats::LikeR::mcnemar_test( [ [ 1, 2 ], [ 3, $die_num ] ] ) },
+        qr/number refused/ ],
+    [ 'mcnemar_test paired label whose stringification dies',
+        sub { Stats::LikeR::mcnemar_test( [ 'a', 'b', bless( {}, 'DieStr' ) ], [ 'b', 'a', 'a' ] ) },
+        qr/label refused/ ],
+    [ 'dunn_test label whose stringification dies',
+        sub { Stats::LikeR::dunn_test( [ 1 .. 4 ], \@kw_g ) },
+        qr/label refused/ ],
+    [ 'median past the stack buffer, value whose numeric overload dies',
+        sub { Stats::LikeR::median( [ 1 .. 300, $die_num ] ) },
+        qr/number refused/ ],
+    [ 'hist value whose numeric overload dies',
+        sub { Stats::LikeR::hist( [ 1 .. 50, $die_num ] ) },
+        qr/number refused/ ],
+    [ 'bedroc score whose numeric overload dies',
+        sub { Stats::LikeR::bedroc( [ 1, 2, $die_num, 4 ], [ 0, 1, 0, 1 ] ) },
+        qr/number refused/ ],
+    [ 'density with a $SIG{__WARN__} that dies',
+        sub { local $SIG{__WARN__} = sub { die "warning refused\n" };
+              Stats::LikeR::density( [ 1 .. 20 ], weights => [ (1) x 20 ], bw => 1 ) },
+        qr/warning refused/ ],
+    [ 'bw_ucv with a $SIG{__WARN__} that dies',
+        sub { local $SIG{__WARN__} = sub { die "warning refused\n" };
+              Stats::LikeR::bw_ucv( [ 1 .. 50 ], lower => 1e-9, upper => 1e-8 ) },
+        qr/warning refused/ ],
 );
 
 # 1. every case croaks, with the message that names what went wrong. A signal

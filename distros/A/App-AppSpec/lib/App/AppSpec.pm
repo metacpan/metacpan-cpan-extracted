@@ -6,9 +6,10 @@ use utf8;
 package App::AppSpec;
 use Term::ANSIColor;
 use YAML::PP;
+use Encode qw/ encode_utf8 /;
 use File::Basename qw/ dirname /;
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = 'v0.7.0'; # VERSION
 
 use base 'App::Spec::Run::Cmd';
 
@@ -27,7 +28,7 @@ sub cmd_completion {
     my $parameters = $run->parameters;
     my $name = $options->{name};
 
-    my $shell = $options->{zsh} ? "zsh" : $options->{bash} ? "bash" : '';
+    my $shell = $options->{zsh} ? "zsh" : $options->{bash} ? "bash" : $options->{fish} ? "fish": '';
     die "Specify which shell" unless $shell;
 
     my $spec = $self->_read_spec($run);
@@ -37,6 +38,9 @@ sub cmd_completion {
     my $completion = $spec->generate_completion(
         shell => $shell,
     );
+    if ($completion =~ m/[^\x00-\x7F]/) {
+        $completion = encode_utf8 $completion;
+    }
     say $completion;
 }
 
@@ -52,6 +56,9 @@ sub generate_pod {
     );
     my $pod = $generator->generate;
 
+    if ($pod =~ m/[^\x00-\x7F]/) {
+        $pod = encode_utf8 $pod;
+    }
     say $pod;
 }
 

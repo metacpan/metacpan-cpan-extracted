@@ -8,7 +8,7 @@ use Keyword::Simple;
 use Carp                   qw(croak);
 use Logic::Relational::DSL ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 # Export logic syntax keywords when imported
 sub import ($class) {
@@ -21,7 +21,7 @@ sub import ($class) {
         if ( $$src_ref =~ s/\A\s*([a-zA-Z_]\w*)\s*(\{(?:[^{}]++|(?2))*\})//s ) {
             my ( $name, $body ) = ( $1, $2 );
             $body =~
-s/\A\s*\{/{\nrequire Logic::Relational::Program;\nrequire Logic::Relational::Goal::Unify;\nrequire Logic::Relational::Goal::Identical;\nrequire Logic::Relational::Goal::Not;\nrequire Logic::Relational::Goal::ConstraintFD;\nrequire Logic::Relational::StdLib;\nour \$PROGRAM = Logic::Relational::Program->new();\nLogic::Relational::StdLib::export_to_program(\$PROGRAM);\nuse Logic::Relational::DSL qw(rest slurp term is_goal identical guard save_snapshot load_snapshot);/s;
+s/\A\s*\{/{\nrequire Logic::Relational::Program;\nrequire Logic::Relational::Goal::Call;\nrequire Logic::Relational::Goal::Unify;\nrequire Logic::Relational::Goal::Identical;\nrequire Logic::Relational::Goal::Not;\nrequire Logic::Relational::Goal::ConstraintFD;\nrequire Logic::Relational::StdLib;\nour \$PROGRAM = Logic::Relational::Program->new();\nLogic::Relational::StdLib::export_to_program(\$PROGRAM);\nuse Logic::Relational::DSL qw(rest slurp term is_goal identical guard save_snapshot load_snapshot);\nour \$AUTOLOAD;\nsub AUTOLOAD (\@args) { my \$sub = \$AUTOLOAD; \$sub =~ s{.*::}{}; require Logic::Relational::Goal::Call; return Logic::Relational::Goal::Call->new(\$sub, \\\@args); }/s;
             my $replacement = <<~"EOF";
                 package $name $body
             EOF
@@ -35,14 +35,16 @@ s/\A\s*\{/{\nrequire Logic::Relational::Program;\nrequire Logic::Relational::Goa
     # 2. fact keyword
     Keyword::Simple::define 'fact', sub ($src_ref) {
 
-      # Match identifier and parenthesized arguments list, followed by semicolon
+# Match identifier and optional parenthesized arguments list, followed by semicolon
         if ( $$src_ref =~
-            s/\A\s*([a-zA-Z_]\w*)\s*(\((?:[^()]++|(?2))*\))\s*;//s )
+            s/\A\s*([a-zA-Z_]\w*)\s*(?:(\((?:[^()]++|(?2))*\)))?\s*;//s )
         {
             my ( $pred, $args ) = ( $1, $2 );
-            my $replacement = <<~"EOF";
-                \$PROGRAM->fact( '$pred', $args );
-            EOF
+            my $fact_call =
+              defined $args
+              ? "\$PROGRAM->fact( '$pred', $args );"
+              : "\$PROGRAM->fact( '$pred' );";
+            my $replacement = "sub $pred;\n$fact_call\n";
             $$src_ref = $replacement . $$src_ref;
         }
         else {
@@ -59,15 +61,27 @@ s/\A\s*\{/{\nrequire Logic::Relational::Program;\nrequire Logic::Relational::Goa
             $block =~ s/\A\s*\{//;
             $block =~ s/\}\s*\z//;
 
-            # Strip comments inside facts block
-            $block =~ s{^\s*#(?![\=/<>!\\\\]).*\n}{\n}mg;
+            # Strip full-line comments inside facts block
+            $block =~ s{^\s*#.*$}{}mg;
 
             my @facts_code;
+            my %seen_preds;
             while ( $block =~
-                s/^\s*([a-zA-Z_]\w*)\s*(\((?:[^()]++|(?2))*\))\s*;\s*//s )
+s/^\s*([a-zA-Z_]\w*)\s*(?:(\((?:[^()]++|(?2))*\)))?\s*;\s*(?:#[^\n]*)?//s
+              )
             {
                 my ( $pred, $args ) = ( $1, $2 );
-                push @facts_code, "\$PROGRAM->fact( '$pred', $args );";
+                push @facts_code, "sub $pred;" unless $seen_preds{$pred}++;
+                if ( defined $args ) {
+                    push @facts_code, "\$PROGRAM->fact( '$pred', $args );";
+                }
+                else {
+                    push @facts_code, "\$PROGRAM->fact( '$pred' );";
+                }
+            }
+            $block =~ s/\s+//g;
+            if ( length($block) > 0 ) {
+                croak "Invalid syntax in facts block near '$block'";
             }
             my $replacement = join( "\n", @facts_code ) . "\n";
             $$src_ref = $replacement . $$src_ref;
@@ -77,15 +91,36 @@ s/\A\s*\{/{\nrequire Logic::Relational::Program;\nrequire Logic::Relational::Goa
         }
     };
 
+    # 2c. table keyword (subgoal tabling / memoization)
+    Keyword::Simple::define 'table', sub ($src_ref) {
+        if ( $$src_ref =~
+s/\A\s*(['"]?[a-zA-Z_]\w*(?:\s*\/\s*(?:\d+|\*))?['"]?(?:\s*,\s*['"]?[a-zA-Z_]\w*(?:\s*\/\s*(?:\d+|\*))?['"]?)*)\s*;//s
+          )
+        {
+            my $list_str = $1;
+            my @specs    = split( /\s*,\s*/, $list_str );
+            my @code;
+            for my $spec (@specs) {
+                $spec =~ s/['"\s]+//g;
+                push @code, "\$PROGRAM->table('$spec');";
+            }
+            my $replacement = join( "\n", @code ) . "\n";
+            $$src_ref = $replacement . $$src_ref;
+        }
+        else {
+            croak "Invalid table syntax";
+        }
+    };
+
     # 3. rule keyword
     Keyword::Simple::define 'rule', sub ($src_ref) {
 
-        # Match identifier, parenthesized parameters, and block
+        # Match identifier, optional parenthesized parameters, and block
         if ( $$src_ref =~
-s/\A\s*([a-zA-Z_]\w*)\s*(\((?:[^()]++|(?2))*\))\s*(\{(?:[^{}]++|(?3))*\})//s
+s/\A\s*([a-zA-Z_]\w*)\s*(?:(\((?:[^()]++|(?2))*\))\s*)?(\{(?:[^{}]++|(?3))*\})//s
           )
         {
-            my ( $pred, $params, $body ) = ( $1, $2, $3 );
+            my ( $pred, $params, $body ) = ( $1, $2 // '()', $3 );
 
             my $param_str = $params;
             $param_str =~ s/^\s*\(\s*//;
@@ -106,6 +141,7 @@ s/\A\s*([a-zA-Z_]\w*)\s*(\((?:[^()]++|(?2))*\))\s*(\{(?:[^{}]++|(?3))*\})//s
             my $args            = join( ", ", @param_vars );
 
             my $replacement = <<~"EOF";
+                sub $pred;
                 {
                     $decls
                     \$PROGRAM->rule(
@@ -212,12 +248,12 @@ s/\A\s*my\s*\(\s*([^)]+?)\s*\)\s+in\s+(-?\d+)\s*\.\.\s*(-?\d+)\s*;//s
     # 5. query keyword
     Keyword::Simple::define 'query', sub ($src_ref) {
 
-# Match Program::predicate(args) optionally followed by -> expression, terminated by semicolon
+# Match Program::predicate[(args)] optionally followed by -> expression, terminated by semicolon
         if ( $$src_ref =~
-s/\A\s*([a-zA-Z_]\w*)\s*::\s*([a-zA-Z_]\w*)\s*(\((?:[^()]++|(?3))*\))(?:\s*->\s*([^;]+?))?\s*;//s
+s/\A\s*([a-zA-Z_]\w*)\s*::\s*([a-zA-Z_]\w*)\s*(?:(\((?:[^()]++|(?3))*\)))?(?:\s*->\s*([^;]+?))?\s*;//s
           )
         {
-            my ( $prog, $pred, $args, $var ) = ( $1, $2, $3, $4 );
+            my ( $prog, $pred, $args, $var ) = ( $1, $2, $3 // '()', $4 );
 
             my $arg_str = $args;
             $arg_str =~ s/^\s*\(\s*//;
@@ -260,13 +296,14 @@ s/\A\s*([a-zA-Z_]\w*)\s*::\s*([a-zA-Z_]\w*)\s*(\((?:[^()]++|(?3))*\))(?:\s*->\s*
     # 6. generator keyword
     Keyword::Simple::define 'generator', sub ($src_ref) {
 
-# Match identifier, arity in parens, followed by 'sub' with balanced signature and block
+# Match identifier, arity in parens, optional comma, followed by 'sub' with balanced signature and block
         if ( $$src_ref =~
-s/\A\s*([a-zA-Z_]\w*)\s*\(\s*(\d+)\s*\)\s*(sub\s*(?:(\((?:[^()]++|(?4))*\)))?\s*(\{(?:[^{}]++|(?5))*\}))//s
+s/\A\s*([a-zA-Z_]\w*)\s*\(\s*(\d+)\s*\)\s*,?\s*(sub\s*(?:(\((?:[^()]++|(?4))*\)))?\s*(\{(?:[^{}]++|(?5))*\}))\s*;?//s
           )
         {
             my ( $pred, $arity, $expr ) = ( $1, $2, $3 );
             my $replacement = <<~"EOF";
+                sub $pred;
                 \$PROGRAM->generator( '$pred', $arity, $expr );
             EOF
             $$src_ref = $replacement . $$src_ref;
@@ -376,7 +413,7 @@ s/^\s*fresh\s+my\s+\$([a-zA-Z_]\w*)\s+in\s+(-?\d+)\s*\.\.\s*(-?\d+)\s*;\s*//s
 
         # 2. either { ... } or { ... } [ or { ... } ... ]
         elsif ( $body_str =~
-s/^\s*either\s*(\{(?:[^{}]++|(?1))*\})((\s*or\s*\{(?:[^{}]++|(?3))*\})+)\s*//s
+s/^\s*either\s*(\{(?:[^{}]++|(?1))*\})((\s*or\s*\{(?:[^{}]++|(?3))*\})+)\s*;?\s*//s
           )
         {
             my $first_raw = $1;
@@ -394,7 +431,7 @@ s/^\s*either\s*(\{(?:[^{}]++|(?1))*\})((\s*or\s*\{(?:[^{}]++|(?3))*\})+)\s*//s
         }
 
         # 3. not { ... }
-        elsif ( $body_str =~ s/^\s*not\s*(\{(?:[^{}]++|(?1))*\})\s*//s ) {
+        elsif ( $body_str =~ s/^\s*not\s*(\{(?:[^{}]++|(?1))*\})\s*;?\s*//s ) {
             my $block = translate_body($1);
             push @goals, "Logic::Relational::Goal::Not->new( $block )";
         }
@@ -443,12 +480,14 @@ s/^\s*either\s*(\{(?:[^{}]++|(?1))*\})((\s*or\s*\{(?:[^{}]++|(?3))*\})+)\s*//s
         }
 
         # 4b3. $t1 := $t2; (Infix Unification)
-        elsif ( $body_str =~ s/^\s*([^;]+?)\s*(?<!\!) := \s*([^;]+?)\s*;\s*//sx ) {
+        elsif (
+            $body_str =~ s/^\s*([^;]+?)\s*(?<!\!) := \s*([^;]+?)\s*;\s*//sx )
+        {
             my ( $t1, $t2 ) = ( $1, $2 );
             push @goals, "Logic::Relational::Goal::Unify->new( $t1, $t2 )";
         }
 
-        # 4c. label(args) / all_different(args) / guard(args) / unify(args) / is_goal(args) / identical(args) / true_goal / fail_goal
+# 4c. label(args) / all_different(args) / guard(args) / unify(args) / is_goal(args) / identical(args) / true_goal / fail_goal
         elsif ( $body_str =~
 s/^\s*(all_different|label|guard|unify|is_goal|identical|true_goal|fail_goal)\b\s*( (\((?: (?>[^()]+) | (?2) )*\)) )?\s*;\s*//sx
           )
@@ -497,7 +536,7 @@ s/^\s*(all_different|label|guard|unify|is_goal|identical|true_goal|fail_goal)\b\
             push @goals, "Logic::Relational::Goal::Identical->new( $t1, $t2 )";
         }
 
-        # 4b0. $left (#=, #/=, #!=, #<, #<=, #>, #>=, !=, <, <=, >, >=) $right; (Arithmetic / CLP(FD) Constraint)
+# 4b0. $left (#=, #/=, #!=, #<, #<=, #>, #>=, !=, <, <=, >, >=) $right; (Arithmetic / CLP(FD) Constraint)
         elsif ( $body_str =~
 s/^\s*([^;]+?)\s*(#=|#\/=|#!=|#\\=|#<=|#=<|#>=|#<|#>|>=|<=|(?<!=)>(?!=)|(?<!=)<(?!=)|(?<!\!)!=(?!=))\s*([^;]+?)\s*;\s*//s
           )
@@ -525,9 +564,9 @@ s/^\s*([^;]+?)\s*(#=|#\/=|#!=|#\\=|#<=|#=<|#>=|#<|#>|>=|<=|(?<!=)>(?!=)|(?<!=)<(
 "Logic::Relational::Goal::ConstraintFD->new( '$op', [$vars_list], sub (\$map_ref) { $assign_code return ( ($left_expr), ($right_expr) ); } )";
         }
 
-        # 6. General predicate call: name(args);
-        elsif ( $body_str =~ s/^\s*([a-zA-Z_]\w*)\s*\((.*?)\)\s*;\s*//s ) {
-            my ( $pred, $args ) = ( $1, $2 );
+        # 6. General predicate call: name(args); or 0-arity name;
+        elsif ( $body_str =~ s/^\s*([a-zA-Z_]\w*)\s*(?:\((.*?)\))?\s*;\s*//s ) {
+            my ( $pred, $args ) = ( $1, $2 // '' );
             push @goals,
               "Logic::Relational::Goal::Call->new( '$pred', [$args] )";
         }
@@ -561,3 +600,50 @@ s/^\s*([^;]+?)\s*(#=|#\/=|#!=|#\\=|#<=|#=<|#>=|#<|#>|>=|<=|(?<!=)>(?!=)|(?<!=)<(
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+Logic::Relational::Syntax - Declarative syntax layer for Logic::Relational.
+
+=head1 SYNOPSIS
+
+    use v5.38;
+    use Logic::Relational::Syntax;
+
+    logic Graph {
+        table path/2;
+
+        facts {
+            edge('a', 'b');
+            edge('b', 'c');
+            edge('c', 'a'); # cyclic graph
+        }
+
+        rule path($x, $y) {
+            edge($x, $y);
+        }
+        rule path($x, $z) {
+            fresh my $y;
+            edge($x, $y);
+            path($y, $z);
+        }
+    }
+
+    query Graph::path('a', fresh my $dest) -> my $q;
+    my @reachable = $q->distinct_values($dest);
+
+=head1 DESCRIPTION
+
+Exports declarative keywords (C<logic>, C<fact>, C<facts>, C<table>, C<rule>,
+C<fresh>, C<query>, and C<generator>) via L<Keyword::Simple>.
+
+=head1 FUNCTIONS
+
+=head2 translate_body
+
+Internal helper that translates a declarative rule body string into a Perl
+expression returning a L<Logic::Relational::Goal> object.
+
+=cut

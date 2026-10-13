@@ -13,9 +13,9 @@ with 'CPAN::Maker::Role::ModuleUtils';
 
 CLI::Simple->import(qw(:roles));
 
-our $VERSION   = '2.4.1';
-our $GIT_SHA   = 'fb46b57786ecad274edd460914188876d0b323f9';
-our $GIT_DIRTY = '2.0.0-28-gfb46b57786ecad274edd460914188876d0b323f9';
+our $VERSION   = '2.5.0';
+our $GIT_SHA   = '35492d471a3fec5f3589a84352012fa5dd353686';
+our $GIT_DIRTY = '2.0.0-29-g35492d471a3fec5f3589a84352012fa5dd353686';
 
 with 'CPAN::Maker::Bootstrapper::Role::Init';
 with 'CPAN::Maker::Bootstrapper::Role::LLM::Utils';
@@ -182,6 +182,20 @@ module explicitly:
       --import lib 
       --import bin 
       --installdir /tmp/Foo-Bar
+
+For projects that require explicit control over which files are
+imported and their destinations, use an import manifest:
+
+  cmb import import.yml
+
+The manifest defines the source directory, primary module, and
+file-selection rules. Use C<--dry-run> to preview the import plan
+before creating the project:
+
+  cmb --dry-run import import.yml
+
+See L</IMPORTING FILES> for automatic discovery and manifest-driven
+imports.
 
 =head1 NEXT STEPS
 
@@ -610,6 +624,105 @@ also exist beneath one of the import paths. For example, C<Foo::Bar>
 must be found as F<Foo/Bar.pm> somewhere beneath one of the directories
 supplied with C<--import>.
 
+=head2 Manifest-Driven Imports
+
+The C<import> command provides an alternative to automatic file
+discovery when importing an existing Perl project.
+
+  cmb import import.yml
+
+An import manifest explicitly identifies the source directory,
+primary module, and files to import. It also allows source files
+to be mapped to specific destinations in the generated project.
+
+For example:
+
+  base-dir: /path/to/existing/project
+  module: Foo::Bar
+
+  import:
+    - lib:
+        path: lib
+        recurse: true
+        ext: pm
+    - bin:
+        path: bin
+        recurse: true
+    - t:
+        path: t
+        recurse: true
+
+The following top-level keys are required:
+
+=over 4
+
+=item C<base-dir>
+
+The root directory containing the files to import. Relative source
+paths in the manifest are resolved against this directory.
+
+=item C<module>
+
+The primary Perl module for the generated project.
+
+=item C<import>
+
+A list of import specifications. Each entry identifies a destination
+directory and the source files or directories to import.
+
+=back
+
+Each import specification supports the following keys:
+
+=over 4
+
+=item C<path>
+
+A source file, directory, or list of paths relative to C<base-dir>.
+Absolute paths are also accepted, provided they remain within
+C<base-dir>.
+
+=item C<recurse>
+
+When true, recursively searches the specified source directories.
+The default is false.
+
+=item C<ext>
+
+Restricts imported files to matching filename extensions. Accepts
+a single extension or a list of extensions. When omitted, all
+extensions are eligible.
+
+=item C<exclude>
+
+Excludes matching files or directories from the import. Exclusions
+may also be specified at the top level of the manifest.
+
+=item C<dest>
+
+An optional subdirectory appended to the import destination.
+
+=back
+
+Each entry in C<import> must specify exactly one destination.
+
+Use C<--dry-run> to preview the file mappings before generating
+the project:
+
+  cmb --dry-run import import.yml
+
+The import command uses the same underlying project construction
+mechanism as C<install>, but obtains its file-selection plan from
+the manifest rather than automatic discovery.
+
+Syntax checking is disabled during the initial import build.
+This allows projects with dependencies or runtime environments
+that have not yet been configured to be imported before addressing
+those requirements.
+
+The C<--import> option remains available for automatic discovery
+without a manifest.
+
 =head2 What Gets Imported
 
 When importing an existing project, the bootstrapper scans each
@@ -1029,8 +1142,9 @@ C<CPAN_MAKER_CONFIG> environment variable in your shell profile:
 
 =item LLM_API_KEY
 
-Your Anthropic Claude API key. Set this before running any LLM command
-(code-review, pod-review, release-notes).
+Your Anthropic Claude API key. Set this before running an LLM
+command, including C<code-review>, C<pod-review>,
+C<release-notes>, and C<change-log>.
 
 The key is removed from environment so it is not inherited by child
 processes such as 'make'. This does not protect against memory
@@ -1088,6 +1202,7 @@ with C<make update>.
   .includes/bootstrap.mk       - used internally by the bootstrapper
   .includes/bash-completion.mk - make bash-completion target
   .includes/build-init.mk      - used to initialize build-time variables
+  .includes/change-log.mk      - make change-log target
   .includes/modulino.mk        - make modulino target
   .includes/git.mk             - make git target
   .includes/help.mk            - make help target
@@ -1130,25 +1245,46 @@ created automatically as needed and should not be edited or committed.
 
 =head1 THE PROJECT MAKEFILE
 
-The installed Makefile is self-configuring. It can derive the primary
-module from C<MODULE_NAME>, the package name inside a custom stub, or
-the project directory name.
+The F<Makefile> serves as the orchestration layer for building and
+maintaining a bootstrapped Perl project. It coordinates the recipes
+required to generate source files, resolve dependencies, run tests,
+build distributions, and perform other development and release
+operations. The individual recipes are organized into Makefile
+fragments under F<.includes/>, which are included by the main
+F<Makefile>.
 
-For example, a primary module of C<My::New::Module> produces:
+Before these recipes can run, Make needs to establish the project's
+configuration. On the initial invocation, Make creates F<config.mk> if
+it does not exist, then invokes C<cmb create-build-config> to generate
+F<build-config.mk>. The generated file contains the resolved project
+settings and paths to the tools used by the build.
 
-  MODULE_PATH  - lib/My/New/Module.pm (from MODULE_NAME)
-  PROJECT_NAME - My-New-Module (from MODULE_NAME)
-  TARBALL      - My-New-Module-1.0.0.tar.gz (from PROJECT_NAME + VERSION)
+C<cmb create-build-config> determines the primary module name from
+C<MODULE_NAME>, if supplied, or derives it from the project directory
+name. It uses that name to construct values such as C<MODULE_PATH>,
+C<PROJECT_NAME>, and C<UNIT_TEST_NAME>. It also resolves configured
+defaults and locates development tools such as Perl, Git, and the
+dependency installers.
 
-If C<MODULE_NAME> is not supplied on the command line, it is inferred
-from the project directory name.
+For example, a project with C<MODULE_NAME=My::New::Module> produces:
 
-At build initialization, C<cmb create-build-config> resolves project
-paths, defaults, and configured helper commands into F<build-config.mk>,
-which is then included by Make. Developer overrides belong in
-F<config.mk>; F<build-config.mk> is generated state.
+  MODULE_NAME    := My::New::Module
+  MODULE_PATH    := lib/My/New/Module.pm
+  PROJECT_NAME   := My-New-Module
+  UNIT_TEST_NAME := t/00-my-new-module.t
 
-Key Makefile targets:
+Make includes F<build-config.mk> to make these values available to the
+build recipes. Developers can customize the build through F<config.mk>
+and the supported configuration settings. Changes to F<config.mk>
+cause F<build-config.mk> to be regenerated, ensuring that the build
+uses the updated configuration.
+
+F<build-config.mk> is generated state and should not be edited
+directly. The F<Makefile> and its included recipes provide the build
+machinery; F<config.mk> provides a place for project-specific
+overrides.
+
+=head2 Makefile Targets
 
 =over 4
 
@@ -1173,6 +1309,36 @@ F<~/.local/share/bash-completion/completions/E<lt>aliasE<gt>>.
 The target depends on the modulino, so it will build F<bin/E<lt>aliasE<gt>>
 first if needed. Completion is only available for modulinos that
 subclass C<CLI::Simple>.
+
+=item C<make change-log>
+
+Generates a draft ChangeLog entry for the current release using
+an LLM and the release artifacts produced by the build process,
+including the Git diff, file inventory, Git status, and
+distribution tarball.
+
+  make change-log
+  make change-log MODEL=<model-name>
+  make change-log DRYRUN=1
+
+The optional C<MODEL> variable overrides the configured LLM model
+for this invocation. Run C<cmb models> to list available models.
+
+Set C<DRYRUN=1> to prepare the ChangeLog request without submitting
+it to the LLM.
+
+The target invokes C<cmb change-log>, using
+F<.prompts/change-log.prompt> to prepare the request. The prompt
+can be customized to follow the project's established ChangeLog
+conventions.
+
+The generated entry is written to F<ChangeLog-VERSION.tmp> in the
+project directory. The existing F<ChangeLog> is not modified.
+
+Review the generated entry and incorporate it into F<ChangeLog>
+before preparing the final release.
+
+See L</LLM Commands> for the C<change-log> command.
 
 =item C<make help>
 
@@ -1289,8 +1455,30 @@ Bumps the patch, minor, or major version number in C<VERSION>.
 
 =item C<make release-notes>
 
-Generates the diff, file list, Git status, and draft release tarball
-used as evidence for LLM-generated release notes.
+Generates draft release notes using an LLM and the release artifacts
+produced by the build process, including the Git diff, file inventory,
+Git status, and distribution tarball.
+
+  make release-notes
+  make release-notes MODEL=<model-name>
+  make release-notes DRYRUN=1
+
+The optional C<MODEL> variable overrides the configured LLM model
+for this invocation. Run C<cmb models> to list available models.
+
+Set C<DRYRUN=1> to prepare the release artifacts without submitting a 
+request to the LLM.
+
+The target invokes C<cmb release-notes>, using
+F<.prompts/release-notes.prompt> to prepare the request. The prompt
+can be customized to follow the project's release documentation
+conventions.
+
+The C<change-log> target generates a separate, file-oriented
+engineering record. Use C<release-notes> to produce the
+developer-facing description of a release.
+
+See L</LLM Commands> for the C<release-notes> command.
 
 =item C<make clean>
 
@@ -1520,6 +1708,28 @@ Scaffolds a new project. This is the default command, so:
 
  cmb -m My::Module install
 
+=item change-log
+
+Generates a draft ChangeLog entry for a release using the LLM.
+The command uses the release artifacts produced by
+C<make release-notes>, including the Git status, diffs,
+file inventory, and distribution tarball.
+
+ cmb change-log
+ cmb change-log <version>
+
+The generated entry is written to F<ChangeLog-VERSION.tmp>
+in the current directory. An existing output file is not
+overwritten.
+
+The command uses F<.prompts/change-log.prompt>, which may be
+customized to follow the project's established ChangeLog format.
+
+The project's F<ChangeLog> is not modified. Review the generated
+entry and incorporate it manually.
+
+See L</THE PROJECT MAKEFILE> for the C<make change-log> target.
+
 =item create-config
 
 Outputs a stub configuration file to STDOUT. Create and edit a new
@@ -1672,6 +1882,31 @@ with the C<PERLCRITIC_THEME>, C<PERLCRITIC_SEVERITY>, and
 C<PERLCRITICRC> environment variables. Requires L<Perl::Critic> to be
 installed.
 
+=item import
+
+Imports an existing Perl project using a YAML manifest.
+
+  cmb import import.yml
+
+The manifest identifies the primary module, source directory,
+and files to import into the generated project.
+
+Unlike the C<--import> option, which discovers source files
+automatically, the C<import> command uses explicit file-selection
+and destination rules.
+
+Use C<--dry-run> to preview the import plan:
+
+  cmb --dry-run import import.yml
+
+Syntax checking is disabled during the initial import build.
+This allows projects with unresolved dependencies or specialized
+runtime requirements to be imported before those requirements
+are addressed.
+
+See L</IMPORTING FILES> for the manifest format and available
+file-selection options.
+
 =item publish-to-cpan
 
  cmb publish-to-cpan distribution.tar.gz [username [password]]
@@ -1691,7 +1926,7 @@ Filters C<source-file> to STDOUT, substituting C<@TOKEN@> placeholders
 with values drawn from the environment (or from a C<--vars-file>). This
 is the mechanism the generated F<Makefile> uses to turn F<.pm.in> and
 F<.pl.in> sources into their built C<.pm>/C<.pl> counterparts -- for
-example filling C<2.4.1> from the F<VERSION> file or
+example filling C<2.5.0> from the F<VERSION> file or
 C<@BUILD_DATE@> at build time.
 
 A placeholder is required to have a value only when it appears in live
@@ -1721,6 +1956,17 @@ See L</C<--vars-file>> and L</C<--strict, --no-strict>>.
 
 =head2 LLM Commands
 
+LLM commands use prompt files installed as needed in the F<.prompts/>
+directory. You can customize each of these prior to executing a
+command.
+
+  .prompts/change-log.prompt
+  .prompts/code-review.prompt
+  .prompts/pod-review.prompt
+  .prompts/release-notes.prompt
+
+=head3 Anthropic API Key
+
 The following commands require L<LLM::API> to be installed and a valid
 Anthropic API key. Set it in the environment before running any LLM command:
 
@@ -1733,6 +1979,8 @@ history entirely.
 
 I<SECURITY NOTE: Never pass your API key on the command line where it
 would be visible in shell history and process listings.>
+
+=head3 Commands
 
 =over 4
 
@@ -1884,8 +2132,16 @@ To turn color off use --no-color.
 
 =item C<--dry-run|-D>
 
-Dry run mode will abort after displaying a pre-submission token and
-cost estimation for the C<pod-review> and C<code-review> commands.
+Previews an operation without completing it.
+
+For C<import>, displays the planned file mappings without creating
+the project.
+
+For C<change-log> and C<release-notes>, generates and validates the
+release artifacts without submitting a request to the LLM.
+
+For C<pod-review> and C<code-review>, displays a pre-submission token
+and cost estimate without submitting the review.
 
 =item C<--config|-c> configuration file
 
@@ -1976,8 +2232,7 @@ default: 4096 (set by L<LLM::API>)
 
 =item C<--model|-M> MODEL
 
-Specifies the model id to use for the C<pod-review> and C<code-review>
-commands.
+Specifies the model id to use for LLM commands.
 
 For C<pod-review> the default model is C<claude-haiku-4-5-20251001>.
 
@@ -2372,6 +2627,7 @@ where they are write-protected and clearly separated from project
 files. The F<Makefile> includes them automatically:
 
  include .includes/publish.mk
+ include .includes/change-log.mk
  include .includes/bootstrap.mk
  include .includes/perl.mk
  include .includes/local.mk
@@ -3637,6 +3893,52 @@ the distribution.
 
 =back
 
+=head2 My build is failing during syntax checking with
+C<...use_log4perl() requires Log::Log4perl...>
+
+If you are using C<CLI::Simple> with its built-in logging support based
+on C<Log::Log4perl>, you probably have something similar to this in
+your code:
+
+  __PACKAGE__->use_log4perl({ level => 'info' });
+
+This requires C<Log::Log4perl> to be installed at runtime.
+
+C<CPAN::Maker::Bootstrapper> scans your project to discover
+dependencies and installs them into an isolated build environment for
+syntax checking. This prevents modules installed in the developer's
+local environment from masking undeclared dependencies.
+
+Because your code does not directly load C<Log::Log4perl>, the
+dependency scanner may not discover it. Furthermore, C<CLI::Simple>
+declares C<Log::Log4perl> as an optional dependency, so it is not
+automatically installed.
+
+You can explicitly declare the dependency in either of two ways:
+
+=over 4
+
+=item 1. Add an appropriate dependency declaration near the call to
+C<__PACKAGE__->use_log4perl()>
+
+  require Log::Log4perl;
+
+or
+
+  use Log::Log4perl();
+
+=item 2. Add C<Log::Log4perl> directly to your C<requires> file:
+
+  +Log::Log4perl
+
+=back
+
+The C<+> prefix instructs C<CPAN::Maker::Bootstrapper> to retain this
+manually declared dependency when rescanning your project.
+
+I<Note: The same approach applies to other required modules that the
+dependency scanner cannot discover. See L</Dependencies Management>.>
+
 =head2 Something still doesn't work - how do I report an issue?
 
 First check the L</FAQ> sections above - your
@@ -3701,7 +4003,7 @@ features are used.
 
 =head1 VERSION
 
-This documentation refers to version 2.4.1
+This documentation refers to version 2.5.0
 
 =head1 AUTHOR
 

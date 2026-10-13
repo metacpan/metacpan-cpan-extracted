@@ -1,5 +1,9 @@
 Revision history for Hyperman
 
+0.59	2026-10-13
+        - FIX: an HTTP/2 stream-handle body was cut at the first DATA frame
+          sent after the close.
+
 0.58	2026-10-12
         - FIXES t/59-ipv6.t on a resolver that answers nonexistent.invalid.
         - t/50-scoreboard.t says why when the attach by name fails.

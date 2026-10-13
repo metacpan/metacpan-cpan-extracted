@@ -14,9 +14,11 @@ lib/CPAN/Maker/Bootstrapper/Role/DepsFilter.pm
 lib/CPAN/Maker/Bootstrapper/Role/DistFile.pm
 lib/CPAN/Maker/Bootstrapper/Role/ExtraFiles.pm
 lib/CPAN/Maker/Bootstrapper/Role/Filter.pm
+lib/CPAN/Maker/Bootstrapper/Role/Importer.pm
 lib/CPAN/Maker/Bootstrapper/Role/Init.pm
 lib/CPAN/Maker/Bootstrapper/Role/Installer.pm
 lib/CPAN/Maker/Bootstrapper/Role/LLM/Annotator.pm
+lib/CPAN/Maker/Bootstrapper/Role/LLM/ChangeLog.pm
 lib/CPAN/Maker/Bootstrapper/Role/LLM/Models.pm
 lib/CPAN/Maker/Bootstrapper/Role/LLM/ReleaseNotes.pm
 lib/CPAN/Maker/Bootstrapper/Role/LLM/Reviewer.pm
@@ -46,6 +48,8 @@ share/builder
 share/builder.env
 share/builder.mk
 share/buildspec.yml.tmpl
+share/change-log.mk
+share/change-log.prompt
 share/class-module.pm.tmpl
 share/cli-module.pm.tmpl
 share/cmb_md5sums.txt
@@ -64,6 +68,7 @@ share/pod-review.prompt
 share/publish.mk
 share/README.md
 share/release-notes.mk
+share/release-notes.prompt
 share/test.mk
 share/test.t.tmpl
 share/update.mk

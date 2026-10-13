@@ -27,6 +27,9 @@ every function here is exported, so Perl parses the bareword as a call to
 
 Add data to an existing hash or array reference. This function acts as the equivalent of adding new rows, as well as an `ljoin` (described below). It dynamically infers your target data structure, handles deeply nested records, and seamlessly coerces mismatched data shapes to preserve the structural integrity of your primary reference.
 
+Every value added is a copy, as with `ljoin`: changing the target afterwards
+does not change the source.
+
 ### Hash of Hashes (HoH)
 
 When the target is a Hash of Hashes, incoming hash keys update existing rows, and new keys create new rows.
@@ -995,7 +998,8 @@ chance a random positive scores higher than a random negative. `1.0` is perfect,
 
 Options: `positive` (which label is the positive class, default `1`) and
 `direction` (`'>'` = higher score is more positive, the default; `'<'` flips it).
-For the full curve and a confidence interval, see [`roc`](#roc).
+Missing values are handled as in [`roc`](#roc). For the full curve and a
+confidence interval, see [`roc`](#roc).
 
 ## auroc
 
@@ -1012,7 +1016,9 @@ Options: `positive` (which label is the positive class, default `1`) and
 sklearn's `roc_auc_score(y, -pred)`). It can also turn a numeric column into
 labels for you: `cutoff => x` marks values `>= x` as positive, or
 `active_frac => 0.1` with `active_side => 'low'|'high'` takes that fraction of
-the extreme tail as positive.
+the extreme tail as positive. A case whose score or truth value is missing
+(`undef`, `NaN` or a hole) is dropped before the column is split, so the
+fraction is a fraction of the complete cases.
 
 ## avals
 
@@ -1083,8 +1089,9 @@ machine precision in a single line.
 ### Options
 
 * **`alpha`** — early-recognition weight, must be `> 0` (default `20`).
-* **`positive`** — label value that marks an active, compared as a string
-  (default `1`). Ignored when `cutoff` is given.
+* **`positive`** — label value that marks an active, compared as `eq`
+  compares (default `1`), so a UTF-8 string and its byte-string spelling are
+  the same label. Ignored when `cutoff` or `active_frac` is given.
 * **`cutoff`** — instead of class labels, treat the second array as a numeric
   column and count an item as active when its value is **`>= cutoff`**. Handy
   when "active" is defined by a measured quantity (an affinity, a titre, an
@@ -1099,9 +1106,29 @@ machine precision in a single line.
   the **largest** values active (matching `cutoff`'s `>=` sense); `'low'` marks
   the **smallest** (e.g. actives = strongest binders when the column is ΔG).
 * **`direction`** — `'>'` (default) means a higher score ranks first; `'<'`
-  flips it so lower scores rank first.
+  flips it so lower scores rank first. Anything else is a fatal error.
 * **`top`** (alias `fraction`) — a fraction in `(0, 1]`. When given, the result
   also reports classic enrichment in the top slice of the ranking (see below).
+
+Options come in `key => value` pairs; a key with no value is a fatal error.
+
+### Missing values
+
+A case whose score is `undef` or `NaN`, or whose label is `undef`, is dropped,
+as pROC's `roc()` drops it, and `n` counts the cases that remain. With
+`cutoff` or `active_frac`, a label that is `NaN` is dropped too, before the
+actives are chosen, so `active_frac` takes its fraction of the complete cases.
+A score or a numeric label that is not a number is a fatal error.
+
+### Accuracy
+
+The score is evaluated in a form algebraically equal to Truchon & Bayly's
+eq. 36 that neither cancels nor overflows, so it is good to the last digit or
+two for any `alpha` from about `1e-8` to well past `1000`; written as the
+paper writes it, the formula had lost every digit by `alpha = 1e-6` and
+overflowed to `NaN` by `alpha = 1500`. `t/bedroc.mpmath.t` checks `bedroc`,
+`rie`, `rie_min` and `rie_max` against the paper's formula in 60-digit
+arithmetic over that range.
 
 ### Result keys
 
@@ -1116,6 +1143,11 @@ machine precision in a single line.
   `fraction`, `n_top` (compounds in the top slice, `ceil(top * n)`),
   `active_count` (actives found there), `expected` (actives expected by chance,
   `ra * n_top`), and `enrichment_factor` (`(active_count / n_top) / ra`).
+  When a run of tied scores straddles the edge of the top slice, its actives
+  count in proportion to how much of the run lies inside, which is the
+  expected count over every order of the tied cases. `active_count` can then
+  be fractional: `bedroc([5,5,5,5], [1,0,0,0], top => 0.25)` reports 0.25,
+  and so does the same call with the labels in any other order.
 
 ### Examples
 
@@ -1606,6 +1638,14 @@ Each 2×2 uses the same layout as [`epi_2x2`](#epi_2x2). Options: `correct`
 result also has `statistic` (chi-squared), `parameter` (df = 1), `conf_int` (for
 the common OR), and `k` (number of strata).
 
+As in R, the continuity correction of 0.5 is applied only when the observed
+count is at least 0.5 away from its expectation, and `method` says whether it
+was ("with" or "without continuity correction"). A cell that is `NaN` or
+infinite is a fatal error, as `NA` is in R. Degenerate tables give what R
+gives: when every stratum has zero variance the statistic and p-value are
+`NaN`, and when no stratum has off-diagonal counts the common odds ratio is
+`Inf`.
+
 ## cohen_d
 
 Cohen's *d* effect size for the difference between two independent groups, using
@@ -2015,6 +2055,26 @@ Just like R, `pearson`, `spearman`, and `kendall` are available
 
 If you provide an array of arrays (a matrix), `cor` will compute the correlation matrix automatically. 
 
+    my $r  = cor(\@x, \@y, 'spearman');       # a number
+    my $R  = cor(\@rows);                     # p x p matrix, AoA of rows
+    my $Rs = cor(\@rows, undef, 'kendall');   # leave y out with undef
+    my $C  = cor(\@xrows, \@yrows);           # p x q cross-correlation
+
+To pass a method without a `y`, leave `y` as `undef`: `cor(\@x, 'spearman')`
+croaks rather than reading the method as `y`. When `x` is a matrix, `y` must be
+a matrix with the same number of rows, or `undef`; a flat `y` beside a matrix
+`x` croaks (R would return a p x 1 matrix).
+
+Missing values follow R's default, `use = "everything"`: an `undef` or
+non-numeric cell makes every correlation it takes part in `NaN`, under all three
+methods. Use `cor_test`, or drop the incomplete pairs yourself, to get the
+complete-case answer. A matrix's diagonal is 1 even for a column that holds a
+missing value, as in R.
+
+Two cases differ from R on purpose. A column with no variance croaks (R
+returns `NA` with a warning), as does a matrix with fewer than two rows; and
+`cor(\@x)` on a single vector returns 1, where R requires a `y`.
+
 ## cor_test
 
     my $result = cor_test(
@@ -2024,6 +2084,9 @@ If you provide an array of arrays (a matrix), `cor` will compute the correlation
     		method      => 'pearson',
     		continuity  => 1
     	);
+
+or, with `x` and `y` first and unnamed, `cor_test($x, $y, method => 'kendall')`.
+The two forms are the same call; before 0.3217 only the second was accepted.
 
 `cor_test` safely handles `undef` (or `NA`) values seamlessly by computing over pairwise complete observations. 
 
@@ -2350,7 +2413,8 @@ arguments. R's `warnWbw` is accepted as well as `warn_wbw`.
 
 - **`x`** — the sample, an array reference. Required (except with
   `give_rkern`). A missing value (`undef` or `NaN`) is an error unless
-  `na_rm` is set; anything else non-numeric is always an error. An infinite
+  `na_rm` is set; anything else non-numeric is always an error. A sample with
+  no values left once the missing ones are gone is an error too, as it is in R. An infinite
   observation is treated as a point mass at ±∞, so it is counted in `n` and
   takes its share of the mass with it, leaving a sub-density on (−∞, ∞).
 - **`bw`** — the smoothing bandwidth, which is the standard deviation of the
@@ -2375,7 +2439,7 @@ arguments. R's `warnWbw` is accepted as well as `warn_wbw`.
   `bw` is not given. A string names a rule, exactly as `bw` does.
 - **`weights`** — an array reference of non-negative observation weights, one
   per element of `x` — including the missing ones, so it is always the same
-  length as `x` was to begin with. The default is `1/nx` each. Weights that do
+  length as `x` was to begin with. A weight that is not a number is an error. The default is `1/nx` each. Weights that do
   not sum to 1 give a *sub*-density and draw a warning; pass `subdensity => 1`
   if that is what you meant. If `na_rm` removes observations and the original
   weights summed to one, the survivors are rescaled so they still do.
@@ -2442,9 +2506,12 @@ was collected with unequal probabilities gets its population back.
 A hash reference:
 
 - **`x`** — the `n` grid points at which the density was estimated, an array
-  reference, strictly increasing from `from` to `to`.
+  reference, evenly spaced from `from` to `to`: increasing as usual, and
+  decreasing if `from` is greater than `to`.
 - **`y`** — the estimated density there, an array reference of the same
-  length. Never negative, though it can be zero.
+  length. Never negative, though it can be zero. It is `NaN` at any point
+  outside the internal grid, which can happen only when `from` is greater than
+  `to`; R gives `NA` there.
 - **`bw`** — the bandwidth actually used, i.e. `adjust` times whatever `bw`
   resolved to. Worth reading back when a rule chose it.
 - **`n`** — the sample size after missing values were removed. Infinite
@@ -2501,6 +2568,12 @@ counts, 1000 by default), `lower` and `upper` (the range searched) and `tol`
 (where the search stops, `0.1 * lower` by default). Unlike `density`, these
 five want a clean numeric sample: a missing or infinite value is an error, not
 something to drop.
+
+`bw_sj` widens its search interval, as R's `bw.SJ` does, when the root is not
+inside it and either bound was left to its default; only with both `lower` and
+`upper` given is a bracket without the root an error ("no solution in the
+specified range of bandwidths"). So `bw_sj(\@x, upper => 0.05)` answers as
+`bw.SJ(x, upper = 0.05)` does, by widening past 0.05 if it has to.
 
 Validated against R 4.6.1 — its own regression suite, the examples in
 `?density` and `?bw.nrd`, and their pinned output — by `t/density.R.scipy.t`,
@@ -2896,7 +2969,14 @@ numerically against the canonical formula computed in base R.
     }
 
 Values and groups are given as two parallel arrays; observations with a missing
-value or group are dropped.
+value or group are dropped. Each p-value is taken from the normal tail
+directly, `2 * pnorm(-|Z|)`, so it stays accurate far out: values 1..200 split
+into two groups of 100 give `Z` = -12.22 and p = 2.5e-34, as R does.
+
+A p-value that cannot be computed -- every value tied, say, so that there is
+no variance to scale by -- is `NaN`, and so is its adjusted p-value, as R's
+`p.adjust()` keeps `NA` as `NA`; the other p-values are adjusted as a family of
+the ones that are not `NaN`, again as `p.adjust()` does.
 
 ### Input Parameters
 
@@ -2938,7 +3018,9 @@ Pass the four counts (or a `[a,b,c,d]` / `[[a,b],[c,d]]` array ref):
     print "@{ $r->{'odds_ratio_ci'} }"; # 0.895 3.285
 
 Options: `conf_level` (default `0.95`) and `correct` (add 0.5 to every cell,
-done automatically when a cell is 0). Result keys: `odds_ratio`, `risk_ratio`,
+done automatically when a cell is 0). Every cell must be a finite,
+non-negative number in either call form; anything else is a fatal error that
+names the cell. Result keys: `odds_ratio`, `risk_ratio`,
 `risk_diff` (each with a matching `*_ci`), `risk_exposed`, `risk_unexposed`, and
 `nnt`. For a significance test use [`fisher_test`](#fisher_test) or
 [`chisq_test`](#chisq_test); to adjust across strata use [`cmh_test`](#cmh_test).
@@ -3084,11 +3166,17 @@ Predicates compose with bitwise `&` (and), `|` (or), and `!` (not):
 
 Comparison operators bind more tightly than `&` and `|`, so `(col('a') > 4) & (col('b') < 2)` is parsed correctly, but the parentheses are recommended for readability.
 
-A `col()` expression is also the quick way to say it: `filter` compiles the whole expression once and tests every row in C, without building a row hash or calling into Perl at all, which on a large frame is several times faster than the equivalent `sub`. What `col()` cannot express — a `->match` regex, an operand that is an object — is evaluated the same way a `sub` is, one call per row.
+Combine with `&` `|` `!` only. `&&`, `||`, `and` and `or` ask whether their left operand is true, and a predicate has no truth value, so they die; until 0.3217 `col('a') > 4 && col('b') < 2` quietly meant `col('b') < 2`. A predicate in any other boolean context (`if (col('a') > 4)`) dies the same way.
+
+**Every column a `col()` predicate names must be in the frame.** `filter` checks them before it tests a row, and dies with `filter: column 'agee' not found in data` when one is not, as R's `subset(df, agee > 18)` does. Until 0.3217 a misspelt column read as `undef` in every row, so `col('agee') > 18` kept nothing and `!(col('agee') > 18)` kept everything, without a word. A HoA has a column when it has the key, even with no rows; an AoH or HoH has it when any row has it, so a column that only some rows carry is fine. An AoH or HoH with no rows names no columns and is not checked. A code reference names no columns either, so `sub { $_->{agee} > 18 }` cannot be checked and still reads `undef`.
+
+A `col()` expression is also the quick way to say it: `filter` compiles the whole expression once and tests every row in C, without building a row hash or calling into Perl at all, which on a large frame is several times faster than the equivalent `sub`. What `col()` cannot express — a `->match` regex, an operand that is an object — is evaluated the same way a `sub` is, one call per row. A *cell* that is an object with overloaded operators (a `Math::BigInt`, say) is compared by its own class, exactly as a `sub` would compare it: `filter` hands that row to the same per-row call, and every other row stays in C. Until 0.3217 the C test took such a cell for a non-number, so `col('x') > 2` dropped a `Math::BigInt` 5.
 
 > Note: `col('age') > 32` works because `col('age')` is an object whose `>` is overloaded. A **bare string** cannot do this — `'age' > 32` is computed by Perl to a plain boolean (the string numifies to 0) before `filter` is ever called, so the column name is lost. Always wrap the column in `col(...)`.
 
 > `col()` addresses **columns only** — it has no handle on a HoH's row name (the outer key). It also cannot express a regex match: there is no `=~` operator to overload, so `col('name') =~ /re/` runs the match immediately on the stringified object and never reaches `filter`. For either case, use the code-reference form below.
+
+> A `col()` is compared with a **value**, not with another column: `col('ALT') > col('AST')` dies (until 0.3217 it kept every row with a numeric `ALT`). Write it as `sub { $_->{ALT} > $_->{AST} }`.
 
 ### The code-reference form
 
@@ -3104,7 +3192,9 @@ Return a true value to keep the row.
     filter($df, sub { $_->{age} % 2 == 0 });            # things col() has no operator for
     filter($df, sub { $_[0]{score} > $_[0]{threshold} });
 
-For a HoA there are no row hashes to hand over, so the sub is given a `{ column => value, ... }` hash built for it, and the same `$_->{column}` syntax works regardless of the input shape. That hash is reused from row to row for as long as the sub only reads it; keeping the row (or a reference to one of its cells), or adding a key to it, makes `filter` start a fresh one, so a row you hold on to is always yours alone. A `col()` predicate needs no row hash at all.
+For a HoA there are no row hashes to hand over, so the sub is given a `{ column => value, ... }` hash built for it, and the same `$_->{column}` syntax works regardless of the input shape. That hash is reused from row to row for as long as the sub only reads it; keeping the row (or a reference to one of its cells), or adding, deleting or replacing a key in it, makes `filter` start a fresh one, so a row you hold on to is always yours alone. A `col()` predicate needs no row hash at all.
+
+`$_` and `$_[0]` are a reference made for the call, so assigning to them (`$_ = undef`) changes nothing outside the sub. Writing *through* them (`$_->{x} = 0`) does reach an AoH's or HoH's row, which is the caller's own hash.
 
 #### Filtering on the row name (`$_[1]`)
 
@@ -3160,10 +3250,10 @@ The two selectable output types are `'aoh'` and `'hoa'`. `'hoh'` is **not** sele
 
 - **The input is never modified.** `filter` builds and returns a new frame; `$df` is left untouched.
 - **The predicate receives the row identifier as `$_[1]`.** For a HoH it is the outer key (the row name); for an AoH or HoA it is the 0-based row index. In a HoH the row name lives in the *key*, not inside each row hash, so `$_->{row_name}` is `undef` — filter on `$_[1]` instead. `col()` expressions see only columns, never the row key.
-- **A missing or `undef` cell never matches a `col()` comparison.** `col('x') > 0` silently drops any row whose `x` is absent or `undef`; for numeric operators a non-numeric cell is likewise dropped. With a coderef, `undef` is whatever your sub makes of it.
-- **Rows are shared, not deep-copied, wherever possible.** When an AoH or HoH row is kept (output left as AoH/HoH, or converted to `aoh`), the returned frame references the *same* inner row hashes as the input. Mutating such a row in the result would also change it in the original. HoA inputs and any `hoa` output build fresh arrays and fresh cell values.
+- **A missing or `undef` cell never matches a `col()` comparison.** `col('x') > 0` silently drops any row whose `x` is absent or `undef`; for numeric operators a non-numeric cell is likewise dropped. With a coderef, `undef` is whatever your sub makes of it. A column absent from *every* row is a different matter: it dies (see above).
+- **Rows are shared, not deep-copied, wherever possible.** When an AoH or HoH row is kept (output left as AoH/HoH, or converted to `aoh`), the returned frame references the *same* inner row hashes as the input. Mutating such a row in the result would also change it in the original. The references to them are the result's own, so replacing a whole row (`$out->[0] = {...}`) leaves the input alone; until 0.3217 it replaced the input's row too. HoA inputs and any `hoa` output build fresh arrays and fresh cell values.
 - **Keep-all / keep-none are well defined.** A predicate true for every row returns the whole frame in the chosen shape; true for none returns an empty frame: `[]` for `aoh`, a hash of empty (but present) columns for `hoa`, and `{}` for `hoh`.
-- **Supported shapes are AoH, HoA, and HoH.** A non-reference, an AoH element that is not a hash reference, a HoA column that is not an array reference, or a HoH row that is not a hash reference all raise a descriptive error; a bare `col('x')` with no comparison is also an error. An empty hash `{}` is treated as an empty frame.
+- **Supported shapes are AoH, HoA, and HoH.** A non-reference, an AoH element that is not a hash reference, a HoA column that is not an array reference, or a HoH row that is not a hash reference all raise a descriptive error; a bare `col('x')` with no comparison is also an error, as are a `col()` column that is not in the frame and a `col()` compared with another `col()`. An empty hash `{}` is treated as an empty frame.
 - **Perl 5.10 compatible.** The `col()`/operator layer is pure Perl (operator overloading building a per-row closure); filtering and any reshaping run in XS.
 
 ### See also
@@ -3260,7 +3350,9 @@ was validated numerically against R.
 
 Input is a matrix (array of array refs) with **one block/subject per row** and
 **one treatment/condition per column**. Blocks (rows) containing any missing or
-non-numeric value are dropped, mirroring R's `complete.cases`.
+non-numeric value are dropped, mirroring R's `complete.cases`. At least two
+complete blocks must remain; with one, R's `friedman.test` errors and so does
+this.
 
     #             cond1 cond2 cond3
     my $r = friedman_test([
@@ -3838,7 +3930,12 @@ Counts are of right-closed intervals with the lowest included — `(a, b]`,
 except the first, which is `[a₀, b₁]` — carrying R's 1e-7 fuzz, so a value that
 lands a rounding error above a breakpoint still counts in the bin below it.
 `density` is `counts / (n × width)` over the unfuzzed breaks. Pinned against R
-across thirteen datasets and eight `breaks` settings in `t/hist.R.t`.
+across seventeen datasets and eight `breaks` settings in `t/hist.R.t`,
+including four whose range is wider than the largest double, where the
+breaks are built as R builds them -- `hist([1.7e308, -1.7e308], breaks => 4)`
+gives `-1.7e308, 0, 1.7e308`. On such a range `mids` departs from R on purpose:
+R's `0.5 * (a + b)` overflows to `-Inf` or `Inf`, and `hist` gives the finite
+midpoint.
 
 ## hosmer_lemeshow
 
@@ -4381,6 +4478,9 @@ on a constant sample, which has no shape to report:
     kurtosis([7, 7, 7, 7]);
     # kurtosis: zero variance (all 4 values are equal), so kurtosis is undefined
 
+A `NaN` or an infinite value is not an error: it makes the answer `NaN`, as it
+does for `skew`.
+
 ### See also
 
 [skew](#skew) for the third moment, [sd](#sd) and [var](#var) for the second,
@@ -4420,6 +4520,12 @@ in this case, running `ljoin(\%h, \%i)` will modify \%h to result:
         dept   "Engineering"
     }
     }
+
+Each value is copied into `%h`, as `$h{$row}{$col} = $i{$row}{$col}` would copy
+it, so changing `%h` afterwards leaves `%i` alone. Up to 0.3217 the two hashes
+shared the value itself, and a write to `$h{'Jack Smith'}{dept}` changed
+`$i{'Jack Smith'}{dept}` too. A value that is a reference is copied as a
+reference, so what it points at is still shared.
 
 ## lm
 
@@ -4587,6 +4693,11 @@ Parameters do not need to be named, so that `matrix` works more like R:
 
 works as `data`, `nrow`, and `ncol`
 
+A matrix with more than 2^48 cells is refused, and so is one the C library
+will not allocate the memory for: both die with a message naming the
+dimensions, which `eval` can catch, rather than reaching perl's own "Out of
+memory!", which it cannot.
+
 ## max
 
     max(1,2,3);
@@ -4621,7 +4732,16 @@ numerically against R.
 
 The first argument is either a square matrix (array of array refs) or, in the
 two-argument form, two equal-length vectors of paired observations that are
-cross-tabulated over their sorted union of levels.
+cross-tabulated over the union of their levels. A pair with either value
+missing is dropped first, as R's `complete.cases()` drops it, so a level that
+appears only in such a pair does not enlarge the table. R refuses a pair of
+vectors whose level counts differ; this takes the union instead.
+
+Every cell of a matrix must be a finite, non-negative number; `undef`, a
+string that is not a number and `Inf` are fatal errors. The exact test also
+needs whole-number counts in the two discordant cells. A pair of discordant
+cells that are both 0 makes the statistic 0/0, which is `NaN`, as it is in R:
+`mcnemar_test([[5,0],[0,5]])` has statistic and p-value `NaN`.
 
 ### Input Parameters
 
@@ -4656,6 +4776,13 @@ or
 
 mean will die if any undefined values are provided
 
+The sum behind it is compensated: the rounding error of every addition is
+carried along and added back, which is how `mean` matches R's long-double
+accumulation on a perl whose NV is a double. `mean([1e16, 1, -1e16, 1])` is
+0.5, as it is in R. A sum that overflows although no value is infinite is
+taken again with each value divided by the count first, so
+`mean([1e308, 1e308])` is `1e308`, again as in R.
+
 ## median
 
 works like mean, taking array references and arrays:
@@ -4663,6 +4790,9 @@ works like mean, taking array references and arrays:
     median( $test_data[$i][0] )
 
 median will die if any undefined values are provided
+
+For an even count the two middle values are averaged by halving each first
+when their sum would overflow, so `median([1e308, 1e308])` is `1e308`, as in R.
 
 ## melt
 
@@ -4776,6 +4906,9 @@ Takes either an array or an array reference, and returns an array of the most co
     @arr = mode([1,3,3,3]); # returns (3)
 
     @arr = mode('a','a','c','c','z'); # returns ('a', 'c')
+
+When several values tie for most common, they come back in the order each was
+first seen, whatever perl's hash seed is.
 
 ## ncol
 
@@ -5211,7 +5344,7 @@ omitting it entirely is how you ask for the power.
 | `sig_level` | Float | 0.05 | Significance level (Type I error probability), in `[0, 1]`. R's dotted `sig.level` is refused as an unknown argument. |
 | `power` | Float | `undef` | Power of test (1 minus Type II error probability), in `[0, 1]`. |
 | `type` | String | `"two.sample"` | Type of t-test: `"two.sample"`, `"one.sample"`, or `"paired"`. |
-| `alternative` | String | `"two.sided"` | One- or two-sided test: `"two.sided"`, `"one.sided"`, `"greater"`, or `"less"`. |
+| `alternative` | String | `"two.sided"` | `"two.sided"`, `"one.sided"`, `"greater"`, or `"less"`. `"one.sided"` is R's one-sided test, against H1: delta > 0, and `"greater"` is the same test. `"less"` is against H1: delta < 0, so its power at `delta` is `"greater"`'s at `-delta`, and a `delta` solved for under `"less"` comes back negative. R's `power.t.test` has only `"two.sided"` and `"one.sided"`. |
 | `strict` | Boolean | 0 (False) | Use strict interpretation of two-sided power calculations. |
 | `tol` | Float | `1e-12` | Relative tolerance on the root when solving for `n`, `delta`, `sd` or `sig_level`. |
 
@@ -5506,7 +5639,15 @@ Validated numerically against R.
     my $g = prop_test(83, 100, p => 0.7, alternative => 'greater', correct => 0);
 
 Pass successes and trials either as matching array references (one entry per
-group) or as two scalars for a single sample.
+group) or as two scalars for a single sample. A group whose count of successes
+or trials is missing -- `undef`, a hole or `NaN` -- is dropped, as R's
+`complete.cases()` drops it, together with its entry in `p`; anything else
+that is not a number is an error. Options come in `key => value` pairs, and a
+key with no value is an error.
+
+The one-sided p-values are taken from the normal tail itself, never as 1 minus
+the other tail, so they stay accurate far out:
+`prop_test(999, 1000, alternative => 'greater')` gives 1.8e-218, as R does.
 
 ### Input Parameters
 
@@ -5811,6 +5952,10 @@ references this is the right-only set difference, so `Ronly(\@a, \@b)` equals
 Create a binomial distribution of numbers
 
     my $binom = rbinom( n => $n, prob => 0.5, size => 9);
+
+`n`, `size` and `prob` are all required, as in R. `prob` must be a number in
+`[0, 1]`. As in R, a `prob` of `NaN` or a `size` that is not a whole number
+gives `NaN` for every draw, with the warning "rbinom: NAs produced".
 
 ## read_table
 
@@ -6361,6 +6506,13 @@ Make a normal distribution of numbers, with pre-set mean `mean`, standard deviat
     my ($rmean, $sd, $n) = (10, 2, 9999);
     my $normals = rnorm( n => $n, mean => $rmean, sd => $sd);
 
+The arguments may also be positional, in R's order, as `runif` takes them:
+`rnorm(10)`, `rnorm(1e3)` and `rnorm(10, 0, 1)` all work, and a positional
+`n` may be mixed with named `mean` and `sd`. A `mean` or `sd` that is not a
+number is an error, and so is a negative `sd`. As in R, an infinite `sd` or a
+`NaN` mean gives `NaN` for every value, with the warning "rnorm: NAs
+produced", and an `sd` of 0 or an infinite mean gives the mean itself.
+
 ## roc
 
 Build a ROC curve from predicted scores and 0/1 labels: the AUC (c-statistic)
@@ -6378,8 +6530,26 @@ well a score separates cases from non-cases.
 
 Options: `positive` (positive-class label, default `1`), `direction` (`'>'`
 default, or `'<'`), `conf_level` (default `0.95`). Result keys: `auc`, `auc_se`,
-`auc_ci`, `n_pos`, `n_neg`, `youden`, and `curve` (one point per threshold). For
+`auc_ci`, `n_pos`, `n_neg`, `n`, `youden`, and `curve` (one point per threshold). For
 just the number, use [`auc`](#auc).
+
+A label is positive when it is `eq` to `positive`; every other label is
+negative. The curve starts at the point where nothing is called positive and
+then has one point per distinct score, from the most positive down. With the
+default `direction => '>'` a case is called positive when its score is at or
+above the threshold, and the first threshold is `+Inf`. With `'<'` it is called
+positive at or below the threshold, the first threshold is `-Inf`, and the
+thresholds rise through the scores. Either way they are the scores themselves,
+so they can be used as cut-offs directly.
+
+Missing values are dropped with their case, as R's pROC does by default
+(`na.rm = TRUE`): a score that is `undef`, `NaN` or a hole in the array, and a
+label that is `undef` or a hole. `n`, `n_pos` and `n_neg` count the cases that
+were used. A score that is not a number dies, naming its index.
+
+`auc_se` is DeLong's standard error, and `auc_ci` is `auc` plus or minus the
+normal quantile times it, clipped to `[0, 1]`. When either class has a single
+case the DeLong variance is undefined, so both are `NaN`, where pROC gives `NA`.
 
 ## rownames
 
@@ -6436,6 +6606,9 @@ will make 9 numbers in [0,1]
 
 will match `n`, `min`, and `max` respectively
 
+As in R, an infinite bound, or `max` below `min`, gives `NaN` for every value,
+with the warning "runif: NAs produced".
+
 ## sample
 
 take a sample of hash or array slices.
@@ -6456,6 +6629,21 @@ Through 0.314 the two shapes disagreed about this and neither said so — a hash
 quietly returned fewer keys than were asked for, and an array padded the result
 out to `n` with `undef`, so `sample([1,2,3], 10)` came back as three values and
 seven undefs that no caller could tell apart from real data.
+
+Three differences from R's `sample()` are worth knowing:
+
+- `n` defaults to **1**, not to the size of the population, so `sample(\@x)`
+  draws one element where R's `sample(x)` returns a permutation of all of
+  them. Ask for `scalar @x` to get one.
+- There is no `replace` and no `prob`: every draw is without replacement and
+  equally likely.
+- The values in the result are copies, so changing them leaves the input
+  alone. A value that is a reference is copied as a reference, as assignment
+  copies it.
+
+The draw is a partial Fisher-Yates shuffle from perl's own PRNG, so
+`srand($seed)` makes it reproducible, and it costs time and memory in
+proportion to `n` rather than to the size of the population.
 
 ## scale
 
@@ -6745,6 +6933,9 @@ on a constant sample, which has no shape to report:
     skew([7, 7, 7, 7]);
     # skew: zero variance (all 4 values are equal), so skewness is undefined
 
+A `NaN` or an infinite value is not an error: it makes the answer `NaN`, as it
+makes every other reduction's answer `NaN`.
+
 ### See also
 
 [kurtosis](#kurtosis) for the fourth moment, [sd](#sd) and [var](#var) for the
@@ -6777,6 +6968,10 @@ which I prefer, compared to List::Util's required casting into an array:
 which passing a reference is shorter and much easier to read.  Stats::LikeR, however, will work for **both**
 
 `sum` will cause the script to die if any undefined values are provided
+
+`sum` is compensated, as `mean` is (see there), so `sum([1e16, 1, -1e16, 1])`
+is 2, R's answer, where a plain left-to-right sum in a double gives 0. It
+costs about half a nanosecond more per element than a plain sum.
 
 ### Compared with List::Util
 
@@ -7157,7 +7352,10 @@ figure needs to change.
 ## transpose
 
 Transposes a two-dimensional data structure, swapping rows and columns. Accepts either an array of arrays or a hash of hashes.
-Returns a new reference of the same type; the input is never modified.
+Returns a new reference of the same type; the input is never modified. Every
+cell of the result is a copy, so writing to the result leaves the input alone;
+a cell that holds a reference is copied as a reference, as assignment copies
+it, so the thing it points at is shared.
 
 ### Array of array input
 
@@ -7370,7 +7568,14 @@ With a key, like `a` for above, only values within that hash key are counted:
 
 the column, or second hash key, that you wish to count, is specified at the command line
 
-The two new subsections (Array of hashes, Array of arrays) are the only additions; everything else is unchanged. They're placed after the array-container forms to keep array inputs grouped, mirroring how Hash of array / Hash of hash sit together.
+### Missing values
+
+An `undef` value is skipped wherever it appears, including first in a flat
+list: `value_counts(undef, 'a')` returns `{ a => 1 }`, the same as
+`value_counts('a', undef)`. A lone `undef`, with nothing to count, is a fatal
+error. In an array of hashes or arrays, a missing or `undef` row is skipped.
+Tied arrays are read through their `FETCH`, so a tied array of hashes works
+as a plain one does.
 
 ## var
 
@@ -7384,6 +7589,11 @@ like `min`, `max`, etc., `var` can accept array references, to make code simpler
 
     my $ref = \@arr;
     var($ref) = var(@arr)
+
+`var` follows R where the data reach the ends of the floating-point range: a
+variance too large to represent is `Inf` (`var([1e200, -1e200, 3e199])`), and
+equal values whose sum overflows still have a variance of `0`
+(`var([1e308, 1e308])`). `sd` does the same.
 
 ## var_test
 
@@ -7403,6 +7613,39 @@ also, conf_level can be set:
 as well as a ratio (from R: the hypothesized ratio of the population variances of `x` and `y`:
 
     $test_data = var_test(\@xk, \@yk, ratio => 2);
+
+and the alternative hypothesis:
+
+    $vt = var_test(\@x, \@y, alternative => 'greater');
+
+| Option | Default | Description |
+| :--- | :--- | :--- |
+| `ratio` | `1` | The hypothesised ratio of the variances of `x` and `y`. Must be positive and finite. |
+| `conf_level` | `0.95` | Confidence level of the interval, strictly between 0 and 1. |
+| `alternative` | `'two.sided'` | `'two.sided'`, `'less'` or `'greater'`. Anything else is a fatal error. |
+
+`x` and `y` may be given positionally or as `x =>` and `y =>`. Only their
+finite numeric values are used, as R uses `x[is.finite(x)]`; each needs at
+least two. Tied arrays are read through their `FETCH`.
+
+The result is a hash reference with R's fields, with dots spelled as
+underscores:
+
+| Field | Meaning |
+| :--- | :--- |
+| `statistic` | The F statistic, the ratio of the sample variances divided by `ratio`. |
+| `parameter` | `[num_df, denom_df]`, the numerator and denominator degrees of freedom. |
+| `p_value` | The p-value for `alternative`. Each tail is computed directly rather than as 1 minus the other, so it stays accurate far below R's. |
+| `conf_int` | `[lower, upper]`, the confidence interval for the ratio of the variances. |
+| `estimate` | The ratio of the sample variances. |
+| `null_value` | `ratio`. |
+| `alternative` | The alternative used. |
+| `method` | `"F test to compare two variances"`. |
+
+A zero variance in `y` is not an error, as it is not in R: the estimate and
+the statistic are `Inf`, the p-value is 0 (1 for `'less'`), and the interval is
+`[Inf, Inf]` (`[0, Inf]` for `'less'`). When both variances are zero, every
+number is `NaN`, again as in R.
 
 ## view
 

@@ -4,7 +4,7 @@ use warnings;
 package App::Spec;
 use 5.010;
 
-our $VERSION = 'v0.15.0'; # VERSION
+our $VERSION = 'v0.17.0'; # VERSION
 
 use App::Spec::Subcommand;
 use App::Spec::Option;
@@ -264,6 +264,13 @@ sub generate_completion {
         );
         return $completer->generate_completion(%args);
     }
+    elsif ($shell eq "fish") {
+        require App::Spec::Completion::Fish;
+        my $completer = App::Spec::Completion::Fish->new(
+            spec => $self,
+        );
+        return $completer->generate_completion(%args);
+    }
 }
 
 
@@ -396,7 +403,7 @@ Returns usage output for the specified subcommands:
 
 =item generate_completion
 
-Generates shell completion script for the spec.
+Generates shell completion script for the spec. Supported shells: C<zsh>, C<bash>, C<fish> (fish >= 4.0).
 
     my $completion = $spec->generate_completion(
         shell => "zsh",

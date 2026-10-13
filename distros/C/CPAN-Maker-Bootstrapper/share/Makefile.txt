@@ -116,6 +116,7 @@ MANAGED_MK_FILES = \
     bash-completion.mk \
     bootstrap.mk \
     builder.mk \
+    change-log.mk \
     git.mk \
     help.mk \
     local.mk \
@@ -212,7 +213,7 @@ cpanfile.darkpan cpanm.darkpan: requires $(wildcard darkpan.skip)
 endif
 
 
-$(TARBALL): $(DEPS) | local/.installed update-available $(TARBALL_ORDER_ONLY_PREREQS) \
+$(TARBALL): $(DEPS) |  $(if $(SKIP_TESTS),,local/.installed) update-available $(TARBALL_ORDER_ONLY_PREREQS) \
     $(if $(syntax_on), $(PERL_CHECKED_FILES) $(PERL_BIN_CHECKED_FILES)) \
     $(if $(tidy_on), $(PERL_MODULES:%=%.tdy) $(PERL_BIN_FILES:%=%.tdy)) \
     $(if $(critic_on), $(PERL_MODULES:%=%.crit) $(PERL_BIN_FILES:%=%.crit))
@@ -303,7 +304,6 @@ test-requires.scan: $(TESTS)
         echo "Scanning...t/"; \
 	PERL5LIB=lib:local/lib/perl5:$$PERL5LIB $(SCANDEPS) $(MIN_PERL_VERSION_FLAG) \
 	  --raw \
-          --log-level info \
 	  --file-list file_list.tmp \
 	  --no-core --filter \
 	  --requires-file $$tmp > /dev/null; \
@@ -324,6 +324,11 @@ test-requires: ## creates or updates the `test-requires` file used to populate t
 requires recommends suggests test-requires: %: %.reconciled
 	@:
 
+DEPENDENCY_FILES := requires recommends suggests test-requires
+MISSING_DEPENDENCY_FILES := $(filter-out $(wildcard $(DEPENDENCY_FILES)),$(DEPENDENCY_FILES))
+
+.PHONY: force-reconcile
+
 requires.reconciled \
 recommends.reconciled \
 suggests.reconciled \
@@ -332,12 +337,14 @@ test-requires.reconciled &: \
     recommends.raw \
     suggests.raw \
     test-requires.raw \
+    $(if $(MISSING_DEPENDENCY_FILES),force-reconcile) \
     | provides
 	$(NO_ECHO)deps="$$(mktemp)"; \
 	output="$$(mktemp)"; \
 	trap 'rm -f "$$deps" "$$output"' EXIT; \
 	for type in requires recommends suggests; do \
-	  if [[ ! -e "$$type.reconciled" || \
+	  if [[ ! -e "$$type" || \
+	        ! -e "$$type.reconciled" || \
 	        "$$type.raw" -nt "$$type.reconciled" ]]; then \
 	    printf '%s\n' "$$type" >> "$$deps"; \
 	  fi; \

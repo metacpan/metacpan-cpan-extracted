@@ -138,6 +138,10 @@ static HV *pdbi_slot_for_opts(pTHX_ HV *o) {
         (void)hv_stores(attr, "RaiseError", newSViv(1));
         (void)hv_stores(attr, "AutoCommit", newSViv(1));
         (void)hv_stores(attr, "PrintError", newSViv(0));
+        /* A handle inherited across a fork is freed when the child connects
+         * for itself, and freeing it must not say goodbye on a socket the
+         * parent is still using. */
+        (void)hv_stores(attr, "AutoInactiveDestroy", newSViv(1));
         if (user_attr && SvROK(user_attr)
             && SvTYPE(SvRV(user_attr)) == SVt_PVHV) {
             HV *ua = (HV *)SvRV(user_attr);

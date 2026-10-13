@@ -1743,4 +1743,888 @@ subtest 'EC27: AUTOLOAD hostile method name dispatch' => sub {
 	ok(1, 'EC27.5 ->can("123col") does not segfault');
 };
 
+# ===========================================================================
+# EC28 — aggregate() hostile `measures` inputs
+# Purpose: _validate_aggregate_spec must reject every malformed or
+# injection-carrying measure specification before any SQL is ever emitted.
+# These tests cover: wrong type for measures, non-hashref elements, missing/
+# empty fn, unsafe fn strings, missing col for non-count functions, unsafe col,
+# missing/empty/unsafe as aliases, duplicates, and alias-vs-by collisions.
+# ===========================================================================
+
+note '';
+note '=== EC28 aggregate() hostile measures inputs ===';
+
+{
+	my $db = Database::test1->new($DATA_DIR);
+
+	# EC28.1 — measures entirely absent → croak
+	throws_ok { $db->aggregate() }
+		qr/'measures' must be a non-empty arrayref/,
+		'EC28.1 aggregate(): measures absent → croak';
+
+	# EC28.2 — measures = undef → croak
+	throws_ok { $db->aggregate(measures => undef) }
+		qr/'measures' must be a non-empty arrayref/,
+		'EC28.2 aggregate(): measures=undef → croak';
+
+	# EC28.3 — measures = empty arrayref → croak
+	throws_ok { $db->aggregate(measures => []) }
+		qr/'measures' must be a non-empty arrayref/,
+		'EC28.3 aggregate(): measures=[] → croak';
+
+	# EC28.4 — measures = plain scalar string → croak
+	throws_ok { $db->aggregate(measures => 'sum') }
+		qr/'measures' must be a non-empty arrayref/,
+		'EC28.4 aggregate(): measures=scalar → croak';
+
+	# EC28.5 — measures = hashref (not arrayref of hashrefs) → croak
+	throws_ok { $db->aggregate(measures => { fn => 'count', as => 'n' }) }
+		qr/'measures' must be a non-empty arrayref/,
+		'EC28.5 aggregate(): measures=hashref → croak';
+
+	# EC28.6 — measures = arrayref of strings (not hashrefs) → croak on element type
+	throws_ok { $db->aggregate(measures => ['sum']) }
+		qr/measure must be a hashref/,
+		'EC28.6 aggregate(): measure element is string → croak';
+
+	# EC28.7 — measures = arrayref containing undef → croak on element type
+	throws_ok { $db->aggregate(measures => [undef]) }
+		qr/measure must be a hashref/,
+		'EC28.7 aggregate(): measure element is undef → croak';
+
+	# EC28.8 — measures = arrayref containing a coderef → croak on element type
+	throws_ok { $db->aggregate(measures => [sub {}]) }
+		qr/measure must be a hashref, got CODE/,
+		'EC28.8 aggregate(): measure element is CODE ref → croak';
+
+	# EC28.9 — fn = empty string → croak unknown fn
+	throws_ok { $db->aggregate(measures => [{ fn => '', as => 'v' }]) }
+		qr/unknown measure function ''/,
+		'EC28.9 aggregate(): fn="" → croak unknown fn';
+
+	# EC28.10 — fn = undef (lc(undef//'') → '') → croak unknown fn
+	throws_ok { $db->aggregate(measures => [{ as => 'v' }]) }
+		qr/unknown measure function ''/,
+		'EC28.10 aggregate(): fn=undef → croak unknown fn';
+
+	# EC28.11 — fn = 'bogus' → croak unknown fn
+	throws_ok { $db->aggregate(measures => [{ fn => 'bogus', as => 'v' }]) }
+		qr/unknown measure function 'bogus'/,
+		'EC28.11 aggregate(): fn=bogus → croak unknown fn';
+
+	# EC28.12 — fn = 'SUM' (uppercase) → should SUCCEED (lc is applied)
+	lives_ok {
+		$db->aggregate(measures => [{ fn => 'SUM', col => 'number', as => 'total' }])
+	} 'EC28.12 aggregate(): fn=SUM (uppercase) → accepted via lc normalisation';
+
+	# EC28.13 — fn = 'sum', col = undef → croak col required
+	throws_ok { $db->aggregate(measures => [{ fn => 'sum', as => 'v' }]) }
+		qr/measure column is required for function 'sum'/,
+		'EC28.13 aggregate(): sum without col → croak';
+
+	# EC28.14 — fn = 'avg', col = '' → croak col required (empty string = not provided)
+	throws_ok { $db->aggregate(measures => [{ fn => 'avg', col => '', as => 'v' }]) }
+		qr/measure column is required for function 'avg'/,
+		'EC28.14 aggregate(): avg with col="" → croak';
+
+	# EC28.15 — fn = 'count', col = undef → VALID (COUNT(*) path) — must not croak
+	lives_ok {
+		$db->aggregate(measures => [{ fn => 'count', as => 'n' }])
+	} 'EC28.15 aggregate(): count with col=undef → valid COUNT(*), no croak';
+
+	# EC28.16 — fn = 'count_distinct', col = undef → croak (col required for count_distinct)
+	throws_ok { $db->aggregate(measures => [{ fn => 'count_distinct', as => 'ud' }]) }
+		qr/measure column is required for function 'count_distinct'/,
+		'EC28.16 aggregate(): count_distinct without col → croak';
+
+	# EC28.17 — col with SQL injection characters → croak unsafe measure column
+	throws_ok {
+		$db->aggregate(measures => [{ fn => 'sum', col => "score; DROP TABLE t--", as => 'v' }])
+	} qr/unsafe measure column/,
+		'EC28.17 aggregate(): col with SQL injection → croak unsafe measure column';
+
+	# EC28.18 — col with null byte → croak (null byte not in SAFE_QUALIFIED charset)
+	throws_ok {
+		$db->aggregate(measures => [{ fn => 'sum', col => "score\0drop", as => 'v' }])
+	} qr/unsafe measure column/,
+		'EC28.18 aggregate(): col with null byte → croak unsafe measure column';
+
+	# EC28.19 — col with path traversal → croak
+	throws_ok {
+		$db->aggregate(measures => [{ fn => 'sum', col => '../../../etc', as => 'v' }])
+	} qr/unsafe measure column/,
+		'EC28.19 aggregate(): col with path traversal → croak unsafe measure column';
+
+	# EC28.20 — as = undef → croak (required)
+	throws_ok {
+		$db->aggregate(measures => [{ fn => 'sum', col => 'number' }])
+	} qr/measure 'as' is required/,
+		'EC28.20 aggregate(): as=undef → croak as required';
+
+	# EC28.21 — as = '' (empty string) → croak (required)
+	throws_ok {
+		$db->aggregate(measures => [{ fn => 'sum', col => 'number', as => '' }])
+	} qr/measure 'as' is required/,
+		'EC28.21 aggregate(): as="" → croak as required';
+
+	# EC28.22 — as contains SQL injection → croak unsafe alias
+	throws_ok {
+		$db->aggregate(measures => [{ fn => 'sum', col => 'number', as => "total'; DROP--" }])
+	} qr/unsafe measure alias/,
+		"EC28.22 aggregate(): as with SQL injection → croak unsafe alias";
+
+	# EC28.23 — as starts with a digit → croak (SAFE_IDENTIFIER: [a-zA-Z_] required first char)
+	throws_ok {
+		$db->aggregate(measures => [{ fn => 'count', as => '1abc' }])
+	} qr/unsafe measure alias/,
+		'EC28.23 aggregate(): as starts with digit → croak unsafe alias';
+
+	# EC28.24 — as contains space → croak
+	throws_ok {
+		$db->aggregate(measures => [{ fn => 'count', as => 'my total' }])
+	} qr/unsafe measure alias/,
+		'EC28.24 aggregate(): as with space → croak unsafe alias';
+
+	# EC28.25 — as contains a dot → croak (SAFE_IDENTIFIER does not allow dots)
+	throws_ok {
+		$db->aggregate(measures => [{ fn => 'count', as => 'table.col' }])
+	} qr/unsafe measure alias/,
+		'EC28.25 aggregate(): as with dot → croak unsafe alias';
+
+	# EC28.26 — duplicate as aliases → croak
+	throws_ok {
+		$db->aggregate(measures => [
+			{ fn => 'count', as => 'n' },
+			{ fn => 'sum',   col => 'number', as => 'n' },
+		])
+	} qr/duplicate measure alias 'n'/,
+		'EC28.26 aggregate(): duplicate as → croak';
+
+	# EC28.27 — as collides with a by-column name → croak
+	throws_ok {
+		$db->aggregate(
+			by       => ['entry'],
+			measures => [{ fn => 'count', as => 'entry' }],
+		)
+	} qr/measure alias 'entry' collides with a group-by column/,
+		'EC28.27 aggregate(): as collides with by-column → croak';
+
+	# EC28.28 — measures = arrayref containing a circular reference element
+	{
+		my $circular = {};
+		$circular->{'self'} = $circular;
+		throws_ok { $db->aggregate(measures => [$circular]) }
+			qr/unknown measure function/,
+			'EC28.28 aggregate(): circular-ref measure element croaks (missing fn)';
+	}
+}
+
+# ===========================================================================
+# EC29 — aggregate() hostile `by` inputs
+# Purpose: the 'by' parameter must be an arrayref whose elements each pass
+# $SAFE_QUALIFIED.  Any deviation must croak before any SQL is emitted.
+# ===========================================================================
+
+note '';
+note '=== EC29 aggregate() hostile by inputs ===';
+
+{
+	my $db = Database::test1->new($DATA_DIR);
+	Readonly my $SAFE_MEAS => [{ fn => 'count', as => 'n' }];
+
+	# EC29.1 — by = scalar string (not arrayref) → croak
+	throws_ok { $db->aggregate(by => 'entry', measures => $SAFE_MEAS) }
+		qr/'by' must be an arrayref/,
+		'EC29.1 aggregate(): by=scalar → croak';
+
+	# EC29.2 — by = hashref → croak
+	throws_ok { $db->aggregate(by => { entry => 1 }, measures => $SAFE_MEAS) }
+		qr/'by' must be an arrayref/,
+		'EC29.2 aggregate(): by=hashref → croak';
+
+	# EC29.3 — by = integer → croak
+	throws_ok { $db->aggregate(by => 42, measures => $SAFE_MEAS) }
+		qr/'by' must be an arrayref/,
+		'EC29.3 aggregate(): by=integer → croak';
+
+	# EC29.4 — by = arrayref containing undef → croak unsafe group-by column
+	throws_ok { $db->aggregate(by => [undef], measures => $SAFE_MEAS) }
+		qr/unsafe group-by column/,
+		'EC29.4 aggregate(): by=[undef] → croak unsafe group-by column';
+
+	# EC29.5 — by = arrayref containing empty string → croak (fails SAFE_QUALIFIED)
+	throws_ok { $db->aggregate(by => [''], measures => $SAFE_MEAS) }
+		qr/unsafe group-by column/,
+		'EC29.5 aggregate(): by=[""] → croak unsafe group-by column';
+
+	# EC29.6 — by = arrayref with SQL injection string → croak
+	throws_ok {
+		$db->aggregate(by => ["entry; DROP TABLE t--"], measures => $SAFE_MEAS)
+	} qr/unsafe group-by column/,
+		'EC29.6 aggregate(): by with SQL injection → croak unsafe group-by column';
+
+	# EC29.7 — by = arrayref starting with digit → croak (SAFE_QUALIFIED requires [a-zA-Z_] first)
+	throws_ok { $db->aggregate(by => ['1col'], measures => $SAFE_MEAS) }
+		qr/unsafe group-by column/,
+		'EC29.7 aggregate(): by=["1col"] (starts with digit) → croak';
+
+	# EC29.8 — by = arrayref with a space in column name → croak
+	throws_ok { $db->aggregate(by => ['col name'], measures => $SAFE_MEAS) }
+		qr/unsafe group-by column/,
+		'EC29.8 aggregate(): by=["col name"] (space) → croak';
+
+	# EC29.9 — by = arrayref with null byte in column name → croak
+	throws_ok { $db->aggregate(by => ["col\0drop"], measures => $SAFE_MEAS) }
+		qr/unsafe group-by column/,
+		'EC29.9 aggregate(): by with null byte → croak';
+
+	# EC29.10 — by = arrayref with semicolon → croak
+	throws_ok { $db->aggregate(by => ["col;inject"], measures => $SAFE_MEAS) }
+		qr/unsafe group-by column/,
+		'EC29.10 aggregate(): by with semicolon → croak';
+
+	# EC29.11 — by = valid qualified name (table.col) → SAFE_QUALIFIED allows dots → no croak
+	# Use SQLite so the full qualified reference resolves; DBD::CSV cannot handle table aliases.
+	SKIP: {
+		skip 'DBD::SQLite not available for EC29.11 qualified by test', 1
+			unless $HAVE_SQLITE;
+		my $e29_dir  = tempdir(CLEANUP => 1);
+		my $e29_dsn  = 'dbi:SQLite:dbname=' . File::Spec->catfile($e29_dir, 'ec29.sqlite');
+		my $e29_dbh  = DBI->connect($e29_dsn, '', '', { RaiseError => 1, AutoCommit => 1 });
+		$e29_dbh->do("CREATE TABLE ec29 (entry TEXT, v INT)");
+		$e29_dbh->do("INSERT INTO ec29 VALUES ('a', 1)");
+		$e29_dbh->disconnect();
+		{ package Database::ec29; use parent 'Database::Abstraction'; }
+		my $dq = Database::ec29->new(dsn => $e29_dsn, no_entry => 1);
+		lives_ok {
+			$dq->aggregate(by => ['ec29.entry'], measures => $SAFE_MEAS)
+		} 'EC29.11 aggregate(): by=["ec29.entry"] (qualified, dot allowed) → no croak on validation';
+	}
+
+	# EC29.12 — by = arrayref with coderef element → croak
+	throws_ok { $db->aggregate(by => [sub {}], measures => $SAFE_MEAS) }
+		qr/unsafe group-by column/,
+		'EC29.12 aggregate(): by=[sub {}] → croak unsafe group-by column';
+}
+
+# ===========================================================================
+# EC30 — aggregate() hostile `having` and `sort_by` inputs
+# Purpose: having must be a hashref; having keys must be in the by/alias
+# allowlist.  sort_by must name a by-column or alias, and direction must be
+# ASC or DESC.
+# ===========================================================================
+
+note '';
+note '=== EC30 aggregate() hostile having and sort_by inputs ===';
+
+{
+	my $db = Database::test1->new($DATA_DIR);
+	Readonly my $SAFE_MEAS  => [{ fn => 'count', as => 'n' }];
+	Readonly my $SAFE_MEAS2 => [{ fn => 'sum', col => 'number', as => 'total' }];
+
+	# EC30.1 — having = scalar string → croak 'having' must be a hashref
+	throws_ok {
+		$db->aggregate(measures => $SAFE_MEAS, having => 'n > 5')
+	} qr/'having' must be a hashref/,
+		'EC30.1 aggregate(): having=scalar → croak';
+
+	# EC30.2 — having = arrayref → croak
+	throws_ok {
+		$db->aggregate(measures => $SAFE_MEAS, having => ['n', '>', 5])
+	} qr/'having' must be a hashref/,
+		'EC30.2 aggregate(): having=arrayref → croak';
+
+	# EC30.3 — having = integer → croak
+	throws_ok {
+		$db->aggregate(measures => $SAFE_MEAS, having => 42)
+	} qr/'having' must be a hashref/,
+		'EC30.3 aggregate(): having=integer → croak';
+
+	# EC30.4 — having key not in by or aliases → croak
+	throws_ok {
+		$db->aggregate(
+			measures => $SAFE_MEAS,
+			having   => { unknown_col => { '>' => 5 } },
+		)
+	} qr/having key 'unknown_col' is not a group-by column or measure alias/,
+		'EC30.4 aggregate(): having key not in allowlist → croak';
+
+	# EC30.5 — having key = '-or' → bypasses key-allowlist check but array VALUE fails type check
+	# The key validation skips '-or'/'-and' (they start with '-'), but _build_having_fragment
+	# still requires each value to be a scalar or operator hashref, not an arrayref.
+	throws_ok {
+		$db->aggregate(
+			measures => $SAFE_MEAS,
+			having   => { '-or' => [] },
+		)
+	} qr/expected scalar or operator hashref/,
+		'EC30.5 aggregate(): having key="-or" bypasses allowlist, but value=[] fails type check';
+
+	# EC30.6 — having key = '-and' → same: key bypasses allowlist, array value rejected
+	throws_ok {
+		$db->aggregate(
+			measures => $SAFE_MEAS,
+			having   => { '-and' => [] },
+		)
+	} qr/expected scalar or operator hashref/,
+		'EC30.6 aggregate(): having key="-and" bypasses allowlist, but value=[] fails type check';
+
+	# EC30.7 — sort_by names a column not in by or aliases → croak
+	throws_ok {
+		$db->aggregate(measures => $SAFE_MEAS, sort_by => 'no_such_col')
+	} qr/sort_by names 'no_such_col'/,
+		'EC30.7 aggregate(): sort_by not in by/aliases → croak';
+
+	# EC30.8 — sort_by with invalid direction → croak
+	throws_ok {
+		$db->aggregate(measures => $SAFE_MEAS2, sort_by => ['total', 'UPWARD'])
+	} qr/sort_by names 'total'/,
+		'EC30.8 aggregate(): sort_by invalid direction → croak';
+
+	# EC30.9 — sort_by = [] (empty arrayref → $sort_col = undef) → croak
+	throws_ok {
+		$db->aggregate(measures => $SAFE_MEAS, sort_by => [])
+	} qr/sort_by names/,
+		'EC30.9 aggregate(): sort_by=[] (empty) → undef col → croak';
+
+	# EC30.10 — sort_by = valid alias, no direction → accepts 'ASC' default (no croak)
+	lives_ok {
+		$db->aggregate(measures => $SAFE_MEAS, sort_by => 'n')
+	} 'EC30.10 aggregate(): sort_by=alias string, no dir → accepts ASC default';
+
+	# EC30.11 — sort_by = SQL injection string → croak (not in allowlist)
+	throws_ok {
+		$db->aggregate(measures => $SAFE_MEAS, sort_by => "n; DROP TABLE--")
+	} qr/sort_by names/,
+		'EC30.11 aggregate(): sort_by with SQL injection → croak';
+
+	# EC30.12 — sort_by = ['n', undef] → undef direction → treated as ASC (no croak)
+	lives_ok {
+		$db->aggregate(measures => $SAFE_MEAS, sort_by => ['n', undef])
+	} 'EC30.12 aggregate(): sort_by dir=undef → treated as ASC (no croak)';
+}
+
+# ===========================================================================
+# EC31 — aggregate() hostile `limit` and `offset` inputs
+# Purpose: invalid limit/offset must be carped and silently ignored (not
+# croaked); valid boundary values (0, large ints) must be accepted.
+# ===========================================================================
+
+note '';
+note '=== EC31 aggregate() hostile limit and offset inputs ===';
+
+# Use a JSON no-DBI backend so that limit/offset reach the Perl _fold_aggregate
+# splice path.  DBD::CSV's SQL::Statement does not support parameterised LIMIT ?,
+# so a CSV backend would croak on valid limit=0 — not the behaviour under test.
+SKIP: {
+	skip 'JSON::MaybeXS not available for EC31 limit/offset tests', 12
+		unless eval { require JSON::MaybeXS; 1 };
+
+	my $e31_dir  = tempdir(CLEANUP => 1);
+	my $e31_file = File::Spec->catfile($e31_dir, 'ec31.json');
+	do {
+		open my $fh, '>', $e31_file or die "Cannot write $e31_file: $!";
+		print {$fh} '[{"entry":"a","v":1},{"entry":"b","v":2},{"entry":"c","v":3}]'."\n";
+		close $fh;
+	};
+	{ package Database::ec31; use parent 'Database::Abstraction'; }
+	my $db31 = Database::ec31->new(directory => $e31_dir);
+	$db31->count();	# trigger slurp
+
+	Readonly my $SAFE_MEAS => [{ fn => 'count', as => 'n' }];
+
+	# EC31.1 — limit = non-numeric string → carp (not croak), result still returned
+	my @warns_lim;
+	{
+		local $SIG{__WARN__} = sub { push @warns_lim, @_ };
+		my $r = $db31->aggregate(measures => $SAFE_MEAS, limit => 'abc');
+		ok(defined $r, 'EC31.1 aggregate(): limit="abc" → carp (not croak), returns result');
+		ok(scalar @warns_lim > 0, 'EC31.1 aggregate(): limit="abc" → warning emitted');
+		like($warns_lim[0], qr/limit/, 'EC31.1 aggregate(): warning mentions "limit"');
+	}
+
+	# EC31.2 — limit = negative number → carp (fails /\A\d+\z/), result returned
+	{
+		local $SIG{__WARN__} = sub {};
+		my $r = $db31->aggregate(measures => $SAFE_MEAS, limit => -1);
+		ok(defined $r, 'EC31.2 aggregate(): limit=-1 → carp (not croak), returns result');
+	}
+
+	# EC31.3 — limit = float string '1.5' → carp (dot not in \d+), result returned
+	{
+		local $SIG{__WARN__} = sub {};
+		my $r = $db31->aggregate(measures => $SAFE_MEAS, limit => '1.5');
+		ok(defined $r, 'EC31.3 aggregate(): limit="1.5" → carp (not croak), returns result');
+	}
+
+	# EC31.4 — limit = 0 → valid (zero rows in Perl splice path), no croak
+	lives_ok { $db31->aggregate(measures => $SAFE_MEAS, limit => 0) }
+		'EC31.4 aggregate(): limit=0 → valid (zero rows via Perl fold), no croak';
+
+	# EC31.5 — limit = '0' (string zero) → valid
+	lives_ok { $db31->aggregate(measures => $SAFE_MEAS, limit => '0') }
+		'EC31.5 aggregate(): limit="0" (string) → valid, no croak';
+
+	# EC31.6 — limit = '' (empty string) → fails \A\d+\z → carp, not croak
+	{
+		local $SIG{__WARN__} = sub {};
+		my $r = $db31->aggregate(measures => $SAFE_MEAS, limit => '');
+		ok(defined $r, 'EC31.6 aggregate(): limit="" → carp, result still returned');
+	}
+
+	# EC31.7 — offset = non-numeric → carp, not croak
+	my @warns_off;
+	{
+		local $SIG{__WARN__} = sub { push @warns_off, @_ };
+		my $r = $db31->aggregate(measures => $SAFE_MEAS, offset => 'xyz');
+		ok(defined $r, 'EC31.7 aggregate(): offset="xyz" → carp, result returned');
+		ok(scalar @warns_off > 0, 'EC31.7 aggregate(): offset="xyz" → warning emitted');
+	}
+
+	# EC31.8 — offset = negative → carp (fails \A\d+\z), not croak
+	{
+		local $SIG{__WARN__} = sub {};
+		my $r = $db31->aggregate(measures => $SAFE_MEAS, offset => -5);
+		ok(defined $r, 'EC31.8 aggregate(): offset=-5 → carp, result returned');
+	}
+
+	# EC31.9 — both limit and offset valid = 0 → no croak, returns arrayref
+	{
+		my $r = $db31->aggregate(measures => $SAFE_MEAS, limit => 0, offset => 0);
+		returns_is($r, { type => 'arrayref' },
+			'EC31.9 aggregate(): limit=0, offset=0 → arrayref returned');
+	}
+}
+
+# ===========================================================================
+# EC32 — aggregate() SQL injection via `col` and `as` (security regression)
+# Purpose: every user-supplied string that appears in emitted SQL must pass
+# a SAFE_QUALIFIED or SAFE_IDENTIFIER whitelist check.  These tests target the
+# exact injection paths (SELECT clause, GROUP BY, ORDER BY, HAVING) that would
+# be vulnerable if the guards were absent.
+# ===========================================================================
+
+note '';
+note '=== EC32 aggregate() SQL injection via col and as ===';
+
+{
+	my $db = Database::test1->new($DATA_DIR);
+
+	# EC32.1 — col = semicolon injection → croak before any SQL emitted
+	throws_ok {
+		$db->aggregate(measures => [{ fn => 'sum', col => "n; SELECT secret FROM users--", as => 'v' }])
+	} qr/unsafe measure column/,
+		'EC32.1 aggregate(): semicolon in col → croak unsafe measure column';
+
+	# EC32.2 — col = single-quote injection → croak
+	throws_ok {
+		$db->aggregate(measures => [{ fn => 'sum', col => "n' OR '1'='1", as => 'v' }])
+	} qr/unsafe measure column/,
+		"EC32.2 aggregate(): single-quote in col → croak unsafe measure column";
+
+	# EC32.3 — col = backtick injection → croak
+	throws_ok {
+		$db->aggregate(measures => [{ fn => 'sum', col => '`secret`', as => 'v' }])
+	} qr/unsafe measure column/,
+		'EC32.3 aggregate(): backtick in col → croak unsafe measure column';
+
+	# EC32.4 — col = UNION injection → croak
+	throws_ok {
+		$db->aggregate(measures => [{ fn => 'sum', col => 'n UNION SELECT password FROM users', as => 'v' }])
+	} qr/unsafe measure column/,
+		'EC32.4 aggregate(): UNION in col → croak unsafe measure column';
+
+	# EC32.5 — col = newline injection → croak (newline not in charset)
+	throws_ok {
+		$db->aggregate(measures => [{ fn => 'sum', col => "n\nDROP TABLE t", as => 'v' }])
+	} qr/unsafe measure column/,
+		'EC32.5 aggregate(): newline in col → croak unsafe measure column';
+
+	# EC32.6 — as = semicolon injection → croak before SQL emitted
+	throws_ok {
+		$db->aggregate(measures => [{ fn => 'count', as => "n; SELECT * FROM users--" }])
+	} qr/unsafe measure alias/,
+		'EC32.6 aggregate(): semicolon in as → croak unsafe measure alias';
+
+	# EC32.7 — as = SQL comment injection → croak
+	throws_ok {
+		$db->aggregate(measures => [{ fn => 'count', as => "n--DROP" }])
+	} qr/unsafe measure alias/,
+		'EC32.7 aggregate(): SQL comment in as → croak unsafe measure alias';
+
+	# EC32.8 — as = CRLF injection → croak
+	throws_ok {
+		$db->aggregate(measures => [{ fn => 'count', as => "n\r\nDROP" }])
+	} qr/unsafe measure alias/,
+		'EC32.8 aggregate(): CRLF in as → croak unsafe measure alias';
+
+	# EC32.9 — by = UNION injection → croak unsafe group-by column
+	throws_ok {
+		$db->aggregate(
+			by       => ['entry UNION SELECT password FROM secrets'],
+			measures => [{ fn => 'count', as => 'n' }],
+		)
+	} qr/unsafe group-by column/,
+		'EC32.9 aggregate(): UNION in by element → croak unsafe group-by column';
+
+	# EC32.10 — by = comment injection → croak
+	throws_ok {
+		$db->aggregate(
+			by       => ['entry--comment'],
+			measures => [{ fn => 'count', as => 'n' }],
+		)
+	} qr/unsafe group-by column/,
+		'EC32.10 aggregate(): comment injection in by element → croak';
+
+	# EC32.11 — col = table.column (qualified with dot) → VALID: SAFE_QUALIFIED allows dots
+	lives_ok {
+		$db->aggregate(measures => [{ fn => 'sum', col => 'test1.number', as => 'total' }])
+	} 'EC32.11 aggregate(): qualified col "t.col" → SAFE_QUALIFIED allows dot (no croak)';
+}
+
+# ===========================================================================
+# EC33 — aggregate() no-DBI backend JOIN croak (security: no SQL injection path)
+# Purpose: aggregate() with a join on a slurp-mode backend must croak with a
+# clear message naming the backend BEFORE any SQL is attempted.  This prevents
+# a join-spec from being used to inject SQL via the join.on / join.table fields
+# on backends that would otherwise never emit SQL.
+# ===========================================================================
+
+note '';
+note '=== EC33 aggregate() no-DBI backend JOIN croak ===';
+
+SKIP: {
+	skip 'JSON::MaybeXS not available for EC33 no-DBI JOIN tests', 8
+		unless eval { require JSON::MaybeXS; 1 };
+
+	my $j_dir  = tempdir(CLEANUP => 1);
+	my $j_file = File::Spec->catfile($j_dir, 'ec33_join.json');
+	do {
+		open my $fh, '>', $j_file or die "Cannot write $j_file: $!";
+		print {$fh} '[{"entry":"x","n":1}]'."\n";
+		close $fh;
+	};
+	{ package Database::ec33_join; use parent 'Database::Abstraction'; }
+	my $jdb = Database::ec33_join->new(directory => $j_dir);
+
+	Readonly my $SAFE_MEAS => [{ fn => 'count', as => 'n' }];
+	Readonly my $SAFE_JOIN => { table => 'other', on => 'ec33_join.entry = other.id' };
+
+	# EC33.1 — join on JSON backend (no DBI handle) → croak with backend in message
+	throws_ok {
+		$jdb->aggregate(measures => $SAFE_MEAS, join => $SAFE_JOIN)
+	} qr/cannot aggregate a JOIN on the/,
+		'EC33.1 aggregate(): join on JSON backend → croak cannot aggregate JOIN';
+
+	# EC33.2 — join on JSON backend: croak message names the backend type
+	{
+		my $err = '';
+		eval { $jdb->aggregate(measures => $SAFE_MEAS, join => $SAFE_JOIN) };
+		$err = $@ // '';
+		like($err, qr/JSON|slurp/i,
+			'EC33.2 aggregate(): croak message names the backend (JSON or slurp)');
+	}
+
+	# EC33.3 — join table name with SQL injection → croak from _build_joins BEFORE backend check
+	throws_ok {
+		$jdb->aggregate(
+			measures => $SAFE_MEAS,
+			join     => { table => "other; DROP TABLE t--", on => 'a.id = other.id' },
+		)
+	} qr/unsafe table name/,
+		'EC33.3 aggregate(): join with SQL injection table → croak unsafe table name';
+
+	# EC33.4 — join missing 'on' clause → croak from _build_joins
+	throws_ok {
+		$jdb->aggregate(
+			measures => $SAFE_MEAS,
+			join     => { table => 'other' },
+		)
+	} qr/missing "on"/,
+		'EC33.4 aggregate(): join without on → croak missing on condition';
+
+	# EC33.5 — join with valid spec on no-DBI backend → croak is repeatable (object still usable)
+	eval { $jdb->aggregate(measures => $SAFE_MEAS, join => $SAFE_JOIN) };
+	ok($@, 'EC33.5 pre-condition: first join croak occurred');
+	lives_ok {
+		$jdb->aggregate(measures => $SAFE_MEAS)
+	} 'EC33.5 aggregate(): object still usable after join croak on no-DBI backend';
+
+	# EC33.6 — aggregate() with SAFE join on CSV (has DBI) must not croak on join check
+	#          (the join-on-no-DBI guard only fires when !$self->{$table})
+	lives_ok {
+		my $csv = Database::test1->new($DATA_DIR);
+		# CSV has DBD::CSV DBI handle; the join SQL will fail but not the backend check
+		eval {
+			$csv->aggregate(
+				measures => $SAFE_MEAS,
+				join     => { table => 'other', on => 'test1.entry = other.id' },
+			);
+		};
+		# Either succeeds (unlikely) or fails with a SQL error, but NOT with "cannot aggregate a JOIN"
+		ok(!defined($@) || $@ !~ /cannot aggregate a JOIN/,
+			'EC33.6 aggregate(): CSV (has DBI) does not hit no-DBI JOIN croak');
+	} 'EC33.6 CSV join: does not reach no-DBI JOIN croak guard';
+}
+
+# ===========================================================================
+# EC34 — aggregate() hostile criteria values (WHERE-clause injection via criteria)
+# Purpose: criteria values passed alongside aggregate() control params are
+# forwarded to _build_where (SQL path) or _match_criteria (Perl fold).
+# Injection via criteria keys must be caught by the _build_where_conditions
+# $SAFE_QUALIFIED guard.
+# ===========================================================================
+
+note '';
+note '=== EC34 aggregate() hostile criteria values ===';
+
+SKIP: {
+	skip 'DBD::SQLite not available for EC34 criteria-injection tests', 8
+		unless $HAVE_SQLITE;
+
+	my $e34_dir  = tempdir(CLEANUP => 1);
+	my $e34_file = File::Spec->catfile($e34_dir, 'ec34.sql');
+	my $e34_dsn  = "dbi:SQLite:dbname=$e34_file";
+
+	{
+		my $s = DBI->connect($e34_dsn, undef, undef, { RaiseError => 1 });
+		$s->do('CREATE TABLE ec34 (entry TEXT PRIMARY KEY, score REAL, status TEXT)');
+		$s->do("INSERT INTO ec34 VALUES ('a', 9.5, 'active')");
+		$s->do("INSERT INTO ec34 VALUES ('b', 7.0, 'inactive')");
+		$s->disconnect();
+	}
+
+	{ package Database::ec34; use parent 'Database::Abstraction'; }
+	my $db34 = Database::ec34->new(dsn => $e34_dsn, no_entry => 1);
+
+	# EC34.1 — criteria value = undef → IS NULL semantics (must not croak)
+	lives_ok {
+		$db34->aggregate(
+			measures => [{ fn => 'count', as => 'n' }],
+			status   => undef,
+		)
+	} 'EC34.1 aggregate(): criteria value=undef (IS NULL) → no croak';
+
+	# EC34.2 — criteria key with SQL injection → croak from _build_where_conditions guard
+	throws_ok {
+		$db34->aggregate(
+			measures          => [{ fn => 'count', as => 'n' }],
+			"status; DROP TABLE ec34--" => 'active',
+		)
+	} qr/unsafe column name/i,
+		'EC34.2 aggregate(): SQL injection in criteria key → croak unsafe column name';
+
+	# EC34.3 — criteria key with UNION injection → croak
+	throws_ok {
+		$db34->aggregate(
+			measures         => [{ fn => 'count', as => 'n' }],
+			"status UNION SELECT 1" => 'active',
+		)
+	} qr/unsafe column name/i,
+		'EC34.3 aggregate(): UNION in criteria key → croak unsafe column name';
+
+	# EC34.4 — criteria value = integer → accepted as bind param (SQL: score = 9)
+	lives_ok {
+		$db34->aggregate(
+			measures => [{ fn => 'count', as => 'n' }],
+			score    => 9,
+		)
+	} 'EC34.4 aggregate(): criteria value=integer → accepted as bind param';
+
+	# EC34.5 — operator-hash criteria value with -in → forces SQL path on no-DBI backend
+	#          On SQLite DSN this is fine; test that the result is correct.
+	{
+		my $r = $db34->aggregate(
+			measures => [{ fn => 'count', as => 'n' }],
+			status   => { '-in' => ['active', 'inactive'] },
+		);
+		returns_is($r, { type => 'arrayref' },
+			'EC34.5 aggregate(): -in criteria on SQL backend → arrayref result');
+		is($r->[0]{'n'}, 2,
+			'EC34.5 aggregate(): -in criteria: both statuses included → count=2');
+	}
+
+	# EC34.6 — empty string criteria value → SQL: status = '' → 0 rows match
+	{
+		my $r = $db34->aggregate(
+			measures => [{ fn => 'count', as => 'n' }],
+			status   => '',
+		);
+		returns_is($r, { type => 'arrayref' },
+			'EC34.6 aggregate(): empty-string criteria → arrayref result');
+	}
+}
+
+# ===========================================================================
+# EC35 — Query builder aggregate hostile inputs
+# Purpose: the fluent chain group_by→measure→having→all/first/count/each
+# must propagate _validate_aggregate_spec errors cleanly and must not allow
+# stale/mutated builder state to silently corrupt results.
+# ===========================================================================
+
+note '';
+note '=== EC35 Query builder aggregate hostile inputs ===';
+
+SKIP: {
+	skip 'DBD::SQLite not available for EC35 Query builder aggregate tests', 20
+		unless $HAVE_SQLITE;
+
+	my $e35_dir  = tempdir(CLEANUP => 1);
+	my $e35_file = File::Spec->catfile($e35_dir, 'ec35.sql');
+	my $e35_dsn  = "dbi:SQLite:dbname=$e35_file";
+
+	{
+		my $s = DBI->connect($e35_dsn, undef, undef, { RaiseError => 1 });
+		$s->do('CREATE TABLE ec35 (entry TEXT PRIMARY KEY, score REAL, status TEXT)');
+		$s->do("INSERT INTO ec35 VALUES ('a', 9.5, 'active')");
+		$s->do("INSERT INTO ec35 VALUES ('b', 7.0, 'inactive')");
+		$s->do("INSERT INTO ec35 VALUES ('c', 8.5, 'active')");
+		$s->disconnect();
+	}
+
+	{ package Database::ec35; use parent 'Database::Abstraction'; }
+	my $db35 = Database::ec35->new(dsn => $e35_dsn, no_entry => 1);
+
+	# EC35.1 — count() after measure() → exact documented croak message
+	throws_ok {
+		$db35->query->measure('score', 'sum', 'total')->count()
+	} qr/count\(\) is not available once measure\(\) has been called/,
+		'EC35.1 query->count() after measure() → exact croak message';
+
+	# EC35.2 — all() with hostile group_by column (SQL injection) → croak in _validate
+	throws_ok {
+		$db35->query
+			->group_by("entry; DROP TABLE ec35--")
+			->measure('score', 'sum', 'total')
+			->all()
+	} qr/unsafe group-by column/,
+		'EC35.2 query->all() with SQL injection in group_by → croak';
+
+	# EC35.3 — all() with unknown fn → croak from _validate_aggregate_spec
+	throws_ok {
+		$db35->query
+			->measure('score', 'bogus_fn', 'total')
+			->all()
+	} qr/unknown measure function/,
+		'EC35.3 query->all() with unknown measure fn → croak';
+
+	# EC35.4 — all() with hostile measure alias (injection) → croak
+	throws_ok {
+		$db35->query
+			->measure('score', 'sum', "total; DROP TABLE--")
+			->all()
+	} qr/unsafe measure alias/,
+		'EC35.4 query->all() with SQL injection in measure alias → croak';
+
+	# EC35.5 — all() with having key not in aliases → croak
+	throws_ok {
+		$db35->query
+			->group_by('status')
+			->measure('score', 'sum', 'total')
+			->having(unknown_alias => { '>' => 5 })
+			->all()
+	} qr/having key 'unknown_alias' is not a group-by column or measure alias/,
+		'EC35.5 query->all() with having key not in aliases → croak';
+
+	# EC35.6 — all() with hostile measure col (SQL injection) → croak
+	throws_ok {
+		$db35->query
+			->measure("score; DROP TABLE ec35--", 'sum', 'total')
+			->all()
+	} qr/unsafe measure column/,
+		'EC35.6 query->all() with SQL injection in measure col → croak';
+
+	# EC35.7 — count() on a builder with no measures → normal count (no croak)
+	lives_ok {
+		$db35->query->where(status => 'active')->count()
+	} 'EC35.7 query->count() with no measures and where() → normal count (no croak)';
+
+	# EC35.8 — first() with hostile group_by → croak from validation
+	throws_ok {
+		$db35->query
+			->group_by("entry'; DROP--")
+			->measure(undef, 'count', 'n')
+			->first()
+	} qr/unsafe group-by column/,
+		'EC35.8 query->first() with SQL injection group_by → croak';
+
+	# EC35.9 — each() callback raises exception → exception is re-thrown by each()
+	{
+		my $die_msg = 'EC35.9 deliberate callback death';
+		my $err = '';
+		eval {
+			$db35->query
+				->group_by('status')
+				->measure(undef, 'count', 'n')
+				->each(sub { die "$die_msg\n" });
+		};
+		$err = $@ // '';
+		like($err, qr/\Q$die_msg\E/,
+			'EC35.9 query->each() re-throws callback exception verbatim');
+	}
+
+	# EC35.10 — Object is still usable after a croak in query->all()
+	#           The builder croak must not corrupt the underlying database object.
+	{
+		eval {
+			$db35->query
+				->measure('score', 'bogus_fn', 'total')
+				->all()
+		};
+		ok($@, 'EC35.10 pre-cond: bogus_fn croak occurred');
+
+		# db35 must still answer a normal query correctly
+		is($db35->count(), 3,
+			'EC35.10 db object still returns correct count() after builder croak');
+	}
+
+	# EC35.11 — having() called with named-pair list (not a hashref) → accepted
+	lives_ok {
+		my $q = $db35->query
+			->group_by('status')
+			->measure(undef, 'count', 'n')
+			->having('n', { '>' => 0 });
+		$q->all();
+	} 'EC35.11 query->having() with named-pair args → accepted';
+
+	# EC35.12 — measure() with as containing a dot (SAFE_IDENTIFIER rejects dots) → croak on all()
+	throws_ok {
+		$db35->query
+			->measure('score', 'sum', 'table.total')
+			->all()
+	} qr/unsafe measure alias/,
+		'EC35.12 query->all() with dotted measure alias → croak unsafe alias';
+
+	# EC35.13 — sort_by names a column not in group_by/aliases → croak
+	# sort_by for aggregate must be set via ->order_by() on the query builder;
+	# extra keyword args to ->all() are ignored by the Query builder's all() method.
+	throws_ok {
+		$db35->query
+			->group_by('status')
+			->measure(undef, 'count', 'n')
+			->order_by('no_such_column')
+			->all()
+	} qr/sort_by names 'no_such_column'/,
+		'EC35.13 query->order_by(unknown)->all() with sort_by not in allowlist → croak';
+
+	# EC35.14 — duplicate measure aliases accumulate and trigger croak on all()
+	throws_ok {
+		$db35->query
+			->measure('score', 'sum', 'dup')
+			->measure(undef, 'count', 'dup')
+			->all()
+	} qr/duplicate measure alias 'dup'/,
+		'EC35.14 query->all() with duplicate measure aliases → croak';
+
+	# EC35.15 — each() with non-coderef callback → croak
+	throws_ok {
+		$db35->query
+			->group_by('status')
+			->measure(undef, 'count', 'n')
+			->each('not a coderef')
+	} qr/callback must be a CODE ref|not.*code|not.*sub/i,
+		'EC35.15 query->each() with non-coderef → croak';
+}
+
 done_testing();

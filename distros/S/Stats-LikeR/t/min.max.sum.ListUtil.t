@@ -136,7 +136,10 @@ subtest 'sum.t' => sub {
 	is(sum($one, $two, $thr), 6, 'overload');
 	cmp_ok(sum($v1, $v2), '==', nv($v1) + nv($v2), 'bigint');
 	cmp_ok(sum(42, $v1), '==', 42 + nv($v1), 'bigint + builtin int');
-	cmp_ok(sum(42, $v1, 2), '==', 42 + nv($v1) + 2, 'bigint + builtin int');
+	# the exact sum, as upstream's Math::BigInt arithmetic gives it: sum() is
+	# compensated, so on a long-double NV, where 2**65 + 42 rounds to 2**65 + 40
+	# and 2**65 + 44 does not round at all, it is not 42 + nv($v1) + 2
+	cmp_ok(sum(42, $v1, 2), '==', nv($v1) + (42 + 2), 'bigint + builtin int');
 	# upstream expects 21, 23 and 25: see the header for why these croak
 	my $e1 = example->new(7, 'test');
 	like(eval { sum($e1, 7, 7); 1 } ? '' : $@,

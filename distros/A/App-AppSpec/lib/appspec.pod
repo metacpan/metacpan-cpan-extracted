@@ -43,6 +43,7 @@ Options:
     --name    name of the program (optional, override the value from the spec)
     --zsh     for zsh (flag)                                                  
     --bash    for bash (flag)                                                 
+    --fish    for fish (>= 4.0) (flag)                                        
 
 Parameters:
 
@@ -142,6 +143,7 @@ Options:
     --name    name of the program (optional, override name in spec)
     --zsh     for zsh (flag)                                       
     --bash    for bash (flag)                                      
+    --fish    for fish (>= 4.0) (flag)                             
 
 
 =head3 _meta pod

@@ -1,0 +1,41 @@
+---
+abstract: 'offline, source-located diagnostics for HTML fragment links'
+author:
+  - 'Nedal Shabaan'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Temp: '0'
+  IPC::Open3: '0'
+  Pod::Checker: '0'
+  Symbol: '0'
+  Test::More: '0.98'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150013'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTML-Anchor-Audit
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+    - examples
+requires:
+  Carp: '0'
+  Encode: '0'
+  Exporter: '0'
+  Getopt::Long: '0'
+  HTML::Parser: '3.72'
+  JSON::PP: '0'
+  Unicode::Normalize: '0'
+  perl: '5.016'
+resources:
+  bugtracker: https://github.com/nedal-dev/html-anchor-audit/issues
+  homepage: https://idraaak.com/
+  repository: https://github.com/nedal-dev/html-anchor-audit.git
+version: '0.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

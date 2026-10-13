@@ -9,11 +9,11 @@ Logic::Relational - A pure-Perl relational logic system.
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
@@ -131,6 +131,13 @@ To execute a query on a logic database, use the name of the logic database with 
 
 	# Option C: Extract all reified values bound to a variable directly
 	my @grandchildren = $q->all_values($child);
+
+	# Option D: Extract deduplicated values bound to a variable
+	my @unique_grandchildren = $q->distinct_values($child);
+
+	# Option E: Extract tuples of multiple variables (deduplicated by default)
+	query Family::parent(fresh my $p, fresh my $c) -> my $q_pairs;
+	my @pairs = $q_pairs->all_tuples([$p, $c]);
 
 =head2 Unification
 
@@ -408,6 +415,68 @@ Negation is implemented as Negation-as-Failure. Therefore, C<not { Goal }> succe
 
 Variables inside a C<not { ... }> block must be ground (bound to concrete values) at evaluation time.
 
+=head2 Subgoal Tabling (Memoization) and Cycle Handling
+
+Standard depth-first relational search can struggle with cyclic data structures (such as bidirectional networks or graphs with loops) and left-recursive rules. C<Logic::Relational> provides two complementary mechanisms to handle recursion safely and efficiently:
+
+=over 4
+
+=item 1. B<Automatic Ancestor Cycle Pruning (Always Active)>
+
+During rule evaluation, the engine tracks active ancestor calls along the current derivation path. If a recursive subgoal is called with arguments that are structurally identical (up to variable renaming) to an active ancestor call on the same branch, that branch is automatically pruned. This prevents infinite loops on cyclic graphs without requiring manual "visited" lists, while still exploring every distinct simple path. Structural recursion (such as list processing with C<append> or C<member>) is unaffected because recursive calls operate on progressively smaller substructures.
+
+=item 2. B<Subgoal Tabling / Answer Memoization (C<table>)>
+
+Declaring a predicate as I<tabled> instructs the engine to memoize unique answers for each subgoal call signature and evaluate recursive dependencies to a least fixpoint. Tabling provides three main benefits:
+
+=over 4
+
+=item *
+
+B<Left-Recursion Support:> Rules such as C<reachable($x, $z) :- reachable($x, $y), edge($y, $z)> terminate cleanly instead of recursing infinitely.
+
+=item *
+
+B<Answer Deduplication:> On diamond-shaped or cyclic graphs where multiple paths lead to the same conclusion, a tabled predicate yields each unique answer only once.
+
+=item *
+
+B<Dynamic Programming Performance:> Repeated subgoals within a query reuse cached answers instead of recomputing derivations.
+
+=back
+
+=back
+
+Use the C<table> keyword inside a C<logic> block to enable tabling for one or more predicates by C<name/arity> (or C<name/*> for all arities):
+
+	logic Network {
+		table reachable/2;
+
+		facts {
+			edge('A', 'B');
+			edge('B', 'C');
+			edge('C', 'A');    # cycle
+			edge('C', 'D');
+		}
+
+		rule reachable($x, $y) {
+			edge($x, $y);
+		}
+
+		# Left-recursive rule over a cyclic graph
+		rule reachable($x, $z) {
+			fresh my $y;
+			reachable($x, $y);
+			edge($y, $z);
+		}
+	}
+
+	my $q;
+	query Network::reachable('A', fresh my $node) -> $q;
+	my @nodes = $q->all_values($node);    # ('A', 'B', 'C', 'D')
+
+See C<tabling_and_cycles.pl> in the examples.
+
 =head2 Guards
 
 Use C<guard> to run Perl code inside a logic rule. For example:-
@@ -468,6 +537,11 @@ Inside any package declared with C<logic PackageName { ... }>, a package variabl
 	
 	# retract a fact by its specific clause id
 	$AccessControl::PROGRAM->retract_clause($clause_id);
+
+	# enable, check, or disable subgoal tabling at runtime
+	$AccessControl::PROGRAM->table('reachable/2');
+	my $is_tabled = $AccessControl::PROGRAM->is_tabled('reachable/2');
+	$AccessControl::PROGRAM->untable('reachable/2');
 	
 When a query iterator is created, it operates on an immutable snapshot of the program version at that moment, meaning that assertions or retractions made mid-query will not affect running queries.
 	
@@ -607,7 +681,7 @@ Matt Johnson <mjohnson@affectivesilicon.com>
 
 =head1 AI
 
-This module was developed with assistance from various AI/LLM, specifically ChatGPT 5.5 and Gemini Flash 3.5/3.6.
+This module was developed with assistance from various AI/LLM, specifically ChatGPT 5.5 and Gemini Flash 3.5/3.6/3.8.
 
 =head1 BUGS
 

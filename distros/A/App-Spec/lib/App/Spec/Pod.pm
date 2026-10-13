@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package App::Spec::Pod;
 
-our $VERSION = 'v0.15.0'; # VERSION
+our $VERSION = 'v0.17.0'; # VERSION
 
 use Moo;
 
@@ -52,6 +52,10 @@ $option_string
 @{[ join '', @subcmd_pod ]}
 EOM
 
+    if ($pod =~ m/[^\x00-\x7F]/) {
+        $pod = "=encoding utf-8\n\n$pod";
+    }
+    return $pod;
 }
 
 sub subcommand_pod {

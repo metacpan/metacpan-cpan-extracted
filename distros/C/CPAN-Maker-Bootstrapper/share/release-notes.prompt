@@ -1,0 +1,51 @@
+- Produce release notes in Markdown format for this Perl CPAN
+  distribution release.
+- Wrap prose at 72 columns.
+- Review all supplied release artifacts, including the ChangeLog,
+  release status, diffs, file list, and draft release tarball.
+- Treat the draft release tarball as authoritative for the final
+  implementation.
+- Use the release status to identify added, modified, renamed, and
+  deleted files.
+- Use the diffs to understand what changed from the previous release.
+- Use the ChangeLog as a technical accounting of the release, but do
+  not simply restate or reorganize its entries.
+- Summarize the important user-visible and developer-visible changes
+  rather than repeat implementation details from the ChangeLog.
+- Identify the major themes of the release and organize the release
+  notes around those themes.
+- Give particular attention to:
+  - new commands, options, roles, files, and capabilities;
+  - behavioral changes;
+  - build and release workflow changes;
+  - performance improvements;
+  - dependency or compatibility changes;
+  - changes that affect existing projects or require user action.
+- Distinguish substantial features and behavioral changes from
+  internal refactoring or implementation cleanup.
+- Include implementation details only when they help explain a
+  user-visible behavior, compatibility consideration, or important
+  architectural change.
+- Do not use marketing language or exaggerate the significance of a
+  change. Write for experienced Perl developers and maintainers.
+- Do not invent motivations, benefits, compatibility implications, or
+  behavior that are not supported by the supplied artifacts.
+- Before reporting a ChangeLog omission or inconsistency, explicitly
+  verify that the behavior, file, or change is not already represented
+  elsewhere in the ChangeLog, including under a related build-system
+  or grouped entry.
+- Do not treat differences between .status, .lst, .diffs, and the
+  release tarball as inconsistencies unless the difference contradicts
+  the documented purpose and scope of those artifacts.
+- Note any inconsistencies, omissions, or apparent errors in the
+  ChangeLog separately after the proposed release notes; do not fold
+  those observations into the release notes themselves.
+- If a new substantive file or capability appears in the release
+  status or final tarball but is missing or understated in the
+  ChangeLog, call that out in the ChangeLog review.
+- Preserve relevant command names, option names, Make targets, module
+  names, and configuration keys exactly.
+- Prefer concise explanations of why a change matters over exhaustive
+  lists of files or methods changed.
+- End with a single-sentence commit message describing the overall
+  theme of the release.

@@ -81,7 +81,7 @@ WriteMakefile(
       'provides'=>{
                       'CPAN::Maker::Bootstrapper'=>{
                                                        'file'=>'lib/CPAN/Maker/Bootstrapper.pm',
-                                                       'version'=>'2.4.1'
+                                                       'version'=>'2.5.0'
                                                      },
                       'CPAN::Maker::Bootstrapper::ConfigReader'=>{
                                                                      'file'=>'lib/CPAN/Maker/Bootstrapper/ConfigReader.pm',
@@ -121,22 +121,30 @@ WriteMakefile(
                                                                      },
                       'CPAN::Maker::Bootstrapper::Role::ExtraFiles'=>{
                                                                          'file'=>'lib/CPAN/Maker/Bootstrapper/Role/ExtraFiles.pm',
-                                                                         'version'=>'2.4.1'
+                                                                         'version'=>'2.5.0'
                                                                        },
                       'CPAN::Maker::Bootstrapper::Role::Filter'=>{
                                                                      'file'=>'lib/CPAN/Maker/Bootstrapper/Role/Filter.pm',
                                                                      'version'=>'undef'
                                                                    },
+                      'CPAN::Maker::Bootstrapper::Role::Importer'=>{
+                                                                       'file'=>'lib/CPAN/Maker/Bootstrapper/Role/Importer.pm',
+                                                                       'version'=>'2.5.0'
+                                                                     },
                       'CPAN::Maker::Bootstrapper::Role::Init'=>{
                                                                    'file'=>'lib/CPAN/Maker/Bootstrapper/Role/Init.pm',
                                                                    'version'=>'undef'
                                                                  },
                       'CPAN::Maker::Bootstrapper::Role::Installer'=>{
                                                                         'file'=>'lib/CPAN/Maker/Bootstrapper/Role/Installer.pm',
-                                                                        'version'=>'2.4.1'
+                                                                        'version'=>'2.5.0'
                                                                       },
                       'CPAN::Maker::Bootstrapper::Role::LLM::Annotator'=>{
                                                                              'file'=>'lib/CPAN/Maker/Bootstrapper/Role/LLM/Annotator.pm',
+                                                                             'version'=>'undef'
+                                                                           },
+                      'CPAN::Maker::Bootstrapper::Role::LLM::ChangeLog'=>{
+                                                                             'file'=>'lib/CPAN/Maker/Bootstrapper/Role/LLM/ChangeLog.pm',
                                                                              'version'=>'undef'
                                                                            },
                       'CPAN::Maker::Bootstrapper::Role::LLM::Models'=>{

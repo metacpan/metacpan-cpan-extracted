@@ -1,0 +1,139 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Crypt::Age::Simple::Common - Helper functions for Crypt::Age::Simple
+
+
+=head1 SYNOPSIS
+
+   use Crypt::Age::Simple::Common qw< :constants :misc :scrypt :x25519 >;
+
+
+=head1 DESCRIPTION
+
+This module provides helper functions for other modules across the
+distribution.
+
+=head1 INTERFACE
+
+The interface is function-oriented. Functions can be imported by name or
+in groups, like C<:constants> or C<:misc>.
+
+=head2 Constants
+
+The following functions belong to group C<:constants>.
+
+=over
+
+=item C<< CHUNK_SIZE >>
+
+=item C<< NONCE_SIZE >>
+
+=item C<< SCRYPT_SALT_PREFIX >>
+
+=item C<< TAG_SIZE >>
+
+=item C<< VERSION_LINE >>
+
+=back
+
+
+=head2 scrypt
+
+=over
+
+=item C<< age_scrypt_decrypter >>
+
+L<Crypt::Age::Simple::Decrypt> constructor aimed at scrypt.
+
+=item C<< age_scrypt_encrypter >>
+
+L<Crypt::Age::Simple::Encrypt> constructor aimed at scrypt.
+
+=item C<< age_scrypt_unwrap_file_key >>
+
+   my $file_key = age_scrypt_unwrap_file_key($stanza, $password);
+
+=item C<< age_scrypt_wrap_key >>
+
+   my $key = age_scrypt_wrap_key($password, $salt, $Nlog2);
+
+C<$Nlog2> is the base-2 logarithm of the scrypt work factor.
+
+=back
+
+=head2 x25519
+
+=over
+
+=item C<< age_x25519_decrypter >>
+
+L<Crypt::Age::Simple::Decrypt> constructor aimed at X25519.
+
+=item C<< age_x25519_encrypter >>
+
+L<Crypt::Age::Simple::Encrypt> constructor aimed at X25519.
+
+=back
+
+=head2 Miscellanea
+
+=over
+
+=item C<< age_base64_multiline >>
+
+Base-64 without padding and with lines no longer than 64 characters.
+
+=item C<< age_primitives_make_nonce >>
+
+=item C<< buffer >>
+
+Wrapper around L<Crypt::Age::Simple::Buffer>.
+
+=back
+
+=head1 BUGS AND LIMITATIONS
+
+Minimum perl version 5.24.
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<CryptX>
+
+=item * L<Crypt::Age>
+
+=item * L<Crypt::Age::Simple>
+
+=back
+
+
+=head1 AUTHOR
+
+Flavio Poletti <flavio@polettix.it>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2026 by Flavio Poletti <flavio@polettix.it>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+=cut

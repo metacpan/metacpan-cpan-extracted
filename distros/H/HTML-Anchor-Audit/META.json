@@ -1,0 +1,71 @@
+{
+   "abstract" : "offline, source-located diagnostics for HTML fragment links",
+   "author" : [
+      "Nedal Shabaan"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "HTML-Anchor-Audit",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "t",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Encode" : "0",
+            "Exporter" : "0",
+            "Getopt::Long" : "0",
+            "HTML::Parser" : "3.72",
+            "JSON::PP" : "0",
+            "Unicode::Normalize" : "0",
+            "perl" : "5.016"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "IPC::Open3" : "0",
+            "Pod::Checker" : "0",
+            "Symbol" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/nedal-dev/html-anchor-audit/issues"
+      },
+      "homepage" : "https://idraaak.com/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/nedal-dev/html-anchor-audit.git",
+         "web" : "https://github.com/nedal-dev/html-anchor-audit"
+      }
+   },
+   "version" : "0.001",
+   "x_serialization_backend" : "JSON::PP version 4.18"
+}

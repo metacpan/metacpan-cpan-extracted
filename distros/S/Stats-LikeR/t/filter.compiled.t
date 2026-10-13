@@ -15,8 +15,10 @@ use Stats::LikeR;
 use Test::More;
 use Test::LeakTrace 'no_leaks_ok';
 
-# the same predicate with its plan removed: forces the closure path
-sub noplan { bless { code => $_[0]{code} }, 'Stats::LikeR::col' }
+# the same predicate with its plan removed: forces the closure path.  {cols}
+# stays, so the closure path checks the frame's columns just as the compiled
+# one does.
+sub noplan { bless { code => $_[0]{code}, cols => $_[0]{cols} }, 'Stats::LikeR::col' }
 
 sub both_ways {
 	my ($frame, $pred, $name, @opts) = @_;
@@ -65,8 +67,6 @@ my @preds = (
 	[ 'not'			 => !(col('x') > 0) ],
 	[ 'nested'		 => (!(col('n') > 3) | (col('tag') eq 'A')) & (col('x') != 0) ],
 	[ 'same column twice' => (col('x') > 0) & (col('x') < 5) ],
-	[ 'unknown column'	  => col('nope') > 0 ],
-	[ 'unknown column !=' => col('nope') ne 'x' ],
 	[ 'keeps nothing'	  => col('n') > 1000 ],
 	[ 'keeps everything'  => col('n') > -1 ],
 );
@@ -88,7 +88,14 @@ is_deeply(filter($hoa, col('x') > 0)->{n}, [ 1, 3, 5, 9 ],
 	"numeric: undef, the empty string, words and '0 but true' never match");
 is_deeply(filter($hoa, col('tag') eq 'b')->{n}, [ 1, 11 ], 'string eq is case sensitive');
 is_deeply(filter($hoa, 2.5 >= col('x'))->{n}, [ 2, 4, 5, 10, 11 ], 'swapped operand');
-is_deeply(filter($hoa, col('nope') > 0)->{n}, [], 'a column the frame does not have keeps nothing');
+# a column the frame does not have dies, both ways, rather than keeping nothing
+# (t/filter.regressions.t has the rest of that)
+for my $pred (col('nope') > 0, noplan(col('nope') > 0), !(col('nope') ne 'x')) {
+	for my $f ([ HoA => $hoa ], [ AoH => $aoh ], [ HoH => $hoh ]) {
+		eval { filter($f->[1], $pred) };
+		like($@, qr/^filter: column 'nope' not found in data/, "$f->[0]: an unknown column dies");
+	}
+}
 
 # a plan is only built for what C reproduces exactly; the rest still works
 {

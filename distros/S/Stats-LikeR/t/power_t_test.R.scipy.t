@@ -443,15 +443,18 @@ for my $t (
 		$two->{power}, 1e-15, 'type/alternative/sd/sig_level defaults');
 }
 
-# 'greater' and 'less' are LikeR extensions; R's power.t.test
-# rejects them, but both mean a one-sided test
+# 'greater' and 'less' are LikeR extensions; R's power.t.test rejects them.
+# 'greater' is R's one.sided (H1: delta > 0); 'less' is H1: delta < 0, so its
+# power at delta is one.sided's at -delta.  This used to require 'less' to
+# equal one.sided at the same delta, which pinned the bug in place.
 {
 	my %base = (n => 30, delta => 0.5, sd => 1, sig_level => 0.05, power => undef);
-	my $one_sided = power_t_test(%base, alternative => 'one.sided')->{power};
-	for my $alt ('greater', 'less') {
-		is_rel(power_t_test(%base, alternative => $alt)->{power}, $one_sided,
-			1e-15, "alternative => '$alt' is one-sided");
-	}
+	is_rel(power_t_test(%base, alternative => 'greater')->{power},
+		power_t_test(%base, alternative => 'one.sided')->{power},
+		1e-15, "alternative => 'greater' is one.sided");
+	is_rel(power_t_test(%base, alternative => 'less')->{power},
+		power_t_test(%base, delta => -0.5, alternative => 'one.sided')->{power},
+		1e-15, "alternative => 'less' is one.sided at -delta");
 }
 
 # a two-sided delta is used as |delta|; a one-sided delta is not
@@ -599,5 +602,38 @@ unless ($INC{'Devel/Cover.pm'}) {
 		eval { power_t_test(power => 0.2, delta => 5, n => undef) };
 	} 'no leaks on the croak paths';
 }
+
+# alternative => 'greater' and 'less'.  R's power.t.test() has neither -- its
+# alternative is "two.sided" or "one.sided", the latter meaning H1: delta > 0.
+# 'greater' is that same test.  'less' is H1: delta < 0, whose power at delta
+# is the one-sided power at -delta, so every one-sided row of the table above
+# is checked again as 'less' with delta's sign flipped, against the same scipy
+# value; where delta is what is solved for, it has to come back negated.  Up
+# to 0.3217 'less' was computed as 'greater': n => 20, delta => 1 gave 0.9279.
+for my $c (grep { $_->{alternative} eq 'one.sided' } @cases) {
+	for my $alt (qw(greater less)) {
+		my $flip = $alt eq 'less' ? -1 : 1;
+		my %args = (type => $c->{type}, alternative => $alt, ($c->{strict} ? (strict => 1) : ()));
+		$args{$_} = $c->{$_} for grep { defined $c->{$_} } qw(n delta sd sig_level power);
+		$args{delta} = $flip * $args{delta} if defined $args{delta};
+		$args{ $c->{solve} } = undef;
+		my $label = join ' ', "solve=$c->{solve}", $c->{type}, $alt, ($c->{strict} ? 'strict' : ()),
+			map { "$_=$args{$_}" } grep { defined $args{$_} } qw(n delta sd sig_level power);
+		my $got = power_t_test(%args);
+		my $want = $c->{solve} eq 'delta' ? $flip * $c->{want} : $c->{want};
+		is_rel($got->{ $c->{solve} }, $want, $EPS_SCIPY, "scipy, mirrored: $label");
+		is($got->{alternative}, $alt, "$label: alternative echoed");
+	}
+}
+
+# The case TODO.md recorded, at a power small enough that R's own pnt() is off:
+# R 4.6.1 gives 1.0041181467412841e-06 for power.t.test(n = 20, delta = -1,
+# alternative = "one.sided"), 3.2e-8 relative from the value below, which is
+# mpmath 1.3.0 at mp.dps = 40 integrating P(Z + ncp > t_crit sqrt(V/nu)) over Z
+# with the regularised incomplete gamma for V, at t_crit = scipy 1.18.0's
+# t.isf(0.05, 38) and ncp = -sqrt(10).  scipy's nct.sf gives
+# 1.0041181143634293e-06, 3.7e-11 from it.
+is_rel(power_t_test(n => 20, delta => 1, alternative => 'less')->{power},
+	1.004118114325838652e-06, 1e-12, "'less' at n = 20, delta = 1: about 1e-6, not 0.9279");
 
 done_testing();

@@ -3,7 +3,7 @@ package Music::NWC2MusicXML::Event;
 use strict;
 use warnings;
 
-our $VERSION = '0.002.0';
+our $VERSION = '0.002.1';
 
 use Carp qw(croak carp);
 use Readonly;

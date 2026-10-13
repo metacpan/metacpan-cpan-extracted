@@ -1,7 +1,7 @@
 {
    "abstract" : "Perl access to Berkeley DB 1.x",
    "author" : [
-      "Paul Marquess <pmqs@cpan.org>"
+      "Paul Marquess <pmqs@outlook.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
@@ -43,6 +43,6 @@
          "web" : "https://github.com/pmqs/DB_File"
       }
    },
-   "version" : "1.860",
+   "version" : "1.861",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

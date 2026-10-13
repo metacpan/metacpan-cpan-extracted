@@ -5,6 +5,7 @@ build-init.mk
 builder
 builder.env
 builder.mk
+change-log.mk
 git.mk
 gitignore
 help.mk

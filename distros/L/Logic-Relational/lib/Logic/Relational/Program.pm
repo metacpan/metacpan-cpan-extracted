@@ -65,6 +65,19 @@ Creates and returns a C<Logic::Relational::Query> snapshot query object.
 Executes a coderef atomically. If the block throws an exception, all changes are
 rolled back.
 
+=head2 table
+
+Marks a predicate (by name and optional arity, or C<'name/arity'>) for subgoal
+tabling and answer memoization during queries.
+
+=head2 untable
+
+Removes tabling for the specified predicate.
+
+=head2 is_tabled
+
+Returns true if the predicate with the given name and arity is tabled.
+
 =cut
 
 sub new ($class) {
@@ -72,6 +85,7 @@ sub new ($class) {
         predicates         => {},
         active_predicates  => {},
         generators         => {},
+        tabled             => {},
         on_expire_handlers => {},
         version            => 1,
         next_clause_id     => 1,
@@ -679,4 +693,47 @@ sub load_snapshot ( $self, $source, %options ) {    ## no critic (Subroutines::P
     return $loaded_count;
 }
 
+sub table ( $self, $name, $arity = undef ) {
+    if ( $name =~ m{\A([a-zA-Z_]\w*)/(\d+|\*)\z}x ) {
+        ( $name, $arity ) = ( $1, $2 );
+    }
+    my $key = defined $arity ? "$name/$arity" : "$name/*";
+    $self->{tabled}{$key} = 1;
+    return $key;
+}
+
+sub untable ( $self, $name, $arity = undef ) {
+    if ( $name =~ m{\A([a-zA-Z_]\w*)/(\d+|\*)\z}x ) {
+        ( $name, $arity ) = ( $1, $2 );
+    }
+    if ( defined $arity ) {
+        delete $self->{tabled}{"$name/$arity"};
+    }
+    else {
+        delete $self->{tabled}{"$name/*"};
+        for my $k ( keys %{ $self->{tabled} } ) {
+            delete $self->{tabled}{$k} if $k =~ m{\A\Q$name\E/}x;
+        }
+    }
+    return 1;
+}
+
+sub is_tabled ( $self, $name, $arity = undef ) {
+    if ( $name =~ m{\A([a-zA-Z_]\w*)/(\d+|\*)\z}x ) {
+        ( $name, $arity ) = ( $1, $2 );
+    }
+    if ( defined $arity ) {
+        return 1
+          if $self->{tabled}{"$name/$arity"} || $self->{tabled}{"$name/*"};
+    }
+    else {
+        return 1 if $self->{tabled}{"$name/*"};
+        for my $k ( keys %{ $self->{tabled} } ) {
+            return 1 if $k =~ m{\A\Q$name\E/}x;
+        }
+    }
+    return 0;
+}
+
 1;
+

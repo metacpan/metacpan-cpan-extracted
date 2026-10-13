@@ -42,15 +42,18 @@ use Stats::LikeR qw(friedman_test mcnemar_test prop_test cmh_test);
 #
 # TOLERANCE
 # ---------
-# One limit for everything here, because every quantity in the table came out
-# at much the same accuracy: over all 274 comparisons the worst relative
-# disagreement with R measured on a double build is 1.24e-14, on the
-# mantelhaen.test common-odds-ratio interval for UCBAdmissions (the interval is
-# built through a normal quantile, so it is the one quantity here not read
-# straight off the counts).  Statistics and p-values sit at 1e-16.  The limit
-# leaves that worst case a factor of ~800, which is ample for long-double and
-# quadmath, and is still tight enough that any real change in these functions
-# fails here.  Do not widen it to make a failure go away.
+# One limit for everything here.  Up to 0.3216 every quantity in the table came
+# out at much the same accuracy: the worst relative disagreement with R on a
+# double build was 1.24e-14, on the mantelhaen.test common-odds-ratio interval
+# for UCBAdmissions (built through a normal quantile, so the one quantity not
+# read straight off the counts), and statistics and p-values sat at 1e-16.
+# 0.3217's rows reach further into the tail: prop.test(999, 1000, alternative =
+# "greater") has p = 1.8e-218, which prop_test() takes from erfc() where R
+# takes it from pnorm(), and the two agree there to 1.42e-13 -- now the worst
+# of the table's comparisons.  The limit leaves that a factor of ~70, which is
+# ample for long-double and quadmath, and is still tight enough that any real
+# change in these functions fails here.  Do not widen it to make a failure go
+# away.
 my $TOL = 1e-11;
 
 # Reading the layout conversions below:
@@ -151,6 +154,18 @@ my %CASE = (
 	'mh.ucb.cl90'       => sub { with_est(cmh_test(\@UCB, 'conf_level' => 0.9)) },
 	'mh.doc3.corr'      => sub { with_est(cmh_test(\@DOC3)) },
 	'mh.doc3.nocorr'    => sub { with_est(cmh_test(\@DOC3, correct => 0)) },
+	# ---- added in 0.3217; see the generator for what each one caught ----
+	'mh.yates.small'    => sub { with_est(cmh_test([[2,3,3,4],[3,2,2,3]])) },
+	'mh.v0'             => sub { with_est(cmh_test([[5,0,0,0],[3,0,0,0]])) },
+	'mh.s0'             => sub { with_est(cmh_test([ acbd_to_abcd(5,3,0,4), acbd_to_abcd(3,2,0,3) ])) },
+	'mcnemar.zero.discordant'      => sub { htest3(mcnemar_test([[5,0],[0,5]])) },
+	'mcnemar.paired.dropped.level' => sub {
+		htest3(mcnemar_test([qw(a b a b a b a a c)], [qw(b a a b b b a a), undef]))
+	},
+	'prop.1s.999.1000.greater'  => sub { with_est(prop_test(999, 1000, alternative => 'greater')) },
+	'prop.2s.90.10.greater'     => sub { with_est(prop_test([90, 10], [100, 100], alternative => 'greater')) },
+	'prop.1s.90.100.p5.greater' => sub { with_est(prop_test(90, 100, p => 0.5, alternative => 'greater')) },
+	'prop.na.dropped'           => sub { with_est(prop_test([83, undef, 90], [100, 100, 100])) },
 );
 
 # The alternative/correct sweeps, built the same way the generator built them.
@@ -180,6 +195,11 @@ sub check_row {
 		my ($e, $g) = ($exp->[$i], $got->[$i]);
 		if ($e eq 'NaN') {
 			ok(!defined $g || $g != $g, "$label\[$i]: NaN, as in R");
+			next;
+		}
+		if ($e eq 'Inf' || $e eq '-Inf') {
+			my $inf = ($e eq 'Inf' ? 1 : -1) * 9**9**9;
+			ok(defined $g && $g == $inf, "$label\[$i]: $e, as in R") or diag("got " . ($g // 'undef'));
 			next;
 		}
 		if (!defined $g) { fail("$label\[$i]: got undef, expected $e"); next }
@@ -296,3 +316,13 @@ mh.ucb.nocorr	1.5246066604434356,1,0.21692369705551837,0.90469682825862308,0.771
 mh.ucb.cl90	1.4269462285866883,1,0.23226346281704827,0.90469682825862308,0.79186030159854326,1.0336120517835519
 mh.doc3.corr	13.199697886817921,1,0.00027999424986994249,4.7735261124267723,2.0969889496845999,10.866319323927524
 mh.doc3.nocorr	14.631044964163097,1,0.00013074294965583619,4.7735261124267723,2.0969889496845999,10.866319323927524
+# added in 0.3217: the TODO.md bugs of 2026-10-12 (see the generator)
+mh.yates.small	0.11827956989247304,1,0.73090797741365199,1.3623188405797102,0.2514392522964185,7.3811571043431767
+mh.v0	NaN,1,NaN,NaN,NaN,NaN
+mh.s0	4.3427799011839276,1,0.037166193292614912,Inf,NaN,NaN
+mcnemar.zero.discordant	NaN,1,NaN
+mcnemar.paired.dropped.level	0,1,1
+prop.1s.999.1000.greater	994.00900000000001,1,1.8008073636049508e-218,0.999,0.99473614122297871,1
+prop.2s.90.10.greater	124.81999999999999,1,2.7863590284763113e-29,0.90000000000000002,0.10000000000000001,0.72021477077939966,1
+prop.1s.90.100.p5.greater	62.409999999999997,1,1.3945171466592746e-15,0.90000000000000002,0.83376324710314409,1
+prop.na.dropped	1.5414258188824661,1,0.21440569960546541,0.82999999999999996,0.90000000000000002,-0.1742210769128868,0.034221076912886686

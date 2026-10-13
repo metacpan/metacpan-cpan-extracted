@@ -1,0 +1,233 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Crypt::Age::Simple::Encrypt - Streaming encrypter for Crypt::Age::Simple
+
+
+=head1 SYNOPSIS
+
+   use Crypt::Age::Simple::Encrypt;
+
+   # initialize with scrypt of X25519 "recipients"
+   my $encrypter = Crypt::Age::Simple::Encrypt->new(
+      recipients => { scrypt => $password },
+   );
+   my $encrypter = Crypt::Age::Simple::Encrypt->new(
+      recipients => {
+         scrypt => { password => $password, work_factor => 20},
+      },
+   );
+   my $encrypter = Crypt::Age::Simple::Encrypt->new(
+      recipients => { X25519 => $recipient_s },
+   );
+
+   # you can give data in as a plain scalar
+   $encrypter->pump($some_plaintext_as_string);
+
+   # data out is in an array of references to scalars
+   my $aref = $encrypter->get_chunks;
+   my $age_data = join '', { $$_ } $aref->@*;
+
+   # pump() works with scalar reference too, for minimal copying around
+   $encrypter->pump(\$some_plaintext_as_reference);
+
+   # finish() marks the end of the ciphertext so that the last chunks
+   # can also be properly decrypted
+   $encrypter->finish;
+
+   # again, get_chunks gives back an array of scalar references
+   $age_data .= join '', { $$_ } $encrypter->get_chunks->@*;
+
+
+=head1 DESCRIPTION
+
+This module provides a streaming interface for age encryption (see
+L<age|https://age-encryption.org/>).
+
+=head1 INTERFACE
+
+The interface is object-oriented. A typical usage is like this:
+
+=over
+
+=item *
+
+Create an object instance via L</new>.
+
+=item *
+
+Alternate L</pump> and L</get_chunks>.
+
+=item *
+
+Call L</finish> and then L</get_chunks> one last time.
+
+=back
+
+Methods:
+
+=begin hide
+
+=head2 B<< BUILDARGS >>
+
+Not really a sub part of the public interface.
+
+=end hide
+
+=head2 B<< finish >>
+
+   $obj->finish;
+
+Mark the data provision as completed, i.e. no more L</pump>. It is
+I<necessary> to call this method in order to get the final chunk from
+L</get_chunks>.
+
+=head2 B<< recipients >>
+
+   my $rec = $self->recipients;
+
+The recipients to use for encryption (technically, to wrap the file
+key).
+
+Accepts:
+
+=over
+
+=item *
+
+Code reference. It is called with the randomly generated C<$file_key>
+and it is supposed to provide back a reference to a scalar holding the
+whole header section of the age data (this does I<not> inlcude the
+nonce for the binary data section).
+
+=item *
+
+Array reference (assumes C<X25519>), holding a list of recipients (public
+keys).
+
+=item *
+
+Plain scalar (assumes C<scrypt>), holding a password.
+
+=item *
+
+Hash reference. It is assumed to only hold a key/value pair, the key being
+the I<type>. Currently supported: C<scrypt>, C<X25519>, C<x25519>. The
+value holds the corresponding input value.
+
+=back
+
+For the C<scrypt> type, the value provided can either be the password,
+or a reference to a hash holding two possible keys: C<password> and
+C<work_factor>. The latter represents the work factor as a base-2
+logarithm (e.g. value C<18> represents a scrypt work factor of C<2^18>).
+
+=head2 B<< is_complete >>
+
+   my $bool = $obj->is_complete;
+
+Boolean value representing whether the encryption is complete or if it
+still has data to extract.
+
+=head2 B<< is_error >>
+
+   my $bool = $obj->is_error;
+
+Boolean value representing if the object is in a state of error, e.g. for
+bad parsing or unmatched identities.
+
+=head2 B<< new >>
+
+   my $obj = Crypt::Age::Simple::Encrypt->new($recipients); # OR
+   my $obj = Crypt::Age::Simple::Encrypt->new(\%args); # OR
+   my $obj = Crypt::Age::Simple::Encrypt->new(%args); # OR
+   my $obj = Crypt::Age::Simple::Encrypt->new($recipients, %args);
+
+Constructor.
+
+Arguments can be passed as a hash reference or a list of key/value pairs.
+If the list of arguments holds an odd number of elements, the first is
+considered associated to the C<recipients> key.
+
+The following keys are valid:
+
+=over
+
+=item *
+
+C<recipients> the recipient(s) used to wrap the file key, see
+L</recipients>. This argument is I<required>.
+
+=back
+
+=head2 B<< get_chunks >>
+
+   my $aref = $obj->get_chunks; # OR
+   my $aref = $obj->get_chunks($n);
+
+Get at most C<$n> available chunks of age data, or all of them if
+C<$n> is missing or otherwise false.
+
+Dies if the object is in a state of error.
+
+Returns an array reference holding scalar references, pointing to the
+decrypted data.
+
+=head2 B<< pump >>
+
+   $obj->pump($scalar); # OR
+   $obj->pump(\$scalar); # OR
+   $obj->pump(\@array_of_scalar_refs);
+
+Add data to the object. Depending on what you have, you can pass it as
+scalar, ref to scalar, or ref to an array holding scalar refs.
+
+After passing the final part of the data make sure to call L</finish> or
+L</get_chunks> will never give you back the last chunk of decrypted
+plaintext.
+
+=head1 BUGS AND LIMITATIONS
+
+Minimum perl version 5.24.
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<CryptX>
+
+=item * L<Crypt::Age>
+
+=item * L<Crypt::Age::Simple>
+
+=back
+
+
+=head1 AUTHOR
+
+Flavio Poletti <flavio@polettix.it>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2026 by Flavio Poletti <flavio@polettix.it>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+=cut

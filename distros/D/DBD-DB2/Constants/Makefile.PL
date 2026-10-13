@@ -76,7 +76,8 @@ if( $os eq "hpux" )
 }
 elsif( $os eq "aix" )
 {
-  $opts{DEFINE} .= ' -qcpluscmt';
+  # -qcpluscmt is XLC-only; GCC rejects it
+  $opts{DEFINE} .= ' -qcpluscmt' if $Config{cc} !~ /gcc/i && !($Config{gccversion});
 }
 elsif( $os eq "solaris" )
 {

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Perl;
 
-our $VERSION = 'v0.42.0'; # VERSION
+our $VERSION = 'v0.43.0'; # VERSION
 
 use Exporter 'import';
 use base 'YAML::PP';

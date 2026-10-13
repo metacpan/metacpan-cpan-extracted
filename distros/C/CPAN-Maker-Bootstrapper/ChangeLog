@@ -1,3 +1,63 @@
+Mon Oct 12 06:14:03 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.5.0]:
+	* VERSION: bump
+	* README.md: generated
+	* release-notes.md: updated
+	* release-notes/release-notes-2.5.0.md: new
+	* .includes/change-log.mk: new
+	* .includes/release-notes.mk
+	(release-notes)
+	- add MODEL variable support; pass --model to cmb release-notes when set
+	* .includes/test.mk
+	- replace GSOURCE_FILES with SOURCE_FILES in test, test-all, and check targets
+	* .includes/update.mk
+	- define INCLUDES_DIR and BOOTSTRAPPER_DIST_DIR variables
+	* .prompts/change-log.prompt
+	- replace enumerated style rules with directive sections matching current prompt format
+	* MANIFEST: +change-log.mk
+	* Makefile
+	- add change-log.mk to MANAGED_MK_FILES
+	- make local/.installed an optional tarball prerequisite when SKIP_TESTS is set
+	- remove --log-level info from test-requires.scan scandeps invocation
+	- add DEPENDENCY_FILES, MISSING_DEPENDENCY_FILES, and force-reconcile phony target
+	- add missing dependency file check to grouped reconcile recipe prerequisite list
+	- check for missing target file (! -e "$$type") in reconcile loop condition in addition to stale .reconciled check
+	* buildspec.yml
+	(extra-files): +.includes/change-log.mk, .prompts/release-notes.prompt, .prompts/change-log.prompt
+	* cmb_md5sums.txt
+	- +.includes/change-log.mk
+	- update checksums for Makefile, .includes/release-notes.mk, .includes/test.mk, .includes/update.mk
+	* cpan-maker-bootstrapper.yml
+	- add change-log command mapped to CPAN::Maker::Bootstrapper::Role::LLM::ChangeLog
+	- add import command mapped to CPAN::Maker::Bootstrapper::Role::Importer
+	* deps.mk
+	- add ChangeLog dependency on Constants and Git::ReleaseDiffs
+	* lib/CPAN/Maker/Bootstrapper.pm.in
+	- POD updates
+	* lib/CPAN/Maker/Bootstrapper/Role/Importer.pm.in: new
+	* lib/CPAN/Maker/Bootstrapper/Role/Installer.pm.in
+	(cmd_install)
+	- delegate project construction to _import_project
+	(_import_project): new
+	- extracted from cmd_install; accepts module, stub, import_paths as named args
+	* lib/CPAN/Maker/Bootstrapper/Role/LLM/ChangeLog.pm.in: new
+	- implement change-log command; depends on Constants and Git::ReleaseDiffs
+	* lib/CPAN/Maker/Bootstrapper/Role/LLM/ReleaseNotes.pm.in
+	(_extract_changelog_section)
+	- convert from plain function to method (add $self as first arg)
+	(_strip_pod_from_content)
+	- rename from _strip_pod and convert to method
+	(cmd_release_notes)
+	- call _extract_changelog_section and _strip_pod_from_content as methods
+	- install release-notes.prompt via _install_prompts before use when absent
+	- consolidate dryrun guard around prompt construction into single block
+	* lib/CPAN/Maker/Bootstrapper/Role/LLM/Reviewer.pm.in
+	(_install_prompts)
+	- accept optional list of prompt names
+	- default to code-review.prompt and pod-review.prompt when none supplied
+	- iterate over prompt names directly rather than deriving from type list
+
 Thu Oct  8 17:08:00 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[2.4.1]:

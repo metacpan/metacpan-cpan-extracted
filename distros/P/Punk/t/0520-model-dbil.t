@@ -232,4 +232,33 @@ SKIP: {
     is($r->[0], 404, 'and a chain may still answer not_found');
 }
 
+# ---- await, after a callback that grew the stack -----------------------------
+# await pumps the loop, which runs whatever was chained on the future. Any of
+# that may grow perl's value stack, and growing it moves it: the stack pointer
+# the XSUB was entered with then points into freed memory.
+{
+    package T::Model::AwaitBook;
+    use Punk::Model;
+    table 'books';
+    field id    => { type => 'integer', primary => 1 };
+    field price => { type => 'integer' };
+    package main;
+
+    my $adir = File::Temp->newdir;
+    my $adsn = "dbi:SQLite:dbname=$adir/a.db";
+    DBI->connect($adsn, undef, undef, { RaiseError => 1 })
+       ->do('CREATE TABLE books (id INTEGER PRIMARY KEY, price INTEGER)');
+    my $am = T::Model::AwaitBook->_instantiate({
+        dsn => $adsn, workers => 1, backend => 'Punk::Model::DBIx::Loop',
+        attr => { PrintError => 0 } });
+    my $grow = sub { my $n = shift; return scalar(() = (1) x $n) };
+    for my $n (0, 1_000, 100_000) {
+        my $f = $am->search({});
+        my $g = $f->then(sub { $grow->($n); $_[0] });
+        my @r = eval { $am->backend->await($f) };
+        is($@, '', "await after a callback that pushed $n values does not panic");
+        is(ref $r[0], 'HASH', '...and returns the page');
+    }
+}
+
 done_testing();

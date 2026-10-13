@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.57';
+our $VERSION = '0.58';
 
 1;
 
@@ -108,10 +108,14 @@ and C<DELETE /orders> are different operations a client could reasonably
 key the same way.
 
 =item * B<The request itself.> The entry records a fingerprint - the
-method, the route and the body - and a retry whose fingerprint does not
-match gets a C<422>. A key reused with a different body is a client bug,
-and a silent replay is the worst possible answer to it: the client would
-believe its second, different order had succeeded when it never ran.
+method, the route, the path and query string as they were asked for, and
+the body - and a retry whose fingerprint does not match gets a C<422>. A
+key reused with a different body is a client bug, and a silent replay is
+the worst possible answer to it: the client would believe its second,
+different order had succeeded when it never ran. The same holds for a
+different resource: C</orders/7/cancel> and C</orders/8/cancel> are one
+declared route and two requests, and a key used for the first is refused
+for the second rather than answered with the first one's response.
 
 =back
 
@@ -172,7 +176,9 @@ L<Punk::Cache>'s single-flight lock is what makes that safe: the first
 execution holds it, and a concurrent retry waits and replays rather than
 executing in parallel. A retry that waits out the budget executes anyway
 - a stalled request is worse than a duplicated one, which is the rule
-C<compute> already follows.
+C<compute> already follows. The budget is L</lock_wait>, thirty seconds
+unless you say otherwise, and it is also how long the first request's lock
+is honoured: set it above the slowest handler a key protects.
 
 The plugin's keys B<cannot enter the memory tier>. A tier is a copy per
 worker, eventually consistent, and a tier that has not yet seen a write
@@ -206,6 +212,16 @@ Required, a coderef receiving the context. See above.
 Seconds an entry is replayable, default C<86400>. How long after a failed
 request will your client still retry is a business question, so this is
 an option rather than a constant.
+
+=item lock_wait
+
+Seconds, default C<30>. While a request is being handled, a second one with
+the same key waits this long for it to finish and then replays its answer;
+if the first is still running when the wait ends, the second runs too, since
+a stalled request is the worse failure. It is also how old the first
+request's lock may get before it is taken for abandoned. Set it above your
+slowest handler behind a key. It is the plugin's own: the cache store's
+C<lock_wait> is tuned for a cache and does not apply here. Must be positive.
 
 =item max_record
 

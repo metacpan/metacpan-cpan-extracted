@@ -38,7 +38,9 @@ sub expand ( $self, %args ) {
         program      => $program,
         goals        => [ $self->{inner_goal} ],
         predicates   => $predicates,
+        generators   => $args{generators} // {},
         substitution => $subst,
+        table_cache  => $state->table_cache,
     );
 
     if ( $inner_query->next ) {

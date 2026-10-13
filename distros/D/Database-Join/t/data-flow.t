@@ -272,8 +272,8 @@ subtest 'add_database: kills _col_cache (new columns included after re-derive)' 
 	my $r_after = $j->columns();
 	isnt refaddr($r_before), refaddr($r_after),
 		'col_cache invalidated by add_database';
-	ok (grep { $_ eq 'region' } @{$r_after}),
-		'new column present in re-derived columns list';
+	ok(grep({ $_ eq 'region' } @{$r_after}),
+		'new column present in re-derived columns list');
 };
 
 subtest 'add_database: kills _schema_cache' => sub {
@@ -687,8 +687,8 @@ subtest 'outer join: secondary-only key added to key-set via union' => sub {
 	);
 	my $rows = $j->selectall_arrayref();
 	is scalar @{$rows}, 2, 'outer join: 2 rows (union of key sets)';
-	ok (grep { $_->{entry} eq $K_C } @{$rows}),
-		'secondary-only key in outer-join result';
+	ok(grep({ $_->{entry} eq $K_C } @{$rows}),
+		'secondary-only key in outer-join result');
 };
 
 subtest 'had_criteria semantics: filtered secondary acts as inner regardless of join_type' => sub {
@@ -1535,8 +1535,8 @@ subtest '_validate_pagination D~K: negative limit undef\'d before splice (no tru
 	my @warnings;
 	local $SIG{__WARN__} = sub { push @warnings, @_ };
 	my $rows = $j->selectall_arrayref(limit => -1);
-	ok (grep { /limit/i } @warnings),
-		'carp emitted for negative limit (D confirmed, carp fired)';
+	ok(grep({ /limit/i } @warnings),
+		'carp emitted for negative limit (D confirmed, carp fired)');
 	is scalar @{$rows}, 2,
 		'all rows returned: invalid limit undef\'d (K before splice U)';
 };
@@ -1555,8 +1555,8 @@ subtest '_validate_pagination D~K: negative offset undef\'d before splice (no sk
 	my @warnings;
 	local $SIG{__WARN__} = sub { push @warnings, @_ };
 	my $rows = $j->selectall_arrayref(offset => -1);
-	ok (grep { /offset/i } @warnings),
-		'carp emitted for negative offset (D confirmed, carp fired)';
+	ok(grep({ /offset/i } @warnings),
+		'carp emitted for negative offset (D confirmed, carp fired)');
 	is scalar @{$rows}, 2, 'all rows from start: invalid offset undef\'d (K before splice U)';
 };
 

@@ -20,6 +20,11 @@ examples/bin/mysimpleapp
 examples/bin/nometa
 examples/bin/pcorelist
 examples/bin/subrepo
+examples/fish/myapp.fish
+examples/fish/mysimpleapp.fish
+examples/fish/nometa.fish
+examples/fish/pcorelist.fish
+examples/fish/subrepo.fish
 examples/html/myapp.html
 examples/html/mysimpleapp.html
 examples/html/nometa.html
@@ -44,6 +49,7 @@ lib/App/Spec.pm
 lib/App/Spec/Argument.pm
 lib/App/Spec/Completion.pm
 lib/App/Spec/Completion/Bash.pm
+lib/App/Spec/Completion/Fish.pm
 lib/App/Spec/Completion/Zsh.pm
 lib/App/Spec/Option.pm
 lib/App/Spec/Parameter.pm
@@ -65,12 +71,12 @@ lib/App/Spec/Subcommand.pm
 lib/App/Spec/Tutorial.pod
 share/schema.yaml
 t/00.compile.t
-t/00.load.t
 t/11.appspecrun.t
 t/12.dsl.t
 t/13.argv.t
 t/14.disable-plugins.t
 t/15.generate-pod.t
+t/16.fish-completion.t
 t/data/11.completion.yaml
 t/data/11.invalid.yaml
 t/data/11.valid.yaml

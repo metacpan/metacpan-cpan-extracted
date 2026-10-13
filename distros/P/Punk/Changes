@@ -1,5 +1,29 @@
 Revision history for Punk
 
+0.58    2026-10-13
+        - SECURITY: an Idempotency-Key replayed one resource's response for
+          another. The path and query string are now part of what a key is
+          checked against, and a mismatch is the 422.
+        - FIX: `Punk::Model::DBIx::Loop->await` used a stale stack pointer
+          after a callback grew the stack.
+        - FIX: a sparse `order_by` arrayref crashed the worker.
+        - FIX: a `limit` at or past the integer maximum became a negative
+          LIMIT.
+        - FIX: a page ending on a NULL in an `order_by` column ended the
+          walk.
+        - FIX: a retry arriving after the cache store's `lock_wait` ran
+          beside the request it was retrying.
+        - FIX: an idempotent request that won the lock did not look again
+          for a recorded answer.
+        - FIX: reading an expired file cache entry could delete a fresh one.
+        - Add the Idempotency `lock_wait` option, default 30 seconds.
+        - `get` and `delete` croak on a key that is not a field.
+        - The pooled DBI handle has `AutoInactiveDestroy`.
+        - `$c->validate` holds at most 256 compiled schemas.
+        - FIX t/1041-stream-handle.t on Linux smokers: the h2 body is its
+          own probe, and drain is asked of a client that does not read.
+        - Requires Hyperman 0.59, which sends an HTTP/2 stream body whole.
+
 0.57    2026-10-12
         - SECURITY: an upload refused at `max_body` part way through left
           its temp file, its descriptor and its buffers behind.

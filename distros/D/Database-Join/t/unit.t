@@ -20,7 +20,7 @@ use Scalar::Util qw(blessed refaddr);
 BEGIN {
 	eval { require Database::Abstraction };
 	plan skip_all => 'Database::Abstraction required' if $@;
-	plan tests => 140;
+	plan tests => 154;
 	use_ok('Database::Join');
 }
 
@@ -218,6 +218,22 @@ my %LEDGER = (
 	'st:join_col_exempt'      => 1,  # join column itself is not checked
 	'st:prefixed_exempt'      => 1,  # collision_prefix columns are exempt
 	'st:add_db_emits_carp'    => 1,  # add_database also checks the new database
+
+	# aggregate() messages (§2.6 of Join.md)
+	'agg:error_aggregate_measures_required' => 1,
+	'agg:error_aggregate_measure_ref'       => 1,
+	'agg:error_aggregate_fn_unknown'        => 1,
+	'agg:error_aggregate_col_required'      => 1,
+	'agg:error_aggregate_col_unknown'       => 1,
+	'agg:error_aggregate_as_required'       => 1,
+	'agg:error_aggregate_as_invalid'        => 1,
+	'agg:error_aggregate_as_duplicate'      => 1,
+	'agg:error_aggregate_as_collision'      => 1,
+	'agg:error_aggregate_by_invalid'        => 1,
+	'agg:error_aggregate_having_key'        => 1,
+	'agg:error_aggregate_having_operator'   => 1,
+	'agg:warn_aggregate_sort_key'           => 1,
+	'agg:warn_aggregate_non_numeric'        => 1,
 );
 
 # ---------------------------------------------------------------------------
@@ -2336,6 +2352,191 @@ subtest 'parallel: 3-db join with parallel => 1 returns same results as sequenti
 	ok(defined $row->{name} && defined $row->{score} && defined $row->{tier},
 		'parallel 3-db join: merged row contains all three DA columns');
 	delete $LEDGER{'par:three_db_correct_results'};
+};
+
+# ===========================================================================
+# SECTION 23 -- aggregate() validation error messages (§2.6 of Join.md)
+# ===========================================================================
+
+subtest 'aggregate: error_aggregate_measures_required -- absent or non-arrayref measures' => sub {
+	plan tests => 2;
+	my $j = _two_db_join(backend => 'array');
+	throws_ok { $j->aggregate(by => ['entry']) }
+		qr/measures.*must be a non-empty arrayref/i,
+		'aggregate() croaks when measures is absent';
+	throws_ok { $j->aggregate(measures => []) }
+		qr/measures.*must be a non-empty arrayref/i,
+		'aggregate() croaks when measures is an empty arrayref';
+	delete $LEDGER{'agg:error_aggregate_measures_required'};
+};
+
+subtest 'aggregate: error_aggregate_measure_ref -- measure is not a hashref' => sub {
+	plan tests => 1;
+	my $j = _two_db_join(backend => 'array');
+	throws_ok { $j->aggregate(measures => ['not_a_hash']) }
+		qr/measure must be a hashref/i,
+		'aggregate() croaks when a measure element is not a hashref';
+	delete $LEDGER{'agg:error_aggregate_measure_ref'};
+};
+
+subtest 'aggregate: error_aggregate_fn_unknown -- unrecognised function name' => sub {
+	plan tests => 1;
+	my $j = _two_db_join(backend => 'array');
+	throws_ok { $j->aggregate(measures => [{ col => $COL_B, fn => 'median', as => 'x' }]) }
+		qr/unknown measure function/i,
+		'aggregate() croaks for an unknown fn value';
+	delete $LEDGER{'agg:error_aggregate_fn_unknown'};
+};
+
+subtest 'aggregate: error_aggregate_col_required -- col absent for non-count function' => sub {
+	plan tests => 1;
+	my $j = _two_db_join(backend => 'array');
+	throws_ok { $j->aggregate(measures => [{ fn => 'sum', as => 'total' }]) }
+		qr/measure column is required for function/i,
+		'aggregate() croaks when col is absent for sum';
+	delete $LEDGER{'agg:error_aggregate_col_required'};
+};
+
+subtest 'aggregate: error_aggregate_col_unknown -- col not in merged view' => sub {
+	plan tests => 1;
+	my $j = _two_db_join(backend => 'array');
+	throws_ok { $j->aggregate(measures => [{ col => 'nosuchcol', fn => 'sum', as => 'x' }]) }
+		qr/column.*is not in the merged view/i,
+		'aggregate() croaks when measure col is not a published column';
+	delete $LEDGER{'agg:error_aggregate_col_unknown'};
+};
+
+subtest 'aggregate: error_aggregate_as_required -- missing alias' => sub {
+	plan tests => 1;
+	my $j = _two_db_join(backend => 'array');
+	throws_ok { $j->aggregate(measures => [{ col => $COL_B, fn => 'sum' }]) }
+		qr/measure "as" is required/i,
+		'aggregate() croaks when as is absent';
+	delete $LEDGER{'agg:error_aggregate_as_required'};
+};
+
+subtest 'aggregate: error_aggregate_as_invalid -- alias contains non-word characters' => sub {
+	plan tests => 1;
+	my $j = _two_db_join(backend => 'array');
+	throws_ok { $j->aggregate(measures => [{ col => $COL_B, fn => 'sum', as => 'bad alias' }]) }
+		qr/measure alias.*must be a plain word/i,
+		'aggregate() croaks when as contains a space';
+	delete $LEDGER{'agg:error_aggregate_as_invalid'};
+};
+
+subtest 'aggregate: error_aggregate_as_duplicate -- repeated alias' => sub {
+	plan tests => 1;
+	my $j = _two_db_join(backend => 'array');
+	throws_ok {
+		$j->aggregate(measures => [
+			{ col => $COL_B, fn => 'sum',   as => 'total' },
+			{ fn => 'count',                as => 'total' },
+		])
+	} qr/duplicate measure alias/i,
+		'aggregate() croaks when two measures share the same alias';
+	delete $LEDGER{'agg:error_aggregate_as_duplicate'};
+};
+
+subtest 'aggregate: error_aggregate_as_collision -- alias matches a by column name' => sub {
+	plan tests => 1;
+	my $j = _two_db_join(backend => 'array');
+	throws_ok {
+		$j->aggregate(
+			by       => [$COL_A],
+			measures => [{ col => $COL_B, fn => 'sum', as => $COL_A }],
+		)
+	} qr/measure alias.*collides with a group-by column/i,
+		'aggregate() croaks when alias matches a by column';
+	delete $LEDGER{'agg:error_aggregate_as_collision'};
+};
+
+subtest 'aggregate: error_aggregate_by_invalid -- by is not an arrayref' => sub {
+	plan tests => 1;
+	my $j = _two_db_join(backend => 'array');
+	throws_ok {
+		$j->aggregate(
+			by       => 'not_an_arrayref',
+			measures => [{ fn => 'count', as => 'n' }],
+		)
+	} qr/"by" must be an arrayref/i,
+		'aggregate() croaks when by is a plain scalar';
+	delete $LEDGER{'agg:error_aggregate_by_invalid'};
+};
+
+subtest 'aggregate: error_aggregate_having_key -- having key not a by col or alias' => sub {
+	plan tests => 1;
+	my $j = _two_db_join(backend => 'array');
+	throws_ok {
+		$j->aggregate(
+			measures => [{ fn => 'count', as => 'n' }],
+			having   => { nosuchkey => { '>' => 0 } },
+		)
+	} qr/having key.*is not a group-by column or measure alias/i,
+		'aggregate() croaks when having key is not a by col or alias';
+	delete $LEDGER{'agg:error_aggregate_having_key'};
+};
+
+subtest 'aggregate: error_aggregate_having_operator -- unsupported operator in having' => sub {
+	plan tests => 1;
+	my $j = _two_db_join(backend => 'array');
+	throws_ok {
+		$j->aggregate(
+			measures => [{ fn => 'count', as => 'n' }],
+			having   => { n => { 'BETWEEN' => [1, 5] } },
+		)
+	} qr/operator.*in having.*is not supported/i,
+		'aggregate() croaks when having uses an unsupported operator';
+	delete $LEDGER{'agg:error_aggregate_having_operator'};
+};
+
+subtest 'aggregate: warn_aggregate_sort_key -- unknown sort_by name carps and falls back' => sub {
+	plan tests => 2;
+	my $j = _two_db_join(backend => 'array');
+	my @warnings;
+	local $SIG{__WARN__} = sub { push @warnings, @_ };
+	my $rows;
+	lives_ok {
+		$rows = $j->aggregate(
+			measures => [{ fn => 'count', as => 'n' }],
+			sort_by  => 'nosuchname',
+		);
+	} 'aggregate() survives an unknown sort_by name';
+	ok(grep({ /nosuchname/ } @warnings), 'carp emitted mentioning the bad sort key');
+	delete $LEDGER{'agg:warn_aggregate_sort_key'};
+};
+
+subtest 'aggregate: warn_aggregate_non_numeric -- non-numeric value in sum skipped with warning' => sub {
+	plan tests => 3;
+	# Build a join with a non-numeric score value in one row.
+	my $db_a = MinimalDA->new(
+		cols => [$JC, $COL_A],
+		rows => [
+			{ entry => 'K1', name => 'Alice' },
+			{ entry => 'K2', name => 'Bob'   },
+		],
+	);
+	my $db_b = MinimalDA->new(
+		cols => [$JC, $COL_B],
+		rows => [
+			{ entry => 'K1', score => 90   },
+			{ entry => 'K2', score => 'abc' },
+		],
+	);
+	my $j = Database::Join->new(
+		databases   => [$db_a, $db_b],
+		join_column => $JC,
+		join_type   => 'inner',
+		backend     => 'array',
+	);
+	my @warnings;
+	local $SIG{__WARN__} = sub { push @warnings, @_ };
+	my $rows;
+	lives_ok {
+		$rows = $j->aggregate(measures => [{ col => $COL_B, fn => 'sum', as => 'total' }]);
+	} 'aggregate() completes without croak on non-numeric value';
+	ok(grep({ /non-numeric/i } @warnings), 'warn_aggregate_non_numeric emitted');
+	is($rows->[0]{total}, 90, 'non-numeric value skipped; only numeric value summed');
+	delete $LEDGER{'agg:warn_aggregate_non_numeric'};
 };
 
 # ===========================================================================

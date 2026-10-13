@@ -6,7 +6,7 @@ use warnings;
 use Punk ();
 use File::Raw::JSON ();
 
-our $VERSION = '0.57';
+our $VERSION = '0.58';
 
 1;
 
@@ -21,8 +21,9 @@ Punk::Model::DBI - the default DBI backend for Punk models
 The shipped L<Punk::Model> backend: plain L<DBI>, no ORM. Connections are
 pooled by C<dsn> and shared across every model that uses them, so a
 hundred models on one database open one handle per worker, not a hundred;
-a C<$$> check reconnects after a fork. C<RaiseError> and C<AutoCommit> are
-on, and generated SQL is prepared through C<prepare_cached> so each
+a C<$$> check reconnects after a fork. C<RaiseError>, C<AutoCommit> and
+C<AutoInactiveDestroy> are on, the last so that a worker dropping a handle
+it inherited does not close the parent's connection, and generated SQL is prepared through C<prepare_cached> so each
 distinct statement is compiled once.
 
 It is selected by default; C<< database backend => 'Class' >> swaps it

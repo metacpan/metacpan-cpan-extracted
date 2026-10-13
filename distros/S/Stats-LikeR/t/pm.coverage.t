@@ -148,7 +148,8 @@ dies_ok { assign({ a => \1 }, x => sub { 1 }) } 'assign: HASH dies on value neit
 {	# stringify / bool overloads
 	my $p = col('x');
 	like("$p", qr/predicate/, 'col: stringifies to a predicate label');
-	ok($p ? 1 : 0, 'col: bool overload is true');
+	# && and || would test it for truth and quietly drop a condition
+	dies_ok { my $b = $p ? 1 : 0 } 'col: a predicate has no truth value';
 }
 #col errors
 dies_ok { col() } 'col: dies with no name';

@@ -280,12 +280,15 @@ static ssize_t hm_h2_data_read(nghttp2_session *ses, int32_t sid, uint8_t *buf,
          * not end of body. Drop what has gone out rather than letting the
          * cursor run away for the life of the stream, then defer - nothing
          * more can be said until stream_write resumes us. */
-        if (st->resp_off >= blen && st->resp_body) {
+        int drained = st->resp_off >= blen;
+        if (drained && st->resp_body) {
             sv_setpvs(st->resp_body, "");
             st->resp_off = 0;
         }
-        if (st->prod_done) *data_flags |= NGHTTP2_DATA_FLAG_EOF;
-        else if (n == 0)   return NGHTTP2_ERR_DEFERRED;
+        /* The producer closing is not the end of the body while frames it
+         * wrote are still waiting here: only the last of them carries EOF. */
+        if (st->prod_done && drained) *data_flags |= NGHTTP2_DATA_FLAG_EOF;
+        else if (n == 0)              return NGHTTP2_ERR_DEFERRED;
         return (ssize_t)n;
     }
     if (st->resp_off >= blen) *data_flags |= NGHTTP2_DATA_FLAG_EOF;

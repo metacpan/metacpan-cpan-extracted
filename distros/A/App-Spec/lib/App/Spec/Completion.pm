@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package App::Spec::Completion;
 
-our $VERSION = 'v0.15.0'; # VERSION
+our $VERSION = 'v0.17.0'; # VERSION
 
 use Moo;
 
@@ -19,7 +19,8 @@ __DATA__
 
 App::Spec::Completion - Shell Completion generator
 
-See L<App::Spec::Completion::Bash> and L<App::Spec::Completion::Zsh>
+See L<App::Spec::Completion::Bash>, L<App::Spec::Completion::Zsh> and
+L<App::Spec::Completion::Fish>
 
 =head1 ATTRIBUTES
 

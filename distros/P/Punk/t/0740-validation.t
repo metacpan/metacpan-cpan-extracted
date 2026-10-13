@@ -193,4 +193,41 @@ $t->get_ok('/nothing')
       . 'object - a consumer can read it the same way either way');
 }
 
+# ---- schemas built per request do not accumulate -----------------------------
+# $c->validate compiles a hashref schema once and keeps the result by its
+# canonical JSON. A schema built per request - an enum of what a query just
+# returned - is a different entry every time, for the life of the worker.
+{
+    package EnumApp;
+    use Punk;
+    post '/pick' => sub {
+        my ($c) = @_;
+        my $n = $c->req->query->{n};
+        my $v = $c->validate({ type => 'object',
+            properties => { choice => { enum => [ "opt$n", 'other' ] } },
+            required => ['choice'] });
+        $c->json({ ok => $v->has_errors ? 0 : 1 });
+    };
+    package main;
+
+    my $app = EnumApp->to_app;         # compiled once, and the client below
+    my $e = Punk::Test->new($app);     # is handed the same app
+    my $before = Punk::Validate::_cache_count();
+    for my $n (1 .. 699) {
+        my $body = qq({"choice":"opt$n"});
+        open my $in, '<', \$body or die $!;
+        $app->({ REQUEST_METHOD => 'POST', PATH_INFO => '/pick',
+                 QUERY_STRING => "n=$n", CONTENT_TYPE => 'application/json',
+                 CONTENT_LENGTH => length $body, 'psgi.input' => $in });
+    }
+    $e->post_ok('/pick?n=700', json => { choice => 'opt700' });
+    $e->json_is('/ok' => 1, 'the 700th distinct schema still validates');
+    cmp_ok(Punk::Validate::_cache_count(), '<=', 256,
+        '700 distinct schemas leave at most 256 compiled ones held');
+    cmp_ok(Punk::Validate::_cache_count(), '>', 0, '...and the cache is in use');
+    $e->post_ok('/pick?n=700', json => { choice => 'nope' })
+      ->json_is('/ok' => 0, 'and a schema met again still refuses what it should');
+    note "cache held $before before";
+}
+
 done_testing();

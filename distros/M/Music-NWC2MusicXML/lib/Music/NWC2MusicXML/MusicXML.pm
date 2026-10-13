@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use autodie qw(:all);
 
-our $VERSION = '0.002.0';
+our $VERSION = '0.002.1';
 
 use Carp qw(croak carp);
 use POSIX qw(floor);
@@ -296,6 +296,14 @@ C<RitardandoToTempo> (rendered as "a tempo") are stored as C<TempoVariance>
 events by the parser.  The generator converts them to italic
 C<< <words> >> direction elements using the C<%TEMPO_VARIANCE_TEXT> table.
 
+The C<Style:Fermata> value is a special case: it is not a tempo-change
+direction but a symbol placed over the note or rest that immediately follows
+the C<TempoVariance> record.  C<_annotate_fermatas> detects these records in
+a pre-pass and marks the following sounding event so that C<_emit_note_event>
+and C<_emit_rest_event> emit C<< <notations><fermata/></notations> >> on it.
+The C<TempoVariance:Fermata> event itself is then skipped during measure
+emission and never produces a C<< <direction> >> element.
+
 =head2 Part name resolution
 
 Display names for each staff are resolved in three steps:
@@ -523,8 +531,10 @@ Each staff is processed by a two-stage pipeline:
 
 C<_annotate_events> detects slur arcs and tie pairs across the entire staff
 before measure grouping.  C<_annotate_wedges> detects hairpin (crescendo /
-diminuendo) arcs stored as per-note C<Opts:> flags.  Both passes store their
-results in a shared C<%ann> hash keyed by stringified event reference.
+diminuendo) arcs stored as per-note C<Opts:> flags.  C<_annotate_fermatas>
+associates C<TempoVariance:Fermata> records with the sounding event that
+follows each one.  All three passes store their results in a shared C<%ann>
+hash keyed by stringified event reference.
 
 =item Stage 2 -- measure emission.
 
@@ -1035,6 +1045,7 @@ sub _emit_part {
 	my $ann = $self->_annotate_events($staff->events);
 	$self->_annotate_wedges($staff->events, $ann);
 	$self->_annotate_lyrics($staff->events, $ann);
+	$self->_annotate_fermatas($staff->events, $ann);
 
 	for my $event (@{ $staff->events }) {
 		my $type = $event->type;
@@ -1145,6 +1156,7 @@ sub _emit_measure {
 
 		} elsif ($type eq 'TempoVariance') {
 			my $d = $event->data // {};
+			next if ($d->{style} // '') eq 'Fermata';   # handled as <fermata/> on following note
 			push @out, $self->_emit_tempo_variance(
 				$d->{style}, $d->{placement}, $pad . $i);
 
@@ -1254,7 +1266,7 @@ sub _annotate_events {
 			}
 		}
 
-		# Slur tracking (not applicable to rests — rests are inside slur spans
+		# Slur tracking (not applicable to rests -- rests are inside slur spans
 		# but don't carry the arc endpoint markers)
 		next if $type eq 'Rest';
 
@@ -1350,6 +1362,30 @@ sub _annotate_wedges {
 	return $ann;
 }
 
+# Associate each TempoVariance:Fermata with the immediately following Note,
+# Rest, or Chord.  NWC places the TempoVariance record before the note it
+# decorates; the fermata is a <notations><fermata/> element on that note, not
+# a text direction.
+sub _annotate_fermatas {
+	my ($self, $events, $ann) = @_;
+	$ann //= {};
+
+	my $pending_fermata = 0;
+	for my $ev (@$events) {
+		my $type = $ev->type;
+		if ($type eq 'Note' || $type eq 'Rest' || $type eq 'Chord') {
+			if ($pending_fermata) {
+				$ann->{"$ev"}{fermata} = 1;
+				$pending_fermata = 0;
+			}
+		} elsif ($type eq 'TempoVariance'
+		      && ($ev->data->{style} // '') eq 'Fermata') {
+			$pending_fermata = 1;
+		}
+	}
+	return $ann;
+}
+
 # ---------------------------------------------------------------------------
 # Private: note / rest / chord XML emission
 # ---------------------------------------------------------------------------
@@ -1410,6 +1446,7 @@ sub _emit_note_event {
 	push @nots, "${pad}${i}${i}<tied type=\"start\"/>"              if $tie_start;
 	push @nots, "${pad}${i}${i}<slur number=\"$slur_stop\" type=\"stop\"/>"   if $slur_stop;
 	push @nots, "${pad}${i}${i}<slur number=\"$slur_start\" type=\"start\"/>" if $slur_start;
+	push @nots, "${pad}${i}${i}<fermata/>" if !$is_chord_member && $ev_ann->{fermata};
 
 	# Articulations: only on the first note of a chord (is_chord_member is false)
 	my @artic_tokens = !$is_chord_member
@@ -1479,6 +1516,11 @@ sub _emit_rest_event {
 	push @out, "${pad}${i}<voice>1</voice>";
 	push @out, "${pad}${i}<type>$type</type>";
 	push @out, "${pad}${i}<dot/>" for 1 .. ($d->{dots} // 0);
+	if ($ev_ann->{fermata}) {
+		push @out, "${pad}${i}<notations>";
+		push @out, "${pad}${i}${i}<fermata/>";
+		push @out, "${pad}${i}</notations>";
+	}
 	push @out, "${pad}</note>";
 	return @out;
 }
@@ -1504,6 +1546,7 @@ sub _emit_chord_event {
 				slur_start => $ev_ann->{slur_start},
 				slur_stop  => $ev_ann->{slur_stop},
 				lyrics     => $ev_ann->{lyrics},
+				fermata    => $ev_ann->{fermata},
 			) : ()),
 		);
 		push @out, $self->_emit_note_event(
@@ -2122,6 +2165,26 @@ Mathematical sets used below:
 
     Post: if the last sounding event carries a hairpin flag,
               ann!(last).wedge_stop_after = 1
+
+=head2 _annotate_fermatas
+
+    AnnotateFermatas
+    ___________________________
+    events : seq Event
+    ann    : Map(EventRef -> Annotation)   -- pre-existing, mutated in place
+    ___________________________
+    ann!   : Map(EventRef -> Annotation)   -- same map, extended
+
+    Let sounding = { ev in events | ev.type in {Note, Rest, Chord} }
+    Let fermata  = { ev in events | ev.type = TempoVariance
+                                    and ev.data.style = 'Fermata' }
+
+    Post: forall tv in fermata,
+              let next = first ev in sounding appearing after tv in events
+              => ann!(next).fermata = 1   (if next exists)
+
+    Post: a TempoVariance:Fermata with no following sounding event is silently
+          ignored (no annotation set, no error)
 
 =head2 _compute_page_layout
 

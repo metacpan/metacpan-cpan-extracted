@@ -1,8 +1,8 @@
                                   DB_File
 
-                               Version 1.860
+                               Version 1.861
 
-                              1 February 2026
+                              13 October 2026
 
      Copyright (c) 1995-2026 Paul Marquess. All rights reserved. This
       program is free software; you can redistribute it and/or modify
@@ -624,7 +624,7 @@ General feedback/questions/bug reports can be sent to
 https://github.com/pmqs/DB_File/issues (preferred) or
 https://rt.cpan.org/Public/Dist/Display.html?Name=DB_File
 
-Alternatively, email me at pmqs@cpan.org.
+Alternatively, email me at pmqs@outlook.com.
 
 
 How to report a problem with DB_File.
@@ -714,4 +714,4 @@ CHANGES
 
 See the Changes file.
 
-Paul Marquess <pmqs@cpan.org>
+Paul Marquess <pmqs@outlook.com>

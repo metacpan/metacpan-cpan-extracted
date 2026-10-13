@@ -49,7 +49,7 @@ my $dir = File::Temp->newdir;
     package Impatient;
     use Punk;
     cache 'file', dir => "$dir/impatient", lock_wait => 0.3;
-    plugin 'Idempotency' => { scope => sub { 'alice' } };
+    plugin 'Idempotency' => { scope => sub { 'alice' }, lock_wait => 0.3 };
 
     post '/slow' => sub {
         my ($c) = @_;
@@ -62,8 +62,29 @@ my $dir = File::Temp->newdir;
     }, { idempotent => 1 };
 }
 
+{
+    # A store tuned the way a cache is - a lock is abandoned after 0.3s -
+    # behind a handler that takes far longer than that. The plugin's own
+    # budget is what decides here, and it is left at its default.
+    package Payment;
+    use Punk;
+    cache 'file', dir => "$dir/payment", lock_wait => 0.3;
+    plugin 'Idempotency' => { scope => sub { 'alice' } };
+
+    post '/slow' => sub {
+        my ($c) = @_;
+        open my $r, '>>', "$dir/ran3" or die $!; print {$r} "$$\n"; close $r;
+        open my $f, '>', "$dir/executing3" or die $!; close $f;
+        my $t = Time::HiRes::time() + 15;
+        Time::HiRes::sleep(0.01)
+            while Time::HiRes::time() < $t && !-e "$dir/release3";
+        $c->json({ pid => $$ }, 201);
+    }, { idempotent => 1 };
+}
+
 # compiled BEFORE any fork, so every process runs the same frozen app
-my %app = (patient => Flight->to_app, impatient => Impatient->to_app);
+my %app = (patient => Flight->to_app, impatient => Impatient->to_app,
+           payment => Payment->to_app);
 
 # Run one request in a forked process; the result lands in $dir/$label.json
 # (written to a temp name and renamed, so the parent never reads half a file).
@@ -189,6 +210,33 @@ sub ran_lines {
     is($rb->{status}, 201, 'the impatient retry answered from its own run');
     ok(!defined $rb->{headers}{'Idempotency-Replayed'},
         'and is not a replay - duplicated work, not a stalled request');
+}
+
+# ---- a handler slower than the store's lock_wait keeps its lock --------------
+# The retry this plugin exists for: the client gave up on a slow request and
+# sent it again. By then the lock is older than the cache store's lock_wait,
+# which is when a cache compute's lock is taken for abandoned - and the retry
+# used to take it, and run beside the first.
+{
+    my $a = spawn('a3', payment => 'shared-key');
+    wait_for(sub { -e "$dir/executing3" }, 'the payment to be mid-handler');
+
+    Time::HiRes::sleep(2.2);          # well past 0.3s, and any mtime slack
+    my $b = spawn('b3', payment => 'shared-key');
+    Time::HiRes::sleep(1.0);          # long enough to have stolen and run
+
+    is(scalar(ran_lines('ran3')), 1,
+        'a retry arriving after the store\'s lock_wait does not run beside it');
+    ok(!-e "$dir/b3.json", '...it is waiting');
+
+    open my $rel, '>', "$dir/release3" or die $!; close $rel;
+    waitpid $a, 0;
+    waitpid $b, 0;
+
+    my $rb = result('b3');
+    is(scalar(ran_lines('ran3')), 1, 'the handler ran once in all');
+    is($rb->{status}, 201, 'the retry got an answer');
+    is($rb->{headers}{'Idempotency-Replayed'}, 'true', '...the replay');
 }
 
 done_testing;

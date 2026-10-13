@@ -7,9 +7,9 @@ use warnings;
 use POSIX ();
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-08-05'; # DATE
+our $DATE = '2026-08-19'; # DATE
 our $DIST = 'App-perlmv-scriptlet-with_number'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our $SCRIPTLET = {
     summary => 'Rename filenames with number',
@@ -33,14 +33,20 @@ MARKDOWN
             schema => 'float*',
             default => 1,
         },
+        random => {
+            summary => 'Randomize the numbers',
+            schema => 'float*',
+            default => 1,
+        },
     },
     code => sub {
         package
             App::perlmv::code;
 
-        use vars qw($ARGS $FILES $TESTING $i);
+        use vars qw($ARGS $FILES $TESTING $i @all_numbers);
 
-        my $ext = /(\.\w+)\z/ ? $1 : '';
+        my $file = $_;
+        my $ext = $file =~ /(\.\w+)\z/ ? $1 : '';
 
         my $start  = $ARGS->{start} // 1;
         my $inc = $ARGS->{inc} // 1;
@@ -56,11 +62,29 @@ MARKDOWN
         my $digits = $ARGS->{digits} // $auto_digits;
 
         $i //= 0;
-        $i++ unless $TESTING;
 
-        my $num  = $start + ($i-1)*$inc;
-        my $fnum = sprintf("%0${digits}d", $num);
-        "$fnum$ext";
+        my $gen_num = sub {
+            my $num  = $start + ($i-1)*$inc;
+            my $fnum = sprintf("%0${digits}d", $num);
+            "$fnum$ext";
+        };
+
+        if ($ARGS->{random}) {
+            if ($i == 0) {
+                @all_numbers = ();
+                for my $j (1 .. @$FILES) {
+                    $i++;
+                    push @all_numbers, $gen_num->();
+                }
+                require List::Util;
+                @all_numbers = List::Util::shuffle(@all_numbers);
+            }
+            die "Didn't produce enough numbers" unless @all_numbers;
+            $TESTING ? $all_numbers[0] : shift(@all_numbers);
+        } else {
+            $i++ unless $TESTING;
+            $gen_num->();
+        }
     },
 };
 
@@ -80,7 +104,7 @@ App::perlmv::scriptlet::with_number - Rename filenames with number
 
 =head1 VERSION
 
-This document describes version 0.002 of App::perlmv::scriptlet::with_number (from Perl distribution App-perlmv-scriptlet-with_number), released on 2026-08-05.
+This document describes version 0.003 of App::perlmv::scriptlet::with_number (from Perl distribution App-perlmv-scriptlet-with_number), released on 2026-08-19.
 
 =head1 SYNOPSIS
 
@@ -117,6 +141,10 @@ Required. Number of digits to use (1 means 1,2,3,..., 2 means 01,02,03,...); the
 =head2 inc
 
 Increment from one number to the next. 
+
+=head2 random
+
+Randomize the numbers. 
 
 =head2 start
 

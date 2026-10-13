@@ -12,6 +12,15 @@ _compile_routes(self)
     CODE:
         pv_compile_routes(aTHX_ self);
 
+# How many compiled schemas $c->validate is holding. For the tests: the cache
+# is bounded, and nothing else can see that it is.
+IV
+_cache_count()
+    CODE:
+        RETVAL = PV_CACHE ? (IV)HvUSEDKEYS(PV_CACHE) : 0;
+    OUTPUT:
+        RETVAL
+
 MODULE = Punk        PACKAGE = Punk::Validate::Result
 
 PROTOTYPES: DISABLE

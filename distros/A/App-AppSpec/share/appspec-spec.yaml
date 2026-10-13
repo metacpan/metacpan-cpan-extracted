@@ -27,8 +27,9 @@ subcommands:
     op: cmd_completion
     options:
     - name=s --name of the program (optional, override the value from the spec)
-    - zsh --for zsh
+    - zsh  --for zsh
     - bash --for bash
+    - fish --for fish (>= 4.0)
     parameters:
     - &param_spec_file
       +spec_file= +file --Path to the spec file (use '-' for standard input)

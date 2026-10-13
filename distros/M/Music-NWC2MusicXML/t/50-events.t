@@ -391,6 +391,106 @@ sub score_with_tempo_variance {
 }
 
 # ---------------------------------------------------------------------------
+# TempoVariance:Fermata -- parsed correctly by the parser
+# ---------------------------------------------------------------------------
+
+{
+	my $score = parse_nwctxt('|TempoVariance|Style:Fermata|Pause:8|Pos:7');
+	my @evs = grep { $_->type eq 'TempoVariance' } @{ $score->staves->[0]->events };
+	is scalar @evs, 1,          'TempoVariance:Fermata parsed as TempoVariance event';
+	is $evs[0]->data->{style}, 'Fermata', 'fermata style stored correctly';
+}
+
+# ---------------------------------------------------------------------------
+# TempoVariance:Fermata -- MusicXML emission
+# ---------------------------------------------------------------------------
+
+# Helper: build a score with a TempoVariance:Fermata followed by a sounding event
+sub score_with_fermata_before_note {
+	my $staff = Music::NWC2MusicXML::Staff->new(name => 'Test');
+	$staff->set_initial_clef('Treble');
+	$staff->set_initial_key({ signature => 'C', tonic => 'C', fifths => 0 });
+	$staff->set_initial_timesig({ beats => 4, beat_type => 4 });
+	$staff->add_event(Music::NWC2MusicXML::Event->new(
+		type => 'TempoVariance',
+		data => { style => 'Fermata', placement => 'above' },
+	));
+	$staff->add_event(Music::NWC2MusicXML::Event->new(
+		type     => 'Note',
+		duration => [1, 1],
+		data     => { nwc_pos => '0', base_dur => '4th', dots => 0, articulations => [] },
+	));
+	my $score = Music::NWC2MusicXML::Score->new;
+	$score->add_staff($staff);
+	return Music::NWC2MusicXML::MusicXML->new->generate($score);
+}
+
+sub score_with_fermata_before_rest {
+	my $staff = Music::NWC2MusicXML::Staff->new(name => 'Test');
+	$staff->set_initial_clef('Treble');
+	$staff->set_initial_key({ signature => 'C', tonic => 'C', fifths => 0 });
+	$staff->set_initial_timesig({ beats => 4, beat_type => 4 });
+	$staff->add_event(Music::NWC2MusicXML::Event->new(
+		type => 'TempoVariance',
+		data => { style => 'Fermata', placement => 'above' },
+	));
+	$staff->add_event(Music::NWC2MusicXML::Event->new(
+		type     => 'Rest',
+		duration => [1, 1],
+		data     => { base_dur => '4th', dots => 0 },
+	));
+	my $score = Music::NWC2MusicXML::Score->new;
+	$score->add_staff($staff);
+	return Music::NWC2MusicXML::MusicXML->new->generate($score);
+}
+
+# Fermata before a Note -> <fermata/> inside <notations>, no <words> direction
+{
+	my $xml = score_with_fermata_before_note();
+	like   $xml, qr/<fermata\/>/,                'fermata element emitted on note';
+	unlike $xml, qr/<words[^>]*>Fermata</,       'no text direction Fermata emitted';
+	unlike $xml, qr/<direction/,                 'no direction element for fermata';
+}
+
+# Fermata before a Rest -> <fermata/> inside <notations>
+{
+	my $xml = score_with_fermata_before_rest();
+	like   $xml, qr/<fermata\/>/,                'fermata element emitted on rest';
+	unlike $xml, qr/<words[^>]*>Fermata</,       'no text direction Fermata on rest';
+}
+
+# TempoVariance:Fermata at end of staff with no following sounding event -> no crash
+{
+	my $staff = Music::NWC2MusicXML::Staff->new(name => 'Test');
+	$staff->set_initial_clef('Treble');
+	$staff->set_initial_key({ signature => 'C', tonic => 'C', fifths => 0 });
+	$staff->set_initial_timesig({ beats => 4, beat_type => 4 });
+	$staff->add_event(Music::NWC2MusicXML::Event->new(
+		type     => 'Note',
+		duration => [1, 1],
+		data     => { nwc_pos => '0', base_dur => '4th', dots => 0, articulations => [] },
+	));
+	$staff->add_event(Music::NWC2MusicXML::Event->new(
+		type => 'TempoVariance',
+		data => { style => 'Fermata', placement => 'above' },
+	));
+	my $score = Music::NWC2MusicXML::Score->new;
+	$score->add_staff($staff);
+	my $xml;
+	lives_ok { $xml = Music::NWC2MusicXML::MusicXML->new->generate($score) }
+		'fermata at end of staff with no following note does not crash';
+	unlike $xml // '', qr/<fermata\/>/,
+		'no fermata element when no following sounding event';
+}
+
+# Non-Fermata TempoVariance still produces a <words> direction (regression guard)
+{
+	my $xml = score_with_tempo_variance('Ritardando');
+	like   $xml, qr/<words[^>]*>rit\.<\/words>/, 'non-Fermata TempoVariance still emits words';
+	unlike $xml, qr/<fermata\/>/,                'no fermata emitted for Ritardando';
+}
+
+# ---------------------------------------------------------------------------
 # Copyright extraction (Copyright1 / Copyright2) and <credit> emission
 # ---------------------------------------------------------------------------
 

@@ -110,6 +110,13 @@ static SV *pv_canon(pTHX_ SV *data) {
 
 static HV *PV_CACHE = NULL;
 
+/* How many compiled schemas the cache may hold. A schema written once in a
+ * route is one entry for the life of the worker, and an application has tens
+ * of those. One BUILT per request - an enum from a query, say - is a new
+ * entry per distinct shape, without end; past this many the cache starts
+ * over rather than grow with the data. */
+#define PV_CACHE_MAX 256
+
 /* A compiled validator (+1): a blessed Compiled passes through, a hashref
  * compiles once (coerce on) and caches by canonical JSON. Croaks on
  * anything else, and on a malformed schema (from the ABI). */
@@ -128,6 +135,7 @@ static SV *pv_compile(pTHX_ SV *schema) {
         {
             SV *compiled = punk_jsf(aTHX)->compile(aTHX_ schema,
                                                    &PL_sv_undef, 1, 0);
+            if (HvUSEDKEYS(PV_CACHE) >= PV_CACHE_MAX) hv_clear(PV_CACHE);
             (void)hv_store_ent(PV_CACHE, key, compiled, 0);  /* cache owns */
             return newSVsv(compiled);
         }

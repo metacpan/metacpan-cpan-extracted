@@ -6,6 +6,7 @@ use Logic::Relational::Syntax;
 
 # Define the Shop program using declarative syntax
 logic Shop {
+
     # We simulate a database table of products in a lexical hash.
     my %product_db = (
         'SKU-100' => { name => 'Coffee Maker', price => 45 },
@@ -17,6 +18,7 @@ logic Shop {
     # Register generator on the program
     generator product(3) sub ( $sku, $name, $price ) {
         if ( defined $sku && !ref($sku) ) {
+
             # SKU is ground (bound) - Perform direct optimized lookup!
             say "   [DB Log] SKU is bound: '$sku'. Performing direct lookup.";
             my $prod = $product_db{$sku};
@@ -36,15 +38,16 @@ logic Shop {
     };
 
     # Rule: cheap_item(SKU, Name) :- product(SKU, Name, Price), Price < 20
-    rule cheap_item($sku, $name) {
+    rule cheap_item( $sku, $name ) {
         fresh my $price;
-        product($sku, $name, $price);
-        guard([$price], sub ($p) { $p < 20 });
+        product( $sku, $name, $price );
+        guard( [$price], sub ($p) { $p < 20 } );
     }
 }
 
 # Define the Streams program using declarative syntax
 logic Streams {
+
     # Generators can yield infinite streams of values on demand!
     generator fibonacci(1) sub ($n) {
         my $fib0 = 0;
@@ -57,7 +60,6 @@ logic Streams {
         };
     };
 }
-
 
 say "=== EXAMPLE 1: Input-Sensitive Database Generator ===";
 

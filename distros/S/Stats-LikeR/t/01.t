@@ -3485,9 +3485,14 @@ foreach my $key ('estimate', 'p_value', 'statistic') {
 no_leaks_ok {
 	$test_data = var_test(\@xk, \@yk, conf_level => 0.99);
 } 'var_test: no leaks with conf_level = 0.99' unless $INC{'Devel/Cover.pm'};
-dies_ok {
-	var_test(\@xk, [1,1,1,1]);
-} 'var_test: dies when variance of y is 0';
+# zero variance in y is not an error in R 4.6.1: var.test(x, c(1,1,1,1)) has
+# F = Inf, p = 0 and the interval [Inf, Inf].  This used to croak.
+{
+	my $z = var_test(\@xk, [1,1,1,1]);
+	is($z->{statistic}, 9**9**9, 'var_test: zero variance in y gives F = Inf, as in R');
+	is($z->{p_value}, 0, 'var_test: zero variance in y gives p = 0, as in R');
+	is_deeply($z->{conf_int}, [9**9**9, 9**9**9], 'var_test: zero variance in y gives the interval [Inf, Inf], as in R');
+}
 dies_ok {
 	var_test([1], \@yk);
 } 'var_test: dies with insufficient # of observations in x';

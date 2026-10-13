@@ -1,6 +1,12 @@
 Revision history for Logic-Relational
 
+0.02    12 October 2026
+        - Added automatic ancestor cycle pruning (variant loop checking) on search states to prevent infinite recursion over cyclic graphs
+        - Added subgoal tabling and iterative fixpoint answer memoization
+        - Updated Logic::Relational::Syntax to add 'table' keyword and to fix parsing issues in facts { ... } blocks
+        - Added distinct_values and all_tuples deduplication helpers for queries
+        - Added some examples
+
 0.01    1 September 2026
-
         - First version
-
+        

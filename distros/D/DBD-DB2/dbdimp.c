@@ -5,6 +5,7 @@
 */
 
 #include <stdio.h>
+#define NEED_my_snprintf
 #include "DB2.h"
 #ifndef AS400
 #include "sqlenv.h"
@@ -836,6 +837,11 @@ int dbd_db_STORE_attrib( SV *dbh,
 		  	if( SvOK( valuesv ) ) {
 				STRLEN vl;
 				ValuePtr = (SQLPOINTER)SvPV( valuesv, vl );
+				if( vl > sizeof( setSchemaSQL ) - sizeof( "SET CURRENT SCHEMA = ''" ) ) {
+					ret = SQL_INVALID_HANDLE;
+					CHECK_ERROR(dbh, 0, SQL_NULL_HANDLE, ret, "Schema name is too long");
+					return FALSE;
+				}
 				StringLength = (SQLINTEGER)vl;
 		  	}
 		  	ret = SQLAllocHandle(SQL_HANDLE_STMT, imp_dbh->hdbc, &hstmt);
@@ -846,7 +852,8 @@ int dbd_db_STORE_attrib( SV *dbh,
 				CHECK_ERROR(dbh, SQL_HANDLE_STMT, hstmt, ret, msg);
 				return FALSE;
 		  	}
-		  	sprintf(setSchemaSQL, "SET CURRENT SCHEMA = '%s'", ValuePtr);
+			my_snprintf(setSchemaSQL, sizeof( setSchemaSQL ),
+				"SET CURRENT SCHEMA = '%s'", ValuePtr);
 			
 		  	ret = SQLExecDirect(hstmt, (SQLCHAR *)setSchemaSQL, SQL_NTS);
 			CHECK_ERROR(dbh, SQL_HANDLE_STMT, hstmt, ret, "Execute immediate failed");

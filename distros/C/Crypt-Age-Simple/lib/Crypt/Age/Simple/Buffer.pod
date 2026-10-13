@@ -1,0 +1,166 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Crypt::Age::Simple::Buffer - Helper for Crypt::Age::Simple streaming interface
+
+
+=head1 SYNOPSIS
+
+   use Crypt::Age::Simple::Buffer;
+
+   my $buffer = Crypt::Age::Simple::Buffer->new;
+
+   $buffer->put('some data');
+   $buffer->put(\'some additional data');
+
+   say 'on to something' if $buffer->has_data;
+   say 'exactly ' . $buffer->available_bytes . ' bytes';
+   say 'divided into ' . $buffer->available_chunks . ' chunks';
+
+   my $bytes_ref_a = $buffer->get_bytes(5); # get at most 5 bytes
+
+   # this complains if there amount of bytes is not available
+   my $bytes_ref_b = $buffer->get_bytes_exactly(3);
+
+   my $bytes_ref_rest = $buffer->get_bytes;
+
+   # got too much? Give back, with optional offset
+   $buffer->give_back($bytes_ref_rest, 10);
+
+   # get rid of some bytes
+   $buffer->drop_bytes(3);
+
+   # just get data, possibly all of it
+   my @parts = $buffer->get_parts(1);
+   my @rest = $buffer->get_parts;
+
+   # search in the data
+   my $idx = $buffer->index_of('needle');
+
+
+=head1 DESCRIPTION
+
+This module provides a helper class for managing buffers of input data
+to the streaming classed L<Crypt::Age::Simple::Decrypt> and
+L<Crypt::Age::Simple::Encrypt>.
+
+=head1 INTERFACE
+
+The interface is object-oriented. A typical usage is adding data via
+L</put> and then taking it back with L</get_bytes>/L</get_chunks>,
+depending on your needs.
+
+Methods:
+
+=begin hide
+
+=head2 B<< BUILDARGS >>
+
+Not really a sub part of the public interface.
+
+=end hide
+
+=head2 B<< available_bytes >>
+
+   my $integer = $buf->available_bytes;
+
+=head2 B<< available_chunks >>
+
+   my $integer = $buf->available_chunks;
+
+=head2 B<< drop_bytes >>
+
+   $buf->drop_bytes(10); # lose 'em for good
+
+=head2 B<< get_bytes >>
+
+   my $bytes_ref = $buf->get_bytes;
+   my $bytes_ref = $buf->get_bytes($n);
+
+Gets I<at most> C<$n> bytes, or all of them if not provided.
+
+=head2 B<< get_bytes_exactly >>
+
+   my $bytes_ref = $buf->get_bytes_exactly($n);
+
+Throws an exception if C<$n> bytes are not available.
+
+=head2 B<< get_parts >>
+
+   my $aref = $buf->get_parts;       # OR
+   my $aref = $buf->get_parts($n);
+
+Gets I<at most> C<$n> parts. Returns an array reference holding references
+to scalars.
+
+=head2 B<< give_back >>
+
+   $buf->give_back($plain_string);                 # OR
+   $buf->give_back(\$plain_string);                # OR
+   $buf->give_back([\$plain, \$string]);           # OR
+   $buf->give_back($plain_string, $offset);        # OR
+   $buf->give_back(\$plain_string, $offset);       # OR
+   $buf->give_back([\$plain, \$string], $offset);
+
+=head2 B<< has_data >>
+
+   my $bool = $buf->has_data;
+
+=head2 B<< index_of >>
+
+   my $integer = $buf->index_of($needle);
+
+Looks for C<$needle> in the data, return the offset when found or C<-1>
+otherwise.
+
+=head2 B<< put >>
+
+   $buf->put($plain_string);        # OR
+   $buf->put(\$plain_string);       # OR
+   $buf->put([\$plain, \$string]);
+
+=head1 BUGS AND LIMITATIONS
+
+Minimum perl version 5.24.
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<CryptX>
+
+=item * L<Crypt::Age>
+
+=item * L<Crypt::Age::Simple>
+
+=back
+
+
+=head1 AUTHOR
+
+Flavio Poletti <flavio@polettix.it>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2026 by Flavio Poletti <flavio@polettix.it>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+=cut

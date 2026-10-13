@@ -4,7 +4,7 @@ Database::Abstraction - Read-only Database Abstraction Layer (ORM)
 
 ## Version
 
-Version 0.47
+Version 0.49
 
 ## Description
 
@@ -28,6 +28,9 @@ combine tables with INNER, LEFT, RIGHT, FULL, or CROSS joins.
 - **Chained query builder.**  The `query()` method returns a
 [Database::Abstraction::Query](https://metacpan.org/pod/Database%3A%3AAbstraction%3A%3AQuery) object for fluent, composable queries:
 `$db->query->where(...)->order_by(...)->limit(...)->all()`.
+- **Aggregation.**  The `aggregate()` method and the fluent
+`->group_by()->measure()->having()->all()` chain push `GROUP BY` to
+SQL backends and fold rows in Perl on slurp-only backends.
 - **Schema introspection.**  `columns()` lists column names; `schema()`
 returns full type/nullability metadata, using native driver introspection
 (`PRAGMA table_info` for SQLite, `column_info` for others).
@@ -113,6 +116,32 @@ my $db2 = Database::Foo->new(
 
 my $cols   = $db->columns();  # ['entry', 'name', 'score', ...]
 my $schema = $db->schema();   # { name => { type=>'TEXT', nullable=>1, ... }, ... }
+
+# 9. Aggregation (GROUP BY) ----------------------------------------
+
+# Total revenue and order count per region
+my $summary = $db->aggregate(
+    by       => ['region'],
+    measures => [
+        { col => 'amount', fn => 'sum',   as => 'revenue' },
+        {                  fn => 'count', as => 'orders'  },
+    ],
+);
+
+# Grand total across all rows
+my $totals = $db->aggregate(
+    measures => [{ col => 'amount', fn => 'sum', as => 'total' }],
+)->[0];
+
+# Fluent style with HAVING and sort
+my $top = $db->query
+    ->group_by('region')
+    ->measure('amount', 'sum',   'revenue')
+    ->measure(undef,    'count', 'orders')
+    ->having(revenue => { '>' => 1000 })
+    ->order_by('revenue DESC')
+    ->limit(5)
+    ->all();
 ```
 
 ## Quick Start Example
@@ -670,6 +699,29 @@ in scalar context, or `$db->query->limit(1)->all()`, to fetch just one row.
 6. Store result in cache; fixate the array; return arrayref.
 ```
 
+#### Api Specification
+
+##### Arguments
+
+```perl
+%criteria   # optional key-value pairs or operator hashrefs
+join        => HashRef | ArrayRef  # optional join spec(s)
+sort_by     => Str | ArrayRef      # optional: 'col' or ['col','DESC']
+limit       => Int                 # optional: max rows
+offset      => Int                 # optional: rows to skip
+no_fixate   => Bool                # optional: skip read-only locking
+table       => Str                 # optional: override table name
+```
+
+##### Returns
+
+```
+ArrayRef[HashRef] | undef
+```
+
+An arrayref of row hashrefs on success.  Returns `undef` when no
+rows match.  Each hashref is read-only unless `no_fixate` was set.
+
 ### Selectall\_Hashref
 
 Deprecated alias for ["selectall\_arrayref"](#selectall_arrayref).  Use `selectall_arrayref` in
@@ -702,6 +754,29 @@ is called on exception).
 **Note:** rows on the SQL path are not fixated (made read-only) because they
 are discarded after each callback invocation.  Slurp-path rows are already
 fixated from the initial load.
+
+#### Api Specification
+
+##### Arguments
+
+```perl
+CodeRef     # required: callback receiving one row hashref per call
+%criteria   # optional: same criteria syntax as selectall_arrayref
+join        => HashRef | ArrayRef  # optional join spec(s)
+sort_by     => Str | ArrayRef      # optional sort column
+limit       => Int                 # optional: max rows to visit
+offset      => Int                 # optional: rows to skip
+```
+
+##### Returns
+
+```
+Int (>= 0)
+```
+
+The number of rows visited (i.e. the number of times the callback
+was called).  Any exception thrown inside the callback is re-thrown
+after the DBI statement handle is properly finished.
 
 ### Selectall\_Array
 
@@ -737,6 +812,25 @@ my $high   = $db->count(score  => { '>' => 90 });
 
 Accepts the full criteria syntax described in ["QUERY CRITERIA"](#query-criteria).
 
+#### Api Specification
+
+##### Arguments
+
+```perl
+%criteria   # optional: same criteria syntax as selectall_arrayref
+join        => HashRef | ArrayRef  # optional join spec(s)
+table       => Str                 # optional: override table name
+```
+
+##### Returns
+
+```
+Int (>= 0)
+```
+
+The number of rows that match the given criteria.  Returns `0`
+when no rows match -- never `undef`.
+
 ### Fetchrow\_Hashref
 
 Returns a hash reference for the first row matching the given criteria,
@@ -766,6 +860,33 @@ my $row = $db->fetchrow_hashref(
 
 Pass `table => $other_table` to query a table other than the one
 derived from the class name.
+
+#### Api Specification
+
+##### Arguments
+
+```perl
+entry       => Str    # primary-key value to look up (positional first
+                      # arg when no_entry is false)
+%criteria   # optional additional column filters
+join        => HashRef | ArrayRef  # optional join spec(s)
+no_fixate   => Bool                # optional: skip read-only locking
+table       => Str                 # optional: override table name
+```
+
+##### Returns
+
+```
+HashRef | undef
+```
+
+A single row hashref when exactly one matching row is found.  Returns
+`undef` when the key is not found or no row matches the criteria.
+The hashref is read-only unless `no_fixate` was set.
+
+**Note:** `fetchrow_hashref` does **not** croak when multiple rows
+match the given criteria; it returns whichever row the backend
+delivers first (usually the first row in file/insertion order).
 
 ### Execute
 
@@ -827,6 +948,23 @@ The source of column names varies by backend:
 
 The result is cached inside the object after the first call.
 
+#### Api Specification
+
+##### Arguments
+
+None beyond the implicit invocant.  The result is cached in the
+object after the first call.
+
+##### Returns
+
+```
+ArrayRef[Str]
+```
+
+A sorted (lexicographic, ascending) arrayref of column names.  The
+sort order is identical across all backends, so switching from CSV
+to SQLite does not change the returned order.
+
 ### Schema
 
 Returns a hash reference describing the schema of the current table.
@@ -865,6 +1003,34 @@ during the scan.
 
 The result is cached inside the object after the first call.
 
+#### Api Specification
+
+##### Arguments
+
+```perl
+infer_types => Bool  # enable heuristic type inference for slurp backends
+                     # (may also be set at construction time)
+```
+
+##### Returns
+
+```perl
+HashRef[Str => HashRef]
+```
+
+A hashref keyed by column name.  Each value is a hashref with:
+
+```perl
+type     => Str          # 'TEXT', 'INTEGER', 'REAL', 'TIMESTAMP', 'DATE'
+nullable => Bool         # 1 if the column may be NULL, 0 if NOT NULL
+default  => Str | undef  # default value, or undef
+pk       => Bool         # 1 if (part of) the primary key
+```
+
+For slurp-mode backends all columns default to type `TEXT` unless
+`infer_types` is set.  The result is cached in the object after the
+first call.
+
 ### Dbi\_Source
 
 Returns a hashref `{ dbh => $dbh, table => $name }` when the backend
@@ -889,6 +1055,115 @@ None beyond the implicit invocant.
 
 A hashref `{ dbh => DBI::db, table => Str }` on a SQLite-backed
 instance, or `undef` on all other backends.
+
+### Aggregate
+
+Groups matching rows and computes aggregate measures over each group.
+Pushes `GROUP BY` SQL to the backend when a DBI handle is available;
+otherwise folds rows in Perl (BerkeleyDB, DBM::Deep, XLSX, JSON, HTML, Redis).
+
+```perl
+my $rows = $db->aggregate(
+    by       => ['region', 'month'],
+    measures => [
+        { col => 'amount', fn => 'sum',   as => 'revenue' },
+        {                  fn => 'count', as => 'orders'  },
+    ],
+    status => 'active',
+);
+
+# Grand total (no 'by')
+my $row = $db->aggregate(
+    measures => [{ col => 'score', fn => 'avg', as => 'mean_score' }],
+)->[0];
+```
+
+Reserved parameter keys (extracted before the rest is treated as WHERE criteria):
+`by`, `measures`, `having`, `sort_by`, `limit`, `offset`, `table`, `join`.
+
+Always returns an **arrayref of hashrefs** (never `undef`); returns `[]` when
+no group qualifies.  Row keys are the `by` column names (in declaration order)
+followed by the measure aliases.
+
+#### Measure Specification
+
+Each measure hashref:
+
+```perl
+{ col => 'amount', fn => 'sum',           as => 'revenue'   }
+{                  fn => 'count',         as => 'orders'    }  # COUNT(*)
+{ col => 'amount', fn => 'count',         as => 'paid'      }  # COUNT(col)
+{ col => 'customer', fn => 'count_distinct', as => 'customers' }
+```
+
+`fn` must be one of `sum`, `avg`, `min`, `max`, `count`, `count_distinct`
+(case-insensitive).  `col` is required for every function except plain
+`count`.  `as` (the result key) must be a valid SQL identifier and must not
+duplicate another alias or a `by` column name.
+
+#### Having
+
+Pass `having => { alias_or_by_col => criterion }` to filter groups
+after aggregation.  Accepts the full criteria syntax.
+
+```perl
+having => { revenue => { '>' => 1000 } }
+```
+
+#### Pseudocode
+
+```
+1. _open_table; croak if JOIN requested on no-DBI backend.
+2. _validate_aggregate_spec: extract/validate by/measures/having/
+   sort_by/limit/offset; remainder of params is WHERE criteria.
+3. Merge base_criteria.
+4. SQL path (DBI handle): _build_aggregate_sql; prepare_cached+execute;
+   normalise empty-set values; cache; fixate; return.
+5. Perl fold: selectall_arrayref(criteria); _fold_aggregate;
+   HAVING via _match_criteria; sort; offset; limit; fixate; return.
+```
+
+#### Backend Notes
+
+On slurp-only backends all matching rows are materialised before folding.
+Use a SQL backend (SQLite DSN, PostgreSQL, MySQL) for large datasets.
+
+#### Api Specification
+
+##### Arguments
+
+```perl
+by         => ArrayRef[Str]     # optional: GROUP BY column names
+measures   => ArrayRef[HashRef] # required: one or more measure specs
+having     => HashRef           # optional: post-group filter criteria
+sort_by    => Str | ArrayRef    # optional: sort column (Str) or [col,dir]
+limit      => Int               # optional: max rows to return
+offset     => Int               # optional: rows to skip before returning
+join       => HashRef | ArrayRef # optional: join spec(s) -- SQL path only
+no_fixate  => Bool              # optional: skip read-only locking
+%criteria                       # optional: WHERE filter before grouping
+```
+
+Each element of `measures` is a hashref with keys:
+
+```perl
+col  => Str    # column to aggregate; omit only for plain count()
+fn   => Str    # one of: sum avg min max count count_distinct
+as   => Str    # result key name (required; valid SQL identifier)
+```
+
+##### Returns
+
+```
+ArrayRef[HashRef]
+```
+
+An arrayref of hashrefs.  Each hashref has one key per `by` column
+and one key per measure `as` alias.  Returns `[]` (empty arrayref)
+when no groups match -- never `undef`.
+
+Empty-set normalisation: `sum`/`count`/`count_distinct` become
+`0`; `avg`/`min`/`max` become `undef` when no rows are present.
 
 ### Query
 
@@ -1044,6 +1319,189 @@ triggers it, and how to resolve it.
     was called on a BerkeleyDB backend, which only supports key-value lookup
     via `fetchrow_hashref`.
 
+- `_Class_: aggregate: 'measures' must be a non-empty arrayref`
+
+    `aggregate()` was called without a `measures` arrayref, or with an empty one.
+
+- `_Class_: aggregate: measure must be a hashref, got _ref_`
+
+    An element of the `measures` arrayref is not a hashref.
+
+- `_Class_: aggregate: unknown measure function '_fn_'`
+
+    `fn` must be one of `sum`, `avg`, `min`, `max`, `count`, `count_distinct`.
+
+- `_Class_: aggregate: measure column is required for function '_fn_'`
+
+    `col` was omitted for a function that requires it.  Only plain `count` (COUNT(\*)) accepts a missing `col`.
+
+- `_Class_: aggregate: unsafe measure column '_col_'`
+
+    The `col` value is not a valid SQL identifier.
+
+- `_Class_: aggregate: measure 'as' is required`
+
+    The `as` alias was missing from a measure hashref.
+
+- `_Class_: aggregate: unsafe measure alias '_as_'`
+
+    The `as` value is not a valid SQL identifier.
+
+- `_Class_: aggregate: duplicate measure alias '_as_'`
+
+    Two measure hashrefs share the same `as` alias.
+
+- `_Class_: aggregate: measure alias '_as_' collides with a group-by column`
+
+    A measure alias duplicates a name in the `by` list.
+
+- `_Class_: aggregate: 'by' must be an arrayref of column names`
+
+    The `by` parameter was not an arrayref.
+
+- `_Class_: aggregate: unsafe group-by column '_col_'`
+
+    A `by` element is not a valid SQL identifier.
+
+- `_Class_: aggregate: having key '_key_' is not a group-by column or measure alias`
+
+    A `having` key does not match any `by` column name or measure `as` alias.
+
+- `_Class_: aggregate: sort_by names '_name_', which is not a group-by column or measure alias`
+
+    The `sort_by` column is not one of the `by` columns or measure aliases.
+
+- `_Class_: aggregate: cannot aggregate a JOIN on the _backend_ backend`
+
+    `join` was passed to `aggregate()` on a slurp-only backend that has no DBI handle.
+
+- `Database::Abstraction::Query: count() is not available once measure() has been called`
+
+    `count()` was called on a query builder that has measures set.  Use `all()` and check `scalar @{$rows}`.
+
+## Common Pitfalls
+
+The following mistakes cause unexpected behaviour in common usage.
+Read this section before filing a bug report.
+
+- **Default CSV separator is `!`, not `,`**
+
+    For historical reasons the module defaults to bang (`!`) as the
+    field separator for CSV files.  Standard RFC 4180 comma-separated
+    files require you to pass `sep_char => ','` in your subclass
+    constructor.
+
+    ```perl
+    sub new {
+        my ($class, %args) = @_;
+        return $class->SUPER::new(sep_char => ',', %args);
+    }
+    ```
+
+- **Primary key column is named `entry`, not `key`**
+
+    The default primary-key column name is `entry` because `key` is
+    a reserved word in SQL.  If your data uses a different column name
+    (e.g. `id`, `customer_id`), pass `id => 'customer_id'` to
+    `new()`.
+
+- **Duplicate primary keys silently overwrite earlier rows**
+
+    In slurp mode the entire data file is loaded into a Perl hash keyed
+    by the `entry` column.  If two rows share the same key value the
+    second row replaces the first.  To keep duplicates either disable
+    slurp with `max_slurp_size => 0` or switch to a `no_entry`
+    schema.
+
+- **Operator-hash criteria do not work on no-DBI backends**
+
+    No-DBI backends (XLSX, DBM::Deep, JSON, HTML URL, Redis) have no SQL
+    engine.  Criteria that use operator hashes (e.g.
+    `score => { '>=' => 80 }`) trigger the SQL path and will croak
+    with a "meaningless on a NoSQL database" error.  Use simple scalar
+    criteria (`score => 80`) on these backends.
+
+- **Read-only results: do not modify returned hashrefs**
+
+    Unless you pass `no_fixate => 1`, every hashref returned by
+    `selectall_arrayref`, `fetchrow_hashref`, and similar methods is
+    made read-only by `Data::Reuse`.  Attempting to assign a value to
+    a key in the returned hashref will throw an exception.  If you need
+    to modify a row, either copy it first (`my %row = %{$orig_row}`) or
+    construct the object with `no_fixate => 1`.
+
+- **`where()` calls in the query builder use AND semantics**
+
+    Each call to `$q->where(...)` adds an additional required
+    condition.  Two separate `where()` calls do NOT produce OR
+    semantics.  To express OR, pass `-or => [...]` inside a single
+    `where()` call:
+
+    ```perl
+    # Wrong: this is AND, not OR
+    $q->where(status => 'active')->where(status => 'pending');
+
+    # Correct: OR grouping inside one where() call
+    $q->where(-or => [{ status => 'active' }, { status => 'pending' }]);
+    ```
+
+- **`aggregate()` `sort_by` must name a grouped or aliased column**
+
+    The `sort_by` parameter for `aggregate()` only accepts column names
+    from the `by` list or measure `as` aliases.  You cannot sort
+    aggregate results by a raw data column that is not part of the group.
+    This restriction applies equally to the `->order_by()` call on a
+    query builder that has `measure()` methods set.
+
+- **`sort_by` is not an argument to the query builder's `all()`**
+
+    When using the fluent query builder to build an aggregate query, set
+    the sort column via `->order_by('col')` before calling
+    `->all()`.  Passing `->all(sort_by => 'col')` has no
+    effect because the `all()` terminal method ignores extra arguments.
+
+- **`Params::Get` positional mapping with `no_entry = 0`**
+
+    When `no_entry` is false (the default), the first positional argument
+    to `selectall_arrayref` and `fetchrow_hashref` is silently mapped to
+    the `entry` key.  Passing an operator-hash criteria in that position
+    (e.g. `selectall_arrayref(status =` { '!=' => 'x' })>) causes
+    `status` to be treated as the entry value rather than a column name,
+    which will produce wrong results.  Always pass a hashref of criteria
+    as a single reference, or use `no_entry =` 1> in your subclass.
+
+## Encoding
+
+- **Column names** must match the pattern `[a-zA-Z_][a-zA-Z0-9_.]*`.
+Only ASCII letters, digits, underscores, and dots (for qualified names
+such as `table.column`) are accepted.  Non-ASCII Unicode characters
+in column names will cause a croak with an "unsafe column name" error.
+- **Column values** (data stored in your rows) are passed through
+unchanged.  Full UTF-8 strings, emoji, and any valid Perl string are
+safe as values in criteria and are stored and returned as-is.  The
+exact encoding depends on your backend:
+    - **SQLite / DBI backends** -- DBD::SQLite stores strings as
+    UTF-8 internally.  Enable `sqlite_unicode => 1` in your DSN
+    or connect attributes if you want Perl to receive decoded Unicode
+    scalars rather than raw UTF-8 bytes.
+    - **CSV / PSV / TSV** -- Text::CSV and DBD::CSV pass bytes
+    through unchanged.  If your file is UTF-8-encoded, strings are
+    returned as UTF-8 byte strings.  You may need to decode them with
+    `Encode::decode('UTF-8', $val)` in your application.
+    - **JSON** -- JSON::MaybeXS decodes JSON strings to Perl Unicode
+    scalars automatically.  UTF-8 and emoji in JSON values are fully
+    supported.
+    - **XML** -- XML::Simple decodes the file with the XML encoding
+    declaration.  UTF-8 encoded XML (the default) produces Perl Unicode
+    scalars.
+    - **XLSX** -- Spreadsheet::ParseXLSX decodes strings to Perl
+    Unicode scalars.  Emoji in cell values are fully supported.
+    - **HTML URL** -- LWP::UserAgent fetches bytes; HTML::TableExtract
+    returns them as-is.  Decode with Encode if the page is UTF-8.
+- **File paths** are handled by `File::Spec::catfile` and work
+on any platform.  On Linux and macOS, UTF-8 directory and file names
+are fully supported.
+
 ## Known Limitations
 
 - **Read-only.**  No INSERT, UPDATE, or DELETE is provided.  `execute()`
@@ -1072,6 +1530,172 @@ same criteria has already populated it.
 - [Configure an Object at Runtime](https://metacpan.org/pod/Object%3A%3AConfigure)
 - [JSON::MaybeXS](https://metacpan.org/pod/JSON%3A%3AMaybeXS) - JSON backend (optional; install for `.json` support)
 - [Test Dashboard](https://nigelhorne.github.io/Database-Abstraction/coverage/)
+
+## Formal Specification
+
+The following section uses Z-notation to describe the key state
+transitions and invariants for the module.  Z is a formal
+specification language based on set theory and predicate logic.
+Unicode is used here as permitted by the documentation skill.
+
+### Database Object State
+
+```
+State == [
+    data       : TABLE_NAME --> (ENTRY --> ROW) | seq ROW | undef,
+    dbh        : TABLE_NAME --> DBI_HANDLE | undef,
+    type       : Str | undef,
+    base_crit  : CRITERIA,
+    _columns   : seq Str | undef,
+    _schema    : NAME --> COL_INFO | undef,
+    _destroyed : Bool
+]
+
+Initial state S0 == [
+    data?        = undef,
+    dbh?         = undef,
+    type?        = undef,
+    base_crit?   = {},
+    _columns?    = undef,
+    _schema?     = undef,
+    _destroyed?  = false
+]
+```
+
+### \_Open\_Table
+
+```
+_open_table ___________________________________________
+DeltaState
+class? : CLASS
+dir?   : DIRPATH | undef
+────────────────────────────────────────────────────
+pre:  _destroyed = false
+pre:  dbh(table) = undef AND data(table) = undef
+post: (EXISTS f : FILE_FORMATS WITH f.probe(dir) = true
+       IMPLIES (f.slurp? IMPLIES data'(table) != undef)
+            AND (f.dbi?  IMPLIES dbh'(table)  != undef))
+```
+
+### Selectall\_Arrayref
+
+```
+selectall_arrayref __________________________________
+XiState  (read-only; state unchanged except cache)
+criteria? : CRITERIA
+────────────────────────────────────────────────────
+pre:  _destroyed = false
+result == (data != undef AND simple(criteria)
+           IMPLIES { r : data | match(r, criteria) }
+           ELSE    dbh != undef
+           IMPLIES SQL_SELECT(dbh, criteria))
+post: result : seq ROW UNION {undef}
+```
+
+### Aggregate
+
+```
+aggregate ____________________________________________
+XiState
+by?       : seq COLNAME
+measures? : seq MEASURE_SPEC
+criteria? : CRITERIA
+────────────────────────────────────────────────────
+pre:  measures != empty
+pre:  FORALL m : measures WITH m.as NOT IN by
+pre:  sort_by != undef IMPLIES sort_by IN ran(by) UNION aliases(measures)
+result == (dbh != undef
+           IMPLIES SQL_GROUP_BY(dbh, by, measures, criteria)
+           ELSE    PERL_FOLD(selectall_arrayref(criteria), by, measures))
+post: result : seq ROW (keys = by UNION aliases(measures))
+post: FORALL r : result WITH
+          r.count != undef IMPLIES r.count >= 0
+        AND r.sum = undef IMPLIES no rows in that group
+```
+
+### Destroy
+
+```
+DESTROY ______________________________________________
+DeltaState
+────────────────────────────────────────────────────
+post: _destroyed' = true
+post: dbh'      = undef  (DBI handles disconnected)
+post: data'     = undef
+post: _columns' = undef
+post: _schema'  = undef
+```
+
+## State Diagram
+
+The following ASCII diagram shows every valid state the object can
+occupy and the transitions between them.  Transitions are labelled
+with the method call or event that triggers them.  Actions are shown
+in parentheses.
+
+```
+.-----------------------------------------------------------.
+|                  S1: CONSTRUCTED                          |
+|  dbh=undef, data=undef, type=undef                        |
+'---.-------.-------.-------.-------.-----.---.-------------'
+    |       |       |       |       |     |   |
+    | first query call triggers _open_table()
+    |       |       |       |       |     |   |
+    v       v       v       v       v     v   v
+.------. .------. .------. .------. .--. .--. .--.
+| S2   | | S3   | | S4   | | S5   | |S6| |S7| |S8|
+| DBI  | | CSV  | | XML  | | JSON | |Xls| |Bk| |Dp|
+'---^--' '--^---' '--^---' '--^---' '-^-' '-^-' '-^-'
+    |       |       |       |       |   |   |   |
+    |       |       '-------'-------'   |   |   |
+    |       |         slurp path        |   |   |
+    |       '-----------+---------------'   |   |
+    |                   |                   |   |
+    |         (data populated,              |   |
+    |          _columns/_schema undef)      |   |
+    |                                       |   |
+    | (dbh populated,                       |   |
+    |  data undef)                          |   |
+    |                                       |   |
+    +-------+--------+-----------+----------+   |
+            |        |           |              |
+      selectall   fetchrow    aggregate      fetchrow
+      count       _hashref    query->all     _hashref
+      each_row    AUTOLOAD    AUTOLOAD        AUTOLOAD
+            |        |           |              |
+            v        v           v              v
+.-----------------------------------------------------------.
+|                  (result returned to caller)              |
+|          state is unchanged; only cache may be updated    |
+'-----------------------------------------------------------'
+                            |
+                DESTROY (or object goes out of scope)
+                            |
+                            v
+.-----------------------------------------------------------.
+|                  S_DEAD: DESTROYED                        |
+|  _destroyed=true; all handles disconnected;               |
+|  temp files unlinked; _remote_tmpdir removed              |
+'-----------------------------------------------------------'
+
+State labels:
+  S1  CONSTRUCTED  - new() returned; no I/O done yet (lazy open)
+  S2  DBI          - live DBI handle (SQLite file, DSN, DBD::CSV)
+  S3  CSV_SLURP    - small CSV/PSV/TSV/gzip-CSV slurped into RAM hash
+  S4  XML_SLURP    - XML file slurped into RAM hash
+  S5  JSON_SLURP   - JSON file slurped into RAM hash
+  S6  XLSX_SLURP   - XLSX file slurped (type='XLSX', no DBI handle)
+  S7  BERKELEYDB   - BerkeleyDB key-value file open (berkeley flag set)
+  S8  DEEP_SLURP   - DBM::Deep file slurped into plain RAM hash
+
+Blocked transitions (croak before state changes):
+  S1 -> any  if constructor arguments are invalid
+             (unsafe id/table/host/url)
+  S* -> S*   aggregate() with join on S3/S4/S5/S6/S7/S8
+             (no DBI handle)
+  S7 -> S*   join() or select()-projection on BerkeleyDB
+  S8 -> S*   join() on DBM::Deep
+```
 
 ## License and Copyright
 

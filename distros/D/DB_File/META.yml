@@ -1,7 +1,7 @@
 ---
 abstract: 'Perl access to Berkeley DB 1.x'
 author:
-  - 'Paul Marquess <pmqs@cpan.org>'
+  - 'Paul Marquess <pmqs@outlook.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
@@ -21,5 +21,5 @@ resources:
   bugtracker: https://github.com/pmqs/DB_File/issues
   homepage: https://github.com/pmqs/DB_File
   repository: git://github.com/pmqs/DB_File.git
-version: '1.860'
+version: '1.861'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

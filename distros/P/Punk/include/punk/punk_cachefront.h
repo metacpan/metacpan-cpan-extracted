@@ -356,11 +356,16 @@ static SV *pkc_be_clear(pTHX_ punk_cachefront *f) {
 }
 
 /* 1 to the caller that should compute, 0 to one that should look again. */
-static int pkc_be_lock(pTHX_ punk_cachefront *f, SV *key) {
+/* `budget` is how long the caller expects to hold the lock, which is how old
+ * it may get before another caller takes it for abandoned. Negative means
+ * the store's own lock_wait, which is what a cache compute wants. A custom
+ * backend is handed it as a second argument and may ignore it. */
+static int pkc_be_lock_for(pTHX_ punk_cachefront *f, SV *key, double budget) {
     if (f->kind == PKC_K_FILE) {
         STRLEN kl;
         const char *k = SvPV_const(key, kl);
-        int r = punk_cachefile_lock(aTHX_ pkc_file(aTHX_ f), k, (uint32_t)kl);
+        int r = punk_cachefile_lock_for(aTHX_ pkc_file(aTHX_ f), k,
+                                        (uint32_t)kl, budget);
         /* A lock that could not be attempted becomes "compute": the store is
          * unusable for this key, so waiting for a holder that can never
          * appear would be an outage in exchange for nothing. The backend has
@@ -369,11 +374,20 @@ static int pkc_be_lock(pTHX_ punk_cachefront *f, SV *key) {
         return (r == PCF_LOCK_UNAVAILABLE) ? 1 : r;
     }
     {
-        SV *r = pcx_call_meth(aTHX_ f->backend, "_lock", &key, 1, 1);
-        int won = (r && SvTRUE(r)) ? 1 : 0;
+        SV *argv[2], *r;
+        int won;
+        argv[0] = key;
+        if (budget >= 0) argv[1] = sv_2mortal(newSVnv(budget));
+        r = pcx_call_meth(aTHX_ f->backend, "_lock", argv,
+                          budget >= 0 ? 2 : 1, 1);
+        won = (r && SvTRUE(r)) ? 1 : 0;
         if (r) SvREFCNT_dec(r);
         return won;
     }
+}
+
+static int pkc_be_lock(pTHX_ punk_cachefront *f, SV *key) {
+    return pkc_be_lock_for(aTHX_ f, key, -1.0);
 }
 
 static void pkc_be_unlock(pTHX_ punk_cachefront *f, SV *key) {

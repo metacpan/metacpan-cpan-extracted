@@ -1,5 +1,20 @@
 Revision history for Database::Join
 
+0.009.0 Mon Oct 12 01:47:59 PM EDT 2026
+	[ Enhancements ]
+	- aggregate(): group the merged view by one or more published column names and
+	  compute aggregate measures (sum/avg/min/max/count/count_distinct) over each
+	  group.  Supports HAVING, sort_by, limit and offset.  On the sqlite/auto backend
+	  the GROUP BY is pushed into the existing SQLite spill cache so rows never pass
+	  through Perl; the array backend folds merged rows in Perl.  The auto backend
+	  always takes the SQLite path for aggregation (skips the row-count threshold
+	  probe, which only exists to decide whether to spill — an aggregation query
+	  never fetches every row).  Without this method a joined view could not answer
+	  "total per group" without shipping every merged row to a caller.
+	- _sqlite_criteria, _sqlite_where, _sqlite_join_clause: extract the criteria
+	  partition, WHERE builder and JOIN builder from _sqlite_join as Protected
+	  helpers so _sqlite_aggregate can reuse them without duplicating logic.
+
 0.008.2	Fri Oct  2 12:43:58 PM EDT 2026
 	[ Enhancements ]
 	- base_criteria constructor parameter: a hashref of column-name => value pairs

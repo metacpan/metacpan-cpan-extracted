@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk (); 
 
-our $VERSION = '0.57';
+our $VERSION = '0.58';
 
 1;
 
@@ -219,9 +219,19 @@ ahead of it. Hand C<next> back as C<after>.
 A token belongs to the ordering it was minted under. Presented against a
 different C<order_by> it is refused rather than applied to the wrong
 columns; the plain token a search without C<order_by> mints has the shape
-it always had and still pages the plain ordering. A sort column holding
-NULL compares unknown and falls out of every page, which is the
-database's rule - order by columns that are NOT NULL.
+it always had and still pages the plain ordering.
+
+Order by columns that are never NULL where you can. Where NULL sorts is
+the database's choice: below every value on SQLite, MySQL and MariaDB,
+above every value on PostgreSQL and Oracle. A page that ends on a row
+holding NULL in a sort column continues correctly on those five, through
+the rest of the NULLs and on to the rows after them; on any other driver
+it croaks, because the next page cannot be found without knowing. A page
+that ends on a value does not go looking for NULLs that sort after it, so
+with the NULLs last they are seen on the first page or not at all.
+
+C<limit> is yours to bound: a value taken from a request is passed through
+as given, so cap it before it gets here.
 
 =head2 Schema
 

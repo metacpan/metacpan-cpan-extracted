@@ -48,8 +48,11 @@ t/append70.gz
 t/arg.crash.regressions.t
 t/assign.HoH.t
 t/assign.t
+t/audit.2026-10-12.regressions.t
 t/avals.t
 t/base_did.csv
+t/bedroc.mpmath.py
+t/bedroc.mpmath.t
 t/bedroc.python.py
 t/bedroc.python.t
 t/bedroc.t
@@ -68,7 +71,11 @@ t/chunk.t
 t/col2col.t
 t/colnames_rownames.t
 t/concat.t
+t/cor.R.scipy.R
+t/cor.R.scipy.py
+t/cor.R.scipy.t
 t/cor.t
+t/cor_test.call_forms.t
 t/cor_test.kendall.R.R
 t/cor_test.kendall.R.t
 t/cor_test.pearson.ci.R.R
@@ -103,6 +110,7 @@ t/effect_sizes.t
 t/epi_2x2.t
 t/fillna.t
 t/filter.compiled.t
+t/filter.regressions.t
 t/filter.rowid.t
 t/filter.t
 t/filter_match.t
@@ -255,6 +263,8 @@ t/read_table.ws_sep.t
 t/read_table.xlsx.parser.t
 t/read_table.xlsx.t
 t/read_table.xlsx.xml.t
+t/roc.R.R
+t/roc.R.t
 t/roc.t
 t/rownames.utf8.t
 t/scale.keywords.t

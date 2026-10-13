@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package App::Spec::Run::Validator;
 
-our $VERSION = 'v0.15.0'; # VERSION;
+our $VERSION = 'v0.17.0'; # VERSION;
 
 use List::Util qw/ any /;
 use List::MoreUtils qw/ uniq /;

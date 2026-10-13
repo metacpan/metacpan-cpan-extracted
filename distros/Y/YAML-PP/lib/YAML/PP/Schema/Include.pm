@@ -2,11 +2,12 @@ use strict;
 use warnings;
 package YAML::PP::Schema::Include;
 
-our $VERSION = 'v0.42.0'; # VERSION
+our $VERSION = 'v0.43.0'; # VERSION
 
 use Carp qw/ croak /;
 use Scalar::Util qw/ weaken /;
 use File::Basename qw/ dirname /;
+use File::Spec;
 
 sub new {
     my ($class, %args) = @_;

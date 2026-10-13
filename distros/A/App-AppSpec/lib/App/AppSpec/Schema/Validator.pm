@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package App::AppSpec::Schema::Validator;
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = 'v0.7.0'; # VERSION
 
 use App::Spec;
 use App::Spec::Schema qw/ $SCHEMA /;

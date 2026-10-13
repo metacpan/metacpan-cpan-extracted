@@ -1,6 +1,6 @@
-#!bash
+#!/usr/bin/env bash
 
-# Generated with perl module App::Spec v0.013
+# Generated with perl module App::Spec v0.000
 
 _appspec() {
 
@@ -54,7 +54,7 @@ _appspec() {
             # subcmds
             case ${MYWORDS[2]} in
               generate)
-                FLAGS+=('--zsh' 'for zsh' '--bash' 'for bash')
+                FLAGS+=('--zsh' 'for zsh' '--bash' 'for bash' '--fish' 'for fish (>= 4.0)')
                 OPTIONS+=('--name' 'name of the program (optional, override name in spec)')
                 __appspec_handle_options_flags
                 case ${MYWORDS[$INDEX-1]} in
@@ -101,7 +101,7 @@ _appspec() {
         esac
       ;;
       completion)
-        FLAGS+=('--zsh' 'for zsh' '--bash' 'for bash')
+        FLAGS+=('--zsh' 'for zsh' '--bash' 'for bash' '--fish' 'for fish (>= 4.0)')
         OPTIONS+=('--name' 'name of the program (optional, override the value from the spec)')
         __appspec_handle_options_flags
         case ${MYWORDS[$INDEX-1]} in

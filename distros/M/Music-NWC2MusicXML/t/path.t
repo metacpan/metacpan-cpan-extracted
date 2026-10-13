@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 use strict;
 use warnings;
 
@@ -8,8 +8,7 @@ use Compress::Zlib ();
 use Readonly;
 use Scalar::Util qw(blessed);
 
-use lib 'lib';
-use Music::NWC2MusicXML::NWC;
+use_ok('Music::NWC2MusicXML::NWC');
 use Music::NWC2MusicXML::Event;
 use Music::NWC2MusicXML::Score;
 use Music::NWC2MusicXML::Staff;
@@ -926,4 +925,73 @@ subtest '_calculate_divisions -- path: three distinct denominators (loop 2 itera
 };
 
 # ---------------------------------------------------------------------------
-done_testing;
+# 17. MusicXML::_annotate_fermatas / _emit_measure / _emit_note_event /
+#     _emit_rest_event -- fermata path coverage
+# ---------------------------------------------------------------------------
+
+subtest '_annotate_fermatas -- path: pending flag cleared after annotating note' => sub {
+	# Verifies the $pending_fermata flag is consumed by the first sounding event
+	# and not carried forward to a second note.
+	my $xml = Music::NWC2MusicXML::MusicXML->new;
+	my $mk_tv = sub { Music::NWC2MusicXML::Event->new(
+		type => 'TempoVariance', data => { style => 'Fermata', placement => 'above' }) };
+	my $mk_note = sub { Music::NWC2MusicXML::Event->new(
+		type => 'Note', duration => [1,1],
+		data => { nwc_pos => '0', base_dur => '4th', dots => 0,
+		          articulations => [], opts => {} }) };
+	my ($tv, $n1, $n2) = ($mk_tv->(), $mk_note->(), $mk_note->());
+	my %ann;
+	$xml->_annotate_fermatas([$tv, $n1, $n2], \%ann);
+	ok  $ann{"$n1"}{fermata},  'first note (immediately after TV:Fermata) is annotated';
+	ok !$ann{"$n2"}{fermata},  'second note is NOT annotated (pending flag was cleared)';
+};
+
+subtest '_emit_measure -- path: TempoVariance:Fermata skipped as direction' => sub {
+	# The `next if` branch in _emit_measure must not emit a <direction> element.
+	my $staff = Music::NWC2MusicXML::Staff->new(name => 'Test');
+	$staff->set_initial_clef('Treble');
+	$staff->set_initial_key({ signature => 'C', tonic => 'C', fifths => 0 });
+	$staff->set_initial_timesig({ beats => 4, beat_type => 4 });
+	$staff->add_event(Music::NWC2MusicXML::Event->new(
+		type => 'TempoVariance',
+		data => { style => 'Fermata', placement => 'above' },
+	));
+	$staff->add_event(Music::NWC2MusicXML::Event->new(
+		type => 'Note', duration => [1,1],
+		data => { nwc_pos => '0', base_dur => '4th', dots => 0, articulations => [] },
+	));
+	$staff->add_event(Music::NWC2MusicXML::Event->new(
+		type => 'Bar', data => { style => 'normal' },
+	));
+	my $score = Music::NWC2MusicXML::Score->new;
+	$score->add_staff($staff);
+	my $xml_str = Music::NWC2MusicXML::MusicXML->new->generate($score);
+	unlike $xml_str, qr/<direction/, 'no <direction> element emitted for fermata';
+	like   $xml_str, qr/<fermata\/>/,'<fermata/> appears in note <notations>';
+};
+
+subtest '_emit_rest_event -- path: fermata annotation adds <notations> block' => sub {
+	my $staff = Music::NWC2MusicXML::Staff->new(name => 'Test');
+	$staff->set_initial_clef('Treble');
+	$staff->set_initial_key({ signature => 'C', tonic => 'C', fifths => 0 });
+	$staff->set_initial_timesig({ beats => 4, beat_type => 4 });
+	$staff->add_event(Music::NWC2MusicXML::Event->new(
+		type => 'TempoVariance',
+		data => { style => 'Fermata', placement => 'above' },
+	));
+	$staff->add_event(Music::NWC2MusicXML::Event->new(
+		type => 'Rest', duration => [1,1],
+		data => { base_dur => '4th', dots => 0 },
+	));
+	$staff->add_event(Music::NWC2MusicXML::Event->new(
+		type => 'Bar', data => { style => 'normal' },
+	));
+	my $score = Music::NWC2MusicXML::Score->new;
+	$score->add_staff($staff);
+	my $xml_str = Music::NWC2MusicXML::MusicXML->new->generate($score);
+	like $xml_str, qr/<fermata\/>/,   '<fermata/> emitted on rest';
+	like $xml_str, qr/<notations>/,   '<notations> wrapper present on rest';
+	unlike $xml_str, qr/<direction/,  'no direction element for fermata on rest';
+};
+
+done_testing();

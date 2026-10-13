@@ -51,6 +51,18 @@ if ($pid == 0) {
                 };
             }
 
+            # More than one DATA frame, closed while most of it is still
+            # buffered: the close must not end the body at the next frame.
+            if ($p eq '/c-big') {
+                return sub {
+                    Hyperman::_abi_stream_open($env, 200,
+                        [ 'Content-Type' => 'text/plain' ]) or return;
+                    Hyperman::_abi_stream_write('x' x 100_000);
+                    Hyperman::_abi_stream_write('end');
+                    Hyperman::_abi_stream_close();
+                };
+            }
+
             # Open, write once, and leave it open. Whatever kills the stream
             # next - the client hanging up, an h2 RST_STREAM - is what the
             # abort callback is there to catch.
@@ -468,16 +480,20 @@ for my $case (['/tunnel', 'hello;', 'a synchronous handler'],
 # ---- HTTP/2: the same application code, a multiplexed transport -----------
 
 SKIP: {
-    skip 'nghttp2 support not built', 3 unless $h2;
+    skip 'nghttp2 support not built', 5 unless $h2;
 
     my $curl = `which curl 2>/dev/null`;
     chomp $curl;
     SKIP: {
-        skip 'no HTTP/2-capable curl', 1
+        skip 'no HTTP/2-capable curl', 3
             unless $curl && `curl --version 2>/dev/null` =~ /\bHTTP2\b/;
         my $out = `$curl -s --http2-prior-knowledge http://127.0.0.1:$port/c-stream 2>/dev/null`;
         is($out, 'chunk1;chunk2;chunk3;',
            'HTTP/2: the same seam, the same body, no branch in the app');
+        my $big = `$curl -s --http2-prior-knowledge http://127.0.0.1:$port/c-big 2>/dev/null`;
+        is(length $big, 100_003,
+           'HTTP/2: a body of several frames closed at once arrives whole');
+        is(substr($big, -4), 'xend', '...to its last byte');
     }
 
     # An h2 peer can reset ONE stream out of many, which HTTP/1.1 has no

@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 1.6.1 are described by their release commits.
 
+## 1.9.3 - 2026-10-13
+
+### Fixes
+
+- Re-pin the spec to 2026.10.13: Open databases come with a license ([`b3a2373`](https://github.com/internetdata/sdk-perl/commit/b3a23737bad936588b9e2d03876ec76627fc0727))
+
 ## 1.9.2 - 2026-10-11
 
 ### Fixes

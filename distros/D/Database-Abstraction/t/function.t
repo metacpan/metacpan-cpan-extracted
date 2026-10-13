@@ -1652,4 +1652,1228 @@ note '--- A37: _infer_type()';
 		'INTEGER', '_infer_type(): undef values ignored, numeric wins → INTEGER');
 }
 
+# ---------------------------------------------------------------------------
+# PART A (continued) — aggregate helpers added in 0.49
+# ---------------------------------------------------------------------------
+
+note '';
+note '=== Aggregate helpers (0.49) ===';
+
+# Magic strings used across the aggregate sections
+Readonly my $ACTIVE   => 'active';
+Readonly my $INACTIVE => 'inactive';
+Readonly my $AGG_DB   => Database::test1->new($DATA_DIR);
+
+# ---- A38: _validate_aggregate_spec() --------------------------------------
+# Pure validation helper; no database access.  Test every croak guard and
+# every valid branch; verify the returned \%spec structure precisely.
+note '--- A38: _validate_aggregate_spec()';
+{
+	my $db = Database::test1->new($DATA_DIR);
+
+	# Minimal valid spec: one measure, no by → grand total
+	{
+		my $p = { measures => [{ col => 'score', fn => 'sum', as => 'total' }] };
+		my $spec;
+		lives_ok { $spec = $db->_validate_aggregate_spec($p) }
+			'_validate_aggregate_spec(): minimal valid spec does not croak';
+		returns_is($spec, { type => 'hashref' }, '_validate_aggregate_spec(): returns hashref');
+		is(ref($spec->{'by'}),       'ARRAY',  '_validate_aggregate_spec(): by is ARRAY');
+		is(scalar @{$spec->{'by'}},  0,        '_validate_aggregate_spec(): empty by (grand total)');
+		is(ref($spec->{'measures'}), 'ARRAY',  '_validate_aggregate_spec(): measures is ARRAY');
+		is($spec->{'measures'}[0]{'fn'},  'sum',   '_validate_aggregate_spec(): fn stored');
+		is($spec->{'measures'}[0]{'as'},  'total', '_validate_aggregate_spec(): as stored');
+		is($spec->{'measures'}[0]{'col'}, 'score', '_validate_aggregate_spec(): col stored');
+		is($spec->{'measures'}[0]{'sql'}, 'SUM(score)', '_validate_aggregate_spec(): sql expression correct');
+		ok($spec->{'aliases'}{'total'}, '_validate_aggregate_spec(): alias registered');
+		is(ref($spec->{'criteria'}), 'HASH', '_validate_aggregate_spec(): criteria is HASH');
+	}
+
+	# by with valid column names → stored in by list
+	{
+		my $p = {
+			by       => ['status', 'region'],
+			measures => [{ fn => 'count', as => 'n' }],
+		};
+		my $spec = $db->_validate_aggregate_spec($p);
+		is(scalar @{$spec->{'by'}}, 2,        '_validate_aggregate_spec(): two by columns stored');
+		is($spec->{'by'}[0]{'name'}, 'status', '_validate_aggregate_spec(): first by name correct');
+		is($spec->{'by'}[1]{'name'}, 'region', '_validate_aggregate_spec(): second by name correct');
+		ok($spec->{'by_names'}{'status'}, '_validate_aggregate_spec(): by_names hash populated');
+	}
+
+	# count without col → COUNT(*)
+	{
+		my $p = { measures => [{ fn => 'count', as => 'n' }] };
+		my $spec = $db->_validate_aggregate_spec($p);
+		is($spec->{'measures'}[0]{'sql'}, 'COUNT(*)',
+			'_validate_aggregate_spec(): count without col → COUNT(*)');
+		ok(!defined($spec->{'measures'}[0]{'col'}),
+			'_validate_aggregate_spec(): count without col → col is undef');
+	}
+
+	# count with col → COUNT(col)
+	{
+		my $p = { measures => [{ fn => 'count', col => 'score', as => 'n' }] };
+		my $spec = $db->_validate_aggregate_spec($p);
+		is($spec->{'measures'}[0]{'sql'}, 'COUNT(score)',
+			'_validate_aggregate_spec(): count with col → COUNT(col)');
+	}
+
+	# count_distinct → COUNT(DISTINCT col)
+	{
+		my $p = { measures => [{ fn => 'count_distinct', col => 'status', as => 'ud' }] };
+		my $spec = $db->_validate_aggregate_spec($p);
+		is($spec->{'measures'}[0]{'sql'}, 'COUNT(DISTINCT status)',
+			'_validate_aggregate_spec(): count_distinct → COUNT(DISTINCT col)');
+	}
+
+	# All other valid functions emit correct SQL expressions
+	for my $fn_case (
+		['avg',  'score', 'AVG(score)'],
+		['min',  'score', 'MIN(score)'],
+		['max',  'score', 'MAX(score)'],
+	) {
+		my ($fn, $col, $expected_sql) = @{$fn_case};
+		my $p = { measures => [{ fn => $fn, col => $col, as => 'v' }] };
+		my $spec = $db->_validate_aggregate_spec($p);
+		is($spec->{'measures'}[0]{'sql'}, $expected_sql,
+			"_validate_aggregate_spec(): fn=$fn → $expected_sql");
+	}
+
+	# fn is case-insensitive (uppercased internally)
+	{
+		my $p = { measures => [{ fn => 'SUM', col => 'score', as => 'v' }] };
+		my $spec;
+		lives_ok { $spec = $db->_validate_aggregate_spec($p) }
+			'_validate_aggregate_spec(): uppercase fn accepted';
+		is($spec->{'measures'}[0]{'fn'}, 'sum',
+			'_validate_aggregate_spec(): fn lowercased internally');
+	}
+
+	# remaining params become criteria (control keys deleted from hashref)
+	{
+		my $p = {
+			measures => [{ fn => 'count', as => 'n' }],
+			status   => $ACTIVE,
+		};
+		my $spec = $db->_validate_aggregate_spec($p);
+		is($spec->{'criteria'}{'status'}, $ACTIVE,
+			'_validate_aggregate_spec(): non-control key left in criteria');
+		ok(!exists($spec->{'criteria'}{'measures'}),
+			'_validate_aggregate_spec(): measures key removed from criteria');
+	}
+
+	# sort_by scalar → [col, 'ASC'], stored in spec->{'sort'}
+	{
+		my $p = {
+			measures => [{ fn => 'count', as => 'n' }],
+			by       => ['status'],
+			sort_by  => 'status',
+		};
+		my $spec = $db->_validate_aggregate_spec($p);
+		is(ref($spec->{'sort'}), 'ARRAY', '_validate_aggregate_spec(): sort stored as arrayref');
+		is($spec->{'sort'}[0], 'status', '_validate_aggregate_spec(): sort col correct');
+		is($spec->{'sort'}[1], 'ASC',    '_validate_aggregate_spec(): sort dir defaults to ASC');
+	}
+
+	# sort_by ['col', 'DESC'] form
+	{
+		my $p = {
+			measures => [{ fn => 'sum', col => 'score', as => 'total' }],
+			by       => ['status'],
+			sort_by  => ['total', 'DESC'],
+		};
+		my $spec = $db->_validate_aggregate_spec($p);
+		is($spec->{'sort'}[0], 'total', '_validate_aggregate_spec(): sort_by array col correct');
+		is($spec->{'sort'}[1], 'DESC',  '_validate_aggregate_spec(): sort_by array dir correct');
+	}
+
+	# limit/offset stored and cast to int
+	{
+		my $p = {
+			measures => [{ fn => 'count', as => 'n' }],
+			limit    => 5,
+			offset   => 10,
+		};
+		my $spec = $db->_validate_aggregate_spec($p);
+		is($spec->{'limit'},  5,  '_validate_aggregate_spec(): limit stored');
+		is($spec->{'offset'}, 10, '_validate_aggregate_spec(): offset stored');
+	}
+
+	# having stored when valid
+	{
+		my $p = {
+			by       => ['status'],
+			measures => [{ fn => 'sum', col => 'score', as => 'total' }],
+			having   => { total => { '>' => 100 } },
+		};
+		my $spec = $db->_validate_aggregate_spec($p);
+		ok(defined($spec->{'having'}), '_validate_aggregate_spec(): having stored');
+		ok(exists($spec->{'having'}{'total'}), '_validate_aggregate_spec(): having key retained');
+	}
+
+	# having with group-by column key (not an alias) is valid
+	{
+		my $p = {
+			by       => ['status'],
+			measures => [{ fn => 'count', as => 'n' }],
+			having   => { status => $ACTIVE },
+		};
+		lives_ok { $db->_validate_aggregate_spec($p) }
+			'_validate_aggregate_spec(): having with group-by column key is valid';
+	}
+
+	# having with -or key is exempt from the allowlist check
+	{
+		my $p = {
+			by       => ['status'],
+			measures => [{ fn => 'count', as => 'n' }],
+			having   => { '-or' => [{ status => $ACTIVE }] },
+		};
+		lives_ok { $db->_validate_aggregate_spec($p) }
+			'_validate_aggregate_spec(): having with -or key is valid';
+	}
+
+	# ---- Negative tests ----
+
+	# measures not provided → croak
+	throws_ok {
+		$db->_validate_aggregate_spec({})
+	} qr/'measures' must be a non-empty arrayref/,
+	'_validate_aggregate_spec(): missing measures → croak';
+
+	# measures is a scalar → croak
+	throws_ok {
+		$db->_validate_aggregate_spec({ measures => 'bad' })
+	} qr/'measures' must be a non-empty arrayref/,
+	'_validate_aggregate_spec(): scalar measures → croak';
+
+	# measures is empty arrayref → croak
+	throws_ok {
+		$db->_validate_aggregate_spec({ measures => [] })
+	} qr/'measures' must be a non-empty arrayref/,
+	'_validate_aggregate_spec(): empty measures → croak';
+
+	# individual measure not a hashref → croak with ref type
+	throws_ok {
+		$db->_validate_aggregate_spec({ measures => ['bad'] })
+	} qr/measure must be a hashref/,
+	'_validate_aggregate_spec(): measure as scalar → croak';
+
+	# individual measure is an arrayref → croak
+	throws_ok {
+		$db->_validate_aggregate_spec({ measures => [[1,2]] })
+	} qr/measure must be a hashref/,
+	'_validate_aggregate_spec(): measure as arrayref → croak';
+
+	# unknown function name → croak
+	throws_ok {
+		$db->_validate_aggregate_spec({ measures => [{ fn => 'bogus', col => 'x', as => 'v' }] })
+	} qr/unknown measure function 'bogus'/,
+	'_validate_aggregate_spec(): unknown fn → croak';
+
+	# col required for sum but missing → croak
+	throws_ok {
+		$db->_validate_aggregate_spec({ measures => [{ fn => 'sum', as => 'v' }] })
+	} qr/measure column is required for function 'sum'/,
+	'_validate_aggregate_spec(): sum without col → croak';
+
+	# col required for avg but missing → croak
+	throws_ok {
+		$db->_validate_aggregate_spec({ measures => [{ fn => 'avg', as => 'v' }] })
+	} qr/measure column is required for function 'avg'/,
+	'_validate_aggregate_spec(): avg without col → croak';
+
+	# col required for min → croak
+	throws_ok {
+		$db->_validate_aggregate_spec({ measures => [{ fn => 'min', as => 'v' }] })
+	} qr/measure column is required for function 'min'/,
+	'_validate_aggregate_spec(): min without col → croak';
+
+	# col required for max → croak
+	throws_ok {
+		$db->_validate_aggregate_spec({ measures => [{ fn => 'max', as => 'v' }] })
+	} qr/measure column is required for function 'max'/,
+	'_validate_aggregate_spec(): max without col → croak';
+
+	# col required for count_distinct → croak
+	throws_ok {
+		$db->_validate_aggregate_spec({ measures => [{ fn => 'count_distinct', as => 'v' }] })
+	} qr/measure column is required for function 'count_distinct'/,
+	'_validate_aggregate_spec(): count_distinct without col → croak';
+
+	# unsafe col (SQL injection in column name) → croak
+	throws_ok {
+		$db->_validate_aggregate_spec({ measures => [{ fn => 'sum', col => 'x; DROP TABLE t--', as => 'v' }] })
+	} qr/unsafe measure column/,
+	'_validate_aggregate_spec(): SQL injection in col → croak';
+
+	# col with null byte → croak
+	throws_ok {
+		$db->_validate_aggregate_spec({ measures => [{ fn => 'sum', col => "score\x00", as => 'v' }] })
+	} qr/unsafe measure column/,
+	'_validate_aggregate_spec(): null byte in col → croak';
+
+	# missing as → croak
+	throws_ok {
+		$db->_validate_aggregate_spec({ measures => [{ fn => 'sum', col => 'score' }] })
+	} qr/measure 'as' is required/,
+	'_validate_aggregate_spec(): missing as → croak';
+
+	# empty as → croak
+	throws_ok {
+		$db->_validate_aggregate_spec({ measures => [{ fn => 'sum', col => 'score', as => '' }] })
+	} qr/measure 'as' is required/,
+	'_validate_aggregate_spec(): empty as → croak';
+
+	# unsafe as (contains semicolon) → croak
+	throws_ok {
+		$db->_validate_aggregate_spec({ measures => [{ fn => 'sum', col => 'score', as => 'bad;alias' }] })
+	} qr/unsafe measure alias/,
+	'_validate_aggregate_spec(): SQL injection in as → croak';
+
+	# as with dot (not a valid identifier) → croak (only $SAFE_IDENTIFIER, not $SAFE_QUALIFIED)
+	throws_ok {
+		$db->_validate_aggregate_spec({ measures => [{ fn => 'sum', col => 'score', as => 'a.b' }] })
+	} qr/unsafe measure alias/,
+	'_validate_aggregate_spec(): dot in as → croak (SAFE_IDENTIFIER rejects dots)';
+
+	# duplicate as across two measures → croak
+	throws_ok {
+		$db->_validate_aggregate_spec({ measures => [
+			{ fn => 'sum', col => 'score', as => 'v' },
+			{ fn => 'avg', col => 'score', as => 'v' },
+		]})
+	} qr/duplicate measure alias 'v'/,
+	'_validate_aggregate_spec(): duplicate as → croak';
+
+	# alias collides with a by column name → croak
+	throws_ok {
+		$db->_validate_aggregate_spec({
+			by       => ['status'],
+			measures => [{ fn => 'sum', col => 'score', as => 'status' }],
+		})
+	} qr/measure alias 'status' collides with a group-by column/,
+	'_validate_aggregate_spec(): alias==by column → croak';
+
+	# by is not an arrayref → croak
+	throws_ok {
+		$db->_validate_aggregate_spec({
+			by       => 'status',
+			measures => [{ fn => 'count', as => 'n' }],
+		})
+	} qr/'by' must be an arrayref/,
+	'_validate_aggregate_spec(): by is a scalar → croak';
+
+	# unsafe by column (space/semicolon) → croak
+	throws_ok {
+		$db->_validate_aggregate_spec({
+			by       => ['status; DROP TABLE t--'],
+			measures => [{ fn => 'count', as => 'n' }],
+		})
+	} qr/unsafe group-by column/,
+	'_validate_aggregate_spec(): SQL injection in by column → croak';
+
+	# having with unknown key (not in by or aliases) → croak
+	throws_ok {
+		$db->_validate_aggregate_spec({
+			by       => ['status'],
+			measures => [{ fn => 'sum', col => 'score', as => 'total' }],
+			having   => { unknown_col => { '>' => 5 } },
+		})
+	} qr/having key 'unknown_col' is not a group-by column or measure alias/,
+	'_validate_aggregate_spec(): having key not in allowlist → croak';
+
+	# sort_by names a column not in by or aliases → croak
+	throws_ok {
+		$db->_validate_aggregate_spec({
+			by       => ['status'],
+			measures => [{ fn => 'count', as => 'n' }],
+			sort_by  => 'bogus_col',
+		})
+	} qr/sort_by names 'bogus_col'/,
+	'_validate_aggregate_spec(): sort_by not in by or aliases → croak';
+
+	# limit with non-integer string → carp and ignored (not a croak)
+	{
+		my @warnings;
+		local $SIG{__WARN__} = sub { push @warnings, @_ };
+		my $p = {
+			measures => [{ fn => 'count', as => 'n' }],
+			limit    => 'bad',
+		};
+		my $spec;
+		lives_ok { $spec = $db->_validate_aggregate_spec($p) }
+			'_validate_aggregate_spec(): non-integer limit does not croak';
+		ok(!defined($spec->{'limit'}), '_validate_aggregate_spec(): bad limit → undef (ignored)');
+		ok(scalar @warnings,           '_validate_aggregate_spec(): bad limit → carp warning emitted');
+	}
+
+	# offset with non-integer string → carp and ignored
+	{
+		my @warnings;
+		local $SIG{__WARN__} = sub { push @warnings, @_ };
+		my $p = {
+			measures => [{ fn => 'count', as => 'n' }],
+			offset   => 'not_a_number',
+		};
+		my $spec;
+		lives_ok { $spec = $db->_validate_aggregate_spec($p) }
+			'_validate_aggregate_spec(): non-integer offset does not croak';
+		ok(!defined($spec->{'offset'}), '_validate_aggregate_spec(): bad offset → undef (ignored)');
+		ok(scalar @warnings,            '_validate_aggregate_spec(): bad offset → carp warning emitted');
+	}
+}
+
+# ---- A39: _build_aggregate_sql() ------------------------------------------
+# SQL assembly from a validated \%spec.  Tests cover SELECT list, GROUP BY,
+# WHERE, HAVING, ORDER BY, LIMIT/OFFSET, and the CSV comment-row guard.
+note '--- A39: _build_aggregate_sql()';
+SKIP: {
+	skip 'DBD::SQLite not available for _build_aggregate_sql() tests', 22
+		unless $have_sqlite;
+
+	my $adir  = File::Temp::tempdir(CLEANUP => 1);
+	my $afile = File::Spec->catfile($adir, 'aggsql.sql');
+	my $adsn  = "dbi:SQLite:dbname=$afile";
+	{
+		my $s = DBI->connect($adsn, undef, undef, { RaiseError => 1 });
+		$s->do('CREATE TABLE aggsql (entry TEXT PRIMARY KEY, score REAL, status TEXT)');
+		$s->do("INSERT INTO aggsql VALUES ('a',9.5,'active')");
+		$s->do("INSERT INTO aggsql VALUES ('b',7.0,'inactive')");
+		$s->disconnect();
+	}
+
+	{ package Database::aggsql; use parent 'Database::Abstraction'; }
+	my $db = Database::aggsql->new(dsn => $adsn, no_entry => 1);
+	$db->count();	# trigger _open so _table_name and DBI handle are populated
+
+	my $table = 'aggsql';
+
+	# Grand total: no by, one sum measure → no GROUP BY, no ORDER BY
+	{
+		my $p    = { measures => [{ fn => 'sum', col => 'score', as => 'total' }] };
+		my $spec = $db->_validate_aggregate_spec($p);
+		my ($sql, $args) = $db->_build_aggregate_sql($spec, '', $table, $db->{$table});
+		like($sql, qr/SELECT SUM\(score\) AS total FROM aggsql/i,
+			'_build_aggregate_sql(): grand total SELECT correct');
+		unlike($sql, qr/GROUP BY/i,
+			'_build_aggregate_sql(): no GROUP BY when by is empty');
+		unlike($sql, qr/ORDER BY/i,
+			'_build_aggregate_sql(): no ORDER BY when no by and no sort_by');
+		is(scalar @{$args}, 0, '_build_aggregate_sql(): grand total → no bind args');
+	}
+
+	# Grouped by one column → GROUP BY + default ORDER BY
+	{
+		my $p    = {
+			by       => ['status'],
+			measures => [{ fn => 'count', as => 'n' }],
+		};
+		my $spec = $db->_validate_aggregate_spec($p);
+		my ($sql, $args) = $db->_build_aggregate_sql($spec, '', $table, $db->{$table});
+		like($sql, qr/SELECT status, COUNT\(\*\) AS n FROM aggsql/i,
+			'_build_aggregate_sql(): grouped SELECT with by column first');
+		like($sql, qr/GROUP BY status/i,
+			'_build_aggregate_sql(): GROUP BY clause present');
+		like($sql, qr/ORDER BY status/i,
+			'_build_aggregate_sql(): default ORDER BY by-column');
+	}
+
+	# WHERE clause from criteria
+	{
+		my $p    = {
+			by       => ['status'],
+			measures => [{ fn => 'sum', col => 'score', as => 'total' }],
+			status   => $ACTIVE,
+		};
+		my $spec = $db->_validate_aggregate_spec($p);
+		my ($sql, $args) = $db->_build_aggregate_sql($spec, '', $table, $db->{$table});
+		like($sql, qr/WHERE/i, '_build_aggregate_sql(): WHERE clause emitted for criteria');
+		is(scalar @{$args}, 1, '_build_aggregate_sql(): one bind arg for criteria');
+		is($args->[0], $ACTIVE, '_build_aggregate_sql(): bind arg value correct');
+	}
+
+	# HAVING with alias (substituted with aggregate expression) → CAST placeholder
+	{
+		my $p    = {
+			by       => ['status'],
+			measures => [{ fn => 'sum', col => 'score', as => 'total' }],
+			having   => { total => { '>' => 20 } },
+		};
+		my $spec = $db->_validate_aggregate_spec($p);
+		my ($sql, $args) = $db->_build_aggregate_sql($spec, '', $table, $db->{$table});
+		like($sql, qr/HAVING SUM\(score\)/i,
+			'_build_aggregate_sql(): HAVING uses expression, not alias (PostgreSQL rule)');
+		like($sql, qr/CAST\(\? AS REAL\)/i,
+			'_build_aggregate_sql(): CAST placeholder for aggregate HAVING comparison');
+	}
+
+	# sort_by DESC → ORDER BY ... DESC
+	{
+		my $p    = {
+			by       => ['status'],
+			measures => [{ fn => 'sum', col => 'score', as => 'total' }],
+			sort_by  => ['total', 'DESC'],
+		};
+		my $spec = $db->_validate_aggregate_spec($p);
+		my ($sql, $args) = $db->_build_aggregate_sql($spec, '', $table, $db->{$table});
+		like($sql, qr/ORDER BY total DESC/i,
+			'_build_aggregate_sql(): explicit sort_by DESC in ORDER BY');
+	}
+
+	# LIMIT and OFFSET → bound as ? placeholders
+	{
+		my $p    = {
+			measures => [{ fn => 'count', as => 'n' }],
+			limit    => 5,
+			offset   => 10,
+		};
+		my $spec = $db->_validate_aggregate_spec($p);
+		my ($sql, $args) = $db->_build_aggregate_sql($spec, '', $table, $db->{$table});
+		like($sql, qr/LIMIT \?/,  '_build_aggregate_sql(): LIMIT bound as ?');
+		like($sql, qr/OFFSET \?/, '_build_aggregate_sql(): OFFSET bound as ?');
+		my @lim_off = grep { /\A\d+\z/ } @{$args};
+		ok((grep { $_ == 5  } @{$args}), '_build_aggregate_sql(): limit=5 in bind args');
+		ok((grep { $_ == 10 } @{$args}), '_build_aggregate_sql(): offset=10 in bind args');
+	}
+
+	# count_distinct → COUNT(DISTINCT col) in SELECT
+	{
+		my $p    = { measures => [{ fn => 'count_distinct', col => 'status', as => 'ud' }] };
+		my $spec = $db->_validate_aggregate_spec($p);
+		my ($sql) = $db->_build_aggregate_sql($spec, '', $table, $db->{$table});
+		like($sql, qr/COUNT\(DISTINCT status\)/i,
+			'_build_aggregate_sql(): count_distinct → COUNT(DISTINCT col)');
+	}
+
+	# Return contract: ($sql, \@args) — args is always an arrayref
+	{
+		my $p    = { measures => [{ fn => 'count', as => 'n' }] };
+		my $spec = $db->_validate_aggregate_spec($p);
+		my (undef, $args) = $db->_build_aggregate_sql($spec, '', $table, $db->{$table});
+		returns_ok($args, { type => 'arrayref' }, '_build_aggregate_sql(): args return is arrayref');
+	}
+}
+
+# ---- A40: _build_having_fragment() ----------------------------------------
+# All operator branches and the CAST(? AS REAL) behaviour.  Both the
+# "alias→aggregate-expression" path (cast) and the "group-by column" path
+# (no cast) must be verified.
+note '--- A40: _build_having_fragment()';
+{
+	my $db = Database::test1->new($DATA_DIR);
+
+	# Map aliases to SQL expressions (simulating what _build_aggregate_sql passes)
+	my %a2s = ( total => 'SUM(score)', mean => 'AVG(score)' );
+
+	# Scalar equality on an alias key → expression substituted, CAST placeholder
+	{
+		my ($frag, $args) = $db->_build_having_fragment({ total => 5 }, \%a2s);
+		like($frag, qr/SUM\(score\) = CAST\(\? AS REAL\)/,
+			'_build_having_fragment(): alias scalar → expression with CAST');
+		is($args->[0], 5, '_build_having_fragment(): scalar bind value correct');
+	}
+
+	# Scalar equality on a group-by column (not an alias) → bare ?
+	{
+		my ($frag, $args) = $db->_build_having_fragment({ status => $ACTIVE }, \%a2s);
+		like($frag, qr/status = \?/,
+			'_build_having_fragment(): group-by column → bare = ?');
+		unlike($frag, qr/CAST/,
+			'_build_having_fragment(): group-by column → no CAST');
+		is($args->[0], $ACTIVE, '_build_having_fragment(): group-by bind value correct');
+	}
+
+	# undef → IS NULL (alias path: expression IS NULL)
+	{
+		my ($frag, $args) = $db->_build_having_fragment({ total => undef }, \%a2s);
+		like($frag, qr/SUM\(score\) IS NULL/,
+			'_build_having_fragment(): undef → IS NULL (alias substituted)');
+		is(scalar @{$args}, 0, '_build_having_fragment(): IS NULL → no bind args');
+	}
+
+	# LIKE pattern with % → LIKE ? (bare ?, no CAST — text comparison)
+	{
+		my ($frag, $args) = $db->_build_having_fragment({ status => 'act%' }, \%a2s);
+		like($frag, qr/status LIKE \?/,
+			'_build_having_fragment(): % value on group-by key → LIKE ?');
+	}
+
+	# > operator with alias → CAST placeholder
+	{
+		my ($frag, $args) = $db->_build_having_fragment({ total => { '>' => 10 } }, \%a2s);
+		like($frag, qr/SUM\(score\) > CAST\(\? AS REAL\)/,
+			'_build_having_fragment(): > operator with alias → expression > CAST(?)');
+		is($args->[0], 10, '_build_having_fragment(): > bind value');
+	}
+
+	# >= operator
+	{
+		my ($frag, $args) = $db->_build_having_fragment({ total => { '>=' => 10 } }, \%a2s);
+		like($frag, qr/SUM\(score\) >= CAST\(\? AS REAL\)/,
+			'_build_having_fragment(): >= operator with alias');
+	}
+
+	# < operator
+	{
+		my ($frag) = $db->_build_having_fragment({ total => { '<' => 10 } }, \%a2s);
+		like($frag, qr/SUM\(score\) < CAST\(\? AS REAL\)/,
+			'_build_having_fragment(): < operator with alias');
+	}
+
+	# != operator with value → != CAST(?)
+	{
+		my ($frag, $args) = $db->_build_having_fragment({ total => { '!=' => 0 } }, \%a2s);
+		like($frag, qr/SUM\(score\) != CAST\(\? AS REAL\)/,
+			'_build_having_fragment(): != operator with alias');
+	}
+
+	# != undef → IS NOT NULL
+	{
+		my ($frag, $args) = $db->_build_having_fragment({ total => { '!=' => undef } }, \%a2s);
+		like($frag, qr/SUM\(score\) IS NOT NULL/,
+			'_build_having_fragment(): != undef → IS NOT NULL');
+		is(scalar @{$args}, 0, '_build_having_fragment(): IS NOT NULL → no bind args');
+	}
+
+	# -in operator → IN (CAST(?) list) for alias
+	{
+		my ($frag, $args) = $db->_build_having_fragment({ total => { '-in' => [10,20] } }, \%a2s);
+		like($frag, qr/SUM\(score\) IN \(/,
+			'_build_having_fragment(): -in with alias → IN clause');
+		is(scalar @{$args}, 2, '_build_having_fragment(): -in → 2 bind args');
+	}
+
+	# -not_in operator
+	{
+		my ($frag, $args) = $db->_build_having_fragment({ total => { '-not_in' => [5] } }, \%a2s);
+		like($frag, qr/SUM\(score\) NOT IN \(/,
+			'_build_having_fragment(): -not_in with alias → NOT IN clause');
+	}
+
+	# -between operator → BETWEEN CAST(?) AND CAST(?)
+	{
+		my ($frag, $args) = $db->_build_having_fragment({ total => { '-between' => [5, 30] } }, \%a2s);
+		like($frag, qr/SUM\(score\) BETWEEN/,
+			'_build_having_fragment(): -between → BETWEEN clause');
+		is(scalar @{$args}, 2, '_build_having_fragment(): -between → 2 bind args');
+		is($args->[0], 5,  '_build_having_fragment(): -between lower bound');
+		is($args->[1], 30, '_build_having_fragment(): -between upper bound');
+	}
+
+	# -like operator → LIKE ? (bare, not CAST)
+	{
+		my ($frag, $args) = $db->_build_having_fragment({ status => { '-like' => 'act%' } }, \%a2s);
+		like($frag, qr/status LIKE \?/,
+			'_build_having_fragment(): -like operator on group-by col');
+	}
+
+	# -not_like operator
+	{
+		my ($frag) = $db->_build_having_fragment({ status => { '-not_like' => 'z%' } }, \%a2s);
+		like($frag, qr/status NOT LIKE \?/,
+			'_build_having_fragment(): -not_like operator on group-by col');
+	}
+
+	# Multiple keys in having → joined with AND
+	{
+		my ($frag) = $db->_build_having_fragment(
+			{ status => $ACTIVE, total => { '>' => 5 } }, \%a2s);
+		like($frag, qr/AND/, '_build_having_fragment(): multiple keys → AND');
+	}
+
+	# Empty having → empty fragment and empty args
+	{
+		my ($frag, $args) = $db->_build_having_fragment({}, \%a2s);
+		is($frag, '', '_build_having_fragment(): empty having → empty string');
+		is(scalar @{$args}, 0, '_build_having_fragment(): empty having → no args');
+	}
+
+	# Unknown operator in hashref → croak
+	throws_ok {
+		$db->_build_having_fragment({ total => { '-bogus' => 5 } }, \%a2s)
+	} qr/Unknown operator '-bogus'/,
+	'_build_having_fragment(): unknown operator → croak';
+
+	# Non-hashref, non-scalar value (arrayref) → croak
+	throws_ok {
+		$db->_build_having_fragment({ total => [1, 2] }, \%a2s)
+	} qr/expected scalar or operator hashref/,
+	'_build_having_fragment(): arrayref value → croak';
+}
+
+# ---- A41: _match_criteria() -----------------------------------------------
+# Recursive in-memory criterion matcher with -or/-and support.
+# Must use exists() guards on all row key accesses (fixated hash safety).
+note '--- A41: _match_criteria()';
+{
+	my $db = Database::test1->new($DATA_DIR);
+
+	# Empty criteria → always true (no keys to fail)
+	ok($db->_match_criteria({ a => 1 }, {}),
+		'_match_criteria(): empty criteria → true');
+
+	# Simple scalar equality: match
+	ok($db->_match_criteria({ status => $ACTIVE }, { status => $ACTIVE }),
+		'_match_criteria(): scalar equality hit → true');
+
+	# Simple scalar equality: no match
+	ok(!$db->_match_criteria({ status => $INACTIVE }, { status => $ACTIVE }),
+		'_match_criteria(): scalar equality miss → false');
+
+	# Missing key treated as undef, matched against undef criterion
+	ok($db->_match_criteria({}, { status => undef }),
+		'_match_criteria(): missing key treated as undef, criterion is undef → true');
+
+	# Missing key does not match a scalar criterion
+	ok(!$db->_match_criteria({}, { status => $ACTIVE }),
+		'_match_criteria(): missing key treated as undef, criterion is scalar → false');
+
+	# Operator hashref: greater-than hit
+	ok($db->_match_criteria({ score => 10 }, { score => { '>' => 5 } }),
+		'_match_criteria(): > operator hit → true');
+
+	# Operator hashref: greater-than miss
+	ok(!$db->_match_criteria({ score => 3 }, { score => { '>' => 5 } }),
+		'_match_criteria(): > operator miss → false');
+
+	# -or grouping: at least one sub-criterion matches → true
+	ok($db->_match_criteria(
+		{ status => $INACTIVE },
+		{ '-or' => [ { status => $ACTIVE }, { status => $INACTIVE } ] }
+	), '_match_criteria(): -or, one match → true');
+
+	# -or grouping: no sub-criterion matches → false
+	ok(!$db->_match_criteria(
+		{ status => 'pending' },
+		{ '-or' => [ { status => $ACTIVE }, { status => $INACTIVE } ] }
+	), '_match_criteria(): -or, no match → false');
+
+	# -or grouping: empty list → no match (returns false because found=0)
+	ok(!$db->_match_criteria({ status => $ACTIVE }, { '-or' => [] }),
+		'_match_criteria(): -or with empty list → false');
+
+	# -and grouping: all sub-criteria match → true
+	ok($db->_match_criteria(
+		{ status => $ACTIVE, score => 10 },
+		{ '-and' => [ { status => $ACTIVE }, { score => { '>' => 5 } } ] }
+	), '_match_criteria(): -and, all match → true');
+
+	# -and grouping: one sub-criterion fails → false
+	ok(!$db->_match_criteria(
+		{ status => $ACTIVE, score => 3 },
+		{ '-and' => [ { status => $ACTIVE }, { score => { '>' => 5 } } ] }
+	), '_match_criteria(): -and, one fails → false');
+
+	# -and grouping: empty list → all trivially satisfied → true
+	ok($db->_match_criteria({ status => $ACTIVE }, { '-and' => [] }),
+		'_match_criteria(): -and with empty list → true');
+
+	# Nested -or inside -and: complex grouping
+	ok($db->_match_criteria(
+		{ status => $ACTIVE, score => 10 },
+		{
+			'-and' => [
+				{ '-or' => [ { status => $ACTIVE }, { status => $INACTIVE } ] },
+				{ score => { '>' => 5 } },
+			],
+		}
+	), '_match_criteria(): nested -or inside -and, all match → true');
+
+	# Nested -or fails first arm, passes second → overall match
+	ok($db->_match_criteria(
+		{ status => $INACTIVE, score => 10 },
+		{
+			'-and' => [
+				{ '-or' => [ { status => $ACTIVE }, { status => $INACTIVE } ] },
+				{ score => 10 },
+			],
+		}
+	), '_match_criteria(): nested: second arm of -or matches → true');
+
+	# Multiple top-level keys: all must match
+	ok($db->_match_criteria(
+		{ status => $ACTIVE, score => 10 },
+		{ status => $ACTIVE, score => 10 }
+	), '_match_criteria(): multiple keys, all match → true');
+
+	# Multiple top-level keys: one fails
+	ok(!$db->_match_criteria(
+		{ status => $ACTIVE, score => 3 },
+		{ status => $ACTIVE, score => { '>' => 5 } }
+	), '_match_criteria(): multiple keys, one fails → false');
+
+	# -like inside -or (delegates to _match_criterion)
+	ok($db->_match_criteria(
+		{ name => 'Alice' },
+		{ '-or' => [ { name => { '-like' => 'Al%' } }, { name => 'Bob' } ] }
+	), '_match_criteria(): -like inside -or → true when first arm matches');
+
+	# Row with fixated key: exists() guard ensures missing key does not die
+	{
+		# Simulate a fixated row: the key 'missing_col' is absent; criterion demands
+		# it equals 'x'.  Should return false, not die.
+		ok(!$db->_match_criteria({ a => 1 }, { missing_col => 'x' }),
+			'_match_criteria(): absent key vs scalar criterion → false (not die)');
+	}
+}
+
+# ---- A42: _fold_aggregate() -----------------------------------------------
+# Pure Perl fold; no DBI.  Tests each accumulator type and edge cases.
+note '--- A42: _fold_aggregate()';
+{
+	my $db = Database::test1->new($DATA_DIR);
+
+	# Helper: build a valid $spec from a simple params hashref
+	my $mk_spec = sub {
+		my ($by, @measures) = @_;
+		my $p = { by => $by, measures => \@measures };
+		return $db->_validate_aggregate_spec($p);
+	};
+
+	# Grand total sum: two rows, known scores
+	{
+		my $rows = [
+			{ score => 9.5, status => $ACTIVE   },
+			{ score => 7.0, status => $INACTIVE },
+		];
+		my $spec = $mk_spec->([], { fn => 'sum', col => 'score', as => 'total' });
+		my $out  = $db->_fold_aggregate($rows, $spec);
+		is(scalar @{$out}, 1,    '_fold_aggregate(): grand total → 1 row');
+		is($out->[0]{'total'}, 16.5, '_fold_aggregate(): sum correct');
+	}
+
+	# Grand total count(*): all rows counted regardless of col value
+	{
+		my $rows = [{ score => undef, status => $ACTIVE }, { score => 7, status => $INACTIVE }];
+		my $spec = $mk_spec->([], { fn => 'count', as => 'n' });
+		my $out  = $db->_fold_aggregate($rows, $spec);
+		is($out->[0]{'n'}, 2, '_fold_aggregate(): count(*) counts undef rows too');
+	}
+
+	# count(col): skips undef values
+	{
+		my $rows = [{ score => undef }, { score => 7 }];
+		my $spec = $mk_spec->([], { fn => 'count', col => 'score', as => 'n' });
+		my $out  = $db->_fold_aggregate($rows, $spec);
+		is($out->[0]{'n'}, 1, '_fold_aggregate(): count(col) skips undef');
+	}
+
+	# count_distinct: only unique defined values
+	{
+		my $rows = [
+			{ status => $ACTIVE   },
+			{ status => $ACTIVE   },
+			{ status => $INACTIVE },
+			{ status => undef     },
+		];
+		my $spec = $mk_spec->([], { fn => 'count_distinct', col => 'status', as => 'ud' });
+		my $out  = $db->_fold_aggregate($rows, $spec);
+		is($out->[0]{'ud'}, 2, '_fold_aggregate(): count_distinct counts unique defined values');
+	}
+
+	# avg: correct arithmetic
+	{
+		my $rows = [{ score => 9 }, { score => 7 }, { score => 8 }];
+		my $spec = $mk_spec->([], { fn => 'avg', col => 'score', as => 'mean' });
+		my $out  = $db->_fold_aggregate($rows, $spec);
+		ok(abs($out->[0]{'mean'} - 8.0) < 1e-9, '_fold_aggregate(): avg correct');
+	}
+
+	# avg with all undef → undef (§5.3 normalisation in _fold_aggregate)
+	{
+		my $rows = [{ score => undef }, { score => undef }];
+		my $spec = $mk_spec->([], { fn => 'avg', col => 'score', as => 'mean' });
+		my $out  = $db->_fold_aggregate($rows, $spec);
+		ok(!defined($out->[0]{'mean'}), '_fold_aggregate(): avg all-undef → undef');
+	}
+
+	# min: correct
+	{
+		my $rows = [{ score => 9 }, { score => 5 }, { score => 7 }];
+		my $spec = $mk_spec->([], { fn => 'min', col => 'score', as => 'lo' });
+		my $out  = $db->_fold_aggregate($rows, $spec);
+		is($out->[0]{'lo'}, 5, '_fold_aggregate(): min correct');
+	}
+
+	# max: correct
+	{
+		my $rows = [{ score => 9 }, { score => 5 }, { score => 7 }];
+		my $spec = $mk_spec->([], { fn => 'max', col => 'score', as => 'hi' });
+		my $out  = $db->_fold_aggregate($rows, $spec);
+		is($out->[0]{'hi'}, 9, '_fold_aggregate(): max correct');
+	}
+
+	# min/max all undef → undef (no match to compare against)
+	{
+		my $rows = [{ score => undef }, { score => undef }];
+		my $spec = $mk_spec->([], { fn => 'min', col => 'score', as => 'lo' });
+		my $out  = $db->_fold_aggregate($rows, $spec);
+		ok(!defined($out->[0]{'lo'}), '_fold_aggregate(): min all-undef → undef');
+	}
+
+	# Grouped by one column → multiple groups, first-seen order
+	{
+		my $rows = [
+			{ status => $ACTIVE,   score => 9.5 },
+			{ status => $INACTIVE, score => 7.0 },
+			{ status => $ACTIVE,   score => 8.5 },
+		];
+		my $spec = $mk_spec->(['status'], { fn => 'sum', col => 'score', as => 'total' });
+		my $out  = $db->_fold_aggregate($rows, $spec);
+		is(scalar @{$out}, 2, '_fold_aggregate(): two groups produced');
+		# First-seen order: active first
+		is($out->[0]{'status'}, $ACTIVE,   '_fold_aggregate(): first group is active (first-seen)');
+		is($out->[0]{'total'},  18.0,       '_fold_aggregate(): active total correct');
+		is($out->[1]{'status'}, $INACTIVE, '_fold_aggregate(): second group is inactive');
+		is($out->[1]{'total'},  7.0,        '_fold_aggregate(): inactive total correct');
+	}
+
+	# undef group key treated as '' (same group as empty string)
+	{
+		my $rows = [{ cat => undef }, { cat => '' }, { cat => 'x' }];
+		my $spec = $mk_spec->(['cat'], { fn => 'count', as => 'n' });
+		my $out  = $db->_fold_aggregate($rows, $spec);
+		# undef and '' should collapse to one group; 'x' is a second group
+		is(scalar @{$out}, 2,
+			'_fold_aggregate(): undef and empty-string collapse to same group key');
+	}
+
+	# Empty input → empty arrayref (not undef)
+	{
+		my $spec = $mk_spec->(['status'], { fn => 'sum', col => 'score', as => 'total' });
+		my $out  = $db->_fold_aggregate([], $spec);
+		is(ref($out), 'ARRAY', '_fold_aggregate(): empty input → arrayref');
+		is(scalar @{$out}, 0, '_fold_aggregate(): empty input → zero groups');
+	}
+
+	# sum with non-numeric value → bad counter incremented, warning emitted
+	# The §5.5 warning fires at finalisation, once per measure per call.
+	{
+		my $rows = [{ score => 'abc' }, { score => 5 }];
+		my $spec = $mk_spec->([], { fn => 'sum', col => 'score', as => 'total' });
+		my @warnings;
+		local $SIG{__WARN__} = sub { push @warnings, @_ };
+		my $out = $db->_fold_aggregate($rows, $spec);
+		# 'abc' is skipped; only 5 contributes
+		is($out->[0]{'total'}, 5, '_fold_aggregate(): non-numeric value skipped for sum');
+		ok(scalar @warnings, '_fold_aggregate(): non-numeric value triggers warning');
+		like($warnings[0], qr/non-numeric/,
+			'_fold_aggregate(): warning text mentions non-numeric');
+	}
+
+	# Warning emitted at most once per measure per call (even for multiple bad values)
+	{
+		my $rows = [{ score => 'x' }, { score => 'y' }, { score => 5 }];
+		my $spec = $mk_spec->([], { fn => 'sum', col => 'score', as => 'total' });
+		my @warnings;
+		local $SIG{__WARN__} = sub { push @warnings, @_ };
+		$db->_fold_aggregate($rows, $spec);
+		is(scalar @warnings, 1,
+			'_fold_aggregate(): warning fires at most once per measure per call');
+	}
+
+	# avg non-numeric → warning, count stays 0 → avg result is undef
+	{
+		my $rows = [{ score => 'bad' }];
+		my $spec = $mk_spec->([], { fn => 'avg', col => 'score', as => 'mean' });
+		my @warnings;
+		local $SIG{__WARN__} = sub { push @warnings, @_ };
+		my $out = $db->_fold_aggregate($rows, $spec);
+		ok(!defined($out->[0]{'mean'}),
+			'_fold_aggregate(): avg with only non-numeric → undef (0/0)');
+		ok(scalar @warnings, '_fold_aggregate(): avg non-numeric triggers warning');
+	}
+
+	# Multiple measures accumulated per group simultaneously
+	{
+		my $rows = [{ s => $ACTIVE, v => 3 }, { s => $ACTIVE, v => 7 }];
+		my $spec = $mk_spec->(['s'],
+			{ fn => 'sum', col => 'v', as => 'total' },
+			{ fn => 'count', as => 'n' },
+		);
+		my $out = $db->_fold_aggregate($rows, $spec);
+		is($out->[0]{'total'}, 10, '_fold_aggregate(): multi-measure sum correct');
+		is($out->[0]{'n'},     2,  '_fold_aggregate(): multi-measure count correct');
+	}
+
+	# Return value is always an arrayref (no undef)
+	{
+		my $rows = [{ a => 1 }];
+		my $spec = $mk_spec->([], { fn => 'count', as => 'n' });
+		my $out  = $db->_fold_aggregate($rows, $spec);
+		returns_ok($out, { type => 'arrayref' }, '_fold_aggregate(): return type is arrayref');
+	}
+}
+
+# ---------------------------------------------------------------------------
+# PART B (continued) — Query builder aggregate additions (0.49)
+# ---------------------------------------------------------------------------
+
+note '';
+note '=== Query builder aggregate additions (0.49) ===';
+
+SKIP: {
+	skip 'DBD::SQLite not available for Query aggregate tests', 40 unless $have_sqlite;
+
+	my $qdir  = File::Temp::tempdir(CLEANUP => 1);
+	my $qfile = File::Spec->catfile($qdir, 'qagg.sql');
+	my $qdsn  = "dbi:SQLite:dbname=$qfile";
+	{
+		my $s = DBI->connect($qdsn, undef, undef, { RaiseError => 1 });
+		$s->do('CREATE TABLE qagg (entry TEXT PRIMARY KEY, score REAL, status TEXT)');
+		for my $r (
+			['a', 9.5, $ACTIVE],   ['b', 7.0, $INACTIVE],
+			['c', 8.5, $ACTIVE],   ['d', 6.0, $INACTIVE],
+			['e', 10.0, $ACTIVE],
+		) {
+			$s->do('INSERT INTO qagg VALUES (?,?,?)', undef, @{$r});
+		}
+		$s->disconnect();
+	}
+
+	{ package Database::qagg; use parent 'Database::Abstraction'; }
+	my $qdb = Database::qagg->new(dsn => $qdsn, no_entry => 1);
+
+	# ---- B13: group_by() -------------------------------------------------------
+	note '--- B13: Query group_by()';
+
+	# List form: multiple args stored as arrayref
+	{
+		my $q = $qdb->query();
+		my $ret = $q->group_by('status', 'score');
+		is($ret, $q, 'group_by(): returns $self for chaining');
+		is(ref($q->{'_group_by'}), 'ARRAY', 'group_by(): _group_by stored as arrayref');
+		is(scalar @{$q->{'_group_by'}}, 2, 'group_by(): two columns stored');
+		is($q->{'_group_by'}[0], 'status', 'group_by(): first column correct');
+	}
+
+	# Arrayref form: single arrayref argument unpacked
+	{
+		my $q = $qdb->query();
+		$q->group_by(['a', 'b', 'c']);
+		is(scalar @{$q->{'_group_by'}}, 3, 'group_by(): arrayref form → three cols stored');
+	}
+
+	# group_by replaces previous value (not append)
+	{
+		my $q = $qdb->query->group_by('x');
+		$q->group_by('y');
+		is(scalar @{$q->{'_group_by'}}, 1, 'group_by(): replaces existing, not appends');
+		is($q->{'_group_by'}[0], 'y', 'group_by(): new value replaces old');
+	}
+
+	# Clearing with empty list → empty arrayref
+	{
+		my $q = $qdb->query->group_by('x');
+		$q->group_by();
+		is(scalar @{$q->{'_group_by'}}, 0, 'group_by(): empty arg → clears list');
+	}
+
+	# ---- B14: measure() -------------------------------------------------------
+	note '--- B14: Query measure()';
+
+	# Three-arg form: col, fn, as
+	{
+		my $q = $qdb->query();
+		my $ret = $q->measure('score', 'sum', 'total');
+		is($ret, $q, 'measure(): returns $self for chaining');
+		is(scalar @{$q->{'_measures'}}, 1, 'measure(): one measure appended');
+		is($q->{'_measures'}[0]{'col'}, 'score', 'measure(): col stored');
+		is($q->{'_measures'}[0]{'fn'},  'sum',   'measure(): fn stored');
+		is($q->{'_measures'}[0]{'as'},  'total', 'measure(): as stored');
+	}
+
+	# Hashref form: single hashref accepted
+	{
+		my $q = $qdb->query()->measure({ col => 'score', fn => 'avg', as => 'mean' });
+		is($q->{'_measures'}[0]{'fn'}, 'avg', 'measure(): hashref form fn stored');
+	}
+
+	# count(*) via undef col: col => undef is stored (aggregate() validates)
+	{
+		my $q = $qdb->query()->measure(undef, 'count', 'n');
+		ok(!defined($q->{'_measures'}[0]{'col'}),
+			'measure(): undef col stored (count(*) pattern)');
+	}
+
+	# Multiple measure() calls accumulate (not replace)
+	{
+		my $q = $qdb->query()
+			->measure('score', 'sum', 'total')
+			->measure(undef, 'count', 'n');
+		is(scalar @{$q->{'_measures'}}, 2, 'measure(): second call appends, not replaces');
+	}
+
+	# ---- B15: having() --------------------------------------------------------
+	note '--- B15: Query having()';
+
+	# Named-pair form
+	{
+		my $q = $qdb->query();
+		my $ret = $q->having(total => { '>' => 10 });
+		is($ret, $q, 'having(): returns $self for chaining');
+		ok(exists($q->{'_having'}{'total'}), 'having(): key stored in _having');
+	}
+
+	# Hashref form
+	{
+		my $q = $qdb->query()->having({ status => $ACTIVE });
+		is($q->{'_having'}{'status'}, $ACTIVE, 'having(): hashref form stored correctly');
+	}
+
+	# Multiple calls merge with AND semantics (later key added alongside earlier)
+	{
+		my $q = $qdb->query()
+			->having(total => { '>' => 10 })
+			->having(n     => { '<' => 100 });
+		ok(exists($q->{'_having'}{'total'}), 'having(): first call key retained');
+		ok(exists($q->{'_having'}{'n'}),     'having(): second call key added');
+	}
+
+	# ---- B16: all() aggregate path --------------------------------------------
+	note '--- B16: Query all() aggregate path';
+
+	# group_by + measure + all() returns same data as $db->aggregate(...)
+	{
+		my $q_rows = $qdb->query
+			->group_by('status')
+			->measure('score', 'sum', 'total')
+			->all();
+		returns_is($q_rows, { type => 'arrayref' },
+			'Query all() aggregate: returns arrayref');
+		is(scalar @{$q_rows}, 2, 'Query all() aggregate: two status groups');
+	}
+
+	# with where() criteria: pre-aggregation filter applied
+	{
+		my $rows = $qdb->query
+			->where(status => $ACTIVE)
+			->group_by('status')
+			->measure('score', 'sum', 'total')
+			->all();
+		is(scalar @{$rows}, 1, 'Query all() aggregate: where() filter applies before group');
+		is($rows->[0]{'status'}, $ACTIVE, 'Query all() aggregate: only active group returned');
+	}
+
+	# with having() post-group filter
+	{
+		my $rows = $qdb->query
+			->group_by('status')
+			->measure('score', 'sum', 'total')
+			->having(total => { '>' => 20 })
+			->all();
+		# Only active group (total=28.0) passes HAVING >20; inactive=13.0 does not
+		is(scalar @{$rows}, 1, 'Query all() aggregate: having() filters result');
+		is($rows->[0]{'status'}, $ACTIVE, 'Query all() aggregate: having() keeps correct group');
+	}
+
+	# order_by maps into sort_by for aggregate path
+	{
+		my $rows = $qdb->query
+			->group_by('status')
+			->measure('score', 'sum', 'total')
+			->order_by('total DESC')
+			->all();
+		is($rows->[0]{'status'}, $ACTIVE,
+			'Query all() aggregate: order_by("total DESC") sorts by total descending');
+	}
+
+	# limit: only first N groups
+	{
+		my $rows = $qdb->query
+			->group_by('status')
+			->measure('score', 'sum', 'total')
+			->limit(1)
+			->all();
+		is(scalar @{$rows}, 1, 'Query all() aggregate: limit(1) returns one group');
+	}
+
+	# Query builder matches direct aggregate() call (two-fronts-one-implementation)
+	{
+		my $q_out = $qdb->query
+			->group_by('status')
+			->measure('score', 'sum', 'total')
+			->all();
+		my $d_out = $qdb->aggregate(
+			by       => ['status'],
+			measures => [{ col => 'score', fn => 'sum', as => 'total' }],
+		);
+		is(scalar @{$q_out}, scalar @{$d_out},
+			'Query->all() matches aggregate(): same row count');
+		# Sort both by status for a stable comparison
+		my @qs = sort { $a->{'status'} cmp $b->{'status'} } @{$q_out};
+		my @ds = sort { $a->{'status'} cmp $b->{'status'} } @{$d_out};
+		is($qs[0]{'total'}, $ds[0]{'total'},
+			'Query->all() matches aggregate(): first group total equal');
+	}
+
+	# ---- B17: count() croaks when measures are set ----------------------------
+	note '--- B17: Query count() with measures → croak';
+
+	throws_ok {
+		$qdb->query->measure('score', 'sum', 'total')->count()
+	} qr/count\(\) is not available once measure\(\) has been called/,
+	'Query count(): after measure() → exact croak message';
+
+	# Without measures: count() still works normally
+	{
+		my $n = $qdb->query->where(status => $ACTIVE)->count();
+		is($n, 3, 'Query count(): without measures → normal count');
+	}
+
+	# ---- B18: first() aggregate path ------------------------------------------
+	note '--- B18: Query first() aggregate path';
+
+	# first() with measures → one row (the first group)
+	{
+		my $row = $qdb->query
+			->group_by('status')
+			->measure('score', 'sum', 'total')
+			->order_by('status ASC')
+			->first();
+		returns_is($row, { type => 'hashref' },
+			'Query first() aggregate: returns hashref');
+		ok(defined($row->{'status'}), 'Query first() aggregate: row has status key');
+		ok(defined($row->{'total'}),  'Query first() aggregate: row has total key');
+	}
+
+	# first() with measures and no match → undef
+	{
+		my $row = $qdb->query
+			->where(status => 'no_such_status')
+			->group_by('status')
+			->measure('score', 'sum', 'total')
+			->first();
+		returns_is($row, { type => 'void' },
+			'Query first() aggregate: no match → undef');
+	}
+
+	# ---- B19: each() aggregate path -------------------------------------------
+	note '--- B19: Query each() aggregate path';
+
+	# each() with measures: iterates over aggregate rows, returns count
+	{
+		my @visited;
+		my $n = $qdb->query
+			->group_by('status')
+			->measure('score', 'sum', 'total')
+			->each(sub { push @visited, shift });
+		is($n, 2, 'Query each() aggregate: returns row count (2 groups)');
+		is(scalar @visited, 2, 'Query each() aggregate: callback called once per group');
+		returns_is($visited[0], { type => 'hashref' },
+			'Query each() aggregate: callback receives hashref');
+		ok(exists($visited[0]{'total'}), 'Query each() aggregate: row has measure alias key');
+	}
+
+	# each() non-code-ref argument → croak
+	throws_ok {
+		$qdb->query->each('not a coderef')
+	} qr/callback must be a code reference/,
+	'Query each(): non-code-ref → croak';
+}
+
 done_testing();
+

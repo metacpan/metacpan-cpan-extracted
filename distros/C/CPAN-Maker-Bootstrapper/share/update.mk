@@ -1,5 +1,8 @@
 #-*- mode: makefile; -*-
 
+INCLUDES_DIR = .includes/
+BOOTSTRAPPER_DIST_DIR = $(shell perl -MFile::ShareDir=dist_dir -e 'print dist_dir("CPAN-Maker-Bootstrapper");')
+
 MANAGED_SOURCE_FILES = \
    Makefile.txt \
    builder \

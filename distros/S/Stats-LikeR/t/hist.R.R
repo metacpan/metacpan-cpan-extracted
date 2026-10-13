@@ -28,7 +28,16 @@ sets <- list(
   frac   = c(0.1,0.2,0.25,0.7,0.9,1.1,1.4,1.9),
   cross0 = c(-0.4,-0.2,0,0.1,0.35,0.5),
   sturges8 = c(1:8),
-  sturges13 = c(1:13)
+  sturges13 = c(1:13),
+  # Added in 0.3217: ranges whose width overflows a double.  hist() filled
+  # the breaks with an infinite step, so ovf.todo gave 0, Inf, 0 for R's
+  # -1.7e308, 0, 1.7e308.  ovf.todo is the case TODO.md recorded; the other
+  # three are reg-tests-1d.R's pretty() overflow data, c(f*1e308, 2^1023.9),
+  # at three of its f.
+  ovf.todo  = c(1.7e308, -1.7e308),
+  ovf.f1797 = c(-1.797*1e308, 2^1023.9),
+  ovf.f15   = c(-1.5*1e308, 2^1023.9),
+  ovf.f1    = c(-1*1e308, 2^1023.9)
 )
 
 for (nm in names(sets)) {
@@ -43,3 +52,13 @@ for (nm in names(sets)) {
                 paste(sprintf("%.17g", h$density), collapse = ",")))
   }
 }
+
+# The ovf.* sets' x as big-endian IEEE double bit patterns.  t/hist.R.t builds
+# those x from these rather than from the decimals above: perl 5.10's atof()
+# reads a 17-digit decimal near 1e308 up to 5 ulp off, and pretty() turns
+# that into a 1.5e-14 error in a break near zero.
+for (nm in grep("^ovf", names(sets), value = TRUE))
+  cat(sprintf("#xbits\t%s\t%s\n", nm,
+              paste(sapply(sets[[nm]], function(v)
+                paste(as.character(writeBin(v, raw(), endian = "big")), collapse = "")),
+                collapse = ",")))

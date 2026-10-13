@@ -12,7 +12,7 @@ use File::Spec;
 use List::Util qw(max);
 use Log::Abstraction;
 use Readonly;
-use Scalar::Util qw(blessed);
+use Scalar::Util qw(blessed looks_like_number);
 use Object::Configure;
 use Params::Get qw(get_params);
 use Params::Validate::Strict qw(validate_strict);
@@ -39,7 +39,10 @@ Readonly::Hash my %SAFE_LIST_OPS => map { $_ => 1 } ('IN', 'NOT IN');
 # A bare undef criterion value (col => undef) also generates IS NULL.
 Readonly::Hash my %SAFE_NOARG_OPS => map { $_ => 1 } ('IS NULL', 'IS NOT NULL');
 
-our $VERSION = '0.008.2';
+# Valid aggregate functions for aggregate().  Lower-cased at validation time.
+Readonly::Hash my %AGGREGATE_FNS => map { $_ => 1 } qw(sum avg min max count count_distinct);
+
+our $VERSION = '0.009.0';
 
 # Package-level cache for threads availability.  undef = not yet checked;
 # 1 = available; 0 = not available.  Checked lazily on the first parallel
@@ -66,6 +69,20 @@ Readonly::Hash my %MESSAGES => (
 	error_sqlite_connect	=> 'Failed to open temporary SQLite database for join backend: %s',
 	warn_schema_type_mismatch => 'column "%s" has type "%s" in database[%d] but type "%s" in database[%d]; use collision_prefix to preserve both values without silent type coercion',
 	error_invalid_callback	=> 'each_row: first argument must be a code reference',
+	error_aggregate_measures_required => 'aggregate: "measures" must be a non-empty arrayref',
+	error_aggregate_measure_ref       => 'aggregate: measure must be a hashref, got %s',
+	error_aggregate_fn_unknown        => 'aggregate: unknown measure function "%s"',
+	error_aggregate_col_required      => 'aggregate: measure column is required for function "%s"',
+	error_aggregate_col_unknown       => 'aggregate: column "%s" is not in the merged view',
+	error_aggregate_as_required       => 'aggregate: measure "as" is required',
+	error_aggregate_as_invalid        => 'aggregate: measure alias "%s" must be a plain word',
+	error_aggregate_as_duplicate      => 'aggregate: duplicate measure alias "%s"',
+	error_aggregate_as_collision      => 'aggregate: measure alias "%s" collides with a group-by column',
+	error_aggregate_by_invalid        => 'aggregate: "by" must be an arrayref of column names',
+	error_aggregate_having_key        => 'aggregate: having key "%s" is not a group-by column or measure alias',
+	error_aggregate_having_operator   => 'aggregate: operator "%s" in having for key "%s" is not supported',
+	warn_aggregate_sort_key           => 'aggregate: sort_by names "%s", which is not a group-by column or measure alias',
+	warn_aggregate_non_numeric        => 'aggregate: column "%s" has %d non-numeric value(s), skipped, e.g. "%s"',
 );
 
 =head1 NAME
@@ -74,7 +91,7 @@ Database::Join - Read-only combined view across two or more Database::Abstractio
 
 =head1 VERSION
 
-Version 0.008.2
+Version 0.009.0
 
 =head1 SYNOPSIS
 
@@ -167,6 +184,26 @@ B<AUTOLOAD column shortcut>
 
     # Returns all 'tier' values (list context)
     my @tiers = $join->tier();
+
+B<aggregate(): GROUP BY across the merged view>
+
+    # Count and total score per tier, highest total first
+    my $rows = $join->aggregate(
+        by       => ['tier'],
+        measures => [
+            { col => 'score', fn => 'sum',   as => 'total' },
+            {                 fn => 'count', as => 'n'     },
+        ],
+        sort_by  => ['total', 'DESC'],
+        having   => { total => { '>' => 100 } },
+    );
+    # => [ { tier => 'gold', total => 183, n => 2 }, ... ]
+
+    # Grand total across the whole view (no 'by' key)
+    my $summary = $join->aggregate(
+        measures => [{ fn => 'count', as => 'n' }],
+    );
+    # => [ { n => 42 } ]
 
 B<SQLite join backend for large datasets>
 
@@ -500,6 +537,56 @@ query method will C<croak> with C<error_join_criterion>.
 B<Fix:> Model the joined table as a separate C<Database::Abstraction> object and
 add it to the C<databases =E<gt> []> list.  Use C<join_column> or C<join_map> to
 specify the shared key.
+
+=item aggregate(): omitting C<by> gives a grand total, not an error
+
+Calling C<aggregate()> without a C<by> key (or with C<< by => [] >>) does
+I<not> croak.  It returns a single-element arrayref containing one row with
+all the computed measure aliases.  This is a grand total over the entire view
+(possibly filtered by any extra criteria you pass).
+
+    my $total = $join->aggregate(measures => [{ fn => 'count', as => 'n' }]);
+    # $total->[0]{n} is the total row count
+
+If you expected multiple rows and got one, you probably forgot the C<by> key.
+
+=item aggregate(): non-numeric values behave differently across backends
+
+On the array backend (C<backend =E<gt> 'array'>), any non-numeric value in a
+column targeted by C<sum> or C<avg> is I<skipped> (not counted, not coerced),
+and a C<carp> warning C<warn_aggregate_non_numeric> is emitted.  On the SQLite
+backend, non-numeric values are silently coerced to C<0.0> via SQL C<CAST>.
+The two backends therefore produce different numeric totals when the data
+contains non-numeric values.  Clean your data first if you need consistent
+results across backends, or choose a backend explicitly.
+
+=item aggregate(): C<BETWEEN> is not supported in C<having>
+
+The C<having> hashref uses the same operator vocabulary as C<selectall_arrayref>,
+which does not include C<BETWEEN>.  Write a range as two explicit constraints:
+
+    # Correct
+    having => { total => { '>=' => 10, '<=' => 50 } }
+
+    # Wrong -- will croak with error_aggregate_having_operator
+    having => { total => { BETWEEN => [10, 50] } }
+
+=item aggregate(): C<count> without C<col> counts all rows, not distinct non-NULL values
+
+A measure with C<< fn => 'count' >> and no C<col> key emits C<COUNT(*)> on the
+SQLite backend (or counts every row in Perl).  This counts rows that have
+C<undef>/NULL in other columns too.  To count only rows where a specific
+column is non-NULL, or to count distinct values, use C<count_distinct>:
+
+    # Count rows with a non-NULL 'score' (one way -- use a pre-filter)
+    measures => [{ col => 'score', fn => 'count_distinct', as => 'distinct_scores' }]
+
+=item aggregate(): the result is never cached
+
+Unlike C<selectall_arrayref> (which benefits from the SQLite file cache on
+repeated identical calls), C<aggregate()> always re-executes.  If your
+aggregation is expensive and the data changes infrequently, cache the result
+yourself using C<updated()> as a staleness signal.
 
 =back
 
@@ -1649,6 +1736,156 @@ sub count {
 	return $self->_sqlite_join($params, count_only => 1)
 		unless $self->{_backend} eq 'array';
 	return scalar @{ $self->_joined_query_array($params) };
+}
+
+=head2 aggregate
+
+=head3 SYNOPSIS
+
+    my $rows = $join->aggregate(
+        by       => ['tier'],
+        measures => [
+            { col => 'score', fn => 'sum', as => 'total' },
+            {                 fn => 'count', as => 'n'   },
+        ],
+        having   => { total => { '>' => 100 } },
+        sort_by  => ['total', 'DESC'],
+        limit    => 10,
+    );
+    # => [ { tier => 'gold', total => 183, n => 2 }, ... ]
+
+=head3 DESCRIPTION
+
+Groups the merged view by one or more published column names and computes
+aggregate measures over each group.
+
+On the SQLite backend (C<backend =E<gt> 'sqlite'>) and the C<auto> backend,
+the aggregation is pushed into the existing SQLite cache as a C<GROUP BY>
+query - rows never pass through Perl.  The C<auto> backend always takes this
+path for aggregation, skipping the row-count threshold probe (aggregation
+makes the row count irrelevant).
+
+On the array backend (C<backend =E<gt> 'array'>), merged rows are fetched in
+full and folded in Perl.  This materialises the complete matching result set.
+
+The two paths return the same rows for the same input, except for two
+documented differences: C<min>/C<max> on a column declared C<TEXT> but
+storing numbers (SQL compares lexically; Perl detects numerics), and
+C<sum>/C<avg> with non-numeric values (SQL coerces to 0.0; Perl skips and
+warns via C<warn_aggregate_non_numeric>).
+
+C<Database::Join> has no C<no_fixate> and no CHI cache (unlike
+C<Database::Abstraction>); aggregation results are not cached between calls.
+
+=head3 API SPECIFICATION
+
+=head4 Input
+
+Reserved keys extracted before the rest is treated as WHERE criteria:
+
+    by       => arrayref of published column names (default: [] = grand total)
+    measures => arrayref of measure hashrefs (required, non-empty)
+    having   => hashref of post-aggregation criteria
+    sort_by  => 'col' or ['col', 'DESC']
+    limit    => positive integer
+    offset   => non-negative integer
+
+Every other key is pre-aggregation criteria routed exactly as
+C<selectall_arrayref> routes criteria.
+
+Measure hashref keys:
+
+    fn  => function name (sum|avg|min|max|count|count_distinct), case-insensitive
+    col => published column name (required for all functions except bare count)
+    as  => result key (required; must match C</^\w+\z/>; unique; not a by name)
+
+C<having> uses the same operator vocabulary as C<selectall_arrayref>:
+C<%SAFE_SQL_OPS> (E<gt>, E<lt>, E<gt>=, E<lt>=, !=, =, LIKE, NOT LIKE),
+C<%SAFE_LIST_OPS> (IN, NOT IN), C<%SAFE_NOARG_OPS> (IS NULL, IS NOT NULL),
+a bare scalar (= ?), and C<-or>/C<-and> groupings.  Write C<-between> as
+two operators and C<LIKE> explicitly.
+
+=head4 Output
+
+Always an arrayref of hashrefs (never C<undef>).  C<[]> when no group
+qualifies and C<by> is non-empty.  When C<by> is omitted or C<[]> and no
+rows match, returns one all-normalised row (grand total of zero).
+
+Key order per row: C<by> columns in declaration order, then measure aliases
+in declaration order.
+
+=head3 EXAMPLE
+
+    # Total score and row count per tier, highest total first
+    my $rows = $join->aggregate(
+        by       => ['tier'],
+        measures => [
+            { col => 'score', fn => 'sum',   as => 'total' },
+            {                 fn => 'count', as => 'n'     },
+        ],
+        sort_by  => ['total', 'DESC'],
+    );
+    for my $r (@{$rows}) {
+        printf "%s: total=%s n=%s\n", $r->{tier}, $r->{total}, $r->{n};
+    }
+
+=head3 PSEUDOCODE
+
+    1. get_params(undef, @args) -- hashref or kv-pairs only (no positional key)
+    2. croak error_join_criterion if 'join =>' present
+    3. _validate_aggregate_spec extracts by/measures/having/sort_by/limit/offset
+    4. array backend:
+         rows   = _joined_query_array(remaining criteria, no sort/limit/offset)
+         groups = _fold_aggregate(rows, spec)
+         groups = [grep { _match_criteria($_, having) } @groups] if having
+         _normalise_aggregate(groups, spec.measures)
+         _sort_and_page(groups, spec)
+       sqlite/auto backend:
+         _sqlite_aggregate(remaining criteria, spec)
+    5. return groups
+
+=head3 MESSAGES
+
+C<error_aggregate_measures_required>, C<error_aggregate_measure_ref>,
+C<error_aggregate_fn_unknown>, C<error_aggregate_col_required>,
+C<error_aggregate_col_unknown>, C<error_aggregate_as_required>,
+C<error_aggregate_as_invalid>, C<error_aggregate_as_duplicate>,
+C<error_aggregate_as_collision>, C<error_aggregate_by_invalid>,
+C<error_aggregate_having_key>, C<error_aggregate_having_operator>,
+C<warn_aggregate_sort_key>, C<warn_aggregate_non_numeric>.
+
+=cut
+
+sub aggregate {
+	my ($self, @args) = @_;
+	my $p = get_params(undef, @args) // {};
+
+	croak $self->_err('error_join_criterion') if exists $p->{join};
+
+	my $spec = $self->_validate_aggregate_spec($p);
+	# After _validate_aggregate_spec, aggregation keys have been deleted from $p.
+	# Remaining keys in $p are WHERE criteria for the join.
+
+	my $backend = $self->{_backend};
+
+	if ($backend eq 'array') {
+		# Fetch all matching merged rows without sort/limit/offset —
+		# those must be applied after grouping.
+		my $merged = $self->_joined_query_array($p);
+		my $groups = $self->_fold_aggregate($merged, $spec);
+
+		# Apply HAVING on the folded groups.
+		if (my $having = $spec->{having}) {
+			$groups = [grep { $self->_match_criteria($_, $having) } @{$groups}];
+		}
+
+		$self->_normalise_aggregate($groups, $spec->{measures});
+		$self->_sort_and_page($groups, $spec);
+		return $groups;
+	} else {
+		# SQLite path (including 'auto'): always use SQL, no threshold probe.
+		return $self->_sqlite_aggregate($p, $spec);
+	}
 }
 
 =head2 each_row
@@ -2873,7 +3110,7 @@ sub _validate_pagination :Protected {
 	#             coercion would silently treat as 0, bypassing the >= 1 guard.
 	if (defined $limit) {
 		if ($limit !~ /^\d+\z/a || $limit < 1) {
-			carp "Database::Join: limit must be a positive integer; ignored";
+			carp('Database::Join: limit must be a positive integer; ignored');
 			undef $limit;
 		}
 	}
@@ -2882,7 +3119,7 @@ sub _validate_pagination :Protected {
 	# Same \z / /a rationale as limit above.
 	if (defined $offset) {
 		if ($offset !~ /^\d+\z/a) {
-			carp "Database::Join: offset must be a non-negative integer; ignored";
+			carp('Database::Join: offset must be a non-negative integer; ignored');
 			undef $offset;
 		}
 	}
@@ -3420,35 +3657,7 @@ sub _sqlite_join :Protected {
 	my $join_type = $self->{_join_type};
 	my $n         = scalar @{ $self->{_dbs} };
 
-	# Partition query-time criteria only (no filter overlay).
-	# Filters are applied at cache-build time for spilled sources, and via the
-	# SQL WHERE clause for ATTACHed sources.  Keeping them separate means the
-	# cached tables can serve any query without rebuilding.
-	my $per_db_query = $self->_partition_criteria($params);
-
-	# Compute the full merged criteria (filter + query) for each source.
-	# Used for had_criteria (join-type semantics) and the WHERE clause for
-	# ATTACHed sources (which were not filtered at spill time).
-	my @per_db_full;
-	for my $i (0 .. $n - 1) {
-		my $base = $self->{_filters}{$i} // {};
-		$per_db_full[$i] = %{$base}
-			? _merge_criteria($base, $per_db_query->[$i])
-			: $per_db_query->[$i];
-	}
-
-	# Determine which secondary sources had effective criteria (inner-join semantics).
-	# The broadcast join-column criterion must NOT count — it is a key-range selector
-	# on the merged view, not a predicate that restricts the secondary's contribution.
-	# Base filters always count (documented: a filtered db is always inner-join).
-	my @had_criteria;
-	for my $i (1 .. $n - 1) {
-		my $local_jc   = $self->{_join_map}{$i} // $join_col;
-		my $has_filter = !!%{ $self->{_filters}{$i} // {} };
-		my %q          = %{ $per_db_query->[$i] };
-		delete $q{$local_jc};
-		$had_criteria[$i] = $has_filter || !!%q;
-	}
+	my ($per_db_query, $per_db_full, $had_criteria) = $self->_sqlite_criteria($params);
 
 	# For 'auto' mode: check total row count without fetching rows.
 	# Count(*) is used for dbi_source() sources; count() for others.
@@ -3512,85 +3721,16 @@ sub _sqlite_join :Protected {
 	my @source_cols = @{ $cache->{source_cols} };
 	my @is_attached = @{ $cache->{is_attached} };
 
-	# Build the WHERE clause from per-call criteria.
-	#   Spilled sources: query-only criteria (filter already applied to spilled data).
-	#   ATTACHed sources: full criteria (filter + query), since source was not filtered.
-	#   Secondary tables (i>0): the broadcast join-column criterion is omitted because
-	#   it is already enforced by the ON clause; adding it to WHERE nullifies LEFT JOIN.
-	my (@where_parts, @bind_vals);
-	for my $i (0 .. $n - 1) {
-		my $crit = $is_attached[$i] ? $per_db_full[$i] : $per_db_query->[$i];
-		next unless %{$crit};
-		my $tref       = $table_refs[$i];
-		my $local_jc_i = $i > 0 ? ($self->{_join_map}{$i} // $join_col) : undef;
-		for my $col (sort keys %{$crit}) {
-			next if defined $local_jc_i && $col eq $local_jc_i;
-			my $val = $crit->{$col};
-			if (ref($val) eq 'HASH') {
-				for my $op (sort keys %{$val}) {
-					if ($SAFE_LIST_OPS{$op}) {
-						# IN / NOT IN: value must be an arrayref; each element is bound.
-						my $arr = $val->{$op};
-						unless (ref($arr) eq 'ARRAY') {
-							carp "Database::Join: operator '$op' requires an arrayref value; criterion skipped";
-							next;
-						}
-						my @items = @{$arr};
-						if (!@items) {
-							# IN ()  → always false: add a tautologically-false term.
-							# NOT IN () → always true: omit the term (all rows match).
-							push @where_parts, '1 = 0' if $op eq 'IN';
-							next;
-						}
-						push @where_parts,
-							$tref . '.' . _sql_quote_identifier($col)
-							. " $op (" . join(', ', ('?') x scalar @items) . ')';
-						push @bind_vals, @items;
-						next;
-					}
-					if ($SAFE_NOARG_OPS{$op}) {
-						# IS NULL / IS NOT NULL: no bind parameter at all.
-						push @where_parts, $tref . '.' . _sql_quote_identifier($col) . " $op";
-						next;
-					}
-					unless ($SAFE_SQL_OPS{$op}) {
-						carp "Database::Join: operator '$op' is not supported on the SQLite backend; criterion skipped (use the array backend or a supported operator)";
-						next;
-					}
-					push @where_parts, $tref . '.' . _sql_quote_identifier($col) . " $op ?";
-					push @bind_vals, $val->{$op};
-				}
-			} elsif (!defined $val) {
-				# A bare undef value means "WHERE col IS NULL".
-				# (col = NULL is always UNKNOWN in SQL and would match nothing.)
-				push @where_parts, $tref . '.' . _sql_quote_identifier($col) . ' IS NULL';
-			} else {
-				push @where_parts, $tref . '.' . _sql_quote_identifier($col) . ' = ?';
-				push @bind_vals, $val;
-			}
-		}
-	}
-	my $where_sql = @where_parts ? ' WHERE ' . join(' AND ', @where_parts) : '';
+	my ($where_sql, $bind_vals_ref) = $self->_sqlite_where(
+		$per_db_query, $per_db_full, \@table_refs, \@is_attached);
+	my @bind_vals = @{$bind_vals_ref};
 
 	my $local_jc_0 = $self->{_join_map}{0} // $join_col;
 
 	# Build JOIN clauses.  Hoisted before the SELECT list so the count_only
 	# path can return early without building the (unused) column expressions.
-	# Join type mirrors the key-set semantics of _joined_query_array:
-	#   had_criteria[i] OR inner  => INNER JOIN
-	#   outer (no criteria)       => FULL OUTER JOIN
-	#   left  (no criteria)       => LEFT JOIN
 	my $from     = $table_refs[0];
-	my $join_sql = '';
-	for my $i (1 .. $n - 1) {
-		my $local_jc = $self->{_join_map}{$i} // $join_col;
-		my $join_kw  = ($had_criteria[$i] || $join_type eq 'inner') ? 'JOIN'
-		             : ($join_type eq 'outer')                       ? 'FULL OUTER JOIN'
-		             :                                                  'LEFT JOIN';
-		$join_sql .= " $join_kw $table_refs[$i]"
-		          . ' ON ' . $table_refs[0] . '.' . _sql_quote_identifier($local_jc_0)
-		          . ' = '  . $table_refs[$i] . '.' . _sql_quote_identifier($local_jc);
-	}
+	my $join_sql = $self->_sqlite_join_clause(\@table_refs, $had_criteria, $local_jc_0);
 
 	# COUNT(*) short-circuit: WHERE and JOIN are built; SELECT list and ORDER BY
 	# are not needed.  selectrow_array returns a single integer without fetching rows.
@@ -3728,6 +3868,826 @@ sub _sqlite_join :Protected {
 	return $sth->fetchall_arrayref({});
 }
 
+# _sqlite_criteria( \%params ) -> ( $per_db_query, \@per_db_full, \@had_criteria )
+# Purpose: Partition query-time criteria and overlay per-db filters.
+# Extracted from _sqlite_join so _sqlite_aggregate can reuse the same logic.
+sub _sqlite_criteria :Protected {
+	my ($self, $params) = @_;
+	my $join_col = $self->{_join_col};
+	my $n        = scalar @{ $self->{_dbs} };
+
+	my $per_db_query = $self->_partition_criteria($params);
+
+	my @per_db_full;
+	for my $i (0 .. $n - 1) {
+		my $base = $self->{_filters}{$i} // {};
+		$per_db_full[$i] = %{$base}
+			? _merge_criteria($base, $per_db_query->[$i])
+			: $per_db_query->[$i];
+	}
+
+	my @had_criteria;
+	for my $i (1 .. $n - 1) {
+		my $local_jc   = $self->{_join_map}{$i} // $join_col;
+		my $has_filter = !!%{ $self->{_filters}{$i} // {} };
+		my %q          = %{ $per_db_query->[$i] };
+		delete $q{$local_jc};
+		$had_criteria[$i] = $has_filter || !!%q;
+	}
+
+	return ($per_db_query, \@per_db_full, \@had_criteria);
+}
+
+# _sqlite_where( $per_db_query, \@per_db_full, \@table_refs, \@is_attached )
+#     -> ( $where_sql, \@bind_vals )
+# Purpose: Build the WHERE clause and bind-value list from per-call criteria.
+# Extracted from _sqlite_join for reuse by _sqlite_aggregate.
+sub _sqlite_where :Protected {
+	my ($self, $per_db_query, $per_db_full, $table_refs, $is_attached) = @_;
+	my $join_col = $self->{_join_col};
+	my $n        = scalar @{ $self->{_dbs} };
+
+	my (@where_parts, @bind_vals);
+	for my $i (0 .. $n - 1) {
+		my $crit = $is_attached->[$i] ? $per_db_full->[$i] : $per_db_query->[$i];
+		next unless %{$crit};
+		my $tref       = $table_refs->[$i];
+		my $local_jc_i = $i > 0 ? ($self->{_join_map}{$i} // $join_col) : undef;
+		for my $col (sort keys %{$crit}) {
+			next if defined $local_jc_i && $col eq $local_jc_i;
+			my $val = $crit->{$col};
+			if (ref($val) eq 'HASH') {
+				for my $op (sort keys %{$val}) {
+					if ($SAFE_LIST_OPS{$op}) {
+						my $arr = $val->{$op};
+						unless (ref($arr) eq 'ARRAY') {
+							carp "Database::Join: operator '$op' requires an arrayref value; criterion skipped";
+							next;
+						}
+						my @items = @{$arr};
+						if (!@items) {
+							push @where_parts, '1 = 0' if $op eq 'IN';
+							next;
+						}
+						push @where_parts,
+							$tref . '.' . _sql_quote_identifier($col)
+							. " $op (" . join(', ', ('?') x scalar @items) . ')';
+						push @bind_vals, @items;
+						next;
+					}
+					if ($SAFE_NOARG_OPS{$op}) {
+						push @where_parts,
+							$tref . '.' . _sql_quote_identifier($col) . " $op";
+						next;
+					}
+					unless ($SAFE_SQL_OPS{$op}) {
+						carp "Database::Join: operator '$op' is not supported on the SQLite backend; criterion skipped (use the array backend or a supported operator)";
+						next;
+					}
+					push @where_parts,
+						$tref . '.' . _sql_quote_identifier($col) . " $op ?";
+					push @bind_vals, $val->{$op};
+				}
+			} elsif (!defined $val) {
+				push @where_parts,
+					$tref . '.' . _sql_quote_identifier($col) . ' IS NULL';
+			} else {
+				push @where_parts,
+					$tref . '.' . _sql_quote_identifier($col) . ' = ?';
+				push @bind_vals, $val;
+			}
+		}
+	}
+	my $where_sql = @where_parts ? ' WHERE ' . join(' AND ', @where_parts) : '';
+	return ($where_sql, \@bind_vals);
+}
+
+# _sqlite_join_clause( \@table_refs, \@had_criteria, $local_jc_0 ) -> $join_sql
+# Purpose: Build the JOIN … ON … clause string.
+# Extracted from _sqlite_join for reuse by _sqlite_aggregate.
+sub _sqlite_join_clause :Protected {
+	my ($self, $table_refs, $had_criteria, $local_jc_0) = @_;
+	my $join_col  = $self->{_join_col};
+	my $join_type = $self->{_join_type};
+	my $n         = scalar @{ $self->{_dbs} };
+
+	my $join_sql = '';
+	for my $i (1 .. $n - 1) {
+		my $local_jc = $self->{_join_map}{$i} // $join_col;
+		my $join_kw  = ($had_criteria->[$i] || $join_type eq 'inner') ? 'JOIN'
+		             : ($join_type eq 'outer')                        ? 'FULL OUTER JOIN'
+		             :                                                   'LEFT JOIN';
+		$join_sql .= " $join_kw $table_refs->[$i]"
+		          . ' ON ' . $table_refs->[0] . '.' . _sql_quote_identifier($local_jc_0)
+		          . ' = '  . $table_refs->[$i] . '.' . _sql_quote_identifier($local_jc);
+	}
+	return $join_sql;
+}
+
+# _validate_having( \%having, \%valid_keys )
+# Purpose: Recursively validate a having hashref; croak on unknown keys or operators.
+# Entry:   $having is the caller's having hashref; $valid_keys maps allowed keys to 1.
+# Effects: Croaks on first violation; returns normally when the spec is clean.
+sub _validate_having :Protected {
+	my ($self, $having, $valid_keys) = @_;
+	for my $key (keys %{$having}) {
+		if ($key eq '-or' || $key eq '-and') {
+			my $list = $having->{$key};
+			croak $self->_err('error_aggregate_having_key', $key)
+				unless ref($list) eq 'ARRAY';
+			for my $sub (@{$list}) {
+				$self->_validate_having($sub, $valid_keys);
+			}
+			next;
+		}
+		croak $self->_err('error_aggregate_having_key', $key)
+			unless exists $valid_keys->{$key};
+		my $val = $having->{$key};
+		if (ref($val) eq 'HASH') {
+			for my $op (keys %{$val}) {
+				unless ($SAFE_SQL_OPS{$op} || $SAFE_LIST_OPS{$op} || $SAFE_NOARG_OPS{$op}) {
+					croak $self->_err('error_aggregate_having_operator', $op, $key);
+				}
+			}
+		}
+	}
+}
+
+# _validate_aggregate_spec( \%params ) -> \%spec
+# Purpose: Extract and validate aggregate-specific keys from %params, leaving
+#          criteria keys in place for _partition_criteria to route.
+# Entry:   $params is the raw caller hashref (mutated: aggregate keys deleted).
+# Exit:    Returns a spec hashref:
+#            by       => [ { name, owner, db_col }, ... ]
+#            measures => [ { fn, col, as, owner, db_col, is_numeric }, ... ]
+#            aliases  => { alias => 1, ... }
+#            having   => \%having or undef
+#            sort     => [ col, dir ] or undef
+#            limit    => positive int or undef
+#            offset   => non-neg int or undef
+sub _validate_aggregate_spec :Protected {
+	my ($self, $params) = @_;
+
+	my $join_col = $self->{_join_col};
+	my $n        = scalar @{ $self->{_dbs} };
+
+	my $by_raw       = delete $params->{by};
+	my $measures_raw = delete $params->{measures};
+	my $having_raw   = delete $params->{having};
+	my $sort_by_raw  = delete $params->{sort_by};
+	my $limit_raw    = delete $params->{limit};
+	my $offset_raw   = delete $params->{offset};
+
+	my ($limit, $offset) = $self->_validate_pagination($limit_raw, $offset_raw);
+
+	# by: default empty (grand total); must be arrayref of known, unambiguous columns.
+	$by_raw = [] unless defined $by_raw;
+	croak $self->_err('error_aggregate_by_invalid')
+		unless ref($by_raw) eq 'ARRAY';
+
+	my @by_names;
+	for my $col (@{$by_raw}) {
+		croak $self->_err('error_aggregate_by_invalid')
+			unless defined $col && length $col;
+		my $owner = $self->{_col_db}{$col};
+		croak $self->_err('error_aggregate_col_unknown', $col)
+			unless defined $owner;
+		# Ambiguity: any DB other than the owner also has the raw column name
+		# without renaming it via collision_prefix → last-wins applied silently.
+		if ($col ne $join_col && index($col, '.') < 0) {
+			for my $j (0 .. $n - 1) {
+				next if $j == $owner;
+				if ($self->{_db_cols}[$j]{$col}
+						&& !exists $self->{_col_rename}[$j]{$col}) {
+					croak $self->_err('error_col_conflict', $col);
+				}
+			}
+		}
+		my $db_col = $self->{_col_unrename}[$owner]{$col} // $col;
+		push @by_names, { name => $col, owner => $owner, db_col => $db_col };
+	}
+
+	# measures: required non-empty arrayref of hashrefs.
+	croak $self->_err('error_aggregate_measures_required')
+		unless ref($measures_raw) eq 'ARRAY' && @{$measures_raw};
+
+	my (@measures, %aliases, %by_name_set);
+	$by_name_set{ $_->{name} } = 1 for @by_names;
+
+	for my $m (@{$measures_raw}) {
+		croak $self->_err('error_aggregate_measure_ref', ref($m) || 'SCALAR')
+			unless ref($m) eq 'HASH';
+
+		my $fn = lc($m->{fn} // '');
+		croak $self->_err('error_aggregate_fn_unknown', $m->{fn} // '')
+			unless $AGGREGATE_FNS{$fn};
+
+		my $col = $m->{col};
+		my ($m_owner, $m_db_col, $m_is_numeric);
+		if (defined $col) {
+			my $col_owner = $self->{_col_db}{$col};
+			croak $self->_err('error_aggregate_col_unknown', $col)
+				unless defined $col_owner;
+			if ($col ne $join_col && index($col, '.') < 0) {
+				for my $j (0 .. $n - 1) {
+					next if $j == $col_owner;
+					if ($self->{_db_cols}[$j]{$col}
+							&& !exists $self->{_col_rename}[$j]{$col}) {
+						croak $self->_err('error_col_conflict', $col);
+					}
+				}
+			}
+			$m_owner  = $col_owner;
+			$m_db_col = $self->{_col_unrename}[$col_owner]{$col} // $col;
+			my $schema = do { local $@; eval { $self->{_dbs}[$col_owner]->schema() } } // {};
+			my $entry  = $schema->{$m_db_col};
+			my $type   = uc(ref($entry) eq 'HASH' ? ($entry->{type} // '') : ($entry // ''));
+			$m_is_numeric = ($type =~ /INT|REAL|FLOAT|DOUBLE|DECIMAL|NUMERIC/) ? 1 : 0;
+		} else {
+			croak $self->_err('error_aggregate_col_required', $fn)
+				if $fn ne 'count';
+		}
+
+		my $as = $m->{as};
+		croak $self->_err('error_aggregate_as_required')
+			unless defined $as && length $as;
+		croak $self->_err('error_aggregate_as_invalid', $as)
+			unless $as =~ /^\w+\z/;
+		croak $self->_err('error_aggregate_as_duplicate', $as)
+			if exists $aliases{$as};
+		croak $self->_err('error_aggregate_as_collision', $as)
+			if exists $by_name_set{$as};
+
+		$aliases{$as} = 1;
+		push @measures, {
+			fn         => $fn,
+			col        => $col,
+			as         => $as,
+			owner      => $m_owner,
+			db_col     => $m_db_col,
+			is_numeric => $m_is_numeric,
+		};
+	}
+
+	# having: validate keys and operators recursively.
+	my %valid_having_keys = (%by_name_set, %aliases);
+	if (defined $having_raw && %{$having_raw}) {
+		$self->_validate_having($having_raw, \%valid_having_keys);
+	}
+
+	# sort_by: name must be a by-column or measure alias; direction ASC/DESC.
+	my ($sort_col, $sort_dir) = (undef, 'ASC');
+	if (defined $sort_by_raw) {
+		my ($req_col, $req_dir);
+		if (ref($sort_by_raw) eq 'ARRAY') {
+			($req_col, $req_dir) = @{$sort_by_raw};
+		} else {
+			($req_col, $req_dir) = ($sort_by_raw, 'ASC');
+		}
+		$req_dir = uc($req_dir // 'ASC');
+		unless ($req_dir eq 'ASC' || $req_dir eq 'DESC') {
+			carp "Database::Join: sort_by direction '$req_dir' is not supported; using ASC";
+			$req_dir = 'ASC';
+		}
+		if (exists $valid_having_keys{$req_col}) {
+			($sort_col, $sort_dir) = ($req_col, $req_dir);
+		} else {
+			carp $self->_err('warn_aggregate_sort_key', $req_col);
+		}
+	}
+
+	return {
+		by       => \@by_names,
+		measures => \@measures,
+		aliases  => \%aliases,
+		having   => $having_raw,
+		sort     => defined($sort_col) ? [$sort_col, $sort_dir] : undef,
+		limit    => $limit,
+		offset   => $offset,
+	};
+}
+
+# _normalise_aggregate( \@rows, \@measures )
+# Purpose: Apply empty-set normalisation to fetched/folded group rows.
+#   sum/count/count_distinct: NULL → 0
+#   avg/min/max:              NULL stays undef
+# Called on both SQLite and array paths so they cannot drift.
+sub _normalise_aggregate :Protected {
+	my ($self, $rows, $measures) = @_;
+	for my $row (@{$rows}) {
+		for my $m (@{$measures}) {
+			my $fn = $m->{fn};
+			next if defined $row->{ $m->{as} };
+			if ($fn eq 'sum' || $fn eq 'count' || $fn eq 'count_distinct') {
+				$row->{ $m->{as} } = 0;
+			}
+		}
+	}
+}
+
+# _match_having_criterion( $value, $criterion, $key ) -> bool
+# Purpose: Evaluate one leaf HAVING condition on the Perl array path.
+#   Implements three-valued logic: a NULL (undef) lhs satisfies only IS NULL.
+sub _match_having_criterion :Protected {
+	my ($self, $value, $criterion, $key) = @_;
+
+	# Empty-list short-circuits precede three-valued logic:
+	#   NOT IN () → always true (vacuously nothing to exclude, including NULL).
+	#   IN ()     → always false.
+	if (ref($criterion) eq 'HASH') {
+		if (exists $criterion->{'NOT IN'}
+				&& ref($criterion->{'NOT IN'}) eq 'ARRAY'
+				&& !@{ $criterion->{'NOT IN'} }) {
+			return 1;
+		}
+		if (exists $criterion->{'IN'}
+				&& ref($criterion->{'IN'}) eq 'ARRAY'
+				&& !@{ $criterion->{'IN'} }) {
+			return 0;
+		}
+	}
+
+	if (!defined $value) {
+		# NULL satisfies: (1) bare undef criterion (IS NULL shorthand), or (2) IS NULL.
+		return 1 unless defined $criterion;
+		return (ref($criterion) eq 'HASH' && exists $criterion->{'IS NULL'}) ? 1 : 0;
+	}
+	if (!defined $criterion) {
+		# bare undef means IS NULL; value is defined → false
+		return 0;
+	}
+	if (ref($criterion) eq 'HASH') {
+		for my $op (keys %{$criterion}) {
+			my $rhs = $criterion->{$op};
+			if ($SAFE_NOARG_OPS{$op}) {
+				return 0 if $op eq 'IS NULL';   # value is defined
+				# IS NOT NULL → pass
+			} elsif ($SAFE_LIST_OPS{$op}) {
+				my @items = ref($rhs) eq 'ARRAY' ? @{$rhs} : ();
+				if ($op eq 'IN') {
+					return 0 unless grep { defined $_ && $_ eq $value } @items;
+				} else {
+					return 0 if grep { defined $_ && $_ eq $value } @items;
+				}
+			} elsif ($SAFE_SQL_OPS{$op}) {
+				my $num = looks_like_number($value) && looks_like_number($rhs);
+				my $ok;
+				if    ($op eq '=')        { $ok = $num ? $value == $rhs : $value eq $rhs }
+				elsif ($op eq '!=')       { $ok = $num ? $value != $rhs : $value ne $rhs }
+				elsif ($op eq '>')        { $ok = $num ? $value > $rhs  : $value gt $rhs }
+				elsif ($op eq '<')        { $ok = $num ? $value < $rhs  : $value lt $rhs }
+				elsif ($op eq '>=')       { $ok = $num ? $value >= $rhs : $value ge $rhs }
+				elsif ($op eq '<=')       { $ok = $num ? $value <= $rhs : $value le $rhs }
+				elsif ($op eq 'LIKE') {
+					my $pat = quotemeta($rhs);
+					$pat =~ s/\\%/.*/g;
+					$pat =~ s/\\_/./g;
+					$ok = ($value =~ /\A$pat\z/i);
+				} elsif ($op eq 'NOT LIKE') {
+					my $pat = quotemeta($rhs);
+					$pat =~ s/\\%/.*/g;
+					$pat =~ s/\\_/./g;
+					$ok = ($value !~ /\A$pat\z/i);
+				} else {
+					$ok = 0;
+				}
+				return 0 unless $ok;
+			} else {
+				croak $self->_err('error_aggregate_having_operator', $op, $key);
+			}
+		}
+		return 1;
+	}
+	# Bare scalar: equality
+	return looks_like_number($value) && looks_like_number($criterion)
+		? ($value == $criterion ? 1 : 0)
+		: ($value eq $criterion ? 1 : 0);
+}
+
+# _match_criteria( $row, \%criteria ) -> bool
+# Purpose: Evaluate a HAVING criteria hashref against a folded group row.
+# Supports -or / -and groupings recursively; delegates leaves to
+# _match_having_criterion.  Used by the array path's aggregate() only.
+sub _match_criteria :Protected {
+	my ($self, $row, $criteria) = @_;
+	for my $key (keys %{$criteria}) {
+		if ($key eq '-or') {
+			my $any = 0;
+			for my $sub (@{ $criteria->{$key} }) {
+				if ($self->_match_criteria($row, $sub)) { $any = 1; last }
+			}
+			return 0 unless $any;
+		} elsif ($key eq '-and') {
+			for my $sub (@{ $criteria->{$key} }) {
+				return 0 unless $self->_match_criteria($row, $sub);
+			}
+		} else {
+			my $val = exists $row->{$key} ? $row->{$key} : undef;
+			return 0 unless $self->_match_having_criterion($val, $criteria->{$key}, $key);
+		}
+	}
+	return 1;
+}
+
+# _fold_aggregate( \@merged_rows, \%spec ) -> \@groups
+# Purpose: Group merged rows and compute aggregate measures in Perl.
+# Used by the array backend path of aggregate().
+sub _fold_aggregate :Protected {
+	my ($self, $rows, $spec) = @_;
+	my @by      = @{ $spec->{by} };
+	my @measures = @{ $spec->{measures} };
+
+	my (%groups, @order);
+
+	my $new_group = sub {
+		my ($row) = @_;
+		my %g;
+		for my $b (@by) {
+			$g{ $b->{name} } = exists $row->{ $b->{name} }
+				? $row->{ $b->{name} } : undef;
+		}
+		for my $m (@measures) {
+			my ($fn, $as) = ($m->{fn}, $m->{as});
+			if    ($fn eq 'sum')            { $g{"${as}__sum"} = 0; $g{"${as}__bad"} = 0; $g{"${as}__badval"} = undef }
+			elsif ($fn eq 'avg')            { $g{"${as}__sum"} = 0; $g{"${as}__cnt"} = 0; $g{"${as}__bad"} = 0; $g{"${as}__badval"} = undef }
+			elsif ($fn eq 'min' || $fn eq 'max') { $g{"${as}__val"} = undef }
+			elsif ($fn eq 'count')          { $g{"${as}__cnt"} = 0 }
+			elsif ($fn eq 'count_distinct') { $g{"${as}__seen"} = {} }
+		}
+		return \%g;
+	};
+
+	for my $row (@{$rows}) {
+		my $key = join("\x00",
+			map { defined $row->{ $_->{name} } ? $row->{ $_->{name} } : '' }
+			@by);
+		my $g = $groups{$key} //= do { push @order, $key; $new_group->($row) };
+
+		for my $m (@measures) {
+			my ($fn, $as, $col) = ($m->{fn}, $m->{as}, $m->{col});
+			my $val = defined $col
+				? (exists $row->{$col} ? $row->{$col} : undef)
+				: undef;
+
+			if ($fn eq 'sum') {
+				if (defined $val && $val ne '' && looks_like_number($val)) {
+					$g->{"${as}__sum"} += $val;
+				} elsif (defined $val && $val ne '') {
+					$g->{"${as}__bad"}++;
+					$g->{"${as}__badval"} //= $val;
+				}
+			} elsif ($fn eq 'avg') {
+				if (defined $val && $val ne '' && looks_like_number($val)) {
+					$g->{"${as}__sum"} += $val;
+					$g->{"${as}__cnt"}++;
+				} elsif (defined $val && $val ne '') {
+					$g->{"${as}__bad"}++;
+					$g->{"${as}__badval"} //= $val;
+				}
+			} elsif ($fn eq 'min') {
+				if (defined $val) {
+					my $cur = $g->{"${as}__val"};
+					if (!defined $cur) {
+						$g->{"${as}__val"} = $val;
+					} else {
+						my $num = looks_like_number($cur) && looks_like_number($val);
+						$g->{"${as}__val"} = $val if $num ? $val < $cur : $val lt $cur;
+					}
+				}
+			} elsif ($fn eq 'max') {
+				if (defined $val) {
+					my $cur = $g->{"${as}__val"};
+					if (!defined $cur) {
+						$g->{"${as}__val"} = $val;
+					} else {
+						my $num = looks_like_number($cur) && looks_like_number($val);
+						$g->{"${as}__val"} = $val if $num ? $val > $cur : $val gt $cur;
+					}
+				}
+			} elsif ($fn eq 'count') {
+				if (!defined $col) {
+					$g->{"${as}__cnt"}++;
+				} else {
+					$g->{"${as}__cnt"}++ if defined $val;
+				}
+			} elsif ($fn eq 'count_distinct') {
+				$g->{"${as}__seen"}{$val} = 1 if defined $val;
+			}
+		}
+	}
+
+	# Grand total with no rows and no by: synthesise one zeroed row.
+	if (!@by && !@order) {
+		push @order, '';
+		$groups{''} = $new_group->({});
+	}
+
+	# Finalise accumulators into result rows.
+	my (@result, %bad_warned);
+	for my $key (@order) {
+		my $g = $groups{$key};
+		my %row;
+		for my $b (@by)     { $row{ $b->{name} } = $g->{ $b->{name} } }
+		for my $m (@measures) {
+			my ($fn, $as, $col) = ($m->{fn}, $m->{as}, $m->{col} // '(row)');
+			if ($fn eq 'sum') {
+				if ($g->{"${as}__bad"} && !$bad_warned{$as}) {
+					carp $self->_err('warn_aggregate_non_numeric',
+						$col, $g->{"${as}__bad"}, $g->{"${as}__badval"});
+					$bad_warned{$as} = 1;
+				}
+				$row{$as} = $g->{"${as}__sum"};
+			} elsif ($fn eq 'avg') {
+				if ($g->{"${as}__bad"} && !$bad_warned{$as}) {
+					carp $self->_err('warn_aggregate_non_numeric',
+						$col, $g->{"${as}__bad"}, $g->{"${as}__badval"});
+					$bad_warned{$as} = 1;
+				}
+				$row{$as} = $g->{"${as}__cnt"}
+					? $g->{"${as}__sum"} / $g->{"${as}__cnt"}
+					: undef;
+			} elsif ($fn eq 'min' || $fn eq 'max') {
+				$row{$as} = $g->{"${as}__val"};
+			} elsif ($fn eq 'count') {
+				$row{$as} = $g->{"${as}__cnt"};
+			} elsif ($fn eq 'count_distinct') {
+				$row{$as} = scalar keys %{ $g->{"${as}__seen"} };
+			}
+		}
+		push @result, \%row;
+	}
+	return \@result;
+}
+
+# _sort_and_page( \@rows, \%spec )
+# Purpose: Sort and splice the array-path aggregate result in place.
+# Order of operations: sort → offset → limit (matching GROUP BY semantics).
+sub _sort_and_page :Protected {
+	my ($self, $rows, $spec) = @_;
+	my $sort   = $spec->{sort};
+	my $limit  = $spec->{limit};
+	my $offset = $spec->{offset};
+	my @by     = @{ $spec->{by} };
+
+	if (defined $sort) {
+		my ($sc, $sd) = @{$sort};
+		@{$rows} = sort {
+			my ($va, $vb) = ($a->{$sc}, $b->{$sc});
+			my $cmp;
+			if    (!defined $va && !defined $vb) { $cmp = 0 }
+			elsif (!defined $va)                 { $cmp = -1 }
+			elsif (!defined $vb)                 { $cmp = 1 }
+			else {
+				$cmp = looks_like_number($va) && looks_like_number($vb)
+					? $va <=> $vb : $va cmp $vb;
+			}
+			$sd eq 'DESC' ? -$cmp : $cmp;
+		} @{$rows};
+	} elsif (@by) {
+		@{$rows} = sort {
+			my $cmp = 0;
+			for my $dim (@by) {
+				my $k = $dim->{name};
+				my ($va, $vb) = ($a->{$k}, $b->{$k});
+				if    (!defined $va && !defined $vb) { $cmp = 0 }
+				elsif (!defined $va)                 { $cmp = -1 }
+				elsif (!defined $vb)                 { $cmp = 1 }
+				else {
+					$cmp = looks_like_number($va) && looks_like_number($vb)
+						? $va <=> $vb : $va cmp $vb;
+				}
+				last if $cmp;
+			}
+			$cmp;
+		} @{$rows};
+	}
+
+	splice(@{$rows}, 0, $offset) if defined $offset && $offset > 0;
+	splice(@{$rows}, $limit)     if defined $limit  && $limit < scalar @{$rows};
+}
+
+# _having_to_sql( \%having, \%have_map ) -> ( $sql_fragment, \@binds )
+# Purpose: Recursively convert a having hashref to a SQL fragment with bind values.
+# $have_map maps every valid key to { expr => SQL_expr, is_agg => bool }.
+#   is_agg => 1  means the expression is an aggregate function → CAST(? AS REAL)
+#   is_agg => 0  means it is a group-by column expression → plain ?
+# Supports -or / -and recursion; delegates leaves to the same three operator tables
+# as _sqlite_where (_sqlite_join's WHERE builder), for vocabulary consistency.
+sub _having_to_sql :Protected {
+	my ($self, $having, $have_map) = @_;
+	my (@parts, @binds);
+
+	for my $key (sort keys %{$having}) {
+		if ($key eq '-or') {
+			my (@sp, @sb);
+			for my $sub (@{ $having->{$key} }) {
+				my ($s, $b) = $self->_having_to_sql($sub, $have_map);
+				push @sp, $s if length $s;
+				push @sb, @{$b};
+			}
+			if (@sp) {
+				push @parts, '(' . join(' OR ', @sp) . ')';
+				push @binds, @sb;
+			}
+			next;
+		}
+		if ($key eq '-and') {
+			my (@sp, @sb);
+			for my $sub (@{ $having->{$key} }) {
+				my ($s, $b) = $self->_having_to_sql($sub, $have_map);
+				push @sp, $s if length $s;
+				push @sb, @{$b};
+			}
+			if (@sp) {
+				push @parts, '(' . join(' AND ', @sp) . ')';
+				push @binds, @sb;
+			}
+			next;
+		}
+
+		my $entry  = $have_map->{$key};
+		my $expr   = $entry ? $entry->{expr}   : _sql_quote_identifier($key);
+		my $is_agg = $entry ? $entry->{is_agg} : 0;
+		my $val    = $having->{$key};
+
+		if (!defined $val) {
+			push @parts, "$expr IS NULL";
+		} elsif (ref($val) eq 'HASH') {
+			for my $op (sort keys %{$val}) {
+				if ($SAFE_NOARG_OPS{$op}) {
+					push @parts, "$expr $op";
+				} elsif ($SAFE_LIST_OPS{$op}) {
+					my $arr   = $val->{$op};
+					my @items = ref($arr) eq 'ARRAY' ? @{$arr} : ();
+					if (!@items) {
+						push @parts, '1 = 0' if $op eq 'IN';
+						next;
+					}
+					push @parts,
+						"$expr $op (" . join(', ', ('?') x scalar @items) . ')';
+					push @binds, @items;
+				} elsif ($SAFE_SQL_OPS{$op}) {
+					my $bind = $is_agg ? 'CAST(? AS REAL)' : '?';
+					push @parts, "$expr $op $bind";
+					push @binds, $val->{$op};
+				} else {
+					croak $self->_err('error_aggregate_having_operator', $op, $key);
+				}
+			}
+		} else {
+			push @parts, "$expr = ?";
+			push @binds, $val;
+		}
+	}
+
+	return (join(' AND ', @parts), \@binds);
+}
+
+# _sqlite_aggregate( \%params, \%spec ) -> \@group_rows
+# Purpose: Execute an aggregate query against the SQLite spill cache.
+# Builds SELECT … GROUP BY … HAVING … ORDER BY … SQL from the spec returned
+# by _validate_aggregate_spec, reusing the three extracted _sqlite_* builders
+# so criteria semantics stay identical to _sqlite_join.
+sub _sqlite_aggregate :Protected {
+	my ($self, $params, $spec) = @_;
+	my $join_col  = $self->{_join_col};
+	my $join_type = $self->{_join_type};
+	my $n         = scalar @{ $self->{_dbs} };
+
+	my ($per_db_query, $per_db_full, $had_criteria) = $self->_sqlite_criteria($params);
+
+	$self->_build_sqlite_cache() unless $self->_cache_fresh();
+	my $cache       = $self->{_sqlite_cache};
+	my $tmpdbh      = $cache->{dbh};
+	my @table_refs  = @{ $cache->{table_refs}  };
+	my @is_attached = @{ $cache->{is_attached} };
+
+	my $local_jc_0 = $self->{_join_map}{0} // $join_col;
+	my $from        = $table_refs[0];
+
+	my ($where_sql, $where_binds) = $self->_sqlite_where(
+		$per_db_query, $per_db_full, \@table_refs, \@is_attached);
+	my $join_sql = $self->_sqlite_join_clause(\@table_refs, $had_criteria, $local_jc_0);
+
+	# Build by-column expressions (GROUP BY / SELECT / ORDER BY).
+	my @by_exprs;
+	my @by_select;
+	my %have_map;   # key => { expr, is_agg } for _having_to_sql
+
+	for my $b (@{ $spec->{by} }) {
+		my ($bname, $owner, $db_col) = @{$b}{qw(name owner db_col)};
+		my $expr;
+		if ($bname eq $join_col) {
+			if ($join_type eq 'outer' && $n > 1) {
+				$expr = 'COALESCE('
+				      . join(', ', map {
+				            my $lc = $self->{_join_map}{$_} // $join_col;
+				            $table_refs[$_] . '.' . _sql_quote_identifier($lc)
+				        } 0 .. $n - 1)
+				      . ')';
+			} else {
+				$expr = $table_refs[0] . '.' . _sql_quote_identifier($local_jc_0);
+			}
+		} else {
+			$expr = $table_refs[$owner] . '.' . _sql_quote_identifier($db_col);
+		}
+		push @by_exprs, $expr;
+		# Dotted names (collision_prefix) need an AS alias so fetchall_arrayref({})
+		# returns the right key.
+		push @by_select, ($bname =~ /\./)
+			? "$expr AS " . _sql_quote_identifier($bname)
+			: $expr;
+		$have_map{$bname} = { expr => $expr, is_agg => 0 };
+	}
+
+	# Build measure expressions (SELECT list / HAVING substitution).
+	my @measure_select;
+	for my $m (@{ $spec->{measures} }) {
+		my ($fn, $as, $owner, $db_col, $is_numeric) =
+			@{$m}{qw(fn as owner db_col is_numeric)};
+		$is_numeric //= 0;
+
+		my $col_ref = defined $db_col
+			? $table_refs[$owner] . '.' . _sql_quote_identifier($db_col)
+			: undef;
+
+		my $sql_expr;
+		if    ($fn eq 'sum')            { $sql_expr = "SUM(CAST($col_ref AS REAL))" }
+		elsif ($fn eq 'avg')            { $sql_expr = "AVG(CAST($col_ref AS REAL))" }
+		elsif ($fn eq 'min')            {
+			$sql_expr = $is_numeric ? "MIN(CAST($col_ref AS REAL))" : "MIN($col_ref)" }
+		elsif ($fn eq 'max')            {
+			$sql_expr = $is_numeric ? "MAX(CAST($col_ref AS REAL))" : "MAX($col_ref)" }
+		elsif ($fn eq 'count')          {
+			$sql_expr = defined $col_ref ? "COUNT($col_ref)" : 'COUNT(*)' }
+		elsif ($fn eq 'count_distinct') { $sql_expr = "COUNT(DISTINCT $col_ref)" }
+
+		push @measure_select, "$sql_expr AS " . _sql_quote_identifier($as);
+		$have_map{$as} = { expr => $sql_expr, is_agg => 1 };
+	}
+
+	my $groupby_sql = @by_exprs
+		? ' GROUP BY ' . join(', ', @by_exprs)
+		: '';
+
+	# HAVING clause.
+	my ($having_sql, $having_binds) = ('', []);
+	if (defined $spec->{having} && %{ $spec->{having} }) {
+		my ($h_sql, $h_binds) = $self->_having_to_sql($spec->{having}, \%have_map);
+		if (length $h_sql) {
+			$having_sql   = ' HAVING ' . $h_sql;
+			$having_binds = $h_binds;
+		}
+	}
+
+	# ORDER BY: default = by expressions ascending; override via spec->{sort}.
+	my $order_sql;
+	if (defined $spec->{sort}) {
+		my ($sc, $sd) = @{ $spec->{sort} };
+		my $sort_expr = $have_map{$sc} ? $have_map{$sc}{expr}
+		                               : _sql_quote_identifier($sc);
+		$order_sql = ' ORDER BY ' . $sort_expr . ($sd eq 'DESC' ? ' DESC' : '');
+	} elsif (@by_exprs) {
+		$order_sql = ' ORDER BY ' . join(', ', @by_exprs);
+	} else {
+		$order_sql = '';
+	}
+
+	my $sql = 'SELECT '
+	        . join(', ', @by_select, @measure_select)
+	        . ' FROM ' . $from . $join_sql
+	        . $where_sql
+	        . $groupby_sql
+	        . $having_sql
+	        . $order_sql;
+
+	my @page_bind;
+	my ($limit, $offset) = ($spec->{limit}, $spec->{offset});
+	if (defined $limit) {
+		$sql .= ' LIMIT ?';
+		push @page_bind, $limit;
+		if (defined $offset) { $sql .= ' OFFSET ?'; push @page_bind, $offset }
+	} elsif (defined $offset) {
+		$sql .= ' LIMIT -1 OFFSET ?';
+		push @page_bind, $offset;
+	}
+
+	my $sth = $tmpdbh->prepare_cached($sql);
+	$sth->execute(@{$where_binds}, @{$having_binds}, @page_bind);
+	my $rows = $sth->fetchall_arrayref({}) // [];
+
+	$self->_normalise_aggregate($rows, $spec->{measures});
+
+	# Grand total with no by and no matching rows: synthesise one normalised row.
+	if (!@{ $spec->{by} } && !@{$rows}) {
+		my %row = map { $_->{as} => undef } @{ $spec->{measures} };
+		$self->_normalise_aggregate([\%row], $spec->{measures});
+		return [\%row];
+	}
+
+	return $rows;
+}
+
 # _merge_criteria( \%base, \%extra ) -> \%merged
 # Purpose: Merge two criteria hashrefs for the same database column set.
 # Entry:   %base is the permanent filter; %extra is the query-time criteria.
@@ -3807,38 +4767,75 @@ __END__
 
 =head1 ENCODING
 
-All text that passes through C<Database::Join> at the Perl layer (column names,
-criteria values, merged row values) is treated as opaque strings.
-C<Database::Join> does not inspect, encode, or transform string content.
+C<Database::Join> is a routing and merge layer written in pure Perl.  It never
+inspects, re-encodes, or transforms the I<content> of strings -- only their
+identity (via C<eq> / hash-key equality) and, on the array backend, their
+numeric interpretation (via C<looks_like_number>).
 
 =over 4
 
 =item Column names
 
-Column names are plain ASCII strings as returned by C<Database::Abstraction::columns()>.
-Non-ASCII column names are accepted but not tested; behaviour depends on the
-underlying DA and database driver.
+Column names are exactly what each component C<Database::Abstraction> object
+returns from its own C<columns()> method.  C<Database::Join> compares them with
+C<eq> (byte-level equality) and builds its internal routing index from them.
+ASCII column names (letters, digits, underscore) are safe everywhere.
+Non-ASCII column names work as long as every component database returns them
+in the same byte encoding and your Perl source file is loaded in the same
+encoding.  Mixed encodings between component databases are not supported.
+
+=item Join-key values (the join_column)
+
+The join-column value is used as a hash key internally (C<$hash{$key}>).
+Perl uses byte-level equality for hash keys, so any value that round-trips
+correctly through your component databases works as a join key, including
+non-ASCII strings, emoji, and other Unicode text, as long as all component
+databases return the same bytes for the same conceptual key.
+
+    # A Japanese city name as a join key works fine
+    my $rows = $join->selectall_arrayref(entry => "\x{6771}\x{4EAC}");
 
 =item Criteria values and row data
 
-Values are passed verbatim between callers and component DAs.  Full UTF-8 is
-safe as long as the underlying C<Database::Abstraction> objects and their
-database drivers handle UTF-8 correctly.  C<Database::Join> neither encodes
-nor decodes any value.
+Criterion values and merged row values are passed verbatim between the caller
+and the component databases.  C<Database::Join> does not examine them.  Full
+UTF-8 text (including multi-byte characters, accented letters, CJK ideographs,
+and emoji) round-trips safely provided the underlying component databases handle
+UTF-8 correctly.
 
-=item SQLite backend
+    # Emoji in a criterion value -- works if the DA supports it
+    my $rows = $join->selectall_arrayref(mood => "\x{1F600}");
 
-When the SQLite path is active, values are inserted into the temporary SQLite
-database via DBI placeholders (never string interpolation), so binary-safe
-round-tripping depends on C<DBD::SQLite>'s character encoding settings.
-By default C<DBD::SQLite> operates in UTF-8 mode, which is correct for text
-data.  Binary blobs are not explicitly tested.
+=item SQLite backend: UTF-8 round-trip guarantee
+
+When the SQLite path is active (C<backend =E<gt> 'sqlite'> or C<'auto'>),
+values are inserted into the temporary C<DBD::SQLite> database exclusively
+through DBI prepared-statement placeholders -- never by string interpolation.
+C<DBD::SQLite> operates in UTF-8 mode by default (C<sqlite_unicode =E<gt> 1>
+in newer releases), so multi-byte UTF-8 text round-trips without corruption.
+Binary blobs containing null bytes may not round-trip correctly; use the array
+backend if you need binary-safe joins.
+
+=item Sorting on the array backend uses Perl string comparison
+
+The array backend sorts with Perl's C<cmp> (byte-level lexicographic order).
+This is correct for pure-ASCII data and for consistently-encoded UTF-8 data
+where byte order matches Unicode code-point order (e.g. sorting within a
+single script).  For locale-aware sorting (e.g. sorting German umlauts in
+German alphabetical order) switch to the SQLite backend, which delegates to
+SQLite's C<ORDER BY> (locale support depends on how SQLite was compiled).
+
+=item Measure aliases in aggregate()
+
+The C<as> alias for each measure must match C</^\w+\z/a> -- ASCII word
+characters only (letters, digits, underscore).  Full Unicode identifiers
+are not supported as aliases.
 
 =item i18n messages
 
-All internal error and warning messages route through the C<i18n> object
-(if one is supplied) via a C<translate($key, @args)> call.  The translation
-dictionary controls the final encoding of those strings.
+All internal error and warning messages route through the optional C<i18n>
+object via a C<translate($key, @args)> call.  The translation dictionary
+controls the final encoding and character set of those user-visible strings.
 
 =back
 
@@ -3938,6 +4935,115 @@ has no free space, or C<DBD::SQLite> is not installed.
 B<Fix:> Check that the directory given by C<tmpdir> (or the system temp
 directory if C<tmpdir> was not set) is writable and has sufficient free space.
 Verify that C<DBD::SQLite> 1.70 or later is installed.
+
+=item C<error_aggregate_measures_required>
+
+B<When:> C<aggregate()> is called without a C<measures> key, or with
+C<measures => []>.
+
+B<Fix:> Pass a non-empty arrayref: C<< measures => [{ fn => 'count', as => 'n' }] >>.
+
+=item C<error_aggregate_measure_ref>
+
+B<When:> One of the elements in the C<measures> arrayref is not a hashref (it
+is a scalar, arrayref, or other non-hash reference).
+
+B<Fix:> Every element of C<measures> must be a plain hashref with at least
+C<fn> and C<as> keys.
+
+=item C<error_aggregate_fn_unknown>
+
+B<When:> The C<fn> value in a measure hashref is not one of: C<sum>, C<avg>,
+C<min>, C<max>, C<count>, C<count_distinct> (case-insensitive).
+
+B<Fix:> Use a supported function name.  C<median>, C<stddev> and window
+functions are not implemented.
+
+=item C<error_aggregate_col_required>
+
+B<When:> The C<col> field is missing from a measure whose C<fn> requires a
+column (any function except plain C<count>).
+
+B<Fix:> Add C<< col => 'column_name' >> to the measure hashref.  C<count>
+without C<col> emits C<COUNT(*)>; all other functions require a column.
+
+=item C<error_aggregate_col_unknown>
+
+B<When:> The C<col> in a measure, or a name in C<by>, refers to a column that
+is not in the merged view (either never existed or was hidden with
+C<remove_column>).
+
+B<Fix:> Check C<< $join->columns() >> for the correct published name.
+C<collision_prefix>-renamed columns are accessed as C<"prefix.col">.
+
+=item C<error_aggregate_as_required>
+
+B<When:> A measure hashref has no C<as> key, or its value is C<undef> or the
+empty string.
+
+B<Fix:> Every measure must have a non-empty C<as> alias: C<< as => 'total' >>.
+
+=item C<error_aggregate_as_invalid>
+
+B<When:> A measure alias (C<as>) contains characters other than word
+characters (C<\w>: letters, digits, underscore).
+
+B<Fix:> Use a plain word for the alias: C<< as => 'total' >>, not
+C<< as => 'total score' >> or C<< as => 'total-score' >>.
+
+=item C<error_aggregate_as_duplicate>
+
+B<When:> Two or more measures share the same C<as> alias.
+
+B<Fix:> Choose a unique alias for each measure.
+
+=item C<error_aggregate_as_collision>
+
+B<When:> A measure's C<as> alias is the same as one of the C<by> column names.
+
+B<Fix:> Choose an alias that does not match any grouping dimension.
+
+=item C<error_aggregate_by_invalid>
+
+B<When:> The C<by> parameter is present but is not an arrayref.
+
+B<Fix:> Pass an arrayref (possibly empty for a grand total):
+C<< by => ['region'] >> or C<< by => [] >>.
+
+=item C<error_aggregate_having_key>
+
+B<When:> A key in the C<having> hashref is not one of the C<by> column names,
+a measure alias, C<-or>, or C<-and>.
+
+B<Fix:> Only filter on names that appear in the aggregate output.
+
+=item C<error_aggregate_having_operator>
+
+B<When:> An operator hashref inside C<having> uses an operator that is not in
+C<%SAFE_SQL_OPS>, C<%SAFE_LIST_OPS>, or C<%SAFE_NOARG_OPS>.
+
+B<Fix:> Use a supported operator.  C<BETWEEN> is not supported; write it as
+two constraints: C<< { '>=' => $lo, '<=' => $hi } >>.
+
+=item C<warn_aggregate_sort_key> (carp)
+
+B<When:> The column or alias named by C<sort_by> in C<aggregate()> is not one
+of the C<by> columns or measure aliases.
+
+B<Fix:> Use a column name from C<by> or a measure alias from C<measures>.
+The sort falls back to the default group ordering (C<by> columns ascending).
+
+=item C<warn_aggregate_non_numeric> (carp)
+
+B<When:> The array backend encounters one or more non-numeric values in a
+column that is the target of a C<sum> or C<avg> measure.  The SQLite backend
+coerces non-numeric values to C<0.0> via C<CAST> and emits no warning.
+
+B<Fix:> Clean the data before joining, or switch to the SQLite backend if
+coercion to zero is acceptable.
+
+    # Example: the warning names the column, the count, and the first bad value
+    # "aggregate: column "score" has 2 non-numeric value(s), skipped, e.g. "n/a""
 
 =back
 
@@ -4298,6 +5404,73 @@ Unicode is used throughout this section as required by Z notation.
     -- Key-set semantics: any database that receives a non-empty
     -- bc_slice acts as an inner-join partner (same as filters).
 
+=head2 aggregate
+
+    ─── AggregateSpec ─────────────────────────────────────────────────
+    MEASURE ::= { fn : AGGFN; col : NAME?; as : ALIAS }
+    AGGFN   ::= sum | avg | min | max | count | count_distinct
+    ALIAS   ::= \w+
+    SPEC    ::= { by : seq NAME; measures : seq MEASURE;
+                  having : CRITERIA?;
+                  sort_by : NAME × {ASC,DESC}?; limit : ℕ?; offset : ℕ? }
+    ─────────────────────────────────────────────────────────────────
+    -- Pre-conditions (checked by _validate_aggregate_spec):
+    ∀ m : measures •
+        m.fn ∈ {sum, avg, min, max, count, count_distinct}
+        ∧ (m.fn ≠ count ∨ m.fn = count_distinct ⟹ m.col ≠ ∅)
+        ∧ m.as matches /^\w+\z/
+    ∀ name : by • name ∈ dom col_db
+    ∀ m : measures • m.col ≠ ∅ ⟹ m.col ∈ dom col_db
+    # aliases are unique and do not collide with 'by' names:
+    ∀ i,j : 0 ‥ #measures-1 • i ≠ j ⟹ measures(i).as ≠ measures(j).as
+    ∀ m : measures; b : by • m.as ≠ b
+
+    ─── Aggregate ─────────────────────────────────────────────────────
+    ΞDatabase_Join               -- state unchanged (Xi-transition)
+    criteria?  : CRITERIA        -- pre-aggregation WHERE
+    spec?      : SPEC
+    result!    : seq GROUP_ROW
+    ─────────────────────────────────────────────────────────────────
+    -- GROUP_ROW has exactly the by-columns plus the measure aliases.
+    -- Group key: tuple of by-column values from a merged row.
+    group_key(row, by) == { b : by • b ↦ row(b) }
+
+    -- Fold function on the array backend:
+    fold(rows, spec) ==
+        let G = { k : IMAGE(group_key(r, by) | r : rows) • k ↦ {} }
+        for r : rows:
+            G[group_key(r, by)] += r   -- accumulate per measure.fn
+        for g : dom G:
+            G[g] = { b : by • b ↦ g(b) }
+                 ∪ { m : measures • m.as ↦ apply(m.fn, m.col, G[g].rows) }
+        result_pre = ran G
+
+    -- apply: maps aggregate function to its computed value.
+    apply(count, ∅, rows)         == #rows
+    apply(count_distinct, col, rows) == #{ r : rows • r(col) }
+    apply(sum, col, rows)         == Σ { r : rows | is_num(r(col)) • r(col) }
+    apply(avg, col, rows)         == sum(col, rows) / #{ r | is_num(r(col)) }
+    apply(min, col, rows)         == min { r : rows • r(col) }
+    apply(max, col, rows)         == max { r : rows • r(col) }
+
+    -- Post-aggregation HAVING filter:
+    result_having = [ g : result_pre | matches_having(g, spec.having) ]
+
+    -- Grand total (by = []):
+    #by = 0 ⟹ #result! = 1
+    #by > 0 ∧ #result_having = 0 ⟹ result! = []
+
+    -- Final result:
+    result! = sort_and_page(result_having, spec)
+
+    -- Backend dispatch:
+    backend ∈ {sqlite, auto} ⟹ aggregation pushed to SQLite GROUP BY
+    backend = array           ⟹ fold() applied in Perl
+
+    -- Correctness invariant (both paths return identical rows):
+    ∀ criteria?, spec? •
+        _sqlite_aggregate(criteria?, spec?) = _fold_aggregate(rows(criteria?), spec?)
+
 =head2 selectall_arrayref
 
     selectall_arrayref : CRITERIA → seq MERGED_ROW
@@ -4409,9 +5582,11 @@ triggers that cause transitions (arrows), and important side-effects.
 =head2 FSM 1: Object Lifecycle
 
 Governs the structural state of a C<Database::Join> instance.
-Query methods (C<selectall_arrayref>, C<fetchrow_hashref>, C<count>,
-C<columns>, C<schema>, C<updated>) are schema-preserving (Xi-transitions) and
-are not shown because they do not change state.
+Query methods (C<selectall_arrayref>, C<selectall_array>, C<fetchrow_hashref>,
+C<count>, C<aggregate>, C<each_row>, C<columns>, C<schema>, C<updated>) are
+schema-preserving (Xi-transitions) and are not shown because they do not change
+state.  C<aggregate()> additionally triggers the SQLite cache lifecycle (FSM 2)
+when the backend is C<'sqlite'> or C<'auto'>, just like any other query method.
 
     [pre-creation]
          |

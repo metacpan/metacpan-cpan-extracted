@@ -43,7 +43,6 @@ WriteMakefile(
 	}, TEST_REQUIRES => {
 		'File::Copy'              => 0,
 		'File::Temp'              => 0,
-		'IPC::System::Simple'  => 0,
 		'Test::DescribeMe' => 0,
 		'Test::Exception'         => 0,
 		'Test::Memory::Cycle'     => 0,

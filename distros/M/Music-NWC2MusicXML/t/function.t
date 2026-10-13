@@ -986,6 +986,114 @@ subtest 'MusicXML::_annotate_wedges -- arc open at end of staff' => sub {
 };
 
 # ============================================================================
+# 11c. Music::NWC2MusicXML::MusicXML -- _annotate_fermatas
+# ============================================================================
+
+subtest 'MusicXML::_annotate_fermatas -- empty list' => sub {
+	my $gen = Music::NWC2MusicXML::MusicXML->new;
+	my %ann;
+	$gen->_annotate_fermatas([], \%ann);
+	is_deeply \%ann, {}, 'empty list -> no annotations added';
+};
+
+subtest 'MusicXML::_annotate_fermatas -- fermata before Note annotates it' => sub {
+	my $gen = Music::NWC2MusicXML::MusicXML->new;
+	my $tv = Music::NWC2MusicXML::Event->new(
+		type => 'TempoVariance',
+		data => { style => 'Fermata', placement => 'above' },
+	);
+	my $note = Music::NWC2MusicXML::Event->new(
+		type => 'Note', duration => [1,1],
+		data => { nwc_pos => '0', base_dur => '4th', dots => 0,
+		          articulations => [], opts => {} },
+	);
+	my %ann;
+	$gen->_annotate_fermatas([$tv, $note], \%ann);
+	ok  $ann{"$note"}{fermata}, 'note following TempoVariance:Fermata gets fermata annotation';
+	ok !$ann{"$tv"}{fermata},   'TempoVariance event itself is not annotated';
+};
+
+subtest 'MusicXML::_annotate_fermatas -- fermata before Rest annotates it' => sub {
+	my $gen = Music::NWC2MusicXML::MusicXML->new;
+	my $tv = Music::NWC2MusicXML::Event->new(
+		type => 'TempoVariance',
+		data => { style => 'Fermata', placement => 'above' },
+	);
+	my $rest = Music::NWC2MusicXML::Event->new(
+		type => 'Rest', duration => [1,1],
+		data => { base_dur => '4th', dots => 0 },
+	);
+	my %ann;
+	$gen->_annotate_fermatas([$tv, $rest], \%ann);
+	ok $ann{"$rest"}{fermata}, 'rest following TempoVariance:Fermata gets fermata annotation';
+};
+
+subtest 'MusicXML::_annotate_fermatas -- fermata before Chord annotates it' => sub {
+	my $gen = Music::NWC2MusicXML::MusicXML->new;
+	my $tv = Music::NWC2MusicXML::Event->new(
+		type => 'TempoVariance',
+		data => { style => 'Fermata', placement => 'above' },
+	);
+	my $chord = Music::NWC2MusicXML::Event->new(
+		type => 'Chord', duration => [1,1],
+		data => { nwc_positions => ['0','2'], base_dur => '4th', dots => 0,
+		          articulations => [] },
+	);
+	my %ann;
+	$gen->_annotate_fermatas([$tv, $chord], \%ann);
+	ok $ann{"$chord"}{fermata}, 'chord following TempoVariance:Fermata gets fermata annotation';
+};
+
+subtest 'MusicXML::_annotate_fermatas -- fermata at end of staff (no following note)' => sub {
+	my $gen = Music::NWC2MusicXML::MusicXML->new;
+	my $note = Music::NWC2MusicXML::Event->new(
+		type => 'Note', duration => [1,1],
+		data => { nwc_pos => '0', base_dur => '4th', dots => 0,
+		          articulations => [], opts => {} },
+	);
+	my $tv = Music::NWC2MusicXML::Event->new(
+		type => 'TempoVariance',
+		data => { style => 'Fermata', placement => 'above' },
+	);
+	my %ann;
+	lives_ok { $gen->_annotate_fermatas([$note, $tv], \%ann) }
+		'fermata at end of staff does not crash';
+	ok !$ann{"$note"}{fermata},
+		'note BEFORE the fermata record is not annotated';
+};
+
+subtest 'MusicXML::_annotate_fermatas -- non-Fermata TempoVariance does not annotate' => sub {
+	my $gen = Music::NWC2MusicXML::MusicXML->new;
+	my $tv = Music::NWC2MusicXML::Event->new(
+		type => 'TempoVariance',
+		data => { style => 'Ritardando', placement => 'above' },
+	);
+	my $note = Music::NWC2MusicXML::Event->new(
+		type => 'Note', duration => [1,1],
+		data => { nwc_pos => '0', base_dur => '4th', dots => 0,
+		          articulations => [], opts => {} },
+	);
+	my %ann;
+	$gen->_annotate_fermatas([$tv, $note], \%ann);
+	ok !$ann{"$note"}{fermata}, 'non-Fermata TempoVariance does not set fermata annotation';
+};
+
+subtest 'MusicXML::_annotate_fermatas -- multiple fermatas annotate independent events' => sub {
+	my $gen = Music::NWC2MusicXML::MusicXML->new;
+	my $mk_tv = sub { Music::NWC2MusicXML::Event->new(
+		type => 'TempoVariance', data => { style => 'Fermata', placement => 'above' }) };
+	my $mk_note = sub { Music::NWC2MusicXML::Event->new(
+		type => 'Note', duration => [1,1],
+		data => { nwc_pos => '0', base_dur => '4th', dots => 0,
+		          articulations => [], opts => {} }) };
+	my ($tv1, $n1, $tv2, $n2) = ($mk_tv->(), $mk_note->(), $mk_tv->(), $mk_note->());
+	my %ann;
+	$gen->_annotate_fermatas([$tv1, $n1, $tv2, $n2], \%ann);
+	ok $ann{"$n1"}{fermata}, 'first note annotated';
+	ok $ann{"$n2"}{fermata}, 'second note annotated independently';
+};
+
+# ============================================================================
 # 12. Music::NWC2MusicXML::MusicXML -- _resolve_part_names
 # ============================================================================
 

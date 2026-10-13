@@ -232,8 +232,15 @@ static SV *punk_cachefile_get_sv(pTHX_ punk_cachefile *c, const char *key,
         close(fd); c->misses++; return NULL;
     }
     if (h.expiry && h.expiry <= pcf_now()) {
+        /* Lazy expiry, noticed on the read - of the file that was READ. A
+         * writer renames a fresh entry over this path whenever it likes, and
+         * unlinking by name after that would delete the new value because
+         * the old one had run out. */
+        struct stat held, now;
+        int same = fstat(fd, &held) == 0 && stat(path, &now) == 0
+                && held.st_dev == now.st_dev && held.st_ino == now.st_ino;
         close(fd);
-        unlink(path);                    /* lazy expiry, noticed on the read */
+        if (same) unlink(path);
         c->expired++;
         c->misses++;
         return NULL;
@@ -512,8 +519,10 @@ static void punk_cachefile_usage(punk_cachefile *c, uint64_t *bytes,
  * actually holding the lock. */
 #define PCF_LOCK_UNAVAILABLE (-1)
 
-static int punk_cachefile_lock(pTHX_ punk_cachefile *c, const char *key,
-                               uint32_t klen) {
+/* `stale` is how old a held lock may be before it is taken for abandoned
+ * and stolen; negative means the store's own lock_wait. */
+static int punk_cachefile_lock_for(pTHX_ punk_cachefile *c, const char *key,
+                                   uint32_t klen, double stale) {
     char path[PCF_PATHMAX], lock[PCF_PATHMAX];
     struct stat st;
     int fd;
@@ -533,12 +542,18 @@ static int punk_cachefile_lock(pTHX_ punk_cachefile *c, const char *key,
      * PCF_MTIME above for why it is added here rather than taken off the
      * age. */
     if (stat(lock, &st) == 0
-        && pcf_now() - PCF_MTIME(st) > c->lock_wait + PCF_MTIME_SLACK) {
+        && pcf_now() - PCF_MTIME(st)
+               > (stale < 0 ? c->lock_wait : stale) + PCF_MTIME_SLACK) {
         unlink(lock);
         fd = open(lock, O_WRONLY | O_CREAT | O_EXCL, 0600);
         if (fd >= 0) { close(fd); return 1; }
     }
     return 0;
+}
+
+static int punk_cachefile_lock(pTHX_ punk_cachefile *c, const char *key,
+                               uint32_t klen) {
+    return punk_cachefile_lock_for(aTHX_ c, key, klen, -1.0);
 }
 
 static void punk_cachefile_unlock(pTHX_ punk_cachefile *c, const char *key,

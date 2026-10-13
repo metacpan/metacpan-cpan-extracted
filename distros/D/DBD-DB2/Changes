@@ -3,6 +3,12 @@
 DBD::DB2::Changes - List of changes
 
 =cut
+=head2 Changes in DBD::DB2 1.93, Oct 5, 2026
+
+  Change the DBD::DB2 project license to Apache-2.0.
+  Prevent a stack buffer overflow when setting db2_set_schema.
+  Only pass -qcpluscmt on AIX when not compiling with GCC (issue #12).
+
 =head2 Changes in DBD::DB2 1.92, Jan 7, 2026
 
   RHEL 10 support. Tested on 5.40 and above.

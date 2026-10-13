@@ -50,7 +50,7 @@ This module is inspired by the Scientist ruby code released by GitHub under the 
 
 In February 2016, I started writing this Perl module to bring similar ideas to Perl.
 
-Please get involved with this module. Contact lancew@cpan.org with ideas, suggestions; support, etc.
+Please get involved with this module. Contact lw@judocoach.com with ideas, suggestions; support, etc.
 
 This code is also released under the MIT license to match the original Ruby implementation.
 
@@ -179,7 +179,7 @@ Below is a small example that pushes mismatch info and timings to StatsD:
 
 =head1 AUTHOR
 
-Lance Wicks <lancew@cpan.org>
+Lance Wicks <lw@judocoach.com>
 
 =head1 CONTRIBUTORS
 

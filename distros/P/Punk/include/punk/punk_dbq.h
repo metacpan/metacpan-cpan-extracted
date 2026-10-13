@@ -94,6 +94,21 @@ static void pdbq_check_col(pTHX_ HV *col, SV *name, SV *table,
           SvPV_nolen(pdbq_col_list(aTHX_ col)));
 }
 
+/* The key columns of a get or a delete, checked the way a filter's are. An
+ * unknown one is a caller's typo, and SQLite reads a quoted name it does not
+ * know as a string literal: the statement ran, matched nothing, and said
+ * nothing, where search would have named the mistake. */
+static void pdbq_check_keys(pTHX_ SV *self, AV *keys, const char *cls,
+                            const char *what) {
+    HV *h = pdbi_hv(aTHX_ self);
+    SV *col = pdbi_get(aTHX_ h, "col");
+    SSize_t i, n = av_len(keys) + 1;
+    if (!(col && SvROK(col) && SvTYPE(SvRV(col)) == SVt_PVHV)) return;
+    for (i = 0; i < n; i++)
+        pdbq_check_col(aTHX_ (HV *)SvRV(col), *av_fetch(keys, i, 0),
+                       pdbi_get(aTHX_ h, "table"), cls, what);
+}
+
 /* ---- one term of the filter ------------------------------------------------ */
 
 /* `\` `%` and `_` are LIKE's metacharacters; a prefix search escapes them so
@@ -283,11 +298,17 @@ static void pdbq_order(pTHX_ HV *col, SV *table, SV *pk, SV *opt,
                 croak("%s: order_by takes [ column => 'asc'|'desc', ... ] "
                       "pairs", cls);
             for (i = 0; i + 1 < n; i += 2) {
-                SV *c = *av_fetch(pairs, i, 0);
-                SV *d = *av_fetch(pairs, i + 1, 0);
+                SV **cp = av_fetch(pairs, i, 0);
+                SV **dpp = av_fetch(pairs, i + 1, 0);
+                SV *c = (cp && *cp) ? *cp : NULL;
+                SV *d = (dpp && *dpp) ? *dpp : NULL;
                 STRLEN dl; const char *dp;
                 SSize_t j, have = av_len(cols) + 1;
                 int is_desc;
+                /* an array with a hole in it has no SV there at all */
+                if (!(c && SvOK(c)))
+                    croak("%s: order_by takes [ column => 'asc'|'desc', ... ] "
+                          "pairs, and one of the columns is undefined", cls);
                 pdbq_check_col(aTHX_ col, c, table, cls, "order_by");
                 dp = (d && SvOK(d)) ? SvPV_const(d, dl) : "";
                 if (!(d && SvOK(d))) dl = 0;
@@ -342,27 +363,103 @@ static SV *pdbq_order_sql(pTHX_ HV *slot, SV *dbh, AV *cols, AV *desc) {
  *   (a < ?) OR (a = ? AND b > ?) OR (a = ? AND b = ? AND id > ?)
  *
  * each column compared in its own direction, which is what lets a mixed
- * ordering page correctly - the row-value form (a, b) < (?, ?) cannot. Null
- * sort columns compare unknown and fall out of every page; that is the
- * database's rule and the POD's warning, not something to paper over here.
- * Mortal; pushes the binds in order. */
+ * ordering page correctly - the row-value form (a, b) < (?, ?) cannot.
+ *
+ * A NULL in a sort column needs its own branches, because `a > NULL` and
+ * `a = NULL` are never true: a page that ended on a row with a NULL there
+ * used to mint a token nothing came after, and every later row was
+ * unreachable. Where the NULLs sort is the database's choice (pdbq_nulls),
+ * so the branches depend on it:
+ *
+ *   the token holds NULL, NULLs come first:  after = a IS NOT NULL
+ *   the token holds NULL, NULLs come last:   after = nothing
+ *   a value, NULLs come last:                after = a > ? OR a IS NULL
+ *   a value, NULLs come first:               after = a > ?
+ *
+ * and "equal" is `a IS NULL` for a NULL. Mortal; pushes the binds in order. */
+
+enum { PDBQ_NULLS_UNKNOWN = 0, PDBQ_NULLS_LOW = 1, PDBQ_NULLS_HIGH = 2 };
+
+/* Does this database sort NULL below every value or above? SQLite, MySQL and
+ * MariaDB put it below; PostgreSQL and Oracle above. Asked once per
+ * connection. Anything else is unknown, and a continuation that would have
+ * to guess croaks instead. */
+static int pdbq_nulls(pTHX_ HV *slot, SV *dbh) {
+    SV *have = slot ? pdbi_get(aTHX_ slot, "nulls") : NULL;
+    SV *drv, *name;
+    int r = PDBQ_NULLS_UNKNOWN;
+    if (have && SvOK(have)) return (int)SvIV(have);
+    drv  = pdbi_attr(aTHX_ dbh, "Driver");
+    name = drv ? pdbi_attr(aTHX_ drv, "Name") : NULL;
+    if (name && SvOK(name)) {
+        STRLEN nl;
+        const char *n = SvPV_const(name, nl);
+        if ((nl == 6 && memEQ(n, "SQLite", 6)) || (nl == 5 && memEQ(n, "mysql", 5))
+            || (nl == 7 && memEQ(n, "MariaDB", 7)))
+            r = PDBQ_NULLS_LOW;
+        else if ((nl == 2 && memEQ(n, "Pg", 2)) || (nl == 6 && memEQ(n, "Oracle", 6)))
+            r = PDBQ_NULLS_HIGH;
+    }
+    if (slot) (void)hv_stores(slot, "nulls", newSViv(r));
+    return r;
+}
+
 static SV *pdbq_keyset(pTHX_ HV *slot, SV *dbh, AV *cols, AV *desc,
-                       AV *vals, AV *bind) {
+                       AV *vals, AV *bind, const char *cls) {
     SV *out = sv_2mortal(newSVpvs("("));
     SSize_t i, j, n = av_len(cols) + 1;
+    int nulls = PDBQ_NULLS_UNKNOWN, any_null = 0, terms = 0;
+    for (i = 0; i < n; i++)
+        if (!SvOK(*av_fetch(vals, i, 0))) any_null = 1;
+    if (any_null) {
+        nulls = pdbq_nulls(aTHX_ slot, dbh);
+        if (nulls == PDBQ_NULLS_UNKNOWN)
+            croak("%s: the page ended on a row with a NULL in an order_by "
+                  "column, and this driver's NULL ordering is not known, so "
+                  "the next page cannot be found - order by a column that "
+                  "is never NULL", cls);
+    }
     for (i = 0; i < n; i++) {
-        if (i) sv_catpvs(out, " OR ");
+        SV *v = *av_fetch(vals, i, 0);
+        int is_desc = SvIV(*av_fetch(desc, i, 0)) ? 1 : 0;
+        /* NULLs first under this column's direction? Only asked when some
+         * token value is NULL; without one the old shape is the right one
+         * on every driver, and rows with a NULL keep falling out as the POD
+         * says they do. */
+        int null_first = (nulls == PDBQ_NULLS_LOW) ? !is_desc : is_desc;
+        if (!SvOK(v) && !null_first) continue;      /* nothing sorts after */
+        if (terms++) sv_catpvs(out, " OR ");
         sv_catpvs(out, "(");
         for (j = 0; j < i; j++) {
+            SV *pv = *av_fetch(vals, j, 0);
             sv_catsv(out, pdbi_qi_slot(aTHX_ slot, dbh, *av_fetch(cols, j, 0)));
-            sv_catpvs(out, " = ? AND ");
-            av_push(bind, newSVsv(*av_fetch(vals, j, 0)));
+            if (SvOK(pv)) {
+                sv_catpvs(out, " = ? AND ");
+                av_push(bind, newSVsv(pv));
+            }
+            else sv_catpvs(out, " IS NULL AND ");
         }
-        sv_catsv(out, pdbi_qi_slot(aTHX_ slot, dbh, *av_fetch(cols, i, 0)));
-        sv_catpv(out, SvIV(*av_fetch(desc, i, 0)) ? " < ?" : " > ?");
-        av_push(bind, newSVsv(*av_fetch(vals, i, 0)));
+        if (!SvOK(v)) {
+            sv_catsv(out, pdbi_qi_slot(aTHX_ slot, dbh, *av_fetch(cols, i, 0)));
+            sv_catpvs(out, " IS NOT NULL");
+        }
+        else if (any_null && !null_first) {
+            SV *q = pdbi_qi_slot(aTHX_ slot, dbh, *av_fetch(cols, i, 0));
+            sv_catpvs(out, "(");
+            sv_catsv(out, q);
+            sv_catpv(out, is_desc ? " < ? OR " : " > ? OR ");
+            sv_catsv(out, q);
+            sv_catpvs(out, " IS NULL)");
+            av_push(bind, newSVsv(v));
+        }
+        else {
+            sv_catsv(out, pdbi_qi_slot(aTHX_ slot, dbh, *av_fetch(cols, i, 0)));
+            sv_catpv(out, is_desc ? " < ?" : " > ?");
+            av_push(bind, newSVsv(v));
+        }
         sv_catpvs(out, ")");
     }
+    if (!terms) sv_catpvs(out, "1=0");
     sv_catpvs(out, ")");
     return out;
 }
@@ -503,6 +600,9 @@ static SV *pdbq_search_sql(pTHX_ HV *slot, SV *dbh, HV *col, SV *table,
     SV *after  = o ? pdbi_get(aTHX_ o, "after") : NULL;
     SV *order  = o ? pdbi_get(aTHX_ o, "order_by") : NULL;
     IV limit   = (lim_sv && SvOK(lim_sv)) ? SvIV(lim_sv) : 20;
+    /* a value past what an IV holds does not come back from SvIV as a large
+     * one, so it is asked for as a float first */
+    int huge   = (lim_sv && SvOK(lim_sv) && SvNV(lim_sv) >= (NV)IV_MAX) ? 1 : 0;
     SV *sql    = sv_2mortal(newSVpvs("SELECT * FROM "));
     SV *where;
     AV *cols, *desc;
@@ -510,6 +610,9 @@ static SV *pdbq_search_sql(pTHX_ HV *slot, SV *dbh, HV *col, SV *table,
 
     pdbq_check_opts(aTHX_ o, cls);
     if (limit < 1) limit = 1;
+    /* the statement asks for one row more, and IV_MAX + 1 is a negative
+     * LIMIT: unbounded on SQLite, an error on PostgreSQL */
+    if (huge || limit > IV_MAX - 1) limit = IV_MAX - 1;
     has_after = (after && SvOK(after) && SvCUR(after)) ? 1 : 0;
 
     pdbq_order(aTHX_ col, table, pk, order, cls, &cols, &desc, &pk_only);
@@ -524,7 +627,8 @@ static SV *pdbq_search_sql(pTHX_ HV *slot, SV *dbh, HV *col, SV *table,
         if (has_after) {
             AV *vals = pdbq_decode_token(aTHX_ after, cols, desc, pk_only, cls);
             if (SvCUR(where)) sv_catpvs(sql, " AND ");
-            sv_catsv(sql, pdbq_keyset(aTHX_ slot, dbh, cols, desc, vals, bind));
+            sv_catsv(sql, pdbq_keyset(aTHX_ slot, dbh, cols, desc, vals, bind,
+                                      cls));
         }
     }
     sv_catsv(sql, pdbq_order_sql(aTHX_ slot, dbh, cols, desc));

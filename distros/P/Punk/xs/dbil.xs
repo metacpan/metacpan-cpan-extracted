@@ -160,6 +160,12 @@ await(self, f)
     PPCODE:
     {
         pdl_await(aTHX_ self, f);
+        /* The loop has just run arbitrary callbacks, and any of them may
+         * have grown the value stack - which moves it. SP is where the stack
+         * WAS when this XSUB was entered, so it is worked out again from the
+         * base: the slot below this call's first argument, which is where
+         * PPCODE left it and where get's values have to land. */
+        SP = PL_stack_base + ax - 1;
         PUSHMARK(SP);
         EXTEND(SP, 1);
         PUSHs(f);

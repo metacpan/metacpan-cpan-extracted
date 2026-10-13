@@ -14,6 +14,7 @@
   * [A GNU Make Tutorial in Disguise](#a-gnu-make-tutorial-in-disguise)
 * [IMPORTING FILES](#importing-files)
   * [Determining the Primary Module](#determining-the-primary-module)
+  * [Manifest-Driven Imports](#manifest-driven-imports)
   * [What Gets Imported](#what-gets-imported)
   * [Excluding Import Paths](#excluding-import-paths)
   * [Previewing an Import](#previewing-an-import)
@@ -27,9 +28,12 @@
   * [Environment](#environment)
 * [INSTALLED PROJECT FILES](#installed-project-files)
 * [THE PROJECT MAKEFILE](#the-project-makefile)
+  * [Makefile Targets](#makefile-targets)
   * [README.md](#readmemd)
 * [COMMANDS](#commands)
   * [LLM Commands](#llm-commands)
+    * [Anthropic API Key](#anthropic-api-key)
+    * [Commands](#commands)
 * [OPTIONS](#options)
 * [THE REVIEW WORKFLOW](#the-review-workflow)
   * [Overview](#overview)
@@ -85,6 +89,7 @@
   * [I want to add a bash script to my distribution](#i-want-to-add-a-bash-script-to-my-distribution)
   * [What is `make release-notes` used for?](#what-is-make-release-notes-used-for)
   * [Can I distribute the POD in my modules separately?](#can-i-distribute-the-pod-in-my-modules-separately)
+  * [My build is failing during syntax checking with](#my-build-is-failing-during-syntax-checking-with)
   * [Something still doesn't work - how do I report an issue?](#something-still-doesnt-work---how-do-i-report-an-issue)
 * [SEE ALSO](#see-also)
 * [DEPENDENCIES](#dependencies)
@@ -226,6 +231,20 @@ module explicitly:
         --import lib 
         --import bin 
         --installdir /tmp/Foo-Bar
+
+For projects that require explicit control over which files are
+imported and their destinations, use an import manifest:
+
+    cmb import import.yml
+
+The manifest defines the source directory, primary module, and
+file-selection rules. Use `--dry-run` to preview the import plan
+before creating the project:
+
+    cmb --dry-run import import.yml
+
+See ["IMPORTING FILES"](#importing-files) for automatic discovery and manifest-driven
+imports.
 
 # NEXT STEPS
 
@@ -614,6 +633,97 @@ When importing an existing project, the corresponding module file must
 also exist beneath one of the import paths. For example, `Foo::Bar`
 must be found as `Foo/Bar.pm` somewhere beneath one of the directories
 supplied with `--import`.
+
+## Manifest-Driven Imports
+
+The `import` command provides an alternative to automatic file
+discovery when importing an existing Perl project.
+
+    cmb import import.yml
+
+An import manifest explicitly identifies the source directory,
+primary module, and files to import. It also allows source files
+to be mapped to specific destinations in the generated project.
+
+For example:
+
+    base-dir: /path/to/existing/project
+    module: Foo::Bar
+
+    import:
+      - lib:
+          path: lib
+          recurse: true
+          ext: pm
+      - bin:
+          path: bin
+          recurse: true
+      - t:
+          path: t
+          recurse: true
+
+The following top-level keys are required:
+
+- `base-dir`
+
+    The root directory containing the files to import. Relative source
+    paths in the manifest are resolved against this directory.
+
+- `module`
+
+    The primary Perl module for the generated project.
+
+- `import`
+
+    A list of import specifications. Each entry identifies a destination
+    directory and the source files or directories to import.
+
+Each import specification supports the following keys:
+
+- `path`
+
+    A source file, directory, or list of paths relative to `base-dir`.
+    Absolute paths are also accepted, provided they remain within
+    `base-dir`.
+
+- `recurse`
+
+    When true, recursively searches the specified source directories.
+    The default is false.
+
+- `ext`
+
+    Restricts imported files to matching filename extensions. Accepts
+    a single extension or a list of extensions. When omitted, all
+    extensions are eligible.
+
+- `exclude`
+
+    Excludes matching files or directories from the import. Exclusions
+    may also be specified at the top level of the manifest.
+
+- `dest`
+
+    An optional subdirectory appended to the import destination.
+
+Each entry in `import` must specify exactly one destination.
+
+Use `--dry-run` to preview the file mappings before generating
+the project:
+
+    cmb --dry-run import import.yml
+
+The import command uses the same underlying project construction
+mechanism as `install`, but obtains its file-selection plan from
+the manifest rather than automatic discovery.
+
+Syntax checking is disabled during the initial import build.
+This allows projects with dependencies or runtime environments
+that have not yet been configured to be imported before addressing
+those requirements.
+
+The `--import` option remains available for automatic discovery
+without a manifest.
 
 ## What Gets Imported
 
@@ -1012,8 +1122,9 @@ A separate configuration file may contain entries such as:
 
 - LLM\_API\_KEY
 
-    Your Anthropic Claude API key. Set this before running any LLM command
-    (code-review, pod-review, release-notes).
+    Your Anthropic Claude API key. Set this before running an LLM
+    command, including `code-review`, `pod-review`,
+    `release-notes`, and `change-log`.
 
     The key is removed from environment so it is not inherited by child
     processes such as 'make'. This does not protect against memory
@@ -1064,6 +1175,7 @@ with `make update`.
         .includes/bootstrap.mk       - used internally by the bootstrapper
         .includes/bash-completion.mk - make bash-completion target
         .includes/build-init.mk      - used to initialize build-time variables
+        .includes/change-log.mk      - make change-log target
         .includes/modulino.mk        - make modulino target
         .includes/git.mk             - make git target
         .includes/help.mk            - make help target
@@ -1099,25 +1211,46 @@ created automatically as needed and should not be edited or committed.
 
 # THE PROJECT MAKEFILE
 
-The installed Makefile is self-configuring. It can derive the primary
-module from `MODULE_NAME`, the package name inside a custom stub, or
-the project directory name.
+The `Makefile` serves as the orchestration layer for building and
+maintaining a bootstrapped Perl project. It coordinates the recipes
+required to generate source files, resolve dependencies, run tests,
+build distributions, and perform other development and release
+operations. The individual recipes are organized into Makefile
+fragments under `.includes/`, which are included by the main
+`Makefile`.
 
-For example, a primary module of `My::New::Module` produces:
+Before these recipes can run, Make needs to establish the project's
+configuration. On the initial invocation, Make creates `config.mk` if
+it does not exist, then invokes `cmb create-build-config` to generate
+`build-config.mk`. The generated file contains the resolved project
+settings and paths to the tools used by the build.
 
-    MODULE_PATH  - lib/My/New/Module.pm (from MODULE_NAME)
-    PROJECT_NAME - My-New-Module (from MODULE_NAME)
-    TARBALL      - My-New-Module-1.0.0.tar.gz (from PROJECT_NAME + VERSION)
+`cmb create-build-config` determines the primary module name from
+`MODULE_NAME`, if supplied, or derives it from the project directory
+name. It uses that name to construct values such as `MODULE_PATH`,
+`PROJECT_NAME`, and `UNIT_TEST_NAME`. It also resolves configured
+defaults and locates development tools such as Perl, Git, and the
+dependency installers.
 
-If `MODULE_NAME` is not supplied on the command line, it is inferred
-from the project directory name.
+For example, a project with `MODULE_NAME=My::New::Module` produces:
 
-At build initialization, `cmb create-build-config` resolves project
-paths, defaults, and configured helper commands into `build-config.mk`,
-which is then included by Make. Developer overrides belong in
-`config.mk`; `build-config.mk` is generated state.
+    MODULE_NAME    := My::New::Module
+    MODULE_PATH    := lib/My/New/Module.pm
+    PROJECT_NAME   := My-New-Module
+    UNIT_TEST_NAME := t/00-my-new-module.t
 
-Key Makefile targets:
+Make includes `build-config.mk` to make these values available to the
+build recipes. Developers can customize the build through `config.mk`
+and the supported configuration settings. Changes to `config.mk`
+cause `build-config.mk` to be regenerated, ensuring that the build
+uses the updated configuration.
+
+`build-config.mk` is generated state and should not be edited
+directly. The `Makefile` and its included recipes provide the build
+machinery; `config.mk` provides a place for project-specific
+overrides.
+
+## Makefile Targets
 
 - `make` / `make all`
 
@@ -1140,6 +1273,36 @@ Key Makefile targets:
     The target depends on the modulino, so it will build `bin/<alias>`
     first if needed. Completion is only available for modulinos that
     subclass `CLI::Simple`.
+
+- `make change-log`
+
+    Generates a draft ChangeLog entry for the current release using
+    an LLM and the release artifacts produced by the build process,
+    including the Git diff, file inventory, Git status, and
+    distribution tarball.
+
+        make change-log
+        make change-log MODEL=<model-name>
+        make change-log DRYRUN=1
+
+    The optional `MODEL` variable overrides the configured LLM model
+    for this invocation. Run `cmb models` to list available models.
+
+    Set `DRYRUN=1` to prepare the ChangeLog request without submitting
+    it to the LLM.
+
+    The target invokes `cmb change-log`, using
+    `.prompts/change-log.prompt` to prepare the request. The prompt
+    can be customized to follow the project's established ChangeLog
+    conventions.
+
+    The generated entry is written to `ChangeLog-VERSION.tmp` in the
+    project directory. The existing `ChangeLog` is not modified.
+
+    Review the generated entry and incorporate it into `ChangeLog`
+    before preparing the final release.
+
+    See ["LLM Commands"](#llm-commands) for the `change-log` command.
 
 - `make help`
 
@@ -1256,8 +1419,30 @@ Key Makefile targets:
 
 - `make release-notes`
 
-    Generates the diff, file list, Git status, and draft release tarball
-    used as evidence for LLM-generated release notes.
+    Generates draft release notes using an LLM and the release artifacts
+    produced by the build process, including the Git diff, file inventory,
+    Git status, and distribution tarball.
+
+        make release-notes
+        make release-notes MODEL=<model-name>
+        make release-notes DRYRUN=1
+
+    The optional `MODEL` variable overrides the configured LLM model
+    for this invocation. Run `cmb models` to list available models.
+
+    Set `DRYRUN=1` to prepare the release artifacts without submitting a 
+    request to the LLM.
+
+    The target invokes `cmb release-notes`, using
+    `.prompts/release-notes.prompt` to prepare the request. The prompt
+    can be customized to follow the project's release documentation
+    conventions.
+
+    The `change-log` target generates a separate, file-oriented
+    engineering record. Use `release-notes` to produce the
+    developer-facing description of a release.
+
+    See ["LLM Commands"](#llm-commands) for the `release-notes` command.
 
 - `make clean`
 
@@ -1483,6 +1668,28 @@ If you want to generate `README.md` from a custom source, create a
 
         cmb -m My::Module install
 
+- change-log
+
+    Generates a draft ChangeLog entry for a release using the LLM.
+    The command uses the release artifacts produced by
+    `make release-notes`, including the Git status, diffs,
+    file inventory, and distribution tarball.
+
+        cmb change-log
+        cmb change-log <version>
+
+    The generated entry is written to `ChangeLog-VERSION.tmp`
+    in the current directory. An existing output file is not
+    overwritten.
+
+    The command uses `.prompts/change-log.prompt`, which may be
+    customized to follow the project's established ChangeLog format.
+
+    The project's `ChangeLog` is not modified. Review the generated
+    entry and incorporate it manually.
+
+    See ["THE PROJECT MAKEFILE"](#the-project-makefile) for the `make change-log` target.
+
 - create-config
 
     Outputs a stub configuration file to STDOUT. Create and edit a new
@@ -1635,6 +1842,31 @@ If you want to generate `README.md` from a custom source, create a
     `PERLCRITICRC` environment variables. Requires [Perl::Critic](https://metacpan.org/pod/Perl%3A%3ACritic) to be
     installed.
 
+- import
+
+    Imports an existing Perl project using a YAML manifest.
+
+        cmb import import.yml
+
+    The manifest identifies the primary module, source directory,
+    and files to import into the generated project.
+
+    Unlike the `--import` option, which discovers source files
+    automatically, the `import` command uses explicit file-selection
+    and destination rules.
+
+    Use `--dry-run` to preview the import plan:
+
+        cmb --dry-run import import.yml
+
+    Syntax checking is disabled during the initial import build.
+    This allows projects with unresolved dependencies or specialized
+    runtime requirements to be imported before those requirements
+    are addressed.
+
+    See ["IMPORTING FILES"](#importing-files) for the manifest format and available
+    file-selection options.
+
 - publish-to-cpan
 
         cmb publish-to-cpan distribution.tar.gz [username [password]]
@@ -1654,7 +1886,7 @@ If you want to generate `README.md` from a custom source, create a
     with values drawn from the environment (or from a `--vars-file`). This
     is the mechanism the generated `Makefile` uses to turn `.pm.in` and
     `.pl.in` sources into their built `.pm`/`.pl` counterparts -- for
-    example filling `2.4.1` from the `VERSION` file or
+    example filling `2.5.0` from the `VERSION` file or
     `@BUILD_DATE@` at build time.
 
     A placeholder is required to have a value only when it appears in live
@@ -1677,6 +1909,17 @@ If you want to generate `README.md` from a custom source, create a
 
 ## LLM Commands
 
+LLM commands use prompt files installed as needed in the `.prompts/`
+directory. You can customize each of these prior to executing a
+command.
+
+    .prompts/change-log.prompt
+    .prompts/code-review.prompt
+    .prompts/pod-review.prompt
+    .prompts/release-notes.prompt
+
+### Anthropic API Key
+
 The following commands require [LLM::API](https://metacpan.org/pod/LLM%3A%3AAPI) to be installed and a valid
 Anthropic API key. Set it in the environment before running any LLM command:
 
@@ -1689,6 +1932,8 @@ history entirely.
 
 _SECURITY NOTE: Never pass your API key on the command line where it
 would be visible in shell history and process listings._
+
+### Commands
 
 - code-review
 
@@ -1834,8 +2079,16 @@ would be visible in shell history and process listings._
 
 - `--dry-run|-D`
 
-    Dry run mode will abort after displaying a pre-submission token and
-    cost estimation for the `pod-review` and `code-review` commands.
+    Previews an operation without completing it.
+
+    For `import`, displays the planned file mappings without creating
+    the project.
+
+    For `change-log` and `release-notes`, generates and validates the
+    release artifacts without submitting a request to the LLM.
+
+    For `pod-review` and `code-review`, displays a pre-submission token
+    and cost estimate without submitting the review.
 
 - `--config|-c` configuration file
 
@@ -1921,8 +2174,7 @@ would be visible in shell history and process listings._
 
 - `--model|-M` MODEL
 
-    Specifies the model id to use for the `pod-review` and `code-review`
-    commands.
+    Specifies the model id to use for LLM commands.
 
     For `pod-review` the default model is `claude-haiku-4-5-20251001`.
 
@@ -2281,6 +2533,7 @@ where they are write-protected and clearly separated from project
 files. The `Makefile` includes them automatically:
 
     include .includes/publish.mk
+    include .includes/change-log.mk
     include .includes/bootstrap.mk
     include .includes/perl.mk
     include .includes/local.mk
@@ -3453,6 +3706,48 @@ your modules or you can extract the pod and provide them as separate
     `remove` will strip POD from your module. No POD will be included in
     the distribution.
 
+## My build is failing during syntax checking with
+`...use_log4perl() requires Log::Log4perl...`
+
+If you are using `CLI::Simple` with its built-in logging support based
+on `Log::Log4perl`, you probably have something similar to this in
+your code:
+
+    __PACKAGE__->use_log4perl({ level => 'info' });
+
+This requires `Log::Log4perl` to be installed at runtime.
+
+`CPAN::Maker::Bootstrapper` scans your project to discover
+dependencies and installs them into an isolated build environment for
+syntax checking. This prevents modules installed in the developer's
+local environment from masking undeclared dependencies.
+
+Because your code does not directly load `Log::Log4perl`, the
+dependency scanner may not discover it. Furthermore, `CLI::Simple`
+declares `Log::Log4perl` as an optional dependency, so it is not
+automatically installed.
+
+You can explicitly declare the dependency in either of two ways:
+
+- 1. Add an appropriate dependency declaration near the call to
+`__PACKAGE__-`use\_log4perl()>
+
+        require Log::Log4perl;
+
+    or
+
+        use Log::Log4perl();
+
+- 2. Add `Log::Log4perl` directly to your `requires` file:
+
+        +Log::Log4perl
+
+The `+` prefix instructs `CPAN::Maker::Bootstrapper` to retain this
+manually declared dependency when rescanning your project.
+
+_Note: The same approach applies to other required modules that the
+dependency scanner cannot discover. See ["Dependencies Management"](#dependencies-management)._
+
 ## Something still doesn't work - how do I report an issue?
 
 First check the ["FAQ"](#faq) sections above - your
@@ -3509,7 +3804,7 @@ features are used.
 
 # VERSION
 
-This documentation refers to version 2.4.1
+This documentation refers to version 2.5.0
 
 # AUTHOR
 

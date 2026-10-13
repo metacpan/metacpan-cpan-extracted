@@ -1,5 +1,28 @@
 Revision history for Database-Abstraction
 
+0.49	Mon Oct 12 10:03:15 AM EDT 2026
+	[ Enhancements ]
+	- aggregate(): new method providing GROUP BY / measures across all backends.
+	  Pass by => [...], measures => [{col=>'amount',fn=>'sum',as=>'revenue'},...]
+	  plus any ordinary WHERE criteria.  Functions: sum, avg, min, max, count,
+	  count_distinct.  SQL pushdown for DBI backends (SQLite, CSV, DSN); Perl
+	  in-memory fold for slurp-only backends (XLSX, DBM::Deep, BerkeleyDB,
+	  JSON, HTML URL, Redis).  HAVING, sort_by, limit, offset all supported.
+	  Empty-set normalisation: sum/count/count_distinct → 0; avg/min/max →
+	  undef.  Cache, base_criteria, and fixate/no_fixate behave as for
+	  selectall_arrayref.  Replaces three separate per-chart aggregation loops
+	  in Database::BI (the motivation: no shared definition of a measure was
+	  the single absence keeping the stack a file viewer rather than a BI tool).
+	- Query builder: group_by(), measure(), having() builder methods added.
+	  Terminal all()/first() delegate to aggregate() when measures are set.
+	  count() croaks when called after measure() with a clear error message.
+	[ Tests ]
+	- t/aggregate.t: 70 tests covering SQL and Perl-fold paths, all measure
+	  functions, HAVING (including PostgreSQL-safe expression substitution),
+	  sort/limit/offset, empty-set and all-NULL groups, validation croaks,
+	  query-builder parity, CSV comment-row guard, DBM::Deep fold path,
+	  non-numeric warning on the Perl path.
+
 0.48	Wed Oct  7 01:23:25 PM EDT 2026
 	[ Enhancements ]
 	- Redis backend: pass database => 'redis://[password@]host[:port][/db]'

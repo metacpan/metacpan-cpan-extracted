@@ -13,6 +13,7 @@ t/10-compile.t
 t/20-new.t
 t/30-basics.t
 t/all-fuzz.t
+t/aggregate.t
 t/base_criteria.t
 t/bugs.t
 t/carp.t

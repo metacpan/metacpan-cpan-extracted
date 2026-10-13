@@ -1,5 +1,13 @@
 Revision history for Music-NWC2MusicXML
 
+0.002.1	Mon Oct 12 04:14:34 PM EDT 2026
+	[ Bug Fixes ]
+	- NWC TempoVariance:Fermata records were emitted as a text direction
+	  (<words font-style="italic">Fermata</words>) instead of the correct
+	  MusicXML <fermata/> notation element on the decorated note or rest.
+	  Fermata symbols now appear as <notations><fermata/></notations> on the
+	  sounding event that immediately follows the TempoVariance:Fermata record.
+
 0.002.0	Fri Oct  9 08:39:33 PM EDT 2026
 	[ Bug Fixes ]
 	- MusicXML::_annotate_events: slur_stop was placed on the last note carrying
@@ -15,7 +23,7 @@ Revision history for Music-NWC2MusicXML
 	  empty staff detection, measure-duration consistency against the active
 	  time signature, unmatched tie detection, and unclosed slur detection.
 
-0.001.1  2026-09-19
+0.001.1	Fri Sep 19 12:00:00 PM EDT 2026
 	[ Bug Fixes]
 	- Fix Test Dashboard URL
 	- Bump minimum version of Params::Validate::Strict

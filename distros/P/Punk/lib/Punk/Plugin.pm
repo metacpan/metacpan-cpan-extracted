@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.57';
+our $VERSION = '0.58';
 
 sub new { bless {}, $_[0] }
 

@@ -34,7 +34,7 @@ register(self, app, opts = &PL_sv_undef)
             o = (HV *)SvRV(opts);
         if (o) {
             static const char *const known[] =
-                { "scope", "ttl", "max_record", NULL };
+                { "scope", "ttl", "max_record", "lock_wait", NULL };
             HE *he;
             hv_iterinit(o);
             while ((he = hv_iternext(o))) {
@@ -74,6 +74,20 @@ register(self, app, opts = &PL_sv_undef)
                           "positive number of bytes");
             }
             (void)hv_stores(cfg, "max_record", newSViv(mr));
+        }
+        {   /* How long a request holds the single-flight lock before another
+             * may take it for abandoned, and how long a retry waits for the
+             * first attempt to finish. It has to outlast the slowest handler
+             * behind a key, which is a fact about the application - not the
+             * cache store's lock_wait, which is tuned for something else. */
+            SV **w = o ? hv_fetchs(o, "lock_wait", 0) : NULL;
+            NV lw = PI_LOCK_WAIT;
+            if (w && *w && SvOK(*w)) {
+                if (!looks_like_number(*w) || (lw = SvNV(*w)) <= 0)
+                    croak("Punk::Plugin::Idempotency: lock_wait must be a "
+                          "positive number of seconds");
+            }
+            (void)hv_stores(cfg, "lock_wait", newSVnv(lw));
         }
         (void)hv_stores(h, K_IDEM, newRV_noinc((SV *)cfg));
     }

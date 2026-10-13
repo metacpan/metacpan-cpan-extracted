@@ -68,6 +68,35 @@ my %LEDGER = (
 	'base_criteria active filter'   => 'base_criteria: count() filtered to active rows',
 	'base_criteria must be hashref' => 'base_criteria: non-hashref croak at construction',
 	'base_criteria unsafe key'      => 'base_criteria: unsafe column key croak at construction',
+	# Added for sections 26-32 (aggregate() and fluent aggregate builder, 0.49)
+	'aggregate returns arrayref'      => 'aggregate(): always returns arrayref of hashrefs',
+	'aggregate empty result []'       => 'aggregate(): [] when no groups qualify',
+	'aggregate measures required'     => 'aggregate(): missing measures croak',
+	'aggregate unknown fn'            => 'aggregate(): unknown fn croak',
+	'aggregate col required'          => 'aggregate(): col required for sum croak',
+	'aggregate as required'           => 'aggregate(): missing as croak',
+	'aggregate duplicate as'          => 'aggregate(): duplicate alias croak',
+	'aggregate alias collides by'     => 'aggregate(): alias==by column croak',
+	'aggregate by not arrayref'       => 'aggregate(): by is scalar croak',
+	'aggregate unsafe by'             => 'aggregate(): SQL injection in by croak',
+	'aggregate having unknown key'    => 'aggregate(): having key not in allowlist croak',
+	'aggregate JOIN no-DBI'           => 'aggregate(): JOIN on slurp backend croak',
+	'aggregate sort_by not allowlist' => 'aggregate(): sort_by not in by/aliases croak',
+	'aggregate SQL path sum'          => 'aggregate(): SQL path grouped sum result',
+	'aggregate SQL path count'        => 'aggregate(): SQL path count result',
+	'aggregate Perl fold path'        => 'aggregate(): Perl fold on slurp backend',
+	'aggregate empty sum zero'        => 'aggregate(): empty-set SUM normalised to 0',
+	'aggregate empty avg undef'       => 'aggregate(): empty-set AVG normalised to undef',
+	'aggregate default sort'          => 'aggregate(): by-columns ASC default ordering',
+	'aggregate sort_by DESC'          => 'aggregate(): explicit sort_by DESC',
+	'aggregate limit'                 => 'aggregate(): limit pagination',
+	'aggregate having filter'         => 'aggregate(): HAVING post-group filter',
+	'aggregate no_fixate'             => 'aggregate(): no_fixate returns mutable array',
+	'aggregate base_criteria'         => 'aggregate(): base_criteria merged into WHERE',
+	'Query count measures croak'      => 'Query->count(): croak when measures set',
+	'Query aggregate two fronts'      => 'Query->all(): delegates to aggregate(), same result',
+	'group_by replaces list'          => 'group_by(): replaces previous list, not appends',
+	'measure accumulates'             => 'measure(): multiple calls accumulate',
 );
 
 # ---------------------------------------------------------------------------
@@ -1680,6 +1709,780 @@ SKIP: {
 }
 
 # ---------------------------------------------------------------------------
+# SECTION 26 — aggregate(): basic black-box, SQL path (SQLite DSN)
+# ---------------------------------------------------------------------------
+
+note '';
+note '=== 26. aggregate() — SQL path (grouped sums, counts, grand total) ===';
+SKIP: {
+	skip 'DBI/DBD::SQLite not available for aggregate() tests', 30
+		unless $have_sqlite;
+
+	Readonly my $AGG_ACTIVE   => 'active';
+	Readonly my $AGG_INACTIVE => 'inactive';
+
+	my $ag_dir  = tempdir(CLEANUP => 1);
+	my $ag_file = File::Spec->catfile($ag_dir, 'agg_unit.sql');
+	my $ag_dsn  = "dbi:SQLite:dbname=$ag_file";
+
+	do {
+		my $s = DBI->connect($ag_dsn, undef, undef, { RaiseError => 1 });
+		$s->do('CREATE TABLE agg_unit (entry TEXT PRIMARY KEY, score REAL, status TEXT)');
+		$s->do("INSERT INTO agg_unit VALUES ('a', 9.5,  'active')");
+		$s->do("INSERT INTO agg_unit VALUES ('b', 7.0,  'inactive')");
+		$s->do("INSERT INTO agg_unit VALUES ('c', 8.5,  'active')");
+		$s->do("INSERT INTO agg_unit VALUES ('d', 6.0,  'inactive')");
+		$s->do("INSERT INTO agg_unit VALUES ('e', 10.0, 'active')");
+		$s->disconnect();
+	};
+
+	{ package Database::agg_unit; use parent 'Database::Abstraction'; }
+
+	# no_entry: prevents Params::Get from mapping the leading scalar to 'entry',
+	# which would corrupt operator-hash criteria (CLAUDE.md Params::Get pitfall).
+	my $adb = Database::agg_unit->new(dsn => $ag_dsn, no_entry => 1);
+
+	# 26.1  Return value is always an arrayref, never undef
+	my $rows = $adb->aggregate(
+		by       => ['status'],
+		measures => [{ col => 'score', fn => 'sum', as => 'total' }],
+	);
+	returns_is($rows, { type => 'arrayref' },
+		'26.1 aggregate(): return value is an arrayref');
+	delete $LEDGER{'aggregate returns arrayref'};
+
+	# 26.2  Two groups for two distinct status values
+	is(scalar @{$rows}, 2, '26.2 aggregate(): two status groups returned');
+
+	# 26.3  Each element is a hashref
+	returns_is($rows->[0], { type => 'hashref' },
+		'26.3 aggregate(): each row element is a hashref');
+
+	# 26.4  Row keys are by-columns then measure aliases (in declaration order)
+	ok(exists($rows->[0]{'status'}), '26.4 aggregate(): by-column key present in row');
+	ok(exists($rows->[0]{'total'}),  '26.4 aggregate(): measure alias key present in row');
+
+	# 26.5  Correct grouped sums — active: 9.5+8.5+10.0=28.0; inactive: 7.0+6.0=13.0
+	my %by_status = map { $_->{'status'} => $_ } @{$rows};
+	ok(abs($by_status{$AGG_ACTIVE}{'total'}   - 28.0) < 1e-9,
+		'26.5 aggregate(): active group sum = 28.0');
+	ok(abs($by_status{$AGG_INACTIVE}{'total'} - 13.0) < 1e-9,
+		'26.5 aggregate(): inactive group sum = 13.0');
+	delete $LEDGER{'aggregate SQL path sum'};
+
+	# 26.6  count(*) without col — counts all rows per group
+	my $cnt_rows = $adb->aggregate(
+		by       => ['status'],
+		measures => [{ fn => 'count', as => 'n' }],
+	);
+	my %cnt_st = map { $_->{'status'} => $_ } @{$cnt_rows};
+	is($cnt_st{$AGG_ACTIVE}{'n'},   3, '26.6 aggregate(): active count(*) = 3');
+	is($cnt_st{$AGG_INACTIVE}{'n'}, 2, '26.6 aggregate(): inactive count(*) = 2');
+	delete $LEDGER{'aggregate SQL path count'};
+
+	# 26.7  Grand total: no 'by' → one row with totals over all rows
+	my $grand = $adb->aggregate(
+		measures => [
+			{ col => 'score', fn => 'sum',   as => 'total' },
+			{                 fn => 'count', as => 'n'     },
+		],
+	);
+	is(scalar @{$grand}, 1,  '26.7 aggregate(): grand total → 1 row');
+	ok(abs($grand->[0]{'total'} - 41.0) < 1e-9,
+		'26.7 aggregate(): grand total sum = 41.0');
+	is($grand->[0]{'n'}, 5, '26.7 aggregate(): grand total count = 5');
+
+	# 26.8  avg: correct average for active group (28.0/3 = 9.333...)
+	my $avg_rows = $adb->aggregate(
+		by       => ['status'],
+		measures => [{ col => 'score', fn => 'avg', as => 'mean' }],
+	);
+	my %avg_st = map { $_->{'status'} => $_ } @{$avg_rows};
+	ok(abs($avg_st{$AGG_ACTIVE}{'mean'} - (28.0/3)) < 1e-6,
+		'26.8 aggregate(): avg correct for active group');
+
+	# 26.9  min/max per group
+	my $mm_rows = $adb->aggregate(
+		by       => ['status'],
+		measures => [
+			{ col => 'score', fn => 'min', as => 'lo' },
+			{ col => 'score', fn => 'max', as => 'hi' },
+		],
+	);
+	my %mm_st = map { $_->{'status'} => $_ } @{$mm_rows};
+	is($mm_st{$AGG_ACTIVE}{'lo'},   8.5,  '26.9 aggregate(): active min = 8.5');
+	is($mm_st{$AGG_ACTIVE}{'hi'},   10.0, '26.9 aggregate(): active max = 10.0');
+	is($mm_st{$AGG_INACTIVE}{'lo'}, 6.0,  '26.9 aggregate(): inactive min = 6.0');
+
+	# 26.10  count_distinct: two distinct status values total
+	my $cd_rows = $adb->aggregate(
+		measures => [{ col => 'status', fn => 'count_distinct', as => 'ud' }],
+	);
+	is($cd_rows->[0]{'ud'}, 2, '26.10 aggregate(): count_distinct = 2');
+
+	# 26.11  WHERE criteria filter before aggregation
+	my $filt_rows = $adb->aggregate(
+		by       => ['status'],
+		measures => [{ fn => 'count', as => 'n' }],
+		status   => $AGG_ACTIVE,
+	);
+	is(scalar @{$filt_rows}, 1,
+		'26.11 aggregate(): criteria filter → one group only');
+	is($filt_rows->[0]{'status'}, $AGG_ACTIVE,
+		'26.11 aggregate(): only active group when status=active');
+
+	# 26.12  Returns [] when criteria match no rows (never undef)
+	my $empty = $adb->aggregate(
+		by       => ['status'],
+		measures => [{ fn => 'count', as => 'n' }],
+		status   => '__nonexistent__',
+	);
+	returns_is($empty, { type => 'arrayref' },
+		'26.12 aggregate(): no-match → arrayref (not undef)');
+	is(scalar @{$empty}, 0, '26.12 aggregate(): no-match → empty arrayref []');
+	delete $LEDGER{'aggregate empty result []'};
+}
+
+# ---------------------------------------------------------------------------
+# SECTION 27 — aggregate(): Perl fold path (CSV slurp, no DBI for aggregation)
+# ---------------------------------------------------------------------------
+
+note '';
+note '=== 27. aggregate() — Perl fold path (JSON backend, no DBI handle) ===';
+SKIP: {
+	# JSON backend is used because it genuinely has no DBI handle ($self->{$table}
+	# is undef), which forces aggregate() into the Perl _fold_aggregate() path.
+	# CSV always has a DBD::CSV DBI handle even for slurped files, so CSV cannot
+	# test this path.
+	skip 'JSON::MaybeXS not available for Perl fold path tests', 7
+		unless eval { require JSON::MaybeXS; 1 };
+
+	my $fold_dir  = tempdir(CLEANUP => 1);
+	my $fold_json = File::Spec->catfile($fold_dir, 'fold_json.json');
+
+	do {
+		open my $fh, '>', $fold_json or die "Cannot write $fold_json: $!";
+		print {$fh} '['."\n";
+		print {$fh} '  {"entry":"r1","score":9,"status":"active"},'."\n";
+		print {$fh} '  {"entry":"r2","score":7,"status":"inactive"},'."\n";
+		print {$fh} '  {"entry":"r3","score":8,"status":"active"}'."\n";
+		print {$fh} ']'."\n";
+		close $fh;
+	};
+
+	{ package Database::fold_json; use parent 'Database::Abstraction'; }
+
+	my $fdb = Database::fold_json->new(directory => $fold_dir);
+	$fdb->count();	# trigger lazy slurp so $fdb->{'data'} is populated
+
+	# JSON backend never creates a DBI handle — this verifies we are on the Perl fold path.
+	ok(!defined($fdb->{'fold_json'}),
+		'27 pre-cond: JSON backend has no DBI handle (Perl fold path confirmed)');
+
+	# 27.1  Grand total count via Perl fold
+	my $fold_grand = $fdb->aggregate(
+		measures => [{ fn => 'count', as => 'n' }],
+	);
+	is(scalar @{$fold_grand}, 1, '27.1 Perl fold: grand total → 1 row');
+	is($fold_grand->[0]{'n'}, 3, '27.1 Perl fold: grand total count = 3');
+	delete $LEDGER{'aggregate Perl fold path'};
+
+	# 27.2  Grouped sum via Perl fold
+	my $fold_sum = $fdb->aggregate(
+		by       => ['status'],
+		measures => [{ col => 'score', fn => 'sum', as => 'total' }],
+	);
+	my %fs = map { $_->{'status'} => $_ } @{$fold_sum};
+	is(scalar @{$fold_sum}, 2, '27.2 Perl fold: two status groups');
+	is($fs{'active'}{'total'} + 0, 9+8, '27.2 Perl fold: active sum = 17');
+
+	# 27.3  Perl fold honours WHERE criteria
+	my $fold_filt = $fdb->aggregate(
+		by       => ['status'],
+		measures => [{ fn => 'count', as => 'n' }],
+		status   => 'active',
+	);
+	is(scalar @{$fold_filt}, 1, '27.3 Perl fold: criteria filter → 1 group');
+	is($fold_filt->[0]{'status'}, 'active', '27.3 Perl fold: correct group returned');
+}
+
+# ---------------------------------------------------------------------------
+# SECTION 28 — aggregate(): validation croak guards
+# These test every documented error message from the POD.
+# ---------------------------------------------------------------------------
+
+note '';
+note '=== 28. aggregate() — validation croak guards ===';
+{
+	my $db28 = Database::test1->new($DATA_DIR);
+
+	# 28.1  measures missing entirely
+	throws_ok {
+		$db28->aggregate()
+	} qr/'measures' must be a non-empty arrayref/,
+	'28.1 aggregate(): missing measures → croak';
+	delete $LEDGER{'aggregate measures required'};
+
+	# 28.2  measures is empty arrayref
+	throws_ok {
+		$db28->aggregate(measures => [])
+	} qr/'measures' must be a non-empty arrayref/,
+	'28.2 aggregate(): empty measures → croak';
+
+	# 28.3  unknown fn
+	throws_ok {
+		$db28->aggregate(measures => [{ fn => 'bogus', col => 'entry', as => 'v' }])
+	} qr/unknown measure function 'bogus'/,
+	'28.3 aggregate(): unknown fn → croak';
+	delete $LEDGER{'aggregate unknown fn'};
+
+	# 28.4  col required for sum
+	throws_ok {
+		$db28->aggregate(measures => [{ fn => 'sum', as => 'v' }])
+	} qr/measure column is required for function 'sum'/,
+	'28.4 aggregate(): sum without col → croak';
+	delete $LEDGER{'aggregate col required'};
+
+	# 28.5  as is required
+	throws_ok {
+		$db28->aggregate(measures => [{ fn => 'sum', col => 'number' }])
+	} qr/measure 'as' is required/,
+	'28.5 aggregate(): missing as → croak';
+	delete $LEDGER{'aggregate as required'};
+
+	# 28.6  duplicate as
+	throws_ok {
+		$db28->aggregate(measures => [
+			{ fn => 'sum', col => 'number', as => 'v' },
+			{ fn => 'avg', col => 'number', as => 'v' },
+		])
+	} qr/duplicate measure alias 'v'/,
+	'28.6 aggregate(): duplicate as → croak';
+	delete $LEDGER{'aggregate duplicate as'};
+
+	# 28.7  alias collides with a by-column name
+	throws_ok {
+		$db28->aggregate(
+			by       => ['entry'],
+			measures => [{ fn => 'count', as => 'entry' }],
+		)
+	} qr/measure alias 'entry' collides with a group-by column/,
+	'28.7 aggregate(): alias==by column → croak';
+	delete $LEDGER{'aggregate alias collides by'};
+
+	# 28.8  by is not an arrayref
+	throws_ok {
+		$db28->aggregate(
+			by       => 'entry',
+			measures => [{ fn => 'count', as => 'n' }],
+		)
+	} qr/'by' must be an arrayref/,
+	'28.8 aggregate(): by scalar → croak';
+	delete $LEDGER{'aggregate by not arrayref'};
+
+	# 28.9  unsafe by column (SQL injection attempt)
+	throws_ok {
+		$db28->aggregate(
+			by       => ['entry; DROP TABLE t--'],
+			measures => [{ fn => 'count', as => 'n' }],
+		)
+	} qr/unsafe group-by column/,
+	'28.9 aggregate(): SQL injection in by column → croak';
+	delete $LEDGER{'aggregate unsafe by'};
+
+	# 28.10  having key not in by or aliases
+	throws_ok {
+		$db28->aggregate(
+			measures => [{ fn => 'count', as => 'n' }],
+			having   => { unknown_alias => { '>' => 5 } },
+		)
+	} qr/having key 'unknown_alias' is not a group-by column or measure alias/,
+	'28.10 aggregate(): having key not in allowlist → croak';
+	delete $LEDGER{'aggregate having unknown key'};
+
+	# 28.11  sort_by names a column not in by or aliases
+	throws_ok {
+		$db28->aggregate(
+			measures => [{ fn => 'count', as => 'n' }],
+			sort_by  => 'no_such_col',
+		)
+	} qr/sort_by names 'no_such_col'/,
+	'28.11 aggregate(): sort_by not in allowlist → croak';
+	delete $LEDGER{'aggregate sort_by not allowlist'};
+
+	# 28.12  JOIN on a no-DBI backend → croak naming the backend.
+	# Must use a backend that genuinely has no DBI handle; CSV always has
+	# DBD::CSV, so a JSON backend is used here (no DBI handle at all).
+	SKIP: {
+		skip 'JSON::MaybeXS not available for 28.12', 1
+			unless eval { require JSON::MaybeXS; 1 };
+		my $j_dir  = tempdir(CLEANUP => 1);
+		my $j_file = File::Spec->catfile($j_dir, 'nodb_join.json');
+		do {
+			open my $fh, '>', $j_file or die "Cannot write $j_file: $!";
+			print {$fh} '[{"entry":"x","n":1}]'."\n";
+			close $fh;
+		};
+		{ package Database::nodb_join; use parent 'Database::Abstraction'; }
+		my $jdb = Database::nodb_join->new(directory => $j_dir);
+		throws_ok {
+			$jdb->aggregate(
+				measures => [{ fn => 'count', as => 'n' }],
+				join     => { table => 'other', on => 'a.id = other.id' },
+			)
+		} qr/cannot aggregate a JOIN on the/,
+		'28.12 aggregate(): JOIN on no-DBI backend → croak';
+		delete $LEDGER{'aggregate JOIN no-DBI'};
+	}
+}
+
+# ---------------------------------------------------------------------------
+# SECTION 29 — aggregate(): HAVING, sort_by, limit, offset, empty-set
+# ---------------------------------------------------------------------------
+
+note '';
+note '=== 29. aggregate() — HAVING, ordering, pagination, empty-set norms ===';
+SKIP: {
+	skip 'DBI/DBD::SQLite not available for aggregate section 29', 18
+		unless $have_sqlite;
+
+	my $p29_dir  = tempdir(CLEANUP => 1);
+	my $p29_file = File::Spec->catfile($p29_dir, 'agg29.sql');
+	my $p29_dsn  = "dbi:SQLite:dbname=$p29_file";
+
+	do {
+		my $s = DBI->connect($p29_dsn, undef, undef, { RaiseError => 1 });
+		$s->do('CREATE TABLE agg29 (entry TEXT PRIMARY KEY, score REAL, status TEXT)');
+		$s->do("INSERT INTO agg29 VALUES ('a', 9.5,  'active')");
+		$s->do("INSERT INTO agg29 VALUES ('b', 7.0,  'inactive')");
+		$s->do("INSERT INTO agg29 VALUES ('c', 8.5,  'active')");
+		$s->do("INSERT INTO agg29 VALUES ('d', 6.0,  'inactive')");
+		$s->do("INSERT INTO agg29 VALUES ('e', 10.0, 'active')");
+		$s->disconnect();
+	};
+
+	{ package Database::agg29; use parent 'Database::Abstraction'; }
+	my $a29 = Database::agg29->new(dsn => $p29_dsn, no_entry => 1);
+
+	# 29.1  HAVING filters groups: only active (total=28) survives >20
+	my $hav = $a29->aggregate(
+		by       => ['status'],
+		measures => [{ col => 'score', fn => 'sum', as => 'total' }],
+		having   => { total => { '>' => 20 } },
+	);
+	is(scalar @{$hav}, 1, '29.1 aggregate() HAVING >20: only 1 group passes');
+	is($hav->[0]{'status'}, 'active',
+		'29.1 aggregate() HAVING >20: active group (28.0) passes');
+	delete $LEDGER{'aggregate having filter'};
+
+	# 29.2  HAVING on a group-by column (not an alias)
+	my $hav2 = $a29->aggregate(
+		by       => ['status'],
+		measures => [{ fn => 'count', as => 'n' }],
+		having   => { status => 'active' },
+	);
+	is(scalar @{$hav2}, 1, '29.2 aggregate() HAVING on group-by col: 1 group');
+	is($hav2->[0]{'status'}, 'active',
+		'29.2 aggregate() HAVING on group-by col: active row returned');
+
+	# 29.3  Default sort: by-columns ASC (active before inactive lexicographically)
+	my $dsort = $a29->aggregate(
+		by       => ['status'],
+		measures => [{ fn => 'count', as => 'n' }],
+	);
+	is($dsort->[0]{'status'}, 'active',
+		'29.3 aggregate(): default sort ASC → active before inactive');
+	delete $LEDGER{'aggregate default sort'};
+
+	# 29.4  Explicit sort_by DESC flips order
+	my $desc = $a29->aggregate(
+		by       => ['status'],
+		measures => [{ col => 'score', fn => 'sum', as => 'total' }],
+		sort_by  => ['total', 'DESC'],
+	);
+	# active total (28) > inactive total (13) → active is first in DESC
+	is($desc->[0]{'status'}, 'active',
+		'29.4 aggregate() sort_by total DESC: largest total first');
+	delete $LEDGER{'aggregate sort_by DESC'};
+
+	# 29.5  limit: returns at most N groups
+	my $lim = $a29->aggregate(
+		by       => ['status'],
+		measures => [{ fn => 'count', as => 'n' }],
+		limit    => 1,
+	);
+	is(scalar @{$lim}, 1, '29.5 aggregate() limit=1: exactly 1 group returned');
+	delete $LEDGER{'aggregate limit'};
+
+	# 29.6  offset: skips first N groups (2 groups total, offset=1 → 1 remains)
+	my $off = $a29->aggregate(
+		by       => ['status'],
+		measures => [{ fn => 'count', as => 'n' }],
+		offset   => 1,
+	);
+	is(scalar @{$off}, 1, '29.6 aggregate() offset=1: 1 group after skip');
+
+	# 29.7  Empty-set normalisation: SUM over empty criteria → 0, not NULL/undef
+	my $es_sum = $a29->aggregate(
+		measures => [{ col => 'score', fn => 'sum', as => 'total' }],
+		status   => '__no_such_status__',
+	);
+	# Empty result set: no rows matched; grand-total row may not appear at all —
+	# what the POD says is: when a group returns NULL for sum, normalise to 0.
+	# On the SQL path an empty WHERE produces 0 rows (not a NULL-sum row) so
+	# the arrayref is empty.  The documented contract is "returns [] when no
+	# group qualifies"; the empty-set NULL→0 normalisation applies to rows that
+	# exist but carry NULL.  We verify both the empty-[] case and the normalisation
+	# in separate subtests.
+	returns_is($es_sum, { type => 'arrayref' },
+		'29.7 aggregate(): empty criteria → arrayref (not undef)');
+
+	# 29.8  Empty-set normalisation: a SQLite aggregate over 0 rows can return NULL;
+	# verify normalised to 0 for sum by adding a row then filtering it out with HAVING
+	# so a group exists but has NULL sum (achieved by a count(*) > 0 row where all
+	# score values are NULL).
+	# Strategy: create a second table with a single NULL-score row and aggregate.
+	{
+		my $ndir  = tempdir(CLEANUP => 1);
+		my $nfile = File::Spec->catfile($ndir, 'nullscr.sql');
+		my $ndsn  = "dbi:SQLite:dbname=$nfile";
+		my $ns    = DBI->connect($ndsn, undef, undef, { RaiseError => 1 });
+		$ns->do('CREATE TABLE nullscr (entry TEXT PRIMARY KEY, score REAL, status TEXT)');
+		$ns->do("INSERT INTO nullscr VALUES ('x', NULL, 'g1')");
+		$ns->disconnect();
+
+		{ package Database::nullscr; use parent 'Database::Abstraction'; }
+		my $ndb = Database::nullscr->new(dsn => $ndsn, no_entry => 1);
+
+		# SUM(NULL) = NULL in SQL; aggregate() must normalise to 0
+		my $nullsum = $ndb->aggregate(
+			by       => ['status'],
+			measures => [{ col => 'score', fn => 'sum', as => 'total' }],
+		);
+		ok(defined($nullsum->[0]{'total'}),
+			'29.8 aggregate(): SUM(NULL) row normalised to defined value');
+		is($nullsum->[0]{'total'}, 0,
+			'29.8 aggregate(): SUM(NULL) row normalised to 0');
+		delete $LEDGER{'aggregate empty sum zero'};
+
+		# AVG(NULL) = NULL in SQL; aggregate() must NOT normalise (stays undef)
+		my $nullavg = $ndb->aggregate(
+			by       => ['status'],
+			measures => [{ col => 'score', fn => 'avg', as => 'mean' }],
+		);
+		ok(!defined($nullavg->[0]{'mean'}),
+			'29.8 aggregate(): AVG(NULL) row stays undef (not normalised)');
+		delete $LEDGER{'aggregate empty avg undef'};
+	}
+}
+
+# ---------------------------------------------------------------------------
+# SECTION 30 — aggregate(): no_fixate and base_criteria
+# ---------------------------------------------------------------------------
+
+note '';
+note '=== 30. aggregate() — no_fixate and base_criteria ===';
+SKIP: {
+	skip 'DBI/DBD::SQLite not available for aggregate section 30', 6
+		unless $have_sqlite;
+
+	my $p30_dir  = tempdir(CLEANUP => 1);
+	my $p30_file = File::Spec->catfile($p30_dir, 'agg30.sql');
+	my $p30_dsn  = "dbi:SQLite:dbname=$p30_file";
+
+	do {
+		my $s = DBI->connect($p30_dsn, undef, undef, { RaiseError => 1 });
+		$s->do('CREATE TABLE agg30 (entry TEXT PRIMARY KEY, score REAL, status TEXT)');
+		$s->do("INSERT INTO agg30 VALUES ('a', 9.5,  'active')");
+		$s->do("INSERT INTO agg30 VALUES ('b', 7.0,  'inactive')");
+		$s->do("INSERT INTO agg30 VALUES ('c', 8.5,  'active')");
+		$s->disconnect();
+	};
+
+	{ package Database::agg30; use parent 'Database::Abstraction'; }
+
+	# 30.1  no_fixate: returned arrayref must not be locked (can add a key)
+	my $mutable = Database::agg30->new(dsn => $p30_dsn, no_entry => 1);
+	my $unfixed = $mutable->aggregate(
+		measures  => [{ fn => 'count', as => 'n' }],
+		no_fixate => 1,
+	);
+	returns_is($unfixed, { type => 'arrayref' },
+		'30.1 aggregate() no_fixate: still returns arrayref');
+	lives_ok {
+		$unfixed->[0]{'__test_mutation__'} = 1;
+	} '30.1 aggregate() no_fixate: result row is mutable (not locked)';
+	delete $LEDGER{'aggregate no_fixate'};
+
+	# 30.2  base_criteria: constructor filter automatically applied to aggregate
+	my $bc_db = Database::agg30->new(
+		dsn           => $p30_dsn,
+		no_entry      => 1,
+		base_criteria => { status => 'active' },
+	);
+	my $bc_rows = $bc_db->aggregate(
+		measures => [{ fn => 'count', as => 'n' }],
+	);
+	# base_criteria silently limits to active rows; count should be 2
+	is($bc_rows->[0]{'n'}, 2,
+		'30.2 aggregate() base_criteria: automatic WHERE filter applied, count=2');
+	delete $LEDGER{'aggregate base_criteria'};
+
+	# 30.3  Caller criteria WIN over base_criteria on collision (documented rule)
+	my $bc2_db = Database::agg30->new(
+		dsn           => $p30_dsn,
+		no_entry      => 1,
+		base_criteria => { status => 'active' },
+	);
+	my $bc2_rows = $bc2_db->aggregate(
+		measures => [{ fn => 'count', as => 'n' }],
+		status   => 'inactive',
+	);
+	# Caller status=inactive overrides base_criteria status=active
+	is($bc2_rows->[0]{'n'}, 1,
+		'30.3 aggregate() base_criteria: caller key wins on collision, count=1');
+}
+
+# ---------------------------------------------------------------------------
+# SECTION 31 — Query group_by(), measure(), having() builder API
+# All three are documented to return $self for chaining.
+# ---------------------------------------------------------------------------
+
+note '';
+note '=== 31. Query group_by(), measure(), having() ===';
+SKIP: {
+	skip 'DBI/DBD::SQLite not available for Query builder section 31', 14
+		unless $have_sqlite;
+
+	my $p31_dir  = tempdir(CLEANUP => 1);
+	my $p31_file = File::Spec->catfile($p31_dir, 'qbld31.sql');
+	my $p31_dsn  = "dbi:SQLite:dbname=$p31_file";
+
+	do {
+		my $s = DBI->connect($p31_dsn, undef, undef, { RaiseError => 1 });
+		$s->do('CREATE TABLE qbld31 (entry TEXT PRIMARY KEY, score REAL, status TEXT)');
+		$s->do("INSERT INTO qbld31 VALUES ('a', 9.5, 'active')");
+		$s->do("INSERT INTO qbld31 VALUES ('b', 7.0, 'inactive')");
+		$s->do("INSERT INTO qbld31 VALUES ('c', 8.5, 'active')");
+		$s->disconnect();
+	};
+
+	{ package Database::qbld31; use parent 'Database::Abstraction'; }
+	my $qb = Database::qbld31->new(dsn => $p31_dsn, no_entry => 1);
+
+	# 31.1  group_by(): list form → stores columns, returns $self
+	{
+		my $q = $qb->query();
+		my $ret = $q->group_by('status', 'score');
+		is($ret, $q, '31.1 group_by(): returns $self for chaining');
+		is(ref($q->{'_group_by'}), 'ARRAY',
+			'31.1 group_by(): _group_by stored as arrayref');
+		is($q->{'_group_by'}[0], 'status',
+			'31.1 group_by(): first column stored correctly');
+	}
+
+	# 31.2  group_by(): arrayref form accepted
+	{
+		my $q = $qb->query()->group_by(['a', 'b']);
+		is(scalar @{$q->{'_group_by'}}, 2,
+			'31.2 group_by(): arrayref form stores two columns');
+	}
+
+	# 31.3  group_by(): replaces previous list (not appends)
+	{
+		my $q = $qb->query()->group_by('x')->group_by('y');
+		is(scalar @{$q->{'_group_by'}}, 1, '31.3 group_by(): replaces, not appends');
+		is($q->{'_group_by'}[0], 'y', '31.3 group_by(): new value is stored');
+		delete $LEDGER{'group_by replaces list'};
+	}
+
+	# 31.4  group_by(): empty list (or []) clears the group
+	{
+		my $q = $qb->query()->group_by('x')->group_by([]);
+		is(scalar @{$q->{'_group_by'}}, 0,
+			'31.4 group_by([]): clears group-by list for grand-total mode');
+	}
+
+	# 31.5  measure(): positional form (col, fn, as) — accumulates
+	{
+		my $q = $qb->query();
+		my $r1 = $q->measure('score', 'sum', 'total');
+		is($r1, $q, '31.5 measure(): returns $self for chaining');
+		my $r2 = $q->measure(undef, 'count', 'n');
+		is(scalar @{$q->{'_measures'}}, 2,
+			'31.5 measure(): two calls accumulate');
+		delete $LEDGER{'measure accumulates'};
+	}
+
+	# 31.6  measure(): hashref form
+	{
+		my $q = $qb->query()->measure({ col => 'score', fn => 'avg', as => 'mean' });
+		is($q->{'_measures'}[0]{'fn'}, 'avg',
+			'31.6 measure(): hashref form fn stored');
+		is($q->{'_measures'}[0]{'as'}, 'mean',
+			'31.6 measure(): hashref form as stored');
+	}
+
+	# 31.7  having(): named-pair form stored in _having; returns $self
+	{
+		my $q = $qb->query();
+		my $ret = $q->having(total => { '>' => 5 });
+		is($ret, $q, '31.7 having(): returns $self for chaining');
+		ok(exists($q->{'_having'}{'total'}),
+			'31.7 having(): named-pair key stored in _having');
+	}
+
+	# 31.8  having(): hashref form accepted
+	{
+		my $q = $qb->query()->having({ status => 'active' });
+		is($q->{'_having'}{'status'}, 'active',
+			'31.8 having(): hashref form stored correctly');
+	}
+
+	# 31.9  having(): multiple calls merge with AND (both keys present)
+	{
+		my $q = $qb->query()
+			->having(total => { '>' => 5 })
+			->having(n     => { '<' => 100 });
+		ok(exists($q->{'_having'}{'total'}), '31.9 having(): first call key retained');
+		ok(exists($q->{'_having'}{'n'}),     '31.9 having(): second call key added');
+	}
+}
+
+# ---------------------------------------------------------------------------
+# SECTION 32 — Query all()/first()/count()/each() aggregate path
+# ---------------------------------------------------------------------------
+
+note '';
+note '=== 32. Query aggregate terminal methods (all/first/count/each) ===';
+SKIP: {
+	skip 'DBI/DBD::SQLite not available for Query aggregate section 32', 16
+		unless $have_sqlite;
+
+	my $p32_dir  = tempdir(CLEANUP => 1);
+	my $p32_file = File::Spec->catfile($p32_dir, 'qagg32.sql');
+	my $p32_dsn  = "dbi:SQLite:dbname=$p32_file";
+
+	do {
+		my $s = DBI->connect($p32_dsn, undef, undef, { RaiseError => 1 });
+		$s->do('CREATE TABLE qagg32 (entry TEXT PRIMARY KEY, score REAL, status TEXT)');
+		$s->do("INSERT INTO qagg32 VALUES ('a', 9.5,  'active')");
+		$s->do("INSERT INTO qagg32 VALUES ('b', 7.0,  'inactive')");
+		$s->do("INSERT INTO qagg32 VALUES ('c', 8.5,  'active')");
+		$s->do("INSERT INTO qagg32 VALUES ('d', 6.0,  'inactive')");
+		$s->do("INSERT INTO qagg32 VALUES ('e', 10.0, 'active')");
+		$s->disconnect();
+	};
+
+	{ package Database::qagg32; use parent 'Database::Abstraction'; }
+	my $qa = Database::qagg32->new(dsn => $p32_dsn, no_entry => 1);
+
+	# 32.1  Query->all() with measures delegates to aggregate(), returns arrayref
+	{
+		my $rows = $qa->query
+			->group_by('status')
+			->measure('score', 'sum', 'total')
+			->all();
+		returns_is($rows, { type => 'arrayref' },
+			'32.1 Query->all() aggregate: returns arrayref');
+		is(scalar @{$rows}, 2,
+			'32.1 Query->all() aggregate: two status groups');
+		ok(exists($rows->[0]{'total'}),
+			'32.1 Query->all() aggregate: measure alias key present in row');
+	}
+
+	# 32.2  Query->all() two-fronts: result matches direct aggregate() call
+	{
+		my $q_out = $qa->query
+			->group_by('status')
+			->measure('score', 'sum', 'total')
+			->all();
+		my $d_out = $qa->aggregate(
+			by       => ['status'],
+			measures => [{ col => 'score', fn => 'sum', as => 'total' }],
+		);
+		my %qmap = map { $_->{'status'} => $_->{'total'} } @{$q_out};
+		my %dmap = map { $_->{'status'} => $_->{'total'} } @{$d_out};
+		ok(abs(($qmap{'active'}   // 0) - ($dmap{'active'}   // 0)) < 1e-9,
+			'32.2 Query->all() two fronts: active total matches direct aggregate()');
+		ok(abs(($qmap{'inactive'} // 0) - ($dmap{'inactive'} // 0)) < 1e-9,
+			'32.2 Query->all() two fronts: inactive total matches direct aggregate()');
+		delete $LEDGER{'Query aggregate two fronts'};
+	}
+
+	# 32.3  Query->all() with where() (pre-aggregation filter)
+	{
+		my $rows = $qa->query
+			->where(status => 'active')
+			->group_by('status')
+			->measure('score', 'sum', 'total')
+			->all();
+		is(scalar @{$rows}, 1,
+			'32.3 Query->all() + where(): pre-aggregation filter → 1 group');
+		is($rows->[0]{'status'}, 'active',
+			'32.3 Query->all() + where(): correct group returned');
+	}
+
+	# 32.4  Query->all() with having() (post-aggregation filter)
+	{
+		my $rows = $qa->query
+			->group_by('status')
+			->measure('score', 'sum', 'total')
+			->having(total => { '>' => 20 })
+			->all();
+		is(scalar @{$rows}, 1,
+			'32.4 Query->all() + having(): post-group filter → 1 group');
+		is($rows->[0]{'status'}, 'active',
+			'32.4 Query->all() + having(): correct group (active, sum=28) passes');
+	}
+
+	# 32.5  Query->first() aggregate: returns first row hashref
+	{
+		my $row = $qa->query
+			->group_by('status')
+			->measure('score', 'sum', 'total')
+			->order_by('status ASC')
+			->first();
+		returns_is($row, { type => 'hashref' },
+			'32.5 Query->first() aggregate: returns hashref');
+		ok(defined($row->{'status'}),
+			'32.5 Query->first() aggregate: row has status key');
+	}
+
+	# 32.6  Query->first() aggregate: no match → undef
+	{
+		my $row = $qa->query
+			->where(status => '__none__')
+			->group_by('status')
+			->measure('score', 'sum', 'total')
+			->first();
+		returns_is($row, { type => 'void' },
+			'32.6 Query->first() aggregate: no match → undef');
+	}
+
+	# 32.7  Query->count() after measure() → exact documented croak message
+	throws_ok {
+		$qa->query->measure('score', 'sum', 'total')->count()
+	} qr/count\(\) is not available once measure\(\) has been called/,
+	'32.7 Query->count() after measure(): exact croak message';
+	delete $LEDGER{'Query count measures croak'};
+
+	# 32.8  Query->each() aggregate: callback called once per group, returns count
+	{
+		my @visited;
+		my $n = $qa->query
+			->group_by('status')
+			->measure('score', 'sum', 'total')
+			->each(sub { push @visited, shift });
+		is($n, 2, '32.8 Query->each() aggregate: return value = row count (2 groups)');
+		is(scalar @visited, 2,
+			'32.8 Query->each() aggregate: callback called once per group');
+		returns_is($visited[0], { type => 'hashref' },
+			'32.8 Query->each() aggregate: callback receives hashref');
+	}
+}
+
+# ---------------------------------------------------------------------------
 # LEDGER ASSERTION
 # If SQLite was unavailable, the SQLite-only states were never reachable;
 # remove them before checking so the ledger still passes on minimal installs.
@@ -1696,6 +2499,20 @@ unless($have_sqlite) {
 		base_criteria active filter
 		base_criteria must be hashref
 		base_criteria unsafe key
+		aggregate SQL path sum
+		aggregate SQL path count
+		aggregate empty sum zero
+		aggregate empty avg undef
+		aggregate default sort
+		aggregate sort_by DESC
+		aggregate limit
+		aggregate having filter
+		aggregate no_fixate
+		aggregate base_criteria
+		Query count measures croak
+		Query aggregate two fronts
+		group_by replaces list
+		measure accumulates
 	)};
 }
 

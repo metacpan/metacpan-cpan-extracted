@@ -3,7 +3,7 @@ package Punk::RateLimit;
 use strict;
 use warnings;
 
-our $VERSION = '0.57';
+our $VERSION = '0.58';
 
 
 1;

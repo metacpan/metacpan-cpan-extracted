@@ -1,0 +1,6 @@
+0.001  2026-10-06
+    First release.
+    Offline fragment-target audit API with source-located diagnostics.
+    Arabic/Unicode and percent-decoded targets, duplicate and ambiguous targets.
+    Unicode normalization hints without changing matching semantics.
+    UTF-8 local-file command with JSON output and bounded input/diagnostics.

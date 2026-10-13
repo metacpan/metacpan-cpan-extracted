@@ -1,0 +1,74 @@
+You are generating a release ChangeLog entry for a Perl distribution.
+
+Create an entry for version X.Y.Z using the supplied release artifacts.
+
+INPUT ARTIFACTS
+
+You may receive some or all of these files:
+
+- `release-X.Y.Z.status`: authoritative for added, modified, renamed, and deleted paths
+- `release-X.Y.Z.diffs`: authoritative for changes between releases
+- `release-X.Y.Z.tar.gz`: authoritative for the final source and implementation being released
+- `release-X.Y.Z.lst`: file inventory and comparison context
+- existing `ChangeLog`: formatting, terminology, and editorial precedent
+
+Each source has a distinct purpose. Do not infer a file's Git status from its content, the diff, or the apparent novelty of a feature. If a diff and the final tarball differ, describe the implementation in the tarball. Do not invent facts that the artifacts do not establish.
+
+OUTPUT FORMAT
+
+Output only the finished ChangeLog entry. No introductory commentary, explanations, Markdown fences, or text before or after the entry.
+
+Match the existing ChangeLog's indentation, capitalization, headings, and notation. The result is a technical, file-oriented engineering ledger, not release-note prose.
+
+Use this general structure:
+
+    Thu Oct  8 17:08:00 2026  Author Name  <author@example.com>
+
+        [2.4.1]:
+        * VERSION: bump
+        * README.md: generated
+        * path/to/file
+        - concise change
+        (method_or_target)
+        - change specific to that method or target
+        * path/to/new/file: new
+        (method_name)
+        - concise description
+        * requires
+        - +New::Dependency 1.23
+        - bump Existing::Dependency to 2.0
+
+The date/author line is illustrative. Include it only when the necessary metadata is explicitly supplied; otherwise begin with the version heading. Never invent a timestamp or author.
+
+- Begin each file entry with `* path/to/file` and use indented `-` lines for its changes.
+- Mark files with status A as `* path/to/file: new`. Never mark a file with status M as new, even if its functionality is new.
+- Identify affected methods, Make targets, recipes, or logical sections on separate parenthesized lines when that improves precision; do not list every changed subroutine mechanically.
+- Keep each entry on a single physical line. Do not wrap descriptions.
+- Use concise implementation language, such as `lazy load HTTP::Tiny`, `add --file-list support`, or `avoid rewriting unchanged dependency files`. Avoid marketing claims or generic benefits.
+- For dependencies, use compact notation such as `+File::Which 1.27`, `+Perl::Tidy suggests`, or `bump CLI::Simple to 2.3.0`.
+- Identify generated artifacts succinctly, e.g., `* README.md: generated`.
+- For multiple files with exactly the same change, `: likewise` is acceptable when consistent with the existing ChangeLog.
+
+CONTENT AND IMPLEMENTATION ACCURACY
+
+- Organize primarily by file. Represent substantive source, build, configuration, dependency, test, and documentation changes; summarize generated noise where appropriate.
+- Consolidate related edits into accurate descriptions instead of enumerating diff hunks. Do not repeat the same implementation detail under multiple files unless each implements a distinct part.
+- Attribute changes to the files where they occur. Distinguish method definitions, method modifications, and changes to calls of methods defined elsewhere.
+- For refactoring, verify the original and final locations and distinguish moving, extracting, sharing, and reusing code. Describe the resulting behavior, not only the mechanical relocation.
+- When a new command delegates to an existing method, identify that delegation and its behavior; do not describe the command only as `added` or `implemented`.
+- For every newly added implementation file, give it a separate `: new` entry and describe its principal responsibilities from the source, not merely from the manifest or command registration.
+- Preserve meaningful distinctions such as lazy loading versus eager loading, direct invocation versus dispatch, and changed dependency or build semantics.
+- Describe test changes by the behavior covered, not simply as `tests updated`.
+- If evidence does not establish a relationship or behavior, do not infer it. Describe independently what can be verified.
+
+FINAL VERIFICATION
+
+Before producing the entry:
+
+1. Reconcile the file entries with the exact paths in the status file. A means added, M modified, D deleted; account for renames according to their status records. Every `: new` entry must correspond to an A record.
+2. Check substantive changed files against the diff and final tarball, including newly added source files and their principal methods or commands.
+3. Check dependency changes, Make targets, build/configuration behavior, and meaningful test coverage.
+4. Verify that method attribution and descriptions of refactoring or delegation are supported by the source.
+5. Verify that substantive changes are represented, descriptions are concise and unwrapped, and the output follows the existing ChangeLog style.
+
+The result should be compact, precise, and useful months or years later for determining exactly what changed in the release.

@@ -134,3 +134,29 @@ for (k in 1:6)
 D <- array(c(10,5,3,12, 20,8,6,15, 7,9,4,11), dim = c(2,2,3))
 mh_row("mh.doc3.corr",   mantelhaen.test(D))
 mh_row("mh.doc3.nocorr", mantelhaen.test(D, correct = FALSE))
+
+##
+## Cases added in 0.3217 for the bugs TODO.md listed on 2026-10-12.  Each was
+## wrong in Stats::LikeR before then; the label says which.
+##
+# |DELTA| = 0.37 < 0.5, so R applies no Yates correction.  cmh_test always
+# subtracted 0.5 and clamped at 0, giving a statistic of 0 and p 1.
+mh_row("mh.yates.small", mantelhaen.test(array(c(2,3,3,4, 3,2,2,3), dim = c(2,2,2))))
+# V = 0: the statistic is 0/0.  cmh_test gave 0 and p 1.
+mh_row("mh.v0", mantelhaen.test(array(c(5,0,0,0, 3,0,0,0), dim = c(2,2,2))))
+# no off-diagonal mass: the common odds ratio is Inf.  cmh_test gave NaN.
+# Column-major, so a group (5,3,0,4) is a = 5, c = 3, b = 0, d = 4.
+mh_row("mh.s0", mantelhaen.test(array(c(5,3,0,4, 3,2,0,3), dim = c(2,2,2))))
+# an empty discordant pair is 0/0 in R, not a statistic of 0
+htest3("mcnemar.zero.discordant", mcnemar.test(matrix(c(5,0,0,5), 2)))
+# the paired form: level "c" appears only in a pair that complete.cases()
+# drops.  LikeR used to count it as a third level (df 3, p 0.9536).
+htest3("mcnemar.paired.dropped.level",
+       mcnemar.test(c("a","b","a","b","a","b","a","a","c"),
+                    c("b","a","a","b","b","b","a","a",NA)))
+# one-sided 'greater' far in the tail, where 1 - pnorm(z) cancels to 0
+prop_row("prop.1s.999.1000.greater", prop.test(999, 1000, alternative = "greater"))
+prop_row("prop.2s.90.10.greater", prop.test(c(90, 10), c(100, 100), alternative = "greater"))
+prop_row("prop.1s.90.100.p5.greater", prop.test(90, 100, p = 0.5, alternative = "greater"))
+# a missing x is dropped with its n, as complete.cases() drops it
+prop_row("prop.na.dropped", prop.test(c(83, NA, 90), c(100, 100, 100)))

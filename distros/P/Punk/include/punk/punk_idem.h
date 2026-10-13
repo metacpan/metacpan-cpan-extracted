@@ -146,15 +146,22 @@ static SV *pi_composite(pTHX_ SV *scope, HV *rech, const char *method,
     return out;
 }
 
-/* The request fingerprint: the method, the declared route and the body.
+/* The request fingerprint: the method, the declared route, the path and
+ * query string as they were ASKED FOR, and the body.
  *
  * A key reused with a DIFFERENT body is a client bug, and a silent replay of
  * an unrelated response is the worst possible answer - the client believes
  * its second, different order succeeded, and it never ran.
  *
+ * The same goes for a different resource. The declared route is
+ * /orders/:id/cancel for order 7 and for order 8, so without the real path
+ * a client that keys per operation and varies the id was handed 7's answer
+ * for 8, which was never cancelled. They are in the fingerprint and not the
+ * key, so that reuse is the 422 and not a second, separate record.
+ *
  * $c->req->body reads once and rewinds, so this costs one hash of bytes
  * already in memory rather than a second read of the socket. */
-static SV *pi_fingerprint(pTHX_ SV *c, HV *rech, const char *method,
+static SV *pi_fingerprint(pTHX_ SV *c, HV *rech, HV *env, const char *method,
                           STRLEN mlen) {
     AV *cav = pcx_av(aTHX_ c);
     SV *reqsv = cav ? pcx_req(aTHX_ cav) : NULL;
@@ -164,6 +171,14 @@ static SV *pi_fingerprint(pTHX_ SV *c, HV *rech, const char *method,
     sv_catpvs(acc, " ");
     if (pp && *pp && SvOK(*pp)) sv_catsv(acc, *pp);
     sv_catpvs(acc, "\n");
+    {
+        SV **pi = env ? hv_fetchs(env, "PATH_INFO", 0) : NULL;
+        SV **qs = env ? hv_fetchs(env, "QUERY_STRING", 0) : NULL;
+        if (pi && *pi && SvOK(*pi)) sv_catsv(acc, *pi);
+        sv_catpvs(acc, "\n");
+        if (qs && *qs && SvOK(*qs)) sv_catsv(acc, *qs);
+        sv_catpvs(acc, "\n");
+    }
     if (reqsv && SvROK(reqsv) && SvTYPE(SvRV(reqsv)) == SVt_PVAV) {
         SV *b = pq_body(aTHX_ (AV *)SvRV(reqsv));
         if (b && SvOK(b)) sv_catsv(acc, b);
@@ -302,6 +317,10 @@ static SV *pi_error(pTHX_ IV status, const char *msg) {
     return newRV_noinc((SV *)resp);
 }
 
+/* How long a single-flight lock is honoured, and how long a retry waits for
+ * the first attempt, unless the plugin was given `lock_wait`. */
+#define PI_LOCK_WAIT 30.0
+
 /* ---- the replay check, between the guards and the handler --------------------
  *
  * Returns 1 when the request has been ANSWERED (*out) and the handler must be
@@ -377,7 +396,7 @@ static int pi_check(pTHX_ SV *c, HV *rech, HV *env, const char *method,
     comp = pi_composite(aTHX_ scope, rech, method, mlen, key, klen);
     SvREFCNT_dec(scope);
     sv_2mortal(comp);
-    fp = sv_2mortal(pi_fingerprint(aTHX_ c, rech, method, mlen));
+    fp = sv_2mortal(pi_fingerprint(aTHX_ c, rech, env, method, mlen));
 
     {   /* Look, and on a miss take the lock so two retries arriving together
          * do not both execute. Hyperman serves a worker's requests one at a
@@ -394,17 +413,42 @@ static int pi_check(pTHX_ SV *c, HV *rech, HV *env, const char *method,
          * application configured one. */
         SV *raw = pkc_be_get(aTHX_ f, comp, NULL);
         if (raw) entry = pkc_ready(aTHX_ raw, 1);
-        if (!entry && (f->caps & PKC_CAN_LOCK) && !pkc_be_lock(aTHX_ f, comp)) {
-            double deadline = pc_now(aTHX) + pkc_be_lock_wait(aTHX_ f);
-            while (pc_now(aTHX) < deadline) {
-                pkc_sleep(0.002);
-                raw = pkc_be_get(aTHX_ f, comp, NULL);
-                if (raw) { entry = pkc_ready(aTHX_ raw, 1); break; }
-                if (pkc_be_lock(aTHX_ f, comp)) break;  /* the holder gave up */
+        if (!entry && (f->caps & PKC_CAN_LOCK)) {
+            /* THE BUDGET IS THE PLUGIN'S, not the cache's. A cache's
+             * lock_wait is tuned for a compute - five seconds by default -
+             * and it is also how old a lock may get before it is stolen. A
+             * handler that takes longer than that, a payment being the usual
+             * one, had its lock taken by the very retry the lock was for, and
+             * the two ran together. */
+            SV **lw = hv_fetchs(ocfg, "lock_wait", 0);
+            double budget = (lw && *lw && SvOK(*lw)) ? (double)SvNV(*lw)
+                                                     : PI_LOCK_WAIT;
+            int locked = pkc_be_lock_for(aTHX_ f, comp, budget);
+            if (!locked) {
+                double deadline = pc_now(aTHX) + budget;
+                double nap = 0.002;
+                while (pc_now(aTHX) < deadline) {
+                    pkc_sleep(nap);
+                    if (nap < 0.05) nap *= 1.5;
+                    raw = pkc_be_get(aTHX_ f, comp, NULL);
+                    if (raw) { entry = pkc_ready(aTHX_ raw, 1); break; }
+                    if (pkc_be_lock_for(aTHX_ f, comp, budget)) {
+                        locked = 1;             /* the holder gave up */
+                        break;
+                    }
+                }
+                /* waited it out with nothing to replay: execute rather than
+                 * hang. Duplicated work is a cost; a stalled request is an
+                 * outage. The same rule Punk::Cache's compute follows. */
             }
-            /* waited it out with nothing to replay: execute rather than
-             * hang. Duplicated work is a cost; a stalled request is an
-             * outage. The same rule Punk::Cache's compute follows. */
+            /* Winning the lock is not finding nothing. The holder records
+             * and THEN unlocks, so a request that looked before the record
+             * and locked after the unlock has the lock and an answer waiting
+             * - and would run the work a second time. Look again. */
+            if (locked && !entry) {
+                raw = pkc_be_get(aTHX_ f, comp, NULL);
+                if (raw) entry = pkc_ready(aTHX_ raw, 1);
+            }
         }
     }
 

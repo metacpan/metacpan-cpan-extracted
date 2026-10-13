@@ -248,6 +248,77 @@ for my $be (@backends) {
     }
     is(r($m->backend->count({ author => 'Gibson' })), 2,
         "$short: count on the backend directly, the same answer");
+
+    # ---- a NULL in a sort column does not end the walk -----------------------
+    # SQLite sorts NULL below every value, so an ascending walk starts in the
+    # NULLs. A page that ended on one used to mint a token nothing came
+    # after, and every later row - none of them NULL - was unreachable.
+    my $walk = sub {
+        my ($order, $limit) = @_;
+        my (@seen, $after, $pages);
+        while (++$pages <= 12) {
+            my $p = r($m->search({}, { order_by => $order, limit => $limit,
+                                       (defined $after ? (after => $after) : ()) }));
+            push @seen, @{ ids($p) };
+            last unless $p->{has_more_data};
+            $after = $p->{next};
+        }
+        return \@seen;
+    };
+    for my $order ([ published => 'asc' ], [ author => 'asc' ],
+                   [ author => 'asc', published => 'asc' ],
+                   [ published => 'asc', author => 'desc' ]) {
+        my $whole = ids(r($m->search({}, { order_by => $order, limit => 100 })));
+        is(scalar @$whole, 7, "$short: @$order in one page is every row");
+        for my $limit (1, 2, 3, 5) {
+            is_deeply($walk->($order, $limit), $whole,
+                "$short: @$order, $limit a page, reaches every row in order");
+        }
+    }
+    # descending, the NULLs are last: a page that ends inside them continues
+    # through them
+    is_deeply($walk->([ published => 'desc' ], 6), [5, 4, 3, 2, 1, 7, 6],
+        "$short: a page ending on a NULL at the END of the order continues");
+    {
+        my $p = r($m->search({}, { order_by => [ published => 'desc' ], limit => 7 }));
+        ok(!$p->{has_more_data} && !defined $p->{next},
+            "$short: and the last row being a NULL ends the walk cleanly");
+    }
+
+    # ---- limit ---------------------------------------------------------------
+    for my $big ('9223372036854775807', '99999999999999999999999', 9**30) {
+        my $p = r($m->search({}, { limit => $big }));
+        is(scalar @{ $p->{rows} }, 7, "$short: limit => $big is every row");
+        ok(!$p->{has_more_data}, "$short: ...and there is no more");
+    }
+    is(scalar @{ r($m->search({}, { limit => 0 }))->{rows} }, 1,
+        "$short: a limit below one is one");
+
+    # ---- an order_by with a hole in it ---------------------------------------
+    {
+        my @sparse; $sparse[1] = 'asc';
+        my $e = ''; eval { r($m->search({}, { order_by => \@sparse })); 1 } or $e = $@;
+        like($e, qr/one of the columns is undefined/,
+            "$short: a sparse order_by croaks, where it used to crash");
+        $e = ''; eval { r($m->search({}, { order_by => [ undef, 'asc' ] })); 1 } or $e = $@;
+        like($e, qr/one of the columns is undefined/, "$short: ...and an undef column");
+        my @gap = ('price'); $#gap = 1;
+        $e = ''; eval { r($m->search({}, { order_by => \@gap })); 1 } or $e = $@;
+        like($e, qr/must be 'asc' or 'desc'/, "$short: ...and a missing direction");
+    }
+
+    # ---- get and delete check their key columns ------------------------------
+    for my $what (qw(get delete)) {
+        my $e = ''; eval { r($m->backend->$what(nosuch => 1)); 1 } or $e = $@;
+        like($e, qr/\Q$cls\E: $what names 'nosuch', which is not a field of books/,
+            "$short: $what on an unknown column croaks");
+        $e = ''; eval { r($m->backend->$what(id => 1, 'title" OR 1=1 --' => 1)); 1 } or $e = $@;
+        like($e, qr/which is not a field of books/,
+            "$short: ...and so does one that is not a name at all");
+    }
+    is(r($m->backend->get(id => 3))->{title}, 'Snow Crash',
+        "$short: a known key column still fetches");
+    is(r($m->count), 7, "$short: and nothing was deleted along the way");
 }
 
 # ---- a token minted on one backend decodes on the other ---------------------

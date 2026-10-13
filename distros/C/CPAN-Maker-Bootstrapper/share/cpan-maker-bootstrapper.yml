@@ -1,6 +1,7 @@
 ---
 commands:
   annotate:                 CPAN::Maker::Bootstrapper::Role::LLM::Annotator
+  change-log:               CPAN::Maker::Bootstrapper::Role::LLM::ChangeLog
   code-finding:             CPAN::Maker::Bootstrapper::Role::LLM::Reviewer
   code-review:              CPAN::Maker::Bootstrapper::Role::LLM::Reviewer
   create-build-config:      CPAN::Maker::Bootstrapper::Role::CreateBuildConfig
@@ -12,6 +13,7 @@ commands:
   extra-files:              CPAN::Maker::Bootstrapper::Role::ExtraFiles
   filter:                   CPAN::Maker::Bootstrapper::Role::Filter 
   install:                  CPAN::Maker::Bootstrapper::Role::Installer
+  import:                   CPAN::Maker::Bootstrapper::Role::Importer
   import-scaffold:          CPAN::Maker::Bootstrapper::Role::ScaffoldImporter
   models:                   CPAN::Maker::Bootstrapper::Role::LLM::Models
   perlcritic:               CPAN::Maker::Bootstrapper::Role::PerlCritic

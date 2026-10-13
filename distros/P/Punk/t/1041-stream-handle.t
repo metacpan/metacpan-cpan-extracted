@@ -26,6 +26,7 @@ use POSIX ();
 $SIG{PIPE} = 'IGNORE';
 
 our $ABORTED = 0;
+our $PRESS   = File::Spec->catfile(File::Temp::tempdir(CLEANUP => 1), 'press');
 
 plan skip_all => 'Hyperman required' unless eval { require Hyperman; 1 };
 plan skip_all => 'Hyperman built without nghttp2' unless Hyperman->has_http2;
@@ -106,6 +107,24 @@ require IO::Socket::INET;
         });
     };
 
+    # One write, far more than a socket holds for a client that is not
+    # reading, and what drain said straight after it goes to a file: that
+    # client never reads a body to find it in.
+    get '/press' => sub {
+        $_[0]->stream('application/octet-stream', sub {
+            my ($c, $w) = @_;
+            $w->write('x' x 8_000_000);
+            my $f = $w->drain;
+            if (open my $fh, '>', "$main::PRESS.tmp") {
+                print $fh $f->is_ready ? 'r' : 'p';
+                close $fh;
+                rename "$main::PRESS.tmp", $main::PRESS;
+            }
+            $f->get;
+            $w->close;
+        });
+    };
+
     get '/attach' => sub {
         $_[0]->stream('text/csv', {
             status  => 201,
@@ -161,6 +180,28 @@ sub serve {
     return $pid;
 }
 
+# A TLS client that asks for a path and then never reads the answer. The
+# request goes in on a pipe that stays open, so s_client does not see the end
+# of its input and leave; the response comes out on one nobody reads.
+sub stalled_client {
+    my ($port, $path) = @_;
+    pipe(my $ir, my $iw) or return;
+    pipe(my $or, my $ow) or return;
+    my $pid = fork;
+    return unless defined $pid;
+    if (!$pid) {
+        open STDIN,  '<&', $ir;
+        open STDOUT, '>&', $ow;
+        open STDERR, '>', File::Spec->devnull;
+        close $_ for $iw, $or;
+        exec('openssl', 's_client', '-quiet', '-connect', "127.0.0.1:$port")
+            or POSIX::_exit(1);
+    }
+    close $_ for $ir, $ow;
+    syswrite $iw, "GET $path HTTP/1.1\r\nHost: 127.0.0.1\r\n\r\n";
+    return ($pid, $iw, $or);
+}
+
 # Headers and body, split. -i puts the response head in the body stream, which
 # is the only way to see it and the payload from one request.
 sub fetch {
@@ -210,17 +251,20 @@ sub fetch {
 
   SKIP: {
         # Hyperman up to 0.58 ends an h2 stream on the first DATA frame sent
-        # after the close, so a body over 16384 bytes is cut there. That is
-        # the server's to fix; this only checks that the handler's own loop
-        # - write, drain, wait - still ends with the whole body on a server
+        # after the close, so a body is cut wherever the close happened to
+        # land: at 16384 bytes when nothing had gone out yet, later when the
+        # socket took some frames first. A small probe therefore says nothing
+        # about a large body, and the body itself is the only probe there is.
+        # That is the server's to fix; this checks that the handler's own
+        # loop - write, drain, wait - ends with the whole body on a server
         # that sends one. Whether drain is ever PENDING over h2 is the
         # server's too: it reports pressure from the connection's buffer,
         # and an h2 body waits in the stream's. The TLS block below is where
         # that is asserted.
-        my $probe = `curl -s --max-time 10 $h2 '$base/big?n=20000' 2>/dev/null`;
-        skip 'this Hyperman truncates an HTTP/2 stream body over 16384 bytes',
-            1 unless length($probe) == 20_000 + 3;
         my $out = `curl -s --max-time 20 $h2 '$base/big' 2>/dev/null`;
+        skip 'this Hyperman truncates an HTTP/2 stream body', 1
+            if length($out) != 6_000_000 + 5
+            && !eval { Hyperman->VERSION('0.59'); 1 };
         is(length $out, 6_000_000 + 5,
            'a write, drain, wait loop delivers the whole body over h2');
     }
@@ -351,18 +395,37 @@ SKIP: {
         is($body, "data: one\n\ndata: two\n\n", '...and the events arrive');
     }
 
-    {   # Backpressure on the stream handle. The client is held to 4 MB a
-        # second and each write is 2 MB, so the server is holding output when
-        # drain is asked for - and drain has to say so, or the loop in the
-        # handler never waits and the server buffers the whole export.
-        my $out = `curl -sk --http1.1 --max-time 20 --limit-rate 4M '$base/big' 2>/dev/null`;
-        my ($states) = $out =~ /\n([rp]{3})\n\z/;
+    {
+        my $out = `curl -sk --http1.1 --max-time 20 '$base/big' 2>/dev/null`;
         is(length $out, 6_000_000 + 5,
            'a body larger than the connection takes at once arrives whole');
-        like($states // '', qr/p/,
-             '...and drain was pending while the server held it, so the '
-           . 'producer waited instead of buffering the lot')
-            or diag 'drain states: ' . ($states // 'none');
+    }
+
+    {   # Backpressure on the stream handle. A client that reads slowly is
+        # not enough to ask the question: how much the kernel takes off the
+        # server's hands before drain is called is the kernel's business, and
+        # on some it is the whole write. This client does not read at all -
+        # s_client stops taking from the socket once the pipe it prints to is
+        # full, and nothing empties that pipe - so the server is holding
+        # output when drain is asked for, and drain has to say so, or the
+        # loop in the handler never waits and the server buffers the lot.
+        my ($pid2, $in, $out) = stalled_client($port, '/press');
+        my $state = '';
+        for (1 .. 100) {
+            if (open my $fh, '<', $PRESS) {
+                $state = <$fh> // '';
+                close $fh;
+                last;
+            }
+            select undef, undef, undef, 0.1;
+        }
+        is($state, 'p',
+           'drain is pending while the server holds output for a client '
+         . 'that is not reading');
+        if ($pid2) {
+            kill 'KILL', $pid2;
+            waitpid $pid2, 0;
+        }
     }
 
     kill 'TERM', $pid;

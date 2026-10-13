@@ -10,6 +10,20 @@
 #   COND_INV_354_2:
 #       NWC.pm line 365, sub decode -- "if" inverted to "unless" on the
 #       utf8::decode() check, flipping which encoding path fires.
+#
+# Fermata annotation mutants (_annotate_fermatas in MusicXML.pm):
+#
+#   COND_INV_FERMATA_STYLE:
+#       Remove/invert the `eq 'Fermata'` guard -> non-Fermata TempoVariance
+#       would annotate the next note.
+#
+#   PENDING_FLAG_CLEAR:
+#       Never clear $pending_fermata -> every note after the first TV:Fermata
+#       would get annotated.
+#
+#   PREV_NOT_NEXT:
+#       Annotate the previous note instead of the next -> fermata on the
+#       wrong note.
 
 use strict;
 use warnings;
@@ -21,6 +35,9 @@ use Readonly;
 use lib 'lib';
 use Music::NWC2MusicXML::Event;
 use Music::NWC2MusicXML::NWC;
+use Music::NWC2MusicXML::MusicXML;
+use Music::NWC2MusicXML::Score;
+use Music::NWC2MusicXML::Staff;
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -202,6 +219,79 @@ subtest 'COND_INV_354_2: Latin-1 NWCTXT triggers encoding warning and returns co
 		'Latin-1 NWCTXT: content is still returned after fallback';
 
 	diag "Latin-1 warning: $enc_warns[0]" if $ENV{TEST_VERBOSE} && @enc_warns;
+};
+
+# ---------------------------------------------------------------------------
+# Fermata annotation mutant killers
+# ---------------------------------------------------------------------------
+
+# Helper: build a score XML from an event list, returning the XML string.
+sub _score_xml_from_events {
+	my (@events) = @_;
+	my $staff = Music::NWC2MusicXML::Staff->new(name => 'Test');
+	$staff->set_initial_clef('Treble');
+	$staff->set_initial_key({ signature => 'C', tonic => 'C', fifths => 0 });
+	$staff->set_initial_timesig({ beats => 4, beat_type => 4 });
+	$staff->add_event($_) for @events;
+	$staff->add_event(Music::NWC2MusicXML::Event->new(
+		type => 'Bar', data => { style => 'normal' }));
+	my $score = Music::NWC2MusicXML::Score->new;
+	$score->add_staff($staff);
+	return Music::NWC2MusicXML::MusicXML->new->generate($score);
+}
+
+sub _mk_tv_fermata {
+	Music::NWC2MusicXML::Event->new(
+		type => 'TempoVariance',
+		data => { style => 'Fermata', placement => 'above' });
+}
+
+sub _mk_note {
+	Music::NWC2MusicXML::Event->new(
+		type => 'Note', duration => [1, 4],
+		data => { nwc_pos => '0', base_dur => '4th', dots => 0,
+		          articulations => [], opts => {} });
+}
+
+# COND_INV_FERMATA_STYLE: the `eq 'Fermata'` guard must reject non-Fermata styles.
+# Mutation: remove the style check -> Ritardando would also annotate the next note.
+# Kill: Ritardando before a note -> no <fermata/> in output.
+subtest 'COND_INV_FERMATA_STYLE: non-Fermata TempoVariance does not emit fermata' => sub {
+	my $tv_rit = Music::NWC2MusicXML::Event->new(
+		type => 'TempoVariance',
+		data => { style => 'Ritardando', placement => 'above' });
+	my $xml = _score_xml_from_events($tv_rit, _mk_note());
+	unlike $xml, qr/<fermata\/>/, 'Ritardando before note: no <fermata/> emitted';
+	like   $xml, qr/<words[^>]*>rit\./, 'Ritardando still emits rit. words direction';
+};
+
+# PENDING_FLAG_CLEAR: $pending_fermata must be cleared after annotating one note.
+# Mutation: never clear the flag -> all subsequent notes also get <fermata/>.
+# Kill: TV:Fermata -> note1 -> note2: only note1 has <fermata/>, note2 does not.
+subtest 'PENDING_FLAG_CLEAR: fermata annotates only the immediately following note' => sub {
+	my $gen   = Music::NWC2MusicXML::MusicXML->new;
+	my $tv    = _mk_tv_fermata();
+	my $note1 = _mk_note();
+	my $note2 = _mk_note();
+	my %ann;
+	$gen->_annotate_fermatas([$tv, $note1, $note2], \%ann);
+	ok  $ann{"$note1"}{fermata},  'note1 (immediately after TV:Fermata) gets fermata';
+	ok !$ann{"$note2"}{fermata},  'note2 (second after TV:Fermata) does NOT get fermata';
+};
+
+# PREV_NOT_NEXT: the fermata must go on the note AFTER the TV:Fermata record,
+# not the note before it.
+# Mutation: annotate $last_sounding_key (previous) instead of next -> wrong note.
+# Kill: note1 -> TV:Fermata -> note2: note2 gets <fermata/>, note1 does not.
+subtest 'PREV_NOT_NEXT: fermata annotates the note AFTER the TempoVariance record' => sub {
+	my $gen   = Music::NWC2MusicXML::MusicXML->new;
+	my $note1 = _mk_note();
+	my $tv    = _mk_tv_fermata();
+	my $note2 = _mk_note();
+	my %ann;
+	$gen->_annotate_fermatas([$note1, $tv, $note2], \%ann);
+	ok !$ann{"$note1"}{fermata}, 'note1 (before TV:Fermata) does NOT get fermata';
+	ok  $ann{"$note2"}{fermata}, 'note2 (after TV:Fermata) gets fermata';
 };
 
 done_testing();

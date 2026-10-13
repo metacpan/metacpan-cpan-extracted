@@ -140,4 +140,19 @@ like($@, qr/validation failed/, 'a missing required title croaks before the inse
         'a different dsn -> a separate connection');
 }
 
+# ---- the pooled handle is safe to inherit across a fork ----------------------
+# A worker that finds a handle its parent opened connects for itself, which
+# frees the inherited one. Without AutoInactiveDestroy that free tells the
+# server goodbye on a socket the parent is still using.
+{
+    ok($model->backend->dbh->{AutoInactiveDestroy},
+        'the pooled handle has AutoInactiveDestroy');
+    my $odir = File::Temp->newdir;         # its own dsn, so its own handle
+    my $own = T::Model::Book->_instantiate({
+        dsn  => "dbi:SQLite:dbname=$odir/own.db",
+        attr => { AutoInactiveDestroy => 0 } });
+    ok(!$own->backend->dbh->{AutoInactiveDestroy},
+        '...unless the application says otherwise');
+}
+
 done_testing();

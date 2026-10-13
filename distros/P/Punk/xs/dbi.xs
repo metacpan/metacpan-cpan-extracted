@@ -84,6 +84,7 @@ get(self, ...)
                             pdbi_get(aTHX_ pdbi_hv(aTHX_ self), "table"), keys);
         SV *sql  = pdbi_sql_cached(aTHX_ slot, sig, NULL);
         SV *sth, *row;
+        pdbq_check_keys(aTHX_ self, keys, "Punk::Model::DBI", "get");
 
         /* the statement is the same for every get on these key columns, so it
          * is built once and only the bind values change */
@@ -399,6 +400,7 @@ delete(self, ...)
                             pdbi_get(aTHX_ pdbi_hv(aTHX_ self), "table"), keys);
         SV *sql  = pdbi_sql_cached(aTHX_ slot, sig, NULL);
         SV *sth, *n;
+        pdbq_check_keys(aTHX_ self, keys, "Punk::Model::DBI", "delete");
 
         if (sql) pdbi_bind_keys(aTHX_ key, keys, bind);
         else {

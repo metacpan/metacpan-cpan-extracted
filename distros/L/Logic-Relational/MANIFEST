@@ -11,10 +11,13 @@ examples/family.pl
 examples/generators.pl
 examples/list_member.pl
 examples/monkey.pl
+examples/Murdoku.pl
+examples/network.pl
 examples/populations.pl
 examples/rbac_policy_engine.pl
 examples/route_finder.pl
 examples/stdlib_demo.pl
+examples/tabling_and_cycles.pl
 examples/temporary_and_expiring.pl
 ignore.txt
 lib/Logic/Relational.pm
@@ -32,6 +35,7 @@ lib/Logic/Relational/Goal/Call.pm
 lib/Logic/Relational/Goal/CellAt.pm
 lib/Logic/Relational/Goal/ConstraintFD.pm
 lib/Logic/Relational/Goal/Domain.pm
+lib/Logic/Relational/Goal/EndCall.pm
 lib/Logic/Relational/Goal/Fail.pm
 lib/Logic/Relational/Goal/GeneratorStep.pm
 lib/Logic/Relational/Goal/Guard.pm
@@ -56,6 +60,8 @@ lib/Logic/Relational/Variable.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
+META.json			Module JSON meta-data (added by MakeMaker)
+META.yml			Module YAML meta-data (added by MakeMaker)
 README
 t/00-load.t
 t/01-atom.t
@@ -91,9 +97,8 @@ t/30-expiring-events-and-mutations.t
 t/31-query-all-results.t
 t/32-not-member.t
 t/33-boolean-queries.t
+t/34-tabling-and-cycles.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
 xt/boilerplate.t
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

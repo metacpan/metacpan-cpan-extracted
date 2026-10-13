@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README.md
+docs/comparison.md
+docs/validation.md
+examples/article.html
+lib/HTML/Anchor/Audit.pm
+script/html-anchor-audit
+t/01-audit.t
+t/02-cli.t
+t/03-pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

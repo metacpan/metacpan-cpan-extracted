@@ -203,7 +203,7 @@ CPAN: DBD-DB2-1.86.tar
 
 
 *** TESTING:
-
+	Set the DB2_USER & DB2_PASSWD as env variable. If the same is not set, it will be picked from connection.pl
     All Platforms:
     Edit the file connection.pl in the folder tests so that it looks like the following:
 

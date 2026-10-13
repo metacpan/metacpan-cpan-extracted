@@ -3,7 +3,7 @@
 require 5.010001;
 use strict;
 package Stats::LikeR;
-our $VERSION = '0.3216';	# quoted: a bare version ending in 0, such as 0.320, is the number 0.32, which the dist would be named
+our $VERSION = '0.3217';	# quoted: a bare version ending in 0, such as 0.320, is the number 0.32, which the dist would be named
 require XSLoader;
 use warnings FATAL => 'all';
 use Exporter 'import';
@@ -1859,12 +1859,17 @@ sub chunk {
 # filter DSL: col() builds a predicate via overloading (pure Perl)
 # col('name') returns an overloaded object; comparing it (col('age') >= 18) or
 # combining comparisons with & | ! builds a predicate that carries its per-row
-# test in a {code} closure. filter() (XS) unwraps that closure, so col() and a
-# plain coderef share one evaluation path -- no XS evaluator, no Carp.
+# test in a {code} closure, and -- when C can reproduce it exactly -- in a
+# {plan} that filter() (XS) compiles and runs without calling the closure.
 #
 # Rules: numeric ops > < >= <= == != compare as numbers; string ops gt lt ge le
 # eq ne compare as strings; & | ! combine; operands may be in either order; a
 # missing/undef cell (and, for numeric ops, a non-numeric cell) never matches.
+#
+# Every predicate also carries {cols}, the distinct column names it reads, in
+# the order they first appear. filter() checks them against the frame before
+# testing a row, so a misspelt column dies instead of quietly keeping nothing
+# (or, under !, everything).
 sub col { Stats::LikeR::col::_new(@_) }
 {
 	package Stats::LikeR::col;
@@ -1887,13 +1892,35 @@ sub col { Stats::LikeR::col::_new(@_) }
 		'|'	 => sub { _logic($_[0], '|', $_[1]) },
 		'!'	 => sub { _not($_[0]) },
 		'""'   => sub { 'Stats::LikeR::col predicate' },
-		'bool' => sub { 1 },
+		# A predicate has no truth value of its own. Up to 0.3216 this returned
+		# 1, so col('a') > 1 && col('b') > 2 -- && and || test their left
+		# operand for truth -- quietly became just col('b') > 2.
+		'bool' => sub {
+			die "col(): a predicate has no truth value; combine predicates with & | ! "
+			  . "(not && || and or), e.g. (col('x') > 0) & (col('y') < 5)\n";
+		},
 		fallback => 0;
 
 	sub _new {
 		my ($name) = @_;
 		die "col(): expects a single column name\n" if !defined($name) || ref $name;
 		return bless { name => $name }, __PACKAGE__;
+	}
+
+	# The operand of a comparison may not be another column: up to 0.3216
+	# col('x') > col('y') compared every cell with the col object, whose own
+	# overloaded > returned a (true) predicate, and so kept every numeric row.
+	sub _literal {
+		my ($op, $other) = @_;
+		die "col(): '$op' compares a column with a value, not with another column; "
+		  . "use a sub, e.g. sub { \$_->{x} $op \$_->{y} }\n"
+			if blessed($other) && $other->isa(__PACKAGE__);
+	}
+
+	# the distinct names in two {cols} lists, first appearance first
+	sub _cols_union {
+		my %seen;
+		return [ grep { !$seen{$_}++ } map { @{ $_ || [] } } @_ ];
 	}
 
 	my %NUM = (
@@ -1931,13 +1958,14 @@ sub col { Stats::LikeR::col::_new(@_) }
 		my $name = $self->{name};
 		die "col(): the '$op' comparison must start from a bare column, e.g. col('x') $op ...\n"
 			unless defined $name;
+		_literal($op, $other);
 		my $f = $NUM{$op};
 		my $code = $swap
 			? sub { my $c = $_[0]{$name}; (defined($c) && looks_like_number($c)) ? ($f->($other, $c) ? 1 : 0) : 0 }
 			: sub { my $c = $_[0]{$name}; (defined($c) && looks_like_number($c)) ? ($f->($c, $other) ? 1 : 0) : 0 };
 		my $plan = (defined($other) && !ref($other) && looks_like_number($other))
 			? [ $P_NUM, $NUM_ID{$op}, $name, $other, ($swap ? 1 : 0) ] : undef;
-		return bless { code => $code, ($plan ? (plan => $plan) : ()) }, __PACKAGE__;
+		return bless { code => $code, cols => [ $name ], ($plan ? (plan => $plan) : ()) }, __PACKAGE__;
 	}
 
 	# string comparison: undef cells never match
@@ -1946,13 +1974,14 @@ sub col { Stats::LikeR::col::_new(@_) }
 		my $name = $self->{name};
 		die "col(): the '$op' comparison must start from a bare column, e.g. col('x') $op ...\n"
 			unless defined $name;
+		_literal($op, $other);
 		my $f = $STR{$op};
 		my $code = $swap
 			? sub { my $c = $_[0]{$name}; defined($c) ? ($f->($other, $c) ? 1 : 0) : 0 }
 			: sub { my $c = $_[0]{$name}; defined($c) ? ($f->($c, $other) ? 1 : 0) : 0 };
 		my $plan = (defined($other) && !ref($other))
 			? [ $P_STR, $STR_ID{$op}, $name, $other, ($swap ? 1 : 0) ] : undef;
-		return bless { code => $code, ($plan ? (plan => $plan) : ()) }, __PACKAGE__;
+		return bless { code => $code, cols => [ $name ], ($plan ? (plan => $plan) : ()) }, __PACKAGE__;
 	}
 
 	sub _logic {
@@ -1968,7 +1997,8 @@ sub col { Stats::LikeR::col::_new(@_) }
 			: sub { ($lc->($_[0]) || $rc->($_[0])) ? 1 : 0 };
 		my $plan = ($self->{plan} && $other->{plan})
 			? [ ($op eq '&' ? $P_AND : $P_OR), $self->{plan}, $other->{plan} ] : undef;
-		return bless { code => $code, ($plan ? (plan => $plan) : ()) }, __PACKAGE__;
+		return bless { code => $code, cols => _cols_union($self->{cols}, $other->{cols}),
+		               ($plan ? (plan => $plan) : ()) }, __PACKAGE__;
 	}
 
 	sub _not {
@@ -1977,7 +2007,7 @@ sub col { Stats::LikeR::col::_new(@_) }
 		die "col(): the operand of '!' is not a comparison (build it like !(col('x') > 0))\n"
 			unless ref $c eq 'CODE';
 		my $plan = $self->{plan} ? [ $P_NOT, $self->{plan} ] : undef;
-		return bless { code => sub { $c->($_[0]) ? 0 : 1 },
+		return bless { code => sub { $c->($_[0]) ? 0 : 1 }, cols => _cols_union($self->{cols}),
 		               ($plan ? (plan => $plan) : ()) }, __PACKAGE__;
 	}
 
@@ -2000,7 +2030,7 @@ sub col { Stats::LikeR::col::_new(@_) }
 			return 0 unless defined $c;
 			return ( ($c =~ $qr) ? 1 : 0 ) == $want ? 1 : 0;
 		};
-		return bless { code => $code }, __PACKAGE__;
+		return bless { code => $code, cols => [ $name ] }, __PACKAGE__;
 	}
 	sub match   { _match($_[0], $_[1], 1, 'match') }
 	sub nomatch { _match($_[0], $_[1], 0, 'nomatch') }
@@ -6388,7 +6418,7 @@ Stats::LikeR - Get basic statistical functions, like in R, but with Perl using X
 
 =head1 VERSION
 
-version 0.3216
+version 0.3217
 
 =head1 Synopsis
 
@@ -6418,6 +6448,9 @@ C<bedroc()> before C<h> is ever reached. Use one of the three forms above.
 =head2 add_data
 
 Add data to an existing hash or array reference. This function acts as the equivalent of adding new rows, as well as an C<ljoin> (described below). It dynamically infers your target data structure, handles deeply nested records, and seamlessly coerces mismatched data shapes to preserve the structural integrity of your primary reference.
+
+Every value added is a copy, as with C<ljoin>: changing the target afterwards
+does not change the source.
 
 =head3 Hash of Hashes (HoH)
 
@@ -7778,7 +7811,8 @@ C<0.5> is a coin flip.
 
 Options: C<positive> (which label is the positive class, default C<1>) and
 C<direction> (C<< 'E<gt>' >> = higher score is more positive, the default; C<< 'E<lt>' >> flips it).
-For the full curve and a confidence interval, see L<C<roc>|/"roc">.
+Missing values are handled as in L<C<roc>|/"roc">. For the full curve and a
+confidence interval, see L<C<roc>|/"roc">.
 
 =head2 auroc
 
@@ -7795,7 +7829,9 @@ C<direction> (C<< 'E<lt>' >> treats a lower score as more positive, i.e. the sam
 sklearn's C<roc_auc_score(y, -pred)>). It can also turn a numeric column into
 labels for you: C<< cutoff =E<gt> x >> marks values C<< E<gt>= x >> as positive, or
 C<< active_frac =E<gt> 0.1 >> with C<< active_side =E<gt> 'low'|'high' >> takes that fraction of
-the extreme tail as positive.
+the extreme tail as positive. A case whose score or truth value is missing
+(C<undef>, C<NaN> or a hole) is dropped before the column is split, so the
+fraction is a fraction of the complete cases.
 
 =head2 avals
 
@@ -7869,8 +7905,9 @@ machine precision in a single line.
 
 =item * B<< C<alpha> >> — early-recognition weight, must be C<< E<gt> 0 >> (default C<20>).
 
-=item * B<< C<positive> >> — label value that marks an active, compared as a string
-(default C<1>). Ignored when C<cutoff> is given.
+=item * B<< C<positive> >> — label value that marks an active, compared as C<eq>
+compares (default C<1>), so a UTF-8 string and its byte-string spelling are
+the same label. Ignored when C<cutoff> or C<active_frac> is given.
 
 =item * B<< C<cutoff> >> — instead of class labels, treat the second array as a numeric
 column and count an item as active when its value is B<< C<< E<gt>= cutoff >> >>. Handy
@@ -7889,12 +7926,32 @@ the B<largest> values active (matching C<cutoff>'s C<< E<gt>= >> sense); C<'low'
 the B<smallest> (e.g. actives = strongest binders when the column is ΔG).
 
 =item * B<< C<direction> >> — C<< 'E<gt>' >> (default) means a higher score ranks first; C<< 'E<lt>' >>
-flips it so lower scores rank first.
+flips it so lower scores rank first. Anything else is a fatal error.
 
 =item * B<< C<top> >> (alias C<fraction>) — a fraction in C<(0, 1]>. When given, the result
 also reports classic enrichment in the top slice of the ranking (see below).
 
 =back
+
+Options come in C<< key =E<gt> value >> pairs; a key with no value is a fatal error.
+
+=head3 Missing values
+
+A case whose score is C<undef> or C<NaN>, or whose label is C<undef>, is dropped,
+as pROC's C<roc()> drops it, and C<n> counts the cases that remain. With
+C<cutoff> or C<active_frac>, a label that is C<NaN> is dropped too, before the
+actives are chosen, so C<active_frac> takes its fraction of the complete cases.
+A score or a numeric label that is not a number is a fatal error.
+
+=head3 Accuracy
+
+The score is evaluated in a form algebraically equal to Truchon & Bayly's
+eq. 36 that neither cancels nor overflows, so it is good to the last digit or
+two for any C<alpha> from about C<1e-8> to well past C<1000>; written as the
+paper writes it, the formula had lost every digit by C<alpha = 1e-6> and
+overflowed to C<NaN> by C<alpha = 1500>. C<t/bedroc.mpmath.t> checks C<bedroc>,
+C<rie>, C<rie_min> and C<rie_max> against the paper's formula in 60-digit
+arithmetic over that range.
 
 =head3 Result keys
 
@@ -7916,6 +7973,11 @@ C<rie> rescaled onto C<[0, 1]>.
 C<fraction>, C<n_top> (compounds in the top slice, C<ceil(top * n)>),
 C<active_count> (actives found there), C<expected> (actives expected by chance,
 C<ra * n_top>), and C<enrichment_factor> (C<(active_count / n_top) / ra>).
+When a run of tied scores straddles the edge of the top slice, its actives
+count in proportion to how much of the run lies inside, which is the
+expected count over every order of the tied cases. C<active_count> can then
+be fractional: C<< bedroc([5,5,5,5], [1,0,0,0], top =E<gt> 0.25) >> reports 0.25,
+and so does the same call with the labels in any other order.
 
 =back
 
@@ -8524,6 +8586,14 @@ Each 2×2 uses the same layout as L<C<epi_2x2>|/"epi_2x2">. Options: C<correct>
 result also has C<statistic> (chi-squared), C<parameter> (df = 1), C<conf_int> (for
 the common OR), and C<k> (number of strata).
 
+As in R, the continuity correction of 0.5 is applied only when the observed
+count is at least 0.5 away from its expectation, and C<method> says whether it
+was ("with" or "without continuity correction"). A cell that is C<NaN> or
+infinite is a fatal error, as C<NA> is in R. Degenerate tables give what R
+gives: when every stratum has zero variance the statistic and p-value are
+C<NaN>, and when no stratum has off-diagonal counts the common odds ratio is
+C<Inf>.
+
 =head2 cohen_d
 
 Cohen's I<d> effect size for the difference between two independent groups, using
@@ -9045,6 +9115,26 @@ Just like R, C<pearson>, C<spearman>, and C<kendall> are available
 
 If you provide an array of arrays (a matrix), C<cor> will compute the correlation matrix automatically. 
 
+ my $r  = cor(\@x, \@y, 'spearman');       # a number
+ my $R  = cor(\@rows);                     # p x p matrix, AoA of rows
+ my $Rs = cor(\@rows, undef, 'kendall');   # leave y out with undef
+ my $C  = cor(\@xrows, \@yrows);           # p x q cross-correlation
+
+To pass a method without a C<y>, leave C<y> as C<undef>: C<cor(\@x, 'spearman')>
+croaks rather than reading the method as C<y>. When C<x> is a matrix, C<y> must be
+a matrix with the same number of rows, or C<undef>; a flat C<y> beside a matrix
+C<x> croaks (R would return a p x 1 matrix).
+
+Missing values follow R's default, C<use = "everything">: an C<undef> or
+non-numeric cell makes every correlation it takes part in C<NaN>, under all three
+methods. Use C<cor_test>, or drop the incomplete pairs yourself, to get the
+complete-case answer. A matrix's diagonal is 1 even for a column that holds a
+missing value, as in R.
+
+Two cases differ from R on purpose. A column with no variance croaks (R
+returns C<NA> with a warning), as does a matrix with fewer than two rows; and
+C<cor(\@x)> on a single vector returns 1, where R requires a C<y>.
+
 =head2 cor_test
 
  my $result = cor_test(
@@ -9054,6 +9144,9 @@ If you provide an array of arrays (a matrix), C<cor> will compute the correlatio
          method      => 'pearson',
          continuity  => 1
      );
+
+or, with C<x> and C<y> first and unnamed, C<< cor_test($x, $y, method =E<gt> 'kendall') >>.
+The two forms are the same call; before 0.3217 only the second was accepted.
 
 C<cor_test> safely handles C<undef> (or C<NA>) values seamlessly by computing over pairwise complete observations. 
 
@@ -9477,7 +9570,8 @@ arguments. R's C<warnWbw> is accepted as well as C<warn_wbw>.
 
 =item * B<< C<x> >> — the sample, an array reference. Required (except with
 C<give_rkern>). A missing value (C<undef> or C<NaN>) is an error unless
-C<na_rm> is set; anything else non-numeric is always an error. An infinite
+C<na_rm> is set; anything else non-numeric is always an error. A sample with
+no values left once the missing ones are gone is an error too, as it is in R. An infinite
 observation is treated as a point mass at ±∞, so it is counted in C<n> and
 takes its share of the mass with it, leaving a sub-density on (−∞, ∞).
 
@@ -9508,7 +9602,7 @@ C<bw> is not given. A string names a rule, exactly as C<bw> does.
 
 =item * B<< C<weights> >> — an array reference of non-negative observation weights, one
 per element of C<x> — including the missing ones, so it is always the same
-length as C<x> was to begin with. The default is C<1/nx> each. Weights that do
+length as C<x> was to begin with. A weight that is not a number is an error. The default is C<1/nx> each. Weights that do
 not sum to 1 give a I<sub>-density and draw a warning; pass C<< subdensity =E<gt> 1 >>
 if that is what you meant. If C<na_rm> removes observations and the original
 weights summed to one, the survivors are rescaled so they still do.
@@ -9589,10 +9683,13 @@ A hash reference:
 =over
 
 =item * B<< C<x> >> — the C<n> grid points at which the density was estimated, an array
-reference, strictly increasing from C<from> to C<to>.
+reference, evenly spaced from C<from> to C<to>: increasing as usual, and
+decreasing if C<from> is greater than C<to>.
 
 =item * B<< C<y> >> — the estimated density there, an array reference of the same
-length. Never negative, though it can be zero.
+length. Never negative, though it can be zero. It is C<NaN> at any point
+outside the internal grid, which can happen only when C<from> is greater than
+C<to>; R gives C<NA> there.
 
 =item * B<< C<bw> >> — the bandwidth actually used, i.e. C<adjust> times whatever C<bw>
 resolved to. Worth reading back when a rule chose it.
@@ -9662,6 +9759,12 @@ counts, 1000 by default), C<lower> and C<upper> (the range searched) and C<tol>
 (where the search stops, C<0.1 * lower> by default). Unlike C<density>, these
 five want a clean numeric sample: a missing or infinite value is an error, not
 something to drop.
+
+C<bw_sj> widens its search interval, as R's C<bw.SJ> does, when the root is not
+inside it and either bound was left to its default; only with both C<lower> and
+C<upper> given is a bracket without the root an error ("no solution in the
+specified range of bandwidths"). So C<< bw_sj(\@x, upper =E<gt> 0.05) >> answers as
+C<bw.SJ(x, upper = 0.05)> does, by widening past 0.05 if it has to.
 
 Validated against R 4.6.1 — its own regression suite, the examples in
 C<?density> and C<?bw.nrd>, and their pinned output — by C<t/density.R.scipy.t>,
@@ -10188,7 +10291,14 @@ numerically against the canonical formula computed in base R.
  }
 
 Values and groups are given as two parallel arrays; observations with a missing
-value or group are dropped.
+value or group are dropped. Each p-value is taken from the normal tail
+directly, C<2 * pnorm(-|Z|)>, so it stays accurate far out: values 1..200 split
+into two groups of 100 give C<Z> = -12.22 and p = 2.5e-34, as R does.
+
+A p-value that cannot be computed -- every value tied, say, so that there is
+no variance to scale by -- is C<NaN>, and so is its adjusted p-value, as R's
+C<p.adjust()> keeps C<NA> as C<NA>; the other p-values are adjusted as a family of
+the ones that are not C<NaN>, again as C<p.adjust()> does.
 
 =head3 Input Parameters
 
@@ -10294,7 +10404,9 @@ Pass the four counts (or a C<[a,b,c,d]> / C<[[a,b],[c,d]]> array ref):
  print "@{ $r->{'odds_ratio_ci'} }"; # 0.895 3.285
 
 Options: C<conf_level> (default C<0.95>) and C<correct> (add 0.5 to every cell,
-done automatically when a cell is 0). Result keys: C<odds_ratio>, C<risk_ratio>,
+done automatically when a cell is 0). Every cell must be a finite,
+non-negative number in either call form; anything else is a fatal error that
+names the cell. Result keys: C<odds_ratio>, C<risk_ratio>,
 C<risk_diff> (each with a matching C<*_ci>), C<risk_exposed>, C<risk_unexposed>, and
 C<nnt>. For a significance test use L<C<fisher_test>|/"fisher_test"> or
 L<C<chisq_test>|/"chisq_test">; to adjust across strata use L<C<cmh_test>|/"cmh_test">.
@@ -10513,11 +10625,17 @@ Predicates compose with bitwise C<&> (and), C<|> (or), and C<!> (not):
 
 Comparison operators bind more tightly than C<&> and C<|>, so C<< (col('a') E<gt> 4) & (col('b') E<lt> 2) >> is parsed correctly, but the parentheses are recommended for readability.
 
-A C<col()> expression is also the quick way to say it: C<filter> compiles the whole expression once and tests every row in C, without building a row hash or calling into Perl at all, which on a large frame is several times faster than the equivalent C<sub>. What C<col()> cannot express — a C<< -E<gt>match >> regex, an operand that is an object — is evaluated the same way a C<sub> is, one call per row.
+Combine with C<&> C<|> C<!> only. C<&&>, C<||>, C<and> and C<or> ask whether their left operand is true, and a predicate has no truth value, so they die; until 0.3217 C<< col('a') E<gt> 4 && col('b') E<lt> 2 >> quietly meant C<< col('b') E<lt> 2 >>. A predicate in any other boolean context (C<< if (col('a') E<gt> 4) >>) dies the same way.
+
+B<< Every column a C<col()> predicate names must be in the frame. >> C<filter> checks them before it tests a row, and dies with C<filter: column 'agee' not found in data> when one is not, as R's C<< subset(df, agee E<gt> 18) >> does. Until 0.3217 a misspelt column read as C<undef> in every row, so C<< col('agee') E<gt> 18 >> kept nothing and C<< !(col('agee') E<gt> 18) >> kept everything, without a word. A HoA has a column when it has the key, even with no rows; an AoH or HoH has it when any row has it, so a column that only some rows carry is fine. An AoH or HoH with no rows names no columns and is not checked. A code reference names no columns either, so C<< sub { $_-E<gt>{agee} E<gt> 18 } >> cannot be checked and still reads C<undef>.
+
+A C<col()> expression is also the quick way to say it: C<filter> compiles the whole expression once and tests every row in C, without building a row hash or calling into Perl at all, which on a large frame is several times faster than the equivalent C<sub>. What C<col()> cannot express — a C<< -E<gt>match >> regex, an operand that is an object — is evaluated the same way a C<sub> is, one call per row. A I<cell> that is an object with overloaded operators (a C<Math::BigInt>, say) is compared by its own class, exactly as a C<sub> would compare it: C<filter> hands that row to the same per-row call, and every other row stays in C. Until 0.3217 the C test took such a cell for a non-number, so C<< col('x') E<gt> 2 >> dropped a C<Math::BigInt> 5.
 
  > Note: C<< col('age') E<gt> 32 >> works because C<col('age')> is an object whose C<< E<gt> >> is overloaded. A B<bare string> cannot do this — C<< 'age' E<gt> 32 >> is computed by Perl to a plain boolean (the string numifies to 0) before C<filter> is ever called, so the column name is lost. Always wrap the column in C<col(...)>.
 
  > C<col()> addresses B<columns only> — it has no handle on a HoH's row name (the outer key). It also cannot express a regex match: there is no C<=~> operator to overload, so C<col('name') =~ /re/> runs the match immediately on the stringified object and never reaches C<filter>. For either case, use the code-reference form below.
+
+ > A C<col()> is compared with a B<value>, not with another column: C<< col('ALT') E<gt> col('AST') >> dies (until 0.3217 it kept every row with a numeric C<ALT>). Write it as C<< sub { $_-E<gt>{ALT} E<gt> $_-E<gt>{AST} } >>.
 
 =head3 The code-reference form
 
@@ -10538,7 +10656,9 @@ Return a true value to keep the row.
  filter($df, sub { $_->{age} % 2 == 0 });            # things col() has no operator for
  filter($df, sub { $_[0]{score} > $_[0]{threshold} });
 
-For a HoA there are no row hashes to hand over, so the sub is given a C<< { column =E<gt> value, ... } >> hash built for it, and the same C<< $_-E<gt>{column} >> syntax works regardless of the input shape. That hash is reused from row to row for as long as the sub only reads it; keeping the row (or a reference to one of its cells), or adding a key to it, makes C<filter> start a fresh one, so a row you hold on to is always yours alone. A C<col()> predicate needs no row hash at all.
+For a HoA there are no row hashes to hand over, so the sub is given a C<< { column =E<gt> value, ... } >> hash built for it, and the same C<< $_-E<gt>{column} >> syntax works regardless of the input shape. That hash is reused from row to row for as long as the sub only reads it; keeping the row (or a reference to one of its cells), or adding, deleting or replacing a key in it, makes C<filter> start a fresh one, so a row you hold on to is always yours alone. A C<col()> predicate needs no row hash at all.
+
+C<$_> and C<$_[0]> are a reference made for the call, so assigning to them (C<$_ = undef>) changes nothing outside the sub. Writing I<through> them (C<< $_-E<gt>{x} = 0 >>) does reach an AoH's or HoH's row, which is the caller's own hash.
 
 =head4 Filtering on the row name (C<$_[1]>)
 
@@ -10598,13 +10718,13 @@ The two selectable output types are C<'aoh'> and C<'hoa'>. C<'hoh'> is B<not> se
 
 =item * B<< The predicate receives the row identifier as C<$_[1]>. >> For a HoH it is the outer key (the row name); for an AoH or HoA it is the 0-based row index. In a HoH the row name lives in the I<key>, not inside each row hash, so C<< $_-E<gt>{row_name} >> is C<undef> — filter on C<$_[1]> instead. C<col()> expressions see only columns, never the row key.
 
-=item * B<< A missing or C<undef> cell never matches a C<col()> comparison. >> C<< col('x') E<gt> 0 >> silently drops any row whose C<x> is absent or C<undef>; for numeric operators a non-numeric cell is likewise dropped. With a coderef, C<undef> is whatever your sub makes of it.
+=item * B<< A missing or C<undef> cell never matches a C<col()> comparison. >> C<< col('x') E<gt> 0 >> silently drops any row whose C<x> is absent or C<undef>; for numeric operators a non-numeric cell is likewise dropped. With a coderef, C<undef> is whatever your sub makes of it. A column absent from I<every> row is a different matter: it dies (see above).
 
-=item * B<Rows are shared, not deep-copied, wherever possible.> When an AoH or HoH row is kept (output left as AoH/HoH, or converted to C<aoh>), the returned frame references the I<same> inner row hashes as the input. Mutating such a row in the result would also change it in the original. HoA inputs and any C<hoa> output build fresh arrays and fresh cell values.
+=item * B<Rows are shared, not deep-copied, wherever possible.> When an AoH or HoH row is kept (output left as AoH/HoH, or converted to C<aoh>), the returned frame references the I<same> inner row hashes as the input. Mutating such a row in the result would also change it in the original. The references to them are the result's own, so replacing a whole row (C<< $out-E<gt>[0] = {...} >>) leaves the input alone; until 0.3217 it replaced the input's row too. HoA inputs and any C<hoa> output build fresh arrays and fresh cell values.
 
 =item * B<Keep-all / keep-none are well defined.> A predicate true for every row returns the whole frame in the chosen shape; true for none returns an empty frame: C<[]> for C<aoh>, a hash of empty (but present) columns for C<hoa>, and C<{}> for C<hoh>.
 
-=item * B<Supported shapes are AoH, HoA, and HoH.> A non-reference, an AoH element that is not a hash reference, a HoA column that is not an array reference, or a HoH row that is not a hash reference all raise a descriptive error; a bare C<col('x')> with no comparison is also an error. An empty hash C<{}> is treated as an empty frame.
+=item * B<Supported shapes are AoH, HoA, and HoH.> A non-reference, an AoH element that is not a hash reference, a HoA column that is not an array reference, or a HoH row that is not a hash reference all raise a descriptive error; a bare C<col('x')> with no comparison is also an error, as are a C<col()> column that is not in the frame and a C<col()> compared with another C<col()>. An empty hash C<{}> is treated as an empty frame.
 
 =item * B<Perl 5.10 compatible.> The C<col()>/operator layer is pure Perl (operator overloading building a per-row closure); filtering and any reshaping run in XS.
 
@@ -10704,7 +10824,9 @@ was validated numerically against R.
 
 Input is a matrix (array of array refs) with B<one block/subject per row> and
 B<one treatment/condition per column>. Blocks (rows) containing any missing or
-non-numeric value are dropped, mirroring R's C<complete.cases>.
+non-numeric value are dropped, mirroring R's C<complete.cases>. At least two
+complete blocks must remain; with one, R's C<friedman.test> errors and so does
+this.
 
  #             cond1 cond2 cond3
  my $r = friedman_test([
@@ -11665,7 +11787,12 @@ Counts are of right-closed intervals with the lowest included — C<(a, b]>,
 except the first, which is C<[a₀, b₁]> — carrying R's 1e-7 fuzz, so a value that
 lands a rounding error above a breakpoint still counts in the bin below it.
 C<density> is C<counts / (n × width)> over the unfuzzed breaks. Pinned against R
-across thirteen datasets and eight C<breaks> settings in C<t/hist.R.t>.
+across seventeen datasets and eight C<breaks> settings in C<t/hist.R.t>,
+including four whose range is wider than the largest double, where the
+breaks are built as R builds them -- C<< hist([1.7e308, -1.7e308], breaks =E<gt> 4) >>
+gives C<-1.7e308, 0, 1.7e308>. On such a range C<mids> departs from R on purpose:
+R's C<0.5 * (a + b)> overflows to C<-Inf> or C<Inf>, and C<hist> gives the finite
+midpoint.
 
 =head2 hosmer_lemeshow
 
@@ -12458,6 +12585,9 @@ on a constant sample, which has no shape to report:
  kurtosis([7, 7, 7, 7]);
  # kurtosis: zero variance (all 4 values are equal), so kurtosis is undefined
 
+A C<NaN> or an infinite value is not an error: it makes the answer C<NaN>, as it
+does for C<skew>.
+
 =head3 See also
 
 L</"skew"> for the third moment, L</"sd"> and L</"var"> for the second,
@@ -12497,6 +12627,12 @@ in this case, running C<ljoin(\%h, \%i)> will modify \%h to result:
      dept   "Engineering"
  }
  }
+
+Each value is copied into C<%h>, as C<$h{$row}{$col} = $i{$row}{$col}> would copy
+it, so changing C<%h> afterwards leaves C<%i> alone. Up to 0.3217 the two hashes
+shared the value itself, and a write to C<$h{'Jack Smith'}{dept}> changed
+C<$i{'Jack Smith'}{dept}> too. A value that is a reference is copied as a
+reference, so what it points at is still shared.
 
 =head2 lm
 
@@ -12695,6 +12831,11 @@ Parameters do not need to be named, so that C<matrix> works more like R:
 
 works as C<data>, C<nrow>, and C<ncol>
 
+A matrix with more than 2^48 cells is refused, and so is one the C library
+will not allocate the memory for: both die with a message naming the
+dimensions, which C<eval> can catch, rather than reaching perl's own "Out of
+memory!", which it cannot.
+
 =head2 max
 
  max(1,2,3);
@@ -12729,7 +12870,16 @@ numerically against R.
 
 The first argument is either a square matrix (array of array refs) or, in the
 two-argument form, two equal-length vectors of paired observations that are
-cross-tabulated over their sorted union of levels.
+cross-tabulated over the union of their levels. A pair with either value
+missing is dropped first, as R's C<complete.cases()> drops it, so a level that
+appears only in such a pair does not enlarge the table. R refuses a pair of
+vectors whose level counts differ; this takes the union instead.
+
+Every cell of a matrix must be a finite, non-negative number; C<undef>, a
+string that is not a number and C<Inf> are fatal errors. The exact test also
+needs whole-number counts in the two discordant cells. A pair of discordant
+cells that are both 0 makes the statistic 0/0, which is C<NaN>, as it is in R:
+C<mcnemar_test([[5,0],[0,5]])> has statistic and p-value C<NaN>.
 
 =head3 Input Parameters
 
@@ -12829,6 +12979,13 @@ or
 
 mean will die if any undefined values are provided
 
+The sum behind it is compensated: the rounding error of every addition is
+carried along and added back, which is how C<mean> matches R's long-double
+accumulation on a perl whose NV is a double. C<mean([1e16, 1, -1e16, 1])> is
+0.5, as it is in R. A sum that overflows although no value is infinite is
+taken again with each value divided by the count first, so
+C<mean([1e308, 1e308])> is C<1e308>, again as in R.
+
 =head2 median
 
 works like mean, taking array references and arrays:
@@ -12836,6 +12993,9 @@ works like mean, taking array references and arrays:
  median( $test_data[$i][0] )
 
 median will die if any undefined values are provided
+
+For an even count the two middle values are averaged by halving each first
+when their sum would overflow, so C<median([1e308, 1e308])> is C<1e308>, as in R.
 
 =head2 melt
 
@@ -12963,6 +13123,9 @@ Takes either an array or an array reference, and returns an array of the most co
  @arr = mode([1,3,3,3]); # returns (3)
 
  @arr = mode('a','a','c','c','z'); # returns ('a', 'c')
+
+When several values tie for most common, they come back in the order each was
+first seen, whatever perl's hash seed is.
 
 =head2 ncol
 
@@ -13557,7 +13720,7 @@ omitting it entirely is how you ask for the power.
   <td><code>alternative</code></td>
   <td>String</td>
   <td><code>"two.sided"</code></td>
-  <td>One- or two-sided test: <code>"two.sided"</code>, <code>"one.sided"</code>, <code>"greater"</code>, or <code>"less"</code>.</td>
+  <td><code>"two.sided"</code>, <code>"one.sided"</code>, <code>"greater"</code>, or <code>"less"</code>. <code>"one.sided"</code> is R's one-sided test, against H1: delta &gt; 0, and <code>"greater"</code> is the same test. <code>"less"</code> is against H1: delta &lt; 0, so its power at <code>delta</code> is <code>"greater"</code>'s at <code>-delta</code>, and a <code>delta</code> solved for under <code>"less"</code> comes back negative. R's <code>power.t.test</code> has only <code>"two.sided"</code> and <code>"one.sided"</code>.</td>
 </tr>
 <tr>
   <td><code>strict</code></td>
@@ -13987,7 +14150,15 @@ Validated numerically against R.
  my $g = prop_test(83, 100, p => 0.7, alternative => 'greater', correct => 0);
 
 Pass successes and trials either as matching array references (one entry per
-group) or as two scalars for a single sample.
+group) or as two scalars for a single sample. A group whose count of successes
+or trials is missing -- C<undef>, a hole or C<NaN> -- is dropped, as R's
+C<complete.cases()> drops it, together with its entry in C<p>; anything else
+that is not a number is an error. Options come in C<< key =E<gt> value >> pairs, and a
+key with no value is an error.
+
+The one-sided p-values are taken from the normal tail itself, never as 1 minus
+the other tail, so they stay accurate far out:
+C<< prop_test(999, 1000, alternative =E<gt> 'greater') >> gives 1.8e-218, as R does.
 
 =head3 Input Parameters
 
@@ -14505,6 +14676,10 @@ C<Lonly(\@b, \@a)>; more generally C<Ronly(@refs)> equals C<Lonly(reverse @refs)
 Create a binomial distribution of numbers
 
  my $binom = rbinom( n => $n, prob => 0.5, size => 9);
+
+C<n>, C<size> and C<prob> are all required, as in R. C<prob> must be a number in
+C<[0, 1]>. As in R, a C<prob> of C<NaN> or a C<size> that is not a whole number
+gives C<NaN> for every draw, with the warning "rbinom: NAs produced".
 
 =head2 read_table
 
@@ -15259,6 +15434,13 @@ Make a normal distribution of numbers, with pre-set mean C<mean>, standard devia
  my ($rmean, $sd, $n) = (10, 2, 9999);
  my $normals = rnorm( n => $n, mean => $rmean, sd => $sd);
 
+The arguments may also be positional, in R's order, as C<runif> takes them:
+C<rnorm(10)>, C<rnorm(1e3)> and C<rnorm(10, 0, 1)> all work, and a positional
+C<n> may be mixed with named C<mean> and C<sd>. A C<mean> or C<sd> that is not a
+number is an error, and so is a negative C<sd>. As in R, an infinite C<sd> or a
+C<NaN> mean gives C<NaN> for every value, with the warning "rnorm: NAs
+produced", and an C<sd> of 0 or an infinite mean gives the mean itself.
+
 =head2 roc
 
 Build a ROC curve from predicted scores and 0/1 labels: the AUC (c-statistic)
@@ -15276,8 +15458,26 @@ well a score separates cases from non-cases.
 
 Options: C<positive> (positive-class label, default C<1>), C<direction> (C<< 'E<gt>' >>
 default, or C<< 'E<lt>' >>), C<conf_level> (default C<0.95>). Result keys: C<auc>, C<auc_se>,
-C<auc_ci>, C<n_pos>, C<n_neg>, C<youden>, and C<curve> (one point per threshold). For
+C<auc_ci>, C<n_pos>, C<n_neg>, C<n>, C<youden>, and C<curve> (one point per threshold). For
 just the number, use L<C<auc>|/"auc">.
+
+A label is positive when it is C<eq> to C<positive>; every other label is
+negative. The curve starts at the point where nothing is called positive and
+then has one point per distinct score, from the most positive down. With the
+default C<< direction =E<gt> 'E<gt>' >> a case is called positive when its score is at or
+above the threshold, and the first threshold is C<+Inf>. With C<< 'E<lt>' >> it is called
+positive at or below the threshold, the first threshold is C<-Inf>, and the
+thresholds rise through the scores. Either way they are the scores themselves,
+so they can be used as cut-offs directly.
+
+Missing values are dropped with their case, as R's pROC does by default
+(C<na.rm = TRUE>): a score that is C<undef>, C<NaN> or a hole in the array, and a
+label that is C<undef> or a hole. C<n>, C<n_pos> and C<n_neg> count the cases that
+were used. A score that is not a number dies, naming its index.
+
+C<auc_se> is DeLong's standard error, and C<auc_ci> is C<auc> plus or minus the
+normal quantile times it, clipped to C<[0, 1]>. When either class has a single
+case the DeLong variance is undefined, so both are C<NaN>, where pROC gives C<NA>.
 
 =head2 rownames
 
@@ -15340,6 +15540,9 @@ will make 9 numbers in [0,1]
 
 will match C<n>, C<min>, and C<max> respectively
 
+As in R, an infinite bound, or C<max> below C<min>, gives C<NaN> for every value,
+with the warning "runif: NAs produced".
+
 =head2 sample
 
 take a sample of hash or array slices.
@@ -15360,6 +15563,27 @@ Through 0.314 the two shapes disagreed about this and neither said so — a hash
 quietly returned fewer keys than were asked for, and an array padded the result
 out to C<n> with C<undef>, so C<sample([1,2,3], 10)> came back as three values and
 seven undefs that no caller could tell apart from real data.
+
+Three differences from R's C<sample()> are worth knowing:
+
+=over
+
+=item * C<n> defaults to B<1>, not to the size of the population, so C<sample(\@x)>
+draws one element where R's C<sample(x)> returns a permutation of all of
+them. Ask for C<scalar @x> to get one.
+
+=item * There is no C<replace> and no C<prob>: every draw is without replacement and
+equally likely.
+
+=item * The values in the result are copies, so changing them leaves the input
+alone. A value that is a reference is copied as a reference, as assignment
+copies it.
+
+=back
+
+The draw is a partial Fisher-Yates shuffle from perl's own PRNG, so
+C<srand($seed)> makes it reproducible, and it costs time and memory in
+proportion to C<n> rather than to the size of the population.
 
 =head2 scale
 
@@ -15684,6 +15908,9 @@ on a constant sample, which has no shape to report:
  skew([7, 7, 7, 7]);
  # skew: zero variance (all 4 values are equal), so skewness is undefined
 
+A C<NaN> or an infinite value is not an error: it makes the answer C<NaN>, as it
+makes every other reduction's answer C<NaN>.
+
 =head3 See also
 
 L</"kurtosis"> for the fourth moment, L</"sd"> and L</"var"> for the
@@ -15716,6 +15943,10 @@ which I prefer, compared to List::Util's required casting into an array:
 which passing a reference is shorter and much easier to read.  Stats::LikeR, however, will work for B<both>
 
 C<sum> will cause the script to die if any undefined values are provided
+
+C<sum> is compensated, as C<mean> is (see there), so C<sum([1e16, 1, -1e16, 1])>
+is 2, R's answer, where a plain left-to-right sum in a double gives 0. It
+costs about half a nanosecond more per element than a plain sum.
 
 =head3 Compared with List::Util
 
@@ -16284,7 +16515,10 @@ figure needs to change.
 =head2 transpose
 
 Transposes a two-dimensional data structure, swapping rows and columns. Accepts either an array of arrays or a hash of hashes.
-Returns a new reference of the same type; the input is never modified.
+Returns a new reference of the same type; the input is never modified. Every
+cell of the result is a copy, so writing to the result leaves the input alone;
+a cell that holds a reference is copied as a reference, as assignment copies
+it, so the thing it points at is shared.
 
 =head3 Array of array input
 
@@ -16528,7 +16762,14 @@ With a key, like C<a> for above, only values within that hash key are counted:
 
 the column, or second hash key, that you wish to count, is specified at the command line
 
-The two new subsections (Array of hashes, Array of arrays) are the only additions; everything else is unchanged. They're placed after the array-container forms to keep array inputs grouped, mirroring how Hash of array / Hash of hash sit together.
+=head3 Missing values
+
+An C<undef> value is skipped wherever it appears, including first in a flat
+list: C<value_counts(undef, 'a')> returns C<< { a =E<gt> 1 } >>, the same as
+C<value_counts('a', undef)>. A lone C<undef>, with nothing to count, is a fatal
+error. In an array of hashes or arrays, a missing or C<undef> row is skipped.
+Tied arrays are read through their C<FETCH>, so a tied array of hashes works
+as a plain one does.
 
 =head2 var
 
@@ -16542,6 +16783,11 @@ like C<min>, C<max>, etc., C<var> can accept array references, to make code simp
 
  my $ref = \@arr;
  var($ref) = var(@arr)
+
+C<var> follows R where the data reach the ends of the floating-point range: a
+variance too large to represent is C<Inf> (C<var([1e200, -1e200, 3e199])>), and
+equal values whose sum overflows still have a variance of C<0>
+(C<var([1e308, 1e308])>). C<sd> does the same.
 
 =head2 var_test
 
@@ -16561,6 +16807,92 @@ also, conf_level can be set:
 as well as a ratio (from R: the hypothesized ratio of the population variances of C<x> and C<y>:
 
  $test_data = var_test(\@xk, \@yk, ratio => 2);
+
+and the alternative hypothesis:
+
+ $vt = var_test(\@x, \@y, alternative => 'greater');
+
+=for html <table>
+<thead>
+<tr>
+  <th>Option</th>
+  <th>Default</th>
+  <th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>ratio</code></td>
+  <td><code>1</code></td>
+  <td>The hypothesised ratio of the variances of <code>x</code> and <code>y</code>. Must be positive and finite.</td>
+</tr>
+<tr>
+  <td><code>conf_level</code></td>
+  <td><code>0.95</code></td>
+  <td>Confidence level of the interval, strictly between 0 and 1.</td>
+</tr>
+<tr>
+  <td><code>alternative</code></td>
+  <td><code>'two.sided'</code></td>
+  <td><code>'two.sided'</code>, <code>'less'</code> or <code>'greater'</code>. Anything else is a fatal error.</td>
+</tr>
+</tbody>
+</table>
+
+C<x> and C<y> may be given positionally or as C<< x =E<gt> >> and C<< y =E<gt> >>. Only their
+finite numeric values are used, as R uses C<x[is.finite(x)]>; each needs at
+least two. Tied arrays are read through their C<FETCH>.
+
+The result is a hash reference with R's fields, with dots spelled as
+underscores:
+
+=for html <table>
+<thead>
+<tr>
+  <th>Field</th>
+  <th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>statistic</code></td>
+  <td>The F statistic, the ratio of the sample variances divided by <code>ratio</code>.</td>
+</tr>
+<tr>
+  <td><code>parameter</code></td>
+  <td><code>[num_df, denom_df]</code>, the numerator and denominator degrees of freedom.</td>
+</tr>
+<tr>
+  <td><code>p_value</code></td>
+  <td>The p-value for <code>alternative</code>. Each tail is computed directly rather than as 1 minus the other, so it stays accurate far below R's.</td>
+</tr>
+<tr>
+  <td><code>conf_int</code></td>
+  <td><code>[lower, upper]</code>, the confidence interval for the ratio of the variances.</td>
+</tr>
+<tr>
+  <td><code>estimate</code></td>
+  <td>The ratio of the sample variances.</td>
+</tr>
+<tr>
+  <td><code>null_value</code></td>
+  <td><code>ratio</code>.</td>
+</tr>
+<tr>
+  <td><code>alternative</code></td>
+  <td>The alternative used.</td>
+</tr>
+<tr>
+  <td><code>method</code></td>
+  <td><code>"F test to compare two variances"</code>.</td>
+</tr>
+</tbody>
+</table>
+
+A zero variance in C<y> is not an error, as it is not in R: the estimate and
+the statistic are C<Inf>, the p-value is 0 (1 for C<'less'>), and the interval is
+C<[Inf, Inf]> (C<[0, Inf]> for C<'less'>). When both variances are zero, every
+number is C<NaN>, again as in R.
 
 =head2 view
 

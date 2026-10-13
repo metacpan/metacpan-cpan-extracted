@@ -1,3 +1,8 @@
+0.003   2026-08-19  Released-By: PERLANCAR; Urgency: medium
+
+        - Add argument: random.
+
+
 0.002   2026-08-05  Released-By: PERLANCAR; Urgency: medium
 
         - [bugfix] Fix extension handling.

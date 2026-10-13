@@ -1,6 +1,6 @@
 #compdef appspec
 
-# Generated with perl module App::Spec v0.013
+# Generated with perl module App::Spec v0.000
 
 _appspec() {
     local program=appspec
@@ -69,6 +69,7 @@ _appspec() {
                                     '--name[name of the program (optional, override name in spec)]:name' \
                                     '--zsh[for zsh]' \
                                     '--bash[for bash]' \
+                                    '--fish[for fish (>= 4.0)]' \
                                     && ret=0
 
 
@@ -133,6 +134,7 @@ _appspec() {
                     '--name[name of the program (optional, override the value from the spec)]:name' \
                     '--zsh[for zsh]' \
                     '--bash[for bash]' \
+                    '--fish[for fish (>= 4.0)]' \
                     && ret=0
 
                 case $state in

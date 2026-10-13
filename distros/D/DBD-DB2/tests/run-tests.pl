@@ -177,6 +177,10 @@ system("$PL perld092_typeDecfloat.pl") if ($runall || $tc{perld092_typeDecfloat}
 system("$PL perld093_testStoredPrcMultResultset.pl") if ($runall || $tc{perld093_testStoredPrcMultResultset});
 system("$PL perld094_testSQLRowCount.pl") if ($runall || $tc{perld094_testSQLRowCount});
 system("$PL perld095_chopblanks_test.pl") if ($runall || $tc{perld095_chopblanks_test});
+system("$PL perld096_cancel_stmt.pl") if ($runall || $tc{perld096_cancel_stmt});
+system("$PL perld097_cancel_noexec.pl") if ($runall || $tc{perld097_cancel_noexec});
+system("$PL perld098_cancel_after_fetch.pl") if ($runall || $tc{perld098_cancel_after_fetch});
+system("$PL perld099_set_schema_overflow.pl") if ($runall || $tc{perld099_set_schema_overflow});
 system("$PL perld_null_clob_test.pl") if ($runall || $tc{perld_null_clob_test});
 system("$PL perld_test_sql_warning.pl") if ($runall || $tc{perld_test_sql_warning});
 

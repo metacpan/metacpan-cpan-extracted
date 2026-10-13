@@ -370,6 +370,7 @@ t/1111-idempotency-window.t
 t/1112-idempotency-store.t
 t/1113-idempotency-flight.t
 t/1114-idempotency-synopsis.t
+t/1115-idempotency-resource.t
 t/1120-request-id.t
 t/1121-request-id-trust.t
 t/1122-request-id-log.t

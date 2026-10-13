@@ -60,9 +60,13 @@ sub cmd_release_notes {
   }
 
   # truncate ChangeLog to current release section only (in memory)
-  my $changelog_excerpt = _extract_changelog_section('ChangeLog');
+  my $changelog_excerpt = $self->_extract_changelog_section('ChangeLog');
 
   my @prompt;
+
+  if ( !-e '.prompts/release-notes.prompt' ) {
+    $self->_install_prompts('release-notes.prompt');
+  }
 
   my $prompt_text = choose {
 
@@ -72,27 +76,28 @@ sub cmd_release_notes {
     return 'Produce release notes in markdown format for this Perl CPAN distribution release.';
   };
 
-  push @prompt, $llm->text($prompt_text)
-    if !$self->get_dryrun;
+  if ( !$self->get_dryrun ) {
+    push @prompt, $llm->text($prompt_text);
 
-  push @prompt,
-    $llm->document(
-    data  => slurp("release-$version.status"),
-    title => 'Git File Status'
-    ) if !$self->get_dryrun;
-
-  push @prompt,
-    $llm->document(
-    data  => slurp("release-$version.lst"),
-    title => 'Changed Files Listing'
-    ) if !$self->get_dryrun;
-
-  if ($changelog_excerpt) {
     push @prompt,
       $llm->document(
-      data  => $changelog_excerpt,
-      title => 'ChangeLog'
-      ) if !$self->get_dryrun;
+      data  => slurp("release-$version.status"),
+      title => 'Git File Status'
+      );
+
+    push @prompt,
+      $llm->document(
+      data  => slurp("release-$version.lst"),
+      title => 'Changed Files Listing'
+      );
+
+    if ($changelog_excerpt) {
+      push @prompt,
+        $llm->document(
+        data  => $changelog_excerpt,
+        title => 'ChangeLog'
+        );
+    }
   }
 
   # send updated files from tarball, stripping POD from Perl sources
@@ -116,7 +121,7 @@ sub cmd_release_notes {
 
     # strip POD from Perl sources to reduce token cost
     if ( $file->name =~ /[.]p[ml][.]in\z/xsm ) {
-      $file_content = _strip_pod($file_content);
+      $file_content = $self->_strip_pod_from_content($file_content);
     }
 
     push @prompt,
@@ -173,7 +178,7 @@ sub cmd_release_notes {
 ########################################################################
 sub _extract_changelog_section {
 ########################################################################
-  my ($changelog_file) = @_;
+  my ( $self, $changelog_file ) = @_;
 
   return q{} if !-e $changelog_file;
 
@@ -195,9 +200,9 @@ sub _extract_changelog_section {
 }
 
 ########################################################################
-sub _strip_pod {
+sub _strip_pod_from_content {
 ########################################################################
-  my (@args) = @_;
+  my ( $self, @args ) = @_;
 
   my $content = @args > 1 && ref $args[0] ? $args[1] : $args[0];
 

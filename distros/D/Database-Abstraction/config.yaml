@@ -7,11 +7,11 @@
 # directory: /tmp
 
 # Cache settings
-cache_duration: 3600  # Cache duration in seconds (default is 1 hour)
-max_slurp_size: 16384  # Maximum size in bytes for in-memory CSV/PSV/XML files (default is 16K)
+cache_duration: 3600 # Cache duration in seconds (default is 1 hour)
+max_slurp_size: 16384 # Maximum size in bytes for in-memory CSV/PSV/XML files (default is 16K)
 
-id: entry  # Default key column name
-auto_load: false  # Disable AUTOLOAD feature for convenient access to database columns
+id: entry # Default key column name
+auto_load: false # Disable AUTOLOAD feature for convenient access to database columns
 
 # Logging options
 # logger:

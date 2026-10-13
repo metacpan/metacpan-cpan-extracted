@@ -1,6 +1,6 @@
 Logic::Relational - A pure-Perl relational logic system.
 
-Version 0.01
+Version 0.02
 
 Logic::Relational provides a relational logic engine in pure Perl, offering logical variables, structural unification, facts, rules, and backtracking depth-first search. 
 

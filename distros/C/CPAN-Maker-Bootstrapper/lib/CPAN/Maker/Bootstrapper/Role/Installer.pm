@@ -20,7 +20,7 @@ use Time::HiRes qw(time);
 
 use Role::Tiny;
 
-our $VERSION = '2.4.1';
+our $VERSION = '2.5.0';
 
 ########################################################################
 sub cmd_install {
@@ -108,6 +108,16 @@ sub cmd_install {
     $self->_report_import_plan;
     return $SUCCESS;
   }
+
+  return $self->_import_project( module => $module_name, stub => $stub, import_paths => $import_paths );
+}
+
+########################################################################
+sub _import_project {
+########################################################################
+  my ( $self, %args ) = @_;
+
+  my ( $module_name, $stub, $import_paths ) = @args{qw(module stub import_paths)};
 
   if ( @{$import_paths} && !$self->get_project_tarball ) {
     my $resolved_installdir = $self->_resolve_install_dir($module_name);

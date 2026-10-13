@@ -467,6 +467,8 @@ static SV *pdl_get(pTHX_ SV *self, SV **st, I32 items) {
     SV *out;
     pdl_pend *p;
 
+    pdbq_check_keys(aTHX_ self, keys, PDL_CLS, "get");
+
     sv_catsv(sql, pdbi_qi_slot(aTHX_ slot, dbh, table));
     sv_catpvs(sql, " WHERE ");
     sv_catsv(sql, where);
@@ -708,6 +710,8 @@ static SV *pdl_delete(pTHX_ SV *self, SV **st, I32 items) {
     const dbil_abi *A = punk_dbil(aTHX);
     SV *out;
     pdl_pend *p;
+
+    pdbq_check_keys(aTHX_ self, keys, PDL_CLS, "delete");
 
     sv_catsv(sql, pdbi_qi_slot(aTHX_ slot, dbh, table));
     sv_catpvs(sql, " WHERE ");

@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::perlmv::scriptlet::with_number",
   "PREREQ_PM" => {
+    "List::Util" => "1.54",
     "POSIX" => 0,
     "strict" => 0,
     "vars" => 0,
@@ -28,7 +29,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,6 +40,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "List::Util" => "1.54",
   "POSIX" => 0,
   "Test::More" => 0,
   "strict" => 0,

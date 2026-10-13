@@ -72,5 +72,6 @@ typescript
 mutation.json
 ^xt/mutant_\d
 CLAUDE.md
+Join.md
 \.claude
 \.circleci

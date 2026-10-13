@@ -58,23 +58,26 @@ sub _get_review_prompt {
 ########################################################################
 sub _install_prompts {
 ########################################################################
-  my ($self) = @_;
+  my ( $self, @prompts ) = @_;
 
   make_path('.prompts');
+
+  if ( !@prompts ) {
+    @prompts = map {"$_-review.prompt"} qw(code pod);
+  }
 
   die "ERROR: could not create .prompts directory\n"
     if !-d '.prompts';
 
   my $dist_dir = $self->get_dist_dir;
 
-  for my $type (qw(code pod)) {
-    my $file = "$type-review.prompt";
-    my $dest = ".prompts/$file";
+  for my $prompt (@prompts) {
+    my $dest = ".prompts/$prompt";
 
     next if -e $dest;
 
-    copy "$dist_dir/$file", $dest
-      or die "ERROR: could not install $file to .prompts/: $OS_ERROR\n";
+    copy "$dist_dir/$prompt", $dest
+      or die "ERROR: could not install $prompt to .prompts/: $OS_ERROR\n";
 
     print "Installed default prompt: $dest\n";
   }

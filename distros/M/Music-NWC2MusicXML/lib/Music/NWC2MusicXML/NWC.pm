@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use autodie qw(open close);
 
-our $VERSION = '0.002.0';
+our $VERSION = '0.002.1';
 
 use Carp qw(croak carp);
 use Readonly;
@@ -56,7 +56,7 @@ Music::NWC2MusicXML::NWC - Binary NWC container decoder.
 
 =head1 VERSION
 
-0.002.0
+0.002.1
 
 =head1 SYNOPSIS
 
