@@ -2,7 +2,7 @@ NAME
     SNMP::Info - OO Interface to Network devices and MIBs through SNMP
 
 VERSION
-    SNMP::Info - Version 3.978000
+    SNMP::Info - Version 3.979000
 
 AUTHOR
     SNMP::Info is maintained by team of Open Source authors headed by Eric
@@ -1778,8 +1778,8 @@ USAGE
         on a device.
 
         Returns either a reference to an array of protocols, possible values
-        being: "lldp", "cdp", "sonmp", "fdp", "edp", "amap" or "undef" if no
-        protocols are supported or running.
+        being: "lldp", "cdp", "sonmp", "fdp", "edp", "amap", "mndp" or
+        "undef" if no protocols are supported or running.
 
    Common Topology Table Information
     The common topology table methods below will query the device for
@@ -1796,7 +1796,7 @@ USAGE
 
     If a reference to an array is provided as the second argument, those
     protocols will be queried for information. The supported array values
-    are: "lldp", "cdp", "sonmp", "fdp", "edp", "amap".
+    are: "lldp", "cdp", "sonmp", "fdp", "edp", "amap", "mndp".
 
     If nothing is passed in as the second argument, the methods will call
     has_topo() to determine supported and running topology protocols on the

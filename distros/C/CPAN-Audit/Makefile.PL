@@ -26,8 +26,8 @@ even from a different path, C<require> thinks it has already loaded
 the file. As such, I recommend you always require the full path to the
 file.
 
-The return value of the C<require> is a package name (in this case,
-the name of the main module. Use that to call the C<arguments> method.
+The return value of the C<require> is a package name, which in this case
+is the name of the main module. Use that to call the C<arguments> method.
 
 Even if this distribution needs a higher version of Perl, this bit
 only needs v5.8. You can play with the data structure with a primitive
@@ -119,7 +119,7 @@ my %WriteMakefile = (
 		'CPAN::DistnameInfo'       => '0',
 		'Module::CoreList'         => '5.20181020',
 		'Module::CPANfile'         => '0',
-		'Module::Extract::VERSION' => '1.121',
+		'Module::Extract::VERSION' => '1.123',
 		'IO::Interactive'          => '0',
 		'JSON'                     => '0',
 		'PerlIO::gzip'             => '0',

@@ -249,6 +249,51 @@ static int pcx_is_triplet(pTHX_ SV *ret) {
     }
 }
 
+/* A triplet in everything but its status: an integer first, then a headers
+ * arrayref of name and value pairs whose names are words, then a body that
+ * is an arrayref, a handle or an object. Narrow on purpose, because a
+ * handler may return three things that are simply data - [ 1, 2, 3 ],
+ * [ 'series', \@xs, \@ys ], [ 5, [ 1, 2 ], [ 3, 4 ] ] - and those must
+ * stay data. */
+static int pcx_triplet_shaped(pTHX_ SV *ret) {
+    AV *a, *hav;
+    SV **s, **h, **b;
+    SSize_t i, n;
+    if (!SvROK(ret) || SvTYPE(SvRV(ret)) != SVt_PVAV) return 0;
+    a = (AV *)SvRV(ret);
+    if (av_len(a) != 2) return 0;
+    s = av_fetch(a, 0, 0);
+    h = av_fetch(a, 1, 0);
+    b = av_fetch(a, 2, 0);
+    if (!(h && *h && SvROK(*h) && SvTYPE(SvRV(*h)) == SVt_PVAV)) return 0;
+    if (!(b && *b && SvROK(*b))) return 0;
+    if (!(SvTYPE(SvRV(*b)) == SVt_PVAV || SvTYPE(SvRV(*b)) == SVt_PVGV
+          || SvOBJECT(SvRV(*b)))) return 0;
+    /* An integer, asked WITHOUT numifying it: this value may yet be encoded
+     * as data, and SvIV or SvNV here would leave a number flag on the
+     * caller's scalar that changes how it is written - a 1 became 1.0. */
+    if (!(s && *s && SvOK(*s) && !SvROK(*s))) return 0;
+    if (!SvIOK(*s)) {
+        STRLEN sl, si = 0;
+        const char *sp;
+        if (!SvPOK(*s)) return 0;
+        sp = SvPVX_const(*s);
+        sl = SvCUR(*s);
+        if (sl && sp[0] == '-') si = 1;
+        if (si == sl) return 0;
+        for (; si < sl; si++) if (!isDIGIT(sp[si])) return 0;
+    }
+    hav = (AV *)SvRV(*h);
+    n = av_len(hav) + 1;
+    if (n == 0 || (n & 1)) return 0;
+    for (i = 0; i < n; i += 2) {
+        SV **k = av_fetch(hav, i, 0);
+        if (!(k && *k && SvOK(*k) && !SvROK(*k)) || looks_like_number(*k))
+            return 0;
+    }
+    return 1;
+}
+
 /* Coerce a handler return into a PSGI triplet: a triplet passes through, a
  * Punk::Response finalizes, a Future is awaited and re-coerced, anything else
  * is JSON-encoded (folding in the context's pending status/headers). +1. */
@@ -263,6 +308,14 @@ static SV *punk_coerce(pTHX_ SV *c, SV *ret) {
      * a psgi.streaming server) - hand it straight to the server */
     if (SvROK(ret) && SvTYPE(SvRV(ret)) == SVt_PVCV) return SvREFCNT_inc(ret);
     if (pcx_is_triplet(aTHX_ ret)) return SvREFCNT_inc(ret);
+    if (pcx_triplet_shaped(aTHX_ ret))
+        /* [ $something, \@headers, \@body ] where $something is not a
+         * status. That is a response somebody built wrongly, and encoding it
+         * as data would publish its headers - a Set-Cookie among them - in
+         * the body of a 200. An error says so instead. */
+        return punk_handle_error(aTHX_ c, sv_2mortal(newSVpvs(
+            "Punk: a handler returned a response whose status is not a "
+            "number from 100 to 599")), NULL);
     if (SvROK(ret) && SvOBJECT(SvRV(ret))) {
         /* One of ours: read the value in C rather than walking @ISA for
          * Punk::Response and then dispatching ->get through perl. */

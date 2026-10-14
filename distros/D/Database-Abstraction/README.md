@@ -4,7 +4,7 @@ Database::Abstraction - Read-only Database Abstraction Layer (ORM)
 
 ## Version
 
-Version 0.49
+Version 0.51
 
 ## Description
 
@@ -677,6 +677,26 @@ than `ASC` or `DESC`, case-insensitive) is ignored with a `carp` warning and
 the default sort order is used instead.  Sorting is applied before
 `limit`/`offset` pagination.
 
+Pass `distinct => 1` to return only unique rows (deduplication):
+
+```perl
+my $rows = $db->selectall_arrayref(distinct => 1);
+my $rows = $db->selectall_arrayref(distinct => 1, columns => [qw(status dept)]);
+```
+
+Pass `columns => \@cols` to restrict which columns appear in the returned
+rows.  Column names are validated against the same identifier rules as other
+parameters; invalid names are dropped with a `carp` warning.
+
+On SQL-capable backends (SQLite, PostgreSQL, MySQL, DBD::CSV ≥ 0.64)
+`distinct => 1` emits `SELECT DISTINCT`.  On the slurp (in-memory) path
+`distinct` without `columns` is a no-op because each row is already unique.
+
+**Order of operations:** sort → offset → limit → `_apply_distinct`.
+This means `limit => N, distinct => 1` deduplicates the already-limited
+slice, not the full result set.  If you need N distinct rows from a larger set,
+omit `limit` and slice the returned arrayref yourself.
+
 Results are returned in the cache (if configured) and the returned array
 reference is made read-only unless `no_fixate` was set.
 
@@ -685,15 +705,18 @@ in scalar context, or `$db->query->limit(1)->all()`, to fetch just one row.
 
 #### Pseudocode
 
-```
+```perl
 1. Parse criteria; extract and build any JOIN clause.
+   Extract distinct, columns, limit, offset, sort_by.
 2. If data is slurped AND no joins AND criteria are simple:
    a. No criteria -> return all rows as arrayref.
    b. entry-only lookup -> return [$data{entry}].
    c. Otherwise -> scan rows in-memory with _match_criterion.
-   In all slurp cases: sort by sort_by column (if given), then apply offset/limit.
-3. Otherwise build SQL: SELECT * FROM table [JOIN] [WHERE]
-   ORDER BY sort_by [else id] [LIMIT] [OFFSET].
+   In all slurp cases: sort by sort_by column (if given), then apply
+   offset/limit, then _apply_distinct (columns projection + dedup).
+3. Otherwise build SQL: SELECT [DISTINCT] [columns|*] FROM table
+   [JOIN] [WHERE] ORDER BY sort_by [else id] [LIMIT] [OFFSET].
+   All DBI backends (including DBD::CSV >= 0.64) use native SELECT DISTINCT.
 4. Check cache; return cached arrayref on HIT.
 5. prepare_cached + execute; fetch all rows.
 6. Store result in cache; fixate the array; return arrayref.
@@ -709,6 +732,8 @@ join        => HashRef | ArrayRef  # optional join spec(s)
 sort_by     => Str | ArrayRef      # optional: 'col' or ['col','DESC']
 limit       => Int                 # optional: max rows
 offset      => Int                 # optional: rows to skip
+distinct    => Bool                # optional: deduplicate rows
+columns     => ArrayRef[Str]       # optional: restrict output columns
 no_fixate   => Bool                # optional: skip read-only locking
 table       => Str                 # optional: override table name
 ```
@@ -1096,10 +1121,18 @@ Each measure hashref:
 { col => 'customer', fn => 'count_distinct', as => 'customers' }
 ```
 
-`fn` must be one of `sum`, `avg`, `min`, `max`, `count`, `count_distinct`
-(case-insensitive).  `col` is required for every function except plain
-`count`.  `as` (the result key) must be a valid SQL identifier and must not
-duplicate another alias or a `by` column name.
+`fn` must be one of `sum`, `avg`, `min`, `max`, `count`, `count_distinct`,
+`median`, `stddev` (case-insensitive).  `col` is required for every function
+except plain `count`.  `as` (the result key) must be a valid SQL identifier
+and must not duplicate another alias or a `by` column name.
+
+`median` computes the median (middle value of sorted values; average of two
+middle values for even count).  `stddev` computes the sample standard deviation
+(using N-1 denominator).  Both are computed in Perl (no SQL pushdown); on SQL
+backends the full result set is fetched first and then folded in memory.
+
+Empty-set normalisation: `median` and `stddev` become `undef` when no rows
+are present; `stddev` on a single-row group returns `0`.
 
 #### Having
 
@@ -1148,7 +1181,7 @@ Each element of `measures` is a hashref with keys:
 
 ```perl
 col  => Str    # column to aggregate; omit only for plain count()
-fn   => Str    # one of: sum avg min max count count_distinct
+fn   => Str    # one of: sum avg min max count count_distinct median stddev
 as   => Str    # result key name (required; valid SQL identifier)
 ```
 
@@ -1163,7 +1196,8 @@ and one key per measure `as` alias.  Returns `[]` (empty arrayref)
 when no groups match -- never `undef`.
 
 Empty-set normalisation: `sum`/`count`/`count_distinct` become
-`0`; `avg`/`min`/`max` become `undef` when no rows are present.
+`0`; `avg`/`min`/`max`/`median`/`stddev` become `undef` when no rows
+are present.
 
 ### Query
 
@@ -1329,7 +1363,8 @@ triggers it, and how to resolve it.
 
 - `_Class_: aggregate: unknown measure function '_fn_'`
 
-    `fn` must be one of `sum`, `avg`, `min`, `max`, `count`, `count_distinct`.
+    `fn` must be one of `sum`, `avg`, `min`, `max`, `count`, `count_distinct`,
+    `median`, `stddev`.
 
 - `_Class_: aggregate: measure column is required for function '_fn_'`
 

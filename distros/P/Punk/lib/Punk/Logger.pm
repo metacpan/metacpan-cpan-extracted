@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.58';
+our $VERSION = '0.59';
 
 1;
 
@@ -109,7 +109,14 @@ the one it was helping to find.
 
 Also from C<punk.yml> under a C<logging:> block. C<STDERR> is the deliberate
 default (let the platform route it); point C<to> at a coderef or filehandle, or
-provide a C<psgix.logger>, for anything else.
+provide a C<psgix.logger>, for anything else. C<to> may also be a path, which
+is what a YAML file can say: it is opened for append when the keyword runs,
+and a path that cannot be opened is a boot error.
+
+A record is one line. In the plain format a control character in the
+message, the method or the path is written out - C<\n>, C<\r>, C<\t>,
+C<\xHH> - as it already was in a field value, so text from a request cannot
+start a line of its own or send an escape sequence to a terminal.
 
 =head1 METHODS
 

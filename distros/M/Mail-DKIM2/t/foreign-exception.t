@@ -107,4 +107,17 @@ my $signed = signed_message();
     is($calls, 1, '  ... after one callback');
 }
 
+# load() probes its input with can(); a host input whose capability lookup
+# dies with an object (a timeout, say) must get that object back, not a
+# replacement "cannot read a message" croak (follow-up review F6).
+{
+    package Host::Input;
+    sub can { die $main::input_thrown }
+}
+{
+    our $input_thrown = Host::Timeout->new('can');
+    my $ok = eval { Mail::DKIM2::Verifier->new->load(bless {}, 'Host::Input'); 1 };
+    ok(!$ok && ref $@ && $@ == $input_thrown, 'load rethrows an object from the input\'s can()');
+}
+
 done_testing;

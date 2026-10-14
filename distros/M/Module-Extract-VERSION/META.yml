@@ -23,10 +23,10 @@ no_index:
 requires:
   Tie::Hash::NamedCapture: '0'
   perl: '5.010'
-  version: '0'
+  version: '0.77'
 resources:
   bugtracker: https://github.com/briandfoy/module-extract-version/issues
   homepage: https://github.com/briandfoy/module-extract-version
   repository: https://github.com/briandfoy/module-extract-version
-version: '1.121'
+version: '1.123'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

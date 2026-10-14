@@ -353,8 +353,7 @@ subtest 'L22: two independent objects have independent data refs' => sub {
 subtest 'L23: DESTROY does not croak' => sub {
 	plan tests => 1;
 	{
-		my $db = _db();
-		$db->count();
+		_db()->count();
 	}
 	pass('DESTROY completes without error');
 };

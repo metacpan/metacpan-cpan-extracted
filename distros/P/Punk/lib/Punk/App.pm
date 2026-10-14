@@ -8,7 +8,7 @@ use Punk::Router::Scope;
 use Punk::Context;
 use Punk::Static;
 
-our $VERSION = '0.58';
+our $VERSION = '0.59';
 
 sub compile_extras {
     my ($self) = @_;
@@ -127,7 +127,9 @@ The application environment, resolved once at compile: the loaded
 config's C<env> when there is one, else C<PUNK_ENV>, else
 C<production> - the same safe default L<Punk::Config> and C<punk> use.
 Development is opted into: C<punk dev> sets it for its server, or set
-C<PUNK_ENV=development> yourself.
+C<PUNK_ENV=development> yourself. C<test> is the third name with a meaning:
+a C<500> still carries the die text there, which L<Punk::Test> relies on and
+sets for you when C<PUNK_ENV> is unset.
 
 =head2 compile_extras
 

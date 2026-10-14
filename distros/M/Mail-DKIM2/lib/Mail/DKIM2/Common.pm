@@ -3,7 +3,7 @@ use 5.20.0;
 use strict;
 use warnings;
 
-our $VERSION = '0.18';
+our $VERSION = '0.20';
 
 use Carp ();
 use MIME::Base64 qw(encode_base64 decode_base64);
@@ -13,6 +13,7 @@ use Crypt::PK::Ed25519;
 use Crypt::Digest::SHA256 qw(sha256 sha256_b64 sha256_hex);
 
 use Email::MIME;
+use Mail::DKIM2::TagValueList ();
 use Email::MIME::ContentType ();
 
 use Exporter 'import';
@@ -317,6 +318,7 @@ sub fold_header {
     my @folded;
     my $remaining = $line;
     my $limit = $margin;
+    my %fold_state;    # where the emitted text ends: see _dkim2_fold_feed
 
     while (length($remaining) > $limit) {
         # Find the best break point: prefer "; " boundaries, then
@@ -354,9 +356,7 @@ sub fold_header {
         # A list-valued tag (the hn= header-name list in X-DKIM2-Info) has
         # no spaces at all, so break after a comma rather than in the middle
         # of a name: "lis" + "t-help" is not a header field that exists.
-        # Base64 tag values contain no commas, so signed headers still fall
-        # through to the hard break below, which their parsers tolerate.
-        if ($break < 0) {
+        if ($break < 0 && $delimiters_only) {
             $pos = rindex($search, ',');
             $break = $pos + 1 if $pos > 0;
         }
@@ -370,8 +370,26 @@ sub fold_header {
             $break = $after[0] + 1;
         }
 
-        # Last resort: hard break at limit
-        $break = $limit if $break < 0;
+        # A DKIM2 field: the latest point before the limit where its grammar
+        # allows FWS (_dkim2_fold_ok), else the first one after it. A token
+        # with no such point -- a long d= Domain -- stays whole on an
+        # over-long line rather than being split into a different value
+        # (follow-up review F2). One pass, carrying the tag state forward a
+        # character at a time: an s= of thousands of items folds in linear
+        # time.
+        if ($break < 0) {
+            my %st = %fold_state;
+            for my $i (1 .. length($remaining) - 1) {
+                last if $i > $limit && $break >= 0;
+                my $prev = substr($remaining, $i - 1, 1);
+                _dkim2_fold_feed(\%st, $prev);
+                next unless $prev eq ';' || _dkim2_fold_ok(\%st, $prev, substr($remaining, $i, 1));
+                if ($i <= $limit) { $break = $i; next }
+                $break = $i if $break < 0;
+                last;
+            }
+            last if $break < 0;
+        }
 
         my $chunk = substr($remaining, 0, $break);
         $remaining = substr($remaining, $break);
@@ -380,12 +398,67 @@ sub fold_header {
         $chunk =~ s/\s+$//;
         $remaining =~ s/^\s+//;
 
+        _dkim2_fold_feed(\%fold_state, $_) for split //, $chunk;
         push @folded, $chunk;
         $limit = $cont_margin;
     }
     push @folded, $remaining if length($remaining);
 
+    # RFC 5322 §2.1.1: 998 is a MUST. Nothing a DKIM2 signer emits has a
+    # token that long, so this is a caller error, not a field to send.
+    if (!$delimiters_only) {
+        for (@folded) {
+            Carp::croak("fold_header: a line exceeds 998 characters with no place to fold")
+                if length > 998;
+        }
+    }
+
     return join("\r\n\t", @folded);
+}
+
+# fold_header's view of a DKIM2 field read so far, one character at a time:
+# the current tag's name (undef until its "=", with the text before it in
+# pending) and how many ":" the current list item has had.
+sub _dkim2_fold_feed {
+    my ($st, $c) = @_;
+    if ($c eq ';') { %$st = (); return }
+    if (!defined $st->{name}) {
+        $st->{pending} .= $c;
+        return unless $c eq '=';
+        ($st->{name}) = $st->{pending} =~ /\A\s*(?:[A-Za-z0-9-]+:\s*)?([A-Za-z][A-Za-z0-9_]*)\s*=\z/;
+        $st->{name} = defined $st->{name} ? lc $st->{name} : '';
+        $st->{colons} = 0;
+        return;
+    }
+    if    ($c eq ',') { $st->{colons} = 0 }
+    elsif ($c eq ':') { $st->{colons}++ }
+}
+
+# May the field fold between $prev and $next, in state $st (_dkim2_fold_feed,
+# fed up to and including $prev)? The grammars (spec-06 §7, §8) allow FWS
+# inside a base64string (§2.13) and in a few list positions, and nowhere in
+# a Domain, selector, algorithm or hash name, so only these are offered:
+#   - between two base64 characters of mf=, rt=, r=, of an h= digest (after
+#     the hash name's ":"), or of an s= signature value (after both ":"s);
+#   - on either side of a ":" in s= and h=;
+#   - after a "," in any list but s=: f= allows FWS around commas, a
+#     hash-set and a base64string (h=, rt=) may start with FWS, and an
+#     unknown tag's x-tag-value allows FWS between characters (X-DKIM2-Info's
+#     hn= list folds here too). Not in s=: a sig-set starts with its
+#     Selector.
+sub _dkim2_fold_ok {
+    my ($st, $prev, $next) = @_;
+    my $name = $st->{name};
+    return 0 unless defined $name && length $name;
+    return $name ne 's' if $prev eq ',';
+    # sig-set and hash-set allow FWS on either side of their ":"s (§8.9,
+    # §7.3; a base64string may begin or end with FWS).
+    return 1 if ($name eq 's' || $name eq 'h') && ($prev eq ':' || $next eq ':');
+    return 0 unless $prev =~ m{[A-Za-z0-9+/=]} && $next =~ m{[A-Za-z0-9+/=]};
+    return 1 if $name eq 'mf' || $name eq 'rt' || $name eq 'r';
+    return $st->{colons} >= 1 if $name eq 'h';
+    return $st->{colons} >= 2 if $name eq 's';
+    return 0;
 }
 
 # Fold a string at arbitrary character positions.
@@ -582,7 +655,8 @@ sub _check_options {
 # type". The whole record is checked, not searched: a repeated tag (an empty
 # p= before a good one, say) makes it invalid, and v=, if present, must be
 # the first tag and exactly DKIM1. Tag names are case sensitive here, as in
-# DKIM1. Unknown and retired tags (h=, n=, s=, t=) are ignored.
+# DKIM1. Unknown and retired tags (h=, n=, s=, t=) are ignored, once their
+# values have passed the tag-list grammar.
 sub parse_dkim_key_record {
     my ($txt) = @_;
     my $syntax = 'has a syntax error';
@@ -594,6 +668,10 @@ sub parse_dkim_key_record {
             or return (undef, $syntax);
         return (undef, $syntax) if exists $tag{$name};
         $value =~ s/\A[ \t\r\n]+|[ \t\r\n]+\z//g;
+        # Every value, unknown tags' included, must fit the tag-list grammar
+        # (RFC 6376 §3.2 VALCHAR): ignoring a tag comes after parsing it
+        # (follow-up review F5).
+        return (undef, $syntax) unless $value =~ /\A$Mail::DKIM2::TagValueList::TAG_VALUE\z/;
         $tag{$name} = $value;
         push @order, $name;
     }
@@ -879,7 +957,13 @@ make every verification warn. The package variable is restored afterwards.
 
 Folds a complete header line at C<$margin> characters (default 72) with
 CRLF-tab continuations, breaking at C<; > first, then at a space, then
-after a C<,>, then anywhere. With C<< delimiters_only => 1 >> it breaks
+where a DKIM2 field's grammar allows folding whitespace: inside a base64
+value (C<mf=>, C<rt=>, C<r=>, an C<h=> digest, an C<s=> signature value),
+beside the C<:>s of an C<s=> or C<h=> item, or after a list comma other
+than in C<s=>. It never splits a domain, selector,
+algorithm or hash name: such a token that will not fit stays whole on a
+longer line, and a line that would exceed RFC 5322's 998 characters croaks.
+With C<< delimiters_only => 1 >> it breaks
 only after C<;> or C<,>, never inside a token, leaving a value that fits
 nowhere whole on an over-long line (the rule for X-DKIM2-Info).
 

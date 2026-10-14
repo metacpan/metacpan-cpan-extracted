@@ -103,13 +103,18 @@ subtest 'the worst single move at the top rung, in milliseconds' => sub {
     for my $name (sort keys %pos) {
         my $g = $pos{$name} ? from($pos{$name}) : game();
         my $t0 = Time::HiRes::time();
-        my $uci = $B->choose($g, 'p1');
+        my ($uci, $nodes) = $B->choose($g, 'p1');
         my $ms = (Time::HiRes::time() - $t0) * 1000;
         $worst = $ms if $ms > $worst;
         ok((grep { $_ eq $uci } @{ $g->legal }), sprintf '%s: a legal move in %.0f ms', $name, $ms);
+        cmp_ok $nodes, '<=', 41_000, "and $nodes nodes is within one interval of the budget";
     }
-    diag sprintf 'worst case %.0f ms at 40,000 nodes', $worst;
-    cmp_ok $worst, '<', 3000, 'and under three seconds';
+    note sprintf 'worst case %.0f ms at 40,000 nodes', $worst;
+    SKIP: {
+        skip 'the wall clock is the host, set RELEASE_TESTING to hold it to three seconds', 1
+            unless $ENV{RELEASE_TESTING};
+        cmp_ok $worst, '<', 3000, 'and under three seconds';
+    }
 };
 
 done_testing;

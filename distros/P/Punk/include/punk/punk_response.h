@@ -61,4 +61,21 @@ static AV *punk_res_headers(pTHX_ AV *res) {
     }
 }
 
+/* A status a handler asked for, as the number to send: 100 to 599, or 0 for
+ * "none given" (undef, 0, the empty string), which the caller turns into its
+ * default. Anything else croaks. It used to be passed through, and a status
+ * the dispatcher did not recognise made the finished response look like data:
+ * it was JSON-encoded, headers and all, and sent as a 200. */
+static IV ps_status_arg(pTHX_ SV *sv) {
+    IV st;
+    if (!(sv && SvOK(sv)) || !SvTRUE(sv)) return 0;
+    if (SvROK(sv))
+        croak("Punk: a response status must be a number from 100 to 599");
+    st = (looks_like_number(sv) && (NV)SvIV(sv) == SvNV(sv)) ? SvIV(sv) : -1;
+    if (st < 100 || st > 599)
+        croak("Punk: a response status must be a number from 100 to 599, "
+              "not '%" SVf "'", SVfARG(sv));
+    return st;
+}
+
 #endif /* PUNK_RESPONSE_H */

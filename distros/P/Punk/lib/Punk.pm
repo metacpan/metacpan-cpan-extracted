@@ -7,7 +7,7 @@ use warnings;
 our $VERSION;
 
 BEGIN {
-    $VERSION = '0.58';
+    $VERSION = '0.59';
     require XSLoader;
     XSLoader::load('Punk', $VERSION);
 }
@@ -1170,6 +1170,13 @@ An outer PSGI wrap, applied at C<to_app>.
 Runs when a guard or handler dies; a reference return becomes the
 response, otherwise the 500 C<{"errors":[...]}> default is served.
 
+What that default says depends on the environment. In C<production>, and in
+any environment Punk does not know by name, the message is C<Internal Server
+Error> and nothing else, and what the handler died with is written to the
+application's log at C<error>: a die text carries file names and, from a
+database, statements and connection strings. In C<test> the message is the
+die text, so a test can assert on it.
+
 In the C<development> environment - an opt-in: C<punk dev>, or
 C<PUNK_ENV=development>, or the config's C<env>; the default is
 C<production> - that default is a debug response instead: an HTML page
@@ -1223,7 +1230,10 @@ See L<Punk::Upload>.
     plugin 'RequestId';
     plugin '+My::Plugin' => { opt => 1 };
 
-Load and register a plugin; see L<Punk::Plugin>.
+Load and register a plugin; see L<Punk::Plugin>. The name has to be a class
+name - words joined by C<::> - and so does a view engine's, a controller's
+and a model's, wherever they come from; anything else croaks and nothing is
+loaded.
 
 =head2 helper
 

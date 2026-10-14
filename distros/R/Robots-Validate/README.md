@@ -22,15 +22,19 @@ This module allows one to validate a robot user-agent string against the IP addr
 
 # RECENT CHANGES
 
-Changes for version v0.4.8 (2026-10-10)
+Changes for version v0.4.9 (2026-10-13)
 
 - Enhancements
     - Added or updated the robot rules for the following:
-        - bl.uk\_lddc\_bot
-        - deepcrawl
-        - GreenFaceLabsCensus
-        - ibaaBot
-        - PartnexRadarBot
+        - CrawlPolicyIndex
+        - Harambis
+        - InfoSifter
+        - InsightBaseBot
+        - IntentRouteBot
+        - KeenableBot and Keenable-User
+        - PartnexRadarBot (fixed typo in rule name)
+        - webXtrendBot
+    - The rebuild-robots-config utility was changed to ignore comments in plain text IP lists.
 
 See the `Changes` file for more details.
 

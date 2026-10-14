@@ -118,14 +118,32 @@ static SV *pm_route_of(pTHX_ SV *c) {
     return NULL;
 }
 
-/* REQUEST_METHOD, or "-". */
+/* REQUEST_METHOD as a label value, or "-".
+ *
+ * A known method, or `<other>`. The method is whatever the client put on the
+ * request line, any bytes at all, and an unknown one on any path is still a
+ * counted 404: left as it came, every spelling was a new series in every
+ * worker and in whatever scrapes them, without end. The route label is
+ * bounded the same way and for the same reason. */
+static const char *pm_method_label(const char *m, STRLEN *len) {
+    static const char *const known[] = { "GET", "HEAD", "POST", "PUT",
+        "DELETE", "PATCH", "OPTIONS", "CONNECT", "TRACE", NULL };
+    int i;
+    for (i = 0; known[i]; i++)
+        if (strlen(known[i]) == *len && memEQ(m, known[i], *len)) return m;
+    *len = 7;
+    return "<other>";
+}
+
 static const char *pm_method_of(pTHX_ SV *c, STRLEN *len) {
     SV *env = pk_abi_env_of(aTHX_ c);
     SV **m;
     if (env && SvROK(env) && SvTYPE(SvRV(env)) == SVt_PVHV
         && (m = hv_fetchs((HV *)SvRV(env), "REQUEST_METHOD", 0))
-        && m && *m && SvOK(*m) && SvCUR(*m))
-        return SvPV_const(*m, *len);
+        && m && *m && SvOK(*m) && SvCUR(*m)) {
+        const char *p = SvPV_const(*m, *len);
+        return pm_method_label(p, len);
+    }
     *len = 1;
     return "-";
 }

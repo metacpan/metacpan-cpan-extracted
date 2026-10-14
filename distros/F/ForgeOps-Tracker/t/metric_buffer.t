@@ -82,6 +82,96 @@ subtest 'a failed delivery keeps every entry for the next flush' => sub {
     $buffer->_clear;
 };
 
+subtest 'a batch the server rejected is dropped and never sent again' => sub {
+    my (@delivered, @outcomes, @logged) :shared;
+    push @outcomes, 'rejected', 'rejected';
+    my $config = new_configuration();
+    $config->{logger} = sub { lock(@logged); push @logged, $_[0] };
+    my $buffer = ForgeOps::Tracker::MetricBuffer->new(
+        $config,
+        sub {
+            my ($entries) = @_;
+            lock(@delivered);
+            push @delivered, JSON::PP::encode_json([ map { $_->{metric_name} } @$entries ]);
+            return shift(@outcomes);
+        },
+        sub { 3600 },
+    );
+    $buffer->record({ metric_name => 'a', value => 1 });
+    $buffer->flush;
+    is($buffer->count, 0);
+    $buffer->flush; # nothing left: the rejected batch is not sent again
+    $buffer->record({ metric_name => 'b', value => 2 });
+    $buffer->flush;
+
+    is_deeply([@delivered], ['["a"]', '["b"]']);
+    is($logged[0], '[forge-ops-tracker] dropping 1 buffered metrics: the server rejected them and will not accept a retry');
+    is(scalar(@logged), 2);
+    $buffer->_clear;
+};
+
+subtest 'a batch is kept through four failed flushes and dropped on the fifth' => sub {
+    my (@delivered, @outcomes, @logged) :shared;
+    push @outcomes, ('failed') x 5;
+    my $config = new_configuration();
+    $config->{logger} = sub { lock(@logged); push @logged, $_[0] };
+    my $buffer = ForgeOps::Tracker::MetricBuffer->new(
+        $config,
+        sub { lock(@delivered); push @delivered, scalar(@{ $_[0] }); return shift(@outcomes) },
+        sub { 3600 },
+    );
+    $buffer->record({ metric_name => 'a', value => 1 });
+    $buffer->flush for 1 .. 4;
+    is($buffer->count, 1, 'still held after four failures');
+    is_deeply([@logged], []);
+
+    $buffer->flush;
+    is($buffer->count, 0, 'dropped by the fifth');
+    $buffer->flush; # nothing left to send
+
+    is_deeply([@delivered], [1, 1, 1, 1, 1]);
+    is_deeply([@logged], ['[forge-ops-tracker] dropping 1 buffered metrics: 5 flushes in a row failed']);
+    $buffer->_clear;
+};
+
+subtest 'a flush that gets through starts the count of failed flushes again' => sub {
+    my (@delivered, @outcomes) :shared;
+    push @outcomes, 0, 0, 0, 0, 1, 0, 0, 0, 0;
+    my $buffer = recording_buffer(\@delivered, \@outcomes);
+    $buffer->record({ metric_name => 'a', value => 1 });
+    $buffer->flush for 1 .. 5;
+    is($buffer->count, 0);
+
+    $buffer->record({ metric_name => 'b', value => 2 });
+    $buffer->flush for 1 .. 4;
+    is($buffer->count, 1, 'four failures since the flush that got through: still held');
+    $buffer->_clear;
+};
+
+subtest 'a failed flush on the background thread and one on the main thread count together' => sub {
+    my (@delivered, @outcomes) :shared;
+    push @outcomes, (0) x 5;
+    my $buffer = recording_buffer(\@delivered, \@outcomes);
+    $buffer->record({ metric_name => 'a', value => 1 });
+    threads->create(sub { $buffer->flush for 1 .. 3 })->join;
+    $buffer->flush;
+    is($buffer->count, 1);
+    $buffer->flush;
+
+    is($buffer->count, 0, 'the fifth failure in a row dropped the batch, whichever thread it ran on');
+    $buffer->_clear;
+};
+
+subtest 'a delivery that dies is a failed flush, not an exception for the caller' => sub {
+    my $buffer = ForgeOps::Tracker::MetricBuffer->new(new_configuration(), sub { die "boom\n" }, sub { 3600 });
+    $buffer->record({ metric_name => 'a', value => 1 });
+
+    ok(eval { $buffer->flush; 1 }, 'flush did not die') or diag $@;
+    is($buffer->count, 1);
+    $buffer->flush for 1 .. 4;
+    is($buffer->count, 0);
+};
+
 subtest 'an entry recorded while delivery is in flight is never lost' => sub {
     my (@delivered, @outcomes) :shared;
     my ($in_flight, $release) :shared;
@@ -165,6 +255,33 @@ subtest 'capture_metric and capture_infrastructure_metric deliver to their own e
     is($infrastructure->[0]{hostname}, 'db-1');
     is($infrastructure->[1]{hostname}, 'web-1');
     ForgeOps::Tracker::_reset_for_testing();
+    $server->stop;
+};
+
+subtest 'capture_metric drops a batch the plan rejects but keeps one the server failed on, end to end' => sub {
+    my $server = t::lib::EchoServer->start;
+    my @sent_for;
+    for my $code (403, 503) {
+        ForgeOps::Tracker::_reset_for_testing();
+        ForgeOps::Tracker::init(
+            dsn                  => 'http://key@127.0.0.1:' . $server->{port} . "/status/$code/api/v1/events",
+            environment          => 'production',
+            enabled_environments => { production => 1 },
+        );
+        ForgeOps::Tracker::capture_metric('first');
+        ForgeOps::Tracker::flush_metrics();
+        ForgeOps::Tracker::capture_metric('second');
+        ForgeOps::Tracker::flush_metrics();
+    }
+    # Nothing may be left for the END block to send once this server is gone.
+    ForgeOps::Tracker::_reset_for_testing();
+
+    for my $request (@{ $server->requests }) {
+        my ($code) = $request->{path} =~ m{/status/(\d{3})/};
+        push @{ $sent_for[$code == 403 ? 0 : 1] }, [ map { $_->{metric_name} } @{ JSON::PP::decode_json($request->{body})->{metrics} } ];
+    }
+    is_deeply($sent_for[0], [ ['first'], ['second'] ], 'a 403 batch is not sent again');
+    is_deeply($sent_for[1], [ ['first'], ['first', 'second'] ], 'a 503 batch is kept for the next flush');
     $server->stop;
 };
 

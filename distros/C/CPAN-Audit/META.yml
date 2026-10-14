@@ -28,12 +28,12 @@ requires:
   JSON: '0'
   Module::CPANfile: '0'
   Module::CoreList: '5.20181020'
-  Module::Extract::VERSION: '1.121'
+  Module::Extract::VERSION: '1.123'
   PerlIO::gzip: '0'
   perl: '5.020'
 resources:
   bugtracker: https://github.com/briandfoy/cpan-audit/issues
   homepage: https://github.com/briandfoy/cpan-audit
   repository: https://github.com/briandfoy/cpan-audit
-version: '20260622.001'
+version: '20261013.002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

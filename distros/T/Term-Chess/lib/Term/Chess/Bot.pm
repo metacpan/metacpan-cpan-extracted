@@ -10,7 +10,7 @@ use Chess::Plisco::Engine::Tree;
 use Chess::Plisco::Engine::TranspositionTable;
 use Term::Chess::Watcher;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 our @LADDER = (2_000, 10_000, 10_000, 40_000);
 
@@ -69,7 +69,7 @@ Term::Chess::Bot - the opponent: Plisco's search, bounded in nodes
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

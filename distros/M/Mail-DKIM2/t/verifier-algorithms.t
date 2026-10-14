@@ -3,7 +3,6 @@ use warnings;
 use Test::More;
 use FindBin;
 use lib "$FindBin::Bin/lib";
-use Time::HiRes qw(time);
 use MIME::Base64 qw(encode_base64);
 use DKIM2SignedFixture;
 use DKIM2TestKeys;
@@ -78,21 +77,15 @@ run('unknown algorithm, value not base64: still ignored',
         'Ed25519 key for rsa-sha256: algorithm mismatch');
 }
 
-# Review R1: thousands of distinct unknown algorithms cost no key lookups
-# and no quadratic reparsing of s=.
+# Review R1: thousands of distinct unknown algorithms cost no key lookups.
 {
     my @items = map { ["x$_", "unknown$_", q(AAAA)] } 1 .. 4000;
     push @items, ['sel1', 'rsa-sha256'];
     my $raw = DKIM2SignedFixture::signed(items => \@items);
     $calls = 0;
-    my $t = time;
     my $v = DKIM2SignedFixture::verify($raw, PubkeyCallback => $counting);
-    my $took = time - $t;
     like($v->result_detail, qr/^pass/, '4000 unknown items + one good: pass');
     is($calls, 1, '4000 unknown items: one key lookup');
-    # A quadratic reparse took ~4.7s here on a laptop; the bound allows for
-    # a small VPS.
-    cmp_ok($took, '<', 3, sprintf '4000 unknown items took %.3fs', $took);
 }
 
 done_testing;

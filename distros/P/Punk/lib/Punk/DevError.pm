@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.58';
+our $VERSION = '0.59';
 
 # Development error pages. Loaded only when the application compiles in the
 # development environment (Punk::App::compile_extras) - an opt-in: punk dev,

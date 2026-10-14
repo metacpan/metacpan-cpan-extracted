@@ -2,7 +2,7 @@ package Mail::DKIM2::Verifier;
 use strict;
 use warnings;
 
-our $VERSION = '0.18';
+our $VERSION = '0.20';
 
 use base 'Mail::DKIM2::HeaderParser';
 use Crypt::Digest::SHA256 qw(sha256);
@@ -44,7 +44,7 @@ sub _extract_mi_hash_sets {
     $raw =~ s/^[^:]+://;        # strip "Message-Instance:" field name
     $raw =~ s/\r?\n[ \t]/ /g;   # unfold continuation lines
     return [] unless $raw =~ /(?:\A|;)\s*h\s*=([^;]*)/i;    # §7: any case
-    return Mail::DKIM2::MessageInstance::parse_hash_sets($1);
+    return Mail::DKIM2::MessageInstance::parse_hash_sets($1) // [];    # malformed: MI parse reports it
 }
 
 sub known_options {
@@ -524,6 +524,13 @@ sub _verify_signature {
     if (my $dup = $signature->duplicate_tag) {
         $self->{result}  = 'permerror';
         $self->{details} = "DKIM2-Signature i=$i duplicate tag $dup not permitted (spec 8)";
+        return 0;
+    }
+    # §11.2: a field that does not parse is a syntax error -- never verified
+    # with its malformed parts dropped (follow-up review F3, F4).
+    if ($signature->syntax_error) {
+        $self->{result}  = 'permerror';
+        $self->{details} = "DKIM2-Signature i=$i syntax error";
         return 0;
     }
 

@@ -13,7 +13,7 @@ use Term::Chess::Game;
 use Term::Chess::Bot;
 use Getopt::Long ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 my %OUTLINE = (
     CP_KING()   => "\x{2654}", CP_QUEEN()  => "\x{2655}", CP_ROOK() => "\x{2656}",
@@ -799,7 +799,7 @@ Term::Chess - chess on the terminal against a bot
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

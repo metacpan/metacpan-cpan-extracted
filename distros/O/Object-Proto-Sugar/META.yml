@@ -21,8 +21,9 @@ no_index:
 requires:
   BEGIN::Lift: '0.07'
   Carp: '0'
+  Devel::CallParser: '0.005'
   Devel::Hook: '0'
   Object::Proto: '0.19'
   perl: '5.008003'
-version: '1.00'
+version: '1.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

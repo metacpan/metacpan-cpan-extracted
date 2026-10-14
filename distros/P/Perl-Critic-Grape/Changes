@@ -1,5 +1,9 @@
 Revision history for Perl::Critic::Grape
 
+0.1.2 - 2026-10-13
+	- Fix Refs $self misbehavior
+	- Fix debug test
+
 0.1.1 - 2026-10-10
 	- viv ProhibitUnnecessaryRefs
 

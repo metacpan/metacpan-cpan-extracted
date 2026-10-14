@@ -40,7 +40,7 @@ package Fake::Client {
     sub deliver_performance_samples {
         my ($self, $samples) = @_;
         $self->{calls}++;
-        return 0 if $self->{fail};
+        return 0 if $self->{fail} || $self->{reject};
         # Lets a test land a record() in the window between the snapshot and delivery succeeding.
         if (my $on_deliver = delete $self->{on_deliver}) {
             $on_deliver->();
@@ -55,6 +55,12 @@ package Fake::Client {
         }
         return 1;
     }
+}
+
+# The real Client's own last_status: what tells the flusher whether a 0 above is worth a retry.
+sub Fake::Client::last_status {
+    my ($self) = @_;
+    return $self->{reject} ? 'rejected' : $self->{fail} ? 'failed' : 'delivered';
 }
 
 sub decode_delivered {
@@ -110,6 +116,71 @@ subtest 'keeps the bucket for the next flush when delivery fails' => sub {
 
     is(scalar(@delivered), 1);
     is(decode_delivered($delivered[0])->[0]{request_count}, 2);
+};
+
+subtest 'drops a bucket the server rejected instead of sending it again' => sub {
+    my (@delivered, @logged) :shared;
+    my $client = Fake::Client->new(delivered => \@delivered, reject => 1);
+    my $config = new_configuration();
+    $config->{logger} = sub { lock(@logged); push @logged, $_[0] };
+    my $flusher = ForgeOps::Tracker::PerformanceFlusher->new($config, $client);
+
+    $flusher->record('GET /posts/:id', 100);
+    $flusher->flush; # rejected: the bucket is let go of
+    $flusher->flush; # nothing left to send
+    is($client->{calls}, 1);
+
+    $client->{reject} = 0;
+    $flusher->record('GET /posts/:id', 100);
+    $flusher->flush;
+
+    is(scalar(@delivered), 1);
+    is(decode_delivered($delivered[0])->[0]{request_count}, 1, 'the rejected request was not carried over');
+    is_deeply([@logged], ['[forge-ops-tracker] dropping 1 buffered performance samples: the server rejected them and will not accept a retry']);
+};
+
+subtest 'keeps a bucket through four failed flushes and drops it on the fifth' => sub {
+    my (@delivered, @logged) :shared;
+    my $client = Fake::Client->new(delivered => \@delivered, fail => 1);
+    my $config = new_configuration();
+    $config->{logger} = sub { lock(@logged); push @logged, $_[0] };
+    my $flusher = ForgeOps::Tracker::PerformanceFlusher->new($config, $client);
+
+    $flusher->record('GET /posts/:id', 100);
+    $flusher->flush for 1 .. 4;
+    is($client->{calls}, 4);
+    is_deeply([@logged], [], 'still held after four failures');
+
+    $flusher->flush; # the fifth in a row: dropped
+    $flusher->flush; # nothing left to send
+    is($client->{calls}, 5);
+    is_deeply([@logged], ['[forge-ops-tracker] dropping 1 buffered performance samples: 5 flushes in a row failed']);
+
+    $client->{fail} = 0;
+    $flusher->record('GET /posts/:id', 100);
+    $flusher->flush;
+    is(decode_delivered($delivered[0])->[0]{request_count}, 1, 'the dropped request was not carried over');
+};
+
+subtest 'a flush that gets through starts the count of failed flushes again' => sub {
+    my @delivered :shared;
+    my $client = Fake::Client->new(delivered => \@delivered, fail => 1);
+    my $flusher = ForgeOps::Tracker::PerformanceFlusher->new(new_configuration(), $client);
+
+    $flusher->record('GET /posts/:id', 100);
+    $flusher->flush for 1 .. 4;
+    $client->{fail} = 0;
+    $flusher->flush;
+    is(scalar(@delivered), 1);
+
+    $client->{fail} = 1;
+    $flusher->record('GET /posts/:id', 100);
+    $flusher->flush for 1 .. 4;
+    $client->{fail} = 0;
+    $flusher->flush;
+
+    is(scalar(@delivered), 2, 'four failures after a success did not drop the bucket');
+    is(decode_delivered($delivered[1])->[0]{request_count}, 1);
 };
 
 subtest 'the background thread flushes on its own after the configured interval' => sub {

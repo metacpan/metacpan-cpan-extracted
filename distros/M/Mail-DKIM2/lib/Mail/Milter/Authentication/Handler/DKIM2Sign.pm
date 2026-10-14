@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Mail::Milter::Authentication::Pragmas;
 # ABSTRACT: Handler class for DKIM2 signing
-our $VERSION = '0.18';
+our $VERSION = '0.20';
 use base 'Mail::Milter::Authentication::Handler';
 
 use Mail::DKIM2::Common qw(extract_mi_version strip_mi_versions load_private_key fold_header parse_mime
@@ -141,6 +141,13 @@ sub addheader_callback {
 
     my $config = $self->_config();
 
+    # X-DKIM2-Snapshot names the snapshot DKIM2Verify took of this message on
+    # this host. It never leaves: remove it from every message, signed or
+    # not, and keep the token (one, well-formed) for the diff below.
+    my @tokens = map { /\AX-DKIM2-Snapshot[ \t]*:\s*(\S*)/i ? ($1) : () } @{ $self->{'headers'} || [] };
+    $self->change_header( 'X-DKIM2-Snapshot', $_, q{} ) for reverse 1 .. @tokens;
+    $self->{'_snapshot_token'} = ( @tokens == 1 && $tokens[0] =~ /\A[0-9a-f]{32}\z/ ) ? $tokens[0] : undef;
+
     # Determine if we should sign this message
     my $should_sign = 0;
     if ( $config->{'sign_authenticated'} && $self->is_authenticated() ) {
@@ -172,6 +179,7 @@ sub addheader_callback {
     my $sign_config = $self->_get_sign_config($sign_domain);
     unless ($sign_config) {
         $self->dbgout( 'DKIM2Sign', "No signing config for $sign_domain", LOG_DEBUG );
+        $self->_remove_unsigned_instances($handler);
         return;
     }
 
@@ -201,8 +209,8 @@ sub addheader_callback {
             $message_data .= _fmtheader($h);
         }
 
-        # Original headers
-        foreach my $chunk (@{$self->{'headers'} || []}) {
+        # Original headers (less X-DKIM2-Snapshot, removed above)
+        foreach my $chunk (grep { !/\AX-DKIM2-Snapshot[ \t]*:/i } @{$self->{'headers'} || []}) {
             $message_data .= $chunk;
         }
 
@@ -302,6 +310,7 @@ sub addheader_callback {
                     'value' => _dkim2_info("not-signed=$reason"),
                 };
             }
+            $self->_remove_unsigned_instances($handler);
             return;
         }
 
@@ -355,6 +364,7 @@ sub addheader_callback {
             # refused.  Either way nothing is added to the message.
             $self->metric_count( 'dkim2_sign_total', { 'result' => 'error' } );
             $self->log_error( "DKIM2 signing failed: " . ($signer->result_detail // 'no result') );
+            $self->_remove_unsigned_instances($handler);
         }
     };
     if ( my $error = $@ ) {
@@ -362,6 +372,37 @@ sub addheader_callback {
         $self->log_error( 'DKIM2 Sign Error ' . $error );
         $self->metric_count( 'dkim2_sign_total', { 'result' => 'error' } );
     }
+}
+
+# Not signing a message this instance would sign: remove every
+# Message-Instance no DKIM2-Signature on it covers (m= above every
+# signature's m=), as bin/dkim2-milter does. Left in, every receiver reports
+# "m=N is not signed"; without them an unsigned post has no DKIM2 at all and
+# a signed one fails honestly against the last signature.
+sub _remove_unsigned_instances {
+    my ( $self, $handler ) = @_;
+    my $covered = 0;
+    for my $chunk ( @{ $self->{'headers'} || [] } ) {
+        next unless $chunk =~ /\ADKIM2-Signature[ \t]*:(.*)\z/is;
+        my ($m) = $1 =~ /(?:\A|;)\s*m\s*=\s*(\d+)/;
+        $covered = $m if defined $m && $m > $covered;
+    }
+    my ( $n, @gone ) = ( 0 );
+    for my $chunk ( @{ $self->{'headers'} || [] } ) {
+        next unless $chunk =~ /\AMessage-Instance[ \t]*:(.*)\z/is;
+        $n++;
+        ( my $val = $1 ) =~ s/\A\s+//;
+        my $v = extract_mi_version($val) // 0;
+        push @gone, [ $n, $v ] if $v > $covered;
+    }
+    return unless @gone;
+    $self->change_header( 'Message-Instance', $_->[0], q{} ) for reverse @gone;
+    my $list = join( ',', map { "m=$_->[1]" } sort { $a->[1] <=> $b->[1] } @gone );
+    push @{ $handler->{pre_headers} }, {
+        'field' => 'X-DKIM2-Info',
+        'value' => _dkim2_info("removed-unsigned-mi=$list"),
+    };
+    $self->dbgout( 'DKIM2MI', "Not signing: removed unsigned $list", LOG_INFO );
 }
 
 # Delete the Message-Instance fields with these m= values from the message as
@@ -404,9 +445,8 @@ sub close_callback {
 # Compute Message-Instance header for the message.
 #
 # 1. If the topmost MI already matches, return undef (no new MI needed).
-# 2. If a snapshot directory is configured, search all MI headers
-#    (highest version first) for one that has a stored snapshot.
-#    If found, compute a diff MI between the snapshot and current message.
+# 2. If the message carries the X-DKIM2-Snapshot token DKIM2Verify gave it,
+#    compute a diff MI between that snapshot and the current message.
 # 3. Otherwise, fall back to a hash-only MI (no Recipes).
 sub _compute_message_instance {
     my ( $self, $message_data, $config ) = @_;
@@ -429,41 +469,52 @@ sub _compute_message_instance {
         my %mi_by_v = map { (extract_mi_version($_) || 0) => $_ } @mi_headers;
         my $max_v = @mi_headers ? (sort { $b <=> $a } keys %mi_by_v)[0] : 0;
 
-        # Try to find a stored snapshot for any MI header
-        if ( $config->{'snapshot_directory'} ) {
+        # The snapshot DKIM2Verify took of this very message, named by its
+        # X-DKIM2-Snapshot token -- never one found by Message-Instance value
+        # (a replayed instance over an edited body would find a different
+        # message's, and the edit would be signed as this hop's own).
+        my $token = $self->{'_snapshot_token'};
+        if ( $config->{'snapshot_directory'} && defined $token && @mi_headers ) {
             my $store = Mail::DKIM2::MessageStore->new(
                 directory => $config->{'snapshot_directory'},
             );
-            for my $v (sort { $b <=> $a } keys %mi_by_v) {
-                my $snapshot_data = $store->fetch($mi_by_v{$v});
-                if ( $snapshot_data ) {
-                    $self->dbgout( 'DKIM2MI', "Found snapshot for MI m=$v, computing diff", LOG_DEBUG );
-                    my $snapshot_msg = parse_mime($snapshot_data);
-                    my @snap_mi = $snapshot_msg->header_raw('Message-Instance');
-
-                    # If the current message has more MI headers than the snapshot,
-                    # upstream added intermediate MIs.  Since verify() already told us
-                    # the top MI is wrong, strip those invalid intermediate headers and
-                    # recompute a clean diff from the snapshot instead of propagating
-                    # a broken chain.
-                    my ($work_data, $work_msg) = ($message_data, $msg);
-                    if ( @mi_headers > @snap_mi ) {
-                        my %snap_by_v = map { (extract_mi_version($_) || 0) => $_ } @snap_mi;
-                        my $snap_max_v = (sort { $b <=> $a } keys %snap_by_v)[0] // 0;
-                        my @to_strip = ($snap_max_v + 1 .. $max_v);
-                        $work_data = strip_mi_versions($message_data, @to_strip);
-                        $work_msg  = parse_mime($work_data);
-                        $self->{'_stripped_mi_versions'} = \@to_strip;
-                        $self->dbgout( 'DKIM2MI',
-                            'Stripped broken MI versions ' . join(',', @to_strip)
-                            . " (snapshot at m=$snap_max_v) — broken chain detected",
-                            LOG_INFO );
+            my $snapshot_data = $store->fetch("X-DKIM2-Snapshot:$token");
+            if ( $snapshot_data ) {
+                $self->dbgout( 'DKIM2MI', "Found snapshot $token, computing diff", LOG_DEBUG );
+                my $snapshot_msg = parse_mime($snapshot_data);
+                my @snap_mi = $snapshot_msg->header_raw('Message-Instance');
+                my %snap_by_v = map { (extract_mi_version($_) || 0) => $_ } @snap_mi;
+                # The snapshot's instances must be the message's lower ones.
+                for my $v (keys %snap_by_v) {
+                    my ($x, $y) = map { defined $_ ? s/\s+/ /gr =~ s/^ | $//gr : '' }
+                                  $snap_by_v{$v}, $mi_by_v{$v};
+                    if ( $x ne $y ) {
+                        $self->dbgout( 'DKIM2MI', "Snapshot $token is not this message's (m=$v differs)", LOG_INFO );
+                        return undef;
                     }
-
-                    $self->{'_clean_message_data'} = $work_data;
-                    return Mail::DKIM2::MessageInstance->calculate($work_msg, $snapshot_msg, @ignore,
-                        MaxRecipeLiterals => $config->{'max_recipe_literals'});
                 }
+
+                # If the current message has more MI headers than the snapshot,
+                # upstream added intermediate MIs.  Since verify() already told us
+                # the top MI is wrong, strip those invalid intermediate headers and
+                # recompute a clean diff from the snapshot instead of propagating
+                # a broken chain.
+                my ($work_data, $work_msg) = ($message_data, $msg);
+                my $snap_max_v = (sort { $b <=> $a } keys %snap_by_v)[0] // 0;
+                if ( $max_v > $snap_max_v ) {
+                    my @to_strip = ($snap_max_v + 1 .. $max_v);
+                    $work_data = strip_mi_versions($message_data, @to_strip);
+                    $work_msg  = parse_mime($work_data);
+                    $self->{'_stripped_mi_versions'} = \@to_strip;
+                    $self->dbgout( 'DKIM2MI',
+                        'Stripped broken MI versions ' . join(',', @to_strip)
+                        . " (snapshot at m=$snap_max_v) — broken chain detected",
+                        LOG_INFO );
+                }
+
+                $self->{'_clean_message_data'} = $work_data;
+                return Mail::DKIM2::MessageInstance->calculate($work_msg, $snapshot_msg, @ignore,
+                    MaxRecipeLiterals => $config->{'max_recipe_literals'});
             }
         }
 
@@ -649,8 +700,11 @@ broken intermediate Message-Instances on the way, it deletes those fields from
 the message once it has signed, through the framework's C<change_header()>
 (an empty value: C<SMFIR_CHGHEADER> in milter mode).
 
-On a refusal nothing is signed and no Message-Instance is added or removed;
-the reason is logged (C<dbgout>, C<LOG_INFO>) and counted in
+On a refusal nothing is signed and no Message-Instance is added; every
+Message-Instance no DKIM2-Signature covers (an C<m=> above every signature's
+C<m=>) is removed, with C<X-DKIM2-Info: ... action=removed-unsigned-mi=...;>,
+as also when the domain has no signing configuration or the Signer fails.
+The reason is logged (C<dbgout>, C<LOG_INFO>) and counted in
 C<dkim2_sign_total> (C<result> C<upstream-chain>, C<broken-mi-chain> or
 C<null-body-recipe>), and for the last two, as with C<dkim2-milter>, an
 C<X-DKIM2-Info: ... action=not-signed=E<lt>reasonE<gt>;> field is prepended.
@@ -734,11 +788,16 @@ unsigned Message-Instance with a null body Recipe for this handler to sign.  It
 never excuses a broken chain.  C<dns_overrides> and C<skip_timestamp_check>
 only affect the verification of the upstream chain, and are for tests.
 
-When C<snapshot_directory> is set, the handler looks up a stored message
-snapshot (written by DKIM2Verify on inbound) using the topmost Message-Instance
-header value as the key.  If found, a diff-based MI is computed capturing
-header and body changes made during local processing.  Without a snapshot,
-a simple hash-only MI is computed.  A snapshot diff whose body Recipe would need more
+When C<snapshot_directory> is set, the handler looks up the stored message
+snapshot DKIM2Verify took of this message on inbound, named by the
+C<X-DKIM2-Snapshot> token DKIM2Verify added -- never by Message-Instance value,
+which a replayed instance over an edited body would share with another
+message.  If found, and its Message-Instances are the message's lower ones, a
+diff-based MI is computed capturing header and body changes made during local
+processing.  A message whose top Message-Instance does not match and that has
+no such snapshot gets no new MI (and the gate refuses it); one with no
+Message-Instance at all gets C<m=1>.  The handler removes C<X-DKIM2-Snapshot>
+from every message it sees, signed or not.  A snapshot diff whose body Recipe would need more
 than C<max_recipe_literals> literal lines declares the body unrecoverable
 (a null body Recipe): this handler only adds header fields, so it cannot
 move the old body into the MIME epilogue.  Like any null this hop adds, it is

@@ -75,3 +75,6 @@ lib/Business/ISBN/RangeMessage.xml.new
 util/
 
 .downstream.json
+
+.downstream.json
+cpan_tester_reports

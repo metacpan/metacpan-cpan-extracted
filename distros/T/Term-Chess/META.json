@@ -36,6 +36,7 @@
          },
          "requires" : {
             "Chess::Plisco" : "v1.0.3",
+            "Devel::CallParser" : "0.005",
             "Digest::SHA" : "0",
             "Getopt::Long" : "0",
             "Object::Proto::Sugar" : "0.05",
@@ -50,6 +51,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

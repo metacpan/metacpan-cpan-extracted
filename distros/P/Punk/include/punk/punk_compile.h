@@ -138,7 +138,7 @@ static SV *pc_resolve_target(pTHX_ SV *self, SV *target, SV *whatsv) {
         const char *methname = SvPV_nolen(methsv);
         cvp = pc_class_can(aTHX_ classname, cl2, methname);
         if (!cvp) {
-            SV *req = sv_2mortal(newSVpvf("require %s; 1;", classname));
+            SV *req = pk_require_src(aTHX_ classname);
             eval_sv(req, G_SCALAR | G_EVAL);
             if (SvTRUE(ERRSV)) {
                 HV *st2 = gv_stashpvn(classname, cl2, 0);
@@ -253,8 +253,7 @@ static void pc_discover_namespace(pTHX_ SV *ns_sv, AV *out) {
                 /* by module name, not by the path the scan found: a
                  * path-form require of "lib/..." is @INC-searched too and
                  * misses when the entry that held the file is relative */
-                SV *req = sv_2mortal(newSVpvf("require %s; 1;",
-                                              SvPV_nolen(class)));
+                SV *req = pk_require_src(aTHX_ SvPV_nolen(class));
                 eval_sv(req, G_SCALAR | G_EVAL);
                 if (SvTRUE(ERRSV))
                     croak("Punk: model %s failed to load: %s",
@@ -330,7 +329,7 @@ static void pc_compile_models(pTHX_ SV *self) {
         else { class = sv_2mortal(newSVsv(ns)); sv_catsv(class, *np); }
         cs = SvPV_const(class, cl);
         if (!pc_class_can(aTHX_ cs, cl, "_punk_model_meta")) {
-            SV *req = sv_2mortal(newSVpvf("require %s; 1;", cs));
+            SV *req = pk_require_src(aTHX_ cs);
             eval_sv(req, G_SCALAR | G_EVAL);
             if (SvTRUE(ERRSV))
                 croak("Punk: model '%s' (%s) failed to load: %s",

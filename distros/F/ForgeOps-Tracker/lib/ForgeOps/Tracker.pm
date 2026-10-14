@@ -24,7 +24,7 @@ use Time::HiRes ();
 # directly: retrying the identical 0.2.0 tarball came back 409 Conflict, not the original success
 # response repeated). No functional change from 0.2.0; this bump exists solely to get a fresh,
 # uploadable version number.
-our $VERSION = '0.12.3';
+our $VERSION = '0.13.0';
 
 my $configuration;
 my $reporter;
@@ -104,10 +104,10 @@ sub _metric_buffers {
         my $config = _configuration();
         my $client = ForgeOps::Tracker::Client->new($config);
         $metric_buffer = ForgeOps::Tracker::MetricBuffer->new(
-            $config, sub { $client->deliver_metrics($_[0]) }, sub { $config->{metric_flush_interval} },
+            $config, sub { $client->deliver_metrics($_[0]); $client->last_status }, sub { $config->{metric_flush_interval} },
         );
         $infrastructure_metric_buffer = ForgeOps::Tracker::MetricBuffer->new(
-            $config, sub { $client->deliver_infrastructure_metrics($_[0]) }, sub { $config->{infrastructure_metric_flush_interval} },
+            $config, sub { $client->deliver_infrastructure_metrics($_[0]); $client->last_status }, sub { $config->{infrastructure_metric_flush_interval} },
         );
     }
     return ($metric_buffer, $infrastructure_metric_buffer);

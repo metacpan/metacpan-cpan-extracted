@@ -16,6 +16,7 @@ use Mail::Milter::Authentication::Handler::DKIM2Verify;
 use Mail::Milter::Authentication::Handler::DKIM2Sign;
 use Mail::DKIM2::Common qw(parse_dkim_pubkey strip_mi_versions);
 use DKIM2TestKeys;
+use Mail::DKIM2::MessageStore;
 
 # Helper: feed a raw message through milter verify callbacks
 sub run_verify {
@@ -430,6 +431,22 @@ sub run_outbound_sign {
     return ($handler, $mock);
 }
 
+# The X-DKIM2-Snapshot token DKIM2Verify put on a message, and the message
+# with it on top (as the MTA would hand it to the signing instance).
+sub snapshot_token {
+    my ($verify_handler) = @_;
+    my ($t) = map { $_->{value} } grep { $_->{field} eq 'X-DKIM2-Snapshot' }
+              @{$verify_handler->{_prepended}};
+    return $t;
+}
+sub with_token {
+    my ($raw, $verify_handler) = @_;
+    my $t = snapshot_token($verify_handler) // die 'no X-DKIM2-Snapshot token';
+    $raw =~ s/\r//gs;
+    $raw =~ s/\n/\r\n/gs;
+    return "X-DKIM2-Snapshot: $t\r\n" . $raw;
+}
+
 # Helper: assemble the final outbound message from sign mock output.
 # pre_headers are prepended (in reverse, as milters do) to the message
 # that was fed to the signer.
@@ -531,7 +548,7 @@ my $expected_dir = path("tests/expected");
     $modified =~ s/\r\n\r\n/\r\nList-Id: test.list\r\n\r\n/;
 
     # Outbound — should detect change and compute diff MI
-    my ($sign_handler, $mock) = run_outbound_sign($modified, $snapshot_dir);
+    my ($sign_handler, $mock) = run_outbound_sign(with_token($modified, $verify_handler), $snapshot_dir);
     my @dk2 = grep { $_->{field} eq 'DKIM2-Signature' } @{$mock->{pre_headers}};
     my @mi  = grep { $_->{field} eq 'Message-Instance' } @{$mock->{pre_headers}};
 
@@ -560,10 +577,10 @@ for my $c (
     my ($name, $want, %extra) = @$c;
     my $snapshot_dir = tempdir(CLEANUP => 1);
     my $signed_msg = make_originator_message();
-    run_inbound_verify($signed_msg, $snapshot_dir);
+    my $verify_handler = run_inbound_verify($signed_msg, $snapshot_dir);
     my $modified = $signed_msg;
     $modified =~ s/(\r\n\r\n)[^\r\n]+/${1}A rewritten first body line/ or die;
-    my (undef, $mock) = run_outbound_sign($modified, $snapshot_dir, %extra);
+    my (undef, $mock) = run_outbound_sign(with_token($modified, $verify_handler), $snapshot_dir, %extra);
     my @dk2 = grep { $_->{field} eq 'DKIM2-Signature' } @{$mock->{pre_headers}};
     my ($mi) = grep { $_->{field} eq 'Message-Instance' } @{$mock->{pre_headers}};
     if ($want eq 'refused') {
@@ -591,7 +608,7 @@ for my $c (
     my $signed_msg = make_originator_message();
 
     # Inbound — stores snapshot
-    run_inbound_verify($signed_msg, $snapshot_dir);
+    my $verify_handler = run_inbound_verify($signed_msg, $snapshot_dir);
 
     # Local processing adds header + computes MI v=2
     my $modified = $signed_msg;
@@ -608,7 +625,7 @@ for my $c (
         'case3: intermediate MI v=2 matches modified message');
 
     # Outbound — MI v=2 matches, no new MI needed
-    my ($sign_handler, $mock) = run_outbound_sign($with_mi2, $snapshot_dir);
+    my ($sign_handler, $mock) = run_outbound_sign(with_token($with_mi2, $verify_handler), $snapshot_dir);
     my @dk2 = grep { $_->{field} eq 'DKIM2-Signature' } @{$mock->{pre_headers}};
     my @mi  = grep { $_->{field} eq 'Message-Instance' } @{$mock->{pre_headers}};
 
@@ -654,7 +671,7 @@ for my $c (
     my $with_broken_mi2 = $broken_mi2_line . $modified;
 
     # Outbound — should detect v=2 is wrong, strip it, recompute from v=1
-    my ($sign_handler, $mock) = run_outbound_sign($with_broken_mi2, $snapshot_dir);
+    my ($sign_handler, $mock) = run_outbound_sign(with_token($with_broken_mi2, $verify_handler), $snapshot_dir);
     my @dk2 = grep { $_->{field} eq 'DKIM2-Signature' } @{$mock->{pre_headers}};
     my @mi  = grep { $_->{field} eq 'Message-Instance' } @{$mock->{pre_headers}};
     my @rem = grep { lc($_->{field}) eq 'message-instance' } @{$mock->{changed_headers}};
@@ -673,7 +690,7 @@ for my $c (
     }
 
     # Assemble the outbound message (with bad MI v=2 stripped)
-    my $outbound = assemble_outbound($with_broken_mi2, $mock);
+    my $outbound = assemble_outbound(with_token($with_broken_mi2, $verify_handler), $mock);
 
     # The outbound message must NOT contain the broken MI v=2
     my $parsed = Email::MIME->new($outbound);
@@ -691,6 +708,61 @@ for my $c (
         'case4: outbound message verifies clean after strip-and-recompute');
 
     $expected_dir->child("milter-case4-broken-mi-stripped.eml")->spew($outbound);
+}
+
+# --- X-DKIM2-Snapshot: snapshots are found only through the token ---
+# A replayed m=1 over an edited body must never find the genuine post's
+# snapshot by instance value and have the edit signed as this hop's own.
+{
+    my $snapshot_dir = tempdir(CLEANUP => 1);
+    my $signed_msg = make_originator_message();
+    my $vh = run_inbound_verify($signed_msg, $snapshot_dir);
+    my $tok = snapshot_token($vh);
+    like($tok // '', qr/^[0-9a-f]{32}$/, 'token: DKIM2Verify names the snapshot with a random token');
+    ok(Mail::DKIM2::MessageStore->new(directory => $snapshot_dir)->fetch("X-DKIM2-Snapshot:$tok"),
+       'token: the snapshot is stored under it');
+
+    # An incoming X-DKIM2-Snapshot is removed on ingress.
+    (my $forged = $signed_msg) =~ s/\r?\n\r?\n/\r\nX-DKIM2-Snapshot: $tok\r\n\r\n/;
+    my $fv = run_inbound_verify($forged, $snapshot_dir);
+    ok(grep({ lc $_->{field} eq 'x-dkim2-snapshot' && $_->{value} eq '' } @{$fv->{_changed_headers} || []}),
+       'token: an incoming X-DKIM2-Snapshot is deleted');
+
+    # The replay: same m=1 and i=1, edited body, no token. Not signed.
+    (my $replay = $signed_msg) =~ s/\r//gs;
+    $replay =~ s/\n/\r\n/gs;
+    $replay =~ s/(\r\n\r\n)/$1Laundered line.\r\n/;
+    my (undef, $mock) = run_outbound_sign($replay, $snapshot_dir);
+    ok(!grep({ $_->{field} eq 'DKIM2-Signature' } @{$mock->{pre_headers}}),
+       'replay: no token, no diff, not signed');
+    ok(!grep({ $_->{field} eq 'Message-Instance' } @{$mock->{pre_headers}}),
+       'replay: no instance added');
+
+    # A token naming another message's snapshot is no better: its instances
+    # are not this message's lower ones... and a token is only ever used once
+    # per message, so the same check covers a stale one. (Here: the genuine
+    # token on the edited replay -- the snapshot's m=1 is the replay's m=1, so
+    # this is exactly what the token binds; it was stripped on ingress and
+    # never leaves, so it cannot be obtained from outside.)
+}
+
+# --- Not signing: remove the instances no signature covers ---
+{
+    my $snapshot_dir = tempdir(CLEANUP => 1);
+    my $signed_msg = make_originator_message();
+    (my $msg = $signed_msg) =~ s/\r//gs;
+    $msg =~ s/\n/\r\n/gs;
+    # An unsigned m=2 (wrong hashes) over the signed m=1, and no token: the
+    # gate refuses; the unsigned m=2 must go.
+    my $bad = 'A' x 43 . '=';
+    my $with = "Message-Instance: m=2; h=sha256:$bad:$bad\r\n" . $msg;
+    my (undef, $mock) = run_outbound_sign($with, $snapshot_dir);
+    ok(!grep({ $_->{field} eq 'DKIM2-Signature' } @{$mock->{pre_headers}}), 'unsigned: refused');
+    my @rem = grep { lc $_->{field} eq 'message-instance' && $_->{value} eq '' } @{$mock->{changed_headers}};
+    is(scalar @rem, 1, 'unsigned: one Message-Instance removed');
+    is($rem[0]{index}, 1, 'unsigned: the m=2 (first field), not the signed m=1');
+    ok(grep({ $_->{field} eq 'X-DKIM2-Info' && $_->{value} =~ /removed-unsigned-mi=m=2;/ } @{$mock->{pre_headers}}),
+       'unsigned: removal recorded');
 }
 
 done_testing();

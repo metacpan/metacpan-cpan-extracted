@@ -10,7 +10,7 @@ use File::Basename ();
 use Getopt::Long ();
 use Punk ();
 
-our $VERSION = '0.58';
+our $VERSION = '0.59';
 
 # The whole punk command line. bin/punk is two lines - `exit
 # Punk::Command->main(@ARGV)` - and everything else is here: a registry of
@@ -694,7 +694,7 @@ sub config_check {
     if ($opt{dump}) {
         print "\nresolved (secrets redacted)\n";
         require Data::Dumper;
-        my $d = Data::Dumper->new([ $cfg->config ]);
+        my $d = Data::Dumper->new([ _redact_inline($cfg->config) ]);
         $d->Sortkeys(1)->Indent(1)->Terse(1);
         print $d->Dump;
     }
@@ -702,6 +702,24 @@ sub config_check {
     print "\n", $bad ? "$bad secret" . ($bad > 1 ? 's' : '')
                      . " could not be resolved\n" : "configuration is sound\n";
     return $bad ? 1 : 0;
+}
+
+# A copy of the resolved configuration with every value whose KEY says it is
+# a credential replaced. A reference such as { $env: ... } is already redacted
+# by the loader; a password somebody typed straight into the file is not, and
+# a dump is the thing that gets pasted into a ticket.
+sub _redact_inline {
+    my ($v, $hide) = @_;
+    if (ref $v eq 'HASH') {
+        return { map {
+            my $k = $_;
+            ($k => _redact_inline($v->{$k},
+                       $hide || $k =~ /pass|secret|token|api_?key|private/i))
+        } keys %$v };
+    }
+    return [ map { _redact_inline($_, $hide) } @$v ] if ref $v eq 'ARRAY';
+    return $v if ref $v || !defined $v || !$hide;
+    return '[redacted]';
 }
 
 # ---- punk api sync -----------------------------------------------------------
@@ -1423,6 +1441,7 @@ sub _insert_stubs {
     close $fh;
 
     require Punk::Generate;
+    Punk::Generate::_op_id($_->{id}) for @$ops;
     my $stubs = join '', map {
         Punk::Generate->render_skel('api_stub.tmpl', { op => $_ })
     } @$ops;

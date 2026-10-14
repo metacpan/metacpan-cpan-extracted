@@ -451,11 +451,12 @@ readings and falls off the end needs nothing more (a test runs exactly that in a
 captured (a signup is a row, not a running total), so a count or sum you compute later is exact. Both
 are a no-op when the client isn't enabled for the environment.
 
-A failed delivery keeps every entry for the next flush, and an entry captured while a delivery is in
-flight is kept too (the Ruby gem's own buffer loses it; a test pins this with a gated delivery on a
-second thread). The buffer holds at most 1000 entries per kind and drops further ones until a flush
-succeeds, since a plan without the feature rejects every flush and would otherwise grow it for as long
-as the process lives. A NaN, infinite or non-numeric value is dropped at capture. Requires a ForgeOps
+A delivery that fails for now (a network error, a timeout, a 5xx, a 408 or a 429) keeps every entry
+for the next flush, and an entry captured while a delivery is in flight is kept too (a test pins this
+with a gated delivery on a second thread). A batch the server rejects (any other 4xx, such as the 403
+a plan without the feature answers) is dropped rather than sent again, and so is one that has failed
+5 flushes in a row. The buffer holds at most 1000 entries per kind and drops further ones until a
+flush lets go of them. A NaN, infinite or non-numeric value is dropped at capture. Requires a ForgeOps
 plan that includes custom metrics / infrastructure monitoring.
 
 ## What changed

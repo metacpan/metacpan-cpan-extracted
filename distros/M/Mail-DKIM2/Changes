@@ -1,5 +1,91 @@
 Revision history for Mail::DKIM2
 
+0.20    2026-10-14
+        DKIM2 for stock Mailman, with dkim2-milter and Postfix routing only.
+        - New: dkim2-milter --wrap-single-part (inbound mode, needs
+          --snapshot-dir). A single-part post is wrapped as a one-part
+          multipart/mixed (its Content-* fields and body unchanged), the
+          wrap recorded as its own unsigned Message-Instance, and the
+          wrapped message kept as the snapshot the outbound milter diffs
+          against. Stock Mailman then adds its footer as an extra part
+          rather than re-encoding the body. See
+          docs/dkim2-postfix-stock-mailman-guide.md in the interop repository.
+        - New: Mail::DKIM2::Wrap (wrap_single_part).
+        - Behaviour change: dkim2-milter in outbound mode adds no
+          Message-Instance to mail it does not sign (no key for the sender,
+          a refused chain, a signer failure), and removes every
+          Message-Instance no DKIM2-Signature covers -- instances hops on
+          this host added for a signature that is not going to be made --
+          recording it as X-DKIM2-Info: action=removed-unsigned-mi=...;.
+          It used to add an unsigned Message-Instance and leave the others,
+          which receivers report as permerror ("m=N is not signed"). An
+          unsigned post now leaves with no DKIM2 at all, and a signed one
+          fails honestly against the sender's signature. DKIM2Sign does the
+          same on a refusal, a domain with no signing configuration, or a
+          Signer failure.
+        - Fix: dkim2-milter in outbound mode computes its own
+          Message-Instance (the diff against the snapshot) before checking
+          the upstream chain, and checks the message as it will be signed.
+          It used to check first, so a list manager that changed a message
+          without recording an instance of its own -- every list copy
+          whose changes only the snapshot diff records -- was refused.
+        - Security fix: dkim2-milter no longer finds snapshots by
+          Message-Instance value. A post that replayed a sender's genuine
+          m=1 over an edited body found the genuine post's snapshot, and
+          the edit was recorded and signed as this host's own change. The
+          inbound milter now snapshots only a message it stamps m=1 or
+          whose top instance matches the content, stores the snapshot under
+          a random token and names it in a new X-DKIM2-Snapshot header; the
+          outbound milter diffs only against the snapshot that token names.
+          Every mode strips X-DKIM2-Snapshot from the mail it sees, so a
+          token neither comes from outside nor leaves the host. The inbound
+          and outbound milters must share --snapshot-dir (as before) and be
+          upgraded together. The authentication_milter handlers do the same:
+          DKIM2Verify names its snapshot in X-DKIM2-Snapshot (and removes
+          any that arrives), DKIM2Sign finds it only through that token, and
+          both must be upgraded together.
+        - Behaviour change: since the outbound milter's own diff instance is
+          now gated as an unsigned instance, a diff that falls back to a null
+          body Recipe is signed only with --allow-null-body-recipe.
+        - Fix: dkim2-milter registers SMFIF_CHGHDRS, so removing a broken
+          intermediate Message-Instance (which calls chgheader) no longer
+          dies in Sendmail::PMilter. The removals now go out before the new
+          Message-Instance is inserted, so an MTA that counts inserted
+          fields in a header index still removes the right one.
+
+0.19    2026-10-09
+        Fixes from a follow-up review of 0.18. Malformed fields that used to
+        verify are now errors; well-formed mail verifies as before, and
+        signatures fold where they did, except as below.
+        - Behaviour change: a DKIM2-Signature or Message-Instance must parse
+          as a whole tag list (spec-06 sections 7, 8, 11.2). A fragment that
+          is not name=value ("junk", "9bad=foo"), or a value with a byte
+          outside printable ASCII or a ";", is PERMERROR "syntax error"; it
+          used to be dropped and the rest verified. Well-formed unknown tags
+          are still ignored and still signed.
+          Mail::DKIM2::TagValueList gains split_tag_list() and syntax_error().
+        - Behaviour change: whitespace inside an s= selector or algorithm, or
+          an h= hash name, is a syntax error. "rsa- sha256" used to be read
+          as rsa-sha256. FWS around the item's colons and commas and inside
+          base64 is still accepted. An h= hash-set missing a digest is a
+          syntax error rather than skipped; parse_hash_sets() returns undef
+          for a malformed value.
+        - Behaviour change: every value in a key record, unknown tags'
+          included, must fit the tag-list grammar; a NUL, DEL or 8-bit byte
+          makes the record a syntax error.
+        - Fix: the signer split a long d= domain (two 40-character labels)
+          across lines, and the verifier then failed the MAIL FROM/d= match.
+          fold_header() now folds a DKIM2 field only where its grammar allows
+          FWS -- base64 interiors, beside s= and h= item colons, list commas
+          other than in s= -- leaving an unbreakable token whole on a longer
+          line, and croaks rather than emit a line over 998 characters.
+        - Fix: header recipe generation was quadratic in repeated identical
+          fields (16,000 took ~3s); it is linear, with identical recipes.
+        - Fix: load() rethrows a host's exception object from the input's
+          can() instead of replacing it with a "cannot read" croak.
+        - Docs: Signature.pm comments describe the empty s= value and
+          spec-06 9.6's WSP deletion.
+
 0.18    2026-10-09
         Fixes from an external review against spec-06. Several are
         behaviour changes for messages that are malformed or adversarial;

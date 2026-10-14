@@ -19,7 +19,7 @@ use Travel::Status::DE::DBRIS;
 use Travel::Routing::DE::DBRIS::Connection;
 use Travel::Routing::DE::DBRIS::Offer;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 Travel::Routing::DE::DBRIS->mk_ro_accessors(qw(earlier later));
 
@@ -38,6 +38,9 @@ sub new {
 
 	if ( not $ua ) {
 		my %lwp_options = %{ $conf{lwp_options} // { timeout => 20 } };
+
+		# work around Akamai BMP TLS fingerprinting
+		$lwp_options{ssl_opts}{SSL_ciphersuites} = 'TLS_AES_256_GCM_SHA384';
 		$ua = LWP::UserAgent->new(%lwp_options);
 		$ua->env_proxy;
 	}
@@ -434,7 +437,7 @@ Travel::Routing::DE::DBRIS - Interface to the bahn.de itinerary service
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 DESCRIPTION
 

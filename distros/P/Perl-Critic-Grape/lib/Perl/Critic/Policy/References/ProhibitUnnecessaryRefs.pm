@@ -9,7 +9,7 @@ use Scalar::Util qw/refaddr/;
 use Perl::Critic::Utils qw/:severities :classification/;
 use base 'Perl::Critic::Policy';
 
-our $VERSION = '0.1.1';
+our $VERSION = '0.1.2';
 
 Readonly::Scalar my $DESC=>q{Use Perl basic types.};
 Readonly::Scalar my $EXPL=>undef;
@@ -305,8 +305,8 @@ sub analyze {
 		}
 		elsif($node->isa('PPI::Statement::Variable')) {
 			foreach my $symbol (grep {'$' eq $_->symbol_type()} $node->symbols()) {
-				push @{$$self{$cachekey}{pending}{lockey($node)}},{type=>'recordAssignment',node=>$node,symbol=>$symbol};
-				if(($symbol eq '$self')&&!$$self{_self}) { $$self{$cachekey}{pending}{lockey($node)}[-1]{exempt}=1 }
+				my %exempt; if(($symbol eq '$self')&&!$$self{_self}) { %exempt=(exempt=>1) }
+				push @{$$self{$cachekey}{pending}{lockey($node)}},{type=>'recordAssignment',node=>$node,symbol=>$symbol,%exempt};
 			}
 			if(my $assign=$node->find_first(sub {
 				my (undef,$e)=@_;
@@ -318,7 +318,9 @@ sub analyze {
 		}
 		elsif($node->isa('PPI::Token::Operator')&&$assignmentOperator{$node->content()}) {
 			foreach my $symbol ($self->assignedVariables($node)) {
-				push @{$$self{$cachekey}{pending}{lockey($node->parent())}},{type=>'recordAssignment',node=>$node,symbol=>$symbol} }
+				my %exempt; if(($symbol eq '$self')&&!$$self{_self}) { %exempt=(exempt=>1) }
+				push @{$$self{$cachekey}{pending}{lockey($node->parent())}},{type=>'recordAssignment',node=>$node,symbol=>$symbol,%exempt};
+			}
 		}
 		$node=$self->step($node);
 	}

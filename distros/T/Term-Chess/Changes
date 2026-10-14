@@ -1,4 +1,7 @@
 Revision history for Term-Chess
 
+0.02    2026-10-13
+        Fix t/02-bot.t timing failure on slow hosts
+
 0.01    2026-10-11
         First version

@@ -13,7 +13,8 @@ use IO::Socket::INET;
 # mocking framework needed, no monkeypatching a global HTTP function), so this spins one up for
 # real rather than faking the transport layer. Each received request is appended as one JSON line
 # to a temp file the test process can read back and assert against; responds 401 for
-# /unauthorized, 202 otherwise, matching the PHP fixture's own convention.
+# /unauthorized, whatever code follows /status/ in the path, 202 otherwise, matching the PHP
+# fixture's own convention.
 sub start {
     my ($class) = @_;
 
@@ -47,7 +48,9 @@ sub start {
             }), "\n";
             close $fh;
 
-            my $status = $env->{PATH_INFO} eq '/unauthorized' ? 401 : 202;
+            my $status = $env->{PATH_INFO} eq '/unauthorized' ? 401
+                : $env->{PATH_INFO} =~ m{/status/(\d{3})} ? $1
+                : 202;
             return [ $status, [ 'Content-Type' => 'text/plain' ], [''] ];
         };
         $server->run($app);

@@ -2814,6 +2814,13 @@ agents="crawl-engine"
 domain=".creasource.dev"
 network="167.233.208.8"
 
+[crawlpolicy]
+## Date: 2026-10-13
+## About: https://crawlpolicyindex.org/bot
+
+agents="CrawlPolicyIndex"
+network=[ "178.128.255.20" ]
+
 [dataforseo]
 ## About: https://dataforseo.com/dataforseo-bot
 
@@ -6204,6 +6211,24 @@ network=[
 agents="GreenFaceLabsCensus"
 network=["45.76.84.221"]
 
+[harambis]
+## Date: 2026-10-13
+## About: https://harambis.com/bot
+## Network: https://harambis.com/bot/ips.txt
+agents="harambis"
+network=[
+  "104.237.134.224/32",
+  "139.162.121.234/32",
+  "139.162.54.193/32",
+  "172.104.151.116/32",
+  "172.233.21.89/32",
+  "172.236.125.5/32",
+  "172.237.100.40/32",
+  "192.81.129.118/32",
+  "194.195.126.109/32",
+  "45.33.84.221/32"
+]
+
 [headline]
 agents="ev-crawler"
 domain=".headline.com"
@@ -6304,11 +6329,24 @@ network=[
 agents="facebookexternalhit/1.1 Facebot Twitterbot"
 ignore=true
 
+[infosifter]
+## About: https://logicus.se/about_InfoSifter.html
+
+agents="InfoSifter"
+domain=".logicus.se"
+
 [infotiger]
 ## About: https://infotiger.com/bot.html
 
 agents="InfoTigerBot"
 domain=".infotiger.com"
+
+[insightbasebot]
+## Date: 2026-10-12
+## About: https://insightbase.com/bot
+
+agents="InsightBaseBot"
+network="194.26.222.226"
 
 [intentbeam]
 ## Date: 2026-09-04
@@ -6318,6 +6356,18 @@ agents="IntentBeamBot"
 network=[
   "91.98.156.201",
   "167.233.62.207",
+]
+
+[intentroutebot]
+## Date: 2026-10-12
+## About: https://intentroute.net/crawler
+## Network: https://intentroute.net/crawler/ips.json
+
+agents="IntentRouteBot"
+domain=".intentroute.net"
+network=[
+  "159.195.241.59/32",
+  "2a0a:4cc0:60:1e57:1499:bdff:fefe:60fa/128"
 ]
 
 [internetmeasurement]
@@ -6411,6 +6461,61 @@ network=[
   "104.254.65.50",
   "209.151.156.194",
 ]
+
+[keenablebot]
+## Date: 2026-10-13
+## About: https://app.keenable.ai/bot
+## Network: https://app.keenable.ai/bot/keenablebot.json
+agents="KeenableBot"
+network=[
+  "104.198.209.18/32",
+  "35.232.42.235/32",
+  "34.42.223.8/32",
+  "34.56.36.185/32",
+  "34.67.139.73/32",
+  "34.123.250.241/32",
+  "35.194.39.138/32",
+  "136.71.4.21/32",
+  "130.211.118.157/32",
+  "35.202.6.174/32",
+  "35.202.16.77/32",
+  "34.132.128.17/32",
+  "35.188.92.138/32",
+  "104.154.246.94/32",
+  "34.56.228.200/32",
+  "35.255.138.62/32",
+  "35.255.22.29/32",
+  "35.188.220.150/32",
+  "136.116.172.161/32",
+  "136.71.136.76/32",
+  "34.16.102.59/32",
+  "34.134.69.125/32",
+  "34.56.241.78/32",
+  "136.65.199.196/32",
+  "104.197.111.254/32",
+  "35.188.69.123/32",
+  "35.222.239.11/32",
+  "35.202.30.16/32",
+  "136.113.235.86/32",
+  "34.123.210.130/32"
+]
+
+[keenable-user]
+## Date: 2026-10-13
+## About: https://app.keenable.ai/bot
+## Network: https://app.keenable.ai/bot/keenable-user.json
+agents="Keenable-User"
+network=[
+  "34.31.116.125/32",
+  "34.31.229.240/32",
+  "35.193.143.101/32",
+  "136.115.37.205/32",
+  "136.64.90.125/32",
+  "104.154.81.154/32",
+  "35.202.5.108/32",
+]
+
+
 
 [linkedin]
 agents="LinkedInBot"
@@ -6716,7 +6821,7 @@ network=[
   "193.224.0.0/15",
 ]
 
-[partnerx]
+[partnex]
 ## About: https://getpartnex.com/bot
 agents="PartnexRadarBot"
 domain=".getpartnex.com"
@@ -8060,6 +8165,11 @@ network=[
   "199.47.80.0/24",
   "199.47.82.16/28",
 ]
+
+[webxtrendbot]
+## About: https://webxtrend.com/crawler
+agents="webXtrendBot"
+domain=".webxtrend.com"
 
 [wikimedia]
 ## About: https://wikitech.wikimedia.org/wiki/Citoid

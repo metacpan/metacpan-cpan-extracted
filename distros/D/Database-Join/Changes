@@ -1,5 +1,23 @@
 Revision history for Database::Join
 
+0.010.0	Tue Oct 13 08:47:55 PM EDT 2026
+	[ Enhancements ]
+	- distinct => 1: selectall_arrayref (and selectall_array) now accept
+	  distinct => 1 to return deduplicated rows.  With columns => \@cols the
+	  result is projected to those columns before deduplication; without columns
+	  the full merged row is deduplicated on all column values.  Array backend:
+	  post-merge Perl-side dedup (first occurrence wins).  SQLite backend:
+	  SELECT DISTINCT ... col1, col2 pushed into the SQL query.
+	- mandatory_filters: new constructor parameter; an arrayref of
+	  {col, op, val} hashrefs that are applied on every query regardless of
+	  what the caller passes.  Intended for row-level security: a mandatory
+	  predicate set at object construction cannot be bypassed by caller criteria.
+	  Supported operators: eq, ne, lt, lte, gt, gte, like, contains.  Array
+	  backend: post-merge Perl-side grep before sort/pagination.  SQLite backend:
+	  injected into the per-call WHERE clause via _sqlite_criteria so the SQL
+	  engine enforces them.  Unknown columns and unsupported ops croak at
+	  construction time.  t/distinct-mandatory.t: 45 new assertions.
+
 0.009.0 Mon Oct 12 01:47:59 PM EDT 2026
 	[ Enhancements ]
 	- aggregate(): group the merged view by one or more published column names and

@@ -4,6 +4,16 @@ use strict;
 use warnings;
 use Test::DescribeMe qw(author);
 use Test::Needs 'Test::Version';
+use Test::More;
 
 Test::Version->import();
 version_all_ok();
+
+use Database::Abstraction;
+use Database::Abstraction::Query;
+
+is($Database::Abstraction::Query::VERSION,
+	$Database::Abstraction::VERSION,
+	'Query.pm version matches main module version');
+
+done_testing();

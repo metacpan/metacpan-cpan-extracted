@@ -1,0 +1,43 @@
+State-Store
+
+State with undo, redo and watchers.
+
+A store holds one value and is the place a program asks for the current
+one. It is meant for values from HAMT, where keeping an old version costs
+almost nothing, so that undo is a matter of pointing at the version before.
+
+Requires a C compiler, perl 5.10 or later, and HAMT.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc State::Store
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=State-Store
+
+    Search CPAN
+        https://metacpan.org/release/State-Store
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION <email@lnation.org>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)

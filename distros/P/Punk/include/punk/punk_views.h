@@ -58,7 +58,7 @@ static void pv_load_engine(pTHX_ pv_views *v, SV *name_sv, SV *opts) {
     SV *engine;
 
     if (!stash || !gv_fetchmethod_autoload(stash, "render", 0)) {
-        SV *req = sv_2mortal(newSVpvf("require %s; 1;", class));
+        SV *req = pk_require_src(aTHX_ class);
         eval_sv(req, G_SCALAR);
         if (SvTRUE(ERRSV))
             croak("Punk::Views: engine '%.*s' (%s) failed to load: %s",

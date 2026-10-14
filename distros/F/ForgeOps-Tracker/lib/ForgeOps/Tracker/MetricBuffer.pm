@@ -6,6 +6,7 @@ use threads;
 use threads::shared;
 use JSON::PP ();
 use Scalar::Util qw(weaken);
+use ForgeOps::Tracker::DeliveryStatus;
 
 # Collects individual capture_metric()/capture_infrastructure_metric() calls in-process and
 # periodically flushes them as one batch, rather than one network call per capture. Unlike
@@ -21,8 +22,8 @@ use Scalar::Util qw(weaken);
 #   resetting the whole list, so an entry recorded while the request is in flight (the lock is not
 #   held around the network call) is kept for the next flush rather than lost.
 # - The buffer is capped at MAX_ENTRIES, and once full further entries are dropped until a flush
-#   succeeds: a plan without the feature answers 403 on every flush, and an uncapped buffer would then
-#   grow for as long as the process lives. Dropping the newest rather than the oldest keeps the
+#   lets go of them: an unreachable server fails every flush, and an uncapped buffer would keep
+#   growing until the batch is given up on (see DeliveryStatus::settle). Dropping the newest rather than the oldest keeps the
 #   entries a flush is delivering at the front of the list, which is what makes removing exactly those
 #   afterward exact.
 # - A NaN or infinite value is dropped at record time: JSON::PP would encode it as the invalid JSON
@@ -43,13 +44,16 @@ sub new {
     my @entries :shared;
     my $lock = 1;
     share($lock);
+    my $failed_flushes = 0;
+    share($failed_flushes);
 
     my $self = bless {
         configuration => $configuration,
-        deliver       => $deliver,     # takes an arrayref of hashrefs, returns whether it succeeded
+        deliver       => $deliver,     # takes an arrayref of hashrefs, returns a DeliveryStatus (or 1/0)
         interval      => $interval,    # returns the flush interval in seconds
         entries       => \@entries,
         lock          => \$lock,
+        failed_flushes => \$failed_flushes,
         worker        => undef,
     }, $class;
 
@@ -79,7 +83,8 @@ sub record {
     return 1;
 }
 
-# Delivers everything buffered so far as one batch. A failed delivery keeps every entry.
+# Delivers everything buffered so far as one batch. A delivery that failed for now keeps every entry;
+# a batch the server rejected, or the DeliveryStatus::MAX_FAILED_FLUSHES-th failure in a row, drops it.
 sub flush {
     my ($self) = @_;
 
@@ -90,11 +95,22 @@ sub flush {
         @snapshot = @{ $self->{entries} };
     }
 
-    my $delivered = $self->{deliver}->([ map { JSON::PP::decode_json($_) } @snapshot ]);
-    return unless $delivered;
+    my $result = eval { $self->{deliver}->([ map { JSON::PP::decode_json($_) } @snapshot ]) };
+    if ($@) {
+        # A delivery that died is one more failed flush, not a reason to die into the caller.
+        eval { $self->{configuration}->log("[forge-ops-tracker] metric flush error: $@") };
+        $result = 0;
+    }
+    my $status = ForgeOps::Tracker::DeliveryStatus::from($result);
 
     lock(${ $self->{lock} });
-    # Exactly the entries just delivered: anything recorded while the request was in flight sits after
+    my ($release, $why) = ForgeOps::Tracker::DeliveryStatus::settle($self->{failed_flushes}, $status);
+    return unless $release;
+    if ($why) {
+        eval { $self->{configuration}->log('[forge-ops-tracker] dropping ' . scalar(@snapshot) . " buffered metrics: $why") };
+    }
+
+    # Exactly the entries just sent: anything recorded while the request was in flight sits after
     # them and stays for the next flush.
     # shift in a loop: splice is not implemented for shared arrays.
     shift @{ $self->{entries} } for 1 .. @snapshot;

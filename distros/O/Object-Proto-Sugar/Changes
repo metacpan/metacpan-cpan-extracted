@@ -1,5 +1,8 @@
 Revision history for Object-Proto-Sugar
 
+1.01	2026-10-13
+	- Require Devel::CallParser 0.005, fixes lexical scoping on threaded perls.
+
 0.06	2026-08-02
 	- Add the prv shortcut and private => 1 option for Object::Proto private attributes.
 

@@ -1,5 +1,11 @@
 Revision history for Perl module Module::Extract::Version
 
+1.123 2026-10-13T11:16:25Z
+	* ugh, left a debugging statement in the previous release
+
+1.122 2026-10-13T10:42:05Z
+	* try harder to handle version->declare (#21)
+
 1.121 2026-06-21T19:43:16Z
 	* support the old qv() syntax from version.pm
 

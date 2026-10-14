@@ -1184,6 +1184,31 @@ logging(self, ...)
             STRLEN kl; const char *k = SvPV_const(ST(i), kl);
             (void)hv_store(cfg, k, (I32)kl, newSVsv(ST(i + 1)), 0);
         }
+        {   /* `to` as a path: what a YAML file can say, since it cannot hold
+             * a handle. Opened here, for append, so a path that cannot be
+             * written is a boot error and not a 500 on the first line that
+             * somebody tries to log. */
+            SV **to = hv_fetchs(cfg, "to", 0);
+            if (to && *to && SvOK(*to) && !SvROK(*to)
+                && SvTYPE(*to) != SVt_PVGV && SvCUR(*to)) {
+                PerlIO *fp = PerlIO_open(SvPV_nolen(*to), "a");
+                GV *gv;
+                IO *io;
+                if (!fp) {
+                    SV *msg = sv_2mortal(newSVpvf(
+                        "Punk: logging cannot open '%" SVf "' for append: %s",
+                        SVfARG(*to), Strerror(errno)));
+                    SvREFCNT_dec((SV *)cfg);
+                    croak_sv(msg);
+                }
+                PerlIO_setlinebuf(fp);
+                gv = newGVgen("Punk::Logger");
+                io = GvIOn(gv);
+                IoIFP(io) = IoOFP(io) = fp;
+                IoTYPE(io) = IoTYPE_APPEND;
+                (void)hv_stores(cfg, "to", newRV_noinc((SV *)gv));
+            }
+        }
         (void)hv_stores(h, "logging", newRV_noinc((SV *)cfg));
         RETVAL = newSVsv(self);
     }
@@ -1725,7 +1750,7 @@ plugin(self, name, opts = &PL_sv_undef)
         SV *p, *argv[2], *r;
         sv_2mortal(classsv);
         if (!(stash && gv_fetchmethod_autoload(stash, "register", 0))) {
-            SV *req = sv_2mortal(newSVpvf("require %s; 1;", class));
+            SV *req = pk_require_src(aTHX_ class);
             eval_sv(req, G_SCALAR);
             if (SvTRUE(ERRSV))
                 croak("Punk: plugin '%s' (%s) failed to load: %s",

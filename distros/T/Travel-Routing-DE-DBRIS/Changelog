@@ -1,3 +1,7 @@
+Travel::Status::DE::DBRIS 0.15 - Wed Oct 14 2026
+
+    * Work around latest Akamai BMP TLS fingerprinting rules
+
 Travel::Routing::DE::DBRIS 0.14 - Sun Sep 27 2026
 
     * dbris: handle pseudo-trains withuot occupancy

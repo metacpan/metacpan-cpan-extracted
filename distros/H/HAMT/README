@@ -1,0 +1,44 @@
+HAMT
+
+Persistent maps, sets and vectors.
+
+A persistent container is one where an update returns a new container and
+leaves the one it was called on exactly as it was. The two share nearly all
+of their memory, so keeping the old one costs a few small nodes and not a
+copy.
+
+Requires a C compiler and perl 5.10 or later. No runtime prerequisites.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc HAMT
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=HAMT
+
+    Search CPAN
+        https://metacpan.org/release/HAMT
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION <email@lnation.org>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)

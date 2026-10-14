@@ -39,7 +39,7 @@ WriteMakefile(
 		'File::Spec' => 0,
 		'File::Temp' => 0,
 		'List::Util' => 1.33,
-		'Log::Abstraction' => 0.39,
+		'Log::Abstraction' => 0.40,
 		'Object::Configure' => 0.24,
 		'Params::Get' => 0.17,
 		'Return::Set' => 0,
@@ -53,7 +53,7 @@ WriteMakefile(
 		#   IO::Compress::Gzip (core since 5.9.4; used in t/ fixture creation)
 	}, TEST_REQUIRES => {
 		'CHI' => 0,
-		'DBD::CSV' => 0,
+		'DBD::CSV' => 0.64,	# 0.64+ (SQL::Statement 1.414+) required for correct SELECT DISTINCT
 		'DBD::XMLSimple' => 0.07,
 		'DBM::Deep' => 0,
 		'Excel::Writer::XLSX' => 0,
@@ -83,7 +83,7 @@ WriteMakefile(
 		'Test::Memory::Cycle' => 0,
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
-		'Test::Mockingbird' => 0,
+		'Test::Mockingbird' => 0.14,
 		'Test::NoWarnings' => 0,
 		'Test::Permissions' => 0,
 		'Test::Returns' => 0,
@@ -103,6 +103,7 @@ WriteMakefile(
 		'meta-spec' => { version => 2 },
 		recommends => {
 			# Optional runtime backends — lazy-loaded; install for full functionality
+			'DBD::CSV' => 0.64,		# CSV/PSV/TSV DBI backend; 0.64+ required for SELECT DISTINCT
 			'DBD::Excel' => 0,		# .xls (old binary Excel) backend
 			'DBM::Deep' => 0,		# .dbm/.deep/magic-byte .db backend
 			'File::Slurp::Remote' => 0,	# remote host backend (SSH/SCP)

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.13.0 (2026-10-13)
+
+- Fixed: a batch the server refused was re-sent at every flush for as long as the process lived, with everything recorded since added to it. Performance samples and custom and infrastructure metrics are now dropped when the server answers with a 4xx other than 408 or 429 (a 400, 401, 403, 413 or 422, for example), since sending the same batch again can only fail the same way. Once a metric buffer had filled up behind such a batch, every new metric was dropped too; that no longer happens.
+- A batch that could not be delivered for now (a network error, a timeout, a 5xx, a 408 or a 429) is still kept for the next flush, but only for 5 flushes in a row. After the fifth it is dropped and the buffer starts clean, so a long outage no longer holds the same data in memory forever. Error events, traces and changes were already sent once and never re-sent; that is unchanged.
+- With a `logger`, each dropped batch is logged once with how many entries were dropped and why, and a 4xx answer is logged as rejected rather than failed.
+- `flush_metrics()` no longer dies if a delivery dies; it counts as a failed flush.
+- New `ForgeOps::Tracker::Client->last_status` returns `delivered`, `rejected` or `failed` for the client's most recent attempt (see `ForgeOps::Tracker::DeliveryStatus`). Every `deliver*` method still returns 1 or 0 as before.
+
 ## 0.12.3 (2026-10-03)
 
 - `IO::Socket::SSL` (1.42+) and `Net::SSLeay` (1.49+) are now prerequisites, so `cpanm ForgeOps::Tracker` installs them. `HTTP::Tiny` needs both to send over https, which a ForgeOps DSN always is, and neither is core Perl: on a perl without them the client installed cleanly and then delivered nothing, without saying why.

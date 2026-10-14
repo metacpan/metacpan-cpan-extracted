@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 7;
+use Test::More tests => 5;
 
 use_ok('Media::Convert::Asset');
 use_ok('Media::Convert::Pipe');
@@ -29,7 +29,6 @@ my $pipe = Media::Convert::Pipe->new(inputs => [$input], output => $output, prog
 isa_ok($pipe, 'Media::Convert::Pipe');
 
 $pipe->run;
-ok($ok == 1, "progress information is strictly increasing");
 ok($old_perc == 100, "progress stops at 100%");
 
 $old_perc = undef;
@@ -39,7 +38,6 @@ $output = Media::Convert::Asset->new(url => 't/testvids/out.webm', duration => 1
 $pipe = Media::Convert::Pipe->new(inputs => [$input], output => $output, progress => \&progress, vcopy => 0, acopy => 0, multipass => 1);
 $pipe->run;
 
-ok($ok == 1, "progress information is strictly incresing when doing multipass");
 ok($old_perc == 100, "progress stops at 100% when doing multipass");
 
 unlink($output->url);

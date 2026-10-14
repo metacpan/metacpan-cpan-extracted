@@ -5,7 +5,7 @@ use warnings;
 
 use Term::Chess;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 exit Term::Chess->run(@ARGV);
 

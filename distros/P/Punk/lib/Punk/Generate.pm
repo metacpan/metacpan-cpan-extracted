@@ -10,7 +10,7 @@ use File::Copy ();
 use File::Basename ();
 use Template::Stencil;
 
-our $VERSION = '0.58';
+our $VERSION = '0.59';
 
 sub new {
     my ($class, %args) = @_;
@@ -153,6 +153,19 @@ sub _dist_dir {
 sub _pkg_ok {
     my ($name) = @_;
     return $name =~ /\A[A-Za-z_][A-Za-z0-9_]*(?:::[A-Za-z_][A-Za-z0-9_]*)*\z/;
+}
+
+# An operationId becomes `sub NAME {` in a generated controller, written
+# with nothing escaped, so it has to BE a name. A specification is a document
+# somebody else may have written, and anything else in that position is their
+# Perl in your application.
+sub _op_id {
+    my ($id) = @_;
+    Carp::croak("punk: operationId '" . ($id // '') . "' is not a Perl "
+              . "identifier (a letter or underscore, then letters, digits "
+              . "and underscores), so no handler can be generated for it")
+        unless defined $id && $id =~ /\A[A-Za-z_][A-Za-z0-9_]*\z/;
+    return $id;
 }
 
 # A tag, a path segment or an operationId turned into something that can sit
@@ -327,7 +340,7 @@ sub _read_api {
         push @order, $group unless $by_group{$group};
         my $node = _op_node($doc, $op);
         push @{ $by_group{$group}{ops} }, {
-            id      => $op->{operationId},
+            id      => _op_id($op->{operationId}),
             method  => uc $op->{method},
             path    => $op->{path},
             summary => _summary($node),
@@ -353,6 +366,7 @@ sub _read_api {
     }
 
     my $first = $ops->[0];
+    _op_id($first->{operationId});
     return {
         # by name, for the same reason the operations are sorted: which class
         # is written first should not depend on hash order

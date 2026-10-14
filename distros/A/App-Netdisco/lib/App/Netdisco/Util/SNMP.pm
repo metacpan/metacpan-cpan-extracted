@@ -14,6 +14,7 @@ our @EXPORT = ();
 our @EXPORT_OK = qw/
   get_communities
   snmp_comm_reindex
+  snmp_vrf_reindex
   get_mibdirs
   get_mibdirs_shortnames
   decode_and_munge
@@ -56,10 +57,19 @@ sub get_communities {
   my $tag_name = 'snmp_auth_tag_'. $mode;
   my $stored_tag = eval { $device->community->$tag_name };
 
+  # A hint for a configured tag other than the stored one goes ahead of the
+  # last known-good credentials, so that a device answering to both can be
+  # moved to the hinted ones, as device_auth_tag_hint is documented to do.
+  # The known-good stanza stays in the list behind it, as does every other.
+  my $hint = setting('device_auth_tag_hint');
+  my $hint_wins = ($hint and $hint ne ($stored_tag // '')
+    and scalar grep { $_->{tag} and $_->{tag} eq $hint } @$config);
+
   if ($device->in_storage and $stored_tag) {
     foreach my $stanza (@$config) {
       if ($stanza->{tag} and $stored_tag eq $stanza->{tag}) {
-        push @communities, {%$stanza, only => [$device->ip]};
+        push @communities, {%$stanza, only => [$device->ip]}
+          unless $hint_wins;
         ++$seen_tags->{ $stored_tag };
         last;
       }
@@ -71,7 +81,7 @@ sub get_communities {
     read => 1, write => 0, driver => 'snmp',
     only => [$device->ip],
     community => $device->snmp_comm,
-  } if defined $device->snmp_comm and $mode eq 'read';
+  } if defined $device->snmp_comm and $mode eq 'read' and not $hint_wins;
 
   # try last-known-good v2 write
   my $snmp_comm_rw = eval { $device->community->snmp_comm_rw };
@@ -79,7 +89,7 @@ sub get_communities {
     write => 1, read => 0, driver => 'snmp',
     only => [$device->ip],
     community => $snmp_comm_rw,
-  } if $snmp_comm_rw and $mode eq 'write';
+  } if $snmp_comm_rw and $mode eq 'write' and not $hint_wins;
 
   # clean the community table of obsolete tags
   eval { $device->community->update({$tag_name => undef}) }
@@ -103,6 +113,23 @@ or v3 empty context.
 
 sub snmp_comm_reindex {
   my ($snmp, $device, $vlan) = @_;
+  return _reindex($snmp, $device, $vlan, 'vlan');
+}
+
+=head2 snmp_vrf_reindex( $snmp, $device, $vrf )
+
+As C<snmp_comm_reindex>, but for a VRF's SNMP context: on SNMPv3 the context
+is the VRF name as given, never the VLAN context prefix.
+
+=cut
+
+sub snmp_vrf_reindex {
+  my ($snmp, $device, $vrf) = @_;
+  return _reindex($snmp, $device, $vrf, 'vrf');
+}
+
+sub _reindex {
+  my ($snmp, $device, $index, $kind) = @_;
   my $ver = $snmp->snmp_ver;
   my $vtp = $snmp->vtp_version;
 
@@ -117,14 +144,16 @@ sub snmp_comm_reindex {
       }
       $prefix ||= 'vlan-';
 
-      if ($vlan =~ /^[0-9]+$/i && $vlan) {
+      # snmp_comm_reindex has been passed VRF names too, so for a VLAN only
+      # a number takes the prefix
+      if ($kind eq 'vlan' && $index =~ /^[0-9]+$/ && $index) {
         debug sprintf ' [%s] reindexing to "%s%s" (ver: %s, class: %s)',
-        $device->ip, $prefix, $vlan, $ver, $snmp->class;
-        $snmp->update(Context => ($prefix . $vlan));
-      } elsif ($vlan =~ /^[a-z0-9]+$/i && $vlan) {
+        $device->ip, $prefix, $index, $ver, $snmp->class;
+        $snmp->update(Context => ($prefix . $index));
+      } elsif ($index =~ /^\S+$/ && $index) {
         debug sprintf ' [%s] reindexing to "%s" (ver: %s, class: %s)',
-          $device->ip, $vlan, $ver, $snmp->class;
-        $snmp->update(Context => ($vlan));
+          $device->ip, $index, $ver, $snmp->class;
+        $snmp->update(Context => ($index));
       } else {
         debug sprintf ' [%s] reindexing without context (ver: %s, class: %s)',
           $device->ip, $ver, $snmp->class;
@@ -134,10 +163,10 @@ sub snmp_comm_reindex {
   else {
       my $comm = $snmp->snmp_comm;
 
-      debug sprintf ' [%s] reindexing to vlan %s (ver: %s, class: %s)',
-        $device->ip, $vlan, $ver, $snmp->class;
-      $vlan ? $snmp->update(Community => $comm . '@' . $vlan)
-            : $snmp->update(Community => $comm);
+      debug sprintf ' [%s] reindexing to %s %s (ver: %s, class: %s)',
+        $device->ip, $kind, $index, $ver, $snmp->class;
+      $index ? $snmp->update(Community => $comm . '@' . $index)
+             : $snmp->update(Community => $comm);
   }
 
   $snmp->cache({ _vtp_version => $vtp });

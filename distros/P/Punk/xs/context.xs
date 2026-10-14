@@ -320,8 +320,9 @@ json(self, data, status = &PL_sv_undef)
     {
         AV *av  = pcx_av(aTHX_ self);
         AV *res = pcx_res_av(aTHX_ av);
-        IV st = SvOK(status) ? SvIV(status) : pcx_res_status(aTHX_ res);
+        IV st = ps_status_arg(aTHX_ status);
         SV *bytes = pcx_json(aTHX_ av, data);
+        if (!st) st = pcx_res_status(aTHX_ res);
         if (!st) st = 200;
         RETVAL = punk_triplet(aTHX_ st,
                     sv_2mortal(newSVpvs("application/json")),
@@ -343,7 +344,7 @@ xml(self, data, status = &PL_sv_undef)
     {
         AV *av  = pcx_av(aTHX_ self);
         AV *res = pcx_res_av(aTHX_ av);
-        IV st = SvOK(status) ? SvIV(status) : pcx_res_status(aTHX_ res);
+        IV st = ps_status_arg(aTHX_ status);
         SV *bytes;
         if (SvROK(data)) {
             SV *err = NULL;
@@ -354,6 +355,7 @@ xml(self, data, status = &PL_sv_undef)
             if (!bytes) croak("%s", err ? SvPV_nolen(err) : "Punk: xml");
         }
         else bytes = newSVsv(data);
+        if (!st) st = pcx_res_status(aTHX_ res);
         if (!st) st = 200;
         RETVAL = punk_triplet(aTHX_ st,
                     sv_2mortal(newSVpvs(PK_XML_CT)),
@@ -373,9 +375,10 @@ text(self, body, status = &PL_sv_undef)
     {
         AV *av  = pcx_av(aTHX_ self);
         AV *res = pcx_res_av(aTHX_ av);
-        IV st = SvOK(status) ? SvIV(status) : pcx_res_status(aTHX_ res);
+        IV st = ps_status_arg(aTHX_ status);
         SV *ct = sv_2mortal(ix == 1 ? newSVpvs("text/html; charset=utf-8")
                                     : newSVpvs("text/plain; charset=utf-8"));
+        if (!st) st = pcx_res_status(aTHX_ res);
         if (!st) st = 200;
         RETVAL = punk_triplet(aTHX_ st, ct, newSVsv(body),
                               res ? pcx_res_headers(aTHX_ res) : NULL);
@@ -591,7 +594,18 @@ redirect(self, url, status = &PL_sv_undef)
         AV *hdr  = newAV();
         AV *body = newAV();
         AV *resp = newAV();
-        IV st = SvOK(status) ? SvIV(status) : 302;
+        IV st = ps_status_arg(aTHX_ status);
+        {   /* a Location is one header line: a CR, LF or NUL in a URL built
+             * from the request would end it and start another */
+            STRLEN ul, ui;
+            const char *up = SvOK(url) ? SvPV_const(url, ul) : "";
+            if (!SvOK(url)) ul = 0;
+            for (ui = 0; ui < ul; ui++)
+                if (up[ui] == '\r' || up[ui] == '\n' || up[ui] == '\0')
+                    croak("Punk: a redirect location may not contain CR, LF "
+                          "or NUL");
+        }
+        if (!st) st = 302;
         av_push(hdr, newSVpvs("Location"));
         av_push(hdr, newSVsv(url));
         av_push(hdr, newSVpvs("Content-Length"));
@@ -765,6 +779,7 @@ status(self, ...)
         AV *av = pcx_av(aTHX_ self);
         if (items > 1) {
             SV *sval = ST(1);   /* capture before forcing/pushing */
+            (void)ps_status_arg(aTHX_ sval);
             SV *res  = pcx_force(aTHX_ av, PCX_RES, "Punk::Response", NULL);
             (void)pcx_call_meth(aTHX_ res, "status", &sval, 1, 0);
             RETVAL = newSVsv(self);

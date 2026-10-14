@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.008_001;
 use parent qw(Plack::Middleware);
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 sub call {
     my $self = shift;
@@ -31,7 +31,7 @@ sub call {
         # in apache1 ServerName example.com:443
         if ( $env->{HTTP_X_FORWARDED_SERVER} ) {
             my ( $host, ) = $env->{HTTP_X_FORWARDED_SERVER} =~ /([^,\s]+)$/;
-            if ( $host =~ /^(.+):(\d+)$/ ) {
+            if ( $host =~ /^(.+):([0-9]+)$/ ) {
 #            $host = $1;
                 $env->{SERVER_PORT} = $2;
                 $env->{'psgi.url_scheme'}  = 'https' if $env->{SERVER_PORT} == 443;
@@ -40,12 +40,12 @@ sub call {
         }
 
         my ( $host, ) = $env->{HTTP_X_FORWARDED_HOST} =~ /([^,\s]+)$/;
-        if ( $host =~ /^(.+):(\d+)$/ ) {
+        if ( $host =~ /^(.+):([0-9]+)$/ ) {
 #            $host = $1;
             $env->{SERVER_PORT} = $2;
-        } elsif ( $env->{HTTP_X_FORWARDED_PORT} ) {
+        } elsif ( $env->{HTTP_X_FORWARDED_PORT} && $env->{HTTP_X_FORWARDED_PORT} =~ /^([0-9]+)\z/ ) {
             # in apache2 httpd.conf (RequestHeader set X-Forwarded-Port 8443)
-            $env->{SERVER_PORT} = $env->{HTTP_X_FORWARDED_PORT};
+            $env->{SERVER_PORT} = $1;
             $host .= ":$env->{SERVER_PORT}";
             $env->{'psgi.url_scheme'} = 'https'
                 if $env->{SERVER_PORT} == 443;
@@ -56,7 +56,7 @@ sub call {
 
     } elsif ( $env->{HTTP_HOST} ) {
         my $host = $env->{HTTP_HOST};
-        if ($host =~ /^(.+):(\d+)$/ ) {
+        if ($host =~ /^(.+):([0-9]+)$/ ) {
 #            $env->{HTTP_HOST}   = $1;
             $env->{SERVER_PORT} = $2;
         } elsif ($host =~ /^(.+)$/ ) {

@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.58';
+our $VERSION = '0.59';
 
 use Punk ();
 use File::Spec ();
@@ -190,8 +190,11 @@ catalogue entry that carries markup - a link inside a sentence - needs C<raw>:
 
 That is safe here for a specific reason: this path takes B<no substitutions>.
 The rule below is about substituted values reaching markup, and a hash has
-nowhere to put one. Anything with a value in it belongs in the handler, where
-C<< $c->locale($key, %values) >> escapes what it interpolates.
+nowhere to put one. Anything with a value in it belongs in the handler:
+C<< $c->locale($key, %values) >> puts the values in B<as they are> and
+returns text, which a template then escapes like any other value it is
+handed. To build markup in the handler itself, use
+C<< $c->locale_html($key, %values) >>, which escapes each value.
 
 A missing key renders as the B<key> here too, exactly as it does through
 C<< $c->locale >>: an omission cannot be visible in your code and invisible on
@@ -277,6 +280,21 @@ The no-argument form is C<< $c->locale >> rather than a separate
 C<< $c->language >>, deliberately: one name means one concept - the language
 this request is in - whether you are asking which it is or asking it for a
 string. The template side of it is spelled the same way.
+
+B<The result is text, not markup.> A substituted value goes in exactly as it
+was given, so the string is right for a template, which escapes it; for a
+JSON body; for a log line. It is B<not> safe to hand to C<< $c->html >> when
+a value came from a request: that is a script tag on your page.
+
+=head2 C<< $c->locale_html >>
+
+    $c->html($c->locale_html('greeting', name => $c->param('name')));
+
+The same lookup with every substituted value HTML-escaped, for a handler
+writing markup itself. The translation is left as written, so a catalogue
+entry may carry a link or an emphasis around a placeholder; a key that is in
+no catalogue comes back escaped too. In a template, output it with C<raw>,
+since it is already escaped.
 
 =head2 What it counts
 

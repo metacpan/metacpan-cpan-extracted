@@ -3,13 +3,10 @@ use warnings;
 
 use File::Spec;
 
-use Test::More 0.95;
+use Test::More 1.0;
 
 my $class  = 'Module::Extract::VERSION';
 my $method = 'parse_version_safely';
-
-use_ok $class or BAIL_OUT "$class did not compile! $@";
-can_ok $class, $method;
 
 my %Corpus = (
 	'Easy.pm'        => 3.01,
@@ -19,6 +16,8 @@ my %Corpus = (
 	'QV.pm'          => '7.4.2',
 	'QV_single.pm'   => '8.5.2',
 	'QV_double.pm'   => '73.8.5552',
+	'version-declare.pm'   => '2.1.5',
+	'version-declare-v.pm'   => '1.3.7',
 	);
 
 if( $] >= 5.012 ) {
@@ -31,13 +30,19 @@ if( $] >= 5.014 ) {
 	$Corpus{ 'Dotted_5_14_braces.pm' } = 'v0.10.01';
 	}
 
+subtest basics => sub {
+	use_ok $class or BAIL_OUT "$class did not compile! $@";
+	can_ok $class, $method;
+	};
+
 foreach my $file ( sort keys %Corpus ) {
-	my $path = File::Spec->catfile( 'corpus', $file );
-	ok( -e $path, "Corpus file <$path> exists" );
+	subtest $file => sub {
+		my $path = File::Spec->catfile( 'corpus', $file );
+		ok -e $path, "Corpus file <$path> exists";
+		my $version = eval{ $class->$method( $path ) };
 
-	my $version = eval{ $class->$method( $path ) };
-
-	is( $version, $Corpus{$file}, "Works for $file" );
+		is( $version, $Corpus{$file}, "Works for $file" );
+		};
 	}
 
 done_testing();

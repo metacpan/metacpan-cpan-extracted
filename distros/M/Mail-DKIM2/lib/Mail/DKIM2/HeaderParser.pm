@@ -2,7 +2,7 @@ package Mail::DKIM2::HeaderParser;
 use strict;
 use warnings;
 
-our $VERSION = '0.18';
+our $VERSION = '0.20';
 
 # Thin base class for streaming message parsing.
 # Replaces the deep Mail::DKIM::Common → Mail::DKIM::MessageParser
@@ -41,15 +41,24 @@ sub TIEHANDLE {
 # got CRLF and may split a line ending across chunks.
 sub load {
     my ($self, $input) = @_;
+    # can() is probed in an eval (an unblessed reference has none), and like
+    # every eval in the library it rethrows a host's exception object
+    # (follow-up review F6).
+    my $can = sub {
+        my ($method) = @_;
+        return unless ref $input;
+        my $r = eval { $input->can($method) };
+        die $@ if ref $@;
+        return $r;
+    };
     my $text;
     if (ref $input eq 'SCALAR') {
         $text = $$input;
     }
-    elsif (ref $input && eval { $input->can('as_string') }) {
+    elsif ($can->('as_string')) {
         $text = $input->as_string;
     }
-    elsif (ref $input eq 'GLOB' || ref \$input eq 'GLOB'
-           || (ref $input && eval { $input->can('getline') })) {
+    elsif (ref $input eq 'GLOB' || ref \$input eq 'GLOB' || $can->('getline')) {
         local $/;
         $text = readline($input);
     }

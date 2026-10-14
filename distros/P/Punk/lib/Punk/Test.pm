@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.58';
+our $VERSION = '0.59';
 
 use Test::Builder ();
 use Scalar::Util ();
@@ -23,6 +23,12 @@ use Punk::Test::WS::Conn ();
 
 my $TB = Test::Builder->new;
 my %APPS;
+
+# An application under test runs in the `test` environment unless something
+# already said which. It is where a 500 still says what the handler died
+# with: in production that goes to the log and the body is a fixed message,
+# and an assertion cannot read a log.
+$ENV{PUNK_ENV} = 'test' unless defined $ENV{PUNK_ENV};
 
 sub new {
     my ($class, $app, %opts) = @_;
@@ -1120,6 +1126,12 @@ between them, and every assertion returns the object so tests chain.
 Assertions report through the one L<Test::Builder> singleton, so this
 works under L<Test::More> and Test2 alike; a failing assertion diags the
 method, path, status and the head of the body.
+
+Loading this module sets C<PUNK_ENV> to C<test> when it is not already set.
+That is the environment in which a C<500> says what the handler died with;
+in production the body is a fixed message and the detail goes to the log,
+where an assertion cannot read it. Set C<PUNK_ENV> yourself, before loading,
+to test an application as it runs anywhere else.
 
 The application is compiled once, at C<new> - which means a test is also
 a boot test.

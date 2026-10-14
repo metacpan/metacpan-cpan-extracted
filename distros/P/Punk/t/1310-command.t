@@ -240,6 +240,31 @@ YML
     like($out, qr/\[redacted\]/, 'the dump shows it redacted');
 }
 
+{   # a credential typed straight into the file is not a reference, so the
+    # loader does not know it is one. The dump still must not print it.
+    my $dir = generate(name => 'InlineApp');
+    my $yml = File::Spec->catfile($dir, 'config', 'punk.yml');
+    spew($yml, slurp($yml) . <<'YML');
+
+mailer:
+  host:     smtp.example.com
+  password: hunter2-inline
+  api_key:  ak-inline-1
+  nested:
+    client_secret: cs-inline-2
+    tokens: [ tk-inline-3, tk-inline-4 ]
+    port: 2525
+YML
+    my ($rc, $out) = punk($dir, 'config', 'check', '--dump');
+    is($rc, 0, 'a configuration with inline credentials checks out');
+    unlike($out, qr/hunter2-inline|ak-inline-1|cs-inline-2|tk-inline-[34]/,
+        'none of the inline credentials reaches the dump');
+    like($out, qr/smtp\.example\.com/, 'a value that is not one still does');
+    like($out, qr/2525/, '...at any depth');
+    my $n = () = $out =~ /\[redacted\]/g;
+    cmp_ok($n, '>=', 5, 'each of them is shown as redacted');
+}
+
 # ---- punk api sync -----------------------------------------------------------
 
 SKIP: {

@@ -603,8 +603,26 @@ static HV *pi_seen = NULL;
  * it. sv_catpvn cannot: it sees bytes and a length, which is precisely what
  * loses the information. The catalogue runs still use sv_catpvn, and that
  * is correct - those octets already ARE out's encoding. */
+/* A value made safe to put into markup: & < > " ' as entities, and the
+ * value's own encoding flag kept, since only ASCII bytes are rewritten.
+ * Mortal. */
+static SV *pi_html_value(pTHX_ SV *val) {
+    STRLEN l;
+    const char *p = SvPV_const(val, l);
+    SV *out = sv_2mortal(newSVpvn("", 0));
+    ps_html_esc(aTHX_ out, p, l);
+    if (SvUTF8(val)) SvUTF8_on(out);
+    return out;
+}
+
+/* `html` escapes each substituted VALUE and leaves the catalogue's own bytes
+ * alone: a translation is authored and may carry a link or an emphasis, and
+ * a value is whatever the caller was handed. That is $c->locale_html. Plain
+ * $c->locale escapes nothing - its result is text, bound for a template that
+ * escapes, a JSON body, a log line - and escaping there would be once too
+ * often for every one of them. */
 static SV *pi_interpolate(pTHX_ const char *v, STRLEN vl, int utf8,
-                          SV **args, int nargs) {
+                          SV **args, int nargs, int html) {
     SV *out = newSVpvn("", 0);
     STRLEN i = 0;
 
@@ -635,7 +653,9 @@ static SV *pi_interpolate(pTHX_ const char *v, STRLEN vl, int utf8,
                 /* sv_catsv, not sv_catpvn(SvPV_const(...)): the argument
                  * carries its own flag and this is the only append that has
                  * to reconcile two encodings. */
-                if (SvOK(args[j + 1])) sv_catsv(out, args[j + 1]);
+                if (SvOK(args[j + 1]))
+                    sv_catsv(out, html ? pi_html_value(aTHX_ args[j + 1])
+                                       : args[j + 1]);
                 done = 1;
                 break;
             }

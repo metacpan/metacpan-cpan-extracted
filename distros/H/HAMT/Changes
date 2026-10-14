@@ -1,0 +1,10 @@
+Revision history for HAMT
+
+0.02    2026-10-14
+        - last or next in a sub given to a method jumped out through the C
+          and left perl corrupted; each sub now runs on a stack of its own
+        - in each and diff, last stops the walk and next goes on
+        - elsewhere last and next are the error perl gives outside a loop
+
+0.01    2026-10-13
+        - first version

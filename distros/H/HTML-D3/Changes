@@ -1,5 +1,48 @@
 Revision history for HTML-D3 - Visualise various charts using D3
 
+0.19	Tue Oct 13 03:35:05 PM EDT 2026
+	[ Enhancements ]
+	- render_stacked_bar_snippet: new snippet method that generates an embeddable
+	  D3 v7 stacked bar chart. Accepts an arrayref of hashrefs (one row per
+	  category/segment combination) and an optional \%opts hashref. Opts: cat_col,
+	  seg_col, val_col (row-hash key names, defaults 'cat'/'seg'/'val'), orient
+	  ('v' vertical / 'h' horizontal, default 'v'), scheme (D3 categorical colour
+	  scheme: tableau10/category10/set2/set3/paired, default 'tableau10'), x_label
+	  (axis label, default ''), sort (undef / 'value' desc-total / 'label' alpha).
+	  Multiple rows sharing the same cat+seg are summed on the Perl side before
+	  encoding. Uses d3.stack() with d3.stackOrderNone / d3.stackOffsetNone.
+	  Includes an interactive legend: clicking a segment label toggles that layer
+	  on/off and re-stacks the visible segments. Tooltip shows category, segment,
+	  and value on mouseover. Returns { svg_id => 'stacked_bar', html => Str }.
+	- render_combo_snippet: new snippet method that generates an embeddable combo
+	  chart — bars for one measure on the left Y axis, a line for another on the
+	  right Y axis, sharing the same X (category/band) axis. Accepts an arrayref
+	  of hashrefs and \%opts: x_col, bar_col, line_col (row-hash key names,
+	  defaults 'x'/'bar_val'/'line_val'), bar_label, line_label (legend/axis
+	  labels, defaults 'Bar'/'Line'), bar_color (default 'steelblue'), line_color
+	  (default '#e15759'). Two independent d3.scaleLinear domains (left for bars,
+	  right for line); bars rendered first, line path and dots on top. Both axes
+	  labelled. Tooltip on bar and dot mouseover shows all three measures.
+	  Returns { svg_id => 'combo_chart', html => Str }.
+	- render_treemap_snippet: new snippet method that generates an embeddable D3
+	  v7 treemap using d3.treemapSquarify tiling. Accepts two data formats:
+	  (1) flat-path arrayref of hashrefs [{path => 'Root/A/X', value => N}, ...]
+	  converted to a stratify hierarchy via d3.stratify() inside the generated JS;
+	  (2) a nested hashref tree with name/children/value structure passed directly
+	  to d3.hierarchy(). Format is detected by ref() of the first argument.
+	  \%opts: path_sep (separator string for flat paths, default '/'), scheme
+	  (categorical colour scheme, default 'tableau10'), label (bool, default 1;
+	  shows node name inside each cell, clipped to cell width). Tooltip shows node
+	  name and value. Returns { svg_id => 'treemap', html => Str }.
+	- render_histogram_snippet: new snippet method that generates an embeddable
+	  frequency histogram. Accepts an arrayref of numeric scalars (pre-extracted
+	  by the caller — no column-extraction logic inside the module) and \%opts:
+	  bins (positive integer, default 20; pass undef for automatic Sturges count:
+	  ceil(log2(n)+1)), x_label (axis label, default ''), color (bar fill colour,
+	  default 'steelblue'). Uses d3.bin() with xScale.ticks(numBins) thresholds.
+	  Tooltip shows bin range and count on mouseover.
+	  Returns { svg_id => 'histogram', html => Str }.
+
 0.18	Wed Sep 23 11:10:09 AM EDT 2026
 	[ Enhancements ]
 	- render_bar_chart_snippet: new snippet method that generates an embeddable

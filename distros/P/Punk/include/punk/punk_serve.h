@@ -80,6 +80,54 @@ static SV *ps_ctx_for(pTHX_ SV **cp, SV *ctx_class, HV *env, SV *app,
     return *cp;
 }
 
+/* May a response say what went wrong? In development, where the person
+ * reading it is the one who can fix it, and under test, where the reader is
+ * an assertion. Asked on the error path only, so a method call is
+ * affordable. An application with no answer is in production. */
+static int ps_app_is_dev(pTHX_ SV *c) {
+    AV *av = (c && SvROK(c)) ? pcx_av(aTHX_ c) : NULL;
+    SV *app = av ? pcx_get(aTHX_ av, PCX_APP) : NULL;
+    SV *env;
+    int dev = 0;
+    if (!(app && SvROK(app) && sv_isobject(app))) return 0;
+    env = pcx_call_meth(aTHX_ app, "env", NULL, 0, 1);
+    if (env) {
+        if (SvOK(env)) {
+            STRLEN el;
+            const char *ep = SvPV_const(env, el);
+            dev = (el == 11 && memEQ(ep, "development", 11))
+               || (el == 4  && memEQ(ep, "test", 4));
+        }
+        SvREFCNT_dec(env);
+    }
+    return dev;
+}
+
+/* An error line on the request's logger, the way $c->log->error would write
+ * it: with the method, the path and the request id the rest of the log has. */
+static void ps_log_error(pTHX_ SV *c, const char *msg, STRLEN len) {
+    AV *av = (c && SvROK(c)) ? pcx_av(aTHX_ c) : NULL;
+    SV *st, *lg;
+    HV *stash;
+    SV **cached;
+    if (!av) return;
+    while (len && (msg[len - 1] == '\n' || msg[len - 1] == '\r')) len--;
+    st = pcx_get(aTHX_ av, PCX_STASH);
+    if (!st) {
+        st = newRV_noinc((SV *)newHV());
+        (void)av_store(av, PCX_STASH, st);
+    }
+    stash = (HV *)SvRV(st);
+    cached = hv_fetchs(stash, "punk.logger", 0);
+    if (cached && *cached && SvROK(*cached)) lg = *cached;
+    else {
+        lg = pl_make_logger(aTHX_ pcx_get(aTHX_ av, PCX_APP), c);
+        (void)hv_stores(stash, "punk.logger", newSVsv(lg));
+        lg = *hv_fetchs(stash, "punk.logger", 0);
+    }
+    pl_emit(aTHX_ lg, PL_ERROR, sv_2mortal(newSVpvn(msg, len)), NULL);
+}
+
 /* $on_error->($c,$err) coerced, or the 500 default (+1). */
 static SV *punk_handle_error(pTHX_ SV *c, SV *err, SV *on_error) {
     HV *body, *m; AV *errs; SV *bytes; STRLEN l; const char *p;
@@ -96,6 +144,16 @@ static SV *punk_handle_error(pTHX_ SV *c, SV *err, SV *on_error) {
     body = newHV(); errs = newAV(); m = newHV();
     p = SvOK(err) ? SvPV_const(err, l) : "";
     if (!SvOK(err)) l = 0;
+    /* What a handler died with is for whoever runs the application: a file
+     * and a line, and from a database the statement, the DSN and sometimes
+     * the row. In development that is the person looking at the response.
+     * Anywhere else it goes to the log, at error, and the client is told
+     * only that it was not their fault. */
+    if (!ps_app_is_dev(aTHX_ c)) {
+        ps_log_error(aTHX_ c, p, l);
+        p = "Internal Server Error";
+        l = 21;
+    }
     (void)hv_stores(m, "message", newSVpvn(p, l));
     av_push(errs, newRV_noinc((SV *)m));
     (void)hv_stores(body, "errors", newRV_noinc((SV *)errs));

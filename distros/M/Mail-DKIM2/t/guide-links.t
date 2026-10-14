@@ -45,8 +45,29 @@ like($text, qr/wwsympa/, 'Sympa restart list includes wwsympa');
 like($text, qr/git -c user\.name/, 'git am works on a host with no identity');
 like($text, qr/i=1\.\.1 verified/, 'the plain-upstream example shows i=1..1');
 
+# The stock-Mailman guide (milters and Postfix routing only, Mailman unpatched).
+my $sguide = "$root/docs/dkim2-postfix-stock-mailman-guide.md";
+ok(-f $sguide, 'the stock-Mailman guide exists');
+my $stext = -f $sguide ? do { local (@ARGV, $/) = $sguide; <> } : '';
+%seen = ();
+for my $path ($stext =~ /`((?:perl|deploy|mailman|sympa|util|docs)\/[A-Za-z0-9_.\/-]+)`/g) {
+    next if $seen{$path}++;
+    ok(-e "$root/$path", "stock guide path $path exists in the repo");
+}
+like($stext, qr/max_recipients: 1/, 'stock guide: one recipient per transaction');
+like($stext, qr/smtp_port: 10572/, 'stock guide: Mailman submits to the routing listener');
+like($stext, qr/--wrap-single-part/, 'stock guide: the wrapping milter');
+like($stext, qr/X-DKIM2-Snapshot/, 'stock guide: explains the snapshot token');
+like($stext, qr/cleanup_service_name=cleanup-dkim2/, 'stock guide: port 25 keeps the hashed headers');
+like($stext, qr/disable_mime_output_conversion = yes/, 'stock guide: warns about transport conversion');
+unlike($stext, qr{/root/interop|/opt/dkim2}, 'stock guide: no dkim2.com box paths');
+unlike($stext, qr/^(?:smtp_port|max_recipients):[^\n#]*#/m, 'stock guide: no inline mailman.cfg comments');
+like($text, qr{dkim2-postfix-stock-mailman-guide\.md}, 'the list-host guide points to the stock guide');
+
 my $index = do { local (@ARGV, $/) = "$root/deploy/www/index.html"; <> };
 like($index, qr{docs/dkim2-postfix-list-host-guide\.md}, 'dkim2.com links to the guide');
+like($index, qr{docs/dkim2-postfix-stock-mailman-guide\.md}, 'dkim2.com links to the stock-Mailman guide');
 my $opguide = do { local (@ARGV, $/) = "$root/docs/dkim2-operator-guide.md"; <> };
 like($opguide, qr{dkim2-postfix-list-host-guide\.md}, 'the operator guide links to it');
+like($opguide, qr{dkim2-postfix-stock-mailman-guide\.md}, 'the operator guide links to the stock guide');
 done_testing;

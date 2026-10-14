@@ -11,7 +11,7 @@ requires 'Data::Reuse';   # Required for result-set memory deduplication; see al
 requires 'File::Spec';
 requires 'File::Temp';
 requires 'List::Util', '1.33';
-requires 'Log::Abstraction', '0.39';
+requires 'Log::Abstraction', '0.40';
 requires 'Object::Configure', '0.24';
 requires 'Params::Get', '0.17';
 requires 'Return::Set';
@@ -21,6 +21,7 @@ requires 'Sub::Protected';
 requires 'autodie';
 requires 'strict';
 requires 'warnings';
+recommends 'DBD::CSV', '0.64';   # CSV/PSV/TSV DBI backend; 0.64+ required for SELECT DISTINCT
 recommends 'DBD::Excel';   # .xls (old binary Excel) backend
 recommends 'DBM::Deep';   # .dbm/.deep/magic-byte .db backend
 recommends 'File::Slurp::Remote';   # remote host backend (SSH/SCP)
@@ -40,7 +41,7 @@ on 'configure' => sub {
 
 on 'test' => sub {
 	requires 'CHI';
-	requires 'DBD::CSV';
+	requires 'DBD::CSV', '0.64';   # 0.64+ (SQL::Statement 1.414+) required for correct SELECT DISTINCT
 	requires 'DBD::XMLSimple', '0.07';
 	requires 'DBM::Deep';
 	requires 'Excel::Writer::XLSX';
@@ -68,7 +69,7 @@ on 'test' => sub {
 	requires 'Test::DescribeMe';
 	requires 'Test::Log::Abstraction';
 	requires 'Test::Memory::Cycle';
-	requires 'Test::Mockingbird';
+	requires 'Test::Mockingbird', '0.14';
 	requires 'Test::Most';
 	requires 'Test::Needs';
 	requires 'Test::NoWarnings';

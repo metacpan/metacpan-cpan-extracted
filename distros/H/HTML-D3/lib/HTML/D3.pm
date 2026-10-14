@@ -19,11 +19,11 @@ HTML::D3 - A simple Perl module for generating charts using D3.js.
 
 =head1 VERSION
 
-Version 0.18
+Version 0.19
 
 =cut
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 =head1 SYNOPSIS
 
@@ -3930,6 +3930,966 @@ HTML
 	return { table_id => $table_id, html => $html };
 }
 
+=head2 render_stacked_bar_snippet
+
+    my $result = $chart->render_stacked_bar_snippet(\@rows, \%opts);
+
+Generates an embeddable stacked bar chart (no page shell, no CDN tag).
+
+Each element of C<\@rows> is a hashref with three keys named by C<opts>:
+C<cat_col> (the X-axis grouping), C<seg_col> (the stacking segment), and
+C<val_col> (the numeric measure).  Multiple rows sharing the same
+cat+seg combination are summed.
+
+Accepted C<\%opts> keys:
+
+=over 4
+
+=item * C<cat_col> (string, default C<'cat'>) - row key for the X-axis category.
+
+=item * C<seg_col> (string, default C<'seg'>) - row key for the stacking segment.
+
+=item * C<val_col> (string, default C<'val'>) - row key for the numeric value.
+
+=item * C<orient> (string C<'v'> or C<'h'>, default C<'v'>) - bar orientation.
+
+=item * C<scheme> (string, default C<'tableau10'>) - D3 categorical colour scheme.
+Supported: C<tableau10>, C<category10>, C<set2>, C<set3>, C<paired>.
+
+=item * C<x_label> (string, optional) - axis label shown below the category axis.
+
+=item * C<sort> (string, optional) - sort categories: C<'value'> (desc total)
+or C<'label'> (alpha).
+
+=item * C<id> (string, optional) - override the default C<svg_id> value.
+
+=item * C<responsive> (boolean, optional) - SVG responsive sizing override.
+
+=back
+
+Returns C<{ svg_id =E<gt> 'stacked_bar', html =E<gt> Str }>.
+
+=head3 Errors
+
+=over 4
+
+=item * Throws C<Data must be an array of hashes> when C<$data> is not an ARRAY reference.
+
+=item * Throws C<Each data point must be a hash reference> when a row is not a hashref.
+
+=item * Throws C<Value must be numeric> when a value field is not a number.
+
+=item * Throws C<orient must be 'v' or 'h'> for an invalid C<orient> value.
+
+=item * Throws C<sort must be 'value' or 'label'> for an invalid C<sort> value.
+
+=back
+
+=head3 API SPECIFICATION
+
+=head4 Input
+
+    {
+        data => { type => 'arrayref' },
+        opts => {
+            type     => 'hashref',
+            optional => 1,
+            keys     => {
+                cat_col  => { type => 'string',  optional => 1, default => 'cat' },
+                seg_col  => { type => 'string',  optional => 1, default => 'seg' },
+                val_col  => { type => 'string',  optional => 1, default => 'val' },
+                orient   => { type => 'string',  optional => 1, default => 'v' },
+                scheme   => { type => 'string',  optional => 1, default => 'tableau10' },
+                x_label  => { type => 'string',  optional => 1, default => '' },
+                sort     => { type => 'string',  optional => 1 },
+                id       => { type => 'string',  optional => 1, default => 'stacked_bar' },
+                responsive => { type => 'boolean', optional => 1 },
+            },
+        },
+    }
+
+=head4 Output
+
+    HashRef -- { svg_id => Str, html => Str }
+
+=cut
+
+sub render_stacked_bar_snippet
+{
+	my ($self, $data, $opts) = @_;
+	$opts //= {};
+
+	die 'Data must be an array of hashes' unless ref($data) eq 'ARRAY';
+
+	my $cat_col = $opts->{cat_col} // 'cat';
+	my $seg_col = $opts->{seg_col} // 'seg';
+	my $val_col = $opts->{val_col} // 'val';
+	my $orient  = $opts->{orient}  // 'v';
+	my $scheme  = $opts->{scheme}  // 'tableau10';
+	my $x_label = $opts->{x_label} // '';
+	my $sort_by = $opts->{sort};
+
+	die "orient must be 'v' or 'h'"
+		unless $orient eq 'v' || $orient eq 'h';
+	die "sort must be 'value' or 'label'"
+		if defined($sort_by) && $sort_by ne 'value' && $sort_by ne 'label';
+
+	my (%cats_seen, %segs_seen, %pivot, @cat_order);
+	for my $row (@$data) {
+		die 'Each data point must be a hash reference' unless ref($row) eq 'HASH';
+		die "Value must be numeric" unless looks_like_number($row->{$val_col} // 'x');
+		my ($cat, $seg, $val) = ($row->{$cat_col} // '', $row->{$seg_col} // '', $row->{$val_col} + 0);
+		push @cat_order, $cat unless $cats_seen{$cat}++;
+		$segs_seen{$seg} = 1;
+		$pivot{$cat}{$seg} = ($pivot{$cat}{$seg} // 0) + $val;
+	}
+
+	my @segs = keys %segs_seen;
+	my @cats = @cat_order;
+
+	if (defined $sort_by && $sort_by eq 'label') {
+		@cats = sort @cats;
+	} elsif (defined $sort_by && $sort_by eq 'value') {
+		@cats = sort {
+			my ($ta, $tb) = (0, 0);
+			$ta += ($pivot{$a}{$_} // 0) for @segs;
+			$tb += ($pivot{$b}{$_} // 0) for @segs;
+			$tb <=> $ta
+		} @cats;
+	}
+
+	my @rows = map {
+		my $cat = $_;
+		my %r = (cat => $cat);
+		$r{$_} = ($pivot{$cat}{$_} // 0) for @segs;
+		\%r
+	} @cats;
+
+	my $json_data = $_JSON->encode(\@rows);
+	my $json_segs = $_JSON->encode(\@segs);
+
+	my $js_esc = sub {
+		my $s = shift;
+		$s =~ s/\\/\\\\/g; $s =~ s/"/\\"/g;
+		$s =~ s/\n/\\n/g;  $s =~ s/\r/\\r/g;
+		return $s;
+	};
+
+	my $x_label_esc = $js_esc->($x_label);
+	my $svg_id  = $opts->{id} // 'stacked_bar';
+	my $tip_id  = $svg_id . '_tip';
+	my $width   = $self->{width};
+	my $height  = $self->{height};
+	my $svg_attrs = ($opts->{responsive} // $self->{responsive})
+		? qq{viewBox="0 0 $width $height" width="100%" height="auto"}
+		: qq{width="$width" height="$height"};
+
+	my $is_v          = ($orient eq 'v') ? 1 : 0;
+	my $margin_top    = 20;
+	my $margin_right  = 130;
+	my $margin_bottom = $is_v ? ($x_label ? 60 : 40) : 40;
+	my $margin_left   = $is_v ? 55 : 130;
+	my $inner_w       = $width  - $margin_left - $margin_right;
+	my $inner_h       = $height - $margin_top  - $margin_bottom;
+	my $legend_x      = $margin_left + $inner_w + 12;
+
+	my $x_label_block = $x_label ? <<"XLB" : '';
+    g.append("text")
+        .attr("class","sb-axis-label")
+        .attr("x", innerW / 2)
+        .attr("y", innerH + (margin.bottom - 10))
+        .attr("text-anchor","middle")
+        .text("$x_label_esc");
+XLB
+
+	my ($scales_js, $axes_js, $rect_attrs_js);
+	if ($is_v) {
+		$scales_js = <<'SCALES';
+    var xScale = d3.scaleBand()
+        .domain(data.map(function(d){return d.cat;}))
+        .range([0, innerW]).padding(0.2);
+    var yScale = d3.scaleLinear()
+        .domain([0, d3.max(stackedData[stackedData.length-1], function(d){return d[1];})])
+        .nice().range([innerH, 0]);
+SCALES
+		$axes_js = <<'AXES';
+    g.append("g").attr("class","sb-x-axis")
+        .attr("transform","translate(0,"+innerH+")").call(d3.axisBottom(xScale));
+    g.append("g").attr("class","sb-y-axis").call(d3.axisLeft(yScale).ticks(6));
+AXES
+		$rect_attrs_js = <<'RECTS';
+            .attr("x",      function(d){return xScale(d.data.cat);})
+            .attr("y",      function(d){return yScale(d[1]);})
+            .attr("height", function(d){return Math.max(0, yScale(d[0]) - yScale(d[1]));})
+            .attr("width",  xScale.bandwidth())
+RECTS
+	} else {
+		$scales_js = <<'SCALES';
+    var yScale = d3.scaleBand()
+        .domain(data.map(function(d){return d.cat;}))
+        .range([0, innerH]).padding(0.2);
+    var xScale = d3.scaleLinear()
+        .domain([0, d3.max(stackedData[stackedData.length-1], function(d){return d[1];})])
+        .nice().range([0, innerW]);
+SCALES
+		$axes_js = <<'AXES';
+    g.append("g").attr("class","sb-x-axis")
+        .attr("transform","translate(0,"+innerH+")").call(d3.axisBottom(xScale).ticks(6));
+    g.append("g").attr("class","sb-y-axis").call(d3.axisLeft(yScale));
+AXES
+		$rect_attrs_js = <<'RECTS';
+            .attr("y",      function(d){return yScale(d.data.cat);})
+            .attr("x",      function(d){return xScale(d[0]);})
+            .attr("width",  function(d){return Math.max(0, xScale(d[1]) - xScale(d[0]));})
+            .attr("height", yScale.bandwidth())
+RECTS
+	}
+
+	my $html = <<"HTML";
+<style>
+    #$tip_id {
+	position:absolute;background:rgba(255,255,255,0.95);border:1px solid #ccc;
+	border-radius:4px;padding:6px 10px;font-size:12px;pointer-events:none;
+	display:none;line-height:1.6;
+    }
+    .sb-axis-label{font-size:11px;fill:#555;}
+    .sb-legend-item{cursor:pointer;}
+</style>
+<svg id="$svg_id" $svg_attrs></svg>
+<div id="$tip_id"></div>
+<script>
+(function(){
+    var data = $json_data;
+    var segs = $json_segs;
+    var margin = {top:$margin_top,right:$margin_right,bottom:$margin_bottom,left:$margin_left};
+    var innerW = $inner_w;
+    var innerH = $inner_h;
+    var SCHEMES = {
+        tableau10:d3.schemeTableau10, category10:d3.schemeCategory10,
+        set2:d3.schemeSet2, set3:d3.schemeSet3, paired:d3.schemePaired
+    };
+    var color = d3.scaleOrdinal(SCHEMES['$scheme'] || d3.schemeTableau10).domain(segs);
+    var hidden = {};
+    var svg = d3.select("#$svg_id");
+    var g = svg.append("g").attr("transform","translate("+margin.left+","+margin.top+")");
+    var tip = d3.select("#$tip_id");
+    var stackFn = d3.stack().order(d3.stackOrderNone).offset(d3.stackOffsetNone);
+    var stackedData = stackFn.keys(segs)(data);
+    $scales_js
+    $axes_js
+    $x_label_block
+    function redraw(){
+        var vis = segs.filter(function(s){return !hidden[s];});
+        var sd = stackFn.keys(vis)(data);
+        var layers = g.selectAll(".sb-layer").data(sd, function(d){return d.key;});
+        var entered = layers.enter().append("g").attr("class","sb-layer")
+            .attr("fill",function(d){return color(d.key);});
+        entered.merge(layers)
+            .selectAll(".sb-rect").data(function(d){return d;})
+            .join("rect").attr("class","sb-rect")
+            $rect_attrs_js
+            .on("mouseover",function(event,d){
+                var seg = d3.select(this.parentNode).datum().key;
+                tip.style("display","block")
+                   .html("<b>"+d.data.cat+"<\\/b><br\/>"+seg+": "+(d[1]-d[0]));
+            })
+            .on("mousemove",function(event){
+                tip.style("left",(event.offsetX+12)+"px").style("top",(event.offsetY-28)+"px");
+            })
+            .on("mouseout",function(){tip.style("display","none");});
+        layers.exit().remove();
+    }
+    redraw();
+    var legend = svg.append("g").attr("transform","translate($legend_x,$margin_top)");
+    segs.forEach(function(seg,i){
+        var item = legend.append("g").attr("class","sb-legend-item")
+            .attr("transform","translate(0,"+(i*20)+")")
+            .on("click",function(){
+                hidden[seg] = !hidden[seg];
+                d3.select(this).select("rect").attr("opacity",hidden[seg]?0.3:1);
+                d3.select(this).select("text").attr("opacity",hidden[seg]?0.4:1);
+                redraw();
+            });
+        item.append("rect").attr("width",12).attr("height",12).attr("y",-10)
+            .attr("fill",color(seg));
+        item.append("text").attr("x",16).attr("font-size","11px").attr("fill","#333")
+            .text(seg);
+    });
+})();
+</script>
+HTML
+
+	return { svg_id => $svg_id, html => $html };
+}
+
+=head2 render_combo_snippet
+
+    my $result = $chart->render_combo_snippet(\@rows, \%opts);
+
+Generates an embeddable combo chart: bars for one measure on the left Y
+axis, a line for another measure on the right Y axis, sharing the same
+X (category) axis.
+
+Each element of C<\@rows> is a hashref with at least three keys named by
+C<opts>: C<x_col> (X-axis label), C<bar_col> (bar measure), and
+C<line_col> (line measure).
+
+Accepted C<\%opts> keys:
+
+=over 4
+
+=item * C<x_col> (string, default C<'x'>) - row key for the X-axis label.
+
+=item * C<bar_col> (string, default C<'bar_val'>) - row key for the bar measure.
+
+=item * C<line_col> (string, default C<'line_val'>) - row key for the line measure.
+
+=item * C<bar_label> (string, default C<'Bar'>) - legend/axis label for bars.
+
+=item * C<line_label> (string, default C<'Line'>) - legend/axis label for line.
+
+=item * C<bar_color> (string, optional CSS colour, default C<'steelblue'>) - bar fill.
+
+=item * C<line_color> (string, optional CSS colour, default C<'#e15759'>) - line stroke.
+
+=item * C<id> (string, optional) - override the default C<svg_id> value.
+
+=item * C<responsive> (boolean, optional) - SVG responsive sizing override.
+
+=back
+
+Returns C<{ svg_id =E<gt> 'combo_chart', html =E<gt> Str }>.
+
+=head3 Errors
+
+=over 4
+
+=item * Throws C<Data must be an array of hashes> when C<$data> is not an ARRAY reference.
+
+=item * Throws C<Each data point must be a hash reference> when a row is not a hashref.
+
+=item * Throws C<Bar value must be numeric> when a bar value field is not a number.
+
+=item * Throws C<Line value must be numeric> when a line value field is not a number.
+
+=back
+
+=head3 API SPECIFICATION
+
+=head4 Input
+
+    {
+        data => { type => 'arrayref' },
+        opts => {
+            type     => 'hashref',
+            optional => 1,
+            keys     => {
+                x_col      => { type => 'string',  optional => 1, default => 'x' },
+                bar_col    => { type => 'string',  optional => 1, default => 'bar_val' },
+                line_col   => { type => 'string',  optional => 1, default => 'line_val' },
+                bar_label  => { type => 'string',  optional => 1, default => 'Bar' },
+                line_label => { type => 'string',  optional => 1, default => 'Line' },
+                bar_color  => { type => 'string',  optional => 1, default => 'steelblue' },
+                line_color => { type => 'string',  optional => 1, default => '#e15759' },
+                id         => { type => 'string',  optional => 1, default => 'combo_chart' },
+                responsive => { type => 'boolean', optional => 1 },
+            },
+        },
+    }
+
+=head4 Output
+
+    HashRef -- { svg_id => Str, html => Str }
+
+=cut
+
+sub render_combo_snippet
+{
+	my ($self, $data, $opts) = @_;
+	$opts //= {};
+
+	die 'Data must be an array of hashes' unless ref($data) eq 'ARRAY';
+
+	my $x_col      = $opts->{x_col}      // 'x';
+	my $bar_col    = $opts->{bar_col}     // 'bar_val';
+	my $line_col   = $opts->{line_col}    // 'line_val';
+	my $bar_label  = $opts->{bar_label}   // 'Bar';
+	my $line_label = $opts->{line_label}  // 'Line';
+	my $bar_color  = $opts->{bar_color}   // 'steelblue';
+	my $line_color = $opts->{line_color}  // '#e15759';
+
+	my @points;
+	for my $row (@$data) {
+		die 'Each data point must be a hash reference' unless ref($row) eq 'HASH';
+		die 'Bar value must be numeric'  unless looks_like_number($row->{$bar_col}  // 'x');
+		die 'Line value must be numeric' unless looks_like_number($row->{$line_col} // 'x');
+		push @points, {
+			x    => defined($row->{$x_col}) ? "$row->{$x_col}" : '',
+			bar  => $row->{$bar_col}  + 0,
+			line => $row->{$line_col} + 0,
+		};
+	}
+
+	my $json_data = $_JSON->encode(\@points);
+
+	my $js_esc = sub {
+		my $s = shift;
+		$s =~ s/\\/\\\\/g; $s =~ s/"/\\"/g;
+		$s =~ s/\n/\\n/g;  $s =~ s/\r/\\r/g;
+		return $s;
+	};
+
+	my $bar_label_esc  = $js_esc->($bar_label);
+	my $line_label_esc = $js_esc->($line_label);
+	my $bar_color_esc  = $js_esc->($bar_color);
+	my $line_color_esc = $js_esc->($line_color);
+
+	my $svg_id  = $opts->{id} // 'combo_chart';
+	my $tip_id  = $svg_id . '_tip';
+	my $width   = $self->{width};
+	my $height  = $self->{height};
+	my $svg_attrs = ($opts->{responsive} // $self->{responsive})
+		? qq{viewBox="0 0 $width $height" width="100%" height="auto"}
+		: qq{width="$width" height="$height"};
+
+	my $margin_top    = 20;
+	my $margin_right  = 70;
+	my $margin_bottom = 55;
+	my $margin_left   = 60;
+	my $inner_w = $width  - $margin_left - $margin_right;
+	my $inner_h = $height - $margin_top  - $margin_bottom;
+
+	my $html = <<"HTML";
+<style>
+    #$tip_id {
+	position:absolute;background:rgba(255,255,255,0.95);border:1px solid #ccc;
+	border-radius:4px;padding:6px 10px;font-size:12px;pointer-events:none;
+	display:none;line-height:1.6;
+    }
+    .cc-axis-label{font-size:11px;fill:#555;}
+    .cc-dot{cursor:default;}
+</style>
+<svg id="$svg_id" $svg_attrs></svg>
+<div id="$tip_id"></div>
+<script>
+(function(){
+    var data = $json_data;
+    var margin = {top:$margin_top,right:$margin_right,bottom:$margin_bottom,left:$margin_left};
+    var innerW = $inner_w;
+    var innerH = $inner_h;
+    var barLabel  = "$bar_label_esc";
+    var lineLabel = "$line_label_esc";
+    var barColor  = "$bar_color_esc";
+    var lineColor = "$line_color_esc";
+    var svg = d3.select("#$svg_id");
+    var g = svg.append("g").attr("transform","translate("+margin.left+","+margin.top+")");
+    var tip = d3.select("#$tip_id");
+
+    var xScale = d3.scaleBand()
+        .domain(data.map(function(d){return d.x;}))
+        .range([0, innerW]).padding(0.25);
+    var yLeft = d3.scaleLinear()
+        .domain([0, d3.max(data,function(d){return d.bar;})]).nice()
+        .range([innerH, 0]);
+    var yRight = d3.scaleLinear()
+        .domain([d3.min(data,function(d){return d.line;}), d3.max(data,function(d){return d.line;})])
+        .nice().range([innerH, 0]);
+
+    g.append("g").attr("class","cc-x-axis")
+        .attr("transform","translate(0,"+innerH+")").call(d3.axisBottom(xScale));
+    g.append("g").attr("class","cc-y-left").call(d3.axisLeft(yLeft).ticks(6));
+    g.append("g").attr("class","cc-y-right")
+        .attr("transform","translate("+innerW+",0)").call(d3.axisRight(yRight).ticks(6));
+
+    // Left axis label
+    g.append("text").attr("class","cc-axis-label")
+        .attr("transform","rotate(-90)")
+        .attr("x",-innerH/2).attr("y",-(margin.left-15))
+        .attr("text-anchor","middle").text(barLabel);
+    // Right axis label
+    svg.append("text").attr("class","cc-axis-label")
+        .attr("transform","rotate(90)")
+        .attr("x",(margin.top+innerH/2)).attr("y",-(margin.left+innerW+margin.right-15))
+        .attr("text-anchor","middle").text(lineLabel);
+    // X axis label
+    g.append("text").attr("class","cc-axis-label")
+        .attr("x",innerW/2).attr("y",innerH+(margin.bottom-12))
+        .attr("text-anchor","middle").text(barLabel+" vs "+lineLabel);
+
+    // Bars
+    g.selectAll(".cc-bar").data(data).join("rect")
+        .attr("class","cc-bar")
+        .attr("x",function(d){return xScale(d.x);})
+        .attr("y",function(d){return yLeft(d.bar);})
+        .attr("width",xScale.bandwidth())
+        .attr("height",function(d){return innerH - yLeft(d.bar);})
+        .attr("fill",barColor).attr("opacity",0.8)
+        .on("mouseover",function(event,d){
+            tip.style("display","block")
+               .html("<b>"+d.x+"<\\/b><br\/>"+barLabel+": "+d.bar+"<br\/>"+lineLabel+": "+d.line);
+        })
+        .on("mousemove",function(event){
+            tip.style("left",(event.offsetX+12)+"px").style("top",(event.offsetY-28)+"px");
+        })
+        .on("mouseout",function(){tip.style("display","none");});
+
+    // Line path
+    var line = d3.line()
+        .x(function(d){return xScale(d.x) + xScale.bandwidth()/2;})
+        .y(function(d){return yRight(d.line);});
+    g.append("path").datum(data)
+        .attr("fill","none").attr("stroke",lineColor).attr("stroke-width",2.5)
+        .attr("d",line);
+
+    // Dots
+    g.selectAll(".cc-dot").data(data).join("circle")
+        .attr("class","cc-dot")
+        .attr("cx",function(d){return xScale(d.x) + xScale.bandwidth()/2;})
+        .attr("cy",function(d){return yRight(d.line);})
+        .attr("r",4).attr("fill",lineColor).attr("stroke","#fff").attr("stroke-width",1.5)
+        .on("mouseover",function(event,d){
+            tip.style("display","block")
+               .html("<b>"+d.x+"<\\/b><br\/>"+barLabel+": "+d.bar+"<br\/>"+lineLabel+": "+d.line);
+        })
+        .on("mousemove",function(event){
+            tip.style("left",(event.offsetX+12)+"px").style("top",(event.offsetY-28)+"px");
+        })
+        .on("mouseout",function(){tip.style("display","none");});
+
+    // Legend
+    var lg = svg.append("g").attr("transform","translate("+(margin.left+8)+","+(margin.top+8)+")");
+    lg.append("rect").attr("width",12).attr("height",12).attr("fill",barColor).attr("opacity",0.8);
+    lg.append("text").attr("x",16).attr("y",10).attr("font-size","11px").attr("fill","#333").text(barLabel);
+    var lg2 = svg.append("g").attr("transform","translate("+(margin.left+8)+","+(margin.top+26)+")");
+    lg2.append("line").attr("x1",0).attr("y1",6).attr("x2",12).attr("y2",6)
+        .attr("stroke",lineColor).attr("stroke-width",2.5);
+    lg2.append("circle").attr("cx",6).attr("cy",6).attr("r",4).attr("fill",lineColor);
+    lg2.append("text").attr("x",16).attr("y",10).attr("font-size","11px").attr("fill","#333").text(lineLabel);
+})();
+</script>
+HTML
+
+	return { svg_id => $svg_id, html => $html };
+}
+
+=head2 render_treemap_snippet
+
+    my $result = $chart->render_treemap_snippet(\@rows_or_tree, \%opts);
+
+Generates an embeddable treemap (no page shell, no CDN tag).
+Leaf area is proportional to the numeric measure.
+
+Accepts two data formats:
+
+=over 4
+
+=item * B<Flat path> (arrayref of hashrefs): each row must have a C<path>
+key (e.g. C<'Root/A/X'>) and a C<value> key.  The module converts this
+to a D3 stratify hierarchy in JS.  Override the path separator with
+C<opts-E<gt>{path_sep}>.
+
+=item * B<Nested tree> (hashref): a pre-built D3-compatible hierarchy
+with C<name>/C<children>/C<value> structure.  Passed directly to
+C<d3.hierarchy()>.
+
+=back
+
+Accepted C<\%opts> keys:
+
+=over 4
+
+=item * C<path_sep> (string, default C<'/'>)  - path separator (flat format only).
+
+=item * C<scheme> (string, default C<'tableau10'>) - D3 categorical colour scheme.
+Supported: C<tableau10>, C<category10>, C<set2>, C<set3>, C<paired>.
+
+=item * C<label> (boolean, default C<1>) - show node labels inside cells.
+
+=item * C<id> (string, optional) - override the default C<svg_id> value.
+
+=item * C<responsive> (boolean, optional) - SVG responsive sizing override.
+
+=back
+
+Returns C<{ svg_id =E<gt> 'treemap', html =E<gt> Str }>.
+
+=head3 Errors
+
+=over 4
+
+=item * Throws C<Data must be an array of hashes or a hash tree>
+when C<$data> is neither an ARRAY nor a HASH reference.
+
+=item * Throws C<Each flat row must be a hash reference> when a flat row is not a hashref.
+
+=item * Throws C<Each flat row must have a 'path' key> when a flat row lacks C<path>.
+
+=item * Throws C<Each flat row must have a numeric 'value' key> when a value is not numeric.
+
+=back
+
+=head3 API SPECIFICATION
+
+=head4 Input
+
+    {
+        data => { type => 'arrayref | hashref' },
+        opts => {
+            type     => 'hashref',
+            optional => 1,
+            keys     => {
+                path_sep => { type => 'string',  optional => 1, default => '/' },
+                scheme   => { type => 'string',  optional => 1, default => 'tableau10' },
+                label    => { type => 'boolean', optional => 1, default => 1 },
+                id       => { type => 'string',  optional => 1, default => 'treemap' },
+                responsive => { type => 'boolean', optional => 1 },
+            },
+        },
+    }
+
+=head4 Output
+
+    HashRef -- { svg_id => Str, html => Str }
+
+=cut
+
+sub render_treemap_snippet
+{
+	my ($self, $data, $opts) = @_;
+	$opts //= {};
+
+	die 'Data must be an array of hashes or a hash tree'
+		unless ref($data) eq 'ARRAY' || ref($data) eq 'HASH';
+
+	my $path_sep = $opts->{path_sep} // '/';
+	my $scheme   = $opts->{scheme}   // 'tableau10';
+	my $label    = exists($opts->{label}) ? ($opts->{label} ? 1 : 0) : 1;
+
+	my $js_esc = sub {
+		my $s = shift;
+		$s =~ s/\\/\\\\/g; $s =~ s/"/\\"/g;
+		$s =~ s/\n/\\n/g;  $s =~ s/\r/\\r/g;
+		return $s;
+	};
+
+	my ($json_data, $build_js);
+	if (ref($data) eq 'ARRAY') {
+		for my $row (@$data) {
+			die 'Each flat row must be a hash reference' unless ref($row) eq 'HASH';
+			die "Each flat row must have a 'path' key"  unless exists $row->{path};
+			die "Each flat row must have a numeric 'value' key"
+				unless looks_like_number($row->{value} // 'x');
+		}
+		my @flat = map { { path => "$_->{path}", value => $_->{value} + 0 } } @$data;
+		$json_data = $_JSON->encode(\@flat);
+		my $sep_esc = $js_esc->($path_sep);
+		$build_js = <<"BUILDJS";
+    var sep = "$sep_esc";
+    var nodeMap = {};
+    rawData.forEach(function(r){
+        var parts = r.path.split(sep);
+        var id = r.path;
+        if(!nodeMap[id]){ nodeMap[id] = {id:id, value:r.value}; }
+        for(var i = parts.length-1; i >= 1; i--){
+            var pid = parts.slice(0,i).join(sep);
+            if(!nodeMap[pid]){ nodeMap[pid] = {id:pid, value:0}; }
+        }
+        var root0 = parts[0];
+        if(!nodeMap[root0]){ nodeMap[root0] = {id:root0, value:0}; }
+    });
+    var nodes = Object.values(nodeMap).map(function(n){
+        var parts = n.id.split(sep);
+        return {id:n.id, parentId: parts.length>1 ? parts.slice(0,parts.length-1).join(sep) : null, value:n.value};
+    });
+    var root = d3.stratify().id(function(d){return d.id;})
+        .parentId(function(d){return d.parentId;})(nodes)
+        .sum(function(d){return d.value || 0;})
+        .sort(function(a,b){return b.value - a.value;});
+BUILDJS
+	} else {
+		$json_data = $_JSON->encode($data);
+		$build_js = <<'BUILDJS';
+    var root = d3.hierarchy(rawData)
+        .sum(function(d){return d.value || 0;})
+        .sort(function(a,b){return b.value - a.value;});
+BUILDJS
+	}
+
+	my $svg_id = $opts->{id} // 'treemap';
+	my $tip_id = $svg_id . '_tip';
+	my $width  = $self->{width};
+	my $height = $self->{height};
+	my $svg_attrs = ($opts->{responsive} // $self->{responsive})
+		? qq{viewBox="0 0 $width $height" width="100%" height="auto"}
+		: qq{width="$width" height="$height"};
+
+	my $label_block = $label ? <<"LBLJS" : '';
+        cell.append("text")
+            .attr("class","tm-label")
+            .attr("x",4).attr("y",14)
+            .attr("font-size","11px").attr("fill","#fff")
+            .text(function(d){
+                var w = d.x1 - d.x0, h = d.y1 - d.y0;
+                if(w < 24 || h < 14){ return ""; }
+                var name = d.id ? d.id.split(sep||"/").pop() : (d.data.name||"");
+                return name;
+            })
+            .each(function(d){
+                var w = d.x1 - d.x0 - 6;
+                var self2 = d3.select(this);
+                var text = self2.text();
+                while(self2.node().getComputedTextLength && self2.node().getComputedTextLength() > w && text.length > 1){
+                    text = text.slice(0,-1);
+                    self2.text(text + "…");
+                }
+            });
+LBLJS
+
+	my $html = <<"HTML";
+<style>
+    #$tip_id {
+	position:absolute;background:rgba(255,255,255,0.95);border:1px solid #ccc;
+	border-radius:4px;padding:6px 10px;font-size:12px;pointer-events:none;
+	display:none;line-height:1.6;
+    }
+    .tm-cell{stroke:#fff;stroke-width:1;}
+    .tm-label{pointer-events:none;}
+</style>
+<svg id="$svg_id" $svg_attrs></svg>
+<div id="$tip_id"></div>
+<script>
+(function(){
+    var rawData = $json_data;
+    var SCHEMES = {
+        tableau10:d3.schemeTableau10, category10:d3.schemeCategory10,
+        set2:d3.schemeSet2, set3:d3.schemeSet3, paired:d3.schemePaired
+    };
+    var color = d3.scaleOrdinal(SCHEMES['$scheme'] || d3.schemeTableau10);
+    var sep = "${\$js_esc->($path_sep)}";
+    var svg = d3.select("#$svg_id");
+    var tip = d3.select("#$tip_id");
+    $build_js
+    var layout = d3.treemap().tile(d3.treemapSquarify)
+        .size([$width, $height]).paddingOuter(2).paddingInner(1)(root);
+    var leaves = root.leaves();
+    var cell = svg.selectAll(".tm-cell-g")
+        .data(leaves).join("g").attr("class","tm-cell-g")
+        .attr("transform",function(d){return "translate("+d.x0+","+d.y0+")";});
+    cell.append("rect")
+        .attr("class","tm-cell")
+        .attr("width",function(d){return Math.max(0,d.x1-d.x0);})
+        .attr("height",function(d){return Math.max(0,d.y1-d.y0);})
+        .attr("fill",function(d){
+            var anc = d; while(anc.depth > 1){ anc = anc.parent; }
+            return color(anc.id || anc.data.name || "");
+        })
+        .on("mouseover",function(event,d){
+            var name = d.id ? d.id.split(sep).pop() : (d.data.name||"");
+            tip.style("display","block")
+               .html("<b>"+name+"<\\/b><br\/>"+d.value);
+        })
+        .on("mousemove",function(event){
+            tip.style("left",(event.offsetX+12)+"px").style("top",(event.offsetY-28)+"px");
+        })
+        .on("mouseout",function(){tip.style("display","none");});
+    $label_block
+})();
+</script>
+HTML
+
+	return { svg_id => $svg_id, html => $html };
+}
+
+=head2 render_histogram_snippet
+
+    my $result = $chart->render_histogram_snippet(\@values, \%opts);
+
+Generates an embeddable frequency histogram (no page shell, no CDN tag).
+C<\@values> is an arrayref of numeric scalars (already extracted and
+coerced by the caller).
+
+Accepted C<\%opts> keys:
+
+=over 4
+
+=item * C<bins> (integer or C<undef>, default C<20>) - number of bins.
+Pass C<undef> for automatic bin count using Sturges' rule:
+C<ceil(log2(n) + 1)>.
+
+=item * C<x_label> (string, optional) - label shown below the X axis.
+
+=item * C<color> (string, default C<'steelblue'>) - bar fill colour.
+
+=item * C<id> (string, optional) - override the default C<svg_id> value.
+
+=item * C<responsive> (boolean, optional) - SVG responsive sizing override.
+
+=back
+
+Returns C<{ svg_id =E<gt> 'histogram', html =E<gt> Str }>.
+
+=head3 Errors
+
+=over 4
+
+=item * Throws C<Data must be an array of numeric values> when C<$data> is
+not an ARRAY reference.
+
+=item * Throws C<Each value must be numeric> when any element is non-numeric.
+
+=item * Throws C<bins must be a positive integer> when C<bins> is defined
+but not a positive integer.
+
+=back
+
+=head3 API SPECIFICATION
+
+=head4 Input
+
+    {
+        data => { type => 'arrayref' },
+        opts => {
+            type     => 'hashref',
+            optional => 1,
+            keys     => {
+                bins    => { type => 'integer', optional => 1, default => 20 },
+                x_label => { type => 'string',  optional => 1, default => '' },
+                color   => { type => 'string',  optional => 1, default => 'steelblue' },
+                id      => { type => 'string',  optional => 1, default => 'histogram' },
+                responsive => { type => 'boolean', optional => 1 },
+            },
+        },
+    }
+
+=head4 Output
+
+    HashRef -- { svg_id => Str, html => Str }
+
+=cut
+
+sub render_histogram_snippet
+{
+	my ($self, $data, $opts) = @_;
+	$opts //= {};
+
+	die 'Data must be an array of numeric values' unless ref($data) eq 'ARRAY';
+
+	my $bins_opt = exists($opts->{bins}) ? $opts->{bins} : 20;
+	if (defined $bins_opt) {
+		die 'bins must be a positive integer'
+			unless looks_like_number($bins_opt) && $bins_opt == int($bins_opt) && $bins_opt >= 1;
+	}
+
+	my @values;
+	for my $v (@$data) {
+		die 'Each value must be numeric' unless looks_like_number($v // 'x');
+		push @values, $v + 0;
+	}
+
+	my $json_data = $_JSON->encode(\@values);
+
+	my $js_esc = sub {
+		my $s = shift;
+		$s =~ s/\\/\\\\/g; $s =~ s/"/\\"/g;
+		$s =~ s/\n/\\n/g;  $s =~ s/\r/\\r/g;
+		return $s;
+	};
+
+	my $x_label = $opts->{x_label} // '';
+	my $color   = $opts->{color}   // 'steelblue';
+
+	my $x_label_esc = $js_esc->($x_label);
+	my $color_esc   = $js_esc->($color);
+
+	my $svg_id  = $opts->{id} // 'histogram';
+	my $tip_id  = $svg_id . '_tip';
+	my $width   = $self->{width};
+	my $height  = $self->{height};
+	my $svg_attrs = ($opts->{responsive} // $self->{responsive})
+		? qq{viewBox="0 0 $width $height" width="100%" height="auto"}
+		: qq{width="$width" height="$height"};
+
+	my $margin_top    = 20;
+	my $margin_right  = 20;
+	my $margin_bottom = $x_label ? 60 : 40;
+	my $margin_left   = 55;
+	my $inner_w = $width  - $margin_left - $margin_right;
+	my $inner_h = $height - $margin_top  - $margin_bottom;
+
+	my $bins_js = defined($bins_opt)
+		? "var numBins = $bins_opt;"
+		: 'var numBins = Math.ceil(Math.log2(values.length) + 1);';
+
+	my $x_label_block = $x_label ? <<"XLB" : '';
+    g.append("text")
+        .attr("class","hg-axis-label")
+        .attr("x", innerW / 2)
+        .attr("y", innerH + (margin.bottom - 10))
+        .attr("text-anchor","middle")
+        .text("$x_label_esc");
+XLB
+
+	my $html = <<"HTML";
+<style>
+    #$tip_id {
+	position:absolute;background:rgba(255,255,255,0.95);border:1px solid #ccc;
+	border-radius:4px;padding:6px 10px;font-size:12px;pointer-events:none;
+	display:none;line-height:1.6;
+    }
+    .hg-axis-label{font-size:11px;fill:#555;}
+    .hg-bar{cursor:default;}
+</style>
+<svg id="$svg_id" $svg_attrs></svg>
+<div id="$tip_id"></div>
+<script>
+(function(){
+    var values = $json_data;
+    var margin = {top:$margin_top,right:$margin_right,bottom:$margin_bottom,left:$margin_left};
+    var innerW = $inner_w;
+    var innerH = $inner_h;
+    $bins_js
+    var svg = d3.select("#$svg_id");
+    var g = svg.append("g").attr("transform","translate("+margin.left+","+margin.top+")");
+    var tip = d3.select("#$tip_id");
+
+    var xScale = d3.scaleLinear()
+        .domain([d3.min(values), d3.max(values)]).nice()
+        .range([0, innerW]);
+
+    var binner = d3.bin().domain(xScale.domain()).thresholds(xScale.ticks(numBins));
+    var bins = binner(values);
+
+    var yScale = d3.scaleLinear()
+        .domain([0, d3.max(bins, function(d){return d.length;})]).nice()
+        .range([innerH, 0]);
+
+    g.append("g").attr("class","hg-x-axis")
+        .attr("transform","translate(0,"+innerH+")").call(d3.axisBottom(xScale));
+    g.append("g").attr("class","hg-y-axis").call(d3.axisLeft(yScale).ticks(6));
+
+    $x_label_block
+    g.selectAll(".hg-bar").data(bins).join("rect")
+        .attr("class","hg-bar")
+        .attr("x",function(d){return xScale(d.x0)+1;})
+        .attr("y",function(d){return yScale(d.length);})
+        .attr("width",function(d){return Math.max(0, xScale(d.x1)-xScale(d.x0)-2);})
+        .attr("height",function(d){return innerH - yScale(d.length);})
+        .attr("fill","$color_esc")
+        .on("mouseover",function(event,d){
+            tip.style("display","block")
+               .html("<b>"+d.x0.toFixed(2)+" – "+d.x1.toFixed(2)+"<\\/b><br\/>Count: "+d.length);
+        })
+        .on("mousemove",function(event){
+            tip.style("left",(event.offsetX+12)+"px").style("top",(event.offsetY-28)+"px");
+        })
+        .on("mouseout",function(){tip.style("display","none");});
+})();
+</script>
+HTML
+
+	return { svg_id => $svg_id, html => $html };
+}
+
 sub _preamble
 {
 	my $html = <<'HTML';
@@ -4213,6 +5173,84 @@ Nigel Horne <njh@nigelhorne.com>
     post result.html ∈ Str
     post "<!DOCTYPE" ∉ result.html
     post opts.sortable ≠ 0         ⇒ "dt-sortable" ⊆ result.html
+
+=head2 render_stacked_bar_snippet
+
+    render_stacked_bar_snippet :
+        HTML::D3 × (ArrayRef | undef) × (HashRef | undef) → HashRef ∪ ⊥
+
+    pre  ref(data) ≠ 'ARRAY'        ⇒ die "Data must be an array of hashes"
+    pre  ∃ row ∈ data . ref(row) ≠ 'HASH'
+                                    ⇒ die "Each data point must be a hash reference"
+    pre  ∃ row ∈ data . ¬numeric(row[val_col])
+                                    ⇒ die "Value must be numeric"
+    pre  opts.orient ∉ {'v','h'}    ⇒ die "orient must be 'v' or 'h'"
+    pre  defined(opts.sort) ∧ opts.sort ∉ {'value','label'}
+                                    ⇒ die "sort must be 'value' or 'label'"
+    post result ∈ HashRef
+    post result.svg_id = opts.id // "stacked_bar"
+    post result.html ∈ Str
+    post "<!DOCTYPE" ∉ result.html
+    post "d3.stack()" ⊆ result.html
+    post "SCHEMES" ⊆ result.html
+
+=head2 render_combo_snippet
+
+    render_combo_snippet :
+        HTML::D3 × (ArrayRef | undef) × (HashRef | undef) → HashRef ∪ ⊥
+
+    pre  ref(data) ≠ 'ARRAY'        ⇒ die "Data must be an array of hashes"
+    pre  ∃ row ∈ data . ref(row) ≠ 'HASH'
+                                    ⇒ die "Each data point must be a hash reference"
+    pre  ∃ row ∈ data . ¬numeric(row[bar_col])
+                                    ⇒ die "Bar value must be numeric"
+    pre  ∃ row ∈ data . ¬numeric(row[line_col])
+                                    ⇒ die "Line value must be numeric"
+    post result ∈ HashRef
+    post result.svg_id = opts.id // "combo_chart"
+    post result.html ∈ Str
+    post "<!DOCTYPE" ∉ result.html
+    post "d3.scaleBand" ⊆ result.html ∧ "d3.scaleLinear" ⊆ result.html
+    post "axisRight" ⊆ result.html
+    post "</b>" ∉ result.html ∧ "<\/b>" ∈ result.html
+
+=head2 render_treemap_snippet
+
+    render_treemap_snippet :
+        HTML::D3 × (ArrayRef | HashRef | undef) × (HashRef | undef) → HashRef ∪ ⊥
+
+    pre  ref(data) ∉ {'ARRAY','HASH'}
+                                    ⇒ die "Data must be an array of hashes or a hash tree"
+    pre  ref(data) = 'ARRAY' ∧ ∃ row ∈ data . ref(row) ≠ 'HASH'
+                                    ⇒ die "Each flat row must be a hash reference"
+    pre  ref(data) = 'ARRAY' ∧ ∃ row ∈ data . ¬exists(row.path)
+                                    ⇒ die "Each flat row must have a 'path' key"
+    pre  ref(data) = 'ARRAY' ∧ ∃ row ∈ data . ¬numeric(row.value)
+                                    ⇒ die "Each flat row must have a numeric 'value' key"
+    post result ∈ HashRef
+    post result.svg_id = opts.id // "treemap"
+    post result.html ∈ Str
+    post "<!DOCTYPE" ∉ result.html
+    post "d3.treemap()" ⊆ result.html
+    post ref(data) = 'ARRAY' ⇒ "d3.stratify()" ⊆ result.html
+    post ref(data) = 'HASH'  ⇒ "d3.hierarchy(" ⊆ result.html
+
+=head2 render_histogram_snippet
+
+    render_histogram_snippet :
+        HTML::D3 × (ArrayRef | undef) × (HashRef | undef) → HashRef ∪ ⊥
+
+    pre  ref(data) ≠ 'ARRAY'        ⇒ die "Data must be an array of numeric values"
+    pre  ∃ v ∈ data . ¬numeric(v)  ⇒ die "Each value must be numeric"
+    pre  defined(opts.bins) ∧ (¬integer(opts.bins) ∨ opts.bins < 1)
+                                    ⇒ die "bins must be a positive integer"
+    post result ∈ HashRef
+    post result.svg_id = opts.id // "histogram"
+    post result.html ∈ Str
+    post "<!DOCTYPE" ∉ result.html
+    post "d3.bin()" ⊆ result.html
+    post opts.bins = undef          ⇒ "Math.log2" ⊆ result.html
+    post opts.x_label ≠ ''         ⇒ "hg-axis-label" ⊆ result.html
 
 =head2 render_line_chart_with_tooltips
 

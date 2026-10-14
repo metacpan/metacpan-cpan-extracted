@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.58';
+our $VERSION = '0.59';
 
 1;
 
@@ -112,6 +112,10 @@ of one, on every dashboard, for ever.
     http_request_duration_seconds{method,route,worker}       histogram
     http_requests_in_flight{worker}                          gauge
     punk_cache_*{cache,worker}                               gauge
+
+C<method> is one of the nine standard methods or C<< <other> >>: it is what
+the client put on the request line, and a label that takes any value a
+client cares to send is a series per value. C<route> is bounded the same way.
 
 The cache gauges are whatever L<Punk::Cache> reports from C<stats> - hits,
 misses, evictions, entries, bytes, and C<pool>, which says whether a shared

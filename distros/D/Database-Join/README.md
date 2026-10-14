@@ -4,7 +4,7 @@ Database::Join - Read-only combined view across two or more Database::Abstractio
 
 ## Version
 
-Version 0.009.0
+Version 0.010.0
 
 ## Synopsis
 
@@ -519,6 +519,41 @@ preserve both values under distinct names instead.
     aggregation is expensive and the data changes infrequently, cache the result
     yourself using `updated()` as a staleness signal.
 
+- distinct => 1 without columns returns full rows, not a column projection
+
+    `distinct => 1` alone deduplicates on _all_ columns of the merged row.
+    If you want a distinct list of values for a single column (e.g. all unique
+    tiers), you **must** supply `columns => ['tier']` as well.  Without
+    `columns`, every column participates in the key used to detect duplicates,
+    which means two rows that differ in any column (e.g. `entry`) are never
+    considered duplicates, and the result will be the same as without `distinct`.
+
+- distinct => 1 with columns projects rows to those columns
+
+    When `columns` is supplied alongside `distinct`, each returned row contains
+    _only_ the named columns -- all other columns are dropped.  The projection
+    happens before deduplication, so the result set may be smaller than the full
+    merged row count.  If you need the full row _and_ want to know unique values,
+    run two separate queries or post-process in Perl.
+
+- mandatory\_filters must never come from user-supplied input
+
+    The predicates in `mandatory_filters` form an enforcement boundary.  They must
+    come from a trusted server-side source (a session store, a policy table, or
+    hard-coded application configuration) -- never from URL parameters, form fields,
+    HTTP headers, or other user-controlled input.  A hostile user who can control
+    a mandatory\_filters predicate can widen it to `{ col =` 'status', op => 'ne',
+    val => 'NONEXISTENT' }> and receive all rows regardless of status.
+
+- mandatory\_filters uses string comparison on the array path
+
+    On the array backend, all `mandatory_filters` comparisons (including `lt`,
+    `lte`, `gt`, `gte`) are _lexicographic string comparisons_, not numeric.
+    `{ col => 'score', op => 'gt', val => 9 }` will match a score of `'10'`
+    only if `'10' gt '9'` is true -- which it is not (`'1' lt '9'`).  Use the
+    SQLite backend (`backend => 'sqlite'`) when numeric comparisons are needed,
+    as SQLite uses the column's declared type for ordering.
+
 ## Methods
 
 ### New
@@ -527,18 +562,20 @@ preserve both values under distinct names instead.
 
 ```perl
 my $join = Database::Join->new(
-    databases        => [ $db1, $db2 ],
-    join_column      => 'entry',
-    join_type        => 'left',
-    join_map         => { 1 => 'local_col' },
-    filters          => { 1 => { score => { '>' => 60 } } },
-    collision_prefix => { 1 => 'right' },
-    remove_columns   => [ 'email', 'internal_id' ],
-    backend          => 'auto',        # 'auto' | 'sqlite' | 'array'
-    max_array_rows   => 10_000,        # threshold for 'auto' mode
-    tmpdir           => '/tmp',        # directory for temp SQLite file
-    logger           => $log,
-    i18n             => $locale,
+    databases         => [ $db1, $db2 ],
+    join_column       => 'entry',
+    join_type         => 'left',
+    join_map          => { 1 => 'local_col' },
+    filters           => { 1 => { score => { '>' => 60 } } },
+    base_criteria     => { active => 1 },
+    mandatory_filters => [{ col => 'region', op => 'eq', val => 'West' }],
+    collision_prefix  => { 1 => 'right' },
+    remove_columns    => [ 'email', 'internal_id' ],
+    backend           => 'auto',        # 'auto' | 'sqlite' | 'array'
+    max_array_rows    => 10_000,        # threshold for 'auto' mode
+    tmpdir            => '/tmp',        # directory for temp SQLite file
+    logger            => $log,
+    i18n              => $locale,
 );
 ```
 
@@ -695,6 +732,36 @@ parallel       => { type => 'integer',  optional => 1, default => 0 }
                   # DOMAIN -- EP invalid: any other integer is treated as truthy/falsy.
                   # DOMAIN -- Default:    0.
 
+mandatory_filters => { type => 'arrayref', optional => 1 }
+                  # Arrayref of {col, op, val} predicate hashrefs.
+                  # These filters are applied to every query result regardless
+                  # of what criteria the caller supplies.  They cannot be
+                  # overridden, suppressed, or circumvented at query time.
+                  # Each predicate must supply:
+                  #   col -- a column name present in the merged view
+                  #   op  -- one of: eq, ne, lt, lte, gt, gte, like, contains
+                  #   val -- the comparison value (plain scalar)
+                  # On the array backend: applied as a Perl-side grep after the
+                  # in-memory merge, before sort/limit/offset.
+                  # On the SQLite backend: injected as parameterised WHERE clauses
+                  # into the per-call SQL query.
+                  #
+                  # SECURITY: Never set this from URL parameters or any
+                  # user-supplied value.  Predicates must come from the
+                  # server-side session or policy store only.
+                  #
+                  # DOMAIN -- EP valid:   [] empty arrayref => no constraint (safe no-op).
+                  # DOMAIN -- EP valid:   arrayref of {col, op, val} hashrefs where
+                  #                       col is in the merged view and op is supported.
+                  # DOMAIN -- EP invalid: element is not a hashref, or is missing
+                  #                       col/op/val => croak error_mandatory_filter_ref.
+                  # DOMAIN -- EP invalid: col not in merged view => croak error_mandatory_filter_col.
+                  # DOMAIN -- EP invalid: op not in supported set => croak error_mandatory_filter_op.
+                  # DOMAIN -- ops:        eq (string eq), ne (string ne),
+                  #                       lt/lte/gt/gte (string comparison),
+                  #                       like (SQL LIKE pattern with % and _),
+                  #                       contains (substring match, equivalent to LIKE %val%).
+
 logger         => { type => 'object',   optional => 1 }
                   # Logger object propagated to all component databases.
 
@@ -741,6 +808,12 @@ if base_criteria given:
     for each database with a non-empty slice:
         merge the slice into _filters[i]
         (explicit filters win on plain-scalar conflicts)
+if mandatory_filters given:
+    for each predicate in mandatory_filters:
+        croak error_mandatory_filter_ref if predicate is not a {col, op, val} hashref
+        croak error_mandatory_filter_col if col is not in the merged view
+        croak error_mandatory_filter_op  if op is not in the supported set
+    store shallow copies of all validated predicates in _mandatory_filters
 for each column in remove_columns: call remove_column
 return the new object
 ```
@@ -748,13 +821,16 @@ return the new object
 #### Messages
 
 ```perl
-error_no_databases        -- databases arrayref was empty
-error_invalid_db          -- an element of databases is not a D::A subclass
-error_join_col_missing    -- join_column (or its join_map alias) not found in a database
-error_invalid_backend     -- backend value is not 'array', 'sqlite', or 'auto'
-error_sqlite_connect      -- temporary SQLite database could not be created (backend='sqlite'/'auto')
-warn_schema_type_mismatch -- (carp) a shared column has different types across databases;
-                             use collision_prefix to preserve both values
+error_no_databases           -- databases arrayref was empty
+error_invalid_db             -- an element of databases is not a D::A subclass
+error_join_col_missing       -- join_column (or its join_map alias) not found in a database
+error_invalid_backend        -- backend value is not 'array', 'sqlite', or 'auto'
+error_sqlite_connect         -- temporary SQLite database could not be created (backend='sqlite'/'auto')
+error_mandatory_filter_ref   -- a mandatory_filters element is not a hashref with col, op, and val keys
+error_mandatory_filter_col   -- a mandatory_filters element names a column not in the merged view
+error_mandatory_filter_op    -- a mandatory_filters element uses an unsupported op value
+warn_schema_type_mismatch    -- (carp) a shared column has different types across databases;
+                                use collision_prefix to preserve both values
 ```
 
 ### Join\_Map - Joining on Differently-Named Columns
@@ -926,6 +1002,128 @@ are combined with AND semantics.
 - Row-level security: `base_criteria => { tenant_id => $tid }`
 - Soft-delete filtering: `base_criteria => { deleted_at => undef }`
 - Status gates: `base_criteria => { active => 1 }`
+
+### Mandatory\_Filters - Row-Level Security Predicates That Cannot Be Bypassed
+
+`mandatory_filters` is an arrayref of `{col, op, val}` predicate hashrefs.
+Every predicate is applied to the merged result of every query, regardless of
+what criteria the caller passes.  Unlike `filters` and `base_criteria` (which
+are per-database constraints applied at fetch time), `mandatory_filters`
+operates on the fully-merged row set, ensuring the constraint applies uniformly
+even when the same logical value is spread across multiple databases.
+
+```perl
+my $join = Database::Join->new(
+    databases         => [ $customers, $loyalty ],
+    join_column       => 'entry',
+    mandatory_filters => [
+        { col => 'region',  op => 'eq',  val => 'West' },
+        { col => 'tier',    op => 'ne',  val => 'banned' },
+        { col => 'balance', op => 'gte', val => 0        },
+    ],
+);
+```
+
+Each predicate hashref must supply exactly these three keys:
+
+- `col`
+
+    The column name in the merged view (as returned by `columns()`).  Must be
+    present at construction time; columns added later via `add_database()` are not
+    retroactively covered by predicates already in `_mandatory_filters`.
+
+- `op`
+
+    The comparison operator.  Supported values:
+
+    ```
+    eq       -- string equality      ($row->{col} eq $val)
+    ne       -- string inequality    ($row->{col} ne $val)
+    lt       -- string less-than     ($row->{col} lt $val)
+    lte      -- string <=            ($row->{col} le $val)
+    gt       -- string greater-than  ($row->{col} gt $val)
+    gte      -- string >=            ($row->{col} ge $val)
+    like     -- SQL LIKE pattern     (% = any sequence, _ = any one character)
+    contains -- substring match      (row value must contain val as a substring)
+    ```
+
+    Comparisons are lexicographic (string-based) on the array path; on the SQLite
+    path they follow SQLite's default collation for the column type.  Use the
+    SQLite backend (`backend => 'sqlite'`) when numeric ordering matters.
+
+- `val`
+
+    The right-hand side of the comparison.  Must be a plain scalar.
+
+**Supported use cases**
+
+- Row-level security: restrict the view to rows the current session is authorised
+to see: `{ col => 'tenant_id', op => 'eq', val => $session_tenant }`
+- Data classification gates: hide rows marked with a sensitivity label:
+`{ col => 'classification', op => 'ne', val => 'restricted' }`
+- Substring/pattern guards:
+`{ col => 'email', op => 'contains', val => '@example.com' }`
+or `{ col => 'code', op => 'like', val => 'PROD_%' }`
+
+**SECURITY: `mandatory_filters` must never be set from user-supplied values**
+
+The predicates in `mandatory_filters` are an enforcement boundary.  They must
+come from a trusted server-side source (a session store, a policy table, or
+hard-coded application configuration) -- never from URL parameters, form fields,
+HTTP headers, or any other user-controlled input.  Setting this parameter from
+user-supplied data would allow an attacker to widen or replace the constraints
+and access rows they are not permitted to see.
+
+**Array vs. SQLite backend**
+
+On the **array backend**, `mandatory_filters` is applied as a Perl-side `grep`
+after the in-memory merge, immediately before `sort_by`/`limit`/`offset`.
+A row that does not satisfy every predicate is silently dropped.
+
+On the **SQLite backend**, each predicate is translated into a parameterised
+`WHERE` clause and injected into the per-call SQL query.  Values are always
+passed via DBI bind parameters, never by string interpolation.
+
+Both backends produce identical filtered results.
+
+### Distinct - Deduplicate Merged Rows
+
+Pass `distinct => 1` to `selectall_arrayref` or `selectall_array` to
+remove duplicate rows from the merged result.
+
+```perl
+# All unique tier values
+my $tiers = $join->selectall_arrayref(
+    distinct => 1,
+    columns  => ['tier'],
+);
+
+# All unique region + tier combinations
+my $combos = $join->selectall_arrayref(
+    distinct => 1,
+    columns  => ['region', 'tier'],
+);
+
+# Remove fully-identical merged rows (all columns participate)
+my $deduped = $join->selectall_arrayref(distinct => 1);
+```
+
+The optional `columns` arrayref projects each row to the named columns _before_
+deduplication.  Omitting `columns` (or passing an empty arrayref) deduplicates
+on the full merged row: two rows must be identical in every column to be
+considered duplicates.
+
+**Array backend**: deduplication is done in Perl using a seen-hash keyed on the
+selected column values.  First occurrence wins.
+
+**SQLite backend**: `SELECT DISTINCT col1, col2, ...` is used; the SQL engine
+handles deduplication.
+
+Both backends produce identical results.
+
+**Interaction with sort\_by / limit / offset**: `distinct` is applied first
+(before pagination and ordering), so `limit` and `offset` operate on the
+already-deduplicated set.
 
 ### Collision\_Prefix - Preserve Colliding Columns From Secondary Databases
 
@@ -1196,6 +1394,8 @@ my $rows = $join->selectall_arrayref(tier => 'gold', sort_by => ['score', 'DESC'
 my $rows = $join->selectall_arrayref(limit => 10);
 my $rows = $join->selectall_arrayref(limit => 10, offset => 20);
 my $rows = $join->selectall_arrayref(tier => 'gold', sort_by => 'name', limit => 5);
+my $rows = $join->selectall_arrayref(distinct => 1, columns => ['tier']);
+my $rows = $join->selectall_arrayref(distinct => 1);  # distinct on all columns
 ```
 
 #### Description
@@ -1210,6 +1410,9 @@ its own columns.  The results are combined in memory using `join_column`.
 Accepts the same criteria syntax as `Database::Abstraction::selectall_arrayref`.
 A single plain scalar argument is interpreted as the `join_column` value
 (equivalent to `entry => 'C001'` when `join_column` is `'entry'`).
+
+Pass `distinct => 1` (with optional `columns => \@cols`) to
+deduplicate results; see the `distinct` feature section for details.
 
 #### Api Specification
 
@@ -1273,6 +1476,29 @@ DOMAIN -- offset:
   EP invalid:         negative integer, float string, or non-numeric string
                       => carp + ignored (no rows skipped).
   Valid domain:       integers in [0, INF); matched by /^\d+\z/a.
+
+distinct => 1          -- deduplicate rows after the merge (see columns below)
+columns  => \@cols     -- arrayref of column names to project and deduplicate on;
+                          used together with distinct => 1
+
+DOMAIN -- distinct:
+  EP absent or 0:     no deduplication; all merged rows are returned.
+  EP 1:               duplicates are removed (see below); first occurrence wins.
+  EP truthy (not 1):  treated as truthy; deduplication is applied.
+  Effect:             on the array backend, a Perl seen-hash keyed on the
+                      selected column values is used; first occurrence wins.
+                      On the SQLite backend, SELECT DISTINCT is used.
+
+DOMAIN -- columns:
+  EP absent/undef:    when distinct is set, deduplication is on all columns
+                      and full rows are returned.
+  EP []:              empty arrayref treated the same as absent.
+  EP valid:           arrayref of column names present in the merged view;
+                      result rows are projected to those columns only, and
+                      deduplication is on the projected values.
+  EP with distinct=0: columns is ignored when distinct is absent or false.
+  Note:               unknown column names in the list are silently ignored
+                      at projection time; the row may lack those keys.
 ```
 
 ##### Output
@@ -1303,6 +1529,20 @@ for my $row (@{$vip}) {
     printf "%-10s tier=%-8s score=%d\n",
         $row->{entry}, $row->{tier}, $row->{score} // 0;
 }
+
+# Distinct tier values across all rows (project to one column, deduplicate)
+my $tiers = $join->selectall_arrayref(distinct => 1, columns => ['tier']);
+# Returns e.g. [{ tier => 'gold' }, { tier => 'silver' }, { tier => 'bronze' }]
+# regardless of how many rows exist for each tier
+
+# Distinct region+tier combinations
+my $combos = $join->selectall_arrayref(
+    distinct => 1,
+    columns  => ['region', 'tier'],
+);
+
+# Distinct on all columns (remove fully-duplicate merged rows)
+my $deduped = $join->selectall_arrayref(distinct => 1);
 ```
 
 #### Messages
@@ -1345,6 +1585,12 @@ my @rows = $join->selectall_array(tier => 'gold');
 
 # Scalar context: only the first matching row
 my $first = $join->selectall_array(entry => 'C001');
+
+# Distinct column projection (list context)
+my @tiers = $join->selectall_array(distinct => 1, columns => ['tier']);
+
+# Distinct on all columns
+my @deduped = $join->selectall_array(distinct => 1);
 ```
 
 #### Description
@@ -2656,6 +2902,21 @@ architectural guarantees, not run-time checks.
     `add_database()` are _deep-copied_ at the point of use.  The caller's
     original hashrefs are never stored; post-construction mutation of those
     hashrefs cannot widen or bypass the configured row-security constraints.
+
+- mandatory\_filters cannot be overridden or bypassed at query time
+
+    Predicates stored in `_mandatory_filters` are applied unconditionally to every
+    query result, after the in-memory merge (array path) or as parameterised SQL
+    `WHERE` clauses (SQLite path).  There is no query-time parameter that suppresses
+    or modifies them.  Caller-supplied criteria are ANDed with the mandatory
+    predicates -- they can only further restrict the result set, never widen it.
+
+    Each predicate is a shallow copy of the caller-supplied hashref; post-construction
+    mutation of the original `mandatory_filters` arrayref or its elements has no
+    effect on the stored predicates.
+
+    Values are always passed to the SQLite engine via DBI bind parameters, never by
+    string interpolation.  A hostile `val` in a predicate cannot inject SQL.
 
 ### What the Caller Is Responsible For
 

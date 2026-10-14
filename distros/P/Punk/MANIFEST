@@ -273,6 +273,7 @@ t/0122-mount.t
 t/0130-not-found.t
 t/0131-before-request.t
 t/0132-after-response.t
+t/0133-error-surface.t
 t/0200-context.t
 t/0210-response.t
 t/0211-respond-to.t

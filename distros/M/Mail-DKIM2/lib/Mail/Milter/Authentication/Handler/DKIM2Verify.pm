@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Mail::Milter::Authentication::Pragmas;
 # ABSTRACT: Handler class for DKIM2 signature verification
-our $VERSION = '0.18';
+our $VERSION = '0.20';
 use base 'Mail::Milter::Authentication::Handler';
 
 use Mail::DKIM2::Common qw(extract_mi_version parse_dkim_pubkey fold_header parse_mime);
@@ -12,6 +12,7 @@ use Mail::DKIM2::Verifier;
 use Mail::DKIM2::MessageInstance;
 use Mail::DKIM2::MessageStore;
 use Email::MIME;
+use Crypt::PRNG qw(random_bytes);
 
 sub default_config {
     return {
@@ -160,6 +161,11 @@ sub body_callback {
 sub eom_callback {
     my ($self) = @_;
 
+    # X-DKIM2-Snapshot names a snapshot this host took of the message; one
+    # that arrives from outside means nothing and is removed, whatever else
+    # happens to the message.
+    $self->_strip_snapshot_header();
+
     return unless $self->{'has_dkim2'};
     return if $self->{'failmode'};
 
@@ -210,7 +216,7 @@ sub _add_mi_and_store {
 
     eval {
         my $EOL = "\015\012";
-        my $message_data = join(q{}, @{$self->{'headers'}})
+        my $message_data = join(q{}, grep { !/\AX-DKIM2-Snapshot[ \t]*:/i } @{$self->{'headers'}})
                          . $EOL
                          . join(q{}, @{$self->{'body'}});
 
@@ -249,20 +255,33 @@ sub _add_mi_and_store {
             $self->dbgout( 'DKIM2MI', "Added Message-Instance m=" . ($mi->get_tag('m') || '?'), LOG_DEBUG );
         }
 
-        # Store snapshot keyed by the MI value so the outbound signer can
-        # compute diff Recipes if the message is modified during local processing
+        # Keep the snapshot under a fresh random token and name it on the
+        # message (X-DKIM2-Snapshot), so the outbound signer can describe what
+        # local processing changes -- against this message's own snapshot,
+        # never one found by Message-Instance value (a replayed instance over
+        # an edited body would find a different message's).
         if ( $config->{'snapshot_directory'} && $mi_value ) {
             my $store = Mail::DKIM2::MessageStore->new(
                 directory => $config->{'snapshot_directory'},
             );
-            $store->store($mi_value, $snapshot);
-            $self->dbgout( 'DKIM2Snapshot', "Stored snapshot", LOG_DEBUG );
+            my $token = unpack('H*', random_bytes(16));
+            $store->store("X-DKIM2-Snapshot:$token", $snapshot);
+            $self->prepend_header( 'X-DKIM2-Snapshot', $token );
+            $self->dbgout( 'DKIM2Snapshot', "Stored snapshot $token", LOG_DEBUG );
         }
     };
     if ( my $error = $@ ) {
         $self->handle_exception( $error );
         $self->log_error( 'DKIM2 MI/Snapshot Error ' . $error );
     }
+}
+
+# Remove every X-DKIM2-Snapshot field the message arrived with (last first,
+# by index among the fields as received).
+sub _strip_snapshot_header {
+    my ($self) = @_;
+    my $n = grep { /\AX-DKIM2-Snapshot[ \t]*:/i } @{ $self->{'headers'} || [] };
+    $self->change_header( 'X-DKIM2-Snapshot', $_, q{} ) for reverse 1 .. $n;
 }
 
 # Format MI header value with folding for insertion into message
@@ -366,10 +385,15 @@ module here follows.
 When C<add_message_instance> is enabled, the handler computes a Message-Instance
 header after successful DKIM2 verification and prepends it to the message.
 
-When C<snapshot_directory> is also set, the full message (with the new MI header)
-is stored to disk.  The DKIM2Sign handler can later retrieve this snapshot to
-compute a diff-based MI when the message leaves the system, capturing any
-modifications made during local processing.
+When C<snapshot_directory> is also set, the full message (with the new MI header,
+or as it arrived when its top Message-Instance already matched) is stored to
+disk under a random token, and the token is prepended as an
+C<X-DKIM2-Snapshot> field.  The DKIM2Sign handler finds the snapshot through
+that token, and only through it, to compute a diff-based MI when the message
+leaves the system, capturing any modifications made during local processing.
+Any C<X-DKIM2-Snapshot> a message arrives with is removed (through the
+framework's C<change_header()>), whether or not it is DKIM2-signed.  Run
+DKIM2Verify and DKIM2Sign in separate instances, as for C<dkim2-milter>.
 
 =head1 CALLBACKS
 

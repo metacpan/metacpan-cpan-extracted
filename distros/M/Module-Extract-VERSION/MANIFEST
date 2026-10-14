@@ -10,6 +10,8 @@ corpus/QV_single.pm
 corpus/RCSKeywords.pm
 corpus/ToTk.pm
 corpus/Underscore.pm
+corpus/version-declare-v.pm
+corpus/version-declare.pm
 examples/placeholder.pl
 INSTALL.SKIP
 lib/Module/Extract/VERSION.pm

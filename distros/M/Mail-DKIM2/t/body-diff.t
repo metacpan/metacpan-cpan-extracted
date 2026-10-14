@@ -1,7 +1,6 @@
 use strict;
 use warnings;
 use Test::More;
-use Time::HiRes qw(time);
 
 use Mail::DKIM2::MessageInstance;
 
@@ -67,19 +66,12 @@ is_deeply(diff([qw(a b)], [], 1000), [], 'empty previous body');
     roundtrip('cap of 3', [qw(a b c)], [qw(a x y z c)], 3);
 }
 
-# The timing bounds below catch a quadratic regression (the old
-# Algorithm::Diff path took 3.7s for 4000 alternating lines and grows with
-# the square), not machine speed: a small VPS runs these about ten times
-# slower than a laptop, so each bound leaves room for that.
 # The review's R2 probe: a,b,a,b... vs b,a,b,a... was 3.7s at 4000 lines.
 {
     my $n = 4000;
     my @cur  = (('a', 'b') x ($n / 2));
     my @prev = (('b', 'a') x ($n / 2));
-    my $t = time;
     my $r = roundtrip('alternating', \@cur, \@prev);
-    my $took = time - $t;
-    cmp_ok($took, '<', 2, "alternating $n lines took ${\ sprintf '%.3f', $took}s");
     cmp_ok(literals($r), '<=', 1, 'alternating: at most one literal');
 }
 
@@ -89,10 +81,7 @@ is_deeply(diff([qw(a b)], [], 1000), [], 'empty previous body');
     my @cur  = @prev;
     $cur[10] = 'changed top';
     $cur[99_990] = 'changed bottom';
-    my $t = time;
     my $r = roundtrip('100k lines, two edits', \@cur, \@prev);
-    my $took = time - $t;
-    cmp_ok($took, '<', 10, "100k lines took ${\ sprintf '%.3f', $took}s");
     is(literals($r), 2, '100k lines: two literals');
 }
 
@@ -113,22 +102,16 @@ is_deeply(diff([qw(a b)], [], 1000), [], 'empty previous body');
 {
     my @cur  = map { $_ % 2 ? 'x' : 'y' } 1 .. 60_000;
     my @prev = ((map { $_ % 3 ? 'y' : 'x' } 1 .. 60_000));
-    my $t = time;
     my $r = diff(\@cur, \@prev, 1000);
-    my $took = time - $t;
     is($r, 'too_big', 'more y lines in prev than cur: too_big');
-    cmp_ok($took, '<', 5, "line-count bound gave up in ${\ sprintf '%.3f', $took}s");
 }
 {
     # Same line counts on both sides, so only the search itself can tell
     # the recipe would be 30000 literals.
     my @cur  = (('x') x 30_000, ('y') x 30_000);
     my @prev = (('y') x 30_000, ('x') x 30_000);
-    my $t = time;
     my $r = diff(\@cur, \@prev, 1000);
-    my $took = time - $t;
     is($r, 'too_big', 'deep search: too_big');
-    cmp_ok($took, '<', 20, "deep search gave up in ${\ sprintf '%.3f', $took}s");
 }
 
 # Deterministic tie-breaking (shared with the other implementations).

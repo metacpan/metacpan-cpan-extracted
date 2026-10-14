@@ -3,7 +3,7 @@ use 5.20.0;
 use strict;
 use warnings;
 
-our $VERSION = '0.18';
+our $VERSION = '0.20';
 
 use Crypt::Digest::SHA256 qw(sha256_hex);
 use File::Path qw(make_path);

@@ -7,7 +7,7 @@ use Punk::Request;
 use Punk::Response;
 use Punk ();
 
-our $VERSION = '0.58';
+our $VERSION = '0.59';
 
 1;
 
@@ -171,6 +171,12 @@ of your own.
 
 Finished responses. Status and headers previously set through
 L</status> and L</header> are folded in.
+
+A status is an integer from 100 to 599. Anything else croaks, here and in
+L</status>; C<0>, C<undef> and the empty string mean "none given" and take
+the default. C<redirect> also croaks on a URL containing CR, LF or NUL.
+A handler that returns C<[ $status, \@headers, \@body ]> with a status that
+is not one gets a C<500>, not its headers encoded into a body.
 
 C<xml> takes a L<File::Raw::XML::Document>, a L<File::Raw::XML::Node> or a
 string of markup you built yourself, and answers C<application/xml;

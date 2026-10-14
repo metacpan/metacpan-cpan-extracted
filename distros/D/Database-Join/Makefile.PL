@@ -20,8 +20,8 @@ WriteMakefile(
 	MIN_PERL_VERSION => '5.010001',
 	PREREQ_PM      => {
 		'autodie'                  => 0,
-		'Carp'                     => 0,
-		'Database::Abstraction'  => 0.49,
+		'Carp'                => 0,
+		'Database::Abstraction'  => 0.51,
 		'DBD::SQLite'              => '1.70',
 		'DBI'                      => 0,
 		'File::Spec'               => 0,
@@ -37,7 +37,6 @@ WriteMakefile(
 		'Sub::Protected'           => 0,
 	}, TEST_REQUIRES => {
 		'DBD::CSV'              => 0,
-		'IPC::System::Simple'   => 0,
 		'Test::DescribeMe'      => 0,
 		'Test::Exception'       => 0,
 		'Test::Memory::Cycle'   => 0,
@@ -51,6 +50,15 @@ WriteMakefile(
 		'Text::xSV::Slurp'      => 0,
 	}, META_MERGE => {
 		'meta-spec' => { version => 2 },
+		prereqs => {
+			runtime => {
+				recommends => {
+					'threads'             => 0,
+					'DBD::Excel'          => '0.06',
+					'Excel::Writer::XLSX' => '1.09',
+				},
+			},
+		},
 		resources => {
 			repository => {
 				type => 'git',

@@ -1,5 +1,32 @@
 Revision history for Database-Abstraction
 
+0.51	Tue Oct 13 01:56:46 PM EDT 2026
+	[ Enhancements ]
+	- selectall_arrayref(): new distinct => 1 parameter deduplicates the
+	  result set.  On SQL-capable backends (SQLite, PostgreSQL, MySQL,
+	  DBD::CSV >= 0.64) it emits SELECT DISTINCT; on the slurp/in-memory
+	  path Perl-side deduplication is performed by _apply_distinct().
+	  Requires DBD::CSV >= 0.64 (SQL::Statement >= 1.414) for the CSV
+	  backend; minimum version raised accordingly in Makefile.PL and cpanfile.
+	- selectall_arrayref(): new columns => \@cols parameter restricts which
+	  columns appear in the returned rows; column names are validated with
+	  SAFE_QUALIFIED; missing keys in fixated slurp rows are returned as undef.
+	  Can be used independently or together with distinct => 1.
+	  Note: _apply_distinct() runs after sort/offset/limit, so limit => N,
+	  distinct => 1 deduplicates the already-limited slice, not the full set.
+	- aggregate(): added median and stddev to the measure vocabulary.
+	  Both are Perl-fold-only (no SQL pushdown); on SQL-backed databases the
+	  full matching result set is fetched and then folded in memory.
+	  median: middle value for odd count, average of two middle values for even
+	  count; undef for empty group.  stddev: sample standard deviation (N-1
+	  denominator); 0 for single-row group, undef for empty group.
+
+0.50	Tue Oct 13 09:44:14 AM EDT 2026
+	[ Bug Fixes ]
+	- new(): added redis_key parameter — a new constructor argument that bypasses SAFE_QUALIFIED validation. It's only accepted when a redis:// database URL is also present, so it can't be injected into SQL paths.
+	- _open() Redis section: standalone key fallback — after KEYS tablename:* returns nothing, it now checks TYPE redis_key and fetches data according to the actual key type: HASH → HGETALL (one row), LIST → LRANGE (index/value rows), SET → SMEMBERS (member rows), ZSET → ZRANGE WITHSCORES (member/score rows), STRING → GET (value row).
+	- selectall_arrayref(): Redis crash guard — before falling through to the DBI prepare_cached path, returns an empty arrayref when type is 'Redis'. This protects against the Can't call method "prepare_cached" on an undefined value crash when a key doesn't exist or is empty.
+
 0.49	Mon Oct 12 10:03:15 AM EDT 2026
 	[ Enhancements ]
 	- aggregate(): new method providing GROUP BY / measures across all backends.

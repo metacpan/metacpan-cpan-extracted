@@ -1,5 +1,26 @@
 Revision history for Punk
 
+0.59    2026-10-13
+        - SECURITY: a 500 outside `development` and `test` no longer
+          carries the die text; it is logged at error.
+        - SECURITY: the metrics `method` label is a known method or
+          `<other>`.
+        - SECURITY: a control character in a logged message, method or path
+          is written out; a newline forged a log record.
+        - SECURITY: a class named in `plugin`, `views`, a route target or a
+          model list must be a class name; anything else was evaluated.
+        - SECURITY: `punk new --api` and `punk api sync` refuse an
+          operationId that is not a Perl identifier.
+        - FIX: the I18n POD said `$c->locale` escapes substituted values.
+          It does not.
+        - FIX: a status outside 100 to 599 turned the response into a 200
+          JSON dump of itself, headers included. It now croaks.
+        - FIX: `logging to => '/path'` was a 500 on the first line logged.
+        - Add `$c->locale_html`, which escapes each substituted value.
+        - `redirect` croaks on a URL with CR, LF or NUL.
+        - `punk config check --dump` redacts inline credentials.
+        - Punk::Test sets PUNK_ENV to `test` when it is unset.
+
 0.58    2026-10-13
         - SECURITY: an Idempotency-Key replayed one resource's response for
           another. The path and query string are now part of what a key is

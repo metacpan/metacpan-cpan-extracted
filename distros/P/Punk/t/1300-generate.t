@@ -449,6 +449,41 @@ sub _spew {
     close $fh;
 }
 
+# ---- an operationId is a sub name, or nothing is generated --------------------
+# It is written into the controller as `sub NAME {` with nothing escaped, and
+# the specification may be somebody else's document.
+{
+    require File::Temp;
+    my $work = File::Temp::tempdir(CLEANUP => 1);
+    my $n = 0;
+    for my $id ('ok { 1 } print STDERR qq{PWNED\\n}; sub a2', 'list-widgets',
+                '9lives', 'a b', 'Foo::bar', '') {
+        my $spec = File::Spec->catfile($work, 'spec' . ++$n . '.json');
+        _spew($spec, qq({"openapi":"3.1.0","info":{"title":"x","version":"1"},)
+                  . qq("paths":{"/a":{"get":{"operationId":")
+                  . ($id =~ s/(["\\])/\\$1/gr)
+                  . qq(","responses":{"200":{"description":"ok"}}}}}}));
+        my $out = File::Spec->catdir($work, "App$n");
+        my $err = '';
+        eval { Punk::Generate->new(name => "EvilApp$n", dir => $out,
+                                   api => $spec)->run; 1 } or $err = $@;
+        like($err, qr/is not a Perl identifier|operationId/,
+            "operationId '$id' is refused");
+        my @written = glob File::Spec->catfile($out, 'lib', "EvilApp$n",
+                                               'Controller', 'API', '*.pm');
+        is(scalar @written, 0, '...and no controller is written for it');
+    }
+    my $spec = File::Spec->catfile($work, 'good.json');
+    _spew($spec, '{"openapi":"3.1.0","info":{"title":"x","version":"1"},'
+              . '"paths":{"/a":{"get":{"operationId":"_list_Widgets2",'
+              . '"responses":{"200":{"description":"ok"}}}}}}');
+    my $out = File::Spec->catdir($work, 'Good');
+    my @w = Punk::Generate->new(name => 'GoodApp', dir => $out, api => $spec)->run;
+    my ($ctrl) = grep { m{Controller/API/} } @w;
+    like(_slurp(File::Spec->catfile($out, $ctrl)), qr/^sub _list_Widgets2 \{/m,
+        'an identifier with an underscore, capitals and a digit is generated');
+}
+
 END { chdir $CWD if $CWD }
 
 done_testing();

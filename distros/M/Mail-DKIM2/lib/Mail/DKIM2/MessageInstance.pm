@@ -2,7 +2,7 @@ package Mail::DKIM2::MessageInstance;
 use strict;
 use warnings;
 
-our $VERSION = '0.18';
+our $VERSION = '0.20';
 
 
 use Crypt::Digest::SHA256;
@@ -13,6 +13,7 @@ use List::Util qw(max);
 use B ();
 use Carp;
 
+use Mail::DKIM2::TagValueList ();
 use Mail::DKIM2::Common qw(
     parse_mime
     should_skip
@@ -58,14 +59,21 @@ sub hash_algs { return { %HASH_ALGS } }
 # Hash names are lowercased -- RFC 5234 makes ABNF quoted strings
 # case-insensitive. All FWS is stripped (§2.12): it may appear anywhere
 # inside a base64 value (e.g. a folded header), not just at either end.
+# h= (spec-06 §7.3): hash-set *("," hash-set), each
+# [FWS] hash-name [FWS] ":" header-hash ":" body-hash. FWS is trimmed from
+# around the name and removed from inside the base64 hashes; anywhere else
+# (inside the name, or a set missing a part) the value is malformed and this
+# returns undef rather than skipping the set or joining the name up.
 sub parse_hash_sets {
     my ($h_tag) = @_;
     my @sets;
-    for my $item (split /,/, $h_tag) {
-        $item =~ s/[\s\r\n]//g;
-        my @parts = split /:/, $item;
-        next unless @parts == 3;
-        push @sets, [lc $parts[0], $parts[1], $parts[2]];
+    for my $item (split /,/, $h_tag, -1) {
+        my ($name, $rest) = $item =~ /\A[ \t\r\n]*([A-Za-z0-9_-]+)[ \t\r\n]*:(.*)\z/s
+            or return;
+        $rest =~ s/[ \t\r\n]//g;
+        my @hashes = split /:/, $rest, -1;
+        return unless @hashes == 2 && length $hashes[0] && length $hashes[1];
+        push @sets, [lc $name, @hashes];
     }
     return \@sets;
 }
@@ -295,10 +303,14 @@ sub parse {
     # names are lowercased, and a repeat in any case is a syntax error --
     # never a silent overwrite, which let a wrong h= ahead of the right one
     # pass (review R5).
-    my (%tags, $dup);
-    for my $part (split /\s*;\s*/, $header) {
-        next unless $part =~ /^(\w+)\s*=\s*(.*)/s;
-        my ($name, $val) = (lc $1, $2);
+    # The list must parse as a whole (TagValueList's grammar): a fragment
+    # that is not a tag is a syntax error, not something to skip
+    # (follow-up review F3).
+    my ($pairs, $ok) = Mail::DKIM2::TagValueList::split_tag_list($header);
+    my (%tags, $dup, $raw_h);
+    for my $p (@$pairs) {
+        my ($name, $val) = (lc $p->[0], $p->[1]);
+        $raw_h = $val if $name eq 'h';
         $val =~ s/\s//gs;
         $dup = 1 if exists $tags{$name};
         $tags{$name} = $val;
@@ -306,12 +318,13 @@ sub parse {
 
     die "missing m= tag in Message-Instance header"
         unless exists $tags{m};
-    die "PERMERROR Message-Instance m=$tags{m} syntax error\n" if $dup;
+    die "PERMERROR Message-Instance m=$tags{m} syntax error\n" if $dup || !$ok;
     $self->{bits}{m} = $tags{m};
 
     # spec-06 §7.3: h= is a list of hash-sets
     if (exists $tags{h}) {
-        my $sets = parse_hash_sets($tags{h});
+        my $sets = parse_hash_sets($raw_h)
+            or die "PERMERROR Message-Instance m=$tags{m} syntax error\n";
 
         # §7.3: an algorithm MUST NOT be present more than once. Check the
         # LIST returned by parse_hash_sets, not a hash keyed by algorithm --
@@ -936,10 +949,18 @@ sub calculate {
         # starts after the last one ends, spec-06 §5.1), so each field of
         # @cur is copied at most once and never out of turn: a repeat, or a
         # field the hop moved above one it left alone, goes in literally.
+        # $last_end only grows, so each value's ascending index list is
+        # consumed through a cursor that never moves back: linear overall.
+        # (A grep over the whole list per field made N repeated fields cost
+        # N^2 -- follow-up review F1.)
         my $last_end = 0;
+        my %cursor;
         my @res = map {
             my $canon = dkim2_canonicalize_header($_);
-            my ($idx) = grep { $_ > $last_end } @{ $known{$canon} || [] };
+            my $list = $known{$canon} || [];
+            my $c = \($cursor{$canon} //= 0);
+            $$c++ while $$c < @$list && $list->[$$c] <= $last_end;
+            my $idx = $list->[$$c];
             $idx ? [$idx, $last_end = $idx] : $_
         } @prev;
         # combine adjacent ranges
@@ -1381,7 +1402,8 @@ function.
 =head2 parse_hash_sets($h_value)
 
 Splits an C<h=> value into an arrayref of C<[alg, header_hash, body_hash]>,
-lowercasing the names and stripping folding whitespace.
+lowercasing the names and stripping folding whitespace from around the names
+and inside the hashes. Returns undef if any hash-set is malformed.
 
 =head1 INSTANCE METHODS
 

@@ -11,7 +11,7 @@ use Chess::Plisco qw(:all);
 use Chess::Plisco::Engine::Position;
 use Term::Chess::Error;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 my $P = 'Chess::Plisco::Engine::Position';
 my $R = 'Term::Chess::Error';
@@ -272,7 +272,7 @@ Term::Chess::Game - a game of chess over a Chess::Plisco position
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

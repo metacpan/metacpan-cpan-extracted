@@ -261,6 +261,29 @@ static void pl_logfmt_val(pTHX_ SV *out, SV *v) {
     sv_catpvs(out, "\"");
 }
 
+/* The message, the method and the path of a plain line: the control bytes
+ * of each written out as a field value's are. A message is what the
+ * application was handed - a parameter, a name, a die text - and one with a
+ * newline in it is a second line of the log, in the house format, saying
+ * whatever its author liked. The path is request bytes outright. Mortal,
+ * with the argument's encoding flag: only ASCII bytes are rewritten. */
+static SV *pl_plain(pTHX_ const char *s, STRLEN l, int utf8) {
+    SV *out = sv_2mortal(newSVpvn("", 0));
+    STRLEN i, run = 0;
+    for (i = 0; i < l; i++) {
+        unsigned char c = (unsigned char)s[i];
+        if (c >= 0x20 && c != 0x7f) { run++; continue; }
+        if (run) { sv_catpvn(out, s + i - run, run); run = 0; }
+        if      (c == '\n') sv_catpvs(out, "\\n");
+        else if (c == '\r') sv_catpvs(out, "\\r");
+        else if (c == '\t') sv_catpvs(out, "\\t");
+        else sv_catpvf(out, "\\x%02x", (unsigned)c);
+    }
+    if (run) sv_catpvn(out, s + l - run, run);
+    if (utf8) SvUTF8_on(out);
+    return out;
+}
+
 /* A record's fields as logfmt pairs, for the plain line and for the message
  * handed to a psgix.logger. Sorted, because perl's hash order is randomised
  * per process and a line that reorders itself between runs is one nobody can
@@ -419,12 +442,19 @@ static void pl_emit(pTHX_ SV *self, int lvl, SV *msg, HV *fields) {
 
     detail = sv_2mortal(newSVpvs(""));
     if (ml || pl2) {
-        sv_catpvn(detail, method, ml);
+        sv_catsv(detail, pl_plain(aTHX_ method, ml, 0));
         sv_catpvs(detail, " ");
-        sv_catpvn(detail, path, pl2);
+        sv_catsv(detail, pl_plain(aTHX_ path, pl2, 0));
         sv_catpvs(detail, " - ");
     }
-    sv_catsv(detail, msg);
+    if (msg && SvOK(msg)) {
+        STRLEN msl;
+        const char *msp = SvPV_const(msg, msl);
+        /* the newline a die text ends with is the end of the message, not
+         * part of it */
+        while (msl && (msp[msl - 1] == '\n' || msp[msl - 1] == '\r')) msl--;
+        sv_catsv(detail, pl_plain(aTHX_ msp, msl, SvUTF8(msg) ? 1 : 0));
+    }
 
     /* the fields, as logfmt, after the message. The json branch below merges
      * them into the object instead and reads `msg`, not this. */

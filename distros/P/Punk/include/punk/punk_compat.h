@@ -105,4 +105,29 @@ static void Punk_croak_sv(pTHX_ SV *sv) {
 #define PK_LOOP_ENTER  ENTER; SAVETMPS
 #define PK_LOOP_LEAVE  FREETMPS; LEAVE
 
+/* The source of `require CLASS`, for the places that load a class named in
+ * a keyword or in punk.yml - a plugin, a view engine, a controller, a model.
+ *
+ * Mortal, and only for a name that IS one: words joined by `::`. The
+ * statement is built by putting the name into Perl source, and a name with
+ * anything else in it was run as whatever it said. */
+static SV *pk_require_src(pTHX_ const char *class) {
+    STRLEN len = strlen(class), i = 0;
+    int ok = len > 0;
+    while (ok && i < len) {
+        STRLEN start = i;
+        if (!(isALPHA((U8)class[i]) || class[i] == '_')) { ok = 0; break; }
+        while (i < len && isWORDCHAR((U8)class[i])) i++;
+        if (i == start) { ok = 0; break; }
+        if (i == len) break;
+        if (!(class[i] == ':' && i + 1 < len && class[i + 1] == ':'
+              && i + 2 < len)) { ok = 0; break; }
+        i += 2;
+    }
+    if (!ok)
+        croak("Punk: '%s' is not a class name, so it will not be loaded",
+              class);
+    return sv_2mortal(newSVpvf("require %s; 1;", class));
+}
+
 #endif /* PUNK_COMPAT_H */

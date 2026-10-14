@@ -4,7 +4,7 @@ HTML::D3 - A simple Perl module for generating charts using D3.js.
 
 ## Version
 
-Version 0.18
+Version 0.19
 
 ## Synopsis
 
@@ -1072,6 +1072,262 @@ table rather than an SVG chart.
 }
 ```
 
+### Render\_Stacked\_Bar\_Snippet
+
+```perl
+my $result = $chart->render_stacked_bar_snippet(\@rows, \%opts);
+```
+
+Generates an embeddable stacked bar chart (no page shell, no CDN tag).
+
+Each element of `\@rows` is a hashref with three keys named by `opts`:
+`cat_col` (the X-axis grouping), `seg_col` (the stacking segment), and
+`val_col` (the numeric measure).  Multiple rows sharing the same
+cat+seg combination are summed.
+
+Accepted `\%opts` keys:
+
+- `cat_col` (string, default `'cat'`) - row key for the X-axis category.
+- `seg_col` (string, default `'seg'`) - row key for the stacking segment.
+- `val_col` (string, default `'val'`) - row key for the numeric value.
+- `orient` (string `'v'` or `'h'`, default `'v'`) - bar orientation.
+- `scheme` (string, default `'tableau10'`) - D3 categorical colour scheme.
+Supported: `tableau10`, `category10`, `set2`, `set3`, `paired`.
+- `x_label` (string, optional) - axis label shown below the category axis.
+- `sort` (string, optional) - sort categories: `'value'` (desc total)
+or `'label'` (alpha).
+- `id` (string, optional) - override the default `svg_id` value.
+- `responsive` (boolean, optional) - SVG responsive sizing override.
+
+Returns `{ svg_id => 'stacked_bar', html => Str }`.
+
+#### Errors
+
+- Throws `Data must be an array of hashes` when `$data` is not an ARRAY reference.
+- Throws `Each data point must be a hash reference` when a row is not a hashref.
+- Throws `Value must be numeric` when a value field is not a number.
+- Throws `orient must be 'v' or 'h'` for an invalid `orient` value.
+- Throws `sort must be 'value' or 'label'` for an invalid `sort` value.
+
+#### Api Specification
+
+##### Input
+
+```perl
+{
+    data => { type => 'arrayref' },
+    opts => {
+        type     => 'hashref',
+        optional => 1,
+        keys     => {
+            cat_col  => { type => 'string',  optional => 1, default => 'cat' },
+            seg_col  => { type => 'string',  optional => 1, default => 'seg' },
+            val_col  => { type => 'string',  optional => 1, default => 'val' },
+            orient   => { type => 'string',  optional => 1, default => 'v' },
+            scheme   => { type => 'string',  optional => 1, default => 'tableau10' },
+            x_label  => { type => 'string',  optional => 1, default => '' },
+            sort     => { type => 'string',  optional => 1 },
+            id       => { type => 'string',  optional => 1, default => 'stacked_bar' },
+            responsive => { type => 'boolean', optional => 1 },
+        },
+    },
+}
+```
+
+##### Output
+
+```perl
+HashRef -- { svg_id => Str, html => Str }
+```
+
+### Render\_Combo\_Snippet
+
+```perl
+my $result = $chart->render_combo_snippet(\@rows, \%opts);
+```
+
+Generates an embeddable combo chart: bars for one measure on the left Y
+axis, a line for another measure on the right Y axis, sharing the same
+X (category) axis.
+
+Each element of `\@rows` is a hashref with at least three keys named by
+`opts`: `x_col` (X-axis label), `bar_col` (bar measure), and
+`line_col` (line measure).
+
+Accepted `\%opts` keys:
+
+- `x_col` (string, default `'x'`) - row key for the X-axis label.
+- `bar_col` (string, default `'bar_val'`) - row key for the bar measure.
+- `line_col` (string, default `'line_val'`) - row key for the line measure.
+- `bar_label` (string, default `'Bar'`) - legend/axis label for bars.
+- `line_label` (string, default `'Line'`) - legend/axis label for line.
+- `bar_color` (string, optional CSS colour, default `'steelblue'`) - bar fill.
+- `line_color` (string, optional CSS colour, default `'#e15759'`) - line stroke.
+- `id` (string, optional) - override the default `svg_id` value.
+- `responsive` (boolean, optional) - SVG responsive sizing override.
+
+Returns `{ svg_id => 'combo_chart', html => Str }`.
+
+#### Errors
+
+- Throws `Data must be an array of hashes` when `$data` is not an ARRAY reference.
+- Throws `Each data point must be a hash reference` when a row is not a hashref.
+- Throws `Bar value must be numeric` when a bar value field is not a number.
+- Throws `Line value must be numeric` when a line value field is not a number.
+
+#### Api Specification
+
+##### Input
+
+```perl
+{
+    data => { type => 'arrayref' },
+    opts => {
+        type     => 'hashref',
+        optional => 1,
+        keys     => {
+            x_col      => { type => 'string',  optional => 1, default => 'x' },
+            bar_col    => { type => 'string',  optional => 1, default => 'bar_val' },
+            line_col   => { type => 'string',  optional => 1, default => 'line_val' },
+            bar_label  => { type => 'string',  optional => 1, default => 'Bar' },
+            line_label => { type => 'string',  optional => 1, default => 'Line' },
+            bar_color  => { type => 'string',  optional => 1, default => 'steelblue' },
+            line_color => { type => 'string',  optional => 1, default => '#e15759' },
+            id         => { type => 'string',  optional => 1, default => 'combo_chart' },
+            responsive => { type => 'boolean', optional => 1 },
+        },
+    },
+}
+```
+
+##### Output
+
+```perl
+HashRef -- { svg_id => Str, html => Str }
+```
+
+### Render\_Treemap\_Snippet
+
+```perl
+my $result = $chart->render_treemap_snippet(\@rows_or_tree, \%opts);
+```
+
+Generates an embeddable treemap (no page shell, no CDN tag).
+Leaf area is proportional to the numeric measure.
+
+Accepts two data formats:
+
+- **Flat path** (arrayref of hashrefs): each row must have a `path`
+key (e.g. `'Root/A/X'`) and a `value` key.  The module converts this
+to a D3 stratify hierarchy in JS.  Override the path separator with
+`opts->{path_sep}`.
+- **Nested tree** (hashref): a pre-built D3-compatible hierarchy
+with `name`/`children`/`value` structure.  Passed directly to
+`d3.hierarchy()`.
+
+Accepted `\%opts` keys:
+
+- `path_sep` (string, default `'/'`)  - path separator (flat format only).
+- `scheme` (string, default `'tableau10'`) - D3 categorical colour scheme.
+Supported: `tableau10`, `category10`, `set2`, `set3`, `paired`.
+- `label` (boolean, default `1`) - show node labels inside cells.
+- `id` (string, optional) - override the default `svg_id` value.
+- `responsive` (boolean, optional) - SVG responsive sizing override.
+
+Returns `{ svg_id => 'treemap', html => Str }`.
+
+#### Errors
+
+- Throws `Data must be an array of hashes or a hash tree`
+when `$data` is neither an ARRAY nor a HASH reference.
+- Throws `Each flat row must be a hash reference` when a flat row is not a hashref.
+- Throws `Each flat row must have a 'path' key` when a flat row lacks `path`.
+- Throws `Each flat row must have a numeric 'value' key` when a value is not numeric.
+
+#### Api Specification
+
+##### Input
+
+```perl
+{
+    data => { type => 'arrayref | hashref' },
+    opts => {
+        type     => 'hashref',
+        optional => 1,
+        keys     => {
+            path_sep => { type => 'string',  optional => 1, default => '/' },
+            scheme   => { type => 'string',  optional => 1, default => 'tableau10' },
+            label    => { type => 'boolean', optional => 1, default => 1 },
+            id       => { type => 'string',  optional => 1, default => 'treemap' },
+            responsive => { type => 'boolean', optional => 1 },
+        },
+    },
+}
+```
+
+##### Output
+
+```perl
+HashRef -- { svg_id => Str, html => Str }
+```
+
+### Render\_Histogram\_Snippet
+
+```perl
+my $result = $chart->render_histogram_snippet(\@values, \%opts);
+```
+
+Generates an embeddable frequency histogram (no page shell, no CDN tag).
+`\@values` is an arrayref of numeric scalars (already extracted and
+coerced by the caller).
+
+Accepted `\%opts` keys:
+
+- `bins` (integer or `undef`, default `20`) - number of bins.
+Pass `undef` for automatic bin count using Sturges' rule:
+`ceil(log2(n) + 1)`.
+- `x_label` (string, optional) - label shown below the X axis.
+- `color` (string, default `'steelblue'`) - bar fill colour.
+- `id` (string, optional) - override the default `svg_id` value.
+- `responsive` (boolean, optional) - SVG responsive sizing override.
+
+Returns `{ svg_id => 'histogram', html => Str }`.
+
+#### Errors
+
+- Throws `Data must be an array of numeric values` when `$data` is
+not an ARRAY reference.
+- Throws `Each value must be numeric` when any element is non-numeric.
+- Throws `bins must be a positive integer` when `bins` is defined
+but not a positive integer.
+
+#### Api Specification
+
+##### Input
+
+```perl
+{
+    data => { type => 'arrayref' },
+    opts => {
+        type     => 'hashref',
+        optional => 1,
+        keys     => {
+            bins    => { type => 'integer', optional => 1, default => 20 },
+            x_label => { type => 'string',  optional => 1, default => '' },
+            color   => { type => 'string',  optional => 1, default => 'steelblue' },
+            id      => { type => 'string',  optional => 1, default => 'histogram' },
+            responsive => { type => 'boolean', optional => 1 },
+        },
+    },
+}
+```
+
+##### Output
+
+```perl
+HashRef -- { svg_id => Str, html => Str }
+```
+
 ## Support
 
 This module is provided as-is without any warranty.
@@ -1322,6 +1578,92 @@ post result.table_id = opts.id // "data_table"
 post result.html ∈ Str
 post "<!DOCTYPE" ∉ result.html
 post opts.sortable ≠ 0         ⇒ "dt-sortable" ⊆ result.html
+```
+
+### Render\_Stacked\_Bar\_Snippet
+
+```
+render_stacked_bar_snippet :
+    HTML::D3 × (ArrayRef | undef) × (HashRef | undef) → HashRef ∪ ⊥
+
+pre  ref(data) ≠ 'ARRAY'        ⇒ die "Data must be an array of hashes"
+pre  ∃ row ∈ data . ref(row) ≠ 'HASH'
+                                ⇒ die "Each data point must be a hash reference"
+pre  ∃ row ∈ data . ¬numeric(row[val_col])
+                                ⇒ die "Value must be numeric"
+pre  opts.orient ∉ {'v','h'}    ⇒ die "orient must be 'v' or 'h'"
+pre  defined(opts.sort) ∧ opts.sort ∉ {'value','label'}
+                                ⇒ die "sort must be 'value' or 'label'"
+post result ∈ HashRef
+post result.svg_id = opts.id // "stacked_bar"
+post result.html ∈ Str
+post "<!DOCTYPE" ∉ result.html
+post "d3.stack()" ⊆ result.html
+post "SCHEMES" ⊆ result.html
+```
+
+### Render\_Combo\_Snippet
+
+```
+render_combo_snippet :
+    HTML::D3 × (ArrayRef | undef) × (HashRef | undef) → HashRef ∪ ⊥
+
+pre  ref(data) ≠ 'ARRAY'        ⇒ die "Data must be an array of hashes"
+pre  ∃ row ∈ data . ref(row) ≠ 'HASH'
+                                ⇒ die "Each data point must be a hash reference"
+pre  ∃ row ∈ data . ¬numeric(row[bar_col])
+                                ⇒ die "Bar value must be numeric"
+pre  ∃ row ∈ data . ¬numeric(row[line_col])
+                                ⇒ die "Line value must be numeric"
+post result ∈ HashRef
+post result.svg_id = opts.id // "combo_chart"
+post result.html ∈ Str
+post "<!DOCTYPE" ∉ result.html
+post "d3.scaleBand" ⊆ result.html ∧ "d3.scaleLinear" ⊆ result.html
+post "axisRight" ⊆ result.html
+post "</b>" ∉ result.html ∧ "<\/b>" ∈ result.html
+```
+
+### Render\_Treemap\_Snippet
+
+```
+render_treemap_snippet :
+    HTML::D3 × (ArrayRef | HashRef | undef) × (HashRef | undef) → HashRef ∪ ⊥
+
+pre  ref(data) ∉ {'ARRAY','HASH'}
+                                ⇒ die "Data must be an array of hashes or a hash tree"
+pre  ref(data) = 'ARRAY' ∧ ∃ row ∈ data . ref(row) ≠ 'HASH'
+                                ⇒ die "Each flat row must be a hash reference"
+pre  ref(data) = 'ARRAY' ∧ ∃ row ∈ data . ¬exists(row.path)
+                                ⇒ die "Each flat row must have a 'path' key"
+pre  ref(data) = 'ARRAY' ∧ ∃ row ∈ data . ¬numeric(row.value)
+                                ⇒ die "Each flat row must have a numeric 'value' key"
+post result ∈ HashRef
+post result.svg_id = opts.id // "treemap"
+post result.html ∈ Str
+post "<!DOCTYPE" ∉ result.html
+post "d3.treemap()" ⊆ result.html
+post ref(data) = 'ARRAY' ⇒ "d3.stratify()" ⊆ result.html
+post ref(data) = 'HASH'  ⇒ "d3.hierarchy(" ⊆ result.html
+```
+
+### Render\_Histogram\_Snippet
+
+```
+render_histogram_snippet :
+    HTML::D3 × (ArrayRef | undef) × (HashRef | undef) → HashRef ∪ ⊥
+
+pre  ref(data) ≠ 'ARRAY'        ⇒ die "Data must be an array of numeric values"
+pre  ∃ v ∈ data . ¬numeric(v)  ⇒ die "Each value must be numeric"
+pre  defined(opts.bins) ∧ (¬integer(opts.bins) ∨ opts.bins < 1)
+                                ⇒ die "bins must be a positive integer"
+post result ∈ HashRef
+post result.svg_id = opts.id // "histogram"
+post result.html ∈ Str
+post "<!DOCTYPE" ∉ result.html
+post "d3.bin()" ⊆ result.html
+post opts.bins = undef          ⇒ "Math.log2" ⊆ result.html
+post opts.x_label ≠ ''         ⇒ "hg-axis-label" ⊆ result.html
 ```
 
 ### Render\_Line\_Chart\_With\_Tooltips

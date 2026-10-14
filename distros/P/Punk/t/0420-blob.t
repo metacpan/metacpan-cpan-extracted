@@ -2,6 +2,9 @@
 use 5.010;
 use strict;
 use warnings;
+# the environment in which a 500 says what the handler died with, and is
+# not also written to the log
+BEGIN { $ENV{PUNK_ENV} = 'test' unless defined $ENV{PUNK_ENV} }
 use Test::More;
 use File::Temp ();
 use File::Spec ();

@@ -80,6 +80,44 @@ subtest 'deliver_performance_samples returns false when there is no DSN configur
     is($client->deliver_performance_samples([]), 0);
 };
 
+subtest 'last_status tells a rejection from a failure worth retrying' => sub {
+    my %expected = (
+        202 => 'delivered',
+        400 => 'rejected', 401 => 'rejected', 403 => 'rejected', 413 => 'rejected', 422 => 'rejected',
+        408 => 'failed', 429 => 'failed', 500 => 'failed', 503 => 'failed',
+    );
+    for my $code (sort keys %expected) {
+        my $config = new_configuration('http://secret-key@127.0.0.1:' . $server->{port} . "/status/$code");
+        my $client = ForgeOps::Tracker::Client->new($config);
+
+        is($client->deliver({ exception_class => 'RuntimeError' }), $expected{$code} eq 'delivered' ? 1 : 0, "$code answers as before");
+        is($client->last_status, $expected{$code}, "$code is $expected{$code}");
+    }
+};
+
+subtest 'last_status is failed for now when there is no reachable server or no DSN' => sub {
+    my $config = new_configuration('http://secret-key@127.0.0.1:1/api/v1/events');
+    $config->{timeout} = 1;
+    my $client = ForgeOps::Tracker::Client->new($config);
+    $client->deliver_metrics([ { metric_name => 'signup', value => 1 } ]);
+    is($client->last_status, 'failed');
+
+    my $unconfigured = ForgeOps::Tracker::Client->new(new_configuration(undef));
+    $unconfigured->deliver({ exception_class => 'RuntimeError' });
+    is($unconfigured->last_status, 'failed');
+};
+
+subtest 'says why a delivery was not accepted' => sub {
+    my @logged;
+    my $config = new_configuration('http://secret-key@127.0.0.1:' . $server->{port} . '/status/422');
+    $config->{logger} = sub { push @logged, $_[0] };
+
+    ForgeOps::Tracker::Client->new($config)->deliver({ exception_class => 'RuntimeError' });
+
+    is(scalar(@logged), 1);
+    like($logged[0], qr/\A\[forge-ops-tracker\] delivery rejected: 422 .*the server will not accept a retry\z/);
+};
+
 END { $server->stop if $server }
 
 done_testing;

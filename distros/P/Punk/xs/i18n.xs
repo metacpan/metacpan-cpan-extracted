@@ -78,6 +78,17 @@ _build(self, app, cats, opts = &PL_sv_undef)
                 if (r) SvREFCNT_dec(r);
             }
         }
+        {   /* $c->locale_html: the same, with the values escaped for markup. */
+            CV *cv = get_cv("Punk::Plugin::I18n::_locale_html", 0);
+            if (cv) {
+                SV *argv[2];
+                SV *r;
+                argv[0] = sv_2mortal(newSVpvs("locale_html"));
+                argv[1] = sv_2mortal(newRV_inc((SV *)cv));
+                r = pcx_call_meth(aTHX_ app, "helper", argv, 2, 1);
+                if (r) SvREFCNT_dec(r);
+            }
+        }
     }
 
 # $c->locale              - the negotiated tag, e.g. 'en-GB'
@@ -88,9 +99,16 @@ _build(self, app, cats, opts = &PL_sv_undef)
 # dispatches asynchronously, so a worker can have several requests in flight
 # and a "current locale" in a static would hand one request's language to
 # another - invisibly, and only under load.
+#
+# $c->locale_html($key, %subs) is the same call with every substituted value
+# HTML-escaped, for a handler that is writing markup itself. The translation
+# is left as written; a key that is in no catalogue comes back escaped too,
+# since it is the caller's string and may not be the caller's own.
 SV *
 _locale(c, ...)
         SV *c
+    ALIAS:
+        _locale_html = 1
     CODE:
     {
         HV *cfg = pi_cfg_of(aTHX_ c);
@@ -194,7 +212,11 @@ _locale(c, ...)
                  * no translation at `items`, only below it. */
                 if (r == PI_MISSING && pi_dev(aTHX_ cfg))
                     pi_warn_missing(aTHX_ c, k, kl);
-                RETVAL = newSVpvn(k, kl);
+                if (ix) {
+                    RETVAL = newSVpvn("", 0);
+                    ps_html_esc(aTHX_ RETVAL, k, kl);
+                }
+                else RETVAL = newSVpvn(k, kl);
                 /* the key echoed back, so it carries the CALLER's flag and
                  * not the block's - a non-ASCII key must come back the way
                  * it went in */
@@ -205,7 +227,8 @@ _locale(c, ...)
                  * itself, because it is joining two encodings. Forcing the
                  * flag on afterwards is what corrupted a downgraded
                  * substitution. */
-                RETVAL = pi_interpolate(aTHX_ v, vl, vu, &ST(2), items - 2);
+                RETVAL = pi_interpolate(aTHX_ v, vl, vu, &ST(2), items - 2,
+                                        ix ? 1 : 0);
             }
             else {
                 RETVAL = newSVpvn(v, vl);
@@ -497,7 +520,7 @@ _interpolate(class, str, ...)
          * question from the request path - which is part of why neither
          * encoding bug was ever caught through it. */
         RETVAL = pi_interpolate(aTHX_ v, vl, SvUTF8(str) ? 1 : 0,
-                                &ST(2), items - 2);
+                                &ST(2), items - 2, 0);
     }
     OUTPUT:
         RETVAL

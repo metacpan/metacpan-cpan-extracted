@@ -2,7 +2,7 @@ package Mail::DKIM2::TagValueList;
 use strict;
 use warnings;
 
-our $VERSION = '0.18';
+our $VERSION = '0.20';
 
 # Simple tag=value list as defined in draft-ietf-dkim-dkim2-spec-06 Sections 6 and 7.
 # Preserves insertion order for serialization.
@@ -12,26 +12,52 @@ sub new {
     return bless { tags => {}, order => [] }, $class;
 }
 
+# The tag-list grammar shared by every DKIM2 field (spec-06 §7, §8): a tag
+# name is ALPHA *(ALPHA / DIGIT / "_"), and a value is printable ASCII other
+# than ";" with FWS only between characters (x-tag-value). The known tags'
+# own grammars are all narrower than that, so a field that fails it is
+# malformed (§11.2) whatever its tags are. DKIM1 key records use the same
+# value characters (RFC 6376 §3.2 VALCHAR).
+our $TAG_NAME  = qr/[A-Za-z][A-Za-z0-9_]*/;
+our $TAG_VALUE = qr/(?:[\x21-\x3A\x3C-\x7E]+(?:[ \t\r\n]+[\x21-\x3A\x3C-\x7E]+)*)?/;
+
+# Split a tag-list into [name, value] pairs, the whitespace around names and
+# values trimmed. Empty specs (";;", a trailing ";") are skipped. Returns
+# (\@pairs, $ok): $ok is false if any non-empty spec is not name=value, or a
+# value has a character the grammar does not allow. The pairs still hold
+# every spec that did parse, for diagnostics.
+sub split_tag_list {
+    my ($string) = @_;
+    my (@pairs, $bad);
+    for my $spec (split /;/, $string, -1) {
+        next if $spec =~ /\A[ \t\r\n]*\z/;
+        my ($name, $val) = $spec =~ /\A[ \t\r\n]*($TAG_NAME)[ \t\r\n]*=[ \t\r\n]*(.*?)[ \t\r\n]*\z/s
+            or do { $bad = 1; next };
+        $bad = 1 unless $val =~ /\A$TAG_VALUE\z/;
+        push @pairs, [$name, $val];
+    }
+    return (\@pairs, !$bad);
+}
+
 # A constructor: always a fresh object, even when called on an existing one
 # (parsing into one left its old tags and duplicate flag behind).
 sub parse {
     my ($class, $string) = @_;
     my $self = (ref($class) || $class)->new();
 
-    $string =~ s/^\s+//;
-    $string =~ s/\s+$//;
-    my @order;
-    my %seen;
     # Tag names keep their original case and order, and values their
     # internal whitespace; as_string() writes "name=value" joined by "; ",
     # so the whitespace around "=" and ";" and a trailing ";" are not kept.
     # That is harmless for signing input: §9.6 deletes all WSP from these
     # fields before hashing. get_tag() does the case-insensitive lookup
-    # required by spec-06 §8.
-    for my $part (split /\s*;\s*/, $string) {
-        next unless $part =~ /^(\w+)\s*=\s*(.*)/s;
-        my ($name, $val) = ($1, $2);
-        $val =~ s/\s+$//;
+    # required by spec-06 §8. A spec that is not a tag is never silently
+    # dropped from what is verified: it makes the whole field a syntax
+    # error (follow-up review F3).
+    my ($pairs, $ok) = split_tag_list($string);
+    $self->{_syntax_error} = 1 unless $ok;
+    my (@order, %seen);
+    for my $p (@$pairs) {
+        my ($name, $val) = @$p;
         # §8: "there MUST be only one of each kind" — flag any repeat.
         $self->{_duplicate} = lc($name) if $seen{lc $name}++;
         $self->{tags}{$name} = $val;
@@ -55,6 +81,9 @@ sub get_tag {
 
 # The lowercased tag name that appeared more than once, if any (spec-06 §8).
 sub duplicate_tag { return $_[0]->{_duplicate} }
+
+# True if the parsed field did not match the tag-list grammar.
+sub syntax_error { return $_[0]->{_syntax_error} }
 
 sub set_tag {
     my ($self, $name, $value) = @_;
@@ -108,7 +137,8 @@ An empty list.
 
 Parses a list into a new object (also when called on an existing one),
 trimming whitespace around names and values. A tag given twice (in any
-case) is reported by C<duplicate_tag>; the verifier rejects such a field.
+case) is reported by C<duplicate_tag>, and a field that is not a valid tag
+list by C<syntax_error>; the verifier rejects either.
 
 =head1 METHODS
 
@@ -126,9 +156,24 @@ The lowercased name of a tag that appeared more than once in the parsed
 input, or undef. Section 8 allows one of each; the Verifier reports a
 repeat as a permerror.
 
+=head2 syntax_error()
+
+True if the parsed input did not match the tag-list grammar of sections 7
+and 8: a non-empty fragment that is not C<name=value>, a name not starting
+with a letter, or a value with a character outside printable ASCII or a
+C<;>. The well-formed tags are still available, for diagnostics.
+
 =head2 as_string()
 
 The list serialised in its original order, C<"; "> between pairs.
+
+=head1 FUNCTIONS
+
+=head2 split_tag_list($string)
+
+Splits a tag list into an arrayref of C<[name, value]> pairs, whitespace
+trimmed, and returns it with a flag that is false if any fragment was
+malformed: C<my ($pairs, $ok) = split_tag_list($s)>.
 
 =head1 AUTHOR
 

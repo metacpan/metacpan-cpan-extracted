@@ -13,6 +13,7 @@ t/20-remove-column.t
 t/30-add-database.t
 t/40-filters.t
 t/50-logic-proofs.t
+t/aggregate.t
 t/base-criteria.t
 t/cgi_security.t
 t/cities.t
@@ -25,6 +26,7 @@ t/data/djjson_c.json
 t/data/djtsv_a.tsv
 t/data/djtsv_b.tsv
 t/data/states.csv
+t/distinct-mandatory.t
 t/domain.t
 t/edge_cases.t
 t/eof.t
@@ -48,12 +50,11 @@ t/lib/Database/test1.pm
 t/lib/Database/test2.pm
 t/lib/Database/xljoin_a.pm
 t/lib/Database/xljoin_b.pm
-t/aggregate.t
-t/redis.t
-t/redis_live.t
 t/logic.t
 t/path.t
 t/pod.t
+t/redis.t
+t/redis_live.t
 t/sqlite-backend.t
 t/test1_2.t
 t/transaction.t

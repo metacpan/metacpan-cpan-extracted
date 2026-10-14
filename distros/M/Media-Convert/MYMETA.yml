@@ -29,5 +29,5 @@ requires:
   SemVer: '0'
 resources:
   repository: https://salsa.debian.org/wouter/media-convert.git
-version: v1.6.0
+version: v1.6.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -1,0 +1,39 @@
+Game-Terminal-Kit
+
+The part of a terminal game that is the same in every terminal game: reading
+one key at a time and naming it, drawing a frame without flicker, leaving
+colour out when it is not wanted, and giving the terminal back on every way
+out. The games started by the game command are built on it.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Game::Terminal::Kit
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Game-Terminal-Kit
+
+    Search CPAN
+        https://metacpan.org/release/Game-Terminal-Kit
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)

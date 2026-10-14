@@ -8,7 +8,7 @@ use Readonly;
 use Perl::Critic::Utils qw/:severities :classification/;
 use base 'Perl::Critic::Policy';
 
-our $VERSION = '0.1.1';
+our $VERSION = '0.1.2';
 
 Readonly::Scalar my $DESC  => q{Place subroutines in dependency order};
 Readonly::Scalar my $EXPL  => undef;

@@ -77,8 +77,10 @@ my $dir = tempdir(CLEANUP => 1);
 sub write_xlsx {
 	my ($dir, $name, $cols, @rows) = @_;
 	my $path = File::Spec->catfile($dir, "$name.xlsx");
-	my $wb   = Excel::Writer::XLSX->new($path);
-	my $ws   = $wb->add_worksheet($name);
+	my $wb = Excel::Writer::XLSX->new($path);
+	die "Excel::Writer::XLSX->new('$path') failed: $!\n" unless defined $wb;
+
+	my $ws = $wb->add_worksheet($name);
 
 	# Header row (row 0)
 	for my $ci (0 .. $#{ $cols }) {
@@ -92,20 +94,34 @@ sub write_xlsx {
 		}
 	}
 	$wb->close;
+
+	# On macOS, Excel::Writer::XLSX can silently fail to write a valid ZIP
+	# (e.g. when close() fails to rename a temp file across a mount boundary).
+	# A valid XLSX file is always >22 bytes (minimum ZIP EOCD size).
+	die "Excel::Writer::XLSX wrote empty/truncated file at '$path' (close may have failed)\n"
+		unless -s $path > 22;
+
 	return $path;
 }
 
-write_xlsx($dir, 'xljoin_a', [qw(entry amount notes)],
-	[$KEY_K1, $AMT_K1, $NOTE_A_K1],
-	[$KEY_K2, $AMT_K2, $NOTE_A_K2],
-	[$KEY_K3, $AMT_K3, 'note-a-k3'],
-);
+eval {
+	write_xlsx($dir, 'xljoin_a', [qw(entry amount notes)],
+		[$KEY_K1, $AMT_K1, $NOTE_A_K1],
+		[$KEY_K2, $AMT_K2, $NOTE_A_K2],
+		[$KEY_K3, $AMT_K3, 'note-a-k3'],
+	);
 
-write_xlsx($dir, 'xljoin_b', [qw(entry price notes)],
-	[$KEY_K1, $PRC_K1, $NOTE_B_K1],
-	[$KEY_K2, $PRC_K2, $NOTE_B_K2],
-	[$KEY_K4, $PRC_K4, 'note-b-k4'],
-);
+	write_xlsx($dir, 'xljoin_b', [qw(entry price notes)],
+		[$KEY_K1, $PRC_K1, $NOTE_B_K1],
+		[$KEY_K2, $PRC_K2, $NOTE_B_K2],
+		[$KEY_K4, $PRC_K4, 'note-b-k4'],
+	);
+};
+if ($@) {
+	my $msg = $@;
+	chomp $msg;
+	plan skip_all => "XLSX fixture creation failed: $msg";
+}
 
 my $da_a = Database::xljoin_a->new($dir);
 my $da_b = Database::xljoin_b->new($dir);
@@ -296,4 +312,4 @@ subtest 'add_database: XLSX-backed DA added at runtime joins correctly' => sub {
 	ok $col_h{price}, '"price" available after add_database';
 };
 
-done_testing;
+done_testing();

@@ -175,7 +175,8 @@ static SV *pc_resolve(pTHX_ SV *key, SV *arg, const char *where) {
         return out;
     }
     if (klen == 5 && memEQ(k, "$exec", 5)) {
-        /* list form runs without a shell; a bare string is one command */
+        /* list form runs without a shell; a bare string is one command,
+         * which perl hands to the shell when it holds a metacharacter */
         AV *av = (SvROK(arg) && SvTYPE(SvRV(arg)) == SVt_PVAV)
                ? (AV *)SvRV(arg) : NULL;
         SV *out;

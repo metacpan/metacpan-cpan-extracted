@@ -2,7 +2,7 @@ package Mail::DKIM2::Gate;
 use strict;
 use warnings;
 
-our $VERSION = '0.18';
+our $VERSION = '0.20';
 
 use Email::MIME;
 use Mail::DKIM2::Common qw(extract_mi_version parse_mime valid_sequence chain_number_error);

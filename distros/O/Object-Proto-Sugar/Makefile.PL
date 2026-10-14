@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
 	},
 	PREREQ_PM => {
 		'BEGIN::Lift' => '0.07',
+		'Devel::CallParser' => '0.005',
 		'Devel::Hook' => '0',
 		'Object::Proto' => '0.19',
 		'Carp' => '0',

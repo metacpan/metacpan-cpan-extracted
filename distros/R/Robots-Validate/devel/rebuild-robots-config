@@ -173,7 +173,7 @@ sub process_section($buffer) {
                 }
                 elsif ( $type eq "text/plain" ) {
 
-                    push @ips, grep { !!$_ } map { trim( $_ // "" ) } split /[\n\r]+/, $res->{content};
+                    push @ips, grep { !!$_ } map { trim( ($_ // "") =~ s/\#.*\z//r ) } split /[\n\r]+/, $res->{content};
                 }
             }
             else {

@@ -145,13 +145,29 @@ sub expect_refuse {
     my ($h, $mock) = gate_sign($raw, $dom, %cfg);
     is(scalar(fields($mock, 'DKIM2-Signature')), 0, "$name: not signed");
     is(scalar(fields($mock, 'Message-Instance')), 0, "$name: no Message-Instance added");
-    is_deeply($h->{_changed_headers} // [], [], "$name: nothing removed");
+    # Not signing: every Message-Instance no DKIM2-Signature covers (m=
+    # above every signature's m=) is removed, and the removal recorded.
+    my $p = parse_mime($raw);
+    my $covered = 0;
+    for ($p->header_raw('DKIM2-Signature')) {
+        my ($m) = /(?:\A|;)\s*m\s*=\s*(\d+)/;
+        $covered = $m if defined $m && $m > $covered;
+    }
+    my @mi = map { (/\bm=(\d+)/)[0] } $p->header_raw('Message-Instance');
+    my @gone = grep { $mi[$_ - 1] > $covered } 1 .. @mi;
+    is_deeply([ map { [$_->{field}, $_->{index}, $_->{value}] }
+                grep { lc $_->{field} eq 'message-instance' } @{$h->{_changed_headers} // []} ],
+              [ map { ['Message-Instance', $_, ''] } reverse @gone ],
+              "$name: removes exactly the instances no signature covers");
     my @info = map { $_->{value} } fields($mock, 'X-DKIM2-Info');
+    my @removed = grep { /\baction=removed-unsigned-mi=/ } @info;
+    is(scalar @removed, @gone ? 1 : 0, "$name: removal recorded iff any");
+    my @other = grep { !/\baction=removed-unsigned-mi=/ } @info;
     if ($reason eq 'upstream-chain') {
-        is(scalar @info, 0, "$name: no X-DKIM2-Info (the verifier's A-R reports it)");
+        is(scalar @other, 0, "$name: no not-signed X-DKIM2-Info (the verifier's A-R reports it)");
     } else {
-        is(scalar @info, 1, "$name: one X-DKIM2-Info");
-        like($info[0] // '', qr/\baction=not-signed=\Q$reason\E;/,
+        is(scalar @other, 1, "$name: one not-signed X-DKIM2-Info");
+        like($other[0] // '', qr/\baction=not-signed=\Q$reason\E;/,
             "$name: X-DKIM2-Info not-signed=$reason");
     }
     my ($logged) = grep { /^Not signing for \Q$dom\E: / } map { $_->[1] // '' } @{$h->{_log}};
@@ -262,10 +278,13 @@ expect_sign('mi-only-null (allow_null_body_recipe)', list_post(null => 1, unsign
 {
     my $post = list_post(null => 1);
     my $dir  = tempdir(CLEANUP => 1);
-    my ($top) = grep { /^\s*m=2;/ } parse_mime($post)->header_raw('Message-Instance');
-    Mail::DKIM2::MessageStore->new(directory => $dir)->store($top, $post);
+    # The snapshot is found through the X-DKIM2-Snapshot token DKIM2Verify
+    # would have put on the message.
+    my $tok = '0123456789abcdef0123456789abcdef';
+    Mail::DKIM2::MessageStore->new(directory => $dir)->store("X-DKIM2-Snapshot:$tok", $post);
     (my $msg = $post) =~ s/^(Subject: )/List-Help: <mailto:list-help\@test2.dkim2.com>$EOL$1/m
         or die 'fixture';
+    $msg = "X-DKIM2-Snapshot: $tok$EOL" . $msg;
     my ($h, $mock) = expect_refuse('own instance over unsigned null', $msg, 'test2.dkim2.com',
         'null-body-recipe', snapshot_directory => $dir);
     my ($logged) = grep { /^Not signing/ } map { $_->[1] // '' } @{$h->{_log}};

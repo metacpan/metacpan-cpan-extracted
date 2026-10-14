@@ -337,4 +337,71 @@ PROBE
         or diag 'orders seen: ', join(' | ', sort keys %orders);
 }
 
+# ---- a handler writing markup itself ------------------------------------------
+# $c->locale returns TEXT: the catalogue string with the values put in as
+# they are. That is right for a template that escapes, for JSON and for a
+# log, and wrong for $c->html - which is what $c->locale_html is for: the
+# same string with each VALUE escaped and the translation left as written.
+{
+    # the catalogue first: it is read when the plugin registers
+    write_file(File::Spec->catfile($cat, 'en.json'), <<'JSON');
+{
+  "welcome":  "Welcome to <a href=\"/\">the site</a>",
+  "plain":    "just words",
+  "amp":      "Fish &amp; Chips",
+  "greeting": "Hello, {name}",
+  "linked":   "<b>{who}</b> signed <a href=\"/tos\">the terms</a>",
+  "items":    { "one": "1 item", "other": "many items" },
+  "deep":     { "a": { "b": "down here" } }
+}
+JSON
+    eval qq{
+        package HApp;
+        use Punk;
+        plugin 'I18n' => { dir => '$cat', default => 'en' };
+        get '/text' => sub { \$_[0]->text(\$_[0]->locale('greeting', name => \$_[0]->param('n'))) };
+        get '/json' => sub { \$_[0]->json({ g => \$_[0]->locale('greeting', name => \$_[0]->param('n')) }) };
+        get '/html' => sub { \$_[0]->html(\$_[0]->locale_html('greeting', name => \$_[0]->param('n'))) };
+        get '/link' => sub { \$_[0]->html(\$_[0]->locale_html('welcome')) };
+        get '/both' => sub { \$_[0]->html(\$_[0]->locale_html('linked', who => \$_[0]->param('n'))) };
+        get '/miss' => sub { \$_[0]->html(\$_[0]->locale_html(\$_[0]->param('k'))) };
+        get '/tag'  => sub { \$_[0]->text(\$_[0]->locale_html) };
+        1;
+    } or die \$@;
+    my $h = HApp->to_app;
+    my $get = sub {
+        my ($path, $q) = @_;
+        my $r = $h->({ REQUEST_METHOD => 'GET', PATH_INFO => $path,
+                       QUERY_STRING => $q // '', 'psgi.input' => undef,
+                       'psgi.errors' => \*STDERR });
+        return ({ @{ $r->[1] } }->{'Content-Type'}, $r->[2][0]);
+    };
+    my $x = 'n=%3Cscript%3Ealert(1)%3C/script%3E%20%26%20%22O%27Brien%22';
+
+    my ($ct, $body) = $get->('/html', $x);
+    like($ct, qr{^text/html}, 'a handler answering text/html');
+    is($body, 'Hello, &lt;script&gt;alert(1)&lt;/script&gt; &amp; &quot;O&#39;Brien&quot;',
+        'locale_html escapes the value it substitutes');
+    unlike($body, qr/<script>/, '...so no tag from the request reaches the page');
+
+    (undef, $body) = $get->('/link');
+    is($body, 'Welcome to <a href="/">the site</a>',
+        'the translation itself is left as written');
+    (undef, $body) = $get->('/both', 'n=%3Ci%3EEve%3C/i%3E');
+    is($body, '<b>&lt;i&gt;Eve&lt;/i&gt;</b> signed <a href="/tos">the terms</a>',
+        '...and the two meet in one string: authored markup, escaped value');
+    (undef, $body) = $get->('/miss', 'k=%3Cb%3Eno.such%3C/b%3E');
+    is($body, '&lt;b&gt;no.such&lt;/b&gt;',
+        'a key that is in no catalogue comes back escaped as well');
+    (undef, $body) = $get->('/tag');
+    is($body, 'en', 'with no arguments it is the tag, like locale');
+
+    (undef, $body) = $get->('/text', $x);
+    is($body, q{Hello, <script>alert(1)</script> & "O'Brien"},
+        'plain locale returns text, with the value as it was given');
+    (undef, $body) = $get->('/json', 'n=O%27Brien%20%26%20Sons');
+    is($body, q({"g":"Hello, O'Brien & Sons"}),
+        '...which is what a JSON body wants: no entities in it');
+}
+
 done_testing;

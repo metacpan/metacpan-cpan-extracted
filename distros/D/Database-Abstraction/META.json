@@ -41,7 +41,7 @@
             "File::Spec" : "0",
             "File::Temp" : "0",
             "List::Util" : "1.33",
-            "Log::Abstraction" : "0.39",
+            "Log::Abstraction" : "0.4",
             "Object::Configure" : "0.24",
             "Params::Get" : "0.17",
             "Return::Set" : "0",
@@ -57,7 +57,7 @@
       "test" : {
          "requires" : {
             "CHI" : "0",
-            "DBD::CSV" : "0",
+            "DBD::CSV" : "0.64",
             "DBD::XMLSimple" : "0.07",
             "DBM::Deep" : "0",
             "Excel::Writer::XLSX" : "0",
@@ -85,7 +85,7 @@
             "Test::DescribeMe" : "0",
             "Test::Log::Abstraction" : "0",
             "Test::Memory::Cycle" : "0",
-            "Test::Mockingbird" : "0",
+            "Test::Mockingbird" : "0.14",
             "Test::Most" : "0",
             "Test::Needs" : "0",
             "Test::NoWarnings" : "0",
@@ -114,6 +114,6 @@
          "x_repository" : "https://github.com/nigelhorne/Database-Abstraction"
       }
    },
-   "version" : "0.49",
+   "version" : "0.51",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

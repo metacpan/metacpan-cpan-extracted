@@ -161,6 +161,7 @@ t/Plack-Middleware/conditionalget_writer.t
 t/Plack-Middleware/content_length.t
 t/Plack-Middleware/directory.t
 t/Plack-Middleware/error_document.t
+t/Plack-Middleware/error_document_restore_env.t
 t/Plack-Middleware/error_document_streaming_app.t
 t/Plack-Middleware/errors/404.html
 t/Plack-Middleware/errors/500.html
@@ -185,6 +186,7 @@ t/Plack-Middleware/prefix.t
 t/Plack-Middleware/psgibin.t
 t/Plack-Middleware/rearrange_headers.t
 t/Plack-Middleware/recursive/base.t
+t/Plack-Middleware/recursive/leak.t
 t/Plack-Middleware/recursive/streaming.t
 t/Plack-Middleware/recursive/throw.t
 t/Plack-Middleware/recursive/throw_streaming.t
@@ -205,6 +207,7 @@ t/Plack-Middleware/static_env.t
 t/Plack-Middleware/urlmap.t
 t/Plack-Middleware/urlmap_builder.t
 t/Plack-Middleware/urlmap_env.t
+t/Plack-Middleware/urlmap_port_meta.t
 t/Plack-Middleware/urlmap_ports.t
 t/Plack-Middleware/wrapcgi.t
 t/Plack-Middleware/wrapcgi_exec.t

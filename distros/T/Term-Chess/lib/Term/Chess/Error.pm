@@ -6,7 +6,7 @@ use warnings;
 
 use Object::Proto::Sugar -types;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 our @FLAGS;
 BEGIN {
@@ -79,7 +79,7 @@ Term::Chess::Error - a refused move: a code, a sentence, and the legal list
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

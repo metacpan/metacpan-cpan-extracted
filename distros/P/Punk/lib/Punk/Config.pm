@@ -5,11 +5,13 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.58';
+our $VERSION = '0.59';
 
-# Capture a command's standard output, without a shell. Called from C for
-# { $exec: [...] }; a non-zero exit is fatal, so a broken secret store stops
-# the boot rather than yielding an empty password.
+# Capture a command's standard output. Called from C for { $exec: ... }; a
+# non-zero exit is fatal, so a broken secret store stops the boot rather than
+# yielding an empty password. A list is run directly. A single string is what
+# perl's piped open makes of one: run directly when it is plain words, handed
+# to the shell when it holds a shell metacharacter.
 sub _exec {
     my (@cmd) = @_;
     open my $ph, '-|', @cmd
@@ -77,9 +79,12 @@ nothing else in a config has, and one that needs nothing from the parser:
 C<$env> reads an environment variable (missing is fatal - better than
 starting with an empty password). C<$file> reads a file and trims one
 trailing newline, which is exactly how Docker and Kubernetes deliver
-secrets to a container. C<$exec> runs a command without a shell and takes
-its standard output, for Vault, C<aws secretsmanager>, C<op read> and
-friends; a non-zero exit is fatal. C<$literal> is an inline
+secrets to a container. C<$exec> runs a command and takes its standard
+output, for Vault, C<aws secretsmanager>, C<op read> and friends; a
+non-zero exit is fatal. Give it a list, as above, and the command is run
+directly with those arguments and no shell. A single string is also
+accepted, and one that contains a shell metacharacter is run B<by the
+shell>: prefer the list. C<$literal> is an inline
 value spelled out as one, for a place where a reference would otherwise
 be expected.
 

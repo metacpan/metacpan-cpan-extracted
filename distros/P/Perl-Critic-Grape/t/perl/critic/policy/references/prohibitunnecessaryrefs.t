@@ -10,26 +10,6 @@ use Test::More tests=>10;
 
 my $failure=qr/Use Perl basic types/;
 
-
-if(0) {
-subtest 'debugging'=>sub {
-	plan tests=>12;
-	my $policy=Perl::Critic::Policy::References::ProhibitUnnecessaryRefs->new();
-	my $code;
-	#
-	$code=q|my $x; {my $x;$x=f(%$x); $$x[5]=7}; $x=g(); $$x{k}=7;|;
-	$code=q|my $x;     my @A=@$x;|,
-	$code=q|my $x;     $$x[5]=7;|,
-	$code=q|$z=f();    $$z[5]=7;|;
-	#
-	my $doc=PPI::Document->new(\$code);
-	$policy->initialize_if_enabled();
-	$policy->prepare_to_scan_document($doc);
-	my %cache=$policy->fetchCache();
-	use Data::Dumper; print Dumper({keys=>[keys %cache], %cache{qw/scopes symbol pending var varscope/} }); ...;
-}; ...  }
-
-
 subtest 'Is basic cast'=>sub {
 	plan tests=>54;
 	my $f=\&Perl::Critic::Policy::References::ProhibitUnnecessaryRefs::isBasicCast;
@@ -329,7 +309,7 @@ subtest 'Broken cases'=>sub {
 };
 
 subtest 'Option self'=>sub {
-	plan tests=>6;
+	plan tests=>8;
 	my $critic=Perl::Critic->new(-profile=>'NONE',-only=>1,-severity=>1);
 	$critic->add_policy(-policy=>'Perl::Critic::Policy::References::ProhibitUnnecessaryRefs',-params=>{self=>0});
 	foreach my $code (
@@ -343,7 +323,7 @@ subtest 'Option self'=>sub {
 		q|
 			sub thing {
 				my $self=shift;
-				if($$self{thing}) { return }
+				if($self->{thing}) { return }
 				return;
 			}
 		|,
@@ -351,7 +331,14 @@ subtest 'Option self'=>sub {
 			sub thing {
 				my $self={};
 				$$self{thing}=5;
-				return bless($self,'C');
+				$$self{hi};
+			}
+		|,
+		q|
+			sub thing {
+				my $self={};
+				$self->{thing}=5;
+				$$self{hi};
 			}
 		|,
 	) {
@@ -380,6 +367,13 @@ subtest 'Option self'=>sub {
 				my $self={};
 				$$self{thing}=5;
 				return bless($self,'C');
+			}
+		|,
+		q|
+			sub thing {
+				my $self={};
+				$self->{thing}=5;
+				$$self{hi};
 			}
 		|,
 	) {

@@ -49,10 +49,14 @@ t/pod-synopsis.t
 t/pod.t
 t/snippet.t
 t/snippet_bar.t
+t/snippet_combo.t
 t/snippet_heatmap.t
+t/snippet_histogram.t
 t/snippet_pie.t
 t/snippet_scatter.t
+t/snippet_stacked_bar.t
 t/snippet_table.t
+t/snippet_treemap.t
 t/tooltip.t
 t/unit.t
 t/zoomable.t

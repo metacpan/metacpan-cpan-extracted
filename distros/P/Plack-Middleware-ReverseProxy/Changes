@@ -1,5 +1,11 @@
 Revision history for Perl extension Plack::Middleware::ReverseProxy
 
+0.17  2026-10-13 14:57:28 PDT
+        - SECURITY: Ignore non-numeric X-Forwarded-Port instead of copying it verbatim
+          into SERVER_PORT and HTTP_HOST (related to CVE-2026-110335)
+        - Only accept ASCII digits as port numbers in Host, X-Forwarded-Host and
+          X-Forwarded-Server
+
 0.16  2019-02-19 08:42:44 PST
         - Update packaging to use Milla
 

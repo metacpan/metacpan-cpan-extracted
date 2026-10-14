@@ -12,8 +12,9 @@ t/00-load.t
 t/10-compile.t
 t/20-new.t
 t/30-basics.t
-t/all-fuzz.t
 t/aggregate.t
+t/aggregate_median_stddev.t
+t/all-fuzz.t
 t/base_criteria.t
 t/bugs.t
 t/carp.t
@@ -38,6 +39,7 @@ t/data/test_tsv.tsv
 t/db.t
 t/db_noentry.t
 t/deep.t
+t/distinct_columns.t
 t/domain.t
 t/each_row.t
 t/edge_cases.t

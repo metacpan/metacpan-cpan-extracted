@@ -6,6 +6,7 @@ lib/ForgeOps/Tracker/Changes.pm
 lib/ForgeOps/Tracker/Client.pm
 lib/ForgeOps/Tracker/Configuration.pm
 lib/ForgeOps/Tracker/DeliveryQueue.pm
+lib/ForgeOps/Tracker/DeliveryStatus.pm
 lib/ForgeOps/Tracker/EventBuilder.pm
 lib/ForgeOps/Tracker/HistogramBucketer.pm
 lib/ForgeOps/Tracker/Integrations/Dancer2.pm

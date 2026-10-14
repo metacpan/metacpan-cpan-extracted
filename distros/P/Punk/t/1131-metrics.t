@@ -2,6 +2,9 @@
 use 5.010;
 use strict;
 use warnings;
+# the environment in which a 500 says what the handler died with, and is
+# not also written to the log
+BEGIN { $ENV{PUNK_ENV} = 'test' unless defined $ENV{PUNK_ENV} }
 use Test::More;
 use Punk::Plugin::Metrics;
 
@@ -58,6 +61,33 @@ sub lines  { my $re = shift; return grep { /$re/ } split /\n/, scrape() }
 
     unlike(scrape(), qr{route="/users/\d},
         'and no id appears anywhere in the document');
+}
+
+# ---- the method label is bounded too ------------------------------------------
+# The method is whatever the client put on the request line. An unknown one
+# on any path is a counted 404, and left as it came every spelling was a new
+# series in every worker.
+{
+    Punk::Plugin::Metrics->_reset;
+    hit(path => '/nope', method => "M$_") for 1 .. 200;
+    hit(path => '/nope', method => 'x' x 500);
+    hit(path => '/nope', method => "GET\"} 1\nforged_total{a=\"");
+    my @m = lines(qr/^http_requests_total\{/);
+    my %methods = map { /method="([^"]*)"/ ? ($1 => 1) : () } @m;
+    is_deeply([ sort keys %methods ], ['<other>'],
+        '202 requests with 202 made-up methods are ONE method label');
+    like($m[0], qr/method="<other>".*\} 202$/, '...which counted them all');
+    unlike(scrape(), qr/forged_total|M17|xxxx/,
+        '...and nothing a client spelled reaches the document');
+
+    Punk::Plugin::Metrics->_reset;
+    hit(path => '/nope', method => $_)
+        for qw(GET HEAD POST PUT DELETE PATCH OPTIONS CONNECT TRACE get);
+    %methods = map { /method="([^"]*)"/ ? ($1 => 1) : () }
+               lines(qr/^http_requests_total\{/);
+    is_deeply([ sort keys %methods ],
+        [ sort qw(GET HEAD POST PUT DELETE PATCH OPTIONS CONNECT TRACE), '<other>' ],
+        'the nine real methods keep their own labels, exactly as spelled');
 }
 
 # ---- the pair: distinct routes are still distinct ---------------------------

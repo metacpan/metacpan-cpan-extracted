@@ -1,0 +1,17 @@
+Revision history for Game-Terminal-Kit
+
+0.05    2026-10-14
+	- History: add turn, so a move made before the person's first turn is not a step
+	- History: undo and redo die when load gives back nothing
+
+0.04    2026-10-14
+	- Add Game::Terminal::Kit::History: undo and redo kept in a State::Store
+
+0.03    2026-10-14
+	- Remove PAX headers
+
+0.02    2026-10-13
+	- Fix t/01-keys.t on a long double perl
+
+0.01    2026-10-13
+	- First version

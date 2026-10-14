@@ -2,7 +2,7 @@ package Mail::DKIM2::Signature;
 use strict;
 use warnings;
 
-our $VERSION = '0.18';
+our $VERSION = '0.20';
 
 use MIME::Base64 qw(encode_base64 decode_base64);
 use Carp;
@@ -120,11 +120,7 @@ sub nonce {
 # Where the grammar allows FWS inside a value -- within a base64string
 # (§2.13: a signature value folded across lines), and around the "," and ":"
 # that separate s= items and their parts (§8.9's sig-set) -- it is not part
-# of the value. TagValueList::parse only trims the ends of the whole value,
-# which leaves a fold after a "," glued to the next item's Selector, so strip
-# per item, before splitting on ':'. This is lenient reading, not
-# validation: it would also accept whitespace the grammar does not allow
-# (inside a Selector or flag name), which no conforming signer emits.
+# of the value.
 sub _strip_fws {
     my ($v) = @_;
     return $v unless defined $v;
@@ -145,22 +141,50 @@ sub flags {
     return [grep { length } map { _strip_fws($_) } split /,/, $f];
 }
 
+# One s= item (§8.9): selector [FWS] ":" [FWS] sig-name [FWS] ":"
+# message-sig. FWS is trimmed from around the selector and algorithm and
+# removed from inside the base64 value -- and nowhere else: whitespace inside
+# a selector or algorithm name makes the item malformed, never a different
+# name ("rsa- sha256" is not rsa-sha256; follow-up review F4). A Selector is
+# a Domain (§3.5) and a sig-name a textstring of letters, digits, "-" and "_".
+my $FWS = qr/[ \t\r\n]*/;
+sub _parse_sig_item {
+    my ($part) = @_;
+    my ($sel, $alg, $val) = $part =~ /\A$FWS([^:]*?)$FWS:$FWS([^:]*?)$FWS:(.*)\z/s;
+    return ([split(/:/, _strip_fws($part), 3)], 0) unless defined $val;
+    my $ok = $sel =~ /\A[A-Za-z0-9_-]+(?:\.[A-Za-z0-9_-]+)*\z/
+          && $alg =~ /\A[A-Za-z0-9_-]+\z/;
+    return ([$sel, $alg, _strip_fws($val)], $ok);
+}
+
+# The s= items and whether they all parsed: (\@items, $ok).
+sub _parse_sig_items {
+    my ($s) = @_;
+    my (@items, $bad);
+    for my $part (split /,/, $s, -1) {
+        my ($item, $ok) = _parse_sig_item($part);
+        $bad = 1 unless $ok;
+        push @items, $item;
+    }
+    return (\@items, !$bad);
+}
+
 sub signatures_data {
     my $self = shift;
     my $s = $self->get_tag('s');
     return unless defined $s && length $s;
-    # Parse sel:alg:sig,sel2:alg2:sig2,...
-    #
-    # Strip FWS from each item *before* splitting on ':'.  A fold landing right
-    # after the comma would otherwise become part of the next item's Selector,
-    # sending the public-key lookup out for "\tsel2._domainkey.example.com"
-    # (SERVFAIL).  Folds inside the base64 signature value and around the item's
-    # colons are handled by the same strip.
-    my @items;
-    for my $part (split /,/, $s) {
-        push @items, [split(/:/, _strip_fws($part), 3)];
-    }
-    return \@items;
+    my ($items) = _parse_sig_items($s);
+    return $items;
+}
+
+# Malformed anywhere: the tag list itself (TagValueList), or an s= item.
+sub syntax_error {
+    my ($self) = @_;
+    return 1 if $self->SUPER::syntax_error;
+    my $s = $self->get_tag('s');
+    return 0 unless defined $s;
+    my (undef, $ok) = _parse_sig_items($s);
+    return !$ok;
 }
 
 # --- Envelope accessors (mf= and rt= tags) ---
@@ -255,10 +279,10 @@ sub as_string {
     return "DKIM2-Signature: " . $self->SUPER::as_string();
 }
 
-# Serialize with signature data replaced by "." in each s= entry.
+# Serialize with each s= item's signature value empty (§8.5, §9.6).
 # Returns unfolded output. Used by the verifier to reconstruct the
 # signing input from a header read from the message.
-# Format: sel:alg:.,sel2:alg2:. (signature replaced with dot)
+# Format: sel:alg:,sel2:alg2:
 sub as_string_without_data {
     my ($self) = @_;
 
@@ -278,9 +302,10 @@ sub as_string_without_data {
     return "DKIM2-Signature: " . join('; ', @parts);
 }
 
-# Folded header with empty s= value, ready for signing.
-# Used by the Signer: fold first, then canonicalize and sign.
-# The fold positions become part of what is signed.
+# Folded header with empty s= values, ready for signing.
+# Used by the Signer: fold first, then canonicalize and sign. §9.6 deletes
+# all WSP from the signing input, so the fold positions are not part of what
+# is signed; they need only be places the grammar allows FWS (fold_header).
 sub as_folded_string_without_data {
     my ($self) = @_;
 
@@ -500,7 +525,14 @@ An arrayref of flags, or undef.
 =head2 signatures_data()
 
 An arrayref of C<[selector, algorithm, value]> arrayrefs, one per C<s=>
-item, with folding whitespace stripped.
+item: folding whitespace trimmed from around the selector and algorithm and
+removed from inside the base64 value, which is all section 8.9 allows.
+
+=head2 syntax_error()
+
+True if the field is not a valid tag list (see
+L<Mail::DKIM2::TagValueList/syntax_error>) or an C<s=> item is malformed:
+missing a part, or whitespace inside its selector or algorithm name.
 
 =head2 selector([$index]), algorithm([$index]), signature_value([$index])
 

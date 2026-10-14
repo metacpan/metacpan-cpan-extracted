@@ -159,4 +159,45 @@ my $vis = sub {
     is($vis->($flags->[1]), 'bbb', 'f= flag 1 has no FWS (fold after comma)');
 }
 
+# A long but valid signing domain (two 40-character labels) has no place to
+# fold: spec-06 §8.8's Domain allows no FWS, so a hard break inside d= made
+# the signer's own output fail the MAIL FROM/d= match (follow-up review F2).
+# Tokens that cannot fold stay whole on an over-long line; base64 still folds.
+{
+    my $domain = ('a' x 40) . '.' . ('b' x 40) . '.example.com';
+    my $message = "From: a\@$domain\r\nTo: b\@example.net\r\n\r\nbody\r\n";
+    my $mi = Mail::DKIM2::MessageInstance->calculate($message);
+    $message = 'Message-Instance: ' . $mi->as_string . "\r\n" . $message;
+    my $signer = Mail::DKIM2::Signer->new(
+        Domain => $domain, Selector => 'sel1',
+        Key => DKIM2TestKeys::private_key('test1.dkim2.com', 'sel1'),
+        MailFrom => "a\@$domain", RcptTo => ['b@example.net'],
+    )->load($message);
+    my $sig = $signer->as_string;
+    like($sig, qr/d=\Q$domain\E;/, 'd= is not folded inside the domain');
+    for my $line (split /\r\n/, $sig) {
+        cmp_ok(length $line, '<=', 998, 'every line within the RFC 5322 limit');
+    }
+    my $pub = Mail::DKIM2::Common::parse_dkim_pubkey(DKIM2TestKeys::dns_txt('test1.dkim2.com', 'sel1'));
+    my $v = Mail::DKIM2::Verifier->new(PubkeyCallback => sub { $pub })->load("$sig\r\n$message");
+    is($v->result, 'pass', 'the long-domain signature verifies') or diag $v->result_detail;
+
+    # A long selector must not be split either: §8.9 allows FWS only around
+    # the colons of an s= item, and the verifier rejects any other.
+    my $sel = 's' x 60;
+    my $folded = fold_header("DKIM2-Signature: i=1; d=example.com; s=$sel:rsa-sha256:" . ('A' x 344) . ';');
+    (my $unfolded = $folded) =~ s/\r\n[ \t]+//g;
+    like($unfolded, qr/s=\Q$sel\E:rsa-sha256:A/, 'selector and algorithm kept whole');
+    my $p = Mail::DKIM2::Signature->parse($folded);
+    ok(!$p->syntax_error, 'the folded field parses');
+    is($p->signature_value(0), 'A' x 344, 'the base64 value still folds');
+    ok((grep { length > 78 } split /\r\n/, $folded) <= 1, 'only the unbreakable segment is over-long');
+
+    # The Message-Instance h= value: hash name and the ':' delimiters stay
+    # whole, the digests fold.
+    my $mi_line = fold_header('Message-Instance: m=1; h=sha256:' . ('A' x 43) . '=:' . ('B' x 43) . '=,sha512:' . ('C' x 86) . '==:' . ('D' x 86) . '==;');
+    my $parsed = Mail::DKIM2::MessageInstance->parse(($mi_line =~ s/^Message-Instance:\s*//r));
+    is($parsed->{bits}{hashes}{sha512}[0], ('C' x 86) . '==', 'folded h= parses back');
+}
+
 done_testing();

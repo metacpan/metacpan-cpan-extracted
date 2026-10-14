@@ -6,6 +6,7 @@ use threads;
 use threads::shared;
 use Time::HiRes ();
 use POSIX qw(strftime);
+use ForgeOps::Tracker::DeliveryStatus;
 use ForgeOps::Tracker::HistogramBucketer;
 
 # Times requests in-process, bucketed by transaction name (see the PSGI/Dancer2 performance
@@ -40,6 +41,9 @@ sub new {
     my $period_started_at;
     share($period_started_at);
     $period_started_at = Time::HiRes::time;
+    # Shared like everything above: a flush runs on the background thread or on the caller's.
+    my $failed_flushes = 0;
+    share($failed_flushes);
 
     return bless {
         configuration      => $configuration,
@@ -50,6 +54,7 @@ sub new {
         histogram_counts   => \%histogram_counts,
         lock               => \$lock,
         period_started_at  => \$period_started_at,
+        failed_flushes     => \$failed_flushes,
         worker             => undef,
     }, $class;
 }
@@ -78,7 +83,10 @@ sub record {
 
 # Snapshots the buffered buckets, then delivers them as one batch. A failed delivery keeps every
 # bucket where it is rather than resetting, so the next flush's batch just grows instead of losing
-# what was already tallied; there's no other copy of this data anywhere.
+# what was already tallied; there's no other copy of this data anywhere. That only holds for a
+# delivery that failed for now, and only DeliveryStatus::MAX_FAILED_FLUSHES times in a row: a batch
+# the server rejected, or one that keeps failing, is removed exactly the way a delivered one is,
+# since re-sending it could never succeed.
 #
 # Only exactly what this snapshot delivered is removed afterward, subtracted from whatever is in
 # each bucket by then, never everything cleared: record() can run on another thread while delivery
@@ -126,9 +134,15 @@ sub flush {
     } @names;
 
     my $delivered = $self->{client}->deliver_performance_samples(\@samples);
-    return unless $delivered;
+    my $status = ForgeOps::Tracker::DeliveryStatus::of_client($self->{client}, $delivered);
 
     lock(${ $self->{lock} });
+    my ($release, $why) = ForgeOps::Tracker::DeliveryStatus::settle($self->{failed_flushes}, $status);
+    return unless $release;
+    if ($why) {
+        eval { $config->log('[forge-ops-tracker] dropping ' . scalar(@names) . " buffered performance samples: $why") };
+    }
+
     for my $key (keys %histogram_snapshot) {
         next unless exists $self->{histogram_counts}{$key};
         my $remaining = $self->{histogram_counts}{$key} - $histogram_snapshot{$key};

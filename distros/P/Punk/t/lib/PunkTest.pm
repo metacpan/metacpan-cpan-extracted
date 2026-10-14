@@ -7,6 +7,9 @@ use Exporter 'import';
 
 our @EXPORT = qw(hit);
 
+# the environment in which a 500 says what died, as Punk::Test sets it
+$ENV{PUNK_ENV} = 'test' unless defined $ENV{PUNK_ENV};
+
 # One hand-built PSGI env call against a compiled app.
 sub hit {
     my ($app, %o) = @_;

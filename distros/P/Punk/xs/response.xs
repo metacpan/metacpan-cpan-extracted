@@ -15,8 +15,12 @@ new(class, ...)
             STRLEN kl;
             const char *k = SvPV_const(ST(i), kl);
             SV *v = ST(i + 1);
-            if (kl == 6 && memEQ(k, "status", 6))
+            if (kl == 6 && memEQ(k, "status", 6)) {
+                sv_2mortal((SV *)res);              /* freed if this croaks */
+                (void)ps_status_arg(aTHX_ v);
+                SvREFCNT_inc_simple_void_NN((SV *)res);
                 (void)av_store(res, PS_STATUS, newSVsv(v));
+            }
             else if (kl == 7 && memEQ(k, "headers", 7)) {
                 if (!SvROK(v) || SvTYPE(SvRV(v)) != SVt_PVAV)
                     croak("Punk::Response: headers must be an arrayref");
@@ -47,6 +51,7 @@ status(self, ...)
         static const I32 slot[] = { PS_STATUS, PS_TYPE, PS_BODY };
         AV *res = punk_res_av(aTHX_ self);
         if (items > 1) {
+            if (ix == 0) (void)ps_status_arg(aTHX_ ST(1));
             (void)av_store(res, slot[ix], newSVsv(ST(1)));
             RETVAL = newSVsv(self);
         }
@@ -134,6 +139,7 @@ finalize(self)
         IV status = (s && *s && SvOK(*s)) ? SvIV(*s) : 200;
         AV *extra = punk_res_headers(aTHX_ res);
         SV *bytes, *ct;
+        if (!status) status = 200;          /* none given */
         if (!(b && *b && SvOK(*b))) {
             bytes = newSVpvs("");
             ct = type ? type
