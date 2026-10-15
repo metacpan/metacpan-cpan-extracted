@@ -10,7 +10,7 @@ use Object::Proto::Sugar;
 use Game::Fanorona::Engine ();
 use Game::Fanorona::Rules ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our @NAMES;
 our @FIELDS;
@@ -165,7 +165,7 @@ Game::Fanorona::Variant - the board a game is played on, where it starts, and it
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

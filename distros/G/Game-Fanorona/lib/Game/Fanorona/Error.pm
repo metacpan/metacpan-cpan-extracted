@@ -7,7 +7,7 @@ use warnings;
 use Carp ();
 use Object::Proto::Sugar;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our @CODES;
 our %MESSAGE;
@@ -114,7 +114,7 @@ Game::Fanorona::Error - why a game of fanorona refused something
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

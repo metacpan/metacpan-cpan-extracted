@@ -5,7 +5,7 @@ use warnings;
 
 use Game::Floppy::Terminal;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 exit Game::Floppy::Terminal->run(@ARGV);
 

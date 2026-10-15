@@ -24,6 +24,11 @@ use constant DEVICE_CODE_GRANT => 'urn:ietf:params:oauth:grant-type:device_code'
 # until the promise settles.
 use constant BOUND => 16;
 
+# Discovery and device authorization take the client's retries, 2 by default,
+# so an answer they cannot read is sent three times; an exchange spends what it
+# presents and is sent once.
+my %SENDS = (metadata => 3, deviceAuthorization => 3, exchangeDeviceCode => 1);
+
 # Satisfies every operation's required members at once.
 my %EVERY_REQUIRED_MEMBER = (
     issuer => 'https://api.example.test',
@@ -280,7 +285,30 @@ subtest 'an answer missing any one required member is the ordinary error' => sub
             my $error = settle(sub { call(client()->oauth, $operation, $args) });
 
             my $label = "$operation without $member";
-            is(scalar @requests, 1, "$label: sent once");
+            is(scalar @requests, $SENDS{$operation}, "$label: sent $SENDS{$operation} time(s)");
+            is_outcome($error, { type => 'client', kind => 'server_error', status => 200 }, $label);
+        }
+    }
+};
+
+# A proxy's page, an empty body, a JSON value that is not an object, or one cut
+# off: each is the ordinary error with its status, retried where the call is.
+subtest 'an unreadable 2xx is retried where the call takes the client\'s retries' => sub {
+    my %bodies = (
+        HTML => '<html><body>502 Bad Gateway</body></html>',
+        empty => '',
+        null => 'null',
+        'a list' => '[]',
+        'cut off' => '{"issuer": "https://',
+    );
+    for my $operation (sort keys %SENDS) {
+        for my $name (sort keys %bodies) {
+            serve({ status => 200, rawBody => $bodies{$name} });
+            my $args = { clientId => 'internetdata-cli', deviceCode => 'mo_dc_x' };
+            my $error = settle(sub { call(client()->oauth, $operation, $args) });
+
+            my $label = "$operation, $name";
+            is(scalar @requests, $SENDS{$operation}, "$label: sent $SENDS{$operation} time(s)");
             is_outcome($error, { type => 'client', kind => 'server_error', status => 200 }, $label);
         }
     }

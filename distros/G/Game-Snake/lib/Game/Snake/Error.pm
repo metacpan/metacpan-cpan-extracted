@@ -7,7 +7,7 @@ use warnings;
 use Carp ();
 use Object::Proto::Sugar -types;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 our (@CODES, %MESSAGE);
 
@@ -72,7 +72,7 @@ Game::Snake::Error - a refused turn, returned rather than thrown
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =head1 SYNOPSIS
 

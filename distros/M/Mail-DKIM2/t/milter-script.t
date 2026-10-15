@@ -745,6 +745,7 @@ sub stock_decorate {
         from => 'author@test1.dkim2.com', rcpt => ['list@test2.dkim2.com'], message => $mp);
     is_deeply([grep { $_->{op} ne 'insert' } @$mods], [], 'multipart: nothing changed, only inserts');
     is_deeply([mi_numbers(assemble($mp, $mods))], [1], 'multipart: only the arrival m=1');
+    like(milter_log(), qr/not wrapping <mp\@test1\.dkim2\.com>: multipart$/m, 'multipart: logged as such');
 }
 
 # 4. Upstream top instance that does not match (no arrival snapshot): not wrapped.

@@ -11,9 +11,12 @@ use Object::Proto::Sugar -types;
 
 use Game::Floppy;
 use Game::Floppy::Bot;
-use Game::Floppy::Ticker;
+use Game::Terminal::Kit::Keys;
+use Game::Terminal::Kit::Run;
+use Game::Terminal::Kit::Screen;
+use Game::Terminal::Kit::Ticker;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 my %GLYPH = (
 	wide => {
@@ -51,34 +54,8 @@ my %SGR = (
 	legend => '2',
 );
 
-my %SEQUENCE = (
-	'A'  => 'up',
-	'B'  => 'down',
-	'C'  => 'right',
-	'D'  => 'left',
-	'H'  => 'home',
-	'F'  => 'end',
-	'1~' => 'home',
-	'4~' => 'end',
-	'5~' => 'page_up',
-	'6~' => 'page_down',
-	'7~' => 'home',
-	'8~' => 'end',
-);
-
-my %CONTROL = (
-	"\r"   => 'enter',
-	"\n"   => 'enter',
-	"\t"   => 'tab',
-	"\x7f" => 'backspace',
-	"\x08" => 'backspace',
-	"\x03" => 'interrupt',
-	"\x04" => 'eof',
-);
-
 my %FLAP = map { $_ => 1 } ' ', 'up', 'enter', 'w', 'k';
 
-my $SEQUENCE_WAIT = 0.05;
 
 my ($MIN_ROWS, $MAX_ROWS) = (10, 25);
 
@@ -138,10 +115,8 @@ has game => (
 	isa => Object
 );
 
-has raw => (
-	is      => 'rw',
-	isa     => Int,
-	default => 0
+has [qw/keyboard screen/] => (
+	is => 'rw'
 );
 
 has keysource => (is => 'rw');
@@ -220,13 +195,6 @@ has _wants_interactive => (
 	private  => 1
 );
 
-has _hid_cursor => (
-	is      => 'rw',
-	isa     => Int,
-	default => 0,
-	private => 1
-);
-
 has _view_cols => (is => 'rw', private => 1);
 has _view_rows => (is => 'rw', private => 1);
 
@@ -262,6 +230,19 @@ sub BUILD {
 	Carp::croak('Game::Floppy::Terminal: the sleeper is a code reference')
 		unless ref $self->sleeper eq 'CODE';
 
+	$self->keyboard(Game::Terminal::Kit::Keys->new(
+		in => $self->in,
+		pending => $self->pending,
+		sleeper => $self->sleeper,
+		($self->keysource ? (keysource => $self->keysource) : ()),
+	)) unless $self->keyboard;
+	$self->screen(Game::Terminal::Kit::Screen->new(
+		out => $self->out,
+		interactive => $self->interactive,
+		colour => $self->ansi,
+		ascii => $self->ascii ? 1 : 0,
+	)) unless $self->screen;
+
 	unless ($self->game) {
 		my $seed = $self->seed;
 		$seed = Digest::SHA::sha256_hex(join ':', $self->clock->(), $$)
@@ -282,7 +263,7 @@ sub BUILD {
 	$self->_view_cols($cols);
 	$self->_view_rows($rows);
 
-	$self->ticker(Game::Floppy::Ticker->new(clock => $self->clock)) unless $self->ticker;
+	$self->ticker(Game::Terminal::Kit::Ticker->new(clock => $self->clock)) unless $self->ticker;
 
 	return;
 }
@@ -302,36 +283,40 @@ sub interactive {
 	return -t $self->out ? 1 : 0;
 }
 
+sub _synced {
+	my ($self) = @_;
+	my $screen = $self->screen;
+	$screen->out($self->out);
+	$screen->interactive($self->interactive);
+	$screen->colour($self->ansi);
+	return $screen;
+}
+
+sub raw {
+	my ($self) = @_;
+	return $self->keyboard->raw;
+}
+
 sub keys_available {
 	my ($self) = @_;
-	return 1 if $self->keysource;
-	return 0 unless defined $self->in && -t $self->in;
-	return eval { require Term::ReadKey; 1 } ? 1 : 0;
+	return $self->keyboard->keys_available;
 }
 
 sub enter_raw {
 	my ($self) = @_;
-	return $self if $self->raw;
-	if ($self->keysource) {
-		$self->raw(1);
-		return $self;
-	}
-	return undef unless $self->keys_available;
-	return undef unless eval { Term::ReadKey::ReadMode(3, $self->in); 1 };
-	$self->raw(1);
-	return $self;
+	return $self->keyboard->enter_raw ? $self : undef;
 }
 
 sub leave_raw {
 	my ($self) = @_;
-	if ($self->_hid_cursor) {
-		$self->_print("\e[?25h");
-		$self->_hid_cursor(0);
-	}
-	return $self unless $self->raw;
-	eval { Term::ReadKey::ReadMode(0, $self->in) } unless $self->keysource;
-	$self->raw(0);
+	$self->screen->restore;
+	$self->keyboard->leave_raw;
 	return $self;
+}
+
+sub read_key {
+	my ($self, $wait) = @_;
+	return $self->keyboard->read_key($wait);
 }
 
 sub cannot_play {
@@ -343,8 +328,7 @@ sub _measure {
 	my ($self) = @_;
 	return ($self->columns, $self->lines) if defined $self->columns;
 	return () if $self->keysource || !$self->interactive;
-	return () unless eval { require Term::ReadKey; 1 };
-	my ($w, $h) = eval { Term::ReadKey::GetTerminalSize($self->out) };
+	my ($w, $h) = $self->_synced->measured;
 	return $w ? ($w, $h) : ();
 }
 
@@ -360,76 +344,17 @@ sub too_narrow {
 		$w, ($h || 0), $cols, $rows, $need_w, $need_h;
 }
 
-sub _read_char {
-	my ($self, $wait) = @_;
-
-	my $pending = $self->pending;
-	return shift @$pending if @$pending;
-	return $self->keysource->($wait) if $self->keysource;
-
-	unless ($self->raw) {
-		$self->sleeper->($wait) if $wait;
-		return undef;
-	}
-
-	my $mode = !defined $wait ? 0 : $wait > 0 ? $wait : -1;
-	return Term::ReadKey::ReadKey($mode, $self->in);
-}
-
-sub read_key {
-	my ($self, $wait) = @_;
-	my $char = $self->_read_char($wait);
-	return undef unless defined $char;
-	return $CONTROL{$char} if $CONTROL{$char};
-	return $self->read_sequence if $char eq "\e";
-	return $char;
-}
-
-sub read_sequence {
-	my ($self) = @_;
-
-	my $opener = $self->_read_char($SEQUENCE_WAIT);
-	return 'escape' unless defined $opener;
-
-	unless ($opener eq '[' || $opener eq 'O') {
-		unshift @{ $self->pending }, $opener;
-		return 'escape';
-	}
-
-	my $tail = '';
-	while (CORE::length $tail < 8) {
-		my $char = $self->_read_char($SEQUENCE_WAIT);
-		last unless defined $char;
-		$tail .= $char;
-		last if $char =~ /[A-Za-z~]/;
-	}
-
-	return $SEQUENCE{$tail} || 'escape';
-}
-
 sub _glyphs { return $GLYPH{ $_[0]->ascii ? 'ascii' : 'wide' } }
 
 sub _paint {
 	my ($self, $text, $key) = @_;
-	return $text unless $self->ansi;
 	return $text unless defined $key && defined $SGR{$key};
-	return "\e[" . $SGR{$key} . 'm' . $text . "\e[0m";
+	return $self->_synced->paint($text, $SGR{$key});
 }
 
 sub _say {
 	my ($self, @lines) = @_;
-	my $out = $self->out;
-	print {$out} "$_\n" for @lines;
-	return;
-}
-
-sub _print {
-	my ($self, $text) = @_;
-	my $out = $self->out;
-	print {$out} $text;
-	my $was = select $out;
-	$| = 1;
-	select $was;
+	$self->_synced->say(@lines) if @lines;
 	return;
 }
 
@@ -520,20 +445,16 @@ sub _frame {
 	return if $self->quiet;
 	$self->frames($self->frames + 1);
 	my @lines = $self->frame_lines($note, $mode);
-	if ($self->interactive) {
-		$self->_print("\e[H" . join('', map { "$_\e[K\n" } @lines) . "\e[J");
-	}
-	else {
-		$self->_say(@lines, '');
-	}
+	my $screen = $self->_synced->flush_on;
+	$screen->show(\@lines);
+	$screen->say('') unless $self->interactive;
 	return;
 }
 
 sub _intro {
 	my ($self) = @_;
 	return unless $self->interactive && !$self->quiet;
-	$self->_print("\e[2J\e[?25l");
-	$self->_hid_cursor(1);
+	$self->_synced->flush_on->clear->hide_cursor;
 	return;
 }
 
@@ -698,6 +619,15 @@ my $sentence = sub {
 	return $why;
 };
 
+sub options {
+	return [
+		{ name => 'level', type => 'int', min => 1, max => 3, help => "the bot's level, for watch" },
+		{ name => 'watch', type => 'flag', help => 'watch the bot fly' },
+		{ name => 'rows', type => 'int', min => 10, max => 25, help => 'the view in cells; the default fits the window' },
+		{ name => 'seed', type => 'str', help => 'the same seed and the same flaps are the same game' },
+	];
+}
+
 sub run {
 	my ($class, @argv) = @_;
 
@@ -760,19 +690,7 @@ sub run {
 		return 2;
 	}
 
-	local @SIG{qw/ INT TERM HUP /};
-	for my $signal (qw/ INT TERM HUP /) {
-		$SIG{$signal} = sub {
-			$terminal->leave_raw;
-			$SIG{$signal} = 'DEFAULT';
-			kill $signal, $$;
-		};
-	}
-
-	my $result = eval { $terminal->start };
-	my $died = $@;
-	$terminal->leave_raw;
-	die $died if $died;
+	my $result = Game::Terminal::Kit::Run::guard(sub { $terminal->start }, $terminal);
 
 	return 0 if $result;
 	print STDERR 'floppy: ' . $terminal->refusal . "\n" if CORE::length $terminal->refusal;
@@ -789,7 +707,7 @@ Game::Floppy::Terminal - Floppy in a terminal
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =head1 SYNOPSIS
 
@@ -815,7 +733,7 @@ the bird is the cells its circle covers. What you see is what collides.
 
 The one wait in the loop is a timed read of the keyboard: a key ends it early
 and is acted on, and the deadline passing is the tick. A tick that is late
-fires once and the schedule restarts (L<Game::Floppy::Ticker>).
+fires once and the schedule restarts (L<Game::Terminal::Kit::Ticker>).
 
 A game lasts seconds. After a death the last frame stays on the screen with
 its sentence; space plays again and quits remain quits. The best score of
@@ -859,7 +777,7 @@ Stop after that many ticks; 0, the default, plays to the end.
 
 =head2 game, ticker
 
-The L<Game::Floppy> being played and its L<Game::Floppy::Ticker>, built in
+The L<Game::Floppy> being played and its L<Game::Terminal::Kit::Ticker>, built in
 C<new> unless given.
 
 =head2 keysource, clock, sleeper, columns, lines
@@ -869,10 +787,15 @@ that returns one character, or undefined when none came in time; C<clock>
 returns seconds; C<sleeper> is called with seconds to wait when there is
 nothing to read; C<columns> and C<lines> stand in for the window's size.
 
-=head2 raw, pending
+=head2 pending
 
-Whether the terminal is in cbreak mode, and the characters read ahead of an
-escape that turned out not to open a sequence.
+Characters to be read before any others, an array reference.
+
+=head2 keyboard, screen
+
+The L<Game::Terminal::Kit::Keys> the keys are read through and the
+L<Game::Terminal::Kit::Screen> the frames are drawn through, built in C<new>
+from the handles unless given.
 
 =head2 frames, refused, games, best, stopped, refusal
 
@@ -887,6 +810,35 @@ and the sentence saying why it could not start.
 Plays until a quit, a cap, or a death that is not followed by space, and
 returns the last game's L<Game::Floppy::Result>; undefined when it could not
 start, with C<refusal> saying why. Never calls C<exit>.
+
+=head2 options
+
+    my $fields = Game::Floppy::Terminal->options;
+
+The options a person would set before a game, in the order a launcher shows
+them. Each is a hash reference with a C<name>, a C<type> and a C<help>, and
+C<min> and C<max> or C<choices> where the type has them. A new list is
+returned each time.
+
+=over 4
+
+=item C<level>
+
+A whole number from 1 to 3: the bot's level, for watch.
+
+=item C<watch>
+
+A switch: watch the bot fly.
+
+=item C<rows>
+
+A whole number from 10 to 25: the view in cells; the default fits the window.
+
+=item C<seed>
+
+Text: the same seed and the same flaps are the same game.
+
+=back
 
 =head2 run
 
@@ -906,10 +858,11 @@ The view's columns and rows.
 The sentence for a window that cannot hold the view, or undefined; the
 sentence for a game with no way to read keys.
 
-=head2 keys_available, enter_raw, leave_raw, read_key, read_sequence
+=head2 keys_available, enter_raw, leave_raw, raw, read_key
 
-Whether keys can be read; cbreak mode in and out; one key by name within the
-wait; the rest of an escape sequence.
+Whether keys can be read; reading a key at a time, giving the terminal back
+with its cursor, and whether a key at a time is how it is being read now; one
+key by name within the wait, the names being L<Game::Terminal::Kit::Keys>'s.
 
 =head2 board_lines, frame_lines, status_line, legend
 

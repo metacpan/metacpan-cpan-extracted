@@ -1,11 +1,11 @@
-use 5.010;
+use 5.014;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
-# The floor is 5.010 and it is measured twice over: Digest::SHA became core at
-# 5.9.3 and the deal needs it, and Object::Proto (under Object::Proto::Sugar)
-# declares 5.010000 itself, so the distribution cannot honestly claim less.
+# The floor is 5.014, which is Game::Terminal::Kit's. Digest::SHA became core
+# at 5.9.3 and the deal needs it, and Object::Proto (under
+# Object::Proto::Sugar) declares 5.010000 itself.
 #
 # bin/durak is installed. bin/soak and bin/ladder are in the tarball and are
 # NOT installed: they are how the numbers in docs/measured.md were made, and
@@ -17,8 +17,9 @@ my %WriteMakefileArgs = (
     VERSION_FROM     => 'lib/Game/Durak.pm',
     ABSTRACT_FROM    => 'lib/Game/Durak.pm',
     LICENSE          => q{artistic_2},
+    macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     EXE_FILES        => [ q{bin/durak} ],
-    MIN_PERL_VERSION => '5.010',
+    MIN_PERL_VERSION => '5.014',
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
     },
@@ -27,8 +28,9 @@ my %WriteMakefileArgs = (
     },
     PREREQ_PM => {
         # Digest::SHA is core and is all the deal needs. The house object
-        # system is the one non-core prerequisite in the distribution.
+        # system and the terminal kit are the non-core prerequisites.
         q{Object::Proto::Sugar} => q{0.05},
+        q{Game::Terminal::Kit} => q{0.05},
     },
     META_MERGE => {
         q{meta-spec} => { version => 2 },

@@ -15,6 +15,20 @@
 	.
 
 
+<http://kasei.us/code/files/IRI-0.015.tar.gz>
+	dcterms:isVersionOf my:project ;
+	dcterms:replaces    <http://kasei.us/code/files/IRI-0.014.tar.gz> ;
+	
+	doap:Version [
+		doap:revision	"0.015" ;
+		doap:created	"2026-10-14" ;
+	] ;
+	asc:changes [
+		asc:addition	"Add is_absolute method." ;
+	] ;
+	.
+
+
 <http://kasei.us/code/files/IRI-0.014.tar.gz>
 	dcterms:isVersionOf my:project ;
 	dcterms:replaces    <http://kasei.us/code/files/IRI-0.013.tar.gz> ;

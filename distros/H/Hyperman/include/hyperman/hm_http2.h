@@ -42,6 +42,9 @@ typedef struct hm_h2_stream {
                               * the end of resp_body is not the end of
                               * the body, so the provider defers       */
     unsigned char prod_done; /* ... and now it is (stream_close ran)   */
+    unsigned char ready;     /* the request is complete and waiting to
+                              * be handed to the application, once
+                              * nghttp2 is off the stack (hm_h2_input) */
     struct hm_h2_stream *next;
 } hm_h2_stream;
 
@@ -52,6 +55,11 @@ typedef struct hm_h2_sess {
     int              in_recv;   /* inside nghttp2_session_mem_recv: no
                                  * send, no close, no second recv until
                                  * it returns (hm_h2_input)        */
+    int              in_send;   /* inside nghttp2_session_send: a second
+                                 * one would re-enter the library    */
+    int              dispatching; /* an application call for this
+                                 * session is on the C stack: requests
+                                 * that complete meanwhile wait for it */
 } hm_h2_sess;
 
 /* The request header block a stream may carry, in octets (name + value +
@@ -630,8 +638,24 @@ static void hm_h2_dispatch(pTHX_ hm_h2_sess *s, hm_h2_stream *st) {
             hv_stores(env, "psgix.proxy_addr", newSVpv(c->proxy_addr, 0));
     }
     env_rv = newRV_noinc((SV *)env);
-    resp = hm_call_app(aTHX_ loop, env_rv);
-    hm_count_request(loop);
+    {
+        int32_t sid = st->id;
+        resp = hm_call_app(aTHX_ loop, env_rv);
+        hm_count_request(loop);
+        /* An application that waited (a ->get, a drain) pumped this loop,
+         * and the loop read this connection: the peer may have reset the
+         * stream, which freed st. Look it up again rather than trust the
+         * pointer the call went in with. */
+        st = s->session
+           ? (hm_h2_stream *)nghttp2_session_get_stream_user_data(s->session,
+                                                                  sid)
+           : NULL;
+        if (!st) {
+            if (resp) SvREFCNT_dec(resp);
+            SvREFCNT_dec(env_rv);
+            return;
+        }
+    }
 
     if (resp && hm_is_awaitable(aTHX_ resp)) {
         SV *cb = hm_closure(aTHX_ hm_xs_h2park_cb, NULL, NULL, NULL,
@@ -791,7 +815,14 @@ static int hm_h2_cb_frame_recv(nghttp2_session *ses,
                                ses, frame->hd.stream_id);
         if (!st || !st->env) return 0;
         if (frame->hd.flags & NGHTTP2_FLAG_END_STREAM) {
-            hm_h2_dispatch(aTHX_ s, st);
+            /* NOT dispatched from here. This is a callback inside
+             * nghttp2_session_mem_recv, where nothing may be sent and the
+             * connection is not read: an application that wrote a body and
+             * waited for it to drain was waiting on output that could not
+             * leave and on window updates that could not arrive. The
+             * request is marked, and hm_h2_input hands it over as soon as
+             * the library has returned. */
+            st->ready = 1;
             return 0;
         }
         /* An Extended CONNECT stream has no end: the client sends headers
@@ -865,13 +896,24 @@ static int hm_h2_flush_send(pTHX_ hm_h2_sess *s) {
      * write error would close the connection and free the session the
      * library is still executing on. hm_h2_input flushes once mem_recv
      * has returned. */
-    if (s->in_recv) return 0;
-    if (nghttp2_session_send(s->session) != 0) {
-        hm_close(aTHX_ c->loop, c);
-        return -1;
+    if (s->in_recv || s->in_send) return 0;
+    {
+        hm_loop *loop = c->loop;
+        int fd = c->fd, rc;
+        UV id = c->id;
+        s->in_send = 1;
+        rc = nghttp2_session_send(s->session);
+        s->in_send = 0;
+        if (rc != 0) {
+            hm_close(aTHX_ loop, c);
+            return -1;
+        }
+        if (loop->conns[fd] != c) return -1;
+        /* a paused stream handle is restarted by hm_flush once what it was
+         * waiting behind has been written (hm_stream_drained) */
+        (void)id;
+        return hm_flush(aTHX_ c);
     }
-    if (c->loop->conns[c->fd] == c) return hm_flush(aTHX_ c);
-    return -1;
 }
 
 /* Create the nghttp2 server session + callbacks and attach it to the
@@ -982,7 +1024,11 @@ static int hm_h2_start_upgrade(pTHX_ hm_conn *c, const char *settings,
         return -1;
     nghttp2_session_set_stream_user_data(s->session, 1, st);
     hm_h2_submit_our_settings(s);   /* server connection preface */
+    /* dispatching: a request that completes while this handler waits is
+     * left for hm_h2_input, as it is for every other handler */
+    s->dispatching = 1;
     hm_h2_dispatch(aTHX_ s, st);    /* env already carries psgi.input */
+    if (c->h2 == (void *)s) s->dispatching = 0;
     return 0;
 }
 
@@ -1004,32 +1050,99 @@ static void hm_h2_free(pTHX_ void *h2) {
  * is reading, and will not call back in here), the session is in_recv
  * (hm_h2_flush_send does nothing), and bytes that arrive meanwhile are
  * fed by the next turn of the loop below rather than by a second frame. */
+/* Hand every complete request to the application, lowest stream first.
+ *
+ * Called with nghttp2 off the stack, which is the point: inside the call the
+ * session can send, and a handler that waits pumps the loop, which reads this
+ * connection and comes back into hm_h2_input - so output it is waiting on
+ * leaves and the window updates it is waiting on arrive.
+ *
+ * One at a time. A request that completes while a handler is on the stack is
+ * left marked and taken by this same loop when that handler returns, exactly
+ * as it used to wait for the handler ahead of it; nesting them would stack a
+ * second application call on a first that cannot finish until the second
+ * does.
+ *
+ * Returns -1 when the connection has gone. */
+static int hm_h2_run_ready(pTHX_ hm_h2_sess *s) {
+    hm_conn *c = s->conn;
+    hm_loop *loop = c->loop;
+    int fd = c->fd;
+    if (s->dispatching) return 0;
+    for (;;) {
+        hm_h2_stream *st, *pick = NULL;
+        unsigned char was;
+        for (st = s->streams; st; st = st->next)
+            if (st->ready && st->env && (!pick || st->id < pick->id))
+                pick = st;
+        if (!pick) return 0;
+        pick->ready = 0;
+        /* in_app: a close asked for while the handler runs is deferred to
+         * here, because this frame still holds c and s (see hm_close) */
+        was = c->in_app;
+        c->in_app = 1;
+        s->dispatching = 1;
+        hm_h2_dispatch(aTHX_ s, pick);
+        s->dispatching = 0;
+        c->in_app = was;
+        if (loop->conns[fd] != c) return -1;
+        if (!was && c->close_deferred) {
+            c->close_deferred = 0;
+            hm_close(aTHX_ loop, c);
+            return -1;
+        }
+        hm_read_resume(loop, c);
+    }
+}
+
+/* May this connection's frames be read while an application call for it is
+ * on the stack? Yes for HTTP/2 once the library has returned: the handler is
+ * waiting on exactly what those frames carry. Never from inside mem_recv. */
+static int hm_h2_reentrant(hm_conn *c) {
+    hm_h2_sess *s = (hm_h2_sess *)c->h2;
+    return s && s->session && !s->in_recv && !s->in_send;
+}
+
 static void hm_h2_input(pTHX_ hm_conn *c) {
     hm_h2_sess *s = (hm_h2_sess *)c->h2;
     hm_loop *loop = c->loop;
     int fd = c->fd;
     if (s->in_recv) return;
-    while (c->rlen > 0) {
-        size_t before = c->rlen;
-        ssize_t rv;
-        s->in_recv++;
-        c->in_app = 1;
-        rv = nghttp2_session_mem_recv(s->session, (const uint8_t *)c->rbuf, before);
-        c->in_app = 0;
-        s->in_recv--;
-        if (loop->conns[fd] != c) return;        /* gone underneath */
-        if (c->close_deferred) {
-            c->close_deferred = 0;
-            hm_close(aTHX_ loop, c);
-            return;
+    for (;;) {
+        int whole = 0;
+        if (c->rlen > 0) {
+            size_t before = c->rlen;
+            ssize_t rv;
+            /* was: this may be a handler's own loop reading for it, and its
+             * frame further up still wants the connection held */
+            unsigned char was = c->in_app;
+            s->in_recv++;
+            c->in_app = 1;
+            rv = nghttp2_session_mem_recv(s->session,
+                                          (const uint8_t *)c->rbuf, before);
+            c->in_app = was;
+            s->in_recv--;
+            if (loop->conns[fd] != c) return;    /* gone underneath */
+            if (!was && c->close_deferred) {
+                c->close_deferred = 0;
+                hm_close(aTHX_ loop, c);
+                return;
+            }
+            hm_read_resume(loop, c);
+            if (rv < 0) { hm_close(aTHX_ loop, c); return; }
+            /* consumed BEFORE any application runs: its loop may read more
+             * into this buffer, and feed it, while the handler waits */
+            if ((size_t)rv < c->rlen)
+                memmove(c->rbuf, c->rbuf + rv, c->rlen - rv);
+            c->rlen -= (size_t)rv;
+            whole = ((size_t)rv == before);
         }
-        hm_read_resume(loop, c);
-        if (rv < 0) { hm_close(aTHX_ loop, c); return; }
-        if ((size_t)rv < c->rlen) memmove(c->rbuf, c->rbuf + rv, c->rlen - rv);
-        c->rlen -= (size_t)rv;
-        if ((size_t)rv < before) break;          /* a partial frame remains */
+        if (hm_h2_run_ready(aTHX_ s) < 0) return;
+        if (c->close_deferred) return;           /* an outer frame closes */
+        if (!whole || c->rlen == 0) break;       /* a partial frame remains */
     }
     if (hm_h2_flush_send(aTHX_ s) < 0) return;
+    if (c->in_app) return;      /* a handler's loop: its own frame decides */
     if (!nghttp2_session_want_read(s->session)
         && !nghttp2_session_want_write(s->session))
         hm_close(aTHX_ loop, c);
@@ -1063,6 +1176,7 @@ static int hm_h2_available(void) { return 1; }
 
 #else /* !HM_HAVE_NGHTTP2 */
 
+static int  hm_h2_reentrant(hm_conn *c)    { (void)c; return 0; }
 static int  hm_h2_detect(pTHX_ hm_conn *c) { (void)c; return 0; }
 static void hm_h2_input(pTHX_ hm_conn *c)  { (void)c; }
 static void hm_h2_free(pTHX_ void *h2)     { (void)h2; }

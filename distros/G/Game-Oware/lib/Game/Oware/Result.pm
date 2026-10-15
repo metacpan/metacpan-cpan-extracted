@@ -5,7 +5,7 @@ use warnings;
 
 use Object::Proto::Sugar -types;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 our @RESULTS = qw/ score draw timeout abandoned resign /;
 
@@ -95,7 +95,7 @@ Game::Oware::Result - how a game ended
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 

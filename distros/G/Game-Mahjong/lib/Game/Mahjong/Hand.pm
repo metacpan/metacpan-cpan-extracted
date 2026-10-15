@@ -10,7 +10,7 @@ use Game::Mahjong::Tiles;
 use Game::Mahjong::Notation;
 use Game::Mahjong::Meld;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use constant FULL => 13;
 
@@ -242,7 +242,7 @@ Game::Mahjong::Hand - one seat's tiles: the counts, the melds, the flowers
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 

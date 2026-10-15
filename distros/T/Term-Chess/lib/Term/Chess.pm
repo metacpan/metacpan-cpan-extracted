@@ -12,8 +12,13 @@ use Chess::Plisco qw(:all);
 use Term::Chess::Game;
 use Term::Chess::Bot;
 use Getopt::Long ();
+use Game::Terminal::Kit::History;
+use Game::Terminal::Kit::Keys;
+use Game::Terminal::Kit::Run;
+use Game::Terminal::Kit::Screen;
+use Game::Terminal::Kit::Steer;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 my %OUTLINE = (
     CP_KING()   => "\x{2654}", CP_QUEEN()  => "\x{2655}", CP_ROOK() => "\x{2656}",
@@ -44,19 +49,6 @@ my %WHY = (
     resignation           => 'resignation',
 );
 
-our %SEQUENCE = (
-    'A' => 'up', 'B' => 'down', 'C' => 'right', 'D' => 'left',
-    'H' => 'home', 'F' => 'end',
-    '1~' => 'home', '4~' => 'end', '5~' => 'page_up', '6~' => 'page_down',
-    '7~' => 'home', '8~' => 'end',
-);
-
-our %CONTROL = (
-    "\r" => 'enter', "\n" => 'enter', "\t" => 'tab',
-    "\x7f" => 'backspace', "\x08" => 'backspace',
-    "\x03" => 'interrupt', "\x04" => 'eof',
-);
-
 my %PAINT = (
     white_piece => '38;5;231',
     black_piece => '38;5;16',
@@ -67,9 +59,10 @@ my %PAINT = (
 use constant {
     CELL => 2,
     GAP  => 1,
+    ROW_WEIGHT => 100,
 };
 
-has in => (is => 'rw', default => sub { \*STDIN });
+has _in => (is => 'rw', init_arg => 'in', private => 1, default => sub { \*STDIN });
 
 has game => (is => 'rw');
 
@@ -83,17 +76,19 @@ has _ascii => (is => 'rw', init_arg => 'ascii', private => 1, default => 0);
 
 has _colour => (is => 'rw', init_arg => 'colour', private => 1);
 
-has raw => (is => 'rw', isa => Any, default => 0);
+has _keysource => (is => 'rw', isa => Any, init_arg => 'keysource', private => 1);
 
-has keysource => (is => 'rw', isa => Any);
+has _pending => (is => 'rw', isa => ArrayRef, init_arg => 'pending', private => 1, default => sub { [] });
 
-has pending => (is => 'rw', isa => ArrayRef, default => sub { [] });
+has [qw/keyboard screen/] => (is => 'rw');
 
 has _picking => (is => 'rw', isa => Any, init_arg => 'picking');
 
 has _rewind => (is => 'rw', isa => Any, init_arg => 'rewind');
 
 has _size => (is => 'rw', isa => Any, init_arg => 'size');
+
+has history => (is => 'rw');
 
 sub BUILD {
     my ($self) = @_;
@@ -102,33 +97,68 @@ sub BUILD {
     Carp::croak("Term::Chess: size is 1, 2 or 3, not '$size'")
         unless $size =~ /\A[123]\z/;
     $self->_size($size + 0);
-    $self->_ascii($self->_ascii ? 1 : 0);
-    $self->_colour(
-        exists $ENV{NO_COLOR}      ? 0
-      : defined $self->_colour     ? ($self->_colour ? 1 : 0)
-      :                              1
-    );
-    $self->_encode_out;
+    $self->keyboard(Game::Terminal::Kit::Keys->new(
+        in      => $self->_in,
+        pending => $self->_pending,
+        ($self->_keysource ? (keysource => $self->_keysource) : ()),
+    ));
+    $self->screen(Game::Terminal::Kit::Screen->new(
+        out    => $self->_fh,
+        ascii  => $self->_ascii ? 1 : 0,
+        colour => Game::Terminal::Kit::Screen::no_colour() ? 0
+                : defined $self->_colour                   ? ($self->_colour ? 1 : 0)
+                :                                            1,
+    ));
+    $self->screen->utf8;
+    $self->history(Game::Terminal::Kit::History->new(
+        save => sub { $_[0]->to_text },
+        load => sub { Term::Chess::Game->from_text($_[0]) },
+    )) unless $self->history;
     return;
 }
 
-sub _encode_out {
-    my ($self) = @_;
-    return $self if $self->_ascii;
-    my $fh = $self->_fh;
-    return $self unless $fh;
-    return $self if grep { /encoding|utf8/i } PerlIO::get_layers($fh);
-    eval { binmode $fh, ':encoding(UTF-8)'; 1 };
-    return $self;
+sub in {
+    my $s = shift;
+    $s->keyboard->in(shift) if @_;
+    return $s->keyboard->in;
 }
 
-sub out    { my $s = shift; if (@_) { $s->_fh(shift); $s->_encode_out } $s->_fh }
-sub ascii  { my $s = shift; if (@_) { $s->_ascii(shift() ? 1 : 0); $s->_encode_out } $s->_ascii }
-sub colour { my $s = shift; $s->_colour(shift() ? 1 : 0) if @_; $s->_colour }
-sub size   { $_[0]->_size }
+sub out {
+    my $s = shift;
+    if (@_) { $s->screen->out(shift); $s->screen->utf8 }
+    return $s->screen->out;
+}
 
-sub _say { my ($self, @t) = @_; my $fh = $self->_fh; print {$fh} @t, "\n" }
-sub _out { my ($self, @t) = @_; my $fh = $self->_fh; print {$fh} @t }
+sub ascii {
+    my $s = shift;
+    if (@_) { $s->screen->ascii(shift() ? 1 : 0); $s->screen->utf8 }
+    return $s->screen->ascii ? 1 : 0;
+}
+
+sub colour {
+    my $s = shift;
+    $s->screen->colour(shift() ? 1 : 0) if @_;
+    return $s->screen->colour ? 1 : 0;
+}
+
+sub size { $_[0]->_size }
+
+sub keysource {
+    my $s = shift;
+    $s->keyboard->keysource(shift) if @_;
+    return $s->keyboard->keysource;
+}
+
+sub pending {
+    my $s = shift;
+    $s->keyboard->pending(shift) if @_;
+    return $s->keyboard->pending;
+}
+
+sub raw { $_[0]->keyboard->raw ? 1 : 0 }
+
+sub _say { my ($self, @t) = @_; $self->screen->say(@t); return }
+sub _out { my ($self, @t) = @_; my $fh = $self->screen->out; print {$fh} @t }
 
 sub light {
     my ($self, $square) = @_;
@@ -139,20 +169,19 @@ sub light {
 sub glyph {
     my ($self, $piece, $colour) = @_;
     return '' unless $piece;
-    if ($self->_ascii) {
+    if ($self->ascii) {
         my $l = $LETTER{$piece};
         return $colour == CP_WHITE ? $l : lc $l;
     }
-    return $FILLED{$piece} if $self->_colour;
+    return $FILLED{$piece} if $self->colour;
     return $colour == CP_WHITE ? $OUTLINE{$piece} : $FILLED{$piece};
 }
 
 sub _paint {
     my ($self, $text, $light, $colour) = @_;
-    return $text unless $self->_colour;
     my $paint = $PAINT{ $light ? 'light' : 'dark' };
     $paint .= ';' . $PAINT{ $colour == CP_WHITE ? 'white_piece' : 'black_piece' } if defined $colour;
-    return "\e[${paint}m$text\e[0m";
+    return $self->screen->paint($text, $paint);
 }
 
 sub _cell {
@@ -164,7 +193,7 @@ sub _cell {
     if (!$glyph_row) { $char = ' ' }
     elsif ($piece)   { $char = $self->glyph($piece, $colour) }
     elsif ($spot)    { $char = '+' }
-    else             { $char = $self->_colour ? ' ' : $light ? '.' : ':' }
+    else             { $char = $self->colour ? ' ' : $light ? '.' : ':' }
     my $text = (' ' x $size) . $char . (' ' x ($w - $size - 1));
     return $self->_paint($text, $light, $piece && $glyph_row ? $colour : undef);
 }
@@ -172,7 +201,7 @@ sub _cell {
 sub _marks {
     my ($self, $rank, $files, $o) = @_;
     my @gap = (' ') x 9;
-    my $take = $self->_ascii ? 'x' : "\x{00D7}";
+    my $take = $self->ascii ? 'x' : "\x{00D7}";
 
     for my $i (0 .. 7) {
         my $sq = $files->[$i] . $rank;
@@ -235,23 +264,18 @@ sub board_lines {
 
 sub draw {
     my ($self, %o) = @_;
-    $self->_say($_) for $self->board_lines(%o);
+    $self->screen->say($self->board_lines(%o));
     return $self;
 }
 
 sub clear {
     my ($self, @notice) = @_;
     $self->_out("\e[H\e[2J") if $self->rewind;
-    $self->_say($_) for @notice;
+    $self->screen->say(@notice) if @notice;
     return $self;
 }
 
-sub keys_available {
-    my ($self) = @_;
-    return 1 if $self->keysource;
-    return 0 unless eval { -t $self->in };
-    return eval { require Term::ReadKey; 1 } ? 1 : 0;
-}
+sub keys_available { $_[0]->keyboard->keys_available }
 
 sub picking {
     my ($self, @set) = @_;
@@ -264,64 +288,21 @@ sub rewind {
     my ($self, @set) = @_;
     $self->_rewind($set[0] ? 1 : 0) if @set;
     return $self->_rewind ? 1 : 0 if defined $self->_rewind;
-    return eval { -t $self->_fh } ? 1 : 0;
+    return eval { -t $self->out } ? 1 : 0;
 }
 
 sub enter_raw {
     my ($self) = @_;
-    return $self if $self->raw;
-    if ($self->keysource) { $self->raw(1); return $self }
-    return undef unless $self->keys_available;
-    return undef unless eval { Term::ReadKey::ReadMode(3, $self->in); 1 };
-    $self->raw(1);
-    return $self;
+    return $self->keyboard->enter_raw ? $self : undef;
 }
 
 sub leave_raw {
     my ($self) = @_;
-    return $self unless $self->raw;
-    eval { Term::ReadKey::ReadMode(0, $self->in) } unless $self->keysource;
-    $self->raw(0);
+    $self->keyboard->leave_raw;
     return $self;
 }
 
-sub read_char {
-    my ($self, $wait) = @_;
-    my $pending = $self->pending;
-    return shift @$pending if @$pending;
-    return $self->keysource->($wait) if $self->keysource;
-    my $char = Term::ReadKey::ReadKey($wait ? 0 : -1, $self->in);
-    return $char if defined $char || $wait;
-    select undef, undef, undef, 0.05;
-    return Term::ReadKey::ReadKey(-1, $self->in);
-}
-
-sub read_key {
-    my ($self) = @_;
-    my $char = $self->read_char(1);
-    return undef unless defined $char;
-    return $CONTROL{$char} if $CONTROL{$char};
-    return $self->read_sequence if $char eq "\e";
-    return $char;
-}
-
-sub read_sequence {
-    my ($self) = @_;
-    my $opener = $self->read_char(0);
-    return 'escape' unless defined $opener;
-    unless ($opener eq '[' || $opener eq 'O') {
-        unshift @{ $self->pending }, $opener;
-        return 'escape';
-    }
-    my $tail = '';
-    while (length $tail < 8) {
-        my $char = $self->read_char(0);
-        last unless defined $char;
-        $tail .= $char;
-        last if $char =~ /[A-Za-z~]/;
-    }
-    return $SEQUENCE{$tail} || 'escape';
-}
+sub read_key { $_[0]->keyboard->read_key }
 
 sub piece_name {
     my ($self, $piece, $colour) = @_;
@@ -376,23 +357,17 @@ sub step {
     my ($self, $squares, $at, $key, $flip) = @_;
     return 0 if $key eq 'home';
     return $#$squares if $key eq 'end';
-    return ($at + 1) % @$squares if $key eq 'right' || $key eq 'tab';
-    return ($at - 1) % @$squares if $key eq 'left';
+    return Game::Terminal::Kit::Steer::ring(scalar @$squares, $at, 1)
+        if $key eq 'right' || $key eq 'tab';
+    return Game::Terminal::Kit::Steer::ring(scalar @$squares, $at, -1)
+        if $key eq 'left';
 
-    my $here = $squares->[$at];
-    my $row  = sub { my $r = substr($_[0], 1, 1); $flip ? $r : 9 - $r };
-    my $col  = sub { ord(substr $_[0], 0, 1) };
-    my $want = $key eq 'up' ? -1 : 1;
-    my ($pick, $near, $off);
-    for my $i (0 .. $#$squares) {
-        my $away = ($row->($squares->[$i]) - $row->($here)) * $want;
-        next unless $away > 0;
-        my $sideways = abs($col->($squares->[$i]) - $col->($here));
-        next if defined $pick
-            && ($away > $near || ($away == $near && $sideways >= $off));
-        ($pick, $near, $off) = ($i, $away, $sideways);
-    }
-    return defined $pick ? $pick : $at;
+    my @points = map {
+        my $rank = substr $_, 1, 1;
+        [ ord(substr $_, 0, 1), ROW_WEIGHT * ($flip ? $rank : 9 - $rank) ]
+    } @$squares;
+    my $next = Game::Terminal::Kit::Steer::nearest(\@points, $at, 0, $key eq 'up' ? -1 : 1);
+    return defined $next ? $next : $at;
 }
 
 sub victims {
@@ -476,8 +451,10 @@ sub pick_move {
                      : defined $held ? 'arrows to choose, enter or space to play, escape to pick another'
                      :                 'arrows to choose a piece, enter or space to take it, ? for the keys');
 
-        $self->_out(sprintf "\e[%dA\r", $drawn) if $drawn && $self->rewind;
-        $self->_say($_) for @lines;
+        my $screen = $self->screen;
+        $screen->interactive($self->rewind);
+        $screen->rewind($drawn);
+        $screen->say(@lines);
         $drawn = scalar @lines;
 
         my $key = $self->read_key;
@@ -493,6 +470,9 @@ sub pick_move {
             next unless defined $letter;
             return $held . $to->[$toat] . $letter;
         }
+
+        my $word = $self->history->game_keys->{$key};
+        return $word if defined $word;
 
         if ($key eq 'enter' || $key eq ' ') {
             if (!defined $held) { ($held, $toat) = ($from->[$at], 0); next }
@@ -529,6 +509,8 @@ sub _keys {
         'q r b n what a pawn becomes, when it is asked',
         'h       the strongest move this engine can find',
         'l f g   every move you have, the FEN, the moves so far',
+        'u       take back your last move and the bot\'s reply',
+        'r       play again what u took back',
         'q       give up and leave';
     return $self;
 }
@@ -537,16 +519,14 @@ sub _keys {
 sub start {
     my ($self) = @_;
 
-    my $g = $self->game;
-    if (!$g) {
-        $g = eval { Term::Chess::Game->new(
+    if (!$self->game) {
+        my $made = eval { Term::Chess::Game->new(
             seed => substr('chess-terminal-default' . ('.' x 32), 0, 32)) };
-        $self->game($g);
+        $self->game($made);
     }
-    return 2 unless $g;
+    return 2 unless $self->game;
+    $self->history->start($self->game);
     my $seat = $self->seat;
-    my $bot  = $g->bot;
-    my $flip = $seat eq $g->black ? 1 : 0;
 
     my $pick = $self->picking && $self->enter_raw ? 1 : 0;
     $self->picking(0) unless $pick;
@@ -554,18 +534,19 @@ sub start {
     $self->_say($pick
         ? 'chess. arrows to choose a move, enter or space to play it, ? for the keys.'
         : 'chess. a move is coordinates like e2e4, or SAN like Nf3. "help" for the rest.');
-    $self->draw(flip => $flip) unless $pick;
+    $self->draw(flip => $self->_flip) unless $pick;
 
-    my $fh = $self->in;
-    while ($g->status eq 'active') {
+    while ($self->game->status eq 'active') {
+        my $g    = $self->game;
+        my $flip = $self->_flip;
         if ($g->turn ne $seat) {
             my $mv = do { local $Term::Chess::Bot::LEVEL = $self->level;
-                          $bot->choose($g, $g->turn) };
+                          $g->bot->choose($g, $g->turn) };
             last unless defined $mv;
             $notice = $self->describe($g, $mv, 'the bot plays');
             my $refusal = $g->play($mv);
             if ($refusal) {
-                $self->_say($notice, "\n", 'the bot offered a move the game refused: ' . $refusal->code);
+                $self->_say($notice, 'the bot offered a move the game refused: ' . $refusal->code);
                 last;
             }
             $self->clear($notice);
@@ -573,19 +554,21 @@ sub start {
             next;
         }
 
+        $self->person_turn;
+
         if ($pick) {
             my $chosen = $self->pick_move($g, $seat);
             last if !defined $chosen || $chosen eq 'quit';
+            if ($chosen eq 'undo') { $notice = undef if $self->take_back;  next }
+            if ($chosen eq 'redo') { $notice = undef if $self->play_again; next }
             my $refusal = $g->play($chosen);
             $self->_say('no: ' . $refusal->message . ' (' . $refusal->code . ')')
                 if $refusal;
             next;
         }
 
-        $self->_out($self->_prompt($g));
-        my $line = <$fh>;
+        my $line = $self->keyboard->read_line($self->_prompt($g), $self->out);
         last unless defined $line;
-        $line =~ s/\A\s+|\s+\z//g;
         next unless length $line;
 
         last                             if $line eq 'quit' || $line eq 'q';
@@ -595,6 +578,8 @@ sub start {
         $self->_history($g),       next  if $line eq 'log';
         $self->draw(flip => $flip), next if $line eq 'board';
         $self->_hint($g, $seat),   next  if $line eq 'hint';
+        $self->take_back,          next  if $line eq 'undo';
+        $self->play_again,         next  if $line eq 'redo';
         if ($line eq 'resign') { $g->resign($seat); last }
 
         my $refusal = $g->play($line);
@@ -606,12 +591,54 @@ sub start {
         $self->draw(flip => $flip);
     }
 
+    $self->person_turn if $self->game->status ne 'active';
     $self->leave_raw;
     if ($pick) {
         $self->clear(defined $notice ? $notice : ());
-        $self->draw(flip => $flip);
+        $self->draw(flip => $self->_flip);
     }
-    return $self->_verdict($g, $seat);
+    return $self->_verdict($self->game, $seat);
+}
+
+sub _flip {
+    my ($self) = @_;
+    return $self->seat eq $self->game->black ? 1 : 0;
+}
+
+sub person_turn {
+    my ($self) = @_;
+    $self->history->turn($self->game);
+    return $self;
+}
+
+sub take_back {
+    my ($self) = @_;
+    my $game = $self->history->undo;
+    unless ($game) {
+        $self->_say('nothing to take back');
+        return 0;
+    }
+    $self->swap($game, 'taken back');
+    return 1;
+}
+
+sub play_again {
+    my ($self) = @_;
+    my $game = $self->history->redo;
+    unless ($game) {
+        $self->_say('nothing to play again');
+        return 0;
+    }
+    $self->swap($game, 'played again');
+    return 1;
+}
+
+sub swap {
+    my ($self, $game, @notice) = @_;
+    $self->game($game);
+    $self->clear(@notice);
+    $self->draw(flip => $self->_flip) unless $self->picking;
+    return $self;
 }
 
 sub _prompt {
@@ -629,6 +656,8 @@ sub _help {
         'fen     the position as a FEN',
         'log     the moves so far',
         'hint    the strongest move this engine can find',
+        'undo    take back your last move and the bot\'s reply',
+        'redo    play again what undo took back',
         'resign  give up the game',
         'quit    leave without finishing';
     return $self;
@@ -698,6 +727,16 @@ or in standard notation, like Nf3 or O-O, and "help" lists the rest.
 The engine is Chess::Plisco, bounded in NODES and never in seconds, so the
 same position answers the same on a busy machine as on an idle one.
 USAGE
+}
+
+sub options {
+    return [
+        { name => 'level', type => 'int', min => 0, max => 3, help => 'a rung of the ladder, 0 the weakest' },
+        { name => 'white', type => 'enum', choices => [qw(p1 p2)], help => 'whoever is White moves first' },
+        { name => 'seat', type => 'enum', choices => [qw(p1 p2)], help => 'which seat you play' },
+        { name => 'size', type => 'int', min => 1, max => 3, help => 'squares of 2, 4 or 6 columns' },
+        { name => 'seed', type => 'str', help => 'up to thirty-two bytes, for a reproducible game' },
+    ];
 }
 
 sub run {
@@ -774,18 +813,11 @@ sub run {
 
     $terminal->game($game);
 
-    local @SIG{qw(INT TERM HUP)};
-    for my $sig (qw(INT TERM HUP)) {
-        $SIG{$sig} = sub { $terminal->leave_raw; $SIG{$sig} = 'DEFAULT'; kill $sig, $$ };
-    }
-
-    my $status = eval { $terminal->start };
-    my $died = $@;
-    $terminal->leave_raw;
-    die $died if $died;
-    return $status;
+    return Game::Terminal::Kit::Run::guard(
+        sub { $terminal->start },
+        $terminal->keyboard, $terminal->screen,
+    );
 }
-
 
 1;
 
@@ -799,7 +831,7 @@ Term::Chess - chess on the terminal against a bot
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 
@@ -864,9 +896,10 @@ White and C<kqrbnp> for Black.
 
 =head2 Colour, and NO_COLOR beating everything
 
-If C<NO_COLOR> is present in the environment, output is uncoloured whatever
-else was asked for, including an explicit C<colour =E<gt> 1>. Its B<presence>
-is what counts and not its value, so C<NO_COLOR=0> still means no colour.
+If C<NO_COLOR> is set in the environment to anything but the empty string,
+output is uncoloured whatever else was asked for, including an explicit
+C<colour =E<gt> 1>. Its value is not read, so C<NO_COLOR=0> still means no
+colour; an empty C<NO_COLOR> leaves colour as it was asked for.
 
 =head2 The output handle gets a UTF-8 layer
 
@@ -884,6 +917,10 @@ then the cursor walks that piece's squares and enter or space plays. When the
 square is on the last rank and the piece is a pawn, the caption asks which
 piece it becomes: C<q>, C<r>, C<b> or C<n>, enter or space for the queen,
 escape back to the squares. Escape in the second phase puts the piece back.
+
+B<C<u> takes back your last move and the bot's reply to it, and C<r> plays
+again what C<u> took back>, until another move is made. With nothing to take back or play again a line says so and
+nothing changes. The C<r> in the question about a pawn is still the rook.
 
 B<While the picker is running it is the only thing that draws a board.> Its
 first frame is the position, so C<start> draws one itself only when there is
@@ -912,8 +949,9 @@ attacks of the side not on move).
 Without a terminal, without L<Term::ReadKey>, or with C<picking> set false, a
 move is typed at a prompt: coordinates like C<e2e4>, or standard algebraic
 notation like C<Nf3>, C<exd5>, C<O-O> or C<a8=Q>. The commands are C<board>,
-C<legal>, C<fen>, C<log>, C<hint>, C<resign>, C<help> and C<quit>. A refused
-move is answered with the reason and its code.
+C<legal>, C<fen>, C<log>, C<hint>, C<undo>, C<redo>, C<resign>, C<help> and
+C<quit>. C<undo> and C<redo> are the picker's C<u> and C<r>. A refused move
+is answered with the reason and its code.
 
 On a terminal the screen is cleared before each new position is drawn, and
 the bot's announcement is printed above the board. The announcement is the
@@ -931,7 +969,17 @@ same deterministic bot the same question for ever.
 
 C<in> and C<out> default to C<STDIN> and C<STDOUT>. C<colour> left undefined
 means colour unless C<NO_COLOR> is set; C<level> is a node budget for the
-opponent, and C<undef> lets the game's seed draw a rung.
+opponent, and C<undef> lets the game's seed draw a rung. C<keysource>,
+C<pending>, C<picking> and C<rewind> are taken too.
+
+=head2 keyboard
+
+=head2 screen
+
+The L<Game::Terminal::Kit::Keys> the keys are read from and the
+L<Game::Terminal::Kit::Screen> everything is written to. Both are built by
+C<new> from C<in>, C<out>, C<keysource>, C<pending>, C<ascii> and C<colour>,
+and those accessors read and set them.
 
 =head2 in
 
@@ -945,6 +993,39 @@ C<ascii> is on, and does so at most once per handle.
 Read-write. The L<Term::Chess::Game> being played; C<start> makes one if there
 is none.
 
+=head2 history
+
+The L<Game::Terminal::Kit::History> the turns are kept in, as the game's
+C<to_text>. C<start> begins it with the game it plays; a turn is kept each
+time the move passes to you, and once more when the game ends, so that
+after C<start> returns, an undo takes back the move that ended it. A bot's
+opening move is never one to take back.
+
+=head2 person_turn
+
+    $t->person_turn;
+
+Keeps the game as it is now in L</history> as a turn. Returns the terminal.
+
+=head2 take_back
+
+=head2 play_again
+
+    $t->take_back;
+    $t->play_again;
+
+C<u> and C<undo>, C<r> and C<redo>: the game as it was a turn back, or a turn
+forward again, through L</swap>. Each returns 1, or says there is nothing to
+take back or play again and returns 0 with the game unchanged.
+
+=head2 swap
+
+    $t->swap($game, 'taken back');
+
+Plays on with another game: it becomes L</game>, the screen is cleared as
+L</clear> does with the lines given, and the board is drawn again unless the
+picker is running, which draws its own. Returns the terminal.
+
 =head2 size
 
 1, 2 or 3: how many rows tall a square is drawn, and half how many columns
@@ -954,8 +1035,8 @@ wide. Read-only; anything else croaks in C<new>.
 
 =head2 colour
 
-Read-write. C<colour> can be turned on and off, but C<NO_COLOR> in the
-environment has already won by the time C<new> returns.
+Read-write. C<colour> can be turned on and off, but a C<NO_COLOR> that is
+set and not empty has already won by the time C<new> returns.
 
 =head2 level
 
@@ -1028,7 +1109,7 @@ won, drew or quit, C<1> if you lost, C<2> if a game could not be built.
     my $uci = $t->pick_move($game, 'p1');
 
 Runs the picker until a move is chosen and returns it as coordinates, or the
-string C<'quit'>. Draws to C<out> and reads from C<keysource> or the
+string C<'quit'>, C<'undo'> for C<u> or C<'redo'> for C<r>. Draws to C<out> and reads from C<keysource> or the
 terminal; it does B<not> play the move, so a caller still gets the game's
 refusal if it somehow offers one.
 
@@ -1070,6 +1151,39 @@ The caption under the board: what the move from one square to another does,
 and what the piece on a square is and how many moves it has. Both read
 Plisco rather than working anything out here.
 
+=head2 options
+
+    my $fields = Term::Chess->options;
+
+The options a person would set before a game, in the order a launcher shows
+them. Each is a hash reference with a C<name>, a C<type> and a C<help>, and
+C<min> and C<max> or C<choices> where the type has them. A new list is
+returned each time.
+
+=over 4
+
+=item C<level>
+
+A whole number from 0 to 3: a rung of the ladder, 0 the weakest.
+
+=item C<white>
+
+One of C<p1>, C<p2>: whoever is White moves first.
+
+=item C<seat>
+
+One of C<p1>, C<p2>: which seat you play.
+
+=item C<size>
+
+A whole number from 1 to 3: squares of 2, 4 or 6 columns.
+
+=item C<seed>
+
+Text: up to thirty-two bytes, for a reproducible game.
+
+=back
+
 =head2 run
 
     exit Term::Chess->run(@ARGV);
@@ -1080,8 +1194,8 @@ B<returns the exit status rather than calling C<exit>>: C<0> if you won, drew
 or quit, C<1> if you lost, C<2> for a bad option or a refused value, with the
 usage on C<STDERR>. C<--help> prints the usage on C<STDOUT> and returns C<0>.
 Options are read from the list passed in and never from C<@ARGV>. Signal
-handlers are local to the call and the terminal is left in cooked mode on
-every way out, so a launcher such as L<Game::Terminal> can call it in its own
+handlers are local to the call and the terminal is given back on every way
+out, an interrupt included, so a launcher such as L<Game::Terminal> can call it in its own
 process and carry on afterwards.
 
 C<--level> takes a rung index into L<Term::Chess::Bot>'s ladder or a node
@@ -1115,12 +1229,13 @@ more than once; C<start> calls it on the way out.
 =head2 keysource, pending, raw
 
 The seam a test drives the picker through, the pushback queue for an escape
-sequence that turned out not to be one, and the cbreak state. C<keysource> is
-a coderef returning B<one character per call>.
+sequence that turned out not to be one, and whether keys are being read one
+at a time. C<keysource> is a coderef returning B<one character per call>.
+C<raw> is read-only: C<enter_raw> and C<leave_raw> change it.
 
-=head2 read_char, read_key, read_sequence
+=head2 read_key
 
-One character, one named key, and the tail of an escape sequence. C<read_key>
-returns C<'up'>, C<'enter'>, C<'escape'> and so on, or the character itself.
+One named key: C<'up'>, C<'enter'>, C<'escape'> and so on, or the character
+itself. An escape sequence that is no key the picker knows is C<'unknown'>.
 
 =cut

@@ -11,7 +11,7 @@ use Object::Proto::Sugar;
 use Game::Fanorona::Engine ();
 use Game::Fanorona::Move ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use constant {
     ONGOING         => 0,
@@ -308,7 +308,7 @@ Game::Fanorona::Rules - a game of fanorona: a position, its history, and how it 
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,9 @@
 Revision history for Game-Snake
 
+0.13    2026-10-13
+        - Add options, the fields a launcher offers before a game
+        - The keys, the screen and the ticker are Game::Terminal::Kit's; Game::Snake::Ticker is gone
+
 0.12    2026-10-11
         - Rewritten as an engine: Game::Snake plays the game and draws nothing.
         - Game::Snake::Terminal and bin/snake: the game in a terminal.

@@ -1,5 +1,14 @@
 Revision history for Game-Brandubh
 
+0.03    2026-10-13
+        - Add options, the fields a launcher offers before a game
+        - The keys, the screen and the opening questions are Game::Terminal::Kit's
+        - Requires perl 5.14
+        - NO_COLOR=0 turns colour off; shift-tab, home and end work in the opening questions, the digits no longer do
+        - Between two squares equally near, an arrow takes the one straighter ahead
+        - as_text writes a waiting draw offer and the attackers at p2, and from_text reads them back
+        - u undoes and r redoes a turn, through Game::Terminal::Kit::History; the rules key is now R
+
 0.02    2026-10-11
         - Add Game::Brandubh::Terminal->run(@argv), which returns the exit status
 

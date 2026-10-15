@@ -16,7 +16,7 @@ use Game::Reversi::Notation;
 use Game::Reversi::Scoring;
 use Game::Reversi::Result;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 has variant => (
 	is      => 'ro',
@@ -327,18 +327,84 @@ sub _signature {
 
 sub to_text {
 	my ($self) = @_;
-	return Game::Reversi::Notation->render(
+	my $start = $self->log->[0]{payload};
+	my @line;
+	push @line, 'variant ' . $self->variant if $self->variant ne 'historic';
+	push @line, 'first ' . $start->{first} if $start->{first} ne Game::Reversi::Opening->first;
+	push @line, 'board ' . $start->{board} if defined $start->{board};
+	if (defined(my $seed = $self->_held_seed)) {
+		utf8::encode($seed) if utf8::is_utf8($seed);
+		push @line, 'seed ' . unpack 'H*', $seed;
+	}
+	my $transcript = Game::Reversi::Notation->render(
 		[ map { $_->{payload}{square} }
 		  grep { $_->{kind} eq 'place' || $_->{kind} eq 'play' } @{ $self->log } ]);
+	push @line, $transcript if length $transcript || @line;
+	for my $event (@{ $self->log }) {
+		push @line, "resign $event->{actor}" if $event->{kind} eq 'resign';
+		push @line, "timeout $event->{payload}{colour}" if $event->{kind} eq 'timeout';
+		push @line, 'abandon' if $event->{kind} eq 'abandon';
+	}
+	return join "\n", @line;
 }
 
 sub from_text {
 	my ($class, $text, %o) = @_;
-	my $self = $class->new(%o);
-	for my $square (@{ Game::Reversi::Notation->parse($text) }) {
+	Carp::croak('Game::Reversi: a transcript is a string')
+		unless defined $text && !ref $text;
+
+	my (%setting, @ending, $squares);
+	for my $line (split /\n/, $text) {
+		next unless $line =~ /\S/;
+		$line =~ s/^\s+|\s+$//g;
+		my ($word, $value) = $line =~ /^(variant|first|board|seed|resign|timeout|abandon)\b\s*(.*)$/;
+		if (!defined $word) {
+			Carp::croak('Game::Reversi: the transcript has moves after its ending') if @ending;
+			$squares = defined $squares ? "$squares $line" : $line;
+			next;
+		}
+		if ($word eq 'resign' || $word eq 'timeout' || $word eq 'abandon') {
+			Carp::croak("Game::Reversi: the transcript has a second ending, '$line'") if @ending;
+			Carp::croak("Game::Reversi: '$line' does not name a colour, b or w")
+				unless $word eq 'abandon' ? $value eq '' : $value =~ /^[bw]$/;
+			@ending = ($word, $value);
+			next;
+		}
+		Carp::croak("Game::Reversi: the transcript says $word twice")
+			if exists $setting{$word};
+		Carp::croak("Game::Reversi: the transcript names its $word after its moves")
+			if defined $squares || @ending;
+		if ($word eq 'first') {
+			Carp::croak("Game::Reversi: the first colour is b or w, not '$value'")
+				unless $value =~ /^[bw]$/;
+			$setting{turn} = $value;
+		}
+		elsif ($word eq 'board') {
+			Carp::croak("Game::Reversi: a board is 64 squares of b, w and ., not '$value'")
+				unless $value =~ /^[bw.]{64}$/;
+			$setting{board} = [ map { $_ eq '.' ? undef : $_ } split //, $value ];
+		}
+		elsif ($word eq 'seed') {
+			Carp::croak("Game::Reversi: a seed is written in hexadecimal, not '$value'")
+				unless $value =~ /^(?:[0-9a-f]{2})*$/;
+			$setting{seed} = pack 'H*', $value;
+		}
+		else {
+			$setting{variant} = $value;
+		}
+	}
+
+	my $self = $class->new(%o, %setting);
+	for my $square (@{ Game::Reversi::Notation->parse($squares) }) {
 		my $result = $self->play($self->turn, $square);
 		Carp::croak('Game::Reversi: the transcript does not fit this game: '
 			. $result->stringify) if ref $result && $result->can('error');
+	}
+	if (@ending) {
+		my ($word, $colour) = @ending;
+		my $result = $word eq 'abandon' ? $self->abandon : $self->$word($colour);
+		Carp::croak("Game::Reversi: the transcript ends by $word, but the moves already end the game")
+			if ref $result && $result->isa('Game::Reversi::Error');
 	}
 	return $self;
 }
@@ -353,7 +419,7 @@ Game::Reversi - the board game of 1883, with its own opening
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 
@@ -544,6 +610,25 @@ possible cheat in this game>: it hands the opponent's turn back to you.
 
 The squares played, in order, as a transcript. Placements and plays alike, since
 both are squares and which is which follows from how many came before.
+
+A game with nothing but its squares to tell is the squares alone. Otherwise
+each of these is a line of its own, written only when it is so: before the
+squares, the variant when it is not C<historic>, the first colour when it is
+not C<b>, the board a game from L</from_board> began from, and the seed in
+hexadecimal; after them, how a game ended by a resignation, a timeout or an
+abandonment ended.
+
+    variant othello
+    seed 7878
+    f5d6c3
+    resign w
+
+The forfeited turns and the natural ending come back from playing the squares,
+so C<from_text> builds the same game back and C<to_text> of it is the same
+text. Further arguments to C<from_text> go to C<new>, though a setting the
+transcript names overrules them. C<from_text> croaks if the transcript does not
+play, if a line beside the squares cannot be read or comes twice, or if it
+names an ending the squares have already reached.
 
 =head1 SEE ALSO
 

@@ -1,0 +1,25 @@
+Revision history for Util-Con
+
+0.01 2026-10-13 CDT (Claude Opus 5.5 helped)
+
+ [First CPAN release]
+
+ - `Util.pm`, a module that had only ever been loaded from a symlink into one perl's `site_perl`, is now the distribution `Util-Con`, installing `Util::Con`. The ten functions it exports, and what each returns, are unchanged: `dir`, `execute`, `file2string`, `format_commas`, `json_file_to_ref`, `random_key`, `random_value`, `ref_to_json_file`, `st` and `structure`. A script changes `use Util` to `use Util::Con`.
+
+ [Runs on perl 5.10.1]
+
+ - The module required perl 5.44: it was written with subroutine signatures, the `:prototype` attribute and `no source::encoding`, none of which an older perl can compile. It is now written in perl 5.10 syntax, and the test suite passes on perl 5.10.1, 5.12.5 (long double) and 5.44.0.
+
+ - `autodie` reaches the script on perl 5.10.1 and 5.12.5 too, whose `autodie` is 2.06. `Util.pm` imported it from inside a string eval, which works with perl 5.44's `autodie` 2.37, but 2.06 un-installs itself again as the eval returns, so a failed `open` in the script would have returned false instead of dying. The import now runs after the eval has returned, and `t/00-load.t` checks it.
+
+ [`p` and `np`]
+
+ - `p` and `np` are installed into the package that says `use Util::Con`, not always into `main`, and only when that package does not have its own. They were compiled into `main` whenever the module was loaded, so a script that said `use DDP` before `use Util` died at compile time with "Subroutine p redefined", under the module's fatal warnings, and a package other than `main` that loaded the module did not get them.
+
+ [Clearer messages]
+
+ - `execute` given an unknown `$return` says that it accepts `exit`, `stdout`, `stderr` and `all`. The message left out `all`.
+
+ [Test suite]
+
+ - The tests no longer assume a unix shell or a unix filesystem: `t/execute.t` runs perl itself rather than `true`, `false` and `echo`, a missing file or directory is named under a temporary directory rather than as `/no/such/...`, and the check that a forked recursive `dir` does not follow a symbolic link is skipped where one cannot be made.

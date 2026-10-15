@@ -5,7 +5,7 @@ use warnings;
 
 use Exporter 'import';
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 our @EXPORT_OK = qw(variants is_variant check_variant spec_for fields
                     grand_slam target draw_at
@@ -69,7 +69,7 @@ Game::Oware::Variant - the rule table, and what varies between rule sets
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 

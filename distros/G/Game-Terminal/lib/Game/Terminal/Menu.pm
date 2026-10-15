@@ -6,34 +6,14 @@ use warnings;
 
 use Object::Proto::Sugar -types;
 use Game::Terminal;
+use Game::Terminal::Kit::Form;
+use Game::Terminal::Kit::Keys;
+use Game::Terminal::Kit::Log;
+use Game::Terminal::Kit::Run;
+use Game::Terminal::Kit::Screen;
 use Text::ParseWords ();
 
-our $VERSION = '0.01';
-
-my %SEQUENCE = (
-	'A' => 'up',
-	'B' => 'down',
-	'C' => 'right',
-	'D' => 'left',
-	'H' => 'home',
-	'F' => 'end',
-	'1~' => 'home',
-	'4~' => 'end',
-	'5~' => 'page_up',
-	'6~' => 'page_down',
-	'7~' => 'home',
-	'8~' => 'end',
-);
-
-my %CONTROL = (
-	"\r" => 'enter',
-	"\n" => 'enter',
-	"\t" => 'tab',
-	"\x7f" => 'backspace',
-	"\x08" => 'backspace',
-	"\x03" => 'interrupt',
-	"\x04" => 'eof',
-);
+our $VERSION = '0.02';
 
 my %WORD = (0 => 'won or drew', 1 => 'lost', 2 => 'bad option');
 
@@ -67,10 +47,8 @@ has [qw/interactive colour picking/] => (
 	is => 'rw'
 );
 
-has raw => (
-	is => 'rw',
-	isa => Bool,
-	default => 0
+has [qw/keyboard screen/] => (
+	is => 'rw'
 );
 
 has keysource => (
@@ -140,8 +118,19 @@ sub BUILD {
 	$self->in(\*STDIN) unless $self->in;
 	$self->out(\*STDOUT) unless $self->out;
 	$self->interactive(-t $self->in ? 1 : 0) unless defined $self->interactive;
-	$self->colour($self->interactive && !$ENV{NO_COLOR} ? 1 : 0)
+	$self->colour($self->interactive && !Game::Terminal::Kit::Screen::no_colour() ? 1 : 0)
 		unless defined $self->colour;
+	$self->keyboard(Game::Terminal::Kit::Keys->new(
+		in => $self->in,
+		pending => $self->pending,
+		($self->keysource ? (keysource => $self->keysource) : ()),
+	)) unless $self->keyboard;
+	$self->screen(Game::Terminal::Kit::Screen->new(
+		out => $self->out,
+		interactive => $self->interactive,
+		colour => $self->colour,
+		ascii => 1,
+	)) unless $self->screen;
 	$self->picking($self->interactive ? 1 : 0) unless defined $self->picking;
 	$self->picking(0) unless $self->keys_available;
 	$self->inc([ @INC ]) unless $self->inc;
@@ -155,104 +144,58 @@ sub BUILD {
 	}
 	$self->at($self->first_installed);
 	$self->rows($self->height) unless $self->rows;
-	my $previous = select $self->out;
-	$| = 1;
-	select $previous;
+	$self->screen->flush_on;
 	return $self;
+}
+
+sub raw {
+	my ($self) = @_;
+	return $self->keyboard->raw;
 }
 
 sub keys_available {
 	my ($self) = @_;
-	return 1 if $self->keysource;
-	return 0 unless defined $self->in && -t $self->in;
-	return eval { require Term::ReadKey; 1 } ? 1 : 0;
+	return $self->keyboard->keys_available;
 }
 
 sub enter_raw {
 	my ($self) = @_;
-	return $self if $self->raw;
-	if ($self->keysource) {
-		$self->raw(1);
-		return $self;
-	}
-	return undef unless $self->keys_available;
-	return undef unless eval { Term::ReadKey::ReadMode(3, $self->in); 1 };
-	$self->raw(1);
-	return $self;
+	return $self->keyboard->enter_raw ? $self : undef;
 }
 
 sub leave_raw {
 	my ($self) = @_;
-	return $self unless $self->raw;
-	eval { Term::ReadKey::ReadMode(0, $self->in) } unless $self->keysource;
-	$self->raw(0);
+	$self->keyboard->leave_raw;
 	return $self;
-}
-
-sub read_char {
-	my ($self, $wait) = @_;
-	my $pending = $self->pending;
-	return shift @{$pending} if @{$pending};
-	return $self->keysource->($wait) if $self->keysource;
-	my $char = Term::ReadKey::ReadKey($wait ? 0 : -1, $self->in);
-	return $char if defined $char || $wait;
-	select undef, undef, undef, 0.05;
-	return Term::ReadKey::ReadKey(-1, $self->in);
 }
 
 sub read_key {
 	my ($self) = @_;
-	my $char = $self->read_char(1);
-	return undef unless defined $char;
-	return $CONTROL{$char} if $CONTROL{$char};
-	return $self->read_sequence if $char eq "\e";
-	return $char;
-}
-
-sub read_sequence {
-	my ($self) = @_;
-	my $opener = $self->read_char(0);
-	return 'escape' unless defined $opener;
-	unless ($opener eq '[' || $opener eq 'O') {
-		unshift @{$self->pending}, $opener;
-		return 'escape';
-	}
-	my $tail = '';
-	while (length $tail < 8) {
-		my $char = $self->read_char(0);
-		last unless defined $char;
-		$tail .= $char;
-		last if $char =~ m/[A-Za-z~]/;
-	}
-	return $SEQUENCE{$tail} || 'escape';
+	return $self->keyboard->read_key;
 }
 
 sub height {
 	my ($self) = @_;
-	return 0 unless $self->interactive && $INC{'Term/ReadKey.pm'};
-	my @size = eval { Term::ReadKey::GetTerminalSize($self->out) };
-	return $size[1] || 0;
+	return 0 unless $self->interactive;
+	my (undef, $rows) = $self->screen->measured;
+	return $rows || 0;
 }
 
 sub say {
 	my ($self, $line) = @_;
-	my $out = $self->out;
-	print {$out} (defined $line ? $line : ''), "\n";
+	$self->screen->say($line);
 	return $self;
 }
 
 sub clear {
 	my ($self) = @_;
-	return $self unless $self->interactive;
-	my $out = $self->out;
-	print {$out} "\e[2J\e[H";
+	$self->screen->clear;
 	return $self;
 }
 
 sub paint {
 	my ($self, $text, $code) = @_;
-	return $text unless $self->colour;
-	return "\e[${code}m" . $text . "\e[0m";
+	return $self->screen->paint($text, $code);
 }
 
 sub first_installed {
@@ -446,113 +389,45 @@ sub prompt {
 
 sub read_line {
 	my ($self, $prompt) = @_;
-	my $was = $self->raw;
-	$self->leave_raw;
-	my $out = $self->out;
-	print {$out} $prompt;
-	my $line = readline $self->in;
-	$self->enter_raw if $was;
-	return undef unless defined $line;
-	$line =~ s/^\s+|\s+$//g;
-	return $line;
+	return $self->keyboard->read_line($prompt, $self->out);
 }
 
-sub fields_for {
+sub form {
 	my ($self, $row) = @_;
-	return [ @{ $row->{options} || [] },
-		{ name => 'extra', type => 'extra', help => 'anything else, as on the command line' } ];
-}
-
-sub show_value {
-	my ($self, $field, $value) = @_;
-	my $type = $field->{type};
-	return $value ? 'on' : 'off' if $type eq 'flag';
-	return !defined $value ? "the game\x27s own" : $value ? 'on' : 'off' if $type eq 'bool';
-	return defined $value && length $value ? $value : '(none)' if $type eq 'extra';
-	return defined $value ? $value : "the game\x27s own";
-}
-
-sub form_lines {
-	my ($self, $row, $fields, $values, $at) = @_;
-	my @lines = ($self->paint($row->{key}, $INK{title}) . ": $row->{blurb}", '');
-	for my $index (0 .. $#{$fields}) {
-		my $field = $fields->[$index];
-		my $value = $values->{ $field->{name} };
-		my $shown = $self->show_value($field, $value);
-		if ($index == $at) {
-			my $line = sprintf '%-11s %-18s %s', $field->{name}, $shown, $field->{help};
-			$line =~ s/\s+$//;
-			push @lines, ' ' . $self->paint("> $line", '1;7');
-			next;
-		}
-		my $set = $field->{type} eq 'flag' ? $value : defined $value && length $value;
-		push @lines, '   ' . $self->paint(sprintf('%-11s', $field->{name}), $INK{key}) . ' '
-			. $self->paint(sprintf('%-18s', $shown), $set ? $INK{set} : $INK{own}) . ' '
-			. $field->{help};
-	}
-	push @lines, '', $at == @{$fields} ? ' ' . $self->paint('> Play', '1;7') : '   ' . $self->paint('Play', $INK{play});
-	push @lines, '', $self->status_line if length $self->status;
-	push @lines, '', $self->paint('left and right change a value, enter edits a text, backspace clears,', $INK{legend}),
-		$self->paint('enter on Play starts, escape goes back', $INK{legend});
-	return \@lines;
+	return Game::Terminal::Kit::Form->new(
+		title => $self->paint($row->{key}, $INK{title}) . ": $row->{blurb}",
+		fields => Game::Terminal::options_for($row),
+		values => ($self->values->{ $row->{key} } ||= {}),
+		legend => [],
+		log => Game::Terminal::Kit::Log->new,
+		screen => $self->screen,
+	);
 }
 
 sub configure {
 	my ($self, $row) = @_;
-	my $fields = $self->fields_for($row);
-	my $values = $self->values->{ $row->{key} } ||= {};
-	my $at = scalar @{$fields};
+	my $form = $self->form($row);
+	my $log = $form->log;
 	$self->note('');
 	while (1) {
 		$self->clear;
-		$self->say($_) for @{ $self->form_lines($row, $fields, $values, $at) };
+		$self->say($_) for $form->lines;
+		$self->say($_) for length $self->status ? ('', $self->status_line) : ();
+		$self->say($_) for '', $self->paint('left and right change a value, enter edits a text, backspace clears,', $INK{legend}),
+			$self->paint('enter on Play starts, escape goes back', $INK{legend});
 		my $key = $self->read_key;
-		return undef if !defined $key;
-		return undef if $key eq 'escape' || $key eq 'q' || $key eq 'eof' || $key eq 'interrupt';
-		return [ Game::Terminal::argv_for($row, $values) ] if $key eq 'p';
-		if ($key eq 'up' || $key eq 'k') {
-			$at = ($at - 1) % (@{$fields} + 1);
-		} elsif ($key eq 'down' || $key eq 'j' || $key eq 'tab') {
-			$at = ($at + 1) % (@{$fields} + 1);
-		} elsif ($at == @{$fields}) {
-			return [ Game::Terminal::argv_for($row, $values) ] if $key eq 'enter' || $key eq ' ';
-			$self->note('That key does nothing here');
-		} else {
-			$self->edit_field($fields->[$at], $values, $key);
+		return undef unless defined $key;
+		my ($event, $value) = $form->step($key);
+		return undef if $event eq 'back' || $event eq 'quit';
+		return [ $form->argv ] if $event eq 'chosen';
+		if ($event eq 'edit') {
+			my $line = $self->read_line("$value->{name}: ");
+			$form->set($value->{name}, $line) if defined $line;
 		}
+		my @said = $log->lines;
+		$log->shown;
+		$self->note($said[0], $said[0] =~ m/^That key/ ? '' : 'warn') if @said;
 	}
-}
-
-sub edit_field {
-	my ($self, $field, $values, $key) = @_;
-	my $name = $field->{name};
-	my $type = $field->{type};
-	my $typed = $type eq 'str' || $type eq 'extra';
-	if ($key eq 'backspace' || $key eq 'delete') {
-		delete $values->{$name};
-	} elsif ($key eq 'left' || $key eq 'right') {
-		return $self->note("$name is typed: press enter", 'warn') if $typed;
-		my $next = Game::Terminal::step_value($field, $values->{$name}, $key eq 'right' ? 1 : -1);
-		if (defined $next) { $values->{$name} = $next } else { delete $values->{$name} }
-	} elsif ($key eq 'enter' || $key eq ' ') {
-		if ($type eq 'flag' || $type eq 'bool' || $type eq 'enum') {
-			my $next = Game::Terminal::step_value($field, $values->{$name}, 1);
-			if (defined $next) { $values->{$name} = $next } else { delete $values->{$name} }
-			return $self;
-		}
-		my $line = $self->read_line("$name: ");
-		return $self unless defined $line;
-		if ($type eq 'extra') {
-			if (length $line) { $values->{$name} = $line } else { delete $values->{$name} }
-			return $self;
-		}
-		my ($value, $error) = Game::Terminal::check_value($field, $line);
-		return $self->note($error, 'warn') if defined $error;
-		if (defined $value) { $values->{$name} = $value } else { delete $values->{$name} }
-	} else {
-		$self->note('That key does nothing here');
-	}
-	return $self;
 }
 
 sub ask_options {
@@ -591,22 +466,19 @@ sub launch {
 sub start {
 	my ($self) = @_;
 	$self->picking(0) if $self->picking && !$self->enter_raw;
-	local @SIG{qw(INT TERM HUP)};
-	for my $sig (qw(INT TERM HUP)) {
-		$SIG{$sig} = sub { $self->leave_raw; $SIG{$sig} = 'DEFAULT'; kill $sig, $$ };
-	}
 	my $ok = eval {
-		while (1) {
-			my $row = $self->picking ? $self->choose : $self->prompt;
-			last unless $row;
-			my $argv = $self->picking ? $self->configure($row) : $self->ask_options($row);
-			next unless $argv;
-			$self->launch($row, $argv);
-		}
+		Game::Terminal::Kit::Run::guard(sub {
+			while (1) {
+				my $row = $self->picking ? $self->choose : $self->prompt;
+				last unless $row;
+				my $argv = $self->picking ? $self->configure($row) : $self->ask_options($row);
+				next unless $argv;
+				$self->launch($row, $argv);
+			}
+		}, $self->keyboard);
 		1;
 	};
 	my $error = $@;
-	$self->leave_raw;
 	if ($self->interactive) {
 		my $out = $self->out;
 		print {$out} "\e[0m\e[?25h\n";
@@ -625,7 +497,7 @@ Game::Terminal::Menu - the menu the game command draws
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 
@@ -714,19 +586,25 @@ Whether escape codes are written.
 Whether the menu is driven by keys (true) or by the numbered prompt. On by
 default when there is a terminal and the keys are available.
 
-=head2 raw
-
-True while the terminal is in cbreak mode.
-
 =head2 keysource
 
-A code ref that returns the next character, or undef at the end. When set,
-the keys come from it and the terminal is never touched: the seam every test
-drives.
+A code ref that returns the next character, or undef at the end, given to
+C<new>. When set, the keys come from it and the terminal is never touched: the
+seam every test drives.
 
 =head2 pending
 
-Characters read ahead while decoding an escape sequence and not yet used.
+Characters to be read before any others, an array reference given to C<new>.
+
+=head2 keyboard
+
+The L<Game::Terminal::Kit::Keys> the keys are read through, built from C<in>,
+C<keysource> and C<pending> unless one is given.
+
+=head2 screen
+
+The L<Game::Terminal::Kit::Screen> everything is printed through, built from
+C<out>, C<interactive> and C<colour> unless one is given.
 
 =head2 runner
 
@@ -805,7 +683,7 @@ the chosen row, or undef when the menu is left.
 
     my $argv = $menu->configure($row);
 
-The second screen: the row's options from L<Game::Terminal/The options table>
+The second screen: the row's options from L<Game::Terminal/options_for>
 with their current values, an C<extra> line for anything else, and Play.
 
     checkers: English draughts
@@ -830,22 +708,12 @@ line; backspace puts a field back to the game's own; C<p>, or enter on
 Play, returns the argument list the values make; escape or C<q> returns
 undef and nothing runs. A field left alone sends nothing.
 
-=head2 edit_field
+=head2 form
 
-One key applied to one field of the form, as above.
+    my $form = $menu->form($row);
 
-=head2 fields_for
-
-The row's options followed by the C<extra> field.
-
-=head2 form_lines
-
-The lines of the second screen.
-
-=head2 show_value
-
-How a value reads on the form: the value, C<on> or C<off>, C<(none)>, or
-C<the game's own>.
+The L<Game::Terminal::Kit::Form> behind the second screen: the row's fields,
+and the values the player has set for that game this session.
 
 =head2 read_line
 
@@ -917,18 +785,17 @@ L<Term::ReadKey> loads.
 
 =head2 leave_raw
 
-Put the terminal into cbreak mode and back. Both are no-ops with a
-keysource.
+Read the terminal a key at a time, and give it back. Both only keep the
+flag with a keysource.
 
-=head2 read_char
+=head2 raw
+
+True while the terminal is being read a key at a time.
 
 =head2 read_key
 
-=head2 read_sequence
-
-One character; one key, with the control characters and escape sequences
-named (C<up>, C<enter>, C<escape>, ...); and the decoding of a sequence
-after an escape, giving back a character that was not one.
+One key, with the control characters and escape sequences named (C<up>,
+C<enter>, C<escape>, ...) as L<Game::Terminal::Kit::Keys> names them.
 
 =head2 say
 

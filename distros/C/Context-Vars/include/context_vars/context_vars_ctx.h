@@ -53,6 +53,10 @@ typedef struct {
     IV                depth;        /* enters whose restore has not run */
     IV                scopes;       /* scopes opened, for the tests */
     context_vars_ctx *program;      /* see context_vars_writable */
+    HV               *map_stash;    /* Context::Vars::Data::Map: a hash in a context */
+    HV               *vec_stash;    /* Context::Vars::Data::Vector: an array in one */
+    HV               *hash_stash;   /* Context::Vars::Hash: a hash proxy */
+    HV               *array_stash;  /* Context::Vars::Array: an array proxy */
     AV               *locals;       /* what `local` displaced, newest last */
 } my_cxt_t;
 
@@ -264,6 +268,10 @@ static void context_vars_ctx_init(pTHX) {
     MY_CXT.empty     = NULL;
     MY_CXT.cur       = NULL;
     MY_CXT.program   = NULL;
+    MY_CXT.map_stash   = gv_stashpvs("Context::Vars::Data::Map", GV_ADD);
+    MY_CXT.vec_stash   = gv_stashpvs("Context::Vars::Data::Vector", GV_ADD);
+    MY_CXT.hash_stash  = gv_stashpvs("Context::Vars::Hash", GV_ADD);
+    MY_CXT.array_stash = gv_stashpvs("Context::Vars::Array", GV_ADD);
     MY_CXT.locals    = newAV();
     MY_CXT.empty     = context_vars_ctx_new(aTHX_ (CONTEXT_VARS_HAMT->map_new)(aTHX));
     MY_CXT.cur       = MY_CXT.empty;

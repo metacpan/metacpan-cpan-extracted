@@ -4,7 +4,7 @@ use warnings;
 
 use Game::Cribbage::Terminal;
 
-our $VERSION = "0.17";
+our $VERSION = "0.18";
 
 exit Game::Cribbage::Terminal->run(@ARGV);
 

@@ -2,12 +2,11 @@
 use 5.010;
 use strict;
 use warnings;
-use lib 't/lib';
 use Test::More;
 
 use Game::Reversi;
 use Game::Reversi::Bot;
-use Game::Reversi::Test::Handle;
+use Game::Terminal::Kit::Test::Handle;
 
 # The engine prints nothing, reads nothing, sleeps never and calls rand never.
 #
@@ -44,8 +43,8 @@ subtest 'a whole game runs with both handles rigged to die' => sub {
 	# still gets out even while STDOUT is rigged.
 	my ($moves, $score, $error);
 
-	tie *STDOUT, 'Game::Reversi::Test::Handle';
-	tie *STDIN, 'Game::Reversi::Test::Handle';
+	tie *STDOUT, 'Game::Terminal::Kit::Test::Handle';
+	tie *STDIN, 'Game::Terminal::Kit::Test::Handle';
 
 	eval {
 		my $game = Game::Reversi->new(variant => 'historic', seed => 'z' x 32);

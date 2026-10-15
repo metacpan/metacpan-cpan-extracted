@@ -315,6 +315,68 @@ object, or a raw flag string when `cflags` or `ldflags` is requested.
 
     Target the same isolated store used by `install( ... )` (see there).
 
+## `fetch_closure( ... )`
+
+```perl
+my @closure = $repo->fetch_closure( 'libsdl3_ttf' );
+```
+
+Like `fetch( ... )`, but asks for the full dependency closure (`--deps`): one hashref per package in the closure,
+each carrying its own `libfiles`, `linkdirs`, `bindirs`, and `artifacts.installdir`. The plain `fetch` collapses
+to the primary package, so this is what reveals where a transitive provider (a vendored `freetype` behind
+`libsdl3_ttf`, say) actually lives.
+
+## `scan_runtime_deps( $libpath, @search_dirs )`
+
+```perl
+my @raw = $repo->scan_runtime_deps( $libpath, $bin_dir, $lib_dir );
+```
+
+Asks Xmake to read `$libpath`'s dependency table and returns one entry per _direct_ dependency, each resolved to an
+absolute path where the supplied search directories allow it and left as a bare loader name otherwise (for example
+`KERNEL32.dll`). This is the raw, unclassified form; see `runtime_deps( ... )` for the diagnostic view.
+
+## `runtime_deps( $libpath, %opts )`
+
+```perl
+my $deps = $repo->runtime_deps( $libpath, search_dirs => [...], store_dirs => [...] );
+```
+
+Scans `$libpath` and classifies every direct dependency by where the dynamic linker would find it. Returns an arrayref
+of hashrefs with `name`, `path`, `dir`, and `scope`, where `scope` is one of:
+
+- `store`
+
+    Resolved into one of the `store_dirs`. The consumer has to make it findable before the library is `dlopen`'d.
+
+- `host`
+
+    Resolved somewhere else on the machine that is not a default system directory (Homebrew, `/usr/local`, ...).
+
+- `system`
+
+    A default OS library directory, or a bare loader name that is plainly part of the C runtime.
+
+- `unresolved`
+
+    A bare name that matched no search directory and no known system pattern. This is the genuinely missing case, and the
+    one worth reporting.
+
+`search_dirs` are the paths handed to Xmake's resolver, `store_dirs` are the install roots that make an entry
+`store`, and `system_dirs` defaults to this platform's standard library directories.
+
+## `loader_env_var()`
+
+The environment variable this platform's loader consults for extra library directories: `PATH` on Windows,
+`DYLD_LIBRARY_PATH` on macOS, and `LD_LIBRARY_PATH` everywhere else.
+
+## `dep_search_dirs( \@entries )`
+
+Takes fetch or closure entries (each with an optional `artifacts.installdir` plus `libfiles`, `linkdirs`, and
+`bindirs`) and returns the pair `( \@search_dirs, \@store_dirs )` a caller should offer the loader and use to
+recognize "our" paths. [Alien::Xrepo::Runtime](https://metacpan.org/pod/Alien%3A%3AXrepo%3A%3ARuntime) and [Alien::Xrepo::Build](https://metacpan.org/pod/Alien%3A%3AXrepo%3A%3ABuild) use it to turn a dependency closure into
+scan arguments.
+
 ## `info( ... )`
 
 ```perl
@@ -519,6 +581,18 @@ resolution.
 
     The installed version.
 
+- **deps**
+
+    The dependency records Xmake reported for the package, as a list of hashrefs. Empty for a plain fetch; populated when
+    the fetch asked for dependencies.
+
+- **runtime\_deps**
+
+    The classified runtime dependencies discovered for the package's `libpath` (see `runtime_deps( ... )` on the engine
+    and [Alien::Xrepo::Runtime](https://metacpan.org/pod/Alien%3A%3AXrepo%3A%3ARuntime)). Each entry is a hashref with `name`, `path`, `dir`, and `scope`.
+    [Alien::Xrepo::Build](https://metacpan.org/pod/Alien%3A%3AXrepo%3A%3ABuild) records these in the snapshot, so a hermetic consumer reads them without a second scan; empty
+    otherwise.
+
 ## Methods
 
 ### `find_header( ... )`
@@ -528,6 +602,15 @@ my $path = $info->find_header( 'png.h' );
 ```
 
 Scans `includedirs` for the given filename and returns the absolute path if found. Returns `undef` otherwise.
+
+### `with_runtime_deps( \@deps )`
+
+```perl
+my $info = $info->with_runtime_deps($deps);
+```
+
+Returns a copy of the object with `runtime_deps` set to `\@deps`, or the object itself unchanged when it already
+carries a non-empty list. `Alien::Xrepo::Runtime::package_info( ... )` uses it to attach the diagnostic.
 
 # Examples
 

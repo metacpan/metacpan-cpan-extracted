@@ -7,7 +7,7 @@ use warnings;
 use Carp ();
 use Digest::SHA ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our @LADDER = (0, 100, 1_000, 10_000, 30_000);
 
@@ -117,7 +117,7 @@ Game::Fanorona::Bot - a player for fanorona, at a strength you choose
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

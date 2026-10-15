@@ -6,7 +6,7 @@ use warnings;
 
 use Exporter 'import';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our @EXPORT_OK = qw(
     SETUP
@@ -130,6 +130,11 @@ sub game_string {
     }
 
     my @lines = ("variant $variant");
+    my $attackers = _plain($game->{attackers});
+    if (defined $attackers && $attackers ne 'p1') {
+        return undef unless $attackers eq 'p2';
+        push @lines, "attackers $attackers";
+    }
     my $start = _plain($game->{start});
     if (defined $start && $start ne SETUP) {
         return undef unless position_ok($start);
@@ -142,6 +147,12 @@ sub game_string {
         my $line = _result_line($result);
         return undef unless defined $line;
         push @lines, "result $line";
+    }
+
+    my $offer = _plain($game->{offer});
+    if (defined $offer) {
+        return undef unless ($offer eq 'p1' || $offer eq 'p2') && !defined $result;
+        push @lines, "offer $offer";
     }
     return join("\n", @lines) . "\n";
 }
@@ -175,6 +186,14 @@ sub game_parse {
             return undef unless $rest =~ /\S/;
             $game{variant} = $rest;
         }
+        elsif ($word eq 'attackers') {
+            return undef unless $rest eq 'p1' || $rest eq 'p2';
+            $game{attackers} = $rest;
+        }
+        elsif ($word eq 'offer') {
+            return undef unless $rest eq 'p1' || $rest eq 'p2';
+            $game{offer} = $rest;
+        }
         elsif ($word eq 'start') {
             return undef unless position_ok($rest);
             $game{start} = $rest;
@@ -195,6 +214,7 @@ sub game_parse {
         }
     }
     return undef unless $seen{variant} && $seen{moves};
+    return undef if defined $game{offer} && defined $game{result};
     return \%game;
 }
 
@@ -208,7 +228,7 @@ Game::Brandubh::Notation - squares, moves, positions and whole games as strings
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 
@@ -293,6 +313,18 @@ players did:
 
 A resignation and an agreed draw are B<not moves> and are never written among
 them.
+
+Two more lines are written only when they say something. C<attackers p2>
+when the second seat has the attackers, and C<offer p1> or C<offer p2> when a
+seat's offer of a draw is waiting for an answer:
+
+    variant brandubh
+    attackers p2
+    moves d1c1 d3c3
+    offer p1
+
+A game with a C<result> line has no C<offer> line: ending a game withdraws
+any offer.
 
 =head1 CONSTANTS
 
@@ -401,6 +433,11 @@ A game as text. The keys of C<%game>:
 
 A word or a line naming the rule set. C<brandubh> when left out.
 
+=item C<attackers>
+
+C<p1> or C<p2>, the seat that has the attackers. Left out, or C<p1>, writes
+no line.
+
 =item C<start>
 
 A position. Left out, or the set-up, when the game began from the set-up.
@@ -415,6 +452,11 @@ Left out unless the game ended by something the players did: C<< { how =>
 'resign', by => 'attackers' } >>, the same with C<defenders>, or C<< { how =>
 'agreed' } >>.
 
+=item C<offer>
+
+C<p1> or C<p2>, the seat whose offer of a draw is waiting. Left out when no
+offer is; never given with C<result>.
+
 =back
 
 C<undef> when any part of it is not written correctly.
@@ -425,9 +467,10 @@ C<undef> when any part of it is not written correctly.
 
 The reverse: a hash reference with C<variant>, C<start> (the set-up when the
 text had no C<start> line), C<moves> and C<result> (C<undef> when the text had
-none). C<undef> when the text is not a game: a line it does not know, a line
-given twice, a move or a position that is not one, or no C<variant> or
-C<moves> line.
+none), and C<attackers> and C<offer> only when the text had those lines.
+C<undef> when the text is not a game: a line it does not know, a line given
+twice, a move, a position or a seat that is not one, an offer beside a
+result, or no C<variant> or C<moves> line.
 
 =head1 AUTHOR
 

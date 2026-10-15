@@ -1,5 +1,13 @@
 Revision history for Term-Chess
 
+0.03    2026-10-13
+        Add options, the fields a launcher offers before a game
+        The keys, the screen and the steering are Game::Terminal::Kit's
+        An empty NO_COLOR leaves colour on
+        An escape sequence that is no known key no longer puts the piece back
+        Add to_text and from_text, a game as a string and back by replay
+        Add undo and redo, u and r in the picker, through Game::Terminal::Kit::History
+
 0.02    2026-10-13
         Fix t/02-bot.t timing failure on slow hosts
 

@@ -59,6 +59,7 @@ like($stext, qr/smtp_port: 10572/, 'stock guide: Mailman submits to the routing 
 like($stext, qr/--wrap-single-part/, 'stock guide: the wrapping milter');
 like($stext, qr/X-DKIM2-Snapshot/, 'stock guide: explains the snapshot token');
 like($stext, qr/cleanup_service_name=cleanup-dkim2/, 'stock guide: port 25 keeps the hashed headers');
+like($stext, qr/recast_multipart/, 'stock guide: says content filtering undoes the wrap');
 like($stext, qr/disable_mime_output_conversion = yes/, 'stock guide: warns about transport conversion');
 unlike($stext, qr{/root/interop|/opt/dkim2}, 'stock guide: no dkim2.com box paths');
 unlike($stext, qr/^(?:smtp_port|max_recipients):[^\n#]*#/m, 'stock guide: no inline mailman.cfg comments');

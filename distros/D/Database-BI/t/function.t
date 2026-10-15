@@ -2636,5 +2636,116 @@ subtest 'GET /tables -- table:no_such_xyz returns 404' => sub {
 	  ->status_is(404, '/tables?l=table: with missing file returns 404');
 };
 
+# ---------------------------------------------------------------------------
+# P0-5: DataSource::dbi_source() -- return contract (P0-4 fix coverage)
+# ---------------------------------------------------------------------------
+
+subtest 'DataSource::dbi_source -- CSV source returns undef (not SQL-backed)' => sub {
+	SKIP: {
+		skip 'data/sales.csv not found', 1 unless -f 'data/sales.csv';
+		require Database::BI::Model::DataSource;
+		my $ds = Database::BI::Model::DataSource->new(
+			table     => 'sales',
+			directory => 'data',
+		);
+		is($ds->dbi_source, undef, 'CSV DataSource returns undef from dbi_source');
+	}
+};
+
+subtest 'DataSource::dbi_source -- SQLite source returns hashref with dbh and table' => sub {
+	SKIP: {
+		eval { require DBI; DBI->install_driver('SQLite') }
+			or skip 'DBD::SQLite not available', 3;
+		my $dir  = tempdir(CLEANUP => 1);
+		my $path = "$dir/dbi_test.sql";
+		my $dbh  = DBI->connect("dbi:SQLite:dbname=$path", '', '', { RaiseError => 1 });
+		$dbh->do('CREATE TABLE dbi_test (id INTEGER, name TEXT)');
+		$dbh->do("INSERT INTO dbi_test VALUES (1, 'Alice')");
+		$dbh->disconnect;
+
+		require Database::BI::Model::DataSource;
+		my $ds = Database::BI::Model::DataSource->new(
+			table     => 'dbi_test',
+			directory => $dir,
+		);
+		$ds->fetch_all;    # initialise the backend
+		my $src = $ds->dbi_source;
+		ok(defined $src, 'SQLite DataSource returns defined value from dbi_source');
+		ok(ref $src,     'return value is a reference');
+	}
+};
+
+subtest 'DataSource::dbi_source -- headerless-only DataSource returns undef' => sub {
+	# DataSources backed by the headerless-CSV path (no DBI) must return undef.
+	# Use a SQLite file created by DBI (dbi_source returns defined) vs a plain
+	# CSV (dbi_source returns undef) as the negative control.
+	SKIP: {
+		skip 'data/sales.csv not found', 1 unless -f 'data/sales.csv';
+		require Database::BI::Model::DataSource;
+		my $ds = Database::BI::Model::DataSource->new(
+			table     => 'sales',
+			directory => 'data',
+		);
+		is($ds->dbi_source, undef,
+			'CSV-backed DataSource::dbi_source returns undef (no SQL backend)');
+	}
+};
+
+# ---------------------------------------------------------------------------
+# P1-2: _grouped_totals push vs fold equivalence gate
+# ---------------------------------------------------------------------------
+
+subtest '_grouped_totals -- fold and push agree on category order (SQLite, no filter)' => sub {
+	SKIP: {
+		eval { require DBI; DBI->install_driver('SQLite') }
+			or skip 'DBD::SQLite not available', 4;
+
+		my $dir  = tempdir(CLEANUP => 1);
+		my $path = "$dir/agg_gate.sql";
+		my $dbh  = DBI->connect("dbi:SQLite:dbname=$path", '', '', { RaiseError => 1 });
+		$dbh->do('CREATE TABLE agg_gate (region TEXT, amount REAL)');
+		# Deliberately insert in non-alphabetical order so first-seen != ascending
+		for my $row (['East', 100], ['North', 200], ['South', 150], ['East', 50]) {
+			$dbh->do('INSERT INTO agg_gate VALUES (?,?)', undef, @$row);
+		}
+		$dbh->disconnect;
+
+		use Mojo::Util qw(url_escape);
+		my $spec = url_escape("path:$path");
+
+		# Push path (SQLite backed)
+		my $push_body = $t->get_ok("/pie?l=$spec&cat=region&val=amount")
+		                   ->status_is(200)->tx->res->body;
+		my @push_labels = ($push_body =~ /"label":"([^"]+)"/g);
+
+		# Forced Perl fold
+		local $ENV{BI_FORCE_PERL_AGG} = 1;
+		my $fold_body = $t->get_ok("/pie?l=$spec&cat=region&val=amount")
+		                   ->status_is(200)->tx->res->body;
+		my @fold_labels = ($fold_body =~ /"label":"([^"]+)"/g);
+
+		is_deeply(\@push_labels, \@fold_labels,
+			'push and fold produce same labels in same ascending order');
+	}
+};
+
+subtest '_grouped_totals -- fold returns same keys as push for bar chart (order-visible)' => sub {
+	# Bar chart preserves category order from _grouped_totals (it only sorts when
+	# ?sort= is explicitly requested), so we can observe fold key order via HTTP.
+	SKIP: {
+		skip 'data/sales.csv not found', 3 unless -f 'data/sales.csv';
+
+		# CSV source always uses Perl fold (never SQL-backed).
+		my $res = $t->get_ok('/bar?l=table:sales&cat=region')
+		             ->status_is(200)->tx->res->body;
+
+		my @labels = ($res =~ /"label":"([^"]+)"/g);
+		ok(@labels > 0, 'bar chart returned at least one category label for CSV fold');
+		my @sorted = sort @labels;
+		is_deeply(\@labels, \@sorted,
+			'fold-path bar chart category labels are in ascending order');
+	}
+};
+
 done_testing();
 

@@ -10,8 +10,13 @@ use Game::Durak::Bot ();
 use Game::Durak::Card qw(name_of long_name_of suit_of rank_of face_of);
 use Game::Durak::Table ();
 use Getopt::Long ();
+use Game::Terminal::Kit::Keys ();
+use Game::Terminal::Kit::Log ();
+use Game::Terminal::Kit::Picker ();
+use Game::Terminal::Kit::Run ();
+use Game::Terminal::Kit::Screen ();
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 my %SUIT = (
     S => { wide => "\x{2660}", ascii => 'S', colour => '37' },
@@ -29,6 +34,9 @@ my %SAID = (
     resign   => 'give up',
 );
 
+my %STEER = map { $_ => 1 }
+    qw(left right up down tab back_tab home end page_up page_down);
+
 has game   => (is => 'rw', isa => Any);
 has out    => (is => 'ro', isa => Any);
 has in     => (is => 'ro', isa => Any);
@@ -40,9 +48,9 @@ has colour => (is => 'ro', isa => Any);
 has paint  => (is => 'ro', isa => Any);
 has width  => (is => 'ro', isa => Int);
 has height => (is => 'ro', isa => Int);
-has _painting => (is => 'rw', isa => Any);
-
-has raw => (is => 'rw', isa => Any, default => 0);
+has keyboard => (is => 'rw', isa => Any);
+has screen   => (is => 'rw', isa => Any);
+has log      => (is => 'rw', isa => Any);
 
 has keysource => (is => 'rw', isa => Any);
 
@@ -50,20 +58,7 @@ has pending => (is => 'rw', isa => ArrayRef, default => sub { [] });
 
 has _picking => (is => 'rw', isa => Any, init_arg => 'picking');
 
-our %SEQUENCE = (
-    'A' => 'up', 'B' => 'down', 'C' => 'right', 'D' => 'left',
-    'H' => 'home', 'F' => 'end',
-    '1~' => 'home', '4~' => 'end', '5~' => 'page_up', '6~' => 'page_down',
-    '7~' => 'home', '8~' => 'end',
-);
-
-our %CONTROL = (
-    "\r" => 'enter', "\n" => 'enter', "\t" => 'tab',
-    "\x7f" => 'backspace', "\x08" => 'backspace',
-    "\x03" => 'interrupt', "\x04" => 'eof',
-);
 has _table => (is => 'rw', isa => Any);
-has _said  => (is => 'rw', isa => Any);
 
 sub _out   { return $_[0]->out || \*STDOUT }
 sub _in    { return $_[0]->in  || \*STDIN }
@@ -74,28 +69,28 @@ sub _them  { return 3 - $_[0]->_seat }
 
 sub BUILD {
     my ($self) = @_;
-    binmode $self->_out, ':encoding(UTF-8)' unless $self->_ascii;
-    my $previous = select $self->_out;
-    $| = 1;
-    select $previous;
+    my $out = $self->_out;
+    my $colour = defined $self->colour ? ($self->colour ? 1 : 0)
+        : ((eval { -t $out } && !Game::Terminal::Kit::Screen::no_colour()) ? 1 : 0);
+    my $paint = defined $self->paint ? ($self->paint ? 1 : 0) : $colour;
+    $self->keyboard(Game::Terminal::Kit::Keys->new(
+        in      => $self->_in,
+        pending => $self->pending,
+        ($self->keysource ? (keysource => $self->keysource) : ()),
+    )) unless $self->keyboard;
+    $self->screen(Game::Terminal::Kit::Screen->new(
+        out         => $out,
+        interactive => $paint,
+        colour      => $colour,
+        ascii       => $self->_ascii,
+    )) unless $self->screen;
+    $self->log(Game::Terminal::Kit::Log->new) unless $self->log;
+    $self->screen->utf8->flush_on;
     return $self;
 }
 
-sub _colour {
-    my ($self) = @_;
-    my $on = $self->_painting;
-    return $on if defined $on;
-    $on = defined $self->colour ? ($self->colour ? 1 : 0)
-        : ((eval { -t $self->_out } && !$ENV{NO_COLOR}) ? 1 : 0);
-    $self->_painting($on);
-    return $on;
-}
-
-sub _paint {
-    my ($self) = @_;
-    return $self->paint ? 1 : 0 if defined $self->paint;
-    return $self->_colour;
-}
+sub _colour { return $_[0]->screen->colour ? 1 : 0 }
+sub _paint  { return $_[0]->screen->interactive ? 1 : 0 }
 
 sub table_of {
     my ($self) = @_;
@@ -119,8 +114,9 @@ sub frame {
 
 sub headline {
     my ($self, $room) = @_;
-    my @said = @{ $self->_said || [] };
+    my @said = @{ $self->log->notes };
     return '' unless @said;
+    my $latest = $said[-1];
     my $line = '';
     while (@said) {
         my $next = pop @said;
@@ -128,13 +124,14 @@ sub headline {
         last if length $grown > $room;
         $line = $grown;
     }
-    $line = substr((pop @{ $self->_said }), 0, $room) unless length $line;
+    $line = substr($latest, 0, $room) unless length $line;
     return $line;
 }
 
 sub show {
     my ($self, $view, %o) = @_;
     my $handle = $self->_out;
+    my $screen = $self->screen;
     my $table  = $self->table_of;
     my $footer = defined $o{footer} ? $o{footer} : '';
     my $lines  = $self->frame($view,
@@ -142,9 +139,10 @@ sub show {
         footer => $footer,
         (defined $o{cursor} ? (cursor => $o{cursor}) : ()),
     );
-    print {$handle} "\e[H", join("\n", @$lines);
-    print {$handle} sprintf "\e[%d;%dH", $table->height, length($footer) + 3;
-    $self->_said([]);
+    $screen->at(1, 1);
+    print {$handle} join("\n", @$lines);
+    $screen->at($table->height, length($footer) + 3);
+    $self->log->shown;
     return;
 }
 
@@ -152,9 +150,7 @@ sub told {
     my ($self, @lines) = @_;
     return unless @lines;
     if ($self->_paint) {
-        my $said = $self->_said || [];
-        push @$said, @lines;
-        $self->_said($said);
+        $self->log->note(@lines);
         return;
     }
     $self->say("  $_") for @lines;
@@ -163,8 +159,7 @@ sub told {
 
 sub say {
     my ($self, @what) = @_;
-    my $handle = $self->_out;
-    print {$handle} @what, "\n";
+    $self->screen->say(join '', @what);
     return;
 }
 
@@ -254,9 +249,7 @@ sub prompt_for {
 
 sub keys_available {
     my ($self) = @_;
-    return 1 if $self->keysource;
-    return 0 unless eval { -t $self->_in };
-    return eval { require Term::ReadKey; 1 } ? 1 : 0;
+    return $self->keyboard->keys_available;
 }
 
 sub picking {
@@ -266,60 +259,25 @@ sub picking {
     return $self->keys_available;
 }
 
+sub raw {
+    my ($self) = @_;
+    return $self->keyboard->raw;
+}
+
 sub enter_raw {
     my ($self) = @_;
-    return $self if $self->raw;
-    if ($self->keysource) { $self->raw(1); return $self }
-    return undef unless $self->keys_available;
-    return undef unless eval { Term::ReadKey::ReadMode(3, $self->_in); 1 };
-    $self->raw(1);
-    return $self;
+    return $self->keyboard->enter_raw ? $self : undef;
 }
 
 sub leave_raw {
     my ($self) = @_;
-    return $self unless $self->raw;
-    eval { Term::ReadKey::ReadMode(0, $self->_in) } unless $self->keysource;
-    $self->raw(0);
+    $self->keyboard->leave_raw;
     return $self;
-}
-
-sub read_char {
-    my ($self, $wait) = @_;
-    my $pending = $self->pending;
-    return shift @$pending if @$pending;
-    return $self->keysource->($wait) if $self->keysource;
-    my $char = Term::ReadKey::ReadKey($wait ? 0 : -1, $self->_in);
-    return $char if defined $char || $wait;
-    select undef, undef, undef, 0.05;
-    return Term::ReadKey::ReadKey(-1, $self->_in);
 }
 
 sub read_key {
     my ($self) = @_;
-    my $char = $self->read_char(1);
-    return undef unless defined $char;
-    return $CONTROL{$char} if $CONTROL{$char};
-    return $self->read_sequence if $char eq "\e";
-    return $char;
-}
-
-sub read_sequence {
-    my ($self) = @_;
-    my $opener = $self->read_char(0);
-    return 'escape' unless defined $opener;
-    unless ($opener eq '[' || $opener eq 'O') {
-        unshift @{ $self->pending }, $opener;
-        return 'escape';
-    }
-    my $tail = '';
-    while (length $tail < 8) {
-        my $char = $self->read_char(0);
-        last unless defined $char;
-        $tail .= $char;
-        last if $char =~ /[A-Za-z~]/;
-    }
-    return $SEQUENCE{$tail} || 'escape';
+    return $self->keyboard->read_key;
 }
 
 sub card_line {
@@ -357,68 +315,78 @@ sub pick_help {
     );
 }
 
+sub picker {
+    my ($self, $view) = @_;
+
+    my %move = map { $_->{card} => $_ }
+               reverse grep { defined $_->{card} } @{ $view->{legal} };
+
+    my @items;
+    for my $slot (@{ $self->playable($view) }) {
+        my $card = $view->{hand}[ $slot - 1 ];
+        push @items, {
+            label => $self->card($card),
+            value => $move{$card},
+            card  => $card,
+            slot  => $slot,
+        };
+    }
+
+    return Game::Terminal::Kit::Picker->new(
+        items     => \@items,
+        numbered  => 0,
+        window    => 0,
+        game_keys => {
+            t => 'take', d => 'done', x => 'swap', r => 'resign', '?' => 'help',
+            (map { ($_ => $_) } 1 .. 9),
+        },
+    );
+}
+
 sub pick_move {
     my ($self, $view) = @_;
 
-    my $at_list = $self->playable($view);
-    my @slot = @$at_list;
+    my $picker = $self->picker($view);
+    my $items  = $picker->items;
 
     my %by;
     push @{ $by{ $_->{kind} } }, $_ for @{ $view->{legal} };
 
-    my $at = 0;
     my @notice;
 
     while (1) {
-        my $card = @slot ? $view->{hand}[ $slot[$at] - 1 ] : undef;
+        my $item = @$items ? $items->[ $picker->at ] : undef;
 
         $self->told(@notice) if @notice;
         @notice = ();
-        $self->told($self->card_line($view, $card)) if defined $card;
+        $self->told($self->card_line($view, $item->{card})) if $item;
 
         $self->position($view,
-            cursor => (defined $card ? $slot[$at] : undef),
+            cursor => ($item ? $item->{slot} : undef),
             footer => $self->pick_keys);
 
         my $key = $self->read_key;
-        return { kind => 'quit' }
-            if !defined $key || $key eq 'eof' || $key eq 'interrupt'
-            || $key eq 'q';
+        my ($event, $value) = $picker->step($key);
 
-        if (@slot && ($key eq 'left' || $key eq 'up')) {
-            $at = ($at - 1) % @slot;
-            next;
-        }
-        if (@slot && ($key eq 'right' || $key eq 'down' || $key eq 'tab')) {
-            $at = ($at + 1) % @slot;
-            next;
-        }
-        if (@slot && ($key eq 'home')) { $at = 0;       next }
-        if (@slot && ($key eq 'end'))  { $at = $#slot;  next }
+        return { kind => 'quit' } if $event eq 'quit';
+        return $value if $event eq 'chosen';
+        next if $event eq 'moved';
 
-        if (@slot && ($key eq 'enter' || $key eq ' ')) {
-            my ($move) = grep { defined $_->{card} && $_->{card} == $card }
-                @{ $view->{legal} };
-            return $move if $move;
-            @notice = ('you cannot play that one');
-            next;
+        if ($event eq 'key') {
+            return $by{$value}[0]
+                if $value =~ /\A(?:take|done|swap)\z/ && $by{$value};
+            return { kind => 'resign' } if $value eq 'resign';
+            if ($value eq 'help') { @notice = $self->pick_help; next }
+            if ($value =~ /\A[1-9]\z/) {
+                my ($found) = grep { $items->[$_]{slot} == $value } 0 .. $#$items;
+                if (defined $found) { $picker->jump($found); next }
+                @notice = ("you cannot play card $value");
+                next;
+            }
         }
 
-        if ($key eq 't' && $by{take}) { return $by{take}[0] }
-        if ($key eq 'd' && $by{done}) { return $by{done}[0] }
-        if ($key eq 'x' && $by{swap}) { return $by{swap}[0] }
-        if ($key eq 'r') { return { kind => 'resign' } }
-
-        if ($key =~ /\A[1-9]\z/) {
-            my ($found) = grep { $slot[$_] == $key } 0 .. $#slot;
-            if (defined $found) { $at = $found; next }
-            @notice = ("you cannot play card $key");
-            next;
-        }
-
-        if ($key eq '?') { @notice = $self->pick_help; next }
-
-        @notice = ('that key does nothing here');
+        @notice = ('that key does nothing here')
+            unless @$items && $STEER{$key};
     }
 }
 
@@ -557,8 +525,7 @@ sub play {
             $self->picking(0);
             $self->position($view);
 
-            my $handle = $self->_in;
-            my $said   = <$handle>;
+            my $said = $self->keyboard->read_line;
             last unless defined $said;
 
             $move = $self->move_for($view, $said);
@@ -589,8 +556,7 @@ sub open_screen {
     my ($self, $game) = @_;
 
     if ($self->_paint) {
-        my $handle = $self->_out;
-        print {$handle} "\e[2J\e[H";
+        $self->screen->clear;
         $self->told(sprintf 'durak: the loser is the fool, and seat %d opens',
                     $game->turn);
         return;
@@ -629,8 +595,7 @@ sub close_screen {
                :                        'they are the durak';
 
     $self->show($view, header => $over, footer => 'the deal is over');
-    my $handle = $self->_out;
-    print {$handle} "\e[0m\n";
+    $self->screen->say("\e[0m");
     return;
 }
 
@@ -662,6 +627,14 @@ trump, r resigns and q (or quit) stops.
 Exit status is 0 if you won or the deal was stopped, 1 if you were the fool,
 2 for an option the game will not take.
 USAGE
+}
+
+sub options {
+    return [
+        { name => 'level', type => 'int', min => 1, max => 5, help => 'how hard the bot plays' },
+        { name => 'seat', type => 'enum', choices => [qw(1 2)], help => 'your seat; the bot takes the other' },
+        { name => 'seed', type => 'str', help => 'the deal; the same seed deals the same cards' },
+    ];
 }
 
 sub run {
@@ -704,15 +677,9 @@ sub run {
         (defined $opt{pick} ? (picking => $opt{pick} ? 1 : 0) : ()),
     );
 
-    local @SIG{qw(INT TERM HUP)};
-    for my $sig (qw(INT TERM HUP)) {
-        $SIG{$sig} = sub { $terminal->leave_raw; $SIG{$sig} = 'DEFAULT'; kill $sig, $$ };
-    }
-
-    my $result = eval { $terminal->play };
-    my $died = $@;
-    $terminal->leave_raw;
-    die $died if $died;
+    my $result = Game::Terminal::Kit::Run::guard(
+        sub { $terminal->play }, $terminal->keyboard, $terminal->screen,
+    );
     return 0 unless $result;
 
     $terminal->say('');
@@ -733,7 +700,7 @@ Game::Durak::Terminal - a deal of durak at a terminal
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 
@@ -778,7 +745,8 @@ through the same loop and the same sentences.
 
 C<name_of> gives the ASCII pair and the glyph is decoration: C<--ascii> turns
 the glyphs off for a terminal that has no font for them, and colour follows
-C<-t> and C<NO_COLOR> unless it is asked for either way.
+C<-t> and C<NO_COLOR> unless it is asked for either way. C<NO_COLOR> set to
+anything but the empty string turns colour off.
 
 =head1 METHODS
 
@@ -787,6 +755,13 @@ C<-t> and C<NO_COLOR> unless it is asked for either way.
 What the terminal was built with. C<seat> is the seat you play, 1 or 2, and
 the other one is the bot. C<width> and C<height> are the painted screen's, and
 default to eighty by twenty-four.
+
+=head2 keyboard, screen, log
+
+The L<Game::Terminal::Kit::Keys> the keys are read with, the
+L<Game::Terminal::Kit::Screen> everything is written through, and the
+L<Game::Terminal::Kit::Log> that holds what L</told> was given until the next
+painted frame. Each is built from the other arguments unless one is passed.
 
 =head2 open_screen, position, close_screen
 
@@ -825,6 +800,31 @@ refuses, because a terminal with no game is not a game.
 Plays until the deal ends or the reader says so, and returns the result
 hashref, or undef when somebody quit.
 
+=head2 options
+
+    my $fields = Game::Durak::Terminal->options;
+
+The options a person would set before a game, in the order a launcher shows
+them. Each is a hash reference with a C<name>, a C<type> and a C<help>, and
+C<min> and C<max> or C<choices> where the type has them. A new list is
+returned each time.
+
+=over 4
+
+=item C<level>
+
+A whole number from 1 to 5: how hard the bot plays.
+
+=item C<seat>
+
+One of C<1>, C<2>: your seat; the bot takes the other.
+
+=item C<seed>
+
+Text: the deal; the same seed deals the same cards.
+
+=back
+
 =head2 run
 
     exit Game::Durak::Terminal->run(@ARGV);
@@ -834,7 +834,8 @@ F<bin/durak> documents, builds the terminal, plays the deal, prints the seed
 at the end, and returns the exit status rather than calling C<exit>: C<0> if
 you won or the deal was stopped, C<1> if you were the fool, C<2> for a bad
 option or a refused value, with the usage on C<STDERR>. C<--help> prints the
-usage on C<STDOUT> and returns C<0>. Signal handlers are local to the call and
+usage on C<STDOUT> and returns C<0>. The deal runs under
+L<Game::Terminal::Kit::Run/guard>: signal handlers are local to the call and
 the terminal is left in cooked mode on every way out, so a launcher such as
 L<Game::Terminal> can call it in its own process and carry on afterwards.
 Colour is off under C<NO_COLOR> as well as off a terminal.
@@ -873,9 +874,9 @@ follows L</keys_available>.
 =head2 keys_available, enter_raw, leave_raw
 
 Whether there is anything to read keys with, and cbreak on and off. B<cbreak
-rather than raw>, so an interrupt stays an interrupt. F<bin/durak> calls
-C<leave_raw> from a signal handler and after an C<eval> round the deal, because
-a program that dies in cbreak leaves the shell with no echo.
+rather than raw>, so an interrupt stays an interrupt. L</run> gives the
+terminal back on a signal and on an error as well as at the end, because a
+program that dies in cbreak leaves the shell with no echo.
 
 =head2 keysource, pending, raw
 
@@ -883,16 +884,26 @@ A coderef returning ONE character in place of L<Term::ReadKey>, characters read
 and given back, and the cbreak state. C<keysource> is what lets F<t/21> drive
 the key loop with no terminal and no L<Term::ReadKey> installed; one character
 a call, because a source handing back C<"\e[C"> whole never becomes a right
-arrow.
+arrow. C<keysource> and C<pending> are read when the terminal is built.
 
-=head2 read_char, read_key, read_sequence
+=head2 read_key
 
-One character, one keystroke as a name, and the tail of an escape sequence. A
-name is always longer than one character, so it never collides with one.
+One keystroke: the character itself, or a name from
+L<Game::Terminal::Kit::Keys/The names>. A name is always longer than one
+character, so it never collides with one.
+
+=head2 picker
+
+    my $picker = $terminal->picker($view);
+
+A L<Game::Terminal::Kit::Picker> over the cards L</playable> lists, in the
+order the hand is drawn, each with the move it would make as its value.
 
 =head2 pick_move, pick_keys, pick_help
 
-The key loop, its one-line legend and its key list. C<pick_move> returns a move
+The key loop, its one-line legend and its key list. Left, up and shift-tab go
+one way round the cards, right, down and tab the other, home and end to the
+ends, and a digit to the card with that number. C<pick_move> returns a move
 for L<Game::Durak/apply> exactly as L</move_for> does, so the loop in L</run>
 does not care which of the two answered.
 

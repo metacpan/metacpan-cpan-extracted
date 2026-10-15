@@ -8,7 +8,7 @@ use Clone        qw(clone);
 use File::Slurp  qw(read_file write_file);
 use List::Util   qw( uniq );
 use Scalar::Util qw(looks_like_number);
-use Time::HiRes  qw(gettimeofday);
+use Time::HiRes  qw(gettimeofday time);
 
 =head1 NAME
 
@@ -35,7 +35,7 @@ our $VERSION = '0.0.6';
 
 The stats names match those produced by "ps --libxo json".
 
-=head2 METHODS
+=head1 METHODS
 
 =head2 new
 
@@ -167,6 +167,12 @@ sub run {
 		}
 		$cache_is_new = 1;
 	}
+
+	# rates are computed over the time since the previous run, as saved in the
+	# cache, instead of assuming it was 300 seconds ago
+	my $run_time = time;
+	my $interval = $self->{obj}->interval_since( $proc_cache, $run_time );
+	$new_proc_cache->{__oslv_monitor__} = { time => $run_time };
 
 	my $base_stats = {
 		'copy-on-write-faults'         => 0,
@@ -430,12 +436,12 @@ sub run {
 		if ( $ENV{'OSLV_MONITOR_DEBUG'} ) {
 			warn(     'DEBUG, '
 					. join( '.', gettimeofday )
-					. ': backend run calling "/bin/ps ax --libxo json -o %cpu,%mem,pid,acflag,cow,dsiz,etimes,inblk,jail,majflt,minflt,msgrcv,msgsnd,nivcsw,nswap,nvcsw,oublk,rss,ssiz,systime,time,tsiz,usertime,vsz,pid,gid,uid,command,nsigs -J '
+					. ': backend run calling "/bin/ps ax --libxo json -o %cpu,%mem,pid,acflag,cow,dsiz,etimes,inblk,jail,majflt,minflt,msgrcv,msgsnd,nivcsw,nswap,nvcsw,oublk,rss,ssiz,systime,time,tsiz,usertime,vsz,gid,uid,command,nsigs -J '
 					. $jail
 					. ' 2> /dev/null"' );
 		}
 		$output
-			= `/bin/ps ax --libxo json -o %cpu,%mem,pid,acflag,cow,dsiz,etimes,inblk,jail,majflt,minflt,msgrcv,msgsnd,nivcsw,nswap,nvcsw,oublk,rss,ssiz,systime,time,tsiz,usertime,vsz,pid,gid,uid,command,nsigs -J $jail 2> /dev/null`;
+			= `/bin/ps ax --libxo json -o %cpu,%mem,pid,acflag,cow,dsiz,etimes,inblk,jail,majflt,minflt,msgrcv,msgsnd,nivcsw,nswap,nvcsw,oublk,rss,ssiz,systime,time,tsiz,usertime,vsz,gid,uid,command,nsigs -J $jail 2> /dev/null`;
 		my $ps;
 		eval { $ps = decode_json($output); };
 		if ( !$@ ) {
@@ -447,10 +453,10 @@ sub run {
 						. '' );
 			}
 			foreach my $proc ( @{ $ps->{'process-information'}{process} } ) {
-				# skip the kernel idle process... on a multi-core system its
-				# per-CPU idle threads make ps report roughly ncpu*100% for
-				# percent-cpu, which would otherwise be summed in and wildly
-				# inflate the reported jail/total CPU usage
+				# skip the kernel idle process... it is in jail 0, so -J should never
+				# list it, but guard against it defensively as its per-CPU idle
+				# threads make ps report roughly ncpu*100% for percent-cpu, which
+				# would wildly inflate the reported jail/total CPU usage
 				if ( defined( $proc->{command} ) && $proc->{command} eq '[idle]' ) {
 					next;
 				}
@@ -489,19 +495,19 @@ sub run {
 									&& defined( $proc_cache->{$cache_name}{$stat} )
 									&& $stat_value >= $proc_cache->{$cache_name}{$stat} )
 								{
-									$stat_value = ( $stat_value - $proc_cache->{$cache_name}{$stat} ) / 300;
+									$stat_value = ( $stat_value - $proc_cache->{$cache_name}{$stat} ) / $interval;
 								} elsif ( defined( $proc_cache->{$cache_name} )
 									&& defined( $proc_cache->{$cache_name}{$stat} ) )
 								{
 									# the counter went backwards (reset/PID reuse), so the raw
 									# value is what has accrued since then
-									$stat_value = $stat_value / 300;
+									$stat_value = $stat_value / $interval;
 								} elsif ( looks_like_number( $proc->{'elapsed-times'} )
-									&& $proc->{'elapsed-times'} <= 300 )
+									&& $proc->{'elapsed-times'} <= $interval )
 								{
 									# no cached previous value, but the proc is younger than the
 									# polling interval, so the total accrued is from this interval
-									$stat_value = $stat_value / 300;
+									$stat_value = $stat_value / $interval;
 								} else {
 									# a old proc with no cached previous value, so zero it to
 									# avoid a spike from the accumulated total... the raw values
@@ -527,7 +533,10 @@ sub run {
 					$new_proc_cache->{$cache_name} = $proc;
 				} ## end if ( $proc->{'elapsed-times'} ne '-' )
 			} ## end foreach my $proc ( @{ $ps->{'process-information'...}})
-		} ## end if ( !$@ )
+		} else {
+			# commonly the jail went away between jls and ps
+			push( @{ $data->{errors} }, 'decoding output from "ps" for jail "' . $jail . '" failed... ' . $@ );
+		}
 	} ## end foreach my $jail (@found_jails)
 
 	# save the proc cache for next run
@@ -602,23 +611,6 @@ sub usable {
 
 	return 1;
 } ## end sub usable
-
-sub ip_to_if {
-	my $self = $_[0];
-	my $ip   = $_[1];
-
-	if ( !defined($ip) || ref($ip) ne '' ) {
-		return undef;
-	}
-
-	my $if = IO::Interface::Simple->new_from_address($ip);
-
-	if ( !defined($if) ) {
-		return undef;
-	}
-
-	return $if->name;
-} ## end sub ip_to_if
 
 =head1 AUTHOR
 

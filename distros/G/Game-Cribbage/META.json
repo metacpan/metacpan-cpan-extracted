@@ -36,10 +36,11 @@
          },
          "requires" : {
             "Array::Diff" : "0",
+            "Game::Terminal::Kit" : "0.05",
             "List::Util" : "0",
             "Object::Proto::Sugar" : "0.05",
             "ntheory" : "0",
-            "perl" : "5.006"
+            "perl" : "5.014"
          }
       },
       "test" : {
@@ -49,6 +50,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.17",
+   "version" : "0.18",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

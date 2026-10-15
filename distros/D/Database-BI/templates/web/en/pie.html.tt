@@ -9,30 +9,6 @@
     gap: 1rem;
     margin: 1rem 0;
   }
-  /* Export bar matches the line graph page style */
-  .pie-export-bar {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    margin-bottom: 0.5rem;
-  }
-  .btn-pie-export {
-    padding: 0.28rem 0.75rem;
-    border: 1px solid #888;
-    border-radius: 6px;
-    background: transparent;
-    color: #444;
-    font-size: 0.82rem;
-    cursor: pointer;
-    transition: background 0.12s;
-  }
-  .btn-pie-export:hover { background: #f0f0f0; }
-  .pie-slice-count {
-    font-size: 0.82rem;
-    color: #666;
-    margin-left: 0.25rem;
-  }
   .chart-source {
     margin: 0.25rem 0 0;
     font-size: 0.82rem;
@@ -46,10 +22,10 @@
 
 <h2 class="graph-title">[% title | html %]</h2>
 
-<div class="pie-export-bar">
-  <button class="btn-pie-export" onclick="biPieExportSVG()">Export SVG</button>
-  <button class="btn-pie-export" onclick="biPieExportPNG()">Export PNG</button>
-  <span class="pie-slice-count">
+<div class="graph-export-bar">
+  <button class="btn-graph-export" onclick="biPieExportSVG()">Export SVG</button>
+  <button class="btn-graph-export" onclick="biPieExportPNG()">Export PNG</button>
+  <span class="graph-point-count">
     [% slice_count %] slice[% IF slice_count != 1 %]s[% END %]
     [% IF slice_count > 12 %](top 12 shown)[% END %]
   </span>
@@ -57,11 +33,11 @@
 
 <div class="pie-container">
   <script src="https://d3js.org/d3.v7.min.js"></script>
-  [% pie_html %]
+  [% chart_html %]
 </div>
 
 <!-- Metadata read by the drill-down click handler below. -->
-<div id="pie-meta" data-back-url="[% back_url | html %]" data-cat-col="[% cat_col | html %]" data-currency="[% currency_symbol | html %]" hidden></div>
+<div id="pie-meta" data-back-url="[% drill_back_url | html %]" data-cat-col="[% cat_col | html %]" data-currency="[% currency_symbol | html %]" hidden></div>
 
 <script>
 // Clicking a slice or legend entry filters the source table to that category.

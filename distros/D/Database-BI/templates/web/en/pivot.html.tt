@@ -1,0 +1,336 @@
+[%- WRAPPER 'web/en/layouts/default.html.tt' -%]
+
+<style>
+  .pivot-wrap { overflow-x: auto; }
+  .pivot-table {
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    min-width: 100%;
+  }
+  .pivot-table th, .pivot-table td {
+    border: 1px solid #d0d4de;
+    padding: 0.35rem 0.55rem;
+    white-space: nowrap;
+  }
+  .pivot-table thead th {
+    /* Inherits white-on-dark-blue background/color from default.html.tt.
+       Measure headers are centred; dim-header overrides to left. */
+    font-weight: 600;
+    text-align: center;
+  }
+  .pivot-table thead th.dim-header {
+    text-align: left;
+  }
+  .pivot-table thead th.total-header {
+    /* inherits background/color from default.html.tt thead tr rule */
+  }
+  .pivot-table td.row-dim {
+    font-weight: 500;
+    background: #f8f9fc;
+  }
+  .pivot-table td.cell-val {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .pivot-table td.cell-empty {
+    text-align: center;
+    color: #999;
+  }
+  .pivot-table tr.totals-row td, .pivot-table tr.totals-row th {
+    background: #e8ecf7;
+    font-weight: 600;
+  }
+  .pivot-export { margin: 0.75rem 0; display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+  .btn-pexport {
+    padding: 0.3rem 0.75rem;
+    border: 1px solid #8899cc;
+    border-radius: 4px;
+    background: #f0f3fc;
+    color: #2c3e7a;
+    cursor: pointer;
+    font-size: 0.85rem;
+    text-decoration: none;
+  }
+  .btn-pexport:hover { background: #dde3f0; }
+  .pivot-meta { font-size: 0.82rem; color: #666; }
+  .scheme-min { color: #0055aa; }
+  .scheme-max { color: #cc2200; }
+  .piv-pagination { display: flex; align-items: center; gap: 0.5rem; margin: 0.75rem 0; flex-wrap: wrap; }
+  .piv-page-btn {
+    padding: 0.3rem 0.7rem;
+    border: 1px solid #8899cc;
+    border-radius: 4px;
+    background: #f0f3fc;
+    color: #2c3e7a;
+    text-decoration: none;
+    font-size: 0.85rem;
+  }
+  .piv-page-btn:hover { background: #dde3f0; }
+  .piv-page-btn-dis { background: #f8f9fc; color: #aaa; border-color: #ccc; cursor: default; }
+  .piv-page-btn-cur { background: #2c3e7a; color: #fff; border-color: #2c3e7a; cursor: default; }
+  .piv-page-info { font-size: 0.82rem; color: #555; }
+</style>
+
+<p class="back-link"><a href="/">&larr; Home</a>[% IF back_url && back_url != '/' %] &rsaquo; <a href="[% back_url | html %]">[% back_label | html %]</a>[% END %][%- IF back2_url -%] &rsaquo; <a href="[% back2_url | html %]">[% back2_label || 'Back' | html %]</a>[%- END -%]</p>
+
+<h2 style="margin-bottom:0.75rem">[% title | html %]</h2>
+
+<div class="pivot-export">
+  [%- SET base = request.url -%]
+  <a class="btn-pexport" href="[% request.url | html %]&amp;format=csv">Export CSV</a>
+  <a class="btn-pexport" href="[% request.url | html %]&amp;format=sqlite">Export SQLite</a>
+  <a class="btn-pexport" href="[% request.url | html %]&amp;format=json">Export JSON</a>
+  <span class="pivot-meta">
+    [% total_row_groups %] row group[% IF total_row_groups != 1 %]s[% END %],
+    [% col_combos.size %] column combo[% IF col_combos.size != 1 %]s[% END %]
+  </span>
+</div>
+
+[%- IF grid_rows.size == 0 -%]
+<p>No data to display for the selected dimensions and measures.</p>
+[%- ELSE -%]
+<div class="pivot-wrap">
+<table class="pivot-table">
+<thead>
+[%- IF cols_dims.size > 0 -%]
+  <tr>
+    [%- FOREACH dim IN rows_dims -%]<th class="dim-header" rowspan="2">[% dim | html %]</th>[%- END -%]
+    [%- FOREACH cc IN col_combos -%]
+      <th colspan="[% measures.size %]">
+        [%- FOREACH cd IN cols_dims -%][% cc.dim_vals.$cd | html %][% UNLESS loop.last %] / [% END %][%- END -%]
+      </th>
+    [%- END -%]
+    [%- IF show_totals -%]<th class="total-header" colspan="[% measures.size %]">Total</th>[%- END -%]
+  </tr>
+  <tr>
+    [%- FOREACH cc IN col_combos -%]
+      [%- FOREACH m IN measures -%]<th>[% m.as | html %]</th>[%- END -%]
+    [%- END -%]
+    [%- IF show_totals -%]
+      [%- FOREACH m IN measures -%]<th class="total-header">[% m.as | html %]</th>[%- END -%]
+    [%- END -%]
+  </tr>
+[%- ELSE -%]
+  <tr>
+    [%- FOREACH dim IN rows_dims -%]<th class="dim-header">[% dim | html %]</th>[%- END -%]
+    [%- FOREACH m IN measures -%]<th>[% m.as | html %]</th>[%- END -%]
+    [%- IF show_totals -%]<th class="total-header">Total</th>[%- END -%]
+  </tr>
+[%- END -%]
+</thead>
+<tbody>
+[%- FOREACH gr IN grid_rows -%]
+  <tr>
+    [%- FOREACH dim IN rows_dims -%]
+      <td class="row-dim">[% gr.row_vals.$dim | html %]</td>
+    [%- END -%]
+    [%- FOREACH cc IN col_combos -%]
+      [%- FOREACH m IN measures -%]
+        [%- SET cv = gr.cells.${cc.key}.${m.as} -%]
+        [%- IF cv.length -%]
+          <td class="cell-val">[% cv | html %]</td>
+        [%- ELSE -%]
+          <td class="cell-empty">&mdash;</td>
+        [%- END -%]
+      [%- END -%]
+    [%- END -%]
+    [%- IF show_totals -%]
+      [%- FOREACH m IN measures -%]
+        [%- SET sv = gr.subtotals.${m.as} -%]
+        [%- IF sv.length -%]
+          <td class="cell-val">[% sv | html %]</td>
+        [%- ELSE -%]
+          <td class="cell-empty">&mdash;</td>
+        [%- END -%]
+      [%- END -%]
+    [%- END -%]
+  </tr>
+[%- END -%]
+</tbody>
+[%- IF show_totals -%]
+<tfoot>
+  <tr class="totals-row">
+    [%- FOREACH dim IN rows_dims -%]
+      [%- IF loop.first -%]<td class="row-dim">Total</td>[%- ELSE -%]<td></td>[%- END -%]
+    [%- END -%]
+    [%- FOREACH cc IN col_combos -%]
+      [%- FOREACH m IN measures -%]
+        [%- SET ctv = col_subtotals.${cc.key}.${m.as} -%]
+        [%- IF ctv.length -%]
+          <td class="cell-val">[% ctv | html %]</td>
+        [%- ELSE -%]
+          <td class="cell-empty">&mdash;</td>
+        [%- END -%]
+      [%- END -%]
+    [%- END -%]
+    [%- FOREACH m IN measures -%]
+      [%- SET gtv = grand_total.${m.as} -%]
+      [%- IF gtv.length -%]
+        <td class="cell-val">[% gtv | html %]</td>
+      [%- ELSE -%]
+        <td class="cell-empty">&mdash;</td>
+      [%- END -%]
+    [%- END -%]
+  </tr>
+</tfoot>
+[%- END -%]
+</table>
+</div>
+
+[%- SET pnum = page ? page : 0 -%]
+[%- IF pnum > 1 OR has_next -%]
+[%- SET sep = (page_base_url.search('\?') >= 0) ? '&amp;' : '?' -%]
+<nav class="piv-pagination" aria-label="Pivot page navigation">
+  [%- IF pnum > 1 -%]
+  <a class="piv-page-btn" href="[% page_base_url | html %][% sep %]page=[% pnum - 1 %]&amp;per_page=[% per_page %]">&laquo; Prev</a>
+  [%- ELSE -%]
+  <span class="piv-page-btn piv-page-btn-dis">&laquo; Prev</span>
+  [%- END -%]
+  <span class="piv-page-btn piv-page-btn-cur">[% page %]</span>
+  [%- IF has_next -%]
+  <a class="piv-page-btn" href="[% page_base_url | html %][% sep %]page=[% pnum + 1 %]&amp;per_page=[% per_page %]">Next &raquo;</a>
+  [%- ELSE -%]
+  <span class="piv-page-btn piv-page-btn-dis">Next &raquo;</span>
+  [%- END -%]
+  <span class="piv-page-info">Page [% page %] &mdash; [% per_page %] row groups/page</span>
+</nav>
+[%- END -%]
+
+<script>
+// ---------------------------------------------------------------------------
+// Pivot table: click-to-sort and (flat header only) drag-to-reorder columns
+// ---------------------------------------------------------------------------
+(function () {
+  var table = document.querySelector('table.pivot-table');
+  if (!table || !table.tHead || !table.tBodies[0]) return;
+
+  // NDIMS: number of row-dimension columns (always at the left of every tbody row)
+  // HASTWO: true when col-dimension headers produce a 2-level thead
+  var NDIMS  = [% rows_dims.size %];
+  var HASTWO = [% (cols_dims.size > 0) ? 1 : 0 %];
+
+  // "Leaf" headers: the row of <th> cells that map 1:1 onto tbody columns.
+  // In the 2-level case this is tHead row 1 (dim headers span via rowspan=2).
+  // In the flat case this is tHead row 0.
+  var leafRow     = table.tHead.rows[HASTWO ? 1 : 0];
+  var leafHeaders = Array.from(leafRow.cells);
+
+  var dragSrcIdx = null;
+  var sortColIdx = -1;
+  var sortAsc    = true;
+
+  // Compute the DOM cell index in tbody/tfoot for a leaf-header position.
+  // In the 2-level case the dim cells (rowspan=2) occupy positions 0..NDIMS-1
+  // in the tbody but are absent from tHead row 1, so offset by NDIMS.
+  function domColIdx(leafIdx) {
+    return HASTWO ? NDIMS + leafIdx : leafIdx;
+  }
+
+  function sortByCol(leafIdx, asc) {
+    var dIdx  = domColIdx(leafIdx);
+    var tbody = table.tBodies[0];
+    var rows  = Array.from(tbody.rows);
+
+    var nonEmpty = rows
+      .map(function (r) { return r.cells[dIdx] ? r.cells[dIdx].textContent.trim() : ''; })
+      .filter(Boolean);
+
+    var numeric = nonEmpty.length > 0 && nonEmpty.every(function (v) {
+      var s = v.replace(/[^\d.\-]/g, '');
+      return s.length > 0 && !isNaN(parseFloat(s));
+    });
+
+    rows.sort(function (a, b) {
+      var av = a.cells[dIdx] ? a.cells[dIdx].textContent.trim() : '';
+      var bv = b.cells[dIdx] ? b.cells[dIdx].textContent.trim() : '';
+      var cmp;
+      if (numeric) {
+        var an = parseFloat(av.replace(/[^\d.\-]/g, '') || '0');
+        var bn = parseFloat(bv.replace(/[^\d.\-]/g, '') || '0');
+        cmp = an - bn;
+      } else {
+        cmp = av.localeCompare(bv, undefined, { numeric: true, sensitivity: 'base' });
+      }
+      return asc ? cmp : -cmp;
+    });
+    rows.forEach(function (r) { tbody.appendChild(r); });
+
+    leafHeaders.forEach(function (h, i) {
+      h.setAttribute('aria-sort', i === leafIdx ? (asc ? 'ascending' : 'descending') : 'none');
+    });
+  }
+
+  // Move leaf column from -> to (flat mode only: no col-dim group structure to break).
+  function moveCol(from, to) {
+    var fd = domColIdx(from);
+    var td = domColIdx(to);
+    Array.from(table.rows).forEach(function (row) {
+      var cells  = Array.from(row.children);
+      var moving = cells[fd];
+      var target = cells[td];
+      if (!moving || !target) return;
+      row.insertBefore(moving, from < to ? target.nextSibling : target);
+    });
+    var moved = leafHeaders.splice(from, 1)[0];
+    leafHeaders.splice(to, 0, moved);
+    if      (sortColIdx === from)                                  sortColIdx = to;
+    else if (from < to && sortColIdx > from && sortColIdx <= to)   sortColIdx--;
+    else if (from > to && sortColIdx >= to  && sortColIdx <  from) sortColIdx++;
+  }
+
+  leafHeaders.forEach(function (th) {
+    th.setAttribute('aria-sort', 'none');
+    th.style.cursor = 'pointer';
+    th.title = 'Click to sort' + (!HASTWO ? ' | Drag to reorder' : '');
+
+    th.addEventListener('click', function () {
+      if (dragSrcIdx !== null) return;
+      var idx = leafHeaders.indexOf(th);
+      if (sortColIdx === idx) { sortAsc = !sortAsc; }
+      else { sortColIdx = idx; sortAsc = true; }
+      sortByCol(sortColIdx, sortAsc);
+    });
+
+    // Drag-to-reorder only works in flat (single-row header) mode -- in the
+    // 2-level case moving individual measure columns would break the colspan
+    // group labels in the first header row.
+    if (!HASTWO) {
+      th.setAttribute('draggable', 'true');
+
+      th.addEventListener('dragstart', function (e) {
+        dragSrcIdx = leafHeaders.indexOf(th);
+        e.dataTransfer.effectAllowed = 'move';
+        setTimeout(function () { th.classList.add('dragging'); }, 0);
+      });
+
+      th.addEventListener('dragend', function () {
+        th.classList.remove('dragging');
+        leafHeaders.forEach(function (h) { h.classList.remove('drag-over'); });
+        dragSrcIdx = null;
+      });
+
+      th.addEventListener('dragover', function (e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        leafHeaders.forEach(function (h) { h.classList.remove('drag-over'); });
+        if (leafHeaders.indexOf(th) !== dragSrcIdx) th.classList.add('drag-over');
+      });
+
+      th.addEventListener('dragleave', function () {
+        th.classList.remove('drag-over');
+      });
+
+      th.addEventListener('drop', function (e) {
+        e.preventDefault();
+        var toIdx = leafHeaders.indexOf(th);
+        if (dragSrcIdx !== null && dragSrcIdx !== toIdx) moveCol(dragSrcIdx, toIdx);
+        leafHeaders.forEach(function (h) { h.classList.remove('drag-over'); });
+      });
+    }
+  });
+}());
+</script>
+
+[%- END -%]
+
+[%- END -%]

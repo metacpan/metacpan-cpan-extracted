@@ -6,7 +6,7 @@ use warnings;
 
 use Exporter 'import';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use constant {
     PAIKA      => 0,
@@ -47,8 +47,8 @@ my %DIR = (
 my %LETTER = (APPROACH, 'A', WITHDRAWAL, 'W');
 my %KIND   = (A => APPROACH, W => WITHDRAWAL);
 
-my %HEADER = map { $_ => 1 } qw(variant start quiet_limit repeat ply_cap white black result);
-my @HEADER = qw(variant start quiet_limit repeat ply_cap white black result);
+my %HEADER = map { $_ => 1 } qw(variant start quiet_limit repeat ply_cap white black result offer chain);
+my @HEADER = qw(variant start quiet_limit repeat ply_cap white black result offer chain);
 
 my $size_ok = sub {
     my ($cols, $rows) = @_;
@@ -314,7 +314,7 @@ sub parse_game {
     my @lines = split /\n/, $text;
     return $fail->('not_a_game', 1) unless @lines && $lines[0] eq 'fanorona 1';
 
-    my (%game, $n);
+    my (%game, %at, $n);
     for ($n = 1; $n < @lines; $n++) {
         my $line = $lines[$n];
         last if $line eq 'moves';
@@ -325,7 +325,11 @@ sub parse_game {
         return $fail->('bad_header', $n + 1) if $value =~ /[^\x20-\x7e]/;
         return $fail->('bad_number', $n + 1)
             if $key =~ /\A(?:quiet_limit|repeat|ply_cap)\z/ && $value !~ /\A(?:0|[1-9][0-9]{0,5})\z/;
+        return $fail->('bad_offer', $n + 1)
+            if $key eq 'offer' && ($value !~ /\A(?:white|black)\z/ || exists $game{result});
+        return $fail->('bad_offer', $n + 1) if $key eq 'result' && exists $game{offer};
         $game{$key} = $value;
+        $at{$key} = $n + 1;
     }
     return $fail->('no_moves_line', scalar @lines) unless $n < @lines;
     my $moves_at = $n;
@@ -336,6 +340,10 @@ sub parse_game {
     if (defined $game{start}) {
         my $start = parse_position($game{start}) or return $fail->('bad_start', 2);
         return $fail->('bad_start', 2) unless $start->{cols} == $cols && $start->{rows} == $rows;
+    }
+    if (defined $game{chain}) {
+        my ($parsed, $reason) = parse_move($game{chain}, cols => $cols, rows => $rows);
+        return $fail->($reason, $at{chain}) unless $parsed;
     }
 
     my @moves;
@@ -349,6 +357,7 @@ sub parse_game {
     $game{moves_at} = $moves_at + 2;
     $game{cols} = $cols;
     $game{rows} = $rows;
+    $game{at} = \%at;
     return \%game;
 }
 
@@ -364,7 +373,7 @@ Game::Fanorona::Notation - moves, positions and games of fanorona as text
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 
@@ -445,7 +454,13 @@ A first line that says what this is, header lines of a word and a value, a
 line C<moves>, and then one move a line. The headers are C<variant> (C<sivy>,
 C<dimy>, C<telo>, or a size such as C<7x5>; C<sivy> when absent), C<start> (a
 position, when the game does not begin from the set-up), C<quiet_limit>,
-C<repeat>, C<ply_cap>, C<white>, C<black> and C<result>.
+C<repeat>, C<ply_cap>, C<white>, C<black>, C<result>, C<offer> and C<chain>.
+
+C<result> is how the game ended: a way and a winner, as C<resign black>, or a
+way alone for a draw, as C<agreement>. C<offer> is C<white> or C<black>, the
+side whose offer of a draw is standing, and is never beside a C<result>.
+C<chain> is the steps made so far of a move not yet finished, written as a
+move is, as C<b2-c2A-c3A>.
 
 That is everything needed to play a game again, because nothing in fanorona
 is left to chance.
@@ -637,14 +652,16 @@ move. What it writes is always something C<parse_game> reads.
     my ($game, $why, $line) = parse_game($text);
 
 A game as a hash: each header that was present, C<variant> always, C<cols>
-and C<rows> for its board, C<moves>, an array reference of move strings, and
-C<moves_at>, the number of the line the first move is on or would be on.
+and C<rows> for its board, C<moves>, an array reference of move strings,
+C<moves_at>, the number of the line the first move is on or would be on, and
+C<at>, a hash reference from each header present to the number of its line.
 Or C<undef>, a word for why, and the number of the line at fault.
 
 The reasons: C<empty>, C<not_a_game> for a first line that is not
 C<fanorona 1>, C<bad_header>, C<unknown_header>, C<repeated_header>,
-C<bad_number>, C<no_moves_line>, C<bad_variant>, C<bad_start>, and any reason
-C<parse_move> gives for a move. A move that parses is already written the one
+C<bad_number>, C<bad_offer> for an offer by something that is not a side or
+an offer beside a result, C<no_moves_line>, C<bad_variant>, C<bad_start>, and
+any reason C<parse_move> gives for a move or for the C<chain>. A move that parses is already written the one
 way C<format_move> writes it, so nothing more is asked of it.
 
 B<A game that parses is well formed, and may still not be a game.> Whether

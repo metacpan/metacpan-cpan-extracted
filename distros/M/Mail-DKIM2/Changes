@@ -1,5 +1,12 @@
 Revision history for Mail::DKIM2
 
+0.21    2026-10-14
+        - Mail::DKIM2::Wrap::wrap_single_part, in list context, also returns
+          why it wrapped nothing: multipart (the normal case), no-header-end,
+          unparsable-header or boundary. Scalar context is unchanged.
+        - dkim2-milter --wrap-single-part logs that reason; it logged every
+          case as "already multipart".
+
 0.20    2026-10-14
         DKIM2 for stock Mailman, with dkim2-milter and Postfix routing only.
         - New: dkim2-milter --wrap-single-part (inbound mode, needs

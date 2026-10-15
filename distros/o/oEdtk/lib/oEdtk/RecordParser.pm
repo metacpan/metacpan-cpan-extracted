@@ -4,12 +4,12 @@ use strict;
 use warnings;
 use Data::Dumper;
 use Scalar::Util qw(blessed);
-our $VERSION		= 2.1109;
+our $VERSION = 2.1109;
 
 # FINE-TUNE PARAMETRIZATION
 my $_denormalized_record = "OPTION";
-# my $_denormalized_split_motif=; 
 
+# my $_denormalized_split_motif=;
 
 sub dumper {
 	my $self = shift;
@@ -17,48 +17,51 @@ sub dumper {
 	return Dumper(shift);
 }
 
-
 sub new {
-	my ($class, $fh, %records) = @_;
+	my ( $class, $fh, %records ) = @_;
 	defined($fh) or die "ERROR: not defined filhandle $fh : $!\n";
 	my %seek_keys;
 
-#	foreach (values %records) {
-#		if (defined($_) && (!blessed($_) || !$_->isa('oEdtk::Record'))) {
-#			die "ERROR: oEdtk::RecordParser::new only accepts oEdtk::Record objects in the hash\n";
-#		}
-#		$seek_keys{$_->{'seek_key'}} .= $_->{'id_key'};
-#		$seek_keys{$_->{'seek_key'}} .= keys ($records->{$id});
-#		warn "INFO : seek_key = ". $_->{'seek_key'} ." = ".$seek_keys{$_->{'seek_key'}}."\n";
-#	}
+	#	foreach (values %records) {
+	#		if (defined($_) && (!blessed($_) || !$_->isa('oEdtk::Record'))) {
+	#			die "ERROR: oEdtk::RecordParser::new only accepts oEdtk::Record objects in the hash\n";
+	#		}
+	#		$seek_keys{$_->{'seek_key'}} .= $_->{'id_key'};
+	#		$seek_keys{$_->{'seek_key'}} .= keys ($records->{$id});
+	#		warn "INFO: seek_key = ". $_->{'seek_key'} ." = ".$seek_keys{$_->{'seek_key'}}."\n";
+	#	}
 
-	foreach my $key (keys %records) {
+	foreach my $key ( keys %records ) {
 		my $object = $records{$key};
-		if (defined($object) && (!blessed($object) || !$object->isa('oEdtk::Record')) ) {
+		if ( defined($object) && ( !blessed($object) || !$object->isa('oEdtk::Record') ) ) {
 			die "ERROR: oEdtk::RecordParser::new only accepts oEdtk::Record objects in the hash\n";
 
-		} elsif (defined($object)) { # ignore undef records
+		}
+		elsif ( defined($object) ) {    # ignore undef records
+
 #			warn "DEBUG: $key = ". $object->{'seek_key'} ." - isa('oEdtk::Record') ? ". $object->isa('oEdtk::Record') ." \n";
 #			$seek_keys{$object->{'seek_key'}} .= $object->{'id_key'};
-			$seek_keys{$object->{'seek_key'}} .= $key;
-			# INFO : seek_key = LIGNE.{153}(.{10}) = L5L6T3L7L4C1T6T4T7F5L3T5
-#			warn "INFO : seek_key = ". $object->{'seek_key'} ." = ".$seek_keys{$object->{'seek_key'}}."\n";
+			$seek_keys{ $object->{'seek_key'} } .= $key;
+
+  # INFO: seek_key = LIGNE.{153}(.{10}) = L5L6T3L7L4C1T6T4T7F5L3T5
+  #			warn "INFO: seek_key = ". $object->{'seek_key'} ." = ".$seek_keys{$object->{'seek_key'}}."\n";
 		}
 	}
 
-
 	my $self = {
-		input		=> $fh,
-		records		=> \%records,
-		seek_keys		=> \%seek_keys,
-		line			=> '',
-		skip_line		=> 'FLUX',
-		mute_record	=> 'ENTETE',
-		mute_id		=> 'ENT',
-		line_record	=> 'LIGNE',
-		key_offset 	=> 153,
-		key_size		=> 10,
-		denormalized	=> 'OPTION',
+		input                    => $fh,
+		records                  => \%records,
+		seek_keys                => \%seek_keys,
+		line                     => '',
+		skip_line                => 'FLUX',
+		mute_record              => 'ENTETE',
+		mute_id                  => 'ENT',
+		line_record              => 'LIGNE',
+		key_offset               => 153,
+		key_size                 => 10,
+		denormalized             => 'OPTION',
+		denormalized_option      => 'OPTION',
+		denormalized_on          => 'ON',
 		denormalized_split_motif => "\x{0}|\x{1}|\x{2}"
 	};
 
@@ -66,120 +69,169 @@ sub new {
 	return $self;
 }
 
-
 sub set_skip_line {
-	my ($self, $value)= @_;
+	my ( $self, $value ) = @_;
 
 	$self->{'skip_line'} .= $value;
 }
 
 sub set_mute_record {
-	my ($self, $value)= @_;
+	my ( $self, $value ) = @_;
 
 	$self->{'mute_record'} .= $value;
 }
 
 sub set_mute_id {
-	my ($self, $value)= @_;
+	my ( $self, $value ) = @_;
 
 	$self->{'mute_id'} .= $value;
 }
 
 sub set_line_record {
-	my ($self, $value)= @_;
+	my ( $self, $value ) = @_;
 
 	$self->{'line_record'} .= $value;
 }
 
 sub set_key_offset {
-	my ($self, $value)= @_;
+	my ( $self, $value ) = @_;
 
 	$self->{'key_offset'} .= $value;
 }
 
 sub set_key_size {
-	my ($self, $value)= @_;
+	my ( $self, $value ) = @_;
 
 	$self->{'key_size'} .= $value;
 }
 
+# Set the denormalized-record options. The mainline keeps a single
+# "denormalized" key that next() reads; the fork splits it into an
+# "option" and an "on" key. set_denormalized_record feeds both fork
+# keys so the mainline and fork nomenclatures stay equivalent.
 sub set_denormalized_record {
-	my ($self, $value)= @_;
+	my ( $self, $value ) = @_;
 
-	$self->{'denormalized'} .= $value;
+	$self->{'denormalized'}        .= $value;
+	$self->{'denormalized_option'} .= $value;
+	$self->{'denormalized_on'}     .= $value;
+}
+
+# Fork accessors (S42): each writes only its own key, faithfully to F.
+sub set_denormalized_option_record {
+	my ( $self, $value ) = @_;
+
+	$self->{'denormalized_option'} .= $value;
+}
+
+sub set_denormalized_on_record {
+	my ( $self, $value ) = @_;
+
+	$self->{'denormalized_on'} .= $value;
 }
 
 sub add_motif_to_denormalized_split {
-	my ($self, $motif)= @_;
-	
-	$self->{'denormalized_split_motif'} .= "|".$motif;
+	my ( $self, $motif ) = @_;
+
+	$self->{'denormalized_split_motif'} .= "|" . $motif;
 }
 
 sub set_motif_to_denormalized_split {
-	my ($self, $motif)= @_;
-	
+	my ( $self, $motif ) = @_;
+
 	$self->{'denormalized_split_motif'} = $motif;
 }
 
+# True when the configured cleanup of non-Latin-1 bytes (the DEL character and
+# the C1 controls) is on. EDTK_RP_KILL_NON_LATIN is a COMPO key, off by
+# default: the mainline assumes its input is sane. config_read() re-parses the
+# ini on every call, so the switch is read once per process and cached; a
+# missing or unreadable configuration leaves it off.
+my $KILL_NON_LATIN;
+
+sub _kill_non_latin_chars {
+	my $cfg = shift;
+	if ( !defined $cfg ) {
+		unless ( defined $KILL_NON_LATIN ) {
+			my $read = eval { require oEdtk::Config; oEdtk::Config::config_read('COMPO') } || {};
+			$KILL_NON_LATIN = _kill_non_latin_chars($read);
+		}
+		return $KILL_NON_LATIN;
+	}
+	return ( ref $cfg && $cfg->{'EDTK_RP_KILL_NON_LATIN'} ) ? 1 : 0;
+}
 
 # Parse and return the next record in the stream.
 sub next {
 	my ($self) = @_;
 
 	my $denormalized_split_motif = $self->{'denormalized_split_motif'};
-	my $denormalized	= $self->{'denormalized'};
-	my $records 		= $self->{'records'};
-	my $seek_keys		= $self->{'seek_keys'};
-	my $skip_line		= $self->{'skip_line'};
-	my $mute_record	= $self->{'mute_record'};
-	my $line_record	= $self->{'line_record'};
-	my $key_offset		= $self->{'key_offset'};
-	my $key_size		= $self->{'key_size'};
-	my $fh 			= $self->{'input'};
+	my $denormalized             = $self->{'denormalized'};
+	my $records                  = $self->{'records'};
+	my $seek_keys                = $self->{'seek_keys'};
+	my $skip_line                = $self->{'skip_line'};
+	my $mute_record              = $self->{'mute_record'};
+	my $line_record              = $self->{'line_record'};
+	my $key_offset               = $self->{'key_offset'};
+	my $key_size                 = $self->{'key_size'};
+	my $fh                       = $self->{'input'};
 	defined($fh) or die "ERROR: not defined filhandle $fh : $!\n";
 
-
-	my ($id, $data) = ("","");
+	my ( $id, $data ) = ( "", "" );
 	do {
 		my $line = <$fh>;
 
 		# Skip lines starting with FLUX.
-		while (defined($line) && $line =~ /^$skip_line/) {
+		while ( defined($line) && $line =~ /^$skip_line/ ) {
 			$line = <$fh>;
 		}
 		return () unless defined $line;
 
+		# Strip the non-Latin-1 bytes a mis-encoded input may carry (the fork
+		# does this unconditionally; the mainline gates it on a key, off by
+		# default).
+		if ( _kill_non_latin_chars() ) {
+			require oEdtk::Utils;
+			oEdtk::Utils::kill_non_latin_1_9_chars_in_place( \$line );
+		}
+
 		chomp $line;
 		$self->{'line'} = $line;
 
-		SEEK: {
-			if ($line =~ /^$denormalized(.*)$/) {
-				$data= $1;
-				$id	= $denormalized;
-	
-			} else {
-				foreach my $search_key (sort keys %{$seek_keys}) {
-#					warn "DEBUG: seek => $search_key line $.\n";
-					if ($line =~ /^$search_key(.*)$/){
-						($id, $data) = ($1, $2);
-						$id =~s/\s*//g;
-#						if (exists $records->{$key}){
-#							($id, $data) = ($key, $right);
-#							warn "DEBUG: success search_key = $search_key, for keys $id line $.\n";
-							last SEEK;
-#						} else {
-						
-						}
+	SEEK: {
+			if ( $line =~ /^$denormalized(.*)$/ ) {
+				$data = $1;
+				$id   = $denormalized;
+
+			}
+			else {
+				foreach my $search_key ( sort keys %{$seek_keys} ) {
+
+					#					warn "DEBUG: seek => $search_key line $.\n";
+					if ( $line =~ /^$search_key(.*)$/ ) {
+						( $id, $data ) = ( $1, $2 );
+						$id =~ s/\s*//g;
+
+					 #						if (exists $records->{$key}){
+					 #							($id, $data) = ($key, $right);
+					 #							warn "DEBUG: success search_key = $search_key, for keys $id line $.\n";
+						last SEEK;
+
+						#						} else {
+
 					}
-#					warn "DEBUG: search_key = $search_key, for keys : ".  $seek_keys->{$search_key} ."\n";
 				}
-				warn "INFO : UNKNOWN RECORD (line $.)=>$line\n";
-				warn "INFO : IGNORING UNKNOWN RECORD (line $.)\n";	
+
+		#					warn "DEBUG: search_key = $search_key, for keys : ".  $seek_keys->{$search_key} ."\n";
+			}
+			warn "INFO: UNKNOWN RECORD (line $.)=>$line\n";
+			warn "INFO: IGNORING UNKNOWN RECORD (line $.)\n";
+
 #				if ($line =~ /^$mute_record.(.*)/) {
 #					($id, $data) = ($self->{'mute_id'}, "   ".$1);
-#		
-#				} elsif ($line =~ /^$line_record.{$key_offset}(.{$key_size})(.*)$/) { 	# xxxxx to evolve here to take record keys on 2 chars / 4 chars or more + revisit the parametrizable length of headers and keys 
-#					# set the record identifier and pass the record, key included: 
+#
+#				} elsif ($line =~ /^$line_record.{$key_offset}(.{$key_size})(.*)$/) { 	# xxxxx to evolve here to take record keys on 2 chars / 4 chars or more + revisit the parametrizable length of headers and keys
+#					# set the record identifier and pass the record, key included:
 #					#  the fields_offset is handled in the record object
 #					$data = $1.$2;
 #					$id = $1;
@@ -187,29 +239,32 @@ sub next {
 #					if (!exists $records->{$id}) {
 #						die "ERROR: Unexpected record identifier: $id\n";
 #					}
-#	
+#
 #				} else {
 #					die "ERROR: Unexpected line format (line $.): $line\n";
 #				}
 #			}
 		}
-	} while ($id ne $denormalized && !defined($records->{$id}));
+	} while ( $id ne $denormalized && !defined( $records->{$id} ) );
+
 	# DENORMALIZED RECORD SHOULD BE AT THE END OF DATA STREAM
 	# TO REVIEW
 
-	if ($id eq $denormalized) {
-#		my @data = split(/(?:$denormalized_split_motif)+/, $data);
-		my @data = split(/(?:$denormalized_split_motif)/, $data);
-#		my @data = split(/(?:\x{0}|\x{1}|\x{2})+/, $data);
-#		my @data = split(/(?:\x{0}|\x{1}|\x{2}|\x{20})+/, $data);
+	if ( $id eq $denormalized ) {
+
+		#		my @data = split(/(?:$denormalized_split_motif)+/, $data);
+		my @data = split( /(?:$denormalized_split_motif)/, $data );
+
+		#		my @data = split(/(?:\x{0}|\x{1}|\x{2})+/, $data);
+		#		my @data = split(/(?:\x{0}|\x{1}|\x{2}|\x{20})+/, $data);
 		# my @data = split(/(?:\(?:\x{0}|\x{20})+(?:\x{1}|\x{2})+/, $data);
 		# my @data = split($_denormalized_split_motif, $data);
-		return ($id, \@data);
+		return ( $id, \@data );
 	}
 
-	my $rec = $records->{$id};
-	my %vals= $rec->parse($data);
-	return ($id, \%vals);
+	my $rec  = $records->{$id};
+	my %vals = $rec->parse($data);
+	return ( $id, \%vals );
 }
 
 1;

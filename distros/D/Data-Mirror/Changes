@@ -1,3 +1,6 @@
+0.09 - 2026-10-15
+  - require LWP::Protocol::https for HTTPS support.
+
 0.08 - 2026-06-04:
   - use File::XDG and cache files in the user's .cache directory instead of /tmp.
 

@@ -10,7 +10,7 @@ use Object::Proto::Sugar;
 use Game::RoyalUr::Engine ();
 use Game::RoyalUr::Variant;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 my $E = 'Game::RoyalUr::Engine';
 
@@ -119,7 +119,7 @@ Game::RoyalUr::Bot - an opponent for the Royal Game of Ur, at several strengths
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

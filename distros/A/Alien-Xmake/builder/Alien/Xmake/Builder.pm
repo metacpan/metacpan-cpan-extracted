@@ -330,10 +330,23 @@ use %s;
 
     method _generate_share_config( $bin_path, $version ) {
 
-        # Calculate relative path from Alien/xmake/ConfigData.pm to the binary
-        # ConfigData is in lib/Alien/xmake/
-        # Bin is in      lib/Alien/xmake/share/bin/
-        { install_type => 'share', version => $version, bin => $bin_path->relative( path('blib/lib/Alien/Xmake')->absolute )->stringify };
+        # Store the binary path *relative to this module's directory*, pointing at the copy that
+        # ships inside the dist sharedir (auto/share/dist/<name>/...). The generated ConfigData
+        # resolves the stored value against dirname(__FILE__), so a value relative to anything
+        # else -- such as the build tree's own share/, which is what this used to compute -- no
+        # longer points inside the installed tree: rel2abs() walks up and out to a path that does
+        # not exist. The dist_dir() fallback would paper over that, but only by searching @INC,
+        # which can just as easily resolve a stale copy in an earlier @INC entry (e.g. site/lib)
+        # instead of the copy we just installed (lib).
+        #
+        # $bin_path lives under share/ (share/xmake.exe on Windows, share/bin/xmake elsewhere);
+        # staging preserves that layout under auto/share/dist/<name>/, so re-rooting the same
+        # relative path is enough, and it keeps working whether the binary sits in bin/ or not.
+        my $config_dir  = path('blib/lib/Alien/Xmake')->absolute;
+        my $sharedir    = path('blib/lib/auto/share/dist')->child( $meta->name )->absolute;
+        my @share_parts = split m{/}, $bin_path->absolute->relative( path('share')->absolute )->stringify;
+        my $staged_bin  = $sharedir->child(@share_parts);
+        return { install_type => 'share', version => $version, bin => $staged_bin->relative($config_dir)->stringify };
     }
 
     method _check_existing_share() {

@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.04';
 
 require XSLoader;
 XSLoader::load('Context::Vars', $VERSION);
@@ -19,7 +19,7 @@ Context::Vars - variables with context scope
 
 =head1 VERSION
 
-Version 0.01
+Version 0.04
 
 =head1 SYNOPSIS
 
@@ -61,28 +61,51 @@ sees the values of the moment it was wrapped or captured, wherever and
 whenever it runs: from an event loop, after other work has changed them, or
 after other requests have come and gone.
 
+=head1 ARRAYS, HASHES AND STRUCTURES
+
+    use Context::Vars qw(@trail %seen $config);
+
+Arrays and hashes are imported as scalars are, and follow the same rule: a
+change to one, an element stored or deleted, a C<push>, a whole assignment,
+holds until the sub it is written in returns.
+
+The rule goes all the way down. A plain hash or array stored in any context
+variable, at any depth, belongs to the context: C<< $seen{a}{b} = 1 >>,
+C<< push @{ $seen{list} }, 1 >> or C<< $config->{db}{host} = 'x' >> in a sub is
+undone when that sub returns, and a capture or a wrapped callback sees the
+structure as it was at that moment. What is stored is the variable's own
+copy: changing the hash or array that was assigned does not change the
+variable, and the other way round.
+
+An object, or a code reference, stored anywhere in such a structure is kept
+as the reference it is, and what it points at is shared, as its class
+expects.
+
+What you read back is not the hash or array that was stored but one that
+stands for it: C<ref> says C<HASH> or C<ARRAY> and everything a hash or array
+does works, but two reads of C<$seen{a}> are two different references, and
+C<==> between them is false. Copy one out, C<< { %{ $seen{a} } } >>, for an
+ordinary hash.
+
+Reading or writing an element costs more than it does in an ordinary hash or
+array: some hundreds of nanoseconds against some tens, and more for each level
+down.
+
 =head1 LIMITS
 
 =over 4
 
-=item * Only scalars can be imported, with a plain name: C<$name>.
+=item * Names are plain identifiers: C<$name>, C<@name>, C<%name>.
 
 =item * No event loop captures for you. A callback sees its registering
 code's values only when it is wrapped; see L</CALLBACKS AND LOOPS>.
 
 =item * An assignment the module cannot see when the sub is compiled is not
-scoped to that sub. That is one made through C<@_>, a C<for> or C<grep>
-alias, a symbolic reference, or a string C<eval> inside a sub that makes no
-other assignment. It changes whatever context is current.
-
-=item * A variable can hold a reference to a hash, an array, code or an
-object, and the reference is its value: a sub's scope covers which reference
-the variable holds, not what that reference points at. A change made through
-it, C<< $variable->{key} = 1 >>, is seen by every context holding the same
-reference. To change a structure for one sub only, assign a changed copy:
-C<< $variable = { %$variable, key => 1 } >>. Vivifying through a variable that
-is not set, C<< $variable->{key} = 1 >> when it holds nothing, sets it in
-whatever context is current.
+scoped to that sub. That is one made through C<@_>, a C<for>, C<grep> or
+C<map> alias, a symbolic reference, a string C<eval> inside a sub that makes
+no other assignment, or a hash or array read out of a variable and kept in a
+lexical before it is written through: C<< my $h = $seen{a}; $h->{b} = 1 >>.
+It changes whatever context is current.
 
 =item * A sub that only assigns a variable for its caller changes nothing
 the caller can see: the assignment ends when that sub returns. Return the

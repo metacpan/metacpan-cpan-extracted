@@ -1,5 +1,5 @@
 package Tie::Filehandle::Preempt::Stdin;
-$VERSION = "0.02";
+$VERSION = "0.03";
 require 5.008;
 use strict;
 use Carp;
@@ -103,7 +103,7 @@ Contact author or post on perl.qa@perl.org.
 
 =head1 AUTHOR
 
-James E Keenan.  CPAN ID: JKEENAN.  Mail to:  jkeenan [at] cpan [dot] org.
+James E Keenan.  CPAN ID: JKEENAN.  Mail to:  jkeenan [at] pobox [dot] com.
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -123,7 +123,7 @@ it and/or modify it under the same terms as Perl itself.
 The full text of the license can be found in the
 LICENSE file included with this module.
 
-Last revision:  October 27 2007.
+Last revision:  October 14 2026.
 
 =head1 SEE ALSO
 

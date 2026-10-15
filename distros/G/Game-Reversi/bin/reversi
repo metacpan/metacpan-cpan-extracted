@@ -5,6 +5,6 @@ use warnings;
 
 use Game::Reversi::Terminal;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 exit Game::Reversi::Terminal->run(@ARGV);

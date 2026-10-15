@@ -16,3 +16,6 @@ Revision history for Term-Maze
         - run takes --width, --height and --help as well as two integers, and returns the exit status
         - The terminal mode is restored on every way out
         - q and escape quit
+
+0.06    2026-10-13
+        - Add options, the fields a launcher offers before a game

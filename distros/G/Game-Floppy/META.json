@@ -40,6 +40,7 @@
             "Digest::SHA" : "0",
             "File::Basename" : "0",
             "File::Spec" : "0",
+            "Game::Terminal::Kit" : "0.05",
             "Getopt::Long" : "0",
             "Object::Proto" : "1.00",
             "Object::Proto::Sugar" : "1.00",
@@ -65,6 +66,6 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/Game-Floppy"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

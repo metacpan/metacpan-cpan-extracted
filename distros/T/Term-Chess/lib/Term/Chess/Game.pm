@@ -11,7 +11,7 @@ use Chess::Plisco qw(:all);
 use Chess::Plisco::Engine::Position;
 use Term::Chess::Error;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 my $P = 'Chess::Plisco::Engine::Position';
 my $R = 'Term::Chess::Error';
@@ -262,6 +262,72 @@ sub _walk {
     return wantarray ? ($self, 0, scalar @$moves) : $self;
 }
 
+sub to_text {
+    my ($self) = @_;
+    my $result = $self->_result;
+    return join "\n",
+        'chess 1',
+        'seed ' . unpack('H*', $self->_held_seed),
+        'white ' . $self->white,
+        'start ' . $self->_start_fen,
+        join(' ', 'moves', @{ $self->_log }),
+        'resigned ' . (($result->{reason} || '') eq 'resignation' ? other($result->{winner}) : '-'),
+        'status ' . $self->status,
+        '';
+}
+
+sub from_text {
+    my ($class, $text) = @_;
+    Carp::croak('Term::Chess::Game: from_text needs the text to_text wrote, and was given '
+        . (defined $text ? 'a reference' : 'nothing'))
+        if !defined $text || ref $text;
+
+    my @lines = split /\n/, $text;
+    Carp::croak('Term::Chess::Game: the text is not a saved game of chess, version 1')
+        unless @lines && $lines[0] eq 'chess 1';
+
+    my %field;
+    for my $line (@lines[1 .. $#lines]) {
+        my ($name, $value) = $line =~ /\A(seed|white|start|moves|resigned|status)(?: (.*))?\z/
+            or Carp::croak("Term::Chess::Game: the saved game has a line it does not know: '$line'");
+        Carp::croak("Term::Chess::Game: the saved game gives $name twice")
+            if exists $field{$name};
+        $field{$name} = defined $value ? $value : '';
+    }
+    for my $name (qw/seed white start moves resigned status/) {
+        Carp::croak("Term::Chess::Game: the saved game has no $name line")
+            unless exists $field{$name};
+    }
+
+    Carp::croak('Term::Chess::Game: the saved seed is not sixty-four hex digits')
+        unless $field{seed} =~ /\A[0-9a-f]{64}\z/;
+    Carp::croak("Term::Chess::Game: the saved resignation must be 'p1', 'p2' or '-', not '$field{resigned}'")
+        unless $field{resigned} =~ /\A(?:p1|p2|-)\z/;
+    Carp::croak("Term::Chess::Game: the saved status must be 'active' or 'finished', not '$field{status}'")
+        unless $field{status} eq 'active' || $field{status} eq 'finished';
+
+    my $self = $class->new(
+        seed     => pack('H*', $field{seed}),
+        white    => $field{white},
+        position => $field{start},
+    );
+    my @moves = split ' ', $field{moves};
+    my (undef, $why, $at) = $self->_walk(\@moves);
+    Carp::croak('Term::Chess::Game: the saved move ' . ($at + 1) . ", $moves[$at], was refused: "
+        . $why->code)
+        if $why;
+
+    if ($field{resigned} ne '-') {
+        my $refused = $self->resign($field{resigned});
+        Carp::croak("Term::Chess::Game: the saved resignation by $field{resigned} was refused: "
+            . $refused->code)
+            if $refused;
+    }
+
+    $self->status($field{status});
+    return $self;
+}
+
 1;
 
 __END__
@@ -272,7 +338,7 @@ Term::Chess::Game - a game of chess over a Chess::Plisco position
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 
@@ -431,6 +497,30 @@ game, the first refusal or C<0>, and the index of the move that was refused
 (or the count of moves when none was). In scalar context returns the game,
 or C<undef> if any move was refused. The instance form replays from this
 game's own seed, colours and starting position.
+
+=head2 to_text
+
+    my $text = $g->to_text;
+
+The game as a string, from which L</from_text> builds the same game again:
+the seed in hex, the seat that plays White, the starting position as FEN,
+every move as coordinates, the seat that resigned or C<->, and the status.
+Two games with the same history write the same string.
+
+=head2 from_text
+
+    my $again = Term::Chess::Game->from_text($text);
+
+A new game built from a string L</to_text> wrote, by B<replaying its moves
+from its starting position>, so the signatures behind a repetition, the SAN
+log and Plisco's own counters all come back as they were, and a resignation
+is made again after the last move. The new game shares nothing with the one
+that was written, and writes the same string.
+
+A string that is not one C<to_text> writes B<croaks> with a sentence naming
+what is wrong: a missing or unknown line, a seed that is not sixty-four hex
+digits, a starting position Plisco refuses, or a move or resignation the
+replay refuses, by its number.
 
 =head2 other
 

@@ -1,5 +1,20 @@
 Revision history for Game-Backgammon
 
+0.04    2026-10-13
+    - Add options, the fields a launcher offers before a game
+    - The keys, the screen and the picker are Game::Terminal::Kit's
+    - Requires perl 5.14
+    - The picker is drawn over itself and no longer clears first
+    - Escape takes a move back as backspace does; home, end, page up,
+      page down and shift-tab move the cursor
+    - A move is listed as "1. 24/23" where it was "1) 24/23"
+    - NO_COLOR=0 turns colour off
+    - A typed turn number may have spaces before it
+    - An interrupt is raised again with the default action, not handed
+      to an outer handler
+    - Add to_text and from_text; legal_turns no longer walks one set of moves twice
+    - u and r, or undo and redo, take a turn back and play it again
+
 0.03    2026-10-11
     - Add Game::Backgammon::Terminal->run(@argv), which returns the exit status
     - Terminal's game loop is now start, not run

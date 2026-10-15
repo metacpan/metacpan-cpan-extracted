@@ -17,15 +17,19 @@ oslv_monitor - LibreNMS style JSON SNMP extend for OS level virtualization monit
 
 =head1 VERSION
 
-1.0.4
+Same as L<OSLV::Monitor>.
 
 =cut
 
-our $VERSION = '1.0.5';
+our $VERSION = $OSLV::Monitor::VERSION;
 
 =head1 SYNOPSIS
 
-oslv_monitor [B<-c>] [B<-f> <config file>] [B<-b> <base dir>] [B<-q>] [B<-t> <time divider>]
+oslv_monitor [B<-c>] [B<-l>] [B<-f> <config file>] [B<-b> <base dir>] [B<-q>] [B<-t> <time divider>] [B<--backend> <backend>]
+
+oslv_monitor B<-h>|B<--help>
+
+oslv_monitor B<-v>|B<--version>
 
 =head1 DESCRIPTION
 
@@ -41,12 +45,24 @@ Debugging info can be printed via OSLV_MONITOR_DEBUG=1.
 
 =head1 FLAGS
 
+=head2 -b <base dir>
+
+The dir to write the cache and output files to.
+
+Default :: /var/cache/oslv_monitor
+
+=head2 --backend <backend>
+
+The backend to use. Overrides the one set in the config file.
+
+Default :: FreeBSD on FreeBSD, cgroups on Linux
+
 =head2 -c
 
-Compress the output using gzip and base64 encoded so it
+Print the output gzip compressed and base64 encoded so it
 can be transmitted via SNMP with out issue.
 
-/var/cache/oslv_monitor/snmp will always be available and compressed.
+$base_dir/snmp is always written compressed regardless of this.
 
 =head2 -f <file>
 
@@ -54,20 +70,36 @@ The config file to use.
 
 Default :: /usr/local/etc/oslv_monitor.json
 
+=head2 -h, --help
+
+Print the help and exit.
+
+=head2 -l
+
+Lock $base_dir/lock while running so overlapping runs, such as one taking
+longer than the cron interval, do not clobber each other's cache. If another
+run holds the lock, it exits 1 right away without writing the output files, so
+the output of the previous run is kept. As the rates are computed over the
+time since the previous run, a skipped run does not throw them off.
+
 =head2 -q
 
 Do not print the results.
 
 =head2 -t <time divider>
 
-What to use for the time divider.
+What to use for the time divider. Overrides the one set in the config file.
+
+=head2 -v, --version
+
+Print the version and exit.
 
 =head1 CONFIG FILE
 
 The following keys are used in the JSON config file.
 
     - include :: A array of regular expressions to include.
-        Default :: ["^.*$"]
+        Default :: ["^.+$"]
 
     - exclude :: A array of regular expressions to exlclude.
         Default :: undef
@@ -93,7 +125,7 @@ By Defaults the backends are as below.
 Default would be like this.
 
     {
-        "include": ["^.*$"]
+        "include": ["^.+$"]
     }
 
 =cut
@@ -103,7 +135,7 @@ sub main::VERSION_MESSAGE {
 }
 
 sub main::HELP_MESSAGE {
-	pod2usage( -exitval => 255, -verbose => 2, -output => \*STDOUT, );
+	pod2usage( -exitval => 'NOEXIT', -verbose => 2, -output => \*STDOUT, );
 }
 
 # get the commandline options
@@ -111,6 +143,8 @@ my $help     = 0;
 my $version  = 0;
 my $base_dir = '/var/cache/oslv_monitor';
 my $quiet;
+my $lock;
+my $compress;
 my $backend;
 my $exclude;
 my $include;
@@ -124,19 +158,22 @@ GetOptions(
 	'v'       => \$version,
 	'help'    => \$help,
 	'h'       => \$help,
-	'q'       => \$quiet,
-	'f=s'     => \$config_file,
-	'b=s'     => \$base_dir,
-);
+	'q'         => \$quiet,
+	'c'         => \$compress,
+	'l'         => \$lock,
+	'f=s'       => \$config_file,
+	'b=s'       => \$base_dir,
+	'backend=s' => \$backend,
+) || exit 1;
 
 if ($version) {
 	&main::VERSION_MESSAGE;
-	exit 1;
+	exit 0;
 }
 
 if ($help) {
 	&main::HELP_MESSAGE;
-	exit 1;
+	exit 0;
 }
 
 if ( -f $config_file ) {
@@ -177,7 +214,8 @@ my $monitor = OSLV::Monitor->new(
 	base_dir     => $base_dir,
 	include      => $include,
 	exclude      => $exclude,
-	time_divider => $time_divider
+	time_divider => $time_divider,
+	lock         => $lock,
 );
 
 if ( !-d $base_dir ) {
@@ -203,34 +241,42 @@ if ( $ENV{'OSLV_MONITOR_DEBUG'} ) {
 
 my $data = encode_json( $monitor->run );
 
-if ( !$quiet ) {
-	print $data. "\n";
-}
-
-if ( $ENV{'OSLV_MONITOR_DEBUG'} ) {
-	warn( 'DEBUG, ' . join( '.', gettimeofday ) . ': writing out "' . $base_dir . '/json"' );
-}
-
-write_file( $base_dir . '/json', $data . "\n" );
-
-if ( $ENV{'OSLV_MONITOR_DEBUG'} ) {
-	warn( 'DEBUG, ' . join( '.', gettimeofday ) . ': writing out "' . $base_dir . '/json"' );
-}
-
 my $toReturnCompressed;
 gzip \$data => \$toReturnCompressed;
 my $compressed = encode_base64($toReturnCompressed);
 $compressed =~ s/\n//g;
 $compressed = $compressed . "\n";
 
-if ( $ENV{'OSLV_MONITOR_DEBUG'} ) {
-	warn( 'DEBUG, ' . join( '.', gettimeofday ) . ': writing out "' . $base_dir . '/snmp"' );
+if ( !$quiet ) {
+	if ($compress) {
+		print $compressed;
+	} else {
+		print $data. "\n";
+	}
 }
 
-write_file( $base_dir . '/snmp', $compressed );
+# another run is going, so leave the output it will write alone
+if ( $monitor->lock_failed ) {
+	exit 1;
+}
+
+# written atomically so snmpd never reads a partially written file... a failure
+# is noted and the other file still written
+my $exit_code = 0;
+foreach my $output ( [ 'json', $data . "\n" ], [ 'snmp', $compressed ] ) {
+	my ( $file, $contents ) = @{$output};
+	if ( $ENV{'OSLV_MONITOR_DEBUG'} ) {
+		warn( 'DEBUG, ' . join( '.', gettimeofday ) . ': writing out "' . $base_dir . '/' . $file . '"' );
+	}
+	eval { write_file( $base_dir . '/' . $file, { atomic => 1 }, $contents ); };
+	if ($@) {
+		warn( 'Failed to write "' . $base_dir . '/' . $file . '"... ' . $@ );
+		$exit_code = 1;
+	}
+}
 
 if ( $ENV{'OSLV_MONITOR_DEBUG'} ) {
 	warn( 'DEBUG, ' . join( '.', gettimeofday ) . ': done' );
 }
 
-exit 0;
+exit $exit_code;

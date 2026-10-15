@@ -44,6 +44,8 @@
       font-size: 0.9rem;
     }
 
+    /* Standard table header: white text on dark blue.
+       All templates must inherit this; never override background/color here. */
     thead tr {
       background: #2c3e7a;
       color: #ffffff;
@@ -146,9 +148,20 @@
     .back-link {
       margin-bottom: 1rem;
       font-size: 0.875rem;
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+      flex-wrap: wrap;
     }
     .back-link a { color: #2c3e7a; text-decoration: none; }
     .back-link a:hover { text-decoration: underline; }
+    .back-link .record-count {
+      margin-left: auto;
+      flex: 0 0 auto;
+      color: #666;
+      font-size: 0.8rem;
+      white-space: nowrap;
+    }
 
     /* Toolbar row: record count + "Add database" button */
     .toolbar {
@@ -342,13 +355,15 @@
     }
 
     .join-field select,
-    .join-field input[type="text"] {
+    .join-field input[type="text"],
+    .join-field input[type="number"] {
       padding: 0.4rem 0.6rem;
       border: 1px solid #c0c8e0;
       border-radius: 5px;
       font-size: 0.875rem;
       background: #fff;
       width: 100%;
+      box-sizing: border-box;
     }
 
     .join-or {
@@ -403,7 +418,7 @@
     .with-tooltip { position: relative; }
     .tip-box {
       position: absolute;
-      top: calc(100% + 7px);
+      bottom: calc(100% + 7px);
       left: 0;
       right: 0;
       z-index: 200;
@@ -417,21 +432,21 @@
       box-shadow: 0 4px 14px rgba(0,0,0,.28);
       pointer-events: none;
       opacity: 0;
-      transform: translateY(-3px);
+      transform: translateY(3px);
       transition: opacity 0.13s, transform 0.13s;
       white-space: normal;
     }
-    /* Arrow pointing up to the input */
+    /* Arrow pointing down to the input */
     .tip-box::before {
       content: '';
       position: absolute;
-      top: -6px;
+      bottom: -6px;
       left: 1rem;
       width: 10px;
       height: 10px;
       background: #1a2040;
-      border-left: 1px solid #3a50a0;
-      border-top: 1px solid #3a50a0;
+      border-right: 1px solid #3a50a0;
+      border-bottom: 1px solid #3a50a0;
       transform: rotate(45deg);
     }
     .tip-box code {
@@ -597,6 +612,11 @@
       transition: background 0.12s;
     }
     .btn-graph-export:hover { background: #f0f0f0; }
+    .graph-point-count {
+      font-size: 0.82rem;
+      color: #666;
+      margin-left: 0.25rem;
+    }
     .graph-container {
       overflow-x: auto;
       text-align: center;
@@ -608,7 +628,17 @@
     .btn-pie,
     .btn-heatmap,
     .btn-bar,
-    .btn-folder {
+    .btn-stacked,
+    .btn-scatter,
+    .btn-combo,
+    .btn-treemap,
+    .btn-histogram,
+    .btn-folder,
+    .btn-pivot,
+    .btn-stats,
+    .btn-calc,
+    .btn-groups,
+    .btn-dates {
       flex-shrink: 0;
       padding: 0.28rem 0.75rem;
       border: 1px solid #888;
@@ -627,11 +657,29 @@
     .btn-pie:hover,
     .btn-heatmap:hover,
     .btn-bar:hover,
-    .btn-folder:hover { background: #f0f0f0; }
+    .btn-stacked:hover,
+    .btn-scatter:hover,
+    .btn-combo:hover,
+    .btn-treemap:hover,
+    .btn-histogram:hover,
+    .btn-folder:hover,
+    .btn-pivot:hover,
+    .btn-stats:hover,
+    .btn-calc:hover,
+    .btn-groups:hover,
+    .btn-dates:hover { background: #f0f0f0; }
     .btn-graph:disabled,
     .btn-pie:disabled,
     .btn-heatmap:disabled,
-    .btn-bar:disabled {
+    .btn-bar:disabled,
+    .btn-stacked:disabled,
+    .btn-scatter:disabled,
+    .btn-combo:disabled,
+    .btn-treemap:disabled,
+    .btn-histogram:disabled,
+    .btn-calc:disabled,
+    .btn-groups:disabled,
+    .btn-dates:disabled {
       opacity: 0.45;
       cursor: not-allowed;
     }

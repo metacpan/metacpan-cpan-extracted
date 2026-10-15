@@ -5,7 +5,7 @@ use warnings;
 
 use Game::Xiangqi::Terminal;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 exit Game::Xiangqi::Terminal->run(@ARGV);
 

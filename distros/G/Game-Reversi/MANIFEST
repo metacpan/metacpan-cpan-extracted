@@ -30,7 +30,10 @@ t/18-bot.t
 t/19-bot-corners.t
 t/20-terminal.t
 t/21-no-io.t
-t/lib/Game/Reversi/Test/Handle.pm
+t/22-options.t
+t/23-cursor-order.t
+t/24-round-trip.t
+t/25-history.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

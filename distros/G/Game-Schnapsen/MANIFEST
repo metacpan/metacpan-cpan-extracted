@@ -42,6 +42,7 @@ t/20-policy.t
 t/21-invariants.t
 t/22-replay.t
 t/23-terminal.t
+t/24-options.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

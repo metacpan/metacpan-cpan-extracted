@@ -1,0 +1,51 @@
+{
+   "abstract" : "simple access to Kraken-style taxDB taxonomy database",
+   "author" : [
+      "Jeremy Volkening <volkening@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4234",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "BioX-Tax-Kraken",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IPC::Cmd" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0",
+            "Test::Pod::Coverage" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "BioX::Tax::Kraken" : {
+         "file" : "lib/BioX/Tax/Kraken.pm",
+         "version" : "0.001003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/jvolkening/p5-BioX-Tax-Kraken"
+      }
+   },
+   "version" : "0.001003",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

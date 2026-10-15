@@ -9,7 +9,6 @@ lib/Game/Floppy/resources/bluebird.png
 lib/Game/Floppy/resources/pipe-green.png
 lib/Game/Floppy/Result.pm
 lib/Game/Floppy/Terminal.pm
-lib/Game/Floppy/Ticker.pm
 Makefile.PL
 MANIFEST			This list of files
 META.json
@@ -23,16 +22,15 @@ t/04-tube.t
 t/05-no-io.t
 t/06-result.t
 t/07-bot.t
-t/20-ticker.t
 t/21-terminal.t
 t/22-watch.t
 t/23-bin.t
 t/30-raylib.t
 t/31-synopsis.t
+t/32-options.t
 t/lib/absent/Raylib/FFI.pm
 t/lib/absent/Term/ReadKey.pm
 t/lib/Game/Floppy/Test/Fly.pm
-t/lib/Game/Floppy/Test/Handle.pm
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

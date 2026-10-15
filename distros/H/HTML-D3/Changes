@@ -1,5 +1,43 @@
 Revision history for HTML-D3 - Visualise various charts using D3
 
+0.20	Wed Oct 14 08:01:05 PM EDT 2026
+	[ Enhancements ]
+	- render_histogram_snippet: new 'binned' option for pre-computed bins, so a
+	  caller can bin server-side and have the exact edges it chose rendered
+	  without the browser re-binning. Each element of the data arrayref is a
+	  hashref with a count plus either a label or a numeric lo/hi pair (the
+	  label is then derived as "[lo,hi)"); d3.bin() is not called on this path
+	  and the supplied counts are authoritative. New 'scheme' option supplies
+	  the bar fill (first colour of the D3 categorical scheme) when 'color' is
+	  absent. New errors: 'Data must contain at least one bin', 'Each
+	  pre-binned entry must be a hash reference', 'Bin count must be numeric',
+	  'Bin count must not be negative', 'Each pre-binned entry must have a
+	  label or numeric lo and hi'. The non-binned path is unchanged, including
+	  its 'Data must be an array of numeric values' error, and the bin-label
+	  tooltip now escapes the label.
+	- render_scatter_chart_snippet: new per-point colour and size dimensions.
+	  An optional fourth element per point may carry { series => Str, size => Num };
+	  the new opts colour_by_series (colour from the series value, with a
+	  legend), scheme (D3 categorical scheme, default 'tableau10'), series_col
+	  and size_col (tooltip row labels) and radius_range ([min, max] pixel
+	  radii mapped by area with d3.scaleSqrt over the observed size domain)
+	  render them. Colour and size are independent: a point may carry both.
+	  A point with no size value keeps a fixed radius and a point with no
+	  series value keeps the default colour, so output for data with neither is
+	  unchanged.
+	- render_multi_series_line_chart_snippet: new snippet method that generates
+	  an embeddable multi-series line chart fragment rather than a whole page,
+	  so a host application can keep its own page chrome. Accepts an arrayref
+	  of { name, data => [ { label, value }, ... ] } series and an optional
+	  \%opts hashref: scheme, x_label, y_label, animated, responsive, id.
+	  Series need not share labels (the X domain is the union, in first-seen
+	  order), each series gets a line and its own dots, and a clickable legend
+	  toggles each series. Returns { svg_id => 'chart', html => Str }.
+	[ Documentation ]
+	- The three capabilities above are documented in the POD, README.md and the
+	  formal specification, with new tests in t/snippet_histogram.t,
+	  t/snippet_scatter.t and t/snippet_multi_series_line.t.
+
 0.19	Tue Oct 13 03:35:05 PM EDT 2026
 	[ Enhancements ]
 	- render_stacked_bar_snippet: new snippet method that generates an embeddable

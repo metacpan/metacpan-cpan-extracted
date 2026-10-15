@@ -9,21 +9,21 @@ use Digest::SHA ();
 use Getopt::Long ();
 use Object::Proto::Sugar;
 
+use Game::Terminal::Kit::History;
+use Game::Terminal::Kit::Keys;
+use Game::Terminal::Kit::Run;
+use Game::Terminal::Kit::Screen;
+use Game::Terminal::Kit::Steer;
+
 use Game::RoyalUr;
 use Game::RoyalUr::Bot;
 use Game::RoyalUr::Variant;
 use Game::RoyalUr::Notation ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
-my (%CONTROL, %SEQUENCE, %STYLE, %GLYPH, %OTHER, @FILES);
+my (%STYLE, %GLYPH, %OTHER, @FILES);
 BEGIN {
-    %CONTROL = (
-        "\n" => 'enter', "\r" => 'enter', "\t" => 'tab', ' ' => 'space',
-        "\x7f" => 'backspace', "\b" => 'backspace', "\x03" => 'interrupt', "\x04" => 'eof',
-    );
-    %SEQUENCE = (A => 'up', B => 'down', C => 'right', D => 'left', Z => 'backtab');
-
     %STYLE = (
         title    => '1;38;5;220',
         grid     => '38;5;241',
@@ -90,11 +90,11 @@ has record => (is => 'rw');
 
 has keysource => (is => 'rw');
 
+has history => (is => 'rw');
+
 has sleeper => (is => 'rw');
 
-has _raw => (is => 'rw', private => 1);
-
-has _pending => (is => 'rw', private => 1);
+has [qw/_keyboard _screen/] => (is => 'rw');
 
 has _events => (is => 'rw', private => 1);
 
@@ -109,10 +109,20 @@ sub BUILD {
     $self->in(\*STDIN) unless $self->in;
     $self->out(\*STDOUT) unless $self->out;
     $self->interactive(-t $self->in ? 1 : 0) unless defined $self->interactive;
-    $self->colour($self->interactive && !$ENV{NO_COLOR} ? 1 : 0) unless defined $self->colour;
+    $self->colour($self->interactive && !Game::Terminal::Kit::Screen::no_colour() ? 1 : 0) unless defined $self->colour;
     $self->unicode($self->interactive ? 1 : 0) unless defined $self->unicode;
+    $self->_keyboard(Game::Terminal::Kit::Keys->new(
+        in => $self->in,
+        ($self->keysource ? (keysource => $self->keysource) : ()),
+    ));
+    $self->_screen(Game::Terminal::Kit::Screen->new(
+        out => $self->out,
+        interactive => $self->interactive,
+        colour => $self->colour,
+        ascii => $self->unicode ? 0 : 1,
+    ));
     $self->picking($self->interactive ? 1 : 0) unless defined $self->picking;
-    $self->picking(0) unless $self->_keys_available;
+    $self->picking(0) unless $self->_keyboard->keys_available;
     $self->pace($self->interactive && !$self->keysource ? 1 : 0) unless defined $self->pace;
 
     Carp::croak("Game::RoyalUr::Terminal: mode is bot, hotseat or watch, not '" . $self->mode . "'")
@@ -131,8 +141,6 @@ sub BUILD {
         unless $self->level =~ /\A\d+\z/ && $self->level >= 1 && $self->level <= $levels[-1];
 
     $self->seed(Digest::SHA::sha256(join '|', 'royalur', $$, time, rand)) unless defined $self->seed;
-    $self->_raw(0);
-    $self->_pending([]);
     $self->_events([]);
     $self->_told(0);
     $self->_cursor(0);
@@ -143,11 +151,13 @@ sub BUILD {
         $self->game($self->_fresh_game);
         $self->_announce_opening;
     }
+    $self->history(Game::Terminal::Kit::History->new(
+        save => sub { $_[0]->to_text },
+        load => sub { Game::RoyalUr->from_text($_[0]) },
+    )) unless $self->history;
+    $self->history->start($self->game);
 
-    binmode $self->out, ':encoding(UTF-8)' if $self->unicode;
-    my $previous = select $self->out;
-    $| = 1;
-    select $previous;
+    $self->_screen->utf8->flush_on;
     return;
 }
 
@@ -177,9 +187,11 @@ sub _announce_opening {
 
 sub _paint {
     my ($self, $text, $style) = @_;
-    return $text unless $self->colour && defined $style && $STYLE{$style};
-    return "\e[$STYLE{$style}m$text\e[0m";
+    return $text unless defined $style;
+    return $self->_screen->paint($text, $STYLE{$style});
 }
+
+sub _raw { $_[0]->_keyboard->raw }
 
 sub _glyph { $GLYPH{ $_[0]->unicode ? 'wide' : 'ascii' }{ $_[1] } }
 
@@ -275,19 +287,15 @@ sub steer {
     my $at = $self->_cursor;
     $at = $#moves if $at > $#moves;
 
-    if ($key eq 'tab')     { $at = ($at + 1) % @moves }
-    if ($key eq 'backtab') { $at = ($at - 1) % @moves }
+    if ($key eq 'tab') { $at = Game::Terminal::Kit::Steer::ring(scalar @moves, $at, 1) }
+    if ($key eq 'back_tab' || $key eq 'backtab') { $at = Game::Terminal::Kit::Steer::ring(scalar @moves, $at, -1) }
     if ($key =~ /\A[1-7]\z/ && $key <= @moves) { $at = $key - 1 }
 
-    if ($key =~ /\A(?:left|right|up|down)\z/) {
+    if (my ($dx, $dy) = Game::Terminal::Kit::Steer::way($key)) {
         my $side = $self->game->side;
-        my @xy = map { [ $coordinates->($_->from, $side) ] } @moves;
-        my @order = $key eq 'left' || $key eq 'right'
-            ? sort { $xy[$a][0] <=> $xy[$b][0] || $xy[$a][1] <=> $xy[$b][1] } 0 .. $#moves
-            : sort { $xy[$b][1] <=> $xy[$a][1] || $xy[$a][0] <=> $xy[$b][0] } 0 .. $#moves;
-        my ($where) = grep { $order[$_] == $at } 0 .. $#order;
-        $where += ($key eq 'right' || $key eq 'down') ? 1 : -1;
-        $at = $order[$where] if $where >= 0 && $where <= $#order;
+        my @points = map { [ $coordinates->($_->from, $side) ] } @moves;
+        if ($dy) { $_->[1] = -$_->[1] for @points }
+        $at = Game::Terminal::Kit::Steer::axis(\@points, $at, $dx, $dy);
     }
     $self->_cursor($at);
     return $at;
@@ -469,10 +477,11 @@ sub _readout {
 sub _legend {
     my ($self, $mode) = @_;
     my $k = sub { $self->_paint($_[0], 'key') };
-    return '    ' . join('  ', $k->('n') . ' new game', $k->('u') . ' take back', $k->('q') . ' leave') if $mode eq 'ended';
+    return '    ' . join('  ', $k->('n') . ' new game', $k->('u') . ' take back',
+        ($self->history->can_redo ? $k->('r') . ' play again' : ()), $k->('q') . ' leave') if $mode eq 'ended';
     return '    ' . $self->_paint('...', 'quiet') if $mode eq 'wait';
     return '    ' . join('  ', $k->('arrows') . ' choose a piece', $k->('enter') . ' move it',
-        $k->('u') . ' take back', $k->('r') . ' route', $k->('?') . ' help', $k->('q') . ' leave');
+        $k->('u') . ' take back', $k->('r') . ' play again', $k->('R') . ' route', $k->('?') . ' help', $k->('q') . ' leave');
 }
 
 sub screen {
@@ -508,14 +517,7 @@ sub screen {
 
 sub show {
     my ($self, $mode) = @_;
-    my $out = $self->out;
-    my $lines = $self->screen($mode);
-    if ($self->interactive) {
-        print {$out} "\e[H", join('', map { "$_\e[K\n" } @$lines), "\e[J";
-    }
-    else {
-        print {$out} "$_\n" for @$lines;
-    }
+    $self->_screen->show($self->screen($mode));
     return $self;
 }
 
@@ -527,8 +529,9 @@ sub help_lines {
         '  arrows, tab     walk the pieces that can move',
         '  1 to 7          go straight to one of them',
         '  enter, space    move it',
-        '  u               take back your last move',
-        '  r               show or hide the route',
+        '  u               take back your last turn and every reply to it',
+        '  r               play a turn taken back again',
+        '  R               show or hide the route',
         '  n               a new game',
         '  q               leave (asked twice)',
         '',
@@ -536,72 +539,16 @@ sub help_lines {
         'it lands, and < > round a piece it sends back to its owner\'s hand.',
         '',
         'Typing instead: a number from the list, or a move such as hand-b1 or a2-d2;',
-        'and undo, new, route, moves, record FILE, level N, help, quit.',
+        'and undo, redo, new, route, moves, record FILE, level N, help, quit.',
     ];
-}
-
-sub _keys_available {
-    my ($self) = @_;
-    return 1 if $self->keysource;
-    return 0 unless defined $self->in && -t $self->in;
-    return eval { require Term::ReadKey; 1 } ? 1 : 0;
 }
 
 sub _enter_raw {
     my ($self) = @_;
     return 1 if $self->_raw;
-    if ($self->keysource) { $self->_raw(1); return 1 }
-    return 0 unless $self->_keys_available;
-    return 0 unless eval { Term::ReadKey::ReadMode(3, $self->in); 1 };
-    $self->_raw(1);
-    my $out = $self->out;
-    print {$out} "\e[?25l\e[2J";
+    return 0 unless $self->_keyboard->enter_raw;
+    $self->_screen->hide_cursor->clear unless $self->keysource;
     return 1;
-}
-
-sub _leave_raw {
-    my ($self) = @_;
-    return unless $self->_raw;
-    unless ($self->keysource) {
-        eval { Term::ReadKey::ReadMode(0, $self->in) };
-        my $out = $self->out;
-        print {$out} "\e[?25h";
-    }
-    $self->_raw(0);
-    return;
-}
-
-sub _read_char {
-    my ($self, $wait) = @_;
-    my $pending = $self->_pending;
-    return shift @$pending if @$pending;
-    return $self->keysource->($wait) if $self->keysource;
-    my $char = Term::ReadKey::ReadKey($wait ? 0 : -1, $self->in);
-    return $char if defined $char || $wait;
-    select undef, undef, undef, 0.05;
-    return Term::ReadKey::ReadKey(-1, $self->in);
-}
-
-sub _read_key {
-    my ($self) = @_;
-    my $char = $self->_read_char(1);
-    return undef unless defined $char;
-    return $CONTROL{$char} if $CONTROL{$char};
-    return $char unless $char eq "\e";
-    my $opener = $self->_read_char(0);
-    return 'escape' unless defined $opener;
-    unless ($opener eq '[' || $opener eq 'O') {
-        unshift @{ $self->_pending }, $opener;
-        return 'escape';
-    }
-    my $tail = '';
-    while (length $tail < 8) {
-        my $next = $self->_read_char(0);
-        last unless defined $next;
-        $tail .= $next;
-        last if $next =~ /[A-Za-z~]/;
-    }
-    return $SEQUENCE{$tail} || 'unknown';
 }
 
 sub pick {
@@ -610,7 +557,7 @@ sub pick {
     $self->_cursor(0) if $self->_cursor > $self->candidates - 1;
     while (1) {
         $self->show('pick');
-        my $key = $self->_read_key;
+        my $key = $self->_keyboard->read_key;
         return undef if !defined $key || $key eq 'eof' || $key eq 'interrupt';
         $self->_note(undef);
         if ($key eq 'q' || $key eq 'escape') {
@@ -620,16 +567,17 @@ sub pick {
             next;
         }
         $leaving = 0;
-        if ($key eq 'enter' || $key eq 'space') {
+        if ($key eq 'enter' || $key eq ' ') {
             my @moves = $self->candidates;
             return Game::RoyalUr::Notation::format_move($moves[ $self->_cursor ]);
         }
         return 'undo'  if $key eq 'u';
+        return 'redo'  if $key eq 'r';
         return 'new'   if $key eq 'n';
-        return 'route' if $key eq 'r';
+        return 'route' if $key eq 'R';
         if ($key eq '?') {
             $self->show('help');
-            $self->_read_key;
+            $self->_keyboard->read_key;
             next;
         }
         $self->steer($key);
@@ -640,18 +588,18 @@ sub _ended_key {
     my ($self) = @_;
     while (1) {
         $self->show('ended');
-        my $key = $self->_read_key;
+        my $key = $self->_keyboard->read_key;
         return undef if !defined $key || $key eq 'eof' || $key eq 'interrupt';
         return 'new'  if $key eq 'n' || $key eq 'enter';
         return 'undo' if $key eq 'u';
+        return 'redo' if $key eq 'r';
         return 'quit' if $key eq 'q' || $key eq 'escape';
     }
 }
 
 sub _say {
     my ($self, @lines) = @_;
-    my $out = $self->out;
-    print {$out} "$_\n" for @lines;
+    $self->_screen->say(@lines) if @lines;
     return;
 }
 
@@ -664,12 +612,9 @@ sub _read_line {
         my @moves = $self->candidates;
         $self->_say(map { sprintf '    %s  %s', $self->_paint($_ + 1, 'key'), substr($self->_readout($moves[$_]), 4) } 0 .. $#moves);
     }
-    print {$out} $game->is_over ? 'new, undo or quit> ' : $game->side . ' (' . $game->roll . ')> ';
-    my $line = readline $self->in;
+    my $line = $self->_keyboard->read_line(
+        $game->is_over ? 'new, undo or quit> ' : $game->side . ' (' . $game->roll . ')> ', $out);
     print {$out} "\n" unless $self->interactive;
-    return undef unless defined $line;
-    $line =~ s/\s+\z//;
-    $line =~ s/\A\s+//;
     return $line;
 }
 
@@ -692,21 +637,19 @@ sub command {
         $self->_events([]);
         $self->_told(0);
         $self->_cursor(0);
+        $self->history->start($self->game);
         $self->_announce_opening;
         return 0;
     }
     if ($word eq 'undo' || $word eq 'u') {
-        my $taken = 0;
-        while ($game->undo) {
-            $taken++;
-            last if $game->is_over || $self->_person($game->side);
-        }
-        $self->_told(scalar @{ $game->log });
-        $self->_cursor(0);
-        $taken ? $self->_event(undef, 'Taken back.') : $self->_note('There is nothing to take back.');
+        $self->take_back;
         return 0;
     }
-    if ($word eq 'route' || $word eq 'r') {
+    if ($word eq 'redo' || $word eq 'r') {
+        $self->play_again;
+        return 0;
+    }
+    if ($word eq 'route') {
         $self->route($self->route ? 0 : 1);
         return 0;
     }
@@ -756,6 +699,53 @@ sub command {
     return 0;
 }
 
+sub take_back {
+    my ($self) = @_;
+    $self->_keep;
+    my $game = $self->history->undo;
+    unless ($game) {
+        $self->_note('There is nothing to take back.');
+        return 0;
+    }
+    $self->swap($game);
+    $self->_event(undef, 'Taken back.');
+    return 1;
+}
+
+sub play_again {
+    my ($self) = @_;
+    $self->_keep;
+    my $game = $self->history->redo;
+    unless ($game) {
+        $self->_note('There is nothing to play again.');
+        return 0;
+    }
+    $self->swap($game);
+    $self->_event(undef, 'Played again.');
+    return 1;
+}
+
+sub _keep {
+    my ($self) = @_;
+    $self->history->record($self->game) if $self->mode ne 'watch';
+    return;
+}
+
+sub swap {
+    my ($self, $game) = @_;
+    $self->game($game);
+    $self->_told(scalar @{ $game->log });
+    $self->_cursor(0);
+    $self->_note(undef);
+    return $self;
+}
+
+sub person_turn {
+    my ($self) = @_;
+    $self->history->turn($self->game);
+    return $self;
+}
+
 sub save {
     my ($self, $file) = @_;
     open my $fh, '>', $file or return 0;
@@ -792,6 +782,7 @@ sub _turns {
             $self->_bot_move;
             next;
         }
+        $self->person_turn;
         my $line = $picking ? $self->pick : $self->_read_line;
         last unless defined $line;
         last if $self->command($line);
@@ -803,17 +794,7 @@ sub start {
     my ($self) = @_;
     $self->picking(0) if $self->picking && !$self->_enter_raw;
 
-    my $interrupt = $SIG{INT};
-    local $SIG{INT} = sub {
-        $self->_leave_raw;
-        $SIG{INT} = defined $interrupt ? $interrupt : 'DEFAULT';
-        kill 'INT', $$;
-    };
-
-    my $played = eval { $self->_turns; 1 };
-    my $error = $@;
-    $self->_leave_raw;
-    die $error unless $played;
+    Game::Terminal::Kit::Run::guard(sub { $self->_turns }, $self->_keyboard, $self->_screen);
 
     $self->_say(@{ $self->screen('plain') }) if $self->mode eq 'watch' || $self->game->is_over;
     $self->save($self->record) if defined $self->record;
@@ -849,6 +830,17 @@ In a terminal, the pieces that can move are walked with the arrow keys and the
 board shows what each move would leave; press ? for the keys. Anywhere else,
 type a number from the list, a move such as hand-b1 or a2-d2, or help.
 USAGE
+}
+
+sub options {
+    return [
+        { name => 'mode', type => 'enum', choices => [qw(bot hotseat watch)], help => 'you against the program, two people, or the program against itself' },
+        { name => 'rules', type => 'enum', choices => [qw(finkel masters)], help => 'the route and the rules' },
+        { name => 'level', type => 'int', min => 1, max => 4, help => 'how well the program plays; the top by default' },
+        { name => 'side', type => 'enum', choices => [qw(light dark)], help => 'your side against the program' },
+        { name => 'first', type => 'enum', choices => [qw(light dark roll)], help => 'who moves first, or throw the dice for it' },
+        { name => 'seed', type => 'str', help => 'hexadecimal; the same seed throws the same dice' },
+    ];
 }
 
 sub run {
@@ -917,11 +909,6 @@ sub run {
         return 2;
     }
 
-    local @SIG{qw(INT TERM HUP)};
-    for my $sig (qw(INT TERM HUP)) {
-        $SIG{$sig} = sub { $terminal->_leave_raw; $SIG{$sig} = 'DEFAULT'; kill $sig, $$ };
-    }
-
     return $terminal->start;
 }
 
@@ -935,7 +922,7 @@ Game::RoyalUr::Terminal - the Royal Game of Ur, played in a terminal
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 
@@ -968,6 +955,19 @@ under the board says the same in words. Enter makes the move.
 
 Anywhere else, and with C<picking> off, the moves are listed with numbers and
 a line is read: a number, or a move such as C<hand-b1> or C<a2-d2>.
+
+=head2 Taking a turn back
+
+C<u>, or the typed C<undo>, takes back your last turn and every move the
+program made after it, however many rosettes and lost turns there were, so the
+board is as it was when it was last yours to move, with the same roll and the
+same dice. C<r>, or the typed C<redo>, plays that turn and its replies again.
+Each goes as far back, or forward, as you like, a turn at a time. Making a move
+after taking one back forgets whatever could have been played again. In
+C<hotseat> every move is a turn; in C<watch> there is nothing to take back.
+With nothing to take back or play again a line says so and the game is
+unchanged. A new game starts its history afresh. C<R>, or the typed C<route>,
+shows or hides the route.
 
 =head2 What is never left out
 
@@ -1040,7 +1040,7 @@ The name of a file to write the game to when the sitting ends.
 Whether to paint, whether to draw with line and shape characters, and
 whether to choose with the arrow keys. Each is on in a terminal and off
 elsewhere unless it is said; colour is also off when the environment has
-C<NO_COLOR> set.
+C<NO_COLOR> set to anything but the empty string.
 
 =item C<interactive>
 
@@ -1063,10 +1063,52 @@ long. For tests.
 
 A L<Game::RoyalUr> to play, in place of a new one.
 
+=item C<history>
+
+A L<Game::Terminal::Kit::History> to keep the turns in, as the text
+L<Game::RoyalUr/to_text> writes. One is made when it is not given.
+
 =back
 
 B<Croaks> on a mode, a side, a first, a level, a pace or rules it does not
 understand.
+
+=head2 options
+
+    my $fields = Game::RoyalUr::Terminal->options;
+
+The options a person would set before a game, in the order a launcher shows
+them. Each is a hash reference with a C<name>, a C<type> and a C<help>, and
+C<min> and C<max> or C<choices> where the type has them. A new list is
+returned each time.
+
+=over 4
+
+=item C<mode>
+
+One of C<bot>, C<hotseat>, C<watch>: you against the program, two people, or the program against itself.
+
+=item C<rules>
+
+One of C<finkel>, C<masters>: the route and the rules.
+
+=item C<level>
+
+A whole number from 1 to 4: how well the program plays; the top by default.
+
+=item C<side>
+
+One of C<light>, C<dark>: your side against the program.
+
+=item C<first>
+
+One of C<light>, C<dark>, C<roll>: who moves first, or throw the dice for it.
+
+=item C<seed>
+
+Text: hexadecimal; the same seed throws the same dice.
+
+=back
 
 =head2 run
 
@@ -1140,22 +1182,57 @@ game's own legal moves.
     my $index = $terminal->steer('right');
 
 Moves the cursor among the candidates and returns where it is: C<left>,
-C<right>, C<up> and C<down> go to the next piece that way, C<tab> and
-C<backtab> go round them in order, and a digit goes straight to one.
+C<right>, C<up> and C<down> go to the next piece that way and stop at the
+last, C<tab> and C<back_tab> go round them in order, and a digit goes
+straight to one. The keys are named as L<Game::Terminal::Kit::Keys> names
+them; C<backtab> is taken as C<back_tab>.
 
 =head2 pick
 
 Runs the arrow-key picker until a move is chosen, and returns it as text; or
-C<'undo'>, C<'new'>, C<'route'> or C<'quit'> for the key that asks for one;
-or C<undef> when the keys run out.
+C<'undo'> for C<u>, C<'redo'> for C<r>, C<'route'> for C<R>, C<'new'> for
+C<n> or C<'quit'> for C<q> pressed twice; or C<undef> when the keys run out.
 
 =head2 command
 
     my $leaving = $terminal->command('a2-d2');
 
 Does what a typed line says: a move, a number from the list, or one of
-C<help>, C<undo>, C<new>, C<route>, C<moves>, C<record FILE>, C<level N> and
-C<quit>. True when the line asks to leave.
+C<help>, C<undo>, C<redo>, C<new>, C<route>, C<moves>, C<record FILE>,
+C<level N> and C<quit>; C<u> is short for C<undo> and C<r> for C<redo>. True
+when the line asks to leave.
+
+=head2 take_back
+
+    $terminal->take_back;
+
+Takes back the last turn of the person at the keys and every reply to it, as
+C<undo> does. True when there was a turn to take back; otherwise a line says
+so and the game is unchanged.
+
+=head2 play_again
+
+    $terminal->play_again;
+
+Plays again the turn last taken back, as C<redo> does. True when there was
+one.
+
+=head2 swap
+
+    $terminal->swap($game);
+
+Puts another game in place of this one, so that what has already been said of
+it is not said again, the cursor is on the first candidate and no note is left
+over.
+
+=head2 person_turn
+
+Called when the turn passes to a person at the keys: records the game in
+L</history> as a turn.
+
+=head2 history
+
+The L<Game::Terminal::Kit::History> the turns are kept in.
 
 =head2 board_lines
 

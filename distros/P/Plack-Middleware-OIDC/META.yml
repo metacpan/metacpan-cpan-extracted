@@ -1,0 +1,60 @@
+---
+abstract: 'OpenID Connect integration for PSGI/Plack applications'
+author:
+  - 'Sébastien Mourlhou'
+build_requires:
+  File::Spec: '0'
+  FindBin: '0'
+  HTTP::Request::Common: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  JSON::PP: '0'
+  OIDC::Client::TokenResponse: '0'
+  Plack::Builder: '0'
+  Plack::Middleware::Session: '0'
+  Plack::Test: '0'
+  Test::MockModule: v0.177.0
+  Test::More: '0'
+  URI::QueryParam: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: v5.20.0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.036, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-OIDC
+provides:
+  Plack::Middleware::OIDC:
+    file: lib/Plack/Middleware/OIDC.pm
+    version: '1.00'
+  Plack::Middleware::OIDC::Logger:
+    file: lib/Plack/Middleware/OIDC/Logger.pm
+    version: '1.00'
+  Plack::Middleware::OIDC::Redirect:
+    file: lib/Plack/Middleware/OIDC/Redirect.pm
+    version: '1.00'
+requires:
+  Carp: '0'
+  Clone: '0'
+  OIDC::Client: '1.08'
+  OIDC::Client::Error: '0'
+  OIDC::Client::Plugin: '0'
+  Plack::Middleware: '0'
+  Plack::Request: '0'
+  Plack::Response: '0'
+  Plack::Util::Accessor: '0'
+  Scalar::Util: '0'
+  Try::Tiny: '0'
+  URI: '0'
+  perl: v5.20.0
+resources:
+  bugtracker: https://github.com/sebmourlhou/plack-middleware-oidc/issues
+  homepage: https://github.com/sebmourlhou/plack-middleware-oidc
+  repository: https://github.com/sebmourlhou/plack-middleware-oidc.git
+version: '1.00'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: Artistic-2.0

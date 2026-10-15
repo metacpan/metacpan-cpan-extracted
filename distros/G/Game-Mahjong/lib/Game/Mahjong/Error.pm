@@ -6,7 +6,7 @@ use warnings;
 
 use Object::Proto::Sugar -types;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 our (@FLAGS, %MESSAGE);
 
@@ -80,7 +80,7 @@ Game::Mahjong::Error - a refused move, as an object and not an exception
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 

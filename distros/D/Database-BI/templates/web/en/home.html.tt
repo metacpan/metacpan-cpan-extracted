@@ -132,8 +132,12 @@
           syntax to open a file via SSH:<br><br>
           <code>/../hostname/dir/file.csv</code><br>
           <code>/../user@hostname/dir/file.csv</code><br><br>
+          To open a Redis table (optional Redis module required):<br>
+          <code>redis:tablename|redis://host:port</code><br>
+          Or enter a bare URL to browse available keys:<br>
+          <code>redis://host:port</code><br><br>
           Accepted: CSV, TSV, PSV, XLSX, SQLite (.sql / .sqlite /
-          .sqlite3), Berkeley DB (.db), XML.
+          .sqlite3), Berkeley DB (.db), XML, Redis.
         </div>
       </div>
       <div class="action-url-row">

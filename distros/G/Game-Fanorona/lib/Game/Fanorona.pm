@@ -23,7 +23,7 @@ use Game::Fanorona::Notation qw(
     format_position format_game parse_game
 );
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 my @WORD = (undef, 'white', 'black');
 my %SIDE = (white => WHITE, black => BLACK);
@@ -462,6 +462,8 @@ sub as_text {
     }
     my $result = $self->result;
     $game{result} = $result->how . (defined $result->winner ? ' ' . $result->winner : '') if $result;
+    $game{offer} = $self->_offer if defined $self->_offer;
+    $game{chain} = $self->in_progress if defined $self->in_progress;
     return format_game(\%game);
 }
 
@@ -478,6 +480,37 @@ sub from_text {
     return (undef, 'bad_variant', 2) unless $variant;
     my ($game, $error, $n) = $class->replay($parsed->{moves}, variant => $variant);
     return (undef, $error->code, $parsed->{moves_at} + $n - 1) if $error;
+    my $at = $parsed->{at};
+
+    if (defined $parsed->{chain}) {
+        my ($chain) = parse_move($parsed->{chain}, cols => $variant->cols, rows => $variant->rows);
+        my $rules = $game->_rules;
+        for my $wanted (@{ $chain->{steps} }) {
+            my $step = $take->($game, $rules, $wanted, $parsed->{chain})
+                or return (undef, $game->error->code, $at->{chain});
+            push @{ $game->_pending }, $step;
+        }
+        return (undef, 'bad_chain', $at->{chain}) unless $rules->in_chain;
+    }
+
+    if (defined $parsed->{offer}) {
+        $game->offer_draw($parsed->{offer}) or return (undef, $game->error->code, $at->{offer});
+    }
+
+    if (defined $parsed->{result}) {
+        my ($how, $winner) = split / /, $parsed->{result}, 2;
+        if ($how eq 'resign' || $how eq 'agreement') {
+            return (undef, 'bad_result', $at->{result})
+                if $game->over
+                || ($how eq 'resign' ? !(defined $winner && $SIDE{$winner}) : defined $winner);
+            $end->($game, $how, $winner);
+        }
+        else {
+            my $result = $game->result;
+            return (undef, 'bad_result', $at->{result})
+                unless $result && $result->how eq $how && ($result->winner // '') eq ($winner // '');
+        }
+    }
     return ($game, undef, undef);
 }
 
@@ -491,7 +524,7 @@ Game::Fanorona - the board game of Madagascar
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 
@@ -635,8 +668,12 @@ C<$why> is a word: one of L<Game::Fanorona::Notation/parse_game>'s if the
 text is malformed, or an L<Game::Fanorona::Error> code if a move in it was
 refused; C<$line> is the line at fault.
 
-The C<result> line of a text is a record and is not replayed: a game that
-ended by resignation or agreement comes back as its moves left it.
+The game comes back as it was: a move half made is made that far, a standing
+offer of a draw stands, and a game that ended by resignation or agreement has
+ended. Two more words may be C<$why>: C<bad_chain>, for a C<chain> line that
+is a whole move, and C<bad_result>, for a C<result> line the game does not
+bear out: a resignation or an agreement in a game already over, or an ending
+on the board the moves do not reach.
 
 =head1 METHODS
 
@@ -807,7 +844,8 @@ moves.
     my $text = $game->as_text(white => 'Rakoto', black => 'Rasoa');
 
 The game as text: the variant, anything about it that is not the default, the
-names if given, the result if there is one, and the moves. See
+names if given, the result if there is one, a standing offer of a draw, the
+steps of a move half made, and the moves. See
 L<Game::Fanorona::Notation/"A game">.
 
 =head2 position

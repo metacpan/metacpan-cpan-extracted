@@ -12,18 +12,18 @@ use File::XDG;
 use HTTP::Date;
 use JSON::XS;
 use List::Util qw(any max);
+use LWP::Protocol::https;
 use LWP::UserAgent;
 use Text::CSV_XS qw(csv);
 use XML::LibXML;
 use YAML::XS;
-use IO::File;
 use base qw(Exporter);
 use open qw(:std :utf8);
 use strict;
 use utf8;
 use vars qw($VERSION %EXPORT_TAGS $TTL_SECONDS $UA $JSON $CSV $XDG);
 
-$VERSION = '0.08';
+$VERSION = '0.09';
 
 $EXPORT_TAGS{'all'} = [qw(
     mirror_str
@@ -227,7 +227,7 @@ Data::Mirror - a simple way to efficiently retrieve data from the World Wide Web
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 

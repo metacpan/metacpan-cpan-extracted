@@ -69,6 +69,25 @@ make install
 make clean
 
 
+OPTIONAL COMPANION DISTRIBUTION
+***************************************************************************
+The oEdtk core is generic and self-contained. A companion distribution,
+oEUser, carries the modules that only specific applications need (user-side
+address helpers, the generated record descriptors, editor-specific XML
+readers, and the document-injection client). It is NOT a prerequisite of
+oEdtk.
+
+When oEUser is installed, the generic oEdtk::Utils, oEdtk::Infinite and the
+other delegates resolve the corresponding oEUser modules on demand; when it is
+not, they fail with an explicit message. A deployment can also plug corporate
+code in without any registry: oEdtk::Ext loads an optional companion module by
+its fixed name (oEUser::Lib, oEUser::Schema) and resolves a callable named in
+the configuration (EDTK_ACQUIT_API) after validating its name.
+
+To build and install it, see oEUser/README (it is a separate distribution and
+needs oEdtk 2.1110 or later).
+
+
 CONTENT OF THIS ARCHIVE
 ***************************************************************************
 Root files :
@@ -81,13 +100,12 @@ Root files :
 Library (lib/) :
 	lib/oEdtk.pm			main module dedicated for documentation
 	lib/oEdtk/			core modules of the toolkit
-		AddrField.pm  C7Doc.pm  C7Tag.pm  Config.pm  DBAdmin.pm
-		DateField.pm  Dict.pm  Doc.pm  EDMS.pm  FPField.pm
-		FatalsToEmail.pm  Field.pm  Main.pm  Messenger.pm
-		OmgrIdxDoc.pm  Outmngr.pm  Record.pm  RecordParser.pm
-		Run.pm  SignedField.pm  Spool.pm  TexDoc.pm  TexTag.pm
-		Tracking.pm  Tracking2.pm  Util.pm  XPath.pm  dataEdtk.pm
-		libC7.pm  libDev.pm  libXls.pm  logger.pm  logger2.pm
+		AddrField.pm  Config.pm  DBAdmin.pm  DateField.pm  Dict.pm
+		Doc.pm  EDMS.pm  FPField.pm  FatalsToEmail.pm  Field.pm
+		Main.pm  Messenger.pm  OmgrIdxDoc.pm  Outmngr.pm  Record.pm
+		RecordParser.pm  Run.pm  SignedField.pm  Spool.pm  TexDoc.pm
+		TexTag.pm  Tracking.pm  Tracking2.pm  Util.pm  XPath.pm
+		dataEdtk.pm  libDev.pm  libXls.pm  logger.pm  logger2.pm
 		trackEdtk.pm  tuiEdtk.pm
 		COPYING			GNU GENERAL PUBLIC LICENSE
 		README			README of the library

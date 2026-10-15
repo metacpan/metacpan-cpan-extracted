@@ -5,7 +5,7 @@ use warnings;
 
 use Exporter 'import';
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 our @EXPORT_OK = qw(out_seats places_for result_for resign_for);
 
 sub out_seats {
@@ -60,7 +60,7 @@ Game::Durak::Result - who the fool is, and when nobody is
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 

@@ -122,6 +122,31 @@ store(name, value)
         (VARS->var_store)(aTHX_ p, len, value);
     }
 
+# Version 2: one element, by a path of keys and indexes.
+SV *
+elem_get(name, ...)
+        SV *name
+    CODE:
+    {
+        STRLEN len;
+        const char *p = SvPV(name, len);
+        SV *got = (VARS->elem_fetch)(aTHX_ p, len, &ST(1), items - 1);
+        RETVAL = got ? newSVsv(got) : &PL_sv_undef;
+    }
+    OUTPUT:
+        RETVAL
+
+void
+elem_set(name, value, ...)
+        SV *name
+        SV *value
+    CODE:
+    {
+        STRLEN len;
+        const char *p = SvPV(name, len);
+        (VARS->elem_store)(aTHX_ p, len, &ST(2), items - 2, SvOK(value) ? value : NULL);
+    }
+
 # What is current, as an object, through ctx_to_sv; and back, through
 # ctx_from_sv, as a yes or no.
 SV *

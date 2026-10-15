@@ -133,9 +133,127 @@ static void context_vars_plant(pTHX_ CV *cv) {
  * around it is finished. There the rv2sv is nulled and the gv beneath it
  * fused into a gvsv - but the nulled op keeps its flags, so it is read the
  * same way. */
+/* Ext magic with this vtable, by hand: mg_findext is 5.14. */
+static int context_vars_has_ext(SV *sv, const MGVTBL *vt) {
+    MAGIC *mg;
+    if (!sv || SvTYPE(sv) < SVt_PVMG) return 0;
+    for (mg = SvMAGIC(sv); mg; mg = mg->mg_moremagic)
+        if (mg->mg_type == PERL_MAGIC_ext && mg->mg_virtual == vt) return 1;
+    return 0;
+}
+
+/* Is a glob one of ours: a scalar carrying our magic, or an array or hash
+ * carrying the container mark? */
+static int context_vars_gv_ours(pTHX_ GV *gv) {
+    if (!gv || !isGV_with_GP(gv)) return 0;
+    if (context_vars_var_mg(GvSV(gv))) return 1;
+    if (context_vars_has_ext((SV *)GvHV(gv), &context_vars_container_vtbl)) return 1;
+    if (context_vars_has_ext((SV *)GvAV(gv), &context_vars_container_vtbl)) return 1;
+    return 0;
+}
+
+/* Follows an lvalue down its first children - element, dereference, the
+ * nulled forms the optimiser leaves - to the glob at its root, and says
+ * whether that is one of ours. */
+static int context_vars_rooted(pTHX_ OP *o) {
+    int guard = 0;
+    while (o && guard++ < 256) {
+        switch (o->op_type) {
+        case OP_GV: case OP_GVSV:
+            return context_vars_gv_ours(aTHX_ cGVOPx_gv(o));
+        case OP_PUSHMARK:
+            o = OpSIBLING(o);
+            continue;
+        case OP_HSLICE: case OP_ASLICE:
+            /* A slice's container is its last child: the keys come first. */
+            if (!(o->op_flags & OPf_KIDS)) return 0;
+            o = cLISTOPx(o)->op_last;
+            continue;
+        case OP_SCOPE: case OP_LEAVE: case OP_LINESEQ:
+            /* A dereference written as a block, @{ $h{a} }, is a scope whose
+             * value is its last statement; the first is a dead nextstate. */
+            if (!(o->op_flags & OPf_KIDS)) return 0;
+            o = cLISTOPx(o)->op_last;
+            continue;
+        case OP_HELEM: case OP_AELEM: case OP_RV2HV: case OP_RV2AV: case OP_RV2SV:
+        case OP_NULL: case OP_EXISTS: case OP_DELETE: case OP_LIST:
+            if (!(o->op_flags & OPf_KIDS)) return 0;
+            o = cUNOPx(o)->op_first;
+            continue;
+        default:
+            return 0;
+        }
+    }
+    return 0;
+}
+
+/* A write to an array, a hash, an element of one, or anything below one.
+ *
+ * perl marks some reads as modifications too, and those are left out: an
+ * element in the middle of a chain, $h{a} in $h{a}{b}, is marked so that it
+ * can be made if it is missing (OPpDEREF); an element passed to a sub is
+ * marked in case the sub assigns through @_ (OPpLVAL_DEFER), which the pass
+ * does not see for a scalar either. */
+static int context_vars_deep_write(pTHX_ OP *o) {
+    switch (o->op_type) {
+    case OP_HELEM: case OP_AELEM:
+        if (o->op_private & (OPpDEREF | OPpLVAL_DEFER)) return 0;
+        if ((o->op_flags & OPf_MOD) || (o->op_private & OPpLVAL_INTRO))
+            return context_vars_rooted(aTHX_ o);
+        return 0;
+    case OP_RV2HV: case OP_RV2AV:
+    case OP_HSLICE: case OP_ASLICE:
+        if ((o->op_flags & OPf_MOD) || (o->op_private & OPpLVAL_INTRO))
+            return context_vars_rooted(aTHX_ o);
+        return 0;
+    case OP_DELETE: case OP_PUSH: case OP_POP: case OP_SHIFT: case OP_UNSHIFT: case OP_SPLICE:
+        return (o->op_flags & OPf_KIDS) && context_vars_rooted(aTHX_ cUNOPx(o)->op_first);
+    default:
+        return 0;
+    }
+}
+
+/* Ops whose container operand perl marks as modified for its own purposes,
+ * not because it is written: keys, values and each reset an iterator, and
+ * foreach, grep and map make aliases. A write through those aliases is one
+ * the pass does not see, as for a scalar. */
+static int context_vars_reads_container(OP *o) {
+    switch (o->op_type) {
+    case OP_KEYS: case OP_VALUES: case OP_EACH:
+    case OP_ENTERITER: case OP_GREPSTART: case OP_MAPSTART:
+        return 1;
+    default:
+        return 0;
+    }
+}
+
+static int context_vars_writes(pTHX_ OP *o);
+
+/* The kids of such an op, with any array or hash among them - directly, or
+ * inside the list perl wraps them in - not counted as written, and everything
+ * below them looked at as usual. */
+static int context_vars_writes_under_reader(pTHX_ OP *o) {
+    OP *k, *g;
+    if (!(o->op_flags & OPf_KIDS)) return 0;
+    for (k = cUNOPx(o)->op_first; k; k = OpSIBLING(k)) {
+        if (k->op_type == OP_RV2AV || k->op_type == OP_RV2HV) {
+            if (k->op_flags & OPf_KIDS)
+                for (g = cUNOPx(k)->op_first; g; g = OpSIBLING(g))
+                    if (context_vars_writes(aTHX_ g)) return 1;
+        }
+        else if ((k->op_type == OP_LIST || k->op_type == OP_NULL) && (k->op_flags & OPf_KIDS)) {
+            if (context_vars_writes_under_reader(aTHX_ k)) return 1;
+        }
+        else if (context_vars_writes(aTHX_ k)) return 1;
+    }
+    return 0;
+}
+
 static int context_vars_writes(pTHX_ OP *o) {
     OP *k;
     if (!o) return 0;
+    if (context_vars_reads_container(o)) return context_vars_writes_under_reader(aTHX_ o);
+    if (context_vars_deep_write(aTHX_ o)) return 1;
     if ((o->op_type == OP_RV2SV
          || (o->op_type == OP_NULL && o->op_targ == OP_RV2SV))
         && (o->op_flags & OPf_KIDS)) {

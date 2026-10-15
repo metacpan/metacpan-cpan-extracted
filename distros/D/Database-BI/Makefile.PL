@@ -15,7 +15,7 @@ WriteMakefile(
 	NAME			 => 'Database::BI',
 	VERSION_FROM	 => 'lib/Database/BI.pm',
 	ABSTRACT_FROM => 'lib/Database/BI.pm',
-	AUTHOR		   => 'Nigel Horne <njh@nigelhorne.com>',
+	AUTHOR		=> 'Nigel Horne <njh@nigelhorne.com>',
 	LICENSE		  => 'gpl_2',
 	MIN_PERL_VERSION => '5.020000',
 	EXE_FILES	=> ['script/database-bi'],
@@ -24,8 +24,8 @@ WriteMakefile(
 		'CHI'			=> 0,
 		'CGI::Info'	=> 0,
 		'CGI::Lingua'		=> '0.85',
-		'Database::Abstraction'	=> '0.48',	# 0.48 added limit/offset support in selectall_arrayref
-		'Database::Join'	=> '0.004.0',
+		'Database::Abstraction'	=> '0.51',	# 0.50 added redis_key + standalone-key support; 0.49 added aggregate(); 0.48 added limit/offset support in selectall_arrayref
+		'Database::Join' => '0.009.0',	# 0.009.0 added aggregate(), limit/offset/sort_by, dbi_source(); 0.004.0 added backend=>'auto' SQLite spill
 		'DBI'		=> 0,
 		'Net::SFTP::Foreign' => 0,
 		'File::Path'	=> '2.07',	# For remove_tree in Dashboard.pm at runtime
@@ -35,7 +35,7 @@ WriteMakefile(
 		'IPC::System::Simple' => 0,	# For autodie (:all) in DataSource.pm at runtime
 		'Mojo::Base' => 0,
 		'Mojo::JSON' => 0,
-		'HTML::D3' => 0.18,
+		'HTML::D3' => '0.20',	# 0.20 added radius_range support for render_scatter_chart_snippet; 0.19 added scatter/stacked/combo/treemap/histogram snippets
 		'HTML::TableExtract'	=> 0,
 		'LWP::UserAgent'		=> 0,		# Needed for Test::Mojo HTTP testing; LWP::UserAgent::Cached is used by D::A url fetch path
 		'LWP::UserAgent::Cached'	=> 0,		# Used by Database::Abstraction for URL-backed tables (import_url)
@@ -47,11 +47,12 @@ WriteMakefile(
 		'Params::Validate::Strict'	=> '0.39',
 		'Readonly'		=> 0,
 		'Socket'	=> '2.010',
+		'POSIX'			=> 0,		# For floor/ceil in Calc.pm (core module, listed for completeness)
 		'Spreadsheet::ParseXLSX'	=> 0,
 		'Sub::Protected'	=> 0,
+		'Excel::Writer::XLSX'	=> '1.07',
 	}, TEST_REQUIRES => {
 		'DBD::CSV' => 0,
-		'Excel::Writer::XLSX' => 0,
 		'Encode' => 0,
 		'Test::Memory::Cycle' => 0,
 		'Test::Mockingbird' => 0,
@@ -70,11 +71,16 @@ WriteMakefile(
 			repository => {
 				type => 'git',
 				url  => 'https://github.com/nigelhorne/Database-BI.git',
-				web  => 'https://github.com/nigelhorne/Database-BI',
-			},
-			bugtracker => {
+				web => 'https://github.com/nigelhorne/Database-BI',
+			}, bugtracker => {
 				web => 'https://github.com/nigelhorne/Database-BI/issues',
-			},
+			}
+		}, prereqs => {
+			test => {
+				recommends => {
+					'Redis' => 0
+				}
+			}
 		},
 	},
 );

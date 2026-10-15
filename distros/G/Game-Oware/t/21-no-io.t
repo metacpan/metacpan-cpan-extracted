@@ -31,14 +31,14 @@ subtest 'the engine does not pull the terminal in with it' => sub {
 };
 
 subtest 'a whole game runs with both handles rigged to die' => sub {
-	require Game::Oware::Test::Handle;
+	require Game::Terminal::Kit::Test::Handle;
 
 	my ($error, $total, $plies);
 
 	# NOTHING BETWEEN THE TIE AND THE UNTIE MAY CALL Test::More: the handles it
 	# would print through are the ones rigged to die.
-	tie *STDOUT, 'Game::Oware::Test::Handle';
-	tie *STDIN,  'Game::Oware::Test::Handle';
+	tie *STDOUT, 'Game::Terminal::Kit::Test::Handle';
+	tie *STDIN,  'Game::Terminal::Kit::Test::Handle';
 
 	eval {
 		my $game = Game::Oware->new(seed => 'no-io');

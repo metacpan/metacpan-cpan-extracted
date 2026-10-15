@@ -5,6 +5,6 @@ use warnings;
 
 use Game::Gin::Terminal;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 exit Game::Gin::Terminal->run(@ARGV);

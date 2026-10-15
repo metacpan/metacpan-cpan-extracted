@@ -42,8 +42,9 @@ A C compiler is needed. To install this module, run the following commands:
 	make test
 	make install
 
-It requires Object::Proto::Sugar. Term::ReadKey is recommended: with it the
-terminal program is played with the arrow keys, and without it by typing.
+It requires Object::Proto::Sugar and Game::Terminal::Kit. Term::ReadKey is
+recommended: with it the terminal program is played with the arrow keys, and
+without it by typing.
 
 
 SUPPORT AND DOCUMENTATION

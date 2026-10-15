@@ -1,5 +1,12 @@
 Revision history for Game-Fanorona
 
+0.03    2026-10-13
+        - Add options, the fields a launcher offers before a game
+        - The keys, the screen, the steering and the typed line are Game::Terminal::Kit's
+        - An unset NO_COLOR or an empty one leaves colour on; any other value turns it off
+        - as_text writes a standing draw offer and a move half made, and from_text restores them and a resignation or agreement
+        - u undoes and r redoes a turn, through Game::Terminal::Kit::History; up-right is 9 alone and the rules key is now R
+
 0.02    2026-10-11
         - Add Game::Fanorona::Terminal->run(@argv), which returns the exit status
 

@@ -7,7 +7,7 @@ use Game::Merrills::Points;
 use Game::Merrills::Board;
 use Game::Merrills::Move;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use constant {
 	HAND_WHITE => 24,
@@ -200,7 +200,7 @@ Game::Merrills::Rules - which moves are legal, and what a move does to a positio
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 

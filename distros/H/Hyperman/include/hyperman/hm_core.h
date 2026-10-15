@@ -449,6 +449,7 @@ static int  hm_stream_deliver(pTHX_ int fd, UV cid, int64_t sid,
                               const char *buf, STRLEN len, int fin);
 static void hm_stream_h2_gone(pTHX_ int fd, UV id, int64_t sid);
 static void hm_stream_drained(pTHX_ hm_conn *c);
+static int  hm_h2_reentrant(hm_conn *c);  /* hm_http2.h */
 
 #include "hm_tls.h"                        /* SSL_CTX, wrap, hm_cread/hm_cwrite */
 
@@ -3603,7 +3604,10 @@ static void hm_readable(pTHX_ hm_conn *c) {
              * reading frames out of this very buffer, or hm_process holding
              * offsets into it: growing it here would move it from under
              * them. Leave the rest in the socket until that frame returns. */
-            if (c->in_app) { hm_read_pause(loop, c); break; }
+            if (c->in_app && !hm_h2_reentrant(c)) {
+                hm_read_pause(loop, c);
+                break;
+            }
             /* HTTP/2: the buffer holds frames, not a request, and nghttp2
              * parses them incrementally - a frame larger than the buffer is
              * consumed across reads. Hand over what is here and let the
@@ -3726,7 +3730,10 @@ static void hm_readable(pTHX_ hm_conn *c) {
      * is on the stack (its ->get pumped this loop) keeps the new bytes in
      * rbuf for the hm_process frame already running on it: a second frame
      * would consume the pipeline from under the first one's offsets. */
-    if (!c->tunnel && !c->in_app) hm_process(aTHX_ c);
+    /* HTTP/2 is the exception once nghttp2 has returned: a handler waiting
+     * for its body to drain is waiting for the window updates in these very
+     * bytes, and hm_h2_input takes them without starting another request. */
+    if (!c->tunnel && (!c->in_app || hm_h2_reentrant(c))) hm_process(aTHX_ c);
     if (loop->conns[c->fd] == c) hm_flush(aTHX_ c);
 }
 
@@ -4031,7 +4038,7 @@ static void hm_run_again(pTHX_ hm_loop *loop) {
     for (i = 0; i < n; i++) {
         hm_conn *c = loop->conns[loop->again[i].fd];
         if (c && c->id == loop->again[i].id && !c->awaiting
-            && !c->in_app && !c->bsrc.kind) {
+            && (!c->in_app || hm_h2_reentrant(c)) && !c->bsrc.kind) {
             hm_process(aTHX_ c);
             if (loop->conns[c->fd] == c) {
                 hm_flush(aTHX_ c);

@@ -21,6 +21,30 @@ static SV *context_vars_abi_ctx_to_sv(pTHX_ context_vars_ctx *c) {
     return obj;
 }
 
+static AV *context_vars_abi_path(pTHX_ const char *name, STRLEN len, SV **keys, int nkeys) {
+    AV *path = (AV *)sv_2mortal((SV *)newAV());
+    int i;
+    av_push(path, newSVpvn(name, len));
+    for (i = 0; i < nkeys; i++) av_push(path, newSVsv(keys[i]));
+    return path;
+}
+
+static SV *context_vars_abi_elem_fetch(pTHX_ const char *name, STRLEN len, SV **keys, int nkeys) {
+    SV *at = context_vars_path_get(aTHX_ context_vars_abi_path(aTHX_ name, len, keys, nkeys));
+    return at ? sv_2mortal(context_vars_plain(aTHX_ at)) : NULL;
+}
+
+static void context_vars_abi_elem_store(pTHX_ const char *name, STRLEN len, SV **keys, int nkeys, SV *value) {
+    SV *conv;
+    if (nkeys == 0) {
+        context_vars_var_put(aTHX_ name, len, value);
+        return;
+    }
+    conv = value ? context_vars_in(aTHX_ value) : NULL;
+    context_vars_path_put(aTHX_ context_vars_abi_path(aTHX_ name, len, keys, nkeys),
+                          conv ? conv : value ? newSVsv(value) : NULL);
+}
+
 static const context_vars_abi CONTEXT_VARS_ABI = {
     CONTEXT_VARS_ABI_VERSION,
     context_vars_current,
@@ -33,7 +57,9 @@ static const context_vars_abi CONTEXT_VARS_ABI = {
     context_vars_fetch,
     context_vars_abi_var_store,
     context_vars_obj_try,
-    context_vars_abi_ctx_to_sv
+    context_vars_abi_ctx_to_sv,
+    context_vars_abi_elem_fetch,
+    context_vars_abi_elem_store
 };
 
 /* ---- the selftest ----------------------------------------------------------- */
@@ -144,6 +170,25 @@ static SV *context_vars_abi_selftest(pTHX_ int *step) {
     bad = sv_2mortal(newSVpvs("Context::Vars::Context"));
     CONTEXT_VARS_ABI_STEP(64, (A->ctx_from_sv)(aTHX_ bad) == NULL);
     CONTEXT_VARS_ABI_STEP(65, (A->ctx_from_sv)(aTHX_ &PL_sv_undef) == NULL);
+
+    /* version 2: a path into a hash, made where it is missing, read back plain */
+    {
+        SV *keys[2], *got2, *val = sv_2mortal(newSViv(7));
+        keys[0] = sv_2mortal(newSVpvs("x"));
+        keys[1] = sv_2mortal(newSVpvs("y"));
+        (A->elem_store)(aTHX_ "%deep", 5, keys, 2, val);
+        got2 = (A->elem_fetch)(aTHX_ "%deep", 5, keys, 2);
+        CONTEXT_VARS_ABI_STEP(80, got2 && SvIV(got2) == 7);
+        got2 = (A->elem_fetch)(aTHX_ "%deep", 5, keys, 1);
+        CONTEXT_VARS_ABI_STEP(81, got2 && SvROK(got2) && SvTYPE(SvRV(got2)) == SVt_PVHV && !SvRMAGICAL(SvRV(got2)));
+        (A->elem_store)(aTHX_ "%deep", 5, keys, 2, NULL);
+        CONTEXT_VARS_ABI_STEP(82, (A->elem_fetch)(aTHX_ "%deep", 5, keys, 2) == NULL);
+        keys[0] = sv_2mortal(newSViv(2));
+        (A->elem_store)(aTHX_ "@deep", 5, keys, 1, val);
+        got2 = (A->elem_fetch)(aTHX_ "@deep", 5, NULL, 0);
+        CONTEXT_VARS_ABI_STEP(83, got2 && SvROK(got2) && SvTYPE(SvRV(got2)) == SVt_PVAV
+                                  && av_len((AV *)SvRV(got2)) == 2);
+    }
 
     LEAVE;
     CONTEXT_VARS_ABI_STEP(70, (A->current)(aTHX) != outer);

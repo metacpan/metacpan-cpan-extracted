@@ -158,6 +158,43 @@ subtest 'hermetic snapshot: no xrepo call at all' => sub {
     is $a->install_type, 'share', 'snapshot install_type served';
     is $spy->calls,      0,       'no xrepo subprocess in hermetic mode';
 };
+subtest 'snapshot state is exposed for built-vs-cold test guards' => sub {
+    my $snap = path($dir)->child('stateful.json');
+    $snap->spew_utf8(
+        encode_json(
+            {   dist_name    => 'Exotic-Zstandard',
+                install_type => 'share',
+                packages     => {
+                    zstd => {
+                        includedirs => ['C:/snap/zstd/include'],
+                        libfiles    => [],
+                        linkdirs    => ['C:/snap/zstd/lib'],
+                        links       => ['zstd'],
+                        license     => undef,
+                        shared      => 1,
+                        static      => 0,
+                        version     => '1.5.6',
+                        installdir  => 'C:/snap/zstd',
+                        kind        => 'library'
+                    }
+                },
+                errors => { zstd => 'boom' }
+            }
+        )
+    );
+    my $spy = Alien::Xrepo::Runtime::TestSpy->new;
+    my $a   = Alien::Xrepo::Runtime->new( pkg_name => 'zstd', snapshot => $snap, repo => $spy, autodetect_snapshot => 0 );
+    ok $a->has_snapshot, 'a loaded snapshot is reported';
+    is $a->snapshot_path, $snap->stringify, 'the snapshot path is exposed';
+    is $a->snapshot_errors, { zstd => 'boom' }, 'recorded build errors are exposed';
+};
+subtest 'a cold runtime reports no snapshot state' => sub {
+    my $spy = Alien::Xrepo::Runtime::TestSpy->new;
+    my $a   = Alien::Xrepo::Runtime->new( pkg_name => 'zstd', repo => $spy, autodetect_snapshot => 0 );
+    ok !$a->has_snapshot, 'no snapshot loaded';
+    is $a->snapshot_path, undef, 'no snapshot path';
+    is $a->snapshot_errors, {}, 'no recorded errors';
+};
 subtest 'unknown packages rejected on use' => sub {
     my $spy = Alien::Xrepo::Runtime::TestSpy->new;
     my $a   = Alien::Xrepo::Runtime->new( pkg_name => 'zstd', repo => $spy );

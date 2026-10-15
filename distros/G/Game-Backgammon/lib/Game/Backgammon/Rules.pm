@@ -8,7 +8,7 @@ use Game::Backgammon::Move;
 use Game::Backgammon::Turn;
 use Exporter 'import';
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 our @EXPORT_OK = qw(legal_turns apply_move single_moves);
 
 sub single_moves {
@@ -75,7 +75,7 @@ sub legal_turns {
     my ($board, $player, @dice) = @_;
 
     my @seqs;
-    _walk($board, $player, \@dice, [], \@seqs);
+    _walk($board, $player, \@dice, [], \@seqs, {});
 
     my $most = 0;
     for my $s (@seqs) { $most = @{ $s->{moves} } if @{ $s->{moves} } > $most }
@@ -101,7 +101,8 @@ sub legal_turns {
 }
 
 sub _walk {
-    my ($board, $player, $dice, $sofar, $out) = @_;
+    my ($board, $player, $dice, $sofar, $out, $seen) = @_;
+    return if $seen->{ join(',', sort map { $_->notation } @$sofar) . '|' . join(',', sort @$dice) }++;
     push @$out, { moves => [ @$sofar ] };
     return unless @$dice;
 
@@ -112,7 +113,7 @@ sub _walk {
         my ($die) = splice @rest, $i, 1;
         for my $move (single_moves($board, $player, $die)) {
             _walk(apply_move($board, $move), $player, \@rest,
-                  [ @$sofar, $move ], $out);
+                  [ @$sofar, $move ], $out, $seen);
         }
     }
     return;

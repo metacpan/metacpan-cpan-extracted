@@ -9,7 +9,7 @@ use Game::Backgammon::Board;
 use Game::Backgammon::Rules ();
 use Game::Backgammon::Shots qw(shots_at);
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 has level => (
 	is => 'ro',

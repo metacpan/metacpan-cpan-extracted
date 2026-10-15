@@ -34,9 +34,9 @@ $scope->(sub {
 
     my $aref = [1, 2];
     $val = $aref;
-    is($val, $aref, 'a reference comes back as the same reference');
+    is_deeply($val, [1, 2], 'an array reference comes back with its contents');
     push @$aref, 3;
-    is_deeply($val, [1, 2, 3], 'and shares what it refers to');
+    is_deeply($val, [1, 2], 'and is the variable\'s own copy: changing the original does not change it');
 
     my $obj = bless { n => 1 }, 'V::Obj';
     $val = $obj;

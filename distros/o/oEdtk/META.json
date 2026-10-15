@@ -31,8 +31,14 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "DBD::Pg" : "0",
+            "DBD::mysql" : "0"
+         },
          "requires" : {
             "Archive::Zip" : "0",
+            "CGI" : "0",
+            "CGI::FormBuilder" : "0",
             "CPAN::DistnameInfo" : "0",
             "Config::IniFiles" : "2.30",
             "Cwd" : "0",
@@ -40,6 +46,7 @@
             "DBD::SQLite" : "0",
             "DBI" : "1.60",
             "Data::Dumper" : "0",
+            "Data::UUID" : "0",
             "Date::Calc" : "0",
             "Digest::MD5" : "0",
             "Email::Sender::Simple" : "0",
@@ -48,32 +55,62 @@
             "File::Basename" : "0",
             "File::Copy" : "0",
             "File::Path" : "0",
+            "File::Slurp" : "0",
+            "HTTP::Request" : "0",
+            "HTTP::Request::Common" : "0",
+            "HTTP::Status" : "0",
+            "IO::Socket::SSL" : "0",
+            "IPC::Run3" : "0",
             "Image::Size" : "0",
             "JSON" : "0",
+            "JSON::PP" : "0",
+            "LWP::UserAgent" : "0",
             "List::MoreUtils" : "0",
             "List::Util" : "0",
             "Log::Log4perl" : "0",
             "Math::Round" : "0.06",
             "Net::FTP" : "0",
             "PDF::Create" : "0",
+            "PDF::Tk" : "0",
+            "Readonly" : "0",
+            "Regexp::Common" : "0",
             "Roman" : "0",
             "Scalar::Util" : "0",
             "Spreadsheet::WriteExcel" : "1.00",
             "Sys::Hostname" : "0",
+            "Term::ANSIColor" : "0",
             "Term::ReadKey" : "0",
             "Text::CSV" : "1.20",
+            "Text::CSV_XS" : "0",
+            "Text::QRCode" : "0",
+            "Time::HiRes" : "0",
+            "Try::Tiny" : "0",
             "XML::LibXML" : "1.70",
             "XML::Simple" : "0",
             "XML::Writer" : "0",
             "XML::XPath" : "1.13",
             "YAML" : "0",
+            "YAML::Tiny" : "0",
             "charnames" : "0",
             "overload" : "0",
-            "perl" : "5.010"
+            "perl" : "5.028"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBD::Pg" : "0",
+            "DBD::mysql" : "0",
+            "IPC::Run3" : "0",
+            "Perl::Critic" : "0",
+            "Perl::Tidy" : "0",
+            "Test::Fake::HTTPD" : "0",
+            "Test::Fatal" : "0",
+            "Test::MockModule" : "0",
+            "Test::More" : "1.302"
          }
       }
    },
    "release_status" : "stable",
-   "version" : 2.1109,
+   "version" : "2.1120",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

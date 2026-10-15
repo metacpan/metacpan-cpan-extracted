@@ -61,9 +61,11 @@ my @tests = (
 	],
 	[ '0::/system.slice/docker-deadbeef.scope', 'd_deadbeef', '/system.slice/docker-deadbeef.scope' ],
 
-	# docker outside of system.slice
-	[ '0::/docker/0123456789abcdef',     'd_0123456789abcdef', '/docker/0123456789abcdef' ],
-	[ '0::/docker/0123456789abcdef/init', 'd_0123456789abcdef', '/docker/0123456789abcdef' ],
+	# docker outside of system.slice, as with the cgroupfs driver, with and without a
+	# known ID
+	[ '0::/docker/0123456789abcdef',      'd_web',      '/docker/0123456789abcdef' ],
+	[ '0::/docker/0123456789abcdef/init', 'd_web',      '/docker/0123456789abcdef' ],
+	[ '0::/docker/deadbeef',              'd_deadbeef', '/docker/deadbeef' ],
 
 	# every cgroup for a user maps to the one name and the stats all come from the
 	# slice for that user
@@ -84,6 +86,31 @@ my @tests = (
 	[   '0::/machine.slice/libpod-conmon-fedcba9876543210.scope',
 		'libpod-conmon',
 		'/machine.slice/libpod-conmon-fedcba9876543210.scope'
+	],
+
+	# anything else under machine.slice is named for the machine, as reading all of
+	# machine.slice would count the podman containers under it twice... the libvirt
+	# domain ID is dropped as it changes each time the VM starts
+	[   '0::/machine.slice/systemd-nspawn@foo.service/payload',
+		'm_nspawn_foo',
+		'/machine.slice/systemd-nspawn@foo.service'
+	],
+	[   '0::/machine.slice/systemd-nspawn@foo\x2dbar.service/payload',
+		'm_nspawn_foo-bar',
+		'/machine.slice/systemd-nspawn@foo\x2dbar.service'
+	],
+	[ '0::/machine.slice/machine-foo.scope/payload', 'm_foo', '/machine.slice/machine-foo.scope' ],
+	[   '0::/machine.slice/machine-qemu\x2d1\x2dvm.scope/libvirt/emulator',
+		'm_qemu_vm',
+		'/machine.slice/machine-qemu\x2d1\x2dvm.scope'
+	],
+	[   '0::/machine.slice/machine-qemu\x2d23\x2dmy\x2dvm.scope/libvirt/vcpu0',
+		'm_qemu_my-vm',
+		'/machine.slice/machine-qemu\x2d23\x2dmy\x2dvm.scope'
+	],
+	[   '0::/machine.slice/machine-lxc\x2d12\x2dweb.scope',
+		'm_lxc_web',
+		'/machine.slice/machine-lxc\x2d12\x2dweb.scope'
 	],
 
 	# anything else is the first bit of the path

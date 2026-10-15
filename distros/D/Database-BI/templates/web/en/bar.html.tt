@@ -25,7 +25,7 @@
 
 <div class="bar-container">
   <script src="https://d3js.org/d3.v7.min.js"></script>
-  [% bar_html %]
+  [% chart_html %]
 </div>
 
 <!-- Metadata read by the drill-down click handler below. -->

@@ -8,7 +8,7 @@ use Exporter 'import';
 use Game::Schnapsen::Card qw(suit_of power_of points_of);
 use Game::Schnapsen::Trick qw(winner_of);
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 our @EXPORT_OK = qw(best_lead best_follow best_marriage should_close should_claim
                     hand_strength LEVELS);
 
@@ -123,7 +123,7 @@ Game::Schnapsen::Search - the bot's reasoning, with a signature that cannot chea
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 

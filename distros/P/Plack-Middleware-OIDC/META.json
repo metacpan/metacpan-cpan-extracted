@@ -1,0 +1,104 @@
+{
+   "abstract" : "OpenID Connect integration for PSGI/Plack applications",
+   "author" : [
+      "S\u00e9bastien Mourlhou"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.036, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Plack-Middleware-OIDC",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "v5.20.0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::More" : "0.88",
+            "Test::NoBreakpoints" : "0.15",
+            "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Portability::Files" : "0",
+            "Test::Vars" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Clone" : "0",
+            "OIDC::Client" : "1.08",
+            "OIDC::Client::Error" : "0",
+            "OIDC::Client::Plugin" : "0",
+            "Plack::Middleware" : "0",
+            "Plack::Request" : "0",
+            "Plack::Response" : "0",
+            "Plack::Util::Accessor" : "0",
+            "Scalar::Util" : "0",
+            "Try::Tiny" : "0",
+            "URI" : "0",
+            "perl" : "v5.20.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "HTTP::Request::Common" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "JSON::PP" : "0",
+            "OIDC::Client::TokenResponse" : "0",
+            "Plack::Builder" : "0",
+            "Plack::Middleware::Session" : "0",
+            "Plack::Test" : "0",
+            "Test::MockModule" : "v0.177.0",
+            "Test::More" : "0",
+            "URI::QueryParam" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Plack::Middleware::OIDC" : {
+         "file" : "lib/Plack/Middleware/OIDC.pm",
+         "version" : "1.00"
+      },
+      "Plack::Middleware::OIDC::Logger" : {
+         "file" : "lib/Plack/Middleware/OIDC/Logger.pm",
+         "version" : "1.00"
+      },
+      "Plack::Middleware::OIDC::Redirect" : {
+         "file" : "lib/Plack/Middleware/OIDC/Redirect.pm",
+         "version" : "1.00"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sebmourlhou/plack-middleware-oidc/issues"
+      },
+      "homepage" : "https://github.com/sebmourlhou/plack-middleware-oidc",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/sebmourlhou/plack-middleware-oidc.git",
+         "web" : "https://github.com/sebmourlhou/plack-middleware-oidc"
+      }
+   },
+   "version" : "1.00",
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
+   "x_spdx_expression" : "Artistic-2.0"
+}
+

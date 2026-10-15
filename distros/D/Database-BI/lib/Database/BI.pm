@@ -12,7 +12,7 @@ use Readonly;
 
 use Database::BI::Model::DataSource;
 
-our $VERSION = '0.011.0';
+our $VERSION = '0.012.0';
 
 # Default config values used by the Config plugin and referenced explicitly
 # in startup() so callers always get a resolved value.
@@ -29,22 +29,23 @@ Readonly my $UPLOAD_MAX_AGE_S  => 24 * 3600;		# evict uploads older than 24 h
 
 =head1 NAME
 
-Database::BI - Web-based Business Intelligence viewer for flat data files
+Database::BI - Web-based Business Intelligence viewer for data files
 
 =head1 VERSION
 
-0.011.0
+0.012.0
 
 =head1 DESCRIPTION
 
 C<Database::BI> is a self-contained L<Mojolicious> web application that reads
-arbitrary flat data files (CSV, PSV, TSV, SQLite, XML, XLSX, etc.) via
-L<Database::Abstraction> and presents them as styled, sortable, reorderable
-HTML tables.  It has no persistent database of its own -- it reads your files
-on every request.
+and views arbitrary flat data (CSV, PSV, TSV, SQLite, XML, XLSX, etc.)
+and presents them as styled, sortable, reorderable
+HTML tables.
+It has no persistent database of its own,
+it reads your files on every request.
 
 Users navigate to pick a file, open the filesystem browser to navigate anywhere
-on disk, drag-and-drop files to upload, join multiple tables in memory, apply
+on disc, drag-and-drop files to upload, join multiple tables in memory, apply
 server-side filters, and export results as CSV, SQLite, or JSON.  D3.js
 visualisations (line chart, pie chart) are available from the toolbar.
 
@@ -115,7 +116,17 @@ B<Export> -- the toolbar export panel writes the current logical view
 =item *
 
 B<URL import> -- C</import> fetches an HTML table from any public URL and
-renders it in the browser without saving to disk.
+renders it in the browser without saving to disc.
+
+=item *
+
+B<Redis data source> (optional) -- when the C<Redis> or C<Redis::Fast> module
+is installed, any Redis hash store can be opened as a read-only data table by
+entering a C<redis:tablename|redis://host:port> spec in the path field or in a
+join/combine panel.  Redis keys must follow the C<tablename:entry> convention
+used by L<Database::Abstraction>.  Because C<Redis> is an optional dependency,
+the application works fully without it; Redis support activates automatically
+when the module is available.
 
 =back
 
@@ -196,9 +207,16 @@ auto-detected first one.
 
 Performs one or more left joins and renders the merged table.  Parameters:
 
-  l=<spec>               left table: "table:name" or "path:/abs/path"
+  l=<spec>               left table spec (see below)
   j=<spec>|<lk>|<rk>    join step (repeatable): right-spec, left key, right key
   f=<col>:<op>:<val>     result filter (repeatable)
+
+Spec formats:
+
+  table:name                         named table from data_dir
+  path:/abs/path/to/file.csv         absolute local path
+  /../hostname/dir/file.csv          remote file via SFTP
+  redis:tablename|redis://host:port  Redis hash store (requires Redis module)
 
 =item C<GET /api/columns>
 
@@ -427,8 +445,27 @@ into the C<Import from a web page> field on the dashboard.
 
 When the router matches C<GET /view/Sales> or C<GET /view/SALES>, the table
 name is lowercased to C<sales> before being passed to the helper.  The data
-file on disk must therefore also be lowercase (C<sales.csv>, not
+file on disc must therefore also be lowercase (C<sales.csv>, not
 C<Sales.csv>).
+
+=item B<Redis support requires the Redis or Redis::Fast module>
+
+Redis data source access is an optional feature.  If neither C<Redis> nor
+C<Redis::Fast> is installed, entering a C<redis:...> spec returns a 404.
+To enable Redis support, install either module:
+
+    cpanm Redis::Fast   # recommended -- C bindings, faster
+    cpanm Redis         # pure-Perl fallback
+
+Redis keys must follow the C<tablename:entry> convention: each key is the
+table name, a colon, and an entry identifier; the value is a Redis hash
+whose fields become the row columns.  For example:
+
+    HSET players:row1 name Alice score 10
+    HSET players:row2 name Bob   score 20
+
+Opening C<redis:players|redis://localhost:6379> then displays a two-row table
+with columns C<entry>, C<name>, and C<score>.
 
 =back
 
@@ -471,15 +508,10 @@ works correctly in production without any special workarounds.
 
 =head1 ROADMAP
 
-Features planned for future releases (post-0.010.0).  Items are ordered by
+Features planned for future releases (post-0.012.0).  Items are ordered by
 priority.
 
 =over 4
-
-=item * B<Pagination / virtual scrolling> (High) -- Tables are rendered as a
-single HTML blob.  Files with 100 k+ rows will time out or exhaust memory.
-Add a C<?page=N&limit=M> server-side slice or a JS C<IntersectionObserver>
-infinite-scroll to cap peak HTML size.
 
 =item * B<XLSX export> (High) -- C</export> supports CSV, SQLite, and JSON
 but not XLSX output.  C<Excel::Writer::XLSX> would close the round-trip for
@@ -521,15 +553,18 @@ renderer, giving visible progress on slow joins.
 # =============================================================================
 #
 # Items marked [NEW 0.010.0] were identified during the 0.010.0 gap analysis.
-# Items marked [DJ 0.007.0] relate specifically to Database::Join 0.007.0.
+# Items completed in 0.012.0 (Phase 0):
+#   A. Pagination -- done: /view, /open, /join, /combine, /export all paginate.
+#   1. dbi_source() proxy -- done: DataSource::dbi_source() delegating method added.
+#   2. limit/offset plumbing -- done: /join, /combine, /export thread pagination.
+#   3. order_by delegation -- done: ?sort=col&dir=asc|desc on /join and /combine.
+#   4. Filter pushdown -- done: _filter_specs_to_criteria translates f= specs to
+#      SQL criteria for SQLite sources; _grouped_totals and _fetch_page both use it.
+#   5. Schema warnings UI -- partial: join_tables captures and passes schema_warnings;
+#      BI-side type-mismatch detection (P0-6 in BI-Phases0-1-TODO.md) is still open.
+#   6. updated() in DataSource -- done: DataSource::updated() delegates to inner DA.
 #
 # ---- POST-RELEASE FEATURE ROADMAP ----
-#
-# A. [NEW 0.010.0] Pagination / virtual scrolling (High priority)
-#    Tables are rendered as a single HTML blob.  Files with 100k+ rows will
-#    time out or exhaust memory.  Add a ?page=N&limit=M server-side slice, or
-#    a JS IntersectionObserver infinite-scroll to cap peak HTML size.  See
-#    also item 2 below (limit/offset plumbing via Database::Join).
 #
 # B. [NEW 0.010.0] XLSX export (High priority)
 #    /export supports CSV, SQLite, and JSON but not XLSX output.
@@ -566,50 +601,9 @@ renderer, giving visible progress on slow joins.
 #    Mojolicious write_chunk / finish can progressively stream rows, giving
 #    visible progress on slow multi-table joins.
 #
-# ---- INTEGRATION GAPS (Database::Join 0.007.0) ----
+# ---- OPEN INTEGRATION GAPS ----
 #
-# =============================================================================
-# KNOWN GAPS & ROADMAP (integration with Database::Join 0.007.0)
-# =============================================================================
-# The items below are enhancements that Database::BI needs to realise the full
-# potential of the new features shipped in Database::Join 0.007.0.  Each item
-# documents what the gap is, why it matters, and a sketch of the fix.
-#
-# 1. dbi_source() proxy in Database::BI::Model::DataSource
-#    ---------------------------------------------------------
-#    Database::Join 0.007.0 supports zero-copy ATTACH: when a component DA
-#    implements dbi_source() returning { dbh => $dbh, table => $name }, the
-#    SQLite backend ATTACHes the source file directly instead of spilling rows
-#    into Perl.  DataSource wraps a Database::Abstraction object but does not
-#    implement dbi_source() itself, so the optimisation is never used even when
-#    the underlying DA would support it.
-#    Fix: add a dbi_source() delegating method to DataSource that forwards to
-#    $self->{_da}->dbi_source() when the inner DA implements it, or returns
-#    undef otherwise.
-#
-# 2. limit/offset plumbing in the /join route
-#    -------------------------------------------
-#    Database::Join 0.007.0 accepts limit => N and offset => M on
-#    selectall_arrayref().  The ROADMAP already plans server-side pagination
-#    (item 1: "Pagination / virtual scrolling").  When that work begins, the
-#    /join route (Dashboard#join_tables) should pass limit/offset from URL
-#    params directly to selectall_arrayref() instead of fetching all rows and
-#    slicing in the template.  On the SQLite backend this generates
-#    LIMIT ? OFFSET ? SQL, keeping peak RAM proportional to the page size
-#    rather than the total result set.
-#
-# 3. order_by delegation in the /join and /view routes
-#    ----------------------------------------------------
-#    The join pipeline currently fetches all rows and relies on client-side JS
-#    sort (column header click) for ordering.  Database::Join 0.007.0 exposes
-#    order_by => 'col' / order_by => ['col', 'DESC'] on all query methods.
-#    Passing the sort column and direction from URL params to selectall_arrayref()
-#    lets the SQL backend sort in-database, which is dramatically faster on large
-#    cached result sets and allows the initial page render to arrive pre-sorted.
-#    Required change: add ?sort=col&dir=asc|desc URL params to the join and view
-#    routes and thread them through to the Database::Join call.
-#
-# 4. parallel => 1 for multi-step join chains
+# I. parallel => 1 for multi-step join chains
 #    --------------------------------------------
 #    When the user chains three or more j= join steps, Database::BI creates a
 #    single Database::Join object with multiple secondary databases.  Enabling
@@ -623,29 +617,7 @@ renderer, giving visible progress on slow joins.
 #    route noting why it is disabled.  Longer-term: implement DataSource::clone()
 #    that creates an independent handle per thread.
 #
-# 5. Surface warn_schema_type_mismatch to the UI
-#    -----------------------------------------------
-#    Database::Join 0.007.0 emits a warn_schema_type_mismatch carp when two
-#    component databases share a column name but with different schema() types
-#    (e.g. TEXT in one, INTEGER in another).  In the BI join pipeline these
-#    warnings land in the server error log and are invisible to the user.
-#    Fix: wrap Database::Join->new() in a local $SIG{__WARN__} capture inside
-#    join_tables(); collect all warnings and pass them to the template as a
-#    non-fatal notices list so the user sees e.g. "Warning: column 'score' has
-#    type TEXT in the left table but INTEGER in the right table."
-#
-# 6. updated() implementation in Database::BI::Model::DataSource
-#    --------------------------------------------------------------
-#    Database::Join's SQLite cache invalidates itself by comparing each source
-#    DA's updated() timestamp.  DataSource does not implement updated(), so the
-#    cache stays valid indefinitely and never picks up changes to the underlying
-#    file while the server is running.  Fix: implement updated() in DataSource
-#    to return the mtime of the backing file (via -M or stat), or proxy to the
-#    inner DA's updated() when available.  This is the single highest-value
-#    change for correctness: without it, a file edited on disk is invisible to
-#    the join cache until the server restarts.
-#
-# 7. per-table filters => on the join pipeline
+# J. per-table filters => on the join pipeline
 #    --------------------------------------------
 #    The /join route accepts f=col:op:val filters that are applied as post-join
 #    in-memory filtering in the template.  Database::Join 0.007.0's filters =>
@@ -657,7 +629,7 @@ renderer, giving visible progress on slow joins.
 #    the Database::Join constructor.  Filters on the merged view (post-join
 #    computed columns) must remain as template-side filtering.
 #
-# 8. collision_prefix exposure in the join UI
+# K. collision_prefix exposure in the join UI
 #    --------------------------------------------
 #    When two joined tables share a column name, Database::Join's default
 #    last-table-wins behaviour silently discards one table's value.  The join
@@ -679,7 +651,7 @@ sub startup ($self) {
 	# Cap inbound request body size.  When the limit fires, Mojolicious sets
 	# req->is_limit_exceeded and still dispatches to the controller (with partial
 	# content in the upload asset).  The controller checks is_limit_exceeded and
-	# returns 413 before writing to disk.
+	# returns 413 before writing to disc.
 	$self->max_request_size($MAX_REQUEST_SIZE);
 
 	# Default export/save directory: ~/Downloads when it exists, else HOME,
@@ -735,6 +707,16 @@ sub startup ($self) {
 					: (),
 			);
 		}
+		# Redis mode: connect to a Redis server via Database::Abstraction's
+		# Redis backend (Redis::Fast or Redis).
+		if (exists $opts{redis}) {
+			return Database::BI::Model::DataSource->new(
+				table         => $table,
+				redis         => $opts{redis},
+				cache         => $chi,
+				cache_ttl_url => $cache_ttl_url,
+			);
+		}
 		my $dir = exists $opts{directory} ? $opts{directory} : $data_dir;
 		Database::BI::Model::DataSource->new(
 			directory      => $dir,
@@ -768,6 +750,23 @@ sub startup ($self) {
 	$r->get('/bar')->to('Dashboard#bar_view');
 	$r->get('/folder')->to('Dashboard#folder_view');
 	$r->get('/tables')->to('Dashboard#tables_view');
+	$r->get('/pivot')->to('Dashboard#pivot_view');
+	$r->get('/stats')->to('Dashboard#stats_view');
+	$r->post('/calc/save')    ->to('Dashboard#calc_save');
+	$r->post('/calc/delete')  ->to('Dashboard#calc_delete');
+	$r->get('/calc/list')     ->to('Dashboard#calc_list');
+	$r->post('/groups/save')  ->to('Dashboard#groups_save');
+	$r->post('/groups/delete')->to('Dashboard#groups_delete');
+	$r->get('/groups/list')   ->to('Dashboard#groups_list');
+	$r->post('/dates/save')   ->to('Dashboard#dates_save');
+	$r->post('/dates/delete') ->to('Dashboard#dates_delete');
+	$r->get('/dates/list')    ->to('Dashboard#dates_list');
+	$r->get('/scatter')       ->to('Dashboard#scatter_view');
+	$r->get('/stacked')       ->to('Dashboard#stacked_view');
+	$r->get('/combo')         ->to('Dashboard#combo_view');
+	$r->get('/treemap')       ->to('Dashboard#treemap_view');
+	$r->get('/histogram')     ->to('Dashboard#histogram_view');
+	$r->get('/line')          ->to('Dashboard#graph_view');	# alias for /graph
 
 	# Evict stale upload subdirectories on every startup so the cache cannot
 	# grow unboundedly across server restarts.  Only entries whose mtime is

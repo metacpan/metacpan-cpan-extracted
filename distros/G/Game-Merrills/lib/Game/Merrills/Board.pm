@@ -6,7 +6,7 @@ use warnings;
 use Object::Proto::Sugar -types;
 use Game::Merrills::Points;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use constant {
 	EMPTY => 0,
@@ -144,7 +144,7 @@ Game::Merrills::Board - the 24 points, the men on them and the men still in hand
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 

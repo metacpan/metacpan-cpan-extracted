@@ -1,5 +1,8 @@
 Revision history for module Map::Tube::Plugin::Graph
 
+1.2.2   2026-10-14
+        - Makefile.PL: Added Path::Tiny to build requirements.
+
 1.2.1   2026-09-10
         - Fixed a typo on t\08-drivers.t; made it more robust.
         - Fixed MANIFEST.SKIP

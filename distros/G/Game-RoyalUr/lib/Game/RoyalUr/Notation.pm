@@ -9,7 +9,7 @@ use Scalar::Util ();
 
 use Game::RoyalUr::Dice ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use constant {
     POS_OK     => 0,
@@ -188,6 +188,7 @@ sub format_record {
         '[rules ' . $rules_text->($record->{rules}) . ']',
         '[first ' . $record->{first} . ']',
     );
+    push @lines, '[position ' . $record->{position} . ']' if defined $record->{position};
     push @lines, '[seed ' . $record->{seed} . ']' if defined $record->{seed};
     push @lines, '[opening ' . $record->{opening} . ']' if $record->{opening};
     my $n = 0;
@@ -228,6 +229,10 @@ sub parse_record {
 
     $record{first} = $header->('first', 'light|dark');
     return $fail->($at + 1, 'first') unless defined $record{first};
+
+    my $position = $header->('position', '[0-9xld/ ]+');
+    return $fail->($at, 'position') if defined $position && validate_position($position);
+    $record{position} = $position if defined $position;
 
     my $seed = $header->('seed', '(?:[0-9a-f]{2})+');
     $record{seed} = $seed if defined $seed;
@@ -303,7 +308,7 @@ Game::RoyalUr::Notation - moves, positions and game records of the Royal Game of
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 
@@ -370,6 +375,12 @@ order: C<route=long dice=3 zero_rolls=4 safe_rosettes=1 pieces=7>.
 =item C<[first ...]>
 
 C<light> or C<dark>: the side that moves first.
+
+=item C<[position ...]>
+
+Optional. The position the game started from, in the form
+L<Game::RoyalUr::Engine/to_string> writes, when it did not start from the
+empty board.
 
 =item C<[seed ...]>
 
@@ -494,6 +505,7 @@ A record is a hash reference:
     {
         rules   => 'finkel',                # or a hash of the five fields
         first   => 'light',
+        position => '4xx2/8/4xx2 l 7 0 7 0',    # when the record has one
         seed    => '5f1c9a',                # when the record has one
         opening => 2,                       # when the record has one
         turns   => [

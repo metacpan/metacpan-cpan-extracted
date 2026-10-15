@@ -19,11 +19,11 @@ HTML::D3 - A simple Perl module for generating charts using D3.js.
 
 =head1 VERSION
 
-Version 0.19
+Version 0.20
 
 =cut
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 =head1 SYNOPSIS
 
@@ -3459,6 +3459,281 @@ HTML
     return $html;
 }
 
+=head2 render_multi_series_line_chart_snippet
+
+    my $fragment = $chart->render_multi_series_line_chart_snippet(\@series);
+    my $fragment = $chart->render_multi_series_line_chart_snippet(\@series, \%opts);
+    # $fragment->{svg_id} - the id attribute of the <svg> element
+    # $fragment->{html}   - embeddable HTML fragment (style + svg + script)
+
+Generates an embeddable multi-series line chart fragment.  Unlike
+C<render_multi_series_line_chart_with_interactive_legends>, this method returns
+a bare fragment with no C<< <html> >>, C<< <head> >>, or C<< <body> >> wrapper;
+D3.js must be loaded by the host page.
+
+=head3 Arguments
+
+=over 4
+
+=item * C<\@series> - An array reference of series.  Each series is a hash
+reference with a C<name> (string) and a C<data> array reference of
+C<< { label => Str, value => Num } >> points:
+
+    [
+        { name => 'North', data => [ { label => 'Jan', value => 12 }, ... ] },
+        { name => 'South', data => [ { label => 'Jan', value =>  8 }, ... ] },
+    ]
+
+Series need not share labels: the X domain is the union of every series' labels,
+in first-seen order.  One line and one set of dots is drawn per series, and a
+clickable legend toggles each series on and off.
+
+=item * C<\%opts> - Optional hash reference:
+
+=over 4
+
+=item * C<scheme> (string, default C<'tableau10'>) - D3 categorical colour
+scheme (for example C<'category10'>, C<'set2'>, C<'set3'>, C<'paired'>).
+
+=item * C<x_label> (string, default C<''>) - Label shown below the X axis.
+
+=item * C<y_label> (string, default C<''>) - Label shown beside the Y axis.
+
+=item * C<animated> (boolean, default 0) - If true each line draws itself left
+to right by animating its stroke dash offset.  Respects
+C<prefers-reduced-motion>.
+
+=item * C<responsive> (boolean, optional) - SVG responsive sizing override.
+
+=item * C<id> (string, default C<'chart'>) - C<id> of the C<<svg>> element.
+
+=back
+
+=back
+
+Returns C<< { svg_id => 'chart', html => Str } >>.
+
+=head3 Errors
+
+=over 4
+
+=item * Throws C<Data must be an array of series> when C<\@series> is not an
+ARRAY reference.
+
+=item * Throws C<Each series must be a hashref with name and data> when a
+series is not a hashref, has no C<name>, or has a C<data> that is not an ARRAY
+reference.
+
+=back
+
+=head3 API SPECIFICATION
+
+=head4 Input
+
+    {
+        data => { type => 'arrayref' },
+        opts => {
+            type     => 'hashref',
+            optional => 1,
+            keys     => {
+                scheme     => { type => 'string',  optional => 1, default => 'tableau10' },
+                x_label    => { type => 'string',  optional => 1, default => '' },
+                y_label    => { type => 'string',  optional => 1, default => '' },
+                animated   => { type => 'boolean', optional => 1, default => 0 },
+                responsive => { type => 'boolean', optional => 1 },
+                id         => { type => 'string',  optional => 1, default => 'chart' },
+            },
+        },
+    }
+
+=head4 Output
+
+    HashRef -- { svg_id => 'chart', html => Str }
+
+=cut
+
+sub render_multi_series_line_chart_snippet
+{
+	my ($self, $series_data, $opts) = @_;
+	$opts //= {};
+
+	die 'Data must be an array of series' unless ref($series_data) eq 'ARRAY';
+	for my $s (@$series_data) {
+		die 'Each series must be a hashref with name and data'
+			unless ref($s) eq 'HASH' && defined $s->{name} && ref($s->{data}) eq 'ARRAY';
+	}
+
+	my $json_data = $_JSON->encode($series_data);
+
+	my $scheme   = $opts->{scheme}   // 'tableau10';
+	my $x_label  = $opts->{x_label} // '';
+	my $y_label  = $opts->{y_label} // '';
+	my $animated = $opts->{animated} // 0;
+	my $svg_id   = $opts->{id}       // 'chart';
+	my $tip_id   = $svg_id . '_tip';
+
+	(my $scheme_js = $scheme) =~ s/^([a-z])/\u$1/;
+
+	my $js_esc = sub {
+		my $s = shift;
+		$s =~ s/\\/\\\\/g; $s =~ s/"/\\"/g;
+		$s =~ s/\n/\\n/g;  $s =~ s/\r/\\r/g;
+		return $s;
+	};
+
+	my $x_label_esc = $js_esc->($x_label);
+	my $y_label_esc = $js_esc->($y_label);
+
+	my $width  = $self->{width};
+	my $height = $self->{height};
+	my $svg_attrs = ($opts->{responsive} // $self->{responsive})
+		? qq{viewBox="0 0 $width $height" width="100%" height="auto"}
+		: qq{width="$width" height="$height"};
+
+	my $margin_right  = 150;  # room for legend
+	my $margin_left   = $y_label ? 60 : 45;
+	my $margin_top    = 20;
+	my $margin_bottom = $x_label ? 60 : 40;
+	my $inner_w = $width  - $margin_left - $margin_right;
+	my $inner_h = $height - $margin_top  - $margin_bottom;
+
+	my $x_label_block = $x_label ? <<"XLB" : '';
+    g.append("text")
+        .attr("class","msl-axis-label")
+        .attr("x", innerW / 2)
+        .attr("y", innerH + (margin.bottom - 10))
+        .attr("text-anchor","middle")
+        .text("$x_label_esc");
+XLB
+
+	my $y_label_block = $y_label ? <<"YLB" : '';
+    g.append("text")
+        .attr("class","msl-axis-label")
+        .attr("transform","rotate(-90)")
+        .attr("x", -innerH / 2)
+        .attr("y", -(margin.left - 14))
+        .attr("text-anchor","middle")
+        .text("$y_label_esc");
+YLB
+
+	my $anim_block = $animated ? <<"ANIM" : '';
+    var noAnim = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!noAnim) {
+        g.selectAll(".msl-line")
+            .each(function() {
+                var totalLen = this.getTotalLength();
+                d3.select(this)
+                    .attr("stroke-dasharray", totalLen)
+                    .attr("stroke-dashoffset", totalLen)
+                    .transition().duration(1200).ease(d3.easeLinear)
+                    .attr("stroke-dashoffset", 0);
+            });
+    }
+ANIM
+
+	my $html = <<"HTML";
+<style>
+    #$tip_id {
+	position:absolute;background:rgba(255,255,255,0.95);border:1px solid #ccc;
+	border-radius:4px;padding:6px 10px;font-size:12px;pointer-events:none;
+	display:none;line-height:1.6;
+    }
+    .msl-axis-label{font-size:11px;fill:#555;}
+    .msl-line{fill:none;stroke-width:2;}
+    .msl-dot{cursor:default;}
+    .msl-leg-item{cursor:pointer;}
+</style>
+<svg id="$svg_id" $svg_attrs></svg>
+<div id="$tip_id"></div>
+<script>
+(function(){
+    var series = $json_data;
+    var margin = {top:$margin_top,right:$margin_right,bottom:$margin_bottom,left:$margin_left};
+    var innerW = $inner_w;
+    var innerH = $inner_h;
+    var svg = d3.select("#$svg_id");
+    var g   = svg.append("g").attr("transform","translate("+margin.left+","+margin.top+")");
+    var tip = d3.select("#$tip_id");
+
+    function esc(s) {
+        return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    var allLabels = Array.from(new Set(series.flatMap(function(s){return s.data.map(function(d){return d.label;});})));
+    var allVals   = series.flatMap(function(s){return s.data.map(function(d){return d.value;});});
+
+    var xScale = d3.scalePoint().domain(allLabels).range([0,innerW]);
+    var yScale = d3.scaleLinear()
+        .domain([Math.min(0,d3.min(allVals)), d3.max(allVals)]).nice()
+        .range([innerH,0]);
+
+    var color = d3.scaleOrdinal(d3.scheme$scheme_js).domain(series.map(function(s){return s.name;}));
+
+    g.append("g").attr("transform","translate(0,"+innerH+")")
+        .call(d3.axisBottom(xScale))
+        .selectAll("text").attr("transform","rotate(-45)").style("text-anchor","end");
+    g.append("g").call(d3.axisLeft(yScale).ticks(6));
+
+    $x_label_block
+    $y_label_block
+
+    var lineGen = d3.line()
+        .x(function(d){return xScale(d.label);})
+        .y(function(d){return yScale(d.value);});
+
+    series.forEach(function(s,i){
+        g.append("path")
+            .datum(s.data)
+            .attr("class","msl-line")
+            .attr("stroke",color(s.name))
+            .attr("d",lineGen);
+
+        g.selectAll(".msl-dot-"+i)
+            .data(s.data).join("circle")
+            .attr("class","msl-dot msl-dot-"+i)
+            .attr("cx",function(d){return xScale(d.label);})
+            .attr("cy",function(d){return yScale(d.value);})
+            .attr("r",4)
+            .attr("fill",color(s.name))
+            .on("mouseover",function(event,d){
+                tip.style("display","block")
+                   .html("<b>"+esc(d.label)+"<\\/b><br\/>"+esc(s.name)+": <b>"+d.value+"<\\/b>");
+            })
+            .on("mousemove",function(event){
+                tip.style("left",(event.pageX+12)+"px").style("top",(event.pageY-24)+"px");
+            })
+            .on("mouseout",function(){tip.style("display","none");});
+    });
+
+    // Legend
+    var legG = svg.append("g")
+        .attr("transform","translate("+(margin.left+innerW+12)+","+margin.top+")");
+    series.forEach(function(s,i){
+        var row = legG.append("g")
+            .attr("class","msl-leg-item")
+            .attr("transform","translate(0,"+(i*18)+")")
+            .on("click",function(){
+                var lines = g.selectAll(".msl-line").filter(function(d,j){return j===i;});
+                var dots  = g.selectAll(".msl-dot-"+i);
+                var vis   = lines.style("opacity") !== "0";
+                lines.style("opacity", vis ? 0 : 1);
+                dots.style("opacity",  vis ? 0 : 1);
+                row.select("text").style("opacity", vis ? 0.4 : 1);
+            });
+        row.append("rect").attr("width",11).attr("height",11).attr("fill",color(s.name)).attr("rx",2);
+        row.append("text").attr("x",15).attr("y",10)
+            .style("font-size","11px").style("fill","#444")
+            .text(s.name.length>14?s.name.slice(0,13)+"…":s.name);
+    });
+
+    $anim_block
+})();
+</script>
+HTML
+
+	return { svg_id => $svg_id, html => $html };
+}
+
 =head2 render_scatter_chart_snippet
 
     my $fragment = $chart->render_scatter_chart_snippet($data);
@@ -3475,11 +3750,14 @@ C<<body>> wrapper; the caller is responsible for loading D3 in the page.
 =over 4
 
 =item * C<$data> - An array reference of data points.  Each point is an array
-reference with two required numeric elements (x, y) and an optional third
-hash reference of extra key/value pairs shown as extra tooltip rows.
+reference with two required numeric elements (x, y), an optional third hash
+reference of extra key/value pairs shown as extra tooltip rows, and an optional
+fourth hash reference carrying the C<series> (colour group) and C<size> (bubble
+radius) dimensions:
 
     [$x, $y]          # basic point
     [$x, $y, \%row]   # point with extra tooltip data
+    [$x, $y, \%row, { series => 'North', size => 42 }]   # colour and size
 
 =item * C<\%opts> - Optional hash reference:
 
@@ -3495,6 +3773,25 @@ Fill colour for the data points.  C<'categorical'> uses the Tableau-10 palette.
 =item * C<y_label> (string, default C<''>) - Label for the Y axis.
 
 =item * C<value_label> (string, default C<'Value'>) - Prefix for the tooltip value row.
+
+=item * C<colour_by_series> (boolean, default 0) - Colour each point by its
+C<series> value instead of by point index, and draw a legend listing the series
+to the right of the plot.  Ignored for points with no C<series> value.
+
+=item * C<scheme> (string, default C<'tableau10'>) - D3 categorical colour
+scheme used when C<colour_by_series> is set, for example C<'category10'>,
+C<'set2'>, C<'set3'>, or C<'paired'>.
+
+=item * C<series_col> (string, default C<'Series'>) - Row label for the series
+value in the tooltip.
+
+=item * C<size_col> (string, default C<'Size'>) - Row label for the size value
+in the tooltip.
+
+=item * C<radius_range> (arrayref of two numbers, default C<[3, 15]>) - Pixel
+radii mapped from the smallest and largest observed C<size> value.  The mapping
+is by area (C<d3.scaleSqrt>), so a point twice as large is drawn with four
+times the area.  A point with no C<size> value is drawn at the lower radius.
 
 =item * C<animated> (boolean, default 0) - If true, circles fade in from
 opacity 0 on page load (400 ms).  Respects C<prefers-reduced-motion>.
@@ -3538,6 +3835,11 @@ A hash reference with C<svg_id> (string) and C<html> (Perl character string).
                 x_label     => { type => 'string',  optional => 1, default => '' },
                 y_label     => { type => 'string',  optional => 1, default => '' },
                 value_label => { type => 'string',  optional => 1, default => 'Value' },
+                colour_by_series => { type => 'boolean', optional => 1, default => 0 },
+                scheme      => { type => 'string',  optional => 1, default => 'tableau10' },
+                series_col  => { type => 'string',  optional => 1, default => '' },
+                size_col    => { type => 'string',  optional => 1, default => '' },
+                radius_range => { type => 'arrayref', optional => 1, default => [3, 15] },
                 animated    => { type => 'boolean', optional => 1, default => 0 },
                 responsive  => { type => 'boolean', optional => 1, default => 0 },
             },
@@ -3553,11 +3855,16 @@ sub render_scatter_chart_snippet
 
 	die 'Data must be an array of arrays' unless ref($data) eq 'ARRAY';
 
-	my $color       = $opts->{color}       // 'steelblue';
-	my $x_label     = $opts->{x_label}     // '';
-	my $y_label     = $opts->{y_label}     // '';
-	my $value_label = $opts->{value_label} // 'Value';
-	my $animated    = $opts->{animated}    // 0;
+	my $color            = $opts->{color}            // 'steelblue';
+	my $x_label          = $opts->{x_label}          // '';
+	my $y_label          = $opts->{y_label}          // '';
+	my $value_label      = $opts->{value_label}      // 'Value';
+	my $animated         = $opts->{animated}         // 0;
+	my $colour_by_series = $opts->{colour_by_series} // 0;
+	my $scheme           = $opts->{scheme}           // 'tableau10';
+	my $series_col       = $opts->{series_col}       // '';
+	my $size_col         = $opts->{size_col}         // '';
+	my $radius_range     = $opts->{radius_range}     // [3, 15];
 
 	my $js_esc = sub {
 		my $s = shift;
@@ -3568,6 +3875,9 @@ sub render_scatter_chart_snippet
 		return $s;
 	};
 
+	# Capitalise the first letter of the scheme name for the d3.scheme* accessor.
+	(my $scheme_js = $scheme) =~ s/^([a-z])/\u$1/;
+
 	my @points;
 	for my $pt (@$data) {
 		die 'Each data point must be an array reference' unless ref($pt) eq 'ARRAY';
@@ -3576,22 +3886,50 @@ sub render_scatter_chart_snippet
 		die 'Y value must be numeric' unless looks_like_number($pt->[1]);
 		my $p = { x => $pt->[0] + 0, y => $pt->[1] + 0 };
 		$p->{extra} = $pt->[2] if ref($pt->[2]) eq 'HASH';
+		if (ref($pt->[3]) eq 'HASH') {
+			$p->{series} = $pt->[3]{series} if defined $pt->[3]{series};
+			$p->{size}   = $pt->[3]{size}+0 if defined $pt->[3]{size} && looks_like_number($pt->[3]{size});
+		}
 		push @points, $p;
 	}
 
+	# Collect series names and size range for JS initialisation.
+	my %seen_series;
+	my @series_names;
+	my ($size_min, $size_max);
+	for my $p (@points) {
+		if (defined $p->{series} && !$seen_series{$p->{series}}++) {
+			push @series_names, $p->{series};
+		}
+		if (defined $p->{size}) {
+			$size_min = $p->{size} if !defined $size_min || $p->{size} < $size_min;
+			$size_max = $p->{size} if !defined $size_max || $p->{size} > $size_max;
+		}
+	}
+	# Colour and size are independent dimensions: a point may carry both.
+	my $has_series = $colour_by_series && @series_names;
+	my $has_size   = defined $size_min;
+
 	my $json_data      = $_JSON->encode(\@points);
+	my $json_series    = $_JSON->encode(\@series_names);
 	my $x_label_esc    = $js_esc->($x_label);
 	my $y_label_esc    = $js_esc->($y_label);
 	my $val_label_esc  = $js_esc->($value_label);
+	my $series_lbl_esc = $js_esc->($series_col || 'Series');
+	my $size_lbl_esc   = $js_esc->($size_col   || 'Size');
 
 	my $is_categorical = ($color eq 'categorical') ? 1 : 0;
-	my $color_esc      = $is_categorical ? 'steelblue' : $js_esc->($color);
+	my $color_esc      = ($is_categorical || $has_series) ? 'steelblue' : $js_esc->($color);
 
 	my $svg_id = $opts->{id} // 'scatter_chart';
 	my $tip_id = $svg_id . '_tip';
+	my $leg_id = $svg_id . '_leg';
 
 	my $width  = $self->{width};
 	my $height = $self->{height};
+
+	# Reserve right margin for legend when series colouring is active.
+	my $margin_right = $has_series ? 140 : 20;
 	my $svg_attrs = ($opts->{responsive} // $self->{responsive})
 		? qq{viewBox="0 0 $width $height" width="100%" height="auto"}
 		: qq{width="$width" height="$height"};
@@ -3599,13 +3937,36 @@ sub render_scatter_chart_snippet
 	my $margin_bottom = $x_label ? 60 : 40;
 	my $margin_left   = $y_label ? 70 : 50;
 	my $margin_top    = 20;
-	my $margin_right  = 20;
 	my $inner_w = $width  - $margin_left - $margin_right;
 	my $inner_h = $height - $margin_top  - $margin_bottom;
 
-	my $color_init_js = $is_categorical
-		? "var color = d3.scaleOrdinal(d3.schemeTableau10).domain(data.map((d, i) => i));"
-		: "var color = function() { return \"$color_esc\"; };";
+	# Color initialisation JS.
+	my $color_init_js;
+	if ($has_series) {
+		$color_init_js = "var seriesNames = $json_series;\n"
+			. "    var color = d3.scaleOrdinal(d3.scheme${scheme_js}).domain(seriesNames);";
+	} elsif ($is_categorical) {
+		$color_init_js = "var color = d3.scaleOrdinal(d3.schemeTableau10).domain(data.map(function(d,i){return i;}));";
+	} else {
+		$color_init_js = "var color = function() { return \"$color_esc\"; };";
+	}
+
+	# Size scale JS (bubble mode).
+	my $r_min = $radius_range->[0] // 3;
+	my $r_max = $radius_range->[1] // 15;
+	my $size_init_js = '';
+	my $radius_js    = '5';
+	if ($has_size && defined $size_min) {
+		my $smin = $size_min + 0;
+		my $smax = $size_max + 0;
+		$size_init_js = "var rScale = d3.scaleSqrt().domain([$smin,$smax]).range([$r_min,$r_max]).clamp(true);";
+		$radius_js    = 'function(d){return d.size!=null?rScale(d.size):' . $r_min . ';}';
+	}
+
+	# Series colouring: color by d.series; fallback to default.
+	my $fill_js = $has_series
+		? 'function(d){return d.series!=null?color(d.series):"' . $color_esc . '";}'
+		: 'function(d,i){return color(i);}';
 
 	my $anim_block = $animated ? <<"ANIM" : '';
     var noAnim = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -3639,6 +4000,26 @@ XLB
         .text("$y_label_esc");
 YLB
 
+	# Legend block (only when colour_by_series is true and we have series names).
+	my $legend_block = $has_series ? <<"LEG" : '';
+    var legendG = svg.append("g")
+        .attr("transform","translate(" + ($margin_left + $inner_w + 12) + "," + $margin_top + ")");
+    var seriesNamesForLeg = $json_series;
+    seriesNamesForLeg.forEach(function(name, i){
+        var row = legendG.append("g").attr("transform","translate(0," + (i*18) + ")");
+        row.append("rect").attr("width",11).attr("height",11).attr("fill",color(name)).attr("rx",2);
+        row.append("text").attr("x",15).attr("y",10).style("font-size","11px").style("fill","#444")
+            .text(name.length>14?name.slice(0,13)+"…":name);
+    });
+LEG
+
+	my $series_tip_js = $has_series
+		? 'if(d.series!=null){tipHtml+="<br>"+esc("' . $js_esc->($series_col || 'Series') . '")+": "+esc(String(d.series));}'
+		: '';
+	my $size_tip_js = $has_size
+		? 'if(d.size!=null){tipHtml+="<br>"+esc("' . $js_esc->($size_col || 'Size') . '")+": "+esc(String(d.size));}'
+		: '';
+
 	my $html = <<"HTML";
 <style>
     #$tip_id {
@@ -3665,6 +4046,7 @@ YLB
     var innerH = $inner_h;
     var valLabel = "$val_label_esc";
     $color_init_js
+    $size_init_js
 
     function esc(s) {
         return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -3703,8 +4085,8 @@ YLB
         .attr("class", "sc-circle")
         .attr("cx", function(d) { return xScale(d.x); })
         .attr("cy", function(d) { return yScale(d.y); })
-        .attr("r", 5)
-        .attr("fill", function(d, i) { return color(i); })
+        .attr("r", $radius_js)
+        .attr("fill", $fill_js)
         .attr("stroke", "white")
         .attr("stroke-width", 0.5)
         .on("mouseover", function(event, d) {
@@ -3714,6 +4096,8 @@ YLB
                     tipHtml += "<br>" + esc(kv[0]) + ": " + esc(kv[1]);
                 });
             }
+            $series_tip_js
+            $size_tip_js
             tip.html(tipHtml)
                .style("display", "block")
                .style("left", (event.pageX + 12) + "px")
@@ -3727,7 +4111,7 @@ YLB
             tip.style("display", "none");
         });
 
-$anim_block$x_label_block$y_label_block})();
+$anim_block$x_label_block$y_label_block$legend_block})();
 </script>
 HTML
 
@@ -4714,7 +5098,22 @@ Accepted C<\%opts> keys:
 
 =item * C<bins> (integer or C<undef>, default C<20>) - number of bins.
 Pass C<undef> for automatic bin count using Sturges' rule:
-C<ceil(log2(n) + 1)>.
+C<ceil(log2(n) + 1)>.  Ignored when C<binned> is set.
+
+=item * C<binned> (boolean, default 0) - treat C<$data> as pre-computed bins
+rather than as raw values.  Each element is a hashref with a C<count> and
+either a C<label> or a numeric C<lo>/C<hi> pair from which the label C<[lo,hi)>
+is derived:
+
+    { label => '[0,10)', count => 3 }
+    { lo => 10, hi => 20, count => 5 }
+
+The caller owns the binning, so C<d3.bin()> is never called: one bar is drawn
+per entry, in the order supplied, and the supplied counts are authoritative.
+
+=item * C<scheme> (string, optional) - D3 categorical colour scheme (for example
+C<'tableau10'> or C<'category10'>) whose first colour is used as the bar fill
+when C<color> is not given.
 
 =item * C<x_label> (string, optional) - label shown below the X axis.
 
@@ -4740,6 +5139,21 @@ not an ARRAY reference.
 =item * Throws C<bins must be a positive integer> when C<bins> is defined
 but not a positive integer.
 
+=item * Throws C<Data must contain at least one bin> when C<binned> is set and
+C<$data> holds no bins.
+
+=item * Throws C<Each pre-binned entry must be a hash reference> when a
+pre-binned element is not a hashref.
+
+=item * Throws C<Bin count must be numeric> when a pre-binned C<count> is
+missing or not numeric.
+
+=item * Throws C<Bin count must not be negative> when a pre-binned C<count> is
+negative.
+
+=item * Throws C<Each pre-binned entry must have a label or numeric lo and hi>
+when a pre-binned entry has neither a C<label> nor a numeric C<lo>/C<hi> pair.
+
 =back
 
 =head3 API SPECIFICATION
@@ -4753,8 +5167,10 @@ but not a positive integer.
             optional => 1,
             keys     => {
                 bins    => { type => 'integer', optional => 1, default => 20 },
+                binned  => { type => 'boolean', optional => 1, default => 0 },
                 x_label => { type => 'string',  optional => 1, default => '' },
                 color   => { type => 'string',  optional => 1, default => 'steelblue' },
+                scheme  => { type => 'string',  optional => 1 },
                 id      => { type => 'string',  optional => 1, default => 'histogram' },
                 responsive => { type => 'boolean', optional => 1 },
             },
@@ -4767,12 +5183,159 @@ but not a positive integer.
 
 =cut
 
+# _render_histogram_binned($self, \@bins, \%opts)
+# Internal helper for the binned => 1 path of render_histogram_snippet.
+# $bins: [ {label=>'[0,10)',count=>N}, ... ] or [ {lo=>0,hi=>10,count=>N}, ... ]
+sub _render_histogram_binned
+{
+	my ($self, $bins, $opts) = @_;
+
+	my $js_esc = sub {
+		my $s = shift;
+		$s =~ s/\\/\\\\/g; $s =~ s/"/\\"/g;
+		$s =~ s/\n/\\n/g;  $s =~ s/\r/\\r/g;
+		return $s;
+	};
+
+	die 'Data must contain at least one bin' unless @$bins;
+
+	my @norm;
+	for my $b (@$bins) {
+		die 'Each pre-binned entry must be a hash reference'
+			unless ref($b) eq 'HASH';
+		die 'Bin count must be numeric'
+			unless defined($b->{count}) && looks_like_number($b->{count});
+		die 'Bin count must not be negative' unless $b->{count} + 0 >= 0;
+
+		my $lo = (defined($b->{lo}) && looks_like_number($b->{lo})) ? $b->{lo} + 0 : undef;
+		my $hi = (defined($b->{hi}) && looks_like_number($b->{hi})) ? $b->{hi} + 0 : undef;
+
+		my $label = $b->{label};
+		if(!defined($label) || !length($label)) {
+			die 'Each pre-binned entry must have a label or numeric lo and hi'
+				unless defined($lo) && defined($hi);
+			$label = sprintf('[%g,%g)', $lo, $hi);
+		}
+
+		push @norm, { label => "$label", count => $b->{count} + 0 };
+	}
+
+	my $json_data = $_JSON->encode(\@norm);
+
+	my $x_label   = $opts->{x_label} // '';
+	my $svg_id    = $opts->{id}      // 'histogram';
+	my $tip_id    = $svg_id . '_tip';
+	my $width     = $self->{width};
+	my $height    = $self->{height};
+	my $svg_attrs = ($opts->{responsive} // $self->{responsive})
+		? qq{viewBox="0 0 $width $height" width="100%" height="auto"}
+		: qq{width="$width" height="$height"};
+
+	my $margin_bottom = $x_label ? 60 : 40;
+	my $margin_left   = 55;
+	my $margin_top    = 20;
+	my $margin_right  = 20;
+	my $inner_w = $width  - $margin_left - $margin_right;
+	my $inner_h = $height - $margin_top  - $margin_bottom;
+
+	my $x_label_esc = $js_esc->($x_label);
+
+	# Bar fill: an explicit colour wins, otherwise the first colour of the
+	# requested D3 categorical scheme, otherwise the default colour.
+	my $fill_js = '"steelblue"';
+	if(defined $opts->{color}) {
+		$fill_js = '"' . $js_esc->($opts->{color}) . '"';
+	} elsif(defined $opts->{scheme}) {
+		(my $scheme_js = $opts->{scheme}) =~ s/^([a-z])/\u$1/;
+		$fill_js = "d3.scheme${scheme_js}[0]";
+	}
+
+	my $x_label_block = $x_label ? <<"XLB" : '';
+    g.append("text")
+        .attr("class","hg-axis-label")
+        .attr("x", innerW / 2)
+        .attr("y", innerH + (margin.bottom - 10))
+        .attr("text-anchor","middle")
+        .text("$x_label_esc");
+XLB
+
+	my $html = <<"HTML";
+<style>
+    #$tip_id {
+	position:absolute;background:rgba(255,255,255,0.95);border:1px solid #ccc;
+	border-radius:4px;padding:6px 10px;font-size:12px;pointer-events:none;
+	display:none;line-height:1.6;
+    }
+    .hg-axis-label{font-size:11px;fill:#555;}
+    .hg-bar{cursor:default;}
+</style>
+<svg id="$svg_id" $svg_attrs></svg>
+<div id="$tip_id"></div>
+<script>
+(function(){
+    var bins = $json_data;
+    var margin = {top:$margin_top,right:$margin_right,bottom:$margin_bottom,left:$margin_left};
+    var innerW = $inner_w;
+    var innerH = $inner_h;
+    var svg = d3.select("#$svg_id");
+    var g = svg.append("g").attr("transform","translate("+margin.left+","+margin.top+")");
+    var tip = d3.select("#$tip_id");
+
+    function esc(s) {
+        return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    var xScale = d3.scaleBand()
+        .domain(bins.map(function(d){return d.label;}))
+        .range([0, innerW])
+        .padding(0.05);
+
+    var yScale = d3.scaleLinear()
+        .domain([0, d3.max(bins, function(d){return d.count;})]).nice()
+        .range([innerH, 0]);
+
+    g.append("g").attr("class","hg-x-axis")
+        .attr("transform","translate(0,"+innerH+")")
+        .call(d3.axisBottom(xScale))
+        .selectAll("text")
+        .attr("transform","rotate(-45)")
+        .style("text-anchor","end");
+    g.append("g").attr("class","hg-y-axis").call(d3.axisLeft(yScale).ticks(6));
+
+    $x_label_block
+    g.selectAll(".hg-bar").data(bins).join("rect")
+        .attr("class","hg-bar")
+        .attr("x",function(d){return xScale(d.label);})
+        .attr("y",function(d){return yScale(d.count);})
+        .attr("width",xScale.bandwidth())
+        .attr("height",function(d){return innerH - yScale(d.count);})
+        .attr("fill",$fill_js)
+        .on("mouseover",function(event,d){
+            tip.style("display","block")
+               .html("<b>"+esc(d.label)+"<\\/b><br\/>Count: "+d.count);
+        })
+        .on("mousemove",function(event){
+            tip.style("left",(event.offsetX+12)+"px").style("top",(event.offsetY-28)+"px");
+        })
+        .on("mouseout",function(){tip.style("display","none");});
+})();
+</script>
+HTML
+
+	return { svg_id => $svg_id, html => $html };
+}
+
 sub render_histogram_snippet
 {
 	my ($self, $data, $opts) = @_;
 	$opts //= {};
 
 	die 'Data must be an array of numeric values' unless ref($data) eq 'ARRAY';
+
+	# Pre-binned path: the caller has already computed the bins.
+	if ($opts->{binned}) {
+		return $self->_render_histogram_binned($data, $opts);
+	}
 
 	my $bins_opt = exists($opts->{bins}) ? $opts->{bins} : 20;
 	if (defined $bins_opt) {
@@ -5139,6 +5702,29 @@ Nigel Horne <njh@nigelhorne.com>
     post opts.max_bars = N ∧ N ≥ 2 ∧ |data| > N
                             ⇒ |result_bars| = N ∧ "Other" ∈ result_labels
 
+=head2 render_multi_series_line_chart_snippet
+
+    render_multi_series_line_chart_snippet :
+        HTML::D3 × (ArrayRef | undef) × (HashRef | undef) → HashRef ∪ ⊥
+
+    pre  ref(data) ≠ 'ARRAY'        ⇒ die "Data must be an array of series"
+    pre  ∃ s ∈ data . ref(s) ≠ 'HASH'
+                                    ⇒ die "Each series must be a hashref with name and data"
+    pre  ∃ s ∈ data . ¬defined(s.name) ∨ ref(s.data) ≠ 'ARRAY'
+                                    ⇒ die "Each series must be a hashref with name and data"
+    post result ∈ HashRef
+    post result.svg_id = opts.id // "chart"
+    post result.html ∈ Str
+    post "<!DOCTYPE" ∉ result.html
+    post "d3.scalePoint" ⊆ result.html ∧ "d3.scaleLinear" ⊆ result.html
+    post "d3.line()" ⊆ result.html
+    post #{path ∈ result.html : class = "msl-line"} = |data|   -- one path per series
+    post opts.x_label ≠ ''          ⇒ "msl-axis-label" ⊆ result.html
+    post opts.y_label ≠ ''          ⇒ "msl-axis-label" ⊆ result.html
+    post opts.scheme = S            ⇒ "scheme" + capitalise(S) ⊆ result.html
+    post opts.animated = 1          ⇒ "stroke-dashoffset" ⊆ result.html
+                                      ∧ "prefers-reduced-motion" ⊆ result.html
+
 =head2 render_scatter_chart_snippet
 
     render_scatter_chart_snippet :
@@ -5158,6 +5744,16 @@ Nigel Horne <njh@nigelhorne.com>
     post "<!DOCTYPE" ∉ result.html
     post "d3.scaleLinear" ⊆ result.html
     post opts.animated = 1         ⇒ "prefers-reduced-motion" ⊆ result.html
+    post opts.colour_by_series = 1 ∧ ∃ pt ∈ data . defined(pt[3].series)
+                                   ⇒ "scaleOrdinal" ⊆ result.html
+                                     ∧ "seriesNames" ⊆ result.html
+                                     ∧ legend drawn (margin right = 140)
+    post ∃ pt ∈ data . defined(pt[3].size)
+                                   ⇒ "d3.scaleSqrt" ⊆ result.html ∧ "rScale" ⊆ result.html
+    post opts.radius_range = [A,B]
+                                   ⇒ "range([A,B])" ⊆ result.html
+    post ∀ pt ∈ data . pt[3].size = undef
+                                   ⇒ "rScale" ∉ result.html      -- fixed radius
 
 =head2 render_table_snippet
 
@@ -5244,11 +5840,26 @@ Nigel Horne <njh@nigelhorne.com>
     pre  ∃ v ∈ data . ¬numeric(v)  ⇒ die "Each value must be numeric"
     pre  defined(opts.bins) ∧ (¬integer(opts.bins) ∨ opts.bins < 1)
                                     ⇒ die "bins must be a positive integer"
+    pre  opts.binned = 1 ∧ |data| = 0
+                                    ⇒ die "Data must contain at least one bin"
+    pre  opts.binned = 1 ∧ ∃ b ∈ data . ref(b) ≠ 'HASH'
+                                    ⇒ die "Each pre-binned entry must be a hash reference"
+    pre  opts.binned = 1 ∧ ∃ b ∈ data . ¬numeric(b.count)
+                                    ⇒ die "Bin count must be numeric"
+    pre  opts.binned = 1 ∧ ∃ b ∈ data . b.count < 0
+                                    ⇒ die "Bin count must not be negative"
+    pre  opts.binned = 1 ∧ ∃ b ∈ data . ¬defined(b.label) ∧ ¬(numeric(b.lo) ∧ numeric(b.hi))
+                                    ⇒ die "Each pre-binned entry must have a label or numeric lo and hi"
+    pre  opts.binned = 1 ∧ ¬defined(b.label) ∧ numeric(b.lo) ∧ numeric(b.hi)
+                                    ⇒ b.label := "[lo,hi)"
     post result ∈ HashRef
     post result.svg_id = opts.id // "histogram"
     post result.html ∈ Str
     post "<!DOCTYPE" ∉ result.html
-    post "d3.bin()" ⊆ result.html
+    post opts.binned ≠ 1            ⇒ "d3.bin()" ⊆ result.html
+    post opts.binned = 1            ⇒ "d3.bin()" ∉ result.html ∧ "scaleBand" ⊆ result.html
+    post opts.color defined         ⇒ c(clone)      -- explicit colour is the bar fill
+    post opts.scheme defined        ⇒ "scheme" ⊆ result.html
     post opts.bins = undef          ⇒ "Math.log2" ⊆ result.html
     post opts.x_label ≠ ''         ⇒ "hg-axis-label" ⊆ result.html
 

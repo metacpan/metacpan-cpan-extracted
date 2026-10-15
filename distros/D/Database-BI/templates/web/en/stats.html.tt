@@ -1,0 +1,96 @@
+[%- WRAPPER 'web/en/layouts/default.html.tt' -%]
+
+<style>
+  .stats-wrap { overflow-x: auto; }
+  .stats-table {
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    min-width: 100%;
+  }
+  .stats-table th, .stats-table td {
+    border: 1px solid #d0d4de;
+    padding: 0.35rem 0.65rem;
+    white-space: nowrap;
+  }
+  .stats-table thead th {
+    /* Inherits white-on-dark-blue background/color from default.html.tt. */
+    font-weight: 600;
+    text-align: center;
+  }
+  .stats-table thead th.col-name {
+    text-align: left;
+  }
+  .stats-table td.col-name { font-weight: 500; }
+  .stats-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .stats-table td.na { text-align: center; color: #bbb; }
+  .stats-meta { font-size: 0.82rem; color: #666; margin-bottom: 0.75rem; }
+  /* drill-down cells: link text matches cell style, hover shows teal underline */
+  .stats-table td.drill a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .stats-table td.drill a:hover {
+    text-decoration: underline;
+    color: #0066aa;
+  }
+</style>
+
+<p class="back-link"><a href="/">&larr; Home</a>[% IF back_url && back_url != '/' %] &rsaquo; <a href="[% back_url | html %]">[% back_label | html %]</a>[% END %][%- IF back2_url -%] &rsaquo; <a href="[% back2_url | html %]">[% back2_label || 'Back' | html %]</a>[%- END -%]</p>
+
+<h2 style="margin-bottom:0.5rem">[% title | html %]</h2>
+<p class="stats-meta">Source: [% left_label | html %] &mdash; [% row_count %] row[% IF row_count != 1 %]s[% END %]</p>
+
+[%- IF stats.size == 0 -%]
+<p>No columns found.</p>
+[%- ELSE -%]
+<div class="stats-wrap">
+<table class="stats-table">
+<thead>
+  <tr>
+    <th class="col-name">Column</th>
+    <th>Rows</th>
+    <th title="Click to filter table to non-null rows">Non-null</th>
+    <th title="Click to filter table to null rows">Null</th>
+    <th>Distinct</th>
+    <th title="Click to filter table to rows equal to this value">Min</th>
+    <th title="Click to filter table to rows equal to this value">Max</th>
+    <th>Mean</th>
+    <th>Median</th>
+  </tr>
+</thead>
+<tbody>
+[%- FOREACH s IN stats -%]
+  [%- SET nonnull = s.row_count - s.null_count -%]
+  <tr>
+    <td class="col-name">[% s.col | html %]</td>
+    <td class="num">[% s.row_count %]</td>
+    [%- IF nonnull > 0 -%]
+    <td class="num drill"><a href="[% drill_back_url | html %][% drill_sep %]f=[% s.col | uri %]:notempty:&amp;back2=[% stats_url | uri %]&amp;back2_label=Back%20to%20column%20stats" title="Show [% nonnull %] rows where [% s.col | html %] is not null">[% nonnull %]</a></td>
+    [%- ELSE -%]
+    <td class="num">[% nonnull %]</td>
+    [%- END -%]
+    [%- IF s.null_count > 0 -%]
+    <td class="num drill"><a href="[% drill_back_url | html %][% drill_sep %]f=[% s.col | uri %]:empty:&amp;back2=[% stats_url | uri %]&amp;back2_label=Back%20to%20column%20stats" title="Show [% s.null_count %] rows where [% s.col | html %] is null">[% s.null_count %]</a></td>
+    [%- ELSE -%]
+    <td class="num">[% s.null_count %]</td>
+    [%- END -%]
+    <td class="num">[% s.distinct_count %]</td>
+    [%- IF s.min.defined -%]
+      <td class="num drill"><a href="[% drill_back_url | html %][% drill_sep %]f=[% s.col | uri %]:eq:[% s.min | uri %]&amp;back2=[% stats_url | uri %]&amp;back2_label=Back%20to%20column%20stats" title="Show rows where [% s.col | html %] = [% s.min | html %]">[% s.min | html %]</a></td>
+      <td class="num drill"><a href="[% drill_back_url | html %][% drill_sep %]f=[% s.col | uri %]:eq:[% s.max | uri %]&amp;back2=[% stats_url | uri %]&amp;back2_label=Back%20to%20column%20stats" title="Show rows where [% s.col | html %] = [% s.max | html %]">[% s.max | html %]</a></td>
+      <td class="num">[% s.avg | html %]</td>
+      <td class="num">[% s.median | html %]</td>
+    [%- ELSE -%]
+      <td class="na">&mdash;</td>
+      <td class="na">&mdash;</td>
+      <td class="na">&mdash;</td>
+      <td class="na">&mdash;</td>
+    [%- END -%]
+  </tr>
+[%- END -%]
+</tbody>
+</table>
+</div>
+[%- END -%]
+
+[%- END -%]

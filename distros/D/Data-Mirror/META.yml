@@ -4,7 +4,6 @@ author:
   - 'Gavin Brown <gavin.brown@fastmail.uk>'
 build_requires:
   LWP::Online: '0'
-  LWP::Protocol::https: '0'
   Test::More: '0'
   warnings: '0'
 configure_requires:
@@ -28,8 +27,8 @@ requires:
   File::XDG: '0'
   File::stat: '0'
   HTTP::Date: '0'
-  IO::File: '0'
   JSON::XS: '0'
+  LWP::Protocol::https: '0'
   LWP::UserAgent: '0'
   List::Util: '0'
   Text::CSV_XS: '0'
@@ -40,7 +39,7 @@ requires:
   strict: '0'
   utf8: '0'
   vars: '0'
-version: '0.08'
-x_generated_by_perl: v5.42.2
+version: '0.09'
+x_generated_by_perl: v5.42.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

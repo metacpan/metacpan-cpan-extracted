@@ -8,7 +8,7 @@ use Carp ();
 use Scalar::Util ();
 use Object::Proto::Sugar;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 my (@FIELDS, %NAMED, %ALLOWED);
 BEGIN {
@@ -112,7 +112,7 @@ Game::RoyalUr::Variant - a rule set of the Royal Game of Ur, as a value
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

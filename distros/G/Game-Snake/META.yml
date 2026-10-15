@@ -30,6 +30,7 @@ requires:
   Digest::SHA: '0'
   File::Basename: '0'
   File::Spec: '0'
+  Game::Terminal::Kit: '0.05'
   Getopt::Long: '0'
   Object::Proto: '1.00'
   Object::Proto::Sugar: '1.00'
@@ -37,5 +38,5 @@ requires:
   perl: '5.014'
 resources:
   repository: https://github.com/ThisUsedToBeAnEmail/Game-Snake.git
-version: '0.12'
+version: '0.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

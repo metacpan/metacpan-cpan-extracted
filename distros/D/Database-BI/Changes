@@ -1,5 +1,81 @@
 Revision history for Database-BI
 
+0.012.0	Wed Oct 14 09:10:15 PM EDT 2026
+    [ New Features ]
+    - GET /pivot: crosstab/pivot table.  Accepts ?rows=, ?cols=, and
+      ?m=col:fn:alias (sum|avg|min|max|count|count_distinct); ?totals=1
+      adds subtotals and a grand-total row; ?h= applies post-aggregation
+      HAVING filters; ?topn=N+?topn_col= keeps the top-N row groups;
+      ?max_cols=N collapses tail column combos into "Other";
+      ?format=csv|sqlite|json|xlsx exports the result.
+    - GET /stats: per-column statistics (row count, null count, distinct
+      count, min, max, mean, median).
+    - GET /scatter: scatter/bubble plot (?x=, ?y=, ?series=, ?size=,
+      ?scheme=, ?min_r=, ?max_r=).  The scatter panel now exposes all
+      parameters: "Colour by" (any column), "Bubble size" (numeric
+      columns only), colour scheme (tableau10|category10|set2|set3|paired
+      -- enabled only when a series column is chosen), and Min/Max radius
+      1-40 (enabled only when a size column is chosen).  ?scheme= is
+      validated server-side; an unrecognised name returns 400.
+    - GET /stacked: stacked bar chart (?cat=, ?series=, ?val=).
+    - GET /combo: combo bar+line chart (?cat=, ?bar_val=, ?line_val=).
+    - GET /treemap: treemap (?group=, ?size=, ?topn=N).
+    - GET /histogram: histogram with server-side binning (?col=, ?bins=N;
+      default 10 bins; max 200).
+    - GET /line: alias for GET /graph (all /graph params accepted).
+    - GET /graph: new ?series=<col> parameter for multi-series line charts.
+    - Calculated fields (Database::BI::Calc): recursive-descent evaluator
+      supporting arithmetic, comparison, IF, string, numeric, and date
+      functions; bin(); coalesce; isnull.  All chart and pivot routes
+      accept ?c=name:expr (repeatable).  Stored fields managed via
+      GET /calc/list, POST /calc/save, POST /calc/delete.
+    - Date normalisation: stored date-format patterns convert non-ISO
+      columns to ISO-8601 before aggregation.  Managed via
+      GET /dates/list, POST /dates/save, POST /dates/delete.
+    - Named value groups: virtual "${col}_group" columns map raw values
+      to analyst-defined labels.  Managed via GET /groups/list,
+      POST /groups/save, POST /groups/delete.
+    - Redis backend: DataSource accepts redis => 'redis://...' and the
+      redis:tablename|redis://... spec format.
+
+    [ Enhancements ]
+    - GET /join and GET /combine now support pagination (?page=N,
+      ?per_page=M, ?sort=<col>, ?dir=asc|desc).
+    - GET /export and POST /export now accept ?page=N and ?per_page=M.
+    - f= filters and d=1 dedup applied before pagination so the N+1
+      row count reflects the reduced set (reduce-before-paginate).
+    - bar_view and pie_view: new ?topn=N parameter; remainder collapsed
+      into "Other".
+    - Added X-BI-Warnings response header to GET /export.
+    - All chart render() calls now use a unified chart_html stash key
+      and include a chart => { kind, title, encode, options } DTO.
+    - Added DataSource::dbi_source() for SQL-capability detection and
+      Database::Join zero-copy ATTACH path.
+    - Added _grouped_totals() as the single aggregation entry point for
+      all chart routes, with SQL push-down and Perl fold fallback.
+
+    [ Bug Fixes ]
+    - /join and /combine: no-params default now returns the first 200
+      rows with a pagination bar, consistent with /view and /open.
+    - f= filters on paginated views no longer produce short pages.
+    - d=1 dedup now deduplicates the full result before slicing.
+    - has_next recomputed after in-memory filter/dedup reduction.
+    - Chart category order no longer changes when a filter is applied:
+      Perl fold now returns groups in the same ascending key order as
+      the SQL path.
+    - Aggregation on SQLite sources pushes SQL-compatible f= filters to
+      the database; non-SQL-able filters still fall back to Perl fold.
+    - DataSource::dbi_source() no longer propagates exceptions from
+      non-SQL backends; returns undef instead.
+    - CSV and other non-SQL sources no longer emit "Bad limit clause"
+      warnings; LIMIT/OFFSET is only sent to SQL-backed sources.
+
+    [ Dependencies ]
+    - HTML::D3 >= 0.20 (radius_range support for scatter bubble charts;
+      0.19 added the five new snippet methods).
+    - Database::Abstraction >= 0.51 (redis key support).
+    - Database::Join >= 0.009.0 (aggregate, limit/offset, dbi_source).
+
 0.011.0	Sun Oct 11 09:20:48 PM EDT 2026
     [ Enhancements ]
     - Added schema browser (GET /tables) for multi-table SQLite databases.

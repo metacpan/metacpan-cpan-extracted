@@ -59,5 +59,10 @@ ok( $@ ne '', 'new dies when time_divider is not a number' );
 $backend = OSLV::Monitor::Backends::cgroups->new( base_dir => $base_dir, obj => $obj );
 my $usable;
 eval { $usable = $backend->usable; };
-is( $usable, 1,  'usable returns 1 on linux' );
-is( $@,      '', 'usable does not die on linux' );
+if ( -f '/sys/fs/cgroup/cgroup.controllers' ) {
+	is( $usable, 1,  'usable returns 1 on linux with cgroup v2' );
+	is( $@,      '', 'usable does not die on linux with cgroup v2' );
+} else {
+	ok( !defined($usable), 'usable does not return without cgroup v2' );
+	ok( $@ ne '',          'usable dies without cgroup v2' );
+}

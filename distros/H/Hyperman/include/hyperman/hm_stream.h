@@ -110,17 +110,49 @@ static void hm_stream_h2_gone(pTHX_ int fd, UV id, int64_t sid) {
     hm_stream_fire_aborts(aTHX);
 }
 
+/* What is still waiting to leave on behalf of this handle.
+ *
+ * For HTTP/1.1 that is the connection's unwritten output. For HTTP/2 it is
+ * that PLUS what the stream itself is holding: nghttp2 frames a body only as
+ * fast as the peer's flow-control window allows, and everything it has not
+ * been allowed to frame yet sits in the stream's own buffer, which the
+ * connection's does not count. Measuring the connection alone, a write was
+ * never answered "full" over HTTP/2 and a producer never paused: the whole
+ * body was held for a client that had not asked for it yet. */
+static size_t hm_stream_h2_held(hm_conn *c, int64_t sid);
+
+static size_t hm_stream_held(hm_stream *s, hm_conn *c) {
+    size_t held = c->wlen - c->woff;
+    if (s->kind == HM_STREAM_H2) held += hm_stream_h2_held(c, s->sid);
+    return held;
+}
+
+/* Below this a paused HTTP/2 producer is restarted. Half the mark it was
+ * stopped at, so it is not woken to write one frame and stopped again. */
+#define HM_STREAM_LOWAT (HM_ABI_STREAM_HIWAT / 2)
+
 /* Output that was over the high-water mark has gone out. Same re-scan rule
  * as the aborts: a drain callback's whole job is to write more. */
 static void hm_stream_drained(pTHX_ hm_conn *c) {
     int again = 1;
+    hm_loop *loop = c->loop;
+    int fd = c->fd;
+    UV id = c->id;
     while (again) {
         hm_stream *s;
         again = 0;
+        if (loop->conns[fd] != c || c->id != id) return;   /* a callback closed it */
         for (s = hm_streams; s; s = s->next) {
-            if (s->paused && s->fd == c->fd && s->cid == c->id) {
-                hm_abi_stream_cb cb = s->drain_cb;
-                void *ud = s->drain_ud;
+            if (s->paused && s->fd == fd && s->cid == id) {
+                hm_abi_stream_cb cb;
+                void *ud;
+                /* an HTTP/2 stream is ready when ITS output has gone, which
+                 * the connection's buffer emptying does not say */
+                if (s->kind == HM_STREAM_H2
+                    && hm_stream_held(s, c) > (size_t)HM_STREAM_LOWAT)
+                    continue;
+                cb = s->drain_cb;
+                ud = s->drain_ud;
                 s->paused = 0;
                 hm_stream_paused_n--;
                 again = 1;
@@ -156,6 +188,15 @@ static hm_h2_stream *hm_stream_h2_st(hm_conn *c, int64_t sid) {
     s = (hm_h2_sess *)c->h2;
     return (hm_h2_stream *)nghttp2_session_get_stream_user_data(s->session,
                                                                (int32_t)sid);
+}
+
+/* The body bytes this stream has been given and nghttp2 has not yet framed. */
+static size_t hm_stream_h2_held(hm_conn *c, int64_t sid) {
+    hm_h2_stream *st = hm_stream_h2_st(c, sid);
+    STRLEN blen;
+    if (!st || !st->resp_body) return 0;
+    blen = SvCUR(st->resp_body);
+    return blen > st->resp_off ? (size_t)(blen - st->resp_off) : 0;
 }
 
 /* Submit status + headers now, with a data provider that defers until there
@@ -229,6 +270,10 @@ static int hm_stream_h2_feed(pTHX_ hm_conn *c, int64_t sid,
 }
 static int hm_stream_h2_reset(pTHX_ hm_conn *c, int64_t sid) {
     PERL_UNUSED_CONTEXT;
+    (void)c; (void)sid;
+    return 0;
+}
+static size_t hm_stream_h2_held(hm_conn *c, int64_t sid) {
     (void)c; (void)sid;
     return 0;
 }
@@ -311,7 +356,7 @@ static void *hm_stream_open(pTHX_ void *vl, int fd, UV id, int64_t sid,
  * the same quantity on both transports: for h2 nghttp2 has already framed
  * what it could and the rest is sitting in the same wbuf. */
 static int hm_stream_pressure(hm_stream *s, hm_conn *c) {
-    if (c->wlen - c->woff <= (size_t)HM_ABI_STREAM_HIWAT)
+    if (hm_stream_held(s, c) <= (size_t)HM_ABI_STREAM_HIWAT)
         return HM_ABI_STREAM_OK;
     if (!s->paused) { s->paused = 1; hm_stream_paused_n++; }
     return HM_ABI_STREAM_FULL;

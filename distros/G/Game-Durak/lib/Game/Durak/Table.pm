@@ -7,7 +7,7 @@ use Object::Proto::Sugar -types;
 
 use Game::Durak::Card qw(face_of suit_of);
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 my %SUIT = (
     S => { wide => "\x{2660}", ascii => 'S', ink => 'black' },
@@ -336,7 +336,7 @@ Game::Durak::Table - the terminal's table, drawn as a grid of characters
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 

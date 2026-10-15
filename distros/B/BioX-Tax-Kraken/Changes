@@ -1,0 +1,14 @@
+Revision history for BioX-Tax-Kraken
+
+0.001003 2026-10-14
+         Fix POD formatting
+
+0.001002 2026-10-14
+         Add a_isa_b() alias for is_ancestor()
+
+0.001001 2026-10-02
+         Fix some test issues on older perls
+
+0.001    2026-10-02
+         Initial release
+

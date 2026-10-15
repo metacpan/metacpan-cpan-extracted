@@ -21,7 +21,7 @@ if ( $? != 0 || !defined($ps_test) || $ps_test !~ /\d/ ) {
 	plan skip_all => 'ps is not usable';
 }
 
-plan tests => 15;
+plan tests => 16;
 
 my $base_dir = tempdir( CLEANUP => 1 );
 my $obj      = OSLV::Monitor->new( base_dir => $base_dir );
@@ -90,6 +90,7 @@ ok( scalar( keys( %{ $data->{oslvms} } ) ) > 0, 'the second run reports oslvms' 
 my @bad_names;
 my @bad_paths;
 my $procs = 0;
+my $rss   = 0;
 foreach my $name ( keys( %{ $data->{oslvms} } ) ) {
 	if ( $name eq '' ) {
 		push( @bad_names, '<empty>' );
@@ -100,6 +101,7 @@ foreach my $name ( keys( %{ $data->{oslvms} } ) ) {
 		push( @bad_paths, $name );
 	}
 	$procs = $procs + $data->{oslvms}{$name}{procs};
+	$rss   = $rss + $data->{oslvms}{$name}{rss};
 }
 
 is( join( ', ', @bad_names ), '', 'no oslvm has a empty name' );
@@ -108,6 +110,9 @@ is( join( ', ', @bad_paths ), '', 'every oslvm has a path' );
 # every cgroup mapping to a name has its procs summed into that name, so this
 # only holds if they are not overwriting each other
 is( $procs, $data->{totals}{procs}, 'the procs for each oslvm sum to the total' );
+
+# the ps stats for the totals only cover the included names, same as procs
+is( $rss, $data->{totals}{rss}, q{the rss for each oslvm sums to the total} );
 
 #
 # every cgroup the run recorded must be a real cgroup and not a mangled one...

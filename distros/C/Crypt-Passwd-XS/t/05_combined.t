@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More 'tests' => 25;
+use Test::More 'tests' => 29;
 use Crypt::Passwd::XS ();
 
 my $checks = [
@@ -36,6 +36,10 @@ my $checks = [
     [ 'a short string',                                       '$6$rounds=123456$asaltof16chars..',     '$6$rounds=123456$asaltof16chars..$BtCwjqMJGx5hrJhZywWvt0RLE8uZ4oPwcelCjmw2kSYu.Ec6ycULevoBK25fs2xXgMNrCzIMVcgEJAstJeonj1', 'SHA512' ],
     [ 'the minimum number is still observed',                 '$6$rounds=10$roundstoolow',             '$6$rounds=1000$roundstoolow$kUMsbe306n21p9R.FRkW3IGn.S9NPN0x50YhH1xhLsPuWGsUSklZt58jaTfF4ZEQpyUNGc0dqbpBYYBaHHrsX.',       'SHA512' ],
     [ 'test1234',                                             '$apr1$test1234$/XUxRsbs/UKum2fGgxyhu/', '$apr1$test1234$/XUxRsbs/UKum2fGgxyhu/',                                                                                    'APR1' ],
+    [ 'test1234', '$y$j5T$abcdefgh',  '$y$j5T$abcdefgh$.yCbNxmm3ocCRtD3gSSUvH1UujnjVMiv0oKzMDnl2r7', 'yescrypt' ],
+    [ 'test1234', '$y$j5T$abcdefgh$.yCbNxmm3ocCRtD3gSSUvH1UujnjVMiv0oKzMDnl2r7', '$y$j5T$abcdefgh$.yCbNxmm3ocCRtD3gSSUvH1UujnjVMiv0oKzMDnl2r7', 'yescrypt' ],
+    [ undef,      '$y$j5T$abcdefgh',  '$y$j5T$abcdefgh$p9Oxoj5X7HzycbqQ1sEdPQIabvfLhlWqwjnJ6ONdUb4', 'yescrypt' ],
+    [ 'test1234', '$y$',  '', 'yescrypt' ],
 
 ];
 

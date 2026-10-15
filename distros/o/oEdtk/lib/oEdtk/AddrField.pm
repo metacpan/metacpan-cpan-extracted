@@ -5,10 +5,10 @@ use warnings;
 
 use oEdtk::Main qw(oe_uc_sans_accents);
 use base 'oEdtk::Field';
-our $VERSION		= 0.01;
+our $VERSION = 0.01;
 
 sub process {
-	my ($self, $data) = @_;
+	my ( $self, $data ) = @_;
 
 	$data =~ s/^\s+//;
 	$data =~ s/\s+$//;

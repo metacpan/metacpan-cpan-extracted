@@ -6,6 +6,6 @@ use warnings;
 
 use Game::Go::Terminal;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 exit Game::Go::Terminal->run(@ARGV);

@@ -154,9 +154,39 @@ Exotic::SDL3->alt('libsdl3_ttf')->cflags >>.
 
 Absolute path to a header within the package include directories, or C<undef> if it is not found.
 
+=item C<runtime_deps( [$pkg] )>
+
+The classified direct runtime dependencies of the package's C<libpath>, as an arrayref of hashrefs with C<name>,
+C<path>, C<dir>, and C<scope> (C<store>, C<host>, C<system>, or C<unresolved>). Cached per package, and degrades to an
+empty arrayref when the engine cannot scan (spy engines, failures). This is the diagnostic that turns an otherwise
+opaque C<dlopen> failure into an explanation: the loader resolves these I<before> the package's own symbols are usable,
+so a vendored provider that is not on the default search path has to be made findable first.
+
+=item C<foreign_runtime_deps( [$pkg] )>
+
+The subset of C<runtime_deps> the loader would I<not> find on its own (C<store>, C<host>, and C<unresolved>; C<system>
+is filtered out). An empty list means every dependency is standard.
+
+=item C<runtime_dep_dirs( [$pkg] )>
+
+The deduplicated directories from C<foreign_runtime_deps>, i.e. what to append to the loader search path so they
+resolve.
+
+=item C<loader_env_var( [$pkg] )>
+
+The environment variable this platform's loader consults for extra directories (C<PATH>, C<DYLD_LIBRARY_PATH>, or
+C<LD_LIBRARY_PATH>). Delegated to the engine when it can answer.
+
+=item C<runtime_dep_report( [$pkg] )>
+
+A short human-readable summary of C<foreign_runtime_deps> and the directories to add to C<loader_env_var>, or an empty
+string when there is nothing to report. Intended for a post-install warning or a test message.
+
 =item C<package_info( [$pkg] )>
 
-The underlying L<Alien::Xrepo::PackageInfo>, or C<undef> before resolution.
+The underlying L<Alien::Xrepo::PackageInfo>, or C<undef> before resolution. Under dynamic resolution it carries the
+runtime dependency diagnostic (see C<runtime_deps( )>); a loaded snapshot's recorded value is served unchanged and
+never triggers a fresh scan. Opt out of the dynamic scan with C<check_runtime_deps =E<gt> 0>.
 
 =item C<package_names()>
 
@@ -165,6 +195,23 @@ The recipe's package names in declaration order (the first is the primary packag
 =item C<package_defs()>
 
 The recipe's normalized per-package definition hashref.
+
+=item C<has_snapshot( )>
+
+True when a snapshot was supplied or auto-detected, regardless of whether every package it names resolved. Lets a
+consumer's tests distinguish a genuinely cold checkout (no snapshot: resolution stays lazy and may legitimately be
+empty) from a distribution whose snapshot was written but is incomplete.
+
+=item C<snapshot_path( )>
+
+The path of the snapshot that was loaded, or C<undef> when resolution is dynamic.
+
+=item C<snapshot_errors( )>
+
+The per-package error map recorded in the loaded snapshot (C<< { <package> => <message> } >>), or an empty hashref when
+there is no snapshot or it recorded no failures. A non-empty map means the build that produced the snapshot failed to
+install those packages; test suites use it to report I<why> a snapshot is unusable rather than just that a package is
+missing.
 
 =item C<split_flags( $flags, [$pkg] )>
 
@@ -182,6 +229,7 @@ is accepted for compatibility with other accessors, but the split logic itself d
         root         => $store_root,
         repo         => $alien_xrepo,            # injectable engine
         cache        => 0,                       # bypass Alien::Xrepo's warm-start cache
+        check_runtime_deps => 1,                 # attach discovered runtime deps to package_info
         snapshot     => $file,                   # hermetic data; wins over dynamic fetch
         autodetect_snapshot => 1,                # look in the installed dist's share dir
         verbose      => 1
@@ -189,6 +237,10 @@ is accepted for compatibility with other accessors, but the split logic itself d
 
 C<recipe> is C<undef> by default; when set, it may be an L<Alien::Xrepo::Build::Recipe> object, a file or directory
 path to an C<xrepo.json>, or a hashref of recipe fields (name, packages, defaults, pkg_roots, local_repos, hooks).
+
+B<check_runtime_deps> (default C<1>) controls whether C<package_info( ... )> attaches the discovered runtime
+dependencies (see C<runtime_deps( )>). A loaded snapshot is always authoritative and never triggers a fresh scan, so
+setting it to C<0> only affects dynamic resolution.
 
 Subclasses may also declare C<recipe>, C<pkg_name>, and C<install_opts> as methods, which the constructor honors when
 no constructor argument is supplied. A subclass's C<recipe> method takes precedence over C<pkg_name>.

@@ -5,7 +5,7 @@ use warnings;
 
 use Object::Proto::Sugar -types;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub _offset { my ($l) = @_; return 7 * $l - ($l * ($l - 1)) / 2 }
 
@@ -97,7 +97,7 @@ Game::Dominoes::Tile - one bone of a double six set
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 

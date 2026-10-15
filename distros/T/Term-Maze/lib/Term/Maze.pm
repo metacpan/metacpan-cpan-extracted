@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Term::ReadKey ();
 use Getopt::Long ();
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 require XSLoader;
 XSLoader::load('Term::Maze', $VERSION);
@@ -68,6 +68,13 @@ sub _sizes {
 	return ($width, $height);
 }
 
+sub options {
+	return [
+		{ name => 'width', type => 'int', min => 5, max => 120, help => 'cells across' },
+		{ name => 'height', type => 'int', min => 5, max => 60, help => 'cells down' },
+	];
+}
+
 sub run {
 	my ($class, @argv) = @_;
 	my @size = _sizes(@argv);
@@ -128,7 +135,7 @@ Term::Maze - Mazes in the terminal
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
@@ -165,6 +172,27 @@ Version 0.05
 
 
 =head1 SUBROUTINES/METHODS
+
+=head2 options
+
+    my $fields = Term::Maze->options;
+
+The options a person would set before a game, in the order a launcher shows
+them. Each is a hash reference with a C<name>, a C<type> and a C<help>, and
+C<min> and C<max> or C<choices> where the type has them. A new list is
+returned each time.
+
+=over 4
+
+=item C<width>
+
+A whole number from 5 to 120: cells across.
+
+=item C<height>
+
+A whole number from 5 to 60: cells down.
+
+=back
 
 =head2 run
 

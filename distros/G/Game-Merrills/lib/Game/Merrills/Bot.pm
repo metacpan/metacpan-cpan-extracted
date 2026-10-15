@@ -10,7 +10,7 @@ use Game::Merrills::Notation;
 use Game::Merrills::Rules;
 use Game::Merrills::Move;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use constant {
 	WIN => 10_000,
@@ -452,7 +452,7 @@ Game::Merrills::Bot - a player that chooses its own moves, at five strengths
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 

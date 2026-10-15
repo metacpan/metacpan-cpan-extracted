@@ -5,7 +5,7 @@ use warnings;
 
 use Object::Proto::Sugar -types;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 my %MESSAGE = (
     no_seed          => 'a deal needs a seed',
@@ -47,7 +47,7 @@ Game::Durak::Error - what the rules refuse, as a code
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 

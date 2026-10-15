@@ -4,7 +4,7 @@ HTML::D3 - A simple Perl module for generating charts using D3.js.
 
 ## Version
 
-Version 0.19
+Version 0.20
 
 ## Synopsis
 
@@ -944,6 +944,86 @@ Str -- complete HTML5 document; legend clicks toggle series visibility.
        Opacity toggled by C<isVisible ? 0 : 1>.
 ```
 
+### Render\_Multi\_Series\_Line\_Chart\_Snippet
+
+```perl
+my $fragment = $chart->render_multi_series_line_chart_snippet(\@series);
+my $fragment = $chart->render_multi_series_line_chart_snippet(\@series, \%opts);
+# $fragment->{svg_id} - the id attribute of the <svg> element
+# $fragment->{html}   - embeddable HTML fragment (style + svg + script)
+```
+
+Generates an embeddable multi-series line chart fragment.  Unlike
+`render_multi_series_line_chart_with_interactive_legends`, this method returns
+a bare fragment with no `<html>`, `<head>`, or `<body>` wrapper;
+D3.js must be loaded by the host page.
+
+#### Arguments
+
+- `\@series` - An array reference of series.  Each series is a hash
+reference with a `name` (string) and a `data` array reference of
+`{ label => Str, value => Num }` points:
+
+    ```perl
+    [
+        { name => 'North', data => [ { label => 'Jan', value => 12 }, ... ] },
+        { name => 'South', data => [ { label => 'Jan', value =>  8 }, ... ] },
+    ]
+    ```
+
+    Series need not share labels: the X domain is the union of every series' labels,
+    in first-seen order.  One line and one set of dots is drawn per series, and a
+    clickable legend toggles each series on and off.
+
+- `\%opts` - Optional hash reference:
+    - `scheme` (string, default `'tableau10'`) - D3 categorical colour
+    scheme (for example `'category10'`, `'set2'`, `'set3'`, `'paired'`).
+    - `x_label` (string, default `''`) - Label shown below the X axis.
+    - `y_label` (string, default `''`) - Label shown beside the Y axis.
+    - `animated` (boolean, default 0) - If true each line draws itself left
+    to right by animating its stroke dash offset.  Respects
+    `prefers-reduced-motion`.
+    - `responsive` (boolean, optional) - SVG responsive sizing override.
+    - `id` (string, default `'chart'`) - `id` of the `<svg`> element.
+
+Returns `{ svg_id => 'chart', html => Str }`.
+
+#### Errors
+
+- Throws `Data must be an array of series` when `\@series` is not an
+ARRAY reference.
+- Throws `Each series must be a hashref with name and data` when a
+series is not a hashref, has no `name`, or has a `data` that is not an ARRAY
+reference.
+
+#### Api Specification
+
+##### Input
+
+```perl
+{
+    data => { type => 'arrayref' },
+    opts => {
+        type     => 'hashref',
+        optional => 1,
+        keys     => {
+            scheme     => { type => 'string',  optional => 1, default => 'tableau10' },
+            x_label    => { type => 'string',  optional => 1, default => '' },
+            y_label    => { type => 'string',  optional => 1, default => '' },
+            animated   => { type => 'boolean', optional => 1, default => 0 },
+            responsive => { type => 'boolean', optional => 1 },
+            id         => { type => 'string',  optional => 1, default => 'chart' },
+        },
+    },
+}
+```
+
+##### Output
+
+```perl
+HashRef -- { svg_id => 'chart', html => Str }
+```
+
 ### Render\_Scatter\_Chart\_Snippet
 
 ```perl
@@ -960,12 +1040,15 @@ tooltips.  Returns a fragment with no `<!DOCTYPE`>, `<html`>, `<head`>, or
 #### Arguments
 
 - `$data` - An array reference of data points.  Each point is an array
-reference with two required numeric elements (x, y) and an optional third
-hash reference of extra key/value pairs shown as extra tooltip rows.
+reference with two required numeric elements (x, y), an optional third hash
+reference of extra key/value pairs shown as extra tooltip rows, and an optional
+fourth hash reference carrying the `series` (colour group) and `size` (bubble
+radius) dimensions:
 
-    ```
+    ```perl
     [$x, $y]          # basic point
     [$x, $y, \%row]   # point with extra tooltip data
+    [$x, $y, \%row, { series => 'North', size => 42 }]   # colour and size
     ```
 
 - `\%opts` - Optional hash reference:
@@ -975,6 +1058,20 @@ hash reference of extra key/value pairs shown as extra tooltip rows.
     - `x_label` (string, default `''`) - Label for the X axis.
     - `y_label` (string, default `''`) - Label for the Y axis.
     - `value_label` (string, default `'Value'`) - Prefix for the tooltip value row.
+    - `colour_by_series` (boolean, default 0) - Colour each point by its
+    `series` value instead of by point index, and draw a legend listing the series
+    to the right of the plot.  Ignored for points with no `series` value.
+    - `scheme` (string, default `'tableau10'`) - D3 categorical colour
+    scheme used when `colour_by_series` is set, for example `'category10'`,
+    `'set2'`, `'set3'`, or `'paired'`.
+    - `series_col` (string, default `'Series'`) - Row label for the series
+    value in the tooltip.
+    - `size_col` (string, default `'Size'`) - Row label for the size value
+    in the tooltip.
+    - `radius_range` (arrayref of two numbers, default `[3, 15]`) - Pixel
+    radii mapped from the smallest and largest observed `size` value.  The mapping
+    is by area (`d3.scaleSqrt`), so a point twice as large is drawn with four
+    times the area.  A point with no `size` value is drawn at the lower radius.
     - `animated` (boolean, default 0) - If true, circles fade in from
     opacity 0 on page load (400 ms).  Respects `prefers-reduced-motion`.
     - `responsive` (boolean, default 0) - See `render_bar_chart_snippet`.
@@ -1005,6 +1102,11 @@ A hash reference with `svg_id` (string) and `html` (Perl character string).
             x_label     => { type => 'string',  optional => 1, default => '' },
             y_label     => { type => 'string',  optional => 1, default => '' },
             value_label => { type => 'string',  optional => 1, default => 'Value' },
+            colour_by_series => { type => 'boolean', optional => 1, default => 0 },
+            scheme      => { type => 'string',  optional => 1, default => 'tableau10' },
+            series_col  => { type => 'string',  optional => 1, default => '' },
+            size_col    => { type => 'string',  optional => 1, default => '' },
+            radius_range => { type => 'arrayref', optional => 1, default => [3, 15] },
             animated    => { type => 'boolean', optional => 1, default => 0 },
             responsive  => { type => 'boolean', optional => 1, default => 0 },
         },
@@ -1285,7 +1387,23 @@ Accepted `\%opts` keys:
 
 - `bins` (integer or `undef`, default `20`) - number of bins.
 Pass `undef` for automatic bin count using Sturges' rule:
-`ceil(log2(n) + 1)`.
+`ceil(log2(n) + 1)`.  Ignored when `binned` is set.
+- `binned` (boolean, default 0) - treat `$data` as pre-computed bins
+rather than as raw values.  Each element is a hashref with a `count` and
+either a `label` or a numeric `lo`/`hi` pair from which the label `[lo,hi)`
+is derived:
+
+    ```perl
+    { label => '[0,10)', count => 3 }
+    { lo => 10, hi => 20, count => 5 }
+    ```
+
+    The caller owns the binning, so `d3.bin()` is never called: one bar is drawn
+    per entry, in the order supplied, and the supplied counts are authoritative.
+
+- `scheme` (string, optional) - D3 categorical colour scheme (for example
+`'tableau10'` or `'category10'`) whose first colour is used as the bar fill
+when `color` is not given.
 - `x_label` (string, optional) - label shown below the X axis.
 - `color` (string, default `'steelblue'`) - bar fill colour.
 - `id` (string, optional) - override the default `svg_id` value.
@@ -1300,6 +1418,16 @@ not an ARRAY reference.
 - Throws `Each value must be numeric` when any element is non-numeric.
 - Throws `bins must be a positive integer` when `bins` is defined
 but not a positive integer.
+- Throws `Data must contain at least one bin` when `binned` is set and
+`$data` holds no bins.
+- Throws `Each pre-binned entry must be a hash reference` when a
+pre-binned element is not a hashref.
+- Throws `Bin count must be numeric` when a pre-binned `count` is
+missing or not numeric.
+- Throws `Bin count must not be negative` when a pre-binned `count` is
+negative.
+- Throws `Each pre-binned entry must have a label or numeric lo and hi`
+when a pre-binned entry has neither a `label` nor a numeric `lo`/`hi` pair.
 
 #### Api Specification
 
@@ -1313,8 +1441,10 @@ but not a positive integer.
         optional => 1,
         keys     => {
             bins    => { type => 'integer', optional => 1, default => 20 },
+            binned  => { type => 'boolean', optional => 1, default => 0 },
             x_label => { type => 'string',  optional => 1, default => '' },
             color   => { type => 'string',  optional => 1, default => 'steelblue' },
+            scheme  => { type => 'string',  optional => 1 },
             id      => { type => 'string',  optional => 1, default => 'histogram' },
             responsive => { type => 'boolean', optional => 1 },
         },
@@ -1541,6 +1671,31 @@ post opts.max_bars = N ∧ N ≥ 2 ∧ |data| > N
                         ⇒ |result_bars| = N ∧ "Other" ∈ result_labels
 ```
 
+### Render\_Multi\_Series\_Line\_Chart\_Snippet
+
+```
+render_multi_series_line_chart_snippet :
+    HTML::D3 × (ArrayRef | undef) × (HashRef | undef) → HashRef ∪ ⊥
+
+pre  ref(data) ≠ 'ARRAY'        ⇒ die "Data must be an array of series"
+pre  ∃ s ∈ data . ref(s) ≠ 'HASH'
+                                ⇒ die "Each series must be a hashref with name and data"
+pre  ∃ s ∈ data . ¬defined(s.name) ∨ ref(s.data) ≠ 'ARRAY'
+                                ⇒ die "Each series must be a hashref with name and data"
+post result ∈ HashRef
+post result.svg_id = opts.id // "chart"
+post result.html ∈ Str
+post "<!DOCTYPE" ∉ result.html
+post "d3.scalePoint" ⊆ result.html ∧ "d3.scaleLinear" ⊆ result.html
+post "d3.line()" ⊆ result.html
+post #{path ∈ result.html : class = "msl-line"} = |data|   -- one path per series
+post opts.x_label ≠ ''          ⇒ "msl-axis-label" ⊆ result.html
+post opts.y_label ≠ ''          ⇒ "msl-axis-label" ⊆ result.html
+post opts.scheme = S            ⇒ "scheme" + capitalise(S) ⊆ result.html
+post opts.animated = 1          ⇒ "stroke-dashoffset" ⊆ result.html
+                                  ∧ "prefers-reduced-motion" ⊆ result.html
+```
+
 ### Render\_Scatter\_Chart\_Snippet
 
 ```
@@ -1561,6 +1716,16 @@ post result.html ∈ Str
 post "<!DOCTYPE" ∉ result.html
 post "d3.scaleLinear" ⊆ result.html
 post opts.animated = 1         ⇒ "prefers-reduced-motion" ⊆ result.html
+post opts.colour_by_series = 1 ∧ ∃ pt ∈ data . defined(pt[3].series)
+                               ⇒ "scaleOrdinal" ⊆ result.html
+                                 ∧ "seriesNames" ⊆ result.html
+                                 ∧ legend drawn (margin right = 140)
+post ∃ pt ∈ data . defined(pt[3].size)
+                               ⇒ "d3.scaleSqrt" ⊆ result.html ∧ "rScale" ⊆ result.html
+post opts.radius_range = [A,B]
+                               ⇒ "range([A,B])" ⊆ result.html
+post ∀ pt ∈ data . pt[3].size = undef
+                               ⇒ "rScale" ∉ result.html      -- fixed radius
 ```
 
 ### Render\_Table\_Snippet
@@ -1657,11 +1822,26 @@ pre  ref(data) ≠ 'ARRAY'        ⇒ die "Data must be an array of numeric valu
 pre  ∃ v ∈ data . ¬numeric(v)  ⇒ die "Each value must be numeric"
 pre  defined(opts.bins) ∧ (¬integer(opts.bins) ∨ opts.bins < 1)
                                 ⇒ die "bins must be a positive integer"
+pre  opts.binned = 1 ∧ |data| = 0
+                                ⇒ die "Data must contain at least one bin"
+pre  opts.binned = 1 ∧ ∃ b ∈ data . ref(b) ≠ 'HASH'
+                                ⇒ die "Each pre-binned entry must be a hash reference"
+pre  opts.binned = 1 ∧ ∃ b ∈ data . ¬numeric(b.count)
+                                ⇒ die "Bin count must be numeric"
+pre  opts.binned = 1 ∧ ∃ b ∈ data . b.count < 0
+                                ⇒ die "Bin count must not be negative"
+pre  opts.binned = 1 ∧ ∃ b ∈ data . ¬defined(b.label) ∧ ¬(numeric(b.lo) ∧ numeric(b.hi))
+                                ⇒ die "Each pre-binned entry must have a label or numeric lo and hi"
+pre  opts.binned = 1 ∧ ¬defined(b.label) ∧ numeric(b.lo) ∧ numeric(b.hi)
+                                ⇒ b.label := "[lo,hi)"
 post result ∈ HashRef
 post result.svg_id = opts.id // "histogram"
 post result.html ∈ Str
 post "<!DOCTYPE" ∉ result.html
-post "d3.bin()" ⊆ result.html
+post opts.binned ≠ 1            ⇒ "d3.bin()" ⊆ result.html
+post opts.binned = 1            ⇒ "d3.bin()" ∉ result.html ∧ "scaleBand" ⊆ result.html
+post opts.color defined         ⇒ c(clone)      -- explicit colour is the bar fill
+post opts.scheme defined        ⇒ "scheme" ⊆ result.html
 post opts.bins = undef          ⇒ "Math.log2" ⊆ result.html
 post opts.x_label ≠ ''         ⇒ "hg-axis-label" ⊆ result.html
 ```

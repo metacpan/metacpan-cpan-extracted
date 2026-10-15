@@ -17,7 +17,7 @@ use Game::Go::Marking;
 use Game::Go::Scoring;
 use Game::Go::Result;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use constant {
 	EMPTY  => Game::Go::Rules::EMPTY,
@@ -98,6 +98,13 @@ sub BUILD {
 	$self->_engine(Game::Go::Engine->new(size => $size));
 	$self->_engine->superko(0) if $ko eq 'simple';
 
+	my $first = $self->first;
+	my $told;
+	if ($first) {
+		$told = Game::Go::Rules::from_letter($first);
+		Carp::croak("Game::Go: first must be 'b' or 'w', not '$first'") unless $told;
+	}
+
 	$self->turn(BLACK);
 
 	$self->_log('sys', 'start', {
@@ -106,16 +113,13 @@ sub BUILD {
 		handicap => $handicap,
 		ko       => $ko,
 		first    => Game::Go::Rules::letter($self->turn),
+		($told ? (turn => $first) : ()),
 	});
 
 	$self->_place_setup($self->setup) if $self->setup;
 	$self->_place_handicap($handicap) if $handicap > 1;
 
-	if (my $first = $self->first) {
-		my $who = Game::Go::Rules::from_letter($first);
-		Carp::croak("Game::Go: first must be 'b' or 'w', not '$first'") unless $who;
-		$self->turn($who);
-	}
+	$self->turn($told) if $told;
 
 	return;
 }
@@ -562,9 +566,11 @@ our %SITE_OWNED;
 BEGIN { %SITE_OWNED = map { $_ => 1 } qw(timeout abandon) }
 
 sub replay {
-	my ($self, $events) = @_;
+	my ($self, $events, %o) = @_;
 	Carp::croak('Game::Go: replay wants an arrayref of events')
 		unless ref $events eq 'ARRAY';
+
+	return $self->_rebuild($events, %o) unless ref $self;
 
 	my $seen = 0;
 	my $seen_handicap = 0;
@@ -668,16 +674,137 @@ sub _same {
 	return $a eq $b ? 1 : 0;
 }
 
+sub _rebuild {
+	my ($class, $events, %o) = @_;
+
+	my $start = $events->[0];
+	Carp::croak("Game::Go: replay: the log does not begin with a 'sys start'")
+		unless ref $start eq 'HASH'
+			&& ($start->{actor} // '') eq 'sys'
+			&& ($start->{kind} // '') eq 'start';
+
+	my $p = $start->{payload} || {};
+	my %args = map { defined $p->{$_} ? ($_ => $p->{$_}) : () } qw(size komi handicap ko);
+	$args{first} = $p->{turn} if defined $p->{turn};
+	$args{seed}  = $o{seed} if defined $o{seed};
+
+	my $size = $args{size} // 19;
+	Carp::croak("Game::Go: replay: the log's 'sys start' names size '$size'")
+		unless $size =~ /\A[0-9]+\z/ && grep { $_ == $size } Game::Go::Rules::sizes();
+
+	my $next = $events->[1];
+	if (ref $next eq 'HASH' && ($next->{actor} // '') eq 'sys' && ($next->{kind} // '') eq 'setup') {
+		my $probe = Game::Go::Engine->new(size => $size);
+		my %setup;
+		my $placed = $next->{payload} || {};
+		for my $letter (keys %$placed) {
+			my $points = $placed->{$letter};
+			Carp::croak("Game::Go: replay: the log's 'sys setup' has a bad list for '$letter'")
+				unless ref $points eq 'ARRAY' && !grep { !defined $_ || !/\A[0-9]+\z/ } @$points;
+			$setup{$letter} = [ map { [ $probe->col_of($_), $probe->row_of($_) ] } @$points ];
+		}
+		$args{setup} = \%setup;
+	}
+
+	my $game = $class->new(%args);
+	$game->replay($events);
+	return $game;
+}
+
 sub clone {
 	my ($self) = @_;
-	my $new = ref($self)->new(
-		size     => $self->size,
-		komi     => $self->komi,
-		handicap => $self->handicap,
-		seed     => $self->_held_seed,
-	);
-	$new->replay($self->events);
-	return $new;
+	return ref($self)->replay($self->events, seed => $self->_held_seed);
+}
+
+use constant TEXT_HEAD => 'game-go 1';
+
+sub to_text {
+	my ($self) = @_;
+	my @lines = (TEXT_HEAD);
+
+	my $seed = $self->_held_seed;
+	if (defined $seed) {
+		Carp::croak('Game::Go: to_text cannot write a seed that is not a byte string')
+			if $seed =~ /[^\x00-\xff]/;
+		push @lines, 'seed ' . unpack('H*', $seed);
+	}
+
+	for my $e (@{ $self->log }) {
+		my $p = $e->{payload} || {};
+		push @lines, join ' ', $e->{actor}, $e->{kind},
+			map { "$_=" . _value_text($p->{$_}) } sort keys %$p;
+	}
+
+	return join("\n", @lines) . "\n";
+}
+
+sub _value_text {
+	my ($v) = @_;
+	return '~' unless defined $v;
+	return '[' . join(',', @$v) . ']' if ref $v eq 'ARRAY';
+	return $v;
+}
+
+sub from_text {
+	my ($class, $text) = @_;
+	Carp::croak('Game::Go: from_text wants the string to_text wrote')
+		unless defined $text && !ref $text;
+
+	my @lines = split /\n/, $text;
+	Carp::croak("Game::Go: from_text: this is not a saved game, it does not begin '" . TEXT_HEAD . "'")
+		unless @lines && $lines[0] eq TEXT_HEAD;
+	shift @lines;
+
+	my %o;
+	if (@lines && $lines[0] =~ /\Aseed/) {
+		my ($hex) = $lines[0] =~ /\Aseed ((?:[0-9a-f]{2})*)\z/;
+		Carp::croak('Game::Go: from_text: the seed line is not an even run of hex digits')
+			unless defined $hex;
+		$o{seed} = pack 'H*', $hex;
+		shift @lines;
+	}
+
+	my @events;
+	my $n = 0;
+	for my $line (@lines) {
+		$n++;
+		my ($actor, $kind, @pairs) = split / /, $line, -1;
+		Carp::croak("Game::Go: from_text: event $n is not an actor and a kind")
+			unless defined $kind && $actor =~ /\A(?:sys|b|w)\z/ && $kind =~ /\A[a-z_]+\z/;
+
+		my %payload;
+		for my $pair (@pairs) {
+			my ($key, $raw) = $pair =~ /\A([a-z_]+)=(.*)\z/;
+			Carp::croak("Game::Go: from_text: event $n has '$pair', which is not a key=value")
+				unless defined $key;
+			Carp::croak("Game::Go: from_text: event $n names '$key' twice")
+				if exists $payload{$key};
+			my ($ok, $value) = _value_from($raw);
+			Carp::croak("Game::Go: from_text: event $n has '$raw' for '$key', which is not a value")
+				unless $ok;
+			$payload{$key} = $value;
+		}
+
+		push @events, { actor => $actor, kind => $kind, payload => \%payload };
+	}
+
+	Carp::croak('Game::Go: from_text: there are no events after the header') unless @events;
+
+	return $class->replay(\@events, %o);
+}
+
+sub _value_from {
+	my ($raw) = @_;
+	my $word = qr/-?[A-Za-z0-9_.]+/;
+	return (1, undef) if $raw eq '~';
+	if (my ($list) = $raw =~ /\A\[(.*)\]\z/) {
+		my @items = split /,/, $list, -1;
+		@items = () if $list eq '';
+		return (0) if grep { !/\A$word\z/ } @items;
+		return (1, \@items);
+	}
+	return (0) unless $raw =~ /\A$word\z/;
+	return (1, $raw);
 }
 
 sub sizes       { Game::Go::Rules::sizes() }
@@ -698,7 +825,7 @@ Game::Go - the rules of Go, with the board in C
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 
@@ -800,7 +927,8 @@ record put them rather than where this distribution's own table would.
 
 C<setup> is a hashref of colour letter to C<[$col, $row]> pairs, logged as one
 C<sys setup> event so a replay reproduces the position. C<first> is C<b> or
-C<w>.
+C<w>, and when it is given the C<sys start> event carries it as C<turn>, so a
+replay knows who was told to move even before anybody has.
 
 =head2 territory_map
 
@@ -1028,6 +1156,14 @@ rather than regenerates.
 
 Applies a log to a fresh game and returns the number of events seen.
 
+    my $game = Game::Go->replay(\@events, seed => $bytes)
+
+Called on the class, it builds the fresh game itself, from the log's own
+C<sys start> (size, komi, handicap, ko rule, and C<turn> when one was given)
+and C<sys setup>, replays the log onto it, and returns the game. The seed is not
+in the log, so it is passed beside it. A log that does not begin with a
+C<sys start> croaks.
+
 Player events are handed back to the method that made them and must be accepted.
 C<sys timeout> and C<sys abandon> are applied. B<Every other sys event is
 regenerated and compared>, and a disagreement croaks: a log the engine does not
@@ -1036,7 +1172,38 @@ detectable.
 
 =head2 clone
 
-An independent game at the same position, by replaying this one's log.
+An independent game at the same position, by replaying this one's log with the
+same seed, ko rule, setup stones and first mover.
+
+=head2 to_text
+
+    my $text = $game->to_text;
+
+The game as a string: a C<game-go 1> line, a C<seed> line in hex when the game
+has a seed, and then every event in the log, one per line, as the actor, the
+kind and the payload's C<key=value> pairs. A list is written C<[a,b]> and an
+undefined value C<~>.
+
+That is everything a game is: the size, komi, handicap, ko rule, setup stones
+and first mover are in the C<sys start> and C<sys setup> lines, and the plays,
+passes, marks, proposals, disputes, resignation and the end are the lines after
+them. A game saved during the confirmation phase reloads in it, with the same
+marks and the same player to answer.
+
+B<The text holds the seed>, which L</seed> keeps back until the game is over.
+Do not publish a running game's text. A seed that is not a byte string croaks.
+
+=head2 from_text
+
+    my $game = Game::Go->from_text($text);
+
+A new, independent game from what L</to_text> wrote, built by the class form of
+L</replay>, so every line is replayed through the method that made it and every
+C<sys> line is regenerated and compared. C<< from_text($text)->to_text >> is
+C<$text>.
+
+Text that is not a saved game, a line that is not an event, a value that is not
+one, or a log the engine does not reproduce croaks with a sentence saying which.
 
 =head2 sizes, other, refusal, refusals
 

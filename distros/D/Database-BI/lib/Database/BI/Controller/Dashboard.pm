@@ -3,7 +3,7 @@ package Database::BI::Controller::Dashboard;
 use strict;
 use warnings;
 
-our $VERSION = '0.011.0';
+our $VERSION = '0.012.0';
 
 use Mojo::Base 'Mojolicious::Controller', -strict, -signatures;
 
@@ -12,7 +12,7 @@ use List::Util		qw(min max sum);
 use CGI::Info;
 use CGI::Lingua;
 use Mojo::File;
-use Mojo::JSON		qw(encode_json);
+use Mojo::JSON		qw(encode_json decode_json);
 use Mojo::Util		qw(url_escape encode);
 use File::Path		qw(remove_tree);
 use File::Temp		qw(tempfile tempdir);
@@ -44,6 +44,15 @@ Readonly my $TABLE_NAME_RE => qr/\A[A-Za-z_][A-Za-z0-9_]*\z/;
 # silently truncate the captured URL before the \z end-of-string anchor.
 Readonly my $URL_SPEC_RE   => qr{\Aurl:(https?://.+)\z}si;
 
+# Redis spec pattern: redis:tablename|redis://[password@]host[:port][/db_index]
+# The pipe separates the table name from the connection URL so the URL's own
+# colons and slashes do not require extra quoting.
+Readonly my $REDIS_SPEC_RE => qr{\Aredis:([^|]+)\|(redis://.+)\z}si;
+
+# Bare Redis URL -- no table name -- used to list available keys.
+# Excludes '|' so it cannot match the redis:table|redis://... full spec.
+Readonly my $REDIS_URL_RE  => qr{\Aredis://[^\s|]+\z}si;
+
 # Hostname pattern accepted in /../hostname/... remote paths.
 # Mirrors Database::Abstraction's own host validation regex.
 # Accepts 'hostname', 'user@hostname', and IPv4 addresses (IPv6 is excluded
@@ -73,6 +82,20 @@ Readonly my %MESSAGES => (
 	error_url_invalid      => '"%s" is not a valid http:// or https:// URL',
 	error_url_fetch        => 'Could not load HTML table from "%s": %s',
 	error_url_ssrf         => '"%s" resolves to a private or reserved address and cannot be fetched',
+	warn_combine_sort      => 'Sorting is applied in memory for /combine; result order may differ from a backend sort',
+	error_sort_column      => 'Unknown sort column "%s"',
+	warn_measure_fallback       => 'Measure "%s" on column "%s" is not uniformly numeric; totalled in Perl',
+	error_measure_column        => 'Measure column "%s" is not in the view',
+	error_pivot_rows_required   => 'At least one rows= dimension is required',
+	error_pivot_measure_req     => 'At least one m= measure (col:fn:as) is required',
+	error_pivot_measure_invalid => 'Invalid measure spec "%s"; expected col:fn:as where fn is one of: sum avg min max count count_distinct',
+	error_pivot_dim_not_found   => 'Row/column dimension "%s" is not in the view',
+	error_pivot_dim_comma       => 'Dimension name "%s" must not contain a comma',
+	error_calc_compile          => 'Calculated field "%s": %s',
+	error_calc_name             => 'Calculated field name "%s" is not a valid identifier',
+	error_topn_col              => 'Top-N column "%s" is not a measure alias in this view',
+	warn_calc_undef             => 'Calculated field "%s" returned undef for %d row(s)',
+	error_date_pattern          => 'Unsupported date format pattern "%s"; allowed: %%m/%%d/%%Y, %%d/%%m/%%Y, %%d-%%b-%%Y',
 );
 
 # Maximum accepted upload body size.  Enforced both here (application layer)
@@ -84,6 +107,18 @@ Readonly my $DEFAULT_JOIN_MAX_ROWS => 10_000;
 Readonly my $MAX_PREFIX_LEN        => 20;
 Readonly my $DEFAULT_PER_PAGE      => 200;
 Readonly my $MAX_PER_PAGE          => 2_000;
+Readonly my %SCATTER_SCHEMES       => map { $_ => 1 } qw(tableau10 category10 set2 set3 paired);
+
+# Valid aggregate function vocabulary shared by _measure, _grouped_totals,
+# and the /pivot measure-spec parser (Phase 2).  Do not add functions here
+# without a corresponding implementation in _grouped_totals's Perl fold AND
+# a corresponding entry in the lower-layer aggregate() implementations.
+Readonly my @MEASURE_FNS  => qw(sum avg min max count count_distinct);
+Readonly my %MEASURE_FN_OK => map { $_ => 1 } @MEASURE_FNS;
+
+# Allowed strptime-style date format patterns for the /dates/save endpoint.
+Readonly my %ALLOWED_DATE_PATTERNS => map { $_ => 1 }
+	qw(%m/%d/%Y %d/%m/%Y %d-%b-%Y);
 
 # ---------------------------------------------------------------------------
 # Protected helpers
@@ -96,7 +131,8 @@ Readonly my $MAX_PER_PAGE          => 2_000;
 # 0-based row offset.  Pagination is optional: when neither param is present
 # per_page defaults to DEFAULT_PER_PAGE.
 sub _pagination {
-	my ($self) = @_;
+	my $self = $_[0];
+
 	my $per_page = int($self->param('per_page') // $DEFAULT_PER_PAGE);
 	$per_page = 1         if $per_page < 1;
 	$per_page = $MAX_PER_PAGE if $per_page > $MAX_PER_PAGE;
@@ -347,6 +383,10 @@ sub _open_spec :Protected ($self, $spec) {
 		return () unless _is_safe_url($url);
 		my $src = eval { $self->open_table('', url => $url) };
 		return ($src, $src->table_name) if $src && !$@;
+	} elsif($spec =~ $REDIS_SPEC_RE) {
+		my ($table, $redis_url) = ($1, $2);
+		my $src = eval { $self->open_table($table, redis => $redis_url) };
+		return ($src, $table) if $src && !$@;
 	}
 	return ();
 }
@@ -361,6 +401,7 @@ sub _spec_to_url :Protected ($self, $spec) {
 	return "/view/$1" if $spec =~ /\Atable:([A-Za-z0-9_]+)\z/;
 	return '/open?path=' . url_escape($1) if $spec =~ /\Apath:(.+)\z/;
 	return '/import?url=' . url_escape($1) if $spec =~ $URL_SPEC_RE;
+	return '/' if $spec =~ $REDIS_SPEC_RE;
 	return '/';
 }
 
@@ -506,6 +547,466 @@ sub _dedup_records {
 		push @out, $row unless $seen{$key}++;
 	}
 	return \@out;
+}
+
+# _filter_specs_to_criteria( \@specs, $source ) -> ( \%criteria, \@residual_specs )
+#
+# Purpose: Map the f= filter vocabulary onto Database::Abstraction / Database::Join
+#          criteria hashrefs so the backend can apply pushable filters before
+#          paginating.  Specs that cannot be safely pushed are returned as
+#          @residual_specs for subsequent in-memory application.
+#
+# Pushdown is only performed when $source->dbi_source() confirms a SQL (SQLite)
+# backend.  For CSV (slurp path), in-memory, XLSX, BerkeleyDB and URL sources
+# everything is placed in @residual_specs so the existing _apply_filter_spec
+# Perl path handles them.
+#
+# Pushable mapping (SQLite only):
+#   eq / ne         -- LIKE / NOT LIKE without wildcards.  SQLite LIKE is
+#                      case-insensitive for ASCII, matching the existing Perl
+#                      lc() semantics.  Values containing % or _ are pushed to
+#                      residual to avoid LIKE metacharacter conflicts.
+#   contains        -- LIKE '%val%'.  Residual when value contains % or _.
+#   starts          -- LIKE 'val%'.   Residual when value contains % or _.
+#   lt / le / gt / ge -- SQL numeric comparison.  Residual when the value is
+#                      not a plain number (avoids column-affinity surprises
+#                      with currency or comma-formatted values).
+#   empty / notempty -- Always residual.  Must match both SQL NULL and the
+#                      literal empty string; cannot be expressed as a single
+#                      D::A criterion without an -or grouping.
+#
+# Column collision: if a column already has a pushable criterion, the second
+# spec for that column is placed in @residual_specs.  This keeps the AND logic
+# simple and safe; callers with multiple conditions on one column (e.g. a range)
+# still get correct results via the in-memory fallback.
+sub _filter_specs_to_criteria {
+	my ($specs, $source) = @_;
+
+	# Only push when the source has a live SQL (SQLite) backend.
+	my $is_sql = $source
+		&& $source->can('dbi_source')
+		&& $source->dbi_source();
+	return ({}, [@$specs]) unless $is_sql;
+
+	require Scalar::Util;
+	my (%criteria, @residual);
+
+	for my $spec (@$specs) {
+		my ($col, $op, $val) = split /:/, $spec, 3;
+		next unless length($col // '') && defined $op && length $op;
+		$val //= '';
+
+		# A second spec on the same column goes to residual.
+		if (exists $criteria{$col}) {
+			push @residual, $spec;
+			next;
+		}
+
+		if ($op eq 'eq' || $op eq 'ne') {
+			if ($val =~ /[%_]/) {
+				push @residual, $spec;
+			} else {
+				$criteria{$col} = ($op eq 'eq')
+					? { -like     => $val }
+					: { -not_like => $val };
+			}
+		} elsif ($op eq 'contains') {
+			if ($val =~ /[%_]/) {
+				push @residual, $spec;
+			} else {
+				$criteria{$col} = { -like => "%${val}%" };
+			}
+		} elsif ($op eq 'starts') {
+			if ($val =~ /[%_]/) {
+				push @residual, $spec;
+			} else {
+				$criteria{$col} = { -like => "${val}%" };
+			}
+		} elsif ($op eq 'lt') {
+			Scalar::Util::looks_like_number($val)
+				? ($criteria{$col} = { '<'  => $val })
+				: push @residual, $spec;
+		} elsif ($op eq 'le') {
+			Scalar::Util::looks_like_number($val)
+				? ($criteria{$col} = { '<=' => $val })
+				: push @residual, $spec;
+		} elsif ($op eq 'gt') {
+			Scalar::Util::looks_like_number($val)
+				? ($criteria{$col} = { '>'  => $val })
+				: push @residual, $spec;
+		} elsif ($op eq 'ge') {
+			Scalar::Util::looks_like_number($val)
+				? ($criteria{$col} = { '>=' => $val })
+				: push @residual, $spec;
+		} else {
+			# empty, notempty, unknown operator: always residual.
+			push @residual, $spec;
+		}
+	}
+
+	return (\%criteria, \@residual);
+}
+
+# ---------------------------------------------------------------------------
+# Phase 1 semantic-layer helpers
+# ---------------------------------------------------------------------------
+
+# _measure($fn, $col, $as) -> \%measure
+#
+# Build one measure descriptor in the vocabulary shared by Database::Abstraction
+# and Database::Join (sum|avg|min|max|count|count_distinct).  $col is the
+# source column name, or undef for COUNT(*).  $as is the result-row key.
+# The returned hashref is consumed directly by aggregate(measures => [...]).
+sub _measure {
+	my ($fn, $col, $as) = @_;
+	return { fn => $fn, (defined $col ? (col => $col) : ()), as => $as };
+}
+
+# _numeric_cell($v) -> $number | undef
+#
+# Extract a numeric value from a raw cell, handling currency prefixes
+# (e.g. $1,234.56) and accounting-notation negatives ((1,234.56) -> -1234.56).
+# Returns undef for empty, undef, or non-numeric input.
+# Used by the Perl fold path of _grouped_totals so all four chart routes
+# share one extraction function.
+sub _numeric_cell {
+	my $v = shift;
+	return undef unless defined $v && length($v);
+	my $is_acct_neg = ($v =~ /\A\s*\(/);
+	(my $n = $v) =~ s/[^\d.\-]//g;
+	$n = "-$n" if $is_acct_neg && $n =~ /\A\d/;
+	return undef unless $n =~ /\A-?\d+(?:\.\d+)?\z/;
+	return $n + 0;
+}
+
+# _measure_pushable($source, $fn, $col, \@records) -> bool
+#
+# Returns true when the measure can be computed by aggregate() on $source and
+# the result will be identical to the Perl fold.  False means use the Perl fold.
+#
+# Decision table:
+#   count / count_distinct -- always pushable (no numeric coercion).
+#   sum / avg / min / max  -- only when every sampled value in $col is either
+#                             a plain number (looks_like_number) or empty/undef.
+#                             Currency symbols or accounting parentheses in any
+#                             value force the Perl fold, which strips them
+#                             correctly; SQLite CAST would coerce them to 0.
+#   Missing $source        -- never pushable.
+#   Missing $col           -- sum/avg/min/max are not pushable without a column.
+sub _measure_pushable {
+	my ($source, $fn, $col, $records) = @_;
+	return 0 unless $source && $source->can('aggregate');
+	return 1 if $fn eq 'count' || $fn eq 'count_distinct';
+	return 0 unless defined $col;
+	# For sum/avg/min/max, only push when at least one value is a plain number
+	# and every non-null/non-blank value passes looks_like_number.
+	#
+	# Two cases where both paths must agree:
+	#   - All values undef/blank: Perl fold produces no rows; SQL SUM(NULL)
+	#     produces NULL, normalised to 0 by D::A → discrepancy.  Return 0 so
+	#     the Perl fold runs and yields the expected "No plottable data" result.
+	#   - Currency/accounting notation (e.g. ($1,234)): _numeric_cell strips
+	#     these correctly; SQL sees non-numeric text → SUM = NULL → 0.  Return 0
+	#     so _numeric_cell is used on every value.
+	require Scalar::Util;
+	my $found = 0;
+	for my $row (@{ $records // [] }) {
+		my $v = $row->{$col};
+		next unless defined $v && length($v);   # undef/blank: same effect as NULL
+		return 0 unless Scalar::Util::looks_like_number($v);
+		$found = 1;
+	}
+	return $found;    # 0 (false) when every sampled value was undef or blank
+}
+
+# _parse_measure_param($spec_str) -> \%measure | undef
+#
+# Parse 'col:fn:as' into { col => ..., fn => ..., as => ... }.
+# Shared dialect for /pivot (Phase 2) so it does not invent a second format.
+# Returns undef for an invalid or unrecognised spec.
+sub _parse_measure_param {
+	my $str = shift;
+	return undef unless defined $str && length($str);
+	my ($col, $fn, $as) = split /:/, $str, 3;
+	return undef unless defined $fn && defined $as && length($fn) && length($as);
+	$fn = lc $fn;
+	return undef unless $MEASURE_FN_OK{$fn};
+	return { col => $col, fn => $fn, as => $as };
+}
+
+# _grouped_totals($self, \%pipeline, \%spec) -> \@rows
+#
+# Single GROUP BY entry point for all four chart routes.  Returns an arrayref
+# of hashrefs, each containing the 'by' column values and the aggregate result
+# under $spec->{as}.
+#
+# $pipeline = { source => $src_or_undef, records => \@rows }
+#   source  -- a DataSource or Database::Join for the push path; undef when
+#              the pipeline is a /combine union (must fold in Perl).
+#   records -- the already-fetched rows (pre-filtered by the caller).
+#
+# $spec = { by => [...], fn => ..., val => ..., as => ..., [sort_by, having, limit, offset] }
+#
+# Dispatch:
+#   Push path  -- $source is defined, measure is pushable (checked by
+#                 _measure_pushable), and either no active f= filters or all
+#                 active filters are SQL-pushable (via _filter_specs_to_criteria).
+#                 Calls $source->aggregate() with pushable criteria when present.
+#   Perl fold  -- Iterates $pipeline->{records} (pre-filtered by the caller)
+#                 when the push path is unavailable (combine union, non-SQL
+#                 source, non-pushable measure, or residual filters that cannot
+#                 be expressed as SQL criteria).
+#
+# $ENV{BI_FORCE_PERL_AGG}: set to a true value in tests to force the Perl fold
+# regardless of source type, enabling cross-backend equivalence assertions.
+sub _grouped_totals :Protected ($self, $pipeline, $spec) {
+	my $source  = $pipeline->{source};
+	my $records = $pipeline->{records} // [];
+	my $by      = $spec->{by}  // [];
+	my $fn      = lc($spec->{fn}  // 'count');
+	my $val_col = $spec->{val};
+	my $as      = $spec->{as}  // 'value';
+
+	# Push path: use backend aggregate() when safe.
+	# When f= filters are active, _filter_specs_to_criteria translates as many
+	# specs as possible to SQL criteria.  The push path is used only when ALL
+	# specs are SQL-pushable (no residual); otherwise the Perl fold handles the
+	# pre-filtered records the caller already passed in.
+	my @f_specs    = grep { /\S/ } @{ $self->every_param('f') // [] };
+	my $has_filter = !!@f_specs;
+
+	# SQL::Statement 1.414 (the SQL engine under DBD::CSV) uses
+	# "use warnings FATAL => 'all'" and calls join("\0", @row[@keycols])
+	# inside getAffectedResult without guarding against undef.  When a GROUP BY
+	# column contains blank CSV cells (empty_is_undef => 1 converts them to
+	# undef), the join triggers a fatal "uninitialized value" exception and the
+	# execute() call dies.  The correct fix is to use
+	#   map { $_ // '' } @row[@keycols]
+	# in SQL::Statement::getAffectedResult, but the module has been unmaintained
+	# since 2020 (21 open RT tickets as of 2026-10).
+	# See: https://rt.cpan.org/Ticket/Display.html?id=181946
+	# Skip the push path whenever any 'by' column has a blank or undef value so
+	# DBD::CSV/SQL::Statement is never asked to GROUP BY a null key.
+	# TODO: remove this guard once SQL-Statement RT#181946 is fixed (last checked: 1.414).
+	my $has_null_by_key = @$by && do {
+		my $found;
+		KEY_SCAN: for my $row (@$records) {
+			for my $col (@$by) {
+				my $v = $row->{$col};
+				if (!defined($v) || !length($v)) { $found = 1; last KEY_SCAN; }
+			}
+		}
+		$found;
+	};
+
+	# When filters are active, translate them to SQL criteria for the push path.
+	# If any spec has no SQL equivalent (@residual is non-empty), the push path
+	# is skipped and the Perl fold uses the already-filtered $records.
+	my ($push_crit, $push_residual) = ($has_filter && $source)
+		? _filter_specs_to_criteria(\@f_specs, $source)
+		: ({}, []);
+	my $can_push_filters = !$has_filter || (!@$push_residual && %$push_crit);
+
+	# Skip the push path when any 'by' or 'val' column is virtual (added by
+	# _apply_calc_fields or named-group loader).  Virtual columns do not exist in
+	# the backend and would cause a "No such column" SQL error before the fold fallback.
+	my $virt        = $self->stash('_virtual_columns') // {};
+	my $has_virtual = grep { $virt->{$_} }
+		(@$by, (defined $val_col ? $val_col : ()));
+
+	unless ($ENV{BI_FORCE_PERL_AGG} || $has_virtual || !$can_push_filters || $has_null_by_key || !$source
+		|| !_measure_pushable($source, $fn, $val_col, $records)) {
+		my $m = _measure($fn, $val_col, $as);
+		my $agg_rows = eval {
+			$source->aggregate(
+				by       => $by,
+				measures => [$m],
+				($has_filter && %$push_crit ? (%$push_crit) : ()),
+				($spec->{sort_by} ? (sort_by => $spec->{sort_by}) : ()),
+				($spec->{having}  ? (having  => $spec->{having})  : ()),
+				($spec->{limit}   ? (limit   => $spec->{limit})   : ()),
+				($spec->{offset}  ? (offset  => $spec->{offset})  : ()),
+			)
+		};
+		unless ($@) {
+			return $agg_rows // [];
+		}
+		$self->app->log->debug("aggregate() push failed: $@; falling back to Perl fold");
+	}
+
+	# Perl fold over pre-filtered records.
+	my (%seen_warned, %seen_key, @key_order);
+	my (%totals, %count_map, %distinct_vals);
+
+	for my $row (@$records) {
+		# Skip rows where any 'by' column is empty/undef (mirrors SQL GROUP BY NULL exclusion).
+		# Note: calc field columns store '(unparseable)' (not undef) for failed expressions,
+		# so those rows pass this guard and appear in the (unparseable) group instead.
+		my @key_parts = map { $row->{$_} // '' } @$by;
+		next if @$by && grep { !length($_) } @key_parts;
+		my $key = join("\x00", @key_parts);
+
+		if ($fn eq 'count') {
+			push @key_order, $key unless $seen_key{$key}++;
+			$totals{$key}++;
+		} elsif ($fn eq 'count_distinct') {
+			push @key_order, $key unless $seen_key{$key}++;
+			my $dv = defined $val_col ? ($row->{$val_col} // '') : '';
+			$distinct_vals{$key}{$dv}++;
+		} else {
+			my $v = defined $val_col ? ($row->{$val_col} // '') : '';
+			my $n = _numeric_cell($v);
+			unless (defined $n) {
+				unless ($seen_warned{"$fn\x01" . ($val_col // '')}++) {
+					carp $self->_i18n('warn_measure_fallback', $fn, $val_col // '(none)');
+				}
+				next;	# skip: do NOT add key to order for non-numeric rows
+			}
+			push @key_order, $key unless $seen_key{$key}++;
+			if    ($fn eq 'sum') { $totals{$key}  += $n                                                             }
+			elsif ($fn eq 'avg') { $totals{$key}  += $n; $count_map{$key}++                                        }
+			elsif ($fn eq 'min') { $totals{$key}   = (!exists $totals{$key} || $n < $totals{$key}) ? $n : $totals{$key} }
+			elsif ($fn eq 'max') { $totals{$key}   = (!exists $totals{$key} || $n > $totals{$key}) ? $n : $totals{$key} }
+		}
+	}
+
+	if ($fn eq 'avg') {
+		for my $k (keys %totals) {
+			$totals{$k} = $count_map{$k} ? $totals{$k} / $count_map{$k} : undef;
+		}
+	} elsif ($fn eq 'count_distinct') {
+		for my $k (@key_order) {
+			$totals{$k} = scalar keys %{ $distinct_vals{$k} // {} };
+		}
+	}
+
+	# Assemble result rows in ascending key order (matching the SQL push path)
+	# unless the caller requested an explicit sort.
+	unless ($spec->{sort_by}) {
+		@key_order = sort @key_order;
+	}
+	my @result;
+	for my $key (@key_order) {
+		my @parts = @$by ? (split /\x00/, $key, scalar @$by) : ();
+		my %row;
+		for my $i (0 .. $#$by) {
+			$row{$by->[$i]} = $parts[$i];
+		}
+		$row{$as} = $totals{$key} // ($fn =~ /\A(?:sum|count|count_distinct)\z/ ? 0 : undef);
+		push @result, \%row;
+	}
+
+	return \@result;
+}
+
+# _fetch_page( $self, $source, \%params ) -> ( $records, $has_next )
+#   params: per_page  -- page size (required)
+#           offset    -- 0-based row offset (required)
+#           dedup     -- truthy when ?d=1 dedup is requested
+#           sort_col  -- column name to sort by (optional)
+#           sort_dir  -- 'asc' or 'desc' (default 'asc'; ignored unless sort_col set)
+#
+# Purpose: Fetch and reduce one page of records from $source, honouring the
+#          reduce-before-paginate ordering contract.  Two modes:
+#
+#   Fast path (no f= filters, no dedup): uses the N+1 trick
+#     selectall_arrayref(limit => per_page+1, offset => offset).  has_next is
+#     determined by the extra row before it is popped.
+#
+#   Reduction path (f= filters or dedup present): materialises the full result
+#     in memory, applies all f= filters with _apply_filter_spec (case-insensitive),
+#     applies dedup if requested, then paginates in Perl.  This guarantees that
+#     the Nth page contains the Nth page of the *reduced* set, not the Nth page
+#     of the raw set reduced to fewer rows.  Memory cost: the full reduced set.
+#
+# Sort: sort_col/sort_dir are forwarded to selectall_arrayref as
+#   sort_by => [$sort_col, $sort_dir].  Both Database::Abstraction 0.49+
+#   and Database::Join 0.009.0 honour this parameter natively.
+#
+# Returns (undef, 0) when the underlying fetch throws; the caller must handle
+# $records being undef.
+sub _fetch_page :Protected ($self, $source, $params) {
+	my $per_page = $params->{per_page};
+	my $offset   = $params->{offset};
+	my $dedup    = $params->{dedup};
+	my $sort_col = $params->{sort_col};
+	my $sort_dir = ($params->{sort_dir} // 'asc') =~ /\Adesc\z/i ? 'desc' : 'asc';
+
+	# sort_by args forwarded to the backend when a sort column is requested.
+	# D::A 0.49+ and D::J 0.009.0 both support sort_by => [$col, $dir].
+	my @sort_args = $sort_col ? (sort_by => [$sort_col, $sort_dir]) : ();
+
+	# Collect and validate f= specs.
+	my @f_specs = grep {
+		my ($c, $o) = split /:/, $_, 3;
+		length($c // '') && defined $o && length $o;
+	} @{ $self->every_param('f') // [] };
+
+	# Determine whether the source has a SQL backend that supports LIMIT/OFFSET.
+	# DBD::CSV / SQL::Statement do not implement LIMIT/OFFSET; passing them emits
+	# a "Bad limit clause" error at the D::A layer before falling back to a Perl
+	# approach.  Avoid the noise by only using the N+1 fast path for SQL-backed
+	# sources.  For non-SQL sources (CSV, XLSX, in-memory) the reduction path
+	# below materialises the full set and paginates in Perl.
+	my $is_sql = $source->can('dbi_source') && $source->dbi_source;
+
+	unless (@f_specs || $dedup) {
+		if ($is_sql) {
+			# Fast path (SQL-backed): delegate LIMIT/OFFSET to the backend N+1 trick.
+			# Copy before pop: D::A may return a read-only ref to its internal cache.
+			my @records = @{ $source->selectall_arrayref(
+				limit => $per_page + 1, offset => $offset, @sort_args,
+			) // [] };
+			my $has_next = (@records > $per_page) ? 1 : 0;
+			pop @records if $has_next;
+			return (\@records, $has_next);
+		}
+		# Non-SQL fast path: fetch all, sort in Perl, then paginate.
+		my $all = $source->selectall_arrayref(@sort_args) // [];
+		my $has_next = (@$all > $offset + $per_page) ? 1 : 0;
+		my @page = splice(@$all, $offset, $per_page);
+		return (\@page, $has_next);
+	}
+
+	# Criteria pushdown: translate as many f= specs as possible into SQL
+	# criteria (_filter_specs_to_criteria returns a criteria hashref and a
+	# residual list for any spec that cannot be safely pushed to SQL).
+	my ($criteria, $residual) = _filter_specs_to_criteria(\@f_specs, $source);
+	my $has_criteria = %$criteria;
+
+	# Full-pushdown fast path: all specs translated, no dedup, SQL-backed source.
+	# Use N+1 trick with SQL criteria + LIMIT/OFFSET -- avoids full-table fetch.
+	# Copy before pop: D::A may return a read-only ref to its internal cache.
+	if ($is_sql && !$dedup && !@$residual) {
+		my @records = @{ $source->selectall_arrayref(
+			%$criteria, limit => $per_page + 1, offset => $offset, @sort_args,
+		) // [] };
+		my $has_next = (@records > $per_page) ? 1 : 0;
+		pop @records if $has_next;
+		return (\@records, $has_next);
+	}
+
+	# Partial-pushdown / dedup path: fetch the SQL-filtered (and sorted) set,
+	# apply residual specs and/or dedup in Perl, then paginate the reduced set.
+	# Memory cost: the full reduced set.
+	my $all = $has_criteria
+		? $source->selectall_arrayref(%$criteria, @sort_args)
+		: $source->selectall_arrayref(@sort_args);
+	$all //= [];
+
+	$all = _apply_filter_spec($all, $_) for @$residual;
+
+	if ($dedup) {
+		my $cols = $source->columns;
+		my @dcols = $cols ? @$cols : (keys %{ $all->[0] // {} });
+		$all = _dedup_records($all, \@dcols);
+	}
+
+	my $total    = scalar @$all;
+	my $has_next = ($total > $offset + $per_page) ? 1 : 0;
+	my @page     = splice(@$all, $offset, $per_page);
+
+	return (\@page, $has_next);
 }
 
 # _combine_tables(\@sources) -> (\@merged_records, \@merged_columns)
@@ -666,22 +1167,23 @@ sub _write_sqlite_db :Protected ($self, $records, $columns) {
 	return $data;
 }
 
-# _run_export_pipeline($self) -> ($records, \@columns, $left_label) or ()
+# _run_pipeline_source($self) -> ($src, $records, \@columns, $left_label) or ()
 #
-# Purpose: Shared join+filter pipeline executed by both export_data (GET, download)
-#          and export_write (POST, filesystem write).  Opens the left table, chains
-#          any Database::Join steps, fetches the merged result, then applies filters.
-# Entry:   Reads "l=", "j=" (repeatable), and "f=" (repeatable) query/body params.
-# Exit:    On success: ($filtered_arrayref, \@column_names, $left_label_string).
+# Purpose: Inner pipeline: opens the left spec, builds the join chain, fetches
+#          all rows, and runs any c= combine step.  Does NOT apply f= filters,
+#          dedup, or pagination -- that is the caller's responsibility.
+#          Chart routes call this directly so they can access $src for the
+#          Phase 1 aggregate() push path.  Row-viewing routes and export routes
+#          call the thin _run_export_pipeline wrapper instead.
+# Exit:    On success: ($src_or_undef, $records_aref, $columns_aref, $label).
+#          $src is undef when a c= combine makes the result non-aggregatable.
 #          On failure: empty list (left table not found / fetch error).
-# Side Effects: Opens data files; may emit carp warnings for empty result sets.
-sub _run_export_pipeline :Protected ($self) {
+sub _run_pipeline_source :Protected ($self) {
 	my $left_spec = $self->param('l') // '';
 	my ($left_src, $left_label) = $self->_open_spec($left_spec);
 	return () unless $left_src;
 
-	# Build the join chain lazily: each Database::Join wraps the previous source
-	# and a new right DataSource.  No data is fetched until after the loop.
+	# Build the join chain lazily.
 	my $max_rows  = $self->app->config('join_max_rows') // $DEFAULT_JOIN_MAX_ROWS;
 	my $join_type = $self->param('jtype') // 'left';
 	$join_type    = 'left' unless $join_type =~ /\A(?:left|inner|outer)\z/;
@@ -715,9 +1217,6 @@ sub _run_export_pipeline :Protected ($self) {
 		);
 	}
 
-	# Surface any schema-type-mismatch warnings from Database::Join to the UI
-	# so the user sees "column X has conflicting types" rather than losing it
-	# silently to the error log.
 	$self->stash(schema_warnings => \@schema_warnings) if @schema_warnings;
 
 	my $records = eval { $src->selectall_arrayref };
@@ -725,8 +1224,8 @@ sub _run_export_pipeline :Protected ($self) {
 	$records //= [];
 	my @columns = _get_columns($src, $records);
 
-	# Combine (vertical stack) with any c= sources.  Runs after joins so a join
-	# result can itself be stacked with another table in a single pipeline.
+	# Combine (vertical stack): sets $src = undef since the result is a union
+	# with no single aggregatable object.
 	my @cspecs = @{ $self->every_param('c') // [] };
 	if (@cspecs) {
 		my @sources = ([$records, \@columns]);
@@ -741,14 +1240,258 @@ sub _run_export_pipeline :Protected ($self) {
 		if (@sources > 1) {
 			($records, my $new_cols) = _combine_tables(\@sources);
 			@columns = @$new_cols;
+			$src = undef;	# union: no single aggregatable source
 		}
 	}
+
+	return ($src, $records, \@columns, $left_label);
+}
+
+# _apply_date_normalization($self, $records, \@columns, $spec_key) -> void
+#
+# Reads date_patterns from .bi/models.json for $spec_key and normalises each
+# configured column's values to ISO-8601 in-place.  A value that does not match
+# the stored pattern is left unchanged so YEAR/MONTH/etc. return undef (and the
+# row falls into the '(unparseable)' bucket in _grouped_totals).
+# Called at the top of _apply_calc_fields so registered patterns are applied
+# before any calc expression is evaluated.
+sub _apply_date_normalization :Protected ($self, $records, $columns, $spec_key) {
+	return unless defined $spec_key && length $spec_key;
+	my $models   = $self->_read_models;
+	my $patterns = $models->{date_patterns}{$spec_key};
+	return unless $patterns && %{$patterns};
+	my %col_set = map { $_ => 1 } @{$columns};
+	require Database::BI::Calc;
+	for my $col (keys %{$patterns}) {
+		next unless $col_set{$col};
+		my $pat = $patterns->{$col};
+		for my $row (@{$records}) {
+			my $v = $row->{$col};
+			next unless defined $v && length $v;
+			# Only overwrite when normalisation succeeds; leave unchanged on
+			# mismatch so the row lands in the '(unparseable)' group.
+			my $iso = Database::BI::Calc::date_normalise($v, $pat);
+			$row->{$col} = $iso if defined $iso;
+		}
+	}
+}
+
+# _apply_calc_fields($self, $records, \@columns) -> ($records, \@columns)
+#
+# Reads ?c=<name>:<expression> params (those NOT matching a path:/table:/url:/redis:
+# source spec) and compiles each via Database::BI::Calc.  Evaluates per row,
+# appending the virtual column to each row hashref.  Croaks on compile error
+# (caller renders 400); runtime undef values are logged at warn level.
+# Later ?c= specs may reference names defined by earlier ones (evaluated in order).
+sub _apply_calc_fields :Protected ($self, $records, $columns) {
+	# Normalise date columns before evaluating expressions so that date
+	# functions (YEAR, MONTH, etc.) see ISO-8601 values even when the source
+	# file uses a non-ISO format (e.g. M/D/YYYY).
+	$self->_apply_date_normalization($records, $columns, $self->param('l'));
+
+	# Build calc spec list: stored fields from models.json first (lower priority),
+	# then URL ?c= params (higher priority — they override stored fields of the
+	# same name so the user can test a new expression without permanently saving).
+	my (@calc_specs, %seen_calc);
+	{
+		my $sk = $self->param('l') // '';
+		if (length $sk) {
+			my $stored = ($self->_read_models)->{fields}{$sk} // {};
+			for my $n (sort keys %{$stored}) {
+				push @calc_specs, { name => $n, expr => $stored->{$n} };
+				$seen_calc{$n} = $#calc_specs;
+			}
+		}
+	}
+	for my $spec (@{ $self->every_param('c') // [] }) {
+		# Skip source specs handled by _run_pipeline_source.
+		next if $spec =~ /\A(?:path:|table:|url:|redis:)/i;
+		my ($name, $expr) = ($spec =~ /\A([A-Za-z_][A-Za-z0-9_]*):(.+)\z/s);
+		next unless defined $name && defined $expr;
+		if (exists $seen_calc{$name}) {
+			$calc_specs[$seen_calc{$name}]{expr} = $expr; # URL overrides stored
+		} else {
+			push @calc_specs, { name => $name, expr => $expr };
+			$seen_calc{$name} = $#calc_specs;
+		}
+	}
+
+	my @cols = @{$columns};
+
+	if (@calc_specs) {
+		require Database::BI::Calc;
+		for my $cs (@calc_specs) {
+			my $name = $cs->{name};
+			my $calc = Database::BI::Calc->new(expr => $cs->{expr}, columns => \@cols);
+			croak $self->_i18n('error_calc_compile', $name, $calc->error)
+				if $calc->has_error;
+
+			my $undef_count = 0;
+			for my $row (@{$records}) {
+				my $val = $calc->evaluate($row);
+				# Store '(unparseable)' rather than undef so that pivot/bar
+				# grouping (which skips empty-string keys) keeps these rows in a
+				# visible '(unparseable)' bucket rather than silently dropping them.
+				$row->{$name} = defined $val ? $val : '(unparseable)';
+				$undef_count++ unless defined $val;
+			}
+			if ($undef_count) {
+				$self->app->log->warn(
+					$self->_i18n('warn_calc_undef', $name, $undef_count)
+				);
+			}
+			push @cols, $name unless grep { $_ eq $name } @cols;
+		# Record as virtual so _grouped_totals can skip the SQL push path.
+		$self->stash('_virtual_columns' => {}) unless $self->stash('_virtual_columns');
+		$self->stash('_virtual_columns')->{$name} = 1;
+		}
+	}
+
+	# Apply named value groups from models.json.
+	# For each source column that has groups registered under the current l=
+	# spec, add a virtual "${col}_group" column to every row.  Each row's value
+	# is mapped to its group label; values not in any group become '(other)'.
+	{
+		my $spec_key = $self->param('l') // '';
+		if (length $spec_key) {
+			my $models = $self->_read_models;
+			my $grps   = $models->{groups}{$spec_key};
+			if ($grps && %{$grps}) {
+				my %col_set = map { $_ => 1 } @cols;
+				for my $col (sort keys %{$grps}) {
+					next unless $col_set{$col};
+					# Build reverse map: value -> group label.
+					my %val2group;
+					for my $gname (keys %{$grps->{$col}}) {
+						for my $v (@{$grps->{$col}{$gname}}) {
+							$val2group{$v} = $gname;
+						}
+					}
+					my $vcol = "${col}_group";
+					for my $row (@{$records}) {
+						my $v = $row->{$col} // '';
+						$row->{$vcol} = $val2group{$v} // '(other)';
+					}
+					push @cols, $vcol unless grep { $_ eq $vcol } @cols;
+					# Record group column as virtual.
+					$self->stash('_virtual_columns' => {}) unless $self->stash('_virtual_columns');
+					$self->stash('_virtual_columns')->{$vcol} = 1;
+				}
+			}
+		}
+	}
+
+	return ($records, \@cols);
+}
+
+# ---------------------------------------------------------------------------
+# Calculated-field model storage  (.bi/models.json)
+# ---------------------------------------------------------------------------
+
+# _calc_models_path($self) -> $path_string_or_undef
+#
+# Returns the path to .bi/models.json (creating .bi/ on first call), or undef
+# when the write must be skipped (data_dir safety guard, mkdir failure).
+sub _calc_models_path :Protected ($self) {
+	my $app      = $self->app;
+	my $home     = $app->home;
+	my $cfg_dir  = $app->config('model_dir') // '.bi';
+	# Support absolute paths in model_dir (e.g. when tests redirect to a temp dir).
+	my $bi_dir   = Mojo::File->new($cfg_dir)->is_abs
+	                ? Mojo::File->new($cfg_dir)
+	                : $home->child($cfg_dir);
+	my $data_dir = $home->child($app->config('data_dir') // 'data');
+
+	# Use canonical absolute paths so that relative variants (e.g. 'data/.bi') are
+	# caught even when they are not equal to data_dir as strings.  Refuse when the
+	# model directory is equal to OR inside data_dir (prefix + separator).
+	my $bi_abs   = eval { $bi_dir->to_abs->to_string }   // $bi_dir->to_string;
+	my $data_abs = eval { $data_dir->to_abs->to_string } // $data_dir->to_string;
+	my $sep      = '/';
+	if ($bi_abs eq $data_abs || index($bi_abs, $data_abs . $sep) == 0) {
+		carp 'model_dir is inside data_dir; skipping model file write';
+		return undef;
+	}
+	unless (-d $bi_dir) {
+		mkdir $bi_dir->to_string
+			or do { $app->log->warn("Cannot create $bi_dir: $!"); return undef };
+	}
+	return $bi_dir->child('models.json')->to_string;
+}
+
+# _read_models($self) -> \%models
+#
+# Returns the parsed models hashref from .bi/models.json, or an empty scaffold.
+sub _read_models :Protected ($self) {
+	my $path = $self->_calc_models_path;
+	my $scaffold = { version => 1, fields => {}, groups => {}, date_patterns => {} };
+	return $scaffold unless defined $path && -f $path;
+	my $json = eval { Mojo::File->new($path)->slurp };
+	return $scaffold unless $json && !$@;
+	my $data = eval { decode_json($json) };
+	return $scaffold unless ref $data eq 'HASH';
+	$data->{fields}        //= {};
+	$data->{groups}        //= {};
+	$data->{date_patterns} //= {};
+	return $data;
+}
+
+# _write_models($self, \%models) -- persists models to .bi/models.json
+sub _write_models :Protected ($self, $models) {
+	my $path = $self->_calc_models_path;
+	return unless defined $path;
+	eval { Mojo::File->new($path)->spurt(encode_json($models)) };
+	$self->app->log->warn("Cannot write $path: $@") if $@;
+}
+
+# _run_export_pipeline($self) -> ($records, \@columns, $left_label) or ()
+#
+# Purpose: Thin wrapper over _run_pipeline_source that additionally applies
+#          f= filters, d=1 dedup, and page/per_page pagination.  Used by
+#          export_data, export_write, folder_view, and import_url (row-viewing
+#          routes that do not need the source object for aggregation).
+# Entry:   Reads "l=", "j=" (repeatable), "c=" (repeatable), "f=" (repeatable),
+#          "d=", "page=", "per_page=" query/body params.
+# Exit:    On success: ($filtered_arrayref, \@column_names, $left_label_string).
+#          On failure: empty list (left table not found / fetch error).
+sub _run_export_pipeline :Protected ($self) {
+	my (undef, $records, $columns, $left_label) = $self->_run_pipeline_source;
+	return () unless defined $records;
+
+	eval { ($records, $columns) = $self->_apply_calc_fields($records, $columns) };
+	if ($@) {
+		(my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//;
+		$self->render(text => $e, status => 400);
+		return ();
+	}
+
+	my @columns = @{ $columns // [] };
 
 	for my $s (@{ $self->every_param('f') }) {
 		$records = _apply_filter_spec($records, $s);
 	}
 
 	$records = _dedup_records($records, \@columns) if $self->param('d');
+
+	# Sort support for /export: applied in memory after filtering/dedup.
+	my $sort = $self->param('sort');
+	my $dir  = ($self->param('dir') // 'asc') =~ /\Adesc\z/i ? 'desc' : 'asc';
+	if (defined $sort && grep { $_ eq $sort } @columns) {
+		@$records = sort { ($a->{$sort} // '') cmp ($b->{$sort} // '') } @$records;
+		@$records = reverse @$records if $dir eq 'desc';
+	} elsif (defined $sort) {
+		carp $self->_i18n('error_sort_column', $sort);
+	}
+
+	# Server-side pagination for /export.
+	if (defined $self->param('page') || defined $self->param('per_page')) {
+		my ($page, $per_page, $offset) = $self->_pagination;
+		my $total    = scalar @$records;
+		my $has_next = ($total > $offset + $per_page) ? 1 : 0;
+		my @page_recs = splice(@$records, $offset, $per_page);
+		$records = \@page_recs;
+		$self->stash(export_has_next => $has_next, export_page => $page, export_per_page => $per_page);
+	}
 
 	return ($records, \@columns, $left_label);
 }
@@ -960,12 +1703,19 @@ sub view ($self) {
 
 	my ($page, $per_page, $offset) = $self->_pagination;
 
-	my ($source, $records);
+	my $dedup = $self->param('d') ? 1 : 0;
+	my ($source, $records, $has_next, $is_multi);
 	eval {
-		$source  = $self->open_table($table);
-		# Fetch one extra row to detect whether a next page exists without
-		# issuing a COUNT(*) query (which blocks on multi-GB SQLite files).
-		$records = $source->selectall_arrayref(limit => $per_page + 1, offset => $offset);
+		$source = $self->open_table($table);
+		# Multi-table SQLite: flag redirect without fetching data.
+		if ($source && $source->sqlite_tables && @{ $source->sqlite_tables } > 1) {
+			$is_multi = 1;
+		} else {
+			# _fetch_page applies reduce-before-paginate: full-fetch + filter + dedup
+			# + Perl paginate when f= or d=1 are set; N+1 trick otherwise.
+			($records, $has_next) = $self->_fetch_page($source,
+				{ per_page => $per_page, offset => $offset, dedup => $dedup });
+		}
 	};
 	if ($@) {
 		return $self->render(
@@ -978,20 +1728,15 @@ sub view ($self) {
 		);
 	}
 
-	# Multi-table SQLite: show the schema browser first so the user can choose
-	# which internal table to open.
-	if ($source && $source->sqlite_tables && @{ $source->sqlite_tables } > 1) {
+	if ($is_multi) {
 		return $self->redirect_to('/tables?l=' . url_escape("table:$table"));
 	}
 
 	$records //= [];
-	my $has_next = (@$records > $per_page) ? 1 : 0;
-	pop @$records if $has_next;
-
 	my @columns = _get_columns($source, $records);
-	my ($filtered, $filter_specs, $filters_json) = $self->_apply_filters($records);
-	my $dedup = $self->param('d') ? 1 : 0;
-	$filtered = _dedup_records($filtered, \@columns) if $dedup;
+	# _apply_filters on already-reduced records is a no-op for filtering but
+	# correctly builds filter_specs (for export URLs) and filters_json (for UI).
+	my (undef, $filter_specs, $filters_json) = $self->_apply_filters($records);
 
 	my $page_url = $self->req->url->clone;
 	$page_url->query->remove('page')->remove('per_page');
@@ -1001,7 +1746,7 @@ sub view ($self) {
 		template         => "$platform/$language/dashboard",
 		handler          => 'tt',
 		format           => 'html',
-		records          => $filtered,
+		records          => $records,
 		columns          => \@columns,
 		table            => $table,
 		title            => ucfirst($table),
@@ -1194,6 +1939,69 @@ sub open_file ($self) {
 
 	my ($page, $per_page, $offset) = $self->_pagination;
 
+	# Bare redis:// URL (no table name) -- redirect to key-listing page.
+	if ($file_path =~ $REDIS_URL_RE) {
+		return $self->redirect_to('/tables?l=' . url_escape($file_path));
+	}
+
+	# Redis spec: redis:tablename|redis://host:port -- delegate to _open_spec.
+	if ($file_path =~ $REDIS_SPEC_RE) {
+		my $lspec = $file_path;
+		my ($source, $label) = $self->_open_spec($lspec);
+		return $self->reply->not_found unless $source;
+		my $table = $label;
+		my $dedup = $self->param('d') ? 1 : 0;
+		my ($records, $has_next);
+		eval {
+			($records, $has_next) = $self->_fetch_page($source,
+				{ per_page => $per_page, offset => $offset, dedup => $dedup });
+		};
+		if ($@) {
+			return $self->render(
+				template   => "$platform/$language/home",
+				handler    => 'tt',
+				format     => 'html',
+				tables     => [],
+				title      => 'Error',
+				error      => $self->_i18n('error_file_open', $label, $@),
+				back_url   => '/',
+				back_label => 'Home',
+			);
+		}
+		$records //= [];
+		my @columns  = _get_columns($source, $records);
+		my (undef, $filter_specs, $filters_json) = $self->_apply_filters($records);
+		my $rpage_url = $self->req->url->clone;
+		$rpage_url->query->remove('page')->remove('per_page');
+		return $self->render(
+			template         => "$platform/$language/dashboard",
+			handler          => 'tt',
+			format           => 'html',
+			records          => $records,
+			columns          => \@columns,
+			table            => $table,
+			title            => $label,
+			back_url         => _safe_back_url($self->param('back')) // '/',
+			back_label       => $self->param('back_label') // 'Home',
+			back2_url        => _safe_back_url($self->param('back2')),
+			back2_label      => $self->param('back2_label') // 'Back',
+			file_path        => $file_path,
+			left_spec        => $lspec,
+			combine_specs    => [],
+			current_joins    => [],
+			available_tables => $self->_scan_data_dir,
+			join_summaries   => [],
+			filter_specs     => $filter_specs,
+			filters_json     => $filters_json,
+			dedup            => $dedup,
+			export_url       => $self->_build_export_url($lspec, [], $filter_specs, undef, $dedup),
+			page             => $page,
+			per_page         => $per_page,
+			has_next         => $has_next,
+			page_base_url    => $rpage_url->to_string,
+		);
+	}
+
 	# Remote path /../hostname/dir/file.ext: delegate opening to _open_spec
 	# and render the dashboard directly, bypassing the realpath/local-file path.
 	if ($file_path =~ m{\A/\.\./}) {
@@ -1202,9 +2010,11 @@ sub open_file ($self) {
 		return $self->reply->not_found unless $source;
 		my $filename = $label;
 		(my $table = $filename) =~ s/\.[^.]+\z//;
-		my $records;
+		my $dedup = $self->param('d') ? 1 : 0;
+		my ($records, $has_next);
 		eval {
-			$records = $source->selectall_arrayref(limit => $per_page + 1, offset => $offset);
+			($records, $has_next) = $self->_fetch_page($source,
+				{ per_page => $per_page, offset => $offset, dedup => $dedup });
 		};
 		if ($@) {
 			return $self->render(
@@ -1219,19 +2029,15 @@ sub open_file ($self) {
 			);
 		}
 		$records //= [];
-		my $has_next = (@$records > $per_page) ? 1 : 0;
-		pop @$records if $has_next;
 		my @columns  = _get_columns($source, $records);
-		my ($filtered, $filter_specs, $filters_json) = $self->_apply_filters($records);
-		my $dedup = $self->param('d') ? 1 : 0;
-		$filtered = _dedup_records($filtered, \@columns) if $dedup;
+		my (undef, $filter_specs, $filters_json) = $self->_apply_filters($records);
 		my $rpage_url = $self->req->url->clone;
 		$rpage_url->query->remove('page')->remove('per_page');
 		return $self->render(
 			template         => "$platform/$language/dashboard",
 			handler          => 'tt',
 			format           => 'html',
-			records          => $filtered,
+			records          => $records,
 			columns          => \@columns,
 			table            => $table,
 			title            => $filename,
@@ -1275,11 +2081,19 @@ sub open_file ($self) {
 	}
 	my $back_label_default = $back_override ? ($self->param('back_label') // 'Back') : 'Back to browser';
 
-	my ($source, $records);
+	my $dedup = $self->param('d') ? 1 : 0;
+	my ($source, $records, $has_next, $is_multi_local);
 	eval {
-		$source  = $self->open_table($table, directory => $dir->to_string,
+		$source = $self->open_table($table, directory => $dir->to_string,
 			defined $it ? (internal_table => $it) : ());
-		$records = $source->selectall_arrayref(limit => $per_page + 1, offset => $offset);
+		# Multi-table SQLite without it=: flag redirect without fetching data.
+		if (!defined $it && $source && $source->sqlite_tables
+				&& @{ $source->sqlite_tables } > 1) {
+			$is_multi_local = 1;
+		} else {
+			($records, $has_next) = $self->_fetch_page($source,
+				{ per_page => $per_page, offset => $offset, dedup => $dedup });
+		}
 	};
 	if ($@) {
 		# Provide a SQLite-specific hint when the error looks like a table-name
@@ -1305,21 +2119,13 @@ sub open_file ($self) {
 		);
 	}
 
-	# Multi-table SQLite without a specific table selected: redirect to schema
-	# browser so the user can pick which internal table to open.
-	if (!defined $it && $source && $source->sqlite_tables
-			&& @{ $source->sqlite_tables } > 1) {
+	if ($is_multi_local) {
 		return $self->redirect_to('/tables?l=' . url_escape("path:${\$file->to_string}"));
 	}
 
 	$records //= [];
-	my $has_next = (@$records > $per_page) ? 1 : 0;
-	pop @$records if $has_next;
-
 	my @columns  = _get_columns($source, $records);
-	my ($filtered, $filter_specs, $filters_json) = $self->_apply_filters($records);
-	my $dedup = $self->param('d') ? 1 : 0;
-	$filtered = _dedup_records($filtered, \@columns) if $dedup;
+	my (undef, $filter_specs, $filters_json) = $self->_apply_filters($records);
 
 	my $lpage_url = $self->req->url->clone;
 	$lpage_url->query->remove('page')->remove('per_page');
@@ -1328,7 +2134,7 @@ sub open_file ($self) {
 		template         => "$platform/$language/dashboard",
 		handler          => 'tt',
 		format           => 'html',
-		records          => $filtered,
+		records          => $records,
 		columns          => \@columns,
 		table            => defined $it ? $it : $table,
 		title            => defined $it ? "$filename ($it)" : $filename,
@@ -1645,7 +2451,18 @@ sub join_tables ($self) {
 		push @summaries, { label => $right_label, left_key => $left_key, right_key => $right_key };
 	}
 
-	my $records = eval { $src->selectall_arrayref };
+	my ($page, $per_page, $offset) = $self->_pagination;
+	my $dedup  = $self->param('d') ? 1 : 0;
+	my $sort   = $self->param('sort');
+	my $dir    = ($self->param('dir') // 'asc') =~ /\Adesc\z/i ? 'desc' : 'asc';
+
+	my ($records, $has_next);
+	eval {
+		($records, $has_next) = $self->_fetch_page($src,
+			{ per_page  => $per_page, offset   => $offset,
+			  dedup     => $dedup,    sort_col => $sort,
+			  sort_dir  => $dir });
+	};
 	if ($@) {
 		return $self->render(
 			template => "$platform/$language/home",
@@ -1659,20 +2476,25 @@ sub join_tables ($self) {
 	$records //= [];
 	my @columns = _get_columns($src, $records);
 
-	my ($filtered, $filter_specs, $filters_json) = $self->_apply_filters($records);
-	my $dedup = $self->param('d') ? 1 : 0;
-	$filtered = _dedup_records($filtered, \@columns) if $dedup;
+	if (defined $sort && !grep { $_ eq $sort } @columns) {
+		carp $self->_i18n('error_sort_column', $sort);
+	}
+
+	my (undef, $filter_specs, $filters_json) = $self->_apply_filters($records);
 
 	my $title     = $left_label;
 	$title       .= ' + ' . join(' + ', map { $_->{label} } @summaries) if @summaries;
 	my $table_key = 'join:' . lc($left_label);
 	$table_key   .= ':' . lc($_->{label}) for @summaries;
 
+	my $page_url = $self->req->url->clone;
+	$page_url->query->remove('page')->remove('per_page');
+
 	$self->render(
 		template         => "$platform/$language/dashboard",
 		handler          => 'tt',
 		format           => 'html',
-		records          => $filtered,
+		records          => $records,
 		columns          => \@columns,
 		table            => $table_key,
 		title            => $title,
@@ -1690,6 +2512,10 @@ sub join_tables ($self) {
 		dedup            => $dedup,
 		export_url       => $self->_build_export_url($left_spec, \@join_specs, $filter_specs, undef, $dedup),
 		schema_warnings  => \@schema_warnings,
+		page             => $page,
+		per_page         => $per_page,
+		has_next         => $has_next,
+		page_base_url    => $page_url->to_string,
 	);
 }
 
@@ -1785,20 +2611,46 @@ sub combine_tables ($self) {
 		: ($left_recs, \@left_cols);
 	my @columns = @$cols_ref;
 
-	my ($filtered, $filter_specs, $filters_json) = $self->_apply_filters($records);
+	# Apply f= filters in memory before paginating (reduce-before-paginate).
+	for my $s (@{ $self->every_param('f') // [] }) {
+		$records = _apply_filter_spec($records, $s);
+	}
 	my $dedup = $self->param('d') ? 1 : 0;
-	$filtered = _dedup_records($filtered, \@columns) if $dedup;
+	$records = _dedup_records($records, \@columns) if $dedup;
+
+	# In-memory sort for /combine (no single backend to delegate to).
+	my $sort = $self->param('sort');
+	my $dir  = ($self->param('dir') // 'asc') =~ /\Adesc\z/i ? 'desc' : 'asc';
+	if (defined $sort && grep { $_ eq $sort } @columns) {
+		carp $self->_i18n('warn_combine_sort');
+		@$records = sort { ($a->{$sort} // '') cmp ($b->{$sort} // '') } @$records;
+		@$records = reverse @$records if $dir eq 'desc';
+	} elsif (defined $sort) {
+		carp $self->_i18n('error_sort_column', $sort);
+	}
+
+	# Server-side pagination: slice the fully-reduced combined set.
+	my ($page, $per_page, $offset) = $self->_pagination;
+	my $total    = scalar @$records;
+	my $has_next = ($total > $offset + $per_page) ? 1 : 0;
+	my @page_recs = splice(@$records, $offset, $per_page);
+	$records = \@page_recs;
+
+	my (undef, $filter_specs, $filters_json) = $self->_apply_filters($records);
 
 	my $title     = $left_label;
 	$title       .= ' + ' . join(' + ', map { $_->{label} } @summaries) if @summaries;
 	my $table_key = 'combine:' . lc($left_label);
 	$table_key   .= ':' . lc($_->{label}) for @summaries;
 
+	my $page_url = $self->req->url->clone;
+	$page_url->query->remove('page')->remove('per_page');
+
 	$self->render(
 		template         => "$platform/$language/dashboard",
 		handler          => 'tt',
 		format           => 'html',
-		records          => $filtered,
+		records          => $records,
 		columns          => \@columns,
 		table            => $table_key,
 		title            => $title,
@@ -1815,6 +2667,10 @@ sub combine_tables ($self) {
 		filters_json     => $filters_json,
 		dedup            => $dedup,
 		export_url       => $self->_build_export_url($left_spec, [], $filter_specs, \@combine_specs, $dedup),
+		page             => $page,
+		per_page         => $per_page,
+		has_next         => $has_next,
+		page_base_url    => $page_url->to_string,
 	);
 }
 
@@ -1879,6 +2735,15 @@ None beyond the 404 response.
 sub export_data ($self) {
 	my ($records, $columns, $left_label) = $self->_run_export_pipeline;
 	return $self->reply->not_found unless $records;
+
+	# Surface schema-type-mismatch warnings in a response header so API
+	# consumers (and the user via browser dev tools) can see them even
+	# though exports render no HTML template.
+	my $warnings = $self->stash('schema_warnings') // [];
+	if (@$warnings) {
+		my $hdr = join('; ', map { s/\s+/ /gr =~ s/^\s+|\s+$//gr } @$warnings);
+		$self->res->headers->header('X-BI-Warnings' => $hdr);
+	}
 
 	my $format = $self->param('format') // 'csv';
 	(my $safe_name = lc $left_label) =~ s/[^a-z0-9_]+/_/g;
@@ -2327,37 +3192,107 @@ sub clear_uploads ($self) {
 #          data source cannot be opened, 200 with an error message when
 #          no plottable rows exist.
 sub graph_view ($self) {
-	my $x_col     = $self->param('x') // '';
-	my $y_col     = $self->param('y') // '';
-	my $back      = _safe_back_url($self->param('back')) // '/';
-	my $back2     = _safe_back_url($self->param('back2'));
-	my $back2_lbl = $self->param('back2_label') // '';
+	my $x_col      = $self->param('x')      // '';
+	my $y_col      = $self->param('y')      // '';
+	my $series_col = $self->param('series') // '';
+	my $back       = _safe_back_url($self->param('back')) // '/';
+	my $back2      = _safe_back_url($self->param('back2'));
+	my $back2_lbl  = $self->param('back2_label') // '';
 
 	return $self->render(text => 'Missing x or y column parameter', status => 400)
 		unless length($x_col) && length($y_col);
 
-	my ($records, $columns) = $self->_run_export_pipeline;
+	my ($src, $records, $columns) = $self->_run_pipeline_source;
 	return $self->render(text => 'Could not open data source', status => 404)
-		unless $records;
+		unless defined $records;
+
+	eval { ($records, $columns) = $self->_apply_calc_fields($records, $columns) };
+	if ($@) { (my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//; return $self->render(text => $e, status => 400) }
+
+	# Apply f= filters (pre-filter before building pairs, same as _run_export_pipeline).
+	for my $s (@{ $self->every_param('f') }) {
+		$records = _apply_filter_spec($records, $s);
+	}
 
 	my %col_set = map { $_ => 1 } @{$columns};
 	return $self->render(text => "Column not found: $x_col", status => 400)
 		unless $col_set{$x_col};
 	return $self->render(text => "Column not found: $y_col", status => 400)
 		unless $col_set{$y_col};
+	if (length $series_col) {
+		return $self->render(text => "Column not found: $series_col", status => 400)
+			unless $col_set{$series_col};
+	}
+
+	# --- Multi-series path: ?series=<col> groups records into one line per value ---
+	if (length $series_col) {
+		my %by_series;
+		my @series_order;
+		for my $row (@{$records}) {
+			my $x   = $row->{$x_col}      // '';
+			my $y   = $row->{$y_col}      // '';
+			my $grp = $row->{$series_col} // '';
+			next unless length($x) && length($y) && length($grp);
+			my $yn  = _numeric_cell($y);
+			next unless defined $yn;
+			unless (exists $by_series{$grp}) {
+				push @series_order, $grp;
+				$by_series{$grp} = [];
+			}
+			push @{$by_series{$grp}}, { label => _decode_cell($x), value => $yn };
+		}
+
+		return $self->render(
+			text   => 'No plottable data: no rows have valid numeric values in the Y column.',
+			status => 200,
+		) unless @series_order;
+
+		my @series_data = map { { name => $_, data => $by_series{$_} } } @series_order;
+
+		my ($source_url, $source_accessed) = $self->_url_attribution;
+
+		require HTML::D3;
+		my $title   = "$y_col vs $x_col by $series_col";
+		my $snippet = HTML::D3->new(title => $title, width => 1100, height => 580, responsive => 1)
+			->render_multi_series_line_chart_snippet(\@series_data, { animated => 1 });
+
+		my $chart_html = $snippet->{html};
+		utf8::decode($chart_html) unless utf8::is_utf8($chart_html);
+
+		my %chart_spec = (
+			kind   => 'graph',
+			title  => $title,
+			encode => { x => $x_col, y => $y_col, series => $series_col },
+		);
+		my ($platform, $language) = $self->_resolve_template;
+		return $self->render(
+			handler         => 'tt',
+			template        => "$platform/$language/graph",
+			format          => 'html',
+			title           => $title,
+			chart_html      => $chart_html,
+			chart           => \%chart_spec,
+			back_url        => ($back2 // $back),
+			back_label      => ($back2 ? ($back2_lbl || 'Back') : 'Back to table'),
+			($back2 ? (back2_url => $back, back2_label => 'Back to table') : ()),
+			point_count     => scalar @series_order,
+			source_url      => $source_url,
+			source_accessed => $source_accessed,
+		);
+	}
+
+	# --- Single-series path (original behaviour when ?series= is absent) ---
 
 	# Extract [label, value] pairs; skip rows where Y is missing or non-numeric.
 	my @pairs;
 	for my $row (@{$records}) {
-		my $x = $row->{$x_col} // '';
-		my $y = $row->{$y_col} // '';
+		my $x  = $row->{$x_col} // '';
+		my $y  = $row->{$y_col} // '';
 		next unless length($x) && length($y);
-		my $is_acct_neg = ($y =~ /\A\s*\(/);   # (value) = accounting negative
-		(my $y_num = $y) =~ s/[^\d.\-]//g;
-		$y_num = "-$y_num" if $is_acct_neg && $y_num =~ /\A\d/;
-		next unless $y_num =~ /\A-?\d+(?:\.\d+)?\z/;
+		my $yn = _numeric_cell($y);
+		next unless defined $yn;
 		my %extra = map { $_ => _decode_cell($row->{$_}) } grep { $_ ne $x_col && $_ ne $y_col } @{$columns};
-		push @pairs, [_decode_cell($x), $y_num + 0, \%extra];
+		push @pairs, [_decode_cell($x), $yn, \%extra];
 	}
 
 	return $self->render(
@@ -2365,10 +3300,38 @@ sub graph_view ($self) {
 		status => 200,
 	) unless @pairs;
 
-	my @y_vals  = map { $_->[1] } @pairs;
-	my $min_y   = min(@y_vals);
-	my $max_y   = max(@y_vals);
-	my $avg_y   = sum(@y_vals) / scalar(@y_vals);
+	my @y_vals = map { $_->[1] } @pairs;
+	my ($min_y, $max_y, $avg_y);
+
+	# Try aggregate() push path for the global min/max/avg reference lines.
+	# Falls back to List::Util on the already-extracted @y_vals when push is
+	# not available (no source, filters active, or non-pushable column).
+	my @f_specs    = grep { /\S/ } @{ $self->every_param('f') // [] };
+	my $has_filter = !!@f_specs;
+	if (!$ENV{BI_FORCE_PERL_AGG} && $src && !$has_filter
+		&& _measure_pushable($src, 'avg', $y_col, $records)) {
+		my $ref = eval {
+			$src->aggregate(
+				by       => [],
+				measures => [
+					_measure('min', $y_col, 'lo'),
+					_measure('max', $y_col, 'hi'),
+					_measure('avg', $y_col, 'mean'),
+				],
+			)
+		};
+		if (!$@ && $ref && @$ref) {
+			$min_y = $ref->[0]{lo};
+			$max_y = $ref->[0]{hi};
+			$avg_y = $ref->[0]{mean};
+		}
+	}
+	# Perl fallback: compute from the already-stripped @y_vals.
+	unless (defined $min_y) {
+		$min_y = min(@y_vals);
+		$max_y = max(@y_vals);
+		$avg_y = sum(@y_vals) / scalar(@y_vals);
+	}
 
 	my ($source_url, $source_accessed) = $self->_url_attribution;
 
@@ -2377,16 +3340,22 @@ sub graph_view ($self) {
 	my $snippet = HTML::D3->new(title => $title, width => 1100, height => 580, responsive => 1)
 		->render_zoomable_line_chart_snippet(\@pairs, { animated => 1 });
 
-	my $graph_html = $snippet->{html};
-	utf8::decode($graph_html) unless utf8::is_utf8($graph_html);
+	my $chart_html = $snippet->{html};
+	utf8::decode($chart_html) unless utf8::is_utf8($chart_html);
 
+	my %chart_spec = (
+		kind   => 'graph',
+		title  => $title,
+		encode => { x => $x_col, y => $y_col },
+	);
 	my ($platform, $language) = $self->_resolve_template;
 	$self->render(
 		handler          => 'tt',
 		template         => "$platform/$language/graph",
 		format           => 'html',
 		title            => $title,
-		graph_html       => $graph_html,
+		chart_html       => $chart_html,
+		chart            => \%chart_spec,
 		back_url         => ($back2 // $back),
 		back_label       => ($back2 ? ($back2_lbl || 'Back') : 'Back to table'),
 		($back2 ? (back2_url => $back, back2_label => 'Back to table') : ()),
@@ -2406,59 +3375,84 @@ sub pie_view ($self) {
 	my $back         = _safe_back_url($self->param('back')) // '/';
 	my $back2        = _safe_back_url($self->param('back2'));
 	my $back2_lbl    = $self->param('back2_label') // '';
-	my @filter_specs = $self->every_param('f');
 
 	return $self->render(text => 'Missing cat or val column parameter', status => 400)
 		unless length($cat_col) && length($val_col);
 
-	my ($records, $columns) = $self->_run_export_pipeline;
+	my ($src, $records, $columns) = $self->_run_pipeline_source;
 	return $self->render(text => 'Could not open data source', status => 404)
-		unless $records;
+		unless defined $records;
+
+	eval { ($records, $columns) = $self->_apply_calc_fields($records, $columns) };
+	if ($@) { (my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//; return $self->render(text => $e, status => 400) }
+
+	# Apply f= filters.
+	for my $s (@{ $self->every_param('f') }) {
+		$records = _apply_filter_spec($records, $s);
+	}
 
 	my %col_set = map { $_ => 1 } @{$columns};
 	return $self->render(text => "Column not found: $cat_col", status => 400)
 		unless $col_set{$cat_col};
 
 	# '__count__' is the sentinel value sent when the user picks "Count (rows)".
-	# In that mode we count rows per category instead of summing a numeric column.
 	my $count_mode = ($val_col eq '__count__');
 	return $self->render(text => "Column not found: $val_col", status => 400)
 		unless $count_mode || $col_set{$val_col};
 
-	# Detect the currency symbol (e.g. $ GBP EUR) from the first non-empty raw
-	# value.  The regex captures the first character that is not a digit,
-	# whitespace, comma, period, hyphen, or open-paren -- that character is
-	# the currency prefix.  Accounting-notation values like ($1,234.56) are
-	# handled by the optional open-paren before the currency character.
-	# Not used in count mode because counts are always plain integers.
+	# Detect the currency symbol from the first non-empty source value.
+	# This is a display concern; derive from the pre-filtered source rows so the
+	# $/$GBP/EUR prefix on the legend is unchanged regardless of the push path.
 	my $currency_symbol = '';
-	my %totals;
-	for my $row (@{$records}) {
-		my $cat = $row->{$cat_col} // '';
-		next unless length($cat);
-		if ($count_mode) {
-			$totals{$cat}++;
-		} else {
+	if (!$count_mode) {
+		for my $row (@$records) {
 			my $v = $row->{$val_col} // '';
 			next unless length($v);
-			if (!length($currency_symbol) && $v =~ /\A\s*\(?\s*([^\d\s.,\-\(])/) {
+			if ($v =~ /\A\s*\(?\s*([^\d\s.,\-\(])/) {
 				$currency_symbol = $1;
+				last;
 			}
-			# Capture accounting-notation sign before stripping non-numeric chars.
-			my $is_acct_neg = ($v =~ /\A\s*\(/);
-			(my $v_num = $v) =~ s/[^\d.\-]//g;
-			$v_num = "-$v_num" if $is_acct_neg && $v_num =~ /\A\d/;
-			next unless $v_num =~ /\A-?\d+(?:\.\d+)?\z/;
-			$totals{$cat} += $v_num + 0;
 		}
+	}
+
+	# Aggregate via _grouped_totals (push path or Perl fold).
+	my $agg_rows = $self->_grouped_totals(
+		{ source => $src, records => $records },
+		{
+			by  => [$cat_col],
+			fn  => $count_mode ? 'count' : 'sum',
+			val => $count_mode ? undef   : $val_col,
+			as  => 'value',
+		},
+	);
+
+	# Top-N: keep the highest-N slices, aggregate the rest as "Other".
+	my $topn_n = int($self->param('topn') // 0);
+	if ($topn_n > 0 && @$agg_rows > $topn_n) {
+		my @sorted   = sort { ($b->{value} // 0) <=> ($a->{value} // 0) } @$agg_rows;
+		my @top_agg  = @sorted[0 .. $topn_n - 1];
+		my %top_cats = map { ($_->{$cat_col} // '') => 1 } @top_agg;
+		my $other_rec = [
+			grep { !$top_cats{$_->{$cat_col} // ''} } @$records
+		];
+		if (@$other_rec) {
+			my $other = $self->_grouped_totals(
+				{ source => undef, records => $other_rec },
+				{ by  => [], fn  => ($count_mode ? 'count' : 'sum'),
+				  val => ($count_mode ? undef : $val_col), as => 'value' },
+			);
+			push @top_agg, { $cat_col => 'Other', value => $other->[0]{value} }
+				if @$other && defined $other->[0]{value};
+		}
+		$agg_rows = \@top_agg;
 	}
 
 	return $self->render(
 		text   => 'No plottable data: no rows have valid data in the selected columns.',
 		status => 200,
-	) unless %totals;
+	) unless @$agg_rows;
 
-	my @slices = map { [_decode_cell($_), $totals{$_}] } sort keys %totals;
+	my @slices = map { [_decode_cell($_->{$cat_col}), $_->{value}] } @$agg_rows;
 
 	my ($source_url, $source_accessed) = $self->_url_attribution;
 
@@ -2475,19 +3469,27 @@ sub pie_view ($self) {
 			color_scheme => $scheme,
 		});
 
-	my $pie_html = $snippet->{html};
-	utf8::decode($pie_html) unless utf8::is_utf8($pie_html);
+	my $chart_html = $snippet->{html};
+	utf8::decode($chart_html) unless utf8::is_utf8($chart_html);
 
+	my %chart_spec = (
+		kind    => 'pie',
+		title   => $title,
+		encode  => { cat => $cat_col, value => $val_col },
+		options => { scheme => $scheme, donut => $donut },
+	);
 	my ($platform, $language) = $self->_resolve_template;
 	$self->render(
 		handler          => 'tt',
 		template         => "$platform/$language/pie",
 		format           => 'html',
 		title            => $title,
-		pie_html         => $pie_html,
+		chart_html       => $chart_html,
+		chart            => \%chart_spec,
 		back_url         => ($back2 // $back),
 		back_label       => ($back2 ? ($back2_lbl || 'Back') : 'Back to table'),
 		($back2 ? (back2_url => $back, back2_label => 'Back to table') : ()),
+		drill_back_url   => $back,
 		slice_count      => scalar @slices,
 		cat_col          => $cat_col,
 		val_col          => $val_col,
@@ -2563,9 +3565,17 @@ sub heatmap_view ($self) {
 	return $self->render(text => 'Missing x or y column parameter', status => 400)
 		unless length($x_col) && length($y_col);
 
-	my ($records, $columns) = $self->_run_export_pipeline;
+	my ($src, $records, $columns) = $self->_run_pipeline_source;
 	return $self->render(text => 'Could not open data source', status => 404)
-		unless $records;
+		unless defined $records;
+
+	eval { ($records, $columns) = $self->_apply_calc_fields($records, $columns) };
+	if ($@) { (my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//; return $self->render(text => $e, status => 400) }
+
+	# Apply f= filters.
+	for my $s (@{ $self->every_param('f') }) {
+		$records = _apply_filter_spec($records, $s);
+	}
 
 	my %col_set = map { $_ => 1 } @{$columns};
 	return $self->render(text => "Column not found: $x_col", status => 400)
@@ -2575,31 +3585,39 @@ sub heatmap_view ($self) {
 	return $self->render(text => "Column not found: $val_col", status => 400)
 		if length($val_col) && !$col_set{$val_col};
 
-	# Aggregate flat rows into [$x, $y, $value] triples.
-	# Preserve first-seen order for both axes so natural sort order in the
-	# source data (e.g. dates) is reflected on the chart axes.
-	my (%grid, @x_order, @y_order, %seen_y);
-	for my $row (@{$records}) {
+	# Collect first-seen axis order from the filtered source rows.
+	# The aggregate path returns groups ordered by (x,y) ascending, which
+	# differs from first-seen.  We re-derive the layout order from the source
+	# so the grid renders in natural data order regardless of backend.
+	my (@x_order, @y_order, %seen_x, %seen_y);
+	for my $row (@$records) {
 		my $x = $row->{$x_col} // next;
 		my $y = $row->{$y_col} // next;
 		next unless length($x) && length($y);
-		push @x_order, $x unless exists $grid{$x};
+		push @x_order, $x unless $seen_x{$x}++;
 		push @y_order, $y unless $seen_y{$y}++;
-		if (length($val_col)) {
-			my $v = $row->{$val_col} // 0;
-			my $is_acct_neg = ($v =~ /\A\s*\(/);
-			(my $v_num = $v) =~ s/[^\d.\-]//g;
-			$v_num = "-$v_num" if $is_acct_neg && $v_num =~ /\A\d/;
-			$v_num = 0 unless $v_num =~ /\A-?\d+(?:\.\d+)?\z/;
-			$grid{$x}{$y} += $v_num + 0;
-		} else {
-			$grid{$x}{$y}++;
-		}
+	}
+
+	# Aggregate with _grouped_totals (push or Perl fold).
+	my $agg_rows = $self->_grouped_totals(
+		{ source => $src, records => $records },
+		{
+			by  => [$x_col, $y_col],
+			fn  => length($val_col) ? 'sum' : 'count',
+			val => length($val_col) ? $val_col : undef,
+			as  => 'value',
+		},
+	);
+
+	# Index aggregate rows by [x][y] for O(1) lookup.
+	my %grid;
+	for my $row (@$agg_rows) {
+		$grid{$row->{$x_col}}{$row->{$y_col}} = $row->{value};
 	}
 
 	my @triples = map {
 		my ($raw_x, $xv) = ($_, _decode_cell($_));
-		map { [$xv, _decode_cell($_), $grid{$raw_x}{$_}] } @y_order
+		map { [$xv, _decode_cell($_), $grid{$raw_x}{$_} // 0] } @y_order
 	} @x_order;
 
 	return $self->render(
@@ -2622,16 +3640,23 @@ sub heatmap_view ($self) {
 			animated     => 1,
 		});
 
-	my $heatmap_html = $snippet->{html};
-	utf8::decode($heatmap_html) unless utf8::is_utf8($heatmap_html);
+	my $chart_html = $snippet->{html};
+	utf8::decode($chart_html) unless utf8::is_utf8($chart_html);
 
+	my %chart_spec = (
+		kind    => 'heatmap',
+		title   => $title,
+		encode  => { x => $x_col, y => $y_col, value => $val_col },
+		options => { scheme => $scheme, show_values => $show_v },
+	);
 	my ($platform, $language) = $self->_resolve_template;
 	$self->render(
 		handler          => 'tt',
 		template         => "$platform/$language/heatmap",
 		format           => 'html',
 		title            => $title,
-		heatmap_html     => $heatmap_html,
+		chart_html       => $chart_html,
+		chart            => \%chart_spec,
 		cell_count       => scalar @triples,
 		back_url         => ($back2 // $back),
 		back_label       => ($back2 ? ($back2_lbl || 'Back') : 'Back to table'),
@@ -2708,9 +3733,17 @@ sub bar_view ($self) {
 	return $self->render(text => 'Missing cat column parameter', status => 400)
 		unless length($cat_col);
 
-	my ($records, $columns) = $self->_run_export_pipeline;
+	my ($src, $records, $columns) = $self->_run_pipeline_source;
 	return $self->render(text => 'Could not open data source', status => 404)
-		unless $records;
+		unless defined $records;
+
+	eval { ($records, $columns) = $self->_apply_calc_fields($records, $columns) };
+	if ($@) { (my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//; return $self->render(text => $e, status => 400) }
+
+	# Apply f= filters.
+	for my $s (@{ $self->every_param('f') }) {
+		$records = _apply_filter_spec($records, $s);
+	}
 
 	my %col_set = map { $_ => 1 } @{$columns};
 	return $self->render(text => "Column not found: $cat_col", status => 400)
@@ -2721,29 +3754,44 @@ sub bar_view ($self) {
 	return $self->render(text => "Column not found: $val_col", status => 400)
 		unless $count_mode || $col_set{$val_col};
 
-	my %totals;
-	for my $row (@{$records}) {
-		my $cat = $row->{$cat_col} // '';
-		next unless length($cat);
-		if ($count_mode) {
-			$totals{$cat}++;
-		} else {
-			my $v = $row->{$val_col} // '';
-			next unless length($v);
-			my $is_acct_neg = ($v =~ /\A\s*\(/);
-			(my $v_num = $v) =~ s/[^\d.\-]//g;
-			$v_num = "-$v_num" if $is_acct_neg && $v_num =~ /\A\d/;
-			next unless $v_num =~ /\A-?\d+(?:\.\d+)?\z/;
-			$totals{$cat} += $v_num + 0;
+	# Aggregate via _grouped_totals (push path or Perl fold).
+	my $agg_rows = $self->_grouped_totals(
+		{ source => $src, records => $records },
+		{
+			by  => [$cat_col],
+			fn  => $count_mode ? 'count' : 'sum',
+			val => $count_mode ? undef   : $val_col,
+			as  => 'value',
+		},
+	);
+
+	# Top-N: keep the highest-N categories, aggregate the rest as "Other".
+	my $topn_n = int($self->param('topn') // 0);
+	if ($topn_n > 0 && @$agg_rows > $topn_n) {
+		my @sorted   = sort { ($b->{value} // 0) <=> ($a->{value} // 0) } @$agg_rows;
+		my @top_agg  = @sorted[0 .. $topn_n - 1];
+		my %top_cats = map { ($_->{$cat_col} // '') => 1 } @top_agg;
+		my $other_rec = [
+			grep { !$top_cats{$_->{$cat_col} // ''} } @$records
+		];
+		if (@$other_rec) {
+			my $other = $self->_grouped_totals(
+				{ source => undef, records => $other_rec },
+				{ by  => [], fn  => ($count_mode ? 'count' : 'sum'),
+				  val => ($count_mode ? undef : $val_col), as => 'value' },
+			);
+			push @top_agg, { $cat_col => 'Other', value => $other->[0]{value} }
+				if @$other && defined $other->[0]{value};
 		}
+		$agg_rows = \@top_agg;
 	}
 
 	return $self->render(
 		text   => 'No plottable data: no rows have valid data in the selected columns.',
 		status => 200,
-	) unless %totals;
+	) unless @$agg_rows;
 
-	my @bars = map { [_decode_cell($_), $totals{$_}] } sort keys %totals;
+	my @bars = map { [_decode_cell($_->{$cat_col}), $_->{value}] } @$agg_rows;
 
 	my $orientation = ($orient eq 'h') ? 'horizontal' : 'vertical';
 	my $sort_bars   = ($sort eq 'value' || $sort eq 'label') ? $sort : 'none';
@@ -2765,16 +3813,23 @@ sub bar_view ($self) {
 			($max_bars > 0 ? (max_bars => $max_bars) : ()),
 		});
 
-	my $bar_html = $snippet->{html};
-	utf8::decode($bar_html) unless utf8::is_utf8($bar_html);
+	my $chart_html = $snippet->{html};
+	utf8::decode($chart_html) unless utf8::is_utf8($chart_html);
 
+	my %chart_spec = (
+		kind    => 'bar',
+		title   => $title,
+		encode  => { cat => $cat_col, value => $val_col },
+		options => { orientation => ($orient // 'v'), max_items => $max_bars },
+	);
 	my ($platform, $language) = $self->_resolve_template;
 	$self->render(
 		handler         => 'tt',
 		template        => "$platform/$language/bar",
 		format          => 'html',
 		title           => $title,
-		bar_html        => $bar_html,
+		chart_html      => $chart_html,
+		chart           => \%chart_spec,
 		bar_count       => scalar @bars,
 		cat_col         => $cat_col,
 		back_url        => ($back2 // $back),
@@ -3027,6 +4082,7 @@ sub tables_view ($self) {
 	return $self->reply->not_found unless defined $spec && length $spec;
 
 	my ($file_path, $db_label, $back_url, $back_label);
+	my @tables;
 
 	if ($spec =~ /\Atable:([A-Za-z0-9_]+)\z/) {
 		my $table_name = lc $1;
@@ -3052,12 +4108,61 @@ sub tables_view ($self) {
 		($db_label  = $file->basename) =~ s/\.[^.]+\z//;
 		$back_url   = '/browse?path=' . url_escape($file->dirname->to_string);
 		$back_label = 'Back to browser';
+	} elsif ($spec =~ $REDIS_URL_RE) {
+		# Bare redis:// URL -- scan keys and present a picker.
+		# Parse redis://[:password@]host[:port][/db]
+		my ($password, $hostport, $db_idx);
+		if ($spec =~ m{\Aredis://(?::([^@]*)@)?([^/]+)(?:/(\d+))?\z}i) {
+			($password, $hostport, $db_idx) = ($1, $2, $3);
+		}
+		$hostport //= 'localhost:6379';
+		$db_label   = "redis://$hostport";
+		$back_url   = '/';
+		$back_label = 'Home';
+
+		eval {
+			# Load Redis::Fast if available, fall back to Redis.
+			# Use the file-path form ("Redis/Fast.pm") because require with a
+			# plain string treats it as a filename, not a module name.
+			my $pkg;
+			for my $mod ('Redis::Fast', 'Redis') {
+				(my $file = $mod) =~ s{::}{/}g;
+				if (eval { require "$file.pm"; 1 }) { $pkg = $mod; last }
+			}
+			croak 'Redis or Redis::Fast must be installed to browse a Redis server'
+				unless $pkg;
+
+			my $redis = $pkg->new(
+				server      => $hostport,
+				cnx_timeout => 5,
+				read_timeout => 10,
+			);
+			$redis->auth($password) if defined $password && length $password;
+			$redis->select(int($db_idx)) if defined $db_idx && int($db_idx) > 0;
+
+			# SCAN in a loop; stop at 200 keys -- enough for a picker.
+			my $cursor = 0;
+			my @all_keys;
+			do {
+				my ($new_cursor, $batch) = $redis->scan($cursor, 'COUNT', 100);
+				$cursor = $new_cursor;
+				push @all_keys, @{ $batch // [] };
+			} while ($cursor ne '0' && @all_keys < 200);
+
+			my $tables_url = '/tables?l=' . url_escape($spec);
+			for my $key (sort @all_keys) {
+				my $open_url = '/open?path='    . url_escape("redis:$key|$spec")
+					. '&back='       . url_escape($tables_url)
+					. '&back_label=Redis+keys';
+				push @tables, { name => $key, columns => [], href => $open_url };
+			}
+		};
+		return $self->reply->not_found if $@;
 	} else {
 		return $self->reply->not_found;
 	}
 
-	my @tables;
-	eval {
+	if (defined $file_path) { eval {
 		require DBI;
 		my $dbh = DBI->connect(
 			"dbi:SQLite:dbname=$file_path", q{}, q{},
@@ -3082,8 +4187,7 @@ sub tables_view ($self) {
 			push @tables, { name => $tname, columns => \@cols, href => $open_url };
 		}
 		$dbh->disconnect;
-	};
-	return $self->reply->not_found if $@;
+	}; return $self->reply->not_found if $@; }
 
 	$self->render(
 		template   => "$platform/$language/tables",
@@ -3095,6 +4199,1230 @@ sub tables_view ($self) {
 		spec       => $spec,
 		back_url   => $back_url,
 		back_label => $back_label,
+	);
+}
+
+=head2 pivot_view
+
+C<GET /pivot> -- Crosstab / pivot table view.
+
+Accepts the same C<l=>, C<j=>, C<f=> pipeline params as C</join>, plus:
+
+  rows=<col>[,<col>...]  Row dimensions (required, comma-separated column names)
+  cols=<col>[,<col>...]  Column dimensions (optional)
+  m=<col>:<fn>:<as>      Measure spec, repeatable (required); col may be empty for count
+  h=<as>:<op>:<val>      Post-aggregation HAVING filter (repeatable, optional)
+  totals=1               Include row subtotals, column subtotals, and grand total
+  scheme=<name>          Colour scheme for cell shading (optional)
+  max_cols=<n>           Collapse column headers beyond top-N into "Other"
+  page= / per_page=      Pagination over row groups
+  format=csv|sqlite|json Export the pivot grid
+
+=cut
+
+sub pivot_view ($self) {
+	my $left_spec = $self->param('l') // '';
+	return $self->render(text => 'Missing l= parameter', status => 400)
+		unless length $left_spec;
+
+	my $back      = _safe_back_url($self->param('back')) // '/';
+	my $back2     = _safe_back_url($self->param('back2'));
+	my $back2_lbl = $self->param('back2_label') // '';
+
+	my $rows_str = $self->param('rows') // '';
+	return $self->render(text => $self->_i18n('error_pivot_rows_required'), status => 400)
+		unless length $rows_str;
+
+	my @measure_strs = @{ $self->every_param('m') // [] };
+	return $self->render(text => $self->_i18n('error_pivot_measure_req'), status => 400)
+		unless @measure_strs;
+
+	# Split dimensions on comma.  A dimension name containing a comma
+	# would produce an ambiguous split; that must be rejected.
+	my @rows = split /,/, $rows_str, -1;
+	my @cols = split /,/, ($self->param('cols') // ''), -1;
+	@cols = grep { length $_ } @cols;
+
+	my @measures;
+	for my $ms (@measure_strs) {
+		my $m = _parse_measure_param($ms);
+		return $self->render(
+			text   => $self->_i18n('error_pivot_measure_invalid', $ms),
+			status => 400,
+		) unless $m;
+		push @measures, $m;
+	}
+
+	my $show_totals = ($self->param('totals') // '') ? 1 : 0;
+	my $scheme      = $self->param('scheme') // '';
+	my $max_cols_n  = int($self->param('max_cols') // 0);
+	my $format      = lc($self->param('format') // '');
+
+	# Build the data pipeline.
+	my ($src, $records, $columns) = $self->_run_pipeline_source;
+	return $self->render(text => 'Could not open data source', status => 404)
+		unless defined $records;
+
+	# Calculated fields (?c=name:expr) -- evaluated before aggregation so calc
+	# columns are available as row/col dimensions and measure columns.
+	{
+		my $err;
+		eval { ($records, $columns) = $self->_apply_calc_fields($records, $columns) };
+		if ($@) { (my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//; return $self->render(text => $e, status => 400) }
+	}
+
+	for my $s (@{ $self->every_param('f') }) {
+		$records = _apply_filter_spec($records, $s);
+	}
+
+	my %col_set = map { $_ => 1 } @{$columns};
+
+	for my $dim (@rows, @cols) {
+		return $self->render(
+			text   => $self->_i18n('error_pivot_dim_not_found', $dim),
+			status => 400,
+		) unless $col_set{$dim};
+	}
+
+	for my $m (@measures) {
+		next unless defined $m->{col} && length $m->{col};
+		return $self->render(
+			text   => $self->_i18n('error_measure_column', $m->{col}),
+			status => 400,
+		) unless $col_set{$m->{col}};
+	}
+
+	my $pipeline = { source => $src, records => $records };
+
+	# -----------------------------------------------------------------------
+	# Aggregate: one _grouped_totals call per measure, grouped by all
+	# row AND column dimensions together.
+	# -----------------------------------------------------------------------
+	my (%cells, %row_combos, %col_combos);
+	my (@row_key_order, @col_key_order);
+	my (%row_seen, %col_seen);
+
+	for my $m (@measures) {
+		my $cv  = (defined $m->{col} && length $m->{col}) ? $m->{col} : undef;
+		my $agg = $self->_grouped_totals($pipeline, {
+			by  => [@rows, @cols],
+			fn  => $m->{fn},
+			val => $cv,
+			as  => $m->{as},
+		});
+		for my $row (@$agg) {
+			my $rkey = join("\x00", map { $row->{$_} // '' } @rows);
+			my $ckey = join("\x00", map { $row->{$_} // '' } @cols);
+			unless ($row_seen{$rkey}++) {
+				push @row_key_order, $rkey;
+				$row_combos{$rkey} = { map { $_ => ($row->{$_} // '') } @rows };
+			}
+			unless ($col_seen{$ckey}++) {
+				push @col_key_order, $ckey;
+				$col_combos{$ckey} = { map { $_ => ($row->{$_} // '') } @cols };
+			}
+			$cells{$rkey}{$ckey}{$m->{as}} = $row->{$m->{as}};
+		}
+	}
+
+	# -----------------------------------------------------------------------
+	# Post-aggregation HAVING filters (h=<as>:<op>:<val>) applied row-by-row.
+	# Each filter operates on a virtual row whose keys are the measure aliases.
+	# -----------------------------------------------------------------------
+	my @h_specs = @{ $self->every_param('h') // [] };
+	if (@h_specs) {
+		my @keep;
+		for my $rkey (@row_key_order) {
+			# Build a virtual row containing each measure's cell value
+			# (using first col-combo as representative, or grand-total style).
+			# For HAVING, we filter on the *row subtotal* value, not a single cell.
+			# We'll compute a temp subtotal row for each row key.
+			my %vrow;
+			for my $m (@measures) {
+				# Sum across cols for this row as representative value.
+				my $v = 0;
+				for my $ck (@col_key_order) {
+					my $cv = $cells{$rkey}{$ck}{$m->{as}};
+					$v += $cv if defined $cv;
+				}
+				$vrow{$m->{as}} = $v;
+			}
+			my $ok = 1;
+			for my $hs (@h_specs) {
+				my $passed = _apply_filter_spec([\%vrow], $hs);
+				$ok = 0 unless @$passed;
+			}
+			push @keep, $rkey if $ok;
+		}
+		@row_key_order = @keep;
+	}
+
+	# -----------------------------------------------------------------------
+	# Top-N rows: keep only the top-N row groups (ranked by measure sum
+	# across all col combos); aggregate the remaining rows as an "Other" row.
+	# -----------------------------------------------------------------------
+	{
+		my $topn_n   = int($self->param('topn') || 0);
+		my $topn_col = $self->param('topn_col') // '';
+
+		if ($topn_n > 0 && @row_key_order > $topn_n) {
+			my %m_aliases = map { $_->{as} => 1 } @measures;
+			if (length $topn_col && !$m_aliases{$topn_col}) {
+				return $self->render(
+					text   => $self->_i18n('error_topn_col', $topn_col),
+					status => 400,
+				);
+			}
+			my $sort_as = length($topn_col) ? $topn_col : $measures[0]{as};
+
+			# Sort rows by descending sum of sort_as across all column combos.
+			my @sorted_rkeys = sort {
+				(do { my $s = 0; $s += ($cells{$b}{$_}{$sort_as} // 0) for @col_key_order; $s })
+				<=>
+				(do { my $s = 0; $s += ($cells{$a}{$_}{$sort_as} // 0) for @col_key_order; $s })
+			} @row_key_order;
+
+			my @top_rkeys  = @sorted_rkeys[0 .. $topn_n - 1];
+			my @rest_rkeys = @sorted_rkeys[$topn_n .. $#sorted_rkeys];
+
+			if (@rest_rkeys) {
+				my %top_rkey_set = map { $_ => 1 } @top_rkeys;
+				my $other_rec = [
+					grep {
+						my $r = $_;
+						!$top_rkey_set{ join("\x00", map { $r->{$_} // '' } @rows) }
+					} @$records
+				];
+				if (@$other_rec) {
+					my $ork = '__topn_other__';
+					$row_combos{$ork} = { map { $_ => 'Other' } @rows };
+					for my $m (@measures) {
+						my $cv = (defined $m->{col} && length $m->{col}) ? $m->{col} : undef;
+						my $oa = $self->_grouped_totals(
+							{ source => undef, records => $other_rec },
+							{ by => [@cols], fn => $m->{fn}, val => $cv, as => $m->{as} },
+						);
+						for my $row (@$oa) {
+							my $ck = join("\x00", map { $row->{$_} // '' } @cols);
+							$cells{$ork}{$ck}{$m->{as}} = $row->{$m->{as}};
+						}
+					}
+					@row_key_order = (@top_rkeys, $ork);
+				} else {
+					@row_key_order = @top_rkeys;
+				}
+			} else {
+				@row_key_order = @top_rkeys;
+			}
+		}
+	}
+
+	# -----------------------------------------------------------------------
+	# Subtotals and grand total (three additional _grouped_totals calls
+	# per measure when totals=1).
+	# -----------------------------------------------------------------------
+	my (%row_subtotals, %col_subtotals, %grand_total);
+
+	if ($show_totals) {
+		for my $m (@measures) {
+			my $cv = (defined $m->{col} && length $m->{col}) ? $m->{col} : undef;
+
+			# Row subtotals: group by @rows only.
+			my $rsub = $self->_grouped_totals($pipeline, {
+				by  => [@rows],
+				fn  => $m->{fn},
+				val => $cv,
+				as  => $m->{as},
+			});
+			for my $r (@$rsub) {
+				my $rk = join("\x00", map { $r->{$_} // '' } @rows);
+				$row_subtotals{$rk}{$m->{as}} = $r->{$m->{as}};
+			}
+
+			# Column subtotals: group by @cols only.
+			if (@cols) {
+				my $csub = $self->_grouped_totals($pipeline, {
+					by  => [@cols],
+					fn  => $m->{fn},
+					val => $cv,
+					as  => $m->{as},
+				});
+				for my $c (@$csub) {
+					my $ck = join("\x00", map { $c->{$_} // '' } @cols);
+					$col_subtotals{$ck}{$m->{as}} = $c->{$m->{as}};
+				}
+			}
+
+			# Grand total: group by nothing (all rows → one result row).
+			my $gtot = $self->_grouped_totals($pipeline, {
+				by  => [],
+				fn  => $m->{fn},
+				val => $cv,
+				as  => $m->{as},
+			});
+			$grand_total{$m->{as}} = $gtot->[0]{$m->{as}} if @$gtot;
+		}
+	}
+
+	# -----------------------------------------------------------------------
+	# max_cols: collapse the tail of column combos beyond top-N into "Other".
+	# The top-N are ranked by the first measure's column subtotal (or cell sum).
+	# -----------------------------------------------------------------------
+	if ($max_cols_n > 0 && @col_key_order > $max_cols_n) {
+		my $first_as = $measures[0]{as};
+		my @sorted_ckeys = sort {
+			(  $show_totals
+			   ? ($col_subtotals{$b}{$first_as} // 0)
+			   : (do { my $s = 0; $s += ($cells{$_}{$b}{$first_as} // 0) for @row_key_order; $s })
+			)
+			<=>
+			(  $show_totals
+			   ? ($col_subtotals{$a}{$first_as} // 0)
+			   : (do { my $s = 0; $s += ($cells{$_}{$a}{$first_as} // 0) for @row_key_order; $s })
+			)
+		} @col_key_order;
+		my @top_ckeys  = @sorted_ckeys[0 .. $max_cols_n - 1];
+		my @rest_ckeys = @sorted_ckeys[$max_cols_n .. $#sorted_ckeys];
+		if (@rest_ckeys) {
+			my $other_key = '__other__';
+			$col_combos{$other_key} = { map { $_ => 'Other' } @cols };
+			for my $rk (@row_key_order) {
+				for my $m (@measures) {
+					my ($v, $have) = (0, 0);
+					for my $ck (@rest_ckeys) {
+						my $cv = $cells{$rk}{$ck}{$m->{as}};
+						if (defined $cv) { $v += $cv; $have = 1 }
+					}
+					$cells{$rk}{$other_key}{$m->{as}} = $have ? $v : undef;
+				}
+			}
+			@col_key_order = (@top_ckeys, $other_key);
+		} else {
+			@col_key_order = @top_ckeys;
+		}
+	}
+
+	# -----------------------------------------------------------------------
+	# Export path: build flat records from the grid.
+	# -----------------------------------------------------------------------
+	if ($format && $format =~ /\A(?:csv|sqlite|sql|json|xlsx)\z/) {
+		my @grid_records;
+		for my $rk (@row_key_order) {
+			for my $ck (@col_key_order) {
+				my %rec;
+				$rec{$_} = $row_combos{$rk}{$_} // '' for @rows;
+				$rec{$_} = $col_combos{$ck}{$_} // '' for @cols;
+				$rec{$_->{as}} = $cells{$rk}{$ck}{$_->{as}} // '' for @measures;
+				push @grid_records, \%rec;
+			}
+		}
+		my @export_cols = (@rows, @cols, map { $_->{as} } @measures);
+		return $self->_render_csv(\@grid_records, \@export_cols, 'pivot')
+			if $format eq 'csv';
+		return $self->_render_sqlite(\@grid_records, \@export_cols, 'pivot')
+			if $format eq 'sqlite' || $format eq 'sql';
+		return $self->_render_json(\@grid_records, \@export_cols, 'pivot')
+			if $format eq 'json';
+		if ($format eq 'xlsx') {
+			require Excel::Writer::XLSX;
+			my $out = '';
+			open my $fh, '>', \$out
+				or return $self->render(text => 'Cannot open XLSX buffer', status => 500);
+			my $wb = Excel::Writer::XLSX->new($fh);
+			my $ws = $wb->add_worksheet('pivot');
+			$ws->write_row(0, 0, \@export_cols);
+			my $row_idx = 1;
+			for my $rec (@grid_records) {
+				$ws->write_row($row_idx++, 0, [ map { $rec->{$_} // '' } @export_cols ]);
+			}
+			$wb->close;
+			$self->res->headers->content_type(
+				'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+			);
+			$self->res->headers->content_disposition(
+				'attachment; filename="pivot.xlsx"'
+			);
+			return $self->render(data => $out);
+		}
+	}
+
+	# -----------------------------------------------------------------------
+	# Pagination: slice @row_key_order using the N+1 trick.
+	# Must come after the export early-return above (exports use the full set)
+	# and after subtotals/grand total (computed from $pipeline, not @row_key_order).
+	# -----------------------------------------------------------------------
+	my ($page, $per_page, $offset) = $self->_pagination;
+	my $total_row_groups = scalar @row_key_order;
+	my $piv_has_next = ($total_row_groups > $offset + $per_page) ? 1 : 0;
+	@row_key_order = $offset < $total_row_groups
+		? @row_key_order[$offset .. ($piv_has_next ? $offset + $per_page - 1 : $#row_key_order)]
+		: ();
+
+	my $piv_page_url = $self->req->url->clone;
+	$piv_page_url->query->remove('page')->remove('per_page');
+
+	# -----------------------------------------------------------------------
+	# Build the template-ready data structure.
+	# -----------------------------------------------------------------------
+	my @col_combo_list = map {
+		my $ck = $_;
+		{
+			key      => $ck,
+			dim_vals => $col_combos{$ck},
+			label    => join(' / ', map { $col_combos{$ck}{$_} // '' } @cols),
+		}
+	} @col_key_order;
+
+	my @grid_rows;
+	for my $rk (@row_key_order) {
+		my %row_cells;
+		for my $ck (@col_key_order) {
+			$row_cells{$ck} = $cells{$rk}{$ck} // {};
+		}
+		push @grid_rows, {
+			row_vals  => $row_combos{$rk},
+			cells     => \%row_cells,
+			subtotals => $show_totals ? ($row_subtotals{$rk} // {}) : {},
+		};
+	}
+
+	(my $left_label = $left_spec) =~ s/\A(?:table:|path:|url:)//;
+
+	my ($platform, $language) = $self->_resolve_template;
+	$self->render(
+		handler       => 'tt',
+		template      => "$platform/$language/pivot",
+		format        => 'html',
+		title         => 'Pivot: ' . join(', ', @rows),
+		rows_dims     => \@rows,
+		cols_dims     => \@cols,
+		measures      => \@measures,
+		col_combos    => \@col_combo_list,
+		grid_rows     => \@grid_rows,
+		show_totals   => $show_totals,
+		col_subtotals => \%col_subtotals,
+		grand_total   => \%grand_total,
+		scheme            => $scheme,
+		left_spec         => $left_spec,
+		left_label        => $left_label,
+		back_url          => ($back2 // $back),
+		back_label        => ($back2 ? ($back2_lbl || 'Back') : ($self->param('back_label') // 'Back to table')),
+		($back2 ? (back2_url => $back, back2_label => ($self->param('back_label') // 'Back to table')) : ()),
+		page              => $page,
+		per_page          => $per_page,
+		has_next          => $piv_has_next,
+		page_base_url     => $piv_page_url->to_string,
+		total_row_groups  => $total_row_groups,
+	);
+}
+
+=head2 stats_view
+
+C<GET /stats> -- Column statistics panel.
+
+Accepts the same C<l=>, C<j=>, C<f=> pipeline params as C</join> and displays
+per-column statistics: min, max, mean, median, null_count, distinct_count,
+row_count.
+
+Statistics are computed through C<_grouped_totals> so they agree with the pivot
+view.  Median is computed in Perl by sorting the column values.
+
+=cut
+
+sub stats_view ($self) {
+	my $left_spec = $self->param('l') // '';
+	return $self->render(text => 'Missing l= parameter', status => 400)
+		unless length $left_spec;
+
+	my $back      = _safe_back_url($self->param('back')) // '/';
+	my $back2     = _safe_back_url($self->param('back2'));
+	my $back2_lbl = $self->param('back2_label') // '';
+
+	my ($src, $records, $columns) = $self->_run_pipeline_source;
+	return $self->render(text => 'Could not open data source', status => 404)
+		unless defined $records;
+
+	eval { ($records, $columns) = $self->_apply_calc_fields($records, $columns) };
+	if ($@) { (my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//; return $self->render(text => $e, status => 400) }
+
+	for my $s (@{ $self->every_param('f') }) {
+		$records = _apply_filter_spec($records, $s);
+	}
+
+	my $row_count = scalar @$records;
+	my $pipeline  = { source => $src, records => $records };
+
+	my @stats;
+	for my $col (@{$columns}) {
+		# null_count = rows where cell is undef or '' (phase 2 definition).
+		my @nonnull    = grep { defined $_->{$col} && length($_->{$col}) } @$records;
+		my $null_count = $row_count - scalar @nonnull;
+
+		# distinct_count via _grouped_totals (count groups by the column).
+		my $dist_rows      = $self->_grouped_totals($pipeline, {
+			by => [$col],
+			fn => 'count',
+			as => 'cnt',
+		});
+		my $distinct_count = scalar @$dist_rows;
+
+		# Numeric statistics.
+		my @nums = grep { defined $_ } map { _numeric_cell($_->{$col}) } @nonnull;
+		my ($min_val, $max_val, $avg_val, $median_val);
+		if (@nums) {
+			my @sorted = sort { $a <=> $b } @nums;
+			$min_val = $sorted[0];
+			$max_val = $sorted[-1];
+			my $sum  = 0;
+			$sum += $_ for @nums;
+			$avg_val = $sum / @nums;
+			my $mid  = int(@sorted / 2);
+			$median_val = @sorted % 2
+				? $sorted[$mid]
+				: ($sorted[$mid - 1] + $sorted[$mid]) / 2;
+		}
+
+		push @stats, {
+			col            => $col,
+			row_count      => $row_count,
+			null_count     => $null_count,
+			distinct_count => $distinct_count,
+			(defined $min_val ? (
+				min    => $min_val,
+				max    => $max_val,
+				avg    => sprintf('%.4g', $avg_val),
+				median => sprintf('%.4g', $median_val),
+			) : ()),
+		};
+	}
+
+	(my $left_label = $left_spec) =~ s/\A(?:table:|path:|url:)//;
+
+	my ($platform, $language) = $self->_resolve_template;
+	$self->render(
+		handler    => 'tt',
+		template   => "$platform/$language/stats",
+		format     => 'html',
+		title          => 'Column statistics',
+		stats          => \@stats,
+		row_count      => $row_count,
+		left_spec      => $left_spec,
+		left_label     => $left_label,
+		drill_back_url => $back,
+		drill_sep      => (CORE::index($back, '?') >= 0 ? '&' : '?'),
+		stats_url      => $self->req->url->path_query,
+		back_url       => ($back2 // $back),
+		back_label     => ($back2 ? ($back2_lbl || 'Back') : ($self->param('back_label') // 'Back to table')),
+		($back2 ? (back2_url => $back, back2_label => ($self->param('back_label') // 'Back to table')) : ()),
+	);
+}
+
+# ---------------------------------------------------------------------------
+# Calculated-field CRUD  (POST /calc/save, POST /calc/delete, GET /calc/list)
+# ---------------------------------------------------------------------------
+
+sub calc_save ($self) {
+	my $spec = $self->param('l') // '';
+	my $name = $self->param('name') // '';
+	my $expr = $self->param('expr') // '';
+
+	return $self->render(json => { error => 'l= required' }, status => 400)
+		unless length $spec;
+	return $self->render(
+		json   => { error => $self->_i18n('error_calc_name', $name) },
+		status => 400,
+	) unless $name =~ /\A[A-Za-z_][A-Za-z0-9_]*\z/;
+	return $self->render(json => { error => 'expr= required' }, status => 400)
+		unless length $expr;
+
+	my $models = $self->_read_models;
+	$models->{fields}{$spec}{$name} = $expr;
+	$self->_write_models($models);
+	$self->render(json => { ok => 1 });
+}
+
+sub calc_delete ($self) {
+	my $spec = $self->param('l') // '';
+	my $name = $self->param('name') // '';
+
+	return $self->render(json => { error => 'l= required' }, status => 400)
+		unless length $spec;
+
+	my $models = $self->_read_models;
+	delete $models->{fields}{$spec}{$name};
+	$self->_write_models($models);
+	$self->render(json => { ok => 1 });
+}
+
+sub calc_list ($self) {
+	my $spec = $self->param('l') // '';
+	return $self->render(json => { error => 'l= required' }, status => 400)
+		unless length $spec;
+
+	my $models = $self->_read_models;
+	$self->render(json => { fields => $models->{fields}{$spec} // {} });
+}
+
+# ---------------------------------------------------------------------------
+# Named-group CRUD  (POST /groups/save, POST /groups/delete, GET /groups/list)
+# ---------------------------------------------------------------------------
+
+sub groups_save ($self) {
+	my $spec       = $self->param('l')     // '';
+	my $col        = $self->param('col')   // '';
+	my $group_name = $self->param('group') // '';
+	my @values     = @{ $self->every_param('values') // [] };
+
+	return $self->render(json => { error => 'l= required' }, status => 400)
+		unless length $spec;
+	return $self->render(json => { error => 'col= required' }, status => 400)
+		unless length $col;
+	return $self->render(json => { error => 'group= required' }, status => 400)
+		unless length $group_name;
+
+	my $models = $self->_read_models;
+	$models->{groups}{$spec}{$col}{$group_name} = \@values;
+	$self->_write_models($models);
+	$self->render(json => { ok => 1 });
+}
+
+sub groups_delete ($self) {
+	my $spec       = $self->param('l')     // '';
+	my $col        = $self->param('col')   // '';
+	my $group_name = $self->param('group') // '';
+
+	return $self->render(json => { error => 'l= required' }, status => 400)
+		unless length $spec;
+
+	my $models = $self->_read_models;
+	if (length $col && length $group_name) {
+		delete $models->{groups}{$spec}{$col}{$group_name};
+	} elsif (length $col) {
+		delete $models->{groups}{$spec}{$col};
+	} else {
+		delete $models->{groups}{$spec};
+	}
+	$self->_write_models($models);
+	$self->render(json => { ok => 1 });
+}
+
+sub groups_list ($self) {
+	my $spec = $self->param('l') // '';
+	return $self->render(json => { error => 'l= required' }, status => 400)
+		unless length $spec;
+
+	my $models = $self->_read_models;
+	$self->render(json => { groups => $models->{groups}{$spec} // {} });
+}
+
+# ---------------------------------------------------------------------------
+# Date-pattern CRUD  (POST /dates/save, POST /dates/delete, GET /dates/list)
+# ---------------------------------------------------------------------------
+
+# dates_save: POST /dates/save?l=<spec>&col=<col>&pattern=<fmt>
+# Stores a strptime-style date normalisation pattern for $col in models.json.
+# Only the three patterns in %ALLOWED_DATE_PATTERNS are accepted.
+sub dates_save ($self) {
+	my $spec    = $self->param('l')       // '';
+	my $col     = $self->param('col')     // '';
+	my $pattern = $self->param('pattern') // '';
+
+	return $self->render(json => { error => 'l= required' }, status => 400)
+		unless length $spec;
+	return $self->render(json => { error => 'col= required' }, status => 400)
+		unless length $col;
+	return $self->render(
+		json   => { error => $self->_i18n('error_date_pattern', $pattern) },
+		status => 400,
+	) unless $ALLOWED_DATE_PATTERNS{$pattern};
+
+	my $models = $self->_read_models;
+	$models->{date_patterns}{$spec}{$col} = $pattern;
+	$self->_write_models($models);
+	$self->render(json => { ok => 1 });
+}
+
+# dates_delete: POST /dates/delete?l=<spec>&col=<col>
+# Removes the pattern for $col (or all patterns for $spec when col is absent).
+sub dates_delete ($self) {
+	my $spec = $self->param('l')   // '';
+	my $col  = $self->param('col') // '';
+
+	return $self->render(json => { error => 'l= required' }, status => 400)
+		unless length $spec;
+
+	my $models = $self->_read_models;
+	if (length $col) {
+		delete $models->{date_patterns}{$spec}{$col};
+	} else {
+		delete $models->{date_patterns}{$spec};
+	}
+	$self->_write_models($models);
+	$self->render(json => { ok => 1 });
+}
+
+# dates_list: GET /dates/list?l=<spec>
+# Returns { patterns: { col: pattern, ... } } for $spec.
+sub dates_list ($self) {
+	my $spec = $self->param('l') // '';
+	return $self->render(json => { error => 'l= required' }, status => 400)
+		unless length $spec;
+
+	my $models = $self->_read_models;
+	$self->render(json => { patterns => $models->{date_patterns}{$spec} // {} });
+}
+
+# ---------------------------------------------------------------------------
+# Scatter chart  (GET /scatter)
+# ---------------------------------------------------------------------------
+
+sub scatter_view ($self) {
+	my $x_col      = $self->param('x')      // '';
+	my $y_col      = $self->param('y')      // '';
+	my $series_col = $self->param('series') // '';
+	my $size_col   = $self->param('size')   // '';
+	my $scheme     = $self->param('scheme') // 'tableau10';
+	my $min_r      = int($self->param('min_r') // 3);
+	my $max_r      = int($self->param('max_r') // 15);
+	$min_r = 1 if $min_r < 1; $min_r = 40 if $min_r > 40;
+	$max_r = 1 if $max_r < 1; $max_r = 40 if $max_r > 40;
+	($min_r, $max_r) = ($max_r, $min_r) if $min_r > $max_r;
+	my $back       = _safe_back_url($self->param('back')) // '/';
+	my $back2      = _safe_back_url($self->param('back2'));
+	my $back2_lbl  = $self->param('back2_label') // '';
+
+	return $self->render(text => 'Missing x= parameter', status => 400) unless length $x_col;
+	return $self->render(text => 'Missing y= parameter', status => 400) unless length $y_col;
+
+	my ($src, $records, $columns) = $self->_run_pipeline_source;
+	return $self->render(text => 'Could not open data source', status => 404) unless defined $records;
+
+	eval { ($records, $columns) = $self->_apply_calc_fields($records, $columns) };
+	if ($@) { (my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//; return $self->render(text => $e, status => 400) }
+
+	for my $s (@{ $self->every_param('f') }) {
+		$records = _apply_filter_spec($records, $s);
+	}
+
+	my %col_set = map { $_ => 1 } @{$columns};
+	return $self->render(text => "Column not found: $x_col",      status => 400) unless $col_set{$x_col};
+	return $self->render(text => "Column not found: $y_col",      status => 400) unless $col_set{$y_col};
+	return $self->render(text => "Column not found: $series_col", status => 400)
+		if length $series_col && !$col_set{$series_col};
+	return $self->render(text => "Column not found: $size_col",   status => 400)
+		if length $size_col && !$col_set{$size_col};
+
+	if (length $series_col && !$SCATTER_SCHEMES{$scheme}) {
+		return $self->render(text => "Unknown colour scheme: $scheme", status => 400);
+	}
+
+	my @points;
+	for my $row (@$records) {
+		my $xv = _numeric_cell($row->{$x_col} // '');
+		my $yv = _numeric_cell($row->{$y_col} // '');
+		next unless defined $xv && defined $yv;
+		my %extra = map { $_ => _decode_cell($row->{$_} // '') }
+		            grep { $_ ne $x_col && $_ ne $y_col } @$columns;
+		my %pt_meta;
+		$pt_meta{series} = _decode_cell($row->{$series_col}) if length $series_col;
+		if (length $size_col) {
+			my $sv = _numeric_cell($row->{$size_col} // '');
+			$pt_meta{size} = $sv if defined $sv;
+		}
+		push @points, [$xv, $yv, \%extra, (%pt_meta ? \%pt_meta : ())];
+	}
+
+	return $self->render(
+		text   => 'No plottable data: no rows have valid numeric values in both selected columns.',
+		status => 200,
+	) unless @points;
+
+	my ($source_url, $source_accessed) = $self->_url_attribution;
+
+	require HTML::D3;
+	my $title   = "$y_col vs $x_col";
+	my $snippet = HTML::D3->new(title => $title, width => 800, height => 480, responsive => 1)
+		->render_scatter_chart_snippet(\@points, {
+			animated           => 1,
+			x_label            => $x_col,
+			y_label            => $y_col,
+			(length $series_col ? (colour_by_series => 1, series_col => $series_col, scheme => $scheme) : ()),
+			(length $size_col   ? (size_col => $size_col, radius_range => [$min_r, $max_r])            : ()),
+		});
+
+	my $chart_html = $snippet->{html};
+	utf8::decode($chart_html) unless utf8::is_utf8($chart_html);
+
+	my %chart_spec = (
+		kind    => 'scatter',
+		title   => $title,
+		encode  => { x => $x_col, y => $y_col,
+			(length $series_col ? (series => $series_col) : ()),
+			(length $size_col   ? (size   => $size_col)   : ()),
+		},
+		options => { scheme => $scheme },
+	);
+	my ($platform, $language) = $self->_resolve_template;
+	$self->render(
+		handler         => 'tt',
+		template        => "$platform/$language/scatter",
+		format          => 'html',
+		title           => $title,
+		chart_html      => $chart_html,
+		chart           => \%chart_spec,
+		point_count     => scalar @points,
+		x_col           => $x_col,
+		y_col           => $y_col,
+		back_url        => ($back2 // $back),
+		back_label      => ($back2 ? ($back2_lbl || 'Back') : 'Back to table'),
+		($back2 ? (back2_url => $back, back2_label => 'Back to table') : ()),
+		source_url      => $source_url,
+		source_accessed => $source_accessed,
+	);
+}
+
+# ---------------------------------------------------------------------------
+# Stacked bar chart  (GET /stacked)
+# ---------------------------------------------------------------------------
+
+sub stacked_view ($self) {
+	my $cat_col   = $self->param('cat')    // '';
+	# ?series= is the canonical spec name; ?seg= is the legacy alias (keep both).
+	my $seg_col   = $self->param('series') // $self->param('seg') // '';
+	my $val_col   = $self->param('val')    // '';
+	my $orient    = $self->param('orient') // 'v';
+	my $scheme    = $self->param('scheme') // 'tableau10';
+	my $back      = _safe_back_url($self->param('back')) // '/';
+	my $back2     = _safe_back_url($self->param('back2'));
+	my $back2_lbl = $self->param('back2_label') // '';
+
+	return $self->render(text => 'Missing cat= parameter',    status => 400) unless length $cat_col;
+	return $self->render(text => 'Missing series= parameter', status => 400) unless length $seg_col;
+
+	my ($src, $records, $columns) = $self->_run_pipeline_source;
+	return $self->render(text => 'Could not open data source', status => 404) unless defined $records;
+
+	eval { ($records, $columns) = $self->_apply_calc_fields($records, $columns) };
+	if ($@) { (my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//; return $self->render(text => $e, status => 400) }
+
+	for my $s (@{ $self->every_param('f') }) {
+		$records = _apply_filter_spec($records, $s);
+	}
+
+	my %col_set = map { $_ => 1 } @{$columns};
+	return $self->render(text => "Column not found: $cat_col", status => 400) unless $col_set{$cat_col};
+	return $self->render(text => "Column not found: $seg_col", status => 400) unless $col_set{$seg_col};
+
+	my $count_mode = (!length $val_col || $val_col eq '__count__');
+	return $self->render(text => "Column not found: $val_col", status => 400)
+		unless $count_mode || $col_set{$val_col};
+
+	# Aggregate by [cat, seg] via _grouped_totals to respect the governing
+	# invariant (all numbers from a single path) and to get ascending key order.
+	my $agg_rows = $self->_grouped_totals(
+		{ source => $src, records => $records },
+		{
+			by  => [$cat_col, $seg_col],
+			fn  => $count_mode ? 'count' : 'sum',
+			val => $count_mode ? undef   : $val_col,
+			as  => 'value',
+		},
+	);
+
+	# render_stacked_bar_snippet accepts flat [{cat_col=>,seg_col=>,val_col=>}] rows
+	# and handles the stacking itself; only include pairs actually returned (no phantom
+	# zero cells for missing intersections).
+	my @data = map {
+		my $cat = _decode_cell($_->{$cat_col} // '');
+		my $seg = _decode_cell($_->{$seg_col} // '');
+		(length $cat && length $seg)
+			? { cat => $cat, seg => $seg, val => $_->{value} }
+			: ()
+	} @$agg_rows;
+
+	return $self->render(
+		text   => 'No plottable data: no rows have valid data in the selected columns.',
+		status => 200,
+	) unless @data;
+
+	my ($source_url, $source_accessed) = $self->_url_attribution;
+
+	require HTML::D3;
+	my $title   = $count_mode ? "Count by $cat_col and $seg_col"
+	                          : "$val_col by $cat_col and $seg_col";
+	my $snippet = HTML::D3->new(title => $title, width => 900, height => 500, responsive => 1)
+		->render_stacked_bar_snippet(\@data, {
+			orient  => ($orient eq 'h') ? 'h' : 'v',
+			x_label => $cat_col,
+			scheme  => $scheme,
+		});
+
+	my $chart_html = $snippet->{html};
+	utf8::decode($chart_html) unless utf8::is_utf8($chart_html);
+
+	my %chart_spec = (
+		kind    => 'stacked',
+		title   => $title,
+		encode  => { cat => $cat_col, series => $seg_col, value => $val_col },
+		options => { orientation => $orient, scheme => $scheme },
+	);
+	my ($platform, $language) = $self->_resolve_template;
+	$self->render(
+		handler         => 'tt',
+		template        => "$platform/$language/stacked",
+		format          => 'html',
+		title           => $title,
+		chart_html      => $chart_html,
+		chart           => \%chart_spec,
+		bar_count       => scalar(grep { defined $_->{cat} } @data),
+		back_url        => ($back2 // $back),
+		back_label      => ($back2 ? ($back2_lbl || 'Back') : 'Back to table'),
+		($back2 ? (back2_url => $back, back2_label => 'Back to table') : ()),
+		source_url      => $source_url,
+		source_accessed => $source_accessed,
+	);
+}
+
+# ---------------------------------------------------------------------------
+# Combo bar+line chart  (GET /combo)
+# ---------------------------------------------------------------------------
+
+sub combo_view ($self) {
+	# ?cat= is the canonical spec name; ?x= is the legacy alias (keep both).
+	my $x_col      = $self->param('cat') // $self->param('x') // '';
+	my $bar_col    = $self->param('bar')         // '';
+	my $line_col   = $self->param('line')        // '';
+	my $bar_label  = $self->param('bar_label')   // '';
+	my $line_label = $self->param('line_label')  // '';
+	my $back       = _safe_back_url($self->param('back')) // '/';
+	my $back2      = _safe_back_url($self->param('back2'));
+	my $back2_lbl  = $self->param('back2_label') // '';
+
+	return $self->render(text => 'Missing cat= parameter',  status => 400) unless length $x_col;
+	return $self->render(text => 'Missing bar= parameter',  status => 400) unless length $bar_col;
+	return $self->render(text => 'Missing line= parameter', status => 400) unless length $line_col;
+
+	my ($src, $records, $columns) = $self->_run_pipeline_source;
+	return $self->render(text => 'Could not open data source', status => 404) unless defined $records;
+
+	eval { ($records, $columns) = $self->_apply_calc_fields($records, $columns) };
+	if ($@) { (my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//; return $self->render(text => $e, status => 400) }
+
+	for my $s (@{ $self->every_param('f') }) {
+		$records = _apply_filter_spec($records, $s);
+	}
+
+	my %col_set = map { $_ => 1 } @{$columns};
+	return $self->render(text => "Column not found: $x_col",    status => 400) unless $col_set{$x_col};
+	return $self->render(text => "Column not found: $bar_col",  status => 400) unless $col_set{$bar_col};
+	return $self->render(text => "Column not found: $line_col", status => 400) unless $col_set{$line_col};
+
+	# Aggregate bar and line measures separately via _grouped_totals so both
+	# use the same path (push or fold) and produce ascending x-axis order.
+	# A category missing from one result set renders as a gap (undef), not zero.
+	my $bar_rows = $self->_grouped_totals(
+		{ source => $src, records => $records },
+		{ by => [$x_col], fn => 'sum', val => $bar_col,  as => 'bar_val' },
+	);
+	my $line_rows = $self->_grouped_totals(
+		{ source => $src, records => $records },
+		{ by => [$x_col], fn => 'sum', val => $line_col, as => 'line_val' },
+	);
+
+	# Merge: build a lookup from both result sets and walk the union of categories.
+	my (%bar_map, %line_map, @x_order, %x_seen);
+	for my $r (@$bar_rows) {
+		my $xv = _decode_cell($r->{$x_col} // '');
+		next unless length $xv;
+		push @x_order, $xv unless $x_seen{$xv}++;
+		$bar_map{$xv} = $r->{bar_val};
+	}
+	for my $r (@$line_rows) {
+		my $xv = _decode_cell($r->{$x_col} // '');
+		next unless length $xv;
+		push @x_order, $xv unless $x_seen{$xv}++;
+		$line_map{$xv} = $r->{line_val};
+	}
+
+	my @data = map { {
+		x        => $_,
+		bar_val  => $bar_map{$_},   # undef = gap in bar series
+		line_val => $line_map{$_},  # undef = gap in line series
+	} } @x_order;
+
+	return $self->render(
+		text   => 'No plottable data: no rows have valid data in the selected columns.',
+		status => 200,
+	) unless @data;
+
+	my ($source_url, $source_accessed) = $self->_url_attribution;
+
+	require HTML::D3;
+	my $eff_bar_lbl  = $bar_label  || $bar_col;
+	my $eff_line_lbl = $line_label || $line_col;
+	my $title        = "$eff_bar_lbl and $eff_line_lbl by $x_col";
+	my $snippet = HTML::D3->new(title => $title, width => 900, height => 500, responsive => 1)
+		->render_combo_snippet(\@data, {
+			bar_label  => $eff_bar_lbl,
+			line_label => $eff_line_lbl,
+		});
+
+	my $chart_html = $snippet->{html};
+	utf8::decode($chart_html) unless utf8::is_utf8($chart_html);
+
+	my %chart_spec = (
+		kind   => 'combo',
+		title  => $title,
+		encode => { x => $x_col, bar => $bar_col, line => $line_col },
+	);
+	my ($platform, $language) = $self->_resolve_template;
+	$self->render(
+		handler         => 'tt',
+		template        => "$platform/$language/combo",
+		format          => 'html',
+		title           => $title,
+		chart_html      => $chart_html,
+		chart           => \%chart_spec,
+		point_count     => scalar @data,
+		back_url        => ($back2 // $back),
+		back_label      => ($back2 ? ($back2_lbl || 'Back') : 'Back to table'),
+		($back2 ? (back2_url => $back, back2_label => 'Back to table') : ()),
+		source_url      => $source_url,
+		source_accessed => $source_accessed,
+	);
+}
+
+# ---------------------------------------------------------------------------
+# Treemap  (GET /treemap)
+# ---------------------------------------------------------------------------
+
+sub treemap_view ($self) {
+	# ?group= is the canonical spec name; ?cat= is the legacy alias (keep both).
+	my $cat_col   = $self->param('group') // $self->param('cat') // '';
+	# ?size= is the canonical spec name; ?val= is the legacy alias (keep both).
+	my $val_col   = $self->param('size')  // $self->param('val') // '';
+	my $scheme    = $self->param('scheme') // 'tableau10';
+	my $back      = _safe_back_url($self->param('back')) // '/';
+	my $back2     = _safe_back_url($self->param('back2'));
+	my $back2_lbl = $self->param('back2_label') // '';
+
+	return $self->render(text => 'Missing group= parameter', status => 400) unless length $cat_col;
+	# ?color= (colour-by-measure) is not yet implemented; reject it explicitly.
+	return $self->render(text => '?color= is not yet supported for /treemap', status => 400)
+		if defined $self->param('color');
+
+	my ($src, $records, $columns) = $self->_run_pipeline_source;
+	return $self->render(text => 'Could not open data source', status => 404) unless defined $records;
+
+	eval { ($records, $columns) = $self->_apply_calc_fields($records, $columns) };
+	if ($@) { (my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//; return $self->render(text => $e, status => 400) }
+
+	for my $s (@{ $self->every_param('f') }) {
+		$records = _apply_filter_spec($records, $s);
+	}
+
+	my %col_set = map { $_ => 1 } @{$columns};
+	return $self->render(text => "Column not found: $cat_col", status => 400) unless $col_set{$cat_col};
+
+	my $count_mode = (!length $val_col || $val_col eq '__count__');
+	return $self->render(text => "Column not found: $val_col", status => 400)
+		unless $count_mode || $col_set{$val_col};
+
+	my $agg_rows = $self->_grouped_totals(
+		{ source => $src, records => $records },
+		{
+			by  => [$cat_col],
+			fn  => $count_mode ? 'count' : 'sum',
+			val => $count_mode ? undef   : $val_col,
+			as  => 'value',
+		},
+	);
+
+	# Top-N: keep the highest-N tiles, aggregate the rest as "Other".
+	my $topn_n = int($self->param('topn') // 0);
+	if ($topn_n > 0 && @$agg_rows > $topn_n) {
+		my @sorted   = sort { ($b->{value} // 0) <=> ($a->{value} // 0) } @$agg_rows;
+		my @top_agg  = @sorted[0 .. $topn_n - 1];
+		my %top_cats = map { ($_->{$cat_col} // '') => 1 } @top_agg;
+		my $other_rec = [
+			grep { !$top_cats{$_->{$cat_col} // ''} } @$records
+		];
+		if (@$other_rec) {
+			my $other = $self->_grouped_totals(
+				{ source => undef, records => $other_rec },
+				{ by  => [], fn  => ($count_mode ? 'count' : 'sum'),
+				  val => ($count_mode ? undef : $val_col), as => 'value' },
+			);
+			push @top_agg, { $cat_col => 'Other', value => $other->[0]{value} }
+				if @$other && defined $other->[0]{value};
+		}
+		$agg_rows = \@top_agg;
+	}
+
+	return $self->render(
+		text   => 'No plottable data: no rows have valid data in the selected column.',
+		status => 200,
+	) unless @$agg_rows;
+
+	my @data = map {
+		{ path => 'Root/' . _decode_cell($_->{$cat_col}), value => $_->{value} }
+	} @$agg_rows;
+
+	my ($source_url, $source_accessed) = $self->_url_attribution;
+
+	require HTML::D3;
+	my $title   = $count_mode ? "Treemap of $cat_col by count" : "Treemap of $cat_col by $val_col";
+	my $snippet = HTML::D3->new(title => $title, width => 800, height => 500, responsive => 1)
+		->render_treemap_snippet(\@data, {
+			scheme => $scheme,
+		});
+
+	my $chart_html = $snippet->{html};
+	utf8::decode($chart_html) unless utf8::is_utf8($chart_html);
+
+	my %chart_spec = (
+		kind    => 'treemap',
+		title   => $title,
+		encode  => { cat => $cat_col, value => $val_col },
+		options => { scheme => $scheme },
+	);
+	my ($platform, $language) = $self->_resolve_template;
+	$self->render(
+		handler         => 'tt',
+		template        => "$platform/$language/treemap",
+		format          => 'html',
+		title           => $title,
+		chart_html      => $chart_html,
+		chart           => \%chart_spec,
+		tile_count      => scalar @data,
+		cat_col         => $cat_col,
+		drill_back_url  => $back,
+		back_url        => ($back2 // $back),
+		back_label      => ($back2 ? ($back2_lbl || 'Back') : 'Back to table'),
+		($back2 ? (back2_url => $back, back2_label => 'Back to table') : ()),
+		source_url      => $source_url,
+		source_accessed => $source_accessed,
+	);
+}
+
+# ---------------------------------------------------------------------------
+# Histogram  (GET /histogram)
+# ---------------------------------------------------------------------------
+
+sub histogram_view ($self) {
+	my $col       = $self->param('col')   // '';
+	my $bins      = $self->param('bins')  // 10;
+	my $back      = _safe_back_url($self->param('back')) // '/';
+	my $back2     = _safe_back_url($self->param('back2'));
+	my $back2_lbl = $self->param('back2_label') // '';
+
+	return $self->render(text => 'Missing col= parameter', status => 400) unless length $col;
+
+	my ($src, $records, $columns) = $self->_run_pipeline_source;
+	return $self->render(text => 'Could not open data source', status => 404) unless defined $records;
+
+	eval { ($records, $columns) = $self->_apply_calc_fields($records, $columns) };
+	if ($@) { (my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//; return $self->render(text => $e, status => 400) }
+
+	for my $s (@{ $self->every_param('f') }) {
+		$records = _apply_filter_spec($records, $s);
+	}
+
+	my %col_set = map { $_ => 1 } @{$columns};
+	return $self->render(text => "Column not found: $col", status => 400) unless $col_set{$col};
+
+	my @values;
+	for my $row (@$records) {
+		my $v = _numeric_cell($row->{$col} // '');
+		push @values, $v if defined $v;
+	}
+
+	return $self->render(
+		text   => 'No plottable data: no rows have valid numeric values in the selected column.',
+		status => 200,
+	) unless @values;
+
+	$bins = int($bins);
+	$bins = 1   if $bins < 1;
+	$bins = 200 if $bins > 200;
+
+	# Server-side binning: compute equal-width bins over the data range.
+	# Values equal to $max land in the highest bin (no overflow bar).
+	# Uses the same bin-boundary logic as Calc.pm bin() to stay consistent with
+	# ?c=band:bin(col,width) computed columns on the same data.
+	use POSIX qw(floor);
+	my $min_v = min(@values);
+	my $max_v = max(@values);
+	my @bin_data;
+	if ($min_v == $max_v) {
+		# All values identical: one bin.
+		push @bin_data, { label => "$min_v", count => scalar @values, lo => $min_v, hi => $min_v };
+	} else {
+		my $raw_w = ($max_v - $min_v) / $bins;
+		# Round up to a "nice" width using 10 significant digits (same guard as Calc bin()).
+		my $width = sprintf('%.10g', $raw_w) + 0;
+		$width = $raw_w if $width <= 0;  # safety: never produce zero width
+		my $fmt = ($width == int($width)) ? '%d' : '%g';
+
+		# Build bin boundaries.
+		my @bin_counts;
+		my @bin_los;
+		for my $i (0 .. $bins - 1) {
+			push @bin_los, $min_v + $i * $width;
+			push @bin_counts, 0;
+		}
+
+		# Assign each value to a bin.
+		for my $v (@values) {
+			my $idx = floor(sprintf('%.10g', ($v - $min_v) / $width) + 0);
+			$idx = $bins - 1 if $idx >= $bins;  # max value -> last bin
+			$idx = 0         if $idx < 0;
+			$bin_counts[$idx]++;
+		}
+
+		for my $i (0 .. $bins - 1) {
+			next unless $bin_counts[$i];
+			my $lo  = $bin_los[$i];
+			my $hi  = $lo + $width;
+			my $lbl = sprintf("[${fmt},${fmt})", $lo, $hi);
+			push @bin_data, { label => $lbl, count => $bin_counts[$i], lo => $lo, hi => $hi };
+		}
+	}
+
+	my ($source_url, $source_accessed) = $self->_url_attribution;
+
+	require HTML::D3;
+	my $title   = "Distribution of $col";
+	my $snippet = HTML::D3->new(title => $title, width => 800, height => 480, responsive => 1)
+		->render_histogram_snippet(\@bin_data, {
+			binned  => 1,
+			x_label => $col,
+		});
+
+	my $chart_html = $snippet->{html};
+	utf8::decode($chart_html) unless utf8::is_utf8($chart_html);
+
+	my %chart_spec = (
+		kind    => 'histogram',
+		title   => $title,
+		encode  => { value => $col },
+		options => { bins => $bins },
+	);
+	my ($platform, $language) = $self->_resolve_template;
+	$self->render(
+		handler          => 'tt',
+		template         => "$platform/$language/histogram",
+		format           => 'html',
+		title            => $title,
+		chart_html       => $chart_html,
+		chart            => \%chart_spec,
+		value_count      => scalar @values,
+		bins             => $bins,
+		back_url         => ($back2 // $back),
+		back_label       => ($back2 ? ($back2_lbl || 'Back') : 'Back to table'),
+		($back2 ? (back2_url => $back, back2_label => 'Back to table') : ()),
+		source_url       => $source_url,
+		source_accessed  => $source_accessed,
 	);
 }
 
@@ -3398,6 +5726,350 @@ No parameters.  The C<.uploads/> path is always the one under C<app->home>.
 
 C<freed> is the total number of bytes removed.  C<count> is the number of
 files deleted.  Both are 0 when the directory is absent or already empty.
+
+=cut
+
+=head2 scatter_view
+
+C<GET /scatter> -- Render a D3.js scatter plot or bubble chart.
+
+Accepts the same C<l=>, C<j=>, C<f=> pipeline params as C</join>, plus:
+
+  x=<col>        X-axis column (required; numeric)
+  y=<col>        Y-axis column (required; numeric)
+  series=<col>   Colour-by category column (optional)
+  size=<col>     Bubble-radius numeric column (optional)
+  scheme=<name>  D3 colour scheme (default tableau10; only used with series=)
+  min_r=N        Minimum bubble radius in px (default 3; range 1-40)
+  max_r=N        Maximum bubble radius in px (default 15; range 1-40)
+  back=<url>     URL for the "Back to table" breadcrumb link
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+  l        spec    Required.  Left table spec (table:name or path:/abs/path).
+  x        string  Required.  Numeric X-axis column name.
+  y        string  Required.  Numeric Y-axis column name.
+  series   string  Optional.  Categorical colour-dimension column.
+  size     string  Optional.  Numeric bubble-radius column.
+  scheme   string  Optional.  One of: tableau10 category10 set2 set3 paired.
+  min_r    int     Optional.  Minimum radius 1-40 (default 3).
+  max_r    int     Optional.  Maximum radius 1-40 (default 15).
+  back     url     Optional.  Safe back-link URL (sanitised by _safe_back_url).
+
+=head4 OUTPUT
+
+  200 text/html    Rendered scatter chart page.
+  400 text/plain   Missing x= or y= parameter.
+  400 text/plain   Column not found: <col>.
+  400 text/plain   Unknown colour scheme: <scheme>  (only when series= is set).
+  404 text/plain   "Could not open data source" when l= is absent/invalid.
+
+=head3 FORMAL SPECIFICATION
+
+  scatter_view == lambda self .
+    pre  length(x_col) > 0 /\ length(y_col) > 0
+         /\ x_col in columns /\ y_col in columns
+         /\ (series_col != '' => series_col in columns)
+         /\ (size_col   != '' => size_col   in columns)
+         /\ (series_col != '' => scheme in SCATTER_SCHEMES)
+         /\ 1 <= min_r <= 40 /\ 1 <= max_r <= 40
+    post render(scatter, pairs)
+
+=head3 EXAMPLE
+
+  GET /scatter?l=table:sales&x=quantity&y=amount&series=region
+    -> 200 HTML page containing D3 scatter chart SVG
+
+=cut
+
+=head2 stacked_view
+
+C<GET /stacked> -- Render a D3.js stacked bar chart.
+
+Accepts the same C<l=>, C<j=>, C<f=> pipeline params as C</join>, plus:
+
+  cat=<col>     X-axis category column (required)
+  series=<col>  Stack-segment column (required; seg= is a backwards-compat alias)
+  val=<col>     Numeric measure column (optional; count rows when absent)
+  scheme=<name> D3 colour scheme (default tableau10)
+  back=<url>    URL for the "Back to table" breadcrumb link
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+  l       spec    Required.  Left table spec.
+  cat     string  Required.  X-axis categorical column name.
+  series  string  Required.  Stack-segment categorical column name.
+  val     string  Optional.  Numeric measure column; omit for count mode.
+  scheme  string  Optional.  D3 colour scheme name.
+  back    url     Optional.  Safe back-link URL.
+
+=head4 OUTPUT
+
+  200 text/html    Rendered stacked bar chart page.
+  400 text/plain   Missing cat= or series= parameter.
+  400 text/plain   Column not found: <col>.
+  404 text/plain   "Could not open data source".
+
+=head3 FORMAL SPECIFICATION
+
+  stacked_view == lambda self .
+    pre  length(cat_col) > 0 /\ length(series_col) > 0
+         /\ cat_col in columns /\ series_col in columns
+    let rows = _grouped_totals(records, cat_col, series_col, val_col) in
+    post render(stacked, rows)
+
+=head3 EXAMPLE
+
+  GET /stacked?l=table:sales&cat=region&series=product&val=amount
+    -> 200 HTML page containing D3 stacked bar chart SVG
+
+=cut
+
+=head2 combo_view
+
+C<GET /combo> -- Render a D3.js combo bar+line chart.
+
+Accepts the same C<l=>, C<j=>, C<f=> pipeline params as C</join>, plus:
+
+  cat=<col>       X-axis category column (required; x= is a backwards-compat alias)
+  bar_val=<col>   Numeric column plotted as bars (required)
+  line_val=<col>  Numeric column plotted as a line (required)
+  back=<url>      URL for the "Back to table" breadcrumb link
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+  l         spec    Required.  Left table spec.
+  cat       string  Required.  X-axis categorical column name (x= also accepted).
+  bar_val   string  Required.  Numeric bar-measure column.
+  line_val  string  Required.  Numeric line-measure column.
+  back      url     Optional.  Safe back-link URL.
+
+=head4 OUTPUT
+
+  200 text/html    Rendered combo chart page.
+  400 text/plain   Missing cat=, bar_val=, or line_val= parameter.
+  400 text/plain   Column not found: <col>.
+  404 text/plain   "Could not open data source".
+
+=head3 FORMAL SPECIFICATION
+
+  combo_view == lambda self .
+    pre  length(cat_col) > 0 /\ length(bar_col) > 0 /\ length(line_col) > 0
+         /\ cat_col in columns /\ bar_col in columns /\ line_col in columns
+    post render(combo, pairs)
+
+=head3 EXAMPLE
+
+  GET /combo?l=table:sales&cat=month&bar_val=revenue&line_val=units
+    -> 200 HTML page containing D3 combo bar+line chart SVG
+
+=cut
+
+=head2 treemap_view
+
+C<GET /treemap> -- Render a D3.js treemap where tile area encodes a numeric column.
+
+Accepts the same C<l=>, C<j=>, C<f=> pipeline params as C</join>, plus:
+
+  group=<col>  Tile-label categorical column (required; cat= is a backwards-compat alias)
+  size=<col>   Tile-area numeric column (required; val= is a backwards-compat alias)
+  topn=N       Keep only the top-N tiles by size; remainder collapsed into "Other"
+  scheme=<name> D3 colour scheme (default tableau10)
+  back=<url>   URL for the "Back to table" breadcrumb link
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+  l       spec    Required.  Left table spec.
+  group   string  Required.  Tile-label categorical column (cat= also accepted).
+  size    string  Required.  Tile-area numeric column (val= also accepted).
+  topn    int     Optional.  Keep top-N tiles; 0 or absent means no limit.
+  scheme  string  Optional.  D3 colour scheme name.
+  back    url     Optional.  Safe back-link URL.
+
+=head4 OUTPUT
+
+  200 text/html    Rendered treemap page.
+  400 text/plain   Missing group= or size= parameter.
+  400 text/plain   Unrecognised scheme= parameter (?color= returns 400).
+  400 text/plain   Column not found: <col>.
+  404 text/plain   "Could not open data source".
+
+=head3 FORMAL SPECIFICATION
+
+  treemap_view == lambda self .
+    pre  length(group_col) > 0 /\ length(size_col) > 0
+         /\ group_col in columns /\ size_col in columns
+         /\ color param absent (scheme= is the correct param name)
+    let tiles = _grouped_totals(records, group_col, [], size_sum) in
+    let top   = topn > 0 ? top_n(tiles, topn) : tiles in
+    post render(treemap, top)
+
+=head3 EXAMPLE
+
+  GET /treemap?l=table:sales&group=product&size=amount&topn=10
+    -> 200 HTML page containing D3 treemap SVG
+
+=cut
+
+=head2 histogram_view
+
+C<GET /histogram> -- Render a D3.js histogram with server-side binning.
+
+Accepts the same C<l=>, C<j=>, C<f=> pipeline params as C</join>, plus:
+
+  col=<col>   Numeric column to bin (required)
+  bins=N      Number of bins (default 10; max 200)
+  back=<url>  URL for the "Back to table" breadcrumb link
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+  l     spec    Required.  Left table spec.
+  col   string  Required.  Numeric column to histogram.
+  bins  int     Optional.  Bin count 1-200 (default 10).
+  back  url     Optional.  Safe back-link URL.
+
+=head4 OUTPUT
+
+  200 text/html    Rendered histogram page.
+  400 text/plain   Missing col= parameter.
+  400 text/plain   Column not found: <col>.
+  200 text/html    Empty histogram page when no numeric values exist.
+  404 text/plain   "Could not open data source".
+
+=head3 FORMAL SPECIFICATION
+
+  histogram_view == lambda self .
+    pre  length(col) > 0 /\ col in columns
+         /\ 1 <= bins <= 200
+    let vals  = { row[col] | row in records, looks_like_number(row[col]) } in
+    let width = (max(vals) - min(vals)) / bins in
+    let bdata = bin(vals, width) in
+    post render(histogram, bdata, bins => |bdata|)
+
+=head3 EXAMPLE
+
+  GET /histogram?l=table:sales&col=amount&bins=20
+    -> 200 HTML page containing D3 histogram SVG
+
+=cut
+
+=head2 calc_list / calc_save / calc_delete
+
+C<GET /calc/list>, C<POST /calc/save>, C<POST /calc/delete> -- Manage stored
+calculated fields for a table spec.
+
+Calculated fields are named expression strings evaluated per-row by
+C<Database::BI::Calc> and appended as virtual columns before any aggregation.
+
+=head3 API SPECIFICATION
+
+=head4 calc_list (GET /calc/list)
+
+  INPUT:  l=<spec>   (required)
+  OUTPUT: 200 application/json  { "fields": { "<name>": "<expr>", ... } }
+          400 application/json  { "error": "l= required" }
+
+=head4 calc_save (POST /calc/save)
+
+  INPUT:  l=<spec>   (required)
+          name=<id>  (required; must match /\A[A-Za-z_][A-Za-z0-9_]*\z/)
+          expr=<expression>  (required; max 512 chars; hostile patterns rejected)
+  OUTPUT: 200 application/json  { "saved": 1 }
+          400 application/json  { "error": "..." }  (compile error or hostile input)
+
+=head4 calc_delete (POST /calc/delete)
+
+  INPUT:  l=<spec>   (required)
+          name=<id>  (required)
+  OUTPUT: 200 application/json  { "deleted": 1 }
+          400 application/json  { "error": "l= required" }
+
+=head3 EXAMPLE
+
+  POST /calc/save  l=path:/data/sales.csv&name=margin&expr=amount-cost
+    -> 200 { "saved": 1 }
+  GET /calc/list?l=path:/data/sales.csv
+    -> 200 { "fields": { "margin": "amount-cost" } }
+
+=cut
+
+=head2 groups_list / groups_save / groups_delete
+
+C<GET /groups/list>, C<POST /groups/save>, C<POST /groups/delete> -- Manage
+named value groups that produce virtual C<${col}_group> columns.
+
+=head3 API SPECIFICATION
+
+=head4 groups_list (GET /groups/list)
+
+  INPUT:  l=<spec>  (required), col=<col>  (required)
+  OUTPUT: 200 application/json  { "groups": { "<label>": ["<val>", ...], ... } }
+          400 application/json  { "error": "l= required" } or "col= required"
+
+=head4 groups_save (POST /groups/save)
+
+  INPUT:  l=<spec>, col=<col>, group=<label>, values=<newline-separated values>
+  OUTPUT: 200 application/json  { "saved": 1 }
+          400 application/json  { "error": "..." }
+
+=head4 groups_delete (POST /groups/delete)
+
+  INPUT:  l=<spec>, col=<col>, group=<label>  (omit group= to delete all groups for col)
+  OUTPUT: 200 application/json  { "deleted": 1 }
+          400 application/json  { "error": "l= required" }
+
+=head3 EXAMPLE
+
+  POST /groups/save  l=path:/data/sales.csv&col=region&group=North&values=MN%0AWI%0AIA
+    -> 200 { "saved": 1 }
+  GET /groups/list?l=path:/data/sales.csv&col=region
+    -> 200 { "groups": { "North": ["MN","WI","IA"] } }
+
+=cut
+
+=head2 dates_list / dates_save / dates_delete
+
+C<GET /dates/list>, C<POST /dates/save>, C<POST /dates/delete> -- Manage stored
+date-normalisation patterns that convert non-ISO date columns to ISO-8601
+(C<YYYY-MM-DD>) in-place before aggregation.
+
+=head3 API SPECIFICATION
+
+=head4 dates_list (GET /dates/list)
+
+  INPUT:  l=<spec>  (required)
+  OUTPUT: 200 application/json  { "patterns": { "<col>": "<pattern>", ... } }
+          400 application/json  { "error": "l= required" }
+
+=head4 dates_save (POST /dates/save)
+
+  INPUT:  l=<spec>, col=<col>, pattern=<fmt>
+          Supported patterns: %m/%d/%Y  %d/%m/%Y  %d-%b-%Y
+  OUTPUT: 200 application/json  { "ok": 1 }
+          400 application/json  { "error": "Unsupported date format pattern ..." }
+
+=head4 dates_delete (POST /dates/delete)
+
+  INPUT:  l=<spec>, col=<col>  (omit col= to delete all patterns for the spec)
+  OUTPUT: 200 application/json  { "deleted": 1 }
+          400 application/json  { "error": "l= required" }
+
+=head3 EXAMPLE
+
+  POST /dates/save  l=path:/data/sales.csv&col=sale_date&pattern=%m/%d/%Y
+    -> 200 { "ok": 1 }
+  GET /dates/list?l=path:/data/sales.csv
+    -> 200 { "patterns": { "sale_date": "%m/%d/%Y" } }
 
 =cut
 

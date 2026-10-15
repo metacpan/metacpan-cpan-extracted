@@ -22,6 +22,7 @@ my %WriteMakefileArgs = (
         'Object::Proto::Sugar' => '0.05',
         'Devel::CallParser'    => '0.005',
         'Chess::Plisco'        => 'v1.0.3',
+        'Game::Terminal::Kit'  => '0.05',
         'Digest::SHA'          => '0',
         'Getopt::Long'         => '0',
         'Time::HiRes'          => '0',

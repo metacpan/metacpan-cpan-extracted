@@ -11,7 +11,7 @@ use Object::Proto::Sugar -types;
 use Game::Floppy::Error;
 use Game::Floppy::Result;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 has width => (
 	is      => 'ro',
@@ -321,7 +321,7 @@ Game::Floppy - Floppy bird, as an engine
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =head1 SYNOPSIS
 

@@ -16,3 +16,46 @@ md5crypt.c - copyright Poul-Henning Kamp
 md5crypt.h - copyright Poul-Henning Kamp
 sha256crypt.c - public domain reference implementation by Ulrich Drepper
 sha512crypt.c - public domain reference implementation by Ulrich Drepper
+yescrypt_crypt.c - copyright 2026 cPanel, Inc. (glue; same terms as Perl)
+cpx_yescrypt_names.h - copyright 2026 cPanel, Inc. (same terms as Perl)
+
+The following files are from Openwall's yescrypt 1.1.0
+(https://www.openwall.com/yescrypt/), lightly modified; each change is marked
+"cpx:" in the file.  See the notices in the files for full details:
+
+yescrypt.h - copyright 2009 Colin Percival, 2013-2018 Alexander Peslyak
+yescrypt-opt.c - copyright 2009 Colin Percival, 2012-2018 Alexander Peslyak
+yescrypt-common.c - copyright 2013-2018 Alexander Peslyak
+yescrypt-platform.c - copyright 2013-2018 Alexander Peslyak
+sha256.c - copyright 2005-2016 Colin Percival, 2016-2018 Alexander Peslyak
+sha256.h - copyright 2005-2016 Colin Percival, 2016-2018 Alexander Peslyak
+insecure_memzero.c - copyright 2014 Colin Percival
+insecure_memzero.h - copyright 2014 Colin Percival
+sysendian.h - copyright 2007-2014 Colin Percival
+
+yescrypt.h, yescrypt-opt.c, sha256.c, sha256.h, insecure_memzero.c,
+insecure_memzero.h and sysendian.h are distributed under the following terms
+(yescrypt-common.c and yescrypt-platform.c are distributed under the same disclaimer, with
+"Redistribution and use in source and binary forms, with or without
+modification, are permitted." as its only license grant):
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
+  1. Redistributions of source code must retain the above copyright
+     notice, this list of conditions and the following disclaimer.
+  2. Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+
+  THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+  FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+  OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+  HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+  SUCH DAMAGE.

@@ -1,5 +1,8 @@
 Revision history for Perl module Tie::Filehandle::Preempt::Stdin
 
+0.03 Wed Oct 14 01:14:20 PM EDT 2026
+    - No change in functionality.  Updated Makefile.PL, etc.
+
 0.02 Sat Oct 27 15:23:32 EDT 2007
     - require 5.8
 

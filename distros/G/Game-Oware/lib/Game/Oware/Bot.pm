@@ -12,7 +12,7 @@ use Game::Oware::Rules;
 use Game::Oware::Scoring;
 use Game::Oware::Variant ();
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 our $STORE      = 100;
 our $MATERIAL   = 2;
@@ -239,7 +239,7 @@ Game::Oware::Bot - an opponent, on a node budget
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 

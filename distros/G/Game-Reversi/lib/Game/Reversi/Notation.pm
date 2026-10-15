@@ -5,7 +5,7 @@ use warnings;
 
 use Game::Reversi::Board;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 my $PASS = '--';
 
@@ -134,7 +134,7 @@ Game::Reversi::Notation - squares, boards and transcripts as text
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 

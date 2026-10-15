@@ -9,7 +9,7 @@ use Game::Gin::Deal ();
 use Game::Gin::Error ();
 use Game::Gin::Scoring qw(match_result TARGET);
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 has seed    => (is => 'ro', isa => Str);
 has target  => (is => 'ro', isa => Int);
@@ -90,7 +90,7 @@ Game::Gin - gin rummy as a reusable engine
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 

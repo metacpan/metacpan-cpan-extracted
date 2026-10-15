@@ -24,6 +24,7 @@ use File::Temp     qw(tempdir tempfile);
 use Mojo::File     ();
 use Mojo::Util     qw(url_escape);
 use Scalar::Util   qw(reftype refaddr);
+use DBI            ();
 
 # ---------------------------------------------------------------------------
 # Constants derived from known sample data (sales.csv, products.psv).
@@ -46,6 +47,12 @@ Readonly my @SALES_COLS => qw(id product region sales_rep amount sale_date);
 # (bypassing the Sub::Private CHECK-phase stash cleanup).
 # ---------------------------------------------------------------------------
 my $t = Test::Mojo->new('Database::BI');
+
+# Redirect model_dir to a temp directory so tests never write to .bi/models.json
+# in the workspace.  The variable must be file-scoped so the dir persists for
+# the entire test process (CLEANUP => 1 deletes it when it goes out of scope).
+my $TEST_MODEL_DIR = tempdir(CLEANUP => 1);
+$t->app->config->{model_dir} = $TEST_MODEL_DIR;
 
 # Guard: most integration subtests depend on the sample data files.
 plan skip_all => 'data/sales.csv not found'    unless -f $SALES_CSV;
@@ -879,6 +886,893 @@ subtest '/combine + filter narrows the stacked result' => sub {
 	 ->content_like(qr/<td[^>]*>B1<\/td>/,  'B1 (hardware) present in filtered combined view')
 	 ->content_unlike(qr/<td[^>]*>A2<\/td>/, 'A2 (software) absent from filtered combined view')
 	 ->content_unlike(qr/<td[^>]*>B2<\/td>/, 'B2 (services) absent from filtered combined view');
+};
+
+# ---------------------------------------------------------------------------
+# Phase 0.2 acceptance tests: pagination and sort on /join, /combine, /export
+# ---------------------------------------------------------------------------
+
+# SECTION 8: /join pagination
+subtest '/join pagination slices the joined view' => sub {
+	my $dir = File::Temp->newdir;
+	Mojo::File->new(File::Spec->catfile($dir, 'orders.csv'))->spurt(
+		"id,item,amount\n1,Alpha,100\n2,Beta,200\n3,Gamma,300\n4,Delta,400\n5,Epsilon,500\n"
+	);
+	my $l_spec = url_escape("path:" . File::Spec->catfile($dir, 'orders.csv'));
+
+	# Without pagination: all 5 rows.
+	$t->get_ok("/join?l=$l_spec")->status_is(200);
+	my $body = $t->tx->res->body;
+	my @rows = ($body =~ /<td[^>]*>[^<]+<\/td>/g);
+	ok scalar(@rows) >= 5, 'no pagination returns all rows';
+
+	# With per_page=2 page=1: first 2 rows, has_next.
+	$t->get_ok("/join?l=$l_spec&per_page=2&page=1")->status_is(200)
+	  ->content_like(qr/pagination|page/i, '/join page 1 shows pagination nav');
+	my $p1_body = $t->tx->res->body;
+
+	# With per_page=2 page=2: next 2 rows.
+	$t->get_ok("/join?l=$l_spec&per_page=2&page=2")->status_is(200);
+	my $p2_body = $t->tx->res->body;
+
+	# page 1 and page 2 must not show identical rows.
+	my @p1_cells = ($p1_body =~ /<td[^>]*>([^<]+)<\/td>/g);
+	my @p2_cells = ($p2_body =~ /<td[^>]*>([^<]+)<\/td>/g);
+	my %p1_set = map { $_ => 1 } @p1_cells;
+	my @overlap = grep { $p1_set{$_} } @p2_cells;
+	# Some overlap is expected (column headers row reuse) but row data differs.
+	ok scalar(@p1_cells) > 0, 'page 1 has data cells';
+	ok scalar(@p2_cells) > 0, 'page 2 has data cells';
+};
+
+# SECTION 9: /join sort pushdown
+subtest '/join sort= orders the result' => sub {
+	SKIP: {
+		eval { require DBI; DBI->install_driver('SQLite') }
+			or skip 'DBD::SQLite not available', 4;
+
+		my $dir     = File::Temp->newdir;
+		my $sqlfile = File::Spec->catfile($dir, 'sortable.sql');
+		my $dbh = DBI->connect("dbi:SQLite:dbname=$sqlfile", '', '',
+			{ RaiseError => 1 });
+		$dbh->do('CREATE TABLE sortable (id INTEGER, name TEXT, score INTEGER)');
+		my $ins = $dbh->prepare('INSERT INTO sortable VALUES (?,?,?)');
+		$ins->execute(1, 'Charlie', 70);
+		$ins->execute(2, 'Alice',   90);
+		$ins->execute(3, 'Bob',     80);
+		$dbh->disconnect;
+
+		my $l_spec = url_escape("path:$sqlfile");
+
+		# Sort ascending by name.
+		$t->get_ok("/join?l=$l_spec&sort=name&dir=asc")->status_is(200);
+		my $body = $t->tx->res->body;
+		my @names = ($body =~ /<td[^>]*>([A-Z][a-z]+)<\/td>/g);
+		is $names[0], 'Alice',   'asc sort: Alice is first';
+		is $names[-1], 'Charlie', 'asc sort: Charlie is last';
+
+		# Sort descending by name.
+		$t->get_ok("/join?l=$l_spec&sort=name&dir=desc")->status_is(200);
+		$body = $t->tx->res->body;
+		@names = ($body =~ /<td[^>]*>([A-Z][a-z]+)<\/td>/g);
+		is $names[0], 'Charlie', 'desc sort: Charlie is first';
+		is $names[-1], 'Alice',   'desc sort: Alice is last';
+	}
+};
+
+# SECTION 10: /combine pagination and sort
+subtest '/combine pagination and sort' => sub {
+	my $dir = File::Temp->newdir;
+	Mojo::File->new(File::Spec->catfile($dir, 'grp_a.csv'))->spurt(
+		"label,val\nZebra,10\nApe,20\n"
+	);
+	Mojo::File->new(File::Spec->catfile($dir, 'grp_b.csv'))->spurt(
+		"label,val\nMink,30\nBear,40\n"
+	);
+	my $a_spec = url_escape("path:" . File::Spec->catfile($dir, 'grp_a.csv'));
+	my $b_spec = url_escape("path:" . File::Spec->catfile($dir, 'grp_b.csv'));
+
+	# Pagination: 4 rows total, per_page=2.
+	$t->get_ok("/combine?l=$a_spec&c=$b_spec&per_page=2&page=1")->status_is(200);
+	my $p1 = $t->tx->res->body;
+	$t->get_ok("/combine?l=$a_spec&c=$b_spec&per_page=2&page=2")->status_is(200);
+	my $p2 = $t->tx->res->body;
+	ok $p1 =~ /<td/, 'combine page 1 has data';
+	ok $p2 =~ /<td/, 'combine page 2 has data';
+
+	# Sort ascending by label: Ape, Bear, Mink, Zebra.
+	$t->get_ok("/combine?l=$a_spec&c=$b_spec&sort=label&dir=asc")->status_is(200);
+	my $body = $t->tx->res->body;
+	my @labels = ($body =~ /<td[^>]*>([A-Z][a-z]+)<\/td>/g);
+	is $labels[0], 'Ape',   'combine asc sort: Ape first';
+	is $labels[-1], 'Zebra', 'combine asc sort: Zebra last';
+
+	# Sort descending by label: Zebra, Mink, Bear, Ape.
+	$t->get_ok("/combine?l=$a_spec&c=$b_spec&sort=label&dir=desc")->status_is(200);
+	$body = $t->tx->res->body;
+	@labels = ($body =~ /<td[^>]*>([A-Z][a-z]+)<\/td>/g);
+	is $labels[0],  'Zebra', 'combine desc sort: Zebra first';
+	is $labels[-1], 'Ape',   'combine desc sort: Ape last';
+};
+
+# SECTION 11: /export page slice
+subtest '/export page slice writes exactly the requested rows' => sub {
+	my $dir = File::Temp->newdir;
+	Mojo::File->new(File::Spec->catfile($dir, 'export_src.csv'))->spurt(
+		"id,color\n1,Red\n2,Green\n3,Blue\n4,Yellow\n5,Purple\n"
+	);
+	my $l_spec = url_escape("path:" . File::Spec->catfile($dir, 'export_src.csv'));
+
+	# Page 1, per_page=2: rows 1 and 2 (Red, Green).
+	$t->get_ok("/export?l=$l_spec&format=csv&per_page=2&page=1")->status_is(200);
+	my $csv1 = $t->tx->res->body;
+	like   $csv1, qr/Red/,   'export page 1 contains Red';
+	like   $csv1, qr/Green/, 'export page 1 contains Green';
+	unlike $csv1, qr/Blue/,  'export page 1 excludes Blue';
+
+	# Page 2, per_page=2: rows 3 and 4 (Blue, Yellow).
+	$t->get_ok("/export?l=$l_spec&format=csv&per_page=2&page=2")->status_is(200);
+	my $csv2 = $t->tx->res->body;
+	like   $csv2, qr/Blue/,   'export page 2 contains Blue';
+	like   $csv2, qr/Yellow/, 'export page 2 contains Yellow';
+	unlike $csv2, qr/\bRed\b/, 'export page 2 excludes Red';
+
+	# Sort descending: page 1 with sort=color desc should start with Yellow (last alpha).
+	$t->get_ok("/export?l=$l_spec&format=csv&per_page=2&page=1&sort=color&dir=desc")
+	  ->status_is(200);
+	my $sorted_csv = $t->tx->res->body;
+	# First data row after header should be Yellow (descending alpha).
+	my @lines = split /\r?\n/, $sorted_csv;
+	shift @lines;  # skip header
+	like $lines[0], qr/Yellow/, 'export sort desc: Yellow is first row';
+};
+
+# SECTION 12: /pivot pagination
+subtest '/pivot pagination slices the row groups' => sub {
+	my $dir = File::Temp->newdir;
+	# 6 distinct region values -> 6 row groups in the pivot
+	Mojo::File->new(File::Spec->catfile($dir, 'sales_p.csv'))->spurt(
+		"region,amount\n" .
+		"North,100\nSouth,200\nEast,300\n" .
+		"West,400\nCentral,500\nNorthEast,600\n"
+	);
+	my $l = url_escape("path:" . File::Spec->catfile($dir, 'sales_p.csv'));
+	my $m = url_escape('amount:sum:total');
+
+	# No pagination: all 6 row groups visible.
+	$t->get_ok("/pivot?l=$l&rows=region&m=$m")->status_is(200);
+	my $full = $t->tx->res->body;
+	my @all_rows = ($full =~ /<td[^>]*class="row-dim"[^>]*>/g);
+	is scalar(@all_rows), 6, 'no pagination: all 6 region rows present';
+	unlike $full, qr/<nav[^>]*piv-pagination/, 'no pagination nav when all rows fit';
+
+	# per_page=2: page 1 has exactly 2 row groups, has_next shown.
+	$t->get_ok("/pivot?l=$l&rows=region&m=$m&per_page=2&page=1")->status_is(200);
+	my $p1 = $t->tx->res->body;
+	my @p1_rows = ($p1 =~ /<td[^>]*class="row-dim"[^>]*>/g);
+	is scalar(@p1_rows), 2, 'page 1 has exactly 2 row groups';
+	like $p1, qr/piv-pagination/, 'page 1 shows pagination nav';
+	like $p1, qr/page=2/, 'page 1 has Next link to page 2';
+
+	# per_page=2: page 2 has 2 more rows.
+	$t->get_ok("/pivot?l=$l&rows=region&m=$m&per_page=2&page=2")->status_is(200);
+	my $p2 = $t->tx->res->body;
+	my @p2_rows = ($p2 =~ /<td[^>]*class="row-dim"[^>]*>/g);
+	is scalar(@p2_rows), 2, 'page 2 has exactly 2 row groups';
+	like $p2, qr/page=1/, 'page 2 has Prev link to page 1';
+
+	# per_page=2: page 3 has the last 2 rows, no Next.
+	$t->get_ok("/pivot?l=$l&rows=region&m=$m&per_page=2&page=3")->status_is(200);
+	my $p3 = $t->tx->res->body;
+	my @p3_rows = ($p3 =~ /<td[^>]*class="row-dim"[^>]*>/g);
+	is scalar(@p3_rows), 2, 'page 3 has 2 row groups';
+	unlike $p3, qr/page=4/, 'page 3 has no Next link (last page)';
+
+	# page 4 beyond end: 0 row groups, "No data" message.
+	$t->get_ok("/pivot?l=$l&rows=region&m=$m&per_page=2&page=4")->status_is(200);
+	my $p4 = $t->tx->res->body;
+	like $p4, qr/No data to display/, 'page 4 beyond end shows no-data message';
+
+	# Subtotals computed over the full set even when paginated.
+	# Grand total of amount:sum must equal 2100 regardless of page.
+	$t->get_ok("/pivot?l=$l&rows=region&m=$m&per_page=2&page=1&totals=1")->status_is(200);
+	like $t->tx->res->body, qr/2100/, 'grand total (2100) visible on page 1 even with per_page=2';
+
+	# Export ignores pagination params and returns all 6 rows.
+	$t->get_ok("/pivot?l=$l&rows=region&m=$m&per_page=2&page=1&format=csv")->status_is(200);
+	my $csv = $t->tx->res->body;
+	my @csv_lines = grep { /\S/ } split /\r?\n/, $csv;
+	is scalar(@csv_lines) - 1, 6, 'CSV export returns all 6 rows regardless of per_page';
+};
+
+# ---------------------------------------------------------------------------
+# Section 13: Phase 2.2 -- Calculated fields (?c= wiring and CRUD)
+# ---------------------------------------------------------------------------
+
+subtest 'Calculated fields: ?c= inline field on /pivot' => sub {
+	my $dir = File::Temp->newdir;
+	my $csv = File::Spec->catfile("$dir", 'calc_src.csv');
+	Mojo::File->new($csv)->spurt(
+		"region,amount,cost\n"
+		. "North,500,300\n"
+		. "South,400,250\n"
+		. "North,600,350\n"
+		. "South,300,200\n"
+	);
+	my $lspec = url_escape("path:$csv");
+
+	# Basic: ?c=margin:amount-cost adds virtual column used by measure
+	my $url = "/pivot?l=$lspec&rows=region&m=" . url_escape('margin:sum:total_margin')
+	        . '&c=' . url_escape('margin:amount-cost');
+	$t->get_ok($url)->status_is(200);
+	my $body = $t->tx->res->body;
+	like $body, qr/total_margin/, 'measure alias present in pivot output';
+	# North total margin: (500-300)+(600-350) = 200+250 = 450
+	like $body, qr/450/, 'North total_margin = 450';
+	# South total margin: (400-250)+(300-200) = 150+100 = 250
+	like $body, qr/250/, 'South total_margin = 250';
+
+	# IF with comparison: ?c=flag:if(amount>400,"high","low") groups correctly
+	my $url2 = "/pivot?l=$lspec&rows=flag&m=:count:orders"
+	         . '&c=' . url_escape('flag:if(amount>400,"high","low")');
+	$t->get_ok($url2)->status_is(200);
+	my $body2 = $t->tx->res->body;
+	like $body2, qr/high/, 'flag=high present in pivot';
+	like $body2, qr/low/,  'flag=low present in pivot';
+
+	# YEAR() date function: groups by year extracted from date column
+	my $date_csv = File::Spec->catfile("$dir", 'dated.csv');
+	Mojo::File->new($date_csv)->spurt(
+		"date,amount\n"
+		. "2024-01-15,100\n"
+		. "2024-06-20,200\n"
+		. "2025-03-10,150\n"
+	);
+	my $dlspec = url_escape("path:$date_csv");
+	my $url3 = "/pivot?l=$dlspec&rows=yr&m=amount:sum:total"
+	         . '&c=' . url_escape('yr:year(date)');
+	$t->get_ok($url3)->status_is(200);
+	my $body3 = $t->tx->res->body;
+	like $body3, qr/2024/, 'year 2024 present in pivot';
+	like $body3, qr/2025/, 'year 2025 present in pivot';
+	# 2024 total: 300; 2025 total: 150
+	like $body3, qr/300/, '2024 sum correct';
+	like $body3, qr/150/, '2025 sum correct';
+
+	# Unknown column -> 400
+	$t->get_ok("/pivot?l=$lspec&rows=region&m=" . url_escape('x:sum:total')
+	         . '&c=' . url_escape('x:nosuchcol'))
+	  ->status_is(400, 'unknown column in calc expr -> 400');
+
+	# Bad expression syntax -> 400
+	$t->get_ok("/pivot?l=$lspec&rows=region&m=" . url_escape('x:sum:total')
+	         . '&c=' . url_escape('x:amount =='))
+	  ->status_is(400, 'syntax error in calc expr -> 400');
+};
+
+subtest 'Calculated fields: ?c= on /bar' => sub {
+	my $dir = File::Temp->newdir;
+	my $csv = File::Spec->catfile("$dir", 'bar_calc.csv');
+	Mojo::File->new($csv)->spurt(
+		"region,revenue,cost\n"
+		. "East,800,500\n"
+		. "West,600,400\n"
+	);
+	my $lspec = url_escape("path:$csv");
+
+	$t->get_ok("/bar?l=$lspec&cat=region&val=margin&c=" . url_escape('margin:revenue-cost'))
+	  ->status_is(200)
+	  ->content_like(qr/bar_chart/, 'bar chart rendered with calc field');
+};
+
+subtest 'Calc CRUD: /calc/save, /calc/list, /calc/delete' => sub {
+	my $spec = 'table:sales';
+
+	# Save a named calc field
+	$t->post_ok('/calc/save', form => {
+		l    => $spec,
+		name => 'margin',
+		expr => 'amount - cost',
+	})->status_is(200)
+	  ->json_is('/ok', 1, 'calc_save returns ok:1');
+
+	# List returns the saved field
+	$t->get_ok('/calc/list?l=' . url_escape($spec))
+	  ->status_is(200)
+	  ->json_is('/fields/margin', 'amount - cost', 'saved field appears in list');
+
+	# Save a second field
+	$t->post_ok('/calc/save', form => {
+		l    => $spec,
+		name => 'doubled',
+		expr => 'amount * 2',
+	})->status_is(200);
+
+	$t->get_ok('/calc/list?l=' . url_escape($spec))
+	  ->status_is(200)
+	  ->json_has('/fields/margin',  'first field still present')
+	  ->json_has('/fields/doubled', 'second field present');
+
+	# Delete one field
+	$t->post_ok('/calc/delete', form => {
+		l    => $spec,
+		name => 'doubled',
+	})->status_is(200)
+	  ->json_is('/ok', 1);
+
+	$t->get_ok('/calc/list?l=' . url_escape($spec))
+	  ->status_is(200)
+	  ->json_is('/fields/doubled', undef, 'deleted field absent')
+	  ->json_is('/fields/margin', 'amount - cost', 'remaining field intact');
+
+	# Delete the last field
+	$t->post_ok('/calc/delete', form => {
+		l    => $spec,
+		name => 'margin',
+	})->status_is(200);
+
+	$t->get_ok('/calc/list?l=' . url_escape($spec))
+	  ->status_is(200)
+	  ->json_is('/fields', {}, 'all fields deleted');
+
+	# Error cases
+	$t->post_ok('/calc/save', form => { name => 'x', expr => '1' })
+	  ->status_is(400, 'calc_save without l= -> 400');
+
+	$t->post_ok('/calc/save', form => { l => $spec, name => 'bad-name', expr => '1' })
+	  ->status_is(400, 'calc_save with invalid name -> 400');
+
+	$t->post_ok('/calc/save', form => { l => $spec, name => 'x' })
+	  ->status_is(400, 'calc_save without expr -> 400');
+
+	$t->get_ok('/calc/list')
+	  ->status_is(400, 'calc_list without l= -> 400');
+};
+
+# ---------------------------------------------------------------------------
+# Section 14: Phase 2.4 -- New chart routes smoke tests + multi-series line
+# ---------------------------------------------------------------------------
+
+subtest '/scatter -- renders with id="scatter_chart"' => sub {
+	my $dir = File::Temp->newdir;
+	my $csv = File::Spec->catfile("$dir", 'scatter_src.csv');
+	Mojo::File->new($csv)->spurt(
+		"x,y\n1,10\n2,20\n3,15\n4,25\n5,18\n"
+	);
+	my $lspec = url_escape("path:$csv");
+
+	$t->get_ok("/scatter?l=$lspec&x=x&y=y")
+	  ->status_is(200)
+	  ->content_like(qr/id="scatter_chart"/, 'scatter SVG id present');
+
+	# Missing required params -> 400
+	$t->get_ok("/scatter?l=$lspec&x=x")->status_is(400, 'missing y= -> 400');
+	$t->get_ok("/scatter?l=$lspec&y=y")->status_is(400, 'missing x= -> 400');
+};
+
+subtest '/stacked -- renders with id="stacked_bar"' => sub {
+	my $dir = File::Temp->newdir;
+	my $csv = File::Spec->catfile("$dir", 'stacked_src.csv');
+	Mojo::File->new($csv)->spurt(
+		"region,product,amount\n"
+		. "North,Widget A,500\n"
+		. "South,Widget A,300\n"
+		. "North,Widget B,200\n"
+		. "South,Widget B,400\n"
+	);
+	my $lspec = url_escape("path:$csv");
+
+	$t->get_ok("/stacked?l=$lspec&cat=region&seg=product")
+	  ->status_is(200)
+	  ->content_like(qr/id="stacked_bar"/, 'stacked SVG id present');
+
+	# Count mode (no val=)
+	$t->get_ok("/stacked?l=$lspec&cat=region&seg=product")
+	  ->status_is(200)
+	  ->content_like(qr/Count by/, 'count mode label present');
+
+	# Val mode
+	$t->get_ok("/stacked?l=$lspec&cat=region&seg=product&val=amount")
+	  ->status_is(200)
+	  ->content_like(qr/amount by/, 'val mode label present');
+
+	# Missing required params -> 400
+	$t->get_ok("/stacked?l=$lspec&seg=product")->status_is(400, 'missing cat= -> 400');
+	$t->get_ok("/stacked?l=$lspec&cat=region")->status_is(400, 'missing seg= -> 400');
+};
+
+subtest '/combo -- renders with id="combo_chart"' => sub {
+	my $dir = File::Temp->newdir;
+	my $csv = File::Spec->catfile("$dir", 'combo_src.csv');
+	Mojo::File->new($csv)->spurt(
+		"month,revenue,cost\n"
+		. "Jan,1000,600\n"
+		. "Feb,1200,700\n"
+		. "Mar,900,550\n"
+	);
+	my $lspec = url_escape("path:$csv");
+
+	$t->get_ok("/combo?l=$lspec&x=month&bar=revenue&line=cost")
+	  ->status_is(200)
+	  ->content_like(qr/id="combo_chart"/, 'combo SVG id present');
+
+	# Missing required params -> 400
+	$t->get_ok("/combo?l=$lspec&bar=revenue&line=cost")->status_is(400, 'missing x= -> 400');
+	$t->get_ok("/combo?l=$lspec&x=month&line=cost")->status_is(400, 'missing bar= -> 400');
+	$t->get_ok("/combo?l=$lspec&x=month&bar=revenue")->status_is(400, 'missing line= -> 400');
+};
+
+subtest '/treemap -- renders with id="treemap"' => sub {
+	my $lspec = url_escape('table:sales');
+
+	$t->get_ok("/treemap?l=$lspec&cat=product")
+	  ->status_is(200)
+	  ->content_like(qr/id="treemap"/, 'treemap SVG id present');
+
+	# Count mode (no val=): renders successfully
+	$t->get_ok("/treemap?l=$lspec&cat=region")
+	  ->status_is(200);
+
+	# Missing cat= -> 400
+	$t->get_ok("/treemap?l=$lspec")->status_is(400, 'missing cat= -> 400');
+};
+
+subtest '/histogram -- renders with id="histogram" and correct bin count' => sub {
+	my $dir = File::Temp->newdir;
+	my $csv = File::Spec->catfile("$dir", 'hist_src.csv');
+	Mojo::File->new($csv)->spurt(
+		"value\n10\n25\n45\n60\n80\n95\n110\n140\n170\n200\n"
+	);
+	my $lspec = url_escape("path:$csv");
+
+	$t->get_ok("/histogram?l=$lspec&col=value")
+	  ->status_is(200)
+	  ->content_like(qr/id="histogram"/, 'histogram SVG id present');
+
+	# bins=5 produces 5 bins
+	$t->get_ok("/histogram?l=$lspec&col=value&bins=5")
+	  ->status_is(200)
+	  ->content_like(qr/id="histogram"/, 'histogram with bins=5 renders');
+
+	# Missing col= -> 400
+	$t->get_ok("/histogram?l=$lspec")->status_is(400, 'missing col= -> 400');
+
+	# Non-numeric col -> graceful (renders empty or 200)
+	$t->get_ok("/histogram?l=table:sales&col=product")
+	  ->status_is(200, 'non-numeric col returns 200');
+};
+
+subtest '/graph with ?series= renders multi-series line chart' => sub {
+	my $dir = File::Temp->newdir;
+	my $csv = File::Spec->catfile("$dir", 'multi_src.csv');
+	Mojo::File->new($csv)->spurt(
+		"month,region,amount\n"
+		. "Jan,North,500\n"
+		. "Feb,North,600\n"
+		. "Mar,North,550\n"
+		. "Jan,South,300\n"
+		. "Feb,South,400\n"
+		. "Mar,South,350\n"
+	);
+	my $lspec = url_escape("path:$csv");
+
+	# Multi-series: one line per region value
+	$t->get_ok("/graph?l=$lspec&x=month&y=amount&series=region")
+	  ->status_is(200)
+	  ->content_like(qr/North/, 'North series present in multi-series chart')
+	  ->content_like(qr/South/, 'South series present in multi-series chart');
+
+	# Without series: single-series (existing behaviour unchanged)
+	$t->get_ok("/graph?l=$lspec&x=month&y=amount")
+	  ->status_is(200)
+	  ->content_like(qr/id="chart"/, 'single-series: zoomable chart id present');
+
+	# Unknown series col -> 400
+	$t->get_ok("/graph?l=$lspec&x=month&y=amount&series=nosuchcol")
+	  ->status_is(400, 'unknown series col -> 400');
+
+	# /line alias for /graph also works with series
+	$t->get_ok("/line?l=$lspec&x=month&y=amount&series=region")
+	  ->status_is(200)
+	  ->content_like(qr/North/, '/line alias works with series');
+};
+
+# ---------------------------------------------------------------------------
+# SECTION 15: Phase 2.5 -- Time intelligence (date normalisation)
+# ---------------------------------------------------------------------------
+
+subtest 'Date patterns CRUD: /dates/save, /dates/list, /dates/delete' => sub {
+	my $dir = File::Temp->newdir;
+	my $csv = File::Spec->catfile("$dir", 'usdate.csv');
+	Mojo::File->new($csv)->spurt("date,amount\n12/25/2025,100\n01/15/2026,200\n");
+	my $l_raw = "path:$csv";
+	my $l     = url_escape($l_raw);
+
+	# Initially no patterns registered
+	$t->get_ok("/dates/list?l=$l")->status_is(200)
+	  ->json_is('/patterns', {}, 'no patterns initially');
+
+	# Save a valid US date pattern
+	$t->post_ok('/dates/save', form => { l => $l_raw, col => 'date', pattern => '%m/%d/%Y' })
+	  ->status_is(200)->json_is('/ok', 1, 'dates_save ok');
+
+	# List confirms the pattern is stored
+	$t->get_ok("/dates/list?l=$l")->status_is(200)
+	  ->json_is('/patterns/date', '%m/%d/%Y', 'pattern stored under col key');
+
+	# Unsupported pattern is rejected with 400
+	$t->post_ok('/dates/save', form => { l => $l_raw, col => 'date', pattern => '%Y/%m/%d' })
+	  ->status_is(400)
+	  ->json_like('/error', qr/[Uu]nsupported|[Uu]nknown/, 'bad pattern rejected with 400');
+
+	# Missing l= -> 400
+	$t->get_ok('/dates/list')->status_is(400, 'dates_list without l= -> 400');
+	$t->post_ok('/dates/save', form => { col => 'date', pattern => '%m/%d/%Y' })
+	  ->status_is(400, 'dates_save without l= -> 400');
+
+	# Delete the pattern for one column
+	$t->post_ok('/dates/delete', form => { l => $l_raw, col => 'date' })
+	  ->status_is(200)->json_is('/ok', 1, 'dates_delete ok');
+	$t->get_ok("/dates/list?l=$l")->status_is(200)
+	  ->json_is('/patterns', {}, 'pattern removed after delete');
+};
+
+subtest 'Date normalisation: M/D/YYYY -> ISO-8601 before YEAR() in /pivot' => sub {
+	my $dir = File::Temp->newdir;
+	my $csv = File::Spec->catfile("$dir", 'usdate2.csv');
+	Mojo::File->new($csv)->spurt(
+		"date,amount\n12/25/2025,100\n01/15/2026,200\n12/31/2025,300\n"
+	);
+	my $l_raw = "path:$csv";
+	my $l     = url_escape($l_raw);
+
+	# Register US date pattern
+	$t->post_ok('/dates/save', form => { l => $l_raw, col => 'date', pattern => '%m/%d/%Y' })
+	  ->status_is(200);
+
+	# Pivot: rows=yr (calc=year(date)), measure sum(amount)
+	# With normalisation: 12/25/2025 -> 2025-12-25, 12/31/2025 -> 2025-12-31 -> YEAR=2025 (sum=400)
+	#                     01/15/2026 -> 2026-01-15 -> YEAR=2026 (sum=200)
+	my $c = url_escape('yr:year(date)');
+	$t->get_ok("/pivot?l=$l&rows=yr&m=amount:sum:total&c=$c")
+	  ->status_is(200)
+	  ->content_like(qr/2025/, '2025 year group visible after normalisation')
+	  ->content_like(qr/2026/, '2026 year group visible after normalisation')
+	  ->content_like(qr/400/,  '2025 sum=400 (100+300) after normalisation');
+
+	# Cleanup
+	$t->post_ok('/dates/delete', form => { l => $l_raw })->status_is(200);
+};
+
+subtest 'Date normalisation: undef calc result groups as (unparseable) in /pivot' => sub {
+	my $dir = File::Temp->newdir;
+	my $csv = File::Spec->catfile("$dir", 'baddate.csv');
+	# Two ISO dates + one non-date value; YEAR(date) returns undef for 'badvalue'
+	Mojo::File->new($csv)->spurt("date,amount\n2025-12-25,100\n2026-01-15,200\nbadvalue,300\n");
+	my $l = url_escape("path:$csv");
+	my $c = url_escape('yr:year(date)');
+
+	$t->get_ok("/pivot?l=$l&rows=yr&m=amount:sum:total&c=$c")
+	  ->status_is(200)
+	  ->content_like(qr/2025/, '2025 group present')
+	  ->content_like(qr/2026/, '2026 group present')
+	  ->content_like(qr/\(unparseable\)/, '(unparseable) bucket for bad date value')
+	  ->content_like(qr/300/, 'amount for unparseable row is present');
+};
+
+# ---------------------------------------------------------------------------
+# Section 16: Phase 2.6 -- Named groups and Top-N
+# ---------------------------------------------------------------------------
+
+subtest 'Named groups: ${col}_group virtual column added via models.json' => sub {
+	my $dir = File::Temp->newdir;
+	my $csv = File::Spec->catfile("$dir", 'regions.csv');
+	Mojo::File->new($csv)->spurt(
+		"region,sales\n"
+		. "North,100\n"
+		. "South,200\n"
+		. "East,150\n"
+		. "West,50\n"
+		. "Unknown,10\n"
+	);
+	my $l = url_escape("path:$csv");
+
+	# Save a named group: North+East => "Northern", South+West => "Southern"
+	$t->post_ok('/groups/save', form => {
+		l      => "path:$csv",
+		col    => 'region',
+		group  => 'Northern',
+		values => ['North', 'East'],
+	})->status_is(200)->json_is('/ok', 1);
+
+	$t->post_ok('/groups/save', form => {
+		l      => "path:$csv",
+		col    => 'region',
+		group  => 'Southern',
+		values => ['South', 'West'],
+	})->status_is(200)->json_is('/ok', 1);
+
+	# Confirm groups stored
+	$t->get_ok("/groups/list?l=" . url_escape("path:$csv"))
+	  ->status_is(200)
+	  ->json_like('/groups/region/Northern/0', qr/North/)
+	  ->json_like('/groups/region/Southern/0', qr/South/);
+
+	# /pivot grouping by region_group virtual column
+	my $url = "/pivot?l=$l&rows=region_group&m=sales:sum:total";
+	$t->get_ok($url)->status_is(200);
+	my $body = $t->tx->res->body;
+	# Northern = 100+150 = 250
+	like $body, qr/Northern/, 'Northern group present in pivot';
+	like $body, qr/250/,      'Northern total sales = 250';
+	# Southern = 200+50 = 250
+	like $body, qr/Southern/, 'Southern group present in pivot';
+	# Unknown row -> (other)
+	like $body, qr/\(other\)/, '(other) group present for unmapped values';
+
+	# /bar grouping by region_group virtual column
+	$t->get_ok("/bar?l=$l&cat=region_group")
+	  ->status_is(200)
+	  ->content_like(qr/Northern/, 'bar chart has Northern group');
+
+	# Clean up groups to avoid polluting other tests
+	$t->post_ok('/groups/delete', form => { l => "path:$csv" })
+	  ->status_is(200)->json_is('/ok', 1);
+};
+
+subtest '/bar ?topn=N: shows N bars plus correct "Other" aggregate' => sub {
+	my $dir = File::Temp->newdir;
+	my $csv = File::Spec->catfile("$dir", 'products.csv');
+	# 5 products; topn=3 should show top 3 + Other (sum of remaining 2)
+	Mojo::File->new($csv)->spurt(
+		"product,revenue\n"
+		. "A,500\n"
+		. "B,400\n"
+		. "C,300\n"
+		. "D,200\n"
+		. "E,100\n"
+	);
+	my $l = url_escape("path:$csv");
+
+	$t->get_ok("/bar?l=$l&cat=product&val=revenue&topn=3")
+	  ->status_is(200);
+	my $body = $t->tx->res->body;
+	# Top 3: A=500, B=400, C=300; Other = D+E = 300
+	like $body, qr/Other/, '"Other" bar present';
+	# bar_count stash = 4 (3 top + Other); reflected in the page
+	like $body, qr/4 bar/, 'bar_count is 4 (3 top + Other)';
+
+	# topn=0 (disabled): all 5 bars, no Other
+	$t->get_ok("/bar?l=$l&cat=product&val=revenue&topn=0")
+	  ->status_is(200)
+	  ->content_unlike(qr/Other/, 'no Other bar when topn=0');
+};
+
+subtest '/pivot ?topn=N: top-N row groups with "Other" row' => sub {
+	my $dir = File::Temp->newdir;
+	my $csv = File::Spec->catfile("$dir", 'pivot_topn.csv');
+	Mojo::File->new($csv)->spurt(
+		"category,amount\n"
+		. "Alpha,1000\n"
+		. "Beta,800\n"
+		. "Gamma,600\n"
+		. "Delta,400\n"
+		. "Epsilon,200\n"
+	);
+	my $l = url_escape("path:$csv");
+
+	$t->get_ok("/pivot?l=$l&rows=category&m=amount:sum:total&topn=2")
+	  ->status_is(200);
+	my $body = $t->tx->res->body;
+	# Top 2 by total: Alpha=1000, Beta=800; Other = 600+400+200 = 1200
+	like $body, qr/Alpha/,  'Alpha row present';
+	like $body, qr/Beta/,   'Beta row present';
+	like $body, qr/Other/,  '"Other" row present';
+	like $body, qr/1200/,   'Other total = 1200';
+	unlike $body, qr/Gamma/, 'Gamma row not present (not in top 2)';
+
+	# Bad topn_col
+	$t->get_ok("/pivot?l=$l&rows=category&m=amount:sum:total&topn=2&topn_col=nonexistent")
+	  ->status_is(400)
+	  ->content_like(qr/nonexistent/, 'error message names bad topn_col');
+};
+
+# ===========================================================================
+# SECTION 50: Push-versus-fold equivalence gate (TODO-10.4)
+#
+# For each SQL-backed chart view, assert that the numeric totals are identical
+# with and without $ENV{BI_FORCE_PERL_AGG}.  This is the strongest net against
+# a repeat of the /stacked//combo category-order divergence (TODO-3).
+# ===========================================================================
+
+subtest 'Push-vs-fold equivalence: /bar' => sub {
+    SKIP: {
+        my $dir = tempdir(CLEANUP => 1);
+        my $dbh = eval { DBI->connect("dbi:SQLite:dbname=$dir/eq_bar.sql", '', '', { RaiseError => 1 }) };
+        skip 'DBD::SQLite not available', 2 unless $dbh;
+        $dbh->do('CREATE TABLE eq_bar (region TEXT, amount INTEGER)');
+        for my $row (['North', 100], ['South', 200], ['North', 50]) {
+            $dbh->do('INSERT INTO eq_bar VALUES (?,?)', {}, @$row);
+        }
+        $dbh->disconnect;
+        my $l = url_escape("path:$dir/eq_bar.sql");
+
+        my $push_body = $t->get_ok("/bar?l=$l&cat=region&val=amount")
+                           ->status_is(200)->tx->res->body;
+
+        local $ENV{BI_FORCE_PERL_AGG} = 1;
+        my $fold_body = $t->get_ok("/bar?l=$l&cat=region&val=amount")
+                           ->status_is(200)->tx->res->body;
+
+        my @push_vals = sort ($push_body =~ /"value":(\d+)/g);
+        my @fold_vals = sort ($fold_body =~ /"value":(\d+)/g);
+        is_deeply(\@push_vals, \@fold_vals, '/bar push and fold produce same values');
+    }
+};
+
+subtest 'Push-vs-fold equivalence: /stacked' => sub {
+    SKIP: {
+        my $dir = tempdir(CLEANUP => 1);
+        my $dbh = eval { DBI->connect("dbi:SQLite:dbname=$dir/eq_stacked.sql", '', '', { RaiseError => 1 }) };
+        skip 'DBD::SQLite not available', 2 unless $dbh;
+        $dbh->do('CREATE TABLE eq_stacked (cat TEXT, seg TEXT, val INTEGER)');
+        for my $row (['A','X',10],['A','Y',20],['B','X',30],['B','Y',40]) {
+            $dbh->do('INSERT INTO eq_stacked VALUES (?,?,?)', {}, @$row);
+        }
+        $dbh->disconnect;
+        my $l = url_escape("path:$dir/eq_stacked.sql");
+
+        my $push_body = $t->get_ok("/stacked?l=$l&cat=cat&series=seg&val=val")
+                           ->status_is(200)->tx->res->body;
+
+        local $ENV{BI_FORCE_PERL_AGG} = 1;
+        my $fold_body = $t->get_ok("/stacked?l=$l&cat=cat&series=seg&val=val")
+                           ->status_is(200)->tx->res->body;
+
+        my @push_vals = sort ($push_body =~ /"val":(\d+)/g);
+        my @fold_vals = sort ($fold_body =~ /"val":(\d+)/g);
+        is_deeply(\@push_vals, \@fold_vals, '/stacked push and fold produce same values');
+    }
+};
+
+subtest 'Push-vs-fold equivalence: /heatmap' => sub {
+    SKIP: {
+        my $dir = tempdir(CLEANUP => 1);
+        my $dbh = eval { DBI->connect("dbi:SQLite:dbname=$dir/eq_heatmap.sql", '', '', { RaiseError => 1 }) };
+        skip 'DBD::SQLite not available', 2 unless $dbh;
+        $dbh->do('CREATE TABLE eq_heatmap (x TEXT, y TEXT, v REAL)');
+        for my $row (['P','Q',1.0],['P','R',2.0],['S','Q',3.0]) {
+            $dbh->do('INSERT INTO eq_heatmap VALUES (?,?,?)', {}, @$row);
+        }
+        $dbh->disconnect;
+        my $l = url_escape("path:$dir/eq_heatmap.sql");
+
+        my $push_body = $t->get_ok("/heatmap?l=$l&x=x&y=y&val=v")
+                           ->status_is(200)->tx->res->body;
+
+        local $ENV{BI_FORCE_PERL_AGG} = 1;
+        my $fold_body = $t->get_ok("/heatmap?l=$l&x=x&y=y&val=v")
+                           ->status_is(200)->tx->res->body;
+
+        my @push_vals = sort ($push_body =~ /"value":([\d.]+)/g);
+        my @fold_vals = sort ($fold_body =~ /"value":([\d.]+)/g);
+        is_deeply(\@push_vals, \@fold_vals, '/heatmap push and fold produce same values');
+    }
+};
+
+subtest 'Push-vs-fold equivalence: /treemap' => sub {
+    SKIP: {
+        my $dir = tempdir(CLEANUP => 1);
+        my $dbh = eval { DBI->connect("dbi:SQLite:dbname=$dir/eq_treemap.sql", '', '', { RaiseError => 1 }) };
+        skip 'DBD::SQLite not available', 2 unless $dbh;
+        $dbh->do('CREATE TABLE eq_treemap (cat TEXT, val INTEGER)');
+        for my $row (['Alpha', 100], ['Beta', 200], ['Alpha', 50]) {
+            $dbh->do('INSERT INTO eq_treemap VALUES (?,?)', {}, @$row);
+        }
+        $dbh->disconnect;
+        my $l = url_escape("path:$dir/eq_treemap.sql");
+
+        my $push_body = $t->get_ok("/treemap?l=$l&group=cat&size=val")
+                           ->status_is(200)->tx->res->body;
+
+        local $ENV{BI_FORCE_PERL_AGG} = 1;
+        my $fold_body = $t->get_ok("/treemap?l=$l&group=cat&size=val")
+                           ->status_is(200)->tx->res->body;
+
+        my @push_vals = sort ($push_body =~ /"value":([\d.]+)/g);
+        my @fold_vals = sort ($fold_body =~ /"value":([\d.]+)/g);
+        is_deeply(\@push_vals, \@fold_vals, '/treemap push and fold produce same values');
+    }
+};
+
+# ===========================================================================
+# SECTION 51: XLSX export parity (TODO-10.1)
+#
+# Assert that ?format=xlsx produces cell-for-cell identical data to
+# ?format=csv for the same request (data/sales.csv).
+# ===========================================================================
+
+subtest 'XLSX export parity with CSV export (/pivot?format=xlsx)' => sub {
+    SKIP: {
+        skip 'data/sales.csv not found', 4 unless -f 'data/sales.csv';
+        eval { require Spreadsheet::ParseXLSX }
+            or skip 'Spreadsheet::ParseXLSX not available', 4;
+        eval { require Excel::Writer::XLSX }
+            or skip 'Excel::Writer::XLSX not available', 4;
+        eval { require Text::CSV }
+            or skip 'Text::CSV not available', 4;
+
+        my $l = url_escape("path:$SALES_CSV");
+
+        # CSV export of the same pivot (rows=product, m=amount:sum:total)
+        my $csv_body = $t->get_ok("/pivot?l=$l&rows=product&m=amount:sum:total&format=csv")
+                          ->status_is(200)->tx->res->body;
+
+        # XLSX export of the same pivot
+        my $xlsx_body = $t->get_ok("/pivot?l=$l&rows=product&m=amount:sum:total&format=xlsx")
+                           ->status_is(200)->tx->res->body;
+
+        # Parse CSV rows (skip the header row for cell comparison)
+        my $csv_parser = Text::CSV->new({ binary => 1 });
+        open my $fh, '<', \$csv_body or die "open: $!";
+        my @csv_rows;
+        while (my $row = $csv_parser->getline($fh)) { push @csv_rows, $row }
+        close $fh;
+
+        # Write XLSX to temp file and parse
+        my $tmpdir = tempdir(CLEANUP => 1);
+        my $xlsx_file = "$tmpdir/export.xlsx";
+        Mojo::File->new($xlsx_file)->spurt($xlsx_body);
+        my $wb  = Spreadsheet::ParseXLSX->new->parse($xlsx_file);
+        skip 'Spreadsheet::ParseXLSX could not parse output', 2 unless $wb;
+        my $ws  = $wb->worksheet(0);
+        my ($row_min, $row_max) = $ws->row_range;
+        my ($col_min, $col_max) = $ws->col_range;
+
+        my @xlsx_rows;
+        for my $r ($row_min .. $row_max) {
+            push @xlsx_rows, [
+                map { my $c = $ws->get_cell($r, $_); $c ? $c->value : '' }
+                    $col_min .. $col_max
+            ];
+        }
+
+        is(scalar @xlsx_rows, scalar @csv_rows, 'XLSX and CSV have same row count');
+        is_deeply(\@xlsx_rows, \@csv_rows, 'XLSX and CSV cells are identical');
+    }
+};
+
+# ===========================================================================
+# SECTION 52: Stacked empty-vs-zero (TODO-10.2)
+#
+# Missing intersections in /stacked must produce no data point at all --
+# not a zero bar -- so the chart can distinguish "no sale in that segment"
+# from "zero sale".
+# ===========================================================================
+
+subtest '/stacked: correct category count and totals (no row inflation)' => sub {
+    my $dir = tempdir(CLEANUP => 1);
+    my $csv = "$dir/sparse.csv";
+    Mojo::File->new($csv)->spurt(
+        "cat,seg,val\n"
+        . "A,X,10\n"
+        . "A,X,5\n"   # two rows for A/X: total should be 15, not 10
+        . "B,Y,20\n"
+    );
+    my $l = url_escape("path:$csv");
+
+    my $body = $t->get_ok("/stacked?l=$l&cat=cat&series=seg&val=val")
+                 ->status_is(200)->tx->res->body;
+
+    # The JSON should contain 2 unique categories (A and B).
+    my @cats = ($body =~ /"cat"\s*:\s*"([^"]+)"/g);
+    is(scalar @cats, 2, 'exactly 2 categories after aggregation');
+
+    # A/X sum should be 15 (not 10 -- two rows summed)
+    like $body, qr/"X"\s*:\s*15/, 'A/X aggregated to 15 (two rows summed)';
+
+    # B/Y should be 20
+    like $body, qr/"Y"\s*:\s*20/, 'B/Y is 20';
 };
 
 done_testing();

@@ -13,7 +13,13 @@ t/cgroups-cache-process.t
 t/cgroups-mapping.t
 t/cgroups-new.t
 t/cgroups-proc-cgroup.t
+t/cgroups-route-get-if.t
 t/cgroups-run.t
+t/freebsd-new.t
+t/freebsd-run-errors.t
+t/freebsd-run.t
+t/freebsd-usable.t
+t/lock.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

@@ -11,9 +11,14 @@ use Game::Schnapsen::Bot ();
 use Game::Schnapsen::Card qw(rank_of suit_of points_of name_of id_of long_name_of);
 use Game::Schnapsen::Declare qw(marriages_in);
 use Game::Schnapsen::Variant ();
+use Game::Terminal::Kit::Keys ();
+use Game::Terminal::Kit::Log ();
+use Game::Terminal::Kit::Picker ();
+use Game::Terminal::Kit::Run ();
+use Game::Terminal::Kit::Screen ();
 use Getopt::Long ();
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 our %FRAME = (
     plain => {
@@ -53,15 +58,16 @@ has seat   => (is => 'ro', isa => Str);
 has variant => (is => 'ro', isa => Str);
 has ascii  => (is => 'ro', isa => Any);
 has colour => (is => 'ro', isa => Any);
-has _painting => (is => 'rw', isa => Any);
 
 has marks => (is => 'rw', isa => HashRef, default => sub { {} });
-
-has raw => (is => 'rw', isa => Any, default => 0);
 
 has keysource => (is => 'rw', isa => Any);
 
 has pending => (is => 'rw', isa => ArrayRef, default => sub { [] });
+
+has keyboard => (is => 'rw', isa => Any);
+has screen   => (is => 'rw', isa => Any);
+has log      => (is => 'rw', isa => Any);
 
 has quit => (is => 'rw', isa => Any, default => 0);
 
@@ -69,18 +75,7 @@ has _picking => (is => 'rw', isa => Any, init_arg => 'picking');
 
 has _staring => (is => 'rw', isa => Any, init_arg => 'interactive');
 
-our %SEQUENCE = (
-    'A' => 'up', 'B' => 'down', 'C' => 'right', 'D' => 'left',
-    'H' => 'home', 'F' => 'end',
-    '1~' => 'home', '4~' => 'end', '5~' => 'page_up', '6~' => 'page_down',
-    '7~' => 'home', '8~' => 'end',
-);
-
-our %CONTROL = (
-    "\r" => 'enter', "\n" => 'enter', "\t" => 'tab',
-    "\x7f" => 'backspace', "\x08" => 'backspace',
-    "\x03" => 'interrupt', "\x04" => 'eof',
-);
+has _framed => (is => 'rw', isa => Any);
 
 sub _out     { return $_[0]->out || \*STDOUT }
 sub _in      { return $_[0]->in  || \*STDIN }
@@ -93,10 +88,21 @@ sub other { return $_[0] eq 'p1' ? 'p2' : 'p1' }
 
 sub BUILD {
     my ($self) = @_;
-    binmode $self->_out, ':encoding(UTF-8)' unless $self->_ascii;
-    my $previous = select $self->_out;
-    $| = 1;
-    select $previous;
+    my $out = $self->_out;
+    $self->keyboard(Game::Terminal::Kit::Keys->new(
+        in      => $self->_in,
+        pending => $self->pending,
+        (defined $self->keysource ? (keysource => $self->keysource) : ()),
+    )) unless $self->keyboard;
+    $self->screen(Game::Terminal::Kit::Screen->new(
+        out         => $out,
+        interactive => $self->interactive,
+        colour      => defined $self->colour ? ($self->colour ? 1 : 0)
+            : ((eval { -t $out } && !Game::Terminal::Kit::Screen::no_colour()) ? 1 : 0),
+        ascii       => $self->_ascii,
+    )) unless $self->screen;
+    $self->log(Game::Terminal::Kit::Log->new(keep => 12)) unless $self->log;
+    $self->screen->utf8->flush_on;
 
     die 'Game::Schnapsen::Terminal: the level is 1 to '
         . Game::Schnapsen::Bot->levels . ', not ' . $self->_level
@@ -106,23 +112,21 @@ sub BUILD {
     return $self;
 }
 
-sub _colour {
-    my ($self) = @_;
-    my $on = $self->_painting;
-    return $on if defined $on;
-    $on = defined $self->colour ? ($self->colour ? 1 : 0)
-        : ((eval { -t $self->_out } && !$ENV{NO_COLOR}) ? 1 : 0);
-    $self->_painting($on);
-    return $on;
-}
+sub _colour { return $_[0]->screen->colour ? 1 : 0 }
 
 sub paint {
     my ($self, $text, $code) = @_;
-    return $text unless $self->_colour;
-    return "\e[${code}m" . $text . "\e[0m";
+    return $self->screen->paint($text, $code);
 }
 
-sub say_to { my ($self, @what) = @_; my $fh = $self->_out; print {$fh} @what, "\n"; return }
+sub say_to { my ($self, @what) = @_; $self->screen->say(join '', @what); return }
+
+sub tell {
+    my ($self, @what) = @_;
+    $self->say_to(@what);
+    $self->log->record(join '', @what);
+    return;
+}
 
 sub ask {
     my ($self, $prompt) = @_;
@@ -312,6 +316,7 @@ sub card_named {
 
 sub options {
     my ($self, $seat) = @_;
+    return $self->_launcher_options unless ref $self;
     my $legal = $self->game->legal($seat);
     my %seen;
     my @kinds = grep { !$seen{$_}++ } map { $_->{kind} } @$legal;
@@ -347,74 +352,19 @@ sub picking {
     return $self->keys_available;
 }
 
-sub keys_available {
-    my ($self) = @_;
-    return 1 if $self->keysource;
-    return 0 unless eval { -t $self->_in };
-    return eval { require Term::ReadKey; 1 } ? 1 : 0;
-}
+sub raw { return $_[0]->keyboard->raw }
 
-sub enter_raw {
-    my ($self) = @_;
-    return $self if $self->raw;
-    if ($self->keysource) { $self->raw(1); return $self }
-    return undef unless $self->keys_available;
-    return undef unless eval { Term::ReadKey::ReadMode(3, $self->_in); 1 };
-    $self->raw(1);
-    return $self;
-}
+sub keys_available { return $_[0]->keyboard->keys_available }
 
-sub leave_raw {
-    my ($self) = @_;
-    return $self unless $self->raw;
-    eval { Term::ReadKey::ReadMode(0, $self->_in) } unless $self->keysource;
-    $self->raw(0);
-    return $self;
-}
+sub enter_raw { return $_[0]->keyboard->enter_raw ? $_[0] : undef }
 
-sub read_char {
-    my ($self, $wait) = @_;
-    my $pending = $self->pending;
-    return shift @$pending if @$pending;
-    return $self->keysource->($wait) if $self->keysource;
-    my $char = Term::ReadKey::ReadKey($wait ? 0 : -1, $self->_in);
-    return $char if defined $char || $wait;
-    select undef, undef, undef, 0.05;
-    return Term::ReadKey::ReadKey(-1, $self->_in);
-}
+sub leave_raw { $_[0]->keyboard->leave_raw; return $_[0] }
 
-sub read_key {
-    my ($self) = @_;
-    my $char = $self->read_char(1);
-    return undef unless defined $char;
-    return $CONTROL{$char} if $CONTROL{$char};
-    return $self->read_sequence if $char eq "\e";
-    return $char;
-}
-
-sub read_sequence {
-    my ($self) = @_;
-    my $opener = $self->read_char(0);
-    return 'escape' unless defined $opener;
-    unless ($opener eq '[' || $opener eq 'O') {
-        unshift @{ $self->pending }, $opener;
-        return 'escape';
-    }
-    my $tail = '';
-    while (length $tail < 8) {
-        my $char = $self->read_char(0);
-        last unless defined $char;
-        $tail .= $char;
-        last if $char =~ /[A-Za-z~]/;
-    }
-    return $SEQUENCE{$tail} || 'escape';
-}
+sub read_key { return $_[0]->keyboard->read_key }
 
 sub clear {
     my ($self) = @_;
-    return $self unless $self->interactive;
-    my $fh = $self->_out;
-    print {$fh} "\e[2J\e[3J\e[H";
+    $self->screen->clear(scrollback => 1);
     return $self;
 }
 
@@ -456,12 +406,16 @@ sub card_line {
 
 sub pick_help {
     return (
-        'left and right walk your hand, enter plays the card under the cursor.',
+        'left and right walk your hand, home and end go to its ends,',
+        'enter plays the card under the cursor.',
         'the line under it says what that card would do to the trick.',
         'x exchanges, c closes, m declares a marriage, o claims 66, d draws.',
         't goes back to typing, q stops.',
     );
 }
+
+my %WALK = map { $_ => 1 }
+    qw(left right up down tab back_tab home end page_up page_down);
 
 my %SPECIAL = (
     x => 'exchange',
@@ -485,72 +439,95 @@ sub pick_move {
     my %playable = map { $_ => 1 } @cards;
     my @order = grep { $playable{$_} } @{ $g->deal->hand_of($seat)->sorted };
 
-    my $at = 0;
-    my @notice;
+    my $picker = Game::Terminal::Kit::Picker->new(
+        items     => [@order],
+        numbered  => 0,
+        game_keys => { %SPECIAL, m => 'marriage', t => 'type', '?' => 'help' },
+        screen    => $self->screen,
+    );
+    my $log = $self->log;
 
     while (1) {
-        $self->clear;
-        my %mark = (%{ $self->marks },
-            @order ? ($order[$at] => 'cursor') : ());
-        $self->say_to($_) for @{ $self->render($seat, \%mark) };
-
-        $self->say_to('  ' . $self->card_line($seat, $order[$at])) if @order;
-        my $offers = $self->_offers(\%by);
-        $self->say_to('  ' . $offers) if length $offers;
-        $self->say_to('  ' . $_) for @notice;
-        @notice = ();
-        $self->say_to('  ' . $self->paint(
-            'arrows to choose, enter to play, ? for the keys', '90'));
+        $self->_pick_frame($seat, $picker, \%by);
 
         my $key = $self->read_key;
-        if (!defined $key || $key eq 'eof' || $key eq 'interrupt' || $key eq 'q') {
+        my ($event, $value) = $picker->step($key);
+
+        if ($event eq 'quit') {
             $self->quit(1);
             return undef;
         }
 
-        if (@order && ($key eq 'left' || $key eq 'up')) {
-            $at = ($at - 1) % @order;
-            next;
-        }
-        if (@order && ($key eq 'right' || $key eq 'down' || $key eq 'tab')) {
-            $at = ($at + 1) % @order;
-            next;
-        }
+        next if $event eq 'moved';
 
-        if (@order && ($key eq 'enter' || $key eq ' ')) {
-            my ($pick) = grep { defined $_->{card} && $_->{card} == $order[$at] }
+        if ($event eq 'chosen') {
+            my ($pick) = grep { defined $_->{card} && $_->{card} == $value }
                 @$legal;
             return $pick if $pick;
-            @notice = ('you cannot play that one');
+            $log->note('you cannot play that one');
             next;
         }
 
-        if (my $kind = $SPECIAL{$key}) {
-            return $by{$kind}[0] if $by{$kind};
-            @notice = ("you cannot $kind here");
+        if ($event ne 'key') {
+            $log->note('that key does nothing here. ? for the ones that do')
+                unless @order && $WALK{$key};
             next;
         }
 
-        if ($key eq 'm') {
-            if (my $m = $by{marriage}) {
-                return $m->[0] if @$m == 1;
-                @notice = ('which marriage? ' . join(' ',
-                    map { lc $_->{suit} } @$m) . ' as a letter');
-                my $suit = $self->read_key;
-                my ($pick) = grep { lc $_->{suit} eq lc($suit // '') } @$m;
-                return $pick if $pick;
-                @notice = ('you do not hold that marriage');
+        if ($value eq 'help') { $log->note($self->pick_help); next }
+
+        if ($value eq 'type') {
+            $self->picking(0);
+            $self->leave_raw;
+            return $self->typed_move($seat);
+        }
+
+        if ($value eq 'marriage') {
+            my $m = $by{marriage};
+            if (!$m) {
+                $log->note('you have no marriage to declare');
                 next;
             }
-            @notice = ('you have no marriage to declare');
+            return $m->[0] if @$m == 1;
+            $log->note('which marriage? ' . join(' ',
+                map { lc $_->{suit} } @$m) . ' as a letter');
+            $self->_pick_frame($seat, $picker, \%by);
+            my $suit = $self->read_key;
+            my ($pick) = grep { lc $_->{suit} eq lc($suit // '') } @$m;
+            return $pick if $pick;
+            $log->note('you do not hold that marriage');
             next;
         }
 
-        if ($key eq 't') { $self->picking(0); return $self->typed_move($seat) }
-        if ($key eq '?') { @notice = $self->pick_help; next }
-
-        @notice = ('that key does nothing here. ? for the ones that do');
+        return $by{$value}[0] if $by{$value};
+        $log->note("you cannot $value here");
     }
+}
+
+sub _pick_frame {
+    my ($self, $seat, $picker, $by) = @_;
+
+    my $card = $picker->current;
+    my $log = $self->log;
+    my %mark = (%{ $self->marks },
+        defined $card ? ($card => 'cursor') : ());
+
+    my @lines;
+    push @lines, map { s/\A\s+//r } map { @$_ } @{ $log->recent }
+        if $self->interactive;
+    push @lines, @{ $self->render($seat, \%mark) };
+    push @lines, '  ' . $self->card_line($seat, $card) if defined $card;
+    my $offers = $self->_offers($by);
+    push @lines, '  ' . $offers if length $offers;
+    push @lines, map { '  ' . $_ } @{ $log->notes };
+    push @lines, '  ' . $self->paint(
+        'arrows to choose, enter to play, ? for the keys', '90');
+
+    $self->clear unless $self->_framed;
+    $self->_framed(1);
+    $self->screen->show(\@lines);
+    $log->shown;
+    return $self;
 }
 
 sub _offers {
@@ -628,11 +605,11 @@ sub announce {
     my ($self, $event) = @_;
     my $k = $event->{kind};
     if ($k eq 'trick') {
-        return $self->say_to('  ' . ($event->{winner} eq $self->_seat ? 'You take it.'
+        return $self->tell('  ' . ($event->{winner} eq $self->_seat ? 'You take it.'
                                                                      : 'They take it.'));
     }
     if ($k eq 'deal_end') {
-        return $self->say_to($self->deal_result_line($event));
+        return $self->tell($self->deal_result_line($event));
     }
     if ($k eq 'deal') {
         return $self->say_to('');
@@ -707,14 +684,15 @@ sub play {
                                           : $self->bot_move($seat);
         last unless $move;
 
-        $self->say_to($self->describe($move, $seat)) unless $self->is_human($seat);
+        if ($self->is_human($seat)) { $self->log->forget }
+        else { $self->tell($self->describe($move, $seat)) }
 
         my $mine = $self->_seat;
         my %held = eval { map { $_ => 1 } @{ $g->deal->hand_of($mine)->sorted } };
 
         my @out = $g->apply($seat, $move);
         if (@out == 1 && ref $out[0] eq 'Game::Schnapsen::Error') {
-            $self->say_to($out[0]->message);
+            $self->tell($out[0]->message);
             next;
         }
 
@@ -778,6 +756,15 @@ stopped early, and 2 for an option the game will not take.
 USAGE
 }
 
+sub _launcher_options {
+    return [
+        { name => 'mode', type => 'enum', choices => [qw(bot hotseat watch)], help => 'you against the bot, two people, or two bots' },
+        { name => 'level', type => 'int', min => 1, max => 2, help => "the bot's strength" },
+        { name => 'seat', type => 'enum', choices => [qw(p1 p2)], help => 'your seat' },
+        { name => 'seed', type => 'str', help => 'deal the same match every time' },
+    ];
+}
+
 sub run {
     my ($class, @argv) = @_;
     my %o = (mode => 'bot', level => 2, seat => 'p1');
@@ -824,15 +811,10 @@ sub run {
         (defined $o{pick} ? (picking => $o{pick} ? 1 : 0) : ()),
     );
 
-    local @SIG{qw(INT TERM HUP)};
-    for my $sig (qw(INT TERM HUP)) {
-        $SIG{$sig} = sub { $ui->leave_raw; $SIG{$sig} = 'DEFAULT'; kill $sig, $$ };
-    }
-
-    my $game = eval { $ui->play(defined $seed ? (seed => $seed) : ()) };
-    my $died = $@;
-    $ui->leave_raw;
-    die $died if $died;
+    my $game = Game::Terminal::Kit::Run::guard(
+        sub { $ui->play(defined $seed ? (seed => $seed) : ()) },
+        $ui->keyboard, $ui->screen,
+    );
 
     return 1 unless ref $game && $game->over;
     return 0 if $o{mode} ne 'bot';
@@ -853,7 +835,7 @@ Game::Schnapsen::Terminal - the whole of the input and output
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 
@@ -908,7 +890,10 @@ make one is a slip. It should not be one keystroke away from something else.
 On a terminal with L<Term::ReadKey> installed the left and right keys walk your
 own hand, and the line under it says what the card under the cursor would do to
 the trick: whether it takes it, what the trick is worth, and what that would put
-you on. Return plays it.
+you on. Home and end go to the ends of the hand. Return plays it.
+
+What the other seat did since your last move, and how the last trick or deal
+came out, is drawn above the table for as long as you are choosing.
 
 B<The moves that are not cards keep their own keys>, C<x>, C<c>, C<m>, C<o> and
 C<d>. A card is a thing in your hand and the cursor belongs on it; exchanging,
@@ -964,7 +949,9 @@ handle.
 =head2 new
 
 Takes C<variant>, C<mode> (C<bot>, C<hotseat> or C<watch>), C<level>, C<seat>,
-C<in>, C<out>, C<ascii> and C<colour>.
+C<in>, C<out>, C<ascii> and C<colour>, and for a test C<interactive>,
+C<picking>, C<keysource> and C<pending>. Colour left unset is on when C<out> is
+a terminal and C<NO_COLOR> is unset or empty.
 
 B<C<variant> has no default.> An earlier version of this file fell back to
 Schnapsen, which is the one thing the distribution is arranged to prevent: the
@@ -977,6 +964,38 @@ without saying so. C<play> refuses instead.
 
 Runs a match to the end and returns the L<Game::Schnapsen>, or an error if it
 could not be built. Without a seed it makes one.
+
+=head2 options
+
+    my $fields = Game::Schnapsen::Terminal->options;
+
+The options a person would set before a game, in the order a launcher shows
+them. Each is a hash reference with a C<name>, a C<type> and a C<help>, and
+C<min> and C<max> or C<choices> where the type has them. A new list is
+returned each time.
+
+=over 4
+
+=item C<mode>
+
+One of C<bot>, C<hotseat>, C<watch>: you against the bot, two people, or two bots.
+
+=item C<level>
+
+A whole number from 1 to 2: the bot's strength.
+
+=item C<seat>
+
+One of C<p1>, C<p2>: your seat.
+
+=item C<seed>
+
+Text: deal the same match every time.
+
+=back
+
+Called on a terminal that is playing, with a seat, it is still the kinds of
+play that seat may make.
 
 =head2 run
 
@@ -1024,7 +1043,14 @@ characters for a sentence.
 =head2 ask, say_to, paint
 
 One line in, one line out, and colour if the output is a terminal and C<NO_COLOR>
-is unset.
+is unset or empty.
+
+=head2 tell
+
+    $terminal->tell('They closed the talon');
+
+Prints a line as L</say_to> does and keeps it in L</log>, so the picker can
+still show it after the screen is drawn again.
 
 =head2 describe, announce, deal_result_line, result_line
 
@@ -1046,8 +1072,8 @@ Set when the player stopped at the keys. L</play> checks it.
 
 =head2 interactive, clear
 
-Whether C<out> is a terminal, and the screen clear the picker does before each
-frame.
+Whether C<out> is a terminal, and the screen clear the picker does before its
+first frame. Later frames are drawn over the one before.
 
 =head2 picking
 
@@ -1055,28 +1081,39 @@ Whether a card is pointed at rather than typed. Settable, because a failed
 C<enter_raw> and the C<t> key turn it off for the rest of the match. Unset, it
 follows L</keys_available>.
 
-=head2 keys_available, enter_raw, leave_raw
+=head2 keys_available, enter_raw, leave_raw, raw
 
-Whether there is anything to read keys with, and cbreak on and off. B<cbreak
-rather than raw>, so an interrupt stays an interrupt. F<bin/schnapsen> calls
-C<leave_raw> from a signal handler and after an C<eval> round the match,
-because a program that dies in cbreak leaves the shell with no echo.
+Whether there is anything to read keys with, reading a key at a time on and
+off, and whether it is on now. An interrupt stays an interrupt while it is on.
+L</run> gives the terminal back on every way out, a signal included, because a
+program that dies reading a key at a time leaves the shell with no echo.
 
-=head2 keysource, pending, raw
+=head2 keysource, pending
 
-A coderef returning ONE character in place of L<Term::ReadKey>, characters read
-and given back, and the cbreak state. C<keysource> is what lets F<t/23> drive
-the key loop with no terminal and no L<Term::ReadKey> installed; one character
-a call, because a source handing back C<"\e[C"> whole never becomes a right
-arrow.
+Given to C<new>: a coderef returning ONE character in place of the keyboard,
+and an array reference of characters to be read before any others.
+C<keysource> is what lets F<t/23> drive the key loop with no terminal and no
+L<Term::ReadKey> installed; one character a call, because a source handing
+back C<"\e[C"> whole never becomes a right arrow.
 
-=head2 read_char, read_key, read_sequence
+=head2 keyboard, screen, log
 
-One character, one keystroke as a name, and the tail of an escape sequence.
+The L<Game::Terminal::Kit::Keys> the keys are read through, built from C<in>,
+C<keysource> and C<pending>; the L<Game::Terminal::Kit::Screen> everything is
+printed through, built from C<out>, C<interactive>, C<colour> and C<ascii>;
+and the L<Game::Terminal::Kit::Log> holding what L</tell> said since the
+player's last move and what the picker has to say about a key. Each may be
+given to C<new> instead.
+
+=head2 read_key
+
+One keystroke, as L<Game::Terminal::Kit::Keys/read_key> names it: the
+character itself, or a name such as C<left>, C<enter> or C<escape>.
 
 =head2 pick_move, pick_help
 
-The key loop and its key list. C<pick_move> returns a move for
+The key loop, over a L<Game::Terminal::Kit::Picker> holding the playable cards
+in the order the hand is drawn, and its key list. C<pick_move> returns a move for
 L<Game::Schnapsen/apply>, or undef to stop, the same contract as
 L</typed_move>.
 

@@ -5,7 +5,7 @@ use warnings;
 
 use Exporter 'import';
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 our @EXPORT_OK = qw(rank_of suit_of power_of name_of long_name_of face_of
                     id_of ids_of_suit six_of beats ranks suits CARDS);
 
@@ -104,7 +104,7 @@ Game::Durak::Card - a card is an integer, and the trump decides what beats it
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 

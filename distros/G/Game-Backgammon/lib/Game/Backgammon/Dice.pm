@@ -6,7 +6,7 @@ use warnings;
 use Digest::SHA ();
 use Exporter 'import';
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 our @EXPORT_OK = qw(roll_for opening_for);
 
 sub _faces {

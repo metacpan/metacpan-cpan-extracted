@@ -33,6 +33,8 @@ t/12-replay.t
 t/13-search-blind.t
 t/14-terminal.t
 t/15-pick.t
+t/16-options.t
+t/17-fan-order.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

@@ -124,7 +124,7 @@ subtest 'a move that wins says so before it is played' => sub {
     is(board_row($frames->[4], 1), ' 1 |(K)|   |   | A |   |   | X |', 'with the king drawn on it');
     is($t->game->result->how, 'corner', 'enter, and the game is won');
     like($frames->[5], qr/The king has reached a corner\. The defenders win\./, 'the last screen says how');
-    like($frames->[5], qr/n new game   u undo   r rules   q quit/, 'and what can be done now');
+    like($frames->[5], qr/n new game   u undo   r redo   R rules   q quit/, 'and what can be done now');
 };
 
 subtest 'a key that is not one is ignored, and not taken for enter' => sub {
@@ -183,8 +183,8 @@ subtest 'the other keys' => sub {
     like($frames->[1], qr/Press any key to go back to the board\./, 'which says how to leave it');
     like($frames->[2], qr/enter pick it up/, 'and any key goes back to the board');
 
-    ($frames, $t) = sitting([ 'r', 'x', 'q' ], human => 'both');
-    like($frames->[1], qr/Every piece moves like a rook/, 'r is the rules');
+    ($frames, $t) = sitting([ 'R', 'x', 'q' ], human => 'both');
+    like($frames->[1], qr/Every piece moves like a rook/, 'R is the rules');
 
     ($frames, $t) = sitting([ ':', 'l', 'e', 'v', 'e', 'l', ' ', '1', 'enter', 'q' ], human => 'both');
     is($t->level, 1, ': takes a typed command');

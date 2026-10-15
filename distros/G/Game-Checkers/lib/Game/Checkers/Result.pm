@@ -5,7 +5,7 @@ use warnings;
 
 use Object::Proto::Sugar -types;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 our %REASON = (
 	no_moves => 1,
@@ -80,7 +80,7 @@ Game::Checkers::Result - how a game ended
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 

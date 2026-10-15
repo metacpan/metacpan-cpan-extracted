@@ -306,4 +306,145 @@ subtest '_left_join: column collision is prefixed, not overwritten' => sub {
 	}
 };
 
+# ---------------------------------------------------------------------------
+# Partition 8: _filter_specs_to_criteria -- SQL pushdown logic
+# ---------------------------------------------------------------------------
+
+subtest '_filter_specs_to_criteria: no source -> all residual' => sub {
+	plan tests => 2;
+	my $fn = \&Database::BI::Controller::Dashboard::_filter_specs_to_criteria;
+	my ($crit, $resid) = $fn->(['region:eq:North', 'amount:gt:100'], undef);
+	is_deeply($crit, {}, 'no source: criteria empty');
+	is(scalar @$resid, 2, 'no source: both specs in residual');
+};
+
+subtest '_filter_specs_to_criteria: non-SQL source -> all residual' => sub {
+	plan tests => 2;
+	require Database::BI::Model::DataSource;
+	# CSV source has no dbi_source
+	my ($crit, $resid) = do {
+		my $fn  = \&Database::BI::Controller::Dashboard::_filter_specs_to_criteria;
+		my $src = Database::BI::Model::DataSource->new(table => 'sales', directory => 'data');
+		$fn->(['region:eq:North'], $src);
+	};
+	is_deeply($crit, {}, 'CSV source: criteria empty');
+	is(scalar @$resid, 1, 'CSV source: spec in residual');
+};
+
+# SQLite pushdown tests require a live SQLite file.
+SKIP: {
+	eval { require DBI; DBI->install_driver('SQLite') }
+		or skip 'DBD::SQLite not available', 12;
+
+	# Build a small SQLite test file.
+	my $tmpdir   = File::Temp->newdir;
+	my $sql_file = File::Spec->catfile($tmpdir, 'push_test.sql');
+	{
+		my $dbh = DBI->connect("dbi:SQLite:dbname=$sql_file", '', '', { RaiseError => 1 });
+		$dbh->do(q{CREATE TABLE push_test (id INTEGER, region TEXT, amount REAL)});
+		my $ins = $dbh->prepare(q{INSERT INTO push_test VALUES (?,?,?)});
+		$ins->execute(1, 'North', 1250);
+		$ins->execute(2, 'South',  875);
+		$ins->execute(3, 'East',  2100);
+		$ins->execute(4, 'West',   950);
+		$ins->execute(5, 'North', 1875);
+		$ins->execute(6, 'East',   725);
+		$dbh->disconnect;
+	}
+
+	require Database::BI::Model::DataSource;
+	my $sql_src = Database::BI::Model::DataSource->new(
+		table     => 'push_test',
+		directory => "$tmpdir",
+	);
+
+	my $fn = \&Database::BI::Controller::Dashboard::_filter_specs_to_criteria;
+
+	subtest '_filter_specs_to_criteria: eq -> LIKE criterion on SQLite' => sub {
+		plan tests => 3;
+		my ($crit, $resid) = $fn->(['region:eq:North'], $sql_src);
+		is(scalar @$resid, 0,           'eq: no residual');
+		ok(exists $crit->{region},      'eq: criterion on correct column');
+		is_deeply($crit->{region}, { -like => 'North' }, 'eq: -like without wildcards');
+	};
+
+	subtest '_filter_specs_to_criteria: ne -> NOT LIKE criterion on SQLite' => sub {
+		plan tests => 2;
+		my ($crit, $resid) = $fn->(['region:ne:North'], $sql_src);
+		is(scalar @$resid, 0, 'ne: no residual');
+		is_deeply($crit->{region}, { -not_like => 'North' }, 'ne: -not_like criterion');
+	};
+
+	subtest '_filter_specs_to_criteria: contains -> LIKE with surrounding wildcards' => sub {
+		plan tests => 2;
+		my ($crit, $resid) = $fn->(['region:contains:or'], $sql_src);
+		is(scalar @$resid, 0, 'contains: no residual');
+		is_deeply($crit->{region}, { -like => '%or%' }, 'contains: -like with % wildcards');
+	};
+
+	subtest '_filter_specs_to_criteria: starts -> LIKE with trailing wildcard' => sub {
+		plan tests => 2;
+		my ($crit, $resid) = $fn->(['region:starts:No'], $sql_src);
+		is(scalar @$resid, 0, 'starts: no residual');
+		is_deeply($crit->{region}, { -like => 'No%' }, 'starts: -like with trailing %');
+	};
+
+	subtest '_filter_specs_to_criteria: gt with number -> SQL criterion' => sub {
+		plan tests => 2;
+		my ($crit, $resid) = $fn->(['amount:gt:1000'], $sql_src);
+		is(scalar @$resid, 0, 'gt: no residual');
+		is_deeply($crit->{amount}, { '>' => '1000' }, 'gt: > criterion');
+	};
+
+	subtest '_filter_specs_to_criteria: gt with non-number -> residual' => sub {
+		plan tests => 2;
+		my ($crit, $resid) = $fn->(['amount:gt:West'], $sql_src);
+		is_deeply($crit, {}, 'gt non-numeric: criteria empty');
+		is(scalar @$resid, 1,  'gt non-numeric: in residual');
+	};
+
+	subtest '_filter_specs_to_criteria: empty -> residual (NULL+empty ambiguity)' => sub {
+		plan tests => 2;
+		my ($crit, $resid) = $fn->(['region:empty:'], $sql_src);
+		is_deeply($crit, {}, 'empty: criteria empty');
+		is(scalar @$resid, 1,  'empty: in residual');
+	};
+
+	subtest '_filter_specs_to_criteria: eq with % in value -> residual' => sub {
+		plan tests => 2;
+		my ($crit, $resid) = $fn->(['region:eq:No%'], $sql_src);
+		is_deeply($crit, {}, 'eq %: criteria empty');
+		is(scalar @$resid, 1,  'eq %: in residual');
+	};
+
+	subtest '_filter_specs_to_criteria: duplicate column -> second in residual' => sub {
+		plan tests => 3;
+		my ($crit, $resid) = $fn->(['region:eq:North', 'region:ne:East'], $sql_src);
+		is(scalar @$resid, 1,        'duplicate col: one residual');
+		ok(exists $crit->{region},   'duplicate col: first spec in criteria');
+		is($resid->[0], 'region:ne:East', 'duplicate col: second spec is residual');
+	};
+
+	# HTTP integration: filter+paginate with SQLite source should return the
+	# correct page of the FILTERED set (reduce-before-paginate contract).
+	subtest '/open?f= filter page 2 returns page of filtered set' => sub {
+		plan tests => 9;
+		# 3 North rows (id 1, 5) -- actually only 2 with region=North and 2 with East
+		# Use region:eq:East -> rows id=3,6 (2 rows total)
+		my $path = url_escape($sql_file);
+		$t->get_ok("/open?path=$path&f=region:eq:East&per_page=1&page=1")
+		  ->status_is(200)
+		  ->content_like(qr/East/, 'page 1 contains an East row');
+		$t->get_ok("/open?path=$path&f=region:eq:East&per_page=1&page=2")
+		  ->status_is(200);
+		# page 2 should also be an East row (not a non-East row)
+		my $body = $t->tx->res->body;
+		ok($body =~ /East/, 'page 2 also contains an East row (not unfiltered row)');
+		# page 3 should have no rows (only 2 East rows total)
+		$t->get_ok("/open?path=$path&f=region:eq:East&per_page=1&page=3")
+		  ->status_is(200)
+		  ->content_unlike(qr/<td[^>]*>East<\/td>/, 'page 3 is empty (no East rows remain)');
+	};
+}
+
 done_testing();

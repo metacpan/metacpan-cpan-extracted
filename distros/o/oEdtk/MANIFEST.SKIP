@@ -1,4 +1,4 @@
-^myldr/Makefile$ 
+^myldr/Makefile$
 ^myldr/Makefile\.old$
 ^myldr/main\.[^c].*$
 ^myldr/x?static(?:.[^c].*)?$
@@ -26,3 +26,39 @@
 \.bzr*		# Bazaar CVS
 \..*\.sw.$	# vim swap files
 \.tar.gz$
+# --- Integration and development paths, excluded from the oEdtk distribution --
+# Read-only integration source trees and the companion distribution.
+^oEUser-M/
+^oEdtk-fork-M/
+^oEdtk-T/
+^oEUser/
+^snap/
+# Integration documentation and the development harness.
+^docs/
+^tracker/
+^cover_db/
+^app-test-fusion/
+^tools/
+# Integration test material, not shipped (the mainline suite only is shipped).
+^t/int/
+^t/data/
+^t/golden/
+^t/fixidx-samples/
+^t/lib/(?!TestOEdtk\.pm$)
+# Root files that are not part of the distribution.
+^cpanfile$
+^META\.
+^MYMETA\.
+^\.git
+^\.claude
+^\.env
+^\.perl
+^0-.*\.sh$
+^find_accents\.sh$
+# Local recette / development runner scripts (not part of the distribution).
+^run_.*\.sh$
+\.log$
+# Root planning documents (the shipped README.md is kept).
+^(?!README\.md$).*\.md$
+# Runtime logs written under lib/ (also covered by .gitignore).
+^lib/oEdtk/log/

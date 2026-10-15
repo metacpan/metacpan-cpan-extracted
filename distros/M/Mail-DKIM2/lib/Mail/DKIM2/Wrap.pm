@@ -3,7 +3,7 @@ use 5.20.0;
 use strict;
 use warnings;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 use Exporter 'import';
 use Crypt::PRNG qw(random_bytes);
@@ -18,28 +18,31 @@ sub wrap_single_part {
     my ($message, %opt) = @_;
     my $gen = $opt{Boundary} // \&_random_boundary;
 
+    # Nothing to wrap: undef, and in list context the reason.
+    my $none = sub { wantarray ? (undef, $_[0]) : undef };
+
     my $sep = index($message, "$EOL$EOL");
-    return undef if $sep < 0;
+    return $none->('no-header-end') if $sep < 0;
     my $head = substr($message, 0, $sep + 2);
     my $body = substr($message, $sep + 4);
 
     my @fields = $head =~ /\G([^\r\n]*\r\n(?:[ \t][^\r\n]*\r\n)*)/g;
-    return undef unless join('', @fields) eq $head;
+    return $none->('unparsable-header') unless join('', @fields) eq $head;
     my @parsed;
     for my $f (@fields) {
-        my ($name) = $f =~ /^([^:\s]+)[ \t]*:/ or return undef;
+        my ($name) = $f =~ /^([^:\s]+)[ \t]*:/ or return $none->('unparsable-header');
         push @parsed, [$name, $f];
     }
 
     my ($ct) = grep { lc $_->[0] eq 'content-type' } @parsed;
-    return undef if $ct && $ct->[1] =~ /^[^:]+:\s*multipart\//i;
+    return $none->('multipart') if $ct && $ct->[1] =~ /^[^:]+:\s*multipart\//i;
 
     my $boundary;
     for (1 .. 10) {
         my $c = $gen->();
         if (index($body, "--$c") < 0) { $boundary = $c; last }
     }
-    return undef unless defined $boundary;
+    return $none->('boundary') unless defined $boundary;
 
     my @content = grep { $_->[0] =~ /^content-/i } @parsed;
     my $new_body = "--$boundary$EOL" . join('', map { $_->[1] } @content)
@@ -105,9 +108,12 @@ this at ingress for stock Mailman.
 
 =head2 wrap_single_part($message, %options)
 
-C<$message> is a whole message with CRLF line ends. Returns C<undef> for a
-C<multipart/*> message (or one with no blank line after the header), else a
-hash reference: C<message> (the wrapped message), C<body> (its new body),
+C<$message> is a whole message with CRLF line ends. Returns C<undef> when it
+wraps nothing -- in list context C<(undef, $reason)>, the reason being
+C<multipart> (already C<multipart/*>, the normal case), C<no-header-end> (no
+blank line after the header), C<unparsable-header> (a header line that is not
+a field), or C<boundary> (no boundary clear of the body) -- else a hash
+reference: C<message> (the wrapped message), C<body> (its new body),
 C<boundary>, and C<edits>, the header changes as milter operations: deletes
 (C<name>, 1-based C<index> among fields of that name, last first), then the
 change of the first C<Content-Type>, then additions (C<Content-Type> if there

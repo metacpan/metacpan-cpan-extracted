@@ -63,6 +63,7 @@ my %WriteMakefileArgs = (
         'Exporter'             => 0,
         'Getopt::Long'         => 0,
         'Object::Proto'        => '1.00',
+        'Game::Terminal::Kit'  => '0.05',
         'Object::Proto::Sugar' => '1.00',
         'XSLoader'             => 0,
         'constant'             => 0,

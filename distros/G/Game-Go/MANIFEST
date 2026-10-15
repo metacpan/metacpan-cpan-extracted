@@ -48,6 +48,10 @@ t/22-bot-marking.t
 t/23-terminal.t
 t/24-no-io.t
 t/25-gtp.t
+t/26-options.t
+t/27-cursor.t
+t/28-round-trip.t
+t/29-history.t
 t/lib/Corpus.pm
 t/lib/Invariants.pm
 t/manifest.t

@@ -35,9 +35,8 @@
             "Clone" : "0",
             "File::Slurp" : "0",
             "IO::Compress::Gzip" : "0",
-            "IO::Interface::Simple" : "0",
             "JSON" : "0",
-            "List::Util" : "0",
+            "List::Util" : "1.45",
             "MIME::Base64" : "0",
             "perl" : "5.006"
          }
@@ -49,6 +48,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v1.0.6",
+   "version" : "v1.0.7",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

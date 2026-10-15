@@ -3,24 +3,16 @@ package Game::Cribbage::Terminal;
 use strict;
 use warnings;
 
-our $VERSION = "0.17";
+our $VERSION = "0.18";
 
 use Object::Proto::Sugar -types;
 use Game::Cribbage::Board;
 use Getopt::Long ();
-
-our %SEQUENCE = (
-	'A' => 'up', 'B' => 'down', 'C' => 'right', 'D' => 'left',
-	'H' => 'home', 'F' => 'end',
-	'1~' => 'home', '4~' => 'end', '5~' => 'page_up', '6~' => 'page_down',
-	'7~' => 'home', '8~' => 'end',
-);
-
-our %CONTROL = (
-	"\r" => 'enter', "\n" => 'enter', "\t" => 'tab',
-	"\x7f" => 'backspace', "\x08" => 'backspace',
-	"\x03" => 'interrupt', "\x04" => 'eof',
-);
+use Game::Terminal::Kit::Keys;
+use Game::Terminal::Kit::Picker;
+use Game::Terminal::Kit::Run;
+use Game::Terminal::Kit::Screen;
+use Game::Terminal::Kit::Steer;
 
 has board => (
 	is => 'rw',
@@ -37,10 +29,14 @@ has out => (
 	default => sub { \*STDOUT }
 );
 
-has raw => (
+has [qw/keyboard screen/] => (
+	is => 'rw'
+);
+
+has _row => (
 	is => 'rw',
 	isa => Any,
-	default => 0
+	default => 1
 );
 
 has keysource => (
@@ -75,6 +71,22 @@ has [qw/dealer crib_set/] => (
 has starter_card => (
 	is => 'rw'
 );
+
+sub BUILD {
+	my ($self) = @_;
+	$self->keyboard(Game::Terminal::Kit::Keys->new(
+		in => $self->in,
+		pending => $self->pending,
+		($self->keysource ? (keysource => $self->keysource) : ()),
+	)) unless $self->keyboard;
+	$self->screen(Game::Terminal::Kit::Screen->new(
+		out => $self->out,
+		interactive => 1,
+		colour => $self->colour,
+	)) unless $self->screen;
+	$self->screen->flush_on;
+	return $self;
+}
 
 sub start {
 	my ($self, %params) = @_;
@@ -370,26 +382,27 @@ sub pick_card {
 	my $can = $self->playable_cards($player);
 	return 'go' unless @$can;
 
-	my $at = 0;
+	my $picker = Game::Terminal::Kit::Picker->new(
+		items => $can,
+		numbered => 0,
+		game_keys => { q => 'quit', g => 'go', b => 'bot' },
+	);
 	while (1) {
 		my $hands = $self->board->get_hands;
+		my $here = $picker->current;
 		$self->clear_screen();
-		$self->print_header($self->card_line($player, $can->[$at]));
+		$self->print_header($self->card_line($player, $here));
 		$self->draw_scores();
 		$self->render_opponent_cards(scalar grep { !$_->used } @{$hands->player1->cards});
 		$self->render_run_play();
 		$self->render_player_cards($hands->player2->cards, 26, 20, 0,
-			{ $can->[$at] => 'double' });
+			{ $here => 'double' });
 		$self->print_footer(
 			q|arrows to choose, enter or space to play, g for go, b for the bot's pick, q to quit|);
 
-		my $key = $self->read_key;
-		return 'quit' unless defined $key;
-		return 'quit' if $key eq 'q' || $key eq 'interrupt' || $key eq 'eof';
-		return 'go'   if $key eq 'g';
-		return 'bot'  if $key eq 'b';
-		return $can->[$at] if $key eq 'enter' || $key eq ' ';
-		$at = $self->step($can, $at, $key) if $key =~ /\A(?:up|down|left|right|home|end|tab)\z/;
+		my ($event, $value) = $picker->step($self->read_key);
+		return 'quit' if $event eq 'quit';
+		return $value if $event eq 'chosen' || $event eq 'key';
 	}
 }
 
@@ -398,34 +411,30 @@ sub pick_discards {
 
 	my $hands = $self->board->get_hands;
 	my $cards = $hands->player2->cards;
-	my @all = (1 .. scalar @$cards);
 
-	my ($at, %held) = (0);
+	my $picker = Game::Terminal::Kit::Picker->new(
+		items => [ 1 .. scalar @$cards ],
+		need => 2,
+		numbered => 0,
+		game_keys => { q => 'quit', b => 'bot' },
+	);
 	while (1) {
-		my %marks = map { $_ => 'heavy' } keys %held;
-		$marks{ $all[$at] } = 'double';
+		my $here = $picker->current;
+		my @held = @{ $picker->chosen };
+		my %marks = map { $_ + 1 => 'heavy' } @held;
+		$marks{$here} = 'double';
 
 		$self->clear_screen();
 		$self->print_header(sprintf '%s - %d of 2 chosen for the crib',
-			$cards->[ $all[$at] - 1 ]->stringify, scalar keys %held);
+			$cards->[ $here - 1 ]->stringify, scalar @held);
 		$self->render_opponent_cards(6);
 		$self->render_player_cards($cards, 26, 5, 1, \%marks);
 		$self->print_footer(
 			q|arrows to choose, enter or space to take a card, b for the bot's pick, q to quit|);
 
-		my $key = $self->read_key;
-		return 'quit' unless defined $key;
-		return 'quit' if $key eq 'q' || $key eq 'interrupt' || $key eq 'eof';
-		return 'bot'  if $key eq 'b';
-
-		if ($key eq 'enter' || $key eq ' ') {
-			my $here = $all[$at];
-			if ($held{$here}) { delete $held{$here} }
-			elsif (scalar keys %held < 2) { $held{$here} = 1 }
-			return [ sort { $a <=> $b } keys %held ] if scalar keys %held == 2;
-			next;
-		}
-		$at = $self->step(\@all, $at, $key) if $key =~ /\A(?:up|down|left|right|home|end|tab)\z/;
+		my ($event, $value) = $picker->step($self->read_key);
+		return 'quit' if $event eq 'quit';
+		return $value if $event eq 'chosen' || $event eq 'key';
 	}
 }
 
@@ -438,9 +447,10 @@ sub step {
 	my ($self, $items, $at, $key) = @_;
 	return 0 if $key eq 'home';
 	return $#$items if $key eq 'end';
-	return ($at + 1) % @$items if $key eq 'right' || $key eq 'down' || $key eq 'tab';
-	return ($at - 1) % @$items if $key eq 'left'  || $key eq 'up';
-	return $at;
+	my $delta = $key eq 'right' || $key eq 'down' || $key eq 'tab' ? 1
+		: $key eq 'left' || $key eq 'up' ? -1
+		: 0;
+	return Game::Terminal::Kit::Steer::ring(scalar @$items, $at, $delta);
 }
 
 sub split_cards {
@@ -732,10 +742,7 @@ sub show_face_down_split {
 
 sub draw_background {
 	for (0 .. 35) {
-		$_[0]->emit("\e[102;1m") if $_[0]->colour;
-		$_[0]->emit(pack("A100", " "));
-		$_[0]->emit("\n");
-		$_[0]->emit("\e[0m") if $_[0]->colour;
+		$_[0]->emit($_[0]->paint(pack("A100", " "), '102;1'), "\n");
 	}
 	$_[0]->draw_dealer();
 	$_[0]->draw_crib();
@@ -827,12 +834,10 @@ sub draw_scores {
 
 sub winner {
 	my ($self, $who) = @_;
-	$self->emit("\e[0m\e[2J\e[0;1H");
+	$self->screen->clear;
+	$self->_row(1);
 	for (0 .. 35) {
-		$self->emit("\e[102;1m") if $self->colour;
-		$self->emit(pack("A100", " "));
-		$self->emit("\n");
-		$self->emit("\e[0m") if $self->colour;
+		$self->emit($self->paint(pack("A100", " "), '102;1'), "\n");
 	}
 	$self->set_cursor_vertical(17);
 	my $player = $self->board->players->[1];
@@ -847,9 +852,7 @@ sub winner {
 
 sub keys_available {
 	my ($self) = @_;
-	return 1 if $self->keysource;
-	return 0 unless eval { -t $self->in };
-	return eval { require Term::ReadKey; 1 } ? 1 : 0;
+	return $self->keyboard->keys_available;
 }
 
 sub picking {
@@ -863,115 +866,84 @@ sub colour {
 	my ($self, @set) = @_;
 	$self->_colour($set[0] ? 1 : 0) if @set;
 	return $self->_colour ? 1 : 0 if defined $self->_colour;
-	return 0 if defined $ENV{NO_COLOR} && length $ENV{NO_COLOR};
+	return 0 if Game::Terminal::Kit::Screen::no_colour();
 	return eval { -t $self->out } ? 1 : 0;
+}
+
+sub raw {
+	my ($self) = @_;
+	return $self->keyboard->raw;
 }
 
 sub enter_raw {
 	my ($self) = @_;
-	return $self if $self->raw;
-	if ($self->keysource) { $self->raw(1); return $self }
-	return undef unless $self->keys_available;
-	return undef unless eval { Term::ReadKey::ReadMode(3, $self->in); 1 };
-	$self->raw(1);
-	return $self;
+	return $self->keyboard->enter_raw ? $self : undef;
 }
 
 sub leave_raw {
 	my ($self) = @_;
-	return $self unless $self->raw;
-	eval { Term::ReadKey::ReadMode(0, $self->in) } unless $self->keysource;
-	$self->raw(0);
+	$self->keyboard->leave_raw;
 	return $self;
-}
-
-sub read_char {
-	my ($self, $wait) = @_;
-	my $pending = $self->pending;
-	return shift @$pending if @$pending;
-	return $self->keysource->($wait) if $self->keysource;
-	my $char = Term::ReadKey::ReadKey($wait ? 0 : -1, $self->in);
-	return $char if defined $char || $wait;
-	select undef, undef, undef, 0.05;
-	return Term::ReadKey::ReadKey(-1, $self->in);
 }
 
 sub read_key {
 	my ($self) = @_;
-	my $char = $self->read_char(1);
-	return undef unless defined $char;
-	return $CONTROL{$char} if $CONTROL{$char};
-	return $self->read_sequence if $char eq "\e";
-	return $char;
-}
-
-sub read_sequence {
-	my ($self) = @_;
-	my $opener = $self->read_char(0);
-	return 'escape' unless defined $opener;
-	unless ($opener eq '[' || $opener eq 'O') {
-		unshift @{ $self->pending }, $opener;
-		return 'escape';
-	}
-	my $tail = '';
-	while (length $tail < 8) {
-		my $char = $self->read_char(0);
-		last unless defined $char;
-		$tail .= $char;
-		last if $char =~ /[A-Za-z~]/;
-	}
-	return $SEQUENCE{$tail} || 'escape';
+	return $self->keyboard->read_key;
 }
 
 sub emit {
 	my ($self, @text) = @_;
-	my $fh = $self->out;
+	my $fh = $self->screen->out;
 	print {$fh} @text;
+	$self->_row($self->_row + tr/\n// ) for @text;
 	1;
 }
 
 sub read_line {
 	my ($self) = @_;
-	my $fh = $self->in;
-	my $line = <$fh>;
-	return $line;
+	return $self->keyboard->read_line;
+}
+
+sub paint {
+	my ($self, $text, $code) = @_;
+	$self->screen->colour($self->colour);
+	return $self->screen->paint($text, $code);
 }
 
 sub clear_screen {
-	$_[0]->emit("\e[0m\e[2J\e[0;1H");
+	$_[0]->screen->clear;
+	$_[0]->_row(1);
 	$_[0]->draw_background();
 }
 
 sub reset_cursor {
-	$_[0]->emit("\e[;2H");
+	$_[0]->set_cursor_vertical(1);
 }
 
 sub set_cursor_vertical {
-	$_[0]->emit("\e[$_[1];2H");
+	$_[0]->_row($_[1] || 1);
+	$_[0]->screen->at($_[0]->_row, 2);
 }
 
 sub set_cursor_horizontal {
-	$_[0]->emit("\e[$_[1]G");
+	$_[0]->screen->at($_[0]->_row, $_[1] || 1);
 }
 
 sub say {
 	my ($self, $msg, $nl, $indent, $color, $back) = @_;
 	$color ||= 90;
 	$back ||= 102;
-	$self->emit("\e[$color;1;1m\e[$back;1m") if $self->colour;
-	$self->emit($msg);
+	$self->emit($self->paint($msg, "$color;1;1;$back;1"));
 	$self->emit("\n") if $nl;
 	$self->set_cursor_horizontal(2) if $indent;
-	$self->emit("\e[0m") if $self->colour;
 	1;
 }
 
 sub print_header {
 	my ($self, $message) = @_;
-	$self->set_cursor_vertical(0);
-	$self->set_cursor_horizontal(0);
-	$self->emit("\e[40;1m") if $self->colour;
-	$self->emit(pack("A100", " "));
+	$self->set_cursor_vertical(1);
+	$self->set_cursor_horizontal(1);
+	$self->emit($self->paint(pack("A100", " "), '40;1'));
 	$self->set_cursor_horizontal(2);
 	$self->say($message, 0, 0, 31, 40);
 }
@@ -979,9 +951,8 @@ sub print_header {
 sub print_footer {
 	my ($self, $message) = @_;
 	$self->set_cursor_vertical(36);
-	$self->set_cursor_horizontal(0);
-	$self->emit("\e[40;1m") if $self->colour;
-	$self->emit(pack("A100", " "));
+	$self->set_cursor_horizontal(1);
+	$self->emit($self->paint(pack("A100", " "), '40;1'));
 	$self->set_cursor_horizontal(2);
 	$self->say($message, 0, 0, 31, 40);
 	$self->set_cursor_horizontal(length($message) + 2);
@@ -1008,6 +979,10 @@ is set or the output is not a terminal.
 USAGE
 }
 
+sub options {
+	return [];
+}
+
 sub run {
 	my ($class, @argv) = @_;
 	my %opt;
@@ -1022,16 +997,10 @@ sub run {
 
 	my $terminal = $class->new(picking => $opt{pick});
 
-	local @SIG{qw(INT TERM HUP)};
-	for my $sig (qw(INT TERM HUP)) {
-		$SIG{$sig} = sub { $terminal->leave_raw; $SIG{$sig} = 'DEFAULT'; kill $sig, $$ };
-	}
-
-	my $status = eval { $terminal->start };
-	my $died = $@;
-	$terminal->leave_raw;
+	my $status = Game::Terminal::Kit::Run::guard(
+		sub { $terminal->start }, $terminal->keyboard, $terminal->screen,
+	);
 	$terminal->emit("\e[0m\n");
-	die $died if $died;
 
 	return $status && $status =~ /^\d+$/ ? $status : 0;
 }
@@ -1048,7 +1017,7 @@ Game::Cribbage::Terminal - the cribbage board on a terminal
 
 =head1 VERSION
 
-Version 0.17
+Version 0.18
 
 =head1 SYNOPSIS
 
@@ -1130,6 +1099,13 @@ The following functions are defined in L<Game::Cribbage::Terminal>
 
 	$game->init_draw();
 
+
+=head2 options
+
+    my $fields = Game::Cribbage::Terminal->options;
+
+The options a person would set before a game, for a launcher to show. There
+are none, so the list is empty.
 
 =head2 run
 
@@ -1386,30 +1362,46 @@ because a program that leaves a terminal in cbreak leaves the shell unusable.
 
 =head2 pending
 
+The seam a test drives the picker through, and the queue of characters read
+and put back. Both are given to C<new>. C<keysource> is a coderef returning
+B<one character per call>, which is what makes the escape sequence for an arrow
+key testable: the reader has to ask three times for one key.
+
+=head2 keyboard
+
+=head2 screen
+
+The L<Game::Terminal::Kit::Keys> every key and line is read through and the
+L<Game::Terminal::Kit::Screen> everything is drawn through. Both are made from
+L</in>, L</out>, L</keysource> and L</pending> when the terminal is built; hand
+C<new> either to use your own.
+
 =head2 raw
 
-The seam a test drives the picker through, the pushback queue for an escape
-sequence that turned out not to be one, and the cbreak state. C<keysource> is a
-coderef returning B<one character per call>, which is what makes the escape
-sequence for an arrow key testable: the reader has to ask three times for one
-key.
-
-=head2 read_char
+True between L</enter_raw> and L</leave_raw>.
 
 =head2 read_key
 
-=head2 read_sequence
-
-One character, one named key, and the tail of an escape sequence. C<read_key>
-returns C<'up'>, C<'enter'>, C<'escape'> and so on, or the character itself.
+One named key: C<'up'>, C<'enter'>, C<'escape'> and so on, or the character
+itself, and C<'unknown'> for an escape sequence that names no key.
 
 =head2 read_line
 
+One line from L</in>, without the space around it, or undef at the end of
+input. What is typed is echoed, also after the arrow keys have been used.
+
 =head2 emit
 
-One line in and whatever is handed to it out, both through L</in> and L</out>.
+Whatever is handed to it, written to L</out>.
 B<Nothing in this module may use C<print> or C<E<lt>STDINE<gt>> directly>: that
 is what made the terminal untestable before.
+
+=head2 paint
+
+	my $text = $t->paint(' Dealer ', '31;1;40');
+
+The text in that colour and a reset after it, or the text as it was when
+L</colour> is off.
 
 =head1 CHOOSING
 

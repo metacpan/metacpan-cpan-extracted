@@ -1,5 +1,13 @@
 Revision history for Game-Mahjong
 
+0.04    2026-10-13
+	- Add options, the fields a launcher offers before a game
+	- The keys, the screen and the tile picker are Game::Terminal::Kit's
+	- Requires perl 5.14
+	- An unset NO_COLOR or an empty one leaves colour on; any other value turns it off
+	- Shift-tab walks the rack to the left
+	- Fix: after t, the move you typed was not echoed
+
 0.03    2026-10-11
 	- Add Game::Mahjong::Terminal->run(@argv), which returns the exit status
 	- Terminal's game loop is now start, not run

@@ -98,6 +98,29 @@ is_deeply(\@Task::read, ['C reads C', 'C reads C', 'B reads B', 'B reads B', 'A 
 is(Context::Vars::_depth(), 0, 'nothing is left entered');
 is(Context::Vars::_live_holders(), 0, 'and no holder is out');
 
+# ---- version 2: elements from C ------------------------------------------------
+{
+    package Deep;
+    use Context::Vars qw(%seen @trail);
+    my @r;
+    Context::Vars::_t_scope(sub {
+        Context::Vars::ABI::Consumer::elem_set('%seen', 'from C', 'a', 'b');
+        push @r, $seen{a}{b};
+        $seen{a}{c} = 'from Perl';
+        push @r, Context::Vars::ABI::Consumer::elem_get('%seen', 'a', 'c');
+        my $whole = Context::Vars::ABI::Consumer::elem_get('%seen');
+        push @r, join ',', sort keys %{ $whole->{a} };
+        push @r, tied(%$whole) ? 'tied' : 'plain';
+        Context::Vars::ABI::Consumer::elem_set('@trail', 'third', 2);
+        push @r, scalar(@trail), $trail[2];
+        Context::Vars::ABI::Consumer::elem_set('%seen', undef, 'a', 'b');
+        push @r, exists $seen{a}{b} ? 'still there' : 'removed';
+    });
+    main::is_deeply(\@r, ['from C', 'from Perl', 'b,c', 'plain', 3, 'third', 'removed'],
+                    'C reads and writes single elements at any depth, and Perl sees them, and the other way');
+    main::ok(!exists $seen{a}, 'and they belonged to the scope C wrote them in');
+}
+
 # A store from C at the top level, with no scope: it is the program's, as an
 # assignment in file code would be.
 {

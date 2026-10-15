@@ -16,7 +16,7 @@ use Game::Oware::Notation;
 use Game::Oware::Result;
 use Game::Oware::Variant ();
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 has variant => (
 	is      => 'ro',
@@ -216,16 +216,85 @@ sub clone {
 
 sub to_text {
 	my ($self) = @_;
-	return Game::Oware::Notation->render(
+	my $start = $self->log->[0]{payload};
+	my @line;
+	push @line, 'variant ' . $self->variant if $self->variant ne 'abapa';
+	push @line, 'first ' . $start->{first} if $start->{first} ne 'p1';
+	push @line, 'board ' . $start->{board}
+		if $start->{board} ne join ',', @{ Game::Oware::Board->opening };
+	if (defined(my $seed = $self->_held_seed)) {
+		utf8::encode($seed) if utf8::is_utf8($seed);
+		push @line, 'seed ' . unpack 'H*', $seed;
+	}
+	my $transcript = Game::Oware::Notation->render(
 		[ map { $_->{payload}{house} } grep { $_->{kind} eq 'sow' } @{ $self->log } ]);
+	push @line, $transcript if length $transcript || @line;
+	for my $event (@{ $self->log }) {
+		push @line, "resign $event->{actor}" if $event->{kind} eq 'resign';
+		push @line, "timeout $event->{payload}{p}" if $event->{kind} eq 'timeout';
+		push @line, 'abandon' if $event->{kind} eq 'abandon';
+	}
+	return join "\n", @line;
 }
 
 sub from_text {
 	my ($class, $text, %options) = @_;
-	my $game = $class->new(%options);
-	for my $house (@{ Game::Oware::Notation->parse($text) }) {
+	Carp::croak('Game::Oware: a transcript is a string')
+		unless defined $text && !ref $text;
+
+	my (%setting, @ending, $letters);
+	for my $line (split /\n/, $text) {
+		next unless $line =~ /\S/;
+		$line =~ s/^\s+|\s+$//g;
+		my ($word, $value) = $line =~ /^(variant|first|board|seed|resign|timeout|abandon)\b\s*(.*)$/;
+		if (!defined $word) {
+			Carp::croak('Game::Oware: the transcript has moves after its ending') if @ending;
+			$letters .= $line;
+			next;
+		}
+		if ($word eq 'resign' || $word eq 'timeout' || $word eq 'abandon') {
+			Carp::croak("Game::Oware: the transcript has a second ending, '$line'") if @ending;
+			Carp::croak("Game::Oware: '$line' does not name a seat, p1 or p2")
+				unless $word eq 'abandon' ? $value eq '' : $value =~ /^p[12]$/;
+			@ending = ($word, $value);
+			next;
+		}
+		Carp::croak("Game::Oware: the transcript says $word twice")
+			if exists $setting{$word};
+		Carp::croak("Game::Oware: the transcript names its $word after its moves")
+			if defined $letters || @ending;
+		if ($word eq 'first') {
+			Carp::croak("Game::Oware: the first seat is p1 or p2, not '$value'")
+				unless $value =~ /^p[12]$/;
+			$setting{turn} = $value;
+		}
+		elsif ($word eq 'board') {
+			Carp::croak("Game::Oware: a board is fourteen counts of seeds, not '$value'")
+				unless $value =~ /^\d+(?:,\d+){13}$/;
+			$setting{board} = [ map { $_ + 0 } split /,/, $value ];
+		}
+		elsif ($word eq 'seed') {
+			Carp::croak("Game::Oware: a seed is written in hexadecimal, not '$value'")
+				unless $value =~ /^(?:[0-9a-f]{2})*$/;
+			$setting{seed} = pack 'H*', $value;
+		}
+		else {
+			Carp::croak("Game::Oware: there is no variant '$value'")
+				unless Game::Oware::Variant::is_variant($value);
+			$setting{variant} = $value;
+		}
+	}
+
+	my $game = $class->new(%options, %setting);
+	for my $house (@{ Game::Oware::Notation->parse($letters // '', $game->turn) }) {
 		my $out = $game->play($game->turn, $house);
 		Carp::croak('Game::Oware: the transcript does not play: ' . $out->stringify)
+			if ref $out && $out->isa('Game::Oware::Error');
+	}
+	if (@ending) {
+		my ($word, $seat) = @ending;
+		my $out = $word eq 'abandon' ? $game->abandon : $game->$word($seat);
+		Carp::croak("Game::Oware: the transcript ends by $word, but the moves already end the game")
 			if ref $out && $out->isa('Game::Oware::Error');
 	}
 	return $game;
@@ -400,7 +469,7 @@ Game::Oware - the African sow and capture game, Abapa rules
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 
@@ -629,13 +698,29 @@ A deep enough copy to play on independently.
 
 =head2 to_text
 
-The game as a transcript of house letters.
+The game as a transcript of house letters. A game with nothing but its moves
+to tell is the letters alone. Otherwise each of these is a line of its own,
+written only when it is so: before the letters, the variant when it is not
+C<abapa>, the first seat when it is not p1, the board it began from when that
+was not the opening, and the seed in hexadecimal; after them, how a game ended
+by a resignation, a timeout or an abandonment ended.
+
+    seed 7878
+    EcAbFd
+    resign p2
+
+Everything else, the counts the cycle rule reads and the natural endings
+included, comes back from playing the moves, so L</from_text> builds the same
+game back and C<to_text> of it is the same text.
 
 =head2 from_text
 
     Game::Oware->from_text('EcAb', seed => $bytes);
 
-A game played out from a transcript. Croaks if the transcript does not play.
+A game played out from a transcript as L</to_text> writes it. Further
+arguments go to C<new>, though a setting the transcript names overrules them.
+Croaks if the transcript does not play, if a line beside the letters cannot be
+read or comes twice, or if it names an ending the moves have already reached.
 
 =head2 replay
 

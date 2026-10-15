@@ -1,7 +1,7 @@
 package JobCenter::Client::Mojo;
 use Mojo::Base 'Mojo::EventEmitter';
 
-our $VERSION = '0.47'; # VERSION
+our $VERSION = '0.48'; # VERSION
 
 #
 # Mojo's default reactor uses EV, and EV does not play nice with signals
@@ -97,18 +97,24 @@ sub new {
 	return;
 }
 
-sub connect {
-	my $self = shift;
+sub connect_nb {
+	my ($self, $connect_cb) = @_;
+
+	croak('connect_cb should be a coderef') if ref $connect_cb ne 'CODE';
+	croak('connect already in progress') if $self->{on_connect};
 
 	delete $self->ioloop->{__exit__};
 	delete $self->{auth};
 	$self->{actions} = {};
 
-	$self->on(disconnect => sub {
-		my ($self, $code) = @_;
-		#$self->{_exit} = $code;
-		$self->ioloop->stop;
-	});
+	my $clarg = {
+		address => $self->{address},
+		port => $self->{port},
+		tls => $self->{tls},
+	};
+	$clarg->{tls_ca} = $self->{tls_ca} if $self->{tls_ca};
+	$clarg->{tls_cert} = $self->{tls_cert} if $self->{tls_cert};
+	$clarg->{tls_key} = $self->{tls_key} if $self->{tls_key};
 
 	my $debug = do {
 		weaken(my $self = $self);
@@ -130,22 +136,34 @@ sub connect {
 	$rpc->register('ping', sub { $self->rpc_ping(@_) });
 	$rpc->register('task_ready', sub { $self->rpc_task_ready(@_) }, notification => 1);
 
-	my $clarg = {
-		address => $self->{address},
-		port => $self->{port},
-		tls => $self->{tls},
+	my $on_connect;
+	my $clientid;
+	my $tmr = $self->ioloop->timer($self->{timeout} => sub {
+		$on_connect->(shift, 0, 'timeout waiting for greeting');
+	});
+	$on_connect = $self->{on_connect} = do {
+		weaken(my $self = $self);
+		sub {
+			my $loop = shift;
+			my $success = shift;
+			$loop->remove($tmr);
+			delete $self->{on_connect} if $self;
+			if (! $success) {
+				$loop->remove($clientid);
+				$self->{auth} = 0 if $self;
+			}
+			$connect_cb->($success, @_) if $self and $connect_cb;
+		};
 	};
-	$clarg->{tls_ca} = $self->{tls_ca} if $self->{tls_ca};
-	$clarg->{tls_cert} = $self->{tls_cert} if $self->{tls_cert};
-	$clarg->{tls_key} = $self->{tls_key} if $self->{tls_key};
-
-	my $clientid = $self->ioloop->client(
+	my $log = $self->log;
+	$clientid = $self->ioloop->client(
 		$clarg => sub {
 		my ($loop, $err, $stream) = @_;
 		if ($err) {
 			$err =~ s/\n$//s;
-			$self->log->info('connection to API failed: ' . $err);
-			$self->{auth} = 0;
+			if (my $on_connect = $self->{on_connect}) {
+				$on_connect->($loop, '', "connection to API failed: $err");
+			}
 			return;
 		}
 		my $ns = MojoX::NetstringStream->new(stream => $stream);
@@ -159,7 +177,7 @@ sub connect {
 			my ($ns2, $chunk) = @_;
 			#say 'got chunk: ', $chunk;
 			my @err = $conn->handle($chunk);
-			$self->log->debug('chunk handler: ' . join(' ', grep defined, @err)) if @err;
+			$log->debug('chunk handler: ' . join(' ', grep defined, @err)) if @err;
 			$ns->close if $err[0];
 		});
 		$ns->on(close => sub {
@@ -168,31 +186,42 @@ sub connect {
 			# Mojo::Util::_global_destruction() won't work
 			return unless $conn;
 			$conn->close;
-			$self->log->info('connection to API closed');
+			$self->{auth} = '' if $self;
+			$log->info('connection to API closed');
 			$self->emit(disconnect => WORK_CONNECTION_CLOSED); # todo doc
 		});
 	});
 
 	$self->{rpc} = $rpc;
 	$self->{clientid} = $clientid;
+}
 
-	# handle timeout?
-	my $tmr = $self->ioloop->timer($self->{timeout} => sub {
-		my $loop = shift;
-		$self->log->error('timeout wating for greeting');
-		$loop->remove($clientid);
-		$self->{auth} = 0;
+sub connect {
+	my $self = shift;
+
+	$self->on(disconnect => sub {
+		my ($self, $code) = @_;
+		$self->ioloop->stop;
+	});
+
+	my $done = 0;
+	my $log = $self->log;
+
+	$self->connect_nb(sub {
+		my ($success, $msg) = @_;
+		$done = 1;
+		if ($success) {
+			$log->info($msg) if defined $msg;
+		} else {
+			$log->error($msg);
+		}
 	});
 
 	$self->log->debug('starting handshake');
-
-	$self->_loop(sub { not defined $self->{auth} });
-
+	$self->_loop(sub { ! $done });
 	$self->log->debug('done with handhake?');
-
-	$self->ioloop->remove($tmr);
 	$self->unsubscribe('disconnect');
-	1;
+	return $self->is_connected;
 }
 
 sub is_connected {
@@ -203,7 +232,8 @@ sub is_connected {
 sub rpc_greetings {
 	my ($self, $c, $i) = @_;
 	#$self->ioloop->delay(
-	JobCenter::Client::Mojo::Steps->new(ioloop => $self->ioloop)->steps([
+	my $ioloop = $self->ioloop;
+	JobCenter::Client::Mojo::Steps->new(ioloop => $ioloop)->steps([
 	sub {
 		my $steps = shift;
 		die "wrong api version $i->{version} (expected 1.1)" unless $i->{version} eq '1.1';
@@ -216,18 +246,29 @@ sub rpc_greetings {
 		#say 'hello returned: ', Dumper(\@_);
 		die "hello returned error $e->{message} ($e->{code})" if $e;
 		die 'no results from hello?' unless $r;
+		my $msg;
 		($r, $w) = @$r;
 		if ($r) {
-			$self->log->info("hello returned: $r, $w");
+			$msg = "hello returned: $r, $w";
 			$self->{auth} = 1;
 		} else {
-			$self->log->error('hello failed: ' . ($w // ''));
+			$msg = 'hello failed: ' . ($w // '');
 			$self->{auth} = 0; # defined but false
+		}
+		if (my $on_connect = $self->{on_connect}) {
+			$on_connect->($ioloop, $self->{auth}, $msg);
+		} elsif ($self->{auth}) {
+			$self->log->info($msg);
+		} else {
+			$self->log->error($msg);
 		}
 	}], sub {
 		my ($err) = @_;
 		$self->log->error('something went wrong in handshake: ' . $err);
 		$self->{auth} = '';
+		if (my $on_connect = $self->{on_connect}) {
+			$on_connect->($ioloop, '', $err);
+		}
 	});
 }
 
@@ -643,20 +684,20 @@ sub announce {
 	sub {
 		my $steps = shift;
 		$self->conn->call('announce', {
-				 workername => $workername,
-				 actionname => $actionname,
-				 slotgroup => $args{slotgroup},
-				 slots => $args{slots},
-				 (($args{filter}) ? (filter => $args{filter}) : ()),
-			}, $steps->next());
+			 workername => $workername,
+			 actionname => $actionname,
+			 slotgroup => $args{slotgroup},
+			 slots => $args{slots},
+			 (($args{filter}) ? (filter => $args{filter}) : ()),
+		}, $steps->next());
 	},
 	sub {
 		#say 'call returned: ', Dumper(\@_);
 		my ($steps, $e, $r) = @_;
 		$done++; # received something so done waiting
 		if ($e) {
-			$self->log->error("announce got error: $e->{message}");
 			$err = $e->{message};
+			$self->log->error("announce got error: $err");
 			return;
 		}
 		my ($res, $msg) = @$r;
@@ -666,12 +707,57 @@ sub announce {
 			mode => $mode,
 			undocb => $undocb,
 			addenv => $args{addenv} // 0,
+			workername => $workername, # XXX required info to withdraw an action
 		} if $res;
 		$err = $msg unless $res;
 	}], sub {
 		($err) = @_;
 		$done++;
 		$self->log->error("something went wrong with announce: $err");
+	});
+
+	$self->_loop(sub { !$done });
+	return $err;
+}
+
+sub withdraw {
+	my ($self, %args) = @_;
+	my $actionname = $args{actionname} or croak 'no actionname?';
+	my $log = $self->log;
+
+	croak 'no action announced ' . $actionname unless
+		my $announce = $self->actions->{$actionname};
+
+	delete $self->actions->{$actionname} if $args{force}; # immediately stop accepting task_ready
+
+	my ($done, $err);
+	JobCenter::Client::Mojo::Steps->new(ioloop => $self->ioloop)->steps([
+	sub {
+		my $steps = shift;
+		$self->conn->call('withdraw', {
+			workername => $announce->{workername},
+			actionname => $actionname,
+		}, $steps->next());
+	},
+	sub {
+		my ($steps, $e, $r) = @_;
+		$done++;
+		if ($e) {
+			$err = $e->{message};
+			$log->error("withdraw got error: $err");
+			return;
+		}
+		unless ($r) {
+			$err = 'withdraw failed';
+			$log->error($err);
+			return;
+		}
+		delete $self->actions->{$actionname};
+		$log->debug("succesfully withdrew $actionname");
+	}], sub {
+		($err) = @_;
+		$done++;
+		$log->error("something went wrong with withdraw: $err");
 	});
 
 	$self->_loop(sub { !$done });
@@ -964,6 +1050,17 @@ connection will be closed and the work() method will return
 
 =back
 
+=head2 connect_nb
+
+$client->connect_nb(\%options, sub { ($success, $message) = @_; ... });
+
+Starts connection handshake and call the provided callback on connection or 
+failure to connect. Throws an error if somethings goes wrong immediately, 
+otherwise the callback is given the result.
+
+C<$success> is a true/false indicator of the result. If set C<$message> is a
+string describing the outcome.
+
 =head2 call
 
 ($job_id, $result) = $client->call(%args);
@@ -1192,6 +1289,20 @@ be forbidden per action.
 If the addenv flag is true the action callback will be given one extra
 argument containing the action environment as a hashref.  In the async
 callback mode the environment will be inserted before the result callback.
+
+=back
+
+=head2 withdraw
+
+Withdraws the capability to do an action to the Api. 
+
+Valid arguments are:
+
+=over 4
+
+=item - actionname: name of the action
+
+(required)
 
 =back
 

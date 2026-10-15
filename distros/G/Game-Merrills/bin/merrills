@@ -5,6 +5,6 @@ use warnings;
 
 use Game::Merrills::Terminal;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 exit Game::Merrills::Terminal->run(@ARGV);

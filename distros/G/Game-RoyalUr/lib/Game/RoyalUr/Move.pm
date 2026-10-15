@@ -6,7 +6,7 @@ use warnings;
 
 use Object::Proto::Sugar;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 has side => (is => 'ro');
 
@@ -47,7 +47,7 @@ Game::RoyalUr::Move - one piece moved by one roll
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

@@ -35,6 +35,10 @@ t/20-bin.t
 t/21-ucci.t
 t/22-no-io.t
 t/23-integer.t
+t/24-options.t
+t/25-drawn-order.t
+t/26-round-trip.t
+t/27-history.t
 t/lib/Game/Xiangqi/Test/Handle.pm
 t/manifest.t
 t/perft.txt

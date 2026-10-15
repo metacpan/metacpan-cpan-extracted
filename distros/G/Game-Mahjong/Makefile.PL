@@ -1,4 +1,4 @@
-use 5.010;
+use 5.014;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
@@ -34,16 +34,16 @@ File::Find::find(sub {
 
 # ---- THE PERL FLOOR, AND WHAT IS EVIDENCE FOR IT -----------------------------
 #
-# 5.010 is the SYNTACTIC floor: the defined-or operator appears in the modules
-# and nothing later than 5.10 does. Object::Proto::Sugar, which the classes are
-# written on, declares 5.008003 and does not raise this.
+# 5.014 is the floor, and it is Game::Terminal::Kit's: the terminal reads its
+# keys and draws through the kit, which declares 5.014. The modules' own syntax
+# needs nothing later than 5.10.
 #
 # WHAT HAS ACTUALLY BEEN RUN is recorded here, and the span between the floor
 # and the oldest tested perl is INFERRED FROM THE SYNTAX AND HAS NOT BEEN
 # TESTED. Saying so is the point of this comment.
 #
 #   tested:   5.42.0, whole suite, 23 Sep 2026 (phase 01)
-#   inferred: 5.10 to 5.40, from the syntax alone
+#   inferred: 5.14 to 5.40, from the syntax alone
 #
 # ---- AND THE FLOOR NOBODY WRITES DOWN: THE COMPILER --------------------------
 #
@@ -90,7 +90,7 @@ my %WriteMakefileArgs = (
     VERSION_FROM     => 'lib/Game/Mahjong.pm',
     ABSTRACT_FROM    => 'lib/Game/Mahjong.pm',
     LICENSE          => 'artistic_2',
-    MIN_PERL_VERSION => '5.010',
+    MIN_PERL_VERSION => '5.014',
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
         'ExtUtils::Depends'   => '0.404',
@@ -99,12 +99,14 @@ my %WriteMakefileArgs = (
     TEST_REQUIRES => {
         'Test::More' => '0.88',
     },
-    # EXACTLY ONE NON-CORE RUNTIME DEPENDENCY. Object::Proto::Sugar is the
+    # TWO NON-CORE RUNTIME DEPENDENCIES. Game::Terminal::Kit is the terminal's
+    # keys, screen and picker. Object::Proto::Sugar is the
     # object system of every class here; the version is WHAT HAS BEEN RUN, not
     # a known floor. Digest::SHA seeds the wall from phase 02 and is core.
     PREREQ_PM => {
         'Object::Proto::Sugar' => '0.06',
         'Digest::SHA'          => '0',
+        'Game::Terminal::Kit'  => '0.05',
     },
     META_MERGE => {
         'meta-spec' => { version => 2 },

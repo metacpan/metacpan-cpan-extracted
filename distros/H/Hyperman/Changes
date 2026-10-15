@@ -1,5 +1,14 @@
 Revision history for Hyperman
 
+0.60	2026-10-14
+        - FIX: a stream handle's write was never answered "full" over
+          HTTP/2, so a producer never paused and the whole body was held.
+        - FIX: an HTTP/2 handler that waited for its body to drain waited
+          for nothing: requests are now handed to the application after
+          nghttp2's receive call returns, not from inside it.
+        - TEST: t/53 failed on OpenBSD; a pipe there has no inode, so the
+          test helper took the arena's wakeup pipes for the harness's.
+
 0.59	2026-10-13
         - FIX: an HTTP/2 stream-handle body was cut at the first DATA frame
           sent after the close.

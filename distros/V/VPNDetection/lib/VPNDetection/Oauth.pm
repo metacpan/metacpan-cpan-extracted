@@ -16,7 +16,7 @@ use Scalar::Util ();
 use VPNDetection::Error;
 use VPNDetection::OauthError;
 
-our $VERSION = '3.5.3';
+our $VERSION = '3.5.4';
 
 use constant DEVICE_CODE_GRANT => 'urn:ietf:params:oauth:grant-type:device_code';
 # The only PKCE method the server accepts.
@@ -69,8 +69,7 @@ sub metadata_p {
     my ($self, %options) = @_;
     $self->{client}->_check_options('oauth->metadata', \%options, 'timeout');
     my $path = '/.well-known/oauth-authorization-server';
-    return $self->_send_p($path, undef, $self->{client}{retries}, \%options)
-        ->then(sub { _members(shift, \%METADATA) });
+    return $self->_send_p($path, undef, $self->{client}{retries}, \%options, \%METADATA);
 }
 
 # Starts a device sign-in. It consumes nothing, so it is retried like a lookup.
@@ -90,8 +89,9 @@ sub device_authorization_p {
         _assert_argument('device_authorization', $name => $options{$name});
         $form{$name} = $options{$name};
     }
-    return $self->_send_p('/oauth/device_authorization', \%form, $self->{client}{retries}, \%options)
-        ->then(sub { _members(shift, \%DEVICE_AUTHORIZATION) });
+    return $self->_send_p(
+        '/oauth/device_authorization', \%form, $self->{client}{retries}, \%options, \%DEVICE_AUTHORIZATION,
+    );
 }
 
 # Asks once whether the person approved. Never retried: an approved code is
@@ -273,8 +273,12 @@ sub _exchange_p {
 
 # Every OAuth request goes through here, and none carries the API key: they are
 # built with build_tx directly, never through the client's _headers.
+# Given $members, an attempt is the request AND the read of its answer, so a 2xx
+# without them is retried like a 5xx where $retries allows, its status kept:
+# read after the retries were spent, an HTML 200 was one request (3.5.3,
+# measured 2026-10-15).
 sub _send_p {
-    my ($self, $path, $form, $retries, $options) = @_;
+    my ($self, $path, $form, $retries, $options, $members) = @_;
     my $client = $self->{client};
     my $url = $client->_url($path);
     return $client->_retry_p($retries, sub {
@@ -284,7 +288,10 @@ sub _send_p {
         my $tx = defined $form
             ? $ua->build_tx(POST => $url => \%headers => form => $form)
             : $ua->build_tx(GET => $url => \%headers);
-        return $client->_start_p($tx, $options->{timeout})->then(sub { _refusal(shift->res) });
+        return $client->_start_p($tx, $options->{timeout})->then(sub {
+            my $res = _refusal(shift->res);
+            return $members ? _members($res, $members) : $res;
+        });
     });
 }
 

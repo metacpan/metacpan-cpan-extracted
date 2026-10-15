@@ -40,12 +40,14 @@
             "Carp" : "0",
             "Digest::SHA" : "0",
             "Exporter" : "0",
+            "Game::Terminal::Kit" : "0.05",
             "Getopt::Long" : "0",
             "Object::Proto" : "1.00",
             "Object::Proto::Sugar" : "1.00",
+            "Scalar::Util" : "0",
             "XSLoader" : "0",
             "constant" : "0",
-            "perl" : "5.010"
+            "perl" : "5.014"
          }
       },
       "test" : {
@@ -60,6 +62,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

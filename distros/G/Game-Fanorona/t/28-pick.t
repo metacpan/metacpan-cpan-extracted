@@ -103,17 +103,17 @@ subtest 'steer: the nearest in a direction, the diagonals too' => sub {
     is($t->steer('d3', 'right', [qw(e3 g3 d4)]), 'e3', 'right: the nearer of two on the row');
     is($t->steer('d3', 'up', [qw(a5 d4 d5)]), 'd4', 'up: the nearer of two on the file, not the one off to the side');
     is($t->steer('d3', 'left', [qw(e3 g3)]), 'd3', 'nothing that way: it stays where it is');
-    is($t->steer('d3', 'u', [qw(e4 d4 c2)]), 'e4', 'u is up and to the right');
+    is($t->steer('d3', '9', [qw(e4 d4 c2)]), 'e4', '9 is up and to the right');
     is($t->steer('d3', 'y', [qw(e4 c4 c2)]), 'c4', 'y up and to the left');
     is($t->steer('d3', 'b', [qw(e4 c4 c2)]), 'c2', 'b down and to the left');
     is($t->steer('d3', 'n', [qw(e4 c4 e2)]), 'e2', 'n down and to the right');
-    is($t->steer('d3', '9', [qw(e4 d4 c2)]), 'e4', 'and 9 on the numeric pad is u');
+    is($t->steer('d3', 'u', [qw(e4 d4 c2)]), 'd3', 'and u is no direction: it is undo');
     is($t->steer('d3', '2', [qw(e4 d1 c2)]), 'd1', '2 is down');
     is($t->steer('d3', 'x', [qw(e4 d1 c2)]), 'd3', 'a key that is no direction goes nowhere');
 };
 
 subtest 'a chain built a step at a time, with a step that takes two ways in it' => sub {
-    my @keys = ('enter', '4', 'x', 'enter', 'a', '8', 'back', 'u', 'enter', 'q');
+    my @keys = ('enter', '4', 'x', 'enter', 'a', '8', 'back', '9', 'enter', 'q');
     my ($frames, $t) = sitting(\@keys, variant => board_of($CHAIN));
     is(scalar(@$frames), 10, 'a frame a key');
 
@@ -266,7 +266,7 @@ subtest 'the only move there is, is not played for the player' => sub {
 
     ($frames, $t) = sitting([ 'enter', '6', 'enter', 'n', 'q' ], variant => $one);
     like($frames->[3], qr/^Black has no stone left\. White wins\.$/m, 'enter plays it, and the game is over');
-    like($frames->[3], qr/^n new game   r rules   : command   q quit$/m, 'with the keys for a game that is over');
+    like($frames->[3], qr/^n new game   u undo   r redo   R rules   : command   q quit$/m, 'with the keys for a game that is over');
     is($t->game->ply, 0, 'n starts another');
     is(marked($frames->[4]), '[O]@a3 (+)@b3', 'and the cursor is on the board again');
 };
@@ -301,11 +301,11 @@ subtest 'the hint' => sub {
 };
 
 subtest 'help, the rules and a typed command' => sub {
-    my ($frames, $t) = sitting([ '?', 'x', 'r', 'x', 'q' ]);
+    my ($frames, $t) = sitting([ '?', 'x', 'R', 'x', 'q' ]);
     like($frames->[1], qr/^  backspace   take the cursor off a point; then take back one step$/m, '? lists the keys');
     like($frames->[1], qr/^Any key goes back\.$/m, 'and says how to leave');
     is($frames->[2], $frames->[0], 'any key does');
-    like($frames->[3], qr/TAKING BY WITHDRAWAL/, 'r gives the rules');
+    like($frames->[3], qr/TAKING BY WITHDRAWAL/, 'R gives the rules');
 
     ($frames, $t) = sitting([ ':', split(//, 'resigm'), 'back', 'n', 'enter', 'q' ]);
     is($t->game->result->how, 'resign', 'a colon takes a command, backspace corrects it, enter does it');

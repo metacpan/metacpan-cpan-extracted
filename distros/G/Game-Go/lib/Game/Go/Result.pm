@@ -8,7 +8,7 @@ use Object::Proto::Sugar -types;
 
 use Game::Go::Rules;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 our @RESULTS;
 BEGIN { @RESULTS = qw(score resign timeout abandoned) }
@@ -83,7 +83,7 @@ Game::Go::Result - who won, by how much, and by what
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 

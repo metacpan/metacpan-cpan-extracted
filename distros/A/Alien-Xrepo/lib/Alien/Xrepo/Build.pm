@@ -2,7 +2,7 @@ use v5.40;
 use feature 'class';
 no warnings 'experimental::class';
 #
-class Alien::Xrepo::Build v1.0.4 {
+class Alien::Xrepo::Build v1.0.6 {
     use Alien::Xrepo;
     use Alien::Xrepo::Build::Recipe;
     use Path::Tiny;
@@ -77,6 +77,17 @@ class Alien::Xrepo::Build v1.0.4 {
         $self->export;
         $self->test;
         $self;
+    }
+
+    method assert_installed () {
+        my $errors = $runtime_prop->{errors} // {};
+        return $self unless %$errors;
+        if ( defined $snapshot && length $snapshot ) {
+            my $file = path($snapshot);
+            $file->remove if -e $file;
+        }
+        my @failed = sort keys %$errors;
+        die 'Alien::Xrepo: failed to install ' . join( ', ', @failed ) . ":\n" . join( "\n", map {"  $_: $errors->{$_}"} @failed ) . "\n";
     }
 
     method configure (%opts) {
@@ -179,7 +190,9 @@ class Alien::Xrepo::Build v1.0.4 {
                 last;
             }
             if ( ref $info eq 'Alien::Xrepo::PackageInfo' ) {
-                $runtime_prop->{packages}{$name} = $info->_data_printer(undef);
+                my $data = $info->_data_printer(undef);
+                $self->_attach_runtime_deps( $name, $data, %opts );
+                $runtime_prop->{packages}{$name} = $data;
                 $install_type = 'share';
             }
         }
@@ -213,13 +226,54 @@ class Alien::Xrepo::Build v1.0.4 {
                 next;
             }
             if ( ref $info eq 'Alien::Xrepo::PackageInfo' ) {
-                $runtime_prop->{packages}{$name} = $info->_data_printer(undef);
+                my $data = $info->_data_printer(undef);
+                $self->_attach_runtime_deps( $name, $data, %opts );
+                $runtime_prop->{packages}{$name} = $data;
                 $install_type = 'share';
             }
         }
         $self->_checkpoint;
         $stage_done->{gather} = 1;
         $self;
+    }
+
+    # Post-install diagnostic: once a package is installed/gathered, ask the engine which shared libraries its
+    # FFI library needs at dlopen time and record them on the package data. They then ride into the snapshot and
+    # out through Alien::Xrepo::Runtime::package_info, so a consumer learns what else must be loadable instead of
+    # hitting an opaque loader error later. Guarded on engine capability, so spy engines are left untouched.
+    method _attach_runtime_deps ( $name, $data, %opts ) {
+        return unless $r->can('runtime_deps') && $r->can('fetch_closure');
+        my $libpath = $data->{libpath};
+        return unless defined $libpath && length $libpath && -f $libpath;
+
+        # Resolve against the package closure (transitive providers such as freetype behind libsdl3_ttf), not the
+        # shallow <share>/<pkg> dir, so clear installdir and fall back to the engine's store root.
+        my %fetch_opts = %opts;
+        delete $fetch_opts{installdir};
+        my @entries = eval { $r->fetch_closure( $name, $recipe->version_for($name), %fetch_opts ) };
+        my ( $search, $store ) = $r->can('dep_search_dirs') ? $r->dep_search_dirs( \@entries ) : ( [], [] );
+        my %seen = map { $_ => 1 } @$search;
+        my $add  = sub { my $d = shift; return unless defined $d && length $d; push @$search, $d unless $seen{$d}++ };
+
+        # Everything already recorded in this run is also fair game to resolve against.
+        for my $other ( values %{ $runtime_prop->{packages} // {} } ) {
+            my $id = $other->{installdir};
+            if ( defined $id && length $id ) {
+                push @$store, $id;
+                $add->( path($id)->child($_)->stringify ) for qw[bin lib];
+            }
+            $add->($_) for @{ $other->{linkdirs} // [] }, @{ $other->{bindirs} // [] };
+        }
+        $add->( path($libpath)->parent->stringify );
+        push @$store, $data->{installdir} if defined $data->{installdir} && length $data->{installdir};
+        my $deps = eval { $r->runtime_deps( $libpath, search_dirs => $search, store_dirs => $store ) };
+        return unless ref $deps eq 'ARRAY';
+        $data->{runtime_deps} = $deps;
+        my @missing = grep { ( $_->{scope} // '' ) eq 'unresolved' } @$deps;
+        warn "[!] $name: unresolved runtime dependencies (not found in the store or system paths): " .
+            join( ', ', map { $_->{name} } @missing ) . "\n"
+            if @missing;
+        return;
     }
 
     method export () {
@@ -388,6 +442,14 @@ class Alien::Xrepo::Build v1.0.4 {
         }
         for my $k (qw[libpath installdir]) {
             $data->{$k} = $self->_under_share( $share, $data->{$k} ) if defined $data->{$k};
+        }
+        if ( ref $data->{runtime_deps} eq 'ARRAY' ) {
+            for my $dep ( @{ $data->{runtime_deps} } ) {
+                next unless ref $dep eq 'HASH';
+                for my $k (qw[path dir]) {
+                    $dep->{$k} = $self->_under_share( $share, $dep->{$k} ) if defined $dep->{$k};
+                }
+            }
         }
         return $data;
     }

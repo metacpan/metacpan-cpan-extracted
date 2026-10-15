@@ -10,24 +10,27 @@
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
+#include "ppport.h"
 
 #include "md5crypt.h"
 #include "des.h"
 #include "sha256crypt.h"
 #include "sha512crypt.h"
+#include "yescrypt_crypt.h"
 
 
 typedef char *(*crypt_function_t)(const char*, const char*);
 
 /* The enum and map are in the same order for easy lookup */
-typedef enum { MD5 = 0, APR1, DES, SHA256, SHA512 } crypt_scheme_t;
+typedef enum { MD5 = 0, APR1, DES, SHA256, SHA512, YESCRYPT } crypt_scheme_t;
 
 crypt_function_t crypt_function_map[] = {
     cpx_crypt_md5,
     cpx_crypt_apr1,
     cpx_crypt_des,
     cpx_sha256_crypt,
-    cpx_sha512_crypt
+    cpx_sha512_crypt,
+    NULL                /* YESCRYPT: reentrant, called directly in _multi_crypt() */
 };
 
 /* This function performs all cleanup of input and calls the correct C crypt function */
@@ -44,7 +47,20 @@ SV* _multi_crypt(crypt_scheme_t scheme, SV *pw, SV *salt) {
     if (SvPOK(salt)) {
         salt_cstr = SvPVX(salt);
     } else {
-        salt_cstr = "";
+        salt_cstr = "\0";
+    }
+    if (scheme == YESCRYPT) {
+        /* A per-call buffer, so concurrent ithreads never share the result. */
+        char buf[CPX_YESCRYPT_BUFLEN];
+        cryptpw_cstr = cpx_yescrypt_crypt( pw_cstr, salt_cstr, buf, sizeof(buf) );
+        /* Copy out before buf goes out of scope. */
+        if (cryptpw_cstr != NULL) {
+            RETVAL = newSVpv(cryptpw_cstr,0);
+        }
+        return RETVAL;
+    }
+    if (crypt_function_map[scheme] == NULL) {
+        return RETVAL;
     }
     cryptpw_cstr = crypt_function_map[scheme]( pw_cstr, salt_cstr );
     if (cryptpw_cstr != NULL) {
@@ -108,6 +124,17 @@ unix_sha512_crypt(pw,salt)
 
     CODE:
         RETVAL = _multi_crypt(SHA512, pw, salt);
+
+    OUTPUT:
+        RETVAL
+
+SV*
+unix_yescrypt_crypt(pw,salt)
+    SV *pw;
+    SV *salt;
+
+    CODE:
+        RETVAL = _multi_crypt(YESCRYPT, pw, salt);
 
     OUTPUT:
         RETVAL

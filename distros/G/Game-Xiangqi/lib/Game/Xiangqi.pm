@@ -11,7 +11,7 @@ use Game::Xiangqi::Engine ':all';
 use Game::Xiangqi::Notation;
 use Game::Xiangqi::Error;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 my $E = 'Game::Xiangqi::Engine';
 my $N = 'Game::Xiangqi::Notation';
@@ -80,6 +80,11 @@ sub seed {
 
 sub play {
     my ($self, $iccs) = @_;
+    return $self->_play($iccs, 1);
+}
+
+sub _play {
+    my ($self, $iccs, $judge) = @_;
     return $R->throw('game_over') unless $self->status eq 'active';
 
     my $mv = $N->move_of_iccs($iccs);
@@ -92,12 +97,13 @@ sub play {
     push @{ $self->_played }, $mv;
     $self->_pos->do_move($mv);
 
-    $self->_settle;
+    $self->_settle($judge);
     return 0;
 }
 
 sub _settle {
-    my ($self) = @_;
+    my ($self, $judge) = @_;
+    $judge = 1 unless defined $judge;
 
     my ($winner, $reason) = $self->_pos->outcome;
     if ($winner) {
@@ -110,6 +116,7 @@ sub _settle {
         });
         return;
     }
+    return unless $judge;
 
     my $v = $self->_start->judge($self->_played);
     return unless $v->{reason} != J_ONGOING;
@@ -231,6 +238,67 @@ sub _walk {
         return wantarray ? ($self, $why, $i) : undef if $why;
     }
     return wantarray ? ($self, 0, scalar @$moves) : $self;
+}
+
+sub to_text {
+    my ($self) = @_;
+    return join "\n",
+        'xiangqi 1',
+        'seed ' . unpack('H*', $self->_held_seed),
+        'red ' . $self->red,
+        'start ' . $self->_start->to_fen,
+        join(' ', 'moves', @{ $self->_log }),
+        'status ' . $self->status,
+        '';
+}
+
+sub from_text {
+    my ($class, $text) = @_;
+    Carp::croak('Game::Xiangqi: from_text needs the text to_text wrote, and was given '
+        . (defined $text ? 'a reference' : 'nothing'))
+        if !defined $text || ref $text;
+
+    my @lines = split /\n/, $text;
+    Carp::croak('Game::Xiangqi: the text is not a saved game of xiangqi, version 1')
+        unless @lines && $lines[0] eq 'xiangqi 1';
+
+    my %field;
+    for my $line (@lines[1 .. $#lines]) {
+        my ($name, $value) = $line =~ /\A(seed|red|start|moves|status)(?: (.*))?\z/
+            or Carp::croak("Game::Xiangqi: the saved game has a line it does not know: '$line'");
+        Carp::croak("Game::Xiangqi: the saved game gives $name twice")
+            if exists $field{$name};
+        $field{$name} = defined $value ? $value : '';
+    }
+    for my $name (qw/seed red start moves status/) {
+        Carp::croak("Game::Xiangqi: the saved game has no $name line")
+            unless exists $field{$name};
+    }
+
+    Carp::croak('Game::Xiangqi: the saved seed is not sixty-four hex digits')
+        unless $field{seed} =~ /\A[0-9a-f]{64}\z/;
+    Carp::croak("Game::Xiangqi: the saved status must be 'active' or 'finished', not '$field{status}'")
+        unless $field{status} eq 'active' || $field{status} eq 'finished';
+
+    my ($start, $err) = $E->of_fen($field{start});
+    Carp::croak("Game::Xiangqi: the saved start position was refused, code $err")
+        unless $start;
+
+    my $self = $class->new(
+        seed     => pack('H*', $field{seed}),
+        red      => $field{red},
+        position => $start,
+    );
+    my @moves = split ' ', $field{moves};
+    for my $at (0 .. $#moves) {
+        my $why = $self->_play($moves[$at], $at == $#moves);
+        Carp::croak('Game::Xiangqi: the saved move ' . ($at + 1) . ", $moves[$at], was refused: "
+            . $why->code)
+            if $why;
+    }
+
+    $self->status($field{status});
+    return $self;
 }
 
 1;
@@ -404,6 +472,32 @@ a bad log went wrong, C<$refusal> being a L<Game::Xiangqi::Error>. In scalar con
 they return the game, or C<undef> if any move was refused. A misuse, such as an
 odd-sized list, returns C<undef> and does not warn; a bad seed croaks, as it does in
 C<new>.
+
+=head2 to_text
+
+    my $text = $game->to_text;
+
+The game as a string, from which L</from_text> builds the same game again: the
+seed in hex, the seat that plays Red, the starting position as FEN, every move in
+ICCS, and the status. A status set by the caller, as for a resignation, is kept.
+Two games with the same history write the same string.
+
+=head2 from_text
+
+    my $again = Game::Xiangqi->from_text($text);
+
+A new game built from a string L</to_text> wrote, by B<replaying its moves from
+its starting position>, so the judge sees the whole sequence and every counter
+and repetition ruling comes back as it was. Each move is checked as it is played,
+and checkmate and stalemate as they arise, but the judge reads the sequence once,
+after the last move, rather than after every move as C<play> does: a game that
+was still on carries no ruling from the moves before its last. The new game
+shares nothing with the one that was written, and writes the same string.
+
+A string that is not one C<to_text> writes B<croaks> with a sentence naming what
+is wrong: a missing or unknown line, a seed that is not sixty-four hex digits, a
+starting position the engine refuses, or a move that the replay refuses, by its
+number.
 
 =head2 position
 

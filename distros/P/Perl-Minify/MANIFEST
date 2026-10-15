@@ -1,0 +1,20 @@
+bench.pl
+CHANGELOG.md
+lib/Perl/Minify.pm
+LICENSE
+Makefile.PL
+MANIFEST
+minify.pl
+color.pl
+README.md
+t/00-basic.t
+t/01-edge.t
+t/02-minify-opts.t
+t/03-minify-sub.t
+t/04-shorten-vars.t
+t/05-wrap.t
+t/06-optimize.t
+t/07-error-reporting.t
+t/08-integration-compile.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

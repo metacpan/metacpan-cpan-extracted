@@ -6,9 +6,8 @@ use warnings;
 use JSON;
 use Clone 'clone';
 use File::Slurp;
-use IO::Interface::Simple;
-use Math::BigInt;
 use Scalar::Util qw(looks_like_number);
+use Time::HiRes  qw(time);
 
 =head1 NAME
 
@@ -39,6 +38,8 @@ The cgroup to name mapping is done like below.
     user -> u_$name
     docker -> d_$name
     podman -> p_$name
+    machine.slice, non-podman -> m_$type_$name
+        type is qemu, lxc, or nspawn, omitted if unknown
     anything else -> $name
 
 Anything else is formed like below.
@@ -75,7 +76,7 @@ The following mappings are done though.
     throttled_usec -> throttled-time
     burst_usec -> burst-time
 
-=head2 METHODS
+=head1 METHODS
 
 =head2 new
 
@@ -179,6 +180,9 @@ sub new {
 		},
 		cache     => {},
 		new_cache => {},
+		# seconds since the previous run, for turning counter deltas into rates...
+		# set by run from the time saved in the cache, 300 if that is unknown
+		interval => 300,
 	};
 	bless $self;
 
@@ -195,9 +199,10 @@ sub run {
 	my $self = $_[0];
 
 	my $data = {
-		errors => [],
-		oslvms => {},
-		has    => {
+		errors        => [],
+		cache_failure => 0,
+		oslvms        => {},
+		has           => {
 			'linux_mem_stats' => 1,
 			'rwdops'          => 0,
 			'rwdbytes'        => 0,
@@ -213,7 +218,7 @@ sub run {
 			'burst_count'     => 0,
 			'throttled_count' => 0,
 		},
-		totals => {
+		totals        => {
 			procs                          => 0,
 			'percent-cpu'                  => 0,
 			'percent-memory'               => 0,
@@ -302,8 +307,6 @@ sub run {
 		},
 	};
 
-	my $proc_cache;
-	my $new_cache    = {};
 	my $cache_is_new = 0;
 	if ( -f $self->{cache_file} ) {
 		eval {
@@ -325,6 +328,12 @@ sub run {
 	} else {
 		$cache_is_new = 1;
 	}
+
+	# rates are computed over the time since the previous run, as saved in the
+	# cache, instead of assuming it was 300 seconds ago
+	my $run_time = time;
+	$self->{interval} = $self->{obj}->interval_since( $self->{cache}, $run_time );
+	$self->{new_cache}{__oslv_monitor__} = { time => $run_time };
 
 	my $base_stats = {
 		procs                          => 0,
@@ -480,7 +489,12 @@ sub run {
 						};
 						my $inspect_output = `$cgroup_jank_type inspect $pod_id 2> /dev/null`;
 						my $inspect_parsed;
-						$self->{ $cgroup_jank_type . '_info' }{$pod_name} = { ip => [], path => undef };
+						# every container in a podman pod maps to the pod name, so the info is
+						# only created for the first and the rest are merged into it
+						if ( !defined( $self->{ $cgroup_jank_type . '_info' }{$pod_name} ) ) {
+							$self->{ $cgroup_jank_type . '_info' }{$pod_name} = { ip => [], path => [] };
+						}
+						my $pod_info = $self->{ $cgroup_jank_type . '_info' }{$pod_name};
 						eval { $inspect_parsed = decode_json($inspect_output) };
 						# record the container's root filesystem path when available
 						if (   defined($inspect_parsed)
@@ -495,8 +509,10 @@ sub run {
 							&& ref( $inspect_parsed->[0]{GraphDriver}{Data}{MergedDir} ) eq ''
 							&& $inspect_parsed->[0]{GraphDriver}{Data}{MergedDir} ne '' )
 						{
-							$self->{ $cgroup_jank_type . '_info' }{$pod_name}{path}
-								= $inspect_parsed->[0]{GraphDriver}{Data}{MergedDir};
+							my $merged_dir = $inspect_parsed->[0]{GraphDriver}{Data}{MergedDir};
+							if ( !grep { $_ eq $merged_dir } @{ $pod_info->{path} } ) {
+								push( @{ $pod_info->{path} }, $merged_dir );
+							}
 						}
 						if (   defined($inspect_parsed)
 							&& ref($inspect_parsed) eq 'ARRAY'
@@ -511,25 +527,13 @@ sub run {
 							foreach my $network_to_process (@podman_networks) {
 								my $current_network
 									= $inspect_parsed->[0]{NetworkSettings}{Networks}{$network_to_process};
-								if (   ref($current_network) eq 'HASH'
-									&& ref( $current_network->{IPAddress} ) eq '' )
-								{
-									my $net_work_info = {
-										ip    => $current_network->{IPAddress},
-										gw    => undef,
-										gw_if => undef,
-										mac   => undef,
-										if    => undef,
-									};
-									if ( defined( $current_network->{Gateway} )
-										&& ref( $current_network->{Gateway} ) eq '' )
-									{
-										$net_work_info->{gw} = $current_network->{Gateway};
-									}
+								if ( ref($current_network) eq 'HASH' ) {
+									my $network_if;
+									my $network_mac;
 									if ( defined( $current_network->{MacAddress} )
 										&& ref( $current_network->{MacAddress} ) eq '' )
 									{
-										$net_work_info->{mac} = $current_network->{MacAddress};
+										$network_mac = $current_network->{MacAddress};
 									}
 									if ( defined( $current_network->{NetworkID} )
 										&& ref( $current_network->{NetworkID} ) eq '' )
@@ -542,29 +546,65 @@ sub run {
 										if (   defined($network_inspect_parsed)
 											&& ref($network_inspect_parsed) eq 'ARRAY'
 											&& defined( $network_inspect_parsed->[0] )
-											&& ref( $network_inspect_parsed->[0] ) eq 'HASH'
-											&& defined( $network_inspect_parsed->[0]{network_interface} )
-											&& ref( $network_inspect_parsed->[0]{network_interface} ) eq '' )
+											&& ref( $network_inspect_parsed->[0] ) eq 'HASH' )
 										{
-											$net_work_info->{if} = $network_inspect_parsed->[0]{network_interface};
-										}
-									} ## end if ( defined( $current_network->{NetworkID...}))
-									if (   defined( $net_work_info->{if} )
-										&& defined( $net_work_info->{ip} ) )
-									{
-										my $ip_r_g_output
-											= `ip r g from $net_work_info->{ip} iif $net_work_info->{if} 8.8.8.8`;
-										if ( $? == 0 ) {
-											my @ip_r_g_output_split = split( /\n/, $ip_r_g_output );
-											if ( defined( $ip_r_g_output_split[0] ) ) {
-												$ip_r_g_output_split[0] =~ s/^.*[\ \t]+dev[\ \t]+//;
-												$ip_r_g_output_split[0] =~ s/[\ \t].*$//;
-												$net_work_info->{gw_if} = $ip_r_g_output_split[0];
+											my $network = $network_inspect_parsed->[0];
+											# podman reports the interface directly, while docker has it as a
+											# option for the bridge, and if not set there, it is br- followed
+											# by the first 12 characters of the network ID
+											if ( defined( $network->{network_interface} )
+												&& ref( $network->{network_interface} ) eq '' )
+											{
+												$network_if = $network->{network_interface};
+											} elsif ( ref( $network->{Options} ) eq 'HASH'
+												&& defined( $network->{Options}{'com.docker.network.bridge.name'} )
+												&& ref( $network->{Options}{'com.docker.network.bridge.name'} ) eq '' )
+											{
+												$network_if = $network->{Options}{'com.docker.network.bridge.name'};
+											} elsif ( defined( $network->{Driver} )
+												&& $network->{Driver} eq 'bridge'
+												&& defined( $network->{Id} )
+												&& ref( $network->{Id} ) eq '' )
+											{
+												$network_if = 'br-' . substr( $network->{Id}, 0, 12 );
 											}
+										} ## end if ( defined($network_inspect_parsed) && ...)
+									} ## end if ( defined( $current_network->{NetworkID...}))
+
+									# a network may have a IPv4 address, a IPv6 one, or both, and each
+									# gets its own entry
+									foreach my $ip_keys ( [ 'IPAddress', 'Gateway' ], [ 'GlobalIPv6Address', 'IPv6Gateway' ] )
+									{
+										my ( $ip_key, $gw_key ) = @{$ip_keys};
+										if (   !defined( $current_network->{$ip_key} )
+											|| ref( $current_network->{$ip_key} ) ne ''
+											|| $current_network->{$ip_key} eq '' )
+										{
+											next;
 										}
-									} ## end if ( defined( $net_work_info->{if} ) && defined...)
-									push( @{ $self->{ $cgroup_jank_type . '_info' }{$pod_name}{ip} }, $net_work_info );
-								} ## end if ( ref($current_network) eq 'HASH' && ref...)
+										my $net_work_info = {
+											ip    => $current_network->{$ip_key},
+											gw    => undef,
+											gw_if => undef,
+											mac   => $network_mac,
+											if    => $network_if,
+										};
+										if (   defined( $current_network->{$gw_key} )
+											&& ref( $current_network->{$gw_key} ) eq ''
+											&& $current_network->{$gw_key} ne '' )
+										{
+											$net_work_info->{gw} = $current_network->{$gw_key};
+										}
+										if ( defined($network_if) ) {
+											$net_work_info->{gw_if} = $self->route_get_if( $net_work_info->{ip}, $network_if );
+										}
+										# containers in a pod share the network namespace of the pod,
+										# so the same IP turns up for each of them
+										if ( !grep { $_->{ip} eq $net_work_info->{ip} } @{ $pod_info->{ip} } ) {
+											push( @{ $pod_info->{ip} }, $net_work_info );
+										}
+									} ## end foreach my $ip_keys ( [ 'IPAddress', 'Gateway' ...])
+								} ## end if ( ref($current_network) eq 'HASH' )
 							} ## end foreach my $network_to_process (@podman_networks)
 						} ## end if ( defined($inspect_parsed) && ref($inspect_parsed...))
 					} ## end if ( defined($pod_id) && defined($pod_name...))
@@ -635,15 +675,6 @@ sub run {
 			$cgroups_root_paths{$cgroup}{$proc_root_path} = 1;
 		}
 
-		$data->{totals}{'percent-cpu'}    = $data->{totals}{'percent-cpu'} + $percpu;
-		$data->{totals}{'percent-memory'} = $data->{totals}{'percent-memory'} + $permem;
-		$data->{totals}{rss}              = $data->{totals}{rss} + $rss;
-		$data->{totals}{'virtual-size'}   = $data->{totals}{'virtual-size'} + $vsize;
-		$data->{totals}{'text-size'}      = $data->{totals}{'text-size'} + $trs;
-		$data->{totals}{'data-size'}      = $data->{totals}{'data-size'} + $drs;
-		$data->{totals}{'size'}           = $data->{totals}{'size'} + $size;
-		$data->{totals}{'elapsed-times'}  = $data->{totals}{'elapsed-times'} + $etimes;
-
 		eval {
 			if ( -f '/proc/' . $pid . '/status' ) {
 				my @switches_find = grep( /voluntary\_ctxt\_switches\:/, read_file( '/proc/' . $pid . '/status' ) );
@@ -653,7 +684,8 @@ sub run {
 					if ( defined( $switch_split[0] ) && defined( $switch_split[1] ) ) {
 						if ( $switch_split[0] eq 'voluntary_ctxt_switches' ) {
 							$vol_ctxt_switches = $switch_split[1];
-						} elsif ( $switch_split[0] eq 'involuntary_ctxt_switches' ) {
+						} elsif ( $switch_split[0] eq 'nonvoluntary_ctxt_switches' ) {
+							# the kernel calls these nonvoluntary and not involuntary
 							$invol_ctxt_switches = $switch_split[1];
 						}
 					}
@@ -662,12 +694,8 @@ sub run {
 		};
 		$vol_ctxt_switches
 			= $self->cache_process( $cache_name, 'voluntary-context-switches', $vol_ctxt_switches, $etimes );
-		$data->{totals}{'voluntary-context-switches'}
-			= $data->{totals}{'voluntary-context-switches'} + $vol_ctxt_switches;
 		$invol_ctxt_switches
 			= $self->cache_process( $cache_name, 'involuntary-context-switches', $invol_ctxt_switches, $etimes );
-		$data->{totals}{'involuntary-context-switches'}
-			= $data->{totals}{'involuntary-context-switches'} + $invol_ctxt_switches;
 
 		if ( !defined( $cgroups_permem{$cgroup} ) ) {
 			$cgroups_permem{$cgroup}               = $permem;
@@ -732,28 +760,27 @@ sub run {
 			$data->{oslvms}{$name} = clone($base_stats);
 
 			# these all come from ps and are per proc, so they are just summed up
-			# across every cgroup mapping to this name
+			# across every cgroup mapping to this name... the totals are summed here
+			# as well so they only cover included names, same as the cgroup stats
 			my %root_paths_found;
 			foreach my $cgroup ( @{ $name_to_cgroups{$name} } ) {
-				$data->{oslvms}{$name}{'percent-cpu'}
-					= $data->{oslvms}{$name}{'percent-cpu'} + $cgroups_percpu{$cgroup};
-				$data->{oslvms}{$name}{'percent-memory'}
-					= $data->{oslvms}{$name}{'percent-memory'} + $cgroups_permem{$cgroup};
-				$data->{oslvms}{$name}{procs}  = $data->{oslvms}{$name}{procs} + $cgroups_procs{$cgroup};
-				$data->{totals}{procs}         = $data->{totals}{procs} + $cgroups_procs{$cgroup};
-				$data->{oslvms}{$name}{rss}    = $data->{oslvms}{$name}{rss} + $cgroups_rss{$cgroup};
-				$data->{oslvms}{$name}{'size'} = $data->{oslvms}{$name}{'size'} + $cgroups_size{$cgroup};
-				$data->{oslvms}{$name}{'virtual-size'}
-					= $data->{oslvms}{$name}{'virtual-size'} + $cgroups_vsize{$cgroup};
-				$data->{oslvms}{$name}{'text-size'} = $data->{oslvms}{$name}{'text-size'} + $cgroups_trs{$cgroup};
-				$data->{oslvms}{$name}{'data-size'} = $data->{oslvms}{$name}{'data-size'} + $cgroups_drs{$cgroup};
-				$data->{oslvms}{$name}{'elapsed-times'}
-					= $data->{oslvms}{$name}{'elapsed-times'} + $cgroups_etimes{$cgroup};
-				$data->{oslvms}{$name}{'voluntary-context-switches'}
-					= $data->{oslvms}{$name}{'voluntary-context-switches'} + $cgroups_vol_ctxt_switches{$cgroup};
-				$data->{oslvms}{$name}{'involuntary-context-switches'}
-					= $data->{oslvms}{$name}{'involuntary-context-switches'}
-					+ $cgroups_invvol_ctxt_switches{$cgroup};
+				my %ps_stats = (
+					'percent-cpu'                  => $cgroups_percpu{$cgroup},
+					'percent-memory'               => $cgroups_permem{$cgroup},
+					procs                          => $cgroups_procs{$cgroup},
+					rss                            => $cgroups_rss{$cgroup},
+					'size'                         => $cgroups_size{$cgroup},
+					'virtual-size'                 => $cgroups_vsize{$cgroup},
+					'text-size'                    => $cgroups_trs{$cgroup},
+					'data-size'                    => $cgroups_drs{$cgroup},
+					'elapsed-times'                => $cgroups_etimes{$cgroup},
+					'voluntary-context-switches'   => $cgroups_vol_ctxt_switches{$cgroup},
+					'involuntary-context-switches' => $cgroups_invvol_ctxt_switches{$cgroup},
+				);
+				foreach my $stat ( keys(%ps_stats) ) {
+					$data->{oslvms}{$name}{$stat} = $data->{oslvms}{$name}{$stat} + $ps_stats{$stat};
+					$data->{totals}{$stat}        = $data->{totals}{$stat} + $ps_stats{$stat};
+				}
 
 				if ( defined( $cgroups_root_paths{$cgroup} ) ) {
 					foreach my $root_path ( keys( %{ $cgroups_root_paths{$cgroup} } ) ) {
@@ -765,10 +792,11 @@ sub run {
 			if ( $name =~ /^p\_/ || $name =~ /^d\_/ ) {
 				my $container_name = $name;
 				$container_name =~ s/^[pd]\_//;
-				if ( $name =~ /^p\_/ ) {
-					$data->{oslvms}{$name}{'ip'} = $self->{podman_info}{$container_name}{ip};
-				} elsif ( $name =~ /^d\_/ ) {
-					$data->{oslvms}{$name}{'ip'} = $self->{docker_info}{$container_name}{ip};
+				my $info_key = ( $name =~ /^p\_/ ) ? 'podman_info' : 'docker_info';
+				# a container with no ps/inspect info, such as one whose ID could not be
+				# mapped to a name, keeps the empty IP list from the base stats
+				if ( defined( $self->{$info_key}{$container_name} ) ) {
+					$data->{oslvms}{$name}{'ip'} = $self->{$info_key}{$container_name}{ip};
 				}
 			}
 
@@ -781,10 +809,8 @@ sub run {
 				my $container_name = $name;
 				$container_name =~ s/^[pd]\_//;
 				my $info_key = ( $name =~ /^p\_/ ) ? 'podman_info' : 'docker_info';
-				if ( defined( $self->{$info_key}{$container_name}{path} )
-					&& $self->{$info_key}{$container_name}{path} ne '' )
-				{
-					push( @root_paths, $self->{$info_key}{$container_name}{path} );
+				if ( defined( $self->{$info_key}{$container_name} ) ) {
+					push( @root_paths, @{ $self->{$info_key}{$container_name}{path} } );
 				}
 			}
 			if ( !@root_paths ) {
@@ -909,7 +935,8 @@ sub run {
 
 =head2 usable
 
-Dies if not usable.
+Dies if not usable, meaning not Linux or cgroup v2 is not mounted at
+/sys/fs/cgroup.
 
     eval{ $backend->usable; };
     if ( $@ ){
@@ -921,15 +948,31 @@ Dies if not usable.
 sub usable {
 	my $self = $_[0];
 
-	# make sure it is freebsd
-
+	# make sure it is linux
 	if ( $^O !~ 'linux' ) {
 		die '$^O is "' . $^O . '" and not "linux"';
+	}
+
+	# the stats are read from under /sys/fs/cgroup, which on a hybrid or v1 only
+	# setup is not the unified hierarchy
+	if ( !-f '/sys/fs/cgroup/cgroup.controllers' ) {
+		die 'cgroup v2 is not mounted at /sys/fs/cgroup';
 	}
 
 	return 1;
 } ## end sub usable
 
+# Finds the cgroup v2 cgroup for a process.
+#
+# One arg is taken, the PID to check.
+#
+# Returns the unified hierarchy line from /proc/$pid/cgroup, as is, such as
+# "0::/system.slice/ssh.service". undef is returned if the PID is undef or not
+# a number, the process exited before it could be read, it is in the root
+# cgroup, or it is not under the unified hierarchy.
+#
+#     my $cgroup = $backend->proc_cgroup(1234);
+#     # "0::/user.slice/user-1000.slice/session-5.scope"
 sub proc_cgroup {
 	my $self = $_[0];
 	my $pid  = $_[1];
@@ -963,10 +1006,83 @@ sub proc_cgroup {
 	return undef;
 } ## end sub proc_cgroup
 
+# Finds the host interface that traffic from a container IP leaves by, as seen
+# by the routing table for a packet arriving from the container's network.
+# Nothing is sent... "ip route get" only does a route lookup, using a public
+# address, 8.8.8.8 or 2001:4860:4860::8888, as the destination.
+#
+# Takes the args below.
+#
+#     - ip :: The container IP, IPv4 or IPv6.
+#
+#     - if :: The host interface for the container's network, such as docker0
+#             or podman0.
+#
+# Returns the interface name, or undef if either arg is undef or does not look
+# like a IP or interface name, or if the lookup fails. The args are checked as
+# they are passed to the shell.
+#
+#     my $gw_if = $backend->route_get_if( '172.17.0.2', 'docker0' );    # "eth0"
+#     $gw_if = $backend->route_get_if( 'fd00::2', 'podman0' );           # "eth0"
+sub route_get_if {
+	my $self = $_[0];
+	my $ip   = $_[1];
+	my $if   = $_[2];
+
+	if (   !defined($ip)
+		|| !defined($if)
+		|| $ip !~ /^[0-9a-fA-F\.\:]+$/
+		|| $if !~ /^[A-Za-z0-9\.\_\-\@]+$/ )
+	{
+		return undef;
+	}
+
+	my ( $family, $destination ) = ( '-4', '8.8.8.8' );
+	if ( $ip =~ /\:/ ) {
+		( $family, $destination ) = ( '-6', '2001:4860:4860::8888' );
+	}
+
+	my $output = `ip -j $family route get $destination from $ip iif $if 2> /dev/null`;
+	if ( $? != 0 ) {
+		return undef;
+	}
+
+	my $parsed;
+	eval { $parsed = decode_json($output); };
+	if (   ref($parsed) eq 'ARRAY'
+		&& ref( $parsed->[0] ) eq 'HASH'
+		&& defined( $parsed->[0]{dev} )
+		&& ref( $parsed->[0]{dev} ) eq '' )
+	{
+		return $parsed->[0]{dev};
+	}
+
+	return undef;
+} ## end sub route_get_if
+
+# Maps a cgroup to the name it is reported as and to the dir its stats are read
+# from. See the POD SYNOPSIS for the naming. docker_mapping and podman_mapping
+# need to be filled in first for containers to be named, else the ID is used.
+#
+# For a user slice, uid_mapping is also filled in with the passwd info for the
+# UID if one exists.
+#
+# One arg is taken, the cgroup as returned by proc_cgroup.
+#
+# Returns a list of two items. The first is the name. The second is the dir to
+# read stats from, relative to /sys/fs/cgroup. As cgroup v2 stats include
+# descendants, this is the unit, slice, or container the name is for and not
+# the cgroup itself. Both are undef if there is no name to map to, such as the
+# root cgroup.
+#
+#     my ( $name, $stat_dir ) = $backend->cgroup_mapping('0::/system.slice/systemd-udevd.service/udev');
+#     # ( 's_systemd-udevd', '/system.slice/systemd-udevd.service' )
+#
+#     ( $name, $stat_dir ) = $backend->cgroup_mapping('0::/user.slice/user-1000.slice/session-5.scope');
+#     # ( 'u_1000', '/user.slice/user-1000.slice' )
 sub cgroup_mapping {
 	my $self        = $_[0];
 	my $cgroup_name = $_[1];
-	#my $cgroupns    = $_[2];
 
 	if ( !defined($cgroup_name) ) {
 		return undef;
@@ -991,10 +1107,34 @@ sub cgroup_mapping {
 		my $id = $cgroup_name;
 		$id =~ s/^0\:\:\/docker\///;
 		$id =~ s/\/.*$//;
+		if ( defined( $self->{docker_mapping}{$id} ) ) {
+			return ( 'd_' . $self->{docker_mapping}{$id}{name}, '/docker/' . $id );
+		}
 		return ( 'd_' . $id, '/docker/' . $id );
-	} elsif ( $cgroup_name =~ /^0\:\:\/system\.slice\// ) {
+	} elsif ( $cgroup_name =~ /^0\:\:\/machine\.slice\/libpod\-conmon-/ ) {
+		# every container has its own conmon scope and all of them are lumped in
+		# under the one name, so the stats are read from each of those scopes
+		my $scope = $cgroup_name;
+		$scope =~ s/^0\:\:\/machine\.slice\///;
+		$scope =~ s/\/.*$//;
+		return ( 'libpod-conmon', '/machine.slice/' . $scope );
+	} elsif ( $cgroup_name =~ /^0\:\:\/machine\.slice\/libpod\-/ ) {
+		my $id = $cgroup_name;
+		$id =~ s/^0\:\:\/machine\.slice\/libpod\-//;
+		$id =~ s/\.scope.*$//;
+		my $stat_dir = '/machine.slice/libpod-' . $id . '.scope';
+		if ( defined( $self->{podman_mapping}{$id} ) ) {
+			return ( 'p_' . $self->{podman_mapping}{$id}{name}, $stat_dir );
+		}
+		return ( 'libpod', $stat_dir );
+	} elsif ( $cgroup_name =~ /^0\:\:\/(system|machine)\.slice\// ) {
+		# machine.slice is handled the same as system.slice once the libpod scopes
+		# have been dealt with... reading stats from all of machine.slice would also
+		# count every podman container under it a second time
+		my $slice       = $1;
+		my $prefix      = ( $slice eq 'system' ) ? 's_' : 'm_';
 		my $under_slice = $cgroup_name;
-		$under_slice =~ s/^0\:\:\/system\.slice\///;
+		$under_slice =~ s/^0\:\:\/(system|machine)\.slice\///;
 		# the first unit in the path is used so that a service with nested
 		# cgroups, such as systemd-udevd.service/udev, is grouped under the
 		# service and not under the name of the nested cgroup... nested slices,
@@ -1019,9 +1159,12 @@ sub cgroup_mapping {
 		}
 		# stats are read from the unit and not from the cgroups nested under it as
 		# the name is for the unit as a whole
-		my $stat_dir = '/system.slice/' . join( '/', @unit_path );
+		my $stat_dir = '/' . $slice . '.slice/' . join( '/', @unit_path );
 		$unit =~ s/\.(service|scope)$//;
-		return ( 's_' . $unit, $stat_dir );
+		if ( $slice eq 'machine' ) {
+			$unit = $self->machine_name($unit);
+		}
+		return ( $prefix . $unit, $stat_dir );
 	} elsif ( $cgroup_name =~ /^0\:\:\/user\.slice\// ) {
 		my $user = $cgroup_name;
 		$user =~ s/^0\:\:\/user\.slice\///;
@@ -1046,22 +1189,6 @@ sub cgroup_mapping {
 		} ## end if ( $user =~ /^\d+$/ )
 
 		return ( 'u_' . $user, $stat_dir );
-	} elsif ( $cgroup_name =~ /^0\:\:\/machine\.slice\/libpod\-conmon-/ ) {
-		# every container has its own conmon scope and all of them are lumped in
-		# under the one name, so the stats are read from each of those scopes
-		my $scope = $cgroup_name;
-		$scope =~ s/^0\:\:\/machine\.slice\///;
-		$scope =~ s/\/.*$//;
-		return ( 'libpod-conmon', '/machine.slice/' . $scope );
-	} elsif ( $cgroup_name =~ /^0\:\:\/machine\.slice\/libpod\-/ ) {
-		my $id = $cgroup_name;
-		$id =~ s/^0\:\:\/machine\.slice\/libpod\-//;
-		$id =~ s/\.scope.*$//;
-		my $stat_dir = '/machine.slice/libpod-' . $id . '.scope';
-		if ( defined( $self->{podman_mapping}{$id} ) ) {
-			return ( 'p_' . $self->{podman_mapping}{$id}{name}, $stat_dir );
-		}
-		return ( 'libpod', $stat_dir );
 	}
 
 	$cgroup_name =~ s/^0\:\:\///;
@@ -1072,23 +1199,82 @@ sub cgroup_mapping {
 	return ( $cgroup_name, '/' . $cgroup_name );
 } ## end sub cgroup_mapping
 
-sub ip_to_if {
+# Normalizes the name of a unit under machine.slice to the name of the machine,
+# so it is readable and stays the same across restarts.
+#
+# systemd escapes "-" in unit names as \x2d, machined names scopes
+# machine-$name, and libvirt adds its type and domain ID, which changes each
+# time the VM starts, as $type-$id-$name. nspawn started via machinectl is
+# systemd-nspawn@$name instead.
+#
+# One arg is taken, the unit name with .service or .scope already removed.
+#
+# Returns the normalized name, prefixed with what it came from, qemu_, lxc_, or
+# nspawn_, when that is known. A plain machine-$name scope could be from any
+# machined user, such as nspawn run directly, so it gets no type. If normalizing
+# leaves no name, the unit name is returned as is.
+#
+#     machine-qemu\x2d1\x2dvm  -> qemu_vm
+#     machine-lxc\x2d12\x2dweb -> lxc_web
+#     systemd-nspawn@foo       -> nspawn_foo
+#     machine-foo              -> foo
+#     foo\x2dbar               -> foo-bar
+sub machine_name {
 	my $self = $_[0];
-	my $ip   = $_[1];
+	my $unit = $_[1];
 
-	if ( !defined($ip) || ref($ip) ne '' ) {
-		return undef;
+	my $name = $unit;
+	my $type;
+	$name =~ s/\\x([0-9a-fA-F]{2})/chr(hex($1))/ge;
+	if ( $name =~ s/^machine\-// ) {
+		if ( $name =~ s/^(qemu|lxc)\-\d+\-// ) {
+			$type = $1;
+		}
+	} elsif ( $name =~ s/^systemd\-nspawn\@// ) {
+		$type = 'nspawn';
 	}
 
-	my $if = IO::Interface::Simple->new_from_address($ip);
-
-	if ( !defined($if) ) {
-		return undef;
+	if ( $name eq '' ) {
+		return $unit;
 	}
 
-	return $if->name;
-} ## end sub ip_to_if
+	if ( defined($type) ) {
+		return $type . '_' . $name;
+	}
 
+	return $name;
+} ## end sub machine_name
+
+# Turns a counter into a per second rate using the value cached by the previous
+# run. Gauges, anything not in the counters list, are returned as is.
+#
+# For counters the raw value is saved to new_cache for the next run. The rate
+# is the delta divided by the interval since the previous run. *_usec time
+# counters are also divided by time_divider, making them seconds per second.
+#
+# Takes the args below.
+#
+#     - name :: The cache entry, such as "cgroup-/system.slice/ssh.service" or
+#             "proc-$pid-$uid-$gid-$cgroup".
+#
+#     - var :: The stat name, such as "rbytes" or "cpu-time".
+#
+#     - new_value :: The current raw value.
+#
+#     - age :: Optional age in seconds of what the counter is for. Used when
+#             nothing is cached, see below.
+#
+# Returns the rate, or the value for a gauge. 0 is returned if any of the first
+# three args are undef, for a rate over 10000000000 as it is garbage, and for a
+# counter with nothing cached unless age is set and within the interval, as
+# then the total accrued is all from this interval. If the counter went
+# backwards it was reset, so the raw value is used as the delta.
+#
+#     # rbytes cached as 100 and a interval of 300
+#     my $rate = $backend->cache_process( 'cgroup-/foo', 'rbytes', 400 );    # 1
+#
+#     # a gauge
+#     my $anon = $backend->cache_process( 'cgroup-/foo', 'anon', 12345 );    # 12345
 sub cache_process {
 	my $self      = $_[0];
 	my $name      = $_[1];
@@ -1118,7 +1304,7 @@ sub cache_process {
 	# but for young ones the total accrued is from this interval, so usable...
 	# either way the raw value saved to new_cache above provides the delta next run
 	if ( !defined( $self->{cache}{$name}{$var} ) ) {
-		if ( !defined($age) || !looks_like_number($age) || $age > 300 ) {
+		if ( !defined($age) || !looks_like_number($age) || $age > $self->{interval} ) {
 			return 0;
 		}
 	} elsif ( $new_value >= $self->{cache}{$name}{$var} ) {
@@ -1137,7 +1323,7 @@ sub cache_process {
 		{
 			$new_value = $new_value / $self->{time_divider};
 		}
-		$new_value = $new_value / 300;
+		$new_value = $new_value / $self->{interval};
 	} ## end if ( $new_value != 0 )
 
 	# discard garbage values... new_cache keeps the raw value saved above so

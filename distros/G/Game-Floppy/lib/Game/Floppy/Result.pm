@@ -7,7 +7,7 @@ use warnings;
 use Carp ();
 use Object::Proto::Sugar -types;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 our @CAUSES = qw/ ground sky tube quit /;
 
@@ -85,7 +85,7 @@ Game::Floppy::Result - how a game of Floppy ended
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =head1 SYNOPSIS
 

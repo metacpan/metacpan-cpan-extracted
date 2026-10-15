@@ -1112,9 +1112,9 @@ static char *cx_formula (pTHX_ csv_t *csv, SV *sv, STRLEN *len, int f) {
 	csv->fld_idx = 0;						\
 	c = CSV_GET;							\
 	if (c == EOF || ser == 2) {					\
-	    sv_free (sv);						\
+	    unless (csv->is_bound) sv_free (sv);			\
 	    sv = NULL;							\
-	    seenSomething = FALSE;						\
+	    seenSomething = FALSE;					\
 	    if (ser == 2) return FALSE;					\
 	    break;							\
 	    }								\
@@ -1137,7 +1137,7 @@ static char *cx_formula (pTHX_ csv_t *csv, SV *sv, STRLEN *len, int f) {
 	SPAGAIN;							\
 	unless (result) {						\
 	    /* A false return will stop the parsing */			\
-	    sv_free (sv);						\
+	    unless (csv->is_bound) sv_free (sv);			\
 	    sv = NULL;							\
 	    waitingForField = 0;					\
 	    return FALSE;						\
@@ -1245,8 +1245,7 @@ static int cx_Combine (pTHX_ csv_t *csv, SV *dst, AV *fields) {
 		 * (always_quote), if binary or blank characters are found
 		 * and if the string contains quote or escape characters.
 		 */
-		if (!quoteMe &&
-		   ( quoteMe = (!SvIOK (sv) && !SvNOK (sv) && CH_QUOTE))) {
+		if (!quoteMe && (quoteMe = CH_QUOTE)) {
 		    char	*ptr2;
 		    STRLEN	 l;
 
@@ -1353,8 +1352,20 @@ static int cx_Combine (pTHX_ csv_t *csv, SV *dst, AV *fields) {
 	while (len--)
 	    CSV_PUT (csv, dst, *ptr++);
 	}
-    if (csv->used)
-	return Print (csv, dst);
+    if (csv->used) {
+	unless (Print (csv, dst))
+	    return FALSE;
+	if (csv->used) {
+	    /* Print () held back trailing bytes that are not valid UTF-8
+	     * to complete them on the next flush. This was the last flush
+	     * of the record, so write them now, as they are */
+	    int r, utf8 = csv->utf8;
+	    csv->utf8 = 0;
+	    r = Print (csv, dst);
+	    csv->utf8 = utf8;
+	    return r;
+	    }
+	}
     return TRUE;
     } /* Combine */
 
@@ -1586,7 +1597,7 @@ static void cx_strip_trail_whitespace (pTHX_ SV *sv) {
     STRLEN len;
     char   *s = SvPV (sv, len);
     unless (s && len) return;
-    while (s[len - 1] == CH_SPACE || s[len - 1] == CH_TAB)
+    while (len && (s[len - 1] == CH_SPACE || s[len - 1] == CH_TAB))
 	s[--len] = (char)0;
     SvCUR_set (sv, len);
     } /* strip_trail_whitespace */
@@ -2102,6 +2113,11 @@ EOLX:
 #endif
 		    unless (seenSomething)
 			break;
+		    /* parse (): a CR at the very end of the input is not part
+		     * of an EOL, as for a non-empty last field; do not go on
+		     * with EOF as if it were a data byte */
+		    unless (csv->useIO)
+			ERROR_INSIDE_FIELD (2032);
 		    goto restart;
 		    }
 
@@ -2474,8 +2490,17 @@ static int cx_c_xsParse (pTHX_ csv_t csv, HV *hv, AV *av, AV *avf, SV *src, bool
 
     if (csv.useIO) {
 	if (csv.tmp && csv.used < csv.size && csv.has_ahead) {
-	    SV *sv = newSVpvn (csv.bptr + csv.used, csv.size - csv.used);
-	    (void)hv_store  (hv, "_AHEAD", 6, sv, 0);
+	    SV **svp;
+	    if (ahead && SvREFCNT (csv.tmp) == 1
+		      && (svp = hv_fetchs (hv, "_AHEAD", FALSE)) && *svp == csv.tmp)
+		/* The remainder already lives in _AHEAD: drop the parsed
+		 * part in place instead of copying the whole tail again,
+		 * which made CR-only input quadratic */
+		sv_chop (csv.tmp, csv.bptr + csv.used);
+	    else {
+		SV *sv = newSVpvn (csv.bptr + csv.used, csv.size - csv.used);
+		(void)hv_store  (hv, "_AHEAD", 6, sv, 0);
+		}
 	    }
 	else {
 	    csv.has_ahead = 0;
@@ -2604,11 +2629,15 @@ static SV *cx_xsParse_all (pTHX_ SV *self, HV *hv, SV *io, SV *off, SV *len) {
 	    }
 	av_push (avr, newRV_noinc ((SV *)row));
 
-	if (n >= length && skip >= 0)
+	if (n >= length && skip >= 0) {
+	    row = NULL;
 	    break; /* We have enough */
+	    }
 
 	row = newAV ();
 	}
+    if (row)
+	SvREFCNT_dec ((SV *)row);
     while (n > length) {
 	SvREFCNT_dec (av_pop (avr));
 	n--;
@@ -2734,7 +2763,7 @@ print (SV *self, SV *io, SV *fields)
 
     CSV_XS_SELF;
     if (fields == &PL_sv_undef)
-	av = newAV ();
+	av = (AV *)sv_2mortal ((SV *)newAV ());
     else {
 	unless (_is_arrayref (fields))
 	    croak ("Expected fields to be an array ref");
@@ -2759,6 +2788,8 @@ getline (SV *self, SV *io)
     av  = newAV ();
     avf = newAV ();
     r   = xsParse (self, hv, av, avf, io, 1);
+    unless (r)
+	SvREFCNT_dec ((SV *)av);
     PUT_RETURN (r ? sv_2mortal (newRV_noinc ((SV *)av)) : undef);
     /* XS getline */
 

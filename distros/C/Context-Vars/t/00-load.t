@@ -26,7 +26,7 @@ my $p = Context::Vars::_abi_ptr();
 ok($p, '_abi_ptr returns a non-zero address');
 is($p, Context::Vars::_abi_ptr(), 'and the same one every call');
 like($p, qr/^\d+$/, 'and an unsigned integer');
-is(Context::Vars::_abi_version(), 1, 'the table is version 1');
+is(Context::Vars::_abi_version(), 2, 'the table is version 2');
 is((Context::Vars::_abi_selftest())[0], 0, 'and its selftest passes')
     or diag('the number is the check that failed in include/context_vars/context_vars_abi_impl.h');
 

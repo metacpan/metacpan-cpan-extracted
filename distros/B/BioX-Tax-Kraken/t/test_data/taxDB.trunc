@@ -1,0 +1,19 @@
+1	1	root	no rank
+2	131567	Bacteria	domain
+1239	1783272	Bacillota	phylum
+1385	91061	Bacillales	order
+2759	131567	Eukaryota	domain
+3193	131221	Embryophyta	clade
+3398	58024	Magnoliopsida	class
+3803	72025	Fabaceae	family
+3814	3803	Papilionoideae	subfamily
+3877	163742	Medicago	genus
+3880	3877	Medicago truncatula	species
+6072	33208	Eumetazoa	clade
+7711	33511	Chordata	phylum
+7742	89593	Vertebrata	clade
+7776	7742	Gnathostomata	clade
+8287	117571	Sarcopterygii	superclass
+8457	32524	Sauropsida	clade
+8492	1329799	Archosauria	clade
+8782	43

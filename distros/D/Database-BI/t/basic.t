@@ -602,4 +602,73 @@ subtest 'GET /folder' => sub {
 	  ->content_like(qr/Folder view/, 'folder view heading present');
 };
 
+# ---------------------------------------------------------------------------
+subtest 'GET /pivot' => sub {
+	my $dir = File::Temp->newdir;
+	my $csv = File::Spec->catfile("$dir", 'pivotsmoke.csv');
+	Mojo::File->new($csv)->spurt(
+		"region,product,amount\n"
+		. "East,Widget,100\nWest,Widget,200\nEast,Gadget,50\nWest,Gadget,150\n"
+	);
+	my $lspec = url_escape("path:$csv");
+
+	# Basic pivot: rows=region, single measure (count).
+	$t->get_ok("/pivot?l=$lspec&rows=region&m=" . url_escape(':count:rows'))
+	  ->status_is(200)
+	  ->content_like(qr/Pivot/, 'pivot heading present');
+
+	# Pivot with col dimension and sum measure.
+	$t->get_ok("/pivot?l=$lspec&rows=region&cols=product&m=" . url_escape('amount:sum:revenue') . '&totals=1')
+	  ->status_is(200)
+	  ->content_like(qr/revenue/, 'measure alias present');
+
+	# CSV export.
+	$t->get_ok("/pivot?l=$lspec&rows=region&m=" . url_escape('amount:sum:revenue') . '&format=csv')
+	  ->status_is(200)
+	  ->content_type_like(qr{text/csv});
+
+	# Missing rows= -> 400.
+	$t->get_ok("/pivot?l=$lspec&m=" . url_escape('amount:sum:revenue'))
+	  ->status_is(400);
+
+	# Missing m= -> 400.
+	$t->get_ok("/pivot?l=$lspec&rows=region")
+	  ->status_is(400);
+
+	# Bad measure fn -> 400.
+	$t->get_ok("/pivot?l=$lspec&rows=region&m=" . url_escape('amount:bogus:x'))
+	  ->status_is(400);
+};
+
+# ---------------------------------------------------------------------------
+subtest 'GET /calc/list' => sub {
+	# With a known spec, returns JSON with a 'fields' key.
+	$t->get_ok('/calc/list?l=table:sales')
+	  ->status_is(200)
+	  ->json_has('/fields', 'fields key present');
+
+	# Without l= param returns 400.
+	$t->get_ok('/calc/list')
+	  ->status_is(400);
+};
+
+# ---------------------------------------------------------------------------
+subtest 'GET /stats' => sub {
+	my $dir = File::Temp->newdir;
+	my $csv = File::Spec->catfile("$dir", 'statssmoke.csv');
+	Mojo::File->new($csv)->spurt(
+		"name,score\nAlice,90\nBob,75\nCarol,85\n"
+	);
+	my $lspec = url_escape("path:$csv");
+
+	$t->get_ok("/stats?l=$lspec")
+	  ->status_is(200)
+	  ->content_like(qr/statistics/i, 'stats heading present')
+	  ->content_like(qr/name/, 'column name present');
+
+	# Missing l= -> 400.
+	$t->get_ok('/stats')
+	  ->status_is(400);
+};
+
 done_testing();

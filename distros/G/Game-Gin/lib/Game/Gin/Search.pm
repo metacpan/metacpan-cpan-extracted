@@ -8,7 +8,7 @@ use Exporter 'import';
 use Game::Gin::Card qw(rank_of suit_of deadwood_of CARDS);
 use Game::Gin::Deadwood qw(deadwood KNOCK_AT);
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 our @EXPORT_OK = qw(worth_taking best_discard knock_now potential LEVELS);
 
 use constant LEVELS => 2;
@@ -100,7 +100,7 @@ Game::Gin::Search - the bot's reasoning, with signatures that cannot cheat
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 

@@ -69,10 +69,12 @@ my $use_fake = 'BEGIN { unshift @INC, q{' . $fake . '} } ';
 
 # A HAMT whose table is older than the one this module was built against.
 # The table's first member is an int, so a packed int is a table of version
-# 0, and `pack "p"` gives the address of that string's buffer.
+# 0, and `pack "p"` gives the address of that string's buffer. The address is
+# pointer-sized, which is not the IV size on a 32-bit perl built with 64-bit
+# integers, so it is read back as Q or L to match, never as J.
 {
     fake_hamt('our $TABLE = pack("i", 0); '
-            . 'sub _abi_ptr { unpack("J", pack("p", $TABLE)) }');
+            . 'sub _abi_ptr { unpack(length(pack("p", "")) == 8 ? "Q" : "L", pack("p", $TABLE)) }');
     my ($rc, $text) = child($use_fake . 'require Context::Vars; print "LOADED\n"');
     isnt($rc, 0, 'with a HAMT whose table is too old the load fails');
     unlike($text, qr/LOADED/, 'nothing after the require ran');

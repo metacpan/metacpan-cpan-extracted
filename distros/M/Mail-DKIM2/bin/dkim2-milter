@@ -409,8 +409,9 @@ sub cb_eom {
                 warn "dkim2-milter: not wrapping $msgid: no arrival snapshot\n";
             } else {
                 my $ok = eval {
-                    $wrap = wrap_single_part($arrival);
-                    warn "dkim2-milter: not wrapping $msgid: already multipart\n" unless $wrap;
+                    my $why;
+                    ($wrap, $why) = wrap_single_part($arrival);
+                    warn "dkim2-milter: not wrapping $msgid: $why\n" unless $wrap;
                     $wrap_mi = _compute_mi($wrap->{message}, \%wrap_info, Snapshot => $arrival) if $wrap;
                     1;
                 };

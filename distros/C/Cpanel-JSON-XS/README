@@ -1066,7 +1066,7 @@ OBJECT-ORIENTED INTERFACE
         the same octet encoding "encode" would produce for the object's
         current flags (see "utf8", "ascii", "latin1", "binary"), regardless
         of any PerlIO encoding layer already present on $filehandle. As with
-        "encode", do not additionally push a :encoding(UTF-8) (or similar)
+        "encode", do not additionally push a ":encoding(UTF-8)" (or similar)
         layer onto the handle, or the output will be double-encoded.
 
     $perl_scalar = $json->decode ($json_text, my $json_type)
@@ -1078,6 +1078,24 @@ OBJECT-ORIENTED INTERFACE
         becomes 1, "false" becomes 0 and "null" becomes "undef".
 
         For the type argument see Cpanel::JSON::XS::Type.
+
+    $perl_scalar = $json->decode_and_validate ($json_text, $schema)
+        Like "decode", but additionally validates the decoded structure
+        against $schema, a schema hash built from the type spec building
+        blocks in Cpanel::JSON::XS::Type (plain "JSON_TYPE_*" constants or
+        their short names, "json_type_arrayof", "json_type_hashof",
+        "json_type_anyof", "json_type_optional", ...). Croaks with one line
+        per mismatch (missing/unexpected hash keys, wrong scalar type, wrong
+        array length/element type) if $data doesn't match $schema; otherwise
+        returns the decoded data exactly like "decode" would.
+
+          use Cpanel::JSON::XS::Type;
+          my $schema = { id => JSON_TYPE_INT, name => 'Str', tags => json_type_arrayof('Str') };
+          my $data = $json->decode_and_validate($json_text, $schema);
+
+        See "check_type" in Cpanel::JSON::XS::Type for the full schema
+        semantics, including how it differs from the encoder's permissive
+        hash type spec.
 
     ($perl_scalar, $characters) = $json->decode_prefix ($json_text)
         This works like the "decode" method, but instead of raising an
@@ -1194,6 +1212,11 @@ INCREMENTAL PARSING
     start of 12? Or is 12 a single JSON number, or the concatenation of 1
     and 2? In neither case you can tell, and this is why Cpanel::JSON::XS
     takes the conservative route and disallows this case.
+
+    Since "allow_nonref" became the default (4.42), "incr_parse" still
+    rejects a top-level number, "true", "false" or "null" unless
+    "allow_nonref" was enabled explicitly, in which case the ambiguity above
+    applies.
 
   EXAMPLES
     Some examples will make all this clearer. First, a simple example that

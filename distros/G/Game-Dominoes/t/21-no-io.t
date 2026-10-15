@@ -2,12 +2,11 @@
 use 5.010;
 use strict;
 use warnings;
-use lib 't/lib';
 use Test::More;
 
 use Game::Dominoes;
 use Game::Dominoes::Bot;
-use Game::Dominoes::Test::Handle;
+use Game::Terminal::Kit::Test::Handle;
 
 plan tests => 4;
 
@@ -34,8 +33,8 @@ subtest 'a whole game runs with both handles rigged to die' => sub {
 	# still gets out even while STDOUT is rigged.
 	my ($plays, $error);
 
-	tie *STDOUT, 'Game::Dominoes::Test::Handle';
-	tie *STDIN, 'Game::Dominoes::Test::Handle';
+	tie *STDOUT, 'Game::Terminal::Kit::Test::Handle';
+	tie *STDIN, 'Game::Terminal::Kit::Test::Handle';
 
 	eval {
 		my $game = Game::Dominoes->new(seed => 'a' x 32, players => 3, target => 60);

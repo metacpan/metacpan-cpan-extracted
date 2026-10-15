@@ -189,7 +189,7 @@ subtest 'leaving is asked twice' => sub {
 subtest 'the other keys' => sub {
     is((standing(['u'], $FIVE, 1))[0]->pick, 'undo', 'u asks to take back');
     is((standing(['n'], $FIVE, 1))[0]->pick, 'new', 'n for a new game');
-    is((standing(['r'], $FIVE, 1))[0]->pick, 'route', 'r for the route');
+    is((standing(['R'], $FIVE, 1))[0]->pick, 'route', 'R for the route');
     my ($t, $written) = standing([ '?', 'x', 'enter' ], $FIVE, 1);
     is($t->pick, 'hand-d1', '? shows the help, any key leaves it, and the picker carries on');
     like($$written, qr/arrows, tab     walk the pieces that can move/, 'the help was shown');

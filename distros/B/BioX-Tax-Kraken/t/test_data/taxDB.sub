@@ -1,0 +1,81 @@
+1	1	root	no rank
+2	131567	Bacteria	domain
+1239	1783272	Bacillota	phylum
+1385	91061	Bacillales	order
+2759	131567	Eukaryota	domain
+3193	131221	Embryophyta	clade
+3398	58024	Magnoliopsida	class
+3803	72025	Fabaceae	family
+3814	3803	Papilionoideae	subfamily
+3877	163742	Medicago	genus
+3880	3877	Medicago truncatula	species
+6072	33208	Eumetazoa	clade
+7711	33511	Chordata	phylum
+7742	89593	Vertebrata	clade
+7776	7742	Gnathostomata	clade
+8287	117571	Sarcopterygii	superclass
+8457	32524	Sauropsida	clade
+8492	1329799	Archosauria	clade
+8782	436492	Aves	class
+8825	8782	Neognathae	infraclass
+8976	1549675	Galliformes	order
+9005	8976	Phasianidae	family
+9030	9072	Gallus	genus
+9031	9030	Gallus gallus	species
+9072	9005	Phasianinae	subfamily
+10239	1	Viruses	domain
+11157	2497574	Mononegavirales	order
+11158	11157	Paramyxoviridae	family
+12908	2787823	unclassified sequences	no rank
+32523	1338369	Tetrapoda	clade
+32524	32523	Amniota	clade
+32561	8457	Sauria	clade
+33090	2759	Viridiplantae	kingdom
+33154	2759	Opisthokonta	clade
+33208	33154	Metazoa	kingdom
+33213	6072	Bilateria	clade
+33511	33213	Deuterostomia	clade
+35493	33090	Streptophyta	phylum
+44770	151659	unidentified soil organisms	no rank
+58023	3193	Tracheophyta	clade
+58024	78536	Spermatophyta	clade
+71240	1437183	eudicotyledons	clade
+71275	1437201	rosids	clade
+72025	91835	Fabales	order
+78536	58023	Euphyllophyta	clade
+89593	7711	Craniata	subphylum
+91061	1239	Bacilli	class
+91827	71240	Gunneridae	clade
+91835	71275	fabids	clade
+117570	7776	Teleostomi	clade
+117571	117570	Euteleostomi	clade
+129337	3120669	Geobacillus	genus
+131221	35493	Streptophytina	subphylum
+131567	1	cellular organisms	no rank
+151659	12908	environmental samples	no rank
+163742	2233839	Trifolieae	tribe
+436486	8492	Dinosauria	clade
+436489	436486	Saurischia	clade
+436491	436489	Theropoda	clade
+436492	436491	Coelurosauria	clade
+1329799	32561	Archelosauria	clade
+1338369	8287	Dipnotetrapodomorpha	clade
+1437183	3398	Mesangiospermae	clade
+1437201	91827	Pentapetalae	clade
+1549675	8825	Galloanserae	superorder
+1783272	2	Bacillati	kingdom
+2231382	2231393	NPAAA clade	clade
+2231393	3814	50 kb inversion clade	clade
+2233838	2231382	Hologalegina	clade
+2233839	2233838	IRL clade	clade
+2497569	2732396	Negarnaviricota	phylum
+2497570	2497569	Haploviricotina	subphylum
+2497574	2497570	Monjiviricetes	class
+2559587	10239	Riboviria	clade
+2560069	11158	Avulavirinae	subfamily
+2560194	2560069	Orthoavulavirus	genus
+2560319	3051375	avian paramyxovirus 1	no rank
+2732396	2559587	Orthornavirae	kingdom
+2787823	1	unclassified entries	no rank
+3051375	2560194	Orthoavulavirus javaense	species
+3120669	1385	Anoxybacillaceae	family

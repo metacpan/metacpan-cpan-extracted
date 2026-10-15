@@ -7,7 +7,7 @@ use Object::Proto::Sugar -types;
 use Game::Merrills::Points;
 use Game::Merrills::Notation;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use constant {
 	RM_FROM => 0,
@@ -103,7 +103,7 @@ Game::Merrills::Move - one whole move: where from, where to, and the man it took
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 

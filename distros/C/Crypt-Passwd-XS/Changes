@@ -1,3 +1,12 @@
+0.701  2026-10-14  Tim Mullin <tim.mullin@webpros.com>
+    - Add support for yescrypt ($y$) password hashes, using vendored
+      Openwall yescrypt 1.1.0, with fixed memory and cost limits.
+      Adds unix_yescrypt_crypt(). scrypt ($7$) settings are refused.
+    - Fix DES crypt out-of-bounds reads on an undef salt, an empty
+      salt and a new-style salt (GH #1, #5, #7).
+    - Fix a salt buffer overread in SHA-256 and SHA-512 crypt.
+    - Ship ppport.h for cross-version XS compatibility.
+
 0.601  2012-09-19  brian m. carlson <brian.carlson@cpanel.net>
     - Fix CVE-2012-2143.
 

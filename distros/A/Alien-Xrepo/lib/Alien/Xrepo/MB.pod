@@ -33,6 +33,12 @@ C<Alien::Xrepo::MB> is a L<Module::Build> subclass for the C<Alien::Xrepo> build
 what C<./Build test> invokes) first runs the C<xrepo> pipeline through L<Alien::Xrepo::Build>. It writes the hermetic
 run-time snapshot into the distribution's C<share> directory inside C<blib> before the normal C<code> action runs.
 
+A package that fails to build or install fails the whole run. The pipeline first records every package that broke (one
+broken package never hides the siblings that did install), then L<Alien::Xrepo::Build/assert_installed> reports them
+and C<./Build> dies. The partially written snapshot is discarded at the same time, so the next C<./Build> rebuilds
+rather than trusting an incomplete one. This is deliberate: an Alien that quietly ships a family of libraries with one
+member missing is worse than a build that stops and says which member is absent.
+
 The dist contains no C<xrepo.json>. The Alien class (C<< module_name >>) is loaded from C<lib/>, and its C<recipe()>
 method acts as the single declaration for both the build engine and the run-time layer (see L<Alien::Xrepo::Runtime>).
 Packages are shallow-installed into the dist's C<share> directory, and the snapshot records share-relative paths. As a

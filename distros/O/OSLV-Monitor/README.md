@@ -9,7 +9,7 @@ OS level virtualization monitoring extend for LibreNMS
 #### FreeBSD
 
 ```shell
-pkg install p5-JSON p5-JSON-XS p5-Mime-Base64 p5-Clone p5-File-Slurp p5-IO-Interface
+pkg install p5-JSON p5-JSON-XS p5-Mime-Base64 p5-Clone p5-File-Slurp
 perl Makefile.pl
 make
 make test
@@ -19,7 +19,7 @@ make install
 or...
 
 ```shell
-pkg install p5-JSON  p5-JSON-XS p5-Mime-Base64 p5-Clone p5-File-Slurp p5-IO-Interface p5-App-cpanminus
+pkg install p5-JSON  p5-JSON-XS p5-Mime-Base64 p5-Clone p5-File-Slurp p5-App-cpanminus
 cpanm OSLV::Monitor
 ```
 
@@ -32,7 +32,7 @@ pkg install p5-OSLV-Monitor
 #### Debian
 
 ```shell
-apt-get install libjson-perl libjson-xs-perl libclone-perl libmime-base64-perl libfile-slurp-perl libio-interface-perl
+apt-get install libjson-perl libjson-xs-perl libclone-perl libmime-base64-perl libfile-slurp-perl
 perl Makefile.pl
 make
 make test
@@ -42,7 +42,7 @@ make install
 or...
 
 ```shell
-apt-get install libjson-perl libjson-xs-perl libclone-perl libmime-base64-perl libfile-slurp-perl libio-interface-perl cpanminus
+apt-get install libjson-perl libjson-xs-perl libclone-perl libmime-base64-perl libfile-slurp-perl cpanminus
 cpanm OSLV::Monitor
 ```
 
@@ -70,7 +70,7 @@ The default location for the optional config file is
 The following keys are used in the JSON config file.
 
     - include :: A array of regular expressions to include.
-        Default :: ["^.*$"]
+        Default :: ["^.+$"]
 
     - exclude :: A array of regular expressions to exlclude.
         Default :: undef
@@ -97,7 +97,7 @@ Default would be like this.
 
 ```json
 {
-    "include": ["^.*$"]
+    "include": ["^.+$"]
 }
 ```
 
@@ -148,6 +148,8 @@ The cgroup to name mapping is done like below.
     user -> u_$name
     docker -> d_$name
     podman -> p_$name
+    machine.slice, non-podman -> m_$type_$name
+        type is qemu, lxc, or nspawn, omitted if unknown
     anything else -> $name
 
 Anything else is formed like below.

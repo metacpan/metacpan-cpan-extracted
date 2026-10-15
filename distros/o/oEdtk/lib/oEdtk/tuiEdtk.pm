@@ -1,43 +1,45 @@
-package oEdtk::tuiEdtk ;
+package oEdtk::tuiEdtk;
+
+use strict;
 
 BEGIN {
-		use Exporter;
-		use vars 				qw($VERSION @ISA @EXPORT); # @EXPORT_OK %EXPORT_TAGS);
-		use strict;
-		use warnings;
-		use Term::ReadKey;
-		use oEdtk::trackEdtk	qw(env_Var_Completion);
+	use Exporter;
+	use vars qw($VERSION @ISA @EXPORT);    # @EXPORT_OK %EXPORT_TAGS);
+	use warnings;
+	use Term::ReadKey;
+	use oEdtk::trackEdtk qw(env_Var_Completion);
 
-		$VERSION		= 2.1109;
-		@ISA			= qw(Exporter);
-		@EXPORT		= qw(
-						clear_Screen	start_Screen	stop_Screen
-						admin_Screen 	not_Configured
-						);
-#		@EXPORT_OK	= qw(
-#						)
+	$VERSION = 2.1109;
+	@ISA     = qw(Exporter);
+	@EXPORT  = qw(
+		clear_Screen	start_Screen	stop_Screen
+		admin_Screen 	not_Configured
+	);
+
+	#		@EXPORT_OK	= qw(
+	#						)
+}
+
+sub clear_Screen() {
+	my $command = "clear";    # default
+	if ( $^O eq "MSWin32" ) {
+		$command = "cls";
 	}
-
-
-sub clear_Screen(){
-	my $command="clear"; # default
-	if ($^O eq "MSWin32"){
-		$command="cls";
-	} else {
+	else {
 		# TODO test...
 		warn "INFO OS $^O, tuiEdtk::clear_Screen awaiting feedback\n";
 	}
 
 	system($command) == 0
-         or warn "INFO OS $^O system command $command failed: $?";
+		or warn "INFO OS $^O system command $command failed: $?";
 
-return 1;
+	return 1;
 }
 
 sub admin_Screen {
 	&clear_Screen();
-	my $wait =10*$ENV{EDTK_WAITRUN};
-	print STDOUT << "EOF";
+	my $wait = 10 * $ENV{EDTK_WAITRUN};
+	print STDOUT <<"EOF";
 
 	oEtdk Simple Administration 
 	______________________________________
@@ -52,57 +54,58 @@ Choose an option by typing associated letter
 (wait ${wait}s or press any key to stop).
 EOF
 
-	my $key =&readKey_Wait($wait);
-	$key ||="";
+	my $key = &readKey_Wait($wait);
+	$key ||= "";
 
-	if 		($key =~/i/i) {
+	if ( $key =~ /i/i ) {
 		&show_INIEDTK();
 		&admin_Screen();
 
-	} elsif	($key =~/c/i) {
+	}
+	elsif ( $key =~ /c/i ) {
 		print " -> Choice = $key\n";
 		&VCS_Screen();
 
-	} elsif	($key =~/d/i) {
+	}
+	elsif ( $key =~ /d/i ) {
 		print " -> Choice = $key\n";
 		&delivery_Screen();
 
-	} elsif	($key =~/a/i) {
+	}
+	elsif ( $key =~ /a/i ) {
 		print " -> Choice = $key\n";
 	}
 
-	warn "INFO : -END- \n";
+	warn "INFO: -END- \n";
 
-exit 1;	
-1;
+	exit 1;
+	1;
 }
 
 sub show_INIEDTK() {
+
 	# determine the default editor based on HOSTNAME
-	my $wait =10*$ENV{EDTK_WAITRUN};
-	my $iniedtk=$ENV{EDTK_INIEDTK};
+	my $wait    = 10 * $ENV{EDTK_WAITRUN};
+	my $iniedtk = $ENV{EDTK_INIEDTK};
 	env_Var_Completion($iniedtk);
 
-	my @args	=("more", $iniedtk);
-	eval {
-		system(@args);
-	};
+	my @args = ( "more", $iniedtk );
+	eval { system(@args); };
 
-	if ($?){
+	if ($?) {
 		print "Screen refresh";
 		&readKey_Wait();
 		return $?;
 	}
 
 	&readKey_Wait($wait);
-1;
+	1;
 }
 
+sub start_Screen() {
+	&clear_Screen();
 
-sub start_Screen(){
- 	&clear_Screen();
-
-	print STDOUT << "EOF";
+	print STDOUT <<"EOF";
 
 	Application launcher $ENV{EDTK_PRGNAME}
 	______________________________________
@@ -120,58 +123,58 @@ Options :
 
 To change an option, type its value or <enter> for the default.
 EOF
-	my $key =&readKey_Wait();
-	$key ||="";
+	my $key = &readKey_Wait();
+	$key ||= "";
 
-	if 	($key  =~/a/i) {
+	if ( $key =~ /a/i ) {
 		&admin_Screen();
-	} elsif	($key =~/\d+/) {
+	}
+	elsif ( $key =~ /\d+/ ) {
 		print " -> Choice = run $ENV{EDTK_PRGNAME}\n";
 	}
 
-print "\n";
+	print "\n";
 
-return 1;
+	return 1;
 }
 
-sub stop_Screen (){
+sub stop_Screen () {
 	print "\nPause, hit <enter> to exit or <w> to watch Doc result...\n";
-	my $key =&readKey_Wait($ENV{EDTK_WAITRUN}*100) || "";
-	my $arg ="$ENV{EDTK_FDATAOUT}.".$ENV{EDTK_EXT_DEFAULT};
+	my $key = &readKey_Wait( $ENV{EDTK_WAITRUN} * 100 ) || "";
+	my $arg = "$ENV{EDTK_FDATAOUT}." . $ENV{EDTK_EXT_DEFAULT};
 
-	if	($key =~/W/i and $arg) {
+	if ( $key =~ /W/i and $arg ) {
 
 		env_Var_Completion($arg);
 
 		warn "$arg...\n";
-		eval {
-			system($arg);
-		};
-	} else {
-	
-	}	
-		
-1;
+		eval { system($arg); };
+	}
+	else {
+
+	}
+
+	1;
 }
 
-sub readKey_Wait(;$){
+sub readKey_Wait {
 	my $key;
-	my $wait_time=shift;
-	$wait_time ||=$ENV{EDTK_WAITRUN};
-	$wait_time ||=1;
+	my $wait_time = shift;
+	$wait_time ||= $ENV{EDTK_WAITRUN};
+	$wait_time ||= 1;
 
 	ReadMode('raw');
 	$key = ReadKey($wait_time);
-	ReadMode ('restore');
+	ReadMode('restore');
 
-return $key;
+	return $key;
 }
 
 sub not_Configured() {
-	my $wait =10*$ENV{EDTK_WAITRUN};
+	my $wait = 10 * $ENV{EDTK_WAITRUN};
 
 SCREEN: {
-	print STDOUT << "EOF";
+		print STDOUT <<"EOF";
 
 	Function not configured 
 	______________________________________
@@ -185,23 +188,22 @@ Application	$ENV{EDTK_PRGNAME}
 
 EOF
 
-	my $key =&readKey_Wait($wait);
-	$key ||="";
-}
+		my $key = &readKey_Wait($wait);
+		$key ||= "";
+	}
 
-exit 1;	
-1;
+	exit 1;
+	1;
 }
-
 
 sub VCS_Screen {
-	if ($ENV{EDTK_VCS_LOCATION} eq "") {not_Configured();}
+	if ( $ENV{EDTK_VCS_LOCATION} eq "" ) { not_Configured(); }
 
-	my $wait =10*$ENV{EDTK_WAITRUN};
-	
+	my $wait = 10 * $ENV{EDTK_WAITRUN};
+
 SCREEN: {
-	&clear_Screen();
-	print STDOUT << "EOF";
+		&clear_Screen();
+		print STDOUT <<"EOF";
 
 	Version Control 
 	______________________________________
@@ -224,87 +226,94 @@ Branch		$ENV{EDTK_DIR_BASE}
 Choose an option by typing associated letter.
 EOF
 
-	my $key =&readKey_Wait($wait);
-	$key ||="";
-#	print " -> Choice = $key\n";
-	
-	if		($key =~/S/i) {
-		&VCS_log();
+		my $key = &readKey_Wait($wait);
+		$key ||= "";
 
-	} elsif	($key =~/A/i) {
-		&VCS_add();
+		#	print " -> Choice = $key\n";
 
-	} elsif 	($key =~/C/i) {
-		&VCS_commit();
+		if ( $key =~ /S/i ) {
+			&VCS_log();
 
-	} elsif	($key =~/U/i) {
-		&VCS_update();
+		}
+		elsif ( $key =~ /A/i ) {
+			&VCS_add();
 
-	} elsif	($key =~/T/i) {
-		&VCS_to();
+		}
+		elsif ( $key =~ /C/i ) {
+			&VCS_commit();
 
-	} elsif	($key =~/W/i) {
-		&VCS_missing();
+		}
+		elsif ( $key =~ /U/i ) {
+			&VCS_update();
 
-	} elsif	($key =~/M/i) {
-		&VCS_merge();
-		&readKey_Wait();
+		}
+		elsif ( $key =~ /T/i ) {
+			&VCS_to();
 
-	} elsif	($key =~/F/i) {
-		print "planned...";
-	} elsif	($key =~/L/i) {
-		print "planned...";
-	} elsif	($key =~/B/i) {
-		&admin_Screen();
-	} elsif	($key =~/Q/i) {
-		&clear_Screen();
-		exit 1;
+		}
+		elsif ( $key =~ /W/i ) {
+			&VCS_missing();
+
+		}
+		elsif ( $key =~ /M/i ) {
+			&VCS_merge();
+			&readKey_Wait();
+
+		}
+		elsif ( $key =~ /F/i ) {
+			print "planned...";
+		}
+		elsif ( $key =~ /L/i ) {
+			print "planned...";
+		}
+		elsif ( $key =~ /B/i ) {
+			&admin_Screen();
+		}
+		elsif ( $key =~ /Q/i ) {
+			&clear_Screen();
+			exit 1;
+		}
+
+		redo SCREEN;
 	}
 
-redo SCREEN; }
-
-exit 1;	
-1;
+	exit 1;
+	1;
 }
 
-
 sub VCS_merge() {
-	my $loc	=$ENV{EDTK_DIR_BASE};
+	my $loc = $ENV{EDTK_DIR_BASE};
 	env_Var_Completion($loc);
 	chdir $loc;
 
 	print "Merging... ";
-	my @args	=("bzr", "merge", $loc);
+	my @args = ( "bzr", "merge", $loc );
 
-	eval {
-		system(@args);
-	};
+	eval { system(@args); };
 
-	if ($?){
+	if ($?) {
 		print "Screen refresh";
 		&readKey_Wait();
 		return $?;
 	}
-1;
+	1;
 }
 
-sub VCS_commit(;$) {
-	my $comment=shift;
-	$comment||="";
-	
+sub VCS_commit {
+	my $comment = shift;
+	$comment ||= "";
+
 	# potential branch location problem if run outside the branch
-	my $base	=$ENV{EDTK_DIR_BASE};
+	my $base = $ENV{EDTK_DIR_BASE};
 	env_Var_Completion($base);
 	chdir $base;
 
-	my @args	=("bzr", "commit");
-	if ($comment ne "") { push (@args, "-m $comment");}
+	my @args = ( "bzr", "commit" );
+	if ( $comment ne "" ) { push( @args, "-m $comment" ); }
 
-	eval {
-		system(@args);
-	};
+	eval { system(@args); };
 
-	if ($?){
+	if ($?) {
 		print "Screen refresh";
 		&readKey_Wait();
 		return $?;
@@ -312,157 +321,148 @@ sub VCS_commit(;$) {
 
 	#&VCS_merge();
 	&readKey_Wait();
-1;
+	1;
 }
 
 sub VCS_missing() {
+
 	# potential branch location problem if run outside the branch
-	my $other_branch	=$ENV{EDTK_VCS_LOCATION};
+	my $other_branch = $ENV{EDTK_VCS_LOCATION};
 	env_Var_Completion($other_branch);
-	my $base			=$ENV{EDTK_DIR_BASE};
+	my $base = $ENV{EDTK_DIR_BASE};
 	env_Var_Completion($base);
 	chdir $base;
 
-	my @args	=("bzr", "missing", $other_branch);
+	my @args = ( "bzr", "missing", $other_branch );
 
-	eval {
-		system(@args);
-	};
+	eval { system(@args); };
 
-	if ($?){
+	if ($?) {
 		print "Screen refresh";
 		&readKey_Wait();
 		return $?;
 	}
 
 	&readKey_Wait();
-1;
+	1;
 }
 
-
 sub VCS_add() {
-	my $wait =10*$ENV{EDTK_WAITRUN};
+	my $wait = 10 * $ENV{EDTK_WAITRUN};
 
 	# potential branch location problem if run outside the branch
-	my $base	=$ENV{EDTK_DIR_BASE};
+	my $base = $ENV{EDTK_DIR_BASE};
 	env_Var_Completion($base);
 	chdir $base;
 
-	my @args	=("bzr", "add", "--dry-run");
+	my @args = ( "bzr", "add", "--dry-run" );
 
-	eval {
-		system(@args);
-	};
+	eval { system(@args); };
 
-	if ($?){
+	if ($?) {
 		return $?;
 
-	} else {
+	}
+	else {
 		print "Enter <Y>es if you confirm action (wait ${wait}s) :\n";
-		my $key =&readKey_Wait($wait);
-		$key ||="";
-	
-		if 		($key =~/y/i) {
+		my $key = &readKey_Wait($wait);
+		$key ||= "";
+
+		if ( $key =~ /y/i ) {
 			print " -> bzr add confirmed\n";
-		} else {
+		}
+		else {
 			print "Canceled\n";
 			&readKey_Wait();
 			return 0;
 		}
-		
-		@args	=("bzr", "add");	
-		eval {
-			system(@args);
-		};
-	
-		if ($?){
+
+		@args = ( "bzr", "add" );
+		eval { system(@args); };
+
+		if ($?) {
 			return $?;
 		}
 		print "Screen refresh";
 	}
 	&readKey_Wait();
-1;
+	1;
 }
 
-
 sub VCS_update() {
+
 	#&VCS_merge();
 
 	# potential branch location problem if run outside the branch
-	my $base	=$ENV{EDTK_DIR_BASE};
+	my $base = $ENV{EDTK_DIR_BASE};
 	env_Var_Completion($base);
 	chdir $base;
 
-	my @args	=("bzr", "pull");
-	eval {
-		system(@args);
-	};
+	my @args = ( "bzr", "pull" );
+	eval { system(@args); };
 
-	if ($?){
+	if ($?) {
 		print "Screen refresh";
 		&readKey_Wait();
 		return $?;
 	}
 
 	&readKey_Wait();
-1;
+	1;
 }
 
 sub VCS_to() {
 	&VCS_merge();
 
-	my $cmd	="cd $ENV{EDTK_DIR_BASE}";
+	my $cmd = "cd $ENV{EDTK_DIR_BASE}";
 	env_Var_Completion($cmd);
 	system($cmd);
 
-	my $base	=$ENV{EDTK_DIR_BASE};
+	my $base = $ENV{EDTK_DIR_BASE};
 	env_Var_Completion($base);
 	chdir $base;
 
-	my @args	=("bzr", "push");
-	eval {
-		system(@args);
-	};
+	my @args = ( "bzr", "push" );
+	eval { system(@args); };
 
-	if ($?){
+	if ($?) {
 		print "Screen refresh";
 		&readKey_Wait();
 		return $?;
 	}
 
 	&readKey_Wait();
-1;
+	1;
 }
 
-
 sub VCS_log() {
-	my $loc	=$ENV{EDTK_DIR_BASE};
+	my $loc = $ENV{EDTK_DIR_BASE};
 	env_Var_Completion($loc);
-	
+
 	# TODO: select qlog or glog depending on the environment
-	my @args	=("bzr", "qlog", $loc);
+	my @args = ( "bzr", "qlog", $loc );
 
-	eval {
-		system(@args);
-	};
+	eval { system(@args); };
 
-	if ($?){
+	if ($?) {
 		print "Screen refresh";
 		&readKey_Wait();
 		return $?;
 	}
 
-sub VCS_rename() {
-	my $wait =10*$ENV{EDTK_WAITRUN};
+	1;
+}
 
-	my $base	=$ENV{EDTK_DIR_BASE};
-	my $oldname=$ENV{EDTK_DIR_SCRIPT}."\\".$ENV{EDTK_PRGNAME};
-	my $newname=$ENV{EDTK_DIR_SCRIPT}."\\".$ENV{EDTK_PRGNAME};
+sub VCS_rename() {
+	my $wait = 10 * $ENV{EDTK_WAITRUN};
+
+	my $base    = $ENV{EDTK_DIR_BASE};
+	my $oldname = $ENV{EDTK_DIR_SCRIPT} . "\\" . $ENV{EDTK_PRGNAME};
+	my $newname = $ENV{EDTK_DIR_SCRIPT} . "\\" . $ENV{EDTK_PRGNAME};
 	my @extension;
-	
-	push (@extension, $ENV{EDTK_EXT_PERL});
-	push (@extension, $ENV{EDTK_EXT_COMSET});
-	push (@extension, $ENV{EDTK_EXT_LATEX});
+
+	push( @extension, $ENV{EDTK_EXT_PERL} );
+	push( @extension, $ENV{EDTK_EXT_LATEX} );
 
 	env_Var_Completion($oldname);
 	env_Var_Completion($newname);
@@ -470,77 +470,75 @@ sub VCS_rename() {
 	chdir $base;
 
 	foreach my $ext (@extension) {
-		my @args	=("bzr", "move", "$oldname.$ext", "$newname.$ext", "--quiet");	
-		eval {
-			system(@args);
-		};
+		my @args = ( "bzr", "move", "$oldname.$ext", "$newname.$ext", "--quiet" );
+		eval { system(@args); };
 
-		if ($?){
+		if ($?) {
 			return $?;
 		}
 	}
 	&readKey_Wait();
-1;
+	1;
 }
 
-
 sub delivery_Screen {
-	if ($ENV{EDTK_PRGNAME} eq "" or $ENV{EDTK_DIR_BASE} eq "") {not_Configured();}
+	if ( $ENV{EDTK_PRGNAME} eq "" or $ENV{EDTK_DIR_BASE} eq "" ) { not_Configured(); }
 
-	my $wait =10*$ENV{EDTK_WAITRUN};
+	my $wait = 10 * $ENV{EDTK_WAITRUN};
 
 SCREEN: {
-	&clear_Screen();
-	print STDOUT << "EOF";
+		&clear_Screen();
+		print STDOUT <<"EOF";
 
-	Deliveries 
-	______________________________________
+Deliveries 
+______________________________________
 
 Repository	$ENV{EDTK_VCS_LOCATION}
 Branch		$ENV{EDTK_DIR_BASE}
 Application	$ENV{EDTK_PRGNAME}
 
 
-	<A> moving from development to tests for Approval : 
-		from $ENV{EDTK_PRGNAME} to $ENV{EDTK_PRGNAME}
+<A> moving from development to tests for Approval : 
+	from $ENV{EDTK_PRGNAME} to $ENV{EDTK_PRGNAME}
 
-	<P> delivering approved applications to Production : (planned)
-		from $ENV{EDTK_PRGNAME} to $ENV{EDTK_PRGNAME}
+<P> delivering approved applications to Production : (planned)
+	from $ENV{EDTK_PRGNAME} to $ENV{EDTK_PRGNAME}
 
-	<B> back	<Q> quit
+<B> back	<Q> quit
 
 Choose an option by typing associated letter.
 EOF
 
-	my $key =&readKey_Wait($wait);
-	$key ||="";
-	
-	if		($key =~/A/i) {
-		&VCS_rename();
-		&VCS_commit ("move $ENV{EDTK_PRGNAME} to $ENV{EDTK_PRGNAME}");
+		my $key = &readKey_Wait($wait);
+		$key ||= "";
 
-	} elsif	($key =~/P/i) {
-		print "planned...";
-		#&VCS_commit();
+		if ( $key =~ /A/i ) {
+			&VCS_rename();
+			&VCS_commit("move $ENV{EDTK_PRGNAME} to $ENV{EDTK_PRGNAME}");
 
-	} elsif	($key =~/B/i) {
-		&admin_Screen();
-	} elsif	($key =~/Q/i) {
-		&clear_Screen();
-		exit 1;
+		}
+		elsif ( $key =~ /P/i ) {
+			print "planned...";
+
+			#&VCS_commit();
+
+		}
+		elsif ( $key =~ /B/i ) {
+			&admin_Screen();
+		}
+		elsif ( $key =~ /Q/i ) {
+			&clear_Screen();
+			exit 1;
+		}
+
+		redo SCREEN;
 	}
 
-redo SCREEN; }
-
-exit 1;	
-1;
+	exit 1;
+	1;
 }
 
-1;
-}
-
-
-END {}
+END { }
 1;
 
 # THIS COMMENTING METHOD IS INTERESTING BUT POLLUTES POD
@@ -563,8 +561,6 @@ END {}
 #     $SIG{__DIE__}  = sub{ print STDERR "Perl: ", @_; exit 1};
 #   }
 
-
-
 # How to manage my own modules/libraries directory?
 # When building modules, use the PREFIX and LIB options at the Makefile generation step:
 #     perl Makefile.PL PREFIX=/mydir/perl LIB=/mydir/perl/lib
@@ -577,6 +573,5 @@ END {}
 #    use lib "$Bin/myPm";
 
 # =end comment
-
 
 #perl -d:ptkdb

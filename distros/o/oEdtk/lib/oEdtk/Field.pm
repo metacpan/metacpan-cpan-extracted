@@ -2,13 +2,13 @@ package oEdtk::Field;
 
 use strict;
 use warnings;
-our $VERSION		= 0.01;
+our $VERSION = 0.01;
 
 sub new {
-	my ($class, $name, $len) = @_;
+	my ( $class, $name, $len ) = @_;
 	my $field = {
-		name	=> $name,
-		len	=> $len,
+		name => $name,
+		len  => $len,
 	};
 
 	bless $field, $class;
@@ -16,7 +16,7 @@ sub new {
 }
 
 sub process {
-	my ($self, $data) = @_;
+	my ( $self, $data ) = @_;
 
 	return $data;
 }
@@ -28,7 +28,7 @@ sub get_name {
 }
 
 sub set_name {
-	my ($self, $name) = @_;
+	my ( $self, $name ) = @_;
 
 	$self->{'name'} = $name;
 }

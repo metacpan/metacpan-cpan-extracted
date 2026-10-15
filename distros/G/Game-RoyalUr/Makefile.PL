@@ -1,4 +1,4 @@
-use 5.010;
+use 5.014;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
@@ -98,6 +98,7 @@ my %WriteMakefileArgs = (
     VERSION_FROM     => 'lib/Game/RoyalUr.pm',
     ABSTRACT_FROM    => 'lib/Game/RoyalUr.pm',
     LICENSE          => 'artistic_2',
+    macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     MIN_PERL_VERSION => '5.014',
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
@@ -126,6 +127,7 @@ my %WriteMakefileArgs = (
         'Carp'                 => 0,
         'Digest::SHA'          => 0,
         'Exporter'             => 0,
+        'Game::Terminal::Kit'  => '0.05',
         'Object::Proto'        => '1.00',
         'Object::Proto::Sugar' => '1.00',
         'Getopt::Long'         => 0,

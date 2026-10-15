@@ -12,9 +12,15 @@ use Game::Gin::Bot ();
 use Game::Gin::Card qw(name_of long_name_of id_of deadwood_of rank_of suit_of);
 use Game::Gin::Deadwood qw(best deadwood KNOCK_AT);
 use Game::Gin::Search ();
+use Game::Terminal::Kit::Choose;
+use Game::Terminal::Kit::Keys;
+use Game::Terminal::Kit::Log;
+use Game::Terminal::Kit::Picker;
+use Game::Terminal::Kit::Run;
+use Game::Terminal::Kit::Screen;
 use Getopt::Long ();
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 our @RANK_TEXT = ('', 'A', 2 .. 9, '10', 'J', 'Q', 'K');
 
@@ -29,31 +35,6 @@ use constant {
     CARD_WIDTH => 11,
     FAN_WIDTH  => 4,
 };
-
-our %SEQUENCE = (
-    'A'  => 'up',
-    'B'  => 'down',
-    'C'  => 'right',
-    'D'  => 'left',
-    'H'  => 'home',
-    'F'  => 'end',
-    '1~' => 'home',
-    '4~' => 'end',
-    '5~' => 'page_up',
-    '6~' => 'page_down',
-    '7~' => 'home',
-    '8~' => 'end',
-);
-
-our %CONTROL = (
-    "\r"   => 'enter',
-    "\n"   => 'enter',
-    "\t"   => 'tab',
-    "\x7f" => 'backspace',
-    "\x08" => 'backspace',
-    "\x03" => 'interrupt',
-    "\x04" => 'eof',
-);
 
 our %MARK_INK = (
     drew   => '1;32',
@@ -94,13 +75,14 @@ has seat   => (is => 'ro', isa => Str);
 has ascii  => (is => 'ro', isa => Any);
 has colour => (is => 'ro', isa => Any);
 has quit   => (is => 'rw', isa => Any);
-has raw    => (is => 'rw', isa => Any);
-has keysource => (is => 'rw', isa => Any);
-has pending   => (is => 'rw', isa => ArrayRef, default => []);
-has marks     => (is => 'rw', isa => HashRef, default => {});
-has _painting => (is => 'rw', isa => Any);
-has _picking  => (is => 'rw', isa => Any, init_arg => 'picking');
-has _staring  => (is => 'rw', isa => Any, init_arg => 'interactive');
+has keyboard => (is => 'rw', isa => Any);
+has screen   => (is => 'rw', isa => Any);
+has log      => (is => 'rw', isa => Any);
+has marks    => (is => 'rw', isa => HashRef, default => {});
+has _keysource => (is => 'rw', isa => Any, init_arg => 'keysource');
+has _pending   => (is => 'rw', isa => ArrayRef, default => [], init_arg => 'pending');
+has _picking   => (is => 'rw', isa => Any, init_arg => 'picking');
+has _staring   => (is => 'rw', isa => Any, init_arg => 'interactive');
 
 sub _out   { return $_[0]->out || \*STDOUT }
 sub _in    { return $_[0]->in  || \*STDIN }
@@ -111,38 +93,41 @@ sub _ascii { return $_[0]->ascii ? 1 : 0 }
 
 sub BUILD {
     my ($self) = @_;
-    binmode $self->_out, ':encoding(UTF-8)' unless $self->_ascii;
 
-    my $previous = select $self->_out;
-    $| = 1;
-    select $previous;
+    my $colour = defined $self->colour ? ($self->colour ? 1 : 0)
+        : ((eval { -t $self->_out }
+            && !Game::Terminal::Kit::Screen::no_colour()) ? 1 : 0);
+
+    $self->keyboard($self->_new_keyboard) unless $self->keyboard;
+    $self->screen(Game::Terminal::Kit::Screen->new(
+        out    => $self->_out,
+        colour => $colour,
+        ascii  => $self->_ascii,
+        (defined $self->_staring ? (interactive => $self->_staring ? 1 : 0) : ()),
+    )) unless $self->screen;
+    $self->log(Game::Terminal::Kit::Log->new(keep => 2)) unless $self->log;
+
+    $self->screen->utf8->flush_on;
     return $self;
 }
 
-sub _colour {
+sub _new_keyboard {
     my ($self) = @_;
-    my $on = $self->_painting;
-    return $on if defined $on;
-    $on = defined $self->colour ? ($self->colour ? 1 : 0)
-        : ((eval { -t $self->_out } && !$ENV{NO_COLOR}) ? 1 : 0);
-    $self->_painting($on);
-    return $on;
+    return Game::Terminal::Kit::Keys->new(
+        in      => $self->_in,
+        pending => $self->_pending,
+        ($self->_keysource ? (keysource => $self->_keysource) : ()),
+    );
 }
 
 sub paint {
     my ($self, $text, $code) = @_;
-    return $text unless $self->_colour;
-    return "\e[${code}m" . $text . "\e[0m";
+    return $self->screen->paint($text, $code);
 }
 
-sub say_to { my ($self, @what) = @_; my $fh = $self->_out; print {$fh} @what, "\n"; return }
+sub say_to { my ($self, @what) = @_; $self->screen->say(join '', @what); return }
 
-sub interactive {
-    my ($self) = @_;
-    my $want = $self->_staring;
-    return $want ? 1 : 0 if defined $want;
-    return (eval { -t $self->_out }) ? 1 : 0;
-}
+sub interactive { return $_[0]->screen->interactive ? 1 : 0 }
 
 sub picking {
     my ($self, @set) = @_;
@@ -151,87 +136,36 @@ sub picking {
     return $self->keys_available;
 }
 
-sub keys_available {
-    my ($self) = @_;
-    return 1 if $self->keysource;
-    return 0 unless eval { -t $self->_in };
-    return eval { require Term::ReadKey; 1 } ? 1 : 0;
-}
+sub keysource {
+    my ($self, @set) = @_;
+    return $self->keyboard->keysource unless @set;
 
-sub enter_raw {
-    my ($self) = @_;
-    return $self if $self->raw;
-
-    if ($self->keysource) {
-        $self->raw(1);
-        return $self;
+    $self->_keysource($set[0]);
+    if ($set[0]) {
+        $self->keyboard->keysource($set[0]);
+        return $set[0];
     }
 
-    return undef unless $self->keys_available;
-    return undef unless eval { Term::ReadKey::ReadMode(3, $self->_in); 1 };
-
-    $self->raw(1);
-    return $self;
+    $self->keyboard->leave_raw;
+    $self->keyboard($self->_new_keyboard);
+    return $set[0];
 }
 
-sub leave_raw {
-    my ($self) = @_;
-    return $self unless $self->raw;
-    eval { Term::ReadKey::ReadMode(0, $self->_in) } unless $self->keysource;
-    $self->raw(0);
-    return $self;
-}
+sub pending { return $_[0]->keyboard->pending }
 
-sub read_char {
-    my ($self, $wait) = @_;
+sub raw { return $_[0]->keyboard->raw ? 1 : 0 }
 
-    my $pending = $self->pending;
-    return shift @$pending if @$pending;
-    return $self->keysource->($wait) if $self->keysource;
+sub keys_available { return $_[0]->keyboard->keys_available }
 
-    my $char = Term::ReadKey::ReadKey($wait ? 0 : -1, $self->_in);
-    return $char if defined $char || $wait;
+sub enter_raw { return $_[0]->keyboard->enter_raw ? $_[0] : undef }
 
-    select undef, undef, undef, 0.05;
-    return Term::ReadKey::ReadKey(-1, $self->_in);
-}
+sub leave_raw { $_[0]->keyboard->leave_raw; return $_[0] }
 
-sub read_key {
-    my ($self) = @_;
-    my $char = $self->read_char(1);
-    return undef unless defined $char;
-    return $CONTROL{$char} if $CONTROL{$char};
-    return $self->read_sequence if $char eq "\e";
-    return $char;
-}
-
-sub read_sequence {
-    my ($self) = @_;
-
-    my $opener = $self->read_char(0);
-    return 'escape' unless defined $opener;
-
-    unless ($opener eq '[' || $opener eq 'O') {
-        unshift @{ $self->pending }, $opener;
-        return 'escape';
-    }
-
-    my $tail = '';
-    while (length $tail < 8) {
-        my $char = $self->read_char(0);
-        last unless defined $char;
-        $tail .= $char;
-        last if $char =~ /[A-Za-z~]/;
-    }
-
-    return $SEQUENCE{$tail} || 'escape';
-}
+sub read_key { return $_[0]->keyboard->read_key }
 
 sub clear {
     my ($self) = @_;
-    return $self unless $self->interactive;
-    my $fh = $self->_out;
-    print {$fh} "\e[2J\e[3J\e[H";
+    $self->screen->clear(scrollback => 1);
     return $self;
 }
 
@@ -239,25 +173,34 @@ sub handover {
     my ($self, $seat) = @_;
     return 1 unless $self->_mode eq 'hotseat';
 
+    my $question = "pass the keyboard to $seat, then press return";
+
     $self->clear;
-    $self->say_to('') for 1 .. ($self->interactive ? 2 : 30);
-    $self->say_to("pass the keyboard to $seat, then press return");
+    $self->say_to('') for 1 .. ($self->interactive ? 0 : 30);
 
-    return defined $self->read_key ? 1 : 0
-        if $self->picking && $self->enter_raw;
+    unless ($self->picking && $self->enter_raw) {
+        $self->say_to($question);
+        return defined $self->ask('') ? 1 : 0;
+    }
 
-    return defined $self->ask('') ? 1 : 0;
+    my $ready = Game::Terminal::Kit::Choose->new(
+        question => $question,
+        choices  => [ [ 1, "$seat has it" ] ],
+        legend   => [ '', 'enter when they do, q to stop' ],
+        screen   => $self->screen,
+    );
+    $ready->picker->numbered(0);
+
+    while (1) {
+        my ($event) = $ready->run($self->keyboard, $self->screen);
+        return 1 if $event eq 'chosen';
+        return 0 if $event eq 'quit';
+    }
 }
 
 sub ask {
     my ($self, $prompt) = @_;
-    my $fh = $self->_out;
-    print {$fh} $prompt;
-    my $in = $self->_in;
-    my $line = <$in>;
-    return undef unless defined $line;
-    chomp $line;
-    return $line;
+    return $self->keyboard->read_line($prompt, $self->_out);
 }
 
 sub pretty {
@@ -399,7 +342,7 @@ sub preview {
     return best(\@rest);
 }
 
-sub choice_cards {
+sub fan_items {
     my ($self, $seat) = @_;
 
     my (%playable, %knock);
@@ -414,11 +357,14 @@ sub choice_cards {
     my @out;
     for my $group (@$groups) {
         for my $card (@{ $group->{cards} }) {
-            next unless $playable{$card};
             push @out, {
-                card  => $card,
-                knock => $knock{$card} ? 1 : 0,
-                loose => $group->{loose},
+                label => $self->pretty($card),
+                skip  => $playable{$card} ? 0 : 1,
+                value => {
+                    card  => $card,
+                    knock => $knock{$card} ? 1 : 0,
+                    loose => $group->{loose},
+                },
             };
         }
     }
@@ -426,10 +372,34 @@ sub choice_cards {
     return \@out;
 }
 
+sub choice_cards {
+    my ($self, $seat) = @_;
+    return [ map { $_->{value} } grep { !$_->{skip} } @{ $self->fan_items($seat) } ];
+}
+
 sub first_loose {
     my ($self, $choices) = @_;
     my ($at) = grep { $choices->[$_]{loose} } 0 .. $#$choices;
     return defined $at ? $at : 0;
+}
+
+sub discard_picker {
+    my ($self, $seat, $big) = @_;
+    return Game::Terminal::Kit::Picker->new(
+        items     => $self->fan_items($seat),
+        prefer    => sub { $_[0]{value}{loose} },
+        across    => 1,
+        numbered  => 0,
+        window    => 0,
+        screen    => $self->screen,
+        game_keys => {
+            q   => 'stop',
+            k   => 'knock',
+            v   => 'remeld',
+            '?' => 'help',
+            ($big ? (g => 'big_gin') : ()),
+        },
+    );
 }
 
 sub legend {
@@ -443,87 +413,77 @@ sub legend {
 sub pick_discard {
     my ($self, $seat) = @_;
 
-    my $choices = $self->choice_cards($seat);
-    return undef unless @$choices;
-
     my $legal = $self->game->deal->legal($seat);
     my ($big) = grep { $_->{kind} eq 'big_gin' } @$legal;
 
-    my $at = $self->first_loose($choices);
+    my $picker = $self->discard_picker($seat, $big);
+    return undef unless defined $picker->current;
+
     my $remelded = 0;
-    my @notice;
 
     while (1) {
-        $self->show_choice($seat, $choices, $at, \@notice, $big, $remelded);
-        @notice = ();
+        my $choice = $picker->current;
+        $self->show_choice($seat, $choice, $big, $remelded);
 
-        my $key = $self->read_key;
-        return undef if !defined $key || $key eq 'eof' || $key eq 'interrupt';
+        my ($event, $value) = $picker->step($self->read_key);
+        next if $event eq 'moved';
+        return undef if $event eq 'quit';
+        return { kind => 'discard', card => $value->{card} } if $event eq 'chosen';
 
-        if ($key eq 'q') { $self->quit(1); return undef }
+        $value = '' unless $event eq 'key';
 
-        if ($key eq 'left' || $key eq 'down') {
-            $at = ($at - 1) % @$choices;
-            next;
-        }
-        if ($key eq 'right' || $key eq 'up' || $key eq 'tab') {
-            $at = ($at + 1) % @$choices;
-            next;
-        }
-        if ($key eq 'home' || $key eq 'page_up') { $at = 0;             next }
-        if ($key eq 'end'  || $key eq 'page_down') { $at = $#$choices;  next }
+        if ($value eq 'stop') { $self->quit(1); return undef }
 
-        if ($key eq 'enter' || $key eq ' ') {
-            return { kind => 'discard', card => $choices->[$at]{card} };
-        }
-
-        if ($key eq 'k') {
-            return { kind => 'discard', card => $choices->[$at]{card}, knock => 1 }
-                if $choices->[$at]{knock};
-            @notice = ('you cannot knock on that one');
+        if ($value eq 'knock') {
+            return { kind => 'discard', card => $choice->{card}, knock => 1 }
+                if $choice->{knock};
+            $self->log->note('you cannot knock on that one');
             next;
         }
 
-        if ($key eq 'g' && $big) { return $big }
+        if ($value eq 'big_gin') { return $big }
 
-        if ($key eq 'v') { $remelded = !$remelded; next }
-        if ($key eq '?') { @notice = $self->help_lines; next }
+        if ($value eq 'remeld') { $remelded = !$remelded; next }
+        if ($value eq 'help') { $self->log->note($self->help_lines); next }
 
-        @notice = ('that key does nothing here. ? for the ones that do');
+        $self->log->note('that key does nothing here. ? for the ones that do');
     }
 }
 
+sub _frame {
+    my ($self, @body) = @_;
+    my $log = $self->log;
+
+    my @lines = ('');
+    push @lines, (map { @$_ } @{ $log->recent }), '' if @{ $log->recent };
+    push @lines, @body;
+    push @lines, '', map { '  ' . $_ } @{ $log->notes } if @{ $log->notes };
+
+    $log->shown;
+    return @lines;
+}
+
 sub show_choice {
-    my ($self, $seat, $choices, $at, $notice, $big, $remelded) = @_;
+    my ($self, $seat, $choice, $big, $remelded) = @_;
 
-    my $card = $choices->[$at]{card};
-    my $deal = $self->game->deal;
-
-    $self->clear;
-    $self->say_to('');
+    my $card = $choice->{card};
+    my @body;
 
     if ($remelded) {
-        $self->say_to($_) for @{ $self->render($seat, $card) };
-        $self->say_to('');
-        $self->say_to('  that is the hand WITHOUT ' . $self->pretty($card)
-            . '. v puts it back.');
+        push @body, @{ $self->render($seat, $card) }, '',
+            '  that is the hand WITHOUT ' . $self->pretty($card)
+            . '. v puts it back.';
     }
     else {
         my %mark = (%{ $self->marks }, $card => 'cursor');
-        $self->say_to($_) for @{ $self->render($seat, undef, \%mark) };
-        $self->say_to('');
-        $self->say_to('  ' . $self->without_line($seat, $choices->[$at]));
+        push @body, @{ $self->render($seat, undef, \%mark) }, '',
+            '  ' . $self->without_line($seat, $choice);
     }
 
-    $self->say_to('  big gin is there for the taking: press g') if $big;
+    push @body, '  big gin is there for the taking: press g' if $big;
 
-    if (@$notice) {
-        $self->say_to('');
-        $self->say_to('  ', $_) for @$notice;
-    }
-
-    $self->say_to('');
-    $self->say_to('  ', $self->legend($choices->[$at]));
+    $self->clear;
+    $self->screen->say($self->_frame(@body), '', '  ' . $self->legend($choice));
     return;
 }
 
@@ -728,25 +688,15 @@ sub pick_draw {
 
     my $deal = $self->game->deal;
     my $upcard = $deal->upcard;
-    my @notice;
 
     while (1) {
-        $self->clear;
-        $self->say_to('');
-        $self->say_to($_) for @{ $self->render($seat) };
-        $self->say_to('');
-        $self->say_to('  u takes the ' . $self->pretty($upcard)
+        my @body = (@{ $self->render($seat) }, '',
+            '  u takes the ' . $self->pretty($upcard)
             . ', d draws from the stock'
             . ($phase eq 'upcard' ? ', n passes it up' : ''));
 
-        if (@notice) {
-            $self->say_to('');
-            $self->say_to('  ', $_) for @notice;
-            @notice = ();
-        }
-
-        $self->say_to('');
-        $self->say_to('  ? for the rest, q to stop');
+        $self->clear;
+        $self->screen->say($self->_frame(@body), '', '  ? for the rest, q to stop');
 
         my $key = $self->read_key;
         return undef if !defined $key || $key eq 'eof' || $key eq 'interrupt';
@@ -756,24 +706,24 @@ sub pick_draw {
 
         if ($key eq 'd') {
             return { kind => 'draw' } if $phase eq 'draw';
-            @notice = ('on the first turn it is take it or pass it up: u or n');
+            $self->log->note('on the first turn it is take it or pass it up: u or n');
             next;
         }
 
         if ($key eq 'n' || $key eq 'p') {
             return { kind => 'pass' } if $phase eq 'upcard';
-            @notice = ('you cannot pass now: u to take it, d to draw');
+            $self->log->note('you cannot pass now: u to take it, d to draw');
             next;
         }
 
         if ($key eq '?') {
-            @notice = ($phase eq 'upcard'
+            $self->log->note($phase eq 'upcard'
                 ? 'u takes the upcard, n passes it up. that is the whole choice.'
                 : 'u takes the upcard, d draws the card nobody has seen.');
             next;
         }
 
-        @notice = ('that key does nothing here. ? for the ones that do');
+        $self->log->note('that key does nothing here. ? for the ones that do');
     }
 }
 
@@ -815,6 +765,7 @@ sub play {
         my @out = $self->game->apply($seat, $move);
         if (ref $out[0] eq 'Game::Gin::Error') { $self->say_to($out[0]->message); next }
         $self->remember($seat, \%held, \@out);
+        $self->log->record(grep { defined } map { $self->told($_) } @out);
         $self->announce($_) for @out;
         $self->say_to('') if $self->game->number != $number;
     }
@@ -853,24 +804,31 @@ sub remember {
     return $self;
 }
 
-sub announce {
+sub told {
     my ($self, $out) = @_;
     my $k = $out->{kind};
-    return $self->say_to("$out->{seat} takes " . $self->pretty($out->{card})) if $k eq 'take';
-    return $self->say_to("$out->{seat} draws")                          if $k eq 'draw';
-    return $self->say_to("$out->{seat} passes")                         if $k eq 'pass';
-    return $self->say_to("$out->{seat} discards " . $self->pretty($out->{card})
-                         . ($out->{knock} ? ' and knocks' : ''))        if $k eq 'discard';
-    return $self->say_to("$out->{seat} declares big gin")               if $k eq 'big_gin';
-    return $self->say_to('the stock ran out: the hand is cancelled')    if $k eq 'cancelled';
+    return "$out->{seat} takes " . $self->pretty($out->{card}) if $k eq 'take';
+    return "$out->{seat} draws"                                if $k eq 'draw';
+    return "$out->{seat} passes"                               if $k eq 'pass';
+    return "$out->{seat} discards " . $self->pretty($out->{card})
+        . ($out->{knock} ? ' and knocks' : '')                 if $k eq 'discard';
+    return "$out->{seat} declares big gin"                     if $k eq 'big_gin';
+    return 'the stock ran out: the hand is cancelled'          if $k eq 'cancelled';
     if ($k eq 'hand_end') {
-        return $self->say_to(sprintf('%s wins the hand by %s, %d points',
-                                     $out->{winner}, $out->{how} // '?', $out->{points}))
+        return sprintf('%s wins the hand by %s, %d points',
+                       $out->{winner}, $out->{how} // '?', $out->{points})
             if $out->{winner};
-        return $self->say_to('the hand is over');
+        return 'the hand is over';
     }
-    return $self->say_to(sprintf('deal %d, dealt by %s', $out->{number}, $out->{dealer}))
+    return sprintf('deal %d, dealt by %s', $out->{number}, $out->{dealer})
         if $k eq 'deal';
+    return undef;
+}
+
+sub announce {
+    my ($self, $out) = @_;
+    my $line = $self->told($out);
+    $self->say_to($line) if defined $line;
     return;
 }
 
@@ -922,6 +880,15 @@ lost or stopped early, and 2 for a bad option.
 USAGE
 }
 
+sub options {
+    return [
+        { name => 'mode', type => 'enum', choices => [qw(bot hotseat watch)], help => 'you against the bot, two people, or two bots' },
+        { name => 'level', type => 'int', min => 1, max => 2, help => "the bot's strength" },
+        { name => 'seat', type => 'enum', choices => [qw(p1 p2)], help => 'your seat' },
+        { name => 'seed', type => 'str', help => 'deal the same game every time' },
+    ];
+}
+
 sub run {
     my ($class, @argv) = @_;
     my %o = (mode => 'bot', level => 2, seat => 'p1');
@@ -964,15 +931,10 @@ sub run {
         (defined $o{pick} ? (picking => $o{pick} ? 1 : 0) : ()),
     );
 
-    local @SIG{qw(INT TERM HUP)};
-    for my $sig (qw(INT TERM HUP)) {
-        $SIG{$sig} = sub { $ui->leave_raw; $SIG{$sig} = 'DEFAULT'; kill $sig, $$ };
-    }
-
-    my $game = eval { $ui->play(defined $seed ? (seed => $seed) : ()) };
-    my $died = $@;
-    $ui->leave_raw;
-    die $died if $died;
+    my $game = Game::Terminal::Kit::Run::guard(
+        sub { $ui->play(defined $seed ? (seed => $seed) : ()) },
+        $ui->keyboard, $ui->screen,
+    );
 
     my $result = $game && $game->result;
     return 1 unless $result;
@@ -994,7 +956,7 @@ Game::Gin::Terminal - gin rummy at a prompt
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 
@@ -1049,7 +1011,7 @@ an empty space rather than a gap, so the table does not appear to end there.
 
 L</ascii> draws the suits as C<S H D C> in a C<+-|> frame for a terminal
 without the box characters, and colour is on when C<out> is a terminal and
-C<NO_COLOR> is unset.
+C<NO_COLOR> is unset or empty.
 
 =head2 You point at the card you mean
 
@@ -1061,7 +1023,8 @@ stops. The draw is the same shape one step earlier: C<u> takes the upcard,
 C<d> draws, C<n> passes it up on the first turn. Off a terminal, or without
 L<Term::ReadKey>, every move is typed as before, and C<--nopick> asks for that.
 
-Same key tables as L<Game::Checkers::Terminal>, L<Game::Oware::Terminal> and
+The keys are read by L<Game::Terminal::Kit::Keys>, as they are in
+L<Game::Checkers::Terminal>, L<Game::Oware::Terminal> and
 L<Game::Dominoes::Terminal>, on purpose: four of this author's terminals
 reading the same keyboard should not disagree about what Home is.
 
@@ -1088,7 +1051,7 @@ L</hand_groups> for that reason. One row of cards may only have one order.
 
 The cursor starts on the B<first loose card>, because that is the one you
 almost always mean, and left or down moves it left while right or up moves it
-right. A card the fan draws that cannot be thrown is skipped rather than
+right. Tab goes right and shift-tab left, home and end go to the ends. A card the fan draws that cannot be thrown is skipped rather than
 landed on: the card just taken from the pile is the only one, and the rules
 forbid throwing it straight back.
 
@@ -1103,6 +1066,14 @@ It is cheap, which is why it can be on every keystroke: C<best> over ten cards
 runs in microseconds, so remelding all eleven candidates costs nothing
 measurable. C<v> shows the remelded hand itself for when the regrouping
 matters rather than only the count.
+
+=head2 What the other seat just did
+
+The last two moves are drawn above the table in every frame of the key
+loops: C<p2 takes 7♥>, C<p2 discards K♠>, and who won the hand before this
+one. On a terminal the screen is cleared for every frame, so a move said once
+would be gone before it was read, and what your opponent took is half of what
+you know about their hand.
 
 =head2 Three frames, because there are three things to mark
 
@@ -1139,7 +1110,7 @@ directly under seat 1's with nothing between them.
 
 So the mode is built around a B<hand-over>. Between seats the screen clears,
 including the scrollback, and nothing is printed but whose turn it is and a
-wait for a keypress. Off a terminal it is thirty blank lines instead, which is
+wait for enter or space; C<q> stops the game there. Off a terminal it is thirty blank lines instead, which is
 honest rather than secure, and a hotseat game piped to a file was never
 private anyway.
 
@@ -1159,6 +1130,35 @@ hand-over is removed rather than passing because the loop ran zero times.
 Plays a match to the end and returns the L<Game::Gin>. With no seed it makes
 one. Stops if input runs out rather than looping.
 
+=head2 options
+
+    my $fields = Game::Gin::Terminal->options;
+
+The options a person would set before a game, in the order a launcher shows
+them. Each is a hash reference with a C<name>, a C<type> and a C<help>, and
+C<min> and C<max> or C<choices> where the type has them. A new list is
+returned each time.
+
+=over 4
+
+=item C<mode>
+
+One of C<bot>, C<hotseat>, C<watch>: you against the bot, two people, or two bots.
+
+=item C<level>
+
+A whole number from 1 to 2: the bot's strength.
+
+=item C<seat>
+
+One of C<p1>, C<p2>: your seat.
+
+=item C<seed>
+
+Text: deal the same game every time.
+
+=back
+
 =head2 run
 
     exit Game::Gin::Terminal->run(@ARGV);
@@ -1171,9 +1171,8 @@ bad option, a leftover word or a refused value, with the reason and the usage
 on C<STDERR>. C<--help> prints the usage on C<STDOUT> and returns C<0>. Signal
 handlers are local to the call and the terminal is left in cooked mode on every
 way out, so a launcher such as L<Game::Terminal> can call it in its own process
-and carry on afterwards. Colour is off when C<NO_COLOR> is set, as it is off a
-terminal.
-
+and carry on afterwards. Colour is off when C<NO_COLOR> is set and not empty,
+as it is off a terminal.
 
 =head2 render
 
@@ -1252,9 +1251,16 @@ What L<Game::Gin::Bot> would play for a seat.
 
 Whether a seat is played from the keyboard, which depends on C<mode>.
 
+=head2 told
+
+    my $line = $ui->told($event);
+
+One line for an outcome from the engine, in words, or undef for an outcome
+with nothing to say.
+
 =head2 announce
 
-One line for an outcome from the engine.
+L</told>, printed.
 
 =head2 announce_result
 
@@ -1269,7 +1275,22 @@ The two places this distribution reads and writes.
 C<mode> is C<bot> (the default), C<hotseat> or C<watch>. C<seat> is the seat a
 person plays when the mode is C<bot>. C<ascii> draws the cards without box
 characters or pips, and C<colour> defaults to on for a terminal with
-C<NO_COLOR> unset.
+C<NO_COLOR> unset or empty.
+
+=head2 keyboard
+
+The L<Game::Terminal::Kit::Keys> every key and every typed line is read
+through, built from C<in>, L</keysource> and L</pending>.
+
+=head2 screen
+
+The L<Game::Terminal::Kit::Screen> everything is printed through, built from
+C<out>, C<colour>, C<ascii> and C<interactive>.
+
+=head2 log
+
+The L<Game::Terminal::Kit::Log> holding the last two moves and whatever the
+key loops have to say about the last key. L</play> records each move in it.
 
 =head2 quit
 
@@ -1297,10 +1318,11 @@ when C<in> is a terminal and L<Term::ReadKey> can be loaded.
 
     $ui->keysource(sub { shift @character });
 
-A coderef taking a wait flag and returning B<one character>, used in place of
+A coderef taking a wait and returning B<one character>, used in place of
 L<Term::ReadKey>. That is how F<t/15-pick.t> drives the key loop with no
 terminal and no L<Term::ReadKey> installed. One character: a source handing
-back C<"\e[C"> whole never becomes a right arrow.
+back C<"\e[C"> whole never becomes a right arrow. It may be given to the
+constructor or set afterwards.
 
 =head2 pending
 
@@ -1309,32 +1331,22 @@ open a sequence does not eat the keystroke behind it.
 
 =head2 raw
 
-Whether the terminal is in cbreak. Set by L</enter_raw>, cleared by
+Whether the terminal is in cbreak: true between L</enter_raw> and
 L</leave_raw>.
 
 =head2 enter_raw, leave_raw
 
 cbreak on and off, B<cbreak rather than raw> so an interrupt stays an
-interrupt. F<bin/gin> calls C<leave_raw> from a signal handler and after an
-C<eval> around the game, because a program that dies in cbreak leaves the
-shell it came from with no echo.
-
-=head2 read_char
-
-One character: whatever L</pending> holds, else L</keysource>, else
-L<Term::ReadKey>. With a false argument it does not block.
+interrupt. C<enter_raw> returns undef when there is nothing to read keys
+with. L</run> leaves cbreak on every way out, a signal included, because a
+program that dies in cbreak leaves the shell it came from with no echo.
 
 =head2 read_key
 
 One keystroke as a name: a character comes back as itself, an escape sequence
 as C<up>, C<left>, C<home> and so on, a control character as C<enter>, C<tab>,
-C<interrupt> or C<eof>. So a name is always longer than one character and
-never collides with one.
-
-=head2 read_sequence
-
-The tail of an escape sequence, once the escape has been read. An opener that
-turns out not to belong to one goes back on L</pending>.
+C<interrupt> or C<eof>, as L<Game::Terminal::Kit::Keys/read_key> names them.
+So a name is always longer than one character and never collides with one.
 
 =head2 clear
 
@@ -1342,8 +1354,10 @@ Clears the screen and the scrollback, on a terminal only.
 
 =head2 handover
 
-Clears, says whose turn it is, and waits. Only in C<hotseat>, and it reads a
-key or a line to match whichever way the game is being played.
+Clears, says whose turn it is, and waits. Only in C<hotseat>. At the keys it
+is a L<Game::Terminal::Kit::Choose> with one answer, taken with enter or
+space, and C<q> stops the game; typed, it waits for a line. True when the
+keyboard was handed over.
 
 =head2 marks
 
@@ -1376,11 +1390,30 @@ The hand split into its melds and its loose cards, each group labelled and
 flagged C<loose>. L</hand_lines> draws from this and L</choice_cards> walks
 it, which is what keeps the cursor and the fan in one order.
 
+=head2 fan_items
+
+    my $items = $ui->fan_items($seat);
+
+Every card in a seat's hand, in the order the fan draws them, as the items of
+a L<Game::Terminal::Kit::Picker>. A card that may not be thrown is a C<skip>
+item: it is drawn, and the cursor steps over it. The value of each is a hash
+reference of C<card>, C<knock> and C<loose>.
+
 =head2 choice_cards
 
 The cards a seat may throw, in the order the fan draws them, one entry each,
 with a C<knock> flag where the same card is also offered as a knock. The
-engine lists those as two moves; the cursor wants one card.
+engine lists those as two moves; the cursor wants one card. These are the
+values of L</fan_items>, less the cards that cannot be thrown.
+
+=head2 discard_picker
+
+    my $picker = $ui->discard_picker($seat, $big_gin);
+
+The L<Game::Terminal::Kit::Picker> over L</fan_items> that
+L</pick_discard> steps: a row, unnumbered, resting on the first loose card,
+with C<q>, C<k>, C<v> and C<?> the game's own keys, and C<g> as well when
+big gin is on offer.
 
 =head2 first_loose
 
@@ -1396,8 +1429,11 @@ L<Game::Gin::Deal/apply>, or C<undef> to stop.
 
 =head2 show_choice
 
-Draws one frame of the discard picker: the table, the hand with the cursor on
-it, what the throw would leave, and the keys.
+    $ui->show_choice($seat, $choice, $big_gin, $remelded);
+
+Draws one frame of the discard picker for the entry of L</choice_cards> under
+the cursor: the last two moves, the table, the hand with the cursor on it,
+what the throw would leave, and the keys.
 
 =head2 legend, help_lines, typed_help
 

@@ -9,37 +9,18 @@ use Game::Backgammon;
 use Game::Backgammon::Board ();
 use Game::Backgammon::Bot;
 use Getopt::Long ();
+use Game::Terminal::Kit::History;
+use Game::Terminal::Kit::Keys;
+use Game::Terminal::Kit::Log;
+use Game::Terminal::Kit::Picker;
+use Game::Terminal::Kit::Run;
+use Game::Terminal::Kit::Screen;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 my %CHECKER = (
 	white => { ascii => 'O', wide => "\x{25CB}", colour => '1;37', ink => '1;38;5;231' },
 	black => { ascii => 'X', wide => "\x{25CF}", colour => '1;36', ink => '1;38;5;16' },
-);
-
-my %SEQUENCE = (
-	'A' => 'up',
-	'B' => 'down',
-	'C' => 'right',
-	'D' => 'left',
-	'H' => 'home',
-	'F' => 'end',
-	'1~' => 'home',
-	'4~' => 'end',
-	'5~' => 'page_up',
-	'6~' => 'page_down',
-	'7~' => 'home',
-	'8~' => 'end',
-);
-
-my %CONTROL = (
-	"\r" => 'enter',
-	"\n" => 'enter',
-	"\t" => 'tab',
-	"\x7f" => 'backspace',
-	"\x08" => 'backspace',
-	"\x03" => 'interrupt',
-	"\x04" => 'eof',
 );
 
 my %GROUND = (
@@ -104,16 +85,14 @@ has [qw/colour interactive picking/] => (
 	is => 'rw'
 );
 
+has [qw/keyboard screen log picker/] => (
+	is => 'rw'
+);
+
 has highlight => (
 	is => 'rw',
 	isa => HashRef,
 	default => sub { {} }
-);
-
-has raw => (
-	is => 'rw',
-	isa => Bool,
-	default => 0
 );
 
 has keysource => (
@@ -127,22 +106,43 @@ has pending => (
 	default => sub { [] }
 );
 
+has history => (
+	is => 'rw'
+);
+
 sub BUILD {
 	my ($self) = @_;
 	$self->interactive(-t $self->in ? 1 : 0) unless defined $self->interactive;
-	$self->colour($self->interactive && !$ENV{NO_COLOR} ? 1 : 0)
+	$self->colour($self->interactive && !Game::Terminal::Kit::Screen::no_colour() ? 1 : 0)
 		unless defined $self->colour;
+	$self->keyboard(Game::Terminal::Kit::Keys->new(
+		in => $self->in,
+		pending => $self->pending,
+		($self->keysource ? (keysource => $self->keysource) : ()),
+	)) unless $self->keyboard;
+	$self->screen(Game::Terminal::Kit::Screen->new(
+		out => $self->out,
+		interactive => $self->interactive ? 1 : 0,
+		colour => $self->colour ? 1 : 0,
+		ascii => $self->ascii ? 1 : 0,
+	)) unless $self->screen;
+	$self->log(Game::Terminal::Kit::Log->new) unless $self->log;
+	$self->picker(Game::Terminal::Kit::Picker->new(
+		window => 0,
+		log => $self->log,
+		screen => $self->screen,
+	)) unless $self->picker;
+	$self->history(Game::Terminal::Kit::History->new(
+		save => sub { $_[0]->to_text },
+		load => sub { Game::Backgammon->from_text($_[0]) },
+	)) unless $self->history;
 	$self->picking($self->interactive ? 1 : 0) unless defined $self->picking;
 	$self->picking(0) unless $self->_keys_available;
-	binmode $self->out, ':encoding(UTF-8)' unless $self->ascii;
-
-	my $previous = select $self->out;
-	$| = 1;
-	select $previous;
+	$self->screen->utf8->flush_on;
 	return;
 }
 
-sub say_to { my ($self, @what) = @_; my $fh = $self->out; print {$fh} @what, "\n"; return }
+sub say_to { my ($self, @what) = @_; $self->screen->say(join '', @what); return }
 
 sub board_lines {
 	my ($self, $view) = @_;
@@ -240,83 +240,20 @@ sub _label { my ($self, $text) = @_; return $self->_paint($text, '2') }
 
 sub _paint {
 	my ($self, $text, $code) = @_;
-	return $text unless $self->colour;
-	return "\e[${code}m" . $text . "\e[0m";
+	return $self->screen->paint($text, $code);
 }
 
-sub clear {
-	my ($self) = @_;
-	return unless $self->interactive;
-	my $fh = $self->out;
-	print {$fh} "\e[2J\e[H";
-	return;
-}
+sub clear { my ($self) = @_; $self->screen->clear; return }
 
-sub _keys_available {
-	my ($self) = @_;
-	return 1 if $self->keysource;
-	return 0 unless defined $self->in && -t $self->in;
-	return eval { require Term::ReadKey; 1 } ? 1 : 0;
-}
+sub raw { my ($self) = @_; return $self->keyboard->raw }
 
-sub _enter_raw {
-	my ($self) = @_;
-	return $self if $self->raw;
-	if ($self->keysource) {
-		$self->raw(1);
-		return $self;
-	}
-	return undef unless $self->_keys_available;
-	return undef unless eval { Term::ReadKey::ReadMode(3, $self->in); 1 };
-	$self->raw(1);
-	return $self;
-}
+sub _keys_available { my ($self) = @_; return $self->keyboard->keys_available }
 
-sub _leave_raw {
-	my ($self) = @_;
-	return $self unless $self->raw;
-	eval { Term::ReadKey::ReadMode(0, $self->in) } unless $self->keysource;
-	$self->raw(0);
-	return $self;
-}
+sub _enter_raw { my ($self) = @_; return $self->keyboard->enter_raw ? $self : undef }
 
-sub _read_char {
-	my ($self, $wait) = @_;
-	my $pending = $self->pending;
-	return shift @$pending if @$pending;
-	return $self->keysource->($wait) if $self->keysource;
-	my $char = Term::ReadKey::ReadKey($wait ? 0 : -1, $self->in);
-	return $char if defined $char || $wait;
-	select undef, undef, undef, 0.05;
-	return Term::ReadKey::ReadKey(-1, $self->in);
-}
+sub _leave_raw { my ($self) = @_; $self->keyboard->leave_raw; return $self }
 
-sub _read_key {
-	my ($self) = @_;
-	my $char = $self->_read_char(1);
-	return undef unless defined $char;
-	return $CONTROL{$char} if $CONTROL{$char};
-	return $self->_read_sequence if $char eq "\e";
-	return $char;
-}
-
-sub _read_sequence {
-	my ($self) = @_;
-	my $opener = $self->_read_char(0);
-	return 'escape' unless defined $opener;
-	unless ($opener eq '[' || $opener eq 'O') {
-		unshift @{ $self->pending }, $opener;
-		return 'escape';
-	}
-	my $tail = '';
-	while (length $tail < 8) {
-		my $char = $self->_read_char(0);
-		last unless defined $char;
-		$tail .= $char;
-		last if $char =~ /[A-Za-z~]/;
-	}
-	return $SEQUENCE{$tail} || 'escape';
-}
+sub _read_key { my ($self) = @_; return $self->keyboard->read_key }
 
 sub step {
 	my ($self) = @_;
@@ -324,12 +261,13 @@ sub step {
 	return 0 if $game->status ne 'active';
 
 	my $who = $game->turn;
-	my $picking = $self->picking && $self->raw
-		&& ($self->mode eq 'hotseat' || ($self->mode eq 'bot' && $who eq $self->seat));
+	my $person = $self->_at_keys($who);
+	my $picking = $self->picking && $self->raw && $person;
 	unless ($picking) {
 		$self->clear;
 		$self->say_to($self->render($who));
 		$self->say_to(sprintf '  %s to play %s', $who, join '-', @{ $game->dice });
+		$self->_say_notes;
 	}
 
 	my $turns = $game->legal_turns;
@@ -341,14 +279,74 @@ sub step {
 		}
 		$self->say_to('  no play');
 		$game->play($turns->[0]);
-		return $game->status eq 'active' ? 1 : 0;
+		return $self->_played;
 	}
 
+	$self->person_turn if $person;
 	my $turn = $self->_ask($who, $turns);
 	return 0 unless $turn;
+	return 1 unless ref $turn;
 	$game->play($turn) or do { $self->say_to('  ' . $@->message); return 1 };
 	$self->say_to('  ' . $turn->notation);
-	return $game->status eq 'active' ? 1 : 0;
+	return $self->_played;
+}
+
+sub _at_keys {
+	my ($self, $who) = @_;
+	return 1 if $self->mode eq 'hotseat';
+	return $self->mode eq 'bot' && $who eq $self->seat ? 1 : 0;
+}
+
+sub _played {
+	my ($self) = @_;
+	return 1 if $self->game->status eq 'active';
+	$self->person_turn unless $self->mode eq 'watch';
+	return 0;
+}
+
+sub _say_notes {
+	my ($self) = @_;
+	$self->say_to("  $_") for $self->log->lines;
+	$self->log->shown;
+	return;
+}
+
+sub person_turn {
+	my ($self) = @_;
+	$self->history->turn($self->game);
+	return $self;
+}
+
+sub take_back {
+	my ($self) = @_;
+	my $game = $self->history->undo;
+	return $self->_notify('There is nothing to take back.') unless $game;
+	$self->swap($game);
+	$self->_notify('Taken back.');
+	return 1;
+}
+
+sub play_again {
+	my ($self) = @_;
+	my $game = $self->history->redo;
+	return $self->_notify('There is nothing to play again.') unless $game;
+	$self->swap($game);
+	$self->_notify('Played again.');
+	return 1;
+}
+
+sub swap {
+	my ($self, $game) = @_;
+	$self->game($game);
+	$self->highlight({});
+	$self->log->forget;
+	return $self;
+}
+
+sub _notify {
+	my ($self, $line) = @_;
+	$self->log->note($line);
+	return 0;
 }
 
 sub _ask {
@@ -364,14 +362,15 @@ sub _ask {
 	}
 
 	$self->say_to($_) for @{ $self->offer_lines($turns) };
-	my $fh = $self->in;
-	my $out = $self->out;
 	while (1) {
-		print {$out} "  $who> ";
-		my $line = <$fh>;
+		my $line = $self->keyboard->read_line("  $who> ", $self->out);
 		return undef unless defined $line;
-		$line =~ s/\s+\z//;
 		return undef if $line eq 'q' || $line eq 'quit';
+		if ($line eq 'undo' || $line eq 'redo') {
+			return 'swapped' if $line eq 'undo' ? $self->take_back : $self->play_again;
+			$self->_say_notes;
+			next;
+		}
 		return $turns->[ $line - 1 ] if $line =~ /\A\d+\z/ && $line >= 1 && $line <= @$turns;
 		$self->say_to('  pick a number from the list, or q to stop');
 	}
@@ -435,117 +434,97 @@ sub _move_marks {
 	return \%mark;
 }
 
+sub _move_items {
+	my ($self, $next) = @_;
+	return [ map { { label => $_->notation, about => $self->_describe($_), value => $_ } } @$next ];
+}
+
 sub _pick_turn {
 	my ($self, $who, $turns) = @_;
 	return undef unless $self->raw;
 	my $view = $self->view || $who;
-	my @chosen;
-	my $at = 0;
-	my @notice;
+	my $picker = $self->picker;
+	my $log = $self->log;
+	my (@chosen, $done);
+	my $fresh = 1;
 
 	while (1) {
-		my $match = $self->_matching($turns, \@chosen);
-		my $next = $self->_next_moves($match, \@chosen);
-		my $done = $self->_complete($match, \@chosen);
-		return $done if $done && !@$next;
+		if ($fresh) {
+			my $match = $self->_matching($turns, \@chosen);
+			my $next = $self->_next_moves($match, \@chosen);
+			$done = $self->_complete($match, \@chosen);
+			return $done if $done && !@$next;
+			$picker->reset($self->_move_items($next));
+			$picker->game_keys({
+				k => 'up', j => 'down', v => 'view', '?' => 'help',
+				%{ Game::Terminal::Kit::History->game_keys },
+				($done ? (f => 'finish') : ()),
+			});
+			$fresh = 0;
+		}
 
-		$at = $#$next if $at > $#$next;
-		$at = 0 if $at < 0;
 		$self->highlight(
-			$self->_move_marks($view, $who, \@chosen, $next->[$at])
+			$self->_move_marks($view, $who, \@chosen, $picker->current)
 		);
-		$self->_draw_choice($who, $view, $next, $at, \@chosen, $done, \@notice);
-		@notice = ();
+		$self->_draw_choice($who, $view, $picker, \@chosen, $done);
 
-		my $key = $self->_read_key;
-		return undef if !defined $key || $key eq 'eof' || $key eq 'interrupt';
-
-		if ($key eq 'up' || $key eq 'left' || $key eq 'k') {
-			$at = ($at - 1) % @$next;
-			next;
-		}
-		if ($key eq 'down' || $key eq 'right' || $key eq 'tab' || $key eq 'j') {
-			$at = ($at + 1) % @$next;
-			next;
-		}
-		if ($key eq 'enter' || $key eq ' ') {
-			push @chosen, $next->[$at];
-			$at = 0;
-			next;
-		}
-		if ($key eq 'backspace') {
-			@notice = ('nothing taken back: no move chosen yet') unless @chosen;
-			pop @chosen;
-			$at = 0;
-			next;
-		}
-		if ($key =~ /\A[1-9]\z/ && $key <= @$next) {
-			$at = $key - 1;
-			next;
-		}
-		if ($key eq 'f' && $done) {
-			return $done;
-		}
-		if ($key eq 'v') {
-			$self->view($view = Game::Backgammon::Board::other($view));
-			next;
-		}
-		if ($key eq 'q') {
+		my ($event, $value) = $picker->step($self->_read_key);
+		if ($event eq 'quit') {
 			$self->highlight({});
 			return undef;
 		}
-		if ($key eq '?') {
-			@notice = @{ $self->_key_lines };
+		if ($event eq 'chosen') {
+			push @chosen, $value;
+			$fresh = 1;
 			next;
 		}
-		@notice = ('that key does nothing here, ? for the ones that do');
+		if ($event eq 'back') {
+			$log->note('nothing taken back: no move chosen yet') unless @chosen;
+			pop @chosen;
+			$fresh = 1;
+			next;
+		}
+		next unless $event eq 'key';
+		return $done if $value eq 'finish';
+		if ($value eq 'undo' || $value eq 'redo') {
+			next unless $value eq 'undo' ? $self->take_back : $self->play_again;
+			$log->note('The moves chosen this turn were dropped.') if @chosen;
+			return 'swapped';
+		}
+		$picker->move($value eq 'up' ? -1 : 1) if $value eq 'up' || $value eq 'down';
+		$self->view($view = Game::Backgammon::Board::other($view)) if $value eq 'view';
+		$log->note(@{ $self->_key_lines }) if $value eq 'help';
 	}
 }
 
 sub _key_lines {
 	return [
 		'up and down choose a move, enter plays it',
-		'backspace takes back the move chosen before it',
+		'backspace or escape takes back the move chosen before it',
 		'a digit jumps to that move, v turns the board round',
 		'f finishes the turn where one can end, q stops the game',
+		'u takes back your last turn, r plays it again',
 	];
 }
 
 sub _draw_choice {
-	my ($self, $who, $view, $next, $at, $chosen, $done, $notice) = @_;
-	$self->clear;
-	$self->say_to($self->render($view));
-	$self->say_to(sprintf '  %s to play %s', $who, join '-', @{ $self->game->dice });
-	$self->say_to(
-		@$chosen
+	my ($self, $who, $view, $picker, $chosen, $done) = @_;
+	my $log = $self->log;
+	$self->screen->show([
+		@{ $self->board_lines($view) },
+		sprintf('  %s to play %s', $who, join '-', @{ $self->game->dice }),
+		(@$chosen
 			? '  so far: ' . join ' ', map { $_->notation } @$chosen
-			: '  nothing chosen yet'
-	);
-	$self->say_to('');
-	$self->say_to($_) for @{ $self->_choice_lines($next, $at) };
-	if ($done) {
-		$self->say_to('');
-		$self->say_to('  f finishes the turn here');
-	}
-	$self->say_to('  ' . $_) for @$notice;
-	$self->say_to('');
-	$self->say_to('  up and down to choose, enter to play it, ? for the keys');
+			: '  nothing chosen yet'),
+		'',
+		(map { " $_" } $picker->rows),
+		($done ? ('', '  f finishes the turn here') : ()),
+		(map { "  $_" } $log->lines),
+		'',
+		'  up and down to choose, enter to play it, ? for the keys',
+	]);
+	$log->shown;
 	return;
-}
-
-sub _choice_lines {
-	my ($self, $next, $at) = @_;
-	my @lines;
-	for my $index (0 .. $#$next) {
-		my $move = $next->[$index];
-		my $text = sprintf '%2d) %-9s %s',
-			$index + 1, $move->notation, $self->_describe($move);
-		$text =~ s/\s+\z//;
-		push @lines, $index == $at
-			? '  ' . $self->_paint("> $text", '1;7')
-			: '    ' . $text;
-	}
-	return \@lines;
 }
 
 sub _describe {
@@ -580,19 +559,10 @@ sub offer_lines {
 sub start {
 	my ($self) = @_;
 	$self->game(Game::Backgammon->new(seed => $self->_seed)) unless $self->game;
+	$self->history->start($self->game);
 	$self->picking(0) if $self->picking && !$self->_enter_raw;
 
-	my $interrupt = $SIG{INT};
-	local $SIG{INT} = sub {
-		$self->_leave_raw;
-		$SIG{INT} = defined $interrupt ? $interrupt : 'DEFAULT';
-		kill 'INT', $$;
-	};
-
-	my $played = eval { $self->_turns; 1 };
-	my $error = $@;
-	$self->_leave_raw;
-	die $error unless $played;
+	Game::Terminal::Kit::Run::guard(sub { $self->_turns }, $self->keyboard, $self->screen);
 
 	$self->clear;
 	$self->highlight({});
@@ -640,15 +610,24 @@ one on the right.
 
 On a terminal a turn is built one checker at a time: the moves you can make
 with the dice you have left are listed, up and down choose one and enter plays
-it, backspace takes the last one back, and the board shows where the checker
+it, backspace or escape takes the last one back, and the board shows where the checker
 under the cursor is going. A roll that can be played three hundred ways is
-still only a handful of choices at each step. v turns the board round and q
-stops. Without a terminal, or with --no-pick, every legal turn is numbered and
-you pick one.
+still only a handful of choices at each step. v turns the board round, u takes
+back your last turn and r plays it again, and q stops. Without a terminal, or
+with --no-pick, every legal turn is numbered and you pick one, or type undo or
+redo.
 
 Exit status is 0 when the game ended or was stopped, 2 for an option the game
 will not take.
 USAGE
+}
+
+sub options {
+	return [
+		{ name => 'mode', type => 'enum', choices => [qw(bot hotseat watch)], help => 'you against the program, two people at one keyboard, or two programs' },
+		{ name => 'level', type => 'int', min => 1, max => 3, help => 'how hard the program plays' },
+		{ name => 'seat', type => 'enum', choices => [qw(white black)], help => 'your side' },
+	];
 }
 
 sub run {
@@ -691,16 +670,9 @@ sub run {
 		(defined $pick ? (picking => $pick) : ()),
 	);
 
-	local @SIG{qw(INT TERM HUP)};
-	for my $sig (qw(INT TERM HUP)) {
-		$SIG{$sig} = sub { $terminal->_leave_raw; $SIG{$sig} = 'DEFAULT'; kill $sig, $$ };
-	}
-
-	my $result;
-	my $played = eval { $result = $terminal->start; 1 };
-	my $died = $@;
-	$terminal->_leave_raw;
-	die $died unless $played;
+	my $result = Game::Terminal::Kit::Run::guard(
+		sub { $terminal->start }, $terminal->keyboard, $terminal->screen,
+	);
 	return 1 if $result && $terminal->mode eq 'bot' && $result->winner ne $terminal->seat;
 	return 0;
 }
@@ -750,7 +722,7 @@ A real board: the twelve points of each half between their borders, the bar
 down the middle and the tray on the right. Checkers hang down from the top
 border and stand up from the bottom one; a point taller than five shows its
 count in the last place. Round checkers unless L</ascii> is set, and colour
-only when the session is interactive and C<NO_COLOR> is unset.
+only when the session is interactive and C<NO_COLOR> is unset or empty.
 
 It is drawn from the numbering of whoever is on roll, so the board in front
 of a player is the one their own moves are written in: their home board is
@@ -799,9 +771,23 @@ already offered, no sequence of choices can reach a dead end, every legal turn
 stays reachable, and what is finally played is one of the objects
 C<legal_turns> returned rather than a turn assembled here and hoped for.
 
-Backspace takes back the move before it and the options are worked out again.
+Backspace or escape takes back the move before it and the options are worked
+out again. Home and end go to the first and the last move offered.
 Where the moves chosen so far are already a legal turn, which is how a roll
 that can only be half played ends, C<f> finishes it.
+
+=head2 Taking a turn back
+
+C<u> takes back your last turn and the bot's reply to it, back to the board
+and the dice you had then, and C<r> plays it again; with no picker, the typed
+words C<undo> and C<redo> do the same. The dice that follow are the dice that
+followed before, because they come from the game's seed. Against the bot a step
+is one of your turns with everything the bot played after it; in C<hotseat>
+every turn is a step; in C<watch> there is nothing to take back. A turn that is
+forced to pass is not a step of its own. C<u> is a whole turn: the moves chosen
+so far in the turn being built are dropped, and the note under the list says so,
+where backspace and escape take back one of them. When there is nothing to take
+back or play again a note says so and nothing changes.
 
 This needs L<Term::ReadKey> to put the terminal into cbreak mode. Without it
 L</picking> is turned off in the constructor and a turn is picked by number as
@@ -836,20 +822,46 @@ light or dark they would have had. The keys are in the numbering of the side the
 board is drawn from, which is not the mover's numbering when the board is pinned
 with L</view>, so the mover's points are converted before they go in here.
 
-=head2 raw, keysource, pending
+=head2 keysource, pending
 
-C<raw> is whether the terminal is in cbreak mode. C<keysource> is a code
-reference called with a wait flag and returning one character, which replaces
-reading the terminal and is how the suite builds a turn with the keys with no
-terminal to build it on. C<pending> holds characters read but not used, so that
-an escape which turns out not to begin a sequence gives back the keystroke
-behind it.
+C<keysource> is a code reference called with a wait and returning one
+character, which replaces reading the terminal and is how the suite builds a
+turn with the keys with no terminal to build it on. C<pending> holds characters
+read but not used, so that an escape which turns out not to begin a sequence
+gives back the keystroke behind it. Both are given to L</keyboard> when it is
+built.
 
 =head2 colour, interactive
 
 Both default from C<in>: colour when it is a terminal and C<NO_COLOR> is
-unset, and the screen is only cleared between turns for a person, so a
-captured transcript stays readable.
+unset or empty, and the screen is only cleared between turns for a person, so a
+captured transcript stays readable. Both are given to L</screen> when it is
+built.
+
+=head2 keyboard
+
+The L<Game::Terminal::Kit::Keys> the keys and the typed lines are read through,
+built from L</in>, C<keysource> and C<pending>.
+
+=head2 screen
+
+The L<Game::Terminal::Kit::Screen> everything is written through, built from
+L</out>, L</interactive>, L</colour> and L</ascii>.
+
+=head2 log
+
+The L<Game::Terminal::Kit::Log> holding what the picker has to say under its
+list: the keys when they are asked for, and a key that did nothing.
+
+=head2 picker
+
+The L<Game::Terminal::Kit::Picker> a turn is built with. It is given the next
+moves afresh at every step of the turn.
+
+=head2 history
+
+The L<Game::Terminal::Kit::History> the turns are kept in, as L<Game::Backgammon/to_text>,
+built in C<new> unless one is given.
 
 =head1 METHODS
 
@@ -871,14 +883,64 @@ it belongs to off the top of the screen.
 
 Clears the screen, but only for a person.
 
+=head2 raw
+
+Whether the terminal is being read a key at a time.
+
 =head2 step
 
 Play one turn. Returns true while the game is still on.
 
+=head2 person_turn
+
+Called by L</step> when the turn passes to a person at the keys, and once when
+the game ends unless nobody is: keeps the game in L</history> as a turn.
+
+=head2 take_back
+
+The C<u> key and the C<undo> word: your last turn and the replies to it, taken
+back. Returns 1, or 0 when there is nothing to take back.
+
+=head2 play_again
+
+The C<r> key and the C<redo> word: the turn L</take_back> took back, played
+again. Returns 1, or 0 when there is nothing to play again.
+
+=head2 swap($game)
+
+Puts another game in place of this one, clearing L</highlight> and what the
+picker had to say.
+
 =head2 start
 
-Play until the game ends or the player stops. Returns the
+Play until the game ends or the player stops. Starts a new L</history> for
+the game. Returns the
 L<Game::Backgammon::Result>, or undef if it was stopped.
+
+=head2 options
+
+    my $fields = Game::Backgammon::Terminal->options;
+
+The options a person would set before a game, in the order a launcher shows
+them. Each is a hash reference with a C<name>, a C<type> and a C<help>, and
+C<min> and C<max> or C<choices> where the type has them. A new list is
+returned each time.
+
+=over 4
+
+=item C<mode>
+
+One of C<bot>, C<hotseat>, C<watch>: you against the program, two people at one keyboard, or two programs.
+
+=item C<level>
+
+A whole number from 1 to 3: how hard the program plays.
+
+=item C<seat>
+
+One of C<white>, C<black>: your side.
+
+=back
 
 =head2 run
 

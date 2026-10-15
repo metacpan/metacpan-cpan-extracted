@@ -27,8 +27,8 @@ my %WriteMakefileArgs = (
     "File::XDG" => 0,
     "File::stat" => 0,
     "HTTP::Date" => 0,
-    "IO::File" => 0,
     "JSON::XS" => 0,
+    "LWP::Protocol::https" => 0,
     "LWP::UserAgent" => 0,
     "List::Util" => 0,
     "Text::CSV_XS" => 0,
@@ -42,11 +42,10 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "LWP::Online" => 0,
-    "LWP::Protocol::https" => 0,
     "Test::More" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.08",
+  "VERSION" => "0.09",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -65,7 +64,6 @@ my %FallbackPrereqs = (
   "File::XDG" => 0,
   "File::stat" => 0,
   "HTTP::Date" => 0,
-  "IO::File" => 0,
   "JSON::XS" => 0,
   "LWP::Online" => 0,
   "LWP::Protocol::https" => 0,

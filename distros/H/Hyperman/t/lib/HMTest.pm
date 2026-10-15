@@ -104,11 +104,23 @@ sub quiet_child {
     my $null = File::Spec->devnull;
     # Which stream is the harness's, named by the pipe itself - taken BEFORE
     # the reopen below, while STDOUT and STDERR still point at it.
-    my %tap;
+    #
+    # Where a pipe HAS no identity the inode cannot name it: OpenBSD answers
+    # every pipe with device 0 and inode 0, so "0:0" matched the arena's
+    # wakeup pipes as well and pointed them at the null device, and every
+    # worker came up deaf (t/53 on an OpenBSD smoker). There the stream is
+    # held open by a dup of its own and recognised by its open file
+    # description instead, which a dup or an inherited copy shares and an
+    # unrelated pipe does not.
+    my (%tap, @desc);
     for my $h (\*STDOUT, \*STDERR) {
         next unless -p $h;
         my ($dev, $ino) = (stat $h)[0, 1];
-        $tap{"$dev:$ino"} = 1 if defined $ino;
+        next unless defined $ino;
+        if ($ino) { $tap{"$dev:$ino"} = 1; next }
+        open my $keep, '>&', $h or next;
+        push @desc, $keep;
+        $tap{desc} = 1;
     }
     open STDOUT, '>', $null;
     open STDERR, '>', (defined $o{stderr} ? $o{stderr} : $null);
@@ -138,21 +150,47 @@ sub quiet_child {
     # its pipe survives.
     if (%tap && open my $sink, '>', $null) {
         my $nul = fileno $sink;
+        my %keep = map { fileno($_) => 1 } @desc;
         for my $fd (3 .. 63) {
-            next if $fd == $nul;
+            next if $fd == $nul || $keep{$fd};
             my $dup = eval { POSIX::dup($fd) };
             next unless defined $dup;
             my $theirs = 0;
             if (open my $probe, '<&=', $dup) {
                 my ($dev, $ino) = (stat $probe)[0, 1];
                 $theirs = defined $ino && $tap{"$dev:$ino"};
+                $theirs ||= _same_description($probe, \@desc)
+                    if !$theirs && $tap{desc} && -p $probe;
                 close $probe;
             }
             else { POSIX::close($dup) }
             POSIX::dup2($nul, $fd) if $theirs;
         }
     }
+    close $_ for @desc;
     alarm(defined $o{alarm} ? $o{alarm} : 120);
+}
+
+# Does this handle share an open file description with one of those? Flip
+# O_APPEND on each and see whether the handle sees it: the flag lives in the
+# description, so a dup sees the change and an unrelated pipe does not. On a
+# pipe O_APPEND changes nothing about a write, so the harness, which shares
+# the description, never notices.
+sub _same_description {
+    my ($probe, $descs) = @_;
+    require Fcntl;
+    my $mine = fcntl($probe, Fcntl::F_GETFL(), 0);
+    return 0 unless defined $mine;
+    for my $d (@$descs) {
+        my $was = fcntl($d, Fcntl::F_GETFL(), 0);
+        next unless defined $was;
+        fcntl($d, Fcntl::F_SETFL(), $was ^ Fcntl::O_APPEND()) or next;
+        my $now = fcntl($probe, Fcntl::F_GETFL(), 0);
+        fcntl($d, Fcntl::F_SETFL(), $was);
+        return 1 if defined $now
+            && ($now & Fcntl::O_APPEND()) != ($mine & Fcntl::O_APPEND());
+    }
+    return 0;
 }
 
 # Reaped children, so a status check and a later wait agree on what happened.

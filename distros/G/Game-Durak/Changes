@@ -1,5 +1,13 @@
 Revision history for Game-Durak
 
+0.04    2026-10-13
+        - Add options, the fields a launcher offers before a game
+        - The keys, the screen and the picker are Game::Terminal::Kit's
+        - Requires perl 5.14
+        - NO_COLOR set to anything but the empty string turns colour off,
+          0 included
+        - Shift-tab, page up and page down move the cursor over the hand
+
 0.03    2026-10-11
         - Add Game::Durak::Terminal->run(@argv), which returns the exit status
         - Terminal's game loop is now play, not run

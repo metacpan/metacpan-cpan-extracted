@@ -13,7 +13,7 @@ use Game::Backgammon::Result;
 use Game::Backgammon::Rules ();
 use Game::Backgammon::Turn;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 has seed => (
 	is => 'ro',
@@ -150,6 +150,71 @@ sub replay {
 
 sub to_log { return [ map { $_->notation } @{ $_[0]->history } ] }
 
+sub to_text {
+	my ($self) = @_;
+	my @lines = ('[seed ' . unpack('H*', $self->seed) . ']');
+	my $n = 0;
+	push @lines, ++$n . '. ' . $_->player . ' ' . join('', @{ $_->dice }) . ': ' . $_->notation
+		for @{ $self->history };
+	my $result = $self->result;
+	push @lines, '[result ' . join(' ', $result->winner, $result->margin, $result->reason) . ']'
+		if $result;
+	return join("\n", @lines) . "\n";
+}
+
+sub from_text {
+	my ($class, $text) = @_;
+	my $refuse = sub { die 'Game::Backgammon: the text was refused: ' . $_[0] . "\n" };
+	$refuse->('from_text wants the text to_text wrote, and was given '
+		. (defined $text ? 'a reference' : 'nothing'))
+		if !defined $text || ref $text;
+	$refuse->('it does not end with a newline') unless $text =~ /\n\z/;
+
+	my @lines = split /\n/, $text, -1;
+	pop @lines;
+	my ($seed) = (shift(@lines) // '') =~ /\A\[seed ((?:[0-9a-f]{2})+)\]\z/
+		or $refuse->('line 1 is not the seed');
+	my $self = $class->new(seed => pack 'H*', $seed);
+
+	my $ending;
+	for my $i (0 .. $#lines) {
+		my ($line, $at) = ($lines[$i], $i + 2);
+		$refuse->("line $at follows the result") if $ending;
+		if ($line =~ /\A\[result (white|black) (single|gammon|backgammon) (\S+)\]\z/) {
+			$ending = { winner => $1, margin => $2, reason => $3 };
+			next;
+		}
+		my ($n, $player, $dice, $notation) = $line =~ /\A([1-9][0-9]*)\. (white|black) ([1-6]{2}|[1-6]{4}): (\S.*)\z/
+			or $refuse->("line $at is not a turn");
+		$refuse->("line $at is numbered $n where " . (@{ $self->history } + 1) . ' was next')
+			unless $n == @{ $self->history } + 1;
+		$refuse->("line $at has a turn after the game ended") if $self->result;
+		$refuse->("line $at is $player to play where it is " . $self->turn . "'s turn")
+			unless $player eq $self->turn;
+		my $rolled = join '', @{ $self->dice };
+		$refuse->("line $at rolls $dice where the seed rolls $rolled") unless $dice eq $rolled;
+		next if $self->play($notation);
+		my $err = $@;
+		my $why = ref $err ? $err->message : $err;
+		$why =~ s/\s+\z//;
+		$refuse->("line $at does not play: $why");
+	}
+
+	my $result = $self->result;
+	if ($result) {
+		$refuse->('the game ended but the text has no result') unless $ending;
+		$refuse->('the result is not the one the game ended with')
+			unless join(' ', @{$ending}{qw/winner margin reason/})
+				eq join(' ', $result->winner, $result->margin, $result->reason);
+	}
+	elsif ($ending) {
+		$refuse->('the result says the checkers were borne off, and they were not')
+			if $ending->{reason} eq 'borne_off';
+		$self->finish(%$ending);
+	}
+	return $self;
+}
+
 sub _refuse {
 	my ($code, $extra) = @_;
 	require Game::Backgammon::Error;
@@ -238,6 +303,36 @@ A finish imposed from outside: a resignation, a timeout, an abandoned game.
 A resignation concedes a single.
 
 =head2 replay(seed => ..., turns => [ '8/5 6/5', ... ])
+
+=head2 to_text
+
+    my $text = $game->to_text;
+
+The game as a string that L</from_text> builds the same game from: the seed
+in hexadecimal, every turn played with its player, its dice and its
+notation, and a result once there is one, whether the checkers were borne
+off or the game was finished from outside:
+
+    [seed 5f1c...]
+    1. white 31: 8/5 6/5
+    2. black 6666: 24/18(2) 13/7(2)
+    [result black single resign]
+
+The dice rolled for the player to move and not yet played are not written:
+they are the seed's next roll, and are rolled again when the text is read.
+
+=head2 from_text
+
+    my $game = Game::Backgammon->from_text($text);
+
+A new game built from the text L</to_text> wrote, by playing every turn in it
+again from the seed, with the same board, the same player to move, the same
+dice waiting and the same dice to come. It shares nothing with the game the
+text came from, and its C<to_text> is the same text.
+
+B<Dies> with a sentence naming the line that is wrong when the text is not a
+game: a turn the seed did not roll, a player out of turn, a turn the rules do
+not offer, or a result the game did not end with.
 
 =head1 SEE ALSO
 

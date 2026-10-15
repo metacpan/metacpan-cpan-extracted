@@ -1,13 +1,13 @@
 ---
 abstract: Comma-Separated Values manipulation routines
 author:
-  - H.Merijn Brand <hmbrand@cpan.org>
+  - H.Merijn Brand <perl5@tux.freedom.nl>
 build_requires:
   Config: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: Author, CPAN::Meta::Converter version 2.150013
+generated_by: Author, CPAN::Meta::Converter version 2.150015
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,7 +16,7 @@ name: Text-CSV_XS
 provides:
   Text::CSV_XS:
     file: CSV_XS.pm
-    version: '1.64'
+    version: '1.65'
 recommends:
   Encode: '3.24'
 requires:
@@ -31,4 +31,4 @@ resources:
   homepage: https://metacpan.org/pod/Text::CSV_XS
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/Text-CSV_XS
-version: '1.64'
+version: '1.65'

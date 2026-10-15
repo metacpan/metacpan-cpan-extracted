@@ -18,7 +18,7 @@ my $p = Context::Vars::_abi_ptr();
 ok($p, 'the table has an address');
 is($p, Context::Vars::_abi_ptr(), 'the same one every call');
 like($p, qr/^\d+$/, 'given as an unsigned integer');
-is(Context::Vars::_abi_version(), 1, 'the table is version 1');
+is(Context::Vars::_abi_version(), 2, 'the table is version 2');
 
 my ($step, $ctx) = Context::Vars::_abi_selftest();
 is($step, 0, 'every entry answered as its declaration says')

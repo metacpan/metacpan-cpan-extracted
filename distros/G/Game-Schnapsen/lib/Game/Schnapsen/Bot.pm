@@ -10,7 +10,7 @@ use Game::Schnapsen::Scoring qw(TARGET_POINTS);
 use Game::Schnapsen::Search qw(best_lead best_follow best_marriage
                                should_close should_claim LEVELS);
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 our @LADDER = (1, 1, 2, 2, 2);
 
@@ -101,7 +101,7 @@ Game::Schnapsen::Bot - an opponent
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 

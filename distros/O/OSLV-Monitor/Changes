@@ -1,5 +1,34 @@
 Revision history for OSLV-Monitor
 
+1.0.7   2026-10-14/17:00
+        - both: compute rates over the time since the previous run, saved in the
+          cache, instead of assuming 300 seconds
+        - cgroups: read nonvoluntary_ctxt_switches, so involuntary context
+          switches are no longer always 0
+        - cgroups: only total ps stats for included names
+        - cgroups: merge the IPs and paths of containers in the same podman pod
+        - cgroups: map docker IDs to names for the cgroupfs driver
+        - cgroups: find the bridge interface for docker networks
+        - cgroups: report IPv6 container addresses and look up their gateway
+          interface, using ip -j with the args checked before reaching the shell
+        - cgroups: name non-podman machine.slice units m_$type_$machine instead of
+          reading all of machine.slice, which double counted podman containers
+        - remove the unused ip_to_if and the IO::Interface::Simple dependency
+        - FreeBSD: report ps output that fails to decode as a error
+        - oslv_monitor: write the json and snmp files atomically and exit 1 if
+          either fails
+        - oslv_monitor: implement -c and add --backend
+        - add the lock option and -l, to skip a run while another holds the
+          lock instead of clobbering its cache
+        - oslv_monitor: exit 0 for -h and -v, and 1 for unknown flags
+        - oslv_monitor: use the OSLV::Monitor version
+        - require List::Util 1.45 for uniq and drop the unused Math::BigInt
+        - fix the documented include default
+        - document new and include, and the internal cgroups subs
+        - cgroups: usable dies if cgroup v2 is not mounted at /sys/fs/cgroup
+        - cgroups: always include cache_failure, matching FreeBSD
+        - FreeBSD: drop the duplicate pid from the ps columns
+
 1.0.6   2026-08-04/13:15
         - cgroups: get the cgroup from /proc/<pid>/cgroup as ps truncates the
           cgroup column to 27 characters, mangling names and breaking stat reads

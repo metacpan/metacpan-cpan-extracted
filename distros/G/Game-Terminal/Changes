@@ -1,4 +1,9 @@
 Revision history for Game-Terminal
 
+0.02    2026-10-13
+	- A game's options are asked of the game: options_for calls its options method
+	- step_value, check_value and argv_for are Game::Terminal::Kit::Options's
+	- The menu's keys, screen and options form are Game::Terminal::Kit's
+
 0.01    2026-10-11
 	- First version

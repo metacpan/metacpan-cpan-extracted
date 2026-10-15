@@ -23,7 +23,7 @@ use Game::Brandubh::Error;
 use Game::Brandubh::Result;
 use Digest::SHA ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 my $E = 'Game::Brandubh::Engine';
 my $X = 'Game::Brandubh::Error';
@@ -417,12 +417,13 @@ sub _apply_result {
 }
 
 sub _walk {
-    my ($self, $moves, $result) = @_;
+    my ($self, $moves, $result, $offer) = @_;
     for my $i (0 .. $#$moves) {
         my $refused = $self->play($moves->[$i]);
         return wantarray ? ($self, $refused, $i) : undef if $refused;
     }
-    my $refused = $self->_apply_result($result);
+    my $refused = defined $offer ? $self->offer_draw($offer) : 0;
+    $refused ||= $self->_apply_result($result);
     return wantarray ? ($self, $refused, scalar @$moves) : undef if $refused;
     return wantarray ? ($self, 0, scalar @$moves) : $self;
 }
@@ -445,9 +446,10 @@ sub replay {
     my %given = @rest;
     my $moves  = delete $given{moves};
     my $result = delete $given{result};
+    my $offer  = delete $given{offer};
     Carp::croak('Game::Brandubh: moves is an array reference') if defined $moves && ref $moves ne 'ARRAY';
     my $fresh = $proto->new(%given);
-    return $fresh->_walk($moves || [], $result);
+    return $fresh->_walk($moves || [], $result, $offer);
 }
 
 sub as_text {
@@ -459,10 +461,12 @@ sub as_text {
                                           : { how => 'agreed' };
     }
     return game_string({
-        variant => $self->_variant->as_string,
-        start   => $self->_start,
-        moves   => $self->_log,
-        result  => $result,
+        variant   => $self->_variant->as_string,
+        attackers => $self->attackers,
+        start     => $self->_start,
+        moves     => $self->_log,
+        result    => $result,
+        offer     => $self->_offer,
     });
 }
 
@@ -474,11 +478,13 @@ sub from_text {
     my $variant = Game::Brandubh::Variant->from_string($record->{variant});
     return wantarray ? (undef, $X->throw('bad_move'), 0) : undef unless $variant;
     return $class->replay(
+        (defined $record->{attackers} ? (attackers => $record->{attackers}) : ()),
         @rest,
         variant  => $variant,
         position => $record->{start},
         moves    => $record->{moves},
         result   => $record->{result},
+        offer    => $record->{offer},
     );
 }
 
@@ -492,7 +498,7 @@ Game::Brandubh - the Irish 7 by 7 tafl game: a king, four defenders, eight attac
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 
@@ -890,7 +896,8 @@ The class that plays this game.
     my $again = $game->replay($game->log);
 
 Builds a game and plays the moves into it. As a class method it takes what
-C<new> takes, with C<moves> and, optionally, C<result>: C<< { how => 'resign',
+C<new> takes, with C<moves> and, optionally, C<offer>, the seat whose offer of
+a draw is left waiting after the moves, and C<result>: C<< { how => 'resign',
 by => 'attackers' } >> or C<< { how => 'agreed' } >>. As an object method it
 starts from the same seats, rule set and position as the game it is called on.
 
@@ -900,16 +907,19 @@ when a move was refused.
 
 =head2 as_text
 
-The game as text: its rule set, where it started when that was not the set-up,
-its moves, and its ending when the players ended it. See
-L<Game::Brandubh::Notation/A game>.
+The game as text: its rule set, the seat with the attackers when that is
+C<p2>, where it started when that was not the set-up, its moves, its ending
+when the players ended it, and a draw offer still waiting for an answer. See
+L<Game::Brandubh::Notation/A game>. The seed is not written.
 
 =head2 from_text
 
-    my $game = Game::Brandubh->from_text($text, attackers => 'p2');
+    my $game = Game::Brandubh->from_text($text, seed => $thirty_two_bytes);
 
-A game from that text. The seats are not part of the text and may be given
-after it. Returns as C<replay> does.
+A game from that text, ended if the text ends it and with its draw offer
+waiting if the text has one. What C<new> takes may be given after the text:
+C<seed>, which the text never holds, and C<attackers>, which overrides the
+text's. Returns as C<replay> does.
 
 =head1 SEE ALSO
 

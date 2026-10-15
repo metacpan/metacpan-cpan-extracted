@@ -242,7 +242,7 @@ Game::Cribbage::Player::Hand - a player's hand of cards within a hands cycle
 
 =head1 VERSION
 
-Version 0.17
+Version 0.18
 
 =cut
 

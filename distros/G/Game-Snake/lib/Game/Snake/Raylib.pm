@@ -13,9 +13,9 @@ use Object::Proto::Sugar -types;
 
 use Game::Snake;
 use Game::Snake::Bot;
-use Game::Snake::Ticker;
+use Game::Terminal::Kit::Ticker;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 my $WHY;
 
@@ -194,7 +194,7 @@ sub BUILD {
 		));
 	}
 
-	$self->ticker(Game::Snake::Ticker->new(clock => $self->clock)) unless $self->ticker;
+	$self->ticker(Game::Terminal::Kit::Ticker->new(clock => $self->clock)) unless $self->ticker;
 
 	return;
 }
@@ -337,7 +337,7 @@ Game::Snake::Raylib - snake in a window, when raylib is there
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =head1 SYNOPSIS
 

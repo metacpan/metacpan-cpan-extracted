@@ -2,6 +2,7 @@ Changes
 include/context_vars/context_vars_abi_impl.h
 include/context_vars/context_vars_ctx.h
 include/context_vars/context_vars_ctx_selftest.h
+include/context_vars/context_vars_deep.h
 include/context_vars/context_vars_faa.h
 include/context_vars/context_vars_hamt.h
 include/context_vars/context_vars_obj.h
@@ -50,6 +51,11 @@ t/32-future.t
 t/33-abi.t
 t/34-synopsis.t
 t/35-references.t
+t/36-containers.t
+t/37-container-scope.t
+t/38-container-shape.t
+t/39-container-local.t
+t/40-container-async-threads.t
 t/lib/Deferred.pm
 t/manifest.t
 t/pod-coverage.t
@@ -57,6 +63,7 @@ t/pod.t
 Vars.xs
 xs/abi.xs
 xs/context.xs
+xs/deep.xs
 xs/test.xs
 xs/vars.xs
 xt/abi-consumer.t

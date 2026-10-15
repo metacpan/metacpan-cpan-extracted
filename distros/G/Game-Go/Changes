@@ -1,5 +1,14 @@
 Revision history for Game-Go
 
+0.04    2026-10-13
+        - Add options, the fields a launcher offers before a game
+        - The keys and the screen are Game::Terminal::Kit's
+        - Requires perl 5.14
+        - An empty NO_COLOR no longer turns colour off
+        - Fix: after t, or at the count, what was typed was not echoed
+        - Add to_text and from_text; fix: clone lost the ko rule, setup and first mover
+        - Add undo and redo: u and r, or the words; r no longer resigns, type resign
+
 0.03    2026-10-11
         - Add Game::Go::Terminal->run(@argv), which returns the exit status
 

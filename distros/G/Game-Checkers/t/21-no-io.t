@@ -2,12 +2,11 @@
 use 5.010;
 use strict;
 use warnings;
-use lib 't/lib';
 use Test::More;
 
 use Game::Checkers;
 use Game::Checkers::Bot;
-use Game::Checkers::Test::Handle;
+use Game::Terminal::Kit::Test::Handle;
 
 # The whole distribution is shaped around the engine doing no input and no
 # output. This is the test that keeps it that way.
@@ -27,8 +26,8 @@ subtest 'a game and a search with both handles taken away' => sub {
 	{
 		# nothing between here and the untie may call Test::More: it would be
 		# printing through a handle that dies on purpose
-		tie *STDOUT, 'Game::Checkers::Test::Handle';
-		tie *STDIN, 'Game::Checkers::Test::Handle';
+		tie *STDOUT, 'Game::Terminal::Kit::Test::Handle';
+		tie *STDIN, 'Game::Terminal::Kit::Test::Handle';
 
 		eval {
 			my $game = Game::Checkers->new;

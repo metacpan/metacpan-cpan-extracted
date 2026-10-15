@@ -1,5 +1,16 @@
 Revision history for Game-Dominoes
 
+0.04    2026-10-13
+	- u and r, or undo and redo, take back your last move and the replies to it, and play them again
+	- Add from_text, and to_text(with_seed => 1) to write a game it can rebuild
+	- Add options, the fields a launcher offers before a game
+	- The keys, the screen and the picker are Game::Terminal::Kit's
+	- Requires perl 5.14
+	- The picker redraws in place instead of clearing the screen at every key
+	- The table wraps at the width of the terminal, not only at COLUMNS
+	- Shift-tab moves the cursor up
+	- An unset NO_COLOR or an empty one leaves colour on; any other value turns it off
+
 0.03    2026-10-11
 	- Add Game::Dominoes::Terminal->run(@argv), which returns the exit status
 

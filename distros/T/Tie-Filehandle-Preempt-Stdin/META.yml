@@ -1,14 +1,28 @@
---- #YAML:1.0
-name:                Tie-Filehandle-Preempt-Stdin
-version:             0.02
-abstract:            Preempt STDIN during testing.
-license:             ~
-generated_by:        ExtUtils::MakeMaker version 6.32
-distribution_type:   module
-requires:     
-    Test::Simple:                  0.44
-meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
-    version: 1.2
+---
+abstract: 'Preempt STDIN during testing.'
 author:
-    - James E Keenan (jkeenan@cpan.org)
+  - 'James E Keenan (jkeenan@pobox.com)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Simple: '0.44'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tie-Filehandle-Preempt-Stdin
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.008000'
+resources:
+  bugtracker: https://github.com/jkeenan/Tie-Filehandle-Preempt-Stdin/issues
+  homepage: http://thenceforward.net/perl/modules/Tie-Filehandle-Preempt-Stdin/
+  repository: https://github.com/jkeenan/Tie-Filehandle-Preempt-Stdin.git
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

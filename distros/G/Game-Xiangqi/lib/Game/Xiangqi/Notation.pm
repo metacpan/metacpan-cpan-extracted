@@ -6,7 +6,7 @@ use warnings;
 
 use Game::Xiangqi::Engine ':all';
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 my $E = 'Game::Xiangqi::Engine';
 

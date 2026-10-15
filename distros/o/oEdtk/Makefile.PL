@@ -13,12 +13,12 @@ use POSIX;
 
 
 BEGIN {
-    require 5.10.0;
+    require 5.028;
 }
 
 
 # load module
-use ExtUtils::MakeMaker 6.48;
+use ExtUtils::MakeMaker 6.64;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 # to install pre requisite libxml : perl Makefile.PL LIBS='-L/usr/lib' INC='-I/usr/include/libxml2'
@@ -29,10 +29,16 @@ use ExtUtils::MakeMaker 6.48;
 # write makefile
 WriteMakefile(
 	# be careful at this level perl version are odd V5.10 should be defined as 5.010 ...
-	MIN_PERL_VERSION	=> 5.010,
+	MIN_PERL_VERSION	=> 5.028,
 	LICENSE 			=> 'perl',
 	NAME				=> 'oEdtk',
 	VERSION_FROM		=> 'lib/oEdtk.pm',
+	# The companion oEUser distributions now live inside this repository.
+	# ExtUtils::MM_Unix::init_dirscan auto-detects every immediate
+	# subdirectory holding a Makefile.PL and recurses into it; oEdtk ships on
+	# its own, so recursion is off. (oEUser-M/ is read-only, recursion would
+	# die there.)
+	DIR					=> [],
 	PREREQ_PM			=> {
 		YAML					=> 0,
 		CPAN::DistnameInfo		=> 0,
@@ -73,7 +79,56 @@ WriteMakefile(
 		XML::LibXML				=>'1.70',
 		XML::Simple				=> 0,
 		XML::XPath				=>'1.13',
-		XML::Writer				=> 0
+		XML::Writer				=> 0,
+		# Dependencies actually used by the 0.8032 fork (S10); merged here as the
+		# fork code lands. The S10 gate kept them all as hard requirements.
+		Data::UUID			=> 0,
+		File::Slurp			=> 0,
+		IPC::Run3			=> 0,
+		JSON::PP			=> 0,
+		Readonly			=> 0,
+		Regexp::Common			=> 0,
+		Term::ANSIColor			=> 0,
+		Text::CSV_XS			=> 0,
+		Time::HiRes			=> 0,
+		Try::Tiny			=> 0,
+		YAML::Tiny			=> 0,
+		HTTP::Request			=> 0,
+		HTTP::Request::Common	=> 0,
+		HTTP::Status			=> 0,
+		IO::Socket::SSL			=> 0,
+		LWP::UserAgent			=> 0,
+		PDF::Tk				=> 0,
+		Text::QRCode			=> 0,
+		# CGI front-end, loaded by the shipped lib/oEdtk/lib/cgi-bin/*.cgi at
+		# the top level, so a hard requirement (never a recommends).
+		CGI				=> 0,
+		CGI::FormBuilder		=> 0,
+	},
+	TEST_REQUIRES		=> {
+		DBD::mysql			=> 0,
+		DBD::Pg				=> 0,
+		IPC::Run3			=> 0,
+		Perl::Critic			=> 0,
+		Perl::Tidy			=> 0,
+		Test::Fake::HTTPD		=> 0,
+		Test::Fatal			=> 0,
+		Test::MockModule		=> 0,
+		Test::More			=> '1.302'
+	},
+	META_MERGE		=> {
+		'meta-spec'	=> { version => 2 },
+		# Optional runtime database drivers: installed by default (a plain
+		# install pulls the driver of the engine in use) but never mandatory.
+		# DBD::Oracle is left out: it needs the Oracle client to build.
+		prereqs		=> {
+			runtime	=> {
+				recommends	=> {
+					'DBD::Pg'	=> 0,
+					'DBD::mysql'	=> 0,
+				},
+			},
+		},
 	},
 	AUTHOR	=> 'oEdtk group <oedtk@free.fr>',
 	dist		=> {

@@ -21,6 +21,7 @@ use_ok( 'IRI' );
 	is($i->value, 'foo', 'IRI value');
 	is($i->path, 'foo', 'relative path');
 	is($i->as_string, 'foo');
+	ok(not($i->is_absolute), 'is not absolute');
 }
 
 {
@@ -34,6 +35,7 @@ use_ok( 'IRI' );
 	is($i->fragment, 'frag', 'fragment');
 	is($i->query, 'foo=bar', 'query');
 	is($i->as_string, 'https://greg@example.org:80/index?foo=bar#frag');
+	ok($i->is_absolute, 'is absolute');
 }
 
 {

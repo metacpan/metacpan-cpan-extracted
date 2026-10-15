@@ -1,5 +1,15 @@
 Revision history for Game-Xiangqi
 
+0.05    2026-10-13
+        - Add options, the fields a launcher offers before a game
+        - The keys and the screen are Game::Terminal::Kit's
+        - Requires perl 5.14
+        - FIX: for the second seat, left and right walked the ranks from
+          the bottom of the board up
+        - An empty NO_COLOR leaves colour on; shift-tab steps back
+        - Add to_text and from_text, a game as a string and back by replay
+        - u and r, or undo and redo, take a turn back and play it again
+
 0.04    2026-10-11
         - Add Game::Xiangqi::Terminal->run(@argv), which returns the exit status
 

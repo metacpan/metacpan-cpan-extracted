@@ -1,4 +1,4 @@
-use 5.010;
+use 5.014;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
@@ -34,8 +34,8 @@ File::Find::find(sub {
 
 # ---- THE PERL FLOOR, AND WHAT IS EVIDENCE FOR IT -----------------------------
 #
-# 5.010 is the SYNTACTIC floor and it is inherited from the siblings rather
-# than measured here.
+# 5.014 is the floor, and it is Game::Terminal::Kit's. 5.010 was the SYNTACTIC
+# floor before it, inherited from the siblings rather than measured here.
 #
 #   tested:   perl 5.42.0, darwin-thread-multi-2level, 9 Oct 2026: the whole
 #             suite, and the whole suite again with Devel::CallParser 0.004
@@ -104,7 +104,8 @@ my %WriteMakefileArgs = (
     VERSION_FROM     => 'lib/Game/Brandubh.pm',
     ABSTRACT_FROM    => 'lib/Game/Brandubh.pm',
     LICENSE          => 'artistic_2',
-    MIN_PERL_VERSION => '5.010',
+    macro => { TARFLAGS   => "--format=ustar -c -v -f" },
+    MIN_PERL_VERSION => '5.014',
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
         'ExtUtils::Depends'   => '0.404',
@@ -131,9 +132,11 @@ my %WriteMakefileArgs = (
         'Carp'                 => 0,
         'Digest::SHA'          => 0,
         'Exporter'             => 0,
+        'Game::Terminal::Kit'  => '0.05',
         'Getopt::Long'         => 0,
         'Object::Proto'        => '1.00',
         'Object::Proto::Sugar' => '1.00',
+        'Scalar::Util'         => 0,
         'XSLoader'             => 0,
         'constant'             => 0,
     },

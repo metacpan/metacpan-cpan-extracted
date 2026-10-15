@@ -3,7 +3,7 @@
 use warnings;
 use strict;
 
-use Test::Most tests => 34;
+use Test::Most tests => 60;
 use_ok('HTML::D3');
 
 my $chart = HTML::D3->new(width => 700, height => 400, title => 'Histogram Test');
@@ -76,3 +76,75 @@ throws_ok { $chart->render_histogram_snippet(\@values, { bins => -5 }) }
 	qr/bins must be a positive integer/, 'Dies on negative bins';
 throws_ok { $chart->render_histogram_snippet(\@values, { bins => 'auto' }) }
 	qr/bins must be a positive integer/, 'Dies on non-numeric bins string';
+
+# ── pre-binned input (binned => 1) ───────────────────────────────────────────
+# The caller owns the binning: the supplied labels and counts are drawn as-is
+# and d3.bin() is never called.
+my @bins = (
+	{ label => '[0,10)',  count => 3 },
+	{ label => '[10,20)', count => 5, lo => 10, hi => 20 },
+);
+my $binned;
+lives_ok { $binned = $chart->render_histogram_snippet(\@bins, { binned => 1 }) }
+	'Pre-binned input renders without error';
+is(ref($binned), 'HASH', 'Pre-binned returns a hash reference');
+is($binned->{svg_id}, 'histogram', 'Pre-binned svg_id is "histogram"');
+like($binned->{html}, qr/"label":"\[0,10\)"/, 'Supplied bin label embedded in JSON');
+like($binned->{html}, qr/"count":5/, 'Supplied bin count embedded in JSON');
+unlike($binned->{html}, qr/d3\.bin\(\)/, 'Pre-binned path never calls d3.bin()');
+like($binned->{html}, qr/d3\.scaleBand/, 'Pre-binned bars use a band scale');
+like($binned->{html}, qr/esc\(d\.label\)/, 'Pre-binned tooltip escapes the bin label');
+unlike($binned->{html}, qr{</b>}, 'Pre-binned fragment has no raw </b>');
+
+# Labels derived from lo/hi when the caller omits them.
+my $derived = $chart->render_histogram_snippet(
+	[{ lo => 0, hi => 10, count => 1 }, { lo => 10, hi => 20, count => 2 }],
+	{ binned => 1 }
+)->{html};
+like($derived, qr/"label":"\[0,10\)"/,  'Label derived from lo/hi for the first bin');
+like($derived, qr/"label":"\[10,20\)"/, 'Label derived from lo/hi for the second bin');
+
+# Bar fill: explicit colour wins, otherwise the first colour of the scheme.
+like(
+	$chart->render_histogram_snippet(\@bins, { binned => 1, color => '#abcdef' })->{html},
+	qr/"#abcdef"/, 'Explicit color opt fills the pre-binned bars'
+);
+like(
+	$chart->render_histogram_snippet(\@bins, { binned => 1, scheme => 'category10' })->{html},
+	qr/d3\.schemeCategory10\[0\]/, 'scheme opt supplies the bar fill when color is absent'
+);
+like(
+	$chart->render_histogram_snippet(\@bins, { binned => 1, color => '#abcdef', scheme => 'category10' })->{html},
+	qr/"#abcdef"/, 'Explicit color wins over scheme'
+);
+
+# The remaining opts apply to the pre-binned path too.
+my $binned_opts = $chart->render_histogram_snippet(\@bins, {
+	binned => 1, x_label => 'Bucket', id => 'mybins', responsive => 1,
+});
+is($binned_opts->{svg_id}, 'mybins', 'id opt honoured for pre-binned input');
+like($binned_opts->{html}, qr/Bucket/, 'x_label honoured for pre-binned input');
+like($binned_opts->{html}, qr/viewBox=/, 'responsive opt honoured for pre-binned input');
+lives_ok { $chart->render_histogram_snippet(\@bins, { binned => 1, bins => 0 }) }
+	'bins is ignored (not validated) when binned is set';
+
+# ── pre-binned validation errors ──────────────────────────────────────────────
+throws_ok { $chart->render_histogram_snippet([], { binned => 1 }) }
+	qr/Data must contain at least one bin/, 'Dies on empty pre-binned data';
+throws_ok { $chart->render_histogram_snippet([1, 2], { binned => 1 }) }
+	qr/Each pre-binned entry must be a hash reference/, 'Dies on non-hashref bin';
+throws_ok { $chart->render_histogram_snippet([{ label => 'a' }], { binned => 1 }) }
+	qr/Bin count must be numeric/, 'Dies when a bin has no count';
+throws_ok { $chart->render_histogram_snippet([{ label => 'a', count => 'many' }], { binned => 1 }) }
+	qr/Bin count must be numeric/, 'Dies on non-numeric count';
+throws_ok { $chart->render_histogram_snippet([{ label => 'a', count => -1 }], { binned => 1 }) }
+	qr/Bin count must not be negative/, 'Dies on negative count';
+throws_ok { $chart->render_histogram_snippet([{ count => 1 }], { binned => 1 }) }
+	qr/Each pre-binned entry must have a label or numeric lo and hi/,
+	'Dies when a bin has neither label nor lo/hi';
+throws_ok { $chart->render_histogram_snippet([{ lo => 0, count => 1 }], { binned => 1 }) }
+	qr/Each pre-binned entry must have a label or numeric lo and hi/,
+	'Dies when only lo is supplied without a label';
+throws_ok { $chart->render_histogram_snippet('not an arrayref', { binned => 1 }) }
+	qr/Data must be an array of numeric values/,
+	'Dies on non-arrayref even in binned mode';

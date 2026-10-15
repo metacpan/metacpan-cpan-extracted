@@ -17,6 +17,10 @@ t/04-pick.t
 t/05-bin.t
 t/06-no-io.t
 t/07-perft.t
+t/08-options.t
+t/09-drawn-order.t
+t/10-round-trip.t
+t/11-history.t
 t/lib/Term/Chess/Test/Handle.pm
 t/manifest.t
 t/pod-coverage.t

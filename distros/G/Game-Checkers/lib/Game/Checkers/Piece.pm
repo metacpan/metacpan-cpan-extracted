@@ -5,7 +5,7 @@ use warnings;
 
 use Object::Proto::Sugar -types;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 my %UI = (
 	'b' => "\x{26C2}",
@@ -74,7 +74,7 @@ Game::Checkers::Piece - one man or king on the board
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 

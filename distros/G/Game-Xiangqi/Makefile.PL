@@ -1,4 +1,4 @@
-use 5.010;
+use 5.014;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
@@ -51,7 +51,7 @@ my %WriteMakefileArgs = (
     VERSION_FROM     => 'lib/Game/Xiangqi.pm',
     ABSTRACT_FROM    => 'lib/Game/Xiangqi.pm',
     LICENSE          => 'artistic_2',
-    MIN_PERL_VERSION => '5.010',
+    MIN_PERL_VERSION => '5.014',
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
         'ExtUtils::Depends'   => '0.404',
@@ -62,6 +62,7 @@ my %WriteMakefileArgs = (
     },
     PREREQ_PM => {
         'Digest::SHA'          => 0,
+        'Game::Terminal::Kit'  => '0.05',
         'Object::Proto::Sugar' => '0.06',
     },
     META_MERGE => {

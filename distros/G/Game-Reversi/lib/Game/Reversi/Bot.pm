@@ -11,7 +11,7 @@ use Game::Reversi::Board;
 use Game::Reversi::Move;
 use Game::Reversi::Opening;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 my @WEIGHT = (
 	120, -20,  20,   5,   5,  20, -20, 120,
@@ -210,7 +210,7 @@ Game::Reversi::Bot - an opponent that does not simply grab discs
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 

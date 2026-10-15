@@ -5,7 +5,7 @@ use warnings;
 
 use Object::Proto::Sugar -types;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our (@FLAGS, %MESSAGE);
 
@@ -106,7 +106,7 @@ Game::Merrills::Error - a move the game refused, and why
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 

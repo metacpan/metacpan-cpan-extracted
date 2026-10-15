@@ -6,7 +6,7 @@ IRI - Internationalized Resource Identifiers
 
 =head1 VERSION
 
-This document describes IRI version 0.014
+This document describes IRI version 0.15
 
 =head1 SYNOPSIS
 
@@ -80,7 +80,7 @@ Returns the respective component of the parsed IRI.
 	package IRI; 
 	use v5.10.1;
 	use warnings;
-	our $VERSION	= '0.014';
+	our $VERSION	= '0.15';
 	use Moo;
 	use MooX::HandlesVia;
 	use Types::Standard qw(Str InstanceOf HashRef Bool);
@@ -564,6 +564,17 @@ IRI, is equal to this IRI.
 			$str =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg;
 		}
 		return $str;
+	}
+	
+=item C<< is_absolute >>
+
+Returns true if the IRI is absolute, false otherwise.
+
+=cut
+
+	sub is_absolute {
+		my $self	= shift;
+		return exists $self->components->{'scheme'};
 	}
 	
 =item C<< query_form >>

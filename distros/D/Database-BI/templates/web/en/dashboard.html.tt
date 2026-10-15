@@ -106,12 +106,87 @@
   :root[data-theme="dark"] .page-btn-cur { background: #1a6bbf; color: #fff; }
   :root[data-theme="dark"] .page-btn-dis { background: #1a1a1a; color: #666; }
   :root[data-theme="dark"] .page-info { color: #999; }
+  /* Pivot table panel */
+  .pivot-config {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem 1.2rem;
+    margin-bottom: 0.75rem;
+  }
+  .pivot-config-col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 160px;
+  }
+  .pivot-config-wide { flex: 1 1 260px; }
+  .pivot-config-col .btn-add-filter { align-self: flex-start; }
+  .pivot-section-head {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.1rem;
+  }
+  .pivot-req { color: #c00; font-weight: 700; text-transform: none; letter-spacing: 0; }
+  .pivot-opt { color: #888; font-weight: 400; text-transform: none; letter-spacing: 0; }
+  .pivot-dim-row, .pivot-measure-row {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    flex-wrap: wrap;
+  }
+  .pivot-dim-row select,
+  .pivot-measure-row select,
+  .pivot-measure-row input[type="text"] {
+    padding: 0.28rem 0.45rem;
+    border: 1px solid #bbb;
+    border-radius: 4px;
+    font-size: 0.83rem;
+  }
+  .pivot-measure-row input[type="text"] { width: 80px; }
+  .pivot-dim-list, .pivot-measure-list { display: flex; flex-direction: column; gap: 0.3rem; }
+  .pivot-options-row {
+    margin: 0.1rem 0 0.75rem;
+    font-size: 0.88rem;
+  }
+  .btn-remove-pivot {
+    background: none;
+    border: 1px solid #bbb;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    padding: 0.2rem 0.45rem;
+    color: #666;
+    line-height: 1;
+  }
+  .btn-remove-pivot:hover { border-color: #c00; color: #c00; }
+  .pivot-alias-label { font-size: 0.75rem; color: #888; white-space: nowrap; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .pivot-section-head { color: #999; }
+    :root:not([data-theme="light"]) .pivot-dim-row select,
+    :root:not([data-theme="light"]) .pivot-measure-row select,
+    :root:not([data-theme="light"]) .pivot-measure-row input[type="text"] {
+      background: #222; color: #ddd; border-color: #555;
+    }
+    :root:not([data-theme="light"]) .btn-remove-pivot { border-color: #555; color: #aaa; }
+    :root:not([data-theme="light"]) .pivot-alias-label { color: #888; }
+  }
+  :root[data-theme="dark"] .pivot-section-head { color: #999; }
+  :root[data-theme="dark"] .pivot-dim-row select,
+  :root[data-theme="dark"] .pivot-measure-row select,
+  :root[data-theme="dark"] .pivot-measure-row input[type="text"] {
+    background: #222; color: #ddd; border-color: #555;
+  }
+  :root[data-theme="dark"] .btn-remove-pivot { border-color: #555; color: #aaa; }
+  :root[data-theme="dark"] .pivot-alias-label { color: #888; }
 </style>
 
 [%- IF back_url -%]
-<p class="back-link"><a href="/">&larr; Home</a> &rsaquo; <a href="[% back_url | html %]">[% back_label || 'Back' | html %]</a>[%- IF back2_url -%] &rsaquo; <a href="[% back2_url | html %]">[% back2_label || 'Back' | html %]</a>[%- END -%]</p>
+<p class="back-link"><span><a href="/">&larr; Home</a> &rsaquo; <a href="[% back_url | html %]">[% back_label || 'Back' | html %]</a>[%- IF back2_url -%] &rsaquo; <a href="[% back2_url | html %]">[% back2_label || 'Back' | html %]</a>[%- END -%]</span>[%- IF left_spec -%]<span class="record-count">[% records.size %] record[% records.size != 1 ? 's' : '' %][%- IF join_summaries.size -%]&ensp;[%- FOREACH s IN join_summaries -%]<span class="join-chip">&#x2b; [% s.label | html %][% IF s.left_key %] <span class="join-chip-key">(on [% s.left_key | html %] = [% s.right_key | html %])</span>[% END %]</span>[%- END -%][%- END -%]</span>[%- END -%]</p>
 [%- ELSE -%]
-<p class="back-link"><a href="/">&larr; Choose another database</a></p>
+<p class="back-link"><span><a href="/">&larr; Choose another database</a></span>[%- IF left_spec -%]<span class="record-count">[% records.size %] record[% records.size != 1 ? 's' : '' %][%- IF join_summaries.size -%]&ensp;[%- FOREACH s IN join_summaries -%]<span class="join-chip">&#x2b; [% s.label | html %][% IF s.left_key %] <span class="join-chip-key">(on [% s.left_key | html %] = [% s.right_key | html %])</span>[% END %]</span>[%- END -%][%- END -%]</span>[%- END -%]</p>
 [%- END -%]
 [%- IF schema_warnings.size -%]
 <ul class="schema-warnings" role="alert">
@@ -123,14 +198,6 @@
 
 [%- IF left_spec -%]
 <div class="toolbar">
-  <p class="record-count">[% records.size %] record[% records.size != 1 ? 's' : '' %]
-    [%- IF join_summaries.size -%]
-    &ensp;
-    [%- FOREACH s IN join_summaries -%]
-    <span class="join-chip">&#x2b; [% s.label | html %][% IF s.left_key %] <span class="join-chip-key">(on [% s.left_key | html %] = [% s.right_key | html %])</span>[% END %]</span>
-    [%- END -%]
-    [%- END -%]
-  </p>
   [%- IF filter_specs.size -%]
   <span class="filter-chips" id="filter-chip-row">
     [%- FOREACH fs IN filter_specs -%]
@@ -155,8 +222,28 @@
           title="Plot the current data as a heatmap - choose two categorical columns and an optional value column">&#x229F; Heatmap&hellip;</button>
   <button class="btn-bar" id="btn-bar" type="button"
           title="Plot the current data as a bar chart - choose a category column and an optional value column">&#x1F4CA; Bar chart&hellip;</button>
+  <button class="btn-stacked" id="btn-stacked" type="button"
+          title="Plot the current data as a stacked bar chart - choose category, segment, and optional value columns">&#x1F4CA; Stacked bar&hellip;</button>
+  <button class="btn-scatter" id="btn-scatter" type="button"
+          title="Plot two numeric columns as a scatter plot - both axes must be numeric">&#x2B1C; Scatter&hellip;</button>
+  <button class="btn-combo" id="btn-combo" type="button"
+          title="Plot two numeric series as a combo bar+line chart - choose the X axis and two numeric columns">&#x1F4C9; Combo chart&hellip;</button>
+  <button class="btn-treemap" id="btn-treemap" type="button"
+          title="Plot the current data as a treemap - choose a category column and an optional value column">&#x25A0; Treemap&hellip;</button>
+  <button class="btn-histogram" id="btn-histogram" type="button"
+          title="Plot the distribution of a numeric column as a histogram">&#x1F4CA; Histogram&hellip;</button>
   <button class="btn-folder" id="btn-folder" type="button"
           title="Browse records grouped by the letter prefix of a code column (e.g. Order # A10, B3, CT4)">&#x1F4C1; Folder view&hellip;</button>
+  <button class="btn-pivot" id="btn-pivot" type="button"
+          title="Summarise the data as a pivot table - group by row and column dimensions and compute aggregates">&#x25A6; Pivot table&hellip;</button>
+  <button class="btn-stats" id="btn-stats" type="button"
+          title="Show column statistics: row count, nulls, distinct values, numeric min, max, mean and median">&#x03A3; Column stats</button>
+  <button class="btn-calc" id="btn-calc" type="button"
+          title="Add virtual columns computed from expressions (e.g. revenue-cost). Saved fields are applied automatically whenever this data source is opened.">&fnof;(x) Calc fields&hellip;</button>
+  <button class="btn-groups" id="btn-groups" type="button"
+          title="Map column values to group labels (e.g. North+East = Northern). The virtual col_group column can then be used in charts and pivots.">&#x25BC; Group values&hellip;</button>
+  <button class="btn-dates" id="btn-dates" type="button"
+          title="Tell the app how date columns are formatted so YEAR(), MONTH() and date sorting work correctly. Saved patterns apply automatically.">&#x1F4C5; Date format&hellip;</button>
   [%- END -%]
   <button class="btn-dedup[% IF dedup %] btn-dedup--active[% END %]" id="btn-dedup" type="button"
           title="Remove duplicate rows from the view and from any export">[% IF dedup %]Show duplicates[% ELSE %]Hide duplicates[% END %]</button>
@@ -264,8 +351,12 @@
             syntax to open a file via SSH:<br><br>
             <code>/../hostname/dir/file.csv</code><br>
             <code>/../user@hostname/dir/file.csv</code><br><br>
+            To join a Redis table (optional Redis module required):<br>
+            <code>redis:tablename|redis://host:port</code><br>
+            Or enter a bare URL to browse available keys:<br>
+            <code>redis://host:port</code><br><br>
             Accepted: CSV, TSV, PSV, XLSX, SQLite (.sql / .sqlite /
-            .sqlite3), Berkeley DB (.db), XML.
+            .sqlite3), Berkeley DB (.db), XML, Redis.
           </div>
         </div>
       </div>
@@ -354,8 +445,12 @@
             syntax to open a file via SSH:<br><br>
             <code>/../hostname/dir/file.csv</code><br>
             <code>/../user@hostname/dir/file.csv</code><br><br>
+            To combine with a Redis table (optional Redis module required):<br>
+            <code>redis:tablename|redis://host:port</code><br>
+            Or enter a bare URL to browse available keys:<br>
+            <code>redis://host:port</code><br><br>
             Accepted: CSV, TSV, PSV, XLSX, SQLite (.sql / .sqlite /
-            .sqlite3), Berkeley DB (.db), XML.
+            .sqlite3), Berkeley DB (.db), XML, Redis.
           </div>
         </div>
       </div>
@@ -469,6 +564,11 @@
         <label style="display:flex;align-items:center;gap:0.4rem;padding-top:0.3rem;">
           <input type="checkbox" id="pie-donut-chk" name="donut" value="1"> Donut
         </label>
+      </div>
+      <div class="join-field">
+        <label for="pie-topn-inp" title="Show only the top N slices; the rest are aggregated into an Other slice">Top N slices</label>
+        <input type="number" id="pie-topn-inp" name="topn" min="1" placeholder="all"
+               style="width:5rem" title="Show only the top N slices; the rest become Other">
       </div>
       <div class="graph-btn-col">
         <span class="graph-btn-spacer"></span>
@@ -607,11 +707,298 @@
           <option value="h">Horizontal</option>
         </select>
       </div>
+      <div class="join-field">
+        <label for="bar-topn-inp" title="Show only the top N categories by value; remaining categories are aggregated into an Other bar">Top N</label>
+        <input type="number" id="bar-topn-inp" name="topn" min="1" placeholder="all"
+               style="width:5rem" title="Show only the top N categories; the rest become Other">
+      </div>
       <div class="graph-btn-col">
         <span class="graph-btn-spacer"></span>
         <div class="graph-btn-row">
           <button type="submit" id="btn-do-bar" class="btn-primary" disabled>Plot</button>
           <button type="button" id="btn-cancel-bar" class="btn-secondary">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="graph-panel" id="stacked-panel" hidden>
+  <form id="stacked-form" method="get" action="/stacked"
+        data-parent-back="[% back_url | html %]" data-parent-back-label="[% back_label | html %]">
+    <input type="hidden" name="l" value="[% left_spec | html %]">
+    [%- FOREACH jspec IN current_joins -%]
+    <input type="hidden" name="j" value="[% jspec | html %]">
+    [%- END -%]
+    [%- FOREACH fs IN filter_specs -%]
+    <input type="hidden" name="f" value="[% fs | html %]">
+    [%- END -%]
+    <input type="hidden" name="back" id="stacked-back-inp" value="">
+    <input type="hidden" name="back2" id="stacked-back2-inp" value="">
+    <input type="hidden" name="back2_label" id="stacked-back2-label-inp" value="">
+
+    <h3 class="graph-panel-title">&#x1F4CA; Stacked bar chart</h3>
+    <p class="graph-panel-desc">Choose a category column, a segment (series) column, and optionally a numeric value column to sum. Leave value on "Count rows" to count occurrences.</p>
+
+    <div class="graph-fields-row">
+      <div class="join-field">
+        <label for="stacked-cat-sel">Category (X axis)</label>
+        <select id="stacked-cat-sel" name="cat" required>
+          <option value="">&#x2014; select column &#x2014;</option>
+          [%- FOREACH col IN columns -%]
+          <option value="[% col | html %]">[% col | html %]</option>
+          [%- END -%]
+        </select>
+      </div>
+      <div class="join-field">
+        <label for="stacked-seg-sel">Segment (series)</label>
+        <select id="stacked-seg-sel" name="seg" required>
+          <option value="">&#x2014; select column &#x2014;</option>
+          [%- FOREACH col IN columns -%]
+          <option value="[% col | html %]">[% col | html %]</option>
+          [%- END -%]
+        </select>
+      </div>
+      <div class="join-field">
+        <label for="stacked-val-sel">Value (height)</label>
+        <select id="stacked-val-sel" name="val">
+          <option value="" style="font-weight:bold">Count (rows)</option>
+          [%- FOREACH col IN columns -%]
+          <option value="[% col | html %]">[% col | html %]</option>
+          [%- END -%]
+        </select>
+      </div>
+      <div class="join-field">
+        <label for="stacked-orient-sel">Orientation</label>
+        <select id="stacked-orient-sel" name="orient">
+          <option value="v">Vertical</option>
+          <option value="h">Horizontal</option>
+        </select>
+      </div>
+      <div class="graph-btn-col">
+        <span class="graph-btn-spacer"></span>
+        <div class="graph-btn-row">
+          <button type="submit" id="btn-do-stacked" class="btn-primary" disabled>Plot</button>
+          <button type="button" id="btn-cancel-stacked" class="btn-secondary">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="graph-panel" id="scatter-panel" hidden>
+  <form id="scatter-form" method="get" action="/scatter"
+        data-parent-back="[% back_url | html %]" data-parent-back-label="[% back_label | html %]">
+    <input type="hidden" name="l" value="[% left_spec | html %]">
+    [%- FOREACH jspec IN current_joins -%]
+    <input type="hidden" name="j" value="[% jspec | html %]">
+    [%- END -%]
+    [%- FOREACH fs IN filter_specs -%]
+    <input type="hidden" name="f" value="[% fs | html %]">
+    [%- END -%]
+    <input type="hidden" name="back" id="scatter-back-inp" value="">
+    <input type="hidden" name="back2" id="scatter-back2-inp" value="">
+    <input type="hidden" name="back2_label" id="scatter-back2-label-inp" value="">
+
+    <h3 class="graph-panel-title">&#x2B1C; Scatter plot</h3>
+    <p class="graph-panel-desc">Choose two numeric columns. Both axes must contain numeric values.</p>
+
+    <div class="graph-fields-row">
+      <div class="join-field">
+        <label for="scatter-x-sel">X axis (horizontal, numeric)</label>
+        <select id="scatter-x-sel" name="x" required>
+          <option value="">&#x2014; select column &#x2014;</option>
+        </select>
+      </div>
+      <div class="join-field">
+        <label id="scatter-y-label" for="scatter-y-sel">Y axis (vertical, numeric)</label>
+        <select id="scatter-y-sel" name="y" required>
+          <option value="">&#x2014; select column &#x2014;</option>
+        </select>
+        <input type="text" id="scatter-y-text" readonly hidden tabindex="-1">
+      </div>
+      <div class="join-field">
+        <label for="scatter-series-sel">Colour by (optional)</label>
+        <select id="scatter-series-sel" name="series">
+          <option value="">&#x2014; none &#x2014;</option>
+          [%- FOREACH col IN columns -%]
+          <option value="[% col | html %]">[% col | html %]</option>
+          [%- END -%]
+        </select>
+      </div>
+      <div class="join-field">
+        <label for="scatter-size-sel">Bubble size (optional)</label>
+        <select id="scatter-size-sel" name="size">
+          <option value="">&#x2014; none &#x2014;</option>
+        </select>
+      </div>
+      <div class="graph-btn-col">
+        <span class="graph-btn-spacer"></span>
+        <div class="graph-btn-row">
+          <button type="submit" id="btn-do-scatter" class="btn-primary" disabled>Plot</button>
+          <button type="button" id="btn-cancel-scatter" class="btn-secondary">Cancel</button>
+        </div>
+      </div>
+    </div>
+    <div class="graph-fields-row">
+      <div class="join-field">
+        <label for="scatter-scheme-sel">Colour scheme</label>
+        <select id="scatter-scheme-sel" name="scheme" disabled>
+          <option value="tableau10">Tableau 10</option>
+          <option value="category10">Category 10</option>
+          <option value="set2">Set 2</option>
+          <option value="set3">Set 3</option>
+          <option value="paired">Paired</option>
+        </select>
+      </div>
+      <div class="join-field">
+        <label for="scatter-min-r">Min radius (1&#x2013;40)</label>
+        <input type="number" id="scatter-min-r" name="min_r" min="1" max="40" value="3" disabled>
+      </div>
+      <div class="join-field">
+        <label for="scatter-max-r">Max radius (1&#x2013;40)</label>
+        <input type="number" id="scatter-max-r" name="max_r" min="1" max="40" value="15" disabled>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="graph-panel" id="combo-panel" hidden>
+  <form id="combo-form" method="get" action="/combo"
+        data-parent-back="[% back_url | html %]" data-parent-back-label="[% back_label | html %]">
+    <input type="hidden" name="l" value="[% left_spec | html %]">
+    [%- FOREACH jspec IN current_joins -%]
+    <input type="hidden" name="j" value="[% jspec | html %]">
+    [%- END -%]
+    [%- FOREACH fs IN filter_specs -%]
+    <input type="hidden" name="f" value="[% fs | html %]">
+    [%- END -%]
+    <input type="hidden" name="back" id="combo-back-inp" value="">
+    <input type="hidden" name="back2" id="combo-back2-inp" value="">
+    <input type="hidden" name="back2_label" id="combo-back2-label-inp" value="">
+
+    <h3 class="graph-panel-title">&#x1F4C9; Combo bar+line chart</h3>
+    <p class="graph-panel-desc">Choose an X axis column and two numeric columns: one for the bars, one for the line overlay. Values are summed per X category.</p>
+
+    <div class="graph-fields-row">
+      <div class="join-field">
+        <label for="combo-x-sel">X axis</label>
+        <select id="combo-x-sel" name="x" required>
+          <option value="">&#x2014; select column &#x2014;</option>
+          [%- FOREACH col IN columns -%]
+          <option value="[% col | html %]">[% col | html %]</option>
+          [%- END -%]
+        </select>
+      </div>
+      <div class="join-field">
+        <label for="combo-bar-sel">Bar column (numeric)</label>
+        <select id="combo-bar-sel" name="bar" required>
+          <option value="">&#x2014; select column &#x2014;</option>
+        </select>
+      </div>
+      <div class="join-field">
+        <label for="combo-line-sel">Line column (numeric)</label>
+        <select id="combo-line-sel" name="line" required>
+          <option value="">&#x2014; select column &#x2014;</option>
+        </select>
+      </div>
+      <div class="graph-btn-col">
+        <span class="graph-btn-spacer"></span>
+        <div class="graph-btn-row">
+          <button type="submit" id="btn-do-combo" class="btn-primary" disabled>Plot</button>
+          <button type="button" id="btn-cancel-combo" class="btn-secondary">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="graph-panel" id="treemap-panel" hidden>
+  <form id="treemap-form" method="get" action="/treemap"
+        data-parent-back="[% back_url | html %]" data-parent-back-label="[% back_label | html %]">
+    <input type="hidden" name="l" value="[% left_spec | html %]">
+    [%- FOREACH jspec IN current_joins -%]
+    <input type="hidden" name="j" value="[% jspec | html %]">
+    [%- END -%]
+    [%- FOREACH fs IN filter_specs -%]
+    <input type="hidden" name="f" value="[% fs | html %]">
+    [%- END -%]
+    <input type="hidden" name="back" id="treemap-back-inp" value="">
+    <input type="hidden" name="back2" id="treemap-back2-inp" value="">
+    <input type="hidden" name="back2_label" id="treemap-back2-label-inp" value="">
+
+    <h3 class="graph-panel-title">&#x25A0; Treemap</h3>
+    <p class="graph-panel-desc">Choose a category column. Optionally pick a numeric column to sum per tile; leave it on "Count rows" to show how many rows fall in each category.</p>
+
+    <div class="graph-fields-row">
+      <div class="join-field">
+        <label for="treemap-cat-sel">Category column</label>
+        <select id="treemap-cat-sel" name="cat" required>
+          <option value="">&#x2014; select column &#x2014;</option>
+          [%- FOREACH col IN columns -%]
+          <option value="[% col | html %]">[% col | html %]</option>
+          [%- END -%]
+        </select>
+      </div>
+      <div class="join-field">
+        <label for="treemap-val-sel">Value (tile size)</label>
+        <select id="treemap-val-sel" name="val">
+          <option value="" style="font-weight:bold">Count (rows)</option>
+          [%- FOREACH col IN columns -%]
+          <option value="[% col | html %]">[% col | html %]</option>
+          [%- END -%]
+        </select>
+      </div>
+      <div class="join-field">
+        <label for="treemap-topn-inp" title="Show only the top N tiles; the rest are aggregated into an Other tile">Top N tiles</label>
+        <input type="number" id="treemap-topn-inp" name="topn" min="1" placeholder="all"
+               style="width:5rem" title="Show only the top N tiles; the rest become Other">
+      </div>
+      <div class="graph-btn-col">
+        <span class="graph-btn-spacer"></span>
+        <div class="graph-btn-row">
+          <button type="submit" id="btn-do-treemap" class="btn-primary" disabled>Plot</button>
+          <button type="button" id="btn-cancel-treemap" class="btn-secondary">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="graph-panel" id="histogram-panel" hidden>
+  <form id="histogram-form" method="get" action="/histogram"
+        data-parent-back="[% back_url | html %]" data-parent-back-label="[% back_label | html %]">
+    <input type="hidden" name="l" value="[% left_spec | html %]">
+    [%- FOREACH jspec IN current_joins -%]
+    <input type="hidden" name="j" value="[% jspec | html %]">
+    [%- END -%]
+    [%- FOREACH fs IN filter_specs -%]
+    <input type="hidden" name="f" value="[% fs | html %]">
+    [%- END -%]
+    <input type="hidden" name="back" id="histogram-back-inp" value="">
+    <input type="hidden" name="back2" id="histogram-back2-inp" value="">
+    <input type="hidden" name="back2_label" id="histogram-back2-label-inp" value="">
+
+    <h3 class="graph-panel-title">&#x1F4CA; Histogram</h3>
+    <p class="graph-panel-desc">Choose a numeric column to plot its distribution. Adjust the number of bins (1-200) to control the granularity.</p>
+
+    <div class="graph-fields-row">
+      <div class="join-field">
+        <label for="histogram-col-sel">Numeric column</label>
+        <select id="histogram-col-sel" name="col" required>
+          <option value="">&#x2014; select column &#x2014;</option>
+        </select>
+      </div>
+      <div class="join-field">
+        <label for="histogram-bins-inp">Number of bins</label>
+        <input type="number" id="histogram-bins-inp" name="bins" min="1" max="200" value="10"
+               style="width:5rem">
+      </div>
+      <div class="graph-btn-col">
+        <span class="graph-btn-spacer"></span>
+        <div class="graph-btn-row">
+          <button type="submit" id="btn-do-histogram" class="btn-primary" disabled>Plot</button>
+          <button type="button" id="btn-cancel-histogram" class="btn-secondary">Cancel</button>
         </div>
       </div>
     </div>
@@ -647,6 +1034,171 @@
     </div>
   </form>
 </div>
+
+<div class="graph-panel" id="pivot-panel" hidden>
+  <form id="pivot-form" method="get" action="/pivot">
+    <input type="hidden" name="l" value="[% left_spec | html %]">
+    [%- FOREACH jspec IN current_joins -%]
+    <input type="hidden" name="j" value="[% jspec | html %]">
+    [%- END -%]
+    [%- FOREACH fs IN filter_specs -%]
+    <input type="hidden" name="f" value="[% fs | html %]">
+    [%- END -%]
+
+    <h3 class="graph-panel-title">&#x25A6; Pivot table</h3>
+    <p class="graph-panel-desc">Group and aggregate data into a crosstab. Dimensions become the row and column headers; measures compute a value for each cell.</p>
+
+    <div class="pivot-config">
+      <div class="pivot-config-col">
+        <div class="pivot-section-head">Row dimensions <span class="pivot-req">* required</span></div>
+        <div id="pivot-row-dims" class="pivot-dim-list"></div>
+        <button type="button" id="btn-add-pivot-row" class="btn-add-filter">&#x2b; Add row</button>
+      </div>
+
+      <div class="pivot-config-col">
+        <div class="pivot-section-head">Column dimensions <span class="pivot-opt">(optional)</span></div>
+        <div id="pivot-col-dims" class="pivot-dim-list"></div>
+        <button type="button" id="btn-add-pivot-col" class="btn-add-filter">&#x2b; Add column</button>
+      </div>
+
+      <div class="pivot-config-col pivot-config-wide">
+        <div class="pivot-section-head">Measures <span class="pivot-req">* required</span></div>
+        <div id="pivot-measures" class="pivot-measure-list"></div>
+        <button type="button" id="btn-add-pivot-measure" class="btn-add-filter">&#x2b; Add measure</button>
+      </div>
+    </div>
+
+    <div class="pivot-options-row">
+      <label><input type="checkbox" id="pivot-totals"> Show subtotals and grand total</label>
+      <span style="margin-left:1.5rem;white-space:nowrap" title="Show only the top N row groups; remaining rows are aggregated into an Other row">
+        Limit to top
+        <input type="number" id="pivot-topn-inp" name="topn" min="1" placeholder="all"
+               style="width:4rem;margin:0 0.3rem">
+        rows
+      </span>
+      <span style="margin-left:0.75rem;white-space:nowrap" title="Measure alias to rank rows by (leave blank to use the first measure)">
+        ranked by
+        <input type="text" id="pivot-topn-col-inp" name="topn_col" placeholder="measure alias"
+               style="width:9rem;margin-left:0.3rem">
+      </span>
+    </div>
+
+    <div class="join-actions">
+      <button type="button" id="btn-cancel-pivot" class="btn-secondary">Cancel</button>
+      <button type="submit" id="btn-do-pivot" class="btn-primary" disabled>Build pivot</button>
+    </div>
+  </form>
+</div>
+
+<div class="graph-panel" id="calc-panel" hidden>
+  <h3 class="graph-panel-title">&fnof;(x) Calculated columns</h3>
+  <p class="graph-panel-desc">Define virtual columns from expressions. Column names are variables; supports +, -, *, /, IF(), YEAR(), MONTH(), bin(), and more. Saved fields are applied automatically when this data source is opened.</p>
+  <div id="calc-field-list" style="margin-bottom:0.5rem"></div>
+  <div class="graph-fields-row" style="align-items:flex-end;gap:0.5rem;flex-wrap:wrap">
+    <div class="join-field" style="flex:0 0 auto;min-width:8rem">
+      <label for="calc-name-inp">Column name</label>
+      <input type="text" id="calc-name-inp" placeholder="e.g. margin"
+             title="Identifier: letters, digits, underscore; must start with a letter or _">
+    </div>
+    <div class="join-field" style="flex:1 1 12rem">
+      <label for="calc-expr-inp">Expression</label>
+      <input type="text" id="calc-expr-inp" placeholder="e.g. revenue - cost">
+    </div>
+    <div style="padding-bottom:0.2rem">
+      <button type="button" id="btn-save-calc" class="btn-primary" disabled>Save &amp; apply</button>
+    </div>
+  </div>
+  <div class="join-actions" style="margin-top:0.75rem">
+    <button type="button" id="btn-cancel-calc" class="btn-secondary">Close</button>
+  </div>
+</div>
+
+<div class="graph-panel" id="groups-panel" hidden>
+  <h3 class="graph-panel-title">&#x25BC; Group values</h3>
+  <p class="graph-panel-desc">Map values in a column to a label. A virtual <em>col_group</em> column is added: values in a group become the group label; unmatched values become <em>(other)</em>. Changes apply after reload.</p>
+  <div class="graph-fields-row" style="align-items:flex-end;gap:0.5rem;margin-bottom:0.75rem">
+    <div class="join-field" style="flex:0 0 auto;min-width:10rem">
+      <label for="groups-col-sel">Source column</label>
+      <select id="groups-col-sel">
+        <option value="">&#x2014; select &#x2014;</option>
+        [%- FOREACH col IN columns -%]
+        <option value="[% col | html %]">[% col | html %]</option>
+        [%- END -%]
+      </select>
+    </div>
+  </div>
+  <div id="groups-existing" style="margin-bottom:0.5rem"></div>
+  <div id="groups-add-row" hidden>
+    <div class="graph-fields-row" style="align-items:flex-end;gap:0.5rem;flex-wrap:wrap">
+      <div class="join-field" style="flex:0 0 auto;min-width:8rem">
+        <label for="groups-name-inp">Group label</label>
+        <input type="text" id="groups-name-inp" placeholder="e.g. Northern">
+      </div>
+      <div class="join-field" style="flex:1 1 12rem">
+        <label for="groups-vals-inp">Values (one per line)</label>
+        <textarea id="groups-vals-inp" rows="3" placeholder="North&#10;Northeast"
+                  style="width:100%;box-sizing:border-box;font-family:monospace;font-size:0.87rem"></textarea>
+      </div>
+      <div style="padding-bottom:0.2rem">
+        <button type="button" id="btn-save-group" class="btn-primary">Save group</button>
+      </div>
+    </div>
+  </div>
+  <div id="groups-add-btn-row" hidden style="margin-top:0.25rem">
+    <button type="button" id="btn-add-group" class="btn-add-filter">&#x2b; Add group</button>
+  </div>
+  <div class="join-actions" style="margin-top:0.75rem">
+    <button type="button" id="btn-cancel-groups" class="btn-secondary">Close</button>
+  </div>
+</div>
+
+<div class="graph-panel" id="dates-panel" hidden>
+  <h3 class="graph-panel-title">&#x1F4C5; Date column formats</h3>
+  <p class="graph-panel-desc">Tell the app how date columns are formatted so YEAR(), MONTH(), DAY(), QUARTER() and date sorting work correctly. Saved patterns are applied automatically when this data source is opened.</p>
+  <div id="dates-list" style="margin-bottom:0.5rem"></div>
+  <div class="graph-fields-row" style="align-items:flex-end;gap:0.5rem;flex-wrap:wrap">
+    <div class="join-field" style="flex:0 0 auto;min-width:10rem">
+      <label for="dates-col-sel">Column</label>
+      <select id="dates-col-sel">
+        <option value="">&#x2014; select &#x2014;</option>
+        [%- FOREACH col IN columns -%]
+        <option value="[% col | html %]">[% col | html %]</option>
+        [%- END -%]
+      </select>
+    </div>
+    <div class="join-field" style="flex:0 0 auto;min-width:14rem">
+      <label for="dates-pat-sel">Format</label>
+      <select id="dates-pat-sel">
+        <option value="%m/%d/%Y">M/D/YYYY &mdash; US (12/31/2025)</option>
+        <option value="%d/%m/%Y">D/M/YYYY &mdash; EU (31/12/2025)</option>
+        <option value="%d-%b-%Y">D-Mon-YYYY (31-Dec-2025)</option>
+      </select>
+    </div>
+    <div style="padding-bottom:0.2rem">
+      <button type="button" id="btn-save-date" class="btn-primary" disabled>Save &amp; apply</button>
+    </div>
+  </div>
+  <div style="margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid #d0d8f0">
+    <div class="filter-section-label" style="margin-bottom:0.45rem">Quick date filters (uses selected column)</div>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+      <button type="button" id="btn-dates-ytd"  class="btn-secondary" disabled>This year</button>
+      <button type="button" id="btn-dates-qtd"  class="btn-secondary" disabled>This quarter</button>
+      <button type="button" id="btn-dates-mtd"  class="btn-secondary" disabled>This month</button>
+    </div>
+  </div>
+  <div class="join-actions" style="margin-top:0.75rem">
+    <button type="button" id="btn-cancel-dates" class="btn-secondary">Close</button>
+  </div>
+</div>
+
+<form id="stats-form" method="get" action="/stats" style="display:none">
+  <input type="hidden" name="l" value="[% left_spec | html %]">
+  [%- FOREACH fs IN filter_specs -%]
+  <input type="hidden" name="f" value="[% fs | html %]">
+  [%- END -%]
+  <input type="hidden" name="back" id="stats-form-back" value="">
+  <input type="hidden" name="back_label" value="Back to table">
+</form>
 [%- END -%]
 
 [% IF records.size %]
@@ -1256,6 +1808,8 @@ function parseAccounting(v) {
       url = '/api/columns?table=' + encodeURIComponent(spec.slice(6));
     } else if (spec.indexOf('path:') === 0) {
       url = '/api/columns?path=' + encodeURIComponent(spec.slice(5));
+    } else if (spec.indexOf('redis:') === 0) {
+      url = '/api/columns?spec=' + encodeURIComponent(spec);
     } else { return; }
 
     rightSpec  = spec;
@@ -1295,8 +1849,12 @@ function parseAccounting(v) {
     clearTimeout(pathTimer);
     if (!val) { rightSpec = ''; rightLabel = ''; updateJoinDesc(); return; }
     pathTimer = setTimeout(function () {
-      var fname = val.replace(/.*[/\\]/, '').replace(/\.[^.]+$/, '') || val;
-      loadRightColumns('path:' + val, fname);
+      var isRedis = val.indexOf('redis:') === 0;
+      var spec  = isRedis ? val : 'path:' + val;
+      var fname = isRedis
+        ? val.replace(/\|.*/, '').replace(/^redis:/, '')
+        : (val.replace(/.*[/\\]/, '').replace(/\.[^.]+$/, '') || val);
+      loadRightColumns(spec, fname);
     }, 500);
   });
 
@@ -1636,7 +2194,7 @@ function parseAccounting(v) {
   var back2LabelInp = document.getElementById('graph-back2-label-inp');
   var graphForm     = document.getElementById('graph-form');
 
-  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'folder-panel'].map(function (id) {
+  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel'].map(function (id) {
     return document.getElementById(id);
   }).filter(Boolean);
 
@@ -1754,7 +2312,7 @@ function parseAccounting(v) {
   var back2LabelInp = document.getElementById('pie-back2-label-inp');
   var pieForm       = document.getElementById('pie-form');
 
-  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'heatmap-panel', 'bar-panel', 'folder-panel'].map(function (id) {
+  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel'].map(function (id) {
     return document.getElementById(id);
   }).filter(Boolean);
 
@@ -1839,7 +2397,7 @@ function parseAccounting(v) {
   var back2LabelInp = document.getElementById('heatmap-back2-label-inp');
   var heatmapForm   = document.getElementById('heatmap-form');
 
-  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'bar-panel', 'folder-panel'].map(function (id) {
+  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel'].map(function (id) {
     return document.getElementById(id);
   }).filter(Boolean);
 
@@ -1910,7 +2468,7 @@ function parseAccounting(v) {
   var back2LabelInp = document.getElementById('bar-back2-label-inp');
   var barForm       = document.getElementById('bar-form');
 
-  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'folder-panel'].map(function (id) {
+  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel'].map(function (id) {
     return document.getElementById(id);
   }).filter(Boolean);
 
@@ -1968,6 +2526,393 @@ function parseAccounting(v) {
 
 <script>
 // ---------------------------------------------------------------------------
+// Stacked bar chart panel
+// ---------------------------------------------------------------------------
+(function () {
+  var btnOpen   = document.getElementById('btn-stacked');
+  var panel     = document.getElementById('stacked-panel');
+  if (!btnOpen || !panel) return;
+
+  var btnCancel     = document.getElementById('btn-cancel-stacked');
+  var btnDo         = document.getElementById('btn-do-stacked');
+  var catSel        = document.getElementById('stacked-cat-sel');
+  var segSel        = document.getElementById('stacked-seg-sel');
+  var backInp       = document.getElementById('stacked-back-inp');
+  var back2Inp      = document.getElementById('stacked-back2-inp');
+  var back2LabelInp = document.getElementById('stacked-back2-label-inp');
+  var stackedForm   = document.getElementById('stacked-form');
+
+  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel'].map(function (id) {
+    return document.getElementById(id);
+  }).filter(Boolean);
+
+  function checkStacked() {
+    btnDo.disabled = !(catSel.value && segSel.value);
+  }
+
+  btnOpen.addEventListener('click', function () {
+    otherPanels.forEach(function (p) { p.hidden = true; });
+    backInp.value = window.location.href;
+    if (back2Inp && stackedForm) {
+      var pb = stackedForm.getAttribute('data-parent-back') || '';
+      back2Inp.value = pb;
+      if (back2LabelInp) back2LabelInp.value = pb ? (stackedForm.getAttribute('data-parent-back-label') || '') : '';
+    }
+    panel.hidden = !panel.hidden;
+    checkStacked();
+  });
+
+  btnCancel && btnCancel.addEventListener('click', function () {
+    panel.hidden = true;
+  });
+
+  catSel.addEventListener('change', checkStacked);
+  segSel.addEventListener('change', checkStacked);
+}());
+</script>
+
+<script>
+// ---------------------------------------------------------------------------
+// Scatter plot panel
+// ---------------------------------------------------------------------------
+(function () {
+  var btnOpen   = document.getElementById('btn-scatter');
+  var panel     = document.getElementById('scatter-panel');
+  if (!btnOpen || !panel) return;
+
+  var btnCancel     = document.getElementById('btn-cancel-scatter');
+  var btnDo         = document.getElementById('btn-do-scatter');
+  var xSel          = document.getElementById('scatter-x-sel');
+  var ySel          = document.getElementById('scatter-y-sel');
+  var yTextInput    = document.getElementById('scatter-y-text');
+  var yLabel        = document.getElementById('scatter-y-label');
+  var seriesSel     = document.getElementById('scatter-series-sel');
+  var sizeSel       = document.getElementById('scatter-size-sel');
+  var schemeSel     = document.getElementById('scatter-scheme-sel');
+  var minRInp       = document.getElementById('scatter-min-r');
+  var maxRInp       = document.getElementById('scatter-max-r');
+  var backInp       = document.getElementById('scatter-back-inp');
+  var back2Inp      = document.getElementById('scatter-back2-inp');
+  var back2LabelInp = document.getElementById('scatter-back2-label-inp');
+  var scatterForm   = document.getElementById('scatter-form');
+
+  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel'].map(function (id) {
+    return document.getElementById(id);
+  }).filter(Boolean);
+
+  function checkScatter() {
+    btnDo.disabled = !(xSel.value && ySel.value);
+  }
+
+  function updateScatterState() {
+    if (schemeSel) schemeSel.disabled = !(seriesSel && seriesSel.value);
+    var hasSize = sizeSel && sizeSel.value;
+    if (minRInp) minRInp.disabled = !hasSize;
+    if (maxRInp) maxRInp.disabled = !hasSize;
+  }
+
+  // Populate X, Y, and size selects with numeric-only columns.
+  function buildScatterSelects() {
+    var tbl = document.querySelector('table[data-table]') || document.querySelector('table');
+    if (!tbl || !tbl.tHead || !tbl.tBodies[0]) return;
+    var headers  = Array.from(tbl.tHead.rows[0].cells);
+    var rows     = Array.from(tbl.tBodies[0].rows);
+    var prevX    = xSel.value;
+    var prevY    = ySel.value;
+    var prevSize = sizeSel ? sizeSel.value : '';
+    [xSel, ySel].forEach(function (sel) {
+      while (sel.options.length > 1) sel.remove(1);
+    });
+    if (sizeSel) { while (sizeSel.options.length > 1) sizeSel.remove(1); }
+    headers.forEach(function (th, idx) {
+      var name = th.textContent.trim();
+      var vals = rows.map(function (r) {
+        return r.cells[idx] ? r.cells[idx].textContent.trim() : '';
+      }).filter(function (v) { return v !== ''; });
+      if (vals.length === 0) return;
+      if (vals.every(function (v) {
+        return /^\d{4}-\d{2}-\d{2}$/.test(v) || /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(v);
+      })) return;
+      if (!vals.every(function (v) { return v === '' || !isNaN(parseAccounting(v)); })) return;
+      var optX = document.createElement('option');
+      optX.value = name; optX.textContent = name;
+      if (name === prevX) optX.selected = true;
+      xSel.appendChild(optX);
+      var optY = document.createElement('option');
+      optY.value = name; optY.textContent = name;
+      if (name === prevY) optY.selected = true;
+      ySel.appendChild(optY);
+      if (sizeSel) {
+        var optS = document.createElement('option');
+        optS.value = name; optS.textContent = name;
+        if (name === prevSize) optS.selected = true;
+        sizeSel.appendChild(optS);
+      }
+    });
+    var n = ySel.options.length - 1;
+    if (n === 1 && yTextInput && yLabel) {
+      ySel.options[1].selected = true;
+      ySel.hidden = true;
+      yTextInput.value = ySel.options[1].value; yTextInput.hidden = false;
+      yLabel.textContent = 'Y axis (auto-selected)';
+    } else {
+      ySel.hidden = false;
+      if (yTextInput) yTextInput.hidden = true;
+      if (yLabel) yLabel.textContent = 'Y axis (vertical, numeric)';
+    }
+    if (n === 0) {
+      btnOpen.disabled = true;
+      btnOpen.title    = 'Scatter plots need at least one numeric column';
+    }
+    updateScatterState();
+    return n;
+  }
+
+  (function initScatterBtn() {
+    var n = buildScatterSelects();
+    if (!n) {
+      btnOpen.disabled = true;
+      btnOpen.title    = 'Scatter plots need numeric columns';
+    }
+  }());
+
+  btnOpen.addEventListener('click', function () {
+    otherPanels.forEach(function (p) { p.hidden = true; });
+    backInp.value = window.location.href;
+    if (back2Inp && scatterForm) {
+      var pb = scatterForm.getAttribute('data-parent-back') || '';
+      back2Inp.value = pb;
+      if (back2LabelInp) back2LabelInp.value = pb ? (scatterForm.getAttribute('data-parent-back-label') || '') : '';
+    }
+    buildScatterSelects();
+    panel.hidden = !panel.hidden;
+    checkScatter();
+  });
+
+  btnCancel && btnCancel.addEventListener('click', function () {
+    panel.hidden = true;
+  });
+
+  xSel.addEventListener('change', checkScatter);
+  ySel.addEventListener('change', checkScatter);
+  seriesSel && seriesSel.addEventListener('change', updateScatterState);
+  sizeSel   && sizeSel.addEventListener('change', updateScatterState);
+}());
+</script>
+
+<script>
+// ---------------------------------------------------------------------------
+// Combo bar+line chart panel
+// ---------------------------------------------------------------------------
+(function () {
+  var btnOpen   = document.getElementById('btn-combo');
+  var panel     = document.getElementById('combo-panel');
+  if (!btnOpen || !panel) return;
+
+  var btnCancel     = document.getElementById('btn-cancel-combo');
+  var btnDo         = document.getElementById('btn-do-combo');
+  var xSel          = document.getElementById('combo-x-sel');
+  var barSel        = document.getElementById('combo-bar-sel');
+  var lineSel       = document.getElementById('combo-line-sel');
+  var backInp       = document.getElementById('combo-back-inp');
+  var back2Inp      = document.getElementById('combo-back2-inp');
+  var back2LabelInp = document.getElementById('combo-back2-label-inp');
+  var comboForm     = document.getElementById('combo-form');
+
+  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel'].map(function (id) {
+    return document.getElementById(id);
+  }).filter(Boolean);
+
+  function checkCombo() {
+    btnDo.disabled = !(xSel.value && barSel.value && lineSel.value);
+  }
+
+  function buildComboNumericSelects() {
+    var tbl = document.querySelector('table[data-table]') || document.querySelector('table');
+    if (!tbl || !tbl.tHead || !tbl.tBodies[0]) return;
+    var headers = Array.from(tbl.tHead.rows[0].cells);
+    var rows    = Array.from(tbl.tBodies[0].rows);
+    var prevBar  = barSel.value;
+    var prevLine = lineSel.value;
+    [barSel, lineSel].forEach(function (sel) {
+      while (sel.options.length > 1) sel.remove(1);
+    });
+    headers.forEach(function (th, idx) {
+      var name = th.textContent.trim();
+      var vals = rows.map(function (r) {
+        return r.cells[idx] ? r.cells[idx].textContent.trim() : '';
+      }).filter(function (v) { return v !== ''; });
+      if (vals.length === 0) return;
+      if (vals.every(function (v) {
+        return /^\d{4}-\d{2}-\d{2}$/.test(v) || /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(v);
+      })) return;
+      if (!vals.every(function (v) { return v === '' || !isNaN(parseAccounting(v)); })) return;
+      var optBar = document.createElement('option');
+      optBar.value = name; optBar.textContent = name;
+      if (name === prevBar) optBar.selected = true;
+      barSel.appendChild(optBar);
+      var optLine = document.createElement('option');
+      optLine.value = name; optLine.textContent = name;
+      if (name === prevLine) optLine.selected = true;
+      lineSel.appendChild(optLine);
+    });
+  }
+
+  btnOpen.addEventListener('click', function () {
+    otherPanels.forEach(function (p) { p.hidden = true; });
+    backInp.value = window.location.href;
+    if (back2Inp && comboForm) {
+      var pb = comboForm.getAttribute('data-parent-back') || '';
+      back2Inp.value = pb;
+      if (back2LabelInp) back2LabelInp.value = pb ? (comboForm.getAttribute('data-parent-back-label') || '') : '';
+    }
+    buildComboNumericSelects();
+    panel.hidden = !panel.hidden;
+    checkCombo();
+  });
+
+  btnCancel && btnCancel.addEventListener('click', function () {
+    panel.hidden = true;
+  });
+
+  xSel.addEventListener('change', checkCombo);
+  barSel.addEventListener('change', checkCombo);
+  lineSel.addEventListener('change', checkCombo);
+}());
+</script>
+
+<script>
+// ---------------------------------------------------------------------------
+// Treemap panel
+// ---------------------------------------------------------------------------
+(function () {
+  var btnOpen   = document.getElementById('btn-treemap');
+  var panel     = document.getElementById('treemap-panel');
+  if (!btnOpen || !panel) return;
+
+  var btnCancel     = document.getElementById('btn-cancel-treemap');
+  var btnDo         = document.getElementById('btn-do-treemap');
+  var catSel        = document.getElementById('treemap-cat-sel');
+  var backInp       = document.getElementById('treemap-back-inp');
+  var back2Inp      = document.getElementById('treemap-back2-inp');
+  var back2LabelInp = document.getElementById('treemap-back2-label-inp');
+  var treemapForm   = document.getElementById('treemap-form');
+
+  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel'].map(function (id) {
+    return document.getElementById(id);
+  }).filter(Boolean);
+
+  function checkTreemap() {
+    btnDo.disabled = !catSel.value;
+  }
+
+  btnOpen.addEventListener('click', function () {
+    otherPanels.forEach(function (p) { p.hidden = true; });
+    backInp.value = window.location.href;
+    if (back2Inp && treemapForm) {
+      var pb = treemapForm.getAttribute('data-parent-back') || '';
+      back2Inp.value = pb;
+      if (back2LabelInp) back2LabelInp.value = pb ? (treemapForm.getAttribute('data-parent-back-label') || '') : '';
+    }
+    panel.hidden = !panel.hidden;
+    checkTreemap();
+  });
+
+  btnCancel && btnCancel.addEventListener('click', function () {
+    panel.hidden = true;
+  });
+
+  catSel.addEventListener('change', checkTreemap);
+}());
+</script>
+
+<script>
+// ---------------------------------------------------------------------------
+// Histogram panel
+// ---------------------------------------------------------------------------
+(function () {
+  var btnOpen   = document.getElementById('btn-histogram');
+  var panel     = document.getElementById('histogram-panel');
+  if (!btnOpen || !panel) return;
+
+  var btnCancel     = document.getElementById('btn-cancel-histogram');
+  var btnDo         = document.getElementById('btn-do-histogram');
+  var colSel        = document.getElementById('histogram-col-sel');
+  var backInp       = document.getElementById('histogram-back-inp');
+  var back2Inp      = document.getElementById('histogram-back2-inp');
+  var back2LabelInp = document.getElementById('histogram-back2-label-inp');
+  var histogramForm = document.getElementById('histogram-form');
+
+  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel'].map(function (id) {
+    return document.getElementById(id);
+  }).filter(Boolean);
+
+  function checkHistogram() {
+    btnDo.disabled = !colSel.value;
+  }
+
+  // Populate col select with numeric-only columns.
+  function buildHistogramColSelect() {
+    var tbl = document.querySelector('table[data-table]') || document.querySelector('table');
+    if (!tbl || !tbl.tHead || !tbl.tBodies[0]) return;
+    var headers = Array.from(tbl.tHead.rows[0].cells);
+    var rows    = Array.from(tbl.tBodies[0].rows);
+    var prev    = colSel.value;
+    while (colSel.options.length > 1) colSel.remove(1);
+    headers.forEach(function (th, idx) {
+      var name = th.textContent.trim();
+      var vals = rows.map(function (r) {
+        return r.cells[idx] ? r.cells[idx].textContent.trim() : '';
+      }).filter(function (v) { return v !== ''; });
+      if (vals.length === 0) return;
+      if (vals.every(function (v) {
+        return /^\d{4}-\d{2}-\d{2}$/.test(v) || /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(v);
+      })) return;
+      if (!vals.every(function (v) { return v === '' || !isNaN(parseAccounting(v)); })) return;
+      var opt = document.createElement('option');
+      opt.value = name; opt.textContent = name;
+      if (name === prev) opt.selected = true;
+      colSel.appendChild(opt);
+    });
+    var n = colSel.options.length - 1;
+    if (n === 0) {
+      btnOpen.disabled = true;
+      btnOpen.title    = 'Histogram needs a numeric column';
+    }
+    return n;
+  }
+
+  (function initHistogramBtn() {
+    var n = buildHistogramColSelect();
+    if (!n) {
+      btnOpen.disabled = true;
+      btnOpen.title    = 'Histogram needs a numeric column';
+    }
+  }());
+
+  btnOpen.addEventListener('click', function () {
+    otherPanels.forEach(function (p) { p.hidden = true; });
+    backInp.value = window.location.href;
+    if (back2Inp && histogramForm) {
+      var pb = histogramForm.getAttribute('data-parent-back') || '';
+      back2Inp.value = pb;
+      if (back2LabelInp) back2LabelInp.value = pb ? (histogramForm.getAttribute('data-parent-back-label') || '') : '';
+    }
+    buildHistogramColSelect();
+    panel.hidden = !panel.hidden;
+    checkHistogram();
+  });
+
+  btnCancel && btnCancel.addEventListener('click', function () {
+    panel.hidden = true;
+  });
+
+  colSel.addEventListener('change', checkHistogram);
+}());
+</script>
+
+<script>
+// ---------------------------------------------------------------------------
 // Folder view panel
 // ---------------------------------------------------------------------------
 (function () {
@@ -1980,7 +2925,7 @@ function parseAccounting(v) {
   var colSel    = document.getElementById('folder-col-sel');
   var backInp   = document.getElementById('folder-back-inp');
 
-  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel'].map(function (id) {
+  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel'].map(function (id) {
     return document.getElementById(id);
   }).filter(Boolean);
 
@@ -2001,6 +2946,581 @@ function parseAccounting(v) {
   });
 
   colSel.addEventListener('change', checkFolder);
+}());
+</script>
+
+<script>
+// ---------------------------------------------------------------------------
+// Stats button -- navigate directly to /stats with current l= and f= params
+// ---------------------------------------------------------------------------
+(function () {
+  var btn  = document.getElementById('btn-stats');
+  var form = document.getElementById('stats-form');
+  if (!btn || !form) return;
+
+  btn.addEventListener('click', function () {
+    var backInp = document.getElementById('stats-form-back');
+    if (backInp) backInp.value = window.location.href;
+    form.submit();
+  });
+}());
+</script>
+
+<script>
+// ---------------------------------------------------------------------------
+// Pivot table panel
+// ---------------------------------------------------------------------------
+(function () {
+  var btnOpen   = document.getElementById('btn-pivot');
+  var panel     = document.getElementById('pivot-panel');
+  if (!btnOpen || !panel) return;
+
+  var btnCancel = document.getElementById('btn-cancel-pivot');
+  var btnDo     = document.getElementById('btn-do-pivot');
+  var pivotForm = document.getElementById('pivot-form');
+  var rowDimList    = document.getElementById('pivot-row-dims');
+  var colDimList    = document.getElementById('pivot-col-dims');
+  var measureList   = document.getElementById('pivot-measures');
+  var chkTotals     = document.getElementById('pivot-totals');
+
+  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'calc-panel', 'groups-panel', 'dates-panel'].map(function (id) {
+    return document.getElementById(id);
+  }).filter(Boolean);
+
+  // Collect column names from the rendered table header.
+  function getColumns() {
+    var tbl = document.querySelector('table[data-table]') || document.querySelector('table');
+    if (!tbl || !tbl.tHead) return [];
+    return Array.from(tbl.tHead.rows[0].cells)
+      .map(function (th) { return th.textContent.trim(); })
+      .filter(function (s) { return s.length > 0; });
+  }
+
+  function colOption(col) {
+    var opt = document.createElement('option');
+    opt.value = col; opt.textContent = col;
+    return opt;
+  }
+
+  function makeColSelect(placeholder) {
+    var sel = document.createElement('select');
+    var ph = document.createElement('option');
+    ph.value = ''; ph.textContent = placeholder;
+    sel.appendChild(ph);
+    getColumns().forEach(function (c) { sel.appendChild(colOption(c)); });
+    sel.addEventListener('change', checkPivot);
+    return sel;
+  }
+
+  function addDimRow(container, label) {
+    var row = document.createElement('div');
+    row.className = 'pivot-dim-row';
+    var sel = makeColSelect(label || '\u2014 column \u2014');
+    var rm  = document.createElement('button');
+    rm.type = 'button'; rm.className = 'btn-remove-pivot'; rm.textContent = '\u00d7';
+    rm.addEventListener('click', function () { row.remove(); checkPivot(); });
+    row.appendChild(sel); row.appendChild(rm);
+    container.appendChild(row);
+    checkPivot();
+    return sel;
+  }
+
+  function autoAlias(col, fn) {
+    if (!col) return '';
+    if (fn === 'count' || fn === 'count_distinct') return fn === 'count' ? 'count' : col + '_distinct';
+    return col + '_' + fn;
+  }
+
+  function addMeasureRow() {
+    var row = document.createElement('div');
+    row.className = 'pivot-measure-row';
+
+    var colSel = document.createElement('select');
+    var ph = document.createElement('option'); ph.value = ''; ph.textContent = '\u2014 column \u2014';
+    colSel.appendChild(ph);
+    getColumns().forEach(function (c) { colSel.appendChild(colOption(c)); });
+
+    var fnSel = document.createElement('select');
+    [['sum','Sum'], ['count','Count'], ['avg','Average'], ['min','Min'],
+     ['max','Max'], ['count_distinct','Count distinct']].forEach(function (p) {
+      var opt = document.createElement('option');
+      opt.value = p[0]; opt.textContent = p[1];
+      fnSel.appendChild(opt);
+    });
+
+    var aliasInp = document.createElement('input');
+    aliasInp.type = 'text'; aliasInp.placeholder = 'alias';
+
+    var aliasLabel = document.createElement('span');
+    aliasLabel.className = 'pivot-alias-label';
+    aliasLabel.textContent = 'as';
+
+    function refreshAlias() {
+      if (!aliasInp.dataset.userEdited) {
+        aliasInp.value = autoAlias(colSel.value, fnSel.value);
+      }
+      checkPivot();
+    }
+    colSel.addEventListener('change', refreshAlias);
+    fnSel.addEventListener('change',  refreshAlias);
+    aliasInp.addEventListener('input', function () {
+      aliasInp.dataset.userEdited = aliasInp.value ? '1' : '';
+      checkPivot();
+    });
+
+    var rm = document.createElement('button');
+    rm.type = 'button'; rm.className = 'btn-remove-pivot'; rm.textContent = '\u00d7';
+    rm.addEventListener('click', function () { row.remove(); checkPivot(); });
+
+    row.appendChild(colSel); row.appendChild(fnSel);
+    row.appendChild(aliasLabel); row.appendChild(aliasInp);
+    row.appendChild(rm);
+    measureList.appendChild(row);
+    checkPivot();
+  }
+
+  function checkPivot() {
+    var rowSelects = Array.from(rowDimList.querySelectorAll('select'));
+    var hasRow = rowSelects.some(function (s) { return s.value; });
+    var measures = Array.from(measureList.querySelectorAll('.pivot-measure-row'));
+    var hasM = measures.some(function (row) {
+      var fn    = row.querySelectorAll('select')[1].value;
+      var alias = row.querySelector('input[type="text"]').value.trim();
+      return alias.length > 0 && (fn === 'count' || row.querySelectorAll('select')[0].value);
+    });
+    btnDo.disabled = !(hasRow && hasM);
+  }
+
+  pivotForm.addEventListener('submit', function () {
+    // Remove previously-generated dynamic pivot params.
+    Array.from(pivotForm.querySelectorAll('[data-pivot-dyn]')).forEach(function (i) { i.remove(); });
+
+    // Inject back= so pivot page can render a breadcrumb back to this view.
+    (function () {
+      var inp = document.createElement('input');
+      inp.type = 'hidden'; inp.name = 'back'; inp.value = window.location.href;
+      inp.setAttribute('data-pivot-dyn', '1');
+      pivotForm.appendChild(inp);
+      var lbl = document.createElement('input');
+      lbl.type = 'hidden'; lbl.name = 'back_label'; lbl.value = 'Back to table';
+      lbl.setAttribute('data-pivot-dyn', '1');
+      pivotForm.appendChild(lbl);
+    }());
+
+    function addHidden(name, val) {
+      var inp = document.createElement('input');
+      inp.type = 'hidden'; inp.name = name; inp.value = val;
+      inp.setAttribute('data-pivot-dyn', '1');
+      pivotForm.appendChild(inp);
+    }
+
+    // rows= (comma-joined)
+    var rowVals = Array.from(rowDimList.querySelectorAll('select'))
+      .map(function (s) { return s.value; }).filter(Boolean);
+    if (rowVals.length) addHidden('rows', rowVals.join(','));
+
+    // cols= (comma-joined, optional)
+    var colVals = Array.from(colDimList.querySelectorAll('select'))
+      .map(function (s) { return s.value; }).filter(Boolean);
+    if (colVals.length) addHidden('cols', colVals.join(','));
+
+    // m=col:fn:alias (one per measure)
+    Array.from(measureList.querySelectorAll('.pivot-measure-row')).forEach(function (row) {
+      var sels  = row.querySelectorAll('select');
+      var col   = sels[0].value;
+      var fn    = sels[1].value;
+      var alias = row.querySelector('input[type="text"]').value.trim();
+      if (!alias) return;
+      if (fn !== 'count' && !col) return;
+      addHidden('m', col + ':' + fn + ':' + alias);
+    });
+
+    // totals=1
+    if (chkTotals && chkTotals.checked) addHidden('totals', '1');
+  });
+
+  document.getElementById('btn-add-pivot-row').addEventListener('click', function () {
+    addDimRow(rowDimList, '\u2014 row \u2014');
+  });
+  document.getElementById('btn-add-pivot-col').addEventListener('click', function () {
+    addDimRow(colDimList, '\u2014 column \u2014');
+  });
+  document.getElementById('btn-add-pivot-measure').addEventListener('click', addMeasureRow);
+
+  btnOpen.addEventListener('click', function () {
+    otherPanels.forEach(function (p) { p.hidden = true; });
+    panel.hidden = !panel.hidden;
+    if (!panel.hidden && rowDimList.childElementCount === 0) {
+      addDimRow(rowDimList, '\u2014 row \u2014');
+      addMeasureRow();
+    }
+  });
+
+  btnCancel && btnCancel.addEventListener('click', function () {
+    panel.hidden = true;
+  });
+}());
+</script>
+
+<script>
+// ---------------------------------------------------------------------------
+// Calculated columns panel
+// ---------------------------------------------------------------------------
+(function () {
+  var btnOpen   = document.getElementById('btn-calc');
+  var panel     = document.getElementById('calc-panel');
+  if (!btnOpen || !panel) return;
+
+  var nameInp   = document.getElementById('calc-name-inp');
+  var exprInp   = document.getElementById('calc-expr-inp');
+  var btnSave   = document.getElementById('btn-save-calc');
+  var btnClose  = document.getElementById('btn-cancel-calc');
+  var listEl    = document.getElementById('calc-field-list');
+
+  var lspec     = '[% left_spec | html %]';
+
+  var otherPanels = ['join-panel','combine-panel','export-panel','graph-panel',
+    'pie-panel','heatmap-panel','bar-panel','stacked-panel','scatter-panel',
+    'combo-panel','treemap-panel','histogram-panel','folder-panel','pivot-panel',
+    'groups-panel','dates-panel'].map(function(id){
+      return document.getElementById(id);
+    }).filter(Boolean);
+
+  var NAME_RE = /^[A-Za-z_][A-Za-z0-9_]*$/;
+
+  function checkSaveEnabled() {
+    btnSave.disabled = !(NAME_RE.test(nameInp.value.trim()) && exprInp.value.trim().length > 0);
+  }
+  nameInp.addEventListener('input', checkSaveEnabled);
+  exprInp.addEventListener('input', checkSaveEnabled);
+
+  function renderList(fields) {
+    listEl.innerHTML = '';
+    if (!fields || !Object.keys(fields).length) {
+      listEl.innerHTML = '<p class="graph-panel-desc" style="margin:0 0 0.4rem">No saved fields yet.</p>';
+      return;
+    }
+    Object.keys(fields).sort().forEach(function(n) {
+      var row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:0.5rem;margin-bottom:0.3rem;font-size:0.87rem';
+      var badge = document.createElement('code');
+      badge.style.cssText = 'flex:0 0 auto;background:var(--badge-bg,#e8eef5);padding:0.1rem 0.4rem;border-radius:3px';
+      badge.textContent = n + ' = ' + fields[n];
+      var del = document.createElement('button');
+      del.type = 'button'; del.className = 'btn-secondary'; del.textContent = '\u00d7';
+      del.style.cssText = 'flex:0 0 auto;padding:0.1rem 0.5rem;font-size:0.8rem';
+      del.title = 'Delete ' + n;
+      del.addEventListener('click', function() {
+        fetch('/calc/delete', {
+          method:'POST',
+          headers:{'Content-Type':'application/x-www-form-urlencoded'},
+          body:'l=' + encodeURIComponent(lspec) + '&name=' + encodeURIComponent(n)
+        }).then(function(r){ return r.json(); }).then(function(j){
+          if (j.ok) { loadList(); location.reload(); }
+          else alert('Error: ' + (j.error||'unknown'));
+        });
+      });
+      row.appendChild(badge); row.appendChild(del);
+      listEl.appendChild(row);
+    });
+  }
+
+  function loadList() {
+    if (!lspec) return;
+    fetch('/calc/list?l=' + encodeURIComponent(lspec))
+      .then(function(r){ return r.json(); })
+      .then(function(j){ renderList(j.fields || {}); })
+      .catch(function(){ renderList({}); });
+  }
+
+  btnSave.addEventListener('click', function() {
+    var n = nameInp.value.trim();
+    var e = exprInp.value.trim();
+    if (!NAME_RE.test(n) || !e) return;
+    fetch('/calc/save', {
+      method:'POST',
+      headers:{'Content-Type':'application/x-www-form-urlencoded'},
+      body:'l=' + encodeURIComponent(lspec) + '&name=' + encodeURIComponent(n) + '&expr=' + encodeURIComponent(e)
+    }).then(function(r){ return r.json(); }).then(function(j){
+      if (j.ok) { nameInp.value = ''; exprInp.value = ''; checkSaveEnabled(); loadList(); location.reload(); }
+      else alert('Error: ' + (j.error||'unknown'));
+    });
+  });
+
+  btnOpen.addEventListener('click', function() {
+    otherPanels.forEach(function(p){ p.hidden = true; });
+    panel.hidden = !panel.hidden;
+    if (!panel.hidden) loadList();
+  });
+
+  btnClose && btnClose.addEventListener('click', function(){ panel.hidden = true; });
+}());
+</script>
+
+<script>
+// ---------------------------------------------------------------------------
+// Group values panel
+// ---------------------------------------------------------------------------
+(function () {
+  var btnOpen   = document.getElementById('btn-groups');
+  var panel     = document.getElementById('groups-panel');
+  if (!btnOpen || !panel) return;
+
+  var colSel      = document.getElementById('groups-col-sel');
+  var existingEl  = document.getElementById('groups-existing');
+  var addRow      = document.getElementById('groups-add-row');
+  var addBtnRow   = document.getElementById('groups-add-btn-row');
+  var nameInp     = document.getElementById('groups-name-inp');
+  var valsInp     = document.getElementById('groups-vals-inp');
+  var btnSaveGrp  = document.getElementById('btn-save-group');
+  var btnAddGrp   = document.getElementById('btn-add-group');
+  var btnClose    = document.getElementById('btn-cancel-groups');
+
+  var lspec = '[% left_spec | html %]';
+
+  var otherPanels = ['join-panel','combine-panel','export-panel','graph-panel',
+    'pie-panel','heatmap-panel','bar-panel','stacked-panel','scatter-panel',
+    'combo-panel','treemap-panel','histogram-panel','folder-panel','pivot-panel',
+    'calc-panel','dates-panel'].map(function(id){
+      return document.getElementById(id);
+    }).filter(Boolean);
+
+  function getUniqueVals(col) {
+    var tbl = document.querySelector('table[data-table]') || document.querySelector('table');
+    if (!tbl || !col) return [];
+    var hdrs = Array.from(tbl.tHead.rows[0].cells).map(function(th){ return th.textContent.trim(); });
+    var idx  = hdrs.indexOf(col);
+    if (idx < 0) return [];
+    var seen = {};
+    Array.from(tbl.tBodies[0].rows).forEach(function(r){
+      var v = (r.cells[idx] || {}).textContent;
+      if (v && v.trim()) seen[v.trim()] = 1;
+    });
+    return Object.keys(seen).sort();
+  }
+
+  function renderExisting(groups, col) {
+    existingEl.innerHTML = '';
+    if (!groups || !Object.keys(groups).length) {
+      existingEl.innerHTML = '<p class="graph-panel-desc" style="margin:0 0 0.4rem">No groups defined for this column yet.</p>';
+      return;
+    }
+    Object.keys(groups).sort().forEach(function(gname) {
+      var row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:flex-start;gap:0.5rem;margin-bottom:0.4rem;font-size:0.87rem';
+      var badge = document.createElement('span');
+      badge.style.cssText = 'flex:1 1 auto';
+      badge.innerHTML = '<strong>' + gname.replace(/&/g,'&amp;').replace(/</g,'&lt;') + '</strong>: '
+        + (groups[gname]||[]).map(function(v){
+            return '<code style="background:var(--badge-bg,#e8eef5);padding:0.05rem 0.3rem;border-radius:2px">'
+              + v.replace(/&/g,'&amp;').replace(/</g,'&lt;') + '</code>';
+          }).join(' ');
+      var del = document.createElement('button');
+      del.type = 'button'; del.className = 'btn-secondary'; del.textContent = '\u00d7';
+      del.style.cssText = 'flex:0 0 auto;padding:0.1rem 0.5rem;font-size:0.8rem';
+      del.title = 'Delete group ' + gname;
+      del.addEventListener('click', function() {
+        fetch('/groups/delete', {
+          method:'POST',
+          headers:{'Content-Type':'application/x-www-form-urlencoded'},
+          body:'l=' + encodeURIComponent(lspec) + '&col=' + encodeURIComponent(col) + '&group=' + encodeURIComponent(gname)
+        }).then(function(r){ return r.json(); }).then(function(j){
+          if (j.ok) loadForCol(col);
+          else alert('Error: ' + (j.error||'unknown'));
+        });
+      });
+      row.appendChild(badge); row.appendChild(del);
+      existingEl.appendChild(row);
+    });
+  }
+
+  function loadForCol(col) {
+    existingEl.innerHTML = '';
+    addRow.hidden = true;
+    addBtnRow.hidden = true;
+    if (!col || !lspec) return;
+    fetch('/groups/list?l=' + encodeURIComponent(lspec) + '&col=' + encodeURIComponent(col))
+      .then(function(r){ return r.json(); })
+      .then(function(j){
+        renderExisting(j.groups || {}, col);
+        addBtnRow.hidden = false;
+      })
+      .catch(function(){ renderExisting({}, col); addBtnRow.hidden = false; });
+  }
+
+  colSel.addEventListener('change', function(){ loadForCol(colSel.value); });
+
+  btnAddGrp && btnAddGrp.addEventListener('click', function(){
+    nameInp.value = ''; valsInp.value = '';
+    // Suggest unique values
+    var uniq = getUniqueVals(colSel.value);
+    if (uniq.length && uniq.length <= 30) {
+      valsInp.placeholder = uniq.slice(0,10).join('\n') + (uniq.length > 10 ? '\n...' : '');
+    }
+    addRow.hidden = false;
+    nameInp.focus();
+  });
+
+  btnSaveGrp && btnSaveGrp.addEventListener('click', function(){
+    var col   = colSel.value;
+    var gname = nameInp.value.trim();
+    var vals  = valsInp.value.split('\n').map(function(v){ return v.trim(); }).filter(Boolean);
+    if (!col || !gname || !vals.length) return;
+    fetch('/groups/save', {
+      method:'POST',
+      headers:{'Content-Type':'application/x-www-form-urlencoded'},
+      body:'l=' + encodeURIComponent(lspec)
+        + '&col='   + encodeURIComponent(col)
+        + '&group=' + encodeURIComponent(gname)
+        + '&values='+ encodeURIComponent(vals.join('\n'))
+    }).then(function(r){ return r.json(); }).then(function(j){
+      if (j.ok) { addRow.hidden = true; loadForCol(col); }
+      else alert('Error: ' + (j.error||'unknown'));
+    });
+  });
+
+  btnOpen.addEventListener('click', function() {
+    otherPanels.forEach(function(p){ p.hidden = true; });
+    panel.hidden = !panel.hidden;
+  });
+
+  btnClose && btnClose.addEventListener('click', function(){ panel.hidden = true; });
+}());
+</script>
+
+<script>
+// ---------------------------------------------------------------------------
+// Date format panel
+// ---------------------------------------------------------------------------
+(function () {
+  var btnOpen   = document.getElementById('btn-dates');
+  var panel     = document.getElementById('dates-panel');
+  if (!btnOpen || !panel) return;
+
+  var colSel   = document.getElementById('dates-col-sel');
+  var patSel   = document.getElementById('dates-pat-sel');
+  var btnSave  = document.getElementById('btn-save-date');
+  var btnClose = document.getElementById('btn-cancel-dates');
+  var listEl   = document.getElementById('dates-list');
+  var btnYtd   = document.getElementById('btn-dates-ytd');
+  var btnQtd   = document.getElementById('btn-dates-qtd');
+  var btnMtd   = document.getElementById('btn-dates-mtd');
+
+  var lspec = '[% left_spec | html %]';
+
+  var otherPanels = ['join-panel','combine-panel','export-panel','graph-panel',
+    'pie-panel','heatmap-panel','bar-panel','stacked-panel','scatter-panel',
+    'combo-panel','treemap-panel','histogram-panel','folder-panel','pivot-panel',
+    'calc-panel','groups-panel'].map(function(id){
+      return document.getElementById(id);
+    }).filter(Boolean);
+
+  function pad2(n) { return n < 10 ? '0' + n : '' + n; }
+
+  function isoDate(y, m, d) {
+    return y + '-' + pad2(m) + '-' + pad2(d);
+  }
+
+  function lastDayOfMonth(y, m) {
+    return new Date(y, m, 0).getDate(); // day 0 of next month = last day of this month
+  }
+
+  function applyPeriodFilter(ge, le) {
+    var col = colSel.value;
+    if (!col) return;
+    // Build a new URL from the current page, appending the two f= filters.
+    var url = new URL(window.location.href);
+    url.searchParams.append('f', col + ':ge:' + ge);
+    url.searchParams.append('f', col + ':le:' + le);
+    window.location.href = url.toString();
+  }
+
+  function checkSaveEnabled() {
+    var hasCol = !!colSel.value;
+    btnSave.disabled = !hasCol;
+    if (btnYtd) { btnYtd.disabled = !hasCol; btnQtd.disabled = !hasCol; btnMtd.disabled = !hasCol; }
+  }
+  colSel.addEventListener('change', checkSaveEnabled);
+
+  if (btnYtd) {
+    btnYtd.addEventListener('click', function() {
+      var now = new Date();
+      var y = now.getFullYear();
+      applyPeriodFilter(isoDate(y, 1, 1), isoDate(y, now.getMonth() + 1, now.getDate()));
+    });
+    btnQtd.addEventListener('click', function() {
+      var now = new Date();
+      var y = now.getFullYear(), m = now.getMonth() + 1; // 1-12
+      var qstart = [1, 1, 1, 4, 4, 4, 7, 7, 7, 10, 10, 10][m - 1];
+      applyPeriodFilter(isoDate(y, qstart, 1), isoDate(y, m, now.getDate()));
+    });
+    btnMtd.addEventListener('click', function() {
+      var now = new Date();
+      var y = now.getFullYear(), m = now.getMonth() + 1;
+      applyPeriodFilter(isoDate(y, m, 1), isoDate(y, m, now.getDate()));
+    });
+  }
+
+  function renderList(dates) {
+    listEl.innerHTML = '';
+    if (!dates || !Object.keys(dates).length) {
+      listEl.innerHTML = '<p class="graph-panel-desc" style="margin:0 0 0.4rem">No date formats saved yet.</p>';
+      return;
+    }
+    Object.keys(dates).sort().forEach(function(col) {
+      var row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:0.5rem;margin-bottom:0.3rem;font-size:0.87rem';
+      var badge = document.createElement('code');
+      badge.style.cssText = 'flex:0 0 auto;background:var(--badge-bg,#e8eef5);padding:0.1rem 0.4rem;border-radius:3px';
+      badge.textContent = col + ' \u2192 ' + dates[col];
+      var del = document.createElement('button');
+      del.type = 'button'; del.className = 'btn-secondary'; del.textContent = '\u00d7';
+      del.style.cssText = 'flex:0 0 auto;padding:0.1rem 0.5rem;font-size:0.8rem';
+      del.title = 'Remove format for ' + col;
+      del.addEventListener('click', function() {
+        fetch('/dates/delete', {
+          method:'POST',
+          headers:{'Content-Type':'application/x-www-form-urlencoded'},
+          body:'l=' + encodeURIComponent(lspec) + '&col=' + encodeURIComponent(col)
+        }).then(function(r){ return r.json(); }).then(function(j){
+          if (j.ok) { loadList(); location.reload(); }
+          else alert('Error: ' + (j.error||'unknown'));
+        });
+      });
+      row.appendChild(badge); row.appendChild(del);
+      listEl.appendChild(row);
+    });
+  }
+
+  function loadList() {
+    if (!lspec) return;
+    fetch('/dates/list?l=' + encodeURIComponent(lspec))
+      .then(function(r){ return r.json(); })
+      .then(function(j){ renderList(j.dates || {}); })
+      .catch(function(){ renderList({}); });
+  }
+
+  btnSave.addEventListener('click', function() {
+    var col = colSel.value;
+    var pat = patSel.value;
+    if (!col || !pat) return;
+    fetch('/dates/save', {
+      method:'POST',
+      headers:{'Content-Type':'application/x-www-form-urlencoded'},
+      body:'l=' + encodeURIComponent(lspec) + '&col=' + encodeURIComponent(col) + '&pattern=' + encodeURIComponent(pat)
+    }).then(function(r){ return r.json(); }).then(function(j){
+      if (j.ok) { loadList(); location.reload(); }
+      else alert('Error: ' + (j.error||'unknown'));
+    });
+  });
+
+  btnOpen.addEventListener('click', function() {
+    otherPanels.forEach(function(p){ p.hidden = true; });
+    panel.hidden = !panel.hidden;
+    if (!panel.hidden) loadList();
+  });
+
+  btnClose && btnClose.addEventListener('click', function(){ panel.hidden = true; });
 }());
 </script>
 

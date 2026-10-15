@@ -1,5 +1,8 @@
 Revision history for HAMT
 
+0.03    2026-10-15
+        - Fix: pairs panicked on DEBUGGING perls 5.28 to 5.36
+
 0.02    2026-10-14
         - last or next in a sub given to a method jumped out through the C
           and left perl corrupted; each sub now runs on a stack of its own

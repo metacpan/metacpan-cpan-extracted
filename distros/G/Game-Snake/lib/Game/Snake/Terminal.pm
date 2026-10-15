@@ -11,9 +11,12 @@ use Object::Proto::Sugar -types;
 
 use Game::Snake;
 use Game::Snake::Bot;
-use Game::Snake::Ticker;
+use Game::Terminal::Kit::Keys;
+use Game::Terminal::Kit::Run;
+use Game::Terminal::Kit::Screen;
+use Game::Terminal::Kit::Ticker;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 my %GLYPH = (
 	wide => {
@@ -48,38 +51,12 @@ my %SGR = (
 	legend => '2',
 );
 
-my %SEQUENCE = (
-	'A'  => 'up',
-	'B'  => 'down',
-	'C'  => 'right',
-	'D'  => 'left',
-	'H'  => 'home',
-	'F'  => 'end',
-	'1~' => 'home',
-	'4~' => 'end',
-	'5~' => 'page_up',
-	'6~' => 'page_down',
-	'7~' => 'home',
-	'8~' => 'end',
-);
-
-my %CONTROL = (
-	"\r"   => 'enter',
-	"\n"   => 'enter',
-	"\t"   => 'tab',
-	"\x7f" => 'backspace',
-	"\x08" => 'backspace',
-	"\x03" => 'interrupt',
-	"\x04" => 'eof',
-);
-
 my %STEER = (
 	up => 'up', down => 'down', left => 'left', right => 'right',
 	w  => 'up', s    => 'down', a    => 'left', d     => 'right',
 	k  => 'up', j    => 'down', h    => 'left', l     => 'right',
 );
 
-my $SEQUENCE_WAIT = 0.05;
 
 my ($MIN_COLS, $MAX_COLS, $MIN_ROWS, $MAX_ROWS) = (10, 40, 8, 28);
 
@@ -139,10 +116,8 @@ has game => (
 	isa => Object
 );
 
-has raw => (
-	is      => 'rw',
-	isa     => Int,
-	default => 0
+has [qw/keyboard screen/] => (
+	is => 'rw'
 );
 
 has keysource => (is => 'rw');
@@ -209,13 +184,6 @@ has _wants_interactive => (
 	private  => 1
 );
 
-has _hid_cursor => (
-	is      => 'rw',
-	isa     => Int,
-	default => 0,
-	private => 1
-);
-
 my $clamp = sub {
 	my ($value, $low, $high) = @_;
 	return $low if $value < $low;
@@ -243,6 +211,19 @@ sub BUILD {
 	Carp::croak('Game::Snake::Terminal: the sleeper is a code reference')
 		unless ref $self->sleeper eq 'CODE';
 
+	$self->keyboard(Game::Terminal::Kit::Keys->new(
+		in => $self->in,
+		pending => $self->pending,
+		sleeper => $self->sleeper,
+		($self->keysource ? (keysource => $self->keysource) : ()),
+	)) unless $self->keyboard;
+	$self->screen(Game::Terminal::Kit::Screen->new(
+		out => $self->out,
+		interactive => $self->interactive,
+		colour => $self->ansi,
+		ascii => $self->ascii ? 1 : 0,
+	)) unless $self->screen;
+
 	unless ($self->game) {
 		my ($w, $h) = $self->_measure;
 		my $cols = defined $self->cols ? $self->cols
@@ -255,7 +236,7 @@ sub BUILD {
 		$self->game(Game::Snake->new(cols => $cols, rows => $rows, seed => $seed));
 	}
 
-	$self->ticker(Game::Snake::Ticker->new(clock => $self->clock)) unless $self->ticker;
+	$self->ticker(Game::Terminal::Kit::Ticker->new(clock => $self->clock)) unless $self->ticker;
 
 	return;
 }
@@ -273,36 +254,40 @@ sub interactive {
 	return -t $self->out ? 1 : 0;
 }
 
+sub _synced {
+	my ($self) = @_;
+	my $screen = $self->screen;
+	$screen->out($self->out);
+	$screen->interactive($self->interactive);
+	$screen->colour($self->ansi);
+	return $screen;
+}
+
+sub raw {
+	my ($self) = @_;
+	return $self->keyboard->raw;
+}
+
 sub keys_available {
 	my ($self) = @_;
-	return 1 if $self->keysource;
-	return 0 unless defined $self->in && -t $self->in;
-	return eval { require Term::ReadKey; 1 } ? 1 : 0;
+	return $self->keyboard->keys_available;
 }
 
 sub enter_raw {
 	my ($self) = @_;
-	return $self if $self->raw;
-	if ($self->keysource) {
-		$self->raw(1);
-		return $self;
-	}
-	return undef unless $self->keys_available;
-	return undef unless eval { Term::ReadKey::ReadMode(3, $self->in); 1 };
-	$self->raw(1);
-	return $self;
+	return $self->keyboard->enter_raw ? $self : undef;
 }
 
 sub leave_raw {
 	my ($self) = @_;
-	if ($self->_hid_cursor) {
-		$self->_print("\e[?25h");
-		$self->_hid_cursor(0);
-	}
-	return $self unless $self->raw;
-	eval { Term::ReadKey::ReadMode(0, $self->in) } unless $self->keysource;
-	$self->raw(0);
+	$self->screen->restore;
+	$self->keyboard->leave_raw;
 	return $self;
+}
+
+sub read_key {
+	my ($self, $wait) = @_;
+	return $self->keyboard->read_key($wait);
 }
 
 sub cannot_play {
@@ -314,8 +299,7 @@ sub _measure {
 	my ($self) = @_;
 	return ($self->width, $self->height) if defined $self->width;
 	return () if $self->keysource || !$self->interactive;
-	return () unless eval { require Term::ReadKey; 1 };
-	my ($w, $h) = eval { Term::ReadKey::GetTerminalSize($self->out) };
+	my ($w, $h) = $self->_synced->measured;
 	return $w ? ($w, $h) : ();
 }
 
@@ -331,76 +315,17 @@ sub too_narrow {
 		$w, ($h || 0), $game->cols, $game->rows, $need_w, $need_h;
 }
 
-sub _read_char {
-	my ($self, $wait) = @_;
-
-	my $pending = $self->pending;
-	return shift @$pending if @$pending;
-	return $self->keysource->($wait) if $self->keysource;
-
-	unless ($self->raw) {
-		$self->sleeper->($wait) if $wait;
-		return undef;
-	}
-
-	my $mode = !defined $wait ? 0 : $wait > 0 ? $wait : -1;
-	return Term::ReadKey::ReadKey($mode, $self->in);
-}
-
-sub read_key {
-	my ($self, $wait) = @_;
-	my $char = $self->_read_char($wait);
-	return undef unless defined $char;
-	return $CONTROL{$char} if $CONTROL{$char};
-	return $self->read_sequence if $char eq "\e";
-	return $char;
-}
-
-sub read_sequence {
-	my ($self) = @_;
-
-	my $opener = $self->_read_char($SEQUENCE_WAIT);
-	return 'escape' unless defined $opener;
-
-	unless ($opener eq '[' || $opener eq 'O') {
-		unshift @{ $self->pending }, $opener;
-		return 'escape';
-	}
-
-	my $tail = '';
-	while (CORE::length $tail < 8) {
-		my $char = $self->_read_char($SEQUENCE_WAIT);
-		last unless defined $char;
-		$tail .= $char;
-		last if $char =~ /[A-Za-z~]/;
-	}
-
-	return $SEQUENCE{$tail} || 'escape';
-}
-
 sub _glyphs { return $GLYPH{ $_[0]->ascii ? 'ascii' : 'wide' } }
 
 sub _paint {
 	my ($self, $text, $key) = @_;
-	return $text unless $self->ansi;
 	return $text unless defined $key && defined $SGR{$key};
-	return "\e[" . $SGR{$key} . 'm' . $text . "\e[0m";
+	return $self->_synced->paint($text, $SGR{$key});
 }
 
 sub _say {
 	my ($self, @lines) = @_;
-	my $out = $self->out;
-	print {$out} "$_\n" for @lines;
-	return;
-}
-
-sub _print {
-	my ($self, $text) = @_;
-	my $out = $self->out;
-	print {$out} $text;
-	my $was = select $out;
-	$| = 1;
-	select $was;
+	$self->_synced->say(@lines) if @lines;
 	return;
 }
 
@@ -468,20 +393,16 @@ sub _frame {
 	return if $self->quiet;
 	$self->frames($self->frames + 1);
 	my @lines = $self->frame_lines($note);
-	if ($self->interactive) {
-		$self->_print("\e[H" . join('', map { "$_\e[K\n" } @lines) . "\e[J");
-	}
-	else {
-		$self->_say(@lines, '');
-	}
+	my $screen = $self->_synced->flush_on;
+	$screen->show(\@lines);
+	$screen->say('') unless $self->interactive;
 	return;
 }
 
 sub _intro {
 	my ($self) = @_;
 	return unless $self->interactive && !$self->quiet;
-	$self->_print("\e[2J\e[?25l");
-	$self->_hid_cursor(1);
+	$self->_synced->flush_on->clear->hide_cursor;
 	return;
 }
 
@@ -621,6 +542,16 @@ my $sentence = sub {
 	return $why;
 };
 
+sub options {
+	return [
+		{ name => 'level', type => 'int', min => 1, max => 2, help => "the bot's level, for watch" },
+		{ name => 'watch', type => 'flag', help => 'watch the bot play' },
+		{ name => 'rows', type => 'int', min => 8, max => 28, help => 'the board; the default fits the window' },
+		{ name => 'cols', type => 'int', min => 8, max => 40, help => 'the board; the default fits the window' },
+		{ name => 'seed', type => 'str', help => 'the same seed and the same moves are the same game' },
+	];
+}
+
 sub run {
 	my ($class, @argv) = @_;
 
@@ -684,19 +615,7 @@ sub run {
 		return 2;
 	}
 
-	local @SIG{qw/ INT TERM HUP /};
-	for my $signal (qw/ INT TERM HUP /) {
-		$SIG{$signal} = sub {
-			$terminal->leave_raw;
-			$SIG{$signal} = 'DEFAULT';
-			kill $signal, $$;
-		};
-	}
-
-	my $result = eval { $terminal->start };
-	my $died = $@;
-	$terminal->leave_raw;
-	die $died if $died;
+	my $result = Game::Terminal::Kit::Run::guard(sub { $terminal->start }, $terminal);
 
 	return 0 if $result;
 	print STDERR 'snake: ' . $terminal->refusal . "\n" if CORE::length $terminal->refusal;
@@ -713,7 +632,7 @@ Game::Snake::Terminal - snake in a terminal
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =head1 SYNOPSIS
 
@@ -735,7 +654,7 @@ Every other terminal game of this author's waits for a key. This one ticks.
 The one wait in the loop is a timed read of the keyboard: a key ends it early
 and is acted on, and the deadline passing is the tick. A tick that is late
 fires once and the schedule restarts, so a stalled machine never hands the
-snake a burst of moves (L<Game::Snake::Ticker>).
+snake a burst of moves (L<Game::Terminal::Kit::Ticker>).
 
 The keys need L<Term::ReadKey>, which is recommended and not required.
 Without it, or without a terminal, the game cannot be played by hand and
@@ -777,7 +696,7 @@ Stop the game after that many ticks; 0, the default, plays to the end.
 
 =head2 game, ticker
 
-The L<Game::Snake> being played and its L<Game::Snake::Ticker>, built in
+The L<Game::Snake> being played and its L<Game::Terminal::Kit::Ticker>, built in
 C<new> unless given.
 
 =head2 keysource, clock, sleeper, width, height
@@ -787,10 +706,15 @@ that returns one character, or undefined when none came in time; C<clock>
 returns seconds; C<sleeper> is called with seconds to wait when there is
 nothing to read; C<width> and C<height> stand in for the window's size.
 
-=head2 raw, pending
+=head2 pending
 
-Whether the terminal is in cbreak mode, and the characters read ahead of an
-escape that turned out not to open a sequence.
+Characters to be read before any others, an array reference.
+
+=head2 keyboard, screen
+
+The L<Game::Terminal::Kit::Keys> the keys are read through and the
+L<Game::Terminal::Kit::Screen> the frames are drawn through, built in C<new>
+from the handles unless given.
 
 =head2 frames, refused, stopped, refusal
 
@@ -805,6 +729,39 @@ start.
 Plays the game and returns its L<Game::Snake::Result>, or undefined when it
 could not start (the window too narrow, or no way to read keys), with
 C<refusal> saying why. Never calls C<exit>.
+
+=head2 options
+
+    my $fields = Game::Snake::Terminal->options;
+
+The options a person would set before a game, in the order a launcher shows
+them. Each is a hash reference with a C<name>, a C<type> and a C<help>, and
+C<min> and C<max> or C<choices> where the type has them. A new list is
+returned each time.
+
+=over 4
+
+=item C<level>
+
+A whole number from 1 to 2: the bot's level, for watch.
+
+=item C<watch>
+
+A switch: watch the bot play.
+
+=item C<rows>
+
+A whole number from 8 to 28: the board; the default fits the window.
+
+=item C<cols>
+
+A whole number from 8 to 40: the board; the default fits the window.
+
+=item C<seed>
+
+Text: the same seed and the same moves are the same game.
+
+=back
 
 =head2 run
 
@@ -823,20 +780,18 @@ The sentence to print when the window cannot hold the board, or undefined.
 
 The sentence for a game with no way to read keys.
 
-=head2 keys_available, enter_raw, leave_raw
+=head2 keys_available, enter_raw, leave_raw, raw
 
-Whether keys can be read; entering and leaving cbreak mode.
+Whether keys can be read; reading a key at a time, giving the terminal back
+with its cursor, and whether a key at a time is how it is being read now.
 
 =head2 read_key
 
     my $key = $terminal->read_key($seconds);
 
 One key by name (C<up>, C<enter>, C<q>, ...) within the wait, or undefined.
-Undefined seconds block; zero polls.
-
-=head2 read_sequence
-
-Reads the rest of an escape sequence after its escape.
+Undefined seconds block; zero polls. The names are
+L<Game::Terminal::Kit::Keys>'s.
 
 =head2 board_lines, frame_lines, status_line, legend
 

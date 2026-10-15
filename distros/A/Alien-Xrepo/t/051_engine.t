@@ -183,6 +183,23 @@ subtest 'export writes the runtime snapshot' => sub {
     is $data->{packages}{zstd}{version},    '1.5.6',           'snapshot records runtime data';
     is $data->{packages}{zstd}{installdir}, '/tmp/store/zstd', 'snapshot records installdir';
 };
+subtest 'assert_installed fails a dist and drops a snapshot that records errors' => sub {
+    my $snap = path($dir)->child('failed.json');
+    my $spy  = Alien::Xrepo::Build::TestSpy->new( fail => { libsdl3 => 1 } );
+    my $b    = build( [ 'zstd', 'libsdl3' ], repo => $spy, probe_policy => 'off', snapshot => $snap );
+    $b->run;
+    ok -e $snap, 'a failed run still writes its snapshot';
+    like dies { $b->assert_installed }, qr/libsdl3/, 'assert_installed dies naming the failed package';
+    ok !-e $snap, 'the snapshot is dropped so the failure is not mistaken for fresh on the next run';
+};
+subtest 'assert_installed passes and keeps the snapshot when everything installed' => sub {
+    my $snap = path($dir)->child('clean.json');
+    my $spy  = Alien::Xrepo::Build::TestSpy->new;
+    my $b    = build( ['zstd'], repo => $spy, probe_policy => 'off', snapshot => $snap );
+    $b->run;
+    ok lives { $b->assert_installed }, 'no die when no package failed';
+    ok -e $snap,                       'a clean snapshot is left in place';
+};
 subtest 'checkpoint/resume skips completed work' => sub {
     my $cp  = path($dir)->child('state.json');
     my $spy = Alien::Xrepo::Build::TestSpy->new;

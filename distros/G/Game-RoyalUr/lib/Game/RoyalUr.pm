@@ -16,7 +16,7 @@ use Game::RoyalUr::Notation ();
 use Game::RoyalUr::Error;
 use Game::RoyalUr::Result;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 my $E = 'Game::RoyalUr::Engine';
 my $X = 'Game::RoyalUr::Error';
@@ -352,6 +352,7 @@ sub to_record {
     my %record = (
         rules => (defined $variant->name ? $variant->name : $variant->as_hash),
         first => $self->_first,
+        (defined $self->_position_given ? (position => $self->_position_given) : ()),
         turns => [ map { {
             side => $_->{side}, roll => $_->{roll}, move => $_->{move},
             (defined $_->{faces} ? (faces => $_->{faces}) : ()),
@@ -385,6 +386,7 @@ sub replay {
         $game = $class->new(
             seed  => pack('H*', $record->{seed}),
             rules => $rules,
+            (defined $record->{position} ? (position => $record->{position}) : ()),
             ($opening ? () : (first => $record->{first})),
         );
         return $bad->(ply => 0, why => 'opening')
@@ -394,6 +396,7 @@ sub replay {
         $game = $class->new(
             script => [ map { { roll => $_->{roll}, faces => $_->{faces} } } @turns ],
             rules  => $rules,
+            (defined $record->{position} ? (position => $record->{position}) : ()),
             first  => $record->{first},
         );
     }
@@ -432,6 +435,21 @@ sub replay {
     return ($game, undef);
 }
 
+sub to_text { $_[0]->to_record }
+
+sub from_text {
+    my ($class, $text) = @_;
+    Carp::croak('Game::RoyalUr: from_text wants the text to_text wrote, and was given '
+        . (defined $text ? 'a reference' : 'nothing'))
+        if !defined $text || ref $text;
+    my ($game, $error) = $class->replay($text);
+    return $game if $game;
+    my $detail = $error->detail;
+    my $where = $detail->{line} ? " at line $detail->{line}" : defined $detail->{line} ? '' : ' at turn ' . (($detail->{ply} // 0) + 1);
+    Carp::croak('Game::RoyalUr: the text was refused' . $where . ': ' . $error->message
+        . (defined $detail->{why} ? " ($detail->{why})" : ''));
+}
+
 1;
 
 __END__
@@ -442,7 +460,7 @@ Game::RoyalUr - the Royal Game of Ur
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 
@@ -854,6 +872,30 @@ such a game can be read but not played on, because nobody can say what would
 have been rolled next.
 
 C<rules> replays the record under another rule set than its own.
+
+=head2 to_text
+
+    my $text = $game->to_text;
+
+The game as a string that L</from_text> builds the same game from: its
+record, as L</to_record> writes it. Everything the game plays on from is in
+it: the rules, who moved first, the position it started from when it was not
+the empty board, the seed, the opening throws, every turn with its dice, and
+a resignation. A game is never between a roll and a move as far as the text
+is concerned: the roll waiting for the side to move is the seed's next throw,
+and is thrown again when the text is read.
+
+=head2 from_text
+
+    my $game = Game::RoyalUr->from_text($text);
+
+A new game built from the text L</to_text> wrote, by replaying it, with the
+same position, the same side to move, the same roll waiting and the same dice
+to come. It shares nothing with the game the text came from, and its
+C<to_text> is the same text.
+
+B<Croaks> with the line or the turn at which the text stopped describing a
+game, and why.
 
 =head1 SEE ALSO
 

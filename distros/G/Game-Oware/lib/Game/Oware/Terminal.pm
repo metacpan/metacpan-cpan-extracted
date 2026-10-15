@@ -13,9 +13,15 @@ use Game::Oware::Notation;
 use Game::Oware::Rules;
 use Game::Oware::Scoring;
 use Game::Oware::Variant ();
+use Game::Terminal::Kit::History;
+use Game::Terminal::Kit::Keys;
+use Game::Terminal::Kit::Log;
+use Game::Terminal::Kit::Picker;
+use Game::Terminal::Kit::Run;
+use Game::Terminal::Kit::Screen;
 use Getopt::Long ();
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 # The glyph tables. NOTE: this file is NOT under `use utf8`, so the wide
 # glyphs are byte strings and `length` on anything built from them is a byte
@@ -63,33 +69,14 @@ my %SGR = (
 
 my @TIMES = ('', 'once', 'twice', 'for the third time', 'for the fourth time');
 
-# Term::ReadKey hands over one character at a time and leaves an escape
-# sequence as the characters it is made of, so the arrow keys are named here.
-# Same tables as Game::Checkers::Terminal, on purpose: two of this author's
-# terminals reading the same keyboard should not disagree about what Home is.
-my %SEQUENCE = (
-	'A'  => 'up',
-	'B'  => 'down',
-	'C'  => 'right',
-	'D'  => 'left',
-	'H'  => 'home',
-	'F'  => 'end',
-	'1~' => 'home',
-	'4~' => 'end',
-	'5~' => 'page_up',
-	'6~' => 'page_down',
-	'7~' => 'home',
-	'8~' => 'end',
-);
-
-my %CONTROL = (
-	"\r"   => 'enter',
-	"\n"   => 'enter',
-	"\t"   => 'tab',
-	"\x7f" => 'backspace',
-	"\x08" => 'backspace',
-	"\x03" => 'interrupt',
-	"\x04" => 'eof',
+my %KEY = (
+	(map { $_ => $_ } 'A' .. 'F', 'a' .. 'f'),
+	'v' => 'live',
+	'?' => 'help',
+	't' => 'type',
+	':' => 'command',
+	'u' => 'undo',
+	'r' => 'redo',
 );
 
 has in => (
@@ -150,19 +137,17 @@ has bot => (
 	isa => Object
 );
 
-has raw => (
-	is      => 'rw',
-	isa     => Int,
-	default => 0
-);
-
 has keysource => (is => 'rw');
 
-has recent => (
-	is      => 'rw',
-	isa     => ArrayRef,
-	default => []
-);
+has keyboard => (is => 'rw');
+
+has screen => (is => 'rw');
+
+has log => (is => 'rw');
+
+has last_move => (is => 'rw');
+
+has history => (is => 'rw');
 
 has pending => (
 	is      => 'rw',
@@ -214,12 +199,33 @@ sub BUILD {
 		seed  => $self->seed . ':bot',
 	)) unless $self->bot;
 
+	$self->keyboard(Game::Terminal::Kit::Keys->new(
+		in      => $self->in,
+		pending => $self->pending,
+		($self->keysource ? (keysource => $self->keysource) : ()),
+	)) unless $self->keyboard;
+
+	$self->screen(Game::Terminal::Kit::Screen->new(
+		out         => $self->out,
+		interactive => $self->interactive,
+		colour      => $self->ansi,
+		ascii       => $self->ascii,
+	)) unless $self->screen;
+
+	$self->log(Game::Terminal::Kit::Log->new(keep => 2)) unless $self->log;
+
+	$self->history(Game::Terminal::Kit::History->new(
+		save => sub { $_[0]->to_text },
+		load => sub { Game::Oware->from_text($_[0]) },
+	)) unless $self->history;
+	$self->history->start($self->game);
+
 	return $self;
 }
 
 sub ansi {
 	my ($self) = @_;
-	return 0 if defined $ENV{NO_COLOR} && length $ENV{NO_COLOR};
+	return 0 if Game::Terminal::Kit::Screen::no_colour();
 	return $self->_wants_ansi ? 1 : 0 if defined $self->_wants_ansi;
 	return -t $self->out ? 1 : 0;
 }
@@ -249,87 +255,30 @@ sub picking {
 	return $self->keys_available;
 }
 
+sub raw {
+	my ($self) = @_;
+	return $self->keyboard->raw ? 1 : 0;
+}
+
 sub keys_available {
 	my ($self) = @_;
-	return 1 if $self->keysource;
-	return 0 unless defined $self->in && -t $self->in;
-	return eval { require Term::ReadKey; 1 } ? 1 : 0;
+	return $self->_synced_keyboard->keys_available;
 }
 
 sub enter_raw {
 	my ($self) = @_;
-	return $self if $self->raw;
-
-	if ($self->keysource) {
-		$self->raw(1);
-		return $self;
-	}
-
-	return undef unless $self->keys_available;
-
-	# cbreak rather than raw, so an interrupt stays an interrupt instead of
-	# becoming a key this loop has to know about.
-	return undef unless eval { Term::ReadKey::ReadMode(3, $self->in); 1 };
-
-	$self->raw(1);
-	return $self;
+	return $self->_synced_keyboard->enter_raw ? $self : undef;
 }
 
 sub leave_raw {
 	my ($self) = @_;
-	return $self unless $self->raw;
-	eval { Term::ReadKey::ReadMode(0, $self->in) } unless $self->keysource;
-	$self->raw(0);
+	$self->keyboard->leave_raw;
 	return $self;
-}
-
-sub read_char {
-	my ($self, $wait) = @_;
-
-	my $pending = $self->pending;
-	return shift @$pending if @$pending;
-	return $self->keysource->($wait) if $self->keysource;
-
-	my $char = Term::ReadKey::ReadKey($wait ? 0 : -1, $self->in);
-	return $char if defined $char || $wait;
-
-	# Nothing there yet, and the rest of an escape sequence is worth one short
-	# wait before the escape is taken for the key of that name.
-	select undef, undef, undef, 0.05;
-	return Term::ReadKey::ReadKey(-1, $self->in);
 }
 
 sub read_key {
 	my ($self) = @_;
-	my $char = $self->read_char(1);
-	return undef unless defined $char;
-	return $CONTROL{$char} if $CONTROL{$char};
-	return $self->read_sequence if $char eq "\e";
-	return $char;
-}
-
-sub read_sequence {
-	my ($self) = @_;
-
-	my $opener = $self->read_char(0);
-	return 'escape' unless defined $opener;
-
-	# A pressed escape key that happens to be followed by a real keystroke must
-	# not eat it, so what is not the opening of a sequence goes back.
-	unless ($opener eq '[' || $opener eq 'O') {
-		unshift @{ $self->pending }, $opener;
-		return 'escape';
-	}
-
-	my $tail = '';
-	while (length $tail < 8) {
-		my $char = $self->read_char(0);
-		last unless defined $char;
-		$tail .= $char;
-		last if $char =~ /[A-Za-z~]/;
-	}
-
-	return $SEQUENCE{$tail} || 'escape';
+	return $self->_synced_keyboard->read_key;
 }
 
 sub rows_for {
@@ -438,27 +387,36 @@ sub describe {
 	return join ', ', @note;
 }
 
-sub choice_lines {
+sub picker {
 	my ($self, $legal, $at) = @_;
 
-	my @lines;
-	for my $index (0 .. $#$legal) {
-		my $line = Game::Oware::Notation->letter_of($legal->[$index])
-			. '  ' . $self->describe($legal->[$index]);
-		$line =~ s/\s+\z//;
-		push @lines, $index == $at
-			? '  ' . $self->_paint("> $line", 'cursor')
-			: "    $line";
-	}
+	my @items = map { +{
+		label => Game::Oware::Notation->letter_of($_),
+		about => $self->describe($_),
+		value => $_,
+	} } @$legal;
 
-	return @lines;
+	return Game::Terminal::Kit::Picker->new(
+		items     => \@items,
+		window    => 0,
+		game_keys => { %KEY },
+		log       => $self->log,
+		screen    => $self->_synced_screen,
+		(defined $at ? (at => $at) : ()),
+	);
+}
+
+sub choice_lines {
+	my ($self, $legal, $at) = @_;
+	return $self->picker($legal, $at)->rows;
 }
 
 sub legend {
 	my ($self) = @_;
 	return (
 		'arrows to choose, enter to sow, a letter to jump to that house',
-		'v for the board as it stands, ? for the rules, t to type, q to quit',
+		'v for the board as it stands, u to undo, r to redo, ? for the rules,',
+		't to type, q to quit',
 	);
 }
 
@@ -477,70 +435,67 @@ sub pick {
 		return $self->_typed_turn;
 	}
 
-	my $at = 0;
+	my $picker = $self->picker(\@legal);
+	my $log = $self->log;
 	my $live = 0;
-	my @notice;
 
 	while (1) {
-		$self->_show_choice(\@legal, $at, \@notice, $live);
-		@notice = ();
+		$self->_show_choice($picker, $live);
 
-		my $key = $self->read_key;
+		my ($event, $value) = $picker->step($self->read_key);
 
-		if (!defined $key || $key eq 'eof' || $key eq 'interrupt' || $key eq 'q') {
+		if ($event eq 'quit') {
 			$self->leave_raw;
 			return 0;
 		}
 
-		if ($key eq 'up' || $key eq 'left') {
-			$at = ($at - 1) % @legal;
-			next;
-		}
-		if ($key eq 'down' || $key eq 'right' || $key eq 'tab') {
-			$at = ($at + 1) % @legal;
-			next;
-		}
-		if ($key eq 'home' || $key eq 'page_up') { $at = 0;       next }
-		if ($key eq 'end'  || $key eq 'page_down') { $at = $#legal; next }
-
-		if ($key eq 'enter' || $key eq ' ') {
+		if ($event eq 'chosen') {
 			$self->leave_raw;
-			my $move = $game->play($seat, $legal[$at]);
+			my $move = $game->play($seat, $value);
 			$self->_after_ply($move, $seat);
 			return 1;
 		}
 
-		if ($key =~ /\A[1-9]\z/ && $key <= @legal) {
-			$at = $key - 1;
+		if ($event eq 'key' && ($value eq 'undo' || $value eq 'redo')) {
+			next unless $value eq 'undo' ? $self->take_back : $self->play_again;
+			$self->leave_raw;
+			return 1;
+		}
+
+		if ($event eq 'back') {
+			$log->note('That key does nothing here. Press ? for the ones that do.');
 			next;
 		}
 
+		next unless $event eq 'key';
+
 		# Not `b`, which is a house. See `command`.
-		if ($key eq 'v') {
+		if ($value eq 'live') {
 			$live = !$live;
 			next;
+		}
+
+		if ($value eq 'help') {
+			$log->note(map { length $_ ? $_ : ' ' } $self->_help_lines);
+			next;
+		}
+
+		if ($value eq 'type' || $value eq 'command') {
+			$self->leave_raw;
+			$self->picking(0) if $value eq 'type';
+			return $self->_typed_turn;
 		}
 
 		# A HOUSE LETTER IS STILL THE INTERFACE. The letters are printed on the
 		# board and against every option, so typing one has to land on it, and
 		# typing one that is not on the list has to say why it is not.
-		my $house = eval { Game::Oware::Notation->index_of($key) };
-		if (defined $house) {
-			my ($found) = grep { $legal[$_] == $house } 0 .. $#legal;
-			if (defined $found) { $at = $found; next }
-			@notice = (ucfirst($self->_why_not($house, $seat)) . '.');
+		my $house = Game::Oware::Notation->index_of($value);
+		my ($found) = grep { $legal[$_] == $house } 0 .. $#legal;
+		if (defined $found) {
+			$picker->jump($found);
 			next;
 		}
-
-		if ($key eq '?') { @notice = $self->_help_lines; next }
-
-		if ($key eq 't' || $key eq ':') {
-			$self->leave_raw;
-			$self->picking(0) if $key eq 't';
-			return $self->_typed_turn;
-		}
-
-		@notice = ('That key does nothing here. Press ? for the ones that do.');
+		$log->note(ucfirst($self->_why_not($house, $seat)) . '.');
 	}
 }
 
@@ -561,14 +516,15 @@ sub start {
 
 	$self->_intro unless $self->quiet;
 
-	my $game = $self->game;
+	$self->history->start($self->game);
 	$self->_show unless $self->picking;
 
-	while ($game->status eq 'active') {
-		my ($turn) = $game->waiting_on;
+	while ($self->game->status eq 'active') {
+		my ($turn) = $self->game->waiting_on;
 		last unless defined $turn;
 
 		if ($turn eq $self->seat) {
+			$self->person_turn;
 			last unless $self->_human_turn;
 		}
 		else {
@@ -576,9 +532,59 @@ sub start {
 		}
 	}
 
+	$self->person_turn if $self->game->status ne 'active';
 	$self->_finish;
 
-	return $game->result;
+	return $self->game->result;
+}
+
+sub person_turn {
+	my ($self) = @_;
+	$self->history->turn($self->game);
+	return $self;
+}
+
+sub take_back {
+	my ($self) = @_;
+	my $game = $self->history->undo;
+	unless ($game) {
+		$self->notify('There is nothing to take back.');
+		return 0;
+	}
+	$self->swap($game);
+	$self->notify('Taken back.');
+	return 1;
+}
+
+sub play_again {
+	my ($self) = @_;
+	my $game = $self->history->redo;
+	unless ($game) {
+		$self->notify('There is nothing to play again.');
+		return 0;
+	}
+	$self->swap($game);
+	$self->notify('Played again.');
+	return 1;
+}
+
+sub swap {
+	my ($self, $game) = @_;
+	$self->game($game);
+	$self->last_move(undef);
+	$self->log->forget;
+	return $self;
+}
+
+sub notify {
+	my ($self, $line) = @_;
+	if ($self->raw) {
+		$self->log->note($line);
+	}
+	else {
+		$self->_say('', $line);
+	}
+	return $self;
 }
 
 sub command {
@@ -593,16 +599,35 @@ sub command {
 	return 'board' if $line =~ /\Aboard\z/i;
 	return 'pick' if $line =~ /\Apick\z/i;
 	return 'type' if $line =~ /\Atype\z/i;
+	return 'undo' if $line =~ /\Aundo\z/i;
+	return 'redo' if $line =~ /\Aredo\z/i;
 
 	return $line;
 }
 
 sub _glyphs { return $GLYPH{ $_[0]->ascii ? 'ascii' : 'wide' } }
 
+sub _synced_keyboard {
+	my ($self) = @_;
+	my $keyboard = $self->keyboard;
+	$keyboard->in($self->in);
+	$keyboard->keysource($self->keysource);
+	$keyboard->pending($self->pending);
+	return $keyboard;
+}
+
+sub _synced_screen {
+	my ($self) = @_;
+	my $screen = $self->screen;
+	$screen->out($self->out);
+	$screen->interactive($self->interactive);
+	$screen->colour($self->ansi);
+	return $screen;
+}
+
 sub _say {
 	my ($self, @lines) = @_;
-	my $out = $self->out;
-	print {$out} "$_\n" for @lines;
+	$self->_synced_screen->say(@lines) if @lines;
 	return;
 }
 
@@ -612,9 +637,7 @@ sub _print {
 	my ($self, $text) = @_;
 	my $out = $self->out;
 	print {$out} $text;
-	my $was = select $out;
-	$| = 1;
-	select $was;
+	$self->_synced_screen->flush_on;
 	return;
 }
 
@@ -623,10 +646,11 @@ sub _print {
 # with no key at all takes the default.
 sub _paint {
 	my ($self, $text, $key) = @_;
-	return $text unless $self->ansi;
 	$key = 'prompt' if @_ < 3;
-	return $text unless defined $key && defined $SGR{$key};
-	return "\e[" . $SGR{$key} . 'm' . $text . "\e[0m";
+	return $text unless defined $key;
+	my $screen = $self->screen;
+	$screen->colour($self->ansi);
+	return $screen->paint($text, $SGR{$key});
 }
 
 sub _letters {
@@ -807,34 +831,20 @@ sub _human_turn {
 	return $self->picking ? $self->pick : $self->_typed_turn;
 }
 
-# The picker redraws the whole screen on every keystroke, so it clears first;
-# scrolling six options past a nine line board is unreadable. Nothing here is
-# an escape the renderer owns, so it is gated on being interactive rather than
-# on `ansi`: a player with NO_COLOR set still wants a usable picker.
-sub _clear {
-	my ($self) = @_;
-	return unless $self->interactive;
-	$self->_print("\e[2J\e[H");
-	return;
-}
-
 sub _show_choice {
-	my ($self, $legal, $at, $notice, $live) = @_;
+	my ($self, $picker, $live) = @_;
 
 	my $game = $self->game;
 	my $seat = $self->seat;
+	my $log  = $self->log;
 
-	$self->_clear;
-
-	# THE ROUND SO FAR, every frame. The picker clears the screen on every
+	# THE ROUND SO FAR, every frame. The picker redraws the screen on every
 	# keystroke, so the narration printed when a move was played has already
 	# gone by the time there is anything to choose. Both plies, not just the
 	# opponent's: a player who cannot see their own capture, or what it was
 	# answered with, is choosing in the dark.
-	my $recent = $self->recent;
-	$self->_say($self->_narrate_lines($_->{move}, $_->{seat}, 1))
-		for @$recent;
-	$self->_say('') if @$recent;
+	my @lines = map { @$_ } @{ $log->recent };
+	push @lines, '' if @lines;
 
 	# THE BOARD DRAWN HERE IS THE ONE THE MOVE WOULD PRODUCE, not the one on
 	# the table with a path drawn over it. The first version did the latter,
@@ -849,34 +859,39 @@ sub _show_choice {
 	my ($board, $marks, $title);
 	if ($live) {
 		$board = $game->board;
-		$marks = @$recent ? $self->marks_for($recent->[-1]{move}) : {};
+		$marks = $self->marks_for($self->last_move);
 		$title = '    as it stands:';
 	}
 	else {
+		my $house = $picker->current;
 		my $move;
-		($board, $move) = $self->preview($legal->[$at]);
+		($board, $move) = $self->preview($house);
 		$marks = $self->marks_for($move);
 		$title = '    if you sow '
-			. Game::Oware::Notation->letter_of($legal->[$at]) . ':';
+			. Game::Oware::Notation->letter_of($house) . ':';
 	}
 
-	$self->_say(
+	push @lines,
 		$title,
 		$self->board_text($board, $seat, $marks),
 		$self->status_text($board),
-		'',
-	);
+		'';
 
 	# The list holds only legal moves, so a player looking for a house the
 	# feeding rule took away has nothing to read. Say it where the list is.
 	my @sowable = Game::Oware::Rules->sowable($game->board, $seat);
-	$self->_say(Game::Oware::Board->other($seat) . ' has no seeds, so only a'
-		. ' house that reaches them can be played:', '')
-		if @sowable > @$legal;
+	push @lines, Game::Oware::Board->other($seat) . ' has no seeds, so only a'
+		. ' house that reaches them can be played:', ''
+		if @sowable > @{ $picker->items };
 
-	$self->_say($self->choice_lines($legal, $at));
-	$self->_say('', @$notice) if @$notice;
-	$self->_say('', map { $self->_paint($_, 'frame') } $self->legend);
+	push @lines, $picker->rows;
+
+	my @notes = @{ $log->notes };
+	push @lines, '', @notes if @notes;
+	push @lines, '', map { $self->_paint($_, 'frame') } $self->legend;
+
+	$self->_synced_screen->flush_on->show(\@lines);
+	$log->shown;
 
 	return;
 }
@@ -894,7 +909,6 @@ sub _typed_turn {
 
 	my $game = $self->game;
 	my $seat = $self->seat;
-	my $in   = $self->in;
 
 	my $legal = $self->_prompt_for($seat);
 
@@ -903,9 +917,9 @@ sub _typed_turn {
 		# terminal the echoed Return supplies one; on a pipe it does not, and
 		# the first version of this loop printed every refusal, every help
 		# screen and every redrawn board onto the prompt's own line.
-		$self->_print("\n" . $self->_paint('your move', 'prompt') . " [$legal] > ");
-
-		my $line = <$in>;
+		my $line = $self->_synced_keyboard->read_line(
+			"\n" . $self->_paint('your move', 'prompt') . " [$legal] > ",
+			$self->out);
 		my $command = $self->command($line);
 
 		return 0 if $command eq 'quit';
@@ -914,6 +928,12 @@ sub _typed_turn {
 		if ($command eq 'again') { next }
 		if ($command eq 'board') { $self->_show; next }
 		if ($command eq 'type')  { $self->picking(0); next }
+
+		if ($command eq 'undo' || $command eq 'redo') {
+			next unless $command eq 'undo' ? $self->take_back : $self->play_again;
+			$self->_show unless $self->picking;
+			return 1;
+		}
 
 		if ($command eq 'pick') {
 			$self->picking(1);
@@ -986,13 +1006,12 @@ sub _thought {
 sub _after_ply {
 	my ($self, $move, $seat) = @_;
 
-	# Recorded whether or not it is printed. The picker clears the screen on
+	# Recorded whether or not it is printed. The picker redraws the screen on
 	# every keystroke, so this is the only surviving copy of the round, and a
 	# player who cannot see their own capture or the reply to it is choosing
 	# in the dark.
-	my $recent = $self->recent;
-	push @$recent, { move => $move, seat => $seat };
-	shift @$recent while @$recent > 2;
+	$self->last_move($move);
+	$self->log->record($self->_narrate_lines($move, $seat, 1));
 
 	return if $self->quiet;
 	return if $self->picking && $self->game->status eq 'active';
@@ -1118,9 +1137,10 @@ Usage: oware [options]
 On a terminal the legal moves are listed under the board and chosen with the
 arrow keys: the board above the list is the one the move under the cursor
 would produce, so a capture is seen before it is played. Enter sows it, a
-house letter jumps to that house, t goes back to typing and ? prints the
-rules. Needs Term::ReadKey; without it, or off a terminal, the moves are
-typed out as a letter at a time.
+house letter jumps to that house, u takes back your last move and the reply,
+r plays them again, t goes back to typing and ? prints the rules. Needs
+Term::ReadKey; without it, or off a terminal, the moves are typed out as a
+letter at a time, and undo and redo are typed too.
 
 The board marks what the last move did: - emptied, + gained a seed, * where
 the last seed landed, x captured, ! capture forfeited. Those are characters
@@ -1132,6 +1152,15 @@ machine plays the same game as an idle one.
 
 Exit status is 0 if you won or drew, 1 if you lost, 2 for a bad option.
 USAGE
+}
+
+sub options {
+	return [
+		{ name => 'level', type => 'int', min => 1, max => 5, help => 'bot level' },
+		{ name => 'seat', type => 'enum', choices => [qw(p1 p2)], help => 'the seat you play' },
+		{ name => 'variant', type => 'enum', choices => [qw(abapa awari)], help => 'the rules' },
+		{ name => 'seed', type => 'str', help => 'so a game can be replayed' },
+	];
 }
 
 sub run {
@@ -1193,15 +1222,8 @@ sub _run {
 		return 2;
 	}
 
-	local @SIG{qw(INT TERM HUP)};
-	for my $sig (qw(INT TERM HUP)) {
-		$SIG{$sig} = sub { $terminal->leave_raw; $SIG{$sig} = 'DEFAULT'; kill $sig, $$ };
-	}
-
-	my $result = eval { $terminal->start };
-	my $died = $@;
-	$terminal->leave_raw;
-	die $died if $died;
+	my $result = Game::Terminal::Kit::Run::guard(
+		sub { $terminal->start }, $terminal->keyboard, $terminal->screen);
 
 	return 0 unless $result;
 	return 0 if !defined $result->winner;
@@ -1219,7 +1241,7 @@ Game::Oware::Terminal - a playable game on two filehandles
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 
@@ -1310,13 +1332,15 @@ bug, and here it is visible in the cell rather than only in a sentence.
 On a terminal with L<Term::ReadKey> installed, the legal moves are listed under
 the board and the up and down keys walk them. Return sows the one under the
 cursor, a house letter jumps to that house, C<v> shows the position as it
-stands, C<?> prints the rules, C<t> goes back to typing and C<q> stops. Off a
+stands, C<u> takes back your last move and the reply to it, C<r> plays them
+again, C<?> prints the rules, C<t> goes back to typing and C<q> stops. Off a
 terminal, or without L<Term::ReadKey>, the moves are typed out as before, and
 C<--no-pick> asks for that on purpose.
 
-The same key tables as L<Game::Checkers::Terminal>, deliberately: two of this
-author's terminals reading the same keyboard should not disagree about what
-Home is.
+The keys are read by L<Game::Terminal::Kit::Keys> and the list is a
+L<Game::Terminal::Kit::Picker>, the same as in this author's other terminal
+games, so that two of them reading the same keyboard do not disagree about what
+Home is. The rows are numbered and a digit jumps to that row.
 
 B<The board above the list is the position the move would produce.> That is
 where this parts company with the Checkers picker, which highlights the squares
@@ -1441,15 +1465,10 @@ is how the suite starts from a constructed position.
 
 The L<Game::Oware::Bot> playing the other seat.
 
-=head2 raw
-
-Whether the terminal is currently in cbreak mode. Set by L</enter_raw> and
-cleared by L</leave_raw>.
-
 =head2 keysource
 
-A coderef taking a wait flag and returning one character, used in place of
-L<Term::ReadKey>:
+A coderef called for each character and returning it, or C<undef> for none,
+used in place of L<Term::ReadKey>:
 
     $terminal->keysource(sub { shift @character });
 
@@ -1462,11 +1481,37 @@ tested, it gets asserted about in POD.
 Characters read and given back, which is how an escape that turns out not to
 open a sequence does not eat the keystroke behind it.
 
-=head2 recent
+=head2 keyboard
 
-The last two plies, as C<< { move, seat } >> hashrefs, oldest first. Recorded
-whether or not they were narrated: the picker clears the screen on every
-keystroke, so this is the only surviving copy of the round.
+The L<Game::Terminal::Kit::Keys> the keys and the typed lines are read through,
+built from L</in>, L</keysource> and L</pending> unless one is given, and kept
+in step with those three when they are set later.
+
+=head2 screen
+
+The L<Game::Terminal::Kit::Screen> the game is printed through, built from
+L</out>, L</interactive>, L</ansi> and L</ascii> unless one is given, and kept
+in step with the first three.
+
+=head2 log
+
+A L<Game::Terminal::Kit::Log> holding the last two plies, oldest first, each as
+the lines that narrate it in the past tense, and whatever the picker has to say
+under the list: the rules, a house that cannot be played, a key that did
+nothing. A ply is recorded whether or not it was narrated: the picker redraws
+the screen on every keystroke, so this is the only surviving copy of the round.
+
+=head2 last_move
+
+The L<Game::Oware::Move> played last, by either seat. Its marks are the ones
+C<v> puts on the board as it stands. Undef after a take back or a play again.
+
+=head2 history
+
+The L<Game::Terminal::Kit::History> the turns are kept in, as the game's
+text. A turn is kept each time the move passes to you, and when the game ends;
+the bot's opening, when it moves first, is never a turn to take back.
+L</start> begins it again.
 
 =head1 METHODS
 
@@ -1490,7 +1535,8 @@ run and not a plain one, which is exactly the difference the suite forbids.
 =head2 interactive
 
 Whether C<out> is something a player is looking at. An explicit C<interactive>
-option beats the tty check. It gates the screen clearing and, by default,
+option beats the tty check. It gates drawing a frame over the last one and, by
+default,
 L</progress>.
 
 =head2 picking
@@ -1505,38 +1551,29 @@ it off outright, there being no board to put a cursor on.
 Whether there is anything to read keys with: true when L</keysource> is set, or
 when C<in> is a terminal and L<Term::ReadKey> can be loaded.
 
+=head2 raw
+
+Whether the terminal is being read a key at a time: true between L</enter_raw>
+and L</leave_raw>.
+
 =head2 enter_raw
 
-Puts the terminal into cbreak and returns the object, or C<undef> if it cannot.
-
-B<cbreak rather than raw>, so an interrupt stays an interrupt rather than
-becoming a key this module has to know about.
+Starts reading the terminal a key at a time and returns the object, or C<undef>
+if it cannot. An interrupt stays an interrupt rather than becoming a key.
 
 =head2 leave_raw
 
-Puts it back. F<bin/oware> calls this from a signal handler and after an C<eval>
-around the game, because a program that dies in cbreak leaves the shell it came
-from with no echo.
-
-=head2 read_char
-
-One character: whatever L</pending> is holding, else L</keysource> if it is set,
-else L<Term::ReadKey>. With a false argument it does not block, and returns
-C<undef> when there is nothing there.
+Puts it back. L</run> does this on every way out, a signal included, because a
+program that dies while reading a key at a time leaves the shell it came from
+with no echo.
 
 =head2 read_key
 
-One keystroke, as a name. A character comes back as itself; an escape sequence
-comes back as C<up>, C<down>, C<home> and so on, and a control character as
-C<enter>, C<tab>, C<backspace>, C<interrupt> or C<eof>. So a name is always
-longer than one character and a key never collides with one.
-
-=head2 read_sequence
-
-The tail of an escape sequence, called once the escape has been read. An opener
-that turns out not to belong to a sequence is put back on L</pending> rather
-than lost, because the escape key and the first byte of an arrow key are the
-same byte.
+One keystroke, as L<Game::Terminal::Kit::Keys/read_key> names it. A character
+comes back as itself; an escape sequence comes back as C<up>, C<down>, C<home>
+and so on, and a control character as C<enter>, C<tab>, C<backspace>,
+C<interrupt> or C<eof>. So a name is always longer than one character and a key
+never collides with one.
 
 =head2 pick
 
@@ -1557,10 +1594,22 @@ played. The board is a new fourteen cells and the game is untouched.
 One line on what sowing a house would do: how many seeds, whether it laps the
 board, what it captures, and whether the capture would be forfeited.
 
+=head2 picker
+
+    my $picker = $terminal->picker($legal, $at);
+
+The L<Game::Terminal::Kit::Picker> for a list of houses: a row for each with
+its letter and what sowing it would do, the cursor on the first or on the index
+given. Not windowed, because six is the most there can ever be. The house
+letters, C<v>, C<u>, C<r>, C<?>, C<t> and C<:> are keys it hands back to the
+game.
+
 =head2 choice_lines
 
-The option list, one line per legal move, with the one under the cursor marked.
-Not windowed, because six is the most there can ever be.
+    my @lines = $terminal->choice_lines($legal, $at);
+
+The option list, one numbered line per legal move, with the one under the
+cursor marked.
 
 =head2 legend
 
@@ -1598,12 +1647,43 @@ Takes a game or a board, for the same reason.
 =head2 command
 
 One line of input as an instruction: C<quit>, C<help>, C<board>, C<pick>,
-C<type>, C<again> for an empty line, or the text itself.
+C<type>, C<undo>, C<redo>, C<again> for an empty line, or the text itself.
+C<undo> takes back your last move and the reply to it, and C<redo> plays them
+again.
 
 B<There is no single-letter shortcut for C<board>.> C<b> and C<B> are houses,
 and the first draft of this module accepted C<b> as the command, so typing a
 perfectly ordinary move redrew the board instead of playing it. C<q> and C<h>
 are safe because no house is called either.
+
+=head2 options
+
+    my $fields = Game::Oware::Terminal->options;
+
+The options a person would set before a game, in the order a launcher shows
+them. Each is a hash reference with a C<name>, a C<type> and a C<help>, and
+C<min> and C<max> or C<choices> where the type has them. A new list is
+returned each time.
+
+=over 4
+
+=item C<level>
+
+A whole number from 1 to 5: bot level.
+
+=item C<seat>
+
+One of C<p1>, C<p2>: the seat you play.
+
+=item C<variant>
+
+One of C<abapa>, C<awari>: the rules.
+
+=item C<seed>
+
+Text: so a game can be replayed.
+
+=back
 
 =head2 run
 
@@ -1616,8 +1696,8 @@ C<2> for a bad option, a leftover word or a refused value, with the reason on
 C<STDERR>. C<--help> and C<--version> print to C<STDOUT> and return C<0>.
 Options are read from the arguments passed in, never from C<@ARGV>, and the
 Getopt configuration the parse needs is restored before it returns. Signal
-handlers are local to the call and the terminal is left in cooked mode on every
-way out, so a launcher such as L<Game::Terminal> can call it in its own process
+handlers are local to the call and the terminal is given back on every way
+out, so a launcher such as L<Game::Terminal> can call it in its own process
 and carry on afterwards. Colour is off under C<NO_COLOR> as well as off a
 terminal.
 
@@ -1625,6 +1705,35 @@ terminal.
 
 Plays the game and returns its L<Game::Oware::Result>, or C<undef> if the player
 quit.
+
+=head2 person_turn
+
+Called by L</start> when the turn passes to you, and when the game ends: keeps
+the game in L</history> as a turn.
+
+=head2 take_back
+
+The C<undo> command and the C<u> key: your last move and every reply to it.
+Says so, and returns 1; with nothing to take back, says that and returns 0.
+
+=head2 play_again
+
+The C<redo> command and the C<r> key: the turn L</take_back> took back, played
+again. Returns 1, or 0 when there is nothing to play again.
+
+=head2 swap
+
+    $terminal->swap($game);
+
+Puts another game in place of this one, and forgets the last move and the
+plies the picker reprints.
+
+=head2 notify
+
+    $terminal->notify($line);
+
+A line under the picker's list while the keys are read one at a time, and
+printed otherwise.
 
 =head1 SEE ALSO
 

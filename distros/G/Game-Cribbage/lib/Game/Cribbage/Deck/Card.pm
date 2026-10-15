@@ -78,7 +78,7 @@ Game::Cribbage::Deck::Card - card
 
 =head1 VERSION
 
-Version 0.17
+Version 0.18
 
 =cut
 

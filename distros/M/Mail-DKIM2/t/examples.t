@@ -78,6 +78,8 @@ unlike($smaster, qr/^127\.0\.0\.1:1002[456] /m, 'no listener on the content-filt
     like($block{10571}, qr/local_header_rewrite_clients=$/m, 'the wrap listener does not rewrite headers');
     unlike($block{10572}, qr/smtpd_milters=/, 'Mailman\'s listener keeps the host\'s own milters');
     like($block{10587}, qr/content_filter=$/m, 'the signer sends nothing round a content filter again');
+    like($block{10587}, qr/receive_override_options=[^\n]*\bno_address_mappings\b/,
+         'the signer does not map addresses again (Mailman\'s listener did; always_bcc would add a recipient to rt=)');
 }
 my $smain = slurp("$ex/postfix-stock-mailman-main.cf.fragment");
 like($smain, qr/^transport_maps = hash:\/etc\/postfix\/dkim2-lists,/m, 'the DKIM2 list map comes before Mailman\'s');

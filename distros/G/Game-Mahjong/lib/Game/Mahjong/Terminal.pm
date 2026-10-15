@@ -14,8 +14,13 @@ use Game::Mahjong::Bot;
 use Game::Mahjong::Fans;
 use Game::Mahjong::Result;
 use Getopt::Long ();
+use Game::Terminal::Kit::Keys;
+use Game::Terminal::Kit::Log;
+use Game::Terminal::Kit::Picker;
+use Game::Terminal::Kit::Run;
+use Game::Terminal::Kit::Screen;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 has seed => (is => 'ro', isa => Str, required => 1);
 
@@ -53,7 +58,7 @@ has winner => (is => 'rw');
 
 has cursor => (is => 'rw');
 
-has raw => (is => 'rw', default => 0);
+has [qw/keyboard screen log/] => (is => 'rw');
 
 has keysource => (is => 'rw');
 
@@ -61,39 +66,16 @@ has pending => (is => 'rw', isa => ArrayRef, default => sub { [] });
 
 has _picking => (is => 'rw', init_arg => 'picking');
 
-our %SEQUENCE = (
-	'A'  => 'up',
-	'B'  => 'down',
-	'C'  => 'right',
-	'D'  => 'left',
-	'H'  => 'home',
-	'F'  => 'end',
-	'1~' => 'home',
-	'4~' => 'end',
-	'5~' => 'page_up',
-	'6~' => 'page_down',
-	'7~' => 'home',
-	'8~' => 'end',
-);
+our %SGR = (bold => 1, dim => 2, red => 31, green => 32, yellow => 33, blue => 34, magenta => 35, cyan => 36);
 
-our %CONTROL = (
-	"\r"   => 'enter',
-	"\n"   => 'enter',
-	"\t"   => 'tab',
-	"\x7f" => 'backspace',
-	"\x08" => 'backspace',
-	"\x03" => 'interrupt',
-	"\x04" => 'eof',
-);
+our %WALK = map { $_ => 1 } qw(left right up down tab back_tab home end page_up page_down);
 
 our %WIND = (0 => 'East', 1 => 'South', 2 => 'West', 3 => 'North');
 our $DOT = '|';
 
 sub _clear {
 	my ($self) = @_;
-	return unless $self->colour && $self->clear;
-	my $out = $self->out;
-	print {$out} "\e[H\e[2J";
+	$self->screen->clear;
 	return;
 }
 
@@ -117,14 +99,24 @@ sub BUILD {
 	$self->rules(Game::Mahjong::Rules->new(seed => $self->seed));
 	$self->bots([ map { Game::Mahjong::Bot->new(level => $self->level, seed => $self->seed) } 0 .. 3 ]);
 	$self->hinter(Game::Mahjong::Bot->new(level => 3, seed => $self->seed . ':hint'));
+	$self->keyboard(Game::Terminal::Kit::Keys->new(
+		in => $self->in,
+		pending => $self->pending,
+		($self->keysource ? (keysource => $self->keysource) : ()),
+	)) unless $self->keyboard;
+	$self->screen(Game::Terminal::Kit::Screen->new(
+		out => $self->out,
+		interactive => ($self->colour && $self->clear ? 1 : 0),
+		colour => ($self->colour ? 1 : 0),
+		ascii => ($self->ascii ? 1 : 0),
+	)) unless $self->screen;
+	$self->log(Game::Terminal::Kit::Log->new) unless $self->log;
 	return;
 }
 
 sub _c {
 	my ($self, $code, $text) = @_;
-	return $text unless $self->colour;
-	my %code = (bold => 1, dim => 2, red => 31, green => 32, yellow => 33, blue => 34, magenta => 35, cyan => 36);
-	return "\e[$code{$code}m$text\e[0m";
+	return $self->screen->paint($text, $SGR{$code});
 }
 
 our %HONOUR_FACE = (
@@ -187,22 +179,19 @@ sub tile_art {
 
 	my $face = $o{back} ? ($ascii ? '##' : "\x{2592}\x{2592}") : $self->face($kind);
 
-	unless ($self->colour) {
-		return ($tl . $h x 2 . $tr, $v . $face . $v, $bl . $h x 2 . $br);
-	}
-
 	my $bg  = $o{back} ? $BACK_BG : $FACE_BG;
-	my $ink = $o{back} ? 250 : $self->_ink($kind);
+	my $ink = $o{back} ? 250 : $self->colour ? $self->_ink($kind) : 0;
 
 	my $edge = $o{mark} ? $FRESH_FG : $EDGE_FG;
 	my $side = $o{mark} ? $FRESH_FG : $SIDE_FG;
 
-	my $on = $o{cursor} ? "\e[1m\e[7m" : $o{mark} ? "\e[1m" : '';
+	my @on = $o{cursor} ? (1, 7) : $o{mark} ? (1) : ();
+	my $screen = $self->screen;
 
 	return (
-		"$on\e[38;5;${edge}m\e[48;5;${bg}m" . $tl . $h x 2 . $tr . "\e[0m",
-		"$on\e[38;5;${ink}m\e[48;5;${bg}m" . $v . $face . $v . "\e[0m",
-		"$on\e[38;5;${side}m\e[48;5;${bg}m" . $bl . $h x 2 . $br . "\e[0m",
+		$screen->paint($tl . $h x 2 . $tr, join ';', @on, "38;5;$edge", "48;5;$bg"),
+		$screen->paint($v . $face . $v, join ';', @on, "38;5;$ink", "48;5;$bg"),
+		$screen->paint($bl . $h x 2 . $br, join ';', @on, "38;5;$side", "48;5;$bg"),
 	);
 }
 
@@ -225,10 +214,11 @@ sub tile_row {
 sub tile_chip {
 	my ($self, $kind, %o) = @_;
 	my $face = $self->face($kind);
-	return ($o{last} ? "<$face>" : "[$face]") unless $self->colour;
+	my $chip = $o{last} ? "<$face>" : "[$face]";
+	return $chip unless $self->colour;
 	my $ink = $self->_ink($kind);
 	my $bg = $o{last} ? 223 : $FACE_BG;
-	return "\e[38;5;${ink}m\e[48;5;${bg}m" . ($o{last} ? '<' : '[') . $face . ($o{last} ? '>' : ']') . "\e[0m";
+	return $self->screen->paint($chip, "38;5;$ink;48;5;$bg");
 }
 
 sub tile_chips {
@@ -259,8 +249,7 @@ sub _does {
 
 sub say {
 	my ($self, @text) = @_;
-	my $out = $self->out;
-	print {$out} @text, "\n";
+	$self->screen->say(join '', @text);
 	return;
 }
 
@@ -359,7 +348,7 @@ sub _melds_line {
 	my @out;
 	for my $meld (@{ $hand->melds }) {
 		push @out, $meld->concealed && $hand != $self->rules->hand_of($self->seat)
-			? ($self->colour ? "\e[48;5;${BACK_BG}m\e[38;5;250m[##][##][##][##]\e[0m" : '[##][##][##][##]')
+			? $self->screen->paint('[##][##][##][##]', "48;5;$BACK_BG;38;5;250")
 			: $self->tile_chips(@{ $meld->tiles });
 	}
 	return join '  ', @out;
@@ -540,80 +529,30 @@ sub picking {
 	return $self->keys_available;
 }
 
+sub raw {
+	my ($self) = @_;
+	return $self->keyboard->raw;
+}
+
 sub keys_available {
 	my ($self) = @_;
-	return 1 if $self->keysource;
-	return 0 unless eval { -t $self->in };
-	return eval { require Term::ReadKey; 1 } ? 1 : 0;
+	return $self->keyboard->keys_available;
 }
 
 sub enter_raw {
 	my ($self) = @_;
-	return $self if $self->raw;
-
-	if ($self->keysource) {
-		$self->raw(1);
-		return $self;
-	}
-
-	return undef unless $self->keys_available;
-	return undef unless eval { Term::ReadKey::ReadMode(3, $self->in); 1 };
-
-	$self->raw(1);
-	return $self;
+	return $self->keyboard->enter_raw ? $self : undef;
 }
 
 sub leave_raw {
 	my ($self) = @_;
-	return $self unless $self->raw;
-	eval { Term::ReadKey::ReadMode(0, $self->in) } unless $self->keysource;
-	$self->raw(0);
+	$self->keyboard->leave_raw;
 	return $self;
-}
-
-sub read_char {
-	my ($self, $wait) = @_;
-
-	my $pending = $self->pending;
-	return shift @$pending if @$pending;
-	return $self->keysource->($wait) if $self->keysource;
-
-	my $char = Term::ReadKey::ReadKey($wait ? 0 : -1, $self->in);
-	return $char if defined $char || $wait;
-
-	select undef, undef, undef, 0.05;
-	return Term::ReadKey::ReadKey(-1, $self->in);
 }
 
 sub read_key {
 	my ($self) = @_;
-	my $char = $self->read_char(1);
-	return undef unless defined $char;
-	return $CONTROL{$char} if $CONTROL{$char};
-	return $self->read_sequence if $char eq "\e";
-	return $char;
-}
-
-sub read_sequence {
-	my ($self) = @_;
-
-	my $opener = $self->read_char(0);
-	return 'escape' unless defined $opener;
-
-	unless ($opener eq '[' || $opener eq 'O') {
-		unshift @{ $self->pending }, $opener;
-		return 'escape';
-	}
-
-	my $tail = '';
-	while (length $tail < 8) {
-		my $char = $self->read_char(0);
-		last unless defined $char;
-		$tail .= $char;
-		last if $char =~ /[A-Za-z~]/;
-	}
-
-	return $SEQUENCE{$tail} || 'escape';
+	return $self->keyboard->read_key;
 }
 
 sub throw_line {
@@ -638,67 +577,77 @@ sub throw_line {
 	return $line;
 }
 
-sub pick_discard {
+sub picker {
 	my ($self, @legal) = @_;
 
 	my ($kinds) = $self->rack_order;
 	my %throwable = map { $_->{tile} => 1 }
 		grep { $_->{kind} eq 'discard' } @legal;
-	my @slot = grep { $throwable{ $kinds->[$_] } } 0 .. $#$kinds;
-	return undef unless @slot;
+	my @open = grep { $throwable{ $kinds->[$_] } } 0 .. $#$kinds;
+	return undef unless @open;
 
-	my $at = $#slot;
-	my @notice;
+	return Game::Terminal::Kit::Picker->new(
+		items => [ map {
+			{ label => $self->tile($_), value => $_, skip => ($throwable{$_} ? 0 : 1) }
+		} @$kinds ],
+		at => $open[-1],
+		across => 1,
+		numbered => 0,
+		window => 0,
+		game_keys => { h => 'hint', t => 'type', '?' => 'help', map { $_ => $_ } 1 .. 9 },
+		screen => $self->screen,
+	);
+}
+
+sub pick_discard {
+	my ($self, @legal) = @_;
+
+	my $picker = $self->picker(@legal) or return undef;
+	my $log = $self->log;
 
 	while (1) {
-		$self->show_pick(\@slot, $at, \@notice, \@legal);
-		@notice = ();
+		$self->show_pick($picker, \@legal);
 
 		my $key = $self->read_key;
-		if (!defined $key || $key eq 'eof' || $key eq 'interrupt' || $key eq 'q') {
+		my ($event, $value) = $picker->step($key);
+		if ($event eq 'quit') {
 			$self->quit(1);
 			return undef;
 		}
+		next if $event eq 'moved';
 
-		if ($key eq 'left' || $key eq 'down') { $at = ($at - 1) % @slot; next }
-		if ($key eq 'right' || $key eq 'up' || $key eq 'tab') {
-			$at = ($at + 1) % @slot;
-			next;
+		if ($event eq 'chosen') {
+			my ($m) = grep { $_->{kind} eq 'discard' && $_->{tile} == $value } @legal;
+			return $m;
 		}
-		if ($key eq 'home' || $key eq 'page_up')   { $at = 0;       next }
-		if ($key eq 'end'  || $key eq 'page_down') { $at = $#slot;  next }
 
-		if ($key eq 'enter' || $key eq ' ') {
-			my $t = $kinds->[ $slot[$at] ];
-			my ($m) = grep { $_->{kind} eq 'discard' && $_->{tile} == $t } @legal;
-			return $m if $m;
-			@notice = ('you cannot throw that one');
+		unless ($event eq 'key') {
+			$log->note('that key does nothing here. ? for the ones that do')
+				unless $event eq 'none' && $WALK{$key};
 			next;
 		}
 
-		if ($key =~ /\A[1-9]\z/) {
-			my ($found) = grep { $slot[$_] == $key - 1 } 0 .. $#slot;
-			if (defined $found) { $at = $found; next }
-			@notice = ('no tile is numbered ' . $key . ' here');
-			next;
-		}
-
-		if ($key eq 'h') {
+		if ($value eq 'hint') {
 			my $m = $self->hinter->hint($self->rules, $self->seat);
 			if ($m && $m->{kind} eq 'discard') {
-				my ($found) = grep { $kinds->[ $slot[$_] ] == $m->{tile} }
-					0 .. $#slot;
-				$at = $found if defined $found;
+				my ($found) = grep {
+					!$picker->skipped($_) && $picker->value_of($_) == $m->{tile}
+				} 0 .. $#{ $picker->items };
+				$picker->jump($found) if defined $found;
 			}
-			@notice = ('Hint: ' . $self->_move_text($m)) if $m;
+			$log->note('Hint: ' . $self->_move_text($m)) if $m;
 			next;
 		}
 
-		if ($key eq 't') { $self->picking(0); return $self->read_move(@legal) }
+		if ($value eq 'type') { $self->picking(0); return $self->read_move(@legal) }
 
-		if ($key eq '?') { @notice = $self->pick_help; next }
+		if ($value eq 'help') { $log->note($self->pick_help); next }
 
-		@notice = ('that key does nothing here. ? for the ones that do');
+		if ($value > @{ $picker->items } || $picker->skipped($value - 1)) {
+			$log->note('no tile is numbered ' . $value . ' here');
+			next;
+		}
+		$picker->jump($value - 1);
 	}
 }
 
@@ -712,16 +661,16 @@ sub pick_help {
 }
 
 sub show_pick {
-	my ($self, $slot, $at, $notice, $legal) = @_;
+	my ($self, $picker, $legal) = @_;
 
-	my ($kinds) = $self->rack_order;
-	$self->cursor($slot->[$at]);
+	$self->cursor($picker->at);
 	$self->show_table;
 	$self->cursor(undef);
 
-	$self->say('  ' . $self->throw_line($kinds->[ $slot->[$at] ]));
+	$self->say('  ' . $self->throw_line($picker->current));
 	$self->_describe_legal(@$legal);
-	$self->say('  ' . $self->_c('dim', $_)) for @$notice;
+	$self->say('  ' . $self->_c('dim', $_)) for $self->log->lines;
+	$self->log->shown;
 	$self->say('  ' . $self->_c('dim', 'arrows to choose, enter to throw, ? for the keys'));
 	return;
 }
@@ -729,7 +678,6 @@ sub show_pick {
 sub read_move {
 	my ($self, @legal) = @_;
 	my $g = $self->rules;
-	my $in = $self->in;
 	my $hand = $g->hand_of($self->seat);
 
 	if ($g->phase eq 'discard' && $self->picking) {
@@ -742,11 +690,8 @@ sub read_move {
 	}
 
 	while (1) {
-		my $out = $self->out;
-		print {$out} '> ';
-		my $line = <$in>;
+		my $line = $self->keyboard->read_line('> ', $self->out);
 		unless (defined $line) { $self->quit(1); return undef }
-		$line =~ s/\A\s+|\s+\z//g;
 		next unless length $line;
 		my ($cmd, @args) = split ' ', lc $line;
 		if ($cmd eq 'quit' || $cmd eq 'q') { $self->quit(1); return undef }
@@ -868,7 +813,7 @@ mahjong: a game against three bots under the Chinese Official rules
   --ascii           draw the tile frames with + - | for a terminal without box drawing
   --no-clear        do not clear the screen before each table
   --no-colour       plain text (colour is on when standard output is a terminal
-                    and NO_COLOR is unset)
+                    and NO_COLOR is unset or empty)
   --no-pick         type the moves out instead of pointing at them
   --auto            four bots, no prompt: watch a game
   --help            this
@@ -886,10 +831,20 @@ early, 2 for an option the game will not take.
 USAGE
 }
 
+sub options {
+	return [
+		{ name => 'level', type => 'int', min => 1, max => 3, help => "the bots' strength" },
+		{ name => 'seat', type => 'int', min => 0, max => 3, help => 'your seat; seat 0 deals the first hand' },
+		{ name => 'glyphs', type => 'flag', help => 'the Unicode Mahjong Tiles block on the tile faces' },
+		{ name => 'auto', type => 'flag', help => 'four bots, no prompt: watch a game' },
+		{ name => 'seed', type => 'str', help => 'the same seed deals the same tiles' },
+	];
+}
+
 sub run {
 	my ($class, @argv) = @_;
 	my $tty = -t STDOUT ? 1 : 0;
-	my %o = (level => 2, seat => 0, colour => ($tty && !$ENV{NO_COLOR} ? 1 : 0), glyphs => 0, auto => 0,
+	my %o = (level => 2, seat => 0, colour => ($tty && !Game::Terminal::Kit::Screen::no_colour() ? 1 : 0), glyphs => 0, auto => 0,
 	         ascii => 0, clear => $tty);
 
 	my $ok = eval {
@@ -932,17 +887,9 @@ sub run {
 		return 2;
 	}
 
-	binmode $t->out, ':encoding(UTF-8)' unless $o{ascii};
+	$t->screen->utf8->flush_on;
 
-	local @SIG{qw(INT TERM HUP)};
-	for my $sig (qw(INT TERM HUP)) {
-		$SIG{$sig} = sub { $t->leave_raw; $SIG{$sig} = 'DEFAULT'; kill $sig, $$ };
-	}
-
-	my $g = eval { $t->start };
-	my $died = $@;
-	$t->leave_raw;
-	die $died if $died;
+	Game::Terminal::Kit::Run::guard(sub { $t->start }, $t->keyboard, $t->screen);
 
 	return 1 unless $t->finished;
 	return 0 if $o{auto};
@@ -961,7 +908,7 @@ Game::Mahjong::Terminal - a game against three bots at the keyboard
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 
@@ -1138,6 +1085,39 @@ Whether the person left.
 
 Plays until the game ends or the person quits; returns the rules object.
 
+=head2 options
+
+    my $fields = Game::Mahjong::Terminal->options;
+
+The options a person would set before a game, in the order a launcher shows
+them. Each is a hash reference with a C<name>, a C<type> and a C<help>, and
+C<min> and C<max> or C<choices> where the type has them. A new list is
+returned each time.
+
+=over 4
+
+=item C<level>
+
+A whole number from 1 to 3: the bots' strength.
+
+=item C<seat>
+
+A whole number from 0 to 3: your seat; seat 0 deals the first hand.
+
+=item C<glyphs>
+
+A switch: the Unicode Mahjong Tiles block on the tile faces.
+
+=item C<auto>
+
+A switch: four bots, no prompt: watch a game.
+
+=item C<seed>
+
+Text: the same seed deals the same tiles.
+
+=back
+
 =head2 run
 
     exit Game::Mahjong::Terminal->run(@ARGV);
@@ -1148,9 +1128,10 @@ and returns the exit status rather than calling C<exit>: C<0> if you won or the
 game was drawn, C<1> if you lost or stopped early, C<2> for a bad option or a
 refused value, with the usage on C<STDERR>. C<--help> prints the usage on
 C<STDOUT> and returns C<0>. Signal handlers are local to the call and the
-terminal is left in cooked mode on every way out, so a launcher such as
+terminal is given back on every way out, so a launcher such as
 L<Game::Terminal> can call it in its own process and carry on afterwards.
-Colour is off under C<NO_COLOR> as well as off a terminal, and C<out> is
+Colour is off when C<NO_COLOR> is set to anything but the empty string, and
+off a terminal, and C<out> is
 UTF-8 unless C<--ascii> was given.
 
 =head2 show_table, show_hand_end, show_game_end, narrate, help, show_fans
@@ -1205,13 +1186,33 @@ cursor reads badly against one suit or another: navy dots on light blue were
 the case that decided it. Reversing swaps whatever the tile already is, so
 the contrast is as good as the tile's own and no suit is the loser.
 
-=head2 raw, keysource, pending
+=head2 keyboard
 
-cbreak state, a coderef returning ONE character in place of L<Term::ReadKey>,
-and characters read and given back. C<keysource> is what lets F<t/32> drive
-the whole key loop with no terminal and no L<Term::ReadKey> installed; one
-character a call, because a source handing back C<"\e[C"> whole never becomes
-a right arrow.
+The L<Game::Terminal::Kit::Keys> the keys and the typed lines are read through,
+built from L</in>, C<keysource> and C<pending>.
+
+=head2 screen
+
+The L<Game::Terminal::Kit::Screen> everything is printed through, built from
+L</out>, L</colour>, L</ascii> and L</clear>.
+
+=head2 log
+
+The L<Game::Terminal::Kit::Log> holding what the picker has to say under the
+rack: the hint, the key list, a key that does nothing. Each is drawn in one
+frame.
+
+=head2 keysource, pending
+
+Constructor arguments: a coderef returning ONE character in place of
+L<Term::ReadKey>, and characters to be read before any other. C<keysource> is
+what lets F<t/32> drive the whole key loop with no terminal and no
+L<Term::ReadKey> installed; one character a call, because a source handing back
+C<"\e[C"> whole never becomes a right arrow.
+
+=head2 raw
+
+True while keys are read one at a time.
 
 =head2 picking
 
@@ -1221,17 +1222,16 @@ L</keys_available>, and C<auto> turns it off outright.
 
 =head2 keys_available, enter_raw, leave_raw
 
-Whether there is anything to read keys with, and cbreak on and off. B<cbreak
-rather than raw>, so an interrupt stays an interrupt. F<bin/mahjong> calls
-C<leave_raw> from a signal handler and after an C<eval> round the game,
-because a program that dies in cbreak leaves the shell with no echo.
+Whether there is anything to read keys with, and reading a key at a time on
+and off. An interrupt stays an interrupt throughout. L</run> turns it off on
+every way out, a signal included, because a program that stops while reading
+a key at a time leaves the shell with no echo.
 
-=head2 read_char, read_key, read_sequence
+=head2 read_key
 
-One character, one keystroke as a name, and the tail of an escape sequence. A
-name is always longer than one character, so it never collides with one, and
-an opener that turns out not to belong to a sequence goes back on L</pending>
-rather than being swallowed.
+One keystroke, as L<Game::Terminal::Kit::Keys/read_key> names it: the
+character itself, or a name such as C<left>, C<enter> or C<escape>. A name is
+always longer than one character, so it never collides with one.
 
 =head2 rack_order
 
@@ -1241,10 +1241,20 @@ The rack in the order it is drawn, and where in it the tile just drawn sits.
 B<The single authority on that order>: see L</The number under a tile is the
 tile above it>.
 
+=head2 picker
+
+    my $picker = $terminal->picker(@legal);
+
+The L<Game::Terminal::Kit::Picker> for a discard: one item for every tile of
+the rack in the order L</rack_order> gives, a tile that may not be thrown
+stepped over, and the cursor on the last tile that may be, which is the tile
+just drawn. Undef when nothing can be thrown.
+
 =head2 pick_discard, show_pick, pick_help
 
 The key loop for a discard, one frame of it, and its key list. C<pick_discard>
 returns a move for L<Game::Mahjong::Rules/apply>, or undef to stop.
+C<show_pick> takes the picker and an array reference of the legal moves.
 
 =head2 throw_line
 

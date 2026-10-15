@@ -46,6 +46,9 @@ t/22-integer.t
 t/23-terminal.t
 t/24-pick.t
 t/25-bin.t
+t/26-options.t
+t/27-round-trip.t
+t/28-history.t
 t/captures.txt
 t/games.txt
 t/lib/Game/Brandubh/Test/Squares.pm

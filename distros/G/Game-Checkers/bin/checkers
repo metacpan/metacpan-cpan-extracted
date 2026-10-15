@@ -6,6 +6,6 @@ use warnings;
 
 use Game::Checkers::Terminal;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 exit Game::Checkers::Terminal->run(@ARGV);

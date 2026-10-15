@@ -1,0 +1,27 @@
+---
+abstract: 'simple access to Kraken-style taxDB taxonomy database'
+author:
+  - 'Jeremy Volkening <volkening@cpan.org>'
+build_requires:
+  Test2::V0: '0'
+  Test::Pod::Coverage: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150013'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: BioX-Tax-Kraken
+provides:
+  BioX::Tax::Kraken:
+    file: lib/BioX/Tax/Kraken.pm
+    version: '0.001003'
+requires:
+  IPC::Cmd: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/jvolkening/p5-BioX-Tax-Kraken
+version: '0.001003'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

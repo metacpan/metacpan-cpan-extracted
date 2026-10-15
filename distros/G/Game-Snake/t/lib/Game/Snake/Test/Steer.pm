@@ -3,7 +3,7 @@ package Game::Snake::Test::Steer;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 # Two ways to steer a Game::Snake from a test without a bot (the bot is phase
 # 02's). `greedy` heads for the food along the shorter axis, refusing any

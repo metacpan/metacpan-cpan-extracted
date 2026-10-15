@@ -165,6 +165,7 @@ WriteMakefile(
     BUILD_REQUIRES   => {
         'Test::More' => 0,
         'Test::Lib'  => 0,
+        'Path::Tiny' => 0.146,
     },
     PREREQ_PM                  => {
         'Moo::Role'            => '2.000000',

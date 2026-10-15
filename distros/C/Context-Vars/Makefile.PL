@@ -94,7 +94,7 @@ my %WriteMakefileArgs = (
         'Test::More' => '0.88',
     },
     PREREQ_PM => {
-        'HAMT' => '0.02',
+        'HAMT' => '0.03',
     },
     XS     => { 'Vars.xs' => 'Vars.c' },
     OBJECT => 'Vars$(OBJ_EXT)',

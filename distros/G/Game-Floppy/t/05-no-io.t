@@ -25,19 +25,19 @@ subtest 'the engine does not pull a front end in with it' => sub {
 	ok($INC{'Game/Floppy/Error.pm'}, 'and the error');
 	ok($INC{'Game/Floppy/Result.pm'}, 'and the result');
 	ok(!$INC{'Game/Floppy/Terminal.pm'}, 'not the terminal');
-	ok(!$INC{'Game/Floppy/Ticker.pm'}, 'not the ticker');
+	ok(!$INC{'Game/Terminal/Kit/Ticker.pm'}, 'not the ticker');
 	ok(!$INC{'Game/Floppy/Raylib.pm'}, 'not the window');
 	ok(!$INC{'Game/Floppy/Bot.pm'}, 'not the bot');
 	ok(!$INC{'Raylib/FFI.pm'}, 'and not raylib');
 };
 
 subtest 'a whole game runs with both handles rigged to die' => sub {
-	require Game::Floppy::Test::Handle;
+	require Game::Terminal::Kit::Test::Handle;
 
 	my ($error, $cause, $ticks);
 
-	tie *STDOUT, 'Game::Floppy::Test::Handle';
-	tie *STDIN,  'Game::Floppy::Test::Handle';
+	tie *STDOUT, 'Game::Terminal::Kit::Test::Handle';
+	tie *STDIN,  'Game::Terminal::Kit::Test::Handle';
 
 	eval {
 		my $game = Game::Floppy->new(seed => 'no-io');

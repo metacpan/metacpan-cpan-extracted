@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More 'tests' => 12;
+use Test::More 'tests' => 13;
 use Crypt::Passwd::XS ();
 
 my $checks = [
@@ -17,6 +17,7 @@ my $checks = [
     [ 'a short string',                                       '$6$rounds=123456$asaltof16chars..', '$6$rounds=123456$asaltof16chars..$BtCwjqMJGx5hrJhZywWvt0RLE8uZ4oPwcelCjmw2kSYu.Ec6ycULevoBK25fs2xXgMNrCzIMVcgEJAstJeonj1' ],
     [ 'the minimum number is still observed',                 '$6$rounds=10$roundstoolow',         '$6$rounds=1000$roundstoolow$kUMsbe306n21p9R.FRkW3IGn.S9NPN0x50YhH1xhLsPuWGsUSklZt58jaTfF4ZEQpyUNGc0dqbpBYYBaHHrsX.' ],
     [ 'test1234',                                             '',                                  '$6$$XHu9fB3LkQSyG0r.FKxZjQlfe/lTi.Vq4qY0fCfJmN0JrDiG8Lv9eYhLuMlnTXFVcSbW/0hPyeKsVpjsk66qo.' ],
+    [ 'test1234',                                             '$6$',                               '$6$$XHu9fB3LkQSyG0r.FKxZjQlfe/lTi.Vq4qY0fCfJmN0JrDiG8Lv9eYhLuMlnTXFVcSbW/0hPyeKsVpjsk66qo.' ],
     [ '',                                                     'test1234',                          '$6$test1234$Dq2xtzGWFK5sgkWSp15mKK/uN14ZEUr9rFlPJ1NtQSnXUkQRz/jvz4iWpFGE/eLPuQH2L6rB.VOQPP.3GC0cv1' ],
     [ 'test1234',                                             undef,                               '$6$$XHu9fB3LkQSyG0r.FKxZjQlfe/lTi.Vq4qY0fCfJmN0JrDiG8Lv9eYhLuMlnTXFVcSbW/0hPyeKsVpjsk66qo.' ],
     [ undef,                                                  'test1234',                          '$6$test1234$Dq2xtzGWFK5sgkWSp15mKK/uN14ZEUr9rFlPJ1NtQSnXUkQRz/jvz4iWpFGE/eLPuQH2L6rB.VOQPP.3GC0cv1' ],
@@ -29,4 +30,3 @@ foreach my $check_ref (@$checks) {
     my $result  = Crypt::Passwd::XS::unix_sha512_crypt( $pass, $salt );
     is( $result, $crypted, q{Hashed with pass:} . ( defined $pass ? qq{"$pass"} : q{(undef)} ) . q{ salt:} . ( defined $salt ? qq{"$salt"} : q{(undef)} ) );
 }
-

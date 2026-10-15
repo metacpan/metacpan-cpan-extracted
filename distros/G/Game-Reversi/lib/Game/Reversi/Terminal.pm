@@ -10,9 +10,14 @@ use Game::Reversi::Board;
 use Game::Reversi::Bot;
 use Game::Reversi::Notation;
 use Game::Reversi::Opening;
+use Game::Terminal::Kit::History;
+use Game::Terminal::Kit::Keys;
+use Game::Terminal::Kit::Run;
+use Game::Terminal::Kit::Screen;
+use Game::Terminal::Kit::Steer;
 use Getopt::Long ();
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 my %GLYPH = (
 	b => { wide => "\x{25CF}", ascii => 'X' },
@@ -33,9 +38,11 @@ my %LINE = (
 	           t => '+', b => '+', l => '+', r => '+', x => '+' },
 );
 
-my %INK = (b => "\e[1m", w => "\e[2m", '*' => "\e[33m", grid => "\e[2m",
-           turned => "\e[1;32m", placed => "\e[1;36m", cursor => "\e[1;7m");
-my $OFF = "\e[0m";
+my %INK = (b => '1', w => '2', '*' => '33', grid => '2',
+           turned => '1;32', placed => '1;36', cursor => '1;7');
+
+my %STEP = (left => -1, up => -1, back_tab => -1,
+            right => 1, down => 1, tab => 1);
 
 has in => (
 	is      => 'rw',
@@ -85,26 +92,15 @@ has game => (
 
 has last_move => (is => 'rw');
 
-has raw => (is => 'rw', default => 0);
-
 has keysource => (is => 'rw');
 
 has pending => (is => 'rw', default => sub { [] });
 
+has [qw/keyboard screen/] => (is => 'rw');
+
+has history => (is => 'rw');
+
 has _picking => (is => 'rw', init_arg => 'picking', private => 1);
-
-our %SEQUENCE = (
-	'A' => 'up', 'B' => 'down', 'C' => 'right', 'D' => 'left',
-	'H' => 'home', 'F' => 'end',
-	'1~' => 'home', '4~' => 'end', '5~' => 'page_up', '6~' => 'page_down',
-	'7~' => 'home', '8~' => 'end',
-);
-
-our %CONTROL = (
-	"\r" => 'enter', "\n" => 'enter', "\t" => 'tab',
-	"\x7f" => 'backspace', "\x08" => 'backspace',
-	"\x03" => 'interrupt', "\x04" => 'eof',
-);
 
 has _wants_ansi => (
 	is       => 'rw',
@@ -115,10 +111,22 @@ has _wants_ansi => (
 sub BUILD {
 	my ($self) = @_;
 
-	binmode $self->out, ':encoding(UTF-8)' unless $self->ascii;
-	my $previous = select $self->out;
-	$| = 1;
-	select $previous;
+	$self->keyboard(Game::Terminal::Kit::Keys->new(
+		in => $self->in,
+		pending => $self->pending,
+		($self->keysource ? (keysource => $self->keysource) : ()),
+	)) unless $self->keyboard;
+	$self->screen(Game::Terminal::Kit::Screen->new(
+		out => $self->out,
+		interactive => $self->interactive,
+		colour => $self->ansi,
+		ascii => $self->ascii,
+	)) unless $self->screen;
+	$self->screen->utf8->flush_on;
+	$self->history(Game::Terminal::Kit::History->new(
+		save => sub { $_[0]->to_text },
+		load => sub { Game::Reversi->from_text($_[0]) },
+	)) unless $self->history;
 
 	die "Game::Reversi::Terminal: colour must be b or w"
 		unless $self->colour eq 'b' || $self->colour eq 'w';
@@ -133,35 +141,45 @@ sub BUILD {
 
 sub ansi {
 	my ($self) = @_;
-	return 0 if defined $ENV{NO_COLOR} && length $ENV{NO_COLOR};
+	return 0 if Game::Terminal::Kit::Screen::no_colour();
 	return $self->_wants_ansi ? 1 : 0 if defined $self->_wants_ansi;
-	return -t $self->out ? 1 : 0;
+	return $self->interactive;
+}
+
+sub _reader {
+	my ($self) = @_;
+	my $keyboard = $self->keyboard;
+	$keyboard->in($self->in);
+	$keyboard->pending($self->pending);
+	$keyboard->keysource($self->keysource) if $self->keysource;
+	return $keyboard;
+}
+
+sub _writer {
+	my ($self) = @_;
+	my $screen = $self->screen;
+	$screen->out($self->out);
+	$screen->interactive($self->interactive);
+	$screen->colour($self->ansi);
+	return $screen;
 }
 
 sub _paint {
 	my ($self, $glyph, $key) = @_;
-	return $glyph unless $self->ansi;
-	return ($INK{$key} || '') . $glyph . $OFF;
+	return $self->_writer->paint($glyph, $INK{$key});
 }
 
 sub _say {
 	my ($self, @lines) = @_;
-	my $fh = $self->out;
-	print {$fh} $_, "\n" for @lines;
+	$self->_writer->say(@lines);
 	return;
 }
 
 sub _ask {
 	my ($self, $prompt) = @_;
-	my $fh = $self->out;
-	print {$fh} $prompt;
-	my $in = $self->in;
-	my $line = <$in>;
+	my $line = $self->_reader->read_line($prompt, $self->out);
 	return undef unless defined $line;
-
-	print {$fh} "\n";
-
-	$line =~ s/\A\s+|\s+\z//g;
+	$self->_say('');
 	return lc $line;
 }
 
@@ -241,22 +259,28 @@ sub _cell {
 sub start {
 	my ($self) = @_;
 
-	my $game = Game::Reversi->new(
-		variant => $self->variant, seed => $self->seed);
-	$self->game($game);
+	$self->game(Game::Reversi->new(
+		variant => $self->variant, seed => $self->seed)) unless $self->game;
 	my $bot = Game::Reversi::Bot->new(
 		level => $self->level, seed => $self->seed . ':bot');
 	my $me = $self->colour;
 
 	$self->_intro;
-	my $seen = scalar @{ $game->events };
+	$self->history->start($self->game);
+	my $seen = scalar @{ $self->game->events };
 
-	while ($game->status eq 'active') {
+	while ($self->game->status eq 'active') {
+		my $game = $self->game;
 		my $turn = $game->turn;
 
 		if ($turn eq $me) {
-			my $quit = $self->_human_turn($game, $me);
-			if ($quit) {
+			$self->history->turn($game);
+			my $outcome = $self->_human_turn($game, $me);
+			if ($outcome && $outcome eq 'swap') {
+				$seen = scalar @{ $self->game->events };
+				next;
+			}
+			if ($outcome) {
 				$game->resign($me);
 				last;
 			}
@@ -277,8 +301,19 @@ sub start {
 		$seen = $self->_announce_passes($game, $seen);
 	}
 
-	$self->_finish($game);
-	return $game->result;
+	$self->_finish($self->game);
+	return $self->game->result;
+}
+
+sub _travel {
+	my ($self, $way) = @_;
+	my $history = $self->history;
+	my $rebuilt = $way eq 'redo' ? $history->redo : $history->undo;
+	return $way eq 'redo' ? 'nothing to redo' : 'nothing to take back'
+		unless $rebuilt;
+	$self->game($rebuilt);
+	$self->last_move(undef);
+	return;
 }
 
 sub _intro {
@@ -297,9 +332,7 @@ sub _intro {
 
 sub keys_available {
 	my ($self) = @_;
-	return 1 if $self->keysource;
-	return 0 unless eval { -t $self->in };
-	return eval { require Term::ReadKey; 1 } ? 1 : 0;
+	return $self->_reader->keys_available;
 }
 
 sub picking {
@@ -310,60 +343,25 @@ sub picking {
 	return $self->keys_available;
 }
 
+sub raw {
+	my ($self) = @_;
+	return $self->keyboard->raw;
+}
+
 sub enter_raw {
 	my ($self) = @_;
-	return $self if $self->raw;
-	if ($self->keysource) { $self->raw(1); return $self }
-	return undef unless $self->keys_available;
-	return undef unless eval { Term::ReadKey::ReadMode(3, $self->in); 1 };
-	$self->raw(1);
-	return $self;
+	return $self->_reader->enter_raw ? $self : undef;
 }
 
 sub leave_raw {
 	my ($self) = @_;
-	return $self unless $self->raw;
-	eval { Term::ReadKey::ReadMode(0, $self->in) } unless $self->keysource;
-	$self->raw(0);
+	$self->_reader->leave_raw;
 	return $self;
-}
-
-sub read_char {
-	my ($self, $wait) = @_;
-	my $pending = $self->pending;
-	return shift @$pending if @$pending;
-	return $self->keysource->($wait) if $self->keysource;
-	my $char = Term::ReadKey::ReadKey($wait ? 0 : -1, $self->in);
-	return $char if defined $char || $wait;
-	select undef, undef, undef, 0.05;
-	return Term::ReadKey::ReadKey(-1, $self->in);
 }
 
 sub read_key {
 	my ($self) = @_;
-	my $char = $self->read_char(1);
-	return undef unless defined $char;
-	return $CONTROL{$char} if $CONTROL{$char};
-	return $self->read_sequence if $char eq "\e";
-	return $char;
-}
-
-sub read_sequence {
-	my ($self) = @_;
-	my $opener = $self->read_char(0);
-	return 'escape' unless defined $opener;
-	unless ($opener eq '[' || $opener eq 'O') {
-		unshift @{ $self->pending }, $opener;
-		return 'escape';
-	}
-	my $tail = '';
-	while (length $tail < 8) {
-		my $char = $self->read_char(0);
-		last unless defined $char;
-		$tail .= $char;
-		last if $char =~ /[A-Za-z~]/;
-	}
-	return $SEQUENCE{$tail} || 'escape';
+	return $self->_reader->read_key;
 }
 
 sub interactive {
@@ -374,9 +372,7 @@ sub interactive {
 
 sub clear {
 	my ($self) = @_;
-	return $self unless $self->interactive;
-	my $fh = $self->out;
-	print {$fh} "\e[2J\e[3J\e[H";
+	$self->_writer->clear(scrollback => 1);
 	return $self;
 }
 
@@ -403,6 +399,7 @@ sub pick_help {
 		'arrows walk the squares marked *, which are the only ones that play.',
 		'the line under the board says what the move would turn.',
 		'enter plays it, t goes back to typing, q gives up.',
+		'u takes your last turn back, r plays it again.',
 	);
 }
 
@@ -414,32 +411,33 @@ sub pick_square {
 
 	my $at = 0;
 	if (my $last = $self->last_move) {
-		my ($near) = sort { abs($a - $last->square) <=> abs($b - $last->square) }
-			0 .. $#legal;
-		$at = $near if defined $near;
+		my ($gap) = sort { $a <=> $b } map { abs($_ - $last->square) } @legal;
+		$at = Game::Terminal::Kit::Steer::rest(\@legal,
+			sub { abs($_[0] - $last->square) == $gap });
 	}
 
 	my @notice;
 
 	while (1) {
 		my $count = $game->counts;
-		$self->clear;
-		$self->_say('', $self->board_text($game, $me, $self->since,
-			cursor => $legal[$at], to_play => $me));
-		$self->_say('  discs: ' . $self->glyph(q{b}) . ' ' . $count->{b}
-			. '   ' . $self->glyph(q{w}) . ' ' . $count->{w});
-		$self->_say('  ' . $self->square_line($game, $me, $legal[$at]));
-		$self->_say('  ' . $_) for @notice;
+		$self->_writer->show([
+			'',
+			$self->board_text($game, $me, $self->since,
+				cursor => $legal[$at], to_play => $me),
+			'  discs: ' . $self->glyph(q{b}) . ' ' . $count->{b}
+				. '   ' . $self->glyph(q{w}) . ' ' . $count->{w},
+			'  ' . $self->square_line($game, $me, $legal[$at]),
+			(map { '  ' . $_ } @notice),
+			'  ' . $self->_paint(join(', ', 'arrows to choose, enter to play, ? for the keys',
+					$self->history->legend || ()), 'grid'),
+		]);
 		@notice = ();
-		$self->_say('  ' . $self->_paint(
-			'arrows to choose, enter to play, ? for the keys', 'grid'));
 
 		my $key = $self->read_key;
 		return 1 if !defined $key || $key eq 'eof' || $key eq 'interrupt';
 
-		if ($key eq 'left' || $key eq 'up') { $at = ($at - 1) % @legal; next }
-		if ($key eq 'right' || $key eq 'down' || $key eq 'tab') {
-			$at = ($at + 1) % @legal;
+		if ($STEP{$key}) {
+			$at = Game::Terminal::Kit::Steer::ring(scalar @legal, $at, $STEP{$key});
 			next;
 		}
 		if ($key eq 'home') { $at = 0;        next }
@@ -460,8 +458,14 @@ sub pick_square {
 			return 0;
 		}
 
+		if ($key eq 'u' || $key eq 'r') {
+			my $nothing = $self->_travel($key eq 'u' ? 'undo' : 'redo');
+			return 'swap' unless $nothing;
+			@notice = ($nothing . '.');
+			next;
+		}
 		if ($key eq 'q') { return 1 }
-		if ($key eq 't') { $self->picking(0); return $self->_typed_turn($game, $me) }
+		if ($key eq 't') { $self->picking(0); $self->leave_raw; return $self->_typed_turn($game, $me) }
 		if ($key eq '?') { @notice = $self->pick_help; next }
 
 		@notice = ('that key does nothing here. ? for the ones that do');
@@ -505,6 +509,12 @@ sub _typed_turn {
 		if ($answer eq 'board' || $answer eq '') {
 			next;
 		}
+		if ($answer eq 'undo' || $answer eq 'redo') {
+			my $nothing = $self->_travel($answer);
+			return 'swap' unless $nothing;
+			$self->_say('  ' . $nothing . '.');
+			next;
+		}
 
 		my $square = Game::Reversi::Notation->text_to_square($answer);
 		if (!defined $square) {
@@ -538,7 +548,8 @@ sub _help {
 		'  The squares marked * are the ones you can play.',
 		'  A turn with no legal move is forfeited for you automatically.',
 		'  The game ends when neither side can move, which can happen with',
-		'  the board not full. "quit" gives up.',
+		'  the board not full. "undo" takes your last turn back, "redo"',
+		'  plays it again, and "quit" gives up.',
 		'',
 	);
 	return;
@@ -602,14 +613,24 @@ reversi - play Reversi in a terminal
 
   On a terminal the arrow keys walk the squares marked *, which are the only
   ones that play, and the line under the board says what the move would turn
-  and what the score would become. Enter plays it, t goes back to typing and
-  ? lists the keys. Needs Term::ReadKey; without it the squares are typed.
+  and what the score would become. Enter plays it, t goes back to typing,
+  u takes your last turn back, r plays it again and ? lists the keys. Typed,
+  the same are undo and redo. Needs Term::ReadKey; without it the squares are typed.
 
   The square the last move went on is bracketed and the discs it turned are
   drawn ringed, so both are visible with --ascii and with colour off.
 
   Exit status is 0 if you won or tied, 1 if you lost, 2 for a bad option.
 USAGE
+}
+
+sub options {
+	return [
+		{ name => 'level', type => 'int', min => 1, max => 5, help => 'how hard the opponent is' },
+		{ name => 'variant', type => 'enum', choices => [qw(historic othello)], help => 'place the first four discs yourselves, or find them down' },
+		{ name => 'colour', type => 'enum', choices => [qw(b w)], help => 'b plays dark and moves first, w plays light' },
+		{ name => 'seed', type => 'str', help => 'makes a game reproducible' },
+	];
 }
 
 sub run {
@@ -644,15 +665,8 @@ sub run {
 		return 2;
 	}
 
-	local @SIG{qw(INT TERM HUP)};
-	for my $sig (qw(INT TERM HUP)) {
-		$SIG{$sig} = sub { $terminal->leave_raw; $SIG{$sig} = 'DEFAULT'; kill $sig, $$ };
-	}
-
-	my $result = eval { $terminal->start };
-	my $died = $@;
-	$terminal->leave_raw;
-	die $died if $died;
+	my $result = Game::Terminal::Kit::Run::guard(
+		sub { $terminal->start }, $terminal->keyboard, $terminal->screen);
 	return 0 unless $result;
 	return 0 if !defined $result->winner;
 	return 0 if $result->winner eq $opt{colour};
@@ -672,7 +686,7 @@ Game::Reversi::Terminal - a playable game on two filehandles
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 
@@ -711,6 +725,16 @@ fork, and no subprocess writing into the TAP stream.
 A module that calls C<exit> cannot be tested and cannot be embedded. The exit
 status belongs to C<bin/reversi>, which is the only part that knows it is a
 program.
+
+=head2 Taking a turn back
+
+C<u> takes your last turn back, with every reply the bot made to it, and
+C<r> plays them again; typed, the same are C<undo> and C<redo>. A move made
+after C<u> forgets what C<r> would have played. With nothing to take back or
+play again a note says so and the board stays as it is. The first turn of a
+game, or of a game given to the terminal, has nothing before it, even when the
+bot opened. The line under the board names C<u undo> and C<r redo> while each
+has something to do.
 
 =head2 The board
 
@@ -813,7 +837,9 @@ Whether colour will be used.
 
 =head2 in, out, game
 
-The handles, and the game once C<start> has built one. All three are read and
+The handles, and the game being played: given to C<new> or set before
+C<start> it is the one played on, otherwise C<start> builds one. A turn taken
+back replaces it with a new game. All three are read and
 write: a test hands this a tied handle and reads the game back out of it.
 
 The C<ansi> option is held privately, because L</ansi> is a question about the
@@ -835,9 +861,23 @@ C<flips> pair L</board_text> marks from.
 
 =head2 interactive, clear
 
-Whether C<out> is a terminal, and the screen clear the picker does before each
-frame. The board is nineteen lines, so a picker that scrolled one of them per
-keystroke would be unreadable.
+Whether C<out> is a terminal, and a clear of the window and of what has
+scrolled off it, which does nothing off a terminal.
+
+=head2 history
+
+The L<Game::Terminal::Kit::History> the turns are taken back through, which
+keeps each of the person's turns as the game's C<to_text>.
+
+=head2 keyboard
+
+The L<Game::Terminal::Kit::Keys> the keys and the typed lines are read
+through, built from C<in>, C<keysource> and C<pending>.
+
+=head2 screen
+
+The L<Game::Terminal::Kit::Screen> everything is printed through, built from
+C<out>, C<ascii> and L</ansi>.
 
 =head2 picking
 
@@ -845,31 +885,35 @@ Whether a square is pointed at rather than typed. Settable, because a failed
 C<enter_raw> and the C<t> key turn it off for the rest of the game. Unset, it
 follows L</keys_available>.
 
-=head2 keys_available, enter_raw, leave_raw
+=head2 keys_available, enter_raw, leave_raw, raw
 
-Whether there is anything to read keys with, and cbreak on and off. B<cbreak
-rather than raw>, so an interrupt stays an interrupt. F<bin/reversi> calls
-C<leave_raw> from a signal handler and after an C<eval> round the game, because
-a program that dies in cbreak leaves the shell with no echo.
+Whether there is anything to read keys with, a key at a time on and off, and
+whether it is on. B<An interrupt stays an interrupt> while it is on.
+L</run> turns it off on every way out, a signal included, because a program
+that dies with it on leaves the shell with no echo.
 
-=head2 keysource, pending, raw
+=head2 keysource, pending
 
-A coderef returning ONE character in place of L<Term::ReadKey>, characters read
-and given back, and the cbreak state. C<keysource> is what lets F<t/20> drive
-the key loop with no terminal and no L<Term::ReadKey> installed; one character
-a call, because a source handing back C<"\e[C"> whole never becomes a right
-arrow.
+A coderef returning ONE character in place of L<Term::ReadKey>, and characters
+read and given back. C<keysource> is what lets F<t/20> drive the key loop
+with no terminal and no L<Term::ReadKey> installed; one character a call,
+because a source handing back C<"\e[C"> whole never becomes a right arrow.
 
-=head2 read_char, read_key, read_sequence
+=head2 read_key
 
-One character, one keystroke as a name, and the tail of an escape sequence. A
-name is always longer than one character so it never collides with one, and an
-opener that turns out not to open a sequence goes back on L</pending>.
+One keystroke, as L<Game::Terminal::Kit::Keys/read_key> names it: the
+character itself, or a name such as C<up>, C<enter> or C<escape>. A name is
+always longer than one character so it never collides with one.
 
 =head2 pick_square, pick_help
 
 The cursor loop and its key list. C<pick_square> returns true to give up and
-false when a turn was taken, the same contract as the typed turn.
+false when a turn was taken, the same contract as the typed turn, and
+C<swap> when C<u> or C<r> replaced the game. The cursor
+starts on the legal square nearest the last move and goes round at the ends:
+right, down and tab go on a square, left, up and shift-tab go back one, home
+and end go to the first and the last. On a terminal each frame is drawn over
+the one before.
 
 =head2 square_line
 
@@ -885,7 +929,37 @@ the engine's job, and a person doing it by hand every turn will get it wrong.
 
 =head2 start
 
-Plays a game and returns its L<Game::Reversi::Result>.
+Plays the game given to the terminal, or a new one when none was, and returns
+its L<Game::Reversi::Result>.
+
+=head2 options
+
+    my $fields = Game::Reversi::Terminal->options;
+
+The options a person would set before a game, in the order a launcher shows
+them. Each is a hash reference with a C<name>, a C<type> and a C<help>, and
+C<min> and C<max> or C<choices> where the type has them. A new list is
+returned each time.
+
+=over 4
+
+=item C<level>
+
+A whole number from 1 to 5: how hard the opponent is.
+
+=item C<variant>
+
+One of C<historic>, C<othello>: place the first four discs yourselves, or find them down.
+
+=item C<colour>
+
+One of C<b>, C<w>: b plays dark and moves first, w plays light.
+
+=item C<seed>
+
+Text: makes a game reproducible.
+
+=back
 
 =head2 run
 

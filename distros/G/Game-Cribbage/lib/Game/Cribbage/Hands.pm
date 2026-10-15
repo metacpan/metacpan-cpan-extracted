@@ -335,7 +335,7 @@ Game::Cribbage::Hands - a single hands cycle within a round
 
 =head1 VERSION
 
-Version 0.17
+Version 0.18
 
 =cut
 

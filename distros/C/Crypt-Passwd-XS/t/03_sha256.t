@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More 'tests' => 12;
+use Test::More 'tests' => 13;
 use Crypt::Passwd::XS ();
 
 my $checks = [
@@ -17,6 +17,7 @@ my $checks = [
     [ 'a short string',                                       '$5$rounds=123456$asaltof16chars..', '$5$rounds=123456$asaltof16chars..$gP3VQ/6X7UUEW3HkBn2w1/Ptq2jxPyzV/cZKmF/wJvD' ],
     [ 'the minimum number is still observed',                 '$5$rounds=10$roundstoolow',         '$5$rounds=1000$roundstoolow$yfvwcWrQ8l/K0DAWyuPMDNHpIVlTQebY9l/gL972bIC' ],
     [ 'test1234',                                             '',                                  '$5$$LTI8w5KsA5bMCaf3VTEMPeKckTBV4y9mN7la4rjh896' ],
+    [ 'test1234',                                             '$5$',                               '$5$$LTI8w5KsA5bMCaf3VTEMPeKckTBV4y9mN7la4rjh896' ],
     [ '',                                                     'test1234',                          '$5$test1234$UA0OvNpssFd2pcJm0sJ0ne3E6b518x/YEIPtJO8m841' ],
     [ 'test1234',                                             undef,                               '$5$$LTI8w5KsA5bMCaf3VTEMPeKckTBV4y9mN7la4rjh896' ],
     [ undef,                                                  'test1234',                          '$5$test1234$UA0OvNpssFd2pcJm0sJ0ne3E6b518x/YEIPtJO8m841' ]

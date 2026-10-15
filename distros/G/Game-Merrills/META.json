@@ -35,8 +35,9 @@
             "Term::ReadKey" : "0"
          },
          "requires" : {
+            "Game::Terminal::Kit" : "0.05",
             "Object::Proto::Sugar" : "0.05",
-            "perl" : "5.010"
+            "perl" : "5.014"
          }
       },
       "test" : {
@@ -46,6 +47,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

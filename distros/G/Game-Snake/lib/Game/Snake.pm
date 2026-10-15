@@ -11,7 +11,7 @@ use Object::Proto::Sugar -types;
 use Game::Snake::Error;
 use Game::Snake::Result;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 our @DIRECTIONS = qw/ up down left right /;
 
@@ -411,7 +411,7 @@ Game::Snake - the classic snake game, as an engine
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =head1 SYNOPSIS
 

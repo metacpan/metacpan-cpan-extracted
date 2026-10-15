@@ -38,6 +38,7 @@
             "Chess::Plisco" : "v1.0.3",
             "Devel::CallParser" : "0.005",
             "Digest::SHA" : "0",
+            "Game::Terminal::Kit" : "0.05",
             "Getopt::Long" : "0",
             "Object::Proto::Sugar" : "0.05",
             "Time::HiRes" : "0",
@@ -51,6 +52,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -2,7 +2,7 @@ use v5.40;
 use feature 'class';
 no warnings 'experimental::class';
 #
-class Alien::Xrepo v1.0.4 {
+class Alien::Xrepo v1.0.6 {
     use Alien::Xmake;
     use JSON::PP;
     use Digest::SHA qw[sha1_hex];
@@ -52,20 +52,22 @@ class Alien::Xrepo v1.0.4 {
         return;
     }
     #
-    class Alien::Xrepo::PackageInfo v1.0.4 {
+    class Alien::Xrepo::PackageInfo v1.0.6 {
         use Path::Tiny;
-        field $includedirs : param : reader;
-        field $libfiles    : param : reader;
-        field $license     : param : reader;
-        field $linkdirs    : param : reader;
-        field $links       : param : reader;
-        field $shared      : param : reader;
-        field $static      : param : reader;
-        field $version     : param : reader;
-        field $libpath     : param : reader //= ();
-        field $bindirs     : param : reader //= [];
-        field $installdir  : param : reader;
-        field $kind        : param : reader //= ();
+        field $includedirs  : param : reader;
+        field $libfiles     : param : reader;
+        field $license      : param : reader;
+        field $linkdirs     : param : reader;
+        field $links        : param : reader;
+        field $shared       : param : reader;
+        field $static       : param : reader;
+        field $version      : param : reader;
+        field $libpath      : param : reader //= ();
+        field $bindirs      : param : reader //= [];
+        field $installdir   : param : reader;
+        field $deps         : param : reader //= [];
+        field $runtime_deps : param : reader //= [];
+        field $kind         : param : reader //= ();
 
         # Helper to find a specific header inside the includedirs
         method find_header ($filename) {
@@ -80,19 +82,44 @@ class Alien::Xrepo v1.0.4 {
         }
         method bin_dir {@$bindirs}
 
+        # Rebuild with a discovered runtime dependency list attached. A consumer that has to dlopen C<libpath>
+        # needs to know which *other* shared libraries must be findable first (the dynamic linker resolves them
+        # before our symbols are usable); this is where that list lands.
+        method with_runtime_deps ($list) {
+            return $self if @{ $runtime_deps // [] };
+            return Alien::Xrepo::PackageInfo->new(
+                includedirs  => $includedirs,
+                libfiles     => $libfiles,
+                license      => $license,
+                linkdirs     => $linkdirs,
+                links        => $links,
+                shared       => $shared,
+                static       => $static,
+                version      => $version,
+                libpath      => $libpath,
+                bindirs      => $bindirs,
+                deps         => $deps,
+                runtime_deps => $list,
+                installdir   => $installdir,
+                kind         => $kind
+            );
+        }
+
         method _data_printer ($ddp) {
-            {   includedirs => $includedirs,
-                libfiles    => $libfiles,
-                license     => $license,
-                linkdirs    => $linkdirs,
-                links       => $links,
-                shared      => $shared,
-                static      => $static,
-                version     => $version,
-                libpath     => $libpath,
-                bindirs     => $bindirs,
-                installdir  => $installdir,
-                kind        => $kind
+            {   includedirs  => $includedirs,
+                libfiles     => $libfiles,
+                license      => $license,
+                linkdirs     => $linkdirs,
+                links        => $links,
+                shared       => $shared,
+                static       => $static,
+                version      => $version,
+                libpath      => $libpath,
+                bindirs      => $bindirs,
+                deps         => $deps,
+                runtime_deps => $runtime_deps,
+                installdir   => $installdir,
+                kind         => $kind
             }
         }
     };
@@ -821,6 +848,169 @@ class Alien::Xrepo v1.0.4 {
         return $decoded;
     }
 
+    # A shared library's own `libpath` is only half the story for an FFI consumer: the dynamic linker resolves
+    # its DT_NEEDED/import-table/LC_LOAD_DYLIB entries *before* dlopen returns, so any transitive library that
+    # is not on the loader's default search path (a vendored freetype behind libsdl3_ttf, say) has to be made
+    # findable first. xmake already knows how to read those tables (a native C reader in core.base.binutils,
+    # with dumpbin/ldd/otool fallbacks) and how to resolve @rpath/@loader_path/$ORIGIN/absolute names against a
+    # set of search paths. These methods expose that as a post-install diagnostic.
+    #
+    # The environment variable this platform's loader consults last (Windows) or at all (ELF/Mach-O).
+    method loader_env_var () {
+        return 'PATH'              if $^O eq 'MSWin32';
+        return 'DYLD_LIBRARY_PATH' if $^O eq 'darwin';
+        return 'LD_LIBRARY_PATH';
+    }
+
+    # `xrepo fetch --json --deps` emits one entry per package in the dependency closure (the package plus
+    # everything it transitively needs), each with its own libfiles/linkdirs/bindirs/installdir. The plain
+    # fetch collapses to the primary package, so this is what lets a caller find where a transitive provider
+    # (freetype behind libsdl3_ttf) lives.
+    method fetch_closure ( $pkg_spec, $version //= (), %opts ) {
+        my $full_spec = $self->_full_spec( $pkg_spec, $version );
+        local $ENV{XMAKE_THEME}          = $self->_theme(%opts);
+        local $ENV{XMAKE_PKG_INSTALLDIR} = $self->_store_dir(%opts) if defined $self->_store_dir(%opts);
+        local $ENV{XMAKE_PKG_CACHEDIR}   = $opts{cachedir}          if defined $opts{cachedir};
+        my @args = ( '--json', $self->_build_args( \%opts, ['--deps'] ) );
+        my @cmd  = $self->_argv( 'fetch', \@args, $full_spec );
+        $self->_debug_cmd(@cmd);
+        $self->blah("Running: @cmd");
+        my ( $out, $err, $exit ) = capture { system @cmd };
+        return () if $exit != 0;
+        my $data = eval { $self->_decode_json_output($out) };
+        return () unless ref $data eq 'ARRAY';
+        return grep { ref $_ eq 'HASH' } @$data;
+    }
+
+    # Ask xmake to list the direct runtime dependencies of $libpath, resolving each to an absolute path where
+    # possible using the supplied search directories. Returns the raw entries: an absolute path when resolved,
+    # otherwise the bare loader name (e.g. `KERNEL32.dll`).
+    method scan_runtime_deps ( $libpath, @search_dirs ) {
+        return () unless defined $libpath && length $libpath && -f $libpath;
+        my $script = File::Temp->new( SUFFIX => '.lua' );
+        print {$script} <<~'LUA';
+            import("core.base.json")
+            import("utils.binary.deplibs")
+            function main(lib, ...)
+                local dirs = {...}
+                local deps = deplibs(lib, {resolve_path = true, resolve_search_paths = dirs}) or {}
+                io.write(json.encode(deps or {}), "\n")
+            end
+            LUA
+        close $script;
+        local $ENV{XMAKE_THEME} = $theme;
+        my @cmd = ( $xmake->exe, 'l', '-q', $script->filename, $libpath, grep {defined} @search_dirs );
+        $self->_debug_cmd(@cmd);
+        my ( $out, $err, $exit ) = capture { system @cmd };
+        return () if $exit != 0;
+        my $deps = eval { $self->_decode_json_output($out) };
+        return () unless ref $deps eq 'ARRAY';
+        return @$deps;
+    }
+
+    # Scan $libpath and classify every direct dependency by where it lives:
+    #   store      - resolved into one of the provided store/closure directories (the consumer must make it findable)
+    #   host       - resolved somewhere else on the machine that is not a default system dir (Homebrew, /usr/local)
+    #   system     - a default OS library directory, or a loader-name that is plainly part of the C runtime
+    #   unresolved - a bare name that matched no search dir and no system pattern (the genuinely missing case)
+    # Options: search_dirs => [...], store_dirs => [...], system_dirs => [...] (defaults to this OS's dirs).
+    method runtime_deps ( $libpath, %opts ) {
+        my @raw = $self->scan_runtime_deps( $libpath, @{ $opts{search_dirs} // [] } );
+        return [] unless @raw;
+        my @store  = @{ $opts{store_dirs}  // [] };
+        my @system = @{ $opts{system_dirs} // [ $self->_system_lib_dirs ] };
+        my @out;
+        for my $dep (@raw) {
+            next unless defined $dep && length $dep;
+            my %r = ( raw => $dep );
+            if ( path($dep)->is_absolute ) {
+                my $p = path($dep);
+                $r{path}  = $p->stringify;
+                $r{name}  = $p->basename;
+                $r{dir}   = $p->parent->stringify;
+                $r{scope} = $self->_path_under( $r{path}, @store ) ? 'store' : $self->_path_under( $r{path}, @system ) ? 'system' : 'host';
+            }
+            else {
+                $r{name}  = $dep;
+                $r{scope} = $self->_looks_system_lib($dep) ? 'system' : 'unresolved';
+            }
+            push @out, \%r;
+        }
+        return \@out;
+    }
+
+    # Directories to offer the loader when resolving a library's dependency table, plus the install roots used to
+    # recognise a resolved path as "ours". Input is a list of fetch/closure entries (each with an optional
+    # artifacts.installdir and libfiles / linkdirs / bindirs). Returns (\@search_dirs, \@store_dirs).
+    method dep_search_dirs ($entries) {
+        my ( @search, @store, %seen );
+        my $add = sub { my $d = shift; return unless defined $d && length $d; push @search, $d unless $seen{$d}++ };
+        for my $e ( grep { ref $_ eq 'HASH' } @{ $entries // [] } ) {
+            my $id = $e->{artifacts}{installdir};
+            if ( defined $id && length $id ) {
+                push @store, $id;
+                $add->( path($id)->child($_)->stringify ) for qw[bin lib];
+            }
+            for my $key (qw[libfiles linkdirs bindirs]) {
+                my $v = $e->{$key} // [];
+                $v = [$v] unless ref $v eq 'ARRAY';
+                for my $p (@$v) {
+                    next unless defined $p && length $p;
+                    $add->( $key eq 'libfiles' ? path($p)->parent->stringify : $p );
+                }
+            }
+        }
+        return ( \@search, \@store );
+    }
+
+    # True when $child is $dir itself or sits underneath it (separator-bounded, case-insensitive on Windows).
+    method _path_under ( $child, @dirs ) {
+        my $c = path($child)->absolute->stringify;
+        ($c) = ( $c =~ s{\\}{/}gr );
+        $c = lc $c if $^O eq 'MSWin32';
+        for my $dir (@dirs) {
+            next unless defined $dir && length $dir;
+            my $d = path($dir)->absolute->stringify;
+            ($d) = ( $d =~ s{\\}{/}gr );
+            $d = lc $d if $^O eq 'MSWin32';
+            return 1 if index( $c, $d ) == 0 && ( length($c) == length($d) || substr( $c, length($d), 1 ) eq '/' );
+        }
+        return 0;
+    }
+
+    # Default OS locations whose libraries the loader already finds without help.
+    method _system_lib_dirs () {
+        if ( $^O eq 'MSWin32' ) {
+            my $root = $ENV{SystemRoot} // 'C:\\Windows';
+            return grep {-d} map { path($root)->child($_)->stringify } qw[System32 SysWOW64];
+        }
+        if ( $^O eq 'darwin' ) {
+            return grep {-d} qw[/usr/lib /usr/lib/system /System/Library/Frameworks /System/Library/PrivateFrameworks /Library/Frameworks];
+        }
+        my @dirs = qw[/lib /lib64 /usr/lib /usr/lib64 /usr/local/lib /usr/local/lib64];
+        push @dirs, grep {-d} glob('/lib/*-linux-gnu'), glob('/usr/lib/*-linux-gnu');
+        return grep {-d} @dirs;
+    }
+
+    # A bare loader name the OS itself provides: the Windows API sets/CRT, Mach-O system install names, and the
+    # usual ELF runtime sonames. Anything else that stayed unresolved is worth reporting.
+    method _looks_system_lib ($name) {
+        if ( $^O eq 'MSWin32' ) {
+            return 1 if $name =~ /\A(?:api-ms-win-|ext-ms-)/i;
+            my $sys
+                = qr/\A(?:ucrtbase|vcruntime\d*|msvcp\d*|msvcr\d*|kernel32|kernelbase|user32|gdi32|gdi32full|advapi32|shell32|ole32|oleaut32|ws2_32|ntdll|combase|bcrypt|bcryptprimitives|cryptbase|userenv|imm32|setupapi|version|winmm|shlwapi|rpcrt4|sechost|cfgmgr32|dwmapi|dcomp|d3d\d*|dxgi|opengl32|glu32|uxtheme|usp10|wtsapi32|mswsock|dnsapi|iphlpapi|winhttp|crypt32|ncrypt|propsys|dwrite|d2d1|comdlg32|winspool|wininet|urlmon|psapi|powrprof|profapi|mpr|netapi32|credui|sspicli|secur32|msvcrt|msimg32|comctl32|windowscodecs|avrt|hid|dbghelp|win32u|shcore|textinputframework|twinapi|uiautomationcore)\d*\.dll\z/i;
+            return 1 if $name =~ $sys;
+            return 0;
+        }
+        if ( $^O eq 'darwin' ) {
+            return 1 if $name =~ m{\A/usr/lib/|/System/Library/|/Library/};
+            return 1 if $name =~ /\Alib(?:System|c\+\+|objc|resolv|iconv)\b/;
+        }
+        return 1 if $name =~ /\Alib(?:c|m|dl|pthread|rt|gcc_s|stdc\+\+|gomp|atomic|resolv|nsl|util|z|crypt|quadmath)\b/;
+        return 1 if $name =~ /\Ald-linux/;
+        return 0;
+    }
+
     # Recover the library artifacts xrepo failed to list. A port that ships only static archives (a vcpkg zlib, say)
     # can come back with an install tree but an empty `libfiles`, which used to drop the package into the header-only
     # branch below and hand consumers an undef libpath for a package that plainly ships a library. Scans the linkdirs
@@ -889,18 +1079,20 @@ class Alien::Xrepo v1.0.4 {
 
             # Return a generic object (likely header-only)
             return Alien::Xrepo::PackageInfo->new(
-                includedirs => $incdirs,
-                libfiles    => [],
-                libpath     => undef,
-                linkdirs    => $linkdirs,
-                links       => $info->{links}   // [],
-                license     => $info->{license} // undef,
-                shared      => $info->{shared}  // 0,
-                static      => $info->{static}  // 0,
-                version     => $info->{version} // undef,
-                bindirs     => $bindirs,
-                installdir  => $installdir,
-                kind        => $kind
+                includedirs  => $incdirs,
+                libfiles     => [],
+                libpath      => undef,
+                linkdirs     => $linkdirs,
+                links        => $info->{links}   // [],
+                license      => $info->{license} // undef,
+                shared       => $info->{shared}  // 0,
+                static       => $info->{static}  // 0,
+                version      => $info->{version} // undef,
+                bindirs      => $bindirs,
+                deps         => $info->{deps}         // [],
+                runtime_deps => $info->{runtime_deps} // [],
+                installdir   => $installdir,
+                kind         => $kind
             );
         }
 
@@ -979,18 +1171,20 @@ class Alien::Xrepo v1.0.4 {
         }
         $self->blah( '[*] Identified runtime library: ' . $runtime_lib ) if $runtime_lib;
         return Alien::Xrepo::PackageInfo->new(
-            includedirs => $incdirs,
-            libfiles    => $libfiles,
-            libpath     => $runtime_lib,
-            linkdirs    => $linkdirs,
-            links       => $info->{links}   // [],
-            license     => $info->{license} // undef,
-            shared      => $info->{shared}  // 0,
-            static      => $info->{static}  // 0,
-            version     => $info->{version} // undef,
-            bindirs     => $bindirs,
-            installdir  => $installdir,
-            kind        => $kind
+            includedirs  => $incdirs,
+            libfiles     => $libfiles,
+            libpath      => $runtime_lib,
+            linkdirs     => $linkdirs,
+            links        => $info->{links}   // [],
+            license      => $info->{license} // undef,
+            shared       => $info->{shared}  // 0,
+            static       => $info->{static}  // 0,
+            version      => $info->{version} // undef,
+            bindirs      => $bindirs,
+            deps         => $info->{deps}         // [],
+            runtime_deps => $info->{runtime_deps} // [],
+            installdir   => $installdir,
+            kind         => $kind
         );
     }
 };

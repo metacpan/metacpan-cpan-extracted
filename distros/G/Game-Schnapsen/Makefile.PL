@@ -1,4 +1,4 @@
-use 5.008003;
+use 5.014;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
@@ -10,7 +10,7 @@ my %WriteMakefileArgs = (
     ABSTRACT_FROM    => 'lib/Game/Schnapsen.pm',
     LICENSE          => 'artistic_2',
     EXE_FILES        => [ 'bin/schnapsen' ],
-    MIN_PERL_VERSION => '5.008003',
+    MIN_PERL_VERSION => '5.014',
     macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
@@ -20,8 +20,10 @@ my %WriteMakefileArgs = (
     },
     PREREQ_PM => {
         # Digest::SHA is core and is all the deal needs. Object::Proto::Sugar
-        # is the house object system and is the one non-core prerequisite.
+        # is the house object system, and Game::Terminal::Kit is the keys,
+        # the screen and the picker.
         'Object::Proto::Sugar' => '0.05',
+        'Game::Terminal::Kit' => '0.05',
     },
     META_MERGE => {
         'meta-spec' => { version => 2 },

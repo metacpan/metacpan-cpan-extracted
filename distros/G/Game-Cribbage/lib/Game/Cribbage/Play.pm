@@ -209,7 +209,7 @@ Game::Cribbage::Play - a single play sequence (cards up to 31)
 
 =head1 VERSION
 
-Version 0.17
+Version 0.18
 
 =cut
 

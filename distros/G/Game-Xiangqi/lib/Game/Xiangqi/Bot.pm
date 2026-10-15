@@ -8,7 +8,7 @@ use Digest::SHA ();
 use Game::Xiangqi::Engine ':all';
 use Game::Xiangqi::Notation;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 my $N = 'Game::Xiangqi::Notation';
 

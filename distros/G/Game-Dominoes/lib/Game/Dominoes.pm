@@ -19,7 +19,7 @@ use Game::Dominoes::Notation;
 use Game::Dominoes::Error;
 use Game::Dominoes::Result;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 our %HAND_SIZE = (2 => 9, 3 => 7, 4 => 5);
 
@@ -368,7 +368,7 @@ sub _end_hand {
 }
 
 sub _finish {
-	my ($self, $reason) = @_;
+	my ($self, $reason, $seat) = @_;
 	$self->status('finished');
 	$self->turn(undef);
 	$self->result(Game::Dominoes::Result->new(
@@ -376,7 +376,7 @@ sub _finish {
 		scores => { %{ $self->scores } },
 		reason => $reason,
 	));
-	$self->_note('game_end', reason => $reason);
+	$self->_note('game_end', reason => $reason, (defined $seat ? (seat => $seat) : ()));
 	return;
 }
 
@@ -407,21 +407,110 @@ sub resign {
 	my $scores = $self->scores;
 	my ($high) = sort { $b <=> $a } map { $scores->{$_} } grep { $_ != $seat } $self->seats;
 	$scores->{$seat} = -1 if $scores->{$seat} >= $high;
-	$self->_finish('resign');
+	$self->_finish('resign', $seat);
 	return $self->result;
 }
 
+our @HEADER = qw/seed players variant target scale reserve resigned/;
+
 sub to_text {
-	my ($self) = @_;
-	my @moves;
+	my ($self, %opt) = @_;
+	my (@moves, $resigned);
 	for my $event (@{ $self->history }) {
 		push @moves, $event->{play} if $event->{kind} eq 'play';
 		push @moves, { kind => 'draw', count => $event->{count} }
 			if $event->{kind} eq 'draw';
 		push @moves, { kind => 'pass' } if $event->{kind} eq 'pass';
 		push @moves, { kind => 'hand_end' } if $event->{kind} eq 'hand_end';
+		$resigned = $event->{seat}
+			if $event->{kind} eq 'game_end' && $event->{reason} eq 'resign';
 	}
-	return Game::Dominoes::Notation::to_text(\@moves);
+	my $log = Game::Dominoes::Notation::to_text(\@moves);
+	return $log unless $opt{with_seed};
+
+	my @lines = (
+		'seed ' . unpack('H*', $self->seed),
+		map({ "$_ " . $self->$_ } qw/players variant target scale reserve/),
+		(defined $resigned ? "resigned $resigned" : ()),
+		"moves $log",
+	);
+	return join "\n", @lines;
+}
+
+sub from_text {
+	my ($class, $text, %args) = @_;
+
+	die 'Game::Dominoes: from_text wants the text of a game'
+		unless defined $text && !ref $text;
+
+	my %known = map { $_ => 1 } @HEADER, 'moves';
+	my @lines = grep { /\S/ } split /\r?\n/, $text;
+	my (%field, $log);
+
+	if (grep { /\A\s*(\w+)/ && $known{$1} } @lines) {
+		for my $line (@lines) {
+			$line =~ s/\A\s+//;
+			$line =~ s/\s+\z//;
+			my ($key, $value) = $line =~ /\A(\w+)(?:\s+(.*))?\z/;
+			die "Game::Dominoes: from_text does not know the line '$line'"
+				unless defined $key && $known{$key};
+			die "Game::Dominoes: from_text found two $key lines"
+				if exists $field{$key};
+			$field{$key} = defined $value ? $value : '';
+		}
+		die 'Game::Dominoes: from_text found no moves line'
+			unless exists $field{moves};
+		$log = delete $field{moves};
+
+		if (exists $field{seed}) {
+			die 'Game::Dominoes: the seed must be 64 hexadecimal digits'
+				unless $field{seed} =~ /\A[0-9a-fA-F]{64}\z/;
+			$field{seed} = pack 'H*', $field{seed};
+		}
+		for my $key (qw/players target scale reserve resigned/) {
+			next unless exists $field{$key};
+			die "Game::Dominoes: $key must be a whole number, not '$field{$key}'"
+				unless $field{$key} =~ /\A-?\d+\z/;
+		}
+	}
+	else {
+		$log = $text;
+	}
+
+	%field = (%args, %field);
+	my $resigned = delete $field{resigned};
+	die 'Game::Dominoes: from_text needs the seed, in the text or as an argument'
+		unless defined $field{seed};
+
+	my $moves = eval { Game::Dominoes::Notation::from_text($log) };
+	unless ($moves) {
+		(my $why = $@) =~ s/ at \S+ line \d+\.?\n\z//;
+		die "Game::Dominoes: from_text could not read the moves: $why";
+	}
+
+	my $game = $class->new(%field);
+	my $n = 0;
+	for my $move (@$moves) {
+		$n++;
+		next unless $move->{kind} eq 'play';
+		my $token = Game::Dominoes::Notation::move_text($move);
+		die "Game::Dominoes: move $n, $token, comes after the game is over"
+			unless $game->status eq 'active';
+		my $out = $game->play($game->turn, { tile => $move->{tile}, arm => $move->{arm} });
+		die "Game::Dominoes: move $n, $token, was refused: " . $out->message
+			if ref $out eq 'Game::Dominoes::Error';
+	}
+
+	die 'Game::Dominoes: the draws, passes and ends of hands in the text are not the ones its plays make'
+		unless $game->to_text eq Game::Dominoes::Notation::to_text($moves);
+
+	if (defined $resigned) {
+		die "Game::Dominoes: seat $resigned cannot resign here"
+			unless $game->status eq 'active' && $game->hands->{$resigned};
+		$game->resign($resigned);
+	}
+
+	return $game;
 }
 
 1;
@@ -434,7 +523,7 @@ Game::Dominoes - draw dominoes with All Fives scoring, as a reusable engine
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 
@@ -719,8 +808,50 @@ two seats level on second means nobody on third.
 =head2 to_text
 
 	$game->to_text;
+	$game->to_text(with_seed => 1);
 
-The whole game so far in this distribution's notation.
+The whole game so far in this distribution's notation, as one line of moves.
+This is safe to show a player: without the seed it does not say what anybody
+holds.
+
+With C<with_seed>, the game is written in full, one field to a line, ready for
+L</from_text>:
+
+	seed 6161616161616161616161616161616161616161616161616161616161616161
+	players 2
+	variant all_fives
+	target 250
+	scale 1
+	reserve 0
+	moves 6-4@L 4-1@R D2 4-4@L ...
+
+The seed is in hexadecimal. A C<resigned> line before C<moves> names the seat
+that resigned, when one did. B<This form holds the seed>, and with it every
+hand and the order of the boneyard, so it must not be shown to a player while
+the game is running.
+
+=head2 from_text
+
+	my $game = Game::Dominoes->from_text($game->to_text(with_seed => 1));
+	my $game = Game::Dominoes->from_text($log, seed => $bytes, players => 3);
+
+A new game, built by dealing from the seed and playing the moves again, so the
+hands, the boneyard, the layout, the scores and the hand number are all as they
+were. C<< from_text($g->to_text(with_seed => 1))->to_text(with_seed => 1) >>
+is the text it was given.
+
+It also reads the one line of moves C<to_text> writes without the seed, given
+the seed and any other settings the game was made with as arguments. A field
+in the text wins over the same argument.
+
+Draws, passes and the ends of hands follow from the plays, so they are not
+replayed but checked: text whose draws or passes are not the ones its plays
+make is refused. So is text with an unknown line, a seed that is not 64
+hexadecimal digits, a move that does not parse, or a play the game would
+refuse, each with a sentence saying which.
+
+A game is rebuilt from its seed, its settings and its moves alone, so a game
+whose hands, boneyard or history were changed by hand does not come back.
 
 =head1 SEE ALSO
 

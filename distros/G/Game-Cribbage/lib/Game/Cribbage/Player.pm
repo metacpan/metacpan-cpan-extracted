@@ -30,7 +30,7 @@ Game::Cribbage::Player - a player in a cribbage game
 
 =head1 VERSION
 
-Version 0.17
+Version 0.18
 
 =cut
 

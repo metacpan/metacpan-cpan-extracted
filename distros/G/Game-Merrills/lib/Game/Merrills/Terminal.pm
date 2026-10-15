@@ -9,8 +9,15 @@ use Game::Merrills::Bot;
 use Game::Merrills::Notation;
 use Game::Merrills::Points;
 use Getopt::Long ();
+use Game::Terminal::Kit::History;
+use Game::Terminal::Kit::Keys;
+use Game::Terminal::Kit::Line;
+use Game::Terminal::Kit::Log;
+use Game::Terminal::Kit::Run;
+use Game::Terminal::Kit::Screen;
+use Game::Terminal::Kit::Steer;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use constant {
 	PITCH => 4,
@@ -19,7 +26,7 @@ use constant {
 	RECENT => 2,
 };
 
-our (%COMMAND, %GLYPH, %INK, %GROUND, %BRACKET, %SEQUENCE, %CONTROL, %KEY);
+our (%COMMAND, %GLYPH, %INK, %GROUND, %BRACKET, %KEY);
 
 BEGIN {
 	%COMMAND = (
@@ -32,6 +39,7 @@ BEGIN {
 		board => 'draw the board again',
 		position => 'the position as one line of text',
 		undo => 'take back your last move, and the reply to it',
+		redo => 'play again what undo took back',
 		'save FILE' => 'write the game out',
 		'load FILE' => 'read a game back in',
 		'level N' => 'set the strength of the bot, 1 to 5',
@@ -103,34 +111,9 @@ BEGIN {
 		chosen => [ '<', '>' ],
 	);
 
-	%SEQUENCE = (
-		'A' => 'up',
-		'B' => 'down',
-		'C' => 'right',
-		'D' => 'left',
-		'H' => 'home',
-		'F' => 'end',
-		'Z' => 'back_tab',
-		'1~' => 'home',
-		'4~' => 'end',
-		'5~' => 'page_up',
-		'6~' => 'page_down',
-		'7~' => 'home',
-		'8~' => 'end',
-	);
-
-	%CONTROL = (
-		"\r" => 'enter',
-		"\n" => 'enter',
-		"\t" => 'tab',
-		"\x7f" => 'backspace',
-		"\x08" => 'backspace',
-		"\x03" => 'interrupt',
-		"\x04" => 'eof',
-	);
-
 	%KEY = (
 		u => 'undo',
+		r => 'redo',
 		t => 'type',
 		q => 'quit',
 	);
@@ -179,21 +162,18 @@ has highlight => (
 	default => sub { {} }
 );
 
-has recent => (
-	is => 'rw',
-	isa => ArrayRef,
-	default => sub { [] }
-);
-
 has picking => (
 	is => 'rw',
 	isa => Bool
 );
 
-has raw => (
+has [qw/keyboard screen log/] => (
+	is => 'rw'
+);
+
+has frame => (
 	is => 'rw',
-	isa => Bool,
-	default => 0
+	isa => ArrayRef
 );
 
 has keysource => (
@@ -201,7 +181,7 @@ has keysource => (
 	isa => CodeRef
 );
 
-has [qw/pending heard/] => (
+has pending => (
 	is => 'rw',
 	isa => ArrayRef,
 	default => sub { [] }
@@ -217,6 +197,10 @@ has frames => (
 	default => 0
 );
 
+has history => (
+	is => 'rw'
+);
+
 sub BUILD {
 	my ($self) = @_;
 	$self->game(Game::Merrills->new) unless $self->game;
@@ -225,22 +209,39 @@ sub BUILD {
 	$self->in(\*STDIN) unless $self->in;
 	$self->out(\*STDOUT) unless $self->out;
 	$self->interactive(-t $self->in ? 1 : 0) unless defined $self->interactive;
-	$self->colour($self->interactive && !$ENV{NO_COLOR} ? 1 : 0)
+	$self->colour($self->interactive && !Game::Terminal::Kit::Screen::no_colour() ? 1 : 0)
 		unless defined $self->colour;
+	$self->keyboard(Game::Terminal::Kit::Keys->new(
+		in => $self->in,
+		pending => $self->pending,
+		($self->keysource ? (keysource => $self->keysource) : ()),
+	)) unless $self->keyboard;
+	$self->screen(Game::Terminal::Kit::Screen->new(
+		out => $self->out,
+		interactive => $self->interactive,
+		colour => $self->colour,
+		ascii => $self->ascii,
+	)) unless $self->screen;
+	$self->log(Game::Terminal::Kit::Log->new(keep => RECENT)) unless $self->log;
+	$self->history(Game::Terminal::Kit::History->new(
+		save => sub { $_[0]->to_text },
+		load => sub { Game::Merrills->from_text($_[0]) },
+	)) unless $self->history;
+	$self->history->start($self->game);
 	$self->picking($self->interactive ? 1 : 0) unless defined $self->picking;
 	$self->picking(0) unless $self->keys_available;
 	$self->layer;
-
-	my $previous = select $self->out;
-	$| = 1;
-	select $previous;
+	$self->screen->flush_on;
 	return $self;
 }
 
 sub layer {
 	my ($self) = @_;
+	my $screen = $self->screen;
+	$screen->ascii($self->ascii ? 1 : 0);
+	$screen->colour($self->colour ? 1 : 0);
 	binmode $self->out, ':raw';
-	binmode $self->out, ':encoding(UTF-8)' unless $self->ascii;
+	$screen->utf8;
 	return $self;
 }
 
@@ -249,18 +250,8 @@ sub start {
 	$self->say($self->paint("Nine Men's Morris.", 'title')
 		. $self->paint(' Type help for the commands.', 'dim'));
 	$self->picking(0) if $self->picking && !$self->enter_raw;
-
-	my $interrupt = $SIG{INT};
-	local $SIG{INT} = sub {
-		$self->leave_raw;
-		$SIG{INT} = defined $interrupt ? $interrupt : 'DEFAULT';
-		kill 'INT', $$;
-	};
-
-	my $played = eval { $self->turns; 1 };
-	my $error = $@;
-	$self->leave_raw;
-	die $error unless $played;
+	$self->history->start($self->game);
+	Game::Terminal::Kit::Run::guard(sub { $self->turns }, $self->keyboard, $self->screen);
 	return $self->game->result;
 }
 
@@ -277,83 +268,60 @@ sub turns {
 			$self->bot_move;
 			next;
 		}
+		$self->person_turn;
 		my $line = $picking ? $self->pick : $self->read_line;
 		unless (defined $line) {
 			$self->say('Bye.');
 			last;
 		}
-		$self->heard([]);
+		$self->log->shown;
 		my $stop = $self->command($line);
-		$self->heard([]) unless $self->picking && $self->raw;
+		$self->log->shown unless $self->picking && $self->raw;
 		last if $stop;
 	}
 	return $self;
 }
 
+sub person_turn {
+	my ($self) = @_;
+	$self->history->turn($self->game);
+	return $self;
+}
+
+sub raw {
+	my ($self) = @_;
+	return $self->keyboard->raw;
+}
+
+sub recent {
+	my ($self) = @_;
+	return [ map { @{$_} } @{ $self->log->recent } ];
+}
+
+sub heard {
+	my ($self) = @_;
+	return $self->log->notes;
+}
+
 sub keys_available {
 	my ($self) = @_;
-	return 1 if $self->keysource;
-	return 0 unless defined $self->in && -t $self->in;
-	return eval { require Term::ReadKey; 1 } ? 1 : 0;
+	return $self->keyboard->keys_available;
 }
 
 sub enter_raw {
 	my ($self) = @_;
-	return $self if $self->raw;
-	if ($self->keysource) {
-		$self->raw(1);
-		return $self;
-	}
-	return undef unless $self->keys_available;
-	return undef unless eval { Term::ReadKey::ReadMode(3, $self->in); 1 };
-	$self->raw(1);
-	return $self;
+	return $self->keyboard->enter_raw ? $self : undef;
 }
 
 sub leave_raw {
 	my ($self) = @_;
-	return $self unless $self->raw;
-	eval { Term::ReadKey::ReadMode(0, $self->in) } unless $self->keysource;
-	$self->raw(0);
+	$self->keyboard->leave_raw;
 	return $self;
 }
 
-sub read_char {
-	my ($self, $wait) = @_;
-	my $pending = $self->pending;
-	return shift @{$pending} if @{$pending};
-	return $self->keysource->($wait) if $self->keysource;
-	my $char = Term::ReadKey::ReadKey($wait ? 0 : -1, $self->in);
-	return $char if defined $char || $wait;
-	select undef, undef, undef, 0.05;
-	return Term::ReadKey::ReadKey(-1, $self->in);
-}
-
 sub read_key {
-	my ($self) = @_;
-	my $char = $self->read_char(1);
-	return undef unless defined $char;
-	return $CONTROL{$char} if $CONTROL{$char};
-	return $self->read_sequence if $char eq "\e";
-	return $char;
-}
-
-sub read_sequence {
-	my ($self) = @_;
-	my $opener = $self->read_char(0);
-	return 'escape' unless defined $opener;
-	unless ($opener eq '[' || $opener eq 'O') {
-		unshift @{ $self->pending }, $opener;
-		return 'escape';
-	}
-	my $tail = '';
-	while (length $tail < 8) {
-		my $char = $self->read_char(0);
-		last unless defined $char;
-		$tail .= $char;
-		last if $char =~ m/[A-Za-z~]/;
-	}
-	return $SEQUENCE{$tail} || 'escape';
+	my ($self, $wait) = @_;
+	return $self->keyboard->read_key($wait);
 }
 
 sub components {
@@ -395,22 +363,12 @@ sub complete {
 
 sub nearest {
 	my ($self, $from, $direction, $candidates) = @_;
-	my ($row, $col) = (Game::Merrills::Points::row_of($from), Game::Merrills::Points::col_of($from));
-	my ($best, $best_cost, $best_off);
-	for my $point (@{$candidates}) {
-		next if $point == $from;
-		my $down = Game::Merrills::Points::row_of($point) - $row;
-		my $right = Game::Merrills::Points::col_of($point) - $col;
-		my ($along, $off) = $direction eq 'up' ? (-$down, abs $right)
-			: $direction eq 'down' ? ($down, abs $right)
-			: $direction eq 'left' ? (-$right, abs $down)
-			: ($right, abs $down);
-		next unless $along > 0;
-		my $cost = $along + 2 * $off;
-		next if defined $best && ($cost > $best_cost || ($cost == $best_cost && $off >= $best_off));
-		($best, $best_cost, $best_off) = ($point, $cost, $off);
-	}
-	return defined $best ? $best : $from;
+	my @points = ($from, grep { $_ != $from } @{$candidates});
+	my $next = Game::Terminal::Kit::Steer::nearest(
+		[ map { [ Game::Merrills::Points::col_of($_), Game::Merrills::Points::row_of($_) ] } @points ],
+		0, Game::Terminal::Kit::Steer::way($direction),
+	);
+	return defined $next ? $points[$next] : $from;
 }
 
 sub step_of {
@@ -426,8 +384,8 @@ sub pick {
 	return undef unless @{ $self->game->legal_moves };
 
 	my (@prefix, $at, $hinted);
-	my $notice = [ @{ $self->heard } ];
-	$self->heard([]);
+	my $notice = [ @{ $self->log->notes } ];
+	$self->log->shown;
 	while (1) {
 		my $options = $self->options_for(\@prefix);
 		if ($hinted && !(defined $at && grep { $_ == $at } @{$options})) {
@@ -451,8 +409,8 @@ sub pick {
 		}
 		if ($key eq 'tab' || $key eq 'j' || $key eq 'back_tab' || $key eq 'k') {
 			my ($index) = grep { $options->[$_] == $at } 0 .. $#{$options};
-			$index += $key eq 'tab' || $key eq 'j' ? 1 : -1;
-			$at = $options->[ $index % @{$options} ];
+			$at = $options->[ Game::Terminal::Kit::Steer::ring(
+				scalar @{$options}, $index, $key eq 'tab' || $key eq 'j' ? 1 : -1) ];
 			next;
 		}
 		if ($key eq 'home' || $key eq 'page_up') {
@@ -574,15 +532,14 @@ sub show_choice {
 		: sprintf('Place on %s and take which man?', Game::Merrills::Points::name($to));
 	my $cursor = sprintf '> %s%s', $name, @said ? ', ' . join(', ', @said) : '';
 
-	$self->clear;
-	$self->say($_) for @{ $self->board_lines }, '', @{ $self->status_lines }, '',
+	my @lines = (@{ $self->board_lines }, '', @{ $self->status_lines }, '',
 		$self->paint($ask, 'step'),
 		' ' . $self->paint($cursor, 'cursor')
-			. $self->paint(sprintf('   %d of %d', $index + 1, scalar @{$options}), 'dim');
-	$self->say('') if $notice && @{$notice};
-	$self->say($_) for @{ $notice || [] };
-	$self->say('');
-	$self->say($self->legend);
+			. $self->paint(sprintf('   %d of %d', $index + 1, scalar @{$options}), 'dim'));
+	push @lines, '', @{$notice} if $notice && @{$notice};
+	push @lines, '', $self->legend;
+	$self->frame(\@lines);
+	$self->screen->show(\@lines);
 	$self->redraw(0);
 	return $self;
 }
@@ -591,7 +548,7 @@ sub legend {
 	my ($self) = @_;
 	my @keys = (
 		[ 'arrows', 'move' ], [ 'tab', 'next' ], [ 'enter', 'choose' ],
-		[ 'backspace', 'back' ], [ 'h', 'hint' ], [ 'u', 'undo' ], [ 't', 'type' ],
+		[ 'backspace', 'back' ], [ 'h', 'hint' ], [ 'u', 'undo' ], [ 'r', 'redo' ], [ 't', 'type' ],
 		[ 'q', 'quit' ], [ '?', 'help' ],
 	);
 	return join $self->paint(' | ', 'dim'),
@@ -607,30 +564,9 @@ sub key_lines {
 		'Enter or space chooses. A move is chosen a step at a time: the man,',
 		'where it goes, and the man it takes if it closes a mill.',
 		'Backspace or escape goes back a step. h shows what the bot would play.',
-		'u takes a move back, t goes back to typing, q quits, : types a command.',
+		'u takes a move back and r plays it again.',
+		't goes back to typing, q quits, : types a command.',
 	];
-}
-
-sub keyed_line {
-	my ($self) = @_;
-	my $out = $self->out;
-	my $line = '';
-	while (1) {
-		my $key = $self->read_key;
-		return undef if !defined $key || $key eq 'eof' || $key eq 'interrupt';
-		last if $key eq 'enter';
-		if ($key eq 'backspace') {
-			next unless length $line;
-			chop $line;
-			print {$out} "\b \b";
-			next;
-		}
-		next if length $key > 1 || $key lt ' ';
-		$line .= $key;
-		print {$out} $key;
-	}
-	print {$out} "\n";
-	return $line;
 }
 
 sub set_picking {
@@ -657,7 +593,8 @@ sub replay {
 		defined $position ? (position => $position) : ()
 	);
 	$self->game($game);
-	$self->recent([]);
+	$self->history->start($game);
+	$self->log->recent([]);
 	$self->render;
 
 	my $number = 0;
@@ -704,9 +641,7 @@ sub bot_move {
 
 sub played {
 	my ($self, $move) = @_;
-	my $recent = $self->recent;
-	push @{$recent}, $self->narrate($move);
-	shift @{$recent} while @{$recent} > RECENT;
+	$self->log->record($self->narrate($move));
 	$self->redraw(1);
 	return $move;
 }
@@ -736,10 +671,18 @@ sub narrate {
 
 sub read_line {
 	my ($self, $prompt) = @_;
+	$prompt = $self->paint($self->game->turn . '>', $self->ink_of($self->game->turn)) . ' '
+		unless defined $prompt;
+	if ($self->raw) {
+		my $typed = Game::Terminal::Kit::Line->new(
+			prompt => $prompt,
+			head => $self->frame || [],
+		);
+		my ($event, $text) = $typed->run($self->keyboard, $self->screen);
+		return $event eq 'chosen' ? $text : $event eq 'back' ? '' : undef;
+	}
 	my $out = $self->out;
-	print {$out} defined $prompt ? $prompt
-		: $self->paint($self->game->turn . '>', $self->ink_of($self->game->turn)) . ' ';
-	return $self->keyed_line if $self->raw;
+	print {$out} $prompt;
 	my $line = readline $self->in;
 	unless (defined $line) {
 		print {$out} "\n" unless $self->interactive;
@@ -752,26 +695,21 @@ sub read_line {
 
 sub say {
 	my ($self, $line) = @_;
-	my $out = $self->out;
-	print {$out} (defined $line ? $line : ''), "\n";
-	push @{ $self->heard }, $line if defined $line && length $line;
+	$self->screen->say($line);
+	$self->log->note($line);
 	return $self;
 }
 
 sub clear {
 	my ($self) = @_;
-	return $self unless $self->interactive;
-	my $out = $self->out;
-	print {$out} "\e[2J\e[H";
+	$self->screen->clear;
 	return $self;
 }
 
 sub paint {
 	my ($self, $text, @keys) = @_;
-	return $text unless $self->colour;
 	my @codes = grep { defined } map { $INK{$_} || $GROUND{$_} } @keys;
-	return $text unless @codes;
-	return "\e[" . join(';', @codes) . 'm' . $text . "\e[0m";
+	return $self->screen->paint($text, join ';', @codes);
 }
 
 sub ink_of {
@@ -979,6 +917,7 @@ sub command {
 	return $self->show_hint if $word eq 'hint';
 	return $self->say($self->game->to_position) && 0 if $word eq 'position';
 	return $self->take_back if $word eq 'undo';
+	return $self->play_again if $word eq 'redo';
 	return $self->save($argument) if $word eq 'save';
 	return $self->load($argument) if $word eq 'load';
 	return $self->set_level($argument) if $word eq 'level';
@@ -1056,14 +995,31 @@ sub show_hint {
 
 sub take_back {
 	my ($self) = @_;
-	my $game = $self->game;
-	return $self->say('There is nothing to take back.') && 0 unless @{ $game->history };
-
-	$game->undo;
-	$game->undo if @{ $game->history } && $self->bot_plays($game->turn);
-	$self->recent([]);
+	my $game = $self->history->undo;
+	return $self->say('There is nothing to take back.') && 0 unless $game;
+	$self->swap($game);
 	$self->later('Taken back.');
 	return 0;
+}
+
+sub play_again {
+	my ($self) = @_;
+	my $game = $self->history->redo;
+	return $self->say('There is nothing to play again.') && 0 unless $game;
+	$self->swap($game);
+	$self->later('Played again.');
+	return 0;
+}
+
+sub swap {
+	my ($self, $game) = @_;
+	$self->game($game);
+	$self->done_picking;
+	$self->log->recent([]);
+	my $bot = $self->bot;
+	$_->last_search(undef) for grep { $_ } ref $bot eq 'HASH' ? values %{$bot} : ($bot);
+	$self->redraw(1);
+	return $self;
 }
 
 sub later {
@@ -1102,8 +1058,8 @@ sub load {
 		$why =~ s/\s+$//;
 		return $self->say("That is not a game I can read: $why") && 0;
 	}
-	$self->game($game);
-	$self->recent([]);
+	$self->swap($game);
+	$self->history->start($game);
 	$self->later("Loaded $file, " . scalar(@{ $game->history }) . ' moves in.');
 	return 0;
 }
@@ -1270,6 +1226,17 @@ sub _bad {
 	return 2;
 }
 
+sub options {
+	return [
+		{ name => 'level', type => 'int', min => 1, max => 5, help => "the bot's strength" },
+		{ name => 'side', type => 'enum', choices => [qw(white black random)], help => 'your side' },
+		{ name => 'hotseat', type => 'flag', help => 'two people at one keyboard, no bot' },
+		{ name => 'bot-vs-bot', type => 'flag', help => 'watch two bots' },
+		{ name => 'flying', type => 'bool', help => 'a side down to three men may fly' },
+		{ name => 'seed', type => 'str', help => 'the same seed, the same game' },
+	];
+}
+
 sub run {
 	my ($class, @argv) = @_;
 	my $saved = Getopt::Long::Configure(qw(no_ignore_case));
@@ -1389,22 +1356,11 @@ sub _run {
 		(exists $opt{pick} ? (picking => $opt{pick} ? 1 : 0) : ()),
 	);
 
-	local @SIG{qw(INT TERM HUP)};
-	for my $sig (qw(INT TERM HUP)) {
-		$SIG{$sig} = sub { $terminal->leave_raw; $SIG{$sig} = 'DEFAULT'; kill $sig, $$ };
-	}
-
-	my $result;
-	if (defined $opt{replay}) {
-		$result = eval { $terminal->replay($record) };
-	}
-	else {
+	my $result = Game::Terminal::Kit::Run::guard(sub {
+		return $terminal->replay($record) if defined $opt{replay};
 		$terminal->say($who);
-		$result = eval { $terminal->start };
-	}
-	my $died = $@;
-	$terminal->leave_raw;
-	die $died if $died;
+		return $terminal->start;
+	}, $terminal->keyboard, $terminal->screen);
 
 	return 0 unless $result;
 	return 0 if $result->is_draw || $human eq 'both' || $human eq 'none' || defined $opt{replay};
@@ -1421,7 +1377,7 @@ Game::Merrills::Terminal - the game at a prompt, on a drawn board
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
@@ -1531,6 +1487,7 @@ taken, before anything is committed.
 	backspace, escape   back a step
 	h                what the bot would play, with the cursor moved to it
 	u                take a move back
+	r                play again a move taken back
 	t                go back to typing
 	:                type one command
 	q                quit
@@ -1539,9 +1496,11 @@ taken, before anything is committed.
 Giving up and offering a draw are not on a key, so that a slip of the finger
 cannot end a game. Type them after C<:>.
 
-Each keystroke draws the whole screen again, so the last two moves are drawn
-with it, above the board's own lines, and are never wiped by the move that
-answers them.
+Each keystroke draws the whole screen again, over the last and with no clear
+between them, so the last two moves are drawn with it, above the board's own
+lines, and are never wiped by the move that answers them. A command typed
+after C<:> is typed under that screen: backspace rubs a letter out and escape
+gives the command up.
 
 Without L<Term::ReadKey>, or off a terminal, moves are typed, and nothing
 else changes.
@@ -1553,7 +1512,16 @@ from the C<moves> list, or a command: C<help> lists them. A move that is
 refused says why and what could be played instead, and the board is not
 drawn again, so the reason stays on the screen.
 
-C<undo> takes back your last move and, against a bot, the reply to it.
+=head2 Taking a move back
+
+C<u>, or the typed C<undo>, takes back your last move and every reply the bot
+made to it, so the board is as it was when it was last your turn. C<r>, or the
+typed C<redo>, plays that turn again. Each goes as far back, or forward, as you
+like, a turn at a time. Playing a move after taking one back forgets whatever
+could have been played again. With two people at one keyboard every move is a
+turn, and with two bots playing there is nothing to take back. With nothing to
+take back or play again a line says so and the game is unchanged. Loading a
+game starts its history afresh.
 
 =head2 Off a terminal
 
@@ -1606,7 +1574,8 @@ Whether the input is a terminal. Worked out from C<in> unless given.
 =head2 colour
 
 Whether to paint. On for a terminal unless the C<NO_COLOR> environment
-variable is set, off otherwise, unless given.
+variable is set to anything but the empty string, off otherwise, unless
+given.
 
 	$terminal->colour;
 
@@ -1630,12 +1599,6 @@ a point that could be chosen, has a ground of its own and no brackets.
 
 	$terminal->highlight({ 19 => 'candidate' });
 
-=head2 recent
-
-An arrayref of the last moves played, in words.
-
-	$terminal->recent;
-
 =head2 picking
 
 Whether moves are chosen with the keys. On for a terminal that can be read a
@@ -1643,33 +1606,49 @@ key at a time, off otherwise, unless given.
 
 	$terminal->picking;
 
-=head2 raw
-
-Whether the terminal is at present being read a key at a time.
-
-	$terminal->raw;
-
 =head2 keysource
 
 A coderef that supplies the keys, one character a call and undef when there
 are no more, in place of the terminal. With one set, the whole of the key
-handling runs with no terminal at all.
+handling runs with no terminal at all. It is read when the terminal is built.
 
 	my @keys = split //, "\e[B\r";
 	my $terminal = Game::Merrills::Terminal->new(keysource => sub { shift @keys });
 
 =head2 pending
 
-An arrayref of characters read and put back, to be read again first.
+An arrayref of characters read and put back, to be read again first. It is
+read when the terminal is built.
 
 	$terminal->pending;
 
-=head2 heard
+=head2 keyboard
 
-An arrayref of the lines printed since the last command was read, kept so
-that the answer to a command can be shown again after the screen is cleared.
+The L<Game::Terminal::Kit::Keys> the keys are read through, built from
+L</in>, L</keysource> and L</pending> unless given.
 
-	$terminal->heard;
+	$terminal->keyboard;
+
+=head2 screen
+
+The L<Game::Terminal::Kit::Screen> everything is printed through, built from
+L</out>, L</interactive>, L</colour> and L</ascii> unless given.
+
+	$terminal->screen;
+
+=head2 log
+
+The L<Game::Terminal::Kit::Log> holding the last moves in words and the
+lines printed since the last command was read. Built unless given.
+
+	$terminal->log;
+
+=head2 frame
+
+The lines of the choosing screen as it was last drawn, as an arrayref, or
+undef before the first.
+
+	$terminal->frame;
 
 =head2 preview
 
@@ -1684,14 +1663,59 @@ How many times the choosing screen has been drawn.
 
 	$terminal->frames;
 
+=head2 history
+
+The L<Game::Terminal::Kit::History> the turns are kept in, each as
+L<Game::Merrills/to_text> writes it, built in C<new> unless one is given.
+
+	$terminal->history->can_undo;
+
 =head1 METHODS
 
 =head2 layer
 
-Sets the output handle to carry what the current C<ascii> setting needs.
-Called whenever that setting changes. Returns the terminal.
+Sets the output handle and the screen to what the current C<ascii> and
+C<colour> settings need. Called whenever either changes. Returns the
+terminal.
 
 	$terminal->layer;
+
+=head2 options
+
+    my $fields = Game::Merrills::Terminal->options;
+
+The options a person would set before a game, in the order a launcher shows
+them. Each is a hash reference with a C<name>, a C<type> and a C<help>, and
+C<min> and C<max> or C<choices> where the type has them. A new list is
+returned each time.
+
+=over 4
+
+=item C<level>
+
+A whole number from 1 to 5: the bot's strength.
+
+=item C<side>
+
+One of C<white>, C<black>, C<random>: your side.
+
+=item C<hotseat>
+
+A switch: two people at one keyboard, no bot.
+
+=item C<bot-vs-bot>
+
+A switch: watch two bots.
+
+=item C<flying>
+
+On or off, C<--no-flying> for off: a side down to three men may fly.
+
+=item C<seed>
+
+Text: the same seed, the same game.
+
+=back
 
 =head2 run
 
@@ -1707,7 +1731,8 @@ arguments passed in, never from C<@ARGV>, and the Getopt configuration the
 parse needs is restored before it returns. Signal handlers are local to the
 call and the terminal is left in cooked mode on every way out, so a launcher
 such as L<Game::Terminal> can call it in its own process and carry on
-afterwards. Colour is off under C<NO_COLOR> as well as off a terminal.
+afterwards. An interrupt gives the terminal back and then stops the program
+as it would have. Colour is off under C<NO_COLOR> as well as off a terminal.
 
 =head2 start
 
@@ -1733,6 +1758,32 @@ it, until done.
 
 	$terminal->turns;
 
+=head2 person_turn
+
+Called by L</turns> when the turn passes to a side with no bot: keeps the game
+in L</history> as a turn. Returns the terminal.
+
+	$terminal->person_turn;
+
+=head2 raw
+
+Whether the terminal is at present being read a key at a time.
+
+	$terminal->raw;
+
+=head2 recent
+
+The last moves played, in words, as an arrayref.
+
+	$terminal->recent;
+
+=head2 heard
+
+The lines printed since the last command was read, as an arrayref, kept so
+that the answer to a command is shown again on the next choosing screen.
+
+	$terminal->heard;
+
 =head2 keys_available
 
 True when keys can be read one at a time: a key source was given, or the
@@ -1753,28 +1804,16 @@ Puts the terminal back to reading whole lines. Returns the terminal.
 
 	$terminal->leave_raw;
 
-=head2 read_char
-
-One character, from what was put back, the key source or the terminal. Given
-a true value it waits for one; otherwise it returns undef when none is there.
-
-	my $char = $terminal->read_char(1);
-
 =head2 read_key
 
-One key. A character comes back as itself and the rest by name: C<up>,
-C<down>, C<left>, C<right>, C<home>, C<end>, C<page_up>, C<page_down>,
-C<enter>, C<tab>, C<back_tab>, C<backspace>, C<escape>, C<interrupt>, C<eof>.
-Returns undef when there are no more.
+One key, as L<Game::Terminal::Kit::Keys/read_key> names it: a character comes
+back as itself and the rest by name, C<up>, C<enter>, C<back_tab> and so on,
+with C<escape> for the escape key alone and C<unknown> for a sequence that is
+none of them. A pressed escape does not swallow the next key. Returns undef
+when there are no more. Given a number of seconds it waits that long and no
+longer.
 
 	my $key = $terminal->read_key;
-
-=head2 read_sequence
-
-The key that follows an escape character. A character that does not begin a
-sequence is put back, so a pressed escape does not swallow the next key.
-
-	my $key = $terminal->read_sequence;
 
 =head2 components
 
@@ -1853,13 +1892,6 @@ What the keys do, as an arrayref of lines.
 
 	$terminal->key_lines;
 
-=head2 keyed_line
-
-Reads a line a key at a time, echoing it, for a command typed while keys are
-being read. Returns undef at the end of the input.
-
-	my $line = $terminal->keyed_line;
-
 =head2 set_picking
 
 Switches between choosing with the keys and typing, for the C<pick> and
@@ -1914,13 +1946,15 @@ A move in words, in the past tense.
 =head2 read_line
 
 Prints a prompt and reads a line, without its newline. Returns undef at the
-end of the input. Takes the prompt, or uses the side to move.
+end of the input. Takes the prompt, or uses the side to move. While keys are
+being read the line is typed a key at a time under the choosing screen, and
+escape gives it up, which returns the empty string.
 
 	my $line = $terminal->read_line;
 
 =head2 say
 
-Prints a line. Returns the terminal.
+Prints a line, and keeps it among those L</heard>. Returns the terminal.
 
 	$terminal->say('Taken back.');
 
@@ -2030,9 +2064,25 @@ Prints the hint.
 
 =head2 take_back
 
-Takes back the last move, and the reply to it when a bot made one.
+The C<undo> command and the C<u> key: your last move and every reply a bot
+made to it, taken back. Returns 0.
 
 	$terminal->take_back;
+
+=head2 play_again
+
+The C<redo> command and the C<r> key: the turn L</take_back> took back, played
+again. Returns 0.
+
+	$terminal->play_again;
+
+=head2 swap
+
+Puts another game in place of this one: clears the L</highlight> and the
+L</preview>, forgets the recent moves in words and the bot's last search, and
+asks for the board to be drawn again. Returns the terminal.
+
+	$terminal->swap($game);
 
 =head2 save
 
@@ -2042,7 +2092,8 @@ Writes the game to a file.
 
 =head2 load
 
-Reads a game from a file and carries on from where it stopped.
+Reads a game from a file and carries on from where it stopped. A loaded game
+starts a new history.
 
 	$terminal->load('game.txt');
 
@@ -2114,11 +2165,6 @@ The colours, as terminal codes, for what is written and what it stands on.
 =item C<%BRACKET>
 
 The pair of characters for each kind of mark.
-
-=item C<%SEQUENCE>, C<%CONTROL>
-
-The names of the keys that arrive as an escape sequence or a control
-character.
 
 =item C<%KEY>
 

@@ -544,7 +544,7 @@ cpx_sha512_crypt_r (const char *key, const char *salt, char *buffer, int buflen)
     }
 
   cp = strncpy (cp, salt, MIN ((size_t) MAX (0, buflen), salt_len));
-  cp += MIN(strlen(salt), MIN ((size_t) MAX (0, buflen), salt_len));
+  cp += MIN ((size_t) MAX (0, buflen), salt_len);
   buflen -= MIN ((size_t) MAX (0, buflen), salt_len);
 
   if (buflen > 0)

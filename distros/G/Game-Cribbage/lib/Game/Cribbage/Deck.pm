@@ -131,7 +131,7 @@ Game::Cribbage::Deck - deck of cards
 
 =head1 VERSION
 
-Version 0.17
+Version 0.18
 
 =cut
 

@@ -1,0 +1,17 @@
+Changes for Plack-Middleware-OIDC distribution
+
+1.00 2026-10-14
+  - added a fix to write logs to the 'psgix.logger' when available
+  - the exception implements an as_psgi() method, so that it can be rethrown by frameworks which support it
+  - authentication errors : message stored in the session and exposed under 'oidc_flash' for one request only
+  - added the check at startup of the 'default_provider' configuration entry
+  - cpanfile lists the used modules instead of the used distributions
+
+0.01 2026-09-29
+  - initial version
+  - Configuration passed directly to 'enable' (config entry)
+  - callback routes derived from 'signin_redirect_path' and 'logout_redirect_path'
+  - OIDC::Client::Plugin instances exposed in $env->{oidc} (default provider) and $env->{'oidc.<provider>'}
+  - all providers instantiated at startup
+  - Redirections requested by the application are done by throwing a Plack::Middleware::OIDC::Redirect exception, caught by the middleware, so that the code placed after redirect_to_authorize() / redirect_to_logout() is never executed
+  - Default logger using psgix.logger or STDERR

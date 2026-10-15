@@ -1,5 +1,12 @@
 Revision history for Game-Cribbage
 
+0.18    2026-10-13
+        - Add options, the fields a launcher offers before a game
+        - The keys, the screen and the picker are Game::Terminal::Kit's
+        - Requires perl 5.14
+        - A typed number is echoed again after the arrow keys have been used
+        - Page up and page down go to the first and last card
+
 0.17    2026-10-11
         - Add Game::Cribbage::Terminal->run(@argv), which returns the exit status
         - Colour is off under NO_COLOR and off a terminal

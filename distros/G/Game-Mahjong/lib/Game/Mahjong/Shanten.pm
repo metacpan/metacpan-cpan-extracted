@@ -6,7 +6,7 @@ use warnings;
 
 use Game::Mahjong::Tiles;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 our @FORMS = qw(standard seven_pairs thirteen_orphans honours_knitted);
 
@@ -45,7 +45,7 @@ Game::Mahjong::Shanten - how far a hand is from ready, and what it accepts
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,20 @@
+.gitattributes
+Build.PL
+Changes
+lib/BioX/Tax/Kraken.pm
+LICENSE
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml
+README.md
+t/00-load.t
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/test.t
+t/test_data/taxDB.loop
+t/test_data/taxDB.sub
+t/test_data/taxDB.sub.xz
+t/test_data/taxDB.trunc

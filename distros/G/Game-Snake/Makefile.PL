@@ -35,6 +35,7 @@ my %WriteMakefileArgs = (
         'File::Spec'           => '0',
         'Getopt::Long'         => '0',
         'Object::Proto'        => '1.00',
+        'Game::Terminal::Kit'  => '0.05',
         'Object::Proto::Sugar' => '1.00',
         'Time::HiRes'          => '0',
     },

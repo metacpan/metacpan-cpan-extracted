@@ -73,7 +73,7 @@
 
 <div class="graph-container">
   <script src="https://d3js.org/d3.v7.min.js"></script>
-  [% graph_html %]
+  [% chart_html %]
 </div>
 
 <script>

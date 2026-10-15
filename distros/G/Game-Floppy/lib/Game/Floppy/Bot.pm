@@ -6,7 +6,7 @@ use warnings;
 
 use Carp ();
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 our @LADDER = (1, 2, 3);
 
@@ -69,7 +69,7 @@ Game::Floppy::Bot - a bird flown once a tick, at one of three levels
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =head1 SYNOPSIS
 

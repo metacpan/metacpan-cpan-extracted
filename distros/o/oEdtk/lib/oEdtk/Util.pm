@@ -3,9 +3,9 @@ package oEdtk::Util;
 use strict;
 use warnings;
 
-our $VERSION	= 2.1109;
-our @ISA	= qw(Exporter);
-our @EXPORT_OK	= qw(_uc_hash_keys);
+our $VERSION   = 2.1109;
+our @ISA       = qw(Exporter);
+our @EXPORT_OK = qw(_uc_hash_keys);
 
 # Convert all hash keys to uppercase, useful
 # because PostgreSQL returns column names in lowercase.
@@ -15,7 +15,7 @@ our @EXPORT_OK	= qw(_uc_hash_keys);
 sub _uc_hash_keys {
 	my $hash = shift;
 
-	$hash->{uc $_} = delete $hash->{$_} for keys %$hash;
+	$hash->{ uc $_ } = delete $hash->{$_} for keys %$hash;
 	return $hash;
 }
 

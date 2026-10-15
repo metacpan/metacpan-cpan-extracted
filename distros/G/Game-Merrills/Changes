@@ -1,5 +1,14 @@
 Revision history for Game-Merrills
 
+0.03    2026-10-13
+	- Add options, the fields a launcher offers before a game
+	- The keys, the screen, the steering and the log are Game::Terminal::Kit's
+	- Requires perl 5.14
+	- The choosing screen is drawn over the last one, with no clear between
+	- Escape gives up a command typed after : and NO_COLOR=0 turns colour off
+	- to_text and from_text carry flying, a standing draw offer, a resignation, a timeout and an agreed draw
+	- u and r, or undo and redo, take a turn back and play it again
+
 0.02    2026-10-11
 	- Add Game::Merrills::Terminal->run(@argv), which returns the exit status
 

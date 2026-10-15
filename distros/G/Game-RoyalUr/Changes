@@ -1,5 +1,13 @@
 Revision history for Game-RoyalUr
 
+0.03    2026-10-13
+        - Add options, the fields a launcher offers before a game
+        - The keys, the screen and the steering are Game::Terminal::Kit's
+        - Shift-tab is named back_tab and the space bar is a space, as the kit names them
+        - An unset NO_COLOR or an empty one leaves colour on; any other value turns it off
+        - Add to_text and from_text, and a record carries the position a game started from
+        - u takes back a turn and r plays it again, through Game::Terminal::Kit::History; the route moves to R
+
 0.02    2026-10-11
         - Add Game::RoyalUr::Terminal->run(@argv), which returns the exit status
 

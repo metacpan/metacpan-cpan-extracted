@@ -8,7 +8,7 @@ use Game::Oware::Move;
 use Game::Oware::Scoring;
 use Game::Oware::Variant ();
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub starved {
 	my ($class, $board, $seat) = @_;
@@ -104,7 +104,7 @@ Game::Oware::Rules - what a move is allowed to do, and what it does
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 

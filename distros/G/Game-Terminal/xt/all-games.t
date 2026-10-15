@@ -21,7 +21,7 @@ my %seen;
 for my $row (Game::Terminal::games()) {
 	next if $seen{$row->{class}}++;
 	subtest $row->{class} => sub {
-		plan tests => 8;
+		plan tests => 10;
 		my $class = eval { Game::Terminal::load($row) };
 		ok $class, "loads" or diag $@;
 		ok $class && $class->can('run'), 'has run'
@@ -60,6 +60,10 @@ for my $row (Game::Terminal::games()) {
 			'the Getopt configuration is as it was (the first element is the last parse error count, not a setting)';
 		is_deeply [ PerlIO::get_layers(\*STDOUT) ], \@layers, 'STDOUT has the layers it had';
 		is_deeply [ @SIG{qw(INT TERM HUP)} ], \@sig, 'and the handlers are as they were';
+
+		my $fields = Game::Terminal::options_for($row);
+		ok $class->can('options'), 'has options';
+		is_deeply [Game::Terminal::Kit::Options::validate($fields)], [], 'and its fields are sound';
 	};
 }
 

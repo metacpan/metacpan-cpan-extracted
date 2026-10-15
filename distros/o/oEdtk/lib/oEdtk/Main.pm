@@ -1,90 +1,94 @@
 package oEdtk::Main;
 
 use strict;
+use utf8;
 use warnings;
+use feature 'state';
 
 use Exporter;
-our $VERSION 	=2.1109;
+our $VERSION = 2.1109;
 
-our @ISA	=	qw(Exporter);
-our @EXPORT = 	qw(
-			c7Flux
-			date2time
-			fmt_address
-			fmt_address_sender
-			fmt_monetary
-			prodEdtk_Current_Rec
-			prodEdtk_Previous_Rec
-			prodEtk_rec_cdata_join
-			recEdtk_erase
-			recEdtk_join_tmplte
-			recEdtk_post_process
-			recEdtk_redefine
-			toC7date
-			oe_app_usage
-			oe_CAP_sans_accents
-			oe_cdata_table_build
-			oe_char_xlate
-			oe_clean_addr_line
-			oe_close_fo
-			oe_compo_link
-			oe_compo_set_value
-			oe_corporation_get
-			oe_corporation_set
-			oe_corporation_tag
-			oe_csv2data_handles
-			oe_data_build
-			oe_date_biggest
-			oe_date_smallest
-			oe_define_TeX_output
-			oe_define_Compuset_output
-			oe_env_var_completion
-			oe_fmt_date
-			oe_ID_LDOC
-			oe_iso_country
-			oe_list_encodings
-			oe_new_job
-			oe_now_time
-			oe_num_sign_x
-			oe_num2txt_us
-			oe_open_fi_IN
-			oe_open_fo_OUT
-			oe_outmngr_compo_run
-			oe_outmngr_full_run
-			oe_outmngr_output_run
-			oe_process_ref_rec
-			oe_rec_motif
-			oe_rec_output
-			oe_rec_pre_process
-			oe_rec_process
-			oe_round
-			oe_set_sys_date
-			oe_to_date
-			oe_trimp_space
-			oe_trt_ref_rec
-			oe_uc_sans_accents
-			oe_unique_data_name
-			*OUT *IN  @DATATAB $LAST_ENR
-			%motifs %ouTags %evalSsTrt
-			);
+our @ISA    = qw(Exporter);
+our @EXPORT = qw(
+	date2time
+	prodEdtk_Current_Rec
+	prodEdtk_Previous_Rec
+	prodEtk_rec_cdata_join
+	recEdtk_erase
+	recEdtk_join_tmplte
+	recEdtk_post_process
+	recEdtk_redefine
+	oe_app_usage
+	oe_backgrounds_apps
+	oe_CAP_sans_accents
+	oe_char_xlate
+	oe_clean_addr
+	oe_clean_addr_line
+	oe_close_fo
+	oe_compo_link
+	oe_corporation_get
+	oe_corporation_set
+	oe_corporation_tag
+	oe_data_build
+	oe_date_biggest
+	oe_date_smallest
+	oe_define_TeX_output
+	oe_env_var_completion
+	oe_fmt_date
+	oe_get_handle_to_input_file
+	oe_ID_LDOC
+	oe_is_IDLDOC
+	oe_iso_country
+	oe_list_encodings
+	oe_new_ID_LDOC
+	oe_new_job
+	oe_new_job_input_file
+	oe_now_time
+	oe_num_sign_x
+	oe_num2txt_us
+	oe_open_fi_IN
+	oe_open_fo_OUT
+	oe_options
+	oe_params
+	oe_print_to_output_file
+	oe_process_ref_rec
+	oe_rec_motif
+	oe_rec_output
+	oe_rec_pre_process
+	oe_rec_process
+	oe_round
+	oe_set_sys_date
+	oe_simple_job
+	oe_to_date
+	oe_trimp_space
+	oe_trt_ref_rec
+	oe_uc_sans_accents
+	oe_unique_data_name
+	*OUT *IN  @DATATAB $LAST_ENR
+	%motifs %ouTags %evalSsTrt
+);
 
-use POSIX		qw(mkfifo);
-use Date::Calc 	qw(Add_Delta_Days Delta_Days Date_to_Time Today Gmtime Week_of_Year);
+use POSIX      qw(mkfifo);
+use Date::Calc qw(Add_Delta_Days Delta_Days Date_to_Time Today Gmtime Week_of_Year);
 use Encode;
 use File::Basename;
-use Getopt::Long;
-use List::MoreUtils	qw(uniq);
-use List::Util		qw(reduce);
-use Math::Round 	qw(nearest);
+use Getopt::Long    qw(GetOptionsFromArray);
+use List::MoreUtils qw(uniq);
+use List::Util      qw(reduce);
+use Math::Round     qw(nearest);
 use Sys::Hostname;
+use Scalar::Util qw(openhandle);
+use Carp         qw(croak);
+use Readonly;
+use Data::UUID;
 
 use oEdtk;
-require oEdtk::libC7;
 require oEdtk::Outmngr;
 require oEdtk::TexDoc;
 use oEdtk::Dict;
-use oEdtk::Config 	qw(config_read);
-use oEdtk::Run		qw(oe_status_to_msg oe_compo_run oe_after_compo oe_outmngr_output_run_tex);
+use oEdtk::Config qw(config_read);
+use oEdtk::Run    qw(oe_status_to_msg oe_compo_run oe_after_compo oe_outmngr_output_run_tex);
+
 #use oEUser::Lib;
 
 #
@@ -93,559 +97,507 @@ use oEdtk::Run		qw(oe_status_to_msg oe_compo_run oe_after_compo oe_outmngr_outpu
 
 # GENERIC METHOD FOR EXTRACTING AND PROCESSING DATA
 
- our @DATATAB;				# the array into which records are distributed
-							# 	rename to OE_DATATAB
- our $LAST_ENR		="";	# WHAT ABOUT LAST_ENR ????
- our $CURRENT_REC	="";	# current record
- our $PREVIOUS_REC	="";	# previous record
+our @DATATAB;              # the array into which records are distributed
+                           # 	rename to OE_DATATAB
+our $LAST_ENR     = "";    # WHAT ABOUT LAST_ENR ????
+our $CURRENT_REC  = "";    # current record
+our $PREVIOUS_REC = "";    # previous record
 
- our %motifs;				#make private
- our %ouTags;				#make private
- our %evalSsTrt;			#make private
+our %motifs;               #make private
+our %ouTags;               #make private
+our %evalSsTrt;            #make private
 
- my $_ID_LDOC		='';	# initialize the unique document id (one per run)
- my $PUSH_VALUE	="";
+my $_ID_LDOC = '';         # initialize the unique document id (one per run)
+my $_IDLDOC_FORMAT;
+my $PUSH_VALUE = "";
 
+# Default option values (see oe_options).
+Readonly my %DEFAULT_OPTIONS => (
+	index      => 0,
+	massmail   => 0,
+	edms       => 0,
+	bpdf       => 0,
+	cgi        => 0,
+	input_code => 0
+);
 
- # PLANNED : CONFIGURATION OF OUTPUT SYSTEM
- # 		return "\\long\\gdef\\$name\{$value\}";
- my $TAG_MODE = 'C7';
- my ($TAG_OPEN, $TAG_CLOSE, $TAG_MARKER, $TAG_ASSIGN, $TAG_ASSIGN_CLOS, $TAG_COMMENT, $TAG_L_SET, $TAG_R_SET);
+# [PRIVATE] Default dump mode (0: off, 1: on). Leave it at 0.
+# @see _dump()
+Readonly::Scalar my $_DEFAULT_OUTPUT_DUMP_MODE => 0;
 
-	sub oe_define_TeX_output(){
-		$TAG_MODE = 'TEX';
-		# \\long\\gdef\\$name\{$value\}
-		# \long\gdef\NUMCONT{000014770}
-		# \long\gdef\PRENOM{MIREILLE}\long\gdef\DATE{01/08/2009}\long\gdef\NICY{10}\STARTGAR
-		$TAG_OPEN	= "\\";				# a tag opening (open)
-		$TAG_CLOSE	= "";				# a tag closing (close)
-		$TAG_MARKER	= "";				# a tag start marker
-		$TAG_ASSIGN	= "long\\gdef\\\{";	# a value assignment marker
-		$TAG_ASSIGN_CLOS= "\}"; 		# a value assignment closing marker
-		$TAG_COMMENT	= "%";			# a comment (rem)
-		$TAG_L_SET	= "";				# variable assignment: left part
-		$TAG_R_SET	= "";				# variable assignment: right part
+# [PRIVATE] Default path of the output debug file.
+# @see _dump()
+Readonly::Scalar my $_DEFAULT_OUTPUT_DUMP_FILE => 'output.rec';
 
-		# \long\gdef\xProdApp\}
+# PLANNED : CONFIGURATION OF OUTPUT SYSTEM
+# 		return "\\long\\gdef\\$name\{$value\}";
+my ( $TAG_OPEN, $TAG_CLOSE, $TAG_COMMENT );
+
+sub oe_define_TeX_output() {
+
+	# \\long\\gdef\\$name\{$value\}
+	# \long\gdef\NUMCONT{000014770}
+	# \long\gdef\PRENOM{MIREILLE}\long\gdef\DATE{01/08/2009}\long\gdef\NICY{10}\STARTGAR
+	$TAG_OPEN    = "\\";    # a tag opening (open)
+	$TAG_CLOSE   = "";      # a tag closing (close)
+	$TAG_COMMENT = "%";     # a comment (rem)
+
+	# \long\gdef\xProdApp\}
 	1;
-	}
+}
 
-oe_define_TeX_output();		# default values
-
+oe_define_TeX_output();     # default values
 
 ################################################################################
-## 		COMPUSET-SPECIFIC, USED ELSEWHERE (XLS)
+## 		GENERIC RECORD HELPERS, USED ELSEWHERE (XLS)
 ################################################################################
 
-	sub oe_rec_motif ($$){		# migrate oe_rec_motif
-		# FUNCTION TO DESCRIBE THE UNPACK PATTERN OF THE RECORD
-		#
-		#  appel :
-		# 	oe_rec_motif ($keyRec, "A2 A10 A15 A10 A15 A*");
-		my $keyRec=shift;
-		my $motif =shift;
-		$motifs{$keyRec}=$motif;
+sub oe_rec_motif {    # migrate oe_rec_motif
+					  # FUNCTION TO DESCRIBE THE UNPACK PATTERN OF THE RECORD
+					  #
+					  #  appel :
+					  # 	oe_rec_motif ($keyRec, "A2 A10 A15 A10 A15 A*");
+	my $keyRec = shift;
+	my $motif  = shift;
+	$motifs{$keyRec} = $motif;
 	1;
-	}
-
-	sub oe_rec_pre_process ($$){		# migrate oe_rec_pre_process
-		# FUNCTION TO ATTACH A PRE-PROCESSING TO A RECORD
-		#  this processing runs before the record is loaded into DATATAB
-		#  the previous record content is always available in DATATAB
-		#  the current record type is known in the execution context
-		#
-		#  appel :
-		# 	oe_rec_pre_process ($keyRec, \&fonction);
-		my $keyRec=shift;
-		my $refFonction=shift;
-		$evalSsTrt{$keyRec}[0]=$refFonction;
-	1;
-	}
-
-	sub oe_rec_output ($$){		# migrate oe_rec_output
-		# FUNCTION TO DESCRIBE THE RECORD OUTPUT FORMAT FOR SPRINTF
-		#
-		#  appel :
-		# 	oe_rec_output ($keyRec, "<#GESTION=%s><#PENOCOD=%s><#LICCODC=%s><SK>%s");
-		my $keyRec=shift;
-		my $format=shift;
-		$ouTags{$keyRec}=$format;
-	1;
-	}
-
-
-################################################################################
-## 		COMPUSET-SPECIFIC, TO BE REMOVED IN THE MEDIUM TERM
-################################################################################
-
-sub oe_define_Compuset_output(){
-	# <#xAppRef=PRRPC-ADCOMS>
-	$TAG_MODE	= 'C7';
-	$TAG_OPEN	= '<';		# a tag opening (open)
-	$TAG_CLOSE	= '>';		# a tag closing (close)
-	$TAG_MARKER	= '#';		# a tag start marker
-	$TAG_ASSIGN	= '=';		# a value assignment marker
-	$TAG_ASSIGN_CLOS= ''; 		# a value assignment closing marker
-	$TAG_COMMENT	= '<SK>';	# a comment (rem)
-	$TAG_L_SET	= '<SET>';	# variable assignment: left part
-	$TAG_R_SET	= '<EDIT>';	# variable assignment: right part
-1;
 }
 
-
-# The newlines are important here, otherwise if you consume too much
-# input in Compuset and don't process it right away, you'll get bogus
-# errors at character count 16384.
-
-sub fmt_monetary($) {	# cf oe_num2txt_us / oe_compo_set_value
-	# DO NOT USE AT ALL ANYMORE!
-	my $mnt = shift;
-
-	#$mnt = oe_num2txt_us($mnt);
-	$mnt=~s/\s*//g;
-	if ($mnt ne 0) {	# fmt_monetary drops zero amounts, which is not a good solution (e.g. INCIMRI) => fix it, but beware of a possible regression on MHN reports
-				# we use 'ne' because at this point the amount may be: '1 000.00' or '-120.00' or '63.00-'
-		$mnt = oe_compo_set_value($mnt);
-	} else {
-		# Some lines have optional amounts and we don't want
-		# to print 0,00 in that case.
-		$mnt = '';
-	}
-	return $mnt;
-}
-
-sub fmt_address(@) {		# migrate c7_oe_fmt_adr
-	my @addr = map { oe_clean_addr_line($_) } @_;
-	return reduce { "$a<nlIF>$b" } @addr;
-}
-
-sub fmt_address_sender(@) {	# migrate c7_oe_fmt_sender_adr
-	my $first = shift;
-	my $addr = fmt_address(@_);
-	return fmt_address($first) . "<nlIF/LT>$addr";
-}
-
-
-sub toC7date(\$) {		# migrate c7_oe_to_date
-	# RECEIVES A REFERENCE TO A DATE IN YYYYMMDD FORMAT
-	# FORMATS AS <C7J>DD<C7M>MM><C7A>YYYY
-	my $refVar  =shift;
-	${$refVar}||="";
-	${$refVar}=~s/(\d{4})(\d{2})(\d{2})(.*)/\<C7j\>$3\<C7m\>$2\<C7a\>$1/o;
-
-return ${$refVar};
-}
-
-sub c7Flux(\$) {		# migrate c7_oe_ref_norm_flux
-	# THE "LESS-THAN" AND "GREATER-THAN" SIGNS ARE DELIMITERS RESERVED FOR COMPUSET
-	# BUSINESS STREAMS ARE PROCESSED TO REPLACE THESE SIGNS WITH BRACES
-	# AT EDITION TIME, COMPUSET RESTORES THESE SIGNS TO GET THE EXPECTED DISPLAY
-	#
-	# IN THE COMPUSET CONFIGURATION, THE FOLLOWING LINES ARE USED TO RESTORE THE ORIGINAL CHARACTERS:
-	# THE CHARACTER { IN THE DATA STREAM IS REPLACED BY THE LESS-THAN SIGN AT COMPOSITION
-	#	<TF,{,<,>
-	# THE CHARACTER } IN THE DATA STREAM IS REPLACED BY THE GREATER-THAN SIGN AT COMPOSITION
-	#	<TF,},>,>
-	#
-	# the function is called with an implicit reference passing
-	#	c7Flux($chaine);
-
-	my $refChaine  =shift;
-	${$refChaine}||="";
-	${$refChaine}=~s/</{/g;
-	${$refChaine}=~s/>/}/g;
-1;
-}
-
-
-	sub recEdtk_erase ($){		# migrate oe_rec_erase
-		# FUNCTION TO REMOVE THE PROCESSING OF A RECORD
-		#
-		#  appel :
-		# 	recEdtk_erase ($keyRec);
-		my $keyRec=shift;
-		$evalSsTrt{$keyRec}[0]="";
-		$evalSsTrt{$keyRec}[1]="";
-		$evalSsTrt{$keyRec}[2]="";
-		$motifs{$keyRec}="";
-		$ouTags{$keyRec}="-1";
+sub oe_rec_pre_process {    # migrate oe_rec_pre_process
+							# FUNCTION TO ATTACH A PRE-PROCESSING TO A RECORD
+							#  this processing runs before the record is loaded into DATATAB
+							#  the previous record content is always available in DATATAB
+							#  the current record type is known in the execution context
+							#
+							#  appel :
+							# 	oe_rec_pre_process ($keyRec, \&fonction);
+	my $keyRec      = shift;
+	my $refFonction = shift;
+	$evalSsTrt{$keyRec}[0] = $refFonction;
 	1;
-	}
+}
 
-	sub recEdtk_redefine ($$){		# migrate oe_rec_redefine
-		# FUNCTION TO REDEFINE THE PROCESSING OF A RECORD
-		#
-		#  appel :
-		# 	recEdtk_redefine ($keyRec, "A2 A10 A15 A10 A15 A*");
-		my $keyRec=shift;
-		my $motif =shift;
-		recEdtk_erase($keyRec);
-		oe_rec_motif($keyRec, $motif);
+sub oe_rec_output {    # migrate oe_rec_output
+					   # FUNCTION TO DESCRIBE THE RECORD OUTPUT FORMAT FOR SPRINTF
+					   #
+					   #  appel :
+					   # 	oe_rec_output ($keyRec, "<#GESTION=%s><#PENOCOD=%s><#LICCODC=%s><SK>%s");
+	my $keyRec = shift;
+	my $format = shift;
+	$ouTags{$keyRec} = $format;
 	1;
-	}
+}
 
-
-	sub recEdtk_join_tmplte ($$$){		# migrate oe_rec_joined_descriptors
-		# FUNCTION TO COMPLETE THE UNPACK PATTERN DESCRIPTORS OF THE RECORD
-		# AND THE OUTPUT FORMAT IN PARALLEL
-		#
-		#  appel :
-		# 	recEdtk_join_tmplte ("abc", 'A2', '<#tag=%s>');
-		# 	recEdtk_join_tmplte ($keyRec, $motif, $output);
-
-		my $keyRec=shift;
-		my $motif	=shift;
-		$motif	||="A*";
-		my $output=shift;
-		$output	||="%s";
-		$motifs{$keyRec}.=$motif;
-		$ouTags{$keyRec}.=$output;
-		$ouTags{$keyRec}=~s/^\-1//; # when recEdtk_join_tmplte is used to set ouTags dynamically during oe_trt_ref_rec, the default ouTags value = '-1' (no processing) => remove it so as not to pollute the output
+sub recEdtk_erase {    # migrate oe_rec_erase
+					   # FUNCTION TO REMOVE THE PROCESSING OF A RECORD
+					   #
+					   #  appel :
+					   # 	recEdtk_erase ($keyRec);
+	my $keyRec = shift;
+	$evalSsTrt{$keyRec}[0] = "";
+	$evalSsTrt{$keyRec}[1] = "";
+	$evalSsTrt{$keyRec}[2] = "";
+	$motifs{$keyRec}       = "";
+	$ouTags{$keyRec}       = "-1";
 	1;
-	}
+}
 
-
-	sub oe_rec_process ($$){		# migrate oe_rec_process
-		# FUNCTION TO ATTACH A PROCESSING TO A RECORD
-		#  this processing runs right after the record is loaded into DATATAB
-		#
-		#  appel :
-		# 	oe_rec_process ($keyRec, \&fonction);
-		my $keyRec=shift;
-		my $refFonction=shift;
-		$evalSsTrt{$keyRec}[1]=$refFonction;
+sub recEdtk_redefine {    # migrate oe_rec_redefine
+						  # FUNCTION TO REDEFINE THE PROCESSING OF A RECORD
+						  #
+						  #  appel :
+						  # 	recEdtk_redefine ($keyRec, "A2 A10 A15 A10 A15 A*");
+	my $keyRec = shift;
+	my $motif  = shift;
+	recEdtk_erase($keyRec);
+	oe_rec_motif( $keyRec, $motif );
 	1;
-	}
+}
 
-	sub recEdtk_post_process ($$){		# migrate recEdtk_post_process
+sub recEdtk_join_tmplte {    # migrate oe_rec_joined_descriptors
+							 # FUNCTION TO COMPLETE THE UNPACK PATTERN DESCRIPTORS OF THE RECORD
+							 # AND THE OUTPUT FORMAT IN PARALLEL
+							 #
+							 #  appel :
+							 # 	recEdtk_join_tmplte ("abc", 'A2', '<#tag=%s>');
+							 # 	recEdtk_join_tmplte ($keyRec, $motif, $output);
+
+	my $keyRec = shift;
+	my $motif  = shift;
+	$motif ||= "A*";
+	my $output = shift;
+	$output ||= "%s";
+	$motifs{$keyRec} .= $motif;
+	$ouTags{$keyRec} .= $output;
+	$ouTags{$keyRec} =~ s/^\-1//
+		; # when recEdtk_join_tmplte is used to set ouTags dynamically during oe_trt_ref_rec, the default ouTags value = '-1' (no processing) => remove it so as not to pollute the output
+	1;
+}
+
+sub oe_rec_process {    # migrate oe_rec_process
+						# FUNCTION TO ATTACH A PROCESSING TO A RECORD
+						#  this processing runs right after the record is loaded into DATATAB
+						#
+						#  appel :
+						# 	oe_rec_process ($keyRec, \&fonction);
+	my $keyRec      = shift;
+	my $refFonction = shift;
+	$evalSsTrt{$keyRec}[1] = $refFonction;
+	1;
+}
+
+sub recEdtk_post_process {    # migrate recEdtk_post_process
 		# FUNCTION TO ATTACH A POST-PROCESSING TO A RECORD
 		#  this processing runs right after the record is reformatted in format_sortie
 		#  the record line is known in the execution context, in its "format_sortie" form
 		#
 		#  appel :
 		# 	recEdtk_post_process ($keyRec, \&fonction);
-		my $keyRec=shift;
-		my $refFonction=shift;
-		$evalSsTrt{$keyRec}[2]=$refFonction;
+	my $keyRec      = shift;
+	my $refFonction = shift;
+	$evalSsTrt{$keyRec}[2] = $refFonction;
 	1;
-	}
+}
 
-	sub oe_process_ref_rec ($$\$;$$) {		# migrate oe_process_ref_rec
+## no critic (ProhibitSubroutinePrototypes)
+sub oe_process_ref_rec ($$\$;$$) {    # migrate oe_process_ref_rec
 		# COMBINED ANALYSIS AND PROCESSING OF RECORDS
 		#  it wraps the complete analysis and processing of the record (oe_trt_ref_rec)
-		#  one call per key length, in decreasing order (from the strictest key to the least restrictive)
-		#  APPEL :
-		#	oe_process_ref_rec ($offsetKey, $lenKey, $ligne [,$offsetRec, $lenRec]);
-		#  RETURNS: status
-		#
-		#	example 			if 		(oe_process_ref_rec (0, 3, $ligne)){
-		#					} elsif 	(oe_process_ref_rec (0, 2, $ligne)){
-		#						etc.
-		my $offsetKey	=shift;
-		my $lenKey	=shift;
-		my $refLigne	=shift;
-		my $offsetRec	=shift;	# optional
-		$offsetRec	||=0;
-		my $lenRec	=shift;	# optional
-		$lenRec		||="";
+	 #  one call per key length, in decreasing order (from the strictest key to the least restrictive)
+	 #  APPEL :
+	 #	oe_process_ref_rec ($offsetKey, $lenKey, $ligne [,$offsetRec, $lenRec]);
+	 #  RETURNS: status
+	 #
+	 #	example 			if 		(oe_process_ref_rec (0, 3, $ligne)){
+	 #					} elsif 	(oe_process_ref_rec (0, 2, $ligne)){
+	 #						etc.
+	my $offsetKey = shift;
+	my $lenKey    = shift;
+	my $refLigne  = shift;
+	my $offsetRec = shift;    # optional
+	$offsetRec ||= 0;
+	my $lenRec = shift;       # optional
+	$lenRec ||= "";
 
-		if (${$refLigne}=~m/^.{$offsetKey}(\w{$lenKey})/s && oe_trt_ref_rec($1,$refLigne,$offsetRec,$lenRec)){
-			# the record has been identified and processed
-			# emit the record
-			print OUT ${$refLigne};
-			return 1;
-		}
-	# OTHERWISE THE RECORD WAS NOT RECOGNIZED, THIS IS A FAILURE
-	return 0;
+	if ( ${$refLigne} =~ m/^.{$offsetKey}(\w{$lenKey})/s
+		&& oe_trt_ref_rec( $1, $refLigne, $offsetRec, $lenRec ) )
+	{
+		# the record has been identified and processed
+		# emit the record
+		print OUT ${$refLigne};
+		return 1;
 	}
 
-	sub oe_trt_ref_rec ($\$;$$){		# migrate oe_trt_ref_rec
+	# OTHERWISE THE RECORD WAS NOT RECOGNIZED, THIS IS A FAILURE
+	return 0;
+}
+
+## no critic (ProhibitSubroutinePrototypes)
+sub oe_trt_ref_rec ($\$;$$) {    # migrate oe_trt_ref_rec
 		# MAIN RECORD PROCESSING
 		# GENERIC METHOD V0.2.1 27/04/2009 10:05:03 (reference passing becomes implicit)
 		# THE FUNCTION NEEDS THE RECORD TYPE AND THE REFERENCE TO A DATA LINE
 		#  appel :
 		#	oe_trt_ref_rec($Rec_ID, $ligne [,$offsetRec,$lenRec]);
 		#  returns: status, $Rec_ID
-		my $Rec_ID	=shift;
-		my $refLigne	=shift;
-		my $offsetRec	=shift;		# OPTIONAL OFFSET OF DATA TO DROP AT THE START OF THE LINE
-		my $lenRec	=shift;		# OPTIONAL LENGTH OF DATA TO PROCESS
-		# DEFAULT VALUES
-		$ouTags{$Rec_ID} 	||="-1";
-		$motifs{$Rec_ID} 	||="";
-		$offsetRec 		||=0;
-		$lenRec			||="";
+	my $Rec_ID    = shift;
+	my $refLigne  = shift;
+	my $offsetRec = shift;    # OPTIONAL OFFSET OF DATA TO DROP AT THE START OF THE LINE
+	my $lenRec    = shift;    # OPTIONAL LENGTH OF DATA TO PROCESS
+							  # DEFAULT VALUES
+	$ouTags{$Rec_ID} ||= "-1";
+	$motifs{$Rec_ID} ||= "";
+	$offsetRec       ||= 0;
+	$lenRec          ||= "";
 
-		# IF THE EXTRACTION PATTERN OF THE RECORD TYPE IS UNKNOWN,
-		#  AND IF THERE IS NO PRE-PROCESSING ATTACHED TO THE RECORD TYPE,
-		#  THEN THE RECORD TYPE IS UNKNOWN
-		#
-		# THIS CHECK ALLOWS DEFINING A RECORD TYPE DYNAMICALLY BASED ON THE CONTEXT
-		#  THAT IS, A RECORD OF TYPE "1" MAY HAVE DIFFERENT CHARACTERISTICS
-		#  DEPENDING ON THE PREVIOUSLY PROCESSED RECORD TYPE.
-		#  THESE CHARACTERISTICS CAN BE SET AT PRE-PROCESSING TIME.
-		#
-		if ($motifs{$Rec_ID} eq "" && !($evalSsTrt{$Rec_ID}[0])) {
-			warn "INFO : oe_trt_ref_rec() > LINE $. REC. >$Rec_ID< (offset $offsetRec) UNKNOWN\n";
-			return 0;
-		}
+	# IF THE EXTRACTION PATTERN OF THE RECORD TYPE IS UNKNOWN,
+	#  AND IF THERE IS NO PRE-PROCESSING ATTACHED TO THE RECORD TYPE,
+	#  THEN THE RECORD TYPE IS UNKNOWN
+	#
+	# THIS CHECK ALLOWS DEFINING A RECORD TYPE DYNAMICALLY BASED ON THE CONTEXT
+	#  THAT IS, A RECORD OF TYPE "1" MAY HAVE DIFFERENT CHARACTERISTICS
+	#  DEPENDING ON THE PREVIOUSLY PROCESSED RECORD TYPE.
+	#  THESE CHARACTERISTICS CAN BE SET AT PRE-PROCESSING TIME.
+	#
+	if ( $motifs{$Rec_ID} eq "" && !( $evalSsTrt{$Rec_ID}[0] ) ) {
+		warn "INFO: oe_trt_ref_rec() > LINE $. REC. >$Rec_ID< (offset $offsetRec) UNKNOWN\n";
+		return 0;
+	}
 
-		$PREVIOUS_REC	=$CURRENT_REC;
-		$CURRENT_REC	=$Rec_ID;
+	$PREVIOUS_REC = $CURRENT_REC;
+	$CURRENT_REC  = $Rec_ID;
 
-		# STEP 0 : EVAL PRE-PROCESSING of $refLigne
-		&{$evalSsTrt{$Rec_ID}[0]}($refLigne) if $evalSsTrt{$Rec_ID}[0];
+	# STEP 0 : EVAL PRE-PROCESSING of $refLigne
+	&{ $evalSsTrt{$Rec_ID}[0] }($refLigne) if $evalSsTrt{$Rec_ID}[0];
 
-		# MAKE SURE TO FULLY CLEAR THE READ ARRAY OF THE PREVIOUS RECORD
-		undef @DATATAB;
+	# MAKE SURE TO FULLY CLEAR THE READ ARRAY OF THE PREVIOUS RECORD
+	undef @DATATAB;
 
-		# OPTIONALLY DROP UNNEEDED DATA (OFFSET AND OUTSIDE USEFUL DATA (lenData))
-		${$refLigne}=~s/^.{$offsetRec}(.{1,$lenRec}).*/$1/ if ($offsetRec > 0);
+	# OPTIONALLY DROP UNNEEDED DATA (OFFSET AND OUTSIDE USEFUL DATA (lenData))
+	${$refLigne} =~ s/^.{$offsetRec}(.{1,$lenRec}).*/$1/ if ( $offsetRec > 0 );
 
-		# SPLIT THE RECORD INTO FIELDS
-		@DATATAB =unpack ($motifs{$Rec_ID},${$refLigne})
-				or die "ERROR: oe_trt_ref_rec() > LINE $. typEnr >$Rec_ID< motif >$motifs{$Rec_ID}< UNKNOWN\n";
+	# SPLIT THE RECORD INTO FIELDS
+	@DATATAB = unpack( $motifs{$Rec_ID}, ${$refLigne} )
+		or die
+		"ERROR: oe_trt_ref_rec() > LINE $. typEnr >$Rec_ID< motif >$motifs{$Rec_ID}< UNKNOWN\n";
 
-		# STEP 1 : EVAL FIELD PROCESSING
-		&{$evalSsTrt{$Rec_ID}[1]} if $evalSsTrt{$Rec_ID}[1];
+	# STEP 1 : EVAL FIELD PROCESSING
+	&{ $evalSsTrt{$Rec_ID}[1] } if $evalSsTrt{$Rec_ID}[1];
 
-		# STRUCTURE THE RECORD FOR OUTPUT
-		if ($ouTags{$Rec_ID} ne "-1"){
-			${$refLigne}  ="${TAG_OPEN}a${Rec_ID}${TAG_CLOSE}";
-			${$refLigne} .=sprintf ($ouTags{$Rec_ID},@DATATAB)
-						or die "ERROR: oe_trt_ref_rec() > LINE $. typEnr >$Rec_ID< ouTags >$ouTags{$Rec_ID}<\n";
-			${$refLigne} .="${TAG_OPEN}e${Rec_ID}${TAG_CLOSE}\n";
-		} else {
-			${$refLigne}="";
-		}
-		$LAST_ENR=$Rec_ID;
+	# STRUCTURE THE RECORD FOR OUTPUT
+	if ( $ouTags{$Rec_ID} ne "-1" ) {
+		${$refLigne} = "${TAG_OPEN}a${Rec_ID}${TAG_CLOSE}";
+		${$refLigne} .= sprintf( $ouTags{$Rec_ID}, @DATATAB )
+			or die "ERROR: oe_trt_ref_rec() > LINE $. typEnr >$Rec_ID< ouTags >$ouTags{$Rec_ID}<\n";
+		${$refLigne} .= "${TAG_OPEN}e${Rec_ID}${TAG_CLOSE}\n";
+	}
+	else {
+		${$refLigne} = "";
+	}
+	$LAST_ENR = $Rec_ID;
 
-		# STEP 2 : EVAL POST-PROCESSING
-		&{$evalSsTrt{$Rec_ID}[2]} if $evalSsTrt{$Rec_ID}[2];
+	# STEP 2 : EVAL POST-PROCESSING
+	&{ $evalSsTrt{$Rec_ID}[2] } if $evalSsTrt{$Rec_ID}[2];
 
-		# OPTIONALLY ADD EXTRA DATA
-		${$refLigne} .=$PUSH_VALUE;
-		$PUSH_VALUE ="";
-		${$refLigne} =~s/\s{2,}/ /g;	#	CONCATENATION OF BLANKS
-		#$LAST_ENR=$Rec_ID;
+	# OPTIONALLY ADD EXTRA DATA
+	${$refLigne} .= $PUSH_VALUE;
+	$PUSH_VALUE = "";
+	${$refLigne} =~ s/\s{2,}/ /g;    #	CONCATENATION OF BLANKS
+									 #$LAST_ENR=$Rec_ID;
 
 	return 1, $Rec_ID;
-	}
+}
 
-	sub prodEtk_rec_cdata_join ($){		# migrate prodEtk_rec_cdata_join
-		$PUSH_VALUE .=shift;
+sub prodEtk_rec_cdata_join {    # migrate prodEtk_rec_cdata_join
+	$PUSH_VALUE .= shift;
 	1;
-	}
+}
 
-	sub prodEdtk_Previous_Rec () {		# migrate oe_previous_rec
-		return $PREVIOUS_REC;
-	}
+sub prodEdtk_Previous_Rec () {    # migrate oe_previous_rec
+	return $PREVIOUS_REC;
+}
 
-	sub prodEdtk_Current_Rec () {		# migrate oe_current_rec
-		return $CURRENT_REC;
-	}
+sub prodEdtk_Current_Rec () {    # migrate oe_current_rec
+	return $CURRENT_REC;
+}
 
 ################################################################################
 
+sub oe_round {
 
-sub oe_round ($;$){
-	# http://perl.enstimac.fr/allpod/fr-5.6.0/perlfaq4.pod
-	# http://perl.enstimac.fr/DocFr/perlfaq4.html
-	# http://www.linux-kheops.com/doc/perl/faq-perl-enstimac/perlfaq4.html
-	# Perl is not at fault. It is the same as in C. IEEE says we must do it this way. Perl numbers whose absolute value is an integer below 2**31 (on 32-bit machines) will generally behave as mathematical integers. Other numbers are not guaranteed.
-	my $value	=	shift;
-	my $multiple=	shift;
-	my $decimal;#=	shift;
+# http://perl.enstimac.fr/allpod/fr-5.6.0/perlfaq4.pod
+# http://perl.enstimac.fr/DocFr/perlfaq4.html
+# http://www.linux-kheops.com/doc/perl/faq-perl-enstimac/perlfaq4.html
+# Perl is not at fault. It is the same as in C. IEEE says we must do it this way. Perl numbers whose absolute value is an integer below 2**31 (on 32-bit machines) will generally behave as mathematical integers. Other numbers are not guaranteed.
+	my $value    = shift;
+	my $multiple = shift;
+	my $decimal;    #=	shift;
 
 	#if (!(defined $decimal)){$decimal = 2;}	# decimal may be 0 (decimal converted to an integer)
-	if (!(defined $multiple)){$multiple = .01;}	# $multiple may be 0 (decimal converted to an integer)
-	if ($multiple=~/^0\./){
-		$decimal=length($multiple)-2;
-	}elsif ($multiple=~/^\./){
-		$decimal=length($multiple)-1;
-	} else {
+	if ( !( defined $multiple ) ) {
+		$multiple = .01;
+	}               # $multiple may be 0 (decimal converted to an integer)
+	if ( $multiple =~ /^0\./ ) {
+		$decimal = length($multiple) - 2;
+	}
+	elsif ( $multiple =~ /^\./ ) {
+		$decimal = length($multiple) - 1;
+	}
+	else {
 		$decimal = 0;
 	}
-	my $motif	= "%.0${decimal}f";
-	#my $multiple=1/(10**$decimal);
-	$value = nearest ($multiple, $value);
+	my $motif = "%.0${decimal}f";
 
-	return sprintf ($motif, $value);
+	#my $multiple=1/(10**$decimal);
+	$value = nearest( $multiple, $value );
+
+	return sprintf( $motif, $value );
 }
 
-sub oe_num_sign_x(\$;$) {		# migrate oe_num_sign_x
-	# processing of alphanumeric signed amounts
-	# receives: a reference to an alphanumeric variable
-	#          a number of decimals after the point (optional, 0 by default)
+## no critic (ProhibitSubroutinePrototypes)
+sub oe_num_sign_x(\$;$) {    # migrate oe_num_sign_x
+		# processing of alphanumeric signed amounts
+		# receives: a reference to an alphanumeric variable
+		#          a number of decimals after the point (optional, 0 by default)
 
-	my ($refMontant, $decimal)=@_;
-	${$refMontant}	||="";
-	$decimal		||=0;
+	my ( $refMontant, $decimal ) = @_;
+	${$refMontant} ||= "";
+	$decimal ||= 0;
 
 	# check the validity of the passed value
-	${$refMontant}=~s/\s+//g;
-	if (${$refMontant} eq "" || ${$refMontant} eq 0) {
-		${$refMontant} =0;
+	${$refMontant} =~ s/\s+//g;
+	if ( ${$refMontant} eq "" || ${$refMontant} eq 0 ) {
+		${$refMontant} = 0;
 		return 1;
-	} elsif (${$refMontant}=~/\D{2,}/){
-		warn "INFO : value (${$refMontant}) not numeric.\n";
+	}
+	elsif ( ${$refMontant} =~ /\D{2,}/ ) {
+		warn "INFO: value (${$refMontant}) not numeric.\n";
 		return -1;
 	}
 
 	my %hXVal;
-	$hXVal{'p'}=0;
-	$hXVal{'q'}=1;
-	$hXVal{'r'}=2;
-	$hXVal{'s'}=3;
-	$hXVal{'t'}=4;
-	$hXVal{'u'}=5;
-	$hXVal{'v'}=6;
-	$hXVal{'w'}=7;
-	$hXVal{'x'}=8;
-	$hXVal{'y'}=9;
+	$hXVal{'p'} = 0;
+	$hXVal{'q'} = 1;
+	$hXVal{'r'} = 2;
+	$hXVal{'s'} = 3;
+	$hXVal{'t'} = 4;
+	$hXVal{'u'} = 5;
+	$hXVal{'v'} = 6;
+	$hXVal{'w'} = 7;
+	$hXVal{'x'} = 8;
+	$hXVal{'y'} = 9;
 
-	if ( ${$refMontant}=~s/(\D{1})$/$hXVal{$1}/ ) {
+	if ( ${$refMontant} =~ s/(\D{1})$/$hXVal{$1}/ ) {
+
 		# a value with an alphanumeric negative sign 213y => -2139
-		${$refMontant}=(${$refMontant}*(-1));
- 		# warn "INFO : SIGNED AMOUNT";
-  	} elsif (${$refMontant}=~/^-{1}/){
+		${$refMontant} = ( ${$refMontant} * (-1) );
+
+		# warn "INFO: SIGNED AMOUNT";
+	}
+	elsif ( ${$refMontant} =~ /^-{1}/ ) {
+
 		# a value with a negative sign -123456
 	}
 
-	${$refMontant}=${$refMontant}/(10**$decimal);
+	${$refMontant} = ${$refMontant} / ( 10**$decimal );
 
-return ${$refMontant};
+	return ${$refMontant};
 }
 
+sub date2time {    # migrate oe_date_to_time
+				   # DEPRECATED FUNCTION,
+				   # USE THE SPECIALIZED LIBRARY: Date::Calc
+	my $date = shift;    # a date in YYYYMMDD format
 
-sub date2time ($){		# migrate oe_date_to_time
-	# DEPRECATED FUNCTION,
-	# USE THE SPECIALIZED LIBRARY: Date::Calc
-	my $date=shift; # a date in YYYYMMDD format
+	my $tmpDate  = "AAAAMMJJ";
+	my $decalage = 0;
+	my $jours    = -1;
+	my $time     = time;
+	my ( $sec, $min, $hour, $mday, $mon, $year, $wday, $yday ) = gmtime($time);
+	my $nowDate = sprintf( "%4.0f%02.0f%02.0f", $year + 1900, $mon + 1, $mday );
 
-	my $tmpDate="AAAAMMJJ";
-	my $decalage=0;
-	my $jours=-1;
-	my $time=time;
-	my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday) =
-		gmtime($time);
-	my $nowDate=sprintf ("%4.0f%02.0f%02.0f", $year+1900, $mon+1, $mday);
+	if ( $nowDate > $date ) {
 
-	if ($nowDate > $date){
 		# date is older
-		$decalage=-1;
-	}elsif ($nowDate < $date){
+		$decalage = -1;
+	}
+	elsif ( $nowDate < $date ) {
+
 		# date is newer
-		$decalage=+1;
+		$decalage = +1;
 	}
 
-	while ($date ne $tmpDate){
+	while ( $date ne $tmpDate ) {
 		$jours++;
+
 		# a day has 86400 seconds
-		($sec,$min,$hour,$mday,$mon,$year,$wday,$yday) =
-			gmtime($time+($decalage*$jours*86400));
-		$tmpDate=sprintf ("%4.0f%02.0f%02.0f", $year+1900, $mon+1, $mday);
+		( $sec, $min, $hour, $mday, $mon, $year, $wday, $yday ) =
+			gmtime( $time + ( $decalage * $jours * 86400 ) );
+		$tmpDate = sprintf( "%4.0f%02.0f%02.0f", $year + 1900, $mon + 1, $mday );
 	}
 
-return ($time+($decalage*$jours*86400)), ($decalage*$jours);
+	return ( $time + ( $decalage * $jours * 86400 ) ), ( $decalage * $jours );
 }
 
+sub oe_now_time() {    # migrate oe_now_time
+					   # DEPRECATED FUNCTION,
+					   # USE THE SPECIALIZED LIBRARY: Date::Calc -> Today
 
-sub oe_now_time(){			# migrate oe_now_time
-	# DEPRECATED FUNCTION,
-	# USE THE SPECIALIZED LIBRARY: Date::Calc -> Today
+	my $time = time;
+	my ( $sec, $min, $hour, $mday, $mon, $year, $wday, $yday ) = gmtime($time);
+	$time = sprintf(
+		"%4.0f%02.0f%02.0f%02.0f%02.0f%02.0f",
+		$year + 1900,
+		$mon + 1, $mday, $hour, $min, $sec
+	);
 
-	my $time =time;
-	my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday) =
-		gmtime($time);
-	$time =sprintf ("%4.0f%02.0f%02.0f%02.0f%02.0f%02.0f", $year+1900, $mon+1, $mday, $hour, $min, $sec);
-
-return $time;
+	return $time;
 }
 
 # ISO COUNTRY DICTIONARY
 my $_DICO_COUNTRY;
+
 # ABBREVIATIONS DICTIONARY.
 my $_DICO_POST;
+
 # translation dictionary for characters (discouraged, but sometimes needed).
 my $_DICO_CHAR;
 
-
 {
-my $_LAST_ISO ="";
+	my $_LAST_ISO = "";
 
-	sub oe_iso_country(;$){
+	sub oe_iso_country {
+
 		# returns the country code in country_dico.ini coding or the last known value
 		my $country = shift;
-		if (!defined($_DICO_COUNTRY))  {
-			my $cfg		= config_read();
-			$_DICO_COUNTRY	= oEdtk::Dict->new($cfg->{'EDTK_DICO_COUNTRY'}, , { section => $cfg->{'EDTK_LANG'} });
+		if ( !defined($_DICO_COUNTRY) ) {
+			my $cfg = config_read();
+			$_DICO_COUNTRY =
+				oEdtk::Dict->new( $cfg->{'EDTK_DICO_COUNTRY'}, { section => $cfg->{'EDTK_LANG'} } );
 		}
-		$_LAST_ISO = $_DICO_COUNTRY->translate($country) if defined ($country);
+		$_LAST_ISO = $_DICO_COUNTRY->translate($country) if defined($country);
 		return $_LAST_ISO;
 	}
 }
 
+sub oe_char_xlate {    # to migrate into the dictionary?
+	my $scalar = shift;
 
-sub oe_char_xlate($;$){ # to migrate into the dictionary?
-		my $scalar = shift;
-
-		if (!defined($_DICO_CHAR))  {
-			my $section	= shift || 'DEFAULT';
-			my $cfg		= config_read();
-			$_DICO_CHAR	= oEdtk::Dict->new($cfg->{'EDTK_DICO_XLAT'}, , { section => $section });
-		}
-		$scalar = $_DICO_CHAR->substitue($scalar);
+	if ( !defined($_DICO_CHAR) ) {
+		my $section = shift || 'DEFAULT';
+		my $cfg     = config_read();
+		$_DICO_CHAR = oEdtk::Dict->new( $cfg->{'EDTK_DICO_XLAT'}, { section => $section } );
+	}
+	$scalar = $_DICO_CHAR->substitue($scalar);
 
 	return $scalar;
 }
 
-
-sub oe_clean_addr_line(\$) {	# migrate oe_clean_addr_line
-	# THIS FUNCTION CLEANS ADDRESS LINES TO BUILD THE RECIPIENT ADDRESS BLOCKS
-	# it works directly on the variable reference but also returns the resulting string
+## no critic (ProhibitSubroutinePrototypes)
+sub oe_clean_addr_line(\$) {    # migrate oe_clean_addr_line
+		# THIS FUNCTION CLEANS ADDRESS LINES TO BUILD THE RECIPIENT ADDRESS BLOCKS
+		# it works directly on the variable reference but also returns the resulting string
 	my $rLine = shift;
 
-	# default value in case the field is undef 
-	if (!defined($$rLine) || length($$rLine) == 0) {
+	# default value in case the field is undef
+	if ( !defined($$rLine) || length($$rLine) == 0 ) {
 		$$rLine = '';
 		return $$rLine;
 	}
 
-	chomp($$rLine);	# to be sure there is no trailing newline at the end of the field
+	chomp($$rLine);    # to be sure there is no trailing newline at the end of the field
 	oe_trimp_space($rLine);
 
-	$$rLine = oe_char_xlate($$rLine, 'ADDRESS');
+	$$rLine = oe_char_xlate( $$rLine, 'ADDRESS' );
+
 	# TODO: a regex that replaces everything that is not 0-9, -, degrees or \w with blanks...
 
-	# THE NEXT LINE MUST BE ENABLED ONLY AFTER TESTING, FOR NOW HANDLED BY oe_char_xlate
-	#$$rLine =~ s/\\+/\//g;	# we remove/replace backslashes which are escape characters and which apparently are not counted in the size check (sprintf("%.38s",...) 
-	$$rLine =~ s/^\s+//;	# remove consecutive blanks at the start of the string (an oe_trimp_space was done first...) LEFT TRIM
-	$$rLine =~ s/\s+$//;	# remove consecutive blanks at the end of the string (...) RIGHT TRIM
-	$$rLine =~ s/^0\s+//;	# remove lone zeros at the start of the string (done last, after the LEFT TRIM)
-	$$rLine =~ s/\s+/ /;	# collapse consecutive blanks
+# THE NEXT LINE MUST BE ENABLED ONLY AFTER TESTING, FOR NOW HANDLED BY oe_char_xlate
+#$$rLine =~ s/\\+/\//g;	# we remove/replace backslashes which are escape characters and which apparently are not counted in the size check (sprintf("%.38s",...)
+	$$rLine =~ s/^\s+//
+		; # remove consecutive blanks at the start of the string (an oe_trimp_space was done first...) LEFT TRIM
+	$$rLine =~ s/\s+$//;    # remove consecutive blanks at the end of the string (...) RIGHT TRIM
+	$$rLine =~
+		s/^0\s+//;   # remove lone zeros at the start of the string (done last, after the LEFT TRIM)
+	$$rLine =~ s/\s+/ /;    # collapse consecutive blanks
 
 	# Use the given dictionary to translate words.
-	if (length($$rLine) > 38) {
-		if (!defined($_DICO_POST))  {
+	if ( length($$rLine) > 38 ) {
+		if ( !defined($_DICO_POST) ) {
 			my $cfg = config_read();
-			$_DICO_POST = oEdtk::Dict->new($cfg->{'EDTK_DICO_POST'});
+			$_DICO_POST = oEdtk::Dict->new( $cfg->{'EDTK_DICO_POST'} );
 		}
-		my @words = split(/ /, $$rLine);
-		$$rLine = join(' ', map { $_DICO_POST->translate($_) } @words);
+		my @words = split( / /, $$rLine );
+		$$rLine = join( ' ', map { $_DICO_POST->translate($_) } @words );
 	}
-	$$rLine = sprintf("%.38s", $$rLine); # make sure not to exceed 38 characters per line
+	$$rLine = sprintf( "%.38s", $$rLine );    # make sure not to exceed 38 characters per line
 
-	# TO AVOID FORCED BLANKS BETWEEN ADDRESS FIELDS (E.G. <PEADNUM>`<PEADBTQ>`<PEVONAT>`<LIBVOIX><NLIF>)
-	# add a trailing blank to the field if it contains at least one character
-	if ($TAG_MODE eq "C7" && $$rLine =~ /\w+$/) {
-		$$rLine .= " ";
-	}
 	return $$rLine;
 }
 
-
+## no critic (ProhibitSubroutinePrototypes)
 sub oe_CAP_sans_accents (\$) {
+
 	# THIS FUNCTION CONVERTS ACCENTED UPPERCASE CHARACTERS INTO NON-ACCENTED UPPERCASE CHARACTERS
 	# using localization causes a bug in the "sort" command.
 	# We do not rely on the ability to restore the default behavior by escaping
@@ -657,261 +609,222 @@ sub oe_CAP_sans_accents (\$) {
 	# the function is called with an implicit reference passing
 	#	oe_char_no_accents($chaine);
 
-	my $refChaine  =shift;
-	${$refChaine}||="";
-	${$refChaine}=~s/[ÀÂÄ]/A/g;
-	${$refChaine}=~s/[ÉÈÊË]/E/g;
-	${$refChaine}=~s/[ÌÎÏ]/I/g;
-	${$refChaine}=~s/[ÒÔÖÕ]/O/g;
-	${$refChaine}=~s/[ÚÙÛÜ]/U/g;
-	${$refChaine}=~s/Ç/C/g;
+	my $refChaine = shift;
+	${$refChaine} ||= "";
+	${$refChaine} =~ s/[Ã€Ã‚Ã„]/A/g;
+	${$refChaine} =~ s/[Ã‰ÃˆÃŠÃ‹]/E/g;
+	${$refChaine} =~ s/[ÃŒÃŽÃ]/I/g;
+	${$refChaine} =~ s/[Ã’Ã”Ã–Ã•]/O/g;
+	${$refChaine} =~ s/[ÃšÃ™Ã›Ãœ]/U/g;
+	${$refChaine} =~ s/Ã‡/C/g;
+
 	# the uc command is not included; it can be done before calling oe_CAP_sans_accents
 	# - either keep accented lowercase letters, or capitalize everything
 	## ${$refChaine}= uc ${$refChaine};
 
-return ${$refChaine};
+	return ${$refChaine};
 }
 
-sub oe_uc_sans_accents (\$) {	# migrate oe_uc_sans_accents
-	# THIS FUNCTION CONVERTS ACCENTED CHARACTERS INTO NON-ACCENTED UPPERCASE CHARACTERS
-	# using localization causes a bug in the "sort" command.
-	# We do not rely on the ability to restore the default behavior by escaping
-	# (the no locale directive, or when leaving the block enclosing the use locale directive)
-	# so as to adopt a standard and simplified operating mode.
-	# NB: localization slows sorting down considerably.
-	# (cf. Perl documentation about localization: perllocale)
-	#
-	# the function is called with an implicit reference passing
-	#	oe_uc_sans_accents($chaine);
+## no critic (ProhibitSubroutinePrototypes)
+sub oe_uc_sans_accents (\$) {    # migrate oe_uc_sans_accents
+		# THIS FUNCTION CONVERTS ACCENTED CHARACTERS INTO NON-ACCENTED UPPERCASE CHARACTERS
+		# using localization causes a bug in the "sort" command.
+		# We do not rely on the ability to restore the default behavior by escaping
+		# (the no locale directive, or when leaving the block enclosing the use locale directive)
+		# so as to adopt a standard and simplified operating mode.
+		# NB: localization slows sorting down considerably.
+		# (cf. Perl documentation about localization: perllocale)
+		#
+		# the function is called with an implicit reference passing
+		#	oe_uc_sans_accents($chaine);
 
-	my $refChaine  =shift;
-	${$refChaine}||="";
-	${$refChaine}=~s/[àâä]/a/ig;
-	${$refChaine}=~s/[éèêë]/e/ig;
-	${$refChaine}=~s/[ìîï]/i/ig;
-	${$refChaine}=~s/[òôöõ]/o/ig;
-	${$refChaine}=~s/[úùûü]/u/ig;
-	${$refChaine}=~s/ç/c/ig;
-	${$refChaine}= uc ${$refChaine};
+	my $refChaine = shift;
+	${$refChaine} ||= "";
+	${$refChaine} =~ s/[Ã Ã¢Ã¤]/a/ig;
+	${$refChaine} =~ s/[Ã©Ã¨ÃªÃ«]/e/ig;
+	${$refChaine} =~ s/[Ã¬Ã®Ã¯]/i/ig;
+	${$refChaine} =~ s/[Ã²Ã´Ã¶Ãµ]/o/ig;
+	${$refChaine} =~ s/[ÃºÃ¹Ã»Ã¼]/u/ig;
+	${$refChaine} =~ s/Ã§/c/ig;
+	${$refChaine} = uc ${$refChaine};
 
-return ${$refChaine};
+	return ${$refChaine};
 }
 
+## no critic (ProhibitSubroutinePrototypes)
+sub oe_trimp_space(\$) {    # migrate oe_trimp_space
+							# REMOVE CONSECUTIVE SPACES (TRAILING BLANK) BY GROUPING
+							# the parameter must be a reference, example: oe_trimp_space($chaine)
+							# returns the number of removed characters
+	my $rChaine = shift;
+	${$rChaine} ||= "";
+	${$rChaine} =~ s/\s{2,}/ /go;
 
-sub oe_trimp_space(\$) {		# migrate oe_trimp_space
-	# REMOVE CONSECUTIVE SPACES (TRAILING BLANK) BY GROUPING
-	# the parameter must be a reference, example: oe_trimp_space($chaine)
-	# returns the number of removed characters
-	my $rChaine  =shift;
-	${$rChaine}||="";
-	${$rChaine} =~s/\s{2,}/ /go;
-
-return ${$rChaine};
+	return ${$rChaine};
 }
-
 
 sub oe_list_encodings {
 	my @list = Encode->encodings();
-	warn "INFO : available encodings on this machine are : @list\n";
+	warn "INFO: available encodings on this machine are : @list\n";
 }
 
-				# migrate oe_open_fi_IN
-sub oe_open_fi_IN ($;$){ 		# BASIC INPUT FILE HANDLING
-	my $fi =shift;
-	open (IN, "$fi")	or die "ERROR: opening $fi, return code $!\n";
+# migrate oe_open_fi_IN
+sub oe_open_fi_IN {    # BASIC INPUT FILE HANDLING
+	my ( $fi, $enc ) = @_;
 
-1;
+	# An explicit encoding wins; otherwise EDTK_OUT_ENCODING from the config.
+	# An absent key keeps M behaviour: an open with no encoding layer.
+	$enc = oe_config_compo()->{'EDTK_OUT_ENCODING'} unless defined $enc;
+	my $mode = $enc ? "<:encoding($enc)" : '<';
+	open( IN, $mode, $fi ) or die "ERROR: opening $fi, return code $!\n";    ## no critic (InputOutput::ProhibitBarewordFileHandles)
+
+	1;
 }
 
-				# migrate oe_open_fo_OUT
-sub oe_open_fo_OUT ($){ 		# BASIC OUTPUT FILE HANDLING
-	my $fo =shift;
-	open (OUT, "> $fo")	or die "ERROR: opening $fo - return code $!\n";
+# migrate oe_open_fo_OUT
+sub oe_open_fo_OUT {    # BASIC OUTPUT FILE HANDLING
+	my ( $fo, $enc ) = @_;
 
-1;
+	$enc = oe_config_compo()->{'EDTK_OUT_ENCODING'} unless defined $enc;
+	my $mode = $enc ? ">:encoding($enc)" : '>';
+	open( OUT, $mode, $fo ) or die "ERROR: opening $fo - return code $!\n";    ## no critic (InputOutput::ProhibitBarewordFileHandles)
+
+	1;
 }
 
+sub oe_close_fo {    # migrate oe_close_fo
+	my $f = shift;
 
-sub oe_close_fo ($) {	# migrate oe_close_fo
-	my $f =shift;
-
-	close (OUT) or die "ERROR: closing $f - return code $!\n";
-1;
+	close(OUT) or die "ERROR: closing $f - return code $!\n";
+	1;
 }
 
-sub oe_to_date(\$) {		# migrate oe_to_date
-	# RECEIVES A REFERENCE TO A DATE IN YYYYMMDD FORMAT
-	# FORMATS AS DD/MM/YYYY
-	my $refVar  =shift;
-	${$refVar}||="";
-	${$refVar}=~s/(\d{4})(\d{2})(\d{2})(.*)/$3\/$2\/$1/o;
+## no critic (ProhibitSubroutinePrototypes)
+sub oe_to_date(\$) {    # migrate oe_to_date
+						# RECEIVES A REFERENCE TO A DATE IN YYYYMMDD FORMAT
+						# FORMATS AS DD/MM/YYYY
+	my $refVar = shift;
+	${$refVar} ||= "";
+	${$refVar} =~ s/(\d{4})(\d{2})(\d{2})(.*)/$3\/$2\/$1/o;
 
-return ${$refVar};
+	return ${$refVar};
 }
 
-
-sub oe_fmt_date($) {		# migrate oe_fmt_date
+sub oe_fmt_date {    # migrate oe_fmt_date
 	my $date = shift;
 
 	die "ERROR: Unexpected date format: \"$date\"\n"
-	    if $date !~ /^\s*(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})\s*$/;
+		if $date !~ /^\s*(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})\s*$/;
 
-	return sprintf("%02s/%02s/%s", $1, $2, $3);
+	return sprintf( "%02s/%02s/%s", $1, $2, $3 );
 }
 
 # Convert a date in DD/MM/YYYY format to YYYYMMDD format.
-sub oe_date_convert($) {	# oe_date_format
+sub oe_date_convert {    # oe_date_format
 	my $date = shift;
 
-	if ($date !~ /^\s*(\d{1,2})\/(\d{1,2})\/(\d{4})\s*$/) {
-		return undef;
+	if ( $date !~ /^\s*(\d{1,2})\/(\d{1,2})\/(\d{4})\s*$/ ) {
+		return;
 	}
-	return sprintf("%d%02d%02d", $3, $2, $1);
+	return sprintf( "%d%02d%02d", $3, $2, $1 );
 }
 
 sub oe_date_compare {
-	my ($date1, $date2) = @_;
+	my ( $date1, $date2 ) = @_;
 
-	if ($date1 eq '') {
-		$date1=$date2;
+	if ( $date1 eq '' ) {
+		$date1 = $date2;
 	}
 
 	my $wdate1 = oe_date_convert($date1);
 	my $wdate2 = oe_date_convert($date1);
 
-	if (!defined($wdate1)) {
-		warn "INFO : Unexpected date format: \"$date1\" should be dd/mm/yyyy. Date ignored\n";
+	if ( !defined($wdate1) ) {
+		warn "INFO: Unexpected date format: \"$date1\" should be dd/mm/yyyy. Date ignored\n";
 		return 1;
 	}
-	if (!defined($wdate2)) {
-		warn "INFO : Unexpected date format: \"$date2\" should be dd/mm/yyyy. Date ignored\n";
+	if ( !defined($wdate2) ) {
+		warn "INFO: Unexpected date format: \"$date2\" should be dd/mm/yyyy. Date ignored\n";
 		return -1;
 	}
 	return $wdate1 <=> $wdate2;
 }
 
-sub oe_date_smallest($$) {
-	my ($date1, $date2) = @_;
+sub oe_date_smallest {
+	my ( $date1, $date2 ) = @_;
 
-	if (oe_date_compare($date1, $date2) <= 0) {
+	if ( oe_date_compare( $date1, $date2 ) <= 0 ) {
 		return $date1;
-	} else {
+	}
+	else {
 		return $date2;
 	}
 }
 
-sub oe_date_biggest($$) {
-	my ($date1, $date2) = @_;
+sub oe_date_biggest {
+	my ( $date1, $date2 ) = @_;
 
-	if (oe_date_compare($date1, $date2) <= 0) {
+	if ( oe_date_compare( $date1, $date2 ) <= 0 ) {
 		return $date2;
-	} else {
+	}
+	else {
 		return $date1;
 	}
 }
 
-
+## no critic (ProhibitSubroutinePrototypes)
 sub oe_num2txt_us(\$) {
+
 	# process amounts in Text format
-	# the decimal separator "," is turned into "." for US / C7 load commands
+	# the decimal separator "," is turned into "." for the load commands
 	# the thousands separator "." or " " is removed
 	# receives: an alphanumeric variable formatted for display
 	# 		$value = oe_num2txt_us($value);
 	# or by reference
 	# 		oe_num2txt_us($value);
 
-	my $refValue  = shift;
-	${$refValue}||="";
+	my $refValue = shift;
+	${$refValue} ||= "";
 
-	if (${$refValue}){
-		${$refValue}=~s/\s+//g;		# remove blanks
-		${$refValue}=~s/\.//g;		# remove thousands separators
-		${$refValue}=~s/\,/\./g;	# replace the decimal separator
-		${$refValue}=~s/(.*)(\-)$/$2$1/;# optionally move the negative sign to the front
+	if ( ${$refValue} ) {
+		${$refValue} =~ s/\s+//g;             # remove blanks
+		${$refValue} =~ s/\.//g;              # remove thousands separators
+		${$refValue} =~ s/\,/\./g;            # replace the decimal separator
+		${$refValue} =~ s/(.*)(\-)$/$2$1/;    # optionally move the negative sign to the front
 
-	} else {
-		${$refValue}=0;
+	}
+	else {
+		${$refValue} = 0;
 	}
 
-return ${$refValue};
+	return ${$refValue};
 }
 
+sub oe_include_build {
+	my ( $name, $path ) = @_;
 
-# NO LONGER USED IN THE LaTeX CONTEXT
-sub oe_compo_set_value ($;$){	# oe_cdata_set
-	my ($value, $noedit) = @_;
-
-	# TO REMOVE: SOME NUMBERS ARE ALREADY IN USE
-	# -> oe_compo_set_value($value) => oe_compo_set_value(oe_num2txt_us($value))
-	my $result = $TAG_L_SET . oe_num2txt_us($value);
-
-	if (!$noedit) {
-		$result .= $TAG_R_SET;
-	}
-	return $result;
-}
-
-
-# NO LONGER USED IN THE LaTeX CONTEXT
-sub oe_cdata_table_build($@){	# oe_xdata_table_build
-	my $name = shift;
-	my @DATATAB = shift;
-	my $cdata="";
-	for (my $i = 0; $i <= $#DATATAB; $i++) {
-		my $elem = sprintf("%.6s%0.2d", $name, $i);
-		$cdata .= oe_data_build($elem, $DATATAB[$i] || "");
-	}
-	#warn "\n";
-return $cdata;
-}
-
-
-sub oe_include_build ($$){ # as part of the C7 code cleanup, these calls will need shortening
-	my ($name, $path)= @_;
 	#import oEdtk::TexDoc;
 
 	my $tag = oEdtk::TexDoc->new();
-	$tag->include($name, $path);
+	$tag->include( $name, $path );
 	return $tag;
 }
 
+sub oe_data_build {    #oe_xdata_build
+	my ( $name, $val ) = @_;
 
-# NO LONGER USED IN THE LaTeX CONTEXT
-# but used in Main.pm => clean up
-sub oe_data_build($;$) {	#oe_xdata_build
-	my ($name, $val)= @_;
-
-	if ($TAG_MODE eq 'TEX') {
-		my $tag = oEdtk::TexTag->new($name, $val);
-		return $tag->emit();
-	}
-
-	# FOR COMPUSET
-	my $data	= "";
-	if 	(defined $val) {
-		# if this is a numeric variable
-		if ($val =~ /^[\d\.]+$/) {
-			$data = $TAG_OPEN . $TAG_MARKER . $name . $TAG_ASSIGN . $TAG_L_SET .
-				$val . $TAG_ASSIGN_CLOS . $TAG_CLOSE;
-		} else {
-			$data = $TAG_OPEN . $TAG_MARKER . $name . $TAG_ASSIGN .
-				$val . $TAG_ASSIGN_CLOS . $TAG_CLOSE;
-		}
-	} elsif	(defined $name) {
-		$data = $TAG_OPEN . $name . $TAG_CLOSE;
-	}
-	return $data;
+	my $tag = oEdtk::TexTag->new( $name, $val );
+	return $tag->emit();
 }
 
+sub oe_app_usage() {    # migrate oe_app_usage
+	my $app = "";
+	$0 =~ /([\w-]+[\.plmex]*$)/;
+	$1 ? $app = "application.pl" : $app = $1;
+	print STDOUT <<"EOF";
 
-sub oe_app_usage() {		# migrate oe_app_usage
-	my $app="";
-	$0=~/([\w-]+[\.plmex]*$)/;
-	$1 ? $app="application.pl" : $app=$1;
-	print STDOUT << "EOF";
-
- Usage :	$app </source/input/file.dat> [job] [options]
- Usage :	$app --noinputfiles [job] [options]
+ Usage:	$app </source/input/file.dat> [job] [options]
+ Usage:	$app --noinputfiles [job] [options]
  options :
 		--massmail 	to confirm mass treatment
 		--edms		to confirm edms treatment
@@ -925,475 +838,362 @@ sub oe_app_usage() {		# migrate oe_app_usage
 		--help		this message
 
 EOF
-# 		--notracking	halt tracking, do not track
-oe_list_encodings();
-exit 1;
-}
 
+	# 		--notracking	halt tracking, do not track
+	oe_list_encodings();
+	exit 1;
+}
 
 # XXX Global variable used to remember stuff from oe_new_job() when we
 # are in oe_compo_link().  It would be *much* better to keep state in an
 # object instance instead.
 my $_RUN_PARAMS;
 
-
-sub oe_new_job(@) {	
-	@ARGV = (@ARGV, @_); # optionally override options with the oe_new_job parameters for GetOptions
-	my $cfg = config_read('COMPO');
+sub oe_new_job {
+	@ARGV =
+		( @ARGV, @_ );   # optionally override options with the oe_new_job parameters for GetOptions
+	my $cfg    = config_read('COMPO');
 	my $params = {};
+
 	# DEFAULT OPTION VALUES.
 	my %defaults = (
-#		xls	 		=> 0,
-#		tex			=> 0,
-		index 		=> 0,
-		massmail	=> 0,
-		edms 		=> 0,
-		cgi			=> 0,
-		input_code	=> 0
+
+		#		xls	 		=> 0,
+		#		tex			=> 0,
+		index      => 0,
+		massmail   => 0,
+		edms       => 0,
+		cgi        => 0,
+		input_code => 0
 	);
 
-	# examples of adding parameters at launch 
+	# examples of adding parameters at launch
 	# oe_new_job('--index');
 	# oe_new_job("--input_code=utf8");
 
-	GetOptions(\%defaults, 'help', 'index', 'massmail', 'edms', 'cgi', 'noinputfiles', 'input_code=s');
-	while (my ($key, $val) = each(%defaults)) {
-		if (!defined($params->{$key})) {
+	GetOptions( \%defaults, 'help', 'index', 'massmail', 'edms', 'cgi', 'noinputfiles',
+		'input_code=s' );
+	while ( my ( $key, $val ) = each(%defaults) ) {
+		if ( !defined( $params->{$key} ) ) {
 			$params->{$key} = $val;
 		}
 	}
 
-	if ($^O ne 'MSWin32') {
+	if ( $^O ne 'MSWin32' ) {
 		$defaults{'fifo'} = 1;
-	} else {
+	}
+	else {
 		$defaults{'fifo'} = 0;
 	}
 
 	$params->{'doclib'} = _omngr_doclib();
 	$params->{'idldoc'} = oe_ID_LDOC();
 
-	$params->{'outfile'} 	= $cfg->{'EDTK_PRGNAME'}.".txt";	# should be tied to TexMode
-	$params->{'output_code'}	= $cfg->{'EDTK_OUT_ENCODING'} || 'utf8';
-	$params->{'output_code'}	= ">:encoding(". $params->{'output_code'} .")";
-	if ($params->{'input_code'}) {
-		$params->{'input_code'} = "<:encoding(". $params->{'input_code'} .")";
-	} else {
+	$params->{'outfile'}     = $cfg->{'EDTK_PRGNAME'} . ".txt";         # should be tied to TexMode
+	$params->{'output_code'} = $cfg->{'EDTK_OUT_ENCODING'} || 'utf8';
+	$params->{'output_code'} = ">:encoding(" . $params->{'output_code'} . ")";
+	if ( $params->{'input_code'} ) {
+		$params->{'input_code'} = "<:encoding(" . $params->{'input_code'} . ")";
+	}
+	else {
 		$params->{'input_code'} = "<";
 	}
 
-
 	my $fi;
-	if ($defaults{help}) {
+	if ( $defaults{help} ) {
 		&oe_app_usage();
 		exit 0;
-	} elsif ($defaults{noinputfiles}) {
-		$fi = 0;	
-		warn "INFO : no input file for this treatment\n";
-	} elsif ($#ARGV ==-1) {	# TO KEEP COMPATIBILITY
-		&oe_app_usage();
-		exit 0;
-	} else {
-		$fi = $ARGV[0];	# TO KEEP COMPATIBILITY
-		open(IN, $params->{'input_code'}, $fi)	or die "ERROR: Cannot open \"$fi\" for reading: $!\n";
-		warn "INFO : input perl data is $fi (encode \'". $params->{'input_code'} ."\' $ARGV[-1])\n";
 	}
-
+	elsif ( $defaults{noinputfiles} ) {
+		$fi = 0;
+		warn "INFO: no input file for this treatment\n";
+	}
+	elsif ( $#ARGV == -1 ) {    # TO KEEP COMPATIBILITY
+		&oe_app_usage();
+		exit 0;
+	}
+	else {
+		$fi = $ARGV[0];                             # TO KEEP COMPATIBILITY
+		open( IN, $params->{'input_code'}, $fi )    ## no critic (InputOutput::ProhibitBarewordFileHandles)
+			or die "ERROR: Cannot open \"$fi\" for reading: $!\n";
+		warn "INFO: input perl data is $fi (encode \'"
+			. $params->{'input_code'}
+			. "\' $ARGV[-1])\n";
+	}
 
 	# Override default setting if EDTK_COMPO_ASYNC is set in edtk.ini.
 	my $async = $cfg->{'EDTK_COMPO_ASYNC'};
-	if (defined($async) && $async =~ /^yes$/i) {
+	if ( defined($async) && $async =~ /^yes$/i ) {
 		$params->{'fifo'} = 1;
-	} elsif (defined($async) && $async =~ /^no$/i){
+	}
+	elsif ( defined($async) && $async =~ /^no$/i ) {
 		$params->{'fifo'} = 0;
 	}
 
-	if ($params->{'fifo'} && $^O eq 'MSWin32') {
-		warn "INFO : FIFO mode is not possible under Windows, ignoring.\n";
+	if ( $params->{'fifo'} && $^O eq 'MSWin32' ) {
+		warn "INFO: FIFO mode is not possible under Windows, ignoring.\n";
 		$params->{'fifo'} = 0;
 	}
 
 	# If we are in FIFO mode and there is a left-over text file, the mkfifo()
 	# call would fail.  If we are not in FIFO mode and there's a left-over FIFO,
 	# we would hang indefinitely, so make sure to remove this file first.
-	unlink($params->{'outfile'});
+	unlink( $params->{'outfile'} );
 
 	# Handle options passed in the EDTK_OPTIONS environment variable.
-	if (exists($ENV{'EDTK_OPTIONS'})) {
-		my @opts = split(',', $ENV{'EDTK_OPTIONS'});
+	if ( exists( $ENV{'EDTK_OPTIONS'} ) ) {
+		my @opts = split( ',', $ENV{'EDTK_OPTIONS'} );
 		foreach my $opt (@opts) {
 			$params->{$opt} = 1;
 		}
 	}
 
-	if ($params->{'fifo'}) {
-		warn "INFO : Creating FIFO for output data file (". $params->{'outfile'} .")\n";
-		mkfifo($params->{'outfile'}, 0700) or die "ERROR: Could not create fifo : $!\n";
-		my $pid = oe_compo_run($cfg->{'EDTK_PRGNAME'}, $params);
+	if ( $params->{'fifo'} ) {
+		warn "INFO: Creating FIFO for output data file (" . $params->{'outfile'} . ")\n";
+		mkfifo( $params->{'outfile'}, oct('700') ) or die "ERROR: Could not create fifo : $!\n";
+		my $pid = oe_compo_run( $cfg->{'EDTK_PRGNAME'}, $params );
 		$params->{'pid'} = $pid;
 	}
 
-	open(OUT,$params->{'output_code'}, $params->{'outfile'})		or die "ERROR: Cannot open \'". $params->{'outfile'} ."\' for writing: $!\n";
-	warn "INFO : input compo data is ".$params->{'outfile'} ." (encode \'". $params->{'output_code'} ."\')\n";
+	open( OUT, $params->{'output_code'}, $params->{'outfile'} )    ## no critic (InputOutput::ProhibitBarewordFileHandles)
+		or die "ERROR: Cannot open \'" . $params->{'outfile'} . "\' for writing: $!\n";
+	warn "INFO: input compo data is "
+		. $params->{'outfile'}
+		. " (encode \'"
+		. $params->{'output_code'} . "\')\n";
 
 	# Remember for later use in oe_compo_link() & oEdtk::Main.
 	$_RUN_PARAMS = $params;
 
-	if (defined $cfg->{'EDTK_COMPO_INCLUDE'} && $cfg->{'EDTK_COMPO_INCLUDE'}=~/yes/i) {
-		print OUT oe_include_build($cfg->{'EDTK_PRGNAME'}.".".$cfg->{'EDTK_EXT_COMPO'}, 'EDTK_DIR_SCRIPT');
+	if ( defined $cfg->{'EDTK_COMPO_INCLUDE'} && $cfg->{'EDTK_COMPO_INCLUDE'} =~ /yes/i ) {
+		print OUT oe_include_build( $cfg->{'EDTK_PRGNAME'} . "." . $cfg->{'EDTK_EXT_COMPO'},
+			'EDTK_DIR_SCRIPT' );
 	}
-	print OUT oe_data_build(oe_corporation_tag());
-	print OUT oe_data_build('xIdLdoc', $params->{'idldoc'});
+	print OUT oe_data_build( oe_corporation_tag() );
+	print OUT oe_data_build( 'xIdLdoc', $params->{'idldoc'} );
 	print OUT oe_data_build('xDebFlux');
-	print OUT oe_data_build('xAppRef', $cfg->{'EDTK_PRGNAME'});
-	print OUT oe_data_build('xDOCLIB', $params->{'doclib'});
+	print OUT oe_data_build( 'xAppRef', $cfg->{'EDTK_PRGNAME'} );
+	print OUT oe_data_build( 'xDOCLIB', $params->{'doclib'} );
 
 	my $env = $cfg->{'EDTK_TYPE_ENV'};
-	if ($env ne 'Production') {
+	if ( $env ne 'Production' ) {
+
 		# Generate the 'TEST EDITION' watermark.
-		print OUT oe_data_build('xWaterM', $cfg->{'EDTK_WATERMARKTEXT'}||' ');
+		print OUT oe_data_build( 'xWaterM', $cfg->{'EDTK_WATERMARKTEXT'} || ' ' );
 		print OUT oe_data_build('xTstApp');
-	} else {
+	}
+	else {
 		# No watermark.
 		print OUT oe_data_build('xProdApp');
 	}
-	print OUT oe_data_build('xTYPPROD', substr($env, 0, 1));
-	print OUT oe_data_build('xHOST',	 hostname());
+	print OUT oe_data_build( 'xTYPPROD', substr( $env, 0, 1 ) );
+	print OUT oe_data_build( 'xHOST',    hostname() );
 
 	# Do we want to generate an index file?
-	if ($params->{'index'}) {
-		print OUT oe_data_build ('xStOmgr');
-		print OUT oe_data_build ('xHost', hostname());
+	if ( $params->{'index'} ) {
+		print OUT oe_data_build('xStOmgr');
+		print OUT oe_data_build( 'xHost', hostname() );
 	}
 	print OUT $TAG_COMMENT;
 	print OUT "\n";
 }
 
-sub oe_csv2data_handles () {
-	undef @DATATAB;
-	my $ligne 	= <IN>;
-	chomp ($ligne);
-	c7Flux($ligne);
-	@DATATAB 	= split (/,/, $ligne);
-	my $motif	= "";
+# True when the dissemination-plan URL is configured and carries a non-blank
+# value: the one switch that lets a 'call-plan' run reach the service. Sites
+# that do not run a dissemination plan leave the key absent, so the call stays
+# inert (the mainline behaviour).
+sub _dissemination_plan_url_set {
+	my $cfg = shift;
+	my $url = $cfg->{'DISSEMINATION_PLAN_URL'};
+	return ( defined $url && $url =~ /\S/ ) ? 1 : 0;
+}
 
+sub oe_compo_link {    # migrate oe_close_files oe_compo_link
+					   # IF THE INPUT STREAM HAS LESS THAN 1 LINE (variable $.), EXIT WITH ERROR
+					   # if ($. == 0) {
+					   #	# INVALID STREAM, STOP
+					   #	die 	"ERROR: uncomplete datastream\n $message \n\n";
+					   #}
 
-	# TURN A CSV FILE INTO A DATA FILE
-	# THE FIRST LINE DEFINES THE COLUMNS AND THE TAG NAMES
-	# a run tag is added at the end of the line = xFLigne
-	# finally an end-of-stream tag is added = xFinFlux
+	my @opt = @_;
 
-	for (my $i=0; $i<=$#DATATAB; $i++){
-		$DATATAB[$i] ="vide$i" if ($DATATAB[$i] eq '');
-		$DATATAB[$i] =~s/\_//g;
-
-		$motif .= sprintf ('%s%s%.8s%s', $TAG_OPEN, $TAG_MARKER, $DATATAB[$i], $TAG_ASSIGN );
-		# my $tag_data =oe_unique_data_name(8, "$DATATAB[$i]", $i);
-		# $motif .= sprintf ('%s%s%.8s%s', $TAG_OPEN, $TAG_MARKER, $tag_data, $TAG_ASSIGN);
-		$motif .= "%s" . $TAG_ASSIGN_CLOS . $TAG_CLOSE;
+	my $cfg    = config_read('COMPO');
+	my $params = $_RUN_PARAMS;
+	$params->{'corp'} = oe_corporation_set();
+	if (@opt) {
+		foreach (@opt) {
+			$_ =~ s/\-+//g;
+			$params->{$_} = 1;
+		}
 	}
-	$motif .= $TAG_OPEN . "xFLigne" . $TAG_CLOSE;
-	$motif =~s/\s//g;
-	# warn $motif . "\n";
 
-	while ($ligne = <IN>) {
-		@DATATAB = ();
-		chomp ($ligne);
-		c7Flux($ligne);
-		@DATATAB= split (/,/, $ligne);
-		for (my $i=0; $i<=$#DATATAB; $i++){
-			if ($DATATAB[$i]=~/^\s*[\d\.\s]+$/){
-				$DATATAB[$i] = $TAG_L_SET . $DATATAB[$i];
+	print OUT oe_data_build('xFinFlux');
+	close(OUT) or die "ERROR: closing output $!\n";
+	if ( $params->{'noinputfiles'} ) {
+	}
+	else {
+		close(IN) or die "ERROR: closing input $!\n";
+	}
+
+	if ( $params->{'fifo'} ) {
+
+		# Disable signal handler.
+		$SIG{'CHLD'} = 'DEFAULT';
+		if ( !defined( $params->{'cldstatus'} ) ) {
+
+			# Wait for the LaTeX process to terminate.
+			my $pid = $params->{'pid'};
+			warn "INFO: Waiting for the LaTeX process to terminate ($pid)...\n";
+			my $kid = waitpid( $pid, 0 );
+			if ( $kid <= 0 ) {
+				die "ERROR: Could not collect child process status: $!\n";
 			}
+			$params->{'cldstatus'} = $?;
 		}
-		$ligne	= sprintf($motif, @DATATAB) || '';
-		print OUT $ligne . "\n"; #  if $ligne;
+		my $status = $params->{'cldstatus'};
+		if ( $status != 0 ) {
+			my $msg = oe_status_to_msg($status);
+			die "ERROR: LaTeX process failed: $msg\n";
+		}
+		warn "INFO: The LaTeX process terminated successfully.\n";
+	}
+	else {
+		# Run the LaTeX process.
+		oe_compo_run( $cfg->{'EDTK_PRGNAME'}, $params );
+	}
+	oe_after_compo( $cfg->{'EDTK_PRGNAME'}, $params );
+
+	# Dissemination plan: only when the caller opted in (and did not veto),
+	# and the service URL is configured. The delegate loads oEUser on demand,
+	# so a missing companion distribution never breaks the oEdtk load.
+	if ( $params->{'call-plan'} && !defined $params->{'nocallplan'} ) {
+		if ( _dissemination_plan_url_set($cfg) ) {
+			require oEdtk::DisseminationPlan;
+			my $app    = $params->{'app-ref'};
+			my $id_lot = $params->{'idldoc'};
+			defined $app    or croak "ERROR: no 'app-ref' in params\n";
+			defined $id_lot or croak "ERROR: no 'idldoc' in params\n";
+			oEdtk::DisseminationPlan::idx1_app_idlot( $cfg, $app, $id_lot,
+				$params->{'forced-paper'} );
+		}
+		else {
+			warn "INFO: not calling the dissemination plan (DISSEMINATION_PLAN_URL absent)\n";
+		}
 	}
 
-1;
+	return 1;
 }
 
+## no critic (ProhibitSubroutinePrototypes)
+sub oe_env_var_completion (\$) {
 
-sub oe_outmngr_full_run($;$){
-	my $input_fdatwork	= shift;
-	my $output_format	= shift || "PDF";
-	oe_outmngr_compo_run	($input_fdatwork, $output_format);
-	oe_outmngr_output_run	();
-1;
-}
-
-sub oe_outmngr_compo_run ($;$){
-	my $input_fdatwork	= shift;
-	my $output_format	= shift || "PDF";
-	my $xTypTrt		= _app_typ_trt();
-
-	import oEdtk::Outmngr qw(omgr_import);
-	import oEdtk::libC7	qw();
-	use Fcntl			qw(:flock);
-	use File::Copy;
-
-	my $cfg 			= config_read('COMSET');
-	my $script_compo	= $cfg->{'EDTK_DIR_SCRIPT'} . "/" . $cfg->{'EDTK_PRGNAME'} . "." . $cfg->{'EDTK_EXT_COMP_OMGR'};
-	my $lockfile 		= $cfg->{'EDTK_DOCLIB_LOCK'};
-	open(my $lock, '>', $lockfile) or die "ERROR: Cannot open lock file: $!\n";
-
-	warn "INFO : starting compo ($output_format, $script_compo, $input_fdatwork)\n";
-
-	# When Compuset fails with a doclib opened in read-write mode, it corrupts the file,
-	# so we have to protect against this...
-	my $doclib = _omngr_doclib();
-	my $DMG_path = $cfg->{'C7_DCLIB_RW'} . "/$doclib.dmg";
-
-	warn "INFO : Acquiring exclusive lock on $lockfile...\n";
-	flock($lock, LOCK_EX) or die "ERROR: Cannot acquire exclusive lock: $!\n";
-	warn "INFO : Successfully acquired lock.\n";
-	eval {
-		if (-f $DMG_path) {
-			copy($DMG_path, "$DMG_path.bak") or die "ERROR: Cannot backup \"$DMG_path\": $!\n";
-		}
-		if (defined $cfg->{'EDTK_TESTDATE'}) { oe_set_sys_date($cfg->{'EDTK_TESTDATE'}) };
-		c7_compo ($output_format, $script_compo, $input_fdatwork, "OMGR", $doclib);
-		c7_emit  ($output_format, $script_compo, $input_fdatwork, $cfg->{'EDTK_FDATAOUT'}, "OMGR", $doclib);
-	};
-	if ($@) {
-		# There was an error, restore the backup doclib, and re-throw the error.
-		copy("$DMG_path.bak", $DMG_path) or warn "INFO : Could not restore the doclib $DMG_path !\n";
-		# die $@;
-	}
-	close($lock);
-
-	my $idx1 	=$cfg->{'EDTK_DIR_OUTMNGR'} . "/" . $cfg->{'EDTK_PRGNAME'} . ".idx1";
-
-	#	warn
-	#	"INFO : OM EDTK_PRGNAME = "
-	#	. $cfg->{'EDTK_PRGNAME'}
-	#	. " EDTK_FTYP_DFLT = "
-	#	. $cfg->{'EDTK_FTYP_DFLT'}
-	#	. " EDTK_TYP_ENVIRO = "
-	#	. $cfg->{'EDTK_TYP_ENVIRO'}
-	#	."\n";
-
-
-	omgr_import	($cfg->{'EDTK_PRGNAME'}, $idx1) if ($xTypTrt =~ /[MGTD]/); # xxxxxx this is where the right application name is needed
-
-	if ($xTypTrt!~/D/) {
-		unlink ($idx1);
-		unlink ($input_fdatwork);
-	}
-
-	print "$cfg->{'EDTK_FDATAOUT'}.$output_format\n";
-1;
-}
-
-
-sub oe_outmngr_output_run (;$){
-	# the optional parameter sets the processing type to
-	# let operations launch the output_run at a regular interval
-	my $xTypTrt = _app_typ_trt(shift);
-
-	if ( $xTypTrt !~/[MTD]/) {
-		# oe_outmngr_output_run: index_output is only entered for Mass, Debug or batching Test
-		warn "INFO : OM processing '$xTypTrt' -> batching suspended\n";
-		return 1;
-	}
-
-	import oEdtk::Outmngr	qw(omgr_export);
-	import oEdtk::libC7 qw ();
-	use	Archive::Zip	qw(:ERROR_CODES);
-	use	Fcntl		qw(:flock);
-
-	my $cfg 	=config_read('COMSET');
-
-	warn "INFO : starting \@tSsLots =omgr_export\n";
-	my @lots = omgr_export();
-	my (@tProcessed_Dclib);
-	my $lockfile = $cfg->{'EDTK_DOCLIB_LOCK'};
-	open(my $lock, '>', $lockfile) or die "ERROR: Cannot open lock file: $!\n";
-
-	foreach (@lots) {
-		my ($SsLot, $numpgs, @tDclib) = @$_;
-
-		warn "INFO : Preparation job ticket $cfg->{'EDTK_DIR_OUTMNGR'} $SsLot for compo - tDclib = @tDclib\n";
-		my $SsLot_output_txt 	=$cfg->{'EDTK_DIR_OUTMNGR'} . "/" . $SsLot . "." . $cfg->{'EDTK_EXT_WORK'};
-		my $SsLot_output_opf 	=$cfg->{'EDTK_DIR_OUTMNGR'} . "/" . $SsLot ; #. "." . $cfg->{'EDTK_EXT_PDF'};
-		my $lib_filieres	=$cfg->{'C7_CHAINS_LIB'};
-
-		oe_open_fo_OUT ($SsLot_output_txt);
-		oe_open_fi_IN ($cfg->{'EDTK_DIR_OUTMNGR'} . "/" . $SsLot . ".job");
-		oe_csv2data_handles ();
-
-		print OUT oe_data_build ("xIniPBAN");
-
-		warn "INFO : Preparation of the index $cfg->{'EDTK_DIR_OUTMNGR'} $SsLot for compo\n";
-		oe_open_fi_IN ($cfg->{'EDTK_DIR_OUTMNGR'} . "/" . $SsLot . ".idx");
-		oe_csv2data_handles;
-		print OUT oe_data_build ("xFinFlux");
-		oe_close_fo($SsLot_output_txt);
-
-		warn "INFO : Composition $SsLot in $cfg->{'EDTK_DIR_OUTMNGR'}\n";
-		warn "INFO : Acquiring shared lock on $lockfile...\n";
-		flock($lock, LOCK_SH) or die "ERROR: Cannot acquire lock: $!\n";
-		warn "INFO : Successfully acquired lock.\n";
-		eval {
-			if (defined $cfg->{'EDTK_TESTDATE'}) { oe_set_sys_date($cfg->{'EDTK_TESTDATE'}) };
-			c7_compo ("PDF", $lib_filieres, $SsLot_output_txt, "OMGR", @tDclib);
-			c7_emit  ("PDF", $lib_filieres, $SsLot_output_txt, $SsLot_output_opf, "OMGR", @tDclib);
-		};
-		flock($lock, LOCK_UN);
-		die "ERROR: can't unlock $lock : $@" if $@;	# Now that we unlocked, re-throw the error if any.
-
-		close(IN);	# XXX OMG THIS IS A HACK!$#@#@
-		warn "INFO : Packaging $cfg->{'EDTK_DIR_OUTMNGR'} $SsLot\n";
-		my $zip = Archive::Zip->new();
-		$zip->addFile("$cfg->{'EDTK_DIR_OUTMNGR'}/$SsLot.idx", "$SsLot.idx");
-		$zip->addFile("$cfg->{'EDTK_DIR_OUTMNGR'}/$SsLot.pdf", "$SsLot.pdf");
-		die "ERROR: Could not create zip archive\n"
-		    unless $zip->writeToFileNamed("$cfg->{'EDTK_DIR_OUTMNGR'}/$SsLot.zip") == AZ_OK;
-
-		if ($xTypTrt !~/D/) {
-			unlink("$cfg->{'EDTK_DIR_OUTMNGR'}/$SsLot.job");
-			unlink("$cfg->{'EDTK_DIR_OUTMNGR'}/$SsLot.idx");
-			unlink("$cfg->{'EDTK_DIR_OUTMNGR'}/$SsLot.txt");
-			unlink("$cfg->{'EDTK_DIR_OUTMNGR'}/$SsLot.pdf");
-		}
-
-		@tProcessed_Dclib = uniq(@tProcessed_Dclib, @tDclib);
-	}
-
-	if ($xTypTrt !~/D/) {
-		while (my $docLib = shift (@tProcessed_Dclib)){
-			# warn "INFO : Delete ".$cfg->{'EDTK_DIR_DOCLIB'}."/$docLib";
-			unlink($cfg->{'EDTK_DIR_DOCLIB'}."/$docLib");
-		}
-	}
-	close($lock);	# This releases locks.
-	warn "INFO : End of oe_outmngr_output_run\n";
-
-	my @zips = map { $cfg->{'EDTK_DIR_OUTMNGR'}."/$$_[0].zip\n" } @lots;
-	print @zips;
-
-return 1;
-}
-
-
-sub oe_compo_link (;@){		# migrate oe_close_files oe_compo_link
-	# IF THE INPUT STREAM HAS LESS THAN 1 LINE (variable $.), EXIT WITH ERROR
-	# if ($. == 0) {
-	#	# INVALID STREAM, STOP
-	#	die 	"ERROR: uncomplete datastream\n $message \n\n";
-	#}
-
-	my @opt=@_;
-
-	if ($TAG_MODE eq 'TEX') {
-		my $cfg = config_read('COMPO');
-		my $params = $_RUN_PARAMS;
-		$params->{'corp'} = oe_corporation_set();
-		if (@opt) {
-			foreach (@opt){
-				$_=~s/\-+//g;
-				$params->{$_} = 1;
-			}
-		}
-
-		print OUT oe_data_build('xFinFlux');
-		close(OUT) or die "ERROR: closing output $!\n";
-		if ($params->{'noinputfiles'}) {
-		} else {
-			close(IN)  or die "ERROR: closing input $!\n" ;
-		}
-
-		if ($params->{'fifo'}) {
-			# Disable signal handler.
-			$SIG{'CHLD'} = 'DEFAULT';
-			if (!defined($params->{'cldstatus'})) {
-				# Wait for the LaTeX process to terminate.
-				my $pid = $params->{'pid'};
-				warn "INFO : Waiting for the LaTeX process to terminate ($pid)...\n";
-				my $kid = waitpid($pid, 0);
-				if ($kid <= 0) {
-					die "ERROR: Could not collect child process status: $!\n";
-				}
-				$params->{'cldstatus'} = $?;
-			}
-			my $status = $params->{'cldstatus'};
-			if ($status != 0) {
-				my $msg = oe_status_to_msg($status);
-				die "ERROR: LaTeX process failed: $msg\n";
-			}
-			warn "INFO : The LaTeX process terminated successfully.\n";
-		} else {
-			# Run the LaTeX process.
-			oe_compo_run($cfg->{'EDTK_PRGNAME'}, $params);
-		}
-		oe_after_compo($cfg->{'EDTK_PRGNAME'}, $params);
-	}
-
-return 1;
-}
-
-
-sub oe_env_var_completion (\$){
 	# expand paths by replacing environment variables with their real values
 	# all nesting levels defined in the environment variables are expanded
 	# requires the environment variables to be defined beforehand
-	my $rValue =shift;
-	if ($^O eq "MSWin32"){
-		# environment variables may themselves contain variables
-		while (${$rValue}=~/\$/g) {
-			${$rValue}=~s/\$(\w+)/${ENV{$1}}/g;
-		}
-		${$rValue}=~s/(\/)/\\/g;
+	my $rValue = shift;
+	if ( $^O eq "MSWin32" ) {
 
-	} else {
+		# environment variables may themselves contain variables
+		while ( ${$rValue} =~ /\$/g ) {
+			${$rValue} =~ s/\$(\w+)/${ENV{$1}}/g;
+		}
+		${$rValue} =~ s/(\/)/\\/g;
+
+	}
+	else {
 		# CHECK COMPATIBILITY UNDER *NIX
-		while (${$rValue}=~/\$/g) {
-			${$rValue}=~s/\$(\w+)/${ENV{$1}}/g;
+		while ( ${$rValue} =~ /\$/g ) {
+			${$rValue} =~ s/\$(\w+)/${ENV{$1}}/g;
 		}
 	}
-return ${$rValue};
+	return ${$rValue};
 }
 
+# Maximum length accepted for a forced document id (a 36-char UUID; S70, D1).
+use constant IDLDOC_MAX_LEN => 36;
 
-sub oe_ID_LDOC(;$) {
-	# USES THE LIBRARY: Date::Calc
-	# document batch id
-	# format YWWWDHHMMSSPPPP.r (compuset is limited to 16 digits: 15 integers, 1 decimal) 999999999999999.9
+sub oe_ID_LDOC {
 	my $force_ID = shift;
 
-	if ($_ID_LDOC eq '') {		# generate it only once per run: several calls in the same instance return the same id
+	# document batch id: a 36-char UUID by default (S70, D1). A forced id (the
+	# -iddoc option, or the witnesses' SETIDLOT) still wins. The id is generated
+	# only once per run: several calls in the same instance return the same id.
+	# EDTK_IDLDOC_FORMAT=LEGACY (or the alias =old) restores the 16-digit
+	# YWWWDHHMMSSPPPP.r format.
+	if ( $_ID_LDOC eq '' ) {
 
-		if (!defined $force_ID){
-			my $time =time;
-			my ($year,$month,$day, $hour,$min,$sec, $doy,$dow,$dst)=
-				Gmtime($time);
-			my ($week,) = Week_of_Year($year,$month,$day);
-
-			my $pid = "$$";
-			my $rnd = int(rand(10));
-			if (length $pid > 5) {
-				$pid = $pid/(10**((length $pid)-5));
-			}
-
-			$_ID_LDOC =sprintf ("%1d%02d%1d%02d%02d%02d%05d%1d", $year % 10, $week, $dow, $hour, $min, $sec, $pid, $rnd );
-
-		} else {
-			if (length $force_ID > 25) {
-				die "ERROR: forced ID_LDOC too long (>25 car) : $force_ID \n";
+		if ( defined $force_ID ) {
+			if ( length $force_ID > IDLDOC_MAX_LEN ) {
+				die "ERROR: forced ID_LDOC too long (>" . IDLDOC_MAX_LEN . " car) : $force_ID \n";
 			}
 			$_ID_LDOC = $force_ID;
+
+		}
+		elsif ( _idldoc_format() eq 'LEGACY' ) {
+			$_ID_LDOC = _idldoc_legacy_new();
+
+		}
+		else {
+			oe_new_ID_LDOC();
+
 		}
 
 	}
 
-return $_ID_LDOC;
+	return $_ID_LDOC;
 }
 
+# The mainline (M) 16-digit id YWWWDHHMMSSPPPP.r, kept for
+# EDTK_IDLDOC_FORMAT=LEGACY (or its 'old' alias).
+sub _idldoc_legacy_new {
+	my $time = time;
+	my ( $year, $month, $day, $hour, $min, $sec, $doy, $dow, $dst ) = Gmtime($time);
+	my ( $week, ) = Week_of_Year( $year, $month, $day );
+
+	my $pid = "$$";
+	my $rnd = int( rand(10) );
+	if ( length $pid > 5 ) {
+		$pid = $pid / ( 10**( ( length $pid ) - 5 ) );
+	}
+
+	return sprintf( "%1d%02d%1d%02d%02d%02d%05d%1d",
+		$year % 10, $week, $dow, $hour, $min, $sec, $pid, $rnd );
+}
+
+# EDTK_IDLDOC_FORMAT: 'UUID' (default) or 'LEGACY' (the 16-digit mainline id).
+# 'old' is an accepted spelling of 'LEGACY' (case-insensitive), normalised here
+# so oe_ID_LDOC tests a single value. Read once per process: config_read is
+# not cached, and oe_ID_LDOC is called from contexts that carry no $cfg
+# (Tracking, EDMS, ...).
+sub _idldoc_format {
+	unless ( defined $_IDLDOC_FORMAT ) {
+		my $cfg = eval { config_read('COMPO') } || {};
+		my $val = ref $cfg                         ? $cfg->{'EDTK_IDLDOC_FORMAT'} : undef;
+		my $fmt = ( defined $val && $val =~ /\S/ ) ? uc($val)                     : 'UUID';
+		$fmt            = 'LEGACY' if $fmt eq 'OLD';
+		$_IDLDOC_FORMAT = $fmt;
+	}
+	return $_IDLDOC_FORMAT;
+}
+
+# A document batch id (idldoc). Since S70/D1 it is a 36-char UUID; the legacy
+# 16-digit YWWWDHHMMSSPPPP.r form is still produced under
+# EDTK_IDLDOC_FORMAT=LEGACY (or its 'old' alias). Kept in this module so the
+# CLI tools that classify a user-supplied id (see lib/index_Block_refs.pl)
+# share one definition.
+sub oe_is_IDLDOC {
+	my $value = shift;
+	return 0 unless defined $value;
+	return $value =~ /^[0-9A-Fa-f]{8}(?:-[0-9A-Fa-f]{4}){3}-[0-9A-Fa-f]{12}$/
+		|| $value =~ /^\d{16}$/;
+}
 
 {
- my $_app_typ_trt;	# batching processing type,
- 			# value accessible only through the _app_typ_trt method
+	my $_app_typ_trt;    # batching processing type,
+						 # value accessible only through the _app_typ_trt method
 
-	sub _app_typ_trt (;$){
+	sub _app_typ_trt {
+
 		# designation of the batching processing type (Output Management)
 		# if the function is called with a parameter, assign it to $_app_typ_trt
 		# if the function is called alone, just return the normalized value
@@ -1416,53 +1216,57 @@ return $_ID_LDOC;
 		# - U   -> default mode
 		# - H   -> mode tied to the 'Homologation' extension (-V2)
 
+# New run handling based on EDTK_TYPE_ENV:
+# EDTK_TYPE_ENV = Production	-> cleanup, if indexed mode: determine the trt from EDTK_REFIDDOC
+# EDTK_TYPE_ENV = Integration	-> cleanup, banner, if indexed mode: determine the trt from EDTK_REFIDDOC
+# EDTK_TYPE_ENV = Test		-> banner, if indexed mode: determine the trt from EDTK_REFIDDOC
+# EDTK_TYPE_ENV = Development	-> cleanup, banner, 'short' processing
 
-		# New run handling based on EDTK_TYPE_ENV:
-		# EDTK_TYPE_ENV = Production	-> cleanup, if indexed mode: determine the trt from EDTK_REFIDDOC
-		# EDTK_TYPE_ENV = Integration	-> cleanup, banner, if indexed mode: determine the trt from EDTK_REFIDDOC
-		# EDTK_TYPE_ENV = Test		-> banner, if indexed mode: determine the trt from EDTK_REFIDDOC
-		# EDTK_TYPE_ENV = Development	-> cleanup, banner, 'short' processing
+		my $xTypTrt = shift || '';
+		if ( defined $_app_typ_trt && $xTypTrt !~ /^[TD]/i ) { return $_app_typ_trt; }
 
-		my $xTypTrt	= shift || '';
-		if (defined $_app_typ_trt && $xTypTrt!~/^[TD]/i) {return $_app_typ_trt ;}
 		# only the Test and Debug types allow changing $_app_typ_trt if it is already set
 
-		if ($xTypTrt !~ /^([MGLHTDU])/i){
-			$_app_typ_trt='U';
+		if ( $xTypTrt !~ /^([MGLHTDU])/i ) {
+			$_app_typ_trt = 'U';
 
-		} elsif ($xTypTrt =~ /^([MGL])/i) {
-			$_app_typ_trt=$1;
+		}
+		elsif ( $xTypTrt =~ /^([MGL])/i ) {
+			$_app_typ_trt = $1;
 
-		} elsif ($xTypTrt =~ /^([HTD])/i) {
-			$_app_typ_trt=$1;
+		}
+		elsif ( $xTypTrt =~ /^([HTD])/i ) {
+			$_app_typ_trt = $1;
 		}
 
-	warn "INFO : OM processing type = $_app_typ_trt (Mass/Grouped/Local/Homol/Test/Debug/Undef)\n";
-	return $_app_typ_trt;
+		warn
+"INFO: OM processing type = $_app_typ_trt (Mass/Grouped/Local/Homol/Test/Debug/Undef)\n";
+		return $_app_typ_trt;
 	}
 }
 
 {
- my $_DOCLIB;	# DCLIB DESIGNATION for batching
- 			# value accessible only through the _omngr_doclib method
+	my $_DOCLIB;    # DCLIB DESIGNATION for batching
+					# value accessible only through the _omngr_doclib method
 
-	sub _omngr_doclib (;$$){
-		if (defined $_DOCLIB) { return $_DOCLIB ; }
+	sub _omngr_doclib {
+		if ( defined $_DOCLIB ) { return $_DOCLIB; }
 
-		my $doclib	=shift;
-		if (!defined $doclib){
+		my $doclib = shift;
+		if ( !defined $doclib ) {
 			my $cfg = config_read('ENVDESC');
-			my $ext		=shift || $cfg->{'EDTK_EXT_DEFAULT'};
+			my $ext = shift || $cfg->{'EDTK_EXT_DEFAULT'};
 			$_DOCLIB = "DCLIB_" . oe_ID_LDOC() . "." . $ext;
+
 			#$_DOCLIB =~ s/\./_/;
-		} else {
-			$_DOCLIB=$doclib;
+		}
+		else {
+			$_DOCLIB = $doclib;
 		}
 
-	return $_DOCLIB;
+		return $_DOCLIB;
 	}
 }
-
 
 #sub user_corp_file_prefixe($;$){
 #	my($filename, $directories, $suffix) = fileparse(shift);
@@ -1474,9 +1278,8 @@ return $_ID_LDOC;
 #}
 
 sub oe_corporation_tag() {
-	return (sprintf ("x%.7s", oe_corporation_set()) );
+	return ( sprintf( "x%.7s", oe_corporation_set() ) );
 }
-
 
 my $_xCORPOR;
 my $_DICT;
@@ -1485,130 +1288,455 @@ sub oe_corporation_get() {
 	return $_xCORPOR;
 }
 
-	sub oe_corporation_set(;$){
-		# DICTIONARY USE:
-		#	- if the parameter is known in the dictionary => dictionary value
-		#	- if the parameter is unknown => default value (edtk.ini / EDTK_CORP)
-		#	- if no parameter => last known value
-		my $parametre = shift;
+sub oe_corporation_set {
 
-		if (!defined($_DICT)) {
-			my $cfg =config_read();
-			$_xCORPOR = $cfg->{'EDTK_CORP'};	# Default value
-			$_DICT = oEdtk::Dict->new($cfg->{'EDTK_DICO'}, { invert => 1 });
-		}
+	# DICTIONARY USE:
+	#	- if the parameter is known in the dictionary => dictionary value
+	#	- if the parameter is unknown => default value (edtk.ini / EDTK_CORP)
+	#	- if no parameter => last known value
+	my $parametre = shift;
 
-		my $entity;
-		if (defined($parametre)) {
-			$entity = $parametre;
-		} else {
-			$entity = $_xCORPOR;
-		}
-
-		$entity = $_DICT->translate($entity, 1);
-
-		if (defined ($entity)) {
-			# if the value was found in the dictionary
-			$_xCORPOR = $entity;
-		}
-
-		# warn "\$entity $entity \$_xCORPOR $_xCORPOR\n";
-		return $_xCORPOR;
+	if ( !defined($_DICT) ) {
+		my $cfg = config_read();
+		$_xCORPOR = $cfg->{'EDTK_CORP'};                                        # Default value
+		$_DICT    = oEdtk::Dict->new( $cfg->{'EDTK_DICO'}, { invert => 1 } );
 	}
 
+	my $entity;
+	if ( defined($parametre) ) {
+		$entity = $parametre;
+	}
+	else {
+		$entity = $_xCORPOR;
+	}
 
+	$entity = $_DICT->translate( $entity, 1 );
 
-{			# in progress, not operational yet (recovery from the generator)
- my $cpt_sub_call =0; 	# constant variable local to the function
- my %hListeId;
+	if ( defined($entity) ) {
 
-	sub oe_unique_data_name ($$;$) {
-		# define a unique identifier over n characters
-		# the first 6 characters of the passed key are extracted
-		# if the id is already known, take the first 4 and add a 3-digit counter (matches the call sequence)
-		# if it is still not unique, take the first 3 characters and complete the 3-digit counter with a character
-		# receives: 	- the total number of characters to return
-		#		- an identifier
-		#		- optional: a reference to a counter value (3 numeric)
+		# if the value was found in the dictionary
+		$_xCORPOR = $entity;
+	}
 
-		my ($nb_car, $id, $cpt_value) =@_;
-		if ($nb_car lt 6) { $nb_car = 6 ; }
+	# warn "\$entity $entity \$_xCORPOR $_xCORPOR\n";
+	return $_xCORPOR;
+}
 
-		if ($cpt_value) {$cpt_sub_call=$cpt_value} else {$cpt_sub_call++};
+{    # in progress, not operational yet (recovery from the generator)
+	my $cpt_sub_call = 0;    # constant variable local to the function
+	my %hListeId;
 
-		my $debut = $nb_car-2;
-		my $motif ="%-" . $debut . "." . $debut . "s%0.2d"; # "%-4.4s%0.2d"
+	sub oe_unique_data_name {
+
+# define a unique identifier over n characters
+# the first 6 characters of the passed key are extracted
+# if the id is already known, take the first 4 and add a 3-digit counter (matches the call sequence)
+# if it is still not unique, take the first 3 characters and complete the 3-digit counter with a character
+# receives: 	- the total number of characters to return
+#		- an identifier
+#		- optional: a reference to a counter value (3 numeric)
+
+		my ( $nb_car, $id, $cpt_value ) = @_;
+		if ( $nb_car lt 6 ) { $nb_car = 6; }
+
+		if ($cpt_value) { $cpt_sub_call = $cpt_value }
+		else            { $cpt_sub_call++ }
+
+		my $debut = $nb_car - 2;
+		my $motif = "%-" . $debut . "." . $debut . "s%0.2d";    # "%-4.4s%0.2d"
 		warn "$motif / $id\n";
-		$id	=sprintf ("$motif", $id);
-		$id	=~s/\s/x/g;
+		$id = sprintf( "$motif", $id );
+		$id =~ s/\s/x/g;
 
-		if (exists ($hListeId{$id})){
-			$debut	= $nb_car-3;
-			$motif	="%-" . $debut . "." . $debut . "s%0.3d"; # "%-3.3s%0.3d"
-			$id	=sprintf ($motif ,$id, $cpt_sub_call);
+		if ( exists( $hListeId{$id} ) ) {
+			$debut = $nb_car - 3;
+			$motif = "%-" . $debut . "." . $debut . "s%0.3d";    # "%-3.3s%0.3d"
+			$id    = sprintf( $motif, $id, $cpt_sub_call );
 
-			my $cpt	=97;    # for the character "a"
-			while (exists ($hListeId{$id})) {
-				$debut	= $nb_car-4;
-				$motif	="%-" . $debut . "." . $debut . "s%0.3d"; # "%-3.3s%0.3d"
-				$id	=sprintf ($motif, $id, $cpt_sub_call, chr($cpt++));
-				die "ERROR: cannot create a unique key" if ($cpt >= 123);
+			my $cpt = 97;                                        # for the character "a"
+			while ( exists( $hListeId{$id} ) ) {
+				$debut = $nb_car - 4;
+				$motif = "%-" . $debut . "." . $debut . "s%0.3d";                # "%-3.3s%0.3d"
+				$id    = sprintf( $motif, $id, $cpt_sub_call, chr( $cpt++ ) );
+				die "ERROR: cannot create a unique key" if ( $cpt >= 123 );
 
-				# use Log::Log4perl;
-				# Log::Log4perl->init("log.conf"); => read log.conf
-				# $logger = Log::Log4perl->get_logger("");
-				# $logger->logdie("cannot create a unique key") if ($cpt >= 123);
-				# $logger->trace("...");  # Log a trace message
-				# $logger->debug("...");  # Log a debug message
-				# $logger->info("...");   # Log a info message
-				# $logger->warn("...");   # Log a warn message	/ $logger->error_warn("..."); (includes the call to warn() )
-				# $logger->error("...");  # Log a error message	/ $logger->logdie ("..."); (includes the call to die() )
-				# $logger->fatal("...");  # Log a fatal message
+# use Log::Log4perl;
+# Log::Log4perl->init("log.conf"); => read log.conf
+# $logger = Log::Log4perl->get_logger("");
+# $logger->logdie("cannot create a unique key") if ($cpt >= 123);
+# $logger->trace("...");  # Log a trace message
+# $logger->debug("...");  # Log a debug message
+# $logger->info("...");   # Log a info message
+# $logger->warn("...");   # Log a warn message	/ $logger->error_warn("..."); (includes the call to warn() )
+# $logger->error("...");  # Log a error message	/ $logger->logdie ("..."); (includes the call to die() )
+# $logger->fatal("...");  # Log a fatal message
 			}
 		}
-		$hListeId{$id}=1;
-	return $id;
+		$hListeId{$id} = 1;
+		return $id;
 	}
 }
 
 {
-my $_backup_date ;
+	my $_backup_date;
 
-	sub oe_set_sys_date($) {
+	sub oe_set_sys_date {
 		my $requested_date = shift;
 
 		my $time = time;
-		my ($year,$month,$day, $hour,$min,$sec, $doy,$dow,$dst) =
-			Gmtime($time);
+		my ( $year, $month, $day, $hour, $min, $sec, $doy, $dow, $dst ) = Gmtime($time);
 
-		my $commande = sprintf ("date %s", $requested_date);
-		warn "INFO : $commande\n";
+		my $commande = sprintf( "date %s", $requested_date );
+		warn "INFO: $commande\n";
 
-		eval {
-			system($commande);
-		};
+		eval { system($commande); };
 
-#		if ($?){
-		if ($@){
+		#		if ($?){
+		if ($@) {
 			warn "ERROR: command failed $commande : $@\n";
 			return -1;
 		}
 
-		if (!defined $_backup_date) {
-			$_backup_date = sprintf ("%02s-%02s-%02s", $day, $month, $year);
+		if ( !defined $_backup_date ) {
+			$_backup_date = sprintf( "%02s-%02s-%02s", $day, $month, $year );
 		}
-	return $_backup_date;
+		return $_backup_date;
 	}
 
 	sub _restore_sys_date {
-		oe_set_sys_date($_backup_date) if (defined $_backup_date);
-	1;
+		oe_set_sys_date($_backup_date) if ( defined $_backup_date );
+		1;
 	}
 }
 
+# Return the handle to the output file, croaking if it was not opened yet.
+sub _oe_get_handle_to_output_file {
+	my $fh = openhandle(*OUT);
+	if ( !defined $fh ) {
+		croak
+"You tried to use the handle to the output file. However, the output file has not been opened yet!";
+	}
+	return $fh;
+}
+
+# Return the handle to the input file (the file that holds the Infinite flux).
+# @note The IN handle should not be accessed directly from outside this module
+#       (all the more so as a global variable!).
+# @TODO write a function oe_read_from_input_file().
+sub oe_get_handle_to_input_file {
+	my $fh = openhandle(*IN);
+	if ( !defined $fh ) {
+		croak
+"You tried to use the handle to the input file. However, the input file has not been opened yet!";
+	}
+	return $fh;
+}
+
+# Print a text into the output file.
+# @param [string] $in_text text to print.
+# @note all actions on the output file should go through an "output adaptor"
+#       implemented as a plugin (a class implementing an interface).
+sub oe_print_to_output_file {
+	my $in_text = shift;
+	croak 'in_text undef' if !defined $in_text;
+	my $fh = _oe_get_handle_to_output_file();
+	return print $fh $in_text;
+}
+
+# Print a text into the "output debug file".
+# @param [string] $in_text text to print.
+# @note the behaviour of this function can be configured through the
+#       environment variables listed below:
+#       - MNT_OUTPUT_DUMP_MODE: activate or deactivate the recording (0: off, 1: on).
+#       - MNT_OUTPUT_DUMP_PATH: the path to the file used to store the recorded data.
+#       both environment variables have default values (see
+#       $_DEFAULT_OUTPUT_DUMP_MODE and $_DEFAULT_OUTPUT_DUMP_FILE).
+sub _dump {
+	my ($in_text) = @_;
+
+	my $dump_mode =
+		exists $ENV{MNT_OUTPUT_DUMP_MODE} && defined $ENV{MNT_OUTPUT_DUMP_MODE}
+		? $ENV{MNT_OUTPUT_DUMP_MODE}
+		: $_DEFAULT_OUTPUT_DUMP_MODE;
+	if ( !$dump_mode ) {
+		return;
+	}
+
+	my $dump_path =
+		exists $ENV{MNT_OUTPUT_DUMP_PATH} && defined $ENV{MNT_OUTPUT_DUMP_PATH}
+		? $ENV{MNT_OUTPUT_DUMP_PATH}
+		: $_DEFAULT_OUTPUT_DUMP_FILE;
+	use open ':encoding(iso-8859-15)';
+	open( my $fd, '>>', $dump_path )
+		or die sprintf(
+'The module "%s::Main" is configured to record all text written to the output file. Can not open the dump file "%s": %s.',
+		__PACKAGE__, $dump_path, $! );
+	printf $fd "%s\n", $in_text;
+	close($fd)
+		or die sprintf(
+'The module "%s::Main" is configured to record all text written to the output file. Can not close the dump file "%s": %s.',
+		__PACKAGE__, $dump_path, $! );
+}
+
+# Dictionary of the applications' backgrounds.
+my $_DICO_BACKGROUNDS;
+
+sub oe_backgrounds_apps {
+	my ($section) = @_;
+
+	my $cfg = config_read();
+	if ( !defined($_DICO_BACKGROUNDS) ) {
+		$_DICO_BACKGROUNDS =
+			oEdtk::Dict->new( $cfg->{'EDTK_APPS_BACKGROUNDS'}, { section => $section } );
+	}
+	return $_DICO_BACKGROUNDS->translate( $cfg->{EDTK_PRGNAME} );
+}
+
+# Clean up an address line in place to build the recipient address blocks.
+# It works on the reference to the variable and also returns the resulting string.
+## no critic (ProhibitSubroutinePrototypes)
+sub oe_clean_addr(\$) {
+	my $rLine = shift;
+
+	# default value when the field is undef
+	if ( !defined($$rLine) || length($$rLine) == 0 ) {
+		$$rLine = '';
+		return $$rLine;
+	}
+
+	chomp($$rLine);    # make sure there is no trailing newline
+	oe_trimp_space($rLine);
+
+	$$rLine = oe_char_xlate( $$rLine, 'ADDRESS' );
+
+	# TODO: a regular expression turning every non 0-9\-\w character into blanks... XXX
+
+	$$rLine =~ s/^\s+//;                 # left trim: drop leading blanks
+	$$rLine =~ s/\s+$//;                 # right trim: drop trailing blanks
+	$$rLine =~ s/^0\s+//;                # drop a lone leading zero (after the trims)
+	$$rLine =~ s/\s+/ /;                 # collapse consecutive blanks
+	$$rLine =~ s/(\s{1}\W{1}){2}/$1/;    # drop a blank followed by a non-alphanumeric
+	$$rLine =~ s/\W+$//;                 # drop trailing non-alphanumeric characters
+
+	return $$rLine;
+}
+
+# Production type: the first letter of the EDTK_TYPE_ENV configuration value.
+sub oe_typ_prod {
+	my ($cfg) = @_;
+	$cfg //= config_read();
+	my $env = $cfg->{'EDTK_TYPE_ENV'} // croak 'Env. var. EDTK_TYPE_ENV undef';
+	return substr( $env, 0, 1 );
+}
+
+# Create a new "job definition" and, if needed, run asynchronously the process
+# that produces the output (pdf) file. When run asynchronously the "job
+# definition" is a "FIFO file", otherwise it is a text file (.txt).
+# The job file name carries the application name (e.g. "PRACI-AC014.txt") and is
+# reachable through the global file handle OUT.
+# @param [array] a list of command line options: --help, --index, --edms,
+#        --bpdf, --cgi, --noinputfiles, --input_code=s (e.g. utf8).
+# @note the input data file (generated by Infinite) is opened and reachable
+#       through the global file handle IN.
+sub oe_new_job_input_file {
+	my $params = oe_params();
+
+	if ( $params->{'input_code'} ) {
+		$params->{'input_code'} = "<:encoding(" . $params->{'input_code'} . ")";
+	}
+	else {
+		$params->{'input_code'} = "<";
+	}
+
+	my $fi;
+	if ( $params->{help} ) {
+		oe_app_usage();
+		exit 0;
+	}
+	elsif ( $params->{noinputfiles} ) {
+		$fi = 0;
+		warn "INFO: no input file for this treatment\n";
+	}
+	elsif ( !scalar @ARGV ) {    # TO KEEP COMPATIBILITY
+		oe_app_usage();
+		exit 0;
+	}
+	else {
+		$fi = $ARGV[0];                       # TO KEEP COMPATIBILITY
+		$params->{'inputfile'} = $fi;
+
+		open( IN, $params->{input_code}, $fi )    ## no critic (InputOutput::ProhibitBarewordFileHandles)
+			or die sprintf( 'Cannot open the input file "%s": %s', $fi, $! );
+		warn "INFO: input perl data is $fi (encode '" . $params->{'input_code'} . "' $ARGV[-1])\n";
+	}
+
+	return;
+}
+
+sub oe_new_job_output_file {
+	my $params = oe_params();
+	my $cfg    = oe_config_compo();
+
+	$params->{'outfile'}     = $cfg->{'EDTK_PRGNAME'} . ".txt";         # should be tied to TexMode
+	$params->{'output_code'} = $cfg->{'EDTK_OUT_ENCODING'} || 'utf8';
+	$params->{'output_code'} = ">:encoding(" . $params->{'output_code'} . ")";
+
+	# Override default setting if EDTK_COMPO_ASYNC is set in edtk.ini.
+
+	if (   exists $cfg->{'EDTK_COMPO_ASYNC'}
+		&& defined $cfg->{'EDTK_COMPO_ASYNC'}
+		&& $cfg->{'EDTK_COMPO_ASYNC'} )
+	{
+		my $async = $cfg->{'EDTK_COMPO_ASYNC'};
+		if ( $async =~ /^yes$/i ) {
+			$params->{'fifo'} = 1;
+		}
+		elsif ( $async =~ /^no$/i ) {
+			$params->{'fifo'} = 0;
+		}
+		else {
+			die sprintf
+				'Unexpected value for configuration tag EDTK_COMPO_ASYNC: "%s"',
+				$async;
+		}
+	}
+
+	if ( $params->{'fifo'} ) {
+		if (   ( exists $cfg->{EDTK_FIFO_MODE} )
+			&& ( $cfg->{EDTK_FIFO_MODE} eq 'NONE' ) )
+		{
+			warn "INFO: Deactivating FIFO MODE, as requested in the configuration";
+			$params->{'fifo'} = 0;
+		}
+		elsif ( $^O eq 'MSWin32' ) {
+			warn "INFO: FIFO mode is not possible under Windows, ignoring.\n";
+			$params->{'fifo'} = 0;
+		}
+	}
+
+	# In FIFO mode a left-over text file makes mkfifo() fail; without FIFO mode a
+	# left-over FIFO would hang us indefinitely, so remove it first.
+	if ( -e $params->{'outfile'} ) {
+		unlink( $params->{'outfile'} )
+			or die( sprintf 'Cannot remove the file "%s": %s', $params->{'outfile'}, $! );
+	}
+
+	# start the LaTeX engine when the FIFO mode is activated.
+	if ( $params->{'fifo'} ) {
+		mkfifo( $params->{'outfile'}, oct(700) )
+			or die
+			sprintf( 'ERROR: Could not create fifo in file "%s": %s', $params->{'outfile'}, $! );
+		my $pid = oe_compo_run( $cfg->{'EDTK_PRGNAME'}, $params );
+		$params->{'pid'} = $pid;
+	}
+
+	# create the output file "/path/to/lateX/file.tex".
+	_dump( sprintf "\n%%\n%% ==> %s <==\n%%\n%%", $params->{outfile} );
+	open( OUT, $params->{output_code}, $params->{outfile} )    ## no critic (InputOutput::ProhibitBarewordFileHandles)
+		or die sprintf 'Can not open the output file "%s": %s', $params->{outfile}, $!;
+	warn sprintf( 'INFO: input compo data is "%s" (encode is "%s".',
+		$params->{'outfile'}, $params->{'output_code'} );
+	return;
+}
+
+sub oe_watermark {
+	my ($cfg) = @_;
+	$cfg //= config_read('COMPO');
+	return $cfg->{'EDTK_WATERMARKTEXT'} || q{ };               # XXX //?
+}
+
+# Getter (no argument) / setter (a hash ref) for the run parameters.
+sub oe_params {
+	my ($params) = @_;
+	state $_RUN_PARAMS;
+	if ( defined $params ) {
+		$_RUN_PARAMS = $params;
+	}
+	else {
+		return $_RUN_PARAMS;
+	}
+}
+
+# The COMPO configuration, read once per run.
+sub oe_config_compo {
+	state $_RUN_CFG = config_read();
+	return $_RUN_CFG;
+}
+
+sub oe_options {
+	my (@args) = @_;
+	my $params = oe_params();         # read (getter)
+	my $cfg    = oe_config_compo();
+	return ( $params, $cfg ) if defined $params;
+	$params = {};
+
+	# load all configuration parameters that describe the publication
+	# environment: EDTK_BIN_COMPO, EDTK_COMPO, EDTK_COMPO_CMD_PDF...
+	my $defaults = {%DEFAULT_OPTIONS};
+	GetOptionsFromArray(
+		[ @ARGV, @args ], $defaults,      'help',    'index',
+		'massmail',       'edms',         'bpdf',    'cgi',
+		'noinputfiles',   'input_code=s', 'iddoc=s', 'nocallplan',
+		'forced-paper'
+	);
+	while ( my ( $key, $val ) = each( %{$defaults} ) ) {
+		$params->{$key} //= $val;
+	}
+	$params->{'doclib'} = _omngr_doclib();
+	if ( exists $params->{'iddoc'} ) {
+		$_ID_LDOC = $params->{'iddoc'};
+	}
+	$params->{'idldoc'} = oe_ID_LDOC();
+
+	$params->{'type-prod'} = oe_typ_prod($cfg);
+	$params->{'HOST-NAME'} = hostname();
+	$params->{'app-ref'}   = $cfg->{'EDTK_PRGNAME'};
+	if ( $params->{'index'} ) {
+		$params->{'activate-lotissement'} = 1;
+		$params->{'Host-name'}            = hostname();
+	}
+	$defaults->{'fifo'} = ( $^O eq 'MSWin32' ) ? 0 : 1;
+	my $env = $cfg->{'EDTK_TYPE_ENV'} // croak "Env. var. 'EDTK_TYPE_ENV' undef";
+	if ( $env eq 'Production' ) {
+		$params->{'type-app'} = 'prod';
+	}
+	else {
+		$params->{'watermark'} = oe_watermark($cfg);
+		$params->{'type-app'}  = 'test';
+	}
+
+	# handle options passed in the EDTK_OPTIONS environment variable.
+	if ( exists( $ENV{'EDTK_OPTIONS'} ) ) {
+		my @opts = split( ',', $ENV{'EDTK_OPTIONS'} );
+		foreach my $opt (@opts) {
+			$params->{$opt} = 1;
+		}
+	}
+
+	oe_params($params);    # write (setter)
+	return ( $params, $cfg );
+}
+
+# Historical name kept as an alias of oe_ID_LDOC (same format until S70).
+# The true generator: a fresh UUID on every call (fork F semantics, S70/D1).
+# oe_ID_LDOC is the memoized entry point; oe_new_ID_LDOC is exported for the
+# callers that genuinely want a new id.
+sub oe_new_ID_LDOC {
+	$_ID_LDOC = Data::UUID->new->create_str();
+	return $_ID_LDOC;
+}
+
+sub oe_simple_job {
+	my (@args) = @_;
+	oe_options(@args);
+	oe_new_job_input_file();
+	oe_new_job_output_file();
+	return ( oe_params(), config_read() );
+}
 
 END {
 	_restore_sys_date;
+
 	# duplicate with oEdtk.pm  :
 	#warn "(c) 2005-2020 grechary\@cpan.org - edtk\@free.fr - oEdtk v$VERSION\n";
 }

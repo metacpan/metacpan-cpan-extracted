@@ -49,6 +49,9 @@ t/24-terminal.t
 t/25-pick.t
 t/26-bin.t
 t/27-synopsis.t
+t/28-options.t
+t/29-round-trip.t
+t/30-history.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

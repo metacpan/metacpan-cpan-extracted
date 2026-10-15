@@ -24,14 +24,14 @@ ok(eval q{package I::F; use strict; use Context::Vars q{$single}; $single = 1; 1
    'a single name given as one string') or diag $@;
 
 # ---- what is refused, at compile time, naming the argument ------------------
-for my $bad ('@list', '%map', '&code', '*glob', 'bare', '$', '$1', '$9lives', '$Other::name',
+for my $bad ('@', '%', '@1', '%9lives', '&code', '*glob', 'bare', '$', '$1', '$9lives', '$Other::name',
              '$a b', '$a-b', '$x $y', '', '$caf' . chr(233)) {
     my $shown = $bad;
     ok(!eval "package I::Bad; use Context::Vars q\x01$bad\x01; 1", "'$shown' is refused");
     like($@, qr/^Context::Vars: cannot import '\Q$bad\E'/, "'$shown': the message names the argument");
     like($@, qr/BEGIN failed/, "'$shown': and it is a compile-time failure");
 }
-for my $forced (qw($_ $ENV $INC $ARGV $ARGVOUT $STDIN $STDOUT $STDERR)) {
+for my $forced (qw($_ $ENV $INC $ARGV $ARGVOUT $STDIN $STDOUT $STDERR @ARGV %ENV @INC %INC %SIG @_)) {
     ok(!eval "package I::Forced; use Context::Vars q{$forced}; 1", "'$forced' is refused");
     like($@, qr/perl keeps that name in package main/, "'$forced': because perl would never look at it");
 }

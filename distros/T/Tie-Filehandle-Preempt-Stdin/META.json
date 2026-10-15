@@ -1,0 +1,58 @@
+{
+   "abstract" : "Preempt STDIN during testing.",
+   "author" : [
+      "James E Keenan (jkeenan@pobox.com)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Tie-Filehandle-Preempt-Stdin",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Simple" : "0.44"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jkeenan/Tie-Filehandle-Preempt-Stdin/issues"
+      },
+      "homepage" : "http://thenceforward.net/perl/modules/Tie-Filehandle-Preempt-Stdin/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jkeenan/Tie-Filehandle-Preempt-Stdin.git",
+         "web" : "https://github.com/jkeenan/Tie-Filehandle-Preempt-Stdin"
+      }
+   },
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

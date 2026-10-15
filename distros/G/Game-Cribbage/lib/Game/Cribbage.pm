@@ -3,7 +3,7 @@ package Game::Cribbage;
 use strict;
 use warnings;
 
-our $VERSION = "0.17";
+our $VERSION = "0.18";
 
 use Game::Cribbage::Terminal;
 
@@ -22,7 +22,7 @@ Game::Cribbage - Cribbage game engine
 
 =head1 VERSION
 
-Version 0.17
+Version 0.18
 
 =cut
 

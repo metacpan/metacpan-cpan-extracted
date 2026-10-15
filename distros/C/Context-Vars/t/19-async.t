@@ -62,9 +62,19 @@ is(Context::Vars::_depth(), 0, 'no scope is left open');
 }
 
 # Dropped while suspended, and failing after resuming.
+#
+# Before perl 5.24 Future::AsyncAwait keeps a cancelled sub, and everything
+# it holds, until global destruction. The guard shows whether it let go, and
+# the holder count at the end allows for the one it kept.
+my $kept = 0;
+{
+    package Kept;
+    sub new { $kept = 1; bless {} }
+    sub DESTROY { $kept = 0 }
+}
 {
     my $x = Future->new;
-    async sub abandoned { $id = 'abandoned'; await $x; $id = 'never'; return }
+    async sub abandoned { my $g = Kept->new; $id = 'abandoned'; await $x; $id = 'never'; return }
     { my $f = abandoned(); $f->cancel; }
     is($id, 'top', 'a cancelled task leaves the caller alone');
 
@@ -79,6 +89,7 @@ is(Context::Vars::_depth(), 0, 'no scope is left open');
 
 # Everything a suspended task held is let go once the tasks are gone.
 @t = ();
-is(Context::Vars::_live_holders(), 0, 'no holder is out once the tasks are gone');
+is(Context::Vars::_live_holders(), $kept, 'no holder is out once the tasks are gone')
+    or diag("Future::AsyncAwait kept the cancelled sub: " . ($kept ? 'yes' : 'no'));
 
 done_testing;

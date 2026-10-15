@@ -5,7 +5,7 @@ use warnings;
 
 use Exporter 'import';
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 our @EXPORT_OK = qw(rank_of suit_of power_of points_of name_of long_name_of id_of
                     ids_of_ranks ranks suits CARDS);
 
@@ -71,7 +71,7 @@ Game::Schnapsen::Card - a card is an integer, and everything else is derived
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 

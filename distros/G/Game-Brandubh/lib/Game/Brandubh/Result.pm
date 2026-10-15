@@ -7,7 +7,7 @@ use warnings;
 use Carp ();
 use Object::Proto::Sugar;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our (%WIN, %DRAW);
 BEGIN {
@@ -71,7 +71,7 @@ Game::Brandubh::Result - how a game of brandubh ended
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

@@ -12,7 +12,7 @@ use Sub::Protected;
 use Params::Validate::Strict qw(validate_strict);
 use Params::Get		();
 
-our $VERSION = '0.011.0';
+our $VERSION = '0.012.0';
 
 =head1 NAME
 
@@ -20,7 +20,7 @@ Database::BI::Model::DataSource - Table-agnostic adapter around Database::Abstra
 
 =head1 VERSION
 
-0.011.0
+0.012.0
 
 =head1 SYNOPSIS
 
@@ -262,6 +262,7 @@ Readonly our %MESSAGES => (
 	error_no_tables			=> 'DataSource: SQLite file "%s" contains no user-defined tables',
 	error_table_not_found		=> 'DataSource: SQLite file "%s" does not contain a table named "%s"',
 	error_unsupported_db		=> 'DataSource: "%s" is a Berkeley DB file but the installed DB_File library cannot open it (file may use a newer Berkeley DB format)',
+	error_redis_invalid		=> 'DataSource: Redis URL "%s" must begin with redis://',
 	warn_empty_result		=> 'DataSource: fetch_all returned no records for table "%s"',
 	warn_data_normalised		=> 'DataSource: result from backend was a hashref; converted to arrayref for table "%s"',
 );
@@ -435,7 +436,8 @@ sub new {
 	# When a "url" key is present, dispatch to the URL/HTML-table path instead.
 	my $class = shift;
 	my $raw   = Params::Get::get_params(undef, \@_) // {};
-	return $class->_new_from_url($raw) if exists $raw->{url};
+	return $class->_new_from_url($raw)   if exists $raw->{url};
+	return $class->_new_from_redis($raw) if exists $raw->{redis};
 
 	my $args = validate_strict(
 		schema => {
@@ -563,6 +565,83 @@ sub _init_url_backend :Protected {
 		})
 	};
 	croak $self->_msg('error_url_fetch', $url, $@) if $@;
+
+	$self->{_db} = $db;
+	return;
+}
+
+# _new_from_redis( $class, \%raw_params ) -> $self
+#
+# Alternate constructor path for Redis-backed tables.
+# Entry:   $raw->{redis} must be a redis:// URL.
+#          $raw->{table} (required): table name -- becomes the Redis key prefix
+#                         (keys in Redis must follow the pattern tablename:*).
+#          $raw->{i18n} (optional): Locale::Maketext-compatible object.
+# Exit:    Returns $self.  Croaks on invalid URL or table name.
+sub _new_from_redis :Protected {
+	my ($class, $raw) = @_;
+
+	my $redis_url = $raw->{redis} // croak _fmt('error_redis_invalid', '');
+	croak _fmt('error_redis_invalid', $redis_url)
+		unless $redis_url =~ m{\Aredis://}i;
+
+	my $table = $raw->{table} // croak _fmt('error_table_required');
+	croak _fmt('error_table_name_invalid', $table)
+		if !length($table) || $table =~ m{[/\\\x00]};
+
+	my $raw_table = $table;
+	(my $safe_table = $raw_table) =~ s/[^A-Za-z0-9_]/_/g;
+	$safe_table = '_' . $safe_table if $safe_table =~ /\A[0-9]/;
+	croak _fmt('error_table_name_invalid', $raw_table)
+		unless $safe_table =~ $TABLE_NAME_RE;
+
+	my $self = bless {
+		_table         => $safe_table,
+		_raw_table     => $raw_table,
+		_redis_url     => $redis_url,
+		_i18n          => $raw->{i18n},
+		_cache         => $raw->{cache},
+		_cache_ttl_url => $raw->{cache_ttl_url} // '15 min',
+		_id_col        => 'entry',
+		_columns       => undef,
+		_db            => undef,
+	}, $class;
+
+	$self->_init_redis_backend();
+	return $self;
+}
+
+# _init_redis_backend( $self ) -> void
+#
+# Purpose: Construct the Database::Abstraction backend for Redis mode.
+#          D::A connects to the Redis server lazily (on first data access).
+#          We pass redis_key => $raw_table so D::A uses the original key name
+#          (which may contain colons, hyphens, etc.) for Redis lookups, while
+#          the sanitized $table is used only as the Perl package-name suffix.
+#          no_entry => 1 requests array-style rows (no id-keyed hash).
+# Entry:   $self->{_redis_url} is a valid redis:// URL.
+#          $self->{_table}     is a safe SQL identifier (sanitized key name).
+#          $self->{_raw_table} is the original Redis key name.
+# Exit:    Sets $self->{_db}.  Croaks when D::A construction fails.
+sub _init_redis_backend :Protected {
+	my $self  = shift;
+	my $table = $self->{_table};
+
+	require Database::Abstraction;
+
+	my $pkg = 'Database::BI::_DB::' . ucfirst($table);
+	{
+		no strict 'refs';
+		push @{"${pkg}::ISA"}, 'Database::Abstraction'
+			unless $pkg->isa('Database::Abstraction');
+	}
+
+	my $db = eval { $pkg->new(
+		database  => $self->{_redis_url},
+		table     => $table,
+		redis_key => $self->{_raw_table},
+	) };
+	croak $self->_msg('error_backend_init', $table, $@) if $@;
 
 	$self->{_db} = $db;
 	return;
@@ -1368,6 +1447,14 @@ so calling C<_db-E<gt>columns()> here would trigger a live network request even
 when the data came from the CHI cache.  The controller derives column order
 from the data records instead (alphabetical fallback).
 
+=item Redis-backed tables
+
+Delegates to the underlying C<Database::Abstraction> C<columns()>, which
+triggers a lazy open of the Redis connection on first call and returns the
+column names derived from the first stored row (alphabetical order, includes
+C<entry>).  This is required so that C<Database::Join> can validate the
+join column at construction time.
+
 =back
 
 Always check the return value before dereferencing:
@@ -1376,7 +1463,7 @@ Always check the return value before dereferencing:
     if ($cols) {
         print join(', ', @{$cols}), "\n";
     } else {
-        # SQLite, XML, or URL: derive columns from the first data row
+        # URL-backed tables: derive columns from the first data row
     }
 
 =head3 API SPECIFICATION
@@ -1399,12 +1486,123 @@ None.
 sub columns {
 	my $self = shift;
 	return $self->{_columns} if defined $self->{_columns};
-	# URL-backed tables have no canonical column order; D::A fetches lazily so
-	# calling _db->columns() here would trigger a live network request even when
-	# the data came from the CHI cache.  Return undef and let _get_columns derive
-	# the list from the data records instead.
+	# URL-backed tables have no canonical column order at construction time;
+	# calling _db->columns() would trigger a live HTTP request which may fail.
+	# Return undef so _get_columns derives column names from fetched data.
 	return undef if defined $self->{_url};
+	# Redis-backed tables: delegate to _db->columns() which triggers the lazy
+	# open() on first call.  D::J requires a real column list at construction
+	# time so returning undef here would make join validation always fail.
+	# D::A builds its Redis column list from hgetall fields only and omits the
+	# entry key (the suffix of the Redis key pattern tablename:entryid).
+	# Prepend the id column so callers and D::J see a complete column list.
+	if (defined $self->{_redis_url} && $self->{_db}) {
+		my $da_cols  = $self->{_db}->columns() // [];
+		my $id       = $self->{_id_col} // 'entry';
+		my @full     = ($id, grep { $_ ne $id } @{$da_cols});
+		$self->{_columns} = \@full;
+		return $self->{_columns};
+	}
 	return $self->{_db} ? $self->{_db}->columns() : undef;
+}
+
+=head2 dbi_source
+
+Returns a hashref C<{ dbh =E<gt> $dbh, table =E<gt> $name }> for SQLite-backed
+instances, and C<undef> for everything else.
+
+C<Database::Join> 0.009.0 probes C<dbi_source> at join-construction time to
+decide whether it can take the zero-copy C<ATTACH> path (avoiding a row-by-row
+spill into a temporary SQLite file).  Without this method, every C</join> on a
+SQLite-backed C<DataSource> uses the spill path regardless of row count.
+
+Returns C<undef> for:
+
+=over 4
+
+=item *
+
+0-byte and header-less pre-parsed files (C<_file_is_empty>, C<_file_data> set).
+
+=item *
+
+Redis-backed and URL-backed sources (no DBI handle).
+
+=item *
+
+Any backend that does not itself implement C<dbi_source>.
+
+=back
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+None.
+
+=head4 OUTPUT
+
+    { dbh => $dbh_object, table => 'table_name' }   # SQLite-backed
+    undef                                            # all other backends
+
+=head3 MESSAGES
+
+None.
+
+=cut
+
+sub dbi_source {
+	my $self = shift;
+	return undef if $self->{_file_is_empty};
+	return undef if $self->{_file_data};
+	return undef unless $self->{_db};
+	return undef unless $self->{_db}->can('dbi_source');
+	my $result = eval { $self->{_db}->dbi_source() };
+	return undef if $@;
+	return $result;
+}
+
+=head2 aggregate
+
+Delegates to the inner C<Database::Abstraction> backend's C<aggregate()> method
+(requires C<Database::Abstraction> E<gt>= 0.49).
+
+Returns C<[]> for in-memory backends (headerless CSV, XLSX, empty files) and for
+URL-backed sources where aggregation is not available.
+
+Accepts the same C<by>, C<measures>, C<having>, C<sort_by>, C<limit>, C<offset>,
+and WHERE-criteria parameters as C<Database::Abstraction::aggregate()>.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+  by        arrayref    Column names to GROUP BY.
+  measures  arrayref    Measure descriptors (see Database::Abstraction::aggregate).
+  having    hashref     Optional HAVING criteria.
+  sort_by   string      Optional ORDER BY column.
+  limit     integer     Optional result limit.
+  offset    integer     Optional result offset.
+  (any other key)       WHERE column criteria passed through to D::A.
+
+=head4 OUTPUT
+
+  arrayref of hashrefs   -- one row per group.
+  []                     -- in-memory / empty / URL-backed sources.
+
+=head3 MESSAGES
+
+None.
+
+=cut
+
+sub aggregate {
+	my ($self, @args) = @_;
+	return [] if $self->{_file_is_empty};
+	return [] if $self->{_file_data};
+	return [] unless $self->{_db};
+	return [] unless $self->{_db}->can('aggregate');
+	return $self->{_db}->aggregate(@args);
 }
 
 =head2 id_column

@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Carp ();
 use Object::Proto::Sugar -types;
@@ -22,6 +22,7 @@ our $NO_MILL_LIMIT = NO_MILL_PLIES;
 
 my %OTHER = (white => 'black', black => 'white');
 my $OPENING = '........................ w 9 9 0 0';
+my %DECLARED = map { $_ => 1 } qw/resign timeout agreement/;
 
 has [qw/position turn/] => (
 	is => 'rw',
@@ -239,7 +240,12 @@ sub to_text {
 	my ($self) = @_;
 	return Game::Merrills::Notation::format_record(
 		[ map { $_->notation } @{ $self->history } ],
-		$self->position eq $OPENING ? () : (position => $self->position)
+		$self->position eq $OPENING ? () : (position => $self->position),
+		$self->flying ? () : (flying => 0),
+		defined $self->draw_offered_by ? (offer => $self->draw_offered_by) : (),
+		$self->result && $DECLARED{ $self->result->reason }
+			? (result => [ $self->result->winner, $self->result->reason ])
+			: ()
 	);
 }
 
@@ -247,7 +253,12 @@ sub from_text {
 	my ($class, $text, %option) = @_;
 	my $moves = Game::Merrills::Notation::parse_record($text);
 	my $position = Game::Merrills::Notation::record_position($text);
-	my $self = $class->new(%option, defined $position ? (position => $position) : ());
+	my $state = Game::Merrills::Notation::record_state($text);
+	my $self = $class->new(
+		%option,
+		defined $position ? (position => $position) : (),
+		exists $state->{flying} ? (flying => $state->{flying}) : ()
+	);
 	my $number = 0;
 	for my $move (@{$moves}) {
 		$number++;
@@ -255,6 +266,12 @@ sub from_text {
 		next unless ref $played eq 'Game::Merrills::Error';
 		die "illegal record: move $number, '"
 			. Game::Merrills::Notation::format_move($move) . "': " . $played->message . "\n";
+	}
+	$self->draw_offered_by($state->{offer}) if defined $state->{offer};
+	if (my $result = $state->{result}) {
+		die "illegal record: it ends by $result->[1], but the moves already end the game\n"
+			if $self->result;
+		$self->_finish(@{$result});
 	}
 	return $self;
 }
@@ -443,7 +460,7 @@ Game::Merrills - Nine Men's Morris as an engine
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
@@ -771,14 +788,21 @@ repeat.
 =head2 to_text
 
 The whole game as text: the moves in numbered pairs, after a line naming the
-position it began from when that was not the empty board.
+position it began from when that was not the empty board and a line saying
+so when the game is played without flying, and before a line naming the side
+whose draw offer stands and a line naming the winner and the reason when the
+game was resigned, timed out or agreed drawn. L</from_text> builds the same
+game back from it, counts, offer and ending included.
 
 	my $text = $game->to_text;
 
 =head2 from_text
 
-A new game played through from its text. Further arguments go to C<new>. Dies,
-naming the move, when one of them is refused.
+A new game played through from its text, with its draw offer and its ending
+put back after the last move. Further arguments go to C<new>, though a
+flying line in the text overrules a C<flying> argument. Dies, naming the move,
+when one of them is refused, and dies saying why when a line beside the moves
+cannot be read or names an ending the moves have already reached.
 
 	my $game = Game::Merrills->from_text($text);
 

@@ -21,4 +21,5 @@ eval "use Pod::Coverage $min_pc";
 plan skip_all => "Pod::Coverage $min_pc required for testing POD coverage"
     if $@;
 
-all_pod_coverage_ok();
+# internal subs used by the backend run method, documented via comments
+all_pod_coverage_ok( { also_private => [qr/^(proc_cgroup|cgroup_mapping|machine_name|route_get_if|cache_process)$/] } );

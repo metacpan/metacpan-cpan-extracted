@@ -1,5 +1,17 @@
 Revision history for Game-Schnapsen
 
+0.04    2026-10-13
+        - Add options, the fields a launcher offers before a game
+        - The keys, the screen and the picker are Game::Terminal::Kit's
+        - Requires perl 5.14
+        - What the other seat did since your move, and how the trick or the
+          deal came out, stays above the table while you choose a card
+        - The picker draws over its last frame, and clears the screen once
+        - Home and end go to the ends of the hand, shift-tab goes left
+        - Fix: m with two marriages to choose from never showed its question
+        - Fix: after t the typed line was read with the echo still off
+        - NO_COLOR=0 turns colour off
+
 0.03    2026-10-11
         - Add Game::Schnapsen::Terminal->run(@argv), which returns the exit status
         - A bad option or a refused value is exit status 2, not 1

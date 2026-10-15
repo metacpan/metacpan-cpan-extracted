@@ -82,6 +82,7 @@ static int context_vars_probe_lio_open(const char *f, int fl) { (void)f; return 
 #include "context_vars/context_vars_hamt.h"
 #include "context_vars/context_vars_ctx.h"
 #include "context_vars/context_vars_ctx_selftest.h"
+#include "context_vars/context_vars_deep.h"
 #include "context_vars/context_vars_var.h"
 #include "context_vars/context_vars_scope.h"
 #include "context_vars/context_vars_faa.h"

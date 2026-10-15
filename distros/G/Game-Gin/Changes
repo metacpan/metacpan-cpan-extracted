@@ -1,5 +1,14 @@
 Revision history for Game-Gin
 
+0.04    2026-10-13
+        - Add options, the fields a launcher offers before a game
+        - The keys, the screen and the picker are Game::Terminal::Kit's
+        - Requires perl 5.14
+        - The last two moves stay on screen above the table while you choose
+        - The hotseat hand-over waits for enter or space, and q stops there
+        - NO_COLOR=0 turns colour off
+        - Shift-tab walks the hand leftwards
+
 0.03    2026-10-11
         - Add Game::Gin::Terminal->run(@argv), which returns the exit status
         - A bad option or a refused value is exit status 2, not 1

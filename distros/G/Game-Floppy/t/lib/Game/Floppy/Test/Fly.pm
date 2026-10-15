@@ -3,7 +3,7 @@ package Game::Floppy::Test::Fly;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 # Scripted flappers for the engine's tests, so the bot (phase 02) is not
 # needed here. Each is a code reference called with the game before a tick

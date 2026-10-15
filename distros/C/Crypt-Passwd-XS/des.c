@@ -623,10 +623,12 @@ cpx_crypt_des(const char *key, const char *setting)
 		 *	setting - underscore, 4 bytes of count, 4 bytes of salt
 		 *	key - unlimited characters
 		 */
-		for (i = 1, count = 0L; i < 5; i++)
+		int setting_len = strlen(setting);
+
+		for (i = 1, count = 0L; i < 5 && i < setting_len; i++)
 			count |= cpx_ascii_to_bin(setting[i]) << (i - 1) * 6;
 
-		for (i = 5, salt = 0L; i < 9; i++)
+		for (i = 5, salt = 0L; i < 9 && i < setting_len; i++)
 			salt |= cpx_ascii_to_bin(setting[i]) << (i - 5) * 6;
 
 		while (*key) {
@@ -678,8 +680,13 @@ cpx_crypt_des(const char *key, const char *setting)
 		 * is only 1 character long, the salt will be corrupted.  We
 		 * need to ensure that the output string doesn't have an extra
 		 * NUL in it!
+		 *
+		 * Only read setting[1] when setting[0] is non-NUL: for an empty
+		 * salt ("") setting[1] is one byte past the buffer (GH #1's
+		 * sibling for a defined empty string).  When setting[0] is NUL
+		 * the salt is empty, so fall back to output[0] without the read.
 		 */
-		output[1] = setting[1] ? setting[1] : output[0];
+		output[1] = (setting[0] && setting[1]) ? setting[1] : output[0];
 
 		p = output + 2;
 	}

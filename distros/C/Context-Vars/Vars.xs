@@ -9,6 +9,7 @@
 #include "context_vars/context_vars_hamt.h"
 #include "context_vars/context_vars_ctx.h"
 #include "context_vars/context_vars_ctx_selftest.h"
+#include "context_vars/context_vars_deep.h"
 #include "context_vars/context_vars_var.h"
 #include "context_vars/context_vars_scope.h"
 #include "context_vars/context_vars_faa.h"
@@ -30,6 +31,8 @@ BOOT:
     }
     context_vars_ctx_init(aTHX);
     context_vars_scope_boot(aTHX);
+    av_push(get_av("Context::Vars::Data::Map::ISA", GV_ADD), newSVpvs("HAMT::Map"));
+    av_push(get_av("Context::Vars::Data::Vector::ISA", GV_ADD), newSVpvs("HAMT::Vector"));
     context_vars_faa_boot(aTHX);
 }
 
@@ -45,5 +48,6 @@ CLONE(...)
 
 INCLUDE: xs/vars.xs
 INCLUDE: xs/context.xs
+INCLUDE: xs/deep.xs
 INCLUDE: xs/abi.xs
 INCLUDE: xs/test.xs

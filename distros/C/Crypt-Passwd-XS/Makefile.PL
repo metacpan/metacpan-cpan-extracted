@@ -14,7 +14,7 @@ my %CFG = (
     'dist'        => { COMPRESS => 'gzip -9f', SUFFIX => 'gz' },
     'clean'       => { FILES    => 'Crypt-Passwd-XS-* *.o' },
     'INSTALLDIRS' => 'site',
-    'OBJECT'      => "sha256crypt.o sha512crypt.o des.o md5.o crypt_to64.o md5crypt.o XS.o",
+    'OBJECT'      => "sha256crypt.o sha512crypt.o des.o md5.o crypt_to64.o md5crypt.o yescrypt_crypt.o yescrypt-opt.o yescrypt-common.o sha256.o insecure_memzero.o XS.o",
     'META_MERGE'  => {
         build_requires => {
             'Test::More' => 0,    # For testing

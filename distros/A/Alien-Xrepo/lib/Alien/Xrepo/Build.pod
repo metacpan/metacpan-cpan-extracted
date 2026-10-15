@@ -146,6 +146,22 @@ C<root>) must be passed to C<new()>, not to C<run()>. They are not profile optio
 
 During a resume, stages that have already successfully run are skipped.
 
+C<run( )> itself never dies because of a failed package: the C<install> stage records the failure and carries on, so
+the siblings that did install are not thrown away. The packaging front ends (L<Alien::Xrepo::MB>, L<Alien::Xrepo::MM>)
+call C<assert_installed( )> straight afterwards to convert that per-package report into an all-or-nothing verdict.
+
+=head2 C<assert_installed( )>
+
+Turns this run's outcome into a pass/fail decision. Returns C<$self> when C<< runtime_prop->{errors} >> is empty.
+Otherwise it removes the snapshot this run just wrote (so C<snapshot_stale( )> cannot mistake the incomplete result for
+a fresh one and skip the rebuild next time) and dies with one line per failed package:
+
+    Alien::Xrepo: failed to install libsdl3_image:
+      libsdl3_image: <the error recorded for that package>
+
+Call it whenever you need a guarantee that the I<whole> recipe installed, not just a partial report. This is what makes
+a distribution whose snapshot was written but is incomplete fail its test suite instead of passing silently.
+
 =head2 C<configure( %opts )>
 
 Prepares the run: records the recipe facts into C<meta_prop>, folds the ambient C<%opts> over the recipe C<defaults>

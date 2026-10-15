@@ -103,9 +103,27 @@
  *   reference count, which is the caller's.
  *
  * - Everything here belongs to one interpreter. A context made in one thread
- *   must not be used in another. */
+ *   must not be used in another.
+ *
+ * ---- version 2: arrays, hashes and what is inside them ---------------------
+ *
+ * An array or hash variable is named with its sigil, "%seen" for %seen, "@trail"
+ * for @trail; a scalar by its bare name, as before. A path is that name and
+ * then `nkeys` keys or indexes, one SV each: "%seen", "a", "b" is $seen{a}{b}.
+ *
+ * - elem_fetch returns a PLAIN COPY of what is at the path - a hash or array
+ *   at any depth comes back as ordinary Perl hashes and arrays - as a new
+ *   mortal SV; NULL when nothing is there.
+ * - elem_store stores a copy of `value` at the path, making any level that is
+ *   missing: the top by its sigil, anything deeper as a hash. A plain hash or
+ *   array in `value` is taken in at every depth; an object or code reference
+ *   is kept as a reference. NULL removes a hash key, or leaves undef at an
+ *   array index. Like var_store, it changes whatever context is current.
+ * - var_fetch on a scalar that holds a hash or array returns context data in
+ *   a form private to this module; use elem_fetch with no keys for a plain
+ *   copy. */
 
-#define CONTEXT_VARS_ABI_VERSION 1
+#define CONTEXT_VARS_ABI_VERSION 2
 
 #ifndef CONTEXT_VARS_CTX_FWD
 #define CONTEXT_VARS_CTX_FWD
@@ -150,6 +168,13 @@ typedef struct context_vars_abi {
     context_vars_ctx *(*ctx_from_sv)(pTHX_ SV *obj);
     /* A new Context::Vars::Context object. TAKES OVER the reference. */
     SV               *(*ctx_to_sv)(pTHX_ context_vars_ctx *c);
+
+    /* ---- version 2: deep data --------------------------------------------- */
+
+    /* A plain copy of what is at a path, mortal, or NULL. */
+    SV               *(*elem_fetch)(pTHX_ const char *name, STRLEN len, SV **keys, int nkeys);
+    /* Stores a copy of `value` at a path; NULL removes. */
+    void              (*elem_store)(pTHX_ const char *name, STRLEN len, SV **keys, int nkeys, SV *value);
 } context_vars_abi;
 
 #endif

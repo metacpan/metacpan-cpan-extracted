@@ -625,4 +625,49 @@ subtest 'POST /upload -- oversized file returns 413' => sub {
 	$t->app->max_request_size($orig_limit);  # restore
 };
 
+# ---------------------------------------------------------------------------
+# Attack vector 13: Hostile Calc expressions
+#
+# Database::BI::Calc MUST reject expressions that contain shell metacharacters,
+# Perl eval, require, backticks, BEGIN blocks, or other injection vectors.
+# The module uses a pure recursive-descent parser with no string eval; any
+# attempt to inject code must surface as a compile-time error from ->error,
+# not as execution.  The ?c= URL parameter feeds expressions to Calc->new,
+# so a hostile value arriving via HTTP must also be rejected as a 400.
+# ---------------------------------------------------------------------------
+
+subtest 'GET /pivot -- hostile ?c= calc expression returns 400' => sub {
+	# Proof: Calc->new rejects the expression at compile time; the controller
+	# returns 400 and the expression is never executed.
+	my @hostile = (
+		'0; system("rm -rf /")',
+		'`id`',
+		'eval("die")',
+		'require POSIX',
+	);
+	for my $h (@hostile) {
+		$t->get_ok('/pivot?l=table:sales&rows=product&m=amount:sum:total'
+		    . '&c=evil:' . Mojo::Util::url_escape($h))
+		  ->status_is(400, "hostile calc expr rejected: $h");
+	}
+};
+
+subtest 'Calc->new -- hostile expressions produce compile errors, not execution' => sub {
+	use_ok 'Database::BI::Calc';
+
+	my @cases = (
+		'0; system("rm -rf /")',
+		'`id`',
+		'${\ system("id")}',
+		'eval("die")',
+		'require POSIX',
+		'BEGIN { die }',
+	);
+	for my $expr (@cases) {
+		my $c = Database::BI::Calc->new(expr => $expr, columns => []);
+		ok $c->has_error, "hostile expr has error: $expr";
+		ok defined $c->error, "hostile expr error is defined: $expr";
+	}
+};
+
 done_testing();

@@ -1,17 +1,18 @@
-package oEdtk ;
+package oEdtk;
+
+use strict;
 
 BEGIN {
-		use Exporter;
-		use vars 	qw($VERSION $YEAR @ISA @EXPORT @EXPORT_OK); # %EXPORT_TAGS);
-		use strict;
+	use Exporter;
+	use vars qw($VERSION $YEAR @ISA @EXPORT @EXPORT_OK);    # %EXPORT_TAGS);
 
-		# a.ammr a.a elapsed years, mm months, r release
-		$VERSION	= 2.1109;
-		$YEAR	= '2026';
-		@ISA		= qw(Exporter);
-		@EXPORT	= qw(oEdtk_release);
+	# a.ammr a.a elapsed years, mm months, r release
+	$VERSION = '2.1120';
+	$YEAR    = '2026';
+	@ISA     = qw(Exporter);
+	@EXPORT  = qw(oEdtk_release);
 
-		print "(c) 2005-$YEAR oedtk\@free.fr - oEdtk v$VERSION\n";
+	print "(c) 2005-$YEAR oedtk\@free.fr - oEdtk v$VERSION\n";
 }
 
 #
@@ -19,10 +20,10 @@ BEGIN {
 #
 
 sub oEdtk_release {
+
 	# warn "DEBUG: >$?< \nDEBUG: >$@<\n";
 	return "(c) 2005-$YEAR oedtk\@free.fr - oEdtk v$VERSION\n";
 }
-
 
 END {
 }
@@ -98,7 +99,7 @@ here.
         # (could be delayed in 'pre_process' procedure)
         oe_rec_motif("016", "A67 A20 A*");
 
-        # compuset output declaration (only if necessary)
+        # LaTeX output declaration (only if necessary)
         oe_rec_output("016", "<SK>%s<#DATE=%s><SK>%s");
         return 1;
     }
@@ -146,7 +147,7 @@ here.
         # (only if necessary)
         oe_rec_process("016", \&format_date);
 
-        # compuset output declaration (only if necessary)
+        # LaTeX output declaration (only if necessary)
         oe_rec_output("016", "<SK>%s<#DATE=%s><SK>%s");
 
         # process after building the output
@@ -277,7 +278,7 @@ look if there is a record key corresponding
 
 =item 2.
 
-run the pre-process function if defined (see L</oe_rec_pre_process>)
+run the pre-process function if defined (see C<oe_rec_pre_process>)
 
 =item 3.
 

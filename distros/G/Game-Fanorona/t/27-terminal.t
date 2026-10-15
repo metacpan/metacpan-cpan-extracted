@@ -214,7 +214,7 @@ subtest 'the commands' => sub {
 
     ($said, $t) = sitting(['help']);
     like($said, qr/^  $_\b/m, "help lists $_") for qw(moves hint board level side new save load draw resign rules quit backspace escape);
-    unlike($said, qr/\bundo\b/, 'and offers no way to take a move back');
+    like($said, qr/^  undo\b/m, 'and offers undo to take a move back');
 
     ($said, $t) = sitting(['rules']);
     like($said, qr/TAKING BY APPROACH/, 'rules: approach');

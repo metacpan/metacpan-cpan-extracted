@@ -1,6 +1,6 @@
 use v5.40;
 
-package Alien::Xrepo::MB v1.0.4 {
+package Alien::Xrepo::MB v1.0.6 {
     use Alien::Xrepo::Build;
     use Alien::Xrepo::Build::Dist;
     use Path::Tiny;
@@ -17,13 +17,15 @@ package Alien::Xrepo::MB v1.0.4 {
             my $share = defined $self->xrepo_share_dir ? path( $self->xrepo_share_dir ) : $snapshot->parent;
             $share->mkpath;
             say '=> xrepo: writing ' . $snapshot;
-            Alien::Xrepo::Build->new(
+            my $build = Alien::Xrepo::Build->new(
                 recipe      => $dist->recipe,
                 snapshot    => $snapshot,
                 share_dir   => $share->stringify,
                 cache       => $self->xrepo_cache,
                 update_repo => $self->xrepo_update_repo
-            )->run;
+            );
+            $build->run;
+            $build->assert_installed;
         }
         else {
             $self->log_verbose("=> xrepo: $snapshot is up to date\n");

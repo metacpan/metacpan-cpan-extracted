@@ -32,9 +32,11 @@ t/19-bot-terminates.t
 t/20-terminal.t
 t/21-no-io.t
 t/22-pick.t
+t/23-options.t
+t/24-round-trip.t
+t/25-history.t
 t/manifest.t
 t/pod-coverage.t
-t/lib/Game/Oware/Test/Handle.pm
 t/lib/Game/Oware/Test/Play.pm
 t/pod.t
 xt/boilerplate.t

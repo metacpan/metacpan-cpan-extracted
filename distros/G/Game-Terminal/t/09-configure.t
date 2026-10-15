@@ -9,6 +9,24 @@ use Game::Terminal::Menu;
 
 my @ALL = Game::Terminal::games();
 
+my %FIELDS = (
+	checkers => [
+		{ name => 'level', type => 'int', min => 1, max => 5, help => 'the strength of the bot' },
+		{ name => 'side', type => 'enum', choices => [qw(black white random)], help => 'your side; black moves first' },
+		{ name => 'hotseat', type => 'flag', help => 'two people at one keyboard, no bot' },
+		{ name => 'bot-vs-bot', type => 'flag', help => 'watch two bots play' },
+		{ name => 'seed', type => 'str', help => 'the bot varies its easy levels with it' },
+	],
+	merrills => [
+		{ name => 'level', type => 'int', min => 1, max => 5, help => "the bot's strength" },
+		{ name => 'side', type => 'enum', choices => [qw(white black random)], help => 'your side' },
+		{ name => 'hotseat', type => 'flag', help => 'two people at one keyboard, no bot' },
+		{ name => 'bot-vs-bot', type => 'flag', help => 'watch two bots' },
+		{ name => 'flying', type => 'bool', help => 'a side down to three men may fly' },
+		{ name => 'seed', type => 'str', help => 'the same seed, the same game' },
+	],
+);
+
 sub menu {
 	my ($keys, %option) = @_;
 	my @chars = split //, defined $keys ? $keys : '';
@@ -21,7 +39,7 @@ sub menu {
 		colour => 0,
 		keysource => sub { shift @chars },
 		picking => 1,
-		games => [ map { { %{$_}, installed => 1 } } @ALL ],
+		games => [ map { { %{$_}, installed => 1, options => $FIELDS{ $_->{key} } || [] } } @ALL ],
 		runner => sub { my ($row, $argv, %seam) = @_; push @ran, [ $row->{key}, @{$argv} ]; return (0, undef) },
 		%option
 	);

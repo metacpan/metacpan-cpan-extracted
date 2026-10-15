@@ -1,6 +1,6 @@
 use v5.40;
 
-package Alien::Xrepo::MM v1.0.4 {
+package Alien::Xrepo::MM v1.0.6 {
     use Cwd      qw[getcwd];
     use JSON::PP qw[decode_json encode_json];
     use Path::Tiny;
@@ -125,13 +125,16 @@ package Alien::Xrepo::MM v1.0.4 {
         my $share = ( defined $data->{share_dir} && $data->{share_dir} ne '' ) ? path( $data->{share_dir} ) : $snapshot->parent;
         $share->mkpath;
         print "=> xrepo: writing $snapshot\n";
-        Alien::Xrepo::Build->new(
+        my $build = Alien::Xrepo::Build->new(
             recipe      => $dist->recipe,
             snapshot    => $snapshot,
             share_dir   => $share->stringify,
             cache       => ( $data->{cache}       // 0 ),
             update_repo => ( $data->{update_repo} // 0 )
-        )->run;
+        );
+        $build->run;
+        $build->assert_installed;
+        return;
     }
 };
 #

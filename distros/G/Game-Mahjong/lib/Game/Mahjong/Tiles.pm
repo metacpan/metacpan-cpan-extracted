@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use constant KINDS    => 34;
 use constant BONUS    => 8;
@@ -68,7 +68,7 @@ Game::Mahjong::Tiles - the forty-two kinds, and the set of 144
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 

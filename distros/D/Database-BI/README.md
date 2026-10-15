@@ -1,21 +1,22 @@
 ## Name
 
-Database::BI - Web-based Business Intelligence viewer for flat data files
+Database::BI - Web-based Business Intelligence viewer for data files
 
 ## Version
 
-0.011.0
+0.012.0
 
 ## Description
 
 `Database::BI` is a self-contained [Mojolicious](https://metacpan.org/pod/Mojolicious) web application that reads
-arbitrary flat data files (CSV, PSV, TSV, SQLite, XML, XLSX, etc.) via
-[Database::Abstraction](https://metacpan.org/pod/Database%3A%3AAbstraction) and presents them as styled, sortable, reorderable
-HTML tables.  It has no persistent database of its own -- it reads your files
-on every request.
+and views arbitrary flat data (CSV, PSV, TSV, SQLite, XML, XLSX, etc.)
+and presents them as styled, sortable, reorderable
+HTML tables.
+It has no persistent database of its own,
+it reads your files on every request.
 
 Users navigate to pick a file, open the filesystem browser to navigate anywhere
-on disk, drag-and-drop files to upload, join multiple tables in memory, apply
+on disc, drag-and-drop files to upload, join multiple tables in memory, apply
 server-side filters, and export results as CSV, SQLite, or JSON.  D3.js
 visualisations (line chart, pie chart) are available from the toolbar.
 
@@ -55,7 +56,14 @@ data" panel is open the dropped file populates the right-table path field.
 (after joins, filters, and dedup) to a chosen filesystem path as CSV
 (`.csv`), SQLite (`.sql`), or JSON (`.json`).
 - **URL import** -- `/import` fetches an HTML table from any public URL and
-renders it in the browser without saving to disk.
+renders it in the browser without saving to disc.
+- **Redis data source** (optional) -- when the `Redis` or `Redis::Fast` module
+is installed, any Redis hash store can be opened as a read-only data table by
+entering a `redis:tablename|redis://host:port` spec in the path field or in a
+join/combine panel.  Redis keys must follow the `tablename:entry` convention
+used by [Database::Abstraction](https://metacpan.org/pod/Database%3A%3AAbstraction).  Because `Redis` is an optional dependency,
+the application works fully without it; Redis support activates automatically
+when the module is available.
 
 ### UTF-8 and Encoding
 
@@ -145,9 +153,18 @@ perl Makefile.PL
     Performs one or more left joins and renders the merged table.  Parameters:
 
     ```
-    l=<spec>               left table: "table:name" or "path:/abs/path"
+    l=<spec>               left table spec (see below)
     j=<spec>|<lk>|<rk>    join step (repeatable): right-spec, left key, right key
     f=<col>:<op>:<val>     result filter (repeatable)
+    ```
+
+    Spec formats:
+
+    ```
+    table:name                         named table from data_dir
+    path:/abs/path/to/file.csv         absolute local path
+    /../hostname/dir/file.csv          remote file via SFTP
+    redis:tablename|redis://host:port  Redis hash store (requires Redis module)
     ```
 
 - `GET /api/columns`
@@ -395,8 +412,31 @@ defaults:
 
     When the router matches `GET /view/Sales` or `GET /view/SALES`, the table
     name is lowercased to `sales` before being passed to the helper.  The data
-    file on disk must therefore also be lowercase (`sales.csv`, not
+    file on disc must therefore also be lowercase (`sales.csv`, not
     `Sales.csv`).
+
+- **Redis support requires the Redis or Redis::Fast module**
+
+    Redis data source access is an optional feature.  If neither `Redis` nor
+    `Redis::Fast` is installed, entering a `redis:...` spec returns a 404.
+    To enable Redis support, install either module:
+
+    ```
+    cpanm Redis::Fast   # recommended -- C bindings, faster
+    cpanm Redis         # pure-Perl fallback
+    ```
+
+    Redis keys must follow the `tablename:entry` convention: each key is the
+    table name, a colon, and an entry identifier; the value is a Redis hash
+    whose fields become the row columns.  For example:
+
+    ```
+    HSET players:row1 name Alice score 10
+    HSET players:row2 name Bob   score 20
+    ```
+
+    Opening `redis:players|redis://localhost:6379` then displays a two-row table
+    with columns `entry`, `name`, and `score`.
 
 ## Limitations
 
@@ -422,13 +462,9 @@ works correctly in production without any special workarounds.
 
 ## Roadmap
 
-Features planned for future releases (post-0.010.0).  Items are ordered by
+Features planned for future releases (post-0.012.0).  Items are ordered by
 priority.
 
-- **Pagination / virtual scrolling** (High) -- Tables are rendered as a
-single HTML blob.  Files with 100 k+ rows will time out or exhaust memory.
-Add a `?page=N&limit=M` server-side slice or a JS `IntersectionObserver`
-infinite-scroll to cap peak HTML size.
 - **XLSX export** (High) -- `/export` supports CSV, SQLite, and JSON
 but not XLSX output.  `Excel::Writer::XLSX` would close the round-trip for
 users whose source data is XLSX.

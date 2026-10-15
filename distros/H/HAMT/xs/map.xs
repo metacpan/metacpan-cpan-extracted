@@ -153,6 +153,7 @@ keys(self)
         hamt_map *m;
         hamt_iter it;
         hamt_entry *e;
+        SSize_t n;
         static const char *const name[3] = {
             "HAMT::Map::keys", "HAMT::Map::values", "HAMT::Map::pairs"
         };
@@ -168,7 +169,11 @@ keys(self)
          * it on every platform. */
         if (m->count > ((size_t)-1 >> 2))
             croak("%s: too many entries for one list", name[ix]);
-        EXTEND(SP, (SSize_t)(ix == 2 ? m->count * 2 : m->count));
+        /* Counted outside EXTEND: on a DEBUGGING perl from 5.28 to 5.36 the
+         * macro declares a local named ix, which hides the alias's ix in
+         * its argument and extended by the count alone for pairs. */
+        n = (SSize_t)(ix == 2 ? m->count * 2 : m->count);
+        EXTEND(SP, n);
         hamt_iter_init(&it, m->root);
         while ((e = hamt_iter_next(&it))) {
             if (ix != 1) PUSHs(sv_2mortal(hamt_key_to_sv(aTHX_ e)));

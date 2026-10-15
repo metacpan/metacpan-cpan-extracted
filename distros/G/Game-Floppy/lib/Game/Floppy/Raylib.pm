@@ -13,9 +13,9 @@ use Object::Proto::Sugar -types;
 
 use Game::Floppy;
 use Game::Floppy::Bot;
-use Game::Floppy::Ticker;
+use Game::Terminal::Kit::Ticker;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 my $WHY;
 
@@ -179,7 +179,7 @@ sub BUILD {
 		$self->game(Game::Floppy->new(seed => $seed));
 	}
 
-	$self->ticker(Game::Floppy::Ticker->new(clock => $self->clock)) unless $self->ticker;
+	$self->ticker(Game::Terminal::Kit::Ticker->new(clock => $self->clock)) unless $self->ticker;
 
 	return;
 }
@@ -311,7 +311,7 @@ Game::Floppy::Raylib - Floppy in a window, when raylib is there
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =head1 SYNOPSIS
 

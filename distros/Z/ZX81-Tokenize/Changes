@@ -1,0 +1,9 @@
+0.001 2026-10-14
+    - First version
+
+0.002 2026-10-14
+    - Added encoding of '#' as the pound character
+
+0.003 2026-10-14
+    - Fix: '#' comments only recognized at the start of a line, so that '#'
+      can also be the pound character

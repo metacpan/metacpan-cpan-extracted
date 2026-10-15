@@ -28,6 +28,9 @@ t/08-bot.t
 t/09-no-io.t
 t/10-terminal.t
 t/11-pick.t
+t/12-options.t
+t/13-round-trip.t
+t/14-history.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

@@ -41,6 +41,7 @@ t/15-cribbage-coverage.t
 t/16-fixes-0.15.t
 t/17-picker.t
 t/18-bin.t
+t/19-options.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

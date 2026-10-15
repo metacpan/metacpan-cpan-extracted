@@ -1,0 +1,43 @@
+---
+abstract: 'Small everyday helpers: directory listing, shell commands, JSON files, number formatting, and data-structure shapes'
+author:
+  - 'David E. Condon <dec986@gmail.com>'
+build_requires:
+  File::Spec: '0'
+  File::Temp: '0'
+  Test::Exception: '0'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '6.58'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Util-Con
+provides:
+  Util::Con:
+    file: lib/Util/Con.pm
+    version: '0.01'
+requires:
+  Capture::Tiny: '0'
+  Data::Printer: '1.000'
+  Devel::Confess: '0'
+  Exporter: '0'
+  File::Find: '0'
+  File::Spec: '0'
+  JSON::MaybeXS: '0'
+  Parallel::ForkManager: '1.12'
+  Scalar::Util: '0'
+  Term::ANSIColor: '3.00'
+  autodie: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/hhg7/util/issues
+  homepage: https://metacpan.org/dist/Util-Con
+  repository: git://github.com/hhg7/util
+version: '0.01'
+x_generated_by_perl: v5.44.0
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

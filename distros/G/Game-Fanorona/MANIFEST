@@ -53,6 +53,9 @@ t/28-pick.t
 t/29-bin.t
 t/30-synopsis.t
 t/31-exceptions.t
+t/32-options.t
+t/33-round-trip.t
+t/34-history.t
 t/games.txt
 t/lib/FnCapture.pm
 t/lib/FnSolve.pm

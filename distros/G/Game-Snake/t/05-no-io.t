@@ -27,18 +27,18 @@ subtest 'the engine does not pull a front end in with it' => sub {
 	ok($INC{'Game/Snake/Error.pm'}, 'and the error');
 	ok($INC{'Game/Snake/Result.pm'}, 'and the result');
 	ok(!$INC{'Game/Snake/Terminal.pm'}, 'not the terminal');
-	ok(!$INC{'Game/Snake/Ticker.pm'}, 'not the ticker');
+	ok(!$INC{'Game/Terminal/Kit/Ticker.pm'}, 'not the ticker');
 	ok(!$INC{'Game/Snake/Raylib.pm'}, 'not the window');
 	ok(!$INC{'Raylib/FFI.pm'}, 'and not raylib');
 };
 
 subtest 'a whole game runs with both handles rigged to die' => sub {
-	require Game::Snake::Test::Handle;
+	require Game::Terminal::Kit::Test::Handle;
 
 	my ($error, $cause, $ticks);
 
-	tie *STDOUT, 'Game::Snake::Test::Handle';
-	tie *STDIN,  'Game::Snake::Test::Handle';
+	tie *STDOUT, 'Game::Terminal::Kit::Test::Handle';
+	tie *STDIN,  'Game::Terminal::Kit::Test::Handle';
 
 	eval {
 		my $game = Game::Snake->new(cols => 10, rows => 8, seed => 'no-io');

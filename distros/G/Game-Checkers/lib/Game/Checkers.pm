@@ -3,7 +3,7 @@ package Game::Checkers;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Carp ();
 use Object::Proto::Sugar -types;
@@ -21,6 +21,8 @@ use constant NO_PROGRESS_PLIES => 80;
 my $STEP = \@Game::Checkers::Squares::STEP;
 my $JUMP_OVER = \@Game::Checkers::Squares::JUMP_OVER;
 my $JUMP_TO = \@Game::Checkers::Squares::JUMP_TO;
+
+my %DECLARED = map { $_ => 1 } qw/resign agreement timeout/;
 
 my %FORWARD = (
 	black => {
@@ -211,6 +213,9 @@ sub to_pdn {
 		$tags{FEN} = $self->fen;
 		$tags{SetUp} = '1';
 	}
+	my $result = $self->result;
+	$tags{Ending} = $result->reason if $result && $DECLARED{$result->reason};
+	$tags{DrawOffer} = $self->draw_offered_by if defined $self->draw_offered_by;
 	return Game::Checkers::Notation::format_pdn({
 		tags => \%tags,
 		moves => [map { $_->notation } @{$self->history}],
@@ -230,6 +235,24 @@ sub from_pdn {
 		my $move = $self->move($notation);
 		next unless ref $move eq 'Game::Checkers::Error';
 		die "illegal PDN: move $number, '$notation': " . $move->message . "\n";
+	}
+	if (defined(my $offer = $parsed->{tags}{DrawOffer})) {
+		die "illegal PDN: the DrawOffer tag must be black or white, got '$offer'\n"
+			unless $FORWARD{$offer};
+		$self->draw_offered_by($offer);
+	}
+	if (defined(my $reason = $parsed->{tags}{Ending})) {
+		die "illegal PDN: the Ending tag must be one of "
+			. join(', ', sort keys %DECLARED) . ", got '$reason'\n"
+			unless $DECLARED{$reason};
+		die "illegal PDN: the Ending tag says '$reason', but the moves already end the game\n"
+			if $self->result;
+		my %winner = ('1-0' => 'white', '0-1' => 'black', '1/2-1/2' => undef);
+		my $result = $parsed->{result};
+		die "illegal PDN: the Ending tag says '$reason', but the result is '$result'\n"
+			unless exists $winner{$result}
+				&& ($reason eq 'agreement' ? !defined $winner{$result} : defined $winner{$result});
+		$self->_finish($winner{$result}, $reason);
 	}
 	return $self;
 }
@@ -388,7 +411,7 @@ Game::Checkers - English draughts as an engine, with a terminal game on top
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
@@ -648,15 +671,21 @@ Clears an offer made by the other side.
 =head2 to_pdn
 
 The game as PDN. Any arguments are tags, and a game that did not start from the
-opening position carries its C<FEN> and C<SetUp> tags automatically.
+opening position carries its C<FEN> and C<SetUp> tags automatically. A game
+ended by resignation, agreement or timeout carries an C<Ending> tag naming the
+reason, and a draw offer still standing carries a C<DrawOffer> tag naming the
+side that made it, so L</from_pdn> builds the same game back, the same text
+included.
 
 	print $game->to_pdn(Event => 'Kitchen table', Black => 'Me');
 
 =head2 from_pdn
 
-Class method replaying a PDN game and returning it. Dies naming the move number
-when one of them is illegal, because a game record that does not replay is not a
-game record.
+Class method replaying a PDN game and returning it, with its repetition and
+no-progress counts rebuilt by the replay, and its C<Ending> and C<DrawOffer>
+tags applied after the last move. Dies naming the move number when one of them
+is illegal, because a game record that does not replay is not a game record, and
+dies saying why when an C<Ending> or C<DrawOffer> tag does not fit the game.
 
 	my $game = Game::Checkers->from_pdn($text);
 

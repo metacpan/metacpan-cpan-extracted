@@ -16,6 +16,7 @@ t/06-keys.t
 t/07-menu.t
 t/08-bin-game.t
 t/09-configure.t
+t/10-options.t
 t/lib/Game/Checkers/Terminal.pm
 t/lib/Game/Fake/Terminal.pm
 t/lib/Game/Terminal/Test/Handle.pm

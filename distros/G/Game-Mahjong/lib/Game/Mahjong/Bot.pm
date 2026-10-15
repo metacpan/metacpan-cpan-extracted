@@ -9,7 +9,7 @@ use Object::Proto::Sugar -types;
 use Digest::SHA ();
 use Game::Mahjong::Search;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 our @LADDER = (1, 2, 3, 3);
 
@@ -53,7 +53,7 @@ Game::Mahjong::Bot - a seat played by the machine, at a level
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 

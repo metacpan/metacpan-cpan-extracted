@@ -6,7 +6,7 @@ package TestOEdtk;
 use strict;
 use warnings;
 
-use Exporter        qw(import);
+use Exporter qw(import);
 our @EXPORT_OK = qw(quiet_require memory_dbh reset_sig_handlers mute);
 
 use File::Spec;
@@ -20,12 +20,12 @@ use DBI;
 sub quiet_require {
 	my ($module) = @_;
 	die "quiet_require: missing module name\n" unless defined $module && $module ne '';
-	my $file = $module =~ /\.pm$/ ? $module : do { (my $p = $module) =~ s{::}{/}g; "$p.pm" };
+	my $file = $module =~ /\.pm$/ ? $module : do { ( my $p = $module ) =~ s{::}{/}g; "$p.pm" };
 	my $ok;
 	{
 		local *STDOUT;
 		open STDOUT, '>', File::Spec->devnull
-		    or die "quiet_require: cannot open devnull: $!\n";
+			or die "quiet_require: cannot open devnull: $!\n";
 		$ok = eval { require $file; 1 };
 	}
 	die "require $module failed: $@" unless $ok;
@@ -35,10 +35,17 @@ sub quiet_require {
 # In-memory SQLite handle, or undef when DBD::SQLite is not installed.
 # FetchHashKeyName mirrors db_connect() so fetchrow_hashref returns upper-case keys.
 sub memory_dbh {
-	return undef unless eval { require DBD::SQLite; 1 };
-	return DBI->connect('dbi:SQLite:dbname=:memory:', '', '',
-		{ RaiseError => 1, AutoCommit => 1, PrintError => 0,
-		  FetchHashKeyName => 'NAME_uc' });
+	return unless eval { require DBD::SQLite; 1 };
+	return DBI->connect(
+		'dbi:SQLite:dbname=:memory:',
+		'', '',
+		{
+			RaiseError       => 1,
+			AutoCommit       => 1,
+			PrintError       => 0,
+			FetchHashKeyName => 'NAME_uc'
+		}
+	);
 }
 
 # oEdtk::Tracking installs global $SIG{__WARN__}/$SIG{__DIE__} at BEGIN.
@@ -59,7 +66,7 @@ sub mute {
 	{
 		local *STDERR;
 		open STDERR, '>', File::Spec->devnull
-		    or die "mute: cannot open devnull: $!\n";
+			or die "mute: cannot open devnull: $!\n";
 		local $SIG{__WARN__} = sub { };
 		@ret = $code->();
 	}

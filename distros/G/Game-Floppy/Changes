@@ -1,5 +1,9 @@
 Revision history for Game-Floppy
 
+0.10    2026-10-13
+        - Add options, the fields a launcher offers before a game
+        - The keys, the screen and the ticker are Game::Terminal::Kit's; Game::Floppy::Ticker is gone
+
 0.09    2026-10-11
         - Rewritten as an engine: Game::Floppy plays the game and draws nothing.
         - Game::Floppy::Terminal and bin/floppy: the game in a terminal.

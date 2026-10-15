@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use constant {
 	EMPTY  => 0,
@@ -131,7 +131,7 @@ Game::Go::Rules - the constants, the codes and the pinned values
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 

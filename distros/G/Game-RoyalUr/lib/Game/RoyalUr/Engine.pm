@@ -11,7 +11,7 @@ use Scalar::Util ();
 
 use Game::RoyalUr::Move;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 require XSLoader;
 XSLoader::load('Game::RoyalUr', $VERSION);
@@ -275,7 +275,7 @@ Game::RoyalUr::Engine - the board of the Royal Game of Ur: cells, pieces, hands,
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

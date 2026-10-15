@@ -76,3 +76,5 @@ CLAUDE.md
 \.circleci
 \.uploads
 TODO.md
+^BI-
+^\.bi/

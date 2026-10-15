@@ -3,6 +3,7 @@ package OSLV::Monitor;
 use 5.006;
 use strict;
 use warnings;
+use Fcntl        qw(:flock);
 use Scalar::Util qw(looks_like_number);
 use Time::HiRes  qw(gettimeofday);
 
@@ -12,11 +13,11 @@ OSLV::Monitor - OS level virtualization monitoring extend for LibreNMS.
 
 =head1 VERSION
 
-Version 1.0.6
+Version 1.0.7
 
 =cut
 
-our $VERSION = '1.0.6';
+our $VERSION = '1.0.7';
 
 =head1 SYNOPSIS
 
@@ -39,7 +40,9 @@ Perhaps a little code snippet.
     print $data."\n";
 
 
-=head2 METHODS
+=head1 METHODS
+
+=head2 new
 
 Inits the object.
 
@@ -59,7 +62,7 @@ The keys are list as below.
 
     - include :: An array of regexps to match names against for seeing if they should
             be included or not. By default everything is return.
-        - Default :: ['^.*$']
+        - Default :: ['^.+$']
 
     - exclude :: An array of regexps to exclude. By default this array is empty. It is
             processed after the include array.
@@ -67,6 +70,11 @@ The keys are list as below.
 
     - time_divider :: What to pass to the backend for the time_divider for that if needed.
         Default :: 1000000
+
+    - lock :: If true, run takes a exclusive lock on $base_dir/lock so that
+            overlapping runs do not clobber each other's cache. If another run
+            holds it, run returns a error right away. See lock_failed.
+        Default :: 0
 
 =cut
 
@@ -135,6 +143,8 @@ sub new {
 		base_dir     => $opts{base_dir},
 		include      => $opts{include},
 		exclude      => $opts{exclude},
+		lock         => $opts{lock} ? 1 : 0,
+		lock_failed  => 0,
 	};
 	bless $self;
 
@@ -202,6 +212,33 @@ sub run {
 		};
 	}
 
+	# held until $lock_fh goes out of scope when this returns... the lock is on a
+	# dedicated file as the caches are replaced by atomic writes, which would
+	# leave a lock on the cache itself on the old, replaced file
+	$self->{lock_failed} = 0;
+	my $lock_fh;
+	if ( $self->{lock} ) {
+		my $lock_file = $self->{base_dir} . '/lock';
+		if ( $ENV{'OSLV_MONITOR_DEBUG'} ) {
+			warn( 'DEBUG, ' . join( '.', gettimeofday ) . ': locking "' . $lock_file . '"' );
+		}
+		my $lock_error;
+		if ( !open( $lock_fh, '>>', $lock_file ) ) {
+			$lock_error = 'Failed to open lock file "' . $lock_file . '"... ' . $!;
+		} elsif ( !flock( $lock_fh, LOCK_EX | LOCK_NB ) ) {
+			$lock_error = 'Another run holds the lock on "' . $lock_file . '"';
+		}
+		if ( defined($lock_error) ) {
+			$self->{lock_failed} = 1;
+			return {
+				version     => $self->{version},
+				data        => {},
+				error       => 1,
+				errorString => $lock_error,
+			};
+		}
+	} ## end if ( $self->{lock} )
+
 	if ( $ENV{'OSLV_MONITOR_DEBUG'} ) {
 		warn( 'DEBUG, ' . join( '.', gettimeofday ) . ': calling backend run' );
 	}
@@ -226,6 +263,84 @@ sub run {
 		errorString => ''
 	};
 } ## end sub run
+
+=head2 lock_failed
+
+Returns 1 if the last call to run returned early because the lock could not be
+taken, either due to another run holding it or the lock file not being
+openable, otherwise 0. Always 0 if lock was not enabled.
+
+This lets a caller tell a skipped run apart from a failed one, such as to keep
+the output of the previous run instead of replacing it with the error.
+
+    my $status = $monitor->run;
+    if ( $monitor->lock_failed ) {
+        exit 1;
+    }
+
+=cut
+
+sub lock_failed {
+	my $self = $_[0];
+
+	return $self->{lock_failed};
+}
+
+=head2 interval_since
+
+Returns the number of seconds between the run that saved a backend's cache and
+the current run, for turning counter deltas into per second rates.
+
+Two args are taken. The first is the decoded cache hash ref, which holds the time
+of the run that saved it as C<< {__oslv_monitor__}{time} >>. The second is the
+time of the current run, as returned by L<Time::HiRes/time>.
+
+300, the expected cron interval, is returned if the cache is undef, lacks a
+time, as one written by a older version would, or if the time is not before the
+current one, as happens if the clock was set backwards.
+
+    my $run_time = Time::HiRes::time;
+    my $interval = $monitor->interval_since( $cache, $run_time );
+
+    # 1000 / 300 for a run 5 minutes after the previous
+    my $rate = $counter_delta / $interval;
+
+=cut
+
+sub interval_since {
+	my $self     = $_[0];
+	my $cache    = $_[1];
+	my $run_time = $_[2];
+
+	my $interval = 300;
+	if (   ref($cache) eq 'HASH'
+		&& ref( $cache->{__oslv_monitor__} ) eq 'HASH'
+		&& looks_like_number( $cache->{__oslv_monitor__}{time} )
+		&& looks_like_number($run_time)
+		&& $run_time > $cache->{__oslv_monitor__}{time} )
+	{
+		$interval = $run_time - $cache->{__oslv_monitor__}{time};
+	}
+
+	return $interval;
+} ## end sub interval_since
+
+=head2 include
+
+Checks if a name should be included, as decided by the include and exclude
+regexps passed to L</new>. The backends call this for each name found.
+
+One arg is taken, the name to check.
+
+Returns 1 if the name matches a include and no excludes, otherwise 0. 0 is also
+returned if the name is undef, a ref, or "".
+
+    # with include => ['^s_'] and exclude => ['^s_cron$']
+    $monitor->include('s_ssh');     # 1
+    $monitor->include('s_cron');    # 0
+    $monitor->include('u_1000');    # 0
+
+=cut
 
 sub include {
 	my $self = $_[0];

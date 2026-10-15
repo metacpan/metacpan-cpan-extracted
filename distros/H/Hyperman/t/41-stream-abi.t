@@ -99,6 +99,30 @@ if ($pid == 0) {
                 };
             }
 
+            # A handler that produces and then WAITS, inside the request,
+            # for the body to finish: a timer future's ->get pumps the
+            # worker's loop, which is how an application waits for a drain.
+            # Whether it finished while the handler was still waiting is
+            # recorded for /sync-result.
+            if ($p eq '/c-sync-wait') {
+                return sub {
+                    Hyperman::_abi_stream_open($env, 200,
+                        [ 'Content-Type' => 'text/plain' ]) or return;
+                    Hyperman::_abi_stream_produce(512);
+                    my $loop = Hyperman->loop;
+                    for (1 .. 150) {
+                        last unless (Hyperman::_abi_stream_state())[0];
+                        $loop->timer_f(0.02)->get;
+                    }
+                    $main::SYNC = (Hyperman::_abi_stream_state())[0]
+                                ? 'stuck' : 'done';
+                };
+            }
+            if ($p eq '/sync-result') {
+                return [ 200, [ 'Content-Type' => 'text/plain' ],
+                         [ $main::SYNC // 'none' ] ];
+            }
+
             # The Perl door onto the same registry.
             if ($p eq '/perl-stream') {
                 return sub {
@@ -480,7 +504,7 @@ for my $case (['/tunnel', 'hello;', 'a synchronous handler'],
 # ---- HTTP/2: the same application code, a multiplexed transport -----------
 
 SKIP: {
-    skip 'nghttp2 support not built', 5 unless $h2;
+    skip 'nghttp2 support not built', 15 unless $h2;
 
     my $curl = `which curl 2>/dev/null`;
     chomp $curl;
@@ -630,6 +654,184 @@ SKIP: {
             or diag("no RST_STREAM; got " . length($data) . " body bytes"
                   . ($end ? " and a clean END_STREAM" : ""));
         ok(!$end, '...and never sees the END_STREAM that would call it whole');
+    }
+
+    # ---- backpressure, where the limit is the peer's window -----------------
+    #
+    # On HTTP/1.1 a slow reader shows up as unwritten bytes on the connection.
+    # On HTTP/2 it shows up as a flow-control window that has not been
+    # reopened, and what cannot be framed waits in the stream's own buffer.
+    # Counting only the connection, a write was never answered "full" here:
+    # the producer ran to the end and the whole body was held.
+    #
+    # The client below opens a stream with the default window (65,535 bytes)
+    # and grants no more. The producer owes 8 MB, so it has to be stopped by
+    # the window and nothing else, whatever this machine's socket buffers
+    # are.
+    my $s3 = connect_h1();
+    SKIP: {
+        skip 'no connection', 4 unless $s3;
+        state_now();
+        my ($fulls, $drains, $writes) = @st{qw(fulls drains writes)};
+
+        syswrite $s3, "PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n";
+        syswrite $s3, $frame->(0x4, 0, 0, '');
+        my $hb = $lit->(':method', 'GET') . $lit->(':scheme', 'http')
+               . $lit->(':path', '/c-stream-big')
+               . $lit->(':authority', "127.0.0.1:$port");
+        syswrite $s3, $frame->(0x1, 0x5, 1, $hb);
+
+        for (1 .. 250) {
+            state_now();
+            last if $st{fulls} > $fulls;
+            Time::HiRes::sleep(0.02);
+        }
+        cmp_ok($st{fulls}, '>', $fulls,
+               'HTTP/2: a producer facing a closed window is told to stop');
+        Time::HiRes::sleep(0.1);
+        state_now();
+        my $made = ($st{writes} - $writes) * 4096;
+        cmp_ok($made, '<', 1024 * 1024,
+               "...having produced $made bytes of 8388608, not all of them");
+
+        # now let it go: a window on the connection and on the stream
+        my $open = pack('N', 0x7fffffff - 65535);
+        syswrite $s3, $frame->(0x8, 0, 0, $open) . $frame->(0x8, 0, 1, $open);
+
+        my ($got, $end) = (0, 0);
+        my $ok = eval {
+            local $SIG{ALRM} = sub { die "timeout\n" };
+            alarm 30;
+            while (1) {
+                my ($type, $flags, $sid, $pay) = $read_frame->($s3);
+                last unless defined $type;
+                if ($type == 0x4 && !($flags & 0x1)) {
+                    syswrite $s3, $frame->(0x4, 0x1, 0, '');
+                }
+                if ($type == 0x0 && $sid == 1) {
+                    $got += length $pay;
+                    if ($flags & 0x1) { $end = 1; last }
+                }
+            }
+            alarm 0;
+            1;
+        };
+        alarm 0;
+        close $s3;
+        is($got, 2048 * 4096,
+           '...and resumes when the window opens, to the last byte')
+            or diag($ok ? ($end ? 'ended early' : 'no END_STREAM')
+                        : "raw h2 client: $@");
+        state_now();
+        cmp_ok($st{drains}, '>', $drains,
+               '...restarted by stream_on_drain, more than once if need be');
+    }
+
+    # ---- a handler that waits for its own body --------------------------------
+    #
+    # The application used to be called from inside nghttp2's receive call,
+    # where the session may not send and the connection is not read. A handler
+    # that wrote and then waited was waiting on output that could not leave:
+    # it sat out its whole wait, and the body went only after it gave up.
+    my $s4 = connect_h1();
+    SKIP: {
+        skip 'no connection', 3 unless $s4;
+        # The window is granted the way a real client grants it: only as
+        # the data arrives, a frame's worth at a time. So the server has to
+        # READ this connection while the handler is waiting, or it never
+        # learns it may send more.
+        syswrite $s4, "PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n";
+        syswrite $s4, $frame->(0x4, 0, 0, '');
+        my $hb = $lit->(':method', 'GET') . $lit->(':scheme', 'http')
+               . $lit->(':path', '/c-sync-wait')
+               . $lit->(':authority', "127.0.0.1:$port");
+        syswrite $s4, $frame->(0x1, 0x5, 1, $hb);
+
+        my ($got, $end) = (0, 0);
+        my $t0 = Time::HiRes::time();
+        eval {
+            local $SIG{ALRM} = sub { die "timeout\n" };
+            alarm 30;
+            while (1) {
+                my ($type, $flags, $sid, $pay) = $read_frame->($s4);
+                last unless defined $type;
+                if ($type == 0x4 && !($flags & 0x1)) {
+                    syswrite $s4, $frame->(0x4, 0x1, 0, '');
+                }
+                if ($type == 0x0 && $sid == 1) {
+                    $got += length $pay;
+                    if ($flags & 0x1) { $end = 1; last }
+                    my $inc = pack('N', length $pay);
+                    syswrite $s4, $frame->(0x8, 0, 0, $inc)
+                                . $frame->(0x8, 0, 1, $inc) if length $pay;
+                }
+            }
+            alarm 0;
+            1;
+        };
+        alarm 0;
+        my $took = Time::HiRes::time() - $t0;
+        close $s4;
+        is($got, 512 * 4096, 'HTTP/2: a handler that waits still sends its body');
+        my $r = '';
+        for (1 .. 100) {
+            $r = body_h1('/sync-result') || '';
+            last if $r eq 'done' || $r eq 'stuck';
+            Time::HiRes::sleep(0.05);
+        }
+        is($r, 'done',
+           '...and the body finished WHILE it waited, not after it gave up');
+        cmp_ok($took, '<', 2.5,
+               sprintf('...in %.2fs, not the three seconds of a wait nothing '
+                     . 'could end', $took));
+    }
+
+    # ---- the stream is reset while its handler waits ---------------------------
+    # Reading the connection under a waiting handler means the peer can end
+    # the stream from there: the handler returns to a stream that is gone,
+    # and has to find that out rather than answer it.
+    my $s5 = connect_h1();
+    SKIP: {
+        skip 'no connection', 3 unless $s5;
+        state_now();
+        my $aborts = $st{aborts};
+        syswrite $s5, "PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n";
+        syswrite $s5, $frame->(0x4, 0, 0, '');
+        my $hb = $lit->(':method', 'GET') . $lit->(':scheme', 'http')
+               . $lit->(':path', '/c-sync-wait')
+               . $lit->(':authority', "127.0.0.1:$port");
+        syswrite $s5, $frame->(0x1, 0x5, 1, $hb);
+        eval {      # the first DATA: the handler is producing, and now waits
+            local $SIG{ALRM} = sub { die "timeout\n" };
+            alarm 10;
+            while (1) {
+                my ($type, $flags) = $read_frame->($s5);
+                last unless defined $type;
+                syswrite $s5, $frame->(0x4, 0x1, 0, '')
+                    if $type == 0x4 && !($flags & 0x1);
+                last if $type == 0x0;
+            }
+            alarm 0;
+        };
+        alarm 0;
+        syswrite $s5, $frame->(0x3, 0, 1, pack('N', 8));   # RST_STREAM CANCEL
+        for (1 .. 150) {
+            state_now();
+            last if $st{aborts} > $aborts && !$st{open};
+            Time::HiRes::sleep(0.02);
+        }
+        is($st{aborts}, $aborts + 1,
+           'HTTP/2: a stream reset under a waiting handler is an abort');
+        close $s5;
+        my $r = '';
+        for (1 .. 150) {
+            $r = body_h1('/sync-result') || '';
+            last if $r eq 'done' || $r eq 'stuck';
+            Time::HiRes::sleep(0.05);
+        }
+        ok($r eq 'done' || $r eq 'stuck', 'the handler came back from its wait');
+        is(body_h1('/ping-after-reset'), 'ok:/ping-after-reset',
+           '...and the worker is still serving');
     }
 }
 

@@ -6,7 +6,7 @@ use warnings;
 
 use Game::Fanorona::Terminal;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 exit Game::Fanorona::Terminal->run(@ARGV);
 

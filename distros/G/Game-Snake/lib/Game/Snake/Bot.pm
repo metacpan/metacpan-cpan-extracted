@@ -7,7 +7,7 @@ use warnings;
 use Carp ();
 use Digest::SHA ();
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 our @LADDER = (1, 2);
 
@@ -189,7 +189,7 @@ Game::Snake::Bot - a snake steered once a tick, at one of three levels
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =head1 SYNOPSIS
 

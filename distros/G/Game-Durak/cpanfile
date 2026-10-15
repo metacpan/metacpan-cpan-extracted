@@ -1,4 +1,5 @@
-requires 'perl', '5.010';
+requires 'perl', '5.014';
+requires 'Game::Terminal::Kit', '0.05';
 
 # Digest::SHA is core at 5.9.3 and is all the deal needs. Phase 02 adds
 # Object::Proto::Sugar, the house object system, as the one non-core

@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 use Getopt::Long ();
-use Text::ParseWords ();
+use Game::Terminal::Kit::Options ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 our @ROSTER;
 my %BY_NAME;
@@ -249,135 +249,8 @@ BEGIN {
 		},
 	);
 
-	my %OPTIONS = (
-		backgammon => [
-			{ name => 'mode',  type => 'enum', choices => [qw(bot hotseat watch)], help => 'you against the program, two people at one keyboard, or two programs' },
-			{ name => 'level', type => 'int',  min => 1, max => 3,                   help => 'how hard the program plays' },
-			{ name => 'seat',  type => 'enum', choices => [qw(white black)],         help => 'your side' },
-		],
-		brandubh => [
-			{ name => 'side',  type => 'enum', choices => [qw(attackers defenders both none)], help => 'your side; both is hotseat, none is watching' },
-			{ name => 'level', type => 'int',  min => 1, max => 3,                            help => 'how hard the program plays' },
-			{ name => 'seed',  type => 'str',                                                 help => 'sixty-four hexadecimal characters; the same seed plays the same game' },
-		],
-		checkers => [
-			{ name => 'level',      type => 'int',  min => 1, max => 5,                   help => 'the strength of the bot' },
-			{ name => 'side',       type => 'enum', choices => [qw(black white random)],  help => 'your side; black moves first' },
-			{ name => 'hotseat',    type => 'flag',                                       help => 'two people at one keyboard, no bot' },
-			{ name => 'bot-vs-bot', type => 'flag',                                       help => 'watch two bots play' },
-			{ name => 'seed',       type => 'str',                                        help => 'the bot varies its easy levels with it' },
-		],
-		chess => [
-			{ name => 'level', type => 'int',  min => 0, max => 3,          help => 'a rung of the ladder, 0 the weakest' },
-			{ name => 'white', type => 'enum', choices => [qw(p1 p2)],      help => 'whoever is White moves first' },
-			{ name => 'seat',  type => 'enum', choices => [qw(p1 p2)],      help => 'which seat you play' },
-			{ name => 'size',  type => 'int',  min => 1, max => 3,          help => 'squares of 2, 4 or 6 columns' },
-			{ name => 'seed',  type => 'str',                               help => 'up to thirty-two bytes, for a reproducible game' },
-		],
-		dominoes => [
-			{ name => 'players',    type => 'int',  min => 2, max => 4,                          help => 'seats at the table' },
-			{ name => 'seat',       type => 'int',  min => 1, max => 4,                          help => 'which seat you take' },
-			{ name => 'level',      type => 'int',  min => 1, max => 5,                          help => 'the bots\x27 level' },
-			{ name => 'variant',    type => 'enum', choices => [qw(all_fives draw block)],       help => 'the rules' },
-			{ name => 'target',     type => 'int',  min => 50, max => 500,                       help => 'the score that wins' },
-			{ name => 'hotseat',    type => 'flag',                                              help => 'every seat is a person' },
-			{ name => 'bot-vs-bot', type => 'flag',                                              help => 'nobody is a person' },
-			{ name => 'seed',       type => 'str',                                               help => 'reproduce a game exactly' },
-		],
-		durak => [
-			{ name => 'level', type => 'int',  min => 1, max => 5,       help => 'how hard the bot plays' },
-			{ name => 'seat',  type => 'enum', choices => [qw(1 2)],     help => 'your seat; the bot takes the other' },
-			{ name => 'seed',  type => 'str',                            help => 'the deal; the same seed deals the same cards' },
-		],
-		fanorona => [
-			{ name => 'side',    type => 'enum', choices => [qw(white black both neither)], help => 'your side; White moves first' },
-			{ name => 'level',   type => 'int',  min => 1, max => 5,                         help => 'how hard the program plays' },
-			{ name => 'variant', type => 'enum', choices => [qw(sivy dimy telo)],            help => 'the board: nine by five, five by five, or three by three' },
-		],
-		floppy => [
-			{ name => 'level', type => 'int',  min => 1, max => 3,   help => 'the bot\x27s level, for watch' },
-			{ name => 'watch', type => 'flag',                       help => 'watch the bot fly' },
-			{ name => 'rows',  type => 'int',  min => 10, max => 25, help => 'the view in cells; the default fits the window' },
-			{ name => 'seed',  type => 'str',                        help => 'the same seed and the same flaps are the same game' },
-		],
-		gin => [
-			{ name => 'mode',  type => 'enum', choices => [qw(bot hotseat watch)], help => 'you against the bot, two people, or two bots' },
-			{ name => 'level', type => 'int',  min => 1, max => 2,                   help => 'the bot\x27s strength' },
-			{ name => 'seat',  type => 'enum', choices => [qw(p1 p2)],               help => 'your seat' },
-			{ name => 'seed',  type => 'str',                                        help => 'deal the same game every time' },
-		],
-		go => [
-			{ name => 'size',     type => 'enum', choices => [qw(9 13 19)],    help => 'the board' },
-			{ name => 'level',    type => 'int',  min => 1, max => 5,          help => 'how hard the program plays' },
-			{ name => 'colour',   type => 'enum', choices => [qw(black white)], help => 'your stones' },
-			{ name => 'handicap', type => 'int',  min => 2, max => 9,          help => 'stones for black; 2 to 5 on the smaller boards' },
-			{ name => 'komi',     type => 'str',                               help => 'a multiple of 0.5; 6.5 by default' },
-			{ name => 'seed',     type => 'str',                               help => 'the seed the bot plays from' },
-		],
-		mahjong => [
-			{ name => 'level',  type => 'int', min => 1, max => 3, help => 'the bots\x27 strength' },
-			{ name => 'seat',   type => 'int', min => 0, max => 3, help => 'your seat; seat 0 deals the first hand' },
-			{ name => 'glyphs', type => 'flag',                    help => 'the Unicode Mahjong Tiles block on the tile faces' },
-			{ name => 'auto',   type => 'flag',                    help => 'four bots, no prompt: watch a game' },
-			{ name => 'seed',   type => 'str',                     help => 'the same seed deals the same tiles' },
-		],
-		maze => [
-			{ name => 'width',  type => 'int', min => 5, max => 120, help => 'cells across' },
-			{ name => 'height', type => 'int', min => 5, max => 60,  help => 'cells down' },
-		],
-		merrills => [
-			{ name => 'level',      type => 'int',  min => 1, max => 5,                  help => 'the bot\x27s strength' },
-			{ name => 'side',       type => 'enum', choices => [qw(white black random)], help => 'your side' },
-			{ name => 'hotseat',    type => 'flag',                                      help => 'two people at one keyboard, no bot' },
-			{ name => 'bot-vs-bot', type => 'flag',                                      help => 'watch two bots' },
-			{ name => 'flying',     type => 'bool',                                      help => 'a side down to three men may fly' },
-			{ name => 'seed',       type => 'str',                                       help => 'the same seed, the same game' },
-		],
-		oware => [
-			{ name => 'level',   type => 'int',  min => 1, max => 5,              help => 'bot level' },
-			{ name => 'seat',    type => 'enum', choices => [qw(p1 p2)],          help => 'the seat you play' },
-			{ name => 'variant', type => 'enum', choices => [qw(abapa awari)],    help => 'the rules' },
-			{ name => 'seed',    type => 'str',                                   help => 'so a game can be replayed' },
-		],
-		reversi => [
-			{ name => 'level',   type => 'int',  min => 1, max => 5,                   help => 'how hard the opponent is' },
-			{ name => 'variant', type => 'enum', choices => [qw(historic othello)],    help => 'place the first four discs yourselves, or find them down' },
-			{ name => 'colour',  type => 'enum', choices => [qw(b w)],                 help => 'b plays dark and moves first, w plays light' },
-			{ name => 'seed',    type => 'str',                                        help => 'makes a game reproducible' },
-		],
-		royalur => [
-			{ name => 'mode',  type => 'enum', choices => [qw(bot hotseat watch)], help => 'you against the program, two people, or the program against itself' },
-			{ name => 'rules', type => 'enum', choices => [qw(finkel masters)],    help => 'the route and the rules' },
-			{ name => 'level', type => 'int',  min => 1, max => 4,                   help => 'how well the program plays; the top by default' },
-			{ name => 'side',  type => 'enum', choices => [qw(light dark)],         help => 'your side against the program' },
-			{ name => 'first', type => 'enum', choices => [qw(light dark roll)],    help => 'who moves first, or throw the dice for it' },
-			{ name => 'seed',  type => 'str',                                        help => 'hexadecimal; the same seed throws the same dice' },
-		],
-		schnapsen => [
-			{ name => 'mode',  type => 'enum', choices => [qw(bot hotseat watch)], help => 'you against the bot, two people, or two bots' },
-			{ name => 'level', type => 'int',  min => 1, max => 2,                   help => 'the bot\x27s strength' },
-			{ name => 'seat',  type => 'enum', choices => [qw(p1 p2)],               help => 'your seat' },
-			{ name => 'seed',  type => 'str',                                        help => 'deal the same match every time' },
-		],
-		snake => [
-			{ name => 'level', type => 'int',  min => 1, max => 2,  help => 'the bot\x27s level, for watch' },
-			{ name => 'watch', type => 'flag',                      help => 'watch the bot play' },
-			{ name => 'rows',  type => 'int',  min => 8, max => 28, help => 'the board; the default fits the window' },
-			{ name => 'cols',  type => 'int',  min => 8, max => 40, help => 'the board; the default fits the window' },
-			{ name => 'seed',  type => 'str',                       help => 'the same seed and the same moves are the same game' },
-		],
-		xiangqi => [
-			{ name => 'level', type => 'int',  min => 0, max => 3,     help => 'a rung of the ladder, 0 the weakest' },
-			{ name => 'red',   type => 'enum', choices => [qw(p1 p2)], help => 'whoever is Red moves first' },
-			{ name => 'seat',  type => 'enum', choices => [qw(p1 p2)], help => 'which seat you play' },
-			{ name => 'wxf',   type => 'flag',                         help => 'show WXF notation beside the coordinates' },
-			{ name => 'seed',  type => 'str',                          help => 'up to thirty-two bytes, for a reproducible game' },
-		],
-	);
-	$OPTIONS{sixtysix} = $OPTIONS{schnapsen};
 
 	for my $row (@ROSTER) {
-		$row->{options} = $OPTIONS{ $row->{key} } || [];
 		$BY_NAME{$row->{key}} = $row;
 		$BY_NAME{$_} = $row for @{$row->{aliases}};
 	}
@@ -475,70 +348,27 @@ sub flags_for {
 	return @flags;
 }
 
+sub options_for {
+	my ($row, %seam) = @_;
+	return $row->{options} if ref $row->{options} eq 'ARRAY';
+	my $loader = $seam{loader} || \&load;
+	my $class = eval { $loader->($row) };
+	return [] unless $class && $class->can('options');
+	my $fields = eval { $class->options };
+	return ref $fields eq 'ARRAY' ? $fields : [];
+}
+
 sub step_value {
-	my ($field, $current, $direction) = @_;
-	my $type = $field->{type};
-	if ($type eq 'int') {
-		return $direction > 0 ? $field->{min} : $field->{max} unless defined $current;
-		my $next = $current + $direction;
-		return $next < $field->{min} ? $field->{min} : $next > $field->{max} ? $field->{max} : $next;
-	}
-	if ($type eq 'enum') {
-		my @choices = @{$field->{choices}};
-		return $direction > 0 ? $choices[0] : $choices[-1] unless defined $current;
-		my ($index) = grep { $choices[$_] eq $current } 0 .. $#choices;
-		$index = 0 unless defined $index;
-		return $choices[ ($index + $direction) % @choices ];
-	}
-	if ($type eq 'flag') {
-		return $current ? undef : 1;
-	}
-	if ($type eq 'bool') {
-		my @cycle = (undef, 1, 0);
-		my $index = !defined $current ? 0 : $current ? 1 : 2;
-		return $cycle[ ($index + $direction) % 3 ];
-	}
-	return $current;
+	return Game::Terminal::Kit::Options::step_value(@_);
 }
 
 sub check_value {
-	my ($field, $text) = @_;
-	$text = '' unless defined $text;
-	$text =~ s/^\s+|\s+$//g;
-	return (undef, undef) unless length $text;
-	my $type = $field->{type};
-	if ($type eq 'int') {
-		return (undef, "$field->{name} takes a whole number from $field->{min} to $field->{max}")
-			unless $text =~ m/^-?\d+$/ && $text >= $field->{min} && $text <= $field->{max};
-		return ($text + 0, undef);
-	}
-	if ($type eq 'enum') {
-		my ($match) = grep { lc $_ eq lc $text } @{$field->{choices}};
-		return ($match, undef) if defined $match;
-		return (undef, "$field->{name} takes " . join(', ', @{$field->{choices}}));
-	}
-	return ($text, undef);
+	return Game::Terminal::Kit::Options::check_value(@_);
 }
 
 sub argv_for {
-	my ($row, $values) = @_;
-	$values ||= {};
-	my @argv;
-	for my $field (@{ $row->{options} || [] }) {
-		my $value = $values->{ $field->{name} };
-		next unless defined $value;
-		my $type = $field->{type};
-		if ($type eq 'flag') {
-			push @argv, "--$field->{name}" if $value;
-		} elsif ($type eq 'bool') {
-			push @argv, $value ? "--$field->{name}" : "--no-$field->{name}";
-		} else {
-			push @argv, "--$field->{name}", $value;
-		}
-	}
-	push @argv, Text::ParseWords::shellwords($values->{extra})
-		if defined $values->{extra} && length $values->{extra};
-	return @argv;
+	my ($row, $values, %seam) = @_;
+	return Game::Terminal::Kit::Options::argv_for(options_for($row, %seam), $values);
 }
 
 sub launch {
@@ -583,11 +413,11 @@ __END__
 
 =head1 NAME
 
-Game::Terminal - one game command for every terminal game
+Game::Terminal - one game command to rule all terminal games
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 
@@ -641,22 +471,20 @@ C<baduk> are go, C<chinesechess> is xiangqi, C<awale> and C<awari> are oware,
 C<rummy> is gin, C<crib> is cribbage, C<flappy> is floppy, and C<66> is
 sixtysix.
 
-=head2 The options table
+=head2 Where the options come from
 
-Each row also carries C<options>, the settings a person chooses before a
-game: the level, a side or seat, a mode, a variant, a board size, a seed,
-and the switches that turn a game into hotseat play or a bot watching
-itself. Each is a hash of C<name>, C<type>, C<help>, and for an C<int> its
-C<min> and C<max>, for an C<enum> its C<choices>. The types are C<int>,
-C<enum>, C<flag> (sent as C<--name> when on), C<bool> (sent as C<--name> or
-C<--no-name>, or not at all) and C<str>. File paths, replay records and
-layout widths are not in the table; they stay on the command line, and the
-menu\x27s C<extra> line takes them.
+The settings a person chooses before a game (the level, a side or seat, a
+mode, a variant, a board size, a seed, the switches that turn a game into
+hotseat play or a bot watching itself) are the game's own to list. Each
+class in the roster has a class method C<options> that returns them as
+fields, and L</options_for> asks it. A field is a hash of C<name>, C<type>
+and C<help>, with C<min> and C<max> for an C<int> and C<choices> for an
+C<enum>; L<Game::Terminal::Kit::Options> describes them in full. File paths,
+replay records and layout widths are not among them; they stay on the
+command line, and the menu's C<extra> line takes them.
 
-The launcher never repeats a game\x27s defaults: a field nobody set sends
-nothing, so the game decides. The ranges and choices were read from each
-game\x27s own usage text, so when a game changes its options this table is
-where the drift lands.
+The launcher never repeats a game's defaults: a field nobody set sends
+nothing, so the game decides.
 
 =head1 FUNCTIONS
 
@@ -711,6 +539,17 @@ The C<$VERSION> written in that file, read without loading it, or undef.
 
 Requires the row's class and returns its name.
 
+=head2 options_for
+
+    my $fields = Game::Terminal::options_for($row);
+
+The fields of a row's game, as an array reference: what its class's
+C<options> method returns. The class is loaded to ask it, so this is called
+when a game's options are about to be shown and not while the games are
+listed. A game that is not installed, or whose class has no such method, has
+no fields. A row that carries its own C<options> list is believed without
+asking. C<loader> may be given as for L</launch>.
+
 =head2 flags_for
 
     my @flags = Game::Terminal::flags_for($row, { ascii => 1, pick => 0 });
@@ -725,6 +564,9 @@ under L</launch>.
 
     my $next = Game::Terminal::step_value($field, $current, +1);
 
+L<Game::Terminal::Kit::Options/step_value>, under the name it has always had
+here.
+
 The value one step to the right (C<+1>) or left (C<-1>) of C<$current> for
 a field: an C<int> moves by one and stops at its ends, and from unset goes
 to C<min> or C<max>; an C<enum> cycles through its choices; a C<flag>
@@ -735,6 +577,8 @@ step.
 
     my ($value, $error) = Game::Terminal::check_value($field, $typed);
 
+L<Game::Terminal::Kit::Options/check_value>, likewise.
+
 A typed value for a field: the number, the matching choice regardless of
 case, or the text, with C<$error> set and C<$value> undef when an C<int> is
 out of range or an C<enum> is not a choice. Blank is unset.
@@ -743,8 +587,9 @@ out of range or an C<enum> is not a choice. Blank is unset.
 
     my @argv = Game::Terminal::argv_for($row, \%values);
 
-The command line the values make, in the table\x27s order, with the
-C<extra> text split like a shell and appended last.
+The command line the values make for the row's fields, in the order
+L</options_for> gives them, with the C<extra> text split like a shell and
+appended last.
 
 =head2 launch
 

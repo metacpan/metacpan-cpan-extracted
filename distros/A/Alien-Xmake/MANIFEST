@@ -22,3 +22,4 @@ t/000_compile.t
 t/001_xmake.t
 t/002_build_cpp.t
 t/003_broken_config.t
+t/004_config_data.t

@@ -1,4 +1,23 @@
 Revision history for Context-Vars
 
+0.04    2026-10-15
+        - Fix t/01-needs-hamt.t on 32-bit perls with 64-bit integers.
+        - Fix t/19-async.t before perl 5.24, where Future::AsyncAwait keeps
+          a cancelled sub until global destruction.
+
+0.03    2026-10-14
+        - Fix a change made through a dereference written as a block,
+          push @{ $seen{list} }, not being undone when the sub returns.
+
+0.02    2026-10-14
+        - Import arrays and hashes as context variables.
+        - Scope a change at any depth of a structure to the sub that makes it.
+        - A variable now holds its own copy of a plain hash or array, at every
+          depth: a change made through it in a sub is undone when the sub
+          returns, and changing the original does not change the variable.
+          In 0.01 the referent was shared.
+        - Support local on whole arrays and hashes and on their elements.
+        - Add elem_fetch and elem_store to the C ABI, version 2.
+
 0.01    2026-10-14
         - First release.

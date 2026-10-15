@@ -13,6 +13,13 @@ our $DIE;
 our $MISBEHAVE;
 our $OUT;
 
+sub options {
+	return [
+		{ name => 'level', type => 'int', min => 1, max => 3, help => 'how hard it plays' },
+		{ name => 'watch', type => 'flag', help => 'nobody plays' },
+	];
+}
+
 sub run {
 	my ($class, @argv) = @_;
 	push @CALLS, [@argv];

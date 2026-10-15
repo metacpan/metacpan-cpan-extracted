@@ -12,7 +12,7 @@ if ( $^O ne 'linux' ) {
 	plan skip_all => 'not linux';
 }
 
-plan tests => 17;
+plan tests => 25;
 
 my $base_dir = tempdir( CLEANUP => 1 );
 my $obj      = OSLV::Monitor->new( base_dir => $base_dir );
@@ -105,3 +105,35 @@ $backend->{cache}{'cgroup-/foo'}{rbytes} = 100;
 $backend->{cache}{'cgroup-/bar'}{rbytes} = 700;
 $backend->cache_process( 'cgroup-/foo', 'rbytes', 400 );
 is( $backend->cache_process( 'cgroup-/bar', 'rbytes', 1000 ), 1, 'each name has its own cached value' );
+
+#
+# rates are over the interval since the previous run and not a fixed 300
+#
+
+$backend = new_backend();
+$backend->{interval}                    = 60;
+$backend->{cache}{'cgroup-/foo'}{rbytes} = 100;
+is( $backend->cache_process( 'cgroup-/foo', 'rbytes', 700 ), 10, 'a counter delta is per second over the interval' );
+
+$backend = new_backend();
+$backend->{interval} = 60;
+is( $backend->cache_process( 'cgroup-/foo', 'rbytes', 600, 100 ), 0, 'a new counter older than the interval returns 0' );
+
+#
+# the interval comes from the time saved in the cache
+#
+
+is( $obj->interval_since( { __oslv_monitor__ => { time => 1000 } }, 1060 ), 60,  'the interval is the time since the cached run' );
+is( $obj->interval_since( {},                                          1060 ), 300, 'a cache with no time defaults to 300' );
+is( $obj->interval_since( undef,                                       1060 ), 300, 'no cache defaults to 300' );
+is( $obj->interval_since( { __oslv_monitor__ => { time => 2000 } }, 1060 ), 300, 'a cached time in the future defaults to 300' );
+
+# the run saves the time for the next run to use, and the next run uses it
+$backend = new_backend();
+$backend->run;
+my $saved_time = $backend->{new_cache}{__oslv_monitor__}{time};
+ok( defined($saved_time), 'run saves the time to the cache' );
+
+$backend = new_backend();
+$backend->run;
+ok( $backend->{interval} > 0 && $backend->{interval} < 300, 'run uses the time saved by the previous run for the interval' );

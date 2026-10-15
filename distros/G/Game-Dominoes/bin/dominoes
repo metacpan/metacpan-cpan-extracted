@@ -5,6 +5,6 @@ use warnings;
 
 use Game::Dominoes::Terminal;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 exit Game::Dominoes::Terminal->run(@ARGV);

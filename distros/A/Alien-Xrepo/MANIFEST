@@ -136,5 +136,6 @@ t/053_install_cache.t
 t/054_mb.t
 t/055_mm.t
 t/056_process_info.t
+t/057_runtime_deps.t
 t/102_ffi.t
 t/103_tools.t

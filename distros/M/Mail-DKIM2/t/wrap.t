@@ -90,4 +90,19 @@ is(wrap_single_part("From: a\@example.org$EOL"), undef, 'no header/body separato
     isnt(wrap_single_part($m)->{boundary}, wrap_single_part($m)->{boundary}, 'random boundaries differ');
 }
 
+# 8. In list context, why nothing was wrapped: the milter logs it.
+{
+    my ($w, $why) = wrap_single_part(msg('Content-Type: multipart/mixed; boundary=x', '', '--x--', ''));
+    is($w, undef, 'multipart: nothing');
+    is($why, 'multipart', 'multipart: says so');
+    ($w, $why) = wrap_single_part("From: a\@example.org$EOL");
+    is($why, 'no-header-end', 'no blank line after the header: says so');
+    ($w, $why) = wrap_single_part(msg('From: a@example.org', 'not a field', '', 'x', ''));
+    is($why, 'unparsable-header', 'a header line that is not a field: says so');
+    ($w, $why) = wrap_single_part(msg('Content-Type: text/plain', '', '--same', ''), Boundary => sub { 'same' });
+    is($why, 'boundary', 'no boundary clear of the body: says so');
+    ($w, $why) = wrap_single_part(msg('Content-Type: text/plain', '', 'x', ''), @fixed);
+    ok($w && !defined $why, 'wrapped: no reason');
+}
+
 done_testing;

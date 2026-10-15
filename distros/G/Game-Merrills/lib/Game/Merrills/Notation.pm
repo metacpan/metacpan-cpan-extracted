@@ -5,15 +5,16 @@ use warnings;
 
 use Game::Merrills::Points;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
-our (%CELL, %GLYPH, %TURN, %LETTER);
+our (%CELL, %GLYPH, %TURN, %LETTER, %SIDE);
 
 BEGIN {
 	%CELL = ('.' => 0, W => 1, B => -1);
 	%GLYPH = (0 => '.', 1 => 'W', -1 => 'B');
 	%TURN = (w => 'white', b => 'black');
 	%LETTER = (white => 'w', black => 'b');
+	%SIDE = (white => 1, black => 1);
 }
 
 sub parse_move {
@@ -118,6 +119,20 @@ sub format_record {
 	if (defined $option{position}) {
 		$header = 'position ' . format_position(parse_position($option{position})) . "\n";
 	}
+	$header .= "flying no\n" if defined $option{flying} && !$option{flying};
+	my $footer = '';
+	if (defined $option{offer}) {
+		die "record: the offer must be white or black, got '$option{offer}'"
+			unless $SIDE{ $option{offer} };
+		$footer .= "offer $option{offer}\n";
+	}
+	if (defined $option{result}) {
+		my ($winner, $reason) = @{ $option{result} };
+		$winner = 'draw' unless defined $winner;
+		die "record: the result must be a winner or draw and a reason, got '$winner $reason'"
+			unless _result_ok($winner, $reason);
+		$footer .= "result $winner $reason\n";
+	}
 	my @text;
 	for my $i (0 .. $#{$moves}) {
 		my $move = $moves->[$i];
@@ -133,7 +148,7 @@ sub format_record {
 	for (my $i = 0; $i < @text; $i += 2) {
 		push @line, join ' ', (($i / 2) + 1) . '.', grep { defined } @text[ $i, $i + 1 ];
 	}
-	return join '', $header, map { "$_\n" } @line;
+	return join '', $header, (map { "$_\n" } @line), $footer;
 }
 
 sub parse_record {
@@ -141,6 +156,7 @@ sub parse_record {
 	die 'record: nothing to read' unless defined $text && !ref $text;
 	$text =~ s/^[ \t]*#[^\n]*$//mg;
 	$text =~ s/^[ \t]*position[ \t]+[^\n]*$//m;
+	$text =~ s/^[ \t]*(?:flying|offer|result)[ \t]+[^\n]*$//mg;
 	my @moves;
 	for my $token (split ' ', $text) {
 		next if $token =~ m/^[0-9]+\.$/;
@@ -158,6 +174,39 @@ sub record_position {
 	return format_position(parse_position($position));
 }
 
+sub record_state {
+	my ($text) = @_;
+	die 'record: nothing to read' unless defined $text && !ref $text;
+	my %state;
+	for my $line (split m/\n/, $text) {
+		next unless $line =~ m/^[ \t]*(flying|offer|result)[ \t]+(.*?)[ \t]*$/;
+		my ($word, $value) = ($1, $2);
+		die "record: a second $word line" if exists $state{$word};
+		if ($word eq 'flying') {
+			die "record: flying must be yes or no, got '$value'" unless $value =~ m/^(?:yes|no)$/;
+			$state{flying} = $value eq 'yes' ? 1 : 0;
+		}
+		elsif ($word eq 'offer') {
+			die "record: the offer must be white or black, got '$value'" unless $SIDE{$value};
+			$state{offer} = $value;
+		}
+		else {
+			my ($winner, $reason) = split ' ', $value;
+			die "record: the result must be a winner or draw and a reason, got '$value'"
+				unless _result_ok($winner, $reason) && $value =~ m/^\S+ \S+$/;
+			$state{result} = [ $winner eq 'draw' ? undef : $winner, $reason ];
+		}
+	}
+	return \%state;
+}
+
+sub _result_ok {
+	my ($winner, $reason) = @_;
+	return 0 unless defined $winner && defined $reason;
+	return $winner eq 'draw' if $reason eq 'agreement';
+	return $SIDE{$winner} && ($reason eq 'resign' || $reason eq 'timeout') ? 1 : 0;
+}
+
 1;
 
 __END__
@@ -168,7 +217,7 @@ Game::Merrills::Notation - moves, positions and whole games as text
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
@@ -262,6 +311,19 @@ line of its own before the moves:
 	position WWW.BB..B..W....B..W.B.. w 4 4 0 10
 	1. d2 f4
 
+A game played without flying says so on a line of its own before the moves,
+and a game with a draw offer standing, or ended by a resignation, a timeout
+or an agreed draw, says so on lines of their own after them. Each of the
+three is written only when it is so:
+
+	flying no
+	1. d2 f4
+	offer black
+	result white resign
+
+The result names the winner, or C<draw>, and the reason. Only the endings
+the moves cannot show are written; the rest come back from playing the moves.
+
 A line that begins with C<#> is a note and is passed over when reading.
 
 =head1 FUNCTIONS
@@ -313,7 +375,10 @@ text is not a position or gives a side more than nine men.
 Writes a game from an arrayref of moves. Each may be a string, a hashref as
 L</parse_move> returns, or a L<Game::Merrills::Move>. Dies, naming the move,
 when one of them is not a move. Give C<position> for a game that began
-somewhere other than the empty board.
+somewhere other than the empty board, C<flying> as 0 for a game played
+without it, C<offer> as the side whose draw offer stands, and C<result> as an
+arrayref of the winner (undef for a draw) and the reason for a game ended by
+C<resign>, C<timeout> or C<agreement>. Dies when one of those is not so.
 
 	my $text = Game::Merrills::Notation::format_record(\@moves);
 	my $text = Game::Merrills::Notation::format_record(\@moves, position => $start);
@@ -321,7 +386,8 @@ somewhere other than the empty board.
 =head2 parse_record
 
 Reads a game. Returns an arrayref of moves as L</parse_move> returns them.
-A position line is passed over; L</record_position> reads it. Dies, naming
+A position line is passed over; L</record_position> reads it. The flying,
+offer and result lines are passed over too; L</record_state> reads them. Dies, naming
 the move by its place in the game, when one cannot be read.
 
 	my $moves = Game::Merrills::Notation::parse_record($text);
@@ -332,6 +398,16 @@ The position a written game began from, or undef when it names none and so
 began from the empty board. Dies when the position line is not a position.
 
 	my $position = Game::Merrills::Notation::record_position($text);
+
+=head2 record_state
+
+What a written game says beside its moves and its start, as a hashref with
+C<flying> (1 or 0) when the game names it, C<offer> (a side) when a draw
+offer stands, and C<result> (an arrayref of the winner, undef for a draw, and
+the reason) when the game was resigned, timed out or agreed drawn. Dies,
+saying what is wrong, when one of those lines cannot be read or comes twice.
+
+	my $state = Game::Merrills::Notation::record_state($text);
 
 =head1 PACKAGE VARIABLES
 
@@ -344,6 +420,10 @@ The cell value of each board character, and the character of each value.
 =item C<%TURN>, C<%LETTER>
 
 The side of each side letter, and the letter of each side.
+
+=item C<%SIDE>
+
+The two sides, C<white> and C<black>, each true.
 
 =back
 

@@ -5,7 +5,7 @@ use warnings;
 
 use Game::Oware::Board;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 my @LETTER = ('A' .. 'F', 'a' .. 'f');
 
@@ -37,15 +37,17 @@ sub render {
 }
 
 sub parse {
-	my ($class, $text) = @_;
+	my ($class, $text, $first) = @_;
 	die 'Game::Oware::Notation: a transcript is a string'
 		unless defined $text;
+	die 'Game::Oware::Notation: the first seat is p1 or p2'
+		if defined $first && $first ne 'p1' && $first ne 'p2';
 
 	$text =~ s/\s+//g;
 	return [] unless length $text;
 
 	my @houses;
-	my $expect = 'p1';
+	my $expect = $first // 'p1';
 	for my $letter (split //, $text) {
 		my $house = $class->index_of($letter);
 		my $seat  = Game::Oware::Board->owner_of($house);
@@ -118,7 +120,7 @@ Game::Oware::Notation - house letters, transcripts, and boards as text
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 
@@ -159,7 +161,7 @@ for one.
 
 Which makes two consecutive moves by the same seat something no game can
 produce, so C<parse> refuses it rather than quietly reattributing it. p1 moves
-first.
+first unless C<parse> is told otherwise.
 
 =head2 The board layout puts each row where the article draws it
 
@@ -197,7 +199,10 @@ A list of house indices as a transcript string.
 =head2 parse
 
 A transcript string as an arrayref of house indices. Dies if the seats do not
-alternate, or if p1 does not move first.
+alternate, or if the first move is not the first seat's. The first seat is
+p1, or the seat given after the transcript.
+
+    my $houses = Game::Oware::Notation->parse('aEbD', 'p2');
 
 =head2 board_to_text
 

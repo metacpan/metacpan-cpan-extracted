@@ -39,6 +39,10 @@ instead of C<./Build> can swap out the build tool and change nothing else. The r
 dist's module, the hermetic C<xrepo-snapshot.json> still lands in F<blib/lib/auto/share/dist/>, and C<make install>
 safely relocates it because C<ExtUtils::MakeMaker> copies the entirety of F<blib/lib>.
 
+A package that fails to build or install fails the whole run, exactly as it does under L<Alien::Xrepo::MB>: the
+pipeline records every failing package, L<Alien::Xrepo::Build/assert_installed> reports them, and the C<make> hook
+exits non-zero. The incomplete snapshot is discarded so a later C<make> rebuilds instead of trusting it.
+
 C<Write()> performs the same actions as L<ExtUtils::MakeMaker/WriteMakefile> (arguments are translated the same way
 C<Alien::Xrepo::MB> maps its properties), and then adds a C<pure_all> dependency. Consequently, every C<make> execution
 runs a tiny Perl freshness check; the C<xrepo> pipeline only (re)runs when the snapshot is missing or older than the

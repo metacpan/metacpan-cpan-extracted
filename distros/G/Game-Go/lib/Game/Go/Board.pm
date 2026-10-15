@@ -6,7 +6,7 @@ use warnings;
 
 use Game::Go::Rules;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub new {
 	my ($class, $engine) = @_;
@@ -96,7 +96,7 @@ Game::Go::Board - a readable view of a position, in columns and rows
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 

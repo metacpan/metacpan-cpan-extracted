@@ -7,7 +7,7 @@ use Exporter 'import';
 
 use Game::Durak::Card qw(rank_of suit_of power_of);
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 our @EXPORT_OK = qw(best LEVELS);
 
 use constant LEVELS => 3;
@@ -106,7 +106,7 @@ Game::Durak::Search - what to play, from what one seat can see
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 

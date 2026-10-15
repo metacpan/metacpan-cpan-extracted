@@ -7,7 +7,7 @@ use Test::More;
 
 use Game::Merrills;
 use Game::Merrills::Bot;
-use Game::Merrills::Test::Handle;
+use Game::Terminal::Kit::Test::Handle;
 
 # The whole distribution is shaped around the engine doing no input and no
 # output. This is the test that keeps it that way.
@@ -27,8 +27,8 @@ subtest 'a game and a search with both handles taken away' => sub {
 	{
 		# nothing between here and the untie may call Test::More: it would be
 		# printing through a handle that dies on purpose
-		tie *STDOUT, 'Game::Merrills::Test::Handle';
-		tie *STDIN, 'Game::Merrills::Test::Handle';
+		tie *STDOUT, 'Game::Terminal::Kit::Test::Handle';
+		tie *STDIN, 'Game::Terminal::Kit::Test::Handle';
 
 		eval {
 			my $game = Game::Merrills->new;

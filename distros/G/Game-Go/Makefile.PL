@@ -1,4 +1,4 @@
-use 5.010;
+use 5.014;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
@@ -37,6 +37,8 @@ File::Find::find(sub {
 # 5.010 is the SYNTACTIC floor: the defined-or operator appears in the modules
 # and nothing later than 5.10 does. Object::Proto::Sugar, which the rules layer
 # will depend on from phase 03, declares 5.008003 and does not raise this.
+# Game::Terminal::Kit, which the terminal reads its keys through, declares
+# 5.014 and does, so 5.014 is what MIN_PERL_VERSION says.
 #
 # WHAT HAS ACTUALLY BEEN RUN is recorded here, and the span between the floor
 # and the oldest tested perl is INFERRED FROM THE SYNTAX AND HAS NOT BEEN
@@ -106,7 +108,7 @@ my %WriteMakefileArgs = (
     VERSION_FROM     => 'lib/Game/Go.pm',
     ABSTRACT_FROM    => 'lib/Game/Go.pm',
     LICENSE          => 'artistic_2',
-    MIN_PERL_VERSION => '5.010',
+    MIN_PERL_VERSION => '5.014',
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
         'ExtUtils::Depends'   => '0.404',
@@ -127,6 +129,7 @@ my %WriteMakefileArgs = (
     PREREQ_PM => {
         'Object::Proto::Sugar' => '0.06',
         'Digest::SHA'          => '0',
+        'Game::Terminal::Kit'  => '0.05',
     },
     META_MERGE => {
         'meta-spec' => { version => 2 },

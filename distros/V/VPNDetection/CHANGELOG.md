@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 3.3.2 are described by their release commits.
 
+## 3.5.4 - 2026-10-15
+
+### Fixes
+
+- Retry an unreadable answer to OAuth discovery and device authorization ([`dfde9e2`](https://github.com/vpndetection-io/sdk-perl/commit/dfde9e266170aa081367cb80d1b48ed57680cd0d))
+
 ## 3.5.3 - 2026-10-10
 
 ### Fixes

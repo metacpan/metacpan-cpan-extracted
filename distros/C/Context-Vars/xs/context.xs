@@ -79,8 +79,9 @@ get(self, name)
         const char *p = SvPV(name, len);
         SV *held;
         if (len && p[0] == '$') { p++; len--; }
+        /* An array or hash keeps its sigil: it is stored under it. */
         held = (CONTEXT_VARS_HAMT->map_fetch)(aTHX_ c->map, p, len, 0);
-        XPUSHs(held ? sv_2mortal(newSVsv(held)) : &PL_sv_undef);
+        XPUSHs(held ? sv_2mortal(context_vars_plain(aTHX_ held)) : &PL_sv_undef);
     }
 
 int

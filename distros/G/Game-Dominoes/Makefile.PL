@@ -1,4 +1,4 @@
-use 5.010;
+use 5.014;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
@@ -9,28 +9,19 @@ my %WriteMakefileArgs = (
     VERSION_FROM     => 'lib/Game/Dominoes.pm',
     ABSTRACT_FROM    => 'lib/Game/Dominoes.pm',
     LICENSE          => 'artistic_2',
+    macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     EXE_FILES        => [ 'bin/dominoes' ],
-    # 5.010 is the SYNTACTIC floor, and it is a fact rather than a guess: the
-    # defined-or operator is used in Game::Dominoes, ::Error, ::Result, ::Bot
-    # and ::Terminal, and nothing later than that appears anywhere. No say, no
-    # state, no signatures, no postfix dereference. Object::Proto::Sugar, the
-    # one runtime dependency, declares 5.008003, so it does not raise this.
-    #
-    # The suite has actually been RUN on 5.34.1 and 5.42.0, both clean. The
-    # span from 5.10 to 5.32 is inferred from the syntax and not tested, and
-    # saying so is the point: Module::Starter's stock 5.008003 is a number
-    # nobody ever checked, and this one should not become another.
-    MIN_PERL_VERSION => '5.010',
+    MIN_PERL_VERSION => '5.014',
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
     },
     TEST_REQUIRES => {
         'Test::More' => '0',
     },
-    # One runtime dependency. Digest::SHA is core and does not go here.
-    # A second one needs a reason written down.
+    # Digest::SHA is core and does not go here.
     PREREQ_PM => {
         'Object::Proto::Sugar' => '0.05',
+        'Game::Terminal::Kit' => '0.05',
     },
     META_MERGE => {
         'meta-spec' => { version => 2 },

@@ -7,7 +7,7 @@ use warnings;
 use Carp ();
 use Digest::SHA ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our @LADDER = (1_000, 10_000, 10_000, 100_000);
 
@@ -105,7 +105,7 @@ Game::Brandubh::Bot - a program that plays brandubh, at three strengths
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

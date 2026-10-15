@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use constant BASE   => 8;
 use constant SEATS  => 4;
@@ -84,7 +84,7 @@ Game::Mahjong::Result - the settlement of a hand, and the standings of a game
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 

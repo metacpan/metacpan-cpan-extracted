@@ -1,4 +1,4 @@
-use 5.010;
+use 5.014;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
@@ -9,7 +9,8 @@ my %WriteMakefileArgs = (
     VERSION_FROM     => 'lib/Game/Checkers.pm',
     ABSTRACT_FROM    => 'lib/Game/Checkers.pm',
     LICENSE          => 'artistic_2',
-    MIN_PERL_VERSION => '5.010',
+    macro => { TARFLAGS   => "--format=ustar -c -v -f" },
+    MIN_PERL_VERSION => '5.014',
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
     },
@@ -19,6 +20,7 @@ my %WriteMakefileArgs = (
     },
     PREREQ_PM => {
         'Object::Proto::Sugar' => '0.05',
+        'Game::Terminal::Kit' => '0.05',
     },
     META_MERGE => {
         'meta-spec' => { version => 2 },

@@ -1,0 +1,12 @@
+#!include_default
+^CLAUDE\.md$
+^AGENTS\.md$
+\.o$
+\.bs$
+^XS\.c$
+^maint/
+^\.claude/
+^\.github/
+^\.githooks/
+^\.mcp\.json$
+^\.worktreeinclude$
