@@ -10,7 +10,7 @@ use Object::Pad 0.825;
 use Term::Fabulous::Role::HasRange;
 use Term::Fabulous::Widget::Input;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 class Term::Fabulous::Widget::Slider
 	:isa(Term::Fabulous::Widget::Input)
@@ -248,7 +248,7 @@ Term::Fabulous::Widget::Slider - Choose a number from a range by moving a thumb
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-slider.svg" alt="Three sliders: focused at 65 percent, a temperature of 21.5 degrees, and a disabled one"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-slider.svg" alt="Three sliders: focused at 65 percent, a temperature of 21.5 degrees, and a disabled one"></p>
 
 =end html
 

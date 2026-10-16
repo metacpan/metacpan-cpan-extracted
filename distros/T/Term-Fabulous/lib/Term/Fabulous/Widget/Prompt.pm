@@ -9,7 +9,7 @@ use Object::Pad 0.825;
 
 use Term::Fabulous::Widget::Dialog;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 class Term::Fabulous::Widget::Prompt
 	:isa(Term::Fabulous::Widget::Dialog)
@@ -406,7 +406,7 @@ waits for the answer
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-prompt.svg" alt="A New contact prompt over the dimmed list of contacts: Name holds Ada Lovelace, E-mail holds ada@engine in red, and the red line E-mail: Please enter an e-mail address. sits above the Add and Cancel buttons"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-prompt.svg" alt="A New contact prompt over the dimmed list of contacts: Name holds Ada Lovelace, E-mail holds ada@engine in red, and the red line E-mail: Please enter an e-mail address. sits above the Add and Cancel buttons"></p>
 
 =end html
 

@@ -6,8 +6,7 @@ use strict;
 use warnings;
 use Test::Most tests => 6;
 use Test::Number::Delta;
-use lib 't/lib';
-use MyLogger;
+use Test::Log::Abstraction;
 
 BEGIN {
 	use_ok('Geo::Coder::Free::DB::MaxMind::cities');
@@ -15,10 +14,18 @@ BEGIN {
 
 CITIES: {
 	SKIP: {
-		if(!$ENV{'NO_NETWORK_TESTING'}) {
+		if($ENV{'NO_NETWORK_TESTING'}) {
+			diag('Network testing disabled');
+			skip('Network testing disabled', 5);
+		}
+
+		skip('No cities database found', 5)
+			unless -f 'lib/Geo/Coder/Free/MaxMind/databases/cities.sql';
+
+		{
 			my $cities = new_ok('Geo::Coder::Free::DB::MaxMind::cities' => [{
 				directory => 'lib/Geo/Coder/Free/MaxMind/databases',
-				logger => new_ok('MyLogger'),
+				logger => new_ok('Test::Log::Abstraction'),
 				no_entry => 1
 			}]);
 
@@ -33,9 +40,6 @@ CITIES: {
 				delta_within($ramsgate->{Latitude}, 51.33, 1e-2);
 				delta_within($ramsgate->{Longitude}, 1.43, 1e-2);
 			}
-		} else {
-			diag('Network testing disabled');
-			skip('Network testing disabled', 5);
 		}
 	}
 }

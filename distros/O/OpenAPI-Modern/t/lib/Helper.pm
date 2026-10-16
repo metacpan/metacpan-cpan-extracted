@@ -26,7 +26,7 @@ use Test::Deep qw(!array !hash); # import symbols: ignore, re etc
 use Test2::API 'context_do';
 use Test::File::ShareDir -share => { -dist => { 'OpenAPI-Modern' => 'share' } };
 use JSON::Schema::Modern::Document::OpenAPI;
-use JSON::Schema::Modern::Utilities qw(true false match_media_type);
+use JSON::Schema::Modern::Utilities 0.651 qw(true false parse_media_type match_media_type);
 use OpenAPI::Modern;
 use OpenAPI::Modern::Utilities qw(:constants elem);
 use YAML::PP 0.005;
@@ -306,11 +306,12 @@ sub _multipart_body ($content_type, $raw_parts) {
   my @parts;
   my @raw_parts = $raw_parts->@*;
 
+  my $is_form = match_media_type($content_type, ['multipart/form-data']);
+
   while (my $part_spec = shift @raw_parts) {
     my @part_spec = $part_spec->@*;
-    unshift @part_spec, undef if $content_type ne 'multipart/form-data';
+    unshift @part_spec, undef if not $is_form;
     my ($name, $value, @headers) = @part_spec;
-
     my $part_content_type = (pairgrep { fc($a) eq fc('Content-Type') } @headers)[1];
 
     # put duplicate-name form-data entries back on the queue and keep iterating...
@@ -370,14 +371,13 @@ sub _multipart_body_string ($content_obj) {
 
 # extract the value of "boundary" parameters for nested multipart parts
 sub get_part_boundaries ($message) {
+  my @content_types;
   if ($TYPE eq 'mojo') {
-    return map +(
-      ($_->headers->content_type//'') =~ m{^multipart/(?:[\w-]+); boundary=(.+)\z}a,
-    ), $message->content->parts->@*;
+    @content_types = map $_->headers->content_type, $message->content->parts->@*;
   }
   elsif ($TYPE eq 'lwp') {
     # parts are HTTP::Message objects
-    return map +((($_->headers->content_type)[1]//'') =~ m{^boundary=(.+)\z}), $message->parts;
+    @content_types = map +(join '; ', $_->headers->content_type), $message->parts;
   }
   elsif (elem($TYPE, [qw(catalyst plack dancer2)])) {
     $message = do { +require Plack::Request; Plack::Request->new($message->env) }
@@ -385,10 +385,13 @@ sub get_part_boundaries ($message) {
     my $content = Mojo::Content::MultiPart->new;
     $content->headers->content_type($message->content_type);
     $content->emit(read => $message->content);
-    return map +(
-      ($_->headers->content_type//'') =~ m{^multipart/(?:[\w-]+); boundary=(.+)\z}a,
-    ), $content->parts->@*;
+    @content_types = map $_->headers->content_type, $content->parts->@*;
   }
+
+  return map do {
+    my $mt = parse_media_type($_);
+    (($mt//{})->{type}//'') eq 'multipart' ? (($mt//{})->{parameters}//{})->{boundary} : ()
+  }, @content_types;
 
   die 'unrecognized type ', ref $message, ' at ', join(' line ', (caller)[1,2]), ".\n";
 }

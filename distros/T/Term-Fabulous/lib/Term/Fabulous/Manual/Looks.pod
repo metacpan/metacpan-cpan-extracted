@@ -64,7 +64,7 @@ takes:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-text-features.svg" alt="Text wrapped at spaces in a narrow panel and text broken only at newlines; a two-line text with line height 2; plain, bold, italic, underlined and combined styles; Latin, Japanese, emoji and combining accents ending in the same column; a tab shown as a space and control characters shown as replacement characters"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-text-features.svg" alt="Text wrapped at spaces in a narrow panel and text broken only at newlines; a two-line text with line height 2; plain, bold, italic, underlined and combined styles; Latin, Japanese, emoji and combining accents ending in the same column; a tab shown as a space and control characters shown as replacement characters"></p>
 
 =end html
 
@@ -171,7 +171,7 @@ wrapped sentence aligned left, centered and aligned right:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-text.svg" alt="Colored words, a sentence wrapped left-aligned, centered and right-aligned, and text in five scripts"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-text.svg" alt="Colored words, a sentence wrapped left-aligned, centered and right-aligned, and text in five scripts"></p>
 
 =end html
 
@@ -426,7 +426,7 @@ and less alpha, and the terminal's default text color:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-colors.svg" alt="Six orange swatches written in different formats; a blue darkened, lightened and blended with white in steps; red swatches with alpha 255, 192, 128, 64 and 0 over a light panel; a line in the terminal's default text color"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-colors.svg" alt="Six orange swatches written in different formats; a blue darkened, lightened and blended with white in steps; red swatches with alpha 255, 192, 128, 64 and 0 over a light panel; a line in the terminal's default text color"></p>
 
 =end html
 
@@ -501,7 +501,7 @@ orbiting over a screen of text:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-translucency.svg" alt="A green, a red and a blue translucent box over a screen of text; the text shows through the green and the blue one"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-translucency.svg" alt="A green, a red and a blue translucent box over a screen of text; the text shows through the green and the blue one"></p>
 
 =end html
 
@@ -617,7 +617,7 @@ F<examples/border-showcase.pl> shows all styles:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-border-showcase.svg" alt="Twenty boxes, one in each border style, labeled with the style's name"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-border-showcase.svg" alt="Twenty boxes, one in each border style, labeled with the style's name"></p>
 
 =end html
 
@@ -681,7 +681,7 @@ the two parameters of L</Joining borders>:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-border-options.svg" alt="Six bordered panels: a border on the left and top only; a solid border with a double top and a thick left side; a round border with a cell of padding inside; a round border with a hidden bottom side; a title box and a body box sharing one line; a round border drawn on the parent's background"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-border-options.svg" alt="Six bordered panels: a border on the left and top only; a solid border with a double top and a thick left side; a round border with a cell of padding inside; a round border with a hidden bottom side; a title box and a body box sharing one line; a round border drawn on the parent's background"></p>
 
 =end html
 
@@ -798,8 +798,8 @@ under the C<ocean> theme file:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-themes-light.svg" alt="The panel in the light theme: dark text on a near-white screen, a white text field holding Ada, a checked check box, a blue progress bar at 65 percent, a Save button and a Cancel button with a red border"></p>
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-themes-ocean.svg" alt="The panel in the ocean theme: teal accents on a deep blue screen, a text field holding Ada, a checked check box, a progress bar at 65 percent, a Save button in the accent and a Cancel button with a red border"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-themes-light.svg" alt="The panel in the light theme: dark text on a near-white screen, a white text field holding Ada, a checked check box, a blue progress bar at 65 percent, a Save button and a Cancel button with a red border"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-themes-ocean.svg" alt="The panel in the ocean theme: teal accents on a deep blue screen, a text field holding Ada, a checked check box, a progress bar at 65 percent, a Save button in the accent and a Cancel button with a red border"></p>
 
 =end html
 

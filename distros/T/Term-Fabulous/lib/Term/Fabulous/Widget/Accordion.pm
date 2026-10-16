@@ -10,7 +10,7 @@ use Object::Pad 0.825;
 use Term::Fabulous::Widget::Box;
 use Term::Fabulous::Widget::Accordion::Item;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 class Term::Fabulous::Widget::Accordion
 	:isa(Term::Fabulous::Widget::Box)
@@ -281,7 +281,7 @@ their headers
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-accordion.svg" alt="Two accordions: one with the Network section open under General and a disabled Licenses section, one with borders, the toggles at the end and two sections open at once"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-accordion.svg" alt="Two accordions: one with the Network section open under General and a disabled Licenses section, one with borders, the toggles at the end and two sections open at once"></p>
 
 =end html
 

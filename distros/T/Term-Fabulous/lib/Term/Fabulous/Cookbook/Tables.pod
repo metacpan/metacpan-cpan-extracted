@@ -172,7 +172,7 @@ This program is shipped as F<examples/cookbook/table-basics.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-table-basics.svg" alt="A table of user accounts sorted by name, two rows selected with check boxes, and two status lines below: the selected logins and the account opened with Enter"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-basics.svg" alt="A table of user accounts sorted by name, two rows selected with check boxes, and two status lines below: the selected logins and the account opened with Enter"></p>
 
 =end html
 
@@ -355,7 +355,7 @@ This program is shipped as F<examples/cookbook/table-format.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-table-format.svg" alt="A table of backup jobs with formatted times, durations, sizes, file counts, percentages, transfer rates and check marks, sorted by size, and a line that shows the raw value and the display text of one size"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-format.svg" alt="A table of backup jobs with formatted times, durations, sizes, file counts, percentages, transfer rates and check marks, sorted by size, and a line that shows the raw value and the display text of one size"></p>
 
 =end html
 
@@ -601,7 +601,7 @@ This program is shipped as F<examples/cookbook/table-edit.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-table-edit.svg" alt="A to-do table with check boxes, delete buttons and a note column, two tasks selected, a new task added and the status line below"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-edit.svg" alt="A to-do table with check boxes, delete buttons and a note column, two tasks selected, a new task added and the status line below"></p>
 
 =end html
 
@@ -792,7 +792,7 @@ This program is shipped as F<examples/cookbook/table-columns.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-table-columns.svg" alt="A staff table with the column chooser open over its top right corner: City unchecked, E-mail checked, and the status line with the columns to save"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-columns.svg" alt="A staff table with the column chooser open over its top right corner: City unchecked, E-mail checked, and the status line with the columns to save"></p>
 
 =end html
 
@@ -933,7 +933,7 @@ This program is shipped as F<examples/cookbook/table-kdl.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-table-kdl.svg" alt="A stock table built from KDL: grouped by category, sorted by quantity, two rows selected and the Displays group closed"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-kdl.svg" alt="A stock table built from KDL: grouped by category, sorted by quantity, two rows selected and the Displays group closed"></p>
 
 =end html
 
@@ -1080,7 +1080,7 @@ This program is shipped as F<examples/cookbook/table-report.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-table-report.svg" alt="The printed sales report: products sorted by revenue, units and amounts formatted, shares in percent and a bold totals row under a double line"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-report.svg" alt="The printed sales report: products sorted by revenue, units and amounts formatted, shares in percent and a bold totals row under a double line"></p>
 
 =end html
 

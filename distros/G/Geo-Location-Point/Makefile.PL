@@ -28,6 +28,7 @@ WriteMakefile(
 		'Params::Get' => 0.13,
 		'Scalar::Util' => 0
 	}, TEST_REQUIRES => {
+		'IPC::System::Simple' => 0,
 		'Test::Carp' => 0,
 		'Test::Compile' => 0,
 		'Test::DescribeMe' => 0,

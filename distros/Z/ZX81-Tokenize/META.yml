@@ -21,5 +21,6 @@ requires:
   Modern::Perl: '1.20250607'
   Test::HexDifferences: '1.001'
   Test::More: '1.302225'
-version: '0.003'
+  ZX81: '0.001'
+version: '0.005'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

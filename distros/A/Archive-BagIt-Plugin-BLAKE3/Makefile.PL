@@ -7,7 +7,7 @@ use 5.008;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "The main module to handle bags.",
+  "ABSTRACT" => "The Blake3 algorithm plugin",
   "AUTHOR" => "Andreas Romeyke <cpan\@andreas.romeyke.de>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.008",
   "NAME" => "Archive::BagIt::Plugin::BLAKE3",
   "PREREQ_PM" => {
+    "Archive::BagIt" => "0.102",
     "Archive::BagIt::Role::Algorithm" => 0,
     "Archive::BagIt::Role::Manifest" => 0,
     "Carp" => 0,
@@ -42,7 +43,7 @@ my %WriteMakefileArgs = (
     "open" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,6 +51,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Archive::BagIt" => "0.102",
   "Archive::BagIt::Role::Algorithm" => 0,
   "Archive::BagIt::Role::Manifest" => 0,
   "Carp" => 0,

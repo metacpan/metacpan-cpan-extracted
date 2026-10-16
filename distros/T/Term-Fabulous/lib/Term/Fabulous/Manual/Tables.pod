@@ -90,7 +90,7 @@ row, a sort, a multiple selection and pages:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-table.svg" alt="A table of staff with a filter row, sorted by the start date, two rows selected with check boxes and a pager below"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-table.svg" alt="A table of staff with a filter row, sorted by the start date, two rows selected with check boxes and a pager below"></p>
 
 =end html
 
@@ -321,7 +321,7 @@ is a complete program:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-table-basics.svg" alt="A table of user accounts sorted by name, two rows selected with check boxes, and two status lines below: the selected logins and the account opened with Enter"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-basics.svg" alt="A table of user accounts sorted by name, two rows selected with check boxes, and two status lines below: the selected logins and the account opened with Enter"></p>
 
 =end html
 
@@ -541,7 +541,7 @@ newlines of its text:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-table-widths.svg" alt="An order table with a fixed number column, a growing Item column, a Notes column that takes a third of the width and wraps, an address column of two lines per row, a centered quantity, prices with a left-aligned title, and a Rating title with a star"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-widths.svg" alt="An order table with a fixed number column, a growing Item column, a Notes column that takes a third of the width and wraps, an address column of two lines per row, a centered quantity, prices with a left-aligned title, and a Rating title with a star"></p>
 
 =end html
 
@@ -646,7 +646,7 @@ is a complete program:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-table-columns.svg" alt="A staff table with the column chooser open over its top right corner: City unchecked, E-mail checked, and the status line with the columns to save"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-columns.svg" alt="A staff table with the column chooser open over its top right corner: City unchecked, E-mail checked, and the status line with the columns to save"></p>
 
 =end html
 
@@ -672,7 +672,7 @@ column is a computed column (see L</Computed columns>):
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-table-format.svg" alt="A table of backup jobs with formatted times, durations, sizes, file counts, percentages, transfer rates and check marks, sorted by size, and a line that shows the raw value and the display text of one size"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-format.svg" alt="A table of backup jobs with formatted times, durations, sizes, file counts, percentages, transfer rates and check marks, sorted by size, and a line that shows the raw value and the display text of one size"></p>
 
 =end html
 
@@ -809,7 +809,7 @@ has a check box and a delete button in every row:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-table-edit.svg" alt="A to-do table with check boxes, delete buttons and a note column, two tasks selected, a new task added and the status line below"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-edit.svg" alt="A to-do table with check boxes, delete buttons and a note column, two tasks selected, a new task added and the status line below"></p>
 
 =end html
 

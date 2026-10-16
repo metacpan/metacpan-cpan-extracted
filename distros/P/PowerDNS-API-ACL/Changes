@@ -1,0 +1,14 @@
+Revision history for PowerDNS-API-ACL
+
+0.002 2026-10-15 TEODESIAN
+    - Reach PowerDNS over a unix socket with no keep-alive: HTTP::Tiny 0.096
+      checks a kept connection with peerhost, which HTTP::Tiny::UNIX lacks,
+      so every request through the socket failed
+
+0.001 2026-10-15 TEODESIAN
+    - Initial Release
+    - Salt the digests of the tokens with a salt that each database makes
+    - A manage grant creates and deletes one zone, and nothing else
+    - Refuse to make a token without a grant, or to remove its last grant
+    - Keep the database in WAL mode, and wait for a lock, for writers in several processes
+    - Open a connection of its own in each process, for a PSGI server that forks

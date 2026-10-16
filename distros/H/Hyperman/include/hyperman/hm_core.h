@@ -1131,6 +1131,27 @@ static void hm_rearm_read(hm_loop *loop, hm_conn *c) {
     loop->be->add_io(loop->be, c->fd, HM_EV_READ, 0);
 }
 
+/* Lend a completion-mode connection a readiness watcher for as long as an
+ * application call that may wait on it is on the stack: an HTTP/2 handler
+ * waiting for its body to drain is waiting for window updates on this very
+ * socket. No completion is outstanding then - HM_EV_RECV re-arms only after
+ * hm_process returns, and arming one under it would let the kernel write into
+ * a buffer nghttp2 is consuming - so without the watcher the handler pumps a
+ * loop that never reads its connection. 1 if lent. */
+static int hm_read_lend(hm_loop *loop, hm_conn *c) {
+    if (!loop->completion || c->recv_fallback || c->recv_inflight) return 0;
+    c->recv_fallback = 1;
+    loop->be->add_io(loop->be, c->fd, HM_EV_READ, 0);
+    return 1;
+}
+
+/* And take it back: the caller's hm_rearm_read returns it to completion. */
+static void hm_read_unlend(hm_loop *loop, hm_conn *c) {
+    if (!c->read_paused) loop->be->remove_io(loop->be, c->fd, HM_EV_READ);
+    c->read_paused = 0;
+    c->recv_fallback = 0;
+}
+
 static void hm_close(pTHX_ hm_loop *loop, hm_conn *c) {
     /* A synchronous handler for this connection is on the stack: its ->get
      * pumped this loop and the loop found the peer gone, or the sweep found

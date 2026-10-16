@@ -1,0 +1,186 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Alien::Xrepo::PackageInfo - The resolved metadata for one xrepo package
+
+=head1 SYNOPSIS
+
+    my $info = $repo->install('libpng', '1.6.x');
+
+    $info->version;                 # 1.6.45
+    $info->libpath;                 # /store/libpng/1.6.45/lib/libpng16.so
+    $info->includedirs;             # [ '/store/libpng/1.6.45/include' ]
+    $info->linkdirs;                # [ '/store/libpng/1.6.45/lib' ]
+    $info->links;                   # [ 'png16' ]
+    $info->kind;                    # 'library'
+
+    my $header = $info->find_header('png.h');
+
+    # a tool package resolves the same way, but answers with binaries
+    my $ninja = $repo->install('ninja');
+    my ($bin) = $ninja->bin_dir;    # .../ninja/bin
+
+=head1 DESCRIPTION
+
+C<Alien::Xrepo::PackageInfo> is the value object L<Alien::Xrepo> builds from a successful C<xrepo> install or fetch,
+and that L<Alien::Xrepo::Runtime> re-exposes to consumers. One instance describes exactly one package: where its
+headers and libraries landed, what to link against, how it was built, and which other shared libraries a dynamic loader
+must be able to find before it is usable.
+
+The engine constructs it; consumers only read it. Most fields come straight from C<xrepo>'s own output, but a few
+heuristics fill the gaps C<xrepo> leaves:
+
+=over
+
+=item * C<installdir> is derived from the first library or include path when C<xrepo> reports no artifacts root.
+
+=item * C<bindirs> falls back to C<< <installdir>/bin >> for a package that ships executables.
+
+=item * C<libfiles> is recovered by scanning the install tree when a package plainly holds libraries but reported
+none, so it is not mistaken for a header-only package.
+
+=item * C<kind> is inferred (C<binary> for a package with an install root but neither libraries nor headers,
+C<library> otherwise) when C<xrepo> reports no kind.
+
+=back
+
+Instances are immutable in practice. C<with_runtime_deps> returns a new object rather than mutating one, so a caller
+can attach a diagnostic without disturbing a cached or snapshotted value.
+
+=head1 CONSTRUCTOR
+
+    my $info = Alien::Xrepo::PackageInfo->new(
+        includedirs  => [ ... ],      # required
+        libfiles     => [ ... ],      # required
+        license      => 'zlib',       # required
+        linkdirs     => [ ... ],      # required
+        links        => [ ... ],      # required
+        shared       => 1,            # required
+        static       => 0,            # required
+        version      => '1.6.45',     # required
+        installdir   => '...',        # required
+        libpath      => '...',        # defaults to undef
+        bindirs      => [ ... ],      # defaults to []
+        deps         => [ ... ],      # defaults to []
+        runtime_deps => [ ... ],      # defaults to []
+        kind         => 'library'     # defaults to undef
+    );
+
+Instances are normally built by L<Alien::Xrepo> and L<Alien::Xrepo::Runtime>, not by hand.
+
+=head1 ATTRIBUTES
+
+=over
+
+=item B<includedirs>
+
+Arrayref of the package's include directories (the C<-I...> paths).
+
+=item B<libfiles>
+
+Arrayref of every library file the package installed: shared objects, import libraries, static archives, and so on.
+Unlike C<libpath>, this is the complete list.
+
+=item B<libpath>
+
+Absolute path to the package's primary runtime library (C<.dll>, C<.dylib>, or C<.so>), chosen by matching the
+package's C<links> against the installed files. C<undef> for a header-only package. When no runtime binary can be
+identified the engine falls back to the first entry of C<libfiles> so an XS build can still proceed (and warns when the
+package was requested as C<shared>).
+
+=item B<linkdirs>
+
+Arrayref of directories to search for the package's libraries (the C<-L...> paths).
+
+=item B<links>
+
+Arrayref of library base names to link against (the C<-l...> names).
+
+=item B<license>
+
+The license identifier C<xrepo> reported for the package.
+
+=item B<shared>
+
+Boolean: whether the package was built as a shared library.
+
+=item B<static>
+
+Boolean: whether the package was built as a static library.
+
+=item B<version>
+
+The installed version, as reported by C<xrepo>.
+
+=item B<bindirs>
+
+Arrayref of directories holding the package's executables. Falls back to C<< <installdir>/bin >> when the package is a
+tool. See also C<bin_dir( )> for the same directories as a list.
+
+=item B<installdir>
+
+The package's install root.
+
+=item B<deps>
+
+Arrayref of the dependency records Xmake reported for the package, as hashrefs. Empty for a plain fetch; populated when
+the fetch asked for dependencies.
+
+=item B<runtime_deps>
+
+Arrayref of the classified runtime dependencies of C<libpath> (the libraries the dynamic linker resolves before the
+package's own symbols are usable). Each entry is a hashref with C<name>, C<path>, C<dir>, and C<scope> (C<store>,
+C<host>, C<system>, or C<unresolved>); empty when nothing was scanned. L<Alien::Xrepo::Build> records these in the
+snapshot, so a hermetic consumer reads them without a second scan.
+
+=item B<kind>
+
+C<'library'> for a library (or header-only package), C<'binary'> for a tool. C<undef> only if it could not be inferred.
+
+=back
+
+=head1 METHODS
+
+=over
+
+=item C<find_header( $filename )>
+
+    my $path = $info->find_header('png.h');
+
+Scans C<includedirs> for the given filename and returns its absolute path, or C<undef> after warning when it is not
+found.
+
+=item C<bin_dir( )>
+
+    my @dirs = $info->bin_dir;
+
+The directories from C<bindirs> as a list, handy for C<map>/C<grep> when hunting for a tool's executable.
+
+=item C<with_runtime_deps( \@deps )>
+
+    my $info = $info->with_runtime_deps($deps);
+
+Returns a copy of the object with C<runtime_deps> set to C<\@deps>, or the object itself unchanged when it already
+carries a non-empty list. L<Alien::Xrepo::Runtime/package_info> uses it to attach the runtime dependency diagnostic.
+
+=back
+
+=head1 SEE ALSO
+
+L<Alien::Xrepo>, L<Alien::Xrepo::Runtime>, L<Alien::Xrepo::Build>
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the terms found in the Artistic License
+2. Other copyrights, terms, and conditions may apply to data transmitted through this module.
+
+=head1 AUTHOR
+
+Sanko Robinson L<https://github.com/sanko>
+
+=cut

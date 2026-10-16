@@ -5,7 +5,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Object::Pad 0.825;
 
@@ -340,7 +340,7 @@ several bordered panels with non-ASCII text.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-static-report.svg" alt="Three panels with double, heavy and round borders, printed to the terminal"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-static-report.svg" alt="Three panels with double, heavy and round borders, printed to the terminal"></p>
 
 =end html
 

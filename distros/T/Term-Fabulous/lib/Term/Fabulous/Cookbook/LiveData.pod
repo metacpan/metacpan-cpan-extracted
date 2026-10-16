@@ -87,7 +87,7 @@ This program is shipped as F<examples/cookbook/clock.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-clock.svg" alt="A clock in the middle of the terminal"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-clock.svg" alt="A clock in the middle of the terminal"></p>
 
 =end html
 
@@ -193,7 +193,7 @@ This program is shipped as F<examples/cookbook/scrolling-log.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-scrolling-log.svg" alt="A framed log with ten timestamped lines"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-scrolling-log.svg" alt="A framed log with ten timestamped lines"></p>
 
 =end html
 
@@ -351,7 +351,7 @@ This program is shipped as F<examples/cookbook/follow-log.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-follow-log.svg" alt="A log that shows its newest lines; every fifth line is wider than the box and cut at its edge"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-follow-log.svg" alt="A log that shows its newest lines; every fifth line is wider than the box and cut at its edge"></p>
 
 =end html
 
@@ -524,7 +524,7 @@ This program is shipped as F<examples/cookbook/show-output.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-show-output.svg" alt="The last lines of the output of seq and the exit status in a framed box"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-show-output.svg" alt="The last lines of the output of seq and the exit status in a framed box"></p>
 
 =end html
 

@@ -9,10 +9,8 @@ use Test::EOL;
 my @files = (
     'lib/Archive/BagIt.pm',
     'lib/Archive/BagIt/Base.pm',
-    'lib/Archive/BagIt/Plugin/Algorithm/MD5.pm',
-    'lib/Archive/BagIt/Plugin/Algorithm/SHA512.pm',
-    'lib/Archive/BagIt/Plugin/Manifest/MD5.pm',
-    'lib/Archive/BagIt/Plugin/Manifest/SHA512.pm',
+    'lib/Archive/BagIt/Plugin/MD5.pm',
+    'lib/Archive/BagIt/Plugin/SHA512.pm',
     'lib/Archive/BagIt/Role/Algorithm.pm',
     'lib/Archive/BagIt/Role/Manifest.pm',
     'lib/Archive/BagIt/Role/OpenSSL.pm',

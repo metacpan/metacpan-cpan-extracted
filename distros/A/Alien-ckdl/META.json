@@ -1,5 +1,5 @@
 {
-   "abstract" : "Build and install ckdl, a C library for KDL documents",
+   "abstract" : "(DEPRECATED) Build and install ckdl, a C library for KDL documents",
    "author" : [
       "Davenonymous <perl@davenonymous.com>"
    ],
@@ -67,7 +67,7 @@
          "web" : "https://github.com/Davenonymous/perl-alien-ckdl"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_alienfile" : {
       "generated_by" : "Alien::Build::MM version 2.84",
       "requires" : {
@@ -85,5 +85,6 @@
          "system" : {}
       }
    },
+   "x_deprecated" : 1,
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

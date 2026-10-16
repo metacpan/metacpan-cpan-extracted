@@ -161,7 +161,7 @@ openapi-validate - A command-line interface to OpenAPI document validation
 
 =head1 VERSION
 
-version 0.149
+version 0.150
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.
@@ -184,7 +184,7 @@ A command-line interface to verify the correctness of an OpenAPI document.
 
 F<openapi.yaml> contains:
 
-  openapi: 3.2.0
+  openapi: 3.2.1
   $self: https://example.com/openapi.yaml
   info:
     title: my title

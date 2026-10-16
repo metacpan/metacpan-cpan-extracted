@@ -2737,7 +2737,7 @@ YAML
       _path_item => { get => ignore },
       _operation => ignore,
       _operation_path_suffix => '/get',
-      operation_uri => str($openapi->openapi_uri->clone->fragment(jsonp(qw(/paths /foo get)))),
+      operation_uri => str($openapi->entry_document->canonical_uri->clone->fragment(jsonp(qw(/paths /foo get)))),
       errors => [],
     },
     'braces in the retrieval uri (and therefore in the normalized server url) aren\'t mistaken for template variables',

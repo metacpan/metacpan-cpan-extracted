@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::MakeMaker 2.80 {
+package Dist::Zilla::Plugin::Author::Plicease::MakeMaker 2.81 {
 
   use 5.022;
   use Moose;
@@ -281,7 +281,7 @@ Dist::Zilla::Plugin::Author::Plicease::MakeMaker - munge the AUTHOR section
 
 =head1 VERSION
 
-version 2.80
+version 2.81
 
 =head1 SYNOPSIS
 

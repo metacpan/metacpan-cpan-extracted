@@ -8,7 +8,7 @@ our $VERSION;
 # The XS code is loaded before the class modules below are compiled, so that
 # each of them can also be loaded on its own (they all load this module).
 BEGIN {
-    $VERSION = '0.002';
+    $VERSION = '0.003';
     require XSLoader;
     XSLoader::load(__PACKAGE__, $VERSION);
 }
@@ -468,10 +468,16 @@ mode, are mapped like this:
 A number with an integer value is written as an integer over the whole
 native range (-2**63 to 2**64-1, unsigned values included); any other
 number as a float, with the shortest text that reads back as the same
-double (C<0.30000000000000004>, C<1e+21>, C<-0.0>, C<123456789.0>; a float
+value (C<0.30000000000000004>, C<1e+21>, C<-0.0>, C<123456789.0>; a float
 always has a decimal point or an exponent). A scalar that has both an
 integer and a floating point value, such as C<3.0> after it has been
 compared with C<==>, is written as an integer.
+
+A float is Perl's floating point type (NV). On a perl built with
+C<-Duselongdouble> or C<-Dusequadmath> it is wider than a double, and
+both directions use that width: a parsed float is the NV nearest the
+literal, and a written float keeps as many digits as the NV needs (up to
+21 for a long double or 36 for a quad instead of 17).
 
 The decision uses the scalar's value, not how it looks. C<'42'> from a
 string literal is a string and C<42> is a number. A string that has been
@@ -910,8 +916,10 @@ Values are created as small blessed hashes; a document with a million
 values needs about 500 MB as a tree. Use L<Text::KDL::XS::Parser> for
 anything of that size.
 
-The module requires Perl 5.12 or newer built with 64-bit integers
-(C<ivsize> 8, the default on 64-bit platforms).
+The module requires Perl 5.30 or newer built with 64-bit integers
+(C<ivsize> 8, the default on 64-bit platforms). Floats have the width
+of the perl's own floating point type, also on perls built with
+C<-Duselongdouble> or C<-Dusequadmath>.
 
 =head1 SEE ALSO
 
@@ -929,18 +937,15 @@ The classes that make up the API.
 
 Internal; documented for completeness.
 
-=item L<Alien::ckdl>
-
-Builds and provides the ckdl library this module links against; its
-C<alienfile> pins the ckdl commit that is compiled.
-
 =item L<https://kdl.dev>, L<https://github.com/kdl-org/kdl>
 
 The KDL specification and reference test suite.
 
 =item L<https://github.com/tjol/ckdl>
 
-The C library doing the actual parsing and emitting.
+The C library doing the actual parsing and emitting. A copy of its
+sources is bundled in the F<ckdl> directory of this distribution and
+compiled into the module; F<ckdl/UPSTREAM.md> names the upstream commit.
 
 =back
 
@@ -953,7 +958,6 @@ Davenonymous E<lt>perl@davenonymous.comE<gt>
 Copyright (C) 2026 Davenonymous.
 
 This Perl distribution is licensed under the same terms as Perl itself.
-The bundled C<ckdl> library (linked statically via L<Alien::ckdl>) is
-MIT-licensed.
+The bundled C<ckdl> library is MIT-licensed; see F<ckdl/COPYING>.
 
 =cut

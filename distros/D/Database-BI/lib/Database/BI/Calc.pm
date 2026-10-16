@@ -8,7 +8,7 @@ use POSIX	qw(floor ceil);
 use Readonly;
 use Scalar::Util	qw(looks_like_number);
 
-our $VERSION = '0.012.0';
+our $VERSION = '0.012.1';
 
 Readonly my $MAX_EXPR_LEN => 512;
 Readonly my $MAX_DEPTH    => 20;

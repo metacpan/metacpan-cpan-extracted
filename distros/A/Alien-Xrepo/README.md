@@ -540,77 +540,8 @@ against the same store starts instantly once a package is resolved.
 
 # Package Info
 
-Returned by `install( ... )` as `Alien::Xrepo::PackageInfo` objects that contain the results of the dependency
-resolution.
-
-## Attributes
-
-- **libpath**
-
-    The absolute path to the main library file (`.dll`, `.dylib`, or `.so`). Returns `undef` if the package is
-    header-only or the binary could not be identified.
-
-- **includedirs**
-
-    List of include paths.
-
-- **installdir**
-
-    The package install root. Packages that mostly exist as tools or runnable binaries (`ninja`, `python`, `cmake`, ...)
-    put their executables under `installdir/bin`.
-
-- **bin\_dir**
-
-    List of directories holding executables. Comes from the `bindirs` fetch metadata, or falls back to `installdir/bin` when the package is a tool. You can run a freshly installed binary like so:
-
-    ```perl
-    my $ninja = $repo->install('ninja');
-    my ($exe) = grep { -e $_ } map { path($_)->child($^O eq 'MSWin32' ? 'ninja.exe' : 'ninja') } $ninja->bin_dir;
-    system $exe, '--version';
-    ```
-
-- **libfiles**
-
-    List of all library files associated with the package (may include import libs, static archives, etc.).
-
-- **license**
-
-    The license identifier.
-
-- **version**
-
-    The installed version.
-
-- **deps**
-
-    The dependency records Xmake reported for the package, as a list of hashrefs. Empty for a plain fetch; populated when
-    the fetch asked for dependencies.
-
-- **runtime\_deps**
-
-    The classified runtime dependencies discovered for the package's `libpath` (see `runtime_deps( ... )` on the engine
-    and [Alien::Xrepo::Runtime](https://metacpan.org/pod/Alien%3A%3AXrepo%3A%3ARuntime)). Each entry is a hashref with `name`, `path`, `dir`, and `scope`.
-    [Alien::Xrepo::Build](https://metacpan.org/pod/Alien%3A%3AXrepo%3A%3ABuild) records these in the snapshot, so a hermetic consumer reads them without a second scan; empty
-    otherwise.
-
-## Methods
-
-### `find_header( ... )`
-
-```perl
-my $path = $info->find_header( 'png.h' );
-```
-
-Scans `includedirs` for the given filename and returns the absolute path if found. Returns `undef` otherwise.
-
-### `with_runtime_deps( \@deps )`
-
-```perl
-my $info = $info->with_runtime_deps($deps);
-```
-
-Returns a copy of the object with `runtime_deps` set to `\@deps`, or the object itself unchanged when it already
-carries a non-empty list. `Alien::Xrepo::Runtime::package_info( ... )` uses it to attach the diagnostic.
+`install( ... )` and its friends return [Alien::Xrepo::PackageInfo](https://metacpan.org/pod/Alien%3A%3AXrepo%3A%3APackageInfo) objects that carry the results of dependency
+resolution. See [Alien::Xrepo::PackageInfo](https://metacpan.org/pod/Alien%3A%3AXrepo%3A%3APackageInfo) for the complete list of attributes and methods.
 
 # Examples
 

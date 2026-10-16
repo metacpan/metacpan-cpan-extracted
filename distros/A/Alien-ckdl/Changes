@@ -1,5 +1,14 @@
 Revision history for Alien-ckdl
 
+0.002  2026-10-15
+        - Deprecated. Text::KDL::XS 0.003 and later bundle the ckdl sources
+          and compile them into the module, so nothing depends on this
+          Alien any more. This final release marks the distribution as
+          deprecated (x_deprecated in the metadata, a notice in the POD
+          and at configure time) and builds the same ckdl commit as
+          0.001, so Text::KDL::XS 0.001 and 0.002 stay installable.
+          There will be no further releases.
+
 0.001  2026-04-30
         - Initial CPAN release.
         - Builds ckdl from upstream main as a static library via alienfile.

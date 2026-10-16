@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 3.3.2 are described by their release commits.
 
+## 3.5.5 - 2026-10-16
+
+### Fixes
+
+- Re-pin the spec to 2026.10.15: descriptions in US spelling ([`a76a981`](https://github.com/vpndetection-io/sdk-perl/commit/a76a98105739a64bb1890188deffe535b01cb6e4))
+
 ## 3.5.4 - 2026-10-15
 
 ### Fixes

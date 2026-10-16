@@ -3,11 +3,13 @@ use warnings;
 use Test::More;
 
 # Every class module must work when it is the first one loaded. Each case
-# runs in a fresh perl so that nothing else is loaded yet.
+# runs in a fresh perl so that nothing else is loaded yet. The expressions
+# use single quotes only: on Windows the child's command line is built from
+# one string, and double quotes inside -e do not survive that.
 my @include = map { "-I$_" } grep { !ref } @INC;
 
 my %first_use = (
-    'Text::KDL::XS::Parser'   => [ q{Text::KDL::XS::Parser->new("a 1\n")->next_event->{name}}, 'a' ],
+    'Text::KDL::XS::Parser'   => [ q{Text::KDL::XS::Parser->new('a 1')->next_event->{name}}, 'a' ],
     'Text::KDL::XS::Emitter'  => [ q{Text::KDL::XS::Emitter->_emit_tree({ a => 1 })}, "a 1\n" ],
     'Text::KDL::XS::Document' => [ q{Text::KDL::XS::Document->new(nodes => [ Text::KDL::XS::Node->new(name => 'a') ])->nodes->[0]->name}, 'a' ],
     'Text::KDL::XS::Node'     => [ q{Text::KDL::XS::Node->new(name => 'a', props => [ [ k => 1 ] ])->prop('k')}, '1' ],

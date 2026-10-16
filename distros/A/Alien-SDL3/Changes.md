@@ -5,6 +5,19 @@ All notable changes to Alien::SDL3 will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v3.4.19] - 2026-10-15
+
+Well, I guess I'm going to have to tinker with versioning soon...
+
+### Fixed
+
+- On Windows, a Strawberry Perl host (gcc, no `cl` on PATH) could not install anything: xmake's `windows` platform never offers a gcc toolchain, so `perl Build` aborted with `toolchain not found!` and the prebuilt SDL3 DLLs were never fetched. The recipe now pins the xmake toolchain to the compiler Perl was built with, so the prebuilt DLL flavour, the import library used by the package self-test, and the library FFI opens all agree.
+- `Affix` test died on an undefined value when the primary package was missing but others resolved: `package_info()` with no argument returns the primary package only, so its one-element list was always truthy. It now collects each named package and drops the undefs.
+
+### Changed
+
+- `t/00_compile.t` and `t/01_delegation.t` now fail only when a snapshot exists but the core `libsdl3` package does not resolve, instead of silently passing; a genuinely cold checkout (no snapshot) still skips. A companion library that failed (`libsdl3_image`, `libsdl3_ttf`, `libsdl3_mixer`) is reported and its checks skipped rather than failing the suite, since a dist with a working core is still useful. Both also surface whatever the build recorded for a failed package.
+
 ## [v3.4.18] - 2026-10-07
 
 ### Changed
@@ -61,7 +74,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Installs from the tip of main
   - Note: Does not pull prebuilt binaries for Windows
 
-[Unreleased]: https://github.com/Perl-SDL3/Alien-SDL3.pm/compare/v3.4.18...HEAD
+[Unreleased]: https://github.com/Perl-SDL3/Alien-SDL3.pm/compare/v3.4.19...HEAD
+[v3.4.19]: https://github.com/Perl-SDL3/Alien-SDL3.pm/compare/v3.4.18...v3.4.19
 [v3.4.18]: https://github.com/Perl-SDL3/Alien-SDL3.pm/compare/v3.4.2...v3.4.18
 [v3.4.2]: https://github.com/Perl-SDL3/Alien-SDL3.pm/compare/v2.28.0...v3.4.2
 [v2.28.0]: https://github.com/Perl-SDL3/Alien-SDL3.pm/compare/0.05...v2.28.0

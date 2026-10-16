@@ -51,7 +51,9 @@
             "Game::Reversi" : "0.04",
             "Game::RoyalUr" : "0.03",
             "Game::Schnapsen" : "0.04",
+            "Game::Shogi" : "0.01",
             "Game::Snake" : "0.13",
+            "Game::Sternhalma" : "0.01",
             "Game::Terminal::Kit" : "0.05",
             "Game::Xiangqi" : "0.05",
             "Object::Proto::Sugar" : "0.05",
@@ -67,6 +69,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

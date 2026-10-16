@@ -282,4 +282,60 @@ subtest 'Logs' => sub {
     };
 };
 
+subtest 'Undefined values' => sub {
+    my $encoder = CLASS->new;
+
+    is $encoder->encode_anyvalue(undef), {},
+        'An undefined value is an empty AnyValue';
+
+    is $encoder->encode_anyvalue(''), { string_value => '' },
+        'An empty string is distinct from an undefined value';
+
+    is $encoder->encode_kvlist( { key => undef } ),
+        [ { key => 'key', value => {} } ],
+        'An undefined attribute value keeps its key';
+
+    is $encoder->encode_arraylist( [ 'a', undef, 'b' ] ), [
+        { string_value => 'a' },
+        {},
+        { string_value => 'b' },
+    ], 'An undefined list element keeps its position';
+
+    is $encoder->encode_kvlist( { key => { inner => undef } } ), [
+        {
+            key   => 'key',
+            value => {
+                kvlist_value => {
+                    values => [ { key => 'inner', value => {} } ],
+                },
+            },
+        },
+    ], 'An undefined value nested in a kvlist is an empty AnyValue';
+
+    is warnings { $encoder->encode_anyvalue(undef) }, [],
+        'Encoding an undefined value does not warn';
+
+    my $unsupported;
+    is warnings {
+        $unsupported = $encoder->encode_arraylist( [ 'a', \'b', 'c' ] )
+    }, [ match qr/Unsupported ref while encoding: SCALAR/ ],
+        'An unsupported ref still warns';
+
+    is $unsupported, [
+        { string_value => 'a' },
+        {},
+        { string_value => 'c' },
+    ], 'An unsupported ref keeps its position in a list';
+
+    ok lives {
+        OpenTelemetry::Proto::Common::V1::AnyValue
+            ->new_and_check( $encoder->encode_anyvalue(undef) )
+    }, 'An empty AnyValue is accepted by the protobuf encoder';
+
+    ok lives {
+        OpenTelemetry::Proto::Common::V1::KeyValue
+            ->new_and_check( $encoder->encode_kvlist( { key => undef } )->[0] )
+    }, 'An empty AnyValue is accepted as a KeyValue value';
+};
+
 done_testing;

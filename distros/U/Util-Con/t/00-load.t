@@ -48,6 +48,36 @@ is( Some::Caller::p(), 'own p', 'a p() the caller already had is not replaced' )
 	my ($out) = capture { main::p(@data) };
 	like( $out, qr/first.*second/s, 'the p() stub prints through DDP on first call' );
 	ok( $INC{'DDP.pm'}, 'calling p() loaded DDP' );
+
+	# DDP->import() exports p() as well as np(), and used to replace the p()
+	# that Some::Caller had of its own when its np() stub loaded DDP.  The
+	# stub was installed at run time, so its prototype does not apply to this
+	# call, and the array is passed as the reference the prototype would make.
+	like( Some::Caller::np(\@data), qr/first.*second/s, 'the np() stub loads DDP into another package' );
+	is( Some::Caller::p(), 'own p', 'loading DDP through np() leaves the caller\'s own p() alone' );
+}
+
+# A p() called again after DDP failed to load dies again.  It used to call
+# itself forever, because the package was marked loaded before the load was
+# tried.  The child script hides DDP behind an @INC hook, so it needs a fresh
+# perl, and an alarm turns a regression into a failure rather than a hang.
+{
+	my $tmp = tempdir(CLEANUP => 1);
+	my $script = File::Spec->catfile($tmp, 'noddp.pl');
+	open my $fh, '>', $script or die "$script: $!";
+	print $fh <<'END';
+BEGIN { unshift @INC, sub { die "no DDP here\n" if $_[1] eq 'DDP.pm'; return } }
+use Util::Con;
+$SIG{ALRM} = sub { print "hung\n"; exit 1 };
+alarm 10;
+my @x = (1);
+for my $try (1, 2) { eval { p(@x) }; print "try $try: ", ($@ ? 'died' : 'returned'), "\n" }
+END
+	close $fh or die "$script: $!";
+	my ($out) = capture {
+		system($^X, (map { "-I$_" } grep { !ref } @INC), $script);
+	};
+	is( $out, "try 1: died\ntry 2: died\n", 'p() dies again, rather than hanging, after DDP failed to load' );
 }
 
 # autodie reaches the file that said `use Util::Con`: a bare open of a missing

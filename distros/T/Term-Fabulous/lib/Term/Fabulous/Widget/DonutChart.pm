@@ -5,7 +5,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Object::Pad 0.825;
 
@@ -41,7 +41,7 @@ Term::Fabulous::Widget::DonutChart - A pie chart with a hole
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-donut-chart.svg" alt="A donut of a monthly budget with the total in the middle and the amounts and shares in the legend"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-donut-chart.svg" alt="A donut of a monthly budget with the total in the middle and the amounts and shares in the legend"></p>
 
 =end html
 
@@ -57,7 +57,7 @@ the hole holds a text.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-donut-chart-centers.svg" alt="Three donuts of the same budget: the total 2170 euros in the middle of the first, 21% Food in the middle of the second with the other slices faded, and a text of its own, 2170 euros per month, in the third"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-donut-chart-centers.svg" alt="Three donuts of the same budget: the total 2170 euros in the middle of the first, 21% Food in the middle of the second with the other slices faded, and a text of its own, 2170 euros per month, in the third"></p>
 
 =end html
 

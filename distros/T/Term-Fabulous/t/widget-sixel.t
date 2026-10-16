@@ -13,6 +13,7 @@ use Module::Load::Conditional qw(can_load);
 
 BEGIN {
 	skip_all 'Imager and Imager::File::SIXEL are not installed' unless can_load( modules => { Imager => 0, 'Imager::File::SIXEL' => 0 } );
+	skip_all 'Imager was built without PNG support' unless $Imager::formats{png};
 }
 
 use Clay::XS qw(sizing_fixed CLAY_ATTACH_TO_PARENT CLAY_ATTACH_POINT_LEFT_TOP);

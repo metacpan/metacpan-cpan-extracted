@@ -5,7 +5,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Object::Pad 0.825;
 
@@ -275,7 +275,7 @@ bins
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-histogram.svg" alt="Two overlapping translucent histograms of response times in milliseconds, with the number of requests on the y axis"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-histogram.svg" alt="Two overlapping translucent histograms of response times in milliseconds, with the number of requests on the y axis"></p>
 
 =end html
 
@@ -318,7 +318,7 @@ L<Term::Fabulous::Widget::XYChart/STACKING>) they stack, opaque.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-histogram-measures.svg" alt="Four histograms of the same response times: counts per bin, percent per bin, density per bin, and cumulative percentages rising to 100%"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-histogram-measures.svg" alt="Four histograms of the same response times: counts per bin, percent per bin, density per bin, and cumulative percentages rising to 100%"></p>
 
 =end html
 

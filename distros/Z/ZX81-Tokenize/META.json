@@ -34,11 +34,12 @@
          "requires" : {
             "Modern::Perl" : "1.20250607",
             "Test::HexDifferences" : "1.001",
-            "Test::More" : "1.302225"
+            "Test::More" : "1.302225",
+            "ZX81" : "0.001"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.003",
+   "version" : "0.005",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

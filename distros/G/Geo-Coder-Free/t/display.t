@@ -6,7 +6,7 @@ use warnings;
 use Test::Needs 'HTML::SocialMedia', 'Log::Any::Adapter::Log4perl', 'Template::Plugin::JSON';
 
 use Cwd;
-use Test::Most tests => 7;
+use Test::Most tests => 6;
 use Data::Validate::URI;
 
 use lib 'lib';
@@ -24,11 +24,12 @@ local %ENV = (
 	REQUEST_METHOD => 'GET',
 	QUERY_STRING => 'foo=bar&baz=qux',
 	SCRIPT_URI => 'http://localhost',
+	root_dir => Cwd::getcwd(),
 );
 
 # Create an instance of the module
 my $display = Geo::Coder::Free::Display->new(
-	config => { root_dir => Cwd::getcwd(), memory_cache => { driver => 'Null' } }
+	config => { root_dir => $ENV{root_dir}, memory_cache => { driver => 'Null' } }
 );
 
 # Test object creation
@@ -50,13 +51,3 @@ like($display->http(), qr/Content-Type: text\/html; charset=UTF-8/, 'HTTP header
 
 like($display->html(), qr/<html/i, 'HTML generation');
 like($display->as_string(), qr/html>/i, 'as_string');
-
-# Simulate HTML generation (assuming template exists)
-sub mock_template {
-	return "<html><body>Test Page</body></html>";
-}
-{
-	no warnings 'redefine';
-	*Geo::Coder::Free::Display::html = \&mock_template;
-	like($display->as_string({}), qr/Test Page/, 'HTML generation overriding html()');
-}

@@ -1,0 +1,100 @@
+Game-Sternhalma
+
+Sternhalma, the star halma of 1892 that most English speakers call Chinese
+checkers: 121 holes in a six-pointed star, ten pieces a seat, and a race to
+move all of them into the point opposite. A piece steps to a neighbouring
+hole, or hops over one piece, anyone's, into the hole beyond it, and may go
+on hopping as long as it likes. Nothing is taken. Two, three, four or six
+can play.
+
+This distribution is the game, an opponent for it, and a program to play it
+in a terminal.
+
+    use Game::Sternhalma;
+    use Game::Sternhalma::Bot;
+
+    my $game = Game::Sternhalma->new(seats => 3);
+    my $flag = $game->play('c3-e7');
+    die Game::Sternhalma->reason($flag) if defined $flag;
+    print "$_->{text}\n" for $game->legal;
+    $game->play(Game::Sternhalma::Bot->choose($game, rung => 2));
+
+Or, from a shell:
+
+    sternhalma
+    sternhalma --seats 4 --people 2
+    sternhalma --seats 6 --bots all
+
+                        a  R
+                      b  R   R
+                    c  R   R  [R]
+                  d  R   R   R   R
+    e  .   .   .   .   .   .  (.)  .  (.)  .   .   .   .
+      f  .   .   .   .   .   .   .   .   .   .   .   .
+        g  .   .   .   .   .   .   .   .   .   .   .
+          h  .   .   .   .   .   .   .   .   .   .
+            i  .   .   .   .   .   .   .   .   .
+          j  .   .   .   .   .   .   .   .   .   .
+        k  .   .   .   .   .   .   .   .   .   .   .
+      l  .   .   .   .   .   .   .   .   .   .   .   .
+    m  .   .   .   .   .   .   .   .   .   .   .   .   .
+                      n  B   B   B   B
+                        o  B   B   B
+                          p  B   B
+                            q  B
+
+In a terminal the cursor walks the pieces that can move, and the holes the
+one under it can reach are lit. With one picked up, the cursor walks those
+holes and the way there, hop by hop, is shown before the move is made. Each
+piece is its seat's letter on its seat's colour, so the seats can be told
+apart with colour and without it.
+
+The game has no single rule book. Game::Sternhalma says which texts its
+rules were taken from and which things this distribution had to choose: that
+a piece left in your home cannot keep you out, that a seat with no move
+passes, and that a game ends at a cap of moves, with the seats still racing
+placed by how far they have left to go.
+
+The engine is C, with no floating point in it. The opponent is bounded by the
+number of positions it may look at and never by the clock, so it makes the
+same move on every machine.
+
+
+INSTALLATION
+
+A C compiler is needed. To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+It requires Object::Proto::Sugar, Game::Terminal::Kit, and perl 5.14 or
+later. Term::ReadKey is recommended: with it the terminal program is played
+with the arrow keys, and without it by typing.
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Game::Sternhalma
+    perldoc sternhalma
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Game-Sternhalma
+
+    Search CPAN
+        https://metacpan.org/release/Game-Sternhalma
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION <email@lnation.org>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)

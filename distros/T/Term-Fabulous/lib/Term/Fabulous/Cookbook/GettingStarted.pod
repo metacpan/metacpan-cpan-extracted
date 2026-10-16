@@ -96,7 +96,7 @@ This program is shipped as F<examples/cookbook/minimal-program.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-minimal-program.svg" alt="The minimal program: one line of text on a dark background"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-minimal-program.svg" alt="The minimal program: one line of text on a dark background"></p>
 
 =end html
 
@@ -219,7 +219,7 @@ This program is shipped as F<examples/cookbook/non-ascii-text.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-non-ascii-text.svg" alt="German, Japanese and a combining accent, each line aligned in its columns"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-non-ascii-text.svg" alt="German, Japanese and a combining accent, each line aligned in its columns"></p>
 
 =end html
 
@@ -336,7 +336,7 @@ This program is shipped as F<examples/cookbook/wrap-and-align-text.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-wrap-and-align-text.svg" alt="Six framed samples: wrapped text aligned left, centered and right, text broken only at line breaks, two rows per line, and a centered label"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-wrap-and-align-text.svg" alt="Six framed samples: wrapped text aligned left, centered and right, text broken only at line breaks, two rows per line, and a centered label"></p>
 
 =end html
 

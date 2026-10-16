@@ -5,6 +5,19 @@ All notable changes to Alien::Xrepo will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.0.8] - 2026-10-15
+
+### Fixed
+
+- Normalize a scalar `links` value from `xrepo fetch --json` back into an array ref.
+
+## [v1.0.7] - 2026-10-15
+
+### Fixed
+
+- Limit each package to one registry refresh and one automatic retry per build tree. The counter is stored in checkpoint data so this limit is applied even if the build is resumed after a mid-stage failure.
+- Checkpoints now record each stage as completed *before* persisting, so a resumed build does not repeat tasks that completed in a previous attempt.
+
 ## [v1.0.6] - 2026-10-14
 
 Alpha runtime dependency diagnostic for FFI libraries. If, say libsdl3_ttf requires freetype, Alien::Xrepo will let you know.
@@ -79,7 +92,9 @@ Splitting this out of the `Alien::Xmake` dist and repo
 
 - It exists? Check the Alien::Xmake changelog, I guess
 
-[Unreleased]: https://github.com/sanko/Alien-Xrepo/compare/v1.0.6...HEAD
+[Unreleased]: https://github.com/sanko/Alien-Xrepo/compare/v1.0.8...HEAD
+[v1.0.8]: https://github.com/sanko/Alien-Xrepo/compare/v1.0.7...v1.0.8
+[v1.0.7]: https://github.com/sanko/Alien-Xrepo/compare/v1.0.6...v1.0.7
 [v1.0.6]: https://github.com/sanko/Alien-Xrepo/compare/v1.0.5...v1.0.6
 [v1.0.5]: https://github.com/sanko/Alien-Xrepo/compare/v1.0.4...v1.0.5
 [v1.0.4]: https://github.com/sanko/Alien-Xrepo/compare/v1.0.3...v1.0.4

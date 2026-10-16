@@ -1,5 +1,29 @@
 Revision history for Dist-Zilla-PluginBundle-Author-Plicease
 
+2.81      2026-10-16 02:00:12 -0600
+  - bump gh checkout action template to v7
+  - default ci to test only 5.42+
+  - Update dzil min (5.22), old (5.22), def (5.42)
+  - Sensible y/n defaults
+  - remove default pkg blocks
+  - [@Author::Plicease] Remove release_tests_skip option, which has not
+    done anything since 2016.  Use skip in author.yml instead.
+  - [@Author::Plicease] Clearer diagnostic for no longer supported keys
+  - [@Author::Plicease] Default repository.url is now https:// instead of
+    git://, which GitHub no longer supports
+  - [@Author::Plicease] Fix repository.url override, which was using the
+    value of repository.web
+  - [@Author::Plicease] clean_keep can again be specified more than once
+  - [@Author::Plicease] Document clean and clean_keep
+  - [Author::Plicease::Tests] Generated t/00_diag.t no longer uses string eval
+  - [Author::Plicease::Tests] Create t/ if needed when writing t/00_diag.t
+  - [Author::Plicease::SpecialPrereqs] Default the Makefile.PL Perl version
+    check to 5.006 when there is no runtime perl prereq
+  - [Author::Plicease::Upload] Prefer ~/www/dist.wdlabs.com/docs, falling back
+    on ~/dev/site-dist/docs for non-CPAN releases
+  - [Author::Plicease::Upload] Report a failed copy instead of success, and
+    don't try to copy when no release directory exists
+
 2.80      2026-08-08 20:51:23 -0600
   - bump gh action templates to v6
   - Drop support for Perl 5.20 (new min: 5.22)

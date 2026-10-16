@@ -13,6 +13,7 @@ use Module::Load::Conditional qw(can_load);
 
 BEGIN {
 	skip_all 'Imager is not installed' unless can_load( modules => { Imager => 0 } );
+	skip_all 'Imager was built without PNG support' unless $Imager::formats{png};
 }
 
 use Clay::XS qw(sizing_fixed);

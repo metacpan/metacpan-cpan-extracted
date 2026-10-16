@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs 2.80 {
+package Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs 2.81 {
 
   use 5.022;
   use Moose;
@@ -256,7 +256,7 @@ package Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs 2.80 {
 
     my $prereqs = $self->zilla->prereqs->as_string_hash;
 
-    my $perl_version = $prereqs->{runtime}->{requires}->{perl};
+    my $perl_version = $prereqs->{runtime}->{requires}->{perl} // '5.006';
 
     $self->log("perl version required = $perl_version");
 
@@ -294,7 +294,7 @@ Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs - Special prereq handling
 
 =head1 VERSION
 
-version 2.80
+version 2.81
 
 =head1 SYNOPSIS
 

@@ -10,8 +10,13 @@ use Test::Most tests => 26;
 
 BIN: {
 	SKIP: {
+		# Every path through this file emits the 26 tests the plan declares: the
+		# two script_compiles() calls at the top, and then either the author-only
+		# block or one skip standing in for it.  A skip that covers more tests
+		# than the plan is a plan failure rather than a skip, so this count is
+		# the whole file, not the author block.
 		if(!defined($ENV{'OPENADDR_HOME'})) {
-			skip('Set OPENADDR_HOME required for testing scripts', 28);
+			skip('Set OPENADDR_HOME required for testing scripts', 26);
 		} else {
 			Test::Script->import();
 

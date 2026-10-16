@@ -130,7 +130,20 @@ package("libsdl3")
     -- in to sit unused (a source-built freetype/cmake is also the slow, flaky part of
     -- the Windows/ARM leg, see issue #3).
     if not is_plat("windows") then
-        add_deps("cmake", "egl-headers", "opengl-headers")
+        add_deps("egl-headers", "opengl-headers")
+    end
+
+    -- ... and not on the BSDs or Solaris: xmake-repo's cmake only knows how to find a
+    -- system cmake on linux/macosx/mingw, so anywhere else it downloads and unpacks a
+    -- release of its own -- which those CI images cannot do (the tarball did not
+    -- download, and the fallback wants an unzip they lack) and, on Solaris, cannot
+    -- even resolve ("unsupported on solaris/i386: -> ninja latest [host,
+    -- from:cmake]", because that cmake recipe wants ninja, which xmake-repo also has
+    -- no recipe for there). Those images install cmake from their own package
+    -- manager, and xmake's cmake tool runs whatever cmake is on PATH, so only ask for
+    -- this dep where xmake-repo can actually deliver it.
+    if not is_plat("windows", "bsd", "solaris") then
+        add_deps("cmake")
     end
 
     if is_plat("linux", "bsd", "cross") then

@@ -9,8 +9,7 @@ use Test::DescribeMe qw(extended);	# This can use a lot of resources
 use Test::Most;
 use Test::Number::Delta;
 
-use lib 't/lib';
-use MyLogger;
+use Test::Log::Abstraction;
 # use Test::Without::Module qw(Geo::libpostal);
 
 BEGIN { use_ok('Geo::Coder::Free') }
@@ -18,7 +17,7 @@ BEGIN { use_ok('Geo::Coder::Free') }
 OPENADDR: {
 	if($ENV{'OPENADDR_HOME'}) {
 		if($ENV{'TEST_VERBOSE'}) {
-			Database::Abstraction::init(logger => MyLogger->new());
+			Database::Abstraction::init(logger => Test::Log::Abstraction->new());
 		}
 
 		my $geo_coder = new_ok('Geo::Coder::Free' => [ openaddr => $ENV{'OPENADDR_HOME'} ]);

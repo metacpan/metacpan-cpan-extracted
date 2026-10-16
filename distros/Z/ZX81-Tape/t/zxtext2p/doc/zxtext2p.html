@@ -1,0 +1,136 @@
+<HTML>
+ 
+<HEAD>
+<TITLE>ZXText2P Documentation</TITLE>
+</HEAD>
+ 
+<BODY>
+<P><FONT FACE="Arial,Helvetica" SIZE="5"><B>What is ZXText2P?</B></FONT><BR>
+<FONT FACE="Verdana,Arial,,Helvetica" SIZE="2">It's an open-source command line
+utility that takes a text file containing a ZX81 BASIC program, and turns it
+into a &quot;.P&quot; file suitable for loading into your favourite ZX81 or
+TS1000 emulator.</FONT></P>
+<P><FONT FACE="Arial,Helvetica" SIZE="5"><B>How do I use it?</B></FONT><BR>
+<FONT FACE="Verdana,Arial,,Helvetica" SIZE="2">From a command prompt, type
+&quot;zxtext2p mytextfile.txt&quot;. Assuming the text file contains a valid
+ZX81 program, you will get a file named &quot;out.p&quot; that you can use with
+an emulator (or transfer to tape and use with a real ZX81, using the
+appropriate tools).</FONT></P>
+<P><FONT FACE="Verdana,Arial,,Helvetica" SIZE="2">There are a number of options
+that you can specify on the command line. They are as follows:-</FONT></P>
+<CENTER>
+<TABLE WIDTH="520" BORDER="1" CELLPADDING="1" CELLSPACING="1">
+<TR>
+<TH WIDTH="100" BGCOLOR="#C0C0C0" VALIGN="MIDDLE" ALIGN="LEFT">Option</TH>
+<TH BGCOLOR="#C0C0C0">Meaning</TH>
+</TR>
+<TR>
+<TD WIDTH="100" VALIGN="MIDDLE" ALIGN="LEFT"><FONT
+FACE="Verdana,Arial,Helvetica" SIZE="2">-h</FONT></TD>
+<TD><FONT FACE="Verdana,Arial,Helvetica" SIZE="2">Show usage help.</FONT></TD>
+</TR>
+<TR>
+<TD WIDTH="100" VALIGN="MIDDLE" ALIGN="LEFT"><FONT
+FACE="Verdana,Arial,Helvetica" SIZE="2">-o output-file</FONT></TD>
+<TD><FONT FACE="Verdana,Arial,Helvetica" SIZE="2">Write the output to the named
+file (default=&quot;out.p&quot;).</FONT></TD>
+</TR>
+<TR>
+<TD WIDTH="100" VALIGN="MIDDLE" ALIGN="LEFT"><FONT
+FACE="Verdana,Arial,Helvetica" SIZE="2">-l</FONT></TD>
+<TD><FONT FACE="Verdana,Arial,Helvetica" SIZE="2">Use labels mode (see the
+section on <A HREF="#labels">labels</A>, below).</FONT></TD>
+</TR>
+<TR>
+<TD WIDTH="100" VALIGN="MIDDLE" ALIGN="LEFT"><FONT
+FACE="Verdana,Arial,Helvetica" SIZE="2">-s line</FONT></TD>
+<TD><FONT FACE="Verdana,Arial,Helvetica" SIZE="2">In labels mode, sets the
+starting line number (default=10).</FONT></TD>
+</TR>
+<TR>
+<TD WIDTH="100" VALIGN="MIDDLE" ALIGN="LEFT"><FONT
+FACE="Verdana,Arial,Helvetica" SIZE="2">-i</FONT></TD>
+<TD><FONT FACE="Verdana,Arial,Helvetica" SIZE="2">In labels mode, set the line
+number increment (default=2).</FONT></TD>
+</TR>
+</TABLE>
+</CENTER>
+<P><FONT FACE="Verdana,Arial,,Helvetica" SIZE="2">For example, </FONT><FONT
+FACE="Courier New,Courier"><B>zxtext2p -l -s 100 -i 5 -o mygame.p gamesrc.txt
+</B></FONT><FONT FACE="Verdana,Arial,,Helvetica" SIZE="2">will read the file
+<I>gamesrc.txt</I>, which must contain labelled code rather than code with line
+numbers, and will produce a .P file called <I>mygame.p</I> The first line will
+be numbered 100, the next 105, and so on.</FONT></P>
+<P><A NAME="labels"></A><FONT FACE="Arial,Helvetica" SIZE="5"><B>Labelled
+Code</B></FONT><BR>
+<FONT FACE="Verdana,Arial,,Helvetica" SIZE="2">Using the &quot;-l&quot; command
+line option allows you to write labelled code. zxtext2p will produce the
+appropriate line-numbered output. Program labels must always start with an @
+character, and must terminated with a colon (':'). Here is an example of
+labelled ZX81 code:-</FONT></P>
+<PRE>
+       CLS
+       PRINT &quot;HELLO WORLD.&quot;
+    @loop1:
+       PRINT &quot;THIS IS A LOOP&quot;
+       GOTO @loop1	 
+</PRE>
+<P><FONT FACE="Arial,Helvetica" SIZE="5"><B>Escape codes, Graphics, and
+Formatting</B></FONT><BR>
+<FONT FACE="Verdana,Arial,,Helvetica" SIZE="2"><B>Formatting</B><BR>
+The text in the input file can be in any combination of upper or lower case.
+For example, this is perfectly valid input:-</FONT></P>
+<PRE>
+    10 scroll
+    20 PRINT &quot;What is your name?&quot;
+    30 Input n$
+    40 pRiNt &quot;hEllo &quot;;N$
+    50 StoP
+</PRE>
+<P><FONT FACE="Verdana,Arial,,Helvetica" SIZE="2"><B>Source Comments and Blank
+Lines</B><BR>
+Any blank lines in the input file will be ignored by zxtext2p, as will any
+lines beginning with a '#' character. This means that you can include
+source-code comments in the input file and not have them take up any space in
+the resultant .P file. Any leading or trailing spaces on a line will also be
+ignored. For example:-</FONT></P>
+<PRE>
+# MyGame - version 0.01
+# 
+# By Fred Bloggs
+   
+   10 REM This is the first line that will appear in the output
+   20 CLS
+   30 PRINT &quot;Welcome to My Game.&quot;</PRE>
+<P><FONT FACE="Verdana,Arial,,Helvetica" SIZE="2">You can also split long lines
+by placing a single backslash (&quot;\&quot;) character at the end of the line
+you wish to wrap:-</FONT></P>
+<PRE>   1120 IF lives&gt;3 AND score&gt;20000 THEN \
+        GOSUB 4200</PRE>
+<P><FONT FACE="Verdana,Arial,,Helvetica" SIZE="2"><B>Inverse Video</B><BR>
+Inverse video (white on black) text can be included in your program by using
+the percent symbol ('%') as a character prefix. For example:-</FONT></P>
+<PRE>   10 PRINT &quot;%I%n%v%e%r%s%e% %V%i%d%e%o Normal Video&quot;</PRE>
+<P><FONT FACE="Verdana,Arial,,Helvetica" SIZE="2"><B>Escape Codes and Block
+Graphics</B><BR>
+In BASIC, the quote symbol (&quot;) is used to delimit strings of text. If you
+want a quote symbol to appear in the middle of a string, you must therefore
+prefix it with a backslash (&quot;\&quot;) escape character. For
+example:-</FONT></P>
+<PRE>   10 PRINT &quot;He said, \&quot;Hello.\&quot;&quot;</PRE>
+<P><FONT FACE="Verdana,Arial,,Helvetica" SIZE="2">The full range of ZX81 block
+graphics characters can easiliy be inserted into a program by using the
+backslash (&quot;\&quot;) escape character followed by a 2 character
+&quot;ASCII-art&quot; style rendition of the desired graphics character. For
+example:-</FONT></P>
+<PRE>   10 PRINT &quot;\:' \':&quot;</PRE>
+<P><FONT FACE="Verdana,Arial,,Helvetica" SIZE="2">The availble graphics
+characters, and their escape codes, are shown below. Notice how the pattern
+suggested by the dots is used to form the appropriate graphics symbol.</FONT> 
+</P>
+<CENTER>
+<IMG SRC="graphics.gif" WIDTH="316" HEIGHT="380" BORDER="0">
+</CENTER>
+</BODY>
+</HTML>
+ 

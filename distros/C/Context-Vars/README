@@ -2,7 +2,7 @@ NAME
     Context::Vars - variables with context scope
 
 VERSION
-    Version 0.04
+    Version 0.05
 
 SYNOPSIS
         use Context::Vars q{$variable};

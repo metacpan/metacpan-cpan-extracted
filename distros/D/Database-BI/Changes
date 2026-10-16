@@ -1,5 +1,20 @@
 Revision history for Database-BI
 
+0.012.1	Thu Oct 15 12:00:00 PM EDT 2026
+    [ Bug Fixes ]
+    - Fix 'Argument "" isn't numeric in int' warnings logged to the console
+      when numeric query parameters (?topn=, ?max=, ?max_cols=, ?per_page=,
+      ?page=, ?min_r=, ?max_r=) are submitted with an empty value.
+    - Fix ?bins=0 reverting to 10 bins instead of clamping to 1: the
+      || 10 empty-string guard must not swallow the literal value 0.
+      histogram_view now uses the defined-and-non-empty pattern so that
+      ?bins=0 correctly passes through the $bins < 1 clamp.
+    [ Tests ]
+    - Add t/binned.t: end-to-end contract tests for /histogram pre-binned
+      mode (label/count correctness, bins=N clamping, max-lands-in-top-bin,
+      no d3.bin() call, bin()/histogram label agreement, virtual column
+      binning, flat fixture, empty/error state).
+
 0.012.0	Wed Oct 14 09:10:15 PM EDT 2026
     [ New Features ]
     - GET /pivot: crosstab/pivot table.  Accepts ?rows=, ?cols=, and

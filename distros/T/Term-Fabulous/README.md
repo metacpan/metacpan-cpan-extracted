@@ -115,6 +115,13 @@ object ([Term::Fabulous::Role::Terminal](https://github.com/davenonymous/perl-te
 [Term::Fabulous::Terminal::Memory](https://github.com/davenonymous/perl-term-fabulous/blob/master/docs/Term/Fabulous/Terminal/Memory.md) in tests, which ["step"](#step) drives
 without an event loop.
 
+# AI DISCLAIMER
+
+AI has been used in the development of this project, including code
+generation and documentation. If that is a concern for you, this
+project may not be for you. Please consider this before using or
+contributing to the project.
+
 # DOCUMENTATION
 
 The documentation has four parts. If you are new to Term::Fabulous,

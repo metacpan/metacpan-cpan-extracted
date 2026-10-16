@@ -159,7 +159,7 @@ menu open:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-menu-bar.svg" alt="A notes editor with a menu bar of File, Edit, View and Help, each with its first letter underlined, and the caption notes.txt. The Edit menu is open below its title with Undo highlighted, Redo, Cut and Copy dimmed, Paste and Select all, each with its key. The status bar at the bottom says F10 opens the menus, Ctrl+Q quits. on the left and modified and Ln 6, Col 7 on the right"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-menu-bar.svg" alt="A notes editor with a menu bar of File, Edit, View and Help, each with its first letter underlined, and the caption notes.txt. The Edit menu is open below its title with Undo highlighted, Redo, Cut and Copy dimmed, Paste and Select all, each with its key. The status bar at the bottom says F10 opens the menus, Ctrl+Q quits. on the left and modified and Ln 6, Col 7 on the right"></p>
 
 =end html
 
@@ -251,7 +251,7 @@ F<examples/widgets/menu.pl>:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-menu.svg" alt="A list of files with a context menu opened over budget.csv where it was right-clicked: Open with Enter, Rename... with F2, a line, Cut with Ctrl+X, a dimmed Paste with Ctrl+V, a line, and Show hidden files with a check mark and Alt+h. The pointer highlights Rename..."></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-menu.svg" alt="A list of files with a context menu opened over budget.csv where it was right-clicked: Open with Enter, Rename... with F2, a line, Cut with Ctrl+X, a dimmed Paste with Ctrl+V, a line, and Show hidden files with a check mark and Alt+h. The pointer highlights Rename..."></p>
 
 =end html
 
@@ -348,7 +348,7 @@ after the user typed C<ctrl> (F<examples/widgets/key-reference.pl>):
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-key-reference.svg" alt="A Keys of the notes editor dialog over a dimmed notes editor: the search field holds ctrl, and the table below lists only the keys with Ctrl, Ctrl+N New note, Ctrl+S Save, Ctrl+A Select all and Ctrl+Q Quit under Everywhere, and the undo, copy and word keys under Text; a Close button at the bottom"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-key-reference.svg" alt="A Keys of the notes editor dialog over a dimmed notes editor: the search field holds ctrl, and the table below lists only the keys with Ctrl, Ctrl+N New note, Ctrl+S Save, Ctrl+A Select all and Ctrl+Q Quit under Everywhere, and the undo, copy and word keys under Text; a Close button at the bottom"></p>
 
 =end html
 

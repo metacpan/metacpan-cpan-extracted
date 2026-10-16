@@ -1,4 +1,4 @@
-package Dist::Zilla::PluginBundle::Author::Plicease 2.80 {
+package Dist::Zilla::PluginBundle::Author::Plicease 2.81 {
 
   use 5.022;
   use Moose;
@@ -8,7 +8,6 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.80 {
   use Dist::Zilla::Util::CurrentCmd ();
   use Path::Tiny qw( path );
   use File::Glob qw( bsd_glob );
-  use Path::Tiny qw( path );
   use Dist::Zilla::Plugin::Author::Plicease;
 
   # ABSTRACT: Dist::Zilla plugin bundle used by Plicease
@@ -22,6 +21,7 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.80 {
     diag_preamble
     workflow
     clean
+    clean_keep
 
     diag
     allow_dirty ) }
@@ -41,18 +41,9 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.80 {
   {
     my($self) = @_;
 
-    foreach my $key (qw( travis_status travis_com travis_base travis_image_base appveyor travis_user appveyor_user ))
+    if(my @bad = grep { defined $self->payload->{$_} } qw( travis_status travis_com travis_base travis_image_base appveyor travis_user appveyor_user ))
     {
-      my $bad = 0;
-      if(defined $self->payload->{$key})
-      {
-        print STDERR Term::ANSIColor::color('bold red') if -t STDERR;
-        print STDERR "dist.ini [\@Author::Plicease] key $key is no longer supported";
-        print STDERR Term::ANSIColor::color('reset') if -t STDERR;
-        print STDERR "\n";
-        $bad = 1;
-      }
-      die "unsuppor" if $bad;
+      die "dist.ini [\@Author::Plicease] no longer supports: @bad\n";
     }
 
     # undocumented for a reason: sometimes I need to release on
@@ -175,7 +166,7 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.80 {
         'MetaResources' => {
           'homepage' => $self->payload->{homepage}                 || "https://metacpan.org/pod/@{[ do { my $foo = $name; $foo =~ s/-/::/g; $foo }]}",
           'bugtracker.web'  => $self->payload->{'bugtracker.web'}  || sprintf("https://github.com/%s/%s/issues", $user, $repo),
-          'repository.url'  => $self->payload->{'repository.web'}  || sprintf("git://github.com/%s/%s.git",      $user, $repo),
+          'repository.url'  => $self->payload->{'repository.url'}  || sprintf("https://github.com/%s/%s.git",    $user, $repo),
           'repository.web'  => $self->payload->{'repository.web'}  || sprintf("https://github.com/%s/%s",        $user, $repo),
           'repository.type' => $self->payload->{'repository.type'} || 'git',
           maybe 'x_IRC' => $self->payload->{irc},
@@ -188,7 +179,6 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.80 {
     {
       $self->_my_add_plugin([
         'Author::Plicease::Tests' => {
-          maybe skip          => $self->payload->{release_tests_skip},
           maybe diag          => $self->payload->{diag},
           maybe diag_preamble => $self->payload->{diag_preamble},
           maybe test2_v0      => $self->payload->{test2_v0},
@@ -343,7 +333,7 @@ Dist::Zilla::PluginBundle::Author::Plicease - Dist::Zilla plugin bundle used by 
 
 =head1 VERSION
 
-version 2.80
+version 2.81
 
 =head1 SYNOPSIS
 
@@ -443,7 +433,7 @@ This plugin bundle is mostly equivalent to
  bugtracker.web = https://github.com/plicease/My-Dist/issues
  homepage = https://metacpan.org/pod/My::Dist
  repository.type = git
- repository.url = git://github.com/plicease/My-Dist.git
+ repository.url = https://github.com/plicease/My-Dist.git
  repository.web = https://github.com/plicease/My-Dist
  
  [InstallGuide]
@@ -490,10 +480,9 @@ specified, then the main module will be used.
 
 If set to true, then include release tests when building.
 
-=head2 release_tests_skip
-
-Passed into the L<Author::Plicease::Tests|Dist::Zilla::Plugin::Author::Plicease::Tests>
-if C<release_tests> is true.
+The C<pod_coverage>, C<pod_spelling_common> and C<pod_spelling_system> release
+tests can be individually disabled by setting C<skip: 1> under the test's key
+in C<author.yml>.
 
 =head2 mb_class
 
@@ -544,6 +533,20 @@ useful for C<Win32::> type dists that aren't testable on Unixy platforms.
 
 If set to false, then the dist MUST NOT be released on MSWin32.  This
 is a personal preference; I prefer not to release on non-Unixy platforms.
+
+=head2 clean
+
+Extra files or directories to remove on C<dzil clean>, in addition to the usual
+C<.tmp>, C<_alien> and FFI build artifacts.  Patterns without a C</> are matched
+in any directory, patterns with a C</> are relative to the root of the dist.
+Can be specified multiple times.  Passed into
+L<Author::Plicease::Cleaner|Dist::Zilla::Plugin::Author::Plicease::Cleaner>.
+
+=head2 clean_keep
+
+Regular expressions for paths that should not be removed by C<dzil clean>.  Can be
+specified multiple times.  Passed into
+L<Author::Plicease::Cleaner|Dist::Zilla::Plugin::Author::Plicease::Cleaner>.
 
 =head1 SEE ALSO
 

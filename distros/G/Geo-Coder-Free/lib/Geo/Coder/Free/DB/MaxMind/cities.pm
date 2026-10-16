@@ -2,6 +2,7 @@ package Geo::Coder::Free::DB::MaxMind::cities;
 
 use strict;
 use warnings;
+use autodie qw(:all);
 
 =head1 NAME
 
@@ -9,15 +10,13 @@ Geo::Coder::Free::DB::MaxMind::cities - driver for https://www.maxmind.com/en/fr
 
 =head1 VERSION
 
-Version 0.42
+Version 0.46
 
 =cut
 
-our $VERSION = '0.42';
+our $VERSION = '0.46';
 
-use Database::Abstraction;
-
-our @ISA = ('Database::Abstraction');
+use parent 'Database::Abstraction';
 
 sub _open {
 	my $self = shift;

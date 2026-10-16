@@ -10,6 +10,8 @@ my %modules;
 my $post_diag;
 
 $modules{$_} = $_ for qw(
+  CPAN::Uploader
+  Capture::Tiny
   Class::Method::Modifiers
   Config::INI::Reader
   Data::Section

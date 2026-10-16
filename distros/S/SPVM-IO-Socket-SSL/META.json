@@ -33,11 +33,11 @@
       "runtime" : {
          "requires" : {
             "SPVM" : "0.990102",
-            "SPVM::Go" : "0.019",
-            "SPVM::IO" : "0.248",
-            "SPVM::Net::SSLeay" : "0.042",
-            "SPVM::Regex" : "0.246",
-            "SPVM::Sys" : "0.528"
+            "SPVM::Go" : "0.047",
+            "SPVM::IO" : "0.255",
+            "SPVM::Net::SSLeay" : "0.047",
+            "SPVM::Regex" : "0.262",
+            "SPVM::Sys" : "0.584"
          }
       },
       "test" : {
@@ -56,6 +56,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM-IO-Socket-SSL"
       }
    },
-   "version" : "0.020",
+   "version" : "0.021",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

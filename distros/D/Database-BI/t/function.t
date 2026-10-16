@@ -2747,5 +2747,571 @@ subtest '_grouped_totals -- fold returns same keys as push for bar chart (order-
 	}
 };
 
+# ============================================================================
+# PART 3: Database::BI::Calc
+# ============================================================================
+# t/calc.t covers arithmetic, comparison, IF, string/numeric/date functions,
+# bin(), the column whitelist, error cases, depth limit, and security.
+# This section targets areas NOT in t/calc.t:
+#   - date_normalise() standalone helper (completely untested elsewhere)
+#   - evaluate() returning undef when _code is absent
+#   - memory-cycle safety of compiled Calc objects
+
+use_ok('Database::BI::Calc');
+
+# ---------------------------------------------------------------------------
+# date_normalise() -- standalone ISO-8601 conversion helper
+# ---------------------------------------------------------------------------
+
+subtest 'Calc::date_normalise -- %m/%d/%Y US format' => sub {
+	# Standard US slash-date; leading zeros optional.
+	is Database::BI::Calc::date_normalise('01/15/2026', '%m/%d/%Y'), '2026-01-15',
+		'converts January 15 2026 from US format';
+	is Database::BI::Calc::date_normalise('12/31/1999', '%m/%d/%Y'), '1999-12-31',
+		'converts Dec 31 1999 from US format';
+	is Database::BI::Calc::date_normalise('3/7/2025',   '%m/%d/%Y'), '2025-03-07',
+		'handles single-digit month and day';
+
+	# Wrong separator makes the regex fail -- must return undef.
+	is Database::BI::Calc::date_normalise('01-15-2026', '%m/%d/%Y'), undef,
+		'wrong separator (hyphens) fails %m/%d/%Y regex (returns undef)';
+};
+
+subtest 'Calc::date_normalise -- %d/%m/%Y EU format' => sub {
+	is Database::BI::Calc::date_normalise('15/01/2026', '%d/%m/%Y'), '2026-01-15',
+		'converts day/month/year in EU format';
+	is Database::BI::Calc::date_normalise('31/12/1999', '%d/%m/%Y'), '1999-12-31',
+		'converts Dec 31 1999 from EU format';
+	is Database::BI::Calc::date_normalise('1/6/2025',   '%d/%m/%Y'), '2025-06-01',
+		'handles single-digit day and month in EU format';
+
+	# Wrong separator must cause regex failure.
+	is Database::BI::Calc::date_normalise('15-01-2026', '%d/%m/%Y'), undef,
+		'wrong separator (hyphens) fails %d/%m/%Y regex (returns undef)';
+};
+
+subtest 'Calc::date_normalise -- %d-%b-%Y DD-Mon-YYYY format' => sub {
+	is Database::BI::Calc::date_normalise('15-Jan-2026', '%d-%b-%Y'), '2026-01-15',
+		'converts DD-Mon-YYYY with mixed-case abbreviation';
+	is Database::BI::Calc::date_normalise('01-DEC-1999', '%d-%b-%Y'), '1999-12-01',
+		'case-insensitive month abbreviation (DEC)';
+	is Database::BI::Calc::date_normalise('7-oct-2024',  '%d-%b-%Y'), '2024-10-07',
+		'lowercase month abbreviation accepted';
+
+	# Invalid month abbreviation must return undef, not crash.
+	is Database::BI::Calc::date_normalise('15-Xxx-2026', '%d-%b-%Y'), undef,
+		'unknown month abbreviation returns undef';
+	# Slash separator does not match hyphen-based pattern.
+	is Database::BI::Calc::date_normalise('15/Jan/2026', '%d-%b-%Y'), undef,
+		'slash-separated date does not match %d-%b-%Y';
+};
+
+subtest 'Calc::date_normalise -- undef / empty / unknown pattern edge cases' => sub {
+	# Guard clauses: undef or empty inputs must return undef safely.
+	is Database::BI::Calc::date_normalise(undef, '%m/%d/%Y'), undef,
+		'undef value returns undef';
+	is Database::BI::Calc::date_normalise('',    '%m/%d/%Y'), undef,
+		'empty string returns undef';
+	is Database::BI::Calc::date_normalise('01/15/2026', undef), undef,
+		'undef pattern returns undef';
+	# An unsupported pattern silently returns undef (no croak).
+	is Database::BI::Calc::date_normalise('01/15/2026', '%Y-%m-%d'), undef,
+		'unsupported pattern returns undef (does not croak)';
+};
+
+subtest 'Calc::evaluate -- returns undef when object has a compile error (_code is undef)' => sub {
+	# When new() fails to parse, _code stays undef.  evaluate() must not croak;
+	# it must return undef so callers can treat runtime errors uniformly.
+	my $bad = Database::BI::Calc->new(expr => 'qty % 2', columns => ['qty']);
+	ok $bad->has_error, 'compile error set on bad expression';
+	is $bad->evaluate({ qty => 10 }), undef,
+		'evaluate() returns undef on object with compile error (no croak)';
+};
+
+subtest 'Calc::evaluate -- runtime division by zero returns undef, does not croak' => sub {
+	my $c = Database::BI::Calc->new(expr => 'amount / qty', columns => ['amount', 'qty']);
+	ok !$c->has_error, 'expression compiles cleanly';
+	is $c->evaluate({ amount => 100, qty => 0 }), undef,
+		'division by zero yields undef at runtime';
+};
+
+subtest 'Calc -- memory cycle check on compiled object' => sub {
+	# Ensure the closure tree created by new() does not form a reference cycle
+	# that would prevent garbage collection.
+	my $c = Database::BI::Calc->new(
+		expr    => 'if(amount > 0, round(amount * 1.1, 2), 0)',
+		columns => ['amount'],
+	);
+	ok !$c->has_error, 'expression compiles for memory-cycle check';
+	memory_cycle_ok($c, 'no reference cycles in compiled Calc object');
+};
+
+# ============================================================================
+# PART 4: new chart-view endpoints (scatter / stacked / combo / treemap / histogram)
+# ============================================================================
+# All tests use the $t Test::Mojo instance and data/sales.csv (6 rows:
+# product, region, amount, date) as the data source.  Only the error-path
+# tests and basic smoke tests are included here; full pipeline tests live in
+# t/integration.t.  The primary goal is 60%+ negative coverage.
+
+{
+	use Mojo::Util qw(url_escape);
+	Readonly my $SALES_SPEC => url_escape('table:sales');
+
+# ---------------------------------------------------------------------------
+# scatter_view
+# ---------------------------------------------------------------------------
+
+subtest 'scatter_view -- missing x= returns 400' => sub {
+	$t->get_ok("/scatter?l=$SALES_SPEC&y=amount")
+	  ->status_is(400)
+	  ->content_like(qr/Missing x=/i,
+		'missing x= produces 400 with descriptive message');
+};
+
+subtest 'scatter_view -- missing y= returns 400' => sub {
+	$t->get_ok("/scatter?l=$SALES_SPEC&x=amount")
+	  ->status_is(400)
+	  ->content_like(qr/Missing y=/i,
+		'missing y= produces 400 with descriptive message');
+};
+
+subtest 'scatter_view -- unknown x column returns 400' => sub {
+	SKIP: {
+		skip 'data/sales.csv not found', 2 unless -f 'data/sales.csv';
+		$t->get_ok("/scatter?l=$SALES_SPEC&x=no_such_col&y=amount")
+		  ->status_is(400)
+		  ->content_like(qr/Column not found.*no_such_col/i,
+			'unknown x column yields 400');
+	}
+};
+
+subtest 'scatter_view -- unknown colour scheme with series= returns 400' => sub {
+	SKIP: {
+		skip 'data/sales.csv not found', 2 unless -f 'data/sales.csv';
+		$t->get_ok("/scatter?l=$SALES_SPEC&x=amount&y=amount&series=region&scheme=bogus")
+		  ->status_is(400)
+		  ->content_like(qr/Unknown colour scheme/i,
+			'unrecognised scheme with series= yields 400');
+	}
+};
+
+subtest 'scatter_view -- valid render returns 200 with SVG' => sub {
+	SKIP: {
+		skip 'data/sales.csv not found', 2 unless -f 'data/sales.csv';
+		$t->get_ok("/scatter?l=$SALES_SPEC&x=amount&y=amount")
+		  ->status_is(200)
+		  ->content_like(qr/<svg/i,
+			'valid scatter request renders an SVG element');
+	}
+};
+
+# ---------------------------------------------------------------------------
+# stacked_view
+# ---------------------------------------------------------------------------
+
+subtest 'stacked_view -- missing cat= returns 400' => sub {
+	$t->get_ok("/stacked?l=$SALES_SPEC&series=region")
+	  ->status_is(400)
+	  ->content_like(qr/Missing cat=/i,
+		'missing cat= yields 400');
+};
+
+subtest 'stacked_view -- missing series= returns 400' => sub {
+	$t->get_ok("/stacked?l=$SALES_SPEC&cat=region")
+	  ->status_is(400)
+	  ->content_like(qr/Missing series=/i,
+		'missing series= yields 400');
+};
+
+subtest 'stacked_view -- unknown cat column returns 400' => sub {
+	SKIP: {
+		skip 'data/sales.csv not found', 2 unless -f 'data/sales.csv';
+		$t->get_ok("/stacked?l=$SALES_SPEC&cat=no_such&series=region")
+		  ->status_is(400)
+		  ->content_like(qr/Column not found/i,
+			'unknown cat column yields 400');
+	}
+};
+
+subtest 'stacked_view -- valid render returns 200 with SVG' => sub {
+	SKIP: {
+		skip 'data/sales.csv not found', 2 unless -f 'data/sales.csv';
+		$t->get_ok("/stacked?l=$SALES_SPEC&cat=region&series=product")
+		  ->status_is(200)
+		  ->content_like(qr/<svg/i,
+			'valid stacked request renders an SVG element');
+	}
+};
+
+# ---------------------------------------------------------------------------
+# combo_view
+# ---------------------------------------------------------------------------
+
+subtest 'combo_view -- missing cat= returns 400' => sub {
+	$t->get_ok("/combo?l=$SALES_SPEC&bar=amount&line=amount")
+	  ->status_is(400)
+	  ->content_like(qr/Missing cat=/i,
+		'missing cat= yields 400');
+};
+
+subtest 'combo_view -- missing bar= returns 400' => sub {
+	$t->get_ok("/combo?l=$SALES_SPEC&cat=region&line=amount")
+	  ->status_is(400)
+	  ->content_like(qr/Missing bar=/i,
+		'missing bar= yields 400');
+};
+
+subtest 'combo_view -- missing line= returns 400' => sub {
+	$t->get_ok("/combo?l=$SALES_SPEC&cat=region&bar=amount")
+	  ->status_is(400)
+	  ->content_like(qr/Missing line=/i,
+		'missing line= yields 400');
+};
+
+subtest 'combo_view -- valid render returns 200 with SVG' => sub {
+	SKIP: {
+		skip 'data/sales.csv not found', 2 unless -f 'data/sales.csv';
+		$t->get_ok("/combo?l=$SALES_SPEC&cat=region&bar=amount&line=amount")
+		  ->status_is(200)
+		  ->content_like(qr/<svg/i,
+			'valid combo request renders an SVG element');
+	}
+};
+
+# ---------------------------------------------------------------------------
+# treemap_view
+# ---------------------------------------------------------------------------
+
+subtest 'treemap_view -- missing group= returns 400' => sub {
+	$t->get_ok("/treemap?l=$SALES_SPEC")
+	  ->status_is(400)
+	  ->content_like(qr/Missing group=/i,
+		'missing group= yields 400');
+};
+
+subtest 'treemap_view -- ?color= returns 400 (not yet implemented)' => sub {
+	SKIP: {
+		skip 'data/sales.csv not found', 2 unless -f 'data/sales.csv';
+		$t->get_ok("/treemap?l=$SALES_SPEC&group=region&color=amount")
+		  ->status_is(400)
+		  ->content_like(qr/color.*not.*supported|not.*supported.*color/i,
+			'?color= parameter yields 400 (use ?scheme= instead)');
+	}
+};
+
+subtest 'treemap_view -- unknown group column returns 400' => sub {
+	SKIP: {
+		skip 'data/sales.csv not found', 2 unless -f 'data/sales.csv';
+		$t->get_ok("/treemap?l=$SALES_SPEC&group=no_such_col")
+		  ->status_is(400)
+		  ->content_like(qr/Column not found/i,
+			'unknown group column yields 400');
+	}
+};
+
+subtest 'treemap_view -- valid render returns 200 with SVG' => sub {
+	SKIP: {
+		skip 'data/sales.csv not found', 2 unless -f 'data/sales.csv';
+		$t->get_ok("/treemap?l=$SALES_SPEC&group=region&size=amount")
+		  ->status_is(200)
+		  ->content_like(qr/<svg/i,
+			'valid treemap request renders an SVG element');
+	}
+};
+
+# ---------------------------------------------------------------------------
+# histogram_view
+# ---------------------------------------------------------------------------
+
+subtest 'histogram_view -- missing col= returns 400' => sub {
+	$t->get_ok("/histogram?l=$SALES_SPEC")
+	  ->status_is(400)
+	  ->content_like(qr/Missing col=/i,
+		'missing col= yields 400');
+};
+
+subtest 'histogram_view -- unknown col returns 400' => sub {
+	SKIP: {
+		skip 'data/sales.csv not found', 2 unless -f 'data/sales.csv';
+		$t->get_ok("/histogram?l=$SALES_SPEC&col=no_such_col")
+		  ->status_is(400)
+		  ->content_like(qr/Column not found/i,
+			'unknown col yields 400');
+	}
+};
+
+subtest 'histogram_view -- bins clamped to 200 maximum (does not crash)' => sub {
+	SKIP: {
+		skip 'data/sales.csv not found', 2 unless -f 'data/sales.csv';
+		# bins=99999 must be clamped to 200 internally; the response must be 200
+		# or the "No plottable data" message, never a 500 or crash.
+		$t->get_ok("/histogram?l=$SALES_SPEC&col=amount&bins=99999")
+		  ->status_is(200, 'bins=99999 clamped to 200, no server error');
+	}
+};
+
+subtest 'histogram_view -- bins clamped to 1 minimum (does not crash)' => sub {
+	SKIP: {
+		skip 'data/sales.csv not found', 2 unless -f 'data/sales.csv';
+		$t->get_ok("/histogram?l=$SALES_SPEC&col=amount&bins=0")
+		  ->status_is(200, 'bins=0 clamped to 1, no server error');
+	}
+};
+
+subtest 'histogram_view -- valid render returns 200 with SVG' => sub {
+	SKIP: {
+		skip 'data/sales.csv not found', 2 unless -f 'data/sales.csv';
+		$t->get_ok("/histogram?l=$SALES_SPEC&col=amount&bins=5")
+		  ->status_is(200)
+		  ->content_like(qr/<svg/i,
+			'valid histogram request renders an SVG element');
+	}
+};
+
+} # end url_escape scope
+
+# ============================================================================
+# PART 5: calc / groups / dates CRUD endpoints
+# ============================================================================
+# Isolate the model store in a fresh tempdir so these tests never touch
+# .bi/models.json in the working directory.
+
+{
+	my $MODEL_DIR = tempdir(CLEANUP => 1);
+	$t->app->config->{model_dir} = $MODEL_DIR;
+
+	Readonly my $TEST_SPEC => 'table:sales';
+
+# ---------------------------------------------------------------------------
+# calc_list / calc_save / calc_delete
+# ---------------------------------------------------------------------------
+
+subtest 'calc_list -- l= required, returns 400 when absent' => sub {
+	$t->get_ok('/calc/list')
+	  ->status_is(400)
+	  ->json_is('/error', 'l= required',
+		'GET /calc/list without l= returns 400 with error message');
+};
+
+subtest 'calc_save -- l= required, returns 400 when absent' => sub {
+	$t->post_ok('/calc/save', form => { name => 'profit', expr => 'amount * 2' })
+	  ->status_is(400)
+	  ->json_is('/error', 'l= required',
+		'POST /calc/save without l= returns 400');
+};
+
+subtest 'calc_save -- invalid name (spaces) returns 400' => sub {
+	$t->post_ok('/calc/save',
+		form => { l => $TEST_SPEC, name => 'bad name', expr => 'amount * 2' })
+	  ->status_is(400)
+	  ->json_like('/error', qr/not a valid identifier/i,
+		'calc name with spaces is rejected with 400');
+};
+
+subtest 'calc_save -- name with leading digit returns 400' => sub {
+	$t->post_ok('/calc/save',
+		form => { l => $TEST_SPEC, name => '1profit', expr => 'amount * 2' })
+	  ->status_is(400)
+	  ->json_like('/error', qr/not a valid identifier/i,
+		'calc name starting with digit is rejected with 400');
+};
+
+subtest 'calc_save -- expr= required, returns 400 when absent' => sub {
+	$t->post_ok('/calc/save', form => { l => $TEST_SPEC, name => 'profit' })
+	  ->status_is(400)
+	  ->json_is('/error', 'expr= required',
+		'POST /calc/save without expr= returns 400');
+};
+
+subtest 'calc_save / calc_list / calc_delete -- full roundtrip' => sub {
+	# Store two calc fields, retrieve them, then delete one and verify.
+
+	$t->post_ok('/calc/save',
+		form => { l => $TEST_SPEC, name => 'double', expr => 'amount * 2' })
+	  ->status_is(200)
+	  ->json_is('/ok', 1, 'first calc field saved');
+
+	$t->post_ok('/calc/save',
+		form => { l => $TEST_SPEC, name => 'halved', expr => 'amount / 2' })
+	  ->status_is(200)
+	  ->json_is('/ok', 1, 'second calc field saved');
+
+	my $list = $t->get_ok("/calc/list?l=$TEST_SPEC")
+	             ->status_is(200)->tx->res->json;
+	ok exists $list->{fields}{double}, 'calc_list returns first field';
+	ok exists $list->{fields}{halved}, 'calc_list returns second field';
+	is $list->{fields}{double}, 'amount * 2', 'stored expression matches';
+
+	$t->post_ok('/calc/delete', form => { l => $TEST_SPEC, name => 'double' })
+	  ->status_is(200)
+	  ->json_is('/ok', 1, 'first field deleted');
+
+	my $after = $t->get_ok("/calc/list?l=$TEST_SPEC")
+	              ->status_is(200)->tx->res->json;
+	ok !exists $after->{fields}{double}, 'deleted field absent from list';
+	ok  exists $after->{fields}{halved}, 'remaining field still present';
+};
+
+subtest 'calc_delete -- l= required, returns 400 when absent' => sub {
+	$t->post_ok('/calc/delete', form => { name => 'whatever' })
+	  ->status_is(400)
+	  ->json_is('/error', 'l= required',
+		'POST /calc/delete without l= returns 400');
+};
+
+# ---------------------------------------------------------------------------
+# groups_list / groups_save / groups_delete
+# ---------------------------------------------------------------------------
+
+subtest 'groups_list -- l= required, returns 400 when absent' => sub {
+	$t->get_ok('/groups/list')
+	  ->status_is(400)
+	  ->json_is('/error', 'l= required',
+		'GET /groups/list without l= returns 400');
+};
+
+subtest 'groups_save -- l= required, returns 400 when absent' => sub {
+	$t->post_ok('/groups/save',
+		form => { col => 'region', group => 'North-East', values => 'North' })
+	  ->status_is(400)
+	  ->json_is('/error', 'l= required',
+		'POST /groups/save without l= returns 400');
+};
+
+subtest 'groups_save -- col= required, returns 400 when absent' => sub {
+	$t->post_ok('/groups/save',
+		form => { l => $TEST_SPEC, group => 'NE', values => 'North' })
+	  ->status_is(400)
+	  ->json_is('/error', 'col= required',
+		'POST /groups/save without col= returns 400');
+};
+
+subtest 'groups_save -- group= required, returns 400 when absent' => sub {
+	$t->post_ok('/groups/save',
+		form => { l => $TEST_SPEC, col => 'region', values => 'North' })
+	  ->status_is(400)
+	  ->json_is('/error', 'group= required',
+		'POST /groups/save without group= returns 400');
+};
+
+subtest 'groups_save / groups_list / groups_delete -- full roundtrip' => sub {
+	$t->post_ok('/groups/save',
+		form => {
+			l      => $TEST_SPEC,
+			col    => 'region',
+			group  => 'North-East',
+			values => ['North', 'East'],
+		})
+	  ->status_is(200)
+	  ->json_is('/ok', 1, 'group saved');
+
+	# groups_list returns { groups: { col: { group_name: [values] } } }
+	my $list = $t->get_ok("/groups/list?l=$TEST_SPEC")
+	             ->status_is(200)->tx->res->json;
+	ok exists $list->{groups}{region}{'North-East'}, 'group appears in list after save';
+
+	$t->post_ok('/groups/delete',
+		form => { l => $TEST_SPEC, col => 'region', group => 'North-East' })
+	  ->status_is(200)
+	  ->json_is('/ok', 1, 'group deleted');
+
+	my $after = $t->get_ok("/groups/list?l=$TEST_SPEC")
+	              ->status_is(200)->tx->res->json;
+	ok !exists($after->{groups}{region}{'North-East'}), 'deleted group absent after delete';
+};
+
+subtest 'groups_delete -- deletes all groups for spec when only l= given' => sub {
+	# Save two groups, then delete with only l= (no col or group).
+	$t->post_ok('/groups/save',
+		form => { l => $TEST_SPEC, col => 'product', group => 'Group-A', values => 'Widget' })
+	  ->status_is(200);
+
+	$t->post_ok('/groups/delete', form => { l => $TEST_SPEC })
+	  ->status_is(200)
+	  ->json_is('/ok', 1, 'all groups for spec deleted');
+
+	my $after = $t->get_ok("/groups/list?l=$TEST_SPEC")
+	              ->status_is(200)->tx->res->json;
+	is_deeply $after->{groups}, {}, 'group store is empty after full-spec delete';
+};
+
+# ---------------------------------------------------------------------------
+# dates_list / dates_save / dates_delete
+# ---------------------------------------------------------------------------
+
+subtest 'dates_list -- l= required, returns 400 when absent' => sub {
+	$t->get_ok('/dates/list')
+	  ->status_is(400)
+	  ->json_is('/error', 'l= required',
+		'GET /dates/list without l= returns 400');
+};
+
+subtest 'dates_save -- l= required, returns 400 when absent' => sub {
+	$t->post_ok('/dates/save', form => { col => 'date', pattern => '%m/%d/%Y' })
+	  ->status_is(400)
+	  ->json_is('/error', 'l= required',
+		'POST /dates/save without l= returns 400');
+};
+
+subtest 'dates_save -- col= required, returns 400 when absent' => sub {
+	$t->post_ok('/dates/save', form => { l => $TEST_SPEC, pattern => '%m/%d/%Y' })
+	  ->status_is(400)
+	  ->json_is('/error', 'col= required',
+		'POST /dates/save without col= returns 400');
+};
+
+subtest 'dates_save -- unsupported pattern returns 400' => sub {
+	$t->post_ok('/dates/save',
+		form => { l => $TEST_SPEC, col => 'date', pattern => '%Y-%m-%d' })
+	  ->status_is(400)
+	  ->json_like('/error', qr/unsupported|not.*supported|pattern/i,
+		'unsupported date pattern returns 400');
+};
+
+subtest 'dates_save -- unknown pattern string returns 400' => sub {
+	$t->post_ok('/dates/save',
+		form => { l => $TEST_SPEC, col => 'date', pattern => 'YYYYMMDD' })
+	  ->status_is(400, 'arbitrary unknown pattern string yields 400');
+};
+
+subtest 'dates_save / dates_list / dates_delete -- full roundtrip for all three allowed patterns' => sub {
+	# Verify all three documented patterns can be stored and retrieved.
+	for my $pat ('%m/%d/%Y', '%d/%m/%Y', '%d-%b-%Y') {
+		$t->post_ok('/dates/save',
+			form => { l => $TEST_SPEC, col => 'date', pattern => $pat })
+		  ->status_is(200)
+		  ->json_is('/ok', 1, "pattern $pat saved OK");
+
+		my $list = $t->get_ok("/dates/list?l=$TEST_SPEC")
+		             ->status_is(200)->tx->res->json;
+		is $list->{patterns}{date}, $pat, "list shows saved pattern $pat for col=date";
+
+		$t->post_ok('/dates/delete', form => { l => $TEST_SPEC, col => 'date' })
+		  ->status_is(200)
+		  ->json_is('/ok', 1, "pattern $pat deleted");
+	}
+};
+
+subtest 'dates_delete -- deletes all patterns for spec when col= absent' => sub {
+	$t->post_ok('/dates/save',
+		form => { l => $TEST_SPEC, col => 'start', pattern => '%m/%d/%Y' })
+	  ->status_is(200);
+	$t->post_ok('/dates/save',
+		form => { l => $TEST_SPEC, col => 'end', pattern => '%d/%m/%Y' })
+	  ->status_is(200);
+
+	# Delete without col= clears all patterns for this spec.
+	$t->post_ok('/dates/delete', form => { l => $TEST_SPEC })
+	  ->status_is(200)
+	  ->json_is('/ok', 1, 'all date patterns for spec deleted');
+
+	my $after = $t->get_ok("/dates/list?l=$TEST_SPEC")
+	              ->status_is(200)->tx->res->json;
+	is_deeply $after->{patterns}, {}, 'pattern store is empty after full-spec delete';
+};
+
+} # end MODEL_DIR scope
+
 done_testing();
 

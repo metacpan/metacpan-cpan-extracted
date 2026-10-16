@@ -1,5 +1,9 @@
 Revision history for Mojolicious-Plugin-OpenAPI-Modern
 
+0.022     2026-10-15 21:18:11Z
+          - remove some unnecessary and redundant prerequisite declarations
+          - switch to the non-deprecated forms of OpenAPI::Modern accessors
+
 0.021     2026-04-21 16:57:49Z
           - fix a missing prereq declaration
 

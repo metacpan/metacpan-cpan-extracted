@@ -1,25 +1,30 @@
 -- Local override of the xmake-repo package recipe for libsdl3_ttf.
 --
 -- Deviations from packages/l/libsdl3_ttf/xmake.lua in xmake-repo:
---   * freetype is forced to a SHARED build. A static libfreetype.a (xmake-built
---     or Homebrew) records its own deps (-lz, -lbz2, -lpng16, ...) only as
---     link-time requirements that neither librarydeps() nor a bare pkg-config
---     call surfaces on CI (no pkg-config on macOS runners; xmake's freetype2.pc
---     is not on PKG_CONFIG_PATH). A shared libfreetype carries those deps
---     itself, so linking a SHARED libsdl3_ttf needs no extra transitive
---     libraries on any platform. (The consumer installs this package with
---     kind => 'shared' for FFI via Affix.)
+--   * freetype is built STATIC with every optional codec disabled
+--     (zlib/bzip2/png/woff2/harfbuzz). An earlier revision forced a SHARED
+--     freetype so libsdl3_ttf would not have to surface freetype's own deps,
+--     but that made libfreetype a *runtime* dependency of the SHARED
+--     libsdl3_ttf -- and the FFI consumer (Affix, which dlopens libpath) has no
+--     way to put the freetype dylib/DLL on the loader path. t/02_affix.t loads
+--     every package exactly that way, so on macOS (and on Windows source
+--     builds) SDL3_ttf failed to dlopen while SDL3/image/mixer loaded. A static
+--     freetype with no vendored codecs has no transitive libs to surface, so it
+--     links into libsdl3_ttf cleanly and leaves it self-contained. (The
+--     consumer installs this package with kind => 'shared' for FFI via Affix.)
 --   * on_install passes -DFREETYPE_INCLUDE_DIR_ft2build and
 --     -DFREETYPE_INCLUDE_DIR_freetype2 instead of the single
 --     -DFREETYPE_INCLUDE_DIRS that CMake's FindFreetype ignores.
 --   * on Windows, "freetype" is added to the `packagedeps` of the cmake install
 --     so xmake generates a FindFreetype module for CMake; hand-passed
 --     -DFREETYPE_* cache vars otherwise get lost on some toolchains.
---   * freetype's `zlib` config is disabled (default is true). With it enabled the
---     freetype build on Windows only passes -DZLIB_* vars when its zlib dep
+--   * freetype's optional codec configs are all disabled (zlib defaults to true;
+--     bzip2/png/woff2/harfbuzz default to false but are pinned off here so a
+--     future xmake-repo bump cannot quietly re-enable one). With zlib enabled
+--     the freetype build on Windows only passes -DZLIB_* vars when its zlib dep
 --     resolves non-system; when it doesn't, CMake's `find_package(ZLIB REQUIRED)`
---     fails the whole install. TTF itself needs no gzip'd font support, so disable
---     zlib to keep the freetype build self-contained everywhere.
+--     fails the whole install. TTF needs none of them, and turning them all off
+--     is what lets libfreetype stay static without transitive libs.
 --   * adds a Windows/vcpkg extsource plus an on_fetch gate that refuses it
 --     unless the system core passes the core recipe's own version gate.
 -- Keep this file in sync with the upstream recipe when bumping versions.
@@ -86,16 +91,17 @@ package("libsdl3_ttf")
     -- broke the Windows/ARM leg (issue #3), so keep it off that platform too.
     if not is_plat("windows") then
         add_deps("cmake")
-        -- Freetype must be shared AND built from source. A STATIC libfreetype.a
-        -- (xmake-built or Homebrew) records its own deps (-lz, -lbz2, ...) only as
-        -- link-time requirements that neither librarydeps() nor a bare pkg-config
-        -- call surfaces on CI (no pkg-config on macOS runners; xmake's freetype2.pc
-        -- is not on PKG_CONFIG_PATH). A shared libfreetype carries those deps
-        -- itself, so linking a SHARED libsdl3_ttf needs no extra transitive
-        -- libraries anywhere. `system = false` keeps xmake from satisfying freetype
-        -- from a Homebrew/apt static lib despite the shared config (the fetch would
-        -- otherwise prefer the system source and return its static archive).
-        add_deps("freetype", {configs = {shared = true, zlib = false}, system = false})
+        -- Freetype is built STATIC with its optional codecs disabled, so the
+        -- SHARED libsdl3_ttf carries no runtime freetype dependency and Affix can
+        -- dlopen it (see the header). With zlib/bzip2/png/woff2/harfbuzz all off,
+        -- libfreetype.a has no transitive libs for the link to surface -- the
+        -- problem that led an earlier revision to force freetype shared instead.
+        -- `system = false` keeps a Homebrew/apt freetype (possibly shared, or a
+        -- static archive built against a different CRT) out of the build.
+        add_deps("freetype", {
+            configs = {shared = false, zlib = false, bzip2 = false, png = false, woff2 = false, harfbuzz = false},
+            system  = false,
+        })
     end
 
     add_configs("harfbuzz", {description = "Use harfbuzz to improve text shaping", default = false, type = "boolean"})
@@ -250,6 +256,31 @@ package("libsdl3_ttf")
                 local libfiles = table.wrap(fetchinfo.libfiles)
                 if #libfiles > 0 then
                     table.insert(configs, "-DFREETYPE_LIBRARY=" .. libfiles[1])
+                end
+                if not freetype:config("shared") then
+                    -- Static freetype: CMake records its transitive libraries only
+                    -- as link-time requirements, so splice the ones xmake knows
+                    -- about onto the Freetype::Freetype link line (the same fix
+                    -- the upstream recipe carries). A no-op while every optional
+                    -- codec above stays disabled, but it keeps the link correct
+                    -- if one is ever turned back on.
+                    local deplibs = {}
+                    for _, dep in ipairs(freetype:librarydeps()) do
+                        local depinfo = dep:fetch()
+                        if depinfo then
+                            table.join2(deplibs, depinfo.libfiles)
+                        end
+                    end
+                    if #deplibs > 0 then
+                        local libraries = ""
+                        for _, libfile in ipairs(deplibs) do
+                            libraries = libraries .. " " .. (libfile:gsub("\\", "/"))
+                        end
+                        io.replace("CMakeLists.txt",
+                            "target_link_libraries(${sdl3_ttf_target_name} PRIVATE Freetype::Freetype)",
+                            "target_link_libraries(${sdl3_ttf_target_name} PRIVATE Freetype::Freetype " .. libraries .. ")",
+                            {plain = true})
+                    end
                 end
             end
         end

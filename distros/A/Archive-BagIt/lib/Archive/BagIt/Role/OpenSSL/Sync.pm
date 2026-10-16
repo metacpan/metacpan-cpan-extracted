@@ -4,7 +4,7 @@ use warnings FATAL => 'all';
 use Moo;
 use namespace::autoclean;
 use Net::SSLeay ();
-our $VERSION = '0.101'; # VERSION
+our $VERSION = '0.102'; # VERSION
 # ABSTRACT: handles synchronous digest calculation using openssl
 
 sub BEGIN {
@@ -58,7 +58,7 @@ Archive::BagIt::Role::OpenSSL::Sync - handles synchronous digest calculation usi
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 AVAILABILITY
 
@@ -77,7 +77,7 @@ Andreas Romeyke <cpan@andreas.romeyke.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Rob Schmidt <rjeschmi@gmail.com>, William Wueppelmann and Andreas Romeyke.
+This software is copyright (c) 2026 by Rob Schmidt <rjeschmi@gmail.com>, William Wueppelmann and Andreas Romeyke.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

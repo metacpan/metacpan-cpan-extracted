@@ -1,5 +1,9 @@
 Revision history for App::papersway
 
+3.003     2026-10-15 20:37:18+01:00 Europe/London
+    - New --version option.
+    - Properly handle how i3 tends to reuse container IDs.
+
 3.002     2026-09-27 16:17:00+01:00 Europe/London
     - Fix under-filling after multiple visible columns close.
     - Don't move a column at index 0 when absorbing into it from the right.

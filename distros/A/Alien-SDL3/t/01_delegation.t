@@ -9,7 +9,7 @@ my $sdl3 = Alien::SDL3->new;
 # a source checkout with no generated ConfigData (e.g. running `prove t/` cold).
 SKIP: {
     my $info = $sdl3->package_info;
-    skip 'ConfigData exists (built); delegation already resolves' => 12 if $info;
+    skip 'ConfigData exists (built); delegation already resolves' => 12 if $info || $sdl3->has_snapshot;
     for my $pkg ( $sdl3->package_names ) {
         is $sdl3->libpath($pkg),      undef, "$pkg libpath is undef before install";
         is $sdl3->version($pkg),      undef, "$pkg version is undef before install";
@@ -20,12 +20,23 @@ SKIP: {
     is [ $sdl3->bin_dir ], [], 'bin_dir is empty before install';
 }
 
-# Resolved state (post-build or already-installed) validates the real paths.
+# Resolved state (post-build or already-installed) validates the real paths. Only a
+# genuinely cold checkout (no snapshot at all) may skip: once a snapshot has been
+# written, the core package must resolve, so a missing core fails here instead of
+# skipping. A missing companion library only diagnoses and is skipped.
 SKIP: {
     my $info = $sdl3->package_info;
-    skip 'packages not installed; run `perl Build` first' => 19 unless $info;
+    skip 'packages not installed; run `perl Build` first' => 19 if !$info && !$sdl3->has_snapshot;
+    my ($core) = $sdl3->package_names;
     for my $pkg ( $sdl3->package_names ) {
         my $alt = $sdl3->alt($pkg);
+
+        # Companion libraries (image, ttf, mixer) are optional: a dist where one failed
+        # still exposes the core API, so report the gap and skip rather than fail.
+        if ( !$alt->package_info && $pkg ne $core ) {
+            diag "$pkg is not installed; skipping its checks";
+            next;
+        }
         ok $alt->libpath, "$pkg alt libpath resolved";
         ok $alt->version, "$pkg alt version resolved";
         is $alt->kind, 'library', "$pkg alt kind is library";

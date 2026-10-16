@@ -149,6 +149,7 @@ subtest 'Term::Fabulous runs on it' => sub {
 
 subtest 'sixel pictures' => sub {
 	skip_all 'Imager and Imager::File::SIXEL are not installed' unless eval { require Imager; require Imager::File::SIXEL; 1 };
+	skip_all 'Imager was built without PNG support' unless grep { $_ eq 'png' } Imager->write_types;
 	require Term::Fabulous::Widget::Sixel;
 	my ( $pty, $input, $answers ) = pseudo_terminal( 6, 3 );
 	my $terminal = Term::Fabulous::Terminal::Termbox->new( input => $input, output => $pty->slave );

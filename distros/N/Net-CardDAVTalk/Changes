@@ -1,5 +1,14 @@
 Revision history for Net-CardDAVTalk
 
+0.13    Thu Oct 15 2026
+  - GetContactLinks: parse props inside DAV:propstat, so etags are
+    returned and non-vCard resources and collections are skipped
+    (Jess Robinson)
+  - GetContactLinks returns (\%links, \@errors) in list context;
+    GetContacts passes those errors through
+  - don't die on responses missing a DAV:status in SyncContactLinks
+  - add tests for GetContactLinks, GetContacts and SyncContactLinks
+
 0.12    Mon Aug 31 2026
   - relicensed from Artistic License 2.0 to the same terms as Perl
     itself (Artistic License 1.0 or GPL version 1 or later)

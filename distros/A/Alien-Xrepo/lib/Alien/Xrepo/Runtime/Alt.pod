@@ -1,0 +1,130 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Alien::Xrepo::Runtime::Alt - A package-bound view of an Alien::Xrepo::Runtime
+
+=head1 SYNOPSIS
+
+    my $sdl3 = Exotic::SDL3->new;
+
+    # every accessor defaults to the recipe's primary package
+    $sdl3->cflags;
+
+    # alt() binds the same accessors to another package in the family
+    my $ttf = $sdl3->alt('libsdl3_ttf');
+    $ttf->version;
+    $ttf->cflags;
+    $ttf->libpath;
+
+=head1 DESCRIPTION
+
+C<Alien::Xrepo::Runtime::Alt> is the small adapter L<Alien::Xrepo::Runtime/alt> returns when the requested package is
+not the recipe's primary package. It holds a reference to the owning runtime and a single package name, and forwards
+every consumer accessor to the owner with that name supplied.
+
+It exists so a multi-package Alien can hand a consumer an object whose accessors all answer for one library. This
+mirrors L<Alien::Base>'s C<alt( )> model: an FFI or XS binding written for one library in a family (the SDL3 core, say,
+or its C<ttf> extension) can take an object that does not have to be told which package it is for on every call.
+
+The object is a thin view: it stores no state of its own beyond the package name. Calling C<alt( )> on it returns the
+C<Alt> for another package (or the base runtime, for the primary), so navigation is uniform. Requesting an unknown
+package dies, exactly as it does on the runtime itself.
+
+=head1 CONSTRUCTOR
+
+    my $alt = Alien::Xrepo::Runtime::Alt->new(
+        base => $runtime,          # the owning Alien::Xrepo::Runtime
+        pkg  => 'libsdl3_ttf'      # the package to bind accessors to
+    );
+
+Instances are created for you by L<Alien::Xrepo::Runtime/alt>; there is no reason to construct one directly.
+
+=head1 ATTRIBUTES
+
+=over
+
+=item B<pkg_name>
+
+The single package name this view is bound to. (Compare the runtime's C<package_names( )>, which lists every package in
+the recipe.)
+
+=back
+
+=head1 METHODS
+
+Every method delegates to the owning runtime with B<pkg_name> supplied as the package argument, so each behaves exactly
+like its L<Alien::Xrepo::Runtime> counterpart bound to this one package:
+
+=over
+
+=item C<package_names( )>
+
+=item C<package_info( )>
+
+=item C<alt( [$name] )>
+
+Returns the view for another package (or the base runtime, for the primary).
+
+=item C<version( )>
+
+=item C<kind( )>
+
+=item C<dist_dir( )>
+
+=item C<install_type( )>
+
+=item C<cflags( )>
+
+=item C<cflags_static( )>
+
+=item C<libs( )>
+
+=item C<libs_static( )>
+
+=item C<split_flags( $flags )>
+
+=item C<find_header( $filename )>
+
+=item C<libpath( )>
+
+=item C<ffi_lib( )>
+
+=item C<dynamic_libs( )>
+
+=item C<bin_dir( )>
+
+=item C<prepend_to_path( )>
+
+Prepends this package's binary directories to C<$ENV{PATH}>.
+
+=item C<runtime_deps( )>
+
+=item C<foreign_runtime_deps( )>
+
+=item C<runtime_dep_dirs( )>
+
+=item C<loader_env_var( )>
+
+=item C<runtime_dep_report( )>
+
+=back
+
+=head1 SEE ALSO
+
+L<Alien::Xrepo::Runtime>, L<Alien::Xrepo>, L<Alien::Xrepo::PackageInfo>
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the terms found in the Artistic License
+2. Other copyrights, terms, and conditions may apply to data transmitted through this module.
+
+=head1 AUTHOR
+
+Sanko Robinson L<https://github.com/sanko>
+
+=cut

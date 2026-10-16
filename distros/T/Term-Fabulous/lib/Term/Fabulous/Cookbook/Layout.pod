@@ -87,7 +87,7 @@ This program is shipped as F<examples/cookbook/width-group.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-width-group.svg" alt="Three label and value rows whose values start in the same column"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-width-group.svg" alt="Three label and value rows whose values start in the same column"></p>
 
 =end html
 
@@ -176,7 +176,7 @@ This program is shipped as F<examples/cookbook/border-sides.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-border-sides.svg" alt="Three boxes: double and single rules above and below, a heavy top edge, and a thick left edge"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-border-sides.svg" alt="Three boxes: double and single rules above and below, a heavy top edge, and a thick left edge"></p>
 
 =end html
 
@@ -326,7 +326,7 @@ theme file is F<examples/themes/ocean.kdl>:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-theme-switch.svg" alt="The ocean theme after two presses of F2: teal text on a dark blue background, a text field holding Light and readable, and a Save button with a teal border"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-theme-switch.svg" alt="The ocean theme after two presses of F2: teal text on a dark blue background, a text field holding Light and readable, and a Save button with a teal border"></p>
 
 =end html
 
@@ -438,7 +438,7 @@ This program is shipped as F<examples/cookbook/theme-editor-preview.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-theme-editor-preview.svg" alt="The theme editor drawn in the light theme, its preview showing a sign-in form in the dark theme being edited: an e-mail field with an invalid address in red, a password field, a check box and Sign in and Cancel buttons; the form on the right lists the palette"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-theme-editor-preview.svg" alt="The theme editor drawn in the light theme, its preview showing a sign-in form in the dark theme being edited: an e-mail field with an invalid address in red, a password field, a check box and Sign in and Cancel buttons; the form on the right lists the palette"></p>
 
 =end html
 
@@ -540,7 +540,7 @@ This program is shipped as F<examples/cookbook/states-and-classes.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-states-and-classes.svg" alt="A menu of three items with Save in the selected color, followed by the states and classes of each item"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-states-and-classes.svg" alt="A menu of three items with Save in the selected color, followed by the states and classes of each item"></p>
 
 =end html
 
@@ -654,7 +654,7 @@ This program is shipped as F<examples/cookbook/resize-aware-layout.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-resize-aware-layout.svg" alt="The Inbox and Message panes side by side on a terminal 80 columns wide"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-resize-aware-layout.svg" alt="The Inbox and Message panes side by side on a terminal 80 columns wide"></p>
 
 =end html
 
@@ -662,7 +662,7 @@ The same program on a terminal 60 columns wide:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-resize-aware-layout-narrow.svg" alt="The Inbox and Message panes above each other on a terminal 60 columns wide"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-resize-aware-layout-narrow.svg" alt="The Inbox and Message panes above each other on a terminal 60 columns wide"></p>
 
 =end html
 

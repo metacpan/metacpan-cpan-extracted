@@ -9,7 +9,7 @@ use Object::Pad 0.825;
 
 use Term::Fabulous::Widget::Display;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 class Term::Fabulous::Widget::Spinner
 	:isa(Term::Fabulous::Widget::Display)
@@ -233,7 +233,7 @@ Term::Fabulous::Widget::Spinner - Show that something is going on
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-spinner.svg" alt="Spinners in every style, each with its name: dots, line, arc, circle, arrow, box, pulse and bar in one cell, dots3, bounce and wave in several, and the three-row ring; a stopped one and one with frames of its own"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-spinner.svg" alt="Spinners in every style, each with its name: dots, line, arc, circle, arrow, box, pulse and bar in one cell, dots3, bounce and wave in several, and the three-row ring; a stopped one and one with frames of its own"></p>
 
 =end html
 

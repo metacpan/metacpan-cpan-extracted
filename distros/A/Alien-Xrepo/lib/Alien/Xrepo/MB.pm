@@ -1,6 +1,6 @@
 use v5.40;
 
-package Alien::Xrepo::MB v1.0.6 {
+package Alien::Xrepo::MB v1.0.8 {
     use Alien::Xrepo::Build;
     use Alien::Xrepo::Build::Dist;
     use Path::Tiny;

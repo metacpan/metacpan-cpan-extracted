@@ -6,7 +6,7 @@ use warnings;
 
 use Context::Vars ();
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 1;
 
@@ -18,7 +18,7 @@ Context::Vars::Context - one captured set of values
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =head1 SYNOPSIS
 

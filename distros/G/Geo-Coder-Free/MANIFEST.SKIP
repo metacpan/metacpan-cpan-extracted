@@ -43,7 +43,7 @@
 \.tmp$
 \.#
 \.rej$
-\.yml$
+schemas\.yml$
 \.swp$
 
 # Avoid OS-specific files/dirs
@@ -66,23 +66,17 @@
 \.appveyor\.yml
 \.releaserc
 \.lwpcookies
+Geo-.*
 .test-script-*
 typescript
-Geo-.*
-conf/GSLAL032003003
+mutation.json
+^xt/mutant_\d
 CLAUDE.md
-
-# Downloaded databases
-\bdatabases/*.txt$
-\b\.zip-\b
-\.zip$
-\.db$
-\.sql$
-\.csv\.gz$
-\.dat$
-\bcodes.txt
-\bcounties.txt
-\bstates.txt
-\ballCountries.txt
-downloads/*
-downloads/allCountries.txt
+\.claude
+\.circleci
+downloads/
+lib/Geo/Coder/Free/GeoNames/
+lib/Geo/Coder/Free/MaxMind/
+lib/Geo/Coder/Free/OpenAddresses/databases/
+save_to/
+page/

@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.006;
+use 5.036000;
 
 use ExtUtils::MakeMaker;
 
@@ -21,7 +21,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Music-Percussion-Tabla",
   "LICENSE" => "artistic_2",
-  "MIN_PERL_VERSION" => "5.006",
+  "MIN_PERL_VERSION" => "5.036000",
   "NAME" => "Music::Percussion::Tabla",
   "PREREQ_PM" => {
     "File::ShareDir" => 0,
@@ -34,14 +34,16 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
+    "File::Temp" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "MIDI::Drummer::Tiny" => "0.4302",
+    "MIDI::Opus" => 0,
     "Test::More" => "0.88",
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.0709",
+  "VERSION" => "0.0803",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -51,10 +53,12 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "File::ShareDir" => 0,
   "File::Spec" => 0,
+  "File::Temp" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "List::Util" => 0,
   "MIDI::Drummer::Tiny" => "0.4302",
+  "MIDI::Opus" => 0,
   "MIDI::Util" => 0,
   "Moo" => 2,
   "Test::More" => "0.88",

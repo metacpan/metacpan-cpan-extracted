@@ -181,7 +181,7 @@ F<examples/custom-widget.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-custom-widget.svg" alt="Three toggle switches, Bluetooth focused and switched on, and the status line"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-custom-widget.svg" alt="Three toggle switches, Bluetooth focused and switched on, and the status line"></p>
 
 =end html
 
@@ -345,7 +345,7 @@ directory:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-kdl-panel.svg" alt="The Network panel in a rounded frame and the Disk panel in a double frame"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-kdl-panel.svg" alt="The Network panel in a rounded frame and the Disk panel in a double frame"></p>
 
 =end html
 

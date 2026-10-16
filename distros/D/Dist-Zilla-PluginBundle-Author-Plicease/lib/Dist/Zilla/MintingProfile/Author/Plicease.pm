@@ -1,4 +1,4 @@
-package Dist::Zilla::MintingProfile::Author::Plicease 2.80 {
+package Dist::Zilla::MintingProfile::Author::Plicease 2.81 {
 
   use 5.022;
   use Moose;
@@ -43,7 +43,7 @@ Dist::Zilla::MintingProfile::Author::Plicease - Minting profile for Plicease
 
 =head1 VERSION
 
-version 2.80
+version 2.81
 
 =head1 SYNOPSIS
 

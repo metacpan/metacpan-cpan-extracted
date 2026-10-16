@@ -4,8 +4,11 @@ package Geo::Coder::Free::OpenAddresses;
 
 use strict;
 use warnings;
+use autodie qw(:all);
 
-use Geo::Coder::Free;	# for _abbreviate
+use Geo::Coder::Free::Provenance qw(GEOCODER);
+use Geo::Coder::Free::Utils qw(_abbreviate _normalize);
+use Geo::Coder::Free::Validate qw(_valid_location);
 use Geo::Coder::Free::DB::OpenAddr;	# SQLite database
 use Geo::Coder::Free::DB::openaddresses;	# The original CSV files
 use Geo::Hash;
@@ -23,6 +26,7 @@ use Locale::Country;
 use Geo::StreetAddress::US;
 use Digest::MD5;
 use Encode;
+use Params::Get;
 use Storable;
 
 # Some locations aren't found because of inconsistencies in the way things are stored - these are some values I know
@@ -36,6 +40,13 @@ our %known_locations = (
 
 our %unknown_locations;
 
+# Lazily-initialised Locale singletons.  Locale::US->new() and
+# Locale::CA->new() were being called up to five times per geocode()
+# invocation for US/Canadian addresses.  These module-level variables
+# persist across all object instances and eliminate repeated construction.
+my $_locale_us;
+my $_locale_ca;
+
 use constant	LIBPOSTAL_UNKNOWN => 0;
 use constant	LIBPOSTAL_INSTALLED => 1;
 use constant	LIBPOSTAL_NOT_INSTALLED => -1;
@@ -48,11 +59,11 @@ Provides a geocoding functionality to a local SQLite database containing geo-cod
 
 =head1 VERSION
 
-Version 0.42
+Version 0.46
 
 =cut
 
-our $VERSION = '0.42';
+our $VERSION = '0.46';
 
 =head1 SYNOPSIS
 
@@ -95,6 +106,19 @@ openaddresses.sql.
 
 Takes an optional parameter cache, which points to an object that understands get() and set() messages to store data in
 
+=head3 API SPECIFICATION
+
+=head4 input
+
+    # Input schema (Params::Validate::Strict)
+    openaddr => { type => 'scalar' }                                          # path to the directory containing openaddresses.sql
+    cache    => { type => 'object', optional => 1, can => ['get', 'set'] }   # CHI-compatible cache object
+
+=head4 output
+
+    # Output schema (Return::Set)
+    { type => 'object', isa => 'Geo::Coder::Free::OpenAddresses' }
+
 =cut
 
 sub new {
@@ -136,29 +160,46 @@ it will go on to look just for the town if the street isn't found.
 The word "county" is removed from US county searches,
 that either C<Leesburg, Loudoun County, Virginia, US> or C<Leesburg, Loudoun, Virginia, US> will work.
 
+=head3 API SPECIFICATION
+
+=head4 input
+
+    # Input schema (Params::Validate::Strict) — exactly one of location or scantext is required
+    location     => { type => 'scalar',   optional => 1 }  # address string (exclusive with scantext)
+    scantext     => { type => 'scalar',   optional => 1 }  # free text to scan for place names
+    region       => { type => 'scalar',   optional => 1 }  # ISO 3166-1 alpha-2 country code hint
+    ignore_words => { type => 'arrayref', optional => 1 }  # words to suppress during scantext scan
+    exact        => { type => 'scalar',   optional => 1 }  # if set, do not fall back to town-only match
+
+=head4 output
+
+    # Output schema (Return::Set)
+    # scalar context: { type => 'object',   isa => 'Geo::Location::Point', optional => 1 }
+    # list context:   { type => 'arrayref', of  => { isa => 'Geo::Location::Point' } }
+
+=head4 provenance
+
+Every result carries C<geocoder>, C<database>, C<confidence> and C<accuracy>
+(section 2.1 of F<BI-Phase6-Dependency-Specs.md>).  This backend reports
+C<database> as C<OpenAddresses>, and C<accuracy> is C<address> when the database
+answered for the address itself and C<locality> when a hand-curated
+C<%known_locations> entry did, since that entry's coordinate is a town's.
+
 =cut
 
 sub geocode
 {
 	my $self = shift;
-
-	my %param;
-	if(ref($_[0]) eq 'HASH') {
-		%param = %{$_[0]};
-	} elsif(ref($_[0])) {
-		Carp::croak('Usage: geocode(location => $location|scantext => $text)');
-	} elsif(scalar(@_) % 2 == 0) {
-		%param = @_;
-	} else {
-		$param{location} = shift;
-	}
+	my $param = (@_ == 1 && !ref($_[0]))
+		? { location => $_[0] }
+		: Params::Get::get_params(undef, @_);
 
 	my %ignore_words;
-	if($param{'ignore_words'}) {
-		%ignore_words = map { lc($_) => 1 } @{$param{'ignore_words'}};
+	if($param->{'ignore_words'}) {
+		%ignore_words = map { lc($_) => 1 } @{$param->{'ignore_words'}};
 	}
 
-	if(my $scantext = $param{'scantext'}) {
+	if(my $scantext = $param->{'scantext'}) {
 		return if(length($scantext) < 6);
 		# FIXME:  wow this is inefficient
 		$scantext =~ s/[^\w']+/ /g;
@@ -166,7 +207,7 @@ sub geocode
 		my $count = scalar(@words);
 		my $offset = 0;
 		my @rc;
-		my $region = $param{'region'};
+		my $region = $param->{'region'};
 		if($region) {
 			$region = uc($region);
 		}
@@ -190,7 +231,7 @@ sub geocode
 				}
 				# https://stackoverflow.com/questions/11160192/how-to-parse-freeform-street-postal-address-out-of-text-and-into-components
 				# TODO: Support longer addresses
-				if($addr =~ /\s+(\d{2,5}\s+)(?![a|p]m\b)(([a-zA-Z|\s+]{1,5}){1,2})?([\s|\,|.]+)?(([a-zA-Z|\s+]{1,30}){1,4})(court|ct|street|st|drive|dr|lane|ln|road|rd|blvd)([\s|\,|.|\;]+)?(([a-zA-Z|\s+]{1,30}){1,2})([\s|\,|.]+)?\b(AK|AL|AR|AZ|CA|CO|CT|DC|DE|FL|GA|GU|HI|IA|ID|IL|IN|KS|KY|LA|MA|MD|ME|MI|MN|MO|MS|MT|NC|ND|NE|NH|NJ|NM|NV|NY|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VA|VI|VT|WA|WI|WV|WY)([\s|\,|.]+)?(\s+\d{5})?([\s|\,|.]+)/i) {
+				if($addr =~ /\s+(?:\d{2,5}\s+)(?![ap]m\b)(?:(?:[a-zA-Z\s]{1,5}){1,2})?(?:[\s,.]+)?(?:(?:[a-zA-Z\s]{1,30}){1,4})(?:court|ct|street|st|drive|dr|lane|ln|road|rd|blvd)(?:[\s,.;]+)?(?:(?:[a-zA-Z\s]{1,30}){1,2})(?:[\s,.]+)?\b(?:AK|AL|AR|AZ|CA|CO|CT|DC|DE|FL|GA|GU|HI|IA|ID|IL|IN|KS|KY|LA|MA|MD|ME|MI|MN|MO|MS|MT|NC|ND|NE|NH|NJ|NM|NV|NY|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VA|VI|VT|WA|WI|WV|WY)(?:[\s,.]+)?(?:\s+\d{5})?(?:[\s,.]+)/i) {
 					unless($region && ($region ne 'US')) {
 						if(($l = $self->geocode(location => "$addr, US")) && ref($l)) {
 							$l->confidence(0.8);
@@ -199,7 +240,7 @@ sub geocode
 							push @rc, $l;
 						}
 					}
-				} elsif($addr =~ /\s+(\d{2,5}\s+)(?![a|p]m\b)(([a-zA-Z|\s+]{1,5}){1,2})?([\s|\,|.]+)?(([a-zA-Z|\s+]{1,30}){1,4})(court|ct|street|st|drive|dr|lane|ln|road|rd|blvd)([\s|\,|.|\;]+)?(([a-zA-Z|\s+]{1,30}){1,2})([\s|\,|.]+)?\b(AB|BC|MB|NB|NL|NT|NS|ON|PE|QC|SK|YT)([\s|\,|.]+)?(\s+\d{5})?([\s|\,|.]+)/i) {
+				} elsif($addr =~ /\s+(?:\d{2,5}\s+)(?![ap]m\b)(?:(?:[a-zA-Z\s]{1,5}){1,2})?(?:[\s,.]+)?(?:(?:[a-zA-Z\s]{1,30}){1,4})(?:court|ct|street|st|drive|dr|lane|ln|road|rd|blvd)(?:[\s,.;]+)?(?:(?:[a-zA-Z\s]{1,30}){1,2})(?:[\s,.]+)?\b(?:AB|BC|MB|NB|NL|NT|NS|ON|PE|QC|SK|YT)(?:[\s,.]+)?(?:\s+\d{5})?(?:[\s,.]+)/i) {
 					unless($region && ($region ne 'CA')) {
 						if(($l = $self->geocode(location => "$addr, Canada")) && ref($l)) {
 							$l->confidence(0.8);
@@ -208,7 +249,7 @@ sub geocode
 							push @rc, $l;
 						}
 					}
-				} elsif($addr =~ /([a-zA-Z|\s+]{1,30}){1,2}([\s|\,|.]+)?\b(AK|AL|AR|AZ|CA|CO|CT|DC|DE|FL|GA|GU|HI|IA|ID|IL|IN|KS|KY|LA|MA|MD|ME|MI|MN|MO|MS|MT|NC|ND|NE|NH|NJ|NM|NV|NY|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VA|VI|VT|WA|WI|WV|WY)/i) {
+				} elsif($addr =~ /([A-Za-z]+(?:\s+[A-Za-z]+)*)([\s,.]+)?\b(AK|AL|AR|AZ|CA|CO|CT|DC|DE|FL|GA|GU|HI|IA|ID|IL|IN|KS|KY|LA|MA|MD|ME|MI|MN|MO|MS|MT|NC|ND|NE|NH|NJ|NM|NV|NY|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VA|VI|VT|WA|WI|WV|WY)/i) {
 					unless($region && ($region ne 'US')) {
 						if(($l = $self->geocode(location => "$addr, US")) && ref($l)) {
 							$l->confidence(0.6);
@@ -219,7 +260,7 @@ sub geocode
 							push @rc, $l;
 						}
 					}
-				} elsif($addr =~ /([a-zA-Z|\s+]{1,30}){1,2}([\s|\,|.]+)?\b(AB|BC|MB|NB|NL|NT|NS|ON|PE|QC|SK|YT)/i) {
+				} elsif($addr =~ /([A-Za-z]+(?:\s+[A-Za-z]+)*)([\s,.]+)?\b(AB|BC|MB|NB|NL|NT|NS|ON|PE|QC|SK|YT)/i) {
 					unless($region && ($region ne 'CA')) {
 						if(($l = $self->geocode(location => "$addr, Canada")) && ref($l)) {
 							$l->confidence(0.6);
@@ -234,12 +275,10 @@ sub geocode
 				if($region && (($l = $self->geocode(location => "$addr, $region")) && ref($l))) {
 					$l->confidence(0.2);
 					$l->location("$addr, $region");
-					# ::diag(__LINE__, ": $addr, $region");
 					push @rc, $l;
 				} elsif((!$region) && (($l = $self->geocode(location => $addr)) && ref($l))) {
 					$l->confidence(0.1);
 					$l->location($addr);
-					# ::diag(__LINE__, ": $addr");
 					push @rc, $l;
 				}
 				if($offset < $count - 2) {
@@ -257,17 +296,15 @@ sub geocode
 		# my @locations;
 
 		# foreach my $l(@rc) {
-			# ::diag(__LINE__, ': ', Data::Dumper->new([$l])->Dump());
 			# push @locations, Location::GeoTool->create_coord($l->{'latitude'}, $l->{'longitude'}, $l->{'location'}, 'Degree');
 		# }
 
 		# return @locations;
 	}
 
-	my $location = $param{location}
+	my $location = $param->{location}
 		or Carp::croak('Usage: geocode(location => $location|scantext => $text)');
 
-	# ::diag($location);
 
 	$location =~ s/,\s+,\s+/, /g;
 
@@ -275,11 +312,12 @@ sub geocode
 		$location = $1;
 	}
 
-	# Fail when the input is just a set of numbers
-	if($location !~ /\D/) {
-		# Carp::croak('Usage: ', __PACKAGE__, ": invalid input to geocode(), $location");
-		return;
-	}
+	# Fail when the input is just a set of numbers.  The rule is the one
+	# Geo::Coder::Free::Validate defines and the facade applies too, so what this
+	# backend refuses cannot drift away from what valid_location() answers.  As
+	# before, the answer is a miss rather than an error, because the caller may
+	# have another backend to try.
+	return unless _valid_location($location);
 	return if(length($location) <= 1);
 
 	if($location =~ /^(.+),?\s*Washington\s*DC$/i) {
@@ -296,7 +334,12 @@ sub geocode
 			'long' => $rc->{'longitude'},
 			'lng' => $rc->{'longitude'},
 			'location' => $location,
-			'database' => 'OpenAddresses'
+			'geocoder' => GEOCODER,
+			'database' => 'OpenAddresses',
+			# A hand-curated entry: the string matched it exactly, and the
+			# coordinate it carries is a town's, not an address's.
+			'confidence' => 1.0,
+			'accuracy' => 'locality'
 		});
 	}
 
@@ -358,14 +401,12 @@ sub geocode
 		}
 		if($ap->parse($l)) {
 			# Carp::croak($ap->report());
-			# ::diag('Address parse failed: ', $ap->report());
 		} else {
 			my %c = $ap->components();
-			# ::diag(Data::Dumper->new([\%c])->Dump());
 			my %addr = ( 'location' => $l );
 			$street = $c{'street_name'};
 			if(my $type = $c{'street_type'}) {
-				if(my $a = Geo::Coder::Free::_abbreviate($type)) {
+				if(my $a = _abbreviate($type)) {
 					$street .= " $a";
 				} else {
 					$street .= " $type";
@@ -381,12 +422,12 @@ sub geocode
 			} else {
 				if($c{'country'} =~ /Canada/i) {
 					$addr{'country'} = 'CA';
-					if(my $twoletterstate = Locale::CA->new()->{province2code}{uc($c{'subcountry'})}) {
+					if(my $twoletterstate = ($_locale_ca //= Locale::CA->new())->{province2code}{uc($c{'subcountry'})}) {
 						$addr{'state'} = $twoletterstate;
 					}
 				} elsif($c{'country'} =~ /^(United States|USA|US)$/i) {
 					$addr{'country'} = 'US';
-					if(my $twoletterstate = Locale::US->new()->{state2code}{uc($c{'subcountry'})}) {
+					if(my $twoletterstate = ($_locale_us //= Locale::US->new())->{state2code}{uc($c{'subcountry'})}) {
 						$addr{'state'} = $twoletterstate;
 					}
 				} elsif($c{'country'}) {
@@ -398,13 +439,12 @@ sub geocode
 			}
 			$addr{'house_number'} = $c{'property_identifier'};
 			$addr{'city'} = $c{'suburb'};
-			# ::diag(Data::Dumper->new([\%addr])->Dump());
 			if($addr{'house_number'}) {
 				if(my $rc = $self->_search(\%addr, ('house_number', 'road', 'city', 'state', 'country'))) {
 					return $rc;
 				}
 			}
-			if((!$addr{'house_number'}) || !$param{'exact'}) {
+			if((!$addr{'house_number'}) || !$param->{'exact'}) {
 				if(my $rc = $self->_search(\%addr, ('road', 'city', 'state', 'country'))) {
 					return $rc;
 				}
@@ -421,10 +461,9 @@ sub geocode
 
 		# Work around for RT#122617
 		if(($location !~ /\sCounty,/i) && (my $href = (Geo::StreetAddress::US->parse_location($l) || Geo::StreetAddress::US->parse_address($l)))) {
-			# ::diag(Data::Dumper->new([$href])->Dump());
 			if($state = $href->{'state'}) {
 				if(length($state) > 2) {
-					if(my $twoletterstate = Locale::US->new()->{state2code}{uc($state)}) {
+					if(my $twoletterstate = ($_locale_us //= Locale::US->new())->{state2code}{uc($state)}) {
 						$state = $twoletterstate;
 					}
 				}
@@ -433,7 +472,7 @@ sub geocode
 					$city = uc($href->{city});
 				}
 				if($street = $href->{street}) {
-					if($href->{'type'} && (my $type = Geo::Coder::Free::_abbreviate($href->{'type'}))) {
+					if($href->{'type'} && (my $type = _abbreviate($href->{'type'}))) {
 						$street .= " $type";
 					}
 					if($href->{suffix}) {
@@ -459,34 +498,28 @@ sub geocode
 		# Hack to find "name, street, town, state, US"
 		my @addr = split(/,\s*/, $location);
 		if(scalar(@addr) == 5) {
-			# ::diag(__PACKAGE__, ': ', __LINE__, ": $location");
 			$state = $addr[3];
 			if(length($state) > 2) {
-				if(my $twoletterstate = Locale::US->new()->{state2code}{uc($state)}) {
+				if(my $twoletterstate = ($_locale_us //= Locale::US->new())->{state2code}{uc($state)}) {
 					$state = $twoletterstate;
 				}
 			}
 			if(length($state) == 2) {
-				$addr[1] = Geo::Coder::Free::_normalize($addr[1]);
-				# ::diag(Data::Dumper->new([\@addr])->Dump());
+				$addr[1] = _normalize($addr[1]);
 				if(my $rc = $self->_get($addr[0], $addr[1], $addr[2], $state, 'US')) {
-					# ::diag(Data::Dumper->new([$rc])->Dump());
 					$rc->{'country'} = 'US';
 					return $rc;
 				}
 			}
 			# Hack to find "street, town, county, state, US"
 			if(length($state) == 2) {
-				$addr[0] = Geo::Coder::Free::_normalize($addr[0]);
+				$addr[0] = _normalize($addr[0]);
 				$addr[2] =~ s/\s+COUNTY$//i;
-				# ::diag(Data::Dumper->new([\@addr])->Dump());
 				if(my $rc = $self->_get($addr[0], $addr[1], $addr[2], $state, 'US')) {
-					# ::diag(Data::Dumper->new([$rc])->Dump());
 					$rc->{'country'} = 'US';
 					return $rc;
 				}
 				if(my $rc = $self->_get($addr[0], $addr[1], $state, 'US')) {
-					# ::diag(Data::Dumper->new([$rc])->Dump());
 					$rc->{'country'} = 'US';
 					return $rc;
 				}
@@ -514,7 +547,7 @@ sub geocode
 		if($c) {
 			if($c eq 'us') {
 				if(length($state) > 2) {
-					if(my $twoletterstate = Locale::US->new()->{state2code}{uc($state)}) {
+					if(my $twoletterstate = ($_locale_us //= Locale::US->new())->{state2code}{uc($state)}) {
 						$state = $twoletterstate;
 					}
 				}
@@ -537,13 +570,10 @@ sub geocode
 					}
 				} elsif(my $href = Geo::StreetAddress::US->parse_address("$city, $state")) {
 				# warn __LINE__;
-				# use Data::Dumper;
-				# warn Dumper($href);
 					# Well formed, simple street address in the US
-					# ::diag(Data::Dumper->new([\$href])->Dump());
 					$state = $href->{'state'};
 					if(length($state) > 2) {
-						if(my $twoletterstate = Locale::US->new()->{state2code}{uc($state)}) {
+						if(my $twoletterstate = ($_locale_us //= Locale::US->new())->{state2code}{uc($state)}) {
 							$state = $twoletterstate;
 						}
 					}
@@ -556,7 +586,7 @@ sub geocode
 					if($street = $fullstreet) {
 				# warn __LINE__;
 						$fullstreet .= ' ' . $href->{'type'};
-						if(my $type = Geo::Coder::Free::_abbreviate($href->{'type'})) {
+						if(my $type = _abbreviate($href->{'type'})) {
 							$street .= " $type";
 						}
 						if($href->{suffix}) {
@@ -571,7 +601,6 @@ sub geocode
 							$fullstreet = "$prefix $fullstreet";
 						}
 						if($href->{'number'}) {
-							# ::diag($href->{'number'}, "$street$city$state", 'US');
 							if($rc = $self->_get($href->{'number'}, "$street$city$state", 'US')) {
 								$rc->{'country'} = 'US';
 								return $rc;
@@ -581,7 +610,6 @@ sub geocode
 								return $rc;
 							}
 						}
-						# ::diag("$street$city$state", 'US');
 						# warn("$street$city$state", 'US');
 						if($rc = $self->_get("$street$city$state", 'US')) {
 							$rc->{'country'} = 'US';
@@ -592,7 +620,6 @@ sub geocode
 							$rc->{'country'} = 'US';
 							return $rc;
 						}
-						# ::diag("$fullstreet$city$state", 'US');
 						# warn("$fullstreet$city$state", 'US');
 						if($rc = $self->_get("$fullstreet$city$state", 'US')) {
 							$rc->{'country'} = 'US';
@@ -600,14 +627,13 @@ sub geocode
 						}
 						$fullstreet =~ s/\s+//g;
 					}
-					warn "Fast lookup of US location '$location' failed";
+					Carp::carp("Fast lookup of US location '$location' failed");
 				} else {
 					if($city =~ /^(\d.+),\s*([\w\s]+),\s*([\w\s]+)/) {
 						my $lookup = "$1, $2, $state";
 						if(my $href = (Geo::StreetAddress::US->parse_address($lookup) || Geo::StreetAddress::US->parse_location($lookup))) {
 							# Street, City, County
 							# 105 S. West Street, Spencer, Owen, Indiana, USA
-							# ::diag(Data::Dumper->new([\$href])->Dump());
 							$county = $3;
 							$county =~ s/\s*county$//i;
 							if($href->{'state'}) {
@@ -616,7 +642,7 @@ sub geocode
 								Carp::croak(__PACKAGE__, ": Geo::StreetAddress::US couldn't find the state in '$lookup'");
 							}
 							if(length($state) > 2) {
-								if(my $twoletterstate = Locale::US->new()->{state2code}{uc($state)}) {
+								if(my $twoletterstate = ($_locale_us //= Locale::US->new())->{state2code}{uc($state)}) {
 									$state = $twoletterstate;
 								}
 							}
@@ -628,7 +654,7 @@ sub geocode
 								$args{number} = $href->{number};
 							}
 							if($street = $href->{street}) {
-								if(my $type = Geo::Coder::Free::_abbreviate($href->{'type'})) {
+								if(my $type = _abbreviate($href->{'type'})) {
 									$street .= " $type";
 								}
 								if($href->{suffix}) {
@@ -663,7 +689,7 @@ sub geocode
 							}
 							return;	# Not found
 						}
-						die $city;	# TODO: do something here
+						Carp::croak($city);	# TODO: do something here
 					} elsif($city =~ /^(\w[\w\s]+),\s*([\w\s]+)/) {
 						# Perhaps it just has the street's name?
 						# Rockville Pike, Rockville, MD, USA
@@ -707,7 +733,7 @@ sub geocode
 				}
 			} elsif($c eq 'ca') {
 				if(length($state) > 2) {
-					if(my $twoletterstate = Locale::CA->new()->{province2code}{uc($state)}) {
+					if(my $twoletterstate = ($_locale_ca //= Locale::CA->new())->{province2code}{uc($state)}) {
 						$state = $twoletterstate;
 					}
 				}
@@ -724,7 +750,7 @@ sub geocode
 					# Well formed, simple street address in Canada
 					$state = $href->{'province'};
 					if(length($state) > 2) {
-						if(my $twoletterstate = Locale::CA->new()->{province2code}{uc($state)}) {
+						if(my $twoletterstate = ($_locale_ca //= Locale::CA->new())->{province2code}{uc($state)}) {
 							$state = $twoletterstate;
 						}
 					}
@@ -736,7 +762,7 @@ sub geocode
 						$args{number} = $href->{number};
 					}
 					if($street = $href->{street}) {
-						if(my $type = Geo::Coder::Free::_abbreviate($href->{'type'})) {
+						if(my $type = _abbreviate($href->{'type'})) {
 							$street .= " $type";
 						}
 						if($href->{suffix}) {
@@ -749,7 +775,7 @@ sub geocode
 						}
 						$args{street} = uc($street);
 					}
-					warn "Fast lookup of Canadian location '$location' failed";
+					Carp::carp("Fast lookup of Canadian location '$location' failed");
 				} else {
 					if($city =~ /^(\w[\w\s]+),\s*([\w\s]+)/) {
 						# Perhaps it just has the street's name?
@@ -813,7 +839,7 @@ sub geocode
 					if($city eq 'MINSTER, THANET') {
 						$city = 'RAMSGATE';
 					}
-					$street = Geo::Coder::Free::_normalize($street);
+					$street = _normalize($street);
 					if($number) {
 						if(my $rc = $self->_get("$number$street$city$state$c")) {
 							return $rc;
@@ -824,7 +850,7 @@ sub geocode
 						return $rc;
 					}
 				}
-				if((!$street) || !$param{'exact'}) {
+				if((!$street) || !$param->{'exact'}) {
 					if(my $rc = $self->_get("$city$state$c")) {
 						# return {
 							# 'number' => undef,
@@ -846,14 +872,14 @@ sub geocode
 		if($country =~ /Canada/i) {
 			$country = 'CA';
 			if(length($state) > 2) {
-				if(my $twoletterstate = Locale::CA->new()->{province2code}{uc($state)}) {
+				if(my $twoletterstate = ($_locale_ca //= Locale::CA->new())->{province2code}{uc($state)}) {
 					$state = $twoletterstate;
 				}
 			}
 		} else {
 			$country = 'US';
 			if(length($state) > 2) {
-				if(my $twoletterstate = Locale::US->new()->{state2code}{uc($state)}) {
+				if(my $twoletterstate = ($_locale_us //= Locale::US->new())->{state2code}{uc($state)}) {
 					$state = $twoletterstate;
 				}
 			}
@@ -882,7 +908,6 @@ sub geocode
 
 	# Finally try libpostal,
 	# which is good but uses a lot of memory
-	# ::diag("try libpostal on $location");
 	if($libpostal_is_installed == LIBPOSTAL_UNKNOWN) {
 		if(eval { require Geo::libpostal; } ) {
 			Geo::libpostal->import();
@@ -892,27 +917,25 @@ sub geocode
 		}
 	}
 
-	# ::diag(__PACKAGE__, ': ', __LINE__, ": libpostal_is_installed = $libpostal_is_installed ($location)");
 	# print(__PACKAGE__, ': ', __LINE__, ": libpostal_is_installed = $libpostal_is_installed ($location)\n");
 
 	if(($libpostal_is_installed == LIBPOSTAL_INSTALLED) && (my %addr = Geo::libpostal::parse_address($location))) {
-		# print Data::Dumper->new([\%addr])->Dump();
 		if($addr{'country'} && $addr{'state'} && ($addr{'country'} =~ /^(Canada|United States|USA|US)$/i)) {
 			if($street = $addr{'road'}) {
-				$street = Geo::Coder::Free::_normalize($street);
+				$street = _normalize($street);
 				$addr{'road'} = $street;
 			}
 			if($addr{'country'} =~ /Canada/i) {
 				$addr{'country'} = 'Canada';
 				if(length($addr{'state'}) > 2) {
-					if(my $twoletterstate = Locale::CA->new()->{province2code}{uc($addr{'state'})}) {
+					if(my $twoletterstate = ($_locale_ca //= Locale::CA->new())->{province2code}{uc($addr{'state'})}) {
 						$addr{'state'} = $twoletterstate;
 					}
 				}
 			} else {
 				$addr{'country'} = 'US';
 				if(length($addr{'state'}) > 2) {
-					if(my $twoletterstate = Locale::US->new()->{state2code}{uc($addr{'state'})}) {
+					if(my $twoletterstate = ($_locale_us //= Locale::US->new())->{state2code}{uc($addr{'state'})}) {
 						$addr{'state'} = $twoletterstate;
 					}
 				}
@@ -967,7 +990,6 @@ sub _get {
 	$location =~ s/\N{U+017E}/z/g;
 	$location =~ s/\s+//g;
 
-	# ::diag(__PACKAGE__, ': ', __LINE__, ": _get: $location");
 	my $digest;
 	if(length($location) <= 16) {
 		$digest = uc($location);
@@ -987,11 +1009,8 @@ sub _get {
 	# my @call_details = caller(0);
 	# print "line ", $call_details[2], "\n";
 	# print "$location: $digest\n";
-	# ::diag("line " . $call_details[2]);
-	# ::diag("$location: $digest");
 	if(my $cache = $self->{'cache'}) {
 		if(my $rc = $cache->get_object($digest)) {
-			# ::diag(__LINE__, ': retrieved from cache');
 			return Storable::thaw($rc->value());
 		}
 	}
@@ -1012,7 +1031,12 @@ sub _get {
 			'long' => $longitude,
 			'lng' => $longitude,
 			'location' => $location,
-			'database' => 'OpenAddresses'
+			'geocoder' => GEOCODER,
+			'database' => 'OpenAddresses',
+			# The database answered for the md5 of the normalised address, so the
+			# string matched exactly and the geohash is the address's position.
+			'confidence' => 1.0,
+			'accuracy' => 'address'
 		});
 
 		if(my $cache = $self->{'cache'}) {

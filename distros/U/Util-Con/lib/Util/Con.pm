@@ -10,7 +10,7 @@ use Devel::Confess;
 
 package Util::Con;
 require 5.010001;
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 require Exporter;
 our @ISA = ('Exporter');
 our @EXPORT = qw(dir execute file2string format_commas json_file_to_ref random_key random_value ref_to_json_file st structure);
@@ -96,6 +96,7 @@ sub import {
 # Util::Con, compiled the stubs into main:: whenever it loaded, which redefined
 # DDP's p() under its FATAL warnings when a script said `use DDP` first.
 my %DDP_LOADED;   # package => true once DDP's real p() and np() are installed there
+my %DDP_STUB;     # package => { name => the stub installed for it }, p and np
 
 sub _install_ddp_stubs {
 	my ($pkg) = @_;
@@ -103,8 +104,13 @@ sub _install_ddp_stubs {
 	for my $name ('p', 'np') {
 		my $glob = "${pkg}::$name";
 		next if defined &{$glob};
-		*{$glob} = sub (\[@$%&];%) {
+		*{$glob} = $DDP_STUB{$pkg}{$name} = sub (\[@$%&];%) {
 			_load_ddp($pkg);
+			# A `p` that DDP did not replace -- an `alias` in ~/.dataprinter
+			# exports it under another name -- would otherwise be this stub
+			# again, and the goto would call it forever.
+			die "Util::Con: DDP did not install ${pkg}::$name\n"
+				if \&{$glob} == $DDP_STUB{$pkg}{$name};
 			goto &{$glob};
 		};
 	}
@@ -113,13 +119,29 @@ sub _install_ddp_stubs {
 
 sub _load_ddp {
 	my ($pkg) = @_;
-	return if $DDP_LOADED{$pkg}++;
+	# Marked loaded only once the import has succeeded.  Marking it first made
+	# a second call after a failed load return here at once, and the stub's
+	# goto then called the stub itself, forever.
+	return if $DDP_LOADED{$pkg};
 	require DDP;
+	no strict 'refs';
+	# DDP->import() exports both p() and np(), but a stub was installed only
+	# for a name the caller had no sub under, so the other -- or one the caller
+	# defined over a stub after its `use` line -- is the caller's own.  Its
+	# glob is localised for the import, so DDP writes into a temporary that is
+	# discarded, and the caller's sub comes back untouched.
+	my %own = map {
+		my $glob = "${pkg}::$_";
+		$_ => (defined &{$glob} && \&{$glob} != ($DDP_STUB{$pkg}{$_} // 0));
+	} 'p', 'np';
+	local *{"${pkg}::p"}  if $own{p};
+	local *{"${pkg}::np"} if $own{np};
 	local $SIG{__WARN__} = sub {
 		warn @_ unless $_[0] =~ m{\ASubroutine \Q$pkg\E::n?p redefined};
 	};
 	my $ok = eval qq{package $pkg;\nDDP->import({output => 'STDOUT', array_max => 10, show_memsize => 1, show_dualvar => 'off'}); 1};
 	die "Util::Con: could not load DDP into $pkg: $@" unless $ok;
+	$DDP_LOADED{$pkg} = 1;
 	return;
 }
 
@@ -167,7 +189,9 @@ sub dir {
 	  : sub { 1 };   # empty tests string now means "no filtering", not "nothing matches"
 
 	my $target_dir = $args{dir};
-	$target_dir =~ s{(?<=[^/])/+\z}{};   # strip trailing slashes, but keep "/" intact
+	# Strip trailing slashes, but keep "/" intact.  (?<=.) rather than
+	# (?<=[^/]), which left "///" as it was, to be joined as "////etc".
+	$target_dir =~ s{(?<=.)/+\z}{}s;
 	# "." is left off the front of results; "/" must not become "//etc".
 	my $join = sub {
 		my ($d, $item) = @_;
@@ -184,6 +208,13 @@ sub dir {
 		my $find = sub {
 			my ($start, $sink) = @_;
 			my $strip = $start eq '.';
+			# File::Find lstat()s its starting path, so a $start that is a
+			# symlink to a directory was taken for a file and nothing was
+			# found under it -- although opendir, which the non-recursive
+			# listing and the parallel walk's top levels use, follows it.  A
+			# trailing slash makes lstat resolve the link; File::Find strips
+			# the slash again only after the lstat (1.14 in perl 5.10.1 and
+			# 1.44 in 5.44 alike), so the paths it reports are unchanged.
 			File::Find::find({
 				no_chdir => 1,
 				wanted   => sub {
@@ -195,7 +226,7 @@ sub dir {
 					     $sink->($path);
 					 }
 				},
-			}, $start);
+			}, -l $start ? "$start/" : $start);
 		};
 		if ($args{cpu} == 1) {
 			$find->($target_dir, $emit);
@@ -365,20 +396,31 @@ sub file2string {
 
 sub format_commas { # https://stackoverflow.com/questions/33442240/perl-printf-to-use-commas-as-thousands-separator
 	my ($n, $format) = @_;
-	$format = '.%02d' unless defined $format; # '%.0u' for integers
+	$format = '.%02d' unless defined $format;
+	# '%.0u' is the documented way to ask for a whole number, but sprintf
+	# prints nothing for it only when the hundredths are 0: 1234.56 came out
+	# "1,23456".  So '%.0u' is recognised here, rounds half up to a whole
+	# number, and prints no fraction at all.
+	my $whole = $format eq '%.0u';
 	my $neg = $n < 0;
 	my $abs = abs $n;
-	my $int = int $abs;
-	# int(100 * (.005 + frac)) is the original expression, and is exactly
-	# round-half-up to hundredths -- .005 * 100 is the +0.5 before truncation.
-	# It is kept verbatim so no already-correct result shifts by a cent.
-	my $cents = int(100 * (.005 + ($abs - $int)));
-	# ...but it can land on 100 (.999 rounds up to 1.00), which used to be
-	# printed straight into the fraction: 999999.999 came out "999,999.100".
-	# The carry has to go into the integer part instead.
-	if ($cents >= 100) {
-		$int++;
-		$cents -= 100;
+	my ($int, $cents);
+	if ($whole) {
+		$int   = int($abs + .5);
+		$cents = 0;
+	} else {
+		$int = int $abs;
+		# int(100 * (.005 + frac)) is the original expression, and is exactly
+		# round-half-up to hundredths -- .005 * 100 is the +0.5 before truncation.
+		# It is kept verbatim so no already-correct result shifts by a cent.
+		$cents = int(100 * (.005 + ($abs - $int)));
+		# ...but it can land on 100 (.999 rounds up to 1.00), which used to be
+		# printed straight into the fraction: 999999.999 came out "999,999.100".
+		# The carry has to go into the integer part instead.
+		if ($cents >= 100) {
+			$int++;
+			$cents -= 100;
+		}
 	}
 	# Split off the sign and work on the magnitude: the old code fed a negative
 	# through int()/sprintf and produced "-1,234.-49" for -1234.5, and lost the
@@ -389,7 +431,7 @@ sub format_commas { # https://stackoverflow.com/questions/33442240/perl-printf-t
 	# scientific notation, and the reverse/unpack grouping shredded that into
 	# "1e,+20" for 1e20.
 	my $digits = sprintf '%.0f', $int;
-	return $sign . reverse(join(',', unpack('(A3)*', reverse $digits))) . sprintf($format, $cents);
+	return $sign . reverse(join(',', unpack('(A3)*', reverse $digits))) . ($whole ? '' : sprintf($format, $cents));
 }
 
 sub json_file_to_ref {
@@ -401,8 +443,11 @@ sub json_file_to_ref {
 	close $fh;
 	# Python/NumPy emit bare NaN / Infinity / -Infinity, which are not valid
 	# JSON. Rewrite them to null (-> undef) only when they sit in JSON value
-	# position (after '[', ',' or ':'), so literal "NaN" inside strings is safe.
-	$json =~ s/[\[,:]\s*\K-?(?:NaN|Infinity)(?=\s*[,\]}])/null/g;
+	# position (after '[', ',' or ':').  That test alone also matched text
+	# inside a string -- "values: [1, NaN, 2]" became "values: [1, null, 2]"
+	# -- so the first alternative matches each whole string literal and
+	# (*SKIP)(*FAIL) resumes the scan after its closing quote.
+	$json =~ s/"(?:[^"\\]++|\\.)*+"(*SKIP)(*FAIL)|[\[,:]\s*\K-?(?:NaN|Infinity)(?=\s*[,\]}])/null/gs;
 	require JSON::MaybeXS; # ~4.3 ms
 	return JSON::MaybeXS::decode_json($json);
 }
@@ -416,9 +461,10 @@ sub json_file_to_ref {
 # was 1.48 ms per call; via each() it is 0.15 us, ~10,000x faster.
 #
 # The bare `keys` in void context resets the iterator, so repeated calls keep
-# returning the first pair instead of walking off the end of the hash.  That
-# is the same side effect the old `keys`-in-list-context version had, so a
-# caller in the middle of its own each() loop is no worse off than before.
+# returning the first pair instead of walking off the end of the hash.  It is
+# reset again after the each(), which would otherwise leave it one pair in, so
+# that a caller's own `while (each %h)` afterwards skipped the first pair.
+# The old `keys`-in-list-context version left it at the start, and so do these.
 #
 # Falling off a foreach also returned '' rather than undef in scalar context;
 # each() on an empty hash returns an empty list, so these now yield a true
@@ -427,6 +473,7 @@ sub random_key {
 	my ($hash) = @_;
 	keys %{ $hash };                 # reset the iterator
 	my ($key) = each %{ $hash };
+	keys %{ $hash };
 	return $key;
 }
 
@@ -434,6 +481,7 @@ sub random_value {
 	my ($hash) = @_;
 	keys %{ $hash };                 # reset the iterator
 	my (undef, $value) = each %{ $hash };
+	keys %{ $hash };
 	return $value;
 }
 
@@ -639,7 +687,11 @@ sub _structure_render {
 		}
 	}
 	elsif ($node->{kind} eq 'sref') { # \$x: stay on the same line, no extra indent level
-		_structure_render($pad . $class . $c->('elem', '\\') . ' ', $node->{node}, 0, $opt, $c, $lines);
+		# The '\ ' joins the label rather than the pad, and $indent passes
+		# through unchanged, so whatever the referent holds is still indented
+		# from this line.  Passing $pad with indent 0 put the line right but
+		# dropped the referent's own children back to depth 1.
+		_structure_render(($label // '') . $class . $c->('elem', '\\') . ' ', $node->{node}, $indent, $opt, $c, $lines);
 	}
 	elsif ($node->{kind} eq 'union') {
 		push @{ $lines }, $pad . $c->('UNION', 'UNION');
@@ -774,7 +826,7 @@ It takes these named arguments:
 
 =over
 
-=item * C<dir> (default C<.>): The directory to list.  Trailing slashes are removed, but C</> stays C</>.
+=item * C<dir> (default C<.>): The directory to list.  Trailing slashes are removed, but C</> stays C</>.  A C<dir> that is a symbolic link to a directory is listed through the link, recursively or not.
 
 =item * C<regex> (default C<.>): A pattern the base name must match, given as a string or a C<qr//>.  An invalid pattern dies, naming it.
 
@@ -834,7 +886,7 @@ Returns the whole of a file as one string, read without any decoding layer.  A f
  format_commas(-0.5);                # '-0.50'
  format_commas(1e20);                # '100,000,000,000,000,000,000.00'
 
-Puts a comma between each group of three digits of the integer part and appends the hundredths, rounded half up.  The second argument is the C<sprintf> format the hundredths are printed with, C<'.%02d'> by default; C<'%.0u'> prints nothing, for a whole number.  Rounding that carries into the integer part does so (C<0.999> is C<1.00>), a negative number keeps its sign, a number that rounds to zero has none, and a large number is grouped as digits rather than printed in exponent form.
+Puts a comma between each group of three digits of the integer part and appends the hundredths, rounded half up.  The second argument is the C<sprintf> format the hundredths are printed with, C<'.%02d'> by default; C<'%.0u'> rounds half up to a whole number and prints no fraction.  Rounding that carries into the integer part does so (C<0.999> is C<1.00>), a negative number keeps its sign, a number that rounds to zero has none, and a large number is grouped as digits rather than printed in exponent form.
 
 =head2 json_file_to_ref
 

@@ -1,0 +1,196 @@
+#!/usr/bin/env perl
+package PowerDNS::API::ACL::CLI 0.002;
+
+#ABSTRACT: Manage the tokens and grants of PowerDNS::API::ACL
+
+use 5.014;
+use strict;
+use warnings FATAL => 'all';
+use re '/aasx';
+
+use Getopt::Long qw{GetOptionsFromArray};
+use Pod::Usage qw{pod2usage};
+
+use PowerDNS::API::ACL::Store;
+
+
+our $DEFAULT_DB = '/var/lib/pdns-acl/acl.db';
+
+# The grant that the options after a label describe, as the store takes it.
+my $grant_from = sub {
+    my @args = @_;
+    my %opts = ( type => [] );
+    GetOptionsFromArray( \@args, \%opts, qw{zone=s name=s type=s@ write manage} ) or pod2usage(2);
+    die "A grant needs --zone, so a token needs one to be made\n" unless $opts{zone};
+    die "--write and --manage are two different grants\n" if $opts{write} && $opts{manage};
+
+    return {
+        zone   => $opts{zone},
+        name   => $opts{name},
+        types  => @{ $opts{type} } ? $opts{type} : [q{*}],
+        access => $opts{manage} ? 'manage' : $opts{write} ? 'write' : 'read',
+    };
+};
+
+my %COMMANDS = (
+    'token add' => sub {
+        my ( $store, $label, @args ) = @_;
+        print $store->add_token( $label, $grant_from->(@args) ) . "\n";
+        return 0;
+    },
+    'token list' => sub {
+        my ($store) = @_;
+        print join( q{}, map { sprintf( "%s\t%d grants\n", $_->{label}, $_->{grants} ) } $store->tokens );
+        return 0;
+    },
+    'token remove' => sub {
+        my ( $store, $label ) = @_;
+        die "There is no token labelled $label\n" unless $store->remove_token($label);
+        return 0;
+    },
+    'grant add' => sub {
+        my ( $store, $label, @args ) = @_;
+        $store->add_grant( $label, %{ $grant_from->(@args) } );
+        return 0;
+    },
+    'grant list' => sub {
+        my ( $store, $label ) = @_;
+        print join( q{}, map { sprintf( "%d\t%s\t%s\t%s\t%s\n", $_->{id}, $_->{access}, $_->{zone}, $_->{name}, join( q{,}, @{ $_->{types} } ) ) } $store->grants($label) );
+        return 0;
+    },
+    'grant remove' => sub {
+        my ( $store, $id ) = @_;
+        die "There is no grant $id\n" unless $store->remove_grant($id);
+        return 0;
+    },
+);
+
+sub main {
+    my @args = @_;
+
+    my %opts = ( db => $ENV{PDNS_ACL_DB} // $DEFAULT_DB );
+    Getopt::Long::Configure('require_order');
+    GetOptionsFromArray( \@args, \%opts, 'db=s', 'help' ) or pod2usage(2);
+    pod2usage(0) if $opts{help};
+
+    my ( $noun, $verb, @rest ) = @args;
+    my $command = $COMMANDS{ join( q{ }, $noun // q{}, $verb // q{} ) } or pod2usage(2);
+
+    return $command->( PowerDNS::API::ACL::Store->new( path => $opts{db} ), @rest );
+}
+
+exit main(@ARGV) unless caller;
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+PowerDNS::API::ACL::CLI - Manage the tokens and grants of PowerDNS::API::ACL
+
+=head1 VERSION
+
+version 0.002
+
+=head1 SYNOPSIS
+
+    pdns-acl [--db FILE] token add LABEL GRANT
+    pdns-acl [--db FILE] token list
+    pdns-acl [--db FILE] token remove LABEL
+
+    pdns-acl [--db FILE] grant add LABEL GRANT
+    pdns-acl [--db FILE] grant list LABEL
+    pdns-acl [--db FILE] grant remove ID
+
+    GRANT is: --zone ZONE [--name NAME] [--type TYPE ...] [--write | --manage]
+
+=head1 DESCRIPTION
+
+C<token add> makes a token with its first grant, and prints its secret.  It is
+the only time that anything shows the secret, because the database keeps only
+its digest.  A token without a grant could do nothing, so there is no way to
+make one.
+
+C<grant add> adds a grant to a token.
+
+A grant gives read access to the records of C<NAME> in C<ZONE>, or write access
+with C<--write>.  C<NAME> is one name, or C<*.> and a name for every name below
+it.  Give C<--type> once for each record type, or leave it out for every type.
+C<--manage> lets the token create and delete C<ZONE> itself, and needs no
+C<--name>.  L<PowerDNS::API::ACL> says what a grant means.
+
+C<grant list> prints each grant with the id that C<grant remove> takes.
+C<grant remove> refuses to remove the last grant of a token.  Remove the token
+instead.
+
+=head1 OPTIONS
+
+=over 4
+
+=item --db FILE
+
+The database.  The default is C<$PDNS_ACL_DB>, or
+F</var/lib/pdns-acl/acl.db>.
+
+=back
+
+=head1 SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<PowerDNS::API::ACL|PowerDNS::API::ACL>
+
+=back
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/Troglodyne-Internet-Widgets/perl-powerdns-api-acl/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHORS
+
+Current Maintainers:
+
+=over 4
+
+=item *
+
+George S. Baugh <george@troglodyne.net>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2026 Troglodyne LLC
+
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+=cut

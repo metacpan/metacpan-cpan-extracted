@@ -19,7 +19,7 @@ name: Util-Con
 provides:
   Util::Con:
     file: lib/Util/Con.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   Capture::Tiny: '0'
   Data::Printer: '1.000'
@@ -37,7 +37,7 @@ resources:
   bugtracker: https://github.com/hhg7/util/issues
   homepage: https://metacpan.org/dist/Util-Con
   repository: git://github.com/hhg7/util
-version: '0.01'
+version: '0.02'
 x_generated_by_perl: v5.44.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

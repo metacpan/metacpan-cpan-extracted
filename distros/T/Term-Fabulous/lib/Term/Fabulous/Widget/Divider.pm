@@ -9,7 +9,7 @@ use Object::Pad 0.825;
 
 use Term::Fabulous::Widget::Display;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 class Term::Fabulous::Widget::Divider
 	:isa(Term::Fabulous::Widget::Display)
@@ -199,7 +199,7 @@ optional text
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-divider.svg" alt="Dividers: a plain line, texts at the start, the center and the end, double and heavy lines in colors, and a vertical divider with a text between two columns"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-divider.svg" alt="Dividers: a plain line, texts at the start, the center and the end, double and heavy lines in colors, and a vertical divider with a text between two columns"></p>
 
 =end html
 

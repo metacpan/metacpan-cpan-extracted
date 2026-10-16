@@ -3,7 +3,7 @@ package Term::Fabulous::Widget::FocusableText;
 use v5.32;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Object::Pad 0.825;
 

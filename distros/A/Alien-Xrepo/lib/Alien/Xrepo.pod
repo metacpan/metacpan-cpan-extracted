@@ -554,76 +554,8 @@ it to the engine they create.
 
 =head1 Package Info
 
-Returned by C<install( ... )> as C<Alien::Xrepo::PackageInfo> objects that contain the results of the dependency
-resolution.
-
-=head2 Attributes
-
-=over
-
-=item B<libpath>
-
-The absolute path to the main library file (C<.dll>, C<.dylib>, or C<.so>). Returns C<undef> if the package is
-header-only or the binary could not be identified.
-
-=item B<includedirs>
-
-List of include paths.
-
-=item B<installdir>
-
-The package install root. Packages that mostly exist as tools or runnable binaries (C<ninja>, C<python>, C<cmake>, ...)
-put their executables under C<< installdir/bin >>.
-
-=item B<bin_dir>
-
-List of directories holding executables. Comes from the C<bindirs> fetch metadata, or falls back to C<< installdir/bin
->> when the package is a tool. You can run a freshly installed binary like so:
-
-    my $ninja = $repo->install('ninja');
-    my ($exe) = grep { -e $_ } map { path($_)->child($^O eq 'MSWin32' ? 'ninja.exe' : 'ninja') } $ninja->bin_dir;
-    system $exe, '--version';
-
-=item B<libfiles>
-
-List of all library files associated with the package (may include import libs, static archives, etc.).
-
-=item B<license>
-
-The license identifier.
-
-=item B<version>
-
-The installed version.
-
-=item B<deps>
-
-The dependency records Xmake reported for the package, as a list of hashrefs. Empty for a plain fetch; populated when
-the fetch asked for dependencies.
-
-=item B<runtime_deps>
-
-The classified runtime dependencies discovered for the package's C<libpath> (see C<runtime_deps( ... )> on the engine
-and L<Alien::Xrepo::Runtime>). Each entry is a hashref with C<name>, C<path>, C<dir>, and C<scope>.
-L<Alien::Xrepo::Build> records these in the snapshot, so a hermetic consumer reads them without a second scan; empty
-otherwise.
-
-=back
-
-=head2 Methods
-
-=head3 C<find_header( ... )>
-
-    my $path = $info->find_header( 'png.h' );
-
-Scans C<includedirs> for the given filename and returns the absolute path if found. Returns C<undef> otherwise.
-
-=head3 C<with_runtime_deps( \@deps )>
-
-    my $info = $info->with_runtime_deps($deps);
-
-Returns a copy of the object with C<runtime_deps> set to C<\@deps>, or the object itself unchanged when it already
-carries a non-empty list. C<Alien::Xrepo::Runtime::package_info( ... )> uses it to attach the diagnostic.
+C<install( ... )> and its friends return L<Alien::Xrepo::PackageInfo> objects that carry the results of dependency
+resolution. See L<Alien::Xrepo::PackageInfo> for the complete list of attributes and methods.
 
 =head1 Examples
 

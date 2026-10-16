@@ -1,0 +1,75 @@
+Game-Shogi
+==========
+
+Shogi, which is Japanese chess: a nine by nine board, twenty pieces a side, and
+a captured piece that changes sides. It goes into its captor's hand and may be
+dropped back onto the board as the captor's own, so material is never lost and
+a game rarely runs down into an empty endgame.
+
+The rules, the move generator and the search are in C behind a versioned
+function table. There is no pure-Perl board.
+
+    use Game::Shogi;
+    use Game::Shogi::Bot;
+
+    my $game = Game::Shogi->new;                    # an even game; Black moves first
+    my $give = Game::Shogi->new(handicap => 'rook');
+
+    $game->play('7g7f');            # 0, or a Game::Shogi::Error; it never dies
+    if (my $no = $game->play('P*5e')) {  # a drop, written as USI
+        print $no->message, "\n";        # refused: no pawn in hand yet
+    }
+    print $_->usi, "\n" for $game->legal;
+    my $r = $game->result;          # mate, resign, sennichite, impasse_declared, cap
+
+    my $move = Game::Shogi::Bot->choose($game, $game->turn, seed => 'mine');
+
+Or play it in a terminal:
+
+    shogi                   # the pieces in kanji, Black red and White blue
+    shogi --ascii           # SFEN letters, for a terminal with no CJK font
+    shogi --handicap rook   # the bot gives a rook
+    shogi --usi             # speak USI to a shogi GUI instead
+
+
+THE RULES THIS DISTRIBUTION CHOSE
+
+Where the sources leave a choice, the choice made here:
+
+- An illegal move is refused, not lost. The board only accepts legal moves.
+- Perpetual check loses for the side that checks on the fourth repetition.
+  Any other fourfold repetition (sennichite) is a draw, with no replay.
+- The impasse is the 27-point declaration: the king in the enemy camp, ten
+  other pieces there, not in check, and 28 points for Black or 27 for White,
+  counting the pieces in the camp and in hand. A correct declaration wins.
+- A game that nobody ends is drawn at 500 moves, the JSA's rule.
+
+
+INSTALLATION
+
+A C compiler is needed. Then:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Term::ReadKey is recommended, so the terminal game can take the arrow keys.
+Without it a move is typed.
+
+
+SUPPORT AND DOCUMENTATION
+
+    perldoc Game::Shogi
+    perldoc shogi
+
+    https://metacpan.org/release/Game-Shogi
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION <email@lnation.org>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)

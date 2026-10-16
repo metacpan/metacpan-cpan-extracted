@@ -82,6 +82,31 @@ subtest 'on Windows, the DLL the package links against wins the libpath' => sub 
     );
     is $info->libpath, $runtime->stringify, 'a DLL matching the package links wins over one that sorts first (libavif < SDL3_image)';
 };
+
+# xmake's vcpkg (and conan) manager runs every list-valued field through table.unwrap, which returns the sole element
+# directly when a list has exactly one entry (core/base/table.lua:357). A package with a single link therefore arrives
+# from `xrepo fetch --json` as the scalar "SDL3_image" rather than ["SDL3_image"]. The four sibling fields are already
+# normalized above; this pins the same treatment for links, which used to die on the deref.
+subtest 'a single scalar link is normalized to a list' => sub {
+    local $^O = 'MSWin32';    # the crash was on the Windows DLL-selection path
+    my $dir     = path( tempdir( CLEANUP => 1 ) )->child('scalar_links');
+    my $imp     = $dir->child( 'bin', 'SDL3_image.lib' );
+    my $codec   = $dir->child( 'bin', 'libavif-16.dll' );
+    my $runtime = $dir->child( 'bin', 'SDL3_image.dll' );
+    $dir->child('bin')->mkpath;
+    for ( $imp, $codec, $runtime ) { $_->spew_utf8(''); }
+    my $info = $repo->_process_info(
+        {   libfiles    => [ map { $_->stringify } $imp, $codec, $runtime ],
+            includedirs => [],
+            linkdirs    => [],
+            version     => '3.4.18',
+            links       => 'SDL3_image',                                       # scalar, as vcpkg reports a one-element links list
+            artifacts   => { installdir => $dir->stringify }
+        }
+    );
+    is [ @{ $info->links } ], ['SDL3_image'],      'the scalar link is wrapped back into a list';
+    is $info->libpath,        $runtime->stringify, 'the matching DLL still wins the libpath';
+};
 subtest 'on Windows, DLLs are preferred over import libs even when links match nothing' => sub {
     local $^O = 'MSWin32';
     my $dir   = path( tempdir( CLEANUP => 1 ) )->child('mismatched');

@@ -101,7 +101,8 @@ while (my $ev = $p->next_event) {
 - Tree API (`parse_kdl` / `emit_kdl`) with faithful round-tripping of
   argument order, property order, type annotations and number kinds.
   Floats are written with the shortest text that reads back as the same
-  double; integers exactly over the whole 64-bit signed and unsigned range.
+  float, at the width of the perl's floats; integers exactly over the
+  whole 64-bit signed and unsigned range.
 - Streaming event API for memory-bounded processing of large documents,
   with optional reporting of comments (including their text) and
   slashdashed elements.
@@ -145,29 +146,27 @@ make test
 make install
 ```
 
-`Text::KDL::XS` links statically against ckdl through
-[`Alien::ckdl`](https://github.com/davenonymous/perl-alien-ckdl), which
-builds the C library from source. No system package is needed; a C11
-compiler and a perl with 64-bit integers are.
+The ckdl sources are bundled in the `ckdl` directory and compiled into
+the module, so no system package and no Alien module is needed. A C11
+compiler and a perl 5.30 or newer with 64-bit integers are.
+`ckdl/UPSTREAM.md` names the bundled upstream commit.
 
 ## Status
 
-Version 0.002 fixes the defects found in 0.001 (see `Changes`; what
-remains are the upstream limitations above) and changes one behaviour on
-purpose: string sources are character strings. The API
-(`parse_kdl`, `emit_kdl`, `Parser`, `Document`, `Node`, `Value`) is
-otherwise stable; `Value` gained `as_bignum`.
+Version 0.003 bundles the ckdl sources and drops the Alien::ckdl
+dependency; the API is unchanged. Version 0.002 fixed the defects found
+in 0.001 (see `Changes`; what remains are the upstream limitations
+above). The API (`parse_kdl`, `emit_kdl`, `Parser`, `Document`, `Node`,
+`Value`) is stable.
 
 ## See also
 
 - [KDL specification](https://github.com/kdl-org/kdl) and [kdl.dev](https://kdl.dev)
 - [ckdl](https://github.com/tjol/ckdl), the underlying C library
-- [`Alien::ckdl`](https://github.com/davenonymous/perl-alien-ckdl)
 
 ## License
 
 Copyright (C) 2026 Davenonymous.
 
 This Perl distribution is released under the same terms as Perl itself.
-The bundled `ckdl` library (linked statically through `Alien::ckdl`) is
-MIT-licensed.
+The bundled `ckdl` library is MIT-licensed; see `ckdl/COPYING`.

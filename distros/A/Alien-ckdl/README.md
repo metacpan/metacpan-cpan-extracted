@@ -1,16 +1,22 @@
 # Alien::ckdl
 
+**Deprecated.** [Text::KDL::XS](https://metacpan.org/pod/Text::KDL::XS)
+0.003 and later bundle the ckdl sources and compile them into the module,
+so nothing on CPAN depends on this Alien any more. Install `Text::KDL::XS`
+directly. The final release, 0.002, keeps Text::KDL::XS 0.001 and 0.002
+installable and will not be followed by another; this repository is
+archived.
+
 `Alien::ckdl` downloads, builds, and installs
 [ckdl](https://github.com/tjol/ckdl), a small C11 library for reading and
 writing [KDL](https://kdl.dev) documents, and exposes it to Perl XS modules
 through the standard [Alien::Base](https://metacpan.org/pod/Alien::Base)
 interface.
 
-You only need this distribution if you are building a Perl module that
-links against `libkdl` from C (the main consumer is
-[Text::KDL::XS](https://metacpan.org/pod/Text::KDL::XS)). For pure-Perl
-KDL access, install `Text::KDL::XS` and let the dependency chain do its
-job.
+You would only need this distribution to build another Perl module that
+links against `libkdl` from C; its one consumer, Text::KDL::XS, stopped
+doing so in 0.003. Vendoring the seven ckdl source files, as Text::KDL::XS
+does, is the simpler route.
 
 ## What you get
 
@@ -135,5 +141,5 @@ The bundled `ckdl` library is distributed under the MIT license. Its
   that provides `cflags`, `libs`, and friends
 - [Alien::Build](https://metacpan.org/pod/Alien::Build) - the build-time
   half of the same framework
-- [Text::KDL::XS](https://github.com/davenonymous/perl-text-kdl-xs) - the Perl XS
-  module that consumes this Alien
+- [Text::KDL::XS](https://github.com/davenonymous/perl-kdl-xs) - the Perl XS
+  module that consumed this Alien up to 0.002 and bundles ckdl since 0.003

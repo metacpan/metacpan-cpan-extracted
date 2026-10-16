@@ -2,6 +2,7 @@ package Geo::Coder::Free::DB::MaxMind::admin;
 
 use strict;
 use warnings;
+use autodie qw(:all);
 
 =head1 NAME
 
@@ -9,17 +10,15 @@ Geo::Coder::Free::DB::MaxMind::admin
 
 =head1 VERSION
 
-Version 0.42
+Version 0.46
 
 =cut
 
-our $VERSION = '0.42';
+our $VERSION = '0.46';
 
 # admin1.db is from http://download.geonames.org/export/dump/admin1CodesASCII.txt
 
-use Database::Abstraction;
-
-our @ISA = ('Database::Abstraction');
+use parent 'Database::Abstraction';
 
 sub _open {
 	my $self = shift;

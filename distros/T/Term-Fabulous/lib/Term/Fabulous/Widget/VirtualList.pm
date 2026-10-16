@@ -10,7 +10,7 @@ use Object::Pad 0.825;
 use Clay::UI::Role::Core::Preparable;
 use Term::Fabulous::Widget::ScrollBox;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 class Term::Fabulous::Widget::VirtualList
 	:isa(Term::Fabulous::Widget::ScrollBox)

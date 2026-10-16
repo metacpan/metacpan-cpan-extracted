@@ -6,8 +6,7 @@ use Test::Most tests => 4;
 use Test::Number::Delta;
 use Test::Carp;
 use Test::Deep;
-use lib 't/lib';
-use MyLogger;
+use Test::Log::Abstraction;
 # use Test::Without::Module qw(Geo::libpostal);
 
 BEGIN {
@@ -18,7 +17,7 @@ OPENADDR: {
 	SKIP: {
 		if($ENV{'OSM_HOME'}) {
 			if($ENV{'TEST_VERBOSE'}) {
-				Database::Abstraction::init(logger => MyLogger->new());
+				Database::Abstraction::init(logger => Test::Log::Abstraction->new());
 			}
 
 			my $geo_coder = new_ok('Geo::Coder::Free' => [ openaddr => $ENV{'OPENADDR_HOME'} ]);

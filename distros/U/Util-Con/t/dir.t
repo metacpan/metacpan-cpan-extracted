@@ -61,6 +61,8 @@ is( scalar @collected, 2, 'on_match received both top-level .txt files' );
 
 # --- "/" does not become "//" ---
 ok( !(grep { m{\A//} } dir(dir => '/', tests => 'd')), 'dir => "/" yields "/x", not "//x"' );
+# "///" used to be left as it was, and joined as "////x".
+ok( !(grep { m{\A//} } dir(dir => '///', tests => 'd')), 'dir => "///" yields "/x", not "////x"' );
 
 # --- cpu => N: forked recursive walk ---
 # dir() walks breadth-first in the parent until a level holds cpu * 4
@@ -97,6 +99,25 @@ SKIP: {
 	skip 'symlink() is not available here', 1 unless $have_symlink;
 	ok( !(grep { m{link_to_d1/} } dir(dir => $wide, recursive => 1, cpu => 2, tests => '')),
 		'cpu => 2 does not descend through a symlinked directory' );
+}
+
+# A dir that is itself a symlink to a directory is listed through the link in
+# every mode.  The serial recursive walk used to find nothing, because
+# File::Find took the link for a file, while the other two followed it.
+{
+	my $links = tempdir( CLEANUP => 1 );
+	my $link  = File::Spec->catdir($links, 'wide');
+	SKIP: {
+		skip 'symlink() is not available here', 5 unless eval { symlink $wide, $link };
+		is( scalar(dir(dir => $link, regex => '^d\d+\z', tests => 'd')), 12,
+			'non-recursive dir lists through a symlinked root' );
+		my @serial   = sort(dir(dir => $link, recursive => 1));
+		my @parallel = sort(dir(dir => $link, recursive => 1, cpu => 2));
+		is( scalar @serial, 36, 'serial recursive dir walks a symlinked root' );
+		is_deeply( \@parallel, \@serial, 'cpu => 2 matches serial under a symlinked root' );
+		ok( !(grep { index($_, "$link/") != 0 } @serial), 'paths are reported under the link, not its target' );
+		is( scalar(dir(dir => "$link/", recursive => 1)), 36, 'a trailing slash on the link makes no difference' );
+	}
 }
 
 # on_match runs in the parent, so a closure over a lexical still works.

@@ -5,7 +5,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Object::Pad 0.825;
 
@@ -44,7 +44,7 @@ lines
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-scatter-plot.svg" alt="Two clouds of points for petrol and hybrid cars, each with a dashed trend line, over an x axis of engine power"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-scatter-plot.svg" alt="Two clouds of points for petrol and hybrid cars, each with a dashed trend line, over an x axis of engine power"></p>
 
 =end html
 

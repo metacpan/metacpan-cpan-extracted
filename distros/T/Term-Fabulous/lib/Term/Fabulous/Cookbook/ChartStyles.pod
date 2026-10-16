@@ -108,7 +108,7 @@ This program is shipped as F<examples/cookbook/chart-curves.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-curves.svg" alt="Six small charts of the same seven points connected linear, step, monotone, catmull-rom, ease-in-out-sine and ease-out-bounce"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-chart-curves.svg" alt="Six small charts of the same seven points connected linear, step, monotone, catmull-rom, ease-in-out-sine and ease-out-bounce"></p>
 
 =end html
 
@@ -208,7 +208,7 @@ This program is shipped as F<examples/cookbook/chart-styles.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-styles.svg" alt="Nine small charts of one wave: lines in Braille, half blocks, quadrants, sextants and box drawing lines, an area in eighth blocks, and bars in quadrants, blocks and Braille"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-chart-styles.svg" alt="Nine small charts of one wave: lines in Braille, half blocks, quadrants, sextants and box drawing lines, an area in eighth blocks, and bars in quadrants, blocks and Braille"></p>
 
 =end html
 
@@ -330,7 +330,7 @@ This program is shipped as F<examples/cookbook/chart-colors.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-colors.svg" alt="A line chart on a light background with dark text, dotted grid lines and the legend below, next to a bar chart with a rounded frame, colors of its own and a dashed red target line"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-chart-colors.svg" alt="A line chart on a light background with dark text, dotted grid lines and the legend below, next to a bar chart with a rounded frame, colors of its own and a dashed red target line"></p>
 
 =end html
 
@@ -506,7 +506,7 @@ This program is shipped as F<examples/cookbook/chart-options.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-options.svg" alt="Six small charts: a solid, a dashed and a dotted line; a line with a gap next to one drawn across the gap; an area with a line and a mark on every point; narrow bars; bars of 2025 and 2026 in two stacks per quarter; a line over dashed vertical and solid horizontal grid lines"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-chart-options.svg" alt="Six small charts: a solid, a dashed and a dotted line; a line with a gap next to one drawn across the gap; an area with a line and a mark on every point; narrow bars; bars of 2025 and 2026 in two stacks per quarter; a line over dashed vertical and solid horizontal grid lines"></p>
 
 =end html
 
@@ -626,7 +626,7 @@ This program is shipped as F<examples/cookbook/chart-hover.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-hover.svg" alt="A stacked area chart of closed issues per team with the area under the mouse pointer emphasized, the others faded, and a status line that names the team, the week and the number of issues"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-chart-hover.svg" alt="A stacked area chart of closed issues per team with the area under the mouse pointer emphasized, the others faded, and a status line that names the team, the week and the number of issues"></p>
 
 =end html
 

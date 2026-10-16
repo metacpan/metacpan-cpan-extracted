@@ -95,7 +95,7 @@ This program is shipped as F<examples/cookbook/key-bindings.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-key-bindings.svg" alt="The key bindings program after Ctrl+R: the help line says reloaded and the second line shows the key name"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-key-bindings.svg" alt="The key bindings program after Ctrl+R: the help line says reloaded and the second line shows the key name"></p>
 
 =end html
 
@@ -287,7 +287,7 @@ F<examples/buttons-and-keys.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-buttons-and-keys.svg" alt="Three buttons, the first focused and the last under the mouse pointer, a counter at 3 and a clock"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-buttons-and-keys.svg" alt="Three buttons, the first focused and the last under the mouse pointer, a counter at 3 and a clock"></p>
 
 =end html
 
@@ -464,7 +464,7 @@ This program is shipped as F<examples/cookbook/follow-links.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-follow-links.svg" alt="The Keys page of the help text: its link the start page selected in dark text on green, and the footer links Back in green and Quit hovered in white on gray"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-follow-links.svg" alt="The Keys page of the help text: its link the start page selected in dark text on green, and the footer links Back in green and Quit hovered in white on gray"></p>
 
 =end html
 
@@ -613,7 +613,7 @@ This program is shipped as F<examples/cookbook/click-a-word.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-click-a-word.svg" alt="Two paragraphs, the second with the word span in bold yellow; below them the line terminal: the program that shows this one, and the line right button at column 5, row 4: offset 3, word span (2 to 6), spans [2-6]"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-click-a-word.svg" alt="Two paragraphs, the second with the word span in bold yellow; below them the line terminal: the program that shows this one, and the line right button at column 5, row 4: offset 3, word span (2 to 6), spans [2-6]"></p>
 
 =end html
 

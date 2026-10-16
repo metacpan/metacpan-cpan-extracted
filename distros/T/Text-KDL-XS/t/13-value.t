@@ -45,7 +45,7 @@ is Value(type => 'bool', value => 0)->value,     0, 'a false bool is stored as 0
 is Value(type => 'null', value => 5)->value, undef, 'null never has a value';
 
 # as_number always returns a native number.
-is parsed('12345678901234567890123')->as_number, 1.2345678901234567e22, 'as_number of a big integer is a float';
+cmp_ok parsed('12345678901234567890123')->as_number, '==', 12345678901234567890123, 'as_number of a big integer is the nearest float';
 is Value(type => 'number', kind => 'string', value => '0x1_0')->as_number,  16,  'as_number reads radix text';
 is Value(type => 'number', kind => 'string', value => '-0o17')->as_number, -15,  'as_number reads signed octal';
 is Value(type => 'number', kind => 'string', value => '#-inf')->as_number, -$inf, 'as_number of #-inf is -Inf';
@@ -77,7 +77,7 @@ is Value(type => 'null')->as_number, undef, 'as_number of null is undef';
 # as_string spells floats as KDL does.
 is parsed('1.0')->as_string,                 '1.0',                 'as_string keeps the decimal point';
 is parsed('1e3')->as_string,                 '1000.0',              'as_string of 1e3';
-is Value(type => 'number', value => 0.1 + 0.2)->as_string, '0.30000000000000004', 'as_string round-trips';
+cmp_ok 0 + Value(type => 'number', value => 0.1 + 0.2)->as_string, '==', 0.1 + 0.2, 'as_string round-trips';
 is parsed('#inf')->as_string,                '#inf',                'as_string of #inf';
 is parsed('#-inf')->as_string,               '#-inf',               'as_string of #-inf';
 is parsed('#nan')->as_string,                '#nan',                'as_string of #nan';

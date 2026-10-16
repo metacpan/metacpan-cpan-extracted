@@ -1,5 +1,11 @@
 Revision history for Geo::Location::Point
 
+0.16	Thu Oct 15 09:47:39 AM EDT 2026
+	Remove wasted test
+	Store and return false values, e.g. confidence => 0, instead of
+	treating them as unset
+	Added the test dashboard
+
 0.15	Mon Aug 25 13:51:01 EDT 2025
 	Check maximum latitude is 90, not 180
 	Use members consistently

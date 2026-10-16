@@ -3,7 +3,7 @@ use stable qw( postderef );
 use experimental qw( signatures );
 use true;
 
-package Dist::Zilla::Plugin::Author::Plicease::Init2 2.80 {
+package Dist::Zilla::Plugin::Author::Plicease::Init2 2.81 {
 
   use Moose;
   use Dist::Zilla::File::InMemory;
@@ -90,9 +90,14 @@ package Dist::Zilla::Plugin::Author::Plicease::Init2 2.80 {
       my $self = shift;
       my @workflow;
 
-      foreach my $workflow (qw( static linux windows macos cygwin msys2-mingw ))
+      foreach my $workflow (qw( static linux ))
       {
-        push @workflow, $workflow if $self->chrome->prompt_yn("workflow $workflow?");
+        push @workflow, $workflow if $self->chrome->prompt_yn("workflow $workflow?", { default => 1 });
+      }
+
+      foreach my $workflow (qw( windows macos cygwin msys2-mingw ))
+      {
+        push @workflow, $workflow if $self->chrome->prompt_yn("workflow $workflow?", { default => 0 });
       }
 
       \@workflow;
@@ -105,7 +110,7 @@ package Dist::Zilla::Plugin::Author::Plicease::Init2 2.80 {
     lazy    => 1,
     default => sub {
       my $self = shift;
-      return undef unless $self->chrome->prompt_yn("irc?");
+      return undef unless $self->chrome->prompt_yn("irc?", { default => 0 });
       $self->chrome->prompt_str("irc url", { default => 'irc://irc.perl.org/#native' });
     },
   );
@@ -127,19 +132,19 @@ package Dist::Zilla::Plugin::Author::Plicease::Init2 2.80 {
       {
         if($self->type_dzil)
         {
-          return '5.020';
+          return '5.022';
         }
         else
         {
           for(1..100)
           {
-            my $answer = $self->chrome->prompt_str("Minimum required Perl (min/old: 5.016, def: 5.020 (default), or an explicit Perl version)",
+            my $answer = $self->chrome->prompt_str("Minimum required Perl (min: 5.016, old: 5.022, def: 5.042 (default), or an explicit Perl version)",
               { default => "def" },
             );
             return $answer    if $answer =~ /^5\.[0-9]{3,6}$/;
             return '5.016'    if $answer eq 'min';
-            return '5.016'    if $answer eq 'old';
-            return '5.020'    if $answer eq 'def';
+            return '5.022'    if $answer eq 'old';
+            return '5.042'    if $answer eq 'def';
             if($answer =~ /^5\.([0-9]+)\.([0-9]+)$/)
             {
               return sprintf "5.%03d%03d", $1, $2;
@@ -288,7 +293,7 @@ package Dist::Zilla::Plugin::Author::Plicease::Init2 2.80 {
       version        => __PACKAGE__->VERSION // '2.41',
       release_tests  => $self->include_tests,
       github_user    => $self->github_user,
-      version_plugin => ($self->perl_version >= 5.014 ? 'PkgVersion::Block' : 0),
+      version_plugin => 0,
       workflow       => $self->workflow,
       irc            => $self->irc,
       default_branch => 'main',
@@ -453,7 +458,7 @@ Dist::Zilla::Plugin::Author::Plicease::Init2 - Dist::Zilla initialization tasks 
 
 =head1 VERSION
 
-version 2.80
+version 2.81
 
 =head1 DESCRIPTION
 
@@ -688,52 +693,53 @@ use base qw( Alien::Base );
 1;
 
 @@ template/Dzil.pm
+package {{ $name =~ s/-/::/gr }};
+
 use warnings;
 use {{ $perl_version }};
 use experimental qw( {{ $experimental }} );
 use true;
+use Moose;
+use namespace::autoclean;
 
-package {{ $name =~ s/-/::/gr }} {
+# ABSTRACT: {{ $abstract }}
+# VERSION
 
-    use Moose;
-    use namespace::autoclean;
-
-    # ABSTRACT: {{ $abstract }}
-
-    __PACKAGE__->meta->make_immutable;
-}
+__PACKAGE__->meta->make_immutable;
 
 
 @@ template/P5014.pm
+package {{ $name =~ s/-/::/gr }};
+
 use warnings;
 use {{ $perl_version }};
 use true;
 
-package {{ $name =~ s/-/::/gr }} {
-
-    # ABSTRACT: {{ $abstract }}
-}
+# ABSTRACT: {{ $abstract }}
+# VERSION
 
 
 @@ template/P5020.pm
+package {{ $name =~ s/-/::/gr }};
+
 use warnings;
 use {{ $perl_version }};
 use experimental qw( {{ $experimental }} );
 use true;
 
-package {{ $name =~ s/-/::/gr }} {
+# ABSTRACT: {{ $abstract }}
+# VERSION
 
-    # ABSTRACT: {{ $abstract }}
-}
 
 @@ template/P5042.pm
+package {{ $name =~ s/-/::/gr }};
+
 use warnings;
 use v{{ $perl_version =~ s/^5.0/5./r }};
 
-package {{ $name =~ s/-/::/gr }} {
+# ABSTRACT: {{ $abstract }}
+# VERSION
 
-    # ABSTRACT: {{ $abstract }}
-}
 
 @@ template/bin.pl
 use warnings;
@@ -748,60 +754,59 @@ use {{ $name =~ s/-/::/gr }};
 
 
 @@ template/App.pm
+package {{ $name =~ s/-/::/gr }};
+
 use warnings;
 use {{ $perl_version }};
 use experimental qw( {{ $experimental }} );
 use true;
 
-package {{ $name =~ s/-/::/gr }} {
+# ABSTRACT: {{ $abstract }}
+# VERSION
 
-    # ABSTRACT: {{ $abstract }}
-
-    use App::Cmd::Setup -app;
-
-}
+use App::Cmd::Setup -app;
 
 
 @@ template/AppCommand.pm
+package {{ $name =~ s/-/::/gr }}::Command;
+
 use warnings;
 use {{ $perl_version }};
 use experimental qw( {{ $experimental }} );
 use true;
 
-package {{ $name =~ s/-/::/gr }}::Command {
+# ABSTRACT: {{ $abstract }}
+# VERSION
 
-    # ABSTRACT: {{ $abstract }}
+use App::Cmd::Setup -command;
 
-    use App::Cmd::Setup -command;
+sub opt_spec ($self) {
+}
 
-    sub opt_spec ($self) {
-    }
-
-    sub validate_args ($self, $opt, $args) {
-    }
+sub validate_args ($self, $opt, $args) {
 }
 
 
 @@ template/AppCommandImpl.pm
+package {{ $name =~ s/-/::/gr }}::Command::foo;
+
 use warnings;
 use {{ $perl_version }};
 use experimental qw( {{ $experimental }} );
 use true;
 
-package {{ $name =~ s/-/::/gr }}::Command::foo {
+# ABSTRACT: {{ $abstract }}
+# VERSION
 
-    # ABSTRACT: {{ $abstract }}
+use App::Cmd::Setup -command;
 
-    use App::Cmd::Setup -command;
+sub opt_spec ($self) {
+}
 
-    sub opt_spec ($self) {
-    }
+sub validate_args ($self, $opt, $args) {
+}
 
-    sub validate_args ($self, $opt, $args) {
-    }
-
-    sub execute ($self, $opt, $args) {
-    }
+sub execute ($self, $opt, $args) {
 }
 
 
@@ -825,7 +830,7 @@ jobs:
       CIP_TAG: static
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Bootstrap CIP
         run: |
@@ -856,24 +861,15 @@ jobs:
       fail-fast: false
       matrix:
         cip_tag:
-          - "5.41"
-          - "5.40"
-          - "5.38"
-          - "5.36"
-          - "5.34"
-          - "5.32"
-          - "5.30"
-          - "5.28"
-          - "5.26"
-          - "5.24"
-          - "5.22"
-          - "5.20"
+          - "5.45"
+          - "5.44"
+          - "5.42"
 
     env:
       CIP_TAG: ${{ matrix.cip_tag }}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Bootstrap CIP
         run: |
@@ -946,7 +942,7 @@ jobs:
           git config --global core.autocrlf false
           git config --global core.eol lf
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Set up Perl
         run: |
@@ -1012,7 +1008,7 @@ jobs:
       fail-fast: false
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Set up Perl
         run: |
@@ -1092,7 +1088,7 @@ jobs:
           git config --global core.eol lf
         shell: powershell
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Set up Cygwin
         uses: egor-tensin/setup-cygwin@v3
@@ -1184,7 +1180,7 @@ jobs:
           git config --global core.eol lf
         shell: powershell
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Set up Perl
         uses: msys2/setup-msys2@v2

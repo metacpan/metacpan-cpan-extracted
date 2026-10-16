@@ -9,7 +9,7 @@ use Object::Pad 0.825;
 
 use Term::Fabulous::Widget::Canvas;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 class Term::Fabulous::Widget::PixelCanvas
 	:isa(Term::Fabulous::Widget::Canvas)
@@ -200,7 +200,7 @@ per cell
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-pixel-paint.svg" alt="A pixel canvas with a frame, a line, a circle, a filled rectangle and a red wave painted with the mouse"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-pixel-paint.svg" alt="A pixel canvas with a frame, a line, a circle, a filled rectangle and a red wave painted with the mouse"></p>
 
 =end html
 

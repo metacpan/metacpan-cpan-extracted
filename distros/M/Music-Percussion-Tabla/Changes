@@ -1,5 +1,21 @@
 Revision history for Music-Percussion-Tabla
 
+0.0803 2026-10-15 21:30:09
+    - Fix patch numbers yet again.
+
+0.0802 2026-10-15 21:12:25
+    - Fix patch numbers again.
+
+0.0801 2026-10-15 20:45:39
+    - Fix patch numbers. Oops!
+    - Flesh-out tests, finally.
+
+0.0711 2026-10-15 19:05:41
+    - Improve documentation again.
+
+0.0710 2026-10-15 18:46:47
+    - Improve documentation.
+
 0.0709 2026-09-05 17:44:48
     - Fix the module ABSTRACT. Oops. :(
 

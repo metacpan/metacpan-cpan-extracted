@@ -1,7 +1,13 @@
 use strict;
 use warnings;
 use Test::More;
+use Config;
 use Text::KDL::XS qw(parse_kdl emit_kdl);
+
+# Floats are Perl floats (NVs): doubles on most perls, long doubles or quads
+# on perls built with -Duselongdouble or -Dusequadmath. Texts that depend
+# on the width are only checked for doubles; the round trips hold for all.
+my $NV_IS_DOUBLE = $Config{nvsize} == 8;
 
 sub emitted_text { my ($out) = emit_kdl({ n => $_[0] }, @_[1 .. $#_]) =~ /\An (.*)\n\z/; $out }
 sub parsed { parse_kdl("n $_[0]\n")->nodes->[0]->args->[0] }
@@ -16,16 +22,15 @@ sub raw_number { bless { type => 'number', kind => $_[0], value => $_[1] }, 'Tex
 my $inf = 9**9**9;
 my $nan = $inf - $inf;
 
-# Floats are written with the shortest text that reads back as the same double.
+# Floats are written with the shortest text that reads back as the same float.
 my %float_text = (
     '1908124443056.387'  => 1908124443056.387,
     '123456789012345.0'  => 123456789012345.0,
-    '0.30000000000000004' => 0.1 + 0.2,
     '9007199254740992.0' => 2**53,
     '123456789.0'        => 123456789.0,
     '2.2250738585072014e-308' => 2.2250738585072014e-308,
     '2.3e-308'           => 2.3e-308,
-    '4.94065645841247e-324' => 5e-324,
+    ($NV_IS_DOUBLE ? '4.94065645841247e-324' : '5e-324') => 5e-324,
     '-0.0'               => -0.0,
     '1e+21'              => 1e21,
     '0.5'                => 0.5,
@@ -33,6 +38,22 @@ my %float_text = (
 for my $text (sort keys %float_text) {
     is emitted_text($float_text{$text}), $text, "float $text";
 }
+
+{
+    my $sum  = 0.1 + 0.2;
+    my $text = emitted_text($sum);
+    cmp_ok 0 + $text, '==', $sum, 'the text of 0.1 + 0.2 reads back as the same float';
+    is $text, '0.30000000000000004', 'and is the 17-digit text of the double' if $NV_IS_DOUBLE;
+}
+
+# A float keeps the precision of this perl's floats: 1 + 2**-60 is 1 as a
+# double and exact as a long double or quad, in both directions.
+{
+    my $wide = 1 + 2**-60;
+    cmp_ok 0 + emitted_text($wide), '==', $wide, "a float is written at the width of the perl's floats";
+    cmp_ok parsed('1.000000000000000000867361737988403547')->as_number, '==', $wide, 'and read back at that width';
+}
+
 for my $float (2.2250738585072014e-308, 2.3e-308, 1.5e-308, 3.5771699383255836e-303, 1e-320, 1e23) {
     is parsed(emitted_text($float))->as_number, $float, sprintf('%.17g round-trips', $float);
 }
@@ -50,10 +71,18 @@ is sprintf('%g', parse_kdl(emit_kdl({ n => -0.0 }))->nodes->[0]->args->[0]->as_n
     my $kdl = emit_kdl({ n => \@doubles });
     my @texts = split / /, ($kdl =~ /\An (.*)\n\z/)[0];
     is scalar(grep { !/[.e]/ } @texts), 0, 'every emitted float has a decimal point or an exponent';
-    my @read_back = map { $_->as_number } @{ parse_kdl($kdl)->nodes->[0]->args };
-    my @different = grep { $read_back[$_] != $doubles[$_] } 0 .. $#doubles;
-    is scalar @different, 0, '10000 random doubles read back unchanged'
-        or diag sprintf '%.17g', $doubles[ $different[0] ];
+    SKIP: {
+        # ckdl reads a float as mantissa * pow(10, exponent), which rounds
+        # twice. With a correctly rounded pow (glibc, macOS, the BSDs) every
+        # double below survives; the Windows C runtime's pow is not, and a
+        # few come back one ulp off.
+        skip "ckdl's float conversion is one ulp off for some values with the Windows C runtime", 1
+            if $^O eq 'MSWin32';
+        my @read_back = map { $_->as_number } @{ parse_kdl($kdl)->nodes->[0]->args };
+        my @different = grep { $read_back[$_] != $doubles[$_] } 0 .. $#doubles;
+        is scalar @different, 0, '10000 random doubles read back unchanged'
+            or diag sprintf '%.17g', $doubles[ $different[0] ];
+    }
 }
 
 # Non-finite values have no KDL v1 spelling.
@@ -80,7 +109,7 @@ for my $big (qw(18446744073709551616 -9223372036854775809)) {
 
 # Parsed floats are correctly rounded.
 for my $literal (qw(1e23 -9.28967186747759e-78 4.48989800528767e-247 0.1)) {
-    is parsed($literal)->value, 0 + $literal, "$literal parses to the nearest double";
+    is parsed($literal)->value, 0 + $literal, "$literal parses to the nearest float";
 }
 
 # String-encoded numbers are written verbatim, but only valid KDL numbers.

@@ -1,5 +1,11 @@
 Revision history for Hyperman
 
+0.61	2026-10-15
+        - FIX: on io_uring with completion reads, an HTTP/2 handler that
+          waited for its body to drain never read its connection, so the
+          window updates it waited on arrived only after it gave up
+          (t/41 on every Linux smoker with liburing).
+
 0.60	2026-10-14
         - FIX: a stream handle's write was never answered "full" over
           HTTP/2, so a producer never paused and the whole body was held.

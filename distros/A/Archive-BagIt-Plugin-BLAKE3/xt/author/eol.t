@@ -7,9 +7,7 @@ use Test::More 0.88;
 use Test::EOL;
 
 my @files = (
-    'lib/Archive/BagIt/Plugin/Algorithm/BLAKE3.pm',
     'lib/Archive/BagIt/Plugin/BLAKE3.pm',
-    'lib/Archive/BagIt/Plugin/Manifest/BLAKE3.pm',
     't/00-compile.t',
     't/store_bag.t',
     't/verify_bag.t'

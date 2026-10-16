@@ -1,5 +1,5 @@
 package BarefootJS;
-our $VERSION = "0.39.5";
+our $VERSION = "0.39.6";
 use strict;
 use warnings;
 use utf8;
@@ -265,6 +265,10 @@ sub escape_comment_key ($self, $value) {
 # bindings stay on the plain `<%= expr %>` emit path and never reach
 # this function.
 sub bool_str ($self, $value) {
+    # An already-stringified JS boolean (`String(flag)`, which `string`
+    # prints as `true` / `false`, #3440) keeps its text: the string
+    # `'false'` is truthy in Perl.
+    return $value if defined $value && !ref($value) && ($value eq 'true' || $value eq 'false');
     return $value ? 'true' : 'false';
 }
 
@@ -695,10 +699,19 @@ sub string ($self, $value) {
     # `.flat(0)`'s shallow copy stringified afterwards (#2262, shared
     # with Mojolicious/Xslate via this runtime).
     return CORE::join(',', map { $self->string($_) } @$value) if ref($value) eq 'ARRAY';
+    # A JSON boolean prints as JS does (`true` / `false`), not as the `1` /
+    # `0` its numeric overload yields (#3440).
+    return $value ? 'true' : 'false' if _is_json_bool($value);
     # A number prints as JS `Number::toString` does, not with Perl's `%.15g`
     # (#3380); a string passes through unchanged.
     return BarefootJS::Evaluator::_format_number($value + 0) if BarefootJS::Evaluator::_is_number($value);
     return "$value";
+}
+
+# A decoded JSON boolean (`Mojo::JSON::true` / `false`, a `JSON::PP::Boolean`).
+sub _is_json_bool ($value) {
+    my $ref = ref($value);
+    return $ref eq 'JSON::PP::Boolean' || $ref eq 'Mojo::JSON::_Bool';
 }
 
 sub number ($self, $value) {
@@ -712,6 +725,34 @@ sub number ($self, $value) {
     return 0 + 'nan' unless defined $value;
     return $value + 0 if looks_like_number($value);
     return 0 + 'nan';
+}
+
+# JS `+` / `-` / `*` / `/` over numbers (#3454). The adapters emit these
+# instead of Perl's native operators so the result is the IEEE double JS
+# computes: a 64-bit IV sum past 2**53 rounds as a double, a perl with a
+# wider NV (-Duselongdouble / -Dusequadmath) rounds to the double JS has,
+# and division by zero yields +/-Infinity or NaN instead of dying. Operand
+# coercion stays Perl's (`undef` is 0), as with the native operator.
+sub _as_double { unpack('d', pack('d', $_[0])) }
+
+sub add ($self, $l, $r) {
+    no warnings qw(numeric uninitialized);
+    return _as_double(_as_double($l) + _as_double($r));
+}
+
+sub subtract ($self, $l, $r) {
+    no warnings qw(numeric uninitialized);
+    return _as_double(_as_double($l) - _as_double($r));
+}
+
+sub multiply ($self, $l, $r) {
+    no warnings qw(numeric uninitialized);
+    return _as_double(_as_double($l) * _as_double($r));
+}
+
+sub divide ($self, $l, $r) {
+    no warnings qw(numeric uninitialized);
+    return BarefootJS::Evaluator::_divide(_as_double($l), _as_double($r));
 }
 
 # NaN is the only float for which `$x != $x` holds. Used as the
@@ -1080,9 +1121,12 @@ sub join ($self, $recv, $sep = undef) {
 # `String.prototype.length` (#2255) — NOT `CORE::length`'s Unicode codepoint
 # count. A codepoint outside the Basic Multilingual Plane (astral,
 # U+10000-U+10FFFF — e.g. '👍') is a surrogate PAIR in UTF-16, so it counts
-# as 2, not 1; '日本語' is 3 either way (BMP-only).
+# as 2, not 1; '日本語' is 3 either way (BMP-only). An object's `.length` is
+# its own `length` property (`{ length: 3 }`), undef when it has none — the
+# same read the evaluator's `_read_property` does.
 sub length ($self, $recv) {
     return scalar @$recv if ref($recv) eq 'ARRAY';
+    return $recv->{length} if ref($recv) eq 'HASH';
     return 0 if ref($recv);
     my $n = 0;
     $n += ord($_) > 0xFFFF ? 2 : 1 for split //, ($recv // '');
@@ -1428,7 +1472,9 @@ sub to_fixed ($self, $value, $digits = 0) {
     return $n < 0 ? '-Infinity' : 'Infinity' if _is_inf($n);
     $digits = 0 if !defined $digits || $digits < 0;
     my $factor  = 10 ** $digits;
-    my $rounded = POSIX::floor($n * $factor + 0.5);
+    # Scaled as doubles, so `(1.005).toFixed(2)` sees JS's 100.49999… on a
+    # perl whose NV is wider than a double (#3454).
+    my $rounded = POSIX::floor(_as_double(_as_double($n) * $factor) + 0.5);
     return sprintf('%.*f', $digits, $rounded / $factor);
 }
 
@@ -2148,7 +2194,7 @@ package BarefootJS::Date;
 # compartment where `$BarefootJS::VERSION` is not visible and collapses to
 # 0. scripts/sync-perl-versions.ts bumps every `our $VERSION` line in the
 # file, so this stays in lockstep with the package version above.
-our $VERSION = "0.39.5";
+our $VERSION = "0.39.6";
 
 sub new {
     my ($class, $epoch_ms) = @_;

@@ -5,7 +5,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Object::Pad 0.825;
 
@@ -46,7 +46,7 @@ Term::Fabulous::Widget::LineChart - A chart of lines through data points
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-line-chart.svg" alt="Three smooth lines for Web, iOS and Android over the months of a year, with a legend at the top and a y axis in thousands"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-line-chart.svg" alt="Three smooth lines for Web, iOS and Android over the months of a year, with a legend at the top and a y axis in thousands"></p>
 
 =end html
 

@@ -113,3 +113,6 @@
 \.a$
 \.lib$
 \.bs$
+
+# Maintainer-only release checklist (not shipped)
+^RELEASING\.md$

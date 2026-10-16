@@ -10,7 +10,7 @@ use Object::Pad 0.825;
 use Clay::UI::Role::Layout::HasScroll;
 use Term::Fabulous::Widget::Box;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 class Term::Fabulous::Widget::ScrollBox
 	:isa(Term::Fabulous::Widget::Box)
@@ -165,7 +165,7 @@ Term::Fabulous::Widget::ScrollBox - A box whose content scrolls
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-scroll-box.svg" alt="Two framed boxes scrolled down, one with numbered lines, one with squares, each with a scrollbar in its last column whose thumb shows the visible part"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-scroll-box.svg" alt="Two framed boxes scrolled down, one with numbered lines, one with squares, each with a scrollbar in its last column whose thumb shows the visible part"></p>
 
 =end html
 

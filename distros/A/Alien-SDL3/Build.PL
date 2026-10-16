@@ -7,9 +7,9 @@ Alien::Xrepo::MB->new(
     dist_version       => 'v1.0.0',
     license            => 'artistic_2',
     xrepo_update_repo  => 1,
-    requires           => { 'perl'             => 'v5.40.0', 'Alien::Xrepo::Runtime' => 'v1.0.4', 'File::ShareDir' => '1.00' },
-    configure_requires => { 'Alien::Xrepo::MB' => 'v1.0.4', 'Module::Build' => 0 },
-    build_requires     => { 'Alien::Xrepo::MB' => 'v1.0.4' },
+    requires           => { 'perl'             => 'v5.40.0', 'Alien::Xrepo::Runtime' => 'v1.0.5', 'File::ShareDir' => '1.00' },
+    configure_requires => { 'Alien::Xrepo::MB' => 'v1.0.5', 'Module::Build' => 0 },
+    build_requires     => { 'Alien::Xrepo::MB' => 'v1.0.5' },
     test_requires      => { 'Test2::V0'        => 0 },
     recommends         => { 'Affix'            => 0 }
 )->create_build_script;

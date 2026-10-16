@@ -3,7 +3,7 @@ BEGIN {
   my %missing = map {
     eval qq{ require $_ };
     $@ ? ($_=>1) : ()
-  } qw( Carp Encode File::Glob File::Path JSON::PP List::Util Module::CoreList Scalar::Util Term::ANSIColor experimental strict version warnings );
+  } qw( Carp Encode File::Glob File::Path File::Spec JSON::PP List::Util Module::CoreList Scalar::Util Term::ANSIColor experimental strict version warnings );
   if(%missing)
   {
     print "Your Perl is missing core modules: @{[ sort keys %missing ]}\n";
@@ -115,10 +115,13 @@ my %WriteMakefileArgs = (
     "true"                                    => 0
   },
   "TEST_REQUIRES" => {
-    "Test2::V0"    => "0.000121",
-    "Test::Script" => "1.10"
+    "CPAN::Uploader"      => 0,
+    "Capture::Tiny"       => 0,
+    "Perl::PrereqScanner" => 0,
+    "Test2::V0"           => "0.000121",
+    "Test::Script"        => "1.10"
   },
-  "VERSION" => "2.80",
+  "VERSION" => "2.81",
   "test"    => {
     "TESTS" => "t/*.t"
   }

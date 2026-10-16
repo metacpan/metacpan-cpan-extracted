@@ -9,8 +9,7 @@ use Test::Most tests => 21;
 use Test::Number::Delta;
 use Test::Carp;
 use Test::Deep;
-use lib 't/lib';
-use MyLogger;
+use Test::Log::Abstraction;
 
 BEGIN {
 	use_ok('Geo::Coder::Free');
@@ -28,7 +27,7 @@ WHOSONFIRST: {
 				}
 
 				if($ENV{'TEST_VERBOSE'}) {
-					Geo::Coder::Free::DB::init(logger => new_ok('MyLogger'));
+					Geo::Coder::Free::DB::init(logger => new_ok('Test::Log::Abstraction'));
 				}
 
 				my $geo_coder = new_ok('Geo::Coder::Free');

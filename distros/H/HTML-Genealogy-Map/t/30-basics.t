@@ -328,10 +328,10 @@ throws_ok {
 
 	my $geocoder = Mock::Geocoder->new();
 
-	my ($head, $body) = HTML::Genealogy::Map->onload_render(
+	my ($head, $body) = HTML::Genealogy::Map::onload_render({
 		gedcom => $ged,
 		geocoder => $geocoder
-	);
+	});
 
 	ok(defined $body, 'Handles failed geocoding gracefully');
 }

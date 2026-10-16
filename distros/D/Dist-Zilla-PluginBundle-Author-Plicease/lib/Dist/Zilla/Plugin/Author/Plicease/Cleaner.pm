@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::Cleaner 2.80 {
+package Dist::Zilla::Plugin::Author::Plicease::Cleaner 2.81 {
 
   use 5.022;
   use Moose;
@@ -127,7 +127,7 @@ Dist::Zilla::Plugin::Author::Plicease::Cleaner - Clean things up
 
 =head1 VERSION
 
-version 2.80
+version 2.81
 
 =head1 SYNOPSIS
 

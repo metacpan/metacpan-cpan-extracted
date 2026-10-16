@@ -3,7 +3,7 @@
    "author" : [
       "Elanat"
    ],
-   "dynamic_config" : 0,
+   "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "mit"
@@ -36,17 +36,17 @@
          }
       }
    },
-	"provides" : {
-	   "WFC" : {
-		  "file" : "lib/WebForms.pm",
-		  "version" : "2.1.1"
-	   },
-	   "WebForms" : {
-		  "file" : "lib/WebForms.pm",
-		  "version" : "2.1.1"
-	   }
-	},
+   "provides" : {
+      "WFC" : {
+         "file" : "lib/WebForms.pm",
+         "version" : "v2.2.0"
+      },
+      "WebForms" : {
+         "file" : "lib/WebForms.pm",
+         "version" : "v2.2.0"
+      }
+   },
    "release_status" : "stable",
-   "version" : "v2.1.1",
+   "version" : "v2.2.0",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

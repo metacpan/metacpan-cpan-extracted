@@ -111,7 +111,7 @@ This program is shipped as F<examples/cookbook/paint-with-the-mouse.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-paint-with-the-mouse.svg" alt="A wave of stars drawn by dragging the mouse over a canvas, with an o where the drag started and at three clicked cells"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-paint-with-the-mouse.svg" alt="A wave of stars drawn by dragging the mouse over a canvas, with an o where the drag started and at three clicked cells"></p>
 
 =end html
 
@@ -221,7 +221,7 @@ This program is shipped as F<examples/cookbook/pixel-canvas-plot.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-pixel-canvas-plot.svg" alt="A line chart of temperatures on a pixel canvas, red above 20 degrees"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-pixel-canvas-plot.svg" alt="A line chart of temperatures on a pixel canvas, red above 20 degrees"></p>
 
 =end html
 
@@ -351,7 +351,7 @@ C<perl examples/cookbook/picture-viewer.pl photo.jpg>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-picture-viewer.svg" alt="Three overlapping translucent circles, red, green and blue, scaled twice in a frame on the dark screen, their colors mixed where they overlap, with the file name, the picture size, the fit and the keys above them"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-picture-viewer.svg" alt="Three overlapping translucent circles, red, green and blue, scaled twice in a frame on the dark screen, their colors mixed where they overlap, with the file name, the picture size, the fit and the keys above them"></p>
 
 =end html
 
@@ -465,7 +465,7 @@ This program is shipped as F<examples/cookbook/embedded-logo.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-embedded-logo.svg" alt="An about box with a rainbow circle logo next to the program name, a description and a hint to press q"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-embedded-logo.svg" alt="An about box with a rainbow circle logo next to the program name, a description and a hint to press q"></p>
 
 =end html
 
@@ -578,7 +578,7 @@ C<perl examples/cookbook/sixel-viewer.pl photo.jpg>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-sixel-viewer.svg" alt="A detail of the Mandelbrot set, blue and white spirals with orange and dark red bands, scaled to fit a rounded frame on the dark screen in sixel graphics, with a help box of the four keys over the top of the picture, which leaves those cells out, and the keys above the frame"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-sixel-viewer.svg" alt="A detail of the Mandelbrot set, blue and white spirals with orange and dark red bands, scaled to fit a rounded frame on the dark screen in sixel graphics, with a help box of the four keys over the top of the picture, which leaves those cells out, and the keys above the frame"></p>
 
 =end html
 

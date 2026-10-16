@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::Tests 2.80 {
+package Dist::Zilla::Plugin::Author::Plicease::Tests 2.81 {
 
   use 5.022;
   use Moose;
@@ -123,11 +123,11 @@ package Dist::Zilla::Plugin::Author::Plicease::Tests 2.80 {
 
     my $code = '';
 
-    $code = "BEGIN { eval q{ use EV; } }\n" if $list{EV};
+    $code = "BEGIN { eval { require 'EV.pm'; } }\n" if $list{EV};
     $code .= '$modules{$_} = $_ for qw(' . "\n";
     $code .= join "\n", map { "  $_" } sort keys %list;
     $code .= "\n);\n";
-    $code .= "eval q{ require Test::Tester; };" if $list{'Test::Builder'} && $list{'Test::Tester'};
+    $code .= "eval { require 'Test/Tester.pm'; };" if $list{'Test::Builder'} && $list{'Test::Tester'};
 
     my($file) = grep { $_->name eq 't/00_diag.t' } $self->zilla->files->@*;
 
@@ -147,7 +147,7 @@ package Dist::Zilla::Plugin::Author::Plicease::Tests 2.80 {
       $self->add_file($file);
     }
 
-    $self->zilla->root->child(qw( t 00_diag.t ))->spew_raw($content);
+    $self->zilla->root->child(qw( t 00_diag.t ))->touchpath->spew_raw($content);
   }
 
   sub test
@@ -177,7 +177,7 @@ Dist::Zilla::Plugin::Author::Plicease::Tests - add author only release tests to 
 
 =head1 VERSION
 
-version 2.80
+version 2.81
 
 =head1 SYNOPSIS
 

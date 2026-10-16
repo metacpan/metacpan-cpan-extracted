@@ -8,17 +8,17 @@ Alien::Xrepo::Runtime - Consumer class for xrepo-based Alien modules
 
 =head1 SYNOPSIS
 
-    package Alien::Zstd;
+    package Alien::Xyz;
     use v5.40;
     use experimental 'class';
     use Alien::Xrepo::Runtime;
 
-    class Alien::Zstd : isa(Alien::Xrepo::Runtime) {
+    class Alien::Xyz : isa(Alien::Xrepo::Runtime) {
         method recipe {
             return {
-                name        => 'Alien-Zstd',
-                packages    => [ { name => 'zstd', kind => 'shared' } ],
-                local_repos => ['vendor/recipes'],   # optional, used by the build engine
+                name        => 'Alien-Xyz',
+                packages    => [ { name => 'zyz', kind => 'shared' } ],
+                local_repos => ['vendor/recipes']   # optional, used by the build engine
             };
         }
     }
@@ -27,14 +27,14 @@ Alien::Xrepo::Runtime - Consumer class for xrepo-based Alien modules
 
     # A dist with no extra recipe fields may declare only pkg_name instead:
 
-    package Alien::Zstd;
+    package Alien::Xyz;
     use v5.40;
     use experimental 'class';
     use Alien::Xrepo::Runtime;
 
-    class Alien::Zstd : isa(Alien::Xrepo::Runtime) {
+    class Alien::Xyz : isa(Alien::Xrepo::Runtime) {
         method pkg_name {
-            return [ { name => 'zstd', kind => 'shared' } ];
+            return [ { name => 'xyz', kind => 'shared' } ];
         }
     }
 
@@ -147,8 +147,8 @@ snapshot is returned unchanged.
 
 =item C<alt( $name )>
 
-Returns an accessor bound to a non-primary package; calling C<alt> on the primary returns C<$self>. Example: C<<
-Exotic::SDL3->alt('libsdl3_ttf')->cflags >>.
+Returns an L<Alien::Xrepo::Runtime::Alt> view bound to a non-primary package; calling C<alt> on the primary returns
+C<$self>. Example: C<< Exotic::SDL3->alt('libsdl3_ttf')->cflags >>.
 
 =item C<find_header( $file, [$pkg] )>
 
@@ -223,17 +223,17 @@ is accepted for compatibility with other accessors, but the split logic itself d
 =head1 CONSTRUCTOR
 
     Alien::Zstd->new(
-        pkg_name     => 'zstd',                  # or an arrayref of names / hashref defs
-        recipe       => $path_or_recipe,         # alternative to inline pkg_name
-        install_opts => { kind => 'shared' },    # ambient flags under every package
-        root         => $store_root,
-        repo         => $alien_xrepo,            # injectable engine
-        cache        => 0,                       # bypass Alien::Xrepo's warm-start cache
-        check_runtime_deps => 1,                 # attach discovered runtime deps to package_info
-        snapshot     => $file,                   # hermetic data; wins over dynamic fetch
-        autodetect_snapshot => 1,                # look in the installed dist's share dir
-        verbose      => 1
-    )
+        pkg_name            => 'zstd',                  # or an arrayref of names / hashref defs
+        recipe              => $path_or_recipe,         # alternative to inline pkg_name
+        install_opts        => { kind => 'shared' },    # ambient flags under every package
+        root                => $store_root,
+        repo                => $alien_xrepo,            # injectable engine
+        cache               => 0,                       # bypass Alien::Xrepo's warm-start cache
+        check_runtime_deps  => 1,                       # attach discovered runtime deps to package_info
+        snapshot            => $file,                   # hermetic data; wins over dynamic fetch
+        autodetect_snapshot => 1,                       # look in the installed dist's share dir
+        verbose             => 1
+    );
 
 C<recipe> is C<undef> by default; when set, it may be an L<Alien::Xrepo::Build::Recipe> object, a file or directory
 path to an C<xrepo.json>, or a hashref of recipe fields (name, packages, defaults, pkg_roots, local_repos, hooks).

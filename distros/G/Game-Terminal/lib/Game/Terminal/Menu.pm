@@ -13,7 +13,7 @@ use Game::Terminal::Kit::Run;
 use Game::Terminal::Kit::Screen;
 use Text::ParseWords ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 my %WORD = (0 => 'won or drew', 1 => 'lost', 2 => 'bad option');
 
@@ -527,7 +527,7 @@ numbered list and a prompt instead.
 
 =head2 The screen
 
-    Game                                                            20 games
+    Game                                                            21 games
 
      > backgammon  board  2    backgammon
        brandubh    board  2    the Irish 7 by 7 tafl game

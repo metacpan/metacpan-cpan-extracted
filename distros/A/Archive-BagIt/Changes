@@ -1,10 +1,60 @@
 ==================================================
-Changes from 2024-10-20 00:00:00 +0000 to present.
+Changes from 2025-10-15 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.101 at 2025-10-20 07:14:13 +0000
+version 0.102 at 2026-10-15 20:35:52 +0000
 ------------------------------------------
+
+  Change: f2c876bc6faafc77492bb12c6913c483c55fee8d
+  Author: art1@andreas-romeyke.de <art1pirat@fsfe.org>
+  Date : 2026-10-15 22:30:22 +0000
+
+    - added new values 
+
+  Change: 8b8c554245fa4d874f0f8498cb05cd09dc805fc5
+  Author: art1@andreas-romeyke.de <art1pirat@fsfe.org>
+  Date : 2026-10-15 22:30:05 +0000
+
+    - improved get_optimal_bufsize(), avoiding multiple calc for
+    different files of same bag 
+
+  Change: 799d848d651fc4e8018c49e2182cba7591a2e50c
+  Author: art1@andreas-romeyke.de <art1pirat@fsfe.org>
+  Date : 2026-10-15 22:29:18 +0000
+
+    - use sync variant, because async needs a rewrite 
+
+  Change: c3068c40717b0589c7f1942df881daed236a1345
+  Author: art1@andreas-romeyke.de <art1pirat@fsfe.org>
+  Date : 2026-10-15 22:28:51 +0000
+
+    - added fixme hint 
+
+  Change: b579249b14b247240d1004f5fce56ba543968428
+  Author: art1@andreas-romeyke.de <art1pirat@fsfe.org>
+  Date : 2026-10-15 20:48:44 +0000
+
+    - updated throughput values 
+
+  Change: a2804b06d005a778b96cc4a2d797b719fe5792d6
+  Author: art1@andreas-romeyke.de <art1pirat@fsfe.org>
+  Date : 2026-10-15 20:17:33 +0000
+
+    - simplified, use base method 
+
+  Change: 77b4740d23185e59d8003e42e8c7a813eb7579c4
+  Author: art1@andreas-romeyke.de <art1pirat@fsfe.org>
+  Date : 2026-10-15 20:14:53 +0000
+
+    - refactoring plugin handling, unified to new plugin structure,
+    breaks existing plugin 
+
+  Change: 2ada1d8a0fbe7d817a66a0a0e4e7bd13f19c118e
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2025-10-20 09:15:22 +0000
+
+    Released 0.101 
 
   Change: 5f19792929aa895c90953bf8437f40cb81ad6012
   Author: Andreas Romeyke <art1@andreas-romeyke.de>
@@ -110,158 +160,6 @@ version 0.101 at 2025-10-20 07:14:13 +0000
 
     - use async IO by default 
 
-------------------------------------------
-version 0.100 at 2025-02-25 08:55:49 +0000
-------------------------------------------
-
-  Change: cc1bd60c64a46fbb5eaf39bd3f89eec5b3fe9aba
-  Author: art1@andreas-romeyke.de <art1pirat@fsfe.org>
-  Date : 2025-02-25 09:55:49 +0000
-
-    Released 0.100 
-
-  Change: 0b176a133eb125b794aaa3de6d0f6146ff37ae14
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2025-02-25 09:52:52 +0000
-
-    - fixed issues if bag-info.txt is empty or undefined, unit tests
-    added, too 
-
-------------------------------------------
-version 0.099 at 2025-02-24 09:27:50 +0000
-------------------------------------------
-
-  Change: 4bb18f7afd748a03f2dde00ae1650023d6ac74d5
-  Author: art1@andreas-romeyke.de <art1pirat@fsfe.org>
-  Date : 2025-02-24 10:27:50 +0000
-
-    Released 0.099 
-
-  Change: 33ebfc16a3f202b1c41dedb3a74a3d0de2bdaa1c
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2025-02-24 10:25:30 +0000
-
-    fixed regex in _extract_key_from_textblob() 
-
-  Change: b8149643abd3ee7b13cd150b7a0f4e56a785292a
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2025-02-24 10:24:30 +0000
-
-    - fixed testcase 
-
-  Change: 11760bf4072d6b7bed3ccc799d0aa7e120c46ae9
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2025-02-24 10:24:15 +0000
-
-    - added unit test to check newline after key 
-
-  Change: 5e74d75da4a43d323b46346b94ba8d9863f50ce1
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2025-02-24 10:23:42 +0000
-
-    - added specific test bag 
-
-------------------------------------------
-version 0.098 at 2025-02-21 08:25:03 +0000
-------------------------------------------
-
-  Change: 33abbce21cab87400377daedfcf50adde2c6f974
-  Author: art1@andreas-romeyke.de <art1pirat@fsfe.org>
-  Date : 2025-02-21 09:25:03 +0000
-
-    Released 0.098 
-
-  Change: 9f82ff81a3305692343d36ade4bff7dbe6e658b0
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2025-02-21 09:21:12 +0000
-
-    - added tests 
-
-  Change: 43001e03c603c6339b1359a417c5a998f9c76def
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2025-02-21 09:20:36 +0000
-
-    - rewrite of _parse_baginfo() using _extract_key_from_textblob() and
-    _extract_value_from_textblob() 
-
-  Change: d6f656633fe299a8c04df140aeca5bf26234b6ea
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2025-02-21 09:19:47 +0000
-
-    - added tests for _extract_key_from_textblob() and
-    _extract_value_from_textblob() 
-
-  Change: 4c3233f2c7ab9f839775c84d1b70006af247d407
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2025-02-21 09:18:15 +0000
-
-    - added _extract_key_from_textblob() and
-    _extract_value_from_textblob() 
-
-  Change: 0c74a9201b31979e99db019a3e440965607ca586
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2025-02-21 09:16:51 +0000
-
-    - added _check_value_or_corak() 
-
-  Change: 58fdeb75acad682bed142caeff661367d6c7bd61
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2025-02-21 09:15:38 +0000
-
-    - fixed return code 
-
-------------------------------------------
-version 0.097 at 2025-02-20 12:36:56 +0000
-------------------------------------------
-
-  Change: f6984c23240eba63ae208cec972e7f31d446d80b
-  Author: art1@andreas-romeyke.de <art1pirat@fsfe.org>
-  Date : 2025-02-20 13:36:56 +0000
-
-    Released 0.097 
-
-  Change: 3206eccbf7fe122c1afc96318fd664d4d5fa2f76
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2025-02-20 13:34:35 +0000
-
-    - minor, renamed to private method 
-
-  Change: e01551190ef45f4eb8d5f3ed7904e75e22c731f4
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2025-02-20 13:22:04 +0000
-
-    - bugfix, improve verify_baginfo() to check key and value problems 
-
-  Change: a66b1d0b6048efb515adf5d3a4f2d4cb4970df86
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2025-02-20 13:19:31 +0000
-
-    - add verify_baginfo() related tests 
-
-------------------------------------------
-version 0.096 at 2025-01-29 08:02:59 +0000
-------------------------------------------
-
-  Change: 4a7021fe3860b7ff1bd67f7bdb06bf37a2602f47
-  Author: art1@andreas-romeyke.de <art1pirat@fsfe.org>
-  Date : 2025-01-29 09:02:59 +0000
-
-    Released 0.096 
-
-  Change: 679d662f6021a9f6fb78dcfd4e55aeebc3367400
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2025-01-29 08:10:32 +0000
-
-    - fix, if you store a bag with large payload-files, the bagit.txt and
-    bag-info.txt should be written after manifest-files to ensure, that a
-    partial written bagit is not processed before finished. 
-
-  Change: 1169e73e7522d9aa8b9f22b334d046d4899d070e
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2025-01-29 07:57:41 +0000
-
-    - fixed outdated README 
-
 =================================================
-Plus 45 releases after 2024-10-20 00:00:00 +0000.
+Plus 50 releases after 2025-10-15 00:00:00 +0000.
 =================================================

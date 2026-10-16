@@ -1,5 +1,8 @@
 Revision history for Context-Vars
 
+0.05    2026-10-16
+        - Fix t/01-needs-hamt.t and t/34-synopsis.t on Windows
+
 0.04    2026-10-15
         - Fix t/01-needs-hamt.t on 32-bit perls with 64-bit integers.
         - Fix t/19-async.t before perl 5.24, where Future::AsyncAwait keeps

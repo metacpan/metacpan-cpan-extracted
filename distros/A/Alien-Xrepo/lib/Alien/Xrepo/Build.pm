@@ -2,7 +2,7 @@ use v5.40;
 use feature 'class';
 no warnings 'experimental::class';
 #
-class Alien::Xrepo::Build v1.0.6 {
+class Alien::Xrepo::Build v1.0.8 {
     use Alien::Xrepo;
     use Alien::Xrepo::Build::Recipe;
     use Path::Tiny;
@@ -119,8 +119,8 @@ class Alien::Xrepo::Build v1.0.6 {
             eval { $r->add_repo( $nm, $dir->stringify ) };
         }
         $install_type = 'system';
-        $self->_checkpoint;
         $stage_done->{configure} = 1;
+        $self->_checkpoint;
         $self;
     }
 
@@ -146,8 +146,8 @@ class Alien::Xrepo::Build v1.0.6 {
                 $install_prop->{probed}{$name} = { version => $found, satisfied => $self->_probe_satisfied( $found, $expected ) };
             }
         }
-        $self->_checkpoint;
         $stage_done->{probe} = 1;
+        $self->_checkpoint;
         $self;
     }
 
@@ -175,12 +175,18 @@ class Alien::Xrepo::Build v1.0.6 {
             my %env = $self->_manager_tool_env($name);
             local @ENV{ keys %env } = values %env if %env;
             my $info;
-            my $attempt = 0;
             while (1) {
-                $attempt++;
                 $info = eval { $r->install( $name, $version, %opts ) };
                 last if $info || !$@;
-                if ( $update_repo && $attempt < 2 ) {
+
+                # Bounded recovery: one refresh-and-retry per package per build tree.
+                # The count lives in runtime_prop, which _checkpoint persists, so a
+                # resumed Build cannot start the cycle over for the same package --
+                # without that, every run of an install the registry cannot satisfy
+                # repeats the refresh and the retry never terminates.
+                if ( $update_repo && !$runtime_prop->{retries}{$name} ) {
+                    $runtime_prop->{retries}{$name} = 1;
+                    $self->_checkpoint;
                     say "[xrepo] $name install failed; refreshing repositories to retry once..." if $verbose;
                     eval { $r->update_repo };
                     next;
@@ -196,8 +202,8 @@ class Alien::Xrepo::Build v1.0.6 {
                 $install_type = 'share';
             }
         }
-        $self->_checkpoint;
         $stage_done->{install} = 1;
+        $self->_checkpoint;
         $self;
     }
 
@@ -232,8 +238,8 @@ class Alien::Xrepo::Build v1.0.6 {
                 $install_type = 'share';
             }
         }
-        $self->_checkpoint;
         $stage_done->{gather} = 1;
+        $self->_checkpoint;
         $self;
     }
 
@@ -310,8 +316,8 @@ class Alien::Xrepo::Build v1.0.6 {
             path($snapshot)->spew_utf8( encode_json($data) . "\n" );
             say "Wrote runtime snapshot $snapshot" if $verbose;
         }
-        $self->_checkpoint;
         $stage_done->{export} = 1;
+        $self->_checkpoint;
         $self;
     }
 
@@ -464,6 +470,9 @@ class Alien::Xrepo::Build v1.0.6 {
         return substr( $p, length($share) + 1 );
     }
 
+    # Callers mark the stage done *before* checkpointing. The file has to record the
+    # stage that just finished, or a resumed Build re-enters work that is already
+    # complete -- on a long stage such as install, repeating it in full.
     method _checkpoint () {
         return unless defined $checkpoint;
         path($checkpoint)->parent->mkpath;

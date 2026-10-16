@@ -1,20 +1,17 @@
-use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.058
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.059
 
 use Test::More;
 
-plan tests => 7;
+plan tests => 5;
 
 my @module_files = (
     'OpenTelemetry/Exporter/OTLP.pm',
     'OpenTelemetry/Exporter/OTLP/Encoder/JSON.pm',
-    'OpenTelemetry/Exporter/OTLP/Encoder/Protobuf.pm',
     'OpenTelemetry/Exporter/OTLP/Logs.pm',
-    'OpenTelemetry/Exporter/OTLP/Traces.pm',
-    'OpenTelemetry/Proto.pm'
+    'OpenTelemetry/Exporter/OTLP/Traces.pm'
 );
 
 
@@ -37,7 +34,7 @@ for my $lib (@module_files)
     # see L<perlfaq8/How can I capture STDERR from an external command?>
     my $stderr = IO::Handle->new;
 
-    diag('Running: ', join(', ', map { my $str = $_; $str =~ s/'/\\'/g; q{'} . $str . q{'} }
+    diag('Running: ', join(', ', map { my $str = $_; $str =~ s/'/\\'/g; q{'}.$str.q{'} }
             $^X, @switches, '-e', "require q[$lib]"))
         if $ENV{PERL_COMPILE_TEST_DEBUG};
 
@@ -59,7 +56,6 @@ for my $lib (@module_files)
 
 
 
-is(scalar(@warnings), 0, 'no warnings found')
-    or diag 'got warnings: ', ( Test::More->can('explain') ? Test::More::explain(\@warnings) : join("\n", '', @warnings) );
+is(scalar(@warnings), 0, 'no warnings found') or diag 'got warnings: ', ( Test::More->can('explain') ? Test::More::explain(\@warnings) : join("\n", '', @warnings) );
 
 

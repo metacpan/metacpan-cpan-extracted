@@ -10,7 +10,7 @@ use Object::Pad 0.825;
 use Term::Fabulous::Role::HasRange;
 use Term::Fabulous::Widget::Display;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 class Term::Fabulous::Widget::ProgressBar
 	:isa(Term::Fabulous::Widget::Display)
@@ -392,7 +392,7 @@ Term::Fabulous::Widget::ProgressBar - How much of a task is done
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-progress-bar.svg" alt="Progress bars: a block bar at 42 percent, one with the value inside, a thin line bar, a striped bar, a bar of three colored segments, an indeterminate bar with its runner, and a two-row ASCII bar"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-progress-bar.svg" alt="Progress bars: a block bar at 42 percent, one with the value inside, a thin line bar, a striped bar, a bar of three colored segments, an indeterminate bar with its runner, and a two-row ASCII bar"></p>
 
 =end html
 

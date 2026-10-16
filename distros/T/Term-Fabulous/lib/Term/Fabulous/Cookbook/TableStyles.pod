@@ -148,7 +148,7 @@ This program is shipped as F<examples/cookbook/table-widths.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-table-widths.svg" alt="An order table with a fixed number column, a growing Item column, a Notes column that takes a third of the width and wraps, an address column of two lines per row, a centered quantity, prices with a left-aligned title, and a Rating title with a star"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-widths.svg" alt="An order table with a fixed number column, a growing Item column, a Notes column that takes a third of the width and wraps, an address column of two lines per row, a centered quantity, prices with a left-aligned title, and a Rating title with a star"></p>
 
 =end html
 
@@ -302,7 +302,7 @@ This program is shipped as F<examples/cookbook/table-lines.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-table-lines.svg" alt="A budget table: a heavy line and dashed lines in the Left column, negative amounts in red, a cancelled row in gray italics and a bold totals row under a double line"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-lines.svg" alt="A budget table: a heavy line and dashed lines in the Left column, negative amounts in red, a cancelled row in gray italics and a bold totals row under a double line"></p>
 
 =end html
 
@@ -444,7 +444,7 @@ This program is shipped as F<examples/cookbook/table-colors.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-table-colors.svg" alt="A table of planets with an Outer block frame, no inner lines, colored column titles, striped rows and the cursor row highlighted up to the frame"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-colors.svg" alt="A table of planets with an Outer block frame, no inner lines, colored column titles, striped rows and the cursor row highlighted up to the frame"></p>
 
 =end html
 
@@ -557,7 +557,7 @@ It shows the same small table nine times, each with other lines.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-table-line-styles.svg" alt="Nine small tables with different lines: the default round frame, a full grid, no lines, a double frame with a heavy title line, a heavy frame with dashed row lines, ASCII lines, and Outer, Inner and Thick block frames"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-line-styles.svg" alt="Nine small tables with different lines: the default round frame, a full grid, no lines, a double frame with a heavy title line, a heavy frame with dashed row lines, ASCII lines, and Outer, Inner and Thick block frames"></p>
 
 =end html
 

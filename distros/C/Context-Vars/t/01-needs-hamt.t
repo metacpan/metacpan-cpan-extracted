@@ -11,21 +11,32 @@ use File::Temp qw(tempdir);
 # perl, because a module that failed to load cannot be loaded again in the
 # same process to try the next one.
 #
-# The child is started with the list form of open, so no shell is involved,
-# and it sends its own STDERR to STDOUT so the message comes back down the
-# one pipe.
+# The child's code is written to a script, never passed with -e: Windows has
+# no argument vector, and perl does not escape a double quote inside an
+# argument when it joins them into one command line. The script sends its own
+# STDOUT and STDERR to a file, so the message comes back without a pipe.
 
 my @inc = map { "-I$_" } grep { !ref } @INC;
+my $work = tempdir(CLEANUP => 1);
+my $script = File::Spec->catfile($work, 'child.pl');
+my $output = File::Spec->catfile($work, 'child.out');
 
 sub child {
     my ($code) = @_;
-    my $pid = open(my $out, '-|', $^X, @inc, '-e',
-                   'BEGIN { open STDERR, ">&", \*STDOUT or die $! } ' . $code);
-    defined $pid or die "cannot start $^X: $!";
-    local $/;
-    my $text = <$out>;
-    close $out;
-    return ($? >> 8, defined $text ? $text : '');
+    open(my $fh, '>', $script) or die "cannot write $script: $!";
+    print {$fh} "BEGIN { open STDOUT, '>', q{$output} or die \$!; "
+              . "open STDERR, '>&', \\*STDOUT or die \$! }\n$code\n";
+    close $fh or die "cannot close $script: $!";
+    unlink $output;
+    system($^X, @inc, $script);
+    my $rc = $? >> 8;
+    my $text = '';
+    if (open(my $in, '<', $output)) {
+        local $/;
+        $text = <$in>;
+        close $in;
+    }
+    return ($rc, defined $text ? $text : '');
 }
 
 # The control: the same child, with nothing in the way, loads. Without this

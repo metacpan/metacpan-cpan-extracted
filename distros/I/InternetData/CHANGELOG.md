@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 1.6.1 are described by their release commits.
 
+## 1.9.5 - 2026-10-16
+
+### Fixes
+
+- Re-pin the spec to 2026.10.15: three descriptions in US spelling ([`597760d`](https://github.com/internetdata/sdk-perl/commit/597760d6628d5a00de9eddc21b148a9357d73276))
+
 ## 1.9.4 - 2026-10-15
 
 ### Fixes

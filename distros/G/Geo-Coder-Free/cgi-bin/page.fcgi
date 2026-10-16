@@ -9,7 +9,7 @@
 #	LANG=en_GB root_dir=$(pwd)/.. ./page.fcgi page=index
 # To mimic a French mobile site:
 #	root_dir=$(pwd)/.. ./page.fcgi --mobile page=index lang=fr
-# To turn off the linting of HTML on a search engine landing page
+# To turn off the linting of HTML on a search-engine landing page
 #	LANG=en_GB root_dir=$(pwd)/.. ./page.fcgi --search-engine page=index lint_content=0
 
 use strict;
@@ -45,6 +45,7 @@ use Error qw(:try);
 use File::Spec;
 use POSIX qw(strftime);
 use Readonly;
+use Module::Runtime qw(require_module);	# Safe dynamic module loading; avoids string eval
 use Time::HiRes;
 
 # use lib '/usr/lib';	# This needs to point to the Geo::Coder::Free directory lives,
@@ -55,6 +56,7 @@ use lib CGI::Info::script_dir() . '/../lib';
 use lib File::HomeDir->my_home() . '/lib/perl5';
 
 use Geo::Coder::Free;
+use Geo::Coder::Free::Allow;
 use Geo::Coder::Free::Config;
 use Geo::Coder::Free::Utils;
 
@@ -345,8 +347,12 @@ sub doit
 				$logger->info("CAPTCHA verified for $client_ip - rate limit bypass granted");
 				$has_captcha_bypass = 1;
 
-				# Redirect to original page or home
+				# Redirect to original page or home.
+				# Strip every non-word character before interpolating into the
+				# Location header to prevent HTTP response splitting: a raw
+				# newline in $redirect_page would inject a second header line.
 				my $redirect_page = $info->param('page') || 'index';
+				$redirect_page =~ s/[^\w]//g;
 				$info->status(302);
 				print "Status: 302 Found\n",
 					"Location: $ENV{SCRIPT_NAME}?page=$redirect_page\n\n";
@@ -448,20 +454,42 @@ sub doit
 		return;
 	}
 
-	# Access control checks
+	# ── Multi-layer access control ─────────────────────────────────────────
+	# Three independent checks are run in order of cheapness:
+	#   1. CGI::ACL — cloud ranges, country blocks, explicit IP allow/deny.
+	#   2. blacklisted() — in-process IP set built from prior SQL-injection attempts.
+	#   3. CGI::Geo::Coder::Free::Allow — DShield feed, user-agent blacklist, throttler, IDS.
 	if(my $remote_addr = $ENV{'REMOTE_ADDR'}) {
 		my $reason;
 		if($acl->all_denied(lingua => $lingua)) {
 			$reason = 'Denied by CGI::ACL';
 		} elsif(blacklisted($info)) {
 			$reason = 'Blacklisted for attempting to break in';
+		} else {
+			# CGI::Geo::Coder::Free::Allow may throw an Error object when it blocks a request.
+			# Catch it here so the 403 response is sent rather than propagating.
+			try {
+				unless(CGI::Geo::Coder::Free::Allow::allow({
+					info   => $info,
+					lingua => $lingua,
+					logger => $logger,
+					cache  => $rate_limit_cache,
+					config => $config,
+				})) {
+					$reason = 'Blocked by CGI::Geo::Coder::Free::Allow';
+				}
+			} catch Error with {
+				$reason = shift;
+			};
 		}
 		if($reason) {
-			# Client has been blocked
+			# Return a minimal plain-text 403 - no template rendering so that
+			# a blocked attacker receives no information about site structure.
 			print "Status: 403 Forbidden\n",
 				"Content-type: text/plain\n",
 				"Pragma: no-cache\n\n";
 
+			# Suppress the body on HEAD requests per RFC 7231 §4.3.2.
 			unless($ENV{'REQUEST_METHOD'} && ($ENV{'REQUEST_METHOD'} eq 'HEAD')) {
 				print "Access Denied\n";
 			}
@@ -472,6 +500,9 @@ sub doit
 		}
 	}
 
+	# ── FCGI::Buffer setup ────────────────────────────────────────────────
+	# FCGI::Buffer post-processes the output: compresses it, generates an ETag
+	# and Last-Modified header, and serves a 304 Not Modified when appropriate.
 	my $args = {
 		generate_etag => 1,
 		generate_last_modified => 1,
@@ -480,6 +511,8 @@ sub doit
 		info => $info,
 		optimise_content => 1,
 		logger => $logger,
+		# lint_content runs HTML::Tidy on the output; enable in debug mode or
+		# when explicitly requested via the lint_content query parameter.
 		lint_content => $info->param('lint_content') // $params{'debug'},
 		lingua => $lingua
 	};
@@ -508,9 +541,12 @@ sub doit
 		}
 	}
 
+	# $display holds the instantiated Geo::Coder::Free::Display subclass when the page is
+	# found; $invalidpage is set when the page name is invalid or unloadable.
 	my $display;
 	my $invalidpage;
 
+	# Arguments forwarded to every Geo::Coder::Free::Display subclass constructor.
 	$args = {
 		cachedir => $cachedir,
 		info => $info,
@@ -520,19 +556,29 @@ sub doit
 		log => $log
 	};
 
-	# Display the requested page
+	# ── Page dispatch ──────────────────────────────────────────────────────
+	# The outer block eval catches any exception thrown during module loading
+	# or display-object construction, setting $@ for inspection below.
 	eval {
 		my $page = $info->param('page');
+
+		# Strip URL fragment identifiers - the server never needs them.
 		$page =~ s/#.*$//;
-		$page =~ s/\\//g;	# I don't know what you're trying to escape or why, but I'm not going to let you
+
+		# Reject backslashes: no legitimate page name contains one, and
+		# they have historically been used to probe Windows path traversal.
+		$page =~ s/\\//g;
+
 		if($page =~ /\//) {
-			# Block "page=/etc/passwd" and "page=http://www.google.com"
+			# A slash in the page name indicates an attempt to traverse
+			# directories (e.g. page=/etc/passwd or page=http://evil.com).
 			$logger->info("Blocking '/' in $page");
 			$info->status(403);
 			$log->status(403);
 			$invalidpage = 1;
 		} else {
-			# Remove all non alphanumeric characters in the name of the page to be loaded
+			# Strip every non-word character so that the page name can only
+			# contain [A-Za-z0-9_] - safe to use as a Perl package suffix.
 			$page =~ s/\W//g;
 			$page =~ s/\s//g;
 			my $display_module = "Geo::Coder::Free::Display::$page";
@@ -540,8 +586,14 @@ sub doit
 			# TODO: consider creating a whitelist of valid modules
 			$logger->debug("doit(): Loading module $display_module from @INC");
 			unless($display_module->can('new')) {
-				eval "require $display_module; 1";
-				$display_module->import();
+				# String-eval elimination:
+				#   The original code used eval "require $display_module" which is a
+				#   string eval on a user-derived value.  Although $page has been
+				#   stripped of \W characters, a Unicode or locale edge-case could
+				#   allow a bypass.  Module::Runtime::require_module() loads a module
+				#   by name using a block eval internally, with no string-eval surface.
+				eval { require_module($display_module) };
+				$display_module->import() unless $@;
 			}
 			if($@) {
 				$logger->debug("Failed to load module $display_module: $@");
@@ -660,12 +712,16 @@ sub doit
 	}
 }
 
+# Send a 300 Multiple Choices response listing the pages this site serves.
+# Called when the ?page= parameter is absent or the requested page is unknown.
 sub choose
 {
 	$logger->info('Called with no page to display');
 
 	my $status = $info->status();
 
+	# If the status is already non-200 (e.g. 404 set by the caller), relay
+	# that status rather than overriding it with a 300.
 	if($status != 200) {
 		print "Status: $status ",
 			HTTP::Status::status_message($status),
@@ -678,7 +734,8 @@ sub choose
 
 	$info->status(300);
 
-	# Print last modified date if path is defined
+	# Include a Last-Modified header based on the script's mtime so that
+	# caches and conditional-GET clients can revalidate efficiently.
 	if(my $path = $info->script_path()) {
 		require HTTP::Date;
 		HTTP::Date->import();
@@ -690,7 +747,7 @@ sub choose
 
 	print "\n";
 
-	# Print available pages unless it's a HEAD request
+	# RFC 7231 §4.3.2: a HEAD response must not include a body.
 	unless($ENV{'REQUEST_METHOD'} && ($ENV{'REQUEST_METHOD'} eq 'HEAD')) {
 		print "/cgi-bin/page.fcgi?page=index\n",
 			"/cgi-bin/page.fcgi?page=query\n",
@@ -698,18 +755,45 @@ sub choose
 	}
 }
 
-# Is this client trying to attack us?
+# Check whether the current request looks like a SQL injection attempt.
+# IPs that trigger a match are added to the in-process %blacklisted_ip set so
+# that subsequent requests from the same IP are rejected without re-scanning.
 sub blacklisted
 {
 	if(my $remote = $ENV{'REMOTE_ADDR'}) {
 		my $info = shift;
+
+		# Fast path: this IP was already blacklisted earlier in this process
+		# lifetime; no need to re-scan the request string.
 		if($blacklisted_ip{$remote}) {
 			$info->status(403);
 			return 1;
 		}
 
 		if(my $string = $info->as_string()) {
-			if(($string =~ /SELECT.+AND.+/i) || ($string =~ /ORDER BY /i) || ($string =~ / OR NOT /i) || ($string =~ / AND \d+=\d+/i) || ($string =~ /THEN.+ELSE.+END/i) || ($string =~ /.+AND.+SELECT.+/i) || ($string =~ /\sAND\s.+\sAND\s/i) || ($string =~ /AND\sCASE\sWHEN/i)) {
+			# Hard length cap: skip pattern matching entirely on absurdly long
+			# inputs.  Even bounded quantifiers like {1,200} iterate many times
+			# across a 1 MB string, so cap before we run any regex.
+			return 0 if length($string) > 8192;
+			# SECURITY - ReDoS defence:
+			#   The original patterns used greedy .+ between SQL keywords, which
+			#   causes catastrophic (exponential) backtracking when an attacker
+			#   sends a string that contains the opening keyword but not the
+			#   closing one (e.g. thousands of chars after SELECT with no AND).
+			#   All .+ quantifiers are replaced with the bounded class [^;]{0,N}:
+			#     - the semicolon is a natural SQL statement terminator so it is
+			#       a safe anchor that real SQL injection never crosses, and
+			#     - the explicit upper bound caps backtracking to O(N) steps.
+			#   Word-boundary assertions (\b) also eliminate false positives on
+			#   ordinary words that happen to contain the substring.
+			if(   ($string =~ /SELECT\b[^;]{0,500}\bAND\b/i)
+			   || ($string =~ /ORDER\s+BY\s/i)
+			   || ($string =~ /\bOR\s+NOT\b/i)
+			   || ($string =~ /\bAND\s+\d+=\d+/i)
+			   || ($string =~ /\bTHEN\b[^;]{0,200}\bELSE\b[^;]{0,200}\bEND\b/i)
+			   || ($string =~ /\bAND\b[^;]{0,200}\bSELECT\b/i)
+			   || ($string =~ /\sAND\s[^;]{0,100}\sAND\s/i)
+			   || ($string =~ /\bAND\s+CASE\s+WHEN\b/i)) {
 				$blacklisted_ip{$remote} = 1;
 				$info->status(403);
 				return 1;
@@ -730,16 +814,40 @@ sub filter
 	return 1;
 }
 
-# Put something to vwf.log
+# Escape a single value for safe inclusion in a double-quoted CSV field.
+# Follows RFC 4180 §2.7 and additionally neutralises spreadsheet formulas.
+sub _csv_escape
+{
+	my $v = shift // '';
+
+	# RFC 4180: a double-quote inside a quoted field is represented by two
+	# double-quote characters.  Without this, one embedded " would break the
+	# column boundary and corrupt every subsequent field on the row.
+	$v =~ s/"/""/g;
+
+	# SECURITY - CSV formula injection defence:
+	#   Spreadsheet applications (Excel, LibreOffice Calc) interpret cell values
+	#   that begin with = + - @ TAB or CR as formulas.  An attacker who controls
+	#   a logged field (e.g. the page parameter) could inject =cmd|'/C calc'!A0.
+	#   Prefix such values with a single-quote to force literal interpretation.
+	$v =~ s/^([=+\-@\t\r])/'$1/;
+
+	return $v;
+}
+
+# Write one access record to vwf.log (CSV format) and optionally to syslog.
+# All user-influenced fields are escaped through _csv_escape before output.
 sub vwflog
 {
 	my ($vwflog, $info, $lingua, $syslog, $message, $log, $request_start) = @_;
 
+	# Calculate request duration in milliseconds if a start timer was supplied.
 	my $duration_ms = '';
 	if($request_start) {
 		$duration_ms = int((Time::HiRes::time() - $request_start) * 1000);
 	}
 
+	# Determine which template was rendered for this request (may be empty on error).
 	my $template;
 	if($log) {
 		$template = $log->template();
@@ -749,14 +857,15 @@ sub vwflog
 	}
 	$message ||= '';
 
+	# Create the log file with a header row on first use.
 	if(!-e $vwflog) {
-		# First run - put in the heading row
 		open(my $fout, '>', $vwflog);
 		print $fout '"domain_name","time","IP","country","type","language","http_code","template","args","messages","error","duration_ms"',
 			"\n";
 		close $fout;
 	}
 
+	# Collect any warn/notice-level messages emitted during this request.
 	my $warnings;
         if(my $messages = $info->messages()) {
                 $warnings = join('; ',
@@ -765,38 +874,51 @@ sub vwflog
         }
 	$warnings ||= '';
 
+	my $country = $lingua->country() || 'unknown';
+
+	# Open the log in append mode.  If the open fails we skip logging silently
+	# so that a disk-full or permissions error does not crash the live request.
 	if(open(my $fout, '>>', $vwflog)) {
+		# SECURITY — CSV injection defence:
+		#   Every user-visible field is passed through _csv_escape so that
+		#   embedded double-quotes cannot break the CSV column structure, and
+		#   leading formula characters cannot trigger code execution when the
+		#   file is opened in a spreadsheet application.
 		print $fout
-			'"', $info->domain_name(), '",',
+			'"', _csv_escape($info->domain_name()), '",',
 			'"', strftime('%F %T', localtime), '",',
-			'"', ($ENV{REMOTE_ADDR} ? $ENV{REMOTE_ADDR} : ''), '",',
-			'"', $lingua->country(), '",',
-			'"', $info->browser_type(), '",',
-			'"', $lingua->language(), '",',
+			'"', _csv_escape($ENV{REMOTE_ADDR} // ''), '",',
+			'"', _csv_escape($country), '",',
+			'"', _csv_escape($info->browser_type()), '",',
+			'"', _csv_escape($lingua->language() // ''), '",',
 			$info->status(), ',',
-			'"', $template, '",',
-			'"', $info->as_string(raw => 1), '",',
-			'"', $warnings, '",',
-			'"', $message, '",',
+			'"', _csv_escape($template), '",',
+			'"', _csv_escape($info->as_string(raw => 1)), '",',
+			'"', _csv_escape($warnings), '",',
+			'"', _csv_escape($message), '",',
 			$duration_ms,
 			"\n";
 		close($fout);
 	}
 
+	# Optionally mirror the record to syslog (configured via the syslog stanza).
 	if($syslog) {
 		unless(Sys::Syslog->can('openlog')) {
 			require Sys::Syslog;
 			Sys::Syslog->import();
 		}
 
+		# Configure the socket transport if a hash of options was provided.
 		if(ref($syslog) eq 'HASH') {
 			Sys::Syslog::setlogsock($syslog);
 		}
 		Sys::Syslog::openlog($script_name, 'cons,pid', 'user');
+		# Use positional %s/%d format args so that special characters in the
+		# values cannot be interpreted as syslog format directives.
 		Sys::Syslog::syslog('info|local0', '%s %s %s %s %s %d %s %s %d %s %s',
 			$info->domain_name() || '',
 			$ENV{REMOTE_ADDR} || '',
-			$lingua->country() || '',
+			$country,
 			$info->browser_type() || '',
 			$lingua->language() || '',
 			$info->status() || '',

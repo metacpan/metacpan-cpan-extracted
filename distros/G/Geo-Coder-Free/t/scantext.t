@@ -7,9 +7,7 @@ use Test::Most;
 use Test::Number::Delta;
 use Test::Carp;
 use Test::Deep;
-
-use lib 't/lib';
-use MyLogger;
+use Test::Log::Abstraction;
 
 BEGIN {
 	use_ok('Geo::Coder::Free');
@@ -20,7 +18,7 @@ SCANTEXT: {
 		diag('This will take some time and memory');
 
 		if($ENV{'TEST_VERBOSE'}) {
-			Database::Abstraction::init(logger => MyLogger->new());
+			Database::Abstraction::init(logger => Test::Log::Abstraction->new());
 		}
 
 		my $geo_coder = new_ok('Geo::Coder::Free' => [ openaddr => $ENV{'OPENADDR_HOME'} ]);

@@ -5,7 +5,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Object::Pad 0.825;
 
@@ -250,7 +250,7 @@ F<examples/kdl-layout.kdl>:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-kdl-layout.svg" alt="A title bar, a sidebar with the buttons web, db and mail with db focused, and a main panel showing the details of the db server"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-kdl-layout.svg" alt="A title bar, a sidebar with the buttons web, db and mail with db focused, and a main panel showing the details of the db server"></p>
 
 =end html
 

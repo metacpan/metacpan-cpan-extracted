@@ -66,7 +66,7 @@ which events a key press or a click produces, and in which order:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-event-monitor.svg" alt="The event monitor after Tab, typing Ada, Enter, F5, Tab and a click on the OK button: the log lists KeyPress, OnFocus, Change, Submit, OnBlur, Mouse, OnHoverStart, OnPress, Activate and OnRelease events with their targets"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-event-monitor.svg" alt="The event monitor after Tab, typing Ada, Enter, F5, Tab and a click on the OK button: the log lists KeyPress, OnFocus, Change, Submit, OnBlur, Mouse, OnHoverStart, OnPress, Activate and OnRelease events with their targets"></p>
 
 =end html
 

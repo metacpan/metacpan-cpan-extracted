@@ -2,15 +2,33 @@ package Archive::BagIt::Role::Plugin;
 use strict;
 use warnings;
 use Moo::Role;
+use Module::Load;
 use namespace::autoclean;
 # ABSTRACT: A role that handles plugin loading
-our $VERSION = '0.101'; # VERSION
+our $VERSION = '0.102'; # VERSION
 
 has plugin_name => (
   is  => 'ro',
   #isa => 'Str',
   default => __PACKAGE__,
 );
+
+sub load_plugin {
+    my ($self, $algo) = @_;
+
+    # Einheitlicher Plugin-Name anstelle getrennter Algorithm/Manifest Module
+    my $plugin_class = "Archive::BagIt::Plugin::$algo";
+
+    load $plugin_class;
+
+    my $plugin = $plugin_class->new;
+
+    # Registrierung des Plugins sowohl als Hash-Algorithmus als auch für Manifeste
+    $self->register_algorithm($algo, $plugin);
+    $self->register_manifest($algo, $plugin);
+
+    return $plugin;
+}
 
 
 has bagit => (
@@ -41,7 +59,7 @@ Archive::BagIt::Role::Plugin - A role that handles plugin loading
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head2 bagit()
 
@@ -64,7 +82,7 @@ Andreas Romeyke <cpan@andreas.romeyke.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Rob Schmidt <rjeschmi@gmail.com>, William Wueppelmann and Andreas Romeyke.
+This software is copyright (c) 2026 by Rob Schmidt <rjeschmi@gmail.com>, William Wueppelmann and Andreas Romeyke.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

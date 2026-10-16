@@ -274,4 +274,60 @@ subtest 'Logs' => sub {
     };
 };
 
+subtest 'Undefined values' => sub {
+    my $encoder = CLASS->new;
+
+    is $encoder->encode_anyvalue(undef), {},
+        'An undefined value is an empty AnyValue';
+
+    is $encoder->encode_anyvalue(''), { stringValue => '' },
+        'An empty string is distinct from an undefined value';
+
+    is $encoder->encode_kvlist( { key => undef } ),
+        [ { key => 'key', value => {} } ],
+        'An undefined attribute value keeps its key';
+
+    is $encoder->encode_arraylist( [ 'a', undef, 'b' ] ), [
+        { stringValue => 'a' },
+        {},
+        { stringValue => 'b' },
+    ], 'An undefined list element keeps its position';
+
+    is $encoder->encode_kvlist( { key => { inner => undef } } ), [
+        {
+            key   => 'key',
+            value => {
+                kvlistValue => {
+                    values => [ { key => 'inner', value => {} } ],
+                },
+            },
+        },
+    ], 'An undefined value nested in a kvlist is an empty AnyValue';
+
+    is decode_json( $encoder->serialise( $encoder->encode_anyvalue(undef) ) ),
+        {}, 'An empty AnyValue survives serialisation';
+
+    is warnings { $encoder->encode_anyvalue(undef) }, [],
+        'Encoding an undefined value does not warn';
+
+    my $unsupported;
+    is warnings {
+        $unsupported = $encoder->encode_arraylist( [ 'a', \'b', 'c' ] )
+    }, [ match qr/Unsupported ref while encoding: SCALAR/ ],
+        'An unsupported ref still warns';
+
+    is $unsupported, [
+        { stringValue => 'a' },
+        {},
+        { stringValue => 'c' },
+    ], 'An unsupported ref keeps its position in a list';
+
+    is warnings {
+        is $encoder->encode_kvlist( { key => \'value' } ),
+            [ { key => 'key', value => {} } ],
+            'An unsupported ref keeps its key';
+    }, [ match qr/Unsupported ref while encoding: SCALAR/ ],
+        'An unsupported ref in a kvlist warns once';
+};
+
 done_testing;

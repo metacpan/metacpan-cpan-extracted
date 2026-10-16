@@ -3,12 +3,11 @@ abstract: 'KDL Document Language parser and emitter built on libckdl'
 author:
   - 'Davenonymous <perl@davenonymous.com>'
 build_requires:
-  Alien::ckdl: '0'
+  ExtUtils::MakeMaker: '0'
   Test::More: '0.88'
 configure_requires:
-  Alien::ckdl: '0'
   Devel::PPPort: '3.68'
-  ExtUtils::MakeMaker: '6.64'
+  ExtUtils::MakeMaker: '7.06'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -28,10 +27,10 @@ requires:
   Scalar::Util: '0'
   XSLoader: '0'
   overload: '0'
-  perl: '5.012'
+  perl: '5.030'
 resources:
   bugtracker: https://github.com/Davenonymous/perl-kdl-xs/issues
   homepage: https://github.com/Davenonymous/perl-kdl-xs
   repository: https://github.com/Davenonymous/perl-kdl-xs.git
-version: '0.002'
+version: '0.003'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

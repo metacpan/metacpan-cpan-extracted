@@ -402,7 +402,7 @@ L<Term::Fabulous::Examples/RUNNING THE EXAMPLES>).
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-first-program.svg" alt="The first program: a greeting in a box with a rounded blue border, centered on a dark blue screen"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-first-program.svg" alt="The first program: a greeting in a box with a rounded blue border, centered on a dark blue screen"></p>
 
 =end html
 

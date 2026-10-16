@@ -1,5 +1,15 @@
 Revision history for WFC
 
+2.2.0  2026-10-15
+- Update to WebForms Core version 2.2.
+- Compatible with WebFormsJS 2.2.
+- Rename the `set_reflection` method to `set_reflect`.
+- Rename the `set_reflection_by_output_place` method to `set_reflect_by_output_place`.
+- Rename the `wf_break` method to `break_`.
+- Rename the `wf_else` method to `else_`.
+- Rename the `then_form` method to `then`.
+- Rename the `repeat_form` method to `repeat`.
+
 2.1.1  2026-09-14
 - Initial CPAN release.
 - Initial Perl implementation of WebForms Core.

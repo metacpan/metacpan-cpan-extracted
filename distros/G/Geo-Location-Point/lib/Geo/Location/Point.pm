@@ -23,11 +23,11 @@ Geo::Location::Point - Location information
 
 =head1 VERSION
 
-Version 0.15
+Version 0.16
 
 =cut
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 =head1 SYNOPSIS
 
@@ -277,8 +277,6 @@ sub as_string {
 				} else {
 					$rc .= ', ';
 				}
-			} elsif($rc) {
-				$rc .= ', ';
 			}
 			my $leave_case = 0;
 			if(my $country = $self->{'country'} // $self->{'Country'}) {
@@ -343,11 +341,24 @@ sub as_uri
 =head2	attr
 
 Get or set arbitrary attributes, such as city or country.
+A call with an argument sets the attribute and returns the value that was set;
+a call without one reads it back and returns C<undef> if it was never set.
 
     $location->city('London');
     $location->country('UK');
     print $location->as_string(), "\n";
     print "$location\n";	# Calls as_string
+
+It is the argument list, not the value, that decides whether a call is a read or a write,
+so false values are attributes like any other and are stored and returned unchanged:
+
+    $location->confidence(0);
+    print 'matched: ', defined($location->confidence()) && $location->confidence(), "\n";
+
+The upper case variant of the key is consulted
+(but not overwritten) when the key as given has never been set,
+which is how the MaxMind field names are read. An attribute that has been set,
+however false, takes precedence over it.
 
 =cut
 
@@ -361,13 +372,20 @@ sub AUTOLOAD {
 
 	my $self = shift;
 
-	if(my $value = shift) {
+	# The argument list, not the value, decides read or write. Testing the value here
+	# (my $value = shift) meant a false value could neither be stored nor read back,
+	# so e.g. a confidence of 0 looked like no data at all.
+	if(@_) {
+		my $value = shift;
 		delete $self->{'location'};	# Invalidate the cache
 		delete $self->{'tz'};	# Invalidate the cache
-		$self->{$key} = $value;
+		return $self->{$key} = $value;
 	}
 
-	return $self->{$key} || $self->{ucfirst($key)}
+	# Defined, not true: a stored 0 or empty string is the caller's data, so return it
+	return $self->{$key} if(defined($self->{$key}));
+
+	return $self->{ucfirst($key)};
 }
 
 =head1 SUPPORT
@@ -385,17 +403,25 @@ so typos such as "citty" will not be caught.
 
 =head1 SEE ALSO
 
+=over 4
+
+=item * L<Configure an Object at Runtime|Object::Configure>
+
+=item * L<Test Dashboard|https://nigelhorne.github.io/Geo-Location-Point/coverage/>
+
+=back
+
 L<GIS::Distance>,
 L<Geo::Point>,
 L<TimeZone::TimeZoneDB>.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2019-2025 Nigel Horne.
+Copyright 2019-2026 Nigel Horne.
 
-The program code is released under the following licence: GPL2 for personal use on a single computer.
-All other users (including Commercial, Charity, Educational, Government)
-must apply in writing for a licence for use from Nigel Horne at `<njh at nigelhorne.com>`.
+Usage is subject to the GPL2 licence terms.
+If you use it,
+please let me know.
 
 =cut
 

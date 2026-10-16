@@ -28,13 +28,13 @@ done_testing;
 
 __DATA__
 share/3.1/strict-dialect.json d13df15c1f7475a477cdff7c3dfa0bca
-share/3.1/strict-schema.json bbd8a79444cfcfb51dc12bf112ebc1d2
+share/3.1/strict-schema.json 53fe3e859d9ea5a665f2a288f9258395
 share/3.2/strict-dialect.json 96d61636ddd9c6bf7e95e13e3ece731f
 share/3.2/strict-schema.json 1aa955923954d26a96994efbdd22d686
 share/oas/3.0/schema.json bd82d5fc176d386ce85d0e8d5836aa32
 share/oas/3.1/dialect.json 06cea984f8807c13e2916914251e22c3
-share/oas/3.1/schema-base.json 529eaf48223ccf46c0627f2b53d14815
-share/oas/3.1/schema.json b1815c7f6149b1252804bc687d8211dc
+share/oas/3.1/schema-base.json 0468e9797fd7d282cea218ff40f37d82
+share/oas/3.1/schema.json f951af39c408588aa47a10bcfc0d139a
 share/oas/3.1/vocabulary.json ecd6e7cbcc29cdabd9c445a2752fc394
 share/oas/3.2/dialect.json 1058187136a6625bdecca7bab876ae17
 share/oas/3.2/schema-base.json 888078cc42327bfe69cd5a954f56be98

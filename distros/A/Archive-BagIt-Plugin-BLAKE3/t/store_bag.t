@@ -22,7 +22,7 @@ my $special = '#--Ä--ä--Ö--ö--Ü--ü--ß--.[{!}].--$';
 my $special_re = qr|#--Ä--ä--Ö--ö--Ü--ü--ß--\.\[\{!\}\]\.--\$|;
 
 use_ok('Archive::BagIt');
-use_ok('Archive::BagIt::Plugin::Algorithm::BLAKE3');
+use_ok('Archive::BagIt::Plugin::BLAKE3');
 
 {
     note("simple bag");
@@ -30,7 +30,7 @@ use_ok('Archive::BagIt::Plugin::Algorithm::BLAKE3');
     mkdir(File::Spec->catdir($dir, "data"));
     write_file(File::Spec->catfile($dir, "data", "1.txt"), "1");
     ok(Archive::BagIt->make_bag($dir, {
-        use_plugins => qw(Archive::BagIt::Plugin::Manifest::BLAKE3)
+        use_plugins => qw(Archive::BagIt::Plugin::BLAKE3)
     }), "make_bag()");
     file_exists_ok(File::Spec->catfile($dir, "bag-info.txt"));
     file_exists_ok(File::Spec->catfile($dir, "bagit.txt"));
@@ -63,7 +63,7 @@ use_ok('Archive::BagIt::Plugin::Algorithm::BLAKE3');
     my $bag;
     my $warning = Test::Warnings::warning {
         $bag = Archive::BagIt->make_bag($dir, {
-            use_plugins => qw(Archive::BagIt::Plugin::Manifest::BLAKE3)
+            use_plugins => qw(Archive::BagIt::Plugin::BLAKE3)
         })
     };
     like (
@@ -109,7 +109,7 @@ use_ok('Archive::BagIt::Plugin::Algorithm::BLAKE3');
     write_file(File::Spec->catfile($dir, "meta", "rights.xml"));
     my $bag = Archive::BagIt->make_bag($dir, {
         force_utf8 => 1,
-        use_plugins => qw(Archive::BagIt::Plugin::Manifest::BLAKE3)
+        use_plugins => qw(Archive::BagIt::Plugin::BLAKE3)
         }
     );
     isa_ok($bag, 'Archive::BagIt', "make_bag(), force_utf8");
@@ -141,7 +141,7 @@ use_ok('Archive::BagIt::Plugin::Algorithm::BLAKE3');
     my $bag;
     my $warning = Test::Warnings::warning {
         $bag = Archive::BagIt->make_bag($dir, {
-            use_plugins => qw(Archive::BagIt::Plugin::Manifest::BLAKE3)
+            use_plugins => qw(Archive::BagIt::Plugin::BLAKE3)
         });
     };
     like (

@@ -12,14 +12,18 @@ package Geo::Coder::Free::MaxMind;
 
 use strict;
 use warnings;
+use autodie qw(:all);
 
 use Geo::Coder::Free::DB::MaxMind::admin1;
 use Geo::Coder::Free::DB::MaxMind::admin2;
 use Geo::Coder::Free::DB::MaxMind::cities;
+use Geo::Coder::Free::Provenance qw(GEOCODER);
+use Geo::Coder::Free::Validate qw(_valid_location);
 use Geo::Location::Point;
 use Module::Info;
 use Carp;
 use File::Spec;
+use Params::Get;
 use Locale::CA;
 use Locale::US;
 use CHI;
@@ -27,9 +31,17 @@ use Locale::Country;
 use Scalar::Util;
 
 our %admin1cache;
-our %admin2cache;	# e.g. maps 'Kent' => 'P5'
+our %admin2cache;     # name → region code (e.g. 'Kent' → 'P5')
+our %admin2cache_rev; # region code → name (inverse; avoids O(N) scan in _prepare)
 
-sub _prepare($$);
+# Lazily-initialised Locale singletons — constructing Locale::US / Locale::CA
+# on every geocode call for US/Canadian addresses was the top object-churn
+# hotspot.  These are module-level my-variables (not exported) so they survive
+# across object instances and avoid the construction cost after the first call.
+my $_locale_us;
+my $_locale_ca;
+
+sub _prepare;
 
 # Some locations aren't found because of inconsistencies in the way things are stored - these are some values I know
 # FIXME: Should be in a configuration file
@@ -46,11 +58,11 @@ Geo::Coder::Free::MaxMind - Provides a geocoding functionality using the MaxMind
 
 =head1 VERSION
 
-Version 0.42
+Version 0.46
 
 =cut
 
-our $VERSION = '0.42';
+our $VERSION = '0.46';
 
 =head1 SYNOPSIS
 
@@ -110,7 +122,7 @@ sub new
 	my $class = shift;
 
 	# Handle hash or hashref arguments
-	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
+	my $args = Params::Get::get_params(undef, @_);
 
 	if(!defined($class)) {
 		# Geo::Coder::Free::Local->new not Geo::Coder::Free::Local::new
@@ -121,10 +133,10 @@ sub new
 		$class = __PACKAGE__;
 	} elsif(Scalar::Util::blessed($class)) {
 		# If $class is an object, clone it with new arguments
-		return bless { %{$class}, %args }, ref($class);
+		return bless { %{$class}, %{$args} }, ref($class);
 	}
 
-	my $directory = $args{'directory'} || Module::Info->new_from_loaded(__PACKAGE__)->file();
+	my $directory = $args->{'directory'} || Module::Info->new_from_loaded(__PACKAGE__)->file();
 	$directory =~ s/\.pm$//;
 
 	if(!-d $directory) {
@@ -133,14 +145,14 @@ sub new
 
 	Database::Abstraction::init({
 		cache_duration => '1 day',
-		%args,
+		%{$args},
 		directory => File::Spec->catfile($directory, 'databases'),
-		cache => $args{cache} || CHI->new(driver => 'Memory', global => 1)
+		cache => $args->{'cache'} || CHI->new(driver => 'Memory', global => 1)
 	});
 
 	# Return the blessed object
 	return bless {
-		cache => $args{cache} || CHI->new(driver => 'Memory', global => 1),
+		cache => $args->{'cache'} || CHI->new(driver => 'Memory', global => 1),
 	}, $class;
 }
 
@@ -159,6 +171,16 @@ sub new
     # TODO: Arguably it should get them all from the database (or at least say the first 100) and return the central location
     my @locations = $geocoder->geocode({ location => 'New Brunswick, Canada' });
     die if(scalar(@locations) != 1);
+
+=head3 provenance
+
+Every result carries C<geocoder>, C<database>, C<confidence> and C<accuracy>
+(section 2.1 of F<BI-Phase6-Dependency-Specs.md>).  This backend reports
+C<database> as C<MaxMind>.  C<accuracy> is C<city> when the row was chosen by
+city name, C<region> when the lookup named only a region or a country - the row
+is then the first match in that region, not a city the caller asked for - and
+C<locality> for a hand-curated C<%known_locations> entry, whose coordinate is a
+town's.
 
 =cut
 
@@ -193,10 +215,11 @@ sub geocode {
 	my $location = $params{location}
 		or Carp::croak('Usage: geocode(location => $location)');
 
-	# Fail when the input is just a set of numbers
-	if($location !~ /\D/) {
+	# Fail when the input is just a set of numbers.  The rule is the one
+	# Geo::Coder::Free::Validate defines and the facade applies too, so what this
+	# backend refuses cannot drift away from what valid_location() answers.
+	if(!_valid_location($location)) {
 		Carp::croak('Usage: ', __PACKAGE__, ": invalid input to geocode(), $location");
-		return;
 	}
 
 	if($location =~ /^(.+),\s*Washington\s*DC,(.+)$/) {
@@ -211,11 +234,15 @@ sub geocode {
 			'lon' => $rc->{'longitude'},
 			'lng' => $rc->{'longitude'},
 			'location' => $location,
-			'database' => 'MaxMind'
+			'geocoder' => GEOCODER,
+			'database' => 'MaxMind',
+			# A hand-curated entry: the string matched it exactly, and the
+			# coordinate it carries is a town's, not an address's.
+			'confidence' => 1.0,
+			'accuracy' => 'locality'
 		});
 	}
 
-	# ::diag(__LINE__, ": $location");
 	return unless(($location =~ /,/) || $params{'region'});	# Not well formed, or an attempt to find the location of an entire country
 
 	# Check cache first
@@ -272,7 +299,6 @@ sub geocode {
 		$county =~ s/\s$//g;
 		# $country =~ s/^\s//g;
 		$country =~ s/\s$//g;
-		# ::diag(__LINE__, "$county, $country");
 		$region_only = 1;	# Will only return one match, not every match in the region
 	} else {
 		# Carp::croak(__PACKAGE__, ' only supports towns, not full addresses');
@@ -285,9 +311,7 @@ sub geocode {
 			$concatenated_codes = 'GB';
 		}
 		$countrycode = country2code($country);
-		# ::diag(__LINE__, ": country $countrycode, county $county, state $state, location $location");
 		# if($county && $countrycode) {
-			# ::diag(__LINE__, ": country $countrycode, county $county, location $location");
 		# }
 
 		if($state && $admin1cache{$state}) {
@@ -295,7 +319,7 @@ sub geocode {
 		} elsif($admin1cache{$country} && !defined($state)) {
 			$concatenated_codes = $admin1cache{$country};
 		} else {
-			$self->{'admin1'} //= Geo::Coder::Free::DB::MaxMind::admin1->new(no_entry => 1) or die "Can't open the admin1 database";
+			$self->{'admin1'} //= Geo::Coder::Free::DB::MaxMind::admin1->new(no_entry => 1) or Carp::croak("Can't open the admin1 database");
 
 			if(my $admin1 = $self->{'admin1'}->fetchrow_hashref(asciiname => $country)) {
 				$concatenated_codes = $admin1->{'concatenated_codes'};
@@ -308,7 +332,7 @@ sub geocode {
 					$country_code = $concatenated_codes;
 					my @admin1s = @{$self->{'admin1'}->selectall_hashref(asciiname => $state)};
 					foreach my $admin1(@admin1s) {
-						if($admin1->{'concatenated_codes'} =~ /^$concatenated_codes\./i) {
+						if($admin1->{'concatenated_codes'} =~ /^\Q$concatenated_codes\E\./i) {
 							$concatenated_codes = $admin1->{'concatenated_codes'};
 							last;
 						}
@@ -325,58 +349,46 @@ sub geocode {
 		}
 	}
 	return unless(defined($concatenated_codes));
-	# ::diag(__LINE__, ": $concatenated_codes");
 
 	my @admin2s;
 	my $region;
 	my @regions;
-	# ::diag(__LINE__, ": $country");
 	if($country =~ /^(United States|USA|US)$/) {
 		if($county && (length($county) > 2)) {
-			if(my $twoletterstate = Locale::US->new()->{state2code}{uc($county)}) {
+			if(my $twoletterstate = ($_locale_us //= Locale::US->new())->{state2code}{uc($county)}) {
 				$county = $twoletterstate;
 			}
-			# ::diag(__LINE__, ": $location, $county, $country");
 		}
 		if($state && (length($state) > 2)) {
-			if(my $twoletterstate = Locale::US->new()->{state2code}{uc($state)}) {
+			if(my $twoletterstate = ($_locale_us //= Locale::US->new())->{state2code}{uc($state)}) {
 				$state = $twoletterstate;
 			}
-			# ::diag(__LINE__, ": $location, $state, $country");
 		}
 	} elsif(($country eq 'Canada') && $state && (length($state) > 2)) {
-		# ::diag(__LINE__, ": $state");
-		if(Locale::CA->new()->{province2code}{uc($state)}) {
+		if(($_locale_ca //= Locale::CA->new())->{province2code}{uc($state)}) {
 			# FIXME:  I can't see that province locations are stored in cities.csv
 			return unless(defined($location));	# OK if searching for a city, that works
 		}
 	}
 
-	$self->{'admin2'} //= Geo::Coder::Free::DB::MaxMind::admin2->new(no_entry => 1) or die "Can't open the admin2 database";
+	$self->{'admin2'} //= Geo::Coder::Free::DB::MaxMind::admin2->new(no_entry => 1) or Carp::croak("Can't open the admin2 database");
 
 	if(defined($county) && ($county =~ /^[A-Z]{2}$/) && ($country =~ /^(United States|USA|US)$/)) {
 		# US state. Not Canadian province.
 		$region = $county;
 	} elsif($county && $admin1cache{$county}) {
-		# ::diag(__LINE__);
 		$region = $admin1cache{$county};
 	} elsif($county && $admin2cache{$county}) {
 		$region = $admin2cache{$county};
-		# ::diag(__LINE__, ": $county");
 	} elsif(defined($state) && $admin2cache{$state} && !defined($county)) {
-		# ::diag(__LINE__);
 		$region = $admin2cache{$state};
 	} else {
-		# ::diag(__PACKAGE__, ': ', __LINE__);
 		if(defined($county) && ($county eq 'London')) {
 			@admin2s = $self->{'admin2'}->selectall_hash(asciiname => $location);
 		} elsif(defined($county)) {
-			# ::diag(__PACKAGE__, ': ', __LINE__, ": $county");
 			@admin2s = $self->{'admin2'}->selectall_hash(asciiname => $county);
 		}
-		# ::diag(__LINE__, Data::Dumper->new([\@admin2s])->Dump());
 		foreach my $admin2(@admin2s) {
-			# ::diag(__LINE__, Data::Dumper->new([$admin2])->Dump());
 			if($admin2->{'concatenated_codes'} =~ $concatenated_codes) {
 				$region = $admin2->{'concatenated_codes'};
 				if($region =~ /^[A-Z]{2}\.([A-Z]{2})\./) {
@@ -415,11 +427,9 @@ sub geocode {
 	if((scalar(@regions) == 0) && !defined($region)) {
 		# e.g. Unitary authorities in the UK
 		# admin[12].db columns are labelled ['concatenated_codes', 'name', 'asciiname', 'geonameId']
-		# ::diag(__PACKAGE__, ': ', __LINE__, ": $location");
 		@admin2s = $self->{'admin2'}->selectall_hash(asciiname => $location);
 		if((scalar(@admin2s) == 0) && ($country =~ /^(Canada|United States|USA|US)$/) && ($location !~ /\sCounty/i)) {
 			$location .= ' County';
-			# ::diag(__PACKAGE__, ': ', __LINE__, ": $location");
 			@admin2s = $self->{'admin2'}->selectall_hash(asciiname => $location);
 		}
 		if(scalar(@admin2s) && defined($admin2s[0]->{'concatenated_codes'})) {
@@ -435,15 +445,13 @@ sub geocode {
 				}
 			}
 		} elsif(defined($county)) {
-			# ::diag(__PACKAGE__, ': ', __LINE__, ": county $county");
 			# e.g. states in the US
 			if(!defined($self->{'admin1'})) {
-				$self->{'admin1'} = Geo::Coder::Free::DB::MaxMind::admin1->new(no_entry => 1) or die "Can't open the admin1 database";
+				$self->{'admin1'} = Geo::Coder::Free::DB::MaxMind::admin1->new(no_entry => 1) or Carp::croak("Can't open the admin1 database");
 			}
 			my @admin1s = $self->{'admin1'}->selectall_hash(asciiname => $county);
 			foreach my $admin1(@admin1s) {
-				# ::diag(__LINE__, Data::Dumper->new([$admin1])->Dump());
-				if($admin1->{'concatenated_codes'} =~ /^$concatenated_codes\./i) {
+				if($admin1->{'concatenated_codes'} =~ /^\Q$concatenated_codes\E\./i) {
 					$region = $admin1->{'concatenated_codes'};
 					if(scalar(@admin1s) == 1) {
 						$admin1cache{$county} = $region;
@@ -473,9 +481,7 @@ sub geocode {
 		}
 	}
 	if($region) {
-		if($region =~ /^.+\.(.+)$/) {
-			$region = $1;
-		}
+		$region =~ s/^.*\.//;    # keep only the rightmost dot-delimited component
 		$options->{'Region'} = $region;
 		if($country_code) {
 			$options->{'Country'} = lc($country_code);
@@ -484,9 +490,11 @@ sub geocode {
 		# know which one will be matched later
 		if(scalar(@admin2s) == 1) {
 			if($state) {
-				$admin2cache{$state} = $region;
+				$admin2cache{$state}     = $region;
+				$admin2cache_rev{$region} = $state;
 			} elsif($county) {
-				$admin2cache{$county} = $region;
+				$admin2cache{$county}    = $region;
+				$admin2cache_rev{$region} = $county;
 			}
 		}
 	}
@@ -499,11 +507,9 @@ sub geocode {
 		$options->{'Country'} = $countrycode;
 		$confidence = 0.1;
 	}
-	# ::diag(__PACKAGE__, ': ', __LINE__, ': ', Data::Dumper->new([$options])->Dump());
 	# This case nonsense is because DBD::CSV changes the columns to lowercase, whereas DBD::SQLite does not
 	# if(wantarray && (!$options->{'City'}) && !$region_only) {
 	# if(0) {	# We don't need to find all the cities in a state, which is what this would do
-		# # ::diag(__PACKAGE__, ': ', __LINE__);
 		# my @rc = $self->{'cities'}->selectall_hash($options);
 		# if(scalar(@rc) == 0) {
 			# if((!defined($region)) && !defined($params{'region'})) {
@@ -515,13 +521,10 @@ sub geocode {
 			# if($countrycode) {
 				# @rc = $self->{'cities'}->selectall_hash('Region' => ($region || $params{'region'}), 'Country' => $countrycode);
 				# if(scalar(@rc) == 0) {
-					# # ::diag(__PACKAGE__, ': ', __LINE__, ': no matches: ', Data::Dumper->new([$options])->Dump());
 					# return;
 				# }
 			# }
-			# # ::diag(__LINE__, ': ', Data::Dumper->new([\@rc])->Dump());
 		# }
-		# # ::diag(__LINE__, ': ', Data::Dumper->new([\@rc])->Dump());
 		# foreach my $city(@rc) {
 			# if($city->{'Latitude'}) {
 				# $city->{'latitude'} = delete $city->{'Latitude'};
@@ -576,14 +579,10 @@ sub geocode {
 		#
 		# return @locations;
 	# }
-	# ::diag(__PACKAGE__, ': ', __LINE__, ': ', Data::Dumper->new([$options])->Dump());
 	my $city = $self->{'cities'}->fetchrow_hashref($options);
 	if(!defined($city)) {
-		# ::diag(__LINE__, ': ', scalar(@regions));
 		foreach $region(@regions) {
-			if($region =~ /^.+\.(.+)$/) {
-				$region = $1;
-			}
+			$region =~ s/^.*\.//;    # keep only the rightmost dot-delimited component
 			if($country =~ /^(United States|USA|US)$/) {
 				next unless($region =~ /^[A-Z]{2}$/);	# In the US, the regions are the states
 			}
@@ -593,14 +592,18 @@ sub geocode {
 		}
 	}
 
-	# ::diag(__LINE__, ': ', Data::Dumper->new([$city])->Dump());
 	if(defined($city) && defined($city->{'Latitude'})) {
 		# Cache and return result
 		delete $city->{'Region'} if(defined($city->{'Region'}) && ($city->{'Region'} =~ /^[A-Z]\d$/));	# E.g. Region = G5
 		delete $city->{'Population'} if(defined($city->{'Population'}) && (length($city->{'Population'}) == 0));
 		my $rc = Geo::Location::Point->new({
 			%{$city},
-			('database' => 'MaxMind', 'confidence' => $confidence)
+			('geocoder' => GEOCODER,
+			 'database' => 'MaxMind',
+			 'confidence' => $confidence,
+			 # A row chosen for its city name is a city; one chosen by region or
+			 # country alone is the first match in that region.
+			 'accuracy' => $options->{'City'} ? 'city' : 'region')
 		});
 		$self->{cache}->set($location, $rc);
 		return $rc;
@@ -670,6 +673,13 @@ sub reverse_geocode
 		);
 	}
 
+	# Validate coordinates before interpolating into SQL — prevents injection
+	# if a caller passes a non-numeric latlng string.
+	for my $c ($latitude, $longitude) {
+		Carp::croak('Invalid coordinate value for reverse_geocode')
+			unless defined($c) && $c =~ /^-?\d+\.?\d*$/;
+	}
+
 	if(wantarray) {
 		my @locs = $self->{'cities'}->execute("SELECT * FROM cities WHERE ((ABS(Latitude - $latitude)) < 0.01) AND ((ABS(Longitude - $longitude)) < 0.01)");
 		foreach my $loc(@locs) {
@@ -677,43 +687,53 @@ sub reverse_geocode
 		}
 		return map { Geo::Location::Point->new($_)->as_string() } @locs;
 	}
-	# Try close in then zoom out, to a reasonable limit
-	foreach my $radius(0.000001, 0.00001, 0.0001, 0.001, 0.01) {
-		if(my $rc = $self->{'cities'}->execute("SELECT * FROM cities WHERE ((ABS(Latitude - $latitude)) < $radius) AND ((ABS(Longitude - $longitude)) < $radius) LIMIT 1")) {
-			$self->_prepare($rc);
-			return Geo::Location::Point->new($rc)->as_string();
-		}
+
+	# Performance: the former code issued 5 sequential SQL queries with ever-
+	# widening radii (0.000001 → 0.01).  Replace with a single query that
+	# orders by Manhattan distance and caps at the maximum radius (0.01°).
+	# This eliminates 4 round-trips to SQLite on the common miss-until-last case.
+	my $rc = $self->{'cities'}->execute(
+		"SELECT * FROM cities" .
+		" WHERE ABS(Latitude - $latitude) < 0.01 AND ABS(Longitude - $longitude) < 0.01" .
+		" ORDER BY (ABS(Latitude - $latitude) + ABS(Longitude - $longitude)) ASC" .
+		" LIMIT 1"
+	);
+	if($rc) {
+		$self->_prepare($rc);
+		return Geo::Location::Point->new($rc)->as_string();
 	}
 	return;
 }
 
 # Change 'Charing Cross, P5, Gb' to 'Charing Cross, London, Gb'
-sub _prepare($$) {
+sub _prepare {
 	my ($self, $loc) = @_;
 
 	if(my $region = $loc->{'Region'}) {
-		my $county;
-
-		# Check if region is already cached in admin2cache
-		while(my ($key, $value) = each %admin2cache) {
-			if($value eq $region) {
-				$county = $key;
-				last;
-			}
-		}
+		# O(1) reverse lookup — the former O(N) `while each %admin2cache` scan
+		# walked the entire cache comparing values.  %admin2cache_rev is kept in
+		# sync at every write site, giving a constant-time code→name translation.
+		my $county = $admin2cache_rev{$region};
 		if($county) {
 			$loc->{'Region'} = $county;
 		} else {
-			# Initialize admin2 object if not already initialized
-			$self->{'admin2'} //= Geo::Coder::Free::DB::MaxMind::admin2->new(no_entry => 1) or die "Can't open the admin2 database";
+			$self->{'admin2'} //= Geo::Coder::Free::DB::MaxMind::admin2->new(no_entry => 1) or Carp::croak("Can't open the admin2 database");
 
-			# Prepare and execute SQL query
-
-			my $row = $self->{'admin2'}->execute("SELECT name FROM admin2 WHERE concatenated_codes LIKE '" . uc($loc->{'Country'}) . '.%.' . uc($region) . "' LIMIT 1");
+			# Validate both tokens before interpolating into SQL.
+			# $loc->{'Country'} is DB-sourced (ISO 3166-1 alpha-2 = two
+			# uppercase letters) and $region is user-supplied.  Unvalidated
+			# interpolation into a LIKE predicate would allow SQL injection.
+			my $_country = uc($loc->{'Country'} // '');
+			my $_reg     = uc($region // '');
+			my $row;
+			if($_country =~ /^[A-Z]{2}$/ && $_reg =~ /^[A-Z0-9]{1,10}$/) {
+				$row = $self->{'admin2'}->execute("SELECT name FROM admin2 WHERE concatenated_codes LIKE '$_country.%.$_reg' LIMIT 1");
+			}
 			if(ref($row) && $row->{'name'}) {
-				# Cache the result for future calls and update the location's region
-				$admin2cache{$row->{'name'}} = $region;
-				$loc->{'Region'} = $row->{'name'};
+				# Write to both forward and reverse caches in one go
+				$admin2cache{$row->{'name'}}  = $region;
+				$admin2cache_rev{$region}      = $row->{'name'};
+				$loc->{'Region'}               = $row->{'name'};
 			}
 		}
 	}

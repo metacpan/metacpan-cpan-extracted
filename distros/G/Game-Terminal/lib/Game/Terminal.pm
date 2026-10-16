@@ -7,7 +7,7 @@ use warnings;
 use Getopt::Long ();
 use Game::Terminal::Kit::Options ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our @ROSTER;
 my %BY_NAME;
@@ -215,6 +215,17 @@ BEGIN {
 			flags   => { %ALL },
 		},
 		{
+			key     => 'shogi',
+			module  => 'Game::Shogi',
+			class   => 'Game::Shogi::Terminal',
+			blurb   => 'shogi, Japanese chess',
+			family  => 'board',
+			players => '2',
+			args    => [],
+			aliases => ['japanesechess'],
+			flags   => { %ALL },
+		},
+		{
 			key     => 'sixtysix',
 			module  => 'Game::Schnapsen',
 			class   => 'Game::Schnapsen::Terminal',
@@ -235,6 +246,17 @@ BEGIN {
 			args    => [],
 			aliases => [],
 			flags   => { ascii => '--ascii' },
+		},
+		{
+			key     => 'sternhalma',
+			module  => 'Game::Sternhalma',
+			class   => 'Game::Sternhalma::Terminal',
+			blurb   => 'sternhalma, Chinese checkers, for two to six',
+			family  => 'board',
+			players => '2-6',
+			args    => [],
+			aliases => ['chinesecheckers'],
+			flags   => { ascii => '--no-unicode', pick => '--no-pick' },
 		},
 		{
 			key     => 'xiangqi',
@@ -457,7 +479,7 @@ forgets the rest (see below).
 
 =head2 The roster
 
-Twenty-one rows for twenty games: Schnapsen is two rows, C<schnapsen> and
+Twenty-three rows for twenty-two games: Schnapsen is two rows, C<schnapsen> and
 C<sixtysix>, because its program needs to be told the variant. Each row has
 a C<key> (the word you type), the C<module> to install and the C<class> to
 call, a one-line C<blurb>, a C<family> (board, card, tile, puzzle or arcade), the
@@ -467,7 +489,7 @@ C<--ascii> and C<--no-pick> in that game's words.
 
 The aliases: C<draughts> is checkers, C<othello> is reversi, C<ur> is royalur,
 C<morris> and C<mills> are merrills, C<tafl> is brandubh, C<weiqi> and
-C<baduk> are go, C<chinesechess> is xiangqi, C<awale> and C<awari> are oware,
+C<baduk> are go, C<chinesechess> is xiangqi, C<japanesechess> is shogi, C<chinesecheckers> is sternhalma, C<awale> and C<awari> are oware,
 C<rummy> is gin, C<crib> is cribbage, C<flappy> is floppy, and C<66> is
 sixtysix.
 
@@ -618,7 +640,7 @@ L<Game::Terminal::Menu>, and the games: L<Game::Backgammon>,
 L<Game::Brandubh>, L<Game::Checkers>, L<Game::Cribbage>, L<Game::Dominoes>,
 L<Game::Durak>, L<Game::Fanorona>, L<Game::Floppy>, L<Game::Gin>, L<Game::Go>,
 L<Game::Mahjong>, L<Game::Merrills>, L<Game::Oware>, L<Game::Reversi>,
-L<Game::RoyalUr>, L<Game::Schnapsen>, L<Game::Snake>, L<Game::Xiangqi>,
+L<Game::RoyalUr>, L<Game::Schnapsen>, L<Game::Shogi>, L<Game::Snake>, L<Game::Sternhalma>, L<Game::Xiangqi>,
 L<Term::Maze>.
 
 =head1 AUTHOR

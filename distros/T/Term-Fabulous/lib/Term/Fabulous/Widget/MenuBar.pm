@@ -9,7 +9,7 @@ use Object::Pad 0.825;
 
 use Term::Fabulous::Widget::Input;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 class Term::Fabulous::Widget::MenuBar
 	:isa(Term::Fabulous::Widget::Input)
@@ -398,7 +398,7 @@ screen
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-menu-bar.svg" alt="A notes editor with a menu bar of File, Edit, View and Help, each with its first letter underlined, and the caption notes.txt. The Edit menu is open below its title with Undo highlighted, Redo, Cut and Copy dimmed, Paste and Select all, each with its key. The status bar at the bottom says F10 opens the menus, Ctrl+Q quits. on the left and modified and Ln 6, Col 7 on the right"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-menu-bar.svg" alt="A notes editor with a menu bar of File, Edit, View and Help, each with its first letter underlined, and the caption notes.txt. The Edit menu is open below its title with Undo highlighted, Redo, Cut and Copy dimmed, Paste and Select all, each with its key. The status bar at the bottom says F10 opens the menus, Ctrl+Q quits. on the left and modified and Ln 6, Col 7 on the right"></p>
 
 =end html
 

@@ -1,20 +1,20 @@
-# NAME
+## Name
 
-HTML::Genealogy::Map - Extract and map genealogical events from GEDCOM file
+HTML::Genealogy::Map - Extract and map genealogical events from a GEDCOM file
 
-# VERSION
+## Version
 
-Version 0.03
+Version 0.05
 
-# DESCRIPTION
+## Description
 
 This module parses GEDCOM genealogy files and creates an interactive map showing
 the locations of births, marriages, and deaths. Events at the same location are
 grouped together in a single marker with a scrollable popup.
 
-# SUBROUTINES/METHODS
+## Subroutines/Methods
 
-## onload\_render
+### Onload\_Render
 
 Render the map.
 It takes two mandatory and one optional parameter.
@@ -27,6 +27,12 @@ It returns an array of two elements, the items for the `head` and `body`.
 - **geocoder**
 
     Geocoder to use.
+    Its results are read through the coordinates in `lat` and `long`/`lng` -
+    through `latitude()`/`longitude()` when the geocoder returns an object -
+    so [Geo::Location::Point](https://metacpan.org/pod/Geo%3A%3ALocation%3A%3APoint) and anything else [HTML::OSM](https://metacpan.org/pod/HTML%3A%3AOSM) accepts will do.
+    A result's `database` says which local dataset answered, and an
+    [Geo::Coder::Free](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AFree) result therefore does not attract the courtesy delay that
+    a remote service gets.
 
 - **google\_key**
 
@@ -36,7 +42,7 @@ It returns an array of two elements, the items for the `head` and `body`.
 
     Enable print statements of what's going on
 
-# FEATURES
+## Features
 
 - Extracts births, marriages, and deaths with location data
 - Geocodes locations using multiple fallback providers
@@ -47,51 +53,49 @@ It returns an array of two elements, the items for the `head` and `body`.
 - Persistent caching of geocoding results
 - For OpenStreetMap: centers on location with most events
 
-### API SPECIFICATION
+#### Api Specification
 
-#### INPUT
+##### Input
 
-    {
-      'gedcom' => { 'type' => 'object', 'can' => 'individuals' },
-      'geocoder' => { 'type' => 'object', 'can' => 'geocode' },
-      'debug' => { 'type' => 'boolean', optional => 1 },
-      'google_key' => { 'type' => 'string', optional => 1, min => 39, max => 39, matches => qr/^AIza[0-9A-Za-z_-]{35}$/ },
-      'height' => { optional => 1 },
-      'width' => { optional => 1 }
-    }
+```perl
+{
+  'gedcom' => { 'type' => 'object', 'can' => 'individuals' },
+  'geocoder' => { 'type' => 'object', 'can' => 'geocode' },
+  'debug' => { 'type' => 'boolean', optional => 1 },
+  'google_key' => { 'type' => 'string', optional => 1, min => 39, max => 39, matches => qr/^AIza[0-9A-Za-z_-]{35}$/ },
+  'height' => { optional => 1 },
+  'width' => { optional => 1 }
+}
+```
 
-#### OUTPUT
+##### Output
 
 Argument error: croak
 No matches found: undef
 
 Returns an array of two strings:
 
-    {
-      'type' => 'array',
-      'min' => 2,
-      'max' => 2,
-      'schema' => { 'type' => 'string', min => 10 },
-    }
+```perl
+{
+  'type' => 'array',
+  'min' => 2,
+  'max' => 2,
+  'schema' => { 'type' => 'string', min => 10 },
+}
+```
 
-# AUTHOR
+## Bugs
 
-Nigel Horne, `<njh at nigelhorne.com>`
+## See Also
 
-# BUGS
+- [Test Dashboard](https://nigelhorne.github.io/HTML-Genealogy-Map/coverage/)
+- [Configure an Object at Runtime](https://metacpan.org/pod/Object%3A%3AConfigure)
 
-# SEE ALSO
-
-- Test coverage report: [https://nigelhorne.github.io/HTML-Genealogy-Map/coverage/](https://nigelhorne.github.io/HTML-Genealogy-Map/coverage/)
-- [Object::Configure](https://metacpan.org/pod/Object%3A%3AConfigure)
-
-    The class is fully configurable at runtime with configuration files.
-
-# REPOSITORY
+## Repository
 
 [https://github.com/nigelhorne/HTML-Genealogy-Map](https://github.com/nigelhorne/HTML-Genealogy-Map)
 
-# SUPPORT
+## Support
 
 This module is provided as-is without any warranty.
 
@@ -103,7 +107,9 @@ automatically be notified of progress on your bug as I make changes.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc HTML::Genalogy::Map
+```
+perldoc HTML::Genalogy::Map
+```
 
 You can also look for information at:
 
@@ -123,15 +129,14 @@ You can also look for information at:
 
     [http://deps.cpantesters.org/?module=HTML::Genalogy::Map](http://deps.cpantesters.org/?module=HTML::Genalogy::Map)
 
-# LICENCE AND COPYRIGHT
+## Author
 
-Copyright 2025 Nigel Horne.
+Nigel Horne, `<njh at nigelhorne.com>`
 
-Usage is subject to licence terms.
+## Licence and Copyright
 
-The licence terms of this software are as follows:
+Copyright 2025-2026 Nigel Horne.
 
-- Personal single user, single computer use: GPL2
-- All other users (including Commercial, Charity, Educational, Government)
-  must apply in writing for a licence for use from Nigel Horne at the
-  above e-mail.
+Usage is subject to the GPL2 licence terms.
+If you use it,
+please let me know.

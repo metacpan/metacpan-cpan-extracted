@@ -964,18 +964,19 @@ kept:
     kind=string   value=1e285
     kind=string   value=1e400
 
-C<value> is a Perl floating point number for the C<float> kind, the
-double nearest to the literal, so C<1e3> comes back as C<1000> and prints
-without a decimal point (and C<-0.0> prints as C<0>, although it keeps its
-sign). When emitted again the float kind is remembered: C<emit_kdl> writes
+C<value> is a Perl floating point number for the C<float> kind, the Perl
+float (NV) nearest to the literal, so C<1e3> comes back as C<1000> and
+prints without a decimal point (and C<-0.0> prints as C<0>, although it
+keeps its sign). When emitted again the float kind is remembered: C<emit_kdl> writes
 the first node as C<floats 3.14 -0.5 1000.0 6.02e+23 0.00015 1000.0 1.5
 -0.0>, every float with the shortest text that reads back as the same
-double. A C<string> kind number is written back verbatim.
+float. A C<string> kind number is written back verbatim.
 
 Note that C<3.141592653589793> (16 digits) is a C<string>, and so are
 C<1.000000000000000> and C<123456789012345.0> (16 digits including the
-zeros), so a double printed with full precision is not a C<float> on the
-way back in; C<< $v->as_number >> gives the double and C<< $v->as_bignum >>
+zeros), so a Perl float printed with full precision is not a C<float> on
+the way back in; C<< $v->as_number >> gives the nearest Perl float and
+C<< $v->as_bignum >>
 the exact decimal. See L</"Emitting floating point numbers"> for writing
 floats.
 
@@ -1700,7 +1701,7 @@ becomes C<3>;
 =back
 
 The value of every float is kept exactly: it is written with the shortest
-text that reads back as the same double.
+text that reads back as the same Perl float.
 
 =head2 Building nodes and values by hand
 
@@ -1794,8 +1795,8 @@ L<Text::KDL::XS::Node/new>.
 =head2 Emitting floating point numbers
 
 Floats are written with the shortest text that reads back as exactly the
-same double, and always with a decimal point or an exponent, so that they
-stay floats when parsed again. Perl integers are written as integers:
+same Perl float, and always with a decimal point or an exponent, so that
+they stay floats when parsed again. Perl integers are written as integers:
 
 =for highlighter language=Perl
 
@@ -1808,11 +1809,17 @@ stay floats when parsed again. Perl integers are written as integers:
 
 =for highlighter
 
+The examples show a perl whose floats are doubles. On a perl built with
+C<-Duselongdouble> or C<-Dusequadmath> the float is wider and the text
+keeps the extra precision: C<0.1 + 0.2> is written as
+C<0.30000000000000000000000000000000004> with a quad, and reads back
+exactly.
+
 Infinity and NaN are written as C<#inf>, C<#-inf> and C<#nan> in KDL v2
 and make C<emit_kdl> die in KDL v1, which cannot express them.
 
 To write a number with exactly the digits you choose, for example a price
-with trailing zeros or a decimal with more precision than a double, hand
+with trailing zeros or a decimal with more precision than a Perl float, hand
 it over as a string-encoded number, which is checked for KDL number syntax
 and copied verbatim:
 
@@ -1825,8 +1832,8 @@ and copied verbatim:
 
 A value with 16 or more significant digits comes back from C<parse_kdl>
 as C<< kind => 'string' >> (see L</"Floating point numbers">); its text is
-exact, C<< $v->as_number >> gives the double and C<< $v->as_bignum >> the
-exact decimal.
+exact, C<< $v->as_number >> gives the nearest Perl float and
+C<< $v->as_bignum >> the exact decimal.
 
 =head2 Emitting strings that look like keywords or numbers
 

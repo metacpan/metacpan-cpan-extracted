@@ -54,7 +54,7 @@ The picture shows the forms a bar can take
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-progress-bar.svg" alt="Progress bars: a block bar at 42 percent, one with the value inside, a thin line bar, a striped bar, a bar of three colored segments, an indeterminate bar with its runner, and a two-row ASCII bar"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-progress-bar.svg" alt="Progress bars: a block bar at 42 percent, one with the value inside, a thin line bar, a striped bar, a bar of three colored segments, an indeterminate bar with its runner, and a two-row ASCII bar"></p>
 
 =end html
 
@@ -138,7 +138,7 @@ picture shows every style (F<examples/widgets/spinner.pl>):
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-spinner.svg" alt="Spinners in every style, each with its name: dots, line, arc, circle, arrow, box, pulse and bar in one cell, dots3, bounce and wave in several, and the three-row ring; a stopped one and one with frames of its own"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-spinner.svg" alt="Spinners in every style, each with its name: dots, line, arc, circle, arrow, box, pulse and bar in one cell, dots3, bounce and wave in several, and the three-row ring; a stopped one and one with frames of its own"></p>
 
 =end html
 
@@ -183,7 +183,7 @@ shows toasts of every kind, an important one and an alert box
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-toast.svg" alt="Toasts stacked in the top right corner: an info, a success and a warning toast with titles, messages and close marks, a filled danger toast in the bottom right corner, and an alert box inside the form"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-toast.svg" alt="Toasts stacked in the top right corner: an info, a success and a warning toast with titles, messages and close marks, a filled danger toast in the bottom right corner, and an alert box inside the form"></p>
 
 =end html
 
@@ -236,7 +236,7 @@ C<warning> and C<danger> (F<examples/widgets/status-bar.pl>):
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-status-bar.svg" alt="A list of files with the cursor on budget.csv and, at the bottom, a status bar with the green message Saved budget.csv. and the parts file 3 of 6 and Ctrl+C quits. Above the list, status bars with a success message, a yellow warning with a blue modified part, and a red error with a red read-only part"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-status-bar.svg" alt="A list of files with the cursor on budget.csv and, at the bottom, a status bar with the green message Saved budget.csv. and the parts file 3 of 6 and Ctrl+C quits. Above the list, status bars with a success message, a yellow warning with a blue modified part, and a red error with a red read-only part"></p>
 
 =end html
 
@@ -303,7 +303,7 @@ whose e-mail field holds an address that is not valid
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-prompt.svg" alt="A New contact prompt over the dimmed list of contacts: Name holds Ada Lovelace, E-mail holds ada@engine in red, and the red line E-mail: Please enter an e-mail address. sits above the Add and Cancel buttons"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-prompt.svg" alt="A New contact prompt over the dimmed list of contacts: Name holds Ada Lovelace, E-mail holds ada@engine in red, and the red line E-mail: Please enter an e-mail address. sits above the Add and Cancel buttons"></p>
 
 =end html
 
@@ -361,7 +361,7 @@ dialog to open a note, with the cursor on a file
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-file-dialog.svg" alt="An Open a file dialog over a dimmed notes program: the folder line ends in Documents/Projects/analytical-engine/notes, the list shows two folders and four notes with their sizes and modification times, the cursor is on reading-list.txt, which is also in the File field, and below it are the Notes filter, the Show hidden files checkbox and the Open and Cancel buttons"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-file-dialog.svg" alt="An Open a file dialog over a dimmed notes program: the folder line ends in Documents/Projects/analytical-engine/notes, the list shows two folders and four notes with their sizes and modification times, the cursor is on reading-list.txt, which is also in the File field, and below it are the Notes filter, the Show hidden files checkbox and the Open and Cancel buttons"></p>
 
 =end html
 

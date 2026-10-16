@@ -1,5 +1,82 @@
 Revision history for Geo-Coder-Free
 
+0.46	Thu Oct 15 09:06:24 PM EDT 2026
+	[ Enhancements ]
+	- Added valid_location(), which answers whether a string is a location at all: the rule geocode()
+	  applies before it touches a backend, made public.  A caller working down a spreadsheet column can
+	  skip a row whose value is a bare number, or empty, instead of catching the croak that would
+	  otherwise end the run.  The regex it replaces was private to this module, so no caller could
+	  pre-filter with the module's own rule
+	- geocode() takes on_error => 'croak' (the default, and the behaviour every existing caller already
+	  has) or 'undef'.  'undef' returns undef - an empty list in list context - for the two documented
+	  input errors, invalid_location and invalid_scantext, and for nothing else: a backend that throws
+	  still throws, because nothing is wrapped in an eval, and a call with neither a location nor a
+	  scantext is still a usage croak.  An on_error with any other value is refused by name rather than
+	  ignored, so a caller who misspells it does not ship a batch job that dies on its first bad row
+
+0.45	Thu Oct 15 01:23:24 PM EDT 2026
+	[ Enhancements ]
+	- Every Geo::Location::Point this distribution returns now carries geocoder, database, confidence and
+	  accuracy, so a caller can tell which distribution and
+	  which backend produced it, how good the match was and how precise the coordinate is.  geocoder is new
+	  and additive, and the existing database values are unchanged for the consumers that match on them
+	- Local, MaxMind and OpenAddresses each describe the match they actually made: an OpenAddresses geohash
+	  hit is an address and a hand-curated entry a locality, a Local match is graded from the columns that
+	  matched rather than the ones the call site offered, and a MaxMind cities row is a city or a region
+	- Added provenance(), which returns the distribution, backend, confidence and accuracy of a result, as a
+	  list or, in scalar context, as a hashref.  The backends' two spellings of database are reduced to one
+	  vocabulary there.  It returns undef rather than guessing for something with no provenance to report,
+	  such as a plain hash handed on by another geocoder
+	- Added Geo::Coder::Free::Provenance: the GEOCODER constant, the ACCURACY_LEVELS vocabulary and
+	  _accuracy_for(), so a backend describes a match without repeating the vocabulary.  They live in a
+	  module of their own because Geo::Coder::Free::Utils is synced from VWF master, where a geocoder
+	  result has no provenance - an addition there would not survive the next sync
+	- Requires Geo::Location::Point 0.16, which stores and returns false values: a confidence of 0 or an
+	  empty accuracy used to be discarded on write, so provenance could not have been reported honestly
+	[ Tests ]
+	- t/unit.t: the API ledger gains the provenance states, and a new section runs the real MaxMind backend
+	  (the mock is restored first) to assert that a hit carries all four keys with an accuracy of city or
+	  region - a point the test built itself would prove nothing about the stamping
+	- t/integration.t: the OpenAddresses path is now asserted end to end - the database lookup is stubbed at
+	  the seam _get() uses, so the stamping, the Storable round trip through the result cache and the thawed
+	  second lookup are all the code under test
+	- t/consumer-contract.t: geocoder, database, confidence and accuracy are declared as guaranteed producer
+	  keys, so a backend that stops setting one of them fails here
+	- t/bin.t: the skip for a run without OPENADDR_HOME covers the 26 tests the plan declares, not 28, so a
+	  configuration that skips the whole file no longer ends with 'Bad plan' and a non-zero exit
+	- t/unit.t needs neither the downloaded databases nor an optional address parser: the MaxMind section
+	  answers the database lookups itself, Geo::libpostal and Geo::Address::Parser are hidden so that what a
+	  location string parses to cannot decide whether a documented state is reachable, and the column scan
+	  is driven with the components a dataset row really carries.  Both of those were passing on a machine
+	  with the data and the parsers installed and failing in CI, which has neither
+
+0.44	Thu Oct 15 10:22:42 AM EDT 2026
+	[ Tests ]
+	- Use Test::Log::Abstraction
+	- Added t/consumer-contract.t: the reader/producer contract for the Geo::Location::Point this dist returns. It checks that each backend still sets
+	  the keys the contract claims, and that every registered consumer in the workspace reads only the keys every backend guarantees - reading a key that
+	  only one backend sets is undef for the others, which is how a caller silently takes the wrong branch. A consumer that is not registered fails the
+	  discovery test, so the check cannot go stale
+
+0.43	Fri Aug 14 08:24:12 PM EDT 2026
+	[ Enhancements ]
+	- _normalize rewritten with split to eliminate O(N³) catastrophic backtracking from (.+)\s+(.+)\s+(.+)
+	- _find_gb_addresses commas now mandatory between parts to prevent exponential backtracking on comma-free text
+	- _find_us_addresses and _find_ca_addresses converted all capturing groups to non-capturing (only $& used)
+	- _find_us_addresses and _find_ca_addresses street name pattern bounded to prevent lazy-quantifier O(N²) expansion
+	- _normalize_args now croaks on odd-count argument lists longer than 1 (closes logic gap M7)
+	- wantarray tautologies in reverse_geocode eliminated (M8)
+	- scantext ignore_words passed by reference instead of copying the full hash each call
+	- %admin2cache_rev added as inverse of %admin2cache, replacing O(N) value scan with O(1) lookup in _prepare
+	[ Tests ]
+	- Added new tests
+	  t/logic-reducer.t: new test file with partition-based proofs for all M-series reductions
+	  t/unit.t: new black-box unit test file covering every public API of Geo::Coder::Free, Local, OpenAddresses, and Utils; uses Test::Mockingbird to mock MaxMind, Test::Returns for schema validation, and an API ledger to guarantee all documented states are exercised
+	  t/integration.t: new end-to-end integration test file covering cross-module workflows; tests backend delegation chain, alternatives singleton, concurrency isolation, clone shallow-copy semantics, scantext memoisation, round-trip geocode/reverse, distance calculations, OA known_locations, MaxMind admin cache invariants, optional Geo::libpostal dep, and USA/US normalisation
+	  t/edge_cases.t: new destructive/boundary/security test file; covers distance() boundary coordinates, undef/non-numeric/out-of-range inputs, cache hostile configs, purely numeric geocode rejection (M7 regression), SQL/shell/newline injection payloads, global variable isolation, and ReDoS regression tests for _normalize(), _find_gb_addresses(), and the OA city-name pattern
+	  t/path.t: new CFG path-coverage test file; maps every unique execution path in GCF::new/geocode/reverse_geocode, Local::geocode/reverse_geocode/_search/_find_geographic_centres/_to_two_letter_state, and the shared helpers _normalize_args/_normalize/_abbreviate/_find_word_ngrams; 97 subtests covering all dispatch branches, guard exits, confidence levels, and mock-contamination hygiene
+	  t/transaction.t: new transaction-flow/lifecycle test file; 18 subtests covering Local cache write-through, geocode idempotency, scantext miss memoization, OA exception propagation (no silent swallow), OA→Local delegation chain, all-miss recovery, one-shot __DATA__ lifecycle, alternatives map re-geocode cycle, geocode→reverse round-trip, USA/US normalization idempotency, lazy backend creation, clone shallow-copy state boundary (shared references visible across both sides), and object usability after mid-chain failure
+
 0.42	Fri Jul 10 11:48:02 EDT 2026
 	Try Geo::Address::Parser before libpostal() as that uses less memory
 	createdatabase.PL - borough parent lookup now uses locality_id from hierarchy to skip intermediate boroughs

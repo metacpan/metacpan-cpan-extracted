@@ -10,8 +10,7 @@ use Test::Most tests => 5;
 use Test::Number::Delta;
 use Test::Carp;
 use Test::Deep;
-use lib 't/lib';
-use MyLogger;
+use Test::Log::Abstraction;
 
 BEGIN {
 	use_ok('Geo::Coder::Free');
@@ -29,7 +28,7 @@ DR5HN: {
 				}
 
 				if($ENV{'TEST_VERBOSE'}) {
-					Database::Abstraction::init(logger => MyLogger->new());
+					Database::Abstraction::init(logger => Test::Log::Abstraction->new());
 				}
 
 				my $geo_coder = new_ok('Geo::Coder::Free');

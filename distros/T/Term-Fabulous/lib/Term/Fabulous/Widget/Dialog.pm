@@ -10,7 +10,7 @@ use Object::Pad 0.825;
 use Term::Fabulous::Widget::Box;
 use Term::Fabulous::Widget::Dialog::Backdrop;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 class Term::Fabulous::Widget::Dialog
 	:isa(Term::Fabulous::Widget::Box)
@@ -174,7 +174,7 @@ and keeps the focus
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-dialog.svg" alt="A Delete 3 files? dialog with Delete and Cancel buttons over a dimmed list of files; Delete has the focus and a blue border"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-dialog.svg" alt="A Delete 3 files? dialog with Delete and Cancel buttons over a dimmed list of files; Delete has the focus and a blue border"></p>
 
 =end html
 

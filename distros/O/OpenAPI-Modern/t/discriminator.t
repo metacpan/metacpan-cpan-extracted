@@ -172,7 +172,8 @@ YAML
   );
 
 
-  my $schema = $openapi->openapi_schema;
+  my $schema = $openapi->entry_document->schema;
+
   $schema->{components}{schemas}{pet}{discriminator}{defaultMapping} = 'generic_pet';
   $schema->{components}{schemas}{pet}{anyOf}[2] = { '$ref' => '#/components/schemas/generic_pet' };
   $schema->{components}{schemas}{generic_pet} = {

@@ -47,7 +47,7 @@ Returns the paths under `dir` whose base name matches `regex` and that pass ever
 
 It takes these named arguments:
 
-* `dir` (default `.`): The directory to list.  Trailing slashes are removed, but `/` stays `/`.
+* `dir` (default `.`): The directory to list.  Trailing slashes are removed, but `/` stays `/`.  A `dir` that is a symbolic link to a directory is listed through the link, recursively or not.
 * `regex` (default `.`): A pattern the base name must match, given as a string or a `qr//`.  An invalid pattern dies, naming it.
 * `tests` (default `f`): One or more of perl's file tests, as letters: `rwxoRWXOezsfdlpSbcugkTB`.  Every one must pass.  `'d'` lists directories; `''` applies no test at all.
 * `recursive` (default `0`): `1` descends into subdirectories, through `File::Find`, without following symbolic links.
@@ -93,7 +93,7 @@ Returns the whole of a file as one string, read without any decoding layer.  A f
     format_commas(-0.5);                # '-0.50'
     format_commas(1e20);                # '100,000,000,000,000,000,000.00'
 
-Puts a comma between each group of three digits of the integer part and appends the hundredths, rounded half up.  The second argument is the `sprintf` format the hundredths are printed with, `'.%02d'` by default; `'%.0u'` prints nothing, for a whole number.  Rounding that carries into the integer part does so (`0.999` is `1.00`), a negative number keeps its sign, a number that rounds to zero has none, and a large number is grouped as digits rather than printed in exponent form.
+Puts a comma between each group of three digits of the integer part and appends the hundredths, rounded half up.  The second argument is the `sprintf` format the hundredths are printed with, `'.%02d'` by default; `'%.0u'` rounds half up to a whole number and prints no fraction.  Rounding that carries into the integer part does so (`0.999` is `1.00`), a negative number keeps its sign, a number that rounds to zero has none, and a large number is grouped as digits rather than printed in exponent form.
 
 ## json_file_to_ref
 

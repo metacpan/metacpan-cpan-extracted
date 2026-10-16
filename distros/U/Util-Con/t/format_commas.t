@@ -30,6 +30,16 @@ is( format_commas(0.995),      '1.00',         'exactly .995 rounds up and carri
 is( format_commas(999999.999, '%.0u'), '1,000,000',
 	'carry also works in integer format' );
 
+# --- '%.0u' rounds a fraction to a whole number. ---
+# --- It used to splice the hundredths on: 1234.56 came out "1,23456". ---
+is( format_commas(1234.56, '%.0u'), '1,235',     'integer format rounds up' );
+is( format_commas(1234.49, '%.0u'), '1,234',     'integer format rounds down' );
+is( format_commas(1234.5,  '%.0u'), '1,235',     'integer format rounds half up' );
+is( format_commas(0.4,     '%.0u'), '0',         'a fraction below one half is 0, not "040"' );
+is( format_commas(999.5,   '%.0u'), '1,000',     'rounding that widens the integer part' );
+is( format_commas(-1234.5, '%.0u'), '-1,235',    'negative fraction in integer format' );
+is( format_commas(-0.4,    '%.0u'), '0',         'rounds to zero in integer format, so no sign' );
+
 # --- Negative numbers: the sign is split off and the magnitude formatted. ---
 # --- These used to emit "-1,234.-49" and lose the sign entirely on -0.5.  ---
 is( format_commas(-1234.5),     '-1,234.50',     'negative with a fraction' );

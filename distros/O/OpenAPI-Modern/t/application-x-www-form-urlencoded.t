@@ -518,7 +518,7 @@ YAML
   );
 
 
-  # see examples in 3.2.0 §4.15.3.1
+  # see examples in v3.2.0 §4.15.3.1
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
     openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));

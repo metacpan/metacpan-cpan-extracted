@@ -10,7 +10,7 @@ use POSIX qw( strftime );
 use Moo;
 with "Archive::BagIt::Role::Portability";
 
-our $VERSION = '0.101'; # VERSION
+our $VERSION = '0.102'; # VERSION
 
 # ABSTRACT: The main module to handle bags.
 
@@ -30,7 +30,7 @@ around 'BUILDARGS' , sub {
 sub BUILD {
     my ($self, $args) = @_;
     if (!defined $self->use_plugins()) {
-        return $self->load_plugins(("Archive::BagIt::Plugin::Manifest::MD5", "Archive::BagIt::Plugin::Manifest::SHA512"));
+        return $self->load_plugins(("Archive::BagIt::Plugin::MD5", "Archive::BagIt::Plugin::SHA512"));
     }
     return $self->load_plugins($self->use_plugins());
 }
@@ -898,10 +898,10 @@ sub _build_forced_fixity_algorithm {
         return;
     } else {
         if ($self->bag_version() >= 1.0) {
-            return Archive::BagIt::Plugin::Algorithm::SHA512->new(bagit => $self);
+            return Archive::BagIt::Plugin::SHA512->new(bagit => $self);
         }
         else {
-            return Archive::BagIt::Plugin::Algorithm::MD5->new(bagit => $self);
+            return Archive::BagIt::Plugin::MD5->new(bagit => $self);
         }
     }
 }
@@ -1141,7 +1141,7 @@ Archive::BagIt - The main module to handle bags.
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 NAME
 
@@ -1203,11 +1203,14 @@ To reduce the complexity of code in current module the support for
 =over
 
 =item parallel processing
-=item synchronous I/O
+=item old synchronous I/O
 
 =back
 
 is removed. The existing code is very fast, so there is no performance loss.
+
+Also the with >v0.100 the plugin structure was simplified. Only one module has to be provided to support a new
+digest-algorithm. This change breaks previous plugin implementations.
 
 In near future the support for L<Archive::BagIt::Fast> will be  removed, because it needs hooks, which increase code
 complexity in current module without any performance benefit.
@@ -1242,27 +1245,28 @@ I have made great efforts to optimize Archive::BagIt for high throughput. There 
 
 =back
 
-On my system with 8cores, SSD and a large 9GB bag with 568 payload files the results for C<verify_bag()> are:
+On my system with 8cores, SSD and a large bag with SHA512 and MD5 sums with 23.013 payload files and size of 632MB the results for C<verify_bag()> are:
 
                     processing time          run time             throughput
    Version       user time    system time    total time    total    MB/s
-    v0.71        38.31s        1.60s         39.938s       100%     230
-    v0.81        25.48s        1.68s         27.1s          67%     340
-    v0.82        48.85s        3.89s          6.84s         17%    1346
+    v0.102b       1,295s       0,419s         1.715 s            368MB/s (sync)
+    v0.102a       2,252s       0,442s         2,695 s            234MB/s (async, needs bo rewritten)
+    v0.101                                    2.708 s
+    v0.100                                    1.674 s 
+    v0.081                                    1.613 s
+    v0.071                                    1.874 s
 
 =head2 How fast is L<Archive::BagIt::Fast>?
 
-It depends. On my system with 8cores, SSD and a 38MB bag with 48 payload files the results for C<verify_bag()> are:
+It depends. On my system the results for C<verify_bag()> are:
 
-                  Rate         Base         Fast
-   Base         3.01/s           --         -21%
-   Fast         3.80/s          26%           --
+ Benchmark 1: perl -I lib verify.pl testbags/file_signatures
+  Time (mean ± σ):      2.685 s ±  0.018 s    [User: 2.225 s, System: 0.459 s]
+  Range (min … max):    2.657 s …  2.721 s    10 runs
 
-On my system with 8cores, SSD and a large 9GB bag with 568 payload files the results for C<verify_bag()> are:
-
-                s/iter         Base         Fast
-   Base           74.6           --          -9%
-   Fast           68.3           9%           --
+ Benchmark 2: perl -I lib verify_fast.pl testbags/file_signatures
+  Time (mean ± σ):      1.560 s ±  0.017 s    [User: 1.187 s, System: 0.373 s]
+  Range (min … max):    1.536 s …  1.575 s    10 runs
 
 But you should measure which variant is best for you. In general the default L<Archive::BagIt> is fast enough.
 
@@ -1578,7 +1582,7 @@ Andreas Romeyke <cpan@andreas.romeyke.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Rob Schmidt <rjeschmi@gmail.com>, William Wueppelmann and Andreas Romeyke.
+This software is copyright (c) 2026 by Rob Schmidt <rjeschmi@gmail.com>, William Wueppelmann and Andreas Romeyke.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -5,7 +5,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Exporter 'import';
 our @EXPORT_OK = qw(positive_integer non_negative_integer integer number string boolean glyph color cell_color sizing class_names one_of border_style border_sides value_format optional describe);

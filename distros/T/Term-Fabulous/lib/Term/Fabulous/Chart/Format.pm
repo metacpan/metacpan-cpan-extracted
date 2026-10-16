@@ -5,7 +5,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Exporter 'import';
 our @EXPORT_OK = qw(number_formatter time_formatter format_value format_values decimals_of check_number_format check_time_format);

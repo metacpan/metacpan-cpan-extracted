@@ -3,7 +3,7 @@ use Object::Pad ':experimental(init_expr)';
 
 package OpenTelemetry::Exporter::OTLP::Encoder::Protobuf;
 
-our $VERSION = '0.021';
+our $VERSION = '0.022';
 
 class OpenTelemetry::Exporter::OTLP::Encoder::Protobuf
     :isa(OpenTelemetry::Exporter::OTLP::Encoder::JSON) {
@@ -28,6 +28,8 @@ class OpenTelemetry::Exporter::OTLP::Encoder::Protobuf
     }
 
     method encode_anyvalue ( $v ) {
+        return {} unless defined $v;
+
         return { kvlist_value => { values => $self->encode_kvlist($v) } }
             if is_hashref $v;
 
@@ -36,7 +38,7 @@ class OpenTelemetry::Exporter::OTLP::Encoder::Protobuf
 
         if ( my $ref = ref $v ) {
             warn "Unsupported ref while encoding: $ref";
-            return;
+            return {};
         }
 
         # TODO: not strings

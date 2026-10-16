@@ -2,25 +2,24 @@ package Geo::Coder::Free::Display::meta_data;
 
 use strict;
 use warnings;
+use autodie qw(:all);
 
 =head1 VERSION
 
-Version 0.42
+Version 0.46
 
 =cut
 
-our $VERSION = '0.42';
+our $VERSION = '0.46';
 
 # Display the meta-data page - the internal status of the server and VWF system
 
-use Geo::Coder::Free::Display;
-
-our @ISA = ('Geo::Coder::Free::Display');
+use parent -norequire, 'Geo::Coder::Free::Display';
 
 sub html
 {
 	my $self = shift;
-        my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
+	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
 	my $vwf_log = $args{'vwf_log'};
 	my $domain_name = $self->{'info'}->domain_name();

@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::Upload 2.80 {
+package Dist::Zilla::Plugin::Author::Plicease::Upload 2.81 {
 
   use 5.022;
   use Moose;
@@ -32,7 +32,7 @@ package Dist::Zilla::Plugin::Author::Plicease::Upload 2.80 {
     my $self = shift;
     my($archive) = @_;
 
-    my $local_release_dir = Path::Tiny->new("~/dev/site-dist/docs");
+    my($local_release_dir) = grep { -d } map { Path::Tiny->new($_) } qw( ~/www/dist.wdlabs.com/docs ~/dev/site-dist/docs );
 
     my @cmd;
 
@@ -50,18 +50,23 @@ package Dist::Zilla::Plugin::Author::Plicease::Upload 2.80 {
       }
       return;
     }
-    elsif(-d "$local_release_dir")
+    elsif(defined $local_release_dir)
     {
       @cmd = ('cp', $archive, "$local_release_dir");
     }
     else
     {
       $self->zilla->log("no release process available, upload tarball manually");
+      return;
     }
 
     {
       $self->zilla->log("% @cmd");
-      eval { system @cmd };
+      eval {
+        system @cmd;
+        die "failed to execute: $!\n" if $? == -1;
+        die "exited with status @{[ $? >> 8 ]}\n" if $?;
+      };
       if(my $error = $@)
       {
         $self->zilla->log("NOTE COPY FAILED: $error");
@@ -69,7 +74,7 @@ package Dist::Zilla::Plugin::Author::Plicease::Upload 2.80 {
       }
       else
       {
-        $self->zilla->log("don't forget to commit and push to site-dist");
+        $self->zilla->log("don't forget to commit and push $local_release_dir");
         $self->zilla->log("download URL: " . $self->url . "$archive");
       }
     }
@@ -95,7 +100,7 @@ Dist::Zilla::Plugin::Author::Plicease::Upload - Upload a dist to CPAN
 
 =head1 VERSION
 
-version 2.80
+version 2.81
 
 =head1 SYNOPSIS
 
@@ -120,7 +125,10 @@ If C<cpan> is set to a true value, ask first before uploading to CPAN.
 Sometimes and for some dists I instead commit it to a GitHub pages website
 for internal use.  If C<cpan> is set to a false value or if you deny
 uploading to CPAN, the dist will be copied into the usual place where
-the aforementioned GitHub pages repository is checked out.
+the aforementioned GitHub pages repository is checked out
+(C<~/www/dist.wdlabs.com/docs> if it exists, otherwise
+C<~/dev/site-dist/docs>).  If neither exists, a warning is logged
+and the tarball will need to be uploaded manually.
 
 =back
 

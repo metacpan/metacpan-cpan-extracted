@@ -11,7 +11,7 @@ use Term::Fabulous::Role::HasOptions;
 use Term::Fabulous::Widget::Dropdown::List;
 use Term::Fabulous::Widget::Input;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 class Term::Fabulous::Widget::Dropdown
 	:isa(Term::Fabulous::Widget::Input)
@@ -388,7 +388,7 @@ list that opens
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-dropdown.svg" alt="Three dropdowns: a placeholder, France selected, and an open list of colors with Blue highlighted"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-dropdown.svg" alt="Three dropdowns: a placeholder, France selected, and an open list of colors with Blue highlighted"></p>
 
 =end html
 

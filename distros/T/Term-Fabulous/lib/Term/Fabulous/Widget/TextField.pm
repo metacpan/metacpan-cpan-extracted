@@ -9,7 +9,7 @@ use Object::Pad 0.825;
 
 use Term::Fabulous::Widget::TextInput;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 class Term::Fabulous::Widget::TextField
 	:isa(Term::Fabulous::Widget::TextInput)
@@ -95,7 +95,7 @@ Term::Fabulous::Widget::TextField - Single-line text input
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-text-field.svg" alt="Four text fields: a focused field with Ada Lovelace typed and Lovelace selected, a placeholder, a masked password and a disabled field"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-text-field.svg" alt="Four text fields: a focused field with Ada Lovelace typed and Lovelace selected, a placeholder, a masked password and a disabled field"></p>
 
 =end html
 

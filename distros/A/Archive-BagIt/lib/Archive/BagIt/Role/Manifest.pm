@@ -5,15 +5,20 @@ use namespace::autoclean;
 use Carp qw( croak carp );
 use File::Spec ();
 use Moo::Role;
-with 'Archive::BagIt::Role::Plugin';
 with 'Archive::BagIt::Role::Portability';
 # ABSTRACT: A role that handles all manifest files for a specific Algorithm
-our $VERSION = '0.101'; # VERSION
+our $VERSION = '0.102'; # VERSION
 
 has 'algorithm' => (
-    is => 'rw',
+    is      => 'rw',
+    builder => '_build_algorithm',
     #isa=>'HashRef',
 );
+
+sub _build_algorithm {
+    my $self = shift;
+    $self;
+}
 
 has 'manifest_file' => (
     is      => 'rw',
@@ -292,7 +297,7 @@ Archive::BagIt::Role::Manifest - A role that handles all manifest files for a sp
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head2 manifest_entries()
 
@@ -343,7 +348,7 @@ Andreas Romeyke <cpan@andreas.romeyke.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Rob Schmidt <rjeschmi@gmail.com>, William Wueppelmann and Andreas Romeyke.
+This software is copyright (c) 2026 by Rob Schmidt <rjeschmi@gmail.com>, William Wueppelmann and Andreas Romeyke.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

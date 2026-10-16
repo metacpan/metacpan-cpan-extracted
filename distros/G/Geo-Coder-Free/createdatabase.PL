@@ -61,6 +61,7 @@ use strict;
 use warnings;
 # use autodie qw(:all);
 use autodie;	# Don't want system() to die, we catch failures
+use Carp;
 use Cache::LRU;
 use Cwd;
 use Data::Dumper;
@@ -75,10 +76,7 @@ use Geo::Hash;
 use JSON::MaybeXS;
 use LWP::ConnCache;
 use LWP::UserAgent::Throttled;
-use Locale::AU;	# TODO: use Locale::Geocode
-use Locale::CA;
 use Locale::Country;
-use Locale::US;
 use Digest::MD5;
 use Encode;
 use Geo::StreetAddress::US;
@@ -1107,7 +1105,7 @@ BEGIN {
 		   ($warning =~ /Wide/) ||
 		   ($warning =~ /masks earlier declaration in same scope/) ||
 		   ($warning =~ /isn't numeric in numeric eq /i)) {
-			die $warning;
+			Carp::croak $warning;
 		}
 		warn $warning;
 	};
@@ -1129,7 +1127,7 @@ if(($^O ne 'solaris') && ($^O ne 'haiku') && ($^O ne 'MSWin32')) {
 		IO::AIO->import()
 	};
 	if($@) {
-		die $@;
+		Carp::croak $@;
 	}
 }
 my %queued_commits;
@@ -1149,14 +1147,14 @@ my $cities_sql = 'lib/Geo/Coder/Free/MaxMind/databases/cities.sql';
 
 if(!-r $cities_sql) {
 	(system('bash bin/create_sqlite') == 0)
-		or warn "Can't create the SQLite database (perhaps you don't have sqlite3 installed) - expect poor performance";
+		or Carp::carp "Can't create the SQLite database (perhaps you don't have sqlite3 installed) - expect poor performance";
 
 	if(-r $cities_sql) {
 		if(-r "blib/$cities_sql") {
 			unlink("blib/$cities_sql");
 		}
 		copy($cities_sql, "blib/$cities_sql")
-			or die "Can't copy SQLite file to blib: $!";
+			or Carp::croak "Can't copy SQLite file to blib: $!";
 	}
 }
 
@@ -1185,7 +1183,7 @@ my $db_file = "$oa/openaddresses.db";
 # my $db_file;
 
 if($sqlite_file && $db_file) {
-	die 'Choose only one database driver';
+	Carp::croak 'Choose only one database driver';
 }
 
 if($force_flag) {
@@ -1217,9 +1215,11 @@ if($ENV{'REDIS_SERVER'}) {
 	$redis->select(1);
 	$redis->flushdb();
 
-	# So the database is not contantly re-written
-	open(my $fout, '>', $sqlite_file);
-	close($fout);
+	# So the database is not constantly re-written (only when SQLite is configured)
+	if(defined($sqlite_file)) {
+		open(my $fout, '>', $sqlite_file);
+		close($fout);
+	}
 } elsif(my $e = $ENV{'MONGODB_SERVER'}) {
 	# TODO
 	# I'm hoping this will require less RAM than SQLite which just chews
@@ -1232,9 +1232,11 @@ if($ENV{'REDIS_SERVER'}) {
 
 	$mongodb = MongoDB::MongoClient->new(host => $server, port => $port)->get_database($db_name)->get_collection('data');
 
-	# So the database is not contantly re-written
-	open(my $fout, '>', $sqlite_file);
-	close($fout);
+	# So the database is not constantly re-written (only when SQLite is configured)
+	if(defined($sqlite_file)) {
+		open(my $fout, '>', $sqlite_file);
+		close($fout);
+	}
 } elsif($e = $ENV{'MARIADB_SERVER'}) {
 	# MariaDB/MySQL
 	require DBD::MariaDB;
@@ -1255,10 +1257,12 @@ if($ENV{'REDIS_SERVER'}) {
 	$dbh->do('CREATE DATABASE geo_coder_free');
 	$dbh->do('USE geo_coder_free');
 
-	# So the database is not contantly re-written
-	open(my $fout, '>', $sqlite_file);
-	close($fout);
-	truncate $sqlite_file, 0;
+	# So the database is not constantly re-written (only when SQLite is configured)
+	if(defined($sqlite_file)) {
+		open(my $fout, '>', $sqlite_file);
+		close($fout);
+		truncate $sqlite_file, 0;
+	}
 } elsif(defined($db_file)) {
 	# if($berkeley_db = DB_File::HASHINFO->new()) {
 		# $berkeley_db->{'cachesize'} = 64 * 1024 * 1024;
@@ -1275,7 +1279,7 @@ if($ENV{'REDIS_SERVER'}) {
 	$berkeley_db = DB_File::HASHINFO->new();
 	$berkeley_db->{'cachesize'} = 65536;
 	$berkeley_db = tie %db_tie, 'DB_File', $db_file, O_RDWR|O_CREAT, 0644, $berkeley_db
-		or die "Cannot open file $db_file: $!";
+		or Carp::croak "Cannot open file $db_file: $!";
 
 	# See the DB_File example "Key is a C int"
 	# $berkeley_db->filter_fetch_key(sub { $_ = unpack('i', $_) } );
@@ -1287,14 +1291,14 @@ if($ENV{'REDIS_SERVER'}) {
 		$dbh->do('PRAGMA cache_size = 262144');	# 256MB
 		$dbh->do('PRAGMA journal_mode = OFF');
 	} else {
-		die "$sqlite_file: $!";
+		Carp::croak "$sqlite_file: $!";
 	}
 } else {
-	die 'Which database driver?';
+	Carp::croak 'Which database driver?';
 }
 
 if((DEBUG&DEBUG_ALL) && (MAX_INSERT_COUNT != 1)) {
-	warn 'MAX_INSERT_COUNT not set to 1 in DEBUG mode';
+	Carp::carp 'MAX_INSERT_COUNT not set to 1 in DEBUG mode';
 }
 
 if($dbh) {
@@ -1313,6 +1317,10 @@ if($dbh) {
 }
 
 print "This will take some time.\nBest to do it last thing at night and go to sleep, it should be ready in the morning.\n";
+
+require Locale::AU;	# TODO: use Locale::Geocode
+require Locale::CA;
+require Locale::US;
 
 my $au = Locale::AU->new();
 my $ca = Locale::CA->new();
@@ -1355,7 +1363,7 @@ if(((!(DEBUG&(DEBUG_KNOWN_PLACES|DEBUG_WOF|DEBUG_OSM))) && (-r $filename)) || $f
 		# print Data::Dumper->new([\$row])->Dump();
 		my $state;
 		unless($state = $us->{state2code}{uc($row->{'Name'})}) {
-			die $row->{'Name'};
+			Carp::croak $row->{'Name'};
 		}
 		$state_fips{$row->{'State FIPS'}} = $state;
 		my %columns = (
@@ -1402,7 +1410,7 @@ if(((!(DEBUG&(DEBUG_KNOWN_PLACES|DEBUG_WOF|DEBUG_OSM))) && (-r $filename)) || $f
 	while(my $row = $csv->getline_hr($fin)) {
 		# print __LINE__, ': ', Data::Dumper->new([\$row])->Dump();
 		my $state = $state_fips{$row->{'State FIPS'}};
-		die $row->{'Name'} unless(defined($state));
+		Carp::croak $row->{'Name'} unless(defined($state));
 		my $county = uc($row->{'Name'});
 		$county =~ s/\s+COUNTY$//;
 		$county =~ s/'/''/g;	# O'Brien County, IA
@@ -1511,7 +1519,7 @@ if(($force_flag || ((!(DEBUG&DEBUG_KNOWN_PLACES)) && (-r $filename))) &&
 			# Fix entries like 'Kansas City/NW/Airport' in allCountries.txt
 			$city = uc($fields[2]);
 			$city =~ s/\/.+$//;
-			die "$filename: $line: $city" if(defined($city) && ($city =~ /\/..\//));
+			Carp::croak "$filename: $line: $city" if(defined($city) && ($city =~ /\/..\//));
 		}
 
 		my $latitude = $fields[4];
@@ -1545,10 +1553,10 @@ if(($force_flag || ((!(DEBUG&DEBUG_KNOWN_PLACES)) && (-r $filename))) &&
 					$state = $code if($code ne 'UNKNOWN');
 					# die "$state:\n", Data::Dumper->new([\@fields])->Dump();
 				} else {
-					die $state;
+					Carp::croak $state;
 				}
 			} else {
-				die "Locale::SubCountry failed on $country";
+				Carp::croak "Locale::SubCountry failed on $country";
 			}
 			if(defined($city) && ($city =~ /(.+)\s+county$/i)) {
 				%columns = (
@@ -1569,7 +1577,7 @@ if(($force_flag || ((!(DEBUG&DEBUG_KNOWN_PLACES)) && (-r $filename))) &&
 			}
 		}
 		# print Data::Dumper->new([\%columns])->Dump() if(!defined($city));
-		die $columns{'CITY'} if(defined($columns{'CITY'}) && ($columns{'CITY'} =~ /\/..\//));
+		Carp::croak $columns{'CITY'} if(defined($columns{'CITY'}) && ($columns{'CITY'} =~ /\/..\//));
 		$inserts += import(row => \%columns, file => "$country/countrywide.csv", ua => $ua, dbh => $dbh, redis => $redis, mongodb => $mongodb, berkeley_db => $berkeley_db, global => 1);
 		if($inserts >= MAX_INSERT_COUNT) {
 			flush_queue($dbh, $redis, $mongodb, $berkeley_db);
@@ -1647,7 +1655,7 @@ foreach my $csv_file (create_tree($oa, 1)) {
 
 		# The readahead code can start doing its thing now
 		my $fh = File::Open::NoCache::ReadOnly->new($csv_file)
-			or die($csv_file);
+			or Carp::croak($csv_file);
 
 		my $fin = $fh->fd();
 
@@ -1812,7 +1820,7 @@ if(my $whosonfirst = $ENV{'WHOSONFIRST_HOME'}) {
 			$properties = $j->decode($data)->{'properties'};
 		};
 		if($@ || !defined($properties)) {
-			warn "$geojson_file: $@";
+			Carp::carp "$geojson_file: $@";
 			next;
 		}
 		# print 'processing ', $properties->{'wof:id'}, "\n";
@@ -1854,7 +1862,7 @@ if(my $whosonfirst = $ENV{'WHOSONFIRST_HOME'}) {
 			$state = $properties->{'sg:province'};
 			if((!defined($state)) && ($country eq 'US') && (my $rc = $properties->{'qs:gn_nameadm1'})) {
 				if($rc =~ /^\[A-Z]{2}$/) {
-					die $rc;
+					Carp::croak $rc;
 				}
 			}
 		}
@@ -1877,7 +1885,7 @@ if(my $whosonfirst = $ENV{'WHOSONFIRST_HOME'}) {
 						$state = $code if($code ne 'UNKNOWN');
 					}
 				} else {
-					die "Locale::SubCountry failed on $country";
+					Carp::croak "Locale::SubCountry failed on $country";
 				}
 			} else {
 				$state = $a1;
@@ -1887,7 +1895,7 @@ if(my $whosonfirst = $ENV{'WHOSONFIRST_HOME'}) {
 				if($state =~ /^CITY\[_\s]OF/i) {
 					$state = undef;
 				} else {
-					die Data::Dumper->new([$properties])->Dump() if($state eq 'England');
+					Carp::croak Data::Dumper->new([$properties])->Dump() if($state eq 'England');
 					print "Gained $state from looking at the record\n" if(DEBUG&DEBUG_DETERMINE_LOCATION);
 				}
 			}
@@ -1933,7 +1941,7 @@ if(my $whosonfirst = $ENV{'WHOSONFIRST_HOME'}) {
 					# die Data::Dumper->new([$properties])->Dump();
 				}
 			} else {
-				die "Locale::SubCountry failed on $country";
+				Carp::croak "Locale::SubCountry failed on $country";
 			}
 		}
 		my $city;
@@ -1952,7 +1960,7 @@ if(my $whosonfirst = $ENV{'WHOSONFIRST_HOME'}) {
 					$city = "$city, $parent_name";
 				}
 			}
-			die "Can't determine the city" if(!defined($city));
+			Carp::croak "Can't determine the city" if(!defined($city));
 		} else {
 			$city = $properties->{'sg:city'};
 			# Don't trust sg:city to be correct
@@ -2163,7 +2171,7 @@ if((!(DEBUG&DEBUG_WOF)) && (my $osm = $ENV{'OSM_HOME'})) {
 
 		eval {
 		my $reader = XML::LibXML::Reader->new(FD => $pin)
-			or die "cannot read $filename";
+			or Carp::croak "cannot read $filename";
 		while($reader->read()) {
 			# These constants are not exported by default :-(
 			# print $reader->document->toString(1);
@@ -2223,7 +2231,7 @@ if((!(DEBUG&DEBUG_WOF)) && (my $osm = $ENV{'OSM_HOME'})) {
 						if($country eq 'CA') {
 							$country = 'Canada';
 						} else {
-							die "Unknown country '$country'";
+							Carp::croak "Unknown country '$country'";
 						}
 					} elsif($key eq 'place') {
 						$place = $reader->getAttribute('v');
@@ -2253,17 +2261,17 @@ if((!(DEBUG&DEBUG_WOF)) && (my $osm = $ENV{'OSM_HOME'})) {
 						$country = $row->{'COUNTRY'};
 						my $state = $row->{'STATE'};
 						if(DEBUG&DEBUG_DATA_VALIDATE) {
-							die __LINE__, ': ', $row->{'CITY'} if(defined($row->{'CITY'}) && ($row->{'CITY'} =~ /,/));
-							die 'no state' if(!defined($state));
-							die __LINE__, ': ', $state if((($country eq 'US') || ($country eq 'Canada')) && ($state !~ /[A-Z]{2}/));
+							Carp::croak __LINE__, ': ', $row->{'CITY'} if(defined($row->{'CITY'}) && ($row->{'CITY'} =~ /,/));
+							Carp::croak 'no state' if(!defined($state));
+							Carp::croak __LINE__, ': ', $state if((($country eq 'US') || ($country eq 'Canada')) && ($state !~ /[A-Z]{2}/));
 							foreach my $v(keys %{$row}) {
-								die __LINE__, ": $v" if(!defined($row->{$v}));
+								Carp::croak __LINE__, ": $v" if(!defined($row->{$v}));
 							}
-							die if(defined($row->{'CITY'}) && defined($row->{'NAME'}) && ($row->{'CITY'} eq $row->{'NAME'}));
-							die if(defined($row->{'NUMBER'}) && !defined($row->{'ROAD'}));
-							die if(defined($row->{'NUMBER'}) && !defined($row->{'CITY'}));
-							die if(defined($row->{'ROAD'}) && !defined($row->{'CITY'}));
-							die $row->{'COUNTRY'} if(!defined($osm_countries{lc($row->{'COUNTRY'})}));
+							Carp::croak if(defined($row->{'CITY'}) && defined($row->{'NAME'}) && ($row->{'CITY'} eq $row->{'NAME'}));
+							Carp::croak if(defined($row->{'NUMBER'}) && !defined($row->{'ROAD'}));
+							Carp::croak if(defined($row->{'NUMBER'}) && !defined($row->{'CITY'}));
+							Carp::croak if(defined($row->{'ROAD'}) && !defined($row->{'CITY'}));
+							Carp::croak $row->{'COUNTRY'} if(!defined($osm_countries{lc($row->{'COUNTRY'})}));
 						}
 						$row->{'LAT'} = $lat;
 						$row->{'LON'} = $lon;
@@ -2513,7 +2521,7 @@ print __LINE__, ": add_record = $add_record (city/state/country = $city/$state/$
 								$state = $code;
 								$country = 'Canada';
 							} else {
-								die "$is_in: unknown Canadian province $state";
+								Carp::croak "$is_in: unknown Canadian province $state";
 							}
 						}
 					}
@@ -2610,7 +2618,7 @@ print __LINE__, ": add_record = $add_record (city/state/country = $city/$state/$
 							if($city) {
 								print "city = $city\n";
 							}
-							die "is_in = $is_in, country = $country" unless($city && $state && $country);
+							Carp::croak "is_in = $is_in, country = $country" unless($city && $state && $country);
 							print __LINE__, ": is_in = $is_in ($city, $state, $country)\n";
 						}
 						print __LINE__, ": is_in = $is_in (add_record = $add_record)\n";
@@ -2656,12 +2664,12 @@ print __LINE__, ": add_record = $add_record (city/state/country = $city/$state/$
 					$lon = $reader->getAttribute('lon');
 				}
 			} else {
-				warn 'Unknown reader type ', $reader->nodeType(), ' in ', $reader->name(), "\n"
+				Carp::carp 'Unknown reader type ', $reader->nodeType(), ' in ', $reader->name(), "\n"
 			}
 		}
 		}; # end eval
 		if(my $err = $@) {
-			die $err unless ref($err) && $err->isa('XML::LibXML::Error');
+			Carp::croak $err unless ref($err) && $err->isa('XML::LibXML::Error');
 			print STDERR "XML parse error in $filename, skipping: $err\n";
 		}
 		close $pin;
@@ -2880,14 +2888,14 @@ sub import
 	if(ref($_[0]) eq 'HASH') {
 		%param = %{$_[0]};
 	} elsif(ref($_[0])) {
-		die 'import: bad args';
+		Carp::croak 'import: bad args';
 	} elsif(scalar(@_) % 2 == 0) {
 		%param = @_;
 	} else {
-		die 'import: no args';
+		Carp::croak 'import: no args';
 	}
 
-	my $row = $param{'row'} || die 'import: no row';
+	my $row = $param{'row'} || Carp::croak 'import: no row';
 	$row = { %{$row} };	# Take a copy of the hash because we're going to play with it
 	my $country = $param{'country'} || $row->{'COUNTRY'};
 	if(!defined($country)) {
@@ -2898,11 +2906,11 @@ sub import
 		while(my @call_details = caller($i++)) {
 			print STDERR "\tCalled at line ", $call_details[2], "\n";
 		}
-		die 'country not defined';
+		Carp::croak 'country not defined';
 	}
 	my $state = $param{'state'} || $row->{'STATE'};	# Will come from $row->{'REGION'}
-	my $file = $param{'file'} || die 'import: no file';
-	my $ua = $param{'ua'} || die 'import: no ua';
+	my $file = $param{'file'} || Carp::croak 'import: no file';
+	my $ua = $param{'ua'} || Carp::croak 'import: no ua';
 	my $dbh = $param{'dbh'};
 	my $redis = $param{'redis'};
 	my $berkeley_db = $param{'berkeley_db'};
@@ -2915,7 +2923,7 @@ sub import
 		while(my @call_details = caller($i++)) {
 			print STDERR "\tCalled at line ", $call_details[2], "\n";
 		}
-		die 'import neither dbh, berkeley_db, redis nor mongodb defined';
+		Carp::croak 'import neither dbh, berkeley_db, redis nor mongodb defined';
 	}
 	my $inserts = 0;
 
@@ -2932,7 +2940,7 @@ sub import
 		while(my @call_details = caller($i++)) {
 			print STDERR "\tCalled at line ", $call_details[2], "\n";
 		}
-		die "$county is not a valid county name";
+		Carp::croak "$county is not a valid county name";
 	}
 
 	if(($file !~ /statewide/) && ($file !~ /^province/) && ($file !~ /countrywide/)) {
@@ -2944,7 +2952,7 @@ sub import
 				while(my @call_details = caller($i++)) {
 					print STDERR "\tCalled at line ", $call_details[2], "\n";
 				}
-				die "$file: $city ($country/$state)";
+				Carp::croak "$file: $city ($country/$state)";
 			}
 		} elsif($file =~ /^town[_\s]of[_\s](.+).csv$/) {
 			$city = $1;
@@ -2967,7 +2975,7 @@ sub import
 			$city =~ s/^.+\///;
 			$city =~ s/(.+)[_\s]district.csv$/$1/;
 			$city =~ tr/_/ /;
-			die "BUG: $file: couldn't extract city name" if(length($city) == 0);
+			Carp::croak "BUG: $file: couldn't extract city name" if(length($city) == 0);
 		} elsif((!defined($city)) && ($file !~ /countries\+states\+cities/i)) {
 			$city = $file;
 			$city =~ s/\Q$oa\E\/?//i;
@@ -2975,7 +2983,7 @@ sub import
 			$city =~ s/^.+\///;	# Remove leading ca/nt in ca/nt/city_of_yellow_knife
 			$city =~ s/^city[_\s]of[_\s](.+).csv$/$1/;
 			$city =~ tr/_/ /;
-			die "BUG: $file: couldn't extract city name" if(length($city) == 0);
+			Carp::croak "BUG: $file: couldn't extract city name" if(length($city) == 0);
 		} elsif((!defined($county)) &&
 			($file !~ /^WHOSONFIRST\-DATA/i)
 			&& ($file !~ /countrywide/)
@@ -3005,7 +3013,7 @@ sub import
 			}
 			my $res = $ua->get("https://api.zippopotam.us/$country/$zip");
 			if(!$res->is_success()) {
-				warn "$file: https://api.zippopotam.us/$country/$zip: ", $res->status_line();
+				Carp::carp "$file: https://api.zippopotam.us/$country/$zip: ", $res->status_line();
 				$unknown_zips{"$country/$zip"} = 1;
 				return 0;
 			}
@@ -3041,7 +3049,7 @@ sub import
 			return $inserts if(!$zip);
 			return $inserts if($zip !~ /^\d{5}/);
 			$dbh->disconnect() if($dbh);
-			die $file;
+			Carp::croak $file;
 		}
 	}
 	if((!defined($row->{'LAT'})) || !defined($row->{'LON'})) {
@@ -3128,7 +3136,7 @@ sub import
 			while(my @call_details = caller($i++)) {
 				print STDERR "\tCalled at line ", $call_details[2], "\n";
 			}
-			die 'state not defined';
+			Carp::croak 'state not defined';
 		}
 		if(($row->{'DISTRICT'} ne $state) && ($row->{'DISTRICT'} !~ /^\d+$/)) {
 			$county = $row->{'DISTRICT'};
@@ -3197,7 +3205,7 @@ sub import
 				while(my @call_details = caller($i++)) {
 					print STDERR "\tCalled at line ", $call_details[2], "\n";
 				}
-				die "$file: $country";
+				Carp::croak "$file: $country";
 			}
 		}
 
@@ -3219,7 +3227,7 @@ sub import
 			$columns{$c} = $row->{$c} if(defined($row->{$c}));
 		}
 
-		die __LINE__, ': ', Data::Dumper->new([$row])->Dump() if((DEBUG&DEBUG_DATA_VALIDATE) && $columns{'NUMBER'} && ($columns{'NUMBER'} !~ /^\d/));
+		Carp::croak __LINE__, ': ', Data::Dumper->new([$row])->Dump() if((DEBUG&DEBUG_DATA_VALIDATE) && $columns{'NUMBER'} && ($columns{'NUMBER'} !~ /^\d/));
 		# Can't compare '== 0' because of house numbers such as '43A'
 		delete($columns{'NUMBER'}) if(defined($columns{'NUMBER'}) && ($columns{'NUMBER'} eq '0'));
 
@@ -3310,9 +3318,9 @@ sub insert
 	my ($dbh, $redis, $mongodb, $berkeley_db, $global, %columns) = @_;
 
 	if((!$dbh) && (!$mongodb) && (!$berkeley_db) && (!$redis)) {
-		die 'insert neither dbh, berkeley_db, redis nor mongodb defined';
+		Carp::croak 'insert neither dbh, berkeley_db, redis nor mongodb defined';
 	}
-	die 'nothing to insert' if(scalar(keys %columns) == 0);
+	Carp::croak 'nothing to insert' if(scalar(keys %columns) == 0);
 
 	foreach my $column(keys %columns) {
 		if(!defined($columns{$column})) {
@@ -3327,7 +3335,7 @@ sub insert
 		while(my @call_details = caller($i++)) {
 			print STDERR "\tCalled at line ", $call_details[2], "\n";
 		}
-		die $columns{'COUNTY'}, ' is not a valid county name';
+		Carp::croak $columns{'COUNTY'}, ' is not a valid county name';
 	}
 
 	# print Data::Dumper->new([$columns])->Dump() if($columns{'CITY'} && (uc($columns{'CITY'}) eq 'INDIANAPOLIS'));
@@ -3357,7 +3365,7 @@ sub insert
 	my $lat = $columns{'LAT'};
 	my $lon = $columns{'LON'};
 
-	die __LINE__, ': ', Data::Dumper->new([\%columns])->Dump() unless(defined($lat) && defined($lon));
+	Carp::croak __LINE__, ': ', Data::Dumper->new([\%columns])->Dump() unless(defined($lat) && defined($lon));
 	# die "$lat/$lon" unless($columns{'STATE'});
 
 	# Remove duplicate, leading and trailing spaces from entries.  Some openaddresses files are littered with them
@@ -3371,7 +3379,7 @@ sub insert
 			while(my @call_details = caller($i++)) {
 				print STDERR "\tCalled at line ", $call_details[2], "\n";
 			}
-			die Data::Dumper->new([\%columns])->Dump();
+			Carp::croak Data::Dumper->new([\%columns])->Dump();
 			delete $columns{$column};
 		}
 	}
@@ -3414,7 +3422,7 @@ sub insert
 	}
 	if(!defined($columns{'COUNTRY'})) {
 		print "insert: no country. Called from line ", $call_details[2], "\n";
-		die Data::Dumper->new([\%columns])->Dump();
+		Carp::croak Data::Dumper->new([\%columns])->Dump();
 	}
 
 	# my $key = city_key($columns{'CITY'}, $columns{'COUNTY'}, $columns{'STATE'}, $columns{'COUNTRY'});
@@ -3476,12 +3484,12 @@ sub flush_queue
 			# print "flush_queue: 177366... called from line ", $call_details[2], "\n\t",
 				# Data::Dumper->new([\%queued_commits])->Dump();
 		# }
-		die if(ref($row) ne 'HASH');
+		Carp::croak if(ref($row) ne 'HASH');
 		my $country = $row->{'COUNTRY'};
 		if(!defined($country)) {
 			my @call_details = caller(0);
 			print STDERR 'flush_queue: called from line ', $call_details[2], "\n";
-			die Data::Dumper->new([$row])->Dump();
+			Carp::croak Data::Dumper->new([$row])->Dump();
 		}
 		my $state = $row->{'STATE'};
 		if($max_state_lengths{$country} && $state && (length($state) > $max_state_lengths{$country})) {
@@ -3682,7 +3690,7 @@ sub flush_queue
 				while(my @call_details = caller($i++)) {
 					print STDERR "\tCalled at line ", $call_details[2], "\n";
 				}
-				die $err;
+				Carp::croak $err;
 			};
 		}
 		if($redis) {
@@ -3708,7 +3716,7 @@ sub flush_queue
 			$dbh->do($tree_query);
 		} catch {
 			print Data::Dumper->new([\%queued_commits])->Dump();
-			die $_;
+			Carp::croak $_;
 		};
 	}
 	%queued_commits = ();
@@ -3740,8 +3748,8 @@ sub create_md5
 	}
 	# FIXME: prefixing the rc with the NUMBER field could reduce the changes of clashes, perhaps
 	if($queued_commits{$rc} || $global_md5s{$rc} || $state_md5s{$rc}) {
-		warn "Potential clash $digest => $rc" if(DEBUG&DEBUG_MD5);
-		return undef;
+		Carp::carp "Potential clash $digest => $rc" if(DEBUG&DEBUG_MD5);
+		return;
 	}
 
 	if(defined($dbh)) {
@@ -3834,7 +3842,7 @@ sub get_wof {
 			$filename = $ENV{'WHOSONFIRST_HOME'} . "/*/data/$1/$2/$3/$id.geojson";
 		}
 	} else {
-		die "Can't parse $id";
+		Carp::croak "Can't parse $id";
 	}
 
 	if($repo eq '*') {
@@ -3852,7 +3860,7 @@ sub get_wof {
 			my @call_details = caller(0);
 			print STDERR "\tcalled from line ",
 				$call_details[2], "\n\t";
-			die "$geojson_file: can't find $id file for ", $properties->{'wof:name'};
+			Carp::croak "$geojson_file: can't find $id file for ", $properties->{'wof:name'};
 		}
 		if($filename) {
 			print STDERR "$geojson_file: can't find $id file for ", $properties->{'wof:name'}, ": $filename: $!\n";
@@ -3883,7 +3891,7 @@ sub get_wof {
 # Do our best to parse and extract data from OpenStreetMaps
 sub extract_osm_home
 {
-	die scalar(@_) if(scalar(@_) != 4);
+	Carp::croak scalar(@_) if(scalar(@_) != 4);
 
 	my($file, $name, $place, $is_in) = @_;
 
@@ -3955,13 +3963,13 @@ sub extract_osm_home
 				COUNTRY => 'US',
 			}
 		}
-		die;
+		Carp::croak;
 	} elsif((scalar(@is_in_fields) > 1) && ($is_in_fields[1] eq 'US') && ($state = $us->{'state2code'}{uc($is_in_fields[0])})) {
-		die;
+		Carp::croak;
 	} elsif(defined($name) && defined($place) && ($place eq "$name, $is_in") && ($state = us_state2code($is_in))) {
 		# name/place/is_in = Marysville/Marysville, Pennsylvania/Pennsylvania
 		my $country = 'US' if($file =~ /north-america/);	# WA can be in US or Australia
-		die if(!defined($country));
+		Carp::croak if(!defined($country));
 		return {
 			CITY => $name,
 			STATE => $state,
@@ -4015,7 +4023,7 @@ sub extract_osm_home
 	if((scalar(@is_in_fields) == 2) && (scalar(@place_fields) == 2) && ($state = us_state2code($is_in_fields[0])) && ($state eq $is_in_fields[1]) && ($place_fields[1] eq $is_in_fields[0])) {
 		# name/place/is_in = Mifflinville/Mifflinville, Pennsylvania/Pennsylvania,PA
 		my $country = 'US' if($file =~ /north-america/);	# WA can be in US or Australia
-		die if(!defined($country));
+		Carp::croak if(!defined($country));
 		return {
 			CITY => $name,
 			STATE => $state,
@@ -4025,7 +4033,7 @@ sub extract_osm_home
 	if((scalar(@is_in_fields) == 2) && defined($name) && (!defined($place)) && us_state2code($is_in_fields[0]) && (us_state2code($is_in_fields[0]) eq $is_in_fields[1])) {
 		# name/place/is_in = Catawissa/undef/Pennsylvania,PA
 		my $country = 'US' if($file =~ /north-america/);	# WA can be in US or Australia
-		die if(!defined($country));
+		Carp::croak if(!defined($country));
 		return {
 			CITY => $name,
 			STATE => $is_in_fields[1],
@@ -4035,7 +4043,7 @@ sub extract_osm_home
 	if((scalar(@is_in_fields) == 2) && defined($name) && (scalar(@place_fields) == 3) && ($state = us_state2code($is_in_fields[1]))) {
 		# name/place/is_in = Enterprise/Enterprise, Lake County, California/Lake, California
 		my $country = 'US' if($file =~ /north-america/);	# WA can be in US or Australia
-		die if(!defined($country));
+		Carp::croak if(!defined($country));
 		$row = {
 			CITY => $name,
 			STATE => $state,
@@ -4116,7 +4124,7 @@ sub extract_osm_home
 		# name/place/is_in = Bellevue/undef/Washington DC
 		# is_in will have been split into 2 by the space
 		my $country = 'US' if($file =~ /north-america/);	# WA can be in US or Australia
-		die if(!defined($country));
+		Carp::croak if(!defined($country));
 		return {
 			CITY => $name,
 			STATE => 'DC',
@@ -4127,7 +4135,7 @@ sub extract_osm_home
 		# name/place/is_in = Congress Heights/Congress Heights/Washington DC
 		# is_in will have been split into 2 by the space
 		my $country = 'US' if($file =~ /north-america/);	# WA can be in US or Australia
-		die if(!defined($country));
+		Carp::croak if(!defined($country));
 		return {
 			CITY => $name,
 			STATE => 'DC',
@@ -4138,7 +4146,7 @@ sub extract_osm_home
 		# name/place/is_in = Petworth/Petworth (Washington, D.C.)/Washington DC
 		# is_in will have been split into 2 by the space
 		my $country = 'US' if($file =~ /north-america/);	# WA can be in US or Australia
-		die if(!defined($country));
+		Carp::croak if(!defined($country));
 		return {
 			CITY => $name,
 			STATE => 'DC',
@@ -4162,7 +4170,7 @@ sub extract_osm_home
 			COUNTRY => 'US'
 		};
 		my $country = 'US' if($file =~ /north-america/);	# WA can be in US or Australia
-		die if(!defined($country));
+		Carp::croak if(!defined($country));
 		$row->{'COUNTRY'} = $country;
 		return $row
 	}
@@ -4316,7 +4324,7 @@ sub extract_osm_home
 				STATE => $state,
 				COUNTRY => 'Canada'
 			};
-			die __LINE__, ': ', Data::Dumper->new([$row])->Dump() if(DEBUG&DEBUG_OSM);
+			Carp::croak __LINE__, ': ', Data::Dumper->new([$row])->Dump() if(DEBUG&DEBUG_OSM);
 		} elsif(scalar(@is_in_fields) == 4) {
 			my $code;
 			my %provinces = (
@@ -4364,7 +4372,7 @@ sub extract_osm_home
 				$row->{'NAME'} = $name if(defined($name));
 			} elsif(ca_province2code($is_in_fields[0]) && (ca_province2code($is_in_fields[0]) eq $is_in_fields[2])) {
 				$state = $is_in_fields[2];
-				die if(!$ca->{'code2province'}{$state});
+				Carp::croak if(!$ca->{'code2province'}{$state});
 				# name/place/is_in = Queens/undef/New Brunswick,N.B.,NB,Canada
 				$row = {
 					STATE => $state,
@@ -4538,14 +4546,14 @@ sub extract_osm_home
 				COUNTRY => 'Canada'
 			}
 		}
-		die __LINE__, ': ', Data::Dumper->new([$row])->Dump();
+		Carp::croak __LINE__, ': ', Data::Dumper->new([$row])->Dump();
 	} elsif(defined($name) && ($name !~ /,/) && defined($place) && ($place =~ /,/) && $ca->{'code2province'}{$is_in}) {
 		my @place_fields = split(/[,;]\s/, $place);
 		if(scalar(@place_fields) == 2) {
 			my @is_in_fields = split(/[,;]\s/, $is_in);
 			if(ca_province2code($place_fields[1]) eq $is_in) {
 				# name/place/is_in = Hague/Hague, Saskatchewan/SK
-				die "$name, $place_fields[1]" if ($name ne $place_fields[0]);
+				Carp::croak "$name, $place_fields[1]" if ($name ne $place_fields[0]);
 				return {
 					CITY => $name,
 					STATE => $is_in,
@@ -4818,7 +4826,7 @@ sub ca_province2code
 {
 	if(!defined($_[0])) {
 		my @call_details = caller(0);
-		die "ca_province2code, argument not given\n",
+		Carp::croak "ca_province2code, argument not given\n",
 			"\tcalled from line ", $call_details[2];
 	}
 	my $province = uc(shift);
@@ -4864,14 +4872,14 @@ sub country
 	my($file, $state) = @_;
 
 	# Ensure the file argument is provided
-	die if(!defined($file));
+	Carp::croak if(!defined($file));
 
 	# Check for file patterns and return corresponding country
 	return 'US' if $file =~ /north-america/;
 	return 'Australia' if $file =~ /australia/;
 
 	# Ensure the state argument is provided if needed
-	die 'State argument is missing' if(!defined($state));
+	Carp::croak 'State argument is missing' if(!defined($state));
 
 	# Handle European cases with specific state codes
 	if($file =~ /europe/) {
@@ -4880,5 +4888,5 @@ sub country
 	}
 
 	# Default case: Raise error with both file and state information
-	die "$file/$state";
+	Carp::croak "$file/$state";
 }

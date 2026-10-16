@@ -3,6 +3,7 @@
 use warnings;
 use strict;
 use autodie qw(:all);
+use Carp;
 
 use FindBin qw($Bin);
 use lib "$Bin/../lib";
@@ -18,11 +19,11 @@ eval {
 	}
 };
 
-die $@ if $@;
+Carp::croak $@ if $@;
 
 sub doit
 {
-	my $test = shift or die;
+	my $test = shift or Carp::croak;
 
 	if($test == 1) {
 		# print "Test 1 - q\n";

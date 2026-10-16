@@ -3,7 +3,7 @@ package Term::Fabulous::Enum::WebColor;
 use v5.32;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Object::PadX::Enum;
 
@@ -199,7 +199,7 @@ L<Term::Fabulous::Color/A string>. F<examples/web-colors.pl> shows all of the co
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-web-colors.svg" alt="A grid of color swatches with their hex values and names, and a dropdown to sort them"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-web-colors.svg" alt="A grid of color swatches with their hex values and names, and a dropdown to sort them"></p>
 
 =end html
 

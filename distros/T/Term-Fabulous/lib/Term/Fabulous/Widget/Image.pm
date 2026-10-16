@@ -9,7 +9,7 @@ use Object::Pad 0.825;
 
 use Term::Fabulous::Widget::Display;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 class Term::Fabulous::Widget::Image
 	:isa(Term::Fabulous::Widget::Display)
@@ -311,7 +311,7 @@ Term::Fabulous::Widget::Image - Show a picture in half-block pixels
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-image.svg" alt="A 16x16 circle of rainbow-colored rings in three frames of 32x24 cells: at its natural size and centered (none), scaled up twice with its proportions kept (contain) and stretched twice wide and three times high to fill the frame (stretch); three frames of 12x4 cells below each other cut it (none), shrink it to half its size (contain) and shrink it to fill the frame (stretch)"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-image.svg" alt="A 16x16 circle of rainbow-colored rings in three frames of 32x24 cells: at its natural size and centered (none), scaled up twice with its proportions kept (contain) and stretched twice wide and three times high to fill the frame (stretch); three frames of 12x4 cells below each other cut it (none), shrink it to half its size (contain) and shrink it to fill the frame (stretch)"></p>
 
 =end html
 

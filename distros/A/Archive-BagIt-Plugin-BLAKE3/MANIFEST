@@ -7,11 +7,10 @@ META.yml
 Makefile.PL
 README.developer
 README.mkdn
+_Deparsed_XSubs.pm
 dist.ini
 ignore.txt
-lib/Archive/BagIt/Plugin/Algorithm/BLAKE3.pm
 lib/Archive/BagIt/Plugin/BLAKE3.pm
-lib/Archive/BagIt/Plugin/Manifest/BLAKE3.pm
 t/00-compile.t
 t/store_bag.t
 t/verify_bag.t

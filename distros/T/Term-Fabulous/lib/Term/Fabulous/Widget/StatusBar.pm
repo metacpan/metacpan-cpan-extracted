@@ -9,7 +9,7 @@ use Object::Pad 0.825;
 
 use Term::Fabulous::Widget::Display;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 class Term::Fabulous::Widget::StatusBar
 	:isa(Term::Fabulous::Widget::Display)
@@ -266,7 +266,7 @@ for messages and the program's state
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-status-bar.svg" alt="A list of files with the cursor on budget.csv and, at the bottom, a status bar with the green message Saved budget.csv. and the parts file 3 of 6 and Ctrl+C quits. Above the list, status bars with a success message, a yellow warning with a blue modified part, and a red error with a red read-only part"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-status-bar.svg" alt="A list of files with the cursor on budget.csv and, at the bottom, a status bar with the green message Saved budget.csv. and the parts file 3 of 6 and Ctrl+C quits. Above the list, status bars with a success message, a yellow warning with a blue modified part, and a red error with a red read-only part"></p>
 
 =end html
 

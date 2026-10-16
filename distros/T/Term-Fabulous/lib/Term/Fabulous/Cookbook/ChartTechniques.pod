@@ -119,7 +119,7 @@ This program is shipped as F<examples/cookbook/chart-time-series.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-time-series.svg" alt="Hourly temperatures over four days on a time axis: a solid measured line, a dashed forecast from noon of June 3rd on, and a red shaded area under the measurements from June 2nd to that noon"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-chart-time-series.svg" alt="Hourly temperatures over four days on a time axis: a solid measured line, a dashed forecast from noon of June 3rd on, and a red shaded area under the measurements from June 2nd to that noon"></p>
 
 =end html
 
@@ -247,7 +247,7 @@ This program is shipped as F<examples/cookbook/chart-live.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-live.svg" alt="A live chart of network traffic: received traffic as a filled area with a line on top and sent traffic as a line fill the right half of a one-minute time axis after 30 seconds, with a status line of the newest values below"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-chart-live.svg" alt="A live chart of network traffic: received traffic as a filled area with a line on top and sent traffic as a line fill the right half of a one-minute time axis after 30 seconds, with a status line of the newest values below"></p>
 
 =end html
 
@@ -352,7 +352,7 @@ This program is shipped as F<examples/cookbook/chart-log-scale.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-log-scale.svg" alt="The same two series twice: on a linear axis the issues and the early downloads lie flat on the bottom, on a logarithmic axis both rise as nearly straight lines"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-chart-log-scale.svg" alt="The same two series twice: on a linear axis the issues and the early downloads lie flat on the bottom, on a logarithmic axis both rise as nearly straight lines"></p>
 
 =end html
 
@@ -452,7 +452,7 @@ This program is shipped as F<examples/cookbook/chart-transform.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-transform.svg" alt="Daily visits as a dim raw line with a 7-day moving average and a dashed exponentially smoothed line over it, and below it share and bond prices both indexed to 100 at day 1"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-chart-transform.svg" alt="Daily visits as a dim raw line with a 7-day moving average and a dashed exponentially smoothed line over it, and below it share and bond prices both indexed to 100 at day 1"></p>
 
 =end html
 
@@ -567,7 +567,7 @@ This program is shipped as F<examples/cookbook/chart-kdl.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-kdl.svg" alt="A bar chart of sold and returned units per quarter with value labels and a dashed trend line, built from KDL, next to a donut chart of sales by channel that includes the Web slice added from Perl"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-chart-kdl.svg" alt="A bar chart of sold and returned units per quarter with value labels and a dashed trend line, built from KDL, next to a donut chart of sales by channel that includes the Web slice added from Perl"></p>
 
 =end html
 
@@ -677,7 +677,7 @@ This program is shipped as F<examples/cookbook/chart-report.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-report.svg" alt="The printed report: horizontal bars of the disk usage of four file systems with their percentages, and a line with the load of the last 18 hours as a bar sparkline"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-chart-report.svg" alt="The printed report: horizontal bars of the disk usage of four file systems with their percentages, and a line with the load of the last 18 hours as a bar sparkline"></p>
 
 =end html
 

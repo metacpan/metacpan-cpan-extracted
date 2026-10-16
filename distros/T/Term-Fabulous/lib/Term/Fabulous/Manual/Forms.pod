@@ -115,7 +115,7 @@ or, as here, what is wrong with a value (see L</Checking input>).
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-form.svg" alt="A form with name, password, notes, color, size, volume, newsletter, terms, e-mail and port; the e-mail field holds ada@ in red and the status line says email: Please enter an e-mail address."></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-form.svg" alt="A form with name, password, notes, color, size, volume, newsletter, terms, e-mail and port; the e-mail field holds ada@ in red and the status line says email: Please enter an e-mail address."></p>
 
 =end html
 
@@ -413,7 +413,7 @@ L<Term::Fabulous::Widget::Input/Invalid values>):
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-input-validation.svg" alt="Eleven inputs: a focused e-mail field with ada@exa in red, a valid address in white, ada@ in red without and with a red border, an empty required field that looks normal and one whose border is red, a red unchecked check box, a dropdown showing its gray placeholder, ada@ in purple, ada@ in yellow with a yellow border, and a disabled field in gray"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-input-validation.svg" alt="Eleven inputs: a focused e-mail field with ada@exa in red, a valid address in white, ada@ in red without and with a red border, an empty required field that looks normal and one whose border is red, a red unchecked check box, a dropdown showing its gray placeholder, ada@ in purple, ada@ in yellow with a yellow border, and a disabled field in gray"></p>
 
 =end html
 
@@ -501,7 +501,7 @@ empty field with a placeholder, a masked password and a disabled field
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-text-field.svg" alt="Four text fields: a focused field with Ada Lovelace typed and Lovelace selected, a placeholder, a masked password and a disabled field"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-text-field.svg" alt="Four text fields: a focused field with Ada Lovelace typed and Lovelace selected, a placeholder, a masked password and a disabled field"></p>
 
 =end html
 
@@ -554,7 +554,7 @@ scrollbar (F<examples/widgets/text-area.pl>):
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-text-area.svg" alt="A text area with a shopping list, a wrapped long line and a scrollbar"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-text-area.svg" alt="A text area with a shopping list, a wrapped long line and a scrollbar"></p>
 
 =end html
 
@@ -591,7 +591,7 @@ and a disabled checkbox (F<examples/widgets/checkbox.pl>):
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-checkbox.svg" alt="Five check boxes: focused, unchecked, checked, indeterminate and disabled"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-checkbox.svg" alt="Five check boxes: focused, unchecked, checked, indeterminate and disabled"></p>
 
 =end html
 
@@ -634,7 +634,7 @@ focused group in a row, a group in a column and a disabled group
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-radio.svg" alt="Radio buttons in a row with Medium chosen, in a column with Express shipping chosen, and a disabled group"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-radio.svg" alt="Radio buttons in a row with Medium chosen, in a column with Express shipping chosen, and a disabled group"></p>
 
 =end html
 
@@ -681,7 +681,7 @@ selection, and a focused one with its list open
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-dropdown.svg" alt="Three dropdowns: a placeholder, France selected, and an open list of colors with Blue highlighted"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-dropdown.svg" alt="Three dropdowns: a placeholder, France selected, and an open list of colors with Blue highlighted"></p>
 
 =end html
 
@@ -722,7 +722,7 @@ code reference, and a disabled one (F<examples/widgets/slider.pl>):
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-slider.svg" alt="Three sliders: focused at 65 percent, a temperature of 21.5 degrees, and a disabled one"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-slider.svg" alt="Three sliders: focused at 65 percent, a temperature of 21.5 degrees, and a disabled one"></p>
 
 =end html
 
@@ -762,7 +762,7 @@ one, one out of ten without gaps and a disabled one
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-star-rating.svg" alt="Star ratings: a focused one with three of five stars, one with half stars and its value, a read-only one, one out of ten with a gap of zero, and a disabled one"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-star-rating.svg" alt="Star ratings: a focused one with three of five stars, one with half stars and its value, a read-only one, one out of ten with a gap of zero, and a disabled one"></p>
 
 =end html
 
@@ -802,7 +802,7 @@ one with a disabled segment, a vertical one and a disabled one
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-segmented-control.svg" alt="Segmented controls: a focused one with Week selected, one stretched to the full width, one with a disabled segment, a vertical one, and a disabled one"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-segmented-control.svg" alt="Segmented controls: a focused one with Week selected, one stretched to the full width, one with a disabled segment, a vertical one, and a disabled one"></p>
 
 =end html
 
@@ -860,7 +860,7 @@ alpha slider, and one without swatches and alpha in HSL
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-color-picker.svg" alt="Two color pickers. The upper one has a framed list of named swatches with color samples on the left, Orange selected, an empty field with a sample of the orange next to it, the RGB/HSL switch on RGB and the red, green, blue and alpha sliders at the orange. The lower one has no list and no alpha slider, its field shows #2e8b57 and its sliders show hue, saturation and lightness. Below each picker a line names the chosen value and its channels"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-color-picker.svg" alt="Two color pickers. The upper one has a framed list of named swatches with color samples on the left, Orange selected, an empty field with a sample of the orange next to it, the RGB/HSL switch on RGB and the red, green, blue and alpha sliders at the orange. The lower one has no list and no alpha slider, its field shows #2e8b57 and its sliders show hue, saturation and lightness. Below each picker a line names the chosen value and its channels"></p>
 
 =end html
 
@@ -1106,7 +1106,7 @@ of all inputs on C<F2>:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-kdl-form.svg" alt="A form built from KDL with name, password, size, color, volume and newsletter, and a status line with all values"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-kdl-form.svg" alt="A form built from KDL with name, password, size, color, volume and newsletter, and a status line with all values"></p>
 
 =end html
 

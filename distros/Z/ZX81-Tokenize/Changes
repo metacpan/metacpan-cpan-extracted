@@ -7,3 +7,9 @@
 0.003 2026-10-14
     - Fix: '#' comments only recognized at the start of a line, so that '#'
       can also be the pound character
+
+0.004 2026-10-15
+    - Fix: don't tokenize keywords and numbers inside REM comments
+
+0.005 2026-10-15
+    - Add README.md generation via Makefile.PL

@@ -25,18 +25,31 @@ my $minimal_schema = {
   paths => {},
 };
 
-subtest 'missing arguments' => sub {
+subtest 'constructor arguments' => sub {
   die_result(
     sub { OpenAPI::Modern->new },
-    qr/missing required constructor arguments: either openapi_document or openapi_schema/,
+    qr/^missing required constructor arguments: either "documents", "openapi_document", or "openapi_schema"/,
     'need something in constructor arguments',
   );
 
   die_result(
     sub { OpenAPI::Modern->new(openapi_uri => 'foo') },
-    qr/missing required constructor arguments: either openapi_document or openapi_schema/,
-    'need openapi_document or openapi_schema',
+    qr/^missing required constructor arguments: either "documents", "openapi_document", or "openapi_schema"/,
+    'need openapi_document(s) or openapi_schema',
   );
+
+  die_result(
+    sub { OpenAPI::Modern->new(openapi_document => 1, documents => 1) },
+    qr/^cannot provide both "openapi_document" and "documents"/,
+    'incompatible arguments',
+  );
+
+  die_result(
+    sub { OpenAPI::Modern->new(openapi_documents => []) },
+    qr/^cannot provide "openapi_documents"; use "documents" instead/,
+    'unsupported argument',
+  );
+
 
   my $openapi;
   lives_result(
@@ -46,6 +59,13 @@ subtest 'missing arguments' => sub {
     },
     'openapi_schema is sufficient',
   );
+
+  cmp_result(
+    $openapi->openapi_documents,
+    [ isa('JSON::Schema::Modern::Document::OpenAPI') ],
+    'schema is used to construct an openapi document',
+  );
+
 
   lives_result(
     sub {
@@ -57,6 +77,8 @@ subtest 'missing arguments' => sub {
     },
     'canonical_uri and schema is sufficient',
   );
+
+  is($openapi->entry_document->canonical_uri, 'http://example.com/openapi.yaml', 'doc uri is saved');
 
   is_equal(
     $openapi->validate_request(request('GET', 'http://example.com'))->TO_JSON,
@@ -74,7 +96,21 @@ subtest 'missing arguments' => sub {
     'validation can be performed with this OpenAPI object',
   );
 
+  lives_result(
+    sub {
+      $openapi = OpenAPI::Modern->new(
+        openapi_document => JSON::Schema::Modern::Document::OpenAPI->new(
+          canonical_uri => 'http://example.com/openapi.yaml',
+          schema => $minimal_schema,
+        )
+      );
+      memory_cycle_ok($openapi, 'no cycles');
+    },
+    'openapi_document is sufficient',
+  );
+};
 
+subtest 'custom dialects' => sub {
   my $js = JSON::Schema::Modern->new;
   my $my_custom_dialect_doc = $js->add_schema({
     '$id' => 'https://my_custom_dialect',
@@ -97,6 +133,7 @@ subtest 'missing arguments' => sub {
   );
 
 
+  my $openapi;
   lives_result(
     sub {
       $openapi = OpenAPI::Modern->new(
@@ -154,8 +191,8 @@ subtest 'missing arguments' => sub {
         ),
         evaluator => $js,
       );
-      is($openapi->openapi_uri, 'openapi.yaml', 'got uri out of object');
-      is_equal($openapi->openapi_schema, $minimal_schema, 'got schema out of object');
+      is($openapi->entry_document->canonical_uri, 'openapi.yaml', 'got uri out of object');
+      is_equal($openapi->entry_document->schema, $minimal_schema, 'got schema out of object');
       ok($openapi->evaluator->collect_annotations, 'original evaluator is still defined');
       memory_cycle_ok($openapi, 'no cycles');
     },
@@ -169,8 +206,8 @@ subtest 'missing arguments' => sub {
         openapi_schema => $minimal_schema,
         evaluator => JSON::Schema::Modern->new(validate_formats => 0),
       );
-      is($openapi->openapi_uri, 'openapi.yaml', 'got uri out of object');
-      is_equal($openapi->openapi_schema, $minimal_schema, 'got schema out of object');
+      is($openapi->entry_document->canonical_uri, 'openapi.yaml', 'got uri out of object');
+      is_equal($openapi->entry_document->schema, $minimal_schema, 'got schema out of object');
       ok(!$openapi->evaluator->validate_formats, 'evaluator overrides the default');
       memory_cycle_ok($openapi, 'no cycles');
     },
@@ -183,8 +220,8 @@ subtest 'missing arguments' => sub {
         openapi_uri => 'openapi.yaml',
         openapi_schema => $minimal_schema,
       );
-      is($openapi->openapi_uri, 'openapi.yaml', 'got uri out of object');
-      is_equal($openapi->openapi_schema, $minimal_schema, 'got schema out of object');
+      is($openapi->entry_document->canonical_uri, 'openapi.yaml', 'got uri out of object');
+      is_equal($openapi->entry_document->schema, $minimal_schema, 'got schema out of object');
       ok($openapi->evaluator->validate_formats, 'default evaluator is used');
       memory_cycle_ok($openapi, 'no cycles');
     },
@@ -220,7 +257,7 @@ subtest 'construct with document' => sub {
   );
 
   is(
-    $openapi->openapi_uri,
+    $openapi->entry_document->canonical_uri,
     'http://localhost:1234/api',
     'canonical uri is taken from the document',
   );

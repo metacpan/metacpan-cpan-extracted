@@ -5,7 +5,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Object::Pad 0.825;
 
@@ -552,7 +552,7 @@ title, legend, colors and hover
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-chart.svg" alt="Four bar charts of the same data: the legend at the top, at the bottom under a centered title, at the right with the iOS series highlighted and the others faded, and at the left of a chart on a light panel with a right-aligned title"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-chart.svg" alt="Four bar charts of the same data: the legend at the top, at the bottom under a centered title, at the right with the iOS series highlighted and the others faded, and at the left of a chart on a light panel with a right-aligned title"></p>
 
 =end html
 

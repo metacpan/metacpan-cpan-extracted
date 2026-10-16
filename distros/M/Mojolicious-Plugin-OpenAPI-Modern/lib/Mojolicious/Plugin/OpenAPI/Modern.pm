@@ -1,10 +1,10 @@
 use strictures 2;
-package Mojolicious::Plugin::OpenAPI::Modern; # git description: v0.020-2-g5da4c0d
+package Mojolicious::Plugin::OpenAPI::Modern; # git description: v0.021-6-g2817bf5
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Mojolicious plugin providing access to an OpenAPI document and parser
 # KEYWORDS: validation evaluation JSON Schema OpenAPI Swagger HTTP request response
 
-our $VERSION = '0.021';
+our $VERSION = '0.022';
 
 use 5.020;
 use utf8;
@@ -17,9 +17,8 @@ no feature 'switch';
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
 use Feature::Compat::Try;
 use YAML::PP;
-use Path::Tiny;
+use Mojo::File 'path';
 use Mojo::JSON 'decode_json';
-use Safe::Isa;
 use OpenAPI::Modern 0.100;
 use namespace::clean;
 
@@ -62,7 +61,7 @@ sub _process_configs ($config) {
       $schema = YAML::PP->new(boolean => 'JSON::PP')->load_file($config->{document_filename}),
     }
     elsif ($config->{document_filename} =~ /\.json$/) {
-      $schema = decode_json(path($config->{document_filename})->slurp_raw);
+      $schema = decode_json(path($config->{document_filename})->slurp);
     }
     else {
       die 'Unsupported file format in filename: ', $config->{document_filename};
@@ -101,13 +100,23 @@ __END__
 
 =encoding UTF-8
 
+=head1 SUPPORT
+
+=for stopwords OpenAPI
+
+You can also find me on the L<JSON Schema Slack server|https://json-schema.slack.com> and L<OpenAPI
+Slack server|https://open-api.slack.com>, which are also great resources for finding help.
+
 =head1 NAME
 
 Mojolicious::Plugin::OpenAPI::Modern - Mojolicious plugin providing access to an OpenAPI document and parser
 
 =head1 VERSION
 
-version 0.021
+version 0.022
+
+I use a linearly-increasing version numbering scheme. No meaning should be
+presumed or inferred from the version being less than 1.0.
 
 =head1 SYNOPSIS
 

@@ -3,7 +3,7 @@ package Database::BI::Controller::Dashboard;
 use strict;
 use warnings;
 
-our $VERSION = '0.012.0';
+our $VERSION = '0.012.1';
 
 use Mojo::Base 'Mojolicious::Controller', -strict, -signatures;
 
@@ -133,10 +133,10 @@ Readonly my %ALLOWED_DATE_PATTERNS => map { $_ => 1 }
 sub _pagination {
 	my $self = $_[0];
 
-	my $per_page = int($self->param('per_page') // $DEFAULT_PER_PAGE);
+	my $per_page = int($self->param('per_page') || $DEFAULT_PER_PAGE);
 	$per_page = 1         if $per_page < 1;
 	$per_page = $MAX_PER_PAGE if $per_page > $MAX_PER_PAGE;
-	my $page = int($self->param('page') // 1);
+	my $page = int($self->param('page') || 1);
 	$page = 1 if $page < 1;
 	my $offset = ($page - 1) * $per_page;
 	return ($page, $per_page, $offset);
@@ -3427,7 +3427,7 @@ sub pie_view ($self) {
 	);
 
 	# Top-N: keep the highest-N slices, aggregate the rest as "Other".
-	my $topn_n = int($self->param('topn') // 0);
+	my $topn_n = int($self->param('topn') || 0);
 	if ($topn_n > 0 && @$agg_rows > $topn_n) {
 		my @sorted   = sort { ($b->{value} // 0) <=> ($a->{value} // 0) } @$agg_rows;
 		my @top_agg  = @sorted[0 .. $topn_n - 1];
@@ -3725,7 +3725,7 @@ sub bar_view ($self) {
 	my $val_col   = $self->param('val')    // '';
 	my $orient    = $self->param('orient') // 'vertical';
 	my $sort      = $self->param('sort')   // 'none';
-	my $max_bars  = int($self->param('max') // 0);
+	my $max_bars  = int($self->param('max') || 0);
 	my $back      = _safe_back_url($self->param('back')) // '/';
 	my $back2     = _safe_back_url($self->param('back2'));
 	my $back2_lbl = $self->param('back2_label') // '';
@@ -3766,7 +3766,7 @@ sub bar_view ($self) {
 	);
 
 	# Top-N: keep the highest-N categories, aggregate the rest as "Other".
-	my $topn_n = int($self->param('topn') // 0);
+	my $topn_n = int($self->param('topn') || 0);
 	if ($topn_n > 0 && @$agg_rows > $topn_n) {
 		my @sorted   = sort { ($b->{value} // 0) <=> ($a->{value} // 0) } @$agg_rows;
 		my @top_agg  = @sorted[0 .. $topn_n - 1];
@@ -4255,7 +4255,7 @@ sub pivot_view ($self) {
 
 	my $show_totals = ($self->param('totals') // '') ? 1 : 0;
 	my $scheme      = $self->param('scheme') // '';
-	my $max_cols_n  = int($self->param('max_cols') // 0);
+	my $max_cols_n  = int($self->param('max_cols') || 0);
 	my $format      = lc($self->param('format') // '');
 
 	# Build the data pipeline.
@@ -4882,8 +4882,8 @@ sub scatter_view ($self) {
 	my $series_col = $self->param('series') // '';
 	my $size_col   = $self->param('size')   // '';
 	my $scheme     = $self->param('scheme') // 'tableau10';
-	my $min_r      = int($self->param('min_r') // 3);
-	my $max_r      = int($self->param('max_r') // 15);
+	my $min_r      = int($self->param('min_r') || 3);
+	my $max_r      = int($self->param('max_r') || 15);
 	$min_r = 1 if $min_r < 1; $min_r = 40 if $min_r > 40;
 	$max_r = 1 if $max_r < 1; $max_r = 40 if $max_r > 40;
 	($min_r, $max_r) = ($max_r, $min_r) if $min_r > $max_r;
@@ -5239,7 +5239,7 @@ sub treemap_view ($self) {
 	);
 
 	# Top-N: keep the highest-N tiles, aggregate the rest as "Other".
-	my $topn_n = int($self->param('topn') // 0);
+	my $topn_n = int($self->param('topn') || 0);
 	if ($topn_n > 0 && @$agg_rows > $topn_n) {
 		my @sorted   = sort { ($b->{value} // 0) <=> ($a->{value} // 0) } @$agg_rows;
 		my @top_agg  = @sorted[0 .. $topn_n - 1];
@@ -5311,7 +5311,8 @@ sub treemap_view ($self) {
 
 sub histogram_view ($self) {
 	my $col       = $self->param('col')   // '';
-	my $bins      = $self->param('bins')  // 10;
+	my $_bins_raw = $self->param('bins');
+	my $bins      = (defined $_bins_raw && length $_bins_raw) ? $_bins_raw : 10;
 	my $back      = _safe_back_url($self->param('back')) // '/';
 	my $back2     = _safe_back_url($self->param('back2'));
 	my $back2_lbl = $self->param('back2_label') // '';

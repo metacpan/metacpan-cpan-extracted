@@ -11,7 +11,7 @@ use Clay::UI::Role::Interaction::Disableable;
 use Clay::UI::Role::Interaction::Focusable;
 use Term::Fabulous::Widget::Box;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 class Term::Fabulous::Widget::RadioGroup
 	:isa(Term::Fabulous::Widget::Box)
@@ -135,7 +135,7 @@ one is selected
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-radio.svg" alt="Radio buttons in a row with Medium chosen, in a column with Express shipping chosen, and a disabled group"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-radio.svg" alt="Radio buttons in a row with Medium chosen, in a column with Express shipping chosen, and a disabled group"></p>
 
 =end html
 

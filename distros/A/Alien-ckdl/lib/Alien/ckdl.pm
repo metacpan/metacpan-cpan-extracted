@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use parent 'Alien::Base';
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 1;
 
@@ -14,7 +14,19 @@ __END__
 
 =head1 NAME
 
-Alien::ckdl - Build and install ckdl, a C library for KDL documents
+Alien::ckdl - (DEPRECATED) Build and install ckdl, a C library for KDL documents
+
+=head1 DEPRECATION NOTICE
+
+This distribution is deprecated and will see no further releases.
+L<Text::KDL::XS> 0.003 and later bundle the ckdl sources and compile
+them into the module, so nothing on CPAN depends on Alien::ckdl any
+more. Install L<Text::KDL::XS> directly.
+
+This final release builds the same ckdl commit as 0.001 and exists so
+that Text::KDL::XS 0.001 and 0.002, which still depend on it, stay
+installable. It is not maintained: there will be no newer ckdl, no
+system library detection and no fixes.
 
 =head1 SYNOPSIS
 
@@ -51,16 +63,17 @@ writing the KDL Document Language (KDL v1 and v2). It exposes the
 result to Perl XS modules through the standard L<Alien::Base>
 interface.
 
-The Alien tracks the upstream C<main> branch rather than a tagged
-release, and always installs from source as a B<static> library.
+The Alien pins one upstream commit (C<$CKDL_COMMIT> in F<alienfile>)
+rather than a tagged release, and always installs from source as a
+B<static> library.
 The upstream CMake build is intentionally bypassed: only the C source
 files that make up C<libkdl> are compiled, omitting the upstream test
 suite, the Python bindings, and the C++ bindings. As a result the
 build has no Python, Cython, or CMake dependency.
 
-The primary consumer is L<Text::KDL::XS>. End users who only want to
-parse or emit KDL from Perl should install C<Text::KDL::XS> directly
-and let it pull in this Alien as a build-time dependency.
+The only consumer was L<Text::KDL::XS> before 0.003, which now bundles
+ckdl itself. End users who want to parse or emit KDL from Perl should
+install C<Text::KDL::XS> directly; it no longer needs this Alien.
 
 =head1 METHODS
 
@@ -96,7 +109,8 @@ against C<libkdl> with no extra configuration.
 
 =head1 SEE ALSO
 
-L<Text::KDL::XS>, the Perl XS binding that consumes this Alien.
+L<Text::KDL::XS>, the Perl XS binding that consumed this Alien up to
+version 0.002 and bundles ckdl since 0.003.
 
 L<Alien::Base> and L<Alien::Build>, the framework this distribution
 plugs into.

@@ -1,5 +1,13 @@
 Revision history for Term::Fabulous
 
+0.03    2026-10-15
+        - Fixes from CPAN Testers: the theme editor no longer needs the PNG
+          support of Imager; its preview picture is a TGA, which Imager
+          reads without a plugin. The image, sixel, screenshot and
+          terminal tests skip when Imager was built without PNG support or
+          without the freetype driver instead of failing.
+        - The main documentation carries an AI disclaimer.
+
 0.02    2026-10-12
         - Term::Fabulous runs on Windows: termbox2 gets a Windows console
           backend (src/patches), reached through the console in virtual

@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.0, v3.1 or v3.2 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.149';
+our $VERSION = '0.150';
 
 use 5.020;
 use utf8;
@@ -185,7 +185,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
 
   # determine canonical uri using rules from v3.2.0 §4.1.2.2.1, "Establishing the Base URI"
   $self->_set_canonical_uri($state->{initial_schema_uri} =
-    Mojo::URL->new($schema->{'$self'}//())->to_abs($self->retrieval_uri));
+    Mojo::URL->new($schema->{'$self'}//())->to_abs($self->retrieval_uri//()));
 
   # /jsonSchemaDialect: https://spec.openapis.org/oas/latest#specifying-schema-dialects
   {
@@ -315,7 +315,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
                 if ($schema_path =~ s{/oneOf/\K([01])\z}{$1 ^ 1}e) {
                   $entity = lc join('-', split /(?=[A-Z])/, substr($metaschema_doc->get($schema_path)->{'$ref'}, 14));
                   $entity .= 's' if $entity eq 'callback';
-                  push @references, [ '$ref', $state->{data_path}, Mojo::URL->new($data->{'$ref'})->to_abs($self->canonical_uri), $entity ];
+                  push @references, [ '$ref', $state->{data_path}, Mojo::URL->new($data->{'$ref'})->to_abs($self->canonical_uri), $self->__entity_type->($entity) ];
                 }
               }
 
@@ -828,7 +828,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.0, v3.1 or v3.2 documen
 
 =head1 VERSION
 
-version 0.149
+version 0.150
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.
@@ -840,7 +840,7 @@ presumed or inferred from the version being less than 1.0.
     metaschema_uri => 'https://example.com/my_custom_metaschema',
     schema => decode_json(<<'JSON'));
   {
-    "openapi": "3.2.0",
+    "openapi": "3.2.1",
     "$self": "openapi.json",
     "info": {
       "title": "my title",
@@ -873,7 +873,7 @@ for v3.2 documents: L<https://spec.openapis.org/oas/3.2/schema-base/2026-08-30> 
 
 =item *
 
-for v3.1 documents: L<https://spec.openapis.org/oas/3.1/schema-base/2025-11-23> (which is a wrapper around L<https://spec.openapis.org/oas/3.1/schema/2025-11-23>), and the L<OpenAPI v3.1.x specification|https://spec.openapis.org/oas/v3.1>
+for v3.1 documents: L<https://spec.openapis.org/oas/3.1/schema-base/2026-08-03> (which is a wrapper around L<https://spec.openapis.org/oas/3.1/schema/2026-08-03>), and the L<OpenAPI v3.1.x specification|https://spec.openapis.org/oas/v3.1>
 
 =back
 

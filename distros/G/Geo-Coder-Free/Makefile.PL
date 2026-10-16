@@ -257,11 +257,14 @@ if(open(my $admin2, '>>', 'lib/Geo/Coder/Free/MaxMind/databases/admin2.db')) {
 		"GB.ENG.O5\tLondon\tLondon\t2648110\n",
 		"GB.ENG.I8\tLondon\tLondon\t2648110\n",
 		"GB.ENG.P5\tLondon\tLondon\t2648110\n",
-		"GB.ENG.G5\tTooting\tTooting\t2648110\n",	# Not in the database, but Balham is close
 		"GB.ENG.A5\tBedfordshire\tBedfordshire\t2648110\n";
+	# NOTE: GB.ENG.G5 is Kent (GeoNames admin2); do not append Tooting here —
+	# Tooting is in London (Wandsworth) and its correct worldcitiespop code is
+	# not G5.  The old entry silently shadowed the Kent row on BSD/macOS where
+	# the file is read in a different order.
 }
 
-# For bin/create_sqlite
+# For bin/create_sqlite/createdatabase
 my $build_requires = {
 	'App::csv2sqlite' => 0,
 	'DB_File' => 0,
@@ -279,7 +282,7 @@ my $build_requires = {
 	'File::Spec' => 0,
 	'autodie' => 0,
 	'Geo::Coder::Abbreviations' => 0.03,
-	'Geo::Location::Point' => 0.14,
+	'Geo::Location::Point' => 0.16,
 	'IPC::System::Simple' => 0,
 	'JSON::MaybeXS' => 0,
 	'LWP::ConnCache' => 0,
@@ -300,18 +303,32 @@ if($ENV{'REDIS_SERVER'}) {
 	$build_requires->{'Redis'} = 0;
 }
 
+if($ENV{OPENADDR_HOME}) {
+	# for createdatabase
+	$build_requires->{'Locale::AU'} = 0;
+	$build_requires->{'Locale::CA'} = 0;
+	$build_requires->{'Locale::US'} = 0;
+}
+
 my $test_requires = {
 	'CGI::IDS' => 0,
+	'CGI::Info' => 0,
 	'CGI::Lingua' => 0,
 	'CHI::Driver::Null' => 0,
 	'Data::Throttler' => 0,
+	'File::Temp' => 0,
 	'Test::Carp' => 0,
 	'Test::Deep' => 0,
 	'Test::DescribeMe' => 0,
+	'Test::Log::Abstraction' => 0,
+	'Test::Memory::Cycle' => 0,
+	'Test::Mockingbird' => 0,
 	'Test::Most' => 0,
 	'Test::Needs' => 0,
 	'Test::NoWarnings' => 0,
-	'Test::Number::Delta' => 0
+	'Test::Number::Delta' => 0,
+	'Test::Returns' => 0,
+	'Test::Without::Module' => 0,
 };
 
 if($ENV{'AUTHOR_TESTING'}) {
@@ -355,8 +372,8 @@ WriteMakefile(
 	PREREQ_PM => {
 		'Carp' => 0,
 		# 'BerkeleyDB' => 0,
+		'Config::Auto' => 0,
 		'Cwd' => 0,
-		'Data::Dumper' => 0,
 		'Data::Validate::URI' => 0,
 		'DB_File' => 0,
 		'DBI' => 0,
@@ -365,22 +382,21 @@ WriteMakefile(
 		'DBD::CSV' => 0,
 		'DBD::SQLite' => 0,
 		'Encode' => 0,
-		'Locale::Country' => 0,
-		'Locale::AU' => 0,
+		'Geo::Coder::Abbreviations' => 0.03,
+		'Geo::Hash' => 0,
+		'Geo::Location::Point' => 0.16,
+		'Geo::StreetAddress::US' => 0,
+		'Lingua::EN::AddressParse' => 0,
 		'Locale::CA' => 0,
+		'Locale::Country' => 0,
 		'Locale::SubCountry' => 0,
 		'Locale::US' => 0,
-		'Lingua::EN::AddressParse' => 0,
-		'Geo::Address::Parser' => 0,
-		'Geo::Hash' => 0,
-		'Geo::StreetAddress::US' => 0,
-		'Gzip::Faster' => 0,
-		'File::Temp' => 0,
 		'Module::Info' => 0,
 		'File::Spec' => 0,
 		'CHI' => 0,
 		'Object::Configure' => 0,
 		'Params::Get' => 0,
+		'Readonly' => 0,
 		'Scalar::Util' => 0,
 		'Storable' => 0,
 		'Text::CSV' => 0,
@@ -425,6 +441,13 @@ WriteMakefile(
 				# url => 'https://github.com/nigelhorne/Geo-Coder-Free/issues',
 				mailto => 'bug-Geo-Coder-Free@rt.cpan.org'
 			}
+		},
+		prereqs => {
+			runtime => {
+				recommends => {
+					'Geo::Address::Parser' => 0,
+				},
+			},
 		},
 	},
 	# PL_FILES => (defined($ENV{'AUTOMATED_TESTING'}) ? {} : {'bin/create_db.PL' => 'bin/create_db'}),

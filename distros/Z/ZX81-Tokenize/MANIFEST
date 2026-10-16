@@ -2,6 +2,7 @@ Changes
 lib/ZX81/Tokenize.pm
 Makefile.PL
 MANIFEST			This list of files
+README.md
 t/encode_chars.t
 t/encode_float.t
 t/tokenize_basic.t

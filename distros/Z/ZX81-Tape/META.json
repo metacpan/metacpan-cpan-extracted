@@ -1,0 +1,49 @@
+{
+   "abstract" : "Create ZX81 tape image files",
+   "author" : [
+      "Paulo Custodio <pauloscustodio@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.68, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "ZX81-Tape",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Modern::Perl" : "1.20250607",
+            "Object::Tiny::RW" : "1.07",
+            "Path::Tiny" : "0.15",
+            "Test::HexDifferences" : "1.001",
+            "Test::More" : "1.302225",
+            "Text::Diff" : "1.46",
+            "ZX81" : "0.001",
+            "ZX81::Tokenize" : "0.004"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.001",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

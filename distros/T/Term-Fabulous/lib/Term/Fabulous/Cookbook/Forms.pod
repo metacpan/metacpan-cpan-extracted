@@ -200,7 +200,7 @@ This program is shipped as F<examples/cookbook/login-form.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-login-form.svg" alt="A centered login dialog with a user name, a masked password, a checked box and the welcome message"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-login-form.svg" alt="A centered login dialog with a user name, a masked password, a checked box and the welcome message"></p>
 
 =end html
 
@@ -375,7 +375,7 @@ This program is shipped as F<examples/cookbook/check-form.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-check-form.svg" alt="A form of eleven inputs; ada@example, perl.org, 192.0.2.300, 70000 and 2026-02-29 are red with a message beside each, the empty color dropdown and the unchecked terms box have messages too, and the status line says 7 fields need your attention"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-check-form.svg" alt="A form of eleven inputs; ada@example, perl.org, 192.0.2.300, 70000 and 2026-02-29 are red with a message beside each, the empty color dropdown and the unchecked terms box have messages too, and the status line says 7 fields need your attention"></p>
 
 =end html
 
@@ -558,7 +558,7 @@ This program is shipped as F<examples/cookbook/own-checks.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-own-checks.svg" alt="Five fields with messages below them: ABC12 with Three letters and three digits, such as ABC123; the name José Saramago without a message; 7 with Please enter an even number; mail.perl.org with Please use a host in example.com; and a text area of two hosts with Line 2: Please enter a host name"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-own-checks.svg" alt="Five fields with messages below them: ABC12 with Three letters and three digits, such as ABC123; the name José Saramago without a message; 7 with Please enter an even number; mail.perl.org with Please use a host in example.com; and a text area of two hosts with Line 2: Please enter a host name"></p>
 
 =end html
 
@@ -707,7 +707,7 @@ This program is shipped as F<examples/cookbook/confirm-dialog.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-confirm-dialog.svg" alt="The Really quit? dialog with Quit and Cancel buttons over the dimmed notes; Quit has the focus and a blue border"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-confirm-dialog.svg" alt="The Really quit? dialog with Quit and Cancel buttons over the dimmed notes; Quit has the focus and a blue border"></p>
 
 =end html
 
@@ -812,7 +812,7 @@ This program is shipped as F<examples/cookbook/confirm-prompt.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-confirm-prompt.svg" alt="A Quit? prompt with the message Your notes are not saved anywhere. and the buttons Quit and Keep writing over the dimmed notes. Keep writing has the focus"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-confirm-prompt.svg" alt="A Quit? prompt with the message Your notes are not saved anywhere. and the buttons Quit and Keep writing over the dimmed notes. Keep writing has the focus"></p>
 
 =end html
 
@@ -927,7 +927,7 @@ This program is shipped as F<examples/cookbook/ask-prompt.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-ask-prompt.svg" alt="A Session length prompt asking How many minutes should the next session last?, with 300 typed in the Minutes field, the red message A session lasts 1 to 120 minutes. and the buttons OK and Cancel"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-ask-prompt.svg" alt="A Session length prompt asking How many minutes should the next session last?, with 300 typed in the Minutes field, the red message A session lasts 1 to 120 minutes. and the buttons OK and Cancel"></p>
 
 =end html
 
@@ -1114,7 +1114,7 @@ directory and deletes when it ends, so it never writes your files.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-open-and-save.svg" alt="An Open a file dialog over the empty notes editor: the folder line ends in garden-club/season-2026/notes, the list shows garden.txt, groceries.txt and ideas.md with sizes and dates, the cursor is on groceries.txt, which is also in the File field, and below are the Notes filter, the Show hidden files checkbox and the Open and Cancel buttons"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-open-and-save.svg" alt="An Open a file dialog over the empty notes editor: the folder line ends in garden-club/season-2026/notes, the list shows garden.txt, groceries.txt and ideas.md with sizes and dates, the cursor is on groceries.txt, which is also in the File field, and below are the Notes filter, the Show hidden files checkbox and the Open and Cancel buttons"></p>
 
 =end html
 
@@ -1265,7 +1265,7 @@ This program is shipped as F<examples/cookbook/color-prompt.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-color-prompt.svg" alt="A Highlight color prompt over the dimmed setting: on the left the label Color and a framed list of six named colors with samples, Mint selected; on the right the field with #98c379 and a green sample, the RGB/HSL switch on RGB and the red, green and blue sliders at 152, 195 and 121; the buttons Use it and Cancel below"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-color-prompt.svg" alt="A Highlight color prompt over the dimmed setting: on the left the label Color and a framed list of six named colors with samples, Mint selected; on the right the field with #98c379 and a green sample, the RGB/HSL switch on RGB and the red, green and blue sliders at 152, 195 and 121; the buttons Use it and Cancel below"></p>
 
 =end html
 
@@ -1368,7 +1368,7 @@ This program is shipped as F<examples/cookbook/inline-prompt.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-inline-prompt.svg" alt="The inline prompt in the three rows below a shell's earlier output: the question, a text field holding Ada Lovelace and a help line"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-inline-prompt.svg" alt="The inline prompt in the three rows below a shell's earlier output: the question, a text field holding Ada Lovelace and a help line"></p>
 
 =end html
 
@@ -1471,7 +1471,7 @@ This program is shipped as F<examples/cookbook/choose-options.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-choose-options.svg" alt="A dropdown showing France, radio buttons with Express chosen, a slider at 15 percent and the status line"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-choose-options.svg" alt="A dropdown showing France, radio buttons with Express chosen, a slider at 15 percent and the status line"></p>
 
 =end html
 
@@ -1740,7 +1740,7 @@ ends. This program is also shipped as F<examples/kdl-form.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-kdl-form.svg" alt="The KDL form filled in, with all values shown in the status line after F2"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-kdl-form.svg" alt="The KDL form filled in, with all values shown in the status line after F2"></p>
 
 =end html
 
@@ -1851,7 +1851,7 @@ This program is shipped as F<examples/cookbook/disable-inputs.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-disable-inputs.svg" alt="An unchecked check box and the grayed out VAT number field below it"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-disable-inputs.svg" alt="An unchecked check box and the grayed out VAT number field below it"></p>
 
 =end html
 
@@ -1937,7 +1937,7 @@ This program is shipped as F<examples/cookbook/focus-help-line.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-focus-help-line.svg" alt="A title, notes being typed, a slider and the help line for the notes"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-focus-help-line.svg" alt="A title, notes being typed, a slider and the help line for the notes"></p>
 
 =end html
 
@@ -2014,7 +2014,7 @@ This program is shipped as F<examples/cookbook/tab-order.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-tab-order.svg" alt="Three text fields side by side: Street filled in, City still empty, and the Zip field focused with 12345 typed, because Tab went from Street straight to Zip"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-tab-order.svg" alt="Three text fields side by side: Street filled in, City still empty, and the Zip field focused with 12345 typed, because Tab went from Street straight to Zip"></p>
 
 =end html
 

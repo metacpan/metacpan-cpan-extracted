@@ -3,6 +3,7 @@
 use warnings;
 use strict;
 use autodie qw(:all);
+use Carp;
 
 use FindBin qw($Bin);
 use lib "$Bin/../lib";
@@ -10,10 +11,14 @@ use lib "$Bin/../lib";
 eval {
 	doit();
 };
-die $@ if $@;
+Carp::croak $@ if $@;
 
 sub doit
 {
 	print "Test 1 - White House\n";
-	system("perl $Bin/../lib/Geo/Coder/Free.pm 1600 Pennsylvania Avenue NW, Washington DC, USA");
+	# List-form system() bypasses shell interpolation — $Bin from FindBin can
+	# contain spaces or metacharacters if installed in an unusual path, which
+	# would allow command injection via the string form.
+	system($^X, "$Bin/../lib/Geo/Coder/Free.pm",
+		'1600 Pennsylvania Avenue NW, Washington DC, USA');
 }

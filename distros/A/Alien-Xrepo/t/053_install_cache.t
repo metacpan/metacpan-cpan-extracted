@@ -126,6 +126,10 @@ subtest '_guard_store enforces a pinned store' => sub {
     ok $repo->_guard_store( { artefacts_typo => { installdir => "$outside" } } ),          'no pinned store accepts anything';
     ok $repo->_guard_store( $pinfo_for->("$in_root"), installdir => $store ),              'PackageInfo under the store is accepted';
     ok dies { $repo->_guard_store( $pinfo_for->("$outside"), installdir => $store ) },     'PackageInfo outside the store dies';
+    ok $repo->_guard_store( { artifacts => { installdir => "$outside" } }, installdir => $store, system => 1 ),
+        'system => 1 waives the pin for an installdir outside the store';
+    ok $repo->_guard_store( $pinfo_for->("$outside"), installdir => $store, system => 1 ),
+        'system => 1 waives the pin for a PackageInfo outside the store';
 };
 subtest '_finalize guards and processes' => sub {
     my $store   = Path::Tiny->tempdir;

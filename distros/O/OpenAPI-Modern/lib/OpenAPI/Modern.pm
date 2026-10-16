@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.148-15-g2ca84e60
+package OpenAPI::Modern; # git description: v0.149-12-g4e03e7cd
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.0, v3.1 or v3.2 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.0 v3.1 v3.2 Swagger HTTP request response
 
-our $VERSION = '0.149';
+our $VERSION = '0.150';
 
 use 5.020;
 use utf8;
@@ -32,23 +32,40 @@ use JSON::Schema::Modern::Utilities qw(jsonp unjsonp canonical_uri E abort is_eq
 use OpenAPI::Modern::Utilities qw(add_vocab_and_default_schemas add_formats convert_request convert_response uri_decode intersect_types coerce_primitive uri_encode uri_encode_strict is_header_name is_cookie_name is_cookie_value elem deserialize_multipart);
 use JSON::Schema::Modern::Document::OpenAPI;
 use MooX::TypeTiny 0.002002;
-use Types::Standard qw(InstanceOf Bool);
+use Types::Standard qw(ArrayRef InstanceOf Bool);
 use Mojo::Util qw(url_unescape punycode_decode);
 use Mojo::Message::Request;
 use Mojo::Message::Response;
 use Clone 'clone';
 use namespace::clean;
 
-has openapi_document => (
+# the first value is always the entry document
+has openapi_documents => (
   is => 'ro',
-  isa => InstanceOf['JSON::Schema::Modern::Document::OpenAPI'],
-  required => 1,
-  handles => {
-    openapi_uri => 'canonical_uri', # Mojo::URL
-    openapi_schema => 'schema',     # hashref
-    document_get => 'get',          # data access using a json pointer
-  },
+  isa => ArrayRef[InstanceOf(['JSON::Schema::Modern::Document::OpenAPI'])],
+  required => 1,  # populated from 'documents' in BUILDARGS
 );
+
+sub entry_document ($self) { $self->{openapi_documents}[0] }
+
+# backcompat aliases; may be removed eventually
+my ($warn_openapi_document, $warn_openapi_uri, $warn_openapi_schema, $warn_document_get);
+sub openapi_document ($self) {
+  carp 'openapi_document is deprecated; use entry_document instead' if not $warn_openapi_document++;
+  $self->{openapi_documents}[0];
+}
+sub openapi_uri ($self) {
+  carp 'openapi_uri is deprecated; use entry_document->canonical_uri instead' if not $warn_openapi_uri++;
+  $self->{openapi_documents}[0]->canonical_uri;
+}
+sub openapi_schema ($self) {
+  carp 'openapi_schema is deprecated; use entry_document->schema instead' if not $warn_openapi_schema++;
+  $self->{openapi_documents}[0]->schema;
+}
+sub document_get ($self, $path) {
+  carp 'document_get is deprecated; use entry_document->get instead' if not $warn_document_get++;
+  $self->{openapi_documents}[0]->get($path);
+}
 
 has evaluator => (
   is => 'ro',
@@ -72,13 +89,22 @@ has with_defaults => (
 around BUILDARGS => sub ($orig, $class, @args) {
   my $args = $class->$orig(@args);
 
-  croak 'missing required constructor arguments: either openapi_document or openapi_schema'
-    if not exists $args->{openapi_document} and not exists $args->{openapi_schema};
+  croak 'cannot provide "openapi_documents"; use "documents" instead'
+    if exists $args->{openapi_documents};
 
-  my $had_document = exists $args->{openapi_document};
+  croak 'missing required constructor arguments: either "documents", "openapi_document", or "openapi_schema"'
+    if not any { exists $args->{$_} } qw(documents openapi_document openapi_schema);
+
+  croak 'cannot provide both "openapi_document" and "documents"'
+    if exists $args->{openapi_document} and exists $args->{documents};
+
+  $args->{documents} = [ delete $args->{openapi_document} ] if exists $args->{openapi_document};
+
+  croak 'the first document must be a JSON::Schema::Modern::Document::OpenAPI object'
+    if exists $args->{documents} and not $args->{documents}[0]->isa('JSON::Schema::Modern::Document::OpenAPI');
 
   my $extra_args = { %$args };
-  delete $extra_args->@{qw(openapi_document openapi_schema openapi_uri evaluator debug)};
+  delete $extra_args->@{qw(documents openapi_schema openapi_uri evaluator debug)};
 
   $args->{evaluator} //= JSON::Schema::Modern->new(
     validate_formats => 1,
@@ -86,20 +112,24 @@ around BUILDARGS => sub ($orig, $class, @args) {
     %$extra_args, # may include with_defaults, or other arguments recognized by JSM
   );
 
-  $args->{openapi_document} //= JSON::Schema::Modern::Document::OpenAPI->new(
-    exists $args->{openapi_uri} ? (canonical_uri => $args->{openapi_uri}) : (),
-    schema => $args->{openapi_schema},
-    evaluator => $args->{evaluator},
-  );
-
-  # add the OpenAPI vacabulary, formats and metaschemas to the evaluator if they weren't there already
-  if ($had_document) {
-    add_vocab_and_default_schemas($args->{evaluator}, $args->{openapi_document}->oas_version);
-    add_formats($args->{evaluator}, $args->{openapi_document}->oas_version);
+  if (not (exists $args->{documents} and $args->{documents}->@*)) {
+    $args->{documents} = [ JSON::Schema::Modern::Document::OpenAPI->new(
+      exists $args->{openapi_uri} ? (canonical_uri => delete $args->{openapi_uri}) : (),
+      schema => delete $args->{openapi_schema},
+      evaluator => $args->{evaluator},
+    ) ];
+  }
+  else {
+    # add the OpenAPI vacabulary, formats and metaschemas to the evaluator if not already there
+    add_vocab_and_default_schemas($args->{evaluator}, $args->{documents}[0]->oas_version);
+    add_formats($args->{evaluator}, $args->{documents}[0]->oas_version);
   }
 
   # if there were errors, this will die with a JSON::Schema::Modern::Result object
-  $args->{evaluator}->add_document($args->{openapi_document});
+  $args->{evaluator}->add_document($_) foreach $args->{documents}->@*;
+
+  $args->{openapi_documents} = [ grep $_->isa('JSON::Schema::Modern::Document::OpenAPI'), $args->{documents}->@* ];
+  delete $args->{documents};  # no need to save non-OpenAPI documents; they are in the evaluator
 
   return $args;
 };
@@ -388,13 +418,14 @@ sub validate_response ($self, $response, $options = {}) {
 
 sub find_path_item ($self, $options, $state = {}) {
   $state->{data_path} //= '';
-  $state->{initial_schema_uri} = $self->openapi_uri;   # the canonical URI as of the start or last $id, or the last traversed $ref
+  # the canonical URI as of the start or last $id, or the last traversed $ref
+  $state->{initial_schema_uri} = $self->entry_document->canonical_uri;
   $state->{traversed_keyword_path} = '';   # the accumulated traversal path as of the start, or last $id, or up to the last traversed $ref
   $state->{keyword_path} = '';             # the rest of the path, since the last $id or the last traversed $ref
-  $state->{document} = $self->openapi_document;
+  $state->{document} = $self->entry_document;
   $state->@{qw(specification_version vocabularies)} =
-    $self->openapi_document->_get_resource($self->openapi_document->canonical_uri)->@{qw(specification_version vocabularies)};
-  $state->{dynamic_scope} = [ $self->openapi_uri ];
+    $state->{document}->_get_resource($state->{document}->canonical_uri)->@{qw(specification_version vocabularies)};
+  $state->{dynamic_scope} = [ $state->{initial_schema_uri} ];
   $state->{errors} = $options->{errors} //= [];
   $state->{annotations} //= [];
   $state->{depth} = 0;
@@ -441,7 +472,7 @@ sub find_path_item ($self, $options, $state = {}) {
   if (exists $options->{operation_id}) {
     # FIXME: what if the operation is defined in another document? Need to look it up across
     # all documents, and localize $state->{initial_schema_uri}
-    my $operation_path = $self->openapi_document->operationId_path($options->{operation_id});
+    my $operation_path = $state->{document}->operationId_path($options->{operation_id});
     return E({ %$state, recommended_response => [ 500 ] }, 'unknown operation_id "%s"', $options->{operation_id})
       if not $operation_path;
 
@@ -458,7 +489,7 @@ sub find_path_item ($self, $options, $state = {}) {
           # differentiate between these operation paths:
           # /components/pathItems/additionalOperations/get (method = 'GET') vs
           # /components/pathItems/additionalOperations/additionalOperations/get (method = 'get')
-        || $self->openapi_document->get_entity_at_location(jsonp(@parts[0..$#parts-1])) eq 'path-item'
+        || $state->{document}->get_entity_at_location(jsonp(@parts[0..$#parts-1])) eq 'path-item'
       ? (jsonp(@parts[0..$#parts-1]), uc($parts[-1]))
       : (jsonp(@parts[0..$#parts-2]), $parts[-1]);
 
@@ -466,7 +497,7 @@ sub find_path_item ($self, $options, $state = {}) {
         'operation at operation_id does not match %s method "%s"%s',
           $options->{uri} ? 'request' : 'provided HTTP', $options->{method},
           (!$options->{uri} && $options->{method} eq lc $options->{method}
-              && exists $self->openapi_document->get($path_item_path)->{$options->{method}}
+              && exists $state->{document}->get($path_item_path)->{$options->{method}}
             ? (' (should be '.uc $options->{method}.')') : ''))
       if exists $options->{method} and $options->{method} ne $method;
 
@@ -476,8 +507,8 @@ sub find_path_item ($self, $options, $state = {}) {
       # some operations don't live under a /paths/$path_template (even via a $ref), e.g. webhooks or
       # callbacks, but they are still usable via operationId for validating responses
       $state->{keyword_path} = $path_item_path;
-      $options->{_path_item} = $self->document_get($path_item_path);
-      $options->{_operation} = $self->document_get($operation_path);
+      $options->{_path_item} = $state->{document}->get($path_item_path);
+      $options->{_operation} = $state->{document}->get($operation_path);
       $options->{_operation_path_suffix} = substr($operation_path, length($path_item_path));
 
       # FIXME: this is not accurate if the operation lives in another document
@@ -487,13 +518,11 @@ sub find_path_item ($self, $options, $state = {}) {
     }
   }
 
-  my $schema = $self->openapi_document->schema;
-
   # path_template from options
   return E({ %$state, ($options->{uri} ? (data_path => '/request/uri') : ()),
         keyword => 'paths' }, 'missing path "%s"', $options->{path_template})
     if exists $options->{path_template}
-      and not exists(($schema->{paths}//{})->{$options->{path_template}});
+      and not exists(($state->{document}->schema->{paths}//{})->{$options->{path_template}});
 
   # hashrefs of template variable names -> concrete values from the uri
   my ($server_captures, $path_captures);
@@ -502,9 +531,9 @@ sub find_path_item ($self, $options, $state = {}) {
     # derive path_template and capture values from the request URI
 
     my $errors = $state->{errors};  # most likely [], but bound to $options
-    foreach my $pt ($self->openapi_document->path_templates->@*) {
+    foreach my $pt ($state->{document}->path_templates->@*) {
       my $local_state = +{ %$state, errors => [] };   # we do not keep errors from match attempts
-      $local_state->{path_item} = $schema->{paths}{$pt};
+      $local_state->{path_item} = $state->{document}->schema->{paths}{$pt};
       $local_state->{keyword_path} = jsonp('/paths', $pt);
       ($server_captures, $path_captures) = $self->_match_uri($options->@{qw(method uri)}, $pt, $local_state);
 
@@ -530,7 +559,7 @@ sub find_path_item ($self, $options, $state = {}) {
 
   elsif ($options->{uri}) {
     # we were passed path_template in options, and now we verify it against the request URI
-    $state->{path_item} = $schema->{paths}{$options->{path_template}};
+    $state->{path_item} = $state->{document}->schema->{paths}{$options->{path_template}};
     $state->{keyword_path} = jsonp('/paths', $options->{path_template});
     ($server_captures, $path_captures) = $self->_match_uri($options->@{qw(method uri path_template)}, $state);
 
@@ -563,7 +592,7 @@ sub find_path_item ($self, $options, $state = {}) {
 
   else {
     # we were provided $options->{path_template}, and we have already confirmed that it exists.
-    $state->{path_item} = $schema->{paths}{$options->{path_template}};
+    $state->{path_item} = $state->{document}->schema->{paths}{$options->{path_template}};
     $state->{keyword_path} = jsonp('/paths', $options->{path_template});
     while (defined(my $ref = $state->{path_item}{'$ref'})) {
       $state->{path_item} = $self->_resolve_ref('path-item', $ref, $state);
@@ -642,7 +671,7 @@ sub find_path_item ($self, $options, $state = {}) {
 
 # TODO: this should (also?) be available at JSON::Schema::Modern
 sub recursive_get ($self, $uri_reference, $entity_type = undef) {
-  my $base = $self->openapi_document->canonical_uri;
+  my $base = $self->entry_document->canonical_uri;
   my $ref = $uri_reference;
   my ($depth, $schema);
   my $parent_obj = {};
@@ -736,13 +765,12 @@ sub _match_uri ($self, $method, $uri, $path_template, $state) {
         ? ($local_state->{operation}{servers}, $local_state->{operation_path_suffix})
     : exists $local_state->{path_item}{servers}
         ? ($local_state->{path_item}{servers}, '')
-    : exists $self->openapi_document->schema->{servers}
-        ? ($self->openapi_document->schema->{servers}, '', $self->openapi_uri)
+    : exists $self->entry_document->schema->{servers}
+        ? ($self->entry_document->schema->{servers}, '', $self->entry_document->canonical_uri)
     : ();
 
-  # v3.2.0 §4.1.1, "OpenAPI Object -> servers": "If the servers field is not provided, or is an
-  # empty array, the default value would be an array consisting of a single Server Object with a
-  # url value of `/`."
+  # v3.2.1 §4.1.1: "If the servers field is not provided, or is an empty array, the default value
+  # would be an array consisting of a single Server Object with a url value of `/`."
   $servers = [{ url => '/' }] if not $servers or not @$servers;
 
   my @path_capture_names = ($path_template =~ /\{([^{}]+)\}/g);
@@ -757,7 +785,7 @@ sub _match_uri ($self, $method, $uri, $path_template, $state) {
     # so they are not altered by normalization. We use NUL, as it is unchanged in the host during
     # punycode-encoding
     my $normalized_server_url = Mojo::URL->new($server->{url} =~ s/\{[^{}]+\}/\x00/gr)
-      ->to_abs($self->openapi_document->retrieval_uri)
+      ->to_abs($self->entry_document->retrieval_uri//())
       ->to_abs($uri);
 
     my $normalized_host = $normalized_server_url->host;
@@ -1076,7 +1104,7 @@ sub _deserialize_cookie_parameter ($self, $state, $param_obj, $headers) {
 
   return if $state->{errors}->@* > $error_count;
 
-  map { $_->[1] =~ s/^"//; $_->[1] =~ s/"\z// } @pairs;
+  map do { $_->[1] =~ s/^"//; $_->[1] =~ s/"\z// }, @pairs;
 
   if (exists $param_obj->{content}) {
     my $data = ((grep +($_->[0] eq $param_obj->{name}), @pairs)[-1]//[])->[1];
@@ -1439,7 +1467,7 @@ sub _deserialize_style ($self, $data, $state, %opt) {
     # of false with deepObject is undefined."
     # v3.2.0 §4.12.2.2: "...when style is "deepObject", [explode] has no effect."
     return E({ %$state, keyword => 'explode' }, '"explode" cannot be false with style=deepObject')
-      if not $explode and $self->openapi_document->oas_version < '3.2';
+      if not $explode and $state->{document}->oas_version < '3.2';
 
     return E({ %$state, keyword => 'style' }, 'deepObject style can only deserialize to objects')
       if not elem('object', \@types);
@@ -1619,7 +1647,7 @@ sub _deserialize_content ($self, $content_ref, $state, $content_obj, $media_type
     { %$state,                                              # encoding_state
       $headers_ref ? (header_path => $state->{data_path} =~ s{/content\z}{/header}r) : () },
     # v3.1.2 §4.8.14.1: "The encoding field SHALL only apply to Request Body Objects"
-    $state->{data_path} =~ m{^/request/body/} || $self->openapi_document->oas_version >= '3.2'
+    $state->{data_path} =~ m{^/request/body/} || $state->{document}->oas_version >= '3.2'
       ? $media_type_obj : undef,                            # encoding_parent
     $content_type,                                          # message Content-Type
   );
@@ -2069,7 +2097,7 @@ sub _result ($self, $state, $is_exception = 0, $is_response = 0) {
 }
 
 sub _resolve_ref ($self, $entity_type, $ref, $state, $keyword = '$ref') {
-  $self->openapi_document->__entity_type->($entity_type);
+  $state->{document}->__entity_type->($entity_type);
   my $uri = Mojo::URL->new($ref)->to_abs($state->{initial_schema_uri});
 
   my $schema_info = $self->evaluator->_fetch_from_uri($uri);
@@ -2416,9 +2444,12 @@ sub FREEZE ($self, $serializer) { +{ %$self } }
 sub THAW ($class, $serializer, $data) {
   my $self = bless($data, $class);
 
-  foreach my $attr (qw(openapi_document evaluator)) {
+  $self->{openapi_documents} = [ delete $self->{openapi_document} ]
+    if exists $self->{openapi_document};
+
+  foreach my $attr (qw(evaluator openapi_documents)) {
     croak "serialization missing attribute '$attr': perhaps your serialized data was produced for an older version of $class?"
-      if not exists $self->{$attr} or not blessed $self->{$attr};
+      if not exists $self->{$attr};
   }
 
   my @versions = uniq map $_->oas_version,
@@ -2446,7 +2477,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.0, 
 
 =head1 VERSION
 
-version 0.149
+version 0.150
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.
@@ -2457,7 +2488,7 @@ presumed or inferred from the version being less than 1.0.
     openapi_uri => 'https://prod.example.com',  # adjust for each deployment environment
     openapi_schema => YAML::PP->new(boolean => 'JSON::PP')->load_string(<<'YAML'));
   $self: /api         # canonical_uri will become https://prod.example.com/api
-  openapi: 3.2.0
+  openapi: 3.2.1
   info:
     title: Test API
     version: 1.2.3
@@ -2591,33 +2622,15 @@ Unless otherwise noted, these are also available as read-only accessors.
 Any additional constructor arguments that are not listed here will be passed along to the evaluator
 constructor: see L<JSON::Schema::Modern/CONSTRUCTOR ARGUMENTS>.
 
-=head2 openapi_uri
+=head2 documents
 
-Optional.
+An arrayref of one or more documents (may be L<JSON::Schema::Modern::Document::OpenAPI> or
+L<JSON::Schema::Modern::Document> objects). The first document must always be an
+L<JSON::Schema::Modern::Document::OpenAPI> object and is used as the source of all APIs; the
+remaining documents are only used as C<$ref> targets (e.g. to definitions under C</components/...>
+for OpenAPI documents, or under C</$defs/...> for JSON Schema documents).
 
-The URI that identifies the OpenAPI document; an alias to C<< ->openapi_document->canonical_uri >>.
-See L<JSON::Schema::Modern::Document::OpenAPI/canonical_uri>.
-Ignored if L</openapi_document> is provided.
-
-This URI will be used at runtime to resolve relative URIs used in
-the OpenAPI document, such as for C<jsonSchemaDialect> or C<servers url> values and C<$ref>
-locations, as well as used for locations in L<JSON::Schema::Modern::Result> objects (see below).
-
-The value of C<$self> in the document (if present) is resolved against this value.
-It is strongly recommended that this resulting URI is absolute.
-
-=head2 openapi_schema
-
-The data structure describing the OpenAPI document (as specified at
-L<https://spec.openapis.org/oas/latest>; an alias to C<< ->openapi_document->schema >>.
-See L<JSON::Schema::Modern::Document::OpenAPI/schema>.
-Ignored if L</openapi_document> is provided, otherwise required.
-
-=head2 openapi_document
-
-The L<JSON::Schema::Modern::Document::OpenAPI> document that holds the OpenAPI information to be
-used for validation. If it is not provided to the constructor, then
-L</openapi_schema> B<MUST> be provided, and L</evaluator> will also be used if provided.
+Not available as an accessor; use L</openapi_documents> or L</entry_document> instead.
 
 =head2 evaluator
 
@@ -2626,7 +2639,7 @@ Optional (a default is constructed when omitted).
 
 This must be prepared in advance if custom metaschemas are to be used, as the evaluator is what
 holds the information about all available schemas (which are used by keywords such as
-C<jsonSchemaDialect> and C<$ref>.
+C<jsonSchemaDialect> and C<$ref>. See L<JSON::Schema::Modern/add_schema>).
 
 =head2 debug
 
@@ -2641,17 +2654,56 @@ When set, missing values from parameter and body schemas that have a correspondi
 keyword will be returned in the L<JSON::Schema::Modern::Result> object under the C<defaults>
 property, and are also populated into C<data>. See example in L</validate_request>.
 
+=head2 openapi_uri
+
+Optional.
+
+The URI that identifies the OpenAPI document; as an accessor, is an alias to
+C<< ->entry_document->canonical_uri >>.
+Defaults to C<''>.
+Ignored if L</documents> is provided.
+
+This URI will be used at runtime to resolve relative URIs used in
+the OpenAPI document, such as for C<jsonSchemaDialect> or C<servers url> values and C<$ref>
+locations, as well as used for locations in L<JSON::Schema::Modern::Result> objects (see below).
+
+The value of C<$self> in the document (if present) is resolved against this value.
+It is strongly recommended that this resulting URI is absolute.
+
+The use of this as an accessor is B<deprecated>; instead use
+L<JSON::Schema::Modern::Document::OpenAPI/canonical_uri>
+or L<JSON::Schema::Modern::Document::OpenAPI/retrieval_uri>
+on the relevant document object (see L</entry_document> and L</documents>).
+
+=head2 openapi_schema
+
+The data structure describing the OpenAPI document (as specified at
+L<https://spec.openapis.org/oas/latest>; as an accessor, is an alias to
+C<< ->entry_document->schema >>.
+Ignored if L</documents> is provided, otherwise required.
+
+The use of this as an accessor is B<deprecated>; instead use C<< $openapi->entry_document->schema >>
+(See L<JSON::Schema::Modern::Document::OpenAPI/schema>.)
+
+=head2 openapi_document
+
+The L<JSON::Schema::Modern::Document::OpenAPI> document that holds the OpenAPI information to be
+used for validation. If it is not provided to the constructor, then
+L</openapi_schema> B<MUST> be provided, and L</evaluator> will also be used if provided.
+
+B<Deprecated>: instead use L</documents> as a constructor argument, and L</openapi_documents> or
+L</entry_document> as an accessor.
+
 =head1 METHODS
 
-=head2 document_get
+=head2 openapi_documents
 
-  my $parameter_data = $openapi->document_get('/paths/~1foo~1{foo_id}~1bar~1%7Bbar_id%7D/post/parameters/0');
+The list of OpenAPI documents that was provided to the constructor in L</documents>.
 
-Fetches the portion of the main OpenAPI document located at the provided JSON pointer.
-Proxies to L<JSON::Schema::Modern::Document::OpenAPI/get>.
-This is not recursive (does not follow C<$ref> chains) -- for that, use
-C<< $openapi->recursive_get(Mojo::URL->new->fragment($json_pointer)) >>, see
-L</recursive_get>.
+=head2 entry_document
+
+The OpenAPI document used to search for APIs (under C</paths>); this is the first item in the
+L</openapi_documents> list.
 
 =head2 validate_request
 
@@ -2852,9 +2904,9 @@ C<uri_captures>: a hashref mapping placeholders in the entire uri template (serv
 
 =item *
 
-C<operation_uri>: a URI indicating the document location of the operation object for the request, after following any references (usually something under C</paths/>, but may be in another document). Use C<< $openapi->evaluator->get($uri) >> to fetch this content (see L<JSON::Schema::Modern/get>). Note that this is the same as:
+C<operation_uri>: a URI indicating the document location of the operation object for the request, after following any references (usually something under C</paths/>, but may be in another document). Use C<< $openapi->evaluator->get($uri) >> to fetch this content (see L<JSON::Schema::Modern/get>). Note that (as long as the operation is in the entry document) this is the same as:
 
-    $openapi->document_get(Mojo::URL->new($openapi->openapi_uri)->fragment($path_to_operation);
+    $openapi->entry_document->get(Mojo::URL->new($openapi->entry_document->canonical_uri)->fragment($path_to_operation));
 
 (See the L<documentation for an operation|https://learn.openapis.org/specification/paths.html#the-endpoints-list>
 or in
@@ -2875,7 +2927,7 @@ C<uri_patterns>: an arrayref of patterns that were attempted to be matched again
 =back
 
 You can find the associated operation object in the OpenAPI document by using either C<operation_uri>,
-or by calling C<< $openapi->openapi_document->operationId_path($operation_id) >>
+or C<< $openapi->entry_document->operationId_path($operation_id) >>
 (see L<JSON::Schema::Modern::Document::OpenAPI/operationId_path>) (note that the latter will
 be changed in a subsequent release, in order to support operations existing in other documents).
 
@@ -2899,13 +2951,17 @@ prepending C<#> and url-encoding it, e.g. C<< Mojo::URL->new->fragment($jsonp) >
   my $operation_schema = $openapi->recursive_get(Mojo::URL->new('https://example.com/api.json')
     ->fragment(jsonp(qw(/paths /foo/{foo_id} get requestBody content application/json schema)));
 
-=head2 canonical_uri
+=head2 document_get
 
-An accessor that delegates to L<JSON::Schema::Modern::Document/canonical_uri>.
+  my $parameter_data = $openapi->document_get('/paths/~1foo~1{foo_id}~1bar~1%7Bbar_id%7D/post/parameters/0');
 
-=head2 schema
+Fetches the portion of the main OpenAPI document located at the provided JSON pointer.
+Proxies to L<JSON::Schema::Modern::Document::OpenAPI/get>.
+This is not recursive (does not follow C<$ref> chains) -- for that, use
+C<< $openapi->recursive_get(Mojo::URL->new->fragment($json_pointer)) >>, see
+L</recursive_get>.
 
-An accessor that delegates to L<JSON::Schema::Modern::Document/schema>.
+B<Deprecated>: use C<< $openapi->entry_document->get(...) >> or C<< $document->get(...) >> instead.
 
 =head1 CACHING
 

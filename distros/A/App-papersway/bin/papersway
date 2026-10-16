@@ -1,4 +1,5 @@
 #!/usr/bin/perl
+package main;			# for Dist::Zilla::Plugin::PkgVersion
 # PODNAME: papersway
 # ABSTRACT: PaperWM-like scrollable tiling window management for Sway/i3wm
 #
@@ -16,7 +17,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
+$main::VERSION = '3.003';
 
 use 5.032;
 use warnings;
@@ -42,16 +43,21 @@ if (AnyEvent::detect eq "AnyEvent::Impl::EV") {
     $EV::DIED = sub { print STDERR $@; exit 255 };
 }
 
-my ($pipe, $i3status, $debug, $with_ws_cmd, $user_cols, $cols_min_width);
+my ($i3status, $debug, $version, $with_ws_cmd, $user_cols, $cols_min_width);
 
 GetOptions
   'debug!'	     => \$debug,
+  'version'	     => \$version,
   'i3status!'	     => \$i3status,
   'with-ws-cmd!'     => \$with_ws_cmd,
   'cols=i'	     => \$user_cols,
   'cols-min-width=i' => \$cols_min_width,
   or die "failed to parse command line options";
 
+if ($version) {
+    printf "papersway version %s\n", $main::VERSION // "UNRELEASED";
+    exit;
+}
 $user_cols && $cols_min_width
   and die "papersway: --cols incompatible with --cols-min-width\n";
 unless ($cols_min_width) {
@@ -68,6 +74,8 @@ sub debugdump {
     return unless $debug;
     print STDERR Data::Dumper->Dump(@_) =~ s/^/papersway: /mgr;
 }
+
+my $pipe;
 
 if ($i3status) {
     $pipe = IO::Pipe->new;
@@ -97,8 +105,9 @@ my $cmds = App::papersway::cmds->new;
 sub for_each_node (&) {
     $cmds->flush;
     my @trees = $wmipc->get_tree->recv;
-    while (@trees) {
-	foreach my $node (@{(shift @trees)->{nodes} // die}) {
+    while (my $tree = shift @trees) {
+	foreach my $node (@{$tree->{nodes} // die},
+			  @{$tree->{floating_nodes} // die}) {
 	    $_[0]->($node // die);
 	    unshift @trees, $node;
 	}
@@ -170,8 +179,13 @@ $wmipc->subscribe({
 
 	# Other container changes we need to handle outside of any callback.
 	elsif ($e->{change} && $e->{change} eq "close") {
-	    clear_caffeinated()
-	      if $caffe_id && $caffe_id == ($e->{container}{id} // die);
+	    my $id = $e->{container}{id} // die;
+	    clear_caffeinated() if $caffe_id && $caffe_id == $id;
+	    delete $col_rows{$id}; delete $col_w{$id}; delete $col_wide{$id};
+	    foreach my $ws (values %paper_ws) {
+		$ws->{off_left}  = [ grep $_ != $id, $ws->{off_left}->@*  ];
+		$ws->{off_right} = [ grep $_ != $id, $ws->{off_right}->@* ];
+	    }
 	    queue_normalise if exists $paper_ws{$focused_ws};
 	} elsif ($e->{change} && exists $paper_ws{$focused_ws}
 		 && ($e->{change} eq "new" || !$ignore_events
@@ -356,7 +370,12 @@ for (;;) {
 	# Pull on a single container in order to resurrect the workspace.
 	# Leave it to normalise_ws_cols() when we next switch to that
 	# workspace to pull in any others.
-	update_hidden($ws);
+	my %still_hidden = map +($_, 1),
+	  grep defined, map $_->{name} =~ /\A\*(\d+)\*\z/,
+	  grep $_->{name} // die, @{$wmipc->get_workspaces->recv // die};
+	debugdump [\%still_hidden], ["*still_hidden"];
+	$ws->{off_left}  = [ grep $still_hidden{$_}, $ws->{off_left}->@*  ];
+	$ws->{off_right} = [ grep $still_hidden{$_}, $ws->{off_right}->@* ];
 	my $pulled = $ws->{off_left}->@*
 	  ? pop $ws->{off_left}->@* : pop $ws->{off_right}->@*
 	  or next;
@@ -509,21 +528,43 @@ sub normalise_ws_cols {
     # wide, in order that closing or moving behaves the same as untoggling it
     # wide and then closing or moving it.
     my $want_l = shift // ($old_wide ? $col_wide{$ws->{focused_col}} : undef);
+
+    # We need to garbage collect containers that have closed to avoid leaking
+    # memory, but also because i3 tends to reuse container IDs -- per the
+    # docs, i3's node IDs are just memory addresses, and so they are reused
+    # whenever malloc(3) allocates the same memory for a new container's data.
+    # This leads to bugs such as a new container already being toggled wide
+    # because it has the same ID as a closed container that was wide.
+    # The deletions in the handler for close events are not sufficient on
+    # their own, not only because relying on them would imply a race, but also
+    # because when the final row of a column with multiple rows closes we get
+    # a close event for the row but none for the outer container.
+    my %live_con_ids;
     for_each_node {
 	my $node = shift;
-	if (($node->{type} // die) eq "output") {
+	my $id = $node->{id} // die;
+	my $type = $node->{type} // die;
+	if ($type eq "output") {
 	    sync_output($node);
-	} elsif (($node->{id} // die) == $focused_ws) {
+	} elsif ($id == $focused_ws) {
 	    sync_cols($node => $ws);
 	    $ws->{output} = $node->{output} // die;
 	    my $first_focus = ($node->{focus} // die)->[0];
 	    $floating_focus = $first_focus && none { $_ == $first_focus }
 	      $ws->{cols}->@*;
-	    goto DONE;
+	} elsif ($type eq "con" || $type eq "floating_con") {
+	    $live_con_ids{$id}++;
 	}
     };
-  DONE:
-    update_hidden($ws);
+    clear_caffeinated() if $caffe_id && !$live_con_ids{$caffe_id};
+    delete @col_rows{grep !$live_con_ids{$_}, keys %col_rows};
+    delete @col_w{   grep !$live_con_ids{$_}, keys %col_w   };
+    delete @col_wide{grep !$live_con_ids{$_}, keys %col_wide};
+    foreach my $ws (values %paper_ws) {
+	$ws->{off_left}  = [ grep $live_con_ids{$_}, $ws->{off_left}->@*  ];
+	$ws->{off_right} = [ grep $live_con_ids{$_}, $ws->{off_right}->@* ];
+    }
+
     my $cols = $ws->{cols};
     my $empty = !@$cols;
     my $i = focused_col_idx($ws);
@@ -691,7 +732,7 @@ sub normalise_ws_cols {
 {
     # Simple class to batch up commands before sending them.
     package App::papersway::cmds;
-$App::papersway::cmds::VERSION = '3.002';
+$App::papersway::cmds::VERSION = '3.003';
 sub new {
 	bless { cmds => [], need_ignore => 0, need_signal => 0 } => shift
     };
@@ -1313,7 +1354,7 @@ sub show_con {
 {
     # Class representing entries in %paper_ws.
     package App::papersway::paper_ws;
-$App::papersway::paper_ws::VERSION = '3.002';
+$App::papersway::paper_ws::VERSION = '3.003';
     # We can't always populate this value when a workspace is initialised
     # because we might not know the output's width yet.  This happens when
     # initialising a new workspace on a newly enabled output.
@@ -1329,16 +1370,6 @@ sub init_ws {
 			       cols => [], off_left => [], off_right => [],
 			       last_dir => 1, @_ }
 	) => "App::papersway::paper_ws"
-}
-
-sub update_hidden {
-    my $ws = shift;
-    my %still_hidden = map +($_, 1),
-      grep defined, map $_->{name} =~ /\A\*(\d+)\*\z/,
-      grep $_->{name} // die, @{$wmipc->get_workspaces->recv // die};
-    debugdump [\%still_hidden], ["*still_hidden"];
-    $ws->{off_left}  = [ grep $still_hidden{$_}, $ws->{off_left}->@*  ];
-    $ws->{off_right} = [ grep $still_hidden{$_}, $ws->{off_right}->@* ];
 }
 
 sub ws_name {
@@ -1368,11 +1399,12 @@ papersway - PaperWM-like scrollable tiling window management for Sway/i3wm
 
 =head1 VERSION
 
-version 3.002
+version 3.003
 
 =head1 SYNOPSIS
 
 B<papersway> [B<--i3status>] [B<--cols=>I<N>|B<--cols-min-width=>I<N>] [B<--with-ws-cmd>] [B<--debug>]
+B<papersway> B<--version>
 
 =head1 DESCRIPTION
 
@@ -1408,6 +1440,10 @@ information about workspaces in the status output.
 =item B<--debug>
 
 Enable some debug printing and don't hide Sway's workspace buttons.
+
+=item B<--version>
+
+Print version information and exit.
 
 =back
 

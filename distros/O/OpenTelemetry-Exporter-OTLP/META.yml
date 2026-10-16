@@ -13,7 +13,7 @@ configure_requires:
   File::ShareDir::Install: '0.06'
   perl: v5.30.0
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,22 +30,22 @@ no_index:
 provides:
   OpenTelemetry::Exporter::OTLP:
     file: lib/OpenTelemetry/Exporter/OTLP.pm
-    version: '0.021'
+    version: '0.022'
   OpenTelemetry::Exporter::OTLP::Encoder::JSON:
     file: lib/OpenTelemetry/Exporter/OTLP/Encoder/JSON.pm
-    version: '0.021'
+    version: '0.022'
   OpenTelemetry::Exporter::OTLP::Encoder::Protobuf:
     file: lib/OpenTelemetry/Exporter/OTLP/Encoder/Protobuf.pm
-    version: '0.021'
+    version: '0.022'
   OpenTelemetry::Exporter::OTLP::Logs:
     file: lib/OpenTelemetry/Exporter/OTLP/Logs.pm
-    version: '0.021'
+    version: '0.022'
   OpenTelemetry::Exporter::OTLP::Traces:
     file: lib/OpenTelemetry/Exporter/OTLP/Traces.pm
-    version: '0.021'
+    version: '0.022'
   OpenTelemetry::Proto:
     file: lib/OpenTelemetry/Proto.pm
-    version: '0.021'
+    version: '0.022'
 recommends:
   Compress::Zlib: '0'
   Google::ProtocolBuffers::Dynamic: '0'
@@ -66,10 +66,12 @@ requires:
   perl: v5.30.0
 resources:
   bugtracker: https://github.com/jjatria/perl-opentelemetry-exporter-otlp/issues
-  repository: git://github.com/jjatria/perl-opentelemetry-exporter-otlp
-version: '0.021'
+  repository: git://github.com/jjatria/perl-opentelemetry-exporter-otlp.git
+version: '0.022'
 x_contributors:
   - 'Ask Bjørn Hansen <ask@develooper.com>'
-x_generated_by_perl: v5.40.0
-x_serialization_backend: 'YAML::Tiny version 1.74'
+  - 'José Joaquín Atria <jjatria@gmail.com>'
+  - 'lnation <lnation@lnations-MacBook-Pro-2.local>'
+x_generated_by_perl: v5.42.2
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

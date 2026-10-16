@@ -17,7 +17,8 @@
 #define PTKX_EMITTER_CLASS  "Text::KDL::XS::Emitter"
 #define PTKX_VALUE_CLASS    "Text::KDL::XS::Value"
 
-/* Room for any number this module formats: "%.17g" of a double plus ".0". */
+/* Room for any number this module formats: 36 significant digits of a quad
+ * with sign, point and a four-digit exponent, plus ".0". */
 #define PTKX_NUMBER_BUFSIZE 64
 
 #define PTKX_MAX_INDENT     64
@@ -201,25 +202,53 @@ ptkx_copy_text(char* buf, const char* text)
     return len;
 }
 
-/* Writes d as a KDL number into buf (PTKX_NUMBER_BUFSIZE bytes): the
- * shortest of %.15g, %.16g and %.17g that strtod() reads back as d, with
- * ".0" appended when the text would otherwise read back as an integer;
- * #inf, #-inf or #nan when d is not finite. Returns the length. */
+/* Text to NV at the NV's own width, inside PTKX_NUMERIC_STANDARD(). Perl's
+ * Strtod() makes the same choice but switches LC_NUMERIC on its own. */
+#if defined(USE_QUADMATH)
+#  define PTKX_STRTONV(text) strtoflt128(text, NULL)
+#elif defined(USE_LONG_DOUBLE) && defined(__MINGW64_VERSION_MAJOR)
+#  define PTKX_STRTONV(text) __mingw_strtold(text, NULL)
+#elif defined(USE_LONG_DOUBLE)
+#  define PTKX_STRTONV(text) strtold(text, NULL)
+#else
+#  define PTKX_STRTONV(text) strtod(text, NULL)
+#endif
+
+/* Significant digits that always read back as the same NV: 17 for a
+ * double, 21 for an x87 long double, 36 for a quad. */
+#define PTKX_NV_ROUND_TRIP_DIGITS (NV_DIG + 3)
+
+/* Writes nv into buf with precision significant digits, "%.<precision>g"
+ * at the NV's width. my_snprintf() knows %Lg and, on a quadmath perl, %Qg,
+ * but only with the precision spelled out: it reads one NV argument. */
 static STRLEN
-ptkx_format_double(pTHX_ double d, char* buf)
+ptkx_format_nv_digits(NV nv, int precision, char* buf)
+{
+    char format[16];
+    snprintf(format, sizeof format, "%%.%d" NVgf, precision);
+    return (STRLEN) my_snprintf(buf, PTKX_NUMBER_BUFSIZE, format, nv);
+}
+
+/* Writes nv as a KDL number into buf (PTKX_NUMBER_BUFSIZE bytes): the
+ * shortest rendering of 15 to PTKX_NV_ROUND_TRIP_DIGITS significant digits
+ * that reads back as nv, with ".0" appended when the text would otherwise
+ * read back as an integer; #inf, #-inf or #nan when nv is not finite.
+ * Returns the length. */
+static STRLEN
+ptkx_format_nv(pTHX_ NV nv, char* buf)
 {
     STRLEN len = 0;
     int precision;
     PTKX_DECLARE_NUMERIC_STATE;
     PERL_UNUSED_CONTEXT;
 
-    if (Perl_isnan(d)) return ptkx_copy_text(buf, "#nan");
-    if (Perl_isinf(d)) return ptkx_copy_text(buf, d < 0 ? "#-inf" : "#inf");
+    if (Perl_isnan(nv)) return ptkx_copy_text(buf, "#nan");
+    if (Perl_isinf(nv)) return ptkx_copy_text(buf, nv < 0 ? "#-inf" : "#inf");
 
     PTKX_NUMERIC_STANDARD();
-    for (precision = 15; precision <= 17; ++precision) {
-        len = (STRLEN) my_snprintf(buf, PTKX_NUMBER_BUFSIZE, "%.*g", precision, d);
-        if (strtod(buf, NULL) == d) break;
+    for (precision = 15; precision <= PTKX_NV_ROUND_TRIP_DIGITS; ++precision) {
+        len = ptkx_format_nv_digits(nv, precision, buf);
+        if (PTKX_STRTONV(buf) == nv) break;
     }
     PTKX_NUMERIC_RESTORE();
 
@@ -229,23 +258,23 @@ ptkx_format_double(pTHX_ double d, char* buf)
 
 /* ckdl reports a floating point number only for literals with at most 15
  * significant digits, but computes it as mantissa / pow(10, k), which can be
- * an ulp off. Reading the 15-digit rendering back with strtod() restores the
- * correctly rounded value of the literal. */
-static double
-ptkx_correctly_rounded(pTHX_ double d)
+ * an ulp off. The 15-digit rendering of that double is the literal again;
+ * reading it at the NV's width gives the NV nearest the literal. */
+static NV
+ptkx_nv_of_literal(pTHX_ double d)
 {
     char buf[PTKX_NUMBER_BUFSIZE];
-    double rounded;
+    NV nearest;
     PTKX_DECLARE_NUMERIC_STATE;
     PERL_UNUSED_CONTEXT;
 
-    if (Perl_isnan(d) || Perl_isinf(d)) return d;
+    if (Perl_isnan(d) || Perl_isinf(d)) return (NV) d;
 
     PTKX_NUMERIC_STANDARD();
-    my_snprintf(buf, sizeof buf, "%.15g", d);
-    rounded = strtod(buf, NULL);
+    snprintf(buf, sizeof buf, "%.15g", d);
+    nearest = PTKX_STRTONV(buf);
     PTKX_NUMERIC_RESTORE();
-    return rounded;
+    return nearest;
 }
 
 static bool
@@ -732,7 +761,7 @@ ptkx_number_sv(pTHX_ const kdl_number* number, const char** kind)
         return newSViv((IV) number->integer);
     case KDL_NUMBER_TYPE_FLOATING_POINT:
         *kind = "float";
-        return newSVnv(ptkx_correctly_rounded(aTHX_ number->floating_point));
+        return newSVnv(ptkx_nv_of_literal(aTHX_ number->floating_point));
     case KDL_NUMBER_TYPE_STRING_ENCODED:
         break;
     }
@@ -963,7 +992,7 @@ ptkx_number_from_payload(pTHX_ const ptkx_emitter* e, SV* kind, SV* content,
         if (e->version == KDL_VERSION_1 && (Perl_isnan(nv) || Perl_isinf(nv)))
             croak(PTKX_V1_NON_FINITE);
         number->string.data = text_buf;
-        number->string.len  = ptkx_format_double(aTHX_ (double) nv, text_buf);
+        number->string.len  = ptkx_format_nv(aTHX_ nv, text_buf);
         return;
     }
 
@@ -1123,7 +1152,7 @@ _float_text(number)
         char text[PTKX_NUMBER_BUFSIZE];
         STRLEN len;
     CODE:
-        len    = ptkx_format_double(aTHX_ (double) number, text);
+        len    = ptkx_format_nv(aTHX_ number, text);
         RETVAL = newSVpvn(text, len);
     OUTPUT:
         RETVAL

@@ -5,7 +5,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Object::Pad 0.825;
 
@@ -1741,7 +1741,7 @@ shows in the preview at once, and every change can be undone.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-theme-editor.svg" alt="The theme editor with four themes in tabs: the menu bar, the tab strip with ocean.kdl active, the preview on the left with the palette swatches, text with links and a box in the ocean theme, and the form on the right listing the theme's name and base and the palette tokens with their swatches, values and where they come from, the cursor on accent"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-theme-editor.svg" alt="The theme editor with four themes in tabs: the menu bar, the tab strip with ocean.kdl active, the preview on the left with the palette swatches, text with links and a box in the ocean theme, and the form on the right listing the theme's name and base and the palette tokens with their swatches, values and where they come from, the cursor on accent"></p>
 
 =end html
 
@@ -1912,7 +1912,7 @@ while it has the keyboard focus.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-theme-editor-dialog.svg" alt="The dialog of button.border.color at the right edge: a color picker with the palette's tokens in a list, danger chosen, a field, an RGB and HSL switch and red, green, blue and alpha sliders for a color of its own; on the left, the preview shows the Cancel button of the bordered row with a red border"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-theme-editor-dialog.svg" alt="The dialog of button.border.color at the right edge: a color picker with the palette's tokens in a list, danger chosen, a field, an RGB and HSL switch and red, green, blue and alpha sliders for a color of its own; on the left, the preview shows the Cancel button of the bordered row with a red border"></p>
 
 =end html
 
@@ -1975,7 +1975,7 @@ it again.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-theme-editor-text.svg" alt="The theme editor in text mode: the end of ocean.kdl with a new line button { text "acent" }, the message Line 51: button.text must be a color, got 'acent' (unrecognized color string 'acent') under the text, an exclamation mark on the tab, and the preview marked stale"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-theme-editor-text.svg" alt="The theme editor in text mode: the end of ocean.kdl with a new line button { text "acent" }, the message Line 51: button.text must be a color, got 'acent' (unrecognized color string 'acent') under the text, an exclamation mark on the tab, and the preview marked stale"></p>
 
 =end html
 
@@ -2253,7 +2253,7 @@ form, with the editor drawn in the light theme:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-theme-editor-preview.svg" alt="The theme editor drawn in the light theme, its preview showing a sign-in form in the dark theme being edited: an e-mail field with an invalid address in red, a password field, a check box and Sign in and Cancel buttons; the form on the right lists the palette"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-theme-editor-preview.svg" alt="The theme editor drawn in the light theme, its preview showing a sign-in form in the dark theme being edited: an e-mail field with an invalid address in red, a password field, a check box and Sign in and Cancel buttons; the form on the right lists the palette"></p>
 
 =end html
 

@@ -1,5 +1,17 @@
 Revision history for HTML-Genealogy-Map
 
+0.05	Thu Oct 15 11:43:35 AM EDT 2026
+	Allow to online_render to be called by -> or ::
+	Read a geocoder result through the coordinates it actually has
+	- {lat}/{long}/{lng}, or latitude()/longitude() for an object such as Geo::Location::Point. A 'lon' key was used to decide whether a lookup had
+	  succeeded, but Geo::Coder::Free never sets it (only one of its MaxMind shortcuts does), so every place looked like a failed lookup and the map
+	  came out empty
+	Use the result's 'database' - the backend that answered - to tell a local lookup from a remote one
+	- The courtesy second before the next lookup was keyed on 'geocoder', which a Geo::Coder::Free result does not carry, so a local lookup paid it
+	  per place; 'geocoder' is now a secondary hint only
+	Test the reader/producer contract in t/40-provenance.t
+	Latest fuzz.t
+
 0.04	Tue Oct 14 19:59:34 EDT 2025
 	Sanity check on the gedcom
 	Added fuzz testing in GitHub Actions

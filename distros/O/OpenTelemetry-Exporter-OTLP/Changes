@@ -1,5 +1,13 @@
 Revision history for OpenTelemetry-Exporter-OTLP
 
+0.022     2026-10-15 21:02:56 BST
+
+    * The code no longer warns when attempting to encode an undefined
+      value as an AnyValue. They are silently encoded as empty AnyValues.
+      Attempting to encode a reference will continue to raise a warning,
+      but those values will now also be encoded as empty AnyValues
+      instead of being dropped.
+
 0.021     2025-05-08 08:49:59 BST
 
     * Switch to the internal logger added to OpenTelemetry v0.030.

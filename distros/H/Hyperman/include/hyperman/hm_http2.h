@@ -1027,7 +1027,13 @@ static int hm_h2_start_upgrade(pTHX_ hm_conn *c, const char *settings,
     /* dispatching: a request that completes while this handler waits is
      * left for hm_h2_input, as it is for every other handler */
     s->dispatching = 1;
-    hm_h2_dispatch(aTHX_ s, st);    /* env already carries psgi.input */
+    {
+        hm_loop *loop = c->loop;
+        int fd = c->fd;
+        int lent = hm_read_lend(loop, c);
+        hm_h2_dispatch(aTHX_ s, st);    /* env already carries psgi.input */
+        if (lent && loop->conns[fd] == c) hm_read_unlend(loop, c);
+    }
     if (c->h2 == (void *)s) s->dispatching = 0;
     return 0;
 }
@@ -1068,6 +1074,7 @@ static int hm_h2_run_ready(pTHX_ hm_h2_sess *s) {
     hm_conn *c = s->conn;
     hm_loop *loop = c->loop;
     int fd = c->fd;
+    int lent = 0;
     if (s->dispatching) return 0;
     for (;;) {
         hm_h2_stream *st, *pick = NULL;
@@ -1075,8 +1082,12 @@ static int hm_h2_run_ready(pTHX_ hm_h2_sess *s) {
         for (st = s->streams; st; st = st->next)
             if (st->ready && st->env && (!pick || st->id < pick->id))
                 pick = st;
-        if (!pick) return 0;
+        if (!pick) {
+            if (lent) hm_read_unlend(loop, c);
+            return 0;
+        }
         pick->ready = 0;
+        if (!lent) lent = hm_read_lend(loop, c);
         /* in_app: a close asked for while the handler runs is deferred to
          * here, because this frame still holds c and s (see hm_close) */
         was = c->in_app;

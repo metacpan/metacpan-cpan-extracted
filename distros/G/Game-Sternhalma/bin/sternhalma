@@ -1,0 +1,115 @@
+#!perl
+
+use 5.014;
+use strict;
+use warnings;
+
+use Game::Sternhalma::Terminal;
+
+our $VERSION = '0.01';
+
+exit Game::Sternhalma::Terminal->run(@ARGV);
+
+__END__
+
+=head1 NAME
+
+sternhalma - the race across a six-pointed star, in a terminal
+
+=head1 SYNOPSIS
+
+    sternhalma
+    sternhalma --seats 3 --level 4
+    sternhalma --seats 4 --people 2
+    sternhalma --seats 6 --bots all
+    sternhalma --load saved.txt
+    sternhalma --seats 3 --bots 1,2 --pipe < moves.txt
+
+=head1 DESCRIPTION
+
+Plays sternhalma, which most English speakers call Chinese checkers, for two,
+three, four or six seats, each played by a person at the keyboard or by the
+program. See L<Game::Sternhalma::Terminal> for how it is played and
+L<Game::Sternhalma> for the rules.
+
+Given none of the options that set up a game, and a terminal whose keys it
+can read, it begins by asking for them.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--seats> I<n>
+
+2 (the default), 3, 4 or 6.
+
+=item B<--pieces> I<n>
+
+10 (the default), or 15 for two or three seats.
+
+=item B<--people> I<n>
+
+How many play at the keyboard, as the seats from 0 up; 1 by default. The
+program plays the rest.
+
+=item B<--bots> I<list>
+
+The seats the program plays, instead of B<--people>: seat numbers joined by
+commas, as C<1,2>, or C<none>, or C<all> to watch the program play itself.
+
+=item B<--level> I<n>
+
+1 to 4. 3 by default. Level 1 moves any piece forward at random; each level
+above it looks further.
+
+=item B<--seed> I<n>
+
+Which of its equally good moves the program makes.
+
+=item B<--load> I<file>
+
+Carry on with a game written by the C<save> command.
+
+=item B<--pipe>
+
+For a program at the other end: a move a line in, and a line out for each,
+C<ok> or the reason it was refused, with the position. See
+L<Game::Sternhalma::Terminal/pipe>.
+
+=item B<--no-colour>
+
+Draw the board in letters and dots. C<--no-color> is the same, and so is
+setting C<NO_COLOR> in the environment.
+
+=item B<--no-pick>
+
+Type moves instead of choosing them with the arrow keys.
+
+=item B<--no-unicode>
+
+Full stops for the holes, keeping the colour.
+
+=item B<--version>, B<--help>
+
+Say so and stop.
+
+=back
+
+=head1 EXIT STATUS
+
+0 when the game was left in the ordinary way, 2 when the options were wrong or
+a file could not be loaded.
+
+=head1 AUTHOR
+
+LNATION <email@lnation.org>
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION <email@lnation.org>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

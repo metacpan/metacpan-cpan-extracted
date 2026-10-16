@@ -1,13 +1,14 @@
 package Archive::BagIt::Role::OpenSSL;
 use strict;
 use warnings;
-use Archive::BagIt::Role::OpenSSL::Async;
+#use Archive::BagIt::Role::OpenSSL::Async;
+use Archive::BagIt::Role::OpenSSL::Sync;
 use Class::Load qw(load_class);
 use Carp qw(carp);
 use Moo::Role;
 use namespace::autoclean;
 # ABSTRACT: A role that handles plugin loading
-our $VERSION = '0.101'; # VERSION
+our $VERSION = '0.102'; # VERSION
 
 
 has 'async_support' => (
@@ -35,7 +36,7 @@ sub _get_hash_string_async {
 sub get_hash_string {
     my ($self, $fh) = @_;
     my $blksize = $self->get_optimal_bufsize($fh);
-    return $self->_get_hash_string_async($fh, $blksize);
+    return $self->_get_hash_string_sync($fh, $blksize);
 }
 
 no Moo;
@@ -53,7 +54,7 @@ Archive::BagIt::Role::OpenSSL - A role that handles plugin loading
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head2 has_async_support()
 
@@ -81,7 +82,7 @@ Andreas Romeyke <cpan@andreas.romeyke.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Rob Schmidt <rjeschmi@gmail.com>, William Wueppelmann and Andreas Romeyke.
+This software is copyright (c) 2026 by Rob Schmidt <rjeschmi@gmail.com>, William Wueppelmann and Andreas Romeyke.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

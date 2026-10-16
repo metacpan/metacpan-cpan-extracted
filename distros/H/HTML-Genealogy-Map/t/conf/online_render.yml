@@ -20,6 +20,25 @@ input:
     min: 39
     max: 39
     matches: "^AIza[0-9A-Za-z_-]{35}$"
+  height:
+    optional: true
+    type: string
+  width:
+    optional: true
+    type: string
+
+# TODO: Needs support from Params::Validate::Strict
+# output:
+#   type: array
+#   min: 2
+#   max: 2
+#   schema:
+#     type: string
+#     min: 10
 
 config:
+  dedup: 1
+  test_empty: 1
+  test_non_ascii: 0
+  test_nuls: 0
   test_undef: 0

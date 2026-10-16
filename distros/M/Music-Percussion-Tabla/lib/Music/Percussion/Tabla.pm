@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Play the tablas!
 
-our $VERSION = '0.0709';
+our $VERSION = '0.0803';
 
 use Moo;
 use File::ShareDir qw(dist_dir);
@@ -33,18 +33,24 @@ has patches => (
     default => sub {
         {
             # single strikes
-            ge   => [qw(65 66 76)],
-            ke   => [qw(64 77 79)],
-            na   => [qw(78 81)],
-            ta   => [qw(71 75 85)],
-            ti   => [qw(61 68 70 72 82 86)],
-            tin  => [qw(60 63 83 87)],
-            tun  => [qw(88)],
+            de   => [qw(62)],
+            din  => [qw(63)],
+            ge   => [qw(61 65 66 67 69 73 76 80)],
+            ke   => [qw(64 68 70 74)],
+            na   => [qw(71 75 78)],
+            ne   => [qw(72)],
+            re   => [qw(77)],
+            te   => [qw(82 84)],
+            ti   => [qw(86)],
+            thap => [qw(85)],
+            tin  => [qw(79 87)],
+            tu   => [qw(60)],
+            sur  => [qw(81 83)],
             # double strikes
-            dha  => [qw(ge ta)],
+            dha  => [qw(ge te)],
             dhin => [qw(ge tin)],
             dhit => [qw(ge ti)],
-            dhun => [qw(ge tun)],
+            dhun => [qw(ge tu)],
         }
     },
 );
@@ -57,33 +63,19 @@ sub BUILD {
 
 
 sub strike {
-    my ($self, $bol, $dura, $return) = @_;
+    my ($self, $bol, $dura) = @_;
     $dura ||= $self->quarter;
-    my @strikes;
-    my $bols = $self->patches->{$bol};
-    if (ref $bol eq 'ARRAY') {
-        my $patches = $self->patches->{ $bol->[0] };
-        if (any { /[a-z]/ } @$patches) {
-            push @strikes, _double($self, $patches, $dura);
-        }
-        else {
-            push @strikes, _single($self, $patches, $dura);
-        }
-        $patches = $self->patches->{ $bol->[1] };
-        if (any { /[a-z]/ } @$patches) {
-            push @strikes, _double($self, $patches, $dura);
-        }
-        else {
-            push @strikes, _single($self, $patches, $dura);
-        }
-    }
-    elsif (any { /[a-z]/ } @$bols) {
-        push @strikes, _double($self, $bols, $dura);
-    }
-    else {
-        push @strikes, _single($self, $bols, $dura);
-    }
-    return \@strikes;
+    my @patches = map { _pick($self, $_) } ref $bol eq 'ARRAY' ? @$bol : $bol;
+    $self->note($dura, @patches);
+    return [ [ $dura, @patches ] ];   # same shape as before for single/double bols
+}
+
+sub _pick {
+    my ($self, $name) = @_;
+    my $patches = $self->patches->{$name} // die "Unknown bol '$name'\n";
+    return map { _pick($self, $_) } @$patches   # double bol: both members
+        if any { /[a-z]/ } @$patches;
+    return $patches->[ int rand @$patches ];    # single bol: one patch
 }
 
 sub _double {
@@ -117,8 +109,8 @@ sub teentaal {
     push @strikes, $self->strike('dha', $dura);
     push @strikes, $self->strike('tin', $dura);
     push @strikes, $self->strike('tin', $dura);
-    push @strikes, $self->strike('ta', $dura);
-    push @strikes, $self->strike('ta', $dura);
+    push @strikes, $self->strike('te', $dura);
+    push @strikes, $self->strike('te', $dura);
     push @strikes, $self->strike('dhin', $dura);
     push @strikes, $self->strike('dhin', $dura);
     push @strikes, $self->strike('dha', $dura);
@@ -197,7 +189,7 @@ sub ektaal {
     push @strikes, $self->strike('ti', $dura);
     push @strikes, $self->strike('na', $dura);
     push @strikes, $self->strike('ke', $dura);
-    push @strikes, $self->strike('ta', $dura);
+    push @strikes, $self->strike('te', $dura);
     push @strikes, $self->strike('dha', $dura);
     push @strikes, $self->tirakita($dura4);
     push @strikes, $self->strike('dhin', $dura);
@@ -218,7 +210,7 @@ sub arachartaal {
     push @strikes, $self->strike('ti', $dura);
     push @strikes, $self->strike('na', $dura);
     push @strikes, $self->strike('ke', $dura);
-    push @strikes, $self->strike('ta', $dura);
+    push @strikes, $self->strike('te', $dura);
     push @strikes, $self->tirakita($dura4);
     push @strikes, $self->strike('dhit', $dura);
     push @strikes, $self->strike('na', $dura);
@@ -235,7 +227,7 @@ sub tirakita {
     push @strikes, $self->strike('ti', $dura);
     push @strikes, $self->strike('na', $dura);
     push @strikes, $self->strike('ke', $dura);
-    push @strikes, $self->strike('ta', $dura);
+    push @strikes, $self->strike('te', $dura);
     return \@strikes;
 }
 
@@ -253,17 +245,19 @@ Music::Percussion::Tabla - Play the tablas!
 
 =head1 VERSION
 
-version 0.0709
+version 0.0803
 
 =head1 SYNOPSIS
 
   use Music::Percussion::Tabla ();
 
-  my $t = Music::Percussion::Tabla->new;
+  my $t = Music::Percussion::Tabla->new(file => 'tablas.mid');
+
+  print 'Soundfont: ', $t->soundfont, "\n"; # sf2 file location
 
   for (1 .. $t->bars) {
-    $t->strike('ta', $t->eighth); # write to the score
-    $t->strike('ta', $t->eighth);
+    $t->strike('te', $t->eighth); # write to the score
+    $t->strike('te', $t->eighth);
     $t->strike('dha');
     $t->strike('ge');
     $t->rest($t->quarter);
@@ -293,53 +287,51 @@ version 0.0709
   $t->ektaal;
   $t->arachartaal;
 
-  $t->write; # save the score as a MIDI file
+  $t->write; # save the score as tablas.mid
 
 =head1 DESCRIPTION
 
 C<Music::Percussion::Tabla> provides named associations between tabla
 drum sounds and the included soundfont file (which is B<4.1MB>).
 
-To use the soundfont file, with say fluidsynth, add it to the startup
-command, like this (on the mac):
+To play F<tablas.mid> with fluidsynth and the soundfont file (as
+printed above), do this:
 
-  fluidsynth -a coreaudio -m coremidi -g 2.0 ~/Music/soundfont/Tabla.sf2
+  fluidsynth -i <the tabla sf2 file> tablas.mid
 
-Here are my "non-tabla player" descriptions of the sounds. And the
-proper "syllable" names for the items with a C<*> are unknown to me,
-as of yet...
+Here are the names and descriptions of the sounds:
 
-     # MIDI Description
+     # Number Name Description
     ...
-     1  60  ringing mid
-     2  61  muted low
-  *  3  62  slap
-     4  63  ringing mid slap
-     5  64  low knock
-     6  65  muted ringing low
-     7  66  lower
-  *  8  67  low-up
-     9  68  muted slap
-  * 10  69  ringing low
-    11  70  flam slap
-    12  71  loud tap
-    13  72  lowest mute
-  * 14  73  ringing low
-  * 15  74  muted low
-    16  75  loud tap double
-    17  76  high-low
-    18  77  high slap
-  * 19  78  tap
-    20  79  high knock
-  * 21  80  short low-up
-    22  81  mid tap
-    23  82  muted tap
-    24  83  mid
-  * 25  84  muted
-    26  85  loud mid double
-    27  86  slightly more muted
-    28  87  low mid
-    29  88  ringing mid
+     1  60  tu   "ringing mid"
+     2  61  ge   "muted low"
+     3  62  de   "slap"
+     4  63  din  "ringing mid slap"
+     5  64  ke   "low knock"
+     6  65  ge   "muted ringing low"
+     7  66  ge   "lower"
+     8  67  ge   "low-up"
+     9  68  ke   "muted slap"
+    10  69  ge   "ringing low"
+    11  70  ke   "flam slap"
+    12  71  na   "loud tap"
+    13  72  ne   "lowest mute"
+    14  73  ge   "ringing low open"
+    15  74  ke   "muted low"
+    16  75  na   "loud tap"
+    17  76  ge   "high-low"
+    18  77  re   "high slap"
+    19  78  na   "sharp tap"
+    20  79  tin  "high knock"
+    21  80  ge   "short low-up sliding"
+    22  81  sur  "mid tap"
+    23  82  te   "muted tap"
+    24  83  sur  "mid"
+    25  84  te   "muted"
+    26  85  thap "loud mid double"
+    27  86  ti   "slightly more muted"
+    28  87  tin  "low mid"
+    29  88  tu   "ringing mid"
   ...
 
 To play patches by number instead of name (e.g. for the C<*> unknown
@@ -365,24 +357,30 @@ Default: C<dist_dir()/Tabla.sf2>
 
   $patches = $tabla->patches;
 
-Each bol can be 1 or more patch numbers.
+Each bol can have 1 or more patch numbers.
 
 Default single strike bol patches:
 
-  ge:   65 66 76
-  ke:   64 77 79
-  na:   78 81
-  ta:   71 75 85
-  ti:   61 68 70 72 82 86
-  tin:  60 63 83 87
-  tun:  88
+  de:   62
+  din:  63
+  ge:   61 65 66 67 69 73 76 80
+  ke:   64 68 70 74
+  na:   71 75 78
+  ne:   72
+  re:   77
+  te:   82 84
+  thap: 85
+  ti:   86
+  tin:  79 87
+  tu:   60
+  sur:  81 83
 
 Default double strike bols:
 
-  dha:  ge ta
+  dha:  ge te
   dhin: ge tin
   dhit: ge ti
-  dhun: ge tun
+  dhun: ge tu
 
 =head1 METHODS
 
@@ -418,14 +416,6 @@ C<'en'> in MIDI-Perl notation).
 
 (If specific patches are desired, use the C<note> method, as shown
 above.)
-
-1. Single strike bols:
-
-  ge, ke, na, ta, ti, tin, tun
-
-2. Double strike bols:
-
-  dha, dhin, dhit, dhun
 
 For a double strike, play both the baya and daya drums for the given
 B<bol> and B<duration>.
@@ -491,6 +481,8 @@ L<https://www.taalgyan.com/theory/basic-bols-on-tabla/>
 
 L<https://kksongs.org/tabla/chapter02.html> &
 L<https://kksongs.org/tabla/chapter03.html>
+
+L<https://www.fluidsynth.org/>
 
 =head1 AUTHOR
 

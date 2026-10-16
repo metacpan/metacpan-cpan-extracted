@@ -12,7 +12,7 @@ use Term::Fabulous::Widget::Button;
 use Term::Fabulous::Widget::Text;
 use Term::Fabulous::Widget::Toast::Stack;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 class Term::Fabulous::Widget::Toast
 	:isa(Term::Fabulous::Widget::Box)
@@ -383,7 +383,7 @@ and goes away by itself
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-toast.svg" alt="Toasts stacked in the top right corner: an info, a success and a warning toast with titles, messages and close marks, a filled danger toast in the bottom right corner, and an alert box inside the form"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-toast.svg" alt="Toasts stacked in the top right corner: an info, a success and a warning toast with titles, messages and close marks, a filled danger toast in the bottom right corner, and an alert box inside the form"></p>
 
 =end html
 

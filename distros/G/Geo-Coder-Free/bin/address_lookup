@@ -6,6 +6,7 @@
 use warnings;
 use strict;
 use autodie qw(:all);
+use Carp;
 
 use FindBin qw($Bin);
 use Getopt::Std;
@@ -14,13 +15,16 @@ use Geo::Coder::Free;
 use Geo::Coder::Free::Local;
 
 if(scalar(@ARGV) == 0) {
-	die "Usage: $0 location";
+	Carp::croak "Usage: $0 location";
 }
 
 my %opts;
 getopts('vd', \%opts);
 # Watch what's going on in debug mode
-Database::Abstraction::init(logger => MyLogger->new()) if($opts{'d'});
+if($opts{'d'}) {
+	require Test::Log::Abstraction;
+	Database::Abstraction::init(logger => Test::Log::Abstraction->new(verbose => 1));
+}
 
 print join(' ', @ARGV), ': ' if($opts{'v'});
 if(my $rc = Geo::Coder::Free::Local::geocode(join(' ', @ARGV))) {
@@ -40,41 +44,3 @@ if(my $rc = Geo::Coder::Free::Local::geocode(join(' ', @ARGV))) {
 	print "Not found\n" if($opts{'v'});
 	exit(1);
 }
-
-package MyLogger;
-
-use strict;
-use warnings;
-
-sub new {
-	my ($proto, %args) = @_;
-
-	my $class = ref($proto) || $proto;
-
-	return bless { }, $class;
-}
-
-sub trace {
-	debug(@_);
-}
-
-sub warn {
-	debug(@_);
-}
-
-sub debug {
-	my $self = shift;
-
-	print @_, "\n";
-}
-
-sub AUTOLOAD {
-	our $AUTOLOAD;
-	my $param = $AUTOLOAD;
-
-	unless($param eq 'MyLogger::DESTROY') {
-		die "Need to define $param";
-	}
-}
-
-1;

@@ -12,7 +12,7 @@ use Term::Fabulous::Widget::Tabs::Bar;
 use Term::Fabulous::Widget::Tabs::Button;
 use Term::Fabulous::Widget::Tabs::Page;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 class Term::Fabulous::Widget::Tabs
 	:isa(Term::Fabulous::Widget::Box)
@@ -316,7 +316,7 @@ Term::Fabulous::Widget::Tabs - Pages behind a row of tabs
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-tabs.svg" alt="Four Tabs widgets: tabs along the top with the Network page shown and a disabled Licenses tab, tabs with vertical labels along the left side, a tab bar at the bottom in the Heavy style, and tabs on the right without a page border"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-tabs.svg" alt="Four Tabs widgets: tabs along the top with the Network page shown and a disabled Licenses tab, tabs with vertical labels along the left side, a tab bar at the bottom in the Heavy style, and tabs on the right without a page border"></p>
 
 =end html
 

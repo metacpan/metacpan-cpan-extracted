@@ -9,8 +9,7 @@ use Test::Deep;
 use Test::Most tests => 103;
 use Test::Number::Delta;
 
-use lib 't/lib';
-use MyLogger;
+use Test::Log::Abstraction;
 # use Test::Without::Module qw(Geo::libpostal);
 
 sub check($$$$);
@@ -29,7 +28,7 @@ MAXMIND: {
 			diag('This may take some time and consume a lot of memory if the database is not SQLite');
 
 			if($ENV{'TEST_VERBOSE'}) {
-				Database::Abstraction::init(logger => MyLogger->new());
+				Database::Abstraction::init(logger => Test::Log::Abstraction->new());
 			}
 
 			my $geo_coder = new_ok('Geo::Coder::Free::MaxMind');

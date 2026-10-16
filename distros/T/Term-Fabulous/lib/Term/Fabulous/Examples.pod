@@ -91,7 +91,7 @@ pressing Save.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/overview.svg" alt="A Term::Fabulous program: a sign-up form with text fields, radio buttons, a dropdown, a slider, a check box and buttons, a chart of requests per second with a translucent notification, an event log and text in several scripts"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/overview.svg" alt="A Term::Fabulous program: a sign-up form with text fields, radio buttons, a dropdown, a slider, a check box and buttons, a chart of requests per second with a translucent notification, an event log and text in several scripts"></p>
 
 =end html
 
@@ -106,7 +106,7 @@ L<Term::Fabulous::Manual::Layout/Direction>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-layout-direction.svg" alt="Four panels: three boxes side by side, three boxes in a column, seven boxes wrapped onto two lines, and three boxes of different sizes on top of each other"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-layout-direction.svg" alt="Four panels: three boxes side by side, three boxes in a column, seven boxes wrapped onto two lines, and three boxes of different sizes on top of each other"></p>
 
 =end html
 
@@ -121,7 +121,7 @@ L<Term::Fabulous::Manual::Layout/Sizing>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-layout-sizing.svg" alt="Eight rows, each a track with colored boxes sized by fit, fit with a minimum, fixed, percent, grow, grow with a maximum, fixed plus grow, and two grow boxes"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-layout-sizing.svg" alt="Eight rows, each a track with colored boxes sized by fit, fit with a minimum, fixed, percent, grow, grow with a maximum, fixed plus grow, and two grow boxes"></p>
 
 =end html
 
@@ -136,7 +136,7 @@ L<Term::Fabulous::Manual::Layout/Borders take space>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-layout-padding.svg" alt="Three boxes with the same three children: without padding and gap, with padding and a gap of one row, and with a border and one cell of padding"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-layout-padding.svg" alt="Three boxes with the same three children: without padding and gap, with padding and a gap of one row, and with a border and one cell of padding"></p>
 
 =end html
 
@@ -149,7 +149,7 @@ L<Term::Fabulous::Manual::Layout/Aligning and centering children>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-layout-alignment.svg" alt="Nine boxes in a grid, each with one child placed at a different combination of left, center, right and top, center, bottom"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-layout-alignment.svg" alt="Nine boxes in a grid, each with one child placed at a different combination of left, center, right and top, center, bottom"></p>
 
 =end html
 
@@ -162,7 +162,7 @@ L<Term::Fabulous::Manual::Layout/Flow layout>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-flow.svg" alt="Twenty colored tags in a rounded box, wrapped onto several lines"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-flow.svg" alt="Twenty colored tags in a rounded box, wrapped onto several lines"></p>
 
 =end html
 
@@ -175,7 +175,7 @@ L<Term::Fabulous::Manual::Layout/Stack layout>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-stack.svg" alt="Three bordered cards with colored badges in their top right corners above a log with a bordered message centered over it"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-stack.svg" alt="Three bordered cards with colored badges in their top right corners above a log with a bordered message centered over it"></p>
 
 =end html
 
@@ -190,7 +190,7 @@ L<Term::Fabulous::Manual::Layout/Floating widgets>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-layout-floating.svg" alt="A File menu open below its button over a panel, a red badge on the panel's top right corner and a green message in the bottom row of the screen"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-layout-floating.svg" alt="A File menu open below its button over a panel, a red badge on the panel's top right corner and a green message in the bottom row of the screen"></p>
 
 =end html
 
@@ -205,7 +205,7 @@ box and two on the right one.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-scroll-box.svg" alt="Two framed boxes scrolled down, one with numbered lines, one with squares, each with a scrollbar in its last column whose thumb shows the visible part"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-scroll-box.svg" alt="Two framed boxes scrolled down, one with numbered lines, one with squares, each with a scrollbar in its last column whose thumb shows the visible part"></p>
 
 =end html
 
@@ -220,7 +220,7 @@ harmless. See L<the text chapter|Term::Fabulous::Manual::Looks/TEXT>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-text-features.svg" alt="Text wrapped at spaces in a narrow panel and text broken only at newlines; a two-line text with line height 2; plain, bold, italic, underlined and combined styles; Latin, Japanese, emoji and combining accents ending in the same column; a tab shown as a space and control characters shown as replacement characters"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-text-features.svg" alt="Text wrapped at spaces in a narrow panel and text broken only at newlines; a two-line text with line height 2; plain, bold, italic, underlined and combined styles; Latin, Japanese, emoji and combining accents ending in the same column; a tab shown as a space and control characters shown as replacement characters"></p>
 
 =end html
 
@@ -233,7 +233,7 @@ L<Term::Fabulous::Manual::Looks/Wide characters and emoji>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-text-sizing.svg" alt="Four boxes with Japanese, Korean, Thai and German text and emoji"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-text-sizing.svg" alt="Four boxes with Japanese, Korean, Thai and German text and emoji"></p>
 
 =end html
 
@@ -247,7 +247,7 @@ L<Term::Fabulous::Manual::Looks/Working with colors>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-colors.svg" alt="Six orange swatches written in different formats; a blue darkened, lightened and blended with white in steps; red swatches with alpha 255, 192, 128, 64 and 0 over a light panel; a line in the terminal's default text color"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-colors.svg" alt="Six orange swatches written in different formats; a blue darkened, lightened and blended with white in steps; red swatches with alpha 255, 192, 128, 64 and 0 over a light panel; a line in the terminal's default text color"></p>
 
 =end html
 
@@ -268,12 +268,12 @@ themes in that order:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-themes-dark.svg" alt="The panel in the dark theme: light text on a dark blue-gray screen, a text field holding Ada, a checked check box, a blue progress bar at 65 percent, a Save button and a Cancel button with a red border"></p>
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-themes-light.svg" alt="The panel in the light theme: dark text on a near-white screen, a white text field holding Ada, a checked check box, a blue progress bar at 65 percent, a Save button and a Cancel button with a red border"></p>
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-themes-ocean.svg" alt="The panel in the ocean theme: teal accents on a deep blue screen, a text field holding Ada, a checked check box, a progress bar at 65 percent, a Save button in the accent and a Cancel button with a red border"></p>
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-themes-nord.svg" alt="The panel in the nord theme: pale text on a slate gray screen, frost blue accents, a text field holding Ada, a checked check box, a progress bar at 65 percent, a round-bordered Save button in frost blue and a Cancel button with a red border"></p>
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-themes-dracula.svg" alt="The panel in the dracula theme: white text on a dark purple-gray screen, purple accents, a text field holding Ada, a checked check box, a progress bar at 65 percent, a pink Save button and a Cancel button with a red border"></p>
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-themes-solarized-light.svg" alt="The panel in the solarized-light theme: gray-blue text on a warm paper-colored screen, blue accents, an orange divider, a text field holding Ada, a checked check box, a progress bar at 65 percent, a Save button in blue and a Cancel button with a red border"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-themes-dark.svg" alt="The panel in the dark theme: light text on a dark blue-gray screen, a text field holding Ada, a checked check box, a blue progress bar at 65 percent, a Save button and a Cancel button with a red border"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-themes-light.svg" alt="The panel in the light theme: dark text on a near-white screen, a white text field holding Ada, a checked check box, a blue progress bar at 65 percent, a Save button and a Cancel button with a red border"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-themes-ocean.svg" alt="The panel in the ocean theme: teal accents on a deep blue screen, a text field holding Ada, a checked check box, a progress bar at 65 percent, a Save button in the accent and a Cancel button with a red border"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-themes-nord.svg" alt="The panel in the nord theme: pale text on a slate gray screen, frost blue accents, a text field holding Ada, a checked check box, a progress bar at 65 percent, a round-bordered Save button in frost blue and a Cancel button with a red border"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-themes-dracula.svg" alt="The panel in the dracula theme: white text on a dark purple-gray screen, purple accents, a text field holding Ada, a checked check box, a progress bar at 65 percent, a pink Save button and a Cancel button with a red border"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-themes-solarized-light.svg" alt="The panel in the solarized-light theme: gray-blue text on a warm paper-colored screen, blue accents, an orange divider, a text field holding Ada, a checked check box, a progress bar at 65 percent, a Save button in blue and a Cancel button with a red border"></p>
 
 =end html
 
@@ -290,9 +290,9 @@ while it is chosen, and text mode with a mistake on its last line:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-theme-editor.svg" alt="The theme editor with four themes in tabs: the menu bar, the tab strip with ocean.kdl active, the preview on the left with the palette swatches, text with links and a box in the ocean theme, and the form on the right listing the theme's name and base and the palette tokens with their swatches, values and where they come from, the cursor on accent"></p>
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-theme-editor-dialog.svg" alt="The dialog of button.border.color at the right edge: a list of the palette's tokens with danger chosen, a field and red, green, blue and alpha sliders for a color of its own; on the left, the preview shows the Cancel button of the bordered row with a red border"></p>
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-theme-editor-text.svg" alt="The theme editor in text mode: the end of ocean.kdl with a new line button { text "acent" }, the message Line 51: button.text must be a color, got 'acent' (unrecognized color string 'acent') under the text, an exclamation mark on the tab, and the preview marked stale"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-theme-editor.svg" alt="The theme editor with four themes in tabs: the menu bar, the tab strip with ocean.kdl active, the preview on the left with the palette swatches, text with links and a box in the ocean theme, and the form on the right listing the theme's name and base and the palette tokens with their swatches, values and where they come from, the cursor on accent"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-theme-editor-dialog.svg" alt="The dialog of button.border.color at the right edge: a list of the palette's tokens with danger chosen, a field and red, green, blue and alpha sliders for a color of its own; on the left, the preview shows the Cancel button of the bordered row with a red border"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-theme-editor-text.svg" alt="The theme editor in text mode: the end of ocean.kdl with a new line button { text "acent" }, the message Line 51: button.text must be a color, got 'acent' (unrecognized color string 'acent') under the text, an exclamation mark on the tab, and the preview marked stale"></p>
 
 =end html
 
@@ -306,7 +306,7 @@ not have the focus. See L<Term::Fabulous::Manual::Looks/Named colors>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-web-colors.svg" alt="A grid of color swatches with their hex values and names, and a dropdown to sort them"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-web-colors.svg" alt="A grid of color swatches with their hex values and names, and a dropdown to sort them"></p>
 
 =end html
 
@@ -322,7 +322,7 @@ The picture shows the orbit after a few seconds.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-translucency.svg" alt="A green, a red and a blue translucent box over a screen of text; the text shows through the green and the blue one"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-translucency.svg" alt="A green, a red and a blue translucent box over a screen of text; the text shows through the green and the blue one"></p>
 
 =end html
 
@@ -333,7 +333,7 @@ each. See L<Term::Fabulous::Manual::Looks/Border styles>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-border-showcase.svg" alt="Twenty boxes, one in each border style, labeled with the style's name"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-border-showcase.svg" alt="Twenty boxes, one in each border style, labeled with the style's name"></p>
 
 =end html
 
@@ -349,7 +349,7 @@ L<Term::Fabulous::Role::HasBorderStyle>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-border-options.svg" alt="Six bordered panels: a border on the left and top only; a solid border with a double top and a thick left side; a round border with a cell of padding inside; a round border with a hidden bottom side; a title box and a body box sharing one line; a round border drawn on the parent's background"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-border-options.svg" alt="Six bordered panels: a border on the left and top only; a solid border with a double top and a thick left side; a round border with a cell of padding inside; a round border with a hidden bottom side; a title box and a body box sharing one line; a round border drawn on the parent's background"></p>
 
 =end html
 
@@ -373,7 +373,7 @@ click on the OK button.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-event-monitor.svg" alt="The event monitor after Tab, typing Ada, Enter, F5, Tab and a click on the OK button: the log lists KeyPress, OnFocus, Change, Submit, OnBlur, Mouse, OnHoverStart, OnPress, Activate and OnRelease events with their targets"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-event-monitor.svg" alt="The event monitor after Tab, typing Ada, Enter, F5, Tab and a click on the OK button: the log lists KeyPress, OnFocus, Change, Submit, OnBlur, Mouse, OnHoverStart, OnPress, Activate and OnRelease events with their targets"></p>
 
 =end html
 
@@ -391,7 +391,7 @@ pointer over the Reset button.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-buttons-and-keys.svg" alt="Three buttons, the first focused and the last under the mouse pointer, a counter at 3 and a clock"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-buttons-and-keys.svg" alt="Three buttons, the first focused and the last under the mouse pointer, a counter at 3 and a clock"></p>
 
 =end html
 
@@ -409,7 +409,7 @@ from the dropdown and starting an e-mail address.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-form.svg" alt="A form with name, password, notes, color, size, volume, newsletter, terms, e-mail and port; the e-mail field holds ada@ in red and the status line says email: Please enter an e-mail address."></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-form.svg" alt="A form with name, password, notes, color, size, volume, newsletter, terms, e-mail and port; the e-mail field holds ada@ in red and the status line says email: Please enter an e-mail address."></p>
 
 =end html
 
@@ -426,7 +426,7 @@ The picture shows it after Tab and Space switched Bluetooth on.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-custom-widget.svg" alt="Three toggle switches, Bluetooth focused and switched on, and the status line"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-custom-widget.svg" alt="Three toggle switches, Bluetooth focused and switched on, and the status line"></p>
 
 =end html
 
@@ -445,7 +445,7 @@ The picture shows it after Tab, Tab and Enter chose the db server.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-kdl-layout.svg" alt="A title bar, a sidebar with the buttons web, db and mail with db focused, and a main panel showing the details of the db server"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-kdl-layout.svg" alt="A title bar, a sidebar with the buttons web, db and mail with db focused, and a main panel showing the details of the db server"></p>
 
 =end html
 
@@ -460,7 +460,7 @@ The picture shows the form filled in, after F2.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-kdl-form.svg" alt="The KDL form filled in, with all values shown in the status line after F2"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-kdl-form.svg" alt="The KDL form filled in, with all values shown in the status line after F2"></p>
 
 =end html
 
@@ -482,7 +482,7 @@ cursor moved on.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-table-directory.svg" alt="A staff table grouped by team with two selected rows, a pager, and a details panel for the person under the cursor"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-table-directory.svg" alt="A staff table grouped by team with two selected rows, a pager, and a details panel for the person under the cursor"></p>
 
 =end html
 
@@ -502,7 +502,7 @@ folder and Right opened it, which loaded its two files.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-table-files.svg" alt="A file tree in a table: open and closed folders in blue, indented files with sizes, dates and kinds, and the vendor folder just loaded"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-table-files.svg" alt="A file tree in a table: open and closed folders in blue, indented files with sizes, dates and kinds, and the vendor folder just loaded"></p>
 
 =end html
 
@@ -513,7 +513,7 @@ See L<Term::Fabulous::Manual::TableStyles/SIZE AND SCROLLING>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-table-files-scrolling.svg" alt="A file tree table with all folders open, scrolled down: the column titles and the filter row stay at the top, and the scrollbar right of the frame shows a thumb in its middle"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-table-files-scrolling.svg" alt="A file tree table with all folders open, scrolled down: the column titles and the filter row stay at the top, and the scrollbar right of the frame shows a thumb in its middle"></p>
 
 =end html
 
@@ -530,7 +530,7 @@ L<Term::Fabulous::Manual::Charts/Which chart for which data>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-chart-gallery.svg" alt="A gallery of ten small charts: a line chart, a stacked area chart, a bar chart, a scatter plot, a histogram, a pie chart, a donut chart, a polar area chart, a radar chart, and line, area and bar sparklines"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-chart-gallery.svg" alt="A gallery of ten small charts: a line chart, a stacked area chart, a bar chart, a scatter plot, a histogram, a pie chart, a donut chart, a polar area chart, a radar chart, and line, area and bar sparklines"></p>
 
 =end html
 
@@ -542,7 +542,7 @@ in each frame. See L<Term::Fabulous::Manual::Charts/CANVASES>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-canvas.svg" alt="Three waves in red, blue and green on a canvas, drawn with half blocks"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-canvas.svg" alt="Three waves in red, blue and green on a canvas, drawn with half blocks"></p>
 
 =end html
 
@@ -557,7 +557,7 @@ The picture shows a red wave painted with the mouse over the shapes.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-pixel-paint.svg" alt="A pixel canvas with a frame, a line, a circle, a filled rectangle and a red wave painted with the mouse"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-pixel-paint.svg" alt="A pixel canvas with a frame, a line, a circle, a filled rectangle and a red wave painted with the mouse"></p>
 
 =end html
 
@@ -573,7 +573,7 @@ notice instead.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-image.svg" alt="A 16x16 circle of rainbow-colored rings in three frames of 32x24 cells: at its natural size and centered (none), scaled up twice with its proportions kept (contain) and stretched twice wide and three times high to fill the frame (stretch); three frames of 12x4 cells below each other cut it (none), shrink it to half its size (contain) and shrink it to fill the frame (stretch)"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-image.svg" alt="A 16x16 circle of rainbow-colored rings in three frames of 32x24 cells: at its natural size and centered (none), scaled up twice with its proportions kept (contain) and stretched twice wide and three times high to fill the frame (stretch); three frames of 12x4 cells below each other cut it (none), shrink it to half its size (contain) and shrink it to fill the frame (stretch)"></p>
 
 =end html
 
@@ -589,7 +589,7 @@ instead.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-sixel.svg" alt="A detail of the Mandelbrot set, blue and white spirals with orange and dark red bands, in sixel graphics in three frames of 28x10 cells: cut to the frame at its natural size (none), scaled down to fit the frame with its proportions kept (contain) and stretched to fill the frame (stretch)"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-sixel.svg" alt="A detail of the Mandelbrot set, blue and white spirals with orange and dark red bands, in sixel graphics in three frames of 28x10 cells: cut to the frame at its natural size (none), scaled down to fit the frame with its proportions kept (contain) and stretched to fill the frame (stretch)"></p>
 
 =end html
 
@@ -604,7 +604,7 @@ L<Term::Fabulous::Manual::Programs/RENDERING WITHOUT A TERMINAL>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-static-report.svg" alt="Three panels with double, heavy and round borders, printed to the terminal"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-static-report.svg" alt="Three panels with double, heavy and round borders, printed to the terminal"></p>
 
 =end html
 
@@ -626,7 +626,7 @@ content, to the room left over and to a fixed width.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-box.svg" alt="A card with a title and body text, and three boxes labeled fit, grow and fixed(14)"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-box.svg" alt="A card with a title and body text, and three boxes labeled fit, grow and fixed(14)"></p>
 
 =end html
 
@@ -637,7 +637,7 @@ in boxes, and in several scripts.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-text.svg" alt="Colored words, a sentence wrapped left-aligned, centered and right-aligned, and text in five scripts"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-text.svg" alt="Colored words, a sentence wrapped left-aligned, centered and right-aligned, and text in five scripts"></p>
 
 =end html
 
@@ -653,7 +653,7 @@ the accent color.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-rich-text.svg" alt="A hint with a bold Enter and a red Esc, a log line with a bold red error and an underlined file name, a row of the words bold, italic, underline, reverse, dim, strike and overline each in its style, a wrapped paragraph whose italic green span and highlighted span continue on the next line, and a line of three links: FAQ underlined in blue, guide selected in dark text on blue, perl.org hovered in white on gray"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-rich-text.svg" alt="A hint with a bold Enter and a red Esc, a log line with a bold red error and an underlined file name, a row of the words bold, italic, underline, reverse, dim, strike and overline each in its style, a wrapped paragraph whose italic green span and highlighted span continue on the next line, and a line of three links: FAQ underlined in blue, guide selected in dark text on blue, perl.org hovered in white on gray"></p>
 
 =end html
 
@@ -671,7 +671,7 @@ built.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-virtual-list.svg" alt="A framed document near its end: numbered paragraphs of different lengths, a scrollbar whose thumb sits at the bottom, and a status line saying Paragraphs 49993-49997 of 50000, 19 built"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-virtual-list.svg" alt="A framed document near its end: numbered paragraphs of different lengths, a scrollbar whose thumb sits at the bottom, and a status line saying Paragraphs 49993-49997 of 50000, 19 built"></p>
 
 =end html
 
@@ -683,7 +683,7 @@ colors, and a vertical divider with a text between two columns.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-divider.svg" alt="Dividers: a plain line, texts at the start, the center and the end, double and heavy lines in colors, and a vertical divider with a text between two columns"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-divider.svg" alt="Dividers: a plain line, texts at the start, the center and the end, double and heavy lines in colors, and a vertical divider with a text between two columns"></p>
 
 =end html
 
@@ -697,7 +697,7 @@ Space opens and closes the focused section.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-accordion.svg" alt="Two accordions: one with the Network section open under General and a disabled Licenses section, one with borders, the toggles at the end and two sections open at once"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-accordion.svg" alt="Two accordions: one with the Network section open under General and a disabled Licenses section, one with borders, the toggles at the end and two sections open at once"></p>
 
 =end html
 
@@ -712,7 +712,7 @@ Ctrl+PageUp and Ctrl+PageDown turn the pages from anywhere inside.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-tabs.svg" alt="Four Tabs widgets: tabs along the top with the Network page shown and a disabled Licenses tab, a sidebar of tabs along the left side, a tab bar at the bottom in the Heavy style with the tabs in the center, and tall tabs with downward labels without a page border"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-tabs.svg" alt="Four Tabs widgets: tabs along the top with the Network page shown and a disabled Licenses tab, a sidebar of tabs along the left side, a tab bar at the bottom in the Heavy style with the tabs in the center, and tall tabs with downward labels without a page border"></p>
 
 =end html
 
@@ -727,7 +727,7 @@ picture shows it after closing README.md and choosing budget.csv.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-document-tabs.svg" alt="A row of document tabs at the top: notes.txt with a blue dot for unsaved changes, config.kdl with a red exclamation mark for errors, todo.md, and the active tab budget.csv in bold on a lighter background with a blue dot, each with a close mark, then an arrow to a hidden tab and a plus button. Below, the text of budget.csv, a dim line with the keys that switch, close and add tabs, and a status bar with the message Closed README.md."></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-document-tabs.svg" alt="A row of document tabs at the top: notes.txt with a blue dot for unsaved changes, config.kdl with a red exclamation mark for errors, todo.md, and the active tab budget.csv in bold on a lighter background with a blue dot, each with a close mark, then an arrow to a hidden tab and a plus button. Below, the text of budget.csv, a dim line with the keys that switch, close and add tabs, and a status bar with the message Closed README.md."></p>
 
 =end html
 
@@ -742,7 +742,7 @@ clicks do nothing. The picture shows it after Enter pressed Save.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-button.svg" alt="Save, Cancel, Delete and Archive buttons: Save focused with a blue border, Archive disabled and drawn in gray, and the line Save was pressed"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-button.svg" alt="Save, Cancel, Delete and Archive buttons: Save focused with a blue border, Archive disabled and drawn in gray, and the line Save was pressed"></p>
 
 =end html
 
@@ -753,7 +753,7 @@ indeterminate and disabled. Space or Enter toggles the focused box.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-checkbox.svg" alt="Five check boxes: focused, unchecked, checked, indeterminate and disabled"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-checkbox.svg" alt="Five check boxes: focused, unchecked, checked, indeterminate and disabled"></p>
 
 =end html
 
@@ -766,7 +766,7 @@ in the focused group.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-radio.svg" alt="Radio buttons in a row with Medium chosen, in a column with Express shipping chosen, and a disabled group"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-radio.svg" alt="Radio buttons in a row with Medium chosen, in a column with Express shipping chosen, and a disabled group"></p>
 
 =end html
 
@@ -780,7 +780,7 @@ Down moved the highlight.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-dropdown.svg" alt="Three dropdowns: a placeholder, France selected, and an open list of colors with Blue highlighted"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-dropdown.svg" alt="Three dropdowns: a placeholder, France selected, and an open list of colors with Blue highlighted"></p>
 
 =end html
 
@@ -792,7 +792,7 @@ Right (or PageUp, PageDown, Home and End) change the value.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-slider.svg" alt="Three sliders: focused at 65 percent, a temperature of 21.5 degrees, and a disabled one"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-slider.svg" alt="Three sliders: focused at 65 percent, a temperature of 21.5 degrees, and a disabled one"></p>
 
 =end html
 
@@ -805,7 +805,7 @@ change the value; so does a click on a star.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-star-rating.svg" alt="Star ratings: a focused one with three of five stars, one with half stars and its value, a read-only one, one out of ten with a gap of zero, and a disabled one"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-star-rating.svg" alt="Star ratings: a focused one with three of five stars, one with half stars and its value, a read-only one, one out of ten with a gap of zero, and a disabled one"></p>
 
 =end html
 
@@ -818,7 +818,7 @@ a segment; so does a click.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-segmented-control.svg" alt="Segmented controls: a focused one with Week selected, one stretched to the full width, one with a disabled segment, a vertical one, and a disabled one"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-segmented-control.svg" alt="Segmented controls: a focused one with Week selected, one stretched to the full width, one with a disabled segment, a vertical one, and a disabled one"></p>
 
 =end html
 
@@ -832,7 +832,7 @@ Right move a slider, and typing a color sets it.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-color-picker.svg" alt="Two color pickers. The upper one has a framed list of named swatches with color samples on the left, Orange selected, an empty field with a sample of the orange next to it, the RGB/HSL switch on RGB and the red, green, blue and alpha sliders at the orange. The lower one has no list and no alpha slider, its field shows #2e8b57 and its sliders show hue, saturation and lightness. Below each picker a line names the chosen value and its channels"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-color-picker.svg" alt="Two color pickers. The upper one has a framed list of named swatches with color samples on the left, Orange selected, an empty field with a sample of the orange next to it, the RGB/HSL switch on RGB and the red, green, blue and alpha sliders at the orange. The lower one has no list and no alpha slider, its field shows #2e8b57 and its sliders show hue, saturation and lightness. Below each picker a line names the chosen value and its channels"></p>
 
 =end html
 
@@ -845,7 +845,7 @@ after typing and selecting a word.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-text-field.svg" alt="Four text fields: a focused field with Ada Lovelace typed and Lovelace selected, a placeholder, a masked password and a disabled field"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-text-field.svg" alt="Four text fields: a focused field with Ada Lovelace typed and Lovelace selected, a placeholder, a masked password and a disabled field"></p>
 
 =end html
 
@@ -857,7 +857,7 @@ the position. Shift with the arrow keys selects text, Ctrl+Z undoes.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-text-area.svg" alt="A text area with a shopping list, a wrapped long line and a scrollbar"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-text-area.svg" alt="A text area with a shopping list, a wrapped long line and a scrollbar"></p>
 
 =end html
 
@@ -874,7 +874,7 @@ after typing C<ada@exa> into the first field.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-input-validation.svg" alt="Eleven inputs: a focused e-mail field with ada@exa in red, a valid address in white, ada@ in red without and with a red border, an empty required field that looks normal and one whose border is red, a red unchecked check box, a dropdown showing its gray placeholder, ada@ in purple, ada@ in yellow with a yellow border, and a disabled field in gray"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-input-validation.svg" alt="Eleven inputs: a focused e-mail field with ada@exa in red, a valid address in white, ada@ in red without and with a red border, an empty required field that looks normal and one whose border is red, a red unchecked check box, a dropdown showing its gray placeholder, ada@ in purple, ada@ in yellow with a yellow border, and a disabled field in gray"></p>
 
 =end html
 
@@ -888,7 +888,7 @@ again.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-dialog.svg" alt="A Delete 3 files? dialog with Delete and Cancel buttons over a dimmed list of files; Delete has the focus and a blue border"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-dialog.svg" alt="A Delete 3 files? dialog with Delete and Cancel buttons over a dimmed list of files; Delete has the focus and a blue border"></p>
 
 =end html
 
@@ -902,7 +902,7 @@ shows the prompt after Add with an e-mail address that is not valid.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-prompt.svg" alt="A New contact prompt over the dimmed list of contacts: Name holds Ada Lovelace, E-mail holds ada@engine in red, and the red line E-mail: Please enter an e-mail address. sits above the Add and Cancel buttons"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-prompt.svg" alt="A New contact prompt over the dimmed list of contacts: Name holds Ada Lovelace, E-mail holds ada@engine in red, and the red line E-mail: Please enter an e-mail address. sits above the Add and Cancel buttons"></p>
 
 =end html
 
@@ -918,7 +918,7 @@ note after the cursor moved to reading-list.txt.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-file-dialog.svg" alt="An Open a file dialog over a dimmed notes program: the folder line ends in Documents/Projects/analytical-engine/notes, the list shows two folders and four notes with their sizes and modification times, the cursor is on reading-list.txt, which is also in the File field, and below it are the Notes filter, the Show hidden files checkbox and the Open and Cancel buttons"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-file-dialog.svg" alt="An Open a file dialog over a dimmed notes program: the folder line ends in Documents/Projects/analytical-engine/notes, the list shows two folders and four notes with their sizes and modification times, the cursor is on reading-list.txt, which is also in the File field, and below it are the Notes filter, the Show hidden files checkbox and the Open and Cancel buttons"></p>
 
 =end html
 
@@ -934,7 +934,7 @@ ASCII bar. The bars fill up from a timer.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-progress-bar.svg" alt="Progress bars: a block bar at 42 percent, one with the value inside, a thin line bar, a striped bar, a bar of three colored segments, an indeterminate bar with its runner, and a two-row ASCII bar"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-progress-bar.svg" alt="Progress bars: a block bar at 42 percent, one with the value inside, a thin line bar, a striped bar, a bar of three colored segments, an indeterminate bar with its runner, and a two-row ASCII bar"></p>
 
 =end html
 
@@ -948,7 +948,7 @@ it after 1, 2, 3 and i.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-toast.svg" alt="Toasts stacked in the top right corner: an info, a success and a warning toast with titles, messages and close marks, a filled danger toast in the bottom right corner, and an alert box inside the form"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-toast.svg" alt="Toasts stacked in the top right corner: an info, a success and a warning toast with titles, messages and close marks, a filled danger toast in the bottom right corner, and an alert box inside the form"></p>
 
 =end html
 
@@ -962,7 +962,7 @@ animates them.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-spinner.svg" alt="Spinners in every style, each with its name: dots, line, arc, circle, arrow, box, pulse and bar in one cell, dots3, bounce and wave in several, and the three-row ring; a stopped one and one with frames of its own"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-spinner.svg" alt="Spinners in every style, each with its name: dots, line, arc, circle, arrow, box, pulse and bar in one cell, dots3, bounce and wave in several, and the three-row ring; a stopped one and one with frames of its own"></p>
 
 =end html
 
@@ -975,7 +975,7 @@ other kind. The picture shows it after Down, Down and s.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-status-bar.svg" alt="A list of files with the cursor on budget.csv and, at the bottom, a status bar with the green message Saved budget.csv. and the parts file 3 of 6 and Ctrl+C quits. Above the list, status bars with a success message, a yellow warning with a blue modified part, and a red error with a red read-only part"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-status-bar.svg" alt="A list of files with the cursor on budget.csv and, at the bottom, a status bar with the green message Saved budget.csv. and the parts file 3 of 6 and Ctrl+C quits. Above the list, status bars with a success message, a yellow warning with a blue modified part, and a red error with a red read-only part"></p>
 
 =end html
 
@@ -991,7 +991,7 @@ menu after a right click on budget.csv.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-menu.svg" alt="A list of files with a context menu opened over budget.csv where it was right-clicked: Open with Enter, Rename... with F2, a line, Cut with Ctrl+X, a dimmed Paste with Ctrl+V, a line, and Show hidden files with a check mark and Alt+h. The pointer highlights Rename..."></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-menu.svg" alt="A list of files with a context menu opened over budget.csv where it was right-clicked: Open with Enter, Rename... with F2, a line, Cut with Ctrl+X, a dimmed Paste with Ctrl+V, a line, and Show hidden files with a check mark and Alt+h. The pointer highlights Rename..."></p>
 
 =end html
 
@@ -1005,7 +1005,7 @@ a line.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-menu-bar.svg" alt="A notes editor with a menu bar of File, Edit, View and Help, each with its first letter underlined, and the caption notes.txt. The Edit menu is open below its title with Undo highlighted, Redo, Cut and Copy dimmed, Paste and Select all, each with its key. The status bar at the bottom says F10 opens the menus, Ctrl+Q quits. on the left and modified and Ln 6, Col 7 on the right"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-menu-bar.svg" alt="A notes editor with a menu bar of File, Edit, View and Help, each with its first letter underlined, and the caption notes.txt. The Edit menu is open below its title with Undo highlighted, Redo, Cut and Copy dimmed, Paste and Select all, each with its key. The status bar at the bottom says F10 opens the menus, Ctrl+Q quits. on the left and modified and Ln 6, Col 7 on the right"></p>
 
 =end html
 
@@ -1019,7 +1019,7 @@ it. The picture shows it after F1 and typing ctrl.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-key-reference.svg" alt="A Keys of the notes editor dialog over a dimmed notes editor: the search field holds ctrl, and the table below lists only the keys with Ctrl, Ctrl+N New note, Ctrl+S Save, Ctrl+A Select all and Ctrl+Q Quit under Everywhere, and the undo, copy and word keys under Text; a Close button at the bottom"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-key-reference.svg" alt="A Keys of the notes editor dialog over a dimmed notes editor: the search field holds ctrl, and the table below lists only the keys with Ctrl, Ctrl+N New note, Ctrl+S Save, Ctrl+A Select all and Ctrl+Q Quit under Everywhere, and the undo, copy and word keys under Text; a Close button at the bottom"></p>
 
 =end html
 
@@ -1037,7 +1037,7 @@ selected two rows.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-table.svg" alt="A table of staff with a filter row, sorted by the start date, two rows selected with check boxes and a pager below"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-table.svg" alt="A table of staff with a filter row, sorted by the start date, two rows selected with check boxes and a pager below"></p>
 
 =end html
 
@@ -1054,7 +1054,7 @@ L<Term::Fabulous::Manual::Charts/Titles and legends>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-chart.svg" alt="Four bar charts of the same data: the legend at the top, at the bottom under a centered title, at the right with the iOS series highlighted and the others faded, and at the left of a chart on a light panel with a right-aligned title"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-chart.svg" alt="Four bar charts of the same data: the legend at the top, at the bottom under a centered title, at the right with the iOS series highlighted and the others faded, and at the left of a chart on a light panel with a right-aligned title"></p>
 
 =end html
 
@@ -1065,7 +1065,7 @@ with smooth C<monotone> curves and a title on the y axis.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-line-chart.svg" alt="A line chart of monthly active users on web, iOS and Android with smooth curves, a legend at the top and the y axis titled thousands"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-line-chart.svg" alt="A line chart of monthly active users on web, iOS and Android with smooth curves, a legend at the top and the y axis titled thousands"></p>
 
 =end html
 
@@ -1076,7 +1076,7 @@ source, stacked, with C<monotone> curves.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-area-chart.svg" alt="Stacked areas of visits from search, social and direct over twelve months, with smooth edges and a legend at the top"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-area-chart.svg" alt="Stacked areas of visits from search, social and direct over twelve months, with smooth edges and a legend at the top"></p>
 
 =end html
 
@@ -1087,7 +1087,7 @@ years as grouped bars, each with its value above it.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-bar-chart.svg" alt="Grouped bars of the revenue per quarter in 2025 and 2026 with the value above each bar"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-bar-chart.svg" alt="Grouped bars of the revenue per quarter in 2025 and 2026 with the value above each bar"></p>
 
 =end html
 
@@ -1098,7 +1098,7 @@ of two kinds of cars, each kind with its trend line.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-scatter-plot.svg" alt="Points of petrol and hybrid cars by engine power and fuel use, each kind with a dashed trend line"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-scatter-plot.svg" alt="Points of petrol and hybrid cars by engine power and fuel use, each kind with a dashed trend line"></p>
 
 =end html
 
@@ -1110,7 +1110,7 @@ each other, translucent.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-histogram.svg" alt="Two overlapping, translucent histograms of the response times of the eu-west and us-east servers"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-histogram.svg" alt="Two overlapping, translucent histograms of the response times of the eu-west and us-east servers"></p>
 
 =end html
 
@@ -1124,7 +1124,7 @@ L<Term::Fabulous::Widget::Histogram/Measures>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-histogram-measures.svg" alt="Four histograms of the same response times: counts per bin, percent per bin, density per bin, and cumulative percentages rising to 100%"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-histogram-measures.svg" alt="Four histograms of the same response times: counts per bin, percent per bin, density per bin, and cumulative percentages rising to 100%"></p>
 
 =end html
 
@@ -1136,7 +1136,7 @@ every second. The picture shows it after three seconds.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-sparkline.svg" alt="Four servers, each with its current load and three sparklines of the last minute: a line, an orange area and green bars"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-sparkline.svg" alt="Four servers, each with its current load and three sparklines of the last minute: a line, an orange area and green bars"></p>
 
 =end html
 
@@ -1147,7 +1147,7 @@ visitors, largest first, with the small ones folded into Other.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-pie-chart.svg" alt="A pie chart of visitors by browser, largest first, with Opera, Vivaldi and Lynx folded into Other, and percentages on the slices and in the legend"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-pie-chart.svg" alt="A pie chart of visitors by browser, largest first, with Opera, Vivaldi and Lynx folded into Other, and percentages on the slices and in the legend"></p>
 
 =end html
 
@@ -1160,7 +1160,7 @@ angle. See L<Term::Fabulous::Widget::PieChart/Styles>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-pie-chart-styles.svg" alt="Four pies of the same budget: in quadrant blocks with percentages, in sextants with gaps between the slices, in Braille dots with the slice labels, and in half blocks with the values, sorted ascending and starting at 3 o'clock"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-pie-chart-styles.svg" alt="Four pies of the same budget: in quadrant blocks with percentages, in sextants with gaps between the slices, in Braille dots with the slice labels, and in half blocks with the values, sorted ascending and starting at 3 o'clock"></p>
 
 =end html
 
@@ -1172,7 +1172,7 @@ pointer is on a slice, the middle shows its share.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-donut-chart.svg" alt="A donut chart of a monthly budget with the total in the middle and amounts and percentages in the legend"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-donut-chart.svg" alt="A donut chart of a monthly budget with the total in the middle and amounts and percentages in the legend"></p>
 
 =end html
 
@@ -1186,7 +1186,7 @@ L<Term::Fabulous::Widget::DonutChart/The text in the hole>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-donut-chart-centers.svg" alt="Three donuts of the same budget: the total 2170 euros in the middle of the first, 21% Food in the middle of the second with the other slices faded, and a text of its own, 2170 euros per month, in the third"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-donut-chart-centers.svg" alt="Three donuts of the same budget: the total 2170 euros in the middle of the first, 21% Food in the middle of the second with the other slices faded, and a text of its own, 2170 euros per month, in the third"></p>
 
 =end html
 
@@ -1198,7 +1198,7 @@ for the scale.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-polar-area-chart.svg" alt="Seven slices of equal angle for the weekdays, reaching as far out as their number of commits, over rings with their values"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-polar-area-chart.svg" alt="Seven slices of equal angle for the weekdays, reaching as far out as their number of commits, over rings with their values"></p>
 
 =end html
 
@@ -1209,7 +1209,7 @@ six categories, as filled shapes on a web of axes.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-radar-chart.svg" alt="Two translucent shapes on a web of six axes: the ratings of two laptops for speed, battery, screen, keyboard, weight and price, with a dot on every value"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-radar-chart.svg" alt="Two translucent shapes on a web of six axes: the ratings of two laptops for speed, battery, screen, keyboard, weight and price, with a dot on every value"></p>
 
 =end html
 
@@ -1235,7 +1235,7 @@ quits on q or Escape.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-first-program.svg" alt="The first program: a greeting in a box with a rounded blue border, centered on a dark blue screen"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-first-program.svg" alt="The first program: a greeting in a box with a rounded blue border, centered on a dark blue screen"></p>
 
 =end html
 
@@ -1254,7 +1254,7 @@ a line of text, and q, Escape or Ctrl+C to quit.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-minimal-program.svg" alt="The minimal program: one line of text on a dark background"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-minimal-program.svg" alt="The minimal program: one line of text on a dark background"></p>
 
 =end html
 
@@ -1266,7 +1266,7 @@ the result and ends.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-non-ascii-text.svg" alt="German, Japanese and a combining accent, each line aligned in its columns"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-non-ascii-text.svg" alt="German, Japanese and a combining accent, each line aligned in its columns"></p>
 
 =end html
 
@@ -1278,7 +1278,7 @@ prints the boxes and ends.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-wrap-and-align-text.svg" alt="Six framed samples: wrapped text aligned left, centered and right, text broken only at line breaks, two rows per line, and a centered label"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-wrap-and-align-text.svg" alt="Six framed samples: wrapped text aligned left, centered and right, text broken only at line breaks, two rows per line, and a centered label"></p>
 
 =end html
 
@@ -1298,7 +1298,7 @@ picture shows it after Ctrl+R.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-key-bindings.svg" alt="The key bindings program after Ctrl+R: the help line says reloaded and the second line shows the key name"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-key-bindings.svg" alt="The key bindings program after Ctrl+R: the help line says reloaded and the second line shows the key name"></p>
 
 =end html
 
@@ -1319,7 +1319,7 @@ pointer over Quit.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-follow-links.svg" alt="The Keys page of the help text: its link the start page selected in dark text on green, and the footer links Back in green and Quit hovered in white on gray"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-follow-links.svg" alt="The Keys page of the help text: its link the start page selected in dark text on green, and the footer links Back in green and Quit hovered in white on gray"></p>
 
 =end html
 
@@ -1332,7 +1332,7 @@ on terminal and a right click on the bold word span.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-click-a-word.svg" alt="Two paragraphs, the second with the word span in bold yellow; below them the line terminal: the program that shows this one, and the line right button at column 5, row 4: offset 3, word span (2 to 6), spans [2-6]"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-click-a-word.svg" alt="Two paragraphs, the second with the word span in bold yellow; below them the line terminal: the program that shows this one, and the line right button at column 5, row 4: offset 3, word span (2 to 6), spans [2-6]"></p>
 
 =end html
 
@@ -1351,7 +1351,7 @@ a clock that a timer updates once per second.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-clock.svg" alt="A clock in the middle of the terminal"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-clock.svg" alt="A clock in the middle of the terminal"></p>
 
 =end html
 
@@ -1363,7 +1363,7 @@ after a few seconds.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-scrolling-log.svg" alt="A framed log with ten timestamped lines"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-scrolling-log.svg" alt="A framed log with ten timestamped lines"></p>
 
 =end html
 
@@ -1377,7 +1377,7 @@ seconds.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-follow-log.svg" alt="A log that shows its newest lines; every fifth line is wider than the box and cut at its edge"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-follow-log.svg" alt="A log that shows its newest lines; every fifth line is wider than the box and cut at its edge"></p>
 
 =end html
 
@@ -1390,7 +1390,7 @@ C<seq -f 'Line %g' 1 40>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-show-output.svg" alt="The last lines of the output of seq and the exit status in a framed box"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-show-output.svg" alt="The last lines of the output of seq and the exit status in a framed box"></p>
 
 =end html
 
@@ -1410,7 +1410,7 @@ Enter in a field logs in. The picture shows it after logging in.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-login-form.svg" alt="A centered login dialog with a user name, a masked password, a checked box and the welcome message"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-login-form.svg" alt="A centered login dialog with a user name, a masked password, a checked box and the welcome message"></p>
 
 =end html
 
@@ -1425,7 +1425,7 @@ Enter.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-check-form.svg" alt="A form of eleven inputs; ada@example, perl.org, 192.0.2.300, 70000 and 2026-02-29 are red with a message beside each, the empty color dropdown and the unchecked terms box have messages too, and the status line says 7 fields need your attention"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-check-form.svg" alt="A form of eleven inputs; ada@example, perl.org, 192.0.2.300, 70000 and 2026-02-29 are red with a message beside each, the empty color dropdown and the unchecked terms box have messages too, and the status line says 7 fields need your attention"></p>
 
 =end html
 
@@ -1439,7 +1439,7 @@ into every field.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-own-checks.svg" alt="Five fields with messages below them: ABC12 with Three letters and three digits, such as ABC123; the name José Saramago without a message; 7 with Please enter an even number; mail.perl.org with Please use a host in example.com; and a text area of two hosts with Line 2: Please enter a host name"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-own-checks.svg" alt="Five fields with messages below them: ABC12 with Three letters and three digits, such as ABC123; the name José Saramago without a message; 7 with Please enter an even number; mail.perl.org with Please use a host in example.com; and a text area of two hosts with Line 2: Please enter a host name"></p>
 
 =end html
 
@@ -1451,7 +1451,7 @@ shows the open dialog, after typing a note and Ctrl+Q.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-confirm-dialog.svg" alt="The Really quit? dialog with Quit and Cancel buttons over the dimmed notes; Quit has the focus and a blue border"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-confirm-dialog.svg" alt="The Really quit? dialog with Quit and Cancel buttons over the dimmed notes; Quit has the focus and a blue border"></p>
 
 =end html
 
@@ -1464,7 +1464,7 @@ prompt after typing a note and Ctrl+Q.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-confirm-prompt.svg" alt="A Quit? prompt with the message Your notes are not saved anywhere. and the buttons Quit and Keep writing over the dimmed notes. Keep writing has the focus"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-confirm-prompt.svg" alt="A Quit? prompt with the message Your notes are not saved anywhere. and the buttons Quit and Keep writing over the dimmed notes. Keep writing has the focus"></p>
 
 =end html
 
@@ -1476,7 +1476,7 @@ to 120. The picture shows the prompt after typing 300 and Enter.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-ask-prompt.svg" alt="A Session length prompt asking How many minutes should the next session last?, with 300 typed in the Minutes field, the red message A session lasts 1 to 120 minutes. and the buttons OK and Cancel"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-ask-prompt.svg" alt="A Session length prompt asking How many minutes should the next session last?, with 300 typed in the Minutes field, the red message A session lasts 1 to 120 minutes. and the buttons OK and Cancel"></p>
 
 =end html
 
@@ -1489,7 +1489,7 @@ shows the open dialog after Ctrl+O and two steps down the list.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-open-and-save.svg" alt="An Open a file dialog over the empty notes editor: the folder line ends in garden-club/season-2026/notes, the list shows garden.txt, groceries.txt and ideas.md with sizes and dates, the cursor is on groceries.txt, which is also in the File field, and below are the Notes filter, the Show hidden files checkbox and the Open and Cancel buttons"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-open-and-save.svg" alt="An Open a file dialog over the empty notes editor: the folder line ends in garden-club/season-2026/notes, the list shows garden.txt, groceries.txt and ideas.md with sizes and dates, the cursor is on groceries.txt, which is also in the File field, and below are the Notes filter, the Show hidden files checkbox and the Open and Cancel buttons"></p>
 
 =end html
 
@@ -1502,7 +1502,7 @@ colors.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-color-prompt.svg" alt="A Highlight color prompt over the dimmed setting: on the left the label Color and a framed list of six named colors with samples, Mint selected; on the right the field with #98c379 and a green sample, the RGB/HSL switch on RGB and the red, green and blue sliders at 152, 195 and 121; the buttons Use it and Cancel below"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-color-prompt.svg" alt="A Highlight color prompt over the dimmed setting: on the left the label Color and a framed list of six named colors with samples, Mint selected; on the right the field with #98c379 and a green sample, the RGB/HSL switch on RGB and the red, green and blue sliders at 152, 195 and 121; the buttons Use it and Cancel below"></p>
 
 =end html
 
@@ -1515,7 +1515,7 @@ it after typing a name.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-inline-prompt.svg" alt="The inline prompt in the three rows below a shell's earlier output: the question, a text field holding Ada Lovelace and a help line"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-inline-prompt.svg" alt="The inline prompt in the three rows below a shell's earlier output: the question, a text field holding Ada Lovelace and a help line"></p>
 
 =end html
 
@@ -1528,7 +1528,7 @@ the tip.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-choose-options.svg" alt="A dropdown showing France, radio buttons with Express chosen, a slider at 15 percent and the status line"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-choose-options.svg" alt="A dropdown showing France, radio buttons with Express chosen, a slider at 15 percent and the status line"></p>
 
 =end html
 
@@ -1545,7 +1545,7 @@ a field that is disabled until a check box is checked.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-disable-inputs.svg" alt="An unchecked check box and the grayed out VAT number field below it"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-disable-inputs.svg" alt="An unchecked check box and the grayed out VAT number field below it"></p>
 
 =end html
 
@@ -1557,7 +1557,7 @@ while the notes have the focus.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-focus-help-line.svg" alt="A title, notes being typed, a slider and the help line for the notes"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-focus-help-line.svg" alt="A title, notes being typed, a slider and the help line for the notes"></p>
 
 =end html
 
@@ -1570,7 +1570,7 @@ went from Street straight to Zip.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-tab-order.svg" alt="Three text fields side by side: Street filled in, City still empty, and the Zip field focused with 12345 typed, because Tab went from Street straight to Zip"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-tab-order.svg" alt="Three text fields side by side: Street filled in, City still empty, and the Zip field focused with 12345 typed, because Tab went from Street straight to Zip"></p>
 
 =end html
 
@@ -1591,7 +1591,7 @@ menu.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-menu-bar.svg" alt="A to-do list of five check boxes below a menu bar with List and View and the caption To-do. The View menu is open and shows Show done with a check mark and the key Alt+d"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-menu-bar.svg" alt="A to-do list of five check boxes below a menu bar with List and View and the caption To-do. The View menu is open and shows Show done with a check mark and the key Alt+d"></p>
 
 =end html
 
@@ -1603,7 +1603,7 @@ picture shows the menu after selecting two words and a right click.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-context-menu.svg" alt="A text area whose first two words are selected, with a context menu opened over it where it was right-clicked: Cut is highlighted, then Copy, Paste, a line and Select all, each with its key"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-context-menu.svg" alt="A text area whose first two words are selected, with a context menu opened over it where it was right-clicked: Cut is highlighted, then Copy, Paste, a line and Select all, each with its key"></p>
 
 =end html
 
@@ -1616,7 +1616,7 @@ Ctrl+S.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-status-bar.svg" alt="A journal entry in a text area and, below it, a status bar with the green message Saved the entry. on the left and 8 words on the right"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-status-bar.svg" alt="A journal entry in a text area and, below it, a status bar with the green message Saved the entry. on the left and 8 words on the right"></p>
 
 =end html
 
@@ -1628,7 +1628,7 @@ commands and of the list. The picture shows it after F1.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-help-screen.svg" alt="A Keys of the to-do list dialog over the dimmed to-do list: an empty search field, and a table of keys and actions in three groups: Everywhere with F1 Keys, Ctrl+A Check all, Ctrl+D Remove done, Alt+s Sort by name and Ctrl+Q Quit, The list with the Tab and Space keys, and This help with typing and Escape; a Close button below"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-help-screen.svg" alt="A Keys of the to-do list dialog over the dimmed to-do list: an empty search field, and a table of keys and actions in three groups: Everywhere with F1 Keys, Ctrl+A Check all, Ctrl+D Remove done, Alt+s Sort by name and Ctrl+Q Quit, The list with the Tab and Space keys, and This help with typing and Escape; a Close button below"></p>
 
 =end html
 
@@ -1641,7 +1641,7 @@ shopping.txt, Ctrl+N and a line in the new document.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-document-tabs.svg" alt="An editor with the tabs shopping.txt with a blue dot, letter.txt, ideas.txt and the active Untitled 1 in bold with a blue dot, each with a close mark, and a plus button. Below, the text Plant the tulips. and a status bar with the keys"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-document-tabs.svg" alt="An editor with the tabs shopping.txt with a blue dot, letter.txt, ideas.txt and the active Untitled 1 in bold with a blue dot, each with a close mark, and a plus button. Below, the text Plant the tulips. and a status bar with the keys"></p>
 
 =end html
 
@@ -1661,7 +1661,7 @@ and ends.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-width-group.svg" alt="Three label and value rows whose values start in the same column"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-width-group.svg" alt="Three label and value rows whose values start in the same column"></p>
 
 =end html
 
@@ -1673,7 +1673,7 @@ the result and ends.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-border-sides.svg" alt="Three boxes: double and single rules above and below, a heavy top edge, and a thick left edge"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-border-sides.svg" alt="Three boxes: double and single rules above and below, a heavy top edge, and a thick left edge"></p>
 
 =end html
 
@@ -1686,7 +1686,7 @@ the ocean theme, after typing a line and two presses of F2.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-theme-switch.svg" alt="The ocean theme after two presses of F2: teal text on a dark blue background, a text field holding Light and readable, and a Save button with a teal border"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-theme-switch.svg" alt="The ocean theme after two presses of F2: teal text on a dark blue background, a text field holding Light and readable, and a Save button with a teal border"></p>
 
 =end html
 
@@ -1699,7 +1699,7 @@ current directory or the first argument.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-theme-editor-preview.svg" alt="The theme editor drawn in the light theme, its preview showing a sign-in form in the dark theme being edited: an e-mail field with an invalid address in red, a password field, a check box and Sign in and Cancel buttons; the form on the right lists the palette"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-theme-editor-preview.svg" alt="The theme editor drawn in the light theme, its preview showing a sign-in form in the dark theme being edited: an e-mail field with an invalid address in red, a password field, a check box and Sign in and Cancel buttons; the form on the right lists the palette"></p>
 
 =end html
 
@@ -1711,7 +1711,7 @@ the states and classes of each item; prints the result and ends.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-states-and-classes.svg" alt="A menu of three items with Save in the selected color, followed by the states and classes of each item"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-states-and-classes.svg" alt="A menu of three items with Save in the selected color, followed by the states and classes of each item"></p>
 
 =end html
 
@@ -1723,13 +1723,13 @@ narrow one. The pictures show it 80 and 60 columns wide.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-resize-aware-layout.svg" alt="The Inbox and Message panes side by side on a terminal 80 columns wide"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-resize-aware-layout.svg" alt="The Inbox and Message panes side by side on a terminal 80 columns wide"></p>
 
 =end html
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-resize-aware-layout-narrow.svg" alt="The Inbox and Message panes above each other on a terminal 60 columns wide"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-resize-aware-layout-narrow.svg" alt="The Inbox and Message panes above each other on a terminal 60 columns wide"></p>
 
 =end html
 
@@ -1747,7 +1747,7 @@ L<Term::Fabulous::Cookbook::Tables/Show a list of hashes in a table (sort, selec
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-table-basics.svg" alt="A table of user accounts sorted by name, two rows selected with check boxes, and two status lines below: the selected logins and the account opened with Enter"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-basics.svg" alt="A table of user accounts sorted by name, two rows selected with check boxes, and two status lines below: the selected logins and the account opened with Enter"></p>
 
 =end html
 
@@ -1757,7 +1757,7 @@ L<Term::Fabulous::Cookbook::Tables/Format cells: dates, numbers, sizes and flags
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-table-format.svg" alt="A table of backup jobs with formatted times, durations, sizes, file counts, percentages, transfer rates and check marks, sorted by size, and a line that shows the raw value and the display text of one size"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-format.svg" alt="A table of backup jobs with formatted times, durations, sizes, file counts, percentages, transfer rates and check marks, sorted by size, and a line that shows the raw value and the display text of one size"></p>
 
 =end html
 
@@ -1772,7 +1772,7 @@ click on the check box of the third task and C<h>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-table-edit.svg" alt="A to-do table with check boxes, delete buttons and a note column, two tasks selected, a new task added and the status line below"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-edit.svg" alt="A to-do table with check boxes, delete buttons and a note column, two tasks selected, a new task added and the status line below"></p>
 
 =end html
 
@@ -1782,7 +1782,7 @@ L<Term::Fabulous::Cookbook::Tables/Let the user choose the visible columns (colu
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-table-columns.svg" alt="A staff table with the column chooser open over its top right corner: City unchecked, E-mail checked, and the status line with the columns to save"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-columns.svg" alt="A staff table with the column chooser open over its top right corner: City unchecked, E-mail checked, and the status line with the columns to save"></p>
 
 =end html
 
@@ -1792,7 +1792,7 @@ L<Term::Fabulous::Cookbook::Tables/Describe a table in a KDL layout (columns, li
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-table-kdl.svg" alt="A stock table built from KDL: grouped by category, sorted by quantity, two rows selected and the Displays group closed"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-kdl.svg" alt="A stock table built from KDL: grouped by category, sorted by quantity, two rows selected and the Displays group closed"></p>
 
 =end html
 
@@ -1803,7 +1803,7 @@ prints the report and ends.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-table-report.svg" alt="The printed sales report: products sorted by revenue, units and amounts formatted, shares in percent and a bold totals row under a double line"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-report.svg" alt="The printed sales report: products sorted by revenue, units and amounts formatted, shares in percent and a bold totals row under a double line"></p>
 
 =end html
 
@@ -1821,7 +1821,7 @@ L<Term::Fabulous::Cookbook::TableRows/Sort rows, also with your own comparison>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-table-sort.svg" alt="A table of tickets sorted by version in natural order and then by priority, with numbered sort markers in the column titles and a line that names the sort"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-sort.svg" alt="A table of tickets sorted by version in natural order and then by priority, with numbered sort markers in the column titles and a line that names the sort"></p>
 
 =end html
 
@@ -1831,7 +1831,7 @@ L<Term::Fabulous::Cookbook::TableRows/Let the user filter rows (filter row and s
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-table-filter.svg" alt="A table of staff with a search field above it and a filter row under the column titles holding the expressions >=2019 and >=80000, four matching rows and the line 4 of 12 rows"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-filter.svg" alt="A table of staff with a search field above it and a filter row under the column titles holding the expressions >=2019 and >=80000, four matching rows and the line 4 of 12 rows"></p>
 
 =end html
 
@@ -1841,7 +1841,7 @@ L<Term::Fabulous::Cookbook::TableRows/Filter rows from Perl (numbers, dates, tex
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-table-filter-perl.svg" alt="A table of invoices filtered to three rows by the fourth of five filters, with a line that names the active filter and counts the rows"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-filter-perl.svg" alt="A table of invoices filtered to three rows by the fourth of five filters, with a line that names the active filter and counts the rows"></p>
 
 =end html
 
@@ -1851,7 +1851,7 @@ L<Term::Fabulous::Cookbook::TableRows/Group rows by a column (collapsible group 
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-table-groups.svg" alt="A table of staff grouped by team: group headers with the team name, the number of people and their total salary, the Network group closed"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-groups.svg" alt="A table of staff grouped by team: group headers with the team name, the number of people and their total salary, the Network group closed"></p>
 
 =end html
 
@@ -1861,7 +1861,7 @@ L<Term::Fabulous::Cookbook::TableRows/Show nested data as a tree (expand and col
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-table-tree.svg" alt="A file tree in a table: folders with open and closed markers, indented files, sizes and dates"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-tree.svg" alt="A file tree in a table: folders with open and closed markers, indented files, sizes and dates"></p>
 
 =end html
 
@@ -1871,7 +1871,7 @@ L<Term::Fabulous::Cookbook::TableRows/Split many rows into pages (pager and page
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-table-pages.svg" alt="A table of orders on page 3 of 30, with the pager below it and the status line naming the orders on the page"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-pages.svg" alt="A table of orders on page 3 of 30, with the pager below it and the status line naming the orders on the page"></p>
 
 =end html
 
@@ -1892,7 +1892,7 @@ terminal to see the widths change.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-table-widths.svg" alt="An order table with a fixed number column, a growing Item column, a Notes column that takes a third of the width and wraps, an address column of two lines per row, a centered quantity, prices with a left-aligned title, and a Rating title with a star"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-widths.svg" alt="An order table with a fixed number column, a growing Item column, a Notes column that takes a third of the width and wraps, an address column of two lines per row, a centered quantity, prices with a left-aligned title, and a Rating title with a star"></p>
 
 =end html
 
@@ -1902,7 +1902,7 @@ L<Term::Fabulous::Cookbook::TableStyles/Lines and colors per row, column and cel
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-table-lines.svg" alt="A budget table: a heavy line and dashed lines in the Left column, negative amounts in red, a cancelled row in gray italics and a bold totals row under a double line"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-lines.svg" alt="A budget table: a heavy line and dashed lines in the Left column, negative amounts in red, a cancelled row in gray italics and a bold totals row under a double line"></p>
 
 =end html
 
@@ -1912,7 +1912,7 @@ L<Term::Fabulous::Cookbook::TableStyles/A table with colored rows and titles (bl
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-table-colors.svg" alt="A table of planets with an Outer block frame, no inner lines, colored column titles, striped rows and the cursor row highlighted up to the frame"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-colors.svg" alt="A table of planets with an Outer block frame, no inner lines, colored column titles, striped rows and the cursor row highlighted up to the frame"></p>
 
 =end html
 
@@ -1923,7 +1923,7 @@ the same small table with nine different settings of its lines.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-table-line-styles.svg" alt="Nine small tables with different lines: the default round frame, a full grid, no lines, a double frame with a heavy title line, a heavy frame with dashed row lines, ASCII lines, and Outer, Inner and Thick block frames"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-line-styles.svg" alt="Nine small tables with different lines: the default round frame, a full grid, no lines, a double frame with a heavy title line, a heavy frame with dashed row lines, ASCII lines, and Outer, Inner and Thick block frames"></p>
 
 =end html
 
@@ -1942,7 +1942,7 @@ L<Term::Fabulous::Cookbook::Charts/Draw a line chart with labels and points (Lin
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-line.svg" alt="A line chart of the average monthly temperatures of Lisbon, Berlin and Oslo, with a dot on every month, a legend at the top and degree labels on the y axis"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-chart-line.svg" alt="A line chart of the average monthly temperatures of Lisbon, Berlin and Oslo, with a dot on every month, a legend at the top and degree labels on the y axis"></p>
 
 =end html
 
@@ -1952,7 +1952,7 @@ L<Term::Fabulous::Cookbook::Charts/Grouped, stacked and horizontal bars (BarChar
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-bars.svg" alt="Three bar charts: orders of the shop and the app per weekday as grouped bars with their values, support tickets per weekday as stacked bars, and the views of four pages as horizontal bars with their values"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-chart-bars.svg" alt="Three bar charts: orders of the shop and the app per weekday as grouped bars with their values, support tickets per weekday as stacked bars, and the views of four pages as horizontal bars with their values"></p>
 
 =end html
 
@@ -1962,7 +1962,7 @@ L<Term::Fabulous::Cookbook::Charts/Show shares as a pie or donut (PieChart, Donu
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-pie.svg" alt="A pie chart of disk usage with percentages on the slices and the legend below it, and a donut chart of sales by region with percentages on its slices, the small regions folded into Rest of world, amounts in the legend and 1150k orders in the middle"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-chart-pie.svg" alt="A pie chart of disk usage with percentages on the slices and the legend below it, and a donut chart of sales by region with percentages on its slices, the small regions folded into Rest of world, amounts in the legend and 1150k orders in the middle"></p>
 
 =end html
 
@@ -1972,7 +1972,7 @@ L<Term::Fabulous::Cookbook::Charts/A scatter plot with trend lines (ScatterPlot)
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-scatter.svg" alt="A scatter plot of petal length and width of three species as three clusters of dots, the largest flowers drawn as diamonds, with a dashed trend line through the two larger species and dotted vertical grid lines"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-chart-scatter.svg" alt="A scatter plot of petal length and width of three species as three clusters of dots, the largest flowers drawn as diamonds, with a dashed trend line through the two larger species and dotted vertical grid lines"></p>
 
 =end html
 
@@ -1982,7 +1982,7 @@ L<Term::Fabulous::Cookbook::Charts/Stacked areas and shares of 100% (AreaChart)>
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-stacked-areas.svg" alt="Two stacked area charts of electricity from coal, gas, wind and solar from 2016 to 2026: the amounts in TWh on the left, each source's share of 100 percent on the right"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-chart-stacked-areas.svg" alt="Two stacked area charts of electricity from coal, gas, wind and solar from 2016 to 2026: the amounts in TWh on the left, each source's share of 100 percent on the right"></p>
 
 =end html
 
@@ -1992,7 +1992,7 @@ L<Term::Fabulous::Cookbook::Charts/How values are distributed (Histogram)>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-histogram.svg" alt="Two histograms of exam scores: counts in automatic bins on the left, and the cumulative share in bins of 10 points from 0 to 100 on the right, rising to 100 percent"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-chart-histogram.svg" alt="Two histograms of exam scores: counts in automatic bins on the left, and the cumulative share in bins of 10 points from 0 to 100 on the right, rising to 100 percent"></p>
 
 =end html
 
@@ -2002,7 +2002,7 @@ L<Term::Fabulous::Cookbook::Charts/Compare profiles on radar and polar area char
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-radar.svg" alt="A radar chart comparing a striker, a defender and a dashed gray average over six skills on circular rings, and a polar area chart of rain per season with Spring at the top"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-chart-radar.svg" alt="A radar chart comparing a striker, a defender and a dashed gray average over six skills on circular rings, and a polar area chart of rain per season with Spring at the top"></p>
 
 =end html
 
@@ -2012,7 +2012,7 @@ L<Term::Fabulous::Cookbook::Charts/Show sparklines in table cells (Sparkline)>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-sparklines.svg" alt="A table of four stocks with symbol, name, last price and the change over 30 days, and a Trend column of area sparklines that span the month's prices, green for rising and red for falling stocks"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-chart-sparklines.svg" alt="A table of four stocks with symbol, name, last price and the change over 30 days, and a Trend column of area sparklines that span the month's prices, green for rising and red for falling stocks"></p>
 
 =end html
 
@@ -2031,7 +2031,7 @@ L<Term::Fabulous::Cookbook::ChartTechniques/Plot values over time (time axis, fr
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-time-series.svg" alt="Hourly temperatures over four days on a time axis: a solid measured line, a dashed forecast from noon of June 3rd on, and a red shaded area under the measurements from June 2nd to that noon"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-chart-time-series.svg" alt="Hourly temperatures over four days on a time axis: a solid measured line, a dashed forecast from noon of June 3rd on, and a red shaded area under the measurements from June 2nd to that noon"></p>
 
 =end html
 
@@ -2042,7 +2042,7 @@ the picture shows it after 30 seconds.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-live.svg" alt="A live chart of network traffic: received traffic as a filled area with a line on top and sent traffic as a line fill the right half of a one-minute time axis after 30 seconds, with a status line of the newest values below"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-chart-live.svg" alt="A live chart of network traffic: received traffic as a filled area with a line on top and sent traffic as a line fill the right half of a one-minute time axis after 30 seconds, with a status line of the newest values below"></p>
 
 =end html
 
@@ -2052,7 +2052,7 @@ L<Term::Fabulous::Cookbook::ChartTechniques/Show values of very different sizes 
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-log-scale.svg" alt="The same two series twice: on a linear axis the issues and the early downloads lie flat on the bottom, on a logarithmic axis both rise as nearly straight lines"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-chart-log-scale.svg" alt="The same two series twice: on a linear axis the issues and the early downloads lie flat on the bottom, on a logarithmic axis both rise as nearly straight lines"></p>
 
 =end html
 
@@ -2062,7 +2062,7 @@ L<Term::Fabulous::Cookbook::ChartTechniques/Smooth noisy data and index it to 10
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-transform.svg" alt="Daily visits as a dim raw line with a 7-day moving average and a dashed exponentially smoothed line over it, and below it share and bond prices both indexed to 100 at day 1"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-chart-transform.svg" alt="Daily visits as a dim raw line with a 7-day moving average and a dashed exponentially smoothed line over it, and below it share and bond prices both indexed to 100 at day 1"></p>
 
 =end html
 
@@ -2072,7 +2072,7 @@ L<Term::Fabulous::Cookbook::ChartTechniques/Describe charts in a KDL layout (ser
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-kdl.svg" alt="A bar chart of sold and returned units per quarter with value labels and a dashed trend line, built from KDL, next to a donut chart of sales by channel that includes the Web slice added from Perl"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-chart-kdl.svg" alt="A bar chart of sold and returned units per quarter with value labels and a dashed trend line, built from KDL, next to a donut chart of sales by channel that includes the Web slice added from Perl"></p>
 
 =end html
 
@@ -2083,7 +2083,7 @@ prints the report and ends.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-report.svg" alt="The printed report: horizontal bars of the disk usage of four file systems with their percentages, and a line with the load of the last 18 hours as a bar sparkline"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-chart-report.svg" alt="The printed report: horizontal bars of the disk usage of four file systems with their percentages, and a line with the load of the last 18 hours as a bar sparkline"></p>
 
 =end html
 
@@ -2102,7 +2102,7 @@ L<Term::Fabulous::Cookbook::ChartStyles/Connect points with curves and easings (
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-curves.svg" alt="Six small charts of the same seven points connected linear, step, monotone, catmull-rom, ease-in-out-sine and ease-out-bounce"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-chart-curves.svg" alt="Six small charts of the same seven points connected linear, step, monotone, catmull-rom, ease-in-out-sine and ease-out-bounce"></p>
 
 =end html
 
@@ -2112,7 +2112,7 @@ L<Term::Fabulous::Cookbook::ChartStyles/Draw with Braille, blocks or box lines (
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-styles.svg" alt="Nine small charts of one wave: lines in Braille, half blocks, quadrants, sextants and box drawing lines, an area in eighth blocks, and bars in quadrants, blocks and Braille"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-chart-styles.svg" alt="Nine small charts of one wave: lines in Braille, half blocks, quadrants, sextants and box drawing lines, an area in eighth blocks, and bars in quadrants, blocks and Braille"></p>
 
 =end html
 
@@ -2122,7 +2122,7 @@ L<Term::Fabulous::Cookbook::ChartStyles/Light backgrounds, palettes and colors o
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-colors.svg" alt="A line chart on a light background with dark text, dotted grid lines and the legend below, next to a bar chart with a rounded frame, colors of its own and a dashed red target line"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-chart-colors.svg" alt="A line chart on a light background with dark text, dotted grid lines and the legend below, next to a bar chart with a rounded frame, colors of its own and a dashed red target line"></p>
 
 =end html
 
@@ -2133,7 +2133,7 @@ six small charts, one for each group of options.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-options.svg" alt="Six small charts: a solid, a dashed and a dotted line; a line with a gap next to one drawn across the gap; an area with a line and a mark on every point; narrow bars; bars of 2025 and 2026 in two stacks per quarter; a line over dashed vertical and solid horizontal grid lines"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-chart-options.svg" alt="Six small charts: a solid, a dashed and a dotted line; a line with a gap next to one drawn across the gap; an area with a line and a mark on every point; narrow bars; bars of 2025 and 2026 in two stacks per quarter; a line over dashed vertical and solid horizontal grid lines"></p>
 
 =end html
 
@@ -2144,7 +2144,7 @@ the picture shows it with the mouse pointer over the chart.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-hover.svg" alt="A stacked area chart of closed issues per team with the area under the mouse pointer emphasized, the others faded, and a status line that names the team, the week and the number of issues"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-chart-hover.svg" alt="A stacked area chart of closed issues per team with the area under the mouse pointer emphasized, the others faded, and a status line that names the team, the week and the number of issues"></p>
 
 =end html
 
@@ -2164,7 +2164,7 @@ The picture shows a drag and three clicks.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-paint-with-the-mouse.svg" alt="A wave of stars drawn by dragging the mouse over a canvas, with an o where the drag started and at three clicked cells"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-paint-with-the-mouse.svg" alt="A wave of stars drawn by dragging the mouse over a canvas, with an o where the drag started and at three clicked cells"></p>
 
 =end html
 
@@ -2174,7 +2174,7 @@ L<Term::Fabulous::Cookbook::Canvases/Plot data on a pixel canvas (PixelCanvas)>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-pixel-canvas-plot.svg" alt="A line chart of temperatures on a pixel canvas, red above 20 degrees"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-pixel-canvas-plot.svg" alt="A line chart of temperatures on a pixel canvas, red above 20 degrees"></p>
 
 =end html
 
@@ -2188,7 +2188,7 @@ screen's and white. Needs L<Imager>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-picture-viewer.svg" alt="Three overlapping translucent circles, red, green and blue, scaled twice in a frame on the dark screen, their colors mixed where they overlap, with the file name, the picture size, the fit and the keys above them"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-picture-viewer.svg" alt="Three overlapping translucent circles, red, green and blue, scaled twice in a frame on the dark screen, their colors mixed where they overlap, with the file name, the picture size, the fit and the keys above them"></p>
 
 =end html
 
@@ -2200,7 +2200,7 @@ L<Imager>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-embedded-logo.svg" alt="An about box with a rainbow circle logo next to the program name, a description and a hint to press q"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-embedded-logo.svg" alt="An about box with a rainbow circle logo next to the program name, a description and a hint to press q"></p>
 
 =end html
 
@@ -2215,7 +2215,7 @@ L<Imager::File::SIXEL> and a terminal that shows sixel graphics.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-sixel-viewer.svg" alt="A detail of the Mandelbrot set, blue and white spirals with orange and dark red bands, scaled to fit a rounded frame on the dark screen in sixel graphics, with a help box of the four keys over the top of the picture, which leaves those cells out, and the keys above the frame"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-sixel-viewer.svg" alt="A detail of the Mandelbrot set, blue and white spirals with orange and dark red bands, scaled to fit a rounded frame on the dark screen in sixel graphics, with a help box of the four keys over the top of the picture, which leaves those cells out, and the keys above the frame"></p>
 
 =end html
 
@@ -2235,7 +2235,7 @@ directory.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-report-to-file.svg" alt="The sales report: a rounded box with a title and three regions"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-report-to-file.svg" alt="The sales report: a rounded box with a title and three regions"></p>
 
 =end html
 
@@ -2266,7 +2266,7 @@ and ends.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-kdl-panel.svg" alt="The Network panel in a rounded frame and the Disk panel in a double frame"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-kdl-panel.svg" alt="The Network panel in a rounded frame and the Disk panel in a double frame"></p>
 
 =end html
 

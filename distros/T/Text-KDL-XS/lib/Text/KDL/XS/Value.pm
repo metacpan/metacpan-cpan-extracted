@@ -256,7 +256,7 @@ The kind of a number says how it is stored in Perl:
   float     decimal point or exponent, at most 15 digits written before
             the exponent (leading and trailing zeros count), written
             exponent within -284 .. 284; also #inf, #-inf and #nan. The
-            value is the double nearest to the literal.
+            value is the Perl float (NV) nearest to the literal.
   string    every other number, as text (underscores removed, radix
             prefixes converted to decimal, leading + dropped, otherwise
             verbatim)
@@ -309,7 +309,7 @@ For numbers only; any other type dies when C<kind> is given. One of:
   integer  a Perl integer, or decimal digits with an optional sign, in the
            range -2**63 .. 2**64-1 (written in decimal)
   float    anything Perl considers numeric (Scalar::Util::looks_like_number);
-           written with the shortest text that reads back as the same double
+           written with the shortest text that reads back as the same float
   string   a KDL number literal, written verbatim: an optional sign followed
            by decimal digits with an optional fraction and exponent, or by
            0x, 0o or 0b digits, '_' allowed after the first digit; or one of
@@ -379,7 +379,7 @@ A string form for display or comparison:
   bool    -> 'true' or 'false'
   number  -> integer: the stored value as a string
              float: the text the emitter writes, the shortest one that
-             reads back as the same double, always with a decimal point
+             reads back as the same float, always with a decimal point
              or an exponent ('1.0', '1000.0', '0.30000000000000004',
              '1e+21'); '#inf', '#-inf' or '#nan' for the special values
              kind 'string': the stored text
@@ -401,7 +401,7 @@ A native Perl number for arithmetic:
 Numbers kept as text are usually too big or too precise for a Perl
 number, so the conversion is lossy: integers beyond 2**64 and decimals
 with more than about 16 digits lose precision, values beyond the range of
-a double become infinite. Use L</as_bignum> for exact arithmetic.
+a Perl float become infinite. Use L</as_bignum> for exact arithmetic.
 
 =head2 as_bignum
 
@@ -416,12 +416,12 @@ An exact arbitrary precision number:
 
 The object is built from the same text as L</as_string>, so a float gives
 the decimal it is written as (C<0.1> gives C<0.1>, not the binary value of
-the double). L<Math::BigInt> and L<Math::BigFloat> are loaded on first use.
+the float). L<Math::BigInt> and L<Math::BigFloat> are loaded on first use.
 
 =head1 ARBITRARY PRECISION NUMBERS
 
-Numbers outside the native integer range, and decimals with more digits
-than a double holds, have kind C<string> and keep their exact text:
+Numbers outside the native integer range, and decimals with more than 15
+significant digits, have kind C<string> and keep their exact text:
 
 =for highlighter language=Perl
 
@@ -429,7 +429,7 @@ than a double holds, have kind C<string> and keep their exact text:
   $v->kind;                  # 'string'
   $v->value;                 # '123456789012345678901234567890'
   $v->as_bignum + 1;         # Math::BigInt 123456789012345678901234567891
-  $v->as_number;             # 1.23456789012346e+29 (a double, inexact)
+  $v->as_number;             # 1.23456789012346e+29 (a Perl float, inexact)
 
 =for highlighter
 

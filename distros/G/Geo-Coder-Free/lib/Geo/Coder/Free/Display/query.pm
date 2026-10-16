@@ -4,32 +4,39 @@ package Geo::Coder::Free::Display::query;
 
 use strict;
 use warnings;
-use JSON::MaybeXS;
+use autodie qw(:all);
+
+use Carp;
 
 =head1 VERSION
 
-Version 0.42
+Version 0.46
 
 =cut
 
-our $VERSION = '0.42';
+our $VERSION = '0.46';
 
-use Geo::Coder::Free::Display;
-
-our @ISA = ('Geo::Coder::Free::Display');
+use parent -norequire, 'Geo::Coder::Free::Display';
+use JSON::MaybeXS;
 
 sub html {
 	my $self = shift;
 	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
 	my $info = $self->{_info};
-	die unless($info);
+	Carp::croak('no _info') unless $info;
 
 	my $allowed = {
-		'page' => 'query',
-		'q' => qr/[a-z][A-Z]$/i,	# TODO: regex of allowable name formats
-		'scantext' => undef,	# TODO: regex of allowable name formats
-		'lang' => qr/^[A-Z][A-Z]/i,
+		'page'     => 'query',
+		# Addresses: letters (including accented), digits, spaces, and common
+		# punctuation.  Angle brackets are excluded to prevent XSS in any
+		# error path that echoes the input.  500-char cap prevents DoS via
+		# absurdly long strings reaching the geocoder.
+		'q'        => qr/^[^<>\x00-\x1f\x7f]{1,500}$/,
+		# Free text for scantext mode — allow anything printable but cap
+		# length so the geocoder's O(N²) word-window scan stays bounded.
+		'scantext' => qr/^[^\x00-\x08\x0b\x0c\x0e-\x1f\x7f]{1,2000}$/,
+		'lang'     => qr/^[A-Z]{2}/i,
 	};
 	my %params = %{$info->params({ allow => $allowed })};
 
@@ -53,41 +60,21 @@ sub html {
 			return '{}' if(!defined($rc));
 		}
 
-		# delete $rc->{'md5'};
-		# delete $rc->{'sequence'};
-		# foreach my $key(keys %{$rc}) {
-			# if(!defined($rc->{$key})) {
-				# delete $rc->{$key};
-			# }
-		# }
-
-		# return encode_json $rc;
 		return encode_json {
-			'latitude' => $rc->lat(),
+			'latitude'  => $rc->lat(),
 			'longitude' => $rc->long()
 		};
 	} elsif(my $scantext = $params{'scantext'}) {
 		my @rc = $geocoder->geocode(scantext => $scantext);
 
 		if(scalar(@rc) > 0) {
-			# foreach my $l(@rc) {
-				# delete $l->{'md5'};
-				# delete $l->{'sequence'};
-				# foreach my $key(keys %{$l}) {
-					# if(!defined($l->{$key})) {
-						# delete $l->{$key};
-					# }
-				# }
-			# }
-			# return encode_json \@rc;
-
 			my @locations;
 			foreach my $l(@rc) {
 				push @locations, {
-					'latitude' => $l->lat(),
+					'latitude'  => $l->lat(),
 					'longitude' => $l->long()
 				};
-			};
+			}
 			return encode_json \@locations;
 		}
 	}

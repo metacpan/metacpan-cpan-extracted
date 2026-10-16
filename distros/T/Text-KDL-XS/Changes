@@ -1,5 +1,33 @@
 Revision history for Text-KDL-XS
 
+0.003  2026-10-15
+        Build:
+        - The ckdl sources are now bundled in the ckdl/ directory and
+          compiled into the extension. Alien::ckdl is no longer a
+          dependency, and installing needs no network access beyond
+          CPAN. ckdl/UPSTREAM.md names the bundled upstream commit
+          (the same one Alien::ckdl 0.001 built).
+        - ExtUtils::MakeMaker 7.06 or newer is required to configure.
+        - Perl 5.30 or newer is required: older perls convert number
+          text to floats without correct rounding, so 17-digit floats
+          did not round-trip.
+
+        Fixes:
+        - Floats are read and written at the width of the perl's own
+          floating point type. On perls built with -Duselongdouble or
+          -Dusequadmath every float was narrowed to a double: 0.1 + 0.2
+          was written as 0.3, a parsed 0.1 was not the nearest long
+          double, and quadmath perls panicked with "quadmath_snprintf
+          failed" for every float (GitHub #1).
+
+        Tests and platforms:
+        - CI now covers macOS, Windows (Strawberry Perl) and FreeBSD
+          besides Linux, and the test suite passes on all of them.
+        - On Windows a few decimal floats read back one ulp off: ckdl
+          converts them as mantissa * pow(10, exponent), and the
+          Windows C runtime's pow is not correctly rounded. The
+          emitted text is exact; the round-trip test is skipped there.
+
 0.002  2026-09-26
         Incompatible changes:
         - A string passed to parse_kdl or Text::KDL::XS::Parser->new is

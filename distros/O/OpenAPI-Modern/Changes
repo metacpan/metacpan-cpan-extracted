@@ -1,5 +1,15 @@
 Revision history for OpenAPI-Modern
 
+0.150     2026-10-15 21:06:52Z
+          - updated bundled schemas for OAS version 3.1 to their latest
+            published versions
+          - the "openapi_document" constructor argument is now deprecated, in
+            favour of "documents" (in the constructor) and "openapi_documents"
+            (as an accessor)
+          - the "openapi_uri" and "openapi_schema" accessors are deprecated
+            (but still available as constructor arguments)
+          - the "document_get" accessor is deprecated
+
 0.149     2026-09-17 23:00:57Z
           - fix string escaping in the Content-Disposition header when
             serializing and deserializing multipart/form-data messages

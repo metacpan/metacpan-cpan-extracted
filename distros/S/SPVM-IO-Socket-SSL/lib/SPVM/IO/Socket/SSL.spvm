@@ -2,7 +2,7 @@
 # MIT License
 
 class IO::Socket::SSL extends IO::Socket::IP {
-  version "0.020";
+  version "0.021";
   
   use IO::Socket::SSL::Callback::BeforeConnectSSL;
   use IO::Socket::SSL::Callback::BeforeAcceptSSL;
@@ -29,13 +29,6 @@ class IO::Socket::SSL extends IO::Socket::IP {
   use List;
   use Re;
   
-  # Enemerations
-  enum {
-    SOCKET_CATEGORY_CLIENT,
-    SOCKET_CATEGORY_SERVER,
-    SOCKET_CATEGORY_ACCEPTED,
-  }
-  
   # Fields
   has ssl_ctx : ro Net::SSLeay::SSL_CTX;
   
@@ -46,8 +39,6 @@ class IO::Socket::SSL extends IO::Socket::IP {
   has before_accept_SSL_cbs : ro IO::Socket::SSL::Callback::BeforeAcceptSSL[];
   
   # Undocumented Fields
-  has SocketCategory : int;
-  
   has SSL_startHandshake : int;
   
   has SSL_verify_mode : int;
@@ -182,7 +173,7 @@ class IO::Socket::SSL extends IO::Socket::IP {
     my $SSL_startHandshake = $self->{SSL_startHandshake};
     if ($SSL_startHandshake) {
       my $SocketCategory = $self->{SocketCategory};
-      if ($SocketCategory == &SOCKET_CATEGORY_CLIENT) {
+      if ($SocketCategory == IO::Socket->SOCKET_CATEGORY_CLIENT) {
         $self->connect_SSL;
       }
     }
@@ -197,31 +188,17 @@ class IO::Socket::SSL extends IO::Socket::IP {
     
     my $FD = $self->{FD};
     
-    # SocketCategory
-    my $SocketCategory = -1;
-    if ($Listen > 0) {
-      $SocketCategory = &SOCKET_CATEGORY_SERVER;
-    }
-    elsif ($PeerAddr) {
-      $SocketCategory = &SOCKET_CATEGORY_CLIENT;
-    }
-    elsif ($FD > 0) {
-      $SocketCategory = &SOCKET_CATEGORY_ACCEPTED;
-    }
-    else {
-      die "[Unexpected Error]A socket category cannot be detected.";
-    }
-    $self->{SocketCategory} = $SocketCategory;
-    if ($SocketCategory == &SOCKET_CATEGORY_ACCEPTED) {
+    my $SocketCategory = $self->{SocketCategory};
+    unless ($SocketCategory == IO::Socket->SOCKET_CATEGORY_SERVER || $SocketCategory == IO::Socket->SOCKET_CATEGORY_CLIENT) {
       return;
     }
     
     # ssl_method
     my $ssl_method = (Net::SSLeay::SSL_METHOD)undef;
-    if ($SocketCategory == &SOCKET_CATEGORY_SERVER) {
+    if ($SocketCategory == IO::Socket->SOCKET_CATEGORY_SERVER) {
       $ssl_method = Net::SSLeay::SSL_METHOD->TLS_server_method;
     }
-    elsif ($SocketCategory == &SOCKET_CATEGORY_CLIENT) {
+    elsif ($SocketCategory == IO::Socket->SOCKET_CATEGORY_CLIENT) {
       $ssl_method = Net::SSLeay::SSL_METHOD->TLS_client_method;
     }
     else {
@@ -233,10 +210,10 @@ class IO::Socket::SSL extends IO::Socket::IP {
     
     # SSL_verify_mode
     unless (exists $self->{SSL_verify_mode}) {
-      if ($SocketCategory == &SOCKET_CATEGORY_SERVER) {
+      if ($SocketCategory == IO::Socket->SOCKET_CATEGORY_SERVER) {
         $self->{SSL_verify_mode} = SSL->SSL_VERIFY_NONE;
       }
-      elsif ($SocketCategory == &SOCKET_CATEGORY_CLIENT) {
+      elsif ($SocketCategory == IO::Socket->SOCKET_CATEGORY_CLIENT) {
         $self->{SSL_verify_mode} = SSL->SSL_VERIFY_PEER;
       }
     }
@@ -266,7 +243,7 @@ class IO::Socket::SSL extends IO::Socket::IP {
     
     # SSL_hostname
     my $SSL_hostname = $self->{SSL_hostname};
-    if ($SocketCategory == &SOCKET_CATEGORY_CLIENT) {
+    if ($SocketCategory == IO::Socket->SOCKET_CATEGORY_CLIENT) {
       unless ($SSL_hostname) {
         if ($PeerAddr && !$PeerAddr_is_ip_address) {
           $SSL_hostname = $PeerAddr;
@@ -370,10 +347,10 @@ class IO::Socket::SSL extends IO::Socket::IP {
     # SSL_alpn_protocols
     my $SSL_alpn_protocols = $self->{SSL_alpn_protocols};
     if ($SSL_alpn_protocols) {
-      if ($SocketCategory == &SOCKET_CATEGORY_CLIENT) {
+      if ($SocketCategory == IO::Socket->SOCKET_CATEGORY_CLIENT) {
         $ssl_ctx->set_alpn_protos_with_protocols($SSL_alpn_protocols);
       }
-      elsif ($SocketCategory == &SOCKET_CATEGORY_SERVER) {
+      elsif ($SocketCategory == IO::Socket->SOCKET_CATEGORY_SERVER) {
         $ssl_ctx->set_alpn_select_cb_with_protocols($SSL_alpn_protocols);
       }
     }
@@ -658,7 +635,7 @@ class IO::Socket::SSL extends IO::Socket::IP {
       my $x509s_original = $ssl->get_peer_cert_chain;
       
       my $SocketCategory = $self->{SocketCategory};
-      if ($SocketCategory == &SOCKET_CATEGORY_ACCEPTED) {
+      if ($SocketCategory == IO::Socket->SOCKET_CATEGORY_ACCEPTED) {
         $x509s = (Net::SSLeay::X509[])Array->merge_object([$x509_peer], $x509s_original);
       }
       else {

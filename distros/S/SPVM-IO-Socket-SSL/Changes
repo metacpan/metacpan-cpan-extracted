@@ -1,3 +1,14 @@
+0.021 2026-10-16
+  [Requirement Changes]
+    * Require SPVM::IO 0.255
+    * Require SPVM::Net::SSLeay 0.047
+    * Require SPVM::Sys 0.584
+    * Require SPVM::Regex 0.262
+    * Require SPVM::Go 0.047
+  [Internal Changes]
+    * Use default SocketCategory in IO::Socket::IP.
+    * Remove SocketCategory field from IO::Socket::SSL and remove the constants.
+
 0.020 2026-10-07
   [Test Improvement]
     * Remove Test::SPVM::Sys::Socket::XXX classes from tests.

@@ -5,7 +5,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Object::Pad 0.825;
 
@@ -453,7 +453,7 @@ around a center
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-radar-chart.svg" alt="Two translucent polygons for two laptop models over a web of six axes labeled Speed, Battery, Screen, Keyboard, Weight and Price"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-radar-chart.svg" alt="Two translucent polygons for two laptop models over a web of six axes labeled Speed, Battery, Screen, Keyboard, Weight and Price"></p>
 
 =end html
 

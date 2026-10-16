@@ -5,7 +5,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Object::Pad 0.825;
 
@@ -637,7 +637,7 @@ distribution (see L<Term::Fabulous::Examples>):
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/overview.svg" alt="A Term::Fabulous program: a sign-up form with text fields, radio buttons, a dropdown, a slider, a check box and buttons, a chart of requests per second with a translucent notification, an event log and text in several scripts"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/overview.svg" alt="A Term::Fabulous program: a sign-up form with text fields, radio buttons, a dropdown, a slider, a check box and buttons, a chart of requests per second with a translucent notification, an event log and text in several scripts"></p>
 
 =end html
 
@@ -748,6 +748,13 @@ subclass of L<Clay::UI>. It reaches the terminal through a I<terminal>
 object (L<Term::Fabulous::Role::Terminal>): the real one by default, or
 L<Term::Fabulous::Terminal::Memory> in tests, which L</step> drives
 without an event loop.
+
+=head1 AI DISCLAIMER
+
+AI has been used in the development of this project, including code
+generation and documentation. If that is a concern for you, this
+project may not be for you. Please consider this before using or
+contributing to the project.
 
 =head1 DOCUMENTATION
 
@@ -1528,7 +1535,7 @@ L<Term::Fabulous::Manual::Events/FOCUS>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-inline-prompt.svg" alt="An inline prompt in the three rows below a shell's earlier output: a question, a text field holding Ada Lovelace and a help line"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-inline-prompt.svg" alt="An inline prompt in the three rows below a shell's earlier output: a question, a text field holding Ada Lovelace and a help line"></p>
 
 =end html
 

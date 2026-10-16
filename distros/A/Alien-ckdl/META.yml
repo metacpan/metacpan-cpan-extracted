@@ -1,5 +1,5 @@
 ---
-abstract: 'Build and install ckdl, a C library for KDL documents'
+abstract: '(DEPRECATED) Build and install ckdl, a C library for KDL documents'
 author:
   - 'Davenonymous <perl@davenonymous.com>'
 build_requires:
@@ -38,7 +38,7 @@ resources:
   bugtracker: https://github.com/Davenonymous/perl-alien-ckdl/issues
   homepage: https://github.com/tjol/ckdl
   repository: https://github.com/Davenonymous/perl-alien-ckdl.git
-version: '0.001'
+version: '0.002'
 x_alienfile:
   generated_by: 'Alien::Build::MM version 2.84'
   requires:
@@ -53,4 +53,5 @@ x_alienfile:
       URI: '0'
       URI::Escape: '0'
     system: {}
+x_deprecated: 1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

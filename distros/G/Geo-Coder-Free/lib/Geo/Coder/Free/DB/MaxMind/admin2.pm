@@ -2,6 +2,7 @@ package Geo::Coder::Free::DB::MaxMind::admin2;
 
 use strict;
 use warnings;
+use autodie qw(:all);
 
 =head1 NAME
 
@@ -9,11 +10,11 @@ Geo::Coder::Free::DB::MaxMind::admin2 - driver for http://download.geonames.org/
 
 =head1 VERSION
 
-Version 0.42
+Version 0.46
 
 =cut
 
-our $VERSION = '0.42';
+our $VERSION = '0.46';
 
 # It contains admin areas drilled down from the admin1 database such as US counties
 # Note that GB has counties
@@ -22,8 +23,7 @@ our $VERSION = '0.42';
 # So a look up of 'Sittingbourne' with a Region set to 'G5' in the cities database will give:
 #	gb,sittingbourne,Sittingbourne,G5,41148,51.333333,.75
 
+use parent -norequire, 'Geo::Coder::Free::DB::MaxMind::admin';
 use Geo::Coder::Free::DB::MaxMind::admin;
-
-our @ISA = ('Geo::Coder::Free::DB::MaxMind::admin');
 
 1;

@@ -312,7 +312,7 @@ the program is F<examples/layout-direction.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-layout-direction.svg" alt="Four panels: three boxes side by side, three boxes in a column, seven boxes wrapped onto two lines, and three boxes of different sizes on top of each other"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-layout-direction.svg" alt="Four panels: three boxes side by side, three boxes in a column, seven boxes wrapped onto two lines, and three boxes of different sizes on top of each other"></p>
 
 =end html
 
@@ -360,7 +360,7 @@ dies. Values with parentheses must be quoted in KDL.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-layout-sizing.svg" alt="Eight rows, each a track with colored boxes sized by fit, fit with a minimum, fixed, percent, grow, grow with a maximum, fixed plus grow, and two grow boxes"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-layout-sizing.svg" alt="Eight rows, each a track with colored boxes sized by fit, fit with a minimum, fixed, percent, grow, grow with a maximum, fixed plus grow, and two grow boxes"></p>
 
 =end html
 
@@ -428,7 +428,7 @@ for all four sides.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-layout-padding.svg" alt="Three boxes with the same three children: without padding and gap, with padding and a gap of one row, and with a border and one cell of padding"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-layout-padding.svg" alt="Three boxes with the same three children: without padding and gap, with padding and a gap of one row, and with a border and one cell of padding"></p>
 
 =end html
 
@@ -486,7 +486,7 @@ out.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-layout-alignment.svg" alt="Nine boxes in a grid, each with one child placed at a different combination of left, center, right and top, center, bottom"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-layout-alignment.svg" alt="Nine boxes in a grid, each with one child placed at a different combination of left, center, right and top, center, bottom"></p>
 
 =end html
 
@@ -530,7 +530,7 @@ In KDL:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-flow.svg" alt="Twenty colored tags in a rounded box, wrapped onto several lines"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-flow.svg" alt="Twenty colored tags in a rounded box, wrapped onto several lines"></p>
 
 =end html
 
@@ -627,7 +627,7 @@ In KDL:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-stack.svg" alt="Three bordered cards with colored badges in their top right corners above a log with a bordered message centered over it"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-stack.svg" alt="Three bordered cards with colored badges in their top right corners above a log with a bordered message centered over it"></p>
 
 =end html
 
@@ -700,7 +700,7 @@ id directly:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-layout-floating.svg" alt="A File menu open below its button over a panel, a red badge on the panel's top right corner and a green message in the bottom row of the screen"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-layout-floating.svg" alt="A File menu open below its button over a panel, a red badge on the panel's top right corner and a green message in the bottom row of the screen"></p>
 
 =end html
 
@@ -792,7 +792,7 @@ In KDL:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-scroll-box.svg" alt="Two framed boxes scrolled down, one with numbered lines, one with squares, each with a scrollbar in its last column whose thumb shows the visible part"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-scroll-box.svg" alt="Two framed boxes scrolled down, one with numbered lines, one with squares, each with a scrollbar in its last column whose thumb shows the visible part"></p>
 
 =end html
 
@@ -898,7 +898,7 @@ one character per row. The picture shows the forms
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-divider.svg" alt="Dividers: a plain line, texts at the start, the center and the end, double and heavy lines in colors, and a vertical divider with a text between two columns"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-divider.svg" alt="Dividers: a plain line, texts at the start, the center and the end, double and heavy lines in colors, and a vertical divider with a text between two columns"></p>
 
 =end html
 
@@ -944,7 +944,7 @@ both looks (F<examples/widgets/accordion.pl>):
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-accordion.svg" alt="Two accordions: one with the Network section open under General and a disabled Licenses section, one with borders, the toggles at the end and two sections open at once"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-accordion.svg" alt="Two accordions: one with the Network section open under General and a disabled Licenses section, one with borders, the toggles at the end and two sections open at once"></p>
 
 =end html
 
@@ -999,7 +999,7 @@ sit at the start, in the center or at the end of the bar
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-tabs.svg" alt="Four Tabs widgets: tabs along the top with the Network page shown and a disabled Licenses tab, a sidebar of tabs along the left side, a tab bar at the bottom in the Heavy style with the tabs in the center, and tall tabs with downward labels without a page border"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-tabs.svg" alt="Four Tabs widgets: tabs along the top with the Network page shown and a disabled Licenses tab, a sidebar of tabs along the left side, a tab bar at the bottom in the Heavy style with the tabs in the center, and tall tabs with downward labels without a page border"></p>
 
 =end html
 
@@ -1064,7 +1064,7 @@ unsaved changes and an error, and an arrow to a tab that does not fit
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-document-tabs.svg" alt="A row of document tabs at the top: notes.txt with a blue dot for unsaved changes, config.kdl with a red exclamation mark for errors, todo.md, and the active tab budget.csv in bold on a lighter background with a blue dot, each with a close mark, then an arrow to a hidden tab and a plus button. Below, the text of budget.csv, a dim line with the keys that switch, close and add tabs, and a status bar with the message Closed README.md."></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-document-tabs.svg" alt="A row of document tabs at the top: notes.txt with a blue dot for unsaved changes, config.kdl with a red exclamation mark for errors, todo.md, and the active tab budget.csv in bold on a lighter background with a blue dot, each with a close mark, then an arrow to a hidden tab and a plus button. Below, the text of budget.csv, a dim line with the keys that switch, close and add tabs, and a status bar with the message Closed README.md."></p>
 
 =end html
 

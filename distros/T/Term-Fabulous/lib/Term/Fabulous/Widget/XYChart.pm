@@ -5,7 +5,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Object::Pad 0.825;
 
@@ -1422,7 +1422,7 @@ pages.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-line-chart.svg" alt="A line chart with three smooth lines for Web, iOS and Android over the months of a year, a legend at the top, y axis labels with a title at the left and month labels below"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-line-chart.svg" alt="A line chart with three smooth lines for Web, iOS and Android over the months of a year, a legend at the top, y axis labels with a title at the left and month labels below"></p>
 
 =end html
 
@@ -1595,7 +1595,7 @@ last in its layer, unless it is part of a stack (see L</HOVER>).
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-line.svg" alt="A line chart of three series, the average monthly temperatures of Lisbon, Berlin and Oslo, each in its own palette color with a dot on every month and a legend at the top"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-chart-line.svg" alt="A line chart of three series, the average monthly temperatures of Lisbon, Berlin and Oslo, each in its own palette color with a dot on every month and a legend at the top"></p>
 
 =end html
 
@@ -1765,7 +1765,7 @@ end of the axis.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-log-scale.svg" alt="The same two series twice: on a linear axis the small values lie flat on the bottom, on a logarithmic axis both series rise as nearly straight lines"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-chart-log-scale.svg" alt="The same two series twice: on a linear axis the small values lie flat on the bottom, on a logarithmic axis both series rise as nearly straight lines"></p>
 
 =end html
 
@@ -1788,7 +1788,7 @@ intervals.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-time-series.svg" alt="Hourly temperatures over four days on a time axis labeled with dates at midnight and hours between: a solid measured line, a dashed forecast and a shaded area under part of the measurements"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-chart-time-series.svg" alt="Hourly temperatures over four days on a time axis labeled with dates at midnight and hours between: a solid measured line, a dashed forecast and a shaded area under part of the measurements"></p>
 
 =end html
 
@@ -1821,7 +1821,7 @@ stacked total; value labels on bars show the total of each stack.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-stacked-areas.svg" alt="Two stacked area charts of electricity from coal, gas, wind and solar from 2016 to 2026: the amounts in TWh on the left, each source's share of 100 percent on the right"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-chart-stacked-areas.svg" alt="Two stacked area charts of electricity from coal, gas, wind and solar from 2016 to 2026: the amounts in TWh on the left, each source's share of 100 percent on the right"></p>
 
 =end html
 
@@ -1877,7 +1877,7 @@ C<< curve =E<gt> sub ($t) { $t ** 2 } >>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-curves.svg" alt="Six small charts of the same seven points connected linear, step, monotone, catmull-rom, ease-in-out-sine and ease-out-bounce"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-chart-curves.svg" alt="Six small charts of the same seven points connected linear, step, monotone, catmull-rom, ease-in-out-sine and ease-out-bounce"></p>
 
 =end html
 
@@ -1933,7 +1933,7 @@ their colors: L<Term::Fabulous::Chart::Marker>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-styles.svg" alt="Nine small charts of one wave: lines in Braille, half blocks, quadrants, sextants and box drawing lines, an area in eighth blocks, and bars in quadrants, blocks and Braille"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-chart-styles.svg" alt="Nine small charts of one wave: lines in Braille, half blocks, quadrants, sextants and box drawing lines, an area in eighth blocks, and bars in quadrants, blocks and Braille"></p>
 
 =end html
 
@@ -1957,7 +1957,7 @@ character, or by a circle for dots and squares.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-scatter.svg" alt="A scatter plot of petal length and width of three species as three clusters of points, two drawn as Braille squares and the largest flowers as diamond characters, and a dashed trend line through each of the two larger species"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-chart-scatter.svg" alt="A scatter plot of petal length and width of three species as three clusters of points, two drawn as Braille squares and the largest flowers as diamond characters, and a dashed trend line through each of the two larger species"></p>
 
 =end html
 
@@ -1977,7 +1977,7 @@ the two can be told apart.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-options.svg" alt="Six small charts: a solid, a dashed and a dotted line; a line with a gap next to one drawn across the gap; an area with a line and a mark on every point; narrow bars; bars of 2025 and 2026 in two stacks per quarter; a line over dashed vertical and solid horizontal grid lines"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-chart-options.svg" alt="Six small charts: a solid, a dashed and a dotted line; a line with a gap next to one drawn across the gap; an area with a line and a mark on every point; narrow bars; bars of 2025 and 2026 in two stacks per quarter; a line over dashed vertical and solid horizontal grid lines"></p>
 
 =end html
 
@@ -2012,7 +2012,7 @@ keep their meaning (C<y_axis> describes the values).
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-bars.svg" alt="Three bar charts: grouped bars with their values above them, stacked bars, and horizontal bars of four pages with their values right of the bars"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-chart-bars.svg" alt="Three bar charts: grouped bars with their values above them, stacked bars, and horizontal bars of four pages with their values right of the bars"></p>
 
 =end html
 
@@ -2060,7 +2060,7 @@ the steps, so a stack adds up the prepared values.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-transform.svg" alt="Daily visits as a dim raw line with a 7-day moving average and a dashed exponentially smoothed line over it, and below it share and bond prices both indexed to 100 at day 1"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-chart-transform.svg" alt="Daily visits as a dim raw line with a 7-day moving average and a dashed exponentially smoothed line over it, and below it share and bond prices both indexed to 100 at day 1"></p>
 
 =end html
 
@@ -2128,7 +2128,7 @@ L<Term::Fabulous::Event::SeriesHover>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-chart-hover.svg" alt="A stacked area chart of closed issues per team with the area under the mouse pointer emphasized, the others faded, and a status line that names the team, the week and the number of issues"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-chart-hover.svg" alt="A stacked area chart of closed issues per team with the area under the mouse pointer emphasized, the others faded, and a status line that names the team, the week and the number of issues"></p>
 
 =end html
 

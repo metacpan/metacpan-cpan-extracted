@@ -1,0 +1,53 @@
+#!/usr/bin/env perl
+use 5.014;
+use strict;
+use warnings;
+
+use Game::Shogi::Terminal;
+
+our $VERSION = '0.01';
+
+exit Game::Shogi::Terminal->run(@ARGV);
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+shogi - Japanese chess on a terminal
+
+=head1 SYNOPSIS
+
+    shogi                          # play the bot from the opening, as Black
+    shogi --side w --level 0       # play White against the weakest rung
+    shogi --handicap rook          # the bot gives a rook and moves first
+    shogi --ascii                  # SFEN letters instead of kanji
+    shogi --usi                    # speak USI to a shogi GUI, draw nothing
+
+=head1 DESCRIPTION
+
+A front end and nothing else: the board and the picker live in
+L<Game::Shogi::Terminal> and the protocol in L<Game::Shogi::USI>.
+
+C<--level> takes either a rung index into C<@Game::Shogi::Bot::LADDER> or a node
+budget outright, and tells them apart by size. B<A number between the two is
+refused rather than guessed at>: the ladder has four rungs and its least budget
+is 400 nodes, so C<--level 4> to C<--level 399> are refused, and the refusal
+names both ranges. Under C<--usi> the level is the default budget of a C<go>
+that names none.
+
+C<--pick> chooses a move with the arrow keys and C<--no-pick> types it. Left
+alone it picks when there is a terminal and L<Term::ReadKey> is installed.
+
+=head1 EXIT STATUS
+
+    0   you won, or the game drew, or you quit
+    1   you lost
+    2   a bad option
+
+=head1 SEE ALSO
+
+L<Game::Shogi>, L<Game::Shogi::Terminal>, L<Game::Shogi::USI>
+
+=cut

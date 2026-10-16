@@ -90,6 +90,8 @@ subtest 'sixel pictures lie over the cells' => sub {
 
 subtest 'the PNG renderer draws every style' => sub {
 	skip_all 'Imager is not installed' unless can_load( modules => { Imager => 0 } );
+	skip_all 'Imager was built without PNG support' unless $Imager::formats{png};
+	skip_all 'Imager was built without the freetype driver' unless $Imager::formats{ft2};
 	skip_all 'fontconfig (fc-match) is not installed' unless grep { -e File::Spec->catfile( $_, "fc-match$Config{_exe}" ) } File::Spec->path;
 	require Term::Fabulous::Screenshot::Render::PNG;
 	my $png = Term::Fabulous::Screenshot::Render::PNG->new->render( styled_scene() );

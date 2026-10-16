@@ -14,6 +14,7 @@ use Module::Load::Conditional qw(can_load);
 # Hide Imager::File::SIXEL, whether it is installed or not.
 BEGIN {
 	skip_all 'Imager is not installed' unless can_load( modules => { Imager => 0 } );
+	skip_all 'Imager was built without PNG support' unless $Imager::formats{png};
 	unshift @INC, sub ( $hook, $file ) {
 		die "Can't locate Imager/File/SIXEL.pm in \@INC (hidden by the test)\n" if $file eq 'Imager/File/SIXEL.pm';
 		return;

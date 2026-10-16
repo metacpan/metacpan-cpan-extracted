@@ -14,6 +14,7 @@ use HTML::OSM;
 use Object::Configure 0.15;
 use Params::Get 0.13;
 use Params::Validate::Strict 0.16;
+use Scalar::Util qw(blessed);
 
 =head1 NAME
 
@@ -21,11 +22,15 @@ HTML::Genealogy::Map - Extract and map genealogical events from a GEDCOM file
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
+
+# The backends of Geo::Coder::Free that answer from a local database, named as
+# they put themselves in a result's 'database' key.
+my %LOCAL_DATABASES = map { $_ => 1 } qw(OpenAddresses MaxMind Local Geo::Coder::Free::Local);
 
 =head1 DESCRIPTION
 
@@ -50,6 +55,12 @@ L<GEDCOM> object to process.
 =item B<geocoder>
 
 Geocoder to use.
+Its results are read through the coordinates in C<lat> and C<long>/C<lng> -
+through C<latitude()>/C<longitude()> when the geocoder returns an object -
+so L<Geo::Location::Point> and anything else L<HTML::OSM> accepts will do.
+A result's C<database> says which local dataset answered, and an
+L<Geo::Coder::Free> result therefore does not attract the courtesy delay that
+a remote service gets.
 
 =item B<google_key>
 
@@ -114,7 +125,7 @@ Returns an array of two strings:
 
 sub onload_render
 {
-	my $class = shift;
+	my $class = ref($_[0]) ? __PACKAGE__ : shift;
 
 	# Configuration
 	my $params = Params::Validate::Strict::validate_strict({
@@ -124,8 +135,8 @@ sub onload_render
 			'geocoder' => { 'type' => 'object', 'can' => 'geocode' },
 			'debug' => { 'type' => 'boolean', optional => 1 },
 			'google_key' => { 'type' => 'string', optional => 1, min => 39, max => 39, matches => qr/^AIza[0-9A-Za-z_-]{35}$/ },
-			'height' => { optional => 1 },
-			'width' => { optional => 1 },
+			'height' => { optional => 1, type => 'string' },
+			'width' => { optional => 1, type => 'string' },
 		}
 	});
 
@@ -212,13 +223,15 @@ sub onload_render
 		# Check cache
 		unless (exists $cache{$place}) {
 			my $location = $geocoder->geocode(location => $place);
-			if ($location && $location->{lat} && $location->{lon}) {
+			my ($lat, $long) = _coordinates($location);
+
+			if (defined($lat) && defined($long)) {
 				$cache{$place} = {
-					lat => $location->{lat},
-					lon => $location->{lon},
+					lat => $lat,
+					lon => $long,	# The cache's own key, not a key of the result
 				};
 				print "\tGeocoded: $place\n" if($debug);
-				sleep 1 if($location->{'geocoder'} !~ /^Geo::Coder::Free/);	# Be nice to geocoding service
+				sleep 1 unless _is_local($location);	# Be nice to geocoding service
 
 			} else {
 				print "\tFailed to geocode: $place\n" if($debug);
@@ -258,6 +271,53 @@ sub onload_render
 	}
 
 	return $map->onload_render();
+}
+
+# Purpose:  Read the position out of a geocoder result.
+# Entry:    $location — a Geo::Location::Point (or anything else with
+#           latitude()/longitude(), which is what HTML::OSM accepts), or a
+#           plain hashref from another geocoder, or undef.
+# Exit:     ($lat, $lon) with either possibly undef; an empty list for a result
+#           that carries no position.
+sub _coordinates {
+	my $location = shift;
+
+	return unless defined($location);
+
+	if(blessed($location) && $location->can('latitude') && $location->can('longitude')) {
+		return ($location->latitude(), $location->longitude());
+	}
+
+	if(ref($location) eq 'HASH') {
+		# lat/long/lng are the keys Geo::Location::Point itself builds; 'lon' is
+		# only a third fallback, for geocoders that spell longitude that way. It
+		# is not part of the point interface: only one of Geo::Coder::Free's
+		# MaxMind shortcuts ever sets it.
+		return ($location->{'lat'},
+			$location->{'long'} // $location->{'lng'} // $location->{'lon'});
+	}
+
+	return;
+}
+
+# Purpose:  Is this result from a local dataset, so that it needs no courtesy
+#           delay before the next lookup?
+# Entry:    $location — a geocoder result.
+# Exit:     1 if it came from an offline database, 0 otherwise.
+sub _is_local {
+	my $location = shift;
+
+	return 0 unless ref($location);
+	return 0 if(ref($location) eq 'ARRAY');	# A flat [lat, lon] says nothing about provenance
+
+	# 'database' is set by every Geo::Coder::Free backend and names the one that
+	# answered. 'geocoder' is a secondary hint, stamped by wrappers such as
+	# Geo::Coder::List - Geo::Coder::Free itself never sets it, so it is tested
+	# second and is never the only evidence of a local lookup.
+	return 1 if(defined($location->{'database'}) && $LOCAL_DATABASES{$location->{'database'}});
+	return 1 if(defined($location->{'geocoder'}) && $location->{'geocoder'} =~ /^Geo::Coder::Free/);
+
+	return 0;
 }
 
 # Generate HTML for grouped events
@@ -409,21 +469,15 @@ sub _generate_osm_map {
 	return $osm;
 }
 
-=head1 AUTHOR
-
-Nigel Horne, C<< <njh at nigelhorne.com> >>
-
 =head1 BUGS
 
 =head1 SEE ALSO
 
 =over 4
 
-=item * Test coverage report: L<https://nigelhorne.github.io/HTML-Genealogy-Map/coverage/>
+=item * L<Test Dashboard|https://nigelhorne.github.io/HTML-Genealogy-Map/coverage/>
 
-=item * L<Object::Configure>
-
-The class is fully configurable at runtime with configuration files.
+=item * L<Configure an Object at Runtime|Object::Configure>
 
 =back
 
@@ -467,23 +521,17 @@ L<http://deps.cpantesters.org/?module=HTML::Genalogy::Map>
 
 =back
 
+=head1 AUTHOR
+
+Nigel Horne, C<< <njh at nigelhorne.com> >>
+
 =head1 LICENCE AND COPYRIGHT
 
-Copyright 2025 Nigel Horne.
+Copyright 2025-2026 Nigel Horne.
 
-Usage is subject to licence terms.
-
-The licence terms of this software are as follows:
-
-=over 4
-
-=item * Personal single user, single computer use: GPL2
-
-=item * All other users (including Commercial, Charity, Educational, Government)
-  must apply in writing for a licence for use from Nigel Horne at the
-  above e-mail.
-
-=back
+Usage is subject to the GPL2 licence terms.
+If you use it,
+please let me know.
 
 =cut
 

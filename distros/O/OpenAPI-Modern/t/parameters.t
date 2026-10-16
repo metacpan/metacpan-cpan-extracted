@@ -28,29 +28,35 @@ no warnings 'redefine';
 *OpenAPI::Modern::_evaluate_subschema = sub {1};
 
 my $keyword_path = '/paths/~1foo/get/parameters/0';
+my $canonical_uri = $openapi->entry_document->canonical_uri;
 
 sub _init_test ($data_path, $param_obj_data) {
   my $state = {
-    initial_schema_uri => $openapi->openapi_uri,
+    initial_schema_uri => $canonical_uri,
     traversed_keyword_path => '',
     keyword_path => $keyword_path,
     data_path => $data_path,
+    document => $openapi->entry_document,
     specification_version => 'draft2020-12',
     vocabularies => OAS_VOCABULARIES,
+    dynamic_scope => [ $canonical_uri ],
     errors => [],
+    annotations => [],
     depth => 0,
     data => {},
   };
 
   # hack, to allow _fetch_from_uri and cache to work: patch schema, content
-  jsonp_set($openapi->openapi_document->schema, $state->{keyword_path}.'/'.$_, $param_obj_data->{$_})
+  jsonp_set($openapi->entry_document->schema, $state->{keyword_path}.'/'.$_, $param_obj_data->{$_})
     foreach keys %$param_obj_data;
 
-  $openapi->openapi_document->{_type_in_schema} //= {};
   my $path = $state->{keyword_path};
   my $len = length $path;
-  delete $openapi->openapi_document->{_type_in_schema}{$_}
-    foreach grep substr($_, 0, $len) eq $path, keys $openapi->openapi_document->{_type_in_schema}->%*;
+  foreach my $document ($openapi->openapi_documents->@*) {
+    $document->{_type_in_schema} //= {};
+    delete $document->{_type_in_schema}{$_}
+      foreach grep substr($_, 0, $len) eq $path, keys $document->{_type_in_schema}->%*;
+  }
 
   return $state;
 }
@@ -71,7 +77,7 @@ subtest 'path parameters' => sub {
         {
           instanceLocation => '/request/uri/path',
           keywordLocation => $keyword_path.'/required',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/required',
           error => 'missing path parameter: missing',
         },
       ],
@@ -85,7 +91,7 @@ subtest 'path parameters' => sub {
         {
           instanceLocation => '/request/uri/path',
           keywordLocation => $keyword_path.'/required',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/required',
           error => 'missing path parameter: missing_json_content',
         },
       ],
@@ -98,7 +104,7 @@ subtest 'path parameters' => sub {
         {
           instanceLocation => '/request/uri/path/color',
           keywordLocation => $keyword_path,
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path,
           error => 'non-ascii character detected in parameter value: not deserializable',
         },
       ],
@@ -214,7 +220,7 @@ subtest 'path parameters' => sub {
         {
           instanceLocation => '/request/uri/path/color',
           keywordLocation => $keyword_path,
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path,
           error => 'non-ascii character detected in parameter value: not deserializable',
         },
       ],
@@ -233,7 +239,7 @@ subtest 'path parameters' => sub {
         {
           instanceLocation => '/request/uri/path/color',
           keywordLocation => $keyword_path.'/schema',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/schema',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/schema',
           error => 'cannot deserialize as simple style to any type',
         },
       ],
@@ -246,7 +252,7 @@ subtest 'path parameters' => sub {
         {
           instanceLocation => '/request/uri/path/color',
           keywordLocation => $keyword_path.'/schema',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/schema',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/schema',
           error => 'cannot deserialize as simple style to requested type (number)',
         },
       ],
@@ -299,7 +305,7 @@ subtest 'path parameters' => sub {
         {
           instanceLocation => '/request/uri/path/color',
           keywordLocation => $keyword_path.'/schema',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/schema',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/schema',
           error => 'cannot deserialize as simple style to requested type (object)',
         },
       ],
@@ -344,7 +350,7 @@ subtest 'path parameters' => sub {
         {
           instanceLocation => '/request/uri/path/color',
           keywordLocation => $keyword_path.'/style',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/style',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/style',
           error => 'data does not match indicated style "simple" for object (invalid separator at key "B")',
         },
       ],
@@ -462,7 +468,7 @@ subtest 'path parameters' => sub {
         {
           instanceLocation => '/request/uri/path/color',
           keywordLocation => $keyword_path.'/schema',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/schema',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/schema',
           error => 'cannot deserialize as matrix style to any type',
         },
       ],
@@ -475,7 +481,7 @@ subtest 'path parameters' => sub {
         {
           instanceLocation => '/request/uri/path/color',
           keywordLocation => $keyword_path.'/style',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/style',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/style',
           error => 'data does not match indicated style "matrix" (invalid prefix)',
         },
       ],
@@ -488,7 +494,7 @@ subtest 'path parameters' => sub {
         {
           instanceLocation => '/request/uri/path/color',
           keywordLocation => $keyword_path.'/style',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/style',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/style',
           error => 'data does not match indicated style "matrix" (invalid prefix)',
         },
       ],
@@ -515,7 +521,7 @@ subtest 'path parameters' => sub {
         (map +{
           instanceLocation => '/request/uri/path/color',
           keywordLocation => $keyword_path.'/style',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/style',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/style',
           error => 'data does not match indicated style "matrix" for array (invalid separator at index '.$_.')',
         }, 0..2),
       ],
@@ -528,7 +534,7 @@ subtest 'path parameters' => sub {
         {
           instanceLocation => '/request/uri/path/color',
           keywordLocation => $keyword_path.'/style',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/style',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/style',
           error => 'data does not match indicated style "matrix" for array (invalid element name at "color1")',
         },
       ],
@@ -562,7 +568,7 @@ subtest 'path parameters' => sub {
         {
           instanceLocation => '/request/uri/path/color',
           keywordLocation => $keyword_path.'/style',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/style',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/style',
           error => 'data does not match indicated style "matrix" (invalid prefix)',
         },
       ],
@@ -575,7 +581,7 @@ subtest 'path parameters' => sub {
         {
           instanceLocation => '/request/uri/path/color',
           keywordLocation => $keyword_path.'/schema',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/schema',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/schema',
           error => 'cannot deserialize as matrix style to requested type (object)',
         },
       ],
@@ -620,7 +626,7 @@ subtest 'path parameters' => sub {
         {
           instanceLocation => '/request/uri/path/color',
           keywordLocation => $keyword_path.'/style',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/style',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/style',
           error => 'data does not match indicated style "matrix" for object (invalid separator at key "R")',
         },
       ],
@@ -633,7 +639,7 @@ subtest 'path parameters' => sub {
         {
           instanceLocation => '/request/uri/path/color',
           keywordLocation => $keyword_path.'/style',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/style',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/style',
           error => 'data does not match indicated style "matrix" for object (invalid separator at key "B")',
         },
       ],
@@ -725,7 +731,7 @@ subtest 'path parameters' => sub {
         {
           instanceLocation => '/request/uri/path/color',
           keywordLocation => $keyword_path.'/schema',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/schema',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/schema',
           error => 'cannot deserialize as label style to any type',
         },
       ],
@@ -766,7 +772,7 @@ subtest 'path parameters' => sub {
         {
           instanceLocation => '/request/uri/path/color',
           keywordLocation => $keyword_path.'/schema',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/schema',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/schema',
           error => 'cannot deserialize as label style to requested type (object)',
         },
       ],
@@ -811,7 +817,7 @@ subtest 'path parameters' => sub {
         {
           instanceLocation => '/request/uri/path/color',
           keywordLocation => $keyword_path.'/style',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/style',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/style',
           error => 'data does not match indicated style "label" for object (invalid separator at key "R")',
         },
       ],
@@ -824,7 +830,7 @@ subtest 'path parameters' => sub {
         {
           instanceLocation => '/request/uri/path/color',
           keywordLocation => $keyword_path.'/style',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/style',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/style',
           error => 'data does not match indicated style "label" for object (invalid separator at key "B")',
         },
       ],
@@ -957,7 +963,7 @@ subtest 'query parameters' => sub {
         {
           instanceLocation => '/request/uri/query',
           keywordLocation => $keyword_path.'/required',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/required',
           error => 'missing query parameter: q',
         },
       ],
@@ -976,7 +982,7 @@ subtest 'query parameters' => sub {
         {
           instanceLocation => '/request/uri/query',
           keywordLocation => $keyword_path.'/required',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/required',
           error => 'missing query parameter: q',
         },
       ],
@@ -1084,7 +1090,7 @@ subtest 'query parameters' => sub {
         {
           instanceLocation => '/request/uri/query',
           keywordLocation => $keyword_path.'/required',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/required',
           error => 'missing query parameter: q',
         },
       ],
@@ -1098,7 +1104,7 @@ subtest 'query parameters' => sub {
         {
           instanceLocation => '/request/uri/query/q',
           keywordLocation => $keyword_path.'/schema/$ref',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/schema/$ref',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/schema/$ref',
           error => 'EXCEPTION: unable to find resource "https://example.com/does_not_exist"',
         },
       ],
@@ -1143,7 +1149,7 @@ subtest 'query parameters' => sub {
         {
           instanceLocation => '/request/uri/query/color',
           keywordLocation => $keyword_path.'/schema',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/schema',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/schema',
           error => 'cannot deserialize as form style to any type',
         },
       ],
@@ -1156,7 +1162,7 @@ subtest 'query parameters' => sub {
         {
           instanceLocation => '/request/uri/query/q',
           keywordLocation => $keyword_path.'/schema',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/schema',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/schema',
           error => 'cannot deserialize as form style to requested type (number)',
         },
       ],
@@ -1181,7 +1187,7 @@ subtest 'query parameters' => sub {
         {
           instanceLocation => '/request/uri/query',
           keywordLocation => $keyword_path.'/required',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/required',
           error => 'missing query parameter: q',
         },
       ],
@@ -1200,7 +1206,7 @@ subtest 'query parameters' => sub {
         {
           instanceLocation => '/request/uri/query',
           keywordLocation => $keyword_path.'/required',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/required',
           error => 'missing query parameter: q',
         },
       ],
@@ -1218,7 +1224,7 @@ subtest 'query parameters' => sub {
         {
           instanceLocation => '/request/uri/query',
           keywordLocation => $keyword_path.'/required',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/required',
           error => 'missing query parameter: q',
         },
       ],
@@ -1263,7 +1269,7 @@ subtest 'query parameters' => sub {
         {
           instanceLocation => '/request/uri/query',
           keywordLocation => $keyword_path.'/required',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/required',
           error => 'missing query parameter: q',
         },
       ],
@@ -1282,7 +1288,7 @@ subtest 'query parameters' => sub {
         {
           instanceLocation => '/request/uri/query',
           keywordLocation => $keyword_path.'/required',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/required',
           error => 'missing query parameter: q',
         },
       ],
@@ -1300,7 +1306,7 @@ subtest 'query parameters' => sub {
         {
           instanceLocation => '/request/uri/query',
           keywordLocation => $keyword_path.'/required',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/required',
           error => 'missing query parameter: q',
         },
       ],
@@ -1345,7 +1351,7 @@ subtest 'query parameters' => sub {
         {
           instanceLocation => '/request/uri/query',
           keywordLocation => $keyword_path.'/required',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/required',
           error => 'missing query parameter: q',
         },
       ],
@@ -1364,7 +1370,7 @@ subtest 'query parameters' => sub {
         {
           instanceLocation => '/request/uri/query',
           keywordLocation => $keyword_path.'/required',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/required',
           error => 'missing query parameter: q',
         },
       ],
@@ -1382,7 +1388,7 @@ subtest 'query parameters' => sub {
         {
           instanceLocation => '/request/uri/query',
           keywordLocation => $keyword_path.'/required',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/required',
           error => 'missing query parameter: q',
         },
       ],
@@ -1395,7 +1401,7 @@ subtest 'query parameters' => sub {
         {
           instanceLocation => '/request/uri/query/color',
           keywordLocation => $keyword_path.'/schema',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/schema',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/schema',
           error => 'cannot deserialize as form style to requested type (object)',
         },
       ],
@@ -1448,7 +1454,7 @@ subtest 'query parameters' => sub {
         {
           instanceLocation => '/request/uri/query',
           keywordLocation => $keyword_path.'/required',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/required',
           error => 'missing query parameters',
         },
       ],
@@ -1466,7 +1472,7 @@ subtest 'query parameters' => sub {
         {
           instanceLocation => '/request/uri/query',
           keywordLocation => $keyword_path.'/required',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/required',
           error => 'missing query parameters',
         },
       ],
@@ -1503,7 +1509,7 @@ subtest 'query parameters' => sub {
         {
           instanceLocation => '/request/uri/query',
           keywordLocation => $keyword_path.'/required',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/required',
           error => 'missing query parameters',
         },
       ],
@@ -1573,7 +1579,7 @@ subtest 'query parameters' => sub {
         {
           instanceLocation => '/request/uri/query/color',
           keywordLocation => $keyword_path.'/style',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/style',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/style',
           error => 'spaceDelimited style can only deserialize to arrays or objects',
         },
       ],
@@ -1586,7 +1592,7 @@ subtest 'query parameters' => sub {
         {
           instanceLocation => '/request/uri/query/color',
           keywordLocation => $keyword_path.'/style',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/style',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/style',
           error => 'spaceDelimited style can only deserialize to arrays or objects',
         },
       ],
@@ -1605,7 +1611,7 @@ subtest 'query parameters' => sub {
         {
           instanceLocation => '/request/uri/query',
           keywordLocation => $keyword_path.'/required',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/required',
           error => 'missing query parameter: q',
         },
       ],
@@ -1624,7 +1630,7 @@ subtest 'query parameters' => sub {
         {
           instanceLocation => '/request/uri/query',
           keywordLocation => $keyword_path.'/required',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/required',
           error => 'missing query parameter: q',
         },
       ],
@@ -1643,7 +1649,7 @@ subtest 'query parameters' => sub {
         {
           instanceLocation => '/request/uri/query',
           keywordLocation => $keyword_path.'/required',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/required',
           error => 'missing query parameter: q',
         },
       ],
@@ -1656,7 +1662,7 @@ subtest 'query parameters' => sub {
         {
           instanceLocation => '/request/uri/query/q',
           keywordLocation => $keyword_path.'/style',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/style',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/style',
           error => 'spaceDelimited style can only deserialize to arrays or objects',
         },
       ],
@@ -1689,7 +1695,7 @@ subtest 'query parameters' => sub {
         {
           instanceLocation => '/request/uri/query/color',
           keywordLocation => $keyword_path.'/explode',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/explode',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/explode',
           error => 'explode=true is not supported for style=spaceDelimited',
         },
       ],
@@ -1702,7 +1708,7 @@ subtest 'query parameters' => sub {
         {
           instanceLocation => '/request/uri/query/color',
           keywordLocation => $keyword_path.'/schema',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/schema',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/schema',
           error => 'cannot deserialize as spaceDelimited style to requested type (object)',
         },
       ],
@@ -1741,7 +1747,7 @@ subtest 'query parameters' => sub {
         {
           instanceLocation => '/request/uri/query/color',
           keywordLocation => $keyword_path.'/schema',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/schema',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/schema',
           error => 'cannot deserialize as spaceDelimited style to requested type (object)',
         },
       ],
@@ -1754,7 +1760,7 @@ subtest 'query parameters' => sub {
         {
           instanceLocation => '/request/uri/query/color',
           keywordLocation => $keyword_path.'/explode',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/explode',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/explode',
           error => 'explode=true is not supported for style=spaceDelimited',
         },
       ],
@@ -1801,7 +1807,7 @@ subtest 'query parameters' => sub {
         {
           instanceLocation => '/request/uri/query/color',
           keywordLocation => $keyword_path.'/style',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/style',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/style',
           error => 'deepObject style can only deserialize to objects',
         },
       ],
@@ -1820,7 +1826,7 @@ subtest 'query parameters' => sub {
         {
           instanceLocation => '/request/uri/query',
           keywordLocation => $keyword_path.'/required',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/required',
           error => 'missing query parameter: q',
         },
       ],
@@ -1839,7 +1845,7 @@ subtest 'query parameters' => sub {
         {
           instanceLocation => '/request/uri/query',
           keywordLocation => $keyword_path.'/required',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/required',
           error => 'missing query parameter: q',
         },
       ],
@@ -1864,7 +1870,7 @@ subtest 'query parameters' => sub {
         {
           instanceLocation => '/request/uri/query',
           keywordLocation => $keyword_path.'/required',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/required',
           error => 'missing query parameter: q',
         },
       ],
@@ -1877,7 +1883,7 @@ subtest 'query parameters' => sub {
         {
           instanceLocation => '/request/uri/query/q',
           keywordLocation => $keyword_path.'/style',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/style',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/style',
           error => 'deepObject style can only deserialize to objects',
         },
       ],
@@ -2031,7 +2037,7 @@ subtest 'header parameters' => sub {
         {
           instanceLocation => '/response/header/My-Header',
           keywordLocation => $keyword_path,
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path,
           error => 'invalid syntax in header value',
         },
       ],
@@ -2099,7 +2105,7 @@ subtest 'header parameters' => sub {
         {
           instanceLocation => '/response/header',
           keywordLocation => $keyword_path.'/required',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/required',
           error => 'missing header: My-Header',
         },
       ],
@@ -2111,7 +2117,7 @@ subtest 'header parameters' => sub {
         {
           instanceLocation => '/response/header/My-Header',
           keywordLocation => $keyword_path,
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path,
           error => 'invalid syntax in header value',
         },
       ],
@@ -2142,7 +2148,7 @@ subtest 'header parameters' => sub {
         {
           instanceLocation => '/response/header/My-Header',
           keywordLocation => $keyword_path.'/schema',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/schema',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/schema',
           error => 'cannot deserialize to requested type (object)',
         },
       ],
@@ -2155,7 +2161,7 @@ subtest 'header parameters' => sub {
         {
           instanceLocation => '/response/header/My-Header',
           keywordLocation => $keyword_path.'/style',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/style',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/style',
           error => 'data does not match indicated style "simple" for object (invalid separator at key "baz")',
         },
       ],
@@ -2268,7 +2274,7 @@ subtest 'cookie parameters' => sub {
         {
           instanceLocation => '/request/header/Cookie',
           keywordLocation => $keyword_path.'/required',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/required',
           error => 'missing header: Cookie',
         },
       ],
@@ -2286,7 +2292,7 @@ subtest 'cookie parameters' => sub {
         {
           instanceLocation => '/request/header/Cookie',
           keywordLocation => $keyword_path.'/required',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/required',
           error => 'missing cookie parameter: q',
         },
       ],
@@ -2310,7 +2316,7 @@ subtest 'cookie parameters' => sub {
         {
           instanceLocation => '/request/header/Cookie/ಠ_ಠ',
           keywordLocation => $keyword_path,
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path,
           error => 'invalid cookie name: "ಠ_ಠ"',
         },
       ],
@@ -2323,7 +2329,7 @@ subtest 'cookie parameters' => sub {
         {
           instanceLocation => '/request/header/Cookie/q',
           keywordLocation => $keyword_path,
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path,
           error => 'invalid cookie value: "ಠ_ಠ"',
         },
       ],
@@ -2341,7 +2347,7 @@ subtest 'cookie parameters' => sub {
           {
             instanceLocation => '/request/header/Cookie',
             keywordLocation => $keyword_path.'/required',
-            absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+            absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/required',
             error => 'missing header: Cookie',
           },
         ],
@@ -2359,7 +2365,7 @@ subtest 'cookie parameters' => sub {
           {
             instanceLocation => '/request/header/Cookie',
             keywordLocation => $keyword_path.'/required',
-            absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+            absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/required',
             error => 'missing cookie parameter: q',
           },
         ],
@@ -2372,7 +2378,7 @@ subtest 'cookie parameters' => sub {
           {
             instanceLocation => '/request/header/Cookie/x',
             keywordLocation => $keyword_path,
-            absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+            absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path,
             error => 'cookie-string "x" is missing a value',
           },
         ],
@@ -2385,13 +2391,13 @@ subtest 'cookie parameters' => sub {
           {
             instanceLocation => '/request/header/Cookie/x',
             keywordLocation => $keyword_path,
-            absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+            absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path,
             error => 'cookie-string "x" is missing a value',
           },
           {
             instanceLocation => '/request/header/Cookie/y',
             keywordLocation => $keyword_path,
-            absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+            absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path,
             error => 'cookie-string "y" is missing a value',
           },
         ],
@@ -2428,7 +2434,7 @@ subtest 'cookie parameters' => sub {
           {
             instanceLocation => '/request/header/Cookie/foo[bar]',
             keywordLocation => $keyword_path,
-            absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+            absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path,
             error => 'invalid cookie name: "foo[bar]"',
           },
         ],
@@ -2441,13 +2447,13 @@ subtest 'cookie parameters' => sub {
           {
             instanceLocation => '/request/header/Cookie/foo',
             keywordLocation => $keyword_path,
-            absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+            absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path,
             error => 'invalid cookie value: "bad,value"',
           },
           {
             instanceLocation => '/request/header/Cookie/bar',
             keywordLocation => $keyword_path,
-            absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+            absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path,
             error => 'invalid cookie value: "worse,value"',
           },
         ],
@@ -2460,7 +2466,7 @@ subtest 'cookie parameters' => sub {
           {
             instanceLocation => '/request/header/Cookie/foo',
             keywordLocation => $keyword_path,
-            absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+            absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path,
             error => 'invalid cookie value: "bad\""',
           },
         ],
@@ -2517,7 +2523,7 @@ subtest 'cookie parameters' => sub {
         {
           instanceLocation => '/request/header/Cookie/foo',
           keywordLocation => $keyword_path.'/style',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/style',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/style',
           error => 'cannot deserialize into an object with style=form, explode=true when multiple cookies are present',
         },
       ],
@@ -2704,7 +2710,7 @@ subtest 'querystring parameters' => sub {
         {
           instanceLocation => '/request/uri/query',
           keywordLocation => $keyword_path.'/required',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          absoluteKeywordLocation => $canonical_uri.'#'.$keyword_path.'/required',
           error => 'missing querystring',
         },
       ],
@@ -2979,13 +2985,13 @@ YAML
 
   # the minimum necessary for _resolve_ref to work
   my $state = {
-    initial_schema_uri => $openapi->openapi_uri,
+    initial_schema_uri => $canonical_uri,
     traversed_keyword_path => '',
     keyword_path => '/components/parameters/MyParameter/schema',
     data_path => '/request/uri/path',
-    document => $openapi->openapi_document,
-    ($openapi->openapi_document->_get_resource($openapi->openapi_document->canonical_uri)->%{qw(specification_version vocabularies)}),
-    dynamic_scope => [ $openapi->openapi_uri ],
+    document => $openapi->entry_document,
+    ($openapi->entry_document->_get_resource($canonical_uri)->%{qw(specification_version vocabularies)}),
+    dynamic_scope => [ $canonical_uri ],
     evaluator => $openapi->evaluator,
     errors => [],
     depth => 0,
@@ -3033,13 +3039,13 @@ YAML
     ) {
       my ($expected_types, $schema) = @$test;
 
-      # hack, to allow _fetch_from_uri and cache to work
-      jsonp_set($openapi->openapi_document->schema, $state->{keyword_path}, $schema);
-      $openapi->openapi_document->{_type_in_schema} //= {};
+      # hack, to allow _fetch_from_uri and cache to work while reusing the same starting location
+      jsonp_set($openapi->entry_document->schema, $state->{keyword_path}, $schema);
+      $openapi->entry_document->{_type_in_schema} //= {};
       my $path = $state->{keyword_path};
       my $len = length $path;
-      delete $openapi->openapi_document->{_type_in_schema}{$_}
-        foreach grep substr($_, 0, $len) eq $path, keys $openapi->openapi_document->{_type_in_schema}->%*;
+      delete $openapi->entry_document->{_type_in_schema}{$_}
+        foreach grep substr($_, 0, $len) eq $path, keys $openapi->entry_document->{_type_in_schema}->%*;
 
       my @types = $openapi->_type_in_schema($schema, { %$state });
       is_equal(

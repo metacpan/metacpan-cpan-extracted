@@ -22,14 +22,13 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Alien::ckdl" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Alien::ckdl" : "0",
             "Devel::PPPort" : "3.68",
-            "ExtUtils::MakeMaker" : "6.64"
+            "ExtUtils::MakeMaker" : "7.06"
          }
       },
       "runtime" : {
@@ -41,7 +40,7 @@
             "Scalar::Util" : "0",
             "XSLoader" : "0",
             "overload" : "0",
-            "perl" : "5.012"
+            "perl" : "5.030"
          }
       },
       "test" : {
@@ -62,6 +61,6 @@
          "web" : "https://github.com/Davenonymous/perl-kdl-xs"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

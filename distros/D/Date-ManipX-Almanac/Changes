@@ -1,3 +1,8 @@
+0.005		2026-10-15	T. R. Wyant
+    Correct Makefile.PL EUMM version accommodations.
+
+    Add explicit release_status to metadata.
+
 0.004		2026-06-15	T. R. Wyant
     Remove references to the RT bug tracking system.
 

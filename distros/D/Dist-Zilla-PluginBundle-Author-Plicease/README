@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 2.80
+    version 2.81
 
 SYNOPSIS
 
@@ -101,7 +101,7 @@ DESCRIPTION
      bugtracker.web = https://github.com/plicease/My-Dist/issues
      homepage = https://metacpan.org/pod/My::Dist
      repository.type = git
-     repository.url = git://github.com/plicease/My-Dist.git
+     repository.url = https://github.com/plicease/My-Dist.git
      repository.web = https://github.com/plicease/My-Dist
      
      [InstallGuide]
@@ -146,9 +146,9 @@ OPTIONS
 
     If set to true, then include release tests when building.
 
- release_tests_skip
-
-    Passed into the Author::Plicease::Tests if release_tests is true.
+    The pod_coverage, pod_spelling_common and pod_spelling_system release
+    tests can be individually disabled by setting skip: 1 under the test's
+    key in author.yml.
 
  mb_class
 
@@ -201,6 +201,19 @@ OPTIONS
 
     If set to false, then the dist MUST NOT be released on MSWin32. This is
     a personal preference; I prefer not to release on non-Unixy platforms.
+
+ clean
+
+    Extra files or directories to remove on dzil clean, in addition to the
+    usual .tmp, _alien and FFI build artifacts. Patterns without a / are
+    matched in any directory, patterns with a / are relative to the root of
+    the dist. Can be specified multiple times. Passed into
+    Author::Plicease::Cleaner.
+
+ clean_keep
+
+    Regular expressions for paths that should not be removed by dzil clean.
+    Can be specified multiple times. Passed into Author::Plicease::Cleaner.
 
 SEE ALSO
 

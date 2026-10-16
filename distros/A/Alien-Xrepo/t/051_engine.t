@@ -3,7 +3,7 @@ use blib;
 use Test2::V0 '!subtest', -no_srand => 1;
 use Test2::Util::Importer 'Test2::Tools::Subtest' => ( subtest_streamed => { -as => 'subtest' } );
 use File::Temp qw[tempdir];
-use JSON::PP   qw[decode_json];
+use JSON::PP   qw[decode_json encode_json];
 use Path::Tiny;
 use Alien::Xrepo;
 use Alien::Xrepo::Build;
@@ -158,6 +158,31 @@ subtest 'a still-failing install records the error after one refresh' => sub {
     is scalar @installs, 2, 'two attempts total';
     like $b->runtime_prop->{errors}{raylib}, qr/boom/, 'failure recorded after the retry limit';
 };
+subtest 'a resumed build cannot refresh and retry the same package again' => sub {
+    my $cp  = path($dir)->child('retry-state.json');
+    my $spy = Alien::Xrepo::Build::TestSpy->new( fail => { raylib => 1 } );
+    my $b   = build( ['raylib'], repo => $spy, probe_policy => 'off', checkpoint => $cp, update_repo => 1 );
+    $b->run;
+    my (@updates)  = grep { $_->{action} eq 'update_repo' } @{ $spy->calls };
+    my (@installs) = grep { $_->{action} eq 'install' } @{ $spy->calls };
+    is scalar @updates,  1, 'first run refreshed the registry once';
+    is scalar @installs, 2, 'first run attempted the install twice';
+
+    # Model a build that died inside the install stage: the checkpoint it wrote
+    # mid-stage is where the retry count is persisted, but the stage never
+    # completed, so a resume re-enters install() for the same package.
+    my $state = decode_json( $cp->slurp_utf8 );
+    delete $state->{stage_done}{install};
+    $cp->spew_utf8( encode_json($state) . "\n" );
+    my $spy2 = Alien::Xrepo::Build::TestSpy->new( fail => { raylib => 1 } );
+    my $b2   = build( ['raylib'], repo => $spy2, probe_policy => 'off', checkpoint => $cp, update_repo => 1, resume => 1 );
+    $b2->run;
+    my (@updates2)  = grep { $_->{action} eq 'update_repo' } @{ $spy2->calls };
+    my (@installs2) = grep { $_->{action} eq 'install' } @{ $spy2->calls };
+    is scalar @updates2,  0, 'the resumed run does not refresh the registry again';
+    is scalar @installs2, 1, 'the resumed run makes one attempt and no retry';
+    like $b2->runtime_prop->{errors}{raylib}, qr/boom/, 'the failure is still recorded on the resumed run';
+};
 subtest 'gather fetches anything the install did not produce' => sub {
     my $spy = Alien::Xrepo::Build::TestSpy->new;
     my $b   = build( ['zstd'], repo => $spy, probe_policy => 'off' );
@@ -199,6 +224,21 @@ subtest 'assert_installed passes and keeps the snapshot when everything installe
     $b->run;
     ok lives { $b->assert_installed }, 'no die when no package failed';
     ok -e $snap,                       'a clean snapshot is left in place';
+};
+subtest 'a checkpoint records the stage it just finished' => sub {
+    my $cp  = path($dir)->child('stage-state.json');
+    my $spy = Alien::Xrepo::Build::TestSpy->new;
+    my $b   = build( ['zstd'], repo => $spy, probe_policy => 'off', checkpoint => $cp );
+    $b->configure;
+    my $state = decode_json( $cp->slurp_utf8 );
+    is $state->{stage_done}{configure}, 1, 'configure is recorded as done as soon as it finishes';
+    my $spy2 = Alien::Xrepo::Build::TestSpy->new;
+    my $b2   = build( ['zstd'], repo => $spy2, probe_policy => 'off', checkpoint => $cp, resume => 1 );
+    my @hooks;
+    $b2->register_hook( configure => sub { push @hooks, 1 } );
+    $b2->run;
+    is scalar @hooks,                0, 'a resumed build does not re-run the configure stage';
+    is $b2->stage_done->{configure}, 1, 'the resumed build knows configure completed';
 };
 subtest 'checkpoint/resume skips completed work' => sub {
     my $cp  = path($dir)->child('state.json');

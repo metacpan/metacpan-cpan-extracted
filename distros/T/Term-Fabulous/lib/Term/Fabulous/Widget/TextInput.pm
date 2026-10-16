@@ -11,7 +11,7 @@ use Term::Fabulous::Editor;
 use Term::Fabulous::TextView;
 use Term::Fabulous::Widget::Input;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 class Term::Fabulous::Widget::TextInput
 	:isa(Term::Fabulous::Widget::Input)

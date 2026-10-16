@@ -11,7 +11,7 @@ configure_requires:
   strict: '0'
   warnings: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150013'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150015'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,16 +27,16 @@ no_index:
 provides:
   Date::ManipX::Almanac:
     file: lib/Date/ManipX/Almanac.pm
-    version: '0.004'
+    version: '0.005'
   Date::ManipX::Almanac::Date:
     file: lib/Date/ManipX/Almanac/Date.pm
-    version: '0.004'
+    version: '0.005'
   Date::ManipX::Almanac::Lang:
     file: lib/Date/ManipX/Almanac/Lang.pm
-    version: '0.004'
+    version: '0.005'
   Date::ManipX::Almanac::Lang::english:
     file: lib/Date/ManipX/Almanac/Lang/english.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   Astro::Coord::ECI: '0.119'
   Astro::Coord::ECI::Moon: '0.119'
@@ -58,5 +58,5 @@ resources:
   bugtracker: https://github.com/trwyant/perl-Date-ManipX-Almanac/issues
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-Date-ManipX-Almanac.git
-version: '0.004'
+version: '0.005'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

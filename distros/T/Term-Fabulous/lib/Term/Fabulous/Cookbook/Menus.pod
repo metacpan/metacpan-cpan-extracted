@@ -147,7 +147,7 @@ This program is shipped as F<examples/cookbook/menu-bar.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-menu-bar.svg" alt="A to-do list of five check boxes below a menu bar with List and View and the caption To-do. The View menu is open and shows Show done with a check mark and the key Alt+d"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-menu-bar.svg" alt="A to-do list of five check boxes below a menu bar with List and View and the caption To-do. The View menu is open and shows Show done with a check mark and the key Alt+d"></p>
 
 =end html
 
@@ -282,7 +282,7 @@ This program is shipped as F<examples/cookbook/context-menu.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-context-menu.svg" alt="A text area whose first two words are selected, with a context menu opened over it where it was right-clicked: Cut is highlighted, then Copy, Paste, a line and Select all, each with its key"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-context-menu.svg" alt="A text area whose first two words are selected, with a context menu opened over it where it was right-clicked: Cut is highlighted, then Copy, Paste, a line and Select all, each with its key"></p>
 
 =end html
 
@@ -402,7 +402,7 @@ This program is shipped as F<examples/cookbook/status-bar.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-status-bar.svg" alt="A journal entry in a text area and, below it, a status bar with the green message Saved the entry. on the left and 8 words on the right"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-status-bar.svg" alt="A journal entry in a text area and, below it, a status bar with the green message Saved the entry. on the left and 8 words on the right"></p>
 
 =end html
 
@@ -524,7 +524,7 @@ This program is shipped as F<examples/cookbook/help-screen.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-help-screen.svg" alt="A Keys of the to-do list dialog over the dimmed to-do list: an empty search field, and a table of keys and actions in three groups: Everywhere with F1 Keys, Ctrl+A Check all, Ctrl+D Remove done, Alt+s Sort by name and Ctrl+Q Quit, The list with the Tab and Space keys, and This help with typing and Escape; a Close button below"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-help-screen.svg" alt="A Keys of the to-do list dialog over the dimmed to-do list: an empty search field, and a table of keys and actions in three groups: Everywhere with F1 Keys, Ctrl+A Check all, Ctrl+D Remove done, Alt+s Sort by name and Ctrl+Q Quit, The list with the Tab and Space keys, and This help with typing and Escape; a Close button below"></p>
 
 =end html
 
@@ -703,7 +703,7 @@ This program is shipped as F<examples/cookbook/document-tabs.pl>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-document-tabs.svg" alt="An editor with the tabs shopping.txt with a blue dot, letter.txt, ideas.txt and the active Untitled 1 in bold with a blue dot, each with a close mark, and a plus button. Below, the text Plant the tulips. and a status bar with the keys"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-document-tabs.svg" alt="An editor with the tabs shopping.txt with a blue dot, letter.txt, ideas.txt and the active Untitled 1 in bold with a blue dot, each with a close mark, and a plus button. Below, the text Plant the tulips. and a status bar with the keys"></p>
 
 =end html
 

@@ -4,17 +4,19 @@ author:
   - 'Gene Boggs <gene.boggs@gmail.com>'
 build_requires:
   File::Spec: '0'
+  File::Temp: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
   MIDI::Drummer::Tiny: '0.4302'
+  MIDI::Opus: '0'
   Test::More: '0.88'
-  perl: '5.006'
+  perl: v5.36.0
   strict: '0'
   warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
-  perl: '5.006'
+  perl: '5.010'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
@@ -29,12 +31,12 @@ requires:
   MIDI::Util: '0'
   Moo: '2'
   namespace::clean: '0'
-  perl: '5.006'
+  perl: v5.36.0
   strictures: '2'
 resources:
   homepage: https://github.com/ology/Music-Percussion-Tabla
   repository: https://github.com/ology/Music-Percussion-Tabla.git
-version: '0.0709'
+version: '0.0803'
 x_Dist_Zilla:
   perl:
     version: '5.042000'

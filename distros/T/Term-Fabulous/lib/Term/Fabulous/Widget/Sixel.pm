@@ -9,7 +9,7 @@ use Object::Pad 0.825;
 
 use Term::Fabulous::Widget::Image;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 class Term::Fabulous::Widget::Sixel
 	:isa(Term::Fabulous::Widget::Image)
@@ -178,7 +178,7 @@ Term::Fabulous::Widget::Sixel - Show a picture in sixel graphics
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-sixel.svg" alt="A detail of the Mandelbrot set, blue and white spirals with orange and dark red bands, in sixel graphics in three frames of 28x10 cells: cut to the frame at its natural size (none), scaled down to fit the frame with its proportions kept (contain) and stretched to fill the frame (stretch)"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-sixel.svg" alt="A detail of the Mandelbrot set, blue and white spirals with orange and dark red bands, in sixel graphics in three frames of 28x10 cells: cut to the frame at its natural size (none), scaled down to fit the frame with its proportions kept (contain) and stretched to fill the frame (stretch)"></p>
 
 =end html
 

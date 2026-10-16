@@ -5,7 +5,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Object::Pad 0.825;
 
@@ -170,7 +170,7 @@ Term::Fabulous::Widget::Sparkline - A small chart without axes, one row high
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-sparkline.svg" alt="Four server rows, each with its load as a line, an area and a bar sparkline of sixteen columns next to the current value"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-sparkline.svg" alt="Four server rows, each with its load as a line, an area and a bar sparkline of sixteen columns next to the current value"></p>
 
 =end html
 

@@ -5,6 +5,8 @@
 
 use strict;
 use warnings;
+use autodie qw(:all);
+use Carp;
 
 print 'Latitude: ';
 my $lat = readline(STDIN);

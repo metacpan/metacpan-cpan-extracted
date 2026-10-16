@@ -5,7 +5,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Object::Pad 0.825;
 
@@ -51,9 +51,11 @@ class Term::Fabulous::ThemeEditor::Preview :isa(Term::Fabulous::Widget::Box) :st
 
 	use constant GALLERY_ID => 'theme-editor-preview';
 
-	# A picture of 12 by 8 pixels, a ring of colors, for the image family.
+	# A picture of 12 by 8 pixels, a ring of colors, for the image family,
+	# as TGA: Imager reads it without a plugin, so the preview does not
+	# depend on the PNG support Imager was built with.
 	use constant PICTURE =>
-'iVBORw0KGgoAAAANSUhEUgAAAAwAAAAICAYAAADN5B7xAAAAlElEQVQYlYWQwQ3DMAwDzx5AAzTjZIB+9O1QmSFffTxA9sgC8QBaQH04ThOgbQwYMGlSIpg4ndk1CgDPdgtQwExS1+T+WF2jAjAAD6hAbWhRj4vBV42t/TcxA+zEjnBdAiD7rNEHbofhQ+wIqLhq5NP2r3G6uBNZRkt3cTohk6UMMEoz/YsjNqVLSyaWfsURex21vgGI6T6voY+23gAAAABJRU5ErkJggg==';
+'AAAKAAAAAAAAAAAADAAIACAoggAAAAAFVPKj/1TyVP+j8lT/8vJU//KjVP/yVFT/ggAAAAALAAAAAAAAAABU8tj/VPKJ/2/yVP+98lT/8thU//KJVP/yVG//8lS9/wAAAAAAAAAACwAAAABU2PL/VPK9/1Tyb/+J8lT/2PJU//K9VP/yb1T/8lSJ//JU2P+9VPL/AAAAAAtUo/L/VPLy/1Tyo/9U8lT/o/JU//LyVP/yo1T/8lRU//JUo//yVPL/o1Ty/1RU8v8LVL3y/1Ty2P9U8on/b/JU/73yVP/y2FT/8olU//JUb//yVL3/2FTy/4lU8v9Ub/L/CwAAAABU8r3/VPJv/4nyVP/Y8lT/8r1U//JvVP/yVIn/8lTY/71U8v9vVPL/AAAAAAsAAAAAAAAAAFTyVP+j8lT/8vJU//KjVP/yVFT/8lSj//JU8v+jVPL/AAAAAAAAAACCAAAAAAW98lT/8thU//KJVP/yVG//8lS9/9hU8v+CAAAAAA==';
 
 	# The sections of the gallery, in order: id, title, and the families
 	# they show.

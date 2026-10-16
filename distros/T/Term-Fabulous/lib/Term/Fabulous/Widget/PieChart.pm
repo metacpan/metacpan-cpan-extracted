@@ -5,7 +5,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Object::Pad 0.825;
 
@@ -477,7 +477,7 @@ Term::Fabulous::Widget::PieChart - A pie chart: parts of a whole as slices
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-pie-chart.svg" alt="A pie of browser shares with the percentage on each slice and a legend on the right, small browsers folded into Other"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-pie-chart.svg" alt="A pie of browser shares with the percentage on each slice and a legend on the right, small browsers folded into Other"></p>
 
 =end html
 
@@ -505,7 +505,7 @@ are neither drawn nor listed in the legend.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/widget-pie-chart-styles.svg" alt="Four pies of the same budget: in quadrant blocks with percentages, in sextants with gaps between the slices, in Braille dots with the slice labels, and in half blocks with the values, sorted ascending and starting at 3 o'clock"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/widget-pie-chart-styles.svg" alt="Four pies of the same budget: in quadrant blocks with percentages, in sextants with gaps between the slices, in Braille dots with the slice labels, and in half blocks with the values, sorted ascending and starting at 3 o'clock"></p>
 
 =end html
 

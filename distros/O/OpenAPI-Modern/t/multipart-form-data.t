@@ -2465,6 +2465,27 @@ YAML
   );
 };
 
+subtest 'get_part_boundaries' => sub {
+  my $request = request('POST', 'http://example.com/foo',
+    [ 'Content-Type' => 'multipart/form-data' ],
+    [
+      [ alpha =>                          # first level, first part
+        [                                 # ...contains a multipart/form-data:
+          [ a => '1', 'X-Test' => 'a' ],  # second level, first part
+        ],
+        'Content-Type' => 'multipart/form-data; bloop=furble',
+        'X-Test' => 'alpha',
+      ],
+    ],
+  );
+
+  cmp_result(
+    [ get_part_boundaries($request) ],
+    [ re(qr{^[A-Za-z0-9+/=]{5,}\z}) ],
+    'boundary is extracted',
+  );
+};
+
 subtest 'deserialize_multipart' => sub {
   skip_all 'this test works directly with mojo objects' if $::TYPE ne 'mojo';
 

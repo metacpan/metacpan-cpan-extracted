@@ -30,6 +30,8 @@ subtest 'find by alias' => sub {
 		weiqi => 'go', baduk => 'go', chinesechess => 'xiangqi',
 		'chinese-chess' => 'xiangqi', awale => 'oware', awari => 'oware',
 		rummy => 'gin', crib => 'cribbage', flappy => 'floppy', 66 => 'sixtysix',
+		japanesechess => 'shogi', 'japanese-chess' => 'shogi',
+		chinesecheckers => 'sternhalma', 'Chinese-Checkers' => 'sternhalma',
 	);
 	plan tests => scalar keys %alias;
 	for my $alias (sort keys %alias) {

@@ -1,0 +1,70 @@
+---
+abstract: 'Per-token access control in front of the PowerDNS HTTP API'
+author:
+  - 'George S. Baugh <george@troglodyne.net>'
+build_requires:
+  Capture::Tiny: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  FindBin: '0'
+  FindBin::libs: '0'
+  HTTP::Request: '0'
+  HTTP::Request::Common: '0'
+  IO::Handle: '0'
+  IO::Socket::UNIX: '0'
+  IPC::Open3: '0'
+  POSIX: '0'
+  Plack::Test: '0'
+  Socket: '0'
+  Test2::Plugin::NoWarnings: '0'
+  Test2::V1: '0'
+  Test::MockModule: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PowerDNS-API-ACL
+no_index:
+  directory:
+    - docs
+    - t
+    - templates
+provides:
+  PowerDNS::API::ACL:
+    file: lib/PowerDNS/API/ACL.pm
+    version: '0.002'
+  PowerDNS::API::ACL::Proxy:
+    file: lib/PowerDNS/API/ACL/Proxy.pm
+    version: '0.002'
+  PowerDNS::API::ACL::Store:
+    file: lib/PowerDNS/API/ACL/Store.pm
+    version: '0.002'
+requires:
+  Cpanel::JSON::XS: '0'
+  Crypt::PRNG: '0'
+  DBD::SQLite: '0'
+  DBI: '0'
+  Digest::SHA: '0'
+  Getopt::Long: '0'
+  HTTP::Tiny::UNIX: '0'
+  List::Util: '1.33'
+  Plack::Request: '0'
+  Pod::Usage: '0'
+  Time::HiRes: '0'
+  perl: '5.014'
+  re: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/Troglodyne-Internet-Widgets/perl-powerdns-api-acl/issues
+  homepage: https://github.com/Troglodyne-Internet-Widgets/perl-powerdns-api-acl
+  repository: https://github.com/Troglodyne-Internet-Widgets/perl-powerdns-api-acl.git
+version: '0.002'
+x_generated_by_perl: v5.44.0
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: MIT

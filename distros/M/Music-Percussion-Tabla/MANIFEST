@@ -18,6 +18,7 @@ lib/Music/Percussion/Tabla.pm
 share/Tabla.sf2
 t/00-compile.t
 t/01-methods.t
+t/02-thekas.t
 t/author-eol.t
 t/author-no-tabs.t
 t/author-pod-coverage.t

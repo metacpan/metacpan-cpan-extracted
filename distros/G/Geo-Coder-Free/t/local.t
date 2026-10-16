@@ -8,8 +8,6 @@ use Test::Number::Delta;
 use Test::Carp;
 use Test::Deep;
 
-use lib 't/lib';
-use MyLogger;
 # use Test::Without::Module qw(Geo::libpostal);
 
 BEGIN {

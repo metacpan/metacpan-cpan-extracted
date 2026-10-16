@@ -17,5 +17,5 @@ recipes/packages/l/libsdl3_mixer/xmake.lua
 recipes/packages/l/libsdl3_ttf/xmake.lua
 t/00_compile.t
 t/01_delegation.t
-t/affix.t
-t/missing_package.t
+t/02_affix.t
+t/03_missing_package.t

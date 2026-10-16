@@ -4,7 +4,7 @@
       "Jos\u00e9 Joaqu\u00edn Atria <jjatria@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "perl_5"
    ],
@@ -78,27 +78,27 @@
    "provides" : {
       "OpenTelemetry::Exporter::OTLP" : {
          "file" : "lib/OpenTelemetry/Exporter/OTLP.pm",
-         "version" : "0.021"
+         "version" : "0.022"
       },
       "OpenTelemetry::Exporter::OTLP::Encoder::JSON" : {
          "file" : "lib/OpenTelemetry/Exporter/OTLP/Encoder/JSON.pm",
-         "version" : "0.021"
+         "version" : "0.022"
       },
       "OpenTelemetry::Exporter::OTLP::Encoder::Protobuf" : {
          "file" : "lib/OpenTelemetry/Exporter/OTLP/Encoder/Protobuf.pm",
-         "version" : "0.021"
+         "version" : "0.022"
       },
       "OpenTelemetry::Exporter::OTLP::Logs" : {
          "file" : "lib/OpenTelemetry/Exporter/OTLP/Logs.pm",
-         "version" : "0.021"
+         "version" : "0.022"
       },
       "OpenTelemetry::Exporter::OTLP::Traces" : {
          "file" : "lib/OpenTelemetry/Exporter/OTLP/Traces.pm",
-         "version" : "0.021"
+         "version" : "0.022"
       },
       "OpenTelemetry::Proto" : {
          "file" : "lib/OpenTelemetry/Proto.pm",
-         "version" : "0.021"
+         "version" : "0.022"
       }
    },
    "release_status" : "stable",
@@ -108,16 +108,18 @@
       },
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/jjatria/perl-opentelemetry-exporter-otlp",
+         "url" : "git://github.com/jjatria/perl-opentelemetry-exporter-otlp.git",
          "web" : "https://github.com/jjatria/perl-opentelemetry-exporter-otlp"
       }
    },
-   "version" : "0.021",
+   "version" : "0.022",
    "x_contributors" : [
-      "Ask Bj\u00f8rn Hansen <ask@develooper.com>"
+      "Ask Bj\u00f8rn Hansen <ask@develooper.com>",
+      "Jos\u00e9 Joaqu\u00edn Atria <jjatria@gmail.com>",
+      "lnation <lnation@lnations-MacBook-Pro-2.local>"
    ],
-   "x_generated_by_perl" : "v5.40.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
+   "x_generated_by_perl" : "v5.42.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.44",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

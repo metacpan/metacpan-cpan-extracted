@@ -12,7 +12,7 @@ no if "$]" >= 5.041009, feature => 'smartmatch';
 no feature 'switch';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 use Mojolicious::Plugin::OpenAPI::Modern;
-use Path::Tiny;
+use Mojo::File qw(path tempfile);
 
 use lib 't/lib';
 use Helper;
@@ -35,15 +35,15 @@ subtest 'raw schema' => sub {
     },
   );
 
-  is($t->app->openapi->document_get('/info/title'), 'Test API with raw schema',
+  is($t->app->openapi->entry_document->get('/info/title'), 'Test API with raw schema',
     'access schema through OM object');
 };
 
 subtest 'YAML schema' => sub {
-  my $filename = Path::Tiny->tempfile;
-  $filename->move($filename.'.yaml');
+  my $filename = tempfile;
+  $filename->move_to($filename.'.yaml');
   $filename = path($filename.'.yaml');
-  $filename->spew_raw("openapi: $::OAD_VERSION\n".<<'YAML');
+  $filename->spew("openapi: $::OAD_VERSION\n".<<'YAML');
 info:
   title: Test API with yaml document
   version: 1.2.3
@@ -55,15 +55,15 @@ YAML
     { openapi => { document_filename => $filename } },
   );
 
-  is($t->app->openapi->document_get('/info/title'), 'Test API with yaml document',
+  is($t->app->openapi->entry_document->get('/info/title'), 'Test API with yaml document',
     'access schema through OM object');
 };
 
 subtest 'JSON schema' => sub {
-  my $filename = Path::Tiny->tempfile;
-  $filename->move($filename.'.json');
+  my $filename = tempfile;
+  $filename->move_to($filename.'.json');
   $filename = path($filename.'.json');
-  $filename->spew_raw(<<JSON);
+  $filename->spew(<<JSON);
 {
   "openapi": "$::OAD_VERSION",
   "info": {
@@ -79,7 +79,7 @@ JSON
     { openapi => { document_filename => $filename } },
   );
 
-  is($t->app->openapi->document_get('/info/title'), 'Test API with json document',
+  is($t->app->openapi->entry_document->get('/info/title'), 'Test API with json document',
     'access schema through OM object');
 };
 
@@ -101,7 +101,7 @@ subtest 'override with our own object' => sub {
     { openapi => { openapi_obj => $openapi } },
   );
 
-  is($t->app->openapi->document_get('/info/title'), 'Test API with our own object',
+  is($t->app->openapi->entry_document->get('/info/title'), 'Test API with our own object',
     'plugin uses a pre-constructed OpenAPI::Modern object');
 };
 

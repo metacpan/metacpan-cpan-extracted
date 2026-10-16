@@ -86,7 +86,7 @@ C<hover> (default 1) turns the hover highlight on or off.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-table-directory.svg" alt="A staff directory: a grouped table with a search field above it, two rows selected, the cursor on a third row, a pager below and a details panel on the right"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-table-directory.svg" alt="A staff directory: a grouped table with a search field above it, two rows selected, the cursor on a third row, a pager below and a details panel on the right"></p>
 
 =end html
 
@@ -310,7 +310,7 @@ clean.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-table-line-styles.svg" alt="Nine small tables with different lines: the default round frame, a full grid, no lines, a double frame with a heavy title line, a heavy frame with dashed row lines, ASCII lines, and Outer, Inner and Thick block frames"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-line-styles.svg" alt="Nine small tables with different lines: the default round frame, a full grid, no lines, a double frame with a heavy title line, a heavy frame with dashed row lines, ASCII lines, and Outer, Inner and Thick block frames"></p>
 
 =end html
 
@@ -360,7 +360,7 @@ titles from the rows and the rows from each other:
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-table-colors.svg" alt="A table with an Outer block frame, no inner lines, colored column titles, striped rows and a highlighted row whose color reaches the frame"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-colors.svg" alt="A table with an Outer block frame, no inner lines, colored column titles, striped rows and a highlighted row whose color reaches the frame"></p>
 
 =end html
 
@@ -398,7 +398,7 @@ takes):
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-table-lines.svg" alt="A budget table: a heavy line and dashed lines in the Left column, negative amounts in red, a cancelled row in gray italics and a bold totals row under a double line"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-lines.svg" alt="A budget table: a heavy line and dashed lines in the Left column, negative amounts in red, a cancelled row in gray italics and a bold totals row under a double line"></p>
 
 =end html
 
@@ -493,7 +493,7 @@ L<Term::Fabulous::Widget::Scrollbar>.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/example-table-files-scrolling.svg" alt="A file tree table with all folders open, scrolled down: the column titles and the filter row stay at the top, and the scrollbar right of the frame shows a thumb in its middle"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/example-table-files-scrolling.svg" alt="A file tree table with all folders open, scrolled down: the column titles and the filter row stay at the top, and the scrollbar right of the frame shows a thumb in its middle"></p>
 
 =end html
 
@@ -534,7 +534,7 @@ them.
 
 =begin html
 
-<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.02/screenshots/cookbook-table-report.svg" alt="The printed sales report: products sorted by revenue, units and amounts formatted, shares in percent and a bold totals row under a double line"></p>
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-term-fabulous/v0.03/screenshots/cookbook-table-report.svg" alt="The printed sales report: products sorted by revenue, units and amounts formatted, shares in percent and a bold totals row under a double line"></p>
 
 =end html
 

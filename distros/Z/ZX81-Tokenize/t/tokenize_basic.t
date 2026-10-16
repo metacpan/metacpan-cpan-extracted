@@ -21,5 +21,9 @@ eq_or_dump_diff(tokenize_basic(" 10 print \"\\\"A\\\"\""),
 eq_or_dump_diff(tokenize_basic(" 10 rem \\01\\01\\00\\C9"), 
 				pack("C*", 
 					0,10, 6,0,  0xEA,0x01,0x01,0x00,0xC9,0x76));
+eq_or_dump_diff( tokenize_basic(" 10 PRINT 0"),
+    pack( "C*", 0, 10, 9, 0, 0xF5, 0x1C, 0x7E, 0x00, 0x00, 0x00, 0x00, 0x00, 0x76 ) );
+eq_or_dump_diff( tokenize_basic(" 10 REM 0"),
+    pack( "C*", 0, 10, 3, 0, 0xEA, 0x1C, 0x76 ) );
 
 done_testing;

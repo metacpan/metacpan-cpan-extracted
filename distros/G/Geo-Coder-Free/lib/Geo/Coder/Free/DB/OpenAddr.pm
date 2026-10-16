@@ -2,7 +2,7 @@ package Geo::Coder::Free::DB::OpenAddr;
 
 use strict;
 use warnings;
-use Database::Abstraction;
+use autodie qw(:all);
 
 =head1 NAME
 
@@ -10,13 +10,13 @@ Geo::Coder::Free::DB::Free::OpenAddr - driver for http://results.openaddresses.i
 
 =head1 VERSION
 
-Version 0.42
+Version 0.46
 
 =cut
 
-our $VERSION = '0.42';
+our $VERSION = '0.46';
 
-our @ISA = ('Database::Abstraction');
+use parent 'Database::Abstraction';
 
 sub _open {
 	my $self = shift;
