@@ -93,7 +93,6 @@ foreach my $dir(@dirs) {
 }
 
 my %urls;
-my $use_withcache;
 
 if(!$ENV{'NO_NETWORK_TESTING'}) {
 	%urls = (
@@ -136,15 +135,17 @@ if(!$ENV{'NO_NETWORK_TESTING'}) {
 		print "Consider installing HTTP::Cache::Transparent to reduce downloads\n";
 	}
 
-	if(eval { require LWP::Simple::WithCache; }) {
-		LWP::Simple::WithCache->import();
-		$use_withcache = 1;
-	} else {
-		require LWP::Simple;
-		LWP::Simple->import();
-
-		print "Consider installing LWP::Simple::WithCache to reduce downloads\n";
-	}
+	# LWP::Simple, not LWP::Simple::WithCache: that module swaps in a caching
+	# user agent whose request($request, $file) answers a cache hit, or a 304,
+	# straight out of the cache and never writes $file, so getstore() answers 200
+	# and leaves nothing behind.  A machine with a warm cache therefore fetched no
+	# databases at all while this build reported success, and the install failed
+	# later on, in the tests, with "gunzip: cities.csv.gz: No such file or
+	# directory".  HTTP::Cache::Transparent above is the caching that is wanted.
+	require LWP::Simple;
+	LWP::Simple->import();
+} else {
+	print "NO_NETWORK_TESTING is set, so the databases are not being downloaded - the tests that need them will be skipped\n";
 }
 
 my $pm;
@@ -165,56 +166,64 @@ foreach my $url(keys %urls) {
 	if(-r $file) {
 		# Don't bother checking for a download if the file is less than a week old
 		next if(-M $file < 7);
-		# I get errors with mirror with L:S:WithCache
-		#	that the temporary file is unavailable
-		if(!$use_withcache) {
-			# Only download if a newer version is available
-			$use_mirror = 1;
-		}
+		# Only download if a newer version is available
+		$use_mirror = 1;
 	}
 
 	$pm->start() and next if($pm);
 
+	my $rc;
+
 	if($use_mirror) {
 		print "Downloading $url to $file if a newer version is available\n";
-		if($use_withcache &&
-		   LWP::Simple::WithCache::is_error(my $rc = LWP::Simple::WithCache::mirror($url, $file))) {
-			if($ENV{'AUTOMATED_TESTING'}) {
-				print STDERR "Can't download $url";
-				exit(0);
-			}
-			die "$url: LWP error $rc";
-		} elsif(LWP::Simple::is_error($rc = LWP::Simple::mirror($url, $file))) {
-			if($ENV{'AUTOMATED_TESTING'}) {
-				print STDERR "Can't download $url";
-				exit(0);
-			}
-			die "$url: LWP error $rc";
-		}
+		$rc = LWP::Simple::mirror($url, $file);
 	} else {
 		print "Downloading $url to $file\n";
-		if($use_withcache &&
-		   LWP::Simple::WithCache::is_error(my $rc = LWP::Simple::WithCache::getstore($url, $file))) {
-			if($ENV{'AUTOMATED_TESTING'}) {
-				print STDERR "Can't download $url";
-				exit(0);
-			}
-			die "$url: LWP error $rc";
-		} elsif(LWP::Simple::is_error($rc = LWP::Simple::getstore($url, $file))) {
-			if($ENV{'AUTOMATED_TESTING'}) {
-				print STDERR "Can't download $url";
-				exit(0);
-			}
-			die "$url: LWP error $rc";
-		}
+		$rc = LWP::Simple::getstore($url, $file);
 	}
-	die $file if(!-r $file);
+
+	# The status code is not enough: a download can answer 200 and write nothing.
+	# A failure here is reported by the parent once the children have been reaped,
+	# because a child's exit status is not seen by the parent on its own (see the
+	# check after wait_all_children()).
+	warn "Can't download $url: LWP error $rc\n" if(LWP::Simple::is_error($rc));
+
 	$pm->finish() if($pm);
 }
 
 my $zip = 'downloads/allCountries.zip';
 
 $pm->wait_all_children() if($pm);
+
+# This is the parent's own check, and the downloads are not the parent's to see:
+# a download that failed in a forked child, or one that answered 200 without
+# writing anything (which is what a cached response does), used to leave the
+# build reporting success with the databases missing, and the failure surfaced
+# much later as a test failing for want of a database.  allCountries.zip is
+# emptied once it has been expanded (see below), so only its existence can be
+# asked of it; every other destination has to hold something.
+my @missing;
+foreach my $url(sort keys %urls) {
+	my $failed = $urls{$url};
+
+	next if(-s $failed);
+	next if(($failed =~ /allCountries\.zip$/) && (-e $failed));
+
+	push @missing, "$url -> $failed";
+}
+
+if(scalar(@missing)) {
+	my $list = "Couldn't download:\n\t" . join("\n\t", @missing) . "\n";
+
+	# An automated tester can't fix the network, and the tests that need these
+	# files skip, so the build carries on; everyone else is told now rather than
+	# half way through the test suite.
+	if($ENV{'AUTOMATED_TESTING'}) {
+		warn "$list The tests that need those files will be skipped\n";
+	} else {
+		die $list;
+	}
+}
 
 if((!(-r 'downloads/allCountries.txt')) && (-r $zip)) {
 	print "Inflating $zip\n";
@@ -282,7 +291,7 @@ my $build_requires = {
 	'File::Spec' => 0,
 	'autodie' => 0,
 	'Geo::Coder::Abbreviations' => 0.03,
-	'Geo::Location::Point' => 0.16,
+	'Geo::Location::Point' => 0.18,	# 0.18 defines the accuracy vocabulary
 	'IPC::System::Simple' => 0,
 	'JSON::MaybeXS' => 0,
 	'LWP::ConnCache' => 0,
@@ -328,6 +337,7 @@ my $test_requires = {
 	'Test::NoWarnings' => 0,
 	'Test::Number::Delta' => 0,
 	'Test::Returns' => 0,
+	'Test::Script' => 1.12,	# t/bin.t runs the command line programs
 	'Test::Without::Module' => 0,
 };
 
@@ -384,7 +394,7 @@ WriteMakefile(
 		'Encode' => 0,
 		'Geo::Coder::Abbreviations' => 0.03,
 		'Geo::Hash' => 0,
-		'Geo::Location::Point' => 0.16,
+		'Geo::Location::Point' => 0.18,	# 0.18 defines the accuracy vocabulary
 		'Geo::StreetAddress::US' => 0,
 		'Lingua::EN::AddressParse' => 0,
 		'Locale::CA' => 0,

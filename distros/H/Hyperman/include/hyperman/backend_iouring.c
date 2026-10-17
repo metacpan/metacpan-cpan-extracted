@@ -77,6 +77,12 @@ typedef struct {
     ur_timer       *timers;            /* doubly-linked, for cleanup    */
     int             sfd;               /* signalfd, -1 until first sig  */
     sigset_t        sigs;
+    /* A poll re-arm found no submission slot (the ring was full and the
+     * submit that should have drained it failed, -EBUSY under completion
+     * overflow). The interest is still in mask[] with armed[] clear, and
+     * ur_wait re-arms every such fd before it sleeps, so a connection is
+     * never left unwatched by a momentary full ring. */
+    int             sq_dropped;
 } hm_ur_state;
 
 /* Get an sqe, flushing the ring if the submission queue is momentarily full. */
@@ -93,7 +99,7 @@ static void ur_arm_poll(hm_ur_state *st, int fd, int evbit) {
     struct io_uring_sqe *sqe = ur_sqe(st);
     unsigned mask = (evbit == HM_EV_READ) ? (POLLIN | POLLHUP | POLLERR)
                                           : (POLLOUT | POLLHUP | POLLERR);
-    if (!sqe) return;
+    if (!sqe) { st->sq_dropped = 1; return; }
     io_uring_prep_poll_add(sqe, fd, mask);
     UR_SET_DATA(sqe,
         ((__u64)(unsigned)fd << 3)
@@ -134,8 +140,12 @@ static int ur_remove_io(hm_backend *be, int fd, int mask) {
                     ((__u64)(unsigned)fd << 3)
                     | (bit == HM_EV_READ ? UR_TAG_READ : UR_TAG_WRITE));
                 UR_SET_DATA(sqe, UR_TAG_IGNORE);
+                st->armed[fd] &= (unsigned char)~bit;
             }
-            st->armed[fd] &= (unsigned char)~bit;
+            /* No slot for the cancel: the poll stays in flight and armed
+             * stays SET, so a later add does not arm a second one; its
+             * completion finds the interest gone (mask) and is dropped
+             * there, which clears armed. */
         }
     }
     return 0;
@@ -186,11 +196,12 @@ static void ur_cancel_recv(hm_backend *be, int fd) {
 }
 #endif /* HM_HAVE_URING_RECV */
 
-static void ur_arm_timer(hm_ur_state *st, ur_timer *t) {
+static int ur_arm_timer(hm_ur_state *st, ur_timer *t) {
     struct io_uring_sqe *sqe = ur_sqe(st);
-    if (!sqe) return;
+    if (!sqe) return -1;
     io_uring_prep_timeout(sqe, &t->ts, 0, 0);
     UR_SET_DATA(sqe, (__u64)(uintptr_t)t);   /* tag 0 (aligned) */
+    return 0;
 }
 
 static int ur_add_timer(hm_backend *be, double secs, int oneshot, void *udata) {
@@ -205,7 +216,16 @@ static int ur_add_timer(hm_backend *be, double secs, int oneshot, void *udata) {
     t->next = st->timers;
     if (st->timers) st->timers->prev = t;
     st->timers = t;
-    ur_arm_timer(st, t);
+    if (ur_arm_timer(st, t) < 0) {
+        /* No submission slot: the caller is told, as the other backends
+         * tell it when a timerfd cannot be had, rather than owning a timer
+         * that will never fire. t is the list head, just linked. */
+        st->timers = t->next;
+        if (t->next) t->next->prev = NULL;
+        free(t);
+        errno = EAGAIN;
+        return -1;
+    }
     return 0;
 }
 
@@ -268,6 +288,19 @@ static int ur_wait(hm_backend *be, hm_event *out, int max, double timeout) {
     unsigned want, n, i;
     int nev = 0, ret;
 
+    if (st->sq_dropped) {
+        /* A re-arm found the ring full: every interest with no poll in
+         * flight is armed again now, with the ring drained by the submit
+         * below between attempts. Rare, so the full-table walk is fine. */
+        int fd;
+        st->sq_dropped = 0;
+        for (fd = 0; fd < HM_MAXFD; fd++) {
+            unsigned char need = st->mask[fd] & (unsigned char)~st->armed[fd];
+            if (!need) continue;
+            if (need & HM_EV_READ)  ur_arm_poll(st, fd, HM_EV_READ);
+            if (need & HM_EV_WRITE) ur_arm_poll(st, fd, HM_EV_WRITE);
+        }
+    }
     io_uring_submit(&st->ring);   /* flush re-arms, cancels, timers */
 
     if (timeout < 0) {

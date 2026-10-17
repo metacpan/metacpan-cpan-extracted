@@ -49,17 +49,21 @@ static int hm_abi_is_future(pTHX_ SV *sv) {
     return hmf_is_future(aTHX_ sv);
 }
 
+/* The C doors never croak over something that is not a future: a croak is
+ * a longjmp through the consumer's frames. A non-future reads as -1 from
+ * state and is ignored by the rest; is_future is there to ask first. */
 static IV hm_abi_future_state(pTHX_ SV *f) {
+    if (!hmf_is_future(aTHX_ f)) return -1;
     return hmf_state(aTHX_ f);
 }
 
 static void hm_abi_future_done(pTHX_ SV *f, SV **vals, SSize_t n) {
-    if (hmf_state(aTHX_ f) != HMF_PENDING) return;
+    if (!hmf_is_future(aTHX_ f) || hmf_state(aTHX_ f) != HMF_PENDING) return;
     hmf_settle(aTHX_ f, HMF_DONE, vals, n);
 }
 
 static void hm_abi_future_fail(pTHX_ SV *f, SV *err) {
-    if (hmf_state(aTHX_ f) != HMF_PENDING) return;
+    if (!hmf_is_future(aTHX_ f) || hmf_state(aTHX_ f) != HMF_PENDING) return;
     hmf_settle(aTHX_ f, HMF_FAILED, &err, 1);
 }
 
@@ -77,13 +81,16 @@ XS_INTERNAL(hm_xs_abi_ready_cb) {
 }
 
 static void hm_abi_future_on_ready(pTHX_ SV *f, hm_abi_ready_cb cb, void *ud) {
-    SV *cbsv = hm_closure(aTHX_ hm_xs_abi_ready_cb, NULL, NULL, NULL, NULL,
-                          PTR2IV(cb), PTR2UV(ud));
+    SV *cbsv;
+    if (!hmf_is_future(aTHX_ f)) return;
+    cbsv = hm_closure(aTHX_ hm_xs_abi_ready_cb, NULL, NULL, NULL, NULL,
+                      PTR2IV(cb), PTR2UV(ud));
     hmf_on_ready(aTHX_ f, cbsv);
     SvREFCNT_dec(cbsv);
 }
 
 static void hm_abi_run_until(pTHX_ void *vl, SV *f) {
+    if (f && !hmf_is_future(aTHX_ f)) return;   /* would never become ready */
     hm_loop_run(aTHX_ (hm_loop *)vl, f);
 }
 
@@ -412,6 +419,32 @@ static void hm_abi_st_io_cb(pTHX_ int fd, int mask, void *ud) {
     hm_abi_table.future_done(aTHX_ st->f, NULL, 0);
 }
 
+/* The same-batch cancel case: the canceller cancels the victim only if the
+ * victim has not fired (a handle dies on fire, so cancelling one that has
+ * would itself be the misuse). */
+typedef struct {
+    void *loop;
+    hm_abi_timer *victim;
+    SV *f;
+    int victim_fired;
+    int cancelled;
+} hm_abi_st_cx;
+static void hm_abi_st_cx_victim(pTHX_ void *ud) {
+    hm_abi_st_cx *cx = (hm_abi_st_cx *)ud;
+    PERL_UNUSED_CONTEXT;
+    cx->victim_fired = 1;
+    cx->victim = NULL;
+}
+static void hm_abi_st_cx_cancel(pTHX_ void *ud) {
+    hm_abi_st_cx *cx = (hm_abi_st_cx *)ud;
+    if (cx->victim && !cx->victim_fired) {
+        hm_abi_table.timer_cancel(aTHX_ cx->loop, cx->victim);
+        cx->victim = NULL;
+        cx->cancelled = 1;
+    }
+    hm_abi_table.future_done(aTHX_ cx->f, NULL, 0);
+}
+
 static int hm_abi_selftest(pTHX) {
     const hm_abi *A = &hm_abi_table;
     int ok = 1;
@@ -472,6 +505,43 @@ static int hm_abi_selftest(pTHX) {
             hm_os_close(fds[0]);
             hm_os_close(fds[1]);
         } else ok = 0;
+
+        /* timer_cancel from a callback in the SAME BATCH as the victim: two
+         * timers due together, the first to fire cancels the other. The
+         * other's event is already in the array the backend returned, so
+         * freeing it at cancel was a use after free at its dispatch (and a
+         * double free). Twenty rounds, alternating registration order,
+         * because which of two due timers a backend reports first is its
+         * business: the victim must never fire after the cancel, and under
+         * ASan the dispatch of a cancelled one must touch nothing freed. */
+        {
+            int round;
+            for (round = 0; round < 20 && ok; round++) {
+                hm_abi_st_cx cx;
+                SV *f = A->future_new(aTHX);
+                cx.loop = (void *)loop;
+                cx.f = f;
+                cx.victim_fired = 0;
+                cx.cancelled = 0;
+                if (round & 1) {
+                    cx.victim = A->timer(aTHX_ (void *)loop, 0.0, hm_abi_st_cx_victim, &cx);
+                    A->timer(aTHX_ (void *)loop, 0.0, hm_abi_st_cx_cancel, &cx);
+                } else {
+                    A->timer(aTHX_ (void *)loop, 0.0, hm_abi_st_cx_cancel, &cx);
+                    cx.victim = A->timer(aTHX_ (void *)loop, 0.0, hm_abi_st_cx_victim, &cx);
+                }
+                A->run_until(aTHX_ (void *)loop, f);
+                /* a second turn, so a victim wrongly left armed would fire */
+                {
+                    SV *f2 = A->future_new(aTHX);
+                    A->timer(aTHX_ (void *)loop, 0.005, hm_abi_st_timer, f2);
+                    A->run_until(aTHX_ (void *)loop, f2);
+                    SvREFCNT_dec(f2);
+                }
+                if (cx.cancelled && cx.victim_fired) ok = 0;
+                SvREFCNT_dec(f);
+            }
+        }
 
         /* v2 conn_detach: the entry is present and rejects tickets that
          * name no connection. The success path needs a live HTTP

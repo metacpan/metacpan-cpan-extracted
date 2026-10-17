@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.59';
+our $VERSION = '0.60';
 
 
 1;
@@ -89,7 +89,7 @@ while your stream waits for a slow client to read. On the stream handle it
 is pending from the moment the server answers a write with "full" until the
 server's own drain, and settled at once when a write was taken without the
 connection backing up. Over HTTP/2 that depends on the server reporting
-pressure for the stream, which Hyperman up to 0.58 does not. On the blocking and C<psgi.streaming>
+pressure for the stream, which Hyperman does from 0.60. On the blocking and C<psgi.streaming>
 transports writes are synchronous, so C<drain> comes back already settled and
 the same loop costs nothing.
 

@@ -74,14 +74,18 @@ basename(self)
             p = SvPV_const(*v, l);
             for (i = 0; i < l; i++)
                 if (p[i] == '/' || p[i] == '\\') start = i + 1;
-            while (start < l && p[start] == '.') start++;
             if (start < l) {
+                STRLEN lead = 0;
+                /* control bytes first, dots second: stripping the dots
+                 * before the bytes let "\x01.env" come out as ".env" */
                 sv_setpvs(RETVAL, "");
                 for (i = start; i < l; i++) {
                     unsigned char ch = (unsigned char)p[i];
                     if (ch < 0x20 || ch == 0x7f) continue;
                     sv_catpvn(RETVAL, (const char *)&ch, 1);
                 }
+                while (lead < SvCUR(RETVAL) && SvPVX(RETVAL)[lead] == '.') lead++;
+                if (lead) sv_chop(RETVAL, SvPVX(RETVAL) + lead);
                 if (!SvCUR(RETVAL)) sv_setsv(RETVAL, &PL_sv_undef);
                 else if (SvUTF8(*v)) SvUTF8_on(RETVAL);
             }
@@ -121,7 +125,14 @@ save(self, path)
         if (!SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVHV)
             croak("Punk::Upload: not an upload");
         h = (HV *)SvRV(self);
-        p = SvPV_nolen(path);
+        {
+            STRLEN plen;
+            p = SvPV(path, plen);
+            /* open() stops at a NUL and the caller's allowlist did not:
+             * "x.php\0.txt" is x.php on disk */
+            if (memchr(p, 0, plen))
+                croak("Punk::Upload: save path contains a NUL byte");
+        }
         pp = hv_fetchs(h, "path", 0);
 
         if (pp && *pp && SvOK(*pp)) {
@@ -152,9 +163,16 @@ save(self, path)
                            croak("Punk::Upload: cannot write '%s': %s",
                                  p, Strerror(errno)); }
                 while ((n = PerlIO_read(in, buf, sizeof buf)) > 0)
-                    (void)PerlIO_write(fh, buf, n);
+                    if (PerlIO_write(fh, buf, n) != n) {
+                        int e = errno;
+                        PerlIO_close(in); PerlIO_close(fh);
+                        croak("Punk::Upload: short write to '%s': %s", p,
+                              Strerror(e));
+                    }
                 PerlIO_close(in);
-                PerlIO_close(fh);
+                if (PerlIO_close(fh) != 0)
+                    croak("Punk::Upload: cannot finish '%s': %s", p,
+                          Strerror(errno));
                 RETVAL = 1;
                 XSRETURN_IV(RETVAL);
             }
@@ -167,8 +185,14 @@ save(self, path)
             fh = PerlIO_open(p, "wb");
             if (!fh) croak("Punk::Upload: cannot write '%s': %s",
                            p, Strerror(errno));
-            if (cl) (void)PerlIO_write(fh, c, cl);
-            PerlIO_close(fh);
+            if (cl && PerlIO_write(fh, c, cl) != (SSize_t)cl) {
+                int e = errno;
+                PerlIO_close(fh);
+                croak("Punk::Upload: short write to '%s': %s", p, Strerror(e));
+            }
+            if (PerlIO_close(fh) != 0)
+                croak("Punk::Upload: cannot finish '%s': %s", p,
+                      Strerror(errno));
         }
         RETVAL = 1;
     }

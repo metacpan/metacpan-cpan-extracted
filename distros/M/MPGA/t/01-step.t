@@ -84,15 +84,15 @@ is_deeply( $reverse_flow, ['ccc', 'bbb', 'aaa', 3, 3, 2, 1], 'test step( fun_ret
 
 $reverse_flow = [ 'ccc', 'bbb', 'aaa', \&fun_return_array_ref, 3, 2, 1 ];
 step( $reverse_flow );
-is_deeply( $reverse_flow, ['ccc', 'bbb', 'aaa', 'zzz', 'yyy', 'xxx', 3, 2, 1], 'test step( fun_return_array_ref, args )' );
+is_deeply( $reverse_flow, ['ccc', 'bbb', 'aaa', 'xxx', 'yyy', 'zzz', 3, 2, 1], 'test step( fun_return_array_ref, args )' );
 
 $reverse_flow = [ 'ccc', 'bbb', 'aaa', \&fun_modifying_flow, 3, 2, 1 ];
 step( $reverse_flow );
-is_deeply( $reverse_flow, ['xxx', 'yyy', 'zzz', 3, 2, 1], 'test step( fun_modifying_flow, args )' );
+is_deeply( $reverse_flow, ['ccc', 'bbb', 'aaa', 'xxx', 'yyy', 'zzz'], 'test step( fun_modifying_flow, args )' );
 
 $reverse_flow = [ 'ccc', 'bbb', 'aaa', \&fun_clear_flow, 3, 2, 1 ];
 step( $reverse_flow );
-is_deeply( $reverse_flow, [3, 2, 1], 'test step( fun_clear_flow, args )' );
+is_deeply( $reverse_flow, ['ccc', 'bbb', 'aaa'], 'test step( fun_clear_flow, args )' );
 
 
 

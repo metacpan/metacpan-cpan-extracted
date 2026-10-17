@@ -98,6 +98,7 @@ t/59-ipv6.t
 t/60-unix.t
 t/61-proxy-protocol.t
 t/62-reexec.t
+t/63-review-0.62.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

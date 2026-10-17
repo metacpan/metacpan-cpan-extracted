@@ -1,0 +1,71 @@
+Revision history for Util-Cn
+
+0.03 2026-10-16 CDT (Claude Opus 5.5 helped)
+
+ [Renamed to Util::Cn]
+
+ - The distribution is now `Util-Cn`, installing `Util::Cn`, and a script changes `use Util::Con` to `use Util::Cn`. `Util-Con` could not be built on Windows: `CON` is a reserved device name there, so `make` died creating `blib\lib\auto\Util\Con` with "Invalid argument" before any test ran. The functions, and what each returns, are unchanged.
+
+ [Test suite]
+
+ - `t/windows-names.t` is new and fails if a file, directory or package segment of the distribution is named after a Windows device such as `CON`, `NUL` or `COM1`.
+
+0.02 2026-10-15 CDT (Claude Opus 5.5 helped)
+
+ [`dir`]
+
+ - A `dir` that is a symbolic link to a directory is listed through the link in every mode. A recursive listing with the default `cpu => 1` returned nothing for one, because `File::Find` took the link for a file, while a non-recursive listing and a recursive one with `cpu` above 1 followed it.
+
+ - `dir => '///'` returns `/etc` and the like. Only a single trailing slash after something other than a slash was removed, so it returned `////etc`.
+
+ [`format_commas`]
+
+ - `format_commas($n, '%.0u')` rounds half up to a whole number. The documented way to ask for a whole number appended the hundredths of any fraction without a decimal point: `1234.56` came out as `1,23456`, and `0.4` as `040`.
+
+ [`json_file_to_ref`]
+
+ - A bare `NaN`, `Infinity` or `-Infinity` is turned into `null` only outside JSON strings. Text inside a string that looked like one in value position was rewritten too, so `"values: [1, NaN, 2]"` was read as `"values: [1, null, 2]"`.
+
+ [`random_key` and `random_value`]
+
+ - Both leave the hash's iterator at the start, as they did before 0.01. 0.01 left it one pair in, so an `each` loop over the same hash afterwards skipped its first pair.
+
+ [`p` and `np`]
+
+ - A `p` or `np` of the calling package's own is kept when the stub for the other one loads DDP. DDP exports both, so a package with its own `p` that called `np` had that `p` replaced by DDP's.
+
+ - A `p` or `np` called again after DDP failed to load dies again. It looped forever, because the package was marked as loaded before the load was tried.
+
+ - If DDP is configured to export `p` under another name (an `alias` in `~/.dataprinter`), calling `p` dies saying so. It looped forever.
+
+ [`structure` and `st`]
+
+ - `structure` and `st` indent everything inside a scalar reference by its depth. The contents of a reference such as `{ a => { ptr => \{ x => 1 } } }` were printed one level below the top, as if they belonged to the outermost hash.
+
+ [Test suite]
+
+ - `t/structure.t` is new and covers `structure` and `st`, which had no tests.
+
+0.01 2026-10-13 CDT (Claude Opus 5.5 helped)
+
+ [First CPAN release]
+
+ - `Util.pm`, a module that had only ever been loaded from a symlink into one perl's `site_perl`, is now the distribution `Util-Con`, installing `Util::Con`. The ten functions it exports, and what each returns, are unchanged: `dir`, `execute`, `file2string`, `format_commas`, `json_file_to_ref`, `random_key`, `random_value`, `ref_to_json_file`, `st` and `structure`. A script changes `use Util` to `use Util::Con`.
+
+ [Runs on perl 5.10.1]
+
+ - The module required perl 5.44: it was written with subroutine signatures, the `:prototype` attribute and `no source::encoding`, none of which an older perl can compile. It is now written in perl 5.10 syntax, and the test suite passes on perl 5.10.1, 5.12.5 (long double) and 5.44.0.
+
+ - `autodie` reaches the script on perl 5.10.1 and 5.12.5 too, whose `autodie` is 2.06. `Util.pm` imported it from inside a string eval, which works with perl 5.44's `autodie` 2.37, but 2.06 un-installs itself again as the eval returns, so a failed `open` in the script would have returned false instead of dying. The import now runs after the eval has returned, and `t/00-load.t` checks it.
+
+ [`p` and `np`]
+
+ - `p` and `np` are installed into the package that says `use Util::Con`, not always into `main`, and only when that package does not have its own. They were compiled into `main` whenever the module was loaded, so a script that said `use DDP` before `use Util` died at compile time with "Subroutine p redefined", under the module's fatal warnings, and a package other than `main` that loaded the module did not get them.
+
+ [Clearer messages]
+
+ - `execute` given an unknown `$return` says that it accepts `exit`, `stdout`, `stderr` and `all`. The message left out `all`.
+
+ [Test suite]
+
+ - The tests no longer assume a unix shell or a unix filesystem: `t/execute.t` runs perl itself rather than `true`, `false` and `echo`, a missing file or directory is named under a temporary directory rather than as `/no/such/...`, and the check that a forked recursive `dir` does not follow a symbolic link is skipped where one cannot be made.

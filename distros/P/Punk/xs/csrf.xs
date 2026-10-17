@@ -14,6 +14,9 @@ _check(c)
     PPCODE:
     {
         SV *refused = pcf_check(aTHX_ c);
+        /* pcf_check ran Perl (the session load, $req->form, on_error), and
+         * Perl may have grown and so moved the value stack */
+        SP = PL_stack_base + ax - 1;
         if (refused) {
             EXTEND(SP, 1);
             mPUSHs(refused);

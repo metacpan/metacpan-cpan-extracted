@@ -6,6 +6,90 @@ use warnings;
 
 use Log::Any ();
 
+my $_adapter_configured = 0;
+
+sub import {
+    my ($class, @args) = @_;
+    my $caller = caller;
+
+    unless ($_adapter_configured) {
+        $_adapter_configured = 1;
+        _setup_default_adapter();
+    }
+
+    for my $arg (@args) {
+        if ($arg eq '$log') {
+            my $logger = Log::Any->get_logger(category => $caller);
+            no strict 'refs';
+            *{"${caller}::log"} = \$logger;
+        }
+    }
+
+    return;
+}
+
+sub _setup_default_adapter {
+    my $level  = $ENV{CLAUDE_AGENT_LOG_LEVEL};
+    my $output = $ENV{CLAUDE_AGENT_LOG_OUTPUT};
+    my $debug  = $ENV{CLAUDE_AGENT_DEBUG};
+
+    my $effective_level = 'warning';
+    if ($level) {
+        $effective_level = $level;
+    }
+    elsif (defined $debug && $debug) {
+        $effective_level = $debug > 1 ? 'trace' : 'debug';
+    }
+
+    require Log::Any::Adapter;
+
+    if ($output && $output ne 'stderr') {
+        if ($output eq 'stdout') {
+            Log::Any::Adapter->set(
+                { formatter => \&_format_message },
+                'Stdout',
+                log_level => $effective_level,
+            );
+        }
+        else {
+            Log::Any::Adapter->set(
+                { formatter => \&_format_message },
+                'File',
+                $output,
+                log_level => $effective_level,
+            );
+        }
+    }
+    else {
+        Log::Any::Adapter->set(
+            { formatter => \&_format_message },
+            'Stderr',
+            log_level => $effective_level,
+        );
+    }
+
+    return;
+}
+
+sub _format_message {
+    my ($category, $level, $message, @args) = @_;
+    if (@args) {
+        $message = sprintf($message, @args);
+    }
+    return $message;
+}
+
+sub get_logger {
+    my ($category) = @_;
+    $category //= scalar caller;
+    return Log::Any->get_logger(category => $category);
+}
+
+
+1;
+
+__END__
+
 =head1 NAME
 
 Claude::Agent::Logger - Configurable logging for Claude Agent SDK
@@ -75,89 +159,6 @@ environment variables:
 
 =cut
 
-my $_adapter_configured = 0;
-
-sub import {
-    my ($class, @args) = @_;
-    my $caller = caller;
-
-    # Configure adapter once
-    unless ($_adapter_configured) {
-        $_adapter_configured = 1;
-        _setup_default_adapter();
-    }
-
-    # Export $log to caller if requested
-    for my $arg (@args) {
-        if ($arg eq '$log') {
-            my $logger = Log::Any->get_logger(category => $caller);
-            no strict 'refs';  ## no critic (ProhibitNoStrict)
-            *{"${caller}::log"} = \$logger;
-        }
-    }
-
-    return;
-}
-
-sub _setup_default_adapter {
-    # Check for our env vars to configure default logging
-    my $level  = $ENV{CLAUDE_AGENT_LOG_LEVEL};
-    my $output = $ENV{CLAUDE_AGENT_LOG_OUTPUT};
-    my $debug  = $ENV{CLAUDE_AGENT_DEBUG};
-
-    # Determine effective level
-    # Default: warning (not silent, not noisy)
-    my $effective_level = 'warning';
-    if ($level) {
-        $effective_level = $level;
-    }
-    elsif (defined $debug && $debug) {
-        $effective_level = $debug > 1 ? 'trace' : 'debug';
-    }
-
-    # Configure adapter based on output destination
-    require Log::Any::Adapter;
-
-    if ($output && $output ne 'stderr') {
-        if ($output eq 'stdout') {
-            Log::Any::Adapter->set(
-                { formatter => \&_format_message },
-                'Stdout',
-                log_level => $effective_level,
-            );
-        }
-        else {
-            # File path
-            Log::Any::Adapter->set(
-                { formatter => \&_format_message },
-                'File',
-                $output,
-                log_level => $effective_level,
-            );
-        }
-    }
-    else {
-        # Default: stderr
-        Log::Any::Adapter->set(
-            { formatter => \&_format_message },
-            'Stderr',
-            log_level => $effective_level,
-        );
-    }
-
-    return;
-}
-
-# Format message with sprintf-style placeholders
-sub _format_message {
-    my ($category, $level, $message, @args) = @_;
-    # Apply sprintf if there are format arguments
-    if (@args) {
-        $message = sprintf($message, @args);
-    }
-    return $message;
-}
-
 =head1 FUNCTIONS
 
 =head2 get_logger
@@ -168,12 +169,6 @@ sub _format_message {
 Returns a Log::Any logger instance. Optionally pass a category name.
 
 =cut
-
-sub get_logger {
-    my ($category) = @_;
-    $category //= scalar caller;
-    return Log::Any->get_logger(category => $category);
-}
 
 =head1 AUTHOR
 
@@ -186,5 +181,3 @@ This software is Copyright (c) 2026 by LNATION.
 This is free software, licensed under The Artistic License 2.0 (GPL Compatible).
 
 =cut
-
-1;

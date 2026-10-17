@@ -4,23 +4,181 @@ use 5.020;
 use strict;
 use warnings;
 
+use Object::Proto ();
+use Future;
 use Claude::Agent::Logger '$log';
-use Types::Common -types;
-use Marlin
-    'options'      => sub { Claude::Agent::Options->new() },
-    'loop?',                                       # Optional external IO::Async loop
-    '_query==.',
-    '_session_id==.',
-    '_connected==' => sub { 0 };
-
 use Claude::Agent::Options;
 use Claude::Agent::Query;
 use Claude::Agent::Message;
 use Claude::Agent::Error;
 
+BEGIN {
+    Object::Proto::define('Claude::Agent::Client',
+        'options:lazy:builder(_build_options)',
+        'loop:predicate',
+        'query_args:HashRef:default({})',
+        '_query',
+        '_session_id',
+        '_connected:Bool:default(0)',
+    );
+}
+
+sub _build_options { Claude::Agent::Options->new }
+
+sub connect {
+    my ($self, $prompt) = @_;
+
+    Claude::Agent::Error->throw(message => 'Already connected') if $self->_connected;
+
+    $log->debug("Client: connecting");
+    $self->_start($self->options, $prompt);
+    return $self;
+}
+
+sub resume {
+    my ($self, $session_id, $prompt, %args) = @_;
+
+    Claude::Agent::Error->throw(message => 'Already connected') if $self->_connected;
+    Claude::Agent::Error->throw(message => 'resume needs a session id') unless defined $session_id && length $session_id;
+
+    $log->debug(sprintf("Client: resuming session %s", $session_id));
+    $self->_start($self->options->with(resume => $session_id, ($args{fork} ? (fork_session => 1) : ())), $prompt);
+    $self->_session_id($session_id);
+    return $self;
+}
+
+sub fork {
+    my ($self, $session_id, $prompt) = @_;
+    return $self->resume($session_id, $prompt, fork => 1);
+}
+
+sub _start {
+    my ($self, $options, $prompt) = @_;
+    $self->_query(Claude::Agent::Query->new(
+        (defined $prompt ? (prompt => $prompt) : ()),
+        options    => $options,
+        persistent => 1,
+        ($self->has_loop ? (loop => $self->loop) : ()),
+        %{$self->query_args},
+    ));
+    $self->_connected(1);
+    return;
+}
+
+sub is_connected {
+    my ($self) = @_;
+    return $self->_connected;
+}
+
+sub session_id {
+    my ($self) = @_;
+    return $self->_session_id // ($self->_query ? $self->_query->session_id : undef);
+}
+
+sub query {
+    my ($self) = @_;
+    return $self->_query;
+}
+
+sub _live_query {
+    my ($self) = @_;
+    Claude::Agent::Error->throw(message => 'Not connected') unless $self->_connected;
+    Claude::Agent::Error->throw(message => 'Query not initialized') unless $self->_query;
+    return $self->_query;
+}
+
+sub send {
+    my ($self, $content, %args) = @_;
+
+    my $query = $self->_live_query;
+    my $session_id = $args{session_id} // 'default';
+    $log->debug(sprintf("Client: sending a message on session %s", $session_id));
+    Claude::Agent::Error->throw(message => 'Could not send the message: the session has ended')
+        unless $query->send_user_message($content, session_id => $session_id);
+    return $self;
+}
+
+sub receive {
+    my ($self) = @_;
+
+    my $msg = $self->_live_query->next;
+    if ($msg && $msg->isa('Claude::Agent::Message::System')) {
+        my $sid = $msg->get_session_id;
+        $self->_session_id($sid) if $sid;
+    }
+    return $msg;
+}
+
+sub receive_async {
+    my ($self) = @_;
+    return $self->_live_query->next_async;
+}
+
+sub receive_until_result {
+    my ($self) = @_;
+
+    my $max_iterations = 1000;
+    my $max_env = $ENV{CLAUDE_AGENT_MAX_MESSAGES};
+    $max_env =~ s/^\s+|\s+$//g if defined $max_env;
+    if (defined $max_env && $max_env =~ /^[1-9]\d*$/) {
+        $max_iterations = $max_env > 5000 ? 5000 : $max_env;
+    }
+
+    my @messages;
+    while (my $msg = $self->receive) {
+        push @messages, $msg;
+        last if $msg->isa('Claude::Agent::Message::Result');
+        if (@messages >= $max_iterations) {
+            $log->warning(sprintf("receive_until_result: stopped after %d messages without a result", $max_iterations));
+            last;
+        }
+    }
+    return wantarray ? @messages : \@messages;
+}
+
+sub disconnect {
+    my ($self) = @_;
+
+    if ($self->_query) {
+        $log->debug("Client: disconnecting");
+        $self->_query->close;
+    }
+    $self->_query(undef);
+    $self->_session_id(undef);
+    $self->_connected(0);
+    return $self;
+}
+
+for my $method (qw(
+    interrupt set_permission_mode set_model set_max_thinking_tokens rewind_files
+    mcp_status get_context_usage reconnect_mcp_server toggle_mcp_server stop_task
+)) {
+    no strict 'refs';
+    *{$method} = sub {
+        my $self = shift;
+        return unless $self->_connected && $self->_query;
+        return $self->_query->$method(@_);
+    };
+    my $async = "${method}_async";
+    *{$async} = sub {
+        my $self = shift;
+        return Future->fail('Not connected') unless $self->_connected && $self->_query;
+        return $self->_query->$async(@_);
+    };
+}
+
+sub server_info {
+    my ($self) = @_;
+    return $self->_query ? $self->_query->server_info : undef;
+}
+
+1;
+
+__END__
+
 =head1 NAME
 
-Claude::Agent::Client - Persistent session client for Claude Agent SDK
+Claude::Agent::Client - Multi-turn session with the Claude Code CLI
 
 =head1 SYNOPSIS
 
@@ -33,10 +191,7 @@ Claude::Agent::Client - Persistent session client for Claude Agent SDK
         ),
     );
 
-    # Start a session
     $client->connect("Help me understand this codebase");
-
-    # Process messages until result
     while (my $msg = $client->receive) {
         if ($msg->isa('Claude::Agent::Message::Result')) {
             print "Result: ", $msg->result, "\n";
@@ -47,376 +202,115 @@ Claude::Agent::Client - Persistent session client for Claude Agent SDK
         }
     }
 
-    # Send follow-up in same session
     $client->send("Now find all TODO comments");
+    my @turn = $client->receive_until_result;
 
-    while (my $msg = $client->receive) {
-        # ... process messages
-    }
-
-    # Disconnect when done
+    $client->set_permission_mode('acceptEdits');
     $client->disconnect;
 
 =head1 DESCRIPTION
 
-Claude::Agent::Client provides a persistent session interface for multi-turn
-conversations with Claude. Unlike the simple C<query()> function which creates
-a new session for each call, the Client maintains state across multiple
-interactions.
+A client keeps one CLI process alive for a whole conversation. Each
+C<send> writes another user message to it and each turn ends with a
+L<Claude::Agent::Message::Result>. The C<session()> function of
+L<Claude::Agent> builds one.
 
 =head1 ATTRIBUTES
 
 =head2 options
 
-L<Claude::Agent::Options> object with configuration settings.
+A L<Claude::Agent::Options>. Defaults to an empty one.
+
+=head2 loop
+
+An L<IO::Async::Loop> to run on.
+
+=head2 query_args
+
+Extra arguments for the L<Claude::Agent::Query> the client creates, for
+tests: C<spawn>, C<writer>, C<closer>.
 
 =head1 METHODS
+
+=head2 new
+
+Takes a flat list of name/value pairs. Unknown names are ignored.
 
 =head2 connect
 
     $client->connect($prompt);
+    $client->connect;
 
-Start a new session with the given prompt.
-
-=cut
-
-## no critic (ProhibitBuiltinHomonyms)
-sub connect {
-    my ($self, $prompt) = @_;
-
-    Claude::Agent::Error->throw(message => 'Already connected') if $self->_connected;
-
-    $log->debug("Client: Connecting to Claude API");
-
-    $self->_query(
-        Claude::Agent::Query->new(
-            prompt  => $prompt,
-            options => $self->options,
-            ($self->has_loop ? (loop => $self->loop) : ()),
-        )
-    );
-
-    $self->_connected(1);
-    $log->debug("Client: Connected, session started");
-    return $self;
-}
-
-=head2 is_connected
-
-    if ($client->is_connected) { ... }
-
-Returns true if the client has an active session.
-
-=cut
-
-sub is_connected {
-    my ($self) = @_;
-    return $self->_connected;
-}
-
-=head2 session_id
-
-    my $id = $client->session_id;
-
-Returns the current session ID (available after first message).
-
-=cut
-
-sub session_id {
-    my ($self) = @_;
-    return $self->_session_id // ($self->_query ? $self->_query->session_id : undef);
-}
-
-=head2 receive
-
-    my $msg = $client->receive;
-
-Blocking call to receive the next message. Returns undef when no more messages.
-
-=cut
-
-sub receive {
-    my ($self) = @_;
-
-    Claude::Agent::Error->throw(message => 'Not connected') unless $self->_connected;
-    Claude::Agent::Error->throw(message => 'Query not initialized') unless $self->_query;
-
-    my $msg = $self->_query->next;
-
-    # Capture session_id from any system message that has one
-    if ($msg && $msg->isa('Claude::Agent::Message::System')) {
-        my $sid = $msg->get_session_id;
-        $self->_session_id($sid) if $sid;
-    }
-
-    # Result messages indicate end of current query turn
-    # No additional handling needed - caller should check message type
-
-    return $msg;
-}
-
-=head2 receive_async
-
-    my $msg = await $client->receive_async;
-
-Async call to receive the next message. Returns a Future.
-
-=cut
-
-sub receive_async {
-    my ($self) = @_;
-
-    Claude::Agent::Error->throw(message => 'Not connected') unless $self->_connected;
-    Claude::Agent::Error->throw(message => 'Query not initialized') unless $self->_query;
-
-    return $self->_query->next_async;
-}
-
-=head2 receive_until_result
-
-    my @messages = $client->receive_until_result;
-
-Receive all messages until a Result message is received.
-
-=cut
-
-sub receive_until_result {
-    my ($self) = @_;
-
-    my @messages;
-    my $estimated_memory = 0;
-    my $max_memory_bytes = $ENV{CLAUDE_AGENT_MAX_MEMORY_MB} ? $ENV{CLAUDE_AGENT_MAX_MEMORY_MB} * 1024 * 1024 : 500 * 1024 * 1024;  # Default 500MB
-    # Default to 1000 messages - generous for typical use but prevents runaway loops.
-    # For very long-running operations, set CLAUDE_AGENT_MAX_MESSAGES higher (max 5000).
-    # Typical queries produce 10-100 messages; 1000 allows for complex multi-tool operations.
-    #
-    # MEMORY WARNING: Each message object may be 1-100KB depending on content.
-    # At max (5000 messages), memory usage could reach 50MB-500MB.
-    # For long-running operations, consider processing messages incrementally
-    # using receive() in a loop rather than receive_until_result().
-    # Set CLAUDE_AGENT_MAX_MEMORY_MB to limit memory usage (default 500MB).
-    my $max_iterations = 1000;
-    my $max_allowed = 5_000;  # Reduced to prevent memory exhaustion (each message ~1-100KB)
-    my $max_msg_env = $ENV{CLAUDE_AGENT_MAX_MESSAGES};
-    $max_msg_env =~ s/^\s+|\s+$//g if defined $max_msg_env;  # trim whitespace
-    # Validate after trimming - must be positive integer > 0 (rejects 0 and leading zeros)
-    if (defined $max_msg_env && $max_msg_env =~ /^[1-9]\d*$/) {
-        $max_iterations = $max_msg_env;
-        if ($max_iterations > $max_allowed) {
-            $log->warning(sprintf("CLAUDE_AGENT_MAX_MESSAGES=%d exceeds maximum (%d), using %d. "
-                . "WARNING: High message counts risk memory exhaustion (estimated %dMB-%dMB at max). "
-                . "Set CLAUDE_AGENT_MAX_MEMORY_MB to limit memory, or use receive() for incremental processing.",
-                $max_iterations, $max_allowed, $max_allowed, $max_allowed / 10, $max_allowed / 1));
-            $max_iterations = $max_allowed;
-        }
-        elsif ($max_iterations > 2500) {
-            $log->warning(sprintf("CLAUDE_AGENT_MAX_MESSAGES=%d may cause high memory usage (estimated %dMB-%dMB). "
-                . "Consider using receive() with incremental processing or set CLAUDE_AGENT_MAX_MEMORY_MB.",
-                $max_iterations, $max_iterations / 10, $max_iterations / 1));
-        }
-    }
-    my $iterations = 0;
-    # Create JSON::Lines instance once outside the loop for better performance
-    require JSON::Lines;
-    my $jsonl = JSON::Lines->new;
-    while (my $msg = $self->receive) {
-        $iterations++;
-        push @messages, $msg;
-        # Estimate memory usage (rough heuristic based on message content)
-        # Estimate size based on raw data structure - use JSON::Lines for encoding
-        my $json_str = eval { $jsonl->encode([$msg->message // {}]) } // '{}';
-        $estimated_memory += length($json_str) + 500;  # Add overhead estimate
-        last if $msg->isa('Claude::Agent::Message::Result');
-        if ($estimated_memory >= $max_memory_bytes) {
-            $log->warning(sprintf("receive_until_result: estimated memory usage (%d bytes) exceeds limit (%d bytes), breaking loop. "
-                . "Set CLAUDE_AGENT_MAX_MEMORY_MB to increase limit or use incremental processing.",
-                $estimated_memory, $max_memory_bytes));
-            last;
-        }
-        if ($iterations >= $max_iterations) {
-            $log->warning(sprintf("receive_until_result: processed max messages (%d), breaking loop. "
-                . "Set CLAUDE_AGENT_MAX_MESSAGES to increase limit.", $max_iterations));
-            last;
-        }
-    }
-    # Check if we exited without a Result (connection dropped)
-    if (@messages && !$messages[-1]->isa('Claude::Agent::Message::Result')) {
-        $log->debug("receive_until_result: connection closed without Result message");
-    }
-    return wantarray ? @messages : \@messages;
-}
-
-=head2 send
-
-    $client->send($message);
-
-Send a follow-up message in the current session.
-
-=cut
-
-## no critic (ProhibitBuiltinHomonyms)
-sub send {
-    my ($self, $content) = @_;
-
-    Claude::Agent::Error->throw(message => 'Not connected') unless $self->_connected;
-
-    # Get session_id from previous query or stored value
-    my $session_id = $self->_session_id // ($self->_query ? $self->_query->session_id : undef);
-    Claude::Agent::Error->throw(message => 'No session_id available for send') unless $session_id;
-
-    # Cleanup previous query if it exists
-    if ($self->_query) {
-        $self->_query->cleanup();
-    }
-
-    $log->debug(sprintf("Client: Sending follow-up, resuming session id=%s", $session_id));
-
-    # Create new options with resume
-    my $opts = $self->options;
-    my $resume_opts = Claude::Agent::Options->new(
-        ($opts->has_allowed_tools ? (allowed_tools => $opts->allowed_tools) : ()),
-        ($opts->has_disallowed_tools ? (disallowed_tools => $opts->disallowed_tools) : ()),
-        ($opts->has_model ? (model => $opts->model) : ()),
-        ($opts->has_permission_mode ? (permission_mode => $opts->permission_mode) : ()),
-        ($opts->has_mcp_servers ? (mcp_servers => $opts->mcp_servers) : ()),
-        ($opts->has_hooks ? (hooks => $opts->hooks) : ()),
-        ($opts->has_agents ? (agents => $opts->agents) : ()),
-        ($opts->has_max_turns ? (max_turns => $opts->max_turns) : ()),
-        ($opts->has_system_prompt ? (system_prompt => $opts->system_prompt) : ()),
-        resume => $session_id,
-    );
-
-    # Create new query with resume
-    $self->_query(
-        Claude::Agent::Query->new(
-            prompt  => $content,
-            options => $resume_opts,
-            ($self->has_loop ? (loop => $self->loop) : ()),
-        )
-    );
-
-    return $self;
-}
-
-=head2 interrupt
-
-    $client->interrupt;
-
-Send an interrupt signal to abort the current operation.
-
-=cut
-
-sub interrupt {
-    my ($self) = @_;
-
-    return unless $self->_connected && $self->_query;
-    $self->_query->interrupt;
-    return $self;
-}
-
-=head2 disconnect
-
-    $client->disconnect;
-
-End the current session.
-
-=cut
-
-sub disconnect {
-    my ($self) = @_;
-
-    $log->debug("Client: Disconnected");
-    $self->_query(undef);
-    $self->_session_id(undef);
-    $self->_connected(0);
-    return $self;
-}
+Start the process and send the first prompt, if given. Dies when already
+connected.
 
 =head2 resume
 
     $client->resume($session_id, $prompt);
 
-Resume a previous session.
+Start the process on an earlier session.
 
-=cut
+=head2 fork
 
-sub resume {
-    my ($self, $session_id, $prompt) = @_;
+    $client->fork($session_id, $prompt);
 
-    Claude::Agent::Error->throw(message => 'Already connected') if $self->_connected;
+As C<resume>, but under a new session id.
 
-    # Create new options with resume, preserving all relevant options
-    my $opts = $self->options;
-    my $resume_opts = Claude::Agent::Options->new(
-        ($opts->has_allowed_tools ? (allowed_tools => $opts->allowed_tools) : ()),
-        ($opts->has_model ? (model => $opts->model) : ()),
-        ($opts->has_permission_mode ? (permission_mode => $opts->permission_mode) : ()),
-        ($opts->has_mcp_servers ? (mcp_servers => $opts->mcp_servers) : ()),
-        ($opts->has_hooks ? (hooks => $opts->hooks) : ()),
-        ($opts->has_agents ? (agents => $opts->agents) : ()),
-        ($opts->has_max_turns ? (max_turns => $opts->max_turns) : ()),
-        ($opts->has_system_prompt ? (system_prompt => $opts->system_prompt) : ()),
-        resume => $session_id,
-    );
+=head2 send
 
-    $log->debug(sprintf("Client: Resuming session id=%s", $session_id));
+    $client->send($content, session_id => $id);
 
-    $self->_query(
-        Claude::Agent::Query->new(
-            prompt  => $prompt,
-            options => $resume_opts,
-            ($self->has_loop ? (loop => $self->loop) : ()),
-        )
-    );
+Write a user message: a string or an array of content blocks. The session
+id defaults to C<default>, which the CLI reads as the current session.
 
-    $self->_session_id($session_id);
-    $self->_connected(1);
-    $log->debug(sprintf("Client: Session resumed id=%s", $session_id));
-    return $self;
-}
+=head2 receive
 
-1;
+    my $msg = $client->receive;
 
-__END__
+The next message, or undef when the process has ended.
 
-=head1 EXAMPLE: INTERACTIVE SESSION
+=head2 receive_async
 
-    use Claude::Agent::Client;
-    use Claude::Agent::Options;
+A L<Future> of the next message.
 
-    my $client = Claude::Agent::Client->new(
-        options => Claude::Agent::Options->new(
-            allowed_tools   => ['Read', 'Glob', 'Grep', 'Edit'],
-            permission_mode => 'acceptEdits',
-        ),
-    );
+=head2 receive_until_result
 
-    # Interactive loop
-    print "Enter your first prompt: ";
-    while (my $input = <STDIN>) {
-        chomp $input;
-        last if $input eq 'quit';
+    my @messages = $client->receive_until_result;
 
-        if ($client->is_connected) {
-            $client->send($input);
-        } else {
-            $client->connect($input);
-        }
+Every message up to and including the next result. Stops after
+C<CLAUDE_AGENT_MAX_MESSAGES> messages (default 1000, at most 5000).
 
-        # Process response
-        for my $msg ($client->receive_until_result) {
-            if ($msg->isa('Claude::Agent::Message::Assistant')) {
-                print "Claude: ", $msg->text, "\n\n";
-            }
-            elsif ($msg->isa('Claude::Agent::Message::Result')) {
-                print "--- End of turn ---\n";
-            }
-        }
+=head2 is_connected
 
-        print "Your turn: ";
-    }
+True between C<connect> and C<disconnect>.
+
+=head2 session_id
+
+The session id, once the CLI has reported it.
+
+=head2 query
+
+The underlying L<Claude::Agent::Query>, or undef.
+
+=head2 server_info
+
+The CLI's C<initialize> response, once the query has started.
+
+=head2 interrupt, set_permission_mode, set_model, set_max_thinking_tokens, rewind_files, mcp_status, get_context_usage, reconnect_mcp_server, toggle_mcp_server, stop_task
+
+Delegate to the query; see L<Claude::Agent::Query>. When the client is not
+connected they return undef.
+
+=head2 interrupt_async, set_permission_mode_async, set_model_async, set_max_thinking_tokens_async, rewind_files_async, mcp_status_async, get_context_usage_async, reconnect_mcp_server_async, toggle_mcp_server_async, stop_task_async
+
+The same, returning a L<Future>, which fails when the client is not
+connected.
+
+=head2 disconnect
 
     $client->disconnect;
+
+Stop the process and forget the session. Safe to call more than once.
 
 =head1 AUTHOR
 

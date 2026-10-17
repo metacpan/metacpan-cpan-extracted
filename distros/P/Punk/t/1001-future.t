@@ -263,6 +263,20 @@ SKIP: {
         use Punk;
         get '/slow' => sub { my $c = shift;
             $c->timer(0.4)->then(sub { $c->json({ slept => 1 }) }) };
+        # get and await push their values after the loop ran; a callback that
+        # grew the value stack moved it, and the push used the old pointer
+        get '/await' => sub { my $c = shift; my $n = $c->param('n') || 0;
+            my $f = $c->promise;
+            $f->then(sub { my @x = (1) x $n; $_[0] });
+            $c->timer(0.01)->on_done(sub { $f->done(42) });
+            my $v = $c->await($f);
+            $c->text("got:$v") };
+        get '/get' => sub { my $c = shift; my $n = $c->param('n') || 0;
+            my $f = $c->promise;
+            $f->then(sub { my @x = (1) x $n; $_[0] });
+            $c->timer(0.01)->on_done(sub { $f->done(42) });
+            my $v = $f->get;
+            $c->text("got:$v") };
         get '/fast' => sub { $_[0]->text('fast') };
         get '/all'  => sub { my $c = shift;
             Punk::Future->needs_all($c->timer(0.15), $c->timer(0.15))
@@ -301,6 +315,12 @@ SKIP: {
     ok($ft < $st - 0.2,
         'the worker served /fast while /slow was pending (non-blocking)');
     like($slurp->($get->('/all')), qr/both/, 'needs_all resolves on the loop');
+    for my $n (1_000, 100_000, 2_000_000) {
+        like($slurp->($get->("/get?n=$n")), qr/got:42/,
+            "get returns the value after a callback grew the stack by $n");
+        like($slurp->($get->("/await?n=$n")), qr/got:42/,
+            "await returns the value after a callback grew the stack by $n");
+    }
     kill 9, $pid; waitpid $pid, 0;
 }
 

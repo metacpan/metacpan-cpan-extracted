@@ -37,7 +37,7 @@ Plack::Test::Suite->run_server_tests('Hyperman');
         # the POD satisfy the check - an option can be documented and still
         # never reach run(), which is exactly the state this test was written
         # to catch.
-        my ($passthrough) = $hd =~ /map \{ defined .*?\bqw\((.*?)\)/s;
+        my ($passthrough) = $hd =~ /\@PASS\s*=\s*qw\((.*?)\)/s;
         $passthrough ||= '';
         my %passed = map { $_ => 1 } split ' ', $passthrough;
 

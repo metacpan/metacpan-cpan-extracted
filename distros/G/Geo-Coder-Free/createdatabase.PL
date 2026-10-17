@@ -1144,10 +1144,19 @@ my %state_md5s;
 my %state_parent_md5s;
 
 my $cities_sql = 'lib/Geo/Coder/Free/MaxMind/databases/cities.sql';
+my $cities_csv = 'lib/Geo/Coder/Free/MaxMind/databases/cities.csv.gz';
 
 if(!-r $cities_sql) {
-	(system('bash bin/create_sqlite') == 0)
-		or Carp::carp "Can't create the SQLite database (perhaps you don't have sqlite3 installed) - expect poor performance";
+	# db2sql gunzips $cities_csv, so running it without it only prints the gzip
+	# error and blames sqlite3 for a file that was never downloaded (the
+	# databases are fetched by Makefile.PL, or not, when NO_NETWORK_TESTING is
+	# set).  Say what is missing once and carry on - cities.sql is optional.
+	if(!-r $cities_csv) {
+		Carp::carp "Can't find $cities_csv, so not creating $cities_sql - expect poor performance";
+	} else {
+		(system('bash bin/create_sqlite') == 0)
+			or Carp::carp "Can't create the SQLite database (perhaps you don't have sqlite3 installed) - expect poor performance";
+	}
 
 	if(-r $cities_sql) {
 		if(-r "blib/$cities_sql") {

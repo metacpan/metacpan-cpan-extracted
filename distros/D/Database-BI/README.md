@@ -4,7 +4,7 @@ Database::BI - Web-based Business Intelligence viewer for data files
 
 ## Version
 
-0.012.1
+0.013.0
 
 ## Description
 
@@ -17,8 +17,9 @@ it reads your files on every request.
 
 Users navigate to pick a file, open the filesystem browser to navigate anywhere
 on disc, drag-and-drop files to upload, join multiple tables in memory, apply
-server-side filters, and export results as CSV, SQLite, or JSON.  D3.js
-visualisations (line chart, pie chart) are available from the toolbar.
+server-side filters, and export results as CSV, SQLite, JSON, or XLSX.  Nine
+D3.js v7 chart types, a pivot/crosstab table, per-column statistics, and
+multi-visual saved canvases are available from the toolbar.
 
 Key features:
 
@@ -43,12 +44,33 @@ button so conditions can be dropped one at a time.  Operators: `eq`,
 - **Combine (UNION ALL)** -- the "Combine data" panel stacks rows from a
 second (or further) file beneath the current rows, using a unified column
 set and leaving blanks where a source file lacks a column.
-- **Charts** -- the toolbar offers a line chart ([HTML::D3](https://metacpan.org/pod/HTML%3A%3AD3)
-`render_zoomable_line_chart_snippet`; brush-to-zoom, reference lines for
-min/avg/max), a pie chart (`render_pie_chart_snippet`; animated,
-sorted by value, capped at 12 slices, click-a-slice to filter the table),
-and a heatmap (`render_heatmap_snippet`; two categorical axes, optional
-value column or row count, configurable sequential colour scheme).
+- **Charts** -- nine [HTML::D3](https://metacpan.org/pod/HTML%3A%3AD3) D3.js v7 chart types are accessible from
+the toolbar: line chart (brush-to-zoom, reference lines for min/avg/max,
+multi-series interactive legend), pie chart (click-a-slice to filter,
+top-N, donut mode, configurable colour scheme), heatmap (two categorical
+axes, count or sum mode), bar chart (horizontal or vertical, sort,
+top-N), scatter/bubble plot (optional categorical colour and numeric
+size dimensions), stacked bar chart, combo bar+line chart, treemap, and
+histogram (server-side binning, `?bins=N`).  All charts can be resized
+by dragging the bottom-right corner grip.  All chart pages include
+Copy-link and Export SVG/PNG buttons.
+- **Pivot table** -- the "Pivot table" panel builds a crosstab from any
+combination of row dimensions, column dimensions, and measures
+(`sum|avg|min|max|count|count_distinct`).  Supports subtotals, HAVING
+filters, top-N row groups, and direct export to CSV, SQLite, JSON, or XLSX.
+- **Column statistics** -- the column-stats button runs `GET /stats`, which
+returns one row per column: row count, null count, distinct count, and
+(for numeric columns) min, max, mean, and median.
+- **Calculated fields** -- virtual columns defined by inline `?c=name:expr`
+URL params or stored persistently via `POST /calc/save`.  Expressions
+support arithmetic, comparison, `IF`, string, numeric, and date
+functions, plus `bin(value,width)` for histogram grouping.  Calc fields
+are applied before aggregation on all chart and pivot routes.
+- **Saved canvases** -- the "Save as Canvas" panel saves the current data
+configuration as a named multi-visual canvas (`/a/:id`).  Canvases
+support cross-filtering, drill-through hierarchies, parameterisation,
+bookmarks with undo/redo, per-visual PNG download, and print to
+PDF/paper.
 - **Drag-and-drop upload** -- any supported data file can be dropped directly
 onto the application.  The file is opened immediately; when the "Combine
 data" panel is open the dropped file populates the right-table path field.
@@ -334,6 +356,191 @@ perl Makefile.PL
     Deletes every file from the `.uploads/` staging directory.  Returns JSON
     `{ "freed": <bytes`, "count": &lt;n> }>.  No request body is needed.
 
+- `GET /pivot`
+
+    Renders a pivot/crosstab table.  Parameters:
+
+    ```
+    l=<spec>             left table (required)
+    rows=col1,col2       row-dimension column names (required)
+    cols=col3            column-dimension names (optional)
+    m=col:fn:alias       measure spec, repeatable (fn: sum|avg|min|max|count|count_distinct)
+    totals=1             include subtotals column and grand-total row
+    topn=N               keep only the top-N row groups
+    topn_col=<alias>     measure alias to rank by (required when topn= is set)
+    max_cols=N           collapse tail column combos beyond top-N into "Other"
+    format=csv|sqlite|json|xlsx  stream result as a download
+    back=<url>           URL for the back breadcrumb link
+    f=                   result filters applied before aggregating (repeatable)
+    ```
+
+- `GET /stats`
+
+    Per-column statistics view.  Returns one row per column: row count, null
+    count, distinct count, and (for numeric columns) min, max, mean, and median.
+    Parameters: `l=<spec>` (required) and `f=` filters.
+
+- `GET /scatter`
+
+    D3.js v7 scatter/bubble plot.  Parameters:
+
+    ```
+    l=<spec>      left table (required)
+    x=<col>       X-axis column (required; numeric)
+    y=<col>       Y-axis column (required; numeric)
+    series=<col>  categorical colour dimension (optional)
+    size=<col>    numeric bubble-radius dimension (optional)
+    scheme=<name> colour scheme when series= is set (optional)
+    back=<url>, back2=<url>, back2_label=<text>  breadcrumb links
+    f=            result filters (repeatable)
+    ```
+
+- `GET /stacked`
+
+    D3.js v7 stacked bar chart.  Parameters:
+
+    ```
+    l=<spec>      left table (required)
+    cat=<col>     X-axis categories (required)
+    series=<col>  stack segments (required; seg= is a backwards-compatible alias)
+    val=<col>     measure column (optional; omit to count rows)
+    scheme=<name> colour scheme (optional)
+    back=<url>, back2=<url>, back2_label=<text>  breadcrumb links
+    f=            result filters (repeatable)
+    ```
+
+- `GET /combo`
+
+    D3.js v7 combo bar+line chart.  Parameters:
+
+    ```
+    l=<spec>       left table (required)
+    cat=<col>      X-axis categories (required; x= is a backwards-compatible alias)
+    bar_val=<col>  bar measure column (required)
+    line_val=<col> line measure column (required)
+    back=<url>, back2=<url>, back2_label=<text>  breadcrumb links
+    f=             result filters (repeatable)
+    ```
+
+- `GET /treemap`
+
+    D3.js v7 treemap.  Parameters:
+
+    ```
+    l=<spec>      left table (required)
+    group=<col>   tile label column (required; cat= is a backwards-compatible alias)
+    size=<col>    tile area column (required; val= is a backwards-compatible alias)
+    topn=N        keep only the top-N tiles; remainder merged into "Other"
+    scheme=<name> colour scheme (optional)
+    back=<url>, back2=<url>, back2_label=<text>  breadcrumb links
+    f=            result filters (repeatable)
+    ```
+
+- `GET /histogram`
+
+    D3.js v7 histogram with server-side binning.  Parameters:
+
+    ```
+    l=<spec>   left table (required)
+    col=<col>  numeric column to bin (required)
+    bins=N     bin count (default 10; clamped to range 1--200)
+    back=<url>, back2=<url>, back2_label=<text>  breadcrumb links
+    f=         result filters (repeatable)
+    ```
+
+- `GET /line`
+
+    Alias for `GET /graph`.  All `/graph` parameters accepted.
+
+- `GET /a/:id`
+
+    Renders a saved canvas (analysis) as a full multi-visual page.  Accepts
+    cross-filter params `?cf=<col>&cv=<val>`, drill-through
+    params `?dd=<col>&dl=<level>`, and parameter overrides
+    `?p.<name>=<value>`.
+
+- `GET /api/analyses`
+
+    Returns `{ analyses: [{id, name, datasets, updated}] }`.
+
+- `POST /api/analyses`
+
+    Creates a new analysis from a JSON request body.  Required fields: `name`
+    and `datasets` (array; each entry must have a `spec` starting with
+    `table:`, `path:`, `url:`, or `redis:`).  Returns `201 { id, created: 1 }`.
+
+- `GET /api/analyses/:id`
+
+    Returns the full analysis document.
+
+- `PUT /api/analyses/:id`
+
+    Full replacement of an analysis document.
+
+- `PATCH /api/analyses/:id`
+
+    Partial update; merges the supplied top-level keys.  `id` and `created`
+    are immutable.
+
+- `DELETE /api/analyses/:id`
+
+    Removes the analysis.  Returns `200 { deleted: 1 }`.
+
+- `GET /api/analyses/:id/export`
+
+    Downloads the analysis document as a `.json` file.
+
+- `POST /api/analyses/import`
+
+    Creates an analysis from an uploaded `.json` file (multipart `file`
+    field) or a raw JSON request body.  Caller-supplied `id`, `created`,
+    and `updated` are stripped.
+
+- `GET /calc/list`
+
+    Returns `{ fields: { name: expr } }` for stored virtual calc fields
+    for a given spec.  Accepts `?l=<spec>`.
+
+- `POST /calc/save`
+
+    Saves a named calc field to `.bi/models.json`.  Body:
+    `l=<spec>&name=<ident>&expr=<expression>`.
+    Returns `{ saved: 1 }` or `{ error: "..." }` (400 for hostile input).
+
+- `POST /calc/delete`
+
+    Removes a named calc field.  Body:
+    `l=<spec>&name=<ident>`.
+
+- `GET /groups/list`
+
+    Returns `{ groups: { label: [vals] } }` for named value groups for
+    a column.  Accepts `?l=<spec>&col=<col>`.
+
+- `POST /groups/save`
+
+    Saves a named value group.  Body: `l=&col=&group=&values=` (values
+    is a newline-separated list of raw cell values).
+
+- `POST /groups/delete`
+
+    Removes a named value group.  Body: `l=&col=&group=`.
+
+- `GET /dates/list`
+
+    Returns `{ patterns: { col: pattern } }` for stored date-normalisation
+    patterns.  Accepts `?l=<spec>`.
+
+- `POST /dates/save`
+
+    Saves a date-normalisation pattern for a column.  Body: `l=&col=&pattern=`.
+    Supported patterns: `%m/%d/%Y` (US), `%d/%m/%Y` (EU), `%d-%b-%Y` (DD-Mon-YYYY).
+
+- `POST /dates/delete`
+
+    Removes a date-normalisation pattern.  Body: `l=&col=`.
+    Omit `col=` to clear all patterns for the spec.
+
 ## Configuration
 
 Place a `database_bi.conf` file in the application root to override
@@ -462,24 +669,13 @@ works correctly in production without any special workarounds.
 
 ## Roadmap
 
-Features planned for future releases (post-0.012.0).  Items are ordered by
+Features planned for future releases (post-0.013.0).  Items are ordered by
 priority.
 
-- **XLSX export** (High) -- `/export` supports CSV, SQLite, and JSON
-but not XLSX output.  `Excel::Writer::XLSX` would close the round-trip for
-users whose source data is XLSX.
 - **Folder view filter/join propagation** (Medium) -- The folder view
-panel in the dashboard does not carry forward active `j=` and `f=` params
-when building the `/folder` URL.  Users who have filtered or joined a table
-and then click "Folder view" silently lose their filter context.
-- **Copy-link button on chart pages** (Medium) -- The dashboard data
-view has a copy-link button when filters are active, but `/graph`, `/pie`,
-`/heatmap`, and `/bar` do not, even though their URLs are fully
-parameterised and users share them.
-- **Column statistics panel** (Medium) -- A per-column popover showing
-min, max, mean, median, and null-count.  `List::Util` is already in
-`PREREQ_PM`; only `Statistics::Descriptive` (or manual computation) is
-needed.
+panel does not carry forward active `j=` and `f=` params when building
+the `/folder` URL.  Users who have filtered or joined a table and then
+click "Folder view" silently lose their filter context.
 - **Multi-sheet XLSX** (Medium) -- `_detect_file_info` reads only the
 first worksheet.  A `?sheet=` URL param with a sheet-name picker would
 expose the full workbook.

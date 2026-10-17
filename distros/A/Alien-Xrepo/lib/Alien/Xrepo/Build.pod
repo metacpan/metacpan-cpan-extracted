@@ -113,7 +113,8 @@ callbacks.
         root         => $store_root,       # XMAKE_PKG_INSTALLDIR
         repo         => $alien_xrepo,      # injectable engine
         cache        => 0,                 # bypass Alien::Xrepo's warm-start cache
-        verbose      => 1,
+        verbose      => 1,                 # engine chatter + xmake's -v on installs
+        diagnosis    => 1,                 # xmake's -D on installs
         checkpoint   => $state_file,       # enables resume
         snapshot     => $snapshot_file,    # write runtime data here during export
         share_dir    => $share_dir,        # shallow-install packages into a self-contained sharedir
@@ -126,6 +127,11 @@ callbacks.
 B<cache> (default 1) is forwarded to the engine this class creates, so C<cache =E<gt> 0> disables the on-disk
 resolution cache (see L<Alien::Xrepo/"Cache System">). If an engine is injected via C<repo =E<gt> ...>, it keeps its
 own cache setting.
+
+B<verbose> and B<diagnosis> are forwarded to the engine this class creates: C<verbose> turns on the engine's status
+chatter and passes C<-v> to C<xrepo install>, and C<diagnosis> passes C<-D>, so a package that fails to build prints
+its full C<install.txt> plus C<xmake>'s diagnostic detail instead of only the tail. A recipe (or a single package def)
+may also set C<verbose> / C<diagnosis> in its C<defaults>, which reaches the same engine call for that package.
 
 B<share_dir> switches the run from the ambient C<xmake> cache to a self-contained install: every package is installed
 into C<< <share_dir>/<pkg> >> (its C<installdir>), so the dist can ship its own copy of the libraries and never depend

@@ -44,7 +44,7 @@ get '/' => 'Web::Root#index', { name => 'home' };
 # checkers refuse everything until you fill them in.
 my $api = under('/api')->api('openapi.json' => {
     security => {
-{% for s in schemes %}        '{% s.name %}' => 'API::{% s.class %}#{% s.method %}',
+{% for s in schemes %}        '{% s.name_q %}' => 'API::{% s.class %}#{% s.method %}',
 {% end %}    },
 });
 {% else %}my $api = under('/api')->api('openapi.json');

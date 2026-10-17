@@ -5588,6 +5588,7 @@
             ],
             "authorization_response_iss_parameter_supported": true,
             "client_id_metadata_document_supported": true,
+            "registration_endpoint": "https://api.vpndetection.io/oauth/register",
             "service_documentation": "https://api.vpndetection.io/"
           },
           "expect": {
@@ -5621,6 +5622,7 @@
               ],
               "authorization_response_iss_parameter_supported": true,
               "client_id_metadata_document_supported": true,
+              "registration_endpoint": "https://api.vpndetection.io/oauth/register",
               "service_documentation": "https://api.vpndetection.io/"
             },
             "absent": []
@@ -6105,6 +6107,7 @@
                 ],
                 "authorization_response_iss_parameter_supported": true,
                 "client_id_metadata_document_supported": true,
+                "registration_endpoint": "https://api.vpndetection.io/oauth/register",
                 "service_documentation": "https://api.vpndetection.io/"
               }
             }

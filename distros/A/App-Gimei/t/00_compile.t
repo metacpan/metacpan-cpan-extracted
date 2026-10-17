@@ -1,4 +1,4 @@
-use v5.40;
+use v5.42;
 
 use App::Gimei;
 use Test2::V1 -utf8;

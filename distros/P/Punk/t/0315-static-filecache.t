@@ -151,4 +151,28 @@ for my $i (1 .. 5) {
     }
 }
 
+# ---- the cache's bytes are nobody's to edit --------------------------------------
+# The request that filled the cache used to be handed the cache's own SV, so a
+# PSGI wrapper editing the body in place edited the cache, and every later hit
+# served the edit (the second fetch read "helloXX").
+{
+    package FcEdit;
+    use Punk;
+    static '/s' => "$dir";
+    package main;
+    write_file("$dir/edit.txt", 'hello');
+    my $inner = FcEdit->to_app;
+    my $wrapped = sub {
+        my $r = $inner->(@_);
+        $r->[2][0] .= 'X' if ref $r->[2] eq 'ARRAY' && !ref $r->[2][0];
+        return $r;
+    };
+    is(body_of(hit($wrapped, path => '/s/edit.txt')), 'helloX',
+        'a wrapper edits the first response');
+    is(body_of(hit($wrapped, path => '/s/edit.txt')), 'helloX',
+        'the second fetch is served from the cache, unedited');
+    is(body_of(hit($inner, path => '/s/edit.txt')), 'hello',
+        'and the cache still holds the file as it is on disk');
+}
+
 done_testing;

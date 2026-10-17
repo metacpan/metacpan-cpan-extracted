@@ -1,5 +1,5 @@
 {
-   "abstract" : "A powerful, general-purpose document expansion framework (currently exists mostly as uncomplete documentation and a beginning of a stub of implementation)",
+   "abstract" : "A powerful, general-purpose document expansion framework",
    "author" : [
       "Ilya Zakharevich <ilyaz@cpan.com>"
    ],
@@ -37,6 +37,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

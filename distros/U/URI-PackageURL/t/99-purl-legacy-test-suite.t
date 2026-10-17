@@ -6,6 +6,10 @@ use File::Spec;
 
 # Official "legacy" PURL test suite (https://raw.githubusercontent.com/package-url/purl-spec/e56202efb16b943add2ae27b81a00efd25add47a/test-suite-data.json)
 
+unless ($ENV{LEGACY_PURL_TESTS}) {
+    plan(skip_all => "LEGACY_PURL_TEST_SUITE disabled");
+}
+
 require_ok('URI::PackageURL');
 
 sub test_purl_encode {

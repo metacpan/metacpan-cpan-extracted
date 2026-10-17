@@ -52,6 +52,10 @@ typedef struct hm_h3_stream {
                               * of the stream is dropped unread        */
     unsigned char fin;       /* the request stream ended               */
     unsigned char dispatched;
+    unsigned char ready;     /* complete: dispatched after read_pkt    */
+    unsigned char responded; /* a response was submitted: nghttp3 now
+                              * points into resp_body, so nothing may
+                              * append to it, free it or submit again  */
     struct hm_h3_stream *next;
 } hm_h3_stream;
 
@@ -226,7 +230,7 @@ static int hm_h3_cb_end_headers(nghttp3_conn *conn, int64_t stream_id,
     (void)conn; (void)stream_id; (void)fin;
     if (!st || st->dispatched || !st->env) return 0;
     if (!hm_h2_is_connect(aTHX_ st->env)) return 0;
-    hm_h3_dispatch(aTHX_ qc, st);
+    st->ready = 1;              /* hm_h3_run_ready, after read_pkt returns */
     return 0;
 }
 
@@ -292,7 +296,12 @@ static int hm_h3_cb_end_stream(nghttp3_conn *conn, int64_t stream_id,
     (void)conn; (void)stream_id;
     if (!st || st->dispatched || st->refused) return 0;
     st->fin = 1;
-    hm_h3_dispatch(aTHX_ qc, st);
+    /* NOT dispatched from here: this is a callback inside
+     * ngtcp2_conn_read_pkt, and a handler that waited pumped a loop whose
+     * expiry sweep freed this connection under the frame (then the
+     * response was written into freed memory). hm_h3_run_ready hands it
+     * over once the library has returned. */
+    st->ready = 1;
     return 0;
 }
 
@@ -462,6 +471,7 @@ static void hm_h3_submit_response(pTHX_ hm_qconn *qc, hm_h3_stream *st,
     }
 
     st->status   = status;
+    st->responded = 1;
     st->resp_off = 0;
     st->resp_acked = 0;
     dr.read_data = hm_h3_read_data;
@@ -518,19 +528,24 @@ static hm_qconn *hm_h3_qconn(int fd, UV qid) {
     return srv ? hm_quic_conn_by_id(srv, qid) : NULL;
 }
 
-static void hm_h3_writer_write(pTHX_ int fd, UV qid, int64_t sid, SV *data) {
+/* 1 buffered, -1 stale. */
+static int hm_h3_writer_write(pTHX_ int fd, UV qid, int64_t sid, SV *data) {
     hm_qconn *qc = hm_h3_qconn(fd, qid);
     hm_h3_stream *st = qc ? hm_h3_stream_find(qc, sid) : NULL;
-    if (!st) return;
+    /* After close the reader has handed nghttp3 a pointer into resp_body:
+     * an append could move it, and a retransmission would then read freed
+     * memory out to the peer. */
+    if (!st || st->responded) return -1;
     if (!st->resp_body) st->resp_body = newSVpvs("");
     sv_catsv(st->resp_body, data);
+    return 1;
 }
 
 static void hm_h3_writer_close(pTHX_ int fd, UV qid, int64_t sid) {
     hm_qconn *qc = hm_h3_qconn(fd, qid);
     hm_h3_stream *st = qc ? hm_h3_stream_find(qc, sid) : NULL;
     AV *hav;
-    if (!st) return;
+    if (!st || st->responded) return;        /* a second close: no-op */
     { STRLEN l; if (st->resp_body) { (void)SvPV(st->resp_body, l); st->blen = l; } }
     hav = (st->resp_headers && SvROK(st->resp_headers))
         ? (AV *)SvRV(st->resp_headers) : NULL;
@@ -558,6 +573,9 @@ XS_INTERNAL(hm_xs_h3responder) {
     qc = hm_h3_qconn(fd, qid);
     st = qc ? hm_h3_stream_find(qc, sid) : NULL;
     if (!st) XSRETURN_EMPTY;
+    /* Answered already (a second responder call): a second submit would
+     * reset the reader's offsets under bytes nghttp3 still holds. */
+    if (st->responded) XSRETURN_EMPTY;
     if (items < 1 || !(SvROK(ST(0)) && SvTYPE(SvRV(ST(0))) == SVt_PVAV))
         croak("Hyperman responder expects an array reference");
     rav = (AV *)SvRV(ST(0));
@@ -598,13 +616,19 @@ static void hm_h3_run_delayed(pTHX_ hm_qconn *qc, hm_h3_stream *st, SV *code) {
     SV *responder = hm_closure(aTHX_ hm_xs_h3responder, NULL, NULL, NULL,
                                sv_2mortal(newSViv((IV)st->id)),
                                (IV)qc->srv->lst->udp_fd, qc->id);
+    int64_t sid = st->id;
     dSP;
     ENTER; SAVETMPS;
     PUSHMARK(SP);
     XPUSHs(responder);
     PUTBACK;
     call_sv(code, G_DISCARD | G_EVAL);
-    if (SvTRUE(ERRSV)) {
+    /* The coderef may have waited, and the stream may have been reset
+     * meanwhile: look it up again. A 500 only for a stream that has not
+     * answered - after the responder ran, the body nghttp3 holds is the
+     * response, and a die after that is logged, not served. */
+    st = hm_h3_stream_find(qc, sid);
+    if (SvTRUE(ERRSV) && st && !st->responded) {
         if (st->resp_body) SvREFCNT_dec(st->resp_body);
         st->resp_body = newSVpvs("Internal Server Error");
         st->blen = 21;
@@ -668,6 +692,7 @@ XS_INTERNAL(hm_xs_h3park_cb) {
     }
     st->awaiting = 0;
     if (st->resp_f) { SvREFCNT_dec(st->resp_f); st->resp_f = NULL; }
+    if (st->responded) XSRETURN_EMPTY;       /* a handle answered meanwhile */
     hm_h3_respond(aTHX_ qc, st, resp);
     if (hm_logging(qc->srv->loop) && st->env_rv)
         hm_access_log(aTHX_ qc->srv->loop, st->env_rv, st->status,
@@ -680,6 +705,7 @@ static void hm_h3_dispatch(pTHX_ hm_qconn *qc, hm_h3_stream *st) {
     hm_loop *loop = qc->srv->loop;
     HV *env = st->env;
     SV *env_rv, *resp;
+    int64_t sid = st->id;
     st->dispatched = 1;
     st->env = NULL;
     if (!hv_exists(env, "psgi.input", 10)) {
@@ -702,6 +728,17 @@ static void hm_h3_dispatch(pTHX_ hm_qconn *qc, hm_h3_stream *st) {
     resp = hm_call_app(aTHX_ loop, env_rv);
     hm_count_request(loop);
     loop->h3_requests++;
+    /* An application that waited pumped this loop, which read this
+     * connection: the peer may have reset the stream, which freed st. Look
+     * it up again rather than trust the pointer the call went in with (the
+     * connection itself cannot have gone: hm_quic_conn_free defers while
+     * in_app). */
+    st = hm_h3_stream_find(qc, sid);
+    if (!st) {
+        if (resp) SvREFCNT_dec(resp);
+        SvREFCNT_dec(env_rv);
+        return;
+    }
 
     if (resp && hm_is_awaitable(aTHX_ resp)) {
         SV *cb = hm_closure(aTHX_ hm_xs_h3park_cb, NULL, NULL, NULL,
@@ -730,6 +767,37 @@ static void hm_h3_dispatch(pTHX_ hm_qconn *qc, hm_h3_stream *st) {
         hm_access_log(aTHX_ loop, env_rv, st->status, (ssize_t)st->blen);
     if (resp) SvREFCNT_dec(resp);
     SvREFCNT_dec(env_rv);
+}
+
+/* Hand every completed request to the application, lowest stream first,
+ * now that ngtcp2 has returned (hm_quic_packet). The h3 counterpart of
+ * hm_h2_run_ready: one handler at a time per connection, the connection
+ * held (in_app) so a free asked for under the handler waits for it, and out
+ * of the expiry heap until the handler returns. -1 if the connection was
+ * freed here. */
+static int hm_h3_run_ready(pTHX_ hm_qconn *qc) {
+    if (qc->dispatching || !qc->h3) return 0;
+    for (;;) {
+        hm_h3_stream *st, *pick = NULL;
+        for (st = (hm_h3_stream *)qc->h3_streams; st; st = st->next)
+            if (st->ready && st->env && !st->dispatched
+                && (!pick || st->id < pick->id))
+                pick = st;
+        if (!pick) return 0;
+        pick->ready = 0;
+        qc->dispatching = 1;
+        qc->in_app = 1;
+        hm_qheap_remove(&qc->srv->loop->qheap, qc);
+        hm_h3_dispatch(aTHX_ qc, pick);
+        qc->in_app = 0;
+        qc->dispatching = 0;
+        if (qc->close_deferred) {
+            qc->close_deferred = 0;
+            hm_quic_conn_free(aTHX_ qc);
+            return -1;
+        }
+        hm_quic_rearm(qc);
+    }
 }
 
 /* ---- session ------------------------------------------------------------- */
@@ -791,16 +859,26 @@ static void hm_h3_session_free(pTHX_ hm_qconn *qc) {
 
 /* ---- the seams the transport reaches up through ------------------------- */
 
-/* Stream bytes off ngtcp2 into nghttp3. The window is credited from
- * recv_data and deferred_consume between them, so nothing is credited here.
- * 0 to carry on, -1 to kill the connection. */
+/* Stream bytes off ngtcp2 into nghttp3. The window is credited in three
+ * parts, and every part is needed: recv_data credits the DATA payload,
+ * deferred_consume what QPACK held back, and the RETURN VALUE here is
+ * everything else - HEADERS frames, frame headers, control and QPACK
+ * stream bytes. That last part was discarded, so a connection that had
+ * carried a megabyte of request headers (a browser tab left open) ran out
+ * of connection window and hung, and the control and encoder streams
+ * blocked for good at 256KB. 0 to carry on, -1 to kill the connection. */
 static int hm_h3_recv_stream(pTHX_ hm_qconn *qc, int64_t sid,
                              const uint8_t *data, size_t datalen, int fin) {
     nghttp3_ssize n;
     PERL_UNUSED_CONTEXT;
     if (!qc->h3) return 0;
     n = nghttp3_conn_read_stream((nghttp3_conn *)qc->h3, sid, data, datalen, fin);
-    return n < 0 ? -1 : 0;
+    if (n < 0) return -1;
+    if (n > 0) {
+        ngtcp2_conn_extend_max_stream_offset(qc->conn, sid, (uint64_t)n);
+        ngtcp2_conn_extend_max_offset(qc->conn, (uint64_t)n);
+    }
+    return 0;
 }
 
 /* ngtcp2 says a stream is finished. nghttp3 has to be told, or its own
@@ -872,8 +950,8 @@ static int hm_h3_wrote(pTHX_ hm_qconn *qc, int64_t sid, size_t n) {
 #else /* !HM_HAVE_HTTP3 */
 
 static int hm_h3_available(void) { return 0; }
-static void hm_h3_writer_write(pTHX_ int fd, UV qid, int64_t sid, SV *d)
-    { PERL_UNUSED_CONTEXT; (void)fd; (void)qid; (void)sid; (void)d; }
+static int hm_h3_writer_write(pTHX_ int fd, UV qid, int64_t sid, SV *d)
+    { PERL_UNUSED_CONTEXT; (void)fd; (void)qid; (void)sid; (void)d; return -1; }
 static void hm_h3_writer_close(pTHX_ int fd, UV qid, int64_t sid)
     { PERL_UNUSED_CONTEXT; (void)fd; (void)qid; (void)sid; }
 

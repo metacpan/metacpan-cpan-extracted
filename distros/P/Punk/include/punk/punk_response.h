@@ -10,8 +10,9 @@
 #ifndef PUNK_RESPONSE_H
 #define PUNK_RESPONSE_H
 
-/* extra: NULL, or an AV of header pairs appended after CT/CL */
-static SV *punk_triplet(pTHX_ IV status, SV *ct, SV *body, AV *extra) {
+/* extra: NULL, or an AV of header pairs appended after CT/CL.
+ * ct is the content type SV, taken as an owned (+1) value. */
+static SV *punk_triplet_own(pTHX_ IV status, SV *ct, SV *body, AV *extra) {
     AV *resp    = newAV();
     AV *headers = newAV();
     AV *bodyav  = newAV();
@@ -19,7 +20,7 @@ static SV *punk_triplet(pTHX_ IV status, SV *ct, SV *body, AV *extra) {
     av_extend(headers, extra ? 3 + av_len(extra) + 1 : 3);
     av_store(resp, 0, newSViv(status));
     av_store(headers, 0, newSVpvs("Content-Type"));
-    av_store(headers, 1, newSVsv(ct));
+    av_store(headers, 1, ct);
     av_store(headers, 2, newSVpvs("Content-Length"));
     av_store(headers, 3, newSViv((IV)(SvOK(body) ? sv_len(body) : 0)));
     if (extra) {
@@ -33,6 +34,17 @@ static SV *punk_triplet(pTHX_ IV status, SV *ct, SV *body, AV *extra) {
     av_store(bodyav, 0, body);   /* takes ownership */
     av_store(resp, 2, newRV_noinc((SV *)bodyav));
     return newRV_noinc((SV *)resp);
+}
+
+/* the same with the content type borrowed (copied once) */
+static SV *punk_triplet(pTHX_ IV status, SV *ct, SV *body, AV *extra) {
+    return punk_triplet_own(aTHX_ status, newSVsv(ct), body, extra);
+}
+
+/* and with the content type as a C string: no mortal, one SV */
+static SV *punk_triplet_ct(pTHX_ IV status, const char *ct, STRLEN ctl,
+                           SV *body, AV *extra) {
+    return punk_triplet_own(aTHX_ status, newSVpvn(ct, ctl), body, extra);
 }
 
 /* ---- the Punk::Response builder ------------------------------------------ *

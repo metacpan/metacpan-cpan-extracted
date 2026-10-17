@@ -184,11 +184,19 @@ static void pdbq_term(pTHX_ SV *out, SV *qcol, int op, SV *val, AV *bind,
         }
         sv_catsv(out, qcol);
         sv_catpv(out, op == PDBQ_IN ? " IN (" : " NOT IN (");
-        for (i = 0; i < n; i++) {
-            SV **e = av_fetch(list, i, 0);
-            if (i) sv_catpvs(out, ", ");
-            sv_catpvs(out, "?");
-            av_push(bind, (e && *e) ? newSVsv(*e) : newSV(0));
+        {
+            /* Past 16 the list is padded to the next power of two by
+             * repeating its last value, which changes neither IN nor NOT IN
+             * and keeps the number of distinct statement shapes - each a
+             * prepare_cached handle - logarithmic in the list length. */
+            SSize_t m = n;
+            if (m > 16) { m = 32; while (m < n) m *= 2; }
+            for (i = 0; i < m; i++) {
+                SV **e = av_fetch(list, i < n ? i : n - 1, 0);
+                if (i) sv_catpvs(out, ", ");
+                sv_catpvs(out, "?");
+                av_push(bind, (e && *e) ? newSVsv(*e) : newSV(0));
+            }
         }
         sv_catpvs(out, ")");
         return;
@@ -632,7 +640,10 @@ static SV *pdbq_search_sql(pTHX_ HV *slot, SV *dbh, HV *col, SV *table,
         }
     }
     sv_catsv(sql, pdbq_order_sql(aTHX_ slot, dbh, cols, desc));
-    sv_catpvf(sql, " LIMIT %" IVdf, (IV)(limit + 1));
+    /* bound, not written into the SQL: the statement is prepare_cached, and
+     * a limit in the text made every distinct limit another cached handle */
+    sv_catpvs(sql, " LIMIT ?");
+    av_push(bind, newSViv(limit + 1));
 
     *limit_out   = limit;
     *cols_out    = cols;

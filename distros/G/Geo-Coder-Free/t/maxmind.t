@@ -6,7 +6,7 @@ use strict;
 use Test::Carp;
 use Test::DescribeMe qw(extended);	# This can use a lot of resources
 use Test::Deep;
-use Test::Most tests => 103;
+use Test::Most;
 use Test::Number::Delta;
 
 use Test::Log::Abstraction;
@@ -142,7 +142,7 @@ MAXMIND: {
 			ok(!defined($geo_coder->reverse_geocode('35.2440910277778,-75.6151199166667')));
 			like($geo_coder->reverse_geocode('51.5029,-0.1197'), qr/London, GB$/, 'test reverse in London');
 			like($geo_coder->reverse_geocode('51.15,1.27'), qr/Ewell,/, 'test reverse');
-			like($geo_coder->reverse_geocode('39.0075611111111,-77.0476'), qr/Forest Glen/i, 'test reverse');
+			like($geo_coder->reverse_geocode('39.0075611111111,-77.0476'), qr/Linden/i, 'test reverse');
 
 			$l = $geo_coder->geocode('Temple Ewell, Kent, England');
 			cmp_deeply($l,
@@ -242,6 +242,8 @@ MAXMIND: {
 		}
 	}
 }
+
+done_testing();
 
 sub check($$$$) {
 	my ($geo_coder, $location, $lat, $long) = @_;

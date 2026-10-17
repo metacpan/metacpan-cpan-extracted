@@ -36,9 +36,11 @@
  * nonce is an attacker's `<script nonce="...">` running on somebody else's
  * page.
  *
- * `getpid()` is 1.5 ns - libc-cached, not a syscall - so the guard costs
- * nothing measurable. Worth checking rather than assuming: a guard that was
- * itself a syscall would have handed back everything the slicing won.
+ * `getpid()` is 1.5 ns on macOS - libc-cached, not a syscall - so the guard
+ * costs nothing measurable there. On glibc 2.25 and later it IS a syscall
+ * (the cache was removed), about 50-60 ns; still a fraction of what the
+ * slicing won. Worth checking rather than assuming: a guard that was itself
+ * a syscall would have handed back everything the slicing won.
  *
  * Needs punk_csrf.h first, for pk_urandom_fd.
  */

@@ -21,6 +21,7 @@ MaxMind
 POSTing
 RT
 attr
+geocoder
 lat
 licence
 lng

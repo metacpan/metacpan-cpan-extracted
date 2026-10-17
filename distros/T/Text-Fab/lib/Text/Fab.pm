@@ -4,51 +4,64 @@ use 5.022;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.04';
 
-#use Storable 'dclone'; # For group snapshots (does not support CODE references in data!)
-use FreezeThaw qw(safeFreeze thaw); # For group snapshots
+# FreezeThaw is required because Storable::dclone cannot serialize CODE references
+# stored in the configuration hash (such as custom sorters, parsers, and callbacks).
+use FreezeThaw qw(safeFreeze thaw);
 
-sub dclone ($) {(thaw safeFreeze shift)[0]}	# return scalar even in scalar content
+sub dclone ($) { (thaw safeFreeze shift)[0] }
 
-# --- Default Callbacks ---
-# These are the "smart" components that define the default language.
-# A user can replace any of these by setting the config hash.
+# File-closing priority boundaries
+# distance 0 (last closed file)  => -1000.0
+# distance 999 (1000th from end) => -1999.0
+# distance >= 1000 (overflow)    => -2000.0
+our $PRIORITY_FILE_CLOSE_LAST     = -1000.0;
+our $PRIORITY_FILE_CLOSE_OVERFLOW = -2000.0;
 
-# Finds the start of the next directive.
+sub priority_for_file_close {
+    my ($self, $dist_from_end) = @_;
+    $dist_from_end = 0 unless defined $dist_from_end;
+    die "E_TYPE_MISMATCH: Distance from end must be a non-negative integer\n"
+        unless $dist_from_end =~ /^\d+$/;
+
+    return -2000.0 if $dist_from_end >= 1000;
+    return -1000.0 - $dist_from_end;
+}
+
+# =========================================================================
+# Default Callbacks (The Pluggable Core Engine)
+# =========================================================================
+
+# Locates the next directive boundary.
+# A default directive begins with '#' at offset 0 or immediately after a newline.
 sub _default_interleaver {
     my ($buffer, $offset) = @_;
-    # A directive is a '#' at the beginning of a line.
-    # We search for a newline, then check if it's followed by '#'.
-    # A special case handles a '#' at the very start of the buffer.
     return 0 if $offset == 0 && substr($buffer, 0, 1) eq '#';
-    my $pos = index($buffer, "\n#", $offset-1);
+    my $pos = index($buffer, "\n#", $offset - 1);
     return $pos == -1 ? undef : $pos + 1;
 }
 
-# Parses a directive and calls the corresponding Fab primitive.
+# Translates user-facing directive syntax into primitive method invocations.
+# Returns the buffer offset immediately following the directive line.
 sub _default_directive_parser {
     my ($fab, $buffer, $offset) = @_;
     my $line_end = index($buffer, "\n", $offset);
     $line_end = length($buffer) if $line_end == -1;
 
     my $directive_line = substr($buffer, $offset, $line_end - $offset);
-#    warn("Drctv_ln: <<<$directive_line>>>");
 
     if ($directive_line =~ /^#(\w+)\s*(.*)/) {
         my ($directive, $args) = (lc $1, $2);
-        $args =~ s/\s+$//; # Trim trailing whitespace
-#        warn("Drctv: <<<$directive>>>, <<<$args>>>");
-        
-        # This dispatch table maps the user-facing syntax to the stable
-        # internal API of primitive operations.
+        $args =~ s/\s+$//; # Strip trailing whitespace
+
         if ($directive eq 'target_section') {
             my ($basename, $ns) = ($args =~ /(\w+)(?:\s+in\s+(\w+))?/);
             $fab->out__target_section($basename, $ns);
         }
         elsif ($directive eq 'set') {
-             my ($key, $value) = split /=/, $args, 2;
-             $fab->cfg__set($key, $value);
+            my ($key, $value) = split /=/, $args, 2;
+            $fab->cfg__set($key, $value);
         }
         elsif ($directive eq 'append') {
             my ($key, @values) = split /\s+/, $args;
@@ -56,18 +69,59 @@ sub _default_directive_parser {
         }
         elsif ($directive eq 'set_parents') {
             my ($ns, @parents) = split /\s+/, $args;
-            # The inheritance graph is stored in a structured way in the config.
-            $fab->cfg__set("Fab/inheritance_graph/$ns/parents", \@parents);
+            $fab->NS__set_parents($ns, @parents);
         }
         elsif ($directive eq 'emb') {
-            my ($basename, $ns) = ($args =~ /(\w+)(?:\s+in\s+(\w+))?/);
-            $fab->out__embed($basename, $ns, {});
+            # Grammar: #emb <basename> [in <namespace>] [asiffrom <StartNamespace>] [with_blinder <SubName>]
+            my ($basename) = ($args =~ /^(\S+)/);
+            my ($ns)        = ($args =~ /\bin\s+(\S+)/);
+            my ($asiffrom)  = ($args =~ /\basiffrom\s+(\S+)/);
+            my ($blinder)   = ($args =~ /\bwith_blinder\s+(\S+)/);
+
+            my %options;
+            $options{asiffrom}     = $asiffrom if defined $asiffrom;
+            $options{with_blinder} = $blinder  if defined $blinder;
+
+            $fab->out__embed($basename, $ns, \%options);
         }
         elsif ($directive eq 'start_group') {
             $fab->group__start($args);
         }
         elsif ($directive eq 'end_group') {
             $fab->group__end($args);
+        }
+        elsif ($directive eq 'include') {
+            # Syntax: #include [how] <data>
+            my ($how, $data);
+            if ($args =~ /^(\w+)\s+(.+)/) {
+                ($how, $data) = ($1, $2);
+            } else {
+                ($how, $data) = ('filename', $args);
+            }
+            $fab->include__text($how, $data);
+        }
+        elsif ($directive eq 'include_scoped') {
+            # Syntax: #include_scoped [how] <data> <flavor>
+            # Guarantees rollback of configuration alterations made by the included unit.
+            my ($how, $data, $flavor);
+            my @tokens = split /\s+/, $args;
+            if (@tokens == 3) {
+                ($how, $data, $flavor) = @tokens;
+            } elsif (@tokens == 2) {
+                ($how, $data, $flavor) = ('filename', $tokens[0], $tokens[1]);
+            } else {
+                die "E_SYNTAX_ERROR: #include_scoped requires <file> <flavor>\n";
+            }
+            $fab->group__start($flavor);
+            eval {
+                $fab->include__text($how, $data);
+                1;
+            } or do {
+                my $err = $@;
+                $fab->group__end($flavor);
+                die $err;
+            };
+            $fab->group__end($flavor);
         }
         else {
             $fab->_handle_error('unknown_directive', { directive => $directive, line => $directive_line });
@@ -76,90 +130,127 @@ sub _default_directive_parser {
     else {
         $fab->_handle_error('malformed_directive', { line => $directive_line });
     }
-    
-    return $line_end + 1; # Resume processing after this directive line.
+
+    # Advance past the trailing newline of the directive
+    return ($line_end == length($buffer)) ? $line_end : $line_end + 1;
 }
 
-# The default "stomach" - processes text chunks between directives.
+# The default "stomach" - returns non-directive text pass-through unchanged.
 sub _default_chunk_preprocessor {
     my ($fab, $chunk) = @_;
-    # By default, it does nothing but return the text.
     return $chunk;
 }
 
-# The default error handler - fail fast.
+# Detects comment directives. Returning an offset signals the main loop to omit
+# flushing the preceding text chunk, fusing it with subsequent chunk(s).
+sub _default_comment_recognizer {
+    my ($fab, $buffer, $offset) = @_;
+    my $line_end = index($buffer, "\n", $offset);
+    $line_end = length($buffer) if $line_end == -1;
+
+    my $directive_line = substr($buffer, $offset, $line_end - $offset);
+    if ($directive_line =~ /^##/) {
+        return ($line_end == length($buffer)) ? $line_end : $line_end + 1;
+    }
+    return undef;
+}
+
+# Fail-fast error handler.
 sub _default_error_handler {
     my ($fab, $type, $details) = @_;
     die "Fab Error ($type): $details->{line}\n";
 }
 
-# --- Core Class ---
+# =========================================================================
+# Constructor & Main Execution Loop
+# =========================================================================
 
 sub new {
     my ($class, %args) = @_;
     my $self = bless {}, $class;
 
-    # The entire state of the system is held in these hashes.
     $self->{config} = {
-        # Meta-configuration: which keys are lists.
-        'Fab/list_keys' => { 'Fab/list_keys' => 1 },
-        'Fab/hash_keys' => {},
-        'Fab/hash_key_sort_order' => sub { $a cmp $b }, # Default sort for hash keys
-        # State for recursive processing.
+        # Meta-configuration declaring value semantics
+        'Fab/list_keys'           => { 'Fab/list_keys' => 1 },
+        'Fab/hash_keys'           => { 'Fab/hash_keys' => 1 },
+        # Sorting closure for hashes: per POD, accepts two arguments via @_
+        'Fab/hash_key_sort_order' => sub { $_[0] cmp $_[1] },
+        # Call stack prefix hierarchy for scoped filter evaluation
         'Fab/call_stack_prefixes' => ['Fab/'],
-        # The user-configurable components that define the language.
-        'Fab/callbacks' => {
+        'Fab/callbacks'           => {
             interleaver        => \&_default_interleaver,
             directive_parser   => \&_default_directive_parser,
             chunk_preprocessor => \&_default_chunk_preprocessor,
+            comment_recognizer => \&_default_comment_recognizer,
             error_handler      => \&_default_error_handler,
         },
-        # The inheritance graph is just another part of the configuration.
-        'Fab/inheritance_graph' => {},
+        'Fab/inheritance_graph'   => {},
+        'opened_groups'           => [],
     };
-    $self->{sections}       = {}; # { namespace => { basename => \@chunks } }
-    $self->{current_target} = ['_main', 'body']; # Default output target.
-    $self->{group_stack}    = [];
+    $self->{sections}       = {}; # { namespace => { basename => [ [type, data...], ... ] } }
+    $self->{current_target} = ['_main', 'body'];
+    $self->{group_stack}    = []; # Stack of active group frames for rollback
+    $self->{include_stack}  = []; # Active include path chain for cycle detection
 
-    # Allow user to provide an initial configuration.
     if ($args{config}) {
-        # A real implementation would merge recursively.
+        # Merge top-level configuration keys
         %{$self->{config}} = (%{$self->{config}}, %{$args{config}});
     }
 
     return $self;
 }
 
-# The main processing loop, driven by the callbacks.
+# Main scanning loop: coordinates the de-interleaver, comment fusion,
+# chunk preprocessor, and directive execution.
 sub process_string {
     my ($self, $string) = @_;
     my $offset = 0;
-    
-    my $callbacks = $self->cfg__get_prefixed('Fab/callbacks');
-    my ($interleaver, $parser, $preprocessor) = 
-        @{$callbacks}{qw(interleaver directive_parser chunk_preprocessor)};
+
+    my $callbacks = $self->cfg__get_prefixed('callbacks')
+                 // $self->cfg__get('Fab/callbacks')
+                 // $self->{config}{'Fab/callbacks'};
+    my ($interleaver, $parser, $preprocessor, $comment_recognizer) = 
+        @{$callbacks}{qw(interleaver directive_parser chunk_preprocessor comment_recognizer)};
+
+    my $pending_chunk = '';
 
     while ($offset < length($string)) {
         my $directive_start = $interleaver->($string, $offset);
 
         if (!defined $directive_start) {
-            $self->_process_chunk(substr($string, $offset), $preprocessor);
+            $pending_chunk .= substr($string, $offset);
             last;
         }
 
-        my $chunk_text = substr($string, $offset, $directive_start - $offset);
-        $self->_process_chunk($chunk_text, $preprocessor);
-        
+        # Accumulate text slice preceding the directive
+        $pending_chunk .= substr($string, $offset, $directive_start - $offset);
+
+        # Check if the matched position represents a comment
+        my $comment_end = $comment_recognizer ? $comment_recognizer->($self, $string, $directive_start) : undef;
+        if (defined $comment_end) {
+            # FUSION: Advance past the comment boundary without flushing $pending_chunk.
+            # The accumulated text will merge with subsequent text before preprocessing.
+            $offset = $comment_end;
+            next;
+        }
+
+        # Active directive: flush pending text chunk to the current target section
+        $self->_process_chunk($pending_chunk, $preprocessor);
+        $pending_chunk = '';
+
+        # Parse and execute directive; resume scan at returned offset
         $offset = $parser->($self, $string, $directive_start);
     }
+
+    # Flush terminal text chunk
+    $self->_process_chunk($pending_chunk, $preprocessor) if length $pending_chunk;
 }
 
 sub _process_chunk {
     my ($self, $chunk_text, $preprocessor) = @_;
-    # Remove leading newline that results from splitting by `\n#`.
-    $chunk_text =~ s/^\n//;
+    $chunk_text =~ s/^\n//; # Strip newline residue resulting from \n# interleaving
     return unless length $chunk_text;
-    
+
     my ($ns, $basename) = @{$self->{current_target}};
     my $processed_chunk = $preprocessor->($self, $chunk_text);
     push @{$self->{sections}{$ns}{$basename}}, ['text', $processed_chunk];
@@ -167,48 +258,237 @@ sub _process_chunk {
 
 sub _handle_error {
     my ($self, $type, $details) = @_;
-    my $handler = $self->cfg__get_prefixed('Fab/callbacks')->{error_handler};
-    $handler->($self, $type, $details);
+    my $callbacks = $self->cfg__get_prefixed('callbacks')
+                 // $self->cfg__get('Fab/callbacks')
+                 // $self->{config}{'Fab/callbacks'};
+    my $handler = $callbacks ? $callbacks->{error_handler} : undef;
+    if ($handler) {
+        $handler->($self, $type, $details);
+    } else {
+        _default_error_handler($self, $type, $details);
+    }
 }
 
-# --- Primitive API (the stable interface for parsers) ---
+# Slurps or accepts literal text, enforcing cycle detection on active files.
+sub include__text {
+    my ($self, $how, $data) = @_;
 
-sub out__target_section { my ($self, $basename, $namespace) = @_; $namespace //= $self->{current_target}->[0]; $self->{current_target} = [$namespace, $basename]; $self->{sections}{$namespace}{$basename} //= []; }
-sub out__embed { my ($self, $basename, $namespace, $options) = @_; my ($target_ns, $target_basename) = @{$self->{current_target}}; $namespace //= $target_ns; push @{$self->{sections}{$target_ns}{$target_basename}}, ['embed', $namespace, $basename, $options]; }
-sub cfg__set { my ($self, $key, $value) = @_; $self->{config}{$key} = $value; }
-sub cfg__append { my ($self, $key, @values) = @_; if ($self->{config}{'Fab/list_keys'}{$key}) { push @{$self->{config}{$key}}, @values; } else { $self->{config}{$key} .= join('', @values); } }
-sub cfg__get { my ($self, $key) = @_; return $self->{config}{$key}; }
-sub cfg__get_prefixed { my ($self, $key) = @_; for my $prefix (reverse @{$self->{config}{'Fab/call_stack_prefixes'}}) { my $full_key = $prefix . $key; return $self->{config}{$full_key} if exists $self->{config}{$full_key}; } return $self->{config}{$key}; }
-sub group__start { my ($self, $flavor) = @_; push @{$self->{group_stack}}, { config => dclone($self->{config}) }; }
-sub group__end { my ($self, $flavor) = @_; my $snapshot = pop @{$self->{group_stack}} or die; $self->{config} = $snapshot->{config};}
+    if ($how eq 'filename') {
+        # Check active recursion stack for cycle prevention
+        my %active = map { $_ => 1 } @{$self->{include_stack}};
+        if ($active{$data}) {
+            die "E_CYCLIC_INCLUDE: Circular inclusion detected for file '$data'\n";
+        }
+
+        open my $fh, '<', $data
+            or die "E_FILE_READ_ERROR: Cannot read include file '$data': $!\n";
+        my $content = do { local $/; <$fh> };
+        close $fh;
+
+        push @{$self->{include_stack}}, $data;
+        eval {
+            $self->process_string($content);
+            1;
+        } or do {
+            my $err = $@;
+            pop @{$self->{include_stack}};
+            die $err;
+        };
+        pop @{$self->{include_stack}};
+    }
+    else {
+        $self->process_string($data);
+    }
+}
+
+# =========================================================================
+# Output Control Primitives
+# =========================================================================
+
+# Redirects preprocessor output stream; autovivifies section if non-existent.
+sub out__target_section {
+    my ($self, $basename, $namespace) = @_;
+    $namespace //= $self->{current_target}->[0] // '_main';
+    $self->{current_target} = [$namespace, $basename];
+    $self->{sections}{$namespace}{$basename} //= [];
+}
+
+# Initializes or clears section contents without necessarily redirecting output.
+sub out__create_section {
+    my ($self, $basename, $namespace) = @_;
+    $namespace //= $self->{current_target}->[0] // '_main';
+    $self->{sections}{$namespace}{$basename} = [];
+}
+
+# Appends an unresolved embed promise to the current target section.
+sub out__embed {
+    my ($self, $basename, $namespace, $options) = @_;
+    my ($target_ns, $target_basename) = @{$self->{current_target}};
+    $namespace //= $target_ns;
+    push @{$self->{sections}{$target_ns}{$target_basename}},
+        ['embed', $namespace, $basename, $options // {}];
+}
+
+# Converts text chunks of a section into a single string using cyclic joiners.
+sub out__get_joined {
+    my ($self, $spec, $joiners, $options) = @_;
+    die "E_TYPE_MISMATCH: out__get_joined requires an array reference for joiners\n"
+        unless ref $joiners eq 'ARRAY';
+
+    my ($ns, $basename) = split /:/, $spec;
+    my $all_chunks = $self->{sections}{$ns}{$basename};
+    return '' unless defined $all_chunks && @$all_chunks;
+
+    my @text_parts = map { $_->[1] } grep { $_->[0] eq 'text' } @$all_chunks;
+    return $self->_join_list(\@text_parts, $joiners, $options);
+}
+
+# =========================================================================
+# Configuration Primitives
+# =========================================================================
+
+sub cfg__set {
+    my ($self, $key, @values) = @_;
+    my $type = $self->_get_key_type($key);
+
+    if ($type eq 'list') {
+        if (@values == 1 && ref $values[0] eq 'ARRAY') {
+            $self->{config}{$key} = $values[0];
+        } else {
+            $self->{config}{$key} = [ @values ];
+        }
+    }
+    elsif ($type eq 'hash') {
+        if (@values == 1 && ref $values[0] eq 'HASH') {
+            $self->{config}{$key} = $values[0];
+        } elsif (@values % 2 == 0) {
+            $self->{config}{$key} = { @values };
+        } else {
+            die "E_TYPE_MISMATCH: Odd number of elements provided to set hash key '$key'\n";
+        }
+    }
+    else {
+        # Scalar keys strictly accept at most one value
+        if (@values > 1) {
+            die "E_TYPE_MISMATCH: Scalar key '$key' accepts at most one value\n";
+        }
+        $self->{config}{$key} = @values ? $values[0] : undef;
+    }
+}
+
+sub cfg__append {
+    my ($self, $key, @values) = @_;
+    my $type = $self->_get_key_type($key);
+
+    if ($type eq 'list') {
+        $self->{config}{$key} //= [];
+        die "E_TYPE_MISMATCH: List key '$key' does not contain an ARRAY ref\n"
+            unless ref $self->{config}{$key} eq 'ARRAY';
+        push @{$self->{config}{$key}}, @values;
+    }
+    elsif ($type eq 'hash') {
+        $self->{config}{$key} //= {};
+        die "E_TYPE_MISMATCH: Expected HASH ref for hash key '$key'\n"
+            unless ref $self->{config}{$key} eq 'HASH';
+
+        my %pairs;
+        if (@values == 1 && ref $values[0] eq 'HASH') {
+            %pairs = %{$values[0]};
+        } elsif (@values % 2 == 0) {
+            %pairs = @values;
+        } else {
+            die "E_TYPE_MISMATCH: Odd number of elements provided to append to hash key '$key'\n";
+        }
+
+        while (my ($k, $v) = each %pairs) {
+            $self->{config}{$key}{$k} = $v;
+        }
+    }
+    else {
+        $self->{config}{$key} = ($self->{config}{$key} // '') . join('', @values);
+    }
+}
+
+sub cfg__prepend {
+    my ($self, $key, @values) = @_;
+    my $type = $self->_get_key_type($key);
+
+    if ($type eq 'list') {
+        $self->{config}{$key} //= [];
+        die "E_TYPE_MISMATCH: List key '$key' does not contain an ARRAY ref\n"
+            unless ref $self->{config}{$key} eq 'ARRAY';
+        unshift @{$self->{config}{$key}}, @values;
+    }
+    elsif ($type eq 'hash') {
+        die "E_TYPE_MISMATCH: Cannot prepend values to hash key '$key'\n";
+    }
+    else {
+        $self->{config}{$key} = join('', @values) . ($self->{config}{$key} // '');
+    }
+}
+
+sub cfg__get {
+    my ($self, $key, $offset) = @_;
+    my $type = $self->_get_key_type($key);
+
+    if (@_ > 2) {
+        if ($type eq 'list') {
+            my $list = $self->{config}{$key};
+            return undef unless defined $list;
+            die "E_TYPE_MISMATCH: Expected ARRAY ref for list key '$key'\n"
+                unless ref $list eq 'ARRAY';
+            return $list->[$offset];
+        }
+        elsif ($type eq 'hash') {
+            my $hash = $self->{config}{$key};
+            return undef unless defined $hash;
+            die "E_TYPE_MISMATCH: Expected HASH ref for hash key '$key'\n"
+                unless ref $hash eq 'HASH';
+            return $hash->{$offset};
+        }
+        else {
+            die "E_TYPE_MISMATCH: Element offset requested on non-list key '$key'\n";
+        }
+    }
+
+    # Returning container reference allows structural inspection and traversal
+    return $self->{config}{$key};
+}
+
+# Pops count elements from a list or deletes specified keys from a hash.
 sub cfg__pop {
     my ($self, $key, @args) = @_;
     my $type = $self->_get_key_type($key);
 
     if ($type eq 'list') {
-        die "cfg__pop on a list key accepts at most one argument (a count)" if @args > 1;
+        die "E_TYPE_MISMATCH: cfg__pop on list key accepts at most one argument (count)\n"
+            if @args > 1;
         my $count = @args ? $args[0] : 1;
-        my $list = $self->{config}{$key} or return;
-        die "cfg__pop expected array reference for key '$key'" unless ref $list eq 'ARRAY';
-        die "cfg__pop cannot pop $count elements from list of size " . scalar(@$list) if $count > @$list;
+        my $list = $self->{config}{$key};
+        return wantarray ? () : undef unless defined $list;
+        die "E_TYPE_MISMATCH: Expected ARRAY ref for key '$key'\n"
+            unless ref $list eq 'ARRAY';
+        die "E_LONG_POP: Cannot pop $count elements from list '$key' of size " . scalar(@$list) . "\n"
+            if $count > @$list;
+
         my @popped = splice @$list, -$count;
         return wantarray ? @popped : $popped[-1];
     }
     elsif ($type eq 'hash') {
-        # Silently a no-op if no keys are provided.
         return wantarray ? () : undef unless @args;
-        my @keys_to_delete = @args;
-        my $hash = $self->{config}{$key} or return;
-        die "cfg__pop expected hash reference for key '$key'" unless ref $hash eq 'HASH';
-        my @deleted_values = delete @{$hash}{@keys_to_delete};
+        my $hash = $self->{config}{$key};
+        return wantarray ? () : undef unless defined $hash;
+        die "E_TYPE_MISMATCH: Expected HASH ref for key '$key'\n"
+            unless ref $hash eq 'HASH';
+
+        my @deleted_values = delete @{$hash}{@args};
         return wantarray ? @deleted_values : $deleted_values[0];
     }
     else {
-        # This branch handles scalars. A pop on a scalar is only valid with no args.
-        die "cfg__pop with arguments can only be called on list or hash keys" if @args;
-        die "cfg__pop called on non-list/non-hash key '$key'";
+        die "E_TYPE_MISMATCH: cfg__pop cannot be called on scalar key '$key'\n";
     }
 }
+
 sub cfg__prepend_elt {
     my ($self, $key, $offset, $value) = @_;
     my $type = $self->_get_key_type($key);
@@ -216,76 +496,439 @@ sub cfg__prepend_elt {
     if ($type eq 'list') {
         $self->{config}{$key} //= [];
         my $list = $self->{config}{$key};
-        die "cfg__prepend_elt expected array reference for key '$key'" unless ref $list eq 'ARRAY';
+        die "E_TYPE_MISMATCH: Expected ARRAY ref for list key '$key'\n"
+            unless ref $list eq 'ARRAY';
         splice @$list, $offset, 0, $value;
         return;
     }
     elsif ($type eq 'hash') {
-        die "cfg__prepend_elt on hash requires value to be an array reference of a [key, value] pair"
+        die "E_TYPE_MISMATCH: cfg__prepend_elt on hash requires [key, value] pair\n"
             unless ref $value eq 'ARRAY' && @$value == 2;
         $self->{config}{$key} //= {};
         my $hash = $self->{config}{$key};
-        die "cfg__prepend_elt expected hash reference for key '$key'" unless ref $hash eq 'HASH';
+        die "E_TYPE_MISMATCH: Expected HASH ref for hash key '$key'\n"
+            unless ref $hash eq 'HASH';
         $hash->{$value->[0]} = $value->[1];
         return;
     }
     else {
-        die "cfg__prepend_elt called on non-list/non-hash key '$key'";
+        die "E_TYPE_MISMATCH: cfg__prepend_elt called on scalar key '$key'\n";
     }
 }
+
+# Joins list elements or sorted hash pairs using cyclic joiner delimiters.
 sub cfg__get_joined {
     my ($self, $key, $joiners, $options) = @_;
-    die "cfg__get_joined requires an array reference for joiners"
+    die "E_TYPE_MISMATCH: cfg__get_joined requires an array reference for joiners\n"
         unless ref $joiners eq 'ARRAY';
     my $type = $self->_get_key_type($key);
 
     if ($type eq 'list') {
-        my $list = $self->{config}{$key} or return '';
-        die "cfg__get_joined expected array reference for key '$key'" unless ref $list eq 'ARRAY';
+        my $list = $self->{config}{$key};
+        return '' unless defined $list && @$list;
+        die "E_TYPE_MISMATCH: Expected ARRAY ref for key '$key'\n"
+            unless ref $list eq 'ARRAY';
         return $self->_join_list($list, $joiners, $options);
     }
     elsif ($type eq 'hash') {
-       my $hash = $self->{config}{$key} or return '';
-       my @sorted_keys = $self->_get_sorted_hash_keys($key);
-       my $intra_pair_joiner = $joiners->[0];
-       my @inter_pair_joiners = @$joiners > 1 ? @$joiners[1..$#$joiners] : ($#$joiners == 0 ? [$joiners->[0]] : []);
-       my @joined_pairs = map { $_ . $intra_pair_joiner . $hash->{$_} } @sorted_keys;
-       return $self->_join_list(\@joined_pairs, \@inter_pair_joiners, $options);
+        my $hash = $self->{config}{$key};
+        return '' unless defined $hash && %$hash;
+        my @sorted_keys = $self->_get_sorted_hash_keys($key);
+        # joiners[0] binds key to value; joiners[1..] cycles between pairs
+        my $intra_pair_joiner = $joiners->[0] // '';
+        my @inter_pair_joiners = @$joiners > 1 ? @$joiners[1..$#$joiners] : [$intra_pair_joiner];
+        my @joined_pairs = map { $_ . $intra_pair_joiner . ($hash->{$_} // '') } @sorted_keys;
+        return $self->_join_list(\@joined_pairs, \@inter_pair_joiners, $options);
     }
     else {
-        die "cfg__get_joined called on non-list/non-hash key '$key'";
+        die "E_TYPE_MISMATCH: cfg__get_joined called on scalar key '$key'\n";
     }
 }
-sub out__get_joined {
-    my ($self, $spec, $joiners, $options) = @_;
-    die "out__get_joined requires an array reference for joiners"
-        unless ref $joiners eq 'ARRAY';
-    my ($ns, $basename) = split /:/, $spec;
-    my $all_chunks = $self->{sections}{$ns}{$basename} or return '';
-    my @text_parts = map { $_->[1] } grep { $_->[0] eq 'text' } @$all_chunks;
-    return $self->_join_list(\@text_parts, $joiners, $options);
+
+# =========================================================================
+# Configuration Prefix & Uplevel API
+# =========================================================================
+
+# Inspects only the topmost prefix on the call stack (CURRENT_PREFIX/$key).
+sub cfg__get_prefixed {
+    my ($self, $key) = @_;
+    my $prefixes = $self->{config}{'Fab/call_stack_prefixes'} // [];
+    my $prefix = @$prefixes ? $prefixes->[-1] : '';
+    return $self->{config}{$prefix . $key};
 }
 
-# --- Private Helpers ---
+# Scans downward through the call stack prefixes from newest to oldest,
+# falling back to the unprefixed base key.
+sub cfg__get_prefixed_scan {
+    my ($self, $key) = @_;
+    my $prefixes = $self->{config}{'Fab/call_stack_prefixes'} // [];
+    for my $prefix (reverse @$prefixes) {
+        my $full_key = $prefix . $key;
+        return $self->{config}{$full_key} if exists $self->{config}{$full_key};
+    }
+    return $self->{config}{$key};
+}
+
+# Skips $level prefixes from the top of the call stack before initiating a downward scan.
+sub cfg__get_uplevel_scan {
+    my ($self, $level, $key) = @_;
+    my $prefixes = $self->{config}{'Fab/call_stack_prefixes'} // [];
+    my $max_idx = $#$prefixes;
+
+    die "E_UPLEVEL_TOO_DEEP: Level $level exceeds call stack prefix depth (" . scalar(@$prefixes) . ")\n"
+        if $level < 0 || $level > $max_idx;
+
+    my $start_idx = $max_idx - $level;
+    for my $i (reverse 0 .. $start_idx) {
+        my $full_key = $prefixes->[$i] . $key;
+        return $self->{config}{$full_key} if exists $self->{config}{$full_key};
+    }
+    return $self->{config}{$key};
+}
+
+# Sets $key under the current (topmost) prefix.
+sub cfg__set_prefixed {
+    my ($self, $key, @values) = @_;
+    my $prefixes = $self->{config}{'Fab/call_stack_prefixes'} // [];
+    die "E_UPLEVEL_TOO_DEEP: Call stack prefixes is empty\n" unless @$prefixes;
+    my $prefix = $prefixes->[-1];
+    $self->cfg__set($prefix . $key, @values);
+}
+
+# Sets $key under the prefix located $level steps back on the call stack.
+sub cfg__set_prefixed_uplevel {
+    my ($self, $level, $key, @values) = @_;
+    my $prefixes = $self->{config}{'Fab/call_stack_prefixes'} // [];
+    my $max_idx = $#$prefixes;
+
+    die "E_UPLEVEL_TOO_DEEP: Level $level exceeds call stack prefix depth (" . scalar(@$prefixes) . ")\n"
+        if $level < 0 || $level > $max_idx;
+
+    my $target_prefix = $prefixes->[$max_idx - $level];
+    $self->cfg__set($target_prefix . $key, @values);
+}
+
+# Propagates the pre-existing value at $level downward to intermediate levels
+# between $level and current, stopping if an intermediate level already defines
+# $key, thus insulating downstream consumers from the modification at $level.
+sub cfg__set_prefixed_uplevel_fixup {
+    my ($self, $level, $key, @values) = @_;
+    my $prefixes = $self->{config}{'Fab/call_stack_prefixes'} // [];
+    my $max_idx = $#$prefixes;
+
+    die "E_UPLEVEL_TOO_DEEP: Level $level exceeds call stack prefix depth (" . scalar(@$prefixes) . ")\n"
+        if $level < 0 || $level > $max_idx;
+
+    my $target_idx = $max_idx - $level;
+    my $target_prefix = $prefixes->[$target_idx];
+
+    if (exists $self->{config}{$target_prefix . $key}) {
+        my $old_val = $self->{config}{$target_prefix . $key};
+        # Propagate forward toward current, halting if already shadowed
+        for my $i ($target_idx + 1 .. $max_idx) {
+            my $inter_prefix = $prefixes->[$i];
+            last if exists $self->{config}{$inter_prefix . $key};
+            $self->cfg__set($inter_prefix . $key, ref($old_val) ? dclone($old_val) : $old_val);
+        }
+    }
+
+    $self->cfg__set($target_prefix . $key, @values);
+}
+
+# =========================================================================
+# Grouping & Scoping Primitives
+# =========================================================================
+
+sub group__start {
+    my ($self, $flavor) = @_;
+    $flavor = undef if defined $flavor && !length $flavor;
+
+    # Verify nesting constraints against the enclosing group flavor
+    if (defined $flavor && @{$self->{group_stack}}) {
+        my $parent_flavor = $self->{group_stack}->[-1]{flavor};
+        my $allowed = $self->{config}{"Fab/group_nesting/$flavor/allowed_parents"}
+                   // (ref($self->{config}{'Fab/group_nesting'}) eq 'HASH'
+                       ? $self->{config}{'Fab/group_nesting'}{$flavor}{allowed_parents}
+                       : undef);
+        if ($allowed && ref $allowed eq 'ARRAY') {
+            my %is_allowed = map { $_ => 1 } @$allowed;
+            if (!$is_allowed{$parent_flavor // ''}) {
+                die "E_INVALID_GROUP_NESTING: Flavor '$flavor' is not allowed inside '" . ($parent_flavor // 'undef') . "'\n";
+            }
+        }
+    }
+
+    my $frame = {
+        flavor            => $flavor,
+        postponed_by_prio => {},
+    };
+
+    # Selective vs full snapshotting: check if flavor restricts tracked keys
+    my $flavor_keys = defined($flavor)
+        ? ($self->{config}{"Fab/group_flavors/$flavor/keys"}
+           // (ref($self->{config}{'Fab/group_flavors'}) eq 'HASH'
+               ? $self->{config}{'Fab/group_flavors'}{$flavor}{keys}
+               : undef))
+        : undef;
+
+    if ($flavor_keys && ref $flavor_keys eq 'ARRAY') {
+        my %snap;
+        for my $k (@$flavor_keys) {
+            if (exists $self->{config}{$k}) {
+                $snap{$k} = ref($self->{config}{$k}) ? dclone($self->{config}{$k}) : $self->{config}{$k};
+            }
+        }
+        $frame->{keys} = $flavor_keys;
+        $frame->{snapshot} = \%snap;
+    } else {
+        # Default: snapshot entire configuration space
+        $frame->{snapshot} = dclone($self->{config});
+    }
+
+    push @{$self->{group_stack}}, $frame;
+    $self->{config}{'opened_groups'} = [ map { $_->{flavor} } @{$self->{group_stack}} ];
+}
+
+sub group__end {
+    my ($self, $flavor) = @_;
+    $flavor = undef if defined $flavor && !length $flavor;
+
+    if (!@{$self->{group_stack}}) {
+        die "E_DANGLING_END_GROUP: #end_group called with no open group\n";
+    }
+
+    # Keep $top on the stack during unwinding so depth 0 targets this closing group
+    my $top = $self->{group_stack}->[-1];
+
+    if (defined $flavor) {
+        if (!defined $top->{flavor} || $top->{flavor} ne $flavor) {
+            my $actual = $top->{flavor} // '<unnamed>';
+            die "E_MISMATCHED_END_GROUP: End group flavor '$flavor' does not match currently open group '$actual'\n";
+        }
+    }
+
+    $top->{is_closing}       = 1;
+    $top->{is_undone}        = 0;
+    $top->{current_priority} = undef;
+    $top->{extra_prio}       = {};
+
+    # Calculate initial array of sorted indices
+    my @priorities = sort { $a <=> $b } keys %{$top->{postponed_by_prio} // {}};
+    my @errors;
+
+    my $do_rollback = sub {
+        return if $top->{is_undone};
+        $top->{is_undone} = 1;
+        eval {
+            if ($top->{keys}) {
+                for my $k (@{$top->{keys}}) {
+                    if (exists $top->{snapshot}{$k}) {
+                        $self->{config}{$k} = $top->{snapshot}{$k};
+                    } else {
+                        delete $self->{config}{$k};
+                    }
+                }
+            } else {
+                $self->{config} = $top->{snapshot};
+            }
+            $self->{config}{'opened_groups'} = [
+                map { $_->{flavor} } @{$self->{group_stack}}[0 .. $#{$self->{group_stack}} - 1]
+            ];
+            1;
+        } or do {
+            push @errors, $@;
+        };
+    };
+
+    while (@priorities || %{$top->{extra_prio}} || (!$top->{is_undone} && (!@priorities || $priorities[0] >= 0))) {
+        # Snapshot rollback boundary (priority 0.0)
+        if (!$top->{is_undone} && (!@priorities || $priorities[0] >= 0)) {
+            $do_rollback->();
+        }
+
+        # Check if the extra hash has entries needing recalculation of @priorities
+        if (%{$top->{extra_prio}}) {
+            for my $new_p (keys %{$top->{extra_prio}}) {
+                $top->{postponed_by_prio}{$new_p} //= [];
+                push @{$top->{postponed_by_prio}{$new_p}}, @{$top->{extra_prio}{$new_p}};
+            }
+            %{$top->{extra_prio}} = ();
+            @priorities = sort { $a <=> $b } keys %{$top->{postponed_by_prio}};
+            next;
+        }
+
+        last unless @priorities;
+
+        my $p = $priorities[0];
+        $top->{current_priority} = $p;
+
+        # Run through the current internal array
+        my $bucket = $top->{postponed_by_prio}{$p};
+        if ($bucket && @$bucket) {
+            my $call = shift @$bucket;
+            eval {
+                $self->_execute_postponed($call);
+                1;
+            } or do {
+                push @errors, $@;
+            };
+
+            # If an action in the past or a non-existing priority was staged,
+            # recalculation of @priorities triggers at the top of the loop.
+            next;
+        }
+
+        # Internal array is exhausted: shift from indices and delete hash entry
+        shift @priorities;
+        delete $top->{postponed_by_prio}{$p};
+        $top->{current_priority} = undef;
+    }
+
+    # Ensure rollback ran even if no actions were registered >= 0
+    $do_rollback->();
+
+    # Pop group frame from group_stack
+    pop @{$self->{group_stack}};
+    $self->{config}{'opened_groups'} = [ map { $_->{flavor} } @{$self->{group_stack}} ];
+
+    die $errors[0] if @errors;
+}
+
+# Schedules an action to be executed during group__end at relative $depth.
+# $priority < 0  => PRE-undo (runs before snapshot rollback in group-local scope)
+# $priority >= 0 => POST-undo (runs after snapshot rollback in restored enclosing scope)
+# $how: 'append' or 'prepend' (resolves execution order among equal priorities)
+sub group__postpone {
+    my ($self, $depth, $priority, $how, $method, @args) = @_;
+
+    $depth = 0 unless defined $depth;
+    $priority = 0.0 + $priority;
+    $how = lc($how // 'append');
+
+    die "E_TYPE_MISMATCH: Postpone order must be 'append' or 'prepend'\n"
+        unless $how eq 'append' || $how eq 'prepend';
+
+    die "E_TYPE_MISMATCH: Postponed action requires a method name or code reference\n"
+        unless defined $method && (length($method) || ref($method) eq 'CODE');
+
+    my $idx = $#{$self->{group_stack}} - $depth;
+    if ($idx < 0 || $idx > $#{$self->{group_stack}}) {
+        die "E_UPLEVEL_TOO_DEEP: Cannot postpone to group at relative depth $depth (stack size " . scalar(@{$self->{group_stack}}) . ")\n";
+    }
+
+    my $target_frame = $self->{group_stack}->[$idx];
+    my $action = [$method, @args];
+
+    # If the group is actively unwinding in group__end:
+    if ($target_frame->{is_closing}) {
+        # Fast path: insertion into an existing internal array in the present or future
+        if (exists $target_frame->{postponed_by_prio}{$priority}
+            && (!defined $target_frame->{current_priority} || $priority >= $target_frame->{current_priority}))
+        {
+            if ($how eq 'append') {
+                push @{$target_frame->{postponed_by_prio}{$priority}}, $action;
+            } else {
+                unshift @{$target_frame->{postponed_by_prio}{$priority}}, $action;
+            }
+            return;
+        }
+
+        # Otherwise: insertion is in the past, or into a non-existing priority.
+        # Route to the extra hash for on-demand recalculation.
+        $target_frame->{extra_prio}{$priority} //= [];
+        if ($how eq 'append') {
+            push @{$target_frame->{extra_prio}{$priority}}, $action;
+        } else {
+            unshift @{$target_frame->{extra_prio}{$priority}}, $action;
+        }
+        return;
+    }
+
+    # Normal registration before group__end:
+    $target_frame->{postponed_by_prio}{$priority} //= [];
+    if ($how eq 'append') {
+        push @{$target_frame->{postponed_by_prio}{$priority}}, $action;
+    } else {
+        unshift @{$target_frame->{postponed_by_prio}{$priority}}, $action;
+    }
+}
+
+sub _execute_postponed {
+    my ($self, $call) = @_;
+    my ($method, @args) = @$call;
+    if (ref($method) eq 'CODE') {
+        $method->($self, @args);
+    } else {
+        $self->$method(@args);
+    }
+}
+
+# =========================================================================
+# Namespace & Inheritance Primitives
+# =========================================================================
+
+# Sets parents for $ns, validating that no directed cycle is introduced.
+sub NS__set_parents {
+    my ($self, $ns, @parents) = @_;
+
+    for my $p (@parents) {
+        if ($p eq $ns) {
+            die "E_CYCLIC_INHERITANCE: Namespace '$ns' cannot be its own parent\n";
+        }
+    }
+
+    # Cycle detection via depth-first reachability search:
+    # Adding edge $ns -> @parents creates a cycle if and only if $ns is already
+    # reachable from any candidate parent in @parents.
+    my $would_cycle;
+    $would_cycle = sub {
+        my ($current, $target, $visited) = @_;
+        return 1 if $current eq $target;
+        return 0 if $visited->{$current}++;
+
+        my $p_list = ($current eq $ns)
+            ? \@parents
+            : ($self->cfg__get("Fab/inheritance_graph/$current/parents")
+               // (ref($self->{config}{'Fab/inheritance_graph'}) eq 'HASH'
+                   ? $self->{config}{'Fab/inheritance_graph'}{$current}{parents}
+                   : undef)
+               // []);
+
+        for my $next_p (@$p_list) {
+            return 1 if $would_cycle->($next_p, $target, $visited);
+        }
+        return 0;
+    };
+
+    for my $p (@parents) {
+        my %visited;
+        if ($would_cycle->($p, $ns, \%visited)) {
+            die "E_CYCLIC_INHERITANCE: Adding parent '$p' to '$ns' creates a cycle in the inheritance DAG\n";
+        }
+    }
+
+    $self->cfg__set("Fab/inheritance_graph/$ns/parents", \@parents);
+}
+
+# =========================================================================
+# Private Helpers
+# =========================================================================
+
 sub _get_key_type {
     my ($self, $key) = @_;
     return 'hash' if $self->{config}{'Fab/hash_keys'}{$key};
     return 'list' if $self->{config}{'Fab/list_keys'}{$key};
     return 'scalar';
 }
+
 sub _get_sorted_hash_keys {
     my ($self, $key) = @_;
     my $hash = $self->{config}{$key} or return ();
-    die "_get_sorted_hash_keys expected hash reference for key '$key'" unless ref $hash eq 'HASH';
-    my $sorter = $self->{config}{'Fab/hash_key_sort_order'};
+    die "E_TYPE_MISMATCH: Expected HASH ref for key '$key'\n" unless ref $hash eq 'HASH';
+    my $sorter = $self->{config}{'Fab/hash_key_sort_order'} // sub { $_[0] cmp $_[1] };
     return sort { $sorter->($a, $b) } (keys %$hash);
 }
-sub _hash_to_sorted_list {
-    my ($self, $key) = @_;
-    my $hash = $self->{config}{$key} or return [];
-    my @sorted_keys = $self->_get_sorted_hash_keys($key);
-    return [ map { $_, $hash->{$_} } @sorted_keys ];
-}
+
 sub _join_list {
     my ($self, $list, $joiners, $options) = @_;
     $options //= {};
@@ -295,7 +938,7 @@ sub _join_list {
 
     my $num_joiners_to_use = $num_elements - 1;
     if (my $mod = $options->{permitted_joiners_modulo}) {
-        die "Join operation violates permitted_joiners_modulo rule (want multiple of $mod, got $num_joiners_to_use)"
+        die "Join operation violates permitted_joiners_modulo rule (want multiple of $mod, got $num_joiners_to_use)\n"
             if $num_joiners_to_use % $mod != 0;
     }
 
@@ -306,49 +949,118 @@ sub _join_list {
     return $output;
 }
 
-# --- Assembly Phase ---
+# =========================================================================
+# Assembly Phase (DAG Traversal, Resolution, Blinding, & Expansion)
+# =========================================================================
 
 sub assemble {
     my ($self, $root_spec) = @_;
-    my ($ns, $basename) = split /:/, $root_spec;
-    my $output = $self->_expand_section($ns, $basename, {});
-    chomp($output); # Trim final trailing newline.
-#    $output =~ s/\s+$//;	# Maybe better (but what for?!) ???
+    my ($ns, $basename) = split /:/, $root_spec, 2;
+    if (!defined $basename) {
+        $basename = $ns;
+        $ns = '_main';
+    }
+
+    my $embed_stack = []; # Accumulates frames: { section, options, blinder_output }
+    my $blinded = {};     # Set of namespaces obscured in the current branch
+
+    my $output = $self->_expand_section($ns, $basename, {}, $embed_stack, $blinded);
+    chomp($output);
     return $output;
 }
 
 sub _expand_section {
-    my ($self, $ns, $basename, $seen) = @_;
+    my ($self, $ns, $basename, $seen, $embed_stack, $blinded) = @_;
     my $id = "$ns:$basename";
-    die "Circular dependency for section '$id'" if $seen->{$id};
-    local $seen->{$id} = 1;
 
-    my $chunks = $self->_resolve_section($ns, $basename);
-    return "" unless $chunks;
+    # Detect recursive embed loops along the current resolution branch
+    if ($seen->{$id}) {
+        die "E_CIRCULAR_EMBED: Circular dependency detected for section '$id'\n";
+    }
+    my %next_seen = (%$seen, $id => 1);
 
-    my $output = "";
+    my $chunks = $self->_resolve_section($ns, $basename, $blinded);
+    if (!defined $chunks) {
+        die "E_EMBED_NOT_FOUND: Section '$id' cannot be resolved in inheritance DAG\n";
+    }
+
+    my $output = '';
     for my $chunk (@$chunks) {
         my ($type, @data) = @$chunk;
         if ($type eq 'text') {
             $output .= $data[0];
-        } elsif ($type eq 'embed') {
-            $output .= $self->_expand_section($data[0], $data[1], $seen);
+        }
+        elsif ($type eq 'embed') {
+            my ($target_ns, $target_basename, $options) = @data;
+            $options //= {};
+
+            # POD: asiffrom initiates resolution directly from the specified context
+            my $start_ns = $options->{asiffrom} // $target_ns;
+
+            # POD: with_blinder dynamically obscures an arbitrary subset of the DAG.
+            # Invokes callback with full embedding stack, start namespace, and blinder name.
+            my %local_blinded = %$blinded;
+            my @obscured_namespaces;
+            if (my $blinder_name = $options->{with_blinder}) {
+                my $blinder_sub = $self->{config}{"Fab/blinders/$blinder_name"};
+                if ($blinder_sub && ref $blinder_sub eq 'CODE') {
+                    @obscured_namespaces = $blinder_sub->($self, {
+                        embed_stack     => $embed_stack,
+                        start_namespace => $start_ns,
+                        blinder_name    => $blinder_name,
+                        target_section  => "$start_ns:$target_basename",
+                    });
+                    $local_blinded{$_} = 1 for @obscured_namespaces;
+                }
+            }
+
+            # Propagate updated embedding stack down to sub-resolutions
+            my $next_embed_stack = [
+                @$embed_stack,
+                {
+                    section        => "$start_ns:$target_basename",
+                    options        => $options,
+                    blinder_output => \@obscured_namespaces,
+                }
+            ];
+
+            $output .= $self->_expand_section($start_ns, $target_basename, \%next_seen, $next_embed_stack, \%local_blinded);
         }
     }
+
     return $output;
 }
 
+# Recursively searches for $basename starting at $ns and traversing parents.
+# Invariant: A blinded namespace has its OWN section definition masked, but
+# resolution continues upward to its parents in the DAG.
 sub _resolve_section {
-    my ($self, $ns, $basename) = @_;
-    return $self->{sections}{$ns}{$basename}
-        if exists $self->{sections}{$ns} && exists $self->{sections}{$ns}{$basename};
+    my ($self, $ns, $basename, $blinded, $visited_ns) = @_;
+    $visited_ns //= {};
 
-    my $parents_key = "Fab/inheritance_graph/$ns/parents";
-    # FIX: Correctly dereference the array reference of parents.
-    for my $parent_ns (@{$self->{config}{$parents_key} || []}) {
-        my $chunks = $self->_resolve_section($parent_ns, $basename);
-        return $chunks if $chunks;
+    # Avoid redundant traversals across diamond inheritance topologies
+    return undef if $visited_ns->{$ns}++;
+
+    # Check for direct section definition if $ns is not blinded
+    if (!$blinded->{$ns}) {
+        if (exists $self->{sections}{$ns} && exists $self->{sections}{$ns}{$basename}) {
+            return $self->{sections}{$ns}{$basename};
+        }
     }
+
+    # Continue fallback search through ancestors in the inheritance graph
+    my $parents_key = "Fab/inheritance_graph/$ns/parents";
+    my $parents = $self->{config}{$parents_key}
+               // (ref($self->{config}{'Fab/inheritance_graph'}) eq 'HASH'
+                   ? $self->{config}{'Fab/inheritance_graph'}{$ns}{parents}
+                   : undef)
+               // [];
+
+    for my $parent_ns (@$parents) {
+        my $chunks = $self->_resolve_section($parent_ns, $basename, $blinded, $visited_ns);
+        return $chunks if defined $chunks;
+    }
+
     return undef;
 }
 
@@ -360,17 +1072,17 @@ __END__
 
 =head1 NAME
 
-Text::Fab - A powerful, general-purpose document expansion framework (currently exists mostly as uncomplete documentation and a beginning of a stub of implementation)
+Text::Fab - A powerful, general-purpose document expansion framework (currently Control Flow, Loops, Caching, Root Directives unimplemented, and the test suite not checked by humans;)
 
 =head1 SYNOPSIS
 
     # -- File: config.fab --   Example of merging multiple files (with almost no content!)
     # Declare which configuration keys will be treated as lists
-    #append Fab/list_keys chapters, css_files
+    #append Fab/list_keys chapters css_files
 
     # Set some configuration variables
     #set site_title=My Awesome Book
-    #append css_files global.css, theme.css
+    #append css_files global.css theme.css
 
     # Define the inheritance graph for our namespaces
     #set_parents ChapterLayout BaseLayout
@@ -378,7 +1090,7 @@ Text::Fab - A powerful, general-purpose document expansion framework (currently 
 
     # -- File: main.fab --
     # The main assembly script. The default output target is '_main:body'.
-    #append chapters chapter1, chapter2, chapter3 # Build the chapter list
+    #append chapters chapter1 chapter2 chapter3 # Build the chapter list
 
     #emb title
     #emb table_of_contents
@@ -443,7 +1155,7 @@ After all the sections has been constructed, they may be “joined arbitrarily�
 
 The heart of C<Text::Fab> is a single Configuration hash. It is a live data structure that directives can modify during processing. It controls everything, from user-defined variables to the very components (parsers, etc.) that define the language's behavior. By default, all internal configuration used by the framework itself is stored under the C<Fab/> top-level key. (Later we are going to discuss how to modify this default, and how this prefix changes during the input processing. However, in examples below we assume that this hasn't been changed.)
 
-Configuration values can be B<scalars> or B<lists>. A special list, C<Fab/list_keys>, is used to declare which keys should be treated as lists by the primitive operations.
+Configuration values can be B<scalars>, B<lists>, or B<hashes>. Special hashes, C<Fab/list_keys> and C<Fab/hash_keys>, are used to declare which keys should be treated as lists or hashes by the primitive operations. Both register themselves in C<new()>.
 
 =head2 The Output Sections
 
@@ -469,13 +1181,22 @@ C<embed> placeholders, which are promises to inline another section during the f
 
 =over 4
 
-=item B<< C<#start_group E<lt>flavor_nameE<gt>> >>
+=item B<< C<#start_group [flavor_name]> >>
 
-Begins a scope. A certain set of keys in the B<Configuration> hash are snapshotted. The C<flavor_name> is used to look up the list of Configuration keys to memorize/restore.
+Begins a scope. A certain set of keys in the B<Configuration> hash are snapshotted.
+The C<flavor_name> is used to look up the list of Configuration keys to memorize/restore
+under C<Fab/group_flavors/$flavor_name/keys> (an array reference). If this key list is
+not defined for the flavor, the default behavior is to snapshot the entire Configuration hash.
+Validates nesting constraints against the enclosing group flavor via
+C<Fab/group_nesting/$flavor/allowed_parents>, halting with C<E_INVALID_GROUP_NESTING> if violated.
 
-=item B<< C<#end_group [E<lt>flavor_nameE<gt>]> >>
+=item B<< C<#end_group [flavor_name]> >>
 
-If a C<flavor_name> is provided, it must be a flavor of an already opened group . All changes made to the observed configuration keys are B<undone>. If the optional name is not given, closes the most recently opened scope.
+If a C<flavor_name> is provided, it must match the flavor of the currently open group;
+otherwise, processing halts with C<E_MISMATCHED_END_GROUP>. All changes made to the
+observed configuration keys are B<undone>. If the optional name is not given, closes the
+most recently opened scope. Calling C<#end_group> with no open scope halts with C<E_DANGLING_END_GROUP>.
+Executes all postponed undo actions and restores the configuration snapshot.
 
 =back
 
@@ -509,30 +1230,45 @@ Places an C<embed> placeholder into the current target section. The C<%options> 
 
 =item C<cfg__set( $key, @values )>
 
-Sets the value of a key.
+Sets the value of a key. For a B<scalar key>, accepts at most one value (empty C<@values> sets
+C<undef>, exactly one value sets the scalar). Passing more than one value halts with
+C<E_TYPE_MISMATCH>. For a B<list key>, C<@values> sets the list elements (or accepts a single
+array reference). For a B<hash key>, C<@values> accepts an even-sized list of key-value pairs or
+a single hash reference; an odd number of items halts with C<E_TYPE_MISMATCH>.
 
 =item C<cfg__append( $key, @values )>
 
-Appends one or more items to a list key, or appends a string value to a scalar key.
+Appends one or more items to a list key, appends a string value to a scalar key, or merges an
+even-sized list of key-value pairs (or a hash reference) into a hash key. Appending an odd number
+of items to a hash key halts with C<E_TYPE_MISMATCH>.
 
 =item C<cfg__prepend( $key, @values )>
 
-Prepends one or more items to a list key, or prepends a string value to a scalar key.
+Prepends one or more items to a list key (preserving their order at the front of the list),
+or prepends a string value to a scalar key. Calling C<cfg__prepend> on a hash key is prohibited
+and halts with C<E_TYPE_MISMATCH>.
 
 =item C<cfg__get( $key, [$offset] )>
 
-Retrieves the value of a scalar key, or of an element of a list key.
+When C<$offset> is omitted, returns the scalar value, array reference, or hash reference.
+When C<$offset> is provided, acts as an array index for list keys, or as a sub-key for hash keys.
+Passing C<$offset> on a scalar key halts with C<E_TYPE_MISMATCH>.
 
 =item C<cfg__get_joined( $key, \@joiners, \%options )>
 
-A powerful utility that retrieves a list-type key and joins its elements into a single string. The C<@joiners> array provides one or more separators that are cycled through when joining. The C<%options> can control complex formatting, for example specify permitted numbers of joiners modulo C<scalar @joiners>. (E.g., if “joiners come in pairs”, then the number of emitted joiners must be even!)
+A powerful utility that retrieves a list-type or hash-type key and joins its elements into a single
+string. The C<@joiners> array provides one or more separators that are cycled through when joining.
+For hashes, joiner 0 binds key to value while subsequent joiners cycle between pairs. The C<%options>
+can control complex formatting, for example specify permitted numbers of joiners modulo
+C<scalar @joiners>. (E.g., if “joiners come in pairs”, then the number of emitted joiners must be even!)
 
 =back
 
-An analogous C<out__get_joined> exists for converting a sections (representable as a list of text-parts and embed-promises) into a single string.
+An analogous C<out__get_joined> exists for converting a section (representable as a list of text-parts and embed-promises) into a single string.
 
-Additionally, one can use C<cfg__pop($key, [$count])>, C<cfg__prepend_elt( $key, $offset, $value )> etc. on a list key. (The parser for directive may implement only the flavors with C<$offset> in 0 and -1 only, e.g., “as if” in C<cfg__prepend_last( $key, $value )> etc.)
+Additionally, one can use C<cfg__pop($key, [$count])>, C<cfg__prepend_elt( $key, $offset, $value )> etc. on a list key.
 C<cfg__pop()> also can be used to C<delete()> one or more subkeys from a hash value (then the C<$count> is replaced by the list of these keys).
+(The parser for directive may implement only the flavors with C<$offset> in 0 and -1 only, e.g., “as if” in C<cfg__prepend_last( $key, $value )> etc.)
 
 =head3 Working with Hashes
 
@@ -547,8 +1283,8 @@ Analogous to C<Fab/list_keys>, this is a hash whose keys are the names of
 configuration variables that should be treated as hashes by the primitive
 operations.
 
-    # In a config file:
-    #append Fab/hash_keys my_parameters
+    # In a config file (registering a hash name):
+    #append Fab/hash_keys my_parameters 1
 
 =item B<C<Fab/hash_key_sort_order>>
 
@@ -562,11 +1298,11 @@ arguments. The default is standard string comparison.
 
 =back
 
-=head2 Grouping and C<uplevel> Primitives
+=head2 Grouping and Postponement Primitives
 
 =over 4
 
-=item C<group__start( $flavor_name )>
+=item C<group__start( [$flavor_name] )>
 
 Starts a scoped group.
 
@@ -574,15 +1310,62 @@ Starts a scoped group.
 
 Ends a scoped group.
 
-=item C<group__postpone( $depth, $method_name, @args )>
+=item C<group__postpone( $depth, $priority, $how, $method_name, @args )>
 
-Schedules a C<Text::Fab> method call to be executed just before a group at a specific relative depth is closed. (Since the stack of group names is available in the configuration hash keyed as C<opened_groups>, the parser for directives may allow more user-friendly UI, such as specifying “a path” to this group, as in “the last-but-one C<x> group before the last two C<y> groups.)
+Schedules a C<Text::Fab> method call (or code reference) to run when the group at relative depth
+C<$depth> is closed. All postponed actions have strict B<undo semantics>: failure in one action does
+not abort the remaining undo actions or snapshot rollback.
+C<$priority> is a real number:
+Priorities C<< < 0 >> execute B<PRE-undo> while the group scope is still active.
+Priority C<0.0> is the snapshot rollback point where configuration is restored.
+Priorities C<< >= 0 >> execute B<POST-undo> in the restored enclosing scope.
+C<$how> must be C<'append'> or C<'prepend'> to define execution order among actions with equal priority.
+
+The closing frame remains active on the stack during unwinding, so actions can target the closing
+group at depth 0 or parent groups at depth > 0. Insertions into existing current/future priority
+buckets are consumed directly by the active loop without recalculation. Insertions into the past
+(time-machine actions) or into non-existing priorities trigger on-demand recalculation of the priority array.
+
+(The parser for directives may allow more user-friendly UI, such as specifying “a path” to this group, as in “the last-but-one C<x> group before the last two C<y> groups.)
+
+=item C<priority_for_file_close( [$dist_from_end] )>
+
+Calculates file-closing priority based on distance from the end: distance 0 (last closed file)
+is C<-1000.0>, distance 999 is C<-1999.0>, and distance C<< >= 1000 >> is C<-2000.0> (overflow).
+
+=back
+
+=head2 Input and Inclusion Primitives
+
+=over 4
+
+=item C<include__text( $how, $data )>
+
+Processes included input. If C<$how> is C<'filename'>, C<$data> is read from disk and processed.
+Recursion is tracked on an inclusion stack; attempting to include a file currently in progress
+halts with C<E_CYCLIC_INCLUDE>. An unreadable file halts with C<E_FILE_READ_ERROR>.
+If C<$how> is not C<'filename'>, C<$data> is processed directly as an in-memory string.
+
+=back
+
+=head2 Namespace and Inheritance Primitives
+
+=over 4
+
+=item C<NS__set_parents( $namespace, @parents )>
+
+Registers the list of immediate parent namespaces for C<$namespace> in the inheritance DAG
+(stored under C<Fab/inheritance_graph/$namespace/parents>). Before writing, the inheritance graph
+is validated for cycles; adding a parent that would create a directed cycle halts with
+C<E_CYCLIC_INHERITANCE>.
 
 =back
 
 =head2 Configuration Prefix API
 
-For recursive processing, the Configuration contains a stack of prefixes at C<Fab/call_stack_prefixes>. Primitives are provided to safely interact with keys relative to this stack. (We list only the most basic retreaval primitives; the rest follows the same principle.)
+For recursive processing, the Configuration contains a stack of prefixes at C<Fab/call_stack_prefixes>. Primitives are provided to safely interact with keys relative to this stack.
+
+(We list only the most basic retreaval primitives; the rest follows the same principle.)
 
 =over 4
 
@@ -610,11 +1393,13 @@ For setting things “uplevel on this stack”, there are two methods matching t
 
 =item C<cfg__set_prefixed_uplevel( $level, $key, @values )>
 
-As C<cfg__set_prefixed()>, but goes back C<$level> steps on the stack of prefixes. This matches retreaval via C<cfg__get_prefixed()>.
+As C<cfg__set_prefixed()>, but goes back C<$level> steps on the stack of prefixes.  This matches retreaval via C<cfg__get_prefixed()>.
 
 =item C<cfg__set_prefixed_uplevel_fixup( $level, $key, @values )>
 
-As C<cfg__set_prefixed_uplevel()>, but first runs “fixup”: copying the preceding value at C<$level> to the levels between this one and the current level — stopping when value is found on a particular level. This matches retreaval via C<cfg__get_prefixed()>: this call won’t change the results on the levels between C<$level> and the current one.
+As C<cfg__set_prefixed_uplevel()>, but first runs “fixup”: copying the preceding value at C<$level> to the levels between this one
+and the current level — stopping when value is found on a particular level.  This matches retreaval via C<cfg__get_prefixed()>: this
+call won’t change the results of these calls on the levels between C<$level> and the current one.
 
 =back
 
@@ -624,7 +1409,7 @@ As C<cfg__set_prefixed_uplevel()>, but first runs “fixup”: copying the prece
 
 The primitive to support the C<#include> directive is C<include__text($how, $data)>. If C<$how> is C<filename>, the file C<$data> is searched for and slurped; if not, C<$data> is the input string to be processed. A special form C<#include_scoped> ensures that configuration changes made by the included file are temporary by wrapping the call in a group named by the last argument.
 
-Recursive processing (e.g., using one C<Text::Fab> “process” to filter data for another) is managed entirely within the Configuration hash. A stack of configuration prefixes is maintained in C<Fab__call_stack_prefixes> (which usually starts as just C<Fab/>). When a named recursive filter is invoked, its name is pushed to the filer name stack C<Fab__call_stack_filter_name>. This also pushes a certain prefix onto C<Fab__call_stack_prefixes>. Since it is the last prefix on this stack which is actually used by C<Text::Fab> for its operation, this allows a special predefined configuration (e.g., C<Fab/myList2ScalarFilter>) to take precedence without conflicting with the “normal” operation of the Fab.
+Recursive processing (e.g., using one C<Text::Fab> “process” to filter data for another) is managed entirely within the Configuration hash. A stack of configuration prefixes is maintained in C<Fab/call_stack_prefixes> (which usually starts as just C<Fab/>). When a named recursive filter is invoked, its name is pushed to the filter name stack C<Fab/call_stack_filter_name>. This also pushes a certain prefix onto C<Fab/call_stack_prefixes>. Since it is the last prefix on this stack which is actually used by C<Text::Fab> for its operation, this allows a special predefined configuration (e.g., C<Fab/myList2ScalarFilter>) to take precedence without conflicting with the “normal” operation of the Fab.
 
 The C<uplevel> family of configuration directives operates with respect to both the group stack and this call stack, allowing for powerful, controlled communication between different layers of processing.
 
@@ -650,11 +1435,20 @@ This performs a "static" embed. It resolves the namespace of the section by star
 
 =item B<< C<#emb E<lt>basenameE<gt> ... with_blinder E<lt>SubNameE<gt>> >>
 
-Here C<SubName> provides a completely customizable analog of the previous call. Instead of (or in addition to) obscuring the part of DAG which is not reachable from C<StartNamespace>, the output of this user-defined subroutine obscures an arbitrary subset of the DAG. It receives the entire current embedding stack (each entry is the currently executed embedding promise) together with the start namespace, the used blinder name, and the output of the blinder for each level. It return a dynamic list of namespaces to "blind" for this specific resolution and any sub-resolutions (which may happen during processing of this embedded section).
+Here C<SubName> provides a completely customizable analog of the previous call, looked up as
+a subroutine reference under C<Fab/blinders/$SubName>. Instead of (or in addition to) obscuring
+the part of DAG which is not reachable from C<StartNamespace>, the output of this user-defined
+subroutine obscures an arbitrary subset of the DAG. Blinding a namespace masks that namespace's
+own section definitions from satisfying the embed, while allowing inheritance traversal to continue
+through its parents in the DAG. It receives the entire current embedding stack (each entry is the
+currently executed embedding promise) together with the start namespace, the used blinder name,
+and the output of the blinder for each level. It returns a dynamic list of namespaces to "blind"
+for this specific resolution and any sub-resolutions (which may happen during processing of this
+embedded section).
 
 =back
 
-=head2 Support of Control-Flow-Like constructs (conditionals and/or loops)
+=head2 Support of Control-Flow-Like constructs (conditionals and/or loops) [Planned]
 
 To simplify support of matched nested control-constructs in the user-defined parser, Fab maintains 6 stacks of matched lengths. Because of this match, they should be modified only via the corresponding API. E.g., the last elements of these lists describe:
 
@@ -779,7 +1573,7 @@ The C<loop_counter> is incremented by the number in C<$incr_loop_counter> (when 
 
 =back
 
-=head2 Support of Caching configuration-related data
+=head2 Support of Caching configuration-related data [Planned]
 
 Sometimes a callback may need a computationally expensive combination of individual entries from a configuration hash. (On may
 thingk of a regular expression depending on several values in this hash.) To avoid recalculating it every time, the callback may
@@ -958,10 +1752,6 @@ C<E_UPLEVEL_TOO_DEEP>: An C<uplevel> directive targets a group or call stack lev
 
 =item *
 
-C<E_TYPE_UNDECLARED>: A type-specific operation is used on a key whose type has not been declared.
-
-=item *
-
 C<E_TYPE_MISMATCH>: A list-specific operation is attempted on a scalar key, or vice-versa.
 
 =item *
@@ -1000,7 +1790,7 @@ C<E_CIRCULAR_EMBED>: An C<#emb> chain results in a loop during the final assembl
 
 =back
 
-=head2 B<< Control Flow Errors (C<E_Control>) >>
+=head2 B<< Control Flow Errors (C<E_Control>) [Planned] >>
 
 =over 4
 
@@ -1048,7 +1838,18 @@ B<Blinder Subroutines:> The data structures passed to them.
 
 =item *
 
-B<The default configuration schema> under the C<Fab/> key.
+B<The default configuration schema> under the C<Fab/> key:
+
+=over 8
+
+=item C<Fab/callbacks>
+
+A hash reference containing the operational engine callbacks: C<interleaver>, C<directive_parser>,
+C<chunk_preprocessor>, C<comment_recognizer>, and C<error_handler>. The C<comment_recognizer> callback
+receives C<($fab, $buffer, $offset)> and returns the offset after the comment line if recognized (defaulting
+to lines prefixed with C<##>), which triggers chunk fusion across the comment boundary.
+
+=back
 
 =back
 
@@ -1058,72 +1859,67 @@ None by default.
 
 =head1 TODO
 
-B<The error messages are not yet in the described format.>
+The default mode of process is equivalent to writing to a buffer C<__default__>, and at the end executing the file
 
-Docs are not cleaned up (mark these by “???”!); and parts are still missing.
+	= = = = = filterbuffer(raw) __default__
 
-The implementation (when it exists) has not been cleaned up yet.
+Doing the same abstraction once more, the buffer with that contents may be also created dynamically, then loaded via filterbuffer().
+On the gripping hand, this may be also
 
-B<MISS:> input__end($n) with $n==0 ending the current input stream, or also $n enclosing streams.  Or maybe better end up to a given
-name of a group?
+	= = = = = filterbuffer(raw) __default__pre
+	= = = = = filterbuffer(raw) __default__
+	= = = = = filterbuffer(raw) __default__post
 
-B<MISS:> need to specify what happens with a group on input__end(): survives / should be closed before / close-if-still-open.  (May be
-not needed if closing is group-controlled.
+With (initially) empty buffers C<__default__pre> and C<__default__post> (to which one has a chance to write later!).  And what one
+writes to these buffers may be triplicated likewise.  Etc.
 
-B<MISS:> input__end_to($group_type): end input of the files opened up to the the opened-latest-group of the given type.
+For postponed actions need an extra argument "ignore errors": with 2 would just put into eval, with 1 converted to a warning,
+negative values stop the remaining undo actions for that many frames (with -2 stopping for the current frame and one more).
+
+One needs to prohibit C<__get()>ing a reference.  Use C<__getref>() when you expect a reference (but no checks for reference are
+performed).
+
+B<MISS:> C<input__end($n)> with C<$n==0> ending the current input stream, or also C<$n> enclosing streams.
+
+B<MISS:> need to specify what happens with a group on C<input__end()>: survives / should be closed before / close-if-still-open.
+
+B<MISS:> C<input__end_to($group_type)>: end input of the files opened up to the the opened-latest-group of the given type.
 
   Likewise for “closing enclosed groups”???  Join together into 1 API by introducing suitable groups???
 
-May run forever!  Even the language of group__start, group_end, group__postpone (with the arguments to the last command
-restricted to these 3 calls) is Turing complete — one can implement a 2-counters machine with this.
+    May run forever???  Even the language if group__start, group_end, group__postpone (with the arguments to the last command
+    restricted to these 3 calls) is probably Turing complete???
 
-B<MISS:> _-prefixed versions of config__*() which check the prefix _ __ ___ of the key and make it read/write only.
+B<MISS:> _-prefixed versions of C<config__*()> which check the prefix C<_ __ ___> of the key and make it read/write only.
 
 B<MISS:> pipelining preprocessor with “filters”: filters consists of 3 components: preprocessor, massaging of promises, and the
 concatenator of the resulting candidates-for-sections.
 
-When undoing, undo data should be guarded, at least up to the exit.
-
 Uplevel w.r.t. the recursion stack should be recalculated into the usual uplevels; a special do-nothing group may be used.
 
-allow not 1 active preprocessor engine, but a stack of them, chained, and have a cfg__pop() primitive method.
+allow not 1 active preprocessor engine, but a stack of them, chained, and have a C<cfg__pop()> primitive method.
 
-Macros are templates marked as OK-to-be-not-executed.
+Macros are templates marked as OK-to-be-ignored.
 
 Hash to mark macros as “types”, with per-type-warning configurable?  Which way to hash, types to macros, or macros to types, or
 pairs???
 
-An extra parameter $is_replay for the syntax callbacks for the non-first pass.  (Probably, the boundary of the preceding pass cannot
+An extra parameter C<$is_replay> for the syntax callbacks for the non-first pass.  (Probably, the boundary of the preceding pass cannot
 be part of this???
 
 hash keys.  Setting/getting them employs a serialization method, by default JSON???
 
-B<uplevel should allow execution AFTER the group is closed>
-
-There should be an indicator that a method is called “from” before/after uplevel.  If uplevel is called “uplevel”ed, it should
-only register the requests,; at end of the enclosing processing of the uplevevel-ed stuff, these postponed commands should be
-executed (reversing order again???).
-
-  Should reversing of order be customizable, and in which order one should put the inverted group and the non-inverted group????
-  Probably better to have more than 2 types, and for every “type” have the pre/post specified, and whether upleveling from the
-  group reverses the order???
-
-  The type is a Unicode string starting with either PRE-, or post-, and sorting as if it is appended by ".000"… with an infinite
-  number of characters '0' (but before the possible suffix "-inv".  Then sorting lexicographically (with actual closing happening
-  between PRE- and post-, and -inv groups inverted gives the order of execution.  (Still: inversion of postponed postpones???)
-
-  When sorting, one can literally pad by ".0"* up to the maximal length of the name of existening groups + 1!
-
-    Note that "string#" comes before "string" for any value of "string", and different strings “sort differently”!
+     !!!!!!!!!!!!!!!!!!!!!!!!!!!!	THIS IS TOO DANGEROUS.
+					Access control to Fab/* keys should be guarded by ungettable/settable types of values ???
 
 C<#unset> — but maybe it is going to make undo harder???
 
-Recursive invocation is needed for massaging data between different level:
+Recursive invocation is needed for massaging data between different levels:
 
-  • The hash
-  • Input file names
-  • Input strings
-  • Output sections
+    • The hash
+    • Input file names
+    • Input strings
+    • Output sections
 
 A top→down approach to recognizing the “reconfiguration directives”: but cannot
 we support a bottom→up approach too, when the preprocessor recognizes interlaced
@@ -1131,7 +1927,7 @@ directives?  How to deal with recursion: return an indicator that the state
 changed?  But it is changing permanently, one needs to filter out changes — but how
 the internal calls know the filters needed for the enclosing calls???
 
-the preprocessor needs a guarantee that it is going to be reentered (to postpone operations).  A special call at end???
+the preprocessor needs a guarantee that it is going to be reentered
 
 =head1 SEE ALSO
 
@@ -1150,7 +1946,7 @@ Ilya Zakharevich, E<lt>ilyaz@cpan.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2025 by Ilya Zakharevich
+Copyright (C) 2025, 2026 by Ilya Zakharevich
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.22.2 or,

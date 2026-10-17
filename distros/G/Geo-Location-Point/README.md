@@ -4,7 +4,7 @@ Geo::Location::Point - Location information
 
 ## Version
 
-Version 0.16
+Version 0.17
 
 ## Synopsis
 
@@ -127,6 +127,86 @@ The upper case variant of the key is consulted
 which is how the MaxMind field names are read. An attribute that has been set,
 however false, takes precedence over it.
 
+### Geocoder
+
+The distribution that produced the point, such as `Geo::Coder::Free`.
+
+```
+$location->geocoder('Geo::Coder::Free');
+```
+
+### Database
+
+The database the distribution answered from, such as `OpenAddresses`, `Local`
+or `MaxMind`.
+
+```
+$location->database('OpenAddresses');
+```
+
+### Confidence
+
+How good the match is, from `0` to `1` inclusive, where `1` is an exact
+match. A confidence that is not a number, or that falls outside that range, is
+rejected rather than stored.
+
+```
+$location->confidence(0);           # Tried and rejected
+$location->confidence(0.8);         # A good match
+```
+
+### Accuracy\_Levels
+
+The accuracy levels a point may claim, most precise first: `address` (a house
+number), `street`, `postcode`, `locality`, `city`, `region` and
+`country`.
+
+This is the vocabulary, written down once here and read from here by
+[Geo::Coder::Free::Provenance](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AFree%3A%3AProvenance) rather than copied, so the levels a point
+accepts and the levels a backend reports cannot drift apart.  `accuracy()`
+accepts these and refuses anything else.
+
+```perl
+my $levels = Geo::Location::Point::ACCURACY_LEVELS();
+```
+
+### Accuracy
+
+How precise the coordinates behind a match can claim to be.  The levels are
+those in ["ACCURACY\_LEVELS"](#accuracy_levels); anything else is rejected, because a reader
+deciding what a point may claim about itself has to be able to trust the
+value.
+
+```
+$location->accuracy('city');
+```
+
+### Country
+
+The country of the point, as the data spells it: `GB`, `US`, `Canada`. It
+is stored as given rather than normalised, so it is whatever the backend
+matched.
+
+```
+$location->country('GB');
+```
+
+### City
+
+The city, town or similar locality of the point.
+
+```
+$location->city('London');
+```
+
+### State
+
+The state, province or region of the point.
+
+```
+$location->state('KY');
+```
+
 ## Support
 
 This module is provided as-is without any warranty.
@@ -139,10 +219,15 @@ Nigel Horne, `<njh at nigelhorne.com>`
 
 There is no validation on the attribute in the AUTOLOAD method,
 so typos such as "citty" will not be caught.
+`geocoder`, `database`, `confidence`, `accuracy`, `country`, `city` and
+`state` have documented accessors of their own that do check what they are
+given,
+but they are the only attributes that do,
+and `new()` stores whatever it is handed without checking it,
+so a provenance field set through the constructor can still be any value.
 
 ## See Also
 
-- [Configure an Object at Runtime](https://metacpan.org/pod/Object%3A%3AConfigure)
 - [Test Dashboard](https://nigelhorne.github.io/Geo-Location-Point/coverage/)
 
 [GIS::Distance](https://metacpan.org/pod/GIS%3A%3ADistance),

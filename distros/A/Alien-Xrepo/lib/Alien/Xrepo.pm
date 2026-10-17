@@ -2,7 +2,7 @@ use v5.40;
 use feature 'class';
 no warnings 'experimental::class';
 #
-class Alien::Xrepo v1.0.8 {
+class Alien::Xrepo v1.0.9 {
     use Alien::Xmake;
     use JSON::PP;
     use Digest::SHA qw[sha1_hex];
@@ -17,6 +17,7 @@ class Alien::Xrepo v1.0.8 {
     # directory on DESTROY, so they are parked here for the life of the object.
     field $pkgfile_guards : param //= [];
     field $verbose        : param //= 0;
+    field $diagnosis      : param //= 0;
     field $root           : param //= undef;
     field $theme          : param //= 'plain';
 
@@ -52,7 +53,7 @@ class Alien::Xrepo v1.0.8 {
         return;
     }
     #
-    class Alien::Xrepo::PackageInfo v1.0.8 {
+    class Alien::Xrepo::PackageInfo v1.0.9 {
         use Path::Tiny;
         field $includedirs  : param : reader;
         field $libfiles     : param : reader;
@@ -141,8 +142,14 @@ class Alien::Xrepo v1.0.8 {
         # because xrepo's shim decides `system` for us otherwise (see _package_file). The common arguments for
         # install and fetch: the mutating install gets an implicit -y unless the caller opted out; fetch is query-only,
         # so no confirm. configs ride along in the package file when there is one, since the shim drops --extra there.
+        # The install also carries the optional -v/-D verbosity flags (see _verbosity_args); they are only added here
+        # because install is the one action whose output is not captured and parsed.
         my $pkgfile = $self->_package_file( $full_spec, \%opts );
-        my @args    = ( $self->_confirm_args( \%opts ), $self->_build_args( defined $pkgfile ? { %opts, configs => undef } : \%opts ) );
+        my @args    = (
+            $self->_confirm_args( \%opts ),
+            $self->_build_args( defined $pkgfile ? { %opts, configs => undef } : \%opts ),
+            $self->_verbosity_args( \%opts ),
+        );
         say "[*] xrepo: ensuring $full_spec is installed..." if $verbose;
 
         # Warm path: a prior successful install+fetch is replayed straight from disk, so a repeat launch (eg/webui.pl)
@@ -693,6 +700,19 @@ class Alien::Xrepo v1.0.8 {
     method _confirm_args ($opts) {
         return ('-y') if !$yes && !exists $opts->{yes} && !( defined $opts->{confirm} && length $opts->{confirm} );
         return ();
+    }
+
+    # xmake prints only the tail of a failed package's log and then points at the full install.txt (which lives on the
+    # build machine and is gone by the time a CPAN tester's report reaches you). `-v`/--verbose makes it print the whole
+    # log to the console and `-D`/--diagnosis adds the diagnostic detail; xrepo's install action forwards both to the
+    # inner `xmake require` (see xmake/modules/private/xrepo/action/install.lua), so they belong on *this* command line.
+    # install is the only action that runs uncaptured, so the flags are deliberately kept out of _build_args: the
+    # JSON-returning actions (fetch/info/scan/...) would have their parsed output polluted by the extra verbosity.
+    method _verbosity_args ($opts) {
+        my @args;
+        push @args, '-v' if $opts->{verbose}   // $verbose;
+        push @args, '-D' if $opts->{diagnosis} // $diagnosis;
+        return @args;
     }
 
     # Run `xrepo fetch` and return a parsed PackageInfo (or raw flags).

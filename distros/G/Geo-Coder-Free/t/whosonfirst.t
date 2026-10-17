@@ -5,7 +5,7 @@
 
 use warnings;
 use strict;
-use Test::Most tests => 21;
+use Test::Most;
 use Test::Number::Delta;
 use Test::Carp;
 use Test::Deep;
@@ -117,3 +117,5 @@ WHOSONFIRST: {
 		}
 	}
 }
+
+done_testing();

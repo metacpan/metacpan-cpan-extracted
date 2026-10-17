@@ -2,7 +2,7 @@
 
 use warnings;
 use strict;
-use Test::Most tests => 4;
+use Test::Most;
 use Test::Number::Delta;
 use Test::Carp;
 use Test::Deep;
@@ -39,3 +39,5 @@ OPENADDR: {
 		}
 	}
 }
+
+done_testing();

@@ -254,6 +254,31 @@ static void pk_url_cap_cat(pTHX_ SV *out, HV *args, HV *used, SV *capname,
                       " slashes"
                     : " A *splat is the segment that takes slashes");
         }
+    /* A splat that starts with '/' would follow the '/' this builder already
+     * wrote, and "//host/..." is a URL for another host. A '.' or '..'
+     * segment is one the browser rewrites before the router sees it. Both
+     * are URLs that cannot mean what was asked: a bug at the call site. */
+    if (splat && vp[0] == '/') {
+        SvREFCNT_dec(out);
+        croak("Punk: url_for('%s'): *%s starts with '/' - the route already "
+              "supplies that slash, and a value beginning with one builds a "
+              "scheme-relative URL for another host", name, cn);
+    }
+    {
+        STRLEN s = 0;
+        for (i = 0; i <= vl; i++) {
+            if (i == vl || vp[i] == '/') {
+                STRLEN sl = i - s;
+                if ((sl == 1 && vp[s] == '.') || (sl == 2 && vp[s] == '.' && vp[s + 1] == '.')) {
+                    SvREFCNT_dec(out);
+                    croak("Punk: url_for('%s'): :%s has a '%.*s' segment, "
+                          "which a browser resolves away before the request "
+                          "is made", name, cn, (int)sl, vp + s);
+                }
+                s = i + 1;
+            }
+        }
+    }
     pk_pct_cat(aTHX_ out, vp, vl, splat);
     (void)hv_store_ent(used, capname, PUNK_SET_TRUE, 0);
 }

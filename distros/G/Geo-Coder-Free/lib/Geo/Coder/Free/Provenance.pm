@@ -9,6 +9,7 @@ package Geo::Coder::Free::Provenance;
 use strict;
 use warnings;
 
+use Geo::Location::Point ();	# Defines the accuracy vocabulary this module speaks
 use Exporter qw(import);
 our @EXPORT_OK = qw(GEOCODER ACCURACY_LEVELS _accuracy_for);
 
@@ -42,11 +43,11 @@ meaning; an addition there would be lost the next time that sync runs.
 
 =head1 VERSION
 
-Version 0.46
+Version 0.47
 
 =cut
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 # The distribution that produced a result.  Every backend stamps this on the
 # Geo::Location::Point it hands back, so a consumer can tell a result from this
@@ -57,7 +58,12 @@ use constant GEOCODER => 'Geo::Coder::Free';
 # How precise the coordinates behind a match can claim to be, most precise
 # first.  _accuracy_for() returns one of these, and anything that validates an
 # accuracy (section 3.2) validates against this list.
-use constant ACCURACY_LEVELS => [qw(address street postcode locality city region country)];
+#
+# The vocabulary is not written down here.  Geo::Location::Point defines it and
+# refuses an accuracy outside it, so this module reads that one list: the levels
+# a backend reports and the levels a point accepts cannot drift apart, and this
+# constant is the same list object rather than a copy that agrees today.
+use constant ACCURACY_LEVELS => Geo::Location::Point::ACCURACY_LEVELS();
 
 =head1 SUBROUTINES/METHODS
 
@@ -71,6 +77,11 @@ came from OpenAddresses, Local or MaxMind.
 
 A list of the accuracies a result may claim, most precise first: C<address>,
 C<street>, C<postcode>, C<locality>, C<city>, C<region> and C<country>.
+
+It is C<Geo::Location::Point::ACCURACY_LEVELS()>, the list that module
+validates an accuracy against, re-exported here so that a backend can describe
+the match it made without knowing which module the vocabulary is defined in.
+There is one list behind both names, not a copy of it.
 
 =head2 _accuracy_for
 

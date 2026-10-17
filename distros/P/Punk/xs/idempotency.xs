@@ -83,9 +83,10 @@ register(self, app, opts = &PL_sv_undef)
             SV **w = o ? hv_fetchs(o, "lock_wait", 0) : NULL;
             NV lw = PI_LOCK_WAIT;
             if (w && *w && SvOK(*w)) {
-                if (!looks_like_number(*w) || (lw = SvNV(*w)) <= 0)
+                if (!looks_like_number(*w) || (lw = SvNV(*w)) <= 0
+                    || Perl_isinfnan(lw))
                     croak("Punk::Plugin::Idempotency: lock_wait must be a "
-                          "positive number of seconds");
+                          "positive, finite number of seconds");
             }
             (void)hv_stores(cfg, "lock_wait", newSVnv(lw));
         }

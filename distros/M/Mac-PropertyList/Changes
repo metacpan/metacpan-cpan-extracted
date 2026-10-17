@@ -1,5 +1,11 @@
 Revision history for Perl module Mac::PropertyList
 
+1.608 2026-10-16T13:44:09Z
+	* the Math::BigInt stuff should work now
+
+1.607_01 2026-10-11T08:26:01Z
+	* try harder on ReadBinary (#38)
+
 1.607 2026-10-05T16:54:59Z
 	* promote to user version (#38)
 

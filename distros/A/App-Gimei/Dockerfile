@@ -23,7 +23,7 @@ RUN git clone https://github.com/tokuhirom/plenv.git ~/.plenv &&\
 RUN echo 'export PATH="$HOME/.plenv/bin:$PATH"' >> ~/.bash_profile &&\
     echo 'eval "$(plenv init -)"' >> ~/.bash_profile
 RUN /bin/bash -l <<EOF
-    plenv install 5.40.3
-    plenv global 5.40.3
+    plenv install 5.42.3
+    plenv global 5.42.3
     plenv install-cpanm
 EOF

@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More;
 
-use URI::VersionRange::Util qw(semver_version_compare);
+use URI::VersionRange::Util qw(semver_version_compare version_compare);
 
 #<<<
 my @test_cases = (
@@ -77,21 +77,33 @@ my @test_cases = (
 );
 #>>>
 
+my %COMPARATORS = (
+    'semver_version_compare'   => \&semver_version_compare,
+    'version_compare (semver)' => sub { version_compare('semver', @_) },
+    'version_compare (npm)'    => sub { version_compare('npm',    @_) },
+);
+
 foreach my $test (@test_cases) {
 
     my ($a, $b, $expected) = @{$test};
-    my $label = "$a <=> $b == $expected";
-    my $got   = semver_version_compare($a, $b);
-
-    is($got, $expected, $label) or diag explain {a => $a, b => $b, expected => $expected, got => $got};
-
-    # Reverse test
-    my $rev_got      = semver_version_compare($b, $a);
     my $rev_expected = -$expected;
-    my $rev_label    = "$b <=> $a == $rev_expected (reverse test)";
 
-    is($rev_got, $rev_expected, $rev_label)
-        or diag explain {a => $a, b => $b, expected => $rev_expected, got => $rev_got};
+    my $test_label     = "$a <=> $b == $expected";
+    my $rev_test_label = "$b <=> $a == $rev_expected (reverse test)";
+
+    foreach my $name (keys %COMPARATORS) {
+
+        my $comparator = $COMPARATORS{$name};
+
+        subtest "$name: $test_label" => sub {
+            my $got     = $comparator->($a, $b);
+            my $rev_got = $comparator->($b, $a);
+
+            is($got,     $expected,     $test_label);
+            is($rev_got, $rev_expected, $rev_test_label);
+        };
+
+    }
 
 }
 

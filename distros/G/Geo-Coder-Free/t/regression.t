@@ -32,8 +32,6 @@ my $LOCAL = Geo::Coder::Free::Local->new();
 #         invisible until the functions are actually called at runtime.
 # -----------------------------------------------------------------------
 subtest 'REG-1: Utils::_normalize and _abbreviate are compiled and callable' => sub {
-	plan tests => 4;
-
 	ok(defined(&Geo::Coder::Free::Utils::_normalize),
 		'_normalize sub is defined — was absent when placed after __END__');
 	ok(defined(&Geo::Coder::Free::Utils::_abbreviate),
@@ -42,6 +40,8 @@ subtest 'REG-1: Utils::_normalize and _abbreviate are compiled and callable' => 
 	my $n = Geo::Coder::Free::Utils::_normalize('04TH AVENUE');
 	ok(defined $n, '_normalize returns a defined value');
 	unlike($n, qr/^0/, '_normalize strips leading zeros (04TH → 4TH)');
+
+	done_testing();
 };
 
 # -----------------------------------------------------------------------
@@ -50,8 +50,6 @@ subtest 'REG-1: Utils::_normalize and _abbreviate are compiled and callable' => 
 #         (use Module qw(name)) for symbols absent from @EXPORT_OK.
 # -----------------------------------------------------------------------
 subtest 'REG-2: explicit import of _normalize and _abbreviate does not croak' => sub {
-	plan tests => 2;
-
 	# Before the fix: "\"_normalize\" is not exported by ... module"
 	lives_ok {
 		Geo::Coder::Free::Utils->import('_normalize');
@@ -60,6 +58,8 @@ subtest 'REG-2: explicit import of _normalize and _abbreviate does not croak' =>
 	lives_ok {
 		Geo::Coder::Free::Utils->import('_abbreviate');
 	} 'explicit import of _abbreviate succeeds (@EXPORT_OK populated)';
+
+	done_testing();
 };
 
 # -----------------------------------------------------------------------
@@ -69,8 +69,6 @@ subtest 'REG-2: explicit import of _normalize and _abbreviate does not croak' =>
 #         CI runners where the database file was absent.
 # -----------------------------------------------------------------------
 subtest 'REG-3: error() does not recurse into itself (old MyLogger defect)' => sub {
-	plan tests => 2;
-
 	my $logger = Test::Log::Abstraction->new();
 
 	# Before the fix this would die: "Deep recursion on subroutine Test::Log::Abstraction::error"
@@ -79,6 +77,8 @@ subtest 'REG-3: error() does not recurse into itself (old MyLogger defect)' => s
 
 	lives_ok { $logger->error(undef) }
 		'Test::Log::Abstraction::error handles undef without croak';
+
+	done_testing();
 };
 
 # -----------------------------------------------------------------------
@@ -96,8 +96,6 @@ subtest 'REG-3: error() does not recurse into itself (old MyLogger defect)' => s
 #               all, it maps to Kent.
 # -----------------------------------------------------------------------
 subtest 'REG-4: Makefile.PL no longer appends Tooting under GB.ENG.G5' => sub {
-	plan tests => 1;
-
 	open(my $fh, '<', 'Makefile.PL') or BAIL_OUT("Cannot open Makefile.PL: $!");
 	my $src = do { local $/; <$fh> };
 	close $fh;
@@ -107,16 +105,17 @@ subtest 'REG-4: Makefile.PL no longer appends Tooting under GB.ENG.G5' => sub {
 	# A comment mentioning both names is not a match; the escaped \t is key.
 	unlike($src, qr["GB\.ENG\.G5\\tTooting],
 		'Makefile.PL source has no GB.ENG.G5/Tooting append (root-cause line removed)');
+
+	done_testing();
 };
 
 subtest 'REG-4b: admin2.db has no Tooting entry under GB.ENG.G5' => sub {
 	my $db = 'lib/Geo/Coder/Free/MaxMind/databases/admin2.db';
 	unless(-f $db) {
-		plan tests => 1;
 		pass('admin2.db not present — skipping data-integrity check');
+		done_testing();
 		return;
 	}
-	plan tests => 2;
 
 	open(my $fh, '<', $db) or BAIL_OUT("Cannot open $db: $!");
 	my @g5 = grep { /^GB\.ENG\.G5\t/ } <$fh>;
@@ -130,6 +129,8 @@ subtest 'REG-4b: admin2.db has no Tooting entry under GB.ENG.G5' => sub {
 	# If the entry is absent from the current upstream data, that is also fine.
 	ok(!@g5 || $g5[0] =~ /\tKent\t/,
 		'GB.ENG.G5, if present, maps to Kent (not overridden by wrong append)');
+
+	done_testing();
 };
 
 # -----------------------------------------------------------------------
@@ -143,11 +144,10 @@ subtest 'REG-4b: admin2.db has no Tooting entry under GB.ENG.G5' => sub {
 subtest 'REG-5: missing Geo::Address::Parser does not kill UK geocode' => sub {
 	# If the module IS installed, the eval path is never reached; skip gracefully.
 	if(eval { require Geo::Address::Parser; 1 }) {
-		plan tests => 1;
 		pass('Geo::Address::Parser is installed — eval guard path not exercisable here');
+		done_testing();
 		return;
 	}
-	plan tests => 1;
 
 	# "10 High Street, Canterbury, Kent, England" has 3 commas (4 parts) so it
 	# bypasses the early-return guard and reaches the require at line ~470.
@@ -155,6 +155,8 @@ subtest 'REG-5: missing Geo::Address::Parser does not kill UK geocode' => sub {
 	lives_ok {
 		$LOCAL->geocode(location => '10 High Street, Canterbury, Kent, England');
 	} 'UK geocode returns cleanly when Geo::Address::Parser is absent (eval guard)';
+
+	done_testing();
 };
 
 done_testing();

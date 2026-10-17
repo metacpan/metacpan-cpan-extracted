@@ -70,7 +70,13 @@ static hm_clos *hm_clos_of(pTHX_ CV *cv) {
 
 static IV hmf_state(pTHX_ SV *self) {
     SV **s;
-    if (!(SvROK(self) && SvTYPE(SvRV(self)) == SVt_PVAV)) return HMF_PENDING;
+    /* A croak, not PENDING: every writer below dereferences the array, so a
+     * class name or an unblessed scalar here was a segfault one call later
+     * (Hyperman::Future->done(1)), and a ->get on one pumped the loop for
+     * ever. Callers that may legitimately hold something else ask
+     * hmf_is_future first. */
+    if (!(self && SvROK(self) && SvTYPE(SvRV(self)) == SVt_PVAV))
+        croak("Hyperman::Future: not a future object");
     s = av_fetch((AV *)SvRV(self), 0, 0);
     return s ? SvIV(*s) : HMF_PENDING;
 }
@@ -134,7 +140,15 @@ static void hm_errlog(const char *fmt, ...) {
     va_end(ap);
     if (k > 0) n += (size_t)k;
     if (n > sizeof(buf) - 2) n = sizeof(buf) - 2;
-    if (n == 0 || buf[n - 1] != '\n') buf[n++] = '\n';
+    while (n > 0 && (buf[n - 1] == '\n' || buf[n - 1] == '\r')) n--;
+    /* One line per call: a die message quoting request data must not be
+     * able to write a second, forged line into the error log. */
+    {
+        size_t i;
+        for (i = 0; i < n; i++)
+            if (buf[i] == '\n' || buf[i] == '\r') buf[i] = ' ';
+    }
+    buf[n++] = '\n';
     {
         int fd = hm_err_fd >= 0 ? hm_err_fd : 2;
         ssize_t w;
@@ -207,18 +221,29 @@ static void hmf_fire(pTHX_ SV *self) {
     hmf_pump(aTHX);
 }
 
+/* A future settles ONCE. The check is here, at the one place a state is
+ * written, rather than at each caller: a continuation that ran a user
+ * callback and then found its future cancelled meanwhile (the callback
+ * closed the connection, say) used to flip CANCELLED to DONE, and every
+ * callback registered after the cancel fired a second time. */
 static void hmf_settle(pTHX_ SV *self, IV state, SV **vals, SSize_t n) {
-    AV *av = (AV *)SvRV(self);
-    AV *val = newAV();
+    AV *av;
+    AV *val;
     SSize_t i;
+    if (hmf_state(aTHX_ self) != HMF_PENDING) return;
+    av = (AV *)SvRV(self);
+    val = newAV();
     for (i = 0; i < n; i++) av_push(val, newSVsv(vals[i]));
     av_store(av, 0, newSViv(state));
     av_store(av, 1, newRV_noinc((SV *)val));
     hmf_fire(aTHX_ self);
 }
 
+/* Takes ownership of vals either way. */
 static void hmf_settle_av(pTHX_ SV *self, IV state, AV *vals) {
-    AV *av = (AV *)SvRV(self);
+    AV *av;
+    if (hmf_state(aTHX_ self) != HMF_PENDING) { SvREFCNT_dec((SV *)vals); return; }
+    av = (AV *)SvRV(self);
     av_store(av, 0, newSViv(state));
     av_store(av, 1, newRV_noinc((SV *)vals));
     hmf_fire(aTHX_ self);
@@ -235,7 +260,7 @@ static SV *hmf_new(pTHX_ const char *classname) {
 }
 
 static const char *hmf_class_of(pTHX_ SV *self) {
-    HV *stash = SvSTASH(SvRV(self));
+    HV *stash = (SvROK(self) && SvOBJECT(SvRV(self))) ? SvSTASH(SvRV(self)) : NULL;
     return stash ? HvNAME(stash) : "Hyperman::Future";
 }
 
@@ -280,7 +305,9 @@ static void hm_any_on_ready(pTHX_ SV *f, SV *cb) {
 }
 
 static void hmf_set_upstream(pTHX_ SV *derived, SV *upstream) {
-    SV *w = newSVsv(upstream);
+    SV *w;
+    (void)hmf_state(aTHX_ derived);           /* croaks on a non-future */
+    w = newSVsv(upstream);
     sv_rvweaken(w);
     av_store((AV *)SvRV(derived), 3, w);
 }
@@ -507,6 +534,12 @@ XS_INTERNAL(hm_xs_then_cb) {
     next = cl->a;
     st = hmf_state(aTHX_ f);
 
+    /* `next` was cancelled after this fire was queued (the upstream had
+     * already settled, so the cancel had nothing to propagate to): the
+     * user's callback must not run and the state must not change. Checked
+     * before BOTH branches; followed_by once ran its callback regardless. */
+    if (hmf_state(aTHX_ next) != HMF_PENDING) XSRETURN_EMPTY;
+
     if (cl->i == 1) {                          /* followed_by: cb($f) */
         AV *out = newAV();
         SV *arg = f;
@@ -520,10 +553,6 @@ XS_INTERNAL(hm_xs_then_cb) {
         XSRETURN_EMPTY;
     }
 
-    /* `next` was cancelled after this fire was queued (the upstream had
-     * already settled, so the cancel had nothing to propagate to): the
-     * user's callback must not run and the state must not change. */
-    if (hmf_state(aTHX_ next) != HMF_PENDING) XSRETURN_EMPTY;
     if (st == HMF_DONE || st == HMF_FAILED) {
         SV *user = (st == HMF_DONE) ? cl->b : cl->c;
         AV *vals = hmf_values_av(aTHX_ f);

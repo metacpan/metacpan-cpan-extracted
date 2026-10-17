@@ -28,8 +28,10 @@ enum {
     PCX_UA      = 7,  /* memoised $c->ua; the agent itself lives on the app */
     PCX_REQID   = 8,  /* Punk::Plugin::RequestId's id, when it is loaded     */
     PCX_AFTER_RES = 9, /* $c->after_response's queue, vivified on first use  */
-    PCX_CANON   = 10  /* set when the route's body is hashed for an ETag:
+    PCX_CANON   = 10, /* set when the route's body is hashed for an ETag:
                          JSON is then encoded with its keys in order      */
+    PCX_T0      = 11  /* Punk::Plugin::Metrics' request start, seconds;
+                         negative for a request it does not count        */
 };
 
 static AV *pcx_av(pTHX_ SV *self) {
@@ -241,6 +243,12 @@ static int pcx_is_triplet(pTHX_ SV *ret) {
     h = av_fetch(a, 1, 0);
     if (!(s && *s && SvOK(*s) && !SvROK(*s))) return 0;
     if (!(h && *h && SvROK(*h) && SvTYPE(SvRV(*h)) == SVt_PVAV)) return 0;
+    /* the status Punk itself built is an integer: read it as one rather
+     * than upgrade it to a string on every response */
+    if (SvIOK(*s) && !SvPOK(*s)) {
+        IV v = SvIVX(*s);
+        return v >= 100 && v <= 599;
+    }
     {
         STRLEN l;
         const char *p = SvPV_const(*s, l);
@@ -326,7 +334,13 @@ static SV *punk_coerce(pTHX_ SV *c, SV *ret) {
             return r;
         }
         if (sv_derived_from(ret, "Punk::Response"))
-            return pcx_call_meth(aTHX_ ret, "finalize", NULL, 0, 1);
+        {
+            /* canonical JSON on an etag route, as pcx_json does for $c->json */
+            SV *canon = pcx_get(aTHX_ pcx_av(aTHX_ c), PCX_CANON);
+            SV *argv[1];
+            argv[0] = (canon && SvTRUE(canon)) ? &PL_sv_yes : &PL_sv_no;
+            return pcx_call_meth(aTHX_ ret, "finalize", argv, 1, 1);
+        }
         /* An XML document, before the on_ready probe below (which walks the
          * stash of every object) and before the JSON fallthrough (which would
          * encode it as the blessed reference it is). This is also what makes
@@ -361,8 +375,7 @@ static SV *punk_coerce(pTHX_ SV *c, SV *ret) {
         IV  st    = pcx_res_status(aTHX_ res);
         SV *bytes = pcx_json(aTHX_ pcx_av(aTHX_ c), ret);
         if (!st) st = 200;
-        return punk_triplet(aTHX_ st,
-                   sv_2mortal(newSVpvs("application/json")),
+        return punk_triplet_ct(aTHX_ st, "application/json", 16,
                    bytes, res ? pcx_res_headers(aTHX_ res) : NULL);
     }
 }

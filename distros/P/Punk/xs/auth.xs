@@ -39,8 +39,13 @@ login(self, user)
 
         key = ps_cfg_str(aTHX_ cfg, "session_key", "user_id", &kl);
         sess = ps_load(aTHX_ self);
-        if (sess && SvROK(sess) && SvTYPE(SvRV(sess)) == SVt_PVHV)
+        if (sess && SvROK(sess) && SvTYPE(SvRV(sess)) == SVt_PVHV) {
             (void)hv_store((HV *)SvRV(sess), key, (I32)kl, newSVsv(id), 0);
+            /* the CSRF token minted for the anonymous session goes with it:
+             * one planted before the login would otherwise validate for the
+             * user after it */
+            (void)hv_delete((HV *)SvRV(sess), "punk.csrf", 9, G_DISCARD);
+        }
         if (sess) SvREFCNT_dec(sess);
         {
             HV *stash = ps_stash(aTHX_ pcx_av(aTHX_ self));
@@ -150,10 +155,12 @@ check_password(self, user, password)
             pwd_dummy_verify(aTHX_ (const unsigned char *)p, pl, iterations);
             RETVAL = 0;
         }
-        else if (!SvOK(password)) RETVAL = 0;
         else {
-            STRLEN pl, sl;
-            const char *p = SvPV_const(password, pl);
+            /* an undef password is the empty one, verified in full: the
+             * early return it used to take answered faster for a known
+             * email than for an unknown one */
+            STRLEN pl = 0, sl;
+            const char *p = SvOK(password) ? SvPV_const(password, pl) : "";
             const char *s = SvPV_const(stored, sl);
             RETVAL = pwd_verify(aTHX_ (const unsigned char *)p, pl, s, sl);
         }

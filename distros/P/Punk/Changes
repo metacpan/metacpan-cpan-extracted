@@ -1,5 +1,37 @@
 Revision history for Punk
 
+0.60    2026-10-16
+        - The compiled application is read into a C struct at `to_app`:
+          the request path no longer looks the router, hooks, mounts and
+          policies up by name, nor the matched route's fields, nor the
+          context class's stash. A dynamic route costs about 0.5us over a
+          bare PSGI app in-process, down from 0.9us.
+        - A static mount of Punk's own is served without the SCRIPT_NAME
+          and PATH_INFO rewrite or a Perl frame, and its ETag and
+          Last-Modified are formatted once per stat, not per hit.
+        - The session reads its cookie through the C parser; `rate_limit`
+          keeps the resolved ABI pointer instead of scanning the
+          environment per request (the `PUNK_NO_HM_ABI` switch is read
+          before the first request); the CSP policy is frozen around the
+          nonce; `headers` hands out its frozen list rather than copying
+          it; metrics keep the start time in a context slot.
+        - A WebSocket message in one frame is handed on from the read
+          buffer; ping and pong payloads are built only for a listener; a
+          room broadcast queues to each member in C; buffers that grew for
+          a large message shrink back once empty.
+        - SECURITY: `$f->get`, `$c->await` and the csrf check wrote to a
+          stale stack after running Perl.
+        - SECURITY: the OpenAPI mount validated a body it never read when
+          the request carried no Content-Length, and reserved a declared
+          length up front.
+        - SECURITY: a middleware editing a static body in place edited the
+          file cache, and every later hit served the edit.
+        - SECURITY: one WebSocket client could keep a worker to itself.
+        - SECURITY: a rate limit keyed on a header limited nothing when the
+          header was absent; it counts against the address.
+        - SECURITY: `database backend` and `$c->txn` loaded a class named in
+          config without checking it was a class name.
+
 0.59    2026-10-13
         - SECURITY: a 500 outside `development` and `test` no longer
           carries the die text; it is logged at error.
@@ -20,6 +52,7 @@ Revision history for Punk
         - `redirect` croaks on a URL with CR, LF or NUL.
         - `punk config check --dump` redacts inline credentials.
         - Punk::Test sets PUNK_ENV to `test` when it is unset.
+        - `$w->drain` is pending over HTTP/2 from Hyperman 0.60.
 
 0.58    2026-10-13
         - SECURITY: an Idempotency-Key replayed one resource's response for

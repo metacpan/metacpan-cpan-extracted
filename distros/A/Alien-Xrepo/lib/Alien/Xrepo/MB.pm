@@ -1,6 +1,6 @@
 use v5.40;
 
-package Alien::Xrepo::MB v1.0.8 {
+package Alien::Xrepo::MB v1.0.9 {
     use Alien::Xrepo::Build;
     use Alien::Xrepo::Build::Dist;
     use Path::Tiny;
@@ -9,6 +9,8 @@ package Alien::Xrepo::MB v1.0.8 {
     __PACKAGE__->add_property( xrepo_share_dir   => undef );    # shallow-install root, defaults to the snapshot's dir
     __PACKAGE__->add_property( xrepo_cache       => 0 );        # bypass Alien::Xrepo's on-disk cache by default
     __PACKAGE__->add_property( xrepo_update_repo => 0 );        # refresh xrepo repositories once when an install fails
+    __PACKAGE__->add_property( xrepo_verbose     => 0 );        # forward Alien::Xrepo->verbose (adds xmake's -v on installs)
+    __PACKAGE__->add_property( xrepo_diagnosis   => 0 );        # forward Alien::Xrepo->diagnosis (adds xmake's -D on installs)
 
     sub ACTION_code($self) {
         my $dist     = $self->_dist;
@@ -22,7 +24,9 @@ package Alien::Xrepo::MB v1.0.8 {
                 snapshot    => $snapshot,
                 share_dir   => $share->stringify,
                 cache       => $self->xrepo_cache,
-                update_repo => $self->xrepo_update_repo
+                update_repo => $self->xrepo_update_repo,
+                verbose     => $self->xrepo_verbose,
+                diagnosis   => $self->xrepo_diagnosis
             );
             $build->run;
             $build->assert_installed;

@@ -9,8 +9,11 @@
  *
  * ---- why the shape is what it is (measured) ------------------------------
  *
- * A bare Punk request - one route, in-process dispatch, no socket - is
- * 1058 ns. Against that:
+ * A bare Punk request - one route, in-process dispatch, no socket - was
+ * 1058 ns when this was measured (Punk 0.3x; bench/apps/punk-conditional-get
+ * records 1434 ns on a later build, and 0.59 after the state struct is about
+ * 1.9 us on bench/dispatch.pl, which includes building the env). The ratios
+ * are what matter. Against that:
  *
  *   getentropy(16) per id ............. 693 ns   65.5% of a request
  *   entropy sliced 16 ids per call ..... 42 ns    4.0%

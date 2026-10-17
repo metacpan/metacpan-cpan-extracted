@@ -369,6 +369,12 @@ close(self, ...)
         STRLEN rlen = 0;
         const char *reason = items > 2 && SvOK(ST(2))
                            ? SvPVutf8(ST(2), rlen) : NULL;
+        /* the frame carries sixteen bits, and a peer may fail the
+         * connection on a code it may not receive: refuse before the cast
+         * turns 70000 into 4464 or 0 into a reserved code */
+        if (code < 0 || code > 0xFFFF || !pw_close_code_ok((uint16_t)code))
+            croak("Punk::WebSocket: close code %" IVdf " is not one a peer "
+                  "may be sent (1000-1003, 1007-1011 or 3000-4999)", code);
         if (ws->state == PW_ST_CLOSED) return;
         pw_queue_close(aTHX_ ws, (uint16_t)code, reason, rlen);
         /* give the peer a bounded window to echo the close */

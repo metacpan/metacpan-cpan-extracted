@@ -1,0 +1,23 @@
+Time-Keeper-Zone
+
+The time zones of the IANA database, compiled in, for Time::Keeper.
+
+INSTALLATION
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+The tools/ directory holds tzcompile, the script that turns the IANA
+time zone database into the tables this dist ships, with zic from the
+same IANA release. It is not installed and is not needed to build or
+install the dist: its output is part of the dist.
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)

@@ -149,4 +149,55 @@ is($result->behavior, 'deny', 'blocked write outside /tmp');
 $result = $can_use_tool->('Read', { file_path => '/any/path' }, {});
 is($result->behavior, 'allow', 'allowed other tools');
 
+# 0.14
+is($Claude::Agent::Permission::MODE_PLAN, 'plan', 'MODE_PLAN constant');
+is($Claude::Agent::Permission::MODE_AUTO, 'auto', 'MODE_AUTO constant');
+is($Claude::Agent::Permission::MODE_MANUAL, 'manual', 'MODE_MANUAL constant');
+is_deeply(
+    [sort @Claude::Agent::Types::PERMISSION_MODES],
+    [sort map { no strict "refs"; ${"Claude::Agent::Permission::$_"} } qw(MODE_DEFAULT MODE_ACCEPT_EDIT MODE_BYPASS MODE_DONT_ASK MODE_PLAN MODE_AUTO MODE_MANUAL)],
+    'the constants and the PermissionMode type agree'
+);
+
+my $bare_deny = Claude::Agent::Permission->deny;
+is($bare_deny->behavior, 'deny', 'deny with no arguments');
+ok(!$bare_deny->has_message, 'deny with no message has none');
+is_deeply($bare_deny->to_hash, { behavior => 'deny', interrupt => \0 }, 'bare deny to_hash');
+
+my $bare_allow = Claude::Agent::Permission->allow;
+ok(!$bare_allow->has_updated_input, 'allow with no input has none');
+is_deeply($bare_allow->to_hash, { behavior => 'allow' }, 'bare allow to_hash');
+$bare_allow = Claude::Agent::Permission->allow(updated_input => undef);
+ok(!$bare_allow->has_updated_input, 'an undef updated_input counts as absent');
+
+my $ctx = Claude::Agent::Permission::Context->new(
+    tool_name       => 'Bash',
+    tool_input      => {},
+    tool_use_id     => 'toolu_1',
+    agent_id        => 'agent_1',
+    suggestions     => [{ type => 'addRules', rules => [{ toolName => 'Bash' }] }],
+    blocked_path    => '/etc',
+    decision_reason => 'rule',
+    title           => 'Run a command',
+);
+is($ctx->tool_use_id, 'toolu_1', 'context tool_use_id');
+is($ctx->agent_id, 'agent_1', 'context agent_id');
+is($ctx->suggestions->[0]{type}, 'addRules', 'context suggestions');
+is($ctx->blocked_path, '/etc', 'context blocked_path');
+is($ctx->decision_reason, 'rule', 'context decision_reason');
+is($ctx->title, 'Run a command', 'context title');
+ok(!$ctx->has_session_id, 'context without session_id');
+eval { Claude::Agent::Permission::Context->new(tool_name => 'X') };
+like($@, qr/Required slot 'tool_input'/, 'tool_input is required');
+
+my $c = Claude::Agent::Permission->coerce({ behavior => 'allow', updatedInput => { a => 1 } });
+isa_ok($c, 'Claude::Agent::Permission::Result::Allow');
+is_deeply($c->updated_input, { a => 1 }, 'coerce reads updatedInput');
+$c = Claude::Agent::Permission->coerce({ behavior => 'deny', message => 'no', interrupt => 1 });
+isa_ok($c, 'Claude::Agent::Permission::Result::Deny');
+ok($c->interrupt, 'coerce reads interrupt');
+is(Claude::Agent::Permission->coerce($c), $c, 'coerce passes a result through');
+ok(!defined Claude::Agent::Permission->coerce({ behavior => 'maybe' }), 'coerce rejects an unknown behavior');
+ok(!defined Claude::Agent::Permission->coerce('allow'), 'coerce rejects a string');
+
 done_testing();

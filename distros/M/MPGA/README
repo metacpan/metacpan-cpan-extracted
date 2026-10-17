@@ -1,32 +1,124 @@
-MPGA version 0.08
-=================
+MPGA
+====
 
-MPGA - Make Perl Great Again - a module that makes it easy 
-to write programs in the PERL programming language.
+MPGA - Make Perl Great Again - a module that makes it easy to write 
+programs in Perl using a concept similar to "Flow-Driven Development".
 
 https://github.com/nni7/MPGA
 
-Something like "Flow driven development".
+## Concept
 
-Flow is a reference to an array of arguments and functions, which 
-are sequentially processed by the functions of this module.
+A "flow" is simply an array reference containing a mix of data (arguments) 
+and code references (functions). These elements are sequentially processed 
+from left to right.
 
-With this module you can program something like this:
+With this module, you can structure your logic like this:
 
-flow( [
-  $args, ... $args, \&fun1,
-  $another, ..., $args, \&fun2,
-  $more, ..., $args, \&fun3
-] );
+```perl
+use MPGA;
 
-A prerequisite is that the functions in the flow must satisfy a few 
-simple conditions:
- - take three arguments - ($self, $args, $flow)
- - return a reference to an array - [ @flow_chunk ]
+flow([
+  'arg1', 'arg2', \&fun1,
+  100, \&fun2
+]);
+```
 
+## The Function Signature
 
+Each function in the flow must expect four arguments:
 
-INSTALLATION
+```perl
+sub fun1 : MPGAargsNum(2) {
+    my ($self, $args, $flow, $ctx) = @_;
+    
+    # $self - reference to this function itself
+    # $args - array ref of arguments passed to this function
+    # $flow - array ref of the remaining flow (can be modified)
+    # $ctx  - optional context object shared across the flow
+    
+    my ($val1, $val2) = @$args;
+    return;
+}
+```
+
+## The `:MPGAargsNum(N)` Attribute
+
+The `:MPGAargsNum(N)` attribute explicitly defines how many arguments your 
+function consumes from the flow. MPGA will automatically extract the `N` 
+arguments immediately preceding the function.
+
+Any arguments in the flow that appeared *before* those `N` arguments are 
+considered **transit arguments**. They are safely preserved and 
+automatically pushed back into the flow to be consumed by subsequent 
+functions.
+
+*(Note: Older code without this attribute receives all preceding arguments 
+and must manage them manually. This backward compatibility is fully 
+preserved).*
+
+## Return Values
+
+Functions can return values to inject new data or functions into the 
+beginning of the remaining flow:
+
+- **Array reference `[...]`**: Elements are unpacked and prepended to the 
+  flow.
+- **Hash reference `{...}`** or **Scalar**: Prepended to the flow as a 
+  single element.
+- **`undef`** (or empty `return;`): The flow remains unchanged.
+
+*Order of insertion:* 
+If there are transit arguments, they are placed in the flow *before* your 
+function's result.
+Final order: 
+`[ ... transit args ..., ... function result ..., ... rest of the flow ... ]`
+
+## Shared Context
+
+If you need to share state across multiple functions, use `flow_ctx()`. 
+The first element of the array is treated as a shared context object 
+(e.g., a hash ref) and is passed to all functions as the 4th argument.
+
+```perl
+my $ctx = { counter => 0 };
+flow_ctx([
+    $ctx,
+    \&step_one,
+    \&step_two
+]);
+```
+
+## Execution Limits
+
+To protect against infinite loops (e.g., a function continuously returning 
+itself into the flow), `flow()` accepts a step limit as the 3rd argument 
+(0 = unlimited):
+
+```perl
+flow($flow_array, $ctx, 100); # Stops after 100 steps
+```
+
+## Debugging and Tracing
+
+The `MPGA::Trace` module provides decorators to monitor flow execution in 
+real-time, hooking into execution before and after every function.
+
+```perl
+use MPGA::Trace;
+
+my $tracer = sub {
+    my ($msg, $args, $flow) = @_;
+    print "$msg | Flow size: " . scalar(@$flow) . "\n";
+};
+
+# Standard trace
+flow_trace($flow_array, $ctx, $max_steps, $tracer);
+
+# Context trace
+flow_ctx_trace($flow_array, $tracer);
+```
+
+## Installation
 
 To install this module type the following:
 
@@ -35,15 +127,14 @@ To install this module type the following:
    make test
    make install
 
-DEPENDENCIES
+## Dependencies
 
-This module NO requires other modules and libraries
+This module requires NO non-core modules or libraries. It uses standard 
+core modules like `Attribute::Handlers` and `Sub::Util`.
 
-COPYRIGHT AND LICENCE
+## Copyright and License
 
-Copyright (C) 2021 by Nikolay Neustroev (NN).
+Copyright (C) 1997-2026 by Nikolay Neustroev (NN).
 
-This program is free software; you can redistribute it and/or 
-modify it under the same terms as Perl itself.
-
-
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

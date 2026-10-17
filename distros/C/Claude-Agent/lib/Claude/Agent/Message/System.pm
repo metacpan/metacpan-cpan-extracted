@@ -4,25 +4,38 @@ use 5.020;
 use strict;
 use warnings;
 
-use Types::Common -types;
-use Marlin
-    -base => 'Claude::Agent::Message::Base',
-    'subtype!' => Str,       # 'init', 'status', etc.
-    'data?'    => HashRef,   # Additional data depending on subtype
+use Object::Proto ();
+use Claude::Agent::Message::Base;
 
-    # Fields from init message
-    'slash_commands?'      => ArrayRef,
-    'claude_code_version?' => Str,
-    'tools?'               => ArrayRef,
-    'output_style?'        => Str,
-    'plugins?'             => ArrayRef,
-    'model?'               => Str,
-    'mcp_servers?'         => ArrayRef | HashRef,  # JSON format varies by CLI version
-    'api_key_source?'      => Str,
-    'skills?'              => ArrayRef,
-    'permission_mode?'     => Str,
-    'cwd?'                 => Str,
-    'agents?'              => Any;       # Can be arrayref or hashref
+BEGIN {
+    Object::Proto::define('Claude::Agent::Message::System',
+        extends => 'Claude::Agent::Message::Base',
+        'subtype:Str:required',
+        'data:predicate',
+        'slash_commands:predicate',
+        'claude_code_version:predicate',
+        'tools:predicate',
+        'output_style:predicate',
+        'plugins:predicate',
+        'model:predicate',
+        'mcp_servers:predicate',
+        'api_key_source:predicate',
+        'skills:predicate',
+        'permission_mode:predicate',
+        'cwd:predicate',
+        'agents:predicate',
+        'state:predicate',
+    );
+}
+
+sub get_session_id {
+    my ($self) = @_;
+    return $self->session_id // ($self->has_data && $self->data ? $self->data->{session_id} : undef);
+}
+
+1;
+
+__END__
 
 =head1 NAME
 
@@ -30,80 +43,98 @@ Claude::Agent::Message::System - System message type
 
 =head1 DESCRIPTION
 
-Represents a system message from the SDK.
+Represents a system message: session initialisation, status changes,
+compaction boundaries and the other events the CLI reports outside the
+conversation itself.
 
-=head2 ATTRIBUTES
+=head1 ATTRIBUTES
 
-=over 4
+=head2 type
 
-=item * type - Always 'system'
+Always C<system>.
 
-=item * subtype - The kind of system message ('init', 'status', etc.)
+=head2 subtype
 
-=item * uuid - Unique message identifier
+The kind of system message. Known values include C<init>, C<status>,
+C<compact_boundary>, C<session_state_changed>, C<api_retry>,
+C<task_started>, C<task_progress>, C<task_notification>,
+C<permission_denied>, C<elicitation> and C<files_persisted>. Hook
+lifecycle subtypes are delivered as L<Claude::Agent::Message::HookEvent>.
 
-=item * session_id - Session identifier
+=head2 data
 
-=item * data - Additional data specific to the subtype
+Additional data specific to the subtype.
 
-=item * slash_commands - Available slash commands (init)
+=head2 slash_commands
 
-=item * claude_code_version - Version of Claude Code CLI (init)
+Available slash commands (init).
 
-=item * tools - Available tools (init)
+=head2 claude_code_version
 
-=item * output_style - Output formatting style (init)
+Version of the Claude Code CLI (init).
 
-=item * plugins - Loaded plugins (init)
+=head2 tools
 
-=item * model - Active model name (init)
+Available tools (init).
 
-=item * mcp_servers - MCP server configurations (init)
+=head2 output_style
 
-B<Note:> The JSON format from the CLI may be an ArrayRef or HashRef depending
-on the CLI version. This differs from L<Claude::Agent::Options> which uses
-HashRef for user-facing configuration.
+Output formatting style (init).
 
-=item * api_key_source - Source of API key (init)
+=head2 plugins
 
-=item * skills - Available skills (init)
+Loaded plugins (init).
 
-=item * permission_mode - Current permission mode (init)
+=head2 model
 
-=item * cwd - Current working directory (init)
+Active model name (init).
 
-=item * agents - Available agent definitions (init)
+=head2 mcp_servers
 
-=back
+MCP server status entries (init). An array of C<{name, status}> hashes on
+current CLIs; older CLIs sent a hash.
 
-=head2 SUBTYPES
+=head2 api_key_source
 
-=over 4
+Source of the API key (init).
 
-=item * init - Initial message with session configuration
+=head2 skills
 
-=item * status - Status updates during execution
+Available skills (init).
 
-=item * subagent_start - When a subagent is spawned
+=head2 permission_mode
 
-=item * subagent_stop - When a subagent finishes
+Current permission mode (init).
 
-=back
+=head2 cwd
 
-=head2 METHODS
+Working directory of the session (init).
 
-=head3 get_session_id
+=head2 agents
+
+Available agent definitions (init).
+
+=head2 state
+
+The session state (C<session_state_changed>): C<running>, C<idle> or
+C<requires_action>.
+
+=head2 uuid, session_id, parent_tool_use_id, agent_id, raw
+
+See L<Claude::Agent::Message::Base>. Fields the CLI sends under other
+names, such as C<capabilities> or C<plugin_errors>, are in C<raw>.
+
+=head1 METHODS
+
+=head2 new
+
+Takes a flat list of name/value pairs. Unknown names are ignored.
+
+=head2 get_session_id
 
     my $id = $msg->get_session_id;
 
-Helper for init messages to get session_id from data.
-
-=cut
-
-sub get_session_id {
-    my ($self) = @_;
-    return $self->session_id // ($self->has_data && $self->data ? $self->data->{session_id} : undef);
-}
+The session id from the message, falling back to C<data-E<gt>{session_id}>.
 
 =head1 AUTHOR
 
@@ -116,5 +147,3 @@ This software is Copyright (c) 2026 by LNATION.
 This is free software, licensed under The Artistic License 2.0 (GPL Compatible).
 
 =cut
-
-1;

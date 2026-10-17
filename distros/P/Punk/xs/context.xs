@@ -324,8 +324,7 @@ json(self, data, status = &PL_sv_undef)
         SV *bytes = pcx_json(aTHX_ av, data);
         if (!st) st = pcx_res_status(aTHX_ res);
         if (!st) st = 200;
-        RETVAL = punk_triplet(aTHX_ st,
-                    sv_2mortal(newSVpvs("application/json")),
+        RETVAL = punk_triplet_ct(aTHX_ st, "application/json", 16,
                     bytes, res ? pcx_res_headers(aTHX_ res) : NULL);
     }
     OUTPUT:
@@ -376,12 +375,13 @@ text(self, body, status = &PL_sv_undef)
         AV *av  = pcx_av(aTHX_ self);
         AV *res = pcx_res_av(aTHX_ av);
         IV st = ps_status_arg(aTHX_ status);
-        SV *ct = sv_2mortal(ix == 1 ? newSVpvs("text/html; charset=utf-8")
-                                    : newSVpvs("text/plain; charset=utf-8"));
         if (!st) st = pcx_res_status(aTHX_ res);
         if (!st) st = 200;
-        RETVAL = punk_triplet(aTHX_ st, ct, newSVsv(body),
-                              res ? pcx_res_headers(aTHX_ res) : NULL);
+        RETVAL = ix == 1
+            ? punk_triplet_ct(aTHX_ st, "text/html; charset=utf-8", 24,
+                              newSVsv(body), res ? pcx_res_headers(aTHX_ res) : NULL)
+            : punk_triplet_ct(aTHX_ st, "text/plain; charset=utf-8", 25,
+                              newSVsv(body), res ? pcx_res_headers(aTHX_ res) : NULL);
     }
     OUTPUT:
         RETVAL
@@ -1026,6 +1026,9 @@ session_rotate(self)
          * handler that rotates before touching $c->session would otherwise
          * leave the write-back with no session to write. */
         SV *sess = ps_load(aTHX_ self);
+        /* a new name, and a new CSRF token to go with it */
+        if (sess && SvROK(sess) && SvTYPE(SvRV(sess)) == SVt_PVHV)
+            (void)hv_delete((HV *)SvRV(sess), "punk.csrf", 9, G_DISCARD);
         SvREFCNT_dec(sess);
         /* The old id to retire, or undef when this session is new, which
          * still marks the write-back as rotating so an unchanged session is

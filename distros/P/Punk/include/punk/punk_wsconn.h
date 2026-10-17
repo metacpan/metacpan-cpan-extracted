@@ -147,6 +147,9 @@ static void *punk_hm_stream_open(pTHX_ HV *envh, const hm_abi **out_abi,
 
 /* ---- small buffer helpers ------------------------------------------------ */
 
+/* a buffer bigger than this is returned once it is empty */
+#define PW_BUF_KEEP (64 * 1024)
+
 static void pw_buf_reserve(char **buf, size_t *cap, size_t need) {
     if (*cap >= need) return;
     {
@@ -214,9 +217,12 @@ static int pw_emit(pTHX_ punk_wsconn *ws, const char *name,
             (void)SvTRUE(ERRSV);      /* an error handler that dies: give up */
         }
         else {
+            STRLEN el; const char *ep = SvPV_const(err, el);
+            /* escaped: a die text is request-shaped, and a newline in it
+             * would be a second log line */
             PerlIO_printf(PerlIO_stderr(),
-                          "Punk::WebSocket: %s handler died: %s",
-                          name, SvPV_nolen(err));
+                          "Punk::WebSocket: %s handler died: %" SVf "\n",
+                          name, SVfARG(pl_plain(aTHX_ ep, el, SvUTF8(err))));
             SvREFCNT_dec(err);
         }
     }
@@ -415,14 +421,19 @@ static void pw_process(pTHX_ punk_wsconn *ws) {
             if (pw_is_control(f.opcode)) {
                 if (f.opcode == PW_OP_PING) {
                     pw_queue_frame(aTHX_ ws, PW_OP_PONG, pl, pn);
-                    { SV *a[1]; a[0] = newSVpvn(pl, pn);
-                      (void)pw_emit(aTHX_ ws, "ping", a, 1);
-                      SvREFCNT_dec(a[0]); }
+                    /* the payload SV only when somebody listens */
+                    if (pw_cb(aTHX_ ws, "ping")) {
+                        SV *a[1]; a[0] = newSVpvn(pl, pn);
+                        (void)pw_emit(aTHX_ ws, "ping", a, 1);
+                        SvREFCNT_dec(a[0]);
+                    }
                 }
                 else if (f.opcode == PW_OP_PONG) {
-                    SV *a[1]; a[0] = newSVpvn(pl, pn);
-                    (void)pw_emit(aTHX_ ws, "pong", a, 1);
-                    SvREFCNT_dec(a[0]);
+                    if (pw_cb(aTHX_ ws, "pong")) {
+                        SV *a[1]; a[0] = newSVpvn(pl, pn);
+                        (void)pw_emit(aTHX_ ws, "pong", a, 1);
+                        SvREFCNT_dec(a[0]);
+                    }
                 }
                 else {   /* close */
                     uint16_t code = PW_CLOSE_NO_STATUS;
@@ -496,30 +507,45 @@ static void pw_process(pTHX_ punk_wsconn *ws) {
                             "text is not utf8");
                     goto consumed;
                 }
-                if (pn) pw_append(&ws->frag, &ws->fraglen, &ws->fragcap, pl, pn);
+                /* One frame that is the whole message - nearly every one -
+                 * is handed on straight from the read buffer; only a
+                 * fragmented message is gathered in `frag` first. */
+                {
+                    int whole = f.fin && ws->fraglen == 0;
+                    if (pn && !whole)
+                        pw_append(&ws->frag, &ws->fraglen, &ws->fragcap, pl, pn);
 
-                if (f.fin) {
-                    int is_text = (ws->frag_op == PW_OP_TEXT);
-                    if (is_text && !pw_utf8_ok(&ws->utf8)) {
-                        pw_fail(aTHX_ ws, PW_CLOSE_INVALID_PAYLOAD,
-                                "text is not utf8");
-                        goto consumed;
-                    }
-                    {
-                        SV *msg = newSVpvn(ws->fraglen ? ws->frag : "",
+                    if (f.fin) {
+                        int is_text = (ws->frag_op == PW_OP_TEXT);
+                        if (is_text && !pw_utf8_ok(&ws->utf8)) {
+                            pw_fail(aTHX_ ws, PW_CLOSE_INVALID_PAYLOAD,
+                                    "text is not utf8");
+                            goto consumed;
+                        }
+                        {
+                            SV *msg = whole
+                                ? newSVpvn(pn ? pl : "", pn)
+                                : newSVpvn(ws->fraglen ? ws->frag : "",
                                            ws->fraglen);
-                        SV *a[1];
-                        if (is_text) SvUTF8_on(msg);
-                        a[0] = msg;
-                        ws->frag_active = 0;
-                        ws->fraglen     = 0;
-                        (void)pw_emit(aTHX_ ws, is_text ? "message" : "binary",
-                                      a, 1);
-                        /* Released here, not left to a temporaries frame:
-                         * this loop hands on every message a fast sender has
-                         * ready before it returns, and as mortals they would
-                         * all be alive at once. */
-                        SvREFCNT_dec(msg);
+                            SV *a[1];
+                            if (is_text) SvUTF8_on(msg);
+                            a[0] = msg;
+                            ws->frag_active = 0;
+                            ws->fraglen     = 0;
+                            /* a large fragmented message leaves a large
+                             * buffer; give it back once it is handed on */
+                            if (ws->fragcap > PW_BUF_KEEP) {
+                                free(ws->frag);
+                                ws->frag = NULL; ws->fragcap = 0;
+                            }
+                            (void)pw_emit(aTHX_ ws,
+                                          is_text ? "message" : "binary", a, 1);
+                            /* Released here, not left to a temporaries
+                             * frame: this loop hands on every message a fast
+                             * sender has ready before it returns, and as
+                             * mortals they would all be alive at once. */
+                            SvREFCNT_dec(msg);
+                        }
                     }
                 }
             }
@@ -530,6 +556,12 @@ consumed:
     if (off && ws->rbuf) {
         if (off < ws->rlen) memmove(ws->rbuf, ws->rbuf + off, ws->rlen - off);
         ws->rlen -= off;
+        /* an empty read buffer that grew for one large message shrinks
+         * back, so an idle connection does not keep it for its whole life */
+        if (ws->rlen == 0 && ws->rcap > PW_BUF_KEEP) {
+            free(ws->rbuf);
+            ws->rbuf = NULL; ws->rcap = 0;
+        }
     }
     if (guard) SvREFCNT_dec(guard);
 }
@@ -592,11 +624,20 @@ static void pw_on_stream_abort(pTHX_ void *h, void *ud) {
     if (keep) SvREFCNT_dec(keep);      /* ws may be gone after this */
 }
 
+/* How many reads one readiness callback may do before it hands the loop
+ * back. A peer that keeps its socket non-empty would otherwise be read and
+ * processed until it stopped, and every other connection and timer on the
+ * worker waited for it. The watcher is level-triggered, so what is left
+ * fires it again. */
+#define PW_READ_BUDGET 16
+
 static void pw_on_readable_in(pTHX_ int fd, int mask, void *ud) {
     punk_wsconn *ws = (punk_wsconn *)ud;
+    int budget = PW_READ_BUDGET;
     PERL_UNUSED_ARG(fd); PERL_UNUSED_ARG(mask);
     for (;;) {
         ssize_t n;
+        if (budget-- <= 0) return;
         size_t cap = ws->max_message_size
                    ? ws->max_message_size + PW_READ_CHUNK : 0;
         if (cap && ws->rlen >= cap) {
@@ -649,7 +690,10 @@ static punk_wsconn *pw_new(pTHX_ int fd, HV *opts) {
     ws->write_buffer_limit = PW_DEFAULT_WRITE_LIMIT;
     pw_utf8_reset(&ws->utf8);
     if (opts) {
-        if ((e = hv_fetchs(opts, "max_message_size", 0)) && *e && SvOK(*e))
+        /* zero keeps the default: it used to mean no bound at all, and a
+         * connection with no bound could grow the worker without limit */
+        if ((e = hv_fetchs(opts, "max_message_size", 0)) && *e && SvOK(*e)
+            && SvUV(*e))
             ws->max_message_size = (size_t)SvUV(*e);
         if ((e = hv_fetchs(opts, "write_buffer_limit", 0)) && *e && SvOK(*e))
             ws->write_buffer_limit = (size_t)SvUV(*e);

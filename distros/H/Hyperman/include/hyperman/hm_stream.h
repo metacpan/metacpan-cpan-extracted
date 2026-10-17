@@ -327,6 +327,7 @@ static void *hm_stream_open(pTHX_ void *vl, int fd, UV id, int64_t sid,
          * goes to the handle's read half. That is what lets a WebSocket run
          * over TLS, which conn_detach refuses. */
         if (!c->awaiting && status != 101) return NULL;
+        if (c->stream_open) return NULL;          /* one response per request */
         if (status == 101) {
             /* Parked before the headers go out: keepalive is off, and a
              * flush on a connection that is neither keeping alive nor
@@ -336,7 +337,7 @@ static void *hm_stream_open(pTHX_ void *vl, int fd, UV id, int64_t sid,
             c->tunnel = c->awaiting ? 1 : 2;
             c->awaiting = 1;
         }
-        hm_start_stream(aTHX_ fd, id, status, headers);
+        if (hm_start_stream(aTHX_ fd, id, status, headers) <= 0) return NULL;
     }
     if (loop->conns[fd] != c) return NULL;        /* the flush closed it    */
     s = (hm_stream *)hm_xcalloc(1, sizeof(hm_stream));

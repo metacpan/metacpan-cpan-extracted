@@ -2,7 +2,8 @@
 # ex:ts=8 sw=4:
 # App::FuguWeb::Index and the manual groups of App::FuguWeb::Config:
 # the group order, the two sort rules, the './' prefix, the escaping,
-# an empty group, a missing directory, and the optional opening.
+# an empty group, a missing directory, the group name, the heading of
+# each language, and the body that opens the index.
 #
 # The test builds its sources in a File::Temp directory. It never reads
 # the repository, so a change under man/ or lib/ cannot break it.
@@ -96,25 +97,25 @@ page "manuals.html" {
 	index = yes
 }
 
-manuals "Tool" {
-	dir    = man/tool
-	anchor = tool
+manuals tool {
+	heading = Tool
+	dir     = man/tool
 }
 
-modules "Thing modules" {
-	dir    = lib/Thing
-	anchor = thing
+modules thing {
+	heading = Thing modules
+	dir     = lib/Thing
 }
 
-manuals "Library" {
+manuals library {
+	heading   = Library
 	dir       = man/lib
-	anchor    = library
 	namespace = "Fugu::"
 }
 
-manuals "Every section" {
-	dir    = man/all
-	anchor = every
+manuals every {
+	heading = Every section
+	dir     = man/all
 }
 RC
 
@@ -136,7 +137,8 @@ subtest 'the groups keep the order of the description' => sub {
 	is_deeply( [ map { $_->kind } @groups ],
 		[ 'manuals', 'modules', 'manuals', 'manuals' ], 'the kinds' );
 	is( $groups[2]->namespace, 'Fugu::', 'the namespace' );
-	is( $groups[0]->anchor,    'tool',   'the anchor' );
+	is_deeply( [ map { $_->name } @groups ],
+		[qw(tool thing library every)], 'the name of each group' );
 };
 
 subtest 'a manuals group sorts by section and then by byte' => sub {
@@ -233,14 +235,16 @@ subtest 'the body lists every group and every manual' => sub {
 	my ( $config, $reason ) = load($RC);
 	ok( $config, 'the description loads' ) or diag $reason;
 
-	my $body = App::FuguWeb::Index->new( config => $config )->body;
+	my $body = App::FuguWeb::Index->new( config => $config )->body('Manuals');
 
-	like( $body, qr{^<h1>Manuals</h1>\n}, 'the title of the page block' );
-	like( $body, qr{<a href="https://man\.openbsd\.org/">},
-		'the opening names the manual host' );
+	like( $body, qr{^<h1>Manuals</h1>\n\n<h2 id="tool">},
+		'the title of the page block, and then the first group' );
+
+	# WEB-LANG-13. The index writes no prose of its own.
+	unlike( $body, qr{<p>|man\.openbsd\.org}, 'and no opening of its own' );
 
 	like( $body, qr{<h2 id="tool">Tool</h2>\n<dl>\n},
-		'a heading carries the anchor' );
+		'a heading carries the name as its anchor, and its heading' );
 	my $entry = qq{<dt><a href="./tool.1.html">tool(1)</a></dt>\n}
 	    . "<dd>the tool</dd>\n";
 	like( $body, qr/\Q$entry\E/,
@@ -270,7 +274,7 @@ subtest 'a page name reaches the href escaped' => sub {
 	    App::FuguWeb::Config->load( root => $root, error => \my $reason );
 	ok( $config, 'the description loads' ) or diag $reason;
 
-	my $body = App::FuguWeb::Index->new( config => $config )->body;
+	my $body = App::FuguWeb::Index->new( config => $config )->body('Manuals');
 	like( $body, qr/href="\.\/od&quot;d\.1\.html"/,
 		'the quote is escaped in the attribute' );
 	unlike( $body, qr/href="\.\/od"d/, 'and the attribute is not broken' );
@@ -287,7 +291,7 @@ subtest 'a description is escaped' => sub {
 	    App::FuguWeb::Config->load( root => $root, error => \my $reason );
 	ok( $config, 'the description loads' ) or diag $reason;
 
-	my $body = App::FuguWeb::Index->new( config => $config )->body;
+	my $body = App::FuguWeb::Index->new( config => $config )->body('Manuals');
 	like( $body, qr{<dd>a &amp; b &lt; c</dd>}, 'the entities' );
 };
 
@@ -300,14 +304,14 @@ page "manuals.html" {
 	index = yes
 }
 
-manuals "Empty" {
-	dir    = web
-	anchor = empty
+manuals empty {
+	heading = Empty
+	dir     = web
 }
 RC
 	ok( $config, 'the description loads' ) or diag $reason;
 
-	my $body = App::FuguWeb::Index->new( config => $config )->body;
+	my $body = App::FuguWeb::Index->new( config => $config )->body('Manuals');
 	unlike( $body, qr/Empty/, 'no heading and no list' );
 	like( $body, qr/<h1>Manuals<\/h1>/,
 		'the opening still has the title' );
@@ -320,14 +324,14 @@ subtest 'two manuals may not become the same page' => sub {
 	my $root = build_root( <<'RC' );
 site = Example
 
-manuals "One" {
-	dir    = man/tool
-	anchor = one
+manuals one {
+	heading = One
+	dir     = man/tool
 }
 
-manuals "Two" {
-	dir    = man/copy
-	anchor = two
+manuals two {
+	heading = Two
+	dir     = man/copy
 }
 RC
 	make_path("$root/man/copy");
@@ -347,41 +351,179 @@ subtest 'a group whose directory is absent fails the load' => sub {
 	my ( $config, $reason ) = load( <<'RC' );
 site = Example
 
-manuals "Gone" {
-	dir    = man/gone
-	anchor = gone
+manuals gone {
+	heading = Gone
+	dir     = man/gone
 }
 RC
 	is( $config, undef, 'the load fails' );
-	like( $reason, qr{manuals "Gone" names man/gone},
+	like( $reason, qr{manuals "gone" names man/gone},
 		'the message names the block and the directory' );
-
-	( $config, $reason ) = load( <<'RC' );
-site = Example
-
-modules "No anchor" {
-	dir = lib/Thing
-}
-RC
-	is( $config, undef, 'a group with no anchor fails the load' );
-	like( $reason, qr{has no anchor}, 'the message says which' );
 };
 
-subtest 'a project fragment replaces the opening' => sub {
-	my $root = build_root($RC);
-	open my $fh, '>', "$root/web/manuals.body.html"
-	    or die "Cannot write the fragment: $!";
-	print {$fh} "<h1>The manuals</h1>\n\n<p>Read them.</p>\n\n";
+subtest 'the body of the page opens the index' => sub {
+	# WEB-MANUALS-8. The heading comes from the title, then the
+	# body of the page as it stands, then the groups.
+	my ( $config, $reason ) = load($RC);
+	ok( $config, 'the description loads' ) or diag $reason;
+
+	my $body = App::FuguWeb::Index->new( config => $config )
+	    ->body( 'Manuals', "<p>Read them.</p>\n" );
+	like( $body, qr{^<h1>Manuals</h1>\n\n<p>Read them\.</p>\n\n<h2 id="tool">},
+		'the heading, the body, and then the groups' );
+
+	$body = App::FuguWeb::Index->new( config => $config )
+	    ->body( 'Tags < & >', undef );
+	like( $body, qr{^<h1>Tags &lt; &amp; &gt;</h1>\n\n<h2 },
+		'the title is escaped, and no body adds nothing' );
+};
+
+subtest 'a group block takes a name and a heading' => sub {
+	# WEB-MANUALS-7. The block of an older description named its
+	# heading and set an anchor. Each failure names the block to
+	# write in its place.
+	my %case = (
+		'an anchor' => [
+			qq{manuals "Commands" {\n\tdir = man/tool\n\tanchor = commands\n}\n},
+qr/manuals "Commands" sets anchor, and a group takes its anchor from the block name: write manuals commands with heading = Commands, and no anchor/
+		],
+		'an anchor beside a heading' => [
+			qq{modules things {\n\theading = Thing modules\n\tdir = lib/Thing\n\tanchor = thing\n}\n},
+qr/modules "things" sets anchor, and a group takes its anchor from the block name: write modules thing with heading = Thing modules, and no anchor\z/
+		],
+		'an anchor outside the shape of a group name' => [
+			qq{manuals library {\n\theading = Library\n\tdir = man/lib\n\tanchor = Lib_X\n}\n},
+qr/manuals "library" sets anchor, and a group takes its anchor from the block name: write manuals lib-x with heading = Library, and no anchor; a group name is one word of lowercase letters, digits and hyphens\z/
+		],
+		'a heading as the name' => [
+			qq{manuals "Every section" {\n\tdir = man/all\n}\n},
+qr/manuals "Every section" has no group name: a group name is one word of lowercase letters, digits and hyphens, and it is the anchor of the heading; write manuals every-section with heading = Every section/
+		],
+		'no heading' => [
+			qq{modules thing {\n\tdir = lib/Thing\n}\n},
+			qr/modules "thing" has no heading/
+		],
+		'one name for two groups' => [
+			qq{manuals tool {\n\theading = Tool\n\tdir = man/tool\n}\n}
+			    . qq{modules tool {\n\theading = Modules\n\tdir = lib/Thing\n}\n},
+qr/manuals "tool" and modules "tool" share one name, and a group name is the anchor of one heading/
+		],
+	);
+
+	for my $name ( sort keys %case ) {
+		my ( $block, $expected ) = @{ $case{$name} };
+		my ( $config, $reason ) = load( "site = Example\n\n" . $block );
+		is( $config, undef, "$name fails the load" );
+		like( $reason, $expected, "and the message says what to write" );
+	}
+
+	my ( $config, $reason ) =
+	    load( qq{site = Example\n\nmanuals tool-2 {\n\theading = Tool\n}\n} );
+	unlike( $reason // '', qr/group name/,
+		'a name of letters, digits and a hyphen is a group name' );
+
+	( $config, $reason ) = load(
+		qq{site = Example\n\nmanuals lib-x {\n\theading = Library\n\tdir = man/lib\n}\n}
+	);
+	ok( $config, 'the block that the message names for Lib_X loads' )
+	    or diag $reason;
+};
+
+# The description of the shared sources in two languages. The tool
+# group of de takes a heading and a dir, and the library group takes
+# a heading alone.
+my $DE = $RC . <<'RC';
+
+manuals de tool {
+	heading = Werkzeug
+	dir     = man/de/tool
+}
+
+manuals de library {
+	heading = Bibliothek
+}
+RC
+
+subtest 'a group takes the heading and the sources of a language' => sub {
+	my $root = build_root($DE);
+	make_path("$root/man/de/tool");
+	open my $fh, '>', "$root/man/de/tool/tool.1"
+	    or die "Cannot write the translation: $!";
+	print {$fh} ".Sh NAME\n.Nd das Werkzeug\n";
 	close $fh;
 
 	my $config =
 	    App::FuguWeb::Config->load( root => $root, error => \my $reason );
 	ok( $config, 'the description loads' ) or diag $reason;
 
-	my $body = App::FuguWeb::Index->new( config => $config )->body;
-	like( $body, qr{^<h1>The manuals</h1>\n}, 'the fragment opens' );
-	unlike( $body, qr/These pages come from/, 'and replaces the prose' );
-	like( $body, qr{<h2 id="tool">Tool</h2>}, 'the groups still follow' );
+	my ($tool) = grep { $_->name eq 'tool' } $config->groups;
+	is( $tool->heading,       'Tool',     'the default heading' );
+	is( $tool->heading('de'), 'Werkzeug', 'the heading of de' );
+
+	# WEB-LANG-5. The namesake comes from the dir of de, and each
+	# other manual from the default dir.
+	my @de = $tool->manuals('de');
+	is_deeply( [ map { $_->page } @de ], [ map { $_->page } $tool->manuals ],
+		'each language holds the same pages' );
+	is_deeply( [ map { $_->lang } @de ], [qw(de en en)],
+		'and the language of each source' );
+	is( $de[0]->path, "$root/man/de/tool/tool.1", 'the source of de' );
+
+	# WEB-LANG-6. A part of the default source carries lang="en"
+	# on its own element, and a part of de carries no marker.
+	my $body = App::FuguWeb::Index->new( config => $config, lang => 'de' )
+	    ->body('Handbuch');
+	like( $body, qr{^<h1>Handbuch</h1>\n}, 'the title of de' );
+	like( $body, qr{<h2 id="tool">Werkzeug</h2>},
+		'the index of de takes the heading of de, and the same anchor' );
+	like( $body, qr{<dd>das Werkzeug</dd>},
+		'and the description of the source of de' );
+	like( $body, qr{<dd lang="en">the configuration</dd>},
+		'and the default description of a manual with no namesake' );
+	like( $body, qr{<h2 id="library">Bibliothek</h2>},
+		'a translation with no dir changes the heading alone' );
+	like( $body, qr{<h2 id="thing" lang="en">Thing modules</h2>},
+		'and a group with no translation keeps its own' );
+
+	# A title and an opening of the default source carry the marker
+	# as well. The caller names the language of each.
+	$body = App::FuguWeb::Index->new( config => $config, lang => 'de' )
+	    ->body( 'Manuals', "<p>Read them.</p>\n",
+		title_lang => 'en', body_lang => 'en' );
+	like( $body,
+		qr{^<h1 lang="en">Manuals</h1>\n\n<div lang="en">\n<p>Read them\.</p>\n</div>\n\n<h2 id="tool">},
+		'a title and an opening of en, each in its own element' );
+
+	$body = App::FuguWeb::Index->new( config => $config )->body('Manuals');
+	like( $body, qr{<h2 id="tool">Tool</h2>}, 'the index of en stays' );
+	like( $body, qr{<dd>the tool</dd>}, 'with its own description' );
+	unlike( $body, qr/ lang=/, 'and carries no marker' );
+};
+
+subtest 'a translation of a group keeps the rules of a group' => sub {
+	my ( $config, $reason ) = load($DE);
+	is( $config, undef, 'a translation dir that is absent fails' );
+	like( $reason, qr{manuals de "tool" names man/de/tool, which is not a directory},
+		'and names the translation' );
+
+	( $config, $reason ) = load( $RC . <<'RC' );
+
+manuals de tool {
+	heading = ""
+}
+RC
+	is( $config, undef, 'an empty heading fails' );
+	like( $reason, qr{manuals de "tool" has no heading}, 'and says which' );
+
+	( $config, $reason ) = load( $RC . <<'RC' );
+
+modules de thing {
+	dir = ../elsewhere
+}
+RC
+	is( $config, undef, 'a dir that leaves the project fails' );
+	like( $reason, qr{modules de "thing" dir is \.\./elsewhere, which leaves the project},
+		'and says which' );
 };
 
 done_testing();

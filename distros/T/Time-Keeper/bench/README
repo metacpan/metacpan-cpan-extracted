@@ -1,0 +1,20 @@
+Benchmarks: Time::Keeper against Time::Piece and DateTime.
+
+From the dist's top, after `perl Makefile.PL && make`, with Time::Keeper::Zone
+built beside it (or installed) and DateTime installed:
+
+    perl -Mblib bench/run.pl           # every mark
+    perl -Mblib bench/06-strftime.pl   # one
+
+Each line says PASS or FAIL, our rate, theirs, how many times faster, and the
+mark set in plan_time_keeper/13-benchmarks-and-gate.md before any number was
+seen. A rate is calls a second over a fixed wall-clock time, the best of five.
+
+    TK_BENCH_SECONDS   seconds a run (0.5)
+    TK_BENCH_RUNS      runs, the best kept (5)
+    TK_BENCH_LOADS     fresh processes for the load time (41)
+    TK_BENCH_VALUES    values for bytes per value (200000)
+    TK_ZONE_DIST       where Time-Keeper-Zone is built (../Time-Keeper-Zone)
+    TK_BENCH_LIB       directories searched last, for modules not installed
+
+DateTime::Format::ISO8601 and Devel::Size are used where installed.

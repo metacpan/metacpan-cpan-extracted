@@ -16,7 +16,7 @@ use URI::PackageURL       ();
 use URI::PackageURL::Type ();
 use URI::PackageURL::Util qw(purl_types);
 
-our $VERSION = '2.25';
+our $VERSION = '2.26';
 
 sub cli_error {
     my ($error) = @_;
@@ -27,6 +27,9 @@ sub cli_error {
 sub run {
 
     my ($class, @args) = @_;
+
+    # UTF-8 encoded command line arguments
+    utf8::decode($_) for @args;
 
     my %options = (format => 'json');
 
@@ -253,11 +256,11 @@ sub _purl_list {
 
     my @types = purl_types();
 
-    my $pattern = "%15s | %10s | %10s | %10s | %10s | %s";
+    my $pattern = "%20s | %10s | %10s | %10s | %10s | %s";
 
     say sprintf $pattern, 'TYPE', 'NAMESPACE', 'NAME', 'VERSION', 'SUBPATH', 'QUALIFIERS';
 
-    say sprintf "%s-|-%s-|-%s-|-%s-|-%s-|-%s", '-' x 15, '-' x 10, '-' x 10, '-' x 10, '-' x 10, '-' x 10;
+    say sprintf "%s-|-%s-|-%s-|-%s-|-%s-|-%s", '-' x 20, '-' x 10, '-' x 10, '-' x 10, '-' x 10, '-' x 10;
 
     for my $type (@types) {
 

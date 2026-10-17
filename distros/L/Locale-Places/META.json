@@ -4,7 +4,7 @@
       "Nigel Horne <njh@nigelhorne.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150011",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
    "license" : [
       "open_source"
    ],
@@ -31,6 +31,7 @@
       "configure" : {
          "requires" : {
             "Config" : "0",
+            "ExtUtils::MakeMaker" : "6.64",
             "File::Which" : "0",
             "LWP::Simple" : "0",
             "Try::Tiny" : "0"
@@ -45,14 +46,13 @@
             "DBI" : "0",
             "Database::Abstraction" : "0.04",
             "Error::Simple" : "0",
-            "ExtUtils::MakeMaker" : "6.64",
             "File::Spec" : "0",
             "File::pfopen" : "0",
             "I18N::LangTags::Detect" : "0",
             "Module::Info" : "0",
-            "Object::Configure" : "0.12",
-            "Params::Get" : "0.13",
-            "Params::Validate::Strict" : "0.13",
+            "Object::Configure" : "0.24",
+            "Params::Get" : "0.17",
+            "Params::Validate::Strict" : "0.41",
             "Scalar::Util" : "0",
             "Text::CSV" : "0",
             "Text::xSV::Slurp" : "0",
@@ -63,6 +63,7 @@
          "requires" : {
             "Test::Carp" : "0",
             "Test::DescribeMe" : "0",
+            "Test::Log::Abstraction" : "0",
             "Test::Most" : "0",
             "Test::Needs" : "0",
             "Test::RequiresInternet" : "0",
@@ -85,6 +86,6 @@
          "x_repository" : "https://github.com/nigelhorne/Locale-Places"
       }
    },
-   "version" : "0.16",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "0.17",
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

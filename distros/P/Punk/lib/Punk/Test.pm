@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.59';
+our $VERSION = '0.60';
 
 use Test::Builder ();
 use Scalar::Util ();
@@ -1131,7 +1131,10 @@ Loading this module sets C<PUNK_ENV> to C<test> when it is not already set.
 That is the environment in which a C<500> says what the handler died with;
 in production the body is a fixed message and the detail goes to the log,
 where an assertion cannot read it. Set C<PUNK_ENV> yourself, before loading,
-to test an application as it runs anywhere else.
+to test an application as it runs anywhere else. Load this module before the
+application class: the keywords that read the environment (the config
+layers, a static mount's cache) read it when the class loads, and a class
+loaded first boots as production.
 
 The application is compiled once, at C<new> - which means a test is also
 a boot test.

@@ -195,6 +195,8 @@ static SV *pk_origin_of(pTHX_ SV *c, int *state) {
             if (portl == 0 || portl > 5) valid = 0;
             for (i = 0; valid && i < portl; i++)
                 if (!isDIGIT(port[i])) valid = 0;
+            /* five digits still has to be a port */
+            if (valid && portl == 5 && memcmp(port, "65535", 5) > 0) valid = 0;
         }
         /* a second ':' would have ended up inside the port and failed */
 

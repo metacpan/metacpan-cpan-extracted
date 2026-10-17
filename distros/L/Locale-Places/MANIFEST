@@ -22,7 +22,6 @@ t/error.t
 t/fuzz.t
 t/gb.t
 t/kwalitee.t
-t/lib/MyLogger.pm
 t/manifest.t
 t/minimum.t
 t/no404s.t

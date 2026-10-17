@@ -1,0 +1,578 @@
+#!/usr/bin/env perl
+use 5.014;
+use strict;
+use warnings;
+
+# cldrcompile - compile CLDR's Gregorian calendar data, zone names and
+# locale names for every locale into what Time::Keeper ships:
+#
+#   share/locales.tkd               one archive, a section per locale, read on demand
+#   include/tk/tk_locale_en.h       English's section as bytes, compiled in
+#   include/tk/tk_locale_table.h    the codes, aliases, names, and the zone and
+#                                   metazone tables every locale shares
+#
+#   tools/cldrcompile --cldr DIR --tzdata tzdata.tar.gz --cldr-version 48.2.3
+#
+# DIR holds the unpacked cldr-json packages cldr-core, cldr-dates-full,
+# cldr-localenames-full, cldr-numbers-full and cldr-bcp47. cldr-json's data
+# is already resolved (each locale has what it inherits); a section is
+# written as its differences from its parent only to keep the file small.
+#
+# Author side only: the three outputs are committed to the dist.
+#
+# The archive: "TKD1", the number of sections, a stamp the build checks,
+# the CLDR version in 16 bytes, 4 spare, then each section's offset and
+# length, then the sections. A section holds only what differs from its CLDR
+# parent (fr-CA from fr), which is read first; one with no parent holds all.
+# All integers are little-endian u16, strings are offsets into the pool at
+# its end; a string offset 0xFFFF means "the parent's", 0xFFFE "none":
+#
+#   "TKL2" parent nfixed nskel nzone nmeta nterr nrule first_day min_days hc24 ascii
+#   fixed[nfixed]                      the slots of tk_locale_strings, in order
+#   skel[nskel]   key pattern          sorted by key; no pattern removes the parent's
+#   zone[nzone]   index s[7]           index into tk_cldr_zones; sorted
+#   meta[nmeta]   index s[6]           index into tk_metazones; sorted
+#   terr[nterr]   index name           index into tk_territories; sorted
+#   rule[nrule]   period from before   minutes; from == before is "at"; nrule
+#                                      0xFFFF is the parent's rules
+#   pool
+
+use Getopt::Long;
+use JSON::PP;
+use File::Temp qw(tempdir);
+
+my %opt = (out => '.');
+GetOptions(\%opt, 'cldr=s', 'tzdata=s', 'cldr-version=s', 'out=s') or die "bad options\n";
+for (qw(cldr tzdata cldr-version)) { die "--$_ is required\n" unless $opt{$_} }
+my $C = $opt{cldr};
+
+my $json = JSON::PP->new->utf8;
+sub slurp { my ($f) = @_; open my $fh, '<:raw', $f or die "$f: $!\n"; local $/; scalar <$fh> }
+sub jfile { $json->decode(slurp($_[0])) }
+sub jmaybe { -e $_[0] ? jfile($_[0]) : {} }
+
+my $supp = "$C/cldr-core/supplemental";
+my @full     = @{ jfile("$C/cldr-core/availableLocales.json")->{availableLocales}{full} };
+my @default  = @{ jfile("$C/cldr-core/defaultContent.json")->{defaultContent} };
+my $likely   = jfile("$supp/likelySubtags.json")->{supplemental}{likelySubtags};
+my $week     = jfile("$supp/weekData.json")->{supplemental}{weekData};
+my $rulesets = jfile("$supp/dayPeriods.json")->{supplemental}{dayPeriodRuleSet};
+my $mzdata   = jfile("$supp/metaZones.json")->{supplemental}{metaZones};
+my $numsys   = jfile("$supp/numberingSystems.json")->{supplemental}{numberingSystems};
+my $aliases  = jfile("$supp/aliases.json")->{supplemental}{metadata}{alias}{languageAlias};
+my $primary  = jfile("$supp/primaryZones.json")->{supplemental}{primaryZones};
+my $bcp47    = jfile("$C/cldr-bcp47/bcp47/timezone.json")->{keyword}{u}{tz};
+my $parents  = jfile("$supp/parentLocales.json")->{supplemental}{parentLocales}{parentLocale};
+
+my %full = map { $_ => 1 } @full;
+
+# ---- the codes ------------------------------------------------------------
+# Every locale cldr-json has, and every default-content code (fr-FR is fr's
+# data under its own name), as DateTime::Locale lists them. English is id 0.
+
+my %blob_of;
+my @codes = ('en', sort grep { $_ ne 'en' } @full);
+for my $d (@default) {
+    next if $full{$d};
+    my $parent = $d;
+    $parent =~ s/-[^-]+\z// while $parent =~ /-/ && !$full{$parent};
+    die "default content $d: no parent among the locales\n" unless $full{$parent} && $parent ne $d;
+    $blob_of{$d} = $parent;
+}
+push @codes, sort keys %blob_of;
+my %code_id;
+$code_id{ $codes[$_] } = $_ for 0 .. $#codes;
+
+# ---- zones -----------------------------------------------------------------
+# IANA names (any that Zone may hand back) to CLDR's canonical name, its
+# short BCP 47 id and its country.
+
+my (%cldr_of, %short_of, %iana_of);
+for my $k (sort keys %$bcp47) {
+    next if $k =~ /^_/;
+    my $e = $bcp47->{$k};
+    next unless ref $e && $e->{_alias};
+    my @names = split ' ', $e->{_alias};
+    for my $n (@names, ($e->{_iana} // ())) {
+        $cldr_of{$n} //= $names[0];
+    }
+    $short_of{ $names[0] } = $k;
+    $iana_of{ $names[0] } = $e->{_iana} // $names[0];
+}
+
+my $tmp = tempdir(CLEANUP => 1);
+system('tar', 'xzf', $opt{tzdata}, '-C', $tmp, 'zone.tab') == 0 or die "tar: zone.tab\n";
+my (%zone_country, %zones_in);
+open my $zt, '<', "$tmp/zone.tab" or die "zone.tab: $!\n";
+while (<$zt>) {
+    next if /^#/;
+    chomp;
+    my ($cc, undef, $tz) = split /\t/;
+    next unless $tz;
+    my $key = $cldr_of{$tz} // $tz;
+    $zone_country{$key} = $cc;
+    $zones_in{$cc}++;
+}
+close $zt;
+my %primary_zone = map { ($cldr_of{ $primary->{$_} } // $primary->{$_}) => $_ } keys %$primary;
+
+# Metazones over time: CLDR name to [metazone, from, to].
+sub utc_of {
+    my ($s) = @_;
+    return undef unless defined $s;
+    my ($y, $m, $d, $H, $M) = $s =~ /^(\d+)-(\d+)-(\d+) (\d+):(\d+)\z/ or die "metazone date '$s'\n";
+    my $yy = $y - ($m <= 2);
+    my $era = int(($yy >= 0 ? $yy : $yy - 399) / 400);
+    my $yoe = $yy - $era * 400;
+    my $doy = int((153 * ($m + ($m > 2 ? -3 : 9)) + 2) / 5) + $d - 1;
+    my $doe = $yoe * 365 + int($yoe / 4) - int($yoe / 100) + $doy;
+    return (($era * 146097 + $doe - 719468) * 86400) + $H * 3600 + $M * 60;
+}
+my (%mz_periods, %mz_seen);
+my $walk;
+$walk = sub {
+    my ($h, $path) = @_;
+    if (ref $h eq 'ARRAY') {
+        for my $u (@$h) {
+            my $m = $u->{usesMetazone} or next;
+            push @{ $mz_periods{$path} }, [ $m->{_mzone}, utc_of($m->{_from}), utc_of($m->{_to}) ];
+            $mz_seen{ $m->{_mzone} } = 1;
+        }
+        return;
+    }
+    $walk->($h->{$_}, $path eq '' ? $_ : "$path/$_") for sort keys %$h;
+};
+$walk->($mzdata->{metazoneInfo}{timezone}, '');
+
+my @cldr_zones = do {
+    my %k = map { $_ => 1 } values %cldr_of, keys %mz_periods, keys %zone_country;
+    sort keys %k;
+};
+my %cldr_zone_id;
+$cldr_zone_id{ $cldr_zones[$_] } = $_ for 0 .. $#cldr_zones;
+my @metazones = sort keys %mz_seen;
+my %mz_id;
+$mz_id{ $metazones[$_] } = $_ for 0 .. $#metazones;
+my @territories = do { my %t = map { $_ => 1 } values %zone_country; sort keys %t };
+my %terr_id;
+$terr_id{ $territories[$_] } = $_ for 0 .. $#territories;
+
+# ---- one locale's section -------------------------------------------------
+
+my @ctx = ('format', 'stand-alone');
+my @wid = ('wide', 'abbreviated', 'narrow');
+my @days = qw(mon tue wed thu fri sat sun);
+my @periods = qw(am pm midnight noon morning1 morning2 afternoon1 afternoon2 evening1 evening2 night1 night2);
+my %period_no = map { $periods[$_] => $_ } 0 .. $#periods;
+my @zone_formats = qw(hourFormat gmtFormat gmtZeroFormat regionFormat regionFormat-type-daylight
+                      regionFormat-type-standard fallbackFormat);
+my %dayno = (mon => 1, tue => 2, wed => 3, thu => 4, fri => 5, sat => 6, sun => 7);
+my $NONE = 0xFFFFFFFF;
+
+sub territory_of {
+    my ($code) = @_;
+    my @t = split /-/, $code;
+    for (@t[1 .. $#t]) { return $_ if /^(?:[A-Z]{2}|\d{3})\z/ }
+    my $l = $likely->{$code} // $likely->{ $t[0] } // $likely->{und};
+    my ($r) = grep { /^(?:[A-Z]{2}|\d{3})\z/ } split /-/, $l;
+    return $r // '001';
+}
+
+sub rules_for {
+    my ($code) = @_;
+    my @t = split /-/, $code;
+    while (@t) {
+        my $k = join '-', @t;
+        return $rulesets->{$k} if $rulesets->{$k};
+        pop @t;
+    }
+    return undef;
+}
+
+sub minutes { my ($s) = @_; my ($h, $m) = split /:/, $s; $h * 60 + $m }
+
+sub record {
+    my ($code) = @_;
+    state %memo;
+    return $memo{$code} if $memo{$code};
+    my $g = jfile("$C/cldr-dates-full/main/$code/ca-gregorian.json")->{main}{$code}{dates}{calendars}{gregorian}
+        or die "$code: no Gregorian calendar\n";
+    my $tzn = jfile("$C/cldr-dates-full/main/$code/timeZoneNames.json")->{main}{$code}{dates}{timeZoneNames};
+    my $num = jfile("$C/cldr-numbers-full/main/$code/numbers.json")->{main}{$code}{numbers};
+    my $terr_names = jmaybe("$C/cldr-localenames-full/main/$code/territories.json")
+        ->{main}{$code}{localeDisplayNames}{territories};
+    my $need = sub { my ($v, $what) = @_; die "$code: no $what\n" unless defined $v; $v };
+    my %r;
+
+    my @fixed;
+    for my $what (['months', [1 .. 12], \@wid], ['days', \@days, [@wid, 'short']], ['quarters', [1 .. 4], \@wid]) {
+        my ($key, $order, $widths) = @$what;
+        for my $c (@ctx) {
+            for my $w (@$widths) {
+                my $set = $need->($g->{$key}{$c}{$w}, "$key $c $w");
+                push @fixed, map { $need->($set->{$_}, "$key $c $w $_") } @$order;
+            }
+        }
+    }
+    my %era_key = (wide => 'eraNames', abbreviated => 'eraAbbr', narrow => 'eraNarrow');
+    for my $w (@wid) {
+        my $e = $need->($g->{eras}{ $era_key{$w} }, "eras $w");
+        push @fixed, $need->($e->{0}, 'era 0'), $need->($e->{1}, 'era 1');
+    }
+    for my $w (@wid) {
+        my $d = $need->($g->{dayPeriods}{format}{$w}, "dayPeriods $w");
+        push @fixed, map { $_ < 2 ? $need->($d->{ $periods[$_] }, $periods[$_]) : $d->{ $periods[$_] } } 0 .. $#periods;
+    }
+    for my $k (qw(dateFormats timeFormats dateTimeFormats)) {
+        for my $len (qw(full long medium short)) {
+            my $v = $g->{$k}{$len};
+            $v = $v->{_value} // $v->{standard} if ref $v;
+            push @fixed, $need->($v, "$k $len");
+        }
+    }
+    push @fixed, map { $need->($tzn->{$_}, $_) } @zone_formats;
+    my $ns = $num->{defaultNumberingSystem} // 'latn';
+    my @d = split //, $need->($numsys->{$ns}{_digits}, "the digits of $ns");
+    die "$code: $ns has ", scalar(@d), " digits\n" unless @d == 10;
+    push @fixed, @d;
+    $r{fixed} = \@fixed;
+
+    my $avail = $need->($g->{dateTimeFormats}{availableFormats}, 'availableFormats');
+    $r{skel} = { map { $_ => $avail->{$_} } grep { !ref $avail->{$_} } keys %$avail };
+
+    my %zones;
+    my $zw;
+    $zw = sub {
+        my ($h, $path) = @_;
+        if (exists $h->{exemplarCity} || exists $h->{long} || exists $h->{short} || exists $h->{_type}) {
+            my $id = $cldr_zone_id{$path};
+            return unless defined $id;
+            my @s = map { my $len = $_; map { $h->{$len}{$_} } qw(generic standard daylight) } qw(long short);
+            (my $city = (split m{/}, $path)[-1]) =~ tr/_/ /;
+            my $ex = $h->{exemplarCity};
+            $ex = undef if defined $ex && $ex eq $city;
+            return unless defined $ex || grep { defined } @s;
+            $zones{$id} = [ @s, $ex ];
+            return;
+        }
+        for my $k (sort keys %$h) {
+            next unless ref $h->{$k} eq 'HASH';
+            $zw->($h->{$k}, $path eq '' ? $k : "$path/$k");
+        }
+    };
+    $zw->($tzn->{zone} // {}, '');
+    $r{zone} = \%zones;
+
+    my %metas;
+    for my $m (keys %{ $tzn->{metazone} // {} }) {
+        my $id = $mz_id{$m};
+        next unless defined $id;
+        my $h = $tzn->{metazone}{$m};
+        my @s = map { my $len = $_; map { $h->{$len}{$_} } qw(generic standard daylight) } qw(long short);
+        $metas{$id} = \@s if grep { defined } @s;
+    }
+    $r{meta} = \%metas;
+    $r{terr} = { map { $terr_id{$_} => $terr_names->{$_} } grep { defined $terr_names->{$_} } @territories };
+
+    my @rules;
+    if (my $rs = rules_for($code)) {
+        for my $p (sort keys %$rs) {
+            next unless exists $period_no{$p};
+            my $x = $rs->{$p};
+            push @rules, defined $x->{_at}
+                ? [ $period_no{$p}, minutes($x->{_at}), minutes($x->{_at}) ]
+                : [ $period_no{$p}, minutes($x->{_from}), minutes($x->{_before}) ];
+        }
+        @rules = sort { $a->[1] <=> $b->[1] || $a->[0] <=> $b->[0] } @rules;
+    }
+    $r{rules} = \@rules;
+
+    my $territory = territory_of($code);
+    my $first = $week->{firstDay}{$territory} // $week->{firstDay}{'001'};
+    my $min = $week->{minDays}{$territory} // $week->{minDays}{'001'};
+    my $short_time = $g->{timeFormats}{short};
+    $short_time = $short_time->{_value} if ref $short_time;
+    (my $letters = $short_time) =~ s/'[^']*'//g;
+    $r{head} = [ $dayno{$first}, $min, ($letters =~ /[Hk]/ ? 1 : 0), ($ns eq 'latn' ? 1 : 0) ];
+    return $memo{$code} = \%r;
+}
+
+# The locale whose data a locale's section is written against, or undef.
+sub parent_of {
+    my ($code) = @_;
+    my $p = $parents->{$code};
+    unless ($p) {
+        return undef unless $code =~ /-/;
+        ($p = $code) =~ s/-[^-]+\z//;
+    }
+    return $full{$p} && $p ne 'root' ? $p : undef;
+}
+
+sub same { my ($x, $y) = @_; (defined $x ? $x : "\x{FFFF}") eq (defined $y ? $y : "\x{FFFF}") }
+sub same_list { my ($x, $y) = @_; return 0 unless $y && @$x == @$y; same($x->[$_], $y->[$_]) || return 0 for 0 .. $#$x; 1 }
+
+sub section {
+    my ($code) = @_;
+    my $r = record($code);
+    my $pc = parent_of($code);
+    my $p = $pc ? record($pc) : undef;
+    my (@pool, %at);
+    my $pool_len = 0;
+    my $str = sub {
+        my ($s) = @_;
+        return 0xFFFE unless defined $s;
+        my $b = $s;
+        utf8::encode($b);
+        unless (exists $at{$b}) {
+            push @pool, $b . "\0";
+            $at{$b} = $pool_len;
+            $pool_len += length($b) + 1;
+        }
+        die "$code: the pool is over 64 KB\n" if $at{$b} >= 0xFFFE;
+        return $at{$b};
+    };
+    my @fixed = map { $p && same($r->{fixed}[$_], $p->{fixed}[$_]) ? 0xFFFF : $str->($r->{fixed}[$_]) } 0 .. $#{ $r->{fixed} };
+    my (@skel, @zones, @metas, @terrs);
+    for my $k (sort keys %{ { %{ $r->{skel} }, $p ? %{ $p->{skel} } : () } }) {
+        next if $p && same($r->{skel}{$k}, $p->{skel}{$k});
+        push @skel, [ $str->($k), $str->($r->{skel}{$k}) ];
+    }
+    for my $w ([ zone => \@zones, 7 ], [ meta => \@metas, 6 ]) {
+        my ($what, $list, $n) = @$w;
+        for my $k (sort { $a <=> $b } keys %{ { %{ $r->{$what} }, $p ? %{ $p->{$what} } : () } }) {
+            my $mine = $r->{$what}{$k} // [ (undef) x $n ];
+            next if $p && same_list($mine, $p->{$what}{$k} // [ (undef) x $n ]);
+            push @$list, [ $k, map { $str->($_) } @$mine ];
+        }
+    }
+    for my $k (sort { $a <=> $b } keys %{ { %{ $r->{terr} }, $p ? %{ $p->{terr} } : () } }) {
+        next if $p && same($r->{terr}{$k}, $p->{terr}{$k});
+        push @terrs, [ $k, $str->($r->{terr}{$k}) ];
+    }
+    my $inherit_rules = $p && join(',', map { @$_ } @{ $r->{rules} }) eq join(',', map { @$_ } @{ $p->{rules} });
+    my @rules = $inherit_rules ? () : @{ $r->{rules} };
+    my @head = (($pc ? $code_id{$pc} : 0xFFFF), scalar(@fixed), scalar(@skel), scalar(@zones), scalar(@metas),
+                scalar(@terrs), ($inherit_rules ? 0xFFFF : scalar(@rules)), @{ $r->{head} });
+    return 'TKL2' . pack('v*', @head, @fixed, map({ @$_ } @skel, @zones, @metas, @terrs, @rules)) . join('', @pool);
+}
+
+# ---- names ----------------------------------------------------------------
+# A locale's name in a locale, as CLDR's display pattern makes it: the
+# language, then the script, territory and variants in brackets.
+
+sub display_name {
+    my ($code, $in) = @_;
+    my $dir = "$C/cldr-localenames-full/main/$in";
+    state %cache;
+    my $n = $cache{$in} //= {
+        map { $_ => (jmaybe("$dir/$_.json")->{main}{$in}{localeDisplayNames} // {}) }
+            qw(languages scripts territories variants localeDisplayNames)
+    };
+    my $pat = $n->{localeDisplayNames}{localeDisplayPattern} // { localePattern => "{0} ({1})", localeSeparator => "{0}, {1}" };
+    my @t = split /-/, $code;
+    my $lang = $n->{languages}{languages}{ $t[0] } // $t[0];
+    my @rest;
+    for my $s (@t[1 .. $#t]) {
+        if ($s =~ /^[A-Z][a-z]{3}\z/) { push @rest, $n->{scripts}{scripts}{$s} // $s }
+        elsif ($s =~ /^(?:[A-Z]{2}|\d{3})\z/) { push @rest, $n->{territories}{territories}{$s} // $s }
+        else { push @rest, $n->{variants}{variants}{ uc $s } // $s }
+    }
+    return $lang unless @rest;
+    my $inner = shift @rest;
+    for (@rest) { (my $j = $pat->{localeSeparator}) =~ s/\{0\}/$inner/; $j =~ s/\{1\}/$_/; $inner = $j }
+    (my $out = $pat->{localePattern}) =~ s/\{0\}/$lang/;
+    $out =~ s/\{1\}/$inner/;
+    return $out;
+}
+
+# A code's subtags, and the name of each in a locale (undef where none).
+sub parts {
+    my ($code, $in) = @_;
+    my $dir = "$C/cldr-localenames-full/main/$in";
+    state %pc;
+    my $nm = $pc{$in} //= {
+        map { $_ => (jmaybe("$dir/$_.json")->{main}{$in}{localeDisplayNames} // {}) } qw(languages scripts territories variants)
+    };
+    my @t = split /-/, $code;
+    my ($lang, $script, $terr, @var) = (shift @t);
+    for (@t) {
+        if (/^[A-Z][a-z]{3}\z/) { $script = $_ }
+        elsif (/^(?:[A-Z]{2}|\d{3})\z/) { $terr = $_ }
+        else { push @var, $_ }
+    }
+    my $var = @var ? join('-', @var) : undef;
+    return ($lang, $script, $terr, $var,
+            $nm->{languages}{languages}{$lang} // $lang,
+            defined $script ? $nm->{scripts}{scripts}{$script} // $script : undef,
+            defined $terr ? $nm->{territories}{territories}{$terr} // $terr : undef,
+            defined $var ? $nm->{variants}{variants}{ uc $var } // $var : undef);
+}
+
+# ---- write ----------------------------------------------------------------
+
+sub c_str {
+    my ($s) = @_;
+    return 'NULL' unless defined $s;
+    my $bytes = $s;
+    utf8::encode($bytes);
+    $bytes =~ s/([\\"])/\\$1/g;
+    $bytes =~ s/([^\x20-\x7e])/sprintf '\\%03o', ord $1/ge;
+    $bytes =~ s/\?\?/?\\?/g;
+    return qq{"$bytes"};
+}
+
+sub fnv { my $h = 0x811c9dc5; for (unpack 'C*', $_[0]) { $h ^= $_; $h = ($h * 0x01000193) & 0xFFFFFFFF } $h }
+
+my (@blobs, %blob_no, @blob_index);
+for my $code (@codes) {
+    my $src = $blob_of{$code} // $code;
+    unless (exists $blob_no{$src}) {
+        my $b = section($src);
+        $blob_no{$src} = scalar @blobs;
+        push @blobs, $b;
+    }
+    push @blob_index, $blob_no{$src};
+}
+
+my $index_len = 32 + 8 * @blobs;
+my ($at, $index, $body) = ($index_len, '', '');
+for my $b (@blobs) {
+    $index .= pack 'VV', $at, length $b;
+    $at += length $b;
+    $body .= $b;
+}
+my $stamp = fnv($index . $body);
+my $vers = $opt{'cldr-version'};
+die "the CLDR version is too long\n" if length $vers > 15;
+my $archive = 'TKD1' . pack('VV', scalar(@blobs), $stamp) . pack('a16', $vers) . pack('V', 0) . $index . $body;
+
+mkdir "$opt{out}/share";
+open my $out, '>:raw', "$opt{out}/share/locales.tkd" or die "locales.tkd: $!\n";
+print $out $archive;
+close $out;
+
+my @h;
+my $p = sub { push @h, join('', @_) };
+$p->('/* Generated by tools/cldrcompile from CLDR ', $vers, '. Do not edit: regenerate. */');
+$p->('');
+$p->('#ifndef TK_LOCALE_EN_H');
+$p->('#define TK_LOCALE_EN_H');
+$p->('');
+$p->('static const unsigned char tk_locale_en_blob[] = {');
+my @bytes = unpack 'C*', $blobs[0];
+while (my @row = splice @bytes, 0, 16) { $p->('    ', join(', ', @row), ',') }
+$p->('};');
+$p->('');
+$p->('#endif');
+open $out, '>', "$opt{out}/include/tk/tk_locale_en.h" or die "tk_locale_en.h: $!\n";
+print $out "$_\n" for @h;
+close $out;
+
+@h = ();
+$p->('/* Generated by tools/cldrcompile from CLDR ', $vers, '. Do not edit: regenerate. */');
+$p->('');
+$p->('#ifndef TK_LOCALE_TABLE_H');
+$p->('#define TK_LOCALE_TABLE_H');
+$p->('');
+$p->('#define TK_CLDR_VERSION ', c_str($vers));
+$p->('#define TK_LOCALE_STAMP 0x', sprintf('%08x', $stamp), 'u');
+$p->('#define TK_LOCALE_BLOBS ', scalar @blobs);
+$p->('#define TK_LOCALE_COUNT ', scalar @codes);
+$p->('#define TK_LOCALE_REAL ', scalar @full, '   /* the first ones; the rest are default content */');
+$p->('');
+$p->('/* id, blob, English name, own name, then the subtags and their names in English and in itself; English is 0 */');
+$p->('static const tk_locale_code tk_locale_codes[TK_LOCALE_COUNT] = {');
+for my $i (0 .. $#codes) {
+    my $c = $codes[$i];
+    my $own = $full{$c} ? $c : $blob_of{$c};
+    my @en = parts($c, 'en');
+    my @me = parts($c, $own);
+    $p->('    { ', c_str($c), ', ', $blob_index[$i], ', ', c_str(display_name($c, 'en')), ', ',
+         c_str(display_name($c, $own)), ', { ', join(', ', map { c_str($_) } @en[0 .. 3], @en[4 .. 7], @me[4 .. 7]), ' } },');
+}
+$p->('};');
+$p->('');
+
+my %lookup;
+for my $i (0 .. $#codes) { $lookup{ lc $codes[$i] } = $i }
+for my $from (sort keys %$aliases) {
+    my $a = $aliases->{$from} or next;
+    my $to = $a->{_replacement} // next;
+    next if $from =~ /[^a-z0-9-]/i || $from =~ /^und/;
+    next if exists $lookup{ lc $from };
+    my $id = $code_id{$to};
+    $lookup{ lc $from } = $id if defined $id;
+}
+$p->('/* lower-case code or alias to id, sorted */');
+$p->('static const tk_locale_alias tk_locale_lookup[] = {');
+$p->('    { ', c_str($_), ', ', $lookup{$_}, ' },') for sort keys %lookup;
+$p->('};');
+$p->('#define TK_LOCALE_LOOKUP ', scalar keys %lookup);
+$p->('');
+
+$p->('static const char *const tk_territories[] = {');
+$p->('    ', join(', ', map { c_str($_) } @territories));
+$p->('};');
+$p->('');
+$p->('static const char *const tk_metazones[] = {');
+$p->('    ', c_str($_), ',') for @metazones;
+$p->('};');
+$p->('');
+my %golden = map { $_->{mapZone}{_other} => $_->{mapZone}{_type} } grep { ($_->{mapZone}{_territory} // '') eq '001' } @{ $mzdata->{metazones} };
+$p->('/* the golden zone of each metazone, its zone in territory 001: into tk_cldr_zones */');
+$p->('static const int16_t tk_metazone_golden[] = {');
+$p->('    ', join(', ', map { my $g = $golden{$_}; defined $g && defined $cldr_zone_id{ $cldr_of{$g} // $g } ? $cldr_zone_id{ $cldr_of{$g} // $g } : -1 } @metazones));
+$p->('};');
+$p->('');
+my (@periods_out);
+$p->('/* CLDR zone, IANA name, BCP 47 short id, territory (-1 none), the only or primary zone, metazones */');
+$p->('static const tk_cldr_zone tk_cldr_zones[] = {');
+for my $z (@cldr_zones) {
+    my $first = scalar @periods_out;
+    push @periods_out, @{ $mz_periods{$z} // [] };
+    my $cc = $zone_country{$z};
+    my $only = defined $cc && ($zones_in{$cc} == 1 || ($primary_zone{$z} // '') eq $cc) ? 1 : 0;
+    $p->('    { ', c_str($z), ', ', c_str($iana_of{$z} // $z), ', ', c_str($short_of{$z} // 'unk'), ', ', (defined $cc ? $terr_id{$cc} : -1), ', ',
+         $only, ', ', $first, ', ', scalar(@{ $mz_periods{$z} // [] }), ' },');
+}
+$p->('};');
+$p->('#define TK_CLDR_ZONES ', scalar @cldr_zones);
+$p->('');
+$p->('static const tk_mz_period tk_mz_periods[] = {');
+for (@periods_out) {
+    my ($m, $f, $t) = @$_;
+    $p->('    { ', $mz_id{$m}, ', ', (defined $f ? "INT64_C($f)" : 'INT64_MIN'), ', ', (defined $t ? "INT64_C($t)" : 'INT64_MAX'), ' },');
+}
+$p->('    { 0, 0, 0 }') unless @periods_out;
+$p->('};');
+$p->('');
+$p->('/* IANA name (any Zone may give) to its CLDR zone, sorted */');
+$p->('static const tk_locale_alias tk_iana_zones[] = {');
+for my $n (sort keys %cldr_of) {
+    $p->('    { ', c_str($n), ', ', $cldr_zone_id{ $cldr_of{$n} }, ' },');
+}
+$p->('};');
+$p->('#define TK_IANA_ZONES ', scalar keys %cldr_of);
+$p->('');
+my %zeros;
+for my $s (values %$numsys) {
+    next unless ($s->{_type} // '') eq 'numeric';
+    my @d = split //, $s->{_digits};
+    next unless @d == 10;
+    next if grep { ord($d[$_]) != ord($d[0]) + $_ } 0 .. 9;
+    $zeros{ ord $d[0] } = 1 if ord $d[0] > 0x7f;
+}
+$p->('/* the zero of every decimal digit set CLDR knows, sorted */');
+$p->('static const uint32_t tk_digit_zeros[] = {');
+my @z = sort { $a <=> $b } keys %zeros;
+while (my @row = splice @z, 0, 8) { $p->('    ', join(', ', map { sprintf '0x%x', $_ } @row), ',') }
+$p->('};');
+$p->('#define TK_DIGIT_ZEROS ', scalar keys %zeros);
+$p->('');
+$p->('#endif');
+open $out, '>', "$opt{out}/include/tk/tk_locale_table.h" or die "tk_locale_table.h: $!\n";
+print $out "$_\n" for @h;
+close $out;
+
+printf "%d codes, %d sections, archive %d bytes, English %d bytes\n",
+    scalar @codes, scalar @blobs, length $archive, length $blobs[0];

@@ -1,5 +1,123 @@
 Revision history for Geo-Coder-Free
 
+0.47	Fri Oct 16 09:34:18 PM EDT 2026
+	[ Enhancements ]
+	- Added geocode_many(), the loop a batch caller writes around geocode() 
+	  It takes an arrayref of locations and answers with one entry
+	  per distinct value - the point it resolved to, or undef - plus lookups (how many values were
+	  looked up), resolved and unresolved (which add up to the number of distinct values) and
+	  unresolved_values (the values that produced nothing, in the order they were first seen, which
+	  is what a caller records as tried-and-failed instead of retrying them on every request).  A
+	  value repeated in the batch is one lookup, so a column holding the same handful of places
+	  thousands of times costs the handful; a value the module refuses before any backend is touched
+	  - a bare number, the empty string, undef, a reference - costs no lookup at all and is counted
+	  unresolved, so the count a caller caps its work by is the number of backends asked.  An undef
+	  is the empty string and shares its entry; region and on_error are handed to every lookup and
+	  mean there what they mean in geocode(), croak by default; and a backend exception is still an
+	  exception.  The four keys the answer carries besides the values are reserved, and a value
+	  spelled like one is refused by name rather than overwriting a count.  A batch of no values
+	  answers with counts of zero
+	- The token filter in _find_word_ngrams() asks the shared location rule what a bare number
+	  is instead of spelling the rule out again with its own regex.  The answer is the same for
+	  every token that can reach it - the text is trimmed and its whitespace collapsed before the
+	  split, so no empty token can arise - and the rule is now answered in one place (below)
+	- The databases Makefile.PL downloads are fetched with LWP::Simple again, and LWP::Simple::WithCache is
+	  no longer used to fetch them.  That module swaps in a caching user agent whose request($request,
+	  $file) answers a cache hit, or a 304, straight out of the cache and never writes $file, so
+	  getstore() answered 200 and left nothing behind: on any machine whose cache had been warmed by an
+	  earlier install no database was fetched at all, while perl Makefile.PL reported "Looks good" and
+	  make succeeded.  The failure arrived much later, as "gunzip: cities.csv.gz: No such file or
+	  directory" from createdatabase.PL and a failing t/locales.t, so an install that should have worked
+	  did not work rather than losing a feature.  HTTP::Cache::Transparent, which caches the file it is
+	  asked for, is still used when it is installed
+	- Makefile.PL checks the files it downloaded rather than the status codes: after wait_all_children()
+	  every destination is looked for in the parent, because a download that fails in a forked child dies
+	  with that child and the parent never saw it - which is how the missing databases went unnoticed.  A
+	  download that didn't arrive is named by URL and file and stops the build, under AUTOMATED_TESTING
+	  it is a warning instead, since a smoker cannot fix the network and the tests that need those files
+	  skip, and a build with NO_NETWORK_TESTING says that it is fetching nothing rather than doing it
+	  quietly
+	- createdatabase.PL no longer runs bin/create_sqlite when cities.csv.gz is absent.  db2sql gunzips
+	  that file, so without it the step could only print the gzip error and blame sqlite3 ("perhaps you
+	  don't have sqlite3 installed") for a file that was never downloaded; it now names the file that is
+	  missing and carries on, cities.sql being optional
+	[ Tests ]
+	- t/unit.t: the API ledger gains the geocode_many states (the map and the counts, the
+	  distinct-value reduction, the region pass-through, the default croak and its message, an undef
+	  cell, the reserved key, an empty batch, both calling conventions, the usage errors and a
+	  backend that dies), and a subtest drives them against a backend that is asked once per call and
+	  answers per location
+	- t/edge_cases.t: section 9d runs a 401-row column holding four distinct values to hold "one
+	  lookup per distinct value" to two backend calls rather than 397, and a column of nothing but
+	  unusable values to zero lookups at all - the backend is mocked to die if it is called for one
+	- t/location-rule.t: the location rule is written out in one file and no other.  It scans every
+	  module under lib/, every script under bin/ and every program under cgi-bin/ for the rule's
+	  question as source text - a negated digit class or an anchored all-digits test - and fails
+	  naming the file, the line, the sub and the spelling, so a renamed copy of _valid_location(),
+	  or the guard typed straight into a caller, is caught as well as a second copy of the sub.
+	  POD, comments and anything after __END__/__DATA__ are masked, since prose that describes the
+	  rule is not a copy of it, and regexes that merely resemble it (a postcode, a coordinate,
+	  /^\d/, /\d+=\d+/) are not reported.  The scan is run first on source whose answer is known,
+	  so it is shown to tell the rule from code that merely uses digits.  Sites that ask one of
+	  those questions about something that is not a location - the CGI test number, a cache
+	  configuration value - are listed with their reason, and an exemption that no longer names a
+	  site fails too, so the table cannot outlive the code it was written for
+	- t/vwf-sync.t says what the sync will do with each block of local code instead of only that it
+	  is not the master's.  A block is a run of consecutive local lines; each line is compared with
+	  the master's lines in the same passage on the words it holds (identifiers and numbers,
+	  punctuation and whitespace ignored), and a line sharing at least half its words with one of
+	  them is that line in an older revision, which the sync will replace - the master's revision is
+	  printed beside ours - while a line sharing that much with none of them is code the master has
+	  never had, which the sync will discard.  A line that could be either is reported as local code,
+	  the reading that sends the reader to look at their own code, and each file's report ends with
+	  the two totals.  The tracked files are unchanged and still fail the test; the difference is in
+	  the report, where Display.pm's local %blacklist hash now stands apart from the die() beside it
+	  (the master's croak() in an older revision) and Utils.pm's @EXPORT line is shown with the
+	  master's shorter list rather than as an addition of ours.  The comparison is run on source
+	  whose answer is known as well - a changed line beside an added subroutine, a reworded line, and
+	  a local line whose neighbour is an unrelated upstream change - so a report that has lost the
+	  distinction fails there first
+	- t/locales.t: the geographic subtests skip when the MaxMind databases are absent instead of failing.
+	  Those lookups need admin1.db and admin2.db, which Makefile.PL downloads, and a build that was never
+	  given them cannot answer the calls at all - the backend croaks "Can't find a file called 'admin1'"
+	  - so a machine with OPENADDR_HOME set and no downloaded data to go with it failed five subtests,
+	  and with them the install.  The skip names the files that are missing, as t/maxmind.t names the
+	  database it needs
+	- Added t/downloads.t: the fetch path in Makefile.PL is held to asking LWP::Simple, to waiting for the
+	  children that do the downloading and to looking for the file that arrived rather than at the status
+	  code, since a download that doesn't happen is invisible in the build and turns up later as a test
+	  failing for want of a database
+	- t/bin.t drives the CGI's index and meta_data pages, not just the query page, and checks what they
+	  render rather than only the coordinates the query page resolves.  The landing page is asked for the
+	  title and description its stub configuration gives it and for the form that starts a search; the
+	  status page for the site title it was configured with, the domain it was answered for and the
+	  figures it counts.  Those figures are the log the pages keep - one entry per visit, and a page
+	  records the visit it serves - so the test writes a log of its own making (CGI::Info::logdir()
+	  honours LOGDIR) and asserts the counts rendered from it, the four visitor types at two web visits,
+	  one mobile, three search engines and no robots, header row and all.  The domain is named
+	  (SERVER_NAME) rather than taken from the host, and the log the status page counts is written after
+	  the landing page has been served, since serving it is itself a visit.  Both pages render templates
+	  this distribution ships - the query page's own template is not one of them, query.txt ships empty,
+	  which is why its answer is only in the log - so their output is the page, and it is asserted as
+	  such.  bin/testcgibin gained tests 5 and 6 to drive them
+	- t/bin.t asserts the site's answer to a client it will not serve, and its answer to one it will.
+	  The same query is asked twice, from the same address and with the same everything else, by a
+	  client whose user agent Geo::Coder::Free::Allow blacklists (bin/testcgibin test 7) and by one
+	  whose agent is an ordinary browser's (test 8): the first is answered with a 403 and the
+	  plain-text block page and is not given the position, the second is served the position and gets
+	  no block page.  The refusal is read back out of the access log as well - the row the page
+	  writes for it carries the reason the user-agent blacklist gave ('zgrab is blacklisted'), which
+	  no other layer of the page's access control produces, plus the 403 and the address that was
+	  refused - so what is asserted is that layer refusing the client and not the account being
+	  written by something else in the stack.  The log every run writes is written into the test's
+	  own directory now (LOGDIR, for all the runs rather than only those that read it back) and the
+	  page's temporary directory is the test's too (TMPDIR), so the throttle that counts requests is
+	  this run's rather than one that carries the count over from the last, and no run leaves an
+	  access log or a throttle outside the temporary directory.  The file also points its diagnostics
+	  at STDOUT: Log::WarnDie, which the pages need installed, takes STDERR over, and a test's
+	  diagnostics go there by default, so before this every failure in t/bin.t was reported as a test
+	  name with no detail to say what the page had answered instead
+
 0.46	Thu Oct 15 09:06:24 PM EDT 2026
 	[ Enhancements ]
 	- Added valid_location(), which answers whether a string is a location at all: the rule geocode()
@@ -13,6 +131,22 @@ Revision history for Geo-Coder-Free
 	  still throws, because nothing is wrapped in an eval, and a call with neither a location nor a
 	  scantext is still a usage croak.  An on_error with any other value is refused by name rather than
 	  ignored, so a caller who misspells it does not ship a batch job that dies on its first bad row
+	- Geo::Coder::Free::Provenance reads the accuracy vocabulary from Geo::Location::Point instead of
+	  keeping a second copy of it.  The levels a backend reports and the levels a point accepts are now
+	  one list - Geo::Location::Point::ACCURACY_LEVELS(), re-exported as Provenance's ACCURACY_LEVELS -
+	  so a level added to one cannot go missing from the other, and the prerequisite is Geo::Location::Point
+	  0.18, which is the version that defines it.  t/accuracy-vocabulary.t asserts the two names are the
+	  same list, that a point accepts every level in it and refuses one outside it, and that every level
+	  _accuracy_for() can derive from the fields a backend matches on is one of them
+	[ Tests ]
+	- t/consumer-contract.t: the declaration now accounts for every accessor Geo::Location::Point
+	  documents, and the checker (Test-Consumer-Contract 0.02) fails when the value object gains an
+	  accessor that is in none of the declaration's lists.  geocoder, database, confidence and
+	  accuracy are named as accessors a consumer may read off a result, country, city and state as
+	  documented accessors only some results carry, and new, AUTOLOAD and ACCURACY_LEVELS as
+	  documented but not slots of one result.  The four provenance accessors and the three attribute
+	  accessors had been absent from the declaration since they were added to the value object, which
+	  is the drift the new direction of the check is for
 
 0.45	Thu Oct 15 01:23:24 PM EDT 2026
 	[ Enhancements ]

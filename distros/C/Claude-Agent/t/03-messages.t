@@ -43,16 +43,16 @@ is($assistant_msg->model, 'claude-sonnet-4-20250514', 'model correct');
 # Test text() helper
 is($assistant_msg->text, 'Hello there!', 'text() extracts text content');
 
-# Test content_blocks() helper - returns raw hashrefs
+# Test content_blocks() helper
 my @blocks = @{$assistant_msg->content_blocks};
 is(scalar @blocks, 2, 'content_blocks returns 2 blocks');
-is($blocks[0]->{type}, 'text', 'first block is text');
-is($blocks[1]->{type}, 'tool_use', 'second block is tool_use');
+is($blocks[0]->type, 'text', 'first block is text');
+is($blocks[1]->type, 'tool_use', 'second block is tool_use');
 
-# Test tool_uses() helper - returns raw hashrefs
+# Test tool_uses() helper
 my @tool_uses = @{$assistant_msg->tool_uses};
 is(scalar @tool_uses, 1, 'tool_uses returns 1 tool use');
-is($tool_uses[0]->{name}, 'Read', 'tool_use name correct');
+is($tool_uses[0]->name, 'Read', 'tool_use name correct');
 
 # Test SystemMessage
 my $system_msg = Claude::Agent::Message::System->new(

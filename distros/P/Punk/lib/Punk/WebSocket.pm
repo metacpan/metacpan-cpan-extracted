@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.59';
+our $VERSION = '0.60';
 
 1;
 
@@ -79,7 +79,8 @@ Frames are decoded in C to RFC 6455, strictly: unmasked client frames,
 fragmented or over-long control frames and reserved opcodes are protocol
 errors (close 1002), text payloads and close reasons must be valid UTF-8
 (1007), and a message over C<max_message_size> is refused from the frame
-header before it is buffered (1009).
+header before it is buffered (1009). A C<max_message_size> of zero means the
+default, 16MB; there is no setting that removes the bound.
 
 =head1 EVENTS
 
@@ -126,7 +127,9 @@ connection is closed with 1008).
 =head2 close($code = 1000, $reason = '')
 
 Start the closing handshake; the C<close> event fires when it completes
-or times out.
+or times out. The code must be one a peer may be sent (1000 to 1003, 1007
+to 1011, or 3000 to 4999); anything else croaks rather than go on the wire
+as whatever its low sixteen bits say.
 
 =head2 state / is_open / is_closing / is_closed
 

@@ -12,7 +12,7 @@ use overload '""' => 'to_string', fallback => 1;
 
 use URI::VersionRange::Version;
 
-our $VERSION = '2.25';
+our $VERSION = '2.26';
 
 our %COMPARATOR = (
     '='  => 'equal',
@@ -21,6 +21,8 @@ our %COMPARATOR = (
     '>'  => 'greater than',
     '>=' => 'greater than or equal',
 );
+
+my $PERCENT_ENCODE_REGEX = qr{[><=!*|% \x80-\xFF]};
 
 sub new {
 
@@ -41,7 +43,7 @@ sub from_string {
 
     my ($class, $string) = @_;
 
-    Carp::croak 'Empty version' unless $string;
+    Carp::croak 'Invalid constraint: empty version' unless defined $string && length $string;
 
     # - For each <version-constraint>:
     #   - Determine if the <version-constraint> starts with one of the two comparators:
@@ -55,14 +57,17 @@ sub from_string {
     #   - Tools should validate and report an error if the version is empty.
     #   - If the version contains a percent "%" character, apply URL quoting rules to unquote this string.
 
-    if ($string =~ /^(>=|<=|!=|<|>)(.*)/) {
+    if ($string =~ /^(>=|<=|!=|<|>|=)(.*)/) {
         my ($comparator, $version) = ($1, $2);
-        return $class->new(comparator => $comparator, version => $version);
+        $version =~ s/^\s+//;
+        Carp::croak 'Invalid constraint: empty version' unless length $version;
+        return $class->new(comparator => $comparator, version => _percent_decode($version));
     }
 
     return $class->new(comparator => '*') if ($string eq '*');
 
-    return $class->new(comparator => '=', version => $string);
+    $string =~ s/^\s+//;
+    return $class->new(comparator => '=', version => _percent_decode($string));
 
 }
 
@@ -72,15 +77,42 @@ sub to_string {
 
     return '*' if $self->comparator eq '*';
 
-    return $self->version if $self->comparator eq '=';
+    return _percent_encode($self->version) if $self->comparator eq '=';
 
-    return join '', $self->comparator, $self->version;
+    return join '', $self->comparator, _percent_encode($self->version);
 
 }
 
 sub to_human_string { sprintf '%s %s', $COMPARATOR{$_[0]->comparator}, $_[0]->version }
 
 sub TO_JSON { {version => $_[0]->version, comparator => $_[0]->comparator} }
+
+sub _percent_encode {
+
+    my $string = shift;
+    utf8::encode($string);
+    $string =~ s/($PERCENT_ENCODE_REGEX)/sprintf '%%%02X', ord $1/ge;
+    return $string;
+
+}
+
+sub _percent_decode {
+
+    my $string = shift;
+    return $string unless $string =~ /%/;
+
+    Carp::croak "Invalid percent-encoding in version '$string'" if $string =~ /%(?![0-9A-F]{2})/;
+
+    my $version = $string;
+    $version =~ s/%([0-9A-F]{2})/chr hex $1/ge;
+
+    Carp::croak "Invalid UTF-8 encoding in version '$string'" unless utf8::decode($version);
+    Carp::croak "Non-canonical percent-encoding in version '$string'" if _percent_encode($version) ne $string;
+
+    return $version;
+
+}
+
 
 1;
 
@@ -102,7 +134,7 @@ URI::VersionRange::Constraint - Version Constraint for Version Range Specificati
     comparator => '>',
     version    => '2.00'
   );
-  
+
   say $constraint; # >2.00
 
   # Parse "vers" string
@@ -153,13 +185,16 @@ Return the version string.
 
 =head3 B<to_string>
 
-    $vers->to_string
+    $constraint->to_string
 
-Stringify C<vers> components.
+Stringify C<constraint> components.
+
+The version is percent-encoded using the vers-spec canonical form (only
+C<< > >>, C<< < >>, C<=>, C<!>, C<*>, C<|>, C<%> and space characters are encoded).
 
 =head3 B<to_human_string>
 
-    $vers->to_human_string
+    $constraint->to_human_string
 
 Convert the constraint into human-readable format.
 
@@ -172,7 +207,7 @@ Convert the constraint into human-readable format.
 
 =head3 B<TO_JSON>
 
-    $vers->TO_JSON
+    $constraint->TO_JSON
 
 Helper method for JSON modules (L<JSON>, L<JSON::PP>, L<JSON::XS>, L<Mojo::JSON>, etc).
 
@@ -182,7 +217,7 @@ Helper method for JSON modules (L<JSON>, L<JSON::PP>, L<JSON::XS>, L<Mojo::JSON>
 
 =head3 B<from_string>
 
-    $vers = URI::VersionRange::Constraint->from_string($vers_string);
+    $constraint = URI::VersionRange::Constraint->from_string($constraint_string);
 
 Converts the given "constraint" string to L<URI::VersionRange::Constraint> object. Croaks on error.
 

@@ -39,6 +39,7 @@ t/modules-used.t
 t/multiple.t
 t/no404s.t
 t/noplan.t
+t/palette.t
 t/pie.t
 t/pod-cm.t
 t/pod-coverage.t

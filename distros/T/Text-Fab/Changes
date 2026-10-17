@@ -9,3 +9,16 @@ Revision history for Perl extension Text::Fab.
 
 	The implementation supports the most basic parts of processing pipeline only.  Only the pure-config__* subsystem is
 	covered by the test suite.
+
+0.02	Reworked with Gemini 3.8 Flash Medium (and one iteration with High) in a pure-chat in AI Studio; no system instructions.
+	The only target was to make the test suite to match the docs (and fix the implementation accordingly).
+	Only the updates to the docs checked by a human.
+	The model claims that all the APIs (except Control Flow, Loops, Caching, Root Directives) are implemented and covered by
+	the test suite.
+
+0.03	Continue reworking with Gemini 3.8 Flash Medium in a pure-chat in AI Studio; no system instructions.
+	Restore the original comments in the code.  Add new comments likewise.
+	Fix a mismatch of the semantic of preserved blinding lists with what is written in the docs.
+	Fix the scalar set/append with multiple arguments (only one allowed), allow string "offset" for hashes.
+	Implement priority-based group__postpone; support insertion of undo actions from undo actions.
+	Even if errors happen, all the postponed actions are performed.

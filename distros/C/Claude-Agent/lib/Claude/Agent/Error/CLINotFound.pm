@@ -4,7 +4,18 @@ use 5.020;
 use strict;
 use warnings;
 
-use Marlin -base => 'Claude::Agent::Error';
+use Object::Proto ();
+use Claude::Agent::Error;
+
+BEGIN {
+    Object::Proto::define('Claude::Agent::Error::CLINotFound',
+        extends => 'Claude::Agent::Error',
+    );
+}
+
+1;
+
+__END__
 
 =head1 NAME
 
@@ -13,6 +24,13 @@ Claude::Agent::Error::CLINotFound - CLI not found exception
 =head1 DESCRIPTION
 
 Thrown when the Claude CLI executable cannot be found.
+Stringifies as C<CLINotFound: message>.
+
+=head1 ATTRIBUTES
+
+=head2 message
+
+The error description. Required.
 
 =head1 AUTHOR
 
@@ -25,5 +43,3 @@ This software is Copyright (c) 2026 by LNATION.
 This is free software, licensed under The Artistic License 2.0 (GPL Compatible).
 
 =cut
-
-1;

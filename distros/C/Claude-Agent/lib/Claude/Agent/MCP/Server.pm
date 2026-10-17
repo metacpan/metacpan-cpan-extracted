@@ -4,16 +4,59 @@ use 5.020;
 use strict;
 use warnings;
 
-use Types::Common -types;
-use Marlin
-    'name!'    => Str,
-    'tools'    => sub { [] },
-    'version'  => sub { '1.0.0' },
-    'type'     => sub { 'sdk' };
+use Object::Proto ();
+
+BEGIN {
+    Object::Proto::define('Claude::Agent::MCP::Server',
+        'name:Str:required',
+        'tools:ArrayRef:default([])',
+        q{version:Str:default('1.0.0')},
+        'type:Str:readonly:default(sdk)',
+    );
+}
+
+sub to_hash {
+    my ($self) = @_;
+    return {
+        type    => $self->type,
+        name    => $self->name,
+        version => $self->version,
+        tools   => [ map { $_->to_hash } @{$self->tools} ],
+    };
+}
+
+sub to_cli_config {
+    my ($self) = @_;
+    return {
+        type => 'sdk',
+        name => $self->name,
+    };
+}
+
+sub get_tool {
+    my ($self, $tool_name) = @_;
+
+    return unless defined $tool_name && length $tool_name;
+
+    for my $tool (@{$self->tools}) {
+        return $tool if $tool->name eq $tool_name;
+    }
+
+    return;
+}
+
+sub tool_names {
+    my ($self) = @_;
+    return [ map { 'mcp__' . $self->name . '__' . $_->name } @{$self->tools} ];
+}
+
+1;
+
+__END__
 
 =head1 NAME
 
-Claude::Agent::MCP::Server - SDK MCP server configuration
+Claude::Agent::MCP::Server - An MCP server that runs inside your process
 
 =head1 SYNOPSIS
 
@@ -49,89 +92,64 @@ Claude::Agent::MCP::Server - SDK MCP server configuration
         version => '1.0.0',
     );
 
-    # Tools are named: mcp__math__calculate
-
 =head1 DESCRIPTION
 
-Defines an SDK MCP server that runs tool handlers locally in your Perl process.
+A set of L<Claude::Agent::MCP::ToolDefinition> objects served to the CLI
+over the SDK control channel: the CLI sends each MCP request as a
+C<mcp_message> control request and L<Claude::Agent::MCP::SDKBridge>
+answers it in this process. Nothing is spawned. The tools are named
+C<mcp__E<lt>nameE<gt>__E<lt>toolE<gt>>; list them in C<allowed_tools> or
+they will prompt for permission.
 
-When you pass an SDK server to C<mcp_servers> in the options, the SDK:
+=head1 ATTRIBUTES
 
-1. Creates a Unix socket to communicate with child processes
-2. Spawns a lightweight MCP server process (SDKRunner)
-3. Passes the runner to the CLI as a stdio MCP server
-4. When the CLI calls a tool, the runner forwards it via the socket
-5. Your handler executes and the result flows back
+=head2 name
 
-This allows your tools to access your application's state, databases,
-and APIs while being fully integrated with Claude's tool system.
+The server's name. Required.
 
-=head2 ATTRIBUTES
+=head2 tools
 
-=over 4
+ArrayRef of L<Claude::Agent::MCP::ToolDefinition>.
 
-=item * name - Server name (used in tool naming: mcp__<name>__<tool>)
+=head2 version
 
-=item * tools - ArrayRef of L<Claude::Agent::MCP::ToolDefinition> objects
+Reported to the CLI in the MCP handshake. Default C<1.0.0>.
 
-=item * version - Server version (default: '1.0.0')
+=head2 type
 
-=item * type - Always 'sdk' for SDK servers
+Always C<sdk>. Read only.
 
-=back
+=head1 METHODS
 
-=head2 METHODS
+=head2 new
 
-=head3 to_hash
+Takes a flat list of name/value pairs. Unknown names are ignored.
 
-    my $hash = $server->to_hash();
+=head2 to_hash
 
-Convert the server configuration to a hash for JSON serialization.
+    my $hash = $server->to_hash;
 
-=cut
+C<{ type, name, version, tools }> with each tool's C<to_hash>.
 
-sub to_hash {
-    my ($self) = @_;
-    return {
-        type    => $self->type,
-        name    => $self->name,
-        version => $self->version,
-        tools   => [ map { $_->to_hash } @{$self->tools} ],
-    };
-}
+=head2 to_cli_config
 
-=head3 get_tool
+    my $config = $server->to_cli_config;
+
+C<{ type =E<gt> 'sdk', name =E<gt> $name }>: the entry written to
+C<--mcp-config>, which tells the CLI to route the server's requests back
+over the control channel.
+
+=head2 get_tool
 
     my $tool = $server->get_tool($tool_name);
 
-Get a tool definition by name.
+The tool with that (unprefixed) name, or undef.
 
-=cut
+=head2 tool_names
 
-sub get_tool {
-    my ($self, $tool_name) = @_;
+    my $names = $server->tool_names;
 
-    return unless defined $tool_name && length $tool_name;
-
-    for my $tool (@{$self->tools}) {
-        return $tool if $tool->name eq $tool_name;
-    }
-
-    return;
-}
-
-=head3 tool_names
-
-    my $names = $server->tool_names();
-
-Get the full MCP tool names for all tools in this server.
-
-=cut
-
-sub tool_names {
-    my ($self) = @_;
-    return [ map { 'mcp__' . $self->name . '__' . $_->name } @{$self->tools} ];
-}
+ArrayRef of the full C<mcp__server__tool> names.
 
 =head1 AUTHOR
 
@@ -144,5 +162,3 @@ This software is Copyright (c) 2026 by LNATION.
 This is free software, licensed under The Artistic License 2.0 (GPL Compatible).
 
 =cut
-
-1;

@@ -1483,6 +1483,39 @@ _submit_trailer_xs(self, stream_id, headers_av)
     OUTPUT:
         RETVAL
 
+# Submit a HEADERS block on a stream: a 1xx informational response, or
+# headers that end the stream when end_stream is true.
+int
+_submit_headers_xs(self, stream_id, headers_av, end_stream)
+        SV *self
+        int stream_id
+        AV *headers_av
+        int end_stream
+    PREINIT:
+        nghttp2_perl_session *ps;
+        nghttp2_nv *nva;
+        size_t nvlen;
+        int rv;
+    CODE:
+        ps = (nghttp2_perl_session *)SvIV(SvRV(self));
+        SESSION_ALIVE_OR_CROAK(ps);
+        nva = perl_headers_to_nva(aTHX_ headers_av, &nvlen);
+
+        rv = nghttp2_submit_headers(ps->session,
+            end_stream ? NGHTTP2_FLAG_END_STREAM : NGHTTP2_FLAG_NONE,
+            stream_id, NULL, nva, nvlen, NULL);
+
+        if (nva) {
+            Safefree(nva);
+        }
+
+        if (rv < 0) {
+            croak("nghttp2_submit_headers failed: %s", nghttp2_strerror(rv));
+        }
+        RETVAL = rv;
+    OUTPUT:
+        RETVAL
+
 # Resume data on a stream (after NGHTTP2_ERR_DEFERRED)
 int
 resume_data(self, stream_id)

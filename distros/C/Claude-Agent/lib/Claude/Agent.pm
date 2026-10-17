@@ -13,17 +13,88 @@ use Claude::Agent::Message;
 use Claude::Agent::Content;
 use Claude::Agent::Error;
 
+our $VERSION = '0.14';
+
+sub query {
+    my (%args) = @_;
+
+    my $prompt = $args{prompt};
+    Claude::Agent::Error->throw(
+        message => "query() requires a 'prompt' argument"
+    ) unless defined $prompt && length $prompt;
+
+    my $options = _options($args{options});
+
+    return Claude::Agent::Query->new(
+        prompt  => $prompt,
+        options => $options,
+        ($args{loop} ? (loop => $args{loop}) : ()),
+    );
+}
+
+sub tool {
+    my ($name, $description, $input_schema, $handler) = @_;
+
+    Claude::Agent::Error->throw(
+        message => "tool() requires a name argument"
+    ) unless defined $name && length $name;
+
+    Claude::Agent::Error->throw(
+        message => "tool() requires a description argument"
+    ) unless defined $description;
+
+    Claude::Agent::Error->throw(
+        message => "tool() requires an input_schema hashref"
+    ) unless ref $input_schema eq 'HASH';
+
+    Claude::Agent::Error->throw(
+        message => "tool() requires a handler coderef"
+    ) unless ref $handler eq 'CODE';
+
+    require Claude::Agent::MCP;
+    return Claude::Agent::MCP::ToolDefinition->new(
+        name         => $name,
+        description  => $description,
+        input_schema => $input_schema,
+        handler      => $handler,
+    );
+}
+
+sub create_sdk_mcp_server {
+    my (%args) = @_;
+
+    require Claude::Agent::MCP;
+    return Claude::Agent::MCP::Server->new(%args);
+}
+
+sub session {
+    my (%args) = @_;
+    require Claude::Agent::Client;
+    $args{options} = _options($args{options});
+    return Claude::Agent::Client->new(%args);
+}
+
+sub _options {
+    my ($options) = @_;
+    return Claude::Agent::Options->new unless defined $options;
+    return Claude::Agent::Options->create(%$options) if ref $options eq 'HASH';
+    return $options;
+}
+
+
+1;
+
+__END__
+
 =head1 NAME
 
 Claude::Agent - Perl SDK for the Claude Agent SDK
 
 =head1 VERSION
 
-Version 0.13
+Version 0.14
 
 =cut
-
-our $VERSION = '0.13';
 
 =head1 SYNOPSIS
 
@@ -82,25 +153,31 @@ Claude::Agent is a Perl SDK for the Claude Agent SDK, providing programmatic
 access to Claude's agentic capabilities. It allows you to build AI agents
 that can read files, run commands, search the web, edit code, and more.
 
-The SDK communicates with the Claude CLI and provides:
+The SDK runs the Claude Code CLI as a child process and speaks its SDK
+control protocol over stream-json, the same way the official Python and
+TypeScript SDKs do. It provides:
 
 =over 4
 
 =item * Streaming message iteration (blocking and async)
 
-=item * Tool permission management
+=item * Tool permission callbacks, asked by the CLI before a tool runs
 
-=item * Hook system for intercepting tool calls
+=item * Hooks on every CLI event, run by the CLI through your callbacks
 
-=item * MCP (Model Context Protocol) server integration
+=item * MCP server integration, with SDK servers served from your process
 
-=item * Subagent support for parallel task execution
+=item * Subagent definitions
 
-=item * Session management (resume, fork)
+=item * Multi-turn sessions on one CLI process, with resume and fork
 
-=item * Structured output support
+=item * Structured output, streaming partial messages, model and
+permission mode changes mid-session
 
 =back
+
+It needs Claude Code 2.1 or later; see L<Claude::Agent::Query> for the
+protocol and L<Claude::Agent::Options> for every option.
 
 =head1 EXPORTED FUNCTIONS
 
@@ -120,7 +197,7 @@ Creates a new query and returns an iterator for streaming messages.
 
 =item * prompt - The prompt string to send to Claude
 
-=item * options - A L<Claude::Agent::Options> object (optional)
+=item * options - A L<Claude::Agent::Options> object (optional), or a hashref of options, which is checked for unknown names
 
 =item * loop - An L<IO::Async::Loop> object (optional, for async integration)
 
@@ -134,23 +211,6 @@ B<Note:> For proper async behavior, pass your application's IO::Async::Loop.
 This allows multiple queries to share the same event loop.
 
 =cut
-
-sub query {
-    my (%args) = @_;
-
-    my $prompt = $args{prompt};
-    Claude::Agent::Error->throw(
-        message => "query() requires a 'prompt' argument"
-    ) unless defined $prompt && length $prompt;
-
-    my $options = $args{options} // Claude::Agent::Options->new();
-
-    return Claude::Agent::Query->new(
-        prompt  => $prompt,
-        options => $options,
-        ($args{loop} ? (loop => $args{loop}) : ()),
-    );
-}
 
 =head2 tool
 
@@ -231,34 +291,6 @@ A L<Claude::Agent::MCP::ToolDefinition> object.
 
 =cut
 
-sub tool {
-    my ($name, $description, $input_schema, $handler) = @_;
-
-    Claude::Agent::Error->throw(
-        message => "tool() requires a name argument"
-    ) unless defined $name && length $name;
-
-    Claude::Agent::Error->throw(
-        message => "tool() requires a description argument"
-    ) unless defined $description;
-
-    Claude::Agent::Error->throw(
-        message => "tool() requires an input_schema hashref"
-    ) unless ref $input_schema eq 'HASH';
-
-    Claude::Agent::Error->throw(
-        message => "tool() requires a handler coderef"
-    ) unless ref $handler eq 'CODE';
-
-    require Claude::Agent::MCP;
-    return Claude::Agent::MCP::ToolDefinition->new(
-        name         => $name,
-        description  => $description,
-        input_schema => $input_schema,
-        handler      => $handler,
-    );
-}
-
 =head2 create_sdk_mcp_server
 
     my $server = create_sdk_mcp_server(
@@ -298,25 +330,13 @@ A L<Claude::Agent::MCP::Server> object.
 
 =head3 How It Works
 
-The SDK creates a Unix socket and spawns a lightweight MCP server process.
-The CLI connects to this server via stdio. When a tool is called:
-
-1. CLI sends the tool request to the MCP server process
-2. MCP server forwards the request to your Perl process via the socket
-3. Your handler executes and returns a result
-4. Result flows back through the socket to the CLI
-
-This architecture allows your handlers to access your application's state,
-database connections, and other resources.
+The server runs inside your process. The CLI is told it is an C<sdk>
+server and sends every MCP request for it back over the SDK control
+channel; L<Claude::Agent::MCP::SDKBridge> answers from your handlers.
+Nothing is spawned, so a handler sees your application's state, database
+connections and other resources directly.
 
 =cut
-
-sub create_sdk_mcp_server {
-    my (%args) = @_;
-
-    require Claude::Agent::MCP;
-    return Claude::Agent::MCP::Server->new(%args);
-}
 
 =head2 session
 
@@ -357,7 +377,7 @@ sub create_sdk_mcp_server {
 
 =over 4
 
-=item * options - A L<Claude::Agent::Options> object (optional)
+=item * options - A L<Claude::Agent::Options> object (optional), or a hashref of options, which is checked for unknown names
 
 =item * loop - An L<IO::Async::Loop> object (optional, for async integration)
 
@@ -371,12 +391,6 @@ Methods: C<connect>, C<send>, C<receive> (blocking), C<receive_async>,
 C<session_id>, C<disconnect>.
 
 =cut
-
-sub session {
-    my (%args) = @_;
-    require Claude::Agent::Client;
-    return Claude::Agent::Client->new(%args);
-}
 
 =head1 MESSAGE TYPES
 
@@ -458,5 +472,3 @@ This is free software, licensed under:
   The Artistic License 2.0 (GPL Compatible)
 
 =cut
-
-1; # End of Claude::Agent

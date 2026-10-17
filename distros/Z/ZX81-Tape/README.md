@@ -4,9 +4,11 @@ ZX81::Tape - Create ZX81 tape image files
 
 # SYNOPSIS
 
-    use ZX81::Tape qw(make_p);
+    use ZX81::Tape qw(make_p dump_p list_p);
+
     make_p($basic_filename, $p_filename);
-        dump_p($p_filename[, $dump_filename]);
+    dump_p($p_filename[, $dump_filename]);
+    list_p($p_filename[, $bas_filename]);
 
 # DESCRIPTION
 
@@ -27,6 +29,13 @@ with the given file name.
 
 Reads the given binary tape image file and dumps its contents to the 
 standard output or a specified file with the given file name.
+
+## list\_p
+
+    list_p($p_filename[, $bas_filename]);
+
+Reads the given binary tape image file and generates a .bas text that 
+can be compiled back to the same .p result.
 
 # SEE ALSO
 

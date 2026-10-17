@@ -95,6 +95,12 @@ typedef struct pfc_entry {
                                       mtime's nanoseconds and its ctime */
     double    checked;             /* when st was taken                 */
     unsigned char exists;          /* 0 = a remembered absence          */
+    /* the validators for `st`, formatted once per stat rather than once
+     * per hit (an ETag is a snprintf, a Last-Modified a gmtime_r and
+     * another); hdr_ok says they belong to the st held now */
+    unsigned char hdr_ok;
+    char      hdr_etag[64];
+    char      hdr_date[40];
     uint32_t  klen;
     char     *key;
 } pfc_entry;
@@ -311,6 +317,8 @@ static int pfc_stat(pTHX_ const char *path, STRLEN plen, Stat_t *out) {
         pfc_drop_val(aTHX_ c, e);
     }
     e->checked = pfc_now();
+    /* a different stat means different validators */
+    if (!ok || !e->exists || !pfc_same(&fresh, &e->st)) e->hdr_ok = 0;
     e->exists  = ok ? 1 : 0;
     if (ok) { e->st = fresh; *out = fresh; }
     return ok;
@@ -404,9 +412,15 @@ static SV *pfc_get(pTHX_ const char *path, STRLEN plen,
     e->st.st_size  = (Off_t)size;
     e->vns    = ns;
     e->vctime = ctime;
-    e->val = SvREFCNT_inc(val);
+    /* The entry keeps the SV it read and the caller gets a copy, the same
+     * shape a hit returns. Handing back the entry's own SV let a middleware
+     * that edits the body in place edit the cache, and every later hit
+     * served the edit. Read-only, so a write through some other path croaks
+     * rather than corrupts. */
+    e->val = val;
+    SvREADONLY_on(val);
     c->bytes += (size_t)size;
-    return val;
+    return newSVsv(val);
 }
 
 /* Forget when this path was last statted, so the next pfc_stat asks the

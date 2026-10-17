@@ -1,5 +1,10 @@
 Revision history for Locale::Places
 
+0.17	Fri Oct 16 01:49:50 PM EDT 2026
+	Fixed testing with NO_NETWORK_TESTING
+	Use Test::Log::Abstraction
+	Bump minimum versions and fix t/carp.t failing with latest Params::Validate::Strict
+
 0.16	Tue Jan 27 20:22:41 EST 2026
 	Workaround for smokers that don't set AUTOMATED TESTING - GitHub#13
 	Use Object::Configure instead of Class::Debug

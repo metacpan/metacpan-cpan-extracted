@@ -3,7 +3,7 @@ package Database::BI::Controller::Dashboard;
 use strict;
 use warnings;
 
-our $VERSION = '0.012.1';
+our $VERSION = '0.013.0';
 
 use Mojo::Base 'Mojolicious::Controller', -strict, -signatures;
 
@@ -96,6 +96,14 @@ Readonly my %MESSAGES => (
 	error_topn_col              => 'Top-N column "%s" is not a measure alias in this view',
 	warn_calc_undef             => 'Calculated field "%s" returned undef for %d row(s)',
 	error_date_pattern          => 'Unsupported date format pattern "%s"; allowed: %%m/%%d/%%Y, %%d/%%m/%%Y, %%d-%%b-%%Y',
+	error_analysis_not_found    => 'Analysis "%s" not found',
+	error_analysis_invalid      => 'Invalid analysis spec: %s',
+	error_analysis_version      => 'Unsupported analysis version %s; please upgrade the application',
+	error_analysis_storage      => 'Analysis storage is not writable; use import/export instead',
+	error_analysis_json         => 'Invalid JSON body: %s',
+	error_analysis_id_invalid   => 'Invalid analysis id',
+	error_param_range           => "Parameter '%s' is out of range (min %s, max %s)",
+	error_param_type            => "Parameter '%s' must be a number",
 );
 
 # Maximum accepted upload body size.  Enforced both here (application layer)
@@ -1276,25 +1284,37 @@ sub _apply_date_normalization :Protected ($self, $records, $columns, $spec_key) 
 	}
 }
 
-# _apply_calc_fields($self, $records, \@columns) -> ($records, \@columns)
+# _apply_calc_fields($self, $records, \@columns, \%extra) -> ($records, \@columns)
 #
 # Reads ?c=<name>:<expression> params (those NOT matching a path:/table:/url:/redis:
 # source spec) and compiles each via Database::BI::Calc.  Evaluates per row,
 # appending the virtual column to each row hashref.  Croaks on compile error
 # (caller renders 400); runtime undef values are logged at warn level.
 # Later ?c= specs may reference names defined by earlier ones (evaluated in order).
-sub _apply_calc_fields :Protected ($self, $records, $columns) {
+#
+# Optional \%extra keys:
+#   params   => \%hash  -- named parameter values bound from the URL (?p.name=val)
+#                          passed to Calc->new so expressions may reference them.
+#   spec_key => $str    -- override the l= spec key used to look up stored calc
+#                          fields (canvas context where ?l= is absent).
+sub _apply_calc_fields :Protected ($self, $records, $columns, $extra = undef) {
+	my $bound_params     = ($extra // {})->{params}   // {};
+	my $spec_key_override = ($extra // {})->{spec_key};
+
 	# Normalise date columns before evaluating expressions so that date
 	# functions (YEAR, MONTH, etc.) see ISO-8601 values even when the source
 	# file uses a non-ISO format (e.g. M/D/YYYY).
-	$self->_apply_date_normalization($records, $columns, $self->param('l'));
+	my $date_spec = defined $spec_key_override
+		? $spec_key_override : ($self->param('l') // '');
+	$self->_apply_date_normalization($records, $columns, $date_spec);
 
 	# Build calc spec list: stored fields from models.json first (lower priority),
 	# then URL ?c= params (higher priority — they override stored fields of the
 	# same name so the user can test a new expression without permanently saving).
 	my (@calc_specs, %seen_calc);
 	{
-		my $sk = $self->param('l') // '';
+		my $sk = defined $spec_key_override
+			? $spec_key_override : ($self->param('l') // '');
 		if (length $sk) {
 			my $stored = ($self->_read_models)->{fields}{$sk} // {};
 			for my $n (sort keys %{$stored}) {
@@ -1322,7 +1342,11 @@ sub _apply_calc_fields :Protected ($self, $records, $columns) {
 		require Database::BI::Calc;
 		for my $cs (@calc_specs) {
 			my $name = $cs->{name};
-			my $calc = Database::BI::Calc->new(expr => $cs->{expr}, columns => \@cols);
+			my $calc = Database::BI::Calc->new(
+				expr    => $cs->{expr},
+				columns => \@cols,
+				params  => $bound_params,
+			);
 			croak $self->_i18n('error_calc_compile', $name, $calc->error)
 				if $calc->has_error;
 
@@ -1442,6 +1466,1166 @@ sub _write_models :Protected ($self, $models) {
 	return unless defined $path;
 	eval { Mojo::File->new($path)->spurt(encode_json($models)) };
 	$self->app->log->warn("Cannot write $path: $@") if $@;
+}
+
+# ---------------------------------------------------------------------------
+# Phase 3.1 -- Saved analyses
+# ---------------------------------------------------------------------------
+
+# _analyses_path($self) -> $path_string_or_undef
+#
+# Returns the path to model_dir/analyses.json (creating model_dir on first call),
+# or undef when the write must be skipped (data_dir safety guard, mkdir failure).
+sub _analyses_path :Protected ($self) {
+	my $app      = $self->app;
+	my $home     = $app->home;
+	my $cfg_dir  = $app->config('model_dir') // '.bi';
+	my $bi_dir   = Mojo::File->new($cfg_dir)->is_abs
+	                ? Mojo::File->new($cfg_dir)
+	                : $home->child($cfg_dir);
+	my $data_dir = $home->child($app->config('data_dir') // 'data');
+
+	my $bi_abs   = eval { $bi_dir->to_abs->to_string }   // $bi_dir->to_string;
+	my $data_abs = eval { $data_dir->to_abs->to_string } // $data_dir->to_string;
+	my $sep      = '/';
+	if ($bi_abs eq $data_abs || index($bi_abs, $data_abs . $sep) == 0) {
+		carp 'model_dir is inside data_dir; skipping analyses file write';
+		return undef;
+	}
+	unless (-d $bi_dir) {
+		mkdir $bi_dir->to_string
+			or do { $app->log->warn("Cannot create $bi_dir: $!"); return undef };
+	}
+	unless (-w $bi_dir) {
+		carp 'model_dir is not writable; analysis storage disabled';
+		return undef;
+	}
+	return $bi_dir->child('analyses.json')->to_string;
+}
+
+# _read_analyses($self) -> \%analyses  (keyed by id)
+sub _read_analyses :Protected ($self) {
+	my $path = $self->_analyses_path;
+	return {} unless defined $path && -f $path;
+	my $json = eval { Mojo::File->new($path)->slurp };
+	return {} unless $json && !$@;
+	my $data = eval { decode_json($json) };
+	return {} unless ref $data eq 'HASH';
+	return $data;
+}
+
+# _write_analyses($self, \%analyses) -- atomic write (temp + rename)
+sub _write_analyses :Protected ($self, $analyses) {
+	my $path = $self->_analyses_path;
+	return unless defined $path;
+	my $dir = Mojo::File->new($path)->dirname->to_string;
+	my ($fh, $tmpfile) = eval { tempfile(DIR => $dir, UNLINK => 0) };
+	if ($@ || !$fh) {
+		$self->app->log->warn("Cannot create temp file in $dir: " . ($@ // $!));
+		return;
+	}
+	my $ok = eval {
+		print {$fh} encode_json($analyses);
+		close $fh;
+		rename($tmpfile, $path);
+		1;
+	};
+	unless ($ok) {
+		$self->app->log->warn("Cannot write $path: $@");
+		unlink $tmpfile;
+	}
+}
+
+# _gen_analysis_id($self) -> $id_string
+#
+# Returns a 10-character URL-safe alphanumeric random ID.
+Readonly my $_ID_CHARS => 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
+sub _gen_analysis_id :Protected ($self) {
+	my $id = '';
+	$id .= substr($_ID_CHARS, int(rand(62)), 1) for 1..10;
+	return $id;
+}
+
+# The canvas is a 12-column CSS grid; a layout entry addresses cells in it.
+# Shared by _validate_layout and by the layout precompute in canvas_render.
+Readonly my $GRID_COLUMNS => 12;
+
+# How many grid rows one visual may span.  A row is at least 15rem tall (see
+# grid-auto-rows in templates/web/en/canvas.html.tt), so this is also a cap on
+# how tall a single visual can be made from the canvas.
+Readonly my $MAX_ROW_SPAN => 6;
+
+# _validate_layout($self, $layout_or_undef) -> $error_string_or_undef
+#
+# A layout entry is { visual, x, y, w, h } -- the grid position of one visual
+# on the canvas.  The canvas PATCHes these straight out of a drag, so they are
+# untrusted input like every other field: reject anything that is not a whole
+# number of columns or rows inside the grid, rather than store a position that
+# renders as "span 0" or runs off the right-hand edge.
+sub _validate_layout :Protected ($self, $layout) {
+	return undef unless defined $layout;
+	return 'layout must be an array' unless ref $layout eq 'ARRAY';
+
+	my $n = 0;
+	for my $lp (@$layout) {
+		$n++;
+		return "layout entry $n must be a hash" unless ref $lp eq 'HASH';
+		for my $f (qw( visual x y w h )) {
+			return "layout entry $n is missing $f" unless defined $lp->{$f};
+			return "layout entry $n: $f must be a whole number"
+				if ref $lp->{$f} || $lp->{$f} !~ /\A\d+\z/;
+		}
+		return "layout entry $n: x must be between 1 and $GRID_COLUMNS"
+			unless $lp->{x} >= 1 && $lp->{x} <= $GRID_COLUMNS;
+		return "layout entry $n: y must be at least 1"
+			unless $lp->{y} >= 1;
+		return "layout entry $n: w must be between 1 and $GRID_COLUMNS"
+			unless $lp->{w} >= 1 && $lp->{w} <= $GRID_COLUMNS;
+		return "layout entry $n: h must be between 1 and $MAX_ROW_SPAN"
+			unless $lp->{h} >= 1 && $lp->{h} <= $MAX_ROW_SPAN;
+		return "layout entry $n: x + w - 1 must not exceed $GRID_COLUMNS"
+			if $lp->{x} + $lp->{w} - 1 > $GRID_COLUMNS;
+	}
+
+	return undef;
+}
+
+# _validate_analysis($self, \%doc) -> $error_string_or_undef
+#
+# Structural validation of a saved-analysis document.  Called on create, on
+# replace and on import; analyses_patch validates the keys it is given instead,
+# so that a PATCH of one field cannot fail because of another field it never
+# read.
+sub _validate_analysis :Protected ($self, $doc) {
+	return 'Missing required field: name'
+		unless defined $doc->{name} && length $doc->{name};
+	return 'Missing required field: datasets'
+		unless ref $doc->{datasets} eq 'ARRAY' && @{ $doc->{datasets} };
+	for my $ds (@{ $doc->{datasets} }) {
+		return 'Each dataset entry must have a spec field'
+			unless defined $ds->{spec} && length $ds->{spec};
+		return qq{"$ds->{spec}" is not a valid spec (must start with table:, path:, url:, or redis:)}
+			unless $ds->{spec} =~ m{\A(?:table:|path:|url:|redis:)};
+	}
+	if (defined $doc->{version}) {
+		return sprintf($MESSAGES{error_analysis_version}, $doc->{version})
+			unless $doc->{version} =~ /\A\d+\z/ && $doc->{version} <= 1;
+	}
+	for my $key (qw( visuals joins measures combines bookmarks layout hierarchies )) {
+		if (defined $doc->{$key}) {
+			return "$key must be an array"
+				unless ref $doc->{$key} eq 'ARRAY';
+		}
+	}
+	my $lerr = $self->_validate_layout($doc->{layout});
+	return $lerr if $lerr;
+	if (defined $doc->{fields}) {
+		return 'fields must be a hash'
+			unless ref $doc->{fields} eq 'HASH';
+	}
+	if (defined $doc->{params}) {
+		return 'params must be a hash'
+			unless ref $doc->{params} eq 'HASH';
+	}
+	return undef;
+}
+
+# _analysis_to_url($self, \%analysis) -> $url_string_or_undef
+#
+# Reconstructs a /join?l=...&j=...&f=... URL from a saved analysis.
+# Used by canvas_render (Phase 3.1) to redirect when no visuals exist yet.
+sub _analysis_to_url :Protected ($self, $a) {
+	my @datasets = @{ $a->{datasets} // [] };
+	return undef unless @datasets;
+
+	my $left_spec = $datasets[0]{spec} or return undef;
+	my @params = ('l=' . url_escape($left_spec));
+
+	# Build an alias->spec lookup for join resolution
+	my %spec_by_alias;
+	for my $ds (@datasets) {
+		$spec_by_alias{ $ds->{alias} // '' } = $ds->{spec} // '';
+	}
+
+	for my $j (@{ $a->{joins} // [] }) {
+		my $right_spec = $spec_by_alias{ $j->{right} // '' } // '';
+		next unless $right_spec;
+		push @params, 'j=' . url_escape(
+			join('|', $right_spec, $j->{left_key}//'', $j->{right_key}//'')
+		);
+	}
+
+	# Filters from all datasets
+	for my $ds (@datasets) {
+		for my $f (@{ $ds->{filters} // [] }) {
+			push @params, 'f=' . url_escape($f);
+		}
+	}
+
+	return '/join?' . join('&', @params);
+}
+
+# ---------------------------------------------------------------------------
+# Controller actions for Phase 3.1 -- /api/analyses and /a/:id
+# ---------------------------------------------------------------------------
+
+# GET /api/analyses
+sub analyses_list ($self) {
+	my $analyses = $self->_read_analyses;
+	my @list = map {
+		my $a = $analyses->{$_};
+		{ id => $_, name => $a->{name}, datasets => $a->{datasets},
+		  updated => $a->{updated} }
+	} sort keys %$analyses;
+	$self->render(json => { analyses => \@list });
+}
+
+# POST /api/analyses
+sub analyses_create ($self) {
+	my $body = eval { decode_json($self->req->body) };
+	return $self->render(json => { error => sprintf($MESSAGES{error_analysis_json}, $@) }, status => 400)
+		unless ref $body eq 'HASH';
+
+	my $err = $self->_validate_analysis($body);
+	return $self->render(json => { error => sprintf($MESSAGES{error_analysis_invalid}, $err) }, status => 400)
+		if $err;
+
+	my $analyses = $self->_read_analyses;
+	unless ($self->_analyses_path) {
+		return $self->render(json => { error => $MESSAGES{error_analysis_storage} }, status => 503);
+	}
+
+	my $id;
+	my $tries = 0;
+	do { $id = $self->_gen_analysis_id; $tries++ }
+		while (exists $analyses->{$id} && $tries < 100);
+
+	$body->{id}      = $id;
+	$body->{version} //= 1;
+	$body->{created} = time();
+	$body->{updated} = time();
+
+	# Strip caller-supplied immutable fields except id/version/created/updated
+	delete $body->{$_} for grep { !m/\A(?:id|version|created|updated|name|datasets|joins|combines|fields|measures|params|visuals|layout|bookmarks|hierarchies)\z/ } keys %$body;
+
+	$analyses->{$id} = $body;
+	$self->_write_analyses($analyses);
+
+	$self->res->headers->location("/api/analyses/$id");
+	$self->render(json => { id => $id, created => 1 }, status => 201);
+}
+
+# GET /api/analyses/:id
+sub analyses_get ($self) {
+	my $id = $self->stash('id') // '';
+	return $self->render(json => { error => $MESSAGES{error_analysis_id_invalid} }, status => 400)
+		unless $id =~ /\A[A-Za-z0-9]+\z/;
+
+	my $analyses = $self->_read_analyses;
+	return $self->render(json => { error => sprintf($MESSAGES{error_analysis_not_found}, $id) }, status => 404)
+		unless exists $analyses->{$id};
+
+	$self->render(json => $analyses->{$id});
+}
+
+# PUT /api/analyses/:id  (full replace)
+sub analyses_update ($self) {
+	my $id = $self->stash('id') // '';
+	return $self->render(json => { error => $MESSAGES{error_analysis_id_invalid} }, status => 400)
+		unless $id =~ /\A[A-Za-z0-9]+\z/;
+
+	my $analyses = $self->_read_analyses;
+	return $self->render(json => { error => sprintf($MESSAGES{error_analysis_not_found}, $id) }, status => 404)
+		unless exists $analyses->{$id};
+
+	my $body = eval { decode_json($self->req->body) };
+	return $self->render(json => { error => sprintf($MESSAGES{error_analysis_json}, $@) }, status => 400)
+		unless ref $body eq 'HASH';
+
+	my $err = $self->_validate_analysis($body);
+	return $self->render(json => { error => sprintf($MESSAGES{error_analysis_invalid}, $err) }, status => 400)
+		if $err;
+
+	$body->{id}      = $id;
+	$body->{version} //= 1;
+	$body->{created} = $analyses->{$id}{created} // time();
+	$body->{updated} = time();
+
+	$analyses->{$id} = $body;
+	$self->_write_analyses($analyses);
+
+	$self->render(json => { id => $id, updated => 1 });
+}
+
+# PATCH /api/analyses/:id  (partial update -- merges supplied keys)
+sub analyses_patch ($self) {
+	my $id = $self->stash('id') // '';
+	return $self->render(json => { error => $MESSAGES{error_analysis_id_invalid} }, status => 400)
+		unless $id =~ /\A[A-Za-z0-9]+\z/;
+
+	my $analyses = $self->_read_analyses;
+	return $self->render(json => { error => sprintf($MESSAGES{error_analysis_not_found}, $id) }, status => 404)
+		unless exists $analyses->{$id};
+
+	my $body = eval { decode_json($self->req->body) };
+	return $self->render(json => { error => sprintf($MESSAGES{error_analysis_json}, $@) }, status => 400)
+		unless ref $body eq 'HASH';
+
+	# Only the keys actually supplied are validated here: the canvas PATCHes
+	# nothing but the layout (a drag) or the bookmarks, and a document that
+	# fails on some other field it never mentioned is not this request's fault.
+	if (exists $body->{layout}) {
+		my $lerr = $self->_validate_layout($body->{layout});
+		return $self->render(json => { error => sprintf($MESSAGES{error_analysis_invalid}, $lerr) }, status => 400)
+			if $lerr;
+	}
+
+	my $existing = { %{ $analyses->{$id} } };
+	for my $key (keys %$body) {
+		next if $key eq 'id' || $key eq 'created';  # immutable
+		$existing->{$key} = $body->{$key};
+	}
+	$existing->{updated} = time();
+
+	$analyses->{$id} = $existing;
+	$self->_write_analyses($analyses);
+
+	$self->render(json => { id => $id, updated => 1 });
+}
+
+# DELETE /api/analyses/:id
+sub analyses_delete ($self) {
+	my $id = $self->stash('id') // '';
+	return $self->render(json => { error => $MESSAGES{error_analysis_id_invalid} }, status => 400)
+		unless $id =~ /\A[A-Za-z0-9]+\z/;
+
+	my $analyses = $self->_read_analyses;
+	return $self->render(json => { error => sprintf($MESSAGES{error_analysis_not_found}, $id) }, status => 404)
+		unless exists $analyses->{$id};
+
+	delete $analyses->{$id};
+	$self->_write_analyses($analyses);
+
+	$self->render(json => { deleted => 1 });
+}
+
+# GET /api/analyses/:id/export
+sub analyses_export ($self) {
+	my $id = $self->stash('id') // '';
+	return $self->render(json => { error => $MESSAGES{error_analysis_id_invalid} }, status => 400)
+		unless $id =~ /\A[A-Za-z0-9]+\z/;
+
+	my $analyses = $self->_read_analyses;
+	return $self->render(json => { error => sprintf($MESSAGES{error_analysis_not_found}, $id) }, status => 404)
+		unless exists $analyses->{$id};
+
+	my $json = encode_json($analyses->{$id});
+	$self->res->headers->content_disposition("attachment; filename=\"analysis-$id.json\"");
+	$self->render(data => $json, format => 'json');
+}
+
+# POST /api/analyses/import  (create from uploaded JSON or raw body)
+sub analyses_import ($self) {
+	my $upload    = $self->req->upload('file');
+	my $body_json = $upload ? $upload->slurp : $self->req->body;
+
+	my $body = eval { decode_json($body_json) };
+	return $self->render(json => { error => sprintf($MESSAGES{error_analysis_json}, $@) }, status => 400)
+		unless ref $body eq 'HASH';
+
+	# Strip any id/timestamps from imported document; assign fresh ones below
+	delete @{$body}{qw( id created updated )};
+
+	my $err = $self->_validate_analysis($body);
+	return $self->render(json => { error => sprintf($MESSAGES{error_analysis_invalid}, $err) }, status => 400)
+		if $err;
+
+	unless ($self->_analyses_path) {
+		return $self->render(json => { error => $MESSAGES{error_analysis_storage} }, status => 503);
+	}
+
+	my $analyses = $self->_read_analyses;
+
+	my $id;
+	my $tries = 0;
+	do { $id = $self->_gen_analysis_id; $tries++ }
+		while (exists $analyses->{$id} && $tries < 100);
+
+	$body->{id}      = $id;
+	$body->{version} //= 1;
+	$body->{created} = time();
+	$body->{updated} = time();
+
+	$analyses->{$id} = $body;
+	$self->_write_analyses($analyses);
+
+	$self->res->headers->location("/api/analyses/$id");
+	$self->render(json => { id => $id, imported => 1 }, status => 201);
+}
+
+# ---------------------------------------------------------------------------
+# Phase 3.2 -- canvas pipeline and per-visual rendering helpers
+# ---------------------------------------------------------------------------
+
+# _build_canvas_pipeline($self, \%analysis) -> ($src, $records, \@cols) or ()
+#
+# Opens the first dataset from a saved analysis and chains any declared joins.
+# Returns the base pipeline triple for _render_visual_html.
+# Returns an empty list on any error so canvas_render can respond 422.
+sub _build_canvas_pipeline :Protected ($self, $analysis) {
+	my @datasets = @{ $analysis->{datasets} // [] };
+	return () unless @datasets;
+
+	my $left_spec = $datasets[0]{spec} or return ();
+	my ($left_src) = $self->_open_spec($left_spec);
+	return () unless $left_src;
+
+	my $max_rows = $self->app->config('join_max_rows') // $DEFAULT_JOIN_MAX_ROWS;
+	my $src = $left_src;
+
+	# Build alias -> spec lookup for join resolution.
+	my %spec_by_alias;
+	for my $ds (@datasets) {
+		$spec_by_alias{ $ds->{alias} // '' } = $ds->{spec} // '';
+	}
+
+	for my $j (@{ $analysis->{joins} // [] }) {
+		my $right_spec = $spec_by_alias{ $j->{right} // '' } // '';
+		next unless length $right_spec;
+		my $left_key  = $j->{left_key}  // '';
+		my $right_key = $j->{right_key} // $left_key;
+		next unless length $left_key;
+
+		my ($right_src) = $self->_open_spec($right_spec);
+		next unless $right_src;
+
+		require Database::Join;
+		$src = Database::Join->new(
+			databases      => [$src, $right_src],
+			join_column    => $left_key,
+			backend        => 'auto',
+			max_array_rows => $max_rows,
+			($left_key ne $right_key ? (join_map => {1 => $right_key}) : ()),
+		);
+	}
+
+	my $records = eval { $src->selectall_arrayref };
+	return () if $@;
+	$records //= [];
+	my @columns = _get_columns($src, $records);
+
+	return ($src, $records, \@columns);
+}
+
+# _render_visual_html($self, \%vis, $records, \@columns, $src)
+#     -> { html => Str, title => Str } | { error => Str }
+#
+# Renders one canvas visual spec to an HTML snippet without touching
+# $self->render().  Applies any per-visual filters, then dispatches by
+# kind to the appropriate HTML::D3 renderer.
+sub _render_visual_html :Protected ($self, $vis, $records, $columns, $src) {
+	my $kind    = $vis->{kind}    // '';
+	my $encode  = $vis->{encode}  // {};
+	my $options = $vis->{options} // {};
+	my $filters = $vis->{filters} // [];
+	my $title   = $vis->{title}   // '';
+
+	# Apply per-visual filters on top of the base pipeline records.
+	my $vis_recs = $records;
+	for my $f (@$filters) {
+		$vis_recs = _apply_filter_spec($vis_recs, $f);
+	}
+
+	my %col_set = map { $_ => 1 } @$columns;
+
+	require HTML::D3;
+
+	# ------------------------------------------------------------------ bar --
+	if ($kind eq 'bar') {
+		my $cat_col   = $encode->{cat}   // '';
+		my $val_col   = $encode->{value} // '';
+		return { error => 'Missing cat column for bar visual' } unless length $cat_col;
+		return { error => "Column not found: $cat_col" }        unless $col_set{$cat_col};
+		my $count_mode = ($val_col eq '__count__' || !length $val_col);
+		return { error => "Column not found: $val_col" }
+			unless $count_mode || $col_set{$val_col};
+
+		my $agg = $self->_grouped_totals(
+			{ source => $src, records => $vis_recs },
+			{ by => [$cat_col], fn => $count_mode ? 'count' : 'sum',
+			  val => $count_mode ? undef : $val_col, as => 'value' },
+		);
+		return { error => 'No plottable data' } unless @$agg;
+
+		$title ||= $count_mode ? "Count by $cat_col" : "$val_col by $cat_col";
+		my @bars   = map { [_decode_cell($_->{$cat_col}), $_->{value}] } @$agg;
+		my $orient = (($options->{orient} // '') eq 'h') ? 'horizontal' : 'vertical';
+		my $sn = HTML::D3->new(title => $title, width => 480, height => 320, responsive => 1)
+			->render_bar_chart_snippet(\@bars, {
+				orientation => $orient,
+				x_label     => $cat_col,
+			});
+		my $html = $sn->{html};
+		utf8::decode($html) unless utf8::is_utf8($html);
+		return { html => $html, title => $title };
+	}
+
+	# ------------------------------------------------------------------ pie --
+	if ($kind eq 'pie') {
+		my $cat_col = $encode->{cat}   // '';
+		my $val_col = $encode->{value} // '';
+		return { error => 'Missing cat or val column for pie visual' }
+			unless length($cat_col) && length($val_col);
+		return { error => "Column not found: $cat_col" } unless $col_set{$cat_col};
+		my $count_mode = ($val_col eq '__count__');
+		return { error => "Column not found: $val_col" }
+			unless $count_mode || $col_set{$val_col};
+
+		my $agg = $self->_grouped_totals(
+			{ source => $src, records => $vis_recs },
+			{ by => [$cat_col], fn => $count_mode ? 'count' : 'sum',
+			  val => $count_mode ? undef : $val_col, as => 'value' },
+		);
+		return { error => 'No plottable data' } unless @$agg;
+
+		$title ||= $count_mode ? "Count by $cat_col" : "$val_col by $cat_col";
+		my @slices = map { [_decode_cell($_->{$cat_col}), $_->{value}] } @$agg;
+		my $scheme = $options->{scheme} // 'tableau10';
+		my $sn = HTML::D3->new(title => $title, width => 480, height => 320, responsive => 1)
+			->render_pie_chart_snippet(\@slices, {
+				donut        => $options->{donut} ? 1 : 0,
+				legend       => 1,
+				color_scheme => $scheme,
+			});
+		my $html = $sn->{html};
+		utf8::decode($html) unless utf8::is_utf8($html);
+		return { html => $html, title => $title };
+	}
+
+	# -------------------------------------------------------------- line/graph --
+	if ($kind eq 'line' || $kind eq 'graph') {
+		my $x_col = $encode->{x} // '';
+		my $y_col = $encode->{y} // '';
+		return { error => 'Missing x or y column for line visual' }
+			unless length($x_col) && length($y_col);
+		return { error => "Column not found: $x_col" } unless $col_set{$x_col};
+		return { error => "Column not found: $y_col" } unless $col_set{$y_col};
+
+		my @pairs;
+		for my $row (@$vis_recs) {
+			my $xv = $row->{$x_col} // ''; next unless length $xv;
+			my $yn = _numeric_cell($row->{$y_col} // ''); next unless defined $yn;
+			push @pairs, [_decode_cell($xv), $yn];
+		}
+		return { error => 'No plottable data' } unless @pairs;
+
+		$title ||= "$y_col vs $x_col";
+		my $sn = HTML::D3->new(title => $title, width => 480, height => 320, responsive => 1)
+			->render_zoomable_line_chart_snippet(\@pairs, {});
+		my $html = $sn->{html};
+		utf8::decode($html) unless utf8::is_utf8($html);
+		return { html => $html, title => $title };
+	}
+
+	# --------------------------------------------------------------- scatter --
+	if ($kind eq 'scatter') {
+		my $x_col = $encode->{x} // '';
+		my $y_col = $encode->{y} // '';
+		return { error => 'Missing x or y column for scatter visual' }
+			unless length($x_col) && length($y_col);
+		return { error => "Column not found: $x_col" } unless $col_set{$x_col};
+		return { error => "Column not found: $y_col" } unless $col_set{$y_col};
+
+		my @points;
+		for my $row (@$vis_recs) {
+			my $xv = _numeric_cell($row->{$x_col} // ''); next unless defined $xv;
+			my $yv = _numeric_cell($row->{$y_col} // ''); next unless defined $yv;
+			push @points, [$xv, $yv];
+		}
+		return { error => 'No plottable data' } unless @points;
+
+		$title ||= "$y_col vs $x_col";
+		my $sn = HTML::D3->new(title => $title, width => 480, height => 320, responsive => 1)
+			->render_scatter_chart_snippet(\@points, {
+				x_label => $x_col,
+				y_label => $y_col,
+			});
+		my $html = $sn->{html};
+		utf8::decode($html) unless utf8::is_utf8($html);
+		return { html => $html, title => $title };
+	}
+
+	# -------------------------------------------------------------- heatmap --
+	if ($kind eq 'heatmap') {
+		my $x_col   = $encode->{x}     // '';
+		my $y_col   = $encode->{y}     // '';
+		my $val_col = $encode->{value} // '';
+		return { error => 'Missing x or y column for heatmap visual' }
+			unless length($x_col) && length($y_col);
+		return { error => "Column not found: $x_col" } unless $col_set{$x_col};
+		return { error => "Column not found: $y_col" } unless $col_set{$y_col};
+		return { error => "Column not found: $val_col" }
+			if length($val_col) && !$col_set{$val_col};
+
+		my (@x_order, @y_order, %seen_x, %seen_y);
+		for my $row (@$vis_recs) {
+			my $xv = $row->{$x_col} // ''; next unless length $xv;
+			my $yv = $row->{$y_col} // ''; next unless length $yv;
+			push @x_order, $xv unless $seen_x{$xv}++;
+			push @y_order, $yv unless $seen_y{$yv}++;
+		}
+		my $agg = $self->_grouped_totals(
+			{ source => $src, records => $vis_recs },
+			{ by  => [$x_col, $y_col],
+			  fn  => length($val_col) ? 'sum' : 'count',
+			  val => length($val_col) ? $val_col : undef,
+			  as  => 'value' },
+		);
+		my %grid;
+		for my $r (@$agg) {
+			$grid{$r->{$x_col}}{$r->{$y_col}} = $r->{value};
+		}
+		my @triples = map {
+			my ($raw_x, $xv) = ($_, _decode_cell($_));
+			map { [$xv, _decode_cell($_), $grid{$raw_x}{$_} // 0] } @y_order
+		} @x_order;
+		return { error => 'No plottable data' } unless @triples;
+
+		$title ||= length($val_col) ? "$val_col by $x_col and $y_col"
+		                            : "Count by $x_col and $y_col";
+		my $scheme = $options->{scheme} // 'YlOrRd';
+		my $sn = HTML::D3->new(title => $title, width => 480, height => 320, responsive => 1)
+			->render_heatmap_snippet(\@triples, {
+				x_label      => $x_col,
+				y_label      => $y_col,
+				val_label    => (length($val_col) ? $val_col : 'Count'),
+				color_scheme => $scheme,
+			});
+		my $html = $sn->{html};
+		utf8::decode($html) unless utf8::is_utf8($html);
+		return { html => $html, title => $title };
+	}
+
+	# --------------------------------------------------------------- stacked --
+	if ($kind eq 'stacked') {
+		my $cat_col = $encode->{cat}    // '';
+		my $seg_col = $encode->{series} // '';
+		my $val_col = $encode->{value}  // '';
+		return { error => 'Missing cat or series column for stacked visual' }
+			unless length($cat_col) && length($seg_col);
+		return { error => "Column not found: $cat_col" } unless $col_set{$cat_col};
+		return { error => "Column not found: $seg_col" } unless $col_set{$seg_col};
+		my $count_mode = (!length $val_col || $val_col eq '__count__');
+		return { error => "Column not found: $val_col" }
+			unless $count_mode || $col_set{$val_col};
+
+		my $agg = $self->_grouped_totals(
+			{ source => $src, records => $vis_recs },
+			{ by  => [$cat_col, $seg_col],
+			  fn  => $count_mode ? 'count' : 'sum',
+			  val => $count_mode ? undef   : $val_col,
+			  as  => 'value' },
+		);
+		my @data = map {
+			my ($c, $s) = ($_->{$cat_col}//'', $_->{$seg_col}//'');
+			(length $c && length $s)
+				? { cat => $c, seg => $s, val => $_->{value} }
+				: ()
+		} @$agg;
+		return { error => 'No plottable data' } unless @data;
+
+		$title ||= $count_mode ? "Count by $cat_col and $seg_col"
+		                       : "$val_col by $cat_col and $seg_col";
+		my $scheme = $options->{scheme} // 'tableau10';
+		my $sn = HTML::D3->new(title => $title, width => 480, height => 320, responsive => 1)
+			->render_stacked_bar_snippet(\@data, {
+				scheme  => $scheme,
+				x_label => $cat_col,
+			});
+		my $html = $sn->{html};
+		utf8::decode($html) unless utf8::is_utf8($html);
+		return { html => $html, title => $title };
+	}
+
+	# ---------------------------------------------------------------- combo --
+	if ($kind eq 'combo') {
+		my $x_col    = $encode->{cat}      // $encode->{x}    // '';
+		my $bar_col  = $encode->{bar_val}  // $encode->{bar}  // '';
+		my $line_col = $encode->{line_val} // $encode->{line} // '';
+		return { error => 'Missing cat, bar_val, or line_val for combo visual' }
+			unless length($x_col) && length($bar_col) && length($line_col);
+		return { error => "Column not found: $x_col"    } unless $col_set{$x_col};
+		return { error => "Column not found: $bar_col"  } unless $col_set{$bar_col};
+		return { error => "Column not found: $line_col" } unless $col_set{$line_col};
+
+		my $bar_rows = $self->_grouped_totals(
+			{ source => $src, records => $vis_recs },
+			{ by => [$x_col], fn => 'sum', val => $bar_col,  as => 'bar_val' },
+		);
+		my $line_rows = $self->_grouped_totals(
+			{ source => $src, records => $vis_recs },
+			{ by => [$x_col], fn => 'sum', val => $line_col, as => 'line_val' },
+		);
+		my (%bar_map, %line_map, @x_order, %x_seen);
+		for my $r (@$bar_rows) {
+			my $xv = _decode_cell($r->{$x_col} // ''); next unless length $xv;
+			push @x_order, $xv unless $x_seen{$xv}++;
+			$bar_map{$xv} = $r->{bar_val};
+		}
+		for my $r (@$line_rows) {
+			my $xv = _decode_cell($r->{$x_col} // ''); next unless length $xv;
+			push @x_order, $xv unless $x_seen{$xv}++;
+			$line_map{$xv} = $r->{line_val};
+		}
+		return { error => 'No plottable data' } unless @x_order;
+
+		my @data = map { { x => $_, bar_val => $bar_map{$_}, line_val => $line_map{$_} } }
+		           @x_order;
+		$title ||= "$bar_col and $line_col by $x_col";
+		my $sn = HTML::D3->new(title => $title, width => 480, height => 320, responsive => 1)
+			->render_combo_snippet(\@data, {
+				bar_label  => $bar_col,
+				line_label => $line_col,
+			});
+		my $html = $sn->{html};
+		utf8::decode($html) unless utf8::is_utf8($html);
+		return { html => $html, title => $title };
+	}
+
+	# --------------------------------------------------------------- treemap --
+	if ($kind eq 'treemap') {
+		my $cat_col = $encode->{group} // $encode->{cat}   // '';
+		my $val_col = $encode->{size}  // $encode->{value} // '';
+		return { error => 'Missing group column for treemap visual' } unless length $cat_col;
+		return { error => "Column not found: $cat_col" } unless $col_set{$cat_col};
+		my $count_mode = (!length $val_col || $val_col eq '__count__');
+		return { error => "Column not found: $val_col" }
+			unless $count_mode || $col_set{$val_col};
+
+		my $agg = $self->_grouped_totals(
+			{ source => $src, records => $vis_recs },
+			{ by  => [$cat_col],
+			  fn  => $count_mode ? 'count' : 'sum',
+			  val => $count_mode ? undef   : $val_col,
+			  as  => 'value' },
+		);
+		return { error => 'No plottable data' } unless @$agg;
+
+		$title ||= $count_mode ? "Count by $cat_col" : "$val_col by $cat_col";
+		my $scheme = $options->{scheme} // 'tableau10';
+		my @tiles  = map { [_decode_cell($_->{$cat_col}), $_->{value}] } @$agg;
+		my $sn = HTML::D3->new(title => $title, width => 480, height => 320, responsive => 1)
+			->render_treemap_snippet(\@tiles, { scheme => $scheme });
+		my $html = $sn->{html};
+		utf8::decode($html) unless utf8::is_utf8($html);
+		return { html => $html, title => $title };
+	}
+
+	# ------------------------------------------------------------ histogram --
+	if ($kind eq 'histogram') {
+		my $col = $encode->{value} // $encode->{col} // '';
+		return { error => 'Missing col for histogram visual' } unless length $col;
+		return { error => "Column not found: $col" }           unless $col_set{$col};
+
+		my @values;
+		for my $row (@$vis_recs) {
+			my $v = _numeric_cell($row->{$col} // '');
+			push @values, $v if defined $v;
+		}
+		return { error => 'No plottable data' } unless @values;
+
+		my $bins = int($options->{bins} // 10);
+		$bins = 1   if $bins < 1;
+		$bins = 200 if $bins > 200;
+		my $min_v = min(@values);
+		my $max_v = max(@values);
+		my @bin_data;
+		if ($min_v == $max_v) {
+			push @bin_data, { label => "$min_v", count => scalar @values,
+			                  lo => $min_v, hi => $min_v };
+		} else {
+			my $raw_w = ($max_v - $min_v) / $bins;
+			my $width = sprintf('%.10g', $raw_w) + 0;
+			$width = $raw_w if $width <= 0;
+			my $fmt = ($width == int($width)) ? '%d' : '%g';
+			my (@bin_counts, @bin_los);
+			for my $i (0 .. $bins - 1) {
+				push @bin_los,    $min_v + $i * $width;
+				push @bin_counts, 0;
+			}
+			for my $v (@values) {
+				my $idx = POSIX::floor(sprintf('%.10g', ($v - $min_v) / $width) + 0);
+				$idx = $bins - 1 if $idx >= $bins;
+				$idx = 0         if $idx < 0;
+				$bin_counts[$idx]++;
+			}
+			for my $i (0 .. $bins - 1) {
+				next unless $bin_counts[$i];
+				my $lo  = $bin_los[$i];
+				my $hi  = $lo + $width;
+				push @bin_data, {
+					label => sprintf("[${fmt},${fmt})", $lo, $hi),
+					count => $bin_counts[$i],
+					lo    => $lo,
+					hi    => $hi,
+				};
+			}
+		}
+
+		$title ||= "Distribution of $col";
+		my $sn = HTML::D3->new(title => $title, width => 480, height => 320, responsive => 1)
+			->render_histogram_snippet(\@bin_data, { binned => 1, x_label => $col });
+		my $html = $sn->{html};
+		utf8::decode($html) unless utf8::is_utf8($html);
+		return { html => $html, title => $title };
+	}
+
+	# ----------------------------------------------------------------- table --
+	if ($kind eq 'table') {
+		return { error => 'No data to display' } unless @$vis_recs;
+		my @cols = @$columns;
+		@cols = @{ $encode->{columns} }
+			if ref $encode->{columns} eq 'ARRAY' && @{ $encode->{columns} };
+
+		$title ||= 'Table';
+		my $max_rows_t = int($options->{rows} // 50);
+		$max_rows_t = 200 if $max_rows_t > 200;
+		$max_rows_t = 1   if $max_rows_t < 1;
+
+		my $html = '<div class="visual-table-wrap"><table class="data-table">'
+		         . '<thead><tr>';
+		for my $c (@cols) {
+			(my $ch = $c) =~ s/&/&amp;/g; $ch =~ s/</&lt;/g; $ch =~ s/>/&gt;/g;
+			$html .= "<th>$ch</th>";
+		}
+		$html .= '</tr></thead><tbody>';
+		my $count = 0;
+		for my $row (@$vis_recs) {
+			last if $count++ >= $max_rows_t;
+			$html .= '<tr>';
+			for my $c (@cols) {
+				my $v = $row->{$c} // '';
+				$v =~ s/&/&amp;/g; $v =~ s/</&lt;/g; $v =~ s/>/&gt;/g;
+				$html .= "<td>$v</td>";
+			}
+			$html .= '</tr>';
+		}
+		$html .= '</tbody></table></div>';
+		return { html => $html, title => $title };
+	}
+
+	return { error => "Unknown visual kind: $kind" };
+}
+
+# _vis_cf_col(\%vis) -> $col_name | undef
+#
+# Returns the primary categorical dimension of a visual -- the column that
+# makes sense to cross-filter on when the user clicks a mark.
+# Priority: cat > group > x > col (histogram).  Series/size/val are measures,
+# not dimensions, so they are intentionally excluded.
+sub _vis_cf_col {
+	my ($vis) = @_;
+	my $enc = $vis->{encode} // {};
+	for my $key (qw(cat group x col)) {
+		return $enc->{$key} if length($enc->{$key} // '');
+	}
+	return undef;
+}
+
+# GET /a/:id  -- render a saved canvas
+#
+# Phase 3.1 bridge: redirects to the reconstructed data-view URL when the
+# canvas has no visuals array.
+# Phase 3.2: renders N visuals in a CSS grid when visuals are present.
+sub canvas_render ($self) {
+	my $id = $self->stash('id') // '';
+	return $self->render(text => $MESSAGES{error_analysis_id_invalid}, status => 400)
+		unless $id =~ /\A[A-Za-z0-9]+\z/;
+
+	my $analyses = $self->_read_analyses;
+	return $self->render(text => sprintf($MESSAGES{error_analysis_not_found}, $id), status => 404)
+		unless exists $analyses->{$id};
+	my $a = $analyses->{$id};
+
+	# Phase 3.2 / 3.3: if visuals array is non-empty, render the canvas.
+	my @visuals = @{ $a->{visuals} // [] };
+	if (@visuals) {
+
+		# Phase 3.5 -- bound parameters from URL ?p.<name>=<value>.
+		# Parameter definitions live in the analysis: params => { name => { type, default, min, max } }.
+		# URL values are type-coerced and range-checked; out-of-range returns 400.
+		my %param_defs   = %{ $a->{params} // {} };
+		my %bound_params;
+		{
+			my @p_errors;
+			for my $pname (sort keys %param_defs) {
+				my $def     = $param_defs{$pname};
+				my $type    = $def->{type}    // 'string';
+				my $default = $def->{default} // '';
+				my $raw     = $self->param("p.$pname");
+				my $val     = defined $raw ? $raw : $default;
+
+				if ($type eq 'number') {
+					require Scalar::Util;
+					unless (Scalar::Util::looks_like_number($val)) {
+						push @p_errors,
+							sprintf($MESSAGES{error_param_type}, $pname);
+						next;
+					}
+					$val = $val + 0;
+					my ($lo, $hi) = ($def->{min}, $def->{max});
+					if (defined $lo && $val < $lo) {
+						push @p_errors, sprintf($MESSAGES{error_param_range},
+							$pname, $lo, defined $hi ? $hi : '+inf');
+						next;
+					}
+					if (defined $hi && $val > $hi) {
+						push @p_errors, sprintf($MESSAGES{error_param_range},
+							$pname, defined $lo ? $lo : '-inf', $hi);
+						next;
+					}
+				}
+				$bound_params{$pname} = $val;
+			}
+			if (@p_errors) {
+				return $self->render(
+					text   => join('; ', @p_errors),
+					status => 400,
+				);
+			}
+		}
+
+		# Build stash list for parameter bar: sorted by name.
+		my @canvas_params = map {
+			my $def = $param_defs{$_};
+			{
+				name    => $_,
+				type    => ($def->{type}    // 'string'),
+				value   => $bound_params{$_},
+				default => ($def->{default} // ''),
+				min     => (defined $def->{min} ? $def->{min} : ''),
+				max     => (defined $def->{max} ? $def->{max} : ''),
+			}
+		} sort keys %param_defs;
+
+		my ($src, $records, $columns) = $self->_build_canvas_pipeline($a);
+		return $self->render(
+			text   => 'Cannot open data source for this canvas',
+			status => 422,
+		) unless defined $records;
+
+		# Apply calc fields with bound params so expressions may reference them.
+		my $canvas_spec_key = ($a->{datasets}[0]{spec} // '');
+		eval {
+			($records, $columns) = $self->_apply_calc_fields(
+				$records, $columns,
+				{ params => \%bound_params, spec_key => $canvas_spec_key }
+			);
+		};
+		if ($@) {
+			(my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//;
+			return $self->render(text => $e, status => 400);
+		}
+
+		# Phase 3.3 -- cross-filter state from URL params.
+		# ?cf=col:op:val (repeatable) filters all visuals except the source.
+		# ?cv=N identifies the source visual (shown unfiltered but highlighted).
+		# Semantics: self-highlighting (source shown in full; others filtered).
+		# Multiple simultaneous selections are not supported in this version.
+		my @cf_specs  = grep { /\S/ } @{ $self->every_param('cf') // [] };
+		my $cf_source = defined($self->param('cv'))
+			? int($self->param('cv')) : -1;
+		my $cf_active = !!@cf_specs;
+
+		# Build the "clear cross-filter" URL for the chip close button.
+		my $cf_clear_url = $self->req->url->clone;
+		$cf_clear_url->query->remove('cf')->remove('cv');
+		$cf_clear_url = $cf_clear_url->to_string;
+
+		# Human-readable summary for the cross-filter chip, e.g. "region = North".
+		my $cf_display = '';
+		if ($cf_active) {
+			my @parts;
+			for my $spec (@cf_specs) {
+				my ($col, $op, $val) = split /:/, $spec, 3;
+				$val //= '';
+				my $sym = ($op eq 'eq') ? '='  : ($op eq 'ne') ? '!='
+				        : ($op eq 'lt') ? '<'  : ($op eq 'le') ? '<='
+				        : ($op eq 'gt') ? '>'  : ($op eq 'ge') ? '>='
+				        : ($op eq 'contains') ? 'contains'
+				        : ($op eq 'starts')   ? 'starts with'
+				        : $op;
+				push @parts, "$col $sym $val";
+			}
+			$cf_display = join(' AND ', @parts);
+		}
+
+		# Phase 3.4 -- drill-through and drill-down.
+		#
+		# Drill-through: when cross-filters are active, build a URL to the
+		# primary data source with those filters applied as ?f= params so the
+		# user can inspect the raw rows behind the selection.
+		my $drillthrough_url = '';
+		if (@cf_specs) {
+			my $ds0   = ($a->{datasets} // [])->[0];
+			my $spec0 = ($ds0  // {})->{spec} // '';
+			my $base  = $self->_spec_to_url($spec0);
+			if ($base ne '/') {
+				my $sep = ($base =~ /\?/) ? '&' : '?';
+				for my $cf (@cf_specs) {
+					$base .= $sep . 'f=' . url_escape($cf);
+					$sep = '&';
+				}
+				$drillthrough_url = $base;
+			}
+		}
+
+		# Drill-down: navigate a named hierarchy one level at a time.
+		# ?dd=<name> names the active hierarchy; ?dl=<N> is the current level
+		# (0-based); accumulated ?cf= params carry the drill path.
+		my $dd_name  = $self->param('dd') // '';
+		my $dl_raw   = $self->param('dl');
+		my $dd_level = (defined $dl_raw && length $dl_raw) ? int($dl_raw) : 0;
+		$dd_level    = 0 if $dd_level < 0;
+
+		my ($dd_hier) = grep { ($_->{name} // '') eq $dd_name }
+		                     @{ $a->{hierarchies} // [] };
+
+		my $drill_active = (defined $dd_hier && length $dd_name) ? 1 : 0;
+		my $drill_col    = '';
+		my @drill_crumb  = ();
+		my $drill_max    = 0;
+
+		if ($drill_active) {
+			my @levels = @{ $dd_hier->{levels} // [] };
+			$drill_max = $#levels;
+			# Allow dl up to scalar(@levels) -- one past the last valid level
+			# means "all levels drilled through" (drill-through mode).
+			my $dl_cap = scalar @levels;
+			$dd_level  = $dl_cap if $dd_level > $dl_cap;
+			$drill_col = $levels[$dd_level] // '';
+
+			# Extract drilled values: each crossed level contributes a
+			# cf=<col>:eq:<val> param in the URL.
+			my %cf_by_col;
+			for my $cf (@cf_specs) {
+				my ($col, $op, $val) = split /:/, $cf, 3;
+				$cf_by_col{$col} = ($val // '')
+					if length($col // '') && ($op // '') eq 'eq';
+			}
+
+			# "All" crumb -- keep ?dd=, remove dl/cf/cv.
+			my $all_url = $self->req->url->clone;
+			$all_url->query->remove('dl')->remove('cf')->remove('cv');
+			push @drill_crumb, {
+				label => 'All',
+				url   => ($dd_level > 0 ? $all_url->to_string : ''),
+				cur   => ($dd_level == 0 ? 1 : 0),
+			};
+
+			# One crumb per drilled value (levels 0 .. dd_level-1).
+			for my $i (0 .. $dd_level - 1) {
+				my $col_i   = $levels[$i];
+				my $val_i   = $cf_by_col{$col_i} // '';
+				my $is_last = ($i == $dd_level - 1);
+
+				# Back-link: keep ?dd=, cf for levels 0..i, dl=i+1.
+				my $back_url = '';
+				unless ($is_last) {
+					my $u = $self->req->url->clone;
+					$u->query->remove('dl')->remove('cf')->remove('cv');
+					$u->query->append('dl' => $i + 1);
+					for my $j (0 .. $i) {
+						my $val_j = $cf_by_col{ $levels[$j] };
+						$u->query->append('cf' => "$levels[$j]:eq:$val_j")
+							if defined $val_j;
+					}
+					$back_url = $u->to_string;
+				}
+
+				push @drill_crumb, {
+					label => $val_i,
+					url   => $back_url,
+					cur   => $is_last ? 1 : 0,
+				};
+			}
+		}
+
+		# Pre-build CSS grid position strings to avoid TT hash-key lookups.
+		my %layout_pos;
+		for my $lp (@{ $a->{layout} // [] }) {
+			my ($x, $y, $w, $h) = @{$lp}{qw(x y w h)};
+			next unless defined $x && defined $y && defined $w && defined $h;
+			$layout_pos{ $lp->{visual} // '' } =
+				"grid-column:${x}/span ${w};grid-row:${y}/span ${h}";
+		}
+
+		my @rendered;
+		for my $i (0 .. $#visuals) {
+			my $vis = $visuals[$i];
+
+			# Apply cross-filter to every visual except the source (self-highlighting).
+			my $vis_recs = $records;
+			if ($cf_active && $i != $cf_source) {
+				for my $cfs (@cf_specs) {
+					$vis_recs = _apply_filter_spec($vis_recs, $cfs);
+				}
+			}
+
+			my $result = $self->_render_visual_html($vis, $vis_recs, $columns, $src);
+			push @rendered, {
+				id        => $i,
+				title     => ($vis->{title} // $result->{title} // ('Visual ' . ($i + 1))),
+				html      => $result->{html}  // '',
+				error     => $result->{error} // '',
+				kind      => $vis->{kind}     // '',
+				style     => $layout_pos{$i}  // '',
+				cf_col    => (_vis_cf_col($vis) // ''),
+				cf_source => ($i == $cf_source ? 1 : 0),
+			};
+		}
+
+		# Phase 3.6 -- bookmarks list for the toolbar panel.
+		my @canvas_bookmarks = @{ $a->{bookmarks} // [] };
+		# Pre-encode as JSON for the JS canvasBookmarks variable.
+		# Escape </ so the array literal cannot prematurely close a <script> tag.
+		(my $bm_json = encode_json(\@canvas_bookmarks)) =~ s{</}{<\\/}g;
+
+		my ($platform, $language) = $self->_resolve_template;
+		return $self->render(
+			handler      => 'tt',
+			template     => "$platform/$language/canvas",
+			format       => 'html',
+			title        => $a->{name},
+			canvas_id    => $id,
+			canvas_name  => $a->{name},
+			canvas_data_url  => ($self->_analysis_to_url($a) // ''),
+			visuals      => \@rendered,
+			canvas_params    => \@canvas_params,
+			canvas_bookmarks => \@canvas_bookmarks,
+			canvas_bookmarks_json => $bm_json,
+			cf_active        => $cf_active    ? 1 : 0,
+			cf_display       => $cf_display,
+			cf_clear_url     => $cf_clear_url,
+			drillthrough_url => $drillthrough_url,
+			drill_active     => $drill_active  ? 1 : 0,
+			drill_name       => $dd_name,
+			drill_level      => $dd_level,
+			drill_col        => $drill_col,
+			drill_crumb      => \@drill_crumb,
+			drill_max        => $drill_max,
+			back_url         => '/',
+			back_label       => 'Home',
+		);
+	}
+
+	# Phase 3.1 bridge: no visuals yet -- reconstruct the data-view URL and redirect.
+	my $url = $self->_analysis_to_url($a);
+	return $self->render(text => 'Cannot reconstruct URL from this analysis', status => 422)
+		unless defined $url;
+
+	$self->redirect_to($url);
 }
 
 # _run_export_pipeline($self) -> ($records, \@columns, $left_label) or ()
@@ -1578,6 +2762,8 @@ sub _render_json :Protected ($self, $records, $columns, $name) {
 # ---------------------------------------------------------------------------
 # Public actions
 # ---------------------------------------------------------------------------
+
+=encoding utf8
 
 =head1 ACTIONS
 
@@ -3253,7 +4439,7 @@ sub graph_view ($self) {
 
 		require HTML::D3;
 		my $title   = "$y_col vs $x_col by $series_col";
-		my $snippet = HTML::D3->new(title => $title, width => 1100, height => 580, responsive => 1)
+		my $snippet = HTML::D3->new(title => $title, width => 1100, height => 580)
 			->render_multi_series_line_chart_snippet(\@series_data, { animated => 1 });
 
 		my $chart_html = $snippet->{html};
@@ -3337,7 +4523,7 @@ sub graph_view ($self) {
 
 	require HTML::D3;
 	my $title   = "$y_col vs $x_col";
-	my $snippet = HTML::D3->new(title => $title, width => 1100, height => 580, responsive => 1)
+	my $snippet = HTML::D3->new(title => $title, width => 1100, height => 580)
 		->render_zoomable_line_chart_snippet(\@pairs, { animated => 1 });
 
 	my $chart_html = $snippet->{html};
@@ -3459,7 +4645,7 @@ sub pie_view ($self) {
 	require HTML::D3;
 	my $scheme  = $self->param('scheme') // 'tableau10';
 	my $title   = $count_mode ? "Count by $cat_col" : "$val_col by $cat_col";
-	my $snippet = HTML::D3->new(title => $title, width => 600, height => 500, responsive => 1)
+	my $snippet = HTML::D3->new(title => $title, width => 600, height => 500)
 		->render_pie_chart_snippet(\@slices, {
 			animated     => 1,
 			donut        => $donut,
@@ -3630,7 +4816,7 @@ sub heatmap_view ($self) {
 	require HTML::D3;
 	my $title   = length($val_col) ? "$val_col by $x_col and $y_col"
 	                                : "Count by $x_col and $y_col";
-	my $snippet = HTML::D3->new(title => $title, width => 900, height => 500, responsive => 1)
+	my $snippet = HTML::D3->new(title => $title, width => 900, height => 500)
 		->render_heatmap_snippet(\@triples, {
 			x_label      => $x_col,
 			y_label      => $y_col,
@@ -3801,7 +4987,7 @@ sub bar_view ($self) {
 	require HTML::D3;
 	my $title   = $count_mode ? "Count by $cat_col"
 	                          : "$val_col by $cat_col";
-	my $snippet = HTML::D3->new(title => $title, width => 800, height => 480, responsive => 1)
+	my $snippet = HTML::D3->new(title => $title, width => 800, height => 480)
 		->render_bar_chart_snippet(\@bars, {
 			animated     => 1,
 			orientation  => $orientation,
@@ -4941,7 +6127,7 @@ sub scatter_view ($self) {
 
 	require HTML::D3;
 	my $title   = "$y_col vs $x_col";
-	my $snippet = HTML::D3->new(title => $title, width => 800, height => 480, responsive => 1)
+	my $snippet = HTML::D3->new(title => $title, width => 800, height => 480)
 		->render_scatter_chart_snippet(\@points, {
 			animated           => 1,
 			x_label            => $x_col,
@@ -5050,7 +6236,7 @@ sub stacked_view ($self) {
 	require HTML::D3;
 	my $title   = $count_mode ? "Count by $cat_col and $seg_col"
 	                          : "$val_col by $cat_col and $seg_col";
-	my $snippet = HTML::D3->new(title => $title, width => 900, height => 500, responsive => 1)
+	my $snippet = HTML::D3->new(title => $title, width => 900, height => 500)
 		->render_stacked_bar_snippet(\@data, {
 			orient  => ($orient eq 'h') ? 'h' : 'v',
 			x_label => $cat_col,
@@ -5161,7 +6347,7 @@ sub combo_view ($self) {
 	my $eff_bar_lbl  = $bar_label  || $bar_col;
 	my $eff_line_lbl = $line_label || $line_col;
 	my $title        = "$eff_bar_lbl and $eff_line_lbl by $x_col";
-	my $snippet = HTML::D3->new(title => $title, width => 900, height => 500, responsive => 1)
+	my $snippet = HTML::D3->new(title => $title, width => 900, height => 500)
 		->render_combo_snippet(\@data, {
 			bar_label  => $eff_bar_lbl,
 			line_label => $eff_line_lbl,
@@ -5272,7 +6458,7 @@ sub treemap_view ($self) {
 
 	require HTML::D3;
 	my $title   = $count_mode ? "Treemap of $cat_col by count" : "Treemap of $cat_col by $val_col";
-	my $snippet = HTML::D3->new(title => $title, width => 800, height => 500, responsive => 1)
+	my $snippet = HTML::D3->new(title => $title, width => 800, height => 500)
 		->render_treemap_snippet(\@data, {
 			scheme => $scheme,
 		});
@@ -5394,7 +6580,7 @@ sub histogram_view ($self) {
 
 	require HTML::D3;
 	my $title   = "Distribution of $col";
-	my $snippet = HTML::D3->new(title => $title, width => 800, height => 480, responsive => 1)
+	my $snippet = HTML::D3->new(title => $title, width => 800, height => 480)
 		->render_histogram_snippet(\@bin_data, {
 			binned  => 1,
 			x_label => $col,

@@ -145,28 +145,48 @@ sub submit_response {
     }
 }
 
-sub submit_trailer {
-    my ($self, $stream_id, %args) = @_;
+# Croak, naming the method, unless $headers is a list of [name, value]
+# pairs of defined non-reference scalars.
+sub _check_header_pairs {
+    my ($method, $headers) = @_;
 
-    my $headers = delete($args{headers}) // [];
-    croak 'submit_trailer: headers must be an array reference'
+    croak "$method: headers must be an array reference"
         unless ref($headers) eq 'ARRAY';
 
     for my $index (0 .. $#$headers) {
         my $pair = $headers->[$index];
-        croak "submit_trailer: header $index must be a two-element array reference"
+        croak "$method: header $index must be a two-element array reference"
             unless ref($pair) eq 'ARRAY' && @$pair == 2;
 
         my ($name, $value) = @$pair;
-        croak "submit_trailer: header $index name must be a defined non-reference scalar"
+        croak "$method: header $index name must be a defined non-reference scalar"
             unless defined($name) && !ref($name);
-        croak "submit_trailer: header $index value must be a defined non-reference scalar"
+        croak "$method: header $index value must be a defined non-reference scalar"
             unless defined($value) && !ref($value);
+    }
+    return;
+}
+
+sub submit_trailer {
+    my ($self, $stream_id, %args) = @_;
+
+    my $headers = delete($args{headers}) // [];
+    _check_header_pairs('submit_trailer', $headers);
+    for my $index (0 .. $#$headers) {
         croak "submit_trailer: header $index must not use a pseudo-header name"
-            if $name =~ /^:/;
+            if $headers->[$index][0] =~ /^:/;
     }
 
     return $self->_submit_trailer_xs($stream_id, $headers);
+}
+
+sub submit_headers {
+    my ($self, $stream_id, %args) = @_;
+
+    my $headers = delete($args{headers}) // [];
+    _check_header_pairs('submit_headers', $headers);
+
+    return $self->_submit_headers_xs($stream_id, $headers, delete($args{end_stream}) ? 1 : 0);
 }
 
 sub submit_goaway {
@@ -520,6 +540,30 @@ terminal HEADERS block.
 A zero return means nghttp2 accepted the trailer block into its outbound
 queue. It does not mean the peer has received it. Invalid Perl input and
 immediate nghttp2 submission errors throw exceptions.
+
+=head2 submit_headers
+
+    $session->submit_headers(
+        $stream_id,
+        headers => [
+            [':status', '103'],
+            ['link', '</style.css>; rel=preload; as=style'],
+        ],
+    );
+
+    $session->submit_headers($stream_id, headers => \@headers, end_stream => 1);
+
+Queue a HEADERS block on an existing stream, as C<nghttp2_submit_headers>
+does. A server uses it to send a non-final (1xx) response, such as 103 Early
+Hints, before the final response, which C<submit_response> cannot send.
+C<headers> is sent as given, pseudo-headers included, so a response block
+starts with C<:status>; it defaults to an empty array reference, and order and
+duplicate names are preserved. With a true C<end_stream> the block carries
+END_STREAM and ends the stream; by default it does not.
+
+A zero return means nghttp2 accepted the block into its outbound queue. It
+does not mean the peer has received it. Invalid Perl input and immediate
+nghttp2 submission errors throw exceptions.
 
 =head2 submit_data
 

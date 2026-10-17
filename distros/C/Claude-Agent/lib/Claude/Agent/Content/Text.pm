@@ -4,10 +4,19 @@ use 5.020;
 use strict;
 use warnings;
 
-use Types::Common -types;
-use Marlin
-    'type'  => sub { 'text' },
-    'text!' => Str;
+use Object::Proto ();
+
+BEGIN {
+    Object::Proto::define('Claude::Agent::Content::Text',
+        'type:Str:readonly:default(text)',
+        'text:Str:required',
+        'raw:HashRef:predicate',
+    );
+}
+
+1;
+
+__END__
 
 =head1 NAME
 
@@ -17,15 +26,27 @@ Claude::Agent::Content::Text - Text content block
 
 A text content block containing Claude's response text.
 
-=head2 ATTRIBUTES
+=head1 ATTRIBUTES
 
-=over 4
+=head2 type
 
-=item * type - Always 'text'
+Always C<text>. Read only.
 
-=item * text - The text content
+=head2 text
 
-=back
+The text content.
+
+=head2 raw
+
+The decoded block as the CLI sent it, when the object was built by
+C<Claude::Agent::Content-E<gt>from_json>. Keys the class does not declare are
+reachable here.
+
+=head1 METHODS
+
+=head2 new
+
+Takes a flat list of name/value pairs. Unknown names are ignored.
 
 =head1 AUTHOR
 
@@ -38,5 +59,3 @@ This software is Copyright (c) 2026 by LNATION.
 This is free software, licensed under The Artistic License 2.0 (GPL Compatible).
 
 =cut
-
-1;

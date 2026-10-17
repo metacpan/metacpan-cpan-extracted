@@ -1,0 +1,70 @@
+{
+   "abstract" : "Small everyday helpers: directory listing, shell commands, JSON files, number formatting, and data-structure shapes",
+   "author" : [
+      "David E. Condon <dec986@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Util-Cn",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.58"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Data::Printer" : "1.000",
+            "Devel::Confess" : "0",
+            "Exporter" : "0",
+            "File::Find" : "0",
+            "File::Spec" : "0",
+            "JSON::MaybeXS" : "0",
+            "Parallel::ForkManager" : "1.12",
+            "Scalar::Util" : "0",
+            "Term::ANSIColor" : "3.00",
+            "autodie" : "0",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Util::Cn" : {
+         "file" : "lib/Util/Cn.pm",
+         "version" : "0.021"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hhg7/util/issues"
+      },
+      "homepage" : "https://metacpan.org/dist/Util-Cn",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/hhg7/util",
+         "web" : "https://github.com/hhg7/util"
+      }
+   },
+   "version" : "0.021",
+   "x_generated_by_perl" : "v5.44.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.43",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

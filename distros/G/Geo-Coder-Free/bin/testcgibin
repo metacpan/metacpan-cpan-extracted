@@ -25,6 +25,25 @@ sub doit
 {
 	my $test = shift or Carp::croak;
 
+	# Tests 3 and 4 simulate a browser in the US, so that the page infers the
+	# country from the client's IP address.  The IP must be one that the page's
+	# CGI::ACL allow-list trusts (see cgi-bin/page.fcgi): any other address gets
+	# a 403 "Access Denied" instead of an answer, and the test would be checking
+	# the block page rather than the geocoder.
+	my $us_ip = '108.44.193.70';
+
+	# The address tests 7 and 8 ask from as well: 7 is refused although it comes
+	# from the same address, so what refuses it is the user agent and nothing
+	# else about the client.
+	#
+	# Geo::Coder::Free::Allow keeps a list of user agents it never serves, and
+	# this is one of them (the list is %blacklist_agents in
+	# lib/Geo/Coder/Free/Allow.pm, which names this agent 'zgrab').  The allowed
+	# case uses an ordinary browser's agent - not an empty one, so that the test
+	# covers the path where an agent is present and is not on the list.
+	my $blacklisted_agent = 'Mozilla/5.0 zgrab/0.x';
+	my $browser_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
+
 	if($test == 1) {
 		# print "Test 1 - q\n";
 		# system("$^X $Bin/../cgi-bin/page.fcgi page=query q='1600+Pennsylvania+Avenue+NW+Washington+DC+USA'");
@@ -33,12 +52,35 @@ sub doit
 		# print "Test 2 - scantext\n";
 		system("$^X $Bin/../cgi-bin/page.fcgi page=query scantext='Washington+DC+USA'");
 	} elsif($test == 3) {
-		$ENV{'REMOTE_ADDR'} = '207.241.237.233';	# An IP address in the US
+		$ENV{'REMOTE_ADDR'} = $us_ip;	# An IP address in the US, trusted by the page's ACL
 		$ENV{'SERVER_PROTOCOL'} = 'HTTP/1.1';
 		system("$^X $Bin/../cgi-bin/page.fcgi page=query q='NASA+TIROS+RD+GREENBELT+MD+US'");
 	} elsif($test == 4) {
-		$ENV{'REMOTE_ADDR'} = '207.241.237.233';	# An IP address in the US, so no need for country in the address
+		$ENV{'REMOTE_ADDR'} = $us_ip;	# An IP address in the US, so no need for country in the address
 		$ENV{'SERVER_PROTOCOL'} = 'HTTP/1.1';
 		system("$^X $Bin/../cgi-bin/page.fcgi page=query q='NASA+TIROS+RD+GREENBELT+MD'");
+	} elsif($test == 5) {
+		# The landing page.  It renders a template that this distribution
+		# ships, so what it prints is the page, not just the log.
+		system("$^X $Bin/../cgi-bin/page.fcgi page=index");
+	} elsif($test == 6) {
+		# The server's own status page: the site title it was configured
+		# with, the domain it was asked about, and the visitor types in the
+		# log (LOGDIR points at the one t/bin.t writes).
+		system("$^X $Bin/../cgi-bin/page.fcgi page=meta_data");
+	} elsif($test == 7) {
+		# A client the site will not serve.  Everything about this request
+		# is test 3's - the same address, asking the same question - except
+		# the user agent, so the page has nothing else to refuse it for.
+		$ENV{'REMOTE_ADDR'} = $us_ip;
+		$ENV{'SERVER_PROTOCOL'} = 'HTTP/1.1';
+		$ENV{'HTTP_USER_AGENT'} = $blacklisted_agent;
+		system("$^X $Bin/../cgi-bin/page.fcgi page=query q='NASA+TIROS+RD+GREENBELT+MD+US'");
+	} elsif($test == 8) {
+		# The same client, allowed through: the answer is served.
+		$ENV{'REMOTE_ADDR'} = $us_ip;
+		$ENV{'SERVER_PROTOCOL'} = 'HTTP/1.1';
+		$ENV{'HTTP_USER_AGENT'} = $browser_agent;
+		system("$^X $Bin/../cgi-bin/page.fcgi page=query q='NASA+TIROS+RD+GREENBELT+MD+US'");
 	}
 }

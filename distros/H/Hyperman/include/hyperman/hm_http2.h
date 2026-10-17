@@ -425,6 +425,10 @@ XS_INTERNAL(hm_xs_h2responder) {
     s = (hm_h2_sess *)c->h2;
     st = (hm_h2_stream *)nghttp2_session_get_stream_user_data(s->session, sid);
     if (!st) XSRETURN_EMPTY;
+    /* answered already, or a writer is open on it: one response per stream */
+    if (st->status || st->producing || st->resp_headers)
+        croak("Hyperman responder: a response has already been started "
+              "on this stream");
     if (items < 1 || !(SvROK(ST(0)) && SvTYPE(SvRV(ST(0))) == SVt_PVAV))
         croak("Hyperman responder expects an array reference");
     rav = (AV *)SvRV(ST(0));
@@ -466,34 +470,52 @@ static void hm_h2_run_delayed(pTHX_ hm_h2_sess *s, hm_h2_stream *st, SV *code) {
     SV *responder = hm_closure(aTHX_ hm_xs_h2responder, NULL, NULL, NULL,
                                sv_2mortal(newSViv(st->id)),
                                (IV)s->conn->fd, s->conn->id);
+    int32_t sid = st->id;
     dSP;
     ENTER; SAVETMPS;
     PUSHMARK(SP);
     XPUSHs(responder);
     PUTBACK;
     call_sv(code, G_DISCARD | G_EVAL);
-    if (SvTRUE(ERRSV)) {
-        if (st->resp_body) SvREFCNT_dec(st->resp_body);
-        st->resp_body = newSVpvs("Internal Server Error");
-        st->blen = 21;
-        hm_h2_submit_status(aTHX_ s, st, 500, "text/plain");
+    /* The coderef may have waited, and the stream may have been reset
+     * meanwhile: look it up again. A 500 only for a stream that has not
+     * answered; one that died with a handle still producing is RESET, the
+     * h2 spelling of the HTTP/1 close without the terminating chunk. */
+    st = s->session
+       ? (hm_h2_stream *)nghttp2_session_get_stream_user_data(s->session, sid)
+       : NULL;
+    if (SvTRUE(ERRSV) && st) {
+        if (st->producing) {
+            hm_warn_died(aTHX_ "streaming handler");
+            nghttp2_submit_rst_stream(s->session, NGHTTP2_FLAG_NONE, sid,
+                                      NGHTTP2_INTERNAL_ERROR);
+        } else if (!st->status) {
+            if (st->resp_body) SvREFCNT_dec(st->resp_body);
+            st->resp_body = newSVpvs("Internal Server Error");
+            st->blen = 21;
+            hm_h2_submit_status(aTHX_ s, st, 500, "text/plain");
+        }
     }
     FREETMPS; LEAVE;
     SvREFCNT_dec(responder);
 }
 
 /* Writer (h2 form) called from xs/writer.xs. */
-static void hm_h2_writer_write(pTHX_ int fd, UV gen, int32_t sid, SV *data) {
+/* 1 buffered, -1 stale (the stream is gone, or already closed: this shape
+ * buffers to close, so a write after it has nowhere to go). */
+static int hm_h2_writer_write(pTHX_ int fd, UV gen, int32_t sid, SV *data) {
     hm_loop *loop = hm_cur_loop;
     hm_conn *c = (loop && fd >= 0 && fd < HM_MAXFD) ? loop->conns[fd] : NULL;
     hm_h2_sess *s;
     hm_h2_stream *st;
-    if (!(c && c->id == gen && c->h2)) return;
+    if (!(c && c->id == gen && c->h2)) return -1;
     s = (hm_h2_sess *)c->h2;
+    if (!s->session) return -1;
     st = (hm_h2_stream *)nghttp2_session_get_stream_user_data(s->session, sid);
-    if (!st) return;
+    if (!st || st->status) return -1;
     if (!st->resp_body) st->resp_body = newSVpvs("");
     sv_catsv(st->resp_body, data);
+    return 1;
 }
 
 static void hm_h2_writer_close(pTHX_ int fd, UV gen, int32_t sid) {
@@ -504,8 +526,11 @@ static void hm_h2_writer_close(pTHX_ int fd, UV gen, int32_t sid) {
     AV *hav;
     if (!(c && c->id == gen && c->h2)) return;
     s = (hm_h2_sess *)c->h2;
+    if (!s->session) return;
     st = (hm_h2_stream *)nghttp2_session_get_stream_user_data(s->session, sid);
-    if (!st) return;
+    /* a second close resubmitted the response from offset 0 and overran
+     * its content-length; status is set by the first submit */
+    if (!st || st->status) return;
     { STRLEN l; if (st->resp_body) { (void)SvPV(st->resp_body, l); st->blen = l; } }
     hav = (st->resp_headers && SvROK(st->resp_headers))
         ? (AV *)SvRV(st->resp_headers) : NULL;
@@ -551,6 +576,12 @@ static void hm_h2_deliver(pTHX_ int fd, UV gen, int32_t sid, SV *resp) {
     if (!st) return;
     st->awaiting = 0;
     if (st->resp_f) { SvREFCNT_dec(st->resp_f); st->resp_f = NULL; }
+    /* A stream handle answered this stream, or is still producing its body
+     * (the documented "open a handle after parking" pattern), and the
+     * Future then resolved: responding here freed the producer's buffer
+     * under it and submitted a second HEADERS. The handle owns the
+     * response; the Future's value is dropped, as hm_deliver drops it. */
+    if (st->producing || st->status) return;
     hm_h2_respond(aTHX_ s, st, resp);
     if (hm_logging(loop) && st->env_rv)
         hm_access_log(aTHX_ loop, st->env_rv, st->status, (ssize_t)st->blen);
@@ -828,13 +859,16 @@ static int hm_h2_cb_frame_recv(nghttp2_session *ses,
         /* An Extended CONNECT stream has no end: the client sends headers
          * and then holds the stream open for as long as the session lasts.
          * Waiting for END_STREAM here would mean never dispatching it at
-         * all, so it goes to the application as soon as the headers are
-         * complete - which is also when the application has everything it
-         * needs to accept or refuse the upgrade. */
+         * all, so it is marked ready as soon as the headers are complete -
+         * which is also when the application has everything it needs to
+         * accept or refuse the upgrade. Marked, not dispatched, for the
+         * same reason as the END_STREAM case above: this is still inside
+         * mem_recv, where a handler that waits for its body to drain waits
+         * on frames that cannot arrive. */
         if (frame->hd.type == NGHTTP2_HEADERS
             && (frame->hd.flags & NGHTTP2_FLAG_END_HEADERS)
             && hm_h2_is_connect(aTHX_ st->env))
-            hm_h2_dispatch(aTHX_ s, st);
+            st->ready = 1;
     }
     return 0;
 }
@@ -931,10 +965,31 @@ static int hm_h2_new_session(pTHX_ hm_conn *c) {
     nghttp2_session_callbacks_set_on_data_chunk_recv_callback(cbs, hm_h2_cb_data_chunk);
     nghttp2_session_callbacks_set_on_frame_recv_callback(cbs, hm_h2_cb_frame_recv);
     nghttp2_session_callbacks_set_on_stream_close_callback(cbs, hm_h2_cb_stream_close);
-    if (nghttp2_session_server_new(&s->session, cbs, s) != 0) {
-        nghttp2_session_callbacks_del(cbs);
-        free(s);
-        return -1;
+    {
+        /* The flood limits nghttp2 grew over its releases, PINNED rather
+         * than inherited: rapid reset (1.57) and CONTINUATION floods (1.61)
+         * are answered with GOAWAY whatever the linked library's defaults,
+         * and a build against an older library gets what it has. The
+         * numbers are nghttp2's own defaults. */
+        nghttp2_option *opt = NULL;
+        int rv;
+        if (nghttp2_option_new(&opt) != 0) opt = NULL;
+        if (opt) {
+#if NGHTTP2_VERSION_NUM >= 0x013900
+            nghttp2_option_set_stream_reset_rate_limit(opt, 1000, 33);
+#endif
+#if NGHTTP2_VERSION_NUM >= 0x013d00
+            nghttp2_option_set_max_continuations(opt, 8);
+#endif
+        }
+        rv = opt ? nghttp2_session_server_new2(&s->session, cbs, s, opt)
+                 : nghttp2_session_server_new(&s->session, cbs, s);
+        if (opt) nghttp2_option_del(opt);
+        if (rv != 0) {
+            nghttp2_session_callbacks_del(cbs);
+            free(s);
+            return -1;
+        }
     }
     nghttp2_session_callbacks_del(cbs);
     c->h2 = s;
@@ -1191,8 +1246,8 @@ static int  hm_h2_reentrant(hm_conn *c)    { (void)c; return 0; }
 static int  hm_h2_detect(pTHX_ hm_conn *c) { (void)c; return 0; }
 static void hm_h2_input(pTHX_ hm_conn *c)  { (void)c; }
 static void hm_h2_free(pTHX_ void *h2)     { (void)h2; }
-static void hm_h2_writer_write(pTHX_ int fd, UV gen, int32_t sid, SV *d)
-    { (void)fd; (void)gen; (void)sid; (void)d; }
+static int  hm_h2_writer_write(pTHX_ int fd, UV gen, int32_t sid, SV *d)
+    { (void)fd; (void)gen; (void)sid; (void)d; return -1; }
 static void hm_h2_writer_close(pTHX_ int fd, UV gen, int32_t sid)
     { (void)fd; (void)gen; (void)sid; }
 static int  hm_h2_preface_pending(hm_conn *c) { (void)c; return 0; }

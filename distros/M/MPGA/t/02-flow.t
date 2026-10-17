@@ -8,7 +8,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 13;
+use Test::More tests => 14;
 BEGIN { use_ok('MPGA') };
 
 #########################
@@ -50,7 +50,7 @@ my $arg = [];
 $flow = [ $arg, \&fun1, 3, 2, 1 ];
 flow( $flow );
 is_deeply( $flow, [], 'test flow( fun_return, args )' );
-is_deeply( $arg, ['fun1', 1, 2, 3], 'test flow( fun1, args )' );
+is_deeply( $arg, ['fun1', 3, 2, 1], 'test flow( fun1, args )' );
 
 $arg = {};
 $flow = [ $arg, \&fun2, \&fun3 ];
@@ -59,6 +59,17 @@ is_deeply( $flow, [], 'test flow( fun2, fun3)' );
 ok( eq_hash( $arg, { 'fun2' => [\&fun3], 'fun3' => [] } ) , 'test flow( hash )' );
 
 
+my $ctx_test = {};
+flow([1, \&fun_ctx_direct], $ctx_test);
+is($ctx_test->{val}, 1, 'test flow($flow, $ctx) direct call');
+
+
+
+sub fun_ctx_direct : MPGAargsNum(1) {
+  my ($self, $args, $flow, $ctx) = @_;
+  $ctx->{val} = $args->[0];
+  return;
+}
 
 sub fun1 {
   my ( $self, $args, $flow ) = @_;

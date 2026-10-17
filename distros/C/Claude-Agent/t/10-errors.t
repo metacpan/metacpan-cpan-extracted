@@ -103,21 +103,18 @@ isa_ok($@, 'Claude::Agent::Error', 'HookError can be caught as Error');
 eval { Claude::Agent::Error::CLINotFound->throw(message => 'not found') };
 isa_ok($@, 'Claude::Agent::Error::CLINotFound', 'throw() creates and dies with error');
 
-# Test using errors in try/catch pattern
-use Try::Tiny;
-
 my $caught_type;
-try {
+eval {
     die Claude::Agent::Error::CLINotFound->new(message => 'not found');
-}
-catch {
-    if ($_->isa('Claude::Agent::Error::CLINotFound')) {
+};
+if (my $err = $@) {
+    if ($err->isa('Claude::Agent::Error::CLINotFound')) {
         $caught_type = 'cli_not_found';
     }
-    elsif ($_->isa('Claude::Agent::Error')) {
+    elsif ($err->isa('Claude::Agent::Error')) {
         $caught_type = 'generic_error';
     }
-};
+}
 
 is($caught_type, 'cli_not_found', 'can catch specific error types');
 

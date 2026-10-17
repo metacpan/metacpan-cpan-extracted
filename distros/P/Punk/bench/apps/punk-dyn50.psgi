@@ -5,8 +5,9 @@ use FindBin ();
 use lib "$FindBin::Bin/../../lib";
 # BENCH-PATH: /api/zz/42
 
-# 50 dynamic routes sharing one first segment - a single bucket the
-# Perl router scans with 50 regexes; the benched route sits last.
+# 50 dynamic routes sharing one first segment, so the C router's linear scan
+# over typed records does 50 segment comparisons before the benched route,
+# which sits last: the worst case the scan has (about 0.3 us over punk-dyn).
 package BenchDyn50;
 use Punk;
 

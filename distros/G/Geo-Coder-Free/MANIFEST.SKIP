@@ -71,6 +71,8 @@ Geo-.*
 typescript
 mutation.json
 ^xt/mutant_\d
+# The bare-environment check the CI job runs: an author's tool, not shipped
+^xt/bare-environment\.pl$
 CLAUDE.md
 \.claude
 \.circleci

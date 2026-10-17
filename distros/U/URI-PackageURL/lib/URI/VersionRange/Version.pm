@@ -5,37 +5,54 @@ use strict;
 use utf8;
 use warnings;
 
+use Carp ();
+
 use URI::VersionRange::Util qw(generic_version_compare);
 
 use overload ('cmp' => \&compare, '<=>' => \&compare, fallback => 1);
 
 use constant DEBUG => $ENV{VERS_DEBUG};
 
-our $VERSION = '2.25';
+our $VERSION = '2.26';
 
 sub load {
 
     my ($class, $scheme) = @_;
 
-    $scheme = lc $scheme;
+    $scheme = lc($scheme // '');
 
-    my @CLASSES = (
-        join('::', 'URI::VersionRange::Scheme',  lc($scheme)),    # Scheme specific
-        join('::', 'URI::VersionRange::Version', lc($scheme)),    # Scheme specific (legacy naming convention)
-    );
+    my @CLASSES = ();
+
+    (my $name = $scheme) =~ tr/.-/__/;
+    if (($name) = $name =~ /\A([a-z][a-z0-9_]*)\z/) {
+        push @CLASSES, "URI::VersionRange::Scheme::$name";     # Scheme specific
+        push @CLASSES, "URI::VersionRange::Version::$name";    # Scheme specific (legacy naming convention)
+    }
+
+    push @CLASSES, 'URI::VersionRange::Scheme::generic';       # Fallback
+    push @CLASSES, 'URI::VersionRange::Version::generic';      # Fallback
 
     foreach my $version_class (@CLASSES) {
-
-        if ($version_class->can('new') or eval "require $version_class; 1") {
+        if ($version_class->can('new') or _require_class($version_class)) {
             DEBUG and say STDERR "-- Loaded '$version_class' class";
             return $version_class;
         }
-
-        DEBUG and say STDERR "-- (E) Failed to load '$version_class' class: $@" if $@;
-
     }
 
     return $class;
+
+}
+
+sub _require_class {
+
+    my $version_class = shift;
+
+    (my $file = "$version_class.pm") =~ s{::}{/}g;
+
+    return 1 if eval { require $file; 1 };
+
+    Carp::croak "Failed to load '$version_class' comparator class: $@" if $@ !~ /^Can't locate \Q$file\E in \@INC/;
+    return;
 
 }
 
@@ -65,18 +82,70 @@ package    # hide from pause
     }
 }
 
-# PyPi
+# SemVer
 
 package    # hide from pause
-    URI::VersionRange::Scheme::pypi {
+    URI::VersionRange::Scheme::semver {
     use parent 'URI::VersionRange::Version';
 
-    use version();
+    use URI::VersionRange::Util qw(semver_version_compare);
     use overload ('cmp' => \&compare, '<=>' => \&compare, fallback => 1);
 
     sub compare {
         my ($left, $right) = @_;
-        return (version->parse($left->[0]) <=> version->parse($right->[0]));
+        return semver_version_compare($left->[0], $right->[0]);
+    }
+}
+
+# NPM
+
+package    # hide from pause
+    URI::VersionRange::Scheme::npm {
+    use parent -norequire, 'URI::VersionRange::Scheme::semver';
+}
+
+# intdot
+
+package    # hide from pause
+    URI::VersionRange::Scheme::intdot {
+    use parent 'URI::VersionRange::Version';
+
+    use URI::VersionRange::Util qw(intdot_version_compare);
+    use overload ('cmp' => \&compare, '<=>' => \&compare, fallback => 1);
+
+    sub compare {
+        my ($left, $right) = @_;
+        return intdot_version_compare($left->[0], $right->[0]);
+    }
+}
+
+# lexicographic
+
+package    # hide from pause
+    URI::VersionRange::Scheme::lexicographic {
+    use parent 'URI::VersionRange::Version';
+
+    use URI::VersionRange::Util qw(lexicographic_version_compare);
+    use overload ('cmp' => \&compare, '<=>' => \&compare, fallback => 1);
+
+    sub compare {
+        my ($left, $right) = @_;
+        return lexicographic_version_compare($left->[0], $right->[0]);
+    }
+}
+
+# datetime
+
+package    # hide from pause
+    URI::VersionRange::Scheme::datetime {
+    use parent 'URI::VersionRange::Version';
+
+    use URI::VersionRange::Util qw(datetime_version_compare);
+    use overload ('cmp' => \&compare, '<=>' => \&compare, fallback => 1);
+
+    sub compare {
+        my ($left, $right) = @_;
+        return datetime_version_compare($left->[0], $right->[0]);
     }
 }
 
@@ -117,6 +186,30 @@ URI::VersionRange::Version - Version scheme helper class
 
 This is a base class for the version scheme helper.
 
+The version comparator is provided by the scheme class (see L</HOW TO CREATE A NEW SCHEME COMPARATOR CLASS>)
+and it's used by L<URI::VersionRange> for C<contains> and for sorting the constraints in C<to_string>.
+
+=head2 BUNDLED SCHEME COMPARATORS
+
+=over 2
+
+=item * C<cpan> - L<version> module
+
+=item * C<semver> - Semantic Versioning 2.0.0 (L<https://semver.org>)
+
+=item * C<npm> - Same as C<semver>
+
+=item * C<datetime> - RFC 3339 timestamp (leap second C<60> is not supported)
+
+=item * C<intdot> - Integers separated by dots (eg. C<10.234.5.12>)
+
+=item * C<lexicographic> - Byte-wise comparison of the UTF-8 encoded versions
+
+=back
+
+For all other schemes the generic comparator is used (see C<generic_version_compare>
+in L<URI::VersionRange::Util>).
+
 
 =head2 OBJECT-ORIENTED INTERFACE
 
@@ -134,9 +227,12 @@ Compare the version
 
 =head3 B<from_native>
 
-    $v->from_native( $native_range )
+    $vers_string = $class->from_native( $native_range, $scheme )
 
-Convert the native range of the scheme into a VERS string.
+Convert the native range of the scheme into a VERS string (optional).
+
+If implemented in the scheme class, this method is used by C<< URI::VersionRange->from_native >>
+instead of C<native_range_to_vers> (see L<URI::VersionRange::Util>).
 
 =head3 B<load>
 
@@ -144,13 +240,37 @@ Convert the native range of the scheme into a VERS string.
 
 Load scheme class.
 
+The class name is built using the C<scheme>, replacing period C<.> and dash C<->
+with underscore C<_> (eg. C<foo-bar> --> C<URI::VersionRange::Scheme::foo_bar>).
+
+This method will attempt to load the classes in this order:
+
+=over 2
+
+=item * C<< URI::VersionRange::Scheme::<scheme> >>
+
+=item * C<< URI::VersionRange::Version::<scheme> >> (legacy naming convention)
+
+=item * C<URI::VersionRange::Scheme::generic> (fallback)
+
+=item * C<URI::VersionRange::Version::generic> (fallback)
+
+=back
+
+If no class is found, the generic comparator of L<URI::VersionRange::Version>
+will be used.
+
+Croaks if the scheme class exists but fails to load (eg. syntax error or
+missing dependency).
+
 
 =head2 HOW TO CREATE A NEW SCHEME COMPARATOR CLASS
 
 =over 2
 
 =item * Create a new package using the naming convention C<< URI::VersionRange::Scheme::<scheme> >>
-by extending L<URI::VersionRange::Version>.
+by extending L<URI::VersionRange::Version> (period C<.> and dash C<-> in the scheme
+must be replaced with underscore C<_>).
 
 =item * Implements the C<compare($left, $right)> subroutine with the algorithm required
 by the C<scheme>.
@@ -160,18 +280,18 @@ first element the value of the version to be compared.
 
 =item * L<overload> C<< '<=>' >> and C<cmp> operators using C<compare> subroutine (MANDATORY)
 
-=item * Implement the C<from_native($self, $native)> subroutine to convert the
-native range of the scheme into a VERS string
+=item * Implement the C<from_native($class, $native_range, $scheme)> subroutine to convert the
+native range of the scheme into a VERS string (optional)
 
 =back
 
 
-This is an example that implements a comparator for the C<generic> scheme using
-L<Version::libversion::XS> module:
+This is an example that implements a comparator for the C<generic> fallback scheme
+using L<Version::libversion::XS> module:
 
   package URI::VersionRange::Scheme::generic {
 
-      use Version::libversion::XS;
+      use Version::libversion::XS qw(version_compare2);
 
       use parent 'URI::VersionRange::Version';
       use overload ('cmp' => \&compare, '<=>' => \&compare, fallback => 1);

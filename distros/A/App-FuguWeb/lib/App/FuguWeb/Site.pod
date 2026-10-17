@@ -40,7 +40,11 @@ output directory, and gives the same bytes for the same checkout.
 
 =head2 config, staging
 
-The site description, and the mdoc staging directory.
+    my $staging = $site->staging;
+    my $english = $site->staging('en');
+
+The site description, and the mdoc staging directory, or the directory
+of one language inside it.
 
 =head2 missing_tool
 
@@ -67,15 +71,18 @@ on a path that the build writes;
 
 =item 3.
 
-lint every mdoc source;
+lint every mdoc source of each language;
 
 =item 4.
 
-create the output directory and the staging directory inside it;
+create the output directory, the directory of each language tree, and
+the staging directory of each language;
 
 =item 5.
 
-copy every mdoc source into the staging directory under its staged name;
+copy the mdoc source of each language into the staging directory of
+that language, under its staged name. A source of a translation takes
+the staged name of its namesake;
 
 =item 6.
 
@@ -87,11 +94,15 @@ write the key directory, when the description names one;
 
 =item 8.
 
-render each C<page> block;
+render each C<page> block into each language tree, from the values of
+that language, then the pages of the top level: the copy of
+F<404.html> when the description holds that page, and the forward
+F<index.html>;
 
 =item 9.
 
-render one page for each manual in each group;
+render one page for each manual in each group, into each language
+tree, from the source of that language;
 
 =item 10.
 
@@ -105,11 +116,19 @@ right. A manual that was renamed leaves its old page behind, and a site
 that carried both would fail its own check. The build owns the output
 directory, so it owns the removal too.
 
-The build owns a plain file at the top level of the output. Below the
-root it owns a file that the site names, and one that takes a shape of
-the key directory. It keeps every other entry and reports it. An
-operator directory in the output therefore survives a build, empty or
-not.
+The build owns a plain file at the top level of the output, and a plain
+file directly in a directory of the top level whose name has the shape
+of a language code. A page of an older flat layout, and the tree of a
+language that the description dropped, are therefore removed. Below the
+root the build also owns a file that the site names, and one that takes
+a shape of the key directory. It keeps every other entry and reports
+it. An operator directory in the output therefore survives a build,
+empty or not, unless it sits at the top level and its name has the
+shape of a language code. The build takes such a directory for a
+language tree: it removes each plain file directly in it that the site
+does not name, and then the directory itself once it is empty. An
+operator directory of that name below the top level, such as
+F<img/de>, is no language tree, so it survives.
 
 A description with no C<keys> block owns no shape of the key directory
 and no directory of the key tree. A site of another maker holds
@@ -117,10 +136,11 @@ F<.well-known/security.txt> too, and the clean must not delete that
 site.
 
 The build removes an empty directory that it owns: one that the site
-holds a name below, and one of the key tree. The output directory
-itself always stays. The clean reads the same two tests, so a build can
-never remove a directory that the clean refuses. C<rmdir> refuses a
-directory that still holds a name, so the walk needs no second test.
+holds a name below, one of the key tree, and a language tree. The
+output directory itself always stays. The clean reads the same three
+tests, so a build can never remove a directory that the clean refuses.
+C<rmdir> refuses a directory that still holds a name, so the walk needs
+no second test.
 
 The method returns true on success, and C<undef> with a message in the
 log otherwise.
@@ -139,24 +159,25 @@ tree without asking, so the one thing it must never do is delete a tree
 that no build made.
 
 A plain file of the top level is one that a build writes, whatever the
-description names today. A renamed manual leaves its old page there. A
-file below the root must be one that the site names, or one of the
-shapes that the key directory takes. A directory must hold a name of
-the site, or be a directory of the key tree. A symlink is never a thing
-that a build wrote. The clean refuses every other entry, and it names
-it.
+description names today. So is a plain file directly in a language
+tree: a renamed manual leaves its old page there. A file below the root
+must be one that the site names, or one of the shapes that the key
+directory takes. A directory must hold a name of the site, be a
+language tree, or be a directory of the key tree. A symlink is never a
+thing that a build wrote. The clean refuses every other entry, and it
+names it.
 
 The clean and the prune read one predicate, so a build can never remove
 a file that the clean refuses.
 
 The staging directory is a build detail, and the build writes one flat
-directory of sources into it. A tree below it belongs to whoever made
-it.
+directory of sources into it for each language. A tree of another shape
+belongs to whoever made it.
 
 With C<--out> the description still names the key directory, so
 C<clean> reads it when it can. A description that does not load names
-nothing, and one flat directory of files is then the whole site that
-C<clean> knows.
+nothing. The files of the top level and the language trees, which the
+clean reads by shape, are then the whole site that C<clean> knows.
 
 That fallback is weak, so C<clean> asks for one more thing: the target
 must hold the stylesheet. Every build writes it, so a target without it
@@ -187,7 +208,7 @@ so the guard has to sit here as well.
 A description that names neither directory takes the two defaults.
 
 The source directory needs the rule because it reads like a built site:
-a flat directory of files. The key directory is the worst case. Each
+plain files of the top level. The key directory is the worst case. Each
 key file sits at its top level, where the clean takes a plain file, so
 a clean of it would take the trust anchor of every release.
 
@@ -214,11 +235,13 @@ build that read one would give different bytes on every checkout.
 
 C<mandoc> decides between a local link and a link to the manual host by
 looking for a file named C<%N.%S> in its working directory. Every mdoc
-source is therefore copied into one directory under its
-L<App::FuguWeb::Manual/staged_name>, and C<mandoc> runs there.
+source is therefore copied into one directory for each language under
+its L<App::FuguWeb::Manual/staged_name>, and C<mandoc> runs there.
 
-The directory lives inside the output directory, under F<.man>, and the
-build removes it. Staging is a build detail: a published tree that
+The directory lives inside the output directory, under
+F<< .man/<code> >>, and the build removes it. A plain file directly in
+F<.man>, or a directory there of another name, is somebody else's, and
+the build refuses it. Staging is a build detail: a published tree that
 carried it would serve the mdoc sources beside the pages made from them.
 
 =head1 THE KEY DIRECTORY

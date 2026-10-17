@@ -1,6 +1,6 @@
 package Parse::File::Metadata;
 use strict;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 use Carp;
 use Scalar::Util qw( reftype );
 
@@ -356,21 +356,16 @@ sub get_exception {
     return $self->{exception};
 }
 
-=head1 SUPPORT
-
-L<https://rt.cpan.org>
-
 =head1 AUTHOR
 
     James E Keenan
     CPAN ID: jkeenan
-    Perl Seminar NY
-    jkeenan@cpan.org
+    jkeenan@pobox.com
     http://thenceforward.net/perl/modules/Parse-File-Metadata
 
 =head1 COPYRIGHT
 
-Copyright 2010 James E Keenan
+Copyright 2010-2026 James E Keenan
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.

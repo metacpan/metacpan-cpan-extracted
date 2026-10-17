@@ -42,6 +42,12 @@ if (!$pid) {
         $ws->on(ping    => sub { });      # the pong is automatic
     };
 
+    # answers one message only: the rest is read and dropped
+    websocket '/sink' => sub {
+        my ($c, $ws) = @_;
+        $ws->on(message => sub { $_[0]->send('pong') if $_[1] eq 'ping-me' });
+    };
+
     websocket '/chat' => sub {
         my ($c, $ws) = @_;
         my $room = Punk::WebSocket::Room->named('lobby');
@@ -394,6 +400,31 @@ sub http_get {
     syswrite $s2, encode_client(opcode => 1, payload => 'x');
     is(read_frame($s2)->{payload}, 'guarded ok', 'the guarded socket works');
     close $s2;
+}
+
+# ---- one loud client does not own the worker ---------------------------------
+# The read loop used to run until the socket was empty. A client that kept
+# its socket full was read and processed until it stopped, and every other
+# connection on the worker waited for it (2.2 s measured for this reply).
+{
+    my ($a) = ws_connect(path => '/sink');
+    my ($b) = ws_connect(path => '/sink');
+    my $child = fork // die "fork: $!";
+    if (!$child) {
+        my $buf = encode_client(opcode => 1, payload => 'x') x 100_000;
+        my $end = time + 2;
+        while (time < $end) { syswrite $a, $buf or last }
+        require POSIX; POSIX::_exit(0);
+    }
+    select undef, undef, undef, 0.3;
+    my $t0 = Time::HiRes::time();
+    syswrite $b, encode_client(opcode => 1, payload => 'ping-me');
+    my $f  = read_frame($b);
+    my $dt = Time::HiRes::time() - $t0;
+    waitpid $child, 0;
+    is($f && $f->{payload}, 'pong', 'the quiet client was answered');
+    cmp_ok($dt, '<', 1.0, sprintf 'in %.3fs, while another client kept its socket full', $dt);
+    close $a; close $b;
 }
 
 # ---- ordinary HTTP is unaffected throughout ---------------------------------

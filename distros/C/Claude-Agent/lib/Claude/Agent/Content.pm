@@ -4,13 +4,32 @@ use 5.020;
 use strict;
 use warnings;
 
-use Types::Common -types;
-
-# Load subclasses
+use Claude::Agent::Types;
 use Claude::Agent::Content::Text;
 use Claude::Agent::Content::Thinking;
 use Claude::Agent::Content::ToolUse;
 use Claude::Agent::Content::ToolResult;
+
+my %CLASS_FOR = (
+    text        => 'Claude::Agent::Content::Text',
+    thinking    => 'Claude::Agent::Content::Thinking',
+    tool_use    => 'Claude::Agent::Content::ToolUse',
+    tool_result => 'Claude::Agent::Content::ToolResult',
+);
+
+sub from_json {
+    my ($class, $data) = @_;
+
+    my $target = $CLASS_FOR{ $data->{type} // '' } or return $data;
+    return $target->new(
+        Claude::Agent::Types::known_args($target, $data),
+        raw => $data,
+    );
+}
+
+1;
+
+__END__
 
 =head1 NAME
 
@@ -20,7 +39,6 @@ Claude::Agent::Content - Content block types for Claude Agent SDK
 
     use Claude::Agent::Content;
 
-    # Content blocks are part of assistant messages
     for my $block (@{$msg->content_blocks}) {
         if ($block->isa('Claude::Agent::Content::Text')) {
             print $block->text;
@@ -32,8 +50,9 @@ Claude::Agent::Content - Content block types for Claude Agent SDK
 
 =head1 DESCRIPTION
 
-This module contains all content block types that can appear in
-assistant messages from the Claude Agent SDK.
+This module loads the content block classes that appear inside assistant
+and user messages and provides the factory that builds them from decoded
+JSON.
 
 =head1 CONTENT TYPES
 
@@ -55,32 +74,11 @@ assistant messages from the Claude Agent SDK.
 
     my $block = Claude::Agent::Content->from_json($data);
 
-Factory method to create the appropriate content block type from JSON data.
-
-=cut
-
-sub from_json {
-    my ($class, $data) = @_;
-
-    my $type = $data->{type} // '';
-
-    if ($type eq 'text') {
-        return Claude::Agent::Content::Text->new(%$data);
-    }
-    elsif ($type eq 'thinking') {
-        return Claude::Agent::Content::Thinking->new(%$data);
-    }
-    elsif ($type eq 'tool_use') {
-        return Claude::Agent::Content::ToolUse->new(%$data);
-    }
-    elsif ($type eq 'tool_result') {
-        return Claude::Agent::Content::ToolResult->new(%$data);
-    }
-    else {
-        # Return as hashref for unknown types
-        return $data;
-    }
-}
+Builds the content block object for C<$data-E<gt>{type}>. A block of a type
+this module does not know is returned as the hashref it was given. Keys the
+class does not declare are not lost: the whole hashref is kept in the
+object's C<raw> attribute. A key whose value is JSON null is treated as
+absent.
 
 =head1 AUTHOR
 
@@ -93,5 +91,3 @@ This software is Copyright (c) 2026 by LNATION.
 This is free software, licensed under The Artistic License 2.0 (GPL Compatible).
 
 =cut
-
-1;

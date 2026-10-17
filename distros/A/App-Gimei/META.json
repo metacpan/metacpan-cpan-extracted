@@ -4,7 +4,7 @@
       "NAKAJIMA Yusaku <youpong@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.29",
+   "generated_by" : "Minilla/v3.3.0",
    "license" : [
       "mit"
    ],
@@ -28,14 +28,15 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build::Tiny" : "== 0.052"
+            "Module::Build::Tiny" : "== 0.053"
          }
       },
       "develop" : {
          "requires" : {
-            "CPAN::Uploader" : "== 0.103018",
-            "Minilla" : "== v3.1.29",
-            "Perl::Tidy" : "== 20260109",
+            "CPAN::Uploader" : "== 0.103019",
+            "Minilla" : "== v3.3.0",
+            "Module::CPANfile" : "== 1.1004",
+            "Perl::Tidy" : "== 20260826",
             "Reply" : "== 0.42",
             "Software::License" : "== 0.104007",
             "Spellunker" : "== v0.4.0",
@@ -51,24 +52,21 @@
       "runtime" : {
          "requires" : {
             "Data::Gimei" : "== v0.5.0",
-            "Getopt::Long" : "== 2.58",
             "Pod::Find" : "== 1.67",
-            "Pod::Text" : "== v6.0.2",
-            "Pod::Usage" : "== 2.05",
-            "perl" : "v5.40.0"
+            "perl" : "v5.42.0"
          }
       },
       "test" : {
          "requires" : {
             "Capture::Tiny" : "== 0.50",
-            "Test2::V1" : "== 1.302219"
+            "Test2::V1" : "== 1.302225"
          }
       }
    },
    "provides" : {
       "App::Gimei" : {
          "file" : "lib/App/Gimei.pm",
-         "version" : "v0.3.1"
+         "version" : "v0.3.2"
       },
       "App::Gimei::Generator" : {
          "file" : "lib/App/Gimei/Generator.pm"
@@ -95,7 +93,7 @@
          "web" : "https://github.com/youpong/App-Gimei"
       }
    },
-   "version" : "v0.3.1",
+   "version" : "v0.3.2",
    "x_authority" : "cpan:YOUPONG",
    "x_contributors" : [
       "NAKAJIMA Yusaku <yupong7@gmail.com>",

@@ -4,12 +4,36 @@ use 5.020;
 use strict;
 use warnings;
 
-use Types::Common -types;
-use Marlin
-    'description!' => Str,     # When to use this agent
-    'prompt!'      => Str,     # System prompt for the agent
-    'tools?'       => ArrayRef[Str],  # Allowed tools (inherits if not set)
-    'model?'       => Str;     # Model override ('sonnet', 'opus', 'haiku', 'inherit')
+use Object::Proto ();
+use Claude::Agent::Types;
+
+BEGIN {
+    Object::Proto::define('Claude::Agent::Subagent',
+        'description:Str:required',
+        'prompt:Str:required',
+        'tools:StrList:predicate',
+        'model:Str:predicate',
+    );
+}
+
+sub to_hash {
+    my ($self) = @_;
+
+    my $hash = {
+        description => $self->description,
+        prompt      => $self->prompt,
+    };
+
+    $hash->{tools} = $self->tools if $self->has_tools;
+    $hash->{model} = $self->model if $self->has_model;
+
+    return $hash;
+}
+
+
+1;
+
+__END__
 
 =head1 NAME
 
@@ -116,23 +140,6 @@ Convert to a hashref for passing to the SDK.
 
 =cut
 
-sub to_hash {
-    my ($self) = @_;
-
-    my $hash = {
-        description => $self->description,
-        prompt      => $self->prompt,
-    };
-
-    $hash->{tools} = $self->tools if $self->has_tools;
-    $hash->{model} = $self->model if $self->has_model;
-
-    return $hash;
-}
-
-1;
-
-__END__
 
 =head1 EXAMPLES
 

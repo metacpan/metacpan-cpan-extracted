@@ -25,7 +25,7 @@ build_requires:
   File::Spec: '0'
   File::Temp: '0'
   Geo::Coder::Abbreviations: '0.03'
-  Geo::Location::Point: '0.16'
+  Geo::Location::Point: '0.18'
   IO::AIO: '0'
   IPC::System::Simple: '0'
   JSON::MaybeXS: '0'
@@ -48,6 +48,7 @@ build_requires:
   Test::NoWarnings: '0'
   Test::Number::Delta: '0'
   Test::Returns: '0'
+  Test::Script: '1.12'
   Test::Without::Module: '0'
   Try::Tiny: '0'
   XML::LibXML::Reader: '0'
@@ -83,7 +84,7 @@ requires:
   File::pfopen: '0.02'
   Geo::Coder::Abbreviations: '0.03'
   Geo::Hash: '0'
-  Geo::Location::Point: '0.16'
+  Geo::Location::Point: '0.18'
   Geo::StreetAddress::US: '0'
   Lingua::EN::AddressParse: '0'
   Locale::CA: '0'
@@ -103,5 +104,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-Free
   homepage: https://geocode.nigelhorne.com
   repository: git://github.com/nigelhorne/Geo-Coder-Free.git
-version: '0.46'
+version: '0.47'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

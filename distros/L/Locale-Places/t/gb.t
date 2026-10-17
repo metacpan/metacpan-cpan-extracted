@@ -8,8 +8,7 @@ use warnings;
 # use autodie qw(:all);
 use Test::DescribeMe qw(extended);	# This can use a lot of resources
 use Test::Most tests => 6;
-use lib 't/lib';
-use MyLogger;
+use Test::Log::Abstraction;
 
 BEGIN {
 	use_ok('Locale::Places::GB');
@@ -19,7 +18,7 @@ GB: {
 	SKIP: {
 		if((!defined($ENV{'AUTOMATED_TESTING'}) && (!defined($ENV{'NO_NETWORK_TESTING'})) && (-d 'lib/Locale/Places/data'))) {
 			Database::Abstraction::init(directory => 'lib/Locale/Places/data');
-			my $places = new_ok('Locale::Places::GB' => [logger => new_ok('MyLogger'), no_entry => 1]);
+			my $places = new_ok('Locale::Places::GB' => [logger => new_ok('Test::Log::Abstraction'), no_entry => 1]);
 
 			eval { require 'autodie' };
 

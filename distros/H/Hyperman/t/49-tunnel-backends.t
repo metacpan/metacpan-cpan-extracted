@@ -77,6 +77,33 @@ for my $case (@backends) {
                         Hyperman::_abi_stream_write("deferred;");
                     };
                 }
+                if ($p eq '/tunnel-wait') {
+                    # A SYNCHRONOUS 101 handler that waits (tunnel state 2:
+                    # the request is still in the read buffer) while the
+                    # client keeps sending. Those bytes belong to the
+                    # handle, but only once this frame has consumed the
+                    # request; handing them up during the wait shipped the
+                    # request line to the callback and underflowed the
+                    # memmove that followed.
+                    Hyperman::_abi_stream_open($env, 101,
+                        [ 'Upgrade' => 'echo', 'Connection' => 'Upgrade' ])
+                        or return [ 500, [ 'Content-Type' => 'text/plain' ],
+                                    ['no tunnel'] ];
+                    Hyperman::_abi_stream_read();
+                    Hyperman->loop->timer_f(0.3)->get;
+                    Hyperman::_abi_stream_write("waited;");
+                    return [ 101, [], [] ];
+                }
+                if ($p eq '/async') {
+                    return Hyperman->loop->timer_f(0.05)->then(sub {
+                        Hyperman::Future->done_future(
+                            [ 200, [ 'Content-Type' => 'text/plain' ], ['async'] ]);
+                    });
+                }
+                if ($p eq '/slowsync') {
+                    Hyperman->loop->timer_f(0.3)->get;
+                    return [ 200, [ 'Content-Type' => 'text/plain' ], ['slow'] ];
+                }
                 if ($p eq '/tunnel-rx') {
                     my ($n, $len, $bytes) = Hyperman::_abi_stream_rx();
                     return [ 200, [ 'Content-Type' => 'text/plain' ], [$bytes] ];
@@ -171,6 +198,46 @@ for my $case (@backends) {
         is($body->('/tunnel-close'), 'close=0', "$label: $how: stream_close");
         is($read_until->($s, undef, 3), '',
            "$label: $how: closing the handle closed the connection");
+        close $s;
+    }
+
+    {   # bytes arriving while a synchronous 101 handler waits
+        my $s = $connect->();
+        ok($s, "$label: connected for the waiting tunnel") or next;
+        syswrite $s, "GET /tunnel-wait HTTP/1.1\r\nHost: 127.0.0.1\r\n"
+                   . "Upgrade: echo\r\nConnection: Upgrade\r\n\r\n";
+        Time::HiRes::sleep(0.1);                  # inside the handler's wait
+        syswrite $s, 'during;';
+        my $got = $read_until->($s, qr/waited;/, 5);
+        like($got, qr{^HTTP/1\.1 101 }, "$label: waiting tunnel: a 101 went out");
+        my $rx = '';
+        my $deadline = Time::HiRes::time() + 5;
+        while (Time::HiRes::time() < $deadline) {
+            $rx = $body->('/tunnel-rx');
+            last if $rx eq 'during;';
+            Time::HiRes::sleep(0.02);
+        }
+        is($rx, 'during;', "$label: bytes sent while a synchronous 101 handler "
+                         . "waited reached the read half after it returned");
+        $body->('/tunnel-close');
+        close $s;
+    }
+
+    {   # a pipelined request behind an async one, served while its own
+        # synchronous handler waits and the client sends a third: the
+        # read that lands under that handler's frame must wait for it
+        my $s = $connect->();
+        ok($s, "$label: connected for the pipeline under a wait") or next;
+        syswrite $s, "GET /async HTTP/1.1\r\nHost: 127.0.0.1\r\n\r\n"
+                   . "GET /slowsync HTTP/1.1\r\nHost: 127.0.0.1\r\n\r\n";
+        Time::HiRes::sleep(0.2);                  # inside /slowsync's wait
+        syswrite $s, "GET /backend HTTP/1.1\r\nHost: 127.0.0.1\r\n"
+                   . "Connection: close\r\n\r\n";
+        my $got = $read_until->($s, undef, 5);
+        my @st = $got =~ m{HTTP/1\.1 (\d\d\d) }g;
+        is_deeply(\@st, [200, 200, 200],
+                  "$label: three responses to the three pipelined requests");
+        like($got, qr/async.*slow.*\Q$backend\E/s, "$label: ...in order, each once");
         close $s;
     }
 

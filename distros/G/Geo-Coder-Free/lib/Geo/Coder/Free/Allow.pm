@@ -6,7 +6,7 @@ use Geo::Coder::Free::Utils;
 # Usage:
 #	unless(Geo::Coder::Free::Allow::allow({info => $info, lingua => $lingua})) {
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 use strict;
 use warnings;

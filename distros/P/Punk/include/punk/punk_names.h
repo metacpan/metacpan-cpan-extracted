@@ -58,6 +58,10 @@ static int pk_require_once(pTHX_ const char *mod, int fatal) {
     sv_catpvs(file, ".pm");
     inc = GvHVn(PL_incgv);
     if (inc && hv_exists_ent(inc, file, 0)) return 1;
+    /* The name goes into Perl source. A `database backend` from punk.yml
+     * reaches here, so it is checked the way the keyword-named classes are
+     * (pk_require_src croaks on anything that is not a class name). */
+    (void)pk_require_src(aTHX_ mod);
     eval_pv(form("require %s;", mod), fatal);
     return SvTRUE(ERRSV) ? 0 : 1;
 }

@@ -1,4 +1,4 @@
-use v5.40;
+use v5.42;
 
 use App::Gimei::Parser;
 
@@ -9,12 +9,12 @@ use Test2::Tools::Exception qw/dies/;
 describe "App::Gimei::Parser" => sub {
 
     it "parse(): no args" => sub {
-        my @gs = App::Gimei::Parser::parse( [] )->to_list;
+        my @gs = App::Gimei::Parser::parse([])->to_list;
         T2->is( scalar @gs, 0, "contains no generator" );
     };
 
     it "_parse_arg(): word_type(name|male|female)" => sub {
-        my $g = App::Gimei::Parser::parse( [ 'name', 'male', 'female' ] );
+        my $g = App::Gimei::Parser::parse(['name', 'male', 'female']);
         my @l = $g->to_list;
 
         T2->is( scalar @l,         3, "contains 3 generator" );
@@ -27,7 +27,7 @@ describe "App::Gimei::Parser" => sub {
     };
 
     it "_parse_arg(): word_type(address)" => sub {
-        my $g = App::Gimei::Parser::parse( ['address'] );
+        my $g = App::Gimei::Parser::parse(['address']);
         my @l = $g->to_list;
 
         T2->is( scalar @l,         1 );
@@ -35,14 +35,14 @@ describe "App::Gimei::Parser" => sub {
     };
 
     it "_parse_arg(): unknown word_type" => sub {
-        T2->like( dies { App::Gimei::Parser::parse( ['unknown'] ) },
+        T2->like( dies { App::Gimei::Parser::parse(['unknown']) },
             qr/unknown word_type/ );
     };
 
     it "_parse_arg(): unknown subtype/rendering" => sub {
-        T2->like( dies { App::Gimei::Parser::parse( ['name:unknown'] ) },
+        T2->like( dies { App::Gimei::Parser::parse(['name:unknown']) },
             qr/unknown subtype/ );
-        T2->like( dies { App::Gimei::Parser::parse( ['name:family:unknown'] ) },
+        T2->like( dies { App::Gimei::Parser::parse(['name:family:unknown']) },
             qr/unknown rendering/ );
     };
 
@@ -51,7 +51,7 @@ describe "App::Gimei::Parser" => sub {
             'name:family', 'name:last', 'name:given', 'name:first',
             'name:gender', 'name:sex',  'name:kanji', 'name'
         );
-        my @l = App::Gimei::Parser::parse( \@args )->to_list;
+        my @l = App::Gimei::Parser::parse(\@args)->to_list;
 
         T2->is( scalar @l,           8 );
         T2->is( $l[0]->word_subtype, 'surname' );
@@ -70,7 +70,7 @@ describe "App::Gimei::Parser" => sub {
             'address:town',       'address:kanji',
             'address'
         );
-        my @l = App::Gimei::Parser::parse( \@args )->to_list;
+        my @l = App::Gimei::Parser::parse(\@args)->to_list;
 
         T2->is( scalar @l,           5 );
         T2->is( $l[0]->word_subtype, 'prefecture' );
@@ -83,7 +83,7 @@ describe "App::Gimei::Parser" => sub {
     it "_rendering(): " => sub {
         my @args =
           ( 'name:kanji', 'name:hiragana', 'name:katakana', 'name:romaji', 'name' );
-        my @l = App::Gimei::Parser::parse( \@args )->to_list;
+        my @l = App::Gimei::Parser::parse(\@args)->to_list;
 
         T2->is( scalar @l,        5 );
         T2->is( $l[0]->rendering, 'kanji' );

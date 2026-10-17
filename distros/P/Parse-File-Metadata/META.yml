@@ -1,25 +1,31 @@
---- #YAML:1.0
-name:               Parse-File-Metadata
-version:            0.07
-abstract:           For plain-text files that contain metadata (in key-value pairs) and data records, parse metadata first before proceeding
+---
+abstract: 'For plain-text files that contain metadata (in key-value pairs) and data records, parse metadata first before proceeding'
 author:
-    - James E Keenan (jkeenan@cpan.org)
-license:            unknown
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'James E Keenan (jkeenan@pobox.com)'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    Carp:          0
-    File::Spec:    0
-    Scalar::Util:  0
-    Test::Simple:  0.44
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.56
+  ExtUtils::MakeMaker: '0'
+  Test::Simple: '0.44'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
+license: unknown
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Parse-File-Metadata
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  File::Spec: '0'
+  Scalar::Util: '0'
+  perl: '5.008000'
+resources:
+  bugtracker: https://github.com/jkeenan/Parse-File-Metadata/issues
+  homepage: http://thenceforward.net/perl/modules/Parse-File-Metadata/
+  repository: https://github.com/jkeenan/Parse-File-Metadata.git
+version: '0.08'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

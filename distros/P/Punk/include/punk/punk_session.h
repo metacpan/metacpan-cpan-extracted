@@ -385,15 +385,44 @@ static SV *ps_cfg_store(pTHX_ HV *cfg) {
  * entry still has to be deleted. Revocation that depends on the handler
  * having looked at the session first would be revocation that usually does
  * not happen. */
+/* The named request cookie's value (+1), or NULL: what Punk::Request::cookie
+ * answers (first value wins, decoded), read without building the request
+ * object and the two method frames. The request's own parsed table is used
+ * when it has one, and filled when the request exists but has not parsed
+ * yet, so a later $c->req->cookies finds the work done. */
+static SV *ps_cookie_value(pTHX_ AV *av, const char *name, STRLEN nl) {
+    SV *req = pcx_get(aTHX_ av, PCX_REQ);
+    AV *reqav = (req && SvROK(req) && SvTYPE(SvRV(req)) == SVt_PVAV)
+              ? (AV *)SvRV(req) : NULL;
+    HV *table = NULL;
+    SV **v;
+    if (reqav) {
+        SV **ck = av_fetch(reqav, PQ_COOKIES, 0);
+        if (ck && *ck && SvROK(*ck) && SvTYPE(SvRV(*ck)) == SVt_PVHV)
+            table = (HV *)SvRV(*ck);
+    }
+    if (!table) {
+        SV *envsv = pcx_get(aTHX_ av, PCX_ENV);
+        HV *env = (envsv && SvROK(envsv) && SvTYPE(SvRV(envsv)) == SVt_PVHV)
+                ? (HV *)SvRV(envsv) : NULL;
+        SV **h = env ? hv_fetchs(env, "HTTP_COOKIE", 0) : NULL;
+        STRLEN hl = 0;
+        const char *hs = (h && *h && SvOK(*h)) ? SvPV_const(*h, hl) : "";
+        if (!hl) return NULL;
+        table = pq_parse_cookies(aTHX_ hs, hl);
+        if (reqav) (void)pq_cached(aTHX_ reqav, PQ_COOKIES, table);
+        else       sv_2mortal((SV *)table);
+    }
+    v = hv_fetch(table, name, (I32)nl, 0);
+    return (v && *v) ? newSVsv(*v) : NULL;
+}
+
 static SV *ps_req_id(pTHX_ SV *c, HV *cfg) {
     AV *av = pcx_av(aTHX_ c);
     STRLEN nl, kl, cvl;
     const char *cookie_name = ps_cfg_str(aTHX_ cfg, "cookie", "punk.sid", &nl);
     const char *key = ps_cfg_str(aTHX_ cfg, "secret", "", &kl);
-    SV *req, *cargv[1], *cval;
-    req = pcx_force(aTHX_ av, PCX_REQ, "Punk::Request", pcx_get(aTHX_ av, PCX_ENV));
-    cargv[0] = sv_2mortal(newSVpvn(cookie_name, nl));
-    cval = pcx_call_meth(aTHX_ req, "cookie", cargv, 1, 1);
+    SV *cval = ps_cookie_value(aTHX_ av, cookie_name, nl);
     if (!cval) return NULL;
     sv_2mortal(cval);
     if (!(SvOK(cval) && SvCUR(cval))) return NULL;
@@ -453,15 +482,13 @@ static SV *ps_load(pTHX_ SV *c) {
     HV *cfg, *sess = NULL;
     STRLEN nl, kl;
     const char *cookie_name, *key;
-    SV *req, *cargv[1], *cval, *rv, *store;
+    SV *cval, *rv, *store;
     if (cached && *cached && SvROK(*cached)) return newSVsv(*cached);
     cfg = ps_cfg(aTHX_ c);
     if (!cfg) croak("Punk: no session configured (add a `session` keyword)");
     cookie_name = ps_cfg_str(aTHX_ cfg, "cookie", "punk.sid", &nl);
     key = ps_cfg_str(aTHX_ cfg, "secret", "", &kl);
-    req = pcx_force(aTHX_ av, PCX_REQ, "Punk::Request", pcx_get(aTHX_ av, PCX_ENV));
-    cargv[0] = sv_2mortal(newSVpvn(cookie_name, nl));
-    cval = pcx_call_meth(aTHX_ req, "cookie", cargv, 1, 1);
+    cval = ps_cookie_value(aTHX_ av, cookie_name, nl);
     if (cval) sv_2mortal(cval);
     store = ps_cfg_store(aTHX_ cfg);
     if (store) {

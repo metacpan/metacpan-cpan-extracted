@@ -6,6 +6,9 @@ use utf8;
 
 use URI::PackageURL::App;
 
+binmode STDOUT, ':encoding(UTF-8)';
+binmode STDERR, ':encoding(UTF-8)';
+
 exit URI::PackageURL::App->run(@ARGV) unless caller();
 
 1;
@@ -62,22 +65,21 @@ purl-tool - Package URL tool
 
     Parse the given Package URL string and return JSON and send the STDOUT to jq:
 
-        purl-tool pkg:cpan/GDT/URI-PackageURL@2.24 --json | jq
+        purl-tool pkg:cpan/URI-PackageURL@2.26 --json | jq
 
     Download the package from the repository using PURL string:
 
-        wget $(purl-tool pkg:cpan/GDT/URI-PackageURL@2.24 --download-url)
+        wget $(purl-tool pkg:cpan/URI-PackageURL@2.26?author=GDT --download-url)
 
     Create a canonical PURL string
 
         purl-tool --type cpan \
-                  --namespace GDT \
                   --name URI-PackageURL \
-                  --version 2.24
+                  --version 2.26
 
     Validate a PURL string:
 
-        if $(purl-tool $PURL_STRING --validate -q); then
+        if purl-tool "$PURL_STRING" --validate -q; then
             echo "PURL string is valid"
         else
             echo "PURL string is not valid"
@@ -139,18 +141,17 @@ Optional.
 
 Parse the given PURL string and return JSON and send the STDOUT to L<jq>:
 
-    purl-tool pkg:cpan/GDT/URI-PackageURL@2.24 --json | jq
+    purl-tool pkg:cpan/URI-PackageURL@2.26 --json | jq
 
 Download the package from the repository using Package URL string:
 
-    wget $(purl-tool pkg:cpan/GDT/URI-PackageURL@2.24 --download-url)
+    wget $(purl-tool pkg:cpan/URI-PackageURL@2.26 --download-url)
 
 Create a canonical Package URL string:
 
     purl-tool --type cpan \
-              --namespace GDT \
               --name URI-PackageURL \
-              --version 2.24
+              --version 2.26
 
 Display information about provided PURL type (allowed components, repository,
 examples, etc.):
@@ -163,7 +164,7 @@ L<Giuseppe Di Terlizzi|https://metacpan.org/author/gdt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2022-2025 L<Giuseppe Di Terlizzi|https://metacpan.org/author/gdt>
+Copyright © 2022-2026 L<Giuseppe Di Terlizzi|https://metacpan.org/author/gdt>
 
 You may use and distribute this module according to the same terms
 that Perl is distributed under.

@@ -212,14 +212,18 @@ static int hm_chunked_scan_from(const char *buf, size_t avail,
          * which is every chunked request that waits for a 100-continue, and
          * any other whose body simply follows a segment boundary. */
         if (ndig == 0) return i >= avail ? 0 : -1;       /* need more / no size */
-        while (i < avail && buf[i] != '\r') i++;         /* skip chunk-ext */
+        /* A bare LF or CR ends the scan and fails the CRLF test below: the
+         * header lines refuse them, and a chunk extension or a trailer that
+         * accepted one let an LF-tolerant front end see the body end where
+         * this parser did not (request smuggling). */
+        while (i < avail && buf[i] != '\r' && buf[i] != '\n') i++;   /* skip chunk-ext */
         if (i + 1 >= avail) return 0;
         if (buf[i] != '\r' || buf[i + 1] != '\n') return -1;
         i += 2;
         if (size == 0) {                                 /* last-chunk + trailers */
             for (;;) {
                 size_t j = i;
-                while (j < avail && buf[j] != '\r') j++;
+                while (j < avail && buf[j] != '\r' && buf[j] != '\n') j++;
                 if (j + 1 >= avail) return 0;
                 if (buf[j] != '\r' || buf[j + 1] != '\n') return -1;
                 if (j == i) { *encoded = j + 2; *decoded = dec; return 1; }

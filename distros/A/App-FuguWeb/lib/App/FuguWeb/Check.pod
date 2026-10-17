@@ -34,18 +34,20 @@ reports them, because the build and its checks touch no network.
 
 =head2 pages, generated_pages
 
-C<pages> names the pages of the description and one page for each
-manual. C<generated_pages> names each page that the build writes
-itself, which today is the human page of the key directory.
+C<pages> names each page of each language tree, as
+C<< <code>/<page> >>: for each language, the pages of the description,
+then one page for each manual of each group. C<generated_pages> names
+the human page of each key directory, which the build writes itself
+and which no block names. The pages of the top level sit outside every
+tree as well, and L<App::FuguWeb::Config/top_pages> names them.
 
 A generated page takes the checks of a page. It takes no reachability
-check: a site links the key directory when it chooses to.
+check: a site links the key directory when it chooses to. The pages of
+the top level take none either.
 
-Every page that the site must hold, in a stable order: the pages of
-the description, then one page for each manual of each group. The full
-expectation, assets included, comes from
-L<App::FuguWeb::Config/inventory>, so the build and the checks can
-never disagree about what the site is.
+The full expectation, assets and the pages of the top level included,
+comes from L<App::FuguWeb::Config/inventory>, so the build and the
+checks can never disagree about what the site is.
 
 =head2 run
 
@@ -62,16 +64,40 @@ every expected page and asset exists and is not empty;
 
 =item *
 
-every page has a title;
+on every page but the top-level F<index.html>, the check finds a
+title, the header link and every navigation link;
 
 =item *
 
-every page carries the whole navigation;
+each of those links takes the form of the kind of its page:
+C<< <page> >> on a tree page, C<< ../en/<page> >> on the key page, and
+C<< en/<page> >> on the top-level copy of F<404.html>. An absolute URL
+and a fragment stay as they stand;
+
+=item *
+
+every page of a language tree carries the code of its tree as
+C<lang>;
+
+=item *
+
+the chrome of a tree page links the same page in each other language,
+as C<< <a href="../<code>/<page>" hreflang="<code>"><code></a> >>. The
+chrome of any other page, and of a site of one language, holds no
+C<hreflang>. The chrome ends where the C<< <main> >> element starts, so
+a link of the body is the writer's own;
 
 =item *
 
 no reference starts with C</>, because the host may serve the site from
-a path below the root;
+a path below the root. The C<< <base href="/"> >> of the top-level
+copy of F<404.html> is the one exception, and that page must carry it;
+
+=item *
+
+the top-level F<index.html> holds a meta refresh to the entry page of
+the default tree. Its one reference is a link to that page, so it
+loads nothing, and it carries no navigation;
 
 =item *
 
@@ -84,8 +110,8 @@ cross-reference included;
 
 =item *
 
-a reference of a page below the root resolves against the directory of
-that page;
+a reference of a page resolves against the directory of that page: a
+language tree, a key directory, or the top level;
 
 =item *
 
@@ -98,8 +124,9 @@ C<./>;
 
 =item *
 
-every page is reachable from the entry page, except a page that the
-description marks C<unlinked>;
+every page of a language tree is reachable from the entry page of that
+tree, except a page that the description marks C<unlinked>. The walk
+stays inside the tree;
 
 =item *
 

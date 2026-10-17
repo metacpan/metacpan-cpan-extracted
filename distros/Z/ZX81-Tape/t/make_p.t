@@ -4,54 +4,80 @@ use Test::HexDifferences;
 use Test::More;
 use Text::Diff;
 
-BEGIN { use_ok 'ZX81::Tape', 'make_p', 'dump_p' }
+BEGIN { use_ok 'ZX81::Tape', 'make_p', 'dump_p', 'list_p' }
 
-for my $bas_file (path("t/input")->children(qr/\.bas$/)) {
-    my $exp_p_file = path("t/expected")->child($bas_file->basename(".bas") . ".p");
-    my $exp_txt_file = path("t/expected")->child($bas_file->basename(".bas") . ".txt");
-    my $p_file = $bas_file->basename(".bas").".p";
-    my $txt_file = $bas_file->basename(".bas").".txt";
+for my $input_bas_file (path("t/input")->children(qr/\.bas$/)) {
+	my $input_basename = $input_bas_file->basename(".bas");
+    my $exp_p_file = path("t/expected")->child("$input_basename.p");
+	my $exp_dump_file = path("t/expected")->child("$input_basename.txt");
+	my $exp_list_file = path("t/expected")->child("$input_basename.bas");
 	
-	# make .p file
-    make_p($bas_file, $p_file);
-
-	# compare with .p file made by zxtext2p
-	if (-f $exp_p_file) {
-		my $p_bytes = path($p_file)->slurp_raw; 
-		my $exp_p_bytes = path($exp_p_file)->slurp_raw;
-
-		eq_or_dump_diff($p_bytes,$exp_p_bytes,{ address => 0x4009 }, "diff $p_file $exp_p_file");
-		if ($p_bytes ne $exp_p_bytes) {
-			if ($ENV{DEVELOPPER}) {
-				dump_p($p_file, "$p_file.txt");
-				dump_p($exp_p_file, "$exp_p_file.txt");
-				system "start \"\" WinMergeU.exe $p_file.txt $exp_p_file.txt";
-			}
-		}
-	}
-
-	# make dump file
-    dump_p($p_file, $txt_file);
-
-	my $diff = diff(
-		"$txt_file",
-		"$exp_txt_file",
-		{ STYLE => 'Table' }
-	);
-    ok $diff eq '', "diff $txt_file $exp_txt_file";
-	if ($diff ne '') {
-		warn $diff;
-		if ($ENV{DEVELOPPER}) {
-            system "start \"\" WinMergeU.exe $txt_file $exp_txt_file";
-		}
-	}
-
+	# make .p file from .bas and compare to expected
+	make_p($input_bas_file, "$input_basename.p");
+	compare_p("$input_basename.p", $exp_p_file);
+	
 	if (Test::More->builder->is_passing) {
-		unlink $p_file;
-		unlink $txt_file;
-		unlink "$p_file.txt";
-		unlink "$exp_p_file.txt";
+		unlink "$input_basename.p";
+	}
+	
+	# make dump file from .p and compare to expected
+	dump_p($exp_p_file, "$input_basename.txt");
+	compare_text("$input_basename.txt", $exp_dump_file);
+	
+	if (Test::More->builder->is_passing) {
+		unlink "$input_basename.txt";
+	}
+	
+	# make list file from .p and compare to expected
+	list_p($exp_p_file, "$input_basename.bas");
+	compare_text("$input_basename.bas", $exp_list_file);
+	
+	if (Test::More->builder->is_passing) {
+		unlink "$input_basename.bas";
+	}
+	
+	# round-trip
+	list_p($exp_p_file, "$input_basename.2.bas");
+	make_p("$input_basename.2.bas", "$input_basename.2.p");
+	compare_p("$input_basename.2.p", $exp_p_file);
+	
+	if (Test::More->builder->is_passing) {
+		unlink "$input_basename.2.bas", "$input_basename.2.p";
 	}
 }
 
 done_testing;
+
+sub compare_p {
+	my($got_p, $exp_p) = @_;
+	
+	my $got_bytes = path($got_p)->slurp_raw; 
+	my $exp_bytes = path($exp_p)->slurp_raw;
+
+	eq_or_dump_diff($got_bytes, $exp_bytes, { address => 0x4009 }, 
+					"diff $got_p $exp_p");
+	if ($got_bytes ne $exp_bytes) {
+		if ($ENV{DEVELOPPER}) {
+			dump_p($got_p, "$got_p.txt");
+			dump_p($exp_p, "$exp_p.txt");
+			system "start \"\" WinMergeU.exe $got_p.txt $exp_p.txt";
+		}
+	}
+
+	if (Test::More->builder->is_passing) {
+		unlink "$got_p.txt", "$exp_p.txt";
+	}
+}
+
+sub compare_text {
+	my($got_txt, $exp_txt) = @_;
+	
+	my $diff = diff("$got_txt", "$exp_txt");
+	ok $diff eq '', "diff $got_txt $exp_txt";
+	if ($diff ne '') {
+		warn $diff;
+		if ($ENV{DEVELOPPER}) {
+            system "start \"\" WinMergeU.exe $got_txt $exp_txt";
+		}
+	}
+}

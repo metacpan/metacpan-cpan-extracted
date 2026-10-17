@@ -31,7 +31,13 @@ MODULE = Hyperman		PACKAGE = Hyperman::Writer
 # the registry, which every entry point consults before dereferencing it, so
 # ->write after the connection died is a return value and not a crash.
 
-void
+# Returns 1 when the bytes were taken and the connection has room, 0 when
+# they were taken but the connection is holding more than it should (the
+# producer pauses until a write answers 1 again), and -1 when nothing was
+# written because the writer is stale: closed, aborted, or outliving its
+# request. Before 0.62 it returned nothing, so a Perl producer could not
+# see FULL at all and a slow reader grew the buffer without bound.
+IV
 write(self, data)
     SV *self
     SV *data
@@ -39,33 +45,39 @@ write(self, data)
     {
         AV *w = (AV *)SvRV(self);
         SSize_t n = av_len(w);
+        RETVAL = -1;
         if (n == 2) {                   /* stream-handle form */
             SV **h = av_fetch(w, 0, 0);
             STRLEN l;
             const char *p = SvPV(data, l);
-            if (h)
-                hm_stream_write_h(aTHX_ INT2PTR(void *, SvIV(*h)), p, l);
+            if (h && SvIV(*h)) {
+                int rc = hm_stream_write_h(aTHX_ INT2PTR(void *, SvIV(*h)), p, l);
+                RETVAL = rc == HM_ABI_STREAM_OK ? 1
+                       : rc == HM_ABI_STREAM_FULL ? 0 : -1;
+            }
         } else if (n >= 3) {            /* h2 or h3: told apart by the tag */
             SV **f = av_fetch(w, 0, 0);
             SV **g = av_fetch(w, 1, 0);
             SV **s = av_fetch(w, 2, 0);
             if (f && g && s) {
                 if (hm_writer_tag_is(aTHX_ w, "h1", 2))
-                    hm_stream_write(aTHX_ (int)SvIV(*f), SvUV(*g), SvUV(*s), data);
+                    RETVAL = hm_stream_write(aTHX_ (int)SvIV(*f), SvUV(*g), SvUV(*s), data);
                 else if (hm_writer_tag_is(aTHX_ w, "h3", 2))
-                    hm_h3_writer_write(aTHX_ (int)SvIV(*f), SvUV(*g),
-                                       (int64_t)SvIV(*s), data);
+                    RETVAL = hm_h3_writer_write(aTHX_ (int)SvIV(*f), SvUV(*g),
+                                                (int64_t)SvIV(*s), data);
                 else
-                    hm_h2_writer_write(aTHX_ (int)SvIV(*f), SvUV(*g),
-                                       (int32_t)SvIV(*s), data);
+                    RETVAL = hm_h2_writer_write(aTHX_ (int)SvIV(*f), SvUV(*g),
+                                                (int32_t)SvIV(*s), data);
             }
         } else {
             SV **f = av_fetch(w, 0, 0);
             SV **i = av_fetch(w, 1, 0);
             if (f && i)
-                hm_stream_write(aTHX_ (int)SvIV(*f), SvUV(*i), 0, data);
+                RETVAL = hm_stream_write(aTHX_ (int)SvIV(*f), SvUV(*i), 0, data);
         }
     }
+    OUTPUT:
+        RETVAL
 
 # A writer dropped without ->close still ends its body, the promise a lexical
 # filehandle makes. The stream-handle form owns a C handle to close. The

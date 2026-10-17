@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.59';
+our $VERSION = '0.60';
 
 1;
 
@@ -221,7 +221,8 @@ if the first is still running when the wait ends, the second runs too, since
 a stalled request is the worse failure. It is also how old the first
 request's lock may get before it is taken for abandoned. Set it above your
 slowest handler behind a key. It is the plugin's own: the cache store's
-C<lock_wait> is tuned for a cache and does not apply here. Must be positive.
+C<lock_wait> is tuned for a cache and does not apply here. Must be positive
+and finite.
 
 =item max_record
 

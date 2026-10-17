@@ -37,6 +37,7 @@ t/33-destroy-order.t
 t/34-provider-ownership.t
 t/35-closed-stream-response.t
 t/36-rapid-reset-response.t
+t/37-submit-headers.t
 t/lib/Test/HTTP2/Frame.pm
 t/lib/Test/HTTP2/HPACK.pm
 t/lib/Test/HTTP2/Pair.pm

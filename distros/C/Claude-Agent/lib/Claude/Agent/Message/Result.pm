@@ -4,21 +4,49 @@ use 5.020;
 use strict;
 use warnings;
 
-use Types::Common -types;
-use Marlin
-    -base => 'Claude::Agent::Message::Base',
-    'subtype!'           => Str,     # 'success', 'error_*', etc.
-    'result?'            => Str,     # Final result text
-    'is_error?'          => Bool,
-    'duration_ms?'       => Num,
-    'duration_api_ms?'   => Num,     # API-specific duration
-    'num_turns?'         => Int,
-    'total_cost_usd?'    => Num,
-    'usage?'             => HashRef, # Token usage stats
-    'model_usage?'       => HashRef, # Per-model usage breakdown
-    'permission_denials?' => ArrayRef, # Permission denial records
-    'structured_output?' => Any,     # Parsed JSON for structured outputs
-    'tool_use_result?'   => Any;     # Tool use result data
+use Object::Proto ();
+use Claude::Agent::Message::Base;
+
+BEGIN {
+    Object::Proto::define('Claude::Agent::Message::Result',
+        extends => 'Claude::Agent::Message::Base',
+        'subtype:Str:required',
+        'result:predicate',
+        'is_error:predicate',
+        'duration_ms:predicate',
+        'duration_api_ms:predicate',
+        'num_turns:predicate',
+        'total_cost_usd:predicate',
+        'usage:predicate',
+        'model_usage:predicate',
+        'permission_denials:predicate',
+        'structured_output:predicate',
+        'tool_use_result:predicate',
+        'stop_reason:predicate',
+        'errors:predicate',
+        'terminal_reason:predicate',
+        'api_error_status:predicate',
+        'user_message_uuid:predicate',
+    );
+}
+
+sub is_success {
+    my ($self) = @_;
+    return $self->subtype eq 'success';
+}
+
+sub error_text {
+    my ($self) = @_;
+    if ($self->has_errors && ref $self->errors eq 'ARRAY' && @{$self->errors}) {
+        return join('; ', @{$self->errors});
+    }
+    return $self->result if $self->has_result && length $self->result;
+    return $self->subtype;
+}
+
+1;
+
+__END__
 
 =head1 NAME
 
@@ -26,64 +54,106 @@ Claude::Agent::Message::Result - Result message type
 
 =head1 DESCRIPTION
 
-Represents the final result of a query.
+Represents the final result of a turn.
 
-=head2 ATTRIBUTES
+=head1 ATTRIBUTES
 
-=over 4
+=head2 type
 
-=item * type - Always 'result'
+Always C<result>.
 
-=item * subtype - Result type: 'success', 'error_max_turns', 'error_during_execution', etc.
+=head2 subtype
 
-=item * uuid - Unique message identifier
+C<success>, C<error_max_turns>, C<error_during_execution>,
+C<error_max_budget_usd> or C<error_max_structured_output_retries>.
 
-=item * session_id - Session identifier
+=head2 result
 
-=item * result - The final result text
+The final result text (success).
 
-=item * is_error - Boolean indicating if this is an error result
+=head2 is_error
 
-=item * duration_ms - Total duration in milliseconds
+True for an error result. A JSON boolean decodes to a L<JSON::PP::Boolean>,
+so test it for truth.
 
-=item * num_turns - Number of conversation turns
+=head2 duration_ms
 
-=item * total_cost_usd - Total cost in USD
+Total duration in milliseconds.
 
-=item * usage - Token usage statistics
+=head2 duration_api_ms
 
-=item * structured_output - Parsed structured output if output_format was specified
+Time spent in API calls, in milliseconds.
 
-=back
+=head2 num_turns
 
-=head2 RESULT SUBTYPES
+Number of conversation turns.
 
-=over 4
+=head2 total_cost_usd
 
-=item * success - Query completed successfully
+Estimated cost in USD.
 
-=item * error_max_turns - Reached maximum turn limit
+=head2 usage
 
-=item * error_during_execution - Error occurred during execution
+Token usage statistics for the main conversation.
 
-=item * error_max_structured_output_retries - Could not produce valid structured output
+=head2 model_usage
 
-=back
+Per-model usage breakdown, sent by the CLI as C<modelUsage>.
 
-=head2 METHODS
+=head2 permission_denials
 
-=head3 is_success
+Array of the tool uses that were denied during the turn.
 
-    if ($msg->is_success) { ... }
+=head2 structured_output
 
-Helper to check if the result was successful.
+Parsed structured output when C<output_format> was given.
 
-=cut
+=head2 tool_use_result
 
-sub is_success {
-    my ($self) = @_;
-    return $self->subtype eq 'success';
-}
+Tool use result data.
+
+=head2 stop_reason
+
+The API stop reason of the last assistant message.
+
+=head2 errors
+
+Array of error strings (error subtypes).
+
+=head2 terminal_reason
+
+Why the turn ended, when the CLI says (for example after an interrupt).
+
+=head2 api_error_status
+
+HTTP status of a failing API call.
+
+=head2 user_message_uuid
+
+The uuid of the prompt this result answers; the value
+C<rewind_files> takes.
+
+=head2 uuid, session_id, parent_tool_use_id, agent_id, raw
+
+See L<Claude::Agent::Message::Base>.
+
+=head1 METHODS
+
+=head2 new
+
+Takes a flat list of name/value pairs. Unknown names are ignored.
+
+=head2 is_success
+
+    if ($result->is_success) { ... }
+
+True when the subtype is C<success>.
+
+=head2 error_text
+
+    my $why = $result->error_text;
+
+The errors joined with C<; >, else the result text, else the subtype.
 
 =head1 AUTHOR
 
@@ -96,5 +166,3 @@ This software is Copyright (c) 2026 by LNATION.
 This is free software, licensed under The Artistic License 2.0 (GPL Compatible).
 
 =cut
-
-1;

@@ -1,5 +1,15 @@
 Revision history for Net-HTTP2-nghttp2
 
+0.012   2026-10-16
+        - submit_headers queues a HEADERS block on a stream, wrapping
+          nghttp2_submit_headers, so a server can send a 1xx response such
+          as 103 Early Hints before the final response (GitHub #2).
+        - t/24-frame-send.t passes with libnghttp2 1.69.0 and newer, which
+          cancel a queued RST_STREAM once its stream has closed
+          (nghttp2/nghttp2#2578); each version's behaviour is checked
+          exactly. Fixes the 0.011 test failure on current libnghttp2
+          (GitHub #1, Joshua S. Day).
+
 0.011   2026-09-12
         - Defer a data provider's release while a session call is running.
           Closing a stream from inside a callback freed the provider that

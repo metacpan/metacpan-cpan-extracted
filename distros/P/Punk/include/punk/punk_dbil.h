@@ -292,10 +292,35 @@ static void pdl_exec(pTHX_ pdl_pend *p, SV *db, SV *tx, int is_query,
             SV **e = av_fetch(bind, i, 0);
             argv[i + 1] = (e && *e) ? *e : &PL_sv_undef;
         }
-        f = pcx_call_meth(aTHX_ tx, is_query ? "query" : "do",
-                          argv, (int)n + 1, 1);
+        {   /* Under an eval: this runs from the continuation of the
+             * previous statement, inside DBIx::Loop's settle path, where a
+             * croak would longjmp out of a fire loop. A handle that dies
+             * (the transaction already ended) fails the future instead. */
+            dSP;
+            int count;
+            ENTER; SAVETMPS;
+            PUSHMARK(SP);
+            EXTEND(SP, n + 2);
+            PUSHs(tx);
+            for (i = 0; i <= n; i++) PUSHs(argv[i]);
+            PUTBACK;
+            count = call_method(is_query ? "query" : "do", G_SCALAR | G_EVAL);
+            SPAGAIN;
+            f = (count > 0) ? SvREFCNT_inc(POPs) : NULL;
+            PUTBACK; FREETMPS; LEAVE;
+            if (SvTRUE(ERRSV)) {
+                if (f) SvREFCNT_dec(f);
+                Safefree(argv);
+                pdl_fail(aTHX_ p, ERRSV);
+                return;
+            }
+        }
         Safefree(argv);
-        if (!f) croak(PDL_CLS ": the transaction handle returned no future");
+        if (!f) {
+            pdl_fail(aTHX_ p, sv_2mortal(newSVpvs(
+                PDL_CLS ": the transaction handle returned no future")));
+            return;
+        }
         p->shape = is_query ? shape : 0;
         if (!p->tx) p->tx = newSVsv(tx);
         pdl_attach(aTHX_ f, p);

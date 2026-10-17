@@ -141,10 +141,10 @@ my $app = Hard->to_app;
 # ---- basename -------------------------------------------------------------------
 {
     my @names = ('../../etc/cron.d/x', 'C:\\Users\\me\\photo.jpg', '.htaccess',
-                 '...', "a\x01\x7fb.txt", 'plain.txt', 'dir/', '');
+                 '...', "a\x01\x7fb.txt", "\x01.env", "\x01..", 'plain.txt', 'dir/', '');
     my $body = multipart(map { { name => 'f', filename => $_, data => 'd' } } @names);
     my $r = post($app, '/names', $body);
-    is text($r), '["x","photo.jpg","htaccess",null,"ab.txt","plain.txt",null,null]',
+    is text($r), '["x","photo.jpg","htaccess",null,"ab.txt","env",null,"plain.txt",null,null]',
         'basename keeps the last segment, drops leading dots and control bytes';
 }
 
@@ -238,6 +238,16 @@ my $app = Hard->to_app;
     my $r = $get->('v=plain%20value%09ok');
     is text($r), 'set', 'an ordinary value, tab included, is set';
     is { @{ $r->[1] } }->{'X-Echo'}, "plain value\tok", '...as given';
+}
+
+# ---- a save path stops nowhere short of its end ---------------------------------
+{
+    my $up  = bless { filename => 'a', content => 'hi' }, 'Punk::Upload';
+    my $d   = File::Temp->newdir;
+    my $err = '';
+    eval { $up->save("$d/x.php\0.txt"); 1 } or $err = $@;
+    like($err, qr/NUL/, 'save refuses a path with a NUL in it');
+    ok(!-e "$d/x.php", '...and creates nothing');
 }
 
 done_testing;

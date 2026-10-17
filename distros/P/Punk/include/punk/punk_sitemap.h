@@ -722,7 +722,10 @@ XS_INTERNAL(pks_serve_cb) {
                 const char *vp = SvPV_const(v, vl);
                 STRLEN d = 0;
                 while (d < vl && isDIGIT(vp[d])) d++;
-                if (d > 0 && d < vl && vl - d == 4 && memEQ(vp + d, ".xml", 4)) {
+                /* at most nine digits: a longer number overflows the
+                 * arithmetic below, and no sitemap has a billion parts */
+                if (d > 0 && d <= 9 && d < vl && vl - d == 4
+                    && memEQ(vp + d, ".xml", 4)) {
                     STRLEN k;
                     for (k = 0; k < d; k++) n = n * 10 + (vp[k] - '0');
                 }

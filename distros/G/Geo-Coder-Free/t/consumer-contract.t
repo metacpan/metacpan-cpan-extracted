@@ -15,6 +15,13 @@
 # PART 3  discovery: a file that can receive a Geo::Coder::Free result but is
 #         not registered is a failure, so a new consumer cannot slip past
 #         PART 2 unnoticed.
+# PART 4  the accessor lists above are checked against Geo::Location::Point
+#         itself, in both directions: every name listed is a documented accessor
+#         of it, and every accessor it documents is listed in 'accessors',
+#         'not_accessors' or 'conditional'.  The second direction is what stops
+#         the value object and this declaration drifting apart - add an accessor
+#         to Geo::Location::Point and this test fails until the contract says
+#         which kind of accessor it is.
 #
 # Parts 2 and 3 need the sibling checkouts (HTML-Genealogy-Map and friends) that
 # share this workspace; they are skipped, with a diagnostic, when this dist is
@@ -65,6 +72,15 @@ sub _declaration
 		location => 'OpenAddresses and Local set it; the MaxMind cities path does not',
 		text     => 'only the scantext path sets it',
 		lon      => "only MaxMind's %known_locations shortcut sets it - Point::new() makes long and lng, never lon",
+		# The three attribute accessors of Geo::Location::Point that only some
+		# results have anything behind: the backing row decides.  They are
+		# documented accessors, so the value object check below needs them
+		# accounted for, and naming them here rather than in 'accessors' keeps a
+		# read of one an offence unless it is registered - the same rule the
+		# hash-key spelling is held to.
+		country  => 'set only when the backing database row has one - OpenAddresses sets none of country, city or state',
+		city     => 'set only when the backing database row has one',
+		state    => 'set only when the backing database row has one',
 	},
 
 	# PART 1: file => keys the file is responsible for setting, with the evidence
@@ -145,10 +161,25 @@ sub _declaration
 		],
 	],
 
-	# Documented accessors of Geo::Location::Point, plus the AUTOLOAD-documented
-	# 'attr'.  A result object is read through these, never through a raw hash key.
+	# Documented accessors of Geo::Location::Point that a consumer may read a
+	# result through: the position, the derived strings and comparisons, the
+	# AUTOLOAD-documented 'attr', and the four provenance keys of section 2.1 of
+	# BI-Phase6-Dependency-Specs.md - geocoder, database, confidence and accuracy
+	# are guaranteed keys as well, and the accessors are how HTML-Genealogy-Map
+	# and friends read them without reaching for a hash key.
 	accessors => [qw(lat latitude long lng longitude distance equal not_equal
-		tz timezone as_string as_uri attr new)],
+		tz timezone as_string as_uri attr geocoder database confidence accuracy)],
+
+	# Documented too, but not a slot of one result, so a consumer never reads a
+	# result through these.  The value object check fails if Geo::Location::Point
+	# documents an accessor that is in none of these three lists, which is how the
+	# four provenance accessors above were found to be missing from it: the value
+	# object grew them and this declaration was not told.
+	not_accessors => {
+		new             => 'the constructor, not a slot of one result',
+		AUTOLOAD        => 'the attribute mechanism; the documented face of it is attr()',
+		ACCURACY_LEVELS => 'a class constant, the levels accuracy() accepts',
+	},
 
 	# Class introspection, not result data: asking whether a result can answer
 	# latitude() is not the same as reading an attribute off it.

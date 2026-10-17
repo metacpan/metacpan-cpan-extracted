@@ -8,7 +8,7 @@ use POSIX	qw(floor ceil);
 use Readonly;
 use Scalar::Util	qw(looks_like_number);
 
-our $VERSION = '0.012.1';
+our $VERSION = '0.013.0';
 
 Readonly my $MAX_EXPR_LEN => 512;
 Readonly my $MAX_DEPTH    => 20;
@@ -45,6 +45,7 @@ our %MESSAGES = (
 	error_bad_char        => "Unexpected character '%s' at position %d",
 	error_trailing        => "Unexpected token '%s' at position %d",
 	error_double_eq       => "Use = not == for equality comparison at position %d",
+	error_param_col_clash => "Parameter '%s' conflicts with a column of the same name",
 );
 
 sub _fmt {
@@ -178,11 +179,28 @@ sub new {
 		_error   => undef,
 		_code    => undef,
 		_columns => {},
+		_params  => {},
 	}, $class;
 
-	my $expr = $args{expr} // '';
-	my @cols = @{ $args{columns} // [] };
+	my $expr   = $args{expr} // '';
+	my @cols   = @{ $args{columns} // [] };
+	my %params = %{ $args{params}  // {} };
 	$self->{_columns}{$_} = 1 for @cols;
+
+	# A name that is both a column and a parameter is an error: the ambiguity
+	# would be resolved silently in whichever direction, making expressions
+	# non-deterministic when the data changes.
+	for my $p (keys %params) {
+		if ($self->{_columns}{$p}) {
+			$self->{_error} = _fmt('error_param_col_clash', $p);
+			return $self;
+		}
+	}
+	# Extend the compile-time column whitelist with param names so _parse_colref
+	# accepts them as identifiers; at evaluate() time their values come from
+	# _params rather than the row hashref.
+	$self->{_columns}{$_} = 1 for keys %params;
+	$self->{_params} = \%params;
 
 	if (length($expr) > $MAX_EXPR_LEN) {
 		$self->{_error} = _fmt('error_expr_too_long', $MAX_EXPR_LEN);
@@ -227,8 +245,15 @@ sub has_error { defined $_[0]->{_error} }
 sub evaluate {
 	my ($self, $row) = @_;
 	return undef unless defined $self->{_code};
+	# Merge bound parameters into the evaluation context.  Parameters take
+	# precedence over same-named columns: the clash check in new() ensures this
+	# never happens legitimately, but a column added to the data after compile
+	# time should still see the parameter value.
+	my $ctx = %{ $self->{_params} }
+		? { %$row, %{ $self->{_params} } }
+		: $row;
 	my $result;
-	my $ok = eval { $result = $self->{_code}->($row); 1 };
+	my $ok = eval { $result = $self->{_code}->($ctx); 1 };
 	return undef unless $ok;
 	return $result;
 }

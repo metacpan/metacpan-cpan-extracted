@@ -1,0 +1,277 @@
+# Formatting: strftime, CLDR patterns, names, and the fixed forms.
+
+MODULE = Time::Keeper    PACKAGE = Time::Keeper
+
+void
+strftime(self, ...)
+        SV *self
+    ALIAS:
+        format = 1
+    PREINIT:
+        tk_value *v;
+        I32 i;
+        const char *what = ix ? "Time::Keeper->format" : "Time::Keeper->strftime";
+    PPCODE:
+        v = tk_value_rw(self, what);
+        if (items < 2)
+            croak("%s: which pattern?", what);
+        for (i = 1; i < items; i++) {
+            tk_out o;
+            STRLEN len;
+            const char *p;
+            SV *pat = ST(i);
+            if (!SvUTF8(pat)) {
+                STRLEN k;
+                p = SvPV(pat, len);
+                for (k = 0; k < len; k++)
+                    if ((unsigned char)p[k] >= 0x80) {
+                        pat = sv_mortalcopy(pat);
+                        sv_utf8_upgrade(pat);
+                        break;
+                    }
+            }
+            p = SvPV(pat, len);
+            o.sv = sv_2mortal(newSV(len * 2 + 40));
+            sv_setpvs(o.sv, "");
+            o.utf8 = 0;
+            o.digits = NULL;
+            if (ix)
+                tk_format_cldr(aTHX_ &o, self, v, tk_locale_of(v), p, len, NULL, NULL);
+            else
+                tk_strftime(aTHX_ &o, self, v, tk_locale_of(v), p, len);
+            if (o.utf8)
+                SvUTF8_on(o.sv);
+            if (GIMME_V != G_ARRAY) {
+                ST(0) = o.sv;
+                XSRETURN(1);
+            }
+            XPUSHs(o.sv);
+        }
+
+SV *
+format_date(self, ...)
+        SV *self
+    ALIAS:
+        format_time = 1
+        format_datetime = 2
+    PREINIT:
+        tk_value *v;
+        const tk_locale_data *loc;
+        int len = TK_LEN_MEDIUM;
+        tk_out o;
+        const char *what = ix == 0 ? "Time::Keeper->format_date"
+                         : ix == 1 ? "Time::Keeper->format_time" : "Time::Keeper->format_datetime";
+    CODE:
+        v = tk_value_rw(self, what);
+        loc = tk_locale_of(v);
+        if (items > 1) {
+            const char *l = SvPV_nolen(ST(1));
+            if (strEQ(l, "full")) len = TK_LEN_FULL;
+            else if (strEQ(l, "long")) len = TK_LEN_LONG;
+            else if (strEQ(l, "medium")) len = TK_LEN_MEDIUM;
+            else if (strEQ(l, "short")) len = TK_LEN_SHORT;
+            else croak("%s: the length is 'full', 'long', 'medium' or 'short', not '%s'", what, l);
+        }
+        o.sv = newSVpvs("");
+        o.utf8 = 0;
+        o.digits = NULL;
+        if (ix == 0)
+            tk_format_cldr(aTHX_ &o, self, v, loc, loc->s.date_formats[len], strlen(loc->s.date_formats[len]), NULL, NULL);
+        else if (ix == 1)
+            tk_format_cldr(aTHX_ &o, self, v, loc, loc->s.time_formats[len], strlen(loc->s.time_formats[len]), NULL, NULL);
+        else
+            tk_format_cldr(aTHX_ &o, self, v, loc, loc->s.datetime_formats[len], strlen(loc->s.datetime_formats[len]),
+                           loc->s.date_formats[len], loc->s.time_formats[len]);
+        if (o.utf8)
+            SvUTF8_on(o.sv);
+        RETVAL = o.sv;
+    OUTPUT:
+        RETVAL
+
+SV *
+format_skeleton(self, skeleton)
+        SV *self
+        const char *skeleton
+    PREINIT:
+        tk_value *v;
+        const tk_locale_data *loc;
+        int lo, hi, found = -1;
+        tk_out o;
+    CODE:
+        v = tk_value_rw(self, "Time::Keeper->format_skeleton");
+        loc = tk_locale_of(v);
+        lo = 0;
+        hi = loc->n_skeletons - 1;
+        while (lo <= hi) {
+            int mid = lo + (hi - lo) / 2;
+            int c = strcmp(loc->skeletons[mid].key, skeleton);
+            if (c == 0) { found = mid; break; }
+            if (c < 0) lo = mid + 1; else hi = mid - 1;
+        }
+        if (found < 0)
+            croak("Time::Keeper->format_skeleton: the locale %s has no format for the skeleton '%s'", loc->id, skeleton);
+        o.sv = newSVpvs("");
+        o.utf8 = 0;
+        o.digits = NULL;
+        tk_format_cldr(aTHX_ &o, self, v, loc, loc->skeletons[found].value,
+                       strlen(loc->skeletons[found].value), NULL, NULL);
+        if (o.utf8)
+            SvUTF8_on(o.sv);
+        RETVAL = o.sv;
+    OUTPUT:
+        RETVAL
+
+SV *
+month_name(self)
+        SV *self
+    ALIAS:
+        month_abbr = 1
+        day_name = 2
+        day_abbr = 3
+        am_pm = 4
+        era_name = 5
+        era_abbr = 6
+        quarter_name = 7
+        quarter_abbr = 8
+    PREINIT:
+        tk_value *v;
+        const tk_locale_data *loc;
+        const tk_civil *c;
+        const char *s;
+    CODE:
+        v = tk_value_rw(self, "Time::Keeper accessor");
+        loc = tk_locale_of(v);
+        c = tk_value_civil(v);
+        switch (ix) {
+        case 0:  s = loc->s.months[TK_CTX_FORMAT][TK_W_WIDE][c->month - 1]; break;
+        case 1:  s = loc->s.months[TK_CTX_FORMAT][TK_W_ABBR][c->month - 1]; break;
+        case 2:  s = loc->s.days[TK_CTX_FORMAT][TK_W_WIDE][c->dow - 1]; break;
+        case 3:  s = loc->s.days[TK_CTX_FORMAT][TK_W_ABBR][c->dow - 1]; break;
+        case 4:  s = loc->s.periods[TK_W_ABBR][c->hour >= 12]; break;
+        case 5:  s = loc->s.eras[TK_W_WIDE][c->year > 0]; break;
+        case 6:  s = loc->s.eras[TK_W_ABBR][c->year > 0]; break;
+        case 7:  s = loc->s.quarters[TK_CTX_FORMAT][TK_W_WIDE][tk_quarter(c->month) - 1]; break;
+        default: s = loc->s.quarters[TK_CTX_FORMAT][TK_W_ABBR][tk_quarter(c->month) - 1]; break;
+        }
+        RETVAL = newSVpv(s, 0);
+        if (!tk_is_ascii(s))
+            SvUTF8_on(RETVAL);
+    OUTPUT:
+        RETVAL
+
+SV *
+iso8601(self, ...)
+        SV *self
+    ALIAS:
+        rfc3339 = 1
+        rfc9557 = 2
+    PREINIT:
+        tk_value *v;
+        tk_out o;
+        int digits = -1;
+        const tk_civil *c;
+        static const char *const whats[] = { "Time::Keeper->iso8601", "Time::Keeper->rfc3339", "Time::Keeper->rfc9557" };
+        const char *what = whats[ix];
+    CODE:
+        v = tk_value_rw(self, what);
+        if (items > 1) {
+            if (items != 3 || strNE(SvPV_nolen(ST(1)), "precision"))
+                croak("%s: the only option is precision => 0 to 9", what);
+            digits = (int)tk_opt_int(aTHX_ ST(2), what, "precision", 0, 9);
+        }
+        c = tk_value_civil(v);
+        if (ix == 1 && (v->zone == TK_ZONE_FLOATING))
+            croak("%s: floating time has no offset, and RFC 3339 needs one", what);
+        if (ix == 1 && (c->year < 0 || c->year > 9999))
+            croak("%s: RFC 3339 has only the years 0000 to 9999", what);
+        o.sv = newSVpvs("");
+        o.utf8 = 0;
+        o.digits = NULL;
+        tk_out_datetime(aTHX_ &o, v, digits);
+        if (ix == 2 && v->zone != TK_ZONE_FLOATING) {
+            SV *name = sv_2mortal(tk_zone_name_sv(aTHX_ v));
+            tk_out_offset(aTHX_ &o, v->utoff, 1, 1);
+            tk_out_cat(aTHX_ &o, "[", 1);
+            tk_out_cat(aTHX_ &o, SvPVX(name), SvCUR(name));
+            tk_out_cat(aTHX_ &o, "]", 1);
+        }
+        else if (v->zone == TK_ZONE_UTC)
+            tk_out_cat(aTHX_ &o, "Z", 1);
+        else if (v->zone != TK_ZONE_FLOATING)
+            tk_out_offset(aTHX_ &o, v->utoff, 1, 1);
+        RETVAL = o.sv;
+    OUTPUT:
+        RETVAL
+
+SV *
+rfc2822(self)
+        SV *self
+    ALIAS:
+        http_date = 1
+    PREINIT:
+        tk_value *v;
+        tk_out o;
+        tk_value u;
+        const char *what = ix ? "Time::Keeper->http_date" : "Time::Keeper->rfc2822";
+    CODE:
+        v = tk_value_rw(self, what);
+        if (v->zone == TK_ZONE_FLOATING)
+            croak("%s: floating time is not an instant", what);
+        if (ix) {
+            tk_zone_spec z;
+            z.zone = TK_ZONE_UTC;
+            z.fixed = 0;
+            tk_value_init(aTHX_ &u, &v->inst, &z);
+            if (tk_value_civil(&u)->year < 0 || tk_value_civil(&u)->year > 9999)
+                croak("%s: only the years 0000 to 9999", what);
+        }
+        else if (tk_value_civil(v)->year < 0 || tk_value_civil(v)->year > 9999)
+            croak("%s: only the years 0000 to 9999", what);
+        o.sv = newSVpvs("");
+        o.utf8 = 0;
+        o.digits = NULL;
+        tk_rfc2822(aTHX_ &o, v, ix);
+        RETVAL = o.sv;
+    OUTPUT:
+        RETVAL
+
+SV *
+ymd(self, ...)
+        SV *self
+    ALIAS:
+        mdy = 1
+        dmy = 2
+        hms = 3
+        date = 4
+        time = 5
+    PREINIT:
+        tk_value *v;
+        const tk_civil *c;
+        const char *sep;
+        STRLEN sl;
+        char y[24];
+        SV *out;
+    CODE:
+        v = tk_value_rw(self, "Time::Keeper accessor");
+        c = tk_value_civil(v);
+        if (items > 1 && ix != 4 && ix != 5)
+            sep = SvPV(ST(1), sl);
+        else {
+            sep = (ix == 3 || ix == 5) ? ":" : "-";
+            sl = 1;
+        }
+        if (c->year < 0)
+            sprintf(y, "-%04ld", (long)-(long)c->year);
+        else
+            sprintf(y, "%04ld", (long)c->year);
+        switch (ix) {
+        case 0: case 4: out = newSVpvf("%s%.*s%02u%.*s%02u", y, (int)sl, sep, (unsigned)c->month, (int)sl, sep, (unsigned)c->day); break;
+        case 1: out = newSVpvf("%02u%.*s%02u%.*s%s", (unsigned)c->month, (int)sl, sep, (unsigned)c->day, (int)sl, sep, y); break;
+        case 2: out = newSVpvf("%02u%.*s%02u%.*s%s", (unsigned)c->day, (int)sl, sep, (unsigned)c->month, (int)sl, sep, y); break;
+        default: out = newSVpvf("%02u%.*s%02u%.*s%02u", (unsigned)c->hour, (int)sl, sep, (unsigned)c->minute, (int)sl, sep, (unsigned)c->second); break;
+        }
+        if (items > 1 && SvUTF8(ST(1)))
+            SvUTF8_on(out);
+        RETVAL = out;
+    OUTPUT:
+        RETVAL

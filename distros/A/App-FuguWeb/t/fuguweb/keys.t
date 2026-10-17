@@ -1115,8 +1115,10 @@ subtest 'the generated files' => sub {
 	like( $page, qr{<title>Keys },     'the index page has a title' );
 	like( $page, qr{href="\.\./style\.css"},
 		'and it steps back to the stylesheet of the root' );
-	like( $page, qr{href="\.\./index\.html"},
-		'and back to the entry page' );
+	like( $page, qr{<header><a href="\.\./en/index\.html">},
+		'and into the entry page of the default tree' );
+	like( $page, qr{<html lang="en">}, 'it is a page of en' );
+	unlike( $page, qr{<footer>}, 'and it carries no footer' );
 	like( $page, qr{href="fugubsd-1-release\.pub"},
 		'and it links each key beside it' );
 	like( $page, qr{<td>release</td>}, 'and it names each purpose' );
@@ -2347,6 +2349,13 @@ subtest 'a keys name that names no directory of its own' => sub {
 		'two dots'  => [ '..',  qr{leaves the output directory} ],
 		'the staging directory' =>
 		    [ '.man', qr{is the staging directory of the build} ],
+
+		# WEB-KEYS-34. A language tree takes a name of this
+		# shape in the output.
+		'a language code' =>
+		    [ 'en', qr{has the shape of a language code} ],
+		'a code of no language of the site' =>
+		    [ 'de', qr{has the shape of a language code} ],
 	);
 
 	for my $name ( sort keys %case ) {
@@ -2370,7 +2379,36 @@ RC
 	}
 };
 
-subtest 'a key directory that collides with a page' => sub {
+subtest 'a key directory that collides with a page of the top level' => sub {
+	# The forward of the top level takes index.html, per
+	# WEB-LANG-8, and a key directory of that name would take its
+	# place.
+	my $root = project( rc => <<'RC' );
+keys "index.html" {
+	org = fugubsd
+}
+
+key "fugubsd-1-release" {
+	status = current
+}
+
+key "fugubsd-1-contact" {
+	status = current
+}
+RC
+
+	rename "$root/web/keys", "$root/web/index.html"
+	    or die "Cannot rename: $!";
+
+	my ( $config, $reason ) = load($root);
+	ok( !$config, 'the description is refused' );
+	like( $reason, qr{both become the same name in the output},
+		'because a page and a directory cannot share one name' );
+};
+
+subtest 'a key directory beside a page of the same name' => sub {
+	# A page sits in its language tree, so a page named keys is
+	# en/keys in the output, and the key directory keeps keys.
 	my $root = project( rc => <<'RC' );
 page "keys" {
 	title = Keys
@@ -2391,9 +2429,11 @@ key "fugubsd-1-contact" {
 RC
 
 	my ( $config, $reason ) = load($root);
-	ok( !$config, 'the description is refused' );
-	like( $reason, qr{both become the same name in the output},
-		'because a page and a directory cannot share one name' );
+	ok( $config, 'the description loads' ) or diag $reason;
+
+	my %inventory = map { $_ => 1 } $config->inventory;
+	ok( $inventory{'en/keys'},         'the page sits in the tree' );
+	ok( $inventory{'keys/index.html'}, 'and the key directory beside it' );
 };
 
 subtest 'a key directory that collides with the stylesheet' => sub {
@@ -2887,7 +2927,7 @@ subtest 'the whole check run holds the key rules' => sub {
 	) or diag join "\n", @problems;
 };
 
-subtest 'the chrome of a page below the root' => sub {
+subtest 'the chrome of the key page' => sub {
 	my $root = project( rc => <<'RC' );
 keys "keys" {
 	org = fugubsd
@@ -2907,7 +2947,8 @@ key "fugubsd-1-contact" {
 RC
 
 	# An absolute navigation entry names a place of its own, so
-	# the step back must not stand in front of it.
+	# the step into the default tree must not stand in front of
+	# it, per WEB-LANG-15.
 	my $rc = slurp("$root/.fuguwebrc");
 	$rc =~ s{nav "index\.html" \{\n\tlabel = Home\n\}}{$&\n\nnav "https://example.org/" {\n\tlabel = Elsewhere\n}};
 	spew( "$root/.fuguwebrc", $rc );
@@ -2921,10 +2962,12 @@ RC
 	my $page = slurp("$out/keys/index.html");
 	like( $page, qr{href="https://example\.org/"},
 		'an absolute navigation href keeps its own form' );
-	unlike( $page, qr{href="\.\./https://},
-		'and takes no step back in front of it' );
-	like( $page, qr{href="\.\./index\.html"},
-		'a relative one takes the step back' );
+	unlike( $page, qr{href="\.\./(?:en/)?https://},
+		'and takes no step in front of it' );
+	like( $page, qr{<a href="\.\./en/index\.html">Home</a>},
+		'a relative one takes the step into the default tree' );
+	like( $page, qr{<link rel="stylesheet" href="\.\./style\.css">},
+		'and the stylesheet takes the step back to the top level' );
 
 	# The generated page gets the checks of a page, so a broken
 	# link of the chrome fails the check and never publishes.
@@ -2954,8 +2997,8 @@ subtest 'the generated page carries no footer' => sub {
 	# The footer is the prose of the project, and the chrome
 	# copies it in unchanged. A relative link of it would resolve
 	# against the directory of the page that carries it. The same
-	# href therefore names one file from the root, and another
-	# from keys/.
+	# href therefore names one file from en/, and another from
+	# keys/.
 	spew( "$root/web/about.body.html", "<h1>About</h1>\n" );
 	spew( "$root/web/footer.body.html",
 		qq{<p><a href="about.html">About</a></p>\n} );
@@ -2971,10 +3014,10 @@ subtest 'the generated page carries no footer' => sub {
 	my $out = "$root/out";
 	ok( site( $config, $out )->build, 'the build succeeds' );
 
-	like( slurp("$out/index.html"), qr{<footer>},
-		'a page of the root carries the footer' );
+	like( slurp("$out/en/index.html"), qr{<footer>},
+		'a page of the tree carries the footer' );
 	unlike( slurp("$out/keys/index.html"), qr{<footer>},
-		'and a page below it does not' );
+		'and the key page does not' );
 
 	SKIP: {
 		skip 'gpg(1) is not installed', 1 unless $GPG;
@@ -3010,18 +3053,18 @@ subtest 'the checks read the links of the generated page' => sub {
 	my @problems =
 	    App::FuguWeb::Check->new( config => $config, out => $out )->run;
 
-	ok( ( grep { $_ eq 'index.html: missing.html leads nowhere' }
+	ok( ( grep { $_ eq 'en/index.html: missing.html leads nowhere' }
 			@problems ),
-		'the check reports the page of the root' )
+		'the check reports the page of the tree' )
 	    or diag join "\n", @problems;
 
-	# The step back is part of the href that the generated page
-	# carries, so the report names it.
+	# The step into the default tree is part of the href that the
+	# generated page carries, so the report names it.
 	ok(
 		(
 			grep {
 				$_ eq
-				    'keys/index.html: ../missing.html leads'
+				    'keys/index.html: ../en/missing.html leads'
 				    . ' nowhere'
 			} @problems
 		),

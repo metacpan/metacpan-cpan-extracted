@@ -1,52 +1,43 @@
-# t/05-api-robustness.t
 use strict;
 use warnings;
-use Test::More tests => 11; # Explicit plan for a flat test file
+use Test::More;
 use Test::Exception;
 use Text::Fab;
 
 use_ok('Text::Fab');
 
-# --- cfg__pop robustness ---
-my $fab_pop = Text::Fab->new();
-$fab_pop->cfg__set('my_scalar', 'value');
-dies_ok { $fab_pop->cfg__pop('my_scalar') } 'pop dies when called on a scalar key';
-
-# --- cfg__prepend_elt robustness ---
-my $fab_prepend = Text::Fab->new(config => {
+my $fab = Text::Fab->new(config => {
     'Fab/list_keys' => { my_list => 1 },
     'Fab/hash_keys' => { my_hash => 1 },
 });
-$fab_prepend->cfg__set('my_scalar', 'value');
+$fab->cfg__set('my_scalar', 'val');
 
-dies_ok { $fab_prepend->cfg__prepend_elt('my_scalar', 0, 'x') } 'prepend_elt dies when called on a scalar key';
+throws_ok { $fab->cfg__pop('my_scalar') } qr/E_TYPE_MISMATCH/,
+    'cfg__pop on scalar dies with E_TYPE_MISMATCH';
 
-dies_ok { $fab_prepend->cfg__prepend_elt('my_hash', 0, 'not a pair') }
-    'prepend_elt on hash dies if value is not an arrayref pair';
+throws_ok { $fab->cfg__prepend_elt('my_scalar', 0, 'x') } qr/E_TYPE_MISMATCH/,
+    'cfg__prepend_elt on scalar dies with E_TYPE_MISMATCH';
 
-lives_ok { $fab_prepend->cfg__prepend_elt('my_list', 0, ['a', 1]) }
-    'prepend_elt on list LIVES when value is an arrayref (valid list element)';
-is_deeply($fab_prepend->cfg__get('my_list'), [ ['a', 1] ], '...and the arrayref is inserted correctly');
+throws_ok { $fab->cfg__prepend_elt('my_hash', 0, 'not_an_aref') } qr/E_TYPE_MISMATCH/,
+    'cfg__prepend_elt on hash with non-arrayref dies with E_TYPE_MISMATCH';
 
-# --- cfg__get_joined robustness ---
-my $fab_join = Text::Fab->new(config => {
-    'Fab/list_keys' => { my_list => 1 },
-});
-$fab_join->cfg__set('my_scalar', 'value');
+lives_ok { $fab->cfg__prepend_elt('my_list', 0, ['nested', 'array']) }
+    'cfg__prepend_elt on list accepts arrayref element';
+is_deeply($fab->cfg__get('my_list'), [['nested', 'array']], 'nested element inserted intact');
 
-dies_ok { $fab_join->cfg__get_joined('my_scalar', [',']) } 'get_joined dies when called on a scalar key';
+throws_ok { $fab->cfg__get_joined('my_scalar', [',']) } qr/E_TYPE_MISMATCH/,
+    'cfg__get_joined on scalar dies with E_TYPE_MISMATCH';
 
-throws_ok { $fab_join->cfg__get_joined('my_list', undef) } qr/requires an array reference for joiners/,
-    'get_joined dies if joiners argument is undef';
+throws_ok { $fab->cfg__get_joined('my_list', 'not_aref') } qr/E_TYPE_MISMATCH/,
+    'cfg__get_joined with non-arrayref joiners dies with E_TYPE_MISMATCH';
 
-throws_ok { $fab_join->cfg__get_joined('my_list', 'not_an_aref') } qr/requires an array reference for joiners/,
-    'get_joined dies if joiners argument is not an array reference';
+throws_ok { $fab->cfg__get_joined('my_list', undef) } qr/E_TYPE_MISMATCH/,
+    'cfg__get_joined with undef joiners dies with E_TYPE_MISMATCH';
 
-# --- out__get_joined robustness ---
-my $fab_out_join = Text::Fab->new();
+throws_ok { $fab->out__get_joined('spec', 'not_aref') } qr/E_TYPE_MISMATCH/,
+    'out__get_joined with non-arrayref joiners dies with E_TYPE_MISMATCH';
 
-throws_ok { $fab_out_join->out__get_joined('spec', undef) } qr/requires an array reference for joiners/,
-    'out__get_joined dies if joiners argument is undef';
+throws_ok { $fab->out__get_joined('spec', undef) } qr/E_TYPE_MISMATCH/,
+    'out__get_joined with undef joiners dies with E_TYPE_MISMATCH';
 
-throws_ok { $fab_out_join->out__get_joined('spec', 'not_an_aref') } qr/requires an array reference for joiners/,
-    'out__get_joined dies if joiners argument is not an array reference';
+done_testing();

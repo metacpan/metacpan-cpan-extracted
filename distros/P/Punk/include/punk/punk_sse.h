@@ -396,7 +396,12 @@ static void se_run_handler(pTHX_ SV *code, SV *c, SV *self) {
     died = SvTRUE(ERRSV) ? 1 : 0;
     PUTBACK; FREETMPS; LEAVE;
     if (died) {
-        warn("Punk::SSE: handler died: %s", SvPV_nolen(ERRSV));
+        {   /* escaped: a die text is request-shaped, and a newline in it
+             * would be a second log line (the 0.59 pl_plain rule) */
+            STRLEN el; const char *ep = SvPV_const(ERRSV, el);
+            warn("Punk::SSE: handler died: %" SVf,
+                 SVfARG(pl_plain(aTHX_ ep, el, SvUTF8(ERRSV))));
+        }
         se_teardown(aTHX_ se_of(aTHX_ self));
     }
 }

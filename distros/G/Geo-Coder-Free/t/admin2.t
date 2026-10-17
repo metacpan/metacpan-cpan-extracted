@@ -4,7 +4,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 4;
+use Test::Most;
 use Test::Log::Abstraction;
 
 BEGIN {
@@ -39,3 +39,5 @@ ADMIN2: {
 		}
 	}
 }
+
+done_testing();

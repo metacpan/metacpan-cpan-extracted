@@ -13,7 +13,9 @@ lib/URI/PackageURL/types/apk-definition.json
 lib/URI/PackageURL/types/bazel-definition.json
 lib/URI/PackageURL/types/bitbucket-definition.json
 lib/URI/PackageURL/types/bitnami-definition.json
+lib/URI/PackageURL/types/brew-definition.json
 lib/URI/PackageURL/types/cargo-definition.json
+lib/URI/PackageURL/types/chrome-extension-definition.json
 lib/URI/PackageURL/types/cocoapods-definition.json
 lib/URI/PackageURL/types/composer-definition.json
 lib/URI/PackageURL/types/conan-definition.json
@@ -24,6 +26,7 @@ lib/URI/PackageURL/types/deb-definition.json
 lib/URI/PackageURL/types/docker-definition.json
 lib/URI/PackageURL/types/gem-definition.json
 lib/URI/PackageURL/types/generic-definition.json
+lib/URI/PackageURL/types/git-definition.json
 lib/URI/PackageURL/types/github-definition.json
 lib/URI/PackageURL/types/golang-definition.json
 lib/URI/PackageURL/types/hackage-definition.json
@@ -36,6 +39,7 @@ lib/URI/PackageURL/types/mlflow-definition.json
 lib/URI/PackageURL/types/npm-definition.json
 lib/URI/PackageURL/types/nuget-definition.json
 lib/URI/PackageURL/types/oci-definition.json
+lib/URI/PackageURL/types/opam-definition.json
 lib/URI/PackageURL/types/otp-definition.json
 lib/URI/PackageURL/types/pub-definition.json
 lib/URI/PackageURL/types/pypi-definition.json
@@ -43,6 +47,9 @@ lib/URI/PackageURL/types/qpkg-definition.json
 lib/URI/PackageURL/types/rpm-definition.json
 lib/URI/PackageURL/types/swid-definition.json
 lib/URI/PackageURL/types/swift-definition.json
+lib/URI/PackageURL/types/vcpkg-definition.json
+lib/URI/PackageURL/types/vscode-extension-definition.json
+lib/URI/PackageURL/types/yocto-definition.json
 lib/URI/PackageURL/Util.pm
 lib/URI/VersionRange.pm
 lib/URI/VersionRange/App.pm
@@ -60,12 +67,17 @@ t/20-decode.t
 t/30-util.t
 t/40-cli.t
 t/50-version-range.t
+t/51-vers-scheme-loading.t
+t/52-vers-scheme-comparator.t
+t/53-vers-percent-encoding.t
+t/54-utf8.t
 t/60-semver-compare.t
 t/70-vers-from-native.t
 t/90-cpan-distname-info.t
 t/91-cpan-distpath-quailfier.t
 t/99-purl-legacy-test-suite.t
 t/99-purl-tests.t
+t/99-purl-type-definition.t
 t/99-vers-tests.t
 t/manifest.t
 t/pod-coverage.t
@@ -76,7 +88,9 @@ t/purl/types/apk-test.json
 t/purl/types/bazel-test.json
 t/purl/types/bitbucket-test.json
 t/purl/types/bitnami-test.json
+t/purl/types/brew-test.json
 t/purl/types/cargo-test.json
+t/purl/types/chrome-extension-test.json
 t/purl/types/cocoapods-test.json
 t/purl/types/composer-test.json
 t/purl/types/conan-test.json
@@ -87,6 +101,7 @@ t/purl/types/deb-test.json
 t/purl/types/docker-test.json
 t/purl/types/gem-test.json
 t/purl/types/generic-test.json
+t/purl/types/git-test.json
 t/purl/types/github-test.json
 t/purl/types/golang-test.json
 t/purl/types/hackage-test.json
@@ -99,6 +114,7 @@ t/purl/types/mlflow-test.json
 t/purl/types/npm-test.json
 t/purl/types/nuget-test.json
 t/purl/types/oci-test.json
+t/purl/types/opam-test.json
 t/purl/types/otp-test.json
 t/purl/types/pub-test.json
 t/purl/types/pypi-test.json
@@ -106,6 +122,9 @@ t/purl/types/qpkg-test.json
 t/purl/types/rpm-test.json
 t/purl/types/swid-test.json
 t/purl/types/swift-test.json
+t/purl/types/vcpkg-test.json
+t/purl/types/vscode-extension-test.json
+t/purl/types/yocto-test.json
 t/sync-purl-legacy-test-suite-data.sh
 t/sync-tests.sh
 t/test-suite-data.json
@@ -114,8 +133,10 @@ t/vers/alpm_version_cmp_test.json
 t/vers/conan_range_from_native_basic_test.json
 t/vers/conan_range_from_native_test.json
 t/vers/conan_version_cmp_test.json
+t/vers/datetime_version_cmp_test.json
 t/vers/gem_range_from_native_test.json
 t/vers/gentoo_version_cmp_test.json
+t/vers/intdot_version_cmp_test.json
 t/vers/lexicographic-test.json
 t/vers/maven_version_cmp_test.json
 t/vers/nginx_range_from_native_test.json
@@ -127,6 +148,10 @@ t/vers/openssl_range_from_native_test.json
 t/vers/openssl_version_cmp_test.json
 t/vers/pypi_range_containment_test.json
 t/vers/pypi_range_from_native_test.json
-t/vers/pypi_range_roundtrip_test.json
+t/vers/pypi_range_validate_test.json
+t/vers/test-overview.md
+t/vers/test-schema.md
+t/vers/test-suite.md
+t/vers/vers_canonical_parse_test.json
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -4,51 +4,22 @@ use 5.020;
 use strict;
 use warnings;
 
-use Types::Common -types;
+use Object::Proto ();
 use Claude::Agent::Permission::Result;
-use Marlin
-    -base => 'Claude::Agent::Permission::Result',
-    'updated_input?',
-    'updated_permissions?';
 
-=head1 NAME
-
-Claude::Agent::Permission::Result::Allow - Permission allow result
-
-=head1 DESCRIPTION
-
-Permission result that allows the tool to execute.
-
-=head2 ATTRIBUTES
-
-=over 4
-
-=item * behavior - Always 'allow'
-
-=item * updated_input - The input to pass to the tool (can be modified)
-
-=item * updated_permissions - Optional permissions update
-
-=back
-
-=cut
+BEGIN {
+    Object::Proto::define('Claude::Agent::Permission::Result::Allow',
+        extends => 'Claude::Agent::Permission::Result',
+        'updated_input:predicate',
+        'updated_permissions:predicate',
+    );
+}
 
 sub BUILD {
     my ($self) = @_;
-    # Force behavior to 'allow'
     $self->behavior('allow');
     return;
 }
-
-=head2 METHODS
-
-=head3 to_hash
-
-    my $hash = $result->to_hash();
-
-Convert the result to a hash for JSON serialization.
-
-=cut
 
 sub to_hash {
     my ($self) = @_;
@@ -57,6 +28,48 @@ sub to_hash {
     $hash->{updatedPermissions} = $self->updated_permissions if $self->has_updated_permissions;
     return $hash;
 }
+
+1;
+
+__END__
+
+=head1 NAME
+
+Claude::Agent::Permission::Result::Allow - Permission result that allows a tool
+
+=head1 DESCRIPTION
+
+Permission result that lets the tool run, optionally with changed input
+or a permission rule update.
+
+=head1 ATTRIBUTES
+
+=head2 behavior
+
+Always C<allow>.
+
+=head2 updated_input
+
+The input the tool should run with. When not given, the CLI is sent the
+input it asked about.
+
+=head2 updated_permissions
+
+ArrayRef of permission updates for the CLI to apply, in the CLI's own
+C<PermissionUpdate> shape.
+
+=head1 METHODS
+
+=head2 new
+
+Takes a flat list of name/value pairs. Unknown names are ignored.
+
+=head2 to_hash
+
+    my $hash = $result->to_hash;
+
+C<{ behavior =E<gt> 'allow', updatedInput =E<gt> ..., updatedPermissions =E<gt> ... }>
+with only the attributes that were given.
 
 =head1 AUTHOR
 
@@ -69,5 +82,3 @@ This software is Copyright (c) 2026 by LNATION.
 This is free software, licensed under The Artistic License 2.0 (GPL Compatible).
 
 =cut
-
-1;

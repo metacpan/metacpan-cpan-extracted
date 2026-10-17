@@ -6,7 +6,7 @@
 use warnings;
 use strict;
 use Data::Dumper;
-use Test::Most tests => 5;
+use Test::Most;
 use Test::Number::Delta;
 use Test::Carp;
 use Test::Deep;
@@ -55,3 +55,5 @@ DR5HN: {
 		}
 	}
 }
+
+done_testing();

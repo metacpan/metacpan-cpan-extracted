@@ -24,11 +24,11 @@ Geo::Coder::Free::Validate - The rule that decides whether a string could be a l
 
 =head1 VERSION
 
-Version 0.46
+Version 0.47
 
 =cut
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 =head1 DESCRIPTION
 

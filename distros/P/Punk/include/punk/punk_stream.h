@@ -428,11 +428,13 @@ static void pst_run_handler(pTHX_ SV *code, SV *c, SV *self) {
     PUTBACK; FREETMPS; LEAVE;
     st = pst_of(aTHX_ self);
     if (died) {
+        STRLEN el; const char *ep = SvPV_const(ERRSV, el);
+        SV *plain = pl_plain(aTHX_ ep, el, SvUTF8(ERRSV));   /* one line */
         if (st->reqid)
             warn("Punk::Stream: handler died (request %" SVf "): %" SVf,
-                 SVfARG(st->reqid), SVfARG(ERRSV));
+                 SVfARG(st->reqid), SVfARG(plain));
         else
-            warn("Punk::Stream: handler died: %" SVf, SVfARG(ERRSV));
+            warn("Punk::Stream: handler died: %" SVf, SVfARG(plain));
         pst_teardown(aTHX_ st);
         return;
     }

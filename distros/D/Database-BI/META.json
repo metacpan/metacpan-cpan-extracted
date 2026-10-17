@@ -31,6 +31,9 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Geo::Coder::Free" : "0.47"
+         },
          "requires" : {
             "CGI::Info" : "0",
             "CGI::Lingua" : "0.85",
@@ -73,6 +76,7 @@
          "requires" : {
             "DBD::CSV" : "0",
             "Encode" : "0",
+            "Test::DescribeMe" : "0",
             "Test::Memory::Cycle" : "0",
             "Test::Mockingbird" : "0",
             "Test::Mojo" : "0",
@@ -96,6 +100,6 @@
          "web" : "https://github.com/nigelhorne/Database-BI"
       }
    },
-   "version" : "v0.012.1",
+   "version" : "v0.013.0",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

@@ -97,8 +97,11 @@ static void pf_invoke(pTHX_ SV *cb, SV **argv, int argc) {
     PUTBACK;
     call_sv(cb, G_VOID | G_EVAL | G_DISCARD);
     SPAGAIN;
-    if (SvTRUE(ERRSV))
-        warn("Punk::Future: callback died: %s", SvPV_nolen(ERRSV));
+    if (SvTRUE(ERRSV)) {
+        STRLEN el; const char *ep = SvPV_const(ERRSV, el);
+        warn("Punk::Future: callback died: %" SVf,
+             SVfARG(pl_plain(aTHX_ ep, el, SvUTF8(ERRSV))));   /* one line */
+    }
     PUTBACK; FREETMPS; LEAVE;
 }
 

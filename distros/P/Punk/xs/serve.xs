@@ -17,7 +17,10 @@ _serve(state, env)
             croak("Punk::_serve: state must be a hashref");
         if (!SvROK(env) || SvTYPE(SvRV(env)) != SVt_PVHV)
             croak("Punk::_serve: env must be a hashref");
-        RETVAL = punk_serve(aTHX_ (HV *)SvRV(state), (HV *)SvRV(env));
+        {   /* the struct the app closure carries, built for this one call */
+            SV *holder = sv_2mortal(pk_state_build(aTHX_ (HV *)SvRV(state)));
+            RETVAL = punk_serve(aTHX_ pk_state_of(aTHX_ holder), (HV *)SvRV(env));
+        }
     }
     OUTPUT:
         RETVAL

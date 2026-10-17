@@ -131,6 +131,7 @@ include/punk/punk_session.h
 include/punk/punk_sessionstore.h
 include/punk/punk_sitemap.h
 include/punk/punk_sse.h
+include/punk/punk_state.h
 include/punk/punk_static.h
 include/punk/punk_stencil.h
 include/punk/punk_stream.h

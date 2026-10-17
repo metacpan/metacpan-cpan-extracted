@@ -13,6 +13,7 @@ lib/Database/BI.pm
 lib/Database/BI/Calc.pm
 lib/Database/BI/Controller/Dashboard.pm
 lib/Database/BI/Model/DataSource.pm
+lib/Database/BI/Model/Geocode.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
@@ -23,19 +24,27 @@ t/basic.t
 t/binned.t
 t/calc.t
 t/cgi_security.t
+t/data-dir-invariant.t
 t/data-flow.t
 t/domain.t
 t/edge_cases.t
 t/filter.t
 t/function.t
+t/geocode-real.t
+t/geocode.t
 t/integration.t
 t/locales.t
+t/manifest.t
+t/model.t
 t/path.t
+t/pod.t
 t/redis.t
 t/redis_live.t
 t/transaction.t
 t/unit.t
+t/version.t
 templates/web/en/bar.html.tt
+templates/web/en/canvas.html.tt
 templates/web/en/browse.html.tt
 templates/web/en/combo.html.tt
 templates/web/en/dashboard.html.tt

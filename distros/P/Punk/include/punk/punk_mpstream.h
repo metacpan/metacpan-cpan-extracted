@@ -57,6 +57,7 @@ typedef struct {
     SV  *path;       /* the temp file's path, or NULL            */
     UV   len;        /* bytes seen                               */
     int  is_file;    /* a file part (has a filename)             */
+    int  err;        /* errno of a write that fell short, else 0 */
 } pq_sink;
 
 /* Temp file for a part that outgrew the threshold.
@@ -99,7 +100,13 @@ static void pq_sink_write(pTHX_ pq_sink *s, const char *p, STRLEN n,
     s->len += n;
     if (s->fd < 0 && s->is_file && s->len > PQ_MP_SPILL)
         (void)pq_sink_spill(aTHX_ s, dir, seq);
-    if (s->fd >= 0) { (void)PerlLIO_write(s->fd, p, n); return; }
+    if (s->fd >= 0) {
+        /* a short write (a full disk) is remembered and refused when the
+         * part ends: `size` must never say more than is on disk */
+        if (!s->err && PerlLIO_write(s->fd, p, n) != (SSize_t)n)
+            s->err = errno ? errno : EIO;
+        return;
+    }
     if (!s->sv) s->sv = newSVpvs("");
     sv_catpvn(s->sv, p, n);
 }
@@ -182,6 +189,7 @@ static pq_sink *pq_sink_guard(pTHX) {
     SvPOK_on(g);
     SvCUR_set(g, sizeof(pq_sink));
     s->sv = NULL; s->fd = -1; s->path = NULL; s->len = 0; s->is_file = 0;
+    s->err = 0;
     sv_magicext(g, NULL, PERL_MAGIC_ext, &pq_sink_vtbl, NULL, 0);
     return s;
 }
@@ -336,6 +344,12 @@ static IV pq_parse_multipart_stream(pTHX_ PerlIO *fp, IV clen, IV max,
                 }
             }
             if (sink->fd >= 0) { PerlLIO_close(sink->fd); sink->fd = -1; }
+            if (sink->err) {
+                /* the guard frees the sink and its temp file on the way out */
+                int e = sink->err;
+                croak("Punk::Request: upload could not be written: %s",
+                      Strerror(e));
+            }
 
             parts++;
             if (!nsv) {                       /* a part with no name is noise */

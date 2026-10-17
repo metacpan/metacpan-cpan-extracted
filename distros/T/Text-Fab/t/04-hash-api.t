@@ -1,86 +1,119 @@
-# t/04-hash-api.t
 use strict;
 use warnings;
 use Test::More;
 use Test::Exception;
 use Text::Fab;
 
-use_ok('Text::Fab', 'Module loads correctly');
+use_ok('Text::Fab');
 
-# --- cfg__pop (on Hashes) ---
+subtest 'cfg__get with offset (as key) on Hashes' => sub {
+    my $fab = Text::Fab->new(config => { 'Fab/hash_keys' => { my_hash => 1 } });
+    $fab->cfg__set('my_hash', { name => 'Alice', role => 'Admin' });
+
+    is($fab->cfg__get('my_hash', 'name'), 'Alice', 'cfg__get with offset returns value for key');
+    is($fab->cfg__get('my_hash', 'role'), 'Admin', 'cfg__get with offset returns value for second key');
+    is($fab->cfg__get('my_hash', 'missing'), undef, 'cfg__get with missing key returns undef');
+
+    my $href = $fab->cfg__get('my_hash');
+    is_deeply($href, { name => 'Alice', role => 'Admin' }, 'cfg__get returns HASH ref when no offset');
+};
+
+subtest 'cfg__append on Hashes with key/value semantics' => sub {
+    my $fab = Text::Fab->new(config => { 'Fab/hash_keys' => { params => 1, new_hash => 1 } });
+    $fab->cfg__set('params', { host => 'localhost' });
+
+    $fab->cfg__append('params', port => 8080, user => 'root');
+    is_deeply($fab->cfg__get('params'), { host => 'localhost', port => 8080, user => 'root' },
+        'append key-value pairs merges into hash');
+
+    $fab->cfg__append('params', { env => 'prod', port => 443 });
+    is_deeply($fab->cfg__get('params'), { host => 'localhost', port => 443, user => 'root', env => 'prod' },
+        'append hashref merges and overwrites existing keys');
+
+    $fab->cfg__append('new_hash', k1 => 'v1');
+    is($fab->cfg__get('new_hash', 'k1'), 'v1', 'append to nonexistent hash autovivifies');
+
+    throws_ok { $fab->cfg__append('params', 'orphan_key') } qr/E_TYPE_MISMATCH/,
+        'append odd number of elements to hash dies with E_TYPE_MISMATCH';
+
+    throws_ok { $fab->cfg__prepend('params', k => 'v') } qr/E_TYPE_MISMATCH/,
+        'cfg__prepend on hash dies with E_TYPE_MISMATCH';
+};
+
+subtest '#append directive on Hashes' => sub {
+    my $fab = Text::Fab->new();
+    $fab->process_string("#append Fab/hash_keys app_cfg 1");
+    is($fab->cfg__get('Fab/hash_keys', 'app_cfg'), 1, '#append on Fab/hash_keys succeeds with key val');
+
+    $fab->process_string("#append app_cfg timeout 30 retries 3");
+    is($fab->cfg__get('app_cfg', 'timeout'), 30, 'app_cfg timeout parsed and appended');
+    is($fab->cfg__get('app_cfg', 'retries'), 3, 'app_cfg retries parsed and appended');
+
+    $fab->process_string("#append app_cfg debug 1");
+    is($fab->cfg__get('app_cfg', 'debug'), 1, 'app_cfg debug parsed and appended');
+};
+
 subtest 'cfg__pop on Hashes (multi-key delete)' => sub {
     my $fab = Text::Fab->new(config => { 'Fab/hash_keys' => { my_hash => 1 } });
     $fab->cfg__set('my_hash', { a => 1, b => 2, c => 3, d => 4 });
 
-    # Branch: delete a single key, testing scalar context return
-    my $deleted_value = $fab->cfg__pop('my_hash', 'c');
-    is($deleted_value, 3, 'Branch: returns value of single deleted key in scalar context');
-    is_deeply($fab->cfg__get('my_hash'), { a => 1, b => 2, d => 4 }, '...and the hash is modified correctly');
+    my $val = $fab->cfg__pop('my_hash', 'c');
+    is($val, 3, 'pop single key in scalar context returns deleted value');
+    is_deeply($fab->cfg__get('my_hash'), { a => 1, b => 2, d => 4 }, 'hash reflects single deletion');
 
-    # Branch: delete multiple keys (including a non-existent one), testing list context return
-    my @deleted_values = $fab->cfg__pop('my_hash', 'd', 'non_existent', 'a');
-    is_deeply(\@deleted_values, [4, undef, 1], 'Branch: returns list of deleted values in list context');
-    is_deeply($fab->cfg__get('my_hash'), { b => 2 }, '...and the hash is modified correctly after multiple deletes');
+    my @vals = $fab->cfg__pop('my_hash', 'd', 'non_existent', 'a');
+    is_deeply(\@vals, [4, undef, 1], 'pop multiple keys in list context returns slice');
+    is_deeply($fab->cfg__get('my_hash'), { b => 2 }, 'hash reflects multiple deletions');
 
-    # Branch: ensure original list behavior is unaffected
-    my $fab_types = Text::Fab->new(config => { 'Fab/list_keys' => { my_list => 1 } });
-    $fab_types->cfg__set('my_list', ['x', 'y', 'z']);
-    $fab_types->cfg__set('my_scalar', 'value');
-    is($fab_types->cfg__pop('my_list'), 'z', 'Branch: pop on list with no args still works');
-    is($fab_types->cfg__pop('my_list', 1), 'y', 'Branch: pop on list with a count still works');
-    dies_ok { $fab_types->cfg__pop('my_list', 1, 'extra_arg') } 'NEW: pop on list dies with more than one argument';
-    dies_ok { $fab_types->cfg__pop('my_scalar', 'a_key') } 'NEW: pop with key arguments dies on a scalar';
+    my @empty = $fab->cfg__pop('my_hash');
+    is_deeply(\@empty, [], 'pop on hash with no keys returns empty list');
 };
 
-
-# --- cfg__prepend_elt (on Hashes) ---
 subtest 'cfg__prepend_elt on Hashes' => sub {
     my $fab = Text::Fab->new(config => { 'Fab/hash_keys' => { my_hash => 1 } });
     $fab->cfg__set('my_hash', { b => 2 });
 
-    # For hashes, offset is ignored, it's just an insertion/update.
     $fab->cfg__prepend_elt('my_hash', 0, ['a', 1]);
-    is_deeply($fab->cfg__get('my_hash'), { a => 1, b => 2 }, 'Branch: prepends a key-value pair to the hash');
-    
-    # Test overwrite
+    is_deeply($fab->cfg__get('my_hash'), { a => 1, b => 2 }, 'inserts key-value pair');
+
     $fab->cfg__prepend_elt('my_hash', -1, ['a', 99]);
-    is_deeply($fab->cfg__get('my_hash'), { a => 99, b => 2 }, 'Branch: overwrites an existing key correctly');
-    
-    dies_ok { $fab->cfg__prepend_elt('my_hash', 0, 'just_a_string') } 'Branch: dies if value is not an array reference';
-    dies_ok { $fab->cfg__prepend_elt('my_hash', 0, ['key_only']) } 'Branch: dies if value is not a pair (odd number)';
-    dies_ok { $fab->cfg__prepend_elt('my_hash', 0, ['k','v','extra']) } 'Branch: dies if value is not a pair (too many)';
+    is_deeply($fab->cfg__get('my_hash'), { a => 99, b => 2 }, 'overwrites existing key');
+
+    throws_ok { $fab->cfg__prepend_elt('my_hash', 0, 'scalar') } qr/E_TYPE_MISMATCH/,
+        'prepend_elt on hash dies with E_TYPE_MISMATCH if value is not an arrayref';
+    throws_ok { $fab->cfg__prepend_elt('my_hash', 0, ['key_only']) } qr/E_TYPE_MISMATCH/,
+        'prepend_elt on hash dies with E_TYPE_MISMATCH if arrayref length != 2';
 };
 
-# --- cfg__get_joined (on Hashes) ---
-subtest 'cfg__get_joined on Hashes' => sub {
-    my $fab = Text::Fab->new(config => { 'Fab/hash_keys' => { my_hash => 1, num_hash => 1 } });
+subtest 'cfg__get_joined on Hashes with sorting' => sub {
+    my $fab = Text::Fab->new(config => {
+        'Fab/hash_keys' => { my_hash => 1, num_hash => 1 }
+    });
     $fab->cfg__set('my_hash', { c => 3, a => 1, b => 2 });
 
-    # Branch 1: Default sort (string cmp) with cycling joiners
-    is($fab->cfg__get_joined('my_hash', ['=', ' & ']), 'a=1 & b=2 & c=3', 'Branch: joins hash using default string sort on keys');
-    
-    # Branch 2: Custom sort (numeric)
+    is($fab->cfg__get_joined('my_hash', ['=', ' & ']), 'a=1 & b=2 & c=3',
+       'joins hash with default sort');
+
     $fab->cfg__set('num_hash', { 10 => 'ten', 2 => 'two', 1 => 'one' });
     $fab->cfg__set('Fab/hash_key_sort_order', sub { $_[0] <=> $_[1] });
-    is($fab->cfg__get_joined('num_hash', [' => ', ', ']), '1 => one, 2 => two, 10 => ten', 'Branch: joins hash using custom numeric sort');
-    
-    # Branch 3: Custom sort (reverse string)
-    $fab->cfg__set('Fab/hash_key_sort_order', sub { $_[1] cmp $_[0] });
-    is($fab->cfg__get_joined('my_hash', [':', ' ']), 'c:3 b:2 a:1', 'Branch: joins hash using custom reverse sort');
-    
-    # Test modulo option, which now applies to inter-pair joiners
-    # 3 pairs => 2 inter-pair joiners. 2 % 2 == 0. Lives.
-    lives_ok { $fab->cfg__get_joined('my_hash', ['='], { permitted_joiners_modulo => 2 }) } 'Branch: modulo option lives for valid number of pairs';
-    
-    # 2 pairs => 1 inter-pair joiner. 1 % 2 != 0. Dies.
-    $fab->cfg__set('my_hash', { a => 1, b => 2 });
-    dies_ok { $fab->cfg__get_joined('my_hash', ['='], { permitted_joiners_modulo => 2 }) } 'Branch: modulo option dies for invalid number of pairs';
-    
-    # Edge cases
-    $fab->cfg__set('my_hash', { key => 'val' });
-    is($fab->cfg__get_joined('my_hash', ['=']), 'key=val', 'Edge case: single-pair hash still uses intra-pair joiner');
+    is($fab->cfg__get_joined('num_hash', [' => ', ', ']), '1 => one, 2 => two, 10 => ten',
+       'joins hash with custom numeric sorter receiving keys in @_');
+
+    $fab->cfg__set('my_hash', { k => 'v' });
+    is($fab->cfg__get_joined('my_hash', ['=']), 'k=v', 'single-pair hash joins correctly');
+
     $fab->cfg__set('my_hash', {});
-    is($fab->cfg__get_joined('my_hash', ['=']), '', 'Edge case: empty hash gives empty string');
+    is($fab->cfg__get_joined('my_hash', ['=']), '', 'empty hash returns empty string');
+};
+
+subtest 'out__create_section and out__target_section' => sub {
+    my $fab = Text::Fab->new();
+    $fab->out__target_section('sec1', 'NS');
+    push @{$fab->{sections}{NS}{sec1}}, ['text', 'initial_content'];
+    is($fab->out__get_joined('NS:sec1', [', ']), 'initial_content', 'target_section accumulated text');
+
+    $fab->out__create_section('sec1', 'NS');
+    is_deeply($fab->{sections}{NS}{sec1}, [], 'out__create_section cleared existing section content');
 };
 
 done_testing();

@@ -22,11 +22,11 @@ Geo::Coder::Free - Geocoding using free, locally-hosted databases
 
 =head1 VERSION
 
-Version 0.46
+Version 0.47
 
 =cut
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 =encoding utf-8
 
@@ -126,10 +126,12 @@ our $alternatives;
 # -----------------------------------------------------------------------
 my %_MESSAGES = (
 	usage_geocode       => 'Usage: %s::geocode(location => $location|scantext => $text)',
+	usage_geocode_many  => 'Usage: %s::geocode_many(\@values, region => $region, on_error => "croak"|"undef")',
 	usage_reverse       => 'Usage: %s::reverse_geocode(latlng => "$lat,$long")',
 	invalid_location    => '%s: invalid location to geocode(), %s',
 	invalid_scantext    => '%s: invalid scantext to geocode(), %s',
 	invalid_on_error    => '%s: on_error must be "croak" or "undef", not %s',
+	reserved_location   => '%s: "%s" is one of the keys geocode_many() answers with, so it cannot be one of the values it looks up',
 	geocoding_failed    => '%s: geocoding failed',
 	reverse_unsupported => 'Reverse lookup is not yet supported',
 	use_arrow_new       => '%s: use ->new() not ::new() to instantiate',
@@ -141,6 +143,11 @@ my %_MESSAGES = (
 Readonly::Scalar my $CONF_TRIPLET => 0.8;
 Readonly::Scalar my $CONF_DUPLET  => 0.7;
 Readonly::Scalar my $CONF_REGEX   => 0.7;
+
+# The keys geocode_many() answers with besides the values themselves.  The map
+# and the counts share one hashref, so a value spelled like one of these would
+# overwrite what the name stands for, and it is refused by name instead
+Readonly::Array my @RESULT_KEYS => qw(lookups resolved unresolved unresolved_values);
 
 # Stopwords excluded from word-window scantext searches.
 my %_COMMON_WORDS = map { $_ => 1 } qw(
@@ -396,7 +403,7 @@ C<geocode()> with no arguments - and stays a croak on either setting.
 =head4 provenance
 
 Every result carries C<geocoder>, C<database>, C<confidence> and C<accuracy>
-(section 2.1 of F<BI-Phase6-Dependency-Specs.md>): which distribution produced
+which distribution produced
 it, which backend answered, how good the match was, and how precise the
 coordinate is.  C<provenance()> reads the four back.  C<location> is set by every
 path but the MaxMind cities one, and C<text> only by a scantext lookup; C<lat>,
@@ -458,8 +465,7 @@ sub geocode {
 	# caller changes; 'undef' is for a batch caller working down a dirty column,
 	# which wants the row skipped rather than the whole run killed.  Only the two
 	# input errors below consult it: a backend that throws still throws, because
-	# nothing here is wrapped in an eval (section 2.4 of
-	# BI-Phase6-Dependency-Specs.md).
+	# nothing here is wrapped in an eval
 	my $on_error = $params{'on_error'} // 'croak';
 	Carp::croak(_i18n('invalid_on_error', __PACKAGE__, $on_error))
 		unless $on_error eq 'croak' || $on_error eq 'undef';
@@ -615,6 +621,214 @@ sub geocode {
 	return;
 }
 
+=head2 geocode_many
+
+=head3 SYNOPSIS
+
+    my $batch = $geo->geocode_many(\@places, region => 'GB', on_error => 'undef');
+
+    for my $place (@places) {
+        my $pt = $batch->{$place};              # a Geo::Location::Point, or undef
+        next unless defined $pt;
+        printf "%s is at %.4f, %.4f\n", $place, $pt->lat(), $pt->long();
+    }
+
+    printf "geocoded %d of %d places in %d lookups\n",
+        $batch->{'resolved'},
+        $batch->{'resolved'} + $batch->{'unresolved'},
+        $batch->{'lookups'};
+
+=head3 DESCRIPTION
+
+The loop a batch caller writes around C<geocode()>, run for it: one lookup per
+B<distinct> value, with the same options and the same results, plus the counts
+that caller would otherwise keep itself - how many values were looked up, how
+many resolved, how many did not, and which ones
+
+The hashref returned holds one entry per distinct value given, keyed by the
+value, plus four keys of its own:
+
+=over 4
+
+=item * C<< $batch->{$value} >> - the C<Geo::Location::Point> the value resolved
+to, or C<undef> if nothing did.  Every distinct value in the input is keyed, so
+a caller walking a column can look each row up without first asking whether the
+batch covered it.  An C<undef> in the input has no key of its own and shares the
+entry of the empty string, which is not a location either.
+
+=item * C<lookups> - how many values were looked up: one per distinct value this
+module agreed to query a backend for.  A value it refuses before any backend is
+touched - a bare number, C<''>, C<undef>, a reference - is not looked up, so it
+is not counted, which is what makes this the number a caller caps its work by.
+A value repeated in the batch is one lookup.  A lookup that is counted may still
+be answered without reading a database: the backends cache their answers, and
+OpenAddresses remembers the values it has already missed for the life of the
+process (C<%unknown_locations>, shared across instances and cannot be cleared), so
+this is the number of lookups asked for rather than of rows read.  A later batch
+in the same process is answered from those caches and does correspondingly less
+work.
+
+=item * C<resolved> - how many distinct values produced a point.
+
+=item * C<unresolved> - how many produced nothing, the refused values included.
+
+=item * C<unresolved_values> - those values, in the order they were first seen,
+so that a caller can record them as tried-and-failed rather than retrying them
+on every request.  Section 2.5 sketches this list under the name C<unresolved>;
+here C<unresolved> is the count a "geocoded N of M" message needs and the values
+themselves are C<unresolved_values>.
+
+=back
+
+C<resolved> and C<unresolved> always add up to the number of distinct values
+given, and the four keys above are reserved: a value equal to one of them is
+refused by name, before anything is looked up, rather than allowed to overwrite
+a count.
+
+C<region> and C<on_error> are handed to every lookup and mean there what they
+mean in C<geocode()>, including the rule that a backend exception is still an
+exception - nothing here is wrapped in an C<eval>.  C<on_error> defaults to
+C<'croak'> for the same reason it does there: a batch should not quietly plot
+fewer points than its column holds unless the caller asked it to, and a caller
+working down a dirty column asks for C<'undef'>.  The two settings do not differ
+in which values are looked up, only in what happens to a value the module
+refuses: C<'croak'> dies on it with the message C<geocode()> gives for it,
+C<'undef'> counts it unresolved and carries on.
+
+A batch of no values is not an error: the counts come back zero.
+
+The values are treated as a set.  Repeating a value in the input looks it up
+once and every row is keyed to the same point object, so a column that repeats
+the same handful of places thousands of times costs the handful of lookups.
+
+=head3 API SPECIFICATION
+
+=head4 input
+
+    # Input schema (Params::Validate::Strict) — values required, options optional
+    values   => { type => 'arrayref' }                  # location strings, one per row
+    region   => { type => 'scalar', optional => 1 }     # ISO 3166-1 alpha-2 country code hint
+    on_error => { type => 'scalar', optional => 1 }     # 'croak' (the default) or 'undef'
+
+=head4 output
+
+    # Output schema (Return::Set)
+    { type => 'hashref' }
+    #   $result->{$value}            => { isa => 'Geo::Location::Point', optional => 1 }
+    #   $result->{lookups}           => { type => 'integer' }
+    #   $result->{resolved}          => { type => 'integer' }
+    #   $result->{unresolved}        => { type => 'integer' }
+    #   $result->{unresolved_values} => { type => 'arrayref' }
+
+=head3 MESSAGES
+
+    Usage: ...::geocode_many(...)   No values argument, one that is not an arrayref,
+                                    or options that are neither a list nor a hashref.
+    invalid location to geocode()   A value refused under on_error => 'croak', with the
+                                    message geocode() gives for that value.
+    on_error must be ...            on_error is neither 'croak' nor 'undef'.
+    <value> is one of the keys ...  A value spelled like one of the four returned keys.
+
+=head3 EXAMPLE
+
+    my $geo = Geo::Coder::Free->new(openaddr => $ENV{OPENADDR_HOME});
+
+    # A log file's place column: repeats, a few unreadable values, one empty cell.
+    my @places = ('Ramsgate, Kent', '0044', 'Nowhere, Imaginary, ZZ',
+                  'Ramsgate, Kent', undef);
+
+    my $batch = $geo->geocode_many(\@places, region => 'GB', on_error => 'undef');
+
+    printf "geocoded %d of %d distinct places in %d lookups\n",
+        $batch->{'resolved'},
+        $batch->{'resolved'} + $batch->{'unresolved'},
+        $batch->{'lookups'};        # 4 distinct places, 2 of them looked up
+
+    for my $place ($batch->{'unresolved_values'}) {
+        warn "no coordinates for '" . (defined($place) ? $place : '') . "'\n";
+    }
+
+=cut
+
+sub geocode_many {
+	my $self = shift;
+
+	# The same calling conventions as the rest of the module, with the batch's
+	# own spelling for the plain-function form: the values are always an
+	# arrayref, so that is what a function call arrives holding.
+	if (!Scalar::Util::blessed($self)) {
+		return __PACKAGE__->new()->geocode_many($self, @_)
+			if ref($self) eq 'ARRAY';
+		Carp::croak(_i18n('usage_geocode_many', __PACKAGE__)) unless @_;
+		return __PACKAGE__->new()->geocode_many(@_);
+	}
+
+	my $values = shift;
+	Carp::croak(_i18n('usage_geocode_many', __PACKAGE__)) unless ref($values) eq 'ARRAY';
+
+	# Options are a hashref or an even list.  A lone scalar is neither: there is
+	# no bare-string form of a batch, so it is refused rather than guessed at.
+	my $opts;
+	if (@_ == 1 && ref($_[0]) eq 'HASH') {
+		$opts = { %{$_[0]} };
+	} elsif ((scalar @_) % 2 == 0 && !grep { ref } @_) {
+		$opts = { @_ };
+	} else {
+		Carp::croak(_i18n('usage_geocode_many', __PACKAGE__));
+	}
+
+	my $on_error = $opts->{'on_error'} // 'croak';
+	Carp::croak(_i18n('invalid_on_error', __PACKAGE__, $on_error))
+		unless $on_error eq 'croak' || $on_error eq 'undef';
+
+	my $region = $opts->{'region'};
+
+	# A value spelled like one of the keys this method answers with would
+	# overwrite it, so it is refused by name - before anything is looked up,
+	# rather than after a count has been lost.
+	my %reserved = map { $_ => 1 } @RESULT_KEYS;
+	for my $value (@{$values}) {
+		my $key = defined($value) ? $value : '';
+		Carp::croak(_i18n('reserved_location', __PACKAGE__, $key)) if $reserved{$key};
+	}
+
+	my %results = map { $_ => 0 } @RESULT_KEYS;
+	$results{'unresolved_values'} = [];
+
+	# A batch is a set: a value repeated in the input is looked up once, and
+	# every row holding it is keyed to the same object.
+	my %seen;
+	for my $value (@{$values}) {
+		# undef has no key of its own, and the empty string it shares is not a
+		# location either, so it is unresolved without reaching a backend.
+		my $key = defined($value) ? $value : '';
+		next if $seen{$key}++;
+
+		# What geocode() makes of this value on this setting is asked of
+		# geocode() rather than written out again here: the guard, its message and
+		# the choice of backend are all its own.
+		my $point = $self->geocode(
+			location => $key,
+			defined($region) ? (region => $region) : (),
+			on_error => $on_error,
+		);
+
+		# A value the module refuses is not a lookup: it never reached a backend,
+		# so it does not count against the work a caller is capping.
+		$results{'lookups'}++ if _valid_location($key);
+		$results{$key} = $point;
+
+		if (defined($point)) {
+			$results{'resolved'}++;
+		} else {
+			$results{'unresolved'}++;
+			push @{$results{'unresolved_values'}}, $value;
+		}
+	}
+
+	return \%results;
+}
+
 =head2 provenance
 
     my ($dist, $backend, $confidence, $accuracy) = $geocoder->provenance($point);
@@ -625,7 +839,7 @@ or, in scalar context, the same four as a hashref:
     print $provenance->{'backend'};
 
 Where a result came from and how good it is, so that a caller does not have to
-reach for the hash keys itself (section 2.1 of F<BI-Phase6-Dependency-Specs.md>):
+reach for the hash keys itself:
 
 =over 4
 
@@ -840,7 +1054,11 @@ sub _resolve_scan_candidates {
 }
 
 # Purpose:  Slide a window of $n words across $text and return all comma-joined
-#           n-grams, excluding pure-numeric tokens and stopwords.
+#           n-grams, excluding pure-numeric tokens and stopwords.  A token of
+#           digits only is not a word of a place name, which is the question
+#           Geo::Coder::Free::Validate::_valid_location() answers, so it is asked
+#           there rather than spelled out here (t/location-rule.t fails if the
+#           rule is written out again).
 #           Replaces the former _find_word_triplets ($n=3) and
 #           _find_word_duplets ($n=2) which were identical except for window size
 #           and the duplets version was missing the lc() normalisation on stopwords.
@@ -851,7 +1069,7 @@ sub _find_word_ngrams {
 	$text =~ s/,+/ /g;
 	$text =~ s/\s+/ /g;
 	$text =~ s/^\s+|\s+$//g;
-	my @words = grep { !/^\d+$/ && !$stop->{lc $_} } split /\s+/, $text;
+	my @words = grep { !$stop->{lc $_} && _valid_location($_) } split /\s+/, $text;
 	my @ngrams;
 	for my $i (0 .. $#words - ($n - 1)) {
 		push @ngrams, join ', ', @words[$i .. $i + $n - 1];

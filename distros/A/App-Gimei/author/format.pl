@@ -1,4 +1,4 @@
-use v5.40;
+use v5.42;
 use feature 'class';
 no warnings 'experimental::class';
 
@@ -17,18 +17,7 @@ class Formatter {
         $root_dir = abs_path( File::Spec->catdir( $FindBin::Bin, '..' ) );
     }
 
-    method run() {
-        my @files = `git -C $root_dir ls-files `;
-        chomp @files;
-        foreach my $f (@files) {
-            if ( any { $f =~ $_ } @patterns ) {
-                $self->format($f);
-            }
-        }
-        say "Done $#files files.";
-    }
-
-    method format($file) {
+    my method _format($file) {
         my $perltidyrc = File::Spec->catfile( $root_dir, '.perltidyrc' );
 
         my $error = Perl::Tidy::perltidy(
@@ -39,6 +28,17 @@ class Formatter {
         if ($error) {
             die "perltidy failed on $file\n";
         }
+    }
+
+    method run() {
+        my @files = `git -C $root_dir ls-files `;
+        chomp @files;
+        foreach my $f (@files) {
+            if ( any { $f =~ $_ } @patterns ) {
+                $self->&_format($f);
+            }
+        }
+        say "Done $#files files.";
     }
 }
 

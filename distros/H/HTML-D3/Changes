@@ -1,5 +1,58 @@
 Revision history for HTML-D3 - Visualise various charts using D3
 
+0.21	Fri Oct 16 09:19:00 PM EDT 2026
+	[ Enhancements ]
+	- The categorical colour schemes are defined once and exposed to Perl.  New
+	  methods categorical_schemes() (the names a scheme option accepts),
+	  palette($scheme) (that scheme's colours, in D3's order) and
+	  colour_at($scheme, $index) (the colour the scheme gives the Nth category,
+	  cycling the palette as d3.scaleOrdinal does), so that a map, a legend or a
+	  static renderer can colour the same data the chart does, from Perl, with no
+	  browser.  palette() and colour_at() die with 'Unknown scheme: <name>' for a
+	  name that is not a scheme, rather than answering with the default scheme's
+	  colours.
+	- The snippets' JS colour lookup is generated from that one definition.
+	  render_pie_chart_snippet, render_stacked_bar_snippet and
+	  render_treemap_snippet each carried its own copy of the same five scheme
+	  names, and render_multi_series_line_chart_snippet,
+	  render_scatter_chart_snippet and render_histogram_snippet (binned)
+	  capitalised the scheme name they were given and looked up the expression
+	  that spelling produced - so a name they did not know became
+	  d3.schemeNonsense, an undefined function in the browser.  All six draw with
+	  the expression the definition holds, and a name that is not a scheme draws
+	  with the documented default, tableau10, which is what the snippets with a
+	  lookup table have always done.  The default scheme is now named once, so it
+	  cannot change in one snippet and not in another.
+	- The charts that offer no scheme option read the definition too: the two
+	  full-page pie charts and the four multi-series line charts that predate the
+	  option have always drawn category10, and the bar chart's
+	  'color => categorical' fills its bars from the default scheme, and each now
+	  takes that expression from the definition rather than writing
+	  d3.schemeCategory10 or d3.schemeTableau10 out a second time.  The HTML and
+	  JavaScript they emit is unchanged, byte for byte; what changes is that each
+	  palette - and the default - is now written down exactly once, so there is
+	  no copy of it left behind when the one definition moves.
+	[ Documentation ]
+	- New POD and README sections for categorical_schemes(), palette() and
+	  colour_at(), and the scheme options of every snippet that takes one now
+	  point at them.
+	- The API SPECIFICATION postconditions of the six snippets that take a scheme
+	  now describe the behaviour they have - a name in categorical_schemes()
+	  draws that name's D3 expression, a name that is not one draws the default's
+	  and invents no d3.scheme of its own - in place of the capitalisation they
+	  replaced.  render_scatter_chart_snippet and render_treemap_snippet state
+	  their scheme postconditions for the first time.
+	[ Tests ]
+	- t/palette.t holds the palettes to D3's published schemes - the names, the
+	  number of colours each has and the d3.scheme* expression each is - and
+	  holds every snippet to the definition, including that an unknown name is
+	  not added to the vocabulary by being asked for.  It also counts the scheme
+	  expressions in the module's code - POD and comments stripped - and requires
+	  each of the five to appear exactly once and no sixth to appear at all, so a
+	  palette written down a second time anywhere, in a snippet or in a chart
+	  that takes no option, fails the suite.  t/unit.t gains the documented
+	  contract of the three methods.
+
 0.20	Wed Oct 14 08:01:05 PM EDT 2026
 	[ Enhancements ]
 	- render_histogram_snippet: new 'binned' option for pre-computed bins, so a

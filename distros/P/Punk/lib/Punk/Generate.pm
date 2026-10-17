@@ -10,7 +10,7 @@ use File::Copy ();
 use File::Basename ();
 use Template::Stencil;
 
-our $VERSION = '0.59';
+our $VERSION = '0.60';
 
 sub new {
     my ($class, %args) = @_;
@@ -342,11 +342,11 @@ sub _read_api {
         push @{ $by_group{$group}{ops} }, {
             id      => _op_id($op->{operationId}),
             method  => uc $op->{method},
-            path    => $op->{path},
+            path    => _one_line($op->{path}),
             summary => _summary($node),
         };
         $by_group{$group}{group}       = $group;
-        $by_group{$group}{group_label} = $label;
+        $by_group{$group}{group_label} = _one_line($label);
         $by_group{$group}{tagged}      = $tagged ? 1 : 0;
     }
 
@@ -377,9 +377,10 @@ sub _read_api {
         # template's placeholders get a filler so it is a real request path.
         first_op => {
             id           => $first->{operationId},
-            method       => uc $first->{method},
-            path         => $first->{path},
-            path_literal => _fill_path($first->{path}),
+            method       => _one_line(uc $first->{method}),
+            path         => _one_line($first->{path}),
+            # it sits inside single quotes in the generated test
+            path_literal => _perl_q(_fill_path($first->{path})),
         },
     };
 }
@@ -413,18 +414,22 @@ sub _schemes {
     for my $name (@order) {
         my $d = ref $defs->{$name} eq 'HASH' ? $defs->{$name} : {};
         push @out, {
-            name        => $name,
+            # Spec strings land in comment lines, so none may carry a
+            # newline; the one that lands inside single quotes (the mount
+            # key in app_class.tmpl) is name_q, escaped for that spot.
+            name        => _one_line($name),
+            name_q      => _perl_q($name),
             # The mount key stays the spec's name. The sub keeps it too when
             # it is already a legal identifier - which is almost always - and
             # is only reshaped when the spec used something like 'api-key'.
             method      => ($name =~ /\A[A-Za-z_]\w*\z/
                             ? $name : (_ident($name) || 'check')),
-            type        => $d->{type}   || '',
-            in          => $d->{in}     || '',
-            key         => $d->{name}   || '',
-            scheme      => lc($d->{scheme} || ''),
+            type        => _one_line($d->{type}   || ''),
+            in          => _one_line($d->{in}     || ''),
+            key         => _one_line($d->{name}   || ''),
+            scheme      => _one_line(lc($d->{scheme} || '')),
             description => _summary($d),
-            credential  => _credential_of($d),
+            credential  => _one_line(_credential_of($d)),
         };
     }
     return @out;
@@ -476,6 +481,23 @@ sub _summary {
     $s =~ s/\s+/ /g;                 # one line, for a comment and a POD para
     $s =~ s/\A\s+|\s+\z//g;
     $s =~ s/"/'/g;                   # it lands inside a double-quoted comment
+    return $s;
+}
+
+# A spec string that lands on a comment line of generated Perl: a newline in
+# it would end the comment, and a control byte would hide what follows.
+sub _one_line {
+    my ($s) = @_;
+    return '' unless defined $s;
+    $s =~ s/[\x00-\x1f\x7f]+/ /g;
+    return $s;
+}
+
+# A spec string that lands inside single quotes in generated Perl.
+sub _perl_q {
+    my ($s) = @_;
+    $s = _one_line($s);
+    $s =~ s/([\\'])/\\$1/g;
     return $s;
 }
 

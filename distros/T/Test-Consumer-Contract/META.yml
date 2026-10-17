@@ -1,0 +1,37 @@
+---
+abstract: 'check a reader against the keys its producer promises'
+author:
+  - 'Nigel Horne <njh@nigelhorne.com>'
+build_requires:
+  Data::Dumper: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Path: '0'
+  File::Temp: '0'
+  Test::DescribeMe: '0'
+  Test::Most: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Consumer-Contract
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Cwd: '0'
+  Exporter: '0'
+  File::Basename: '0'
+  File::Find: '0'
+  File::Spec: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Consumer-Contract
+  repository: git://github.com/nigelhorne/Test-Consumer-Contract.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -125,7 +125,15 @@ Creates a new instance. All values are optional.
 
 =item B<verbose>
 
-Boolean. If true, prints command output and status messages to C<STDOUT>. Defaults to C<0>.
+Boolean. If true, prints command output and status messages to C<STDOUT>, and passes C<-v> (C<--verbose>) to C<xrepo
+install> so C<xmake> prints the full C<install.txt> of a package that fails to build (by default only the tail is
+shown, and the file lives on the build machine). Defaults to C<0>. May be overridden per-call with C<verbose =E<gt>
+...> on any store-touching method.
+
+=item B<diagnosis>
+
+Boolean. If true, passes C<-D> (C<--diagnosis>) to C<xrepo install>, adding C<xmake>'s diagnostic detail to the log of
+a package that fails to build. Defaults to C<0>. May be overridden per-call with C<diagnosis =E<gt> ...>.
 
 =item B<root>
 

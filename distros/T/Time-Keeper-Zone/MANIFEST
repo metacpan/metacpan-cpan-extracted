@@ -1,0 +1,36 @@
+Changes
+include/time_keeper_zone_abi.h
+include/tkz/tkz_abi_impl.h
+include/tkz/tkz_data.h
+include/tkz/tkz_dump.h
+include/tkz/tkz_engine.h
+include/tkz/tkz_local.h
+include/tkz/tkz_types.h
+lib/Time/Keeper/Zone.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-load.t
+t/01-table.t
+t/02-offsets.t
+t/03-gaps.t
+t/04-surface.t
+t/05-rules.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+tools/tzcompile
+xs/abi.xs
+xs/data.xs
+xs/engine.xs
+xs/rules.xs
+xs/test.xs
+xs/zone.xs
+xt/03-zdump-oracle.t
+xt/04-datetime-oracle.t
+xt/04-zdump-engine.t
+xt/boilerplate.t
+Zone.xs
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

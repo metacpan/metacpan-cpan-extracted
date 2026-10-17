@@ -5,6 +5,7 @@ Dockerfile
 LICENSE
 META.json
 README.md
+author/cpanfile-check-core
 author/format.pl
 cpanfile
 cpanfile.snapshot

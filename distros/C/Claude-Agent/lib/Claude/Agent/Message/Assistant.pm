@@ -4,94 +4,29 @@ use 5.020;
 use strict;
 use warnings;
 
-use Types::Common -types;
+use Object::Proto ();
 use Scalar::Util qw(blessed);
 use Claude::Agent::Content;
-use Marlin
-    -base => 'Claude::Agent::Message::Base',
-    'message!' => HashRef,   # Contains role, content (with blocks)
-    'model?'   => Str,       # Model that generated this response
-    '_content_blocks_cache==.';  # Cached content block objects
+use Claude::Agent::Message::Base;
 
-=head1 NAME
-
-Claude::Agent::Message::Assistant - Assistant message type
-
-=head1 DESCRIPTION
-
-Represents an assistant (Claude) message in the conversation.
-
-=head2 ATTRIBUTES
-
-=over 4
-
-=item * type - Always 'assistant'
-
-=item * uuid - Unique message identifier
-
-=item * session_id - Session identifier
-
-=item * message - HashRef with 'role' and 'content' (array of content blocks)
-
-=item * model - The model that generated this response
-
-=item * parent_tool_use_id - Optional, set if message is within a subagent
-
-=back
-
-=head2 METHODS
-
-=head3 content_blocks
-
-    my $blocks = $msg->content_blocks;
-
-Returns arrayref of content blocks from the message.
-
-B<Note:> Results are cached on first access. If the underlying message content
-is modified after this method is called, the cached value will be returned
-on subsequent calls. Messages are typically immutable after creation.
-
-B<Warning - Shared Object References:> The returned arrayref is a shallow copy,
-but the Content objects inside are shared with the internal cache. This means:
-
-=over 4
-
-=item * Mutating a Content object affects ALL code holding references to it
-
-=item * Subsequent calls to content_blocks() return the same (mutated) objects
-
-=item * This can cause subtle bugs if Content objects are modified in place
-
-=back
-
-B<Recommended:> Treat returned Content objects as read-only. If you need to
-modify content, create deep copies of the objects first using appropriate
-cloning methods.
-
-=head3 text
-
-    my $text = $msg->text;
-
-Returns concatenated text content from all text blocks.
-
-=head3 tool_uses
-
-    my $uses = $msg->tool_uses;
-
-Returns arrayref of tool_use blocks.
-
-=cut
+BEGIN {
+    Object::Proto::define('Claude::Agent::Message::Assistant',
+        extends => 'Claude::Agent::Message::Base',
+        'message:HashRef:required',
+        'model:predicate',
+        'error:predicate',
+        '_content_blocks_cache',
+    );
+}
 
 sub content_blocks {
     my ($self) = @_;
 
-    # Return cached if available
-    return $self->_content_blocks_cache if $self->_content_blocks_cache;
+    return [@{$self->_content_blocks_cache}] if $self->_content_blocks_cache;
 
     my $raw = $self->message->{content};
     $raw = [] unless ref($raw) eq 'ARRAY';
 
-    # Convert hashrefs to Content objects
     my @blocks = map {
         ref($_) eq 'HASH'
             ? Claude::Agent::Content->from_json($_)
@@ -99,9 +34,7 @@ sub content_blocks {
     } @$raw;
 
     $self->_content_blocks_cache(\@blocks);
-    # WARNING: Objects are shared - mutations affect cached state
-    # Use Storable::dclone() if you need to modify returned objects
-    return [@{$self->_content_blocks_cache}];
+    return [@blocks];
 }
 
 sub text {
@@ -128,6 +61,95 @@ sub tool_uses {
     ];
 }
 
+sub usage {
+    my ($self) = @_;
+    return $self->message->{usage};
+}
+
+sub stop_reason {
+    my ($self) = @_;
+    return $self->message->{stop_reason};
+}
+
+sub message_id {
+    my ($self) = @_;
+    return $self->message->{id};
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+Claude::Agent::Message::Assistant - Assistant message type
+
+=head1 DESCRIPTION
+
+Represents an assistant (Claude) message in the conversation.
+
+=head1 ATTRIBUTES
+
+=head2 type
+
+Always C<assistant>.
+
+=head2 message
+
+HashRef with C<role>, C<content> (an array of content blocks) and, from
+the API, C<id>, C<model>, C<stop_reason> and C<usage>.
+
+=head2 model
+
+The model that generated this response.
+
+=head2 error
+
+Set when the CLI reports an API error for this message.
+
+=head2 uuid, session_id, parent_tool_use_id, agent_id, raw
+
+See L<Claude::Agent::Message::Base>.
+
+=head1 METHODS
+
+=head2 new
+
+Takes a flat list of name/value pairs. Unknown names are ignored.
+
+=head2 content_blocks
+
+    my $blocks = $msg->content_blocks;
+
+Returns an ArrayRef of content block objects (see L<Claude::Agent::Content>).
+The objects are built once and shared between calls: mutating one affects
+every holder of a reference to it. Copy with L<Storable/dclone> before
+modifying a block in place.
+
+=head2 text
+
+    my $text = $msg->text;
+
+The text of every text block, joined with newlines.
+
+=head2 tool_uses
+
+    my $uses = $msg->tool_uses;
+
+ArrayRef of the tool_use blocks.
+
+=head2 usage
+
+The API usage hash for this message, if present.
+
+=head2 stop_reason
+
+The API stop reason for this message, if present.
+
+=head2 message_id
+
+The API message id, if present.
+
 =head1 AUTHOR
 
 LNATION, C<< <email at lnation.org> >>
@@ -139,5 +161,3 @@ This software is Copyright (c) 2026 by LNATION.
 This is free software, licensed under The Artistic License 2.0 (GPL Compatible).
 
 =cut
-
-1;

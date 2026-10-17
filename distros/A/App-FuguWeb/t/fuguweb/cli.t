@@ -152,10 +152,16 @@ subtest 'init writes a starter, once' => sub {
 
 subtest 'clean needs no description when --out names the target' => sub {
 	my $root = tempdir( CLEANUP => 1 );
-	make_path("$root/out");
-	open my $fh, '>', "$root/out/index.html" or die "Cannot write: $!";
-	print {$fh} "<html></html>\n";
-	close $fh;
+	make_path("$root/out/en");
+
+	# The forward, the stylesheet, and one page of the tree of en.
+	# The clean reads the tree by its shape, because no description
+	# names it.
+	for my $name (qw(index.html style.css en/index.html)) {
+		open my $fh, '>', "$root/out/$name" or die "Cannot write: $!";
+		print {$fh} "<html></html>\n";
+		close $fh;
+	}
 
 	# clean is the command an operator reaches for when the
 	# description is the thing that is broken.
@@ -188,7 +194,8 @@ SKIP: {
 
 		my ( $exit, $out, $err ) = run( '--project', $root, 'build' );
 		is( $exit, 0, 'build succeeds' ) or diag $err;
-		ok( -s "$root/out/index.html", 'and writes the page' );
+		ok( -s "$root/out/en/index.html", 'and writes the page' );
+		ok( -s "$root/out/index.html",    'and the forward' );
 
 		( $exit, $out, $err ) = run( '--project', $root, 'check' );
 		is( $exit, 0,  'check passes' ) or diag $err;
@@ -203,7 +210,7 @@ SKIP: {
 		my $root = project();
 		run( '--project', $root, 'build' );
 
-		open my $fh, '>>', "$root/out/index.html"
+		open my $fh, '>>', "$root/out/en/index.html"
 		    or die "Cannot append: $!";
 		print {$fh} qq{<a href="./gone.html">Gone</a>\n};
 		close $fh;
@@ -221,7 +228,7 @@ SKIP: {
 		my ( $exit, $out, $err ) =
 		    run( '--project', $root, 'build', '--out', 'elsewhere' );
 		is( $exit, 0, 'build succeeds' ) or diag $err;
-		ok( -s "$root/elsewhere/index.html",
+		ok( -s "$root/elsewhere/en/index.html",
 			'and writes below the project root' );
 
 		( $exit, $out, $err ) =
@@ -238,9 +245,9 @@ SKIP: {
 		my $root = project(
 			'.fuguwebrc' => $RC . <<'RC',
 
-manuals "Manuals" {
-	dir    = man
-	anchor = manuals
+manuals manuals {
+	heading = Manuals
+	dir     = man
 }
 RC
 			'man/bad.1' => ".Sh NAME\n.Nm bad\n",

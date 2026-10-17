@@ -4,51 +4,22 @@ use 5.020;
 use strict;
 use warnings;
 
-use Types::Common -types;
+use Object::Proto ();
 use Claude::Agent::Permission::Result;
-use Marlin
-    -base => 'Claude::Agent::Permission::Result',
-    'message?' => Str,
-    'interrupt?' => Bool;
 
-=head1 NAME
-
-Claude::Agent::Permission::Result::Deny - Permission deny result
-
-=head1 DESCRIPTION
-
-Permission result that denies the tool execution.
-
-=head2 ATTRIBUTES
-
-=over 4
-
-=item * behavior - Always 'deny'
-
-=item * message - Reason for denial (shown to Claude)
-
-=item * interrupt - If true, interrupts the entire query
-
-=back
-
-=cut
+BEGIN {
+    Object::Proto::define('Claude::Agent::Permission::Result::Deny',
+        extends => 'Claude::Agent::Permission::Result',
+        'message:Str:predicate',
+        'interrupt:predicate',
+    );
+}
 
 sub BUILD {
     my ($self) = @_;
-    # Force behavior to 'deny'
     $self->behavior('deny');
     return;
 }
-
-=head2 METHODS
-
-=head3 to_hash
-
-    my $hash = $result->to_hash();
-
-Convert the result to a hash for JSON serialization.
-
-=cut
 
 sub to_hash {
     my ($self) = @_;
@@ -59,6 +30,45 @@ sub to_hash {
     $hash->{message} = $self->message if $self->has_message;
     return $hash;
 }
+
+1;
+
+__END__
+
+=head1 NAME
+
+Claude::Agent::Permission::Result::Deny - Permission result that denies a tool
+
+=head1 DESCRIPTION
+
+Permission result that stops the tool from running.
+
+=head1 ATTRIBUTES
+
+=head2 behavior
+
+Always C<deny>.
+
+=head2 message
+
+The reason, shown to the model.
+
+=head2 interrupt
+
+True to end the whole turn rather than let the model carry on.
+
+=head1 METHODS
+
+=head2 new
+
+Takes a flat list of name/value pairs. Unknown names are ignored.
+
+=head2 to_hash
+
+    my $hash = $result->to_hash;
+
+C<{ behavior =E<gt> 'deny', interrupt =E<gt> \1 or \0, message =E<gt> ... }>.
+C<interrupt> is always present as a JSON boolean.
 
 =head1 AUTHOR
 
@@ -71,5 +81,3 @@ This software is Copyright (c) 2026 by LNATION.
 This is free software, licensed under The Artistic License 2.0 (GPL Compatible).
 
 =cut
-
-1;

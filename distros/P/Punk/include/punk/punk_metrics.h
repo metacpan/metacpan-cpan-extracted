@@ -187,10 +187,14 @@ static void pm_bump_hist(pTHX_ const char *k, STRLEN kl, double secs) {
  *
  * MUST NOT croak: they run inside somebody else's request, and an exporter
  * that can take the application down with it is worse than no exporter. */
+/* The context's own slot for the start time: one av_store, where the stash
+ * hash cost a hash to create and two stores per request. */
+static AV *pm_ctx_av(pTHX_ SV *c) {
+    return (c && SvROK(c) && SvTYPE(SvRV(c)) == SVt_PVAV) ? (AV *)SvRV(c) : NULL;
+}
+
 static void pm_on_request(pTHX_ SV *c, void *ud) {
-    SV *st = pk_abi_stash_of(aTHX_ c);
-    HV *sh = (st && SvROK(st) && SvTYPE(SvRV(st)) == SVt_PVHV)
-             ? (HV *)SvRV(st) : NULL;
+    AV *cav = pm_ctx_av(aTHX_ c);
     PERL_UNUSED_ARG(ud);
 
     /* Is this the scrape itself? Decided HERE, at the one moment it can be
@@ -209,31 +213,31 @@ static void pm_on_request(pTHX_ SV *c, void *ud) {
         SV **p = (env && SvROK(env) && SvTYPE(SvRV(env)) == SVt_PVHV)
                  ? hv_fetchs((HV *)SvRV(env), "PATH_INFO", 0) : NULL;
         if (p && *p && pm_is_scrape(aTHX_ *p)) {
-            if (sh) (void)hv_stores(sh, PM_SKIP_KEY, newSViv(1));
+            if (cav) (void)av_store(cav, PCX_T0, newSVnv(-1.0));
             return;
         }
     }
 
     PM_INFLIGHT++;
-    if (sh) (void)hv_stores(sh, PM_T0_KEY, newSVnv(pc_now(aTHX)));
+    if (cav) (void)av_store(cav, PCX_T0, newSVnv(pc_now(aTHX)));
 }
 
 static void pm_on_response(pTHX_ SV *c, SV *response, void *ud) {
-    SV *route, *st;
+    SV *route;
+    AV *cav = pm_ctx_av(aTHX_ c);
     const char *mp; STRLEN ml;
     IV status;
     double t0 = 0.0, secs;
     SV *key;
     PERL_UNUSED_ARG(ud);
 
-    st = pk_abi_stash_of(aTHX_ c);
-
+    if (cav) {
+        SV **t = av_fetch(cav, PCX_T0, 0);
+        if (t && *t && SvOK(*t)) t0 = SvNV(*t);
+    }
     /* The request side already decided, so the two cannot disagree: it never
      * incremented the gauge for this one, and this never decrements it. */
-    if (st && SvROK(st) && SvTYPE(SvRV(st)) == SVt_PVHV
-        && hv_exists((HV *)SvRV(st), PM_SKIP_KEY,
-                     (I32)(sizeof(PM_SKIP_KEY) - 1)))
-        return;
+    if (t0 < 0.0) return;
 
     if (PM_INFLIGHT > 0) PM_INFLIGHT--;
     pm_init(aTHX);
@@ -247,10 +251,6 @@ static void pm_on_response(pTHX_ SV *c, SV *response, void *ud) {
     mp = pm_method_of(aTHX_ c, &ml);
     status = pk_abi_status_of(aTHX_ response);
 
-    if (st && SvROK(st) && SvTYPE(SvRV(st)) == SVt_PVHV) {
-        SV **t = hv_fetchs((HV *)SvRV(st), PM_T0_KEY, 0);
-        if (t && *t && SvOK(*t)) t0 = SvNV(*t);
-    }
     secs = t0 > 0.0 ? pc_now(aTHX) - t0 : 0.0;
     if (secs < 0.0) secs = 0.0;
 

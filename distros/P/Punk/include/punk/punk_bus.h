@@ -147,18 +147,16 @@ static void punk_bus_room_cb_in(pTHX_ const char *topic, STRLEN tlen,
     frame = sv_2mortal(newSVpvn(payload + 2 + nl + PUNK_BUS_ROOM_SKIP_LEN,
                                 plen - 2 - nl - PUNK_BUS_ROOM_SKIP_LEN));
 
-    /* named() creates the room on first use, which is right: a worker that
-     * has never seen this room has no members in it, and fanning to an empty
-     * room costs one hash lookup. */
+    /* A lookup, never a creation. A worker that has not named this room
+     * has no members in it, and creating it here let one client's stream
+     * of fresh names grow every worker in the pool for the pool's life. */
     {
-        SV *argv[1];
-        argv[0] = name;
-        room = pcx_call_meth(aTHX_ sv_2mortal(newSVpvs(PK_WEBSOCKET "::Room")),
-                             "named", argv, 1, 1);
+        SV **rp;
+        if (!pwr_rooms || pwr_rooms_pid != (IV)PerlProc_getpid()) return;
+        rp = hv_fetch(pwr_rooms, SvPVX(name), (I32)nl, 0);
+        if (!(rp && *rp && SvROK(*rp))) return;
+        room = *rp;
     }
-    if (!room) return;
-    sv_2mortal(room);
-    if (!SvOK(room)) return;
 
     PUNK_BUS_LAST_FAN += pwr_fan_skip(aTHX_ room, frame, skip);
 }

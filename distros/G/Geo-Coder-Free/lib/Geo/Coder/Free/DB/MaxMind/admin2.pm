@@ -10,11 +10,11 @@ Geo::Coder::Free::DB::MaxMind::admin2 - driver for http://download.geonames.org/
 
 =head1 VERSION
 
-Version 0.46
+Version 0.47
 
 =cut
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 # It contains admin areas drilled down from the admin1 database such as US counties
 # Note that GB has counties

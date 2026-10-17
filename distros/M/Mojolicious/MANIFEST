@@ -170,6 +170,7 @@ README.md
 script/hypnotoad
 script/mojo
 script/morbo
+SECURITY.md
 t/mojo/asset.t
 t/mojo/base.t
 t/mojo/base_util.t

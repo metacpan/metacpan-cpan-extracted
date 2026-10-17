@@ -167,9 +167,26 @@
     .toolbar {
       display: flex;
       align-items: baseline;
-      gap: 1rem;
+      gap: 0.5rem;
       margin-bottom: 0.75rem;
       flex-wrap: wrap;
+    }
+    .toolbar-sep {
+      width: 1px;
+      height: 1.4em;
+      background: var(--border, #dee2e6);
+      align-self: center;
+      flex-shrink: 0;
+      margin: 0 0.25rem;
+    }
+    .sr-only {
+      position: absolute;
+      width: 1px; height: 1px;
+      padding: 0; margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      white-space: nowrap;
+      border: 0;
     }
 
     .record-count {
@@ -638,7 +655,8 @@
     .btn-stats,
     .btn-calc,
     .btn-groups,
-    .btn-dates {
+    .btn-dates,
+    .btn-save-analysis {
       flex-shrink: 0;
       padding: 0.28rem 0.75rem;
       border: 1px solid #888;
@@ -667,7 +685,8 @@
     .btn-stats:hover,
     .btn-calc:hover,
     .btn-groups:hover,
-    .btn-dates:hover { background: #f0f0f0; }
+    .btn-dates:hover,
+    .btn-save-analysis:hover { background: #f0f0f0; }
     .btn-graph:disabled,
     .btn-pie:disabled,
     .btn-heatmap:disabled,
@@ -679,7 +698,8 @@
     .btn-histogram:disabled,
     .btn-calc:disabled,
     .btn-groups:disabled,
-    .btn-dates:disabled {
+    .btn-dates:disabled,
+    .btn-save-analysis:disabled {
       opacity: 0.45;
       cursor: not-allowed;
     }
@@ -1387,5 +1407,266 @@
     });
   }());
   </script>
+[% IF chart %]
+<style>
+#add-to-canvas-btn {
+  position: fixed;
+  bottom: 1.25rem;
+  right: 1.25rem;
+  z-index: 900;
+  background: #0d6efd;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  display: none;
+}
+#add-to-canvas-btn:hover { background: #0b5ed7; }
+#add-to-canvas-panel {
+  position: fixed;
+  bottom: 4rem;
+  right: 1.25rem;
+  z-index: 901;
+  background: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 1rem;
+  min-width: 260px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  display: none;
+}
+#add-to-canvas-panel h4 { margin: 0 0 0.75rem; font-size: 0.95rem; }
+#atc-analysis-sel { width: 100%; margin-bottom: 0.6rem; }
+#atc-status { font-size: 0.8rem; color: #6c757d; margin-top: 0.4rem; min-height: 1.2em; }
+/* Resize handle for chart SVGs */
+.chart-svg-wrap {
+  position: relative;
+  display: inline-block;
+  margin: 0 auto;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.chart-resize-handle {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 20px;
+  height: 20px;
+  cursor: nwse-resize;
+  opacity: 0.35;
+  transition: opacity 0.15s;
+}
+.chart-resize-handle::after {
+  content: '';
+  display: block;
+  width: 0;
+  height: 0;
+  position: absolute;
+  bottom: 3px;
+  right: 3px;
+  border-style: solid;
+  border-width: 0 0 14px 14px;
+  border-color: transparent transparent #666 transparent;
+}
+.chart-resize-handle:hover,
+.chart-svg-wrap:hover .chart-resize-handle { opacity: 0.85; }
+</style>
+<button id="add-to-canvas-btn" title="Add this chart to an existing canvas">+ Add to Existing Canvas</button>
+<div id="add-to-canvas-panel">
+  <h4>Add chart to existing canvas</h4>
+  <select id="atc-analysis-sel"><option value="">Loading...</option></select>
+  <div style="display:flex;gap:0.5rem;margin-top:0.25rem">
+    <button class="btn-primary" id="atc-save-btn" style="flex:1">Add</button>
+    <button class="btn-secondary" id="atc-cancel-btn">Cancel</button>
+  </div>
+  <div id="atc-status"></div>
+</div>
+<script>
+(function () {
+  'use strict';
+  var btn    = document.getElementById('add-to-canvas-btn');
+  var panel  = document.getElementById('add-to-canvas-panel');
+  var sel    = document.getElementById('atc-analysis-sel');
+  var save   = document.getElementById('atc-save-btn');
+  var cancel = document.getElementById('atc-cancel-btn');
+  var status = document.getElementById('atc-status');
+  var loaded = false;
+
+  /* Show the button only when at least one saved analysis exists. */
+  fetch('/api/analyses').then(function (r) { return r.json(); }).then(function (data) {
+    var list = (data && data.analyses) ? data.analyses : [];
+    if (list.length) btn.style.display = '';
+  }).catch(function () {});
+
+  function buildVisualSpec() {
+    var p   = new URLSearchParams(window.location.search);
+    var url = window.location.href;
+    var kind = (function () {
+      var path = window.location.pathname;
+      if (/\/graph$|\/line$/.test(path)) return 'line';
+      if (/\/pie$/.test(path))           return 'pie';
+      if (/\/bar$/.test(path))           return 'bar';
+      if (/\/scatter$/.test(path))       return 'scatter';
+      if (/\/heatmap$/.test(path))       return 'heatmap';
+      if (/\/stacked$/.test(path))       return 'stacked';
+      if (/\/combo$/.test(path))         return 'combo';
+      if (/\/treemap$/.test(path))       return 'treemap';
+      if (/\/histogram$/.test(path))     return 'histogram';
+      return 'table';
+    }());
+    var encode = {};
+    ['x','y','cat','val','series','size','bar_val','line_val','group','col'].forEach(function (k) {
+      if (p.get(k)) encode[k] = p.get(k);
+    });
+    var filters = p.getAll('f');
+    var vis = { kind: kind, encode: encode, title: document.title || kind };
+    if (filters.length) vis.filters = filters;
+    return vis;
+  }
+
+  function loadAnalyses() {
+    if (loaded) return;
+    loaded = true;
+    sel.innerHTML = '<option value="">Loading...</option>';
+    fetch('/api/analyses').then(function (r) { return r.json(); }).then(function (data) {
+      var list = (data && data.analyses) ? data.analyses : [];
+      if (!list.length) {
+        sel.innerHTML = '<option value="">No saved analyses</option>';
+        return;
+      }
+      sel.innerHTML = '<option value="">-- choose an analysis --</option>';
+      list.forEach(function (a) {
+        var o = document.createElement('option');
+        o.value = a.id;
+        o.textContent = a.name;
+        sel.appendChild(o);
+      });
+    }).catch(function () {
+      sel.innerHTML = '<option value="">Could not load analyses</option>';
+    });
+  }
+
+  btn.addEventListener('click', function () {
+    var open = panel.style.display === 'block';
+    panel.style.display = open ? 'none' : 'block';
+    if (!open) { status.textContent = ''; loadAnalyses(); }
+  });
+
+  cancel.addEventListener('click', function () {
+    panel.style.display = 'none';
+  });
+
+  save.addEventListener('click', function () {
+    var id = sel.value;
+    if (!id) { status.textContent = 'Please choose an analysis.'; return; }
+    status.textContent = 'Saving...';
+    fetch('/api/analyses/' + encodeURIComponent(id))
+      .then(function (r) { return r.json(); })
+      .then(function (a) {
+        var vis     = buildVisualSpec();
+        var visuals = a.visuals || [];
+        visuals.push(vis);
+        return fetch('/api/analyses/' + encodeURIComponent(id), {
+          method  : 'PATCH',
+          headers : { 'Content-Type': 'application/json' },
+          body    : JSON.stringify({ visuals: visuals }),
+        });
+      })
+      .then(function (r) { return r.json(); })
+      .then(function (res) {
+        if (res && res.updated) {
+          status.textContent = 'Added! ';
+          var lk = document.createElement('a');
+          lk.href = '/a/' + sel.value;
+          lk.textContent = 'View canvas';
+          status.appendChild(lk);
+        } else {
+          status.textContent = 'Could not add visual.';
+        }
+      })
+      .catch(function () { status.textContent = 'Network error.'; });
+  });
+}());
+</script>
+<script>
+/* Chart resize handle -- injected after D3 and the viewBox-widening JS
+   (graph.html.tt setTimeout 0) have both run.  Wraps each chart SVG in a
+   relative-positioned div and appends a draggable triangle grip at the
+   bottom-right corner.  Dragging updates the SVG width/height while keeping
+   the viewBox fixed so D3 content scales proportionally. */
+(function () {
+  var MIN_W = 200, MIN_H = 120;
+
+  function ensureViewBox(svg) {
+    if (svg.getAttribute('viewBox')) return;
+    var w = parseFloat(svg.getAttribute('width'))  || svg.getBoundingClientRect().width;
+    var h = parseFloat(svg.getAttribute('height')) || svg.getBoundingClientRect().height;
+    if (w && h) svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+  }
+
+  function initChartResize() {
+    var containers = document.querySelectorAll('.graph-container, .pie-container, .bar-container, .heatmap-container, .scatter-container, .stacked-container, .combo-container, .treemap-container, .histogram-container');
+    for (var ci = 0; ci < containers.length; ci++) {
+      var container = containers[ci];
+      var svg = container.querySelector('svg');
+      if (!svg || container.querySelector('.chart-resize-handle')) continue;
+      ensureViewBox(svg);
+      var svgW = parseFloat(svg.getAttribute('width'))  || svg.getBoundingClientRect().width;
+      var svgH = parseFloat(svg.getAttribute('height')) || svg.getBoundingClientRect().height;
+      var wrap = document.createElement('div');
+      wrap.className = 'chart-svg-wrap';
+      if (svgW) wrap.style.width  = svgW + 'px';
+      if (svgH) wrap.style.height = svgH + 'px';
+      container.insertBefore(wrap, svg);
+      wrap.appendChild(svg);
+      var handle = document.createElement('div');
+      handle.className = 'chart-resize-handle';
+      handle.setAttribute('title', 'Drag to resize chart');
+      wrap.appendChild(handle);
+      (function (svg, handle, wrap) {
+        var startX, startY, startW, startH;
+        function onDown(e) {
+          e.preventDefault();
+          var touch = e.touches && e.touches[0];
+          startX = touch ? touch.clientX : e.clientX;
+          startY = touch ? touch.clientY : e.clientY;
+          startW = parseFloat(svg.getAttribute('width'))  || svg.getBoundingClientRect().width;
+          startH = parseFloat(svg.getAttribute('height')) || svg.getBoundingClientRect().height;
+          document.addEventListener('mousemove', onMove);
+          document.addEventListener('mouseup',   onUp);
+          document.addEventListener('touchmove', onMove, { passive: false });
+          document.addEventListener('touchend',  onUp);
+        }
+        function onMove(e) {
+          e.preventDefault();
+          var touch = e.touches && e.touches[0];
+          var cx = touch ? touch.clientX : e.clientX;
+          var cy = touch ? touch.clientY : e.clientY;
+          var newW = Math.max(MIN_W, startW + cx - startX);
+          var newH = Math.max(MIN_H, startH + cy - startY);
+          svg.setAttribute('width',  newW);
+          svg.setAttribute('height', newH);
+          wrap.style.width  = newW + 'px';
+          wrap.style.height = newH + 'px';
+        }
+        function onUp() {
+          document.removeEventListener('mousemove', onMove);
+          document.removeEventListener('mouseup',   onUp);
+          document.removeEventListener('touchmove', onMove);
+          document.removeEventListener('touchend',  onUp);
+        }
+        handle.addEventListener('mousedown',  onDown);
+        handle.addEventListener('touchstart', onDown, { passive: false });
+      }(svg, handle, wrap));
+    }
+  }
+
+  setTimeout(initChartResize, 100);
+}());
+</script>
+[% END %]
 </body>
 </html>

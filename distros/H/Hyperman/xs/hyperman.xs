@@ -68,6 +68,8 @@ run(class, ...)
             else if (strEQ(key, "idle_timeout"))   cfg.idle_t = SvNV(val);
             else if (strEQ(key, "header_timeout")) cfg.header_t = SvNV(val);
             else if (strEQ(key, "body_timeout"))   cfg.body_t   = SvNV(val);
+            else if (strEQ(key, "request_timeout")) cfg.request_t = SvNV(val);
+            else if (strEQ(key, "body_min_rate"))  cfg.body_min_rate = hm_opt_count(aTHX_ val, key);
             else if (strEQ(key, "max_pipeline"))   cfg.max_pipe = (int)SvIV(val);
             else if (strEQ(key, "reuseport"))      cfg.reuseport = SvTRUE(val) ? 1 : 0;
             /* Completion-mode reads. On by default wherever the backend can
@@ -116,6 +118,9 @@ run(class, ...)
                         if (cfg.log_fd < 0)
                             croak("Hyperman->run: dup access_log fd: %s",
                                   strerror(errno));
+#ifndef _WIN32
+                        (void)fcntl(cfg.log_fd, F_SETFD, FD_CLOEXEC);
+#endif
                     } else {
                         cfg.log_path = SvPV_nolen(val);   /* opened in the parent */
                     }
@@ -159,19 +164,22 @@ run(class, ...)
                         cfg.err_fd = dup(raw);
                         if (cfg.err_fd < 0)
                             croak("Hyperman->run: dup error_log fd: %s", strerror(errno));
+#ifndef _WIN32
+                        (void)fcntl(cfg.err_fd, F_SETFD, FD_CLOEXEC);
+#endif
                     } else {
                         cfg.err_path = SvPV_nolen(val);
                     }
                 }
             }
             else if (strEQ(key, "max_requests_per_worker"))
-                                                   cfg.max_requests = SvUV(val);
+                                                   cfg.max_requests = hm_opt_count(aTHX_ val, key);
             /* Response compression. Off by default: a server that starts
              * compressing on upgrade is a surprise. Accepted and inert on a
              * build without zlib, so a config is portable across them. */
             else if (strEQ(key, "compress"))       cfg.compress = SvTRUE(val) ? 1 : 0;
             else if (strEQ(key, "compress_min_length"))
-                                                   cfg.compress_min = (size_t)SvUV(val);
+                                                   cfg.compress_min = (size_t)hm_opt_count(aTHX_ val, key);
             /* The request ceiling: headers plus body, buffered per
              * connection before the app is called. This is the only thing
              * bounding a worker's memory against a large POST, so 0 is
@@ -179,7 +187,7 @@ run(class, ...)
              * ceiling is a memory-exhaustion switch and must not be
              * reachable by a config typo that produces a falsy value. */
             else if (strEQ(key, "max_body")) {
-                UV n = SvUV(val);
+                UV n = hm_opt_count(aTHX_ val, key);   /* -1 was UV_MAX: unbounded */
                 if (!n)
                     croak("Hyperman->run: max_body must be a byte count - "
                           "0 would mean an unbounded request buffer, which "
@@ -197,7 +205,7 @@ run(class, ...)
             else if (strEQ(key, "http2"))          dfl.http2 = SvTRUE(val) ? 1 : 0;
             else if (strEQ(key, "http3"))          dfl.http3 = SvTRUE(val) ? 1 : 0;
             else if (strEQ(key, "proxy_protocol")) dfl.proxy_protocol = SvTRUE(val) ? 1 : 0;
-            else if (strEQ(key, "http3_max_conns")) cfg.http3_max_conns = SvUV(val);
+            else if (strEQ(key, "http3_max_conns")) cfg.http3_max_conns = hm_opt_count(aTHX_ val, key);
             else if (strEQ(key, "tls_cert"))       dfl.tls_cert = SvOK(val) ? SvPV_nolen(val) : NULL;
             else if (strEQ(key, "tls_key"))        dfl.tls_key  = SvOK(val) ? SvPV_nolen(val) : NULL;
             else if (strEQ(key, "tls_ca"))         dfl.tls_ca   = SvOK(val) ? SvPV_nolen(val) : NULL;
@@ -770,6 +778,7 @@ ratelimit_hit(class, key, limit, window = 60)
         const char *kp = SvOK(key) ? SvPV_const(key, klen) : "";
         long rem = 0, reset = 0;
         int ok;
+        PERL_UNUSED_VAR(class);
         if (!SvOK(key)) klen = 0;
         ok = hm_sa_ratelimit_hit(kp, (size_t)klen, (long)limit, (long)window,
                                  &rem, &reset);

@@ -46,6 +46,26 @@ subtest 'system is accepted as a recipe default and a per-package def' => sub {
     like dies { Alien::Xrepo::Build::Recipe->new( packages => ['zstd'], defaults => { systemm => 1 } ) }, qr[unknown key 'systemm'],
         'a typo is still rejected';
 };
+subtest 'verbose and diagnosis are accepted as recipe defaults and per-package defs' => sub {
+
+    # Both are installer flags forwarded to make a failed build print its full
+    # install.txt (-v) plus xmake's diagnosis detail (-D); they must survive
+    # recipe validation so a dist can turn them on from its own recipe.
+    my $recipe = Alien::Xrepo::Build::Recipe->new( packages => [ 'zstd', { name => 'libsdl3', diagnosis => 1 } ], defaults => { verbose => 1 } );
+    is $recipe->defaults->{verbose}, 1, 'verbose accepted in defaults';
+    my %zstd = $recipe->opts_for( 'zstd', %{ $recipe->defaults } );
+    is $zstd{verbose}, 1, 'verbose flows to a package with no def of its own';
+    my %sdl = $recipe->opts_for( 'libsdl3', %{ $recipe->defaults } );
+    is $sdl{verbose},                               1, 'defaults still merge under a per-package def';
+    is $sdl{diagnosis},                             1, 'per-package diagnosis merges over the default';
+    is $recipe->package_defs->{libsdl3}{diagnosis}, 1, 'per-package diagnosis captured in the def';
+
+    # Undefined by default: a recipe that says nothing stays exactly as before.
+    my $off = Alien::Xrepo::Build::Recipe->new( packages => ['zstd'] );
+    my %off = $off->opts_for('zstd');
+    ok !defined $off{verbose},   'verbose stays undefined by default';
+    ok !defined $off{diagnosis}, 'diagnosis stays undefined by default';
+};
 subtest 'opts_for merges defs over ambient opts' => sub {
     my $recipe = Alien::Xrepo::Build::Recipe->new( packages => [ 'zstd', { name => 'libsdl3', kind => 'shared', configs => { wayland => 1 } }, ], );
     my %zstd   = $recipe->opts_for( 'zstd', kind => 'static', configs => { wayland => 0 } );

@@ -2,6 +2,19 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 1.6.1 are described by their release commits.
 
+## 1.10.1 - 2026-10-17
+
+### Fixes
+
+- Refuse a database answer whose member has the wrong type ([`c4d8144`](https://github.com/internetdata/sdk-perl/commit/c4d81447a5deea913497e32e2bb1967a94ae6325))
+
+## 1.10.0 - 2026-10-17
+
+### Features
+
+- Integration: pass over a licensed file past the CI budget ([`296d85f`](https://github.com/internetdata/sdk-perl/commit/296d85fdebfa9b216630447e840e6e4e53a52ef8))
+- Re-pin the spec to 2026.10.16: dynamic client registration ([`504d5e9`](https://github.com/internetdata/sdk-perl/commit/504d5e96bc85b2b6b9e39e2d43b212f89ce945f9))
+
 ## 1.9.5 - 2026-10-16
 
 ### Fixes

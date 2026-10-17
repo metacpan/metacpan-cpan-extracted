@@ -52,6 +52,8 @@ static SV *pc_yaml_decode(pTHX_ SV *text, const char *path) {
             "sub Punk::Config::_yaml_load {"
             "  local $YAML::XS::Boolean ="
             "    eval { require JSON::PP; 1 } ? 'JSON::PP' : $YAML::XS::Boolean;"
+            /* a config file is data; an object tag in it must not bless */
+            "  local $YAML::XS::LoadBlessed = 0;"
             "  YAML::XS::Load($_[0]);"
             "}", TRUE);
         shim = 1;
@@ -93,8 +95,16 @@ static SV *pc_slurp(pTHX_ const char *path) {
 /* ---- merge ---------------------------------------------------------------
  * Later layers win. Hashes merge key by key; anything else replaces, so an
  * array in an overlay is a replacement rather than an append. */
-static SV *pc_merge(pTHX_ SV *base, SV *over) {
+/* How deep a document may nest. A YAML alias cycle is unbounded, and the
+ * walk below copies subtrees, so an alias bomb is exponential: both end
+ * here with a message instead of a stack or the machine. */
+#define PC_MAX_DEPTH 64
+
+static SV *pc_merge(pTHX_ SV *base, SV *over, int depth) {
     HV *bh, *oh, *out;
+    if (depth > PC_MAX_DEPTH)
+        croak("Punk::Config: nested deeper than %d levels (an alias "
+              "cycle?)", PC_MAX_DEPTH);
     HE *he;
     if (!(base && SvROK(base) && SvTYPE(SvRV(base)) == SVt_PVHV
           && over && SvROK(over) && SvTYPE(SvRV(over)) == SVt_PVHV))
@@ -109,7 +119,7 @@ static SV *pc_merge(pTHX_ SV *base, SV *over) {
     while ((he = hv_iternext(oh))) {
         SV *key = HeSVKEY_force(he);
         HE *have = hv_fetch_ent(out, key, 0, 0);
-        SV *merged = have ? pc_merge(aTHX_ HeVAL(have), HeVAL(he))
+        SV *merged = have ? pc_merge(aTHX_ HeVAL(have), HeVAL(he), depth + 1)
                           : newSVsv(HeVAL(he));
         (void)hv_store_ent(out, key, merged, 0);
     }
@@ -220,9 +230,13 @@ static SV *pc_resolve(pTHX_ SV *key, SV *arg, const char *where) {
  * public copy with each secret replaced by [redacted]. Returns the public
  * node (owned); *resolved_out gets the resolved node (owned). */
 static SV *pc_walk(pTHX_ punk_config *cfg, SV *node, SV *path,
-                   SV **resolved_out) {
+                   SV **resolved_out, int depth) {
     SV *arg = NULL;
-    SV *key = pc_reference(aTHX_ node, &arg);
+    SV *key;
+    if (depth > PC_MAX_DEPTH)
+        croak("Punk::Config: nested deeper than %d levels (an alias "
+              "cycle?)", PC_MAX_DEPTH);
+    key = pc_reference(aTHX_ node, &arg);
 
     if (key) {
         const char *where_path = SvCUR(path) ? SvPV_nolen(path) : "(root)";
@@ -247,7 +261,7 @@ static SV *pc_walk(pTHX_ punk_config *cfg, SV *node, SV *path,
                 : sv_2mortal(newSVsv(k));
             SV *rnode = NULL;
             SV *pnode;
-            pnode = pc_walk(aTHX_ cfg, HeVAL(he), child, &rnode);
+            pnode = pc_walk(aTHX_ cfg, HeVAL(he), child, &rnode, depth + 1);
             (void)hv_store_ent(pub, k, pnode, 0);
             (void)hv_store_ent(res, k, rnode ? rnode : newSVsv(HeVAL(he)), 0);
         }
@@ -265,7 +279,7 @@ static SV *pc_walk(pTHX_ punk_config *cfg, SV *node, SV *path,
                                             SvPV_nolen(path), (IV)i));
             SV *rnode = NULL;
             SV *pnode = pc_walk(aTHX_ cfg, e ? *e : &PL_sv_undef, child,
-                                &rnode);
+                                &rnode, depth + 1);
             av_push(pub, pnode);
             av_push(res, rnode ? rnode : newSVsv(e ? *e : &PL_sv_undef));
         }

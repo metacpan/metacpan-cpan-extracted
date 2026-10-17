@@ -30,4 +30,9 @@ svndiff/
 ^init
 ^results
 ^htmlify
-^.git
+^.git/
+^.gitignore
+^MYMETA\.json$
+^MYMETA\.yml$
+\B\.git\b
+\B\.github\b

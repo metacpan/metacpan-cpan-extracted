@@ -39,12 +39,14 @@ static volatile sig_atomic_t hm_poll_sigflag[64];
 static int hm_poll_pipe_w = -1;
 
 static void hm_poll_handler(int signo) {
+    int saved = errno;          /* a handler must leave errno as it found it */
     if (signo > 0 && signo < 64) hm_poll_sigflag[signo] = 1;
     if (hm_poll_pipe_w >= 0) {
         char b = 1;
         ssize_t r = write(hm_poll_pipe_w, &b, 1);
         (void)r;
     }
+    errno = saved;
 }
 
 static double hm_poll_now(void) {
@@ -174,8 +176,11 @@ static int pl_wait(hm_backend *be, hm_event *out, int max, double timeout) {
     n = poll(st->pfds, (nfds_t)st->npfds, tmo_ms);
     if (n < 0 && errno != EINTR) return -1;
 
-    /* io + signal readiness */
-    for (i = 0; i < st->npfds && nev < max; i++) {
+    /* io + signal readiness. Not walked after EINTR or a timeout: revents
+     * is then whatever the previous call left, or never-written memory for
+     * an entry realloc'd in since, and a stale bit dispatched a readiness
+     * nobody had. The timers below still run. */
+    for (i = 0; n > 0 && i < st->npfds && nev < max; i++) {
         short rev = st->pfds[i].revents;
         int fd = st->pfds[i].fd;
         if (!rev) continue;
@@ -297,9 +302,11 @@ hm_backend *hm_backend_create(const char *name) {
         if (strcmp(name, "poll")     == 0) return hm_backend_poll_new();
         return NULL;
     }
-    /* auto: kqueue > epoll > wsapoll > poll; io_uring stays opt-in until
-     * benchmarked. Each _new returns NULL where its platform is absent, so
-     * exactly one of wsapoll/poll can ever answer. */
+    /* auto: kqueue > io_uring > epoll > wsapoll > poll. io_uring IS chosen
+     * wherever liburing was found at build time (it beat epoll by 48% at a
+     * thousand connections); HYPERMAN_BACKEND=epoll opts out. Each _new
+     * returns NULL where its platform is absent, so exactly one of
+     * wsapoll/poll can ever answer. */
     {
         hm_backend *be;
         if ((be = hm_backend_kqueue_new())) return be;

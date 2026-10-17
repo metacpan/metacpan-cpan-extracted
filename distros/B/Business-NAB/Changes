@@ -1,5 +1,8 @@
 Revision history for Business-NAB
 
+0.11
+        - Handle more status values in XML ACK files
+
 0.10
         - Protect against even more rounding errors (for real this time)
 

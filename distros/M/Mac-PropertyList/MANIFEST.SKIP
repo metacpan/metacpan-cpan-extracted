@@ -79,3 +79,4 @@ Dockerfile
 plists.md
 
 .downstream.json
+cpan_tester_reports

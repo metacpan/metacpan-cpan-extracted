@@ -28,6 +28,9 @@
 #define PRL_TAG     5    /* PV: counter namespace                       */
 #define PRL_BYFN    6    /* SV: the coderef for by-mode 2, else undef   */
 
+/* the most of a header or coderef id that becomes part of the counter key */
+#define PRL_ID_MAX  256
+
 /* The before_dispatch body for one rule. ST(0) is $c; a reference return
  * short-circuits the request (punk_dispatch.h), so a 429 answers here. */
 XS_INTERNAL(prl_check_cb);
@@ -86,10 +89,18 @@ XS_INTERNAL(prl_check_cb) {
     } else {                                        /* ip (0) or header (1) */
         SV **ev = (by == 1) ? hv_fetch(env, envkey, (I32)elen, 0)
                             : hv_fetchs(env, "REMOTE_ADDR", 0);
+        /* A header rule with no header falls back to the address: a client
+         * that simply omits the header is still one client, and a rule that
+         * limited nothing for it was no limit at all. */
+        if (by == 1 && !(ev && *ev && SvOK(*ev) && SvCUR(*ev)))
+            ev = hv_fetchs(env, "REMOTE_ADDR", 0);
         if (!(ev && *ev && SvOK(*ev))) XSRETURN_EMPTY;
         id = SvPV(*ev, idlen);
     }
     if (!idlen) { SvREFCNT_dec(idsv); XSRETURN_EMPTY; }
+    /* an id is a key in a shared table, not a place to put a header's worth
+     * of bytes per request */
+    if (idlen > PRL_ID_MAX) idlen = PRL_ID_MAX;
 
     /* key = "rl\0" tag "\0" id - NUL-joined so rules and ids never collide */
     keysv = sv_2mortal(newSVpvs("rl"));
@@ -99,7 +110,9 @@ XS_INTERNAL(prl_check_cb) {
     sv_catpvn(keysv, id, idlen);
     SvREFCNT_dec(idsv);
 
-    A = punk_hm(aTHX);
+    /* resolved: punk_hm's environment check is a scan of every variable,
+     * per request, and the answer cannot change once the table is found */
+    A = punk_hm_resolved(aTHX);
     if (!(A && A->ratelimit_hit)) XSRETURN_EMPTY;    /* fail open */
     {
         STRLEN klen;

@@ -168,14 +168,20 @@ _locale(c, ...)
                         for (z = 0; z < sl; z++)
                             if (sp[z] == '.') { is_int = 0; break; }
                     }
-                    if (is_int && nv != (NV)(IV)nv) is_int = 0;
+                    /* I_V, not a bare cast: a NaN or an infinity cast to IV
+                     * is undefined in C, and a count can be either */
+                    if (is_int && (Perl_isinfnan(nv) || nv != (NV)I_V(nv)))
+                        is_int = 0;
 
                     rule = pi_rule_for(cat->tag, cat->taglen);
                     if (rule == PR_NONE) break;   /* checked at boot */
                     pc  = pi_plural(rule, (double)nv, is_int);
                     cn  = PI_CAT_NAME[pc];
                     cnl = strlen(cn);
-                    if (kl + 1 + cnl > PI_KEY_MAX) break;
+                    /* bounded by the WIDEST category: the `other` fallback
+                     * below writes five bytes where a three-letter one fit */
+                    if (kl + 1 + 5 > PI_KEY_MAX || kl + 1 + cnl > PI_KEY_MAX)
+                        break;
 
                     memcpy(pkey, k, kl);
                     pkey[kl] = '.';

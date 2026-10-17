@@ -1,6 +1,6 @@
 use v5.40;
 
-package Alien::Xrepo::MM v1.0.8 {
+package Alien::Xrepo::MM v1.0.9 {
     use Cwd      qw[getcwd];
     use JSON::PP qw[decode_json encode_json];
     use Path::Tiny;
@@ -12,11 +12,14 @@ package Alien::Xrepo::MM v1.0.8 {
         my %self = map { $_ => $attr{$_} } qw[
             module_name dist_abstract dist_author dist_version license
             base_dir xrepo_snapshot xrepo_share_dir xrepo_cache xrepo_update_repo
+            xrepo_verbose xrepo_diagnosis
         ];
         $self{dist_version}      //= 'v1.0.0';
         $self{license}           //= 'artistic_2';
         $self{xrepo_cache}       //= 0;
         $self{xrepo_update_repo} //= 0;
+        $self{xrepo_verbose}     //= 0;
+        $self{xrepo_diagnosis}   //= 0;
         $self{base_dir}          //= Cwd::getcwd();
         $self{requires}           = { %{ $attr{requires}           // {} } };
         $self{configure_requires} = { %{ $attr{configure_requires} // {} } };
@@ -36,6 +39,8 @@ package Alien::Xrepo::MM v1.0.8 {
     sub xrepo_share_dir    { $_[0]{xrepo_share_dir} }
     sub xrepo_cache        { $_[0]{xrepo_cache} }
     sub xrepo_update_repo  { $_[0]{xrepo_update_repo} }
+    sub xrepo_verbose      { $_[0]{xrepo_verbose} }
+    sub xrepo_diagnosis    { $_[0]{xrepo_diagnosis} }
     sub base_dir           { $_[0]{base_dir} }
     sub requires           { $_[0]{requires} }
     sub configure_requires { $_[0]{configure_requires} }
@@ -85,7 +90,9 @@ package Alien::Xrepo::MM v1.0.8 {
                     snapshot    => $snapshot->stringify,
                     share_dir   => $share->stringify,
                     cache       => $self->{xrepo_cache},
-                    update_repo => $self->{xrepo_update_repo}
+                    update_repo => $self->{xrepo_update_repo},
+                    verbose     => $self->{xrepo_verbose},
+                    diagnosis   => $self->{xrepo_diagnosis}
                 }
             )
         );
@@ -130,7 +137,9 @@ package Alien::Xrepo::MM v1.0.8 {
             snapshot    => $snapshot,
             share_dir   => $share->stringify,
             cache       => ( $data->{cache}       // 0 ),
-            update_repo => ( $data->{update_repo} // 0 )
+            update_repo => ( $data->{update_repo} // 0 ),
+            verbose     => ( $data->{verbose}     // 0 ),
+            diagnosis   => ( $data->{diagnosis}   // 0 )
         );
         $build->run;
         $build->assert_installed;

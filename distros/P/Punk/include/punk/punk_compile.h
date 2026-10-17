@@ -21,13 +21,17 @@ XS_INTERNAL(pc_app_cb);
 XS_INTERNAL(pc_app_cb) {
     dXSARGS;
     AV *cap = punk_clos_cap(aTHX_ cv);
-    SV *state;
+    SV **holder;
+    pk_state *st;
     if (!cap || items < 1) XSRETURN_EMPTY;
-    state = *av_fetch(cap, 0, 0);
+    /* slot 0 is the state hash (kept alive for the struct's borrowed
+     * pointers), slot 1 the struct the request path reads */
+    holder = av_fetch(cap, 1, 0);
+    st = (holder && *holder) ? pk_state_of(aTHX_ *holder) : NULL;
+    if (!st) croak("Punk: the compiled application has no state");
     if (!SvROK(ST(0)) || SvTYPE(SvRV(ST(0))) != SVt_PVHV)
         croak("Punk: the app takes a PSGI env hashref");
     {
-        HV *st  = (HV *)SvRV(state);
         HV *env = (HV *)SvRV(ST(0));
         SV *out;
         /* A preflight is answered here, before routing: OPTIONS on a path with

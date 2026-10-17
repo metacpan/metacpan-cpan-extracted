@@ -3,6 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 use Test::More;
+use IO::Socket::INET;
 use File::Spec ();
 use File::Temp ();
 use POSIX ();
@@ -258,9 +259,8 @@ sub fetch {
         # That is the server's to fix; this checks that the handler's own
         # loop - write, drain, wait - ends with the whole body on a server
         # that sends one. Whether drain is ever PENDING over h2 is the
-        # server's too: it reports pressure from the connection's buffer,
-        # and an h2 body waits in the stream's. The TLS block below is where
-        # that is asserted.
+        # server's too, and is asserted below on a Hyperman that reports
+        # it.
         my $out = `curl -s --max-time 20 $h2 '$base/big' 2>/dev/null`;
         skip 'this Hyperman truncates an HTTP/2 stream body', 1
             if length($out) != 6_000_000 + 5
@@ -349,6 +349,53 @@ sub fetch {
         }
         is($got, 'aborted:1',
            'a client that goes away aborts the stream and the handler hears it');
+    }
+
+  SKIP: {
+        # Backpressure over h2. The limit there is the peer's flow-control
+        # window, and what it has not opened waits in the stream's own buffer
+        # - which the server did not count until 0.60, so drain was settled
+        # at once and the whole body was held. The handler also waits inside
+        # the request, which an h2 server can only serve if it reads the
+        # connection meanwhile.
+        #
+        # The client speaks h2 by hand: a preface, an empty SETTINGS and one
+        # HEADERS frame, then nothing - no window update, no read. Its
+        # window is the default 65,535 bytes against an 8 MB write.
+        skip 'Hyperman 0.60 or later reports pressure on an h2 stream', 1
+            unless eval { Hyperman->VERSION('0.60'); 1 };
+        unlink $PRESS;
+        my $sock = IO::Socket::INET->new(PeerAddr => "127.0.0.1:$port")
+            or skip "connect: $!", 1;
+        my $frame = sub {
+            my ($type, $flags, $sid, $pay) = @_;
+            my $l = length $pay;
+            return pack('CCCCCN', ($l >> 16) & 0xff, ($l >> 8) & 0xff,
+                        $l & 0xff, $type, $flags, $sid) . $pay;
+        };
+        my $lit = sub {          # an HPACK literal, never indexed
+            my ($n, $v) = @_;
+            return "\x00" . chr(length $n) . $n . chr(length $v) . $v;
+        };
+        syswrite $sock, "PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n"
+                      . $frame->(0x4, 0, 0, '')
+                      . $frame->(0x1, 0x5, 1,
+                            $lit->(':method', 'GET') . $lit->(':scheme', 'http')
+                          . $lit->(':path', '/press')
+                          . $lit->(':authority', "127.0.0.1:$port"));
+        my $state = '';
+        for (1 .. 100) {
+            if (open my $fh, '<', $PRESS) {
+                $state = <$fh> // '';
+                close $fh;
+                last;
+            }
+            select undef, undef, undef, 0.1;
+        }
+        is($state, 'p',
+           'over h2, drain is pending while the stream holds what the '
+         . 'client has not made room for');
+        close $sock;          # the waiting handler hears the abort and ends
     }
 
     kill 'TERM', $pid;

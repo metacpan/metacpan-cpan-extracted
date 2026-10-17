@@ -18,7 +18,7 @@
 use v5.36;
 
 package App::FuguWeb;
-our $VERSION = '0.8.1';
+our $VERSION = '0.9.0';
 
 # App::FuguWeb - a static documentation site for a Perl project.
 #
@@ -39,10 +39,28 @@ our $VERSION = '0.8.1';
 # discovery match .fuguvmrc.
 use constant CONFIG_FILE => '.fuguwebrc';
 
-# The stylesheet, as the output directory holds it and as every page
-# links it. The site is served from one flat directory, so the name
-# is a file name there.
+# The stylesheet, as the output directory holds it. The sheet sits at
+# the top level, outside every language tree, so one file serves each
+# tree.
 use constant STYLESHEET => 'style.css';
+
+# The language of the default tree, per D-05. Every page of the
+# description renders in its tree, and the key page and the pages of
+# the top level are pages of it.
+use constant DEFAULT_LANGUAGE => 'en';
+
+# The shape of a language code: two lowercase ASCII letters, per ISO
+# 639-1. A directory at the top level of the output whose name takes
+# this shape holds a language tree.
+use constant LANGUAGE_CODE => qr/\A[a-z]{2}\z/;
+
+# The two pages of the top level, which a host serves. The forward
+# sends a visitor of the root into the default tree. The copy of the
+# 404 page answers each path that no file answers.
+use constant {
+	FORWARD_PAGE   => 'index.html',
+	NOT_FOUND_PAGE => '404.html',
+};
 
 # The staging directory for the mdoc sources, inside the output
 # directory. The build makes it, uses it, and removes it again.
@@ -118,9 +136,9 @@ sub list_dir ($dir)
 #	answered with files alone would hide a stray directory from
 #	the checks, and the clean refuses one.
 #
-#	A site is one flat directory of files, and the key directory
-#	is the one part below it. The output therefore needs a walk of
-#	the tree wherever a walk of one level served before.
+#	Each language tree and each key directory sits below the top
+#	level of a site. The output therefore needs a walk of the
+#	tree wherever a walk of one level would serve one directory.
 sub list_tree ( $dir, $prefix = '' )
 {
 	my $names = list_dir($dir) or return;

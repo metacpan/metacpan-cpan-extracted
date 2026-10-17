@@ -1,0 +1,32 @@
+Changes
+examples/README.md
+examples/server_config.json
+examples/sse_server.pl
+examples/stdio_server.pl
+lib/App/MCP/CLI.pm
+lib/App/MCP/CLI/Client.pm
+lib/App/MCP/CLI/Command/call.pm
+lib/App/MCP/CLI/Command/interactive.pm
+lib/App/MCP/CLI/Command/list.pm
+lib/App/MCP/CLI/Command/servers.pm
+lib/App/MCP/CLI/Command/version.pm
+lib/App/MCP/CLI/Config.pm
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+script/mcpcli
+t/00-load.t
+t/call.t
+t/chat.t
+t/client.t
+t/config.t
+t/lib/mock_ollama.pl
+t/lib/mock_sse.pl
+t/lib/mock_stdio.pl
+t/lib/TestUtil.pm
+xt/manifest.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -5,7 +5,9 @@ WriteMakefile(
     NAME              => 'MPGA',
     VERSION_FROM      => 'lib/MPGA.pm', # finds $VERSION, requires EU::MM from perl >= 5.5
     PREREQ_PM         => {
-                   'Test::More' => 0,
+                   'Attribute::Handlers' => 0,
+                   'Sub::Util'           => 0,
+                   'Test::More'          => 0,
     }, # e.g., Module::Name => 1.1
     ABSTRACT_FROM     => 'lib/MPGA.pm', # retrieve abstract from module
     AUTHOR            => 'NN<autumNN@yandex.ru>',

@@ -117,10 +117,21 @@ static void ps_http_date(char *out, size_t outlen, time_t when) {
                                           "Jul","Aug","Sep","Oct","Nov","Dec" };
     struct tm tm;
 #ifdef HAS_GMTIME_R
-    gmtime_r(&when, &tm);
+    if (!gmtime_r(&when, &tm)) {
 #else
-    tm = *gmtime(&when);
+    struct tm *tp = gmtime(&when);
+    if (tp) tm = *tp;
+    else {
 #endif
+        /* out of range for the C library (a validator that returned
+         * nonsense): the epoch, rather than whatever was on the stack */
+        time_t zero = 0;
+#ifdef HAS_GMTIME_R
+        gmtime_r(&zero, &tm);
+#else
+        tm = *gmtime(&zero);
+#endif
+    }
     my_snprintf(out, outlen, "%s, %02d %s %04d %02d:%02d:%02d GMT",
                 days[tm.tm_wday % 7], tm.tm_mday, months[tm.tm_mon % 12],
                 tm.tm_year + 1900, tm.tm_hour, tm.tm_min, tm.tm_sec);
@@ -423,49 +434,29 @@ static SV *psc_cap(pTHX_ AV *cap, int slot) {
     return (s && *s && SvOK(*s)) ? *s : NULL;
 }
 
-XS_INTERNAL(punk_static_cb);
-XS_INTERNAL(punk_static_cb) {
-    dXSARGS;
-    AV *cap = punk_clos_cap(aTHX_ cv);
+/* The mount's answer (+1) for a GET or HEAD of `path` under its directory.
+ * The XSUB below reads the method and PATH_INFO from the env and calls this;
+ * the dispatcher calls it directly for a mount it recognises as its own,
+ * with the sub-path it already has, and so skips the SCRIPT_NAME/PATH_INFO
+ * rewrite and the Perl frame. */
+static SV *punk_static_in(pTHX_ AV *cap, HV *env, const char *path,
+                          STRLEN plen, int is_head) {
     SV *dirsv, *cachesv;
-    HV *env;
-    SV **e;
-    const char *dir, *path, *method;
-    STRLEN dlen, plen, mlen = 3, flen;
+    const char *dir;
+    STRLEN dlen, flen;
     char file[MAXPATHLEN + 1];
     SV *resp;
     ps_fopts fo;
-    int is_head = 0;
 
-    if (!cap || items < 1) XSRETURN_EMPTY;
     dirsv = *av_fetch(cap, 0, 0);
     dir   = SvPV_const(dirsv, dlen);
     Zero(&fo, 1, ps_fopts);
     fo.cache_control = psc_cap(aTHX_ cap, PSC_CC);
     cachesv = psc_cap(aTHX_ cap, PSC_CACHE);
 
-    if (!SvROK(ST(0)) || SvTYPE(SvRV(ST(0))) != SVt_PVHV)
-        croak("Punk::Static: the app takes a PSGI env hashref");
-    env = (HV *)SvRV(ST(0));
-
-    e = hv_fetchs(env, "REQUEST_METHOD", 0);
-    method = (e && *e && SvOK(*e)) ? SvPV_const(*e, mlen) : "GET";
-    if (mlen == 4 && memEQ(method, "HEAD", 4)) is_head = 1;
-    else if (!(mlen == 3 && memEQ(method, "GET", 3))) {
-        ST(0) = sv_2mortal(ps_plain(aTHX_ 405, "Method Not Allowed",
-                                    "Allow", "GET, HEAD"));
-        XSRETURN(1);
-    }
-
-    e = hv_fetchs(env, "PATH_INFO", 0);
-    if (e && *e && SvOK(*e)) path = SvPV_const(*e, plen);
-    else { path = "/"; plen = 1; }
-
     if (ps_path_unsafe(path, plen) || dlen + plen > MAXPATHLEN
-        || (!psc_cap(aTHX_ cap, PSC_DOT) && ps_path_dotted(path, plen, 1))) {
-        ST(0) = sv_2mortal(ps_plain(aTHX_ 404, "Not Found", NULL, NULL));
-        XSRETURN(1);
-    }
+        || (!psc_cap(aTHX_ cap, PSC_DOT) && ps_path_dotted(path, plen, 1)))
+        return ps_plain(aTHX_ 404, "Not Found", NULL, NULL);
     memcpy(file, dir, dlen);
     memcpy(file + dlen, path, plen);
     file[dlen + plen] = '\0';
@@ -532,7 +523,7 @@ XS_INTERNAL(punk_static_cb) {
                     resp = ps_listing(aTHX_ env, file, flen, path, plen,
                                       is_head,
                                       psc_cap(aTHX_ cap, PSC_DOT) ? 1 : 0);
-                    if (resp) { ST(0) = sv_2mortal(resp); XSRETURN(1); }
+                    if (resp) return resp;
                 }
             }
         }
@@ -540,8 +531,55 @@ XS_INTERNAL(punk_static_cb) {
 
     resp = ps_serve_file_opt(aTHX_ env, file, flen, is_head, &fo);
     if (!resp) resp = ps_plain(aTHX_ 404, "Not Found", NULL, NULL);
-    ST(0) = sv_2mortal(resp);
+    return resp;
+}
+
+XS_INTERNAL(punk_static_cb);
+XS_INTERNAL(punk_static_cb) {
+    dXSARGS;
+    AV *cap = punk_clos_cap(aTHX_ cv);
+    HV *env;
+    SV **e;
+    const char *path, *method;
+    STRLEN plen, mlen = 3;
+    int is_head = 0;
+
+    if (!cap || items < 1) XSRETURN_EMPTY;
+    if (!SvROK(ST(0)) || SvTYPE(SvRV(ST(0))) != SVt_PVHV)
+        croak("Punk::Static: the app takes a PSGI env hashref");
+    env = (HV *)SvRV(ST(0));
+
+    e = hv_fetchs(env, "REQUEST_METHOD", 0);
+    method = (e && *e && SvOK(*e)) ? SvPV_const(*e, mlen) : "GET";
+    if (mlen == 4 && memEQ(method, "HEAD", 4)) is_head = 1;
+    else if (!(mlen == 3 && memEQ(method, "GET", 3))) {
+        ST(0) = sv_2mortal(ps_plain(aTHX_ 405, "Method Not Allowed",
+                                    "Allow", "GET, HEAD"));
+        XSRETURN(1);
+    }
+
+    e = hv_fetchs(env, "PATH_INFO", 0);
+    if (e && *e && SvOK(*e)) path = SvPV_const(*e, plen);
+    else { path = "/"; plen = 1; }
+
+    ST(0) = sv_2mortal(punk_static_in(aTHX_ cap, env, path, plen, is_head));
     XSRETURN(1);
+}
+
+/* Is this mount coderef the plain static closure above, with no directory
+ * index or listing (the two things that read SCRIPT_NAME)? Then the
+ * dispatcher may call punk_static_in directly. Hands back the capture. */
+static int punk_static_fast_ok(pTHX_ SV *mapp, AV **cap_out) {
+    CV *cv;
+    AV *cap;
+    if (!(mapp && SvROK(mapp) && SvTYPE(SvRV(mapp)) == SVt_PVCV)) return 0;
+    cv = (CV *)SvRV(mapp);
+    if (!CvISXSUB(cv) || CvXSUB(cv) != punk_static_cb) return 0;
+    cap = punk_clos_cap(aTHX_ cv);
+    if (!cap || psc_cap(aTHX_ cap, PSC_INDEX) || psc_cap(aTHX_ cap, PSC_LIST))
+        return 0;
+    *cap_out = cap;
+    return 1;
 }
 
 /* ---- the other direction: naming a file ------------------------------------

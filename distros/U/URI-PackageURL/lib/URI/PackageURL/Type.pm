@@ -13,8 +13,8 @@ use List::Util qw(first);
 
 use constant DEBUG => $ENV{PURL_DEBUG};
 
-our $VERSION = '2.25';
-
+our $VERSION = '2.26';
+my %DEFINITION_CACHE = ();
 
 my %ALGO_LENGTH = ('md5' => 32, 'sha1' => 40, 'sha256' => 64, 'sha384' => 96, 'sha512' => 128);
 
@@ -22,13 +22,15 @@ my %CACHE = ();
 
 sub new {
 
-    my ($class, $type) = @_;
+    my ($class, $type, $definition) = @_;
 
     Carp::croak 'Missing PURL type' unless $type;
 
     $type = lc $type;
 
-    my $self = {type => $type, definition => _load_definition($type) || {}};
+    $definition = $DEFINITION_CACHE{$type} //= _load_definition($type);
+
+    my $self = {type => $type, definition => $definition || {}};
 
     return bless $self, $class;
 
@@ -73,12 +75,17 @@ sub definition { shift->{definition} }
 
 sub _property {
 
-    my ($self, $property, $sub_property) = @_;
+    my $self       = shift;
+    my @filter     = @_;
+    my $definition = $self->definition;
 
-    return unless $self->definition;
+    return unless $definition;
 
-    return $self->definition->{$property} unless defined $sub_property;
-    return $self->definition->{$property}->{$sub_property};
+    foreach (@filter) {
+        $definition = (defined $definition->{$_}) ? $definition->{$_} : undef;
+    }
+
+    return $definition;
 
 }
 
@@ -108,7 +115,23 @@ sub component_native_name          { shift->_property(shift . '_definition', 'na
 sub component_normalization_rules  { shift->_property(shift . '_definition', 'normalization_rules') || [] }
 sub component_note                 { shift->_property(shift . '_definition', 'note') }
 sub component_permitted_characters { shift->_property(shift . '_definition', 'permitted_characters') }
-sub component_requirement          { shift->_property(shift . '_definition', 'requirement') }
+
+sub component_requirement {
+
+    my ($self, $component) = @_;
+
+    if ($component eq 'qualifiers') {
+        foreach (@{$self->qualifiers_definition}) {
+            my $requirement = $_->{requirement};
+            next unless $requirement;
+            return 'required' if ($requirement eq 'required');
+        }
+        return 'optional';
+    }
+
+    return $self->_property($component . '_definition', 'requirement');
+
+}
 
 sub normalize {
 
@@ -138,8 +161,8 @@ sub normalize {
             $components{namespace} = lc $components{namespace};
         }
 
-        # The namespace is the CPAN id of the author/publisher. It MUST be written uppercase and is required.
-
+        # Legacy CPAN spec: The namespace is the CPAN id of the author/publisher.
+        #                   It MUST be written uppercase and is required.
         if ($components{type} eq 'cpan') {
             $components{namespace} = uc $components{namespace};
         }
@@ -150,6 +173,9 @@ sub normalize {
     if (defined $components{qualifiers}->{checksum} and ref $components{qualifiers}->{checksum} ne 'ARRAY') {
         $components{qualifiers}->{checksum} = [$components{qualifiers}->{checksum}];
     }
+
+    # Force qualifier keys to lowercase
+    %{$components{qualifiers}} = map { lc $_ => $components{qualifiers}->{$_} } keys %{$components{qualifiers}};
 
     # PURL type specific normalization
 TYPE: for ($components{type}) {
@@ -193,6 +219,30 @@ TYPE: for ($components{type}) {
             last TYPE;
         }
 
+        if (/brew/) {
+
+            # namespace and name: It is not case sensitive and must be lowercased.
+
+            $components{namespace} = lc($components{namespace}) if (defined $components{namespace});
+            $components{name}      = lc($components{name});
+
+            last TYPE;
+
+        }
+
+        if (/git/) {
+
+            $components{namespace} = lc($components{namespace});
+            $components{name}      = lc($components{name});
+
+            my @parts = split '/', $components{namespace}, 2;
+
+            $components{namespace} = join '/', shift @parts;
+            $components{name}      = join '/', @parts, $components{name};
+
+            last TYPE;
+        }
+
     }
 
     return wantarray ? %components : \%components;
@@ -204,10 +254,10 @@ sub validate {
     my $self = shift;
 
     my %components = (
+        scheme     => 'pkg',
         type       => undef,
         namespace  => undef,
         name       => undef,
-        version    => undef,
         version    => undef,
         qualifiers => {},
         subpath    => undef,
@@ -222,7 +272,8 @@ sub validate {
     Carp::croak "Invalid PURL: '$components{scheme}' is not a valid scheme" unless ($components{scheme} eq 'pkg');
 
     foreach my $qualifier (keys %{$components{qualifiers}}) {
-        Carp::croak "Invalid PURL: '$qualifier' is not a valid qualifier" if ($qualifier =~ /(\s|\%)/);
+        Carp::croak "Invalid PURL: '$qualifier' is not a valid qualifier"   if ($qualifier =~ /(\s|\%)/);
+        Carp::croak "Invalid PURL: '$qualifier' qualifier not in lowercase" if ($qualifier =~ /([A-Z])/);
     }
 
     # Check checksum qualifier
@@ -267,8 +318,23 @@ sub validate {
 
             DEBUG and say STDERR "-- Validation - $component is $requirement";
 
-            if (defined $components{$component} && $self->component_is_prohibited($component)) {
-                Carp::croak sprintf("Invalid PURL: '%s' is prohibited for '%s' PURL type", $component, $purl_type);
+            if (defined $components{$component}) {
+
+                if ($self->component_is_prohibited($component)) {
+                    Carp::croak sprintf("Invalid PURL: '%s' is prohibited for '%s' PURL type", $component, $purl_type);
+                }
+
+                if (my $permitted_characters = $self->component_permitted_characters($component)) {
+
+                    DEBUG and say STDERR "-- Validation - $component permitted characters $permitted_characters";
+
+                    if ($components{$component} !~ /$permitted_characters/) {
+                        Carp::croak
+                            sprintf("Invalid PURL: '%s' invalid characters for '%s' PURL type", $component, $purl_type);
+                    }
+
+                }
+
             }
 
             if (!defined $components{$component} && $self->component_is_required($component)) {
@@ -364,9 +430,6 @@ TYPE: for ($purl_type) {
         }
 
         if (/swift/) {
-
-            # TODO remove after spec FIX
-            Carp::croak "Invalid PURL: Swift 'version' is required" unless defined $components{version};
 
             if (defined $components{namespace}) {
                 my ($source, $user_org) = split '/', $components{namespace};

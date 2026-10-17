@@ -2,7 +2,7 @@ use v5.40;
 use feature qw[class try];
 no warnings 'experimental::class';
 #
-class Alien::Xrepo::Runtime v1.0.8 {
+class Alien::Xrepo::Runtime v1.0.9 {
     use Alien::Xrepo;
     use Alien::Xrepo::Build::Recipe;
     use Config   ();
@@ -14,6 +14,7 @@ class Alien::Xrepo::Runtime v1.0.8 {
     field $recipe              : param = undef;      # Recipe object (or file/dir) - alternative to inline pkg_name
     field $root                : param = undef;
     field $verbose             : param = 0;
+    field $diagnosis           : param = 0;          # forwarded to Alien::Xrepo->diagnosis (xmake -D on installs)
     field $repo                : param //= undef;    # injectable engine
     field $snapshot            : param //= undef;    # path to a snapshot JSON (hermetic mode)
     field $autodetect_snapshot : param //= 1;        # look for dist auto/share snapshots
@@ -45,7 +46,7 @@ class Alien::Xrepo::Runtime v1.0.8 {
         if ( !keys %$install_opts && $self->can('install_opts') ) {
             $install_opts = { $self->install_opts };
         }
-        $r = $repo // Alien::Xrepo->new( root => $root, verbose => $verbose, cache => $cache );
+        $r = $repo // Alien::Xrepo->new( root => $root, verbose => $verbose, diagnosis => $diagnosis, cache => $cache );
         if ( defined $recipe ) {
             $recipe_obj
                 = ref $recipe eq 'HASH' ? Alien::Xrepo::Build::Recipe->new(%$recipe) :
@@ -304,7 +305,7 @@ class Alien::Xrepo::Runtime v1.0.8 {
     }
 };
 #
-class Alien::Xrepo::Runtime::Alt v1.0.8 {
+class Alien::Xrepo::Runtime::Alt v1.0.9 {
     field $base : param;
     field $pkg : reader(pkg_name) : param;
     method package_names ()      { $base->package_names }

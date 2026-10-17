@@ -191,4 +191,39 @@ sub petstore {
         'unknown mount options croak at registration');
 }
 
+# ---- a body with no Content-Length is read before it is validated --------------
+# HTTP/2 and /3 frame a body without a length. The mount used to read nothing
+# in that case: validation saw no body and passed, while the controller read
+# the real one through $c->req. And a declared length was reserved up front.
+{
+    package OaNoLen;
+    use Punk;
+    api {
+        openapi => '3.1.0', info => { title => 'T', version => '1' },
+        paths => { '/notes' => { post => {
+            operationId => 'addNote',
+            requestBody => { required => 0, content => { 'application/json' => {
+                schema => { type => 'object',
+                            properties => { n => { type => 'integer' } } } } } },
+            responses => { 200 => { description => 'ok' } },
+        } } },
+    } => { max_body_size => 0,
+           handlers => { addNote => sub { { body => $_[0]->openapi->{body} } } } };
+    package main;
+
+    my $app = OaNoLen->to_app;
+    my %h2  = (CONTENT_LENGTH => undef, 'psgix.input.buffered' => 1);
+    my $r = hit($app, method => 'POST', path => '/notes', body => '{"n":"x"}',
+                env => \%h2);
+    is($r->[0], 400, 'a body that arrives without a length is validated');
+    $r = hit($app, method => 'POST', path => '/notes', body => '{"n":5}',
+             env => \%h2);
+    is($r->[0], 200, '...and a valid one passes');
+    like($r->[2][0], qr/"n":5/, '...with its body in $c->openapi');
+    $r = hit($app, method => 'POST', path => '/notes', body => '{"n":1}',
+             env => { CONTENT_LENGTH => 2**33 });
+    is($r->[0], 200, 'a Content-Length far above what is sent is read, not reserved');
+    like($r->[2][0], qr/"n":1/, '...and what was sent is what was validated');
+}
+
 done_testing();

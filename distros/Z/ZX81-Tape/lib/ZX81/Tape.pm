@@ -4,13 +4,14 @@ use Modern::Perl;
 use Path::Tiny;
 use ZX81::Tokenize qw( tokenize_basic );
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Exporter qw(import);
 
 our @EXPORT_OK = qw(
   make_p
   dump_p
+  list_p
 );
 
 #------------------------------------------------------------------------------
@@ -239,7 +240,7 @@ my %zx81chars = (
 );
 
 #------------------------------------------------------------------------------
-# driver
+# make_p driver
 #------------------------------------------------------------------------------
 sub make_p {
     my ( $basic_filename, $p_filename ) = @_;
@@ -252,6 +253,9 @@ sub make_p {
     return;
 }
 
+#------------------------------------------------------------------------------
+# dump_p
+#------------------------------------------------------------------------------
 sub dump_p {
     my ( $p_filename, $dump_filename ) = @_;
     my $dump_fh;
@@ -305,6 +309,26 @@ sub dump_p {
         }
         return $text;
     };
+	my $dump = sub {
+		my($addr, $size, $text) = @_;
+		
+		printf $dump_fh "%04X        %s\n", $addr, $text;
+		for (my $i = 0; $i < $size; ) {
+			my $bytes_dump = "";
+			my $text_dump = "";
+			my $num_dumpped = 0;
+			for (my $j = 0; $j < 8 && $i + $j < $size; $j++) {
+				my $byte = $peek->($addr+$i+$j);
+				$num_dumpped++;
+				$bytes_dump .= sprintf("%02X ", $byte);
+				$text_dump .= $peek_text->($addr+$i+$j, 1)." ";
+				last if $byte == 0x76;
+			}
+			printf $dump_fh "%04X        %-26s  %s\n", 
+					$addr+$i, $bytes_dump, $text_dump;
+			$i += $num_dumpped;
+		}
+	};
 
     my $prog   = $sysvars{PROG};
     my $d_file = $dpeek->( $sysvars{D_FILE} );
@@ -319,27 +343,13 @@ sub dump_p {
     }
     for ( my $addr = $sysvars{VERSN} ; $addr < $prog ; $addr++ ) {
         if ( $addr == $sysvars{PRBUFF} ) {
-
-            # printer buffer
-            printf $dump_fh "%04X        %s\n", $addr,
-              $rev_sysvars{$addr} // "";
-            printf $dump_fh "      ";
-            for ( my $i = 0 ; $i < 33 ; $i++ ) {
-                printf $dump_fh "%02X ", $peek->( $addr + $i );
-            }
-            print $dump_fh "\n";
+			# printer buffer
+			$dump->($addr, 33, "PRBUFF");
             $addr += 33 - 1;
         }
         elsif ( $addr == $sysvars{MEMBOT} ) {
-
-            # calculator memory bottom
-            printf $dump_fh "%04X        %s\n", $addr,
-              $rev_sysvars{$addr} // "";
-            printf $dump_fh "      ";
-            for ( my $i = 0 ; $i < 30 ; $i++ ) {
-                printf $dump_fh "%02X ", $peek->( $addr + $i );
-            }
-            print $dump_fh "\n";
+			# memory calculator area
+			$dump->($addr, 30, "MEMBOT");
             $addr += 30 - 1;
         }
         elsif ( exists $rev_sysvars{ $addr + 1 } ) {
@@ -361,31 +371,131 @@ sub dump_p {
     for ( my $addr = $prog ; $addr < $d_file ; ) {
         my $line_num = $dpeek_be->($addr);
         my $size     = $dpeek->( $addr + 2 );
-        printf $dump_fh "%04X  %4d %s\n", $addr, $line_num,
-          $peek_text->( $addr + 4, $size - 1 );
-        $addr += $size +
-          4; # move to the next line (2 bytes for line number, 2 bytes for size)
+		$dump->($addr, 4+$size, 
+				"[$size] $line_num ".$peek_text->( $addr + 4, $size - 1 ));
+		# move to the next line (2 bytes for line number, 2 bytes for size)
+        $addr += $size + 4; 
     }
 
     # show D_FILE section
     print $dump_fh "\nD_FILE Section:\n";
-    for ( my $addr = $d_file ; $addr < $vars ; ) {
-        printf $dump_fh "%04X  ", $addr;
-        for ( ; $addr < $vars ; $addr++ ) {
-            printf $dump_fh "%02X ", $peek->($addr);
-            if ( $peek->($addr) == 0x76 ) {
-                last;
-            }
-        }
-        print $dump_fh "\n";
-        $addr++;
-    }
+	$dump->($d_file, $vars-$d_file, "D_FILE");
 
     # Show VARS section
     print $dump_fh "\nVARS Section:\n";
-    for ( my $addr = $vars ; $addr < $e_line ; $addr++ ) {
-        printf $dump_fh "%04X    %02X  \n", $addr, $peek->($addr);
+	$dump->($vars, $e_line-$vars, "VARS");
+}
+
+#------------------------------------------------------------------------------
+# list basic program
+#------------------------------------------------------------------------------
+sub list_p {
+	my($p_filename, $bas_filename) = @_;
+	
+    my $bas_fh;
+    if ( defined $bas_filename ) {
+        open( $bas_fh, ">", $bas_filename )
+          or die "error: open $bas_filename: $!\n";
     }
+    else {
+        $bas_fh = *STDOUT;
+    }
+
+    # load memory
+    my @mem = ( map { ord } split //, path($p_filename)->slurp_raw );
+
+    # memory access helpers
+    my $peek = sub {
+        my ($addr) = @_;
+        return $mem[ $addr - 0x4009 ];
+    };
+    my $dpeek = sub {
+        my ($addr) = @_;
+        return $mem[ $addr - 0x4009 ] | ( $mem[ $addr + 1 - 0x4009 ] << 8 );
+    };
+    my $dpeek_be = sub {
+        my ($addr) = @_;
+        return ( $mem[ $addr - 0x4009 ] << 8 ) | $mem[ $addr + 1 - 0x4009 ];
+    };
+	
+	# dump BASIC program
+	my $prog = $sysvars{PROG};
+	my $d_file = $dpeek->($sysvars{D_FILE});
+	for (my $addr = $prog; $addr < $d_file; ) {
+        my $line_num = $dpeek_be->($addr);
+        my $size     = $dpeek->( $addr + 2 );
+		printf $bas_fh "%5d ", $line_num;
+		
+		# rem line with possible binary data
+		if ($peek->($addr+4) == 0xEA) {	# REM
+			my $has_binary_data = 0;
+			for (my $i = 1; $i < $size-1; $i++) {
+				if (($peek->($addr+4+$i) & 0x40) == 0x40) {
+					$has_binary_data = 1;
+					last;
+				}
+			}
+			if ($has_binary_data) {
+				print $bas_fh "REM ";
+				for (my $i = 1; $i < $size-1; $i++) {
+					printf $bas_fh "\\%02X", $peek->($addr+4+$i);
+				}
+				print $bas_fh "\n";
+			}
+			else {
+				print $bas_fh " REM ";
+				for (my $i = 1; $i < $size-1; $i++) {
+					my $byte = $peek->($addr+4+$i);
+					if (($byte & 0x40) == 0 && exists $zx81chars{$byte}) {
+						print $bas_fh $zx81chars{$byte};
+					}
+					else {
+						printf $bas_fh "\\%02X", $byte;
+					}
+				}
+				print $bas_fh "\n";
+			}
+			
+			$addr += 4+$size;
+			next;
+		}
+		
+		# BASIC text
+		my $in_quote = 0;
+		for (my $i = 0; $i < $size-1; $i++) {
+			my $byte = $peek->($addr+4+$i);
+			if ($byte == 0x0B) {
+				$in_quote = !$in_quote;
+			}
+
+			if ($byte == 0xC0) {	# double quote
+				print $bas_fh "\\\"";
+			}
+			elsif ($byte == 0x7E) {	# number
+				$i += 5;
+			}
+			elsif ($in_quote && ($byte & 0x40) == 0x40) {
+				printf $bas_fh "\\%02X", $byte;
+			}
+			elsif (!$in_quote && $byte == 0) {
+				printf $bas_fh "\\%02X", $byte;	# space
+			}
+			elsif (exists $zx81chars{$byte}) {
+				my $code = $zx81chars{$byte};
+				if ($code =~ /^\w\w/) {
+					$code = " $code ";
+				}
+				printf $bas_fh $code;
+			}
+			else {
+				printf $bas_fh "\\%02X", $byte;
+			}
+		}
+		print $bas_fh "\n";
+
+		$addr += 4+$size;
+		next;
+	}
 }
 
 #------------------------------------------------------------------------------
@@ -671,9 +781,11 @@ ZX81::Tape - Create ZX81 tape image files
 
 =head1 SYNOPSIS
 
-    use ZX81::Tape qw(make_p);
+    use ZX81::Tape qw(make_p dump_p list_p);
+
     make_p($basic_filename, $p_filename);
-	dump_p($p_filename[, $dump_filename]);
+    dump_p($p_filename[, $dump_filename]);
+    list_p($p_filename[, $bas_filename]);
 
 =head1 DESCRIPTION
 
@@ -694,6 +806,13 @@ with the given file name.
 
 Reads the given binary tape image file and dumps its contents to the 
 standard output or a specified file with the given file name.
+
+=head2 list_p
+
+    list_p($p_filename[, $bas_filename]);
+
+Reads the given binary tape image file and generates a .bas text that 
+can be compiled back to the same .p result.
 
 =head1 SEE ALSO
 

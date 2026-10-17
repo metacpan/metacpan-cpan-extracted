@@ -7,7 +7,7 @@ use utf8;
 
 binmode STDOUT, ':encoding(UTF-8)';
 
-plan tests => 6;
+plan tests => 7;
 
 is convert_to_ascii(
     'Ýou hãve a nèw vòice-mãil'),
@@ -38,6 +38,11 @@ is convert_to_ascii(
     'Copyright © 2019 • Company Name ❪312❫ 555–1212 www·example·com “We´re the best in townǃ”'),
     'Copyright (C) 2019 * Company Name (312) 555-1212 www.example.com "We\'re the best in town!"',
     'Test symbols';
+
+# Input longer than the regex recursion limit (65534) must not die (issue #1)
+is convert_to_ascii('a' x 70000),
+    'a' x 70000,
+    'Test large input over 65534 characters';
 
 # Test japanese text
 

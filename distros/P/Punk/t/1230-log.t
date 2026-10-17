@@ -6,6 +6,8 @@ use FindBin ();
 use lib "$FindBin::Bin/lib";
 use Test::More;
 use File::Raw::JSON qw(file_json_decode);
+use Cwd ();
+use File::Temp ();
 
 # $c->log / $app->log: a level-based logger that honours psgix.logger, else
 # emits a readable (or JSON) line; a level threshold; the request's method/path.
@@ -420,6 +422,35 @@ sub logger {
       . 'mangle every non-ASCII value in the log to protect against nothing');
     like($line, qr/plain=ok/,
         'and a value needing no quoting is still emitted bare');
+}
+
+# ---- `to` names a handle before it names a file ---------------------------------
+# `to: STDERR` is what a YAML file says for the default. 0.59 opened a file of
+# that name in the working directory.
+{
+    my $cwd = Cwd::getcwd();
+    my $tmp = File::Temp->newdir;
+    chdir "$tmp" or die "chdir: $!";
+    package LName;
+    use Punk;
+    logging to => 'STDERR';
+    get '/x' => sub { $_[0]->log->info('named handle'); $_[0]->text('ok') };
+    package main;
+    my $napp = LName->to_app;
+    {
+        open my $save, '>&', \*STDERR or die;
+        open STDERR, '>', "$tmp/err.txt" or die;
+        my $b = '';
+        open my $in, '<', \$b;
+        $napp->({ REQUEST_METHOD => 'GET', PATH_INFO => '/x', QUERY_STRING => '',
+                  'psgi.input' => $in });
+        open STDERR, '>&', $save or die;
+    }
+    ok(!-e "$tmp/STDERR", 'logging to => "STDERR" opens no file of that name');
+    open my $fh, '<', "$tmp/err.txt" or die;
+    my $got = do { local $/; <$fh> };
+    like($got, qr/named handle/, '...the line went to the handle');
+    chdir $cwd or die;
 }
 
 done_testing;

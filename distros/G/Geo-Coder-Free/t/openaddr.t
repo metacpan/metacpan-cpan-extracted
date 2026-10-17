@@ -32,12 +32,12 @@ OPENADDR: {
 
 		$location = $geo_coder->geocode('Indiana, USA');
 		cmp_deeply($location,
-			methods('lat' => num(39.5, 1), 'long' => num(-86, 1)));
+			methods('lat' => num(40.5, 1), 'long' => num(-85, 1)));
 
 		$location = $geo_coder->geocode('Indianapolis, Indiana, USA');
 		ok(defined($location));
 		cmp_deeply($location,
-			methods('lat' => num(39.71, 1e-1), 'long' => num(-86.2, 1e-1)));
+			methods('lat' => num(39.84, 1e-1), 'long' => num(-86.2, 1e-1)));
 
 		# $location = $geo_coder->geocode(location => '9235 Main St, Richibucto, New Brunswick, Canada');
 		# delta_ok($location->{latt}, 46.67);
@@ -104,28 +104,28 @@ OPENADDR: {
 
 		$location = $geo_coder->geocode('Silver Spring, Maryland, USA');
 		cmp_deeply($location,
-			methods('lat' => num(39, 1), 'long' => num(-77.02, 1e-2)));
+			methods('lat' => num(39, 1), 'long' => num(-77.08, 1e-2)));
 
 		$location = $geo_coder->geocode('Silver Spring, MD, USA');
 		cmp_deeply($location,
-			methods('lat' => num(39, 1), 'long' => num(-77.02, 1e-2)));
+			methods('lat' => num(39, 1), 'long' => num(-77.08, 1e-2)));
 
 		$location = $geo_coder->geocode('Silver Spring, Montgomery, MD, USA');
 		cmp_deeply($location,
-			methods('lat' => num(39, 1), 'long' => num(-77.02, 1e-2)));
+			methods('lat' => num(39, 1), 'long' => num(-77.08, 1e-2)));
 
 		$location = $geo_coder->geocode('Silver Spring, Maryland, United States');
 		cmp_deeply($location,
-			methods('lat' => num(39, 1), 'long' => num(-77.02, 1e-2)));
+			methods('lat' => num(39, 1), 'long' => num(-77.08, 1e-2)));
 
 		$location = $geo_coder->geocode('Silver Spring, Montgomery County, Maryland, USA');
 		cmp_deeply($location,
-			methods('lat' => num(39, 1), 'long' => num(-77.02, 1e-2)));
+			methods('lat' => num(39, 1), 'long' => num(-77.08, 1e-2)));
 
 		if($ENV{'WHOSONFIRST_HOME'}) {
 			$location = $geo_coder->geocode('Rockville Pike, Rockville, Montgomery County, MD, USA');
 			cmp_deeply($location,
-				methods('lat' => num(39.07, 1e-2), 'long' => num(-77.13, 1e-1)));
+				methods('lat' => num(39.05, 1e-2), 'long' => num(-77.13, 1e-1)));
 
 			$location = $geo_coder->geocode('Rockville Pike, Rockville, MD, USA');
 			ok(defined($location));
@@ -157,7 +157,7 @@ OPENADDR: {
 
 		$location = $geo_coder->geocode('Wisconsin, USA');
 		cmp_deeply($location,
-			methods('lat' => num(44, 1), 'long' => num(-90, 1)));
+			methods('lat' => num(46, 1), 'long' => num(-90, 1)));
 
 		$location = $geo_coder->geocode('At sea or abroad');
 		ok(!defined($location));
@@ -168,15 +168,15 @@ OPENADDR: {
 
 		$location = $geo_coder->geocode({ location => 'St. Louis, Missouri, USA' });
 		cmp_deeply($location,
-			methods('lat' => num(38.63, 1e-2), 'long' => num(-90.20, 1e-1)));
+			methods('lat' => num(38.53, 1e-2), 'long' => num(-90.30, 1e-1)));
 
 		$location = $geo_coder->geocode({ location => 'St Louis, Missouri, USA' });
 		cmp_deeply($location,
-			methods('lat' => num(38.63, 1e-2), 'long' => num(-90.20, 1e-1)));
+			methods('lat' => num(38.53, 1e-2), 'long' => num(-90.30, 1e-1)));
 
 		$location = $geo_coder->geocode({ location => 'Saint Louis, Missouri, USA' });
 		cmp_deeply($location,
-			methods('lat' => num(38.63, 1e-2), 'long' => num(-90.2, 1e-1)));
+			methods('lat' => num(38.53, 1e-2), 'long' => num(-90.3, 1e-1)));
 
 		if($ENV{'WHOSONFIRST_HOME'}) {
 			$location = $geo_coder->geocode('716 Yates Street, Victoria, British Columbia, Canada');

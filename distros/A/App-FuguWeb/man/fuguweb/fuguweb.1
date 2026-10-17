@@ -137,12 +137,19 @@ the first one that is not.
 It runs
 .Xr mandoc 1
 in lint mode over every mdoc source, and a warning fails the build.
-It then writes the stylesheet, the assets, each key directory, each
-page, and one page for each manual.
+It then writes the stylesheet, the assets and each key directory.
+It writes each page into each language tree, and then the pages of the
+top level: the copy of
+.Pa 404.html
+when the description holds that page, and the forward
+.Pa index.html .
+Next it writes one page for each manual into each tree.
 Last, it removes every file of the site that the description no longer
 names, so a second build over one directory gives the same tree as the
 first.
 See
+.Sx THE PAGE LAYOUT
+and
 .Sx THE OUTPUT DIRECTORY .
 .It Cm check Oo Fl v Oc Op Fl Fl out Ar dir
 Check a built site.
@@ -150,15 +157,55 @@ The command prints one line for each problem and exits with status 5.
 It prints nothing and exits with status 0 when the site is good.
 .Pp
 The checks are these:
-every page and asset of the site exists and is not empty;
-every page has a title and carries the whole navigation;
-every local link, manual cross-reference, and fragment resolves;
-no reference starts with a solidus, uses a
+.Bl -bullet
+.It
+Every page and asset of the site exists and is not empty.
+.It
+On every page but the forward
+.Pa index.html ,
+the check finds a title, the banner link and the whole navigation.
+.It
+Each of those links takes the form of the kind of its page:
+.Pa <page>
+on a tree page,
+.Pa ../en/<page>
+on the key page, and
+.Pa en/<page>
+on the copy of
+.Pa 404.html
+at the top level.
+An absolute URL and a fragment stay as they stand.
+.It
+Every tree page carries the code of its tree as
+.Ql lang .
+.It
+The forward
+.Pa index.html
+holds a meta refresh to the entry page of
+.Pa en/ .
+Its one reference is a link to that page, and it holds no navigation.
+.It
+Every local link, manual cross-reference, and fragment resolves.
+.It
+No reference uses a
 .Ql file\&:
-URL, or reads as a URL scheme;
-every page is reachable from the entry page, except a page marked
-.Ic unlinked ;
-and the output holds the site and nothing else, at any depth.
+URL, or reads as a URL scheme.
+.It
+No reference starts with a solidus.
+The one exception is the
+.Ql <base href="/">
+of the copy of
+.Pa 404.html
+at the top level, and that page must carry it.
+.It
+Every page of each language tree is reachable from the entry page of
+that tree, except a page marked
+.Ic unlinked .
+The pages of the top level and the key page take no such walk.
+.It
+The output holds the site and nothing else, at any depth.
+.El
+.Pp
 A description with a
 .Ic keys
 block adds the checks of
@@ -178,8 +225,10 @@ See
 With
 .Fl Fl out
 the command runs without a loadable description.
-It then knows one flat directory of files, and it refuses a target that
-holds no stylesheet, because every build writes one.
+It then knows the files of the top level and the language trees, by
+their shape.
+It refuses a target that holds no stylesheet, because every build
+writes one.
 .It Xo Cm mint-key
 .Fl Fl purpose Ar word
 .Op Fl Fl type Ar type
@@ -301,8 +350,12 @@ at the project root.
 A setting is one
 .Ar name No = Ar value
 line.
-A block opens with its type, a quoted name, and a brace, and closes
-with a brace on a line of its own.
+A block opens with its type, a name, and a brace, and closes with a
+brace on a line of its own.
+A name that holds whitespace takes double quotes.
+A block with a language code in front of its name is a translation, and
+.Sx LANGUAGES
+states its rules.
 A
 .Ql #
 starts a comment, and no value can hold one.
@@ -313,12 +366,6 @@ The settings are as follows:
 The name of the site.
 It ends the title of every page, and it is the text of the banner link.
 This is the one required setting.
-.It Ic lang
-The
-.Ql lang
-attribute of every page.
-The default is
-.Ql en .
 .It Ic out_dir
 The output directory.
 The default is
@@ -328,7 +375,8 @@ The source directory.
 The default is
 .Pa web .
 .It Ic entry
-The front page, and the target of the banner link.
+The front page of each language tree, and the target of the banner
+link.
 The default is
 .Pa index.html .
 .It Ic module_root
@@ -353,11 +401,14 @@ A path setting must not step out of the project.
 The block types are as follows:
 .Bl -tag -width Ds
 .It Ic nav Qq Ar href
-One navigation entry, on every page, in file order.
+One navigation entry, in file order.
+Every page carries it, except the forward
+.Pa index.html
+at the top level.
 The block must set a
 .Ic label .
 .It Ic page Qq Ar file
-One page of the site, named by its file in the output directory.
+One page of each language tree, named by its file in the tree.
 The name must be one path segment.
 The block sets a
 .Ic title ,
@@ -369,21 +420,27 @@ An HTML body fragment in the source directory.
 A Markdown file, relative to the project root.
 .It Ic index No = Cm yes
 The generated manual index.
+The page can also set a
+.Ic body ,
+which opens the index below its heading.
 .El
 .Pp
 .Ic unlinked No = Cm yes
 marks a page that no other page links to, such as
 .Pa 404.html ,
 and the reachability check skips it.
-.It Ic manuals Qq Ar heading
+.It Ic manuals Ar name
 One group of
 .Xr mdoc 7
 manuals.
-The block must set
-.Ic dir ,
-the directory of the sources, and
-.Ic anchor ,
+The name is one word of lowercase letters, digits and hyphens, and it is
 the fragment identifier of the group on the index page.
+Two groups must not share a name.
+The block must set
+.Ic heading ,
+the text of the heading of the group, and
+.Ic dir ,
+the directory of the sources.
 An optional
 .Ic namespace
 prefixes each manual name, so
@@ -392,12 +449,15 @@ with the namespace
 .Ql Fugu:\&:
 becomes
 .Ql Fugu::Daemon(3p) .
-.It Ic modules Qq Ar heading
+.It Ic modules Ar name
 One group of POD sidecars.
+The name follows the rules of a
+.Ic manuals
+name.
 The block must set
-.Ic dir
+.Ic heading
 and
-.Ic anchor ,
+.Ic dir ,
 and
 .Ic dir
 must lie below
@@ -411,17 +471,158 @@ See
 .El
 .Pp
 The load fails when a block names no source or two sources, when two
-blocks name one page, when a group directory does not exist, or when
-the source directory holds a symlink.
+blocks name one page, or when a group directory does not exist.
+A symlink at the top level of the source directory fails the load.
+A symlink below the source directory on the path of a fragment that the
+build reads fails it too.
+A group block that sets
+.Ic anchor ,
+or whose name is a heading text, fails the load.
+The message names the block to write in its place, such as
+.Ql write manuals commands with heading = Commands, and no anchor .
 Every message names the file and the block at fault.
+.Sh LANGUAGES
+English is the default language, and its code is
+.Ql en .
+A translation is a block with a language code in front of its name.
+The code is two lowercase letters, per ISO 639-1.
+The block translates the block of one argument of the same type and
+name:
+.Bd -literal -offset indent
+page "index.html" {
+	title = Home
+	body  = index.body.html
+}
+
+page de "index.html" {
+	title = Start
+	body  = de/index.body.html
+}
+
+manuals commands {
+	heading = Commands
+	dir     = man/fuguweb
+}
+
+manuals de commands {
+	heading = Befehle
+	dir     = man/de/fuguweb
+}
+.Ed
+.Pp
+The languages of a site are
+.Ql en
+and each code that a translation names.
+The build writes one tree for each language, and each tree holds the
+same pages.
+A
+.Ic page ,
+a
+.Ic nav ,
+a
+.Ic manuals
+and a
+.Ic modules
+block can take a translation:
+.Bl -tag -width "manuals, modules" -offset indent
+.It Ic page
+.Ic title ,
+.Ic body
+and
+.Ic markdown .
+.It Ic nav
+.Ic label .
+.It Ic manuals , modules
+.Ic heading
+and
+.Ic dir .
+.El
+.Pp
+A page of a language takes each value of its translation, and the value
+of the default block where the translation holds none.
+A page whose body comes from the default source carries
+.Ql lang="en"
+on the element that holds the body.
+The index page marks each part on its own element instead: the title,
+the
+.Ic body ,
+each group heading and each manual description.
+On another tree, each part of the default language carries
+.Ql lang="en" .
+.Pp
+The
+.Ic dir
+of a group translation mirrors the default
+.Ic dir .
+A manual of a language comes from the file of the same relative path in
+that directory, and from the default source when the directory holds no
+such file.
+A
+.Ic modules
+translation mirrors the umbrella sidecar as well.
+A manual keeps the page name of its default source in every language.
+.Pp
+The load fails when a code has another shape, or is
+.Ql en .
+It fails when a translation names no default block of its type, when it
+comes twice for one name and one language, or when it sets a setting
+outside its list.
+It fails when a manual source of a translation
+.Ic dir
+has no source of the same path in the default
+.Ic dir .
+A
+.Ic keys
+block and a
+.Ic key
+block take no translation.
 .Sh THE PAGE LAYOUT
 Every source becomes one HTML body fragment, and the build wraps each
 fragment in one fixed layout: the head, a banner, the navigation, the
 fragment, and a footer.
-A project decides the site name, the language, the navigation, and the
-footer prose.
+A project decides the site name, the navigation, and the footer prose.
 .Pp
-The title of a page is its own title, an em dash, and the site name.
+Every page of the description sits in the tree of its language, below
+.Pa <code>/
+of the output.
+English is the default language, and its tree
+.Pa en/
+holds every page of the description.
+The
+.Ql html
+element of a page carries the code of its tree as
+.Ql lang .
+The banner and the navigation of a tree page name each page of the
+tree by its file name.
+An absolute URL stays as it stands.
+After the navigation entries, a tree page links the same page in each
+other language of the site, as
+.Pa ../<code>/<page> .
+The code is the text and the
+.Ql hreflang
+of each link.
+A site of one language carries no such link.
+.Pp
+The top level holds two pages for the host.
+The forward
+.Pa index.html
+leads to the entry page of
+.Pa en/
+with a meta refresh, and holds one link to it.
+Its title is the site name alone.
+It carries no banner, no navigation and no footer, and it loads no
+stylesheet.
+When the description holds the page
+.Pa 404.html ,
+the top level holds one more copy of it, with
+.Ql <base href="/"> .
+A host serves that copy at each path that no file answers, and each
+relative link of the page resolves from the root of the origin.
+Its banner and its navigation therefore link
+.Pa en/<page> .
+.Pp
+On every page but the forward, the title is the title of the page, an
+em dash, and the site name.
 The banner links the site name to the entry page.
 The navigation lists each
 .Ic nav
@@ -429,14 +630,22 @@ block, in file order.
 .Pp
 A
 .Pa footer.body.html
-in the source directory becomes the footer prose.
+in the source directory becomes the footer prose of each tree page.
+A language takes its own footer from
+.Pa <code>/footer.body.html
+in the source directory, and the default one when it has none.
+The key page and the pages of the top level carry no footer.
 A project without one gets no footer element.
 .Pp
 The base stylesheet ships with the tool as
 .Pa share/fuguweb/style.css .
 The build copies it to
 .Pa style.css
-in the output directory, and every page links it under that name.
+at the top level of the output, outside every tree.
+A tree page and the key page link it as
+.Pa ../style.css ,
+and the copy of the 404 page links it as
+.Pa style.css .
 The
 .Ic stylesheet
 setting names another sheet.
@@ -492,13 +701,14 @@ The index page is the
 .Ic page
 block with
 .Ic index No = Cm yes .
-It opens with a paragraph that names the manual host.
-A
-.Pa manuals.body.html
-in the source directory replaces that paragraph.
-Each group then adds one heading with its
-.Ic anchor ,
-and one list of its manuals.
+Its heading is the title of the page, and its
+.Ic body ,
+when it sets one, follows the heading.
+The index writes no prose of its own.
+Each group then adds one heading, with the group name as its fragment
+identifier and the
+.Ic heading
+of the language as its text, and one list of its manuals.
 Each entry links the page and shows the one-line description, from the
 first
 .Ic \&Nd
@@ -522,23 +732,55 @@ and
 therefore need no entry in the description, and notes for the
 maintainers are not published.
 .Pp
-The build rejects a symlink in the source directory.
-A copy would publish the bytes of the target, from anywhere on the
-machine.
+The build copies each asset to the top level of the output, outside
+every language tree.
+A tree page sits one directory below the top level.
+A body fragment, a Markdown page and the footer of a tree page
+therefore link an asset as
+.Pa ../<asset> .
+.Pp
+The body of
+.Pa 404.html
+is the one exception.
+The build writes it into each tree, and into the copy at the top level.
+The check resolves each link of that copy against the top level, so
+there it refuses
+.Pa ../<asset> .
+Each relative link of an asset fails in one of the two copies, and a
+link that starts with a solidus fails in both.
+The body fragment or Markdown page of
+.Pa 404.html
+must therefore link an asset with an absolute URL, such as
+.Ql https://example.org/logo.png .
+.Pp
+The build rejects a symlink at the top level of the source directory.
+It also rejects a symlink on the path of each fragment that it reads.
+The rule holds for the file, and for each directory between the source
+directory and the file.
+These fragments are the body fragment of each page in each language,
+the footer, and the footer of each language.
+An asset or a fragment would publish the bytes of the target, from
+anywhere on the machine.
 .Sh THE OUTPUT DIRECTORY
-The output is one flat directory of files.
-The key directory and the well-known tree are the only parts below the
+The top level of the output holds the two pages for the host, the
+stylesheet and the assets.
+Each language tree is one flat directory of pages below it.
+The key directory and the well-known tree are the other parts below the
 top level.
 .Pp
 The build writes plain files only.
 It refuses a symlink on any path that it writes, before it writes one
 file.
-It owns a plain file at the top level, a file that the site names, and
-a file that has a shape of the key directory.
-It keeps every other entry, reports it, and never removes it.
+It owns a plain file at the top level, and a plain file directly in a
+directory of the top level whose name has the shape of a language code.
+It also owns a file that the site names, and a file that has a shape of
+the key directory.
+A page of an older flat layout, and the tree of a language that the
+description dropped, are therefore removed.
+The build keeps every other entry, reports it, and never removes it.
 .Cm clean
-removes what the build owns, and a directory of the site or of the key
-tree.
+removes what the build owns, and a directory of the site, of a language
+tree, or of the key tree.
 It refuses every other entry, and names it, so it never removes a file
 that the build keeps.
 .Pp
@@ -554,8 +796,8 @@ The output directory of the description is the one exception, because
 the default output directory sits inside the default source directory.
 .Pp
 The build stages every manual source in
-.Pa .man
-inside the output directory, so that
+.Pa .man/<code>
+inside the output directory, one directory for each language, so that
 .Xr mandoc 1
 resolves a cross-reference against the manuals of the site.
 The build removes the staging directory when it ends.
@@ -594,6 +836,8 @@ key "fugubsd-1-release" {
 .Pp
 The block name is the directory, one path segment below the source
 directory.
+A name of two lowercase letters is refused, because a language tree
+takes a name of that shape in the output.
 The settings are as follows:
 .Bl -tag -width "contact" -offset indent
 .It Ic org
@@ -698,6 +942,10 @@ The human page, with the serial, purpose, type, status, fingerprint,
 dates and bindings of each key.
 The row of a certificate names its subject and its validity dates
 beside the fingerprint.
+The page is a page of the default language: its banner and its
+navigation link
+.Pa ../en/<page> ,
+and it carries no footer.
 .It Pa .well-known/openpgpkey/hu/<hash>
 The Web Key Directory file of each email address.
 The file holds the keys of that address of every directory, in
@@ -1002,8 +1250,8 @@ The site description, at the project root.
 The base stylesheet, which ships with the tool.
 .It Pa web/footer.body.html
 The footer prose, in the default source directory.
-.It Pa web/manuals.body.html
-The opening of the manual index, in the default source directory.
+.It Pa web/<code>/footer.body.html
+The footer prose of one language.
 .It Pa web/build/.man
 The staging directory of the build, in the default output directory.
 .El

@@ -454,6 +454,12 @@ static void *hm_tls_ctx_build(pTHX_ const char *cert, const char *key,
                 hm_errlog("Hyperman TLS: SNI host '%s' needs cert and key\n", host);
                 continue;
             }
+            if (strlen(host) != (size_t)klen) {
+                /* a NUL inside the key: strdup stops at it and the fold
+                 * below would write klen bytes past the copy */
+                hm_errlog("Hyperman TLS: SNI host key carries a NUL; skipped\n");
+                continue;
+            }
             hctx = hm_tls_ctx_one(hc, hk, ca, verify, alpn_h2, tkey, tkeylen, 0);
             if (!hctx) continue;
             lchost = strdup(host);
@@ -586,6 +592,9 @@ static void hm_tls_conn_free(hm_conn *c) {
         else           SSL_shutdown((SSL *)c->ssl);
         SSL_free((SSL *)c->ssl);
         c->ssl = NULL;
+        /* a shutdown on a reset socket leaves errors queued, and the queue
+         * is per thread: the application's own OpenSSL use would read them */
+        ERR_clear_error();
     }
 }
 
@@ -747,6 +756,12 @@ static void *hm_tls_ctx_build(pTHX_ const char *cert, const char *key,
 }
 static int  hm_tls_get_ticket_key(void *ctx, unsigned char *buf, size_t *len)
     { (void)ctx; (void)buf; (void)len; return 0; }
+static void *hm_tls_quic_ctx_build(const char *cert, const char *key,
+                                   const char *ca, int verify,
+                                   const unsigned char *tkey, size_t tkeylen) {
+    (void)cert; (void)key; (void)ca; (void)verify; (void)tkey; (void)tkeylen;
+    return 0;
+}
 static int  hm_tls_sni_count(void *ctx) { (void)ctx; return -1; }
 static void hm_tls_ctx_free(void *ctx) { (void)ctx; }
 static int  hm_tls_wrap(hm_conn *c, void *ctx) { (void)c; (void)ctx; return -1; }

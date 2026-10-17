@@ -5,9 +5,7 @@ use warnings;
 
 use Test::RequiresInternet;
 use Test::Most tests => 32;
-
-use lib 't/lib';
-use MyLogger;
+use Test::Log::Abstraction;
 
 BEGIN {
 	use_ok('Locale::Places');
@@ -16,7 +14,7 @@ BEGIN {
 TRANSLATE: {
 	my $places;
 	if($ENV{'TEST_VERBOSE'}) {
-		$places = new_ok('Locale::Places' => [logger => MyLogger->new()]);
+		$places = new_ok('Locale::Places' => [logger => Test::Log::Abstraction->new()]);
 	} else {
 		$places = new_ok('Locale::Places');
 	}

@@ -92,6 +92,10 @@ alone names the C<contact> and the C<expires> of the site.
     .well-known/openpgpkey/policy
     .well-known/security.txt            RFC 9116
 
+The human page is a page of the default language. Its chrome links the
+tree of C<en> as F<< ../en/<page> >>, it links the stylesheet as
+F<../style.css>, and it carries no footer.
+
 The two well-known paths sit at the site root, because a reader asks
 for the registered path and never for one below the key directory.
 The site holds one such tree, and every key directory writes into it.

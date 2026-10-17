@@ -395,6 +395,15 @@ my %LEDGER = (
 	'table-snip: caption present when provided'        => 1,
 	'table-snip: XSS headers escaped'                  => 1,
 	'table-snip: XSS cells escaped'                    => 1,
+
+	# categorical_schemes / palette / colour_at
+	'palette: categorical_schemes lists the schemes'   => 1,
+	'palette: palette returns the scheme colours'      => 1,
+	'palette: palette returns a copy'                  => 1,
+	'palette: colour_at cycles the palette'            => 1,
+	'palette: die unknown scheme'                      => 1,
+	'palette: colour_at die unknown scheme'            => 1,
+	'palette: colour_at die bad index'                 => 1,
 );
 
 # Marks a ledger entry as verified.  Calling with an unknown key catches typos.
@@ -1794,6 +1803,50 @@ subtest 'render_table_snippet() -- XSS escaping' => sub {
 
 	like($html, qr/&lt;em&gt;cell&lt;\/em&gt;/, 'HTML tags in cell escaped');
 	mark('table-snip: XSS cells escaped');
+};
+
+# ─────────────────────────────────────────────────────────────────────────────
+# categorical_schemes() / palette() / colour_at()
+#
+# The Perl view of the categorical colour schemes, which is what a map or any
+# other renderer colours the same data with.  t/palette.t holds these palettes
+# to D3's published schemes and holds every chart to this definition; here the
+# documented contract of the three accessors is exercised.
+# ─────────────────────────────────────────────────────────────────────────────
+
+subtest 'the categorical palettes, read from Perl' => sub {
+	my $chart = HTML::D3->new(title => 'Palette');
+
+	is_deeply(HTML::D3->categorical_schemes(),
+		['category10', 'paired', 'set2', 'set3', 'tableau10'],
+		'categorical_schemes() lists the five schemes D3 publishes, sorted');
+	mark('palette: categorical_schemes lists the schemes');
+
+	my $colours = $chart->palette('tableau10');
+	isa_ok($colours, 'ARRAY', q{palette('tableau10')});
+	is(scalar(@$colours), 10, 'and holds the ten colours D3 gives that scheme');
+	mark('palette: palette returns the scheme colours');
+
+	push @$colours, '#000000';
+	is(scalar @{$chart->palette('tableau10')}, 10,
+		'a caller that pushes onto the arrayref is given a copy, not the palette');
+	mark('palette: palette returns a copy');
+
+	is($chart->colour_at('set2', 8), $chart->palette('set2')->[0],
+		'index 8 of an eight colour scheme wraps to colour 0, as d3.scaleOrdinal does');
+	mark('palette: colour_at cycles the palette');
+
+	throws_ok { $chart->palette('Tableau10') } qr/\QUnknown scheme: Tableau10\E/,
+		q{palette() dies on a name that is not a scheme, rather than answering with the default};
+	mark('palette: die unknown scheme');
+
+	throws_ok { $chart->colour_at('Tableau10', 0) } qr/\QUnknown scheme: Tableau10\E/,
+		'colour_at() names the scheme it does not know';
+	mark('palette: colour_at die unknown scheme');
+
+	throws_ok { $chart->colour_at('set2', -1) } qr/^Colour index must be a non-negative integer/,
+		'colour_at() dies on an index that is not a non-negative integer';
+	mark('palette: colour_at die bad index');
 };
 
 # ─────────────────────────────────────────────────────────────────────────────

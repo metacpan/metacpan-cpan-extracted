@@ -4,9 +4,22 @@ use 5.020;
 use strict;
 use warnings;
 
-use Types::Common -types;
-use Marlin
-    'behavior==' => Str;  # rw attribute, no init_arg (set by subclasses)
+use Object::Proto ();
+
+BEGIN {
+    Object::Proto::define('Claude::Agent::Permission::Result',
+        'behavior:Str',
+    );
+}
+
+sub to_hash {
+    my ($self) = @_;
+    return { behavior => $self->behavior };
+}
+
+1;
+
+__END__
 
 =head1 NAME
 
@@ -14,30 +27,28 @@ Claude::Agent::Permission::Result - Base class for permission results
 
 =head1 DESCRIPTION
 
-Base class for permission results in the Claude Agent SDK.
+Base class for the answers a C<can_use_tool> callback returns. Use
+L<Claude::Agent::Permission::Result::Allow> or
+L<Claude::Agent::Permission::Result::Deny>, usually through
+C<Claude::Agent::Permission-E<gt>allow> and C<-E<gt>deny>.
 
-=head2 ATTRIBUTES
+=head1 ATTRIBUTES
 
-=over 4
+=head2 behavior
 
-=item * behavior - The permission behavior ('allow' or 'deny')
+C<allow> or C<deny>. Set by the subclass.
 
-=back
+=head1 METHODS
 
-=head2 METHODS
+=head2 new
 
-=head3 to_hash
+Takes a flat list of name/value pairs. Unknown names are ignored.
 
-    my $hash = $result->to_hash();
+=head2 to_hash
 
-Convert the result to a hash for JSON serialization.
+    my $hash = $result->to_hash;
 
-=cut
-
-sub to_hash {
-    my ($self) = @_;
-    return { behavior => $self->behavior };
-}
+The result in the shape the CLI expects.
 
 =head1 AUTHOR
 
@@ -50,5 +61,3 @@ This software is Copyright (c) 2026 by LNATION.
 This is free software, licensed under The Artistic License 2.0 (GPL Compatible).
 
 =cut
-
-1;

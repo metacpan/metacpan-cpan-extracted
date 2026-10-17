@@ -2,17 +2,17 @@ package Claude::Agent::MCP;
 use 5.020;
 use strict;
 use warnings;
-use Types::Common -types;
 use Claude::Agent::MCP::ToolDefinition;
 use Claude::Agent::MCP::Server;
 use Claude::Agent::MCP::StdioServer;
 use Claude::Agent::MCP::SSEServer;
 use Claude::Agent::MCP::HTTPServer;
-use Claude::Agent::MCP::SDKServer;
-use Claude::Agent::MCP::SDKRunner;
+use Claude::Agent::MCP::SDKBridge;
+
 1;
 
 __END__
+
 
 =encoding utf8
 
@@ -293,31 +293,15 @@ Use C<< $server->tool_names >> to get all full names:
 
 =head1 ARCHITECTURE
 
-When you use an SDK MCP server, the following happens:
-
-    ┌─────────────────┐
-    │  Your Perl App  │
-    │                 │
-    │  ┌───────────┐  │    Unix Socket    ┌─────────────┐
-    │  │ SDKServer │◄─┼──────────────────►│ SDKRunner   │
-    │  │ (handler) │  │                   │ (MCP proto) │
-    │  └───────────┘  │                   └──────┬──────┘
-    │                 │                          │ stdio
-    └─────────────────┘                          │
-                                                 ▼
-                                          ┌─────────────┐
-                                          │ Claude CLI  │
-                                          └─────────────┘
-
-1. Your app creates an SDKServer with tool handlers
-2. SDKServer spawns SDKRunner as a child process
-3. Claude CLI connects to SDKRunner via stdio (MCP protocol)
-4. When Claude calls a tool, SDKRunner forwards via Unix socket
-5. SDKServer executes your handler and returns the result
-6. Result flows back through SDKRunner to Claude
-
-This architecture allows handlers to run in your process with full access
-to application state, while still integrating with the MCP protocol.
+An SDK server runs inside your process. The query tells the CLI, through
+C<--mcp-config>, that the server is of type C<sdk>; the CLI then sends every
+MCP request for it (the handshake, C<tools/list>, C<tools/call>) back over
+the SDK control channel as a C<mcp_message> control request, and
+L<Claude::Agent::MCP::SDKBridge> answers it from your tool handlers.
+Nothing is spawned and no socket is opened, so a handler sees your
+application state directly. A handler may return a L<Future> and is given
+the event loop; a call that outruns C<CLAUDE_AGENT_TOOL_TIMEOUT> (default
+60 seconds, at most 300) is answered with an error result.
 
 =head1 EXTERNAL MCP SERVERS
 

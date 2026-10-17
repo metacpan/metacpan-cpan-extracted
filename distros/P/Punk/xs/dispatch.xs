@@ -49,6 +49,7 @@ _oa_dispatch(c, before, rec, api, op_id, caps, max_body)
         rech = (HV *)SvRV(rec);
         punk_oa_dispatch(aTHX_ c, before_av, rech, api, op_id, caps,
                          max_body, &ret, &err);
+        SP = PL_stack_base + ax - 1;      /* hooks and the controller ran */
         EXTEND(SP, 2);
         PUSHs(ret == &PL_sv_undef ? ret : sv_2mortal(ret));
         PUSHs(err == &PL_sv_undef ? err : sv_2mortal(err));

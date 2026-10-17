@@ -1,0 +1,399 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use FindBin qw($RealBin);
+use lib "$RealBin/../lib";
+use App::MCP::CLI;
+
+if (@ARGV && $ARGV[0] =~ /^(--version|-V)$/) {
+    printf "mcpcli %s\n", $App::MCP::CLI::VERSION;
+    exit 0;
+}
+
+App::MCP::CLI->run;
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+mcpcli - Command-line client for Model Context Protocol (MCP) servers
+
+=head1 VERSION
+
+This script is distributed as part of L<App::MCP::CLI> v0.0.1.
+
+=head1 SYNOPSIS
+
+    mcpcli <command> [options]
+
+    # List all servers defined in the config file
+    mcpcli servers --config server_config.json
+
+    # List all tools exposed by a server
+    mcpcli list --config server_config.json --server perl-math-server
+
+    # Call a specific tool with inline arguments
+    mcpcli call add_numbers --config server_config.json --server perl-math-server a=10 b=5
+
+    # Call a tool interactively (prompted for arguments)
+    mcpcli call add_numbers --config server_config.json --server perl-math-server
+
+    # Start an interactive agent chat session
+    mcpcli interactive --config server_config.json --server perl-math-server
+
+    # Alias: chat and interactive are identical
+    mcpcli chat --config server_config.json --server perl-math-server
+
+    # Print version
+    mcpcli --version
+    mcpcli -V
+    mcpcli version
+
+    # Built-in help
+    mcpcli help
+    mcpcli help <command>
+
+=head1 DESCRIPTION
+
+C<mcpcli> is a Perl implementation of a command-line client for servers that
+implement the B<Model Context Protocol (MCP)> - a JSON-RPC 2.0-based protocol
+for exposing callable tools to AI agents and other automation clients.
+
+It provides a suite of sub-commands for discovering, inspecting, and invoking
+MCP tools, as well as an interactive agent shell that routes natural-language
+queries through a local LLM (currently Ollama) to the appropriate tool.
+
+=head1 COMMANDS
+
+=over 4
+
+=item B<servers>
+
+List all servers defined in the configuration file.
+
+    mcpcli servers [--config <file>]
+
+=item B<list>
+
+List all tools exposed by a specific MCP server.
+
+    mcpcli list [--server <name>] [--config <file>] [--timeout <seconds>]
+
+=item B<call>
+
+Invoke a specific tool on an MCP server.  Arguments may be supplied inline as
+C<key=value> pairs, or omitted to enter interactive mode where the tool's input
+schema is inspected and the user is prompted for each required field.
+
+    mcpcli call <tool_name> [key=value ...] [--server <name>] [--config <file>] [--timeout <seconds>]
+
+=item B<interactive> (alias: B<chat>)
+
+Start an agent-style REPL that accepts natural-language queries, routes them
+through a local Ollama LLM, and executes the appropriate MCP tool.  Results are
+summarised by the LLM before being displayed.
+
+    mcpcli interactive [--server <name>] [--provider <name>] [--model <name>] [--config <file>] [--timeout <seconds>]
+    mcpcli chat        [--server <name>] [--provider <name>] [--model <name>] [--config <file>] [--timeout <seconds>]
+
+=item B<version>
+
+Print the installed version of C<mcpcli> and exit.
+
+    mcpcli version
+
+=item B<help>
+
+Display help for the application or a specific sub-command.
+
+    mcpcli help
+    mcpcli help <command>
+
+=item B<commands>
+
+List all available sub-commands.
+
+    mcpcli commands
+
+=back
+
+=head1 GLOBAL OPTIONS
+
+=over 4
+
+=item B<--version>, B<-V>
+
+Print the version string and exit immediately.
+
+=item B<--help>, B<-h>, B<-?>
+
+Display the top-level help screen listing all available commands.
+
+=back
+
+=head1 COMMON SUB-COMMAND OPTIONS
+
+The following options are accepted by most sub-commands:
+
+=over 4
+
+=item B<--config|-c> I<path>
+
+Path to a JSON configuration file describing available MCP servers.  When
+omitted, the following locations are searched in order:
+
+=over 4
+
+=item 1. C<./server_config.json> in the current directory.
+
+=item 2. C<./mcp-config.json> in the current directory.
+
+=item 3. C<$HOME/.config/mcp-cli/config.json>.
+
+=back
+
+=item B<--server|-s> I<name>
+
+The name of an MCP server as defined in the C<mcpServers> section of the
+configuration file.  May also be a path to a C<.pl> script, an
+C<http://>/C<https://> URL (SSE mode), or a bare shell command string.  May be
+omitted when the configuration file defines exactly one server.
+
+=item B<--timeout|-t> I<seconds>  (default: 30)
+
+How long to wait for each reply from the MCP server (C<list>, C<call>,
+C<chat>).  C<0> waits forever.
+
+=item B<--provider|-p> I<name>  (default: C<ollama>)
+
+The LLM provider to use for the C<interactive>/C<chat> commands.  Only
+C<ollama> is currently supported.
+
+=item B<--model|-m> I<name>  (default: C<qwen2.5:1.5b>)
+
+The model tag to pass to the LLM provider.
+
+=back
+
+=head1 CONFIGURATION FILE
+
+The JSON configuration file has the following structure:
+
+    {
+      "confirmTools": true,
+      "mcpServers": {
+        "perl-math-server": {
+          "command": "perl",
+          "args": ["stdio_server.pl"],
+          "env": { "DEBUG": "1" }
+        },
+        "remote-server": {
+          "url": "http://mcp.example.com/sse"
+        }
+      }
+    }
+
+=over 4
+
+=item C<mcpServers> (object)
+
+A map of server alias names to server descriptor objects. Each descriptor
+supports:
+
+=over 4
+
+=item C<command> (string) - executable to launch (stdio mode).
+
+=item C<args> (array) - additional arguments for the executable.
+
+=item C<env> (object) - environment variables to set before launching.
+
+=item C<url> (string) - SSE endpoint URL (SSE mode).
+
+=item C<transport> (string) - set to C<"sse"> to force SSE mode.
+
+=back
+
+=item C<confirmTools> (boolean, default: C<true>)
+
+When true, the C<interactive>/C<chat> command pauses before executing any tool
+call and asks the user for explicit confirmation. Set to C<false> to allow
+autonomous execution.
+
+=back
+
+=head1 TRANSPORT MODES
+
+=head2 stdio
+
+The server is launched as a child process. Messages are exchanged as
+newline-delimited JSON on its stdin/stdout. This is the default mode when a
+C<command> key is present in the server descriptor.
+
+=head2 HTTP/SSE
+
+When the server descriptor contains a C<url> key, or when C<--server> is
+given an C<http://>/C<https://> URL directly, the client connects in SSE mode
+(MCP protocol revision 2024-11-05).  It opens the event stream with a C<GET>,
+reads the C<endpoint> event to learn the C<POST> URL, then sends all JSON-RPC
+messages as C<POST> requests to that URL.  Responses are accepted either in the
+C<POST> reply body or as C<message> events on the stream.  This works for
+C<list>, C<call> and C<chat>.  C<https://> URLs need L<IO::Socket::SSL>.
+
+=head1 ENVIRONMENT
+
+=over 4
+
+=item C<HOME> / C<USERPROFILE>
+
+Used to locate the default configuration file at
+C<$HOME/.config/mcp-cli/config.json> when no C<--config> option is given and
+no local config file is found.
+
+=item C<OLLAMA_HOST>
+
+Address of the Ollama server used by C<chat> (default
+C<http://localhost:11434>).
+
+=item C<MCPCLI_DEBUG>
+
+When set to a true value, every JSON-RPC message sent to or received from the
+server is printed to STDERR.
+
+=back
+
+=head1 DEPENDENCIES
+
+=over 4
+
+=item * L<App::MCP::CLI> - application framework and command dispatcher.
+
+=item * L<App::Cmd> - sub-command dispatch framework.
+
+=item * L<HTTP::Tiny> - HTTP client for the Ollama API and SSE C<POST> requests.
+
+=item * L<IO::Socket::IP> (or L<IO::Socket::INET>) - the SSE event stream; L<IO::Socket::SSL> is needed for C<https://> servers.
+
+=item * L<IPC::Open2> - bidirectional pipe to stdio MCP server processes.
+
+=item * L<JSON::MaybeXS> - JSON encoding and decoding.
+
+=item * L<Text::Table::Tiny> - ASCII table rendering for C<list> and C<servers>.
+
+=back
+
+A running L<Ollama|https://ollama.com> instance (C<http://localhost:11434>
+unless C<OLLAMA_HOST> is set) is required for the C<interactive>/C<chat> commands.
+
+=head1 EXIT STATUS
+
+=over 4
+
+=item C<0> - success.
+
+=item C<1> - any error: usage error or missing argument, invalid configuration,
+the server could not be started or reached, a timeout, an unknown tool, a
+JSON-RPC error, or (for C<call>) a tool result flagged C<isError>.  The message
+is printed to STDERR.
+
+Results are written to STDOUT; progress and error messages go to STDERR.
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<App::MCP::CLI>
+
+=item * L<App::MCP::CLI::Command::list>
+
+=item * L<App::MCP::CLI::Command::call>
+
+=item * L<App::MCP::CLI::Command::interactive>
+
+=item * L<App::MCP::CLI::Command::servers>
+
+=item * MCP specification: L<https://spec.modelcontextprotocol.io/>
+
+=item * Ollama: L<https://ollama.com>
+
+=back
+
+=head1 AUTHOR
+
+Mohammad Sajid Anwar, C<< <mohammad.anwar at yahoo.com> >>
+
+=head1 REPOSITORY
+
+L<https://github.com/manwar/App-MCP-CLI>
+
+=head1 BUGS
+
+Please report any bugs or feature requests through the web interface at L<https://github.com/manwar/App-MCP-CLI/issues>.
+I will  be notified and then you'll automatically be notified of progress on your
+bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc App::MCP::CLI
+
+You can also look for information at:
+
+=over 4
+
+=item * BUG Report
+
+L<https://github.com/manwar/App-MCP-CLI/issues>
+
+=item * Search MetaCPAN
+
+L<http://metacpan.org/dist/App-MCP-CLI>
+
+=back
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Mohammad Sajid Anwar.
+
+This program  is  free software; you can redistribute it and / or modify it under
+the  terms  of the the Artistic License (2.0). You may obtain  a copy of the full
+license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Any  use,  modification, and distribution of the Standard or Modified Versions is
+governed by this Artistic License.By using, modifying or distributing the Package,
+you accept this license. Do not use, modify, or distribute the Package, if you do
+not accept this license.
+
+If your Modified Version has been derived from a Modified Version made by someone
+other than you,you are nevertheless required to ensure that your Modified Version
+ complies with the requirements of this license.
+
+This  license  does  not grant you the right to use any trademark,  service mark,
+tradename, or logo of the Copyright Holder.
+
+This license includes the non-exclusive, worldwide, free-of-charge patent license
+to make,  have made, use,  offer to sell, sell, import and otherwise transfer the
+Package with respect to any patent claims licensable by the Copyright Holder that
+are  necessarily  infringed  by  the  Package. If you institute patent litigation
+(including  a  cross-claim  or  counterclaim) against any party alleging that the
+Package constitutes direct or contributory patent infringement,then this Artistic
+License to you shall terminate on the date that such litigation is filed.
+
+Disclaimer  of  Warranty:  THE  PACKAGE  IS  PROVIDED BY THE COPYRIGHT HOLDER AND
+CONTRIBUTORS  "AS IS'  AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES. THE IMPLIED
+WARRANTIES    OF   MERCHANTABILITY,   FITNESS   FOR   A   PARTICULAR  PURPOSE, OR
+NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY YOUR LOCAL LAW. UNLESS
+REQUIRED BY LAW, NO COPYRIGHT HOLDER OR CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT,
+INDIRECT, INCIDENTAL,  OR CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE
+OF THE PACKAGE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=cut

@@ -32,7 +32,7 @@ SYNOPSIS
 
 FEATURES
 
-    - Async support via IO::Async and Future::AsyncAwait
+    - Async support via IO::Async and Future
     - Streaming message iteration (blocking and async)
     - Full tool support (Read, Write, Edit, Bash, Glob, Grep, WebFetch, etc.)
     - Hook system for intercepting tool calls
@@ -50,14 +50,16 @@ REQUIREMENTS
 
 DEPENDENCIES
 
-    - Marlin (fast Moo-compatible OO)
+    - Object::Proto
     - IO::Async
-    - Future::AsyncAwait
-    - Cpanel::JSON::XS
+    - Future
     - JSON::Lines
-    - Types::Common
-    - Try::Tiny
     - File::Which
+    - Const::XS
+    - Crypt::URandom
+    - Log::Any
+    - Term::Choose, Term::ReadKey, Term::ProgressSpinner (Claude::Agent::CLI)
+    - Future::AsyncAwait (optional, used by the examples)
 
 INSTALLATION
 

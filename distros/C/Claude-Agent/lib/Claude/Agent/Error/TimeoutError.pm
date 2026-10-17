@@ -4,10 +4,19 @@ use 5.020;
 use strict;
 use warnings;
 
-use Types::Common -types;
-use Marlin
-    -base => 'Claude::Agent::Error',
-    'timeout_ms?' => Num;
+use Object::Proto ();
+use Claude::Agent::Error;
+
+BEGIN {
+    Object::Proto::define('Claude::Agent::Error::TimeoutError',
+        extends => 'Claude::Agent::Error',
+        'timeout_ms:Num:predicate',
+    );
+}
+
+1;
+
+__END__
 
 =head1 NAME
 
@@ -16,16 +25,17 @@ Claude::Agent::Error::TimeoutError - Timeout exception
 =head1 DESCRIPTION
 
 Thrown when an operation times out.
+Stringifies as C<TimeoutError: message>.
 
-=head2 ATTRIBUTES
+=head1 ATTRIBUTES
 
-=over 4
+=head2 message
 
-=item * message - Error description
+The error description. Required.
 
-=item * timeout_ms - Timeout value in milliseconds
+=head2 timeout_ms
 
-=back
+Timeout value in milliseconds. Optional; C<has_timeout_ms> reports whether it was given.
 
 =head1 AUTHOR
 
@@ -38,5 +48,3 @@ This software is Copyright (c) 2026 by LNATION.
 This is free software, licensed under The Artistic License 2.0 (GPL Compatible).
 
 =cut
-
-1;

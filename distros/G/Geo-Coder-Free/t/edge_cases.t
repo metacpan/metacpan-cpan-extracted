@@ -404,6 +404,96 @@ subtest 'One rule for the facade and both backends' => sub {
 };
 
 # -----------------------------------------------------------------------
+# 9d. geocode_many() — a column of hundreds of rows, and a dirty one
+# Strategy: the loop this method replaces goes wrong in two ways - it looks the
+# same value up once per row, and it either dies on a value that is not a place
+# at all or spends a lookup on one.  So a repeated value must cost one backend
+# call however often it appears, a value the module refuses must cost none, and
+# the counts must still account for every distinct value
+# (section 2.5 of BI-Phase6-Dependency-Specs.md).
+# -----------------------------------------------------------------------
+subtest 'GCF geocode_many() — one lookup per distinct value, and none for garbage' => sub {
+	my $geo = Geo::Coder::Free->new();
+
+	my @asked;
+	mock('Geo::Coder::Free::MaxMind', 'geocode', sub {
+		my ($mm, $params) = @_;
+		push @asked, $params->{'location'};
+		return $params->{'location'} =~ /Ramsgate/
+			? Geo::Location::Point->new({ lat => 51.3341, long => -1.4159 })
+			: undef;
+	});
+	mock('Geo::Coder::Free::MaxMind', 'reverse_geocode', sub { return undef });
+
+	# 401 rows holding four distinct values: one that resolves, one that does not,
+	# a bare number and an empty cell.  A hand-rolled loop would make 397 lookups
+	# for the first value alone.
+	my @column = (('Ramsgate, Kent') x 397, 'Nowhere, Imaginary, ZZ', '0044', '0044', '');
+	my $batch = $geo->geocode_many(\@column, on_error => 'undef');
+
+	is(scalar @asked, 2, 'two backend lookups for 401 rows and four distinct values');
+	is_deeply([grep { /^\d+\z/ || $_ eq '' } @asked], [],
+		'a value that is not a location never reached the backend');
+	is_deeply([grep { $_ eq 'Ramsgate, Kent' } @asked], ['Ramsgate, Kent'],
+		'the repeated value was looked up once, not 397 times');
+	is($batch->{'lookups'},    2, 'and exactly the two worth looking up were counted');
+	is($batch->{'resolved'},   1, 'one distinct value resolved');
+	is($batch->{'unresolved'}, 3, 'the miss and the two refused values did not');
+	is(scalar keys %{$batch},  8, 'four values and the four keys of the answer itself');
+
+	_remock_maxmind();
+};
+
+subtest 'GCF geocode_many() — the dirty column, in the words geocode() uses' => sub {
+	my $geo = Geo::Coder::Free->new();
+
+	# On the default setting an unusable value is refused with geocode()'s own
+	# message for it, so a caller who leaves the option out hears exactly what the
+	# loop they replaced would have said.
+	throws_ok { $geo->geocode_many(['0044']) }
+		qr/invalid location to geocode\(\), 0044/,
+		'the default croaks the message geocode() gives for that value';
+	throws_ok { $geo->geocode_many(['Ramsgate, Kent'], on_error => 'nonsense') }
+		qr/on_error must be/, 'an unknown on_error is refused, not ignored';
+
+	# The counts and the map share one hashref: a value spelled like one of the
+	# answer's own keys is refused by name rather than overwriting a count.
+	throws_ok { $geo->geocode_many(['lookups'], on_error => 'undef') }
+		qr/"lookups" is one of the keys geocode_many\(\) answers with/,
+		'a value spelled like a returned key is refused';
+
+	# On 'undef' the same column is reported instead of fatal, and an empty cell
+	# is one entry whether it arrived as undef or as ''.
+	my $dirty = $geo->geocode_many(['0044', undef, ''], on_error => 'undef');
+	is($dirty->{'unresolved'}, 2, 'the bare number and the empty cell are unresolved');
+	is($dirty->{'lookups'},    0, 'and neither was looked up');
+	ok(exists($dirty->{'0044'}) && !defined($dirty->{'0044'}),
+		'the bare number is keyed, with undef');
+	ok(exists($dirty->{''}) && !defined($dirty->{''}),
+		'so is the empty cell: undef and \'\' share one entry');
+	is_deeply([sort keys %{$dirty}],
+		[sort ('', '0044', qw(lookups resolved unresolved unresolved_values))],
+		'and nothing else was invented');
+	is(scalar @{$dirty->{'unresolved_values'}}, 2,
+		'both are listed, which is what the caller records to stop retrying them');
+
+	# Nothing here is worth a lookup at all, so a backend that refuses to be called
+	# is never asked: if it were, this subtest would die rather than fail.
+	mock('Geo::Coder::Free::MaxMind', 'geocode',
+		sub { die "geocode_many() looked up a value it should have refused\n" });
+	# Five distinct values, none of them a location: three bare numbers, the empty
+	# cell (twice over - as '' and as undef, which are one entry) and a reference.
+	my @garbage = ('0044', '9999', '7', '', undef, \'not a location');
+	my $all_garbage = $geo->geocode_many(\@garbage, on_error => 'undef');
+	is($all_garbage->{'unresolved'}, 5, 'five distinct unusable values, counted one by one');
+	is($all_garbage->{'resolved'},   0, 'none of them resolved');
+	is($all_garbage->{'lookups'},    0, 'and not one of them cost a lookup');
+	is(scalar @{$all_garbage->{'unresolved_values'}}, 5, 'all five are listed for the caller');
+
+	_remock_maxmind();
+};
+
+# -----------------------------------------------------------------------
 # 10. Geo::Coder::Free::geocode() — empty/undef inputs
 # Strategy:
 #   - empty string location: defined, no \D chars, length=0 → early 'return'

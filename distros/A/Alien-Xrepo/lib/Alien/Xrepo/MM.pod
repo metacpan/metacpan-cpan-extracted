@@ -68,11 +68,15 @@ recipe inputs (F<Makefile.PL>, F<lib/C<module>.pm>, the loaded engine modules, a
       xrepo_cache         => 0,       # bypass the engine's on-disk cache
       xrepo_update_repo   => 1        # refresh xrepo's repository index once
                                       #   and retry a failing install
+      xrepo_verbose       => 0,       # engine chatter + xmake's -v on installs
+      xrepo_diagnosis     => 0        # xmake's -D on installs
   );
 
 Properties carry the exact same meanings as they do in L<Alien::Xrepo::MB>: C<xrepo_snapshot> defaults to
 F<blib/lib/auto/share/dist/<Dist>/xrepo-snapshot.json>, C<xrepo_share_dir> defaults to the snapshot's directory,
-C<xrepo_cache> defaults to C<0>, and C<xrepo_update_repo> defaults to C<0>.
+C<xrepo_cache> defaults to C<0>, and C<xrepo_update_repo> defaults to C<0>. C<xrepo_verbose> (default C<0>) enables the
+engine's status chatter and passes C<-v> to C<xrepo install>, and C<xrepo_diagnosis> (default C<0>) passes C<-D>, so a
+package that fails to build prints its full C<install.txt> plus C<xmake>'s diagnostic detail.
 
 =head2 C<Write>
 

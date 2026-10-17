@@ -1,0 +1,441 @@
+#!/usr/bin/env perl
+use 5.014;
+use strict;
+use warnings;
+
+# tzcompile - compile the IANA time zone database into the C tables that
+# Time::Keeper::Zone ships.
+#
+#   tools/tzcompile --tzdata tzdata-2026e.tar.gz --zic /path/to/zic \
+#                   --windows windowsZones.json --out include/tkz/tkz_data.h
+#
+# This runs on the author's machine only. Its output is committed to the
+# dist, so building Time::Keeper::Zone never needs it, nor zic.
+#
+# zic, the reference compiler from the same tzcode release as the data,
+# turns the source into TZif files (RFC 8536). This reads the 64-bit
+# section of each, which is what the engine needs: explicit transitions,
+# their local time types, and a POSIX TZ string for every time after the
+# last of them. zic runs with "-b slim", so the transitions stop where the
+# TZ string takes over. backzone is not compiled (K11), nor leap seconds,
+# which Time::Keeper keeps for itself (K10).
+#
+# Everything is deduplicated across zones: local time types, abbreviations
+# and TZ strings. Each TZ string is parsed here into a struct, so the C
+# never parses text.
+
+use File::Temp qw(tempdir);
+use File::Spec;
+use Getopt::Long;
+use JSON::PP;
+
+my %opt;
+GetOptions(\%opt, 'tzdata=s', 'zic=s', 'windows=s', 'out=s') or die "bad options\n";
+for (qw(tzdata zic windows out)) { die "--$_ is required\n" unless $opt{$_} }
+
+my @SOURCES = qw(africa antarctica asia australasia europe northamerica
+                 southamerica etcetera backward);
+
+my $src = tempdir(CLEANUP => 1);
+my $bin = tempdir(CLEANUP => 1);
+system('tar', '-xzf', $opt{tzdata}, '-C', $src) == 0 or die "tar failed\n";
+
+my $version = slurp("$src/version");
+chomp $version;
+$version =~ /^\d{4}[a-z]$/ or die "unexpected version '$version'\n";
+
+my $zic_version = `$opt{zic} --version`;
+$zic_version =~ /\Q$version\E/ or die "zic is not from tzcode $version: $zic_version";
+
+system($opt{zic}, '-b', 'slim', '-d', $bin, map { "$src/$_" } @SOURCES) == 0
+    or die "zic failed\n";
+
+# Zone and Link lines, read from the source: zic writes a link as a copy
+# of its target's file, so the files alone cannot tell them apart.
+my (@zones, %link);
+for my $f (@SOURCES) {
+    for (split /\n/, slurp("$src/$f")) {
+        s/#.*//;
+        if (/^Zone\s+(\S+)/) { push @zones, $1 }
+        elsif (/^Link\s+(\S+)\s+(\S+)/) { $link{$2} = $1 }
+    }
+}
+my %is_zone = map { $_ => 1 } @zones;
+die "zone named twice\n" if keys %is_zone != @zones;
+for my $l (sort keys %link) {
+    die "link $l is also a zone\n" if $is_zone{$l};
+    die "link $l -> $link{$l}: the target is not a zone\n" unless $is_zone{$link{$l}};
+}
+@zones = sort @zones;
+my %zone_index;
+@zone_index{@zones} = 0 .. $#zones;
+
+my (@types, %type_index);      # [utoff, isdst, abbr offset]
+my ($abbr_pool, %abbr_offset) = ('');
+my (@footers, %footer_index);  # parsed TZ strings
+my (@trans_at, @trans_type);
+my @zone_rec;
+
+for my $name (@zones) {
+    my $tz = read_tzif("$bin/$name");
+    my @gtype = map { type_id(@$_) } @{ $tz->{types} };
+    my $first = @trans_at;
+    for my $i (0 .. $#{ $tz->{times} }) {
+        push @trans_at, $tz->{times}[$i];
+        push @trans_type, $gtype[ $tz->{idx}[$i] ];
+    }
+    push @zone_rec, {
+        name    => $name,
+        first   => $first,
+        n       => scalar(@{ $tz->{times} }),
+        initial => $gtype[0],
+        footer  => footer_id($tz->{footer}, $name),
+    };
+}
+
+# Windows zone names, from CLDR: the "001" (world) mapping of each.
+my $wz = decode_json(slurp($opt{windows}));
+my @windows;
+for my $m (@{ $wz->{supplemental}{windowsZones}{mapTimezones} }) {
+    my $z = $m->{mapZone};
+    next unless $z->{_territory} eq '001';
+    my $iana = $z->{_type};
+    my $target = $is_zone{$iana} ? $iana : $link{$iana}
+        or die "Windows zone $z->{_other} maps to $iana, which is not here\n";
+    push @windows, [$z->{_other}, $zone_index{$target}];
+}
+@windows = sort { $a->[0] cmp $b->[0] } @windows;
+
+# One lookup table over zones and links, sorted by lower-cased name for a
+# case-blind binary search. Two names that differ only in case would make
+# that ambiguous: refuse them.
+my @lookup = (
+    (map { [$_, $zone_index{$_}, 0] } @zones),
+    (map { [$_, $zone_index{ $link{$_} }, 1] } keys %link),
+);
+@lookup = sort { lc($a->[0]) cmp lc($b->[0]) } @lookup;
+for my $i (1 .. $#lookup) {
+    die "$lookup[$i-1][0] and $lookup[$i][0] differ only in case\n"
+        if lc $lookup[$i-1][0] eq lc $lookup[$i][0];
+}
+
+my ($names, %name_offset) = ('');
+for my $n (sort map { $_->[0] } @lookup) {
+    $name_offset{$n} = length $names;
+    $names .= "$n\0";
+}
+# Countries, from zone.tab (one row per zone a country uses, as
+# DateTime::TimeZone's names_in_country has them) and iso3166.tab (their
+# names). A zone here may be a link: Norway is Europe/Oslo.
+my %lookup_index;
+$lookup_index{ $lookup[$_][0] } = $_ for 0 .. $#lookup;
+my (%country_name, %country_zones);
+for (split /\n/, slurp("$src/iso3166.tab")) {
+    next if /^#/ || !/\S/;
+    my ($cc, $cname) = split /\t/;
+    $country_name{$cc} = $cname;
+}
+for (split /\n/, slurp("$src/zone.tab")) {
+    next if /^#/ || !/\S/;
+    my ($cc, undef, $tzname) = split /\t/;
+    die "zone.tab: $cc is not in iso3166.tab\n" unless defined $country_name{$cc};
+    die "zone.tab: $tzname is not compiled in\n" unless defined $lookup_index{$tzname};
+    push @{ $country_zones{$cc} }, $lookup_index{$tzname};
+}
+my @countries = sort keys %country_zones;
+my ($cnames, %cname_offset) = ('');
+for my $cc (@countries) {
+    $cname_offset{$cc} = length $cnames;
+    $cnames .= "$country_name{$cc}\0";
+}
+
+my ($wnames, %wname_offset) = ('');
+for my $w (@windows) {
+    $wname_offset{ $w->[0] } = length $wnames;
+    $wnames .= "$w->[0]\0";
+}
+
+write_header();
+printf STDERR "tzdata %s: %d zones, %d links, %d types, %d transitions, %d TZ strings, %d Windows names, %d countries\n",
+    $version, scalar @zones, scalar keys %link, scalar @types, scalar @trans_at,
+    scalar @footers, scalar @windows, scalar @countries;
+exit 0;
+
+sub slurp {
+    my ($f) = @_;
+    open my $fh, '<:raw', $f or die "$f: $!\n";
+    local $/;
+    return scalar <$fh>;
+}
+
+sub abbr_id {
+    my ($abbr) = @_;
+    return $abbr_offset{$abbr} //= do {
+        my $o = length $abbr_pool;
+        $abbr_pool .= "$abbr\0";
+        $o;
+    };
+}
+
+sub type_id {
+    my ($utoff, $isdst, $abbr) = @_;
+    my $key = "$utoff/$isdst/$abbr";
+    return $type_index{$key} //= do {
+        push @types, [$utoff, $isdst, abbr_id($abbr)];
+        $#types;
+    };
+}
+
+# RFC 8536: a header, the 32-bit data (skipped), a second header, the
+# 64-bit data, then the footer between two newlines.
+sub read_tzif {
+    my ($file) = @_;
+    my $d = slurp($file);
+    my $pos = 0;
+    my $hdr = sub {
+        my ($magic, $ver, @c) = unpack 'a4 a1 x15 N6', substr($d, $pos, 44);
+        die "$file: not TZif\n" unless $magic eq 'TZif';
+        $pos += 44;
+        my %c;
+        @c{qw(isut isstd leap time type char)} = @c;
+        return ($ver, \%c);
+    };
+    my ($ver, $c) = $hdr->();
+    die "$file: TZif version 1 has no 64-bit data\n" if $ver eq "\0";
+    $pos += $c->{time} * 5 + $c->{type} * 6 + $c->{char} + $c->{leap} * 8
+          + $c->{isstd} + $c->{isut};
+    ($ver, $c) = $hdr->();
+    die "$file: has leap seconds\n" if $c->{leap};
+
+    my @times = unpack 'q>*', substr($d, $pos, $c->{time} * 8);
+    $pos += $c->{time} * 8;
+    my @idx = unpack 'C*', substr($d, $pos, $c->{time});
+    $pos += $c->{time};
+    my @raw = map { [unpack 'l> C C', substr($d, $pos + $_ * 6, 6)] } 0 .. $c->{type} - 1;
+    $pos += $c->{type} * 6;
+    my $chars = substr($d, $pos, $c->{char});
+    $pos += $c->{char} + $c->{isstd} + $c->{isut};
+
+    my @types = map {
+        my ($utoff, $isdst, $ai) = @$_;
+        my $abbr = substr($chars, $ai);
+        $abbr =~ s/\0.*//s;
+        [$utoff, $isdst, $abbr];
+    } @raw;
+
+    my $rest = substr($d, $pos);
+    $rest =~ /\A\n(.*)\n\z/s or die "$file: no footer\n";
+    return { times => \@times, idx => \@idx, types => \@types, footer => $1 };
+}
+
+# A POSIX TZ string with RFC 8536's extensions: hours to 167 in a rule's
+# time, and a negative rule time. "" means none, and the last transition's
+# type holds for ever.
+sub footer_id {
+    my ($s, $zone) = @_;
+    return 0xFFFF if $s eq '';
+    return $footer_index{$s} //= do {
+        my $f = parse_tz($s);
+        die "$zone: TZ string '$s' does not round-trip\n" if render_tz($f) ne $s;
+        $f->{text} = $s;
+        $f->{std_type} = type_id(-$f->{std_off}, 0, $f->{std});
+        $f->{dst_type} = defined $f->{dst} ? type_id(-$f->{dst_off}, 1, $f->{dst}) : 0xFFFF;
+        push @footers, $f;
+        $#footers;
+    };
+}
+
+sub parse_tz {
+    my ($s) = @_;
+    my %f;
+    my $name = qr/([A-Za-z]{3,}|<[+\-A-Za-z0-9]{3,}>)/;
+    my $off = qr/([+-]?\d{1,3}(?::\d{1,2}(?::\d{1,2})?)?)/;
+    $s =~ s/^$name$off// or die "TZ string '$_[0]': no standard time\n";
+    ($f{std}, $f{std_off}) = (unangle($1), secs($2));
+    if ($s =~ s/^$name//) {
+        $f{dst} = unangle($1);
+        $f{dst_off} = $s =~ s/^$off// ? secs($1) : $f{std_off} - 3600;
+        $s =~ s/^,([^,]+),([^,]+)$// or die "TZ string '$_[0]': daylight time with no rules\n";
+        $f{start} = parse_rule($1, $_[0]);
+        $f{end}   = parse_rule($2, $_[0]);
+    }
+    die "TZ string '$_[0]': '$s' left over\n" if length $s;
+    return \%f;
+}
+
+sub parse_rule {
+    my ($r, $whole) = @_;
+    my %r = (time => 7200);
+    $r{time} = secs($1) if $r =~ s{/([+-]?\d{1,3}(?::\d{1,2}(?::\d{1,2})?)?)$}{};
+    if ($r =~ /^M(\d{1,2})\.(\d)\.(\d)$/) {
+        @r{qw(kind month week wday)} = ('M', $1, $2, $3);
+        die "TZ string '$whole': bad rule '$r'\n"
+            unless $1 >= 1 && $1 <= 12 && $2 >= 1 && $2 <= 5 && $3 <= 6;
+    }
+    elsif ($r =~ /^J(\d{1,3})$/) { @r{qw(kind day)} = ('J', $1); die "bad Julian day\n" unless $1 >= 1 && $1 <= 365 }
+    elsif ($r =~ /^(\d{1,3})$/)  { @r{qw(kind day)} = ('N', $1); die "bad day\n" if $1 > 365 }
+    else { die "TZ string '$whole': bad rule '$r'\n" }
+    $r{text} = $r;
+    return \%r;
+}
+
+sub secs {
+    my ($t) = @_;
+    my $sign = $t =~ s/^([+-])// && $1 eq '-' ? -1 : 1;
+    my ($h, $m, $s) = split /:/, $t;
+    return $sign * ($h * 3600 + ($m // 0) * 60 + ($s // 0));
+}
+
+sub unangle { my ($n) = @_; $n =~ s/^<(.*)>$/$1/; $n }
+
+# The canonical text back from the struct, for the round-trip check: zic
+# writes the shortest form, so this does too.
+sub render_tz {
+    my ($f) = @_;
+    my $s = angle($f->{std}) . hms($f->{std_off});
+    return $s unless defined $f->{dst};
+    $s .= angle($f->{dst});
+    $s .= hms($f->{dst_off}) if $f->{dst_off} != $f->{std_off} - 3600;
+    for my $r ($f->{start}, $f->{end}) {
+        $s .= ",$r->{text}";
+        $s .= '/' . hms($r->{time}) if $r->{time} != 7200;
+    }
+    return $s;
+}
+
+sub angle { my ($n) = @_; $n =~ /^[A-Za-z]+$/ ? $n : "<$n>" }
+
+sub hms {
+    my ($t) = @_;
+    my $sign = $t < 0 ? '-' : '';
+    $t = abs $t;
+    my ($h, $m, $s) = (int($t / 3600), int($t / 60) % 60, $t % 60);
+    return $sign . $h . ($m || $s ? sprintf(':%02d', $m) : '') . ($s ? sprintf(':%02d', $s) : '');
+}
+
+sub c_string {
+    my ($s) = @_;
+    my @lines;
+    while (length $s) {
+        my $chunk = substr($s, 0, 64, '');
+        $chunk =~ s/([\\"])/\\$1/g;
+        $chunk =~ s/\0/\\0/g;
+        $chunk =~ s/\\0(\d)/\\000$1/g;
+        push @lines, qq{    "$chunk"};
+    }
+    return @lines ? join("\n", @lines) : '    ""';
+}
+
+sub rule_c {
+    my ($r) = @_;
+    my $kind = { M => 'TKZ_RULE_MONTH', J => 'TKZ_RULE_JULIAN', N => 'TKZ_RULE_DAY' }->{ $r->{kind} };
+    return sprintf '{ %s, %d, %d, %d, %d, %d }', $kind, $r->{month} // 0, $r->{week} // 0,
+        $r->{wday} // 0, $r->{day} // 0, $r->{time};
+}
+
+sub write_header {
+    open my $fh, '>', $opt{out} or die "$opt{out}: $!\n";
+    my $p = sub { print $fh @_, "\n" };
+
+    $p->("/* Generated by tools/tzcompile from tzdata $version. Do not edit: regenerate.");
+    $p->(" * include/tkz/tkz_types.h says what each table holds. */");
+    $p->('');
+    $p->('#ifndef TKZ_DATA_H');
+    $p->('#define TKZ_DATA_H');
+    $p->('');
+    $p->(qq{#define TKZ_TZDATA_VERSION "$version"});
+    $p->('#define TKZ_ZONE_COUNT   ', scalar @zones);
+    $p->('#define TKZ_LINK_COUNT   ', scalar keys %link);
+    $p->('#define TKZ_LOOKUP_COUNT ', scalar @lookup);
+    $p->('#define TKZ_TYPE_COUNT   ', scalar @types);
+    $p->('#define TKZ_TRANS_COUNT  ', scalar @trans_at);
+    $p->('#define TKZ_FOOTER_COUNT ', scalar @footers);
+    $p->('#define TKZ_WINDOWS_COUNT ', scalar @windows);
+    $p->('#define TKZ_COUNTRY_COUNT ', scalar @countries);
+    $p->('#define TKZ_COUNTRY_ZONE_COUNT ', scalar(map { @$_ } values %country_zones));
+    $p->('');
+
+    $p->('static const char tkz_names[] =');
+    $p->(c_string($names), ';');
+    $p->('');
+    $p->('static const char tkz_abbrs[] =');
+    $p->(c_string($abbr_pool), ';');
+    $p->('');
+    $p->('static const char tkz_footer_text[] =');
+    my ($ftext, @foff) = ('');
+    for my $f (@footers) { push @foff, length $ftext; $ftext .= "$f->{text}\0" }
+    $p->(c_string($ftext), ';');
+    $p->('');
+    $p->('static const char tkz_windows_names[] =');
+    $p->(c_string($wnames), ';');
+    $p->('');
+
+    $p->('static const tkz_type tkz_types[TKZ_TYPE_COUNT] = {');
+    $p->(sprintf '    { %d, %d, %d },', @$_) for @types;
+    $p->('};');
+    $p->('');
+
+    $p->('static const int64_t tkz_trans_at[TKZ_TRANS_COUNT + 1] = {');
+    for (my $i = 0; $i < @trans_at; $i += 4) {
+        $p->('    ', join(' ', map { "INT64_C($_)," } @trans_at[$i .. ($i + 3 > $#trans_at ? $#trans_at : $i + 3)]));
+    }
+    $p->('    0');
+    $p->('};');
+    $p->('');
+    $p->('static const uint16_t tkz_trans_type[TKZ_TRANS_COUNT + 1] = {');
+    for (my $i = 0; $i < @trans_type; $i += 16) {
+        $p->('    ', join(' ', map { "$_," } @trans_type[$i .. ($i + 15 > $#trans_type ? $#trans_type : $i + 15)]));
+    }
+    $p->('    0');
+    $p->('};');
+    $p->('');
+
+    $p->('static const tkz_footer tkz_footers[TKZ_FOOTER_COUNT] = {');
+    for my $i (0 .. $#footers) {
+        my $f = $footers[$i];
+        my $none = '{ TKZ_RULE_NONE, 0, 0, 0, 0, 0 }';
+        $p->(sprintf '    { %d, %d, %d, %d, %d, %s, %s },',
+            $foff[$i], -$f->{std_off}, defined $f->{dst} ? -$f->{dst_off} : -$f->{std_off},
+            $f->{std_type}, $f->{dst_type},
+            defined $f->{dst} ? rule_c($f->{start}) : $none,
+            defined $f->{dst} ? rule_c($f->{end}) : $none);
+    }
+    $p->('};');
+    $p->('');
+
+    $p->('static const tkz_zone tkz_zones[TKZ_ZONE_COUNT] = {');
+    $p->(sprintf '    { %d, %d, %d, %d, %d },', $name_offset{ $_->{name} }, $_->{first}, $_->{n},
+        $_->{initial}, $_->{footer}) for @zone_rec;
+    $p->('};');
+    $p->('');
+
+    $p->('static const tkz_lookup_entry tkz_lookup[TKZ_LOOKUP_COUNT] = {');
+    $p->(sprintf '    { %d, %d, %d },', $name_offset{ $_->[0] }, $_->[1], $_->[2]) for @lookup;
+    $p->('};');
+    $p->('');
+
+    $p->('static const char tkz_country_names[] =');
+    $p->(c_string($cnames), ';');
+    $p->('');
+    my @czones;
+    $p->('static const tkz_country tkz_countries[TKZ_COUNTRY_COUNT] = {');
+    for my $cc (@countries) {
+        $p->(sprintf '    { "%s", %d, %d, %d },', $cc, $cname_offset{$cc}, scalar @czones, scalar @{ $country_zones{$cc} });
+        push @czones, @{ $country_zones{$cc} };
+    }
+    $p->('};');
+    $p->('');
+    $p->('static const uint16_t tkz_country_zones[TKZ_COUNTRY_ZONE_COUNT] = {');
+    for (my $i = 0; $i < @czones; $i += 16) {
+        $p->('    ', join(' ', map { "$_," } @czones[$i .. ($i + 15 > $#czones ? $#czones : $i + 15)]));
+    }
+    $p->('};');
+    $p->('');
+
+    $p->('static const tkz_windows_entry tkz_windows[TKZ_WINDOWS_COUNT] = {');
+    $p->(sprintf '    { %d, %d },', $wname_offset{ $_->[0] }, $_->[1]) for @windows;
+    $p->('};');
+    $p->('');
+    $p->('#endif');
+    close $fh or die "$opt{out}: $!\n";
+}

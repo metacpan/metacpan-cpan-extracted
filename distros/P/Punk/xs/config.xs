@@ -78,7 +78,7 @@ load(class, ...)
                     pc_free(aTHX_ cfg);
                     croak("Punk::Config: '%s' is not a YAML mapping", layer);
                 }
-                merged = merged ? sv_2mortal(pc_merge(aTHX_ merged, doc))
+                merged = merged ? sv_2mortal(pc_merge(aTHX_ merged, doc, 0))
                                 : sv_2mortal(newSVsv(doc));
             }
         }
@@ -92,7 +92,7 @@ load(class, ...)
         {   /* resolve + redact in one walk */
             SV *resolved = NULL;
             SV *public   = pc_walk(aTHX_ cfg, merged,
-                                   sv_2mortal(newSVpvs("")), &resolved);
+                                   sv_2mortal(newSVpvs("")), &resolved, 0);
             cfg->public   = (SvROK(public) && SvTYPE(SvRV(public)) == SVt_PVHV)
                           ? (HV *)SvREFCNT_inc(SvRV(public)) : newHV();
             cfg->resolved = (resolved && SvROK(resolved)

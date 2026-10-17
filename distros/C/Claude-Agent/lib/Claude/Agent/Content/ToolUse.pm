@@ -4,12 +4,42 @@ use 5.020;
 use strict;
 use warnings;
 
-use Types::Common -types;
-use Marlin
-    'type'   => sub { 'tool_use' },
-    'id!'    => Str,           # Unique tool use ID
-    'name!'  => Str,           # Tool name (e.g., 'Read', 'Bash')
-    'input!' => HashRef;       # Tool input parameters
+use Object::Proto ();
+
+BEGIN {
+    Object::Proto::define('Claude::Agent::Content::ToolUse',
+        'type:Str:readonly:default(tool_use)',
+        'id:Str:required',
+        'name:Str:required',
+        'input:HashRef:required',
+        'raw:HashRef:predicate',
+    );
+}
+
+sub is_mcp_tool {
+    my ($self) = @_;
+    return $self->name =~ /^mcp__/;
+}
+
+sub mcp_server {
+    my ($self) = @_;
+    if ($self->name =~ /^mcp__(.+?)__(.+)$/) {
+        return $1;
+    }
+    return;
+}
+
+sub mcp_tool_name {
+    my ($self) = @_;
+    if ($self->name =~ /^mcp__(.+?)__(.+)$/) {
+        return $2;
+    }
+    return;
+}
+
+1;
+
+__END__
 
 =head1 NAME
 
@@ -19,94 +49,82 @@ Claude::Agent::Content::ToolUse - Tool use content block
 
 A tool use content block representing Claude's request to use a tool.
 
-=head2 ATTRIBUTES
+=head1 ATTRIBUTES
 
-=over 4
+=head2 type
 
-=item * type - Always 'tool_use'
+Always C<tool_use>. Read only.
 
-=item * id - Unique identifier for this tool use
+=head2 id
 
-=item * name - Name of the tool being used
+Unique identifier for this tool use.
 
-=item * input - HashRef of input parameters for the tool
+=head2 name
 
-=back
+Name of the tool being used.
 
-=head2 COMMON TOOL INPUTS
+=head2 input
+
+HashRef of input parameters for the tool.
+
+=head2 raw
+
+The decoded block as the CLI sent it, when the object was built by
+C<Claude::Agent::Content-E<gt>from_json>.
+
+=head1 COMMON TOOL INPUTS
 
 Different tools accept different inputs:
 
-=head3 Read
+=head2 Read
 
     { file_path => '/path/to/file', offset => 0, limit => 100 }
 
-=head3 Write
+=head2 Write
 
     { file_path => '/path/to/file', content => '...' }
 
-=head3 Edit
+=head2 Edit
 
     { file_path => '/path/to/file', old_string => '...', new_string => '...' }
 
-=head3 Bash
+=head2 Bash
 
     { command => '...', description => '...', timeout => 60000 }
 
-=head3 Glob
+=head2 Glob
 
     { pattern => '**/*.pm', path => '/path/to/search' }
 
-=head3 Grep
+=head2 Grep
 
     { pattern => 'search term', path => '/path/to/search' }
 
-=head2 METHODS
+=head1 METHODS
 
-=head3 is_mcp_tool
+=head2 new
+
+Takes a flat list of name/value pairs. Unknown names are ignored.
+
+=head2 is_mcp_tool
 
     if ($block->is_mcp_tool) { ... }
 
-Returns true if this is an MCP tool (name starts with 'mcp__').
+True when the tool name starts with C<mcp__>.
 
-=head3 mcp_server
+=head2 mcp_server
 
     my $server = $block->mcp_server;
 
-Returns the MCP server name if this is an MCP tool.
+The server part of an MCP tool name (C<mcp__server__tool>), or undef.
+The split is on the first C<__> after the prefix, so a tool whose own name
+contains C<__> keeps it.
 
-=head3 mcp_tool_name
+=head2 mcp_tool_name
 
     my $tool = $block->mcp_tool_name;
 
-Returns the MCP tool name (without server prefix) if this is an MCP tool.
-
-=cut
-
-sub is_mcp_tool {
-    my ($self) = @_;
-    return $self->name =~ /^mcp__/;
-}
-
-sub mcp_server {
-    my ($self) = @_;
-    # Split on first occurrence of double underscore after 'mcp__'
-    # Example: mcp__my_server__my__tool -> server=my_server, tool=my__tool
-    if ($self->name =~ /^mcp__(.+?)__(.+)$/) {
-        return $1;
-    }
-    return;
-}
-
-sub mcp_tool_name {
-    my ($self) = @_;
-    # Split on first occurrence of double underscore after 'mcp__'
-    # Example: mcp__my_server__my__tool -> server=my_server, tool=my__tool
-    if ($self->name =~ /^mcp__(.+?)__(.+)$/) {
-        return $2;
-    }
-    return;
-}
+The tool part of an MCP tool name, or undef.
 
 =head1 AUTHOR
 
@@ -119,5 +137,3 @@ This software is Copyright (c) 2026 by LNATION.
 This is free software, licensed under The Artistic License 2.0 (GPL Compatible).
 
 =cut
-
-1;

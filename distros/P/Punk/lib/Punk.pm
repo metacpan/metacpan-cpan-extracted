@@ -7,7 +7,7 @@ use warnings;
 our $VERSION;
 
 BEGIN {
-    $VERSION = '0.59';
+    $VERSION = '0.60';
     require XSLoader;
     XSLoader::load('Punk', $VERSION);
 }
@@ -85,9 +85,12 @@ L<https://punkperl.com>
 
 Punk resolves and freezes everything - routes, guard chains, handler
 coderefs, helpers, mounts - once, at C<to_app> time. Nothing is
-interpreted per request: dispatch is a hash lookup or a short bucket
-scan, guards are a frozen array walk, and the handler is a plain
-coderef call receiving one argument, the L<Punk::Context>.
+interpreted per request: dispatch is an exact-match hash lookup for a
+static path, or a linear walk of the typed-segment records for a dynamic
+one (memcmp, no regex; about 6 ns per record scanned), guards are a frozen
+array walk, and the handler is a plain coderef call receiving one argument,
+the L<Punk::Context>. The compiled application is a C struct, read by
+field; nothing is looked up by name per request.
 
 C<use Punk> turns on strict and warnings, creates the per-application
 registry, and exports the DSL keywords below into the calling package.
@@ -933,7 +936,10 @@ L<Punk::Mount::Markdown>.
 
     mount '/legacy' => $psgi_app;
 
-Mount any PSGI app under a prefix (longest prefix wins).
+Mount any PSGI app under a prefix (longest prefix wins). Mounts are tried
+before the dynamic routes, so every dynamic request pays one prefix
+comparison per mount; a `static` mount of Punk's own is served from C
+without the SCRIPT_NAME/PATH_INFO rewrite a PSGI app needs.
 
 =head2 api
 

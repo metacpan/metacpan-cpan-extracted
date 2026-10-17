@@ -1,9 +1,11 @@
 #!perl
 
-use File::Spec;
-use JSON::PP;
+use strict;
+use warnings;
+
 use Test::More;
 use File::Find qw(find);
+use File::Spec;
 
 require_ok('URI::PackageURL');
 
@@ -11,12 +13,11 @@ my $purl_tests_dir = File::Spec->catdir('t', 'purl');
 
 BAIL_OUT('"purl" tests directory not found') if (!-d $purl_tests_dir);
 
-
 find {wanted => \&execute_test, no_chdir => 1}, $purl_tests_dir;
 
 sub test_context {
     my $test = shift;
-    return sprintf '%s [%s] %s', $test->{test_type}, $test->{test_group}, $test->{description};
+    return sprintf '[group:%s / type:%s] %s', $test->{test_group}, $test->{test_type}, $test->{description};
 }
 
 sub execute_test {
@@ -46,17 +47,12 @@ sub execute_test {
 
     TODO: {
 
-            local $TODO = 'Maven - SKIP test because in ENCODE always generate well format PURL string'
-                if ($test->{description} eq 'invalid encoded colon : between scheme and type');
+            local $TODO = 'Upstream inconsistency: uppercase qualifier key (see "types/gem-test.json" parse test)'
+                if ($test->{description} eq 'maven pom reference' && $test->{test_type} eq 'parse');
 
-            # (!) Skip some tests for PRs and issues in purl-spec that are still open
-
-            local $TODO = 'Huggingface - missing namespace - test issue' if ($test_file =~ /huggingface/);
-
-            execute_parse_test($test)      if $test->{test_type} eq 'parse';
-            execute_build_test($test)      if $test->{test_type} eq 'build';
-            execute_roundtrip_test($test)  if $test->{test_type} eq 'roundtrip';
-            execute_validation_test($test) if $test->{test_type} eq 'validation';
+            execute_parse_test($test)    if $test->{test_type} eq 'parse';
+            execute_build_test($test)    if $test->{test_type} eq 'build';
+            execute_validate_test($test) if $test->{test_type} eq 'validate';
 
         }
 
@@ -70,7 +66,7 @@ sub execute_build_test {
 
     my $test_context = test_context($test);
 
-    my $purl = eval { URI::PackageURL->new(%{$test->{input}}); };
+    my $purl = eval { URI::PackageURL->new(%{$test->{input}}) };
 
     if ($test->{expected_failure}) {
         like($@, qr/Invalid PURL/i, $test_context);
@@ -92,10 +88,11 @@ sub execute_parse_test {
 
     my $test_context = test_context($test);
     my $purl_string  = $test->{input};
+    my $validate     = $test->{test_group} eq 'recommended' ? 0 : 1;
 
     note $purl_string;
 
-    my $purl = eval { URI::PackageURL->from_string($purl_string, 0) };
+    my $purl = eval { URI::PackageURL->from_string($purl_string, validate => $validate) };
 
     if ($test->{expected_failure}) {
         like($@, qr/(Invalid|Malformed) PURL/i, $test_context);
@@ -117,49 +114,46 @@ sub execute_parse_test {
         );
     }
 
+    if (%{$purl->qualifiers}) {
+
+        my $got_qualifiers      = $purl->qualifiers;
+        my $expected_qualifiers = $test->{expected_output}->{qualifiers};
+
+        if (defined $got_qualifiers->{checksum}) {
+            $got_qualifiers->{checksum} = join ',', @{$got_qualifiers->{checksum}};
+        }
+
+        is_deeply($got_qualifiers, $expected_qualifiers, "$test_context --> Compare 'qualifiers' component");
+
+    }
+
 }
 
-sub execute_roundtrip_test {
+sub execute_validate_test {
 
     my $test = shift;
 
     my $test_context = test_context($test);
     my $purl_string  = $test->{input};
+    my $validate     = $test->{test_group} eq 'recommended' ? 0 : 1;
 
     note $purl_string;
 
-    my $purl = eval { URI::PackageURL->from_string($purl_string, 0) };
+    my $purl = eval { URI::PackageURL->from_string($purl_string, validate => $validate) };
 
-    if ($@) {
+    if ($test->{expected_failure}) {
+        diag "-- URI::PackageURL exception: $@";
+        diag "-- Expected message:", $test->{expected_message};
+        like($@, qr/(Invalid|Malformed) PURL/i, $test_context);
+        return;
+    }
+
+    if (!$test->{expected_failure} && $@) {
         fail("$test_context ($@)");
         return;
     }
 
     is($purl->to_string, $test->{expected_output}, $test_context);
-
-}
-
-sub execute_validation_test {
-
-    my $test = shift;
-
-    my $test_context = test_context($test);
-
-    my $purl = eval { URI::PackageURL->new(%{$test->{input}}); };
-
-    if (@{$test->{expected_messages}}) {
-        like($@, qr/Invalid PURL/i, $test_context);
-        diag "-- URI::PackageURL exception: $@";
-        diag "-- Expected message: $_" for @{$test->{expected_messages}};
-        return;
-    }
-
-    if (!@{$test->{expected_messages}} && $@) {
-        fail("$test_context ($@)");
-        return;
-    }
-
-    ok($purl->to_string, $test_context);
 
 }
 

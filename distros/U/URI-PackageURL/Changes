@@ -1,5 +1,36 @@
 Change history for URI-PackageURL
 
+2.26 2026-10-16
+    - PURL: Improved component validation and percent-encoding
+    - PURL: Added UTF-8 support (RFC 3629) in components, "purl-tool" input and output
+    - PURL: Added "is_purl" utility and validation flag (enabled by default) in
+      "URI::PackageURL->from_string" and "decode_purl"
+    - PURL: Reduced execution time by ~39% for "URI::PackageURL::Type"
+    - PURL: FIX "0" value lost in namespace, name, version, qualifiers and subpath
+    - PURL: FIX "clone" and qualifiers modified by "new" and "to_string"
+    - PURL: FIX missing "URI::VersionRange" import ("vers" qualifier)
+    - PURL: FIX "URI::PackageURL::Type->validate" default "pkg" scheme'
+    - VERS: FIX code injection via "scheme" in "URI::VersionRange::Version->load"
+      (removed string eval)
+    - VERS: FIX "vers:none/*" contained all versions (vers-spec: no versions)
+    - VERS: Added "is_vers" utility and "scheme" validation (aligned to vers-spec "type")
+    - VERS: Added "semver", "npm", "intdot", "lexicographic" and "datetime" scheme comparators
+    - VERS: The scheme comparator class is now used by "contains", "to_string" (sort),
+      "version_compare" and "from_native" (if implemented)
+    - VERS: Improved scheme comparator class loading ("." and "-" in scheme, croak on
+      load errors)
+    - VERS: FIX percent-encoding (vers-spec canonical form, decoded exactly once) and
+      added UTF-8 support
+    - VERS: FIX constraint parser (croak on empty version)
+    - VERS: FIX "alpm" and "pypi" schemes compared as SemVer
+    - VERS: FIX "vers-tool --contains" fallback comparator warning
+    - VERS: FIX npm/semver native range intersection (eg. ">=5.0.3 >=4.2.1" --> "vers:npm/>=5.0.3")
+      and croak on unsatisfiable ranges
+    - VERS: Improved "pypi" and "generic" schema and "gem" native range
+    - Synced PURL and VERS spec and tests, switched to "purl-test.schema-0.2.json"
+    - Improved tests ("parse" vers-spec tests, experimental PURL examples) and disabled
+      "legacy" PURL test suite
+
 2.25 2026-01-26
     - Added missing import (@gregoa patch applied from Debian Perl Group -
       liburi-packageurl-perl) - giterlizzi/perl-URI-PackageURL#22
@@ -52,7 +83,7 @@ Change history for URI-PackageURL
     - Use RFC 2119 terms for CPAN purl type specification (sjn)
     - Added "swid" purl type support
     - Moved normalization and validation check in "URI::PackageURL::Util"
-    - Dropped support for "version_prefix" qualifier for "github", "gitlab" and 
+    - Dropped support for "version_prefix" qualifier for "github", "gitlab" and
       "bitbucket" PURL types in "purl_to_urls" util (pombredanne via giterlizzi/perl-URI-PackageURL#14)
 
 2.20 2024-05-13

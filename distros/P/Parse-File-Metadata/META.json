@@ -1,0 +1,61 @@
+{
+   "abstract" : "For plain-text files that contain metadata (in key-value pairs) and data records, parse metadata first before proceeding",
+   "author" : [
+      "James E Keenan (jkeenan@pobox.com)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Parse-File-Metadata",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "File::Spec" : "0",
+            "Scalar::Util" : "0",
+            "perl" : "5.008000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Simple" : "0.44"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jkeenan/Parse-File-Metadata/issues"
+      },
+      "homepage" : "http://thenceforward.net/perl/modules/Parse-File-Metadata/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jkeenan/Parse-File-Metadata.git",
+         "web" : "https://github.com/jkeenan/Parse-File-Metadata"
+      }
+   },
+   "version" : "0.08",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

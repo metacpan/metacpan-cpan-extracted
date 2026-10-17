@@ -19,11 +19,11 @@ HTML::D3 - A simple Perl module for generating charts using D3.js.
 
 =head1 VERSION
 
-Version 0.20
+Version 0.21
 
 =cut
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 =head1 SYNOPSIS
 
@@ -139,6 +139,133 @@ sub new
 		title      => $params->{title}  || 'Chart',
 		responsive => $params->{responsive} || 0,
 	}, $class;
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# The categorical colour schemes, written down once.
+#
+# The scheme names, the D3 expression each one is, and the colours themselves
+# live here and nowhere else.  The snippets build the JS lookup they draw with
+# from %CATEGORICAL_SCHEMES, and Perl callers - a map, a legend, a static
+# renderer - read the same colours through categorical_schemes(), palette() and
+# colour_at().  A chart and a map of the same data therefore cannot disagree
+# about what scheme 'set2' means, which two separate lists of names and colours
+# eventually would.
+#
+# The colours are D3's own, in D3's order: the scheme arrays in d3-scale-chromatic
+# 3.x, which is the version d3 v7 - what _head() loads - bundles.  They are
+# recorded here because Perl has no browser to ask, and a map colouring its
+# categories server-side needs the hex values the chart draws.  Both sides agree
+# as long as these arrays are D3's, so a change to one has to come from D3's
+# source: https://github.com/d3/d3-scale-chromatic/tree/main/src/categorical
+my %CATEGORICAL_SCHEMES = (
+	tableau10 => {
+		js      => 'd3.schemeTableau10',
+		colours => [ '#4e79a7', '#f28e2c', '#e15759', '#76b7b2', '#59a14f',
+			'#edc949', '#af7aa1', '#ff9da7', '#9c755f', '#bab0ab' ],
+	}, category10 => {
+		js      => 'd3.schemeCategory10',
+		colours => [ '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
+			'#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf' ],
+	}, set2 => {
+		js      => 'd3.schemeSet2',
+		colours => [ '#66c2a5', '#fc8d62', '#8da0cb', '#e78ac3',
+			'#a6d854', '#ffd92f', '#e5c494', '#b3b3b3' ],
+	}, set3 => {
+		js      => 'd3.schemeSet3',
+		colours => [ '#8dd3c7', '#ffffb3', '#bebada', '#fb8072', '#80b1d3',
+			'#fdb462', '#b3de69', '#fccde5', '#d9d9d9', '#bc80bd',
+			'#ccebc5', '#ffed6f' ],
+	}, paired => {
+		js      => 'd3.schemePaired',
+		colours => [ '#a6cee3', '#1f78b4', '#b2df8a', '#33a02c', '#fb9a99',
+			'#e31a1c', '#fdbf6f', '#ff7f00', '#cab2d6', '#6a3d9a',
+			'#ffff99', '#b15928' ],
+	},
+);
+
+# The scheme a chart draws with when it is not told which one to use.
+my $DEFAULT_CATEGORICAL_SCHEME = 'tableau10';
+
+# The palette the charts that offer no scheme option draw with: the pie family
+# and the multi-series line charts that predate the option have always drawn
+# category10.  The expression is read from the definition above rather than
+# written out again here, so that a chart with no choice and a chart told which
+# scheme to use are the same palette and not two copies of it.
+my $CATEGORY10_JS = $CATEGORICAL_SCHEMES{'category10'}{'js'};
+
+=head2 categorical_schemes
+
+    my $names = HTML::D3->categorical_schemes();
+
+Returns an arrayref of the names of the categorical colour schemes this module
+can draw with, sorted alphabetically: C<category10>, C<paired>, C<set2>,
+C<set3> and C<tableau10>.
+These are the names the C<scheme> and C<color_scheme> options accept.
+
+=cut
+
+sub categorical_schemes
+{
+	return [ sort keys %CATEGORICAL_SCHEMES ];
+}
+
+=head2 palette
+
+    my $colours = HTML::D3->palette('set2');
+
+Returns an arrayref of the colours of one scheme - the same colours, in the same
+order, that a chart drawn with C<< scheme => 'set2' >> draws with.
+A map, a legend or a static renderer can therefore colour the same data the way
+the chart does, from Perl, without a browser:
+
+    my $scheme  = 'set2';
+    my $colours = HTML::D3->palette($scheme);
+    my $index   = 0;
+    for my $category (@categories) {
+        printf "%s is %s\n", $category, HTML::D3->colour_at($scheme, $index++);
+    }
+
+Dies with C<Unknown scheme: E<lt>nameE<gt>> for a name that is not in
+C<categorical_schemes()>, rather than quietly returning the default scheme's
+colours, so that a misspelt scheme is found where it is asked for.
+The arrayref returned is a copy: pushing onto it does not change the palette.
+
+=head2 colour_at
+
+    my $fill = HTML::D3->colour_at('tableau10', $index);
+
+Returns the colour one scheme gives the C<$index>th category, counting from
+zero, cyclically: an index past the end of the palette wraps around to its
+start, which is how C<d3.scaleOrdinal> - what the snippets draw with - assigns
+colours.
+Colour 0 is the first colour of the scheme, the one C<render_histogram_snippet>
+uses as the bar fill when it is given a C<scheme>.
+
+The British spelling matches the C<colour_by_series> option.
+Dies with C<Unknown scheme: E<lt>nameE<gt>> for an unknown scheme, and with
+C<Colour index must be a non-negative integer> for an index that is not one.
+
+=cut
+
+sub palette
+{
+	my ($self, $scheme) = @_;
+
+	return [ @{_categorical_scheme($scheme)->{colours}} ];
+}
+
+sub colour_at
+{
+	my ($self, $scheme, $index) = @_;
+
+	die 'Colour index must be a non-negative integer'
+		unless defined($index) && looks_like_number($index)
+			&& $index == int($index) && $index >= 0;
+
+	my $colours = _categorical_scheme($scheme)->{colours};
+
+	return $colours->[$index % scalar(@$colours)];
 }
 
 =head2 render_bar_chart
@@ -715,7 +842,7 @@ sub render_pie_chart {
 	const height = $self->{height};
 	const radius = Math.min(width, height) / 2 - 40;
 
-	const color = d3.scaleOrdinal(d3.schemeCategory10);
+	const color = d3.scaleOrdinal($CATEGORY10_JS);
 
 	const pie = d3.pie()
 	    .sort(null)
@@ -871,7 +998,7 @@ sub render_animated_pie_chart {
 	const height = $self->{height};
 	const radius = Math.min(width, height) / 2 - 40;
 
-	const color = d3.scaleOrdinal(d3.schemeCategory10);
+	const color = d3.scaleOrdinal($CATEGORY10_JS);
 
 	const pie = d3.pie()
 	    .sort(null)
@@ -990,7 +1117,8 @@ slices are shown individually; the rest are collapsed into an C<"Other"> slice.
 
 =item * C<color_scheme> (string, default C<'tableau10'>) - D3 categorical
 colour scheme.  Supported: C<tableau10>, C<category10>, C<set2>, C<set3>,
-C<paired>.
+C<paired> - the names C<categorical_schemes()> returns, whose colours C<palette()>
+makes available to Perl.
 
 =item * C<separator> (string, default C<'/'>) - Character shown between the
 label and value in each legend entry (e.g. C<'/'> produces
@@ -1043,8 +1171,10 @@ sub render_pie_chart_snippet {
 	my $sort_slices  = $opts->{sort_slices} // 'none';
 	my $max_slices   = int($opts->{max_slices} // 0);
 	my $show_legend  = exists $opts->{legend} ? ($opts->{legend} ? 1 : 0) : 1;
-	my $color_scheme = $opts->{color_scheme} // 'tableau10';
+	my $color_scheme = $opts->{color_scheme} // $DEFAULT_CATEGORICAL_SCHEME;
 	my $separator    = $opts->{separator}   // '/';
+	my $schemes_js = $self->_schemes_js('const');
+	my $default_js = _default_scheme_js();
 
 	# Normalise: absolute values, drop zeros, pull optional extra hashref
 	my @slices;
@@ -1202,14 +1332,8 @@ $legend_div_html</div>
         return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 
-    const SCHEMES = {
-        tableau10:  d3.schemeTableau10,
-        category10: d3.schemeCategory10,
-        set2:       d3.schemeSet2,
-        set3:       d3.schemeSet3,
-        paired:     d3.schemePaired,
-    };
-    const color = d3.scaleOrdinal(SCHEMES['$color_scheme'] || d3.schemeTableau10)
+    $schemes_js
+    const color = d3.scaleOrdinal(SCHEMES['$color_scheme'] || $default_js)
         .domain(data.map(d => d.label));
 
     const width  = $width;
@@ -1846,7 +1970,7 @@ sub render_bar_chart_snippet {
 
 	# JS colour initialiser and per-bar fill callback
 	my $color_init_js = $is_categorical
-		? 'var colorOf = d3.scaleOrdinal(d3.schemeTableau10)'
+		? 'var colorOf = d3.scaleOrdinal(' . _default_scheme_js() . ')'
 		  . ".domain(data.map(function(d){return d.label;}));"
 		: "var colorOf = function() { return \"$color_esc\"; };";
 	my $color_func_js = 'function(d) { return colorOf(d.label); }';
@@ -2824,7 +2948,7 @@ sub render_multi_series_line_chart_with_tooltips
 	    .range([height, 0]);
 
 	// Define color scale for series
-	const color = d3.scaleOrdinal(d3.schemeCategory10);
+	const color = d3.scaleOrdinal($CATEGORY10_JS);
 
 	// Add axes
 	chart.append("g")
@@ -2988,7 +3112,7 @@ sub render_multi_series_line_chart_with_animated_tooltips
 	    .range([height, 0]);
 
 	// Define color scale for series
-	const color = d3.scaleOrdinal(d3.schemeCategory10);
+	const color = d3.scaleOrdinal($CATEGORY10_JS);
 
 	// Add axes
 	chart.append("g")
@@ -3165,7 +3289,7 @@ sub render_multi_series_line_chart_with_legends {
             .range([height, 0]);
 
 	// Define color scale for series
-        const color = d3.scaleOrdinal(d3.schemeCategory10);
+        const color = d3.scaleOrdinal($CATEGORY10_JS);
 
         // Add axes
         chart.append("g")
@@ -3370,7 +3494,7 @@ sub render_multi_series_line_chart_with_interactive_legends
             .range([height, 0]);
 
 	// Define color scale for series
-        const color = d3.scaleOrdinal(d3.schemeCategory10);
+        const color = d3.scaleOrdinal($CATEGORY10_JS);
 
         // Add axes
         chart.append("g")
@@ -3494,6 +3618,8 @@ clickable legend toggles each series on and off.
 
 =item * C<scheme> (string, default C<'tableau10'>) - D3 categorical colour
 scheme (for example C<'category10'>, C<'set2'>, C<'set3'>, C<'paired'>).
+C<categorical_schemes()> lists the names, and C<palette()> hands a Perl caller
+the colours of one.
 
 =item * C<x_label> (string, default C<''>) - Label shown below the X axis.
 
@@ -3565,14 +3691,14 @@ sub render_multi_series_line_chart_snippet
 
 	my $json_data = $_JSON->encode($series_data);
 
-	my $scheme   = $opts->{scheme}   // 'tableau10';
+	my $scheme   = $opts->{scheme}   // $DEFAULT_CATEGORICAL_SCHEME;
 	my $x_label  = $opts->{x_label} // '';
 	my $y_label  = $opts->{y_label} // '';
 	my $animated = $opts->{animated} // 0;
 	my $svg_id   = $opts->{id}       // 'chart';
 	my $tip_id   = $svg_id . '_tip';
 
-	(my $scheme_js = $scheme) =~ s/^([a-z])/\u$1/;
+	my $scheme_js = _scheme_js($scheme);
 
 	my $js_esc = sub {
 		my $s = shift;
@@ -3667,7 +3793,7 @@ ANIM
         .domain([Math.min(0,d3.min(allVals)), d3.max(allVals)]).nice()
         .range([innerH,0]);
 
-    var color = d3.scaleOrdinal(d3.scheme$scheme_js).domain(series.map(function(s){return s.name;}));
+    var color = d3.scaleOrdinal($scheme_js).domain(series.map(function(s){return s.name;}));
 
     g.append("g").attr("transform","translate(0,"+innerH+")")
         .call(d3.axisBottom(xScale))
@@ -3781,6 +3907,8 @@ to the right of the plot.  Ignored for points with no C<series> value.
 =item * C<scheme> (string, default C<'tableau10'>) - D3 categorical colour
 scheme used when C<colour_by_series> is set, for example C<'category10'>,
 C<'set2'>, C<'set3'>, or C<'paired'>.
+C<categorical_schemes()> lists the names, and C<palette()> hands a Perl caller
+the colours of one.
 
 =item * C<series_col> (string, default C<'Series'>) - Row label for the series
 value in the tooltip.
@@ -3861,7 +3989,7 @@ sub render_scatter_chart_snippet
 	my $value_label      = $opts->{value_label}      // 'Value';
 	my $animated         = $opts->{animated}         // 0;
 	my $colour_by_series = $opts->{colour_by_series} // 0;
-	my $scheme           = $opts->{scheme}           // 'tableau10';
+	my $scheme           = $opts->{scheme}           // $DEFAULT_CATEGORICAL_SCHEME;
 	my $series_col       = $opts->{series_col}       // '';
 	my $size_col         = $opts->{size_col}         // '';
 	my $radius_range     = $opts->{radius_range}     // [3, 15];
@@ -3875,8 +4003,9 @@ sub render_scatter_chart_snippet
 		return $s;
 	};
 
-	# Capitalise the first letter of the scheme name for the d3.scheme* accessor.
-	(my $scheme_js = $scheme) =~ s/^([a-z])/\u$1/;
+	# The d3.scheme* expression for the scheme, from the one definition of the
+	# schemes rather than from the spelling of the name.
+	my $scheme_js = _scheme_js($scheme);
 
 	my @points;
 	for my $pt (@$data) {
@@ -3944,9 +4073,9 @@ sub render_scatter_chart_snippet
 	my $color_init_js;
 	if ($has_series) {
 		$color_init_js = "var seriesNames = $json_series;\n"
-			. "    var color = d3.scaleOrdinal(d3.scheme${scheme_js}).domain(seriesNames);";
+			. "    var color = d3.scaleOrdinal(${scheme_js}).domain(seriesNames);";
 	} elsif ($is_categorical) {
-		$color_init_js = "var color = d3.scaleOrdinal(d3.schemeTableau10).domain(data.map(function(d,i){return i;}));";
+		$color_init_js = 'var color = d3.scaleOrdinal(' . _default_scheme_js() . ').domain(data.map(function(d,i){return i;}));';
 	} else {
 		$color_init_js = "var color = function() { return \"$color_esc\"; };";
 	}
@@ -4338,7 +4467,9 @@ Accepted C<\%opts> keys:
 =item * C<orient> (string C<'v'> or C<'h'>, default C<'v'>) - bar orientation.
 
 =item * C<scheme> (string, default C<'tableau10'>) - D3 categorical colour scheme.
-Supported: C<tableau10>, C<category10>, C<set2>, C<set3>, C<paired>.
+Supported: C<tableau10>, C<category10>, C<set2>, C<set3>, C<paired> - the names
+C<categorical_schemes()> returns, whose colours C<palette()> makes available to
+Perl.
 
 =item * C<x_label> (string, optional) - axis label shown below the category axis.
 
@@ -4409,9 +4540,11 @@ sub render_stacked_bar_snippet
 	my $seg_col = $opts->{seg_col} // 'seg';
 	my $val_col = $opts->{val_col} // 'val';
 	my $orient  = $opts->{orient}  // 'v';
-	my $scheme  = $opts->{scheme}  // 'tableau10';
+	my $scheme  = $opts->{scheme}  // $DEFAULT_CATEGORICAL_SCHEME;
 	my $x_label = $opts->{x_label} // '';
 	my $sort_by = $opts->{sort};
+	my $schemes_js = $self->_schemes_js('var');
+	my $default_js = _default_scheme_js();
 
 	die "orient must be 'v' or 'h'"
 		unless $orient eq 'v' || $orient eq 'h';
@@ -4548,11 +4681,8 @@ RECTS
     var margin = {top:$margin_top,right:$margin_right,bottom:$margin_bottom,left:$margin_left};
     var innerW = $inner_w;
     var innerH = $inner_h;
-    var SCHEMES = {
-        tableau10:d3.schemeTableau10, category10:d3.schemeCategory10,
-        set2:d3.schemeSet2, set3:d3.schemeSet3, paired:d3.schemePaired
-    };
-    var color = d3.scaleOrdinal(SCHEMES['$scheme'] || d3.schemeTableau10).domain(segs);
+    $schemes_js
+    var color = d3.scaleOrdinal(SCHEMES['$scheme'] || $default_js).domain(segs);
     var hidden = {};
     var svg = d3.select("#$svg_id");
     var g = svg.append("g").attr("transform","translate("+margin.left+","+margin.top+")");
@@ -4885,7 +5015,9 @@ Accepted C<\%opts> keys:
 =item * C<path_sep> (string, default C<'/'>)  - path separator (flat format only).
 
 =item * C<scheme> (string, default C<'tableau10'>) - D3 categorical colour scheme.
-Supported: C<tableau10>, C<category10>, C<set2>, C<set3>, C<paired>.
+Supported: C<tableau10>, C<category10>, C<set2>, C<set3>, C<paired> - the names
+C<categorical_schemes()> returns, whose colours C<palette()> makes available to
+Perl.
 
 =item * C<label> (boolean, default C<1>) - show node labels inside cells.
 
@@ -4946,8 +5078,10 @@ sub render_treemap_snippet
 		unless ref($data) eq 'ARRAY' || ref($data) eq 'HASH';
 
 	my $path_sep = $opts->{path_sep} // '/';
-	my $scheme   = $opts->{scheme}   // 'tableau10';
+	my $scheme   = $opts->{scheme}   // $DEFAULT_CATEGORICAL_SCHEME;
 	my $label    = exists($opts->{label}) ? ($opts->{label} ? 1 : 0) : 1;
+	my $schemes_js = $self->_schemes_js('var');
+	my $default_js = _default_scheme_js();
 
 	my $js_esc = sub {
 		my $s = shift;
@@ -5044,11 +5178,8 @@ LBLJS
 <script>
 (function(){
     var rawData = $json_data;
-    var SCHEMES = {
-        tableau10:d3.schemeTableau10, category10:d3.schemeCategory10,
-        set2:d3.schemeSet2, set3:d3.schemeSet3, paired:d3.schemePaired
-    };
-    var color = d3.scaleOrdinal(SCHEMES['$scheme'] || d3.schemeTableau10);
+    $schemes_js
+    var color = d3.scaleOrdinal(SCHEMES['$scheme'] || $default_js);
     var sep = "${\$js_esc->($path_sep)}";
     var svg = d3.select("#$svg_id");
     var tip = d3.select("#$tip_id");
@@ -5114,6 +5245,8 @@ per entry, in the order supplied, and the supplied counts are authoritative.
 =item * C<scheme> (string, optional) - D3 categorical colour scheme (for example
 C<'tableau10'> or C<'category10'>) whose first colour is used as the bar fill
 when C<color> is not given.
+That colour is C<colour_at($scheme, 0)>, so a caller shading the same data by
+hand starts from the same colour the bars do.
 
 =item * C<x_label> (string, optional) - label shown below the X axis.
 
@@ -5246,8 +5379,9 @@ sub _render_histogram_binned
 	if(defined $opts->{color}) {
 		$fill_js = '"' . $js_esc->($opts->{color}) . '"';
 	} elsif(defined $opts->{scheme}) {
-		(my $scheme_js = $opts->{scheme}) =~ s/^([a-z])/\u$1/;
-		$fill_js = "d3.scheme${scheme_js}[0]";
+		# The scheme's first colour, which is the one colour_at($scheme, 0)
+		# reports to a Perl caller colouring the same data by hand.
+		$fill_js = _scheme_js($opts->{scheme}) . '[0]';
 	}
 
 	my $x_label_block = $x_label ? <<"XLB" : '';
@@ -5453,6 +5587,51 @@ HTML
 	return { svg_id => $svg_id, html => $html };
 }
 
+# The definition of one scheme, by name, or a die that names what was asked for.
+sub _categorical_scheme
+{
+	my $scheme = shift;
+
+	die 'Unknown scheme: ' . (defined($scheme) ? $scheme : '(none)')
+		unless defined($scheme) && exists($CATEGORICAL_SCHEMES{$scheme});
+
+	return $CATEGORICAL_SCHEMES{$scheme};
+}
+
+# The D3 expression for a scheme - d3.schemeSet2 - or, for a name that is not
+# one, the default scheme's.  The snippets used to capitalise the name they were
+# handed and look up the expression that spelling produced, which turned a name
+# they did not know into an undefined function in the browser; drawing with the
+# documented default is what the snippets that look their scheme up in a table
+# have always done.
+sub _scheme_js
+{
+	my $scheme = shift;
+
+	# exists() first: naming a scheme that is not one must not add it to the
+	# vocabulary, which is what dereferencing the missing entry would do.
+	return exists($CATEGORICAL_SCHEMES{$scheme})
+		? $CATEGORICAL_SCHEMES{$scheme}{'js'}
+		: _default_scheme_js();
+}
+
+sub _default_scheme_js
+{
+	return $CATEGORICAL_SCHEMES{$DEFAULT_CATEGORICAL_SCHEME}{'js'};
+}
+
+# The table the snippets look a scheme up in, built from the definition above, so
+# that a scheme added there is understood by every snippet that offers a scheme
+# rather than by the ones somebody remembered to edit.
+sub _schemes_js
+{
+	my ($self, $declaration) = @_;
+
+	return $declaration . ' SCHEMES = { '
+		. join(', ', map { "$_: " . $CATEGORICAL_SCHEMES{$_}{'js'} } sort keys %CATEGORICAL_SCHEMES)
+		. ' };';
+}
+
 sub _preamble
 {
 	my $html = <<'HTML';
@@ -5642,6 +5821,10 @@ Nigel Horne <njh@nigelhorne.com>
     post result.html ∈ Str
     post "<!DOCTYPE" ∉ result.html
     post "d3.pie()" ⊆ result.html ∧ "schemeTableau10" ⊆ result.html
+    post opts.color_scheme = S ∧ S ∈ categorical_schemes()
+                            ⇒ the D3 expression of S ⊆ result.html
+    post opts.color_scheme ∉ categorical_schemes()
+                            ⇒ "schemeTableau10" ⊆ result.html  -- the default scheme
     post opts.animated = 1  ⇒  "attrTween" ⊆ result.html
                               ∧ "initialDrawDone" ⊆ result.html
     post opts.donut = 1     ⇒  "innerRadius" ⊆ result.html
@@ -5698,7 +5881,8 @@ Nigel Horne <njh@nigelhorne.com>
     post "<!DOCTYPE" ∉ result.html
     post "d3.scaleBand" ⊆ result.html ∧ "d3.scaleLinear" ⊆ result.html
     post opts.animated = 1         ⇒ "prefers-reduced-motion" ⊆ result.html
-    post opts.color = 'categorical' ⇒ "schemeTableau10" ⊆ result.html
+    post opts.color = 'categorical' ⇒ the default scheme's expression
+                                      ("schemeTableau10") ⊆ result.html
     post opts.max_bars = N ∧ N ≥ 2 ∧ |data| > N
                             ⇒ |result_bars| = N ∧ "Other" ∈ result_labels
 
@@ -5721,7 +5905,11 @@ Nigel Horne <njh@nigelhorne.com>
     post #{path ∈ result.html : class = "msl-line"} = |data|   -- one path per series
     post opts.x_label ≠ ''          ⇒ "msl-axis-label" ⊆ result.html
     post opts.y_label ≠ ''          ⇒ "msl-axis-label" ⊆ result.html
-    post opts.scheme = S            ⇒ "scheme" + capitalise(S) ⊆ result.html
+    post opts.scheme = S ∧ S ∈ categorical_schemes()
+                                    ⇒ the D3 expression of S ⊆ result.html
+    post opts.scheme ∉ categorical_schemes()
+                                    ⇒ the default scheme's expression ⊆ result.html
+                                      -- not d3.scheme<S>
     post opts.animated = 1          ⇒ "stroke-dashoffset" ⊆ result.html
                                       ∧ "prefers-reduced-motion" ⊆ result.html
 
@@ -5748,6 +5936,10 @@ Nigel Horne <njh@nigelhorne.com>
                                    ⇒ "scaleOrdinal" ⊆ result.html
                                      ∧ "seriesNames" ⊆ result.html
                                      ∧ legend drawn (margin right = 140)
+    post opts.colour_by_series = 1 ∧ opts.scheme = S ∧ S ∈ categorical_schemes()
+                                   ⇒ the D3 expression of S ⊆ result.html
+    post opts.colour_by_series = 1 ∧ opts.scheme ∉ categorical_schemes()
+                                   ⇒ the default scheme's expression ⊆ result.html
     post ∃ pt ∈ data . defined(pt[3].size)
                                    ⇒ "d3.scaleSqrt" ⊆ result.html ∧ "rScale" ⊆ result.html
     post opts.radius_range = [A,B]
@@ -5789,6 +5981,10 @@ Nigel Horne <njh@nigelhorne.com>
     post "<!DOCTYPE" ∉ result.html
     post "d3.stack()" ⊆ result.html
     post "SCHEMES" ⊆ result.html
+    post opts.scheme = S ∧ S ∈ categorical_schemes()
+                                    ⇒ the D3 expression of S ⊆ result.html
+    post opts.scheme ∉ categorical_schemes()
+                                    ⇒ the default scheme's expression ⊆ result.html
 
 =head2 render_combo_snippet
 
@@ -5830,6 +6026,10 @@ Nigel Horne <njh@nigelhorne.com>
     post "d3.treemap()" ⊆ result.html
     post ref(data) = 'ARRAY' ⇒ "d3.stratify()" ⊆ result.html
     post ref(data) = 'HASH'  ⇒ "d3.hierarchy(" ⊆ result.html
+    post opts.scheme = S ∧ S ∈ categorical_schemes()
+                                    ⇒ the D3 expression of S ⊆ result.html
+    post opts.scheme ∉ categorical_schemes()
+                                    ⇒ the default scheme's expression ⊆ result.html
 
 =head2 render_histogram_snippet
 
@@ -5859,7 +6059,11 @@ Nigel Horne <njh@nigelhorne.com>
     post opts.binned ≠ 1            ⇒ "d3.bin()" ⊆ result.html
     post opts.binned = 1            ⇒ "d3.bin()" ∉ result.html ∧ "scaleBand" ⊆ result.html
     post opts.color defined         ⇒ c(clone)      -- explicit colour is the bar fill
-    post opts.scheme defined        ⇒ "scheme" ⊆ result.html
+    post opts.color = undef ∧ opts.scheme = S ∧ S ∈ categorical_schemes()
+                                    ⇒ the D3 expression of S subscripted "[0]"
+                                      ⊆ result.html            -- colour_at(S, 0)
+    post opts.color = undef ∧ opts.scheme ∉ categorical_schemes()
+                                    ⇒ the default scheme's first colour ⊆ result.html
     post opts.bins = undef          ⇒ "Math.log2" ⊆ result.html
     post opts.x_label ≠ ''         ⇒ "hg-axis-label" ⊆ result.html
 

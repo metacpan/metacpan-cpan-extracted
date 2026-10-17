@@ -3,7 +3,7 @@ package Punk::RateLimit;
 use strict;
 use warnings;
 
-our $VERSION = '0.59';
+our $VERSION = '0.60';
 
 
 1;
@@ -45,6 +45,18 @@ per worker. It is C<by> the client IP by default; C<< by => 'header:NAME' >>
 keys on a request header, and C<< by => sub { ... } >> on whatever the coderef
 returns for a context. C<for> scopes a rule to a path prefix, C<tag> names its
 counter namespace. Declare it more than once for layered limits.
+
+A header rule counts a request that carries no such header against the
+client address instead, so leaving the header off is not a way around the
+rule. An id longer than 256 bytes is cut to 256 before it becomes a key.
+
+The arena's rate table holds 4096 live keys across every rule of every
+application on it. When it is full, Hyperman lets a request with a new key
+through rather than refuse it, and this plugin cannot tell that from a first
+hit. A rule keyed on a header or a coderef value that a client chooses can
+therefore fill the table with keys of its own and switch every rule off for
+the rest of the window. Key such rules on something the client cannot mint
+freely, and keep the sensitive limits (C</login>) on the address.
 
 A route may also carry a budget of its own:
 

@@ -354,4 +354,49 @@ SKIP: {
     }
 }
 
+# ---- the refusal survives a stack the hook grew ---------------------------------
+# _check pushes its 403 after pcf_check ran Perl. A hook that grows the value
+# stack moves it, and a push through the pointer captured on entry landed in
+# freed memory: the dispatcher saw a GLOB where the triplet should have been.
+{
+    package CsrfGrow;
+    use Punk;
+    session secret => 'k';
+    csrf on_error => sub { my @x = (1) x $main::GROW;
+                           [ 403, [ 'Content-Type' => 'text/plain' ], ['refused'] ] };
+    post '/p' => sub { $_[0]->text('posted') };
+    package main;
+    our $GROW;
+    my $g = CsrfGrow->to_app;
+    for my $n (1_000, 2_000_000) {
+        $GROW = $n;
+        my $body = 'a=1';
+        open my $in, '<', \$body;
+        my $r = $g->({ REQUEST_METHOD => 'POST', PATH_INFO => '/p',
+                       QUERY_STRING => '', CONTENT_LENGTH => 3,
+                       CONTENT_TYPE => 'application/x-www-form-urlencoded',
+                       'psgi.input' => $in, HTTP_HOST => 'l',
+                       REMOTE_ADDR => '1.1.1.1' });
+        is(ref $r, 'ARRAY', "a forged POST is still a triplet after on_error grew the stack by $n");
+        is($r->[0], 403, '...a 403');
+        is($r->[2][0], 'refused', '...with the hook\'s body');
+    }
+}
+
+# ---- options are checked at the keyword ----------------------------------------
+# The mirror cookie is written inside a trapped after-hook, so a name the
+# cookie builder refuses used to make the cookie silently disappear.
+{
+    my $err = '';
+    eval { package CsrfBadCookie; use Punk; session secret => 'k';
+           csrf cookie => 'a;b'; 1 } or $err = $@;
+    like($err, qr/csrf `cookie` may not contain/,
+        'a csrf cookie name with a ";" croaks at the keyword');
+    $err = '';
+    eval { package CsrfLongHeader; use Punk; session secret => 'k';
+           csrf header => ('X' x 130); 1 } or $err = $@;
+    like($err, qr/csrf `header` name is longer/,
+        'a header name over the env key\'s size croaks at the keyword');
+}
+
 done_testing();

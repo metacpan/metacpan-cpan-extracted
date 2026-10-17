@@ -6,15 +6,15 @@ use autodie qw(:all);
 
 =head1 VERSION
 
-Version 0.46
+Version 0.47
 
 =cut
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 # Display the meta-data page - the internal status of the server and VWF system
 
-use parent -norequire, 'Geo::Coder::Free::Display';
+use parent 'Geo::Coder::Free::Display';
 
 sub html
 {

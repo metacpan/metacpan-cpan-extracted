@@ -127,10 +127,14 @@ header(self, ...)
 # any other reference body JSON-encodes through the frj ABI, a string is html
 # unless type says otherwise, no body is text/plain.
 SV *
-finalize(self)
+finalize(self, ...)
         SV *self
     CODE:
     {
+        /* finalize($canonical): the dispatcher passes true on an
+         * `etag => 1` route, so a JSON body is encoded with its keys in
+         * order and the tag is the same in every worker */
+        int canon = items > 1 && SvTRUE(ST(1));
         AV *res = punk_res_av(aTHX_ self);
         SV **b = av_fetch(res, PS_BODY, 0);
         SV **t = av_fetch(res, PS_TYPE, 0);
@@ -156,7 +160,10 @@ finalize(self)
         }
         else if (SvROK(*b)) {
             const frj_abi *J = punk_frj(aTHX);
-            bytes = J->encode(aTHX_ *b, NULL);
+            frj_opts o;
+            Zero(&o, 1, frj_opts);
+            o.canonical = 1;
+            bytes = J->encode(aTHX_ *b, canon ? &o : NULL);
             ct = type ? type : sv_2mortal(newSVpvs("application/json"));
         }
         else {

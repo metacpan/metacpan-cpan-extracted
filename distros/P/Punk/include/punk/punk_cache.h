@@ -66,6 +66,10 @@ typedef struct {
     uint64_t   hits, misses, evictions, refused, expired;
 
     IV         owner_pid;
+
+    /* mixed into every key's hash, drawn at construction: a table whose
+     * bucket an outsider can compute is a table they can fill one chain of */
+    uint64_t   seed;
 } punk_cache;
 
 /* The per-entry overhead counted against the budget.
@@ -141,6 +145,18 @@ static uint64_t pc_hash(const char *k, size_t n) {
     return h;
 }
 
+/* the table's own hash: the same function over a per-table seed, so the
+ * bucket a key lands in is not something a key's author can arrange. The
+ * file store keeps the unseeded one - its paths must be stable across
+ * processes and restarts. */
+static uint64_t pc_hash_seeded(const punk_cache *c, const char *k, size_t n) {
+    const unsigned char *p = (const unsigned char *)k;
+    uint64_t h = 1469598103934665603ULL ^ c->seed;
+    size_t i;
+    for (i = 0; i < n; i++) { h ^= p[i]; h *= 1099511628211ULL; }
+    return h;
+}
+
 static void pc_table_alloc(pTHX_ punk_cache *c, uint32_t n) {
     Newxz(c->buckets, n, pc_entry *);
     c->nbuckets = n;
@@ -201,6 +217,7 @@ static punk_cache *punk_cache_new(pTHX_ size_t max_bytes) {
     Newxz(c, 1, punk_cache);
     c->max_bytes = max_bytes;
     c->owner_pid = (IV)PerlProc_getpid();
+    pk_ent_take(aTHX_ (unsigned char *)&c->seed, sizeof c->seed);
     pc_table_alloc(aTHX_ c, PC_BUCKETS_MIN);
     return c;
 }
@@ -249,7 +266,7 @@ static void punk_cache_check_fork(pTHX_ punk_cache *c) {
  * into every call site. */
 static const char *punk_cache_get(pTHX_ punk_cache *c, const char *k,
                                   uint32_t klen, double now, uint32_t *vlen) {
-    uint64_t h = pc_hash(k, klen);
+    uint64_t h = pc_hash_seeded(c, k, klen);
     pc_entry *e;
 
     punk_cache_check_fork(aTHX_ c);
@@ -285,7 +302,7 @@ static void pc_make_room(pTHX_ punk_cache *c, size_t need) {
  * that is only ever discovered from the outside. */
 static int punk_cache_set(pTHX_ punk_cache *c, const char *k, uint32_t klen,
                           const char *v, uint32_t vlen, double expiry) {
-    uint64_t h = pc_hash(k, klen);
+    uint64_t h = pc_hash_seeded(c, k, klen);
     size_t cost = pc_entry_cost(klen, vlen);
     pc_entry *e;
 
@@ -340,7 +357,7 @@ static int punk_cache_set(pTHX_ punk_cache *c, const char *k, uint32_t klen,
 
 static int punk_cache_delete(pTHX_ punk_cache *c, const char *k,
                              uint32_t klen) {
-    uint64_t h = pc_hash(k, klen);
+    uint64_t h = pc_hash_seeded(c, k, klen);
     pc_entry *e;
     punk_cache_check_fork(aTHX_ c);
     e = pc_find(c, k, klen, h, NULL);

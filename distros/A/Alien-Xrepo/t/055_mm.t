@@ -33,6 +33,8 @@ subtest 'loads and defaults' => sub {
     is $mm->license,           'artistic_2',  'license defaults';
     is $mm->xrepo_cache,       0,             'xrepo_cache defaults to 0';
     is $mm->xrepo_update_repo, 0,             'xrepo_update_repo defaults to 0';
+    is $mm->xrepo_verbose,     0,             'xrepo_verbose defaults to 0';
+    is $mm->xrepo_diagnosis,   0,             'xrepo_diagnosis defaults to 0';
     is $mm->xrepo_snapshot,    undef,         'xrepo_snapshot defaults to undef';
     is $mm->xrepo_share_dir,   undef,         'xrepo_share_dir defaults to undef';
     is $mm->requires, {},      'requires defaults to empty';
@@ -99,6 +101,21 @@ subtest 'xrepo_update_repo folds into the write config' => sub {
     $mm->Write;
     my $cfg = JSON::PP::decode_json( $root->child('xrepo-mm.json')->slurp_utf8 );
     is $cfg->{update_repo}, 1, 'update_repo recorded in xrepo-mm.json';
+};
+subtest 'xrepo_verbose / xrepo_diagnosis fold into the write config' => sub {
+    my $root = make_mini_dist();
+    my $mm   = Alien::Xrepo::MM->new( module_name => 'Exotic::Foo', base_dir => $root->stringify, xrepo_verbose => 1, xrepo_diagnosis => 1, );
+    is $mm->xrepo_verbose,   1, 'xrepo_verbose read back';
+    is $mm->xrepo_diagnosis, 1, 'xrepo_diagnosis read back';
+    $mm->Write;
+    my $cfg = JSON::PP::decode_json( $root->child('xrepo-mm.json')->slurp_utf8 );
+    is $cfg->{verbose},   1, 'verbose recorded in xrepo-mm.json';
+    is $cfg->{diagnosis}, 1, 'diagnosis recorded in xrepo-mm.json';
+    my $default = Alien::Xrepo::MM->new( module_name => 'Exotic::Foo', base_dir => $root->stringify );
+    $default->Write;
+    my $dcfg = JSON::PP::decode_json( $root->child('xrepo-mm.json')->slurp_utf8 );
+    is $dcfg->{verbose},   0, 'verbose defaults to 0 in the config';
+    is $dcfg->{diagnosis}, 0, 'diagnosis defaults to 0 in the config';
 };
 subtest 'snapshot_stale rejects a directory masquerading as the snapshot' => sub {
     my $root = make_mini_dist();

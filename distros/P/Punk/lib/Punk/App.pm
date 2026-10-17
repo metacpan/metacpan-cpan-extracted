@@ -8,7 +8,7 @@ use Punk::Router::Scope;
 use Punk::Context;
 use Punk::Static;
 
-our $VERSION = '0.59';
+our $VERSION = '0.60';
 
 sub compile_extras {
     my ($self) = @_;
@@ -206,8 +206,9 @@ Only meaningful after C<to_app>: the names are resolved when the routes are.
 Freezes the configuration and returns the PSGI app. Dispatch order:
 before_request hooks (when any are registered - they run before anything
 is matched, so they are the only phase a 404, a 405 or a mount reaches),
-static table, PSGI/static-file mounts (longest prefix first), dynamic
-buckets, then 404/405. Matched requests construct the context, run
+static table, PSGI/static-file mounts (longest prefix first), the dynamic
+records (a linear scan in declaration order), then 404/405. Matched
+requests construct the context, run
 before_dispatch hooks and the route's frozen guard chain (a reference
 return short-circuits), call the handler, and coerce the return value:
 

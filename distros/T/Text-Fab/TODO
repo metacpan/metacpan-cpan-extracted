@@ -1,8 +1,18 @@
-﻿The error messages are not yet in the described format.
+﻿The default mode of process is equivalent to writing to a buffer __default__, and at the end executing the file
+	= = = = = filterbuffer(raw) __default__
+Doing the same abstraction once more, the buffer with that contents may be also created dynamically, then loaded via filterbuffer().
+On the gripping hand, this may be also
+	= = = = = filterbuffer(raw) __default__pre
+	= = = = = filterbuffer(raw) __default__
+	= = = = = filterbuffer(raw) __default__post
+With (initially) empty buffers __default__pre and __default__post (to which one has a chance to write later!).  And what one
+writes to these buffers may be triplicated likewise.  Etc.
 
-Docs are not cleaned up (mark these by “???”!); and parts are still missing.
+For postponed actions need an extra argument "ignore errors": with 2 would just put into eval, with 1 converted to a warning,
+negative values stop the remaining undo actions for that many frames (with -2 stopping for the current frame and one more).
 
-The implementation (when it exists) has not been cleaned up yet.
+One needs to prohibit __get()ing a reference.  Use __getref() when you expect a reference (but no checks for reference are
+performed).
 
 MISS: input__end($n) with $n==0 ending the current input stream, or also $n enclosing streams.
 
@@ -20,8 +30,6 @@ MISS: _-prefixed versions of config__*() which check the prefix _ __ ___ of the 
 MISS: pipelining preprocessor with “filters”: filters consists of 3 components: preprocessor, massaging of promises, and the
       concatenator of the resulting candidates-for-sections.
 
-When undoing, undo data should be guarded, at least up to the exit.
-
 Uplevel w.r.t. the recursion stack should be recalculated into the usual uplevels; a special do-nothing group may be used.
 
 allow not 1 active preprocessor engine, but a stack of them, chained, and have a cfg__pop() primitive method.
@@ -35,8 +43,39 @@ An extra parameter $is_replay for the syntax callbacks for the non-first pass.  
 be part of this???
 
 hash keys.  Setting/getting them employs a serialization method, by default JSON???
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!	THIS IS TOO DANGEROUS.
+					Access control to Fab/* keys should be guarded by ungettable/settable types of values ???
 
-==== uplevel should allow execution AFTER the group is closed
+#unset — but maybe it is going to make undo harder???
+
+Recursive invocation is needed for massaging data between different levels:
+  • The hash
+  • Input file names
+  • Input strings
+  • Output sections
+
+A top→down approach to recognizing the “reconfiguration directives”: but cannot
+we support a bottom→up approach too, when the preprocessor recognizes interlaced
+directives?  How to deal with recursion: return an indicator that the state
+changed?  But it is changing permanently, one needs to filter out changes — but how
+the internal calls know the filters needed for the enclosing calls???
+
+the preprocessor needs a guarantee that it is going to be reentered
+
+=========================== DONE/OBSOLETE beyond this point
+
+Docs are not cleaned up (mark these by “???”!); and parts are still missing.
+
+cfg__set() with a scalar key should fail with more than 1 values to set.
+
+What if no $offset and list???
+	Passing C<$offset> on a non-list key halts with C<E_TYPE_MISMATCH>.
+
+When undoing, undo data should be guarded, at least up to the exit.
+
+====================
+
+uplevel should allow execution AFTER the group is closed
 
 There should be an indicator that a method is called “from” before/after uplevel.  If uplevel is called “uplevel”ed, it should
 only register the requests,; at end of the enclosing processing of the uplevevel-ed stuff, these postponed commands should be
@@ -54,20 +93,17 @@ executed (reversing order again???).
 
     Note that "string#" comes before "string" for any value of "string", and different strings “sort differently”!
 
-#unset — but maybe it is going to make undo harder???
+  The current docs mix pre/post semantics.
 
-Recursive invocation is needed for massaging data between different level:
-  • The hash
-  • Input file names
-  • Input strings
-  • Output sections
-
-#unset — but maybe it is going to make undo harder???
-
-A top→down approach to recognizing the “reconfiguration directives”: but cannot
-we support a bottom→up approach too, when the preprocessor recognizes interlaced
-directives?  How to deal with recursion: return an indicator that the state
-changed?  But it is changing permanently, one needs to filter out changes — but how
-the internal calls know the filters needed for the enclosing calls???
-
-the preprocessor needs a guarantee that it is going to be reentered
+    Status Details:
+      • DONE: Clean, non-heuristic API: group__postpone($depth, $priority, $how, $method, @args).
+      • DONE: Real-number priority: < 0 executes PRE-undo (before rollback), 0.0 is the
+        rollback point, >= 0 executes POST-undo (in restored enclosing scope).
+      • DONE: User-selected 'append' vs 'prepend' controls execution order within equal priorities.
+      • DONE: Two-level execution architecture:
+          - Level 1: Sorted array of priority indices (@priorities).
+          - Level 2: Hash of internal arrays ($top->{postponed_by_prio}).
+          - Fast path: sequential shift from current internal array. Insertions into existing
+            present/future buckets push/unshift directly without recalculation.
+          - Slow path: insertions in the past (time machine) or into newly created future priorities
+            route to $top->{extra_prio} and trigger index recalculation on demand.

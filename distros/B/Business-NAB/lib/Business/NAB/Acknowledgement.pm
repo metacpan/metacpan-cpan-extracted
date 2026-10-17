@@ -1,5 +1,5 @@
 package Business::NAB::Acknowledgement;
-$Business::NAB::Acknowledgement::VERSION = '0.10';
+$Business::NAB::Acknowledgement::VERSION = '0.11';
 =head1 NAME
 
 Business::NAB::Acknowledgement
@@ -274,17 +274,45 @@ sub _parse_payments_ack ( $Node ) {
 
     $attributes{ user_message } = $Node->findvalue( './UserMessage' );
 
-    ( $attributes{ status } ) = (
+    $attributes{ status } = _user_message_to_status(
         $attributes{ user_message }
-            =~ /(ACCEPTED|PROCESSED|REJECTED|PENDING|DECLINED|SUCCESS|HELD)/i
     );
-
-    $attributes{ status } = lc( $attributes{ status } );
 
     $attributes{ detailed_message }
         = $Node->findvalue( './DetailedMessage' );
 
     return %attributes;
+}
+
+sub _user_message_to_status ( $message ) {
+
+    # XML? Free form text? WHY NOT BOTH!
+    my ( $status ) = $message
+        =~ /(ACCEPTED|PROCESSED|REJECTED|PENDING|DECLINED|SUCCESS|HELD)/i
+    ;
+
+    if ( ! $status ) {
+
+        # try harder to get the status value
+        chomp( $message );
+        $message =~ s/Payment status is\s*//i;
+
+        # normalise myriad status strings
+        $status = {
+            'DELETED'                => 'REJECTED',
+            'CANCELLED'              => 'REJECTED',
+            'FUTURE DATED'           => 'ACCEPTED',
+            'REQUIRES APPROVAL'      => 'HELD',
+            'REQUIRES AUTHORISATION' => 'HELD',
+            'REQUIRES BANK APPROVAL' => 'HELD',
+
+            # the status of last resort
+            '' => undef,
+
+        }->{ uc( $message ) } // undef;
+    }
+
+    return $status ? lc( $status ) : undef;
 }
 
 sub _parse_common_ack ( $Node ) {

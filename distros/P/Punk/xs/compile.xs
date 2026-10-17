@@ -1305,6 +1305,9 @@ compile(self)
         {
             AV *acap = newAV();
             av_push(acap, newSVsv(state_rv));
+            /* the same state read once into a struct (punk_state.h); it
+             * borrows from the hash in slot 0, which the capture keeps */
+            av_push(acap, pk_state_build(aTHX_ state));
             app_cv = punk_closure(aTHX_ pc_app_cb, acap);
         }
 

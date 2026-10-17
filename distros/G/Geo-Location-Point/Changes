@@ -1,5 +1,23 @@
 Revision history for Geo::Location::Point
 
+0.17	Fri Oct 16 09:03:34 PM EDT 2026
+	Named accessors for the provenance fields - geocoder, database, confidence,
+	accuracy, country, city and state - instead of leaving them to AUTOLOAD, so
+	that pod-coverage sees them and a value the reader cannot trust is refused
+	where it is set: confidence must be a number from 0 to 1, and accuracy must
+	be one of address, street, postcode, locality, city, region or country, the
+	vocabulary that Geo::Coder::Free::Provenance speaks
+	They read and write the slot AUTOLOAD would, invalidating the same caches,
+	so the two spellings are interchangeable and undef still clears a field
+	The BUGS section now says which attributes are checked and which are not:
+	new() still stores whatever it is handed, including the false values 0.16
+	made readable, so a provenance field set through the constructor is not
+	validated
+	t/attr.t: a VALIDATION block asserts that an out-of-range confidence, an
+	accuracy outside the vocabulary and a non-string city are refused by name,
+	and that the valid values round-trip.  The empty string is no longer an
+	accuracy, so the three assertions that used it as one now use a level
+
 0.16	Thu Oct 15 09:47:39 AM EDT 2026
 	Remove wasted test
 	Store and return false values, e.g. confidence => 0, instead of

@@ -13,7 +13,7 @@ BEGIN {
 CARP: {
 	my $places = new_ok('Locale::Places');
 
-	does_croak_that_matches(sub { $places->translate() }, qr/Usage/);
+	throws_ok(sub { $places->translate() }, qr/Usage/, 'translate() with no arguments dies with usage');
 	does_croak_that_matches(sub { Locale::Places->translate({ from => 'fr' }) }, qr/must be called on an object/);
 
 	delete $ENV{'LC_MESSAGES'};

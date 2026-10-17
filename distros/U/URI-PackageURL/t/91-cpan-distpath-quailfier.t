@@ -2,7 +2,6 @@
 
 use v5.10;
 use Test::More;
-use Data::Dumper;
 
 use CPAN::DistnameInfo;
 
@@ -19,10 +18,9 @@ while (my $distpath = <DATA>) {
 
         my $purl1 = PURL->new(
             type       => 'cpan',
-            namespace  => $d->cpanid,
             name       => $d->dist,
             version    => $d->version,
-            qualifiers => {distpath => $distpath}
+            qualifiers => {distpath => $distpath, author => $d->cpanid}
         );
 
         my $urls1 = purl_to_urls($purl1);

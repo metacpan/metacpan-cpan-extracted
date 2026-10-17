@@ -54,6 +54,7 @@ WriteMakefile(
 	}, TEST_REQUIRES => {
 		'DBD::CSV' => 0,
 		'Encode' => 0,
+		'Test::DescribeMe' => 0,	# Author tests (t/pod.t, t/manifest.t, t/version.t) declare themselves with this; the tools they need are optional and skipped without them
 		'Test::Memory::Cycle' => 0,
 		'Test::Mockingbird' => 0,
 		'Test::Most' => 0,
@@ -75,7 +76,17 @@ WriteMakefile(
 			}, bugtracker => {
 				web => 'https://github.com/nigelhorne/Database-BI/issues',
 			}
-		}, prereqs => {
+		},		prereqs => {
+			runtime => {
+				recommends => {
+					# Geocoding a dataset's location column (Phase 6.2).  Loaded with a
+					# runtime require, never a hard prerequisite: 0.46 added
+					# valid_location() and 0.47 added geocode_many(), and the app
+					# installs, starts and tests without the module, hiding the
+					# location option and saying which version is needed.
+					'Geo::Coder::Free' => '0.47'
+				}
+			},
 			test => {
 				recommends => {
 					'Redis' => 0

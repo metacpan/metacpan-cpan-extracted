@@ -42,26 +42,56 @@ page "404.html" {
 }
 RC
 
+# The chrome of a page of the tree of en: the language of the tree,
+# the stylesheet one step up, and the header link by name. Each page
+# of the tree below starts with it.
+my $TREE = <<'HTML';
+<html lang="en">
+<link rel="stylesheet" href="../style.css">
+<header><a href="index.html">Example</a></header>
+HTML
+
 # The pages of a site that passes every check. Each subtest starts
 # from this and breaks exactly one thing.
 my %GOOD = (
-	'index.html' => <<'HTML',
+	'en/index.html' => $TREE . <<'HTML',
 <title>Home &#8212; Example</title>
 <a href="index.html">Home</a>
 <a href="https://example.org/">Elsewhere</a>
 <a href="./other.html">Other</a>
 <a href="./other.html#here">The anchor</a>
 HTML
-	'404.html' => <<'HTML',
+	'en/404.html' => $TREE . <<'HTML',
 <title>Not found &#8212; Example</title>
 <a href="index.html">Home</a>
 <a href="https://example.org/">Elsewhere</a>
 HTML
-	'other.html' => <<'HTML',
+	'en/other.html' => $TREE . <<'HTML',
 <title>Other &#8212; Example</title>
 <a href="index.html">Home</a>
 <a href="https://example.org/">Elsewhere</a>
 <h2 id="here">Here</h2>
+HTML
+
+	# The copy of the 404 page at the top level. Its base is the
+	# one root-absolute href of the site, and its chrome links the
+	# default tree.
+	'404.html' => <<'HTML',
+<html lang="en">
+<base href="/">
+<title>Not found &#8212; Example</title>
+<link rel="stylesheet" href="style.css">
+<header><a href="en/index.html">Example</a></header>
+<a href="en/index.html">Home</a>
+<a href="https://example.org/">Elsewhere</a>
+HTML
+
+	# The forward of the top level, per WEB-LANG-8.
+	'index.html' => <<'HTML',
+<html lang="en">
+<meta http-equiv="refresh" content="0; url=en/index.html">
+<title>Example</title>
+<p><a href="en/index.html">Example</a></p>
 HTML
 	'style.css'  => "body { color: black }\n",
 	'robots.txt' => "User-agent: *\n",
@@ -108,7 +138,7 @@ PAGE
 	close $body;
 
 	my $out = "$root/out";
-	make_path($out);
+	make_path("$out/en");
 
 	my %page = ( %GOOD, %override );
 	for my $name ( sort keys %page ) {
@@ -141,38 +171,220 @@ subtest 'a site that is good gives no problem' => sub {
 };
 
 subtest 'a page that is missing or empty' => sub {
-	my @problems = built( 'other.html' => undef )->run;
-	like( join( "\n", @problems ), qr/other\.html: missing from the output/,
-		'a missing page' );
+	my @problems = built( 'en/other.html' => undef )->run;
+	like( join( "\n", @problems ),
+		qr{en/other\.html: missing from the output}, 'a missing page' );
 
-	@problems = built( 'other.html' => '' )->run;
-	like( join( "\n", @problems ), qr/other\.html: empty/,
+	@problems = built( 'en/other.html' => '' )->run;
+	like( join( "\n", @problems ), qr{en/other\.html: empty},
 		'an empty page' );
+
+	@problems = built( 'index.html' => undef )->run;
+	like( join( "\n", @problems ), qr{^index\.html: missing from the output}m,
+		'a missing forward' );
+
+	@problems = built( '404.html' => undef )->run;
+	like( join( "\n", @problems ), qr{^404\.html: missing from the output}m,
+		'a missing copy of the 404 page' );
 };
 
 subtest 'a page with no title' => sub {
-	my @problems = built( 'other.html' =>
-		    "<a href=\"index.html\">Home</a>\n"
+	my @problems = built( 'en/other.html' => $TREE
+		    . "<a href=\"index.html\">Home</a>\n"
 		    . "<a href=\"https://example.org/\">Elsewhere</a>\n"
 		    . "<h2 id=\"here\">Here</h2>\n" )->run;
-	like( join( "\n", @problems ), qr/other\.html: has no title/,
+	like( join( "\n", @problems ), qr{en/other\.html: has no title},
 		'no title' );
 };
 
 subtest 'a page that drops the navigation' => sub {
-	my @problems = built( 'other.html' => <<'HTML' )->run;
+	my @problems = built( 'en/other.html' => $TREE . <<'HTML' )->run;
 <title>Other &#8212; Example</title>
 <a href="index.html">Home</a>
 <h2 id="here">Here</h2>
 HTML
-	my $expected = 'other.html: does not carry the navigation entry'
+	my $expected = 'en/other.html: does not carry the navigation entry'
 	    . ' https://example.org/';
 	like( join( "\n", @problems ), qr/\Q$expected\E/,
 		'the missing entry is named' );
 };
 
+subtest 'a tree page of another language' => sub {
+	# WEB-LANG-14. A tree page carries the code of its tree.
+	my @problems = built( 'en/other.html' => <<'HTML' )->run;
+<html lang="sv">
+<link rel="stylesheet" href="../style.css">
+<header><a href="index.html">Example</a></header>
+<title>Other &#8212; Example</title>
+<a href="index.html">Home</a>
+<a href="https://example.org/">Elsewhere</a>
+<h2 id="here">Here</h2>
+HTML
+	is_deeply( \@problems, ['en/other.html: does not carry lang="en"'],
+		'the page is held to the language of its tree' );
+};
+
+subtest 'each kind of page takes one form of the chrome' => sub {
+	# WEB-LANG-15. A tree page takes <page>, the key page
+	# ../en/<page>, and the top-level copy of the 404 page
+	# en/<page>. An absolute URL passes unchanged on each.
+	my %form = (
+		tree => 'index.html',
+		keys => '../en/index.html',
+		top  => 'en/index.html',
+	);
+	for my $kind ( sort keys %form ) {
+		is( App::FuguWeb::Check::_chrome( $kind, 'index.html' ),
+			$form{$kind}, "the form of a $kind page" );
+		is( App::FuguWeb::Check::_chrome( $kind, 'https://example.org/' ),
+			'https://example.org/',
+			"and an absolute URL of a $kind page" );
+	}
+
+	# A tree page that links the default tree from outside it.
+	my @problems = built( 'en/other.html' => <<'HTML' )->run;
+<html lang="en">
+<link rel="stylesheet" href="../style.css">
+<header><a href="../en/index.html">Example</a></header>
+<title>Other &#8212; Example</title>
+<a href="../en/index.html">Home</a>
+<a href="https://example.org/">Elsewhere</a>
+<h2 id="here">Here</h2>
+HTML
+	is_deeply(
+		\@problems,
+		[
+			'en/other.html: the header does not link index.html',
+			'en/other.html: does not carry the navigation entry'
+			    . ' index.html'
+		],
+		'a tree page names each page of its tree by name'
+	);
+
+	# The copy of the 404 page with the links of a tree page. The
+	# base makes each one resolve from the root, so each one would
+	# name a page of the top level.
+	@problems = built( '404.html' => <<'HTML' )->run;
+<html lang="en">
+<base href="/">
+<title>Not found &#8212; Example</title>
+<link rel="stylesheet" href="style.css">
+<header><a href="index.html">Example</a></header>
+<a href="index.html">Home</a>
+<a href="en/https://example.org/">Elsewhere</a>
+HTML
+	my $joined = join "\n", @problems;
+	like( $joined, qr{^404\.html: the header does not link index\.html}m,
+		'the top-level copy takes en/ in front of the header link' );
+	like(
+		$joined,
+		qr{^404\.html: does not carry the navigation entry index\.html}m,
+		'and in front of a nav link'
+	);
+	like(
+		$joined,
+qr{^404\.html: does not carry the navigation entry https://example\.org/}m,
+		'and an absolute nav URL passes unchanged'
+	);
+};
+
+subtest 'a language link that the site does not hold' => sub {
+	# WEB-LANG-7. A site of one language carries no language link.
+	# The site of two languages is in site.t, which builds it.
+	my @problems = built( 'en/other.html' => $GOOD{'en/other.html'}
+		    . qq{<a href="../de/other.html" hreflang="de">de</a>\n} )->run;
+	like(
+		join( "\n", @problems ),
+qr{^en/other\.html: carries 1 language links, and the page takes 0$}m,
+		'a tree page with a link to a language the site does not hold'
+	);
+
+	# The chrome ends where the main element starts. A link of the
+	# body is the writer's own.
+	@problems = built( 'en/other.html' => $GOOD{'en/other.html'}
+		    . "<main>\n"
+		    . qq{<a href="https://example.org/de/" hreflang="de">de</a>\n} )
+	    ->run;
+	is( scalar @problems, 0, 'a link of the body is no language link' )
+	    or diag join "\n", @problems;
+};
+
+subtest 'the base href is the one root-absolute href' => sub {
+	# WEB-LANG-15. The top-level copy of the 404 page carries the
+	# base, and no other page and no other href may be rooted.
+	my @problems = built( '404.html' => <<'HTML' )->run;
+<html lang="en">
+<title>Not found &#8212; Example</title>
+<link rel="stylesheet" href="style.css">
+<header><a href="en/index.html">Example</a></header>
+<a href="en/index.html">Home</a>
+<a href="https://example.org/">Elsewhere</a>
+HTML
+	is_deeply( \@problems, ['404.html: does not carry <base href="/">'],
+		'the copy needs its base' );
+
+	@problems = built( '404.html' => <<'HTML' )->run;
+<html lang="en">
+<base href="/">
+<title>Not found &#8212; Example</title>
+<link rel="stylesheet" href="style.css">
+<header><a href="en/index.html">Example</a></header>
+<a href="en/index.html">Home</a>
+<a href="https://example.org/">Elsewhere</a>
+<a href="/en/index.html">Rooted</a>
+HTML
+	is_deeply( \@problems, ['404.html: /en/index.html is root-absolute'],
+		'a second root-absolute href of the copy fails' );
+
+	@problems = built( 'en/other.html' => "<base href=\"/\">\n"
+		    . $GOOD{'en/other.html'} )->run;
+	is_deeply( \@problems, ['en/other.html: / is root-absolute'],
+		'and a base on a tree page fails' );
+};
+
+subtest 'the forward takes one shape' => sub {
+	# WEB-LANG-8. A meta refresh, one link, and nothing loaded.
+	my @problems = built( 'index.html' => <<'HTML' )->run;
+<html lang="en">
+<title>Example</title>
+<p><a href="en/index.html">Example</a></p>
+HTML
+	is_deeply( \@problems, ['index.html: does not forward to en/index.html'],
+		'a forward with no refresh' );
+
+	@problems = built( 'index.html' => <<'HTML' )->run;
+<html lang="en">
+<meta http-equiv="refresh" content="0; url=en/index.html">
+<title>Example</title>
+<link rel="stylesheet" href="style.css">
+<p><a href="en/index.html">Example</a></p>
+HTML
+	is_deeply(
+		\@problems,
+		[
+			'index.html: holds a reference other than one link to'
+			    . ' en/index.html'
+		],
+		'a forward that loads a stylesheet'
+	);
+
+	@problems = built( 'index.html' => <<'HTML' )->run;
+<html lang="en">
+<meta http-equiv="refresh" content="0; url=en/index.html">
+<title>Example</title>
+<nav>
+</nav>
+<p><a href="en/index.html">Example</a></p>
+HTML
+	is_deeply(
+		\@problems,
+		['index.html: carries a nav, and the forward takes none'],
+		'a forward with a nav'
+	);
+};
+
 subtest 'a link that leads nowhere, or to no such anchor' => sub {
-	my @problems = built( 'other.html' => <<'HTML' )->run;
+	my @problems = built( 'en/other.html' => $TREE . <<'HTML' )->run;
 <title>Other &#8212; Example</title>
 <a href="index.html">Home</a>
 <a href="https://example.org/">Elsewhere</a>
@@ -180,9 +392,9 @@ subtest 'a link that leads nowhere, or to no such anchor' => sub {
 <h2 id="here">Here</h2>
 HTML
 	like( join( "\n", @problems ),
-		qr{other\.html: \./gone\.html leads nowhere}, 'a dead link' );
+		qr{en/other\.html: \./gone\.html leads nowhere}, 'a dead link' );
 
-	@problems = built( 'other.html' => <<'HTML' )->run;
+	@problems = built( 'en/other.html' => $TREE . <<'HTML' )->run;
 <title>Other &#8212; Example</title>
 <a href="index.html">Home</a>
 <a href="https://example.org/">Elsewhere</a>
@@ -190,12 +402,12 @@ HTML
 <h2 id="here">Here</h2>
 HTML
 	like( join( "\n", @problems ),
-		qr{other\.html: \./index\.html#absent has no such anchor},
+		qr{en/other\.html: \./index\.html#absent has no such anchor},
 		'a dead fragment' );
 };
 
 subtest 'a reference that leaves the site' => sub {
-	my @problems = built( 'other.html' => <<'HTML' )->run;
+	my @problems = built( 'en/other.html' => $TREE . <<'HTML' )->run;
 <title>Other &#8212; Example</title>
 <a href="index.html">Home</a>
 <a href="https://example.org/">Elsewhere</a>
@@ -207,13 +419,13 @@ HTML
 
 	# The host may serve the site from a path below the root, where
 	# a leading slash leaves the site entirely.
-	like( $joined, qr{other\.html: /index\.html is root-absolute},
+	like( $joined, qr{en/other\.html: /index\.html is root-absolute},
 		'a root-absolute reference' );
 	like( $joined, qr{is a file: URL}, 'a file: URL' );
 };
 
 subtest 'a local link that reads as a URL scheme' => sub {
-	my @problems = built( 'other.html' => <<'HTML' )->run;
+	my @problems = built( 'en/other.html' => $TREE . <<'HTML' )->run;
 <title>Other &#8212; Example</title>
 <a href="index.html">Home</a>
 <a href="https://example.org/">Elsewhere</a>
@@ -233,7 +445,7 @@ HTML
 subtest 'a cross-reference that dangles' => sub {
 	# A local .Xr link is a reference like any other, and the
 	# reference check catches it.
-	my @problems = built( 'other.html' => <<'HTML' )->run;
+	my @problems = built( 'en/other.html' => $TREE . <<'HTML' )->run;
 <title>Other &#8212; Example</title>
 <a href="index.html">Home</a>
 <a href="https://example.org/">Elsewhere</a>
@@ -241,31 +453,67 @@ subtest 'a cross-reference that dangles' => sub {
 <h2 id="here">Here</h2>
 HTML
 	my $joined = join "\n", @problems;
-	like( $joined, qr{other\.html: \./gone\.1\.html leads nowhere},
+	like( $joined, qr{en/other\.html: \./gone\.1\.html leads nowhere},
 		'a local .Xr that leads nowhere' );
 };
 
 subtest 'a page that nothing links to' => sub {
-	# index.html no longer links to other.html. 404.html is
+	# en/index.html no longer links to other.html. 404.html is
 	# unlinked on purpose, so it must not be reported.
-	my @problems = built( 'index.html' => <<'HTML' )->run;
+	my @problems = built( 'en/index.html' => $TREE . <<'HTML' )->run;
 <title>Home &#8212; Example</title>
 <a href="index.html">Home</a>
 <a href="https://example.org/">Elsewhere</a>
 HTML
 	my $joined = join "\n", @problems;
 
-	like( $joined, qr{other\.html: no page links to it},
+	like( $joined, qr{en/other\.html: no page links to it},
 		'the unreachable page' );
 	unlike( $joined, qr{404\.html: no page links to it},
 		'a page marked unlinked is not reported' );
+
+	# WEB-LANG-14. The walk starts at the entry page of the tree,
+	# and never at a page of the top level. A link of the forward
+	# or of the copy of the 404 page reaches no page of the tree.
+	@problems = built(
+		'en/index.html' => $TREE . <<'HTML',
+<title>Home &#8212; Example</title>
+<a href="index.html">Home</a>
+<a href="https://example.org/">Elsewhere</a>
+HTML
+		'404.html' => $GOOD{'404.html'} . <<'HTML',
+<a href="en/other.html">Other</a>
+HTML
+	)->run;
+	like( join( "\n", @problems ), qr{en/other\.html: no page links to it},
+		'a link of the top level does not count' );
+
+	# The walk stays inside the tree. A link out of the tree to the
+	# top level reaches no page of the tree through it.
+	@problems = built(
+		'en/index.html' => $TREE . <<'HTML',
+<title>Home &#8212; Example</title>
+<a href="index.html">Home</a>
+<a href="https://example.org/">Elsewhere</a>
+<a href="../404.html">Out</a>
+HTML
+		'404.html' => $GOOD{'404.html'} . <<'HTML',
+<a href="en/other.html">Other</a>
+HTML
+	)->run;
+	is_deeply( \@problems, ['en/other.html: no page links to it'],
+		'and neither does a page of the top level on the way' );
+
+	@problems = built( 'en/index.html' => undef )->run;
+	like( join( "\n", @problems ), qr{en/index\.html: the entry page is missing},
+		'the entry page of the tree is missing' );
 };
 
 subtest 'what is not a problem stays not a problem' => sub {
 	# The two skip rules. Without a case that exercises each of
 	# them, a check that lost one would report a false positive and
 	# only the real site would notice.
-	my @problems = built( 'other.html' => <<'HTML' )->run;
+	my @problems = built( 'en/other.html' => $TREE . <<'HTML' )->run;
 <title>Other &#8212; Example</title>
 <a href="index.html">Home</a>
 <a href="https://example.org/">Elsewhere</a>
@@ -287,6 +535,11 @@ subtest 'a stray file in the output' => sub {
 	like( join( "\n", @problems ),
 		qr{index\.html~: in the output but not in the site},
 		'the stray file is named' );
+
+	# A page of the old flat layout is a stray file of the new one.
+	@problems = built( 'other.html' => $GOOD{'en/other.html'} )->run;
+	is_deeply( \@problems, ['other.html: in the output but not in the site'],
+		'a page at the top level is named' );
 };
 
 done_testing();

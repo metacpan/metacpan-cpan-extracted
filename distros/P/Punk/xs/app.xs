@@ -1043,6 +1043,21 @@ csrf(self, ...)
             (void)hv_delete(h, K_CSRF, (I32)strlen(K_CSRF), G_DISCARD);
         }
         else {
+            /* The mirror cookie is written where a croak is trapped, so a
+             * name the cookie builder would refuse is refused here; and the
+             * header name has a fixed-size env key, so a long one is refused
+             * rather than silently matching nothing. */
+            SV **ck = hv_fetchs(cfg, "cookie", 0);
+            SV **hd = hv_fetchs(cfg, "header", 0);
+            if (ck && *ck && SvOK(*ck) && !pk_cookie_safe(aTHX_ *ck)) {
+                SvREFCNT_dec((SV *)cfg);
+                croak("Punk: csrf `cookie` may not contain ';' or a control "
+                      "character");
+            }
+            if (hd && *hd && SvOK(*hd) && SvCUR(*hd) > 120) {
+                SvREFCNT_dec((SV *)cfg);
+                croak("Punk: csrf `header` name is longer than 120 bytes");
+            }
             (void)hv_store(h, K_CSRF, (I32)strlen(K_CSRF),
                            newRV_noinc((SV *)cfg), 0);
         }
@@ -1189,7 +1204,17 @@ logging(self, ...)
              * written is a boot error and not a 500 on the first line that
              * somebody tries to log. */
             SV **to = hv_fetchs(cfg, "to", 0);
+            GV *named = NULL;
             if (to && *to && SvOK(*to) && !SvROK(*to)
+                && SvTYPE(*to) != SVt_PVGV && SvCUR(*to)) {
+                /* the NAME of an open handle first - `to: STDERR` is what
+                 * a YAML file says for the default - and a path otherwise */
+                GV *g = gv_fetchsv(*to, 0, SVt_PVIO);
+                if (g && GvIO(g) && IoOFP(GvIO(g))) named = g;
+            }
+            if (named)
+                (void)hv_stores(cfg, "to", newRV_inc((SV *)named));
+            else if (to && *to && SvOK(*to) && !SvROK(*to)
                 && SvTYPE(*to) != SVt_PVGV && SvCUR(*to)) {
                 PerlIO *fp = PerlIO_open(SvPV_nolen(*to), "a");
                 GV *gv;

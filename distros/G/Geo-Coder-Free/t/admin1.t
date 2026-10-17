@@ -4,7 +4,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 6;
+use Test::Most;
 use Test::Log::Abstraction;
 
 use constant	DATABASE => 'lib/Geo/Coder/Free/MaxMind/databases/admin1.db';
@@ -39,3 +39,5 @@ ADMIN1: {
 		}
 	}
 }
+
+done_testing();

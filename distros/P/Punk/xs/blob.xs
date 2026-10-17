@@ -160,6 +160,7 @@ sweep(class, where, ...)
         sv_2mortal((SV *)live);
         pb_sweep(aTHX_ SvPV_nolen(root), live, grace, dry, &removed, &kept);
 
+        SP = PL_stack_base + ax - 1;      /* the live callback ran */
         EXTEND(SP, 2);
         mPUSHu(removed);
         mPUSHu(kept);

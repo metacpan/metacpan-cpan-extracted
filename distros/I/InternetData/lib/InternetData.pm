@@ -14,7 +14,7 @@ use InternetData::Database;
 use InternetData::Error;
 use InternetData::Oauth;
 
-our $VERSION = '1.9.5';
+our $VERSION = '1.10.1';
 
 use constant DEFAULT_BASE_URL => 'https://internetdata.io';
 
@@ -213,28 +213,73 @@ sub _retry_delay {
 # as a retried server_error, like any other 2xx that cannot be read, rather than
 # reaching the caller as undef.
 sub _json_p {
-    my ($self, $url, $timeout, $member, $type, @required) = @_;
+    my ($self, $url, $timeout, $member, $shape) = @_;
     return $self->_get_p($url, $timeout)->then(sub {
         my $res = shift->res;
         die InternetData::Error->from_response($res->code, $res->headers, $res->json)
             unless $res->is_success;
         my $body = $res->json;
-        die InternetData::Error->new(
-            kind => 'server_error', status => $res->code,
-            message => 'the API did not answer with a JSON object',
-        ) unless ref $body eq 'HASH';
-        for my $key (@required) {
-            die InternetData::Error->new(
-                kind => 'server_error', status => $res->code, message => "the API answered with no $key",
-            ) unless defined $body->{$key};
-        }
-        return $body unless defined $member;
-        return $body->{$member} if ref $body->{$member} eq $type;
-        die InternetData::Error->new(
-            kind => 'server_error', status => $res->code,
-            message => "the API answered with no $member",
-        );
+        my $unreadable = sub {
+            die InternetData::Error->new(kind => 'server_error', status => $res->code, message => shift);
+        };
+        $unreadable->('the API did not answer with a JSON object') unless ref $body eq 'HASH';
+        return $body unless $shape;
+        my $answer = defined $member ? $body->{$member} : $body;
+        $unreadable->("the API answered with no $member") unless defined $answer;
+        my $wrong = _nonconforming($shape, $answer, defined $member ? [$member] : []);
+        $unreadable->($wrong) if defined $wrong;
+        return $answer;
     });
+}
+
+# undef when the value has the shape, else what the API answered wrong, naming
+# the member by its path. A string is told from a number by the scalar Mojo::JSON
+# decoded it into, as InternetData::Oauth does, since nothing else in Perl tells
+# `"7"` from `7`.
+sub _nonconforming {
+    my ($shape, $value, $at) = @_;
+    my ($kind, $inner) = @$shape;
+    my $wrong = sub { 'the API answered ' . (@$at ? join('.', @$at) : 'the answer') . ' of the wrong type' };
+    if ($kind eq 'string') {
+        return InternetData::Oauth::_is_string($value) ? undef : $wrong->();
+    }
+    if ($kind eq 'integer') {
+        return !ref $value && !InternetData::Oauth::_is_string($value) && $value =~ /\A-?[0-9]+\z/
+            ? undef : $wrong->();
+    }
+    if ($kind eq 'boolean') {
+        return Scalar::Util::blessed($value) && $value->isa('JSON::PP::Boolean') ? undef : $wrong->();
+    }
+    if ($kind eq 'object') {
+        return ref $value eq 'HASH' ? undef : $wrong->();
+    }
+    if ($kind eq 'list') {
+        return $wrong->() unless ref $value eq 'ARRAY';
+        for my $i (0 .. $#$value) {
+            my $w = _nonconforming($inner, $value->[$i], [@$at, $i]);
+            return $w if defined $w;
+        }
+        return undef;
+    }
+    if ($kind eq 'map_of') {
+        return $wrong->() unless ref $value eq 'HASH';
+        for my $key (sort keys %$value) {
+            my $w = _nonconforming($inner, $value->{$key}, [@$at, $key]);
+            return $w if defined $w;
+        }
+        return undef;
+    }
+    return $wrong->() unless ref $value eq 'HASH';
+    for my $field (@$inner) {
+        my ($name, $member_shape, $required) = @$field;
+        if (!defined $value->{$name}) {
+            return 'the API answered with no ' . join('.', @$at, $name) if $required;
+            next;
+        }
+        my $w = _nonconforming($member_shape, $value->{$name}, [@$at, $name]);
+        return $w if defined $w;
+    }
+    return undef;
 }
 
 sub _get_p {

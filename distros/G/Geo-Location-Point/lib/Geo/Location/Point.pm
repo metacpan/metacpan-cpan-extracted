@@ -23,11 +23,11 @@ Geo::Location::Point - Location information
 
 =head1 VERSION
 
-Version 0.16
+Version 0.17
 
 =cut
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 =head1 SYNOPSIS
 
@@ -388,6 +388,206 @@ sub AUTOLOAD {
 	return $self->{ucfirst($key)};
 }
 
+# The accuracy levels a point may claim, most precise first.  This is the one
+# place the vocabulary is written down: Geo::Coder::Free::Provenance reads it
+# from here instead of keeping a copy of its own, so a level added to one of
+# them cannot go missing from the other.  It is defined here because
+# Geo::Coder::Free depends on this module, and not the other way round.
+use constant ACCURACY_LEVELS => [qw(address street postcode locality city region country)];
+
+my %IS_ACCURACY_LEVEL = map { $_ => 1 } @{ACCURACY_LEVELS()};
+
+# Read a slot the way AUTOLOAD reads it: a lower case key that was never set
+# falls back to its upper case spelling, so a field the caller stored under the
+# upper case name is still found.
+sub _attribute {
+	my ($self, $key) = @_;
+
+	return $self->{$key} if(defined($self->{$key}));
+
+	return $self->{ucfirst($key)};
+}
+
+# Write a slot the way AUTOLOAD writes it, invalidating the caches derived from
+# the attributes: a validated accessor has to keep that promise too, or setting
+# a city after reading as_string() would be invisible.
+sub _set_attribute {
+	my ($self, $key, $value) = @_;
+
+	delete $self->{'location'};
+	delete $self->{'tz'};
+
+	return $self->{$key} = $value;
+}
+
+# Passing undef clears an attribute, so every validated accessor accepts it;
+# anything else has to be the type the field promises.
+sub _check_string {
+	my ($field, $value) = @_;
+
+	return if(!defined($value));
+	Carp::croak(__PACKAGE__, ": $field must be a string, not a ", ref($value)) if(ref($value));
+
+	return $value;
+}
+
+sub _check_confidence {
+	my ($value) = @_;
+
+	return if(!defined($value));
+	Carp::croak(__PACKAGE__, ': confidence must be a number from 0 to 1, not ',
+		ref($value) ? ref($value) : $value)
+		if(ref($value) || !Scalar::Util::looks_like_number($value) || ($value < 0) || ($value > 1));
+
+	return $value;
+}
+
+sub _check_accuracy {
+	my ($value) = @_;
+
+	return if(!defined($value));
+	Carp::croak(__PACKAGE__, ': unknown accuracy: ', ref($value) ? ref($value) : $value)
+		if(ref($value) || !$IS_ACCURACY_LEVEL{$value});
+
+	return $value;
+}
+
+=head2	geocoder
+
+The distribution that produced the point, such as C<Geo::Coder::Free>.
+
+    $location->geocoder('Geo::Coder::Free');
+
+=cut
+
+sub geocoder {
+	my $self = shift;
+
+	return $self->_attribute('geocoder') unless(@_);
+
+	return $self->_set_attribute('geocoder', _check_string('geocoder', shift));
+}
+
+=head2	database
+
+The database the distribution answered from, such as C<OpenAddresses>, C<Local>
+or C<MaxMind>.
+
+    $location->database('OpenAddresses');
+
+=cut
+
+sub database {
+	my $self = shift;
+
+	return $self->_attribute('database') unless(@_);
+
+	return $self->_set_attribute('database', _check_string('database', shift));
+}
+
+=head2	confidence
+
+How good the match is, from C<0> to C<1> inclusive, where C<1> is an exact
+match. A confidence that is not a number, or that falls outside that range, is
+rejected rather than stored.
+
+    $location->confidence(0);		# Tried and rejected
+    $location->confidence(0.8);		# A good match
+
+=cut
+
+sub confidence {
+	my $self = shift;
+
+	return $self->_attribute('confidence') unless(@_);
+
+	return $self->_set_attribute('confidence', _check_confidence(shift));
+}
+
+=head2	ACCURACY_LEVELS
+
+The accuracy levels a point may claim, most precise first: C<address> (a house
+number), C<street>, C<postcode>, C<locality>, C<city>, C<region> and
+C<country>.
+
+This is the vocabulary, written down once here and read from here by
+L<Geo::Coder::Free::Provenance> rather than copied, so the levels a point
+accepts and the levels a backend reports cannot drift apart.  C<accuracy()>
+accepts these and refuses anything else.
+
+    my $levels = Geo::Location::Point::ACCURACY_LEVELS();
+
+=cut
+
+=head2	accuracy
+
+How precise the coordinates behind a match can claim to be.  The levels are
+those in L</ACCURACY_LEVELS>; anything else is rejected, because a reader
+deciding what a point may claim about itself has to be able to trust the
+value.
+
+    $location->accuracy('city');
+
+=cut
+
+sub accuracy {
+	my $self = shift;
+
+	return $self->_attribute('accuracy') unless(@_);
+
+	return $self->_set_attribute('accuracy', _check_accuracy(shift));
+}
+
+=head2	country
+
+The country of the point, as the data spells it: C<GB>, C<US>, C<Canada>. It
+is stored as given rather than normalised, so it is whatever the backend
+matched.
+
+    $location->country('GB');
+
+=cut
+
+sub country {
+	my $self = shift;
+
+	return $self->_attribute('country') unless(@_);
+
+	return $self->_set_attribute('country', _check_string('country', shift));
+}
+
+=head2	city
+
+The city, town or similar locality of the point.
+
+    $location->city('London');
+
+=cut
+
+sub city {
+	my $self = shift;
+
+	return $self->_attribute('city') unless(@_);
+
+	return $self->_set_attribute('city', _check_string('city', shift));
+}
+
+=head2	state
+
+The state, province or region of the point.
+
+    $location->state('KY');
+
+=cut
+
+sub state {
+	my $self = shift;
+
+	return $self->_attribute('state') unless(@_);
+
+	return $self->_set_attribute('state', _check_string('state', shift));
+}
+
 =head1 SUPPORT
 
 This module is provided as-is without any warranty.
@@ -400,12 +600,16 @@ Nigel Horne, C<< <njh at nigelhorne.com> >>
 
 There is no validation on the attribute in the AUTOLOAD method,
 so typos such as "citty" will not be caught.
+C<geocoder>, C<database>, C<confidence>, C<accuracy>, C<country>, C<city> and
+C<state> have documented accessors of their own that do check what they are
+given,
+but they are the only attributes that do,
+and C<new()> stores whatever it is handed without checking it,
+so a provenance field set through the constructor can still be any value.
 
 =head1 SEE ALSO
 
 =over 4
-
-=item * L<Configure an Object at Runtime|Object::Configure>
 
 =item * L<Test Dashboard|https://nigelhorne.github.io/Geo-Location-Point/coverage/>
 

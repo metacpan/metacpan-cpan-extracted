@@ -1,0 +1,1 @@
+   10  PRINT "THIS COSTS #10"

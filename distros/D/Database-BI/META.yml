@@ -6,6 +6,7 @@ build_requires:
   DBD::CSV: '0'
   Encode: '0'
   ExtUtils::MakeMaker: '0'
+  Test::DescribeMe: '0'
   Test::Memory::Cycle: '0'
   Test::Mockingbird: '0'
   Test::Mojo: '0'
@@ -28,6 +29,8 @@ no_index:
   directory:
     - t
     - inc
+recommends:
+  Geo::Coder::Free: '0.47'
 requires:
   CGI::Info: '0'
   CGI::Lingua: '0.85'
@@ -64,5 +67,5 @@ requires:
 resources:
   bugtracker: https://github.com/nigelhorne/Database-BI/issues
   repository: https://github.com/nigelhorne/Database-BI.git
-version: v0.012.1
+version: v0.013.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

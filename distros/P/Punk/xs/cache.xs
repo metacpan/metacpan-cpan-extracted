@@ -168,6 +168,9 @@ new(class, ...)
             croak("Punk::Cache::File: need a `dir`");
         if (!max_bytes)
             croak("Punk::Cache::File: max_bytes must be greater than zero");
+        if (Perl_isinfnan(lock_wait) || lock_wait < 0)
+            croak("Punk::Cache::File: lock_wait must be a finite number of "
+                  "seconds, zero or more");
 
         dp = SvPV_const(dir, dl);
         /* Created and checked HERE, at construction - which is to_app - so an
@@ -178,6 +181,14 @@ new(class, ...)
                   strerror(errno));
         if (access(dp, W_OK | X_OK) != 0)
             croak("Punk::Cache::File: '%s' is not writable", dp);
+        {   /* A directory anyone may write to is one anyone may plant a
+             * symlink in, and the store follows paths under it. */
+            struct stat st;
+            if (stat(dp, &st) == 0 && (st.st_mode & S_IWOTH)
+                && !(st.st_mode & S_ISVTX))
+                croak("Punk::Cache::File: '%s' is world-writable; the cache "
+                      "directory must be private to the server", dp);
+        }
 
         c = punk_cachefile_new(aTHX_ dp, dl, (size_t)max_bytes,
                                (double)lock_wait);

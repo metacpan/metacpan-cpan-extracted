@@ -112,6 +112,7 @@ static const frx_abi *punk_frx(pTHX) {
 #include "punk/punk_app.h"        /* the Punk::App registrar (needs context) */
 #include "punk/punk_host.h"       /* the origin + host allowlist (needs app) */
 #include "punk/punk_proxy.h"      /* reverse-proxy trust (used by serve)    */
+#include "punk/punk_state.h"      /* the compiled app as a C struct         */
 #include "punk/punk_serve.h"      /* the request dispatcher                 */
 #include "punk/punk_ws.h"         /* the RFC 6455 frame codec              */
 #include "punk/punk_config.h"      /* layered YAML config + resolved secrets */

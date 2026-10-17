@@ -18,7 +18,7 @@
 use v5.36;
 
 package App::FuguWeb::Site;
-our $VERSION = '0.8.1';
+our $VERSION = '0.9.0';
 
 use App::FuguWeb;
 use App::FuguWeb::Index;
@@ -37,10 +37,11 @@ use POSIX ();
 #
 # One method renders the site: probe the renderers, refuse an output
 # directory that no build may own, lint every manual source, stage the
-# mdoc sources, copy the assets, render every page, remove the staging,
-# and remove what the site no longer holds. Each step reports its own
-# failure and stops the build. A site that is half rendered must not
-# look like a success.
+# mdoc sources, copy the assets, render every page of each language
+# tree and the pages of the top level, remove the staging, and remove
+# what the site no longer holds. Each step reports its own failure and
+# stops the build. A site that is half rendered must not look like a
+# success.
 #
 # The build reads nothing from the network, writes nothing outside the
 # output directory, and gives the same bytes for the same checkout.
@@ -95,12 +96,18 @@ sub new ( $class, %args )
 #	The site description.
 sub config ($self) { return $self->{config}; }
 
-# $self->staging:
-#	The mdoc staging directory. It lives inside the output
-#	directory and never reaches the published tree.
-sub staging ($self)
+# $self->staging($code):
+#	The mdoc staging directory, or the directory of one language
+#	inside it when the caller names a code. It lives inside the
+#	output directory and never reaches the published tree.
+#
+#	Each language stages its own sources in its own directory,
+#	because mandoc reads its working directory to decide a link.
+sub staging ( $self, $code = undef )
 {
-	return $self->{out} . '/' . STAGING_DIR;
+	my $staging = $self->{out} . '/' . STAGING_DIR;
+
+	return defined $code ? "$staging/$code" : $staging;
 }
 
 # $self->missing_tool:
@@ -175,9 +182,9 @@ sub clean ($self)
 #	Whether the output directory can be the output of any build.
 #
 #	A description that did not load names nothing, so the rules
-#	of _stranger fall back to "a flat directory of plain files".
-#	A key directory reads exactly like that, and so does a source
-#	directory. The clean is the command an operator reaches for
+#	of _stranger fall back to "plain files of the top level and of
+#	the language trees". A key directory reads exactly like that,
+#	and so does a source directory. The clean is the command an operator reaches for
 #	when a description is broken, so that fallback runs on the
 #	real path and not on an edge.
 #
@@ -202,10 +209,11 @@ sub _built_here ($self)
 #	The first entry of the output directory that no build makes,
 #	or undef when every entry is one.
 #
-#	A build writes plain files: one flat directory of them, the
-#	key directory tree below it, and the staging directory while
-#	it runs. A directory that the description does not name is
-#	therefore not part of a site, and so is anything below it.
+#	A build writes plain files: the top level, one flat directory
+#	for each language tree, the key directory tree, and the
+#	staging directory while it runs. A directory that the
+#	description does not name, and that takes no shape of a tree,
+#	is therefore not part of a site, and so is anything below it.
 #
 #	The clean deletes the tree without asking, so it refuses
 #	whatever it cannot account for. It reads the same predicate
@@ -231,22 +239,24 @@ sub _stranger ($self)
 		return $relative if -l $path;
 
 		# The staging directory is a build detail, and the
-		# build writes one flat directory of sources into it.
-		# A tree below it is somebody else's.
+		# build writes one flat directory of sources into it for
+		# each language. A tree of another shape is somebody
+		# else's.
 		if ( App::FuguWeb::path_below( $relative, STAGING_DIR ) ) {
-			next if $relative eq STAGING_DIR;
+			my $dir = -d $path;
 			next
-			    if $relative =~ m{\A\Q@{[STAGING_DIR]}\E/[^/]+\z}
-			    && $self->_build_made($relative);
+			    if _staged( $relative, $dir )
+			    && ( $dir || $self->_build_made($relative) );
 			return $relative;
 		}
 
 		# A directory holds a name of the site, or a name of the
-		# key directory tree, or it holds the files of whoever
-		# made it.
+		# key directory tree, or it is a language tree. Every
+		# other one holds the files of whoever made it.
 		if ( -d $path ) {
 			next if _holds( $named, $relative );
 			next if $self->_key_dir($relative);
+			next if _tree_dir($relative);
 			return $relative;
 		}
 
@@ -264,7 +274,8 @@ sub _stranger ($self)
 # $self->_named:
 #	Every path that the site holds, as a hash reference. The set
 #	is empty for a description that did not load, so the clean
-#	then accepts one flat directory of files and no more.
+#	then accepts what _owns and _tree_dir take by shape, and no
+#	more.
 sub _named ($self)
 {
 	my $config = $self->{config};
@@ -277,9 +288,11 @@ sub _named ($self)
 #	Report whether a build writes a path of the output.
 #
 #	A name of the top level is one that a build writes, whatever
-#	the description names today. A renamed manual leaves its old
-#	page there. A name below the root is one that the site holds,
-#	or one of the shape that the key directory takes.
+#	the description names today. So is a name one level below a
+#	language tree: a renamed manual leaves its old page there, and
+#	a dropped language leaves its whole tree. A name below the
+#	root is one that the site holds, or one of the shape that the
+#	key directory takes.
 #
 #	The prune and the clean read this one predicate, so the build
 #	can never remove a file that the clean refuses.
@@ -287,8 +300,52 @@ sub _owns ( $self, $path, $named )
 {
 	return 1 unless $path =~ m{/};
 	return 1 if $named->{$path};
+	return 1 if _tree_file($path);
 
 	return App::FuguWeb::Keys->shaped( $self->{config}, $path );
+}
+
+# _tree_dir($path):
+#	Report whether a path of the output is the directory of a
+#	language tree: one segment of the top level, in the shape of a
+#	language code.
+#
+#	The test reads the shape, and not the languages of the
+#	description. A tree that the description dropped is then a
+#	tree all the same, so the build removes it, and so does the
+#	clean of a description that did not load.
+sub _tree_dir ($path)
+{
+	return $path =~ App::FuguWeb::LANGUAGE_CODE ? 1 : 0;
+}
+
+# _tree_file($path):
+#	Report whether a path of the output is one name directly in a
+#	language tree, per WEB-OUTPUT-10. A tree is one flat directory
+#	of pages, so a deeper path is somebody else's.
+sub _tree_file ($path)
+{
+	my @parts = split m{/}, $path, -1;
+	return 0 unless @parts == 2 && length $parts[1];
+
+	return _tree_dir( $parts[0] );
+}
+
+# _staged($path, $is_dir):
+#	Report whether a path below the output takes a shape of the
+#	staging directory: the directory itself, the directory of one
+#	language inside it, or one file of that directory. The caller
+#	tests for a plain file and a symlink, per WEB-OUTPUT-14.
+sub _staged ( $path, $is_dir )
+{
+	my ( $top, $code, $name, @deeper ) = split m{/}, $path, -1;
+	return 0 if @deeper || $top ne STAGING_DIR;
+
+	return 1 if !defined $code && $is_dir;
+	return 0 unless defined $code && _tree_dir($code);
+	return $is_dir ? 1 : 0 unless defined $name;
+
+	return length $name && !$is_dir ? 1 : 0;
 }
 
 # $self->_key_dir($path):
@@ -422,7 +479,8 @@ sub _prune_output ($self)
 		if ( -d $self->{out} . "/$path" ) {
 			next
 			    if _holds( $named, $path )
-			    || $self->_key_dir($path);
+			    || $self->_key_dir($path)
+			    || _tree_dir($path);
 
 			$self->{log}->warning(
 				'%s is in the output, and the site does not'
@@ -459,22 +517,25 @@ sub _prune_output ($self)
 
 # $self->_prune_dirs:
 #	Remove each empty directory that the build owns: one that the
-#	site holds a name below, and one of the key tree.
+#	site holds a name below, one of the key tree, and a language
+#	tree. A tree that the description dropped is empty once the
+#	prune removed its pages, so this removes it.
 #
-#	The two tests answer alike today. Every name of the inventory
-#	is one path segment but a key path, so the key tree holds
-#	every directory that the inventory implies. The first test
-#	reads the inventory, which is the rule, and it stays right if
-#	a deeper name ever reaches the list.
+#	The first test reads the inventory, which is the rule. The
+#	other two read a shape, because the inventory names what the
+#	site holds today and not the directory that a dropped key or
+#	a dropped language left.
 #
 #	A description that drops its keys block owns no directory of
 #	the key tree any more, so the build keeps that tree and the
 #	checks report it. Remove it by hand, or name the block again.
 #
-#	The clean reads the same two tests, so the build can never
+#	The clean reads the same three tests, so the build can never
 #	remove a directory that the clean refuses. An operator
 #	directory therefore stays, empty or not, and the checks report
-#	it.
+#	it. Only a directory of the top level in the shape of a
+#	language code is a language tree, so the build removes it once
+#	it is empty. An operator directory such as img/de stays.
 #
 #	rmdir refuses a directory that still holds a name, so the walk
 #	needs no second test: a directory that the site still uses
@@ -493,10 +554,11 @@ sub _prune_dirs ($self)
 		},
 		$self->{out} );
 
-	# A directory that the site holds a name below, or a directory
-	# of the key tree. The clean reads the same two tests, so a
-	# directory of the operator stays here and the checks report
-	# it.
+	# A directory that the site holds a name below, a directory of
+	# the key tree, or a language tree. The clean reads the same
+	# three tests. A directory of the operator therefore stays here
+	# and the checks report it, unless it sits at the top level and
+	# its name has the shape of a language code.
 	#
 	# rmdir refuses a directory that still holds a name, so the
 	# walk needs no second test. The output directory itself
@@ -510,7 +572,8 @@ sub _prune_dirs ($self)
 		my $relative = substr $dir, 1 + length $self->{out};
 		next
 		    unless _holds( $named, $relative )
-		    || $self->_key_dir($relative);
+		    || $self->_key_dir($relative)
+		    || _tree_dir($relative);
 
 		# rmdir refuses a directory that still holds a name,
 		# and that refusal is the test of this loop. Every
@@ -586,28 +649,33 @@ sub pod_date ($self)
 	return length $date ? $date : POSIX::strftime( '%Y-%m-%d', localtime );
 }
 
-# $self->_mdoc_manuals:
-#	Every mdoc source of the site, in group order.
-sub _mdoc_manuals ($self)
+# $self->_mdoc_manuals($code):
+#	Every mdoc manual of one language, in group order.
+sub _mdoc_manuals ( $self, $code )
 {
 	return grep { !$_->is_pod }
-	    map { $_->manuals } $self->{config}->groups;
+	    map { $_->manuals($code) } $self->{config}->groups;
 }
 
 # $self->_lint:
 #	Refuse a malformed manual source before anything is rendered.
+#	The lint reads the source of each language once.
 sub _lint ($self)
 {
-	my @paths = map { $_->path } $self->_mdoc_manuals;
+	my %seen;
+	my @paths = grep { !$seen{$_}++ }
+	    map { $_->path }
+	    map { $self->_mdoc_manuals($_) } $self->{config}->languages;
 
 	return $self->{render}->lint(@paths);
 }
 
 # $self->_prepare_output:
-#	Create the output directory and the staging directory inside
-#	it. The output directory is created on purpose. The recipe that
-#	this replaced got it as a side effect of the staging mkdir,
-#	which would have broken the moment the staging step moved.
+#	Create the output directory, the directory of each language
+#	tree, and the staging directory of each language. The output
+#	directory is created on purpose. The recipe that this replaced
+#	got it as a side effect of the staging mkdir, which would have
+#	broken the moment the staging step moved.
 sub _prepare_output ($self)
 {
 	Fugu::File->ensure_dir( $self->{out} ) or return;
@@ -617,17 +685,22 @@ sub _prepare_output ($self)
 	# stale sources into this one.
 	$self->_drop_staging or return;
 
-	return Fugu::File->ensure_dir( $self->staging );
+	for my $code ( $self->{config}->languages ) {
+		Fugu::File->ensure_dir( $self->{out} . "/$code" ) or return;
+		Fugu::File->ensure_dir( $self->staging($code) )   or return;
+	}
+
+	return 1;
 }
 
 # $self->_drop_staging:
 #	Remove the staging directory, and refuse one that no build
 #	made.
 #
-#	A build writes one flat directory of plain files there, so
-#	anything else is somebody else's. The clean refuses such a
-#	tree, and WEB-OUTPUT-6 holds that the build must never remove
-#	what the clean refuses.
+#	A build writes one flat directory of plain files there for each
+#	language, so anything else is somebody else's. The clean
+#	refuses such a tree, and WEB-OUTPUT-6 holds that the build must
+#	never remove what the clean refuses.
 #
 #	_check_links runs first and refuses a link on this path, so
 #	the link test here never fires today. It stays because this
@@ -642,16 +715,22 @@ sub _drop_staging ($self)
 	my $staging = $self->staging;
 	return 1 unless -d $staging && !-l $staging;
 
-	my $names = App::FuguWeb::list_dir($staging);
-	unless ($names) {
+	my $paths = App::FuguWeb::list_tree($staging);
+	unless ($paths) {
 		$self->{log}->error( 'Cannot read %s: %s', $staging, $! );
 		return;
 	}
 
-	# A build writes one flat directory of plain files, so the
-	# first entry of another kind is the whole answer.
-	my ($stranger) =
-	    grep { !-f "$staging/$_" || -l "$staging/$_" } @$names;
+	# A build writes one flat directory of plain files for each
+	# language, so the first entry of another kind is the whole
+	# answer. The walk names each file and each empty directory. A
+	# symlink is a leaf of it, and never a thing that a build made.
+	my ($stranger) = grep {
+		my $path = "$staging/$_";
+		-l $path
+		    || !_staged( STAGING_DIR . "/$_", -d $path )
+		    || !-d $path && !-f $path
+	} @$paths;
 
 	if ( defined $stranger ) {
 		$self->{log}->error(
@@ -741,14 +820,20 @@ sub _copy ( $self, $from, $to )
 }
 
 # $self->_stage_mdoc:
-#	Copy every mdoc source into the staging directory, under the
-#	name that a cross-reference refers to it by.
+#	Copy the mdoc source of each language into the staging
+#	directory of that language, under the name that a
+#	cross-reference refers to it by. A source of a translation
+#	takes the name of its namesake, so a cross-reference reads the
+#	same in each language.
 sub _stage_mdoc ($self)
 {
-	for my $manual ( $self->_mdoc_manuals ) {
-		$self->_copy( $manual->path,
-			$self->staging . '/' . $manual->staged_name )
-		    or return;
+	for my $code ( $self->{config}->languages ) {
+		for my $manual ( $self->_mdoc_manuals($code) ) {
+			$self->_copy( $manual->path,
+				      $self->staging($code) . '/'
+				    . $manual->staged_name )
+			    or return;
+		}
 	}
 
 	return 1;
@@ -883,66 +968,160 @@ sub _write_out ( $self, $path, $bytes )
 }
 
 # $self->_render_pages:
-#	Render every page block. A body fragment is already HTML, a
-#	Markdown file goes through lowdown, and the index comes from
-#	App::FuguWeb::Index.
+#	Render every page block into each language tree, from the
+#	values of that language, and then the pages of the top level.
 sub _render_pages ($self)
 {
 	my $config = $self->{config};
-	my $page   = App::FuguWeb::Page->new( config => $config );
-	my $index  = App::FuguWeb::Index->new( config => $config );
 
-	for my $entry ( $config->pages ) {
-		my $fragment;
+	for my $code ( $config->languages ) {
+		my $page = App::FuguWeb::Page->new(
+			config => $config,
+			lang   => $code
+		);
 
-		if ( $entry->{source} eq 'body' ) {
-			my $path = $config->source_path( $entry->{value} );
-			$fragment = Fugu::File->read($path);
-			unless ( defined $fragment ) {
-				$self->{log}->error( 'Cannot read %s', $path );
-				return;
-			}
-		}
-		elsif ( $entry->{source} eq 'markdown' ) {
-			$fragment =
-			    $self->{render}
-			    ->markdown( $config->root . '/' . $entry->{value} );
-			return unless defined $fragment;
-		}
-		else {
-			$fragment = $index->body;
-		}
+		for my $entry ( $config->pages($code) ) {
+			my $fragment = $self->_fragment( $entry, $code )
+			    // return;
 
-		$page->write( $self->{out} . '/' . $entry->{file},
-			$entry->{title}, $fragment )
-		    or return;
+			# WEB-LANG-6. The index marks each part of its own,
+			# so the element that holds it takes the language of
+			# the tree.
+			$page->write(
+				$self->{out} . "/$code/$entry->{file}",
+				$entry->{title}, $fragment,
+				name      => $entry->{file},
+				body_lang => $entry->{source} eq 'index'
+				? $code
+				: $entry->{lang},
+			) or return;
+		}
 	}
 
-	return 1;
+	$self->_write_not_found or return;
+
+	return Fugu::File->write(
+		$self->{out} . '/' . App::FuguWeb::FORWARD_PAGE,
+		$self->_forward );
+}
+
+# $self->_fragment($entry, $code):
+#	The body fragment of one page of one language, or undef with a
+#	message in the log. A body fragment is already HTML, a Markdown
+#	file goes through lowdown, and the index comes from
+#	App::FuguWeb::Index. The body of an index page opens it.
+sub _fragment ( $self, $entry, $code )
+{
+	my $config = $self->{config};
+
+	if ( $entry->{source} eq 'markdown' ) {
+		return $self->{render}
+		    ->markdown( $config->root . '/' . $entry->{value} );
+	}
+
+	my $body;
+	if ( defined $entry->{value} ) {
+		my $path = $config->source_path( $entry->{value} );
+		$body = Fugu::File->read($path);
+		unless ( defined $body ) {
+			$self->{log}->error( 'Cannot read %s', $path );
+			return;
+		}
+	}
+	return $body if $entry->{source} eq 'body';
+
+	return App::FuguWeb::Index->new( config => $config, lang => $code )
+	    ->body(
+		$entry->{title}, $body,
+		title_lang => $entry->{title_lang},
+		body_lang  => $entry->{lang},
+	    );
+}
+
+# $self->_write_not_found:
+#	Write the top-level copy of the 404 page, when the description
+#	holds that page, per WEB-LANG-9. The copy is the page of the
+#	default language. Its base makes each relative link resolve
+#	from the root of the origin, and not from the missing path that
+#	the host serves it at.
+sub _write_not_found ($self)
+{
+	my $config    = $self->{config};
+	my $not_found = App::FuguWeb::NOT_FOUND_PAGE;
+
+	my ($entry) = grep { $_->{file} eq $not_found } $config->pages;
+	return 1 unless $entry;
+
+	my $fragment =
+	    $self->_fragment( $entry, App::FuguWeb::DEFAULT_LANGUAGE )
+	    // return;
+	my $page = App::FuguWeb::Page->new( config => $config, kind => 'top' );
+
+	return $page->write( $self->{out} . "/$not_found",
+		$entry->{title}, $fragment );
+}
+
+# $self->_forward:
+#	The top-level index.html, which forwards to the entry page of
+#	the default tree, per WEB-LANG-8. It holds a meta refresh and
+#	one link to that page, for a reader that follows no refresh. It
+#	loads nothing, per D-01: no stylesheet and no script. The site
+#	name is the one word of the page, so the renderer writes no
+#	prose of its own.
+sub _forward ($self)
+{
+	my $config = $self->{config};
+
+	my $lang = App::FuguWeb::DEFAULT_LANGUAGE;
+	my $site = App::FuguWeb::escape_html( $config->site );
+	my $to   = App::FuguWeb::escape_attr( "$lang/" . $config->entry );
+
+	return <<"HTML";
+<!DOCTYPE html>
+<html lang="$lang">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="refresh" content="0; url=$to">
+<title>$site</title>
+</head>
+<body>
+<p><a href="$to">$site</a></p>
+</body>
+</html>
+HTML
 }
 
 # $self->_render_manuals:
-#	Render one page for each manual of each group.
+#	Render one page for each manual of each group, into each
+#	language tree, from the source of that language. mandoc runs in
+#	the staging directory of the language, so a cross-reference
+#	links a page of the same tree.
 sub _render_manuals ($self)
 {
 	my $config = $self->{config};
-	my $page   = App::FuguWeb::Page->new( config => $config );
 	my $date   = $self->pod_date;
 
-	for my $group ( $config->groups ) {
-		for my $manual ( $group->manuals ) {
+	for my $code ( $config->languages ) {
+		my $page = App::FuguWeb::Page->new(
+			config => $config,
+			lang   => $code
+		);
+
+		for my $manual ( map { $_->manuals($code) } $config->groups ) {
 			my $fragment =
 			      $manual->is_pod
 			    ? $self->{render}
 			    ->pod( $manual->path, $manual->name, $date )
-			    : $self->{render}
-			    ->mdoc( $manual->staged_name, $self->staging );
+			    : $self->{render}->mdoc( $manual->staged_name,
+				$self->staging($code) );
 			return unless defined $fragment;
 
 			$page->write(
-				$self->{out} . '/' . $manual->page,
+				$self->{out} . "/$code/" . $manual->page,
 				$manual->name . '(' . $manual->section . ')',
-				$fragment
+				$fragment,
+				name      => $manual->page,
+				body_lang => $manual->lang,
 			) or return;
 		}
 	}

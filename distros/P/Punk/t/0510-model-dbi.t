@@ -155,4 +155,36 @@ like($@, qr/validation failed/, 'a missing required title croaks before the inse
         '...unless the application says otherwise');
 }
 
+# ---- a backend name is a class name ----------------------------------------
+# `database backend => ...` can come from punk.yml and reached
+# `eval "require $name;"` unchecked.
+{
+    my $err = '';
+    eval { T::Model::Book->_instantiate({
+               dsn => 'dbi:SQLite:dbname=:memory:',
+               backend => 'Punk::Model::DBI; die q(ran)' })->get(1); 1 }
+        or $err = $@;
+    like($err, qr/is not a class name/, 'a backend that is not a class name croaks');
+    unlike($err, qr/\bran at /, '...before anything in it runs');
+}
+
+# ---- a limit is bound, not spelled into the statement -----------------------------
+# prepare_cached keeps one handle per distinct SQL string, so a limit in the
+# text made every distinct limit another handle, and an `in` list another per
+# length. The limit is a bind value now, and a list past 16 is padded to the
+# next power of two.
+{
+    my $before = scalar keys %{ $dbh->{CachedKids} };
+    $model->search({}, { limit => $_ }) for 1 .. 20;
+    my $after = scalar keys %{ $dbh->{CachedKids} };
+    cmp_ok($after - $before, '<=', 1, 'twenty limits add at most one cached handle');
+    $before = $after;
+    $model->search({ id => { in => [ 1 .. $_ ] } }) for 17 .. 64;
+    $after = scalar keys %{ $dbh->{CachedKids} };
+    cmp_ok($after - $before, '<=', 2,
+        'in-lists of 17 to 64 values add at most two shapes (32 and 64)');
+    my $page = $model->search({ id => { in => [ 1 .. 17 ] } });
+    ok(ref $page, 'and a padded list still answers');
+}
+
 done_testing();

@@ -35,8 +35,6 @@ use Geo::Coder::Free::Local;
 # -----------------------------------------------------------------------
 
 subtest '_normalize_args: Free.pm — 6 equivalence partitions' => sub {
-	plan tests => 7;
-
 	# P1: hashref → expand
 	my %r1 = Geo::Coder::Free::_normalize_args('ERR', 'location', { location => 'London' });
 	is($r1{'location'}, 'London', 'P1: hashref expanded to flat hash');
@@ -64,11 +62,11 @@ subtest '_normalize_args: Free.pm — 6 equivalence partitions' => sub {
 	throws_ok {
 		Geo::Coder::Free::_normalize_args('P6-err', 'location', 'a', 'b', 'c');
 	} qr/P6-err/, 'P6: odd-count > 1 list croaks (M7 logic-gap closed)';
+
+	done_testing();
 };
 
 subtest '_normalize_args: Local.pm — bare_key=latlng variant' => sub {
-	plan tests => 5;
-
 	# P1
 	my %r1 = Geo::Coder::Free::Local::_normalize_args('ERR', 'latlng', { latlng => '51.5,0' });
 	is($r1{'latlng'}, '51.5,0', 'P1: hashref (Local)');
@@ -87,6 +85,8 @@ subtest '_normalize_args: Local.pm — bare_key=latlng variant' => sub {
 	throws_ok {
 		Geo::Coder::Free::Local::_normalize_args('LE6', 'latlng', 'a', 'b', 'c');
 	} qr/LE6/, 'P6: odd-count > 1 croaks (Local — M7)';
+
+	done_testing();
 };
 
 # -----------------------------------------------------------------------
@@ -97,8 +97,6 @@ subtest '_normalize_args: Local.pm — bare_key=latlng variant' => sub {
 # -----------------------------------------------------------------------
 
 subtest 'geocode: invalid-input guard clauses' => sub {
-	plan tests => 3;
-
 	my $geo = Geo::Coder::Free->new();
 
 	# Purely numeric → invalid location error
@@ -115,6 +113,8 @@ subtest 'geocode: invalid-input guard clauses' => sub {
 	throws_ok { Geo::Coder::Free->geocode() }
 		qr/usage.*geocode/i,
 		'class-method geocode() with no args throws usage error';
+
+	done_testing();
 };
 
 # -----------------------------------------------------------------------
@@ -125,8 +125,6 @@ subtest 'geocode: invalid-input guard clauses' => sub {
 # -----------------------------------------------------------------------
 
 subtest '_find_word_ngrams: Free.pm — n=3 partitions' => sub {
-	plan tests => 8;
-
 	my $stop = { the => 1, of => 1 };
 
 	# Q1: fewer than n words → empty
@@ -154,6 +152,8 @@ subtest '_find_word_ngrams: Free.pm — n=3 partitions' => sub {
 	my @r6 = Geo::Coder::Free::_find_word_ngrams('London, England, UK', 3, $stop);
 	is(scalar @r6, 1, 'Q6: commas stripped → same 3 tokens → 1 ngram');
 	is($r6[0], 'London, England, UK', 'Q6: ngram content matches comma-joined tokens');
+
+	done_testing();
 };
 
 # -----------------------------------------------------------------------
@@ -166,8 +166,6 @@ subtest '_find_word_ngrams: Free.pm — n=3 partitions' => sub {
 # -----------------------------------------------------------------------
 
 subtest '_search: Local.pm — column-count floor (M5 labeled-loop)' => sub {
-	plan tests => 2;
-
 	my $local = Geo::Coder::Free::Local->new();
 
 	# 0 columns → undef (vacuously below the floor of 3)
@@ -181,6 +179,8 @@ subtest '_search: Local.pm — column-count floor (M5 labeled-loop)' => sub {
 		qw(road city)
 	);
 	is($rc2, undef, '2-column search → undef (floor of 3 not met)');
+
+	done_testing();
 };
 
 # -----------------------------------------------------------------------
@@ -196,8 +196,6 @@ subtest '_search: Local.pm — column-count floor (M5 labeled-loop)' => sub {
 # -----------------------------------------------------------------------
 
 subtest 'M3: scantext path never reaches alternatives table' => sub {
-	plan tests => 2;
-
 	my $geo = Geo::Coder::Free->new();   # no openaddr configured
 
 	my @hits;
@@ -208,6 +206,8 @@ subtest 'M3: scantext path never reaches alternatives table' => sub {
 	# Without openaddr the result is undef/empty — not an error
 	is(scalar(grep { defined } @hits), 0,
 		'scantext without openaddr returns no hits (expected behaviour)');
+
+	done_testing();
 };
 
 # -----------------------------------------------------------------------
@@ -222,18 +222,16 @@ subtest 'M3: scantext path never reaches alternatives table' => sub {
 
 subtest 'M8: maxmind fallback — scalar and list context both work' => sub {
 	if(defined($ENV{NO_NETWORK_TESTING})) {
-		plan tests => 1;
 		pass('Needs network testing');
+		done_testing();
 		return;
 	}
 
 	unless(-f 'lib/Geo/Coder/Free/MaxMind/databases/cities.sql') {
-		plan tests => 1;
 		pass('No cities database — skipping M8 context test');
+		done_testing();
 		return;
 	}
-
-	plan tests => 3;
 
 	# Suppress OPENADDR_HOME so we stay on the MaxMind-only path
 	local $ENV{OPENADDR_HOME} = '';
@@ -249,6 +247,8 @@ subtest 'M8: maxmind fallback — scalar and list context both work' => sub {
 	lives_ok {
 		@list_result = $geo->geocode(location => 'Ramsgate, Kent, UK');
 	} 'geocode in list context does not die (M8 context propagation intact)';
+
+	done_testing();
 };
 
 done_testing();

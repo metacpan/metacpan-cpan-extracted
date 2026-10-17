@@ -58,6 +58,14 @@
 
 #define PCF_MAGIC     0x504b4331u      /* "PKC1" */
 #define PCF_PATHMAX   1024
+
+/* a snprintf that fit its buffer: a truncated path names some other file */
+#define PCF_FITS(r, buf) ((r) >= 0 && (size_t)(r) < sizeof (buf))
+#ifdef O_NOFOLLOW
+#  define PCF_O_NOFOLLOW O_NOFOLLOW
+#else
+#  define PCF_O_NOFOLLOW 0
+#endif
 #define PCF_HEADMAX   4352             /* header + a 4096-byte key */
 
 /* On disk: magic, expiry, key length, value length, then key, then value.
@@ -294,7 +302,8 @@ static void pcf_sweep(pTHX_ punk_cachefile *c) {
         DIR *d2;
         struct dirent *e2;
         if (e1->d_name[0] == '.') continue;
-        if (snprintf(l1, sizeof l1, "%s/%s", c->dir, e1->d_name) < 0) continue;
+        if (!PCF_FITS(snprintf(l1, sizeof l1, "%s/%s", c->dir, e1->d_name), l1))
+            continue;
         d2 = opendir(l1);
         if (!d2) continue;
         while ((e2 = readdir(d2))) {
@@ -302,14 +311,15 @@ static void pcf_sweep(pTHX_ punk_cachefile *c) {
             DIR *d3;
             struct dirent *e3;
             if (e2->d_name[0] == '.') continue;
-            if (snprintf(l2, sizeof l2, "%s/%s", l1, e2->d_name) < 0) continue;
+            if (!PCF_FITS(snprintf(l2, sizeof l2, "%s/%s", l1, e2->d_name), l2))
+                continue;
             d3 = opendir(l2);
             if (!d3) continue;
             while ((e3 = readdir(d3))) {
                 char p[PCF_PATHMAX];
                 struct stat st;
                 if (e3->d_name[0] == '.') continue;
-                if (snprintf(p, sizeof p, "%s/%s", l2, e3->d_name) < 0)
+                if (!PCF_FITS(snprintf(p, sizeof p, "%s/%s", l2, e3->d_name), p))
                     continue;
                 if (stat(p, &st) != 0 || !S_ISREG(st.st_mode)) continue;
 
@@ -386,10 +396,17 @@ static int punk_cachefile_set(pTHX_ punk_cachefile *c, const char *key,
     if ((size_t)sizeof h + klen + vlen > c->max_bytes) { c->refused++; return 0; }
 
     if (pcf_path(c, key, klen, path, sizeof path, 1) != 0) return 0;
-    if (snprintf(tmp, sizeof tmp, "%s.tmp%ld", path,
-                 (long)PerlProc_getpid()) < 0) return 0;
+    if (!PCF_FITS(snprintf(tmp, sizeof tmp, "%s.tmp%ld", path,
+                           (long)PerlProc_getpid()), tmp)) return 0;
 
-    fd = open(tmp, O_WRONLY | O_CREAT | O_TRUNC, 0600);
+    /* Exclusive and never through a symlink: a name somebody planted in
+     * the directory must not become a file this writes to. A leftover from
+     * a writer of this pid that died mid-write is unlinked and retried. */
+    fd = open(tmp, O_WRONLY | O_CREAT | O_EXCL | PCF_O_NOFOLLOW, 0600);
+    if (fd < 0 && errno == EEXIST) {
+        unlink(tmp);
+        fd = open(tmp, O_WRONLY | O_CREAT | O_EXCL | PCF_O_NOFOLLOW, 0600);
+    }
     if (fd < 0) return 0;
 
     h.magic = PCF_MAGIC; h.expiry = expiry; h.klen = klen; h.vlen = vlen;
@@ -425,8 +442,11 @@ static void pcf_rmtree(const char *dir, int depth) {
         char p[PCF_PATHMAX];
         struct stat st;
         if (e->d_name[0] == '.') continue;
-        if (snprintf(p, sizeof p, "%s/%s", dir, e->d_name) < 0) continue;
-        if (stat(p, &st) != 0) continue;
+        if (!PCF_FITS(snprintf(p, sizeof p, "%s/%s", dir, e->d_name), p))
+            continue;
+        /* lstat: a symlink to a directory elsewhere is unlinked as the
+         * link it is, never descended into */
+        if (lstat(p, &st) != 0) continue;
         if (S_ISDIR(st.st_mode)) {
             if (depth > 0) { pcf_rmtree(p, depth - 1); rmdir(p); }
         }
@@ -457,7 +477,8 @@ static void punk_cachefile_usage(punk_cachefile *c, uint64_t *bytes,
         DIR *d2;
         struct dirent *e2;
         if (e1->d_name[0] == '.') continue;
-        if (snprintf(l1, sizeof l1, "%s/%s", c->dir, e1->d_name) < 0) continue;
+        if (!PCF_FITS(snprintf(l1, sizeof l1, "%s/%s", c->dir, e1->d_name), l1))
+            continue;
         d2 = opendir(l1);
         if (!d2) continue;
         while ((e2 = readdir(d2))) {
@@ -465,7 +486,8 @@ static void punk_cachefile_usage(punk_cachefile *c, uint64_t *bytes,
             DIR *d3;
             struct dirent *e3;
             if (e2->d_name[0] == '.') continue;
-            if (snprintf(l2, sizeof l2, "%s/%s", l1, e2->d_name) < 0) continue;
+            if (!PCF_FITS(snprintf(l2, sizeof l2, "%s/%s", l1, e2->d_name), l2))
+                continue;
             d3 = opendir(l2);
             if (!d3) continue;
             while ((e3 = readdir(d3))) {
@@ -474,7 +496,7 @@ static void punk_cachefile_usage(punk_cachefile *c, uint64_t *bytes,
                 if (e3->d_name[0] == '.') continue;
                 if (strstr(e3->d_name, ".tmp") || strstr(e3->d_name, ".lock"))
                     continue;
-                if (snprintf(p, sizeof p, "%s/%s", l2, e3->d_name) < 0)
+                if (!PCF_FITS(snprintf(p, sizeof p, "%s/%s", l2, e3->d_name), p))
                     continue;
                 if (stat(p, &st) != 0 || !S_ISREG(st.st_mode)) continue;
                 *bytes += (uint64_t)st.st_size;
@@ -528,7 +550,7 @@ static int punk_cachefile_lock_for(pTHX_ punk_cachefile *c, const char *key,
     int fd;
 
     if (pcf_path(c, key, klen, path, sizeof path, 1) != 0
-        || snprintf(lock, sizeof lock, "%s.lock", path) < 0) {
+        || !PCF_FITS(snprintf(lock, sizeof lock, "%s.lock", path), lock)) {
         c->lock_errors++;
         return PCF_LOCK_UNAVAILABLE;
     }
@@ -560,7 +582,7 @@ static void punk_cachefile_unlock(pTHX_ punk_cachefile *c, const char *key,
                                   uint32_t klen) {
     char path[PCF_PATHMAX], lock[PCF_PATHMAX];
     if (pcf_path(c, key, klen, path, sizeof path, 0) != 0) return;
-    if (snprintf(lock, sizeof lock, "%s.lock", path) < 0) return;
+    if (!PCF_FITS(snprintf(lock, sizeof lock, "%s.lock", path), lock)) return;
     unlink(lock);
 }
 

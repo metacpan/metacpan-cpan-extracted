@@ -92,13 +92,22 @@ static SV *poa_b64_decode(pTHX_ const char *s, STRLEN len) {
     for (i = 0; i < len; i++) {
         char c = s[i];
         int x;
-        if (c == '=') break;
+        if (c == '=') {
+            /* padding ends the data: at most two, nothing after them, and
+             * the bits they pad must be zero - anything looser decodes two
+             * different headers to one credential */
+            STRLEN pad = 0;
+            while (i < len && s[i] == '=') { pad++; i++; }
+            if (i != len || pad > 2 || (bits && (v & ((1u << bits) - 1)))) {
+                SvREFCNT_dec(out); return NULL;
+            }
+            break;
+        }
         if      (c >= 'A' && c <= 'Z') x = c - 'A';
         else if (c >= 'a' && c <= 'z') x = c - 'a' + 26;
         else if (c >= '0' && c <= '9') x = c - '0' + 52;
         else if (c == '+') x = 62;
         else if (c == '/') x = 63;
-        else if (c == '\n' || c == '\r') continue;
         else { SvREFCNT_dec(out); return NULL; }
         v = (v << 6) | (unsigned)x;
         bits += 6;
@@ -121,7 +130,7 @@ static const char *poa_auth_param(const char *s, STRLEN len,
         if (toLOWER((U8)s[i]) != toLOWER((U8)word[i])) return NULL;
     if (s[wlen] != ' ') return NULL;
     for (i = wlen + 1; i < len; i++)
-        if (s[i] == '\n') return NULL;
+        if (s[i] == '\n' || s[i] == '\r') return NULL;
     *out_len = len - wlen - 1;
     return s + wlen + 1;
 }
@@ -239,7 +248,11 @@ XS_INTERNAL(punk_oa_security_cb) {
             SV *cred = poa_credential(aTHX_ c, def);
             SV *got;
 
-            if (!(cred && SvOK(cred) && SvCUR(cred))) { ok = 0; break; }
+            /* a repeated query parameter arrives as an arrayref: that is
+             * no credential, not a string whose length is a pointer's */
+            if (!(cred && SvOK(cred) && !SvROK(cred) && SvCUR(cred))) {
+                ok = 0; break;
+            }
             {
                 SV *argv[4];
                 argv[0] = cred;

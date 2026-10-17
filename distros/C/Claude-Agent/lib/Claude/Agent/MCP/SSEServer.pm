@@ -4,13 +4,17 @@ use 5.020;
 use strict;
 use warnings;
 
-use Types::Common -types;
+use Object::Proto ();
 use Claude::Agent::MCP::HeaderUtils ();
-use Marlin
-    'url!'             => Str,
-    'headers'          => sub { {} },
-    'sensitive_headers' => sub { [] },  # Headers to redact from debug output
-    'type'             => sub { 'sse' };
+
+BEGIN {
+    Object::Proto::define('Claude::Agent::MCP::SSEServer',
+        'url:Str:required',
+        'headers:HashRef:default({})',
+        'sensitive_headers:ArrayRef:default([])',
+        'type:Str:readonly:default(sse)',
+    );
+}
 
 sub BUILD {
     my ($self) = @_;
@@ -19,45 +23,6 @@ sub BUILD {
     return;
 }
 
-=head1 NAME
-
-Claude::Agent::MCP::SSEServer - SSE MCP server configuration
-
-=head1 DESCRIPTION
-
-Configuration for a remote MCP server using Server-Sent Events.
-
-=head2 ATTRIBUTES
-
-=over 4
-
-=item * url - Server URL
-
-=item * headers - HashRef of HTTP headers
-
-B<Security note:> Headers containing sensitive data (authorization tokens, API
-keys) are automatically redacted in debug output. Common sensitive headers like
-C<Authorization>, C<X-API-Key>, etc. are detected automatically. You can also
-explicitly mark additional headers as sensitive using C<sensitive_headers>.
-
-=item * sensitive_headers - ArrayRef of header names to redact (optional)
-
-Additional header names to treat as sensitive beyond the auto-detected ones.
-
-=item * type - Always 'sse'
-
-=back
-
-=head2 METHODS
-
-=head3 is_sensitive_header
-
-    if ($server->is_sensitive_header('Authorization')) { ... }
-
-Check if a header name is considered sensitive (should be redacted in logs).
-
-=cut
-
 sub is_sensitive_header {
     my ($self, $header_name) = @_;
     return Claude::Agent::MCP::HeaderUtils::is_sensitive_header(
@@ -65,31 +30,12 @@ sub is_sensitive_header {
     );
 }
 
-=head3 redacted_headers
-
-    my $safe_headers = $server->redacted_headers();
-
-Returns a copy of headers with sensitive values replaced by '[REDACTED]'.
-Use this for debug output instead of accessing headers directly.
-
-=cut
-
 sub redacted_headers {
     my ($self) = @_;
     return Claude::Agent::MCP::HeaderUtils::redacted_headers(
         $self->headers, $self->sensitive_headers
     );
 }
-
-=head3 to_hash
-
-    my $hash = $server->to_hash();
-
-Convert the server configuration to a hash for JSON serialization.
-Note: This returns actual header values for the CLI. Use C<redacted_headers>
-for debug/logging purposes.
-
-=cut
 
 sub to_hash {
     my ($self) = @_;
@@ -99,6 +45,75 @@ sub to_hash {
         headers => $self->headers,
     };
 }
+
+1;
+
+__END__
+
+=head1 NAME
+
+Claude::Agent::MCP::SSEServer - A remote MCP server reached over Server-Sent Events
+
+=head1 SYNOPSIS
+
+    use Claude::Agent::MCP::SSEServer;
+
+    my $server = Claude::Agent::MCP::SSEServer->new(
+        url     => 'https://api.example.com/mcp/sse',
+        headers => { Authorization => "Bearer $token" },
+    );
+
+=head1 DESCRIPTION
+
+Configuration for an MCP server the CLI connects to over Server-Sent
+Events. The URL must use the http or https scheme.
+
+Header values that look sensitive (C<Authorization>, C<X-API-Key> and the
+like, plus anything named in C<sensitive_headers>) are redacted in debug
+output; see L<Claude::Agent::MCP::HeaderUtils>.
+
+=head1 ATTRIBUTES
+
+=head2 url
+
+The server's URL. Required.
+
+=head2 headers
+
+HashRef of request headers.
+
+=head2 sensitive_headers
+
+ArrayRef of header names to redact in debug output, beyond the ones
+recognised automatically.
+
+=head2 type
+
+Always C<sse>. Read only.
+
+=head1 METHODS
+
+=head2 new
+
+Takes a flat list of name/value pairs. Unknown names are ignored.
+
+=head2 is_sensitive_header
+
+    if ($server->is_sensitive_header('Authorization')) { ... }
+
+True when the header would be redacted.
+
+=head2 redacted_headers
+
+    my $safe = $server->redacted_headers;
+
+The headers with sensitive values replaced, for logging.
+
+=head2 to_hash
+
+    my $hash = $server->to_hash;
+
+C<{ type, url, headers }>, the C<--mcp-config> entry.
 
 =head1 AUTHOR
 
@@ -111,5 +126,3 @@ This software is Copyright (c) 2026 by LNATION.
 This is free software, licensed under The Artistic License 2.0 (GPL Compatible).
 
 =cut
-
-1;

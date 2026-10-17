@@ -138,6 +138,20 @@ struct hm_qconn {
     unsigned char in_read;             /* inside ngtcp2_conn_read_pkt: the
                                         * write half waits for it to return
                                         * (hm_quic_write)                 */
+    /* An application call for one of this connection's streams is on the
+     * stack (hm_h3_run_ready). Its ->get may pump the loop, and the loop
+     * may then want this connection gone - an expiry, a read error, the
+     * idle timeout - while that frame still holds qc and the stream: the
+     * free is deferred to the frame's return instead. Out of the expiry
+     * heap for the duration (hm_quic_rearm), as the h2 half is out of its
+     * read watcher. */
+    unsigned char in_app;
+    unsigned char close_deferred;
+    unsigned char dispatching;         /* one stream's handler at a time  */
+    unsigned char src_counted;         /* in the per-source table: an inc
+                                        * the table refused (full) must not
+                                        * be matched by a dec against some
+                                        * other address's slot            */
 };
 
 /* One per listener, not per loop: a CID minted on listener A must not be
@@ -188,8 +202,21 @@ static uint32_t hm_quic_hash(const uint8_t *d, size_t n);
 
 /* The slot for an address: its own, or the first empty one on the probe
  * walk, or -1 when the table is full. */
+/* KEYED: the per-process secret seeds the hash, so an attacker holding a
+ * /64 cannot pick addresses that land in one slot and walk the probe
+ * sequence to make the table look full. */
+static uint32_t hm_quic_src_home(const hm_quic_srv *srv, const uint8_t *a, int len) {
+    uint32_t h = 2166136261u ^ ((uint32_t)srv->secret[0]
+                              | ((uint32_t)srv->secret[1] << 8)
+                              | ((uint32_t)srv->secret[2] << 16)
+                              | ((uint32_t)srv->secret[3] << 24));
+    int i;
+    for (i = 0; i < len; i++) { h ^= a[i]; h *= 16777619u; }
+    return h & (HM_QUIC_SRC_SLOTS - 1);
+}
+
 static int hm_quic_src_slot(hm_quic_srv *srv, const uint8_t *a, int len, int create) {
-    uint32_t h = hm_quic_hash(a, (size_t)len) & (HM_QUIC_SRC_SLOTS - 1);
+    uint32_t h = hm_quic_src_home(srv, a, len);
     int i;
     for (i = 0; i < HM_QUIC_SRC_SLOTS; i++) {
         int k = (int)((h + (uint32_t)i) & (HM_QUIC_SRC_SLOTS - 1));
@@ -204,6 +231,31 @@ static int hm_quic_src_slot(hm_quic_srv *srv, const uint8_t *a, int len, int cre
         }
     }
     return -1;
+}
+
+/* Empty slot k and close the probe chain behind it (backward-shift
+ * deletion). Linear probing finds an address by walking from its home to
+ * the first EMPTY slot, so simply emptying k hid every address stored past
+ * it: those read as absent, were re-created as duplicates, and their
+ * counts never drained - ghosts filled the table and the cap switched off.
+ * Each later entry whose home is not inside (k, j] is moved back into k. */
+static void hm_quic_src_erase(hm_quic_srv *srv, int k) {
+    int j = k;
+    srv->src[k].len = 0;
+    for (;;) {
+        uint32_t home;
+        int in_gap;
+        j = (j + 1) & (HM_QUIC_SRC_SLOTS - 1);
+        if (srv->src[j].len == 0) return;
+        home = hm_quic_src_home(srv, srv->src[j].addr, srv->src[j].len);
+        /* is home cyclically in (k, j]? then j may stay where it is */
+        in_gap = (k < j) ? ((int)home > k && (int)home <= j)
+                         : ((int)home > k || (int)home <= j);
+        if (in_gap) continue;
+        srv->src[k] = srv->src[j];
+        srv->src[j].len = 0;
+        k = j;
+    }
 }
 
 /* Count a half-open handshake against its source: the new count, or -1 for
@@ -232,7 +284,7 @@ static void hm_quic_src_dec(hm_quic_srv *srv, const struct sockaddr *sa) {
     k = hm_quic_src_slot(srv, a, len, 0);
     if (k < 0) return;
     if (srv->src[k].count > 0) srv->src[k].count--;
-    if (srv->src[k].count == 0) srv->src[k].len = 0;
+    if (srv->src[k].count == 0) hm_quic_src_erase(srv, k);
 }
 
 /* Filled before any worker forks; every srv copies it. */
@@ -467,6 +519,7 @@ static int       hm_quic_write(pTHX_ hm_qconn *qc);
  * cross from one to the other. */
 static int       hm_h3_session_start(pTHX_ hm_qconn *qc);
 static void      hm_h3_session_free(pTHX_ hm_qconn *qc);
+static int       hm_h3_run_ready(pTHX_ hm_qconn *qc);
 static int       hm_h3_recv_stream(pTHX_ hm_qconn *qc, int64_t sid,
                                    const uint8_t *data, size_t datalen,
                                    int fin);
@@ -617,6 +670,7 @@ static int hm_quic_packet(pTHX_ hm_loop *loop, hm_listener *lst,
         return 0;
     }
     if (rv < 0) return 0;                     /* not decodable */
+    if (qc && qc->close_deferred) return 0;   /* freed when its handler returns */
 
     if (!qc) {
         ngtcp2_pkt_hd hd;
@@ -692,6 +746,11 @@ static int hm_quic_packet(pTHX_ hm_loop *loop, hm_listener *lst,
         hm_quic_conn_free(aTHX_ qc);
         return 0;
     }
+    /* Requests completed by this packet go to the application HERE, once
+     * ngtcp2 has returned - never from inside its callbacks, where a handler
+     * that waited pumped a loop that could free this very connection. The
+     * h2 half made the same move in 0.60. */
+    if (hm_h3_run_ready(aTHX_ qc) < 0) return 0;
     hm_quic_write(aTHX_ qc);
     return 0;
 }
@@ -747,6 +806,47 @@ static int hm_quic_src_selftest(void) {
         f.sin_addr.s_addr = htonl(0x0b000000u);
         if (hm_quic_src_inc(srv, (struct sockaddr *)&f) != -1) ok = 0;
         if (hm_quic_src_count(srv, (struct sockaddr *)&f) != 0) ok = 0;
+    }
+    {   /* Deletion closes the probe chain. Two addresses with the same home
+         * (found by walking addresses until one collides), the first
+         * stored at home and the second one past it; freeing the first
+         * must leave the second FINDABLE - before backward-shift deletion
+         * the empty slot ended every lookup walk, the second read as
+         * absent, and a fresh increment created a duplicate whose count
+         * never drained. */
+        struct sockaddr_in p, q;
+        uint8_t pa[4], qa[4];
+        uint32_t home;
+        uint32_t cand;
+        int found = 0;
+        memset(srv->src, 0, sizeof(srv->src));
+        memset(&p, 0, sizeof p); p.sin_family = AF_INET;
+        p.sin_addr.s_addr = htonl(0x0a010101u);
+        hm_quic_src_bytes((struct sockaddr *)&p, pa);
+        home = hm_quic_src_home(srv, pa, 4);
+        q = p;
+        for (cand = 0x0a010102u; cand < 0x0a01ffffu; cand++) {
+            q.sin_addr.s_addr = htonl(cand);
+            hm_quic_src_bytes((struct sockaddr *)&q, qa);
+            if (hm_quic_src_home(srv, qa, 4) == home) { found = 1; break; }
+        }
+        if (!found) ok = 0;
+        else {
+            if (hm_quic_src_inc(srv, (struct sockaddr *)&p) != 1) ok = 0;
+            if (hm_quic_src_inc(srv, (struct sockaddr *)&q) != 1) ok = 0;
+            hm_quic_src_dec(srv, (struct sockaddr *)&p);
+            if (hm_quic_src_count(srv, (struct sockaddr *)&q) != 1) ok = 0;
+            if (hm_quic_src_inc(srv, (struct sockaddr *)&q) != 2) ok = 0;
+            hm_quic_src_dec(srv, (struct sockaddr *)&q);
+            hm_quic_src_dec(srv, (struct sockaddr *)&q);
+            if (hm_quic_src_count(srv, (struct sockaddr *)&q) != 0) ok = 0;
+            {
+                int n = 0;
+                for (found = 0; found < HM_QUIC_SRC_SLOTS; found++)
+                    if (srv->src[found].len) n++;
+                if (n != 0) ok = 0;              /* no ghosts left behind */
+            }
+        }
     }
     free(srv);
     return ok;
@@ -1141,7 +1241,7 @@ static int hm_quic_cb_handshake_completed(ngtcp2_conn *conn, void *user_data) {
     if (!qc->handshake_done) {
         qc->handshake_done = 1;
         if (qc->srv->handshaking > 0) qc->srv->handshaking--;
-        hm_quic_src_dec(qc->srv, (const struct sockaddr *)&qc->peer);
+        if (qc->src_counted) { qc->src_counted = 0; hm_quic_src_dec(qc->srv, (const struct sockaddr *)&qc->peer); }
     }
     /* NEW_TOKEN, so this client's next visit skips address validation
      * entirely - no Retry round trip even while the server is demanding one
@@ -1284,6 +1384,12 @@ static hm_quic_srv *hm_quic_srv_new(hm_loop *loop, hm_listener *lst, int widx) {
 static void hm_quic_conn_free(pTHX_ hm_qconn *qc) {
     hm_quic_srv *srv = qc->srv;
     hm_qconn **pp;
+    /* A handler for one of its streams is on the stack: only MARK it, and
+     * hm_h3_run_ready frees it when that handler returns. Freeing here
+     * handed the frame a freed qc and a freed stream to write its response
+     * into (the expiry sweep did exactly that under any ->get longer than
+     * the ack delay). */
+    if (qc->in_app) { qc->close_deferred = 1; return; }
     hm_qheap_remove(&srv->loop->qheap, qc);
     hm_quic_cid_drop_conn(srv, qc);
     hm_quic_id_remove(srv, qc);
@@ -1292,7 +1398,7 @@ static void hm_quic_conn_free(pTHX_ hm_qconn *qc) {
     srv->nconns--;
     if (!qc->handshake_done) {
         if (srv->handshaking > 0) srv->handshaking--;
-        hm_quic_src_dec(srv, (const struct sockaddr *)&qc->peer);
+        if (qc->src_counted) { qc->src_counted = 0; hm_quic_src_dec(srv, (const struct sockaddr *)&qc->peer); }
     }
     if (srv->loop->h3_live > 0) srv->loop->h3_live--;
     hm_h3_session_free(aTHX_ qc);
@@ -1315,6 +1421,11 @@ static void hm_quic_conn_free(pTHX_ hm_qconn *qc) {
  * every read and every write, because that is how often ngtcp2 moves it. */
 static void hm_quic_rearm(hm_qconn *qc) {
     ngtcp2_tstamp t = ngtcp2_conn_get_expiry(qc->conn);
+    /* Out of the heap while a handler runs: hm_quic_expire would otherwise
+     * find it due, be unable to free it, and spin. Re-armed by
+     * hm_h3_run_ready when the handler returns; ngtcp2 copes with a late
+     * expiry. */
+    if (qc->in_app) { hm_qheap_remove(&qc->srv->loop->qheap, qc); return; }
     if (t == UINT64_MAX) hm_qheap_remove(&qc->srv->loop->qheap, qc);
     else                 hm_qheap_set(&qc->srv->loop->qheap, qc, (uint64_t)t);
 }
@@ -1333,6 +1444,7 @@ static int hm_quic_write(pTHX_ hm_qconn *qc) {
      * error paths below would free the connection read_pkt is still
      * executing on. hm_quic_packet writes once read_pkt has returned. */
     if (qc->in_read) return 0;
+    if (qc->close_deferred) return -1;     /* as good as gone */
     for (;;) {
         nghttp3_vec vec[16];
         ngtcp2_ssize n, wrote = 0;
@@ -1526,7 +1638,7 @@ static hm_qconn *hm_quic_conn_new(pTHX_ hm_quic_srv *srv,
     srv->conns = qc;
     srv->nconns++;
     srv->handshaking++;
-    (void)hm_quic_src_inc(srv, peer);
+    qc->src_counted = hm_quic_src_inc(srv, peer) >= 0;
     srv->loop->h3_live++;
     return qc;
 }
@@ -1543,6 +1655,9 @@ static void hm_quic_expire(pTHX_ hm_loop *loop) {
     uint64_t now = hm_now_ns();
     while (loop->qheap.n && loop->qheap.a[0]->expiry <= now) {
         hm_qconn *qc = loop->qheap.a[0];
+        /* Its handler is on the stack (hm_quic_rearm keeps such a
+         * connection out of the heap; this is the belt to that brace). */
+        if (qc->in_app) { hm_qheap_remove(&loop->qheap, qc); continue; }
         if (ngtcp2_conn_handle_expiry(qc->conn, now) != 0) {
             hm_quic_conn_free(aTHX_ qc);
             continue;
@@ -1616,7 +1731,10 @@ static void hm_quic_ctx_swap(pTHX_ hm_listener *lst, void *fresh) {
 static void hm_quic_srv_free(pTHX_ hm_listener *lst) {
     hm_quic_srv *srv = (hm_quic_srv *)lst->quic;
     if (!srv) return;
-    while (srv->conns) hm_quic_conn_free(aTHX_ srv->conns);
+    while (srv->conns) {
+        srv->conns->in_app = 0;      /* teardown: no frame to defer to */
+        hm_quic_conn_free(aTHX_ srv->conns);
+    }
     if (srv->ssl_ctx) SSL_CTX_free((SSL_CTX *)srv->ssl_ctx);
     free(srv);
     lst->quic = NULL;

@@ -2,7 +2,6 @@
 
 use v5.10;
 use Test::More;
-use Data::Dumper;
 
 use CPAN::DistnameInfo;
 use URI::PackageURL;
@@ -16,7 +15,7 @@ while (my $distname = <DATA>) {
     next unless $d->cpanid;
     next unless $d->dist;
 
-    my $qualifiers = {};
+    my $qualifiers = {author => $d->cpanid};
 
     # "tar.gz" is the default extension for CPAN distributions
     if ($d->extension ne 'tar.gz') {
@@ -24,22 +23,17 @@ while (my $distname = <DATA>) {
     }
 
     my $purl = eval {
-        URI::PackageURL->new(
-            type       => 'cpan',
-            namespace  => $d->cpanid,
-            name       => $d->dist,
-            version    => $d->version,
-            qualifiers => $qualifiers
-        );
+        URI::PackageURL->new(type => 'cpan', name => $d->dist, version => $d->version, qualifiers => $qualifiers);
     };
 
     fail(@$) if $@;
 
     ok($purl, "Conversion: $distname --> $purl");
 
-    is($d->cpanid,  $purl->namespace, 'dist(cpanid)  == purl(namespace)');
-    is($d->dist,    $purl->name,      'dist(dist)    == purl(name)');
-    is($d->version, $purl->version,   'dist(version) == purl(version)');
+    is($d->dist,    $purl->name,                 'dist(dist)    == purl(name)');
+    is($d->version, $purl->version,              'dist(version) == purl(version)');
+    is($d->cpanid,  $purl->qualifiers->{author}, 'dist(cpanid)  == purl(qualifiers:author)');
+
 
 }
 

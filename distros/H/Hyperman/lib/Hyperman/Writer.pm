@@ -3,7 +3,7 @@ package Hyperman::Writer;
 use strict;
 use warnings;
 
-our $VERSION = '0.61';
+our $VERSION = '0.63';
 
 require Hyperman;   # all methods are XS (xs/writer.xs, include/hyperman/)
 
@@ -79,12 +79,17 @@ holding a writer never has to ask which it has.
 
 Append to the body. The bytes are copied, so the caller may reuse its buffer.
 
+Returns C<1> when the bytes were taken and the connection has room for more,
+C<0> when they were taken but the connection is holding more unwritten than
+it should (a producer that can pause should, and write again when a call
+answers C<1>), and C<-1> when nothing was written because the writer is
+stale: closed already, aborted, or kept past the request it answered.
+
 Writing to a stream whose connection has gone is dropped rather than fatal:
 by then the reader is already lost, and a producer looping over rows has
-nothing useful to do with an exception. A C consumer that does want to know -
-to stop a query, or to release a subscription - gets the reason from the C
-ABI's C<stream_write> instead, along with the backpressure signal that says
-when to pause. See L<Hyperman/Stream handles>.
+nothing useful to do with an exception. A C consumer that wants the reason
+in more detail - to stop a query, or to release a subscription - gets it
+from the C ABI's C<stream_write>. See L<Hyperman/Stream handles>.
 
 =head2 close
 

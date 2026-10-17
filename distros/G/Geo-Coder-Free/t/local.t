@@ -3,7 +3,7 @@
 use warnings;
 use strict;
 
-use Test::Most tests => 127;
+use Test::Most;
 use Test::Number::Delta;
 use Test::Carp;
 use Test::Deep;
@@ -124,6 +124,8 @@ LOCAL: {
 		}
 	}
 }
+
+done_testing();
 
 sub check {
 	my ($geo_coder, $location, $lat, $long, $expect) = @_;

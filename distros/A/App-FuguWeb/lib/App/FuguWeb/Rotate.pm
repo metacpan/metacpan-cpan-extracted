@@ -18,7 +18,7 @@
 use v5.36;
 
 package App::FuguWeb::Rotate;
-our $VERSION = '0.8.1';
+our $VERSION = '0.9.0';
 
 use App::FuguWeb;
 use App::FuguWeb::Config;

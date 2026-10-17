@@ -1,5 +1,18 @@
 Revision history for Database-BI
 
+0.013.0 Fri Oct 16 04:08:48 PM EDT 2026
+	[ New Features ]
+	- Saved canvases: multi-visual workspace pages (/a/:id) that combine
+	  charts and table views.  Full CRUD API at /api/analyses.  Canvas
+	  pages support cross-filtering, drill-through hierarchies,
+	  parameterisation (?p.<name>=), bookmarks with undo/redo, per-visual
+	  PNG download, and print to PDF/paper.
+	[ Enhancements ]
+	- Chart resize: all chart pages (line, pie, bar, heatmap, scatter,
+	  stacked, combo, treemap, histogram) now show a drag handle at the
+	  bottom-right corner of the chart SVG.  Dragging it resizes the chart
+	  proportionally without a page reload or D3 re-render.
+
 0.012.1	Thu Oct 15 12:00:00 PM EDT 2026
     [ Bug Fixes ]
     - Fix 'Argument "" isn't numeric in int' warnings logged to the console

@@ -461,6 +461,47 @@ C
         unless $sf_inc;
 }
 
+# accept4(2): the accepted socket is non-blocking and close-on-exec in the
+# one call, which is two syscalls fewer per connection and no window in which
+# a fork from a handler inherits a client socket. Probed with the perl's own
+# ccflags so the real build sees the same declaration the probe did (glibc
+# hides it without _GNU_SOURCE, which perl's flags carry on Linux).
+my $acc_inc = '';
+if ($^O ne 'MSWin32') {
+    my $code = <<'C';
+#include <sys/types.h>
+#include <sys/socket.h>
+int main(void) {
+    struct sockaddr sa; socklen_t l = sizeof(sa);
+    return accept4(0, &sa, &l, SOCK_NONBLOCK | SOCK_CLOEXEC);
+}
+C
+    if (probe_c_flags($code, $Config{ccflags})) {
+        $acc_inc = ' -DHM_HAVE_ACCEPT4';
+        print "Found accept4(2): accepted sockets are non-blocking and close-on-exec at once.\n";
+    } else {
+        print "accept4(2) not usable here: accept plus two fcntl calls per connection.\n";
+    }
+}
+
+# probe_c with extra compiler flags.
+sub probe_c_flags {
+    my ($code, $flags) = @_;
+    my $dir = "hm_acc_probe_$$";
+    mkdir $dir or return 0;
+    my ($src, $bin, $ok) = ("$dir/probe.c", "$dir/probe", 0);
+    if (open my $fh, '>', $src) {
+        print $fh $code;
+        close $fh;
+        my $cc = $Config{cc} || 'cc';
+        $flags = '' unless defined $flags;
+        $ok = system("$cc $flags $src -o $bin >$DEVNULL 2>&1") == 0;
+    }
+    unlink $src, $bin;
+    rmdir $dir;
+    return $ok;
+}
+
 # True if the given C program compiles and links as-is.
 sub probe_c {
     my ($code) = @_;
@@ -655,7 +696,7 @@ my %WriteMakefileArgs = (
     MIN_PERL_VERSION => '5.010000',
     OBJECT           => 'Hyperman$(OBJ_EXT)',
     INC              => join(' ', grep { defined && length }
-                            '-Iinclude/hyperman' . $sib_inc . $uring_inc . $h2_inc . $tls_inc . $sf_inc . $z_inc . $q_inc . $cc_inc,
+                            '-Iinclude/hyperman' . $sib_inc . $uring_inc . $h2_inc . $tls_inc . $sf_inc . $acc_inc . $z_inc . $q_inc . $cc_inc,
                             $dep_inc),
     LIBS             => [ join(' ', grep { defined && length } $uring_libs, $h2_libs, $tls_libs, $z_libs, $q_libs, $rt_libs, $win_libs, $dep_libs) ],
     # MakeMaker tracks neither include/*.h nor the xs/*.xs pulled in with

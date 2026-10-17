@@ -23,6 +23,12 @@ static const char PS_ERR_403[] = "{\"errors\":[{\"message\":\"Forbidden\"}]}";
 static const char PS_ERR_405[] =
     "{\"errors\":[{\"message\":\"Method Not Allowed\"}]}";
 
+/* the static mount's C body and its recogniser, defined in punk_static.h,
+ * which is included after this file (it needs the dispatcher's helpers) */
+static int punk_static_fast_ok(pTHX_ SV *mapp, AV **cap_out);
+static SV *punk_static_in(pTHX_ AV *cap, HV *env, const char *path,
+                          STRLEN plen, int is_head);
+
 static SV *ps_state(pTHX_ HV *st, const char *k) {
     SV **e = hv_fetch(st, k, (I32)strlen(k), 0);
     return (e && *e) ? *e : NULL;
@@ -43,13 +49,15 @@ static const char *ps_env_str(pTHX_ HV *env, const char *k, const char *def,
 
 /* Bless a fresh context AV (the PCX_* layout from punk_context.h: 0=env,
  * 1=app, 6=match) into the app's context class. match is owned. */
-static SV *ps_ctx(pTHX_ SV *ctx_class, HV *env, SV *app, SV *match) {
+static SV *ps_ctx(pTHX_ pk_state *S, HV *env, SV *match) {
     AV *av = newAV();
-    av_extend(av, PCX_MATCH);
+    /* room for every slot the plugins fill (request id, canon), so the
+     * array is not regrown twice per request */
+    av_extend(av, PCX_T0);
     (void)av_store(av, PCX_ENV,   newRV_inc((SV *)env));
-    (void)av_store(av, PCX_APP,   newSVsv(app));
+    (void)av_store(av, PCX_APP,   newSVsv(S->app));
     (void)av_store(av, PCX_MATCH, match);
-    return sv_bless(newRV_noinc((SV *)av), gv_stashsv(ctx_class, GV_ADD));
+    return sv_bless(newRV_noinc((SV *)av), S->ctxstash);
 }
 
 /* The request context, built once.
@@ -67,17 +75,38 @@ static SV *ps_ctx(pTHX_ SV *ctx_class, HV *env, SV *app, SV *match) {
 /* Every path that needs a context comes through here, built or reused, which
  * is why pk_abi's current_of is set here and not at the four call sites. The
  * restore is punk_serve's, on the save stack. */
-static SV *ps_ctx_for(pTHX_ SV **cp, SV *ctx_class, HV *env, SV *app,
-                      SV *match) {
+static SV *ps_ctx_for(pTHX_ SV **cp, pk_state *S, HV *env, SV *match) {
     if (*cp) {
         AV *av = (AV *)SvRV(*cp);
         if (!av_store(av, PCX_MATCH, match)) SvREFCNT_dec(match);
         pk_cur_set(aTHX_ *cp);
         return *cp;
     }
-    *cp = sv_2mortal(ps_ctx(aTHX_ ctx_class, env, app, match));
+    *cp = sv_2mortal(ps_ctx(aTHX_ S, env, match));
     pk_cur_set(aTHX_ *cp);
     return *cp;
+}
+
+/* The match hash the routed request fills in. When a context already exists
+ * (an observer or a before_request hook built it ahead of routing) its match
+ * hash is reused rather than a second one built and the first thrown away:
+ * the hook's hash gains `route` and the captures, which is what $c->match
+ * has always documented. Returns the hash to fill; *cp ends up pointing at
+ * the context that owns it. */
+static HV *ps_match_for(pTHX_ SV **cp, pk_state *S, HV *env) {
+    if (*cp) {
+        AV *av = (AV *)SvRV(*cp);
+        SV *m = pcx_get(aTHX_ av, PCX_MATCH);
+        if (m && SvROK(m) && SvTYPE(SvRV(m)) == SVt_PVHV) {
+            pk_cur_set(aTHX_ *cp);
+            return (HV *)SvRV(m);
+        }
+    }
+    {
+        HV *match = newHV();
+        (void)ps_ctx_for(aTHX_ cp, S, env, newRV_noinc((SV *)match));
+        return match;
+    }
 }
 
 /* May a response say what went wrong? In development, where the person
@@ -230,40 +259,32 @@ static int ps_under(const char *path, STRLEN plen, const char *pf, STRLEN pfl) {
         && (plen == pfl || path[pfl] == '/');
 }
 
-static SV *ps_serve_one(pTHX_ HV *state, HV *env) {
-    SV *router = ps_state(aTHX_ state, "router");
-    AV *recs   = ps_state_av(aTHX_ state, "recs");
-    AV *apims  = ps_state_av(aTHX_ state, "api_mounts");
-    AV *mounts = ps_state_av(aTHX_ state, "mounts");
-    SV *ctxcls = ps_state(aTHX_ state, "ctx");
-    SV *app    = ps_state(aTHX_ state, "app");
-    {   /* Where a large multipart part spills. The parser has the request's
-         * env and nothing else - the env belongs to the server - so the one
-         * place this can be handed over is here, and only when an
-         * application named a directory. One hv_store for those that did,
-         * one hv_fetch for those that did not. */
-        SV *ud = ps_state(aTHX_ state, "upload_dir");
-        if (ud && SvOK(ud)) (void)hv_stores(env, "punk.upload_dir", newSVsv(ud));
-    }
-    AV *before = ps_state_av(aTHX_ state, "before");
-    AV *after  = ps_state_av(aTHX_ state, "after");
-    SV *on_err = ps_state(aTHX_ state, "on_error");
-    pr_router *rt = (router && SvROK(router) && SvIOK(SvRV(router)))
-                    ? (pr_router *)INT2PTR(void *, SvIV(SvRV(router))) : NULL;
+static SV *ps_serve_one(pTHX_ pk_state *S, HV *env) {
+    AV *recs   = S->recs;
+    AV *apims  = S->apims;
+    AV *mounts = S->mounts;
+    SV *app    = S->app;
+    AV *before = S->before;
+    AV *after  = S->after;
+    SV *on_err = S->on_err;
+    pr_router *rt = S->rt;
+    IV ridx = -1;                      /* the matched record's index */
 
     STRLEN mlen, plen;
     const char *method;
     int ext_connect = 0;
 
-    {   /* Reverse-proxy trust, before anything reads the env: REMOTE_ADDR is
-         * rewritten to the real client so rate_limit, block_ip, the access
-         * log and $c->req all see it without any of them being changed.
-         * Absent a `proxy` policy this is one predictable branch. */
-        SV *px = ps_state(aTHX_ state, K_PROXY);
-        if (px && SvROK(px) && SvIOK(SvRV(px)))
-            pp_resolve(aTHX_ (const pp_policy *)INT2PTR(void *,
-                                                        SvIV(SvRV(px))), env);
-    }
+    /* Where a large multipart part spills. The parser has the request's env
+     * and nothing else - the env belongs to the server - so the one place
+     * this can be handed over is here, and only when an application named
+     * a directory. */
+    if (S->upload_dir)
+        (void)hv_stores(env, "punk.upload_dir", newSVsv(S->upload_dir));
+
+    /* Reverse-proxy trust, before anything reads the env: REMOTE_ADDR is
+     * rewritten to the real client so rate_limit, block_ip, the access log
+     * and $c->req all see it without any of them being changed. */
+    if (S->proxy) pp_resolve(aTHX_ S->proxy, env);
 
     method = ps_env_str(aTHX_ env, "REQUEST_METHOD", "GET", &mlen);
 
@@ -320,8 +341,8 @@ static SV *ps_serve_one(pTHX_ HV *state, HV *env) {
          *
          * compile omits the state key when the chain is empty, so an app
          * with no such hook pays one hv_fetch and one branch. */
-        AV *before_req = ps_state_av(aTHX_ state, K_BEFORE_REQ);
-        int has_hooks = (before_req && av_len(before_req) >= 0);
+        AV *before_req = S->before_req;
+        int has_hooks = before_req != NULL;
 
         /* The C ABI's observers register process-globally and run here, ahead
          * of any Perl phase - a consumer measuring a request should start
@@ -333,8 +354,7 @@ static SV *ps_serve_one(pTHX_ HV *state, HV *env) {
             /* a real hashref with empty captures, not undef, so $c->match and
              * $c->param behave inside the hook instead of croaking */
             (void)hv_stores(match, "captures", newRV_noinc((SV *)newHV()));
-            (void)ps_ctx_for(aTHX_ &c, ctxcls, env, app,
-                             newRV_noinc((SV *)match));
+            (void)ps_ctx_for(aTHX_ &c, S, env, newRV_noinc((SV *)match));
         }
         if (PK_OBS_WANT_REQ) pk_obs_fire_req(aTHX_ c);
 
@@ -368,7 +388,10 @@ static SV *ps_serve_one(pTHX_ HV *state, HV *env) {
     /* 1. static exact hit */
     if (rt) {
         IV i = pr_static_match(aTHX_ rt, method, mlen, path, plen);
-        if (i >= 0) { SV **rp = av_fetch(recs, i, 0); if (rp && *rp) rec = *rp; }
+        if (i >= 0) {
+            SV **rp = av_fetch(recs, i, 0);
+            if (rp && *rp) { rec = *rp; ridx = i; }
+        }
     }
 
     /* 2. API mounts.
@@ -430,8 +453,7 @@ static SV *ps_serve_one(pTHX_ HV *state, HV *env) {
                 SV *ret = &PL_sv_undef, *err = &PL_sv_undef, *out;
                 (void)hv_stores(match, "captures", newRV_inc((SV *)capsh));
                 (void)hv_stores(match, "operation", newSVsv(opid));
-                (void)ps_ctx_for(aTHX_ &c, ctxcls, env, app,
-                                 newRV_noinc((SV *)match));
+                (void)ps_ctx_for(aTHX_ &c, S, env, newRV_noinc((SV *)match));
                 if (oprec && SvROK(oprec) && SvTYPE(SvRV(oprec)) == SVt_PVHV)
                     punk_oa_dispatch(aTHX_ c, before, (HV *)SvRV(oprec), api, opid,
                         sv_2mortal(newRV_inc((SV *)capsh)), maxb, &ret, &err);
@@ -463,6 +485,21 @@ static SV *ps_serve_one(pTHX_ HV *state, HV *env) {
             if (x && *x && SvOK(*x)) pf = SvPV_const(*x, pfl); else { pf = ""; pfl = 0; }
             if (!ps_under(path, plen, pf, pfl)) continue;
             mapp = *hv_fetchs(m, "app", 0);
+            {   /* A `static` mount of this framework's own, answering a GET
+                 * or HEAD: its C body, handed the sub-path. The env rewrite
+                 * and the Perl frame below exist for a mounted PSGI app;
+                 * this one reads neither SCRIPT_NAME nor PATH_INFO. */
+                AV *scap;
+                if ((is_head || (mlen == 3 && memEQ(method, "GET", 3)))
+                    && punk_static_fast_ok(aTHX_ mapp, &scap)) {
+                    SV *r = punk_static_in(aTHX_ scap, env,
+                                           plen > pfl ? path + pfl : "/",
+                                           plen > pfl ? plen - pfl : 1,
+                                           is_head);
+                    if (PK_OBS_WANT_RES) pk_obs_fire_res(aTHX_ c, r);
+                    return r;
+                }
+            }
             {
                 SV *save_sn, *save_pi, *newsn, *newpi, *r;
                 SV **sn = hv_fetchs(env, "SCRIPT_NAME", 0);
@@ -498,7 +535,7 @@ static SV *ps_serve_one(pTHX_ HV *state, HV *env) {
         IV idx = pr_match(aTHX_ rt, method, mlen, path, plen, capsh);
         if (idx >= 0) {
             SV **rp = av_fetch(recs, idx, 0);
-            if (rp && *rp) rec = *rp;
+            if (rp && *rp) { rec = *rp; ridx = idx; }
             caps = sv_2mortal(newRV_inc((SV *)capsh));
         }
         else {
@@ -521,14 +558,15 @@ static SV *ps_serve_one(pTHX_ HV *state, HV *env) {
         i = pr_static_match(aTHX_ rt, method, mlen, path, tl);
         if (i >= 0) {
             SV **rp = av_fetch(recs, i, 0);
-            if (rp && *rp) { rec = *rp; caps = NULL; }
+            if (rp && *rp) { rec = *rp; ridx = i; caps = NULL; }
         }
         if (!rec) {
             HV *capsh = (HV *)sv_2mortal((SV *)newHV());
             IV idx = pr_match(aTHX_ rt, method, mlen, path, tl, capsh);
             if (idx >= 0) {
                 SV **rp = av_fetch(recs, idx, 0);
-                if (rp && *rp) { rec = *rp; caps = sv_2mortal(newRV_inc((SV *)capsh)); }
+                if (rp && *rp) { rec = *rp; ridx = idx;
+                                 caps = sv_2mortal(newRV_inc((SV *)capsh)); }
             }
             else if (!caps) {                /* keep the untrimmed Allow if any */
                 AV *allowv = (AV *)sv_2mortal((SV *)newAV());
@@ -556,11 +594,7 @@ static SV *ps_serve_one(pTHX_ HV *state, HV *env) {
      * IS a websocket falls through to the dispatch, where the origin check
      * and the route's own `origin` option decide. */
     if (ext_connect) {
-        int is_ws = 0;
-        if (rec && SvROK(rec) && SvTYPE(SvRV(rec)) == SVt_PVHV) {
-            SV **w = hv_fetchs((HV *)SvRV(rec), K_WS, 0);
-            is_ws = (w && *w && SvTRUE(*w));
-        }
+        int is_ws = (rec && ridx >= 0 && ridx < S->nrec && S->rec[ridx].ws);
         if (!is_ws) {
             SV *out = ps_err_triplet(aTHX_ 404, PS_ERR_404,
                                      sizeof(PS_ERR_404) - 1, NULL);
@@ -606,14 +640,13 @@ static SV *ps_serve_one(pTHX_ HV *state, HV *env) {
              * Future is awaited), anything else keeps the default below,
              * and a die inside it goes through on_error. The 405 above is
              * deliberately not covered: its Allow semantics stay. */
-            SV *on_nf = ps_state(aTHX_ state, K_ON_NOT_FOUND);
-            if (on_nf && SvOK(on_nf)) {
+            SV *on_nf = S->on_nf;
+            if (on_nf) {
                 HV *match = newHV();
                 SV *r = NULL;
                 int died;
                 (void)hv_stores(match, "captures", newRV_noinc((SV *)newHV()));
-                (void)ps_ctx_for(aTHX_ &c, ctxcls, env, app,
-                                 newRV_noinc((SV *)match));
+                (void)ps_ctx_for(aTHX_ &c, S, env, newRV_noinc((SV *)match));
                 {
                     dSP; int count;
                     ENTER; SAVETMPS;
@@ -654,10 +687,17 @@ static SV *ps_serve_one(pTHX_ HV *state, HV *env) {
     /* 5. web route: ctx, before + guards, controller/ws, finish */
     {
         HV *rech = (HV *)SvRV(rec);
-        HV *match = newHV();
+        /* the record's hot fields, mirrored at compile (punk_state.h) */
+        const pk_rec_c *R = (ridx >= 0 && ridx < S->nrec) ? &S->rec[ridx]
+                                                          : NULL;
+        pk_rec_c none;
+        HV *match;
         SV *ret = &PL_sv_undef, *err = &PL_sv_undef, *out;
-        SV **guardsp, **codep, **wsp, **ssep;
         int shorted;
+        if (!R) { pk_rec_mirror(aTHX_ &none, rec); R = &none; }
+        /* the hook's match hash when a context exists already, else a new
+         * one in a new context */
+        match = ps_match_for(aTHX_ &c, S, env);
         if (caps && SvROK(caps) && SvTYPE(SvRV(caps)) == SVt_PVHV)
             (void)hv_stores(match, "captures", newRV_inc(SvRV(caps)));
         else
@@ -667,17 +707,14 @@ static SV *ps_serve_one(pTHX_ HV *state, HV *env) {
          * what names the route as DECLARED - "/users/:id" - for anything
          * grouping by route rather than by path, the C ABI included. */
         (void)hv_stores(match, "route", newSVsv(rec));
-        (void)ps_ctx_for(aTHX_ &c, ctxcls, env, app, newRV_noinc((SV *)match));
 
         {   /* The body ceiling, before the hook chain and before the guards:
              * an oversize request should cost no auth lookup, no validation,
              * no body parse and no Perl frame. A route's own value wins over
              * the app-wide one, and 0 on a route disables the check there. */
-            SV **rmb = hv_fetchs(rech, K_MAX_BODY, 0);
-            SV  *amb = ps_state(aTHX_ state, K_MAX_BODY);
-            IV   lim = (rmb && *rmb && SvOK(*rmb)) ? SvIV(*rmb)
-                     : (amb && SvOK(amb))          ? SvIV(amb)
-                     : 0;
+            IV lim = R->has_max_body ? R->max_body
+                   : S->has_max_body ? S->max_body
+                   : 0;
             if (lim > 0) {
                 SV *over = pd_body_limit(aTHX_ env, lim);
                 if (over) {   /* the 413 refuses before the hook chain, so it
@@ -689,28 +726,21 @@ static SV *ps_serve_one(pTHX_ HV *state, HV *env) {
         }
 
         shorted = pd_run_chain(aTHX_ before, c, &ret, &err);
-        if (!shorted) {
-            guardsp = hv_fetchs(rech, "guards", 0);
-            if (guardsp && *guardsp && SvROK(*guardsp)
-                && SvTYPE(SvRV(*guardsp)) == SVt_PVAV)
-                shorted = pd_run_chain(aTHX_ (AV *)SvRV(*guardsp), c, &ret, &err);
-        }
+        if (!shorted && R->guards)
+            shorted = pd_run_chain(aTHX_ R->guards, c, &ret, &err);
         if (!shorted) {
             /* The conditional GET, after the guards and before the handler.
              * Not earlier: before_dispatch runs ahead of the guards, and a
              * 304 there would answer a request an authentication guard was
              * about to refuse. Inert unless the plugin is registered, and
              * one hv_fetch when it is not - the `sitemap` arrangement. */
-            SV *cg = ps_state(aTHX_ state, K_CGET);
-            if (cg && SvTRUE(cg)) {
+            SV *cg = S->cget;
+            if (cg) {
                 SV *cgout = NULL, *cgerr = NULL;
-                {   /* `etag => 1` hashes the body this route renders, so
-                     * the body has to come out the same way every time */
-                    SV **et = hv_fetchs(rech, K_ETAG, 0);
-                    if (et && *et && SvOK(*et) && !SvROK(*et) && SvTRUE(*et))
-                        (void)av_store(pcx_av(aTHX_ c), PCX_CANON,
-                                       newSViv(1));
-                }
+                /* `etag => 1` hashes the body this route renders, so the
+                 * body has to come out the same way every time */
+                if (R->etag)
+                    (void)av_store(pcx_av(aTHX_ c), PCX_CANON, newSViv(1));
                 if (pcg_check(aTHX_ c, rech, env, method, mlen,
                               &cgout, &cgerr)) {
                     if (cgerr) err = cgerr;      /* the app's 500 */
@@ -725,9 +755,8 @@ static SV *ps_serve_one(pTHX_ HV *state, HV *env) {
              * of the guards would hand somebody else's order to a caller
              * the guard was about to refuse. The two never both fire - one
              * answers GET and HEAD, the other only unsafe methods. */
-            SV *ic = ps_state(aTHX_ state, K_IDEM);
-            SV **ir = ic ? hv_fetchs(rech, K_IDEMPOTENT, 0) : NULL;
-            if (ir && *ir && SvTRUE(*ir)) {
+            SV *ic = S->idem;
+            if (ic && R->idempotent) {
                 SV *iout = NULL, *ierr = NULL;
                 if (pi_check(aTHX_ c, rech, env, method, mlen, ic,
                              &iout, &ierr)) {
@@ -739,11 +768,8 @@ static SV *ps_serve_one(pTHX_ HV *state, HV *env) {
         }
         if (!shorted) {
             int died = 0;
-            wsp   = hv_fetchs(rech, "ws", 0);
-            ssep  = hv_fetchs(rech, "sse", 0);
-            codep = hv_fetchs(rech, "code", 0);
-            if ((wsp && *wsp && SvTRUE(*wsp)) || (ssep && *ssep && SvTRUE(*ssep))) {
-                const char *disp = (wsp && *wsp && SvTRUE(*wsp))
+            if (R->ws || R->sse) {
+                const char *disp = R->ws
                     ? "Punk::WebSocket::_dispatch" : "Punk::SSE::_dispatch";
                 dSP; int count;
                 ENTER; SAVETMPS;
@@ -758,7 +784,7 @@ static SV *ps_serve_one(pTHX_ HV *state, HV *env) {
                 died = SvTRUE(ERRSV) ? 1 : 0;
             }
             else {
-                ret = pd_call(aTHX_ (codep && *codep) ? *codep : &PL_sv_undef, c, &died);
+                ret = pd_call(aTHX_ R->code ? R->code : &PL_sv_undef, c, &died);
             }
             if (died) err = newSVsv(ERRSV);
         }
@@ -767,8 +793,7 @@ static SV *ps_serve_one(pTHX_ HV *state, HV *env) {
              * `identity` is the documented hands-off spelling (Hyperman
              * strips it before writing); a response that already declares
              * an encoding has said something more specific and is left. */
-            SV **nc = hv_fetchs(rech, K_COMPRESS, 0);
-            if (nc && *nc && !SvTRUE(*nc)
+            if (R->nocompress
                 && out && SvROK(out) && SvTYPE(SvRV(out)) == SVt_PVAV) {
                 AV *ra = (AV *)SvRV(out);
                 SV **hp = av_fetch(ra, 1, 0);
@@ -805,11 +830,11 @@ static SV *ps_serve_one(pTHX_ HV *state, HV *env) {
  * PREVIOUS value is what goes back, not NULL: a mounted application inside
  * another one has to leave the outer context where the outer frame will find
  * it. */
-static SV *punk_serve(pTHX_ HV *state, HV *env) {
+static SV *punk_serve(pTHX_ pk_state *S, HV *env) {
     SV *out;
     ENTER;
     SAVEDESTRUCTOR_X(pk_cur_restore, (void *)PK_CURRENT);
-    out = ps_serve_one(aTHX_ state, env);
+    out = ps_serve_one(aTHX_ S, env);
     LEAVE;
     return out;
 }

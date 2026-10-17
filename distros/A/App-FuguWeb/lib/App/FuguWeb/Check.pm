@@ -18,7 +18,7 @@
 use v5.36;
 
 package App::FuguWeb::Check;
-our $VERSION = '0.8.1';
+our $VERSION = '0.9.0';
 
 use App::FuguWeb;
 use App::FuguWeb::Keys;
@@ -52,18 +52,25 @@ sub new ( $class, %args )
 }
 
 # $self->pages:
-#	Every page that the site must hold, in a stable order: the
-#	pages of the description, then one page for each manual.
+#	Every page of every language tree, in a stable order: for each
+#	language, the pages of the description, then one page for each
+#	manual. Each name is <code>/<page>.
 sub pages ($self)
 {
-	return ( map { $_->{file} } $self->{config}->pages ),
-	    ( map { $_->page } map { $_->manuals } $self->{config}->groups );
+	my $config = $self->{config};
+	my @names  = $config->page_names;
+
+	return map {
+		my $code = $_;
+		map { "$code/$_" } @names
+	} $config->languages;
 }
 
 # $self->generated_pages:
-#	Every page that the build writes itself, and that no
-#	description block names. Today that is the human page of the
-#	key directory.
+#	The human page of each key directory. The build writes it
+#	itself, and no description block names it. The pages of the
+#	top level are the other pages outside every tree, and
+#	top_pages of the description names them.
 #
 #	The page gets the checks of a page, so a broken link of the
 #	chrome fails the check. It gets no reachability check: the
@@ -87,16 +94,31 @@ sub external ($self)
 # $self->run:
 #	Check the site and return the problems, each one a sentence
 #	that names the page. An empty list means the site is good.
+#
+#	Each kind of page takes the checks of its own chrome, per
+#	WEB-LANG-15. The forward takes the checks of its own shape.
 sub run ($self)
 {
 	$self->{external} = {};
 
 	my @problems = $self->_check_inventory;
 
-	for my $page ( $self->pages, $self->generated_pages ) {
+	my $forward   = App::FuguWeb::FORWARD_PAGE;
+	my @not_found = grep { $_ ne $forward } $self->{config}->top_pages;
+
+	my @kinds = (
+		( map { [ $_, 'tree' ] } $self->pages ),
+		( map { [ $_, 'top' ] } @not_found ),
+		( map { [ $_, 'keys' ] } $self->generated_pages ),
+	);
+	for my $each (@kinds) {
+		my ( $page, $kind ) = @$each;
 		next unless -f $self->{out} . "/$page";
-		push @problems, $self->_check_page($page);
+		push @problems, $self->_check_page( $page, $kind );
 	}
+
+	push @problems, $self->_check_forward
+	    if -f $self->{out} . "/$forward";
 	push @problems, $self->_check_reachable;
 	push @problems, $self->_check_keys;
 
@@ -141,9 +163,9 @@ sub _check_inventory ($self)
 		push @problems, "$name: empty" if -e $path && !-s $path;
 	}
 
-	# The walk reads the whole tree. A site is one flat directory,
-	# and the key directory is the one part below it. A walk of one
-	# level would take every published key for a stray file.
+	# The walk reads the whole tree. Each language tree and each
+	# key directory sit below the top level, and a walk of one
+	# level would take every page and every key for a stray file.
 	my $entries = App::FuguWeb::list_tree( $self->{out} )
 	    or return "$self->{out}: cannot read the output directory: $!";
 
@@ -154,9 +176,14 @@ sub _check_inventory ($self)
 	return @problems;
 }
 
-# $self->_check_page($page):
-#	Everything that one page must be true of.
-sub _check_page ( $self, $page )
+# The base element of the top-level copy of the 404 page, per
+# WEB-LANG-9. Its href is the one root-absolute href of the site.
+use constant BASE_ELEMENT => '<base href="/">';
+
+# $self->_check_page($page, $kind):
+#	Everything that one page must be true of. The kind is tree,
+#	keys or top, as App::FuguWeb::Page names it.
+sub _check_page ( $self, $page, $kind )
 {
 	my $html = Fugu::File->read( $self->{out} . "/$page" ) // '';
 	my @problems;
@@ -165,25 +192,140 @@ sub _check_page ( $self, $page )
 	push @problems, "$page: has no title"
 	    unless defined $title && length $title;
 
-	for my $entry ( $self->{config}->nav ) {
-		my $href = $entry->{href};
+	# WEB-LANG-14. A tree page carries the code of its tree.
+	if ( $kind eq 'tree' ) {
+		my ($code) = split m{/}, $page;
+		push @problems, qq{$page: does not carry lang="$code"}
+		    unless index( $html, qq{<html lang="$code">} ) >= 0;
+	}
 
-		# The chrome escapes an attribute on its way out, so the
-		# search has to escape it the same way. A page below the
-		# root also carries the step back, so the search reads
-		# the same form that App::FuguWeb::Page writes.
-		my $written = App::FuguWeb::escape_attr($href);
-		$written = _base_of($page) . $written
-		    unless $href =~ m{\A(?:[A-Za-z][A-Za-z0-9.+-]*:|/|\#)};
+	# WEB-LANG-15. The header link and each nav link take the form
+	# of the kind of page. The chrome escapes an attribute on its
+	# way out, so the search escapes it the same way.
+	my $entry = $self->{config}->entry;
+	push @problems,
+	    "$page: the header does not link $entry"
+	    unless index( $html,
+		'<header><a href="' . _chrome( $kind, $entry ) . '">' ) >= 0;
+
+	for my $each ( $self->{config}->nav ) {
+		my $href = $each->{href};
 
 		push @problems,
 		    "$page: does not carry the navigation" . " entry $href"
-		    unless index( $html, qq{href="$written"} ) >= 0;
+		    unless
+		    index( $html, 'href="' . _chrome( $kind, $href ) . '"' ) >=
+		    0;
+	}
+
+	push @problems, $self->_check_languages( $page, $kind, $html );
+
+	# The base href of the top-level copy of the 404 page is the
+	# one root-absolute href that the site holds. The check takes
+	# it out, so every other root-absolute href still fails.
+	if ( $kind eq 'top' ) {
+		my $at = index $html, BASE_ELEMENT;
+		if ( $at < 0 ) {
+			push @problems, "$page: does not carry " . BASE_ELEMENT;
+		}
+		else {
+			substr( $html, $at, length BASE_ELEMENT ) = '';
+		}
 	}
 
 	push @problems, $self->_check_references( $page, $html );
 
 	return @problems;
+}
+
+# $self->_check_languages($page, $kind, $html):
+#	Hold the language links of the chrome to WEB-LANG-7. A tree
+#	page links the same page in each other language of the site,
+#	with the code as the text and the hreflang of the link. No
+#	other page carries a language link. The chrome ends where the
+#	main element starts, so a link of the body is the writer's own.
+sub _check_languages ( $self, $page, $kind, $html )
+{
+	my ($chrome) = $html =~ m{\A(.*?)<main\b}s;
+	$chrome //= $html;
+
+	my ( $code, $name ) = split m{/}, $page, 2;
+	my @others =
+	    $kind eq 'tree'
+	    ? grep { $_ ne $code } $self->{config}->languages
+	    : ();
+
+	my @problems;
+	for my $other (@others) {
+		my $link =
+		      qq{<a href="../$other/}
+		    . App::FuguWeb::escape_attr($name)
+		    . qq{" hreflang="$other">$other</a>};
+		push @problems, "$page: does not link the page in $other"
+		    unless index( $chrome, $link ) >= 0;
+	}
+
+	my $held = () = $chrome =~ m{\bhreflang="}g;
+	push @problems,
+	    "$page: carries $held language links, and the page takes "
+	    . scalar(@others)
+	    unless $held == @others;
+
+	return @problems;
+}
+
+# $self->_check_forward:
+#	Hold the top-level index.html to the shape of WEB-LANG-8: a
+#	meta refresh to the entry page of the default tree, and one
+#	link to that page as its one reference. The page loads nothing
+#	and carries no nav.
+sub _check_forward ($self)
+{
+	my $page = App::FuguWeb::FORWARD_PAGE;
+	my $html = Fugu::File->read( $self->{out} . "/$page" ) // '';
+	my $to   = App::FuguWeb::escape_attr(
+		App::FuguWeb::DEFAULT_LANGUAGE . '/' . $self->{config}->entry );
+
+	my @problems;
+
+	push @problems, "$page: does not forward to $to"
+	    unless
+	    index( $html, qq{<meta http-equiv="refresh" content="0; url=$to">} )
+	    >= 0;
+
+	# One reference, and that one the link to the entry page. A
+	# second href or any src is a thing that the page loads, or a
+	# second way out of it.
+	my @refs = $html =~ m{(?:href|src)="([^"]+)"}g;
+	push @problems, "$page: holds a reference other than one link to $to"
+	    unless @refs == 1
+	    && index( $html, qq{<a href="$to">} ) >= 0;
+
+	push @problems, "$page: carries a nav, and the forward takes none"
+	    if $html =~ m{<nav\b};
+
+	push @problems, $self->_check_references( $page, $html );
+
+	return @problems;
+}
+
+# _chrome($kind, $href):
+#	The form of one link of the chrome on a page of the kind, as
+#	App::FuguWeb::Page writes it, per WEB-LANG-15. A tree page
+#	takes <page>, the key page ../en/<page>, and the top-level copy
+#	of the 404 page en/<page>. An absolute URL and a fragment pass
+#	unchanged.
+sub _chrome ( $kind, $href )
+{
+	my $written = App::FuguWeb::escape_attr($href);
+	return $written
+	    if $href =~ m{\A(?:[A-Za-z][A-Za-z0-9.+-]*:|/|\#)};
+
+	my $lang = App::FuguWeb::DEFAULT_LANGUAGE;
+	return "../$lang/$written" if $kind eq 'keys';
+	return "$lang/$written"    if $kind eq 'top';
+
+	return $written;
 }
 
 # $self->_check_references($page, $html):
@@ -248,23 +390,10 @@ sub _check_references ( $self, $page, $html )
 	return @problems;
 }
 
-# _base_of($page):
-#	The step back from a page to the site root. It is the empty
-#	string for a page of the root, and one '../' for each
-#	directory below it. App::FuguWeb::Page writes the same step in
-#	front of every relative link of the chrome.
-sub _base_of ($page)
-{
-	my $depth = () = $page =~ m{/}g;
-
-	return '../' x $depth;
-}
-
 # _resolve($page, $ref):
 #	One relative reference of a page, as a path below the output
-#	directory. A site is one flat directory, so most references
-#	resolve to themselves. The key directory sits below the root,
-#	and a reference there is relative to its own page.
+#	directory. A reference is relative to the directory of its own
+#	page: a language tree, a key directory, or the top level.
 sub _resolve ( $page, $ref )
 {
 	my @parts = split m{/}, $page;
@@ -310,15 +439,45 @@ sub _unescape ($text)
 }
 
 # $self->_check_reachable:
-#	Every page is reachable from the entry page. A page that no
-#	other page links to declares itself unlinked, as a 404 page
-#	does: the host serves that one for an unknown path.
+#	Every page of each tree is reachable from the entry page of
+#	that tree, per WEB-LANG-14. A page that no other page links to
+#	declares itself unlinked, as a 404 page does: the host serves
+#	that one for an unknown path.
+#
+#	The pages of the top level take no walk. The forward leads
+#	into the default tree, and the copy of the 404 page answers a
+#	path that no page links to.
 sub _check_reachable ($self)
 {
-	my $entry = $self->{config}->entry;
-	return "$entry: the entry page is missing"
-	    unless -f $self->{out} . "/$entry";
+	my $config = $self->{config};
 
+	my %unlinked = map { $_->{file} => 1 }
+	    grep { $_->{unlinked} } $config->pages;
+
+	my @problems;
+	for my $code ( $config->languages ) {
+		my $entry = "$code/" . $config->entry;
+		unless ( -f $self->{out} . "/$entry" ) {
+			push @problems, "$entry: the entry page is missing";
+			next;
+		}
+
+		my $seen = $self->_walk( $code, $entry );
+
+		push @problems, map { "$code/$_: no page links to it" }
+		    grep { !$seen->{"$code/$_"} && !$unlinked{$_} }
+		    $config->page_names;
+	}
+
+	return @problems;
+}
+
+# $self->_walk($code, $entry):
+#	Every path that the tree of the code reaches from its entry
+#	page, as a hash reference. The walk stays inside the tree, so a
+#	link into another tree reaches no page of this one.
+sub _walk ( $self, $code, $entry )
+{
 	my %seen  = ( $entry => 1 );
 	my @queue = ($entry);
 
@@ -335,17 +494,14 @@ sub _check_reachable ($self)
 			next unless defined $path && length $path;
 			$path = _resolve( $page, $path );
 			next unless defined $path;
+			next unless App::FuguWeb::path_below( $path, $code );
 
 			next if $seen{$path}++;
 			push @queue, $path;
 		}
 	}
 
-	my %unlinked = map { $_->{file} => 1 }
-	    grep { $_->{unlinked} } $self->{config}->pages;
-
-	return map { "$_: no page links to it" }
-	    grep { !$seen{$_} && !$unlinked{$_} } $self->pages;
+	return \%seen;
 }
 
 1;

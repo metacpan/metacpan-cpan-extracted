@@ -1,0 +1,66 @@
+---
+abstract: 'Command line interface for MCP servers'
+author:
+  - 'Mohammad Sajid Anwar <mohammad.anwar@yahoo.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-MCP-CLI
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  App::MCP::CLI:
+    file: lib/App/MCP/CLI.pm
+    version: v0.0.1
+  App::MCP::CLI::Client:
+    file: lib/App/MCP/CLI/Client.pm
+    version: v0.0.1
+  App::MCP::CLI::Command::call:
+    file: lib/App/MCP/CLI/Command/call.pm
+    version: v0.0.1
+  App::MCP::CLI::Command::interactive:
+    file: lib/App/MCP/CLI/Command/interactive.pm
+    version: v0.0.1
+  App::MCP::CLI::Command::list:
+    file: lib/App/MCP/CLI/Command/list.pm
+    version: v0.0.1
+  App::MCP::CLI::Command::servers:
+    file: lib/App/MCP/CLI/Command/servers.pm
+    version: v0.0.1
+  App::MCP::CLI::Command::version:
+    file: lib/App/MCP/CLI/Command/version.pm
+    version: v0.0.1
+  App::MCP::CLI::Config:
+    file: lib/App/MCP/CLI/Config.pm
+    version: v0.0.1
+recommends:
+  HTTP::Daemon: '0'
+  IO::Socket::SSL: '0'
+  MCP: '0'
+requires:
+  App::Cmd: '0.330'
+  File::Spec: '0'
+  HTTP::Tiny: '0'
+  IO::Handle: '0'
+  IO::Socket::INET: '0'
+  IPC::Open2: '0'
+  JSON::MaybeXS: '0'
+  POSIX: '0'
+  Scalar::Util: '0'
+  Text::Table::Tiny: '0'
+  Time::HiRes: '0'
+  perl: '5.014'
+resources:
+  bugtracker: https://github.com/manwar/App-MCP-CLI/issues
+  repository: https://github.com/manwar/App-MCP-CLI.git
+version: v0.0.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

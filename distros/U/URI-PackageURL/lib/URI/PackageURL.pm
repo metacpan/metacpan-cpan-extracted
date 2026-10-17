@@ -10,6 +10,7 @@ use Exporter qw(import);
 
 use URI::PackageURL::Type;
 use URI::PackageURL::Util qw(purl_to_urls);
+use URI::VersionRange     ();
 
 BEGIN { *PURL:: = *URI::PackageURL:: }
 
@@ -17,27 +18,29 @@ use constant DEBUG => $ENV{PURL_DEBUG};
 
 use overload '""' => 'to_string', fallback => 1;
 
-our $VERSION = '2.25';
-our @EXPORT  = qw(encode_purl decode_purl);
+our $VERSION = '2.26';
+our @EXPORT  = qw(encode_purl decode_purl is_purl);
 
-my $PURL_REGEXP = qr{^pkg:(([/]{1,})?)([A-Za-z][A-Za-z0-9\.\-]*)([/]{1,}).+};
+my $PURL_TYPE_REGEXP = qr{[a-z][a-z0-9\.\-]*};
+my $PURL_REGEXP      = qr{^pkg:(([/]{1,})?)([A-Za-z][A-Za-z0-9\.\-]*)([/]{1,}).+};
 
 sub new {
 
     my ($class, %params) = @_;
 
-    my $type       = delete $params{type} or Carp::croak "Invalid PURL: 'type' component is required";
+    my $type       = delete $params{type};
     my $namespace  = delete $params{namespace};
     my $name       = delete $params{name} or Carp::croak "Invalid PURL: 'name' component is required";
     my $version    = delete $params{version};
     my $qualifiers = delete $params{qualifiers} // {};
     my $subpath    = delete $params{subpath};
 
+    Carp::croak "Invalid PURL: 'type' component is required"     unless defined $type && length $type;
+    Carp::croak "Invalid PURL: invalid 'type' component '$type'" unless lc($type) =~ /\A$PURL_TYPE_REGEXP\z/;
+
     my $validate = delete $params{validate} // 1;
 
-    my $purl_definition = URI::PackageURL::Type->new($type);
-
-    my %components = $purl_definition->normalize(
+    my %components = (
         scheme     => 'pkg',         # The scheme is a constant with the value "pkg".
         type       => $type,
         namespace  => $namespace,
@@ -47,9 +50,11 @@ sub new {
         subpath    => $subpath,
     );
 
-    $purl_definition->validate(%components) if $validate;
+    my $definition = URI::PackageURL::Type->new($type);
 
-    my $self = {components => \%components, definition => $purl_definition};
+    $definition->validate(%components) if $validate;
+
+    my $self = {components => \%{$definition->normalize(%components)}, definition => $definition};
 
     return bless $self, $class;
 
@@ -66,11 +71,12 @@ sub qualifiers { shift->_component('qualifiers', @_) }
 sub subpath    { shift->_component('subpath',    @_) }
 
 sub encode_purl { __PACKAGE__->new(@_)->to_string }
-sub decode_purl { __PACKAGE__->from_string(shift) }
+sub decode_purl { __PACKAGE__->from_string(@_) }
+sub is_purl     { ($_[0] =~ /$PURL_REGEXP/) ? 1 : undef }
 
 sub clone {
     my $self = shift;
-    bless {%$self}, ref $self;
+    return ref($self)->new(%{$self->to_hash}, validate => 0);
 }
 
 sub to_urls        { purl_to_urls(shift) }
@@ -79,7 +85,9 @@ sub repository_url { shift->to_urls->{repository} }
 
 sub from_string {
 
-    my ($class, $string) = @_;
+    my ($class, $string, %options) = @_;
+
+    utf8::encode($string);
 
     DEBUG and say STDERR "-- INPUT: $string";
     DEBUG and say STDERR "-- REGEXP: $PURL_REGEXP";
@@ -89,7 +97,7 @@ sub from_string {
         $string =~ s{^pkg:/}{pkg:};
     }
 
-    if ($string !~ /$PURL_REGEXP/) {
+    unless (is_purl($string)) {
         Carp::croak 'Malformed PURL string';
     }
 
@@ -109,9 +117,9 @@ sub from_string {
 
     my @s1 = split(/#([^#]+)$/, $string);
 
-    if ($s1[1]) {
+    if (defined $s1[1]) {
         $s1[1] =~ s/(^\/|\/$)//;
-        my @subpath = map { _url_decode($_) } grep { $_ ne '' && $_ ne '.' && $_ ne '..' } split /\//, $s1[1];
+        my @subpath = map { _percent_decode($_) } grep { $_ ne '' && $_ ne '.' && $_ ne '..' } split /\//, $s1[1];
         $components{subpath} = join '/', @subpath;
     }
 
@@ -130,21 +138,28 @@ sub from_string {
 
     my @s2 = split(/\?([^\?]+)$/, $s1[0]);
 
-    if ($s2[1]) {
+    if (defined $s2[1]) {
 
         my @qualifiers = split('&', $s2[1]);
 
         foreach my $qualifier (@qualifiers) {
 
             my ($key, $value) = ($qualifier =~ /^([^=]+)(?:=(.*))?$/);
-            $value = _url_decode($value);
+
+            # Discard any key/value pairs where the value is empty
+            next unless defined $value && length $value;
+            $value = _percent_decode($value);
 
             if ($key eq 'checksums' || $key eq 'checksum') {
                 Carp::carp "Detected 'checksums' qualifier. Use 'checksum' qualifier instead." if ($key eq 'checksums');
                 $value = [split(',', $value)];
             }
 
-            $components{qualifiers}->{lc $key} = $value;
+            if ($key eq 'vers') {
+                $value = URI::VersionRange->from_string($value);
+            }
+
+            $components{qualifiers}->{$key} = $value;
 
         }
 
@@ -176,7 +191,7 @@ sub from_string {
     my @s4 = split('/', $s3[1], 2);
     $components{type} = lc $s4[0];
 
-    Carp::croak 'Invalid PURL: Invalid "type"' if $components{type} !~ /^[a-z][a-z0-9.-]+$/;
+    Carp::croak 'Invalid PURL: Invalid "type"' if $components{type} !~ /\A$PURL_TYPE_REGEXP\z/;
     Carp::croak 'Invalid PURL' unless $s4[1];
 
 
@@ -195,7 +210,7 @@ sub from_string {
         @s5 = ($s4[1]);
     }
 
-    $components{version} = _url_decode($s5[1]) if ($s5[1]);
+    $components{version} = _percent_decode($s5[1]) if (defined $s5[1]);
 
 
     # Strip all trailing '/' characters (e.g., '/', '//', '///' and so on) from the 'remainder'
@@ -212,9 +227,9 @@ sub from_string {
     $s5[0] =~ s|/$||;    # Strip trailing '/' character
 
     my @s6 = split('/', $s5[0], -1);
-    $components{name} = _url_decode(pop @s6);
+    $components{name} = _percent_decode(pop @s6);
 
-    Carp::croak 'Invalid PURL: Missing "name"' unless $components{name};
+    Carp::croak 'Invalid PURL: Missing "name"' unless defined $components{name} && length $components{name};
 
 
     # Split the 'remainder' on '/'
@@ -226,7 +241,7 @@ sub from_string {
     #     This is the 'namespace'
 
     if (@s6) {
-        $components{namespace} = join '/', map { _url_decode($_) } @s6;
+        $components{namespace} = join '/', map { _percent_decode($_) } @s6;
     }
 
 
@@ -239,7 +254,7 @@ sub from_string {
         say STDERR "-- S6: @s6";
     }
 
-    return $class->new(%components);
+    return $class->new(%components, validate => ($options{validate} // 1));
 
 }
 
@@ -250,53 +265,45 @@ sub to_string {
     my @purl = ('pkg', ':', $self->type, '/');
 
     # Namespace
-    if ($self->namespace) {
-
-        my @ns = map { _url_encode($_) } split(/\//, $self->namespace);
+    if (defined $self->namespace && length $self->namespace) {
+        my @ns = map { _percent_encode($_) } split(/\//, $self->namespace);
         push @purl, (join('/', @ns), '/');
-
     }
 
     # Name
-    push @purl, _encode($self->name);
+    push @purl, _percent_encode($self->name, '^A-Za-z0-9\-._~:\/');    # Default percent encoding + excluding slash
 
     # Version
-    push @purl, ('@', _encode($self->version)) if ($self->version);
+    push @purl, ('@', _percent_encode($self->version)) if (defined $self->version && length $self->version);
 
     # Qualifiers
-    if (my $qualifiers = $self->qualifiers) {
+    if ($self->qualifiers) {
+
+        my %qualifiers = %{$self->qualifiers};
 
         # TODO: Legacy 'checksums' qualifier will be dropped in the future
         foreach (qw[checksum checksums]) {
-            if (defined $qualifiers->{$_} && ref $qualifiers->{$_} eq 'ARRAY') {
-                $qualifiers->{$_} = join ',', @{$qualifiers->{$_}};
+            if (defined $qualifiers{$_} && ref $qualifiers{$_} eq 'ARRAY') {
+                $qualifiers{$_} = join ',', @{$qualifiers{$_}};
             }
         }
 
-        # TODO: Use URI::VersionRange during qualifiers decode ?
-        if (defined $qualifiers->{vers} && ref $qualifiers->{vers} eq 'URI::VersionRange') {
-            $qualifiers->{vers} = $qualifiers->{vers}->to_string;
-            say STDERR $qualifiers->{vers};
+        if (defined $qualifiers{vers} && ref $qualifiers{vers} eq 'URI::VersionRange') {
+            $qualifiers{vers} = $qualifiers{vers}->to_string;
         }
 
-        my @qualifiers = map { sprintf('%s=%s', lc $_, _encode($qualifiers->{$_})) }
-            grep { $qualifiers->{$_} } sort keys %{$qualifiers};
+        my @qualifiers = map { sprintf('%s=%s', lc $_, _percent_encode($qualifiers{$_})) }
+            grep { defined $qualifiers{$_} && length $qualifiers{$_} } sort keys %qualifiers;
 
         push @purl, ('?', join('&', @qualifiers)) if (@qualifiers);
 
     }
 
     # Subpath
-    if ($self->subpath) {
-
-        my $subpath = $self->subpath;
-
-        $subpath =~ s{\.\./}{};
-        $subpath =~ s{\./}{};
-
-        my @subpath = map { _encode($_) } split '/', $subpath;
+    if (defined $self->subpath && length $self->subpath) {
+        my @subpath = map { _percent_encode($_) } grep { length $_ && $_ ne '.' && $_ ne '..' } split '/',
+            $self->subpath;
         push @purl, ('#', join('/', @subpath));
-
     }
 
     return join '', @purl;
@@ -304,12 +311,8 @@ sub to_string {
 }
 
 sub to_hash {
-
-    my $self = shift;
-
-    my %hash = map { $_ => $self->{components}->{$_} } qw[scheme type name version namespace qualifiers subpath];
+    my %hash = map { $_ => $_[0]->{components}->{$_} } qw[scheme type name version namespace qualifiers subpath];
     return \%hash;
-
 }
 
 sub TO_JSON { shift->to_hash }
@@ -326,36 +329,27 @@ sub _component {
 
 }
 
-sub _url_encode {
+sub _percent_encode {
 
     my ($string, $pattern) = @_;
 
-    # RFC-3986
-    $pattern //= '^A-Za-z0-9\-._~/' unless $pattern;
+    $pattern //= '^A-Za-z0-9\-._~:' unless $pattern;
+
+    utf8::encode($string);
+
     $string =~ s/([$pattern])/sprintf '%%%02X', ord $1/ge;
     return $string;
 
 }
 
-sub _encode {
+sub _percent_decode {
 
     my $string = shift;
-
-    $string = _url_encode($string);
-
-    $string =~ s{%3A}{:}g;
-    $string =~ s{/}{%2F}g;
-
-    return $string;
-
-}
-
-sub _url_decode {
-
-    my $string = shift;
-    return unless $string;
+    return unless defined $string;
 
     $string =~ s/%([0-9a-fA-F]{2})/chr hex $1/ge;
+
+    Carp::croak 'Invalid PURL: invalid UTF-8 encoding' unless utf8::decode($string);
     return $string;
 
 }
@@ -375,58 +369,59 @@ URI::PackageURL - Perl extension for PURL (Package URL)
   use URI::PackageURL;
 
   # OO-interface
-  
+
   # Encode components in PURL string
   $purl = URI::PackageURL->new(
     type      => 'cpan',
-    namespace => 'GDT',
     name      => 'URI-PackageURL',
-    version   => '2.25'
+    version   => '2.26'
   );
-  
-  say $purl; # pkg:cpan/GDT/URI-PackageURL@2.25
+
+  say $purl; # pkg:cpan/URI-PackageURL@2.26
 
   # Parse a PURL string
-  $purl = URI::PackageURL->from_string('pkg:cpan/GDT/URI-PackageURL@2.25');
-  
-  
-  # use setter methods
-  
-  my $purl = URI::PackageURL->new(type => 'cpan', namespace => 'GDT', name => 'URI-PackageURL');
+  $purl = URI::PackageURL->from_string('pkg:cpan/URI-PackageURL@2.26');
 
-  say $purl; # pkg:cpan/GDT/URI-PackageURL
+
+  # use setter methods
+
+  $purl = URI::PackageURL->new(type => 'cpan', name => 'URI-PackageURL');
+
+  say $purl; # pkg:cpan/URI-PackageURL
   say $purl->version; # undef
 
-  $purl->version('2.25');
-  say $purl; # pkg:cpan/GDT/URI-PackageURL@2.25
-  say $purl->version; # 2.25
-  
-  
+  $purl->version('2.26');
+  say $purl; # pkg:cpan/URI-PackageURL@2.26
+  say $purl->version; # 2.26
+
+
   # exported functions
 
-  $purl = decode_purl('pkg:cpan/GDT/URI-PackageURL@2.25');
+  $purl = decode_purl('pkg:cpan/URI-PackageURL@2.26');
   say $purl->type;  # cpan
 
-  $purl_string = encode_purl(type => cpan, namespace => 'GDT', name => 'URI-PackageURL', version => '2.25');
-  say $purl_string; # pkg:cpan/GDT/URI-PackageURL@2.25
-  
-  
+  $purl_string = encode_purl(type => 'cpan', name => 'URI-PackageURL', version => '2.26');
+  say $purl_string; # pkg:cpan/URI-PackageURL@2.26
+
+  if (! is_purl('https://packageurl.org/')) {
+    die "Invalid PURL string";
+  }
+
+
   # uses the legacy CPAN PURL type, to be used only for compatibility (will be removed in the future)
-  
+
   $ENV{PURL_LEGACY_CPAN_TYPE} = 1;
   URI::PackageURL->new(type => 'cpan', name => 'URI::PackageURL');
-
 
   # alias
 
   $purl = PURL->new(
     type      => 'cpan',
-    namespace => 'GDT',
     name      => 'URI-PackageURL',
-    version   => '2.25'
+    version   => '2.26'
   );
 
-  $purl = PURL->from_string('pkg:cpan/GDT/URI-PackageURL');
+  $purl = PURL->from_string('pkg:cpan/URI-PackageURL');
 
 
   # clone
@@ -435,9 +430,9 @@ URI::PackageURL - Perl extension for PURL (Package URL)
 
   $cloned->version('1.00');
 
-  say $cloned; # pkg:cpan/GDT/URI-PackageURL@1.00
-  say $purl;   # pkg:cpan/GDT/URI-PackageURL@2.25
-  
+  say $cloned; # pkg:cpan/URI-PackageURL@1.00
+  say $purl;   # pkg:cpan/URI-PackageURL@2.26
+
 
 =head1 DESCRIPTION
 
@@ -448,6 +443,8 @@ package in a mostly universal and uniform way across programing languages,
 package managers, packaging conventions, tools, APIs and databases.
 
 L<https://github.com/package-url/purl-spec>
+
+L<https://packageurl.org/>
 
 L<TC54 - Software and system transparency|https://tc54.org/>
 
@@ -487,21 +484,41 @@ Optional.
 
 =head2 CPAN PURL TYPE
 
-C<cpan> is an official PURL type (L<https://github.com/package-url/purl-spec/blob/main/types-doc/cpan-definition.md>)
+C<cpan> is an official PURL type (L<https://github.com/package-url/purl-spec/blob/main/docs/types/definitions/cpan-definition.md>).
 
-=over 2
+    pkg:cpan/<namespace>/<name>@<version>?<qualifiers>#<subpath>
 
-=item * The default repository is C<https://www.cpan.org/>.
+=head3 Namespace
 
-=item * The C<namespace> is the CPAN id of the author/publisher. It MUST be written uppercase and is required.
+The C<namespace> is the CPAN author/publisher ID (CPANID) and is optional.
 
-=item * The C<name> is the distribution name and is case sensitive. A distribution name MUST NOT contain the string C<::>.
+When present, it represents the CPAN author/publisher ID (CPANID) and MUST be
+uppercase. It is appropriate to use C<namespace> for compatibility with
+existing CPAN purl producers/consumers or when a workflow explicitly requires
+author-scoped identifiers. For new identifiers, the C<author> qualifier is the
+preferred way to specify the author/publisher. When C<version> is omitted,
+author scoping via C<namespace> MAY be ambiguous because a distribution can
+change maintainers over time.
 
-=item * The C<version> is the distribution version.
+=head3 Name
 
-=item * Optional qualifiers may include:
+The C<name> is the distribution name and is case sensitive. A distribution name
+MUST NOT contain the string C<::>.
+
+=head3 Version
+
+The C<version> is the distribution version.
+
+=head3 Qualifiers
+
+Optional qualifiers may include:
 
 =over
+
+=item * C<author>: CPAN author/publisher ID (CPANID)
+
+=item * C<distpath>: Repository-relative path (not a URL) to the distribution
+archive or directory, typically under 'authors/id/...'
 
 =item * C<repository_url>: CPAN/MetaCPAN/BackPAN/DarkPAN repository base URL (default is https://www.cpan.org)
 
@@ -513,9 +530,19 @@ C<cpan> is an official PURL type (L<https://github.com/package-url/purl-spec/blo
 
 =back
 
-=back
+=head3 Repository
+
+The default repository URL is C<https://www.cpan.org/>.
 
 =head3 Examples
+
+    pkg:cpan/perl@5.42
+    pkg:cpan/DBI@1.646
+    pkg:cpan/SBOM-CycloneDX
+    pkg:cpan/URI-PackageURL?author=GDT
+    pkg:cpan/libwww-perl@6.76?author=OALDERS
+    pkg:cpan/DateTime@1.55?author=DROLSKY&repository_url=backpan.perl.org
+    pkg:cpan/Term-Gnuplot@0.90380906?distpath=authors%2Fid%2FI%2FIL%2FILYAZ%2Fmodules%2FTerm-Gnuplot-0.90380906.zip
 
     pkg:cpan/DROLSKY/DateTime@1.55
     pkg:cpan/GDT/URI-PackageURL
@@ -543,13 +570,22 @@ This function call is functionally identical to:
 
 =head3 B<decode_purl>
 
-    $purl_components = decode_purl($purl_string)
+    $purl = decode_purl($purl_string)
 
-Converts the given PURL string to PURL components. Croaks on error.
+Converts the given PURL string to a URI::PackageURL object. Croaks on error.
 
 This function call is functionally identical to:
 
     $purl = URI::PackageURL->from_string($purl_string);
+
+=head3 B<is_purl>
+
+    if (! is_purl('https://packageurl.org/')) {
+        die "Invalid PURL string";
+    }
+
+Check if the given string is a valid PURL string.
+
 
 =head2 OBJECT-ORIENTED INTERFACE
 
@@ -650,8 +686,8 @@ Clone PURL object.
 
     $cloned->version('1.00');
 
-    say $cloned; # pkg:cpan/GDT/URI-PackageURL@1.00
-    say $purl;   # pkg:cpan/GDT/URI-PackageURL@2.25
+    say $cloned; # pkg:cpan/URI-PackageURL@1.00
+    say $purl;   # pkg:cpan/URI-PackageURL@2.26
 
 =head3 B<TO_JSON>
 
@@ -663,12 +699,12 @@ Helper method for JSON modules (L<JSON>, L<JSON::PP>, L<JSON::XS>, L<Cpanel::JSO
 
     # {
     #    "name" : "URI-PackageURL",
-    #    "namespace" : "GDT",
+    #    "namespace" : null,
     #    "qualifiers" : {},
     #    "scheme" : "pkg",
     #    "subpath" : null,
     #    "type" : "cpan",
-    #    "version" : "2.25"
+    #    "version" : "2.26"
     # }
 
 =head3 B<from_string>

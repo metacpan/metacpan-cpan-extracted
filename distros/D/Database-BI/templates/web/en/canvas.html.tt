@@ -1,0 +1,1002 @@
+[%- WRAPPER 'web/en/layouts/default.html.tt'
+    page_title = title
+    back_url   = back_url
+    back_label = back_label
+-%]
+<style>
+.canvas-grid {
+	display: grid;
+	grid-template-columns: repeat(12, 1fr);
+	/* Rows have a minimum height so a card's grid-row span (h) is a real
+	 * height and not just a number in the layout: a two-row visual is twice
+	 * as tall as a one-row visual, before any JavaScript runs. */
+	grid-auto-rows: minmax(15rem, auto);
+	gap: 1rem;
+	padding: 1rem 0;
+}
+.visual-card {
+	background: var(--card-bg, #fff);
+	border: 1px solid var(--border, #dee2e6);
+	border-radius: 6px;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	position: relative;
+}
+.visual-card:not([style]) {
+	grid-column: span 6;
+}
+.visual-card-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0.4rem 0.75rem;
+	background: var(--header-bg, #f8f9fa);
+	border-bottom: 1px solid var(--border, #dee2e6);
+	cursor: grab;
+}
+.visual-card-header:active { cursor: grabbing; }
+.visual-card-title {
+	font-weight: 600;
+	font-size: 0.9rem;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+.visual-card-body {
+	flex: 1;
+	overflow: auto;
+	padding: 0.5rem;
+}
+.visual-card-body svg {
+	max-width: 100%;
+	height: auto;
+}
+.visual-error {
+	color: #dc3545;
+	padding: 0.5rem;
+	font-size: 0.85rem;
+}
+.visual-table-wrap {
+	overflow: auto;
+}
+.data-table {
+	border-collapse: collapse;
+	font-size: 0.8rem;
+	width: 100%;
+}
+.data-table th, .data-table td {
+	border: 1px solid var(--border, #dee2e6);
+	padding: 0.25rem 0.4rem;
+	white-space: nowrap;
+}
+.data-table th {
+	background: var(--header-bg, #f8f9fa);
+	font-weight: 600;
+}
+.canvas-toolbar {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	margin-bottom: 0.75rem;
+	flex-wrap: wrap;
+}
+/* Cross-filter chip */
+.cf-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	background: #fff3cd;
+	border: 1px solid #ffc107;
+	border-radius: 4px;
+	padding: 0.2rem 0.6rem;
+	font-size: 0.82rem;
+	color: #664d03;
+}
+.cf-chip a {
+	color: #664d03;
+	text-decoration: none;
+	font-weight: 700;
+}
+.cf-chip a:hover { text-decoration: underline; }
+/* Source visual: highlighted border, not filtered */
+.visual-card.cf-source {
+	border-color: #0d6efd;
+	box-shadow: 0 0 0 2px rgba(13,110,253,0.25);
+}
+.visual-card.cf-source .visual-card-header::after {
+	content: 'filter source';
+	font-size: 0.7rem;
+	color: #0d6efd;
+	margin-left: auto;
+	padding-left: 0.5rem;
+	white-space: nowrap;
+}
+/* SVG marks become pointer-cursor when cross-filter is possible */
+.visual-card[data-cf-col] svg rect,
+.visual-card[data-cf-col] svg path,
+.visual-card[data-cf-col] svg circle {
+	cursor: pointer;
+}
+/* Parameter bar */
+.param-bar {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	flex-wrap: wrap;
+	margin-bottom: 0.75rem;
+	padding: 0.5rem 0.75rem;
+	background: var(--card-bg, #fff);
+	border: 1px solid var(--border, #dee2e6);
+	border-radius: 6px;
+}
+.param-bar label {
+	display: flex;
+	align-items: center;
+	gap: 0.35rem;
+	font-size: 0.85rem;
+	font-weight: 600;
+	white-space: nowrap;
+}
+.param-bar input {
+	font-size: 0.85rem;
+	padding: 0.2rem 0.4rem;
+	border: 1px solid var(--border, #dee2e6);
+	border-radius: 4px;
+	width: 8rem;
+}
+.param-bar input[type="number"] { width: 6rem; }
+/* Drill-down breadcrumb */
+.drill-crumb {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.25rem;
+	font-size: 0.85rem;
+	color: var(--muted, #6c757d);
+	flex-wrap: wrap;
+}
+.drill-crumb a { color: var(--link, #0d6efd); text-decoration: none; }
+.drill-crumb a:hover { text-decoration: underline; }
+.drill-crumb .drill-cur { font-weight: 600; color: var(--body-color, #212529); }
+/* Drill-through and cross-filter "View rows" links */
+.drill-through-link, .cf-drillthrough {
+	font-size: 0.82rem;
+	color: var(--link, #0d6efd);
+	text-decoration: none;
+	white-space: nowrap;
+}
+.drill-through-link:hover, .cf-drillthrough:hover { text-decoration: underline; }
+/* Bookmark button/panel (3.6) */
+.bm-wrap { position: relative; }
+.bm-panel {
+	position: absolute;
+	top: calc(100% + 4px);
+	right: 0;
+	z-index: 300;
+	background: var(--card-bg, #fff);
+	border: 1px solid var(--border, #dee2e6);
+	border-radius: 6px;
+	padding: 0.5rem;
+	min-width: 220px;
+	max-width: 320px;
+	box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+.bm-save-row {
+	display: flex;
+	gap: 0.35rem;
+	margin-bottom: 0.4rem;
+}
+.bm-save-row input {
+	flex: 1;
+	font-size: 0.82rem;
+	padding: 0.2rem 0.4rem;
+	border: 1px solid var(--border, #dee2e6);
+	border-radius: 4px;
+}
+.bm-save-btn, .bm-del-btn {
+	font-size: 0.78rem;
+	padding: 0.2rem 0.5rem;
+	border: 1px solid var(--border, #dee2e6);
+	border-radius: 4px;
+	background: var(--header-bg, #f8f9fa);
+	cursor: pointer;
+	white-space: nowrap;
+}
+.bm-item {
+	display: flex;
+	align-items: center;
+	gap: 0.35rem;
+	padding: 0.2rem 0;
+	border-top: 1px solid var(--border, #dee2e6);
+	font-size: 0.82rem;
+}
+.bm-item a {
+	flex: 1;
+	color: var(--link, #0d6efd);
+	text-decoration: none;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.bm-item a:hover { text-decoration: underline; }
+.bm-empty { font-size: 0.82rem; color: var(--muted, #6c757d); padding: 0.25rem 0; margin: 0; }
+/* Undo / redo buttons (3.6) */
+.btn-undo, .btn-redo {
+	font-size: 0.8rem;
+	padding: 0.2rem 0.5rem;
+	border: 1px solid var(--border, #dee2e6);
+	border-radius: 4px;
+	background: var(--header-bg, #f8f9fa);
+	cursor: pointer;
+	white-space: nowrap;
+}
+.btn-undo:disabled, .btn-redo:disabled { opacity: 0.35; cursor: not-allowed; }
+/* "Add visual" button in canvas toolbar (P3) */
+.btn-add-visual {
+	font-size: 0.82rem;
+	padding: 0.2rem 0.55rem;
+	border: 1px solid var(--border, #dee2e6);
+	border-radius: 4px;
+	background: var(--header-bg, #f8f9fa);
+	color: var(--body-color, #212529);
+	text-decoration: none;
+	white-space: nowrap;
+	cursor: pointer;
+}
+.btn-add-visual:hover { background: #e2e6ea; text-decoration: none; }
+/* Drag handle affordance on visual card headers (P7) */
+.drag-handle {
+	color: var(--muted, #6c757d);
+	font-size: 0.75rem;
+	letter-spacing: -1px;
+	padding-right: 0.35rem;
+	cursor: grab;
+	user-select: none;
+	flex-shrink: 0;
+}
+.drag-handle:active { cursor: grabbing; }
+/* Resize handle: drags the card's grid span (P8) */
+.visual-resize-handle {
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	width: 26px;
+	height: 26px;
+	cursor: nwse-resize;
+	/* Pointer events only: without this a touch drag scrolls the page. */
+	touch-action: none;
+}
+/* The grip is painted by a pseudo-element so the hit area stays the whole
+ * 26x26 corner while the visible mark is a triangle of diagonal ridges -- the
+ * conventional "drag me to resize" grip.  A bare corner is easy to miss
+ * entirely, which is what a first attempt at this looked like. */
+.visual-resize-handle::after {
+	content: '';
+	position: absolute;
+	right: 3px;
+	bottom: 3px;
+	width: 16px;
+	height: 16px;
+	border-bottom-right-radius: 3px;
+	background-image: repeating-linear-gradient(135deg,
+		transparent 0 4px, var(--muted, #6c757d) 4px 5px);
+	clip-path: polygon(100% 0, 100% 100%, 0 100%);
+	opacity: 0.5;
+}
+/* Bright enough to find as soon as the pointer is over the card, quiet enough
+ * not to compete with the data the rest of the time. */
+.visual-card:hover .visual-resize-handle::after,
+.visual-resize-handle:hover::after { opacity: 1; }
+.visual-resize-handle:hover::after { background-color: #e2e6ea; }
+.visual-card.resizing { outline: 2px solid var(--link, #0d6efd); }
+.visual-card.resizing .visual-card-body {
+	/* Keep the drag from selecting chart text or hitting chart marks. */
+	pointer-events: none;
+	user-select: none;
+}
+/* Per-visual PNG download button (3.7) */
+.visual-dl-btn {
+	font-size: 0.7rem;
+	padding: 0.1rem 0.35rem;
+	border: 1px solid var(--border, #dee2e6);
+	border-radius: 3px;
+	background: var(--header-bg, #f8f9fa);
+	cursor: pointer;
+	white-space: nowrap;
+	flex-shrink: 0;
+	margin-left: 0.3rem;
+}
+.visual-dl-btn:hover { background: #e2e6ea; }
+/* Print styles (3.7) */
+@media print {
+	@page { size: landscape; margin: 1.5cm; }
+	.canvas-toolbar button,
+	.canvas-toolbar .bm-wrap,
+	.param-bar,
+	#bm-panel { display: none !important; }
+	.canvas-toolbar {
+		flex-wrap: nowrap;
+		margin-bottom: 0.5rem;
+		gap: 0.75rem;
+	}
+	.canvas-toolbar h2 { font-size: 1.1rem; }
+	.cf-chip, .drill-crumb { font-size: 0.75rem; }
+	.canvas-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 0.5rem;
+		padding: 0.25rem 0;
+	}
+	.visual-card {
+		break-inside: avoid;
+		box-shadow: none;
+		border: 1px solid #aaa;
+		border-radius: 3px;
+	}
+	.visual-card-header { cursor: default; }
+	.visual-dl-btn { display: none; }
+	.visual-resize-handle { display: none; }
+	.visual-card-body {
+		overflow: visible;
+		padding: 0.25rem;
+	}
+	.visual-card-body svg { max-width: 100% !important; height: auto !important; }
+}
+</style>
+
+<div class="canvas-toolbar">
+	<h2 style="margin:0;flex:1">[% title | html %]</h2>
+	[% IF drill_name.length %]
+	<nav class="drill-crumb" aria-label="Drill path">
+		[% FOREACH crumb IN drill_crumb %]
+		[% UNLESS loop.first %] &rsaquo; [% END %]
+		[% IF crumb.url.length %]
+			<a href="[% crumb.url | html %]">[% crumb.label | html %]</a>
+		[% ELSE %]
+			<span class="drill-cur">[% crumb.label | html %]</span>
+		[% END %]
+		[% END %]
+		[% IF drillthrough_url.length %]
+		&nbsp;&middot;&nbsp;<a href="[% drillthrough_url | html %]" class="drill-through-link" title="View matching rows in source table">View rows &rarr;</a>
+		[% END %]
+	</nav>
+	[% ELSIF cf_display.length %]
+	<div class="cf-chip" id="cf-chip">
+		<span>Cross-filter: <strong>[% cf_display | html %]</strong></span>
+		[% IF drillthrough_url.length %]
+		<a href="[% drillthrough_url | html %]" class="cf-drillthrough" title="View matching rows in source table">View rows &rarr;</a>
+		[% END %]
+		<a href="[% cf_clear_url | html %]" title="Clear cross-filter">&times; Clear</a>
+	</div>
+	[% END %]
+	<button id="btn-undo" class="btn-undo" type="button" title="Undo last action" disabled>&larr; Undo</button>
+	<button id="btn-redo" class="btn-redo" type="button" title="Redo" disabled>Redo &rarr;</button>
+	<div class="bm-wrap">
+		<button id="btn-bm" type="button" title="Save or restore a view bookmark">&#9733; Bookmarks</button>
+		<div id="bm-panel" class="bm-panel" hidden>
+			<div class="bm-save-row">
+				<input id="bm-name-inp" type="text" placeholder="Bookmark name" maxlength="80" autocomplete="off">
+				<button id="bm-save-btn" class="bm-save-btn" type="button">Save</button>
+			</div>
+			[% IF canvas_bookmarks.size %]
+			[% FOREACH bm IN canvas_bookmarks %]
+			<div class="bm-item" data-created="[% bm.created %]">
+				<a href="/a/[% canvas_id | html %][% bm.state | html %]" title="[% bm.name | html %]">[% bm.name | html %]</a>
+				<button class="bm-del-btn" data-created="[% bm.created %]" title="Remove this bookmark">&#x1F5D1;</button>
+			</div>
+			[% END %]
+			[% ELSE %]
+			<p class="bm-empty" id="bm-empty">No bookmarks saved yet.</p>
+			[% END %]
+		</div>
+	</div>
+	[% IF canvas_data_url.length %]
+	<a href="[% canvas_data_url | html %]" class="btn-add-visual" id="btn-add-visual"
+	   title="Go to the data source to add another chart to this canvas">&#x2295; Add visual&hellip;</a>
+	[% END %]
+	<span style="color:var(--muted,#6c757d);font-size:0.85rem">
+		[% visuals.size %] visual[% visuals.size != 1 ? 's' : '' %]
+	</span>
+	<button id="btn-copy-link" type="button" title="Copy a shareable link to this canvas view" style="margin-left:auto">&#x1F517; Copy link</button>
+	<button id="btn-print" type="button" title="Print or save as PDF (Ctrl+P)">&#x1F5A8; Print</button>
+</div>
+
+[% IF canvas_params.size %]
+<div class="param-bar" id="param-bar">
+	[% FOREACH p IN canvas_params %]
+	<label for="param-[% p.name | html %]">[% p.name | html %]:
+		<input
+			class="param-input"
+			id="param-[% p.name | html %]"
+			type="[% p.type == 'number' ? 'number' : 'text' %]"
+			value="[% p.value | html %]"
+			[% IF p.min.length %]min="[% p.min | html %]"[% END %]
+			[% IF p.max.length %]max="[% p.max | html %]"[% END %]
+			data-param="p.[% p.name | html %]"
+			autocomplete="off">
+	</label>
+	[% END %]
+</div>
+[% END %]
+
+<div class="canvas-grid" id="canvas-grid" data-canvas-id="[% canvas_id | html %]"
+[% IF drill_name.length %]     data-drill-name="[% drill_name | html %]" data-drill-level="[% drill_level %]" data-drill-max="[% drill_max %]" data-drill-col="[% drill_col | html %]"[% END %]>
+[% FOREACH v IN visuals %]
+	<div class="visual-card[% v.cf_source ? ' cf-source' : '' %]"
+	     id="visual-[% v.id %]"
+	     data-visual="[% v.id %]"
+	     [% IF v.cf_col %]data-cf-col="[% v.cf_col | html %]"[% END %]
+	     [% IF v.style %]style="[% v.style | html %]"[% END %]
+	     draggable="true">
+		<div class="visual-card-header">
+			<span class="drag-handle" aria-hidden="true">::</span>
+			<span class="sr-only">Drag to reorder</span>
+			<span class="visual-card-title">[% v.title | html %]</span>
+			<span style="font-size:0.75rem;opacity:0.5;margin-left:0.5rem">[% v.kind | html %]</span>
+			<button class="visual-dl-btn" data-title="[% v.title | html %]" title="Download as PNG" hidden>&#x2B07; Save image</button>
+		</div>
+		<div class="visual-card-body">
+		[% IF v.error %]
+			<div class="visual-error">[% v.error | html %]</div>
+		[% ELSE %]
+			[% v.html %]
+		[% END %]
+		</div>
+		[% IF canvas_id.length %]
+		<span class="visual-resize-handle" data-resize-handle="1"
+		      aria-hidden="true" title="Drag to resize this visual"></span>
+		[% END %]
+	</div>
+[% END %]
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script>
+(function () {
+	'use strict';
+
+	/* ---- drag-to-reorder ---- */
+	var grid       = document.getElementById('canvas-grid');
+	var anaId      = grid ? grid.getAttribute('data-canvas-id') : '';
+	var drillName  = grid ? (grid.getAttribute('data-drill-name')  || '') : '';
+	var drillLevel = grid ? parseInt(grid.getAttribute('data-drill-level') || '0', 10) : 0;
+	var drillMax   = grid ? parseInt(grid.getAttribute('data-drill-max')   || '0', 10) : 0;
+	var drillCol   = grid ? (grid.getAttribute('data-drill-col')   || '') : '';
+	var dragSrc    = null;
+
+	function onDragStart(e) {
+		dragSrc = this.closest('.visual-card');
+		e.dataTransfer.effectAllowed = 'move';
+		e.dataTransfer.setData('text/plain', dragSrc.getAttribute('data-visual'));
+	}
+
+	function onDragOver(e) {
+		e.preventDefault();
+		e.dataTransfer.dropEffect = 'move';
+	}
+
+	function onDrop(e) {
+		e.preventDefault();
+		if (!dragSrc) return;
+		var target = e.target.closest('.visual-card');
+		if (!target || target === dragSrc) return;
+		var parent = grid;
+		var cards  = Array.from(parent.children);
+		var srcIdx = cards.indexOf(dragSrc);
+		var tgtIdx = cards.indexOf(target);
+		if (srcIdx < 0 || tgtIdx < 0) return;
+		if (srcIdx < tgtIdx) {
+			parent.insertBefore(dragSrc, target.nextSibling);
+		} else {
+			parent.insertBefore(dragSrc, target);
+		}
+		saveLayout();
+	}
+
+	function saveLayout() {
+		if (!anaId) return;
+		/* Pack the cards in DOM order: x and y come from the flow, w and h from
+		 * whatever the user last resized each card to.  Packing rather than
+		 * reusing stored coordinates is what makes drag-to-reorder and
+		 * drag-to-resize compose: a card that moves keeps its width and cannot
+		 * end up stacked on top of a neighbour, which a stale grid-row would
+		 * otherwise do as soon as one card spans more than one row. */
+		var col = 1, row = 1;
+		var layout = [];
+		Array.from(grid.children).forEach(function (c) {
+			var vid = parseInt(c.getAttribute('data-visual'), 10);
+			if (isNaN(vid)) return;
+			var sp = spanOf(c);
+			var w  = clampSpan(sp.w, 1, GRID_COLS);
+			var h  = clampSpan(sp.h, 1, MAX_ROW_SPAN);
+			if (col + w - 1 > GRID_COLS) { col = 1; row++; }
+			applySpan(c, col, w, row, h);
+			layout.push({ visual: vid, x: col, y: row, w: w, h: h });
+			if (h > 1) {
+				/* A tall card owns the whole band of rows under it. */
+				row += h;
+				col  = 1;
+			} else {
+				col += w;
+				if (col > GRID_COLS) { col = 1; row++; }
+			}
+		});
+		var body = JSON.stringify({ layout: layout });
+		fetch('/api/analyses/' + encodeURIComponent(anaId), {
+			method  : 'PATCH',
+			headers : { 'Content-Type': 'application/json' },
+			body    : body,
+		}).catch(function () {});
+	}
+
+	if (grid) {
+		var headers = grid.querySelectorAll('.visual-card-header');
+		headers.forEach(function (h) {
+			h.addEventListener('dragstart', onDragStart);
+		});
+		grid.addEventListener('dragover', onDragOver);
+		grid.addEventListener('drop',     onDrop);
+	}
+
+	/* ---- grid span helpers (3.2 canvas layout) ---- */
+	var GRID_COLS    = 12;
+	var MAX_ROW_SPAN = 6;
+
+	function clampSpan(n, lo, hi) {
+		return Math.max(lo, Math.min(hi, isNaN(n) ? lo : n));
+	}
+
+	function gridGap() {
+		var cs = window.getComputedStyle(grid);
+		return {
+			col: parseFloat(cs.columnGap || cs.gap) || 0,
+			row: parseFloat(cs.rowGap    || cs.gap) || 0,
+		};
+	}
+
+	/* Pixels per grid column, gap included, measured from the rendered grid so
+	 * the drag follows the columns the user can actually see. */
+	function columnPitch() {
+		var cs     = window.getComputedStyle(grid);
+		var tracks = (cs.gridTemplateColumns || '').split(/\s+/).filter(function (t) {
+			return parseFloat(t) > 0;
+		});
+		var w = tracks.length ? parseFloat(tracks[0]) : 0;
+		return (w > 0 ? w : grid.getBoundingClientRect().width / GRID_COLS) + gridGap().col;
+	}
+
+	/* Span and start line for one axis, taken from the computed style rather
+	 * than the style attribute.  Two reasons: the browser resolves the
+	 * placement of auto-positioned cards, so a card with no saved position
+	 * still reports where it actually is; and once JavaScript has written the
+	 * two longhands, WebKit re-serialises the attribute as the grid-area
+	 * shorthand ("grid-area: 1 / 1 / span 1 / span 6"), which no
+	 * grid-column-based pattern would match.  A span may also come back in
+	 * the start longhand (grid-column: span 6 computes to start="span 6"), so
+	 * both are searched. */
+	function gridPlacement(cs, axis) {
+		var start = cs['grid' + axis + 'Start'] || '';
+		var end   = cs['grid' + axis + 'End']   || '';
+		var span  = (start + ' ' + end).match(/span\s+(\d+)/);
+		var line  = parseInt(start, 10);
+		return { span: span ? parseInt(span[1], 10) : 0, line: isNaN(line) ? 0 : line };
+	}
+
+	function spanOf(card) {
+		var cs    = window.getComputedStyle(card);
+		var col   = gridPlacement(cs, 'Column');
+		var row   = gridPlacement(cs, 'Row');
+		var gap   = gridGap();
+		var cr    = card.getBoundingClientRect();
+		var gr    = grid.getBoundingClientRect();
+		var order = Array.prototype.indexOf.call(grid.children, card) + 1;
+		return {
+			/* Line 0 means the browser had to auto-place the card (a card with
+			 * no saved position, or a width-only rule): fall back to the
+			 * geometry, which is what the user can see either way. */
+			x: col.line || Math.round((cr.left - gr.left) / columnPitch()) + 1,
+			w: col.span || Math.max(1, Math.round((cr.width + gap.col) / columnPitch())),
+			y: row.line || order,
+			h: row.span || 1,
+		};
+	}
+
+	function applySpan(card, x, w, y, h) {
+		card.style.setProperty('grid-column', x + '/span ' + w);
+		card.style.setProperty('grid-row',    y + '/span ' + h);
+	}
+
+	function rowPitch(card) {
+		var m = (window.getComputedStyle(grid).gridAutoRows || '').match(/([\d.]+)px/);
+		if (m) return parseFloat(m[1]) + gridGap().row;
+		/* No pixel minimum on the rows: fall back to the card's own height,
+		 * divided by its row span so a two-row card does not report twice the
+		 * pitch. */
+		return (card.getBoundingClientRect().height / spanOf(card).h) + gridGap().row;
+	}
+
+	/* ---- resize handles (3.2 grid span) ----
+	 *
+	 * Each card's bottom-right handle drags its grid-column span (w) and
+	 * grid-row span (h), snapped to whole columns and rows.  The spans are
+	 * written to the card's inline style as the drag happens, so the cards
+	 * reflow live, and the complete layout is PATCHed to
+	 * /api/analyses/:id on release by saveLayout().  A reload renders the
+	 * same geometry server-side, with no JavaScript involved.
+	 *
+	 * x is never dragged (the canvas has no drag-to-position), so the widest a
+	 * card can be is the columns left of it: 1 <= w <= 13 - x.
+	 *
+	 * Pointer events cover mouse, pen and touch; the handle sets
+	 * touch-action: none so a touch drag resizes instead of scrolling.  The
+	 * handle is deliberately hidden from assistive technology -- there is no
+	 * keyboard equivalent, and advertising a control that cannot be operated
+	 * is worse than omitting it.
+	 */
+	function onResizeStart(e) {
+		if (e.button) return;
+		var card = e.target.closest('.visual-card');
+		if (!card) return;
+		e.preventDefault();
+		e.stopPropagation();
+
+		var sp       = spanOf(card);
+		var startX   = e.clientX;
+		var startY   = e.clientY;
+		var colPitch = columnPitch() || 1;
+		var rPitch   = rowPitch(card)  || 1;
+
+		card.classList.add('resizing');
+		/* The header drag must not start while the handle is being used. */
+		card.setAttribute('draggable', 'false');
+		document.body.style.userSelect = 'none';
+
+		function onResizeMove(ev) {
+			var w = clampSpan(sp.w + Math.round((ev.clientX - startX) / colPitch), 1, GRID_COLS - sp.x + 1);
+			var h = clampSpan(sp.h + Math.round((ev.clientY - startY) / rPitch),   1, MAX_ROW_SPAN);
+			applySpan(card, sp.x, w, sp.y, h);
+		}
+
+		function onResizeEnd() {
+			document.removeEventListener('pointermove', onResizeMove);
+			document.removeEventListener('pointerup',   onResizeEnd);
+			card.classList.remove('resizing');
+			card.setAttribute('draggable', 'true');
+			document.body.style.userSelect = '';
+			saveLayout();
+		}
+
+		document.addEventListener('pointermove', onResizeMove);
+		document.addEventListener('pointerup',   onResizeEnd);
+	}
+
+	function initResizeHandles() {
+		if (!grid || !anaId) return;
+		grid.querySelectorAll('.visual-resize-handle').forEach(function (handle) {
+			handle.addEventListener('pointerdown', onResizeStart);
+		});
+	}
+
+	initResizeHandles();
+
+	/* ---- cross-filter (3.3 URL-stage) ----
+	 *
+	 * Semantics: self-highlighting.
+	 *   - Clicking a mark on visual N navigates to ?cf=col:eq:val&cv=N.
+	 *   - On reload the server filters every visual except the source (cv=N).
+	 *   - The source card gets a blue border (.cf-source) to show it is the
+	 *     filter origin and is intentionally shown unfiltered.
+	 *   - Multi-select not supported: each click replaces any prior cross-filter.
+	 *   - Cross-filter respects each visual's own saved filters because the
+	 *     server applies ?cf= on top of them (see canvas_render in Dashboard.pm).
+	 *
+	 * extractCfValue(d) extracts the categorical value from a D3 datum.
+	 * HTML::D3 uses these shapes depending on chart kind:
+	 *   bar/treemap : d = [label, value]   (positional array)
+	 *   pie         : d = { data:[label,value], ... }  (pie arc datum)
+	 *   stacked     : d = { cat, seg, val }
+	 *   combo/line  : d = { x, bar_val, line_val } or { label, value }
+	 *   scatter     : d = [x, y]  -- less useful for CF; skipped when val==NaN
+	 */
+	function extractCfValue(d) {
+		if (d === undefined || d === null) return null;
+		if (Array.isArray(d) && d.length >= 1) {
+			var v = d[0];
+			return (v !== null && v !== undefined) ? String(v) : null;
+		}
+		if (d.data) {
+			if (Array.isArray(d.data) && d.data.length >= 1) return String(d.data[0]);
+			if (d.data.label !== undefined)                   return String(d.data.label);
+		}
+		if (d.cat   !== undefined) return String(d.cat);
+		if (d.label !== undefined) return String(d.label);
+		if (d.x     !== undefined) return String(d.x);
+		return null;
+	}
+
+	function initCrossFilters() {
+		if (typeof d3 === 'undefined') return;
+		var cards = document.querySelectorAll('.visual-card[data-cf-col]');
+		cards.forEach(function (card) {
+			var cfCol = card.getAttribute('data-cf-col');
+			var visId = card.getAttribute('data-visual');
+			if (!cfCol || visId === null) return;
+			var svg = card.querySelector('svg');
+			if (!svg) return;
+			d3.select(svg)
+				.selectAll('rect, path.arc, path.slice, circle.dot, g.bar > rect')
+				.on('click.cf', function (event, d) {
+					event.stopPropagation();
+					var val = extractCfValue(d);
+					if (val === null || val === '') return;
+					var u = new URL(window.location.href);
+
+					if (drillName && cfCol === drillCol) {
+						/* Drill-down mode: clicking the current-level column
+						 * advances one level.  At the deepest level, open the
+						 * drill-through URL to see the raw matching rows. */
+						if (drillLevel >= drillMax) {
+							var dtLink = document.querySelector('a.drill-through-link');
+							if (dtLink) { pushUndo(window.location.search); window.location.href = dtLink.href; }
+							return;
+						}
+						u.searchParams.delete('cv');
+						u.searchParams.delete('dl');
+						u.searchParams.set('dl', drillLevel + 1);
+						u.searchParams.append('cf', drillCol + ':eq:' + encodeURIComponent(val));
+						pushUndo(window.location.search);
+						window.location.href = u.toString();
+					} else if (!drillName) {
+						/* Normal cross-filter mode: replace any existing filter. */
+						u.searchParams.delete('cf');
+						u.searchParams.delete('cv');
+						u.searchParams.append('cf', cfCol + ':eq:' + encodeURIComponent(val));
+						u.searchParams.set('cv', visId);
+						pushUndo(window.location.search);
+						window.location.href = u.toString();
+					}
+					/* drillName set but cfCol !== drillCol: ignore click. */
+				});
+		});
+	}
+
+	/* Run after a short delay so D3 chart init (which is synchronous but
+	 * may queue microtasks) has fully bound data to the SVG elements. */
+	setTimeout(function () { initCrossFilters(); initDownloadButtons(); }, 50);
+
+	/* ---- parameter bar (3.5 what-if controls) ----
+	 *
+	 * Each .param-input carries data-param="p.<name>".  On 'change', update
+	 * that URL param and reload.  Other URL state (cross-filter, drill path)
+	 * is preserved because we clone the current URL and only set/replace the
+	 * one changed parameter.
+	 */
+	document.querySelectorAll('.param-input').forEach(function (inp) {
+		inp.addEventListener('change', function () {
+			var key = this.getAttribute('data-param');
+			if (!key) return;
+			var u = new URL(window.location.href);
+			u.searchParams.set(key, this.value);
+			pushUndo(window.location.search);
+			window.location.href = u.toString();
+		});
+	});
+
+	/* ---- copy-link button (P4) ---- */
+	var btnCopyLink = document.getElementById('btn-copy-link');
+	if (btnCopyLink) {
+		btnCopyLink.addEventListener('click', function () {
+			var btn = this;
+			navigator.clipboard.writeText(window.location.href)
+				.then(function () {
+					var orig = btn.textContent;
+					btn.textContent = 'Copied!';
+					setTimeout(function () { btn.textContent = orig; }, 1500);
+				})
+				.catch(function () {});
+		});
+	}
+
+	/* ---- print button (3.7) ---- */
+	var btnPrint = document.getElementById('btn-print');
+	if (btnPrint) {
+		btnPrint.addEventListener('click', function () { window.print(); });
+	}
+
+	/* ---- per-visual PNG download (3.7) ----
+	 *
+	 * For SVG-based chart visuals: serialise the SVG with XMLSerializer, paint it
+	 * onto a hidden <canvas> element, then trigger a PNG download.  Table visuals
+	 * have no SVG so their button stays hidden.
+	 *
+	 * Run inside the same setTimeout as initCrossFilters so D3 has finished
+	 * drawing before we probe for SVG elements.
+	 */
+	function initDownloadButtons() {
+		var cards = document.querySelectorAll('.visual-card');
+		cards.forEach(function (card) {
+			var svg = card.querySelector('svg');
+			var btn = card.querySelector('.visual-dl-btn');
+			if (!svg || !btn) return;
+			btn.hidden = false;
+			btn.addEventListener('click', function (e) {
+				e.stopPropagation();
+				downloadCardPng(card, svg, btn.getAttribute('data-title') || 'visual');
+			});
+		});
+	}
+
+	function downloadCardPng(card, svg, title) {
+		/* Clone and inline computed styles so the PNG looks like the screen. */
+		var bbox = svg.getBoundingClientRect();
+		var w = Math.round(bbox.width)  || 800;
+		var h = Math.round(bbox.height) || 400;
+
+		/* Embed the SVG width/height so the image element sizes correctly. */
+		var clone = svg.cloneNode(true);
+		clone.setAttribute('width',  w);
+		clone.setAttribute('height', h);
+		clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+
+		var svgStr  = new XMLSerializer().serializeToString(clone);
+		var svgBlob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
+		var url     = URL.createObjectURL(svgBlob);
+
+		var img = new Image();
+		img.onload = function () {
+			var canv = document.createElement('canvas');
+			canv.width  = w;
+			canv.height = h;
+			var ctx = canv.getContext('2d');
+			ctx.fillStyle = '#ffffff';
+			ctx.fillRect(0, 0, w, h);
+			ctx.drawImage(img, 0, 0);
+			URL.revokeObjectURL(url);
+			var a = document.createElement('a');
+			a.download = title.replace(/[^A-Za-z0-9_\- ]/g, '_') + '.png';
+			a.href = canv.toDataURL('image/png');
+			a.click();
+		};
+		img.onerror = function () { URL.revokeObjectURL(url); };
+		img.src = url;
+	}
+
+	/* ---- undo / redo (3.6) ---- */
+	var UNDO_KEY  = 'bi:undo:' + anaId;
+	var MAX_STACK = 50;
+
+	function readBfStack() {
+		try {
+			var raw = localStorage.getItem(UNDO_KEY);
+			if (raw) {
+				var s = JSON.parse(raw);
+				if (s && Array.isArray(s.undo) && Array.isArray(s.redo)) return s;
+			}
+		} catch (e) {}
+		return { undo: [], redo: [] };
+	}
+
+	function saveBfStack(s) {
+		try { localStorage.setItem(UNDO_KEY, JSON.stringify(s)); } catch (e) {}
+	}
+
+	function pushUndo(search) {
+		if (!anaId) return;
+		var s = readBfStack();
+		s.undo.push(search);
+		if (s.undo.length > MAX_STACK) s.undo = s.undo.slice(-MAX_STACK);
+		s.redo = [];
+		saveBfStack(s);
+		var btnUndo = document.getElementById('btn-undo');
+		var btnRedo = document.getElementById('btn-redo');
+		if (btnUndo) btnUndo.disabled = false;
+		if (btnRedo) btnRedo.disabled = true;
+	}
+
+	function initUndoRedo() {
+		var btnUndo = document.getElementById('btn-undo');
+		var btnRedo = document.getElementById('btn-redo');
+		if (!btnUndo || !btnRedo || !anaId) return;
+		var s = readBfStack();
+		btnUndo.disabled = s.undo.length === 0;
+		btnRedo.disabled = s.redo.length === 0;
+		btnUndo.addEventListener('click', function () {
+			var s2 = readBfStack();
+			if (!s2.undo.length) return;
+			var prev = s2.undo.pop();
+			s2.redo.push(window.location.search);
+			if (s2.redo.length > MAX_STACK) s2.redo = s2.redo.slice(-MAX_STACK);
+			saveBfStack(s2);
+			window.location.href = '/a/' + encodeURIComponent(anaId) + (prev || '');
+		});
+		btnRedo.addEventListener('click', function () {
+			var s2 = readBfStack();
+			if (!s2.redo.length) return;
+			var nxt = s2.redo.pop();
+			s2.undo.push(window.location.search);
+			if (s2.undo.length > MAX_STACK) s2.undo = s2.undo.slice(-MAX_STACK);
+			saveBfStack(s2);
+			window.location.href = '/a/' + encodeURIComponent(anaId) + (nxt || '');
+		});
+	}
+
+	initUndoRedo();
+
+	/* ---- bookmarks (3.6) ---- */
+	var canvasBookmarks = [% canvas_bookmarks_json %];
+
+	(function () {
+		var btnBm   = document.getElementById('btn-bm');
+		var bmPanel = document.getElementById('bm-panel');
+		var bmInp   = document.getElementById('bm-name-inp');
+		var bmSave  = document.getElementById('bm-save-btn');
+		if (!btnBm || !bmPanel) return;
+
+		btnBm.addEventListener('click', function () {
+			bmPanel.hidden = !bmPanel.hidden;
+			if (!bmPanel.hidden && bmInp) bmInp.focus();
+		});
+
+		document.addEventListener('click', function (e) {
+			if (!bmPanel.hidden &&
+					!bmPanel.contains(e.target) &&
+					e.target !== btnBm) {
+				bmPanel.hidden = true;
+			}
+		});
+
+		if (bmSave) {
+			bmSave.addEventListener('click', function () {
+				if (!bmInp) return;
+				var name = bmInp.value.trim();
+				if (!name) { bmInp.focus(); return; }
+				var bm = { name: name, state: window.location.search, created: Date.now() };
+				var updated = canvasBookmarks.slice();
+				updated.push(bm);
+				patchBookmarks(updated, function () { window.location.reload(); });
+			});
+			if (bmInp) {
+				bmInp.addEventListener('keydown', function (e) {
+					if (e.key === 'Enter') bmSave.click();
+				});
+			}
+		}
+
+		bmPanel.querySelectorAll('.bm-del-btn').forEach(function (btn) {
+			btn.addEventListener('click', function (e) {
+				e.stopPropagation();
+				var created = parseInt(this.getAttribute('data-created'), 10);
+				if (!confirm('Remove this bookmark?')) return;
+				var updated = canvasBookmarks.filter(function (b) {
+					return b.created !== created;
+				});
+				var item = this.closest('.bm-item');
+				patchBookmarks(updated, function () {
+					canvasBookmarks = updated;
+					if (item) item.remove();
+					var empty = document.getElementById('bm-empty');
+					if (updated.length === 0 && !empty && bmPanel) {
+						var p = document.createElement('p');
+						p.className = 'bm-empty';
+						p.id = 'bm-empty';
+						p.textContent = 'No bookmarks saved yet.';
+						bmPanel.appendChild(p);
+					}
+				});
+			});
+		});
+
+		function patchBookmarks(bms, onSuccess) {
+			fetch('/api/analyses/' + encodeURIComponent(anaId), {
+				method  : 'PATCH',
+				headers : { 'Content-Type': 'application/json' },
+				body    : JSON.stringify({ bookmarks: bms }),
+			}).then(function (r) {
+				if (r.ok) { onSuccess(); }
+			}).catch(function () {});
+		}
+	}());
+
+}());
+</script>
+[%- END -%]

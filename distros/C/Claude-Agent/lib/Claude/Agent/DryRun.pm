@@ -10,6 +10,196 @@ our @EXPORT_OK = qw(create_dry_run_hooks is_write_tool format_preview);
 use Claude::Agent::Hook::Matcher;
 use Claude::Agent::Hook::Result;
 
+sub create_dry_run_hooks {
+    my ($on_dry_run) = @_;
+
+    unless ($ENV{CLAUDE_AGENT_DRY_RUN_NO_WARN}) {
+        warn "=" x 72 . "\n";
+        warn "[DRY-RUN MODE WARNING]\n";
+        warn "Dry-run mode provides PREVIEW FUNCTIONALITY ONLY, not security.\n";
+        warn "Bash command detection uses regex heuristics that can be BYPASSED via:\n";
+        warn "  - Command substitution: \$(echo rm) -rf\n";
+        warn "  - Variable expansion: \$cmd where cmd=rm\n";
+        warn "  - Aliases, scripts, or encoded commands\n";
+        warn "For security-critical use, use tool whitelisting or sandboxing.\n";
+        warn "Set CLAUDE_AGENT_DRY_RUN_NO_WARN=1 to suppress this warning.\n";
+        warn "=" x 72 . "\n";
+    }
+
+    return {
+        PreToolUse => [
+            Claude::Agent::Hook::Matcher->new(
+                hooks => [sub {
+                    my ($input, $tool_use_id, $context) = @_;
+                    my $tool_name = $input->{tool_name};
+                    my $tool_input = $input->{tool_input};
+
+                    if (is_write_tool($tool_name, $tool_input)) {
+                        my $preview = format_preview($tool_name, $tool_input);
+
+                        if ($on_dry_run && ref($on_dry_run) eq 'CODE') {
+                            $on_dry_run->($tool_name, $tool_input, $preview);
+                        }
+                        else {
+                            print "[DRY-RUN] $preview\n";
+                        }
+
+                        return Claude::Agent::Hook::Result->deny(
+                            reason => "[DRY-RUN] $preview",
+                        );
+                    }
+
+                    return Claude::Agent::Hook::Result->proceed();
+                }],
+            ),
+        ],
+    };
+}
+
+sub is_write_tool {
+    my ($tool_name, $tool_input) = @_;
+
+    return 1 if $tool_name eq 'Write';
+    return 1 if $tool_name eq 'Edit';
+    return 1 if $tool_name eq 'NotebookEdit';
+
+    if ($tool_name eq 'Bash') {
+        my $command = $tool_input->{command} // '';
+
+        if (!defined $ENV{CLAUDE_AGENT_DRY_RUN_STRICT} || $ENV{CLAUDE_AGENT_DRY_RUN_STRICT}) {
+            my $safe_commands_env = $ENV{CLAUDE_AGENT_DRY_RUN_SAFE_COMMANDS}
+                // 'ls,cat,head,tail,grep,find,which,pwd,whoami,date,echo,wc,file,stat,type,uname,env,printenv';
+            my @raw_commands = split /,/, $safe_commands_env;
+            my @valid_commands = grep { /^[a-zA-Z0-9_-]+$/ } @raw_commands;
+            if (@valid_commands < @raw_commands) {
+                my %valid_set = map { $_ => 1 } @valid_commands;
+                my @filtered = grep { !$valid_set{$_} } @raw_commands;
+                warn sprintf("[DRY-RUN CONFIG] Filtered %d invalid entries from CLAUDE_AGENT_DRY_RUN_SAFE_COMMANDS: %s\n",
+                    scalar(@filtered), join(', ', map { "'$_'" } @filtered));
+            }
+            my %safe_commands = map { $_ => 1 } @valid_commands;
+
+            my ($first_cmd) = $command =~ /^\s*(\S+)/;
+            $first_cmd //= '';
+            if ($first_cmd =~ m{^/}) {
+                return 1 unless $first_cmd =~ m{^/(usr/)?s?bin/};
+            }
+            $first_cmd =~ s{^.*/}{};
+
+            return 1 unless $safe_commands{$first_cmd};
+            return 1 if $command =~ /[>|]/;
+            return 0;
+        }
+
+        state $heuristic_warned = 0;
+        if (!$heuristic_warned++) {
+            warn "[DEPRECATION WARNING] Dry-run heuristic mode (CLAUDE_AGENT_DRY_RUN_STRICT=0) is "
+                . "deprecated and provides NO security guarantees. This fallback may be removed in "
+                . "future versions. Use strict mode (default) for any security-sensitive applications.\n";
+        }
+
+        if (!$ENV{CLAUDE_AGENT_DRY_RUN_QUIET}) {
+            state $dry_run_warned = 0;
+            warn "[DRY-RUN WARNING] Bash command detection is bypassable. "
+                . "Set CLAUDE_AGENT_DRY_RUN_STRICT=1 for stricter protection.\n"
+                unless $dry_run_warned++;
+        }
+        my @dangerous_cmds = qw(rm rmdir mv cp mkdir touch chmod chown dd truncate install ln patch rsync shred);
+        for my $cmd (@dangerous_cmds) {
+            return 1 if $command =~ /^\s*$cmd\b/ || $command =~ /[;|&]\s*$cmd\b/;
+        }
+        return 1 if $command =~ /^\s*wget\b/ || $command =~ /[;|&]\s*wget\b/;
+        return 1 if $command =~ /^\s*curl\s+.*-[oO]/ || $command =~ /[;|&]\s*curl\s+.*-[oO]/;
+        return 1 if $command =~ /<<[<]?/;
+        return 1 if $command =~ /\b(perl|python|ruby|sh|bash)\s+(-[ec]|-.*[ec])/i;
+        return 1 if $command =~ /\beval\b/;
+        return 1 if $command =~ /\b(source|\.)\s+/;
+        return 1 if $command =~ /\bxargs\b.*\b(rm|mv|cp)\b/;
+        return 1 if $command =~ /\b(git\s+(add|commit|push|reset|checkout|merge|rebase))\b/;
+        return 1 if $command =~ /\b(npm\s+(install|uninstall|update|publish))\b/;
+        return 1 if $command =~ /\b(pip\s+(install|uninstall))\b/;
+        return 1 if $command =~ /\b(cargo\s+(build|install|publish))\b/;
+        return 1 if $command =~ /\b(make|cmake)\b/;
+        return 1 if $command =~ /[>|]\s*\S/;
+        return 1 if $command =~ /`[^`]*[>|]/;
+        return 1 if $command =~ /\$\([^)]*[>|]/;
+        return 1 if $command =~ /\btee\b/;
+        return 1 if $command =~ /\bsed\s+-i/;
+
+        return 1 if $tool_input->{dangerouslyDisableSandbox};
+
+        if (!$ENV{CLAUDE_AGENT_DRY_RUN_QUIET}) {
+            my $safe_commands_env = $ENV{CLAUDE_AGENT_DRY_RUN_SAFE_COMMANDS}
+                // 'ls,cat,head,tail,grep,find,which,pwd,whoami,date,echo,wc,file,stat,type,uname,env,printenv';
+            my %safe_commands = map { $_ => 1 } split /,/, $safe_commands_env;
+            my ($first_cmd) = $command =~ /^\s*(\S+)/;
+            $first_cmd //= '';
+            $first_cmd =~ s{^.*/}{};
+            if (!$safe_commands{$first_cmd}) {
+                warn "[DRY-RUN NOTICE] Command '$first_cmd' is not in safe list but allowed by heuristics. "
+                    . "In strict mode (default), this would be blocked.\n";
+            }
+        }
+    }
+
+    if ($tool_name =~ /^mcp__/) {
+        my $write_tools_env = $ENV{CLAUDE_AGENT_MCP_WRITE_TOOLS} // '';
+        my %write_mcp_tools = map { $_ => 1 } split /,/, $write_tools_env;
+        return 1 if $write_mcp_tools{$tool_name};
+        return 0;
+    }
+
+    return 0;
+}
+
+sub format_preview {
+    my ($tool_name, $tool_input) = @_;
+
+    if ($tool_name eq 'Write') {
+        my $path = $tool_input->{file_path} // 'unknown';
+        my $content = $tool_input->{content} // '';
+        my $lines = () = $content =~ /\n/g;
+        $lines++;
+        my $bytes = length($content);
+        return "Would write $bytes bytes ($lines lines) to: $path";
+    }
+
+    if ($tool_name eq 'Edit') {
+        my $path = $tool_input->{file_path} // 'unknown';
+        my $old = $tool_input->{old_string} // '';
+        my $new = $tool_input->{new_string} // '';
+        my $old_preview = length($old) > 50 ? substr($old, 0, 47) . '...' : $old;
+        my $new_preview = length($new) > 50 ? substr($new, 0, 47) . '...' : $new;
+        $old_preview =~ s/\n/\\n/g;
+        $new_preview =~ s/\n/\\n/g;
+        my $replace_all = $tool_input->{replace_all} ? ' (all occurrences)' : '';
+        return "Would edit $path$replace_all: '$old_preview' -> '$new_preview'";
+    }
+
+    if ($tool_name eq 'Bash') {
+        my $cmd = $tool_input->{command} // 'unknown';
+        my $desc = $tool_input->{description} // '';
+        my $cmd_preview = length($cmd) > 80 ? substr($cmd, 0, 77) . '...' : $cmd;
+        return $desc ? "Would run: $cmd_preview ($desc)" : "Would run: $cmd_preview";
+    }
+
+    if ($tool_name eq 'NotebookEdit') {
+        my $path = $tool_input->{notebook_path} // 'unknown';
+        my $mode = $tool_input->{edit_mode} // 'replace';
+        return "Would $mode cell in notebook: $path";
+    }
+
+    my $input_preview = join(', ', map { "$_=$tool_input->{$_}" }
+        grep { defined $tool_input->{$_} } sort keys %$tool_input);
+    $input_preview = substr($input_preview, 0, 100) . '...' if length($input_preview) > 100;
+    return "Would execute $tool_name with: $input_preview";
+}
+
+
+1;
+
+__END__
+
 =head1 NAME
 
 Claude::Agent::DryRun - Dry-run mode support for Claude Agent SDK
@@ -158,58 +348,6 @@ for the C<hooks> option.
 
 =cut
 
-sub create_dry_run_hooks {
-    my ($on_dry_run) = @_;
-
-    # Emit prominent warning about dry-run limitations unless suppressed
-    unless ($ENV{CLAUDE_AGENT_DRY_RUN_NO_WARN}) {
-        warn "=" x 72 . "\n";
-        warn "[DRY-RUN MODE WARNING]\n";
-        warn "Dry-run mode provides PREVIEW FUNCTIONALITY ONLY, not security.\n";
-        warn "Bash command detection uses regex heuristics that can be BYPASSED via:\n";
-        warn "  - Command substitution: \$(echo rm) -rf\n";
-        warn "  - Variable expansion: \$cmd where cmd=rm\n";
-        warn "  - Aliases, scripts, or encoded commands\n";
-        warn "For security-critical use, use tool whitelisting or sandboxing.\n";
-        warn "Set CLAUDE_AGENT_DRY_RUN_NO_WARN=1 to suppress this warning.\n";
-        warn "=" x 72 . "\n";
-    }
-
-    return {
-        PreToolUse => [
-            Claude::Agent::Hook::Matcher->new(
-                hooks => [sub {
-                    my ($input, $tool_use_id, $context) = @_;
-                    my $tool_name = $input->{tool_name};
-                    my $tool_input = $input->{tool_input};
-
-                    # Check if this is a write tool
-                    if (is_write_tool($tool_name, $tool_input)) {
-                        my $preview = format_preview($tool_name, $tool_input);
-
-                        # Call the callback if provided
-                        if ($on_dry_run && ref($on_dry_run) eq 'CODE') {
-                            $on_dry_run->($tool_name, $tool_input, $preview);
-                        }
-                        else {
-                            # Default output
-                            print "[DRY-RUN] $preview\n";
-                        }
-
-                        # Block the tool with informative message
-                        return Claude::Agent::Hook::Result->deny(
-                            reason => "[DRY-RUN] $preview",
-                        );
-                    }
-
-                    # Allow read-only tools
-                    return Claude::Agent::Hook::Result->proceed();
-                }],
-            ),
-        ],
-    };
-}
-
 =head2 is_write_tool
 
     my $is_write = is_write_tool($tool_name, $tool_input);
@@ -218,157 +356,6 @@ Returns true if the tool is considered a write operation.
 
 =cut
 
-sub is_write_tool {
-    my ($tool_name, $tool_input) = @_;
-
-    # Definite write tools
-    return 1 if $tool_name eq 'Write';
-    return 1 if $tool_name eq 'Edit';
-    return 1 if $tool_name eq 'NotebookEdit';
-
-    # Bash commands need heuristic detection
-    # Note: This check is for preview/convenience only - NOT a security boundary.
-    # For security-critical use cases, use explicit tool whitelisting or containerization.
-    if ($tool_name eq 'Bash') {
-        my $command = $tool_input->{command} // '';
-
-        # SECURITY: Strict mode is the DEFAULT and STRONGLY RECOMMENDED
-        # Set CLAUDE_AGENT_DRY_RUN_STRICT=0 to enable heuristic mode (DEPRECATED - NOT RECOMMENDED)
-        # WARNING: Heuristic detection provides NO security guarantees and is EASILY BYPASSED
-        # via shell obfuscation (command substitution, variable expansion, encoding, etc.)
-        # The heuristic fallback exists only for legacy compatibility and may be removed in future versions.
-        # For any security-sensitive use case, keep strict mode enabled (the default).
-        if (!defined $ENV{CLAUDE_AGENT_DRY_RUN_STRICT} || $ENV{CLAUDE_AGENT_DRY_RUN_STRICT}) {
-            # In strict mode, only allow explicitly whitelisted read-only commands
-            my $safe_commands_env = $ENV{CLAUDE_AGENT_DRY_RUN_SAFE_COMMANDS}
-                // 'ls,cat,head,tail,grep,find,which,pwd,whoami,date,echo,wc,file,stat,type,uname,env,printenv';
-            # Validate each command name to prevent injection via malicious env values
-            # Only allow alphanumeric characters, hyphens, and underscores
-            my @raw_commands = split /,/, $safe_commands_env;
-            my @valid_commands = grep { /^[a-zA-Z0-9_-]+$/ } @raw_commands;
-            # Log filtered entries to help users debug configuration issues
-            if (@valid_commands < @raw_commands) {
-                my %valid_set = map { $_ => 1 } @valid_commands;
-                my @filtered = grep { !$valid_set{$_} } @raw_commands;
-                warn sprintf("[DRY-RUN CONFIG] Filtered %d invalid entries from CLAUDE_AGENT_DRY_RUN_SAFE_COMMANDS: %s\n",
-                    scalar(@filtered), join(', ', map { "'$_'" } @filtered));
-            }
-            my %safe_commands = map { $_ => 1 } @valid_commands;
-
-            # Extract first command word (before any args, pipes, or redirects)
-            my ($first_cmd) = $command =~ /^\s*(\S+)/;
-            $first_cmd //= '';
-            # Keep full path for safe directory validation
-            if ($first_cmd =~ m{^/}) {
-                # Only strip if it's in a known safe directory
-                return 1 unless $first_cmd =~ m{^/(usr/)?s?bin/};
-            }
-            $first_cmd =~ s{^.*/}{};
-
-            # Block if command is not in safe list
-            return 1 unless $safe_commands{$first_cmd};
-            # Even safe commands are blocked if they use redirects or pipes
-            return 1 if $command =~ /[>|]/;
-            return 0;  # Safe command without redirects - allow
-        }
-
-        # DEPRECATED: Heuristic fallback mode - will be removed in a future version
-        # Emit deprecation warning when heuristic mode is used
-        state $heuristic_warned = 0;
-        if (!$heuristic_warned++) {
-            warn "[DEPRECATION WARNING] Dry-run heuristic mode (CLAUDE_AGENT_DRY_RUN_STRICT=0) is "
-                . "deprecated and provides NO security guarantees. This fallback may be removed in "
-                . "future versions. Use strict mode (default) for any security-sensitive applications.\n";
-        }
-
-        # Commands that are definitely writes
-        # Note: This detection is not exhaustive. Complex shell constructs, xargs with
-        # write commands, or custom scripts may bypass detection. For maximum safety,
-        # consider using a whitelist approach or reviewing all blocked operations.
-        #
-        # IMPORTANT: Dry-run mode provides INFORMATIONAL protection only, NOT security
-        # guarantees. This regex-based detection can be bypassed using shell obfuscation
-        # techniques including:
-        #   - Command substitution: $(echo rm) -rf
-        #   - Variable expansion: $cmd where cmd=rm
-        #   - Hex/octal encoding in certain shells
-        #   - Aliases that expand to write commands
-        #   - Less common destructive tools (shred, truncate via other means)
-        #   - Custom scripts that perform write operations
-        #
-        # For security-critical applications, consider:
-        #   1. Set CLAUDE_AGENT_DRY_RUN_STRICT=1 to block all non-whitelisted commands
-        #   2. Running in a sandboxed environment (containers, VMs)
-        #   3. Using custom PreToolUse hooks with stricter validation
-        #
-        # WARNING: Always print security notice to STDERR for Bash commands
-        # This ensures users are aware of limitations even if callbacks suppress output
-        if (!$ENV{CLAUDE_AGENT_DRY_RUN_QUIET}) {
-            state $dry_run_warned = 0;
-            warn "[DRY-RUN WARNING] Bash command detection is bypassable. "
-                . "Set CLAUDE_AGENT_DRY_RUN_STRICT=1 for stricter protection.\n"
-                unless $dry_run_warned++;
-        }
-        # More precise command detection: check if dangerous command is at start or after pipe/semicolon/&&
-        # This avoids false positives like 'grep rm file.txt' or 'echo rm > log.txt'
-        my @dangerous_cmds = qw(rm rmdir mv cp mkdir touch chmod chown dd truncate install ln patch rsync shred);
-        for my $cmd (@dangerous_cmds) {
-            return 1 if $command =~ /^\s*$cmd\b/ || $command =~ /[;|&]\s*$cmd\b/;
-        }
-        # Handle wget and curl with output flags separately (more complex patterns)
-        return 1 if $command =~ /^\s*wget\b/ || $command =~ /[;|&]\s*wget\b/;
-        return 1 if $command =~ /^\s*curl\s+.*-[oO]/ || $command =~ /[;|&]\s*curl\s+.*-[oO]/;
-        return 1 if $command =~ /<<[<]?/;  # Heredoc redirects
-        return 1 if $command =~ /\b(perl|python|ruby|sh|bash)\s+(-[ec]|-.*[ec])/i;  # Inline scripts that could write
-        return 1 if $command =~ /\beval\b/;  # eval command
-        return 1 if $command =~ /\b(source|\.)\s+/;  # source command
-        return 1 if $command =~ /\bxargs\b.*\b(rm|mv|cp)\b/;  # xargs with write commands
-        return 1 if $command =~ /\b(git\s+(add|commit|push|reset|checkout|merge|rebase))\b/;
-        return 1 if $command =~ /\b(npm\s+(install|uninstall|update|publish))\b/;
-        return 1 if $command =~ /\b(pip\s+(install|uninstall))\b/;
-        return 1 if $command =~ /\b(cargo\s+(build|install|publish))\b/;
-        return 1 if $command =~ /\b(make|cmake)\b/;
-        return 1 if $command =~ /[>|]\s*\S/;  # Redirects or pipes to commands
-        return 1 if $command =~ /`[^`]*[>|]/;  # Command substitution with backticks
-        return 1 if $command =~ /\$\([^)]*[>|]/;  # Command substitution with $()
-        return 1 if $command =~ /\btee\b/;
-        return 1 if $command =~ /\bsed\s+-i/;  # In-place sed
-
-        # If disabling sandbox, likely a write
-        return 1 if $tool_input->{dangerouslyDisableSandbox};
-
-        # In non-strict mode, warn if command is not in the safe list
-        # This helps users understand what would be blocked in strict mode
-        if (!$ENV{CLAUDE_AGENT_DRY_RUN_QUIET}) {
-            my $safe_commands_env = $ENV{CLAUDE_AGENT_DRY_RUN_SAFE_COMMANDS}
-                // 'ls,cat,head,tail,grep,find,which,pwd,whoami,date,echo,wc,file,stat,type,uname,env,printenv';
-            my %safe_commands = map { $_ => 1 } split /,/, $safe_commands_env;
-            my ($first_cmd) = $command =~ /^\s*(\S+)/;
-            $first_cmd //= '';
-            $first_cmd =~ s{^.*/}{};
-            if (!$safe_commands{$first_cmd}) {
-                warn "[DRY-RUN NOTICE] Command '$first_cmd' is not in safe list but allowed by heuristics. "
-                    . "In strict mode (default), this would be blocked.\n";
-            }
-        }
-    }
-
-    # MCP tools - check if marked as write operation via configuration
-    # Users can specify MCP tools that perform write operations via the
-    # CLAUDE_AGENT_MCP_WRITE_TOOLS environment variable (comma-separated list)
-    # or by implementing custom PreToolUse hooks.
-    if ($tool_name =~ /^mcp__/) {
-        # Check if tool is in user-configured write-tools list
-        my $write_tools_env = $ENV{CLAUDE_AGENT_MCP_WRITE_TOOLS} // '';
-        my %write_mcp_tools = map { $_ => 1 } split /,/, $write_tools_env;
-        return 1 if $write_mcp_tools{$tool_name};
-        return 0;
-    }
-
-    # Default: allow (read-only tools like Read, Glob, Grep, etc.)
-    return 0;
-}
-
 =head2 format_preview
 
     my $preview = format_preview($tool_name, $tool_input);
@@ -376,50 +363,6 @@ sub is_write_tool {
 Formats a human-readable preview of what the tool would do.
 
 =cut
-
-sub format_preview {
-    my ($tool_name, $tool_input) = @_;
-
-    if ($tool_name eq 'Write') {
-        my $path = $tool_input->{file_path} // 'unknown';
-        my $content = $tool_input->{content} // '';
-        my $lines = () = $content =~ /\n/g;
-        $lines++;
-        my $bytes = length($content);
-        return "Would write $bytes bytes ($lines lines) to: $path";
-    }
-
-    if ($tool_name eq 'Edit') {
-        my $path = $tool_input->{file_path} // 'unknown';
-        my $old = $tool_input->{old_string} // '';
-        my $new = $tool_input->{new_string} // '';
-        my $old_preview = length($old) > 50 ? substr($old, 0, 47) . '...' : $old;
-        my $new_preview = length($new) > 50 ? substr($new, 0, 47) . '...' : $new;
-        $old_preview =~ s/\n/\\n/g;
-        $new_preview =~ s/\n/\\n/g;
-        my $replace_all = $tool_input->{replace_all} ? ' (all occurrences)' : '';
-        return "Would edit $path$replace_all: '$old_preview' -> '$new_preview'";
-    }
-
-    if ($tool_name eq 'Bash') {
-        my $cmd = $tool_input->{command} // 'unknown';
-        my $desc = $tool_input->{description} // '';
-        my $cmd_preview = length($cmd) > 80 ? substr($cmd, 0, 77) . '...' : $cmd;
-        return $desc ? "Would run: $cmd_preview ($desc)" : "Would run: $cmd_preview";
-    }
-
-    if ($tool_name eq 'NotebookEdit') {
-        my $path = $tool_input->{notebook_path} // 'unknown';
-        my $mode = $tool_input->{edit_mode} // 'replace';
-        return "Would $mode cell in notebook: $path";
-    }
-
-    # Generic fallback
-    my $input_preview = join(', ', map { "$_=$tool_input->{$_}" }
-        grep { defined $tool_input->{$_} } sort keys %$tool_input);
-    $input_preview = substr($input_preview, 0, 100) . '...' if length($input_preview) > 100;
-    return "Would execute $tool_name with: $input_preview";
-}
 
 =head1 AUTHOR
 
@@ -432,5 +375,3 @@ This software is Copyright (c) 2026 by LNATION.
 This is free software, licensed under The Artistic License 2.0 (GPL Compatible).
 
 =cut
-
-1;

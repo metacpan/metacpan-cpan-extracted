@@ -6,9 +6,9 @@ App::FuguWeb::Index - the body of the manual index
 
     use App::FuguWeb::Index;
 
-    my $index = App::FuguWeb::Index->new(config => $config);
+    my $index = App::FuguWeb::Index->new(config => $config, lang => 'de');
 
-    print $index->body;
+    print $index->body('Handbuch', $opening, body_lang => 'en');
 
 =head1 DESCRIPTION
 
@@ -20,36 +20,41 @@ here names one.
 The index does not retype a description either. It asks each
 L<App::FuguWeb::Manual>, and that reads the source.
 
+The index writes no prose of its own. The title, the opening and each
+heading come from the description, and each description comes from a
+source.
+
 =head1 METHODS
 
 =head2 new
 
-    App::FuguWeb::Index->new(config => $config)
+    App::FuguWeb::Index->new(config => $config, lang => $code)
 
-C<config> is an L<App::FuguWeb::Config> and is required.
-
-=head2 title
-
-The title of the index page. It comes from the C<page> block that names
-the index as its source, so the heading and the browser tab always
-agree. The build renders the index for such a block only, so the block
-is always there.
+C<config> is an L<App::FuguWeb::Config> and is required. C<lang> is the
+code of the language of the page, and it defaults to C<en>.
 
 =head2 body
+
+    $index->body($title, $opening,
+        title_lang => 'en',
+        body_lang  => 'en')
 
 The body fragment. L<App::FuguWeb::Page> wraps it, exactly as it wraps
 a body fragment that a project wrote by hand.
 
-The fragment opens with the title and a paragraph about the manual
-sources, which names the configured manual host. A
-F<manuals.body.html> in the source directory replaces that opening: the
-prose is the project's, and only the project knows what its manuals are.
+The fragment opens with the title as its C<< <h1> >>, and then the
+opening as it stands. The caller passes the title and the C<body> of
+the index page for the language of the page, so the heading and the
+browser tab always agree. A page with no C<body> passes C<undef>, and
+the groups then follow the heading.
 
-Each group then emits an C<< <h2> >> that carries the group anchor, one
-C<< <dl> >>, and one blank line. A group with no manual emits nothing,
-so an empty group leaves no heading behind.
+Each group then emits an C<< <h2> >>, one C<< <dl> >>, and one blank
+line. The C<id> of the heading is the group name, and its text is the
+heading of the language. A group with no manual emits nothing, so an
+empty group leaves no heading behind.
 
-Each manual emits a term and a definition:
+Each manual of the language emits a term and a definition. The
+description comes from the source of that language.
 
     <dt><a href="./Fugu::Daemon.3p.html">Fugu::Daemon(3p)</a></dt>
     <dd>daemonize a process the OpenBSD way</dd>
@@ -57,6 +62,21 @@ Each manual emits a term and a definition:
 The C<./> is mandatory. A browser reads a relative URL whose first
 segment holds a colon as a scheme, so a bare F<Fugu::Daemon.3p.html>
 would be read as the C<fugu:> protocol.
+
+The parts of the page come from the sources of more than one language:
+the title, the opening, each heading and each description. A part from
+a source of another language than the page carries that code as
+C<lang> on its own element, per WEB-LANG-6. That element is the
+C<< <h1> >> of the title, one C<< <div> >> around the opening, the
+C<< <h2> >> of a heading, or the C<< <dd> >> of a description. A part
+of the language of the page carries no C<lang>, because the
+C<< <html> >> element carries that code.
+
+C<title_lang> and C<body_lang> are the languages of the title and of
+the opening. The caller passes the C<title_lang> and the C<lang> of the
+page, as L<App::FuguWeb::Config/pages> names them. Each one defaults to
+the language of the page. The group gives the language of each
+heading, and the manual the language of each description.
 
 =head1 SEE ALSO
 

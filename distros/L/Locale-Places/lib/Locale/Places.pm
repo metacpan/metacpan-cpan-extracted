@@ -2,6 +2,7 @@ package Locale::Places;
 
 # TODO:	Investigate https://github.com/x88/i18nGeoNamesDB
 # TODO:	US State names
+# TODO: support src/dest as well as from/to to have an API more consistent with Lingua::Translate
 
 use strict;
 use warnings;
@@ -25,11 +26,11 @@ Locale::Places - Translate places between different languages using http://downl
 
 =head1 VERSION
 
-Version 0.16
+Version 0.17
 
 =cut
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 =head1 SYNOPSIS
 

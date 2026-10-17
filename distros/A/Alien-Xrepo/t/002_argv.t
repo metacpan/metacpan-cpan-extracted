@@ -172,6 +172,27 @@ subtest '_confirm_args default-confirm for mutating actions' => sub {
     is [ $repo->_confirm_args( { yes     => 1 } ) ],       [], 'yes => 1 handled by _build_args';
     is [ $repo->_confirm_args( { confirm => 'never' } ) ], [], 'confirm opts out';
 };
+subtest '_verbosity_args adds xmake -v/-D for installs only' => sub {
+
+    # Default instance (verbose => 0): nothing extra, so a plain install stays byte-identical.
+    is [ $repo->_verbosity_args( {} ) ], [], 'no flags by default';
+
+    # Instance-level verbose/diagnosis are honored per-call, and a per-call key overrides them.
+    my $loud = Alien::Xrepo->new( verbose => 1, diagnosis => 1 );
+    is [ $loud->_verbosity_args( {} ) ], [ '-v', '-D' ], 'constructor verbose/diagnosis become -v/-D';
+    is [ $loud->_verbosity_args( { verbose   => 0 } ) ], ['-D'], 'per-call verbose => 0 drops only -v';
+    is [ $loud->_verbosity_args( { diagnosis => 0 } ) ], ['-v'], 'per-call diagnosis => 0 drops only -D';
+
+    # A recipe/package def sets these as ambient options, which reach install as %opts.
+    is [ $repo->_verbosity_args( { verbose   => 1 } ) ],                 ['-v'],         '-v from per-call opts';
+    is [ $repo->_verbosity_args( { diagnosis => 1 } ) ],                 ['-D'],         '-D from per-call opts';
+    is [ $repo->_verbosity_args( { verbose   => 1, diagnosis => 1 } ) ], [ '-v', '-D' ], 'both flags in a stable order';
+
+    # The flags ride on flags-before-spec and never after the package spec.
+    my @argv = $repo->_argv( 'install', [ '-y', $repo->_verbosity_args( { verbose => 1, diagnosis => 1 } ) ], 'zlib' );
+    is $argv[-1],                    'zlib',         'spec is still last';
+    is [ grep {/^-v$|^-D$/} @argv ], [ '-v', '-D' ], 'both flags present before the spec';
+};
 
 # End-to-end-ish: the full install argv for the SDL3 TTF recipe (the case that
 # motivated `--includes`) has the recipe as a flag and the package last.

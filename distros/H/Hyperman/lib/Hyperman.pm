@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.61';
+our $VERSION = '0.63';
 
 require XSLoader;
 XSLoader::load('Hyperman', $VERSION);
@@ -263,10 +263,32 @@ pipes the old pool created, so they poll the bus every fifty milliseconds
 instead of being poked: a published message reaches them a little later, and
 always.
 
+A supervisor that dropped privileges starts its successor as the dropped
+user: the successor finds itself already the configured C<user> and C<group>
+and carries on, and the pid file, owned by that user, is rewritten in place.
+Sockets adopted from a service manager (C<listen_fds>) are handed on exactly
+as bound ones are.
+
+=head3 Signals and the application's children
+
+The supervisor and the workers handle C<TERM>, C<INT>, C<HUP>, C<USR1> and
+C<USR2> themselves, in C, and the workers keep them blocked or ignored while
+they serve. A handler that sets C<$SIG{TERM}> is therefore not called for
+the server's own shutdown, and a process the application starts with
+C<system>, backticks or a piped C<open> inherits those dispositions: it will
+not die of a C<TERM> or an C<INT> unless it installs handlers of its own.
+Reset them in the child, or run such programs under a wrapper that does.
+
 =head3 proxy_protocol
 
     listen => [ { port => 8080, proxy_protocol => 1 } ]
     proxy_protocol => 1       # for every listener
+
+A listener that reads the PROXY header believes it: the address it names
+becomes the client for the denylist, the rate limiter and the access log.
+There is no list of trusted proxies, so such a listener must be reachable
+only from the proxy (a private network, a firewall rule, a unix socket);
+anyone else who can connect to it can claim any address.
 
 Behind HAProxy or a load balancer that speaks the PROXY protocol, each
 connection opens with one header naming the real client. A listener with
@@ -357,12 +379,18 @@ before the first worker is forked, so the supervisor and every worker run as
 it. C<group> names the group (default: the user's primary group), and the
 supplementary groups are set from the user's entry. A user or group that does
 not exist is refused before anything is bound, and a drop that fails is a
-croak, never a server that carries on as root.
+croak, never a server that carries on as root. A numeric C<user> with no
+passwd entry (a container with no C</etc/passwd>) has no primary group to
+take, so it needs C<group> as well and is refused without it.
 
-C<umask> is applied at the same point, as a number (C<0077>) or a string of
-octal digits. C<pid_file> is written whole and renamed into place, holds the
-supervisor's pid (the worker's own in single-worker mode), and is removed at
-exit if it still holds that pid.
+C<umask> is applied before anything is created, so the unix socket, the pid
+file and the logs come out under it; it is given as a number (C<0077>) or a
+string of octal digits. C<pid_file> is written whole and renamed into place,
+holds the supervisor's pid (the worker's own in single-worker mode), and is
+owned by C<user> once the drop is configured, so that a C<USR2> successor,
+which is born as that user, can rewrite it. It is removed at exit if it still
+holds that pid; where the directory no longer allows that (C</run> after a
+drop) it is emptied instead.
 
 C<reuseport> with C<user> refuses a port below 1024, because the workers
 rebind it themselves and would do so as the dropped user. None of these four
@@ -462,6 +490,16 @@ long it has been coming, and an upload that keeps moving is never cut off
 for being large. A connection that has finished a request and sent nothing
 since is closed after C<idle_timeout>. All three are checked by a sweep that
 runs every five seconds, so each is honoured to within that.
+
+Progress alone lets a body arrive a byte a minute for as long as it likes,
+holding a connection and a buffer the whole time. Two floors are available
+for a deployment that cannot afford that, both off by default:
+C<body_min_rate> is an average in bytes per second a body must sustain,
+judged from two seconds into it, and C<request_timeout> is a ceiling in
+seconds on the whole request from its first byte to the last of its body,
+whatever its progress.
+
+    Hyperman->run(app => $app, body_min_rate => 1024, request_timeout => 300);
 
 =head2 Expect: 100-continue
 

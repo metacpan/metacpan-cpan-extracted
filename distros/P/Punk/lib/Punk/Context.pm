@@ -7,7 +7,7 @@ use Punk::Request;
 use Punk::Response;
 use Punk ();
 
-our $VERSION = '0.59';
+our $VERSION = '0.60';
 
 1;
 
@@ -324,9 +324,12 @@ The result carries the application's prefix - the path on L<Punk/host>,
 then C<SCRIPT_NAME> - whether or not it is absolute.
 
 It croaks rather than return a URL that cannot work: on a name no route
-carries, on a capture with no value, on an empty one, on a reference, and
-on a C</> inside a C<:param>, which C<PATH_INFO> would deliver decoded and
-split into an extra segment. Those are bugs at the call site, and a 500 in
+carries, on a capture with no value, on an empty one, on a reference, on a
+C</> inside a C<:param>, which C<PATH_INFO> would deliver decoded and split
+into an extra segment, on a C<*splat> value that begins with C</> (the route
+supplies that slash, and C<//host/...> is a URL for another host), and on a
+C<.> or C<..> segment, which a browser resolves away. Those are bugs at the
+call site, and a 500 in
 development is how they get found; L<Punk::Test> takes C<< [ 'book', id =>
 1 ] >> wherever it takes a path, which turns a wrong name into a failing
 test rather than a 404 in production.

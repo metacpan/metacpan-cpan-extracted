@@ -27,6 +27,239 @@ our %EXPORT_TAGS = (
     term    => [qw(clear_line move_up)],
 );
 
+my $_term;
+
+sub _term {
+    $_term //= Term::ReadLine->new('Claude::Agent');
+}
+
+sub with_spinner {
+    my ($message, $code) = @_;
+
+    my $ps = Term::ProgressSpinner->new();
+    $ps->message("{spinner} $message");
+    $ps->start(100);
+
+    my $result = $code->();
+
+    $ps->finish();
+    status('success', $message);
+
+    return $result;
+}
+
+my $_active_spinner;
+
+sub start_spinner {
+    my ($message, $loop, %opts) = @_;
+
+    my $interval = delete $opts{interval} // 0.1;
+
+    my %spinner_opts = (
+        spinner       => $opts{spinner}       // 'dots',
+        spinner_color => $opts{spinner_color} // 'cyan',
+        message       => $opts{message}       // "{spinner} $message",
+    );
+
+    for my $key (qw(terminal_line terminal_height output)) {
+        $spinner_opts{$key} = $opts{$key} if defined $opts{$key};
+    }
+
+    $_active_spinner = Term::ProgressSpinner->new(%spinner_opts);
+
+    if ($loop) {
+        $_active_spinner->start_async($loop, interval => $interval);
+    } else {
+        $_active_spinner->start(1);
+        $_active_spinner->draw($_active_spinner);
+    }
+
+    return $_active_spinner;
+}
+
+sub stop_spinner {
+    my ($spinner, $success_message) = @_;
+
+    $spinner //= $_active_spinner;
+    return unless $spinner;
+
+    if ($spinner->{_async_timer}) {
+        $spinner->stop_async($success_message);
+    } else {
+        $spinner->finish();
+        status('success', $success_message) if $success_message;
+    }
+
+    $_active_spinner = undef;
+}
+
+sub prompt {
+    my ($message, $default) = @_;
+    my $prompt_str = $message;
+    $prompt_str .= " [$default]" if defined $default && $default ne '';
+    $prompt_str .= ": ";
+
+    my $answer = _term->readline($prompt_str);
+    $answer //= '';
+    $answer =~ s/^\s+|\s+$//g;
+
+    return ($answer ne '' ? $answer : $default) // '';
+}
+
+sub ask_yn {
+    my ($message, $default) = @_;
+    $default //= 'y';
+
+    my @options = $default =~ /^y/i
+        ? ('Yes', 'No')
+        : ('No', 'Yes');
+
+    my $choice = choose(
+        \@options,
+        {
+            prompt => "$message ",
+            layout => 1,
+        }
+    );
+
+    return unless defined $choice;
+    return $choice eq 'Yes';
+}
+
+sub menu {
+    my ($title, $options) = @_;
+
+    my @labels = map { "[$_->{key}] $_->{label}" } @$options;
+
+    my $choice = choose(
+        \@labels,
+        {
+            prompt => "$title:",
+            layout => 2,
+        }
+    );
+
+    return unless defined $choice;
+
+    if ($choice =~ /^\[(\w+)\]/) {
+        return $1;
+    }
+    return $options->[0]{key};
+}
+
+sub select_option {
+    my ($options, %args) = @_;
+
+    my @display;
+    for my $i (0 .. $#$options) {
+        my $preview = substr($options->[$i], 0, 60);
+        $preview .= "..." if length($options->[$i]) > 60;
+        $preview =~ s/\n/ /g;
+        push @display, "[$i] $preview";
+    }
+
+    if ($args{allow_custom}) {
+        push @display, "[c] Custom";
+    }
+
+    my $choice = choose(
+        \@display,
+        {
+            prompt => $args{prompt} // 'Select:',
+            layout => 2,
+        }
+    );
+
+    return unless defined $choice;
+
+    return undef if $choice =~ /^\[c\]/;
+
+    if ($choice =~ /^\[(\d+)\]/) {
+        return $options->[$1];
+    }
+    return $options->[0];
+}
+
+sub choose_from {
+    my ($options, %args) = @_;
+    my $prompt_text = $args{prompt} // 'Select an option:';
+
+    header($prompt_text) if $args{show_header};
+
+    return choose(
+        $options,
+        {
+            prompt => $args{inline_prompt} // '',
+            layout => $args{layout} // 1,
+            index  => $args{return_index} // 0,
+            mouse  => $args{mouse} // 0,
+            search => 1,
+        }
+    );
+}
+
+sub choose_multiple {
+    my ($options, %args) = @_;
+    my @selected = choose(
+        $options,
+        {
+            prompt => $args{prompt} // 'Select items (Space to mark, Enter to confirm):',
+            layout => 2,
+            mark   => $args{preselected} // [],
+        }
+    );
+    return @selected;
+}
+
+sub header {
+    my ($text) = @_;
+    my $line = "=" x 60;
+    print colored(['bold', 'blue'], $line), "\n";
+    print colored(['bold', 'white'], "  $text"), "\n";
+    print colored(['bold', 'blue'], $line), "\n\n";
+}
+
+sub divider {
+    my ($char, $width) = @_;
+    $char  //= '-';
+    $width //= 60;
+    print $char x $width, "\n";
+}
+
+sub status {
+    my ($type, $message) = @_;
+    my %colors = (
+        success => 'green',
+        error   => 'red',
+        warning => 'yellow',
+        info    => 'cyan',
+    );
+    my %icons = (
+        success => "\x{2713}",
+        error   => "\x{2717}",
+        warning => "\x{26A0}",
+        info    => "\x{2139}",
+    );
+    my $color = $colors{$type} // 'white';
+    my $icon  = $icons{$type} // '*';
+    print colored([$color], "$icon $message"), "\n";
+}
+
+sub clear_line {
+    print "\r\033[K";
+}
+
+sub move_up {
+    my ($n) = @_;
+    $n //= 1;
+    print "\033[${n}A";
+}
+
+
+1;
+
+__END__
+
 =head1 NAME
 
 Claude::Agent::CLI - Terminal UI utilities for interactive CLI applications
@@ -99,13 +332,6 @@ Nothing is exported by default. Use C<:all> for everything, or import specific f
 
 =cut
 
-# Terminal singleton for Term::ReadLine
-my $_term;
-
-sub _term {
-    $_term //= Term::ReadLine->new('Claude::Agent');
-}
-
 =head1 FUNCTIONS
 
 =head2 Spinners
@@ -122,21 +348,6 @@ Note: This is for synchronous code. For async operations, use start_spinner/stop
     });
 
 =cut
-
-sub with_spinner {
-    my ($message, $code) = @_;
-
-    my $ps = Term::ProgressSpinner->new();
-    $ps->message("{spinner} $message");
-    $ps->start(100);  # Indeterminate mode
-
-    my $result = $code->();
-
-    $ps->finish();
-    status('success', $message);
-
-    return $result;
-}
 
 =head3 start_spinner
 
@@ -180,40 +391,6 @@ Options:
 
 =cut
 
-my $_active_spinner;
-
-sub start_spinner {
-    my ($message, $loop, %opts) = @_;
-
-    # Extract our options vs Term::ProgressSpinner options
-    my $interval = delete $opts{interval} // 0.1;
-
-    # Build spinner options with defaults
-    my %spinner_opts = (
-        spinner       => $opts{spinner}       // 'dots',
-        spinner_color => $opts{spinner_color} // 'cyan',
-        message       => $opts{message}       // "{spinner} $message",
-    );
-
-    # Pass through any additional Term::ProgressSpinner options
-    for my $key (qw(terminal_line terminal_height output)) {
-        $spinner_opts{$key} = $opts{$key} if defined $opts{$key};
-    }
-
-    $_active_spinner = Term::ProgressSpinner->new(%spinner_opts);
-
-    if ($loop) {
-        # Async mode - spinner animates via IO::Async timer
-        $_active_spinner->start_async($loop, interval => $interval);
-    } else {
-        # Non-async mode - start and draw once
-        $_active_spinner->start(1);
-        $_active_spinner->draw($_active_spinner);
-    }
-
-    return $_active_spinner;
-}
-
 =head3 stop_spinner
 
     stop_spinner($spinner, $success_message);
@@ -221,24 +398,6 @@ sub start_spinner {
 Stop a spinner started with start_spinner. Optionally display a success message.
 
 =cut
-
-sub stop_spinner {
-    my ($spinner, $success_message) = @_;
-
-    $spinner //= $_active_spinner;
-    return unless $spinner;
-
-    if ($spinner->{_async_timer}) {
-        # Async mode - use stop_async
-        $spinner->stop_async($success_message);
-    } else {
-        # Non-async mode - finish and show message
-        $spinner->finish();
-        status('success', $success_message) if $success_message;
-    }
-
-    $_active_spinner = undef;
-}
 
 =head2 Prompts
 
@@ -249,19 +408,6 @@ sub stop_spinner {
 Prompt the user for text input with an optional default value.
 
 =cut
-
-sub prompt {
-    my ($message, $default) = @_;
-    my $prompt_str = $message;
-    $prompt_str .= " [$default]" if defined $default && $default ne '';
-    $prompt_str .= ": ";
-
-    my $answer = _term->readline($prompt_str);
-    $answer //= '';
-    $answer =~ s/^\s+|\s+$//g;
-
-    return ($answer ne '' ? $answer : $default) // '';
-}
 
 =head3 ask_yn
 
@@ -275,27 +421,6 @@ Default is 'y' if not specified.
     }
 
 =cut
-
-sub ask_yn {
-    my ($message, $default) = @_;
-    $default //= 'y';
-
-    # Use Term::Choose for interactive yes/no
-    my @options = $default =~ /^y/i
-        ? ('Yes', 'No')
-        : ('No', 'Yes');
-
-    my $choice = choose(
-        \@options,
-        {
-            prompt => "$message ",
-            layout => 1,  # Horizontal layout
-        }
-    );
-
-    return unless defined $choice;  # Cancelled
-    return $choice eq 'Yes';
-}
 
 =head3 menu
 
@@ -312,29 +437,6 @@ Returns the selected key.
 
 =cut
 
-sub menu {
-    my ($title, $options) = @_;
-
-    # Build display labels for Term::Choose
-    my @labels = map { "[$_->{key}] $_->{label}" } @$options;
-
-    my $choice = choose(
-        \@labels,
-        {
-            prompt => "$title:",
-            layout => 2,  # Single column
-        }
-    );
-
-    return unless defined $choice;
-
-    # Extract key from selected label "[k] Label"
-    if ($choice =~ /^\[(\w+)\]/) {
-        return $1;
-    }
-    return $options->[0]{key};
-}
-
 =head3 select_option
 
     my $selected = select_option($options, %args);
@@ -350,42 +452,6 @@ Returns the selected option text, or undef if "Custom" was selected
     }
 
 =cut
-
-sub select_option {
-    my ($options, %args) = @_;
-
-    # Build display list with previews
-    my @display;
-    for my $i (0 .. $#$options) {
-        my $preview = substr($options->[$i], 0, 60);
-        $preview .= "..." if length($options->[$i]) > 60;
-        $preview =~ s/\n/ /g;  # Replace newlines with spaces
-        push @display, "[$i] $preview";
-    }
-
-    if ($args{allow_custom}) {
-        push @display, "[c] Custom";
-    }
-
-    my $choice = choose(
-        \@display,
-        {
-            prompt => $args{prompt} // 'Select:',
-            layout => 2,  # Single column
-        }
-    );
-
-    return unless defined $choice;
-
-    # Check for custom
-    return undef if $choice =~ /^\[c\]/;
-
-    # Extract index
-    if ($choice =~ /^\[(\d+)\]/) {
-        return $options->[$1];
-    }
-    return $options->[0];
-}
 
 =head3 choose_from
 
@@ -405,24 +471,6 @@ Options:
 
 =cut
 
-sub choose_from {
-    my ($options, %args) = @_;
-    my $prompt_text = $args{prompt} // 'Select an option:';
-
-    header($prompt_text) if $args{show_header};
-
-    return choose(
-        $options,
-        {
-            prompt => $args{inline_prompt} // '',
-            layout => $args{layout} // 1,  # 1 = columns
-            index  => $args{return_index} // 0,
-            mouse  => $args{mouse} // 0,
-            search => 1,  # Enable Ctrl-F search
-        }
-    );
-}
-
 =head3 choose_multiple
 
     my @selected = choose_multiple($options, %args);
@@ -438,19 +486,6 @@ to mark items and Enter to confirm.
 
 =cut
 
-sub choose_multiple {
-    my ($options, %args) = @_;
-    my @selected = choose(
-        $options,
-        {
-            prompt => $args{prompt} // 'Select items (Space to mark, Enter to confirm):',
-            layout => 2,  # Single column for clarity
-            mark   => $args{preselected} // [],
-        }
-    );
-    return @selected;
-}
-
 =head2 Display
 
 =head3 header
@@ -461,14 +496,6 @@ Display a styled header with border lines.
 
 =cut
 
-sub header {
-    my ($text) = @_;
-    my $line = "=" x 60;
-    print colored(['bold', 'blue'], $line), "\n";
-    print colored(['bold', 'white'], "  $text"), "\n";
-    print colored(['bold', 'blue'], $line), "\n\n";
-}
-
 =head3 divider
 
     divider($char, $width);
@@ -476,13 +503,6 @@ sub header {
 Print a divider line. Defaults to '-' x 60.
 
 =cut
-
-sub divider {
-    my ($char, $width) = @_;
-    $char  //= '-';
-    $width //= 60;
-    print $char x $width, "\n";
-}
 
 =head3 status
 
@@ -498,25 +518,6 @@ Types: success, error, warning, info
 
 =cut
 
-sub status {
-    my ($type, $message) = @_;
-    my %colors = (
-        success => 'green',
-        error   => 'red',
-        warning => 'yellow',
-        info    => 'cyan',
-    );
-    my %icons = (
-        success => "\x{2713}",  # Check mark
-        error   => "\x{2717}",  # X mark
-        warning => "\x{26A0}", # Warning sign
-        info    => "\x{2139}",  # Info symbol
-    );
-    my $color = $colors{$type} // 'white';
-    my $icon  = $icons{$type} // '*';
-    print colored([$color], "$icon $message"), "\n";
-}
-
 =head2 Terminal Control
 
 =head3 clear_line
@@ -527,10 +528,6 @@ Clear the current line (useful for updating spinner messages).
 
 =cut
 
-sub clear_line {
-    print "\r\033[K";
-}
-
 =head3 move_up
 
     move_up($n);
@@ -538,12 +535,6 @@ sub clear_line {
 Move cursor up N lines.
 
 =cut
-
-sub move_up {
-    my ($n) = @_;
-    $n //= 1;
-    print "\033[${n}A";
-}
 
 =head1 DEPENDENCIES
 
@@ -574,5 +565,3 @@ This is free software, licensed under:
   The Artistic License 2.0 (GPL Compatible)
 
 =cut
-
-1;

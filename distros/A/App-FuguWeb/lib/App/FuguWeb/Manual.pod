@@ -50,11 +50,22 @@ C<App::OpenHAP::Tasmota::Heater(3p)>.
 C<$path> and C<$module_root> must be paths of the same kind: both
 absolute, or both relative to the same directory.
 
+=head2 translated
+
+    $manual->translated($path, $code)
+
+The manual of one language whose source is the namesake of this one.
+The copy keeps the name, the section and the page, because a page name
+must not change with the language. It reads its description from its
+own source.
+
 =head1 METHODS
 
-=head2 path, name, section
+=head2 path, name, section, lang
 
-The source, the manual name, and its section.
+The source, the manual name, its section, and the language of the
+source. A manual of a constructor holds C<en>, and a translated manual
+holds the code of its language.
 
 =head2 is_pod
 

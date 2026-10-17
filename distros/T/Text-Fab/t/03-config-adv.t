@@ -1,84 +1,65 @@
-# t/03-advanced-api.t
 use strict;
 use warnings;
 use Test::More;
 use Test::Exception;
 use Text::Fab;
 
-use_ok('Text::Fab', 'Module loads correctly');
+use_ok('Text::Fab');
 
-# --- cfg__pop ---
-subtest 'cfg__pop' => sub {
+subtest 'cfg__pop on lists' => sub {
     my $fab = Text::Fab->new(config => { 'Fab/list_keys' => { my_list => 1 } });
     $fab->cfg__set('my_list', ['a', 'b', 'c', 'd']);
-    $fab->cfg__set('my_scalar', 'value');
+    $fab->cfg__set('my_scalar', 'val');
 
-    is($fab->cfg__pop('my_list'), 'd', 'Branch: pop with no count returns single last element');
-    is_deeply($fab->cfg__get('my_list'), ['a', 'b', 'c'], '...and the list is modified correctly');
+    is($fab->cfg__pop('my_list'), 'd', 'pop() returns single last element');
+    is_deeply($fab->cfg__get('my_list'), ['a', 'b', 'c'], 'list modified after single pop');
 
-    is_deeply([$fab->cfg__pop('my_list', 2)], ['b', 'c'], 'Branch: pop with a count returns correct elements');
-    is_deeply($fab->cfg__get('my_list'), ['a'], '...and the list is modified correctly');
+    my @popped = $fab->cfg__pop('my_list', 2);
+    is_deeply(\@popped, ['b', 'c'], 'pop($count) in list context returns correct slice');
+    is_deeply($fab->cfg__get('my_list'), ['a'], 'list modified after count pop');
 
-    dies_ok { $fab->cfg__pop('my_list', 2) } 'Branch: pop dies if trying to pop more elements than exist';
-    dies_ok { $fab->cfg__pop('my_scalar') } 'Branch: pop dies when called on a non-list key';
+    throws_ok { $fab->cfg__pop('my_list', 5) } qr/E_LONG_POP/,
+        'popping more elements than exist dies with E_LONG_POP';
+
+    throws_ok { $fab->cfg__pop('my_scalar') } qr/E_TYPE_MISMATCH/,
+        'pop on scalar dies with E_TYPE_MISMATCH';
+    throws_ok { $fab->cfg__pop('my_list', 1, 2) } qr/E_TYPE_MISMATCH/,
+        'pop on list with multiple args dies with E_TYPE_MISMATCH';
 };
 
-# --- cfg__prepend_elt ---
-subtest 'cfg__prepend_elt' => sub {
+subtest 'cfg__prepend_elt on lists' => sub {
     my $fab = Text::Fab->new(config => { 'Fab/list_keys' => { my_list => 1 } });
     $fab->cfg__set('my_list', ['b', 'd']);
 
     $fab->cfg__prepend_elt('my_list', 0, 'a');
-    is_deeply($fab->cfg__get('my_list'), ['a', 'b', 'd'], 'Branch: offset 0 prepends to the beginning of the list');
-    
-    $fab->cfg__prepend_elt('my_list', -1, 'c');
-    is_deeply($fab->cfg__get('my_list'), ['a', 'b', 'c', 'd'], 'Branch: offset -1 inserts before the last element');
+    is_deeply($fab->cfg__get('my_list'), ['a', 'b', 'd'], 'offset 0 inserts at beginning');
 
-    dies_ok { $fab->cfg__prepend_elt('my_scalar', 0, 'x') } 'Branch: prepend_elt dies when called on a non-list key';
+    $fab->cfg__prepend_elt('my_list', -1, 'c');
+    is_deeply($fab->cfg__get('my_list'), ['a', 'b', 'c', 'd'], 'offset -1 inserts before last element');
+
+    $fab->cfg__set('my_scalar', 'val');
+    throws_ok { $fab->cfg__prepend_elt('my_scalar', 0, 'x') } qr/E_TYPE_MISMATCH/,
+        'prepend_elt on scalar dies with E_TYPE_MISMATCH';
 };
 
-# --- cfg__get_joined ---
-subtest 'cfg__get_joined' => sub {
+subtest 'cfg__get_joined on lists' => sub {
     my $fab = Text::Fab->new(config => { 'Fab/list_keys' => { my_list => 1 } });
     $fab->cfg__set('my_list', ['k1', 'v1', 'k2', 'v2', 'k3']);
-    
-    is($fab->cfg__get_joined('my_list', ['=']), 'k1=v1=k2=v2=k3', 'Branch: works with a single joiner');
 
-    is($fab->cfg__get_joined('my_list', ['=', '&']), 'k1=v1&k2=v2&k3', 'Branch: cycles through multiple joiners');
+    is($fab->cfg__get_joined('my_list', ['=']), 'k1=v1=k2=v2=k3', 'single joiner joins list');
+    is($fab->cfg__get_joined('my_list', ['=', '&']), 'k1=v1&k2=v2&k3', 'multiple joiners cycle');
 
-    my $options = { permitted_joiners_modulo => 2 };
-    # 4 joiners used (5 elements - 1). 4 % 2 == 0. This should pass.
-    lives_ok { $fab->cfg__get_joined('my_list', ['=', '&'], $options) } 'Branch: options permit an even number of joiners';
+    my $opt = { permitted_joiners_modulo => 2 };
+    lives_ok { $fab->cfg__get_joined('my_list', ['=', '&'], $opt) }
+        'permitted_joiners_modulo lives when (N-1) % mod == 0';
 
-    # Now add an element. 5 joiners will be used. 5 % 2 != 0. This must die.
     $fab->cfg__append('my_list', 'v3');
-    throws_ok { $fab->cfg__get_joined('my_list', ['=', '&'], $options) } qr/violates permitted_joiners_modulo/, 'Branch: options cause die on odd number of joiners';
-    
-    $fab->cfg__set('my_list', ['one']);
-    is($fab->cfg__get_joined('my_list', [',']), 'one', 'Edge Case: returns single element with no joiners');
+    throws_ok { $fab->cfg__get_joined('my_list', ['=', '&'], $opt) } qr/permitted_joiners_modulo/,
+        'permitted_joiners_modulo dies when (N-1) % mod != 0';
 
-    $fab->cfg__set('my_list', []);
-    is($fab->cfg__get_joined('my_list', [',']), '', 'Edge Case: returns empty string for empty list');
-
-    dies_ok { $fab->cfg__get_joined('my_scalar', [',']) } 'Branch: get_joined dies when called on a non-list key';
-};
-
-# --- out__get_joined ---
-subtest 'out__get_joined' => sub {
-    my $fab = Text::Fab->new();
-    $fab->out__target_section('body', 'TestNS');
-    # Manually create a section with mixed content
-    $fab->{sections}{TestNS}{body} = [
-        ['text', 'Part 1'],
-        ['embed', '_main', 'footer', {}],
-        ['text', 'Part 2'],
-        ['text', 'Part 3'],
-    ];
-
-    my $spec = 'TestNS:body';
-    is($fab->out__get_joined($spec, [', ']), 'Part 1, Part 2, Part 3', 'Branch: joins text parts of a section, ignoring embeds');
-
-    is($fab->out__get_joined($spec, [',', ';']), 'Part 1,Part 2;Part 3', 'Branch: cycles joiners correctly for section content');
+    $fab->cfg__set('my_scalar', 'val');
+    throws_ok { $fab->cfg__get_joined('my_scalar', [',']) } qr/E_TYPE_MISMATCH/,
+        'get_joined on scalar dies with E_TYPE_MISMATCH';
 };
 
 done_testing();

@@ -531,7 +531,10 @@ body_to(self, dest, ...)
                       "not open for writing");
         }
         else {
-            const char *path = SvPV_nolen(dest);
+            STRLEN plen;
+            const char *path = SvPV(dest, plen);
+            if (memchr(path, 0, plen))
+                croak("Punk::Request: body_to path contains a NUL byte");
             out = PerlIO_open(path, "wb");
             if (!out)
                 croak("Punk::Request: cannot write '%s': %s", path,

@@ -2,7 +2,7 @@ use v5.40;
 use feature 'class';
 no warnings 'experimental::class';
 #
-class Alien::Xrepo::Build v1.0.8 {
+class Alien::Xrepo::Build v1.0.9 {
     use Alien::Xrepo;
     use Alien::Xrepo::Build::Recipe;
     use Path::Tiny;
@@ -14,6 +14,7 @@ class Alien::Xrepo::Build v1.0.8 {
     field $recipe       : param;               # Recipe object (or path/dir, normalized in ADJUST)
     field $root         : param //= undef;     # xrepo store root (XMAKE_PKG_INSTALLDIR)
     field $verbose      : param //= 0;
+    field $diagnosis    : param //= 0;         # forward the engine's -D to xmake require for install failures
     field $cache        : param //= 1;         # forward the engine's warm-start cache to Alien::Xrepo
     field $repo         : param //= undef;     # injectable engine (spy-able)
     field $checkpoint   : param //= undef;     # state file path; enables resume
@@ -48,7 +49,7 @@ class Alien::Xrepo::Build v1.0.8 {
             $recipe = Alien::Xrepo::Build::Recipe->new( defined $recipe && -d $recipe ? ( dir => $recipe ) : ( file => $recipe ), );
         }
         die "probe_policy must be skip|always|off" unless $probe_policy =~ /^(?:skip|always|off)$/;
-        $r = $repo // Alien::Xrepo->new( root => $root, verbose => $verbose, cache => $cache );
+        $r = $repo // Alien::Xrepo->new( root => $root, verbose => $verbose, diagnosis => $diagnosis, cache => $cache );
         if ($resume) {
             $self->_load_checkpoint;
             $self->configure( resume => 1 ) unless $stage_done->{configure};

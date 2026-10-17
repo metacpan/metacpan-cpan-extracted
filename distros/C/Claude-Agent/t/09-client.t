@@ -136,4 +136,70 @@ subtest 'Resume requires not connected' => sub {
     can_ok($c, 'resume');
 };
 
+# 0.14: one process per session, driven through the Query test seam
+subtest 'Client drives one Query' => sub {
+    require JSON::PP;
+    require IO::Async::Loop;
+    my $json = JSON::PP->new;
+    my @out;
+    my $closed = 0;
+    my $loop = IO::Async::Loop->new;
+    my $c = Claude::Agent::Client->new(
+        loop       => $loop,
+        options    => Claude::Agent::Options->new(allowed_tools => ['Read']),
+        query_args => { spawn => 0, writer => sub { push @out, $_[1] }, closer => sub { $closed++ } },
+    );
+    $c->connect('first prompt');
+    ok($c->is_connected, 'connected');
+    my $query = $c->query;
+    isa_ok($query, 'Claude::Agent::Query');
+    ok($query->persistent, 'the query is persistent');
+    is($out[0]{request}{subtype}, 'initialize', 'initialize written');
+    $query->feed_line($json->encode({ type => 'control_response', response => { subtype => 'success', request_id => $out[0]{request_id}, response => { commands => [] } } }));
+    is($out[1]{message}{content}, 'first prompt', 'the prompt follows the initialize response');
+    is($closed, 0, 'stdin stays open');
+    $query->feed_line($json->encode({ type => 'system', subtype => 'init', session_id => 'sess-1' }));
+    $query->feed_line($json->encode({ type => 'result', subtype => 'success', result => 'one' }));
+    my @turn = $c->receive_until_result;
+    is(scalar @turn, 2, 'two messages in the first turn');
+    is($c->session_id, 'sess-1', 'session id captured');
+    is($closed, 0, 'stdin still open after the result');
+
+    $c->send('second prompt');
+    is($c->query, $query, 'send did not spawn a new query');
+    is_deeply($out[-1], { type => 'user', session_id => 'default', message => { role => 'user', content => 'second prompt' }, parent_tool_use_id => undef }, 'the follow-up is a user message');
+    $c->send('third', session_id => 'sess-1');
+    is($out[-1]{session_id}, 'sess-1', 'an explicit session id is used');
+
+    my $f = $c->set_permission_mode_async('acceptEdits');
+    is($out[-1]{request}{subtype}, 'set_permission_mode', 'set_permission_mode delegates');
+    $query->feed_line($json->encode({ type => 'control_response', response => { subtype => 'success', request_id => $out[-1]{request_id}, response => {} } }));
+    ok($f->is_done, 'and resolves');
+    is_deeply($c->server_info, { commands => [] }, 'server_info delegates');
+
+    $c->disconnect;
+    ok(!$c->is_connected, 'disconnected');
+    is($closed, 1, 'disconnect closed stdin');
+    ok(!defined $c->query, 'the query is gone');
+    ok(!defined $c->interrupt, 'interrupt after disconnect returns undef');
+    ok($c->interrupt_async->is_failed, 'interrupt_async after disconnect fails');
+
+    $c->connect;
+    ok($c->is_connected, 'connect without a prompt');
+    is($out[-1]{request}{subtype}, 'initialize', 'a fresh initialize');
+    $c->disconnect;
+
+    $c->resume('sess-1');
+    is($c->session_id, 'sess-1', 'resume sets the session id');
+    is($c->query->options->resume, 'sess-1', 'resume option set on the new query');
+    ok(!$c->query->options->has_fork_session, 'resume does not fork');
+    is_deeply($c->query->options->allowed_tools, ['Read'], 'resume keeps the other options');
+    eval { $c->resume('sess-2') };
+    like($@, qr/Already connected/, 'resume while connected dies');
+    $c->disconnect;
+    $c->fork('sess-1', 'again');
+    ok($c->query->options->fork_session, 'fork sets fork_session');
+    $c->disconnect;
+};
+
 done_testing();

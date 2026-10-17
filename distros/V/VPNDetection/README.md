@@ -37,7 +37,7 @@ my $client = VPNDetection->new(api_key => $ENV{VPNDETECTION_API_KEY});
 
 my $result = $client->lookup('45.83.91.1');
 print $result->is_vpn;               # 1
-print $result->vpn->{provider};      # mullvad
+print $result->vpn->{provider};      # nordvpn
 print $result->is_hosting;           # 1
 print $result->hosting->{provider};
 ```
@@ -177,6 +177,29 @@ $client->lookup_p('45.83.91.1')
 ```
 
 The blocking calls are those same promises plus a `wait`, so both paths retry, cache and short-circuit identically. Inside an already running event loop the blocking calls cannot block, and say so rather than returning nothing.
+
+In a Mojolicious app, check the visitor in an `under`:
+
+```perl
+use Mojolicious::Lite -signatures;
+use VPNDetection;
+
+my $vpn = VPNDetection->new(api_key => $ENV{VPNDETECTION_API_KEY}, timeout => 2, retries => 0);
+
+under sub ($c) {
+    $vpn->lookup_p($c->tx->remote_address)->then(sub ($result) {
+        return $c->render(text => 'VPN not allowed', status => 403) if $result->is_vpn;
+        $c->continue;
+    })->catch(sub ($err) {
+        $c->app->log->warn("vpndetection: $err");
+        $c->continue;
+    });
+    return undef;
+};
+```
+
+- **Bound the lookup.** The defaults (30 seconds an attempt, two retries) outlast Mojolicious's own 30-second inactivity timeout, so with the API unreachable the visitor gets an empty reply, or a 502 through a proxy, before the `catch` runs.
+- **Return `undef` and call `$c->continue`.** A promise returned from an `under` does not hold the route: it carries on at once, and the 403 then dies with "A response has already been rendered".
 
 ### Database downloads
 

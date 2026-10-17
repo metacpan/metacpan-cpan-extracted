@@ -134,8 +134,9 @@ static int phd_seen_has(pTHX_ HV *seen, const char *k, STRLEN kl) {
 /* The pair list this request's path gets: the matching scoped policies,
  * longest prefix first, then the application-wide one - first mention of a
  * name wins, and an undef mention drops the name entirely. Returns an RV
- * (+1) to the effective flat AV, or NULL when nothing applies. When no
- * scope matches this is one newSVsv of the frozen state entry. */
+ * (+1) to the effective flat AV, or NULL when nothing applies. With no scoped
+ * policy and no CSP this is a reference to the frozen list itself, borrowed;
+ * with a CSP the frozen pairs are copied and the policy pair appended. */
 /* Punk::Plugin::CSP's per-request policy, appended to whatever the `headers`
  * keyword produced.
  *
@@ -149,13 +150,11 @@ static int phd_seen_has(pTHX_ HV *seen, const char *k, STRLEN kl) {
  * Set-if-absent comes free with the rest: an application that set its own
  * Content-Security-Policy on a particular response keeps it.
  */
-static void phd_csp_pair(pTHX_ HV *state, HV *env, AV *into) {
-    SV *cfg = ps_state(aTHX_ state, K_CSP);
-    HV *ch;
+static void phd_csp_pair(pTHX_ pk_state *S, HV *env, AV *into) {
+    HV *ch = S->csp;
     SV **rop;
     int report_only;
-    if (!(cfg && SvROK(cfg) && SvTYPE(SvRV(cfg)) == SVt_PVHV)) return;
-    ch = (HV *)SvRV(cfg);
+    if (!ch) return;
     rop = hv_fetchs(ch, "report_only", 0);
     report_only = (rop && *rop && SvOK(*rop) && SvTRUE(*rop));
 
@@ -181,9 +180,8 @@ static void phd_csp_pair(pTHX_ HV *state, HV *env, AV *into) {
     av_push(into, pcsp_policy(aTHX_ ch, env));
 }
 
-static SV *phd_effective(pTHX_ HV *state, HV *env) {
-    SV *app_sv    = ps_state(aTHX_ state, K_HEADERS);
-    SV *scoped_sv = ps_state(aTHX_ state, K_HEADERS_SCOPED);
+static SV *phd_effective(pTHX_ pk_state *S, HV *env) {
+    AV *app_pairs = S->headers;
     AV *scoped, *merged;
     HV *seen;
     SSize_t i, n;
@@ -191,12 +189,16 @@ static SV *phd_effective(pTHX_ HV *state, HV *env) {
     SV *pi;
     const char *p; STRLEN pl;
 
-    if (app_sv && !(SvROK(app_sv) && SvTYPE(SvRV(app_sv)) == SVt_PVAV))
-        app_sv = NULL;
-    if (!(scoped_sv && SvROK(scoped_sv)
-          && SvTYPE(SvRV(scoped_sv)) == SVt_PVAV)) {
-        AV *only = app_sv ? (AV *)SvRV(app_sv) : NULL;
-        AV *outv = newAV();
+    if (!S->headers_scoped) {
+        AV *only = app_pairs;
+        AV *outv;
+        /* nothing configured: nothing to allocate either */
+        if (!only && !S->csp) return NULL;
+        /* no CSP to append: the frozen list itself, borrowed. Every reader
+         * copies what it takes from it (phd_add_absent, the stream and
+         * Future wrappers hold the reference), so it is never written. */
+        if (!S->csp) return newRV_inc((SV *)only);
+        outv = newAV();
         if (only) {
             SSize_t k, kn = av_len(only) + 1;
             for (k = 0; k < kn; k++) {
@@ -204,12 +206,12 @@ static SV *phd_effective(pTHX_ HV *state, HV *env) {
                 av_push(outv, (x && *x) ? newSVsv(*x) : newSV(0));
             }
         }
-        phd_csp_pair(aTHX_ state, env, outv);
+        phd_csp_pair(aTHX_ S, env, outv);
         if (av_len(outv) < 0) { SvREFCNT_dec((SV *)outv); return NULL; }
         return newRV_noinc((SV *)outv);
     }
 
-    scoped = (AV *)SvRV(scoped_sv);
+    scoped = S->headers_scoped;
     n = av_len(scoped) + 1;
     pi = pco_env(aTHX_ env, "PATH_INFO");
     p  = pi ? SvPV_const(pi, pl) : "/";
@@ -251,8 +253,10 @@ static SV *phd_effective(pTHX_ HV *state, HV *env) {
         }
     }
     if (!hits) {
-        AV *only = app_sv ? (AV *)SvRV(app_sv) : NULL;
-        AV *outv = newAV();
+        AV *only = app_pairs;
+        AV *outv;
+        if (!only && !S->csp) return NULL;
+        outv = newAV();
         if (only) {
             SSize_t k, kn = av_len(only) + 1;
             for (k = 0; k < kn; k++) {
@@ -260,12 +264,12 @@ static SV *phd_effective(pTHX_ HV *state, HV *env) {
                 av_push(outv, (x && *x) ? newSVsv(*x) : newSV(0));
             }
         }
-        phd_csp_pair(aTHX_ state, env, outv);
+        phd_csp_pair(aTHX_ S, env, outv);
         if (av_len(outv) < 0) { SvREFCNT_dec((SV *)outv); return NULL; }
         return newRV_noinc((SV *)outv);
     }
-    if (app_sv) {
-        AV *pairs = (AV *)SvRV(app_sv);
+    if (app_pairs) {
+        AV *pairs = app_pairs;
         SSize_t j, np = av_len(pairs) + 1;
         for (j = 0; j + 1 < np; j += 2) {
             SV **kp = av_fetch(pairs, j, 0);
@@ -279,7 +283,7 @@ static SV *phd_effective(pTHX_ HV *state, HV *env) {
             av_push(merged, newSVsv(*vp));
         }
     }
-    phd_csp_pair(aTHX_ state, env, merged);
+    phd_csp_pair(aTHX_ S, env, merged);
     return newRV_noinc((SV *)merged);
 }
 
@@ -366,12 +370,12 @@ XS_INTERNAL(phd_stream_cb) {
 
 /* Decorate whatever pc_app_cb is about to return - the same three shapes
  * pco_decorate handles, with the same replacements in place. */
-static void phd_decorate(pTHX_ HV *state, HV *env, SV **resp) {
+static void phd_decorate(pTHX_ pk_state *S, HV *env, SV **resp) {
     SV *pairs_sv;
     AV *pairs;
 
     if (!(*resp && SvROK(*resp))) return;
-    pairs_sv = phd_effective(aTHX_ state, env);
+    pairs_sv = phd_effective(aTHX_ S, env);
     if (!pairs_sv) return;
     sv_2mortal(pairs_sv);
     pairs = (AV *)SvRV(pairs_sv);

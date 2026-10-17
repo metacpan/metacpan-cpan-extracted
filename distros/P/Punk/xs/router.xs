@@ -78,6 +78,7 @@ compile(self, resolve, ...)
             }
         }
         pr_build(aTHX_ rt, routes);
+        SP = PL_stack_base + ax - 1;      /* $resolve ran Perl */
         XPUSHs(self);
     }
 

@@ -1,5 +1,18 @@
 Revision history for Claude-Agent
 
+0.14    2026-10-16
+	- Refactor to use Object::Proto
+	- Speak the Claude Code SDK control protocol
+	- Run hooks through the CLI
+	- Answer can_use_tool permission requests through --permission-prompt-tool stdio.
+	- Serve SDK MCP servers in-process over mcp_message; remove SDKServer and SDKRunner.
+	- Add options: effort, tools, betas, max_budget_usd, add_dirs, settings, session_id, fallback_model, thinking, include_hook_events, forward_subagent_text, strict_mcp_config, plugins, extra_args, env, stderr, cli_path, enable_file_checkpointing.
+	- Honour cwd, continue_conversation, include_partial_messages, sandbox and agents.
+	- Add permission modes auto and manual; drop delegate.
+	- Parse every stream-json message type; keep the raw hash on each message; add StreamEvent, RateLimitEvent, ToolProgress and HookEvent.
+	- Client keeps one CLI process per session.
+	- Add Query methods set_model, set_max_thinking_tokens, mcp_status, get_context_usage, server_info, close and the _async forms.
+
 0.13    2026-01-11
 	- fix progress spinner
 

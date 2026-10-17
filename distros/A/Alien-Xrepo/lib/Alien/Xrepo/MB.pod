@@ -78,6 +78,10 @@ In addition to the standard L<Module::Build> properties, you can configure:
 
 =item * C<xrepo_update_repo>: Pass C<1> to refresh C<xrepo>'s repository index (C<xrepo update-repo>) once and retry an install that fails. Useful when a stale registry reports a precompiled artifact with a checksum that no longer matches the mirror.
 
+=item * C<xrepo_verbose>: Pass C<1> to forward C<verbose> to the engine, enabling its status chatter and passing C<-v> to C<xrepo install> so a package that fails to build prints its full C<install.txt> (by default only the tail is shown). Defaults to C<0>.
+
+=item * C<xrepo_diagnosis>: Pass C<1> to forward C<diagnosis> to the engine, passing C<-D> to C<xrepo install> so a failed build includes C<xmake>'s diagnostic detail. Defaults to C<0>.
+
 =back
 
 =head1 SEE ALSO

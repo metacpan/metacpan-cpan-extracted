@@ -258,6 +258,54 @@ JSON
     like($sp, qr/Every widget/, 'the summary rides along into the stub');
 }
 
+# ---- a spec string is data, wherever it lands in generated Perl -----------------
+# Scheme attributes and paths sit on comment lines of generated Perl, where a
+# newline would end the comment. (A quote in a scheme NAME cannot arrive:
+# Open::API refuses a component name that is not [A-Za-z0-9._-]; the escaper
+# for the quoted spot is checked on its own.)
+{
+    my $root = tempdir();
+    my $spec = "$root/quoted.json";
+    _spew($spec, <<'JSON');
+{
+  "openapi": "3.1.0",
+  "info": { "title": "Quoted", "version": "1" },
+  "components": { "securitySchemes": {
+    "api.key": { "type": "apiKey", "in": "header", "name": "X-K\nsystem('id')" }
+  } },
+  "security": [ { "api.key": [] } ],
+  "paths": {
+    "/things\n# not a comment": {
+      "get": { "operationId": "listThings",
+               "responses": { "200": { "description": "ok" } } }
+    }
+  }
+}
+JSON
+    my $dir = "$root/Quoted";
+    my $err = '';
+    eval { Punk::Generate->new(name => 'Quoted', dir => $dir, api => $spec)->run; 1 }
+        or $err = $@;
+    SKIP: {
+        skip "Open::API refuses this document upstream: $err", 4 if $err;
+        my $auth = _slurp("$dir/lib/Quoted/Controller/API/Auth.pm");
+        unlike($auth, qr/^\s*system\(/m,
+            'a newline in a scheme attribute does not end its comment');
+        my ($things) = grep { !/Auth\.pm\z/ } glob("$dir/lib/Quoted/Controller/API/*.pm");
+        my $api = _slurp($things);
+        unlike($api, qr/^# not a comment/m,
+            'a newline in a path does not end its comment');
+        for my $f ("$dir/lib/Quoted/Controller/API/Auth.pm", $things) {
+            my $out = `$^X -I"$dir/lib" -c "$f" 2>&1`;
+            like($out, qr/syntax OK/, "$f compiles") or diag $out;
+        }
+    }
+    is(Punk::Generate::_perl_q("k'; die 'x\n"), "k\\'; die \\'x ",
+        'the single-quote escaper escapes the quote and flattens the newline');
+    is(Punk::Generate::_one_line("a\r\nb\x00c"), 'a b c',
+        'the comment-line filter flattens every control byte');
+}
+
 # ---- determinism -------------------------------------------------------------
 # operations comes back in hash order, which perl randomises per process. If
 # the generator did not sort, regenerating the same spec would shuffle subs

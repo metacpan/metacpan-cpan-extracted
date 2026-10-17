@@ -161,12 +161,9 @@ static void pcsp_add(pTHX_ SV *out, const char *name, const char *val,
  * sources and the nonce, in one directive, rather than a second script-src
  * that browsers would ignore.
  */
-static SV *pcsp_policy(pTHX_ HV *cfg, HV *env) {
+static SV *pcsp_policy_build(pTHX_ HV *cfg, const char *np, STRLEN nl) {
     SV *out = newSVpvs("");
     SV **v;
-    SV *nonce = pcsp_nonce(aTHX_ env);
-    STRLEN nl;
-    const char *np = SvPV_const(nonce, nl);
 
     v = cfg ? hv_fetchs(cfg, "default_src", 0) : NULL;
     {   STRLEN l; const char *p = (v && *v && SvOK(*v))
@@ -224,6 +221,48 @@ static SV *pcsp_policy(pTHX_ HV *cfg, HV *env) {
         }
     }
 
+    return out;
+}
+
+/* This request's policy: the configured directives frozen once as the text
+ * before and after the nonce, so a response is two copies and the nonce
+ * rather than eleven lookups and a dozen concatenations. The two halves are
+ * kept in the policy hash under private keys; it is not written after boot. */
+#define PCSP_PRE_KEY "_prefix"
+#define PCSP_SUF_KEY "_suffix"
+
+static SV *pcsp_policy(pTHX_ HV *cfg, HV *env) {
+    SV *nonce = pcsp_nonce(aTHX_ env);
+    STRLEN nl, pl, sl;
+    const char *np = SvPV_const(nonce, nl);
+    SV **pre = cfg ? hv_fetchs(cfg, PCSP_PRE_KEY, 0) : NULL;
+    SV **suf = cfg ? hv_fetchs(cfg, PCSP_SUF_KEY, 0) : NULL;
+    SV *out;
+    if (!(pre && *pre && suf && *suf)) {
+        /* build once around a one-byte placeholder no directive can hold */
+        SV *full = pcsp_policy_build(aTHX_ cfg, "\x01", 1);
+        STRLEN fl;
+        const char *fp = SvPV_const(full, fl);
+        const char *at = (const char *)memchr(fp, 1, fl);
+        if (!at || !cfg) {              /* no nonce slot: the text as built */
+            SvREFCNT_dec(full);
+            return pcsp_policy_build(aTHX_ cfg, np, nl);
+        }
+        (void)hv_stores(cfg, PCSP_PRE_KEY, newSVpvn(fp, (STRLEN)(at - fp)));
+        (void)hv_stores(cfg, PCSP_SUF_KEY,
+                        newSVpvn(at + 1, fl - (STRLEN)(at - fp) - 1));
+        SvREFCNT_dec(full);
+        pre = hv_fetchs(cfg, PCSP_PRE_KEY, 0);
+        suf = hv_fetchs(cfg, PCSP_SUF_KEY, 0);
+    }
+    pl = SvCUR(*pre); sl = SvCUR(*suf);
+    out = newSV(pl + nl + sl + 1);
+    SvPOK_on(out);
+    memcpy(SvPVX(out), SvPVX(*pre), pl);
+    memcpy(SvPVX(out) + pl, np, nl);
+    memcpy(SvPVX(out) + pl + nl, SvPVX(*suf), sl);
+    SvPVX(out)[pl + nl + sl] = '\0';
+    SvCUR_set(out, pl + nl + sl);
     return out;
 }
 

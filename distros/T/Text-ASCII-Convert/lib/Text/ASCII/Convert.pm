@@ -1,11 +1,11 @@
 package Text::ASCII::Convert;
 use strict;
 use warnings FATAL => 'all';
-use Encode qw(decode);
+use Encode qw(decode FB_CROAK LEAVE_SRC);
 use base 'Exporter';
 our @EXPORT = qw(convert_to_ascii);
 our @EXPORT_OK = qw(convert_to_ascii);
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 my %char_map;
 
 =encoding utf8
@@ -101,7 +101,14 @@ UNITCHECK {
 # Zero-width characters and combining marks are removed. Multiple spaces are collapsed into a single space.
 #
 sub convert_to_ascii {
-    my $str = is_valid_utf_8($_[0]) ? decode('UTF-8', $_[0]) : $_[0];
+    return $_[0] if !defined $_[0];
+    # Decode as UTF-8 if the input is syntactically valid UTF-8, otherwise
+    # treat it as already-decoded characters. FB_CROAK dies on invalid input
+    # (caught by eval) and LEAVE_SRC keeps the source buffer untouched. A plain
+    # decode (rather than a validating regex) avoids Perl's "Complex regular
+    # subexpression recursion limit (65534) exceeded" on inputs over ~64K chars.
+    my $decoded = eval { decode('UTF-8', $_[0], FB_CROAK | LEAVE_SRC) };
+    my $str = defined $decoded ? $decoded : $_[0];
     # remove zero-width characters and combining marks
     $str =~ s/[\xAD\x{034F}\x{200A}-\x{200F}\x{202A}\x{202B}\x{202C}\x{2060}\x{FEFF}]|\p{Combining_Mark}//g;
     # replace non-ascii characters with ascii equivalents
@@ -109,43 +116,6 @@ sub convert_to_ascii {
     # collapse spaces
     $str =~ s/\x{20}+/ /g;
     return $str;
-}
-
-# returns true if the provided string of octets represents a syntactically
-# valid UTF-8 string, otherwise a false is returned.
-# Copied from Mail::SpamAssassin::Util::is_valid_utf8
-#
-sub is_valid_utf_8 {
-    return undef if !defined $_[0];
-    #
-    # RFC 6532: UTF8-non-ascii = UTF8-2 / UTF8-3 / UTF8-4
-    # RFC 3629 section 4: Syntax of UTF-8 Byte Sequences
-    #   UTF8-char   = UTF8-1 / UTF8-2 / UTF8-3 / UTF8-4
-    #   UTF8-1      = %x00-7F
-    #   UTF8-2      = %xC2-DF UTF8-tail
-    #   UTF8-3      = %xE0 %xA0-BF UTF8-tail /
-    #                 %xE1-EC 2( UTF8-tail ) /
-    #                 %xED %x80-9F UTF8-tail /
-    #                   # U+D800..U+DFFF are utf16 surrogates, not legal utf8
-    #                 %xEE-EF 2( UTF8-tail )
-    #   UTF8-4      = %xF0 %x90-BF 2( UTF8-tail ) /
-    #                 %xF1-F3 3( UTF8-tail ) /
-    #                 %xF4 %x80-8F 2( UTF8-tail )
-    #   UTF8-tail   = %x80-BF
-    #
-    # loose variant:
-    #   [\x00-\x7F] | [\xC0-\xDF][\x80-\xBF] |
-    #   [\xE0-\xEF][\x80-\xBF]{2} | [\xF0-\xF4][\x80-\xBF]{3}
-    #
-    $_[0] =~ /^ (?: [\x00-\x7F] |
-                  [\xC2-\xDF] [\x80-\xBF] |
-                  \xE0 [\xA0-\xBF] [\x80-\xBF] |
-                  [\xE1-\xEC] [\x80-\xBF]{2} |
-                  \xED [\x80-\x9F] [\x80-\xBF] |
-                  [\xEE-\xEF] [\x80-\xBF]{2} |
-                  \xF0 [\x90-\xBF] [\x80-\xBF]{2} |
-                  [\xF1-\xF3] [\x80-\xBF]{3} |
-                  \xF4 [\x80-\x8F] [\x80-\xBF]{2} )* \z/xs ? 1 : 0;
 }
 
 

@@ -1,20 +1,20 @@
-# NAME
+## Name
 
 Locale::Places - Translate places between different languages using http://download.geonames.org/
 
-# VERSION
+## Version
 
-Version 0.16
+Version 0.17
 
-# SYNOPSIS
+## Synopsis
 
 Provides the functionality for translating place names between different languages using data from GeoNames.
 It currently supports places in Great Britain (GB) and the United States (US) and relies on localized databases.
 For example, London is Londres in French.
 
-# METHODS
+## Methods
 
-## new
+### New
 
 Create a Locale::Places object.
 
@@ -43,7 +43,7 @@ Takes different argument formats (hash or positional)
 
 Any other options are passed to the underlying database driver.
 
-## translate
+### Translate
 
 Translate a city into a different language.
 
@@ -59,10 +59,12 @@ Returns:
 Example:
     use Locale::Places;
 
-    # Prints "Douvres"
-    print Locale::Places->new()->translate({ place => 'Dover', country => 'GB', from => 'en', to => 'fr' });
+```perl
+# Prints "Douvres"
+print Locale::Places->new()->translate({ place => 'Dover', country => 'GB', from => 'en', to => 'fr' });
+```
 
-### Translation Resolution Order
+#### Translation Resolution Order
 
 - 1. Preferred names
 - 2. Non-preferred names
@@ -71,68 +73,78 @@ Example:
 - 5. Single-translation disambiguation
 - 6. Identity fallback
 
-### API SPECIFICATION
+#### Api Specification
 
-#### INPUT
+##### Input
 
-    {
-      'place' => { 'type' => 'string', 'min' => 2, 'max' => 64 },
-      'from' => { 'type' => 'string', 'min' => 2, 'max' => 64, optional => 1 },
-      'to' => { 'type' => 'string', 'min' => 2, 'max' => 64, optional => 1 },
-      'country' => { 'type' => 'string', 'min' => 2, 'max' => 64, optional => 1 }
-    }
+```perl
+{
+  'place' => { 'type' => 'string', 'min' => 2, 'max' => 64 },
+  'from' => { 'type' => 'string', 'min' => 2, 'max' => 64, optional => 1 },
+  'to' => { 'type' => 'string', 'min' => 2, 'max' => 64, optional => 1 },
+  'country' => { 'type' => 'string', 'min' => 2, 'max' => 64, optional => 1 }
+}
+```
 
-#### OUTPUT
+##### Output
 
 Argument error: croak
 No matches found: undef
 
-    {
-      'type' => 'string',
-      'min' => 1
-    }
+```perl
+{
+  'type' => 'string',
+  'min' => 1
+}
+```
 
-## AUTOLOAD
+### Autoload
 
 Translate to the given language, where the routine's name will be the target language.
 
-    # Prints 'Virginie', since that's Virginia in French
-    print $places->fr({ place => 'Virginia', from => 'en', country => 'US' });
+```perl
+# Prints 'Virginie', since that's Virginia in French
+print $places->fr({ place => 'Virginia', from => 'en', country => 'US' });
+```
 
 Extracts the target language from the method name and calls `translate()` internally.
 
 Returns a string containing the translated name if found, or undef if no translation exists.
 
-# AUTHOR
+## Author
 
 Nigel Horne, `<njh at nigelhorne.com>`
 
-# BUGS
+## Bugs
 
 Only supports places in GB and the US at the moment.
 
-Canterbury no longer translates to CantorbÃ©ry in French.
+Canterbury no longer translates to Cantorbéry in French.
 This is a problem with the data, which has this line:
 
-    16324587    2653877 fr      Canterbury      1
+```
+16324587    2653877 fr      Canterbury      1
+```
 
 which overrides the translation by setting the 'isPreferredName' flag
 
 Can't specify below the country level.
 For example, is Virginia a state, a town in Illinois or one in Minnesota?
 
-# SEE ALSO
+## See Also
 
 - [Test Coverage Report](https://nigelhorne.github.io/Locale-Places/coverage/)
 - [Locale::Country::Multilingual](https://metacpan.org/pod/Locale%3A%3ACountry%3A%3AMultilingual) to translate country names.
 
-# SUPPORT
+## Support
 
 This module is provided as-is without any warranty.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Locale::Places
+```
+perldoc Locale::Places
+```
 
 You can also look for information at:
 
@@ -160,7 +172,7 @@ You can also look for information at:
 
     [https://groups.google.com/g/geonames](https://groups.google.com/g/geonames)
 
-# LICENCE AND COPYRIGHT
+## Licence and Copyright
 
 Copyright 2020-2026 Nigel Horne.
 

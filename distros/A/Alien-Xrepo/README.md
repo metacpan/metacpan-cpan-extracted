@@ -101,7 +101,15 @@ Creates a new instance. All values are optional.
 
 - **verbose**
 
-    Boolean. If true, prints command output and status messages to `STDOUT`. Defaults to `0`.
+    Boolean. If true, prints command output and status messages to `STDOUT`, and passes `-v` (`--verbose`) to `xrepo
+    install` so `xmake` prints the full `install.txt` of a package that fails to build (by default only the tail is
+    shown, and the file lives on the build machine). Defaults to `0`. May be overridden per-call with `verbose =>
+    ...` on any store-touching method.
+
+- **diagnosis**
+
+    Boolean. If true, passes `-D` (`--diagnosis`) to `xrepo install`, adding `xmake`'s diagnostic detail to the log of
+    a package that fails to build. Defaults to `0`. May be overridden per-call with `diagnosis => ...`.
 
 - **root**
 

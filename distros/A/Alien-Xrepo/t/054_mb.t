@@ -42,6 +42,18 @@ subtest 'loads as a Module::Build subclass' => sub {
     is $b->xrepo_cache,     0,     'xrepo_cache defaults to 0';
     is $b->xrepo_snapshot,  undef, 'xrepo_snapshot defaults to undef (auto-derive)';
     is $b->xrepo_share_dir, undef, 'xrepo_share_dir defaults to undef (snapshot parent)';
+    is $b->xrepo_verbose,   0,     'xrepo_verbose defaults to 0';
+    is $b->xrepo_diagnosis, 0,     'xrepo_diagnosis defaults to 0';
+    my $loud = Alien::Xrepo::MB->new(
+        module_name     => 'Exotic::Foo',
+        base_dir        => $dir,
+        build_dir       => $dir,
+        dist_version    => 'v1.0.0',
+        xrepo_verbose   => 1,
+        xrepo_diagnosis => 1
+    );
+    is $loud->xrepo_verbose,   1, 'xrepo_verbose read back';
+    is $loud->xrepo_diagnosis, 1, 'xrepo_diagnosis read back';
 };
 subtest 'snapshot path derives from the module tail' => sub {
     my $root = make_mini_dist();

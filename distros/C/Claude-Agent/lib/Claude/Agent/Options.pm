@@ -4,259 +4,145 @@ use 5.020;
 use strict;
 use warnings;
 
-use Types::Common -types;
-use Marlin
-    # Tool configuration
-    'allowed_tools?'    => ArrayRef[Str],    # Tools Claude can use
-    'disallowed_tools?' => ArrayRef[Str],    # Tools Claude cannot use
+use Carp ();
+use Object::Proto ();
+use Claude::Agent::Types;
 
-    # System prompt configuration
-    'system_prompt?' => Str | HashRef,        # String or hashref with preset
-
-    # Permission settings
-    'permission_mode?' => Enum['default', 'acceptEdits', 'bypassPermissions', 'dontAsk', 'plan'],
-
-    # MCP server configuration
-    'mcp_servers?' => HashRef,                # Server name => config hashref
-
-    # Hook configuration
-    'hooks?' => HashRef,                      # Event name => arrayref of matchers
-
-    # Permission callback
-    'can_use_tool?' => CodeRef,               # Coderef for permission prompts
-
-    # Working directory
-    'cwd?' => Str,                            # Working directory for agent
-
-    # Model configuration
-    'model?' => Str,                          # Model name (e.g., 'claude-sonnet-4-5')
-
-    # Turn limits
-    'max_turns?' => Int,                      # Maximum conversation turns
-
-    # Session management
-    'resume?'       => Str,                   # Session ID to resume
-    'fork_session?' => Bool,                  # Fork session when resuming (default false)
-
-    # Subagent definitions
-    'agents?' => HashRef,                     # Agent name => AgentDefinition
-
-    # Structured output
-    'output_format?',                         # JSON schema for structured outputs
-
-    # Settings sources
-    'setting_sources?' => ArrayRef[Str],     # 'user', 'project', 'local'
-
-    # Sandbox settings
-    'sandbox?',                               # Sandbox configuration
-
-    # Include partial messages during streaming
-    'include_partial_messages?' => Bool,
-
-    # Continue conversation from previous messages
-    'continue_conversation?' => Bool,
-
-    # Query timeout in seconds (default 600 = 10 minutes)
-    'query_timeout?' => Int,
-
-    # Dry-run mode - preview tool calls without executing writes
-    'dry_run?' => Bool,
-
-    # Dry-run callback for custom handling
-    'on_dry_run?' => CodeRef;
-
-=head1 NAME
-
-Claude::Agent::Options - Configuration options for Claude Agent queries
-
-=head1 SYNOPSIS
-
-    use Claude::Agent::Options;
-
-    my $options = Claude::Agent::Options->new(
-        allowed_tools   => ['Read', 'Glob', 'Grep'],
-        permission_mode => 'bypassPermissions',
-        model           => 'claude-sonnet-4-5',
-        max_turns       => 10,
+BEGIN {
+    Object::Proto::define('Claude::Agent::Options',
+        'allowed_tools:StrList:predicate',
+        'disallowed_tools:StrList:predicate',
+        'tools:predicate',
+        'system_prompt:StrOrHashRef:predicate',
+        'permission_mode:PermissionMode:predicate',
+        'permission_prompt_tool_name:Str:predicate',
+        'can_use_tool:CodeRef:predicate',
+        'mcp_servers:HashRef:predicate',
+        'strict_mcp_config:Bool:predicate',
+        'hooks:HashRef:predicate',
+        'agents:HashRef:predicate',
+        'cwd:Str:predicate',
+        'add_dirs:StrList:predicate',
+        'env:HashRef:predicate',
+        'model:Str:predicate',
+        'fallback_model:Str:predicate',
+        'effort:Effort:predicate',
+        'thinking:HashRef:predicate',
+        'max_thinking_tokens:Int:predicate',
+        'betas:StrList:predicate',
+        'max_turns:Int:predicate',
+        'max_budget_usd:Num:predicate',
+        'resume:Str:predicate',
+        'continue_conversation:Bool:predicate',
+        'session_id:Str:predicate',
+        'fork_session:Bool:predicate',
+        'output_format:predicate',
+        'settings:StrOrHashRef:predicate',
+        'setting_sources:StrList:predicate',
+        'sandbox:HashRef:predicate',
+        'plugins:ArrayRef:predicate',
+        'include_partial_messages:Bool:predicate',
+        'include_hook_events:Bool:predicate',
+        'forward_subagent_text:Bool:predicate',
+        'enable_file_checkpointing:Bool:predicate',
+        'extra_args:HashRef:predicate',
+        'stderr:CodeRef:predicate',
+        'cli_path:Str:predicate',
+        'query_timeout:Int:default(600):predicate',
+        'dry_run:Bool:predicate',
+        'on_dry_run:CodeRef:predicate',
     );
+}
 
-=head1 DESCRIPTION
+my %CAMEL = (
+    allowed_tools               => 'allowedTools',
+    disallowed_tools            => 'disallowedTools',
+    system_prompt               => 'systemPrompt',
+    permission_mode             => 'permissionMode',
+    permission_prompt_tool_name => 'permissionPromptToolName',
+    strict_mcp_config           => 'strictMcpConfig',
+    add_dirs                    => 'addDirs',
+    fallback_model              => 'fallbackModel',
+    max_thinking_tokens         => 'maxThinkingTokens',
+    max_turns                   => 'maxTurns',
+    max_budget_usd              => 'maxBudgetUsd',
+    continue_conversation       => 'continueConversation',
+    session_id                  => 'sessionId',
+    fork_session                => 'forkSession',
+    output_format               => 'outputFormat',
+    setting_sources             => 'settingSources',
+    include_partial_messages    => 'includePartialMessages',
+    include_hook_events         => 'includeHookEvents',
+    forward_subagent_text       => 'forwardSubagentText',
+    enable_file_checkpointing   => 'enableFileCheckpointing',
+    extra_args                  => 'extraArgs',
+    cli_path                    => 'cliPath',
+    query_timeout               => 'queryTimeout',
+    dry_run                     => 'dryRun',
+);
 
-This module defines all configuration options that can be passed to the
-C<query()> function in L<Claude::Agent>.
+my %SKIP_IN_HASH = map { $_ => 1 } qw(can_use_tool hooks stderr on_dry_run);
 
-=head1 ATTRIBUTES
-
-=head2 allowed_tools
-
-ArrayRef of tool names that Claude is allowed to use.
-
-=head2 disallowed_tools
-
-ArrayRef of tool names that Claude is not allowed to use.
-
-=head2 system_prompt
-
-Custom system prompt. Can be a string or a hashref with a C<preset> key.
-
-=head2 permission_mode
-
-Controls how permissions are handled. Valid values:
-
-=over 4
-
-=item * C<default> - Normal permission behavior
-
-=item * C<acceptEdits> - Auto-accept file edits
-
-=item * C<bypassPermissions> - Bypass all permission checks
-
-=item * C<dontAsk> - Auto-deny tools unless explicitly allowed
-
-=back
-
-=head2 mcp_servers
-
-HashRef of MCP server configurations. Keys are server names, values are
-configuration hashrefs.
-
-=head2 hooks
-
-HashRef of hook configurations. Keys are event names (e.g., 'PreToolUse'),
-values are arrayrefs of L<Claude::Agent::Hook::Matcher> objects.
-
-=head2 can_use_tool
-
-Coderef callback for permission prompts. Called when Claude needs permission
-to use a tool.
-
-    can_use_tool => sub {
-        my ($tool_name, $input, $context) = @_;
-        # Return Claude::Agent::Permission->allow(...) or ->deny(...)
+sub BUILD {
+    my ($self) = @_;
+    if ($self->has_session_id) {
+        my $id = $self->session_id;
+        Carp::croak("session_id must be a UUID, not '$id'")
+            unless $id =~ /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     }
-
-=head2 cwd
-
-Working directory for the agent.
-
-=head2 model
-
-Model name to use (e.g., 'claude-sonnet-4-5', 'claude-opus-4').
-
-=head2 max_turns
-
-Maximum number of conversation turns before stopping.
-
-=head2 resume
-
-Session ID to resume a previous conversation.
-
-=head2 fork_session
-
-Boolean. If true, forking the session when resuming creates a new session ID.
-
-=head2 agents
-
-HashRef of subagent definitions. Keys are agent names, values are
-L<Claude::Agent::Subagent> objects.
-
-=head2 output_format
-
-Configuration for structured outputs. Should be a hashref with:
-
-    output_format => {
-        type   => 'json_schema',
-        schema => { ... JSON Schema ... }
+    if ($self->has_can_use_tool && $self->has_permission_prompt_tool_name) {
+        Carp::croak("can_use_tool and permission_prompt_tool_name cannot both be set");
     }
+    if ($self->has_thinking) {
+        my $type = $self->thinking->{type} // '';
+        Carp::croak("thinking->{type} must be adaptive, enabled or disabled, not '$type'")
+            unless $type =~ /^(?:adaptive|enabled|disabled)$/;
+    }
+    if ($self->has_plugins) {
+        for my $plugin (@{$self->plugins}) {
+            Carp::croak("plugins entries are hashrefs with type => 'local' and a path")
+                unless ref $plugin eq 'HASH'
+                    && ($plugin->{type} // 'local') eq 'local'
+                    && defined $plugin->{path};
+        }
+    }
+    return;
+}
 
-=head2 setting_sources
+sub create {
+    my ($class, %args) = @_;
+    return $class->new(Claude::Agent::Types::check_args($class, %args));
+}
 
-ArrayRef specifying which settings files to load. Valid values:
-'user', 'project', 'local'.
-
-=head2 sandbox
-
-Sandbox configuration settings.
-
-=head2 include_partial_messages
-
-Boolean. If true, include partial messages during streaming.
-
-=head2 continue_conversation
-
-Boolean. If true, continue from previous conversation messages.
-
-=head2 query_timeout
-
-Timeout in seconds for the C<next()> method to wait for messages.
-Defaults to 600 seconds (10 minutes). Set to a lower value for
-interactive applications, or higher for complex long-running queries.
-
-The MCP tool handler timeout can be configured via the
-C<CLAUDE_AGENT_TOOL_TIMEOUT> environment variable (default 60 seconds).
-
-=head2 dry_run
-
-Boolean. If true, enables dry-run mode where file-modifying tools (Write, Edit,
-Bash with write operations) are intercepted and their effects are previewed
-without actually executing them. Read-only tools (Read, Glob, Grep) still execute
-normally.
-
-    my $options = Claude::Agent::Options->new(
-        dry_run => 1,
-        on_dry_run => sub {
-            my ($tool_name, $tool_input, $preview) = @_;
-            print "Would execute $tool_name:\n";
-            print "  $preview\n";
-        },
-    );
-
-=head2 on_dry_run
-
-Coderef callback invoked when a tool is blocked in dry-run mode. Receives:
-
-=over 4
-
-=item * tool_name - Name of the tool that would execute
-
-=item * tool_input - HashRef of input parameters
-
-=item * preview - Human-readable preview of what would happen
-
-=back
-
-=head1 METHODS
-
-=head2 to_hash
-
-    my $hash = $options->to_hash;
-
-Convert options to a hashref for CLI arguments or serialization.
-Uses camelCase keys to match the SDK API format.
-
-=cut
+sub with {
+    my ($self, %overrides) = @_;
+    my %args;
+    for my $name (Object::Proto::properties(ref $self)) {
+        my $has = "has_$name";
+        $args{$name} = $self->$name if $self->$has;
+    }
+    for my $name (keys %overrides) {
+        if (defined $overrides{$name}) {
+            $args{$name} = $overrides{$name};
+        }
+        else {
+            delete $args{$name};
+        }
+    }
+    return (ref $self)->create(%args);
+}
 
 sub to_hash {
     my ($self) = @_;
 
     my %hash;
+    for my $name (Object::Proto::properties(ref $self)) {
+        next if $SKIP_IN_HASH{$name};
+        my $has = "has_$name";
+        next unless $self->$has;
+        $hash{ $CAMEL{$name} // $name } = $self->$name;
+    }
 
-    $hash{allowedTools} = $self->allowed_tools if $self->has_allowed_tools;
-    $hash{disallowedTools} = $self->disallowed_tools if $self->has_disallowed_tools;
-    $hash{systemPrompt} = $self->system_prompt if $self->has_system_prompt;
-    $hash{permissionMode} = $self->permission_mode if $self->has_permission_mode;
-    $hash{model} = $self->model if $self->has_model;
-    $hash{maxTurns} = $self->max_turns if $self->has_max_turns;
-    $hash{cwd} = $self->cwd if $self->has_cwd;
-    $hash{resume} = $self->resume if $self->has_resume;
-    $hash{forkSession} = $self->fork_session if $self->has_fork_session;
-    $hash{outputFormat} = $self->output_format if $self->has_output_format;
-    $hash{settingSources} = $self->setting_sources if $self->has_setting_sources;
-    $hash{sandbox} = $self->sandbox if $self->has_sandbox;
-    $hash{includePartialMessages} = $self->include_partial_messages if $self->has_include_partial_messages;
-    $hash{continueConversation} = $self->continue_conversation if $self->has_continue_conversation;
-
-    # Handle MCP servers
     if ($self->has_mcp_servers) {
         $hash{mcpServers} = {
             map {
@@ -266,7 +152,6 @@ sub to_hash {
         };
     }
 
-    # Handle agents (subagents)
     if ($self->has_agents) {
         $hash{agents} = {
             map {
@@ -279,6 +164,281 @@ sub to_hash {
     return \%hash;
 }
 
+1;
+
+__END__
+
+=head1 NAME
+
+Claude::Agent::Options - Configuration options for Claude Agent queries
+
+=head1 SYNOPSIS
+
+    use Claude::Agent::Options;
+
+    my $options = Claude::Agent::Options->new(
+        allowed_tools   => ['Read', 'Glob', 'Grep'],
+        permission_mode => 'acceptEdits',
+        model           => 'sonnet',
+        effort          => 'high',
+        max_turns       => 10,
+    );
+
+=head1 DESCRIPTION
+
+This module defines every option that C<query()>, C<session()> and
+L<Claude::Agent::Query> accept. Each option maps to a flag of the C<claude>
+CLI, an entry of the SDK C<initialize> request, or a behaviour of the Perl
+side; the mapping is given with each attribute.
+
+=head1 CONSTRUCTORS
+
+=head2 new
+
+    my $options = Claude::Agent::Options->new(%options);
+
+Takes a flat list of name/value pairs. An option this class does not know
+is ignored, so prefer C<create> when the names come from configuration.
+Passing a hashref is not supported.
+
+=head2 create
+
+    my $options = Claude::Agent::Options->create(%options);
+
+As C<new>, but croaks naming every unknown option. C<Claude::Agent::query>
+and C<session> build their options this way when given a hashref.
+
+=head1 ATTRIBUTES
+
+Every attribute is optional and has a C<has_*> predicate that reports
+whether it was given.
+
+=head2 allowed_tools
+
+ArrayRef of tool names Claude may use without asking. C<--allowedTools>.
+
+=head2 disallowed_tools
+
+ArrayRef of tool names Claude may not use. C<--disallowedTools>.
+
+=head2 tools
+
+Which built-in tools exist at all: an ArrayRef of names, C<[]> for none, or
+C<{ type =E<gt> 'preset' }> for the default set. C<--tools>.
+
+=head2 system_prompt
+
+A string replaces the system prompt (C<--system-prompt>). A hashref is one
+of C<{ type =E<gt> 'preset', preset =E<gt> 'claude_code', append =E<gt> $text }>
+(keep the CLI's prompt and append; C<--append-system-prompt>),
+C<{ type =E<gt> 'custom', prompt =E<gt> $text }> (C<--system-prompt>) or
+C<{ type =E<gt> 'file', path =E<gt> $file }> (C<--system-prompt-file>). A hashref
+with only C<preset> is read as the preset form. When unset the CLI's own
+prompt is used.
+
+=head2 permission_mode
+
+One of C<default>, C<acceptEdits>, C<bypassPermissions>, C<dontAsk>,
+C<plan>, C<auto> or C<manual>. C<--permission-mode>.
+
+=head2 permission_prompt_tool_name
+
+The MCP tool that answers permission prompts (C<--permission-prompt-tool>).
+Cannot be combined with C<can_use_tool>, which sets it to C<stdio>.
+
+=head2 can_use_tool
+
+    can_use_tool => sub {
+        my ($tool_name, $input, $context) = @_;
+        return Claude::Agent::Permission->allow;
+    }
+
+Callback asked whenever the CLI would prompt for permission. It receives
+the tool name, its input and a L<Claude::Agent::Permission::Context>, and
+returns a L<Claude::Agent::Permission::Result>, a hashref with a C<behavior>
+key, or a L<Future> of either.
+
+=head2 mcp_servers
+
+HashRef of MCP server configurations keyed by name: L<Claude::Agent::MCP::Server>
+objects run in this process, L<Claude::Agent::MCP::StdioServer>,
+L<Claude::Agent::MCP::SSEServer> and L<Claude::Agent::MCP::HTTPServer>
+objects (or plain hashrefs) are passed to the CLI. C<--mcp-config>.
+
+=head2 strict_mcp_config
+
+Use only the servers in C<mcp_servers>. C<--strict-mcp-config>.
+
+=head2 hooks
+
+HashRef of event name to ArrayRef of L<Claude::Agent::Hook::Matcher>
+objects, registered with the CLI in the C<initialize> request.
+
+=head2 agents
+
+HashRef of subagent name to L<Claude::Agent::Subagent>, sent in the
+C<initialize> request.
+
+=head2 cwd
+
+Working directory for the CLI process.
+
+=head2 add_dirs
+
+ArrayRef of extra directories the tools may touch. One C<--add-dir> each.
+
+=head2 env
+
+HashRef of environment variables set for the CLI process, over the
+inherited environment.
+
+=head2 model
+
+Model name or alias. C<--model>.
+
+=head2 fallback_model
+
+Model to use when the first is overloaded. C<--fallback-model>.
+
+=head2 effort
+
+One of C<low>, C<medium>, C<high>, C<xhigh>, C<max>. C<--effort>.
+
+=head2 thinking
+
+C<{ type =E<gt> 'adaptive' }>, C<{ type =E<gt> 'enabled', budget_tokens =E<gt> $n }>
+or C<{ type =E<gt> 'disabled' }>. C<--thinking> or C<--max-thinking-tokens>.
+
+=head2 max_thinking_tokens
+
+Thinking budget. C<--max-thinking-tokens>. Ignored when C<thinking> is set.
+
+=head2 betas
+
+ArrayRef of beta header names. C<--betas>.
+
+=head2 max_turns
+
+Maximum number of agentic turns. C<--max-turns>.
+
+=head2 max_budget_usd
+
+Spending cap for the query. C<--max-budget-usd>.
+
+=head2 resume
+
+Session ID to resume. C<--resume>.
+
+=head2 continue_conversation
+
+Continue the most recent conversation in the working directory.
+C<--continue>.
+
+=head2 session_id
+
+UUID to use for the new session. C<--session-id>. Validated at
+construction.
+
+=head2 fork_session
+
+When resuming, start a new session ID. C<--fork-session>.
+
+=head2 output_format
+
+    output_format => {
+        type   => 'json_schema',
+        schema => { ... JSON Schema ... },
+    }
+
+Structured output. The schema goes to C<--json-schema> and the parsed
+result arrives in the result message's C<structured_output>.
+
+=head2 settings
+
+Path to a settings file, a JSON string, or a hashref. C<--settings>.
+
+=head2 setting_sources
+
+ArrayRef of C<user>, C<project>, C<local>. C<--setting-sources>.
+
+=head2 sandbox
+
+Sandbox settings hashref, merged into C<settings> as its C<sandbox> key.
+
+=head2 plugins
+
+ArrayRef of C<{ type =E<gt> 'local', path =E<gt> $dir }>. One C<--plugin-dir>
+each.
+
+=head2 include_partial_messages
+
+Deliver L<Claude::Agent::Message::StreamEvent> messages as the model
+streams. C<--include-partial-messages>.
+
+=head2 include_hook_events
+
+Deliver L<Claude::Agent::Message::HookEvent> messages for every hook.
+C<--include-hook-events>.
+
+=head2 forward_subagent_text
+
+Deliver subagent assistant and user messages, with C<parent_tool_use_id>
+set. Sent in the C<initialize> request.
+
+=head2 enable_file_checkpointing
+
+Let the CLI checkpoint file changes so C<rewind_files> can undo them.
+
+=head2 extra_args
+
+HashRef of extra CLI flags without the leading dashes. A value of undef
+passes the bare flag.
+
+=head2 stderr
+
+Callback given each line of the CLI's standard error. By default they are
+logged at debug level.
+
+=head2 cli_path
+
+Path to the C<claude> executable, instead of searching for it.
+
+=head2 query_timeout
+
+Seconds the blocking C<next()> waits for a message. Default 600, maximum
+3600. Always set, so C<has_query_timeout> is always true.
+
+=head2 dry_run
+
+Preview file-modifying tools instead of running them. See
+L<Claude::Agent::DryRun>.
+
+=head2 on_dry_run
+
+    on_dry_run => sub {
+        my ($tool_name, $tool_input, $preview) = @_;
+        ...
+    }
+
+Callback for each tool blocked in dry-run mode.
+
+=head1 METHODS
+
+=head2 with
+
+    my $resumed = $options->with(resume => $session_id);
+
+A copy with the given options changed. A value of undef removes the
+option from the copy.
+
+=head2 to_hash
+
+    my $hash = $options->to_hash;
+
+The options that were given, as a hashref with camelCase keys. Callbacks
+and hooks are left out; MCP servers and agents are expanded with their
+own C<to_hash>.
+
 =head1 AUTHOR
 
 LNATION, C<< <email at lnation.org> >>
@@ -290,5 +450,3 @@ This software is Copyright (c) 2026 by LNATION.
 This is free software, licensed under The Artistic License 2.0 (GPL Compatible).
 
 =cut
-
-1;

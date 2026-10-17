@@ -149,8 +149,8 @@ subtest 'responses are unwrapped at the right depth' => sub {
             id => 'bogon_ip_v1', format => 'csvgz',
             checksums => { md5 => 'm', sha1 => 's1', sha256 => 's256', sha512 => 's512' },
         },
-        '/api/v2/database/downloads' => { downloads => [{ dataset_id => 'bogon_ip_v1', open => true }] },
-        '/api/v2/database/metadata' => { id => 'bogon_ip_v1', entries => 42, size => { csvgz => 760 } },
+        '/api/v2/database/downloads' => { downloads => [InternetDataTest::download(open => true)] },
+        '/api/v2/database/metadata' => InternetDataTest::metadata(),
     );
     my $origin = InternetDataTest::Origin->new(sub {
         my ($c) = @_;
@@ -176,7 +176,7 @@ subtest 'responses are unwrapped at the right depth' => sub {
         'open is read beside standing');
 
     my $downloads = $client->database->downloads;
-    is_deeply($downloads, [{ dataset_id => 'bogon_ip_v1', open => true }], 'downloads unwraps downloads');
+    is_deeply($downloads, $bodies{'/api/v2/database/downloads'}{downloads}, 'downloads unwraps downloads');
     ok($downloads->[0]{open}, 'and a download of an Open database says so');
     # metadata is the whole document rather than a member of it: it carries the
     # per-format size a caller budgets a transfer against.
@@ -227,13 +227,94 @@ subtest 'a 2xx a database call cannot read as its answer is a retried server_err
     is($origin->count, 2, 'and retried like any outage');
 };
 
+# Through 1.10.0 a member of another type than the spec's came back as served:
+# a version of "3" as a string, `{}` as a family, a `size` of "760" as the size.
+subtest 'a member of the wrong type at any depth is a retried server_error' => sub {
+    my $body;
+    my $origin = InternetDataTest::Origin->new(sub {
+        my ($c) = @_;
+        $c->res->headers->content_type('application/json');
+        $c->render(data => $body);
+    });
+    my $db = InternetData->new(base_url => $origin->url, api_key => 'k', retries => 1)->database;
+    my %calls = (
+        list => sub { $db->list },
+        metadata => sub { $db->metadata('bogon_ip_v1') },
+        checksums => sub { $db->checksums('bogon_ip_v1', 'csvgz') },
+        downloads => sub { $db->downloads },
+    );
+    my $family = InternetDataTest::family();
+    my $version = $family->{versions}[0];
+    my $listing = sub { { databases => [shift] } };
+    my %sums = (md5 => 'm', sha1 => 's1', sha256 => 's256', sha512 => 's512');
+    my @cases = (
+        [list => $listing->({ %$family, versions => [{ %$version, version => '3' }] })],
+        [list => $listing->({ %$family, versions => [{ %$version, version => 'x' }] })],
+        [list => $listing->({ %$family, versions => [{ %$version, version => 1.5 }] })],
+        [list => $listing->({ %$family, versions => [{ %$version, formats => [1] }] })],
+        [list => $listing->({ %$family, versions => [{ %$version, id => undef }] })],
+        [list => $listing->({ %$family, versions => [1] })],
+        [list => $listing->({ %$family, open => 'yes' })],
+        [list => $listing->({ %$family, open => 1 })],
+        [list => $listing->({ %$family, expires => 1 })],
+        [list => $listing->({ %$family, base => undef })],
+        [list => $listing->({})],
+        [metadata => InternetDataTest::metadata(entries => '42')],
+        [metadata => InternetDataTest::metadata(size => { csvgz => '760' })],
+        [metadata => InternetDataTest::metadata(size => '760')],
+        [metadata => InternetDataTest::metadata(schema => { csvgz => [{ name => 1, type => 't' }] })],
+        [metadata => InternetDataTest::metadata(sample => { csvgz => [1] })],
+        [metadata => InternetDataTest::metadata(updated => undef)],
+        [checksums => { checksums => { %sums, sha256 => 1 } }],
+        [checksums => { checksums => { %sums, sha512 => undef } }],
+        [downloads => { downloads => [InternetDataTest::download(bytes => '10')] }],
+        [downloads => { downloads => [InternetDataTest::download(open => 'true')] }],
+        [downloads => { downloads => [InternetDataTest::download(created => undef)] }],
+    );
+    for my $case (@cases) {
+        (my $name, my $wire) = @$case;
+        $body = Mojo::JSON::encode_json($wire);
+        $origin->reset;
+        my $error = eval { $calls{$name}->(); 1 } ? undef : $@;
+        ok(ref $error && $error->isa('InternetData::Error'), "$name, $body: raised an InternetData::Error")
+            or next;
+        is($error->kind, 'server_error', "$name, $body: server_error");
+        is($error->status, 200, "$name, $body: carrying the status");
+        is($origin->count, 2, "$name, $body: retried like any outage");
+    }
+};
+
+# Refusing these would fail every refused download and every family with no
+# license: a nullable member may be null, and an optional one absent.
+subtest 'nullable and optional members stay an answer' => sub {
+    my $family = InternetDataTest::family(expires => undef, license_type => undef);
+    delete $family->{starts};
+    my %bodies = (
+        '/api/v2/database/list' => { databases => [$family] },
+        '/api/v2/database/metadata' => InternetDataTest::metadata(),
+        '/api/v2/database/downloads' => { downloads => [InternetDataTest::download(
+            bytes => undef, http_status => undef, apikey_id => undef, client_ip => undef, user_agent => undef,
+        )] },
+    );
+    my $origin = InternetDataTest::Origin->new(sub {
+        my ($c) = @_;
+        $c->render(json => $bodies{ $c->req->url->path->to_string });
+    });
+    my $db = InternetData->new(base_url => $origin->url, api_key => 'k', retries => 0)->database;
+    is_deeply($db->list, [$family], 'a family with no license');
+    is($db->metadata('bogon_ip_v1')->{entries}, 42, 'metadata with no sample');
+    is($db->downloads->[0]{bytes}, undef, 'a refused download, its nulls kept');
+};
+
 subtest 'the query a call makes says what it asked for' => sub {
     my $origin = InternetDataTest::Origin->new(sub {
         my ($c) = @_;
         my %body = (
             '/api/v2/database/downloads' => { downloads => [] },
-            '/api/v2/database/checksum' => { checksums => {} },
-            '/api/v2/database/metadata' => { id => 'bogon_asn_v1' },
+            '/api/v2/database/checksum' => {
+                checksums => { md5 => 'm', sha1 => 's1', sha256 => 's256', sha512 => 's512' },
+            },
+            '/api/v2/database/metadata' => InternetDataTest::metadata(id => 'bogon_asn_v1'),
             '/api/v2/database/list' => { databases => [] },
         );
         $c->render(json => $body{ $c->req->url->path->to_string });
@@ -317,7 +398,7 @@ subtest 'a per-call timeout bounds every attempt of that call and nothing after 
         my $path = $c->req->url->path->to_string;
         return InternetDataTest::Origin::stall_body($c) if $path eq '/api/v2/database/list';
         $c->render_later;
-        Mojo::IOLoop->timer(0.5 => sub { $c->render(json => { id => 'bogon_ip_v1' }) });
+        Mojo::IOLoop->timer(0.5 => sub { $c->render(json => InternetDataTest::metadata()) });
     });
     my $ua = Mojo::UserAgent->new;
     my $db = InternetData->new(
@@ -421,7 +502,8 @@ subtest 'a zero written as a string is no bound too' => sub {
 subtest 'an unpublished format is refused before the network' => sub {
     my $origin = InternetDataTest::Origin->new(sub {
         my ($c, $o) = @_;
-        return $c->render(json => { checksums => {} }) if $c->req->url->path->to_string =~ /checksum/;
+        return $c->render(json => { checksums => { map { $_ => 'd' } qw(md5 sha1 sha256 sha512) } })
+            if $c->req->url->path->to_string =~ /checksum/;
         $c->res->headers->location($o->url . '/file');
         $c->rendered(302);
     });
@@ -471,7 +553,7 @@ subtest 'a 429 is retried only when it carries Retry-After' => sub {
             $c->res->headers->header('Retry-After' => 0) if $retryable;
             return $c->render(json => { rc => 'RATE_LIMITED' }, status => 429);
         }
-        $c->render(json => { id => 'ok' });
+        $c->render(json => InternetDataTest::metadata(id => 'ok'));
     });
     my $client = InternetData->new(base_url => $origin->url, api_key => 'k', retries => 2);
 

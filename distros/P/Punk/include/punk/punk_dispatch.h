@@ -143,29 +143,57 @@ static int pd_run_chain(pTHX_ AV *chain, SV *c, SV **ret, SV **err) {
 /* Read CONTENT_LENGTH bytes of the request body from the env's psgi.input,
  * rewinding after. Returns an owned SV, or NULL for no body; *cl_out gets the
  * CONTENT_LENGTH. */
-static SV *punk_oa_env_body(pTHX_ HV *env, IV *cl_out) {
+static SV *punk_oa_env_body(pTHX_ HV *env, IV *cl_out, IV max_body,
+                            int *over) {
     SV **in = env ? hv_fetchs(env, "psgi.input", 0) : NULL;
     SV **cl = env ? hv_fetchs(env, "CONTENT_LENGTH", 0) : NULL;
-    IV len  = (cl && *cl && SvOK(*cl)) ? SvIV(*cl) : 0;
-    if (cl_out) *cl_out = len;
-    if (!(in && *in && SvTRUE(*in) && len > 0)) return NULL;
+    IV len  = (cl && *cl && SvOK(*cl)) ? SvIV(*cl) : -1;
+    *over = 0;
+    /* No length and a buffered input (HTTP/2 and /3 frame the body without
+     * one) reads to EOF, as pq_body does. Not reading it validated an
+     * absent body while the controller read the real one. */
+    if (len < 0 && !(env && pq_input_buffered(aTHX_ env))) len = 0;
+    if (cl_out) *cl_out = len > 0 ? len : 0;
+    if (!(in && *in && SvTRUE(*in) && len != 0)) return NULL;
     {
         IO *io = sv_2io(*in);
         PerlIO *fp = io ? IoIFP(io) : NULL;
         SV *raw;
-        char *d;
         IV got = 0;
         if (!fp) return NULL;
-        raw = newSV(len + 1);
+        /* sized for what arrives, not for what the header declared */
+        raw = newSV((len > 0 && len < PQ_STREAM_CHUNK ? (STRLEN)len
+                                                       : PQ_STREAM_CHUNK) + 1);
         SvPOK_on(raw);
-        d = SvPVX(raw);
-        while (got < len) {
-            SSize_t n = PerlIO_read(fp, d + got, (Size_t)(len - got));
+        SvCUR_set(raw, 0);
+        *SvPVX(raw) = '\0';
+        for (;;) {
+            STRLEN want = (STRLEN)PQ_STREAM_CHUNK;
+            SSize_t n;
+            char *d;
+            if (len >= 0 && len - got < (IV)want) want = (STRLEN)(len - got);
+            if (!want) break;
+            if ((STRLEN)got + want + 1 > SvLEN(raw)) {
+                STRLEN need = (STRLEN)got + want + 1;
+                STRLEN grow = SvLEN(raw) * 2;
+                if (len >= 0 && grow > (STRLEN)len + 1) grow = (STRLEN)len + 1;
+                if (grow < need) grow = need;
+                (void)SvGROW(raw, grow);
+            }
+            d = SvPVX(raw);
+            n = PerlIO_read(fp, d + got, want);
             if (n <= 0) break;
             got += (IV)n;
+            SvCUR_set(raw, (STRLEN)got);
+            SvPVX(raw)[got] = '\0';
+            if (max_body > 0 && got > max_body) {
+                SvREFCNT_dec(raw);
+                *over = 1;
+                (void)PerlIO_seek(fp, 0, SEEK_SET);
+                return NULL;
+            }
         }
-        d[got] = '\0';
-        SvCUR_set(raw, (STRLEN)got);
+        if (cl_out) *cl_out = got;
         (void)PerlIO_seek(fp, 0, SEEK_SET);
         return raw;
     }
@@ -277,7 +305,16 @@ static void punk_oa_dispatch(pTHX_ SV *c, AV *before, HV *rec, SV *api,
     op   = apip ? A->op_by_id(aTHX_ apip, op_id) : NULL;
     if (!op) croak("Punk: unknown operationId '%s'", SvPV_nolen(op_id));
 
-    body  = punk_oa_env_body(aTHX_ env, &cl);
+    {
+        int over = 0;
+        body = punk_oa_env_body(aTHX_ env, &cl, max_body, &over);
+        if (over) {
+            ret = punk_triplet(aTHX_ 413,
+                               sv_2mortal(newSVpvs("application/json")),
+                               newSVpvs(PD_ERR_413), NULL);
+            goto done;
+        }
+    }
     if (body) body = sv_2mortal(body);
     rawh  = punk_oa_build_raw(aTHX_ env, caps, body, cl);
     typed = (HV *)sv_2mortal((SV *)newHV());

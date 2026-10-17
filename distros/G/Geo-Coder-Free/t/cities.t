@@ -4,7 +4,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 6;
+use Test::Most;
 use Test::Number::Delta;
 use Test::Log::Abstraction;
 
@@ -43,3 +43,5 @@ CITIES: {
 		}
 	}
 }
+
+done_testing();

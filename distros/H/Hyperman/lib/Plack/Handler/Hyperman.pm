@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Hyperman ();
 
-our $VERSION = '0.61';
+our $VERSION = '0.63';
 
 sub new {
     my ($class, %args) = @_;
@@ -25,6 +25,31 @@ sub _parse_listen {
     die "Plack::Handler::Hyperman: cannot parse listen spec '$spec'\n";
 }
 
+my @PASS = qw(reuseport completion max_requests_per_worker shutdown_grace affinity
+              idle_timeout header_timeout body_timeout request_timeout body_min_rate
+              max_pipeline http2 http3 http3_max_conns redirect_https
+              compress compress_min_length compress_level max_body
+              access_log access_log_format error_log deny_capacity rate_capacity
+              user group umask pid_file listen_fds proxy_protocol
+              bus_slots bus_slot_size bus_groups arena_name arena_size
+              distinct_clients
+              tls_cert tls_key tls_ca tls_verify tls_sni);
+
+# The spellings other servers use for the same things, so a plackup line
+# written for one of them is not silently a plaintext server here.
+my %ALIAS = (
+    ssl_cert_file => 'tls_cert',
+    ssl_key_file  => 'tls_key',
+    ssl_cert      => 'tls_cert',
+    ssl_key       => 'tls_key',
+    ssl_ca_file   => 'tls_ca',
+);
+
+# What plackup itself hands every handler, or consumes before it does.
+my %PLACK = map { $_ => 1 }
+    qw(app host port socket listen listen_sock server_ready daemonize pid
+       workers max_workers deny enable_ssl);
+
 sub run {
     my ($self, $app) = @_;
     my %args = (
@@ -32,16 +57,24 @@ sub run {
         workers => (defined $self->{workers}     ? $self->{workers}
                   : defined $self->{max_workers} ? $self->{max_workers}
                   : 0),                            # 0 = ncpu
-        map { defined $self->{$_} ? ($_ => $self->{$_}) : () }
-            qw(reuseport completion max_requests_per_worker shutdown_grace affinity
-               idle_timeout header_timeout body_timeout max_pipeline http2 http3 http3_max_conns redirect_https
-               compress compress_min_length compress_level max_body
-               access_log access_log_format error_log deny_capacity rate_capacity
-               user group umask pid_file listen_fds proxy_protocol
-               bus_slots bus_slot_size bus_groups arena_name arena_size
-               distinct_clients
-               tls_cert tls_key tls_ca tls_verify tls_sni),
+        map { defined $self->{$_} ? ($_ => $self->{$_}) : () } @PASS,
     );
+    for my $k (sort keys %ALIAS) {
+        next unless defined $self->{$k};
+        $args{ $ALIAS{$k} } = $self->{$k} unless defined $args{ $ALIAS{$k} };
+    }
+    # Hyperman->run croaks on an option it does not know; a handler that
+    # dropped one quietly turned a typo (or --enable-ssl with no files) into
+    # a server that was not what was asked for.
+    my %known = (map({ $_ => 1 } @PASS), %ALIAS, %PLACK);
+    for my $k (sort keys %$self) {
+        next if $known{$k};
+        warn "Plack::Handler::Hyperman: option '$k' is not one Hyperman takes; ignored\n";
+    }
+    if ($self->{enable_ssl} && !defined $args{tls_cert}) {
+        die "Plack::Handler::Hyperman: --enable-ssl needs --ssl-cert-file and "
+          . "--ssl-key-file (or --tls_cert and --tls_key)\n";
+    }
 
     # `deny` wants an arrayref, and plackup hands a single --deny through as
     # a plain scalar - which run() would quietly ignore, since it only reads

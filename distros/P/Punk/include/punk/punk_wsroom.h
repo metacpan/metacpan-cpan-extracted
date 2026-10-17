@@ -82,16 +82,26 @@ static IV pwr_fan_skip(pTHX_ SV *self, SV *frame, void *skip) {
     AV *live = (AV *)sv_2mortal((SV *)newAV());
     IV sent = 0;
     SSize_t i, n;
+    STRLEN flen;
+    const char *fp = SvPV_const(frame, flen);
     pwr_live(aTHX_ members, live);
     n = av_len(live) + 1;
     for (i = 0; i < n; i++) {
         SV *ws = *av_fetch(live, i, 0);
-        SV *argv[1], *r;
+        punk_wsconn *w;
         if (skip && (void *)SvRV(ws) == skip) continue;
         if (pwr_ws_state(aTHX_ ws) != PW_ST_OPEN) continue;
-        argv[0] = frame;
-        r = pcx_call_meth(aTHX_ ws, "_send_raw", argv, 1, 0);
-        if (r) SvREFCNT_dec(r);
+        /* what Punk::WebSocket::_send_raw does, without the method call
+         * per member: `live` holds a strong reference to each, so a member
+         * that fails here outlives the loop */
+        w = punk_ws_of(aTHX_ ws);
+        if (w->write_buffer_limit
+            && w->wlen - w->woff + flen > w->write_buffer_limit) {
+            pw_fail(aTHX_ w, PW_CLOSE_POLICY_VIOLATION, "send buffer full");
+            continue;
+        }
+        pw_append(&w->wbuf, &w->wlen, &w->wcap, fp, flen);
+        pw_flush(aTHX_ w);
         sent++;
     }
     return sent;

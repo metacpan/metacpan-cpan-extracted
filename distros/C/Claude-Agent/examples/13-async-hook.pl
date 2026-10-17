@@ -57,7 +57,8 @@ my $pre_tool_hooks = [
     # Async permission check hook
     Claude::Agent::Hook::Matcher->new(
         hooks => [sub {
-            my ($input, $tool_use_id, $context, $loop) = @_;
+            my ($input, $tool_use_id, $context) = @_;
+            my $loop = $context->loop;
             my $tool_name = $input->{tool_name};
 
             # If we have a loop, use async permission check
@@ -88,7 +89,8 @@ my $pre_tool_hooks = [
     # Async audit logging hook (non-blocking)
     Claude::Agent::Hook::Matcher->new(
         hooks => [sub {
-            my ($input, $tool_use_id, $context, $loop) = @_;
+            my ($input, $tool_use_id, $context) = @_;
+            my $loop = $context->loop;
             my $tool_name = $input->{tool_name};
             my $tool_input = $input->{tool_input};
 
@@ -109,7 +111,8 @@ my $pre_tool_hooks = [
 my $post_tool_hooks = [
     Claude::Agent::Hook::Matcher->new(
         hooks => [sub {
-            my ($input, $tool_use_id, $context, $loop) = @_;
+            my ($input, $tool_use_id, $context) = @_;
+            my $loop = $context->loop;
             my $tool_name = $input->{tool_name};
             my $tool_result = $input->{tool_result};
 
@@ -132,7 +135,8 @@ my $rate_limit_hooks = [
     Claude::Agent::Hook::Matcher->new(
         matcher => 'Grep',  # Only apply to Grep tool
         hooks   => [sub {
-            my ($input, $tool_use_id, $context, $loop) = @_;
+            my ($input, $tool_use_id, $context) = @_;
+            my $loop = $context->loop;
 
             if ($loop) {
                 # Simulate async rate limit check

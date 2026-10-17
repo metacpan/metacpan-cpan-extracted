@@ -1,0 +1,7 @@
+Revision history for Test::Consumer::Contract
+
+0.01	Fri Oct 16 08:52:09 PM EDT 2026
+	- First version, lifted from the reader/producer contract that lived inside
+	  Geo-Coder-Free/t/consumer-contract.t, so any distribution in the workspace
+	  can declare its producer keys and registered consumers and get the same
+	  three checks.

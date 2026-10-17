@@ -293,4 +293,28 @@ sub entries {
     }
 }
 
+# ---- a login replaces the CSRF token with the session id ----------------------------
+# The token minted for the anonymous session used to ride into the logged-in
+# one: a token planted before the login validated for the user after it.
+{
+    package FixTok;
+    use Punk;
+    session secret => 'k', expires => '7d', store => { backend => 'T::Store' };
+    csrf exempt => ['/login'];
+    auth model => 'users';
+    get  '/tok'   => sub { $_[0]->text($_[0]->csrf_token) };
+    post '/login' => sub { $_[0]->login(42); $_[0]->text('in') };
+    package main;
+}
+{
+    my $app = FixTok->to_app;
+    my $r0  = hit($app, path => '/tok');
+    my ($planted, $t0) = (sid($r0), $r0->[2][0]);
+    my $r1  = hit($app, method => 'POST', path => '/login', env => with($planted));
+    my $r2  = hit($app, path => '/tok', env => with(sid($r1)));
+    my $t1  = $r2->[2][0];
+    ok(length $t0 && length $t1, 'a token before and after the login');
+    isnt($t1, $t0, 'the login replaced it');
+}
+
 done_testing;

@@ -277,4 +277,17 @@ isa_ok($options->mcp_servers->{fs}, 'Claude::Agent::MCP::StdioServer');
 isa_ok($options->mcp_servers->{api}, 'Claude::Agent::MCP::SSEServer');
 isa_ok($options->mcp_servers->{http}, 'Claude::Agent::MCP::HTTPServer');
 
+# 0.14
+is_deeply($server->to_cli_config, { type => 'sdk', name => 'math-server' }, 'to_cli_config');
+is_deeply(Claude::Agent::MCP::Server->new(name => 'x')->tools, [], 'tools default to empty');
+is(Claude::Agent::MCP::Server->new(name => 'x')->version, '1.0.0', 'version default is a string');
+isnt(Claude::Agent::MCP::StdioServer->new(command => '/usr/bin/npx')->env,
+    Claude::Agent::MCP::StdioServer->new(command => '/usr/bin/npx')->env, 'default env is fresh per object');
+eval { $sse_server->type('http') };
+like($@, qr/readonly/, 'type is read only');
+eval { Claude::Agent::MCP::SSEServer->new(url => 'ftp://x') };
+like($@, qr/http or https/, 'SSE rejects a non-http URL');
+ok($http_server->is_sensitive_header('Authorization'), 'Authorization is sensitive');
+ok(!$http_server->is_sensitive_header('Accept'), 'Accept is not');
+
 done_testing();

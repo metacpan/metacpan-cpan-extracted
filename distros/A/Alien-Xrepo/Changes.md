@@ -5,6 +5,15 @@ All notable changes to Alien::Xrepo will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.0.9] - 2026-10-17
+
+### Added
+
+- New `Alien::Xrepo` fields:
+  - `verbose`: Passes `-v` to `xrepo install` 
+  - `diagnosis`: Passes `-D` 
+- Both the `verbose` and `diagnosis` flags are honored per-call on `install` and may be set via the `Alien::Xrepo::Build` engine, `Alien::Xrepo::Runtime`, or the `Alien::Xrepo::MB` / `Alien::Xrepo::MM` `xrepo_verbose` / `xrepo_diagnosis` build properties.
+
 ## [v1.0.8] - 2026-10-15
 
 ### Fixed
@@ -92,7 +101,8 @@ Splitting this out of the `Alien::Xmake` dist and repo
 
 - It exists? Check the Alien::Xmake changelog, I guess
 
-[Unreleased]: https://github.com/sanko/Alien-Xrepo/compare/v1.0.8...HEAD
+[Unreleased]: https://github.com/sanko/Alien-Xrepo/compare/v1.0.9...HEAD
+[v1.0.9]: https://github.com/sanko/Alien-Xrepo/compare/v1.0.8...v1.0.9
 [v1.0.8]: https://github.com/sanko/Alien-Xrepo/compare/v1.0.7...v1.0.8
 [v1.0.7]: https://github.com/sanko/Alien-Xrepo/compare/v1.0.6...v1.0.7
 [v1.0.6]: https://github.com/sanko/Alien-Xrepo/compare/v1.0.5...v1.0.6

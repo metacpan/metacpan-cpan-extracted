@@ -43,8 +43,10 @@ README.md
 t/00-load.t
 t/10-new.t
 t/30-basics.t
+t/accuracy-vocabulary.t
 t/admin1.t
 t/admin2.t
+t/bare-environment.pl
 t/bin.t
 t/cities.t
 t/comment-spelling.t
@@ -52,6 +54,7 @@ t/config.t
 t/consumer-contract.t
 t/critic.t
 t/display.t
+t/downloads.t
 t/dr5hn.t
 t/edge_cases.t
 t/eof.t
@@ -64,6 +67,7 @@ t/kwalitee.t
 t/links.t
 t/local.t
 t/locales.t
+t/location-rule.t
 t/logic-reducer.t
 t/manifest.t
 t/maxmind.t
@@ -83,6 +87,7 @@ t/pod-synopsis.t
 t/pod.t
 t/port.t
 t/prereq.t
+t/provenance-sites.t
 t/regression.t
 t/scantext.t
 t/strict.t
@@ -92,6 +97,7 @@ t/unused.t
 t/utils.t
 t/vars.t
 t/version.t
+t/vwf-sync.t
 t/whosonfirst.t
 templates/default/Geo/Coder/Free/Display/index.tmpl
 templates/default/Geo/Coder/Free/Display/meta_data.tmpl

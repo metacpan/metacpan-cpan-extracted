@@ -181,10 +181,10 @@ static void pco_common(pTHX_ AV *headers, HV *cfg, SV *allow) {
  * configured list is the whole reason preflight lives here - but the router
  * alone would miss every spec operation, which for an api-first application is
  * all of them. Pushes uppercase method SVs into `out`. */
-static void pco_methods_for(pTHX_ HV *state, const char *path, STRLEN plen,
+static void pco_methods_for(pTHX_ pk_state *S, const char *path, STRLEN plen,
                             AV *out) {
-    SV *router = ps_state(aTHX_ state, K_ROUTER);
-    AV *apims  = ps_state_av(aTHX_ state, K_API_MOUNTS);
+    SV *router = S->router_sv;
+    AV *apims  = S->apims;
     HV *seen   = (HV *)sv_2mortal((SV *)newHV());
     SSize_t i, n;
 
@@ -254,9 +254,8 @@ static void pco_methods_for(pTHX_ HV *state, const char *path, STRLEN plen,
  *
  * Returns the response (+1), or NULL when this is not a preflight and the
  * request should carry on to punk_serve. */
-static SV *pco_preflight(pTHX_ HV *state, HV *env) {
-    SV *cfg_sv = ps_state(aTHX_ state, K_CORS);
-    HV *cfg;
+static SV *pco_preflight(pTHX_ pk_state *S, HV *env) {
+    HV *cfg = S->cors;
     SV *method, *origin, *want, *allow;
     AV *methods = NULL, *headers, *resp, *body;
     SV *mlist = NULL;
@@ -264,9 +263,7 @@ static SV *pco_preflight(pTHX_ HV *state, HV *env) {
     const char *m, *w;
     int i, n, found = 0;
 
-    if (!(cfg_sv && SvROK(cfg_sv) && SvTYPE(SvRV(cfg_sv)) == SVt_PVHV))
-        return NULL;
-    cfg = (HV *)SvRV(cfg_sv);
+    if (!cfg) return NULL;
 
     method = pco_env(aTHX_ env, "REQUEST_METHOD");
     if (!method) return NULL;
@@ -305,7 +302,7 @@ static SV *pco_preflight(pTHX_ HV *state, HV *env) {
             const char *p = pi ? SvPV_const(pi, pl) : "/";
             if (!pi) pl = 1;
             methods = (AV *)sv_2mortal((SV *)newAV());
-            pco_methods_for(aTHX_ state, p, pl, methods);
+            pco_methods_for(aTHX_ S, p, pl, methods);
             w = SvPV_const(want, wl);
             n = (int)(av_len(methods) + 1);
             for (i = 0; i < n; i++) {
@@ -466,13 +463,14 @@ XS_INTERNAL(pco_stream_cb) {
  * three matter: a triplet (including the 404s and 405s that never build a
  * context), a streaming coderef, and a Future from a nonblocking handler.
  * *resp is replaced in place for the shapes that need wrapping. */
-static void pco_decorate(pTHX_ HV *state, HV *env, SV **resp) {
-    SV *cfg_sv = ps_state(aTHX_ state, K_CORS);
-    HV *cfg;
+static void pco_decorate(pTHX_ pk_state *S, HV *env, SV **resp) {
+    HV *cfg = S->cors;
+    SV *cfg_sv;
     SV *origin, *allow;
 
-    if (!(cfg_sv && SvROK(cfg_sv) && SvTYPE(SvRV(cfg_sv)) == SVt_PVHV)) return;
-    cfg = (HV *)SvRV(cfg_sv);
+    if (!cfg) return;
+    /* the stream and Future shapes below capture the policy as a reference */
+    cfg_sv = sv_2mortal(newRV_inc((SV *)cfg));
     origin = pco_env(aTHX_ env, "HTTP_ORIGIN");
     if (!pco_path_ok(aTHX_ cfg, env)) return;
     allow = origin ? pco_allow_origin(aTHX_ cfg, origin) : NULL;

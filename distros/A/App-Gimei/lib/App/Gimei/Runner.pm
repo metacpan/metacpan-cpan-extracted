@@ -1,4 +1,4 @@
-use v5.40;
+use v5.42;
 use feature 'class';
 no warnings 'experimental::class';
 
@@ -17,13 +17,13 @@ class App::Gimei::Runner {
     # instance variables
     #
 
-    field $conf : param = { POD_FILE => pod_where( { -inc => 1 }, 'App::Gimei' ) };
+    field $conf = { POD_FILE => pod_where( { -inc => 1 }, 'App::Gimei' ) };
 
     #
-    # instance methods
+    # private instance methods
     #
 
-    method _parse_option ( $args_ref, $opts_ref ) {
+    my method _parse_option ( $args_ref, $opts_ref ) {
         $opts_ref->{n}   = 1;
         $opts_ref->{sep} = ', ';
 
@@ -40,9 +40,13 @@ class App::Gimei::Runner {
         }
     }
 
+    #
+    # public instance methods
+    #
+
     method execute (@args) {
         my %opts;
-        $self->_parse_option( \@args, \%opts );
+        $self->&_parse_option( \@args, \%opts );
 
         if ( $opts{version} ) {
             say "$App::Gimei::VERSION";
@@ -58,9 +62,7 @@ class App::Gimei::Runner {
             push @args, 'name:kanji';
         }
 
-        #        my $parser     = App::Gimei::Parser->new( args => \@args );
-        #        my $generators = $parser->parse();
-        my $generators = App::Gimei::Parser::parse( \@args );
+        my $generators = App::Gimei::Parser::parse(\@args);
 
         _semantic_analysis($generators);
 

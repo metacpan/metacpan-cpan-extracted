@@ -48,6 +48,22 @@ ok($h{'X-RateLimit-Reset'} > time, '...X-RateLimit-Reset is in the future');
 is(hit($app, env => { REMOTE_ADDR => '203.0.113.56' })->[0], 200,
    'a different client has its own budget');
 
+# ---- a header rule with no header counts the address --------------------------
+# A client that left the header off used to meet no limit at all.
+{
+    package RLHdr;
+    use Punk;
+    rate_limit limit => 1, window => 60, by => 'header:X-K', tag => "hdr$$";
+    get '/' => sub { $_[0]->text('ok') };
+    package main;
+    my $h  = RLHdr->to_app;
+    my @s  = map { hit($h, env => { REMOTE_ADDR => '203.0.113.90' })->[0] } 1 .. 2;
+    is_deeply(\@s, [ 200, 429 ], 'without the header the rule limits by address');
+    is(hit($h, env => { REMOTE_ADDR => '203.0.113.90', HTTP_X_K => 'k1' })->[0],
+       200, 'with it, the header value is its own bucket');
+}
+
+
 # ---- key strategies: header, coderef, and a `for` prefix --------------------
 {
     package RLApp2;
@@ -106,8 +122,20 @@ is(hit($app2, path => '/api/1', env => { HTTP_X_USER => 'anon' })->[0], 200,
     is($rem, 0, '...reporting limit-1 remaining');
     is($c->block_ip('1.2.3.4'), 0, 'block_ip is a no-op without the arena');
 
-    my @s = map { hit($app, %ip)->[0] } 1 .. 6;
-    is_deeply(\@s, [ (200) x 6 ], 'the rate_limit keyword fails open too');
+    # The keyword resolves the ABI table once and keeps the pointer (the
+    # switch is an environment scan, and reading it per request cost more
+    # than the limit check), so the switch has to be set before the first
+    # request of the process: a fresh interpreter shows the keyword failing
+    # open the same way.
+    my @s = do {
+        local $ENV{PUNK_NO_HM_ABI} = 1;
+        my $inc = join ' ', map { "-I$_" } @INC[0 .. 3];
+        my $out = `$^X $inc -e 'package RLFresh; use Punk; rate_limit limit => 1, window => 60, by => "ip"; get "/" => sub { \$_[0]->text("ok") }; package main; use PunkTest; my \$a = RLFresh->to_app; print join " ", map { hit(\$a, env => { REMOTE_ADDR => "203.0.113.55" })->[0] } 1 .. 6' 2>&1`;
+        split ' ', $out;
+    };
+    is_deeply(\@s, [ (200) x 6 ],
+        'the rate_limit keyword fails open too, in a process that never had the ABI')
+        or diag "@s";
 }
 
 done_testing;

@@ -458,7 +458,7 @@ sub doit
 	# Three independent checks are run in order of cheapness:
 	#   1. CGI::ACL — cloud ranges, country blocks, explicit IP allow/deny.
 	#   2. blacklisted() — in-process IP set built from prior SQL-injection attempts.
-	#   3. CGI::Geo::Coder::Free::Allow — DShield feed, user-agent blacklist, throttler, IDS.
+	#   3. Geo::Coder::Free::Allow — DShield feed, user-agent blacklist, throttler, IDS.
 	if(my $remote_addr = $ENV{'REMOTE_ADDR'}) {
 		my $reason;
 		if($acl->all_denied(lingua => $lingua)) {
@@ -466,17 +466,17 @@ sub doit
 		} elsif(blacklisted($info)) {
 			$reason = 'Blacklisted for attempting to break in';
 		} else {
-			# CGI::Geo::Coder::Free::Allow may throw an Error object when it blocks a request.
+			# Geo::Coder::Free::Allow may throw an Error object when it blocks a request.
 			# Catch it here so the 403 response is sent rather than propagating.
 			try {
-				unless(CGI::Geo::Coder::Free::Allow::allow({
+				unless(Geo::Coder::Free::Allow::allow({
 					info   => $info,
 					lingua => $lingua,
 					logger => $logger,
 					cache  => $rate_limit_cache,
 					config => $config,
 				})) {
-					$reason = 'Blocked by CGI::Geo::Coder::Free::Allow';
+					$reason = 'Blocked by Geo::Coder::Free::Allow';
 				}
 			} catch Error with {
 				$reason = shift;

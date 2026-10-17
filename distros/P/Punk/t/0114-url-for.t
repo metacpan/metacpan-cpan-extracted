@@ -360,4 +360,22 @@ sub urls_env {
     is $h{Location}, '/books/7', 'and the Location is what url_for returned';
 }
 
+# ---- a URL that would leave the site, or that a browser rewrites -------------------
+{
+    local @CALL = ([ 'file', path => '/evil.example' ],
+                   [ 'file', path => '//evil.example/x' ],
+                   [ 'book', id => '..' ],
+                   [ 'book', id => '.' ],
+                   [ 'file', path => 'a/../b' ],
+                   [ 'file', path => 'a/./b.txt' ]);
+    my @out = split /\n/, hit($app, path => '/u')->[2][0];
+    like($out[0], qr/ERR: .*starts with '\/'/,
+        'a splat value beginning with / croaks: it would build //host');
+    like($out[1], qr/ERR: .*starts with '\/'/, '...and so does //host/x');
+    like($out[2], qr/ERR: .*'\.\.' segment/, 'a .. capture croaks');
+    like($out[3], qr/ERR: .*'\.' segment/, 'a . capture croaks');
+    like($out[4], qr/ERR: .*'\.\.' segment/, 'a .. segment inside a splat croaks');
+    like($out[5], qr/ERR: .*'\.' segment/, 'a . segment inside a splat croaks');
+}
+
 done_testing;

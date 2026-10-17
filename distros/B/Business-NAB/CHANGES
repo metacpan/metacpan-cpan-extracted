@@ -1,10 +1,39 @@
 ==================================================
-Changes from 2025-10-01 00:00:00 +0000 to present.
+Changes from 2025-10-16 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.10 at 2026-10-01 06:50:38 +0000
+version 0.11 at 2026-10-16 11:34:48 +0000
 -----------------------------------------
+
+  Change: 932691408d302fe92929ff8dfaabd5146d24acbb
+  Author: Lee J <lee@payprop.com>
+  Date : 2026-10-16 13:34:11 +0000
+
+    Merge pull request #7 from payprop/lee/more_response_status
+
+    handle more status values in XML ACK response files 
+
+  Change: 0c67dec306b53abaa790c94fb9d0eb2440d56d9d
+  Author: Lee Johnson <lee@payprop.com>
+  Date : 2026-10-15 13:37:26 +0000
+
+    handle more status values in XML ACK response files
+
+    convert the free form text into the meaningful status values as per
+    the NAB docs[^1]. it would be better if this XML was modelled
+    correctly, but i've complained about that before and we just have to
+    deal with it
+
+    exercise with some test coverage, bump VERSION and Changes for CPAN
+    release
+
+    [^1]:
+    nab-direct-link-australian-direct-entry-payments-and-dishonour-report
+    .pdf
+
+    [^2]: 6babd0527837248ded98e6086f43d1ca0ed5b6e9 and also
+    474b1a077d0cb1f88fda187d4fcf63303de8133f 
 
   Change: d1e0b7d5b75e8b2dd5b3137245bceef1e6b4bb69
   Author: Lee Johnson <lee@payprop.com>

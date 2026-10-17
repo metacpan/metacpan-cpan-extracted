@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Test::DescribeMe qw(author);
-use Test::Most tests => 4;
+use Test::Most;
 
 use constant URL => 'https://api.github.com/repos/nigelhorne/Geo-Coder-Free/issues';
 use constant SITE =>'api.github.com';
@@ -74,9 +74,11 @@ GITHUB: {
 					}
 				} else {
 					diag("Can't connect to ", SITE, ": $IO::Socket::errstr");
-					skip("Can't connect to " . SITE . ": $IO::Socket::errstr", 1);
-				}
+				skip("Can't connect to " . SITE . ": $IO::Socket::errstr", 1);
 			}
 		}
 	}
+}
+
+done_testing();
 }

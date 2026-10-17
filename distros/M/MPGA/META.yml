@@ -17,8 +17,8 @@ no_index:
 provides:
   MPGA:
     file: lib/MPGA.pm
-    version: '0.08'
+    version: '0.24'
 resources:
   repository: https://github.com/nni7/MPGA.git
-version: v0.08
+version: v0.24
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -135,6 +135,10 @@ get(self)
                 croak("Punk::Future: AWAIT_GET on a future that is not ready");
         }
         else if (pf->state == PF_PENDING) pf_await(aTHX_ self);  /* pump/sleep */
+        /* pf_await ran the loop, and anything on it may have grown the value
+         * stack; a grown stack is reallocated, so the SP captured on entry
+         * points into freed memory. Re-derive it before pushing. */
+        SP = PL_stack_base + ax - 1;
         if (pf->state == PF_CANCELLED)
             croak("Punk::Future: get on a cancelled future");
         if (pf->state == PF_FAILED) {
@@ -365,6 +369,7 @@ await(self, f)
         PERL_UNUSED_VAR(self);
         pf = pf_of(aTHX_ f);
         if (pf->state == PF_PENDING) pf_await(aTHX_ f);
+        SP = PL_stack_base + ax - 1;      /* the loop ran: see get above */
         if (pf->state == PF_CANCELLED) croak("Punk::Future: await on a cancelled future");
         if (pf->state == PF_FAILED) {
             SV **fl = pf->vals ? av_fetch(pf->vals, 0, 0) : NULL;

@@ -17,8 +17,8 @@
 ]>
 <ISBNRangeMessage>
   <MessageSource>International ISBN Agency</MessageSource>
-  <MessageSerialNumber>decd00a9-b5f9-4bbf-8a8c-ee1aee776c41</MessageSerialNumber>
-  <MessageDate>Thu, 15 Oct 2026 09:22:23 UTC</MessageDate>
+  <MessageSerialNumber>f555024d-ede5-4176-8e45-ab7def6768b2</MessageSerialNumber>
+  <MessageDate>Fri, 16 Oct 2026 08:28:35 UTC</MessageDate>
   <EAN.UCCPrefixes>
     <EAN.UCC>
       <Prefix>978</Prefix>
@@ -8867,31 +8867,23 @@
       <Agency>Paraguay</Agency>
       <Rules>
         <Rule>
-          <Range>0000000-1999999</Range>
+          <Range>0000000-2999999</Range>
           <Length>1</Length>
         </Rule>
         <Rule>
-          <Range>2000000-4499999</Range>
+          <Range>3000000-3499999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>
-          <Range>4500000-4999999</Range>
+          <Range>3500000-7999999</Range>
           <Length>2</Length>
         </Rule>
         <Rule>
-          <Range>5000000-7999999</Range>
-          <Length>2</Length>
-        </Rule>
-        <Rule>
-          <Range>8000000-8749999</Range>
+          <Range>8000000-8499999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>
-          <Range>8750000-8999999</Range>
-          <Length>3</Length>
-        </Rule>
-        <Rule>
-          <Range>9000000-9999999</Range>
+          <Range>8500000-9999999</Range>
           <Length>3</Length>
         </Rule>
       </Rules>
@@ -8931,19 +8923,19 @@
           <Length>1</Length>
         </Rule>
         <Rule>
-          <Range>1000000-4999999</Range>
+          <Range>1000000-4899999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>
-          <Range>5000000-6099999</Range>
+          <Range>4900000-6099999</Range>
           <Length>2</Length>
         </Rule>
         <Rule>
-          <Range>6100000-9599999</Range>
+          <Range>6100000-9549999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>
-          <Range>9600000-9999999</Range>
+          <Range>9550000-9999999</Range>
           <Length>3</Length>
         </Rule>
       </Rules>

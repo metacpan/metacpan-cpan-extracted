@@ -6,7 +6,7 @@ use warnings;
 use Punk ();
 use Apophis ();
 
-our $VERSION = '0.59';
+our $VERSION = '0.60';
 
 1;
 

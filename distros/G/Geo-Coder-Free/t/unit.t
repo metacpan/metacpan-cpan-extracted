@@ -113,6 +113,21 @@ my %LEDGER = (
 	# Geo::Coder::Free::valid_location
 	'GCF::valid_location'            => 1,
 
+	# Geo::Coder::Free::geocode_many
+	'GCF::geocode_many map'              => 1,
+	'GCF::geocode_many counts'           => 1,
+	'GCF::geocode_many unresolved list'  => 1,
+	'GCF::geocode_many distinct'         => 1,
+	'GCF::geocode_many region'           => 1,
+	'GCF::geocode_many croak'            => 1,
+	'GCF::geocode_many undef value'      => 1,
+	'GCF::geocode_many invalid_on_error' => 1,
+	'GCF::geocode_many reserved'         => 1,
+	'GCF::geocode_many empty'            => 1,
+	'GCF::geocode_many conventions'      => 1,
+	'GCF::geocode_many usage'            => 1,
+	'GCF::geocode_many backend dies'     => 1,
+
 	# Geo::Coder::Free::reverse_geocode
 	'GCF::reverse_geocode usage_reverse'  => 1,
 	'GCF::reverse_geocode unsupported'    => 1,
@@ -327,6 +342,138 @@ subtest 'GCF::valid_location — the predicate, and the non-croaking mode' => su
 	throws_ok { $geo->geocode(location => 'Ramsgate, Kent', on_error => 'ignore') }
 		qr/on_error must be/, 'unknown on_error croaks invalid_on_error';
 	delete $LEDGER{'GCF::geocode invalid_on_error'};
+};
+
+subtest 'GCF::geocode_many — the batch loop, its counts and its refusals' => sub {
+	my $geo = Geo::Coder::Free->new();
+
+	# The backend is asked per call and answers per location, so that a value
+	# which resolves, one which does not, and one the module refuses before any
+	# backend are told apart.  This file's own mock is reinstated at the end.
+	my @asked;
+	restore_all();
+	mock('Geo::Coder::Free::MaxMind', 'geocode', sub {
+		my ($mm, $params) = @_;
+		push @asked, { location => $params->{'location'}, region => $params->{'region'} };
+		return $params->{'location'} =~ /Ramsgate/ ? $MOCK_PT : undef;
+	});
+	mock('Geo::Coder::Free::MaxMind', 'reverse_geocode', sub { return undef });
+
+	my @places = ('Ramsgate, Kent', 'Nowhere, Imaginary, ZZ', 'Ramsgate, Kent', '0044');
+	my $batch = $geo->geocode_many(\@places, region => 'GB', on_error => 'undef');
+
+	# The map: one entry per distinct value, hit or miss, so that a caller
+	# walking a column can look each row up without asking whether it was in the
+	# batch.
+	isa_ok($batch, 'HASH', 'geocode_many() returns a hashref');
+	isa_ok($batch->{'Ramsgate, Kent'}, 'Geo::Location::Point', 'a hit is keyed by its value');
+	is($batch->{'Ramsgate, Kent'}->lat(), $MOCK_LAT, 'and it is the point the backend gave');
+	ok(exists($batch->{'Nowhere, Imaginary, ZZ'}) && !defined($batch->{'Nowhere, Imaginary, ZZ'}),
+		'a value that resolved to nothing is keyed too, with undef');
+	ok(exists($batch->{'0044'}) && !defined($batch->{'0044'}),
+		'and so is a value the module refuses');
+	delete $LEDGER{'GCF::geocode_many map'};
+
+	# The counts.  Two of the four values are worth looking up - the repetition
+	# is not a second lookup and the refused value is no lookup at all - and one
+	# of those two resolved.
+	is($batch->{'lookups'}, 2, 'lookups counts the distinct values worth looking up');
+	is($batch->{'resolved'}, 1, 'resolved counts the values that produced a point');
+	is($batch->{'unresolved'}, 2, 'unresolved counts the values that produced nothing');
+	is($batch->{'resolved'} + $batch->{'unresolved'}, 3,
+		'and the two add up to the number of distinct values');
+	delete $LEDGER{'GCF::geocode_many counts'};
+
+	# The ordered list of what produced nothing, which is what a caller records
+	# as tried-and-failed instead of retrying it on every request.
+	is_deeply($batch->{'unresolved_values'}, ['Nowhere, Imaginary, ZZ', '0044'],
+		'unresolved_values lists them, in the order they were first seen');
+	delete $LEDGER{'GCF::geocode_many unresolved list'};
+
+	# A batch is a set, and garbage costs no backend work: the repeated value is
+	# asked once and the refused one is never asked at all.
+	is_deeply([map { $_->{'location'} } @asked],
+		['Ramsgate, Kent', 'Nowhere, Imaginary, ZZ'],
+		'one lookup per distinct value, and none for a value the module refuses');
+	delete $LEDGER{'GCF::geocode_many distinct'};
+
+	# region and on_error are handed to every lookup, so a hint improves the
+	# whole batch rather than the first call.
+	is_deeply([map { $_->{'region'} } @asked], ['GB', 'GB'],
+		'the region hint reached every lookup');
+	delete $LEDGER{'GCF::geocode_many region'};
+
+	# The default is still the croak geocode() gives, with its own message, and
+	# a batch that is going to die on a value does so before looking anything up.
+	my $before = scalar @asked;
+	throws_ok { $geo->geocode_many(['0044']) }
+		qr/invalid location to geocode\(\), 0044/,
+		'a refused value croaks on the default setting, naming the value';
+	is(scalar @asked, $before, 'and nothing was looked up');
+	delete $LEDGER{'GCF::geocode_many croak'};
+
+	# An undef cell is not the usage croak that geocode(location => undef) gives:
+	# it is the empty string, which is not a location, so the batch carries on
+	# with it counted unresolved.  This is what a spreadsheet column holds.
+	my $sparse = $geo->geocode_many(['Ramsgate, Kent', undef], on_error => 'undef');
+	ok(exists($sparse->{''}), 'an undef value is reported under the empty string');
+	is($sparse->{'unresolved'}, 1, 'and is unresolved rather than a usage error');
+	delete $LEDGER{'GCF::geocode_many undef value'};
+
+	# An on_error nobody understands is refused rather than ignored, as in
+	# geocode(): silently croaking is the failure the option exists to prevent.
+	throws_ok { $geo->geocode_many(['Ramsgate, Kent'], on_error => 'ignore') }
+		qr/on_error must be/, 'an unknown on_error is refused, not ignored';
+	delete $LEDGER{'GCF::geocode_many invalid_on_error'};
+
+	# The counts and the map share one hashref, so a value spelled like a count
+	# is refused by name - before any lookup - rather than overwriting it.
+	$before = scalar @asked;
+	throws_ok { $geo->geocode_many(['Ramsgate, Kent', 'lookups'], on_error => 'undef') }
+		qr/"lookups" is one of the keys geocode_many\(\) answers with/,
+		'a value spelled like a returned key is refused, not merged into the answer';
+	is(scalar @asked, $before, 'and the batch was refused before it looked anything up');
+	delete $LEDGER{'GCF::geocode_many reserved'};
+
+	# A batch of nothing is a batch of nothing, not an error.
+	my $none = $geo->geocode_many([], on_error => 'undef');
+	is_deeply([sort keys %{$none}], [sort qw(lookups resolved unresolved unresolved_values)],
+		'an empty batch answers with the counts and nothing else');
+	is_deeply([map { $none->{$_} } qw(lookups resolved unresolved)], [0, 0, 0], 'as zeroes');
+	is_deeply($none->{'unresolved_values'}, [], 'and an empty list');
+	delete $LEDGER{'GCF::geocode_many empty'};
+
+	# The calling conventions the rest of the module accepts.
+	my $by_class = Geo::Coder::Free->geocode_many(['Ramsgate, Kent'], on_error => 'undef');
+	isa_ok($by_class->{'Ramsgate, Kent'}, 'Geo::Location::Point', 'the class-method form works');
+	my $by_function = Geo::Coder::Free::geocode_many(['Ramsgate, Kent'], on_error => 'undef');
+	isa_ok($by_function->{'Ramsgate, Kent'}, 'Geo::Location::Point', 'so does the function form');
+	delete $LEDGER{'GCF::geocode_many conventions'};
+
+	# Usage errors: no values, values that are not an arrayref, and options that
+	# are neither an even list nor a hashref.
+	throws_ok { $geo->geocode_many() } qr/Usage:.*geocode_many/,
+		'no values croaks usage_geocode_many';
+	throws_ok { $geo->geocode_many('Ramsgate, Kent') } qr/Usage:.*geocode_many/,
+		'a bare string is not a batch';
+	throws_ok { $geo->geocode_many(\@places, region => 'GB', 'loose') } qr/Usage:.*geocode_many/,
+		'an odd option list croaks the usage message';
+	throws_ok { Geo::Coder::Free::geocode_many() } qr/Usage:.*geocode_many/,
+		'the function form with no arguments croaks too';
+	delete $LEDGER{'GCF::geocode_many usage'};
+
+	# A backend exception is still an exception on either setting: nothing here
+	# is wrapped in an eval, or on_error would swallow the failure the OA path
+	# exists to report.
+	mock('Geo::Coder::Free::MaxMind', 'geocode', sub { die "simulated DB connection failure\n" });
+	throws_ok { $geo->geocode_many(['Ramsgate, Kent'], on_error => 'undef') }
+		qr/simulated DB connection failure/,
+		'a backend exception propagates under on_error => undef';
+	delete $LEDGER{'GCF::geocode_many backend dies'};
+
+	restore_all();
+	mock('Geo::Coder::Free::MaxMind', 'geocode',         sub { return $mock_mm_result });
+	mock('Geo::Coder::Free::MaxMind', 'reverse_geocode', sub { return $mock_mm_result });
 };
 
 subtest 'GCF::reverse_geocode — error states and delegation' => sub {

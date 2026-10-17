@@ -6,9 +6,10 @@
 #
 #   1. Geographic (country-based) — verify that geocoding calls targeting
 #      GB, US, FR, DE, and CN do not crash and handle case-insensitivity
-#      and concurrent instances correctly.  Requires OPENADDR_HOME to be set;
-#      the subtests are individually skipped when it is absent so the suite
-#      still runs (with those skips) in a minimal CI environment.
+#      and concurrent instances correctly.  Requires OPENADDR_HOME to be set
+#      and the MaxMind databases to have been downloaded; the subtests are
+#      individually skipped when either is absent so the suite still runs
+#      (with those skips) in a minimal CI environment.
 #
 #   2. System (POSIX) — verify that Geo::Coder::Free errors are thrown
 #      regardless of the OS locale, and that OS error strings are sourced
@@ -39,6 +40,17 @@ pass('Geo::Coder::Free->new() succeeds');
 
 # Country specifications for the geographic locale subtests.
 # Each entry exercises one ISO 3166-1 alpha-2 code.
+#
+# Those lookups are answered from the MaxMind databases that Makefile.PL
+# downloads (and that createdatabase.PL builds cities.sql from).  A build that
+# was never given them - NO_NETWORK_TESTING, or a download that didn't arrive -
+# cannot answer these calls at all: the backend croaks "Can't find a file called
+# 'admin1'" instead of returning nothing.  The subtests skip on that, as
+# t/maxmind.t does for the data it needs, rather than failing an install that had
+# no way to fetch the data.
+my @DATABASES = ('admin1.db', 'admin2.db');
+my @missing_databases = grep { !-s "lib/Geo/Coder/Free/MaxMind/databases/$_" } @DATABASES;
+
 my @COUNTRY_SPECS = (
 	{ code => 'GB', name => 'United Kingdom', location => 'London, England' },
 	{ code => 'US', name => 'United States',  location => 'Washington, DC'  },
@@ -52,6 +64,13 @@ for my $spec (@COUNTRY_SPECS) {
 		unless ($ENV{'OPENADDR_HOME'} && -d $ENV{'OPENADDR_HOME'}) {
 			plan skip_all =>
 				"OPENADDR_HOME not set or not a directory — skipping $spec->{name} lookup";
+			return;
+		}
+
+		if (@missing_databases) {
+			plan skip_all =>
+				'the MaxMind databases are missing (' . join(', ', @missing_databases)
+				. ") — skipping $spec->{name} lookup";
 			return;
 		}
 

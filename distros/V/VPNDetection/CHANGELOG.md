@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 3.3.2 are described by their release commits.
 
+## 3.6.0 - 2026-10-17
+
+### Features
+
+- Re-pin the spec to 2026.10.16: dynamic client registration ([`9875fa0`](https://github.com/vpndetection-io/sdk-perl/commit/9875fa07b2d77d88948c4ffbd523d51abc457f02))
+
 ## 3.5.5 - 2026-10-16
 
 ### Fixes

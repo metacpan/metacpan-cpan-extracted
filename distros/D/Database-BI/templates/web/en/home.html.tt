@@ -106,6 +106,7 @@
 }());
 </script>
 
+<div id="bi-canvases"></div>
 <div id="bi-recent"></div>
 <div id="bi-saved"></div>
 
@@ -344,6 +345,56 @@
       JSON.parse(localStorage.getItem('bi:saved') || '[]'), true, 'saved');  // eagerStat=true; fromTag='saved'
 
   } catch (e) {}
+}());
+</script>
+
+<script>
+/* Saved canvases section -- fetches /api/analyses and renders links.
+ * Only shown when at least one saved analysis exists. */
+(function () {
+  var container = document.getElementById('bi-canvases');
+  if (!container) return;
+  fetch('/api/analyses')
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+      var list = (data && data.analyses) ? data.analyses : [];
+      if (!list.length) return;
+      var section = document.createElement('section');
+      section.className = 'recent-section';
+      var h2 = document.createElement('h2');
+      h2.className = 'recent-heading';
+      h2.innerHTML = '&#x1F5BC; Saved canvases';
+      section.appendChild(h2);
+      var ul = document.createElement('ul');
+      ul.className = 'recent-list';
+      list.forEach(function (a) {
+        var li = document.createElement('li');
+        li.className = 'recent-item';
+        var link = document.createElement('a');
+        link.href = '/a/' + encodeURIComponent(a.id);
+        link.className = 'recent-link';
+        var icon = document.createElement('span');
+        icon.setAttribute('aria-hidden', 'true');
+        icon.textContent = '🖼';   /* framed picture */
+        var name = document.createElement('span');
+        name.className = 'recent-name';
+        name.textContent = a.name || a.id;
+        link.appendChild(icon);
+        link.appendChild(name);
+        if (a.datasets && a.datasets.length) {
+          var meta = document.createElement('span');
+          meta.className = 'recent-meta';
+          meta.textContent = a.datasets.length + ' dataset'
+            + (a.datasets.length !== 1 ? 's' : '');
+          link.appendChild(meta);
+        }
+        li.appendChild(link);
+        ul.appendChild(li);
+      });
+      section.appendChild(ul);
+      container.appendChild(section);
+    })
+    .catch(function () {});
 }());
 </script>
 

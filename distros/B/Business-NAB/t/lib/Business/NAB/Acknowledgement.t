@@ -183,4 +183,52 @@ subtest 'parse PaymentsAcknowledgement (rejected)' => sub {
         ok( !$Ack->is_held,      '! ->is_held' );
     };
 };
+
+subtest 'free form status strings' => sub {
+
+    is(
+        Business::NAB::Acknowledgement::_user_message_to_status( "Foo" ),
+        undef,
+        'nonsense status value'
+    );
+
+    my %status_map = (
+        'ACCEPTED'  => 'ACCEPTED',
+        'PROCESSED' => 'PROCESSED',
+        'REJECTED'  => 'REJECTED',
+        'PENDING'   => 'PENDING',
+        'DECLINED'  => 'DECLINED',
+        'SUCCESS'   => 'SUCCESS',
+        'HELD'      => 'HELD',
+        
+        'DELETED'                => 'REJECTED',
+        "DELETED\n"              => 'REJECTED',
+        'CANCELLED'              => 'REJECTED',
+        'FUTURE DATED'           => 'ACCEPTED',
+        'REQUIRES APPROVAL'      => 'HELD',
+        'REQUIRES AUTHORISATION' => 'HELD',
+        'REQUIRES BANK APPROVAL' => 'HELD',
+
+        'PROCESSED WITH INVALID TRANSACTIONS' => 'PROCESSED',
+
+        ''               => undef,
+        'MYSTERY STATUS' => undef,
+    );
+
+    foreach my $incoming_status ( sort keys %status_map ) {
+
+        my $expected_status = $status_map{ $incoming_status }
+            ? lc( $status_map{ $incoming_status } )
+            : undef;
+
+        is(
+            Business::NAB::Acknowledgement::_user_message_to_status(
+                "Payment status is $_",
+            ),
+            $expected_status,
+            "$_ mapped",
+        ) for ( $incoming_status,lc( $incoming_status ) );
+    }
+};
+
 done_testing();

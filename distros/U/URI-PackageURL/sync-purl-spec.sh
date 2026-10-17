@@ -2,12 +2,12 @@
 
 # sync-purl-spec - Sync the PURL specs
 #
-# (C) 2025, Giuseppe Di Terlizzi <giuseppe.diterlizzi@gmail.com>
+# (C) 2025-2026, Giuseppe Di Terlizzi <giuseppe.diterlizzi@gmail.com>
 
 cd $(dirname $0) ; CWD=$(pwd)
 
 GIT_REF=heads/main
-GIT_REF=tags/v1.0.0
+#GIT_REF=tags/v1.0.0
 
 PURL_ARCHIVE_URL="https://github.com/package-url/purl-spec/archive/refs/$GIT_REF.zip"
 PURL_ARCHIVE_FILE=$(mktemp)

@@ -34,9 +34,12 @@ requires 'Socket', '2.010';
 requires 'Spreadsheet::ParseXLSX';
 requires 'Sub::Protected';
 
+recommends 'Geo::Coder::Free', '0.47';   # Geocoding a location column (Phase 6.2).  Optional: loaded with a runtime require, and the app works without it - 0.46 added valid_location(), 0.47 added geocode_many()
+
 on 'test' => sub {
 	requires 'DBD::CSV';
 	requires 'Encode';
+	requires 'Test::DescribeMe';	# Author tests declare themselves with this
 	requires 'Test::Memory::Cycle';
 	requires 'Test::Mockingbird';
 	requires 'Test::Mojo';
@@ -52,6 +55,8 @@ on 'test' => sub {
 on 'develop' => sub {
 	requires 'Devel::Cover';
 	requires 'Perl::Critic';
-	requires 'Test::Pod';
+	requires 'Test::CheckManifest';   # t/manifest.t
+	requires 'Test::Pod';             # t/pod.t
 	requires 'Test::Pod::Coverage';
+	requires 'Test::Version';         # t/version.t
 };

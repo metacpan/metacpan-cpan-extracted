@@ -169,7 +169,8 @@ static pi_pcat pi_plural(pi_rule rule, double count, int is_int) {
     /* Rules are written over the ABSOLUTE value: -1 item and 1 item take the
      * same form in every language here. */
     double n = count < 0 ? -count : count;
-    UV i = (UV)n;                    /* the integer part */
+    /* a NaN or an infinity cast to UV is undefined in C; both take `other` */
+    UV i = (Perl_isinfnan(n) || n >= (double)UV_MAX) ? 0 : (UV)n;
     UV i10, i100;
 
     if (!is_int) {

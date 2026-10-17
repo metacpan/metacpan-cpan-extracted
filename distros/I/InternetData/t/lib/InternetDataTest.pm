@@ -36,4 +36,36 @@ sub family {
     };
 }
 
+# One download attempt with every member the spec requires.
+sub download {
+    my (%overrides) = @_;
+    return {
+        dataset_id => 'bogon_ip_v1',
+        format => 'csvgz',
+        outcome => 'ok',
+        sample => false,
+        open => false,
+        bytes => 760,
+        http_status => 200,
+        apikey_id => 'key_1',
+        client_ip => '203.0.113.7',
+        user_agent => 'curl/8.5.0',
+        created => '2026-09-04T10:00:00.000Z',
+        %overrides,
+    };
+}
+
+# A dataset's metadata with every member the spec requires.
+sub metadata {
+    my (%overrides) = @_;
+    return {
+        id => 'bogon_ip_v1',
+        updated => '2026-09-04',
+        entries => 42,
+        schema => { csvgz => [{ name => 'range_start', type => 'varchar' }] },
+        size => { csvgz => 760 },
+        %overrides,
+    };
+}
+
 1;

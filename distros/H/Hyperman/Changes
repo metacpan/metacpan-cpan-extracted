@@ -1,5 +1,37 @@
 Revision history for Hyperman
 
+0.63	2026-10-16
+        - FIX: a build without nghttp2 or without OpenSSL did not compile:
+          the HTTP/2 writer stub returned nothing and the QUIC context
+          builder had no stub.
+
+0.62	2026-10-16
+        - SECURITY: FIX a Future's get and failure pushing results through a
+          stack pointer the nested loop had moved (heap corruption).
+        - SECURITY: FIX a completion read landing under a running handler
+          re-parsing its request and underflowing the buffer (io_uring).
+        - SECURITY: FIX bytes arriving while a synchronous 101 handler waited
+          being handed to the tunnel before the request was consumed.
+        - SECURITY: FIX a timer cancelled from an earlier event in the same
+          batch being freed before its own event was dispatched.
+        - SECURITY: FIX an HTTP/3 handler that waited freeing its own
+          connection: requests are dispatched after ngtcp2 returns, and a
+          connection with a handler on the stack is freed when it returns.
+        - SECURITY: FIX a partial PROXY header spinning the worker at 100% CPU.
+        - SECURITY: a bare LF or CR in a chunk extension or a trailer is a 400.
+        - SECURITY: a numeric user with no passwd entry needs a group.
+        - SECURITY: the pid file's temporary is created exclusively, never
+          through a symlink, with a random name.
+        - SECURITY: accepted sockets, log handles and adopted listeners are
+          close-on-exec; accept4(2) where the platform has it.
+        - SECURITY: the QUIC per-source table is keyed and closes its probe
+          chain on delete, so a freed slot no longer hides or duplicates
+          its neighbours; a refused count is never decremented.
+        - SECURITY: nghttp2's rapid-reset and CONTINUATION limits are set
+          explicitly where the library offers them.
+        - SECURITY: a Future method on something that is not a future
+          croaks instead of crashing.
+
 0.61	2026-10-15
         - FIX: on io_uring with completion reads, an HTTP/2 handler that
           waited for its body to drain never read its connection, so the

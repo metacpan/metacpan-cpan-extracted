@@ -124,11 +124,11 @@ sub req {
 
 # ---- lock_wait is the plugin's, and checked --------------------------------------
 {
-    for my $bad (0, -1, 'soon') {
+    for my $bad (0, -1, 'soon', 'Inf', 'NaN') {
         my $err = '';
         eval { Punk::App->new->plugin('Idempotency',
                    { scope => sub { 1 }, lock_wait => $bad }); 1 } or $err = $@;
-        like($err, qr/lock_wait must be a positive number of seconds/,
+        like($err, qr/lock_wait must be a positive(?:, finite)? number of seconds/,
             "lock_wait => '$bad' is refused at boot");
     }
     {

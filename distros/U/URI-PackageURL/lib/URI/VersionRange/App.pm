@@ -13,7 +13,7 @@ use Data::Dumper ();
 
 use URI::VersionRange ();
 
-our $VERSION = '2.25';
+our $VERSION = '2.26';
 
 sub cli_error {
     my ($error) = @_;
@@ -24,6 +24,9 @@ sub cli_error {
 sub run {
 
     my ($class, @args) = @_;
+
+    # UTF-8 encoded command line arguments
+    utf8::decode($_) for @args;
 
     my %options = (format => 'json');
 
@@ -84,7 +87,7 @@ VERSION
 
         my $vers_comparator_class = join '::', 'URI::VersionRange::Version', $vers->scheme;
 
-        if (!$vers_comparator_class->can('new')) {
+        if (URI::VersionRange::Version->load($vers->scheme) eq 'URI::VersionRange::Version') {
             say STDERR 'WARNING: Loaded the fallback scheme class comparator.';
             say STDERR '         The comparison may not work correctly!';
         }

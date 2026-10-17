@@ -14,13 +14,12 @@ use lib 'lib';
 use Claude::Agent qw(query);
 use Claude::Agent::Options;
 use Claude::Agent::Error;
-use Try::Tiny;
 
 # Example 1: Handle CLI not found
 say "Example 1: Handling CLI errors";
 say "-" x 50;
 
-try {
+eval {
     my $options = Claude::Agent::Options->new(
         allowed_tools   => ['Read'],
         permission_mode => 'bypassPermissions',
@@ -42,53 +41,53 @@ try {
             last;
         }
     }
-}
-catch {
-    if ($_->isa('Claude::Agent::Error::CLINotFound')) {
+};
+if (my $err = $@) {
+    if ($err->isa('Claude::Agent::Error::CLINotFound')) {
         say "ERROR: Claude CLI not found!";
         say "Please install it from: https://claude.ai/download";
     }
-    elsif ($_->isa('Claude::Agent::Error::ProcessError')) {
+    elsif ($err->isa('Claude::Agent::Error::ProcessError')) {
         say "ERROR: Process failed!";
-        say "Exit code: " . ($_->exit_code // 'unknown');
-        say "Stderr: " . ($_->stderr // 'none');
+        say "Exit code: " . ($err->exit_code // 'unknown');
+        say "Stderr: " . ($err->stderr // 'none');
     }
-    elsif ($_->isa('Claude::Agent::Error::TimeoutError')) {
-        say "ERROR: Operation timed out after " . $_->timeout_ms . "ms";
+    elsif ($err->isa('Claude::Agent::Error::TimeoutError')) {
+        say "ERROR: Operation timed out after " . $err->timeout_ms . "ms";
     }
-    elsif ($_->isa('Claude::Agent::Error::JSONDecodeError')) {
+    elsif ($err->isa('Claude::Agent::Error::JSONDecodeError')) {
         say "ERROR: Failed to parse response!";
-        say "Line: " . ($_->line // 'unknown');
+        say "Line: " . ($err->line // 'unknown');
     }
-    elsif ($_->isa('Claude::Agent::Error')) {
-        say "ERROR: " . $_->message;
+    elsif ($err->isa('Claude::Agent::Error')) {
+        say "ERROR: " . $err->message;
     }
     else {
-        say "UNEXPECTED ERROR: $_";
+        say "UNEXPECTED ERROR: $err";
     }
-};
+}
 
 # Example 2: Validate options
 say "\nExample 2: Option validation";
 say "-" x 50;
 
-try {
+eval {
     # This should work fine
     my $valid_options = Claude::Agent::Options->new(
         permission_mode => 'bypassPermissions',
         max_turns       => 10,
     );
     say "Valid options created successfully";
-}
-catch {
-    say "Failed to create options: $_";
 };
+if (my $err = $@) {
+    say "Failed to create options: $err";
+}
 
 # Example 3: Handle tool errors gracefully
 say "\nExample 3: Tool error handling";
 say "-" x 50;
 
-try {
+eval {
     my $options = Claude::Agent::Options->new(
         allowed_tools   => ['Bash'],
         permission_mode => 'bypassPermissions',
@@ -118,10 +117,10 @@ try {
             last;
         }
     }
-}
-catch {
-    say "Error during query: $_";
 };
+if (my $err = $@) {
+    say "Error during query: $err";
+}
 
 say "\n", "-" x 50;
 say "Error handling examples complete!";

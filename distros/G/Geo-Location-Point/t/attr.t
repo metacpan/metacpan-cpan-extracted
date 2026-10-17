@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 39;	# 38 below plus the Test::NoWarnings test
+use Test::Most tests => 59;	# 58 below plus the Test::NoWarnings test
 use Test::NoWarnings;
 
 BEGIN {
@@ -13,6 +13,11 @@ BEGIN {
 # value (if(my $value = shift)) and it returned $self->{$key} || $self->{ucfirst($key)}.
 # A false value could therefore be neither stored nor read back, so a rejected
 # match with a confidence of 0 was indistinguishable from no provenance at all.
+#
+# Section 3.2 of BI-Phase6-Dependency-Specs.md then gave the provenance fields
+# accessors of their own, which check what they are given, so the fields that
+# Phase 6 reads to decide what a marker claims cannot be a value outside the
+# vocabulary.  That is what the VALIDATION block below covers.
 
 READ: {
 	my $point = new_ok('Geo::Location::Point' => [
@@ -36,9 +41,13 @@ WRITE: {
 	is($point->{'confidence'}, 0, 'A stored 0 is written to the object');
 	ok(!$point->confidence(), 'A stored 0 is still false in boolean context');
 
-	is($point->accuracy(''), '', 'Setting the empty string returns it');
-	ok(defined($point->accuracy()), 'Setting the empty string leaves a defined value');
-	is($point->accuracy(), '', 'A stored empty string is read back');
+	# accuracy is validated against a vocabulary, so the empty string is not a
+	# value it can hold; the false-value round trip it used to demonstrate is
+	# still covered by the unvalidated attributes here (found, city, state) and
+	# by the constructor's accuracy => '' in CONSTRUCTOR below
+	is($point->accuracy('city'), 'city', 'Setting a level returns it');
+	ok(defined($point->accuracy()), 'Setting a level leaves a defined value');
+	is($point->accuracy(), 'city', 'A stored level is read back');
 
 	is($point->found('0'), '0', 'Setting the string 0 returns it');
 	is($point->found(), '0', 'The string 0 is read back');
@@ -103,4 +112,60 @@ CASE: {
 	$point->country('');
 	is($point->country(), '', 'An emptied field shadows the upper case one');
 	ok(defined($point->country()), 'The emptied field is a value, not a fallback');
+}
+
+VALIDATION: {
+	my $point = new_ok('Geo::Location::Point' => [
+		lat => 51.34,
+		long => 1.42
+	]);
+
+	# A value the reader cannot trust is a bug where it is set, not something to
+	# discover from the map later, so the accessors reject it by name.
+	my $error;
+
+	eval { $point->confidence(1.5); 1 } or $error = $@;
+	like($error, qr/confidence must be a number from 0 to 1/, 'A confidence above 1 is rejected');
+
+	eval { $point->confidence(-0.5); 1 } or $error = $@;
+	like($error, qr/confidence must be a number from 0 to 1/, 'A negative confidence is rejected');
+
+	eval { $point->confidence('high'); 1 } or $error = $@;
+	like($error, qr/confidence must be a number from 0 to 1/, 'A confidence that is not a number is rejected');
+
+	eval { $point->accuracy('street address'); 1 } or $error = $@;
+	like($error, qr/unknown accuracy/, 'An accuracy outside the vocabulary is rejected');
+
+	eval { $point->accuracy(''); 1 } or $error = $@;
+	like($error, qr/unknown accuracy/, 'The empty string is not an accuracy');
+
+	eval { $point->city([]); 1 } or $error = $@;
+	like($error, qr/city must be a string/, 'A reference is not a city');
+
+	is($point->confidence('0E0'), '0E0', 'A zero confidence is still a number');
+	is($point->confidence(1), 1, 'A confidence of 1 is the top of the range');
+	# Every level the module publishes is a level it accepts: ACCURACY_LEVELS is
+	# what Geo::Coder::Free::Provenance reads, so a name in it that the accessor
+	# refused would be a level a backend could report and no point could hold.
+	# One assertion over the whole list rather than one per level, so the plan
+	# above does not have to be recounted whenever the vocabulary grows.
+	my @levels = @{Geo::Location::Point::ACCURACY_LEVELS()};
+	is_deeply([map { $point->accuracy($_) } @levels], \@levels,
+		'Every level of ACCURACY_LEVELS is accepted and read back');
+
+	is($point->accuracy('address'), 'address', 'The most precise level is accepted');
+	is($point->accuracy('country'), 'country', 'The least precise level is accepted');
+	is($point->geocoder('Geo::Coder::Free'), 'Geo::Coder::Free', 'geocoder round-trips');
+	is($point->database('OpenAddresses'), 'OpenAddresses', 'database round-trips');
+	is($point->country('GB'), 'GB', 'country round-trips');
+	is($point->state('KY'), 'KY', 'state round-trips');
+	is($point->city('London'), 'London', 'city round-trips');
+
+	# The validated accessors read and write the slot AUTOLOAD would, so the two
+	# spellings are interchangeable rather than parallel
+	is($point->{'city'}, 'London', 'A validated accessor writes the slot AUTOLOAD uses');
+	ok(!defined($point->{'location'}), 'A validated write invalidates the as_string cache');
+
+	$point->confidence(undef);
+	ok(!defined($point->confidence()), 'An explicit undef clears a validated attribute');
 }

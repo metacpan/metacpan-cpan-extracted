@@ -293,4 +293,18 @@ YAML
         'the removed option says so by name');
 }
 
+# ---- a document is data, and finite -------------------------------------------------
+{
+    write_file('cycle.yml', "a: &x\n  b: *x\n");
+    my $err = '';
+    eval { Punk::Config->load(file => "$dir/cycle.yml", env => 'production'); 1 }
+        or $err = $@;
+    like($err, qr/nested deeper than 64 levels/,
+        'an alias cycle is refused rather than walked for ever');
+
+    write_file('blessed.yml', "a: !!perl/hash:Some::Class\n  k: v\n");
+    my $cfg = Punk::Config->load(file => "$dir/blessed.yml", env => 'production');
+    is(ref $cfg->get('a'), 'HASH', 'a perl object tag loads as a plain hash');
+}
+
 done_testing();

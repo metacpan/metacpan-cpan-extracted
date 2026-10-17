@@ -6,6 +6,9 @@ manager.
 For private instance methods, prefix the method name with an underscore.
 For example, _parse().
 
+We considered using `App::Yath`, a test harness CLI, but it does not support
+Windows and was therefore not adopted.
+
 ## How to Setup Development Environment
 ```bash
 $ cpanm Carton@v1.0.35

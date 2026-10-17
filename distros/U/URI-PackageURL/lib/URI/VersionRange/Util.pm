@@ -5,18 +5,20 @@ use strict;
 use utf8;
 use warnings;
 
+use Time::Local;
 use Exporter qw(import);
 use Carp     ();
 
-our $VERSION = '2.25';
+our $VERSION = '2.26';
 
 our @EXPORT = qw(
     parse_semver normalize_semver is_semver
     native_range_to_vers
     version_compare semver_version_compare generic_version_compare
+    intdot_version_compare datetime_version_compare lexicographic_version_compare
 );
 
-# https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
+# SemVer (https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string)
 my $SEMVER_REGEXP = qr{(?x)
     ^
     (?P<major>0|[1-9]\d*)
@@ -26,6 +28,21 @@ my $SEMVER_REGEXP = qr{(?x)
     (?P<patch>0|[1-9]\d*)
     (?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?
     (?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?
+    $
+};
+
+# RFC 3339 date-time (https://www.rfc-editor.org/rfc/rfc3339#section-5.6)
+my $RFC3339_REGEXP = qr{(?x)
+    ^
+    (?P<year>[0-9]{4}) - (?P<month>[0-9]{2}) - (?P<day>[0-9]{2})             # full-date
+    [Tt]
+    (?P<hour>[0-9]{2}) : (?P<minute>[0-9]{2}) : (?P<second>[0-9]{2})         # partial-time
+    (?: \. (?P<fraction>[0-9]+) )?                                           # time-secfrac
+    (?:                                                                      # time-offset
+        (?P<utc>[Zz])
+        |
+        (?P<offset_sign>[+-]) (?P<offset_hour>[0-9]{2}) : (?P<offset_minute>[0-9]{2})
+    )
     $
 };
 
@@ -172,70 +189,149 @@ sub _semver_native_range {
     $native =~ s/^(.*)\s\-\s(.*)$/>= $1 <= $2/g;    # TODO
     $native =~ s/(>\=|<\=|>|<)\s+/$1/g;
 
-    my @p = grep {$_} split /(?:\s+|\|\|)/, $native;
     my @constraints = ();
 
-    foreach my $part (@p) {
+    # "||" separates the ranges (union) and whitespace separates the comparators (intersection)
+    foreach my $range (split /\|\|/, $native) {
 
-        $part =~ s{v(\d+)}{$1};
-        $part =~ s{^=}{};
-        $part =~ s/^\s+|\s+$//g;
+        my @parts       = grep {$_} split /\s+/, $range;
+        my @comparators = map  { split /\|/ } map { _semver_native_comparator($_) } @parts;
 
-        # Wildcards (1.x or 2.0.x)
-        if (my @wildcards = _semver_wildcards('>=', $part)) {
-            push @constraints, @wildcards;
-            next;
-        }
-
-        # Tilde operator
-        if ($part =~ /^(~)(.*)/) {
-            push @constraints, _tilde_operator('semver', $2);
-            next;
-        }
-
-        # Caret operator
-        if ($part =~ /^(\^)(.*)/) {
-            push @constraints, _caret_operator('semver', $2);
-            next;
-        }
-
-        # Operators
-        if ($part =~ /(>\=|<\=|>|<)(.*)/) {
-
-            my ($operator, $version) = ($1, $2);
-
-            # Wildcards (1.x or 2.0.x)
-            if (my @wildcards = _semver_wildcards($operator, $version)) {
-                push @constraints, @wildcards;
-                next;
-            }
-
-
-            $version = normalize_semver($version);
-
-            if ($version and is_semver($version)) {
-                push @constraints, join('', $operator, $version);
-                next;
-            }
-
-        }
-
-        if ($part ne '*') {
-
-            my $version = normalize_semver($part);
-
-            if ($version and is_semver($version)) {
-                push @constraints, normalize_semver($part);
-                next;
-            }
-
-        }
-
-        push @constraints, $part;
+        # Intersect the comparators (eg. ">=5.0.3 >=4.2.1" --> ">=5.0.3")
+        push @constraints, (@parts > 1) ? _semver_intersect(@comparators) : @comparators;
 
     }
 
     return join '|', @constraints;
+}
+
+sub _semver_native_comparator {
+
+    my $part = shift;
+
+    $part =~ s{v(\d+)}{$1};
+    $part =~ s{^=}{};
+    $part =~ s/^\s+|\s+$//g;
+
+    # Wildcards (1.x or 2.0.x)
+    if (my @wildcards = _semver_wildcards('>=', $part)) {
+        return @wildcards;
+    }
+
+    # Tilde operator
+    if ($part =~ /^(~)(.*)/) {
+        return _tilde_operator('semver', $2);
+    }
+
+    # Caret operator
+    if ($part =~ /^(\^)(.*)/) {
+        return _caret_operator('semver', $2);
+    }
+
+    # Operators
+    if ($part =~ /(>\=|<\=|>|<)(.*)/) {
+
+        my ($operator, $version) = ($1, $2);
+
+        # Wildcards (1.x or 2.0.x)
+        if (my @wildcards = _semver_wildcards($operator, $version)) {
+            return @wildcards;
+        }
+
+        $version = normalize_semver($version);
+
+        if ($version and is_semver($version)) {
+            return join('', $operator, $version);
+        }
+
+    }
+
+    if ($part ne '*') {
+
+        my $version = normalize_semver($part);
+
+        if ($version and is_semver($version)) {
+            return $version;
+        }
+
+    }
+
+    return $part;
+
+}
+
+sub _semver_intersect {
+
+    my @comparators = @_;
+
+    my ($lower, $upper, $equal);
+
+    foreach my $comparator (@comparators) {
+
+        my ($operator, $version) = $comparator =~ /^(>=|<=|>|<)?(.*)$/;
+
+        # Skip the intersection for non-SemVer versions (eg. "*")
+        return @comparators unless is_semver($version);
+
+        if (!$operator) {
+
+            if ($equal && semver_version_compare($equal, $version) != 0) {
+                Carp::croak "Invalid Version Range: '$equal' and '$version' match no version";
+            }
+
+            $equal = $version;
+            next;
+
+        }
+
+        # Keep the highest lower bound (">" wins over ">=" for the same version)
+        if ($operator =~ /^>/) {
+
+            my $cmp = $lower ? semver_version_compare($version, $lower->[1]) : 1;
+            $lower = [$operator, $version] if ($cmp > 0 || ($cmp == 0 && $operator eq '>'));
+            next;
+
+        }
+
+        # Keep the lowest upper bound ("<" wins over "<=" for the same version)
+        my $cmp = $upper ? semver_version_compare($version, $upper->[1]) : -1;
+        $upper = [$operator, $version] if ($cmp < 0 || ($cmp == 0 && $operator eq '<'));
+
+    }
+
+    my @bounds = grep {$_} $lower, $upper;
+
+    if ($lower && $upper) {
+
+        my $cmp = semver_version_compare($lower->[1], $upper->[1]);
+
+        if ($cmp > 0 || ($cmp == 0 && ($lower->[0] eq '>' || $upper->[0] eq '<'))) {
+            Carp::croak sprintf "Invalid Version Range: '%s' and '%s' match no version", map { join '', @{$_} } @bounds;
+        }
+
+    }
+
+    if ($equal) {
+
+        foreach my $bound (@bounds) {
+
+            my ($operator, $version) = @{$bound};
+            my $cmp = semver_version_compare($equal, $version);
+
+            my %match = ('>=' => $cmp >= 0, '>' => $cmp > 0, '<=' => $cmp <= 0, '<' => $cmp < 0);
+
+            unless ($match{$operator}) {
+                Carp::croak "Invalid Version Range: '$equal' and '$operator$version' match no version";
+            }
+
+        }
+
+        return ($equal);
+
+    }
+
+    return map { join '', @{$_} } @bounds;
+
 }
 
 sub _conan_native_range {
@@ -296,6 +392,7 @@ sub _gem_native_range {
     # Convert GEM version spec to VERS range
 
     my $native = shift;
+    $native =~ s/\s+//g;
 
     # Specification From  ... To (exclusive)
     # ">= 3.0"      3.0   ... &infin;
@@ -305,11 +402,22 @@ sub _gem_native_range {
     # "~> 3.5.0"    3.5.0 ... 3.6
     # "~> 3"        3.0   ... 4.0
 
-    if ($native =~ /^(~>)(.*)/) {
-        return _tilde_operator('gem', $2);
+    my @parts       = grep {length} split /,/, $native;
+    my @constraints = ();
+
+    foreach my $part (@parts) {
+
+
+        if ($part =~ /^(~>)(.*)/) {
+            push @constraints, _tilde_operator('gem', $2);
+            next;
+        }
+
+        push @constraints, $part;
+
     }
 
-    return $native;
+    return join('|', @constraints);
 
 }
 
@@ -471,18 +579,16 @@ sub hash_to_semver {
 
 sub version_compare {
 
-    my $scheme = shift;
+    my ($scheme, $left, $right) = @_;
 
-    my %TYPES = (npm => \&semver_version_compare, semver => \&semver_version_compare);
+    require URI::VersionRange::Version;
 
-    if (defined $TYPES{$scheme}) {
-        return $TYPES{$scheme}->(@_);
-    }
+    my $version_class = URI::VersionRange::Version->load($scheme);
+    return $version_class->new($left) <=> $version_class->new($right);
 
-    return generic_version_compare(@_);
 }
 
-# Semver compare
+# SemVer compare
 
 sub semver_version_compare {
 
@@ -585,6 +691,90 @@ sub generic_version_compare {
 
 }
 
+# intdot compare
+
+sub intdot_version_compare {
+
+    my ($a, $b) = @_;
+
+    ($a) = ($a // '') =~ /^([0-9.]*)/;
+    ($b) = ($b // '') =~ /^([0-9.]*)/;
+
+    my @A = split /\./, $a;
+    my @B = split /\./, $b;
+
+    s/^0+// for @A;
+    s/^0+// for @B;
+
+    my $max = @A > @B ? scalar @A : scalar @B;
+
+    for my $i (0 .. $max - 1) {
+        my $a_part = $A[$i] || 0;
+        my $b_part = $B[$i] || 0;
+
+        my $cmp = ($a_part <=> $b_part);
+        return $cmp if $cmp;
+    }
+
+    return 0;
+
+}
+
+
+# datetime compare
+
+sub datetime_version_compare {
+
+    my ($a, $b) = @_;
+
+    my ($a_epoch, $a_fraction) = _datetime_to_epoch($a);
+    my ($b_epoch, $b_fraction) = _datetime_to_epoch($b);
+
+    return ($a_epoch <=> $b_epoch) || ($a_fraction cmp $b_fraction);
+}
+
+sub _datetime_to_epoch {
+
+    my $datetime = shift // '';
+
+    Carp::croak "Invalid datetime version '$datetime'" unless $datetime =~ $RFC3339_REGEXP;
+
+    my %dt = %+;
+
+    Carp::croak "Invalid datetime version '$datetime' (time-offset out of range)"
+        if (defined $dt{offset_hour} && ($dt{offset_hour} > 23 || $dt{offset_minute} > 59));
+
+    my $epoch = eval { timegm($dt{second}, $dt{minute}, $dt{hour}, $dt{day}, $dt{month} - 1, $dt{year}) };
+
+    Carp::croak "Invalid datetime version '$datetime'" unless defined $epoch;
+
+    if (defined $dt{offset_hour}) {
+        my $offset = ($dt{offset_hour} * 60 + $dt{offset_minute}) * 60;
+        $epoch -= $offset if ($dt{offset_sign} eq '+');
+        $epoch += $offset if ($dt{offset_sign} eq '-');
+    }
+
+    my $fraction = $dt{fraction} // '000';
+    $fraction .= '0' x (9 - length $fraction);    # nanoseconds
+
+    return ($epoch, $fraction);
+
+}
+
+
+# lexicographic compare
+
+sub lexicographic_version_compare {
+
+    my ($a, $b) = @_;
+
+    utf8::encode($a);
+    utf8::encode($b);
+
+    return $a cmp $b;
+
+}
+
 1;
 
 __END__
@@ -647,9 +837,29 @@ range string to a VERS string, but this may not work perfectly.
 
 =item $int = version_compare($scheme, $a, $b)
 
+Compare two versions using the scheme comparator class (see L<URI::VersionRange::Version>).
+
 =item $int = generic_version_compare($a, $b)
 
+Generic comparison (split on numeric and alphabetic segments).
+
 =item $int = semver_version_compare($a, $b)
+
+Semantic Versioning 2.0.0 comparison (L<https://semver.org>).
+
+=item $int = datetime_version_compare($a, $b)
+
+RFC 3339 timestamp comparison based on the UTC instant (eg. C<2024-01-01T00:00:00Z == 2023-12-31T19:00:00-05:00>).
+Fractional seconds are supported up to 9 digits. Croaks on invalid timestamp.
+
+=item $int = intdot_version_compare($a, $b)
+
+Integers separated by dots (eg. C<10.234.5.12>). Leading zeros are ignored, a missing segment is equivalent
+to a zero segment and the interpretation stops at the first character that is not a digit or a dot.
+
+=item $int = lexicographic_version_compare($a, $b)
+
+Byte-wise comparison of the UTF-8 encoded versions, without normalisation.
 
 =back
 

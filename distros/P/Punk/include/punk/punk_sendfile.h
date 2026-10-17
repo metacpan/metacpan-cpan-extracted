@@ -286,7 +286,35 @@ typedef struct psf_src {
      * stat said: a caller whose stat came from a cache retries with a fresh
      * one rather than send a Content-Length the body will not match. */
     int         changed;
+    /* the validators already formatted for this stat (the file cache keeps
+     * them per entry), or NULL to format them here */
+    const char *etag_pre;
+    const char *date_pre;
 } psf_src;
+
+/* The ETag and Last-Modified for the file pfc_stat just answered for: from
+ * its cache entry when that entry still holds them for this stat, formatted
+ * into the entry otherwise. Copied out, so the caller holds no pointer into
+ * the cache. Returns 0 when the cache is off or the path is not cached. */
+static int psf_cached_validators(pTHX_ const char *path, STRLEN plen,
+                                 const Stat_t *st, char *etag, size_t etagl,
+                                 char *date, size_t datel) {
+    punk_filecache *c = &PFC_CACHE;
+    pfc_entry *e;
+    if (!pfc_enabled() || c->disabled || plen == 0 || plen >= PFC_KEY_MAX)
+        return 0;
+    e = pfc_lookup(c, path, plen, pfc_hash(path, plen));
+    if (!e || !e->exists) return 0;
+    if (!e->hdr_ok || !pfc_same(st, &e->st)) {
+        psf_etag(e->hdr_etag, sizeof e->hdr_etag, (UV)st->st_mtime,
+                 PFC_MTIME_NS(*st), (UV)st->st_size);
+        ps_http_date(e->hdr_date, sizeof e->hdr_date, (time_t)st->st_mtime);
+        e->hdr_ok = 1;
+    }
+    my_strlcpy(etag, e->hdr_etag, etagl);
+    my_strlcpy(date, e->hdr_date, datel);
+    return 1;
+}
 
 typedef struct psf_opts {
     SV *type;                  /* Content-Type, or NULL to infer       */
@@ -381,13 +409,19 @@ static SV *psf_respond(pTHX_ HV *env, psf_src *src, psf_opts *opt) {
         }
     }
     else if (src->has_mtime) {
-        psf_etag(etagbuf, sizeof etagbuf, src->mtime, src->mns, src->size);
-        etag = etagbuf;
-        elen = strlen(etagbuf);
+        if (src->etag_pre) etag = src->etag_pre;
+        else {
+            psf_etag(etagbuf, sizeof etagbuf, src->mtime, src->mns, src->size);
+            etag = etagbuf;
+        }
+        elen = strlen(etag);
     }
     if (src->has_mtime) {
-        ps_http_date(date, sizeof date, (time_t)src->mtime);
-        ldate = date;
+        if (src->date_pre) ldate = src->date_pre;
+        else {
+            ps_http_date(date, sizeof date, (time_t)src->mtime);
+            ldate = date;
+        }
     }
 
     e = hv_fetchs(env, "REQUEST_METHOD", 0);
@@ -623,7 +657,7 @@ static SV *ps_serve_file_opt(pTHX_ HV *env, const char *file, STRLEN flen,
     psf_src  s;
     psf_opts o;
     char sib[MAXPATHLEN + 8];
-    char etagbuf[PSF_ETAG_MAX + 8];
+    char etagbuf[PSF_ETAG_MAX + 8], datebuf[40];
     AV *extra = NULL;
     const char *ae;
     STRLEN ael = 0;
@@ -647,6 +681,12 @@ static SV *ps_serve_file_opt(pTHX_ HV *env, const char *file, STRLEN flen,
     s.ino       = (UV)st.st_ino;
     s.has_id    = 1;
     o.ranges    = 1;
+    /* the validators the cache already formatted for this stat */
+    if (psf_cached_validators(aTHX_ file, flen, &st, etagbuf, sizeof etagbuf,
+                              datebuf, sizeof datebuf)) {
+        s.etag_pre = etagbuf;
+        s.date_pre = datebuf;
+    }
     if (fo) o.cache_control = fo->cache_control;
 
     /* Vary goes on EVERY response from here, compressed or not: a shared
@@ -690,6 +730,8 @@ static SV *ps_serve_file_opt(pTHX_ HV *env, const char *file, STRLEN flen,
              * validate it against another */
             s.dev   = (UV)sst.st_dev;
             s.ino   = (UV)sst.st_ino;
+            s.etag_pre = NULL;           /* the original's, not this file's */
+            s.date_pre = NULL;
 
             /* an encoding-tagged ETag, so an identity client and this one
              * never collide in a shared cache even if the two files should

@@ -18,16 +18,17 @@
 use v5.36;
 
 package App::FuguWeb::Manual;
-our $VERSION = '0.8.1';
+our $VERSION = '0.9.0';
 
+use App::FuguWeb;
 use Fugu::File;
 
 # App::FuguWeb::Manual - one manual source.
 #
 # A manual is an mdoc(7) page or a POD sidecar. The class answers the
-# five questions that the build and the index ask about one: where it
+# six questions that the build and the index ask about one: where it
 # is, what it is called, which section it belongs to, which page it
-# becomes, and what it is for.
+# becomes, what it is for, and which language it holds.
 #
 # The class never retypes a description. The source page is the only
 # copy, and the method reads it.
@@ -51,6 +52,7 @@ sub from_mdoc ( $class, $path, $group )
 		name    => ( $namespace // '' ) . ( $stem // $base ),
 		section => $section // '',
 		group   => $group,
+		lang    => App::FuguWeb::DEFAULT_LANGUAGE,
 	}, $class;
 }
 
@@ -71,14 +73,30 @@ sub from_pod ( $class, $path, $group, $module_root )
 		name    => $name,
 		section => POD_SECTION,
 		group   => $group,
+		lang    => App::FuguWeb::DEFAULT_LANGUAGE,
 	}, $class;
 }
 
-# $self->path, $self->name, $self->section:
-#	The source, the manual name, and its section.
+# $self->translated($path, $code):
+#	The manual of one language whose source is the namesake of
+#	this one, per WEB-LANG-5. The copy keeps the name, the section
+#	and the page, because a page name must not change with the
+#	language. It reads its description from its own source.
+sub translated ( $self, $path, $code )
+{
+	my %copy = %$self;
+	delete $copy{description};
+
+	return bless { %copy, path => $path, lang => $code }, ref $self;
+}
+
+# $self->path, $self->name, $self->section, $self->lang:
+#	The source, the manual name, its section, and the language of
+#	the source.
 sub path    ($self) { return $self->{path}; }
 sub name    ($self) { return $self->{name}; }
 sub section ($self) { return $self->{section}; }
+sub lang    ($self) { return $self->{lang}; }
 
 # $self->is_pod:
 #	Report whether the source is a POD sidecar. A sidecar goes

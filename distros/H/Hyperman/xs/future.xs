@@ -63,7 +63,7 @@ done_future(class, ...)
         AWAIT_NEW_DONE = 1
     CODE:
     {
-        const char *name = SvROK(class) ? HvNAME(SvSTASH(SvRV(class)))
+        const char *name = (SvROK(class) && SvOBJECT(SvRV(class))) ? HvNAME(SvSTASH(SvRV(class)))
                                         : SvPV_nolen(class);
         PERL_UNUSED_VAR(ix);
         RETVAL = hmf_new(aTHX_ name);
@@ -79,7 +79,7 @@ fail_future(class, ...)
         AWAIT_NEW_FAIL = 1
     CODE:
     {
-        const char *name = SvROK(class) ? HvNAME(SvSTASH(SvRV(class)))
+        const char *name = (SvROK(class) && SvOBJECT(SvRV(class))) ? HvNAME(SvSTASH(SvRV(class)))
                                         : SvPV_nolen(class);
         PERL_UNUSED_VAR(ix);
         RETVAL = hmf_new(aTHX_ name);
@@ -235,7 +235,12 @@ get(self)
             st = hmf_state(aTHX_ self);
             if (st == HMF_PENDING) croak("Hyperman::Future is not ready");
         } else {
+            /* The wait pumps the loop, which runs other handlers: the Perl
+             * stack can be reallocated under this frame, so the pointer this
+             * PPCODE pushes results through is re-read afterwards. */
+            PUTBACK;
             hmf_await(aTHX_ self);
+            SPAGAIN;
             st = hmf_state(aTHX_ self);
         }
         if (st == HMF_FAILED) {
@@ -270,7 +275,9 @@ failure(self)
     SV *self
     PPCODE:
     {
+        PUTBACK;
         hmf_await(aTHX_ self);
+        SPAGAIN;
         if (hmf_state(aTHX_ self) != HMF_FAILED) XSRETURN_EMPTY;
         {
             AV *fav = hmf_values_av(aTHX_ self);
@@ -430,7 +437,7 @@ from_future(class, other)
     SV *other
     CODE:
     {
-        const char *name = SvROK(class) ? HvNAME(SvSTASH(SvRV(class)))
+        const char *name = (SvROK(class) && SvOBJECT(SvRV(class))) ? HvNAME(SvSTASH(SvRV(class)))
                                         : SvPV_nolen(class);
         SV *cb;
         RETVAL = hmf_new(aTHX_ name);

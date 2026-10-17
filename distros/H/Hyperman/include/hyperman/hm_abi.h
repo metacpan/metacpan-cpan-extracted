@@ -237,7 +237,11 @@ typedef struct hm_abi {
      * The CALLER owns it from stream_open until stream_close, which is the
      * only entry point that frees it - a stream that is aborted underneath
      * you still has to be closed. Passing a handle that is not live is
-     * HM_ABI_STREAM_STALE, not a crash.
+     * HM_ABI_STREAM_STALE, not a crash. Liveness is membership of the
+     * registry, by address: a handle closed and then used again is STALE
+     * only until that address is handed out for a NEW handle, after which
+     * the stale pointer would act on somebody else's stream. Forget a
+     * handle the moment stream_close or stream_abort returns.
      *
      * stream_write copies buf; a NULL buf with a non-zero len is
      * HM_ABI_STREAM_ARG. HM_ABI_STREAM_FULL means the bytes were taken but
