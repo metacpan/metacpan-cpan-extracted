@@ -91,20 +91,6 @@ return [
                 }
             },
 
-            [qw/default_with_init/] => {
-                type       => 'hash',
-                level      => 'hidden',
-                index_type => 'string',
-                cargo      => { type => 'leaf', value_type => 'string' },
-                warp       => {
-                    follow  => { 't'            => '?type' },
-                    'rules' => [{
-                        when =>  '$t eq "hash" or $t eq "list"',
-                        apply => { level => 'normal', }
-                    }]
-                }
-            },
-
             'max_nb' => {
                 type       => 'leaf',
                 level      => 'hidden',
@@ -177,10 +163,6 @@ return [
             auto_create_ids => 'always create the number of id specified in this integer',
             allow_keys => 'specify a set of allowed keys',
             allow_keys_matching => 'Keys must match the specified regular expression.',
-            default_with_init => 'specify a set of keys and values to create and initialize '
-            .'some elements . E.g. initialize of hash of nodes with \' foo => "X=Av Y=Bv", bar => "Y=Av Z=Cz"\' '
-            .'or initialize a list of string with \'0 => "foo", 1 => "bar"\'. The values follows '
-            .'the syntax specified in L<Config::Model::Loader/"load string syntax">',
             help => 'Specify help string applicable to values. The keys are regexp matched to the beginning of the value. See C<help> parameter of L<Config::Model::Value/DESCRIPTION> for more possibilities',
             replace => 'Used for enum to substitute one value with another. This parameter must be used to enable user to upgrade a configuration with obsolete values. The old value is the key of the hash, the new one is the value of the hash',
             warn_if_key_match => 'Warn user if a key is created matching this regular expression',

@@ -31,6 +31,9 @@ WriteMakefile(
             bugtracker => {
                 web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Net-IP-LPM'
             },
+            x_contributors => [
+                'Joel C. Maslak <jmaslak@antelope.net>',
+            ],
         },
       } ) : ()),
     LIBS              => [ ], # e.g., '-lm'

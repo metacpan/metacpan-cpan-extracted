@@ -9,7 +9,7 @@ use File::Path;
 use File::Copy;
 use File::Temp qw(tempdir);
 use File::Slurp qw( read_file write_file);
-use Test::More tests => 71;
+use Test::More tests => 70;
 use Test::File;
 use Test::Warnings;
 use lib '../lib';
@@ -122,12 +122,7 @@ use_ok('Archive::BagIt');
     my $bag;
     my $warning = Test::Warnings::warning { $bag = Archive::BagIt->make_bag($dir) };
     like (
-        $warning->[0] ,
-        qr/empty file .* detected/,
-        'Got expected warning from make_bag()',
-    ) or diag 'got unexpected warnings:' , explain($warning);
-    like (
-        $warning->[1] ,
+        $warning,
         qr/empty file .* detected/,
         'Got expected warning from make_bag()',
     ) or diag 'got unexpected warnings:' , explain($warning);

@@ -115,7 +115,7 @@ subtest 'Issue' => sub {
             line        => 1,
             description => 'test',
         );
-    } qr/failed type constraint/, 'rejects invalid severity';
+    } qr/Type constraint failed|failed type constraint/, 'rejects invalid severity';
 
     throws_ok {
         Claude::Agent::Code::Review::Issue->new(
@@ -125,7 +125,7 @@ subtest 'Issue' => sub {
             line        => 1,
             description => 'test',
         );
-    } qr/failed type constraint/, 'rejects invalid category';
+    } qr/Type constraint failed|failed type constraint/, 'rejects invalid category';
 };
 
 # Test Report

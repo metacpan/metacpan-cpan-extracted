@@ -3,6 +3,7 @@ lib/Geo/Coder/DataScienceToolkit.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
 README
 README.md
 t/00-load.t
@@ -14,6 +15,8 @@ t/coverage.t
 t/critic.t
 t/cv.t
 t/dist.t
+t/eof.t
+t/eol.t
 t/gv.t
 t/kwalitee.t
 t/links.t
@@ -26,6 +29,7 @@ t/pod-cm.t
 t/pod.t
 t/port.t
 t/prereq.t
+t/reference.t
 t/snippets.t
 t/spelling.t
 t/strict.t

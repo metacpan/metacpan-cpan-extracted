@@ -4,7 +4,9 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.04';
+
+our $CLOCK;
 
 use XSLoader;
 XSLoader::load('Time::Keeper', $VERSION);
@@ -19,6 +21,10 @@ use overload
     fallback => 1;
 
 use Time::Keeper::Duration;
+use Time::Keeper::Date;
+use Time::Keeper::YearMonth;
+use Time::Keeper::MonthDay;
+use Time::Keeper::Time;
 
 1;
 
@@ -32,7 +38,7 @@ Time::Keeper - dates and times with time zones, leap seconds and locales
 
 =head1 VERSION
 
-Version 0.01
+Version 0.04
 
 =head1 SYNOPSIS
 
@@ -88,7 +94,8 @@ that names it.
     my $t = Time::Keeper->now;
     my $t = Time::Keeper->now(zone => 'Asia/Tokyo');
 
-The current time, to the nanosecond where the system gives it. C<zone> is
+The current time, to the nanosecond where the system gives it, or the
+clock a test pinned (see L</TESTING>). C<zone> is
 described under L</TIME ZONES>. Every constructor also takes C<locale>, as
 described under L</LOCALES>.
 
@@ -99,6 +106,12 @@ described under L</LOCALES>.
 Midnight at the start of today in the zone. Where a zone's clocks jumped
 over midnight, as some zones' spring changes do, it is the first moment of
 the day that did happen: C<today> never dies on such a day.
+
+=head2 try_new
+
+    my $t = Time::Keeper->try_new(year => 2026, month => 2, day => 30);   # undef
+
+As L</new>, but undef where L</new> would die, and C<$@> left as it was.
 
 =head2 new
 
@@ -153,6 +166,22 @@ taken exactly. A number with a fraction is rounded to the microsecond,
 because a floating-point number holds no more than that for times near
 today: pass a string when the nanoseconds matter.
 
+=head2 from_epoch_millis
+
+=head2 from_epoch_micros
+
+=head2 from_epoch_nanos
+
+    my $t = Time::Keeper->from_epoch_millis(1760000000123, zone => 'Asia/Tokyo');
+    my $t = Time::Keeper->from_epoch_nanos('1760000000123456789');
+
+The instant a whole number of milliseconds, microseconds or nanoseconds
+after the epoch: an integer, or a string of digits for one too large for the
+perl's integers. A fraction is an error, since L</from_epoch> takes those.
+Negative numbers count back, so -1 millisecond is 23:59:59.999 on 31
+December 1969. A leap second cannot be named this way: the epoch has no
+number for it.
+
 =head2 from_object
 
     my $t = Time::Keeper->from_object(object => $datetime);
@@ -162,6 +191,14 @@ The instant of any object with a C<utc_rd_values> method, as L<DateTime>
 and the modules built on it have. The zone is C<zone> if given, else the
 object's own (the name its C<time_zone> gives), else UTC. A floating object
 gives a floating value.
+
+An object without C<utc_rd_values> but with C<epoch>, as L<Time::Piece> and
+L<Time::Moment> have, gives the instant that returns (a string with a
+fraction is read exactly, as L</from_epoch> reads one); its C<nanosecond>,
+if it has the method, is taken too, and its C<tzoffset>, in seconds, gives a
+fixed zone (UTC for an offset of zero) unless C<zone> is given. A
+Time::Piece from C<localtime> is best given C<< zone => 'local' >>, so the
+value has the machine's zone and its rules rather than one offset.
 
 =head2 max
 
@@ -192,6 +229,11 @@ The day of the month, from 1.
 =head2 hour
 
 0 to 23.
+
+=head2 hour_12
+
+1 to 12: the hour on a twelve-hour clock, 12 at midnight and at noon.
+L</am_pm> says which.
 
 =head2 minute
 
@@ -230,9 +272,15 @@ The day of the quarter, from 1.
 
 =head2 week_year
 
+    $t->week;                 # 42, ISO 8601's
+    $t->week(locale => 1);    # the locale's: 43 in the United States
+
 The ISO 8601 week, 1 to 53, and the year it belongs to. Weeks begin on a
 Monday, and week 1 is the week with the year's first Thursday in it, so
 the first days of January can belong to the last week of the year before.
+With C<< locale => 1 >>, the week as the value's locale counts it, as
+L</format>'s C<w> and C<Y> write it: from the locale's first day of the
+week, with week 1 the first that holds its minimum of days of January.
 
 =head2 week_of_month
 
@@ -242,6 +290,15 @@ week is the first that has a Thursday in the month.
 =head2 is_leap_year
 
 True in a leap year.
+
+=head2 is_weekend
+
+=head2 is_weekday
+
+True on a day of the locale's weekend, and true on any other day: Saturday
+and Sunday in most of the world, Friday and Saturday in Egypt, Thursday and
+Friday in Afghanistan, Sunday alone in India, as CLDR has it for the
+locale's territory.
 
 =head2 days_in_month
 
@@ -260,6 +317,21 @@ The zone's offset from UTC at this instant, in seconds east of UTC.
 True when the zone is on daylight saving time at this instant. Some zones
 mark their winter time as daylight saving time and their summer time as
 standard, as Ireland does: this says what the database says.
+
+=head2 standard_offset
+
+The offset of the zone's standard time at this instant, in seconds east of
+UTC: in summer, the offset the clocks are an hour ahead of. The offset
+itself for a fixed zone, 0 for UTC and floating time. What the database
+calls standard is not always what the clocks are called: Europe/Dublin's
+standard time is +01:00 all year, and its winter GMT is a daylight time an
+hour behind it. Needs L<Time::Keeper::Zone> 0.03 or later.
+
+=head2 dst_offset
+
+How far the offset in force is from the standard one: L</offset> less
+L</standard_offset>. 3600 in London in July, 1800 on Lord Howe Island in
+January, 0 where the clocks have not moved, and -3600 in Dublin in winter.
 
 =head2 is_utc
 
@@ -297,6 +369,21 @@ The same with the fraction of the second, as a floating-point number.
 The same as a string, exact to the nanosecond: give it to L</from_epoch>
 to have the instant back.
 
+=head2 epoch_millis
+
+=head2 epoch_micros
+
+=head2 epoch_nanos
+
+The same in milliseconds, microseconds and nanoseconds, as whole numbers:
+the fraction below the unit is dropped, so -1 millisecond is 23:59:59.999 on
+31 December 1969. Milliseconds and microseconds are an integer where one
+fits, and past that a floating-point number, exact below 2**53 (every
+millisecond of the next 280,000 years); nanoseconds are an integer on a
+64-bit perl between September 1677 and April 2262, and a string of digits
+beyond that or on a 32-bit perl, as L</epoch_string> is. During a leap
+second the second is that of the midnight after, as L</epoch> has it.
+
 =head2 julian_day
 
 =head2 mjd
@@ -318,7 +405,23 @@ second. Undefined before 1972, and in floating time. See L</LEAP SECONDS>.
 
 A value in the same zone with the wall-clock fields given changed and the
 rest as they were. It takes the fields L</new> does, apart from C<zone>,
-and C<gap> and C<overlap>.
+and C<gap> and C<overlap>. C<day> may be C<last>, the last day of the
+month; C<day_of_week>, 1 for Monday to 7 for Sunday, moves to that day of
+the same ISO 8601 week, after the other fields have been set.
+
+    my $end = $t->with(month => 2, day => 'last');
+    my $sun = $t->with(day_of_week => 7);
+    my $doy = $t->with(year => 2027, day_of_year => 60);
+    my $wk  = $t->with(week => 1, day_of_week => 1);
+
+C<day_of_year>, 1 to 366, and C<week>, an ISO 8601 week of the year
+given or the value's own, set the date instead of C<month> and C<day>, and
+cannot be given with them; C<week> keeps the value's day of the week unless
+C<day_of_week> says otherwise.
+
+=head2 try_with
+
+As L</with>, but undef where L</with> would die, and C<$@> left as it was.
 
 =head2 in_zone
 
@@ -342,6 +445,24 @@ C<< $t->in_zone('UTC') >>.
 =head2 as_floating
 
 The same wall-clock time in floating time.
+
+=head2 to_date
+
+=head2 to_year_month
+
+=head2 to_month_day
+
+=head2 to_time
+
+    $t->to_date;          # a Time::Keeper::Date: the wall-clock date
+    $t->to_year_month;    # a Time::Keeper::YearMonth
+    $t->to_month_day;     # a Time::Keeper::MonthDay
+    $t->to_time;          # a Time::Keeper::Time: the wall-clock time of day
+
+The value's wall-clock date or time of day, or part of the date, as a plain
+class with the value's locale (see L</DATES WITHOUT TIMES>). During a leap
+second C<to_time> gives 23:59:59.999999999, the last time of day there is.
+C<< $t->date >> and C<< $t->time >> are still the strings.
 
 =head1 ARITHMETIC
 
@@ -406,20 +527,146 @@ The months and days between the two values' dates, never negative.
 
 The minutes and seconds between the two values, never negative.
 
+=head2 until
+
+=head2 since
+
+    my $d = $a->until($b);                            # the same as $b - $a
+    my $d = $a->until($b, largest => 'hours');        # PT747H30M15.5S
+    my $d = $b->since($a, largest => 'weeks', smallest => 'days');
+    my $d = $a->until($b, smallest => 'hours', mode => 'half_ceil');
+    my $d = $a->until($b, smallest => 'minutes', increment => 15);
+
+The duration from this value to C<$b> (C<until>), or from C<$a> to this
+value (C<since>), in the units asked for. C<largest> is the largest unit
+the duration may have: C<years> or C<months> give months, then days, then
+the clock, as L</minus> does; C<weeks> or C<days> give days, then the clock;
+C<hours> or C<minutes> give minutes of 60 seconds and then seconds; C<seconds>
+and below give seconds alone, the time that passed, counting leap seconds
+(a leap second crossed shows in the seconds whatever the largest unit).
+
+C<smallest> drops the parts below it and rounds the unit's own part, to a
+multiple of C<increment> for a clock unit, by C<mode>: C<trunc>, towards
+zero, the default; C<expand>, away from it; and L</round>'s C<floor>,
+C<ceil>, C<half_floor>, C<half_ceil> and C<half_even>, where C<floor> of a
+negative duration is away from zero. The two candidates are measured as
+instants from the start, so a day is as long as it was there, and a clock
+part that rounds up into a whole day is carried into the days.
+
+C<< $a->plus($a->until($b, largest => ...)) >> is C<$b> for every
+C<largest>; with C<smallest> it is C<$b> rounded.
+
 =head2 truncate
 
     my $monday = $t->truncate(to => 'week');
+    my $ms     = $t->truncate(to => 'millisecond');
 
 The start of the value's year, quarter, month, week (a Monday), day, hour,
-minute or second. Where that wall-clock time did not happen, the first
-moment after it that did.
+minute, second, millisecond, microsecond or nanosecond. Where that wall-clock
+time did not happen, the first moment after it that did.
+
+    $t->truncate(to => 'week', week_start => 7);          # the Sunday
+    $t->truncate(to => 'week', week_start => 'locale');   # the locale's first day
+
+C<week_start> says what day a week begins on, 1 for Monday to 7 for Sunday,
+or C<locale> for the value's locale's first day of the week: Sunday in the
+United States, Saturday in Egypt. L</round> and L</end_of> take it too.
 
 =head2 round
 
     my $t = $t->round(to => 'minute');
+    my $t = $t->round(to => 'minute', increment => 15);
+    my $t = $t->round(to => 'hour', increment => 6, mode => 'floor');
 
-The start of the nearest year, quarter, month, week, day, hour, minute or
-second, the later of two as near.
+The start of the nearest year, quarter, month, week, day, hour, minute,
+second, millisecond, microsecond or nanosecond, the later of two as near.
+
+C<increment> rounds to a multiple of the unit: 15 minutes, 6 hours, 100
+nanoseconds. It is for the clock units, and must divide the next unit up:
+1 to 23 dividing 24 for an hour, a divisor of 60 for a minute or a second,
+of 1000 for the rest. Hours in increments are counted on the wall clock, so
+six-hour buckets begin at 00:00, 06:00, 12:00 and 18:00 local time whatever
+the day's length; a bucket whose start the clocks skipped begins at the
+first moment that did happen.
+
+C<mode> says which way:
+
+    floor       the start of the value's own bucket, as truncate gives it
+    ceil        the start of the next, unless the value is at a start
+    half_floor  the nearer, the earlier of two as near
+    half_ceil   the nearer, the later of two as near; the default
+    half_even   the nearer, the even-numbered bucket of two as near,
+                counted from the start of the day, or of the calendar
+    trunc       floor, and expand is ceil: for a value they are the same,
+                and L</until> and L<Time::Keeper::Duration/round> tell them apart
+
+Nearer is by the time that passed, so around a change of the clocks the two
+candidates are not an equal number of wall-clock minutes apart.
+
+=head2 end_of
+
+    my $last = $t->end_of(to => 'month');    # 2026-10-31T23:59:59.999999999Z
+
+The last nanosecond of the value's year, quarter, month, week, day, hour,
+minute, second, millisecond, microsecond or nanosecond: the instant before
+the next one begins. On a day that ends in a leap second it is 23:59:60.999999999, and on
+a day whose midnight the clocks skipped it is the nanosecond before the
+first moment that did happen.
+
+=head2 next
+
+=head2 previous
+
+    my $monday = $t->next(day_of_week => 1);
+    my $friday = $t->previous(day_of_week => 5, or_same => 1);
+
+The value's time of day on the next, or the previous, day of the week
+given, 1 for Monday to 7 for Sunday: strictly after, or before, the value's
+own day, unless C<or_same> is true, when a value already on that day is
+given back as it is. C<gap> and C<overlap> may be given, as for L</plus>.
+
+=head2 nth_in_month
+
+=head2 last_in_month
+
+    my $thanksgiving = $t->nth_in_month(day_of_week => 4, n => 4);
+    my $change       = $t->last_in_month(day_of_week => 7);
+
+The value's time of day on the nth day of the week given in the value's
+month, C<n> 1 to 5, or on the last of them with C<n> -1 or
+C<last_in_month>. A month with no fifth such day is an error that names
+it. C<gap> and C<overlap> as for L</plus>.
+
+=head2 range
+
+    my @days   = $start->range($end, by => 'day');
+    my @weeks  = $start->range($end, by => 'week', inclusive => 0);
+    my @hours  = $start->range($end, by => 'hour', step => 2);
+    my @months = $start->range($end, by => 'month', end_of_month => 'limit');
+    my @back   = $end->range($start, by => Time::Keeper::Duration->new(days => -1));
+    my @safe   = $start->range($end, by => 'day', gap => 'forward');
+
+The values from the start to the end, a step apart. C<by> is a unit name,
+singular or plural, or a L<Time::Keeper::Duration>; C<step> multiplies it.
+Each value is the start plus the step times its position, never the value
+before plus the step, so a month from 31 January gives 3 March, 31 March
+and 1 May, as L</plus> would, and C<end_of_month> says what a short month
+does. The end is included when the step lands on it, unless
+C<< inclusive => 0 >>. The step must move toward the end: a zero step, a
+step with parts of both signs, or an end the step walks away from is an
+error. C<gap> and C<overlap> as for L</plus>: a step of a day that keeps a
+time of day the clocks skipped dies unless told what to do. A range of more
+than about ten million values is refused; L</iterate> has no limit.
+
+=head2 iterate
+
+    my $next = $start->iterate($end, by => 'month');
+    while (my $t = $next->()) { ... }
+
+As L</range>, but a code ref giving the next value each time it is called
+and undef after the last, for ranges too long to hold at once. Each
+iterator keeps its own place; a copy made for a thread continues on its
+own.
 
 =head2 Months and the end of the month
 
@@ -567,6 +814,44 @@ C<long>, C<medium> (the default) or C<short>.
 The locale's format for a skeleton: the fields wanted, without their order
 or punctuation, which are the locale's. A skeleton the locale has no format
 for is an error.
+
+=head2 format_relative
+
+    $t->format_relative;                                  # 3 hours ago
+    $t->format_relative(to => $then);                     # in 2 days
+    $t->format_relative(unit => 'day');                   # yesterday
+    $t->format_relative(numeric => 'always');             # 1 day ago
+    $t->in_locale('fr')->format_relative(style => 'short');   # il y a 3 h
+
+The value as a time relative to C<to>, which is now if not given, in the
+locale's words, as C<Intl.RelativeTimeFormat> writes one. C<unit> is C<auto>
+(the default: the largest of year, month, week, day, hour, minute and second
+with a count that is not zero), or one of them, or C<quarter>. Days, weeks,
+months and years are counted on the wall-clock dates in the value's zone, so
+23:00 yesterday is C<yesterday> at 09:00 today, and hours, minutes and
+seconds by the time that passed. C<style> is C<long>, C<short> or C<narrow>.
+With C<numeric> C<auto>, the default, a count the locale has a word for is
+written as the word: C<yesterday>, C<today>, C<tomorrow>, C<last month>,
+C<now>; with C<always> it is written as a number: C<1 day ago>, C<in 0
+days>. Numbers are in the locale's digits.
+
+=head2 format_interval
+
+    $a->format_interval($b, skeleton => 'yMMMd');   # Oct 15 – 17, 2026
+    $a->format_interval($b, skeleton => 'hm');      # 9:00 – 10:30 AM
+    $a->in_locale('fr')->format_interval($b, skeleton => 'yMMMd');   # 15–17 oct. 2026
+
+The two values as an interval in the locale's words, as
+C<Intl.DateTimeFormat>'s C<formatRange> writes one: the fields the skeleton
+names, with what the two ends share written once. The greatest field that
+differs, of era, year, month, day, the period of the day, hour and minute,
+chooses the locale's interval format for the skeleton; where the two ends
+agree in every field the skeleton shows, the start alone is written, as
+L</format_skeleton> writes it; where they differ in a field the skeleton
+does not show, both are written in full round the locale's dash. The end is
+brought into the start's zone and written in the start's locale; the two are
+written in the order given. A skeleton the locale has no interval formats
+for is an error, and a value in floating time pairs only with another.
 
 =head2 month_name
 
@@ -772,9 +1057,29 @@ digits, 0 to 9, truncated:
     $t->iso8601(precision => 3);   # 2026-10-15T09:00:00.123Z Years before 0 or after
 9999 take ISO 8601's expanded form, such as C<+012026>.
 
+    $t->iso8601(form => 'basic');     # 20261015T090000Z
+    $t->iso8601(form => 'week');      # 2026-W42-4T09:00:00Z
+    $t->iso8601(form => 'ordinal');   # 2026-288T09:00:00Z
+
+C<form> chooses among ISO 8601's forms: C<extended>, the default, with its
+separators; C<basic>, without them, as file names like it; C<week>, the
+week date; and C<ordinal>, the day of the year. L</parse> reads the three
+back, except a C<basic> form with an expanded year, whose number of year
+digits ISO 8601 leaves to agreement. L</rfc3339> and L</rfc9557> take
+C<precision> only.
+
 =head2 TO_JSON
 
 The L</iso8601> form, for JSON encoders that call C<TO_JSON>.
+
+=head2 to_list
+
+    my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = $t->to_list;
+
+The nine fields C<localtime> gives, in its conventions: the month from 0,
+the year less 1900, Sunday 0, the day of the year from 0, and whether the
+zone is on daylight saving time; the second is 60 during a leap second. For
+code that was fed C<localtime>'s list.
 
 =head1 TIME ZONES
 
@@ -816,6 +1121,41 @@ with the offset from after it.
 C<overlap> says which of two instants to take: C<earlier>, the default, or
 C<later>.
 
+B<Ambiguity.> A value made can be asked whether its wall-clock time was
+one of the repeated ones, and for the other instant that reads the same.
+Both are worked out from the value's civil fields, however it was made: a
+value from an epoch is as ambiguous as one from a wall clock. The methods
+here, and L</next_transition> and L</previous_transition>, need
+L<Time::Keeper::Zone> 0.03 or later, and die naming it with an older one.
+
+=head2 is_ambiguous
+
+True when the value's wall-clock time happened twice in its zone. False
+in UTC, in a fixed offset and in floating time, and for a time the clocks
+jumped over.
+
+=head2 other_reading
+
+    my $t = Time::Keeper->new(year => 2026, month => 11, day => 1, hour => 1, minute => 30,
+                              zone => 'America/New_York');   # 01:30 EDT, the earlier
+    $t->other_reading;                                       # 01:30 EST, an hour later
+
+The other instant whose wall-clock time is this value's, in the same zone
+(a link keeps its name) and locale, or undef when there is only one.
+
+=head2 next_transition
+
+=head2 previous_transition
+
+    my $next = $t->next_transition;        # a value, or undef
+
+The next, or the last, instant at which the value's zone changes its
+offset, its DST flag or its abbreviation, as a value in the same zone and
+locale, or undef when there is none. The next transition is strictly
+after the value, the previous one strictly before it. UTC, a fixed offset
+and floating time never change. L<Time::Keeper::Zone/transitions> lists
+a zone's transitions over a span.
+
 =head1 LEAP SECONDS
 
 A leap second is 23:59:60 UTC on one of the 27 days that ended with one,
@@ -842,7 +1182,8 @@ None has been added since 2016, and leap seconds are due to be given up by
 
 A value's locale gives its names and formats: month and day names, eras,
 AM and PM, the periods of the day, the date and time formats, the formats
-by skeleton, the zone names, the first day of the week, and its digits.
+by skeleton, the zone names, the first day of the week and the weekend, the
+words for relative times, durations, lists and intervals, and its digits.
 Every constructor and parser takes C<locale>; L</in_locale> changes it;
 L</locale> gives it. The default is English, C<en>, as used in the United
 States.
@@ -865,16 +1206,48 @@ locale. L</strftime> writes ASCII digits unless asked with C<%O>, and the
 fixed forms (L</iso8601>, L</rfc2822> and the others) always do. The
 parsers read the digits of any script in any locale.
 
+=head1 DATES WITHOUT TIMES
+
+    my $d  = Time::Keeper::Date->new(year => 2026, month => 10, day => 15);
+    my $ym = Time::Keeper::YearMonth->new(year => 2026, month => 10);
+    my $md = Time::Keeper::MonthDay->new(month => 2, day => 29);
+    my $tm = Time::Keeper::Time->new(hour => 9);
+    my $t  = $d->at($tm, zone => 'Europe/London');
+
+A date, a time of day, a year and month, and a month and day are classes
+of their own: L<Time::Keeper::Date>, L<Time::Keeper::Time>,
+L<Time::Keeper::YearMonth> and L<Time::Keeper::MonthDay>, loaded with this
+module. None is a Time::Keeper
+value and none pretends to be: a date has no hour and no zone, a pattern
+letter that needs one is an error, and each compares only with its own
+kind. They share the arithmetic, the locales, the formats and the parsers.
+L</to_date>, L</to_time>, L</to_year_month> and L</to_month_day> take them
+from a value; C<at>, C<on> and C<in_year> give a value or a date back.
+
 =head1 SERIALISATION
 
 A value freezes with L<Storable> as text: its instant, its zone by name
 and its locale by code, so a value frozen by one release thaws in another.
+
+A serialiser that calls no hook, such as L<Struct::Codec>, copies a value's
+bytes and gives back a working value in the same process. The bytes hold
+the zone by its place in L<Time::Keeper::Zone>'s table, which changes with
+the zone database, so bytes kept past a release of that module may name
+another zone: for storage, the hooks' text is the form to keep.
 
 =head2 STORABLE_freeze
 
 =head2 STORABLE_thaw
 
 The L<Storable> hooks.
+
+=head2 FREEZE
+
+=head2 THAW
+
+The same for the serialisers that use L<Types::Serialiser>'s protocol:
+L<Sereal>, L<CBOR::XS> and L<JSON::XS> with C<allow_tags>. C<FREEZE> gives
+the one string Storable gets, and C<THAW> takes it back.
 
 =head1 C ABI
 
@@ -903,6 +1276,72 @@ Values may be shared with or copied into threads.
 =head2 CLONE
 
 Sets up a new thread's copy of the module.
+
+=head1 TESTING
+
+    {
+        local $Time::Keeper::CLOCK = Time::Keeper->parse('2026-10-15T09:00:00Z');
+        Time::Keeper->now;                     # 2026-10-15T09:00:00Z
+        Time::Keeper->today(zone => 'Asia/Tokyo');
+        $t->format_relative;                   # measured from the pinned clock
+    }
+    local $Time::Keeper::CLOCK = sub { $t = $t->plus(seconds => 1) };
+    local $Time::Keeper::CLOCK = sub { Time::Keeper->now->plus(hours => 1) };
+
+Every reading of the clock, by L</now>, L</today>, L</format_relative>
+without C<to>, L<Time::Keeper::Duration/compare> without a start and the
+C ABI's C<now>, goes through C<$Time::Keeper::CLOCK> when it is defined.
+It holds a value or an epoch, which pins the clock, or a code ref, called
+for each reading, that returns either. While the code ref runs the system
+clock is read, so the last example is a clock an hour fast. Set it with
+C<local> so a test pins the clock for one block and nothing outside sees
+it; it is for tests, and a module that sets it for its callers is in the
+wrong. The pinned value's zone and locale are not taken: C<now> applies its
+own arguments to the instant, as it does to the system's.
+
+=head1 MOVING FROM TIME::PIECE AND DATETIME
+
+=over 4
+
+=item * B<Values never change.> DateTime's C<set>, C<add>, C<truncate> and
+C<set_time_zone> change a value; L</with>, L</plus>, L</truncate> and
+L</in_zone> return a new one. There is no C<clone>: a value is its own copy.
+
+=item * B<UTC by default.> DateTime's default is floating time and
+Time::Piece's C<localtime> is the machine's zone; here a value with no zone
+is UTC, and C<< zone => 'local' >> asks for the machine's.
+
+=item * B<A zone is a name and a locale a code.> L</zone_name> and
+L</locale> give them; L<Time::Keeper::Zone> and L<Time::Keeper::Locale>
+answer questions about them.
+
+=item * B<Arithmetic adds months before days>, so C<< $b->minus($a) >> is
+the duration that adds back to exactly C<$b>; DateTime adds days first, and
+1.5% of its differences do not add back. L</delta_md> differs from
+DateTime's in the same way.
+
+=item * B<Gaps and overlaps> are chosen with C<gap> and C<overlap> (see
+L</GAPS AND OVERLAPS>): a time that did not happen dies unless asked
+otherwise, and of two that did the earlier is taken.
+
+=item * B<In a string> a value is RFC 3339 with its offset;
+C<< $t->strftime('%FT%T') >> is DateTime's form.
+
+=item * B<Formatting follows CLDR> where DateTime's C<format_cldr> does
+not (see L</format>): zone names, weeks counted as the locale counts them,
+and the locale's own digits.
+
+=item * C<< DateTime->from_object(object => $t) >> and
+C<< Time::Keeper->from_object(object => $dt) >> move a time between the
+two.
+
+=back
+
+Time::Piece's names map as C<mon> to L</month>, C<mday> to L</day>,
+C<add_months> to C<< plus(months => $n) >>, C<localtime> to
+C<< from_epoch($e, zone => 'local') >>; DateTime's as C<add> to L</plus>,
+C<set> to L</with>, C<set_time_zone> to L</in_zone>, C<format_cldr> to
+L</format>, C<time_zone_short_name> to L</zone_abbr>.
 
 =head1 SEE ALSO
 

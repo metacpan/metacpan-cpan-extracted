@@ -305,7 +305,8 @@
       "is_cdn",
       "is_resproxy",
       "is_dcproxy",
-      "is_mobproxy"
+      "is_mobproxy",
+      "is_pubproxy"
     ],
     "emptyObjects": [
       "vpn",
@@ -315,7 +316,8 @@
       "cdn",
       "resproxy",
       "dcproxy",
-      "mobproxy"
+      "mobproxy",
+      "pubproxy"
     ]
   },
   "lookup": [
@@ -348,7 +350,9 @@
           "cdn",
           "resproxy",
           "dcproxy",
-          "mobproxy"
+          "mobproxy",
+          "is_pubproxy",
+          "pubproxy"
         ]
       }
     },
@@ -386,7 +390,9 @@
           "cdn",
           "resproxy",
           "dcproxy",
-          "mobproxy"
+          "mobproxy",
+          "is_pubproxy",
+          "pubproxy"
         ],
         "vpn": {
           "provider": "mullvad",
@@ -429,7 +435,9 @@
           "is_mobproxy",
           "resproxy",
           "dcproxy",
-          "mobproxy"
+          "mobproxy",
+          "is_pubproxy",
+          "pubproxy"
         ],
         "emptyPresent": [
           "vpn",
@@ -446,7 +454,7 @@
     },
     {
       "name": "max-full-shape",
-      "why": "Max adds confidence and method on vpn, plus the three proxy families.",
+      "why": "Max adds confidence and method on vpn, plus the three proxy families and the public proxy detail.",
       "status": 200,
       "body": {
         "ip": "45.83.91.1",
@@ -458,6 +466,7 @@
         "is_resproxy": false,
         "is_dcproxy": true,
         "is_mobproxy": false,
+        "is_pubproxy": true,
         "vpn": {
           "provider": "mullvad",
           "last_seen": "2026-09-02",
@@ -481,7 +490,17 @@
           "hits_days_pct": 63,
           "providers_num": 2
         },
-        "mobproxy": {}
+        "mobproxy": {},
+        "pubproxy": {
+          "entry": true,
+          "exit": false,
+          "protocols": [
+            "http",
+            "https"
+          ],
+          "last_seen": "2026-10-17",
+          "last_usable": ""
+        }
       },
       "expect": {
         "ip": "45.83.91.1",
@@ -489,7 +508,8 @@
         "present": {
           "is_vpn": true,
           "is_dcproxy": true,
-          "is_resproxy": false
+          "is_resproxy": false,
+          "is_pubproxy": true
         },
         "absent": [],
         "vpn": {
@@ -505,6 +525,16 @@
           "hits": 42,
           "hits_days_pct": 63,
           "providers_num": 2
+        },
+        "pubproxy": {
+          "entry": true,
+          "exit": false,
+          "protocols": [
+            "http",
+            "https"
+          ],
+          "last_seen": "2026-10-17",
+          "last_usable": ""
         }
       }
     },
@@ -546,6 +576,7 @@
         "is_resproxy": false,
         "is_dcproxy": false,
         "is_mobproxy": false,
+        "is_pubproxy": false,
         "vpn": {},
         "hosting": {},
         "relay": {},
@@ -553,7 +584,8 @@
         "cdn": {},
         "resproxy": {},
         "dcproxy": {},
-        "mobproxy": {}
+        "mobproxy": {},
+        "pubproxy": {}
       },
       "expect": {
         "ip": "8.8.4.4",
@@ -566,7 +598,8 @@
           "is_cdn": false,
           "is_resproxy": false,
           "is_dcproxy": false,
-          "is_mobproxy": false
+          "is_mobproxy": false,
+          "is_pubproxy": false
         },
         "absent": [],
         "emptyPresent": [
@@ -577,7 +610,8 @@
           "cdn",
           "resproxy",
           "dcproxy",
-          "mobproxy"
+          "mobproxy",
+          "pubproxy"
         ]
       }
     }
@@ -5419,6 +5453,123 @@
         "bogon": "10.0.0.1",
         "condition": {
           "is_hosting": true
+        },
+        "expect": {
+          "blocked": false,
+          "missing": []
+        }
+      },
+      {
+        "name": "pubproxy-detail-term-matches",
+        "why": "The public proxy detail is a member like the other families: a nested boolean term reaches it.",
+        "body": {
+          "ip": "45.83.91.1",
+          "is_vpn": true,
+          "is_hosting": true,
+          "is_relay": false,
+          "is_tor": false,
+          "is_cdn": false,
+          "is_resproxy": true,
+          "is_dcproxy": false,
+          "is_mobproxy": false,
+          "vpn": {
+            "provider": "nordvpn",
+            "confidence": "high",
+            "method": "rdns",
+            "last_seen": "2026-09-01"
+          },
+          "hosting": {
+            "provider": "ovh",
+            "confidence": "medium",
+            "last_seen": "2026-09-01"
+          },
+          "relay": {},
+          "tor": {},
+          "cdn": {},
+          "resproxy": {
+            "provider": "brightdata",
+            "first_seen": "2026-06-01",
+            "last_seen": "2026-09-01",
+            "hits": 7,
+            "hits_days_pct": 42,
+            "providers_num": 2
+          },
+          "dcproxy": {},
+          "mobproxy": {},
+          "is_pubproxy": true,
+          "pubproxy": {
+            "entry": true,
+            "exit": false,
+            "protocols": [
+              "socks5"
+            ],
+            "last_seen": "2026-10-17",
+            "last_usable": "2026-10-16"
+          }
+        },
+        "condition": {
+          "is_pubproxy": true,
+          "pubproxy": {
+            "entry": true
+          }
+        },
+        "expect": {
+          "blocked": true,
+          "missing": []
+        }
+      },
+      {
+        "name": "pubproxy-detail-term-misses",
+        "why": "A nested term that disagrees with the served detail does not block.",
+        "body": {
+          "ip": "45.83.91.1",
+          "is_vpn": true,
+          "is_hosting": true,
+          "is_relay": false,
+          "is_tor": false,
+          "is_cdn": false,
+          "is_resproxy": true,
+          "is_dcproxy": false,
+          "is_mobproxy": false,
+          "vpn": {
+            "provider": "nordvpn",
+            "confidence": "high",
+            "method": "rdns",
+            "last_seen": "2026-09-01"
+          },
+          "hosting": {
+            "provider": "ovh",
+            "confidence": "medium",
+            "last_seen": "2026-09-01"
+          },
+          "relay": {},
+          "tor": {},
+          "cdn": {},
+          "resproxy": {
+            "provider": "brightdata",
+            "first_seen": "2026-06-01",
+            "last_seen": "2026-09-01",
+            "hits": 7,
+            "hits_days_pct": 42,
+            "providers_num": 2
+          },
+          "dcproxy": {},
+          "mobproxy": {},
+          "is_pubproxy": true,
+          "pubproxy": {
+            "entry": true,
+            "exit": false,
+            "protocols": [
+              "socks5"
+            ],
+            "last_seen": "2026-10-17",
+            "last_usable": "2026-10-16"
+          }
+        },
+        "condition": {
+          "pubproxy": {
+            "exit": true
+          }
         },
         "expect": {
           "blocked": false,

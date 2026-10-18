@@ -1,5 +1,6 @@
 TODO list for Perl module List::RewriteElements
 
-- Nothing yet
+- 2026-09-08: In a future version, we will cease using IO::Capture::Stdout in
+  the test suite and substitute Capture::Tiny therefor.
 
 

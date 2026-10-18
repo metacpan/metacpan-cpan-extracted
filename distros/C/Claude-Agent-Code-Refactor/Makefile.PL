@@ -19,10 +19,9 @@ my %WriteMakefileArgs = (
         'Test::Exception' => '0.43',
     },
     PREREQ_PM => {
-        'Claude::Agent'               => '0.10',
-        'Claude::Agent::Code::Review' => '0.01',
-        'Marlin'                      => '0.007000',
-        'Types::Common'               => '2.0',
+        'Claude::Agent'               => '0.14',
+        'Claude::Agent::Code::Review' => '0.03',
+        'Object::Proto'               => '1.00',
         'Path::Tiny'                  => '0.100',
         'IO::Async'                   => '0.80',
         'Future::AsyncAwait'          => '0.60',

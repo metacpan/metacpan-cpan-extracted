@@ -1,0 +1,44 @@
+---
+abstract: 'update Uptime Kuma push monitors'
+author:
+  - 'Sven Kirmess <sven.kirmess@kzone.ch>'
+build_requires:
+  Cwd: '0'
+  Exporter: '0'
+  File::Spec: '0'
+  Test::More: '0.88'
+  lib: '0'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla, CPAN::Meta::Converter'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-UptimeKuma-Push
+no_index:
+  directory:
+    - t
+    - xt
+recommends:
+  IO::Socket::SSL: '1.42'
+  Net::SSLeay: '1.49'
+requires:
+  Carp: '0'
+  File::Basename: '0'
+  Getopt::Long: '0'
+  HTTP::Tiny: '0.025'
+  JSON::PP: '0'
+  Scalar::Util: '0'
+  Time::HiRes: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/skirmess/WebService-UptimeKuma-Push/issues
+  homepage: https://github.com/skirmess/WebService-UptimeKuma-Push
+  repository: https://github.com/skirmess/WebService-UptimeKuma-Push.git
+version: '0.002'

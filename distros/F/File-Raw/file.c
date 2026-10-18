@@ -1340,6 +1340,11 @@ static OP* pp_file_atomic_spew(pTHX) {
    Call checkers for compile-time optimization
    ============================================ */
 
+/* Call checkers can only be installed from 5.14 (cv_set_call_checker is a
+ * no-op below it, see xop_compat.h), and they use op_contextualize, which
+ * is 5.14 too, so below 5.14 they are not compiled at all. */
+#if PERL_VERSION >= 14
+
 /* Count args between pushop's first sibling and the trailing cv op.
  * The last sibling in the chain is the cv (we don't replace it), so the
  * arg count is (total siblings) - 1. Returns -1 if the chain is shorter
@@ -1443,6 +1448,8 @@ static OP* file_call_checker_2arg(pTHX_ OP *entersubop, GV *namegv, SV *ckobj) {
     op_free(entersubop);
     return newop;
 }
+
+#endif /* PERL_VERSION >= 14 */
 
 /* Install 1-arg function with call checker */
 static void install_file_func_1arg(pTHX_ const char *pkg, const char *name,

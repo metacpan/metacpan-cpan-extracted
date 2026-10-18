@@ -242,7 +242,14 @@ sub status {
     );
     my $color = $colors{$type} // 'white';
     my $icon  = $icons{$type} // '*';
-    print colored([$color], "$icon $message"), "\n";
+    print _encoded(colored([$color], "$icon $message") . "\n");
+}
+
+sub _encoded {
+    my ($text) = @_;
+    return $text if grep { /utf8|encoding/ } PerlIO::get_layers(\*STDOUT);
+    utf8::encode($text);
+    return $text;
 }
 
 sub clear_line {

@@ -102,6 +102,9 @@ ok($catch_all->matches('anything'), 'no matcher matches anything');
 ok(!Claude::Agent::Hook::Matcher->new(matcher => '(a+)+$')->matches('aaaa'), 'nested quantifiers are refused');
 ok(!Claude::Agent::Hook::Matcher->new(matcher => 'x' x 1001)->matches('x'), 'an over-long pattern is refused');
 ok(Claude::Agent::Hook::Matcher->new(matcher => 'Write|Edit')->matches('Edit'), 'alternation works');
+ok(!Claude::Agent::Hook::Matcher->new(matcher => 'shell-tools__')->matches('mcp__shell-tools__run'), 'a hyphenated plain string is exact, as in the CLI');
+ok(Claude::Agent::Hook::Matcher->new(matcher => 'mcp__shell-tools__.*')->matches('mcp__shell-tools__run'), 'a dotstar pattern is a regex');
+ok(Claude::Agent::Hook::Matcher->new(matcher => 'mcp__a-b__c')->matches('mcp__a-b__c'), 'an exact hyphenated name matches itself');
 
 # Hook::Context
 my $context = Claude::Agent::Hook::Context->new(

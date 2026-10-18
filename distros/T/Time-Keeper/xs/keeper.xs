@@ -14,7 +14,7 @@ now(class, ...)
     CODE:
         tk_args_parse(aTHX_ &ST(1), items - 1, TK_A(TK_A_ZONE) | TK_A(TK_A_LOCALE), &a, "Time::Keeper->now");
         tk_zone_spec_from_sv(aTHX_ a.v[TK_A_ZONE], &z, "Time::Keeper->now");
-        tk_now(&t);
+        tk_now_sv(aTHX_ &t);
         tk_value_init(aTHX_ &v, &t, &z);
         v.locale = tk_args_locale(&a, "Time::Keeper->now");
         RETVAL = tk_value_new_sv(aTHX_ tk_stash_for(aTHX_ class), &v);
@@ -32,7 +32,7 @@ today(class, ...)
     CODE:
         tk_args_parse(aTHX_ &ST(1), items - 1, TK_A(TK_A_ZONE) | TK_A(TK_A_LOCALE), &a, "Time::Keeper->today");
         tk_zone_spec_from_sv(aTHX_ a.v[TK_A_ZONE], &z, "Time::Keeper->today");
-        tk_now(&t);
+        tk_now_sv(aTHX_ &t);
         tk_value_init(aTHX_ &v, &t, &z);
         tk_value_start_of_day(aTHX_ &day, &v, "Time::Keeper->today");
         day.locale = tk_args_locale(&a, "Time::Keeper->today");
@@ -62,7 +62,7 @@ new(class, ...)
         tk_args a;
         tk_zone_spec z;
         int gap, overlap;
-        int64_t y, m = 1, d = 1, h, mi, s, yy;
+        int64_t y, h, mi, s;
         int32_t ns;
         unsigned mm, dd;
         tk_value v;
@@ -71,57 +71,69 @@ new(class, ...)
         if (!a.v[TK_A_YEAR])
             croak("%s: year is required", what);
         y = tk_args_int(aTHX_ &a, TK_A_YEAR, 0, TK_YEAR_MIN, TK_YEAR_MAX, what);
-        switch (ix) {
-        case 0:
-            m = tk_args_int(aTHX_ &a, TK_A_MONTH, 1, 1, 12, what);
-            d = tk_args_int(aTHX_ &a, TK_A_DAY, 1, 1, 31, what);
-            if (d > (int64_t)tk_days_in_month(y, (unsigned)m))
-                croak("%s: %04" IVdf "-%02u has no day %" IVdf, what, (IV)y, (unsigned)m, (IV)d);
-            break;
-        case 1:
-            if (!a.v[TK_A_MONTH])
-                croak("%s: month is required", what);
-            m = tk_args_int(aTHX_ &a, TK_A_MONTH, 1, 1, 12, what);
-            d = tk_days_in_month(y, (unsigned)m);
-            break;
-        case 2: {
-            int64_t doy;
-            if (!a.v[TK_A_DAY_OF_YEAR])
-                croak("%s: day_of_year is required", what);
-            doy = tk_args_int(aTHX_ &a, TK_A_DAY_OF_YEAR, 1, 1, 366, what);
-            if (doy == 366 && !tk_is_leap_year(y))
-                croak("%s: %" IVdf " has no day 366", what, (IV)y);
-            tk_civil_from_days(tk_days_from_civil(y, 1, 1) + doy - 1, &yy, &mm, &dd);
-            m = mm;
-            d = dd;
-            break;
-        }
-        case 3: {
-            int64_t wk, wd, wy, monday;
-            unsigned last;
-            if (!a.v[TK_A_WEEK])
-                croak("%s: week is required", what);
-            wk = tk_args_int(aTHX_ &a, TK_A_WEEK, 1, 1, 53, what);
-            wd = tk_args_int(aTHX_ &a, TK_A_DAY, 1, 1, 7, what);
-            tk_iso_week(y, 12, 28, &wy, &last);
-            if (wk > last)
-                croak("%s: %" IVdf " has %u ISO weeks, not %" IVdf, what, (IV)y, last, (IV)wk);
-            monday = tk_days_from_civil(y, 1, 4);
-            monday -= tk_dow_from_days(monday) - 1;
-            tk_civil_from_days(monday + (wk - 1) * 7 + wd - 1, &yy, &mm, &dd);
-            y = yy;
-            m = mm;
-            d = dd;
-            break;
-        }
-        }
+        tk_args_ymd(aTHX_ &a, ix, &y, &mm, &dd, what);
         tk_args_time(aTHX_ &a, &h, &mi, &s, &ns, what);
         tk_args_resolve(aTHX_ &a, &z, &gap, &overlap, what);
-        tk_value_from_local(aTHX_ &v, &z, y, (unsigned)m, (unsigned)d, h, mi, s, ns, gap, overlap, what);
+        tk_value_from_local(aTHX_ &v, &z, y, mm, dd, h, mi, s, ns, gap, overlap, what);
         v.locale = tk_args_locale(&a, what);
         RETVAL = tk_value_new_sv(aTHX_ tk_stash_for(aTHX_ class), &v);
     OUTPUT:
         RETVAL
+
+SV *
+try_new(class, ...)
+        SV *class
+    ALIAS:
+        try_with = 1
+    PREINIT:
+        static const char *const methods[] = { "new", "with" };
+        int count;
+        I32 i;
+    CODE:
+        PERL_UNUSED_VAR(class);
+        {
+            dSP;
+            ENTER;
+            SAVETMPS;
+            save_scalar(PL_errgv);
+            PUSHMARK(SP);
+            for (i = 0; i < items; i++)
+                XPUSHs(ST(i));
+            PUTBACK;
+            count = call_method(methods[ix], G_SCALAR | G_EVAL);
+            SPAGAIN;
+            if (count == 1 && !SvTRUE(ERRSV))
+                RETVAL = newSVsv(POPs);
+            else {
+                if (count) (void)POPs;
+                RETVAL = &PL_sv_undef;
+            }
+            PUTBACK;
+            FREETMPS;
+            LEAVE;
+        }
+    OUTPUT:
+        RETVAL
+
+void
+to_list(self)
+        SV *self
+    PREINIT:
+        tk_value *v;
+        const tk_civil *c;
+    PPCODE:
+        v = tk_value_rw(self, "Time::Keeper->to_list");
+        c = tk_value_civil(v);
+        EXTEND(SP, 9);
+        mPUSHi(c->second);
+        mPUSHi(c->minute);
+        mPUSHi(c->hour);
+        mPUSHi(c->day);
+        mPUSHi(c->month - 1);
+        mPUSHi((IV)c->year - 1900);
+        mPUSHi(c->dow % 7);
+        mPUSHi(c->doy - 1);
+        mPUSHi((v->flags & TK_F_DST) ? 1 : 0);
 
 SV *
 from_epoch(class, epoch, ...)
@@ -140,6 +152,34 @@ from_epoch(class, epoch, ...)
             croak("Time::Keeper->from_epoch: out of range");
         tk_value_init(aTHX_ &v, &t, &z);
         v.locale = tk_args_locale(&a, "Time::Keeper->from_epoch");
+        RETVAL = tk_value_new_sv(aTHX_ tk_stash_for(aTHX_ class), &v);
+    OUTPUT:
+        RETVAL
+
+SV *
+from_epoch_millis(class, n, ...)
+        SV *class
+        SV *n
+    ALIAS:
+        from_epoch_micros = 1
+        from_epoch_nanos = 2
+    PREINIT:
+        static const char *const whats[] = {
+            "Time::Keeper->from_epoch_millis", "Time::Keeper->from_epoch_micros", "Time::Keeper->from_epoch_nanos"
+        };
+        const char *what = whats[ix];
+        tk_args a;
+        tk_zone_spec z;
+        tk_instant t;
+        tk_value v;
+    CODE:
+        tk_args_parse(aTHX_ &ST(2), items - 2, TK_A(TK_A_ZONE) | TK_A(TK_A_LOCALE), &a, what);
+        tk_zone_spec_from_sv(aTHX_ a.v[TK_A_ZONE], &z, what);
+        tk_epoch_scaled_from_sv(aTHX_ n, ix == 0 ? 3 : ix == 1 ? 6 : 9, &t, what);
+        if (!tk_instant_valid(&t))
+            croak("%s: out of range", what);
+        tk_value_init(aTHX_ &v, &t, &z);
+        v.locale = tk_args_locale(&a, what);
         RETVAL = tk_value_new_sv(aTHX_ tk_stash_for(aTHX_ class), &v);
     OUTPUT:
         RETVAL
@@ -175,7 +215,7 @@ max(class)
         RETVAL
 
 IV
-year(self)
+year(self, ...)
         SV *self
     ALIAS:
         month = 1
@@ -201,13 +241,25 @@ year(self)
         is_floating = 21
         days_in_year = 22
         days_in_quarter = 23
+        hour_12 = 24
+        is_weekend = 25
+        is_weekday = 26
     PREINIT:
         tk_value *v;
         const tk_civil *c;
         int64_t wy;
         unsigned w;
+        int by_locale = 0;
     CODE:
         v = tk_value_rw(self, "Time::Keeper accessor");
+        if (items > 1) {
+            /* week and week_year take locale => 1, the locale's weeks instead of ISO's */
+            tk_args a;
+            if (ix != 13 && ix != 14)
+                croak("Time::Keeper accessor: this accessor takes no arguments");
+            tk_args_parse(aTHX_ &ST(1), items - 1, TK_A(TK_A_LOCALE), &a, ix == 13 ? "Time::Keeper->week" : "Time::Keeper->week_year");
+            by_locale = a.v[TK_A_LOCALE] && SvTRUE(a.v[TK_A_LOCALE]);
+        }
         if (ix >= 18 && ix <= 21) {
             switch (ix) {
             case 18: RETVAL = v->utoff; break;
@@ -220,6 +272,14 @@ year(self)
             c = tk_value_civil(v);
             switch (ix) {
             case 0:  RETVAL = c->year; break;
+            case 24: RETVAL = c->hour % 12 ? c->hour % 12 : 12; break;
+            case 25: case 26: {
+                const tk_locale_data *loc = tk_locale_of(v);
+                int ws = loc->weekend_start, we = loc->weekend_end, d = c->dow;
+                int weekend = ws <= we ? (d >= ws && d <= we) : (d >= ws || d <= we);
+                RETVAL = ix == 25 ? weekend : !weekend;
+                break;
+            }
             case 1:  RETVAL = c->month; break;
             case 2:  RETVAL = c->day; break;
             case 3:  RETVAL = c->hour; break;
@@ -232,8 +292,11 @@ year(self)
             case 10: RETVAL = c->doy; break;
             case 11: RETVAL = tk_quarter(c->month); break;
             case 12: RETVAL = tk_day_of_quarter(c->year, c->month, c->day); break;
-            case 13: tk_iso_week(c->year, c->month, c->day, &wy, &w); RETVAL = w; break;
-            case 14: tk_iso_week(c->year, c->month, c->day, &wy, &w); RETVAL = (IV)wy; break;
+            case 13: case 14:
+                if (by_locale) tk_locale_week(tk_locale_of(v), c, &wy, &w);
+                else tk_iso_week(c->year, c->month, c->day, &wy, &w);
+                RETVAL = ix == 13 ? (IV)w : (IV)wy;
+                break;
             case 15: RETVAL = (c->day + 4 - c->dow + 6) / 7; break;
             case 16: RETVAL = tk_is_leap_year(c->year); break;
             case 17: RETVAL = tk_days_in_month(c->year, c->month); break;
@@ -317,6 +380,28 @@ epoch(self)
         RETVAL
 
 SV *
+epoch_millis(self)
+        SV *self
+    ALIAS:
+        epoch_micros = 1
+        epoch_nanos = 2
+    PREINIT:
+        const tk_value *v;
+        int64_t s;
+        int32_t n;
+    CODE:
+        v = tk_value_of(aTHX_ self, "Time::Keeper->epoch_millis");
+        s = v->inst.sec;
+        n = v->inst.nsec;
+        if (n >= TK_NSECS_PER_SEC) {
+            s += 1;
+            n -= TK_NSECS_PER_SEC;
+        }
+        RETVAL = tk_epoch_scaled(aTHX_ s, n, ix == 0 ? 3 : ix == 1 ? 6 : 9, ix < 2);
+    OUTPUT:
+        RETVAL
+
+SV *
 zone_name(self, ...)
         SV *self
     ALIAS:
@@ -354,28 +439,25 @@ with(self, ...)
         const tk_civil *c;
         tk_zone_spec z;
         int gap, overlap;
-        int64_t y, m, d, h, mi, s;
+        int64_t y, h, mi, s;
+        unsigned mm, dd;
         int32_t ns;
         const char *what = "Time::Keeper->with";
     CODE:
         v = tk_value_rw(self, what);
         tk_args_parse(aTHX_ &ST(1), items - 1,
                       TK_A(TK_A_YEAR) | TK_A(TK_A_MONTH) | TK_A(TK_A_DAY) | TK_A_TIME
-                      | TK_A(TK_A_GAP) | TK_A(TK_A_OVERLAP), &a, what);
+                      | TK_A(TK_A_GAP) | TK_A(TK_A_OVERLAP) | TK_A(TK_A_DAY_OF_WEEK)
+                      | TK_A(TK_A_DAY_OF_YEAR) | TK_A(TK_A_WEEK), &a, what);
         c = tk_value_civil(v);
-        y  = tk_args_int(aTHX_ &a, TK_A_YEAR, c->year, TK_YEAR_MIN, TK_YEAR_MAX, what);
-        m  = tk_args_int(aTHX_ &a, TK_A_MONTH, c->month, 1, 12, what);
-        d  = tk_args_int(aTHX_ &a, TK_A_DAY, c->day, 1, 31, what);
+        tk_args_with_date(aTHX_ &a, c, &y, &mm, &dd, what);
         h  = tk_args_int(aTHX_ &a, TK_A_HOUR, c->hour, 0, 23, what);
         mi = tk_args_int(aTHX_ &a, TK_A_MINUTE, c->minute, 0, 59, what);
         s  = tk_args_int(aTHX_ &a, TK_A_SECOND, c->second, 0, 60, what);
         ns = (int32_t)tk_args_int(aTHX_ &a, TK_A_NANOSECOND, c->nsec, 0, TK_NSECS_PER_SEC - 1, what);
-        if (d > (int64_t)tk_days_in_month(y, (unsigned)m))
-            croak("%s: %04" IVdf "-%02u has no day %" IVdf, what, (IV)y, (unsigned)m, (IV)d);
         tk_value_zone(v, &z);
-        gap = a.v[TK_A_GAP] ? tk_opt_gap(aTHX_ a.v[TK_A_GAP], what) : TK_GAP_DEFAULT;
-        overlap = a.v[TK_A_OVERLAP] ? tk_opt_overlap(aTHX_ a.v[TK_A_OVERLAP], what) : TK_OVERLAP_DEFAULT;
-        tk_value_from_local(aTHX_ &nv, &z, y, (unsigned)m, (unsigned)d, h, mi, s, ns, gap, overlap, what);
+        tk_args_gap_overlap(aTHX_ &a, &gap, &overlap, what);
+        tk_value_from_local(aTHX_ &nv, &z, y, mm, dd, h, mi, s, ns, gap, overlap, what);
         nv.locale = v->locale;
         RETVAL = tk_value_new_sv(aTHX_ SvSTASH(SvRV(self)), &nv);
     OUTPUT:
@@ -420,6 +502,120 @@ in_zone(self, ...)
             tk_value_init(aTHX_ &nv, &v->inst, &z);
         nv.locale = v->locale;
         RETVAL = tk_value_new_sv(aTHX_ SvSTASH(SvRV(self)), &nv);
+    OUTPUT:
+        RETVAL
+
+# The value at the zone's next (or last) change of offset, DST flag or
+# abbreviation, in the same zone and locale; undef when there is none, and
+# for UTC, a fixed offset and floating time, which never change.
+SV *
+next_transition(self)
+        SV *self
+    ALIAS:
+        previous_transition = 1
+    PREINIT:
+        static const char *const whats[] = {
+            "Time::Keeper->next_transition", "Time::Keeper->previous_transition"
+        };
+        const tk_value *v;
+        const tkz_abi *a;
+        tk_value nv;
+        tk_zone_spec z;
+        tk_instant t;
+        int id;
+    CODE:
+        v = tk_value_of(aTHX_ self, whats[ix]);
+        if (v->zone < TK_ZONE_NAMED)
+            XSRETURN_UNDEF;
+        a = tk_zone_abi_v2(aTHX_ whats[ix]);
+        id = v->zone - TK_ZONE_NAMED;
+        /* strictly before the value: a value past the second's start has
+         * that second's own change before it */
+        t.sec = ix ? (a->prev_change)(id, v->inst.sec + (v->inst.nsec > 0 ? 1 : 0))
+                   : (a->next_change)(id, v->inst.sec);
+        t.nsec = 0;
+        if (t.sec == TKZ_NO_CHANGE || !tk_instant_valid(&t))
+            XSRETURN_UNDEF;
+        tk_value_zone(v, &z);
+        tk_value_init(aTHX_ &nv, &t, &z);
+        nv.locale = v->locale;
+        RETVAL = tk_value_new_sv(aTHX_ SvSTASH(SvRV(self)), &nv);
+    OUTPUT:
+        RETVAL
+
+# Whether the value's wall-clock time happened twice, worked out from its
+# civil fields: how it was made does not matter.
+bool
+is_ambiguous(self)
+        SV *self
+    PREINIT:
+        const tk_value *v;
+        int64_t u[2];
+        int32_t o[2];
+    CODE:
+        v = tk_value_of(aTHX_ self, "Time::Keeper->is_ambiguous");
+        RETVAL = 0;
+        if (v->zone >= TK_ZONE_NAMED)
+            RETVAL = (tk_zone_abi_v2(aTHX_ "Time::Keeper->is_ambiguous")->resolve_local_all)
+                         (v->zone - TK_ZONE_NAMED, v->inst.sec + v->utoff, u, o) == 2;
+    OUTPUT:
+        RETVAL
+
+# The other instant with this wall-clock time, in the same zone and
+# locale, or undef when there is only one.
+SV *
+other_reading(self)
+        SV *self
+    PREINIT:
+        const tk_value *v;
+        tk_value nv;
+        tk_zone_spec z;
+        tk_instant t;
+        int64_t u[2];
+        int32_t o[2];
+    CODE:
+        v = tk_value_of(aTHX_ self, "Time::Keeper->other_reading");
+        if (v->zone < TK_ZONE_NAMED)
+            XSRETURN_UNDEF;
+        if ((tk_zone_abi_v2(aTHX_ "Time::Keeper->other_reading")->resolve_local_all)
+                (v->zone - TK_ZONE_NAMED, v->inst.sec + v->utoff, u, o) != 2)
+            XSRETURN_UNDEF;
+        t.sec = u[0] != v->inst.sec ? u[0] : u[1];
+        t.nsec = v->inst.nsec;
+        tk_value_zone(v, &z);
+        tk_value_init(aTHX_ &nv, &t, &z);
+        nv.locale = v->locale;
+        RETVAL = tk_value_new_sv(aTHX_ SvSTASH(SvRV(self)), &nv);
+    OUTPUT:
+        RETVAL
+
+# The zone's standard offset at this instant, and how far the offset in
+# force is from it.
+IV
+standard_offset(self)
+        SV *self
+    ALIAS:
+        dst_offset = 1
+    PREINIT:
+        static const char *const whats[] = {
+            "Time::Keeper->standard_offset", "Time::Keeper->dst_offset"
+        };
+        const tk_value *v;
+        int32_t std = 0;
+    CODE:
+        v = tk_value_of(aTHX_ self, whats[ix]);
+        switch (v->zone) {
+        case TK_ZONE_UTC:
+        case TK_ZONE_FLOATING:
+            break;
+        case TK_ZONE_FIXED:
+            std = v->utoff;
+            break;
+        default:
+            (tk_zone_abi_v2(aTHX_ whats[ix])->standard_offset_at)(v->zone - TK_ZONE_NAMED, v->inst.sec, &std);
+            break;
+        }
+        RETVAL = ix ? v->utoff - std : std;
     OUTPUT:
         RETVAL
 
@@ -519,8 +715,8 @@ from_object(class, ...)
         SV *tzname = NULL;
         SV *got[3];
         I32 i;
-        int count;
-        int64_t days, secs, ns;
+        int count, via_epoch = 0;
+        int64_t days = 0, secs = 0, ns = 0;
         tk_instant t;
         tk_zone_spec z;
         tk_value v;
@@ -535,8 +731,67 @@ from_object(class, ...)
             else croak("%s: unknown argument '%s'", what, k);
         }
         if (!obj || !sv_isobject(obj))
-            croak("%s: object => an object with utc_rd_values is required", what);
-        {
+            croak("%s: object => an object with utc_rd_values or epoch is required", what);
+        if (!gv_fetchmethod_autoload(SvSTASH(SvRV(obj)), "utc_rd_values", 0)) {
+            /* Time::Piece, Time::Moment and the like: epoch, then nanosecond
+             * and tzoffset if it has them */
+            dSP;
+            if (!gv_fetchmethod_autoload(SvSTASH(SvRV(obj)), "epoch", 0))
+                croak("%s: object => an object with utc_rd_values or epoch is required", what);
+            via_epoch = 1;
+            ENTER;
+            SAVETMPS;
+            PUSHMARK(SP);
+            XPUSHs(obj);
+            PUTBACK;
+            count = call_method("epoch", G_SCALAR);
+            SPAGAIN;
+            if (count != 1) {
+                PUTBACK;
+                FREETMPS;
+                LEAVE;
+                croak("%s: epoch gave %d values, not 1", what, count);
+            }
+            tk_epoch_from_sv(aTHX_ POPs, &t, what);
+            if (gv_fetchmethod_autoload(SvSTASH(SvRV(obj)), "nanosecond", 0)) {
+                PUTBACK;
+                PUSHMARK(SP);
+                XPUSHs(obj);
+                PUTBACK;
+                count = call_method("nanosecond", G_SCALAR);
+                SPAGAIN;
+                if (count == 1) {
+                    SV *nsv_sv = POPs;
+                    if (SvOK(nsv_sv)) {
+                        IV nsv = SvIV(nsv_sv);
+                        if (nsv < 0 || nsv >= TK_NSECS_PER_SEC)
+                            croak("%s: nanosecond gave %" IVdf, what, nsv);
+                        t.nsec = (int32_t)nsv;
+                    }
+                }
+            }
+            if (!zone && gv_fetchmethod_autoload(SvSTASH(SvRV(obj)), "tzoffset", 0)) {
+                PUTBACK;
+                PUSHMARK(SP);
+                XPUSHs(obj);
+                PUTBACK;
+                count = call_method("tzoffset", G_SCALAR);
+                SPAGAIN;
+                if (count == 1) {
+                    /* POPs once: SvIV names its argument twice before 5.38 */
+                    SV *osv = POPs;
+                    IV off = SvIV(osv);
+                    char ob[16];
+                    if (off <= -86400 || off >= 86400)
+                        croak("%s: tzoffset gave %" IVdf " seconds", what, off);
+                    tzname = newSVpvn(ob, tk_fmt_offset(ob, (int32_t)off, 1));   /* a zero offset reads as UTC */
+                }
+            }
+            PUTBACK;
+            FREETMPS;
+            LEAVE;
+        }
+        if (!via_epoch) {
             dSP;
             ENTER;
             SAVETMPS;
@@ -589,10 +844,12 @@ from_object(class, ...)
         }
         if (tzname)
             zone = sv_2mortal(tzname);
-        if (secs < 0 || secs > 86400 || ns < 0 || ns >= TK_NSECS_PER_SEC)
-            croak("%s: utc_rd_values gave seconds or nanoseconds out of range", what);
-        t.sec = (days - 719163) * 86400 + (secs == 86400 ? 86399 : secs);
-        t.nsec = (int32_t)ns + (secs == 86400 ? TK_NSECS_PER_SEC : 0);
+        if (!via_epoch) {
+            if (secs < 0 || secs > 86400 || ns < 0 || ns >= TK_NSECS_PER_SEC)
+                croak("%s: utc_rd_values gave seconds or nanoseconds out of range", what);
+            t.sec = (days - 719163) * 86400 + (secs == 86400 ? 86399 : secs);
+            t.nsec = (int32_t)ns + (secs == 86400 ? TK_NSECS_PER_SEC : 0);
+        }
         if (!tk_instant_valid(&t))
             croak("%s: %s", what, secs == 86400 ? "there was no leap second then" : "out of range");
         if (zone && SvOK(zone) && strEQ(SvPV_nolen(zone), "floating")) {
@@ -613,16 +870,14 @@ void
 STORABLE_freeze(self, cloning)
         SV *self
         SV *cloning
+    ALIAS:
+        FREEZE = 1
     PREINIT:
         const tk_value *v;
-        SV *out;
     PPCODE:
         PERL_UNUSED_VAR(cloning);
-        v = tk_value_of(aTHX_ self, "Time::Keeper->STORABLE_freeze");
-        out = sv_2mortal(tk_freeze_sv(aTHX_ v));
-        if (v->locale && v->locale < TK_LOCALE_COUNT)
-            sv_catpvf(out, " %s", tk_locale_codes[v->locale].code);
-        XPUSHs(out);
+        v = tk_value_of(aTHX_ self, ix ? "Time::Keeper->FREEZE" : "Time::Keeper->STORABLE_freeze");
+        XPUSHs(sv_2mortal(tk_freeze_full_sv(aTHX_ v)));
 
 void
 STORABLE_thaw(self, cloning, frozen)
@@ -630,45 +885,29 @@ STORABLE_thaw(self, cloning, frozen)
         SV *cloning
         SV *frozen
     PREINIT:
-        const char *s, *p;
-        STRLEN len;
-        tk_instant t;
-        tk_zone_spec z;
         tk_value v;
-        SV *num, *zone;
-        const char *lsep;
-        uint16_t lid = 0;
-        long ns;
         const char *what = "Time::Keeper->STORABLE_thaw";
     PPCODE:
         PERL_UNUSED_VAR(cloning);
-        s = SvPV(frozen, len);
-        if (len < 4 || memNE(s, "tk1 ", 4))
-            croak("%s: not a frozen Time::Keeper value", what);
-        p = strchr(s + 4, ' ');
-        if (!p)
-            croak("%s: not a frozen Time::Keeper value", what);
-        num = sv_2mortal(newSVpvn(s + 4, p - (s + 4)));
-        if (!tk_sv_to_i64(aTHX_ num, &t.sec))
-            croak("%s: not a frozen Time::Keeper value", what);
-        ns = strtol(p + 1, (char **)&p, 10);
-        if (*p != ' ' || ns < 0 || ns >= 2L * TK_NSECS_PER_SEC)
-            croak("%s: not a frozen Time::Keeper value", what);
-        t.nsec = (int32_t)ns;
-        lsep = strchr(p + 1, ' ');
-        zone = sv_2mortal(newSVpvn(p + 1, (lsep ? lsep : s + len) - (p + 1)));
-        if (lsep)
-            lid = tk_locale_id_from_sv(aTHX_ sv_2mortal(newSVpvn(lsep + 1, len - (lsep + 1 - s))), what);
-        tk_zone_spec_from_sv(aTHX_ zone, &z, what);
-        if (!tk_instant_valid(&t))
-            croak("%s: out of range", what);
-        tk_value_init(aTHX_ &v, &t, &z);
-        v.locale = lid;
+        tk_thaw_value(aTHX_ frozen, &v, what);
         if (!SvROK(self))
             croak("%s: not a reference", what);
         sv_setpvn(SvRV(self), (const char *)&v, sizeof v);
-        SvREADONLY_on(SvRV(self));
         XSRETURN_EMPTY;
+
+SV *
+THAW(class, serialiser, frozen)
+        SV *class
+        SV *serialiser
+        SV *frozen
+    PREINIT:
+        tk_value v;
+    CODE:
+        PERL_UNUSED_VAR(serialiser);
+        tk_thaw_value(aTHX_ frozen, &v, "Time::Keeper->THAW");
+        RETVAL = tk_value_new_sv(aTHX_ tk_stash_for(aTHX_ class), &v);
+    OUTPUT:
+        RETVAL
 
 void
 CLONE(...)
@@ -678,4 +917,7 @@ CLONE(...)
             MY_CXT_CLONE;
             MY_CXT.stash = gv_stashpvs("Time::Keeper", GV_ADD);
             MY_CXT.dstash = gv_stashpvs("Time::Keeper::Duration", GV_ADD);
+            MY_CXT.clock = gv_fetchpvs("Time::Keeper::CLOCK", GV_ADD, SVt_PV);
+            MY_CXT.in_clock = 0;
+            { int k; for (k = 1; k < TK_KIND_COUNT; k++) MY_CXT.pstash[k] = gv_stashpv(tk_plain_class[k], GV_ADD); }
         }

@@ -264,7 +264,7 @@ like error_of(sub { read_table(fixture(qq{a,,b\n1,,a\n2,,"2,,b"}), sep => qr/,,/
 	'test_multi_char_sep_quotes: QUOTE_NONE, the quoted ",," separates';
 like error_of(sub { read_table(fixture("x,1\ny,2,5\nz,3\n"), header => 0,
 		'col_names' => [qw(a b)]) }),
-	qr/^Alignment error on \S+ data row 2 \(3 fields vs 2 headers\)\.$/,
+	qr/^Alignment error on \S+ data row 2 \(3 fields vs 2 'col_names'\)\.$/,
 	'test_header_none_and_implicit_index_in_second_row';
 {
 	my @na = ('', '#N/A', '#N/A N/A', '#NA', '-1.#IND', '-1.#QNAN', '-NaN',

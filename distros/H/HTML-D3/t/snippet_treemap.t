@@ -42,7 +42,7 @@ like($html, qr/id="treemap_tip"/, 'Tooltip div present (flat)');
 like($html, qr/d3\.treemap\(\)/, 'Uses d3.treemap()');
 like($html, qr/d3\.stratify\(\)/, 'Flat format uses d3.stratify()');
 like($html, qr/SCHEMES/, 'Contains SCHEMES colour map');
-like($html, qr/schemeTableau10/, 'Default tableau10 scheme');
+like($html, qr/SCHEMES\['tableau10'\]/, 'Default tableau10 scheme');
 like($html, qr/treemapSquarify/, 'Uses treemapSquarify tiling');
 unlike($html, qr/d3\.hierarchy\(raw/, 'Flat format does not use d3.hierarchy(raw)');
 unlike($html, qr/<!DOCTYPE/i, 'No DOCTYPE (snippet)');

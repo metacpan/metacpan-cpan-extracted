@@ -1,5 +1,46 @@
 Revision history for HTML-D3 - Visualise various charts using D3
 
+0.23	Sat Oct 17 08:28:48 AM EDT 2026
+	[ Enhancements ]
+	- The chart snippets inline each categorical scheme's colours as a literal
+	  hex array, taken from the one definition that palette() and colour_at()
+	  also read, instead of naming a d3.scheme* expression for the browser to
+	  look up.  A page and a map colouring the same categories therefore draw
+	  the same numbers, and an upgrade of d3 cannot move a chart's colours: the
+	  page no longer asks d3 for a palette at all
+	  This affects the SCHEMES lookup table the pie, stacked bar and treemap
+	  snippets emit, the direct scaleOrdinal() calls of the multi-series line,
+	  scatter and binned histogram snippets, and the full-page charts that draw
+	  category10 or the default tableau10 palette.  The scheme options and the
+	  fallback for an unknown name are unchanged, and both are still resolved
+	  from the definition, so an unknown name draws the default rather than an
+	  invented d3.schemeNonsense
+	- The d3 scheme each palette transcribes is recorded beside the definition
+	  (and in t/palette.t), so it can still be checked against the library, but
+	  it is no longer emitted into the page.  t/d3-schemes.t continues to check
+	  palette() against d3 itself when Node and d3 are installed
+	[ Tests ]
+	- t/palette.t now asserts the inlined arrays rather than d3.scheme*
+	  expressions: the SCHEMES table must hold exactly the colours palette()
+	  returns for each scheme, the snippets that draw their colours directly
+	  must inline the requested scheme's array, and the module's code must hold
+	  no d3.scheme* expression at all.  The tests that asserted the old
+	  expressions in snippet output were updated to the hex arrays (the key
+	  lookups they also asserted are unchanged)
+
+0.22	Fri Oct 16 09:50:42 PM EDT 2026
+	[ Tests ]
+	- t/d3-schemes.t checks palette() against d3 itself.  It runs Node, loads
+	  the d3 package and compares each scheme - category10, tableau10, set2,
+	  set3 and paired - colour by colour and count by count with the array
+	  d3.scheme* publishes.  t/palette.t is an offline oracle: it holds D3's
+	  colours as this distribution read them, so a transcription error there
+	  and in the module would agree with itself, and this test is what catches
+	  it.  Neither Node nor d3 is a prerequisite, so the file skips with the
+	  reason when it cannot reach them, and fails (rather than skipping) when
+	  d3 is reached but does not publish a scheme, since that is the module
+	  describing a palette d3 does not have
+
 0.21	Fri Oct 16 09:19:00 PM EDT 2026
 	[ Enhancements ]
 	- The categorical colour schemes are defined once and exposed to Perl.  New

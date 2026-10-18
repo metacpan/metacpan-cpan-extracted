@@ -17,6 +17,7 @@ t/02-offsets.t
 t/03-gaps.t
 t/04-surface.t
 t/05-rules.t
+t/06-transitions.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
@@ -30,6 +31,8 @@ xs/zone.xs
 xt/03-zdump-oracle.t
 xt/04-datetime-oracle.t
 xt/04-zdump-engine.t
+xt/05-transitions-zdump.t
+xt/06-both-readings.t
 xt/boilerplate.t
 Zone.xs
 META.yml                                 Module YAML meta-data (added by MakeMaker)

@@ -57,6 +57,7 @@ lib/Kelp/templates/kelp/template
 lib/Kelp/templates/kelp/views-welcome.tt
 lib/Kelp/templates/less/NAME.psgi.gen
 lib/Kelp/templates/less/template
+t/as_psgi_exceptions.t
 t/author-pod-syntax.t
 t/base.t
 t/base_attr.t
@@ -82,6 +83,7 @@ t/cookbook_yaml.t
 t/custom_req_resp.t
 t/encoders.t
 t/exceptions.t
+t/handle_exception.t
 t/json-encode-error.t
 t/less.t
 t/lib/CustomContext/Context.pm

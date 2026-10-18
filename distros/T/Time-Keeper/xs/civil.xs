@@ -208,7 +208,7 @@ _now()
     PREINIT:
         tk_instant t;
     PPCODE:
-        tk_now(&t);
+        tk_now_sv(aTHX_ &t);
         EXTEND(SP, 2);
         mPUSHs(tk_newSVi64(aTHX_ t.sec));
         mPUSHi(t.nsec);

@@ -62,7 +62,7 @@
          "web" : "https://github.com/Kelp-framework/Kelp"
       }
    },
-   "version" : "2.22",
+   "version" : "2.23",
    "x_contributors" : [
       "Bartosz Jarzyna <bbrtj.pro@gmail.com>",
       "Stefan Geneshky <minimal@cpan.org>",
@@ -80,9 +80,10 @@
       "Julio Fraire Dom\u00ednguez <jfraire@cpan.org>",
       "roy-tate <roy.l.tate@gmail.com>",
       "Ruslan Zakirov <Ruslan.Zakirov@gmail.com>",
+      "sebmourlhou <sebmourlhou@yahoo.fr>",
       "Serguei Trouchelle <stro@cpan.org>"
    ],
-   "x_generated_by_perl" : "v5.40.1",
+   "x_generated_by_perl" : "v5.42.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }

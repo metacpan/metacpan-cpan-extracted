@@ -107,7 +107,7 @@ subtest 'lookup preserves absent-versus-false across every plan shape' => sub {
             ok($result->has($field), "$case->{name}: $field was served");
             is_deeply($result->$field, {}, "$case->{name}: $field is present and empty");
         }
-        for my $object (qw(vpn hosting dcproxy)) {
+        for my $object (qw(vpn hosting dcproxy pubproxy)) {
             next unless $expect->{$object};
             is_deeply($result->$object, $expect->{$object}, "$case->{name}: $object");
         }

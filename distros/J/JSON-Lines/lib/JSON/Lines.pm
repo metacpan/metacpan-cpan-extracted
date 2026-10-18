@@ -1,6 +1,6 @@
 package JSON::Lines;
-use 5.006; use strict; use warnings; our $VERSION = '1.11';
-use Cpanel::JSON::XS; use base 'Import::Export';
+use 5.006; use strict; use warnings; our $VERSION = '1.12';
+use re 'eval'; use Cpanel::JSON::XS; use base 'Import::Export';
 our ($JSON, $LINES, $STRING, %EX);
 BEGIN {
 	$JSON = Cpanel::JSON::XS->new;
@@ -375,7 +375,7 @@ JSON::Lines - Parse JSONLines with perl.
 
 =head1 VERSION
 
-Version 1.11
+Version 1.12
 
 =cut
 

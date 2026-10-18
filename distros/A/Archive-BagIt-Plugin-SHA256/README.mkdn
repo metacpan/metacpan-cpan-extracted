@@ -4,7 +4,7 @@ Archive::BagIt::Plugin::SHA256 - The main module to handle bags.
 
 # VERSION
 
-version 0.005
+version 0.006
 
 # AVAILABILITY
 

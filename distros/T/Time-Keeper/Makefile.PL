@@ -93,13 +93,13 @@ my %WriteMakefileArgs = (
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
         'ExtUtils::Depends'   => '0.404',
-        'Time::Keeper::Zone'  => '0.01',
+        'Time::Keeper::Zone'  => '0.03',
     },
     TEST_REQUIRES => {
         'Test::More' => '0.88',
     },
     PREREQ_PM => {
-        'Time::Keeper::Zone' => '0.01',
+        'Time::Keeper::Zone' => '0.03',
     },
     XS     => { 'Keeper.xs' => 'Keeper.c' },
     OBJECT => 'Keeper$(OBJ_EXT)',

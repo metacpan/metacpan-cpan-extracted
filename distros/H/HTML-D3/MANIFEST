@@ -24,6 +24,7 @@ t/bar.t
 t/comment-spelling.t
 t/cover.t
 t/critic.t
+t/d3-schemes.t
 t/eof.t
 t/eol.t
 t/fixme.t

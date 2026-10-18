@@ -143,6 +143,29 @@ for (split /\n/, slurp("$src/zone.tab")) {
     push @{ $country_zones{$cc} }, $lookup_index{$tzname};
 }
 my @countries = sort keys %country_zones;
+die "more countries than a u8 index holds\n" if @countries >= 0xFF;
+
+# The reverse of both: each name's country, the first zone.tab gives it,
+# and for a link zone.tab leaves out, its zone's; each zone's Windows
+# name, the first in name order.
+my %country_index;
+@country_index{@countries} = 0 .. $#countries;
+my @lookup_country = (0xFF) x @lookup;
+for (split /\n/, slurp("$src/zone.tab")) {
+    next if /^#/ || !/\S/;
+    my ($cc, undef, $tzname) = split /\t/;
+    my $i = $lookup_index{$tzname};
+    $lookup_country[$i] = $country_index{$cc} if $lookup_country[$i] == 0xFF;
+}
+for my $i (0 .. $#lookup) {
+    next unless $lookup[$i][2] && $lookup_country[$i] == 0xFF;
+    $lookup_country[$i] = $lookup_country[ $lookup_index{ $zones[ $lookup[$i][1] ] } ];
+}
+my @zone_windows = (0xFFFF) x @zones;
+for my $i (0 .. $#windows) {
+    $zone_windows[ $windows[$i][1] ] = $i if $zone_windows[ $windows[$i][1] ] == 0xFFFF;
+}
+
 my ($cnames, %cname_offset) = ('');
 for my $cc (@countries) {
     $cname_offset{$cc} = length $cnames;
@@ -434,6 +457,19 @@ sub write_header {
 
     $p->('static const tkz_windows_entry tkz_windows[TKZ_WINDOWS_COUNT] = {');
     $p->(sprintf '    { %d, %d },', $wname_offset{ $_->[0] }, $_->[1]) for @windows;
+    $p->('};');
+    $p->('');
+
+    $p->('static const uint8_t tkz_lookup_country[TKZ_LOOKUP_COUNT] = {');
+    for (my $i = 0; $i < @lookup_country; $i += 16) {
+        $p->('    ', join(' ', map { "$_," } @lookup_country[$i .. ($i + 15 > $#lookup_country ? $#lookup_country : $i + 15)]));
+    }
+    $p->('};');
+    $p->('');
+    $p->('static const uint16_t tkz_zone_windows[TKZ_ZONE_COUNT] = {');
+    for (my $i = 0; $i < @zone_windows; $i += 16) {
+        $p->('    ', join(' ', map { "$_," } @zone_windows[$i .. ($i + 15 > $#zone_windows ? $#zone_windows : $i + 15)]));
+    }
     $p->('};');
     $p->('');
     $p->('#endif');

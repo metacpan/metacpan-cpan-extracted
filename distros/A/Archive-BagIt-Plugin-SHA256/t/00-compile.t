@@ -6,11 +6,9 @@ use warnings;
 
 use Test::More;
 
-plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 1 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'Archive/BagIt/Plugin/Algorithm/SHA256.pm',
-    'Archive/BagIt/Plugin/Manifest/SHA256.pm',
     'Archive/BagIt/Plugin/SHA256.pm'
 );
 

@@ -3,6 +3,7 @@ package Acme::Claude::Shell::Hooks;
 use 5.020;
 use strict;
 use warnings;
+use utf8;
 
 use Exporter 'import';
 our @EXPORT_OK = qw(safety_hooks);
@@ -12,6 +13,156 @@ use Claude::Agent::Hook::Matcher;
 use Claude::Agent::Hook::Result;
 use Term::ANSIColor qw(colored);
 use Time::HiRes qw(time);
+
+sub safety_hooks {
+    my ($session) = @_;
+
+    my $execute_cmd_pattern = 'execute_command$';
+    my $any_shell_tool = 'mcp__shell-tools__.*';
+
+    $session->_session_start(time()) unless $session->_session_start;
+
+    return {
+        PreToolUse => [
+            Claude::Agent::Hook::Matcher->new(
+                matcher => $any_shell_tool,
+                hooks   => [sub {
+                    my ($input, $tool_use_id, $context) = @_;
+
+                    my $tool_name = $input->{tool_name} // 'unknown';
+                    my $tool_input = $input->{tool_input} // {};
+
+                    my $short_name = $tool_name;
+                    $short_name =~ s/^mcp__shell-tools__//;
+
+                    if ($session->verbose) {
+                        if ($session->colorful) {
+                            status('info', "Tool: $short_name");
+                        }
+                        else {
+                            print "[Tool] $short_name\n";
+                        }
+                    }
+
+                    if ($session->audit_log) {
+                        push @{$session->_audit_log}, {
+                            time       => time(),
+                            tool       => $short_name,
+                            input      => $tool_input,
+                            tool_use_id => $tool_use_id,
+                        };
+                    }
+
+                    return Claude::Agent::Hook::Result->proceed();
+                }],
+            ),
+        ],
+
+        PostToolUse => [
+            Claude::Agent::Hook::Matcher->new(
+                matcher => $execute_cmd_pattern,
+                hooks   => [sub {
+                    my ($input, $tool_use_id, $context) = @_;
+                    if ($session->_spinner) {
+                        stop_spinner($session->_spinner);
+                        $session->_spinner(undef);
+                    }
+                    $session->_tool_count($session->_tool_count + 1);
+                    return Claude::Agent::Hook::Result->proceed();
+                }],
+            ),
+        ],
+
+        PostToolUseFailure => [
+            Claude::Agent::Hook::Matcher->new(
+                matcher => $any_shell_tool,
+                hooks   => [sub {
+                    my ($input, $tool_use_id, $context) = @_;
+
+                    my $tool_name = $input->{tool_name} // 'unknown';
+                    my $error = $input->{error} // 'Unknown error';
+
+                    my $short_name = $tool_name;
+                    $short_name =~ s/^mcp__shell-tools__//;
+
+                    $session->_tool_errors($session->_tool_errors + 1);
+
+                    if ($session->colorful) {
+                        status('error', "Tool '$short_name' failed: $error");
+                    }
+                    else {
+                        print "[ERROR] Tool '$short_name' failed: $error\n";
+                    }
+
+                    return Claude::Agent::Hook::Result->proceed();
+                }],
+            ),
+        ],
+
+        Stop => [
+            Claude::Agent::Hook::Matcher->new(
+                matcher => '.*',
+                hooks   => [sub {
+                    my ($input, $tool_use_id, $context) = @_;
+
+                    my $duration = time() - ($session->_session_start // time());
+                    my $tool_count = $session->_tool_count // 0;
+                    my $tool_errors = $session->_tool_errors // 0;
+                    my $history_count = scalar(@{$session->_history // []});
+
+                    if ($session->colorful) {
+                        print "\n";
+                        print colored(['cyan'], "─" x 40) . "\n";
+                        status('info', "Session Statistics");
+                        printf "  Duration: %.1f seconds\n", $duration;
+                        printf "  Tools used: %d\n", $tool_count;
+                        printf "  Tool errors: %d\n", $tool_errors if $tool_errors > 0;
+                        printf "  Commands in history: %d\n", $history_count;
+                        print colored(['cyan'], "─" x 40) . "\n";
+                    }
+                    else {
+                        print "\n--- Session Statistics ---\n";
+                        printf "Duration: %.1f seconds\n", $duration;
+                        printf "Tools used: %d\n", $tool_count;
+                        printf "Tool errors: %d\n", $tool_errors if $tool_errors > 0;
+                        printf "Commands in history: %d\n", $history_count;
+                        print "--------------------------\n";
+                    }
+
+                    return Claude::Agent::Hook::Result->proceed();
+                }],
+            ),
+        ],
+
+        Notification => [
+            Claude::Agent::Hook::Matcher->new(
+                matcher => '.*',
+                hooks   => [sub {
+                    my ($input, $tool_use_id, $context) = @_;
+
+                    my $type = $input->{notification_type} // $input->{title} // 'unknown';
+                    my $message = $input->{message} // '';
+
+                    if ($session->verbose) {
+                        if ($session->colorful) {
+                            status('info', "Notification: $type" . (length $message ? " - $message" : ""));
+                        }
+                        else {
+                            print "[Notification] $type", (length $message ? " - $message" : ""), "\n";
+                        }
+                    }
+
+                    return Claude::Agent::Hook::Result->proceed();
+                }],
+            ),
+        ],
+    };
+}
+
+
+1;
+
+__END__
 
 =head1 NAME
 
@@ -39,7 +190,7 @@ to ensure it happens synchronously before execution.
 =item * B<PreToolUse> - Audit logging of tool calls
 
 Triggered before any shell-tools MCP tool executes. Logs tool usage in
-verbose mode and tracks calls in an audit log if C<< $session->{audit_log} >>
+verbose mode and tracks calls in an audit log if C<< $session->audit_log >>
 is enabled.
 
 =item * B<PostToolUse> - Stop spinner after command execution
@@ -82,7 +233,7 @@ The following session attributes affect hook behavior:
 
 =item * C<verbose> - Enable verbose logging of tool calls and notifications
 
-=item * C<audit_log> - Enable detailed audit logging to C<< $session->{_audit_log} >>
+=item * C<audit_log> - Enable detailed audit logging to C<_audit_log>
 
 =item * C<colorful> - Use colored output (default: auto-detect TTY)
 
@@ -90,169 +241,15 @@ The following session attributes affect hook behavior:
 
 =cut
 
-sub safety_hooks {
-    my ($session) = @_;
+=head1 FUNCTIONS
 
-    # Tool name pattern - matches mcp__shell-tools__execute_command
-    my $execute_cmd_pattern = 'execute_command$';
-    # Match any tool from our shell-tools server
-    my $any_shell_tool = 'shell-tools__';
+=head2 safety_hooks
 
-    # Track session start time
-    $session->{_session_start} //= time();
-    $session->{_tool_count} //= 0;
-    $session->{_tool_errors} //= 0;
+    my $hooks = safety_hooks($session);
 
-    return {
-        # PreToolUse: Audit logging - track what tools Claude wants to use
-        PreToolUse => [
-            Claude::Agent::Hook::Matcher->new(
-                matcher => $any_shell_tool,
-                hooks   => [sub {
-                    my ($input, $tool_use_id, $context) = @_;
-
-                    my $tool_name = $input->{tool_name} // 'unknown';
-                    my $tool_input = $input->{tool_input} // {};
-
-                    # Extract short tool name (after mcp__shell-tools__)
-                    my $short_name = $tool_name;
-                    $short_name =~ s/^mcp__shell-tools__//;
-
-                    # Log tool usage in verbose mode
-                    if ($session->{verbose}) {
-                        if ($session->colorful) {
-                            status('info', "Tool: $short_name");
-                        }
-                        else {
-                            print "[Tool] $short_name\n";
-                        }
-                    }
-
-                    # Track in audit log if enabled
-                    if ($session->{audit_log}) {
-                        push @{$session->{_audit_log} //= []}, {
-                            time       => time(),
-                            tool       => $short_name,
-                            input      => $tool_input,
-                            tool_use_id => $tool_use_id,
-                        };
-                    }
-
-                    return Claude::Agent::Hook::Result->proceed();
-                }],
-            ),
-        ],
-
-        # PostToolUse: Stop spinner after command execution and track stats
-        PostToolUse => [
-            Claude::Agent::Hook::Matcher->new(
-                matcher => $execute_cmd_pattern,
-                hooks   => [sub {
-                    my ($input, $tool_use_id, $context) = @_;
-                    # Stop the execution spinner
-                    if ($session->_spinner) {
-                        stop_spinner($session->_spinner);
-                        $session->_spinner(undef);
-                    }
-                    # Track tool usage
-                    $session->{_tool_count}++;
-                    return Claude::Agent::Hook::Result->proceed();
-                }],
-            ),
-        ],
-
-        # PostToolUseFailure: Handle tool failures gracefully
-        PostToolUseFailure => [
-            Claude::Agent::Hook::Matcher->new(
-                matcher => $any_shell_tool,
-                hooks   => [sub {
-                    my ($input, $tool_use_id, $context) = @_;
-
-                    my $tool_name = $input->{tool_name} // 'unknown';
-                    my $error = $input->{error} // 'Unknown error';
-
-                    # Extract short tool name
-                    my $short_name = $tool_name;
-                    $short_name =~ s/^mcp__shell-tools__//;
-
-                    # Track error count
-                    $session->{_tool_errors}++;
-
-                    # Show error to user
-                    if ($session->colorful) {
-                        status('error', "Tool '$short_name' failed: $error");
-                    }
-                    else {
-                        print "[ERROR] Tool '$short_name' failed: $error\n";
-                    }
-
-                    return Claude::Agent::Hook::Result->proceed();
-                }],
-            ),
-        ],
-
-        # Stop: Show session statistics when the agent stops
-        Stop => [
-            Claude::Agent::Hook::Matcher->new(
-                matcher => '.*',  # Match any stop reason
-                hooks   => [sub {
-                    my ($input, $tool_use_id, $context) = @_;
-
-                    my $duration = time() - ($session->{_session_start} // time());
-                    my $tool_count = $session->{_tool_count} // 0;
-                    my $tool_errors = $session->{_tool_errors} // 0;
-                    my $history_count = scalar(@{$session->_history // []});
-
-                    if ($session->colorful) {
-                        print "\n";
-                        print colored(['cyan'], "─" x 40) . "\n";
-                        status('info', "Session Statistics");
-                        printf "  Duration: %.1f seconds\n", $duration;
-                        printf "  Tools used: %d\n", $tool_count;
-                        printf "  Tool errors: %d\n", $tool_errors if $tool_errors > 0;
-                        printf "  Commands in history: %d\n", $history_count;
-                        print colored(['cyan'], "─" x 40) . "\n";
-                    }
-                    else {
-                        print "\n--- Session Statistics ---\n";
-                        printf "Duration: %.1f seconds\n", $duration;
-                        printf "Tools used: %d\n", $tool_count;
-                        printf "Tool errors: %d\n", $tool_errors if $tool_errors > 0;
-                        printf "Commands in history: %d\n", $history_count;
-                        print "--------------------------\n";
-                    }
-
-                    return Claude::Agent::Hook::Result->proceed();
-                }],
-            ),
-        ],
-
-        # Notification: Log important events
-        Notification => [
-            Claude::Agent::Hook::Matcher->new(
-                matcher => '.*',  # Match all notifications
-                hooks   => [sub {
-                    my ($input, $tool_use_id, $context) = @_;
-
-                    my $type = $input->{notification_type} // 'unknown';
-                    my $data = $input->{data} // {};
-
-                    # Log certain notification types if verbose mode is on
-                    if ($session->{verbose}) {
-                        if ($session->colorful) {
-                            status('info', "Notification: $type");
-                        }
-                        else {
-                            print "[Notification] $type\n";
-                        }
-                    }
-
-                    return Claude::Agent::Hook::Result->proceed();
-                }],
-            ),
-        ],
-    };
-}
+Build the hooks hash for a L<Acme::Claude::Shell::Session> or
+L<Acme::Claude::Shell::Query>, ready for the C<hooks> option. Records the
+session start time on first call.
 
 =head1 AUTHOR
 
@@ -267,5 +264,3 @@ This is free software, licensed under:
   The Artistic License 2.0 (GPL Compatible)
 
 =cut
-
-1;

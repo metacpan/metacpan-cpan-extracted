@@ -7,7 +7,60 @@ use warnings;
 use Exporter 'import';
 our @EXPORT_OK = qw(shell run);
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
+
+use Acme::Claude::Shell::Session;
+use Acme::Claude::Shell::Query;
+use IO::Async::Loop;
+
+sub shell {
+    my (%args) = @_;
+
+    my $loop = $args{loop} // IO::Async::Loop->new;
+
+    my $session = Acme::Claude::Shell::Session->new(
+        loop        => $loop,
+        dry_run     => $args{dry_run} // 0,
+        safe_mode   => $args{safe_mode} // 1,
+        working_dir => $args{working_dir} // '.',
+        colorful    => $args{colorful} // _detect_color(),
+        ($args{model}  ? (model  => $args{model})  : ()),
+        ($args{effort} ? (effort => $args{effort}) : ()),
+        verbose     => $args{verbose} // 0,
+        audit_log   => $args{audit_log} // 0,
+    );
+
+    return $session->run->get;
+}
+
+sub run {
+    my ($prompt, %args) = @_;
+
+    my $loop = $args{loop} // IO::Async::Loop->new;
+
+    my $query = Acme::Claude::Shell::Query->new(
+        loop        => $loop,
+        dry_run     => $args{dry_run} // 0,
+        safe_mode   => $args{safe_mode} // 1,
+        working_dir => $args{working_dir} // '.',
+        colorful    => $args{colorful} // _detect_color(),
+        ($args{model}  ? (model  => $args{model})  : ()),
+        ($args{effort} ? (effort => $args{effort}) : ()),
+        verbose     => $args{verbose} // 0,
+        audit_log   => $args{audit_log} // 0,
+    );
+
+    return $query->run($prompt)->get;
+}
+
+sub _detect_color {
+    return -t STDOUT ? 1 : 0;
+}
+
+
+1;
+
+__END__
 
 =head1 NAME
 
@@ -15,7 +68,7 @@ Acme::Claude::Shell - AI-powered interactive shell using Claude Agent SDK
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 
@@ -84,48 +137,6 @@ Execute a single command and return the result. Does not maintain
 session context between calls.
 
 =cut
-
-use Acme::Claude::Shell::Session;
-use Acme::Claude::Shell::Query;
-use IO::Async::Loop;
-
-sub shell {
-    my (%args) = @_;
-
-    my $loop = $args{loop} // IO::Async::Loop->new;
-
-    my $session = Acme::Claude::Shell::Session->new(
-        loop        => $loop,
-        dry_run     => $args{dry_run} // 0,
-        safe_mode   => $args{safe_mode} // 1,
-        working_dir => $args{working_dir} // '.',
-        colorful    => $args{colorful} // _detect_color(),
-        ($args{model} ? (model => $args{model}) : ()),
-    );
-
-    return $session->run->get;
-}
-
-sub run {
-    my ($prompt, %args) = @_;
-
-    my $loop = $args{loop} // IO::Async::Loop->new;
-
-    my $query = Acme::Claude::Shell::Query->new(
-        loop        => $loop,
-        dry_run     => $args{dry_run} // 0,
-        safe_mode   => $args{safe_mode} // 1,
-        working_dir => $args{working_dir} // '.',
-        colorful    => $args{colorful} // _detect_color(),
-        ($args{model} ? (model => $args{model}) : ()),
-    );
-
-    return $query->run($prompt)->get;
-}
-
-sub _detect_color {
-    return -t STDOUT ? 1 : 0;
-}
 
 =head1 EXAMPLE SESSION
 
@@ -232,5 +243,3 @@ This is free software, licensed under:
   The Artistic License 2.0 (GPL Compatible)
 
 =cut
-
-1;

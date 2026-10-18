@@ -1,0 +1,75 @@
+Game-Senet
+
+Senet, the race game of ancient Egypt: thirty houses in three rows of ten,
+five pieces a side, and four throwing sticks. Both sides run the same S-shaped
+track from house 1 to house 30 and off the board, and the first to bear every
+piece off wins. A piece that lands on one of the other side's swaps houses
+with it, unless that piece is protected by its neighbours.
+
+This distribution is the game, an opponent for it, and a program to play it
+in a terminal.
+
+    use Game::Senet;
+
+    my $game = Game::Senet->new(seed => 'any bytes at all');
+    while (!$game->is_over) {
+        my @moves = $game->legal;
+        $game->play($moves[0]);
+    }
+    print $game->result->winner, " won\n";
+
+Or, from a shell:
+
+    senet
+    senet --rules skyruk --level 2
+
+Nobody knows how Senet was played, and every set of rules is a modern
+reconstruction. Two are played here by name: kendall, after Timothy Kendall's
+reconstruction (1978) as modern sets play it, and skyruk, a reconstruction
+published with an open-source implementation.
+
+Every throw of the sticks follows from a seed, so a game can be recorded and
+played again exactly. The engine is C, with no floating point in it; the
+opponent looks ahead through the sticks and is bounded by the number of
+positions it may look at, never by the clock, so it makes the same move on
+every machine.
+
+
+INSTALLATION
+
+A C compiler is needed. To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+It requires Object::Proto::Sugar and Game::Terminal::Kit. Term::ReadKey is
+recommended: with it the terminal program is played with the arrow keys, and
+without it by typing.
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Game::Senet
+    perldoc senet
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Game-Senet
+
+    Search CPAN
+        https://metacpan.org/release/Game-Senet
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION <email@lnation.org>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)

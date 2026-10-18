@@ -62,7 +62,7 @@ ok($dump1,"dumped master instance") ;
 # ok now we can load test model in Itself
 
 my $meta_inst = $meta_model -> instance (
-    root_class_name   => 'Itself::Model', 
+    root_class_name   => 'Itself::Model',
     instance_name     => 'itself_instance',
     root_dir          => $wr_model1->stringify,
 );
@@ -77,14 +77,14 @@ my $rw_obj = Config::Model::Itself -> new(
 
 my $map = $rw_obj -> read_all(
     root_model => 'MasterModel',
-    legacy => 'ignore',
+    legacy => 'warn',
 ) ;
 
 ok(1,"Read all models in data dir") ;
 
 print $meta_model->list_class_element if $trace ;
 
-my $expected_map 
+my $expected_map
   = {
      'MasterModel/HashIdOfValues.pl' => [
                              'MasterModel::HashIdOfValues'
@@ -137,7 +137,7 @@ is($master_model->grab_value('rw_config file'), 'mymaster.cds', "write_config da
 # check that utf8 description is not garbled
 is($master_model->grab_value('element:std_id description'), "test utf8 😀", "test utf8 description");
 
-# add a new class 
+# add a new class
 $meta_root->load("class:Master::Created element:created1 type=leaf value_type=number"
                      ." - element:created2 type=leaf value_type=uniline") ;
 ok(1,"added new class Master::Created") ;
@@ -163,7 +163,7 @@ ok( ! $wr_model1->child("models/MasterModel/ToTrash.pl")->exists,
 
 #create a 2nd empty model
 my $meta_inst2 = $meta_model->instance (
-    root_class_name   => 'Itself::Model', 
+    root_class_name   => 'Itself::Model',
     instance_name     => 'itself_instance2'
 );
 
@@ -176,7 +176,7 @@ ok(1,"Created and loaded 2nd instance") ;
 my $cds2 = $meta_root2 ->dump_tree () ;
 $wr_conf1->child("inst2.cds")->spew_utf8($cds2);
 
-is_deeply([split /\n/,$cds2],\@cds_orig,"Compared the 2 full dumps") ; 
+is_deeply([split /\n/,$cds2],\@cds_orig,"Compared the 2 full dumps") ;
 
 my $pdata2 = $meta_root2 -> dump_as_data ;
 print Dumper $pdata2 if $trace ;
@@ -194,7 +194,7 @@ $rw_obj2 -> write_all();
 my $written_model_file = $wr_model2->child("models/MasterModel.pl");
 file_contents_like  $written_model_file,  qr/use strict;/,  "stricture was added when writing file";
 
-# create 3rd instance 
+# create 3rd instance
 
 my $meta_inst3 = $meta_model->instance (
     root_class_name   => 'Itself::Model',
@@ -208,7 +208,7 @@ ok(1,"Created and loaded 3nd instance with perl data") ;
 my $cds3 = $meta_root3 ->dump_tree () ;
 $wr_conf1->child("inst3.cds")->spew_utf8($cds3);
 
-is_deeply([split /\n/,$cds3],\@cds_orig,"Compared the 3rd full dump with first one") ; 
+is_deeply([split /\n/,$cds3],\@cds_orig,"Compared the 3rd full dump with first one") ;
 
 # check dump of one class
 my $dump = $rw_obj -> get_perl_data_model ('MasterModel') ;

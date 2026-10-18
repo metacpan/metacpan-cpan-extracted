@@ -4,13 +4,23 @@ use 5.020;
 use strict;
 use warnings;
 
-use Types::Common -types;
-use Marlin
-    'model?' => Str,              # Claude model to use
-    'max_length?' => Int,         # Maximum output length hint
-    'preserve_formatting?' => Bool,  # Try to preserve original formatting
-    'language?' => Str,           # Output language (for translation)
-    'permission_mode?' => Str;    # Claude Agent permission mode (default: bypassPermissions)
+use Object::Proto ();
+
+BEGIN {
+    Object::Proto::define('Wordsmith::Claude::Options',
+        'model:Str:predicate',
+        'effort:Str:predicate',
+        'max_length:Int:predicate',
+        'preserve_formatting:Bool:predicate',
+        'language:Str:predicate',
+        'permission_mode:Str:default(bypassPermissions):predicate',
+    );
+}
+
+
+1;
+
+__END__
 
 =head1 NAME
 
@@ -51,6 +61,11 @@ Hint for maximum output length in characters. Not strictly enforced.
 Boolean. If true, attempt to preserve the original formatting
 (paragraphs, lists, etc.) in the output.
 
+=head2 effort
+
+Effort level passed to Claude::Agent: C<low>, C<medium>, C<high>, C<xhigh>
+or C<max>. Optional.
+
 =head2 language
 
 Output language for translation. If set, the rewritten text will
@@ -77,5 +92,3 @@ This is free software, licensed under:
   The Artistic License 2.0 (GPL Compatible)
 
 =cut
-
-1;

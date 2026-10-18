@@ -10,8 +10,6 @@ README.developer
 README.mkdn
 dist.ini
 ignore.txt
-lib/Archive/BagIt/Plugin/Algorithm/SHA256.pm
-lib/Archive/BagIt/Plugin/Manifest/SHA256.pm
 lib/Archive/BagIt/Plugin/SHA256.pm
 t/00-compile.t
 t/store_bag.t

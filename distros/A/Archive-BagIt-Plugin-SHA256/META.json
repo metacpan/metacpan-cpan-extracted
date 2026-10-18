@@ -52,6 +52,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Archive::BagIt" : "0.102",
             "Archive::BagIt::Role::Algorithm" : "0",
             "Archive::BagIt::Role::Manifest" : "0",
             "Archive::BagIt::Role::OpenSSL" : "0",
@@ -84,17 +85,9 @@
       }
    },
    "provides" : {
-      "Archive::BagIt::Plugin::Algorithm::SHA256" : {
-         "file" : "lib/Archive/BagIt/Plugin/Algorithm/SHA256.pm",
-         "version" : "0.005"
-      },
-      "Archive::BagIt::Plugin::Manifest::SHA256" : {
-         "file" : "lib/Archive/BagIt/Plugin/Manifest/SHA256.pm",
-         "version" : "0.005"
-      },
       "Archive::BagIt::Plugin::SHA256" : {
          "file" : "lib/Archive/BagIt/Plugin/SHA256.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
@@ -106,7 +99,7 @@
          "web" : "https://git.fsfe.org/art1pirat/Archive-BagIt-Plugin-SHA256"
       }
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_contributors" : [
       "Andreas Romeyke <art1@andreas-romeyke.de>"
    ],

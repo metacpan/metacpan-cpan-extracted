@@ -1,5 +1,9 @@
 Revision history for File-Raw
 
+0.19    2026-10-17
+        - Fix: the build failed on perl 5.12.
+        - Fix: t/022 did not parse on perl 5.8.
+
 0.18    2026-09-08
         - Fix each_line: close the file when the plugin or the callback dies.
 

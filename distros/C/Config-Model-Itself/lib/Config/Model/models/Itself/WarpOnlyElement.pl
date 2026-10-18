@@ -14,6 +14,9 @@ return [
     [
         name => "Itself::WarpOnlyElement",
 
+        class_description => 'these properties as the same as the ones in Element model, minus '.
+        'the upstream_default and mandatory properties.',
+
         include => 'Itself::WarpableElement' ,
 
         'element' => [

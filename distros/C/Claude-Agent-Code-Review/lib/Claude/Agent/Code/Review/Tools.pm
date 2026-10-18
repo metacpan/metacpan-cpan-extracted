@@ -8,36 +8,6 @@ use Claude::Agent qw(tool create_sdk_mcp_server);
 use Path::Tiny;
 use File::Glob qw(:bsd_glob);
 
-=head1 NAME
-
-Claude::Agent::Code::Review::Tools - Custom MCP tools for code review
-
-=head1 SYNOPSIS
-
-    use Claude::Agent::Code::Review::Tools;
-
-    my $server = Claude::Agent::Code::Review::Tools->create_server();
-
-    # Use in Claude::Agent::Options
-    my $options = Claude::Agent::Options->new(
-        mcp_servers   => { review => $server },
-        allowed_tools => $server->tool_names,
-    );
-
-=head1 DESCRIPTION
-
-Provides custom MCP tools to enhance code review capabilities.
-
-=head1 METHODS
-
-=head2 create_server
-
-    my $server = Claude::Agent::Code::Review::Tools->create_server();
-
-Creates an MCP server with all review tools.
-
-=cut
-
 sub create_server {
     my ($class) = @_;
 
@@ -54,7 +24,6 @@ sub create_server {
     );
 }
 
-# Internal: get_file_context tool
 sub _get_file_context_tool {
     return tool(
         'get_file_context',
@@ -97,7 +66,6 @@ sub _get_file_context_tool {
                 };
             }
 
-            # Open file first to prevent TOCTOU race condition
             my $fh = eval { $file_path->openr_utf8 };
             unless ($fh) {
                 return {
@@ -106,7 +74,6 @@ sub _get_file_context_tool {
                 };
             }
 
-            # Validate path after acquiring handle (cross-platform)
             my $safe_path = eval { $file_path->realpath };
             my $base_dir = path('.')->realpath;
             unless ($safe_path && $base_dir->subsumes($safe_path)) {
@@ -117,7 +84,6 @@ sub _get_file_context_tool {
                 };
             }
 
-            # Read from already-opened handle
             my @lines = map { chomp; $_ } <$fh>;
             close $fh;
             my $total = scalar @lines;
@@ -145,7 +111,6 @@ sub _get_file_context_tool {
     );
 }
 
-# Internal: search_codebase tool
 sub _search_codebase_tool {
     return tool(
         'search_codebase',
@@ -176,14 +141,10 @@ sub _search_codebase_tool {
             my ($args) = @_;
 
             my $pattern      = $args->{pattern};
-            my $literal      = $args->{literal} // 1;  # Default to literal (safe)
+            my $literal      = $args->{literal} // 1;
             my $file_pattern = $args->{file_pattern} // '**/*.{pm,pl,t}';
             my $max_results  = $args->{max_results} // 20;
 
-            # Reject file patterns containing '..' as a basic sanity check.
-            # Note: This is NOT a security boundary - the actual path traversal
-            # protection is enforced by realpath/subsumes validation which
-            # verifies resolved paths are within the base directory.
             if ($file_pattern =~ /\.\./) {
                 return {
                     content  => [{ type => 'text', text => "Invalid file pattern: '..' not allowed" }],
@@ -195,12 +156,9 @@ sub _search_codebase_tool {
             my $re;
 
             if ($literal) {
-                # Literal matching - no ReDoS risk
                 $re = qr/\Q$pattern\E/i;
             } else {
-                # Regex mode - apply safety checks
 
-                # Validate pattern length to prevent ReDoS
                 if (length($pattern) > 500) {
                     return {
                         content  => [{ type => 'text', text => "Pattern too long (max 500 chars)" }],
@@ -208,8 +166,6 @@ sub _search_codebase_tool {
                     };
                 }
 
-                # Reject patterns with nested quantifiers (primary ReDoS vectors)
-                # Matches: (...)+ followed by +*?, or nested groups with quantifiers
                 if ($pattern =~ /\([^)]*[+*][^)]*\)[+*?]/ ||
                     $pattern =~ /\(\?[^)]*[+*][^)]*\)[+*?]/) {
                     return {
@@ -218,9 +174,6 @@ sub _search_codebase_tool {
                     };
                 }
 
-                # Compile regex with timeout protection.
-                # Note: alarm() does not work on Windows (MSWin32). The pattern length
-                # limit above (500 chars) provides primary protection on all platforms.
                 eval {
                     if ($^O ne 'MSWin32') {
                         local $SIG{ALRM} = sub { die "regex compilation timeout\n" };
@@ -228,11 +181,10 @@ sub _search_codebase_tool {
                         $re = qr/$pattern/i;
                         alarm(0);
                     } else {
-                        # Windows: rely on pattern length limit for protection
                         $re = qr/$pattern/i;
                     }
                 };
-                alarm(0) if $^O ne 'MSWin32';  # Ensure alarm is cleared
+                alarm(0) if $^O ne 'MSWin32';
                 if ($@) {
                     return {
                         content  => [{ type => 'text', text => "Invalid or unsafe regex: $@" }],
@@ -243,14 +195,9 @@ sub _search_codebase_tool {
 
             my $base_dir = path('.')->realpath;
 
-            # Use bsd_glob for reliable brace expansion across platforms.
-            # Note: Glob may match paths outside base_dir (including via symlinks),
-            # but security is enforced later where realpath/subsumes validates
-            # each file is within the base directory before reading.
             my @files = bsd_glob($file_pattern, GLOB_BRACE);
             unless (@files) {
-                # Fallback: extract extension from pattern and search recursively
-                my $ext_pattern = '\.(?:pm|pl|t)$';  # Default extensions
+                my $ext_pattern = '\.(?:pm|pl|t)$';
                 if ($file_pattern =~ /\*\.(\w+)$/) {
                     $ext_pattern = '\.' . quotemeta($1) . '$';
                 } elsif ($file_pattern =~ /\*\.\{([^}]+)\}$/) {
@@ -264,22 +211,17 @@ sub _search_codebase_tool {
             }
 
             FILE: for my $file (@files) {
-                next unless -f $file;  # realpath/subsumes below handles symlink security
+                next unless -f $file;
                 my $path = path($file);
 
-                # Validate path is within base directory (cross-platform)
                 my $safe_path = eval { $path->realpath };
                 next unless $safe_path && $base_dir->subsumes($safe_path);
 
                 my $line_num = 0;
-                # ReDoS protection: (1) literal mode uses quotemeta (no regex risk),
-                # (2) regex mode rejects nested quantifiers, (3) pattern length limit,
-                # (4) line length limit below, (5) max_results limit.
                 for my $line ($safe_path->lines_utf8({ chomp => 1 })) {
                     $line_num++;
-                    next if length($line) > 10_000;  # Skip very long lines
+                    next if length($line) > 10_000;
                     if ($line =~ $re) {
-                        # Use safe_path for consistent output (validated path)
                         push @results, sprintf "%s:%d: %s", $safe_path, $line_num, $line;
                         last FILE if @results >= $max_results;
                     }
@@ -297,7 +239,6 @@ sub _search_codebase_tool {
     );
 }
 
-# Internal: check_tests tool
 sub _check_tests_tool {
     return tool(
         'check_tests',
@@ -322,10 +263,8 @@ sub _check_tests_tool {
             my $module   = $args->{module};
             my $function = $args->{function};
 
-            # Convert module name to possible test file patterns
             my $module_path = $module;
             $module_path =~ s/::/-/g;
-            # Escape glob metacharacters to prevent unexpected behavior
             $module_path =~ s/([*?\[\]{}])/\\$1/g;
 
             my @test_patterns = (
@@ -347,9 +286,7 @@ sub _check_tests_tool {
                 for my $test (@found_tests) {
                     push @results, "  - $test";
 
-                    # If function specified, check if it's tested
                     if ($function && !-l $test) {
-                        # Validate test file path is within base directory (cross-platform)
                         my $test_path = eval { path($test)->realpath };
                         next unless $test_path && $base_dir->subsumes($test_path);
                         my $content = eval { $test_path->slurp_utf8 } // '';
@@ -372,7 +309,6 @@ sub _check_tests_tool {
     );
 }
 
-# Internal: get_dependencies tool
 sub _get_dependencies_tool {
     return tool(
         'get_dependencies',
@@ -400,7 +336,6 @@ sub _get_dependencies_tool {
                 };
             }
 
-            # Open file first to prevent TOCTOU race condition
             my $fh = eval { $file_path->openr_utf8 };
             unless ($fh) {
                 return {
@@ -409,7 +344,6 @@ sub _get_dependencies_tool {
                 };
             }
 
-            # Validate path after acquiring handle (cross-platform, catches symlinks)
             my $safe_path = eval { $file_path->realpath };
             my $base_dir = path('.')->realpath;
             unless ($safe_path && $base_dir->subsumes($safe_path)) {
@@ -420,23 +354,18 @@ sub _get_dependencies_tool {
                 };
             }
 
-            # Read from already-opened handle
             my $content = do { local $/; <$fh> };
             close $fh;
 
             my @use_statements;
             my @require_statements;
 
-            # Note: This simple regex extracts module names from 'use Module' statements.
-            # It handles basic cases but won't capture version requirements or qw() imports.
-            # For comprehensive dependency analysis, consider using PPI or Module::ExtractUse.
             while ($content =~ /^\s*use\s+([\w:]+)(?:\s|;)/gm) {
                 push @use_statements, $1 unless $1 =~ /^(strict|warnings|v?\d|parent|base|lib|constant|if|feature)$/;
             }
 
             while ($content =~ /^\s*require\s+([\w:]+)/gm) {
                 my $mod = $1;
-                # Skip version requirements like 'require 5.020' or 'require v5'
                 next if $mod =~ /^v?\d/;
                 push @require_statements, $mod;
             }
@@ -467,7 +396,6 @@ sub _get_dependencies_tool {
     );
 }
 
-# Internal: analyze_complexity tool
 sub _analyze_complexity_tool {
     return tool(
         'analyze_complexity',
@@ -500,7 +428,6 @@ sub _analyze_complexity_tool {
                 };
             }
 
-            # Open file first to prevent TOCTOU race condition
             my $fh = eval { $file_path->openr_utf8 };
             unless ($fh) {
                 return {
@@ -509,7 +436,6 @@ sub _analyze_complexity_tool {
                 };
             }
 
-            # Validate path after acquiring handle (cross-platform, catches symlinks)
             my $safe_path = eval { $file_path->realpath };
             my $base_dir = path('.')->realpath;
             unless ($safe_path && $base_dir->subsumes($safe_path)) {
@@ -520,11 +446,9 @@ sub _analyze_complexity_tool {
                 };
             }
 
-            # Read from already-opened handle
             my $content = do { local $/; <$fh> };
             close $fh;
 
-            # Find the subroutine (escape function name for regex safety)
             my $safe_func = quotemeta($function);
             my $sub_re = qr/sub\s+$safe_func\s*\{/;
             unless ($content =~ $sub_re) {
@@ -533,10 +457,9 @@ sub _analyze_complexity_tool {
                 };
             }
 
-            # Extract subroutine body using balanced brace matching
             my $sub_body;
             if ($content =~ /sub\s+$safe_func\s*\{/) {
-                my $pos = $+[0] - 1;  # Position of opening brace
+                my $pos = $+[0] - 1;
                 my $depth = 0;
                 my $start = $pos;
                 for my $i ($pos .. length($content) - 1) {
@@ -559,27 +482,18 @@ sub _analyze_complexity_tool {
                 };
             }
 
-            # Count decision points for cyclomatic complexity
-            # CC = E - N + 2P where E = edges, N = nodes, P = connected components
-            # Simplified: count decision keywords + 1
-
-            # Strip strings and comments to avoid false positives.
-            # Note: Heredoc handling is basic and may not catch all variants
-            # (e.g., <<~INDENT, complex delimiters). For production use with
-            # critical complexity requirements, consider using PPI for parsing.
             my $code_only = $sub_body;
-            $code_only =~ s/#.*$//gm;                    # Remove line comments
-            $code_only =~ s/'(?:[^'\\]|\\.)*'//g;        # Remove single-quoted strings
-            $code_only =~ s/"(?:[^"\\]|\\.)*"//g;        # Remove double-quoted strings
-            $code_only =~ s/<<['"]?(\w+)['"]?.*?\n\1//gs; # Remove heredocs (basic)
+            $code_only =~ s/#.*$//gm;
+            $code_only =~ s/'(?:[^'\\]|\\.)*'//g;
+            $code_only =~ s/"(?:[^"\\]|\\.)*"//g;
+            $code_only =~ s/<<['"]?(\w+)['"]?.*?\n\1//gs;
 
-            my $complexity = 1;  # Base complexity
+            my $complexity = 1;
 
-            # Count decision points (on code without strings/comments)
             $complexity += () = $code_only =~ /\b(if|elsif|unless|while|until|for|foreach)\b/g;
             $complexity += () = $code_only =~ /\b(and|or)\b/g;
-            $complexity += () = $code_only =~ /(\?\s*:)/g;  # Ternary operators
-            $complexity += () = $code_only =~ /(\|\||\&\&)/g;  # Logical operators
+            $complexity += () = $code_only =~ /(\?\s*:)/g;
+            $complexity += () = $code_only =~ /(\|\||\&\&)/g;
 
             my $assessment;
             if ($complexity <= 5) {
@@ -608,6 +522,41 @@ sub _analyze_complexity_tool {
         }
     );
 }
+
+
+1;
+
+__END__
+
+=head1 NAME
+
+Claude::Agent::Code::Review::Tools - Custom MCP tools for code review
+
+=head1 SYNOPSIS
+
+    use Claude::Agent::Code::Review::Tools;
+
+    my $server = Claude::Agent::Code::Review::Tools->create_server();
+
+    # Use in Claude::Agent::Options
+    my $options = Claude::Agent::Options->new(
+        mcp_servers   => { review => $server },
+        allowed_tools => $server->tool_names,
+    );
+
+=head1 DESCRIPTION
+
+Provides custom MCP tools to enhance code review capabilities.
+
+=head1 METHODS
+
+=head2 create_server
+
+    my $server = Claude::Agent::Code::Review::Tools->create_server();
+
+Creates an MCP server with all review tools.
+
+=cut
 
 =head1 AVAILABLE TOOLS
 
@@ -665,5 +614,3 @@ This software is Copyright (c) 2026 by LNATION.
 This is free software, licensed under The Artistic License 2.0 (GPL Compatible).
 
 =cut
-
-1;

@@ -4,7 +4,7 @@ no warnings 'experimental::class';
 use Alien::Xrepo::Runtime;
 use Config ();
 #
-class Alien::SDL3 v3.4.19 : isa(Alien::Xrepo::Runtime) {
+class Alien::SDL3 v3.4.20 : isa(Alien::Xrepo::Runtime) {
 
     # SDL3 is bound as a family: core + the common extension libraries. Each is installed
     # separately (as a SHARED library; xrepo builds SDL3 static by default, and Affix/FFI::Platypus
@@ -20,6 +20,16 @@ class Alien::SDL3 v3.4.19 : isa(Alien::Xrepo::Runtime) {
         # recipe's `defaults`. Folding install_opts() in here is what actually hands -a (and the Windows
         # toolchain below) to `perl Build`, keeping the built profile and dynamic resolution in step.
         my %defaults = ( system => 1, $self->install_opts );
+
+        # ALIEN_SDL3_XMAKE_DEBUG=1 forwards -v/-D to `xrepo install` (Alien::Xrepo's
+        # verbose/diagnosis, which needs v1.0.9+) so a package that fails to build prints
+        # its whole install.txt instead of only the tail. That is what turns an opaque
+        # `=> install libsdl3 .. failed` into the real error. Off by default: the
+        # diagnostic detail is large and is only wanted while debugging a build.
+        if ( $ENV{ALIEN_SDL3_XMAKE_DEBUG} ) {
+            $defaults{verbose}   = 1;
+            $defaults{diagnosis} = 1;
+        }
         return {
             name     => 'Alien-SDL3',
             packages => [
@@ -76,7 +86,22 @@ class Alien::SDL3 v3.4.19 : isa(Alien::Xrepo::Runtime) {
         my $arch = $Config::Config{archname} // '';
         if    ( $arch =~ /(?:^|-)(?:arm64|aarch64)(?:-|$)/i )        { $opts{arch} = 'arm64' }
         elsif ( $arch =~ /\bx86_64\b|\bamd64\b|(?:^|-)x64(?:-|$)/i ) { $opts{arch} = 'x86_64' }
-        elsif ( $arch =~ /\bi[3-6]86\b|(?:^|-)x86(?:-|$)/i )         { $opts{arch} = 'x86' }
+        elsif ( $arch =~ /\bi86pc\b/i ) {
+
+            # Solaris calls the machine "i86pc" for both word sizes, so a 64-bit
+            # Perl's archname ("i86pc-solaris-64") matches neither branch above
+            # nor the i[3-6]86 one below. Left unrecognised, xmake keeps its host
+            # default -- which it also reads as "i386" -- and its gcc toolchain
+            # then appends -m32 to everything it compiles: the wrong word size
+            # for the -m64 Perl that has to dlopen the result. It first bites
+            # while libsdl3_ttf builds its freetype dependency, whose cmake build
+            # still comes out 64-bit while its on_test link check is -m32:
+            #   ld: ... libfreetype.a(ftinit.c.o): wrong ELF class: ELFCLASS64
+            # Trust the Perl this Alien feeds over the machine string.
+            my $is64 = ( $Config::Config{ptrsize} // 0 ) == 8 || $arch =~ /-64(?:-|$)/;
+            $opts{arch} = $is64 ? 'x86_64' : 'x86';
+        }
+        elsif ( $arch =~ /\bi[3-6]86\b|(?:^|-)x86(?:-|$)/i ) { $opts{arch} = 'x86' }
         if    ( $^O eq 'MSWin32' ) {
             my $cc       = $Config::Config{cc} // '';
             my $gcc_like = ( $Config::Config{gccversion} // '' ) || $cc =~ /\b(?:gcc|clang|g\+\+)\b/i;

@@ -53,7 +53,7 @@ is($lines[-1], q{100}, "Last element of list is correct");
     ok(-f $output, "Output file created");
 
     my @lines;
-    open my $FH, $output or croak "Unable to open $output for reading";
+    open my $FH, '<', $output or croak "Unable to open $output for reading";
     while (<$FH>) {
         chomp;
         push @lines, $_;

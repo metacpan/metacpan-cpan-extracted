@@ -13,7 +13,7 @@ use Claude::Agent::Message;
 use Claude::Agent::Content;
 use Claude::Agent::Error;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 sub query {
     my (%args) = @_;
@@ -92,7 +92,7 @@ Claude::Agent - Perl SDK for the Claude Agent SDK
 
 =head1 VERSION
 
-Version 0.14
+Version 0.15
 
 =cut
 

@@ -12,106 +12,24 @@ use Wordsmith::Claude::Blog::Result;
 use Future::AsyncAwait;
 use IO::Async::Loop;
 use Scalar::Util qw(blessed);
-use Types::Standard qw(Str CodeRef);
+use Object::Proto ();
 
-use Marlin
-    'text!'           => Str,
-    'title?'          => Str,
-    'source_file?'    => Str,
-    'options?'        => sub { Wordsmith::Claude::Options->new() },
-    'loop?'           => sub { IO::Async::Loop->new },
-    # Callbacks
-    'on_paragraph?'   => CodeRef,
-    'on_progress?'    => CodeRef,
-    'on_complete?'    => CodeRef,
-    # Internal
-    '_client==.';
-
-=head1 NAME
-
-Wordsmith::Claude::Blog::Reviewer - AI-powered blog paragraph reviewer
-
-=head1 SYNOPSIS
-
-    use Wordsmith::Claude::Blog::Reviewer;
-    use IO::Async::Loop;
-
-    my $loop = IO::Async::Loop->new;
-
-    my $reviewer = Wordsmith::Claude::Blog::Reviewer->new(
-        text        => $blog_text,
-        title       => 'My Blog Post',
-        source_file => 'blog.md',  # For live progress saving
-        loop        => $loop,
-
-        on_paragraph => sub {
-            my ($para, $analysis, $num, $total) = @_;
-            print "Paragraph $num/$total\n";
-            print "Analysis: $analysis\n";
-            # Return decision hashref
-            return { action => 'approve' };
-        },
-
-        on_progress => sub {
-            my ($current, $total) = @_;
-            print "Progress: $current/$total\n";
-        },
+BEGIN {
+    Object::Proto::define('Wordsmith::Claude::Blog::Reviewer',
+        'text:Str:required',
+        'title:Str:predicate',
+        'source_file:Str:predicate',
+        'options:builder(_build_options):predicate',
+        'loop:builder(_build_loop):predicate',
+        'on_paragraph:CodeRef:predicate',
+        'on_progress:CodeRef:predicate',
+        'on_complete:CodeRef:predicate',
+        '_client',
     );
+}
 
-    my $result = $reviewer->review->get;
-    print $result->text;
-
-=head1 DESCRIPTION
-
-Reviews blog posts paragraph by paragraph, providing AI analysis of content
-validity and grammar quality. Supports:
-
-=over 4
-
-=item * Paragraph-by-paragraph review with AI analysis
-
-=item * Code block detection with specialized analysis
-
-=item * Multiple revision options (grammar, clarity, conciseness, etc.)
-
-=item * Live file updates for progress saving
-
-=item * Callback-based workflow for UI integration
-
-=back
-
-=head1 CALLBACKS
-
-=head2 on_paragraph
-
-    on_paragraph => sub {
-        my ($paragraph, $analysis, $num, $total) = @_;
-        # Return a decision hashref
-        return { action => 'approve' };
-        # Or: { action => 'revise', instructions => '...' }
-        # Or: { action => 'replace', content => '...' }
-        # Or: { action => 'skip' }
-    }
-
-Called for each paragraph with the AI analysis. Must return a decision hashref.
-
-=head2 on_progress
-
-    on_progress => sub {
-        my ($current, $total) = @_;
-    }
-
-Called after each paragraph is processed.
-
-=head2 on_complete
-
-    on_complete => sub {
-        my ($final_text) = @_;
-    }
-
-Called when review is complete.
-
-=cut
+sub _build_options { Wordsmith::Claude::Options->new }
+sub _build_loop    { IO::Async::Loop->new }
 
 async sub review {
     my ($self) = @_;
@@ -126,10 +44,8 @@ async sub review {
 
         my $is_code = ($para =~ /^```/);
 
-        # Analyze paragraph
         my $analysis = await $self->_analyze($para, $is_code, \@reviewed);
 
-        # Get user decision via callback or default
         my $decision;
         if ($self->has_on_paragraph) {
             $decision = $self->on_paragraph->($para, $analysis, $i+1, scalar(@paragraphs));
@@ -137,12 +53,10 @@ async sub review {
             $decision = { action => 'approve' };
         }
 
-        # Validate decision
         $decision //= { action => 'approve' };
         $decision = { action => 'approve' } unless ref($decision) eq 'HASH';
         $decision->{action} //= 'approve';
 
-        # Process decision
         if ($decision->{action} eq 'approve') {
             push @reviewed, $para;
         }
@@ -154,27 +68,20 @@ async sub review {
             push @reviewed, $decision->{content} // $para;
         }
         elsif ($decision->{action} eq 'skip') {
-            # Don't add to reviewed
         }
         else {
-            # Unknown action, default to approve
             push @reviewed, $para;
         }
 
-        # Progress callback
         $self->on_progress->($i+1, scalar(@paragraphs)) if $self->has_on_progress;
 
-        # Save progress if source file specified
         $self->_save_progress(\@reviewed, \@pending) if $self->source_file;
     }
 
-    # Cleanup session
     $self->_cleanup_session();
 
-    # Assemble final text
     my $final_text = $self->_assemble(\@reviewed);
 
-    # Complete callback
     $self->on_complete->($final_text) if $self->has_on_complete;
 
     return Wordsmith::Claude::Blog::Result->new(
@@ -197,7 +104,6 @@ sub _parse_paragraphs {
     my $in_code_block = 0;
 
     for my $line (@lines) {
-        # Track code block state
         if ($line =~ /^```/) {
             $in_code_block = !$in_code_block;
             $current_para .= "$line\n";
@@ -205,11 +111,9 @@ sub _parse_paragraphs {
         }
 
         if ($in_code_block) {
-            # Inside code block - keep accumulating
             $current_para .= "$line\n";
         }
         elsif ($line =~ /^\s*$/) {
-            # Empty line outside code block - paragraph break
             if ($current_para =~ /\S/) {
                 $current_para =~ s/^\s+|\s+$//g;
                 push @paragraphs, $current_para;
@@ -217,12 +121,10 @@ sub _parse_paragraphs {
             }
         }
         else {
-            # Regular content line
             $current_para .= "$line\n";
         }
     }
 
-    # Don't forget the last paragraph
     if ($current_para =~ /\S/) {
         $current_para =~ s/^\s+|\s+$//g;
         push @paragraphs, $current_para;
@@ -325,7 +227,6 @@ sub _save_progress {
     $content = "# " . $self->title . "\n\n" if $self->title;
     $content .= join("\n\n", @$reviewed);
 
-    # Add remaining unreviewed paragraphs
     if (@$pending) {
         $content .= "\n\n" if @$reviewed;
         $content .= join("\n\n", @$pending);
@@ -355,6 +256,7 @@ sub _init_session {
     my $claude_opts = Claude::Agent::Options->new(
         permission_mode => $self->options->permission_mode // 'bypassPermissions',
         $self->options->has_model ? (model => $self->options->model) : (),
+        $self->options->has_effort ? (effort => $self->options->effort) : (),
     );
 
     $self->_client(session(
@@ -395,6 +297,116 @@ async sub _query {
     return $result_text // '';
 }
 
+
+1;
+
+__END__
+
+=head1 NAME
+
+Wordsmith::Claude::Blog::Reviewer - AI-powered blog paragraph reviewer
+
+=head1 SYNOPSIS
+
+    use Wordsmith::Claude::Blog::Reviewer;
+    use IO::Async::Loop;
+
+    my $loop = IO::Async::Loop->new;
+
+    my $reviewer = Wordsmith::Claude::Blog::Reviewer->new(
+        text        => $blog_text,
+        title       => 'My Blog Post',
+        source_file => 'blog.md',  # For live progress saving
+        loop        => $loop,
+
+        on_paragraph => sub {
+            my ($para, $analysis, $num, $total) = @_;
+            print "Paragraph $num/$total\n";
+            print "Analysis: $analysis\n";
+            # Return decision hashref
+            return { action => 'approve' };
+        },
+
+        on_progress => sub {
+            my ($current, $total) = @_;
+            print "Progress: $current/$total\n";
+        },
+    );
+
+    my $result = $reviewer->review->get;
+    print $result->text;
+
+=head1 DESCRIPTION
+
+Reviews blog posts paragraph by paragraph, providing AI analysis of content
+validity and grammar quality. Supports:
+
+=over 4
+
+=item * Paragraph-by-paragraph review with AI analysis
+
+=item * Code block detection with specialized analysis
+
+=item * Multiple revision options (grammar, clarity, conciseness, etc.)
+
+=item * Live file updates for progress saving
+
+=item * Callback-based workflow for UI integration
+
+=back
+
+=head1 ATTRIBUTES
+
+Every attribute is set through C<new>, which takes a flat list of
+name/value pairs and ignores unknown names.
+
+=over 4
+
+=item * text - The text to review. Required.
+
+=item * title - The title of the piece, when known
+
+=item * source_file - The file the text came from; progress is saved back to it
+
+=item * options - A L<Wordsmith::Claude::Options>; a default one is built
+
+=item * loop - The L<IO::Async::Loop> to run on; one is created when not given
+
+=back
+
+=head1 CALLBACKS
+
+=head2 on_paragraph
+
+    on_paragraph => sub {
+        my ($paragraph, $analysis, $num, $total) = @_;
+        # Return a decision hashref
+        return { action => 'approve' };
+        # Or: { action => 'revise', instructions => '...' }
+        # Or: { action => 'replace', content => '...' }
+        # Or: { action => 'skip' }
+    }
+
+Called for each paragraph with the AI analysis. Must return a decision hashref.
+
+=head2 on_progress
+
+    on_progress => sub {
+        my ($current, $total) = @_;
+    }
+
+Called after each paragraph is processed.
+
+=head2 on_complete
+
+    on_complete => sub {
+        my ($final_text) = @_;
+    }
+
+Called when review is complete.
+
+=cut
+
 =head1 AUTHOR
 
 LNATION, C<< <email at lnation.org> >>
@@ -408,5 +420,3 @@ This is free software, licensed under:
   The Artistic License 2.0 (GPL Compatible)
 
 =cut
-
-1;

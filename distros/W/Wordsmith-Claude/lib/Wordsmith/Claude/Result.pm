@@ -4,13 +4,64 @@ use 5.020;
 use strict;
 use warnings;
 
-use Types::Common -types;
-use Marlin
-    'original!'   => Str,              # Original input text
-    'text!'       => Str,              # Rewritten text (or first variation)
-    'mode?'       => Str,              # Mode used (if any)
-    'variations?' => ArrayRef[Str],    # All variations (if requested)
-    'error?'      => Str;              # Error message (if failed)
+use Object::Proto ();
+use Claude::Agent::Types;
+
+BEGIN {
+    Object::Proto::define('Wordsmith::Claude::Result',
+        'original:Str:required',
+        'text:Str:required',
+        'mode:Str:predicate',
+        'variations:StrList:predicate',
+        'error:Str:predicate',
+    );
+}
+
+sub all_variations {
+    my ($self) = @_;
+
+    if ($self->has_variations && @{$self->variations}) {
+        return @{$self->variations};
+    }
+
+    return ($self->text);
+}
+
+sub variation {
+    my ($self, $index) = @_;
+    return unless defined $index && $index >= 0;
+
+    if ($self->has_variations && @{$self->variations}) {
+        return $index < @{$self->variations} ? $self->variations->[$index] : ();
+    }
+
+    return $index == 0 ? $self->text : ();
+}
+
+sub variation_count {
+    my ($self) = @_;
+
+    if ($self->has_variations && @{$self->variations}) {
+        return scalar @{$self->variations};
+    }
+
+    return 1;
+}
+
+sub is_success {
+    my ($self) = @_;
+    return !$self->has_error;
+}
+
+sub is_error {
+    my ($self) = @_;
+    return $self->has_error;
+}
+
+
+1;
+
+__END__
 
 =head1 NAME
 
@@ -82,16 +133,6 @@ returns the single rewritten text.
 
 =cut
 
-sub all_variations {
-    my ($self) = @_;
-
-    if ($self->has_variations && @{$self->variations}) {
-        return @{$self->variations};
-    }
-
-    return ($self->text);
-}
-
 =head2 variation
 
     my $text = $result->variation(0);  # First variation
@@ -101,17 +142,6 @@ Get a specific variation by index (0-based).
 
 =cut
 
-sub variation {
-    my ($self, $index) = @_;
-    return unless defined $index && $index >= 0;
-
-    if ($self->has_variations && @{$self->variations}) {
-        return $index < @{$self->variations} ? $self->variations->[$index] : ();
-    }
-
-    return $index == 0 ? $self->text : ();
-}
-
 =head2 variation_count
 
     my $count = $result->variation_count;
@@ -119,16 +149,6 @@ sub variation {
 Returns the number of variations available.
 
 =cut
-
-sub variation_count {
-    my ($self) = @_;
-
-    if ($self->has_variations && @{$self->variations}) {
-        return scalar @{$self->variations};
-    }
-
-    return 1;
-}
 
 =head2 is_success
 
@@ -138,11 +158,6 @@ Returns true if the rewrite succeeded (no error).
 
 =cut
 
-sub is_success {
-    my ($self) = @_;
-    return !$self->has_error;
-}
-
 =head2 is_error
 
     if ($result->is_error) { ... }
@@ -150,11 +165,6 @@ sub is_success {
 Returns true if the rewrite failed.
 
 =cut
-
-sub is_error {
-    my ($self) = @_;
-    return $self->has_error;
-}
 
 =head1 AUTHOR
 
@@ -169,5 +179,3 @@ This is free software, licensed under:
   The Artistic License 2.0 (GPL Compatible)
 
 =cut
-
-1;

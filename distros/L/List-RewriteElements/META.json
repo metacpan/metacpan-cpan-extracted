@@ -1,0 +1,65 @@
+{
+   "abstract" : "Create a new list by rewriting elements of a first list",
+   "author" : [
+      "James E Keenan (jkeenan@pobox.com)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "List-RewriteElements",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Cwd" : "0",
+            "File::Basename" : "0",
+            "File::Copy" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Test::Simple" : "0.44",
+            "Tie::File" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Simple" : "0.44"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jkeenan/List-RewriteElements/issues"
+      },
+      "homepage" : "http://thenceforward.net/perl/modules/List-RewriteElements/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jkeenan/List-RewriteElements.git",
+         "web" : "https://github.com/jkeenan/List-RewriteElements"
+      }
+   },
+   "version" : "0.11",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

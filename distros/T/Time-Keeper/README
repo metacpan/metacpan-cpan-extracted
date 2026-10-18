@@ -4,6 +4,8 @@ Dates and times with time zones, leap seconds and every locale.
 
 INSTALLATION
 
+Time-Keeper-Zone must be installed first: Time::Keeper builds against it.
+
     perl Makefile.PL
     make
     make test

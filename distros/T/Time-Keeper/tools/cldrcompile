@@ -3,18 +3,21 @@ use 5.014;
 use strict;
 use warnings;
 
-# cldrcompile - compile CLDR's Gregorian calendar data, zone names and
-# locale names for every locale into what Time::Keeper ships:
+# cldrcompile - compile CLDR's Gregorian calendar data, zone names, locale
+# names, relative-time and duration words, list patterns, interval formats,
+# weekend days and plural rules for every locale into what Time::Keeper ships:
 #
 #   share/locales.tkd               one archive, a section per locale, read on demand
 #   include/tk/tk_locale_en.h       English's section as bytes, compiled in
 #   include/tk/tk_locale_table.h    the codes, aliases, names, and the zone and
 #                                   metazone tables every locale shares
+#   include/tk/tk_plural.h          the plural rules, one C function a rule set
 #
 #   tools/cldrcompile --cldr DIR --tzdata tzdata.tar.gz --cldr-version 48.2.3
 #
 # DIR holds the unpacked cldr-json packages cldr-core, cldr-dates-full,
-# cldr-localenames-full, cldr-numbers-full and cldr-bcp47. cldr-json's data
+# cldr-localenames-full, cldr-numbers-full, cldr-units-full, cldr-misc-full
+# and cldr-bcp47. cldr-json's data
 # is already resolved (each locale has what it inherits); a section is
 # written as its differences from its parent only to keep the file small.
 #
@@ -27,7 +30,8 @@ use warnings;
 # All integers are little-endian u16, strings are offsets into the pool at
 # its end; a string offset 0xFFFF means "the parent's", 0xFFFE "none":
 #
-#   "TKL2" parent nfixed nskel nzone nmeta nterr nrule first_day min_days hc24 ascii
+#   "TKL3" parent nfixed nskel nzone nmeta nterr nrule first_day min_days hc24 ascii
+#          nwords nival weekend_start weekend_end plural
 #   fixed[nfixed]                      the slots of tk_locale_strings, in order
 #   skel[nskel]   key pattern          sorted by key; no pattern removes the parent's
 #   zone[nzone]   index s[7]           index into tk_cldr_zones; sorted
@@ -35,7 +39,15 @@ use warnings;
 #   terr[nterr]   index name           index into tk_territories; sorted
 #   rule[nrule]   period from before   minutes; from == before is "at"; nrule
 #                                      0xFFFF is the parent's rules
+#   words[nwords]                      the slots of tk_locale_words, in order: the
+#                                      relative-time fields, the duration units, the
+#                                      list patterns, the interval fallback
+#   ival[nival]   key letter pattern   interval formats, sorted by key then letter;
+#                                      no pattern removes the parent's
 #   pool
+#
+# plural is an index into tk_plural_rules in tk_plural.h, the locale's
+# cardinal rules for a whole number (the operands v, w, f, t, e and c are 0).
 
 use Getopt::Long;
 use JSON::PP;
@@ -63,6 +75,7 @@ my $aliases  = jfile("$supp/aliases.json")->{supplemental}{metadata}{alias}{lang
 my $primary  = jfile("$supp/primaryZones.json")->{supplemental}{primaryZones};
 my $bcp47    = jfile("$C/cldr-bcp47/bcp47/timezone.json")->{keyword}{u}{tz};
 my $parents  = jfile("$supp/parentLocales.json")->{supplemental}{parentLocales}{parentLocale};
+my $plurals  = jfile("$supp/plurals.json")->{supplemental}{'plurals-type-cardinal'};
 
 my %full = map { $_ => 1 } @full;
 
@@ -191,6 +204,117 @@ sub rules_for {
 
 sub minutes { my ($s) = @_; my ($h, $m) = split /:/, $s; $h * 60 + $m }
 
+# ---- words: relative time, durations, lists, intervals, plurals -------------
+
+my @rel_fields = qw(year quarter month week day hour minute second);
+my @rel_widths = ('', '-short', '-narrow');
+my @categories = qw(zero one two few many other);
+my @dur_units = qw(year month week day hour minute second millisecond microsecond nanosecond);
+my @list_types = qw(standard unit unit-short unit-narrow);
+my @list_slots = qw(start middle end 2);
+
+# The words of a locale, in the order of tk_locale_words: for each relative
+# field and width the display name, the five relative-type strings (-2 to 2),
+# then the future and the past pattern for each plural category; for each
+# duration unit and width the display name and the six count patterns; the
+# three digital duration patterns; the four list patterns' four slots; the
+# interval fallback. Then the interval formats by skeleton and letter.
+sub words_of {
+    my ($code, $g) = @_;
+    my $df = jfile("$C/cldr-dates-full/main/$code/dateFields.json")->{main}{$code}{dates}{fields};
+    my $un = jfile("$C/cldr-units-full/main/$code/units.json")->{main}{$code}{units};
+    my $lp = jfile("$C/cldr-misc-full/main/$code/listPatterns.json")->{main}{$code}{listPatterns};
+    my @w;
+    for my $f (@rel_fields) {
+        for my $wd (@rel_widths) {
+            my $e = $df->{"$f$wd"} // {};
+            push @w, $e->{displayName};
+            push @w, map { $e->{"relative-type-$_"} } -2 .. 2;
+            push @w, map { $e->{'relativeTime-type-future'}{"relativeTimePattern-count-$_"} } @categories;
+            push @w, map { $e->{'relativeTime-type-past'}{"relativeTimePattern-count-$_"} } @categories;
+        }
+    }
+    for my $u (@dur_units) {
+        for my $wd (qw(long short narrow)) {
+            my $e = $un->{$wd}{"duration-$u"} // {};
+            push @w, $e->{displayName};
+            push @w, map { $e->{"unitPattern-count-$_"} } @categories;
+        }
+    }
+    push @w, map { $un->{"durationUnit-type-$_"}{durationUnitPattern} } qw(hm hms ms);
+    for my $t (@list_types) {
+        my $e = $lp->{"listPattern-type-$t"} // {};
+        push @w, map { $e->{$_} } @list_slots;
+    }
+    my $iv = $g->{dateTimeFormats}{intervalFormats} // {};
+    push @w, $iv->{intervalFormatFallback};
+    my %ival;
+    for my $k (keys %$iv) {
+        next if $k eq 'intervalFormatFallback' || !ref $iv->{$k};
+        for my $letter (keys %{ $iv->{$k} }) {
+            next unless length($letter) == 1 && !ref $iv->{$k}{$letter};
+            $ival{"$k\0$letter"} = $iv->{$k}{$letter};
+        }
+    }
+    return (\@w, \%ival);
+}
+
+# The plural rule set of a locale: its own code, then shorter ones, then root.
+sub plural_key_of {
+    my ($code) = @_;
+    my @t = split /-/, $code;
+    while (@t) {
+        my $k = join '-', @t;
+        return $k if $plurals->{$k};
+        pop @t;
+    }
+    return 'root';
+}
+
+# A rule set as C: the condition of each category in order, zero to many, for
+# a whole number n: i is n, and v, w, f, t, e and c are 0.
+sub plural_c {
+    my ($set) = @_;
+    my @lines;
+    for my $ci (0 .. 4) {
+        my $rule = $set->{"pluralRule-count-$categories[$ci]"} // next;
+        $rule =~ s/\s*\@.*//s;
+        $rule =~ s/^\s+|\s+$//g;
+        next if $rule eq '';
+        my @ors;
+        for my $or (split /\s+or\s+/, $rule) {
+            my @ands;
+            for my $rel (split /\s+and\s+/, $or) {
+                my ($lhs, $op, $rhs) = $rel =~ /^(.+?)\s*(!=|=)\s*(.+)$/ or die "plural relation '$rel'\n";
+                my ($operand, $mod) = $lhs =~ /^([nivwftce])(?:\s*%\s*(\d+))?$/ or die "plural operand '$lhs'\n";
+                my $expr = $operand =~ /^[ni]$/ ? (defined $mod ? "(n % $mod)" : "n") : "0";
+                my @parts;
+                for my $range (split /\s*,\s*/, $rhs) {
+                    if ($range =~ /^(\d+)\.\.(\d+)$/) { push @parts, "($expr >= $1 && $expr <= $2)" }
+                    elsif ($range =~ /^(\d+)$/) { push @parts, "$expr == $1" }
+                    else { die "plural range '$range'\n" }
+                }
+                my $c = @parts > 1 ? '(' . join(' || ', @parts) . ')' : $parts[0];
+                push @ands, $op eq '=' ? $c : "!($c)";
+            }
+            push @ors, @ands > 1 ? '(' . join(' && ', @ands) . ')' : $ands[0];
+        }
+        push @lines, "    if (" . join(' || ', @ors) . ") return $ci;";
+    }
+    return join("\n", @lines);
+}
+
+my (@plural_bodies, %plural_index);
+sub plural_index_of {
+    my ($code) = @_;
+    my $key = plural_key_of($code);
+    return $plural_index{$key} if exists $plural_index{$key};
+    my $body = $key eq 'root' ? '' : plural_c($plurals->{$key});
+    my ($i) = grep { $plural_bodies[$_] eq $body } 0 .. $#plural_bodies;
+    unless (defined $i) { push @plural_bodies, $body; $i = $#plural_bodies }
+    return $plural_index{$key} = $i;
+}
+
 sub record {
     my ($code) = @_;
     state %memo;
@@ -287,13 +411,17 @@ sub record {
     }
     $r{rules} = \@rules;
 
+    ($r{words}, $r{ival}) = words_of($code, $g);
     my $territory = territory_of($code);
     my $first = $week->{firstDay}{$territory} // $week->{firstDay}{'001'};
     my $min = $week->{minDays}{$territory} // $week->{minDays}{'001'};
+    my $wstart = $week->{weekendStart}{$territory} // $week->{weekendStart}{'001'};
+    my $wend = $week->{weekendEnd}{$territory} // $week->{weekendEnd}{'001'};
     my $short_time = $g->{timeFormats}{short};
     $short_time = $short_time->{_value} if ref $short_time;
     (my $letters = $short_time) =~ s/'[^']*'//g;
     $r{head} = [ $dayno{$first}, $min, ($letters =~ /[Hk]/ ? 1 : 0), ($ns eq 'latn' ? 1 : 0) ];
+    $r{tail} = [ $dayno{$wstart}, $dayno{$wend}, plural_index_of($code) ];
     return $memo{$code} = \%r;
 }
 
@@ -351,9 +479,18 @@ sub section {
     }
     my $inherit_rules = $p && join(',', map { @$_ } @{ $r->{rules} }) eq join(',', map { @$_ } @{ $p->{rules} });
     my @rules = $inherit_rules ? () : @{ $r->{rules} };
+    my @words = map { $p && same($r->{words}[$_], $p->{words}[$_]) ? 0xFFFF : $str->($r->{words}[$_]) } 0 .. $#{ $r->{words} };
+    my @ival;
+    for my $k (sort keys %{ { %{ $r->{ival} }, $p ? %{ $p->{ival} } : () } }) {
+        next if $p && same($r->{ival}{$k}, $p->{ival}{$k});
+        my ($skel, $letter) = split /\0/, $k;
+        push @ival, [ $str->($skel), ord($letter), $str->($r->{ival}{$k}) ];
+    }
     my @head = (($pc ? $code_id{$pc} : 0xFFFF), scalar(@fixed), scalar(@skel), scalar(@zones), scalar(@metas),
-                scalar(@terrs), ($inherit_rules ? 0xFFFF : scalar(@rules)), @{ $r->{head} });
-    return 'TKL2' . pack('v*', @head, @fixed, map({ @$_ } @skel, @zones, @metas, @terrs, @rules)) . join('', @pool);
+                scalar(@terrs), ($inherit_rules ? 0xFFFF : scalar(@rules)), @{ $r->{head} },
+                scalar(@words), scalar(@ival), @{ $r->{tail} });
+    return 'TKL3' . pack('v*', @head, @fixed, map({ @$_ } @skel, @zones, @metas, @terrs, @rules), @words, map({ @$_ } @ival)) . join('', @pool);
+
 }
 
 # ---- names ----------------------------------------------------------------
@@ -574,5 +711,41 @@ open $out, '>', "$opt{out}/include/tk/tk_locale_table.h" or die "tk_locale_table
 print $out "$_\n" for @h;
 close $out;
 
-printf "%d codes, %d sections, archive %d bytes, English %d bytes\n",
-    scalar @codes, scalar @blobs, length $archive, length $blobs[0];
+@h = ();
+$p->('/* Generated by tools/cldrcompile from CLDR ', $vers, '. Do not edit: regenerate. */');
+$p->('');
+$p->('#ifndef TK_PLURAL_H');
+$p->('#define TK_PLURAL_H');
+$p->('');
+$p->('/* The cardinal plural category of a whole number n in a rule set: 0 zero,');
+$p->(' * 1 one, 2 two, 3 few, 4 many, 5 other. A locale\'s section names its set. */');
+$p->('');
+for my $i (0 .. $#plural_bodies) {
+    $p->('static int tk_plural_', $i, '(int64_t n)');
+    $p->('{');
+    $p->('    PERL_UNUSED_VAR(n);') if $plural_bodies[$i] eq '';
+    $p->($plural_bodies[$i]) if $plural_bodies[$i] ne '';
+    $p->('    return 5;');
+    $p->('}');
+    $p->('');
+}
+$p->('typedef int (*tk_plural_fn)(int64_t);');
+$p->('static const tk_plural_fn tk_plural_rules[] = {');
+$p->('    ', join(', ', map { "tk_plural_$_" } 0 .. $#plural_bodies));
+$p->('};');
+$p->('#define TK_PLURAL_RULES ', scalar @plural_bodies);
+$p->('');
+$p->('/* the rule set of each plural key CLDR has, sorted, for the tests */');
+$p->('static const tk_locale_alias tk_plural_keys[] = {');
+$p->('    { ', c_str($_), ', ', $plural_index{$_}, ' },') for sort keys %plural_index;
+$p->('};');
+$p->('#define TK_PLURAL_KEYS ', scalar keys %plural_index);
+$p->('');
+$p->('#endif');
+open $out, '>', "$opt{out}/include/tk/tk_plural.h" or die "tk_plural.h: $!\n";
+print $out "$_\n" for @h;
+close $out;
+
+printf "%d codes, %d sections, archive %d bytes, English %d bytes, %d plural rule sets\n",
+    scalar @codes, scalar @blobs, length $archive, length $blobs[0], scalar @plural_bodies;
+

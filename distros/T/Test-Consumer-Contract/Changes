@@ -1,7 +1,42 @@
 Revision history for Test::Consumer::Contract
 
+0.03	Sat Oct 17 08:54:27 PM EDT 2026
+	- Rework the documentation and move the code more to my standards
+
+0.02	Sat Oct 17 08:51:01 AM EDT 2026
+	- Discovery now sees extensionless programs.  A file with no extension and a
+	  shebang is a consumer like any other, whether it lives in bin/ or at the
+	  distribution root: a script can hold the same geocoding loop as the module
+	  beside it, and the reader/producer contract used to walk past both
+	  HTML-Genealogy-Map/ged2map and the root of a distribution entirely.
+	- geocode_many() is a producing method.  A variable bound from a batch is not
+	  a result - its counts are not fields of one - while a value taken out of the
+	  batch is, so the reads off that value are checked.  Database::BI's place
+	  column resolution was invisible until this: it reads the position out of a
+	  batch and nothing else.
+	- A value taken out of a batch is followed wherever it is put, not only into
+	  a variable of its own: into a hash, where a read through an element is a
+	  read of a result, and back out of a sub through a return, whose callers are
+	  sources of results in turn.  A consumer that keeps a batch's values in a
+	  hash of its own, or hands one back out of a helper, was read as a consumer
+	  of nothing at all; Database::BI happens to bind into a variable first, so
+	  this is the shape the fixtures pin rather than one the workspace holds.
+	  reads_of_results() also reports in file order now, so a report reads
+	  top-down rather than in the order the several passes happened to find.
+	- t/contract.t proves each capability by mutation.  With the shebang rule
+	  removed an unregistered program is invisible; with batch support removed
+	  neither geocode_many() failure is found; with the batch treated as a
+	  result its own count is reported as a read ('lookups'); and with the hash
+	  and return following removed the two reads through them are missed.  Each
+	  mutation runs the same fixture in a subprocess with the checker patched, so
+	  the new tests are shown to fail because of the capability and not by
+	  accident.
+	- workspace_present() answers before a check has run.  It read the cache of
+	  missing siblings directly instead of filling it, and died on an undefined
+	  array reference the first time it was asked.
+
 0.01	Fri Oct 16 08:52:09 PM EDT 2026
 	- First version, lifted from the reader/producer contract that lived inside
 	  Geo-Coder-Free/t/consumer-contract.t, so any distribution in the workspace
-	  can declare its producer keys and registered consumers and get the same
+	  can declare its own producer keys and registered consumers and get the same
 	  three checks.

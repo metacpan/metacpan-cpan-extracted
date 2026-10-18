@@ -1,9 +1,30 @@
-
 package Archive::BagIt::Plugin::SHA256;
 
-our $VERSION = '0.005'; # VERSION
-
+our $VERSION = '0.006'; # VERSION
 # ABSTRACT: The main module to handle bags.
+
+use strict;
+use warnings;
+use Carp qw( croak );
+use Moo;
+use namespace::autoclean;
+with 'Archive::BagIt::Role::Algorithm',
+    'Archive::BagIt::Role::Manifest',
+    'Archive::BagIt::Role::OpenSSL';
+
+has '+name' => (
+    is      => 'ro',
+    #isa     => 'Str',
+    default => 'sha256',
+);
+
+sub BUILD {
+    my ($self) = @_;
+    $self->bagit->plugins( { $self->plugin_name => $self });
+    return 1;
+}
+
+__PACKAGE__->meta->make_immutable;
 
 1;
 
@@ -19,7 +40,7 @@ Archive::BagIt::Plugin::SHA256 - The main module to handle bags.
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 AVAILABILITY
 

@@ -1,5 +1,7 @@
 =pod
 
+=encoding utf-8
+
 =head1 NAME
 
 Kelp::Manual - Reference to web development with Kelp
@@ -988,6 +990,8 @@ Benjamin Hengst (notbenh)
 Nikolay Mishin (@mishin)
 
 Bartosz Jarzyna (bbrtj)
+
+Sébastien Mourlhou
 
 =head1 LICENSE
 

@@ -1,4 +1,8 @@
-Revision history for Claude-Code-Review
+Revision history for Claude-Agent-Code-Review
+
+0.03    2026-10-17
+	- Require Claude::Agent 0.14 and close the query when the review ends.
+	- Add the effort option.
 
 0.02    2026-01-11
         - Call Query->cleanup() after iteration to release SDK server sockets

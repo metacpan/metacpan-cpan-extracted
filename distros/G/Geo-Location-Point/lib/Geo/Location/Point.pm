@@ -7,6 +7,7 @@ use warnings;
 use Carp;
 use GIS::Distance;
 use Params::Get 0.13;
+use Readonly;
 use Scalar::Util;
 
 use overload (
@@ -23,11 +24,11 @@ Geo::Location::Point - Location information
 
 =head1 VERSION
 
-Version 0.17
+Version 0.19
 
 =cut
 
-our $VERSION = '0.17';
+our $VERSION = '0.19';
 
 =head1 SYNOPSIS
 
@@ -393,9 +394,60 @@ sub AUTOLOAD {
 # from here instead of keeping a copy of its own, so a level added to one of
 # them cannot go missing from the other.  It is defined here because
 # Geo::Coder::Free depends on this module, and not the other way round.
-use constant ACCURACY_LEVELS => [qw(address street postcode locality city region country)];
+#
+# It is read-only because it is shared.  %IS_ACCURACY_LEVEL below is taken from
+# this list when the module loads, so a caller that pushed a level into the list
+# would publish a vocabulary that accuracy() still refuses: the module would
+# describe one set of levels and accept another, and every module that reads the
+# list - Provenance's name for it included - would be speaking the same language
+# as the list and not as the points.  A level that belongs in the vocabulary is
+# added here, beside the validator it is checked against.
+Readonly::Array my @ACCURACY_LEVELS => qw(address street postcode locality city region country);
 
-my %IS_ACCURACY_LEVEL = map { $_ => 1 } @{ACCURACY_LEVELS()};
+# The list itself, rather than a copy of it: every module that speaks this
+# vocabulary shares this one list, so the levels it reports are the levels a point
+# accepts.
+sub ACCURACY_LEVELS {
+	return \@ACCURACY_LEVELS;
+}
+
+my %IS_ACCURACY_LEVEL = map { $_ => 1 } @ACCURACY_LEVELS;
+
+# The fields a backend can match on, and the level each one justifies.  Keyed by
+# level, because accuracy_for() walks ACCURACY_LEVELS in order: the most precise
+# level with a matched field wins, and a level that is not in the vocabulary
+# cannot come out of here.  'city' has no entry of its own - a city match is a
+# locality, the most precise claim the centre of a city supports.
+#
+# This is the other half of the vocabulary, in the same place: the levels a
+# point accepts and the rule that turns a backend's matched fields into one of
+# them are defined together, so a rule cannot name a level accuracy() refuses,
+# and a backend does not have to keep two modules in step to describe a match.
+Readonly::Hash my %FIELDS_FOR_ACCURACY => (
+	address  => [qw(house_number number)],
+	street   => [qw(road street)],
+	postcode => [qw(postcode post_code zip)],
+	locality => [qw(city town name)],
+	region   => [qw(state state_district county region)],
+	country  => [qw(country)],
+);
+
+sub accuracy_for {
+	my %field = map { lc($_) => 1 } @_;
+
+	for my $level (@ACCURACY_LEVELS) {
+		next unless(my $fields = $FIELDS_FOR_ACCURACY{$level});
+
+		for my $field (@{$fields}) {
+			return $level if($field{$field});
+		}
+	}
+
+	# A match on a row with none of these fields is still a named place, and
+	# every result promises an accuracy, so it is reported as a locality rather
+	# than left unsaid.
+	return 'locality';
+}
 
 # Read a slot the way AUTOLOAD reads it: a lower case key that was never set
 # falls back to its upper case spelling, so a field the caller stored under the
@@ -515,7 +567,36 @@ L<Geo::Coder::Free::Provenance> rather than copied, so the levels a point
 accepts and the levels a backend reports cannot drift apart.  C<accuracy()>
 accepts these and refuses anything else.
 
+The rule that turns the fields a backend matched into one of these levels is
+L</accuracy_for>, beside the list it returns a level from.
+
+The list is read-only, and a caller that tries to add to it is refused, because
+it is the list C<accuracy()> checks against: were it writable, a level pushed
+into it would be published to every reader of this list while the module went on
+refusing it.
+
     my $levels = Geo::Location::Point::ACCURACY_LEVELS();
+
+=cut
+
+=head2	accuracy_for
+
+The accuracy a match can claim, from the fields that made it.  The most precise
+field present decides: a house number makes it an C<address>, a road a
+C<street>, a postcode a C<postcode>, a name or a city a C<locality>, a state or
+region a C<region>, and a country a C<country>.  So a dataset row carrying only
+a city, state and country is a C<locality>: a named place, not an address.
+
+    my $level = Geo::Location::Point::accuracy_for(qw(house_number road city));
+
+Always returns one of the L</ACCURACY_LEVELS>: a match on a row with none of the
+fields above is still a named place, so it is reported as a C<locality> rather
+than left unsaid, because every result promises an accuracy.
+
+It is a function, not a method - the fields are what a backend matched, not
+something a point carries - and it lives beside the vocabulary it returns a
+level from, so the levels a point accepts and the rules that choose one of them
+have a single home.
 
 =cut
 

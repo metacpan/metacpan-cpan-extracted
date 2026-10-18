@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.60';
+our $VERSION = '0.61';
 
 # Every worker sees the same files, which is the whole point of this store
 # being the default - so it needs no cross-worker invalidation.

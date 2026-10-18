@@ -82,7 +82,7 @@ my $rw_obj = Config::Model::Itself -> new(
 
 my $map = $rw_obj->read_all(
     root_model => 'MasterModel',
-    legacy     => 'ignore',
+    legacy     => 'warn',
 );
 $meta_inst->initial_load_stop ;
 
@@ -157,5 +157,3 @@ unless ($args->{show} || $args->{interactive}) {
 }
 
 done_testing;
-
-

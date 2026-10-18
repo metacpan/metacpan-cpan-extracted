@@ -145,6 +145,11 @@ package("libsdl3")
     if not is_plat("windows", "bsd", "solaris") then
         add_deps("cmake")
     end
+    if is_plat("solaris") then
+        add_cxxflags("-m64")
+        add_cflags("-m64")
+        add_ldflags("-m64")
+    end
 
     if is_plat("linux", "bsd", "cross") then
         add_configs("x11", {description = "Enables X11 support", default = true, type = "boolean"})
@@ -372,6 +377,24 @@ package("libsdl3")
             table.insert(configs, "-DSDL_WAYLAND=" .. (package:config("wayland") and "ON" or "OFF"))
             table.insert(configs, "-DSDL_WAYLAND_SHARED=" .. (package:config("wayland_shared") and "ON" or "OFF"))
         end
+        if package:is_plat("solaris") then
+            -- xmake reads a 64-bit Solaris host's arch as i386 (uname -m is the
+            -- unhelpful "i86pc"), so the `-a x86_64` this Alien passes looks like
+            -- a cross-compile: cmake.lua takes its cross branch, where
+            -- CMAKE_SYSTEM_NAME becomes package:targetos() -- literally
+            -- "solaris" -- and cmake dies with
+            --   System is unknown to cmake, create: Platform/solaris
+            -- That branch exists to keep cmake from searching the host's
+            -- include/library paths, which is exactly wrong for what is really
+            -- a native build. Pin the platform to the name cmake knows, and undo
+            -- the system/prefix search suppression. cmake.lua only inserts its
+            -- own value for a key the recipe has not already set as -D<key>=,
+            -- so these win.
+            table.insert(configs, "-DCMAKE_SYSTEM_NAME=SunOS")
+            table.insert(configs, "-DCMAKE_FIND_USE_CMAKE_SYSTEM_PATH=ON")
+            table.insert(configs, "-DCMAKE_FIND_USE_INSTALL_PREFIX=ON")
+        end
+
         if package:is_plat("wasm") and package:config("threads") then
             table.insert(configs, "-DSDL_PTHREADS=ON")
         end

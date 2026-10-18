@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Itself 2.031;
+package Config::Model::Itself 2.032;
 
 use Mouse ;
 use Mouse::Util::TypeConstraints;
@@ -904,7 +904,7 @@ Config::Model::Itself - Model (or schema) editor for Config::Model
 
 =head1 VERSION
 
-version 2.031
+version 2.032
 
 =head1 SYNOPSIS
 

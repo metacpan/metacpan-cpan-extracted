@@ -4,18 +4,10 @@ use 5.020;
 use strict;
 use warnings;
 
-use Types::Standard qw(InstanceOf Str);
-use Marlin
-    'loop!'        => InstanceOf['IO::Async::Loop'],
-    'dry_run?'     => sub { 0 },
-    'safe_mode?'   => sub { 1 },
-    'working_dir?' => sub { '.' },
-    'colorful?'    => sub { 1 },
-    'model?'       => Str,
-    '_spinner==.';
-
+use Object::Proto ();
 use Claude::Agent qw(query create_sdk_mcp_server);
 use Claude::Agent::Options;
+use Claude::Agent::Content;
 use Claude::Agent::CLI qw(
     start_spinner stop_spinner
     header divider status
@@ -24,7 +16,26 @@ use Acme::Claude::Shell::Tools qw(shell_tools);
 use Acme::Claude::Shell::Hooks qw(safety_hooks);
 use Future::AsyncAwait;
 
-# Fun spinner styles with matching colors
+BEGIN {
+    Object::Proto::define('Acme::Claude::Shell::Query',
+        'loop:Object:required',
+        'dry_run:Bool:default(0):predicate',
+        'safe_mode:Bool:default(1):predicate',
+        'working_dir:Str:default(.):predicate',
+        'colorful:Bool:default(1):predicate',
+        'verbose:Bool:default(0):predicate',
+        'audit_log:Bool:default(0):predicate',
+        'model:Str:predicate',
+        'effort:Str:predicate',
+        '_history:ArrayRef:default([])',
+        '_spinner',
+        '_session_start',
+        '_tool_count:Int:default(0)',
+        '_tool_errors:Int:default(0)',
+        '_audit_log:ArrayRef:default([])',
+    );
+}
+
 my @SPINNERS = (
     { spinner => 'moon',          spinner_color => 'yellow' },
     { spinner => 'earth',         spinner_color => 'cyan' },
@@ -39,137 +50,52 @@ sub _random_spinner {
     return %{ $SPINNERS[rand @SPINNERS] };
 }
 
-=head1 NAME
+sub options {
+    my ($self) = @_;
 
-Acme::Claude::Shell::Query - Single-shot query mode for Acme::Claude::Shell
-
-=head1 SYNOPSIS
-
-    use Acme::Claude::Shell::Query;
-    use IO::Async::Loop;
-
-    my $loop = IO::Async::Loop->new;
-
-    my $query = Acme::Claude::Shell::Query->new(
-        loop      => $loop,
-        dry_run   => 0,
-        safe_mode => 1,
-    );
-
-    my $result = $query->run("find all large log files")->get;
-
-=head1 DESCRIPTION
-
-Executes a single natural language command using Claude's query() function.
-Does not maintain session context between calls - each run() is independent.
-
-This is useful for scripting or when you want a one-shot command without
-starting an interactive session.
-
-Uses Claude::Agent SDK features:
-
-=over 4
-
-=item * C<query()> - Single-shot prompt execution
-
-=item * SDK MCP tools - execute_command, read_file, list_directory, search_files, get_system_info, get_working_directory
-
-=item * Hooks - PreToolUse (audit), PostToolUse (stats), PostToolUseFailure (errors), Stop (statistics), Notification (logging)
-
-=item * CLI utilities - Spinners and colored output
-
-=back
-
-=head2 Attributes
-
-=over 4
-
-=item * C<loop> (required) - IO::Async::Loop instance
-
-=item * C<dry_run> - Preview mode, don't execute commands (default: 0)
-
-=item * C<safe_mode> - Confirm dangerous commands (default: 1)
-
-=item * C<working_dir> - Starting directory (default: '.')
-
-=item * C<colorful> - Use colored output (default: 1)
-
-=item * C<model> - Claude model to use (optional)
-
-=back
-
-=head2 Methods
-
-=over 4
-
-=item * C<run($prompt)> - Execute a single prompt and return a Future
-
-=back
-
-=cut
-
-async sub run {
-    my ($self, $prompt) = @_;
-
-    # Show header
-    if ($self->colorful) {
-        header("Acme::Claude::Shell - Query Mode");
-    }
-
-    # Create SDK MCP server with shell tools
     my $mcp = create_sdk_mcp_server(
         name  => 'shell-tools',
         tools => shell_tools($self),
     );
 
-    # Create options with hooks
-    my $options = Claude::Agent::Options->new(
+    return Claude::Agent::Options->new(
         permission_mode => 'bypassPermissions',
+        tools           => [],
         mcp_servers     => { 'shell-tools' => $mcp },
         hooks           => safety_hooks($self),
         dry_run         => $self->dry_run,
         system_prompt   => $self->_system_prompt,
-        ($self->has_model ? (model => $self->model) : ()),
+        ($self->has_model  ? (model  => $self->model)  : ()),
+        ($self->has_effort ? (effort => $self->effort) : ()),
     );
+}
 
-    # Store spinner in self so hooks can stop it before reading STDIN
-    # Pick a random fun spinner each time
-    $self->_spinner(start_spinner("Thinking...", $self->loop,
-        _random_spinner(),
-    ));
+async sub run {
+    my ($self, $prompt) = @_;
 
-    # Execute query
+    if ($self->colorful) {
+        header("Acme::Claude::Shell - Query Mode");
+    }
+
+    $self->_spinner(start_spinner("Thinking...", $self->loop, _random_spinner())) if $self->colorful;
+
     my $iter = query(
         prompt  => $prompt,
-        options => $options,
+        options => $self->options,
         loop    => $self->loop,
     );
 
     my $response_text = '';
     my $result;
+    my %tool_names;
 
     while (my $msg = await $iter->next_async) {
         if ($msg->isa('Claude::Agent::Message::Assistant')) {
             $response_text .= $msg->text // '';
+            $tool_names{ $_->id } = $_->name for @{ $msg->tool_uses };
         }
-        elsif ($msg->isa('Claude::Agent::Message::ToolUse')) {
-            # Spinner already stopped by hook before STDIN read
-        }
-        elsif ($msg->isa('Claude::Agent::Message::ToolResult')) {
-            # Show result
-            my $content = $msg->content // '';
-            if ($msg->is_error) {
-                # Check if this was a user denial (dry-run, cancel, etc.)
-                # In that case, don't show error and stop processing
-                if ($content =~ /^(Dry-run:|User cancelled)/) {
-                    last;  # Stop the conversation here
-                }
-                status('error', $content) if $self->colorful;
-            } else {
-                print $content, "\n" if $content;
-            }
-            # Don't restart spinner - avoids conflicts with Term::ProgressSpinner
-            # when STDIN was used for hook confirmation
+        elsif ($msg->isa('Claude::Agent::Message::User')) {
+            $self->_show_tool_results($msg, \%tool_names);
         }
         elsif ($msg->isa('Claude::Agent::Message::Result')) {
             $result = $msg;
@@ -177,19 +103,41 @@ async sub run {
         }
     }
 
-    # Stop spinner
     stop_spinner($self->_spinner, "Done") if $self->_spinner;
     $self->_spinner(undef);
 
-    # Show response
-    if ($response_text) {
+    if (length $response_text) {
         print "\n", $response_text, "\n";
     }
 
-    # Cleanup
-    $iter->cleanup if $iter->can('cleanup');
+    $iter->close;
 
     return $result;
+}
+
+sub _show_tool_results {
+    my ($self, $msg, $tool_names) = @_;
+
+    my $content = $msg->message->{content};
+    return unless ref $content eq 'ARRAY';
+
+    for my $block (@$content) {
+        next unless ref $block eq 'HASH' && ($block->{type} // '') eq 'tool_result';
+        my $result = Claude::Agent::Content->from_json($block);
+        next unless ref $result && $result->can('text');
+        my $name = $tool_names->{ $result->tool_use_id } // '';
+        next unless $name =~ /execute_command$/;
+        my $text = $result->text // '';
+        if ($result->is_error) {
+            next if $text =~ /^(Dry-run:|User cancelled)/;
+            status('error', $text) if $self->colorful;
+        }
+        elsif (length $text) {
+            print $text;
+            print "\n" unless $text =~ /\n\z/;
+        }
+    }
+    return;
 }
 
 sub _system_prompt {
@@ -218,6 +166,97 @@ Always explain what you're about to do before using tools.
 PROMPT
 }
 
+1;
+
+__END__
+
+=head1 NAME
+
+Acme::Claude::Shell::Query - Single-shot query mode for Acme::Claude::Shell
+
+=head1 SYNOPSIS
+
+    use Acme::Claude::Shell::Query;
+    use IO::Async::Loop;
+
+    my $loop = IO::Async::Loop->new;
+
+    my $query = Acme::Claude::Shell::Query->new(
+        loop      => $loop,
+        dry_run   => 0,
+        safe_mode => 1,
+    );
+
+    my $result = $query->run("find all large log files")->get;
+
+=head1 DESCRIPTION
+
+Executes a single natural language command through Claude::Agent's
+C<query()>. Each C<run> is independent: no context is kept between calls.
+This suits scripting, or a one-shot command without starting an
+interactive session.
+
+=head1 ATTRIBUTES
+
+=head2 loop
+
+The L<IO::Async::Loop> to run on. Required.
+
+=head2 dry_run
+
+Preview mode. Default 0.
+
+=head2 safe_mode
+
+Ask for extra confirmation before dangerous commands. Default 1.
+
+=head2 working_dir
+
+Starting directory for commands. Default C<.>.
+
+=head2 colorful
+
+Use colored output and spinners. Default 1.
+
+=head2 verbose
+
+Log every tool call and notification through the hooks. Default 0.
+
+=head2 audit_log
+
+Record every tool call in C<_audit_log>. Default 0.
+
+=head2 model
+
+Claude model to use. Optional.
+
+=head2 effort
+
+Effort level: C<low>, C<medium>, C<high>, C<xhigh> or C<max>. Optional.
+
+=head2 _history, _spinner, _session_start, _tool_count, _tool_errors, _audit_log
+
+State the tools and hooks read and write.
+
+=head1 METHODS
+
+=head2 new
+
+Takes a flat list of name/value pairs. Unknown names are ignored.
+
+=head2 options
+
+The L<Claude::Agent::Options> for the query. The CLI's built-in tools are
+turned off, so every command goes through C<execute_command> and its
+approval menu.
+
+=head2 run
+
+    my $result = $query->run($prompt)->get;
+
+Execute one prompt. Returns a L<Future> of the
+L<Claude::Agent::Message::Result>.
+
 =head1 AUTHOR
 
 LNATION, C<< <email at lnation.org> >>
@@ -231,5 +270,3 @@ This is free software, licensed under:
   The Artistic License 2.0 (GPL Compatible)
 
 =cut
-
-1;

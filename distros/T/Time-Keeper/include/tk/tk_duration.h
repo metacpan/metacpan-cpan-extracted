@@ -67,6 +67,26 @@ tk_dur_normalize(tk_duration *d, int64_t nsec)
         && tk_dur_in_range(d->minutes) && tk_dur_in_range(d->seconds);
 }
 
+/* d times f, eom kept; 0 when a part leaves the range. */
+static int
+tk_dur_multiply(const tk_duration *d, int64_t f, tk_duration *out)
+{
+    int64_t a = f < 0 ? -f : f;
+    if (f > TK_DUR_LIMIT || f < -TK_DUR_LIMIT)
+        return 0;
+    if (a && (d->months > TK_DUR_LIMIT / a || d->months < -TK_DUR_LIMIT / a
+              || d->days > TK_DUR_LIMIT / a || d->days < -TK_DUR_LIMIT / a
+              || d->minutes > TK_DUR_LIMIT / a || d->minutes < -TK_DUR_LIMIT / a
+              || d->seconds > TK_DUR_LIMIT / a || d->seconds < -TK_DUR_LIMIT / a))
+        return 0;
+    *out = *d;
+    out->months *= f;
+    out->days *= f;
+    out->minutes *= f;
+    out->seconds *= f;
+    return tk_dur_normalize(out, (int64_t)d->nsec * f);
+}
+
 static int
 tk_dur_is_zero(const tk_duration *d)
 {

@@ -1,5 +1,16 @@
 Revision history for HTML-Genealogy-Map
 
+0.06	Sat Oct 17 04:52:44 PM EDT 2026
+	ged2map read a geocoder result the way the pre-0.05 Map.pm did.  {lat} and
+	{lon} decided whether a lookup had succeeded, so an OpenAddresses or Local
+	result - which has no {lon} - was treated as a miss, and {geocoder} picked
+	the courtesy second.  Both are now read the way the module reads them, and
+	through the same adapter: a Geo::Location::Point by its accessors, a plain
+	hash by {lat}/{long}/{lng} with {lon} as the last fallback, and a position of
+	zero is a position.  The program is at the distribution root and has no
+	extension, so the reader/producer contract did not see it at all; it is
+	registered now that the contract's scanner knows what a program looks like.
+
 0.05	Thu Oct 15 11:43:35 AM EDT 2026
 	Allow to online_render to be called by -> or ::
 	Read a geocoder result through the coordinates it actually has

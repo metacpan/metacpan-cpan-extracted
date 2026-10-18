@@ -168,16 +168,28 @@ iso8601(self, ...)
     PREINIT:
         tk_value *v;
         tk_out o;
-        int digits = -1;
+        int digits = -1, form = 0;
+        I32 i;
         const tk_civil *c;
         static const char *const whats[] = { "Time::Keeper->iso8601", "Time::Keeper->rfc3339", "Time::Keeper->rfc9557" };
         const char *what = whats[ix];
     CODE:
         v = tk_value_rw(self, what);
-        if (items > 1) {
-            if (items != 3 || strNE(SvPV_nolen(ST(1)), "precision"))
-                croak("%s: the only option is precision => 0 to 9", what);
-            digits = (int)tk_opt_int(aTHX_ ST(2), what, "precision", 0, 9);
+        if ((items - 1) % 2)
+            croak("%s: the options are precision => 0 to 9%s", what, ix ? "" : " and form => extended, basic, week or ordinal");
+        for (i = 1; i + 1 < items; i += 2) {
+            const char *k = SvPV_nolen(ST(i));
+            if (strEQ(k, "precision"))
+                digits = (int)tk_opt_int(aTHX_ ST(i + 1), what, "precision", 0, 9);
+            else if (strEQ(k, "form") && !ix) {
+                const char *fm = SvPV_nolen(ST(i + 1));
+                form = strEQ(fm, "extended") ? 0 : strEQ(fm, "basic") ? 1 : strEQ(fm, "week") ? 2 : strEQ(fm, "ordinal") ? 3 : -1;
+                if (form < 0)
+                    croak("%s: form is extended, basic, week or ordinal, not '%s'", what, fm);
+            }
+            else
+                croak("%s: the options are precision => 0 to 9%s, not '%s'", what,
+                      ix ? "" : " and form => extended, basic, week or ordinal", k);
         }
         c = tk_value_civil(v);
         if (ix == 1 && (v->zone == TK_ZONE_FLOATING))
@@ -187,7 +199,7 @@ iso8601(self, ...)
         o.sv = newSVpvs("");
         o.utf8 = 0;
         o.digits = NULL;
-        tk_out_datetime(aTHX_ &o, v, digits);
+        tk_out_datetime_form(aTHX_ &o, v, digits, form);
         if (ix == 2 && v->zone != TK_ZONE_FLOATING) {
             SV *name = sv_2mortal(tk_zone_name_sv(aTHX_ v));
             tk_out_offset(aTHX_ &o, v->utoff, 1, 1);
@@ -198,7 +210,7 @@ iso8601(self, ...)
         else if (v->zone == TK_ZONE_UTC)
             tk_out_cat(aTHX_ &o, "Z", 1);
         else if (v->zone != TK_ZONE_FLOATING)
-            tk_out_offset(aTHX_ &o, v->utoff, 1, 1);
+            tk_out_offset(aTHX_ &o, v->utoff, form != 1, 1);
         RETVAL = o.sv;
     OUTPUT:
         RETVAL
@@ -273,5 +285,99 @@ ymd(self, ...)
         if (items > 1 && SvUTF8(ST(1)))
             SvUTF8_on(out);
         RETVAL = out;
+    OUTPUT:
+        RETVAL
+
+SV *
+format_relative(self, ...)
+        SV *self
+    PREINIT:
+        static const char *const fields[TK_RF_COUNT] = { "year", "quarter", "month", "week", "day", "hour", "minute", "second" };
+        static const char *const widths[TK_RW_COUNT] = { "long", "short", "narrow" };
+        const char *what = "Time::Keeper->format_relative";
+        tk_args a;
+        tk_value *v, *to, now;
+        const tk_locale_data *loc;
+        tk_out o;
+        int field = -1, width = TK_RW_LONG, numeric_auto = 1;
+        int64_t count = 0;
+    CODE:
+        v = tk_value_rw(self, what);
+        tk_args_parse(aTHX_ &ST(1), items - 1, TK_A(TK_A_TO) | TK_A(TK_A_UNIT) | TK_A(TK_A_STYLE) | TK_A(TK_A_NUMERIC), &a, what);
+        if (a.v[TK_A_TO])
+            to = tk_value_rw(a.v[TK_A_TO], what);
+        else {
+            tk_zone_spec z;
+            tk_instant t;
+            tk_now_sv(aTHX_ &t);
+            tk_value_zone(v, &z);
+            if (z.zone == TK_ZONE_FLOATING) { z.zone = TK_ZONE_UTC; z.fixed = 0; }
+            tk_value_init(aTHX_ &now, &t, &z);
+            to = &now;
+        }
+        if (a.v[TK_A_UNIT]) {
+            const char *u = SvPV_nolen(a.v[TK_A_UNIT]);
+            if (strNE(u, "auto")) {
+                for (field = 0; field < TK_RF_COUNT && strNE(u, fields[field]); field++) ;
+                if (field == TK_RF_COUNT)
+                    croak("%s: unit is auto, year, quarter, month, week, day, hour, minute or second, not '%s'", what, u);
+            }
+        }
+        if (a.v[TK_A_STYLE]) {
+            const char *s = SvPV_nolen(a.v[TK_A_STYLE]);
+            for (width = 0; width < TK_RW_COUNT && strNE(s, widths[width]); width++) ;
+            if (width == TK_RW_COUNT)
+                croak("%s: style is 'long', 'short' or 'narrow', not '%s'", what, s);
+        }
+        if (a.v[TK_A_NUMERIC]) {
+            const char *s = SvPV_nolen(a.v[TK_A_NUMERIC]);
+            if (strEQ(s, "always")) numeric_auto = 0;
+            else if (strNE(s, "auto")) croak("%s: numeric is 'auto' or 'always', not '%s'", what, s);
+        }
+        if (field < 0)
+            field = tk_relative_auto(aTHX_ to, v, &count, what);
+        else
+            count = tk_relative_count(aTHX_ to, v, field, what);
+        loc = tk_locale_of(v);
+        o.sv = newSVpvs("");
+        o.utf8 = 0;
+        o.digits = loc->ascii_digits ? NULL : loc->s.digits;
+        tk_out_relative(aTHX_ &o, loc, field, width, count, numeric_auto);
+        if (o.utf8)
+            SvUTF8_on(o.sv);
+        RETVAL = o.sv;
+    OUTPUT:
+        RETVAL
+
+SV *
+format_interval(self, end, ...)
+        SV *self
+        SV *end
+    PREINIT:
+        const char *what = "Time::Keeper->format_interval";
+        tk_args a;
+        tk_value *v, *e, b;
+        SV *bsv;
+        const tk_locale_data *loc;
+        tk_out o;
+    CODE:
+        v = tk_value_rw(self, what);
+        e = tk_value_rw(end, what);
+        tk_args_parse(aTHX_ &ST(2), items - 2, TK_A(TK_A_SKELETON), &a, what);
+        if (!a.v[TK_A_SKELETON])
+            croak("%s: say skeleton => the fields wanted, such as 'yMMMd'", what);
+        if ((v->zone == TK_ZONE_FLOATING) != (e->zone == TK_ZONE_FLOATING))
+            croak("%s: one value is in floating time and the other is not", what);
+        tk_value_in_zone_of(aTHX_ &b, e, v);
+        b.locale = v->locale;
+        bsv = sv_2mortal(tk_value_new_sv(aTHX_ SvSTASH(SvRV(self)), &b));
+        loc = tk_locale_of(v);
+        o.sv = newSVpvs("");
+        o.utf8 = 0;
+        o.digits = NULL;
+        tk_format_interval(aTHX_ &o, self, v, bsv, &b, loc, SvPV_nolen(a.v[TK_A_SKELETON]), what);
+        if (o.utf8)
+            SvUTF8_on(o.sv);
+        RETVAL = o.sv;
     OUTPUT:
         RETVAL

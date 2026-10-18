@@ -700,8 +700,8 @@ subtest 'no raw </b> tag appears in any render output' => sub {
 # ─────────────────────────────────────────────────────────────────────────────
 # 16. Pie chart method consistency
 #
-# All three pie methods share the same d3.pie() / d3.arc() / schemeCategory10
-# structure; the animated variant adds attrTween / d3.interpolate; the snippet
+# All three pie methods share the same d3.pie() / d3.arc() / inlined category10
+# palette structure; the animated variant adds attrTween / d3.interpolate; the snippet
 # omits the page shell.  Verified cross-method so a shared-helper refactor
 # cannot silently break one variant.
 # ─────────────────────────────────────────────────────────────────────────────
@@ -721,7 +721,7 @@ subtest 'pie chart methods share consistent D3 structure' => sub {
 		my ($name, $html) = @$pair;
 		like($html, qr/d3\.pie\(\)/,          "$name: d3.pie() present");
 		like($html, qr/d3\.arc\(\)/,           "$name: d3.arc() present");
-		like($html, qr/d3\.schemeCategory10/, "$name: schemeCategory10 colour scheme present");
+		like($html, qr/\['#1f77b4', '#ff7f0e'/, "$name: category10 colours inlined as hex values");
 		like($html, qr/d3\.scaleOrdinal/,     "$name: d3.scaleOrdinal maps colours");
 		like($html, qr/d3\.sum/,               "$name: d3.sum computes total for percentages");
 	}
@@ -730,7 +730,7 @@ subtest 'pie chart methods share consistent D3 structure' => sub {
 	# (opts: animated, donut, sort_slices, max_slices, legend, color_scheme).
 	like($snip_html, qr/d3\.pie\(\)/,         'render_pie_chart_snippet: d3.pie() present');
 	like($snip_html, qr/d3\.arc\(\)/,          'render_pie_chart_snippet: d3.arc() present');
-	like($snip_html, qr/d3\.schemeTableau10/, 'render_pie_chart_snippet: default scheme is tableau10');
+	like($snip_html, qr/SCHEMES\['tableau10'\]/, 'render_pie_chart_snippet: default scheme is tableau10');
 	like($snip_html, qr/d3\.scaleOrdinal/,    'render_pie_chart_snippet: d3.scaleOrdinal present');
 	like($snip_html, qr/d3\.sum/,              'render_pie_chart_snippet: d3.sum present');
 
@@ -841,7 +841,7 @@ subtest 'separator option propagates consistently across all three pie methods' 
 	# must still be present regardless of which separator is chosen.
 	like($pie_bar, qr/d3\.pie\(\)/,          'custom-sep pie: d3.pie() unaffected');
 	like($anim_bar, qr/attrTween/,           'custom-sep animated pie: attrTween unaffected');
-	like($snip_bar, qr/d3\.schemeTableau10/, 'custom-sep snippet: scheme unaffected');
+	like($snip_bar, qr/SCHEMES\['tableau10'\]/, 'custom-sep snippet: scheme unaffected');
 
 	diag("pie_bar length: " . length($pie_bar)) if $ENV{TEST_VERBOSE};
 };
@@ -1048,7 +1048,7 @@ subtest 'render_bar_chart_snippet: structure, options, and error handling' => su
 
 	# color => 'categorical'
 	my $cat = $chart->render_bar_chart_snippet(\@data, { color => 'categorical' })->{html};
-	like($cat, qr/schemeTableau10/, 'categorical: Tableau-10 palette used');
+	like($cat, qr/\['#4e79a7', '#f28e2c'/, 'categorical: tableau10 colours inlined');
 
 	# show_values
 	my $vals = $chart->render_bar_chart_snippet(\@data, { show_values => 1 })->{html};

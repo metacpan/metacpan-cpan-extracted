@@ -86,7 +86,7 @@ tk_u32(const unsigned char *p)
     return (uint32_t)p[0] | ((uint32_t)p[1] << 8) | ((uint32_t)p[2] << 16) | ((uint32_t)p[3] << 24);
 }
 
-#define TK_SECTION_HEAD 26
+#define TK_SECTION_HEAD 36
 
 /* A pool string, or NULL; 0 when the offset is past the pool. */
 static int
@@ -100,6 +100,14 @@ tk_section_str(const char *pool, size_t pool_len, unsigned off, const char **out
         return 0;
     *out = pool + off;
     return 1;
+}
+
+/* Interval formats sort by skeleton, then letter. */
+static int
+tk_interval_cmp(const tk_interval *x, const tk_interval *y)
+{
+    int c = strcmp(x->skeleton, y->skeleton);
+    return c ? c : (int)x->letter - (int)y->letter;
 }
 
 /* Merge a parent's sorted records with a section's: a section's record
@@ -135,7 +143,7 @@ static tk_locale_data *
 tk_section_decode(const unsigned char *b, size_t len, const tk_locale_data *parent, int want_parent,
                   const char *id, const char **err)
 {
-    unsigned nfixed, nskel, nzone, nmeta, nterr, nrule, i, k;
+    unsigned nfixed, nskel, nzone, nmeta, nterr, nrule, nwords, nival, plural, i, k;
     size_t idx, pool_at, pool_len;
     const char *pool;
     const unsigned char *p;
@@ -145,8 +153,9 @@ tk_section_decode(const unsigned char *b, size_t len, const tk_locale_data *pare
     tk_pair *sk;
     tk_zone_names *zn, *mn;
     tk_terr_name *tn;
+    tk_interval *iv;
 
-    if (len < TK_SECTION_HEAD || memNE(b, "TKL2", 4)) {
+    if (len < TK_SECTION_HEAD || memNE(b, "TKL3", 4)) {
         *err = "the section is not one this Time::Keeper reads";
         return NULL;
     }
@@ -160,13 +169,20 @@ tk_section_decode(const unsigned char *b, size_t len, const tk_locale_data *pare
     nmeta  = tk_u16(b + 12);
     nterr  = tk_u16(b + 14);
     nrule  = tk_u16(b + 16);
-    if (nfixed != TK_LOCALE_SLOTS) {
+    nwords = tk_u16(b + 26);
+    nival  = tk_u16(b + 28);
+    plural = tk_u16(b + 34);
+    if (nfixed != TK_LOCALE_SLOTS || nwords != TK_WORD_SLOTS) {
         *err = "the section has a different number of names";
+        return NULL;
+    }
+    if (plural >= TK_PLURAL_RULES) {
+        *err = "the section names a plural rule this Time::Keeper lacks";
         return NULL;
     }
     idx = TK_SECTION_HEAD;
     pool_at = idx + 2 * ((size_t)nfixed + 2 * nskel + 8 * nzone + 7 * nmeta + 2 * nterr
-                         + (nrule == TK_LOCALE_INHERIT ? 0 : 3 * (size_t)nrule));
+                         + (nrule == TK_LOCALE_INHERIT ? 0 : 3 * (size_t)nrule) + nwords + 3 * (size_t)nival);
     if (pool_at > len || (len > pool_at && b[len - 1] != '\0')) {
         *err = "the section is cut short";
         return NULL;
@@ -180,6 +196,11 @@ tk_section_decode(const unsigned char *b, size_t len, const tk_locale_data *pare
     d->min_days = (uint8_t)tk_u16(b + 20);
     d->hour_cycle_24 = (uint8_t)tk_u16(b + 22);
     d->ascii_digits = (uint8_t)tk_u16(b + 24);
+    d->weekend_start = (uint8_t)tk_u16(b + 30);
+    d->weekend_end = (uint8_t)tk_u16(b + 32);
+    d->plural = (uint16_t)plural;
+    if (d->weekend_start < 1 || d->weekend_start > 7 || d->weekend_end < 1 || d->weekend_end > 7)
+        goto bad;
 
     p = b + idx;
     slot = (const char **)&d->s;
@@ -288,6 +309,45 @@ tk_section_decode(const unsigned char *b, size_t len, const tk_locale_data *pare
         d->rules = r;
         d->n_rules = (uint16_t)nrule;
     }
+    slot = (const char **)&d->w;
+    pslot = parent ? (const char *const *)&parent->w : NULL;
+    for (i = 0; i < nwords; i++, p += 2) {
+        unsigned off = tk_u16(p);
+        if (off == TK_LOCALE_INHERIT) {
+            if (!pslot) goto bad;
+            slot[i] = pslot[i];
+        }
+        else if (!tk_section_str(pool, pool_len, off, &slot[i]))
+            goto bad;
+    }
+
+    Newxz(iv, (parent ? parent->n_intervals : 0) + nival + 1, tk_interval);
+    {
+        const tk_interval *pa = parent ? parent->intervals : NULL;
+        unsigned np = parent ? parent->n_intervals : 0, a = 0, n = 0;
+        for (k = 0; k <= nival; k++) {
+            tk_interval c;
+            if (k < nival) {
+                unsigned letter = tk_u16(p + 2);
+                if (!tk_section_str(pool, pool_len, tk_u16(p), &c.skeleton) || !c.skeleton || letter > 0x7f
+                    || !tk_section_str(pool, pool_len, tk_u16(p + 4), &c.pattern))
+                    goto bad;
+                c.letter = (char)letter;
+                p += 6;
+            }
+            while (a < np && (k == nival || tk_interval_cmp(&pa[a], &c) < 0))
+                iv[n++] = pa[a++];
+            if (k == nival)
+                break;
+            if (a < np && tk_interval_cmp(&pa[a], &c) == 0)
+                a++;
+            if (c.pattern)
+                iv[n++] = c;
+        }
+        d->intervals = iv;
+        d->n_intervals = (uint16_t)n;
+    }
+
     for (i = 0; i < TK_W_COUNT; i++)
         if (!d->s.periods[i][TK_DP_AM] || !d->s.periods[i][TK_DP_PM])
             goto bad;

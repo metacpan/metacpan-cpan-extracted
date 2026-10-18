@@ -10,7 +10,7 @@ use strict;
 use warnings FATAL => 'all';
 use Test::More;
 use Test::Exception;
-use Stats::LikeR qw(lm glm predict);
+use Stats::LikeR qw(lm glm predict anova);
 use Test::LeakTrace;
 
 my %d = (
@@ -46,6 +46,56 @@ for my $case (
 		is($g->{coefficients}{$c}, $l->{coefficients}{$c},
 			"'$formula': lm and gaussian glm agree on $c");
 	}
+}
+
+# R's term removal, `a - b`.  Through 0.3217 the parser split only on '+', so
+# "z-w" was looked up as one column, no row had it, and both functions died
+# with "0 degrees of freedom".  Each case's terms are the term labels R 4.6.1
+# gives for the same formula, attr(terms(f), "term.labels"), and its fit must
+# be the fit of the formula written without the removal.
+{
+	my %d3 = (%d, w => [3, 1, 4, 1, 5, 9, 2, 6, 5, 3]);
+	for my $case (
+		['y ~ x + z - w',     'y ~ x + z',      [qw(Intercept x z)]],   # w is not in the model
+		['y ~ x + z + w - w', 'y ~ x + z',      [qw(Intercept x z)]],
+		['y ~ . - w',         'y ~ x + z',      [qw(Intercept x z)]],
+		['y ~ x*z - x:z',     'y ~ x + z',      [qw(Intercept x z)]],
+		['y ~ x*z - z:x',     'y ~ x + z',      [qw(Intercept x z)]],   # a:b and b:a are one term
+		['y ~ x*z*w - x:z:w', 'y ~ x + z + w + x:z + x:w + z:w', [qw(Intercept x z w x:z x:w z:w)]],
+		# R labels these x:w and x:z:w: it orders a term's variables by the
+		# whole formula, removed terms and all, where the design orders them
+		# by the terms that remain, and w is the first of those.  The fit is
+		# the same; README.md lists this among the differences from R.
+		['y ~ x*z*w - x*z',   'y ~ w + x:w + z:w + x:z:w',       [qw(Intercept w w:x w:z w:x:z)]],
+		['y ~ -x + z',        'y ~ z',          [qw(Intercept z)]],
+		['y ~ x + z - x - 1', 'y ~ z - 1',      [qw(z)]],
+	) {
+		my ($formula, $plain, $want) = @$case;
+		for my $fn (['lm', \&linear], ['glm', \&gaussian]) {
+			my $r = $fn->[1]->($formula, \%d3);
+			my $p = $fn->[1]->($plain, \%d3);
+			is_deeply([sort @{ $r->{terms} }], [sort @$want], "$fn->[0]: '$formula' terms");
+			is_deeply($r->{coefficients}, $p->{coefficients}, "$fn->[0]: '$formula' fits '$plain'");
+		}
+	}
+	my $a = anova(\%d3, 'y ~ x*z - x:z');
+	is_deeply([sort grep { $_ ne 'Residuals' } keys %$a], [qw(x z)], "anova: 'y ~ x*z - x:z' has terms x and z");
+	# a '-' inside parentheses is not removal, and a chunk that names a column
+	# is that column, as it was before '-' meant anything
+	my %h = (%d, 'a-b' => [2, 7, 1, 8, 2, 8, 1, 8, 2, 8]);
+	is_deeply(linear('y ~ a-b + x', \%h)->{terms}, [qw(Intercept a-b x)], "lm: a column named 'a-b' is still a column");
+	is_deeply(gaussian('y ~ a-b + x', \%h)->{terms}, [qw(Intercept a-b x)], "glm: a column named 'a-b' is still a column");
+}
+
+# Seven variables crossed are 128 terms.  The parser's list of distinct terms
+# was allocated at 64 beside the list of all of them, and only that one grew
+# inside lm_expand_cross(), so this formula wrote past the end of it.  It ran
+# clean only by luck; valgrind reported the invalid writes.
+{
+	srand(1);
+	my %d7 = map { $_ => [ map { rand() } 1 .. 200 ] } qw(y a b c d e f g);
+	is(scalar @{ linear('y ~ a*b*c*d*e*f*g', \%d7)->{terms} }, 128, 'lm: a 7-way cross has 128 columns');
+	is(scalar @{ gaussian('y ~ a*b*c*d*e*f*g', \%d7)->{terms} }, 128, 'glm: a 7-way cross has 128 columns');
 }
 
 # A formula longer than the 512-byte buffer glm() used to copy into.  25 columns

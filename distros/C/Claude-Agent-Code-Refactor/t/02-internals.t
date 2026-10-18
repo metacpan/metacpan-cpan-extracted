@@ -99,4 +99,18 @@ subtest 'Options to_review_options' => sub {
     }
 };
 
+
+subtest 'Result is driven through accessors' => sub {
+    open my $fh, '<', 'lib/Claude/Agent/Code/Refactor.pm' or die $!;
+    my @pokes = grep { /\$result->\{/ } <$fh>;
+    close $fh;
+    is(scalar @pokes, 0, 'no hash access on the Result object') or diag @pokes;
+    my $result = Claude::Agent::Code::Refactor::Result->new;
+    $result->initial_issues(3);
+    $result->success(1);
+    $result->final_issues(0);
+    $result->duration_ms(12.5);
+    ok($result->is_clean, 'slots set through accessors');
+};
+
 done_testing();

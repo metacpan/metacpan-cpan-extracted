@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Moo;
 extends "Archive::BagIt";
-our $VERSION = '0.102'; # VERSION
+our $VERSION = '0.103'; # VERSION
 # ABSTRACT: deprecated, used for backwards compatibility
 
 
@@ -23,7 +23,7 @@ Archive::BagIt::Base - deprecated, used for backwards compatibility
 
 =head1 VERSION
 
-version 0.102
+version 0.103
 
 =head1 NAME
 

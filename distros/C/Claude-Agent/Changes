@@ -1,5 +1,9 @@
 Revision history for Claude-Agent
 
+0.15    2026-10-17
+	- Match a hook pattern without regex metacharacters exactly, as the CLI does
+	- Encode a status line to UTF-8 when STDOUT has no encoding layer
+
 0.14    2026-10-16
 	- Refactor to use Object::Proto
 	- Speak the Claude Code SDK control protocol

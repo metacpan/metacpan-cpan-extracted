@@ -10,7 +10,7 @@ use POSIX qw( strftime );
 use Moo;
 with "Archive::BagIt::Role::Portability";
 
-our $VERSION = '0.102'; # VERSION
+our $VERSION = '0.103'; # VERSION
 
 # ABSTRACT: The main module to handle bags.
 
@@ -668,7 +668,7 @@ sub __file_find { ## no critic (CognitiveComplexity::ProhibitExcessCognitiveComp
         my @todo;
         my @tmp_file_paths;
         opendir( my $dh, $current_dir);
-        my @paths = File::Spec->no_upwards ( readdir $dh );
+        my @paths = sort File::Spec->no_upwards ( readdir $dh );
         closedir $dh;
         foreach my $local_entry (@paths) {
             my $path_entry = File::Spec->catdir($current_dir, $self->__handle_nonportable_local_entry($local_entry, $dir));
@@ -682,8 +682,8 @@ sub __file_find { ## no critic (CognitiveComplexity::ProhibitExcessCognitiveComp
                 croak "not a file nor a dir found '$path_entry'";
             }
         }
-        push @file_paths, sort @tmp_file_paths;
-        foreach my $subdir (sort @todo) {
+        push @file_paths, @tmp_file_paths;
+        foreach my $subdir (@todo) {
             &$finder($subdir);
         }
     };
@@ -1019,15 +1019,20 @@ sub calc_payload_oxum {
     return ($octets, $streamcount);
 }
 
-
-sub calc_bagsize {
-    my($self) = @_;
-    my ($octets,$streamcount) = $self->calc_payload_oxum();
+sub _calc_bagsize_by_octets {
+    my $octets = $_[0];
     if ($octets < 1024) { return "$octets B"; }
     elsif ($octets < 1024*1024) {return sprintf("%0.1f kB", $octets/1024); }
     elsif ($octets < 1024*1024*1024) {return sprintf "%0.1f MB", $octets/(1024*1024); }
     elsif ($octets < 1024*1024*1024*1024) {return sprintf "%0.1f GB", $octets/(1024*1024*1024); }
     else { return sprintf "%0.2f TB", $octets/(1024*1024*1024*1024); }
+}
+
+
+sub calc_bagsize {
+    my($self) = @_;
+    my ($octets,$streamcount) = $self->calc_payload_oxum();
+    return _calc_bagsize_by_octets( $octets );
 }
 
 
@@ -1048,7 +1053,9 @@ sub create_baginfo {
     $self->add_or_replace_baginfo_by_key('Bag-Software-Agent', 'Archive::BagIt <https://metacpan.org/pod/Archive::BagIt>');
     my ($octets, $streams) = $self->calc_payload_oxum();
     $self->add_or_replace_baginfo_by_key('Payload-Oxum', "$octets.$streams");
-    $self->add_or_replace_baginfo_by_key('Bag-Size', $self->calc_bagsize());
+    my $bagsize = _calc_bagsize_by_octets($octets);
+
+    $self->add_or_replace_baginfo_by_key('Bag-Size', $bagsize);
     # The RFC does not allow reordering:
     my $metadata_path = $self->metadata_path();
     my $bag_info_path = File::Spec->catfile( $metadata_path, "bag-info.txt");
@@ -1141,7 +1148,7 @@ Archive::BagIt - The main module to handle bags.
 
 =head1 VERSION
 
-version 0.102
+version 0.103
 
 =head1 NAME
 

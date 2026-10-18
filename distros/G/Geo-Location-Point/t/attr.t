@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 59;	# 58 below plus the Test::NoWarnings test
+use Test::Most tests => 81;	# 80 below plus the Test::NoWarnings test
 use Test::NoWarnings;
 
 BEGIN {
@@ -152,6 +152,52 @@ VALIDATION: {
 	my @levels = @{Geo::Location::Point::ACCURACY_LEVELS()};
 	is_deeply([map { $point->accuracy($_) } @levels], \@levels,
 		'Every level of ACCURACY_LEVELS is accepted and read back');
+
+	# The vocabulary is shared - Geo::Coder::Free::Provenance re-exports this
+	# list rather than keeping a copy - and the check above is only safe because
+	# it cannot change at run time.  The module takes its own copy when it loads,
+	# so a level pushed into the list afterwards would be published to every
+	# reader of it while accuracy() went on refusing the name: the vocabulary and
+	# the validator would describe different sets of levels.  So the attempt is
+	# refused, and the list it was refused by is left as it was.
+	throws_ok { push @{Geo::Location::Point::ACCURACY_LEVELS()}, 'planet' } qr/read-only/,
+		'A new level cannot be pushed into the vocabulary';
+	is_deeply(Geo::Location::Point::ACCURACY_LEVELS(), \@levels,
+		'and the list the attempt was made on is unchanged');
+
+	# The rule that turns the fields a backend matched into a level lives beside
+	# the vocabulary, so the levels a point accepts and the levels a backend can
+	# derive are defined together.  These are the spellings the backends match
+	# on: each field set must describe itself as the level its precision
+	# justifies, and the empty set - a row with none of them - is still a named
+	# place, so it is a locality.
+	my @derivations = (
+		[['house_number'], 'address'], [['number'], 'address'],
+		[['road'], 'street'], [['street'], 'street'],
+		[['postcode'], 'postcode'], [['post_code'], 'postcode'], [['zip'], 'postcode'],
+		[['city'], 'locality'], [['town'], 'locality'], [['name'], 'locality'],
+		[['state'], 'region'], [['state_district'], 'region'],
+		[['county'], 'region'], [['region'], 'region'],
+		[['country'], 'country'],
+		[[], 'locality'],
+	);
+	for my $case (@derivations) {
+		my ($fields, $expected) = @{$case};
+		is(Geo::Location::Point::accuracy_for(@{$fields}), $expected,
+			'accuracy_for(' . join(', ', @{$fields}) . ") is $expected");
+	}
+
+	# The most precise field decides, whatever order the fields arrive in and
+	# whether or not the backend spells them in upper case.
+	is(Geo::Location::Point::accuracy_for(qw(city road house_number)), 'address',
+		'A house number outranks the road and city it was matched with');
+	is(Geo::Location::Point::accuracy_for(qw(country postcode state)), 'postcode',
+		'A postcode outranks the state and country it was matched with');
+	is(Geo::Location::Point::accuracy_for('House_Number'), 'address',
+		'The fields are read case-insensitively');
+	my %published = map { $_ => 1 } @levels;
+	is_deeply([grep { !$published{$_} } map { Geo::Location::Point::accuracy_for(@{$_->[0]}) } @derivations], [],
+		'Every level accuracy_for() derives is one the vocabulary publishes and a point accepts');
 
 	is($point->accuracy('address'), 'address', 'The most precise level is accepted');
 	is($point->accuracy('country'), 'country', 'The least precise level is accepted');

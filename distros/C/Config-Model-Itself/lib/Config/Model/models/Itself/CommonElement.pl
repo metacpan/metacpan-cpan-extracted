@@ -230,7 +230,7 @@ return [
                         vt => '?value_type',
                     },
                     'rules' => [
-                        '  ($t eq "leaf" and (   $vt eq "enum" 
+                        '  ($t eq "leaf" and (   $vt eq "enum"
                                                 or $vt eq "reference")
                              )
                            or $t eq "check_list"' => { level => 'normal', },
@@ -250,9 +250,9 @@ return [
                         'vtype' => '?value_type',
                     },
                     'rules' => [
-                        '    $type eq "leaf" 
-                           and (    $vtype eq "integer" 
-                                 or $vtype eq "number" 
+                        '    $type eq "leaf"
+                           and (    $vtype eq "integer"
+                                 or $vtype eq "number"
                                )
                           '
                           => { level => 'normal', }
@@ -271,9 +271,9 @@ return [
                         'vtype' => '?value_type',
                     },
                     'rules' => [
-                        '    $type eq "leaf" 
-                           and (    $vtype eq "integer" 
-                                 or $vtype eq "number" 
+                        '    $type eq "leaf"
+                           and (    $vtype eq "integer"
+                                 or $vtype eq "number"
                                )
                           '
                           => { level => 'normal', }
@@ -323,9 +323,18 @@ return [
                 description => 'Specify default value. This default value is written '
                     .'in the configuration data',
                 warp => {
-                    follow  => { 't'            => '?type' },
-                    'rules' => [ '$t eq "leaf"' => { level => 'normal', } ]
-                }
+                  follow => {
+                    t => '?type'
+                  },
+                  rules => [
+                    {
+                      apply => {
+                        level => 'normal'
+                      },
+                      when => '$t eq "leaf" and &parent->element_name ne "cargo"'
+                    }
+                  ]
+                },
             },
 
             'upstream_default' => {
@@ -335,9 +344,18 @@ return [
                 description =>
 'Another way to specify a default value. But this default value is considered as "built_in" the application and is not written in the configuration data (unless modified)',
                 warp => {
-                    follow  => { 't'            => '?type' },
-                    'rules' => [ '$t eq "leaf"' => { level => 'normal', } ]
-                }
+                  follow => {
+                    t => '?type'
+                  },
+                  rules => [
+                    {
+                      apply => {
+                        level => 'normal'
+                      },
+                      when => '$t eq "leaf" and &parent->element_name ne "cargo"',
+                    }
+                  ]
+                },
             },
 
             'convert' => {

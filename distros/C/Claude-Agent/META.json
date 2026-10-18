@@ -64,6 +64,6 @@
          "web" : "https://github.com/lnation/Claude-Agent"
       }
    },
-   "version" : "0.14",
+   "version" : "0.15",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -47,7 +47,7 @@ like($html, qr/d3\.line\(\)/,   'Uses d3.line() for the paths');
 like($html, qr/msl-line/,       'Line class present');
 like($html, qr/Array\.from\(new Set\(series\.flatMap/,
 	'X domain is the union of every series\' labels');
-like($html, qr/d3\.schemeTableau10/, 'Default scheme is tableau10');
+like($html, qr/scaleOrdinal\(\['#4e79a7', '#f28e2c'/, 'Default scheme is tableau10');
 unlike($html, qr/<!DOCTYPE/i, 'No DOCTYPE (snippet)');
 unlike($html, qr/<html/i,     'No <html> wrapper');
 unlike($html, qr/<head/i,     'No <head> element');
@@ -66,7 +66,7 @@ my $opts_html = $chart->render_multi_series_line_chart_snippet(\@series, {
 })->{html};
 like($opts_html, qr/Month/,       'x_label embedded');
 like($opts_html, qr/Sales/,       'y_label embedded');
-like($opts_html, qr/d3\.schemeCategory10/, 'scheme opt selects the D3 scheme');
+like($opts_html, qr/scaleOrdinal\(\['#1f77b4', '#ff7f0e'/, 'scheme opt inlines the category10 colours');
 like($opts_html, qr/<svg id="ms"/, 'id opt overrides the svg id');
 like($opts_html, qr/viewBox=/,    'responsive opt produces a viewBox');
 like($opts_html, qr/msl-axis-label/, 'Axis label class present');

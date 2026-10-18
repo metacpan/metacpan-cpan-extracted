@@ -1,0 +1,2 @@
+- you need hyperfine and a directory containing testdata (for store tests) or testbags (for verify tests)
+

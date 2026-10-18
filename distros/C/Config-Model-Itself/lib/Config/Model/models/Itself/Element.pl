@@ -33,11 +33,11 @@ return [
   name => "Itself::Element",
 
   include => ['Itself::NonWarpableElement' ,'Itself::WarpableElement'],
-  include_after => 'type' , 
+  include_after => 'type' ,
 
   gist => '{level} {status} {type}',
 
-  'element' 
+  'element'
   => [
 
       # structural information
@@ -50,34 +50,34 @@ return [
                 },
 
       # all elements
-      'status' 
+      'status'
       => {
           type => 'leaf',
-          value_type => 'enum', 
+          value_type => 'enum',
           choice => [qw/obsolete deprecated standard/],
           upstream_default => 'standard' ,
          },
 
-       'level' 
+       'level'
        => {
            type => 'leaf',
-           value_type => 'enum', 
+           value_type => 'enum',
            choice => [qw/important normal hidden/] ,
            upstream_default => 'normal',
            description => 'Used to highlight important parameter or to hide others. Hidden parameter are mostly used to hide features that are unavailable at start time. They can be made available later using warp mechanism',
           },
 
-      'summary' 
+      'summary'
       => {
           type => 'leaf',
-          value_type => 'uniline', 
+          value_type => 'uniline',
           description => 'enter short information regarding this element',
          },
 
-      'description' 
+      'description'
       => {
           type => 'leaf',
-          value_type => 'string', 
+          value_type => 'string',
           description => 'enter detailed help information regarding this element',
          },
 
@@ -97,7 +97,7 @@ return [
       },
 
       # hash or list
-      'index_type' 
+      'index_type'
       => { type => 'leaf',
            value_type => 'enum',
            level      => 'hidden' ,

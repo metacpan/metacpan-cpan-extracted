@@ -67,4 +67,19 @@ is($K->from_epoch('-62135596800')->year, 1, 'year 1');
 ok(!eval { Time::Keeper::year('not a value'); 1 }, 'an accessor on something that is not a value');
 like($@, qr/not a Time::Keeper value/, 'says so');
 
+# hour_12 and to_list.
+{
+    my $t = $K->new(year => 2026, month => 10, day => 15, hour => 21, minute => 5, second => 7, zone => 'America/New_York');
+    is($t->hour_12, 9, '21:05 is 9 on a 12-hour clock');
+    is($t->with(hour => 0)->hour_12, 12, 'midnight is 12');
+    is($t->with(hour => 12)->hour_12, 12, 'as is noon');
+    is($t->with(hour => 1)->hour_12, 1, 'and 01:00 is 1');
+    is_deeply([$t->to_list], [7, 5, 21, 15, 9, 126, 4, 287, 1], 'to_list: the nine localtime fields, month and yday from 0, year from 1900, Sunday 0, isdst');
+    is_deeply([$K->from_epoch(1760000000)->to_list], [gmtime(1760000000)], 'in UTC it is gmtime');
+    is_deeply([$K->new(year => 2026, month => 1, day => 4)->to_list], [0, 0, 0, 4, 0, 126, 0, 3, 0], 'a Sunday is 0 and 4 January is yday 3');
+    is(($K->new(year => 2016, month => 12, day => 31, hour => 23, minute => 59, second => 60)->to_list)[0], 60, 'a leap second is second 60');
+    is(($K->new(year => 2026, month => 7, day => 1, zone => 'Europe/London')->to_list)[8], 1, 'isdst in summer');
+    is(($K->new(year => 2026, month => 1, day => 1, zone => 'floating')->to_list)[8], 0, 'and 0 in floating time');
+}
+
 done_testing;

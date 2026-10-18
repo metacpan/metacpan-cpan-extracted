@@ -27,9 +27,20 @@ typedef struct tk_value {
     uint16_t   zone;
     uint16_t   locale;  /* Phase 10; 0 is English */
     uint8_t    flags;
-    uint8_t    pad[3];
+    uint8_t    kind;     /* TK_KIND_*: 0 for a Time::Keeper value */
+    uint8_t    calendar; /* 0, the Gregorian calendar, until a later release */
+    uint8_t    pad;
     tk_civil   civil;
 } tk_value;
+
+/* The plain classes share the struct: a floating value at midnight of the
+ * day it names, blessed into its own class, telling its kind here. */
+#define TK_KIND_DATETIME   0
+#define TK_KIND_DATE       1
+#define TK_KIND_TIME       2
+#define TK_KIND_YEAR_MONTH 3
+#define TK_KIND_MONTH_DAY  4
+#define TK_KIND_COUNT      5
 
 typedef struct tk_zone_spec {
     uint16_t zone;
@@ -47,6 +58,9 @@ typedef struct tk_zone_spec {
 typedef struct {
     HV *stash;          /* Time::Keeper's, for the common case of no subclass */
     HV *dstash;         /* Time::Keeper::Duration's */
+    HV *pstash[TK_KIND_COUNT];   /* the plain classes', by kind; [0] unused */
+    GV *clock;          /* *Time::Keeper::CLOCK; its scalar is read on each call */
+    int in_clock;       /* set while the clock's code ref runs */
 } my_cxt_t;
 START_MY_CXT
 
@@ -216,9 +230,11 @@ static SV *
 tk_value_new_sv(pTHX_ HV *stash, const tk_value *v)
 {
     SV *inner = newSVpvn((const char *)v, sizeof *v);
-    SV *ref = sv_bless(newRV_noinc(inner), stash);   /* bless first: it marks the referent */
-    SvREADONLY_on(inner);
-    return ref;
+    /* The referent is not made read-only: bless croaks on a read-only
+     * referent, and CBOR::XS and JSON::XS re-bless a value before calling
+     * its FREEZE. The API keeps a value immutable; tk_value_of checks the
+     * bytes on every read. */
+    return sv_bless(newRV_noinc(inner), stash);
 }
 
 static int
@@ -246,7 +262,8 @@ tk_value_of(pTHX_ SV *sv, const char *what)
     if (!tk_instant_valid(&v->inst)
         || (v->zone >= TK_ZONE_NAMED && v->zone - TK_ZONE_NAMED >= (tk_zone_abi(aTHX)->zone_count)())
         || (v->zone == TK_ZONE_FIXED && (v->utoff < -TK_MAX_FIXED_OFFSET || v->utoff > TK_MAX_FIXED_OFFSET))
-        || (v->zone < TK_ZONE_FIXED && v->utoff != 0))
+        || (v->zone < TK_ZONE_FIXED && v->utoff != 0)
+        || v->kind != TK_KIND_DATETIME || v->calendar != 0)
         croak("%s: a damaged Time::Keeper value", what);
     return v;
 }

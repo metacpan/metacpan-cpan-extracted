@@ -4,7 +4,7 @@ Geo::Location::Point - Location information
 
 ## Version
 
-Version 0.17
+Version 0.19
 
 ## Synopsis
 
@@ -166,9 +166,38 @@ This is the vocabulary, written down once here and read from here by
 accepts and the levels a backend reports cannot drift apart.  `accuracy()`
 accepts these and refuses anything else.
 
+The rule that turns the fields a backend matched into one of these levels is
+["accuracy\_for"](#accuracy_for), beside the list it returns a level from.
+
+The list is read-only, and a caller that tries to add to it is refused, because
+it is the list `accuracy()` checks against: were it writable, a level pushed
+into it would be published to every reader of this list while the module went on
+refusing it.
+
 ```perl
 my $levels = Geo::Location::Point::ACCURACY_LEVELS();
 ```
+
+### Accuracy\_for
+
+The accuracy a match can claim, from the fields that made it.  The most precise
+field present decides: a house number makes it an `address`, a road a
+`street`, a postcode a `postcode`, a name or a city a `locality`, a state or
+region a `region`, and a country a `country`.  So a dataset row carrying only
+a city, state and country is a `locality`: a named place, not an address.
+
+```perl
+my $level = Geo::Location::Point::accuracy_for(qw(house_number road city));
+```
+
+Always returns one of the ["ACCURACY\_LEVELS"](#accuracy_levels): a match on a row with none of the
+fields above is still a named place, so it is reported as a `locality` rather
+than left unsaid, because every result promises an accuracy.
+
+It is a function, not a method - the fields are what a backend matched, not
+something a point carries - and it lives beside the vocabulary it returns a
+level from, so the levels a point accepts and the rules that choose one of them
+have a single home.
 
 ### Accuracy
 

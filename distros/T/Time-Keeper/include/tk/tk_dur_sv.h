@@ -9,7 +9,6 @@ tk_dur_new_sv(pTHX_ HV *stash, const tk_duration *d)
 {
     SV *inner = newSVpvn((const char *)d, sizeof *d);
     SV *ref = sv_bless(newRV_noinc(inner), stash);
-    SvREADONLY_on(inner);
     return ref;
 }
 
@@ -60,6 +59,53 @@ tk_dur_stash(pTHX)
 {
     dMY_CXT;
     return MY_CXT.dstash;
+}
+
+/* A duration frozen as text: "tkd1 months days minutes seconds nsec eom". */
+static SV *
+tk_dur_freeze_sv(pTHX_ const tk_duration *d)
+{
+    static const char *const eoms[] = { "wrap", "limit", "preserve" };
+    SV *out = newSVpvs("tkd1 ");
+    sv_catsv(out, sv_2mortal(tk_newSVi64(aTHX_ d->months)));
+    sv_catpvs(out, " ");
+    sv_catsv(out, sv_2mortal(tk_newSVi64(aTHX_ d->days)));
+    sv_catpvs(out, " ");
+    sv_catsv(out, sv_2mortal(tk_newSVi64(aTHX_ d->minutes)));
+    sv_catpvs(out, " ");
+    sv_catsv(out, sv_2mortal(tk_newSVi64(aTHX_ d->seconds)));
+    sv_catpvf(out, " %ld %s", (long)d->nsec, eoms[d->eom < 3 ? d->eom : 0]);
+    return out;
+}
+
+static void
+tk_dur_thaw(pTHX_ SV *frozen, tk_duration *d, const char *what)
+{
+    STRLEN len;
+    const char *s = SvPV(frozen, len), *end = s + len, *p;
+    int64_t parts[5];
+    int i;
+
+    if (len < 5 || memNE(s, "tkd1 ", 5))
+        croak("%s: not a frozen Time::Keeper::Duration", what);
+    p = s + 5;
+    for (i = 0; i < 5; i++) {
+        const char *q = p;
+        while (q < end && *q != ' ')
+            q++;
+        if (q == p || !tk_sv_to_i64(aTHX_ sv_2mortal(newSVpvn(p, q - p)), &parts[i]) || q == end)
+            croak("%s: not a frozen Time::Keeper::Duration", what);
+        p = q + 1;
+    }
+    Zero(d, 1, tk_duration);
+    d->months = parts[0];
+    d->days = parts[1];
+    d->minutes = parts[2];
+    d->seconds = parts[3];
+    if (parts[4] < -TK_NSECS_PER_SEC || parts[4] > TK_NSECS_PER_SEC
+        || !tk_dur_normalize(d, parts[4]))
+        croak("%s: not a frozen Time::Keeper::Duration", what);
+    d->eom = (uint8_t)tk_opt_eom(aTHX_ sv_2mortal(newSVpvn(p, end - p)), what);
 }
 
 #endif

@@ -53,7 +53,7 @@ ok($rw_obj,"Created model reader/writer");
 
 $rw_obj->read_all(
     root_model => 'MasterModel',
-    legacy => 'ignore',
+    legacy => 'warn',
 ) ;
 
 ok(1,"Read all models in data dir") ;

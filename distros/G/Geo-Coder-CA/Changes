@@ -1,5 +1,12 @@
 Revision history for Geo-Coder-CA
 
+0.16	Sat Oct 17 08:16:04 PM EDT 2026
+	geocode(): refuse a reference; it used to be accepted because the string it
+		turns into contains a non-digit
+	Check a reference against Geo::Coder::Free::Validate's rule when that module
+		is installed, so that the check cannot drift away from Geo::Coder::Free
+	Added t/reference.t, the same test as the other Geo::Coder distributions
+
 0.15	Sat Feb  8 08:23:11 EST 2025
 	geocode(): croak when input is just a set of numbers
 	Use Test::Needs

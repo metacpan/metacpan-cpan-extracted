@@ -34,7 +34,7 @@ return [
             # node element (may be within a hash or list)
 
             'warp' => {
-                type   => 'warped_node',              # ?
+                type   => 'warped_node',
                 level  => 'hidden',
 
                 warp => {
@@ -48,7 +48,7 @@ return [
                 },
                 description =>
                     "change the properties (i.e. default value or its value_type) "
-                  . "dynamically according to the value of another Value object locate "
+                  . "dynamically according to the value of another Value object located "
                   . "elsewhere in the configuration tree. "
 
             },

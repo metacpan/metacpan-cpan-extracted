@@ -1,5 +1,12 @@
 Revision history for Acme-Claude-Shell
 
+0.04    2026-10-17
+	- Require Claude::Agent 0.14: hooks now run through the CLI and command output is printed from the tool results.
+	- Add verbose, audit_log and effort options and the --verbose and --effort flags.
+	- Turn off the CLI built-in tools so every command goes through execute_command.
+	- Read the approval from STDIN when output is not colorful; end of input cancels.
+	- Declare utf8 in Hooks.pm so the statistics rule prints.
+
 0.01    2026-01-11
         First version - AI-powered interactive shell showcasing Claude::Agent SDK
 

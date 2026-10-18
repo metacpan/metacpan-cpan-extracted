@@ -1,5 +1,18 @@
 Revision history for Geo-Coder-DataScienceToolkit
 
+0.03	Sat Oct 17 07:58:42 PM EDT 2026
+	geocode(): croak when input is just a set of numbers
+	Use JSON::MaybeXS instead of JSON
+	Use gtar to create a distribution on Macs
+	Use Test::Needs and Object::Configure
+	Use Test::DescribeMe to simplify tests
+	Handle broken smokers
+	geocode(): refuse a reference; it used to be accepted because the string it
+		turns into contains a non-digit
+	Check a reference against Geo::Coder::Free::Validate's rule when that module
+		is installed, so that the check cannot drift away from Geo::Coder::Free
+	Added t/reference.t, the same test as the other Geo::Coder distributions
+
 0.02	Sat Feb  2 08:02:49 EST 2019
 	Documentation fixes
 

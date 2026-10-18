@@ -1,3 +1,17 @@
+2.032 2026-10-17
+
+  Bug fix:
+    * BackendDetector: fix potential precedence issue (may fix
+      test issues on FreeBSD)
+    * test: fix handling of legacy issues (Closes Debian #1151064)
+
+  Doc:
+    * Itself::WarpOnlyElement model: add class_description
+
+  Model changes:
+    * Hide "default" and "upstream_default" in cargo element
+    * WarpableElement: remove deprecated default_with_init
+
 2.031 2026-06-05
 
   Feature:
@@ -305,7 +319,7 @@
 
   Test enhancements:
   * Skip cme-meta tests involing Tk when a display is not available.
-  
+
 2.001 2015-11-29
 
   Major feature enhancement:
@@ -342,7 +356,7 @@
 1.243 2015-01-11
 
    A small change for this release:
-  
+
     * Version 1.242 added the possibility to override the Perl class
       implementing a configuration node by adding a class parameter in a
       place that is confusing. This release fix this bug: this optional
@@ -361,7 +375,7 @@
 
 1.241 2014-10-22
 
-    * config-model-edit: 
+    * config-model-edit:
       + added system option to read a model from system files
       * fix yaml and load_yaml options
       * fix dump and dumptype options
@@ -390,7 +404,7 @@
 
 2013-08-27 - 1.239
 
-   * Itself writer: ensure that hash data in models snippets 
+   * Itself writer: ensure that hash data in models snippets
      have a predictable order (fix tests for perl 5.18)
 
 2013-08-25 - 1.238
@@ -419,7 +433,7 @@
     * Fix quit bug in model test widget
     * integrate model pod generation at build time
     * Added memory cycle tests where possible
-    * Bump dependency on Config::Model 2.028 to generate 
+    * Bump dependency on Config::Model 2.028 to generate
       properly the documentation for Itself model (which
       may be should be called C::M::MyOwnDogFood... )
 
@@ -432,7 +446,7 @@
 
     * model Itself::Class: added accept_after
       (requires Config::Model 2.020)
-    * config-model-edit: make sure that loading models are not 
+    * config-model-edit: make sure that loading models are not
       recorded as changed data
 
 1.231 2012-05-22
@@ -470,13 +484,13 @@
 
     * Requires Config::Model >= 1.263
     * Meta model changes:
-        * Itself/CommonElement: enable convert for hash indexes. 
+        * Itself/CommonElement: enable convert for hash indexes.
         * Itself/Class, added in ini backend a lot of paramaters to
           cope with various conventions:
-          + force_lc_* parameters. 
+          + force_lc_* parameters.
           + write_boolean_as parameter
           + join_list_value parameter
-          + store_class_in_hash section_map split_list_value 
+          + store_class_in_hash section_map split_list_value
         * Itself/CommonElement: max_index can be used in lists
         * Itself/NonWarpableElement:
           + added write_as parameter (for booleans)
@@ -485,7 +499,7 @@
 
 	* MigratedValue.pl: replaced value can be a string, not only a
 	uniline
-	* CommonElement.pl: added assert and warn_unless parameters 
+	* CommonElement.pl: added assert and warn_unless parameters
 	  (requires Config::Model 1.258)
 
 1.226 2011-09-02
@@ -496,7 +510,7 @@
 
 1.225 2011-06-07
 
-        * Itself.pm:  munge pod text embedded in description 
+        * Itself.pm:  munge pod text embedded in description
           to avoid spurious pod formatting in model files
         * WarpableElement.pl: allow default_with_init for list (like hash)
         * MigratedValue.pl: updated undef_is doc: use '' to have an empty string
@@ -513,13 +527,13 @@
         * Class.pl: added copyright, author, license elements
         * Search backend in all @INC directories (useful for dev)
         * Reduced indentation of generated Perl files.
-        * NonWarpableElement: added replace_follow parameter 
+        * NonWarpableElement: added replace_follow parameter
         * Build depend on Test::Differences
         * Requires Config::Model 1.236
 
 1.222 2011-01-20
 
-        * added migrate_keys_from, undef_is parameters 
+        * added migrate_keys_from, undef_is parameters
         * Above require Config::Model 1.230
 
 1.221 2011-01-09
@@ -529,14 +543,14 @@
 1.220 2011-01-09
 
 	* config-model-edit: use same log4perl config files as config-edit
-	* CommonElement: added warn* parameters 
+	* CommonElement: added warn* parameters
           (require Config::Model 1.228)
         * Fix class deletion issue
         * Adapted model and test to new style of accept specification
 
 1.219 2010-10-15
 
-	* removed obsolete push/pop_no_value_check calls 
+	* removed obsolete push/pop_no_value_check calls
 	* requires Config::Model 1.212
 
 1.218 2010-09-16
@@ -692,20 +706,20 @@
 
 0.204 2008-07-25
 
-	* lib/Config/Model/models/Itself/*.pl: 
-	All the changes described below will be handled by the 
-	upgrade facility of Config::Model. I.e. to upgrade your 
-	configuration model, load your model in config-model-edit, 
+	* lib/Config/Model/models/Itself/*.pl:
+	All the changes described below will be handled by the
+	upgrade facility of Config::Model. I.e. to upgrade your
+	configuration model, load your model in config-model-edit,
 	save it, and you're done.
 	Changes:
-	- Changed auto read and auto write meta-model (needed by 
-	  Config::Model 0.624). 
-	- autoread autowrite 'syntax' parameter is replaced by 'backend'. 
-	- Added auto-read/write 'augeas' backend. 
-	- Added migrate_from in Class so that your own model will be able 
-	  to smoothly upgrade configuration data (See upgrade doc in 
+	- Changed auto read and auto write meta-model (needed by
+	  Config::Model 0.624).
+	- autoread autowrite 'syntax' parameter is replaced by 'backend'.
+	- Added auto-read/write 'augeas' backend.
+	- Added migrate_from in Class so that your own model will be able
+	  to smoothly upgrade configuration data (See upgrade doc in
 	  Config::Model::Value)
-	- Added use_eval for more complex string computation when the power 
+	- Added use_eval for more complex string computation when the power
 	  of Perl is needed (See Config::Model::ComputedValue documentation)
 
 
@@ -716,7 +730,7 @@
 
 0.202 2008-05-18
 
-	* lib/Config/Model/models/Itself/CommonElement.pl: Added support for 
+	* lib/Config/Model/models/Itself/CommonElement.pl: Added support for
 	built in default list for check_list elements
 
 
@@ -732,11 +746,11 @@
 	* lib/Config/Model/Itself.pm (read_all): Reworked model to fit with
 	new cargo arguments.
 	* tests: suppress legacy warnings
-	
+
 0.201 2008-04-03
 
 	* lib/Config/Model/models/Itself/Element.pl: Fixed element and
-	cargo models. 
+	cargo models.
 
 
 	* lib/Config/Model/models/Itself/WarpableElement.pl: added
@@ -747,7 +761,7 @@
 	enum_integer type
 
 	* config-model-edit: Clarified where models are read and
-	written. 
+	written.
 
 0.102 2008-03-18
 
@@ -773,5 +787,3 @@
 0.101 2007-10-16
 
 	* All: first version
-	
-

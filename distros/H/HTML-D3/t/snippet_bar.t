@@ -67,7 +67,7 @@ unlike($maxed, qr/"label":"Beta"/,  'max_bars: Beta collapsed (4th highest)');
 
 # ── color => categorical ──────────────────────────────────────────────────────
 my $cat = $chart->render_bar_chart_snippet(\@data, { color => 'categorical' })->{html};
-like($cat, qr/schemeTableau10/, 'categorical: Tableau-10 palette used');
+like($cat, qr/\['#4e79a7', '#f28e2c'/, 'categorical: tableau10 colours inlined');
 
 # ── show_values => 1 ─────────────────────────────────────────────────────────
 my $vals = $chart->render_bar_chart_snippet(\@data, { show_values => 1 })->{html};

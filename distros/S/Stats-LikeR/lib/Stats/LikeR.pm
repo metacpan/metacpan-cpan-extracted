@@ -3,7 +3,7 @@
 require 5.010001;
 use strict;
 package Stats::LikeR;
-our $VERSION = '0.3217';	# quoted: a bare version ending in 0, such as 0.320, is the number 0.32, which the dist would be named
+our $VERSION = '0.3218';	# quoted: a bare version ending in 0, such as 0.320, is the number 0.32, which the dist would be named
 require XSLoader;
 use warnings FATAL => 'all';
 use Exporter 'import';
@@ -86,6 +86,7 @@ my %HELP_ALIAS = (
 	_hoa_assign       => 'assign',
 	col               => 'filter',
 	_rename_inplace   => 'rename_cols',
+	_aoh2h            => 'aoh2h',
 	_cols_select      => 'select_cols',
 	_cols_drop        => 'drop_cols',
 	_cols_rename      => 'rename_cols',
@@ -1105,12 +1106,25 @@ sub _kv_names {
 	return ($var, $value);
 }
 
+# _opt_names_defined($caller, @pairs) -- die, in the caller's name, on an undef
+# option name.  Without it `my %arg = @_` raises perl's own "Use of
+# uninitialized value", which the FATAL warnings above make fatal and which
+# names a line of this file rather than the option.  Up to 0.3217 that was what
+# h2aoh({}, undef, 1) and aoh2h([], undef, 1) died with.
+sub _opt_names_defined {
+	my $caller = shift;
+	for (my $j = 0; $j < @_; $j += 2) {
+		die "$caller: an option name is undefined\n" unless defined $_[$j];
+	}
+}
+
 sub h2aoh {
 	my $h = shift;
 	die "h2aoh: first argument is undefined\n" unless defined $h;
 	die "h2aoh: first argument must be a hashref\n" unless ref($h) eq 'HASH';
 	die "h2aoh: arguments after the hash must be name => value pairs\n"
 		if @_ % 2;
+	_opt_names_defined('h2aoh', @_);
 	my %arg   = @_;
 	my %known = ( var_name => 1, value_name => 1, sort => 1 );
 	my @bad   = sort grep { !$known{$_} } keys %arg;
@@ -1159,13 +1173,18 @@ sub h2aoh {
 	return [ map { { $var_name => $_, $value_name => $h->{$_} } } @keys ];
 }
 
+# The rows are read by the XSUB _aoh2h, which also makes every check on them;
+# only the options are read here.
 sub aoh2h {
 	my $aoh = shift;
 	die "aoh2h: first argument is undefined\n" unless defined $aoh;
+	# reftype, not ref: a blessed array of hashes is still one, as aoh2hoa
+	# already took it.  Up to 0.3217 a blessed frame or row was refused.
 	die "aoh2h: first argument must be an arrayref of hashrefs\n"
-		unless ref($aoh) eq 'ARRAY';
+		unless (reftype($aoh) || '') eq 'ARRAY';
 	die "aoh2h: arguments after the data frame must be name => value pairs\n"
 		if @_ % 2;
+	_opt_names_defined('aoh2h', @_);
 	my %arg   = @_;
 	my %known = ( var_name => 1, value_name => 1, duplicates => 1 );
 	my @bad   = sort grep { !$known{$_} } keys %arg;
@@ -1173,29 +1192,11 @@ sub aoh2h {
 
 	my ($var_name, $value_name) = _kv_names('aoh2h', \%arg);
 	my $dup = defined $arg{duplicates} ? lc $arg{duplicates} : 'die';
+	my %dup_code = ( die => 0, first => 1, last => 2 );	# _aoh2h's `dup`
 	die "aoh2h: duplicates '$dup' isn't allowed (die, first, last)\n"
-		unless $dup eq 'die' || $dup eq 'first' || $dup eq 'last';
+		unless exists $dup_code{$dup};
 
-	my %out;
-	my $i = 0;
-	for my $row (@$aoh) {
-		die "aoh2h: index $i is not a hashref\n" unless ref($row) eq 'HASH';
-		die "aoh2h: index $i has no '$var_name' column\n"
-			unless exists $row->{$var_name};
-		die "aoh2h: index $i has no '$value_name' column\n"
-			unless exists $row->{$value_name};
-		my $k = $row->{$var_name};
-		die "aoh2h: index $i has an undefined '$var_name'; a hash key has to "
-		  . "be defined\n" unless defined $k;
-		if (exists $out{$k}) {
-			die "aoh2h: duplicate key '$k' has >= 2 occurrences\n"
-				if $dup eq 'die';
-			if ($dup eq 'first') { $i++; next }
-		}
-		$out{$k} = $row->{$value_name};
-		$i++;
-	}
-	return \%out;
+	return _aoh2h($aoh, $var_name, $value_name, $dup_code{$dup});
 }
 # agg / concat / rbind  --  additions to lib/Stats/LikeR.pm
 # Splice these in after the dropna sub. Also add  agg concat rbind  to
@@ -3536,6 +3537,11 @@ sub read_table {
 	# hoh: rows whose name an earlier row already had, and the first of them as
 	# [name, data row]. Counted and warned about once, after the parse.
 	my ($n_dup_rn, $first_dup_rn) = (0, undef);
+	# The alignment message's parts, set by $finalize_header: what a ragged
+	# row's field count is compared with, and a note for a width of one whose
+	# line held no separator (undef when there is none). The parser's
+	# S_fast_row() gets both through the plan.
+	my ($width_txt, $sep_note);
 
 # Once the header is fixed there is nothing left for the row closure below to
 # decide, so the parser is given a plan and builds the rest of the table
@@ -3569,6 +3575,8 @@ sub read_table {
 		$plan->{idx}  = [ map { $last{$_} } @uniq_header ];
 		$plan->{ncol} = scalar @header;
 		$plan->{file} = $file;
+		$plan->{width}    = $width_txt;
+		$plan->{sep_note} = $sep_note;
 		$plan->{na}   = $has_na ? \%na_string : undef;
 		if (@cls) {
 			$plan->{cls} = [ @cls ];
@@ -3731,6 +3739,37 @@ sub read_table {
 		# nor the row loop below has to fetch them out of %data (and
 		# autovivify them) once per column per row.
 		@hoa_cols = map { $data{$_} ||= [] } @uniq_header if $otype eq 'hoa';
+		# What the alignment message compares a ragged row with. With
+		# header => 0 there is no header to count, and up to 0.3217 the message
+		# said "N headers" all the same, which read as though header => 0 had
+		# been ignored; it now says where the width came from.
+		my $w = @header;
+		$width_txt = $want_header ? "$w headers"
+		           : $col_names   ? "$w 'col_names'"
+		           :                "$w in data row 1";
+		# A width of one, read from the file, means that the line that set it
+		# held no separator, and a later row with more fields did: the shape of
+		# a file read with the wrong sep. A ';'-separated .csv read with the
+		# default ',' fails on the first row with a comma in its text. Not for
+		# an .xlsx, whose cells are not split, nor where 'col_names' set the
+		# width.
+		$sep_note = undef;
+		if ($w == 1 && !$is_xlsx && !$col_names) {
+			my $where = $want_header ? 'the header' : 'data row 1';
+			if ($sep_re) {
+				$sep_note = "$where has no match for the sep regex $sep_re, so "
+				  . "it may not be what separates this file's fields";
+			} else {
+				my $s = $args{sep} eq "\t" ? '\t' : $args{sep};
+				$sep_note = exists $input_args{sep}
+					? "$where has no '$s' in it, so '$s' may not be what "
+					  . "separates this file's fields"
+					: "$where has no '$s' in it, and '$s' is only the default "
+					  . "sep for this file's name: pass 'sep' if its fields are "
+					  . "separated by something else";
+			}
+			$sep_note = _as_bytes($sep_note);
+		}
 	};
 
 	# _parse_csv_file() treats a line whose comment marker is followed by
@@ -3913,10 +3952,12 @@ sub read_table {
 # --- DATA PROCESSING (operate on $line_ref directly; no row copy)
 		$data_row++;
 		if (@$line_ref != @header) {
-			# FIX: alignment errors now say WHICH row is ragged
-			die sprintf "Alignment error on %s data row %d (%d fields vs %d headers)%s.\n",
-				$file, $data_row, scalar @$line_ref, scalar @header,
-				defined $quote_note ? "; $quote_note" : '';
+			# FIX: alignment errors now say WHICH row is ragged. The words
+			# are S_fast_row()'s in LikeR.xs, and must stay the same.
+			die sprintf "Alignment error on %s data row %d (%d fields vs %s)%s%s.\n",
+				$file, $data_row, scalar @$line_ref, $width_txt,
+				defined $quote_note ? "; $quote_note" : '',
+				defined $sep_note && @$line_ref > @header ? "; $sep_note" : '';
 		}
 		my %line_hash;
 		for my $i (0 .. $#header) {
@@ -4652,34 +4693,33 @@ sub _tukey_compare {
 # mutates its input.  Shape is classified by _df_shape (the agg()/view()
 # detector); 'output_type' defaults to the input family, like agg().
 
-# _frame_cols($df, $shape, \@need) -> (\%col, $R)
+# _frame_cols($df, $shape, \@need, \@rows) -> (\%col, $R, \@rows)
 #
 # Extract the named columns once, aligned to row positions 0 .. R-1, using
 # the same per-shape access agg() uses.  For HoA the column arrays are
 # aliased (read-only callers), not rebuilt; every other shape materialises
 # a fresh per-column slice.  HoH rows are visited in string-sorted key
-# order so a positional axis exists.  Not exported.
+# order so a positional axis exists.  \@rows is those rows in that order,
+# undef for HoA, which needs none; passing back the one an earlier call
+# returned skips finding them again -- for HoH, a sort of every key -- so a
+# caller can fetch one column at a time.  Not exported.
 sub _frame_cols {
-	my ($df, $shape, $need) = @_;
-	my (%col, $R);
-	if ($shape eq 'AoA') {
-		my @h = grep { defined } @$df;
-		$R = scalar @h;
-		for my $c (@$need) { $col{$c} = [ map { $_->[$c] } @h ] }
-	} elsif ($shape eq 'AoH') {
-		my @h = grep { defined } @$df;
-		$R = scalar @h;
-		for my $c (@$need) { $col{$c} = [ map { $_->{$c} } @h ] }
-	} elsif ($shape eq 'HoA') {
-		$R = 0;
+	my ($df, $shape, $need, $rows) = @_;
+	my %col;
+	if ($shape eq 'HoA') {
+		my $R = 0;
 		for my $v (values %$df) { $R = @$v if ref $v eq 'ARRAY' && @$v > $R }
 		for my $c (@$need) { $col{$c} = ref $df->{$c} eq 'ARRAY' ? $df->{$c} : [] }
-	} else {                                     # HoH
-		my @h = map { $df->{$_} } sort keys %$df;
-		$R = scalar @h;
-		for my $c (@$need) { $col{$c} = [ map { $_->{$c} } @h ] }
+		return (\%col, $R, undef);
 	}
-	return (\%col, $R);
+	$rows ||= $shape eq 'HoH' ? [ map { $df->{$_} } sort keys %$df ]
+	                          : [ grep { defined } @$df ];
+	if ($shape eq 'AoA') {
+		for my $c (@$need) { $col{$c} = [ map { $_->[$c] } @$rows ] }
+	} else {                                     # AoH, HoH
+		for my $c (@$need) { $col{$c} = [ map { $_->{$c} } @$rows ] }
+	}
+	return (\%col, scalar @$rows, $rows);
 }
 
 # _sort_group_keys(\@order, \%repr) -> \@sorted
@@ -5459,30 +5499,45 @@ sub _tukey_col {
 # numeric, else 'categorical'.
 sub _t1_classify {
 	my ($vals) = @_;
-	my @def = grep { defined } @$vals;
-	return 'categorical' unless @def;
-	for (@def) { return 'categorical' unless looks_like_number($_) }
-	return 'continuous';
+	my $any = 0;                     # 0 = no defined value seen yet
+	for (@$vals) {
+		next unless defined;
+		return 'categorical' unless looks_like_number($_);
+		$any = 1;
+	}
+	return $any ? 'continuous' : 'categorical';
 }
 
 # p-value + test label for a continuous variable across >=2 groups.
-# @$byg is one arrayref of (numeric, defined) values per group.
+# @$byg is one arrayref of (numeric, defined) values per group.  Returns
+# (undef, undef) when the test cannot run, as _t1_cat_p() does: t_test() dies
+# on a group of one and on data that are constant, and up to 0.3217 that took
+# the whole table down for the sake of one row.
 sub _t1_cont_p {
 	my ($byg, $nonpar) = @_;
 	my @g = grep { @$_ >= 1 } @$byg;
 	return (undef, undef) if @g < 2;
-	if (@g == 2) {
-		my $r = $nonpar ? wilcox_test($g[0], $g[1]) : t_test($g[0], $g[1]);
-		return ($r->{'p_value'}, $nonpar ? 'wilcoxon' : 't-test');
-	}
-	# >2 groups: Kruskal-Wallis (nonparametric) or one-way ANOVA
-	my (@x, @lab);
-	for my $i (0 .. $#g) { push @x, @{ $g[$i] }; push @lab, ("g$i") x scalar @{ $g[$i] } }
-	if ($nonpar) {
-		return (kruskal_test(\@x, \@lab)->{'p_value'}, 'kruskal-wallis');
-	}
-	my $aov = aov({ value => \@x, grp => \@lab }, 'value ~ grp');
-	return ($aov->{grp}{'Pr(>F)'}, 'anova');
+	my @r = eval {
+		if (@g == 2) {
+			my $r = $nonpar ? wilcox_test($g[0], $g[1]) : t_test($g[0], $g[1]);
+			return ($r->{'p_value'}, $nonpar ? 'wilcoxon' : 't-test');
+		}
+		# >2 groups: Kruskal-Wallis (nonparametric) or one-way ANOVA
+		my %by; @by{ map { "g$_" } 0 .. $#g } = @g;
+		return (kruskal_test(\%by)->{'p_value'}, 'kruskal-wallis') if $nonpar;
+		# oneway_test(var_equal => 1) is the F test aov() computes for one
+		# factor -- R's oneway.test(var.equal = TRUE) -- from each group's sum
+		# and sum of squares, where aov() builds and rotates a design: on 1e5
+		# rows in three groups, 8 ms against aov()'s 54.  It refuses a group of
+		# one observation, which aov() takes, so that case still goes to aov().
+		return (oneway_test(\@g, var_equal => 1)->{Group}{'Pr(>F)'}, 'anova')
+			unless grep { @$_ < 2 } @g;
+		my (@x, @lab);
+		for my $i (0 .. $#g) { push @x, @{ $g[$i] }; push @lab, ("g$i") x scalar @{ $g[$i] } }
+		my $aov = aov({ value => \@x, grp => \@lab }, 'value ~ grp');
+		return ($aov->{grp}{'Pr(>F)'}, 'anova');
+	};
+	return $@ ? (undef, undef) : @r;
 }
 
 # p-value + test label for a categorical variable: chi-squared on the
@@ -5518,6 +5573,14 @@ sub table_one {
 	my $pdig   = defined $opt{pct_digits} ? $opt{pct_digits} : 1;
 	my $nonpar = $opt{nonparametric} ? 1 : 0;
 	my %types  = $opt{types} ? %{ $opt{types} } : ();
+	# anything but 'continuous' took the categorical branch, so a misspelling
+	# or types => { age => 'numeric' } made a row of every distinct age
+	for my $v (sort keys %types) {
+		my $t = $types{$v};
+		die "table_one: the type of '$v' must be 'continuous' or 'categorical', not '"
+		  . (defined $t ? $t : 'undef') . "'\n"
+			unless defined $t && ($t eq 'continuous' || $t eq 'categorical');
+	}
 
 	my $shape   = _df_shape($df, 'table_one');
 	my @allcols = colnames($df);
@@ -5527,39 +5590,69 @@ sub table_one {
 	                      : grep { !defined $by || $_ ne $by } @allcols;
 	for my $v (@vars) { die "table_one: column '$v' not found\n" unless $colset{$v} }
 
-	my @need = (@vars, defined $by ? ($by) : ());
-	my ($col, $R) = _frame_cols($df, $shape, \@need);
+	# Each column is fetched as it is summarised rather than all at once: an
+	# AoA, AoH or HoH frame's columns are copies, and holding every one of them
+	# for the whole call was most of the memory this used.
+	my ($bc, $R, $rows) = _frame_cols($df, $shape, defined $by ? [$by] : []);
 
-	my @grp = defined $by
-	        ? map { defined $_ ? "$_" : 'NA' } @{ $col->{$by} }
-	        : ('Overall') x $R;
-	my %seen; my @groups = grep { !$seen{$_}++ } @grp;
-	@groups = sort @groups if defined $by;
-	# One pass that buckets every row, rather than a full scan of the frame per
-	# group: the row lists were built by O(groups x rows) greps, which is the
-	# same shape as the O(levels x groups x rows) counting further down that
-	# this file already records having replaced with a single pass.
-	my %gpos; @gpos{ @groups } = 0 .. $#groups;
-	my @grp_rows = map { [] } @groups;
-	for my $r (0 .. $R - 1) { push @{ $grp_rows[ $gpos{ $grp[$r] } ] }, $r }
+	# $gidx[$r] is row $r's group, an index into @groups.  The labels are read
+	# over 0 .. $R-1, as every column below is, so that a `by` column shorter
+	# than the frame reads as 'NA' past its end; mapping over the column itself
+	# left those rows with no group, and the warning that raised was fatal.
+	my (@groups, @gidx, @gsize);
+	if (defined $by) {
+		my $bycol = $bc->{$by};
+		my %size;                        # label => rows in that group
+		for my $r (0 .. $R - 1) {
+			my $g = $bycol->[$r];
+			$size{ defined $g ? $g : 'NA' }++;
+		}
+		@groups = sort keys %size;
+		@gsize  = @size{@groups};
+		# Each group is a key of every output row, beside these: a group named
+		# 'test' was overwritten by the label 't-test', and one named 'Overall'
+		# overwrote the column summarising every row.
+		my %fixed = map { $_ => 1 } qw(variable level type p_value test Overall);
+		my @clash = grep { $fixed{$_} } @groups;
+		die "table_one: the '$by' column has a group named '"
+		  . join("', '", @clash) . "', which is also the name of an output column\n"
+			if @clash;
+		my %gpos; @gpos{@groups} = 0 .. $#groups;
+		@gidx = map { my $g = $bycol->[$_]; $gpos{ defined $g ? $g : 'NA' } } 0 .. $R - 1;
+	} else {
+		@groups = ('Overall');
+		@gsize  = ($R);
+		@gidx   = (0) x $R;
+	}
 
 	my @out;
 	for my $v (@vars) {
-		my @vals = @{ $col->{$v} };
-		my $type = $types{$v} || _t1_classify(\@vals);
+		my ($vc) = _frame_cols($df, $shape, [$v], $rows);
+		my $vals = $vc->{$v};
+		my $type = $types{$v} || _t1_classify($vals);
 
 		if ($type eq 'continuous') {
 			my %row = (variable => $v, level => '', type => 'continuous');
-			my @byg;
+			# One pass in row order, so each group's values and the Overall
+			# ones keep the order they had, and with it mean()'s and sd()'s
+			# last bit.  Each value is made a number once, here: mean(), sd()
+			# and the test used to read copies of the cell, and each copy of a
+			# numeric string was parsed again.
+			my @byg = map { [] } @groups;
+			my @allv;
+			for my $r (0 .. $R - 1) {
+				my $x = $vals->[$r];
+				next unless defined $x && looks_like_number($x);
+				my $num = 0 + $x;
+				push @{ $byg[ $gidx[$r] ] }, $num;
+				push @allv, $num;
+			}
 			for my $gi (0 .. $#groups) {
-				my @gv = grep { looks_like_number($_) }
-				         grep { defined } map { $vals[$_] } @{ $grp_rows[$gi] };
-				push @byg, \@gv;
-				$row{ $groups[$gi] } = @gv
-					? sprintf('%.*f (%.*f)', $digits, mean(\@gv), $digits, @gv > 1 ? sd(\@gv) : 0)
+				my $gv = $byg[$gi];
+				$row{ $groups[$gi] } = @$gv
+					? sprintf('%.*f (%.*f)', $digits, mean($gv), $digits, @$gv > 1 ? sd($gv) : 0)
 					: '';
 			}
-			my @allv = grep { looks_like_number($_) } grep { defined } @vals;
 			$row{Overall} = @allv
 				? sprintf('%.*f (%.*f)', $digits, mean(\@allv), $digits, @allv > 1 ? sd(\@allv) : 0)
 				: '';
@@ -5569,39 +5662,42 @@ sub table_one {
 			push @out, \%row;
 		}
 		else {
-			my %lseen;
-			my @levels = sort grep { !$lseen{$_}++ }
-			             map { defined $_ ? "$_" : 'NA' } @vals;
-			# Every count below comes from one pass per group plus one over the
-			# frame, looked up by level afterwards.
+			# One pass over the rows counts every (group, level) pair; the
+			# Overall count of a level is the sum over the groups, since every
+			# row is in exactly one.  Up to 0.3217 a string was built for every
+			# row and counted twice, and the levels listed came from the cells
+			# themselves, so a column shorter than the frame counted its rows
+			# past the end as NA without listing an NA row; they are listed now.
 			#
-			# They used to come from a `grep` over a group's rows for each
-			# (level, group) pair -- run twice, once to build the table
-			# _t1_cat_p() sees and again to format the output rows -- plus one
-			# more scan of every row per level for the Overall column. That is
-			# O(levels x groups x rows), and on 20000 rows it cost 0.021s at 5
-			# levels against 0.120s at 40, growing without bound in the number
-			# of levels where one pass is flat in it.
-			#
-			# $lab[$r] is the level row $r contributes, indexed over 0 .. $R-1
-			# rather than over @vals so that a column shorter than the frame
-			# still reads as 'NA' past its end, exactly as indexing $vals[$_]
-			# out of range did. @levels stays derived from @vals, so a level
-			# that no row in range carries still prints, with a count of 0.
-			my @lab = map { defined $vals[$_] ? "$vals[$_]" : 'NA' } 0 .. $R - 1;
-			my @gcnt;                         # $gcnt[$gi]{$level} = rows in that group
-			for my $gi (0 .. $#grp_rows) {
-				my %c;
-				$c{ $lab[$_] }++ for @{ $grp_rows[$gi] };
-				$gcnt[$gi] = \%c;
+			# Before that the counts came from a `grep` over a group's rows for
+			# each (level, group) pair -- run twice -- plus one more scan of
+			# every row per level for the Overall column: O(levels x groups x
+			# rows), which on 20000 rows cost 0.021s at 5 levels against 0.120s
+			# at 40.
+			my @gcnt = map { {} } @groups;   # $gcnt[$gi]{$level} = rows in that group
+			for my $r (0 .. $R - 1) {
+				my $x = $vals->[$r];
+				$gcnt[ $gidx[$r] ]{ defined $x ? $x : 'NA' }++;
 			}
 			my %allcnt;
-			$allcnt{$_}++ for @lab;
+			for my $c (@gcnt) { $allcnt{$_} += $c->{$_} for keys %$c }
+			my @levels = keys %allcnt;
+			# Numeric codes in numeric order -- a string sort put stage 10
+			# between 1 and 2 -- with NA last.  A NaN level has no numeric
+			# order, and <=> returning undef is fatal here, so it keeps the
+			# string sort.
+			my @known = grep { $_ ne 'NA' } @levels;
+			if (@known && !grep { !looks_like_number($_) || $_ != $_ } @known) {
+				@levels = ( (sort { $a <=> $b || $a cmp $b } @known),
+				            (@known < @levels ? 'NA' : ()) );
+			} else {
+				@levels = sort @levels;
+			}
 			my %hdr = (variable => $v, level => '', type => 'categorical');
 			if (defined $by && @groups >= 2) {
 				my @table;
 				for my $lv (@levels) {
-					push @table, [ map { $gcnt[$_]{$lv} || 0 } 0 .. $#grp_rows ];
+					push @table, [ map { $gcnt[$_]{$lv} || 0 } 0 .. $#groups ];
 				}
 				($hdr{'p_value'}, $hdr{test}) = _t1_cat_p(\@table);
 			}
@@ -5610,7 +5706,7 @@ sub table_one {
 				my %row = (variable => $v, level => $lv, type => 'categorical');
 				for my $gi (0 .. $#groups) {
 					my $cnt = $gcnt[$gi]{$lv} || 0;
-					my $tot = scalar @{ $grp_rows[$gi] };
+					my $tot = $gsize[$gi];
 					$row{ $groups[$gi] } = $tot ? sprintf('%d (%.*f%%)', $cnt, $pdig, 100 * $cnt / $tot) : '0';
 				}
 				my $cntall = $allcnt{$lv} || 0;
@@ -5637,17 +5733,33 @@ sub _num_pair {
 	return (\@xn, \@yn);
 }
 
-# cohen_d(\@x, \@y, conf_level => 0.95)
+# cohen_d(\@x, \@y, conf_level => 0.95, ci_method => 'nct')
 #
 # Cohen's d for two independent samples using the pooled standard deviation,
-# with the Hedges' g small-sample bias correction and a large-sample
-# (normal-approximation) confidence interval.
+# with the Hedges' g small-sample bias correction.
+#
+# The interval is effectsize 1.0.3's cohens_d() interval by default
+# (R/cohens_d.R): t = d / sqrt(1/n1 + 1/n2) on n1 + n2 - 2 df, the limits of
+# its noncentrality parameter (_nct_ncp_ci(), in the XS), each scaled back by
+# sqrt(1/n1 + 1/n2).  Up to 0.3217 it was d +- z * se, which effectsize's own
+# test of mtcars wt ~ am puts at 1.048 to 2.737 for its 1.030 to 2.732; that
+# interval is still there as ci_method => 'normal'.  se is Hedges and Olkin's
+# large-sample standard error, which effsize 0.8.1's cohen.d() also reports
+# (as sqrt of var); the 'nct' interval does not use it.
+#
+# J is the approximation 1 - 3/(4 df - 1) that effsize 0.8.1 uses, written
+# with df = n1 + n2 - 2.  effectsize 1.0.3 uses the exact gamma ratio; the two
+# differ by 4e-5 relative at df = 30 and by 3e-6 at df = 100.
 sub cohen_d {
 	my ($x, $y, %opt) = @_;
-	my @bad = sort grep { $_ ne 'conf_level' } keys %opt;
+	my @bad = sort grep { $_ ne 'conf_level' && $_ ne 'ci_method' } keys %opt;
 	die "cohen_d: unknown argument(s): @bad\n" if @bad;
 	my $cl = defined $opt{conf_level} ? $opt{conf_level} : 0.95;
-	die "cohen_d: conf_level must be between 0 and 1\n" unless $cl > 0 && $cl < 1;
+	die "cohen_d: conf_level must be between 0 and 1\n"
+		unless looks_like_number($cl) && $cl > 0 && $cl < 1;
+	my $method = defined $opt{ci_method} ? $opt{ci_method} : 'nct';
+	die "cohen_d: ci_method must be 'nct' or 'normal'\n"
+		unless $method eq 'nct' || $method eq 'normal';
 	my ($xn, $yn) = _num_pair($x, $y, 'cohen_d');
 	my ($n1, $n2) = (scalar @$xn, scalar @$yn);
 	my ($m1, $m2) = (mean($xn), mean($yn));
@@ -5657,14 +5769,22 @@ sub cohen_d {
 	my $d  = ($m1 - $m2) / $sp;
 	my $J  = 1 - 3 / (4 * ($n1 + $n2) - 9); # Hedges' correction factor
 	my $se = sqrt(($n1 + $n2) / ($n1 * $n2) + $d * $d / (2 * ($n1 + $n2)));
-	my $z  = qnorm((1 + $cl) / 2);
+	my @ci;
+	if ($method eq 'nct') {
+		my $hn = sqrt(1 / $n1 + 1 / $n2);
+		@ci = map { $_ * $hn } _nct_ncp_ci($d / $hn, $n1 + $n2 - 2, $cl);
+	} else {
+		my $z = qnorm((1 + $cl) / 2);
+		@ci = ($d - $z * $se, $d + $z * $se);
+	}
 	return {
 		estimate     => $d,
 		hedges_g     => $d * $J,
 		pooled_sd    => $sp,
 		se           => $se,
-		'conf_int'   => [ $d - $z * $se, $d + $z * $se ],
+		'conf_int'   => \@ci,
 		'conf_level' => $cl,
+		ci_method    => $method,
 		n1           => $n1,
 		n2           => $n2,
 	};
@@ -5674,14 +5794,26 @@ sub cohen_d {
 #
 # Standardized mean difference for two continuous groups using the simple
 # (unweighted) average of the group variances in the denominator -- the
-# convention used for covariate-balance "Table 1" diagnostics (R's tableone /
-# stddiff).  Returns the signed value.
+# convention used for covariate-balance "Table 1" diagnostics.  It is
+# tableone 0.13.2's StdDiff() (R/modules-smd.R) for one pair of groups, signed
+# where StdDiff() returns abs().
+#
+# A zero denominator is answered as StdDiff() answers it.  A column that is
+# one constant in both groups is 0, which StdDiff() substitutes for 0/0 and
+# smd 0.8.0's tests also expect; a column constant within each group but not
+# between them is +-Inf, StdDiff()'s mean difference over sqrt(0).  Up to
+# 0.3217 both died with "pooled standard deviation is zero", which took a
+# balance table down over one constant covariate.
 sub smd {
 	my ($x, $y) = @_;
 	my ($xn, $yn) = _num_pair($x, $y, 'smd');
+	my $diff  = mean($xn) - mean($yn);
 	my $denom = sqrt((var($xn) + var($yn)) / 2);
-	die "smd: pooled standard deviation is zero\n" if $denom == 0;
-	return (mean($xn) - mean($yn)) / $denom;
+	if ($denom == 0) {
+		return 0 if $diff == 0;
+		return $diff > 0 ? 9**9**9 : -9**9**9;
+	}
+	return $diff / $denom;
 }
 
 # _xtab(\@a, \@b) -> (\@table, \@rowlevels, \@collevels): contingency table
@@ -5732,6 +5864,9 @@ sub cramers_v {
 		}
 	}
 	die "cramers_v: table total is zero\n" unless $N;
+	# the bias correction divides by N - 1: up to 0.3217 a total of 1 died on
+	# perl's own "Illegal division by zero", naming a line of this file
+	die "cramers_v: the table total must be more than 1\n" unless $N > 1;
 	my $chi = 0;
 	for my $i (0 .. $r - 1) {
 		for my $j (0 .. $c - 1) {
@@ -5765,15 +5900,38 @@ sub cramers_v {
 # Eta-squared, partial eta-squared and omega-squared for a one-way design,
 # from the ANOVA sums of squares.  Accepts an aov() result hash (single factor)
 # or raw values + group labels.
+#
+# The raw form fits Group as a factor whatever its labels look like, through
+# oneway_test() or aov()'s stacked form; see below for which.  Up to 0.3217 it
+# passed aov() a formula, which fits a column whose values all look like
+# numbers as one slope: groups coded 1, 2, 3 were a linear trend with 1 df,
+# and the airquality Ozone ~ Month example gave eta_sq 0.0271 for R's 0.2352.
 sub eta_squared {
 	my @args = @_;
 	my $aov_res;
 	if (ref $args[0] eq 'HASH') {
 		$aov_res = $args[0];
 	} elsif (ref $args[0] eq 'ARRAY' && ref $args[1] eq 'ARRAY') {
+		my ($v, $g) = @args;
 		die "eta_squared: values and groups must have the same length\n"
-			unless @{ $args[0] } == @{ $args[1] };
-		$aov_res = aov({ __value => $args[0], __group => $args[1] }, '__value ~ __group');
+			unless @$v == @$g;
+		my %by;          # group label => its values; aov() drops an undef value itself
+		my $plain = 1;   # 0 = some value is undef or not a number
+		for my $i (0 .. $#$v) {
+			next unless defined $g->[$i];
+			my $x = $v->[$i];
+			$plain = 0 unless defined $x && looks_like_number($x);
+			push @{ $by{ $g->[$i] } }, $x;
+		}
+		# oneway_test(var_equal => 1) gives the table aov()'s stacked form does,
+		# from each group's sum and sum of squares rather than a design matrix:
+		# on 1e6 values in 5 groups, 0.10 s and 47 MB against 0.73 s and 326 MB.
+		# It refuses what aov() takes -- one group, a group of one value, and an
+		# undef or non-numeric value, which aov() drops -- so those go to aov().
+		my $small = grep { @$_ < 2 } values %by;   # groups of fewer than two values
+		$aov_res = $plain && keys %by >= 2 && !$small
+			? oneway_test(\%by, var_equal => 1)
+			: aov(\%by);
 	} else {
 		die "eta_squared: expected an aov() result or (\\\@values, \\\@groups)\n";
 	}
@@ -5781,10 +5939,15 @@ sub eta_squared {
 		or die "eta_squared: not an ANOVA result (no Residuals term)\n";
 	my $ss_resid = $resid->{'Sum Sq'};
 	my $ms_resid = $resid->{'Mean Sq'};
-	# the single non-Residuals effect term
-	my ($term) = grep { $_ ne 'Residuals' && ref $aov_res->{$_} eq 'HASH'
+	# SS_total below is SS_effect + SS_resid, which is the total only when there
+	# is one effect term.  Up to 0.3217 a two-factor result was answered for
+	# whichever term sorted first, with partial eta-squared reported as eta_sq.
+	my @terms = grep { $_ ne 'Residuals' && ref $aov_res->{$_} eq 'HASH'
 		&& exists $aov_res->{$_}{'Sum Sq'} } sort keys %$aov_res;
-	die "eta_squared: could not find an effect term\n" unless defined $term;
+	die "eta_squared: could not find an effect term\n" unless @terms;
+	die 'eta_squared: the aov() result has ' . @terms . " effect terms (@terms); "
+	  . "eta_squared() measures a one-way design, which has one\n" if @terms > 1;
+	my $term = $terms[0];
 	my $ss_eff = $aov_res->{$term}{'Sum Sq'};
 	my $df_eff = $aov_res->{$term}{'Df'};
 	my $ss_tot = $ss_eff + $ss_resid;
@@ -5802,60 +5965,178 @@ sub eta_squared {
 # living here.  They are now XS (see LikeR.xs), so there is one implementation
 # instead of two that could disagree; _lgamma went away entirely because only
 # _igamc ever called it.  _qnorm went the same way in 0.303: it was Acklam's
-# rational approximation, good to about 1e-9, and cohen_d's interval is now
-# built from the XS qnorm() that every other confidence limit in the
+# rational approximation, good to about 1e-9, and cohen_d's normal interval
+# is now built from the XS qnorm() that every other confidence limit in the
 # distribution uses.
 
-# _quantile7(\@sorted_ascending, $p): R's default (type 7) sample quantile.
+# _quantile7(\@sorted_ascending, $p): R's default (type 7) sample quantile,
+# in R 4.6.1 quantile.default()'s own arithmetic -- the 1-based index, and
+# (1 - h) * x[lo] + h * x[hi] rather than x[lo] + h * (x[hi] - x[lo]) -- so that
+# a break hosmer_lemeshow() compares a prediction against is R's to the bit.
 sub _quantile7 {
 	my ($s, $p) = @_;
-	my $n = scalar @$s;
-	return $s->[0] if $n == 1;
-	my $h = ($n - 1) * $p;
-	my $lo = int($h);
-	my $hi = $lo + 1 < $n ? $lo + 1 : $lo;
-	return $s->[$lo] + ($h - $lo) * ($s->[$hi] - $s->[$lo]);
+	my $index = 1 + (@$s - 1) * $p;
+	my $lo = int $index;                      # floor: $index >= 1
+	my $qs = $s->[$lo - 1];
+	return $qs unless $index > $lo && $s->[$lo] != $qs;
+	my $h = $index - $lo;
+	return (1 - $h) * $qs + $h * $s->[$lo];
+}
+
+# _chol(\@A) -> \@L: the lower Cholesky factor of a symmetric positive definite
+# matrix given as an array of rows, or undef when it is not positive definite.
+sub _chol {
+	my ($A) = @_;
+	my $n = @$A;
+	my @L = map { [ (0) x $n ] } 1 .. $n;
+	for my $j (0 .. $n - 1) {
+		my $s = $A->[$j][$j];
+		$s -= $L[$j][$_] ** 2 for 0 .. $j - 1;
+		return undef unless $s > 0;
+		my $d = sqrt $s;
+		$L[$j][$j] = $d;
+		for my $i ($j + 1 .. $n - 1) {
+			my $t = $A->[$i][$j];
+			$t -= $L[$i][$_] * $L[$j][$_] for 0 .. $j - 1;
+			$L[$i][$j] = $t / $d;
+		}
+	}
+	return \@L;
+}
+
+# _chol_det(\@A): the determinant of a symmetric positive definite matrix.
+sub _chol_det {
+	my $L = _chol($_[0]) or return 0;
+	my $det = 1;
+	$det *= $L->[$_][$_] ** 2 for 0 .. $#$L;
+	return $det;
 }
 
 # vif($data, $formula_or_predictors)
 #
-# Variance inflation factors for the numeric predictors of a linear model:
-# VIF_j = 1 / (1 - R^2_j), where R^2_j comes from regressing predictor j on all
-# the others.  The second argument is either a formula string (its right-hand
-# side terms are used) or an array reference of predictor column names.  Returns
-# a hash of predictor => VIF.  (Numeric predictors only; categorical predictors
-# would require a generalized VIF.)
+# Variance inflation factors, ported from car 3.1-5's vif.default()
+# (R/vif.R), which vif.lm() hands its default type = "terms" to:
+#
+#   R <- cov2cor(vcov(mod))[-1, -1]       # less the intercept
+#   GVIF_term = det(R[subs, subs]) * det(R[-subs, -subs]) / det(R)
+#
+# with subs the columns of one term, its result a plain VIF per term when
+# every term has 1 df and a GVIF, Df and GVIF^(1/(2*Df)) table when one has
+# more.  The design is the one lm() builds from the formula, read by the XS
+# _vif_design(); only its columns' correlation matters, so R here is the
+# correlation of the design columns rather than of the coefficients.  The two
+# give the same determinant ratio: by Jacobi's identity, det((C^-1)_SS) =
+# det(C_-S-S) / det(C), and the diagonal scaling of cov2cor() cancels.  So
+#
+#   GVIF_term = det(C[S, S]) * det(Cinv[S, S]),   C = cor(X), Cinv = C^-1
+#
+# which for a 1-df term is Cinv's diagonal, the classical 1 / (1 - R^2_j).
+# Without an intercept car uses the uncentred vcov, and C here is the
+# uncentred cross-product matrix scaled to a unit diagonal, by the same
+# identity.
+#
+# Through 0.3217 vif() split the formula's right-hand side on '+' and
+# regressed each piece on the others, so only additive numeric terms worked:
+# y ~ x1*x2 + x3, y ~ x1 + x2 - x3 and y ~ . all died, the first two with
+# lm()'s "0 degrees of freedom" and the last with "need at least two
+# predictors"; a factor was never handled; and a response's missing values
+# did not take its rows out, where car's model has none of them.
 sub vif {
 	my ($data, $spec) = @_;
 	die "vif: first argument must be a data reference\n" unless ref $data;
-	my @preds;
+	my $formula;
 	if (ref $spec eq 'ARRAY') {
-		@preds = @$spec;
-	} elsif (!ref $spec) {
-		my ($rhs) = $spec =~ /~\s*(.*)$/
-			or die "vif: expected a formula string or an array ref of predictors\n";
-		$rhs =~ s/\s+//g;
-		@preds = grep { length && $_ ne '1' && $_ ne '-1' } split /\+/, $rhs;
+		$formula = '~ ' . join(' + ', @$spec);
+	} elsif (defined $spec && !ref $spec && $spec =~ /~/) {
+		$formula = $spec;
 	} else {
 		die "vif: expected a formula string or an array ref of predictors\n";
 	}
-	die "vif: need at least two predictors\n" if @preds < 2;
-	my %out;
-	for my $p (@preds) {
-		my @others = grep { $_ ne $p } @preds;
-		my $m = lm(formula => "$p ~ " . join(' + ', @others), data => $data);
-		my $r2 = $m->{'r_squared'};
-		$out{$p} = ($r2 >= 1) ? 9**9**9 : 1 / (1 - $r2);
+	# the XS croaks from this line, so its messages would name a line of this
+	# file; vif()'s own messages carry no location, and neither do these
+	my $ds = eval { _vif_design($data, $formula) };
+	if (!$ds) {
+		(my $e = $@) =~ s/ at \S+ line \d+\.\n\z/\n/;
+		die $e;
 	}
-	return \%out;
+	die 'vif: there are aliased coefficients in the model (' . join(', ', @{ $ds->{aliased} }) . ")\n"
+		if @{ $ds->{aliased} };
+	# car counts the formula's terms; a factor with one level has no column
+	# here, and lm() leaves it out of the fit, so it is not one of them
+	my @terms = grep { $ds->{order}[$_] } 0 .. $#{ $ds->{term_labels} };
+	die "vif: model contains fewer than 2 terms\n" if @terms < 2;
+	warn "vif: No intercept: vifs may not be sensible.\n" unless $ds->{intercept};
+	warn "vif: there are higher-order terms (interactions) in this model\n"
+		if grep { $ds->{order}[$_] > 1 } @terms;
+	my $q = @{ $ds->{names} };
+	my $x = $ds->{cross};
+	my @sd = map { sqrt $x->[$_ * $q + $_] } 0 .. $q - 1;
+	my @C;
+	for my $i (0 .. $q - 1) {
+		$C[$i][$_] = $x->[$i * $q + $_] / ($sd[$i] * $sd[$_]) for 0 .. $q - 1;
+	}
+	my $L = _chol(\@C) or die "vif: there are aliased coefficients in the model\n";
+	# Cinv = L'^-1 L^-1, from M = L^-1
+	my @M = map { [ (0) x $q ] } 1 .. $q;
+	for my $j (0 .. $q - 1) {
+		$M[$j][$j] = 1 / $L->[$j][$j];
+		for my $i ($j + 1 .. $q - 1) {
+			my $s = 0;
+			$s += $L->[$i][$_] * $M[$_][$j] for $j .. $i - 1;
+			$M[$i][$j] = -$s / $L->[$i][$i];
+		}
+	}
+	my @Cinv;
+	for my $i (0 .. $q - 1) {
+		for my $j ($i .. $q - 1) {
+			my $s = 0;
+			$s += $M[$_][$i] * $M[$_][$j] for $j .. $q - 1;
+			$Cinv[$i][$j] = $Cinv[$j][$i] = $s;
+		}
+	}
+	my (%gvif, %df);
+	for my $t (@terms) {
+		my @S = grep { $ds->{assign}[$_] == $t + 1 } 0 .. $q - 1;
+		my $label = $ds->{term_labels}[$t];
+		$df{$label} = @S;
+		$gvif{$label} = @S == 1
+			? $Cinv[ $S[0] ][ $S[0] ]
+			: _chol_det([ map { my $i = $_; [ @{ $C[$i] }[@S] ] } @S ])
+			* _chol_det([ map { my $i = $_; [ @{ $Cinv[$i] }[@S] ] } @S ]);
+	}
+	return \%gvif unless grep { $_ > 1 } values %df;
+	return { map { $_ => {
+		GVIF              => $gvif{$_},
+		Df                => $df{$_},
+		'GVIF^(1/(2*Df))' => $gvif{$_} ** (1 / (2 * $df{$_})),
+	} } keys %gvif };
 }
 
 # hosmer_lemeshow(\@observed, \@predicted, g => 10)
 #
-# Hosmer-Lemeshow goodness-of-fit test for a logistic model.  Observations are
-# grouped into `g` bins by risk deciles of the predicted probabilities (R's
-# cut() on type-7 quantiles, as in ResourceSelection::hoslem.test); the statistic
-# compares observed and expected event counts per bin.  df = g - 2.
+# Hosmer-Lemeshow goodness-of-fit test for a logistic model, ported from
+# ResourceSelection 0.3-6's hoslem.test() (R/hoslem.test.R):
+#
+#   qq <- unique(quantile(yhat, probs = seq(0, 1, 1/g)))
+#   cutyhat <- cut(yhat, breaks = qq, include.lowest = TRUE)
+#   chisq <- sum((observed - expected)^2/expected)
+#   G <- length(unique(cutyhat)); df = G - 2
+#
+# Up to 0.3217 the breaks were not made unique, so a prediction tied at the
+# lowest break -- every prediction from a model with only categorical
+# predictors -- was a group of its own rather than part of the first one; and
+# df was g - 2 where 0.3-6 has G - 2, the number of groups that hold a row.
+#
+# Two departures from 0.3-6, both where it has no usable answer:
+#  * an empty bin, which cut() makes when two breaks fall in the gap between
+#    the same two sorted predictions, is left out rather than added as 0/0,
+#    which made R's statistic NaN; a bin whose expected count is 0 and whose
+#    observed count is also 0 adds 0 for the same reason.
+#  * the last break is the largest prediction.  seq(0, 1, 1/g) ends at
+#    1 - 2^-53 rather than 1 for some g (49 is the first), and the last
+#    quantile then falls below the largest prediction, which cut() leaves out of
+#    every bin: at g = 49 the package's own example bins 499 of 500 rows and,
+#    counting the NA as a group, reports df 48.
 sub hosmer_lemeshow {
 	my ($obs, $pred, %opt) = @_;
 	die "hosmer_lemeshow: observed and predicted must be array references\n"
@@ -5863,7 +6144,8 @@ sub hosmer_lemeshow {
 	die "hosmer_lemeshow: observed and predicted must have the same length\n"
 		unless @$obs == @$pred;
 	my $g = defined $opt{g} ? $opt{g} : 10;
-	die "hosmer_lemeshow: g must be at least 3\n" if $g < 3;
+	die "hosmer_lemeshow: g must be an integer of at least 3\n"
+		unless looks_like_number($g) && $g == int $g && $g >= 3;
 
 	my (@y, @p);
 	for my $i (0 .. $#$obs) {
@@ -5876,36 +6158,56 @@ sub hosmer_lemeshow {
 	die "hosmer_lemeshow: not enough complete observations for g=$g groups\n" if $n < $g;
 
 	my @sorted = sort { $a <=> $b } @p;
-	my @breaks = map { _quantile7(\@sorted, $_ / $g) } 0 .. $g;
+	# seq(0, 1, 1/g) is (0:g) * (1/g) in R, not (0:g) / g; the two differ in
+	# the last bit for some k, and with it which side of a tie a break lands on.
+	my $step = 1 / $g;
+	my @br = sort { $a <=> $b }
+		( map( { _quantile7(\@sorted, $_ * $step) } 0 .. $g - 1 ), $sorted[-1] );
+	my @qq = ($br[0]);
+	for my $b (@br[1 .. $#br]) { push @qq, $b if $b != $qq[-1] }
+	die "hosmer_lemeshow: every prediction is $qq[0], so there is only one group\n"
+		if @qq < 2;
 
+	my $nbin = $#qq;
 	my (@O1, @O0, @E1, @E0, @ng);
-	$O1[$_] = $O0[$_] = $E1[$_] = $E0[$_] = $ng[$_] = 0 for 0 .. $g - 1;
+	$O1[$_] = $O0[$_] = $E1[$_] = $E0[$_] = $ng[$_] = 0 for 0 .. $nbin - 1;
 	for my $i (0 .. $n - 1) {
-		# cut(..., include.lowest = TRUE): first interval closed on the left,
-		# every other interval left-open / right-closed.
-		my $gi = $g - 1;
-		for my $j (1 .. $g) { if ($p[$i] <= $breaks[$j]) { $gi = $j - 1; last } }
-		$O1[$gi] += $y[$i];
-		$O0[$gi] += 1 - $y[$i];
-		$E1[$gi] += $p[$i];
-		$E0[$gi] += 1 - $p[$i];
-		$ng[$gi]++;
+		# cut(..., include.lowest = TRUE): bin 0 is [qq0, qq1], bin k is
+		# (qq_k, qq_k+1].  A binary search for the first break >= the
+		# prediction, as R's .bincode() does.
+		my ($lo, $hi) = (0, $nbin);
+		while ($hi - $lo > 1) {
+			my $mid = ($lo + $hi) >> 1;
+			if ($p[$i] > $qq[$mid]) { $lo = $mid } else { $hi = $mid }
+		}
+		$O1[$lo] += $y[$i];
+		$O0[$lo] += 1 - $y[$i];
+		$E1[$lo] += $p[$i];
+		$E0[$lo] += 1 - $p[$i];
+		$ng[$lo]++;
 	}
 
 	my ($chi, $used) = (0, 0);
 	my @groups;
-	for my $j (0 .. $g - 1) {
+	for my $j (0 .. $nbin - 1) {
 		next unless $ng[$j];
 		$used++;
-		$chi += ($O1[$j] - $E1[$j]) ** 2 / $E1[$j] if $E1[$j] > 0;
-		$chi += ($O0[$j] - $E0[$j]) ** 2 / $E0[$j] if $E0[$j] > 0;
+		for my $oe ([ $O1[$j], $E1[$j] ], [ $O0[$j], $E0[$j] ]) {
+			my ($o, $e) = @$oe;
+			$chi += $e ? ($o - $e) ** 2 / $e : $o ? 9**9**9 : 0;
+		}
 		push @groups, { n => $ng[$j], observed => $O1[$j], expected => $E1[$j] };
 	}
-	my $df = $g - 2;
+	die "hosmer_lemeshow: the predictions allow only one group\n" if $used < 2;
+	warn "hosmer_lemeshow: the data allowed $used of the $g groups requested\n"
+		if $used < $g;
+	my $df = $used - 2;
 	return {
 		statistic => $chi,
 		parameter => $df,
-		'p_value'   => _pchisq_upper($chi, $df),
+		# not _pchisq_upper(), which is NaN at an infinite statistic and 1 at
+		# df 0, where R's 1 - pchisq(chisq, 0) is 0 for any chisq > 0
+		'p_value'   => pchisq($chi, $df, lower => 0),
 		groups    => $used,
 		table     => \@groups,
 	};
@@ -6418,7 +6720,7 @@ Stats::LikeR - Get basic statistical functions, like in R, but with Perl using X
 
 =head1 VERSION
 
-version 0.3217
+version 0.3218
 
 =head1 Synopsis
 
@@ -7226,7 +7528,8 @@ C<df.set_index('k')['v'].to_dict()>.
 =head3 Arguments
 
 C<$aoh> — an array ref of hash refs. Required. Every row has to be a hash ref
-carrying both named columns.
+carrying both named columns. A blessed array or row is fine, and so is a tied
+one.
 
 Everything after it is C<< name =E<gt> value >> pairs:
 
@@ -7264,8 +7567,14 @@ C<var_name> and C<value_name> must differ.
 A hash ref mapping each row's C<var_name> cell to its C<value_name> cell. An
 empty array ref gives back C<{}>.
 
-Values are assigned across, so a value that is itself a reference is shared
-with the input rather than cloned — the same shallow copy C<aoh2hoa> makes.
+A key is the string Perl makes of the key cell, so the number C<2.50> becomes
+the key C<2.5>. A key cell that holds a reference is an error, because its
+string is the reference's address. An object that overloads its operators is
+keyed by its string form, and a compiled pattern (C<qr//>) by its pattern.
+
+Values are copied across, so a value that is itself a reference is shared with
+the input rather than cloned — the same shallow copy C<aoh2hoa> makes. The input
+is not changed.
 
 =head3 Example
 
@@ -7292,12 +7601,13 @@ same way.
 =head3 Errors
 
 C<aoh2h> dies when the first argument is undefined or not an array ref, when the
-options are not C<< name =E<gt> value >> pairs, when an option is unknown, when
-C<var_name> equals C<value_name>, when C<duplicates> is not one of the three
-allowed words, when a row is not a hash ref, when a row is missing either named
-column, when a row's key cell is C<undef>, or — under the default
-C<< duplicates =E<gt> 'die' >> — when two rows share a key. Every message names the
-offending row by index.
+options are not C<< name =E<gt> value >> pairs, when an option name is C<undef> or
+unknown, when C<var_name> equals C<value_name>, when C<duplicates> is not one of
+the three allowed words, when a row is not a hash ref, when a row is missing
+either named column, when a row's key cell is C<undef> or a reference, or —
+under the default C<< duplicates =E<gt> 'die' >> — when two rows share a key. Every
+message about a row names it by index; for a shared key, that is the index of
+the first repeat.
 
 =head3 See also
 
@@ -8597,13 +8907,48 @@ C<Inf>.
 =head2 cohen_d
 
 Cohen's I<d> effect size for the difference between two independent groups, using
-the pooled standard deviation. It also returns the Hedges' I<g> small-sample
-correction and a large-sample (normal-approximation) confidence interval.
-Validated numerically against R.
+the pooled standard deviation, with the Hedges' I<g> small-sample correction and
+a confidence interval. Same as C<effectsize::cohens_d()> (effectsize 1.0.3), and
+validated against its tests and effsize 0.8.1's.
 
  my $d = cohen_d(\@treatment, \@control);           # or conf_level => 0.90
  printf "d = %.2f (95%% CI %.2f–%.2f), Hedges g = %.2f\n",
      $d->{estimate}, $d->{'conf_int'}[0], $d->{'conf_int'}[1], $d->{hedges_g};
+
+The interval is the exact one under normality, C<effectsize>'s default: with
+C<t = d / sqrt(1/n1 + 1/n2)> on C<n1 + n2 - 2> degrees of freedom, the limits of
+the noncentral I<t>'s noncentrality parameter that put C<t> at its two
+C<(1 - conf_level)/2> points, each scaled back by C<sqrt(1/n1 + 1/n2)>.
+C<< ci_method =E<gt> 'normal' >> gives the large-sample interval C<d ± z se> instead,
+which was the default up to 0.3217 and is a little narrow in small samples: on
+mtcars' weight by transmission it is 1.048 to 2.737 where the exact interval is
+1.030 to 2.733.
+
+=for html <table>
+<thead>
+<tr>
+  <th>Option</th>
+  <th>Default</th>
+  <th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>conf_level</code></td>
+  <td><code>0.95</code></td>
+  <td>Confidence level of <code>conf_int</code>.</td>
+</tr>
+<tr>
+  <td><code>ci_method</code></td>
+  <td><code>'nct'</code></td>
+  <td><code>'nct'</code> for the noncentral-<i>t</i> interval, <code>'normal'</code> for <code>d ± z se</code>.</td>
+</tr>
+</tbody>
+</table>
+
+Hedges' I<g> is I<d> times C<1 - 3/(4 df - 1)>, the approximation C<effsize> uses;
+C<effectsize> uses the exact gamma-function ratio, which differs from it by 4e-5
+relative at 30 degrees of freedom and by 3e-6 at 100.
 
 Compare with L</"smd">, which standardizes by the simple (unweighted) average
 of the group variances and is the convention for covariate-balance tables.
@@ -8641,20 +8986,26 @@ of the group variances and is the convention for covariate-balance tables.
 <tr>
   <td><code>se</code></td>
   <td><code>Double</code></td>
-  <td>Approximate standard error of <i>d</i>.</td>
+  <td>Hedges and Olkin's large-sample standard error of <i>d</i>, which <code>effsize</code> also reports; only the <code>'normal'</code> interval uses it.</td>
   <td><code>0.6907</code></td>
 </tr>
 <tr>
   <td><code>conf_int</code></td>
   <td><code>ArrayRef</code></td>
-  <td><code>[lower, upper]</code> normal-approximation CI for <i>d</i>.</td>
-  <td><code>[0.96, 3.67]</code></td>
+  <td><code>[lower, upper]</code> confidence interval for <i>d</i>.</td>
+  <td><code>[0.90, 3.68]</code></td>
 </tr>
 <tr>
   <td><code>conf_level</code></td>
   <td><code>Double</code></td>
   <td>Confidence level used.</td>
   <td><code>0.95</code></td>
+</tr>
+<tr>
+  <td><code>ci_method</code></td>
+  <td><code>String</code></td>
+  <td><code>'nct'</code> or <code>'normal'</code>, the interval returned.</td>
+  <td><code>nct</code></td>
 </tr>
 <tr>
   <td><code>n1</code>, <code>n2</code></td>
@@ -9873,6 +10224,12 @@ does. An C<undef> element becomes C<NaN>.
  my $z  = qnorm(0.975);                 # 1.959963984540054
  my $zs = qnorm([0.025, 0.5, 0.975]);   # [-1.9599639845, 0, 1.9599639845]
 
+C<< df =E<gt> 0 >> is a chi-square with all its mass at 0, as in R, not an invalid
+parameter: C<pchisq($q, 0)> is 0 for C<< $q E<lt>= 0 >> and 1 above it, and
+C<qchisq($p, 0)> is 0, or C<Inf> at C<$p = 1>. R's own C<tests/d-p-q-r-tst-2.R>
+pins those values; up to 0.3217 both functions returned C<NaN> there. A negative
+C<df> is still C<NaN>.
+
 =head3 What each one does, in one picture
 
 The same identity read from two ends: a C<p*> function is given the boundary and
@@ -10418,6 +10775,14 @@ sums of squares. Returns η², partial η² (equal to η² for a one-way design)
 ω² (omega-squared, a less biased estimator). Accepts either raw values and group
 labels or an existing L<C<aov>|/"aov"> result. Validated numerically against R.
 
+The group labels are a factor whatever they look like: codes C<1, 2, 3> are
+three groups, not one slope. Up to 0.3217 numeric codes were fitted as a slope,
+so R's C<airquality> example, Ozone by Month 5 to 9, gave η² 0.027 for R's
+0.235. An undef value or group drops its row. An C<aov> result must have exactly
+one effect term; a two-factor result is refused rather than answered for one of
+its terms. An C<aov> fitted from a formula still treats a numeric column as a
+slope, as R's C<aov()> does without C<factor()>.
+
  my $e = eta_squared(\@values, \@group);            # or eta_squared($aov_result)
  printf "eta^2 = %.3f, omega^2 = %.3f\n", $e->{eta_sq}, $e->{omega_sq};
 
@@ -10454,7 +10819,7 @@ labels or an existing L<C<aov>|/"aov"> result. Validated numerically against R.
 <tr>
   <td><code>term</code></td>
   <td><code>String</code></td>
-  <td>Name of the effect term used.</td>
+  <td>Name of the effect term used: <code>Group</code> for raw values and labels.</td>
   <td><code>"grp"</code></td>
 </tr>
 </tbody>
@@ -11027,7 +11392,7 @@ errors are right as they stand.
   <td><code>formula</code></td>
   <td><code>String</code></td>
   <td><i>None (Required)</i></td>
-  <td>A symbolic description of the model to be fitted. Parsed by the same code as [<code>lm</code>](#lm)'s, so it takes the same operators: <code>+</code>, <code>:</code>, <code>*</code>, <code>^</code>, <code>.</code> for every remaining column, and <code>-1</code> / <code>+0</code> to remove the intercept. It may also hold <code>offset()</code> terms, and factors to absorb after a <code>|</code>.</td>
+  <td>A symbolic description of the model to be fitted. Parsed by the same code as [<code>lm</code>](#lm)'s, so it takes the same operators: <code>+</code>, <code>:</code>, <code>*</code>, <code>^</code>, <code>.</code> for every remaining column, <code>- b</code> to remove a term, and <code>-1</code> / <code>+0</code> to remove the intercept. It may also hold <code>offset()</code> terms, and factors to absorb after a <code>|</code>.</td>
   <td><code>'am ~ wt + hp'</code>, <code>'y ~ x - 1'</code>, <code>'y ~ .'</code></td>
 </tr>
 <tr>
@@ -11568,8 +11933,9 @@ An empty hash gives back C<[]>. C<undef> values are carried through as C<undef>.
 =head3 Errors
 
 C<h2aoh> dies when the argument is undefined or not a hash ref, when the options
-are not C<< name =E<gt> value >> pairs, when an option is unknown, when C<var_name>
-equals C<value_name>, or when C<sort> is not one of the three allowed words.
+are not C<< name =E<gt> value >> pairs, when an option name is C<undef> or unknown, when
+C<var_name> equals C<value_name>, or when C<sort> is not one of the three allowed
+words.
 
 It also dies when any value is a B<reference>, naming the key and pointing at
 the converter that was probably meant: a hash of array refs is
@@ -11800,8 +12166,23 @@ The Hosmer-Lemeshow goodness-of-fit test for a logistic-regression model. Given
 the observed 0/1 outcomes and the model's predicted probabilities, it bins the
 observations into C<g> risk groups (deciles by default) and compares observed and
 expected event counts. A large p-value indicates the model fits adequately. The
-grouping and statistic follow R's C<ResourceSelection::hoslem.test>, against which
-it was validated numerically.
+grouping, statistic and degrees of freedom are those of C<hoslem.test()> in R's
+ResourceSelection 0.3-6, and C<t/hosmer_lemeshow.R.t> holds it to that
+function's own documented example at 17 values of C<g>.
+
+The bins are cut at the I<distinct> quantiles of the predictions, so tied
+predictions — every prediction from a model whose predictors are all
+categorical — can leave fewer than C<g> groups. The degrees of freedom are then
+C<groups - 2>, not C<g - 2>, and a warning says how many groups the data allowed,
+as R's does. One group is an error. Up to 0.3217 tied breaks were kept, which
+gave a tie at the lowest break a group of its own, and the degrees of freedom
+were always C<g - 2>.
+
+Two cases depart from C<hoslem.test()>, which has no usable answer in either:
+a cell whose observed and expected counts are both 0, as in an empty bin, adds
+0 to the statistic where R adds 0/0 and returns C<NaN>; and the last break is
+the largest prediction, where R's C<seq(0, 1, 1/g)> falls short of 1 at some
+C<g> (49 is the first) and leaves the largest prediction out of every bin.
 
  # $fit is a binomial glm(); align observed outcomes with fitted_values
  my @obs  = map { $data{$_}{outcome} } @ids;
@@ -11868,7 +12249,7 @@ it was validated numerically.
 <tr>
   <td><code>parameter</code></td>
   <td><code>Integer</code></td>
-  <td>Degrees of freedom, <code>g - 2</code>.</td>
+  <td>Degrees of freedom, <code>groups - 2</code>.</td>
   <td><code>8</code></td>
 </tr>
 <tr>
@@ -11880,7 +12261,7 @@ it was validated numerically.
 <tr>
   <td><code>groups</code></td>
   <td><code>Integer</code></td>
-  <td>Number of non-empty groups used.</td>
+  <td>Number of groups that hold a row; fewer than <code>g</code> when predictions are tied.</td>
   <td><code>10</code></td>
 </tr>
 <tr>
@@ -12668,7 +13049,14 @@ cross-classification.
 
 If your data contains missing numbers (C<NA> or C<undef>), C<lm> handles listwise deletion dynamically to ensure mathematical integrity before fitting. A row whose categorical value is missing is dropped the same way.
 
-Three details differ from R deliberately:
+A term is removed with C<->, as in R: C<y ~ x*z - x:z> fits C<y ~ x + z>,
+C<y ~ . - id> fits every column but C<id> (and the response), and C<- x*z> takes
+out C<x>, C<z> and C<x:z> together. Removing a term the model does not have
+changes nothing. Only a C<-> outside parentheses removes, and a term that is
+itself the name of a column is that column, so a column named C<a-b> can still be
+written C<y ~ a-b>.
+
+Four details differ from R deliberately:
 
 =over
 
@@ -12686,6 +13074,12 @@ C<a>, making the same formula mean C<y ~ wt> there.
 =item * A categorical column with only one level contributes no column, so
 C<y ~ x + g> fits C<y ~ x>. R refuses the model outright ("contrasts can be
 applied only to factors with 2 or more levels").
+
+=item * An interaction's variables are named in the order they first appear among
+the terms that remain after removals, where R orders them by the whole
+formula. So C<y ~ x*z*w - x*z>, whose first remaining term is C<w>, names its
+interactions C<w:x>, C<w:z> and C<w:x:z> where R has C<x:w>, C<z:w> and C<x:z:w>.
+The fit is the same.
 
 =back
 
@@ -14927,6 +15321,16 @@ C<col_names>. With C<< header =E<gt> 0 >>, a line starting with the comment mark
 always a comment, even C<#text> with no space after the marker, as in R; with a
 header, such a line can be a commented-out header, as described below.
 
+A row with more or fewer fields than the table has columns is an
+C<Alignment error>, which names the row and says what its field count was
+compared with: C<3 headers>, C<3 'col_names'>, or, with C<< header =E<gt> 0 >> and no
+C<col_names>, C<3 in data row 1>. When the header or data row 1 was a single
+field, with no separator in it, and the row has more, it adds that C<sep> may be
+wrong. The default C<sep> comes from the file's name, so a C<;>-separated file
+named C<.csv> or C<.csv.gz> fails that way until it is told otherwise:
+
+ my $d = read_table('annotation.csv.gz', header => 0, sep => ';');
+
 C<< quote =E<gt> '' >> turns quoting off: a C<"> is kept as ordinary text wherever it
 appears. By default a C<"> anywhere in a field opens a quoted field that runs to
 the next C<">, possibly many lines later, so a file whose quotes are not CSV
@@ -15921,10 +16325,16 @@ departure from it.
 
 Standardized mean difference between two continuous groups, standardizing by the
 simple (unweighted) average of the group variances — the convention used for
-covariate-balance diagnostics in "Table 1" (R's C<tableone> / C<stddiff>). Returns
-the signed value. Validated numerically against R.
+covariate-balance diagnostics in "Table 1". It is C<tableone>'s continuous SMD
+(tableone 0.13.2, C<StdDiff()>), validated against that package's tests, but
+signed: C<tableone> reports the absolute value.
 
  my $balance = smd(\@exposed_age, \@unexposed_age);   # |smd| < 0.1 is well balanced
+
+A column that is one constant in both groups has an SMD of 0, which is how
+C<tableone> defines the 0/0, and a column that is constant within each group but
+differs between them is C<±Inf>. Values that are C<undef> or not numbers are
+dropped; each group needs two that are left.
 
 Unlike L</"cohen_d"> (which pools by sample size), C<smd> weights the two
 group variances equally, so the two diverge when the groups differ in size.
@@ -16184,6 +16594,17 @@ C<< nonparametric =E<gt> 1 >>), chi-squared for categorical. Options: C<by>, C<v
 (which columns), C<types> (override a column's type), C<nonparametric>, C<digits>,
 C<pct_digits>. Each returned row has C<variable>, C<level>, one column per group,
 C<Overall>, and — on a variable's row — C<p_value> and C<test>.
+
+A variable whose test cannot run has no C<p_value> or C<test>, and the rest of
+the table is unaffected: a categorical one that C<chisq_test> cannot test, or a
+continuous one that is constant or has a single observation in a group. Up to
+0.3217 the continuous case died, taking the whole table with it.
+
+Because each group is a key of every row, a C<by> column with a group named
+C<variable>, C<level>, C<type>, C<p_value>, C<test> or C<Overall> is an error. A
+C<types> value must be C<continuous> or C<categorical>. Categorical levels are
+listed in string order, except that levels which are all numbers are listed in
+numeric order, with C<NA> last.
 
 =head2 t_test
 
@@ -17073,19 +17494,69 @@ C<to> output paths, empty structures, and the error cases.
 =head2 vif
 
 Variance inflation factors, the standard multicollinearity diagnostic for a
-regression model. For each predictor, C<vif> regresses it on all the other
-predictors and reports C<1 / (1 - R²)>; values above ~5–10 flag problematic
-collinearity. The second argument is either a formula string (its right-hand-side
-terms are used) or an array reference of predictor column names. Validated
-numerically against R. Numeric predictors only — categorical predictors would
-need a generalized VIF.
+regression model; values above ~5–10 flag problematic collinearity. Same as
+C<car::vif()> (car 3.1-5) at its default C<type = "terms">, and validated against
+it.
 
- my $v = vif(\%data, [qw(age bmi sbp chol)]);        # or 'y ~ age + bmi + sbp + chol'
+ my $v = vif(\%data, 'sbp ~ age + bmi + chol');      # or [qw(age bmi chol)]
  for my $p (sort { $v->{$b} <=> $v->{$a} } keys %$v) {
      printf "%-6s VIF = %.2f\n", $p, $v->{$p};
  }
 
-Returns a hash of C<< predictor =E<gt> VIF >>.
+The second argument is a formula, read exactly as L</"lm"> reads it, or an
+array reference of column names, which is the formula C<~ age + bmi + chol>. A
+formula's response is not needed, since a VIF depends only on the predictors,
+but when there is one it takes out the rows where it is missing, as it does
+from the model C<car::vif()> is given. So interactions, removed terms, C<.> and
+factors are all understood:
+
+ vif(\%data, 'sbp ~ age * bmi + chol');      # terms age, bmi, chol, age:bmi
+ vif(\%data, 'sbp ~ . - id');
+ vif(\%data, [qw(age bmi smoking)]);         # smoking is a factor: a GVIF table
+
+For each term, with C<C> the correlation matrix of the design's columns less the
+intercept and C<S> the term's own columns,
+
+ GVIF = det(C[S, S]) * det(C[-S, -S]) / det(C)
+
+which for a term with one column is the familiar C<1 / (1 - R²)> from
+regressing that column on all the others. This is Fox and Monette's
+generalized VIF, the quantity C<car::vif()> computes.
+
+When every term has one column, as numeric main effects and their products do,
+the result is a hash of C<< term =E<gt> VIF >>. When any term has more, as a factor with
+three or more levels does, each term maps to a hash instead, as C<car::vif()>'s
+result becomes a table:
+
+=for html <table>
+<thead>
+<tr>
+  <th>Key</th>
+  <th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>GVIF</code></td>
+  <td>The generalized VIF.</td>
+</tr>
+<tr>
+  <td><code>Df</code></td>
+  <td>The term's number of columns.</td>
+</tr>
+<tr>
+  <td><code>GVIF^(1/(2*Df))</code></td>
+  <td><code>GVIF</code> to the power <code>1/(2 Df)</code>, comparable across terms of different sizes.</td>
+</tr>
+</tbody>
+</table>
+
+As in C<car::vif()>, a model with an interaction warns that "there are
+higher-order terms (interactions) in this model" (car's C<type = "predictor"> is
+not implemented), a model with no intercept warns "No intercept: vifs may not be
+sensible.", and a model with fewer than two terms, or with an aliased column,
+is an error. A formula whose response is a name the data do not have is an
+error too.
 
 =head2 wilcox_test
 

@@ -1,0 +1,278 @@
+---
+20-use:
+  10-none:
+    check: inc
+    expect:
+      - lib
+  20-base-lib:
+    args:
+      - base=lib
+    check: inc
+    expect:
+      - lib
+  21-use-base-lib:
+    args:
+      - use
+      - base=lib
+    check: inc
+    expect:
+      - lib
+  30-base-foo:
+    setup:
+      - 20-use/foo
+    args:
+      - base=foo
+    check: inc
+    expect:
+      - 20-use/foo
+  40-base-foo-subdir-bar:
+    setup:
+      - 20-use/foo
+      - 20-use/foo/bar
+    args:
+      - base=foo
+      - subdir=bar
+    check: inc
+    expect:
+      - 20-use/foo/bar
+      - 20-use/foo
+  50-base-foo-subdir-bar-subonly:
+    setup:
+      - 20-use/foo
+      - 20-use/foo/bar
+    args:
+      - base=foo
+      - subdir=bar
+      - subonly
+    check: inc
+    expect:
+      - 20-use/foo/bar
+21-export:
+  10-none:
+    args:
+      - export
+    check: export
+    var: lib
+    expect:
+      - lib
+  11-export-lib:
+    args:
+      - export=lib
+    check: export
+    var: lib
+    expect:
+      - lib
+  12-export-foo:
+    args:
+      - export=foo
+    check: export
+    var: foo
+    expect:
+      - lib
+  13-export-foo-scalar:
+    args:
+      - export=foo
+      - scalar
+    check: export
+    var: foo
+    expect:
+      - lib
+  20-base-foo:
+    setup:
+      - 21-export/foo
+    args:
+      - export
+      - base=foo
+    check: export
+    var: foo
+    expect:
+      - 21-export/foo
+  21-base-foo-subdir-bar:
+    setup:
+      - 21-export/foo
+      - 21-export/foo/bar
+    args:
+      - export
+      - base=foo
+      - subdir=bar
+    check: export
+    var: foo
+    expect:
+      - 21-export/foo/bar
+      - 21-export/foo
+  22-export-bim-base-foo-subdir-bar:
+    setup:
+      - 21-export/foo
+      - 21-export/foo/bar
+    args:
+      - export=bim
+      - base=foo
+      - subdir=bar
+    check: export
+    var: bim
+    expect:
+      - 21-export/foo/bar
+      - 21-export/foo
+  23-export-bim-base-foo-subdir-bar-subonly:
+    setup:
+      - 21-export/foo
+      - 21-export/foo/bar
+    args:
+      - export=bim
+      - base=foo
+      - subdir=bar
+      - subonly
+    check: export
+    var: bim
+    expect:
+      - 21-export/foo/bar
+  24-export-base-foo-subdir-bar-subonly-scalar:
+    setup:
+      - 21-export/foo
+      - 21-export/foo/bar
+    args:
+      - export
+      - base=foo
+      - subdir=bar
+      - subonly
+      - scalar
+    check: export
+    var: foo
+    expect:
+      - 21-export/foo/bar
+  25-export-bim-base-foo-subdir-bar-subonly-scalar:
+    setup:
+      - 21-export/foo
+      - 21-export/foo/bar
+    args:
+      - export=bim
+      - base=foo
+      - subdir=bar
+      - subonly
+      - scalar
+    check: export
+    var: bim
+    expect:
+      - 21-export/foo/bar
+22-perl5lib:
+  10-none:
+    args:
+      - p5lib
+    check: env
+    env_key: PERL5LIB
+    expect:
+      - lib
+  20-base-lib:
+    args:
+      - p5lib
+      - base=lib
+    check: env
+    env_key: PERL5LIB
+    expect:
+      - lib
+  21-use-base-lib:
+    args:
+      - p5lib
+      - use
+      - base=lib
+    check: env
+    env_key: PERL5LIB
+    expect:
+      - lib
+  30-base-foo:
+    setup:
+      - 22-perl5lib/foo
+    args:
+      - p5lib
+      - base=foo
+    check: env
+    env_key: PERL5LIB
+    expect:
+      - 22-perl5lib/foo
+  40-base-foo-subdir-bar:
+    setup:
+      - 22-perl5lib/foo
+      - 22-perl5lib/foo/bar
+    args:
+      - p5lib
+      - base=foo
+      - subdir=bar
+    check: env
+    env_key: PERL5LIB
+    expect:
+      - 22-perl5lib/foo/bar
+      - 22-perl5lib/foo
+  50-base-foo-subdir-bar-subonly:
+    setup:
+      - 22-perl5lib/foo
+      - 22-perl5lib/foo/bar
+    args:
+      - p5lib
+      - base=foo
+      - subdir=bar
+      - subonly
+    check: env
+    env_key: PERL5LIB
+    expect:
+      - 22-perl5lib/foo/bar
+23-ld_lib:
+  10-none:
+    args:
+      - ld_lib
+    check: env
+    env_key: LD_LIBRARY_PATH
+    expect:
+      - lib
+  20-base-lib:
+    args:
+      - ld_lib
+      - base=lib
+    check: env
+    env_key: LD_LIBRARY_PATH
+    expect:
+      - lib
+  21-use-base-lib:
+    args:
+      - ld_lib
+      - use
+      - base=lib
+    check: env
+    env_key: LD_LIBRARY_PATH
+    expect:
+      - lib
+  30-base-foo:
+    setup:
+      - 23-ld_lib/foo
+    args:
+      - ld_lib
+      - base=foo
+    check: env
+    env_key: LD_LIBRARY_PATH
+    expect:
+      - 23-ld_lib/foo
+  40-base-foo-subdir-bar:
+    setup:
+      - 23-ld_lib/foo
+      - 23-ld_lib/foo/bar
+    args:
+      - ld_lib
+      - base=foo
+      - subdir=bar
+    check: env
+    env_key: LD_LIBRARY_PATH
+    expect:
+      - 23-ld_lib/foo/bar
+      - 23-ld_lib/foo
+  50-base-foo-subdir-bar-subonly:
+    setup:
+      - 23-ld_lib/foo
+      - 23-ld_lib/foo/bar
+    args:
+      - ld_lib
+      - base=foo
+      - subdir=bar
+      - subonly
+    check: env
+    env_key: LD_LIBRARY_PATH
+    expect:
+      - 23-ld_lib/foo/bar

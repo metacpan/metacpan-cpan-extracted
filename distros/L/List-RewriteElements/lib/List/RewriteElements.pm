@@ -1,8 +1,7 @@
 package List::RewriteElements;
-#$Id: RewriteElements.pm 1123 2007-01-23 03:39:35Z jimk $
-$VERSION = 0.09;
 use strict;
 use warnings;
+our $VERSION = '0.11';
 use Carp;
 use Cwd;
 use File::Basename;
@@ -101,7 +100,7 @@ sub generate_output {
             $outfile = File::Spec->catfile( ( cwd() ),
                 basename($self->{file}) . $self->{output_suffix} );
         }
-        open my $OUT, ">$outfile"
+        open my $OUT, '>', $outfile
             or croak "Unable to open $outfile for writing";
         my $oldfh = select($OUT);
         $self->_handler_control();
@@ -326,10 +325,11 @@ Provide criteria to suppress output of header or individual record.
 
 =head1 DESCRIPTION
 
-It is common in many situations for you to receive a flat data file from someone
-else and have to generate a new file in which each row or record in the
-incoming file must either (a) be transformed according to some rule before 
-being printing to the new file; or (b) if it meets certain criteria, not output to the new file at all.
+It is common in many situations for you to receive a flat data file from
+someone else and have to generate a new file in which each row or record in
+the incoming file must either (a) be transformed according to some rule before
+being printing to the new file; or (b) if it meets certain criteria, not
+output to the new file at all.
 
 List::RewriteElements enables you to write such rules and criteria, generate
 the file of transformed data records, and get back some basic statistics about
@@ -680,46 +680,9 @@ included in the distribution under the F<t/> directory.
 
 =head1 BUGS
 
-None known at this time.  File bug reports at L<http://rt.cpan.org>.
+File bug reports at L<https://github.com/jkeenan/List-RewriteElements/issues>.
 
-=head1 HISTORY
-
-0.09 Mon Jan 22 22:35:56 EST 2007
-    - Update version number and release date only.  Purpose:  generate new
-round of tests by cpan testers, in the hope that it eliminates a FAIL report
-on v0.08 where failure was due solely to error on tester's box.
-
-0.08 Mon Jan  1 08:54:01 EST 2007
-    - xdg to the rescue!  Applied and extended patches supplied by David
-Golden for Win32.  In constructor, value of C<$/> is supplied to the C<recsep>
-option.
-
-0.07 Sun Dec 31 11:13:04 EST 2006
-    - Switched to using File::Spec::catfile() to generate one path (rather
-than Cwd::realpath().  This was done in an attempt to respond to corion's FAIL
-reports (but I don't have a good Windows box, so I can't be certain of the
-results).
-
-0.06 Sat Dec 16 11:31:38 EST 2006
-    - Created t/07_fixed_width.t and t/testlib/fixed.t to illustrate use of 
-List::RewriteElements with fixed-width data.
-
-0.05 Thu Dec 14 07:42:24 EST 2006
-    - Correction of POD formatting errors only; no change in functionality.
-CPAN upload.
-
-0.04 Wed Dec 13 23:04:33 EST 2006
-    - More tests; fine-tuning of code and documentation.  First CPAN upload.
-
-0.03 Tue Dec 12 22:13:00 EST 2006
-    - Implementation of statistical methods; more tests.
-
-0.02 Mon Dec 11 19:38:26 EST 2006
-    - Added tests to demonstrate use of closures to supply additional
-information to elements such as body_rule.
-
-0.01 Sat Dec  9 22:29:51 2006
-    - original version; created by ExtUtils::ModuleMaker 0.47
+One test failure reported during testing on Win32 via GitHub Actions.
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -732,13 +695,12 @@ demonstrating processing of fixed-width data.
 
 =head1 AUTHOR
 
-James E Keenan.  CPAN ID: JKEENAN.  jkeenan@cpan.org. 
-http://search.cpan.org/~jkeenan/ or
-http://thenceforward.net/perl/modules/List-RewriteElements.
+James E Keenan.  CPAN ID: JKEENAN.  jkeenan@pobox.com
+L<http://thenceforward.net/perl/modules/List-RewriteElements>.
 
 =head1 COPYRIGHT
 
-Copyright 2006 James E Keenan (USA).
+Copyright 2006-2026 James E Keenan (USA).
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.

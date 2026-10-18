@@ -14,6 +14,24 @@ time zone database into the tables this dist ships, with zic from the
 same IANA release. It is not installed and is not needed to build or
 install the dist: its output is part of the dist.
 
+A NEW TZDATA RELEASE
+
+A new IANA release is a new release of this dist alone; Time-Keeper does
+not change. The C ABI (include/time_keeper_zone_abi.h) is append-only and
+versioned: a release that adds to it bumps TKZ_ABI_VERSION, and Time-Keeper
+checks the version it needs.
+
+    1. Fetch tzdata and tzcode of the release into plan_time_keeper/sources/.
+    2. Build zic from that tzcode, and run tools/tzcompile with it to
+       regenerate include/tkz/tkz_data.h.
+    3. Run every test, with RELEASE_TESTING, and the zdump oracles in xt/
+       (xt/03-zdump-oracle.t, xt/04-zdump-engine.t, xt/05-transitions-zdump.t
+       and xt/06-both-readings.t) against the new zic's zdump, with
+       TKZ_ZIC, TKZ_ZDUMP and TKZ_TZDATA naming them.
+    4. Bump $VERSION in lib/Time/Keeper/Zone.pm and add a line to Changes
+       naming the release; regenerate the Makefile.
+    5. make dist, then build and test from the unpacked tarball.
+
 LICENSE AND COPYRIGHT
 
 This software is Copyright (c) 2026 by LNATION.

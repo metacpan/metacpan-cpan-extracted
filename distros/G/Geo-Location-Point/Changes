@@ -1,5 +1,27 @@
 Revision history for Geo::Location::Point
 
+0.19	Sat Oct 17 09:03:01 AM EDT 2026
+	accuracy_for(): the rule that turns the fields a match was made on into an
+	accuracy level now lives here, beside ACCURACY_LEVELS, instead of in
+	Geo::Coder::Free::Provenance.  The levels a point accepts and the rules that
+	choose one of them therefore have a single home, and a caller does not have
+	to keep two modules in step to describe a match
+	It is a function, not a method - the fields are what a backend matched, not
+	something a point carries - and it walks ACCURACY_LEVELS in order, so the
+	most precise level with a matched field wins and the answer is always a level
+	the vocabulary publishes.  A match on a row with none of the fields is still
+	a named place, so it is a locality rather than left unsaid
+	The field spellings and the precedence are unchanged from the copy that was
+	in Provenance: house_number/number, road/street, postcode/post_code/zip,
+	city/town/name, state/state_district/county/region and country, read
+	case-insensitively
+
+0.18    Sat Oct 17 09:03:01 AM EDT 2026
+	t/attr.t: every field set a backend can match on derives the level it should,
+	the most precise field wins whatever order the fields arrive in, the fields
+	are read case-insensitively, and every level derived is one the vocabulary
+	publishes and a point accepts
+
 0.17	Fri Oct 16 09:03:34 PM EDT 2026
 	Named accessors for the provenance fields - geocoder, database, confidence,
 	accuracy, country, city and state - instead of leaving them to AUTOLOAD, so
@@ -16,7 +38,17 @@ Revision history for Geo::Location::Point
 	t/attr.t: a VALIDATION block asserts that an out-of-range confidence, an
 	accuracy outside the vocabulary and a non-string city are refused by name,
 	and that the valid values round-trip.  The empty string is no longer an
-	accuracy, so the three assertions that used it as one now use a level
+	accuracy, so the three assertions that used it as one now use a level.
+	ACCURACY_LEVELS() hands out one list that is read-only (Readonly), not a
+	copy, because the vocabulary is shared: the module takes the levels it
+	validates against when it loads, and accuracy() refuses anything else
+	there, so a level pushed into the list would be a level the module
+	published and would not accept.  A caller that tries is refused rather
+	than obeyed, and every module that reads the list - the name
+	Geo::Coder::Free::Provenance re-exports included - is reading the same
+	levels the validator enforces.  t/attr.t asserts that the attempt is
+	refused with a read-only error and that the list is left as it was, and
+	that every level in it is a level accuracy() accepts and reads back
 
 0.16	Thu Oct 15 09:47:39 AM EDT 2026
 	Remove wasted test

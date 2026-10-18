@@ -1,5 +1,15 @@
 Revision history for Perl extension Net::IP::LPM.
 
+1.13 Sat 17 Oct 12:55:19 BST 2026
+  [Bug Fixes]
+  - Skip cloning the object into a new thread.
+
+  [Documentation]
+  - Added KNOWN ISSUES.
+
+  [Toolchain]
+  - Updated contributor metadata.
+
 1.12 Sun Sep 6, 2026
   [Bug Fixes]
   - fixed CVE-2026-86287 with improved validation of prefixes

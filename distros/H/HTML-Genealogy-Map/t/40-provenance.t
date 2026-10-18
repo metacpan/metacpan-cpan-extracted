@@ -4,12 +4,12 @@
 #
 # HTML::Genealogy::Map reads the results of an injected geocoder, and the geocoder
 # its own POD and tests pass is Geo::Coder::Free, whose backends answer with a
-# real Geo::Location::Point carrying lat, long, lng, location and database.
-# A Geo::Location::Point has no 'lon' and Geo::Coder::Free sets no 'geocoder'
-# (only a wrapper such as Geo::Coder::List stamps that), so reading either of
-# those keys made every place look like a failed lookup - the map came out empty
-# - and charged every local lookup the one-second delay meant for a remote
-# service.
+# real Geo::Location::Point carrying lat, long, lng, location, database, geocoder,
+# confidence and accuracy
+# A Geo::Location::Point has no 'lon' - nothing in Geo::Coder::Free sets it - so
+# reading it made every place look like a failed lookup, and the map came out
+# empty.  The result was charged the one-second delay meant for a remote service
+# as well, because the provenance was read through a key that was not set either.
 #
 # The stubs below therefore return the real value object, built the way
 # Geo::Coder::Free builds it (lib/Geo/Coder/Free/OpenAddresses.pm#L1013-L1018,
@@ -77,9 +77,12 @@ BEGIN {
 	# $database mirrors the backend Geo::Coder::Free would have asked: 'database'
 	# is what says a result came from a local dataset.
 	my %POINTS = (
-		'Ramsgate, Kent, England' => { lat => 51.3354, long =>  1.4186, database => 'OpenAddresses' },
-		'Minster, Kent, England'  => { lat => 51.3359, long =>  1.3141, database => 'MaxMind' },
-		'Gulf of Guinea'          => { lat =>  0,      long =>  0,      database => 'Geo::Coder::Free::Local' },
+		'Ramsgate, Kent, England' => { lat => 51.3354, long =>  1.4186, database => 'OpenAddresses', accuracy => 'address' },
+		'Minster, Kent, England'  => { lat => 51.3359, long =>  1.3141, database => 'MaxMind', accuracy => 'city' },
+		'Gulf of Guinea'          => { lat =>  0,      long =>  0,      database => 'Geo::Coder::Free::Local', accuracy => 'address' },
+		# A result a wrapper such as Geo::Coder::List stamped: the distribution is
+		# named, the backend is not.
+		'Wrapper result'          => { lat => 51.5,    long =>  0.1,    database => undef, accuracy => 'street' },
 	);
 
 	sub new {
@@ -100,14 +103,16 @@ BEGIN {
 
 		my $point = $POINTS{$place} or return;
 
-		# Exactly the keys Geo::Coder::Free sets: no 'lon', no 'geocoder'.
+		# Exactly the keys Geo::Coder::Free sets: no 'lon'.
 		return Geo::Location::Point->new(
 			lat        => $point->{'lat'},
 			long       => $point->{'long'},
 			lng        => $point->{'long'},
 			location   => $place,
 			database   => $point->{'database'},
+			geocoder   => 'Geo::Coder::Free',
 			confidence => 1,
+			accuracy   => $point->{'accuracy'},
 		);
 	}
 }
@@ -173,6 +178,18 @@ subtest 'a local lookup is not charged a remote lookup delay' => sub {
 
 	# The reader used to miss on every result and then sleep a second per place.
 	cmp_ok($elapsed, '<', 1, "two local places rendered in $elapsed seconds, with no 1s sleep");
+};
+
+subtest 'a result whose provenance is the distribution alone is still local' => sub {
+	my ($html, $elapsed) = _render(['Wrapper result']);
+
+	# 'geocoder' names the
+	# distribution on every result Geo::Coder::Free returns, and a wrapper such as
+	# Geo::Coder::List stamps it too - so a result that carries it came from local
+	# data even when nothing named the backend that answered.
+	ok(defined($html) && length($html), 'the map rendered');
+	is(scalar(_markers($html)), 1, 'the place is marked');
+	cmp_ok($elapsed, '<', 1, "a wrapper-stamped place rendered in $elapsed seconds, with no 1s sleep");
 };
 
 subtest 'a position of zero is a position' => sub {

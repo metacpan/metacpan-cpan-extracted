@@ -4,38 +4,9 @@ use 5.020;
 use strict;
 use warnings;
 
-=head1 NAME
-
-Wordsmith::Claude::Mode - Built-in rewriting mode definitions
-
-=head1 SYNOPSIS
-
-    use Wordsmith::Claude::Mode;
-
-    # Get instruction for a mode
-    my $instruction = Wordsmith::Claude::Mode->get_instruction('eli5');
-
-    # Check if mode exists
-    if (Wordsmith::Claude::Mode->mode_exists('pirate')) { ... }
-
-    # List all modes
-    my @modes = Wordsmith::Claude::Mode->all_modes;
-
-    # Get modes by category
-    my @fun_modes = Wordsmith::Claude::Mode->modes_in_category('fun');
-
-=head1 DESCRIPTION
-
-Defines all built-in rewriting modes with their instructions.
-
-=head1 MODES
-
-=cut
-
 our %MODES;
 BEGIN {
     %MODES = (
-        # Complexity modes
         eli5 => {
             category    => 'complexity',
             description => 'Explain Like I\'m 5 - very simple language',
@@ -52,7 +23,6 @@ BEGIN {
             instruction => 'Rewrite this with more technical precision. Use proper terminology, be specific, and add relevant technical details where appropriate.',
         },
 
-        # Tone modes
         formal => {
             category    => 'tone',
             description => 'Professional, business-appropriate',
@@ -74,7 +44,6 @@ BEGIN {
             instruction => 'Rewrite this in a polished, authoritative tone. Sound confident and knowledgeable while remaining clear and accessible.',
         },
 
-        # Length/Format modes
         concise => {
             category    => 'format',
             description => 'Trim to essentials',
@@ -96,7 +65,6 @@ BEGIN {
             instruction => 'Summarize this in 1-2 sentences. Capture only the main point.',
         },
 
-        # Fun styles
         pirate => {
             category    => 'fun',
             description => 'Talk like a pirate',
@@ -138,7 +106,6 @@ BEGIN {
             instruction => 'Rewrite this using Gen Z slang. Use "no cap", "fr fr", "slay", "bussin", "its giving", "lowkey/highkey", "based", "rent free", etc. Keep it authentic.',
         },
 
-        # Utility modes
         proofread => {
             category    => 'utility',
             description => 'Fix grammar and spelling',
@@ -157,6 +124,86 @@ BEGIN {
     );
 }
 
+sub get_instruction {
+    my ($class, $mode) = @_;
+    return unless defined $mode && exists $MODES{$mode};
+    return $MODES{$mode}{instruction};
+}
+
+sub mode_exists {
+    my ($class, $mode) = @_;
+    return defined $mode && exists $MODES{$mode};
+}
+
+sub all_modes {
+    my @sorted = sort keys %MODES;
+    return @sorted;
+}
+
+sub get_description {
+    my ($class, $mode) = @_;
+    return unless defined $mode && exists $MODES{$mode};
+    return $MODES{$mode}{description};
+}
+
+sub get_category {
+    my ($class, $mode) = @_;
+    return unless defined $mode && exists $MODES{$mode};
+    return $MODES{$mode}{category};
+}
+
+sub modes_in_category {
+    my ($class, $category) = @_;
+    return () unless defined $category;
+    my @sorted = sort grep { $MODES{$_}{category} eq $category } keys %MODES;
+    return @sorted;
+}
+
+sub all_categories {
+    my %cats = map { $MODES{$_}{category} => 1 } keys %MODES;
+    my @sorted = sort keys %cats;
+    return @sorted;
+}
+
+sub mode_info {
+    my ($class, $mode) = @_;
+    return unless defined $mode && exists $MODES{$mode};
+    return { %{$MODES{$mode}} };
+}
+
+
+1;
+
+__END__
+
+=head1 NAME
+
+Wordsmith::Claude::Mode - Built-in rewriting mode definitions
+
+=head1 SYNOPSIS
+
+    use Wordsmith::Claude::Mode;
+
+    # Get instruction for a mode
+    my $instruction = Wordsmith::Claude::Mode->get_instruction('eli5');
+
+    # Check if mode exists
+    if (Wordsmith::Claude::Mode->mode_exists('pirate')) { ... }
+
+    # List all modes
+    my @modes = Wordsmith::Claude::Mode->all_modes;
+
+    # Get modes by category
+    my @fun_modes = Wordsmith::Claude::Mode->modes_in_category('fun');
+
+=head1 DESCRIPTION
+
+Defines all built-in rewriting modes with their instructions.
+
+=head1 MODES
+
+=cut
+
 =head1 CLASS METHODS
 
 =head2 get_instruction
@@ -167,12 +214,6 @@ Returns the instruction text for a mode, or undef if mode doesn't exist.
 
 =cut
 
-sub get_instruction {
-    my ($class, $mode) = @_;
-    return unless defined $mode && exists $MODES{$mode};
-    return $MODES{$mode}{instruction};
-}
-
 =head2 mode_exists
 
     if (Wordsmith::Claude::Mode->mode_exists('pirate')) { ... }
@@ -180,11 +221,6 @@ sub get_instruction {
 Returns true if the mode exists.
 
 =cut
-
-sub mode_exists {
-    my ($class, $mode) = @_;
-    return defined $mode && exists $MODES{$mode};
-}
 
 =head2 all_modes
 
@@ -194,11 +230,6 @@ Returns list of all mode names.
 
 =cut
 
-sub all_modes {
-    my @sorted = sort keys %MODES;
-    return @sorted;
-}
-
 =head2 get_description
 
     my $desc = Wordsmith::Claude::Mode->get_description('eli5');
@@ -206,12 +237,6 @@ sub all_modes {
 Returns the description for a mode.
 
 =cut
-
-sub get_description {
-    my ($class, $mode) = @_;
-    return unless defined $mode && exists $MODES{$mode};
-    return $MODES{$mode}{description};
-}
 
 =head2 get_category
 
@@ -221,12 +246,6 @@ Returns the category for a mode.
 
 =cut
 
-sub get_category {
-    my ($class, $mode) = @_;
-    return unless defined $mode && exists $MODES{$mode};
-    return $MODES{$mode}{category};
-}
-
 =head2 modes_in_category
 
     my @fun = Wordsmith::Claude::Mode->modes_in_category('fun');
@@ -234,13 +253,6 @@ sub get_category {
 Returns all modes in a category.
 
 =cut
-
-sub modes_in_category {
-    my ($class, $category) = @_;
-    return () unless defined $category;
-    my @sorted = sort grep { $MODES{$_}{category} eq $category } keys %MODES;
-    return @sorted;
-}
 
 =head2 all_categories
 
@@ -250,12 +262,6 @@ Returns list of all category names.
 
 =cut
 
-sub all_categories {
-    my %cats = map { $MODES{$_}{category} => 1 } keys %MODES;
-    my @sorted = sort keys %cats;
-    return @sorted;
-}
-
 =head2 mode_info
 
     my $info = Wordsmith::Claude::Mode->mode_info('eli5');
@@ -264,12 +270,6 @@ sub all_categories {
 Returns full info hashref for a mode.
 
 =cut
-
-sub mode_info {
-    my ($class, $mode) = @_;
-    return unless defined $mode && exists $MODES{$mode};
-    return { %{$MODES{$mode}} };
-}
 
 =head1 AUTHOR
 
@@ -284,5 +284,3 @@ This is free software, licensed under:
   The Artistic License 2.0 (GPL Compatible)
 
 =cut
-
-1;

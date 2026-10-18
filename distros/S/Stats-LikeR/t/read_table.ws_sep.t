@@ -100,9 +100,13 @@ my @case = (
 	["ragged", undef, "Alignment error on FILE data row 1 (3 fields vs 2 headers).\n", []],
 );
 # \v is \s, and isSPACE(), only from perl 5.18 on; before that it is text
-# to both, and "a\x0bb" is one column.
+# to both, and "a\x0bb" is one column. A header of one field, with a data row
+# of two, is also what a wrong sep looks like, and the message says so; RX
+# stands for the regex as it stringifies, which differs between perls.
 if ($] < 5.018) {
-	$_->[1] = undef, $_->[2] = "Alignment error on FILE data row 1 (2 fields vs 1 headers).\n"
+	$_->[1] = undef, $_->[2] = "Alignment error on FILE data row 1 (2 fields vs 1 headers); "
+		. "the header has no match for the sep regex RX, so it may not be what "
+		. "separates this file's fields.\n"
 		for grep { $_->[0] eq 'vertical tab' } @case;
 }
 
@@ -118,6 +122,7 @@ for my $i (0 .. $#input) {
 		local $SIG{__WARN__} = sub { push @w, $_[0] };
 		my $got = eval { read_table($path, @$opt, sep => $r->[1], output_type => 'aoa') };
 		(my $err = $@) =~ s/\Q$path\E/FILE/g;
+		$err =~ s/\Q$r->[1]\E/RX/g;
 		s/\Q$path\E/FILE/g for @w;
 		is_deeply($got, $want, "$tag, $r->[0]: the rows");
 		is($err, $want_err, "$tag, $r->[0]: the error");

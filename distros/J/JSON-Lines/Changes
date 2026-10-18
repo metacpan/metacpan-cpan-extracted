@@ -22,3 +22,6 @@ Revision history for JSON-Lines
 	- Adds chunked/streaming input support with automatic buffering
 	- Adds remaining() method to check buffer state
 	- Adds clear_buffer() method to reset buffer between operations
+
+1.12	2026/10/17
+	- Fix: the module failed to load on perls before 5.18.

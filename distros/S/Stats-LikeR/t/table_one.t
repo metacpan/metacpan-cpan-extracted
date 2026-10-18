@@ -91,4 +91,80 @@ dies_ok { table_one(\@rows, by => 'nope') }       'unknown by column dies';
 dies_ok { table_one(\@rows, vars => ['ghost']) }  'unknown var dies';
 dies_ok { table_one(\@rows, bogus => 1) }         'unknown option dies';
 
+# Regressions, each of which failed on 0.3217.
+
+# A continuous variable whose test cannot run gets no p-value, as a categorical
+# one already did; t_test() dying on it used to take the whole table down.
+{
+	my %df = (arm  => [qw(a a a b b b)], age => [30, 41, 52, 33, 40, 47],
+	          dose => [(5) x 6], lone => [1, 2, 3, 4, undef, undef]);
+	for my $np (0, 1) {
+		my $t;
+		lives_ok { $t = table_one(\%df, by => 'arm', nonparametric => $np) }
+			"nonparametric => $np: a constant column and a group of one do not die";
+		ok(!defined row_for($t, 'lone')->{'p_value'}, "nonparametric => $np: a group of one has no p-value")
+			unless $np;    # wilcox_test() runs on n = 1 against 3
+		ok(defined row_for($t, 'age')->{'p_value'}, "nonparametric => $np: the other rows still have theirs");
+	}
+	my $t = table_one(\%df, by => 'arm');
+	ok(!defined row_for($t, 'dose')->{'p_value'}, 'a constant column has no t-test p-value');
+	ok(!defined row_for($t, 'dose')->{test}, '...and no test label');
+	is(row_for($t, 'dose')->{a}, '5.00 (0.00)', '...but still its summary');
+}
+
+# A group may not share its name with an output column: a group named 'test'
+# used to be overwritten by the label 't-test', and one named 'Overall'
+# overwrote the column that summarises every row.
+for my $name (qw(test Overall p_value variable level type)) {
+	my %df = (arm => [ ($name) x 3, ('control') x 3 ], age => [30, 41, 52, 33, 40, 47]);
+	throws_ok { table_one(\%df, by => 'arm') }
+		qr/^table_one: the 'arm' column has a group named '\Q$name\E', which is also the name of an output column$/m,
+		"a group named '$name' is refused";
+}
+
+# A type that is neither 'continuous' nor 'categorical' is refused; 'numeric'
+# used to be taken as categorical, a row per distinct value.
+throws_ok { table_one(\@rows, by => 'arm', types => { age => 'numeric' }) }
+	qr/^table_one: the type of 'age' must be 'continuous' or 'categorical', not 'numeric'$/m,
+	"types => { age => 'numeric' } is refused";
+throws_ok { table_one(\@rows, types => { age => undef }) }
+	qr/not 'undef'/, 'an undef type is refused';
+
+# A `by` column shorter than the frame reads as NA past its end, as every other
+# column already did; it used to die on perl's own "uninitialized" warning.
+{
+	my $t = table_one({ arm => [qw(a a b)], x => [1, 2, 3, 4] }, by => 'arm');
+	is(row_for($t, 'x')->{NA}, '4.00 (0.00)', 'a short by column: the row past its end is group NA');
+}
+
+# More than two groups: the ANOVA p-value comes from oneway_test(var_equal => 1)
+# unless a group has one observation, which it refuses and aov() does not.
+{
+	my %df = (arm => [qw(A A A B B B C)], val => [5.1, 4.9, 6.2, 6.1, 6.9, 7.2, 8]);
+	my $t = table_one(\%df, by => 'arm');
+	is($t->[0]{test}, 'anova', 'a group of one among three: still an ANOVA');
+	is_approx($t->[0]{'p_value'}, aov(\%df, 'val ~ arm')->{arm}{'Pr(>F)'},
+		'...whose p-value is aov()\'s', 1e-12);
+}
+
+# A categorical column shorter than the frame lists its rows past the end as
+# NA.  They were counted, so the percentages already used them, but no NA row
+# was listed.
+{
+	my $t = table_one({ arm => [qw(a a b b)], sex => [qw(F M F)] }, by => 'arm');
+	my $na = row_for($t, 'sex', 'NA');
+	ok(defined $na, 'a short categorical column has an NA row');
+	is($na->{b}, '1 (50.0%)', '...counting the row past its end');
+}
+
+# Numeric levels sort as numbers, with NA last: a string sort put 10 between 1
+# and 2.  Other levels keep the string sort.
+{
+	my %df = (stage => [1, 2, 10, 2, 1, 10, 3, undef], arm => [qw(a a a b b b b b)]);
+	my $t = table_one(\%df, by => 'arm', vars => ['stage'], types => { stage => 'categorical' });
+	is_deeply([ map { $_->{level} } @$t ], [ '', 1, 2, 3, 10, 'NA' ], 'numeric levels in numeric order, NA last');
+	$t = table_one({ s => [qw(b a NA c)] }, types => { s => 'categorical' });
+	is_deeply([ map { $_->{level} } @$t ], [ '', qw(NA a b c) ], 'string levels keep the string order');
+}
+
 done_testing();

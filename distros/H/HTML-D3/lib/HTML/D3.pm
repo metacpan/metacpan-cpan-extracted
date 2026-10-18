@@ -19,11 +19,11 @@ HTML::D3 - A simple Perl module for generating charts using D3.js.
 
 =head1 VERSION
 
-Version 0.21
+Version 0.23
 
 =cut
 
-our $VERSION = '0.21';
+our $VERSION = '0.23';
 
 =head1 SYNOPSIS
 
@@ -144,40 +144,35 @@ sub new
 # ─────────────────────────────────────────────────────────────────────────────
 # The categorical colour schemes, written down once.
 #
-# The scheme names, the D3 expression each one is, and the colours themselves
-# live here and nowhere else.  The snippets build the JS lookup they draw with
-# from %CATEGORICAL_SCHEMES, and Perl callers - a map, a legend, a static
-# renderer - read the same colours through categorical_schemes(), palette() and
-# colour_at().  A chart and a map of the same data therefore cannot disagree
-# about what scheme 'set2' means, which two separate lists of names and colours
-# eventually would.
+# The scheme names and the colours themselves live here and nowhere else.  The
+# snippets inline these colours as a JavaScript array - not as a d3.scheme*
+# expression - so a page draws the exact numbers palette() hands a map, and a
+# change to d3's own palette cannot move a chart's colours under it.  Perl
+# callers - a map, a legend, a static renderer - read the same colours through
+# categorical_schemes(), palette() and colour_at().  A chart and a map of the
+# same data therefore cannot disagree about what scheme 'set2' means, which two
+# separate lists of names and colours eventually would.
 #
-# The colours are D3's own, in D3's order: the scheme arrays in d3-scale-chromatic
-# 3.x, which is the version d3 v7 - what _head() loads - bundles.  They are
-# recorded here because Perl has no browser to ask, and a map colouring its
-# categories server-side needs the hex values the chart draws.  Both sides agree
-# as long as these arrays are D3's, so a change to one has to come from D3's
-# source: https://github.com/d3/d3-scale-chromatic/tree/main/src/categorical
+# The colours are D3's own, in D3's order: the scheme arrays in
+# d3-scale-chromatic 3.x, which is the version d3 v7 - what _head() loads -
+# bundles.  Each entry names the d3 scheme it transcribes, so the palette can be
+# checked against the library (t/d3-schemes.t does that when Node and d3 are
+# installed), but the chart does not depend on d3 for the numbers it draws.
 my %CATEGORICAL_SCHEMES = (
 	tableau10 => {
-		js      => 'd3.schemeTableau10',
 		colours => [ '#4e79a7', '#f28e2c', '#e15759', '#76b7b2', '#59a14f',
 			'#edc949', '#af7aa1', '#ff9da7', '#9c755f', '#bab0ab' ],
 	}, category10 => {
-		js      => 'd3.schemeCategory10',
 		colours => [ '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
 			'#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf' ],
 	}, set2 => {
-		js      => 'd3.schemeSet2',
 		colours => [ '#66c2a5', '#fc8d62', '#8da0cb', '#e78ac3',
 			'#a6d854', '#ffd92f', '#e5c494', '#b3b3b3' ],
 	}, set3 => {
-		js      => 'd3.schemeSet3',
 		colours => [ '#8dd3c7', '#ffffb3', '#bebada', '#fb8072', '#80b1d3',
 			'#fdb462', '#b3de69', '#fccde5', '#d9d9d9', '#bc80bd',
 			'#ccebc5', '#ffed6f' ],
 	}, paired => {
-		js      => 'd3.schemePaired',
 		colours => [ '#a6cee3', '#1f78b4', '#b2df8a', '#33a02c', '#fb9a99',
 			'#e31a1c', '#fdbf6f', '#ff7f00', '#cab2d6', '#6a3d9a',
 			'#ffff99', '#b15928' ],
@@ -189,10 +184,10 @@ my $DEFAULT_CATEGORICAL_SCHEME = 'tableau10';
 
 # The palette the charts that offer no scheme option draw with: the pie family
 # and the multi-series line charts that predate the option have always drawn
-# category10.  The expression is read from the definition above rather than
+# category10.  The colours are read from the definition above rather than
 # written out again here, so that a chart with no choice and a chart told which
 # scheme to use are the same palette and not two copies of it.
-my $CATEGORY10_JS = $CATEGORICAL_SCHEMES{'category10'}{'js'};
+my $CATEGORY10_JS = _scheme_colours_js('category10');
 
 =head2 categorical_schemes
 
@@ -759,8 +754,10 @@ HTML
     my $html = $chart->render_pie_chart($data, { separator => ':' });
 
 Generates HTML and JavaScript code to render a pie chart.
-Each slice is coloured with C<d3.schemeCategory10>; percentage labels appear
-inside each slice and a colour legend is shown to the right of the pie.
+Each slice is coloured with the ten hex values of C<d3.schemeCategory10>,
+inlined into the page rather than read from D3's own palette (see L</palette>);
+percentage labels appear inside each slice and a colour legend is shown to the
+right of the pie.
 Accepts the following arguments:
 
 =over 4
@@ -811,8 +808,8 @@ Returns a string containing the complete HTML5 document.
 =head4 Output
 
     Str -- complete HTML5 document; pie rendered with C<d3.pie()> and
-           C<d3.arc()>; slices coloured with C<d3.schemeCategory10>;
-           percentage label inside each slice; legend to the right.
+           C<d3.arc()>; slices coloured with category10's hex values,
+           inlined; percentage label inside each slice; legend to the right.
 
 =cut
 
@@ -4003,8 +4000,8 @@ sub render_scatter_chart_snippet
 		return $s;
 	};
 
-	# The d3.scheme* expression for the scheme, from the one definition of the
-	# schemes rather than from the spelling of the name.
+	# The scheme's colours as a JS array, from the one definition rather than
+	# from the spelling of the name.
 	my $scheme_js = _scheme_js($scheme);
 
 	my @points;
@@ -5598,10 +5595,21 @@ sub _categorical_scheme
 	return $CATEGORICAL_SCHEMES{$scheme};
 }
 
-# The D3 expression for a scheme - d3.schemeSet2 - or, for a name that is not
-# one, the default scheme's.  The snippets used to capitalise the name they were
-# handed and look up the expression that spelling produced, which turned a name
-# they did not know into an undefined function in the browser; drawing with the
+# A scheme's colours as JavaScript source: a literal array, in the scheme's
+# order, built from the one definition.  The snippets inline this rather than a
+# d3.scheme* expression, so the browser draws the numbers palette() handed a
+# map, and an upgrade of d3 cannot change a chart's colours.
+sub _scheme_colours_js
+{
+	my $scheme = shift;
+
+	return '[' . join(', ', map { "'$_'" } @{_categorical_scheme($scheme)->{colours}}) . ']';
+}
+
+# The colours of a scheme as a JS array, or the default scheme's for a name that
+# is not one.  The snippets used to capitalise the name they were handed and
+# look up the expression that spelling produced, which turned a name they did
+# not know into an undefined function in the browser; drawing with the
 # documented default is what the snippets that look their scheme up in a table
 # have always done.
 sub _scheme_js
@@ -5611,24 +5619,25 @@ sub _scheme_js
 	# exists() first: naming a scheme that is not one must not add it to the
 	# vocabulary, which is what dereferencing the missing entry would do.
 	return exists($CATEGORICAL_SCHEMES{$scheme})
-		? $CATEGORICAL_SCHEMES{$scheme}{'js'}
+		? _scheme_colours_js($scheme)
 		: _default_scheme_js();
 }
 
 sub _default_scheme_js
 {
-	return $CATEGORICAL_SCHEMES{$DEFAULT_CATEGORICAL_SCHEME}{'js'};
+	return _scheme_colours_js($DEFAULT_CATEGORICAL_SCHEME);
 }
 
 # The table the snippets look a scheme up in, built from the definition above, so
 # that a scheme added there is understood by every snippet that offers a scheme
-# rather than by the ones somebody remembered to edit.
+# rather than by the ones somebody remembered to edit.  Each value is the
+# scheme's colours as a literal array: the same numbers palette() returns.
 sub _schemes_js
 {
 	my ($self, $declaration) = @_;
 
 	return $declaration . ' SCHEMES = { '
-		. join(', ', map { "$_: " . $CATEGORICAL_SCHEMES{$_}{'js'} } sort keys %CATEGORICAL_SCHEMES)
+		. join(', ', map { "$_: " . _scheme_colours_js($_) } sort keys %CATEGORICAL_SCHEMES)
 		. ' };';
 }
 
@@ -5769,7 +5778,8 @@ Nigel Horne <njh@nigelhorne.com>
     pre  ref(data) ≠ 'ARRAY'      ⇒ die "Data must be an array of arrays"
     post result ∈ Str
     post "<!DOCTYPE" ⊆ result
-    post "d3.pie()" ⊆ result ∧ "d3.arc()" ⊆ result ∧ "d3.schemeCategory10" ⊆ result
+    post "d3.pie()" ⊆ result ∧ "d3.arc()" ⊆ result ∧ "'#1f77b4'" ⊆ result
+                                      -- category10's colours, inlined: no d3.scheme* is read
     post opts.separator = S        ⇒  " S " ⊆ result (SVG legend: label S value)
 
 =head2 render_animated_pie_chart
@@ -5906,10 +5916,10 @@ Nigel Horne <njh@nigelhorne.com>
     post opts.x_label ≠ ''          ⇒ "msl-axis-label" ⊆ result.html
     post opts.y_label ≠ ''          ⇒ "msl-axis-label" ⊆ result.html
     post opts.scheme = S ∧ S ∈ categorical_schemes()
-                                    ⇒ the D3 expression of S ⊆ result.html
+                                    ⇒ the colours of S, as a JS array, ⊆ result.html
     post opts.scheme ∉ categorical_schemes()
-                                    ⇒ the default scheme's expression ⊆ result.html
-                                      -- not d3.scheme<S>
+                                    ⇒ the default scheme's colours ⊆ result.html
+                                      -- not a d3.scheme<S> expression
     post opts.animated = 1          ⇒ "stroke-dashoffset" ⊆ result.html
                                       ∧ "prefers-reduced-motion" ⊆ result.html
 

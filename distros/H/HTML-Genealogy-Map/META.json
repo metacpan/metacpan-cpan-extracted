@@ -78,6 +78,6 @@
          "x_repository" : "https://github.com/nigelhorne/HTML-Genealogy-Map"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

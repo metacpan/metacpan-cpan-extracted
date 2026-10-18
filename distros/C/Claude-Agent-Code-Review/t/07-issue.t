@@ -27,7 +27,7 @@ subtest 'Severity levels' => sub {
             line        => 1,
             description => 'test',
         );
-    } qr/failed type constraint/, 'rejects invalid severity';
+    } qr/Type constraint failed|failed type constraint/, 'rejects invalid severity';
 };
 
 # Test all category levels
@@ -51,7 +51,7 @@ subtest 'Category levels' => sub {
             line        => 1,
             description => 'test',
         );
-    } qr/failed type constraint/, 'rejects invalid category';
+    } qr/Type constraint failed|failed type constraint/, 'rejects invalid category';
 };
 
 # Test severity check methods

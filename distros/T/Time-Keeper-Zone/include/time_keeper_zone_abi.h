@@ -30,7 +30,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#define TKZ_ABI_VERSION 1
+#define TKZ_ABI_VERSION 2
 
 /* next_change() when nothing ever changes again. */
 #define TKZ_NO_CHANGE INT64_MAX
@@ -76,6 +76,30 @@ typedef struct tkz_abi {
 
     /* Ids run from 0 to zone_count() - 1, zones and links together. */
     int         (*zone_count)(void);
+
+    /* Version 2 from here. */
+
+    /* The last instant strictly before utc at which the offset, DST flag or
+     * abbreviation changes, or TKZ_NO_CHANGE. */
+    int64_t     (*prev_change)(int id, int64_t utc);
+
+    /* Every instant whose wall clock reads local: 0 (a gap), 1, or 2 (an
+     * overlap), or -1 for a bad id. Two fill utc[] earlier first and
+     * utoff[] with each one's offset; one fills both slots alike; a gap
+     * fills utoff[] with the offsets before and after it. In every case
+     * utc[i] == local - utoff[i]. */
+    int         (*resolve_local_all)(int id, int64_t local, int64_t utc[2], int32_t utoff[2]);
+
+    /* The offset of standard time at utc, as the database's types have it:
+     * Europe/Dublin's standard time is +01:00, its winter GMT a negative
+     * daylight time. 0 for a bad id. */
+    int         (*standard_offset_at)(int id, int64_t utc, int32_t *utoff);
+
+    /* The two-letter ISO 3166 code of the zone's country, or NULL. */
+    const char *(*country_of)(int id);
+
+    /* The zone's Windows name, such as "GMT Standard Time", or NULL. */
+    const char *(*windows_name)(int id);
 } tkz_abi;
 
 #endif

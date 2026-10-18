@@ -26,6 +26,7 @@ WriteMakefile(
 		'GIS::Distance' => 0,
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 		'Params::Get' => 0.13,
+		'Readonly' => 0,
 		'Scalar::Util' => 0
 	}, TEST_REQUIRES => {
 		'IPC::System::Simple' => 0,

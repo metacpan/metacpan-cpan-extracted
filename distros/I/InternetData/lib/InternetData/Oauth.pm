@@ -16,7 +16,7 @@ use Scalar::Util ();
 use InternetData::Error;
 use InternetData::OauthError;
 
-our $VERSION = '1.10.1';
+our $VERSION = '1.11.0';
 
 use constant DEVICE_CODE_GRANT => 'urn:ietf:params:oauth:grant-type:device_code';
 # The only PKCE method the server accepts.
@@ -56,6 +56,17 @@ my %TOKEN_RESPONSE = (
     scope => ['string'],
     'mslm:apikey_id' => ['string', 0, 'apikey_id'],
     'mslm:apikey' => ['string', 0, 'apikey'],
+);
+
+my %CLIENT_REGISTRATION = (
+    client_id => ['string', 1],
+    client_id_issued_at => ['int', 1],
+    client_name => ['string', 1],
+    redirect_uris => ['list', 1],
+    grant_types => ['list'],
+    response_types => ['list'],
+    token_endpoint_auth_method => ['string', 1],
+    scope => ['string'],
 );
 
 # The authorization server's discovery document. No call here needs it: each
@@ -143,6 +154,36 @@ sub revoke_p {
     $self->{client}->_check_options('oauth->revoke', \%options, 'timeout');
     my %form = (token => $token, client_id => $client_id);
     return $self->_send_p('/oauth/revoke', \%form, $self->{client}{retries}, \%options)->then(sub { return });
+}
+
+# Registers a client for the authorization code flow, for an app that cannot
+# serve a Client ID Metadata Document, and answers its client_id. Nothing is kept
+# until a person approves the client, so it is retried like a lookup.
+sub register {
+    my $self = shift;
+    $self->_assert_blocking_ok('register');
+    return $self->{client}->_wait($self->register_p(@_));
+}
+
+sub register_p {
+    my ($self, $redirect_uris, %options) = @_;
+    Carp::croak('InternetData::oauth->register: expected redirect_uris as a list of at least one URI')
+        if ref $redirect_uris ne 'ARRAY' || !@$redirect_uris;
+    $self->{client}->_check_options('oauth->register', \%options, 'client_name', 'timeout');
+    my @uris = @$redirect_uris;
+    for my $i (0 .. $#uris) {
+        _assert_argument('register', "redirect_uris[$i]" => $uris[$i]);
+        _assert_utf8('register', "redirect_uris[$i]", $uris[$i]);
+    }
+    my %body = (redirect_uris => [map {"$_"} @uris]);
+    if (defined $options{client_name} && length $options{client_name}) {
+        _assert_argument('register', client_name => $options{client_name});
+        _assert_utf8('register', 'client_name', $options{client_name});
+        $body{client_name} = "$options{client_name}";
+    }
+    return $self->_send_p(
+        '/oauth/register', undef, $self->{client}{retries}, \%options, \%CLIENT_REGISTRATION, \%body,
+    );
 }
 
 # The URL to open in the person's browser for the authorization code flow. Makes
@@ -277,15 +318,15 @@ sub _exchange_p {
 # Given $members, an attempt is the request AND the read of its answer, so a 2xx
 # without them is retried like a 5xx where $retries allows, its status kept.
 sub _send_p {
-    my ($self, $path, $form, $retries, $options, $members) = @_;
+    my ($self, $path, $form, $retries, $options, $members, $json) = @_;
     my $client = $self->{client};
     my $url = $client->_url($path);
     return $client->_retry_p($retries, sub {
         my $ua = $client->{ua};
         my %headers = (Accept => 'application/json');
         # Mojo's form generator sends a `+` in a value as %2B and a space as `+`.
-        my $tx = defined $form
-            ? $ua->build_tx(POST => $url => \%headers => form => $form)
+        my $tx = defined $json ? $ua->build_tx(POST => $url => \%headers => json => $json)
+            : defined $form ? $ua->build_tx(POST => $url => \%headers => form => $form)
             : $ua->build_tx(GET => $url => \%headers);
         return $client->_start_p($tx, $options->{timeout})->then(sub {
             my $res = _refusal(shift->res);
@@ -366,6 +407,13 @@ sub _percent_encode {
     Carp::croak("InternetData::oauth->$method: $name has no UTF-8 form") unless defined $bytes;
     $bytes =~ s/([^A-Za-z0-9\-._~])/sprintf('%%%02X', ord $1)/ge;
     return $bytes;
+}
+
+# Mojo's JSON generator would send a lone surrogate in perl's own lax encoding.
+sub _assert_utf8 {
+    my ($method, $name, $value) = @_;
+    my $bytes = eval { Encode::encode('UTF-8', $value, Encode::FB_CROAK | Encode::LEAVE_SRC) };
+    Carp::croak("InternetData::oauth->$method: $name has no UTF-8 form") unless defined $bytes;
 }
 
 sub _assert_argument {
@@ -496,6 +544,24 @@ Trades the C<code> the redirect brought back for tokens, answering as the two
 exchanges above do. C<$code_verifier> is the PKCE C<verifier> whose challenge went
 into the authorization URL, and C<$redirect_uri> that URL's, exactly. Never
 retried: the server spends the code on first read, before it checks the verifier.
+
+=head2 register(\@redirect_uris, %options)
+
+Registers a client for the authorization code flow, for an app that cannot
+serve a Client ID Metadata Document, and returns it as a hash reference:
+C<client_id>, for C<authorization_url> and C<exchange_authorization_code>;
+C<client_id_issued_at>, in Unix seconds; C<client_name>, as the person will see
+it; C<redirect_uris>; C<token_endpoint_auth_method>, always C<none>; and, when
+the server sends them, C<grant_types>, C<response_types> and C<scope>, the most
+the client may be granted.
+
+Each redirect URI must be https on a public host name, or http on a loopback
+address, which then matches on any port; the server refuses any other with
+C<invalid_redirect_uri>. Options are C<client_name>, shown to the person as the
+client's own claim and left out when empty, and C<timeout>. Nothing is kept
+until a person approves the client, so registering again costs nothing, and it
+is retried like a lookup. No URI at all, an empty one, or one with no UTF-8 form
+croaks before anything is sent.
 
 =head2 create_pkce
 

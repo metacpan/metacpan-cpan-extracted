@@ -3,6 +3,7 @@ use warnings;
 
 use lib 't/lib';
 
+use Mojo::JSON ();
 use Mojo::URL ();
 use Mojo::Util ();
 use Scalar::Util ();
@@ -41,6 +42,11 @@ my %EVERY_REQUIRED_MEMBER = (
     interval => 5,
     access_token => 'mo_at_x',
     token_type => 'Bearer',
+    client_id => 'dcr_x',
+    client_id_issued_at => 1792304178,
+    client_name => 'Example CLI',
+    redirect_uris => ['http://127.0.0.1/cb'],
+    token_endpoint_auth_method => 'none',
 );
 my %DEVICE = (
     device_code => 'mo_dc_x', user_code => 'BCDF-GHJK',
@@ -176,13 +182,14 @@ subtest 'no OAuth request carries the API key' => sub {
     $oauth->revoke('internetdata-cli', 'mo_rt_x');
     $oauth->poll_device_token('internetdata-cli', $device);
     $oauth->exchange_authorization_code('internetdata-cli', 'mo_ac_x', 'verifier', 'http://127.0.0.1:8765/cb');
+    $oauth->register(['http://127.0.0.1:8765/cb'], client_name => 'Example CLI');
 
     my $url = Mojo::URL->new($oauth->authorization_url('internetdata-cli', 'http://127.0.0.1:8765/cb', 'c',
         scope => 'apikeys.use', state => 's', resource => 'https://x.test/'));
     ok(!exists $url->query->to_hash->{$_}, "the authorization URL carries no $_") for @{ $rule->{forbiddenQuery} };
     is(index("$url", $rule->{apiKey}), -1, 'the authorization URL carries the key nowhere');
 
-    is(scalar @requests, 7, 'every operation was sent');
+    is(scalar @requests, 8, 'every operation was sent');
     for my $req (@requests) {
         my $label = "$req->{method} $req->{path}";
         ok(!exists $req->{headers}{$_}, "$label carried no $_") for @{ $rule->{forbiddenHeaders} };
@@ -331,6 +338,71 @@ subtest 'only what consumes nothing is retried, and never an OAuth refusal' => s
         if ($case->{expect}{outcome} eq 'ok') {
             # An answer, or nothing from revoke: a plain-string die is neither.
             ok(!defined $outcome || ref $outcome eq 'HASH', "$case->{name}: succeeds");
+            next;
+        }
+        is_outcome($outcome, { %{ $case->{expect} }, type => $case->{expect}{outcome} }, $case->{name});
+    }
+};
+
+my $register = $corpus->{register};
+
+subtest 'register posts exactly its JSON body, and refuses an empty URI unsent' => sub {
+    for my $case (@{ $register->{bodies}{cases} }) {
+        serve({ status => 201, body => \%EVERY_REQUIRED_MEMBER });
+        my %given = exists $case->{args}{clientName} ? (client_name => $case->{args}{clientName}) : ();
+        my $outcome = settle(sub {
+            InternetData->new(base_url => $origin->url . '///')->oauth
+                ->register($case->{args}{redirectUris}, %given, timeout => 5);
+        });
+        is(ref $outcome, 'HASH', "$case->{name}: answered");
+        is(scalar @requests, 1, "$case->{name}: one request");
+        is("$requests[0]{method} $requests[0]{path}", "$register->{endpoint}{method} $register->{endpoint}{path}",
+            "$case->{name}: endpoint");
+        like($requests[0]{headers}{'content-type'}, qr/\A\Q$register->{contentType}\E/, "$case->{name}: JSON");
+        is_deeply(Mojo::JSON::decode_json($requests[0]{body}), $case->{body}, "$case->{name}: body");
+    }
+    my @refused = (
+        (map { $_->{args}{redirectUris} } @{ $register->{refusals}{cases} }),
+        ["http://127.0.0.1/cb\x{D800}"], 'http://127.0.0.1/cb', undef,
+    );
+    for my $uris (@refused) {
+        serve({ status => 201, body => \%EVERY_REQUIRED_MEMBER });
+        my $label = Mojo::JSON::encode_json([$uris]);
+        my $error = settle(sub { client()->oauth->register($uris) });
+        like("$error", qr/oauth->register/, "$label: croaked");
+        is(scalar @requests, 0, "$label: nothing sent");
+    }
+    serve({ status => 201, body => \%EVERY_REQUIRED_MEMBER });
+    like(settle(sub { client()->oauth->register(['http://127.0.0.1/cb'], client_name => "\x{DC00}") }),
+        qr/client_name has no UTF-8/, 'a name with no UTF-8 croaks');
+    is(scalar @requests, 0, 'and sends nothing');
+};
+
+subtest 'register decodes on presence, and anything unreadable is a server_error' => sub {
+    for my $case (@{ $register->{responses}{cases} }) {
+        serve($case);
+        my $got = settle(sub { client()->oauth->register(['http://127.0.0.1/cb']) });
+        is(ref $got, 'HASH', "$case->{name}: answered");
+        next unless ref $got eq 'HASH';
+        is_deeply($got->{$_}, $case->{expect}{present}{$_}, "$case->{name}: $_") for sort keys %{ $case->{expect}{present} };
+        ok(!exists $got->{$_}, "$case->{name}: $_ absent") for @{ $case->{expect}{absent} };
+    }
+    for my $case (@{ $register->{unreadable}{cases} }) {
+        serve($case);
+        my $error = settle(sub { client(retries => 0)->oauth->register(['http://127.0.0.1/cb']) });
+        is_outcome($error, { type => 'client', kind => 'server_error', status => $case->{status} }, $case->{name});
+        is(scalar @requests, 1, "$case->{name}: sent once");
+    }
+    for my $case (@{ $register->{errors} }) {
+        serve($case);
+        is_outcome(settle(sub { client()->oauth->register(['http://127.0.0.1/cb']) }), $case->{expect}, $case->{name});
+    }
+    for my $case (@{ $register->{retries} }) {
+        serve(@{ $case->{responses} });
+        my $outcome = settle(sub { client()->oauth->register($case->{args}{redirectUris}) });
+        is(scalar @requests, $case->{expect}{requests}, "$case->{name}: requests sent");
+        if ($case->{expect}{outcome} eq 'ok') {
+            is(ref $outcome, 'HASH', "$case->{name}: succeeds");
             next;
         }
         is_outcome($outcome, { %{ $case->{expect} }, type => $case->{expect}{outcome} }, $case->{name});

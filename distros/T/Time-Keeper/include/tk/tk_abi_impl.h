@@ -11,10 +11,11 @@ typedef char tk_abi_instant_matches[sizeof(time_keeper_instant) == sizeof(tk_ins
 static int
 tka_now(time_keeper_instant *out)
 {
+    dTHX;
     tk_instant t;
     if (!out)
         return TIME_KEEPER_BAD;
-    tk_now(&t);
+    tk_now_sv(aTHX_ &t);
     out->sec = t.sec;
     out->nsec = t.nsec;
     return TIME_KEEPER_OK;

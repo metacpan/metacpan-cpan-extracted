@@ -352,8 +352,8 @@ SKIP: {
 		my $z = 0;
 		my $cb = sub {
 			return if %$p;
-			@$p{qw(keys idx ncol file row mode)}
-				= ([qw(id v w)], [0, 1, 2], 3, $file, \$z, $mode);
+			@$p{qw(keys idx ncol file row mode width)}
+				= ([qw(id v w)], [0, 1, 2], 3, $file, \$z, $mode, '3 headers');
 			$p->{rn}  = 0 if $mode == 2;
 			$p->{out} = $out;
 		};

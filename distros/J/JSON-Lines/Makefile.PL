@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
     macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
+        'Module::Metadata' => '0',
     },
     TEST_REQUIRES => {
         'Test::More' => '0',

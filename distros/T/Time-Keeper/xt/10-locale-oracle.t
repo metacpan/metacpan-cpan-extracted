@@ -182,4 +182,106 @@ SKIP: {
     is(scalar(grep { !defined $L->code($_) } DateTime::Locale->codes), 0, 'every code DateTime::Locale has is one here');
 }
 
+# ---- archive version 3: the words ----------------------------------------------
+# Every locale's relative-time words, duration units, list patterns, interval
+# formats and weekend days against the JSON they were compiled from
+# (cldr-units-full and cldr-misc-full must be in TK_CLDR_JSON too), and every
+# plural rule against CLDR's own @integer samples.
+{
+    my @rel_fields = qw(year quarter month week day hour minute second);
+    my @cats = qw(zero one two few many other);
+    my @dur_units = qw(year month week day hour minute second millisecond microsecond nanosecond);
+    my $bad = 0;
+    my $checked = 0;
+    my $note = sub { $bad++; diag(shift) if $bad <= 30 };
+    my $week = jfile("$dir/cldr-core/supplemental/weekData.json")->{supplemental}{weekData};
+    my $likely = jfile("$dir/cldr-core/supplemental/likelySubtags.json")->{supplemental}{likelySubtags};
+    my %dayno = (mon => 1, tue => 2, wed => 3, thu => 4, fri => 5, sat => 6, sun => 7);
+    for my $code ($L->codes) {
+        my $src = source($dir, $code) // next;
+        my $df = jfile("$dir/cldr-dates-full/main/$src/dateFields.json")->{main}{$src}{dates}{fields};
+        my $un = jfile("$dir/cldr-units-full/main/$src/units.json")->{main}{$src}{units};
+        my $lp = jfile("$dir/cldr-misc-full/main/$src/listPatterns.json")->{main}{$src}{listPatterns};
+        my $iv = jfile("$dir/cldr-dates-full/main/$src/ca-gregorian.json")->{main}{$src}{dates}{calendars}{gregorian}{dateTimeFormats}{intervalFormats};
+        for my $fld (@rel_fields) {
+            for my $w (['long', ''], ['short', '-short'], ['narrow', '-narrow']) {
+                my $e = $df->{"$fld$w->[1]"} // {};
+                my $r = $L->relative_names($code, $fld, $w->[0]);
+                my %want_at = map { my $v = $e->{"relative-type-$_"}; defined $v ? ($_ => $v) : () } -2 .. 2;
+                $note->("$code $fld $w->[0] display") unless (($r->{display} // '') eq ($e->{displayName} // ''));
+                $note->("$code $fld $w->[0] at") unless join('|', map { "$_=$want_at{$_}" } sort keys %want_at) eq join('|', map { "$_=$r->{at}{$_}" } sort keys %{ $r->{at} });
+                for my $dir2 (qw(future past)) {
+                    my %want = map { my $v = $e->{"relativeTime-type-$dir2"}{"relativeTimePattern-count-$_"}; defined $v ? ($_ => $v) : () } @cats;
+                    $note->("$code $fld $w->[0] $dir2") unless join('|', map { "$_=$want{$_}" } sort keys %want) eq join('|', map { "$_=$r->{$dir2}{$_}" } sort keys %{ $r->{$dir2} });
+                }
+                $checked += 4;
+            }
+        }
+        for my $u (@dur_units) {
+            for my $w (qw(long short narrow)) {
+                my $e = $un->{$w}{"duration-$u"} // {};
+                my $r = $L->unit_patterns($code, $u, $w);
+                my %want = map { my $v = $e->{"unitPattern-count-$_"}; defined $v ? ($_ => $v) : () } @cats;
+                $note->("$code $u $w display") unless (($r->{display} // '') eq ($e->{displayName} // ''));
+                $note->("$code $u $w count") unless join('|', map { "$_=$want{$_}" } sort keys %want) eq join('|', map { "$_=$r->{count}{$_}" } sort keys %{ $r->{count} });
+                $checked += 2;
+            }
+        }
+        my $dp = $L->duration_patterns($code);
+        for my $k (qw(hm hms ms)) {
+            $note->("$code durationUnit $k") unless (($dp->{$k} // '') eq ($un->{"durationUnit-type-$k"}{durationUnitPattern} // ''));
+            $checked++;
+        }
+        for my $t (qw(standard unit unit-short unit-narrow)) {
+            my $e = $lp->{"listPattern-type-$t"} // {};
+            my $r = $L->list_patterns($code, $t);
+            $note->("$code list $t") unless join('|', map { $e->{$_} // '' } qw(start middle end 2)) eq join('|', map { $r->{$_} // '' } qw(start middle end two));
+            $checked++;
+        }
+        my $all = $L->interval_formats($code);
+        my %want_iv;
+        for my $k (keys %$iv) {
+            next if $k eq 'intervalFormatFallback' || !ref $iv->{$k};
+            for my $l (keys %{ $iv->{$k} }) { $want_iv{"$k/$l"} = $iv->{$k}{$l} if length($l) == 1 && !ref $iv->{$k}{$l} }
+        }
+        my %got_iv = map { my $k = $_; map { ("$k/$_" => $all->{$k}{$_}) } keys %{ $all->{$k} } } keys %$all;
+        $note->("$code interval formats") unless join('|', map { "$_=$want_iv{$_}" } sort keys %want_iv) eq join('|', map { "$_=$got_iv{$_}" } sort keys %got_iv);
+        $note->("$code interval fallback") unless (($L->interval_fallback($code) // '') eq ($iv->{intervalFormatFallback} // ''));
+        # the territory of the SOURCE: a default-content code shares its parent's section, weekend included
+        my ($terr) = grep { defined && /^(?:[A-Z]{2}|\d{3})\z/ } (split /-/, $src)[1 .. 3];
+        unless ($terr) {
+            my $l = $likely->{$src} // $likely->{ (split /-/, $src)[0] } // $likely->{und};
+            ($terr) = grep { /^(?:[A-Z]{2}|\d{3})\z/ } split /-/, $l;
+        }
+        $terr //= '001';
+        my $ws = $dayno{ $week->{weekendStart}{$terr} // $week->{weekendStart}{'001'} };
+        my $we = $dayno{ $week->{weekendEnd}{$terr} // $week->{weekendEnd}{'001'} };
+        $note->("$code weekend") unless $L->weekend_start($code) == $ws && $L->weekend_end($code) == $we;
+        $checked += 3;
+    }
+    is($bad, 0, "the words of every locale agree with the JSON ($checked checks)");
+
+    my $plurals = jfile("$dir/cldr-core/supplemental/plurals.json")->{supplemental}{'plurals-type-cardinal'};
+    my ($pbad, $pchecked) = (0, 0);
+    for my $key (sort keys %$plurals) {
+        my $loc = $L->code($key) // next;
+        for my $cat (@cats) {
+            my $rule = $plurals->{$key}{"pluralRule-count-$cat"} // next;
+            my ($samples) = $rule =~ /\@integer\s+([^@]*)/ or next;
+            for my $tok (split /\s*,\s*/, $samples) {
+                next unless defined $tok;
+                $tok =~ s/\s+//g;
+                next if $tok eq '' || $tok =~ /…|c|\.{3}/;
+                my @ns = $tok =~ /^(\d+)~(\d+)$/ ? ($1 .. $2) : $tok =~ /^\d+$/ ? ($tok) : ();
+                for my $n (@ns) {
+                    my $got = $L->plural_category($loc, $n);
+                    unless ($got eq $cat) { $pbad++; diag("$key ($loc): $n is $got, CLDR says $cat") if $pbad <= 30 }
+                    $pchecked++;
+                }
+            }
+        }
+    }
+    is($pbad, 0, "every plural rule agrees with CLDR's integer samples ($pchecked numbers)");
+}
+
 done_testing;

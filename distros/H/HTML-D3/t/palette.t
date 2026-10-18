@@ -1,20 +1,21 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 # The categorical colour schemes, and the one definition of them.
 #
-# A chart draws its categories with d3.scheme*, in the browser.  A map - or a
-# legend, or a static renderer - colours the same categories in Perl, where
-# there is no d3 to ask, so HTML::D3 keeps the palettes itself:
-# categorical_schemes(), palette() and colour_at() read the same definition that
-# the chart snippets build their JS lookup from.  These tests hold that
-# definition to D3's published schemes, and hold every chart to the definition.
+# A chart draws its categories with the scheme's hex colours, inlined into the
+# page by the snippet.  A map - or a legend, or a static renderer - colours the
+# same categories in Perl, where there is no d3 to ask, so HTML::D3 keeps the
+# palettes itself: categorical_schemes(), palette() and colour_at() read the same
+# definition the chart snippets build their JS arrays from.  These tests hold
+# that definition to the charts, and hold every chart to the definition.
 #
-# The names, the D3 expressions and the number of colours each scheme has are
-# D3's, from the categorical directory of d3-scale-chromatic 3.x - the module
-# d3 v7, which _head() loads, bundles:
+# The names and the number of colours each scheme has are D3's, from the
+# categorical directory of d3-scale-chromatic 3.x - the module d3 v7, which
+# _head() loads, bundles:
 # https://github.com/d3/d3-scale-chromatic/tree/main/src/categorical
-# They are written out here rather than read back from the module, so that this
-# file is an oracle rather than an echo: swap one palette for another, or draw a
-# chart with a scheme nobody asked for, and it fails.
+# The colours are not written out here: they are read from palette(), because
+# what this file checks is that a chart emits exactly what palette() hands a
+# map.  t/d3-schemes.t is what checks palette() against d3 itself, when Node and
+# d3 are installed.
 
 use strict;
 use warnings;
@@ -23,19 +24,19 @@ use Test::Most;
 
 use_ok('HTML::D3');
 
-# scheme => the D3 expression a chart must draw it with, and how many colours D3
-# gives it.
+# scheme => the d3 scheme it transcribes (for the messages), and how many colours
+# d3 gives it.
 my %D3_CATEGORICAL = (
-	category10 => { js => 'd3.schemeCategory10', colours => 10 },
-	tableau10  => { js => 'd3.schemeTableau10',  colours => 10 },
-	set2       => { js => 'd3.schemeSet2',       colours =>  8 },
-	set3       => { js => 'd3.schemeSet3',       colours => 12 },
-	paired     => { js => 'd3.schemePaired',     colours => 12 },
+	category10 => { d3 => 'd3.schemeCategory10', colours => 10 },
+	tableau10  => { d3 => 'd3.schemeTableau10',  colours => 10 },
+	set2       => { d3 => 'd3.schemeSet2',       colours =>  8 },
+	set3       => { d3 => 'd3.schemeSet3',       colours => 12 },
+	paired     => { d3 => 'd3.schemePaired',     colours => 12 },
 );
 
 # The scheme a chart draws with when it is not told which one to use.
 my $DEFAULT_SCHEME = 'tableau10';
-my $DEFAULT_JS     = $D3_CATEGORICAL{$DEFAULT_SCHEME}{'js'};
+my $DEFAULT_COLOURS = _js_colours($DEFAULT_SCHEME);
 
 my $chart = HTML::D3->new(title => 'Palette');
 
@@ -116,9 +117,10 @@ throws_ok { HTML::D3->colour_at('set2') } qr/^Colour index must be a non-negativ
 # The charts draw with the definition.
 #
 # Every snippet that takes a scheme is rendered once per scheme the API names,
-# and the JS it emits has to name that scheme's D3 expression - the same one a
-# map is handed - and to look it up under the name the caller passed.  That is
-# what makes "the same data, the same scheme=" true for a chart and a map.
+# and the JS it emits has to name that scheme in its lookup - the same one a map
+# is handed - and, where it draws the colours directly, to hold the scheme's hex
+# array exactly as palette() reports it.  That is what makes "the same data, the
+# same scheme=" true for a chart and a map.
 # ─────────────────────────────────────────────────────────────────────────────
 
 my @PIE_DATA     = (['A', 1], ['B', 2], ['C', 3]);
@@ -130,53 +132,58 @@ my @BINNED_DATA  = ({ label => 'a', count => 3 });
 
 subtest 'each snippet draws the scheme it is given with that scheme' => sub {
 	for my $scheme (sort keys %D3_CATEGORICAL) {
-		my $js = $D3_CATEGORICAL{$scheme}{'js'};
+		my $d3      = $D3_CATEGORICAL{$scheme}{'d3'};
+		my $colours = _js_colours($scheme);
 
 		my $pie = $chart->render_pie_chart_snippet(\@PIE_DATA, { color_scheme => $scheme })->{html};
-		like($pie, qr/\Q$js\E/, "pie chart draws '$scheme' with $js");
 		like($pie, qr/SCHEMES\['\Q$scheme\E'\]/, "pie chart looks '$scheme' up by name");
+		like($pie, qr/\Q$colours\E/, "pie chart inlines the hex colours of $d3");
 
 		my $stacked = $chart->render_stacked_bar_snippet(\@STACKED_DATA, { scheme => $scheme })->{html};
-		like($stacked, qr/\Q$js\E/, "stacked bar draws '$scheme' with $js");
 		like($stacked, qr/SCHEMES\['\Q$scheme\E'\]/, "stacked bar looks '$scheme' up by name");
 
 		my $treemap = $chart->render_treemap_snippet(\@TREEMAP_DATA, { scheme => $scheme })->{html};
-		like($treemap, qr/\Q$js\E/, "treemap draws '$scheme' with $js");
 		like($treemap, qr/SCHEMES\['\Q$scheme\E'\]/, "treemap looks '$scheme' up by name");
 
 		my $multi = $chart->render_multi_series_line_chart_snippet(\@SERIES_DATA, { scheme => $scheme })->{html};
-		like($multi, qr/scaleOrdinal\(\Q$js\E\)/, "multi-series line chart draws '$scheme' with $js");
+		like($multi, qr/scaleOrdinal\(\Q$colours\E\)/, "multi-series line chart draws '$scheme' with its hex array");
 
 		my $scatter = $chart->render_scatter_chart_snippet(\@SCATTER_DATA, { colour_by_series => 1, scheme => $scheme })->{html};
-		like($scatter, qr/scaleOrdinal\(\Q$js\E\)/, "scatter chart draws '$scheme' with $js");
+		like($scatter, qr/scaleOrdinal\(\Q$colours\E\)/, "scatter chart draws '$scheme' with its hex array");
 
 		# The binned histogram fills its bars with the scheme's first colour:
 		# colour_at($scheme, 0), the colour a map shading the first category by
 		# hand uses, so the histogram and the map start from the same one.
 		my $histogram = $chart->render_histogram_snippet(\@BINNED_DATA, { binned => 1, scheme => $scheme })->{html};
-		like($histogram, qr/\Q$js\E\[0\]/, "binned histogram fills with the first colour of '$scheme'");
+		like($histogram, qr/\Q$colours\E\[0\]/, "binned histogram fills with the first colour of '$scheme'");
 	}
 };
 
 # The lookup table is generated from the definition, so a scheme added to the
 # vocabulary reaches every snippet that offers one rather than the snippets
-# somebody remembered to edit.
-subtest 'the table the snippets draw from holds every scheme, correctly paired' => sub {
+# somebody remembered to edit.  Its values are the colours palette() returns, as
+# literals: the browser is not asked to look up a d3.scheme* expression, which
+# could change under the page.
+subtest 'the table the snippets draw from holds every scheme, with its hex colours' => sub {
 	my $pie = $chart->render_pie_chart_snippet(\@PIE_DATA)->{html};
 
 	my ($table) = $pie =~ /SCHEMES = \{([^}]*)\}/;
 	ok(defined($table), 'the pie snippet looks its colours up in a SCHEMES table');
 
-	my %emitted = defined($table) ? ($table =~ /(\w+):\s*(d3\.scheme\w+)/g) : ();
-	is_deeply(\%emitted, { map { $_ => $D3_CATEGORICAL{$_}{'js'} } keys %D3_CATEGORICAL },
-		'and every scheme is in it, paired with that scheme\'s D3 expression')
+	my %emitted;
+	$emitted{$1} = $2 while(defined($table) && $table =~ /(\w+):\s*(\[[^\]]*\])/g);
+	is_deeply(\%emitted, { map { $_ => _js_colours($_) } keys %D3_CATEGORICAL },
+		'and every scheme is in it, as the hex array palette() hands out')
 		or diag(explain(\%emitted));
+
+	unlike($pie, qr/d3\.scheme/,
+		'and no scheme is emitted as a d3.scheme* expression');
 };
 
 # An unknown scheme is drawn with the documented default.  The capitalisation
 # this replaced produced d3.schemeNonsense, an undefined function in the
 # browser, so the fallback is asserted to be the default and nothing invented.
-subtest 'an unknown scheme falls back to the default, and invents no d3.scheme' => sub {
+subtest 'an unknown scheme falls back to the default, and reads no d3.scheme' => sub {
 	my %renders = (
 		'pie chart' => sub { $chart->render_pie_chart_snippet(\@PIE_DATA, { color_scheme => $_[0] })->{html} },
 		'stacked bar' => sub { $chart->render_stacked_bar_snippet(\@STACKED_DATA, { scheme => $_[0] })->{html} },
@@ -188,9 +195,8 @@ subtest 'an unknown scheme falls back to the default, and invents no d3.scheme' 
 
 	for my $name (sort keys %renders) {
 		my $html = $renders{$name}->('nonsense');
-		like($html, qr/\Q$DEFAULT_JS\E/, "$name with an unknown scheme draws the default scheme");
-		unlike($html, qr/d3\.scheme(?!Category10|Tableau10|Set2|Set3|Paired)/,
-			"$name with an unknown scheme names no scheme outside the vocabulary");
+		like($html, qr/\Q$DEFAULT_COLOURS\E/, "$name with an unknown scheme draws the default palette");
+		unlike($html, qr/d3\.scheme/, "$name with an unknown scheme reads no D3 palette");
 	}
 
 	# Being asked for is not a way into the vocabulary: looking a name up must
@@ -202,29 +208,36 @@ subtest 'an unknown scheme falls back to the default, and invents no d3.scheme' 
 };
 
 # ─────────────────────────────────────────────────────────────────────────────
-# No palette is written down anywhere else.
+# The page does not ask d3 for a palette.
 #
-# The schemes are a definition, not a convention: each one's D3 expression is
-# written once, in the table at the top of the module, and every chart reads it
-# from there - a snippet with a scheme option, a full-page chart that has always
-# drawn category10, whatever is added tomorrow.  So the module's *code* has to
-# hold each of the five expressions exactly once and no sixth: a second copy is
-# a palette that a change to the first one leaves behind, which is the drift
-# this file exists to catch.  Prose is not code - a sentence about a scheme, or
-# a hex colour in a comment, is stripped before the count.
+# A chart that drew with d3.schemeCategory10 would change colour when d3 did,
+# and would disagree with a map shading the same categories from palette().
+# Every colour is inlined from the definition instead, so the module's code has
+# to hold no d3.scheme* expression at all.  Prose is not code - a comment or POD
+# naming the scheme a palette transcribes is stripped before the count.
 # ─────────────────────────────────────────────────────────────────────────────
 
-subtest 'each scheme is written down once, and only the five are written' => sub {
+subtest 'the module reads no palette from d3' => sub {
 	my %written;
 	my $code = _module_code();
-	$written{$1}++ while $code =~ /(d3\.scheme\w+)/g;
+	$written{$1}++ while $code =~ /(d3\.scheme\w*)/g;
 
-	is_deeply(\%written, { map { $_->{'js'} => 1 } values %D3_CATEGORICAL },
-		"each published scheme is the module's only mention of that expression")
+	is_deeply(\%written, {},
+		'every chart inlines its colours from the definition, and reads no d3.scheme* palette')
 		or diag(explain(\%written));
 };
 
 done_testing();
+
+# A scheme's colours as the JS array a snippet inlines, built from palette() -
+# the same accessor a map calls - so an assertion here is that the chart emits
+# the colours the API hands out.
+sub _js_colours
+{
+	my ($scheme) = @_;
+
+	return '[' . join(', ', map { "'$_'" } @{HTML::D3->palette($scheme)}) . ']';
+}
 
 # The module's code: its POD and its comments removed, so that a sentence about
 # a scheme - or a hex colour in a comment - is not mistaken for a definition.

@@ -1,4 +1,33 @@
 Revision history for Time-Keeper
 
-0.01    2026-10-15
+0.04    2026-10-18
+        - Time::Keeper::Date, Time::Keeper::YearMonth and Time::Keeper::MonthDay: a date with no time, a year and month, a month and day; to_date, to_year_month and to_month_day on a value.
+        - Time::Keeper::Time: a time of day on no date, wrapping at midnight; to_time on a value; Date->at takes one.
+
+0.03    2026-10-18
+        - The locale archive carries CLDR's relative-time words, duration units, list patterns, interval formats, weekend days and plural rules (archive section version 3).
+        - Time::Keeper::Locale: weekend_start, weekend_end, plural_category, relative_names, unit_patterns, duration_patterns, list_patterns, interval_formats, interval_fallback.
+        - format_relative: "3 hours ago", "yesterday", in every locale; Duration->format: "1 hour, 30 minutes" and h:mm:ss.
+        - format_interval: "Oct 15 – 17, 2026", the shared fields written once, in every locale.
+        - is_weekend and is_weekday; week and week_year take locale => 1; truncate, round and end_of take week_start.
+        - $Time::Keeper::CLOCK pins the clock now and today read, for tests; a value, an epoch or a code ref.
+        - range and iterate: the values from one to another by a unit or a duration, as a list or one at a time.
+        - Fix: CBOR::XS and JSON::XS could not encode a value or a duration; a value's referent is no longer read-only.
+        - Fix: from_object read tzoffset wrongly before perl 5.38.
+
+0.02    2026-10-18
+        - end_of: the last nanosecond of a year, quarter, month, week, day, hour, minute, second, millisecond or microsecond.
+        - truncate, round and end_of to a millisecond, microsecond or nanosecond; round to a day on a day with no midnight rounds to the real next midnight.
+        - round takes increment and mode (floor, ceil, half_floor, half_ceil, half_even); Duration->round.
+        - until and since: the difference in chosen units (largest, smallest, increment, mode); modes trunc and expand.
+        - Duration->total, Duration->balance, and relative_to for Duration->round.
+        - epoch_millis, epoch_micros, epoch_nanos, and from_epoch_millis, from_epoch_micros, from_epoch_nanos.
+        - FREEZE and THAW (Sereal, CBOR::XS) on values and durations; Storable hooks on durations.
+        - from_object takes an object with epoch (Time::Piece, Time::Moment); iso8601 takes form => basic, week or ordinal.
+        - try_new and try_with; with takes day_of_year and week; to_list; hour_12; Duration->divide and ->abs.
+        - next, previous, nth_in_month and last_in_month: the weekday adjusters.
+        - with takes day => 'last' and day_of_week.
+        - Add next_transition, previous_transition, is_ambiguous, other_reading, standard_offset and dst_offset.
+
+0.01    2026-10-16
         - first version

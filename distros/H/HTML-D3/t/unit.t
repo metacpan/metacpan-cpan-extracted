@@ -153,7 +153,7 @@ my %LEDGER = (
 	'pie: D3 CDN loaded'                               => 1,
 	'pie: SVG element present'                         => 1,
 	'pie: d3.pie present'                              => 1,
-	'pie: d3.schemeCategory10 present'                 => 1,
+	'pie: category10 colours inlined'                  => 1,
 
 	# render_animated_pie_chart
 	'anim-pie: die data not optional'                  => 1,
@@ -332,7 +332,7 @@ my %LEDGER = (
 	'bar-snip: default vertical scaleBand on x'        => 1,
 	'bar-snip: horizontal scaleBand on y'              => 1,
 	'bar-snip: default color steelblue'                => 1,
-	'bar-snip: categorical color schemeTableau10'      => 1,
+	'bar-snip: categorical color tableau10 colours'      => 1,
 	'bar-snip: sort by value descending'               => 1,
 	'bar-snip: max_bars collapses tail into Other'     => 1,
 	'bar-snip: show_values D3 block present'           => 1,
@@ -650,8 +650,8 @@ subtest 'render_pie_chart() -- output content' => sub {
 	like($html, qr/d3\.pie\(\)/, 'd3.pie() generator present');
 	mark('pie: d3.pie present');
 
-	like($html, qr/d3\.schemeCategory10/, 'd3.schemeCategory10 colour scheme present');
-	mark('pie: d3.schemeCategory10 present');
+	like($html, qr/\['#1f77b4', '#ff7f0e'/, 'category10 colours inlined as hex values');
+	mark('pie: category10 colours inlined');
 
 	diag('render_pie_chart output length: ' . length($html)) if $ENV{TEST_VERBOSE};
 };
@@ -747,7 +747,7 @@ subtest 'render_pie_chart_snippet() -- page-shell absent and D3 primitives' => s
 	like($html, qr/d3\.pie\(\)/, 'd3.pie() present in fragment');
 	mark('pie-snip: d3.pie present');
 
-	like($html, qr/schemeTableau10/, 'default colour scheme is tableau10');
+	like($html, qr/SCHEMES\['tableau10'\]/, 'default colour scheme is tableau10');
 	mark('pie-snip: tableau10 default scheme');
 };
 
@@ -1480,8 +1480,8 @@ subtest 'render_bar_chart_snippet() -- color options' => sub {
 
 	# Categorical color uses the D3 Tableau-10 palette.
 	my $html_cat = HTML::D3->new()->render_bar_chart_snippet(\@BAR_DATA, { color => 'categorical' })->{html};
-	like($html_cat, qr/schemeTableau10/, 'categorical color emits schemeTableau10');
-	mark('bar-snip: categorical color schemeTableau10');
+	like($html_cat, qr/\['#4e79a7', '#f28e2c'/, 'categorical color emits the tableau10 hex colours');
+	mark('bar-snip: categorical color tableau10 colours');
 };
 
 subtest 'render_bar_chart_snippet() -- sorting and truncation' => sub {

@@ -6,7 +6,7 @@ use namespace::autoclean;
 use IO::Async::Loop;
 use IO::Async::Stream;
 use Net::SSLeay ();
-our $VERSION = '0.102'; # VERSION
+our $VERSION = '0.103'; # VERSION
 # ABSTRACT: handles asynchronous digest calculation using openssl
 
 # FIXME, needs to be rewritten using futures and filename in calc_digests
@@ -94,7 +94,7 @@ Archive::BagIt::Role::OpenSSL::Async - handles asynchronous digest calculation u
 
 =head1 VERSION
 
-version 0.102
+version 0.103
 
 =head1 AVAILABILITY
 

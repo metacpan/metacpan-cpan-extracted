@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.60';
+our $VERSION = '0.61';
 
 # The runtime cost. Deliberately a package variable so a test suite can
 # `local $Punk::Auth::Password::ITERATIONS = 1_000;` and stay fast; the

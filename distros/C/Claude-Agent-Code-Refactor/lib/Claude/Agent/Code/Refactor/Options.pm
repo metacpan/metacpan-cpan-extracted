@@ -4,40 +4,37 @@ use 5.020;
 use strict;
 use warnings;
 
-use Types::Common -types;
+use Object::Proto ();
 
-# Valid values for validation
 my @VALID_SEVERITIES = qw(critical high medium low info);
 my @VALID_CATEGORIES = qw(bugs security style performance maintainability);
 
-use Marlin
-    # Loop control
-    'max_iterations'     => sub { 5 },
-    'max_turns_per_fix'  => sub { 20 },
-    'stop_on_critical'   => sub { 1 },
+BEGIN {
+    Object::Proto::define('Claude::Agent::Code::Refactor::Options',
+        'max_iterations:Int:default(5)',
+        'max_turns_per_fix:Int:default(20)',
+        'stop_on_critical:Bool:default(1)',
+        'min_severity:Str:default(low)',
+        'categories:builder(_build_categories)',
+        'fix_one_at_a_time:Bool:default(0)',
+        'dry_run:Bool:default(0)',
+        'create_backup:Bool:default(0)',
+        'perlcritic:default(0)',
+        'perlcritic_severity:Int:default(4)',
+        'filter_false_positives:Bool:default(1)',
+        'model',
+        'effort:Str:predicate',
+        'permission_mode:Str:default(acceptEdits)',
+    );
+}
 
-    # Issue filtering (passed to Code::Review)
-    'min_severity'       => sub { 'low' },
-    'categories'         => sub { ['bugs', 'security', 'style', 'performance', 'maintainability'] },
-
-    # Fix behavior
-    'fix_one_at_a_time'  => sub { 0 },
-    'dry_run'            => sub { 0 },
-    'create_backup'      => sub { 0 },
-
-    # Review options (passed through to Code::Review)
-    'perlcritic'              => sub { 0 },
-    'perlcritic_severity'     => sub { 4 },
-    'filter_false_positives'  => sub { 1 },
-
-    # Claude options
-    'model'              => sub { undef },
-    'permission_mode'    => sub { 'acceptEdits' };
+sub _build_categories {
+    return [@VALID_CATEGORIES];
+}
 
 sub BUILD {
     my ($self) = @_;
 
-    # Validate min_severity
     if (defined $self->min_severity) {
         my $sev = $self->min_severity;
         unless (grep { $_ eq $sev } @VALID_SEVERITIES) {
@@ -46,7 +43,6 @@ sub BUILD {
         }
     }
 
-    # Validate categories
     if (defined $self->categories) {
         unless (ref $self->categories eq 'ARRAY') {
             die "Categories must be an array reference";
@@ -62,7 +58,6 @@ sub BUILD {
         }
     }
 
-    # Validate max_iterations
     if (defined $self->max_iterations) {
         if ($self->max_iterations < 1) {
             die "max_iterations must be >= 1";
@@ -72,7 +67,6 @@ sub BUILD {
         }
     }
 
-    # Validate max_turns_per_fix
     if (defined $self->max_turns_per_fix) {
         if ($self->max_turns_per_fix < 1) {
             die "max_turns_per_fix must be >= 1";
@@ -82,7 +76,6 @@ sub BUILD {
         }
     }
 
-    # Validate perlcritic_severity (1-5)
     if (defined $self->perlcritic_severity) {
         my $sev = $self->perlcritic_severity;
         unless ($sev =~ /^[1-5]$/) {
@@ -90,6 +83,30 @@ sub BUILD {
         }
     }
 }
+
+sub to_review_options {
+    my ($self) = @_;
+
+    require Claude::Agent::Code::Review::Options;
+
+    my $review_perm_mode = 'default';
+
+    return Claude::Agent::Code::Review::Options->new(
+        severity               => $self->min_severity,
+        categories             => $self->categories,
+        perlcritic             => $self->perlcritic,
+        perlcritic_severity    => $self->perlcritic_severity,
+        filter_false_positives => $self->filter_false_positives,
+        permission_mode        => $review_perm_mode,
+        ($self->model ? (model => $self->model) : ()),
+        ($self->has_effort ? (effort => $self->effort) : ()),
+    );
+}
+
+
+1;
+
+__END__
 
 =head1 NAME
 
@@ -138,6 +155,8 @@ Configuration object for Claude::Agent::Code::Refactor.
 
 =item * model - Claude model to use (default: inherited)
 
+=item * effort - Effort level passed to both the review and the fix: low, medium, high, xhigh or max (optional; C<has_effort> reports whether it was given)
+
 =item * permission_mode - Permission mode (default: 'acceptEdits')
 
 =back
@@ -151,26 +170,6 @@ the review-related settings from this object.
 
 =cut
 
-sub to_review_options {
-    my ($self) = @_;
-
-    require Claude::Agent::Code::Review::Options;
-
-    # Use 'default' permission mode for review operations - review only reads files
-    # and doesn't need edit permissions.
-    my $review_perm_mode = 'default';
-
-    return Claude::Agent::Code::Review::Options->new(
-        severity               => $self->min_severity,
-        categories             => $self->categories,
-        perlcritic             => $self->perlcritic,
-        perlcritic_severity    => $self->perlcritic_severity,
-        filter_false_positives => $self->filter_false_positives,
-        permission_mode        => $review_perm_mode,
-        ($self->model ? (model => $self->model) : ()),
-    );
-}
-
 =head1 AUTHOR
 
 LNATION, C<< <email at lnation.org> >>
@@ -182,5 +181,3 @@ This software is Copyright (c) 2026 by LNATION.
 This is free software, licensed under The Artistic License 2.0 (GPL Compatible).
 
 =cut
-
-1;

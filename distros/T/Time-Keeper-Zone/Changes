@@ -1,4 +1,16 @@
 Revision history for Time-Keeper-Zone
 
-0.01    2026-10-15
+0.04    2026-10-18
+        - Fix: t/04-surface.t failed on a Windows machine whose zone is not UTC.
+
+0.03    2026-10-17
+        - Add transitions, next_transition and previous_transition.
+        - Add offset_at, standard_offset_at and has_dst.
+        - Add country_of and windows_name.
+        - C ABI version 2: prev_change, resolve_local_all, standard_offset_at, country_of, windows_name.
+
+0.02    2026-10-17
+        - Fix: the build failed on Windows.
+
+0.01    2026-10-16
         - first version

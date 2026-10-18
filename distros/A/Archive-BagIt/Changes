@@ -1,10 +1,40 @@
 ==================================================
-Changes from 2025-10-15 00:00:00 +0000 to present.
+Changes from 2025-10-17 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.102 at 2026-10-15 20:35:52 +0000
+version 0.103 at 2026-10-17 12:32:06 +0000
 ------------------------------------------
+
+  Change: 651ca1434ecda2f07aa248f52ee6ea6618773e9b
+  Author: art1@andreas-romeyke.de <art1pirat@fsfe.org>
+  Date : 2026-10-17 14:31:33 +0000
+
+    - init, to check which algorithm needs attention 
+
+  Change: 05b06bcad9d3790216a10a640b6422d8718473ef
+  Author: art1@andreas-romeyke.de <art1pirat@fsfe.org>
+  Date : 2026-10-17 14:25:02 +0000
+
+    - refactoring, extracted _calc_bagsize_by_octets() - avoids multiple
+    calls to calc_payload_oxum() - fixed test, only one warning will be
+    generated now (as expected) 
+
+  Change: 1b8ed0aa5b5a73072d9e2a1969c878c99b7800ae
+  Author: art1@andreas-romeyke.de <art1pirat@fsfe.org>
+  Date : 2026-10-17 14:05:16 +0000
+
+    - refactoring, moved sort to use it once per level (instead multiple) 
+
+------------------------------------------
+version 0.102 at 2026-10-15 20:36:31 +0000
+------------------------------------------
+
+  Change: 4585f2411e72a38b70f185e25d8e4a24619fad2d
+  Author: art1@andreas-romeyke.de <art1pirat@fsfe.org>
+  Date : 2026-10-15 22:36:31 +0000
+
+    Released 0.102 
 
   Change: f2c876bc6faafc77492bb12c6913c483c55fee8d
   Author: art1@andreas-romeyke.de <art1pirat@fsfe.org>
@@ -161,5 +191,5 @@ version 0.102 at 2026-10-15 20:35:52 +0000
     - use async IO by default 
 
 =================================================
-Plus 50 releases after 2025-10-15 00:00:00 +0000.
+Plus 50 releases after 2025-10-17 00:00:00 +0000.
 =================================================

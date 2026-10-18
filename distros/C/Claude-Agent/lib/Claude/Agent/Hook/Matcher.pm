@@ -22,7 +22,7 @@ sub matches {
 
     my $pattern = $self->matcher;
 
-    if ($pattern eq quotemeta($pattern)) {
+    if ($pattern !~ /[\\^\$.|?*+()\[\]{}]/) {
         return $tool_name eq $pattern;
     }
 
@@ -104,9 +104,11 @@ Takes a flat list of name/value pairs. Unknown names are ignored.
 
     if ($matcher->matches('Bash')) { ... }
 
-True when the pattern matches the tool name. A plain string is an exact
-match; anything with regex metacharacters is a regular expression, run
-with a one second alarm and refused outright when it nests quantifiers.
+True when the pattern matches the tool name, the way the CLI decides it:
+a pattern with no regular expression metacharacter is an exact match, so
+C<shell-tools__> matches nothing and C<mcp__shell-tools__.*> is needed;
+anything else is a regular expression, run with a one second alarm and
+refused outright when it nests quantifiers.
 
 =head1 AUTHOR
 

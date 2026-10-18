@@ -1,0 +1,185 @@
+NAME
+
+    WebService::UptimeKuma::Push - update Uptime Kuma push monitors
+
+VERSION
+
+    Version 0.002
+
+SYNOPSIS
+
+        use WebService::UptimeKuma::Push 0.001;
+
+        my $kuma = WebService::UptimeKuma::Push->new(
+            server => 'https://kuma.example.net:3001',
+            token  => 'MSCHnx6nVs',
+        );
+
+        # or use the push URL from the Uptime Kuma web interface
+        my $kuma = WebService::UptimeKuma::Push->new(
+            url => 'https://kuma.example.net:3001/api/push/MSCHnx6nVs?status=up&msg=OK&ping=',
+        );
+
+        $kuma->up( msg => 'hello world', ping => 7 );
+        $kuma->down( msg => 'backup failed' );
+
+        # run the code, report its runtime as ping and up or down
+        # depending on whether it threw an exception
+        $kuma->run( sub { do_backup() } );
+
+DESCRIPTION
+
+    Uptime Kuma <https://uptime.kuma.pet/> supports push monitors. Instead
+    of Uptime Kuma checking a service, the service (or a script) sends a
+    heartbeat to Uptime Kuma. If no heartbeat arrives in time, Uptime Kuma
+    marks the monitor as down.
+
+    This module sends these heartbeats, so you don't have to construct the
+    push URL yourself in every script.
+
+    By default, failing to reach Uptime Kuma is not fatal. A script which
+    does its job should not die because the monitoring is unavailable. The
+    methods up and down return false instead and the reason is available
+    from error. Use the fatal option to get an exception instead.
+
+USAGE
+
+ new( ARGS )
+
+    Creates and returns a new WebService::UptimeKuma::Push object for one
+    push monitor. new throws an exception on invalid arguments.
+
+        my $kuma = WebService::UptimeKuma::Push->new( url => $url );
+        my $kuma = WebService::UptimeKuma::Push->new( server => $server, token => $token );
+        my $kuma = WebService::UptimeKuma::Push->new( url => $url, fatal => 1, timeout => 3 );
+
+    The following arguments are supported:
+
+  url
+
+    The push URL of the monitor, as shown by the Uptime Kuma web interface.
+    The query string is ignored.
+
+    Either url, or server and token must be specified.
+
+  server
+
+    The base URL of the Uptime Kuma server, consisting of the scheme, the
+    host and, optionally, the port.
+
+  token
+
+    The push token of the monitor.
+
+  fatal
+
+    If true, up, down, and run throw an exception if the heartbeat cannot
+    be delivered. Defaults to false.
+
+  timeout
+
+    The timeout, in seconds, for the HTTP request. Defaults to 10.
+
+  http
+
+    An object to use instead of the default HTTP::Tiny object. It must
+    provide a get method compatible with HTTP::Tiny. This can be used to
+    configure a proxy or SSL options. Cannot be combined with timeout.
+
+ up( [ARGS] )
+
+    Sends an up heartbeat to Uptime Kuma. Returns true on success and false
+    otherwise. If fatal is set, an exception is thrown instead of returning
+    false.
+
+        $kuma->up;
+        $kuma->up( msg => 'all good', ping => 17 );
+
+    The following arguments are supported:
+
+      * msg - The message shown in Uptime Kuma. Uptime Kuma uses OK if none
+      is given.
+
+      * ping - The response time, in milliseconds, shown in Uptime Kuma.
+
+ down( [ARGS] )
+
+    Sends a down heartbeat to Uptime Kuma. Supports the same arguments, and
+    returns the same, as up.
+
+        $kuma->down( msg => 'disk full' );
+
+ run( CODE, [ARGS] )
+
+    Runs the code reference and measures its runtime. If the code returns,
+    an up heartbeat is sent with the runtime as ping. If the code throws an
+    exception, a down heartbeat is sent with the exception as msg and the
+    exception is rethrown. In that case a failure to deliver the down
+    heartbeat is never fatal, the exception from the code takes precedence.
+
+    Returns whatever the code returned, in the context run was called in.
+
+        my $result = $kuma->run( sub { do_backup() }, msg => 'backup done' );
+
+    The only supported argument is msg, the message to send on success.
+
+ error
+
+    Returns the error of the last failed up or down, or undef if the last
+    heartbeat was delivered successfully.
+
+ server
+
+    Returns the base URL of the Uptime Kuma server.
+
+ token
+
+    Returns the push token.
+
+ url
+
+    Returns the push URL, without query string.
+
+EXAMPLES
+
+ Example 1 Report the result of a cron job
+
+        use WebService::UptimeKuma::Push;
+
+        my $kuma = WebService::UptimeKuma::Push->new(
+            url => 'https://kuma.example.net:3001/api/push/MSCHnx6nVs',
+        );
+
+        $kuma->run(
+            sub {
+                system( 'rsync', '-a', '/data/', 'backup:/data/' ) == 0
+                  or die "rsync failed with exit code " . ( $? >> 8 ) . "\n";
+            },
+            msg => 'backup successful',
+        );
+
+SEE ALSO
+
+    HTTP::Tiny, https://github.com/louislam/uptime-kuma
+
+SUPPORT
+
+ Bugs / Feature Requests
+
+    Please report any bugs or feature requests through the issue tracker at
+    https://github.com/skirmess/WebService-UptimeKuma-Push/issues. You will
+    be notified automatically of any progress on your issue.
+
+ Source Code
+
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    https://github.com/skirmess/WebService-UptimeKuma-Push
+
+      git clone https://github.com/skirmess/WebService-UptimeKuma-Push.git
+
+AUTHOR
+
+    Sven Kirmess <sven.kirmess@kzone.ch>
+

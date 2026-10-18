@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.7702, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,12 +19,14 @@ no_index:
     - t
     - inc
 requires:
-  Claude::Agent: '0.11'
+  Claude::Agent: '0.14'
   Future::AsyncAwait: '0.60'
+  HTML::Scrubber: '0'
   IO::Async: '0.80'
-  Marlin: '0.007000'
+  Object::Proto: '1.00'
   Scalar::Util: '0'
-  Types::Standard: '2.0'
+  Text::Markdown: '0'
+  URI: '0'
   perl: '5.020'
-version: '0.02'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

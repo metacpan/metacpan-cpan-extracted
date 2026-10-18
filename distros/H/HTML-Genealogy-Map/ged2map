@@ -19,6 +19,7 @@ use Geo::Coder::List;
 use Geo::Coder::OSM;
 use HTML::GoogleMaps::V3;
 use HTML::OSM;
+use Scalar::Util qw(blessed);
 
 # Configuration
 my $gedcom_file = $ARGV[0] or die "Usage: $0 <gedcom_file>";
@@ -110,13 +111,14 @@ foreach my $event (@events) {
 	# Check cache
 	unless (exists $cache{$place}) {
 		my $location = $geocoder->geocode(location => $place);
-		if ($location && $location->{lat} && $location->{lon}) {
+		my ($latitude, $longitude) = $location ? _coordinates($location) : ();
+		if (defined($latitude) && defined($longitude)) {
 			$cache{$place} = {
-				lat => $location->{lat},
-				lon => $location->{lon},
+				lat => $latitude,
+				lon => $longitude,
 			};
 			print "\tGeocoded: $place\n";
-			sleep 1 if($location->{'geocoder'} !~ /^Geo::Coder::Free/);	# Be nice to geocoding service
+			sleep 1 if(($location->{'geocoder'} // '') !~ /^Geo::Coder::Free/);	# Be nice to geocoding service
 
 		} else {
 			print "\tFailed to geocode: $place\n";
@@ -152,6 +154,23 @@ if ($google_key) {
 }
 
 print "Map saved to $output_file\n";
+
+# The position out of a geocoder result, read the way the result is built:
+# accessors when it is a Geo::Location::Point (Geo::Coder::Free and its
+# backends), hash keys for the geocoders that return a plain hash.  'lon' is the
+# last fallback, as in HTML::Genealogy::Map: it is not part of the point
+# interface, and it is never the test of whether the lookup succeeded.
+sub _coordinates {
+	my $location = shift;
+
+	return unless ref($location);
+
+	if(blessed($location) && $location->can('latitude') && $location->can('longitude')) {
+		return ($location->latitude(), $location->longitude());
+	}
+
+	return ($location->{'lat'}, $location->{'long'} // $location->{'lng'} // $location->{'lon'});
+}
 
 # Generate HTML for grouped events
 sub generate_popup_html {

@@ -26,6 +26,19 @@ tk_is_ascii(const char *s)
     return 1;
 }
 
+/* A string as an SV, UTF-8 where it has to be, or undef for NULL. */
+static SV *
+tk_newSVstr(pTHX_ const char *s)
+{
+    SV *sv;
+    if (!s)
+        return newSV(0);
+    sv = newSVpv(s, 0);
+    if (!tk_is_ascii(s))
+        SvUTF8_on(sv);
+    return sv;
+}
+
 /* Append and note when what was appended is not ASCII, so the result can
  * be flagged as characters. */
 typedef struct tk_out {
@@ -946,15 +959,33 @@ tk_rfc2822(pTHX_ tk_out *o, tk_value *v, int http)
 }
 
 /* The date and time with a fraction of exactly `digits` digits (0 to 9),
- * or the fewest of 3, 6 or 9 that are exact when digits is -1. */
+ * or the fewest of 3, 6 or 9 that are exact when digits is -1, in ISO
+ * 8601's form 0 extended (2026-10-15T09:00:00), 1 basic (20261015T090000),
+ * 2 week (2026-W42-4T09:00:00) or 3 ordinal (2026-288T09:00:00). */
 static void
-tk_out_datetime(pTHX_ tk_out *o, tk_value *v, int digits)
+tk_out_datetime_form(pTHX_ tk_out *o, tk_value *v, int digits, int form)
 {
     char buf[64];
     const tk_civil *c = tk_value_civil(v);
-    int n = tk_fmt_year(buf, c->year);
-    n += sprintf(buf + n, "-%02u-%02uT%02u:%02u:%02u", (unsigned)c->month, (unsigned)c->day,
-                 (unsigned)c->hour, (unsigned)c->minute, (unsigned)c->second);
+    int n;
+    if (form == 2) {
+        int64_t wy;
+        unsigned w;
+        tk_iso_week(c->year, c->month, c->day, &wy, &w);
+        n = tk_fmt_year(buf, wy);
+        n += sprintf(buf + n, "-W%02u-%uT%02u:%02u:%02u", w, (unsigned)c->dow,
+                     (unsigned)c->hour, (unsigned)c->minute, (unsigned)c->second);
+    }
+    else {
+        n = tk_fmt_year(buf, c->year);
+        if (form == 3)
+            n += sprintf(buf + n, "-%03uT%02u:%02u:%02u", (unsigned)c->doy,
+                         (unsigned)c->hour, (unsigned)c->minute, (unsigned)c->second);
+        else
+            n += sprintf(buf + n, form == 1 ? "%02u%02uT%02u%02u%02u" : "-%02u-%02uT%02u:%02u:%02u",
+                         (unsigned)c->month, (unsigned)c->day,
+                         (unsigned)c->hour, (unsigned)c->minute, (unsigned)c->second);
+    }
     if (digits < 0)
         n += tk_fmt_fraction(buf + n, c->nsec);
     else if (digits > 0) {
@@ -965,6 +996,12 @@ tk_out_datetime(pTHX_ tk_out *o, tk_value *v, int digits)
         n += digits;
     }
     tk_out_cat(aTHX_ o, buf, (STRLEN)n);
+}
+
+static void
+tk_out_datetime(pTHX_ tk_out *o, tk_value *v, int digits)
+{
+    tk_out_datetime_form(aTHX_ o, v, digits, 0);
 }
 
 #endif

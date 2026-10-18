@@ -33,7 +33,7 @@ unlike($html, qr/<html/i,           'No <html> wrapper');
 unlike($html, qr/<head/i,           'No <head> element');
 unlike($html, qr/<body/i,           'No <body> element');
 unlike($html, qr{https://d3js\.org/d3\.v7}, 'No D3 CDN tag — caller loads D3');
-like($html, qr/schemeTableau10/, 'Default colour scheme is tableau10');
+like($html, qr/SCHEMES\['tableau10'\]/, 'Default colour scheme is tableau10');
 
 # ── animated => 1 ─────────────────────────────────────────────────────────────
 my $anim = $chart->render_pie_chart_snippet(\@data, { animated => 1 });

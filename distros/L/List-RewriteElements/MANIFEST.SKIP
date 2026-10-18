@@ -2,17 +2,24 @@
 \bRCS\b
 \bCVS\b
 ,v$
-.svn/
+^.svn/
+^.gitignore
+^.git/
 
 # ExtUtils::MakeMaker generated files and dirs.
 ^MANIFEST\.(?!SKIP)
+^MANIFEST.bak
 ^Makefile$
+^Makefile.old$
 ^blib/
 ^blibdirs$
 ^PM_to_blib$
+^pm_to_blib$
 ^MakeMaker-\d
-pm_to_blib
-                                                                                                                    
+^pm_to_blib$
+^MYMETA\.json$
+^MYMETA\.yml$
+
 # Module::Build
 ^Build$
 ^_build
@@ -33,3 +40,17 @@ pm_to_blib
 ^init_update\.conf
 .patch$
 .DS_Store
+
+# GitHub-related files
+\B\.git\b
+\B\.github\b
+
+# various other files
+nytprof/
+nytprof.out
+\.travis.yml
+^README.md
+^.README.pod
+\.appveyor.yml
+.version_info.pl
+

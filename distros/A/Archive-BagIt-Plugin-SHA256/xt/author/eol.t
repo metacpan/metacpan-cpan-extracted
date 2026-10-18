@@ -7,8 +7,6 @@ use Test::More 0.88;
 use Test::EOL;
 
 my @files = (
-    'lib/Archive/BagIt/Plugin/Algorithm/SHA256.pm',
-    'lib/Archive/BagIt/Plugin/Manifest/SHA256.pm',
     'lib/Archive/BagIt/Plugin/SHA256.pm',
     't/00-compile.t',
     't/store_bag.t',

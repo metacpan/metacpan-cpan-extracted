@@ -59,12 +59,12 @@ is($Z->windows_zone('Nowhere Standard Time'), undef, 'undef for a name Windows d
 
 # The local zone. TZ first, then the files, each stood in for here.
 sub local_from { Time::Keeper::Zone::_local_zone_from(@_) }
-is(local_from('Asia/Tokyo', undef, undef, undef), 'Asia/Tokyo', 'TZ names a zone');
-is(local_from(':Asia/Tokyo', undef, undef, undef), 'Asia/Tokyo', 'TZ with a colon before it');
-is(local_from('asia/tokyo', undef, undef, undef), 'Asia/Tokyo', 'TZ in the wrong case');
-is(local_from('', undef, undef, undef), 'Etc/UTC', 'an empty TZ is UTC');
-is(local_from('/usr/share/zoneinfo/Asia/Tokyo', undef, undef, undef), 'Asia/Tokyo', 'TZ as a path into zoneinfo');
-is(local_from(undef, undef, undef, undef), 'Etc/UTC', 'nothing at all is UTC');
+is(local_from('Asia/Tokyo', undef, undef, undef, undef), 'Asia/Tokyo', 'TZ names a zone');
+is(local_from(':Asia/Tokyo', undef, undef, undef, undef), 'Asia/Tokyo', 'TZ with a colon before it');
+is(local_from('asia/tokyo', undef, undef, undef, undef), 'Asia/Tokyo', 'TZ in the wrong case');
+is(local_from('', undef, undef, undef, undef), 'Etc/UTC', 'an empty TZ is UTC');
+is(local_from('/usr/share/zoneinfo/Asia/Tokyo', undef, undef, undef, undef), 'Asia/Tokyo', 'TZ as a path into zoneinfo');
+is(local_from(undef, undef, undef, undef, undef), 'Etc/UTC', 'nothing at all is UTC');
 
 my $dir = tempdir(CLEANUP => 1);
 open my $fh, '>', "$dir/timezone" or die;
@@ -75,13 +75,18 @@ print $fh "# comment\nUTC=true\nZONE=\"Africa/Lagos\"\n";
 close $fh;
 SKIP: {
     skip 'no symlinks here', 3 unless eval { symlink("/var/db/timezone/zoneinfo/Australia/Perth", "$dir/localtime") };
-    is(local_from(undef, "$dir/localtime", "$dir/timezone", "$dir/clock"), 'Australia/Perth', 'the link of /etc/localtime first');
-    is(local_from('EST5EDT', "$dir/localtime", undef, undef), 'EST5EDT', 'but TZ before it');
-    is(local_from('Not/AZone', "$dir/localtime", undef, undef), 'Australia/Perth', 'and a TZ that names nothing is passed over');
+    is(local_from(undef, "$dir/localtime", "$dir/timezone", "$dir/clock", undef), 'Australia/Perth', 'the link of /etc/localtime first');
+    is(local_from('EST5EDT', "$dir/localtime", undef, undef, undef), 'EST5EDT', 'but TZ before it');
+    is(local_from('Not/AZone', "$dir/localtime", undef, undef, undef), 'Australia/Perth', 'and a TZ that names nothing is passed over');
 }
-is(local_from(undef, "$dir/missing", "$dir/timezone", "$dir/clock"), 'America/Chicago', 'then /etc/timezone, trimmed');
-is(local_from(undef, undef, "$dir/missing", "$dir/clock"), 'Africa/Lagos', 'then /etc/sysconfig/clock');
-is(local_from(undef, "$dir/timezone", undef, undef), 'Etc/UTC', 'a localtime that is a file and not a link names nothing');
+is(local_from(undef, "$dir/missing", "$dir/timezone", "$dir/clock", undef), 'America/Chicago', 'then /etc/timezone, trimmed');
+is(local_from(undef, undef, "$dir/missing", "$dir/clock", undef), 'Africa/Lagos', 'then /etc/sysconfig/clock');
+is(local_from(undef, "$dir/timezone", undef, undef, undef), 'Etc/UTC', 'a localtime that is a file and not a link names nothing');
+is(local_from(undef, undef, undef, undef, 'W. Europe Standard Time'), 'Europe/Berlin', 'then the Windows time zone key name');
+is(local_from(undef, undef, "$dir/timezone", undef, 'W. Europe Standard Time'), 'America/Chicago', 'after the files');
+is(local_from('Asia/Tokyo', undef, undef, undef, 'W. Europe Standard Time'), 'Asia/Tokyo', 'and after TZ');
+is(local_from(undef, undef, undef, undef, 'Nowhere Standard Time'), 'Etc/UTC', 'a key name Windows does not have is UTC');
+is(local_from(undef, undef, undef, undef, ''), 'Etc/UTC', 'as is an empty one');
 
 {
     local $ENV{TZ} = 'Pacific/Auckland';

@@ -1,5 +1,320 @@
 Revision history for Stats-LikeR
 
+0.3218 2026-10-16 CDT (Claude Opus 5.5 helped)
+
+ [read_table()]
+
+ - An "Alignment error" now says what a ragged row's field count was
+   compared with. With header => 0 there is no header, but the message
+   still ended "(2 fields vs 1 headers)", which read as though header => 0
+   had been ignored. It now ends "(2 fields vs 1 in data row 1)", or "(2
+   fields vs 1 'col_names')" where col_names set the width. With a header
+   it is unchanged.
+
+ - When the header or data row 1 is a single field and a later row has
+   more, the message adds that the line has no separator in it, so sep may
+   be wrong, and, when sep was not passed, that ',' or a tab is only the
+   default for the file's name. A ';'-separated file named .csv.gz, read
+   with header => 0, failed on its first row with a comma in its text, and
+   nothing in the message pointed at the ',' that the name had chosen. The
+   note is not given for an .xlsx, or where col_names set the width.
+
+ [aoh2h() and h2aoh()]
+
+ - aoh2h() now dies on a key cell that holds a reference. It used the
+   reference's address as the key, so { variable => [1, 2], value => 1 }
+   came back as { 'ARRAY(0x611ec9f965f8)' => 1 }, a key nothing could
+   look up. h2aoh() already refused reference values for the same reason.
+   An object that overloads its operators is still a key, under its string
+   form, and is now stringified once per row instead of twice; so is a
+   qr//, under its pattern.
+
+ - aoh2h() takes a blessed array of rows, and blessed rows. It refused
+   both as "not a hashref", although aoh2hoa() takes them.
+
+ - aoh2h()'s duplicate-key message now names the row, as its other
+   messages about a row do and as the documentation said they all did:
+   "duplicate key 'a' has >= 2 occurrences, the first repeat at index 2".
+
+ - An undef option name, as in aoh2h($aoh, undef, 1) or h2aoh(\%h, undef,
+   1), now dies with "an option name is undefined". It died with perl's
+   "Use of uninitialized value within @_ in list assignment at
+   .../LikeR.pm line 1169", which named a line of the module rather than
+   the mistake.
+
+ [aoh2h(): speed and memory]
+
+ - aoh2h() is now XS. It runs 2.1 to 3.9 times as fast, and its result
+   takes 25% to 66% less memory, mostly because the keys are no longer
+   also stored in perl's shared string table: a frame's keys are its data,
+   and usually live in this one hash. A number is copied as a number, so
+   one that has been printed no longer brings its cached string along.
+   A tied frame sees the same EXISTS and FETCH calls, in the same order,
+   as before. The input is not changed.
+
+ - Each figure below is one cold call on perl 5.44.0, the median of 7
+   runs, on a frame of three columns; memory is the RSS the result adds.
+   The string values are numeric strings, which is what read_table()
+   gives, and the "printed" integers had been interpolated into a string
+   before the call. With 1000 distinct keys the result is under 1 MB
+   either way.
+
+ - | rows | keys | values | time, 0.3217 -> 0.3218 | faster |
+   |---|---|---|---|---|
+   | 1e6 | 1e6 | strings | 563 ms -> 272 ms | 2.1x |
+   | 1e6 | 1e6 | integers | 517 ms -> 201 ms | 2.6x |
+   | 1e6 | 1e6 | printed integers | 559 ms -> 208 ms | 2.7x |
+   | 1e6 | 1000 | strings, `duplicates => 'first'` | 215 ms -> 55 ms | 3.9x |
+   | 1e6 | 1000 | strings, `duplicates => 'last'` | 251 ms -> 69 ms | 3.6x |
+   | 1e5 | 1e5 | strings | 41.5 ms -> 16.3 ms | 2.5x |
+   | 1e5 | 1e5 | integers | 37.9 ms -> 11.2 ms | 3.4x |
+
+ - | rows | keys | values | memory, 0.3217 -> 0.3218 | change |
+   |---|---|---|---|---|
+   | 1e6 | 1e6 | strings | 130.0 MB -> 85.4 MB | -34% |
+   | 1e6 | 1e6 | integers | 114.7 MB -> 39.5 MB | -66% |
+   | 1e6 | 1e6 | printed integers | 114.6 MB -> 39.5 MB | -66% |
+   | 1e5 | 1e5 | strings | 12.4 MB -> 9.3 MB | -25% |
+   | 1e5 | 1e5 | integers | 10.9 MB -> 4.7 MB | -57% |
+
+ [cohen_d()]
+
+ - The confidence interval is now effectsize's noncentral-t interval, the
+   exact one under normality: t = d / sqrt(1/n1 + 1/n2) on n1 + n2 - 2 df,
+   and the limits of its noncentrality parameter, each scaled back by
+   sqrt(1/n1 + 1/n2). It was d +- z * se, a large-sample interval that is
+   too narrow in small samples and matched neither R package: on
+   effectsize 1.0.3's own test case, mtcars' weight by transmission, 0.3217
+   gave 1.048 to 2.737 where that test pins 1.030 to 2.732. ci_method =>
+   'normal' still gives the old interval, and the result's new ci_method
+   says which one it holds.
+
+ - Each limit is one root, in the noncentrality, of the same exact_pnt()
+   that power_t_test() uses, and agrees with mpmath at 60 digits to
+   8.4e-13. The same limits taken from R's pt() are good to about 2e-10,
+   and past |ncp| = 37.62 pt() returns a normal approximation: iris's
+   upper limits, Sepal.Length against Sepal.Width, are up to 1.6e-3 off in
+   R, so the test pins them to mpmath instead.
+
+ [cramers_v()]
+
+ - A table whose total is 1, or below 1 with fractional counts, is now
+   refused with "cramers_v: the table total must be more than 1". Bergsma's
+   bias correction divides by N - 1, and a total of 1 died on perl's own
+   "Illegal division by zero", naming a line of the module.
+
+ [eta_squared()]
+
+ - Group labels that look like numbers are now a factor. The raw form,
+   eta_squared(\@values, \@groups), passed aov() a formula, and aov() fits
+   a numeric column as one slope, so groups coded 1, 2, 3 were a linear
+   trend on 1 df. R's airquality example, Ozone by Month 5 to 9, gave
+   eta_sq 0.0271 where summary(aov(Ozone ~ factor(Month))) gives 0.2352.
+   The raw form's term is now 'Group', not '__group'.
+
+ - An aov() result with more than one effect term is now refused. It was
+   answered for whichever term sorted first, with that term's sum of
+   squares plus the residual one taken as the total, so eta_sq was
+   partial eta-squared and omega_sq was wrong as well.
+
+ - The raw form fits through oneway_test(var_equal => 1) where the data
+   allow it, and through aov() where oneway_test() would refuse them: one
+   group, a group of one value, or a value that is undef or not a number.
+   On 1e6 values in 5 groups that is 0.10 s and 47 MB, where aov() takes
+   0.73 s and 326 MB, and the two agree to 7e-16.
+
+ [hosmer_lemeshow()]
+
+ - The groups and the degrees of freedom are now those of hoslem.test() in
+   ResourceSelection 0.3-6. The breaks were not made unique, so a
+   prediction tied at the lowest one, as every prediction from a model
+   with only categorical predictors is, became a group of its own; and df
+   was g - 2 where hoslem.test() has G - 2, for the G groups that hold a
+   row. On predictions from a 4-level factor at the default g = 10, 0.3217
+   gave X-squared 2.745 on 4 groups and df 8, where hoslem.test() gives
+   0.920 on 3 groups and df 1.
+
+ - Fewer groups than g now warn, as R does: "hosmer_lemeshow: the data
+   allowed 3 of the 10 groups requested". One group, where R stops, is an
+   error.
+
+ - Two departures from hoslem.test() are deliberate, in cases where it has
+   no usable answer. A cell whose observed and expected counts are both 0
+   adds 0, where R adds 0/0 and returns NaN; that is every cell of an empty
+   bin. The last break is the largest prediction: R's seq(0, 1, 1/g) falls
+   short of 1 at g = 49, and the package's own example then bins 499 of
+   its 500 rows and reports df 48.
+
+ - g must now be an integer; g => 3.5 used to be accepted.
+
+ [smd()]
+
+ - A column that is one constant in both groups now has an SMD of 0, and
+   one that is constant within each group but differs between them is
+   +-Inf, as in tableone 0.13.2's StdDiff(). Both died with "pooled
+   standard deviation is zero", so one constant covariate took a whole
+   balance table down.
+
+ [table_one()]
+
+ - A continuous variable whose test cannot run now gets no p-value, as a
+   categorical one already did. t_test() dies on data that are constant
+   and on a group of one observation, and that took the whole table down.
+
+ - A by column with a group named variable, level, type, p_value, test or
+   Overall is now an error. Each group is a key of every output row, so a
+   group named 'test' had its summary overwritten by the label 't-test',
+   and one named 'Overall' overwrote the column that summarises every row.
+
+ - A types value other than 'continuous' or 'categorical' is now an error.
+   types => { age => 'numeric' } was taken as categorical, a row for every
+   distinct age.
+
+ - A by column shorter than the frame now reads as NA past its end, as
+   every other column did; it died on perl's "uninitialized value"
+   warning. A categorical column shorter than the frame now lists its rows
+   past the end as an NA level. They were already counted in the
+   percentages.
+
+ - Levels that are all numbers are listed in numeric order, with NA last.
+   They were sorted as strings, so stage 10 came between 1 and 2.
+
+ [table_one(): speed and memory]
+
+ - Columns are fetched one at a time instead of all at once; each value is
+   made a number once, where mean(), sd() and the test each parsed their
+   own copy of the string; the per-row group label strings and level
+   strings are gone; and with more than two groups the ANOVA p-value comes
+   from oneway_test(var_equal => 1), which agrees with aov() to the 1e-12
+   that R's anova(lm()) and oneway.test() differ by on the same data.
+
+ - Each figure is the best of 3 cold calls on perl 5.44.0 with by => 'arm'
+   (three groups) over four continuous and four categorical columns, about
+   5% missing; memory is the peak RSS the call adds.
+
+ - | rows | frame | test | time, 0.3217 -> 0.3218 | memory, 0.3217 -> 0.3218 |
+   |---|---|---|---|---|
+   | 1e6 | AoH | parametric | 10.53 s -> 5.32 s | 1573.7 MB -> 536.8 MB |
+   | 1e6 | AoH | nonparametric | 7.40 s -> 5.56 s | 1416.7 MB -> 545.0 MB |
+   | 1e6 | HoA | parametric | 8.71 s -> 2.72 s | 748.2 MB -> 167.0 MB |
+   | 1e6 | HoA | nonparametric | 5.55 s -> 2.94 s | 590.5 MB -> 172.6 MB |
+   | 1e5 | AoH | parametric | 0.91 s -> 0.42 s | 157.6 MB -> 53.4 MB |
+   | 1e5 | HoA | parametric | 0.72 s -> 0.23 s | 75.5 MB -> 16.8 MB |
+
+ [vif()]
+
+ - vif() is now car 3.1-5's vif() at its default type = "terms", computed
+   on the design lm() builds from the formula. It split the right-hand
+   side on '+' and regressed each piece on the others, so y ~ x1*x2 + x3,
+   y ~ x1 + x2 - x3, y ~ ., y ~ x1 + x2 - 1 and any factor died, with
+   lm()'s "0 degrees of freedom" or with "need at least two predictors".
+   All of those now work. A term with more than one column, such as a
+   factor of three or more levels, gets car's generalized VIF, and each
+   term then maps to { GVIF, Df, 'GVIF^(1/(2*Df))' }, as car's result
+   becomes a table. When every term has one column the result is the hash
+   of numbers it always was.
+
+ - A formula's response now takes out the rows where it is missing, as it
+   does from car's model; it was ignored. On airquality's Ozone ~ Solar.R
+   + Wind + Temp that is car's 111 rows rather than 146, and Solar.R's VIF
+   goes from 1.0893 to car's 1.0953. A response that is not a column of
+   the data is an error naming it, where it used to be ignored. An array
+   of names, or a formula with no response, uses every row that has the
+   predictors, as before.
+
+ - car's warnings and refusals have counterparts: "there are higher-order
+   terms (interactions) in this model", "No intercept: vifs may not be
+   sensible.", "model contains fewer than 2 terms" (which was "need at
+   least two predictors"), and "there are aliased coefficients in the
+   model", now naming the column. An aliased column used to get a VIF of
+   Inf.
+
+ [Formulas: lm(), glm(), anova(), aov() and the rest]
+
+ - A term can now be removed with '-', as in R: y ~ x*z - x:z is y ~ x +
+   z, y ~ . - id is every column but id, and - x*z takes out x, z and x:z.
+   The parser split only on '+', so "z-w" was looked up as one column, no
+   row had it, and the fit died with "0 degrees of freedom". A '-' inside
+   parentheses is not removal, and a term that names a column is still
+   that column, so y ~ a-b fits a column named a-b as it did.
+
+ - A formula crossing seven or more variables with '*', which has 128 or
+   more terms, wrote past the end of the parser's list of distinct terms:
+   it was allocated at 64 beside the list of all terms, and only the latter
+   grew as a cross was expanded. valgrind reported the invalid writes in
+   lm() on y ~ a*b*c*d*e*f*g; the list is now sized once the count is
+   known. Every function that reads a formula through lm()'s parser was
+   affected: lm(), glm(), anova(), aov(), coxph(), zerotrunc(), hurdle(),
+   svyglm(), ivreg() and lmer().
+
+ [pchisq() and qchisq()]
+
+ - df => 0 is now the chi-square with all its mass at 0, as in R:
+   pchisq($q, 0) is 0 for $q <= 0 and 1 above, and qchisq($p, 0) is 0, or
+   Inf at $p = 1. Both returned NaN, and t/distributions.R.scipy.t asserted
+   NaN for pchisq(1, 0) under a comment saying R returns NaN there too. R's
+   own tests/d-p-q-r-tst-2.R pins the values above.
+
+ [Tests]
+
+ - t/hosmer_lemeshow.R.t, with its generator t/hosmer_lemeshow.R.R: 316
+   tests, 103 of which fail on 0.3217. They hold the function to
+   hoslem.test() on the package's documented example at 17 values of g,
+   and on tied, categorical and two-valued predictions, including each
+   warning and each case where R stops. The deliberate departures above
+   are pinned against a third opinion in R that makes the same two
+   changes.
+
+ - t/eta_squared.R.t, with its generator t/eta_squared.R.R: 54 tests, 24
+   of which fail on 0.3217, on R's own airquality, PlantGrowth,
+   InsectSprays and chickwts examples. Each is run under its own labels,
+   under numeric codes and as an aov() result, and warpbreaks covers the
+   two-factor refusal.
+
+ - t/table_one.t has a test for each table_one() fix above; on 0.3217 it
+   dies at the first of them.
+
+ - t/distributions.R.scipy.t: six df = 0 cases from R's
+   tests/d-p-q-r-tst-2.R, all of which fail on 0.3217.
+
+ - t/read_table.alignment.t checks each wording from both the parser's
+   fast path and read_table's row closure, which must agree word for word.
+
+ - t/aoh2h.regressions.t: 18 of its 73 tests fail on 0.3217, those for the
+   four aoh2h() and h2aoh() fixes above and for the overloaded key it
+   stringified twice. The rest hold the XS version to what 0.3217 did:
+   the key perl makes of every kind of cell, input cells left untouched,
+   the order of a tied frame's EXISTS and FETCH calls, and no leak on
+   return or on any croak.
+
+ - t/cohen_d.R.t, with its generators t/cohen_d.R.R and
+   t/cohen_d.mpmath.py: 720 tests on effectsize 1.0.3's and effsize
+   0.8.1's own test data at five confidence levels, through both interval
+   methods. The default interval is pinned to mpmath, and to R where R's
+   pt() sums its series. On 0.3217, 84 of the 94 limits held to mpmath
+   fail; the other ten are at d = 0, where the two intervals coincide. A
+   quadmath perl runs only conf_level 0.95 unless EXTENDED_TESTING is set,
+   since each interval takes 3 s there: 176 tests in 48 s, where all five
+   levels took 162 s.
+
+ - t/smd.R.t, with its generator t/smd.R.R: 48 tests from tableone
+   0.13.2's and smd 0.8.0's own tests, on survey's nhanes data among
+   others. On 0.3217 it dies after 34, at the first constant column.
+
+ - t/vif.R.t, with its generator t/vif.R.R: 138 tests, every expected
+   value car::vif()'s, on car's own Duncan examples and on mtcars,
+   warpbreaks and airquality, plus Stata's statecrime VIF from statsmodels
+   0.14.6's tests. Of its ten models 0.3217 got the first right, died on
+   eight, and gave airquality the wrong rows.
+
+ - t/lm_glm_shared.t has 41 more tests, for term removal in lm(), glm()
+   and anova() against R's term labels, and for the 7-way cross. On 0.3217
+   it dies at the first removal.
+
+ - t/effect_sizes.t asks for cohen_d()'s normal interval by name, and
+   t/vif_hoslem.t passes a one-sided formula where it passed a response
+   its data did not have, and expects car's "fewer than 2 terms".
+
 0.3217 2026-10-12 CDT (Claude Opus 5.5 helped)
 
  [cor()]

@@ -40,4 +40,29 @@ is(Time::Keeper::_zone_abi_version(), $built + 1, 'asked again, it gives the tab
 is(Time::Keeper::_zone_abi_version(), $built + 1, 'and again');
 is($asked, 0, 'without asking the zones for it again');
 
+# It needs the version whose entries it calls, version 1's, whichever Zone
+# header it was built against: a Zone of 0.01 or 0.02 still serves it.
+is($built, 1, 'the version it needs is 1');
+cmp_ok(Time::Keeper::_zone_abi_header(), '>=', 2, 'built against a header at version 2 or later');
+for my $v (1, 2) {
+    Time::Keeper::_zone_abi_forget();
+    $table = pack('i', $v);
+    is(Time::Keeper::_zone_abi_version(), $v, "a table at version $v is taken");
+}
+
+# The methods of Phase 05 call version 2's entries, and say so when the
+# table is older.
+Time::Keeper::_zone_abi_forget();
+$table = pack('i', 1);
+{
+    no warnings 'once';
+    local $Time::Keeper::Zone::VERSION = '0.02';
+    ok(!eval { Time::Keeper::_zone_abi_v2_version(); 1 }, 'a version 1 table is refused by the version 2 gate');
+    like($@, qr/^Time::Keeper->_zone_abi_v2_version needs Time::Keeper::Zone 0\.03 or later \(have 0\.02\)/,
+         'naming the method and the Zone installed');
+}
+Time::Keeper::_zone_abi_forget();
+$table = pack('i', 2);
+is(Time::Keeper::_zone_abi_v2_version(), 2, 'and a version 2 table passes it');
+
 done_testing;

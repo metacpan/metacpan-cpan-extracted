@@ -1,21 +1,35 @@
---- #YAML:1.0
-name:                List-RewriteElements
-version:             0.09
-abstract:            Create a new list by rewriting elements of a first list
-license:             ~
-generated_by:        ExtUtils::MakeMaker version 6.31
-distribution_type:   module
-requires:     
-    Carp:                          0
-    Cwd:                           0
-    File::Basename:                0
-    File::Copy:                    0
-    File::Spec:                    0
-    File::Temp:                    0
-    Test::Simple:                  0.44
-    Tie::File:                     0
-meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
-    version: 1.2
+---
+abstract: 'Create a new list by rewriting elements of a first list'
 author:
-    - James E Keenan (jkeenan@cpan.org)
+  - 'James E Keenan (jkeenan@pobox.com)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Simple: '0.44'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: List-RewriteElements
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Cwd: '0'
+  File::Basename: '0'
+  File::Copy: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  Test::Simple: '0.44'
+  Tie::File: '0'
+resources:
+  bugtracker: https://github.com/jkeenan/List-RewriteElements/issues
+  homepage: http://thenceforward.net/perl/modules/List-RewriteElements/
+  repository: https://github.com/jkeenan/List-RewriteElements.git
+version: '0.11'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

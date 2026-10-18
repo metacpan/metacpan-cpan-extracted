@@ -150,3 +150,151 @@ windows_zone(class, name)
         RETVAL = newSVpv(tkz_id_name(id), 0);
     OUTPUT:
         RETVAL
+
+# Each change from `from` to `to`, both included, as
+# [epoch, offset before, offset after, abbreviation after, is DST after].
+void
+transitions(class, name, from, to)
+        SV *class
+        SV *name
+        SV *from
+        SV *to
+    PREINIT:
+        int id;
+        int64_t t, t0, t1;
+    PPCODE:
+        PERL_UNUSED_VAR(class);
+        id = tkz_sv_zone(aTHX_ name);
+        t0 = tkz_sv_epoch(aTHX_ from);
+        t1 = tkz_sv_epoch(aTHX_ to);
+        if (t1 < t0)
+            croak("Time::Keeper::Zone: transitions: the end is before the start");
+        if (t1 - t0 > INT64_C(31557600000))
+            croak("Time::Keeper::Zone: transitions: the span is over 1,000 years");
+        t = t0 - 1;
+        while ((t = tkz_next_change(id, t)) != TKZ_NO_CHANGE && t <= t1) {
+            int32_t before, after;
+            int isdst;
+            const char *abbr;
+            AV *row = newAV();
+            tkz_offset_at(id, t - 1, &before, NULL, NULL);
+            tkz_offset_at(id, t, &after, &isdst, &abbr);
+            av_extend(row, 4);
+            av_push(row, tkz_newSVi64(aTHX_ t));
+            av_push(row, newSViv(before));
+            av_push(row, newSViv(after));
+            av_push(row, newSVpv(abbr, 0));
+            av_push(row, newSViv(isdst));
+            XPUSHs(sv_2mortal(newRV_noinc((SV *)row)));
+        }
+
+SV *
+next_transition(class, name, epoch)
+        SV *class
+        SV *name
+        SV *epoch
+    ALIAS:
+        previous_transition = 1
+    PREINIT:
+        int id;
+        int64_t t;
+    CODE:
+        PERL_UNUSED_VAR(class);
+        id = tkz_sv_zone(aTHX_ name);
+        t = tkz_sv_epoch(aTHX_ epoch);
+        t = ix ? tkz_prev_change(id, t) : tkz_next_change(id, t);
+        if (t == TKZ_NO_CHANGE)
+            XSRETURN_UNDEF;
+        RETVAL = tkz_newSVi64(aTHX_ t);
+    OUTPUT:
+        RETVAL
+
+void
+offset_at(class, name, epoch)
+        SV *class
+        SV *name
+        SV *epoch
+    PREINIT:
+        int id, isdst;
+        int32_t utoff;
+        const char *abbr;
+    PPCODE:
+        PERL_UNUSED_VAR(class);
+        id = tkz_sv_zone(aTHX_ name);
+        tkz_offset_at(id, tkz_sv_epoch(aTHX_ epoch), &utoff, &isdst, &abbr);
+        if (GIMME_V != G_LIST) {
+            mXPUSHi(utoff);
+            XSRETURN(1);
+        }
+        EXTEND(SP, 3);
+        mPUSHi(utoff);
+        mPUSHi(isdst);
+        mPUSHp(abbr, strlen(abbr));
+
+IV
+standard_offset_at(class, name, epoch)
+        SV *class
+        SV *name
+        SV *epoch
+    PREINIT:
+        int32_t utoff;
+    CODE:
+        PERL_UNUSED_VAR(class);
+        tkz_standard_offset_at(tkz_sv_zone(aTHX_ name), tkz_sv_epoch(aTHX_ epoch), &utoff);
+        RETVAL = utoff;
+    OUTPUT:
+        RETVAL
+
+# Whether the DST flag changes in the year, the year as the zone's own
+# wall clock counts it.
+bool
+has_dst(class, name, year)
+        SV *class
+        SV *name
+        IV year
+    PREINIT:
+        int id, was;
+        int64_t u[2], t, end;
+        int32_t o[2];
+    CODE:
+        PERL_UNUSED_VAR(class);
+        id = tkz_sv_zone(aTHX_ name);
+        if (year < -999999999 || year > 999999999)
+            croak("Time::Keeper::Zone: has_dst: year %" IVdf " is out of range", year);
+        tkz_resolve_local_all(id, tkz_days_from_civil(year, 1, 1) * 86400, u, o);
+        t = u[0];
+        tkz_resolve_local_all(id, tkz_days_from_civil(year + 1, 1, 1) * 86400, u, o);
+        end = u[0];
+        tkz_offset_at(id, t, NULL, &was, NULL);
+        RETVAL = 0;
+        while ((t = tkz_next_change(id, t)) != TKZ_NO_CHANGE && t < end) {
+            int isdst;
+            tkz_offset_at(id, t, NULL, &isdst, NULL);
+            if (isdst != was) {
+                RETVAL = 1;
+                break;
+            }
+        }
+    OUTPUT:
+        RETVAL
+
+SV *
+country_of(class, name)
+        SV *class
+        SV *name
+    ALIAS:
+        windows_name = 1
+    PREINIT:
+        STRLEN len;
+        const char *p;
+    CODE:
+        PERL_UNUSED_VAR(class);
+        if (!SvOK(name))
+            XSRETURN_UNDEF;
+        p = SvPV(name, len);
+        p = ix ? tkz_windows_name(tkz_lookup_name(p, len)) : tkz_country_of(tkz_lookup_name(p, len));
+        if (!p)
+            XSRETURN_UNDEF;
+        RETVAL = newSVpv(p, 0);
+    OUTPUT:
+        RETVAL

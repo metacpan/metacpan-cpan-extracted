@@ -1,15 +1,15 @@
-#$Id: Makefile.PL 1120 2006-12-31 16:20:24Z jimk $
-
-
+use strict;
+use warnings;
 use ExtUtils::MakeMaker;
-# See lib/ExtUtils/MakeMaker.pm for details of how to influence
-# the contents of the Makefile that is written.
+
+my $mm_ver = ExtUtils::MakeMaker->VERSION;
+
 WriteMakefile(
-    NAME         => 'List::RewriteElements',
-    VERSION_FROM => 'lib/List/RewriteElements.pm', # finds \$VERSION
-    AUTHOR       => 'James E Keenan (jkeenan@cpan.org)',
-    ABSTRACT     => 'Create a new list by rewriting elements of a first list',
-    PREREQ_PM    => {
+    NAME            => 'List::RewriteElements',
+    AUTHOR          => 'James E Keenan (jkeenan@pobox.com)',
+    VERSION_FROM    => 'lib/List/RewriteElements.pm',
+    ABSTRACT_FROM   => 'lib/List/RewriteElements.pm',
+    PREREQ_PM       => {
                      'Carp'             => 0,
                      'Cwd'              => 0,
                      'File::Basename'   => 0,
@@ -19,4 +19,22 @@ WriteMakefile(
                      'Test::Simple'     => 0.44,
                      'Tie::File'        => 0,
                     },
+    ($mm_ver < 6.63_03 ? 'BUILD_REQUIRES' : 'TEST_REQUIRES' ) => {
+                     'Test::Simple' => 0.44,
+                    },
+    ($mm_ver < 6.46 ? () : (META_MERGE => {
+        'meta-spec' => { version => 2 },
+        dynamic_config => 1,
+        resources => {
+            homepage => 'http://thenceforward.net/perl/modules/List-RewriteElements/',
+            repository => {
+                url => 'https://github.com/jkeenan/List-RewriteElements.git',
+                web => 'https://github.com/jkeenan/List-RewriteElements',
+                type => 'git',
+            },
+            bugtracker => {
+                web => 'https://github.com/jkeenan/List-RewriteElements/issues',
+            },
+        },
+    })),
 );

@@ -20,11 +20,10 @@ my %WriteMakefileArgs = (
         'Test::Deep'      => '1.0',
     },
     PREREQ_PM => {
-        'Claude::Agent'      => '0.10',
-        'Marlin'             => '0.007000',
+        'Claude::Agent'      => '0.14',
+        'Object::Proto'      => '1.00',
         'Cpanel::JSON::XS'   => '4.0',
         'Path::Tiny'         => '0.100',
-        'Types::Common'      => '2.0',
         'IO::Async'          => '0.80',
         'Future::AsyncAwait' => '0.60',
     },

@@ -589,7 +589,8 @@ row is ignored. R spells this `tibble::deframe()`; pandas spells it
 ### Arguments
 
 `$aoh` — an array ref of hash refs. Required. Every row has to be a hash ref
-carrying both named columns.
+carrying both named columns. A blessed array or row is fine, and so is a tied
+one.
 
 Everything after it is `name => value` pairs:
 
@@ -606,8 +607,14 @@ Everything after it is `name => value` pairs:
 A hash ref mapping each row's `var_name` cell to its `value_name` cell. An
 empty array ref gives back `{}`.
 
-Values are assigned across, so a value that is itself a reference is shared
-with the input rather than cloned — the same shallow copy `aoh2hoa` makes.
+A key is the string Perl makes of the key cell, so the number `2.50` becomes
+the key `2.5`. A key cell that holds a reference is an error, because its
+string is the reference's address. An object that overloads its operators is
+keyed by its string form, and a compiled pattern (`qr//`) by its pattern.
+
+Values are copied across, so a value that is itself a reference is shared with
+the input rather than cloned — the same shallow copy `aoh2hoa` makes. The input
+is not changed.
 
 ### Example
 
@@ -634,12 +641,13 @@ same way.
 ### Errors
 
 `aoh2h` dies when the first argument is undefined or not an array ref, when the
-options are not `name => value` pairs, when an option is unknown, when
-`var_name` equals `value_name`, when `duplicates` is not one of the three
-allowed words, when a row is not a hash ref, when a row is missing either named
-column, when a row's key cell is `undef`, or — under the default
-`duplicates => 'die'` — when two rows share a key. Every message names the
-offending row by index.
+options are not `name => value` pairs, when an option name is `undef` or
+unknown, when `var_name` equals `value_name`, when `duplicates` is not one of
+the three allowed words, when a row is not a hash ref, when a row is missing
+either named column, when a row's key cell is `undef` or a reference, or —
+under the default `duplicates => 'die'` — when two rows share a key. Every
+message about a row names it by index; for a shared key, that is the index of
+the first repeat.
 
 ### See also
 
@@ -1649,13 +1657,31 @@ gives: when every stratum has zero variance the statistic and p-value are
 ## cohen_d
 
 Cohen's *d* effect size for the difference between two independent groups, using
-the pooled standard deviation. It also returns the Hedges' *g* small-sample
-correction and a large-sample (normal-approximation) confidence interval.
-Validated numerically against R.
+the pooled standard deviation, with the Hedges' *g* small-sample correction and
+a confidence interval. Same as `effectsize::cohens_d()` (effectsize 1.0.3), and
+validated against its tests and effsize 0.8.1's.
 
     my $d = cohen_d(\@treatment, \@control);           # or conf_level => 0.90
     printf "d = %.2f (95%% CI %.2f–%.2f), Hedges g = %.2f\n",
         $d->{estimate}, $d->{'conf_int'}[0], $d->{'conf_int'}[1], $d->{hedges_g};
+
+The interval is the exact one under normality, `effectsize`'s default: with
+`t = d / sqrt(1/n1 + 1/n2)` on `n1 + n2 - 2` degrees of freedom, the limits of
+the noncentral *t*'s noncentrality parameter that put `t` at its two
+`(1 - conf_level)/2` points, each scaled back by `sqrt(1/n1 + 1/n2)`.
+`ci_method => 'normal'` gives the large-sample interval `d ± z se` instead,
+which was the default up to 0.3217 and is a little narrow in small samples: on
+mtcars' weight by transmission it is 1.048 to 2.737 where the exact interval is
+1.030 to 2.733.
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `conf_level` | `0.95` | Confidence level of `conf_int`. |
+| `ci_method` | `'nct'` | `'nct'` for the noncentral-*t* interval, `'normal'` for `d ± z se`. |
+
+Hedges' *g* is *d* times `1 - 3/(4 df - 1)`, the approximation `effsize` uses;
+`effectsize` uses the exact gamma-function ratio, which differs from it by 4e-5
+relative at 30 degrees of freedom and by 3e-6 at 100.
 
 Compare with [smd](#smd), which standardizes by the simple (unweighted) average
 of the group variances and is the convention for covariate-balance tables.
@@ -1667,9 +1693,10 @@ of the group variances and is the convention for covariate-balance tables.
 | `estimate` | `Double` | Cohen's *d* (mean₁ − mean₂ over the pooled SD). | `2.3146` |
 | `hedges_g` | `Double` | Hedges' *g* (bias-corrected *d*). | `2.1668` |
 | `pooled_sd` | `Double` | Pooled standard deviation. | `1.2344` |
-| `se` | `Double` | Approximate standard error of *d*. | `0.6907` |
-| `conf_int` | `ArrayRef` | `[lower, upper]` normal-approximation CI for *d*. | `[0.96, 3.67]` |
+| `se` | `Double` | Hedges and Olkin's large-sample standard error of *d*, which `effsize` also reports; only the `'normal'` interval uses it. | `0.6907` |
+| `conf_int` | `ArrayRef` | `[lower, upper]` confidence interval for *d*. | `[0.90, 3.68]` |
 | `conf_level` | `Double` | Confidence level used. | `0.95` |
+| `ci_method` | `String` | `'nct'` or `'normal'`, the interval returned. | `nct` |
 | `n1`, `n2` | `Integer` | Group sizes. | `7`, `7` |
 
 ## col2col
@@ -2627,6 +2654,12 @@ does. An `undef` element becomes `NaN`.
     my $z  = qnorm(0.975);                 # 1.959963984540054
     my $zs = qnorm([0.025, 0.5, 0.975]);   # [-1.9599639845, 0, 1.9599639845]
 
+`df => 0` is a chi-square with all its mass at 0, as in R, not an invalid
+parameter: `pchisq($q, 0)` is 0 for `$q <= 0` and 1 above it, and
+`qchisq($p, 0)` is 0, or `Inf` at `$p = 1`. R's own `tests/d-p-q-r-tst-2.R`
+pins those values; up to 0.3217 both functions returned `NaN` there. A negative
+`df` is still `NaN`.
+
 ### What each one does, in one picture
 
 The same identity read from two ends: a `p*` function is given the boundary and
@@ -3032,6 +3065,14 @@ sums of squares. Returns η², partial η² (equal to η² for a one-way design)
 ω² (omega-squared, a less biased estimator). Accepts either raw values and group
 labels or an existing [`aov`](#aov) result. Validated numerically against R.
 
+The group labels are a factor whatever they look like: codes `1, 2, 3` are
+three groups, not one slope. Up to 0.3217 numeric codes were fitted as a slope,
+so R's `airquality` example, Ozone by Month 5 to 9, gave η² 0.027 for R's
+0.235. An undef value or group drops its row. An `aov` result must have exactly
+one effect term; a two-factor result is refused rather than answered for one of
+its terms. An `aov` fitted from a formula still treats a numeric column as a
+slope, as R's `aov()` does without `factor()`.
+
     my $e = eta_squared(\@values, \@group);            # or eta_squared($aov_result)
     printf "eta^2 = %.3f, omega^2 = %.3f\n", $e->{eta_sq}, $e->{omega_sq};
 
@@ -3042,7 +3083,7 @@ labels or an existing [`aov`](#aov) result. Validated numerically against R.
 | `eta_sq` | `Double` | η² = SS_effect / SS_total. | `0.8457` |
 | `partial_eta_sq` | `Double` | Partial η² = SS_effect / (SS_effect + SS_resid). | `0.8457` |
 | `omega_sq` | `Double` | ω², adjusted for bias. | `0.7743` |
-| `term` | `String` | Name of the effect term used. | `"grp"` |
+| `term` | `String` | Name of the effect term used: `Group` for raw values and labels. | `"grp"` |
 
 ## ffill
 
@@ -3505,7 +3546,7 @@ errors are right as they stand.
 
 | Parameter | Type | Default | Description | Example |
 | --- | --- | --- | --- | --- |
-| `formula` | `String` | *None (Required)* | A symbolic description of the model to be fitted. Parsed by the same code as [`lm`](#lm)'s, so it takes the same operators: `+`, `:`, `*`, `^`, `.` for every remaining column, and `-1` / `+0` to remove the intercept. It may also hold `offset()` terms, and factors to absorb after a `\|`. | `'am ~ wt + hp'`, `'y ~ x - 1'`, `'y ~ .'` |
+| `formula` | `String` | *None (Required)* | A symbolic description of the model to be fitted. Parsed by the same code as [`lm`](#lm)'s, so it takes the same operators: `+`, `:`, `*`, `^`, `.` for every remaining column, `- b` to remove a term, and `-1` / `+0` to remove the intercept. It may also hold `offset()` terms, and factors to absorb after a `\|`. | `'am ~ wt + hp'`, `'y ~ x - 1'`, `'y ~ .'` |
 | `data` | `HashRef` or `ArrayRef` | *None (Required)* | The dataset containing the variables used in the formula. Accepts a Hash of Arrays (HoA), a Hash of Hashes (HoH) or an Array of Hashes (AoH). Rows are named as described under [`lm`](#lm). | `\%mtcars`, `[{x => 1, y => 2}, ...]` |
 | `family` | `String` | `'gaussian'` | The error distribution / link function: `'gaussian'` (identity link), `'binomial'` (logit link), `'poisson'` (log link) or `'negbin'` (negative binomial, log link). | `'poisson'` |
 | `theta` | `Number` | *estimated by ML* | Negative-binomial dispersion. When omitted (with `family => 'negbin'`) it is estimated by maximum likelihood as in `MASS::glm.nb`; supply a value to hold it fixed. | `1.7` |
@@ -3758,8 +3799,9 @@ An empty hash gives back `[]`. `undef` values are carried through as `undef`.
 ### Errors
 
 `h2aoh` dies when the argument is undefined or not a hash ref, when the options
-are not `name => value` pairs, when an option is unknown, when `var_name`
-equals `value_name`, or when `sort` is not one of the three allowed words.
+are not `name => value` pairs, when an option name is `undef` or unknown, when
+`var_name` equals `value_name`, or when `sort` is not one of the three allowed
+words.
 
 It also dies when any value is a **reference**, naming the key and pointing at
 the converter that was probably meant: a hash of array refs is
@@ -3943,8 +3985,23 @@ The Hosmer-Lemeshow goodness-of-fit test for a logistic-regression model. Given
 the observed 0/1 outcomes and the model's predicted probabilities, it bins the
 observations into `g` risk groups (deciles by default) and compares observed and
 expected event counts. A large p-value indicates the model fits adequately. The
-grouping and statistic follow R's `ResourceSelection::hoslem.test`, against which
-it was validated numerically.
+grouping, statistic and degrees of freedom are those of `hoslem.test()` in R's
+ResourceSelection 0.3-6, and `t/hosmer_lemeshow.R.t` holds it to that
+function's own documented example at 17 values of `g`.
+
+The bins are cut at the *distinct* quantiles of the predictions, so tied
+predictions — every prediction from a model whose predictors are all
+categorical — can leave fewer than `g` groups. The degrees of freedom are then
+`groups - 2`, not `g - 2`, and a warning says how many groups the data allowed,
+as R's does. One group is an error. Up to 0.3217 tied breaks were kept, which
+gave a tie at the lowest break a group of its own, and the degrees of freedom
+were always `g - 2`.
+
+Two cases depart from `hoslem.test()`, which has no usable answer in either:
+a cell whose observed and expected counts are both 0, as in an empty bin, adds
+0 to the statistic where R adds 0/0 and returns `NaN`; and the last break is
+the largest prediction, where R's `seq(0, 1, 1/g)` falls short of 1 at some
+`g` (49 is the first) and leaves the largest prediction out of every bin.
 
     # $fit is a binomial glm(); align observed outcomes with fitted_values
     my @obs  = map { $data{$_}{outcome} } @ids;
@@ -3966,9 +4023,9 @@ it was validated numerically.
 | Variable | Type | Description | Example |
 | --- | --- | --- | --- |
 | `statistic` | `Double` | Hosmer-Lemeshow chi-squared statistic. | `4.3456` |
-| `parameter` | `Integer` | Degrees of freedom, `g - 2`. | `8` |
+| `parameter` | `Integer` | Degrees of freedom, `groups - 2`. | `8` |
 | `p_value` | `Double` | Goodness-of-fit p-value (large = good fit). | `0.825` |
-| `groups` | `Integer` | Number of non-empty groups used. | `10` |
+| `groups` | `Integer` | Number of groups that hold a row; fewer than `g` when predictions are tied. | `10` |
 | `table` | `ArrayRef` | Per-group `{n, observed, expected}` event summaries. | |
 
 ## hurdle
@@ -4561,7 +4618,14 @@ cross-classification.
 
 If your data contains missing numbers (`NA` or `undef`), `lm` handles listwise deletion dynamically to ensure mathematical integrity before fitting. A row whose categorical value is missing is dropped the same way.
 
-Three details differ from R deliberately:
+A term is removed with `-`, as in R: `y ~ x*z - x:z` fits `y ~ x + z`,
+`y ~ . - id` fits every column but `id` (and the response), and `- x*z` takes
+out `x`, `z` and `x:z` together. Removing a term the model does not have
+changes nothing. Only a `-` outside parentheses removes, and a term that is
+itself the name of a column is that column, so a column named `a-b` can still be
+written `y ~ a-b`.
+
+Four details differ from R deliberately:
 
 - Levels are sorted with `strcmp`, i.e. by byte value, which is what
   `patsy`/`pandas` does. R sorts with the collation of the running locale, so a
@@ -4575,6 +4639,11 @@ Three details differ from R deliberately:
 - A categorical column with only one level contributes no column, so
   `y ~ x + g` fits `y ~ x`. R refuses the model outright ("contrasts can be
   applied only to factors with 2 or more levels").
+- An interaction's variables are named in the order they first appear among
+  the terms that remain after removals, where R orders them by the whole
+  formula. So `y ~ x*z*w - x*z`, whose first remaining term is `w`, names its
+  interactions `w:x`, `w:z` and `w:x:z` where R has `x:w`, `z:w` and `x:z:w`.
+  The fit is the same.
 
 the dot operator also works:
 
@@ -6105,6 +6174,16 @@ if the two differ in length, `read_table` warns, as R does, and uses
 always a comment, even `#text` with no space after the marker, as in R; with a
 header, such a line can be a commented-out header, as described below.
 
+A row with more or fewer fields than the table has columns is an
+`Alignment error`, which names the row and says what its field count was
+compared with: `3 headers`, `3 'col_names'`, or, with `header => 0` and no
+`col_names`, `3 in data row 1`. When the header or data row 1 was a single
+field, with no separator in it, and the row has more, it adds that `sep` may be
+wrong. The default `sep` comes from the file's name, so a `;`-separated file
+named `.csv` or `.csv.gz` fails that way until it is told otherwise:
+
+    my $d = read_table('annotation.csv.gz', header => 0, sep => ';');
+
 `quote => ''` turns quoting off: a `"` is kept as ordinary text wherever it
 appears. By default a `"` anywhere in a field opens a quoted field that runs to
 the next `"`, possibly many lines later, so a file whose quotes are not CSV
@@ -6946,10 +7025,16 @@ departure from it.
 
 Standardized mean difference between two continuous groups, standardizing by the
 simple (unweighted) average of the group variances — the convention used for
-covariate-balance diagnostics in "Table 1" (R's `tableone` / `stddiff`). Returns
-the signed value. Validated numerically against R.
+covariate-balance diagnostics in "Table 1". It is `tableone`'s continuous SMD
+(tableone 0.13.2, `StdDiff()`), validated against that package's tests, but
+signed: `tableone` reports the absolute value.
 
     my $balance = smd(\@exposed_age, \@unexposed_age);   # |smd| < 0.1 is well balanced
+
+A column that is one constant in both groups has an SMD of 0, which is how
+`tableone` defines the 0/0, and a column that is constant within each group but
+differs between them is `±Inf`. Values that are `undef` or not numbers are
+dropped; each group needs two that are left.
 
 Unlike [cohen_d](#cohen_d) (which pools by sample size), `smd` weights the two
 group variances equally, so the two diverge when the groups differ in size.
@@ -7098,6 +7183,17 @@ and the test follows: t-test / ANOVA for continuous (Wilcoxon / Kruskal with
 (which columns), `types` (override a column's type), `nonparametric`, `digits`,
 `pct_digits`. Each returned row has `variable`, `level`, one column per group,
 `Overall`, and — on a variable's row — `p_value` and `test`.
+
+A variable whose test cannot run has no `p_value` or `test`, and the rest of
+the table is unaffected: a categorical one that `chisq_test` cannot test, or a
+continuous one that is constant or has a single observation in a group. Up to
+0.3217 the continuous case died, taking the whole table with it.
+
+Because each group is a key of every row, a `by` column with a group named
+`variable`, `level`, `type`, `p_value`, `test` or `Overall` is an error. A
+`types` value must be `continuous` or `categorical`. Categorical levels are
+listed in string order, except that levels which are all numbers are listed in
+numeric order, with `NA` last.
 
 ## t_test
 
@@ -7741,19 +7837,52 @@ structure types, `n` boundaries, alignment, `NA` rendering, truncation,
 ## vif
 
 Variance inflation factors, the standard multicollinearity diagnostic for a
-regression model. For each predictor, `vif` regresses it on all the other
-predictors and reports `1 / (1 - R²)`; values above ~5–10 flag problematic
-collinearity. The second argument is either a formula string (its right-hand-side
-terms are used) or an array reference of predictor column names. Validated
-numerically against R. Numeric predictors only — categorical predictors would
-need a generalized VIF.
+regression model; values above ~5–10 flag problematic collinearity. Same as
+`car::vif()` (car 3.1-5) at its default `type = "terms"`, and validated against
+it.
 
-    my $v = vif(\%data, [qw(age bmi sbp chol)]);        # or 'y ~ age + bmi + sbp + chol'
+    my $v = vif(\%data, 'sbp ~ age + bmi + chol');      # or [qw(age bmi chol)]
     for my $p (sort { $v->{$b} <=> $v->{$a} } keys %$v) {
         printf "%-6s VIF = %.2f\n", $p, $v->{$p};
     }
 
-Returns a hash of `predictor => VIF`.
+The second argument is a formula, read exactly as [lm](#lm) reads it, or an
+array reference of column names, which is the formula `~ age + bmi + chol`. A
+formula's response is not needed, since a VIF depends only on the predictors,
+but when there is one it takes out the rows where it is missing, as it does
+from the model `car::vif()` is given. So interactions, removed terms, `.` and
+factors are all understood:
+
+    vif(\%data, 'sbp ~ age * bmi + chol');      # terms age, bmi, chol, age:bmi
+    vif(\%data, 'sbp ~ . - id');
+    vif(\%data, [qw(age bmi smoking)]);         # smoking is a factor: a GVIF table
+
+For each term, with `C` the correlation matrix of the design's columns less the
+intercept and `S` the term's own columns,
+
+    GVIF = det(C[S, S]) * det(C[-S, -S]) / det(C)
+
+which for a term with one column is the familiar `1 / (1 - R²)` from
+regressing that column on all the others. This is Fox and Monette's
+generalized VIF, the quantity `car::vif()` computes.
+
+When every term has one column, as numeric main effects and their products do,
+the result is a hash of `term => VIF`. When any term has more, as a factor with
+three or more levels does, each term maps to a hash instead, as `car::vif()`'s
+result becomes a table:
+
+| Key | Description |
+| --- | --- |
+| `GVIF` | The generalized VIF. |
+| `Df` | The term's number of columns. |
+| `GVIF^(1/(2*Df))` | `GVIF` to the power `1/(2 Df)`, comparable across terms of different sizes. |
+
+As in `car::vif()`, a model with an interaction warns that "there are
+higher-order terms (interactions) in this model" (car's `type = "predictor"` is
+not implemented), a model with no intercept warns "No intercept: vifs may not be
+sensible.", and a model with fewer than two terms, or with an aliased column,
+is an error. A formula whose response is a name the data do not have is an
+error too.
 
 ## wilcox_test
 

@@ -111,7 +111,7 @@ like(
 );
 like(
 	$chart->render_histogram_snippet(\@bins, { binned => 1, scheme => 'category10' })->{html},
-	qr/d3\.schemeCategory10\[0\]/, 'scheme opt supplies the bar fill when color is absent'
+	qr/\['#1f77b4', '#ff7f0e'[^\]]*\]\[0\]/, 'scheme opt supplies the bar fill when color is absent'
 );
 like(
 	$chart->render_histogram_snippet(\@bins, { binned => 1, color => '#abcdef', scheme => 'category10' })->{html},

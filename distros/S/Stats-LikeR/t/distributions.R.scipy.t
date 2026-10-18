@@ -578,6 +578,33 @@ is( scalar keys %COUNT, 8, 'the frozen table covered all eight functions' );
 	is( pbinom(0, 0, 0.5), 1, 'size = 0 is a point mass at 0' );
 }
 
+# df = 0 is a chi-square with all its mass at 0, not an invalid parameter.
+# R 4.6.1 tests/d-p-q-r-tst-2.R:277-279, with its upstream note "pchisq(df=0)
+# was wrong in 2.7.1; then, upto 2.10.1, P*(0,0) gave 1":
+#
+#   stopifnot(pchisq(c(-1,0,1), df=0) == c(0,0,1),
+#             pchisq(c(-1,0,1), df=0, lower.tail=FALSE) == c(1,1,0))
+#
+# The log-scale and qchisq() rows are R 4.6.1's answers to the same arguments,
+# pchisq(c(-1,0,1,Inf), 0, log.p=TRUE) and qchisq(c(0,.5,1), 0) with each
+# tail. Up to 0.3217 every one of them was NaN, and the NaN list above asserted
+# it for pchisq(1, 0), under a comment saying R returns NaN there too.
+{
+	my $INF = 9 ** 9 ** 9;
+	is_deeply( [ map { pchisq($_, 0) } -1, 0, 1 ], [ 0, 0, 1 ],
+		'pchisq(c(-1,0,1), df=0) == c(0,0,1)' );
+	is_deeply( [ map { pchisq($_, 0, lower => 0) } -1, 0, 1 ], [ 1, 1, 0 ],
+		'pchisq(c(-1,0,1), df=0, lower.tail=FALSE) == c(1,1,0)' );
+	is_deeply( [ map { pchisq($_, 0, log => 1) } -1, 0, 1, $INF ],
+		[ -$INF, -$INF, 0, 0 ], 'pchisq(c(-1,0,1,Inf), 0, log.p=TRUE)' );
+	is_deeply( [ map { pchisq($_, 0, lower => 0, log => 1) } -1, 0, 1, $INF ],
+		[ 0, 0, -$INF, -$INF ], 'pchisq(c(-1,0,1,Inf), 0, lower.tail=FALSE, log.p=TRUE)' );
+	is_deeply( [ map { qchisq($_, 0) } 0, 0.5, 1 ], [ 0, 0, $INF ],
+		'qchisq(c(0,.5,1), 0) == c(0,0,Inf)' );
+	is_deeply( [ map { qchisq($_, 0, lower => 0) } 0, 0.5, 1 ], [ $INF, 0, 0 ],
+		'qchisq(c(0,.5,1), 0, lower.tail=FALSE) == c(Inf,0,0)' );
+}
+
 # Out-of-domain arguments are NaN, not a plausible number.  R warns and returns
 # NaN for each of these.
 {
@@ -588,7 +615,8 @@ is( scalar keys %COUNT, 8, 'the frozen table covered all eight functions' );
 		[ 'pt(1, 0)'             => sub { pt(1, 0) } ],
 		[ 'pt(1, -5)'            => sub { pt(1, -5) } ],
 		[ 'qt(-0.1, 5)'          => sub { qt(-0.1, 5) } ],
-		[ 'pchisq(1, 0)'         => sub { pchisq(1, 0) } ],
+		[ 'pchisq(1, -1)'        => sub { pchisq(1, -1) } ],
+		[ 'qchisq(0.5, -1)'      => sub { qchisq(0.5, -1) } ],
 		[ 'qchisq(2, 5)'         => sub { qchisq(2, 5) } ],
 		[ 'pf(1, 0, 5)'          => sub { pf(1, 0, 5) } ],
 		[ 'pf(1, 5, 0)'          => sub { pf(1, 5, 0) } ],

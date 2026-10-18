@@ -1,12 +1,14 @@
 ---
-abstract: 'check a reader against the keys its producer promises'
+abstract: 'check that code reading a result only reads the fields that are always there'
 author:
   - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
   Data::Dumper: '0'
+  Errno: '0'
   ExtUtils::MakeMaker: '0'
   File::Path: '0'
   File::Temp: '0'
+  POSIX: '0'
   Test::DescribeMe: '0'
   Test::Most: '0'
 configure_requires:
@@ -29,9 +31,23 @@ requires:
   File::Basename: '0'
   File::Find: '0'
   File::Spec: '0'
-  perl: '5.010'
+  IPC::System::Simple: '0'
+  List::Util: '0'
+  Module::Runtime: '0'
+  Params::Get: '0.17'
+  Params::Validate::Strict: '0.41'
+  Readonly: '0'
+  Return::Set: '0.05'
+  Scalar::Util: '0'
+  Sub::Private: '0.06'
+  Sub::Protected: '0.03'
+  Test::More: '0'
+  Text::Balanced: '0'
+  autodie: '0'
+  lib: '0'
+  perl: '5.014'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Consumer-Contract
   repository: git://github.com/nigelhorne/Test-Consumer-Contract.git
-version: '0.01'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -14,7 +14,7 @@ my $dir = tempdir(CLEANUP => 1);
 File::Raw::register_plugin('csv', {
     read => sub {
         my ($p, $bytes, $opts) = @_;
-        my $sep = $opts->{sep} // ',';
+        my $sep = defined $opts->{sep} ? $opts->{sep} : ',';
         return [ map { [split /\Q$sep\E/, $_, -1] } split /\n/, $bytes ];
     },
 });

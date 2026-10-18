@@ -307,6 +307,17 @@ bagit_conformance_suite/v1.0/valid/basicBag/manifest-md5.txt
 bagit_conformance_suite/v1.0/valid/basicBag/manifest-sha512.txt
 bagit_conformance_suite/v1.0/valid/basicBag/tagmanifest-md5.txt
 bagit_conformance_suite/v1.0/valid/basicBag/tagmanifest-sha512.txt
+bench/README
+bench/hyperfine_store.sh
+bench/hyperfine_verify.sh
+bench/store_bag_blake3.pl
+bench/store_bag_md5.pl
+bench/store_bag_sha256.pl
+bench/store_bag_sha512.pl
+bench/verify_bag_blake3.pl
+bench/verify_bag_md5.pl
+bench/verify_bag_sha256.pl
+bench/verify_bag_sha512.pl
 dist.ini
 ignore.txt
 lib/Archive/BagIt.pm
@@ -365,8 +376,6 @@ t/store_bag.t
 t/verify_bag.t
 t/verify_baginfo.t
 t/verify_simple.t
-verify.pl
-verify_fast.pl
 xt/author/critic.t
 xt/author/distmeta.t
 xt/author/eol.t

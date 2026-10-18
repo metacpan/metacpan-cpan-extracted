@@ -27,8 +27,9 @@ sub is_approx {
 	is_approx($v->{x2}, 281.17926952, 'VIF x2', 1e-3);
 	is_approx($v->{x3},   1.03529944, 'VIF x3', 1e-5);
 
-	# formula form gives the same result
-	my $v2 = vif(\%d, 'y ~ x1 + x2 + x3');
+	# formula form gives the same result; the data have no response, so the
+	# formula has none (through 0.3217 a 'y' that was not there was ignored)
+	my $v2 = vif(\%d, '~ x1 + x2 + x3');
 	is_approx($v2->{x1}, $v->{x1}, 'VIF formula form matches list form', 1e-9);
 }
 
@@ -47,7 +48,7 @@ sub is_approx {
 }
 
 # error handling
-throws_ok { vif(\%{{x1=>[1,2]}}, ['x1']) } qr/at least two predictors/, 'vif needs >=2 predictors';
+throws_ok { vif(\%{{x1=>[1,2]}}, ['x1']) } qr/^vif: model contains fewer than 2 terms$/m, 'vif needs >=2 predictors';
 throws_ok { hosmer_lemeshow([1,0,1],[0.5,0.5,0.5], g => 2) } qr/at least 3/, 'HL needs g>=3';
 throws_ok { hosmer_lemeshow([1,0],[0.5,0.5,0.5]) } qr/same length/, 'HL length mismatch';
 

@@ -214,3 +214,212 @@ parts(class, locale)
         RETVAL = newRV_noinc((SV *)hv);
     OUTPUT:
         RETVAL
+
+IV
+weekend_start(class, locale)
+        SV *class
+        SV *locale
+    ALIAS:
+        weekend_end = 1
+    PREINIT:
+        const tk_locale_data *d;
+    CODE:
+        PERL_UNUSED_VAR(class);
+        d = tk_locale_get(aTHX_ tk_locale_id_from_sv(aTHX_ locale, ix ? "Time::Keeper::Locale->weekend_end" : "Time::Keeper::Locale->weekend_start"));
+        RETVAL = ix ? d->weekend_end : d->weekend_start;
+    OUTPUT:
+        RETVAL
+
+SV *
+plural_category(class, locale, n)
+        SV *class
+        SV *locale
+        SV *n
+    PREINIT:
+        static const char *const cats[TK_PL_COUNT] = { "zero", "one", "two", "few", "many", "other" };
+        const char *me = "Time::Keeper::Locale->plural_category";
+        const tk_locale_data *d;
+        int64_t v;
+    CODE:
+        PERL_UNUSED_VAR(class);
+        d = tk_locale_get(aTHX_ tk_locale_id_from_sv(aTHX_ locale, me));
+        if (!tk_sv_to_i64(aTHX_ n, &v))
+            croak("%s: the number is a whole number", me);
+        RETVAL = newSVpv(cats[tk_plural_rules[d->plural](v < 0 ? -v : v)], 0);
+    OUTPUT:
+        RETVAL
+
+SV *
+relative_names(class, locale, field, ...)
+        SV *class
+        SV *locale
+        const char *field
+    PREINIT:
+        static const char *const fields[TK_RF_COUNT] = { "year", "quarter", "month", "week", "day", "hour", "minute", "second" };
+        static const char *const widths[TK_RW_COUNT] = { "long", "short", "narrow" };
+        static const char *const cats[TK_PL_COUNT] = { "zero", "one", "two", "few", "many", "other" };
+        const char *me = "Time::Keeper::Locale->relative_names";
+        const char *w = "long";
+        const tk_locale_data *d;
+        const tk_relative *r;
+        int fi, wi, k;
+        HV *hv, *at, *fut, *past;
+    CODE:
+        PERL_UNUSED_VAR(class);
+        d = tk_locale_get(aTHX_ tk_locale_id_from_sv(aTHX_ locale, me));
+        if (items > 3) w = SvPV_nolen(ST(3));
+        for (fi = 0; fi < TK_RF_COUNT && strNE(field, fields[fi]); fi++) ;
+        if (fi == TK_RF_COUNT)
+            croak("%s: the field is year, quarter, month, week, day, hour, minute or second, not '%s'", me, field);
+        for (wi = 0; wi < TK_RW_COUNT && strNE(w, widths[wi]); wi++) ;
+        if (wi == TK_RW_COUNT)
+            croak("%s: the width is 'long', 'short' or 'narrow', not '%s'", me, w);
+        r = &d->w.relative[fi][wi];
+        hv = newHV();
+        (void)hv_stores(hv, "display", tk_newSVstr(aTHX_ r->display));
+        at = newHV();
+        for (k = 0; k < 5; k++)
+            if (r->at[k]) {
+                char key[4];
+                sprintf(key, "%d", k - 2);
+                (void)hv_store(at, key, (I32)strlen(key), tk_newSVstr(aTHX_ r->at[k]), 0);
+            }
+        (void)hv_stores(hv, "at", newRV_noinc((SV *)at));
+        fut = newHV();
+        past = newHV();
+        for (k = 0; k < TK_PL_COUNT; k++) {
+            if (r->future[k]) (void)hv_store(fut, cats[k], (I32)strlen(cats[k]), tk_newSVstr(aTHX_ r->future[k]), 0);
+            if (r->past[k]) (void)hv_store(past, cats[k], (I32)strlen(cats[k]), tk_newSVstr(aTHX_ r->past[k]), 0);
+        }
+        (void)hv_stores(hv, "future", newRV_noinc((SV *)fut));
+        (void)hv_stores(hv, "past", newRV_noinc((SV *)past));
+        RETVAL = newRV_noinc((SV *)hv);
+    OUTPUT:
+        RETVAL
+
+SV *
+unit_patterns(class, locale, unit, ...)
+        SV *class
+        SV *locale
+        const char *unit
+    PREINIT:
+        static const char *const units[TK_DU_COUNT] = { "year", "month", "week", "day", "hour", "minute", "second",
+                                                        "millisecond", "microsecond", "nanosecond" };
+        static const char *const widths[TK_RW_COUNT] = { "long", "short", "narrow" };
+        static const char *const cats[TK_PL_COUNT] = { "zero", "one", "two", "few", "many", "other" };
+        const char *me = "Time::Keeper::Locale->unit_patterns";
+        const char *w = "long";
+        const tk_locale_data *d;
+        const tk_unit_words *u;
+        int ui, wi, k;
+        HV *hv, *count;
+    CODE:
+        PERL_UNUSED_VAR(class);
+        d = tk_locale_get(aTHX_ tk_locale_id_from_sv(aTHX_ locale, me));
+        if (items > 3) w = SvPV_nolen(ST(3));
+        for (ui = 0; ui < TK_DU_COUNT && strNE(unit, units[ui]); ui++) ;
+        if (ui == TK_DU_COUNT)
+            croak("%s: the unit is year, month, week, day, hour, minute, second, millisecond, microsecond or nanosecond, not '%s'", me, unit);
+        for (wi = 0; wi < TK_RW_COUNT && strNE(w, widths[wi]); wi++) ;
+        if (wi == TK_RW_COUNT)
+            croak("%s: the width is 'long', 'short' or 'narrow', not '%s'", me, w);
+        u = &d->w.units[ui][wi];
+        hv = newHV();
+        (void)hv_stores(hv, "display", tk_newSVstr(aTHX_ u->display));
+        count = newHV();
+        for (k = 0; k < TK_PL_COUNT; k++)
+            if (u->count[k]) (void)hv_store(count, cats[k], (I32)strlen(cats[k]), tk_newSVstr(aTHX_ u->count[k]), 0);
+        (void)hv_stores(hv, "count", newRV_noinc((SV *)count));
+        RETVAL = newRV_noinc((SV *)hv);
+    OUTPUT:
+        RETVAL
+
+SV *
+duration_patterns(class, locale)
+        SV *class
+        SV *locale
+    PREINIT:
+        const tk_locale_data *d;
+        HV *hv;
+    CODE:
+        PERL_UNUSED_VAR(class);
+        d = tk_locale_get(aTHX_ tk_locale_id_from_sv(aTHX_ locale, "Time::Keeper::Locale->duration_patterns"));
+        hv = newHV();
+        (void)hv_stores(hv, "hm", tk_newSVstr(aTHX_ d->w.digital[0]));
+        (void)hv_stores(hv, "hms", tk_newSVstr(aTHX_ d->w.digital[1]));
+        (void)hv_stores(hv, "ms", tk_newSVstr(aTHX_ d->w.digital[2]));
+        RETVAL = newRV_noinc((SV *)hv);
+    OUTPUT:
+        RETVAL
+
+SV *
+list_patterns(class, locale, ...)
+        SV *class
+        SV *locale
+    PREINIT:
+        static const char *const types[TK_LT_COUNT] = { "standard", "unit", "unit-short", "unit-narrow" };
+        static const char *const slots[TK_LS_COUNT] = { "start", "middle", "end", "two" };
+        const char *me = "Time::Keeper::Locale->list_patterns";
+        const char *t = "standard";
+        const tk_locale_data *d;
+        int ti, k;
+        HV *hv;
+    CODE:
+        PERL_UNUSED_VAR(class);
+        d = tk_locale_get(aTHX_ tk_locale_id_from_sv(aTHX_ locale, me));
+        if (items > 2) t = SvPV_nolen(ST(2));
+        for (ti = 0; ti < TK_LT_COUNT && strNE(t, types[ti]); ti++) ;
+        if (ti == TK_LT_COUNT)
+            croak("%s: the type is 'standard', 'unit', 'unit-short' or 'unit-narrow', not '%s'", me, t);
+        hv = newHV();
+        for (k = 0; k < TK_LS_COUNT; k++)
+            (void)hv_store(hv, slots[k], (I32)strlen(slots[k]), tk_newSVstr(aTHX_ d->w.lists[ti][k]), 0);
+        RETVAL = newRV_noinc((SV *)hv);
+    OUTPUT:
+        RETVAL
+
+SV *
+interval_formats(class, locale, ...)
+        SV *class
+        SV *locale
+    PREINIT:
+        const char *me = "Time::Keeper::Locale->interval_formats";
+        const tk_locale_data *d;
+        unsigned k;
+        HV *hv;
+    CODE:
+        PERL_UNUSED_VAR(class);
+        d = tk_locale_get(aTHX_ tk_locale_id_from_sv(aTHX_ locale, me));
+        hv = newHV();
+        if (items > 2) {
+            const char *skel = SvPV_nolen(ST(2));
+            for (k = 0; k < d->n_intervals; k++)
+                if (strEQ(d->intervals[k].skeleton, skel))
+                    (void)hv_store(hv, &d->intervals[k].letter, 1, tk_newSVstr(aTHX_ d->intervals[k].pattern), 0);
+        }
+        else {
+            for (k = 0; k < d->n_intervals; k++) {
+                SV **e = hv_fetch(hv, d->intervals[k].skeleton, (I32)strlen(d->intervals[k].skeleton), 1);
+                HV *inner;
+                if (!SvROK(*e))
+                    sv_setsv(*e, sv_2mortal(newRV_noinc((SV *)newHV())));
+                inner = (HV *)SvRV(*e);
+                (void)hv_store(inner, &d->intervals[k].letter, 1, tk_newSVstr(aTHX_ d->intervals[k].pattern), 0);
+            }
+        }
+        RETVAL = newRV_noinc((SV *)hv);
+    OUTPUT:
+        RETVAL
+
+SV *
+interval_fallback(class, locale)
+        SV *class
+        SV *locale
+    PREINIT:
+        const tk_locale_data *d;
+    CODE:
+        PERL_UNUSED_VAR(class);
+        d = tk_locale_get(aTHX_ tk_locale_id_from_sv(aTHX_ locale, "Time::Keeper::Locale->interval_fallback"));
+        RETVAL = tk_newSVstr(aTHX_ d->w.interval_fallback);
+    OUTPUT:
+        RETVAL

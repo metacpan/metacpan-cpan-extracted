@@ -4,7 +4,7 @@
 #define TK_LOCALE_TABLE_H
 
 #define TK_CLDR_VERSION "48.2.3"
-#define TK_LOCALE_STAMP 0xf3482a7cu
+#define TK_LOCALE_STAMP 0xb4bbb7c0u
 #define TK_LOCALE_BLOBS 766
 #define TK_LOCALE_COUNT 1121
 #define TK_LOCALE_REAL 766   /* the first ones; the rest are default content */

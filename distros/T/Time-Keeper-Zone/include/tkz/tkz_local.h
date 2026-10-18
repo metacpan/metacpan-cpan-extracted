@@ -113,12 +113,13 @@ tkz_windows_lookup(const char *name)
     return -1;
 }
 
-/* Each source tried in turn, with the files named so a test can stand in
- * its own. NULL skips a file. */
+/* Each source tried in turn, with the files and the Windows time zone key
+ * name passed in so a test can stand in its own on any platform. NULL
+ * skips a source; the system is never asked here. */
 static int
 tkz_local_zone_from(const char *tz, size_t tzlen,
                     const char *localtime_link, const char *timezone_file,
-                    const char *clock_file)
+                    const char *clock_file, const char *windows_key)
 {
     int id;
     char buf[1024];
@@ -130,6 +131,8 @@ tkz_local_zone_from(const char *tz, size_t tzlen,
         if (n > 0 && (id = tkz_zone_from_path(buf, (size_t)n)) >= 0)
             return id;
     }
+#else
+    (void)localtime_link;
 #endif
     if (timezone_file) {
         size_t n = tkz_first_line(timezone_file, buf, sizeof buf);
@@ -138,27 +141,39 @@ tkz_local_zone_from(const char *tz, size_t tzlen,
     }
     if (clock_file && (id = tkz_zone_from_clock_file(clock_file)) >= 0)
         return id;
-#ifdef WIN32
-    {
-        DYNAMIC_TIME_ZONE_INFORMATION dz;
-        if (GetDynamicTimeZoneInformation(&dz) != TIME_ZONE_ID_INVALID) {
-            int i;
-            for (i = 0; i < 127 && dz.TimeZoneKeyName[i]; i++)
-                buf[i] = dz.TimeZoneKeyName[i] < 128 ? (char)dz.TimeZoneKeyName[i] : '?';
-            buf[i] = '\0';
-            if ((id = tkz_windows_lookup(buf)) >= 0)
-                return id;
-        }
-    }
-#endif
+    if (windows_key && (id = tkz_windows_lookup(windows_key)) >= 0)
+        return id;
     return tkz_lookup_name("Etc/UTC", 7);
+}
+
+/* The system's time zone key name on Windows, in buf; NULL elsewhere or
+ * when Windows has none. */
+static const char *
+tkz_windows_key_name(char *buf, size_t size)
+{
+#ifdef WIN32
+    DYNAMIC_TIME_ZONE_INFORMATION dz;
+    size_t i;
+    if (GetDynamicTimeZoneInformation(&dz) == TIME_ZONE_ID_INVALID)
+        return NULL;
+    for (i = 0; i + 1 < size && i < 128 && dz.TimeZoneKeyName[i]; i++)
+        buf[i] = dz.TimeZoneKeyName[i] < 128 ? (char)dz.TimeZoneKeyName[i] : '?';
+    buf[i] = '\0';
+    return i ? buf : NULL;
+#else
+    (void)buf;
+    (void)size;
+    return NULL;
+#endif
 }
 
 static int
 tkz_local_zone(const char *tz, size_t tzlen)
 {
+    char key[256];
     return tkz_local_zone_from(tz, tzlen, "/etc/localtime", "/etc/timezone",
-                               "/etc/sysconfig/clock");
+                               "/etc/sysconfig/clock",
+                               tkz_windows_key_name(key, sizeof key));
 }
 
 #endif

@@ -1,0 +1,88 @@
+#!/bin/bash
+########################################################################
+# install test symlinks for all groups in t/etc/tests.yaml
+# each install-tests.d/<group>.inst handles one group directory.
+########################################################################
+
+base0=$( basename $0 );
+ dir0=$( dirname  $0 );
+
+log-msg()
+{
+    local IFS=' ';
+    echo -e "(+$SECONDS) $base0\t$*";
+}
+
+fatal()
+{
+    log-msg "FATAL: $*";
+    exit -1;
+}
+
+########################################################################
+
+log-msg "$( date )";
+
+typeset -rx  bin_d=$( cd $dir0; pwd -L );
+typeset -rx unit_d=$bin_d/$base0.d;
+typeset -rx test_d=$( dirname $bin_d  );
+typeset -rx root_d=$( dirname $test_d );
+typeset -rx  etc_d=$test_d/etc;
+typeset -rx yaml_f=$etc_d/tests.yaml;
+
+[[ -f $yaml_f ]] || fatal "Missing: $yaml_f";
+
+umask 022;
+
+# rebuilding stubs invalidates any cached prove state.
+
+for cruft in $root_d/{.prove,cover_db}
+do
+    [[ -e $cruft ]] && rm -rf $cruft;
+    [[ -e $cruft ]] && fatal "Failed remove: stale '$cruft' ($?)";
+done
+
+########################################################################
+# create per-group .inst symlinks from the top-level keys in tests.yaml.
+
+for group in $(
+    perl -MYAML::Tiny -e '
+        my $y = YAML::Tiny->read( $ARGV[0] )
+            or die "Cannot read: $ARGV[0]";
+        print join "\n", sort keys %{ $y->[0] };
+    ' "$yaml_f"
+)
+do
+    link=$unit_d/$group.inst;
+
+    [[ -e $link ]] && continue;
+
+    ln -s _inst_t "$link" \
+    || fatal "Failed symlink: $link";
+
+    log-msg "Linked: $link";
+done
+
+########################################################################
+
+typeset -x i;
+
+for i in $unit_d/*.inst
+do
+    if [[ -r $i ]]
+    then
+        j=$( basename $i .inst );
+        dest_d=$test_d/$j;
+
+        log-msg "$i ($dest_d)";
+
+        perl "$i" \
+        || fatal "Failed: $i ($?)";
+    else
+        log-msg "Non-readable: $i";
+    fi
+done
+
+log-msg "Done.";
+
+exit 0;

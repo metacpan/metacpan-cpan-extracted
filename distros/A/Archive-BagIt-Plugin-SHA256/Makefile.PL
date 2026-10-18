@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.008",
   "NAME" => "Archive::BagIt::Plugin::SHA256",
   "PREREQ_PM" => {
+    "Archive::BagIt" => "0.102",
     "Archive::BagIt::Role::Algorithm" => 0,
     "Archive::BagIt::Role::Manifest" => 0,
     "Archive::BagIt::Role::OpenSSL" => 0,
@@ -42,7 +43,7 @@ my %WriteMakefileArgs = (
     "open" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,6 +51,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Archive::BagIt" => "0.102",
   "Archive::BagIt::Role::Algorithm" => 0,
   "Archive::BagIt::Role::Manifest" => 0,
   "Archive::BagIt::Role::OpenSSL" => 0,

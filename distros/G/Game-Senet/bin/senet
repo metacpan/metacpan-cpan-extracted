@@ -1,0 +1,43 @@
+#!perl
+our $VERSION = '0.01';
+use Game::Senet::Terminal;
+exit Game::Senet::Terminal->run(@ARGV);
+
+__END__
+
+=head1 NAME
+
+senet - Senet, the race game of ancient Egypt, in a terminal
+
+=head1 SYNOPSIS
+
+    senet
+    senet --rules skyruk --level 2
+    senet --mode hotseat --pieces 7
+    senet --ascii --no-pick
+    senet --help
+
+=head1 DESCRIPTION
+
+Thirty houses in three rows of ten, the track a reversed S, five pieces a side
+and four throwing sticks. You play light against the program unless told
+otherwise. See L<Game::Senet::Terminal> for every option and the keys.
+
+=head1 EXIT STATUS
+
+0 when the game was won, drawn or left; 1 when you lost to the program; 2 for
+an option or a value it does not know.
+
+=head1 AUTHOR
+
+LNATION <email@lnation.org>
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION <email@lnation.org>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

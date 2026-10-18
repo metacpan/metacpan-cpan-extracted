@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 1.6.1 are described by their release commits.
 
+## 1.11.0 - 2026-10-18
+
+### Features
+
+- Add oauth->register, for RFC 7591 dynamic client registration ([`8ed4586`](https://github.com/internetdata/sdk-perl/commit/8ed4586060b418faee13930f43d13fb528f67795))
+
 ## 1.10.1 - 2026-10-17
 
 ### Fixes

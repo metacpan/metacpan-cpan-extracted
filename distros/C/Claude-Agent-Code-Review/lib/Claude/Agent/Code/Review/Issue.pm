@@ -4,25 +4,128 @@ use 5.020;
 use strict;
 use warnings;
 
-use Types::Common -types;
+use Object::Proto ();
+use Claude::Agent::Code::Review::Types;
 
-# Marlin attribute declarations:
-#   Required attributes (marked with '!'):
-#     severity, category, file, line, description
-#   Optional attributes (use Maybe[Type]):
-#     end_line, column, explanation, suggestion, code_before, code_after
-use Marlin
-    'severity!'    => Enum['critical', 'high', 'medium', 'low', 'info'],
-    'category!'    => Enum['bugs', 'security', 'style', 'performance', 'maintainability'],
-    'file!'        => Str,
-    'line!'        => Int,
-    'description!' => Str,
-    'end_line'     => Maybe[Int],
-    'column'       => Maybe[Int],
-    'explanation'  => Maybe[Str],
-    'suggestion'   => Maybe[Str],
-    'code_before'  => Maybe[Str],
-    'code_after'   => Maybe[Str];
+BEGIN {
+    Object::Proto::define('Claude::Agent::Code::Review::Issue',
+        'severity:ReviewSeverity:required',
+        'category:ReviewCategory:required',
+        'file:Str:required',
+        'line:Int:required',
+        'description:Str:required',
+        'end_line',
+        'column',
+        'explanation',
+        'suggestion',
+        'code_before',
+        'code_after',
+    );
+}
+
+sub has_end_line {
+    my ($self) = @_;
+    return defined $self->end_line;
+}
+
+sub has_column {
+    my ($self) = @_;
+    return defined $self->column;
+}
+
+sub has_explanation {
+    my ($self) = @_;
+    return defined $self->explanation && length $self->explanation;
+}
+
+sub has_suggestion {
+    my ($self) = @_;
+    return defined $self->suggestion && length $self->suggestion;
+}
+
+sub has_code_before {
+    my ($self) = @_;
+    return defined $self->code_before && length $self->code_before;
+}
+
+sub has_code_after {
+    my ($self) = @_;
+    return defined $self->code_after && length $self->code_after;
+}
+
+sub is_critical {
+    my ($self) = @_;
+    return $self->severity eq 'critical';
+}
+
+sub is_high {
+    my ($self) = @_;
+    return $self->severity eq 'high';
+}
+
+sub is_security {
+    my ($self) = @_;
+    return $self->category eq 'security';
+}
+
+sub location {
+    my ($self) = @_;
+
+    if ($self->has_end_line && $self->end_line != $self->line) {
+        return sprintf "%s:%d-%d", $self->file, $self->line, $self->end_line;
+    }
+
+    return sprintf "%s:%d", $self->file, $self->line;
+}
+
+sub to_hash {
+    my ($self) = @_;
+
+    return {
+        severity    => $self->severity,
+        category    => $self->category,
+        file        => $self->file,
+        line        => $self->line,
+        ($self->has_end_line    ? (end_line    => $self->end_line)    : ()),
+        ($self->has_column      ? (column      => $self->column)      : ()),
+        description => $self->description,
+        ($self->has_explanation ? (explanation => $self->explanation) : ()),
+        ($self->has_suggestion  ? (suggestion  => $self->suggestion)  : ()),
+        ($self->has_code_before ? (code_before => $self->code_before) : ()),
+        ($self->has_code_after  ? (code_after  => $self->code_after)  : ()),
+    };
+}
+
+sub as_text {
+    my ($self) = @_;
+
+    my @lines;
+    push @lines, sprintf "[%s] %s - %s", uc($self->severity), $self->category, $self->location;
+    push @lines, "  " . $self->description;
+
+    if ($self->has_explanation) {
+        push @lines, "  Explanation: " . $self->explanation;
+    }
+
+    if ($self->has_suggestion) {
+        push @lines, "  Suggestion: " . $self->suggestion;
+    }
+
+    if ($self->has_code_before) {
+        push @lines, "  Before: " . $self->code_before;
+    }
+
+    if ($self->has_code_after) {
+        push @lines, "  After:  " . $self->code_after;
+    }
+
+    return join("\n", @lines);
+}
+
+
+1;
+
+__END__
 
 =head1 NAME
 
@@ -86,21 +189,11 @@ Returns true if end_line is set.
 
 =cut
 
-sub has_end_line {
-    my ($self) = @_;
-    return defined $self->end_line;
-}
-
 =head2 has_column
 
 Returns true if column is set.
 
 =cut
-
-sub has_column {
-    my ($self) = @_;
-    return defined $self->column;
-}
 
 =head2 has_explanation
 
@@ -108,21 +201,11 @@ Returns true if explanation is set.
 
 =cut
 
-sub has_explanation {
-    my ($self) = @_;
-    return defined $self->explanation && length $self->explanation;
-}
-
 =head2 has_suggestion
 
 Returns true if suggestion is set.
 
 =cut
-
-sub has_suggestion {
-    my ($self) = @_;
-    return defined $self->suggestion && length $self->suggestion;
-}
 
 =head2 has_code_before
 
@@ -130,21 +213,11 @@ Returns true if code_before is set.
 
 =cut
 
-sub has_code_before {
-    my ($self) = @_;
-    return defined $self->code_before && length $self->code_before;
-}
-
 =head2 has_code_after
 
 Returns true if code_after is set.
 
 =cut
-
-sub has_code_after {
-    my ($self) = @_;
-    return defined $self->code_after && length $self->code_after;
-}
 
 =head2 is_critical
 
@@ -152,21 +225,11 @@ Returns true if severity is critical.
 
 =cut
 
-sub is_critical {
-    my ($self) = @_;
-    return $self->severity eq 'critical';
-}
-
 =head2 is_high
 
 Returns true if severity is high.
 
 =cut
-
-sub is_high {
-    my ($self) = @_;
-    return $self->severity eq 'high';
-}
 
 =head2 is_security
 
@@ -174,26 +237,11 @@ Returns true if category is security.
 
 =cut
 
-sub is_security {
-    my ($self) = @_;
-    return $self->category eq 'security';
-}
-
 =head2 location
 
 Returns a formatted location string "file:line" or "file:line-end_line".
 
 =cut
-
-sub location {
-    my ($self) = @_;
-
-    if ($self->has_end_line && $self->end_line != $self->line) {
-        return sprintf "%s:%d-%d", $self->file, $self->line, $self->end_line;
-    }
-
-    return sprintf "%s:%d", $self->file, $self->line;
-}
 
 =head2 to_hash
 
@@ -201,55 +249,11 @@ Returns a hashref representation of the issue.
 
 =cut
 
-sub to_hash {
-    my ($self) = @_;
-
-    return {
-        severity    => $self->severity,
-        category    => $self->category,
-        file        => $self->file,
-        line        => $self->line,
-        ($self->has_end_line    ? (end_line    => $self->end_line)    : ()),
-        ($self->has_column      ? (column      => $self->column)      : ()),
-        description => $self->description,
-        ($self->has_explanation ? (explanation => $self->explanation) : ()),
-        ($self->has_suggestion  ? (suggestion  => $self->suggestion)  : ()),
-        ($self->has_code_before ? (code_before => $self->code_before) : ()),
-        ($self->has_code_after  ? (code_after  => $self->code_after)  : ()),
-    };
-}
-
 =head2 as_text
 
 Returns a human-readable text representation.
 
 =cut
-
-sub as_text {
-    my ($self) = @_;
-
-    my @lines;
-    push @lines, sprintf "[%s] %s - %s", uc($self->severity), $self->category, $self->location;
-    push @lines, "  " . $self->description;
-
-    if ($self->has_explanation) {
-        push @lines, "  Explanation: " . $self->explanation;
-    }
-
-    if ($self->has_suggestion) {
-        push @lines, "  Suggestion: " . $self->suggestion;
-    }
-
-    if ($self->has_code_before) {
-        push @lines, "  Before: " . $self->code_before;
-    }
-
-    if ($self->has_code_after) {
-        push @lines, "  After:  " . $self->code_after;
-    }
-
-    return join("\n", @lines);
-}
 
 =head1 AUTHOR
 
@@ -262,5 +266,3 @@ This software is Copyright (c) 2026 by LNATION.
 This is free software, licensed under The Artistic License 2.0 (GPL Compatible).
 
 =cut
-
-1;

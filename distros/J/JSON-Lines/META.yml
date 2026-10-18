@@ -7,8 +7,9 @@ build_requires:
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  Module::Metadata: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.7702, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,12 +22,12 @@ no_index:
 provides:
   JSON::Lines:
     file: lib/JSON/Lines.pm
-    version: '1.11'
+    version: '1.12'
 requires:
   Cpanel::JSON::XS: '0'
   Import::Export: '1.00'
   perl: '5.006'
 resources:
   repository: https://github.com/ThisUsedToBeAnEmail/JSON-Lines.git
-version: '1.11'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '1.12'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -1,5 +1,9 @@
 Revision history for Kelp
 
+2.23 - 2026-10-18
+            [New Interface]
+            - Added handle_exception hook
+
 2.22 - 2025-06-12
             [New Interface]
             - Added Kelp::Context::run_method method

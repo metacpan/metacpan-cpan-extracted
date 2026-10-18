@@ -204,9 +204,11 @@ sub spit {
 	my %base = (
 		keys => [ 'a', 'b' ], idx => [ 0, 1 ], out => [],
 		ncol => 2, mode => 0, file => $good, row => \$rownum,
+		width => '2 headers',
 	);
 	my @broken = (
 		[ 'missing key',      sub { delete $_[0]{ncol} },      qr/missing 'ncol'/ ],
+		[ 'missing width',    sub { delete $_[0]{width} },     qr/missing 'width'/ ],
 		[ 'wrong ref kind',   sub { $_[0]{keys} = {} },        qr/'keys' is the wrong kind/ ],
 		[ 'row not a ref',    sub { $_[0]{row} = 0 },          qr/'row' is not a reference/ ],
 		[ 'unknown mode',     sub { $_[0]{mode} = 7 },         qr/'mode' 7 is not 0/ ],

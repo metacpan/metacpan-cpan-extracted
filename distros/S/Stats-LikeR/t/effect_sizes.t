@@ -16,11 +16,12 @@ sub is_approx {
 
 # All reference values computed in base R.
 
-# cohen_d (pooled SD, Hedges g, normal-approx CI)
+# cohen_d (pooled SD, Hedges g, and the normal-approximation CI that was the
+# default through 0.3217; t/cohen_d.R.t holds the default noncentral-t one)
 {
 	my @x = (5,6,7,8,9,7,8);
 	my @y = (3,4,5,6,4,5,3);
-	my $d = cohen_d(\@x, \@y);
+	my $d = cohen_d(\@x, \@y, ci_method => 'normal');
 	is_approx($d->{estimate},   2.31455025, 'cohen d');
 	is_approx($d->{pooled_sd},  1.23442680, 'cohen pooled sd');
 	is_approx($d->{hedges_g},   2.16681300, 'hedges g');
@@ -78,6 +79,10 @@ sub is_approx {
 # error handling
 throws_ok { cohen_d([1], [2,3]) } qr/at least two/, 'cohen_d needs >=2 per group';
 throws_ok { cramers_v([[1,2]]) }  qr/two rows/,     'cramers_v needs >=2 rows';
+# Bergsma's correction divides by N - 1; up to 0.3217 this died on perl's own
+# "Illegal division by zero"
+throws_ok { cramers_v([[1,0],[0,0]]) } qr/^cramers_v: the table total must be more than 1$/m,
+	'cramers_v: a table total of 1 is refused by name';
 throws_ok { eta_squared(42) }     qr/expected/,     'eta_squared rejects bad input';
 
 # Devel::Cover's own per-line counters are allocated inside whatever block is

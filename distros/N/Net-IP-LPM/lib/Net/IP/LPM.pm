@@ -35,7 +35,7 @@ our @EXPORT = qw(
 
 );
 
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 sub AUTOLOAD {
 	# This AUTOLOAD is used to 'autoload' constants from the constant()
 	# XS function.
@@ -286,6 +286,18 @@ sub DESTROY {
 
 	lpm_destroy($self->{handle});
 }
+
+=head1 KNOWN ISSUES
+
+Threads are not supported.
+
+=cut
+
+# The object is a thin handle onto one process-wide C instance table; a clone
+# made by threads->create would share the same handle and its DESTROY would
+# free the parent's trie. Refuse to clone: in a new thread the object
+# becomes undef instead of a second owner of the same native table.
+sub CLONE_SKIP { 1 }
 
 =head1 SEE ALSO
 

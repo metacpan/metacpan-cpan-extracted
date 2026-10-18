@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.04';
 
 use Time::Keeper;
 
@@ -20,7 +20,7 @@ Time::Keeper::Locale - what CLDR says of every locale Time::Keeper knows
 
 =head1 VERSION
 
-Version 0.01
+Version 0.04
 
 =head1 SYNOPSIS
 
@@ -132,6 +132,86 @@ The locale's subtags, C<language>, C<script>, C<territory> and C<variant>
 
 The ten digits the locale writes, 0 to 9: C<0> to C<9> in most, C<٠> to
 C<٩> in C<ar-EG>, C<০> to C<৯> in C<bn>.
+
+=head2 weekend_start
+
+=head2 weekend_end
+
+    Time::Keeper::Locale->weekend_start('ar-EG');   # 5, Friday
+
+The first and last day of the locale's weekend, 1 for Monday to 7 for
+Sunday, from CLDR's data for the locale's territory: Saturday and Sunday in
+most of the world, Friday and Saturday in Egypt, Thursday and Friday in
+Afghanistan, Sunday alone in India.
+
+=head2 plural_category
+
+    Time::Keeper::Locale->plural_category('ru', 21);   # one
+    Time::Keeper::Locale->plural_category('ru', 5);    # many
+
+The CLDR plural category of a whole number in the locale: C<zero>, C<one>,
+C<two>, C<few>, C<many> or C<other>. English has C<one> and C<other>;
+Russian C<one>, C<few>, C<many> and C<other>; Arabic all six; Japanese
+C<other> alone. The sign is ignored.
+
+=head2 relative_names
+
+    my $r = Time::Keeper::Locale->relative_names('en', 'day');
+    $r->{display};          # day
+    $r->{at}{-1};           # yesterday
+    $r->{at}{1};            # tomorrow
+    $r->{future}{one};      # in {0} day
+    $r->{past}{other};      # {0} days ago
+
+The locale's words for a relative time in a field (C<year>, C<quarter>,
+C<month>, C<week>, C<day>, C<hour>, C<minute> or C<second>) and a width
+(C<long>, the default, C<short> or C<narrow>), as a hash reference: the
+field's name, the words for the field -2 to 2 away where the locale has
+them (C<at>, keyed by the offset), and the patterns for a count in the
+future and the past by plural category, with C<{0}> for the number.
+
+=head2 unit_patterns
+
+    my $u = Time::Keeper::Locale->unit_patterns('de', 'hour', 'short');
+    $u->{display};          # Std.
+    $u->{count}{one};       # {0} Std.
+
+The locale's words for a duration unit (C<year>, C<month>, C<week>,
+C<day>, C<hour>, C<minute>, C<second>, C<millisecond>, C<microsecond> or
+C<nanosecond>) in a width (C<long>, C<short> or C<narrow>): its name and
+the pattern for a count by plural category.
+
+=head2 duration_patterns
+
+A hash reference of the locale's patterns for a duration written as digits:
+C<hm> (C<h:mm>), C<hms> (C<h:mm:ss>) and C<ms> (C<m:ss>).
+
+=head2 list_patterns
+
+    my $l = Time::Keeper::Locale->list_patterns('en', 'unit');
+    $l->{two};              # {0}, {1}
+    $l->{start};  $l->{middle};  $l->{end};
+
+The locale's patterns for joining a list, of the type C<standard> (and),
+C<unit>, C<unit-short> or C<unit-narrow>, as a hash reference: C<two> for a
+list of two, and C<start>, C<middle> and C<end> for a longer one.
+
+=head2 interval_formats
+
+    my $i = Time::Keeper::Locale->interval_formats('en', 'yMMMd');
+    $i->{d};                # MMM d – d, y
+    $i->{M};                # MMM d – MMM d, y
+    my $all = Time::Keeper::Locale->interval_formats('en');   # by skeleton
+
+The locale's interval formats for a skeleton: a hash reference from the
+greatest field that differs between the two ends (C<y>, C<M>, C<d>, C<a>,
+C<h>, C<H>, C<m>, C<B> or C<G>) to the pattern, whose second half begins at
+the first field that repeats. With no skeleton, every skeleton's, as a hash
+of hashes.
+
+=head2 interval_fallback
+
+The locale's pattern for an interval no format fits, C<{0} – {1}> in English.
 
 =head1 SEE ALSO
 

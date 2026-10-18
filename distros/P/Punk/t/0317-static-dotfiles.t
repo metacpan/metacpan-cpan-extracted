@@ -154,17 +154,29 @@ put("$dir/$_", "OPEN:$_") for 'x.txt', 'sub/x.txt', 'sub/deep/y.txt',
     my $app = Punk::Static->app("$live");
 
     # same size, and as fast as the filesystem allows: the second and the
-    # size both stand still, so only a finer stamp can tell them apart
+    # size both stand still, so only a finer stamp can tell them apart.
+    # The finer stamp is only as fine as the kernel's inode clock: Linux
+    # before 6.13 stamps from a jiffy clock, so two writes a few
+    # microseconds apart share the nanoseconds too and no stat can tell
+    # them apart. Rewrite until the stamp moves, and skip if it never does.
     put("$live/s.txt", 'version-one');
+    my @first = Time::HiRes::stat("$live/s.txt");
     my $r1 = hit($app, PATH_INFO => '/s.txt');
+    my @st;
+    for my $try (1 .. 200) {
+        put("$live/s.txt", 'version-two');
+        @st = Time::HiRes::stat("$live/s.txt");
+        last if $st[9] != $first[9];
+        Time::HiRes::sleep(0.005);
+    }
     is body($r1), 'version-one', 'the first write is served';
-    put("$live/s.txt", 'version-two');
-    my @st = Time::HiRes::stat("$live/s.txt");
     Time::HiRes::sleep(1.2);                      # past the stat TTL
     my $r2 = hit($app, PATH_INFO => '/s.txt');
   SKIP: {
         skip 'this filesystem keeps whole-second mtimes', 4
             if $st[9] == int $st[9];
+        skip 'the inode clock did not tick between the writes', 4
+            if $st[9] == $first[9];
         is body($r2), 'version-two',
             'a same-size rewrite in the same second is noticed';
         isnt hdr($r2, 'ETag'), hdr($r1, 'ETag'), '...and has its own ETag';

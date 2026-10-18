@@ -12,7 +12,7 @@ use Getopt::Long;
 use Term::ANSIColor qw(colored);
 use Pod::Usage;
 
-our $VERSION = '0.01';
+our $VERSION = '0.04';
 
 my %opts = (
     'dry-run'   => 0,
@@ -29,6 +29,8 @@ GetOptions(
     'directory|d=s' => \$opts{'dir'},
     'command|c=s'   => \$opts{'command'},
     'model|m=s'     => \$opts{'model'},
+    'effort|e=s'    => \$opts{'effort'},
+    'verbose'       => \$opts{'verbose'},
     'help|h'        => \$opts{'help'},
     'version|v'     => \$opts{'version'},
 ) or pod2usage(2);
@@ -43,16 +45,13 @@ if ($opts{'version'}) {
     exit 0;
 }
 
-# Check for piped input: acme_claude_shell -c - reads from stdin
 my $command = $opts{'command'};
 if (defined $command && $command eq '-') {
-    # Read command from stdin (for piping: echo "list files" | acme_claude_shell -c -)
     local $/;
     $command = <STDIN>;
     chomp $command if defined $command;
 }
 
-# Single command mode or interactive
 if (defined $command && length $command) {
     run($command,
         dry_run     => $opts{'dry-run'},
@@ -60,6 +59,8 @@ if (defined $command && length $command) {
         working_dir => $opts{'dir'},
         colorful    => $opts{'color'},
         ($opts{'model'} ? (model => $opts{'model'}) : ()),
+        ($opts{'effort'} ? (effort => $opts{'effort'}) : ()),
+        verbose     => $opts{'verbose'} ? 1 : 0,
     );
 } else {
     shell(
@@ -68,6 +69,8 @@ if (defined $command && length $command) {
         working_dir => $opts{'dir'},
         colorful    => $opts{'color'},
         ($opts{'model'} ? (model => $opts{'model'}) : ()),
+        ($opts{'effort'} ? (effort => $opts{'effort'}) : ()),
+        verbose     => $opts{'verbose'} ? 1 : 0,
     );
 }
 
@@ -90,7 +93,9 @@ sub show_help {
     print_opt("--no-color", "Disable colored output", $c);
     print_opt("-d, --directory DIR", "Set working directory (default: current)", $c);
     print_opt("-c, --command CMD", "Run single command and exit (use '-' for stdin)", $c);
-    print_opt("-m, --model MODEL", "Claude model to use (e.g., claude-opus-4-5)", $c);
+    print_opt("-m, --model MODEL", "Claude model to use (e.g., opus, sonnet)", $c);
+    print_opt("-e, --effort LEVEL", "Effort level: low, medium, high, xhigh or max", $c);
+    print_opt("--verbose", "Log every tool call and notification", $c);
     print_opt("-h, --help", "Show this help", $c);
     print_opt("-v, --version", "Show version", $c);
     print "\n";
@@ -174,6 +179,7 @@ sub print_opt {
 }
 
 __END__
+
 
 =head1 NAME
 

@@ -37,6 +37,7 @@ t/pod-synopsis.t
 t/pod.t
 t/port.t
 t/prereq.t
+t/reference.t
 t/snippets.t
 t/strict.t
 t/unused.t

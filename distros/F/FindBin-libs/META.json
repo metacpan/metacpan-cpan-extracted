@@ -4,7 +4,7 @@
       "Steven Lembark <lembark@wrkhors.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
    "license" : [
       "perl_5"
    ],
@@ -39,12 +39,13 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Cwd" : "3.073000",
+            "Cwd" : "0",
             "Data::Dump" : "0",
             "File::Basename" : "0",
             "File::Copy::Recursive::Reduced" : "0.002000",
             "File::Spec::Functions" : "0",
             "File::Temp" : "0",
+            "File::stat" : "0",
             "List::Util" : "0",
             "Symbol" : "0",
             "Test::More" : "0",
@@ -54,6 +55,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v4.0.4",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "v4.2.0",
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

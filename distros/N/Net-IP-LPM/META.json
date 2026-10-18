@@ -6,7 +6,7 @@
       "Robert Rothenberg <perl@rhizomnic.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150014",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -40,6 +40,9 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "X_contributors" : [
+         "Joel C. Maslak <jmaslak@antelope.net>"
+      ],
       "bugtracker" : {
          "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Net-IP-LPM"
       },
@@ -48,6 +51,6 @@
          "web" : "https://github.com/robrwo/perl-Net-IP-LPM"
       }
    },
-   "version" : "1.12",
+   "version" : "1.13",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

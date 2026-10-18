@@ -75,6 +75,55 @@ typedef struct tk_period_rule {
     uint16_t from, before;            /* minutes of the day; equal for "at" */
 } tk_period_rule;
 
+
+/* ---- words: relative time, durations, lists, intervals ---------------------
+ * Compiled from CLDR's dateFields, units, listPatterns and intervalFormats
+ * since archive version 3. Every slot of tk_locale_words is a string, in the
+ * order tools/cldrcompile writes them, so a section fills it as one array. */
+
+enum { TK_RF_YEAR, TK_RF_QUARTER, TK_RF_MONTH, TK_RF_WEEK, TK_RF_DAY, TK_RF_HOUR, TK_RF_MINUTE,
+       TK_RF_SECOND, TK_RF_COUNT };
+enum { TK_RW_LONG, TK_RW_SHORT, TK_RW_NARROW, TK_RW_COUNT };
+enum { TK_PL_ZERO, TK_PL_ONE, TK_PL_TWO, TK_PL_FEW, TK_PL_MANY, TK_PL_OTHER, TK_PL_COUNT };
+enum { TK_DU_YEAR, TK_DU_MONTH, TK_DU_WEEK, TK_DU_DAY, TK_DU_HOUR, TK_DU_MINUTE, TK_DU_SECOND,
+       TK_DU_MILLISECOND, TK_DU_MICROSECOND, TK_DU_NANOSECOND, TK_DU_COUNT };
+enum { TK_LT_STANDARD, TK_LT_UNIT, TK_LT_UNIT_SHORT, TK_LT_UNIT_NARROW, TK_LT_COUNT };
+enum { TK_LS_START, TK_LS_MIDDLE, TK_LS_END, TK_LS_TWO, TK_LS_COUNT };
+
+/* A relative-time field in one width: "day", then "the day before yesterday"
+ * to "the day after tomorrow" (at[0] is -2, at[4] is 2; most are NULL), then
+ * "in {0} days" and "{0} days ago" by plural category. */
+typedef struct tk_relative {
+    const char *display;
+    const char *at[5];
+    const char *future[TK_PL_COUNT];
+    const char *past[TK_PL_COUNT];
+} tk_relative;
+
+/* A duration unit in one width: "hours", then "{0} hours" by category. */
+typedef struct tk_unit_words {
+    const char *display;
+    const char *count[TK_PL_COUNT];
+} tk_unit_words;
+
+typedef struct tk_locale_words {
+    tk_relative   relative[TK_RF_COUNT][TK_RW_COUNT];
+    tk_unit_words units[TK_DU_COUNT][TK_RW_COUNT];
+    const char   *digital[3];                    /* h:mm, h:mm:ss, m:ss */
+    const char   *lists[TK_LT_COUNT][TK_LS_COUNT];
+    const char   *interval_fallback;             /* "{0} – {1}" */
+} tk_locale_words;
+
+#define TK_WORD_SLOTS (sizeof(tk_locale_words) / sizeof(const char *))
+
+/* One interval format: the skeleton, the greatest differing field's letter,
+ * the pattern. Sorted by skeleton, then letter. */
+typedef struct tk_interval {
+    const char *skeleton;
+    const char *pattern;
+    char        letter;
+} tk_interval;
+
 typedef struct tk_locale_data {
     const char        *id;
     tk_locale_strings  s;
@@ -88,6 +137,11 @@ typedef struct tk_locale_data {
     const tk_zone_names  *metazones;  /* sorted by id */
     const tk_terr_name   *territories;/* sorted by id */
     const tk_period_rule *rules;
+    tk_locale_words    w;
+    uint8_t            weekend_start, weekend_end;   /* 1 Monday .. 7 Sunday */
+    uint16_t           plural;                       /* into tk_plural_rules */
+    uint16_t           n_intervals;
+    const tk_interval *intervals;                    /* sorted by skeleton, then letter */
 } tk_locale_data;
 
 /* The tables tools/cldrcompile writes into tk_locale_table.h. */

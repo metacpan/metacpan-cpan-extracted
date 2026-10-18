@@ -15,73 +15,26 @@ use Wordsmith::Claude::Blog::Result;
 use Wordsmith::Claude::Options;
 use Future::AsyncAwait;
 use IO::Async::Loop;
-use Types::Standard qw(Str);
+use Object::Proto ();
 
-use Marlin
-    'file?'       => Str,
-    'text?'       => Str,
-    'title?'      => Str,
-    'options?'    => sub { Wordsmith::Claude::Options->new() },
-    'loop?'       => sub { IO::Async::Loop->new };
-
-=head1 NAME
-
-Wordsmith::Claude::Blog::Reviewer::Interactive - Interactive terminal UI for blog reviewing
-
-=head1 SYNOPSIS
-
-    use Wordsmith::Claude::Blog::Reviewer::Interactive;
-    use IO::Async::Loop;
-
-    my $loop = IO::Async::Loop->new;
-
-    # Review from file
-    my $interactive = Wordsmith::Claude::Blog::Reviewer::Interactive->new(
-        file => 'my-blog.md',
-        loop => $loop,
+BEGIN {
+    Object::Proto::define('Wordsmith::Claude::Blog::Reviewer::Interactive',
+        'file:Str:predicate',
+        'text:Str:predicate',
+        'title:Str:predicate',
+        'options:builder(_build_options):predicate',
+        'loop:builder(_build_loop):predicate',
     );
+}
 
-    # Or review text directly
-    my $interactive = Wordsmith::Claude::Blog::Reviewer::Interactive->new(
-        text  => $blog_text,
-        title => 'My Blog Post',
-        loop  => $loop,
-    );
-
-    my $result = $interactive->run->get;
-
-    if ($result->is_success) {
-        print $result->text;
-    }
-
-=head1 DESCRIPTION
-
-Provides an interactive terminal UI for the Blog::Reviewer, featuring:
-
-=over 4
-
-=item * Colored headers and status messages
-
-=item * Paragraph-by-paragraph display with AI analysis
-
-=item * Interactive menu for approve/revise/edit/skip actions
-
-=item * Multiple revision options (grammar, clarity, conciseness, etc.)
-
-=item * Manual editing with external editor support
-
-=item * Live progress saving to file
-
-=back
-
-=cut
+sub _build_options { Wordsmith::Claude::Options->new }
+sub _build_loop    { IO::Async::Loop->new }
 
 async sub run {
     my ($self) = @_;
 
     header("Interactive Blog Reviewer");
 
-    # Load text from file or use provided text
     my ($text, $source_file, $title) = $self->_load_input();
 
     unless ($text) {
@@ -139,7 +92,6 @@ sub _load_input {
             $text = do { local $/; <$fh> };
             close $fh;
 
-            # Extract title from first markdown heading if not provided
             if (!$title && $text =~ /^#\s+(.+)$/m) {
                 $title = $1;
             }
@@ -157,7 +109,6 @@ sub _load_input {
 sub _handle_paragraph {
     my ($self, $para, $analysis, $num, $total) = @_;
 
-    # Display paragraph
     header("Paragraph $num of $total");
 
     my $is_code = ($para =~ /^```/);
@@ -167,12 +118,10 @@ sub _handle_paragraph {
     print $para, "\n\n";
     divider();
 
-    # Display analysis
     print "AI Analysis:\n";
     print $analysis, "\n\n";
     divider();
 
-    # Get user decision
     return $self->_get_user_decision($para, $is_code);
 }
 
@@ -201,11 +150,9 @@ sub _get_user_decision {
             status('warning', "Paragraph deleted");
             return { action => 'skip' };
         }
-        # User changed mind, recurse
         return $self->_get_user_decision($para, $is_code);
     }
 
-    # Default to approve
     return { action => 'approve' };
 }
 
@@ -268,21 +215,17 @@ sub _get_revision_instructions {
 sub _manual_edit {
     my ($self, $para) = @_;
 
-    # Try to use external editor
     my $editor = $ENV{EDITOR} || $ENV{VISUAL} || 'vim';
     my $tmpfile = "/tmp/blog-review-$$.txt";
 
-    # Write current paragraph to temp file
     if (open my $tmp, '>:encoding(UTF-8)', $tmpfile) {
         print $tmp $para;
         close $tmp;
 
         status('info', "Opening editor: $editor");
 
-        # Open editor
         system($editor, $tmpfile);
 
-        # Read back edited content
         if (-f $tmpfile && open my $in, '<:encoding(UTF-8)', $tmpfile) {
             my $edited = do { local $/; <$in> };
             close $in;
@@ -304,6 +247,91 @@ sub _manual_edit {
     return { action => 'approve' };
 }
 
+
+1;
+
+__END__
+
+=head1 NAME
+
+Wordsmith::Claude::Blog::Reviewer::Interactive - Interactive terminal UI for blog reviewing
+
+=head1 SYNOPSIS
+
+    use Wordsmith::Claude::Blog::Reviewer::Interactive;
+    use IO::Async::Loop;
+
+    my $loop = IO::Async::Loop->new;
+
+    # Review from file
+    my $interactive = Wordsmith::Claude::Blog::Reviewer::Interactive->new(
+        file => 'my-blog.md',
+        loop => $loop,
+    );
+
+    # Or review text directly
+    my $interactive = Wordsmith::Claude::Blog::Reviewer::Interactive->new(
+        text  => $blog_text,
+        title => 'My Blog Post',
+        loop  => $loop,
+    );
+
+    my $result = $interactive->run->get;
+
+    if ($result->is_success) {
+        print $result->text;
+    }
+
+=head1 DESCRIPTION
+
+Provides an interactive terminal UI for the Blog::Reviewer, featuring:
+
+=over 4
+
+=item * Colored headers and status messages
+
+=item * Paragraph-by-paragraph display with AI analysis
+
+=item * Interactive menu for approve/revise/edit/skip actions
+
+=item * Multiple revision options (grammar, clarity, conciseness, etc.)
+
+=item * Manual editing with external editor support
+
+=item * Live progress saving to file
+
+=back
+
+=cut
+
+=head1 ATTRIBUTES
+
+Every attribute is set through C<new>, which takes a flat list of
+name/value pairs and ignores unknown names.
+
+=over 4
+
+=item * file - Path of the file to review
+
+=item * text - The text to review, when not read from a file
+
+=item * title - The title of the piece, when known
+
+=item * options - A L<Wordsmith::Claude::Options>; a default one is built
+
+=item * loop - The L<IO::Async::Loop> to run on; one is created when not given
+
+=back
+
+=head1 METHODS
+
+=head2 run
+
+    my $result = $interactive->run->get;
+
+Run the interactive review in the terminal and return a L<Future> of the
+L<Wordsmith::Claude::Blog::Result>.
+
 =head1 AUTHOR
 
 LNATION, C<< <email at lnation.org> >>
@@ -317,5 +345,3 @@ This is free software, licensed under:
   The Artistic License 2.0 (GPL Compatible)
 
 =cut
-
-1;

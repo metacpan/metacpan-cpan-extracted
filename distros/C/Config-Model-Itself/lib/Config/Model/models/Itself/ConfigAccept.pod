@@ -233,10 +233,6 @@ specify a set of allowed keys. I< Optional. Type list of string.  >
 
 always create the number of id specified in this integer. I< Optional. Type string.  > 
 
-=head2 default_with_init
-
-specify a set of keys and values to create and initialize some elements . E.g. initialize of hash of nodes with ' foo => "X=Av Y=Bv", bar => "Y=Av Z=Cz"' or initialize a list of string with '0 => "foo", 1 => "bar"'. The values follows the syntax specified in L<Config::Model::Loader/"load string syntax"> I< Optional. Type hash of string.  > 
-
 =head2 max_nb
 
 I< Optional. Type integer.  > 

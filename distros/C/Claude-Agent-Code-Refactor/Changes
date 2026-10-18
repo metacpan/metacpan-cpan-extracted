@@ -1,5 +1,9 @@
 Revision history for Claude-Agent-Code-Refactor
 
+0.03    2026-10-17
+	- Require Claude::Agent 0.14 and Claude::Agent::Code::Review 0.03; close the query when a fix ends or times out.
+	- Add the effort option, passed to both the review and the fix.
+
 0.02    2026-01-11
         - Call Query->cleanup() after iteration to release SDK server sockets
         - Fixes socket accumulation in refactor_until_clean loops

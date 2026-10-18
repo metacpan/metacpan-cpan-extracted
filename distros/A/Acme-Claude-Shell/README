@@ -1,16 +1,17 @@
 Acme-Claude-Shell
 
-The README is used to introduce the module and provide instructions on
-how to install the module, any machine dependencies it may have (for
-example C compilers and installed libraries) and any other information
-that should be provided before the module is installed.
+An AI-powered interactive shell built on Claude::Agent. Describe a task in
+plain English; Claude turns it into shell commands, shows each one for
+approval, runs it through an in-process MCP tool and prints the output.
+The interactive shell keeps context between commands; the -c option runs
+one command and exits.
 
-A README file is required for CPAN modules since CPAN extracts the README
-file from a module distribution so that people browsing the archive
-can use it to get an idea of the module's uses. It is usually a good idea
-to provide version information here so that people can decide whether
-fixes for the module are worth downloading.
+REQUIREMENTS
 
+    - Perl 5.020 or higher
+    - Claude::Agent 0.14 or higher, and the Claude Code CLI it drives
+    - Object::Proto, IO::Async, Future::AsyncAwait
+    - Term::ReadLine, Term::ANSIColor, Term::Choose, Term::ReadKey, Term::ProgressSpinner
 
 INSTALLATION
 

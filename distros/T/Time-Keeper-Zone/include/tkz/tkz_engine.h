@@ -185,22 +185,33 @@ tkz_offset_at(int id, int64_t t, int32_t *utoff, int *isdst, const char **abbr)
     return 1;
 }
 
+/* Whether two types differ in offset, DST flag or abbreviation: what makes
+ * a transition a change. */
+static int
+tkz_types_differ(uint16_t i, uint16_t j)
+{
+    const tkz_type *a = &tkz_types[i], *b = &tkz_types[j];
+    if (i == j)
+        return 0;
+    return a->utoff != b->utoff || a->isdst != b->isdst
+        || strcmp(tkz_abbrs + a->abbr, tkz_abbrs + b->abbr) != 0;
+}
+
 /* The next instant after t at which the offset, DST flag or abbreviation
  * really changes, or TKZ_NO_CHANGE. */
 static int64_t
 tkz_next_change(int id, int64_t t)
 {
     int64_t next;
-    uint16_t now = tkz_type_at(id, t, &next);
+    uint16_t now;
+    if (id < 0 || id >= TKZ_LOOKUP_COUNT)
+        return TKZ_NO_CHANGE;
+    now = tkz_type_at(id, t, &next);
     while (next != TKZ_NO_CHANGE) {
         int64_t after;
         uint16_t then = tkz_type_at(id, next, &after);
-        if (then != now) {
-            const tkz_type *a = &tkz_types[now], *b = &tkz_types[then];
-            if (a->utoff != b->utoff || a->isdst != b->isdst
-                || strcmp(tkz_abbrs + a->abbr, tkz_abbrs + b->abbr) != 0)
-                return next;
-        }
+        if (tkz_types_differ(now, then))
+            return next;
         if (after <= next)
             break;
         next = after;
@@ -208,29 +219,109 @@ tkz_next_change(int id, int64_t t)
     return TKZ_NO_CHANGE;
 }
 
-/* The UTC instant of local time `local` (seconds since 1970, as if the
- * wall clock were UTC). Every stretch of constant offset within a day and
- * a bit either side is tried: an instant t in a stretch with offset o
- * matches when t + o == local. No offset has ever been more than a day. */
+/* The last instant strictly before t at which the footer moves between
+ * standard and daylight time, or TKZ_NO_CHANGE if it has no daylight time.
+ * A rule's time may carry its instant up to a week into the next year, so
+ * the two years before t's are worked out as well as t's own. */
+static int64_t
+tkz_footer_prev(const tkz_footer *f, int64_t t)
+{
+    int64_t y, a, best = TKZ_NO_CHANGE;
+    int j;
+
+    if (f->dst_type == 0xFFFF)
+        return TKZ_NO_CHANGE;
+    y = tkz_year_of_day(tkz_floor_div(t + f->std_utoff, 86400));
+    for (j = -2; j <= 1; j++) {
+        a = tkz_rule_local(&f->start, y + j) - f->std_utoff;
+        if (a < t && (best == TKZ_NO_CHANGE || a > best))
+            best = a;
+        a = tkz_rule_local(&f->end, y + j) - f->dst_utoff;
+        if (a < t && (best == TKZ_NO_CHANGE || a > best))
+            best = a;
+    }
+    return best;
+}
+
+/* The last transition strictly before t, in the table or the footer, or
+ * TKZ_NO_CHANGE. The footer rules only from the table's last transition
+ * on: an instant it gives at or before that one is the table's to answer. */
+static int64_t
+tkz_trans_prev(int id, int64_t t)
+{
+    const tkz_zone *z = tkz_zone_of(id);
+    const int64_t *at = tkz_trans_at + z->first_trans;
+    uint32_t n = z->n_trans, lo, hi;
+
+    if (z->footer != TKZ_NO_FOOTER && (n == 0 || t > at[n - 1])) {
+        int64_t p = tkz_footer_prev(&tkz_footers[z->footer], t);
+        if (p != TKZ_NO_CHANGE && (n == 0 || p > at[n - 1]))
+            return p;
+    }
+    if (n == 0 || t <= at[0])
+        return TKZ_NO_CHANGE;
+    /* The last transition before t: at[lo] < t <= at[hi], or hi == n. */
+    lo = 0;
+    hi = n;
+    while (hi - lo > 1) {
+        uint32_t mid = lo + (hi - lo) / 2;
+        if (at[mid] < t)
+            lo = mid;
+        else
+            hi = mid;
+    }
+    return at[lo];
+}
+
+/* The last instant strictly before t at which the offset, DST flag or
+ * abbreviation really changes, or TKZ_NO_CHANGE. */
+static int64_t
+tkz_prev_change(int id, int64_t t)
+{
+    int64_t c, next;
+    if (id < 0 || id >= TKZ_LOOKUP_COUNT)
+        return TKZ_NO_CHANGE;
+    while ((c = tkz_trans_prev(id, t)) != TKZ_NO_CHANGE) {
+        if (tkz_types_differ(tkz_type_at(id, c - 1, &next), tkz_type_at(id, c, &next)))
+            return c;
+        t = c;
+    }
+    return TKZ_NO_CHANGE;
+}
+
+/* Every UTC instant whose wall clock reads `local` (seconds since 1970, as
+ * if the wall clock were UTC). Every stretch of constant offset within a
+ * day and a bit either side is tried: an instant t in a stretch with offset
+ * o matches when t + o == local. No offset has ever been more than a day.
+ *
+ * Returns how many there are, 0 (a gap), 1 or 2 (an overlap), or -1 for a
+ * bad id. Two or more fill utc[] with the earliest and the latest. One
+ * fills both slots with it. A gap fills utoff[] with the offsets before
+ * and after it, and utc[] with local read in each. In every case
+ * utc[i] == local - utoff[i]. */
 static int
-tkz_resolve_local(int id, int64_t local, int gap, int overlap, int64_t *utc)
+tkz_resolve_local_all(int id, int64_t local, int64_t utc[2], int32_t utoff[2])
 {
     int64_t from = local - 2 * 86400, to = local + 2 * 86400;
-    int64_t t = from, first = TKZ_NO_CHANGE, last = TKZ_NO_CHANGE;
-    int found = 0;
-    int32_t before_off = 0, after_off = 0;
-    int have_gap = 0;
+    int64_t t = from;
+    int found = 0, have_gap = 0;
 
     if (id < 0 || id >= TKZ_LOOKUP_COUNT)
         return -1;
+    utc[0] = utc[1] = local;
+    utoff[0] = utoff[1] = 0;
     while (t <= to) {
         int64_t next, cand;
         uint16_t ty = tkz_type_at(id, t, &next);
         int32_t off = tkz_types[ty].utoff;
         cand = local - off;
         if (cand >= t && (next == TKZ_NO_CHANGE || cand < next)) {
-            if (!found) first = cand;
-            last = cand;
+            if (!found) {
+                utc[0] = cand;
+                utoff[0] = off;
+            }
+            utc[1] = cand;
+            utoff[1] = off;
             found++;
         }
         else if (!found && !have_gap && next != TKZ_NO_CHANGE && cand >= next) {
@@ -240,29 +331,94 @@ tkz_resolve_local(int id, int64_t local, int gap, int overlap, int64_t *utc)
                 /* next + off <= local < next + noff: the clocks jumped
                  * from next + off to next + noff, over local */
                 have_gap = 1;
-                before_off = off;
-                after_off = noff;
+                utoff[0] = off;
+                utoff[1] = noff;
+                utc[0] = local - off;
+                utc[1] = local - noff;
             }
         }
         if (next == TKZ_NO_CHANGE)
             break;
         t = next;
     }
-    if (found == 1) {
-        *utc = first;
+    return found > 2 ? 2 : found;
+}
+
+/* The UTC instant of local time `local`: one of resolve_local_all's
+ * readings, picked by gap and overlap. */
+static int
+tkz_resolve_local(int id, int64_t local, int gap, int overlap, int64_t *utc)
+{
+    int64_t u[2];
+    int32_t o[2];
+    int n = tkz_resolve_local_all(id, local, u, o);
+
+    if (n < 0)
+        return -1;
+    if (n == 1) {
+        *utc = u[0];
         return TKZ_LOCAL_EXACT;
     }
-    if (found > 1) {
-        *utc = overlap == TKZ_OVERLAP_EARLIER ? first : last;
+    if (n == 2) {
+        *utc = overlap == TKZ_OVERLAP_EARLIER ? u[0] : u[1];
         return TKZ_LOCAL_OVERLAP;
     }
-    if (have_gap) {
-        if (gap == TKZ_GAP_FORWARD)
-            *utc = local - before_off;
-        else if (gap == TKZ_GAP_BACKWARD)
-            *utc = local - after_off;
-    }
+    if (gap == TKZ_GAP_FORWARD)
+        *utc = u[0];
+    else if (gap == TKZ_GAP_BACKWARD)
+        *utc = u[1];
     return TKZ_LOCAL_GAP;
+}
+
+/* The offset of standard time at t, as the database's types say it: past
+ * the table's last transition, the footer's standard offset; before that,
+ * the offset of the latest type at or before t whose DST flag is clear. The
+ * database decides what is standard: Europe/Dublin's is IST, +01:00, and
+ * its winter GMT is the daylight time, a negative one. A zone that has
+ * been on DST since its first transition gives its initial type's offset.
+ * 0 for a bad id. */
+static int
+tkz_standard_offset_at(int id, int64_t t, int32_t *utoff)
+{
+    const tkz_zone *z;
+    const int64_t *at;
+    uint32_t n, i, lo, hi;
+    int64_t next;
+    uint16_t ty;
+
+    if (id < 0 || id >= TKZ_LOOKUP_COUNT)
+        return 0;
+    z = tkz_zone_of(id);
+    at = tkz_trans_at + z->first_trans;
+    n = z->n_trans;
+    if (z->footer != TKZ_NO_FOOTER && (n == 0 || t >= at[n - 1])) {
+        *utoff = tkz_footers[z->footer].std_utoff;
+        return 1;
+    }
+    ty = tkz_type_at(id, t, &next);
+    if (!tkz_types[ty].isdst) {
+        *utoff = tkz_types[ty].utoff;
+        return 1;
+    }
+    /* Back through the transitions at or before t: at[i - 1] <= t < at[i]. */
+    lo = 0;
+    hi = n;
+    while (lo < hi) {
+        uint32_t mid = lo + (hi - lo) / 2;
+        if (at[mid] <= t)
+            lo = mid + 1;
+        else
+            hi = mid;
+    }
+    for (i = lo; i > 0; i--) {
+        ty = tkz_trans_type[z->first_trans + i - 1];
+        if (!tkz_types[ty].isdst) {
+            *utoff = tkz_types[ty].utoff;
+            return 1;
+        }
+    }
+    *utoff = tkz_types[z->initial_type].utoff;
+    return 1;
 }
 
 /* Case-blind binary search of the names. */
@@ -315,6 +471,28 @@ static int
 tkz_id_is_link(int id)
 {
     return (id < 0 || id >= TKZ_LOOKUP_COUNT) ? 0 : tkz_lookup[id].is_link;
+}
+
+/* The ISO 3166 code of the country a name belongs to, or NULL. */
+static const char *
+tkz_country_of(int id)
+{
+    uint8_t c;
+    if (id < 0 || id >= TKZ_LOOKUP_COUNT)
+        return NULL;
+    c = tkz_lookup_country[id];
+    return c == TKZ_NO_COUNTRY ? NULL : tkz_countries[c].code;
+}
+
+/* The Windows name of the zone a name follows, or NULL. */
+static const char *
+tkz_windows_name(int id)
+{
+    uint16_t w;
+    if (id < 0 || id >= TKZ_LOOKUP_COUNT)
+        return NULL;
+    w = tkz_zone_windows[tkz_lookup[id].zone];
+    return w == TKZ_NO_WINDOWS ? NULL : tkz_windows_names + tkz_windows[w].name;
 }
 
 #endif

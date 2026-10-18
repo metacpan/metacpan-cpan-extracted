@@ -1,7 +1,8 @@
+Changes
 lib/List/RewriteElements.pm
 LICENSE
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 MANIFEST.SKIP
 README
 t/01_load.t
@@ -20,4 +21,5 @@ t/testlib/IO/Capture/Stdout.pm
 t/testlib/IO/Capture/Tie_STDx.pm
 t/testlib/simple.txt
 Todo
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

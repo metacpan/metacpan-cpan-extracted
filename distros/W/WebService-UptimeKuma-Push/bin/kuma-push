@@ -1,0 +1,307 @@
+#!perl
+
+# vim: ts=4 sts=4 sw=4 et: syntax=perl
+#
+# Copyright (c) 2026 Sven Kirmess
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+use 5.010;
+use strict;
+use warnings;
+
+our $VERSION = '0.002';
+
+package WebService::UptimeKuma::Push::App;
+
+use File::Basename qw(fileparse);
+use Getopt::Long   qw(GetOptionsFromArray);
+
+use WebService::UptimeKuma::Push 0.001;
+
+if ( !caller ) {
+    exit _main(@ARGV);
+}
+
+sub _main {
+    my (@args) = @_;
+
+    my $url = $ENV{KUMA_PUSH_URL};
+    my $down;
+    my $msg;
+    my $ping;
+    my $timeout;
+
+    Getopt::Long::Configure(qw(require_order no_ignore_case));
+    return _usage() if !GetOptionsFromArray(
+        \@args,
+        'down'      => \$down,
+        'msg=s'     => \$msg,
+        'ping=s'    => \$ping,
+        'timeout=s' => \$timeout,
+        'url=s'     => \$url,
+    );
+
+    if ( !defined $url || $url eq q{} ) {
+        _error('No push URL given. Use --url or set KUMA_PUSH_URL.');
+        return _usage();
+    }
+
+    # --down and --ping make no sense with a command
+    return _usage() if @args && ( defined $down || defined $ping );
+
+    my $kuma;
+    {
+        local $@;    ## no critic (Variables::RequireInitializationForLocalVars)
+        $kuma = eval { WebService::UptimeKuma::Push->new( url => $url, ( defined $timeout ? ( timeout => $timeout ) : () ) ) };
+        if ( !defined $kuma ) {
+            _error( _strip_location($@) );
+            return 2;
+        }
+    }
+
+    return _run_command( $kuma, $msg, @args ) if @args;
+
+    my $ok;
+    {
+        local $@;    ## no critic (Variables::RequireInitializationForLocalVars)
+        $ok = eval {
+            my %args = (
+                ( defined $msg  ? ( msg  => $msg )  : () ),
+                ( defined $ping ? ( ping => $ping ) : () ),
+            );
+            $down ? $kuma->down(%args) : $kuma->up(%args);
+        };
+
+        # invalid ping
+        if ( !defined $ok ) {
+            _error( _strip_location($@) );
+            return 2;
+        }
+    }
+
+    return 0 if $ok;
+
+    _error( 'Cannot send heartbeat: ' . $kuma->error );
+    return 1;
+}
+
+sub _error {
+    my ($msg) = @_;
+
+    my $name = fileparse($0);
+    print {*STDERR} "$name: $msg\n";
+
+    return;
+}
+
+sub _run_command {
+    my ( $kuma, $msg, @cmd ) = @_;
+
+    my $rc;
+    my $failure;
+    {
+        local $@;    ## no critic (Variables::RequireInitializationForLocalVars)
+        if (
+            !eval {
+                $kuma->run(
+                    sub {
+                        my $exit = system { $cmd[0] } @cmd;
+
+                        if ( $exit == -1 ) {
+                            $rc = 127;
+                            die "Cannot run $cmd[0]: $!\n";
+                        }
+
+                        if ( $? & 127 ) {    ## no critic (Bangs::ProhibitBitwiseOperators)
+                            my $signal = $? & 127;    ## no critic (Bangs::ProhibitBitwiseOperators)
+                            $rc = 128 + $signal;
+                            die "$cmd[0] died with signal $signal\n";
+                        }
+
+                        $rc = $? >> 8;
+                        die "$cmd[0] exited with $rc\n" if $rc;
+
+                        return;
+                    },
+                    ( defined $msg ? ( msg => $msg ) : () ),
+                );
+
+                1;
+            }
+          )
+        {
+            $failure = $@;
+            chomp $failure;
+        }
+    }
+
+    if ( defined $failure ) {
+        _error($failure);
+    }
+
+    # The exit code of the command is more important than a failed
+    # heartbeat. A missing heartbeat is noticed by Uptime Kuma anyway.
+    if ( defined $kuma->error ) {
+        _error( 'Cannot send heartbeat: ' . $kuma->error );
+    }
+
+    return $rc;
+}
+
+sub _strip_location {
+    my ($e) = @_;
+
+    $e =~ s{ \s+ at \s .+ \s line \s [0-9]+ [.]? \s* \z }{}xsm;
+    return $e;
+}
+
+sub _usage {
+    my $name = fileparse($0);
+    print {*STDERR} "usage: $name [--url URL] [--down] [--msg TEXT] [--ping MS] [--timeout SEC]\n";
+    print {*STDERR} "       $name [--url URL] [--msg TEXT] [--timeout SEC] -- COMMAND [ARGS...]\n";
+
+    return 2;
+}
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+kuma-push - update an Uptime Kuma push monitor
+
+=head1 VERSION
+
+Version 0.002
+
+=head1 SYNOPSIS
+
+=over
+
+=item B<kuma-push> [B<--url> I<url>] [B<--down>] [B<--msg> I<text>] [B<--ping> I<ms>] [B<--timeout> I<sec>]
+
+=item B<kuma-push> [B<--url> I<url>] [B<--msg> I<text>] [B<--timeout> I<sec>] B<--> I<command> [I<args> ...]
+
+=back
+
+=head1 DESCRIPTION
+
+The B<kuma-push> utility sends a heartbeat to an Uptime Kuma push monitor.
+It uses L<WebService::UptimeKuma::Push>.
+
+In the first form, a single up heartbeat, or a down heartbeat with
+B<--down>, is sent.
+
+In the second form, the command is run and its runtime is sent as ping. If
+the command exits with 0, an up heartbeat is sent. Otherwise a down
+heartbeat is sent with the reason as message. The command is run directly,
+not through a shell.
+
+=head1 OPTIONS
+
+=over
+
+=item B<--down>
+
+Send a down heartbeat instead of an up heartbeat. Cannot be used with a
+command.
+
+=item B<--msg> I<text>
+
+The message shown in Uptime Kuma. With a command, the message is only used
+if the command succeeds.
+
+=item B<--ping> I<ms>
+
+The response time, in milliseconds, shown in Uptime Kuma. Cannot be used
+with a command.
+
+=item B<--timeout> I<sec>
+
+The timeout, in seconds, for the HTTP request. Defaults to 10.
+
+=item B<--url> I<url>
+
+The push URL of the monitor, as shown by the Uptime Kuma web interface.
+Defaults to the C<KUMA_PUSH_URL> environment variable.
+
+=back
+
+=head1 EXIT STATUS
+
+Without a command, the B<kuma-push> utility exits 0 on success, 1 if the
+heartbeat cannot be sent, and 2 if invalid arguments are given.
+
+With a command, B<kuma-push> exits with the exit status of the command, 127
+if the command cannot be run, 128 plus the signal number if the command was
+killed by a signal, and 2 if invalid arguments are given. A failure to send
+the heartbeat is reported on standard error but does not change the exit
+status.
+
+On Windows, Perl cannot distinguish a command that cannot be run from a
+command that exits with 255. In that case B<kuma-push> exits with 255.
+
+=head1 EXAMPLES
+
+=head2 Example 1 Send an up heartbeat
+
+    kuma-push --url 'https://kuma.example.net:3001/api/push/MSCHnx6nVs' --msg 'all good'
+
+=head2 Example 2 Monitor a backup from cron
+
+    KUMA_PUSH_URL=https://kuma.example.net:3001/api/push/MSCHnx6nVs
+    0 3 * * * kuma-push --msg 'backup done' -- rsync -a /data/ backup:/data/
+
+=head1 ENVIRONMENT
+
+=over
+
+=item C<KUMA_PUSH_URL>
+
+The push URL, if B<--url> is not given. Using the environment variable
+prevents the push token from showing up in the process list.
+
+=back
+
+=head1 SEE ALSO
+
+L<WebService::UptimeKuma::Push>
+
+=head1 SUPPORT
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests through the issue tracker
+at L<https://github.com/skirmess/WebService-UptimeKuma-Push/issues>.
+You will be notified automatically of any progress on your issue.
+
+=head2 Source Code
+
+This is open source software. The code repository is available for
+public review and contribution under the terms of the license.
+
+L<https://github.com/skirmess/WebService-UptimeKuma-Push>
+
+  git clone https://github.com/skirmess/WebService-UptimeKuma-Push.git
+
+=head1 AUTHOR
+
+Sven Kirmess <sven.kirmess@kzone.ch>
+
+=cut

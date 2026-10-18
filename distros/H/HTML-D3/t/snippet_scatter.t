@@ -109,7 +109,7 @@ like($dims_html, qr/"series":"North"/, 'Series value embedded in the JSON bindin
 like($dims_html, qr/"size":90/, 'Size value embedded in the JSON binding');
 like($dims_html, qr/seriesNames = \["North","South"\]/,
 	'Series names collected in first-seen order');
-like($dims_html, qr/d3\.schemeCategory10/, 'scheme opt selects the D3 categorical scheme');
+like($dims_html, qr/scaleOrdinal\(\['#1f77b4', '#ff7f0e'/, 'scheme opt inlines the category10 colours');
 like($dims_html, qr/rScale = d3\.scaleSqrt\(\)\.domain\(\[10,90\]\)\.range\(\[4,20\]\)/,
 	'Radius scale uses the observed size domain and radius_range');
 like($dims_html, qr/return d\.series!=null\?color\(d\.series\)/,
@@ -127,7 +127,7 @@ my $series_only = $chart->render_scatter_chart_snippet(
 	{ colour_by_series => 1 }
 )->{html};
 like($series_only,  qr/seriesNames/,       'Series-only: points coloured by series');
-like($series_only,  qr/schemeTableau10/,   'Series-only: default scheme is tableau10');
+like($series_only,  qr/scaleOrdinal\(\['#4e79a7', '#f28e2c'/, 'Series-only: default scheme is tableau10');
 unlike($series_only, qr/rScale/,           'Series-only: no radius scale without size values');
 
 # Bubble sizing alone.

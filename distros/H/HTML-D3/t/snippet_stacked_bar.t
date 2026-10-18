@@ -31,7 +31,7 @@ like($html, qr/d3\.stack\(\)/, 'Uses d3.stack()');
 like($html, qr/d3\.scaleBand/, 'Uses d3.scaleBand for category axis');
 like($html, qr/d3\.scaleLinear/, 'Uses d3.scaleLinear for value axis');
 like($html, qr/SCHEMES/, 'Contains SCHEMES colour map');
-like($html, qr/schemeTableau10/, 'Uses default tableau10 scheme');
+like($html, qr/SCHEMES\['tableau10'\]/, 'Uses default tableau10 scheme');
 like($html, qr/East/, 'Category East in output');
 like($html, qr/Widgets/, 'Segment Widgets in output');
 unlike($html, qr/<!DOCTYPE/i, 'No DOCTYPE (snippet)');

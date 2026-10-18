@@ -5,12 +5,13 @@ use warnings;
 
 use Carp ();
 
-our $VERSION = '3.6.0';
+our $VERSION = '3.7.0';
 
 our @FLAGS = qw(
     is_vpn is_hosting is_relay is_tor is_cdn is_resproxy is_dcproxy is_mobproxy
+    is_pubproxy
 );
-our @DETAILS = qw(vpn hosting relay tor cdn resproxy dcproxy mobproxy);
+our @DETAILS = qw(vpn hosting relay tor cdn resproxy dcproxy mobproxy pubproxy);
 
 my %KNOWN = map { $_ => 1 } 'ip', 'is_bogon', @FLAGS, @DETAILS;
 
@@ -114,14 +115,18 @@ false. A populated one always carries every one of its keys.
 Always present. C<is_bogon> is set when the answer was computed locally rather
 than served.
 
-=head2 is_hosting, is_relay, is_tor, is_cdn, is_resproxy, is_dcproxy, is_mobproxy
+=head2 is_hosting, is_relay, is_tor, is_cdn, is_resproxy, is_dcproxy, is_mobproxy, is_pubproxy
 
 The tier-gated flags: C<1>, C<0>, or C<undef> when your plan omits the field.
+C<is_pubproxy> is whether a public proxy, one anyone can connect through,
+listens on the address or sends its traffic out from it.
 
-=head2 vpn, hosting, relay, tor, cdn, resproxy, dcproxy, mobproxy
+=head2 vpn, hosting, relay, tor, cdn, resproxy, dcproxy, mobproxy, pubproxy
 
 The detail objects, as plain hash references, or C<undef> when your plan omits
-them.
+them. C<pubproxy> carries C<entry>, C<exit>, C<protocols> (an array
+reference), C<last_seen> and C<last_usable>, the last an empty string when no
+request through a proxy on the address was answered.
 
 =head2 has($field)
 

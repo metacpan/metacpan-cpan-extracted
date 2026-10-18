@@ -60,7 +60,7 @@ return [
                type => 'node',
                config_class_name => "Itself::WarpApply",
            },
-           description => 'Specify a set of test and paramaters to apply. Only the fist matching test is used to apply its parameters.'
+           description => 'Specify a set of test and parameters to apply. Only the fist matching test is used to apply its parameters.'
        },
    ],
 ],

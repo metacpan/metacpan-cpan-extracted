@@ -2,13 +2,36 @@
 
 MODULE = Time::Keeper    PACKAGE = Time::Keeper
 
-# The version of Zone's table this was compiled against.
+# The version of Zone's table this needs.
 IV
 _zone_abi_built()
+    CODE:
+        RETVAL = TK_ZONE_ABI_NEEDS;
+    OUTPUT:
+        RETVAL
+
+# The version of the Zone header this was compiled against.
+IV
+_zone_abi_header()
     CODE:
         RETVAL = TKZ_ABI_VERSION;
     OUTPUT:
         RETVAL
+
+# The table's version through the version 2 gate: dies as the new methods
+# do when the table is older.
+IV
+_zone_abi_v2_version()
+    CODE:
+        RETVAL = tk_zone_abi_v2(aTHX_ "Time::Keeper->_zone_abi_v2_version")->abi_version;
+    OUTPUT:
+        RETVAL
+
+# Lets go of the table, so the next named zone looks for it again.
+void
+_zone_abi_forget()
+    CODE:
+        tk_zone_table = NULL;
 
 # Whether the table has been looked for yet, without looking.
 IV
@@ -81,7 +104,21 @@ _today_at(self)
 void
 _value_layout()
     PPCODE:
-        EXTEND(SP, 3);
+        EXTEND(SP, 4);
         mPUSHi(STRUCT_OFFSET(tk_value, inst) + STRUCT_OFFSET(tk_instant, nsec));
         mPUSHi(STRUCT_OFFSET(tk_value, utoff));
         mPUSHi(STRUCT_OFFSET(tk_value, zone));
+        mPUSHi(STRUCT_OFFSET(tk_value, kind));
+
+# About how many values range would give, before it gives any.
+NV
+_range_estimate(self, end, ...)
+        SV *self
+        SV *end
+    PREINIT:
+        tk_iter it;
+    CODE:
+        tk_range_init(aTHX_ &it, self, end, &ST(2), items - 2, "Time::Keeper->range");
+        RETVAL = tk_range_estimate(&it);
+    OUTPUT:
+        RETVAL

@@ -105,4 +105,59 @@ dies_like(sub { $D->new(years => 2**60) }, qr/out of range/, 'too many years');
 dies_like(sub { Time::Keeper::Duration::days('x') }, qr/not a Time::Keeper::Duration/, 'a method on something that is not one');
 dies_like(sub { my $x = $D->new(days => 1) + 3 }, qr/takes another duration/, 'a duration plus a number');
 
+# round.
+{
+    is($D->new(hours => 1, minutes => 30)->round(to => 'hours') . '', 'PT2H', '90 minutes to the hour is 2 hours');
+    is($D->new(minutes => 90)->round(to => 'hours', mode => 'floor') . '', 'PT1H', 'floor is 1');
+    is($D->new(minutes => 90)->round(to => 'hours')->minutes, 0, 'a duration of minutes alone stays in minutes');
+    is($D->new(minutes => 90)->round(to => 'hours')->in_units('minutes'), 120, '120 of them');
+    is($D->new(seconds => 95)->round(to => 'minutes')->in_units('seconds'), 120, '95 seconds to the minute is 120 seconds');
+    is($D->new(seconds => 95)->round(to => 'minutes')->minutes, 0, 'in seconds, since it had seconds');
+    is($D->new(seconds => -95)->round(to => 'minutes', mode => 'floor')->in_units('seconds'), -120, 'floor of a negative duration goes further from zero');
+    is($D->new(seconds => -95)->round(to => 'minutes', mode => 'ceil')->in_units('seconds'), -60, 'ceil towards it');
+    is($D->new(seconds => -95)->round(to => 'minutes')->in_units('seconds'), -120, '-95 is nearer -120');
+    is($D->new(seconds => -90)->round(to => 'minutes')->in_units('seconds'), -60, 'a tie goes later: -60');
+    is($D->new(seconds => 90)->round(to => 'minutes', mode => 'half_even')->in_units('seconds'), 120, 'half_even: bucket 1 is odd, up');
+    is($D->new(seconds => 150)->round(to => 'minutes', mode => 'half_even')->in_units('seconds'), 120, 'bucket 2 is even, down');
+    is($D->new(minutes => 7)->round(to => 'minutes', increment => 5) . '', 'PT5M', '7 minutes to 5 is 5');
+    is($D->new(minutes => 8)->round(to => 'minutes', increment => 5) . '', 'PT10M', '8 is 10');
+    is($D->new(nanoseconds => 1500)->round(to => 'microseconds')->in_units('nanoseconds'), 2000, '1.5 us to the microsecond is 2');
+    is($D->new(nanoseconds => 1500)->round(to => 'microseconds', mode => 'half_even')->in_units('nanoseconds'), 2000, 'half_even: bucket 1 odd');
+    is($D->new(nanoseconds => 2500)->round(to => 'microseconds', mode => 'half_even')->in_units('nanoseconds'), 2000, 'bucket 2 even');
+    is($D->new(seconds => 1, nanoseconds => 999_999_999)->round(to => 'milliseconds')->in_units('seconds', 'nanoseconds') . '', '2',
+       'carries into the seconds');
+    is($D->new(hours => 1, seconds => 1)->round(to => 'hours')->in_units('seconds'), 3600, 'an hour and a second is an hour, in seconds');
+    is($D->new(seconds => -1, nanoseconds => 250_000_000)->round(to => 'seconds')->in_units('seconds', 'nanoseconds') . '', '-1',
+       '-0.75 s to the second is -1');
+    is($D->new(hours => 1, end_of_month => 'limit')->round(to => 'hours')->end_of_month, 'limit', 'end_of_month is kept');
+    dies_like(sub { $D->new(days => 1)->round(to => 'hours') }, qr/months or days has no fixed length to round/, 'not with days');
+    dies_like(sub { $D->new(months => 1)->round(to => 'hours') }, qr/months or days has no fixed length/, 'nor months');
+    dies_like(sub { $D->new(hours => 1)->round(to => 'days') }, qr/days have no fixed length in a duration/, 'nor to days');
+    dies_like(sub { $D->new(hours => 1)->round(to => 'minutes', increment => 7) }, qr/increment 7 does not divide the 60 minutes/, 'a bad increment');
+    dies_like(sub { $D->new(hours => 1)->round(to => 'minutes', mode => 'up') }, qr/mode is .*not 'up'/, 'a bad mode');
+    dies_like(sub { $D->new(hours => 1)->round('minutes') }, qr/say to => a unit/, 'round wants to =>');
+}
+
+# divide and abs.
+{
+    is($D->new(hours => 3, minutes => 30)->divide(2) . '', 'PT1H45M', '3h30m divided by 2');
+    is_deeply([$D->new(hours => 3, seconds => 7, nanoseconds => 5)->divide(2)->in_units('minutes', 'seconds', 'nanoseconds')], [90, 3, 500000002],
+       'the seconds carry into the nanoseconds, to the nanosecond');
+    is($D->new(months => 12, days => 6)->divide(3) . '', 'P4M2D', 'months and days that divide');
+    is($D->new(seconds => -9)->divide(2)->in_units('seconds', 'nanoseconds') . '', '-4', 'a negative duration');
+    is_deeply([$D->new(seconds => -9)->divide(2)->in_units('seconds', 'nanoseconds')], [-4, -500000000], '-4.5 seconds');
+    is($D->new(nanoseconds => 7)->divide(2)->in_units('nanoseconds'), 3, 'the rest below a nanosecond is dropped');
+    is($D->new(hours => 1, end_of_month => 'limit')->divide(2)->end_of_month, 'limit', 'the end-of-month rule is kept');
+    dies_like(sub { $D->new(months => 3)->divide(2) }, qr/3 months do not divide by 2/, 'months with a remainder');
+    dies_like(sub { $D->new(days => 7)->divide(2) }, qr/7 days do not divide by 2/, 'days with a remainder');
+    dies_like(sub { $D->new(minutes => 7)->divide(2) }, qr/7 minutes do not divide by 2/, 'minutes with a remainder');
+    dies_like(sub { $D->new(hours => 1)->divide(0) }, qr/cannot divide by zero/, 'by zero');
+    dies_like(sub { $D->new(hours => 1)->divide(1.5) }, qr/the divisor is not an integer/, 'by a fraction');
+    is($D->new(hours => -3, seconds => -7)->abs . '', 'PT3H7S', 'abs of a negative duration');
+    is($D->new(hours => 3)->abs . '', 'PT3H', 'of a positive one');
+    is($D->new->abs . '', 'PT0S', 'of nothing');
+    is($D->new(months => -1, end_of_month => 'preserve')->abs->end_of_month, 'preserve', 'abs keeps the rule as given');
+    dies_like(sub { $D->new(months => 1, days => -1)->abs }, qr/parts of both signs has no absolute value/, 'mixed signs');
+}
+
 done_testing;

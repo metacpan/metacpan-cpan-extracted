@@ -87,7 +87,7 @@ is($lines[-1], q{90}, "Last element of list is correct");
         "Confirmed count of rows out");
 
     my @lines;
-    open my $FH, $output or croak "Unable to open $output for reading";
+    open my $FH, '<', $output or croak "Unable to open $output for reading";
     while (<$FH>) {
         chomp;
         push @lines, $_;
@@ -146,7 +146,7 @@ is($lines[-1], q{90}, "Last element of list is correct");
     ok(-f $output, "Output file created");
 
     my @lines;
-    open my $FH, $output or croak "Unable to open $output for reading";
+    open my $FH, '<', $output or croak "Unable to open $output for reading";
     while (<$FH>) {
         chomp;
         push @lines, $_;
@@ -154,7 +154,11 @@ is($lines[-1], q{90}, "Last element of list is correct");
     close $FH or croak "Unable to close $output";
     is($lines[0], q{10}, "First element of list is correct");
     is($lines[-2], q{80}, "Next to last element of list is correct");
-    is($lines[-1], q{alpha}, "Last element of list is correct");
+    {
+        note("Failing on Win32 on GH: GH issue 1");
+        is($lines[-1], q{alpha}, "Last element of list is correct");
+    }
+
 
     is(scalar(@greeks), $numcount - 1,
         "Count of items in external file is correct");

@@ -1,5 +1,9 @@
 Revision history for Punk
 
+0.61    2026-10-17
+        - Fix: t/0317-static-dotfiles.t failed where two writes share one
+          inode stamp (Linux before 6.13).
+
 0.60    2026-10-16
         - The compiled application is read into a C struct at `to_app`:
           the request path no longer looks the router, hooks, mounts and

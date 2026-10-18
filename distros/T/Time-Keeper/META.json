@@ -1,5 +1,5 @@
 {
-   "abstract" : "dates and times with time zones, leap seconds and every locale",
+   "abstract" : "dates and times with time zones, leap seconds and locales",
    "author" : [
       "LNATION <email@lnation.org>"
    ],
@@ -29,12 +29,12 @@
          "requires" : {
             "ExtUtils::Depends" : "0.404",
             "ExtUtils::MakeMaker" : "0",
-            "Time::Keeper::Zone" : "0.01"
+            "Time::Keeper::Zone" : "0.03"
          }
       },
       "runtime" : {
          "requires" : {
-            "Time::Keeper::Zone" : "0.01",
+            "Time::Keeper::Zone" : "0.03",
             "perl" : "5.010"
          }
       },
@@ -45,6 +45,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

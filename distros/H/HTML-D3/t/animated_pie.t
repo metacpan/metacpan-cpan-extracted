@@ -37,7 +37,7 @@ like($html, qr/<html/,                    'Output contains <html> tag');
 like($html, qr/Animated Pie Test<\/h1>/, 'Title is included in h1');
 html_tidy_ok($html, 'Output is valid HTML');
 like($html, qr/d3\.pie\(\)/,              'd3.pie() present');
-like($html, qr/d3\.schemeCategory10/,    'd3.schemeCategory10 colours present');
+like($html, qr/\['#1f77b4', '#ff7f0e'/,  'category10 colours inlined as hex values');
 like($html, qr/attrTween/,               'attrTween animation present');
 like($html, qr/d3\.interpolate/,          'd3.interpolate used for tween');
 

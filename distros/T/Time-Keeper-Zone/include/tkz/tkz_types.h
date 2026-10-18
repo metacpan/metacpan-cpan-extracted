@@ -74,4 +74,11 @@ typedef struct tkz_country {
     uint16_t n;
 } tkz_country;
 
+/* tkz_lookup_country[] holds, for every name, the tkz_countries index of
+ * the country zone.tab gives it; a link zone.tab does not list takes its
+ * zone's. tkz_zone_windows[] holds, for every zone, the tkz_windows index
+ * of its Windows name. */
+#define TKZ_NO_COUNTRY 0xFF
+#define TKZ_NO_WINDOWS 0xFFFF
+
 #endif

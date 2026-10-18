@@ -69,6 +69,41 @@ ok(!eval { $K->from_object(object => 'My::Bare'); 1 }, 'a class is not an object
 ok(!eval { $K->from_object(thing => 1); 1 }, 'an unknown argument');
 ok(!eval { $K->from_object(object => My::Time->new(@rd, 'Nowhere/Special')); 1 }, 'a zone that is not there');
 
+# An object with epoch but no utc_rd_values: Time::Piece, Time::Moment and the like.
+{
+    package My::Epochy;
+    sub new { my ($c, %f) = @_; bless {%f}, $c }
+    sub epoch { $_[0]{epoch} }
+    sub nanosecond { $_[0]{nanosecond} }
+    package My::Offsetty;
+    our @ISA = ('My::Epochy');
+    sub tzoffset { $_[0]{tzoffset} }
+    package My::Nothing;
+    sub new { bless {}, shift }
+    package main;
+}
+is($K->from_object(object => My::Epochy->new(epoch => 1760000000, nanosecond => 123))->iso8601, '2025-10-09T08:53:20.000000123Z', 'an object with epoch and nanosecond');
+is($K->from_object(object => My::Epochy->new(epoch => '1760000000.5'))->iso8601, '2025-10-09T08:53:20.500Z', 'an epoch with a fraction, as from_epoch reads it');
+is($K->from_object(object => My::Offsetty->new(epoch => 1760000000, tzoffset => 19800))->zone_name, '+05:30', 'tzoffset gives a fixed zone');
+is($K->from_object(object => My::Offsetty->new(epoch => 1760000000, tzoffset => 19800))->iso8601, '2025-10-09T14:23:20+05:30', 'the same instant there');
+is($K->from_object(object => My::Offsetty->new(epoch => 1760000000, tzoffset => 0))->zone_name, 'UTC', 'a zero offset is UTC');
+is($K->from_object(object => My::Offsetty->new(epoch => 1760000000, tzoffset => 19800), zone => 'Asia/Kolkata')->zone_name, 'Asia/Kolkata',
+   'a zone given wins over tzoffset');
+is($K->from_object(object => My::Epochy->new(epoch => 1760000000), locale => 'fr')->locale, 'fr', 'with a locale');
+ok(!eval { $K->from_object(object => My::Nothing->new); 1 }, 'an object with neither method');
+like($@, qr/an object with utc_rd_values or epoch is required/, 'says so');
+ok(!eval { $K->from_object(object => My::Epochy->new(epoch => 1760000000, nanosecond => -1)); 1 }, 'a nanosecond out of range');
+ok(!eval { $K->from_object(object => My::Offsetty->new(epoch => 1, tzoffset => 90000)); 1 }, 'an offset of more than a day');
+SKIP: {
+    skip 'Time::Piece is not installed', 4 unless eval { require Time::Piece; 1 };
+    my $gm = Time::Piece->gmtime(1760000000);
+    is($K->from_object(object => $gm)->iso8601, '2025-10-09T08:53:20Z', 'a Time::Piece from gmtime');
+    is($K->from_object(object => $gm)->zone_name, 'UTC', 'is in UTC');
+    my $lt = Time::Piece->localtime(1760000000);
+    is($K->from_object(object => $lt)->epoch, 1760000000, 'a Time::Piece from localtime is the same instant');
+    is($K->from_object(object => $lt, zone => 'local')->epoch, 1760000000, 'and with zone => local too');
+}
+
 SKIP: {
     skip 'DateTime is not installed', 4 unless eval { require DateTime; 1 };
     my $dt = DateTime->new(year => 2026, month => 10, day => 15, hour => 21, minute => 5, second => 7,

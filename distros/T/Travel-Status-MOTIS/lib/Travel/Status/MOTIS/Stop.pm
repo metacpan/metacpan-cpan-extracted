@@ -6,7 +6,7 @@ use 5.020;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 Travel::Status::MOTIS::Stop->mk_ro_accessors(
 	qw(

@@ -23,7 +23,7 @@ use Travel::Status::MOTIS::Trip;
 use Travel::Status::MOTIS::Stopover;
 use Travel::Status::MOTIS::Stop;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 # {{{ Endpoint Definition
 
@@ -80,6 +80,7 @@ sub new {
 			time   => DateTime::Format::ISO8601->format_datetime($timestamp),
 			stopId => $stop_id,
 			n      => $conf{results} // 10,
+			window => $conf{window},
 			mode   => join( ',', @modes_of_transit ),
 		);
 	}
@@ -452,7 +453,7 @@ Non-blocking variant;
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 DESCRIPTION
 
@@ -503,6 +504,20 @@ modes, e.g. stops_by_coordinate or stop_id.
 
 =over
 
+=item B<results> => I<number>
+
+Number of results to return, defaults to C<< 10 >>. If I<window> is set, will
+return whichever selector returns more elements.
+
+=item B<window> => I<seconds>
+
+Results to return based on a window between I<timestamp> and I<window> number
+of seconds after I<timestamp>. Will at least return I<results> number of results.
+
+=item B<timestamp> => I<timestamp>
+
+Request departures on or after I<timestamp> (DateTime(3pm) instance). Default: C<< now >>.
+
 =item B<cache> => I<$obj>
 
 A Cache::File(3pm) object used to cache realtime data requests. It should be
@@ -513,7 +528,7 @@ configured for an expiry of one to two minutes.
 Passed on to C<< LWP::UserAgent->new >>. Defaults to C<< { timeout => 10 } >>,
 you can use an empty hashref to unset the default.
 
-=item B<modes_of_transit> => I<\@arrayref> (stop_id)
+=item B<modes_of_transit> => I<\@arrayref>
 
 Only consider the modes of transit given in I<arrayref> when listing
 departures. Accepted modes of transit are:

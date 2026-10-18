@@ -107,45 +107,145 @@ minus_absolute(self, other)
         RETVAL
 
 SV *
+until(self, other, ...)
+        SV *self
+        SV *other
+    ALIAS:
+        since = 1
+    PREINIT:
+        const char *what = ix ? "Time::Keeper->since" : "Time::Keeper->until";
+        tk_args a;
+        tk_value *from, *to;
+        tk_duration d;
+        int largest = TK_U_MONTH, smallest = TK_U_NANOSECOND, mode = TK_RM_TRUNC;
+        int64_t inc = 1;
+    CODE:
+        from = tk_value_rw(ix ? other : self, what);
+        to   = tk_value_rw(ix ? self : other, what);
+        tk_args_parse(aTHX_ &ST(2), items - 2,
+                      TK_A(TK_A_LARGEST) | TK_A(TK_A_SMALLEST) | TK_A(TK_A_INCREMENT) | TK_A(TK_A_MODE),
+                      &a, what);
+        if (a.v[TK_A_LARGEST])
+            largest = tk_opt_dur_unit(aTHX_ a.v[TK_A_LARGEST], "largest", what);
+        if (a.v[TK_A_SMALLEST])
+            smallest = tk_opt_dur_unit(aTHX_ a.v[TK_A_SMALLEST], "smallest", what);
+        if (!a.v[TK_A_LARGEST] && smallest < largest)
+            largest = smallest;        /* months unless smallest is larger, as Temporal has it */
+        if (smallest < largest)
+            croak("%s: smallest (%ss) is a larger unit than largest (%ss)", what,
+                  tk_unit_names[smallest], tk_unit_names[largest]);
+        if (a.v[TK_A_INCREMENT])
+            inc = tk_opt_increment(aTHX_ a.v[TK_A_INCREMENT], smallest, what);
+        if (a.v[TK_A_MODE])
+            mode = tk_opt_mode(aTHX_ a.v[TK_A_MODE], what);
+        tk_value_until(aTHX_ &d, to, from, largest, smallest, inc, mode);
+        RETVAL = tk_dur_new_sv(aTHX_ tk_dur_stash(aTHX), &d);
+    OUTPUT:
+        RETVAL
+
+SV *
 truncate(self, ...)
         SV *self
     ALIAS:
         round = 1
+        end_of = 2
     PREINIT:
+        static const char *const whats[] = {
+            "Time::Keeper->truncate", "Time::Keeper->round", "Time::Keeper->end_of"
+        };
+        const char *what = whats[ix];
+        tk_args a;
         tk_value *v;
-        tk_value lo;
-        int unit;
-        const char *what = ix ? "Time::Keeper->round" : "Time::Keeper->truncate";
+        tk_value out;
+        int unit, mode = TK_RM_HALF_CEIL, ws = 1;
+        int64_t inc = 1;
     CODE:
         v = tk_value_rw(self, what);
-        if (items != 3 || strNE(SvPV_nolen(ST(1)), "to"))
-            croak("%s: say to => 'year', 'quarter', 'month', 'week', 'day', 'hour', 'minute' or 'second'", what);
-        unit = tk_opt_unit(aTHX_ ST(2), what);
-        tk_value_truncate(aTHX_ &lo, v, unit, what);
-        if (ix) {
-            tk_value hi;
-            int ok;
-            int64_t s1, s2;
-            int32_t n1, n2;
-            switch (unit) {
-            case TK_U_YEAR:    ok = tk_value_calendar_rc(aTHX_ &hi, &lo, 12, 0, TK_EOM_WRAP, TKZ_GAP_FORWARD, TK_OVERLAP_DEFAULT) == TK_LOCAL_OK; break;
-            case TK_U_QUARTER: ok = tk_value_calendar_rc(aTHX_ &hi, &lo, 3, 0, TK_EOM_WRAP, TKZ_GAP_FORWARD, TK_OVERLAP_DEFAULT) == TK_LOCAL_OK; break;
-            case TK_U_MONTH:   ok = tk_value_calendar_rc(aTHX_ &hi, &lo, 1, 0, TK_EOM_WRAP, TKZ_GAP_FORWARD, TK_OVERLAP_DEFAULT) == TK_LOCAL_OK; break;
-            case TK_U_WEEK:    ok = tk_value_calendar_rc(aTHX_ &hi, &lo, 0, 7, TK_EOM_WRAP, TKZ_GAP_FORWARD, TK_OVERLAP_DEFAULT) == TK_LOCAL_OK; break;
-            case TK_U_DAY:     ok = tk_value_calendar_rc(aTHX_ &hi, &lo, 0, 1, TK_EOM_WRAP, TKZ_GAP_FORWARD, TK_OVERLAP_DEFAULT) == TK_LOCAL_OK; break;
-            case TK_U_HOUR:    ok = tk_value_clock_rc(aTHX_ &hi, &lo, 60, 0, 0); break;
-            case TK_U_MINUTE:  ok = tk_value_clock_rc(aTHX_ &hi, &lo, 1, 0, 0); break;
-            default:           ok = tk_value_clock_rc(aTHX_ &hi, &lo, 0, 1, 0); break;
-            }
-            /* the nearer of the two, the later when they are as near */
-            tk_value_minus_exact(v, &lo, &s1, &n1);
-            if (ok) {
-                tk_value_minus_exact(&hi, v, &s2, &n2);
-                if (s2 < s1 || (s2 == s1 && n2 <= n1))
-                    lo = hi;
-            }
+        if ((items - 1) % 2)
+            croak("%s: say to => one of " TK_UNIT_LIST, what);
+        tk_args_parse(aTHX_ &ST(1), items - 1,
+                      TK_A(TK_A_TO) | TK_A(TK_A_WEEK_START) | (ix == 1 ? TK_A(TK_A_INCREMENT) | TK_A(TK_A_MODE) : 0), &a, what);
+        if (a.v[TK_A_WEEK_START]) {
+            /* a day, 1 Monday to 7 Sunday, or 'locale' for the locale's first day */
+            SV *w = a.v[TK_A_WEEK_START];
+            if (SvPOK(w) && strEQ(SvPV_nolen(w), "locale"))
+                ws = tk_locale_of(v)->first_day;
+            else
+                ws = (int)tk_opt_int(aTHX_ w, what, "week_start", 1, 7);
         }
-        RETVAL = tk_value_new_sv(aTHX_ SvSTASH(SvRV(self)), &lo);
+        if (!a.v[TK_A_TO])
+            croak("%s: say to => one of " TK_UNIT_LIST, what);
+        unit = tk_opt_unit(aTHX_ a.v[TK_A_TO], what);
+        if (a.v[TK_A_INCREMENT])
+            inc = tk_opt_increment(aTHX_ a.v[TK_A_INCREMENT], unit, what);
+        if (a.v[TK_A_MODE])
+            mode = tk_opt_mode(aTHX_ a.v[TK_A_MODE], what);
+        switch (ix) {
+        case 0:  tk_value_truncate_ws(aTHX_ &out, v, unit, ws, what); break;
+        case 1:  tk_value_round(aTHX_ &out, v, unit, inc, mode, ws, what); break;
+        default: tk_value_end_of(aTHX_ &out, v, unit, ws, what); break;
+        }
+        RETVAL = tk_value_new_sv(aTHX_ SvSTASH(SvRV(self)), &out);
+    OUTPUT:
+        RETVAL
+
+SV *
+next(self, ...)
+        SV *self
+    ALIAS:
+        previous = 1
+    PREINIT:
+        const char *what = ix ? "Time::Keeper->previous" : "Time::Keeper->next";
+        tk_args a;
+        tk_value *v;
+        tk_value out;
+        int gap, overlap, or_same;
+        int64_t dow;
+    CODE:
+        v = tk_value_rw(self, what);
+        tk_args_parse(aTHX_ &ST(1), items - 1,
+                      TK_A(TK_A_DAY_OF_WEEK) | TK_A(TK_A_OR_SAME) | TK_A(TK_A_GAP) | TK_A(TK_A_OVERLAP),
+                      &a, what);
+        if (!a.v[TK_A_DAY_OF_WEEK])
+            croak("%s: day_of_week is required", what);
+        dow = tk_args_int(aTHX_ &a, TK_A_DAY_OF_WEEK, 1, 1, 7, what);
+        or_same = a.v[TK_A_OR_SAME] ? SvTRUE(a.v[TK_A_OR_SAME]) : 0;
+        tk_args_gap_overlap(aTHX_ &a, &gap, &overlap, what);
+        tk_value_adjust_dow(aTHX_ &out, v, (int)dow, ix ? -1 : 1, or_same, gap, overlap, what);
+        RETVAL = tk_value_new_sv(aTHX_ SvSTASH(SvRV(self)), &out);
+    OUTPUT:
+        RETVAL
+
+SV *
+nth_in_month(self, ...)
+        SV *self
+    ALIAS:
+        last_in_month = 1
+    PREINIT:
+        const char *what = ix ? "Time::Keeper->last_in_month" : "Time::Keeper->nth_in_month";
+        tk_args a;
+        tk_value *v;
+        tk_value out;
+        int gap, overlap;
+        int64_t dow, n = -1;
+    CODE:
+        v = tk_value_rw(self, what);
+        tk_args_parse(aTHX_ &ST(1), items - 1,
+                      TK_A(TK_A_DAY_OF_WEEK) | (ix ? 0 : TK_A(TK_A_N)) | TK_A(TK_A_GAP) | TK_A(TK_A_OVERLAP),
+                      &a, what);
+        if (!a.v[TK_A_DAY_OF_WEEK])
+            croak("%s: day_of_week is required", what);
+        dow = tk_args_int(aTHX_ &a, TK_A_DAY_OF_WEEK, 1, 1, 7, what);
+        if (!ix) {
+            if (!a.v[TK_A_N])
+                croak("%s: n is required: 1 to 5, or -1 for the last", what);
+            n = tk_args_int(aTHX_ &a, TK_A_N, 1, -1, 5, what);
+            if (n == 0)
+                croak("%s: n is 1 to 5, or -1 for the last, not 0", what);
+        }
+        tk_args_gap_overlap(aTHX_ &a, &gap, &overlap, what);
+        tk_value_nth_in_month(aTHX_ &out, v, (int)dow, (int)n, gap, overlap, what);
+        RETVAL = tk_value_new_sv(aTHX_ SvSTASH(SvRV(self)), &out);
     OUTPUT:
         RETVAL
 
@@ -213,6 +313,15 @@ _add_overload(self, other, swapped)
                 croak("Time::Keeper::Duration: out of range");
             RETVAL = tk_dur_new_sv(aTHX_ SvSTASH(SvRV(self)), &d);
         }
+        else if (tk_plain_kind_of(aTHX_ other) > 0) {
+            tk_value out, *pv;
+            int kind = tk_plain_kind_of(aTHX_ other);
+            if (ix)
+                croak("Time::Keeper::Duration: a duration minus a value means nothing");
+            pv = tk_plain_of(aTHX_ other, kind, "Time::Keeper::Duration +");
+            tk_plain_add(aTHX_ &out, kind, pv, &d, "Time::Keeper::Duration +");
+            RETVAL = tk_value_new_sv(aTHX_ SvSTASH(SvRV(other)), &out);
+        }
         else if (tk_is_value(aTHX_ other)) {
             tk_value out;
             if (ix)
@@ -269,12 +378,60 @@ compare(class, x, y, ...)
             tk_instant t;
             z.zone = TK_ZONE_UTC;
             z.fixed = 0;
-            tk_now(&t);
+            tk_now_sv(aTHX_ &t);
             tk_value_init(aTHX_ &start, &t, &z);
             base = &start;
         }
         tk_value_plus(aTHX_ &vx, base, tk_dur_of(aTHX_ x, what), TK_GAP_DEFAULT, TK_OVERLAP_DEFAULT, what);
         tk_value_plus(aTHX_ &vy, base, tk_dur_of(aTHX_ y, what), TK_GAP_DEFAULT, TK_OVERLAP_DEFAULT, what);
         RETVAL = tk_value_cmp(&vx, &vy);
+    OUTPUT:
+        RETVAL
+
+MODULE = Time::Keeper    PACKAGE = Time::Keeper
+
+void
+range(self, end, ...)
+        SV *self
+        SV *end
+    PREINIT:
+        tk_iter it;
+        tk_value out;
+        const char *what = "Time::Keeper->range";
+    PPCODE:
+        tk_range_init(aTHX_ &it, self, end, &ST(2), items - 2, what);
+        if (tk_range_estimate(&it) > TK_RANGE_MAX)
+            croak("%s: more than %d values; use iterate", what, TK_RANGE_MAX);
+        while (tk_range_next(aTHX_ &it, &out, what))
+            XPUSHs(sv_2mortal(tk_value_new_sv(aTHX_ it.stash, &out)));
+
+void
+_iterate_step(...)
+    PREINIT:
+        tk_iter *it;
+        tk_value out;
+    PPCODE:
+        PERL_UNUSED_VAR(items);
+        it = tk_iter_of(aTHX_ cv, "Time::Keeper->iterate");
+        if (tk_range_next(aTHX_ it, &out, "Time::Keeper->iterate"))
+            XPUSHs(sv_2mortal(tk_value_new_sv(aTHX_ it->stash, &out)));
+        else
+            XPUSHs(&PL_sv_undef);
+
+SV *
+iterate(self, end, ...)
+        SV *self
+        SV *end
+    PREINIT:
+        tk_iter it;
+        CV *cv;
+        SV *state;
+    CODE:
+        tk_range_init(aTHX_ &it, self, end, &ST(2), items - 2, "Time::Keeper->iterate");
+        cv = newXS(NULL, XS_Time__Keeper__iterate_step, __FILE__);
+        state = newSVpvn((const char *)&it, sizeof it);
+        sv_magicext((SV *)cv, state, PERL_MAGIC_ext, &tk_iter_vtbl, NULL, 0);
+        SvREFCNT_dec(state);
+        RETVAL = newRV_noinc((SV *)cv);
     OUTPUT:
         RETVAL

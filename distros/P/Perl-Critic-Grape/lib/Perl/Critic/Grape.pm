@@ -3,7 +3,7 @@ package Perl::Critic::Grape;
 use strict;
 use warnings;
 
-our $VERSION='0.1.2';
+our $VERSION='0.1.3';
 
 1;
 
@@ -52,6 +52,10 @@ Place subroutines in dependency order.
 =item L<ValuesAndExpressions::RequireSlices|Perl::Critic::Policy::ValuesAndExpressions::RequireSlices>
 
 Use array and hash slices for lookup sequences.
+
+=item L<Variables::ProhibitExcessiveNames|Perl::Critic::Policy::Variables::ProhibitExcessiveNames>
+
+Use concise variable and subroutine names.
 
 =item L<Variables::ProhibitTopicIterator|Perl::Critic::Policy::Variables::ProhibitTopicIterator>
 

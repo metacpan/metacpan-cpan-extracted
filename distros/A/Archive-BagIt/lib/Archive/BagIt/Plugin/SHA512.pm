@@ -1,7 +1,7 @@
 package Archive::BagIt::Plugin::SHA512;
 
 # ABSTRACT: The role to load the sha512 plugin (default for v1.0)
-our $VERSION = '0.102'; # VERSION
+our $VERSION = '0.103'; # VERSION
 
 use strict;
 use warnings;
@@ -40,7 +40,7 @@ Archive::BagIt::Plugin::SHA512 - The role to load the sha512 plugin (default for
 
 =head1 VERSION
 
-version 0.102
+version 0.103
 
 =head1 AVAILABILITY
 

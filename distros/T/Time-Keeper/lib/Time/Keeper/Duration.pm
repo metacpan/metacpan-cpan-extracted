@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.04';
 
 use Time::Keeper;
 
@@ -28,7 +28,7 @@ Time::Keeper::Duration - an amount of time: months, days, minutes and seconds
 
 =head1 VERSION
 
-Version 0.01
+Version 0.04
 
 =head1 SYNOPSIS
 
@@ -158,6 +158,18 @@ The duration as a number of seconds, for one with no months or days: those
 are not a fixed number of seconds, and a duration with them is an error
 here.
 
+=head2 total
+
+    $d->total('hours');                          # 49.5
+    $d->total('days', relative_to => $t);        # months and days need a start
+
+The duration as a number of the unit, with a fraction. Hours, minutes,
+seconds and below are the clock time; days and weeks are 24-hour days for a
+duration of clock time alone. A duration with months or days, or a total in
+months or years, is measured from C<relative_to>, a value: the whole units
+from it, then the fraction of the next, so a month from 31 January is 31
+days and 45 days from 1 January 2026 is 1.5 months.
+
 =head1 NEW DURATIONS FROM OLD
 
 =head2 inverse
@@ -184,6 +196,48 @@ the same, and C<-$d> is L</inverse>.
 C<< $d->multiply(3) >>: every part three times, as C<$d * 3>. The factor is a
 whole number.
 
+=head2 divide
+
+C<< $d->divide(2) >>: every part divided by a whole number. The months, days
+and minutes must divide exactly, since a remainder of one is not a whole
+number of the next; the seconds carry into the nanoseconds, and what is left
+below a nanosecond is dropped.
+
+=head2 abs
+
+The duration with every part made positive. A duration with parts of both
+signs has no absolute value, and is an error here.
+
+=head2 balance
+
+    $d->balance(largest => 'days', relative_to => $t);   # P1M2D is P33D from 31 January
+    $d->balance(largest => 'hours');                     # PT1H30M from PT90M
+
+The duration with C<largest> as its largest unit (C<months> if not given),
+as L<Time::Keeper/until> gives it from C<relative_to>. Without
+C<relative_to> a duration of clock time is balanced from a floating moment,
+so a day is 24 hours; one with months or days needs it.
+
+=head2 round
+
+    my $d = $d->round(to => 'minutes');
+    my $d = $d->round(to => 'minutes', increment => 5, mode => 'ceil');
+
+The duration rounded to a whole number of hours, minutes, seconds,
+milliseconds, microseconds or nanoseconds, with C<increment> and C<mode> as
+L<Time::Keeper/round> takes them; C<floor> of a negative duration goes
+further from zero, and C<half_even> counts buckets from zero. The result is
+in seconds, or in minutes when the duration was minutes alone and the unit
+is a minute or more.
+
+    $d->round(to => 'months', relative_to => $t);   # P1M15D from 1 January 2026 is P2M
+
+With C<relative_to>, a value, months and days are rounded too: the duration
+is added to the value and the result rounded as L<Time::Keeper/until>
+rounds, so a month and fifteen days from 1 January 2026 is two months, since
+16 February is past the middle of February. A duration with months or days
+needs it, and so does rounding to days, weeks, months or years.
+
 =head1 COMPARING AND PRINTING
 
 =head2 compare
@@ -197,11 +251,47 @@ from 1 February, so durations with months or days compare only from a
 starting point: C<< <=> >> compares durations without them, and is an error
 for those with.
 
+=head2 format
+
+    $d->format;                                       # 1 hour, 30 minutes
+    $d->format(locale => 'de', style => 'narrow');    # 1 Std., 30 Min.
+    $d->format(style => 'digital');                   # 1:30:00
+    $d->format(units => ['hours', 'minutes'], largest => 1);   # 1 hour
+
+The duration in the words of C<locale> (English if not given), as
+C<Intl.DurationFormat> writes one: each part that is not zero in its unit's
+words for its plural category, joined as the locale joins a list. C<style>
+is C<long>, C<short> or C<narrow>, or C<digital> for C<h:mm:ss> (a duration
+with months or days has no fixed length and cannot be written as digits).
+C<units> is a list of the units that may appear, from years to nanoseconds;
+a unit left out folds into the next smaller one given (90 minutes is 1 hour
+30 minutes, or 90 minutes without hours), and what is left below the
+smallest unit given is dropped; months need years or months, and days weeks
+or days. C<largest> keeps that many of the largest parts. A duration of
+nothing is C<0 seconds>, in the smallest unit given. Parts are written
+without their sign.
+
 =head2 iso8601
 
 The ISO 8601 form, such as C<P1Y2M3DT4H5M6.5S>, as C<"$d"> gives it. A
 duration whose parts have both signs has no ISO 8601 form; each part is
 then given with its own sign, as C<P1M-2D>.
+
+=head1 SERIALISATION
+
+A duration freezes as text, its five parts and its end-of-month rule, with
+L<Storable> and with the serialisers that use L<Types::Serialiser>'s
+protocol (L<Sereal>, L<CBOR::XS>).
+
+=head2 STORABLE_freeze
+
+=head2 STORABLE_thaw
+
+=head2 FREEZE
+
+=head2 THAW
+
+The hooks.
 
 =head1 AUTHOR
 

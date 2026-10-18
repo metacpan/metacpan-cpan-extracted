@@ -169,6 +169,97 @@ tk_epoch_from_sv(pTHX_ SV *sv, tk_instant *t, const char *what)
     croak("%s: an epoch is a number", what);
 }
 
+/* ---- the epoch in milliseconds, microseconds and nanoseconds ------------- */
+
+/* The scale of a unit of `digits` decimal places: 1000, 1000000, 1e9. */
+#define TK_SCALE(digits) ((digits) == 3 ? (int64_t)1000 : (digits) == 6 ? (int64_t)1000000 : (int64_t)TK_NSECS_PER_SEC)
+
+/* (s, n) as a whole number of the unit, the fraction below it dropped
+ * (towards minus infinity). An IV where one fits; past that an NV when
+ * nv_ok (exact below 2**53), else, or beyond int64 at all, a string of
+ * digits, exact. */
+static SV *
+tk_epoch_scaled(pTHX_ int64_t s, int32_t n, int digits, int nv_ok)
+{
+    int64_t scale = TK_SCALE(digits);
+    int64_t f = n / (TK_NSECS_PER_SEC / scale);
+    SV *sv;
+    char frac[12];
+    int neg = 0;
+
+    if (s < INT64_MAX / scale && s > INT64_MIN / scale) {
+        int64_t v = s * scale + f;
+        return nv_ok ? tk_newSVi64_nv(aTHX_ v) : tk_newSVi64(aTHX_ v);
+    }
+    /* beyond int64: the decimal built from the two parts; before 1970 the
+     * whole part is one nearer zero and the fraction counts back from it */
+    if (s < 0 && f > 0) {
+        neg = 1;
+        s += 1;
+        f = scale - f;
+    }
+    sv = newSVpvs("");
+    if (s == 0) {
+        if (neg)
+            sv_catpvs(sv, "-");
+        sv_catsv(sv, sv_2mortal(tk_newSVi64(aTHX_ f)));
+        return sv;
+    }
+    sv_catsv(sv, sv_2mortal(tk_newSVi64(aTHX_ s)));
+    sprintf(frac, "%0*d", digits, (int)f);
+    sv_catpvn(sv, frac, (STRLEN)digits);
+    return sv;
+}
+
+/* A whole number of the unit, from an integer or a string of digits of any
+ * length, to (s, n). Negative numbers count back from the epoch. */
+static void
+tk_epoch_scaled_from_sv(pTHX_ SV *sv, int digits, tk_instant *t, const char *what)
+{
+    int64_t scale = TK_SCALE(digits), v;
+    SvGETMAGIC(sv);
+    if (tk_sv_to_i64(aTHX_ sv, &v)) {
+        t->sec = tk_floor_div(v, scale);
+        t->nsec = (int32_t)(tk_floor_mod(v, scale) * (TK_NSECS_PER_SEC / scale));
+        return;
+    }
+    if (SvPOK(sv) && !SvROK(sv)) {
+        STRLEN len, k = 0;
+        const char *s = SvPV_nomg(sv, len);
+        int neg = 0;
+        uint64_t whole = 0;
+        int64_t f = 0;
+        if (k < len && (s[k] == '-' || s[k] == '+'))
+            neg = s[k++] == '-';
+        if (k == len || len - k <= (STRLEN)digits)
+            croak("%s: '%s' is not a whole number", what, s);
+        for (; k < len - digits; k++) {
+            if (!isDIGIT(s[k]))
+                croak("%s: '%s' is not a whole number", what, s);
+            if (whole > (uint64_t)INT64_MAX / 10)
+                croak("%s: out of range", what);
+            whole = whole * 10 + (s[k] - '0');
+        }
+        for (; k < len; k++) {
+            if (!isDIGIT(s[k]))
+                croak("%s: '%s' is not a whole number", what, s);
+            f = f * 10 + (s[k] - '0');
+        }
+        if (whole > (uint64_t)INT64_MAX)
+            croak("%s: out of range", what);
+        t->sec = neg ? -(int64_t)whole : (int64_t)whole;
+        t->nsec = (int32_t)(f * (TK_NSECS_PER_SEC / scale));
+        if (neg && f) {
+            t->sec -= 1;
+            t->nsec = TK_NSECS_PER_SEC - t->nsec;
+        }
+        return;
+    }
+    if (SvNIOK(sv) || looks_like_number(sv))
+        croak("%s takes a whole number; from_epoch takes a fraction", what);
+    croak("%s: a number is needed", what);
+}
+
 /* The zone's name: as given for a named zone (a link keeps its own),
  * "UTC", "floating", or the offset of a fixed one. */
 static SV *

@@ -91,14 +91,16 @@ _resolve_local(name, local, gap, overlap)
         else
             mPUSHs(tkz_newSVi64(aTHX_ utc));
 
-# The local zone's name from a TZ value (undef for unset) and files of the
-# test's own; undef for any file skips it.
+# The local zone's name from a TZ value (undef for unset), files of the
+# test's own and a Windows time zone key name; undef for any source skips
+# it, so the system is never consulted.
 SV *
-_local_zone_from(tz, link, tzfile, clock)
+_local_zone_from(tz, link, tzfile, clock, windows)
         SV *tz
         SV *link
         SV *tzfile
         SV *clock
+        SV *windows
     PREINIT:
         STRLEN len = 0;
         const char *p = NULL;
@@ -108,7 +110,8 @@ _local_zone_from(tz, link, tzfile, clock)
         RETVAL = newSVpv(tkz_id_name(tkz_local_zone_from(p, len,
                      SvOK(link) ? SvPV_nolen(link) : NULL,
                      SvOK(tzfile) ? SvPV_nolen(tzfile) : NULL,
-                     SvOK(clock) ? SvPV_nolen(clock) : NULL)), 0);
+                     SvOK(clock) ? SvPV_nolen(clock) : NULL,
+                     SvOK(windows) ? SvPV_nolen(windows) : NULL)), 0);
     OUTPUT:
         RETVAL
 
@@ -160,5 +163,32 @@ _abi_call(what, ...)
             mXPUSHs(newSVpv((a->tzdata_version)(), 0));
         else if (strEQ(what, "zone_count"))
             mXPUSHi((a->zone_count)());
+        else if (strEQ(what, "prev_change")) {
+            int64_t n = (a->prev_change)((int)SvIV(ST(1)), tkz_sv_i64(aTHX_ ST(2)));
+            XPUSHs(n == TKZ_NO_CHANGE ? &PL_sv_undef : sv_2mortal(tkz_newSVi64(aTHX_ n)));
+        }
+        else if (strEQ(what, "resolve_local_all")) {
+            int64_t u[2];
+            int32_t o[2];
+            int n = (a->resolve_local_all)((int)SvIV(ST(1)), tkz_sv_i64(aTHX_ ST(2)), u, o);
+            mXPUSHi(n);
+            if (n >= 0) {
+                mXPUSHs(tkz_newSVi64(aTHX_ u[0]));
+                mXPUSHi(o[0]);
+                mXPUSHs(tkz_newSVi64(aTHX_ u[1]));
+                mXPUSHi(o[1]);
+            }
+        }
+        else if (strEQ(what, "standard_offset_at")) {
+            int32_t u;
+            int ok = (a->standard_offset_at)((int)SvIV(ST(1)), tkz_sv_i64(aTHX_ ST(2)), &u);
+            mXPUSHi(ok);
+            if (ok) mXPUSHi(u);
+        }
+        else if (strEQ(what, "country_of") || strEQ(what, "windows_name")) {
+            const char *n = what[0] == 'c' ? (a->country_of)((int)SvIV(ST(1)))
+                                           : (a->windows_name)((int)SvIV(ST(1)));
+            XPUSHs(n ? sv_2mortal(newSVpv(n, 0)) : &PL_sv_undef);
+        }
         else
             croak("no ABI entry %s", what);

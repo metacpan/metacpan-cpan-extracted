@@ -5,7 +5,7 @@ use Moo::Role;
 use Module::Load;
 use namespace::autoclean;
 # ABSTRACT: A role that handles plugin loading
-our $VERSION = '0.102'; # VERSION
+our $VERSION = '0.103'; # VERSION
 
 has plugin_name => (
   is  => 'ro',
@@ -59,7 +59,7 @@ Archive::BagIt::Role::Plugin - A role that handles plugin loading
 
 =head1 VERSION
 
-version 0.102
+version 0.103
 
 =head2 bagit()
 

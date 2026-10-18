@@ -4,34 +4,6 @@ use 5.020;
 use strict;
 use warnings;
 
-=head1 NAME
-
-Wordsmith::Claude::Blog - Blog style definitions and presets
-
-=head1 SYNOPSIS
-
-    use Wordsmith::Claude::Blog;
-
-    # Get style instruction
-    my $instruction = Wordsmith::Claude::Blog->get_style('technical');
-
-    # Get tone instruction
-    my $tone = Wordsmith::Claude::Blog->get_tone('enthusiastic');
-
-    # List all styles
-    my @styles = Wordsmith::Claude::Blog->all_styles;
-
-    # Get style info
-    my $info = Wordsmith::Claude::Blog->style_info('tutorial');
-
-=head1 DESCRIPTION
-
-Defines blog styles, tones, and length presets for the blog() function.
-
-=head1 STYLES
-
-=cut
-
 our %STYLES;
 BEGIN {
     %STYLES = (
@@ -118,6 +90,123 @@ BEGIN {
     );
 }
 
+sub get_style {
+    my ($class, $style) = @_;
+    return unless $style && exists $STYLES{$style};
+    return $STYLES{$style}{instruction};
+}
+
+sub get_tone {
+    my ($class, $tone) = @_;
+    return unless $tone && exists $TONES{$tone};
+    return $TONES{$tone}{instruction};
+}
+
+sub get_length {
+    my ($class, $length) = @_;
+    return unless $length && exists $LENGTHS{$length};
+    return $LENGTHS{$length}{instruction};
+}
+
+sub style_exists {
+    my ($class, $style) = @_;
+    return $style && exists $STYLES{$style};
+}
+
+sub tone_exists {
+    my ($class, $tone) = @_;
+    return $tone && exists $TONES{$tone};
+}
+
+sub length_exists {
+    my ($class, $length) = @_;
+    return $length && exists $LENGTHS{$length};
+}
+
+sub all_styles {
+    my @sorted = sort keys %STYLES;
+    return @sorted;
+}
+
+sub all_tones {
+    my @sorted = sort keys %TONES;
+    return @sorted;
+}
+
+sub all_lengths {
+    my @sorted = sort keys %LENGTHS;
+    return @sorted;
+}
+
+sub style_info {
+    my ($class, $style) = @_;
+    return unless $style && exists $STYLES{$style};
+    return { %{$STYLES{$style}} };
+}
+
+sub tone_info {
+    my ($class, $tone) = @_;
+    return unless $tone && exists $TONES{$tone};
+    return { %{$TONES{$tone}} };
+}
+
+sub length_info {
+    my ($class, $length) = @_;
+    return unless $length && exists $LENGTHS{$length};
+    return { %{$LENGTHS{$length}} };
+}
+
+sub style_description {
+    my ($class, $style) = @_;
+    return unless $style && exists $STYLES{$style};
+    return $STYLES{$style}{description};
+}
+
+sub tone_description {
+    my ($class, $tone) = @_;
+    return unless $tone && exists $TONES{$tone};
+    return $TONES{$tone}{description};
+}
+
+sub length_description {
+    my ($class, $length) = @_;
+    return unless $length && exists $LENGTHS{$length};
+    return $LENGTHS{$length}{description};
+}
+
+
+1;
+
+__END__
+
+=head1 NAME
+
+Wordsmith::Claude::Blog - Blog style definitions and presets
+
+=head1 SYNOPSIS
+
+    use Wordsmith::Claude::Blog;
+
+    # Get style instruction
+    my $instruction = Wordsmith::Claude::Blog->get_style('technical');
+
+    # Get tone instruction
+    my $tone = Wordsmith::Claude::Blog->get_tone('enthusiastic');
+
+    # List all styles
+    my @styles = Wordsmith::Claude::Blog->all_styles;
+
+    # Get style info
+    my $info = Wordsmith::Claude::Blog->style_info('tutorial');
+
+=head1 DESCRIPTION
+
+Defines blog styles, tones, and length presets for the blog() function.
+
+=head1 STYLES
+
+=cut
+
 =head1 CLASS METHODS
 
 =head2 get_style
@@ -128,12 +217,6 @@ Returns the instruction text for a style, or undef if style doesn't exist.
 
 =cut
 
-sub get_style {
-    my ($class, $style) = @_;
-    return unless $style && exists $STYLES{$style};
-    return $STYLES{$style}{instruction};
-}
-
 =head2 get_tone
 
     my $instruction = Wordsmith::Claude::Blog->get_tone('friendly');
@@ -141,12 +224,6 @@ sub get_style {
 Returns the instruction text for a tone, or undef if tone doesn't exist.
 
 =cut
-
-sub get_tone {
-    my ($class, $tone) = @_;
-    return unless $tone && exists $TONES{$tone};
-    return $TONES{$tone}{instruction};
-}
 
 =head2 get_length
 
@@ -156,12 +233,6 @@ Returns the instruction text for a length, or undef if length doesn't exist.
 
 =cut
 
-sub get_length {
-    my ($class, $length) = @_;
-    return unless $length && exists $LENGTHS{$length};
-    return $LENGTHS{$length}{instruction};
-}
-
 =head2 style_exists
 
     if (Wordsmith::Claude::Blog->style_exists('tutorial')) { ... }
@@ -169,11 +240,6 @@ sub get_length {
 Returns true if the style exists.
 
 =cut
-
-sub style_exists {
-    my ($class, $style) = @_;
-    return $style && exists $STYLES{$style};
-}
 
 =head2 tone_exists
 
@@ -183,11 +249,6 @@ Returns true if the tone exists.
 
 =cut
 
-sub tone_exists {
-    my ($class, $tone) = @_;
-    return $tone && exists $TONES{$tone};
-}
-
 =head2 length_exists
 
     if (Wordsmith::Claude::Blog->length_exists('short')) { ... }
@@ -195,11 +256,6 @@ sub tone_exists {
 Returns true if the length exists.
 
 =cut
-
-sub length_exists {
-    my ($class, $length) = @_;
-    return $length && exists $LENGTHS{$length};
-}
 
 =head2 all_styles
 
@@ -209,11 +265,6 @@ Returns list of all style names.
 
 =cut
 
-sub all_styles {
-    my @sorted = sort keys %STYLES;
-    return @sorted;
-}
-
 =head2 all_tones
 
     my @tones = Wordsmith::Claude::Blog->all_tones;
@@ -222,11 +273,6 @@ Returns list of all tone names.
 
 =cut
 
-sub all_tones {
-    my @sorted = sort keys %TONES;
-    return @sorted;
-}
-
 =head2 all_lengths
 
     my @lengths = Wordsmith::Claude::Blog->all_lengths;
@@ -234,11 +280,6 @@ sub all_tones {
 Returns list of all length names.
 
 =cut
-
-sub all_lengths {
-    my @sorted = sort keys %LENGTHS;
-    return @sorted;
-}
 
 =head2 style_info
 
@@ -249,12 +290,6 @@ Returns full info hashref for a style.
 
 =cut
 
-sub style_info {
-    my ($class, $style) = @_;
-    return unless $style && exists $STYLES{$style};
-    return { %{$STYLES{$style}} };
-}
-
 =head2 tone_info
 
     my $info = Wordsmith::Claude::Blog->tone_info('friendly');
@@ -262,12 +297,6 @@ sub style_info {
 Returns full info hashref for a tone.
 
 =cut
-
-sub tone_info {
-    my ($class, $tone) = @_;
-    return unless $tone && exists $TONES{$tone};
-    return { %{$TONES{$tone}} };
-}
 
 =head2 length_info
 
@@ -277,12 +306,6 @@ Returns full info hashref for a length.
 
 =cut
 
-sub length_info {
-    my ($class, $length) = @_;
-    return unless $length && exists $LENGTHS{$length};
-    return { %{$LENGTHS{$length}} };
-}
-
 =head2 style_description
 
     my $desc = Wordsmith::Claude::Blog->style_description('tutorial');
@@ -290,12 +313,6 @@ sub length_info {
 Returns the short description for a style.
 
 =cut
-
-sub style_description {
-    my ($class, $style) = @_;
-    return unless $style && exists $STYLES{$style};
-    return $STYLES{$style}{description};
-}
 
 =head2 tone_description
 
@@ -305,12 +322,6 @@ Returns the short description for a tone.
 
 =cut
 
-sub tone_description {
-    my ($class, $tone) = @_;
-    return unless $tone && exists $TONES{$tone};
-    return $TONES{$tone}{description};
-}
-
 =head2 length_description
 
     my $desc = Wordsmith::Claude::Blog->length_description('long');
@@ -318,12 +329,6 @@ sub tone_description {
 Returns the short description for a length.
 
 =cut
-
-sub length_description {
-    my ($class, $length) = @_;
-    return unless $length && exists $LENGTHS{$length};
-    return $LENGTHS{$length}{description};
-}
 
 =head1 AUTHOR
 
@@ -338,5 +343,3 @@ This is free software, licensed under:
   The Artistic License 2.0 (GPL Compatible)
 
 =cut
-
-1;

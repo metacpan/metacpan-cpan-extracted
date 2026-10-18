@@ -18,7 +18,12 @@ my ($at_nsec, $at_utoff, $at_zone) = Time::Keeper::_value_layout();
     my $bytes = ${$real};
     is(length $bytes, $size, 'a value holds its bytes');
 
-    ok(!eval { my $x = ${$real} = 'x'; 1 }, 'which cannot be changed');
+    # The referent is writable (a serialiser may re-bless it), so a value
+    # is checked on every read instead.
+    my $changed = $K->new(year => 2026, zone => 'Europe/London');
+    ${$changed} = 'x';
+    ok(!eval { $changed->year; 1 }, 'a value whose bytes were changed is refused');
+    like($@, qr/not a Time::Keeper value/, 'as not a value');
 
     my $short = bless \(my $s = substr($bytes, 1)), $K;
     ok(!eval { $short->year; 1 }, 'a value one byte short');

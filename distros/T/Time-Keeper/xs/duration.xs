@@ -227,24 +227,12 @@ multiply(self, factor)
         SV *factor
     PREINIT:
         tk_duration d;
-        int64_t f, ns;
+        int64_t f;
         const char *what = "Time::Keeper::Duration->multiply";
     CODE:
-        d = *tk_dur_of(aTHX_ self, what);
         if (!tk_sv_to_i64(aTHX_ factor, &f))
             croak("%s: the factor is not an integer", what);
-        if (f > TK_DUR_LIMIT || f < -TK_DUR_LIMIT
-            || (f && (d.months > TK_DUR_LIMIT / (f < 0 ? -f : f) || d.months < -TK_DUR_LIMIT / (f < 0 ? -f : f)
-                      || d.days > TK_DUR_LIMIT / (f < 0 ? -f : f) || d.days < -TK_DUR_LIMIT / (f < 0 ? -f : f)
-                      || d.minutes > TK_DUR_LIMIT / (f < 0 ? -f : f) || d.minutes < -TK_DUR_LIMIT / (f < 0 ? -f : f)
-                      || d.seconds > TK_DUR_LIMIT / (f < 0 ? -f : f) || d.seconds < -TK_DUR_LIMIT / (f < 0 ? -f : f))))
-            croak("%s: out of range", what);
-        d.months *= f;
-        d.days *= f;
-        d.minutes *= f;
-        d.seconds *= f;
-        ns = (int64_t)d.nsec * f;
-        if (!tk_dur_normalize(&d, ns))
+        if (!tk_dur_multiply(tk_dur_of(aTHX_ self, what), f, &d))
             croak("%s: out of range", what);
         RETVAL = tk_dur_new_sv(aTHX_ SvSTASH(SvRV(self)), &d);
     OUTPUT:
@@ -337,5 +325,280 @@ _compare(a, b, swapped)
         RETVAL = xs < ys ? -1 : xs > ys ? 1 : x->nsec < y->nsec ? -1 : x->nsec > y->nsec;
         if (SvTRUE(swapped))
             RETVAL = -RETVAL;
+    OUTPUT:
+        RETVAL
+
+SV *
+round(self, ...)
+        SV *self
+    PREINIT:
+        const char *what = "Time::Keeper::Duration->round";
+        const tk_duration *d;
+        tk_duration out;
+        tk_args a;
+        int unit, mode = TK_RM_HALF_CEIL;
+        int64_t inc = 1;
+    CODE:
+        d = tk_dur_of(aTHX_ self, what);
+        if ((items - 1) % 2)
+            croak("%s: say to => a unit", what);
+        tk_args_parse(aTHX_ &ST(1), items - 1,
+                      TK_A(TK_A_TO) | TK_A(TK_A_INCREMENT) | TK_A(TK_A_MODE) | TK_A(TK_A_RELATIVE_TO), &a, what);
+        if (!a.v[TK_A_TO])
+            croak("%s: say to => a unit", what);
+        unit = tk_opt_dur_unit(aTHX_ a.v[TK_A_TO], "the unit", what);
+        if (a.v[TK_A_INCREMENT])
+            inc = tk_opt_increment(aTHX_ a.v[TK_A_INCREMENT], unit, what);
+        if (a.v[TK_A_MODE])
+            mode = tk_opt_mode(aTHX_ a.v[TK_A_MODE], what);
+        if (a.v[TK_A_RELATIVE_TO]) {
+            tk_value *rel = tk_value_rw(a.v[TK_A_RELATIVE_TO], what);
+            tk_value end;
+            int largest = d->months ? TK_U_MONTH : (d->days || unit <= TK_U_DAY) ? TK_U_DAY : TK_U_HOUR;
+            if (!tk_value_plus_rc(aTHX_ &end, rel, d))
+                croak("%s: out of range", what);
+            tk_value_until(aTHX_ &out, &end, rel, largest, unit, inc, mode);
+        }
+        else {
+            if (unit < TK_U_HOUR)
+                croak("%s: %ss have no fixed length in a duration; give relative_to, a value to measure"
+                      " from, or round to hours, minutes, seconds, milliseconds, microseconds or nanoseconds",
+                      what, tk_unit_names[unit]);
+            if (d->months || d->days)
+                croak("%s: a duration with months or days has no fixed length to round; give relative_to,"
+                      " a value to measure from", what);
+            if (!tk_dur_round(&out, d, unit, inc, mode))
+                croak("%s: out of range", what);
+        }
+        RETVAL = tk_dur_new_sv(aTHX_ SvSTASH(SvRV(self)), &out);
+    OUTPUT:
+        RETVAL
+
+SV *
+total(self, unit, ...)
+        SV *self
+        SV *unit
+    PREINIT:
+        const char *what = "Time::Keeper::Duration->total";
+        const tk_duration *d;
+        tk_args a;
+        int u;
+        double t;
+    CODE:
+        d = tk_dur_of(aTHX_ self, what);
+        u = tk_opt_dur_unit(aTHX_ unit, "the unit", what);
+        tk_args_parse(aTHX_ &ST(2), items - 2, TK_A(TK_A_RELATIVE_TO), &a, what);
+        if (a.v[TK_A_RELATIVE_TO]) {
+            if (!tk_dur_total_from(aTHX_ &t, d, u, tk_value_rw(a.v[TK_A_RELATIVE_TO], what)))
+                croak("%s: out of range", what);
+        }
+        else {
+            if (d->months || u <= TK_U_MONTH)
+                croak("%s: months have no fixed length; give relative_to, a value to measure from", what);
+            if (d->days && u >= TK_U_HOUR)
+                croak("%s: a day is not always 24 hours; give relative_to, a value to measure from", what);
+            t = ((double)d->days * 86400 + (double)d->minutes * 60 + (double)d->seconds
+                 + (double)d->nsec / TK_NSECS_PER_SEC) / tk_unit_seconds(u);
+        }
+        if (t == (double)(IV)t)
+            RETVAL = newSViv((IV)t);
+        else
+            RETVAL = newSVnv(t);
+    OUTPUT:
+        RETVAL
+
+SV *
+balance(self, ...)
+        SV *self
+    PREINIT:
+        const char *what = "Time::Keeper::Duration->balance";
+        const tk_duration *d;
+        tk_duration out;
+        tk_args a;
+        tk_value *rel, base, end;
+        int largest = TK_U_MONTH;
+    CODE:
+        d = tk_dur_of(aTHX_ self, what);
+        tk_args_parse(aTHX_ &ST(1), items - 1, TK_A(TK_A_LARGEST) | TK_A(TK_A_RELATIVE_TO), &a, what);
+        if (a.v[TK_A_LARGEST])
+            largest = tk_opt_dur_unit(aTHX_ a.v[TK_A_LARGEST], "largest", what);
+        if (a.v[TK_A_RELATIVE_TO])
+            rel = tk_value_rw(a.v[TK_A_RELATIVE_TO], what);
+        else {
+            tk_zone_spec fl;
+            tk_instant t0;
+            if (d->months || d->days)
+                croak("%s: months and days have no fixed length; give relative_to, a value to measure from", what);
+            fl.zone = TK_ZONE_FLOATING;
+            fl.fixed = 0;
+            t0.sec = 0;
+            t0.nsec = 0;
+            tk_value_init(aTHX_ &base, &t0, &fl);
+            rel = &base;
+        }
+        if (!tk_value_plus_rc(aTHX_ &end, rel, d))
+            croak("%s: out of range", what);
+        tk_value_until_raw(aTHX_ &out, &end, rel, largest);
+        RETVAL = tk_dur_new_sv(aTHX_ SvSTASH(SvRV(self)), &out);
+    OUTPUT:
+        RETVAL
+
+SV *
+divide(self, divisor)
+        SV *self
+        SV *divisor
+    PREINIT:
+        tk_duration d;
+        int64_t f, q, r, ns;
+        const char *what = "Time::Keeper::Duration->divide";
+    CODE:
+        d = *tk_dur_of(aTHX_ self, what);
+        if (!tk_sv_to_i64(aTHX_ divisor, &f))
+            croak("%s: the divisor is not an integer", what);
+        if (f == 0)
+            croak("%s: cannot divide by zero", what);
+        if (d.months % f)
+            croak("%s: %" IVdf " months do not divide by %" IVdf, what, (IV)d.months, (IV)f);
+        if (d.days % f)
+            croak("%s: %" IVdf " days do not divide by %" IVdf, what, (IV)d.days, (IV)f);
+        if (d.minutes % f)
+            croak("%s: %" IVdf " minutes do not divide by %" IVdf, what, (IV)d.minutes, (IV)f);
+        d.months /= f;
+        d.days /= f;
+        d.minutes /= f;
+        q = d.seconds / f;
+        r = d.seconds - q * f;
+        if (r > INT64_MAX / TK_NSECS_PER_SEC || r < -(INT64_MAX / TK_NSECS_PER_SEC))
+            croak("%s: out of range", what);
+        ns = (r * TK_NSECS_PER_SEC + d.nsec) / f;      /* to the nanosecond, the rest dropped */
+        d.seconds = q;
+        if (!tk_dur_normalize(&d, ns))
+            croak("%s: out of range", what);
+        RETVAL = tk_dur_new_sv(aTHX_ SvSTASH(SvRV(self)), &d);
+    OUTPUT:
+        RETVAL
+
+SV *
+abs(self)
+        SV *self
+    PREINIT:
+        tk_duration d;
+        int neg = 0, pos = 0;
+        const char *what = "Time::Keeper::Duration->abs";
+    CODE:
+        d = *tk_dur_of(aTHX_ self, what);
+        if (d.months < 0 || d.days < 0 || d.minutes < 0 || d.seconds < 0 || d.nsec < 0) neg = 1;
+        if (d.months > 0 || d.days > 0 || d.minutes > 0 || d.seconds > 0 || d.nsec > 0) pos = 1;
+        if (neg && pos)
+            croak("%s: a duration with parts of both signs has no absolute value", what);
+        if (neg)
+            tk_dur_negate(&d, 1);               /* the rule as given, not the default of the new sign */
+        RETVAL = tk_dur_new_sv(aTHX_ SvSTASH(SvRV(self)), &d);
+    OUTPUT:
+        RETVAL
+
+void
+STORABLE_freeze(self, cloning)
+        SV *self
+        SV *cloning
+    ALIAS:
+        FREEZE = 1
+    PREINIT:
+        const tk_duration *d;
+    PPCODE:
+        PERL_UNUSED_VAR(cloning);
+        d = tk_dur_of(aTHX_ self, ix ? "Time::Keeper::Duration->FREEZE" : "Time::Keeper::Duration->STORABLE_freeze");
+        XPUSHs(sv_2mortal(tk_dur_freeze_sv(aTHX_ d)));
+
+void
+STORABLE_thaw(self, cloning, frozen)
+        SV *self
+        SV *cloning
+        SV *frozen
+    PREINIT:
+        tk_duration d;
+        const char *what = "Time::Keeper::Duration->STORABLE_thaw";
+    PPCODE:
+        PERL_UNUSED_VAR(cloning);
+        tk_dur_thaw(aTHX_ frozen, &d, what);
+        if (!SvROK(self))
+            croak("%s: not a reference", what);
+        sv_setpvn(SvRV(self), (const char *)&d, sizeof d);
+        XSRETURN_EMPTY;
+
+SV *
+THAW(class, serialiser, frozen)
+        SV *class
+        SV *serialiser
+        SV *frozen
+    PREINIT:
+        tk_duration d;
+    CODE:
+        PERL_UNUSED_VAR(serialiser);
+        tk_dur_thaw(aTHX_ frozen, &d, "Time::Keeper::Duration->THAW");
+        RETVAL = tk_dur_new_sv(aTHX_ tk_dur_stash_for(aTHX_ class), &d);
+    OUTPUT:
+        RETVAL
+
+SV *
+format(self, ...)
+        SV *self
+    PREINIT:
+        static const char *const units[TK_DU_COUNT] = { "year", "month", "week", "day", "hour", "minute", "second",
+                                                        "millisecond", "microsecond", "nanosecond" };
+        const char *what = "Time::Keeper::Duration->format";
+        const tk_duration *d;
+        tk_args a;
+        const tk_locale_data *loc;
+        tk_out o;
+        int width = TK_RW_LONG, list_type = TK_LT_UNIT, digital = 0, largest = TK_DU_COUNT;
+        unsigned allowed = (1u << TK_DU_COUNT) - 1;
+    CODE:
+        d = tk_dur_of(aTHX_ self, what);
+        tk_args_parse(aTHX_ &ST(1), items - 1, TK_A(TK_A_LOCALE) | TK_A(TK_A_STYLE) | TK_A(TK_A_UNITS) | TK_A(TK_A_LARGEST), &a, what);
+        loc = tk_locale_get(aTHX_ tk_args_locale(&a, what));
+        if (a.v[TK_A_STYLE]) {
+            const char *s = SvPV_nolen(a.v[TK_A_STYLE]);
+            if (strEQ(s, "long")) { width = TK_RW_LONG; list_type = TK_LT_UNIT; }
+            else if (strEQ(s, "short")) { width = TK_RW_SHORT; list_type = TK_LT_UNIT_SHORT; }
+            else if (strEQ(s, "narrow")) { width = TK_RW_NARROW; list_type = TK_LT_UNIT_NARROW; }
+            else if (strEQ(s, "digital")) digital = 1;
+            else croak("%s: style is 'long', 'short', 'narrow' or 'digital', not '%s'", what, s);
+        }
+        if (a.v[TK_A_UNITS]) {
+            AV *av;
+            I32 i, n;
+            if (!SvROK(a.v[TK_A_UNITS]) || SvTYPE(SvRV(a.v[TK_A_UNITS])) != SVt_PVAV)
+                croak("%s: units is a list of unit names", what);
+            av = (AV *)SvRV(a.v[TK_A_UNITS]);
+            n = av_len(av) + 1;
+            if (!n)
+                croak("%s: units is empty", what);
+            allowed = 0;
+            for (i = 0; i < n; i++) {
+                SV **e = av_fetch(av, i, 0);
+                STRLEN len;
+                const char *u = e ? SvPV(*e, len) : "";
+                int k;
+                if (len > 1 && u[len - 1] == 's') len--;
+                for (k = 0; k < TK_DU_COUNT && !(strlen(units[k]) == len && memEQ(u, units[k], len)); k++) ;
+                if (k == TK_DU_COUNT)
+                    croak("%s: '%s' is not a unit: years, months, weeks, days, hours, minutes, seconds, milliseconds,"
+                          " microseconds or nanoseconds", what, u);
+                allowed |= 1u << k;
+            }
+        }
+        if (a.v[TK_A_LARGEST])
+            largest = (int)tk_opt_int(aTHX_ a.v[TK_A_LARGEST], what, "largest", 1, TK_DU_COUNT);
+        o.sv = newSVpvs("");
+        o.utf8 = 0;
+        o.digits = loc->ascii_digits ? NULL : loc->s.digits;
+        if (digital)
+            tk_out_duration_digital(aTHX_ &o, loc, d, what);
+        else
+            tk_out_duration_words(aTHX_ &o, loc, d, width, list_type, allowed, largest, what);
+        if (o.utf8)
+            SvUTF8_on(o.sv);
+        RETVAL = o.sv;
     OUTPUT:
         RETVAL

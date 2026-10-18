@@ -92,9 +92,9 @@
          "web" : "http://github.com/dod38fr/config-model-itself"
       }
    },
-   "version" : "2.031",
-   "x_generated_by_perl" : "v5.40.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.41",
+   "version" : "2.032",
+   "x_generated_by_perl" : "v5.42.3",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.51",
    "x_spdx_expression" : "LGPL-2.1"
 }
 

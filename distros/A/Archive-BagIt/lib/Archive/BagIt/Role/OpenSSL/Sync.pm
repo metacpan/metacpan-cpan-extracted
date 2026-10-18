@@ -4,7 +4,7 @@ use warnings FATAL => 'all';
 use Moo;
 use namespace::autoclean;
 use Net::SSLeay ();
-our $VERSION = '0.102'; # VERSION
+our $VERSION = '0.103'; # VERSION
 # ABSTRACT: handles synchronous digest calculation using openssl
 
 sub BEGIN {
@@ -58,7 +58,7 @@ Archive::BagIt::Role::OpenSSL::Sync - handles synchronous digest calculation usi
 
 =head1 VERSION
 
-version 0.102
+version 0.103
 
 =head1 AVAILABILITY
 

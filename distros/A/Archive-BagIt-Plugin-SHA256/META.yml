@@ -34,16 +34,11 @@ no_index:
     - examples
     - inc
 provides:
-  Archive::BagIt::Plugin::Algorithm::SHA256:
-    file: lib/Archive/BagIt/Plugin/Algorithm/SHA256.pm
-    version: '0.005'
-  Archive::BagIt::Plugin::Manifest::SHA256:
-    file: lib/Archive/BagIt/Plugin/Manifest/SHA256.pm
-    version: '0.005'
   Archive::BagIt::Plugin::SHA256:
     file: lib/Archive/BagIt/Plugin/SHA256.pm
-    version: '0.005'
+    version: '0.006'
 requires:
+  Archive::BagIt: '0.102'
   Archive::BagIt::Role::Algorithm: '0'
   Archive::BagIt::Role::Manifest: '0'
   Archive::BagIt::Role::OpenSSL: '0'
@@ -55,7 +50,7 @@ requires:
   warnings: '0'
 resources:
   repository: https://git.fsfe.org/art1pirat/Archive-BagIt-Plugin-SHA256.git
-version: '0.005'
+version: '0.006'
 x_contributors:
   - 'Andreas Romeyke <art1@andreas-romeyke.de>'
 x_generated_by_perl: v5.40.1

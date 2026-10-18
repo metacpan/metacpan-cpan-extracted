@@ -6,6 +6,7 @@ requires 'Carp';
 requires 'ExtUtils::MakeMaker', '6.64';   # Minimum version for TEST_REQUIRES
 requires 'GIS::Distance';
 requires 'Params::Get', '0.13';
+requires 'Readonly';
 requires 'Scalar::Util';
 
 on 'test' => sub {

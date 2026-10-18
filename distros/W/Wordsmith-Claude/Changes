@@ -1,5 +1,9 @@
 Revision history for Wordsmith-Claude
 
+0.03    2026-10-17
+	- Require Claude::Agent 0.14; close each query when its result arrives.
+	- Add the effort option, passed to every query and session.
+
 0.02    2026-01-11
 	- Blogs...
         - Use Claude::Agent::CLI for terminal UI utilities

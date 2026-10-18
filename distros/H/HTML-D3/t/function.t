@@ -418,7 +418,7 @@ subtest 'render_pie_chart - output structure and content' => sub {
 	like($html, qr/January/,           'first data label present in JSON');
 	like($html, qr/d3\.pie\(\)/,       'd3.pie() generator present');
 	like($html, qr/d3\.arc\(\)/,       'd3.arc() path generator present');
-	like($html, qr/d3\.schemeCategory10/, 'd3.schemeCategory10 colour scheme used');
+	like($html, qr/\['#1f77b4', '#ff7f0e'/, 'category10 colours inlined as hex values');
 	like($html, qr/d3\.scaleOrdinal/, 'd3.scaleOrdinal maps labels to colours');
 
 	diag('render_pie_chart length: ' . length($html)) if $ENV{TEST_VERBOSE};
@@ -468,7 +468,7 @@ subtest 'render_animated_pie_chart - output structure and animation features' =>
 	like($html, qr/<!DOCTYPE html>/i,    'output includes DOCTYPE');
 	like($html, qr/<svg id="chart"/,     'SVG element present');
 	like($html, qr/d3\.pie\(\)/,         'd3.pie() present');
-	like($html, qr/d3\.schemeCategory10/,'d3.schemeCategory10 present');
+	like($html, qr/\['#1f77b4', '#ff7f0e'/, 'category10 colours inlined as hex values');
 	like($html, qr/attrTween/,           'attrTween animation present');
 	like($html, qr/d3\.interpolate/,      'd3.interpolate used for tween');
 	# Labels must start transparent and fade in after slices finish.
@@ -536,7 +536,7 @@ subtest 'render_pie_chart_snippet - no circular references in returned hashref' 
 
 subtest 'render_pie_chart_snippet - default colour scheme is tableau10 not category10' => sub {
 	# The snippet intentionally diverges from the full-page methods (which use
-	# schemeCategory10) to provide a visually distinct default palette.
+	# the category10 palette) to provide a visually distinct default palette.
 	my $html = HTML::D3->new()->render_pie_chart_snippet(\@SIMPLE_DATA)->{html};
 
 	# The selected scheme appears as SCHEMES['<name>'] in the const color = ... line.
@@ -632,9 +632,10 @@ subtest 'render_pie_chart_snippet - legend => 0 suppresses legend panel' => sub 
 		'legend => 0 suppresses the legend container div');
 };
 
-subtest 'render_pie_chart_snippet - color_scheme => category10 selects schemeCategory10' => sub {
-	# The SCHEMES JS object maps scheme name strings to D3 colour arrays; the Perl
-	# colour_scheme opt is interpolated as the lookup key in the scaleOrdinal call.
+subtest 'render_pie_chart_snippet - color_scheme => category10 selects the category10 palette' => sub {
+	# The SCHEMES JS object maps scheme name strings to the scheme's hex colours;
+	# the Perl colour_scheme opt is interpolated as the lookup key in the
+	# scaleOrdinal call.
 	my $html = HTML::D3->new()->render_pie_chart_snippet(
 		\@SIMPLE_DATA, { color_scheme => 'category10' }
 	)->{html};
@@ -1305,13 +1306,13 @@ subtest 'render_bar_chart_snippet - default color is steelblue' => sub {
 	my $html = HTML::D3->new()->render_bar_chart_snippet(\@BAR_DATA)->{html};
 
 	like($html, qr/steelblue/, 'default fill color steelblue is present');
-	unlike($html, qr/schemeTableau10/, 'schemeTableau10 absent for solid-color chart');
+	unlike($html, qr/\['#4e79a7', '#f28e2c'/, 'tableau10 colours absent for solid-color chart');
 };
 
 subtest 'render_bar_chart_snippet - color => categorical emits Tableau-10 palette' => sub {
 	my $html = HTML::D3->new()->render_bar_chart_snippet(\@BAR_DATA, { color => 'categorical' })->{html};
 
-	like($html, qr/schemeTableau10/,   'schemeTableau10 present for categorical coloring');
+	like($html, qr/\['#4e79a7', '#f28e2c'/, 'tableau10 colours inlined for categorical coloring');
 	like($html, qr/d3\.scaleOrdinal/, 'd3.scaleOrdinal present for categorical coloring');
 };
 

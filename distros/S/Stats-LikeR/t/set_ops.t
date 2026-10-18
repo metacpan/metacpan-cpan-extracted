@@ -63,10 +63,10 @@ throws_ok { $UNION->() }                       qr/needs >= 1 array ref/,   'unio
 get_union(\@a, \@b, \@c);                       # hoist real call outside the leak closure
 no_leaks_ok {
 	eval {
-		my @l = union(\@a, \@b, \@c);   # list  context branch
-		my $s = union(\@a, \@b);        # scalar context branch
+		my @l = get_union(\@a, \@b, \@c); # list  context branch
+		my $s = get_union(\@a, \@b);      # scalar context branch
 	}
-} 'union(): no memory leaks' unless $INC{'Devel/Cover.pm'};
+} 'get_union(): no memory leaks' unless $INC{'Devel/Cover.pm'};
 
 # Lonly   (values only in the first ref, in no other ref)
 is_list( [Lonly(\@a, \@b, \@c)], [1, 2],       'Lonly: only-in-first values');
