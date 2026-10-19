@@ -1,4 +1,8 @@
 Revision history for Game-Senet
 
+0.02    2026-10-18
+        - Add protected and in_blockade, asked of a house, so a page draws both without a rule
+        - Add rules_revision, which changes only when a game played from a seed would
+
 0.01    2026-10-18
         - First release.

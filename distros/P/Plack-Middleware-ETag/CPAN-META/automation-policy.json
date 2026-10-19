@@ -1,0 +1,7 @@
+{
+   "automated_actions" : "issue",
+   "automated_contributions" : "issue",
+   "code_generation" : "toolchain",
+   "distribution" : "Plack-Middleware-ETag-0.06",
+   "version" : 1
+}

@@ -25,16 +25,17 @@ can_ok('Game::Senet::Engine', qw(house_of row_of col_of is_marked all_houses
                                  marked_houses rules rules_named rules_id
                                  abi_version live other piece_of
                                  chances extra moves));
-can_ok('Game::Senet::Engine', qw(apply forfeit unapply status how winner ply_cap walk));
+can_ok('Game::Senet::Engine', qw(apply forfeit unapply status how winner ply_cap walk protected in_blockade));
 can_ok('Game::Senet::Sticks', qw(throw_for light_of roll_of roll_for extra_throw));
 can_ok('Game::Senet::Move', qw(side roll from to swap back off walk trace));
 can_ok('Game::Senet::Rules', qw(new rules side only ply position key board home status how winner
-                               is_over moves apply forfeit undo depth));
+                               is_over moves apply forfeit undo depth protected in_blockade));
 can_ok('Game::Senet::Notation', qw(house_ok parse_move format_move format_display format_forfeit
                                    validate_position parse_record format_record));
 can_ok('Game::Senet', qw(new side sticks throw roll legal play play_or_die error undo resign is_over result
                          turn side_of seat_of variant first seed throws ply position key home at chances
-                         log forfeits_since to_record to_text from_text replay));
+                         log forfeits_since to_record to_text from_text replay
+                         protected in_blockade rules_revision));
 can_ok('Game::Senet::Variant', qw(new named custom of names fields name describe as_hash equals exit_for));
 can_ok('Game::Senet::Error', qw(of code message detail codes message_for));
 can_ok('Game::Senet::Result', qw(winner loser how is_draw final home plies throws));
@@ -53,7 +54,7 @@ for my $module (qw(Engine Sticks Move Rules Notation Variant Error Result Bot Te
 # version 1 is the board and the rule sets as data, version 2 appended the
 # chance of a roll, version 3 what a roll allows, version 4 a move made and
 # how a game ends, version 5 the evaluation and the search.
-is(Game::Senet::Engine->abi_version, 5, 'the ABI is at version 5');
+is(Game::Senet::Engine->abi_version, 6, 'the ABI is at version 6');
 cmp_ok(Game::Senet::Engine->abi_version, '>=', 1, 'and a consumer written against 1 accepts it');
 ok(Game::Senet::Engine::_abi_ptr(), 'the table has an address');
 

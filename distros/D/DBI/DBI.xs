@@ -1080,7 +1080,7 @@ dbih_inner(pTHX_ SV *orv, const char *what)
         if (!what)
             return NULL;
         if (!hv_fetchs((HV*)ohv,"_NO_DESTRUCT_WARN",0))
-	    sv_dump(orv);
+            sv_dump(orv);
         croak("%s handle %s is not a DBI handle (has no magic)",
                 what, neatsvpv(orv,0));
     }
@@ -2353,10 +2353,10 @@ dbih_get_attr_k(SV *h, SV *keysv, int dbikey)
                         i = AvFILL(name_av)+1; /* limit for safe iteration over array */
                     }
 
-		    if (DBIc_TRACE_LEVEL(imp_sth) >= 10 || (num_fields_mismatch && DBIc_WARN(imp_xxh))) {
-			PerlIO_printf(DBIc_LOGPIO(imp_sth),"       FETCH $h->{%s} from $h->{NAME} with $h->{NUM_OF_FIELDS} = %d"
-			                       " and %ld entries in $h->{NAME}%s\n",
-				neatsvpv(keysv,0), DBIc_NUM_FIELDS(imp_sth), AvFILL(name_av)+1,
+                    if (DBIc_TRACE_LEVEL(imp_sth) >= 10 || (num_fields_mismatch && DBIc_WARN(imp_xxh))) {
+                        PerlIO_printf(DBIc_LOGPIO(imp_sth),"       FETCH $h->{%s} from $h->{NAME} with $h->{NUM_OF_FIELDS} = %d"
+                                               " and %ld entries in $h->{NAME}%s\n",
+                                neatsvpv(keysv,0), DBIc_NUM_FIELDS(imp_sth), AvFILL(name_av)+1,
                                 (num_fields_mismatch) ? " (possible bug in driver)" : "");
                     }
 
@@ -3004,7 +3004,13 @@ dbi_profile(SV *h, imp_xxh_t *imp_xxh, SV *statement_sv, SV *method, NV t1, NV t
                         dbh_outer_hv = DBIc_MY_H(imp_dbh);
                         if (SvTYPE(dbh_outer_hv) != SVt_PVHV)
                             return &PL_sv_undef;        /* presumably global destruction - bail */
-                        dbh_inner_hv = (HV*)SvRV(dbih_inner(aTHX_ (SV*)dbh_outer_hv, "profile"));
+                        {   /* dbih_inner() returns the inner handle as an RV, except when it was
+                             * given a raw inner HV (DBIc_MY_H() is set to the inner HV while the
+                             * outer handle is being destroyed): then it returns that HV itself,
+                             * and SvRV() on it would return its bucket array (HvARRAY). */
+                            SV *irv = dbih_inner(aTHX_ (SV*)dbh_outer_hv, "profile");
+                            dbh_inner_hv = (HV*)(SvROK (irv) ? SvRV (irv) : irv);
+                        }
                         if (SvTYPE(dbh_inner_hv) != SVt_PVHV)
                             return &PL_sv_undef;        /* presumably global destruction - bail */
                     }
@@ -3412,8 +3418,8 @@ XS(XS_DBI_dispatch)
         for(i=1; i < items; ++i) {
             if (SvTAINTED(ST(i))) {
                 SV *taint_msg = sv_2mortal(newSVpvf(
-		    "parameter %d of %s->%s method call",
-		    i, SvPV_nolen(h), meth_name));
+                    "parameter %d of %s->%s method call",
+                    i, SvPV_nolen(h), meth_name));
                 PL_tainted = 1; /* needed for TAINT_PROPER to work      */
                 TAINT_PROPER(SvPV_nolen(taint_msg));      /* die's */
             }

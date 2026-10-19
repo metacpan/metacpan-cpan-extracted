@@ -2,10 +2,9 @@ package DBIx::QuickDB::Driver::MariaDB;
 use strict;
 use warnings;
 
-our $VERSION = '0.000065';
+our $VERSION = '0.000066';
 
 use Carp qw/croak/;
-use IPC::Cmd qw/can_run/;
 use Capture::Tiny qw/capture/;
 use File::Basename qw/basename dirname/;
 use File::Spec;
@@ -165,6 +164,8 @@ sub viable {
 
     push @bad => "Could not load either 'DBD::MariaDB' or 'DBD::mysql', needed for everything"
         unless $this->dbd_driver;
+
+    push @bad => $this->_watcher_unsupported_reason($spec) // ();
 
     if (!keys %{$this->provider_info}) {
         push @bad => "Installed MySQL is not " . $this->provider;

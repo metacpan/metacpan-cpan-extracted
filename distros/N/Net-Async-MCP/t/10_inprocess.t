@@ -6,8 +6,13 @@ use Future;
 use IO::Async::Loop;
 use Scalar::Util qw( weaken );
 use Net::Async::MCP;
-use MCP::Server;
-use MCP::Server::Transport::HTTP;
+
+# A real MCP::Server is what this file drives, and MCP reaches this
+# distribution as a recommendation and not a requirement: only the in-process
+# transport touches any part of it, and it does so at the first request rather
+# than at compile time. Without MCP there is no server here to drive.
+skip_all 'MCP is required for the in-process transport tests'
+  unless eval { require MCP::Server; require MCP::Server::Transport::HTTP; 1 };
 
 # Create test MCP server with tools
 my $server = MCP::Server->new(name => 'TestServer');

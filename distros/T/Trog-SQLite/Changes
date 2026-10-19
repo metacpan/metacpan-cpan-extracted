@@ -1,0 +1,11 @@
+Revision history for Trog-SQLite
+
+0.001 2026-10-18 TEODESIAN
+    - Initial release, from the copies in tCMS and trog-provisioner.
+    - Versioned schema updates: NAME.vN.update.sql beside NAME.sql, each run
+      once, in order, in its own transaction, and recorded in
+      trog_sqlite_schema_version.
+    - Handles have RaiseError on, and busy_timeout is set before the schema,
+      so that a second process waits for the updates of the first.
+    - bulk_insert quotes the table and the columns as identifiers, fills each
+      batch up to the parameter limit, and returns 1.

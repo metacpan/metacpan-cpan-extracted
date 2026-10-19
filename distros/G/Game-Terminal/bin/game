@@ -6,7 +6,7 @@ use warnings;
 use Getopt::Long ();
 use Game::Terminal;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 exit main(@ARGV) unless caller;
 

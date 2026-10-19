@@ -1,3 +1,13 @@
+0.10 2026-10-18T22:07:31+02:00
+ - Add check for extra opening parenthesis.
+ - Add support for AUX_GROUP before main number.
+ - Add support for missing closing quotation mark.
+ - Code optimization.
+ - Fix detection of '/' operator in the begin.
+ - Fix detection of ALPHA_SPEC inside of AUX_GROUP.
+ - Fix detection of whitespace after apostrophe.
+ - Fix detection of whitespace in AUX_GROUP.
+
 0.09 2026-10-11T11:24:24+02:00
  - Add another case for whitespace issue ( = ).
  - Add another case for whitespace issue (- 044).

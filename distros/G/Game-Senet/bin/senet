@@ -1,5 +1,5 @@
 #!perl
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 use Game::Senet::Terminal;
 exit Game::Senet::Terminal->run(@ARGV);
 

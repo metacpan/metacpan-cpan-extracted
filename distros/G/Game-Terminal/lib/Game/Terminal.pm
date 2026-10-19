@@ -7,7 +7,7 @@ use warnings;
 use Getopt::Long ();
 use Game::Terminal::Kit::Options ();
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 our @ROSTER;
 my %BY_NAME;
@@ -211,6 +211,17 @@ BEGIN {
 			family  => 'card',
 			players => '2',
 			args    => ['--variant', 'schnapsen'],
+			aliases => [],
+			flags   => { %ALL },
+		},
+		{
+			key     => 'senet',
+			module  => 'Game::Senet',
+			class   => 'Game::Senet::Terminal',
+			blurb   => 'Senet, the race game of ancient Egypt',
+			family  => 'board',
+			players => '2',
+			args    => [],
 			aliases => [],
 			flags   => { %ALL },
 		},
@@ -479,7 +490,7 @@ forgets the rest (see below).
 
 =head2 The roster
 
-Twenty-three rows for twenty-two games: Schnapsen is two rows, C<schnapsen> and
+Twenty-four rows for twenty-three games: Schnapsen is two rows, C<schnapsen> and
 C<sixtysix>, because its program needs to be told the variant. Each row has
 a C<key> (the word you type), the C<module> to install and the C<class> to
 call, a one-line C<blurb>, a C<family> (board, card, tile, puzzle or arcade), the
@@ -640,7 +651,7 @@ L<Game::Terminal::Menu>, and the games: L<Game::Backgammon>,
 L<Game::Brandubh>, L<Game::Checkers>, L<Game::Cribbage>, L<Game::Dominoes>,
 L<Game::Durak>, L<Game::Fanorona>, L<Game::Floppy>, L<Game::Gin>, L<Game::Go>,
 L<Game::Mahjong>, L<Game::Merrills>, L<Game::Oware>, L<Game::Reversi>,
-L<Game::RoyalUr>, L<Game::Schnapsen>, L<Game::Shogi>, L<Game::Snake>, L<Game::Sternhalma>, L<Game::Xiangqi>,
+L<Game::RoyalUr>, L<Game::Schnapsen>, L<Game::Senet>, L<Game::Shogi>, L<Game::Snake>, L<Game::Sternhalma>, L<Game::Xiangqi>,
 L<Term::Maze>.
 
 =head1 AUTHOR

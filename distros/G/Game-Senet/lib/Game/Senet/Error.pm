@@ -7,7 +7,7 @@ use warnings;
 use Carp ();
 use Object::Proto::Sugar;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 my (@CODES, %MESSAGE);
 BEGIN {
@@ -68,7 +68,7 @@ Game::Senet::Error - why a move, a record or a position was refused
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

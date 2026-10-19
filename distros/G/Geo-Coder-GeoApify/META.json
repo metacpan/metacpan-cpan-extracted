@@ -4,9 +4,9 @@
       "Nigel Horne <njh@nigelhorne.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
    "license" : [
-      "open_source"
+      "gpl_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -31,6 +31,9 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Geo::Location::Predicate" : "0.01"
+         },
          "requires" : {
             "CHI" : "0",
             "Encode" : "0",
@@ -39,7 +42,8 @@
             "JSON::MaybeXS" : "0",
             "LWP::Protocol::https" : "0",
             "LWP::UserAgent" : "0",
-            "Params::Get" : "0",
+            "Params::Get" : "0.04",
+            "Params::Validate::Strict" : "0",
             "Time::HiRes" : "0",
             "URI" : "0",
             "perl" : "5.006002"
@@ -47,6 +51,7 @@
       },
       "test" : {
          "requires" : {
+            "Geo::Location::Predicate" : "0",
             "Test::Carp" : "0",
             "Test::DescribeMe" : "0",
             "Test::LWP::UserAgent" : "0",
@@ -70,6 +75,6 @@
          "web" : "https://github.com/nigelhorne/Geo-Coder-GeoApify"
       }
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk::Queue ();
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 1;
 
@@ -68,11 +68,18 @@ fires.
 =head2 Timezones
 
 C<tz> is C<UTC> (the default), C<local>, or a fixed C<+HHMM>/C<-HHMM>
-offset. There is no timezone database: UTC and fixed offsets use bundled
-civil-date arithmetic; only C<local> touches libc, because only C<local>
-has DST. The DST consequences, stated plainly: an occurrence in the
-spring-forward skipped hour does not fire that day; in the fall-back
-doubled hour a pinned time fires once, at the first (DST) instance.
+offset, or, when L<Time::Keeper::Recurrence> is installed, a time zone
+name such as C<America/New_York>. UTC and fixed offsets use bundled
+civil-date arithmetic and C<local> uses libc, as before; a zone name is
+walked by L<Time::Keeper::Recurrence>, which reads this same grammar,
+through its zone database. Without that module a zone name is refused,
+as it always was. C<PUNK_QUEUE_NO_RECURRENCE=1> keeps it unused even when
+installed.
+
+The DST consequences, stated plainly, the same for C<local> and for a
+zone name: an occurrence in the spring-forward skipped hour does not fire
+that day; in the fall-back doubled hour a pinned time fires once, at the
+first (DST) instance, and an every-minute spec fires every real minute.
 
 =head1 METHODS
 

@@ -115,7 +115,7 @@ sub subtest_or_resource_skip {
 
 my %MYSQL_FORK = (
     MariaDB  => {servers => [qw/mariadbd mysqld/], clients => [qw/mariadb mysql/], match => qr/MariaDB/i},
-    MySQLCom => {servers => [qw/mysqld/],          clients => [qw/mysql/],         match => qr/MySQL Community Server/i},
+    MySQLCom => {servers => [qw/mysqld/],          clients => [qw/mysql/],         match => qr/\A(?!.*(?:MariaDB|Percona))(?=.*\bVer\s+\d)/is},
     Percona  => {servers => [qw/mysqld/],          clients => [qw/mysql/],         match => qr/Percona Server/i},
 );
 

@@ -11,6 +11,8 @@ use Try::Tiny qw(try catch);
 
 use Readonly;
 
+our $VERSION = 2.1126;
+
 Readonly my $TYPE_FILE   => 'file';
 Readonly my $TYPE_STRING => 'string';
 
@@ -235,14 +237,19 @@ text and unexpected node types.
 Drop a leading C<< <?xml ... ?> >> declaration and decode the hexadecimal
 numeric entities that follow it; croak on any entity left undecoded.
 
-=head2 first_id / xpath
+=head2 first_id
 
     my $id = first_id($root);
-    my $v  = xpath($node, $path, $required);
 
-C<first_id> returns the first of the C<id/@numaba>, C<id/@external> and
-C<id/@phoenix> attributes. C<xpath> returns an attribute value and croaks when it
-is missing and C<$required> is true.
+Return the first of the C<id/@numaba>, C<id/@external> and C<id/@phoenix>
+attributes, and croak when none of them exists.
+
+=head2 xpath
+
+    my $value = xpath($node, $path, $required);
+
+Return the value of the C<$path> attribute of C<$node>, croaking when it is
+missing and C<$required> is true.
 
 =head2 found_in_list
 

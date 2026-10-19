@@ -50,7 +50,7 @@ my $probe_stderr = capture_stderr {
             my $ver;
             if ($found) {
                 chomp($ver = $set->{$cmd} ? `$found $set->{$cmd}` : 'N/A');
-                $ver =~ s/\s*$found\s*//g;
+                $ver =~ s/\s*\Q$found\E\s*//g;
                 $ver =~ s/,?\s*for.*$//g;
                 $ver =~ s/\s[0-9a-f]+$//gi;
             }

@@ -10,12 +10,14 @@
 #include "tk/tk_int.h"
 #include "tk/tk_sv.h"
 #include "tk/tk_civil.h"
+#include "tk/tk_cal.h"
 #include "tk/tk_now.h"
 #include "tk/tk_zone.h"
 #include "tk/tk_value.h"
 #include "tk/tk_surface.h"
 #include "tk/tk_now_sv.h"
 #include "tk/tk_args.h"
+#include "tk/tk_cal_value.h"
 #include "tk/tk_duration.h"
 #include "tk/tk_dur_sv.h"
 #include "tk/tk_arith.h"
@@ -26,7 +28,9 @@
 #include "tk/tk_locale_en.h"
 #include "tk/tk_plural.h"
 #include "tk/tk_locale_load.h"
+#include "tk/tk_cal_meta.h"
 #include "tk/tk_freeze.h"
+#include "tk/tk_cal_names.h"
 
 /* The locale of a value. */
 #define tk_locale_of(v) tk_locale_get(aTHX_ (v)->locale)
@@ -37,6 +41,7 @@
 #include "tk/tk_parse.h"
 #include "tk/tk_parse_pat.h"
 #include "tk/tk_parse_sv.h"
+#include "tk/tk_cal_parse.h"
 #include "tk/tk_parse_xs.h"
 #include "tk/tk_plain.h"
 #include "time_keeper_abi.h"
@@ -72,6 +77,7 @@ INCLUDE: xs/duration.xs
 INCLUDE: xs/format.xs
 INCLUDE: xs/parse.xs
 INCLUDE: xs/plain.xs
+INCLUDE: xs/calendar.xs
 INCLUDE: xs/locale.xs
 INCLUDE: xs/abi.xs
 INCLUDE: xs/civil.xs

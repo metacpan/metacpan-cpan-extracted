@@ -12,6 +12,45 @@ DBI::Changes - List of significant changes to the DBI
 
 =encoding UTF-8
 
+=head2 Changes in DBI 1.656 - 17 Oct 2026
+
+=over 2
+
+=item *
+
+Re-add conflicts to cpanfile. (WIP)
+
+=item *
+
+Remove lock file on end of scope
+
+=item *
+
+Prevent dbi_profile crash (CVE-2026-108518) (Henrik Teichmann)
+
+=item *
+
+Memory corruption via selectrow_array + SQLite UDF (issue#98)
+
+=item *
+
+Fix errstr when dbm_updatable_key attribute for DBD::DBM is set to 2 (croak) on Perl versions < v5.13.2.
+
+=item *
+
+Fix emit warnings when dbm_updatable_key attribute for DBD::DBM is set to 1 (carp)
+
+=item *
+
+Fix lock file not removed when DBD::DBM check for bad serializer class fails. (CVE-2026-111879)
+
+=item *
+
+*** WARNING: Next release will require perl-5.14 ***
+- Main reason: Exception handling
+
+=back
+
 =head2 Changes in DBI 1.655 - 30 Sep 2026
 
 =over 2

@@ -1,0 +1,2 @@
+  100  PRINT "HELLO"
+  110  GOTO 100

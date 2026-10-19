@@ -41,6 +41,10 @@ WriteMakefile(
         prereqs => {
             runtime => {
                 recommends => {
+                    # OpenSSL's SHA-2 for the message hashes (several times
+                    # CryptX's on a CPU with SHA instructions);
+                    # Mail::DKIM2::Digest falls back to CryptX without it.
+                    'Net::SSLeay' => '1.38',
                     # dkim2-milter
                     'Sendmail::PMilter' => '1.28',   # 1.27 never answered MAIL FROM:<>
                     # dkim2-split-lmtp

@@ -11,7 +11,7 @@ use Scalar::Util ();
 
 use Game::Senet::Move;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 require XSLoader;
 XSLoader::load('Game::Senet', $VERSION);
@@ -296,6 +296,24 @@ sub evaluate {
     return _evaluate($self->_ptr, $rules, $weights, $side);
 }
 
+my $check_house = sub {
+    my ($house) = @_;
+    Carp::croak('Game::Senet::Engine: a house is a whole number from 1 to 30')
+        unless defined $house && $house =~ /\A[0-9]{1,2}\z/ && $house >= 1 && $house <= HOUSES;
+};
+
+sub protected {
+    my ($self, $house, $rules) = @_;
+    $check_house->($house);
+    return _protected($self->_ptr, $rules, $house);
+}
+
+sub in_blockade {
+    my ($self, $house, $rules) = @_;
+    $check_house->($house);
+    return _in_blockade($self->_ptr, $rules, $house);
+}
+
 sub greedy {
     my ($self, $roll, $rules, $only) = @_;
     $check_roll->($roll);
@@ -339,7 +357,7 @@ Game::Senet::Engine - the board of Senet: thirty houses, two sides, the named ru
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 
@@ -583,6 +601,24 @@ The position valued for a side, in sixteenths of a house: the houses its pieces
 stand on, a piece at home counting 31, less the other side's, and the terms
 whose weight is given: C<blockade>, own runs wide enough to block with an enemy
 piece behind them. C<ties> chooses the earlier of two moves of equal value.
+
+=head2 protected
+
+    print "safe from a swap\n" if $board->protected(12, 'kendall');
+
+1 when the piece on a house cannot be swapped under a rule set, because it
+stands in a run of its own side the set protects: every piece of a run of two
+or more under C<kendall>, the first and the last of one under C<skyruk>. 0 for
+an empty house or a piece standing alone. Whether the house itself is safe is
+the rule set's C<safe> list. A house that is not 1 to 30 croaks.
+
+=head2 in_blockade
+
+    print "part of a blockade\n" if $board->in_blockade(12, 'kendall');
+
+1 when the piece on a house is part of a run of its own side long enough that
+the other side may not pass it: three under C<kendall>, two under C<skyruk>. 0
+for an empty house, and always under a rule set with no blockade.
 
 =head2 greedy
 

@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 use Time::Keeper;
 
@@ -20,7 +20,7 @@ Time::Keeper::Locale - what CLDR says of every locale Time::Keeper knows
 
 =head1 VERSION
 
-Version 0.04
+Version 0.06
 
 =head1 SYNOPSIS
 
@@ -64,6 +64,9 @@ The codes of every locale, English first.
 
 The locale's code as Time::Keeper writes it, or undef for one it does not
 know. This is the one method that does not die for an unknown code.
+A C<-u-ca-> extension naming a calendar (C<th-u-ca-buddhist>) is not part
+of the code and is stripped here and in every method that takes a locale;
+L<Time::Keeper/CALENDARS> says what reads it.
 
 =head2 name
 
@@ -103,6 +106,32 @@ follow, C<wide> (the default), C<abbreviated> or C<narrow>, and C<short>
 for days; and a context, C<format> (the default), the form used inside a
 date, or C<stand-alone>, the form used alone. Where a language has only
 one form the two are the same.
+A calendar's id may follow as a fifth argument: its C<months> (CLDR's
+slots, thirteen for the Hebrew with Adar II a fourteenth), C<eras> and
+C<cyclic_years> in the locale, as L<Time::Keeper/CALENDARS> uses them.
+
+=head2 day_periods
+
+    my $p = Time::Keeper::Locale->day_periods('en');
+    $p->{noon};             # noon
+    $p->{afternoon1};       # in the afternoon
+
+The locale's names for the parts of a day, as a hash reference keyed by
+CLDR's ids: C<am>, C<pm>, C<midnight>, C<noon>, C<morning1>, C<morning2>,
+C<afternoon1>, C<afternoon2>, C<evening1>, C<evening2>, C<night1> and
+C<night2>, those the locale has. A width may follow, C<wide> (the default),
+C<abbreviated> or C<narrow>. These are the words C<B> writes in a pattern.
+
+=head2 day_period_rules
+
+    my @rules = Time::Keeper::Locale->day_period_rules('en');
+    # { period => 'morning1', from => 360, before => 720 }, ... { period => 'noon', at => 720 }
+
+When each named period is, as a list of hash references: the period's id and
+either C<from> and C<before>, minutes of the day with the end excluded, or
+C<at>, the one minute of C<midnight> or C<noon>. CLDR cuts the day at
+midnight, so no period crosses it: English's night runs from 21:00 to 24:00
+and its morning from 00:00. Locales that share CLDR's rules share them.
 
 =head2 formats
 
@@ -110,11 +139,23 @@ one form the two are the same.
 
 The locale's four CLDR patterns for C<date>, C<time> or C<datetime>. In a
 C<datetime> pattern C<{1}> is the date and C<{0}> the time.
+A calendar's id as a third argument gives the calendar's own C<date> and
+C<datetime> patterns; the time patterns are the Gregorian's. A pattern is
+returned as its letters, without the numbering system CLDR may attach to it.
 
 =head2 available_formats
 
 A hash reference of the locale's patterns by skeleton, as
 L<Time::Keeper/format_skeleton> uses them.
+A calendar's id as a second argument lays the calendar's skeletons over
+the Gregorian ones.
+
+=head2 calendars
+
+    my @ids = Time::Keeper::Locale->calendars('th');   # buddhist gregory
+
+The calendars the locale's territory uses, most preferred first:
+L<Time::Keeper::Calendar/preferred> for a locale code.
 
 =head2 parts
 
@@ -169,6 +210,11 @@ C<month>, C<week>, C<day>, C<hour>, C<minute> or C<second>) and a width
 field's name, the words for the field -2 to 2 away where the locale has
 them (C<at>, keyed by the offset), and the patterns for a count in the
 future and the past by plural category, with C<{0}> for the number.
+
+A weekday is a field too, C<mon> to C<sun>: C<at> holds the locale's "last
+Tuesday", "this Tuesday" and "next Tuesday" (-1, 0 and 1), and the patterns
+are its "in {0} Tuesdays" and "{0} Tuesdays ago". A weekday has no
+C<display> name; L</names> gives the day's.
 
 =head2 unit_patterns
 

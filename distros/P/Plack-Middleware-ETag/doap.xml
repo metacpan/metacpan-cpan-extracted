@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Project
+  xmlns="http://usefulinc.com/ns/doap#"
+  xmlns:dc="http://purl.org/dc/terms/"
+  xmlns:foaf="http://xmlns.com/foaf/0.1/"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  >
+  <name>Plack-Middleware-ETag</name>
+  <shortdesc>Adds automatically an ETag header.</shortdesc>
+  <category rdfs:label="ETag" />
+  <category rdfs:label="HTTP" />
+  <developer>
+    <foaf:Person>
+      <foaf:name>Franck Cuny</foaf:name>
+      <foaf:mbox rdf:resource="mailto:franckcuny@gmail.com" />
+    </foaf:Person>
+  </developer>
+  <developer>
+    <foaf:Person>
+      <foaf:name>Robert Rothenberg</foaf:name>
+      <foaf:mbox rdf:resource="mailto:perl@rhizomnic.com" />
+    </foaf:Person>
+  </developer>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Leo Lapworth</foaf:name>
+      <foaf:mbox rdf:resource="mailto:leo@cuckoo.org" />
+    </foaf:Person>
+  </helper>
+  <license rdf:resource="http://dev.perl.org/licenses/" />
+  <bug-database rdf:resource="https://github.com/robrwo/perl-Plack-Middleware-ETag/issues" />
+  <repository>
+    <GitRepository>
+      <browse rdf:resource="https://github.com/robrwo/perl-Plack-Middleware-ETag" />
+      <location rdf:resource="git://github.com/robrwo/perl-Plack-Middleware-ETag.git" />
+    </GitRepository>
+  </repository>
+  <programming-language>Perl</programming-language>
+</Project>

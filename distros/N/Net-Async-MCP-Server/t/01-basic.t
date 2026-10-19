@@ -22,180 +22,136 @@ subtest 'server_info' => sub {
     ok(defined $info->{version}, 'server_info has version');
 };
 
-subtest 'initialize' => sub {
+subtest 'supported_versions' => sub {
     my $server = Net::Async::MCP::Server->new;
-    my $result = $server->initialize->get;
-
-    is($result->{protocolVersion}, '2025-11-25', 'protocol version');
-    is($result->{serverInfo}{name}, 'NetAsyncMCPServer', 'server info in initialize result');
-    ok(defined $result->{capabilities}, 'capabilities returned');
+    my $v = $server->supported_versions;
+    ok(ref $v eq 'ARRAY', 'supported_versions returns arrayref');
+    ok(grep { $_ eq '2026-07-28' } @{$v}, 'supports 2026-07-28');
 };
 
 subtest 'register_tool' => sub {
     my $server = Net::Async::MCP::Server->new;
 
     $server->register_tool(
-        name        => 'test_tool',
-        description => 'A test tool',
-        input_schema => { type => 'object' },
+        name         => 'test_tool',
+        description  => 'A test tool',
+        inputSchema  => { type => 'object' },
     );
 
     my $tools = $server->tools;
     is(scalar @$tools, 1, 'one tool registered');
     is($tools->[0]{name}, 'test_tool', 'tool name');
+    is($tools->[0]{inputSchema}{type}, 'object', 'inputSchema preserved');
+
+    # Legacy snake_case alias is normalised to inputSchema at registration time.
+    $server = Net::Async::MCP::Server->new;
+    $server->register_tool(
+        name         => 'legacy_tool',
+        description  => 'Legacy',
+        input_schema => { type => 'object' },
+    );
+    is($server->tools->[0]{inputSchema}{type}, 'object', 'input_schema normalised');
 };
 
-subtest 'list_tools' => sub {
+subtest 'register_tool validates inputSchema' => sub {
     my $server = Net::Async::MCP::Server->new;
 
-    $server->register_tool(name => 'tool1', description => 'First');
-    $server->register_tool(name => 'tool2', description => 'Second');
+    like(
+        dies { $server->register_tool(name => 'no_schema', description => 'x') },
+        qr/inputSchema/,
+        'dies without inputSchema',
+    );
+
+    like(
+        dies { $server->register_tool(description => 'x', inputSchema => {}) },
+        qr/name/,
+        'dies without name',
+    );
+};
+
+subtest 'list_tools returns wire shape' => sub {
+    my $server = Net::Async::MCP::Server->new;
+
+    $server->register_tool(
+        name         => 'tool1',
+        description  => 'First',
+        inputSchema  => { type => 'object' },
+    );
+    $server->register_tool(
+        name         => 'tool2',
+        title        => 'Second (display)',
+        description  => 'Second',
+        inputSchema  => { type => 'object' },
+    );
 
     my $tools = $server->list_tools->get;
     is(scalar @$tools, 2, 'two tools listed');
     is([map { $_->{name} } @$tools], ['tool1', 'tool2'], 'tool names');
+    ok(exists $tools->[0]{inputSchema}, 'wire shape uses inputSchema');
+    ok(!exists $tools->[0]{input_schema}, 'wire shape does not use input_schema');
+    is($tools->[1]{title}, 'Second (display)', 'title passes through when set');
 };
 
-subtest 'handle - initialize request' => sub {
+subtest 'duplicate registration croaks' => sub {
     my $server = Net::Async::MCP::Server->new;
 
-    my $request = {
-        jsonrpc => '2.0',
-        id      => 1,
-        method  => 'initialize',
-        params  => {},
-    };
-
-    my $response = $server->handle($request);
-
-    ok($response, 'got response');
-    is($response->{id}, 1, 'response id matches');
-    is($response->{result}{protocolVersion}, '2025-11-25', 'protocol version in result');
-};
-
-subtest 'handle - tools/list request' => sub {
-    my $server = Net::Async::MCP::Server->new;
-    $server->register_tool(name => 'my_tool', description => 'A tool');
-
-    my $request = {
-        jsonrpc => '2.0',
-        id      => 2,
-        method  => 'tools/list',
-    };
-
-    my $response = $server->handle($request);
-
-    ok($response, 'got response');
-    is($response->{id}, 2, 'response id matches');
-    is($response->{result}{tools}[0]{name}, 'my_tool', 'tool in result');
-};
-
-subtest 'handle - tools/call request' => sub {
-    my $server = Net::Async::MCP::Server->new;
     $server->register_tool(
-        name    => 'echo',
-        description => 'Echoes input',
-        code    => sub {
-            my ($args) = @_;
-            return { echoed => $args->{value} };
-        },
+        name => 't', description => 'first', inputSchema => { type => 'object' },
     );
+    like(
+        dies { $server->register_tool(
+            name => 't', description => 'second', inputSchema => { type => 'object' },
+        ) },
+        qr/Tool 't' is already registered/,
+        'duplicate tool name croaks',
+    );
+    is([map { $_->{description} } @{ $server->tools }], ['first'],
+        'first tool registration kept, none appended');
 
-    my $request = {
-        jsonrpc => '2.0',
-        id      => 3,
-        method  => 'tools/call',
-        params  => {
-            name      => 'echo',
-            arguments => { value => 'hello' },
-        },
-    };
+    $server->register_resource( uri => 'file:///a', name => 'a' );
+    like(
+        dies { $server->register_resource( uri => 'file:///a', name => 'other' ) },
+        qr{Resource 'file:///a' is already registered},
+        'duplicate resource uri croaks',
+    );
+    is(scalar @{ $server->resources }, 1, 'one resource kept');
 
-    my $response = $server->handle($request);
+    $server->register_prompt( name => 'p' );
+    like(
+        dies { $server->register_prompt( name => 'p' ) },
+        qr/Prompt 'p' is already registered/,
+        'duplicate prompt name croaks',
+    );
+    is(scalar @{ $server->prompts }, 1, 'one prompt kept');
 
-    ok($response, 'got response');
-    is($response->{id}, 3, 'response id matches');
+    # Same key across different kinds is not a duplicate.
+    ok(lives { $server->register_prompt( name => 't' ) },
+        'prompt may share a name with a tool');
 };
 
-subtest 'handle - ping request' => sub {
+subtest 'discover' => sub {
     my $server = Net::Async::MCP::Server->new;
+    my $result = $server->discover->get;
 
-    my $request = {
-        jsonrpc => '2.0',
-        id      => 4,
-        method  => 'ping',
-    };
-
-    my $response = $server->handle($request);
-
-    ok($response, 'got response');
-    is($response->{id}, 4, 'response id matches');
-    is($response->{result}, {}, 'ping result is empty');
-};
-
-subtest 'handle - notifications/initialized' => sub {
-    my $server = Net::Async::MCP::Server->new;
-
-    my $request = {
-        jsonrpc => '2.0',
-        method  => 'notifications/initialized',
-    };
-
-    my $response = $server->handle($request);
-
-    is($response, undef, 'notification returns undef');
-};
-
-subtest 'handle - unknown method' => sub {
-    my $server = Net::Async::MCP::Server->new;
-
-    my $request = {
-        jsonrpc => '2.0',
-        id      => 5,
-        method  => 'unknown/method',
-    };
-
-    my $response = $server->handle($request);
-
-    ok($response, 'got error response');
-    is($response->{id}, 5, 'response id matches');
-    is($response->{error}{code}, -32601, 'method not found error code');
-};
-
-subtest 'handle - missing method' => sub {
-    my $server = Net::Async::MCP::Server->new;
-
-    my $request = {
-        jsonrpc => '2.0',
-        id      => 6,
-    };
-
-    my $response = $server->handle($request);
-
-    ok($response, 'got error response');
-    is($response->{error}{code}, -32600, 'invalid request error code');
-};
-
-subtest 'handle - invalid jsonrpc' => sub {
-    my $server = Net::Async::MCP::Server->new;
-
-    my $request = {
-        id      => 7,
-    };
-
-    my $response = $server->handle($request);
-
-    ok($response, 'got error response');
-    is($response->{error}{code}, -32600, 'missing method error code');
+    is($result->{resultType}, 'complete', 'resultType complete');
+    ok(grep { $_ eq '2026-07-28' } @{$result->{supportedVersions}}, 'advertises 2026-07-28');
+    ok(exists $result->{capabilities}, 'capabilities returned');
+    ok(defined $result->{ttlMs}, 'ttlMs present');
+    ok(defined $result->{cacheScope}, 'cacheScope present');
 };
 
 subtest 'server_capabilities' => sub {
     my $server = Net::Async::MCP::Server->new;
 
-    $server->register_tool(name => 'test', description => 'Test');
+    $server->register_tool(
+        name         => 'test',
+        description  => 'Test',
+        inputSchema  => { type => 'object' },
+    );
 
     my $caps = $server->server_capabilities;
     ok(defined $caps, 'capabilities returned');
+    ok(exists $caps->{tools}, 'tools capability present');
 };
 
 done_testing;

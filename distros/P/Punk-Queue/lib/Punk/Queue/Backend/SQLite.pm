@@ -6,7 +6,7 @@ use warnings;
 use Punk::Queue ();
 
 our @ISA = ('Punk::Queue::Backend');
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 1;
 

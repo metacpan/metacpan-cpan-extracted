@@ -82,7 +82,9 @@ typedef struct tk_period_rule {
  * order tools/cldrcompile writes them, so a section fills it as one array. */
 
 enum { TK_RF_YEAR, TK_RF_QUARTER, TK_RF_MONTH, TK_RF_WEEK, TK_RF_DAY, TK_RF_HOUR, TK_RF_MINUTE,
-       TK_RF_SECOND, TK_RF_COUNT };
+       TK_RF_SECOND, TK_RF_UNIT_COUNT,
+       TK_RF_MON = TK_RF_UNIT_COUNT, TK_RF_TUE, TK_RF_WED, TK_RF_THU, TK_RF_FRI, TK_RF_SAT, TK_RF_SUN,
+       TK_RF_COUNT };
 enum { TK_RW_LONG, TK_RW_SHORT, TK_RW_NARROW, TK_RW_COUNT };
 enum { TK_PL_ZERO, TK_PL_ONE, TK_PL_TWO, TK_PL_FEW, TK_PL_MANY, TK_PL_OTHER, TK_PL_COUNT };
 enum { TK_DU_YEAR, TK_DU_MONTH, TK_DU_WEEK, TK_DU_DAY, TK_DU_HOUR, TK_DU_MINUTE, TK_DU_SECOND,
@@ -92,7 +94,10 @@ enum { TK_LS_START, TK_LS_MIDDLE, TK_LS_END, TK_LS_TWO, TK_LS_COUNT };
 
 /* A relative-time field in one width: "day", then "the day before yesterday"
  * to "the day after tomorrow" (at[0] is -2, at[4] is 2; most are NULL), then
- * "in {0} days" and "{0} days ago" by plural category. */
+ * "in {0} days" and "{0} days ago" by plural category. The first eight fields
+ * are the units format_relative counts; the seven after them are the weekdays
+ * ("last Tuesday", "next Tuesday", "in {0} Tuesdays"), which have no display
+ * name and no -2 or 2 (archive version 4). */
 typedef struct tk_relative {
     const char *display;
     const char *at[5];

@@ -11,7 +11,7 @@ use Error::Pure::Utils qw(err_get);
 use MARC::Leader 0.08;
 use MARC::Field008;
 
-our $VERSION = 0.23;
+our $VERSION = 0.24;
 
 sub module_name {
 	my $self = shift;

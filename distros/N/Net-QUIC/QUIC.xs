@@ -556,6 +556,7 @@ _client_new(class, local_sv, peer_sv, alpn_sv, server_name_sv, ca_file_sv, trans
         callbacks.recv_stream_data = net_quic_recv_stream_data_cb;
         callbacks.recv_datagram = net_quic_recv_datagram_cb;
         callbacks.acked_stream_data_offset = net_quic_acked_stream_data_offset_cb;
+        callbacks.extend_max_stream_data = net_quic_extend_max_stream_data_cb;
         callbacks.stream_open = net_quic_stream_open_cb;
         callbacks.stream_close = net_quic_stream_close_limit_cb;
         callbacks.stream_reset = net_quic_stream_reset_cb;
@@ -850,6 +851,7 @@ _server_new(class, initial_sv, local_sv, peer_sv, alpn_sv, server_tls_sv, odcid_
         callbacks.recv_stream_data = net_quic_recv_stream_data_cb;
         callbacks.recv_datagram = net_quic_recv_datagram_cb;
         callbacks.acked_stream_data_offset = net_quic_acked_stream_data_offset_cb;
+        callbacks.extend_max_stream_data = net_quic_extend_max_stream_data_cb;
         callbacks.stream_open = net_quic_stream_open_cb;
         callbacks.stream_close = net_quic_stream_close_limit_cb;
         callbacks.stream_reset = net_quic_stream_reset_cb;
@@ -1528,10 +1530,11 @@ _stream_send(self, stream_id_iv, data_sv)
         }
 
 UV
-_stream_send_some(self, stream_id_iv, data_sv)
+_stream_send_some(self, stream_id_iv, data_sv, credit_limited = 0)
     SV *self
     IV stream_id_iv
     SV *data_sv
+    int credit_limited
     PREINIT:
         net_quic_connection *ep;
         net_quic_stream_state *stream;
@@ -1556,6 +1559,28 @@ _stream_send_some(self, stream_id_iv, data_sv)
         data = SvPVbyte(data_sv, datalen);
         available = ep->stream_tx_buffer_limit -
                     ep->stream_tx_buffered_bytes;
+        if (credit_limited) {
+            uint64_t stream_credit =
+                ngtcp2_conn_get_max_stream_data_left2(ep->conn, stream->id);
+            uint64_t connection_credit =
+                ngtcp2_conn_get_max_data_left2(ep->conn);
+            uint64_t stream_unsent =
+                stream->tx_next_offset - stream->tx_sent_offset;
+
+            /* Previously accepted but unsent bytes already claim QUIC
+             * stream/connection credit. Do not reserve it again.
+             */
+            stream_credit = stream_credit > stream_unsent
+                ? stream_credit - stream_unsent : 0;
+            connection_credit = connection_credit > ep->stream_tx_unsent_bytes
+                ? connection_credit - ep->stream_tx_unsent_bytes : 0;
+            if (available > stream_credit) {
+                available = stream_credit;
+            }
+            if (available > connection_credit) {
+                available = connection_credit;
+            }
+        }
         accepted = (uint64_t)datalen;
         if (accepted > available) {
             accepted = available;
@@ -1576,6 +1601,13 @@ _stream_send_some(self, stream_id_iv, data_sv)
             }
         }
 
+        /* A caller which received a short accepted prefix may have no
+         * QUIC stream bytes outstanding to ACK. Wake it when shared
+         * capacity returns on a sibling, not only on its own activity.
+         */
+        net_quic_stream_set_capacity_waiter(
+            ep, stream, accepted < (uint64_t)datalen
+        );
         RETVAL = (UV)accepted;
     OUTPUT:
         RETVAL
@@ -2227,6 +2259,8 @@ _next_datagram(self)
 
             if (wdatalen >= 0) {
                 chunk->sent += (size_t)wdatalen;
+                stream->tx_sent_offset += (uint64_t)wdatalen;
+                ep->stream_tx_unsent_bytes -= (uint64_t)wdatalen;
                 if (chunk->fin && chunk->sent == chunk->len) {
                     chunk->fin_sent = 1;
                 }

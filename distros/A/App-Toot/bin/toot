@@ -7,7 +7,7 @@ use Getopt::Long ();
 use Pod::Usage   ();
 use App::Toot;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 my $opt = {
     config => 'default',
@@ -16,7 +16,7 @@ my $opt = {
 Getopt::Long::GetOptions(
     $opt,
     'config=s',
-    'status=s',
+    'status:s',
     'help',
 ) or Pod::Usage::pod2usage( -exitval => 1 );
 
@@ -68,7 +68,7 @@ C<toot> is a tool for posting to Mastodon.
 
 The section of the config to load credentials for.
 
-Optional.  Defaults to C<default>.
+Optional.  Defaults to the C<default> section.  The requested section must be defined in the config; a C<default> section is not required.
 
 For more details, see the documentation for L<App::Toot::Config> or C<perldoc App::Toot::Config>.
 

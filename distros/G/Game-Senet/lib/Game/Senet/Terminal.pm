@@ -21,7 +21,7 @@ use Game::Senet::Bot;
 use Game::Senet::Variant;
 use Game::Senet::Notation ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 my (%STYLE, %GLYPH, %SIGN, %OTHER, %ROW_OF, %COL_OF);
 BEGIN {
@@ -988,7 +988,7 @@ Game::Senet::Terminal - Senet, played in a terminal
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

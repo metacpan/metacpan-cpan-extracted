@@ -54,7 +54,24 @@ tk_value_calendar_rc(pTHX_ tk_value *out, tk_value *v, int64_t months, int64_t d
     unsigned m, d;
     int r;
 
-    tk_add_months_ymd(c.year, c.month, c.day, months, eom, &y, &m, &d);
+    if (v->calendar != TK_CAL_GREGORY) {
+        /* months are the calendar's; the day count below is calendar blind */
+        const tk_calendar *cal = tk_cal_of(v);
+        tk_calfields f;
+        int64_t cy;
+        unsigned cm, cd;
+        if (!tk_cal_days_ok(cal, tk_value_local_days(v)))
+            return TK_LOCAL_RANGE;
+        tk_cal_fields(cal, tk_value_local_days(v), &f);
+        if (f.year + months / 12 < -TK_CAL_YEAR_LIMIT || f.year + months / 12 > TK_CAL_YEAR_LIMIT)
+            return TK_LOCAL_RANGE;
+        tk_cal_add_months(cal, f.year, f.month, f.day, months, eom, &cy, &cm, &cd);
+        if (!tk_cal_year_ok(cal, cy) || (cal->year_min && cy == cal->year_max && !tk_cal_days_ok(cal, cal->to_days(cy, cm, cd))))
+            return TK_LOCAL_RANGE;
+        tk_civil_from_days(cal->to_days(cy, cm, cd), &y, &m, &d);
+    }
+    else
+        tk_add_months_ymd(c.year, c.month, c.day, months, eom, &y, &m, &d);
     if (y < TK_YEAR_MIN || y > TK_YEAR_MAX)
         return TK_LOCAL_RANGE;
     if (days) {
@@ -69,6 +86,7 @@ tk_value_calendar_rc(pTHX_ tk_value *out, tk_value *v, int64_t months, int64_t d
                                gap, overlap);
     if (r == TK_LOCAL_OK)
         out->locale = v->locale;
+        out->calendar = v->calendar;
     return r;
 }
 
@@ -133,6 +151,7 @@ tk_value_clock_rc(pTHX_ tk_value *out, const tk_value *v, int64_t minutes,
     tk_value_zone(v, &z);
     tk_value_init(aTHX_ out, &t, &z);
     out->locale = v->locale;
+        out->calendar = v->calendar;
     return 1;
 }
 
@@ -151,6 +170,35 @@ tk_local_croak(pTHX_ int r, const tk_value *v, const char *what)
         croak("%s: the result is a 23:59:60 on a day with no leap second", what);
     if (r != TK_LOCAL_OK)
         croak("%s: out of range", what);
+}
+
+/* v's wall-clock time years on in its calendar, the month kept by its code. */
+static void
+tk_value_plus_years(pTHX_ tk_value *out, tk_value *v, int64_t years, int eom, int gap, int overlap, const char *what)
+{
+    const tk_calendar *cal = tk_cal_of(v);
+    tk_calfields f;
+    tk_civil c = *tk_value_civil(v);
+    tk_zone_spec z;
+    int64_t cy, y;
+    unsigned cm, cd, m, d;
+    if (years == 0) {
+        *out = *v;
+        return;
+    }
+    if (!tk_cal_days_ok(cal, tk_value_local_days(v)))
+        tk_cal_croak_range(aTHX_ cal, what);
+    tk_cal_fields(cal, tk_value_local_days(v), &f);
+    if (years > TK_CAL_YEAR_LIMIT || years < -TK_CAL_YEAR_LIMIT || !tk_cal_year_ok(cal, f.year + years))
+        tk_cal_croak_range(aTHX_ cal, what);
+    tk_cal_add_years(cal, f.year, f.month, f.day, years, eom, &cy, &cm, &cd);
+    tk_civil_from_days(cal->to_days(cy, cm, cd), &y, &m, &d);
+    if (y < TK_YEAR_MIN || y > TK_YEAR_MAX)
+        croak("%s: out of range", what);
+    tk_value_zone(v, &z);
+    tk_local_croak(aTHX_ tk_value_from_local_rc(aTHX_ out, &z, y, m, d, c.hour, c.minute, c.second, c.nsec, gap, overlap), v, what);
+    out->locale = v->locale;
+    out->calendar = v->calendar;
 }
 
 static void
@@ -261,7 +309,16 @@ tk_value_difference(pTHX_ tk_duration *d, tk_value *bin, tk_value *a, int calend
         unsigned mm, dd;
         ca = tk_value_civil(a);
         cb = tk_value_civil(&b);
-        if (calendar == 1) {
+        if (calendar == 1 && a->calendar != TK_CAL_GREGORY) {
+            const tk_calendar *cal = tk_cal_of(a);
+            tk_calfields fa, fb;
+            tk_cal_fields(cal, tk_value_local_days(a), &fa);
+            tk_cal_fields(cal, tk_value_local_days(&b), &fb);
+            m = (tk_cal_months_before(cal, fb.year) + fb.month) - (tk_cal_months_before(cal, fa.year) + fa.month);
+            if (m * sign < 0)
+                m = 0;
+        }
+        else if (calendar == 1) {
             m = ((int64_t)cb->year * 12 + cb->month) - ((int64_t)ca->year * 12 + ca->month);
             if (m * sign < 0)
                 m = 0;
@@ -274,8 +331,17 @@ tk_value_difference(pTHX_ tk_duration *d, tk_value *bin, tk_value *a, int calend
                 break;
         }
         /* then the most days */
-        tk_add_months_ymd(ca->year, ca->month, ca->day, m, tk_dur_default_eom(m), &yy, &mm, &dd);
-        days = tk_days_from_civil(cb->year, cb->month, cb->day) - tk_days_from_civil(yy, mm, dd);
+        if (a->calendar != TK_CAL_GREGORY) {
+            const tk_calendar *cal = tk_cal_of(a);
+            tk_calfields fa;
+            tk_cal_fields(cal, tk_value_local_days(a), &fa);
+            tk_cal_add_months(cal, fa.year, fa.month, fa.day, m, tk_dur_default_eom(m), &yy, &mm, &dd);
+            days = tk_value_local_days(&b) - cal->to_days(yy, mm, dd);
+        }
+        else {
+            tk_add_months_ymd(ca->year, ca->month, ca->day, m, tk_dur_default_eom(m), &yy, &mm, &dd);
+            days = tk_days_from_civil(cb->year, cb->month, cb->day) - tk_days_from_civil(yy, mm, dd);
+        }
         if (days * sign < 0)
             days = 0;
         for (; days != 0; days -= sign) {
@@ -460,6 +526,47 @@ tk_bucket_index(int64_t y, unsigned m, unsigned d, unsigned h, unsigned mi, unsi
     }
 }
 
+/* ---- what the arithmetic needs ---------------------------------------- */
+
+/* The first day of v's year, quarter or month in its calendar, as days. */
+static int64_t
+tk_cal_period_first_day(const tk_calendar *cal, const tk_calfields *f, int unit)
+{
+    if (unit == TK_U_YEAR)
+        return cal->to_days(f->year, 1, 1);
+    if (unit == TK_U_QUARTER)
+        return cal->to_days(f->year, ((f->month - 1) / 3) * 3 + 1, 1);
+    return cal->to_days(f->year, f->month, 1);
+}
+
+/* The first day of the period after f's. */
+static int64_t
+tk_cal_period_next_day(const tk_calendar *cal, const tk_calfields *f, int unit)
+{
+    int64_t y;
+    unsigned m, d;
+    if (unit == TK_U_YEAR)
+        return cal->to_days(f->year + 1, 1, 1);
+    if (unit == TK_U_QUARTER) {
+        unsigned next = ((f->month - 1) / 3) * 3 + 4;
+        return next > f->months_in_year ? cal->to_days(f->year + 1, 1, 1) : cal->to_days(f->year, next, 1);
+    }
+    tk_cal_add_months(cal, f->year, f->month, 1, 1, TK_EOM_LIMIT, &y, &m, &d);
+    return cal->to_days(y, m, d);
+}
+
+/* The bucket's number for half_even: years, quarters or months from the
+ * calendar's own start. */
+static int64_t
+tk_cal_bucket_index(const tk_calendar *cal, const tk_calfields *f, int unit)
+{
+    if (unit == TK_U_YEAR)
+        return f->year;
+    if (unit == TK_U_QUARTER)
+        return (tk_cal_months_before(cal, f->year) + f->month - 1) / 3;
+    return tk_cal_months_before(cal, f->year) + f->month - 1;
+}
+
 /* The start of v's bucket: the latest wall time at or before v on a bucket
  * boundary. Where that wall time fell in a gap, the first moment after it;
  * where it came twice, the reading at or before v. */
@@ -472,6 +579,11 @@ tk_value_bucket(pTHX_ tk_value *out, tk_value *v, int unit, int64_t inc, int ws,
     int32_t ns;
 
     tk_period_start(tk_value_civil(v), unit, inc, ws, &y, &m, &d, &h, &mi, &s, &ns);
+    if (v->calendar != TK_CAL_GREGORY && unit <= TK_U_MONTH) {
+        tk_calfields f;
+        tk_cal_fields(tk_cal_of(v), tk_value_local_days(v), &f);
+        tk_civil_from_days(tk_cal_period_first_day(tk_cal_of(v), &f, unit), &y, &m, &d);
+    }
     tk_value_zone(v, &z);
     if (tk_value_from_local_rc(aTHX_ out, &z, y, m, d, h, mi, s, ns, TKZ_GAP_FORWARD,
                                TKZ_OVERLAP_LATER) != TK_LOCAL_OK
@@ -479,6 +591,7 @@ tk_value_bucket(pTHX_ tk_value *out, tk_value *v, int unit, int64_t inc, int ws,
         tk_value_from_local(aTHX_ out, &z, y, m, d, h, mi, s, ns, TKZ_GAP_FORWARD,
                             TKZ_OVERLAP_EARLIER, what);
     out->locale = v->locale;
+        out->calendar = v->calendar;
 }
 
 static void
@@ -518,7 +631,16 @@ tk_value_bucket_next(pTHX_ tk_value *hi, tk_value *lo, int unit, int64_t inc, in
     default:               break;
     }
     tk_period_start(tk_value_civil(lo), unit, inc, ws, &y, &m, &d, &h, &mi, &s, &ns);
-    switch (unit) {
+    if (lo->calendar != TK_CAL_GREGORY && unit <= TK_U_MONTH) {
+        tk_calfields f;
+        if (!tk_cal_days_ok(tk_cal_of(lo), tk_value_local_days(lo)))
+            return 0;
+        tk_cal_fields(tk_cal_of(lo), tk_value_local_days(lo), &f);
+        if (f.year >= TK_CAL_YEAR_LIMIT || !tk_cal_year_ok(tk_cal_of(lo), f.year + 1))
+            return 0;
+        tk_civil_from_days(tk_cal_period_next_day(tk_cal_of(lo), &f, unit), &y, &m, &d);
+    }
+    else switch (unit) {
     case TK_U_YEAR:    y += 1; break;
     case TK_U_QUARTER: m += 3; if (m > 12) { m -= 12; y += 1; } break;
     case TK_U_MONTH:   m += 1; if (m > 12) { m = 1; y += 1; } break;
@@ -538,6 +660,7 @@ tk_value_bucket_next(pTHX_ tk_value *hi, tk_value *lo, int unit, int64_t inc, in
                                TKZ_OVERLAP_EARLIER) != TK_LOCAL_OK)
         return 0;
     hi->locale = lo->locale;
+    hi->calendar = lo->calendar;
     return 1;
 }
 
@@ -580,8 +703,15 @@ tk_value_round(pTHX_ tk_value *out, tk_value *v, int unit, int64_t inc, int mode
     rem = full = 1;
     {
         const tk_civil *c = tk_value_civil(&lo);
-        int64_t index = tk_bucket_index(c->year, c->month, c->day, c->hour, c->minute, c->second,
-                                        c->nsec, unit, inc);
+        int64_t index;
+        if (lo.calendar != TK_CAL_GREGORY && unit <= TK_U_MONTH) {
+            tk_calfields f;
+            tk_cal_fields(tk_cal_of(&lo), tk_value_local_days(&lo), &f);
+            index = tk_cal_bucket_index(tk_cal_of(&lo), &f, unit);
+        }
+        else
+            index = tk_bucket_index(c->year, c->month, c->day, c->hour, c->minute, c->second,
+                                    c->nsec, unit, inc);
         if (tk_round_up(mode, rem, 2 * full, index))
             lo = hi;
     }
@@ -605,6 +735,7 @@ tk_value_end_of(pTHX_ tk_value *out, tk_value *v, int unit, int ws, const char *
         tk_value_zone(v, &z);
         tk_value_init(aTHX_ out, &t, &z);
         out->locale = v->locale;
+        out->calendar = v->calendar;
         return;
     }
     if (!tk_value_clock_rc(aTHX_ out, &hi, 0, 0, -1))
@@ -666,6 +797,8 @@ tk_dur_round(tk_duration *out, const tk_duration *d, int unit, int64_t inc, int 
 static void
 tk_value_until_raw(pTHX_ tk_duration *d, tk_value *b, tk_value *a, int largest)
 {
+    if (largest == TK_U_YEAR && a->calendar != TK_CAL_GREGORY)
+        croak("Time::Keeper->until: largest => 'years' in the %s calendar comes in a later release; largest => 'months' counts its months", tk_cal_of(a)->id);
     if (largest <= TK_U_MONTH)
         tk_value_difference(aTHX_ d, b, a, 1);
     else if (largest <= TK_U_DAY)
@@ -948,12 +1081,22 @@ tk_value_nth_in_month(pTHX_ tk_value *out, tk_value *v, int dow, int n, int gap,
     int64_t here = tk_days_from_civil(c->year, c->month, c->day);
     int64_t first = tk_days_from_civil(c->year, c->month, 1);
     unsigned len = tk_days_in_month(c->year, c->month);
-    int64_t target;
+    int64_t target, year_shown = c->year;
+    unsigned month_shown = c->month;
+
+    if (v->calendar != TK_CAL_GREGORY) {
+        tk_calfields f;
+        tk_cal_fields(tk_cal_of(v), here, &f);
+        first = tk_cal_of(v)->to_days(f.year, f.month, 1);
+        len = f.days_in_month;
+        year_shown = f.year;
+        month_shown = f.month;
+    }
 
     if (n > 0) {
         target = first + (dow - (int)tk_dow_from_days(first) + 7) % 7 + (int64_t)(n - 1) * 7;
         if (target - first >= (int64_t)len)
-            croak("%s: %04" IVdf "-%02u has no %s %s", what, (IV)c->year, (unsigned)c->month,
+            croak("%s: %04" IVdf "-%02u has no %s %s", what, (IV)year_shown, month_shown,
                   tk_ordinal_names[n], tk_dow_names[dow]);
     }
     else {

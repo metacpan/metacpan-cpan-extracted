@@ -61,7 +61,7 @@ is($K->parse('1996-12-19T16:39:57-08:00[America/Los_Angeles]')->zone_name, 'Amer
 is($K->parse('2026-10-15T09:00:00+00:00[Asia/Tokyo]') . '', '2026-10-15T18:00:00+09:00',
    'an offset that disagrees with a zone that is not critical: the offset fixes the instant');
 like(p('2026-10-15T09:00:00+00:00[!Asia/Tokyo]'), qr/the zone is marked critical/, 'a critical zone that disagrees is refused');
-like(p('2026-10-15T09:00:00[u-ca=hebrew]'), qr/only the Gregorian calendar/, 'another calendar is refused');
+is(Time::Keeper->parse('2026-10-15T09:00:00Z[u-ca=hebrew]')->calendar, 'hebrew', 'another calendar is read, since 0.05');
 like(p('2026-10-15T09:00:00[!foo=bar]'), qr/critical annotation that is not known/, 'a critical annotation it does not know');
 like(p('2026-10-15T09:00:00[Asia/Tokyo][Europe/London]'), qr/a second time zone/, 'two zones');
 is($K->parse('2026-10-15T09:00', zone => 'Europe/London') . '', '2026-10-15T09:00:00+01:00', 'zone => for text without an offset');

@@ -458,7 +458,39 @@ function holdUntilSettled(pane, indicator) {
   });
 }
 
+/**
+ * Wires the user menu's light / computer / dark switch to the theme resolver.
+ * Bootstrap closes a dropdown on a click anywhere in its menu except a form
+ * field, listening on document, so the click stops here: the user sees the
+ * theme change with the menu still open.
+ * @param {Element} sw the switch's button group
+ * @param {{choose: function(string): void, chosen: function(): string}} theme
+ *   the resolver's window.ndTheme
+ * @returns {void}
+ */
+function nd_init_theme_switch(sw, theme) {
+  var buttons = sw.querySelectorAll('button[data-nd-theme-choice]');
+  function mark() {
+    buttons.forEach(function (b) {
+      var on = b.dataset.ndThemeChoice === theme.chosen();
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+  }
+  sw.addEventListener('click', function (event) {
+    event.stopPropagation();
+    var b = event.target.closest('button[data-nd-theme-choice]');
+    if (!b) { return }
+    theme.choose(b.dataset.ndThemeChoice);
+    mark();
+  });
+  mark();
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+  var themeSwitch = document.querySelector('.nd_theme-switch');
+  if (themeSwitch && window.ndTheme) { nd_init_theme_switch(themeSwitch, window.ndTheme) }
+
   // sidebar form fields should change colour and have bin/copy icon
   document.querySelectorAll('.nd_field-copy-icon').forEach(function (el) { el.style.display = 'none' });
   hideWithTooltip('.nd_field-clear-icon');
@@ -943,8 +975,10 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-// index.tt: load System Information once its accordion is first opened,
-// using {once: true} in place of a stats_loaded flag.
+// index.tt: load System Information now if its accordion is rendered open,
+// else once it is first opened, using {once: true} in place of a
+// stats_loaded flag. Bootstrap fires no show.bs.collapse for an accordion
+// that starts open.
 function nd_statistics_panel() {
   var stats = document.getElementById('nd_stats');
   var nqbody = document.getElementById('nqbody');
@@ -955,7 +989,10 @@ function nd_statistics_panel() {
   var collapseStats = document.getElementById('collapse-stats');
   if (!collapseStats) return;
 
-  collapseStats.addEventListener('show.bs.collapse', function() {
+  if (collapseStats.classList.contains('show')) { loadStatistics() }
+  else { collapseStats.addEventListener('show.bs.collapse', loadStatistics, { once: true }) }
+
+  function loadStatistics() {
     fetch( stats.dataset.ndUrl,
       { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
       .then( response => {
@@ -990,7 +1027,7 @@ function nd_statistics_panel() {
         }
         console.error('There has been a problem with your fetch operation:', error);
       });
-  }, { once: true });
+  }
 }
 
 // called after every ajax-loaded pane finishes settling, so a page's own

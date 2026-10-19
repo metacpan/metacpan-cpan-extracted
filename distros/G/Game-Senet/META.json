@@ -1,5 +1,5 @@
 {
-   "abstract" : "Senet, the Egyptian game of passing, with an XS engine",
+   "abstract" : "Senet, the Egyptian game of passing",
    "author" : [
       "LNATION <email@lnation.org>"
    ],
@@ -64,6 +64,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

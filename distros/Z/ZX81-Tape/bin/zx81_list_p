@@ -1,0 +1,55 @@
+#!/usr/bin/env perl
+
+use Modern::Perl;
+use ZX81::Tape qw(list_p);
+use Getopt::Std;
+
+my $USAGE = "Usage: $0 [-o output_file.bas] input_file.p\n";
+getopts( 'o:', \my %opts ) or die $USAGE;
+@ARGV == 1                 or die $USAGE;
+my $input_file = shift @ARGV;
+
+if ( $opts{o} ) {
+    my $output_file = $opts{o};
+    list_p( $input_file, $output_file );
+}
+else {
+    list_p($input_file);
+}
+
+__END__
+
+#------------------------------------------------------------------------------
+
+=pod
+
+=head1 NAME
+
+zx81_list_p - List a ZX81 .p file in BASIC format
+
+=head1 USAGE
+
+    zx81_list_p [-o output_file.bas] input_file.p
+
+=head1 DESCRIPTION
+
+This script takes a ZX81 program file (.p) and generates a corresponding
+BASIC listing on standard output, or on a file if the -o option is used.
+
+=head1 SEE ALSO
+
+L<ZX81::Tape>
+
+=head1 AUTHOR
+
+Paulo Custodio
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2026 Paulo Custodio.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+

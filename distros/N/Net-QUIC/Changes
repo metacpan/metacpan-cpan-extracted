@@ -1,5 +1,26 @@
 Revision history for Net-QUIC
 
+0.05  2026-10-18
+    - Add optional Stream->send_some($bytes, limit_to_credit => 1) for
+      advanced multiplexed senders. Keep the default send_some behavior
+      and its accepted-prefix contract unchanged.
+    - In opt-in mode, cap accepted bytes by the remaining peer Stream
+      and Connection flow-control credit, accounting for queued bytes
+      not yet handed to the QUIC transport.
+    - Wake only blocked bounded-send producers when an unrelated Stream
+      frees connection-wide transmit queue capacity through ACKs or reset,
+      using existing on_stream_activity and next_active_stream_id hooks.
+    - Wake waiting Streams on peer MAX_STREAM_DATA increases, with no
+      new event-loop or HTTP dependency.
+    - Keep all original Net::QUIC APIs and existing bounded-send semantics
+      valid for standalone clients, servers, and protocol engines.
+    - Add standalone authenticated multi-Stream regression testing
+      bounded queue contention, flow-credit resumption, sibling ACK/reset
+      notifications, payload integrity, and default compatibility.
+    - Verify Linux Perl 5.20 through 5.44, macOS and Windows and
+      event-loop example smoke tests; validate six concurrent HTTP/3
+      producers separately in a downstream integration suite.
+
 0.04  2026-10-03
     - Add RFC 9221 QUIC DATAGRAM transport as an opt-in Connection feature.
     - Negotiate DATAGRAM receive capability directionally with the

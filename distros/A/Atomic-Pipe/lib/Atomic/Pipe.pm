@@ -2,7 +2,7 @@ package Atomic::Pipe;
 use strict;
 use warnings;
 
-our $VERSION = '0.032';
+our $VERSION = '0.033';
 
 use IO();
 use IO::Handle();
@@ -117,6 +117,14 @@ use constant COMPRESSION_LEVEL           => 'compression_level';
 use constant COMPRESSION_DICTIONARY      => 'compression_dictionary';
 use constant COMPRESSION_DICTIONARY_FILE => 'compression_dictionary_file';
 use constant KEEP_COMPRESSED             => 'keep_compressed';
+use constant COMPRESS_LARGE_ONLY         => 'compress_large_only';
+use constant COMPRESSION_THRESHOLD       => 'compression_threshold';
+
+# High bit of the 32-bit part size in a message header. Part sizes never exceed
+# PIPE_BUF, so the bit is free; it marks the parts of a compressed message when
+# compress_large_only is in use.
+use constant SIZE_COMPRESSED_FLAG => 0x80000000;
+use constant SIZE_MASK            => 0x7FFFFFFF;
 
 sub wh  { shift->{+WH} }
 sub rh  { shift->{+RH} }
@@ -150,6 +158,18 @@ sub compression_level           { $_[0]->{+COMPRESSION_LEVEL} }
 sub compression_dictionary      { $_[0]->{+COMPRESSION_DICTIONARY} }
 sub compression_dictionary_file { $_[0]->{+COMPRESSION_DICTIONARY_FILE} }
 sub keep_compressed             { $_[0]->{+KEEP_COMPRESSED} ? 1 : 0 }
+# The threshold in effect (default included) while compress_large_only is on.
+sub compression_threshold {
+    my $self = shift;
+    return undef unless $self->compress_large_only;
+    return $self->_large_threshold;
+}
+
+sub compress_large_only {
+    my $self = shift;
+    return 1 if $self->{+COMPRESS_LARGE_ONLY} || defined $self->{+COMPRESSION_THRESHOLD};
+    return 0;
+}
 
 sub fill_buffer {
     my $self = shift;
@@ -214,7 +234,12 @@ sub _from_buffer {
     my ($size, %params) = @_;
 
     unless ($self->{+IN_BUFFER_SIZE} && $self->{+IN_BUFFER_SIZE} >= $size) {
-        $self->fill_buffer;
+        # Keep reading while reads return data: with a read_size smaller than
+        # what is needed, one read is not enough, and a blocking caller would
+        # otherwise get undef (which looks like EOF) in the middle of a
+        # message. fill_buffer returns 0 at EOF and when a non-blocking read
+        # finds nothing, which ends the loop.
+        1 while ($self->{+IN_BUFFER_SIZE} // 0) < $size && $self->fill_buffer;
         unless($self->{+IN_BUFFER_SIZE} >= $size) {
             return unless $params{eof_invalid} && $self->{+EOF};
             $self->throw_invalid($params{eof_invalid});
@@ -282,6 +307,10 @@ sub _decompress {
         $out = $ctx->decompress_using_dict($data, $ddict);
     }
     else {
+        # A reader without compression configured can still receive messages
+        # flagged as compressed by a compress_large_only writer.
+        $self->throw_invalid("Received a compressed message but Compress::Zstd is not installed")
+            unless eval { require Compress::Zstd; 1 };
         $out = Compress::Zstd::decompress($data);
     }
     $self->throw_invalid("zstd decompression failed") unless defined $out;
@@ -294,6 +323,15 @@ sub eof {
     $self->throw_invalid() if $self->{+INVALID_STATE};
 
     return 0 if $self->fill_buffer;
+    return $self->_drained;
+}
+
+# Same answer as eof() but without reading more data. Internal loops must use
+# this: eof() pulls another read into in_buffer on every call, so calling it
+# per pass drains the whole pipe into memory.
+sub _drained {
+    my $self = shift;
+
     return 0 unless $self->{+EOF};
     return 0 if $self->{+IN_BUFFER_SIZE};
 
@@ -327,10 +365,21 @@ sub _mode_to_dir {
     return $MODE_TO_DIR{$mode};
 }
 
+# compress_large_only (or a compression_threshold) turns compression on when
+# no algorithm was given.
+sub _implied_compression {
+    my ($class, $params) = @_;
+    return $params->{+COMPRESSION} if defined $params->{+COMPRESSION};
+    return 'zstd' if $params->{+COMPRESS_LARGE_ONLY} || defined $params->{+COMPRESSION_THRESHOLD};
+    return undef;
+}
+
 sub _check_params {
     my ($class, %params) = @_;
     croak "IO::Select is not installed, cannot enable use_io_select"
         if $params{+USE_IO_SELECT} && !HAVE_IO_SELECT;
+
+    $params{+COMPRESSION} = $class->_implied_compression(\%params);
 
     if (defined(my $algo = $params{+COMPRESSION})) {
         croak "Unknown compression algorithm '$algo'" unless $algo eq 'zstd';
@@ -344,6 +393,9 @@ sub _check_params {
     croak "compression_dictionary requires compression to be enabled"
         if (defined($params{+COMPRESSION_DICTIONARY}) || defined($params{+COMPRESSION_DICTIONARY_FILE}))
             && !defined($params{+COMPRESSION});
+
+    croak "compression_threshold must be a non-negative integer"
+        if defined($params{+COMPRESSION_THRESHOLD}) && $params{+COMPRESSION_THRESHOLD} !~ m/^\d+$/;
 }
 
 sub read_fifo {
@@ -414,6 +466,13 @@ sub _new_from_params {
 
     my $mixed = delete $params->{mixed_data_mode};
 
+    # Remember when compression was switched on only because of
+    # compress_large_only, so turning that off can switch it back off.
+    unless (defined $params->{+COMPRESSION}) {
+        my $algo = $class->_implied_compression($params);
+        @{$params}{+COMPRESSION, '_compression_implied'} = ($algo, 1) if defined $algo;
+    }
+
     my $self = bless({%$params, @handles}, $class);
     $self->set_mixed_data_mode() if $mixed;
 
@@ -468,6 +527,9 @@ sub set_mixed_data_mode {
 sub set_compression {
     my $self = shift;
     my ($algo, $level) = @_;
+
+    # An explicit call makes the compression setting the caller's own.
+    delete $self->{_compression_implied};
 
     if (!defined $algo) {
         delete $self->{+COMPRESSION};
@@ -539,6 +601,73 @@ sub set_keep_compressed {
     return;
 }
 
+sub set_compress_large_only {
+    my ($self, $val, $threshold) = @_;
+
+    unless ($val) {
+        delete $self->{+COMPRESS_LARGE_ONLY};
+        delete $self->{+COMPRESSION_THRESHOLD};
+
+        # Undo what turning it on did: if compression was only on because of
+        # compress_large_only, switch it off; an explicit setting stays.
+        $self->set_compression(undef) if $self->{_compression_implied};
+        return;
+    }
+
+    croak "compression_threshold must be a non-negative integer"
+        if defined($threshold) && $threshold !~ m/^\d+$/;
+
+    # Turn compression on if it is not already (croaks without Compress::Zstd).
+    unless (defined $self->{+COMPRESSION}) {
+        $self->set_compression('zstd');
+        $self->{_compression_implied} = 1;
+    }
+
+    $self->{+COMPRESS_LARGE_ONLY} = 1;
+    if (defined $threshold) { $self->{+COMPRESSION_THRESHOLD} = $threshold }
+    else                    { delete $self->{+COMPRESSION_THRESHOLD} }
+
+    return;
+}
+
+# Messages longer than this are compressed under compress_large_only. The
+# default is the largest payload that fits in one atomic part, so only messages
+# that would otherwise be split are compressed.
+sub _large_threshold {
+    my $self = shift;
+    return $self->{+COMPRESSION_THRESHOLD} // ($self->{+ADJUSTED_DSIZE} // $self->_adjusted_dsize);
+}
+
+# Bursts and legacy (unflagged) messages are compressed iff compression is on
+# and compress_large_only is not.
+sub _compress_all {
+    my $self = shift;
+    return 0 unless $self->{+COMPRESSION};
+    return 0 if $self->{+COMPRESS_LARGE_ONLY} || defined $self->{+COMPRESSION_THRESHOLD};
+    return 1;
+}
+
+# Length of the longest suffix of $buf that is a proper prefix of $delim: the
+# bytes that may be the start of a delimiter split across reads. Anything else
+# can be handed on right away.
+sub _partial_suffix {
+    my ($buf, $delim) = @_;
+    for my $k (reverse 1 .. min(length($delim) - 1, length($buf))) {
+        return $k if substr($buf, -$k) eq substr($delim, 0, $k);
+    }
+    return 0;
+}
+
+sub _mixed_message_result {
+    my ($self, $message, $flagged) = @_;
+
+    return (message => $message) unless $flagged || $self->_compress_all;
+
+    my $decompressed = $self->_decompress($message);
+    return (message => $decompressed, compressed => $message) if $self->{+KEEP_COMPRESSED};
+    return (message => $decompressed);
+}
+
 sub get_line_burst_or_data {
     my $self = shift;
     my %params = @_;
@@ -561,7 +690,7 @@ sub get_line_burst_or_data {
 
     while (1) {
         $self->throw_invalid('Incomplete message received before EOF')
-            if $self->eof && (keys(%{$self->{+STATE}->{buffers}}) || keys (%{$self->{+STATE}->{parts}}));
+            if $self->_drained && (keys(%{$self->{+STATE}->{buffers}}) || keys (%{$self->{+STATE}->{parts}}));
 
         if($buffer->{lines} || length($buffer->{lines})) {
             # Look for a complete line
@@ -576,7 +705,7 @@ sub get_line_burst_or_data {
         }
 
         if ($buffer->{in_message}) {
-            my ($id, $message) = $self->_extract_message(one_part_only => 1);
+            my ($id, $message, $flagged) = $self->_extract_message(one_part_only => 1);
 
             unless(defined $id) {
                 $self->throw_invalid('Incomplete burst data received before end of pipe')
@@ -594,45 +723,66 @@ sub get_line_burst_or_data {
 
             $buffer->{strip_term}++;
             $buffer->{in_message} = 0;
-            if (defined $message) {
-                if ($self->{+COMPRESSION}) {
-                    my $compressed   = $message;
-                    my $decompressed = $self->_decompress($compressed);
-                    return (message => $decompressed, compressed => $compressed)
-                        if $self->{+KEEP_COMPRESSED};
-                    return (message => $decompressed);
-                }
-                return (message => $message);
-            }
+            return $self->_mixed_message_result($message, $flagged) if defined $message;
         }
 
         if ($buffer->{strip_term}) {
-            my $term = $self->_get_from_buffer(1, eof_invalid => 'EOF before message terminator') // return;
+            my $term = $self->_get_from_buffer(length($postfix), eof_invalid => 'EOF before message terminator') // return;
 
             $self->throw_invalid("No message terminator") unless $term eq $postfix;
             $buffer->{strip_term}--;
         }
 
         if ($buffer->{in_burst}) {
-            my $peek = $self->_peek_from_buffer(1, eof_invalid => 'Incomplete burst data received before end of pipe') // next;
+            # undef here means a non-blocking read found nothing (EOF throws);
+            # looping again cannot make progress.
+            my $first = $self->_peek_from_buffer(1, eof_invalid => 'Incomplete burst data received before end of pipe');
+            unless (defined $first) {
+                return (peek => $peek) if $peek;
+                return;
+            }
 
-            if ($peek eq $key) {
+            # Only the first byte of a burst can be the message key; later
+            # reads continuing a burst are data.
+            if ($first eq $key && !length($buffer->{burst} // '')) {
+                # Fast path: the whole part (key, header, payload, postfix) is
+                # already buffered, so take it in one step.
+                if (my @part = $self->_take_part(length($key), $postfix)) {
+                    $buffer->{in_burst} = 0;
+                    my ($message, $flagged) = $self->_assemble(@part);
+                    next unless defined $message;
+                    return $self->_mixed_message_result($message, $flagged);
+                }
+
                 $self->_get_from_buffer(1); # Strip the key
                 $buffer->{in_message} = 1;
                 $buffer->{in_burst} = 0;
                 next;
             }
 
+            # Consume with index + 4-arg substr: chopping the front of a
+            # string is O(1) in perl, while split would copy the remainder of
+            # the buffer every time, making a large buffer quadratic.
             $buffer->{burst} //= '';
-            my ($burst_data, $term);
-            ($burst_data, $term, $self->{+IN_BUFFER}) = split /(\Q$postfix\E)/, $self->{+IN_BUFFER}, 2;
-            $buffer->{burst} .= $burst_data;
+            my $term;
+            my $at = index($self->{+IN_BUFFER}, $postfix);
+            if ($at < 0) {
+                # Keep a possible partial postfix at the end of the buffer so
+                # a multi-byte postfix split across reads is still found.
+                my $keep = _partial_suffix($self->{+IN_BUFFER}, $postfix);
+                my $take = length($self->{+IN_BUFFER}) - $keep;
+                $buffer->{burst} .= substr($self->{+IN_BUFFER}, 0, $take, '') if $take;
+            }
+            else {
+                $buffer->{burst} .= substr($self->{+IN_BUFFER}, 0, $at, '') if $at;
+                $term = substr($self->{+IN_BUFFER}, 0, length($postfix), '');
+            }
 
-            if ($term) {
+            if (defined $term) {
                 $self->{+IN_BUFFER_SIZE} = length($self->{+IN_BUFFER});
                 $buffer->{in_burst} = 0;
                 my $compressed = delete $buffer->{burst};
-                if ($self->{+COMPRESSION}) {
+                if ($self->_compress_all) {
                     my $decompressed = $self->_decompress($compressed);
                     return (burst => $decompressed, compressed => $compressed)
                         if $self->{+KEEP_COMPRESSED};
@@ -640,17 +790,33 @@ sub get_line_burst_or_data {
                 }
                 return (burst => $compressed);
             }
-            else {
-                $self->{+IN_BUFFER_SIZE} = 0;
-            }
 
+            # The rest of the burst is not here yet. Read more and stay in the
+            # burst; falling through would treat the next read as line data.
+            $self->{+IN_BUFFER_SIZE} = length($self->{+IN_BUFFER});
             $self->throw_invalid('Incomplete burst data received before end of pipe') if $self->{+EOF};
+            next if $self->fill_buffer;
+            $self->throw_invalid('Incomplete burst data received before end of pipe') if $self->{+EOF};
+            return (peek => $peek) if $peek;
+            return;
         }
 
-        unless ($self->{+IN_BUFFER_SIZE} || $self->fill_buffer()) {
+        # A held partial prefix (see below) counts as an empty buffer: it
+        # cannot be classified until more data arrives.
+        my $held = $buffer->{held_prefix} && $self->{+IN_BUFFER_SIZE};
+        unless (($self->{+IN_BUFFER_SIZE} && !$held) || $self->fill_buffer()) {
             return (peek => $peek) if $peek && !$self->{+EOF};
 
             return unless $self->{+EOF};
+
+            if ($held) {
+                # No more data is coming, so the held bytes are line data.
+                $buffer->{lines} .= $self->{+IN_BUFFER};
+                $self->{+IN_BUFFER}      = '';
+                $self->{+IN_BUFFER_SIZE} = 0;
+                $buffer->{held_prefix}   = 0;
+                next;
+            }
 
             # Do at least one more iteration after EOF
             return if $buffer->{+EOF}++;
@@ -658,17 +824,23 @@ sub get_line_burst_or_data {
             # But do not try to split the empty buffer
             next;
         }
+        $buffer->{held_prefix} = 0;
 
         # Look for the start of a burst, anything before a burst is line data
-        my $linedata;
-        ($linedata, $buffer->{in_burst}, $self->{+IN_BUFFER}) = split /(\Q$prefix\E)/, $self->{+IN_BUFFER}, 2;
-        $buffer->{lines} .= $linedata if defined $linedata;
-
-        if ($buffer->{in_burst}) {
-            $self->{+IN_BUFFER_SIZE} -= length($linedata) + length($buffer->{in_burst});
+        my $at = index($self->{+IN_BUFFER}, $prefix);
+        if ($at < 0) {
+            # Hold back a possible partial prefix at the end of the buffer so
+            # a multi-byte prefix split across reads is still found.
+            my $keep = _partial_suffix($self->{+IN_BUFFER}, $prefix);
+            my $take = length($self->{+IN_BUFFER}) - $keep;
+            $buffer->{lines} .= substr($self->{+IN_BUFFER}, 0, $take, '') if $take;
+            $self->{+IN_BUFFER_SIZE} = length($self->{+IN_BUFFER});
+            $buffer->{held_prefix}   = $self->{+IN_BUFFER_SIZE} ? 1 : 0;
         }
         else {
-            $self->{+IN_BUFFER_SIZE} = 0;
+            $buffer->{lines} .= substr($self->{+IN_BUFFER}, 0, $at, '') if $at;
+            $buffer->{in_burst} = substr($self->{+IN_BUFFER}, 0, length($prefix), '');
+            $self->{+IN_BUFFER_SIZE} = length($self->{+IN_BUFFER});
         }
     }
 }
@@ -902,7 +1074,7 @@ sub fits_in_burst {
     my $self = shift;
     my ($data) = @_;
 
-    $data = $self->_compress_cached($data) if $self->{+COMPRESSION};
+    $data = $self->_compress_cached($data) if $self->_compress_all;
 
     my $size = bytes::length($data) + ($self->{+DELIMITER_SIZE} // $self->delimiter_size);
     return undef unless $size <= PIPE_BUF;
@@ -914,7 +1086,7 @@ sub write_burst {
     my $self = shift;
     my ($data) = @_;
 
-    $data = $self->_compress_cached($data) if $self->{+COMPRESSION};
+    $data = $self->_compress_cached($data) if $self->_compress_all;
 
     my $size = bytes::length($data) + ($self->{+DELIMITER_SIZE} // $self->delimiter_size);
     return undef unless $size <= PIPE_BUF;
@@ -1013,12 +1185,26 @@ sub write_message {
     my $self = shift;
     my ($data) = @_;
 
-    $data = $self->_compress($data) if $self->{+COMPRESSION};
-
-    my $tid            = _get_tid();
-    my $message_key    = $self->{+MESSAGE_KEY}    // '';
     my $adjusted_dsize = $self->{+ADJUSTED_DSIZE} // $self->_adjusted_dsize;
-    my $dtotal         = bytes::length($data);
+
+    my $flag = 0;
+    if ($self->{+COMPRESSION}) {
+        if ($self->_compress_all) {
+            $data = $self->_compress($data);
+        }
+        elsif (bytes::length($data) > $self->_large_threshold) {
+            # Only keep the compressed form when it actually saves space.
+            my $compressed = $self->_compress($data);
+            if (bytes::length($compressed) < bytes::length($data)) {
+                $data = $compressed;
+                $flag = SIZE_COMPRESSED_FLAG;
+            }
+        }
+    }
+
+    my $tid         = _get_tid();
+    my $message_key = $self->{+MESSAGE_KEY} // '';
+    my $dtotal      = bytes::length($data);
 
     my $parts = int($dtotal / $adjusted_dsize);
     $parts++ if $dtotal % $adjusted_dsize;
@@ -1029,7 +1215,7 @@ sub write_message {
     if ($parts == 1) {
         my $bytes = $data;
         my $size  = $dtotal;
-        my $out   = $message_key . pack("l2L2", $$, $tid, $id--, $size) . $bytes;
+        my $out   = $message_key . pack("l2L2", $$, $tid, $id--, $size | $flag) . $bytes;
 
         my $out_size = $dtotal + ($self->{+DELIMITER_SIZE} // $self->delimiter_size) + $psize + ($message_key ? 1 : 0);
 
@@ -1040,7 +1226,7 @@ sub write_message {
             my $bytes = bytes::substr($data, $part * $adjusted_dsize, $adjusted_dsize);
             my $size  = bytes::length($bytes);
 
-            my $out = $message_key . pack("l2L2", $$, $tid, $id--, $size) . $bytes;
+            my $out = $message_key . pack("l2L2", $$, $tid, $id--, $size | $flag) . $bytes;
 
             my $out_size = bytes::length($out) + ($self->{+DELIMITER_SIZE} // $self->delimiter_size);
             push @{$self->{+OUT_BUFFER} //= []} => [$out, $out_size];
@@ -1051,15 +1237,66 @@ sub write_message {
     return $parts;
 }
 
+# Fast path: take one whole message part off the front of the buffer in a
+# single step, but only if all of it is already there:
+#   $lead bytes (the message key in mixed mode), the 16 byte header, the
+#   payload, then $trail (the burst postfix in mixed mode).
+# Returns ($pid, $tid, $id, $flagged, $data), or nothing (buffer untouched)
+# when the part is incomplete or malformed; the slower step-by-step path then
+# handles it, including partial reads and EOF errors.
+sub _take_part {
+    my ($self, $lead, $trail) = @_;
+
+    my $have = $self->{+IN_BUFFER_SIZE} or return;
+    return if $have < $lead + $psize;
+
+    my ($pid, $tid, $id, $size) = $lead
+        ? unpack("x$lead l2L2", $self->{+IN_BUFFER})
+        : unpack('l2L2', $self->{+IN_BUFFER});
+    my $flagged = $size & SIZE_COMPRESSED_FLAG ? 1 : 0;
+    $size &= SIZE_MASK;
+
+    my $tlen  = defined($trail) ? length($trail) : 0;
+    my $total = $lead + $psize + $size + $tlen;
+    return if $have < $total;
+    return if $tlen && substr($self->{+IN_BUFFER}, $total - $tlen, $tlen) ne $trail;
+
+    substr($self->{+IN_BUFFER}, 0, $lead + $psize, '');
+    my $data = substr($self->{+IN_BUFFER}, 0, $size, '');
+    substr($self->{+IN_BUFFER}, 0, $tlen, '') if $tlen;
+    $self->{+IN_BUFFER_SIZE} = $have - $total;
+
+    return ($pid, $tid, $id, $flagged, $data);
+}
+
+# Add one part to the reassembly state. Returns ($message, $flagged) once the
+# final part (id 0) arrives, nothing before that. A single-part message with no
+# earlier parts pending skips the bookkeeping entirely.
+sub _assemble {
+    my ($self, $pid, $tid, $id, $flagged, $data) = @_;
+
+    my $state = $self->{+STATE} //= {};
+    my $tag   = "$pid:$tid";
+
+    return ($data, $flagged) if $id == 0 && !($state->{buffers} && exists $state->{buffers}->{$tag});
+
+    push @{$state->{parts}->{$tag} //= []} => $id;
+    $state->{buffers}->{$tag} .= $data;
+    return unless $id == 0;
+
+    delete $state->{parts}->{$tag};
+    return (delete($state->{buffers}->{$tag}), $flagged);
+}
+
 sub read_message {
     my $self = shift;
     my %params = @_;
 
-    my ($id, $out) = $self->_extract_message(%params);
+    my ($id, $out, $flagged) = $self->_extract_message(%params);
 
     return unless defined $id;
 
-    return $out unless $self->{+COMPRESSION};
+    return $out unless $flagged || $self->_compress_all;
 
     if ($params{debug}) {
         my $compressed = $out->{message};
@@ -1082,6 +1319,16 @@ sub _extract_message {
     my $state = $self->{+STATE} //= {};
 
     while (1) {
+        # Whole part already buffered: take it in one step. (debug wants the
+        # per-message part list, so it always uses the step-by-step path.)
+        if (!$state->{key} && !$params{debug} && (my @part = $self->_take_part(0))) {
+            my $id = $part[2];
+            my ($message, $flagged) = $self->_assemble(@part);
+            return ($id, $message, $flagged) if $id == 0;
+            return ($id, undef) if $params{one_part_only};
+            next;
+        }
+
         unless ($state->{key}) {
             my $key_bytes = $self->_get_from_buffer($psize);
             unless (defined($key_bytes) && length($key_bytes)) {
@@ -1095,6 +1342,8 @@ sub _extract_message {
 
             my %key;
             @key{qw/pid tid id size/} = unpack('l2L2', $key_bytes);
+            $key{compressed} = $key{size} & SIZE_COMPRESSED_FLAG ? 1 : 0;
+            $key{size} &= SIZE_MASK;
             $state->{key} = \%key;
         }
 
@@ -1105,7 +1354,9 @@ sub _extract_message {
         my $id   = $key->{id};
         my $tag  = join ':' => @{$key}{qw/pid tid/};
         push @{$state->{parts}->{$tag} //= []} => $id;
-        $state->{buffers}->{$tag} = $state->{buffers}->{$tag} ? $state->{buffers}->{$tag} . $data : $data;
+        # Append in place; rebuilding the string per part is quadratic in
+        # message size.
+        $state->{buffers}->{$tag} .= $data;
 
         delete $state->{key};
 
@@ -1117,7 +1368,7 @@ sub _extract_message {
         my $message = delete $state->{buffers}->{$tag};
         my $parts   = delete $state->{parts}->{$tag};
 
-        return ($id, $message) unless $params{debug};
+        return ($id, $message, $key->{compressed}) unless $params{debug};
 
         return (
             $id,
@@ -1127,6 +1378,7 @@ sub _extract_message {
                 pid     => $key->{pid},
                 tid     => $key->{tid},
             },
+            $key->{compressed},
         );
     }
 }
@@ -1236,11 +1488,25 @@ Fork example from tests:
 
     done_testing;
 
-Optional Zstd compression for bursts and messages (both ends must agree):
+Optional Zstd compression, only for messages too big for one atomic write
+(the recommended way to use compression):
+
+    my ($r, $w) = Atomic::Pipe->pair(compress_large_only => 1);
+
+    # Fits in one atomic part: sent as-is, no compression cost.
+    $w->write_message($small_payload);
+
+    # Larger than one atomic part (4080 bytes on Linux by default): compressed
+    # first, then split only if it is still too big.
+    $w->write_message($big_payload);
+
+    my $msg = $r->read_message;    # decompressed transparently when needed
+
+Pass C<< compression_threshold => $bytes >> to use a different cut-off.
+
+Or compress every burst and message (both ends must agree):
 
     my ($r, $w) = Atomic::Pipe->pair(compression => 'zstd');
-    $w->write_message($big_payload);   # compressed on the wire
-    my $msg = $r->read_message;        # decompressed transparently
 
 See L</COMPRESSION> for details and options.
 
@@ -1376,18 +1642,120 @@ demand.
 =item keep_compressed => $bool
 
 When set together with C<compression>, reads expose the on-wire compressed
-bytes alongside the decompressed payload. See L</read_message> and
-L</get_line_burst_or_data> for the exact return-shape changes. Has no effect
+bytes alongside the decompressed payload. See L<< read_message|/"$msg = $p->read_message" >> and
+L<< get_line_burst_or_data|/"($type, $data) = $r->get_line_burst_or_data()" >> for the exact return-shape changes. Has no effect
 without C<compression>.
 
+Under L</compress_large_only> only messages that were actually compressed
+report a compressed form; messages sent plain return just the payload.
+
+=item compress_large_only => $bool
+
+Compress only messages too big for one atomic part, and send the rest plain.
+Turns on C<< compression => 'zstd' >> when no C<compression> is given, so this
+one option is all most users need. See L</"Compressing only large messages">.
+
+=item compression_threshold => $bytes
+
+B<Optional.> Messages longer than C<$bytes> are compressed.
+
+B<Default:> the largest payload that fits in one atomic part, C<PIPE_BUF>
+minus framing. That is B<4080 bytes> on Linux (4077 in mixed-data mode), so
+exactly the messages that would otherwise be split get compressed.
+
+C<0> compresses every message that compression makes smaller. Unlike plain
+C<compression>, this still uses the flagged format, so incompressible
+messages go out as-is.
+
+Setting this also turns on C<compress_large_only> (and compression). The
+L</compression_threshold> accessor reports the threshold in use.
+
 =back
+
+=head2 Compressing only large messages
+
+With plain C<compression> every burst and message is compressed. For small
+messages that is pure CPU cost: they already fit in one atomic write, and
+decompressing on a single reader is slower than reading them as-is.
+C<compress_large_only> compresses a message only when it is longer than
+L</compression_threshold>, and only keeps the compressed form when it is
+actually smaller (already-compressed or random payloads go out plain).
+
+    my ($r, $w) = Atomic::Pipe->pair(compress_large_only => 1);
+
+That is the whole setup. It turns on zstd and uses the default threshold:
+
+=over 4
+
+=item *
+
+A message that fits in one atomic part (up to 4080 bytes on Linux, 4077 in
+mixed-data mode) is sent as-is.
+
+=item *
+
+A larger message is compressed first, then split into parts only if it is
+still too big for one.
+
+=item *
+
+If compressing does not make it smaller, it is sent as-is (and split as
+usual).
+
+=back
+
+To use a different cut-off:
+
+    my ($r, $w) = Atomic::Pipe->pair(compression_threshold => 16_384);
+
+Each compressed message is marked by the high bit of the part-size field in
+its headers, so the reader knows which messages to decompress. Consequences:
+
+=over 4
+
+=item *
+
+B<Mixing versions is not supported.> Both ends must run this version or
+later. An older reader takes the flagged size field as a ~2 GB part: on a
+plain pipe it stalls until EOF and then throws C<EOF before end of message>,
+and on a FIFO that stays open it hangs forever with no error. Atomic::Pipe is
+almost always used between forked processes running the same code, so this
+should not come up; just don't enable C<compress_large_only> on a writer that
+older readers consume.
+
+=item *
+
+Configure C<compress_large_only> on the reader too (or leave compression off
+there, see the next point). A reader with plain C<compression> and no
+C<compress_large_only> still tries to decompress every unflagged message.
+
+=item *
+
+A reader without C<compression> configured still decompresses flagged
+messages, as long as L<Compress::Zstd> is installed. A custom dictionary must
+still be configured on both ends.
+
+=item *
+
+Bursts (L<< write_burst|/"$undef_or_true = $p->write_burst($data)" >>) are never compressed in this mode, and the reader
+does not try to decompress them.
+
+=item *
+
+With C<keep_compressed>, only messages that were sent compressed report a
+compressed form.
+
+=back
+
+Plain C<compression> without C<compress_large_only> keeps the original wire
+format, so it stays compatible with older versions.
 
 =head2 Custom dictionary
 
 Custom Zstd dictionaries can dramatically reduce frame size for small,
 repetitive payloads. Either form (bytes or file) may be supplied at
-construction or via L</set_compression_dictionary> /
-L</set_compression_dictionary_file>.
+construction or via L<< set_compression_dictionary|/"$p->set_compression_dictionary($bytes)" >> /
+L<< set_compression_dictionary_file|/"$p->set_compression_dictionary_file($path)" >>.
 
 B<Caveat:> raw zstd dictionaries do not embed a dict-ID. As a result a
 B<mismatched> peer dictionary will silently decode to garbage rather than
@@ -1396,79 +1764,69 @@ fatally.) Both ends must agree on byte-identical dictionary content.
 
 =head2 Performance
 
-Compression is not just a wire-size optimization for C<Atomic::Pipe>: when
-messages exceed C<PIPE_BUF> (typically 4096 bytes on Linux) the writer must
-fragment them into multiple non-atomic chunks, and the reader must reassemble
-them. Compressing the payload first frequently collapses a multi-part message
-back into a single atomic burst, which avoids that per-message protocol
-overhead entirely. As a result, on workloads dominated by larger-than-PIPE_BUF
-messages, compression is often B<much faster end-to-end than no compression>,
-even after accounting for the CPU cost of compress/decompress.
-
-The kernel pipe buffer size (see L</resize>) does B<not> affect this --
-fragmentation is keyed on the POSIX C<PIPE_BUF> atomic-write threshold, not on
-the buffer capacity.
-
-=head3 Benchmark: streaming JSON objects
-
-Numbers below are from C<bench/zstd_compression.pl> in the distribution. The
-workload is a synthetic but representative stream of JSON log/event objects
-sent in mixed-data mode via C<write_message>. The corpus is generated once and
-reused across all runs; sizes are JSON-encoded byte counts.
-
-Two corpora were measured:
+Compression trades CPU for wire size. Whether it is also faster depends on
+where the bottleneck is:
 
 =over 4
 
-=item Small JSON (10 MB total, 11785 objects)
+=item *
 
-Object sizes 181 .. 1977 bytes, average ~890 B; ~37% of objects under 500 B.
-Most messages fit in a single C<PIPE_BUF> burst regardless of compression.
+B<Small messages> (that already fit in one atomic part) are always faster
+plain. Compressing them only adds work on both ends.
 
-  level     raw MB/s   wire MB    ratio   saved
-  plain         9.74    10.00       -        -
-  L-3          15.98     6.68    1.50x    33.2%
-  L1           24.55     4.92    2.03x    50.8%
-  L3 (def)     27.79     4.91    2.04x    50.9%
-  L5           46.34     4.87    2.05x    51.3%
-  L7           63.72     4.87    2.05x    51.3%
-  L12          27.02     4.85    2.06x    51.5%
-  L22          14.43     4.84    2.07x    51.6%
+=item *
 
-For this size distribution, levels 1..7 are all faster than no compression
-(pipe back-pressure on the uncompressed run still dominates).
+B<Large messages with one writer> are also faster plain: the reader does the
+same work either way, and decompression is extra.
 
-=item Larger JSON (100 MB total, 20407 objects)
+=item *
 
-Object sizes 187 .. 10000 bytes, average ~5.1 KB, evenly distributed across
-the 1..10 KB range. Most objects exceed C<PIPE_BUF>, so the uncompressed path
-pays the multi-part fragmentation cost on nearly every message.
-
-  level     raw MB/s   wire MB    ratio   saved
-  plain         0.29   100.00       -        -
-  L-3         287.85    35.61    2.81x    64.4%
-  L-1         273.56    33.92    2.95x    66.1%
-  L1          237.04    30.56    3.27x    69.4%
-  L3 (def)    207.61    30.25    3.31x    69.7%
-  L5          113.02    30.01    3.33x    70.0%
-  L9           39.35    29.93    3.34x    70.1%
-  L18           7.81    28.14    3.55x    71.9%
-  L22           7.85    28.14    3.55x    71.9%
-
-Here the uncompressed run collapses to ~0.29 MB/s, while even modest
-compression levels achieve 200+ MB/s -- a ~1000x throughput improvement
-driven almost entirely by avoided fragmentation. Levels above ~5 trade
-significant CPU for negligible additional ratio.
-
-=item Pipe buffer size has minimal impact
-
-The same 100 MB corpus, holding mode constant and varying the kernel pipe
-buffer (32 KB, 128 KB, 512 KB, 1 MB), shows almost no movement in either
-direction. The bottleneck is C<PIPE_BUF>-aligned framing, not buffer fill, so
-calling L</resize> with a larger size will not rescue an uncompressed
-large-message workload.
+B<Large messages from many writers into one reader> can be faster compressed
+in mixed-data mode, where each part costs the reader more. Compression runs in
+parallel in the writers, decompression is cheap, and the reader handles fewer
+parts. This is the case L</compress_large_only> is for. With plain
+C<read_message> the reader is fast enough that plain still wins.
 
 =back
+
+Versions before 0.033 had a reader bug that made reading large streams
+quadratic, especially in mixed-data mode. Compression shrank the stream and so
+hid most of it, which is why older versions of this documentation reported
+compression as up to ~1000x faster. That advice no longer applies.
+
+The kernel pipe buffer size (see L<< resize|/"$p->resize($bytes)" >>) has little effect on throughput.
+
+=head3 Benchmark: streaming JSON objects
+
+From C<bench/zstd_compression.pl> in the distribution: one writer, one reader,
+mixed-data mode, 100 MB of synthetic JSON objects of 187 .. 10000 bytes
+(average ~5.1 KB, so most are larger than C<PIPE_BUF>), 1 MB pipe:
+
+  mode        raw MB/s   wire MB    ratio
+  plain         530.70    100.00       -
+  L-3           276.39     35.61    2.81x
+  L1            240.18     30.56    3.27x
+  L3 (def)      208.35     30.25    3.31x
+  large-only    244.90     40.67    2.46x
+
+("large-only" is C<compress_large_only> at the default threshold and level.)
+
+A separate run with 1 and 8 writers into one reader, MB/s. Large messages are
+~1.6 MB:
+
+  large messages        plain    zstd   large-only
+  1 writer, mixed         883     482          503
+  1 writer, read_msg     1337     530          520
+  8 writers, mixed        878    1143         1112
+  8 writers, read_msg    1339    1148         1171
+
+Small messages are ~1.2 KB, so large-only sends them all plain:
+
+  small messages        plain    zstd   large-only
+  1 writer, mixed         359     121          335
+  1 writer, read_msg      555     129          477
+  8 writers, mixed        344     119          334
+  8 writers, read_msg     649     140          587
 
 =head3 Practical guidance
 
@@ -1476,19 +1834,28 @@ large-message workload.
 
 =item *
 
-If your messages are routinely larger than C<PIPE_BUF> (~4 KB), enabling
-compression is almost always a throughput win, not just a bandwidth win.
+Leave compression off unless wire size matters, or many writers feed one
+reader with large messages in mixed-data mode. With one writer, compression
+of any kind is slower: about half the speed for large messages.
 
 =item *
 
-For mixed JSON-like payloads, B<level 1> or the default B<level 3> are good
-starting points. Level -3 is the throughput champion when CPU is precious and
-some ratio can be sacrificed.
+A reader that is slowed down by other work (for example, it writes every
+message to a database) gains nothing from compression either; the pipe is not
+its bottleneck.
 
 =item *
 
-Levels above ~7 buy single-digit-percent ratio gains for multi-x CPU cost; in
-an IPC path they are rarely worth it.
+If you do enable it, prefer L</compress_large_only> over plain
+C<compression>: small messages go out plain, so they keep their speed, and
+large ones are compressed. With many writers it stays within about 15% of the
+faster of plain and full compression in the runs above.
+
+=item *
+
+For JSON-like payloads, B<level 1> or the default B<level 3> are good
+starting points. Levels above ~7 buy single-digit-percent ratio gains for
+multi-x CPU cost; in an IPC path they are rarely worth it.
 
 =item *
 
@@ -1497,9 +1864,9 @@ small and share structure -- e.g. identical JSON keys across every message.
 
 =back
 
-These results depend heavily on payload entropy and CPU. Re-run
+These results depend heavily on payload entropy, CPU and topology. Re-run
 C<bench/zstd_compression.pl> against a representative slice of your own data
-before committing to a level.
+before deciding.
 
 =head1 METHODS
 
@@ -1640,6 +2007,9 @@ additionally return the raw on-wire compressed bytes:
 In C<< debug => 1 >> mode the returned hashref gains a C<compressed> key
 holding the raw compressed bytes. Scalar-context calls always return just the
 decompressed message, regardless of C<keep_compressed>.
+
+Under L</compress_large_only> only messages that were sent compressed carry
+the extra value; plain messages return just the message.
 
 =item $p->blocking($bool)
 
@@ -1842,6 +2212,9 @@ pair:
     (burst   => $decompressed, compressed => $raw)
     (message => $decompressed, compressed => $raw)
 
+Under L</compress_large_only> bursts and plain messages never include a
+C<compressed> key; only messages that were sent compressed do.
+
 The C<line> and C<peek> paths never include a C<compressed> key. The 2-tuple
 idiom
 
@@ -1865,8 +2238,14 @@ remains valid; the extra elements are simply discarded.
 
 =item $bool = $p->keep_compressed
 
+=item $bool = $p->compress_large_only
+
+=item $bytes_or_undef = $p->compression_threshold
+
 Read-only accessors for the corresponding compression settings. See
-L</COMPRESSION>.
+L</COMPRESSION>. C<compression_threshold> returns the threshold in use while
+C<compress_large_only> is on, including the default (4080 bytes on Linux,
+4077 in mixed-data mode), and undef when it is off.
 
 =item $p->set_compression('zstd', $level)
 
@@ -1901,6 +2280,20 @@ raw-bytes dictionary.
 
 Toggle whether reads expose the raw compressed bytes alongside the
 decompressed payload.
+
+=item $p->set_compress_large_only($bool)
+
+=item $p->set_compress_large_only(1, $threshold)
+
+Turn L</"Compressing only large messages"> on or off. C<$threshold> is
+optional; without it the default is used (one atomic part, 4080 bytes on
+Linux). Turning it on enables C<zstd> compression if it is not already
+enabled.
+
+Turning it off undoes that: it clears the threshold, and if compression was
+only on because of C<compress_large_only>, compression goes off too. If you
+set C<compression> yourself, it stays on and the pipe goes back to
+compressing every burst and message.
 
 =back
 

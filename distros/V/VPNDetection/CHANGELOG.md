@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 3.3.2 are described by their release commits.
 
+## 3.8.0 - 2026-10-19
+
+### Features
+
+- Re-pin the spec to 2026.10.19: num_ports and num_proxies in the pubproxy detail ([`ac7ce7c`](https://github.com/vpndetection-io/sdk-perl/commit/ac7ce7cfa8596ddbc817651200538c638fb4d83e))
+
 ## 3.7.0 - 2026-10-18
 
 ### Features

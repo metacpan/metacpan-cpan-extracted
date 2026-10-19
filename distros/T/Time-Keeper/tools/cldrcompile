@@ -28,11 +28,14 @@ use warnings;
 # length, then the sections. A section holds only what differs from its CLDR
 # parent (fr-CA from fr), which is read first; one with no parent holds all.
 # All integers are little-endian u16, strings are offsets into the pool at
-# its end; a string offset 0xFFFF means "the parent's", 0xFFFE "none":
+# its end in units of two bytes (each pool string is NUL-terminated and padded
+# to an even length, so the pool may reach 128 KB; ff-Adlm passed 64 KB with
+# the weekday words); a string offset 0xFFFF means "the parent's", 0xFFFE "none":
 #
-#   "TKL3" parent nfixed nskel nzone nmeta nterr nrule first_day min_days hc24 ascii
+#   "TKL4" parent nfixed nskel nzone nmeta nterr nrule first_day min_days hc24 ascii
 #          nwords nival weekend_start weekend_end plural
-#   fixed[nfixed]                      the slots of tk_locale_strings, in order
+#   fixed[nfixed]                      the slots of tk_locale_strings, in order; nfixed
+#                                      0xFFFF is all the parent's, with no table
 #   skel[nskel]   key pattern          sorted by key; no pattern removes the parent's
 #   zone[nzone]   index s[7]           index into tk_cldr_zones; sorted
 #   meta[nmeta]   index s[6]           index into tk_metazones; sorted
@@ -40,8 +43,10 @@ use warnings;
 #   rule[nrule]   period from before   minutes; from == before is "at"; nrule
 #                                      0xFFFF is the parent's rules
 #   words[nwords]                      the slots of tk_locale_words, in order: the
-#                                      relative-time fields, the duration units, the
-#                                      list patterns, the interval fallback
+#                                      relative-time fields (the eight units, then the
+#                                      seven weekdays, since TKL4), the duration units,
+#                                      the list patterns, the interval fallback; nwords
+#                                      0xFFFF is all the parent's, with no table
 #   ival[nival]   key letter pattern   interval formats, sorted by key then letter;
 #                                      no pattern removes the parent's
 #   pool
@@ -206,7 +211,7 @@ sub minutes { my ($s) = @_; my ($h, $m) = split /:/, $s; $h * 60 + $m }
 
 # ---- words: relative time, durations, lists, intervals, plurals -------------
 
-my @rel_fields = qw(year quarter month week day hour minute second);
+my @rel_fields = qw(year quarter month week day hour minute second mon tue wed thu fri sat sun);
 my @rel_widths = ('', '-short', '-narrow');
 my @categories = qw(zero one two few many other);
 my @dur_units = qw(year month week day hour minute second millisecond microsecond nanosecond);
@@ -214,7 +219,8 @@ my @list_types = qw(standard unit unit-short unit-narrow);
 my @list_slots = qw(start middle end 2);
 
 # The words of a locale, in the order of tk_locale_words: for each relative
-# field and width the display name, the five relative-type strings (-2 to 2),
+# field (the eight units, then mon to sun, which have no display name and no
+# -2 or 2) and width the display name, the five relative-type strings (-2 to 2),
 # then the future and the past pattern for each plural category; for each
 # duration unit and width the display name and the six count patterns; the
 # three digital duration patterns; the four list patterns' four slots; the
@@ -452,11 +458,12 @@ sub section {
         my $b = $s;
         utf8::encode($b);
         unless (exists $at{$b}) {
-            push @pool, $b . "\0";
-            $at{$b} = $pool_len;
-            $pool_len += length($b) + 1;
+            my $e = $b . "\0" . (length($b) % 2 ? '' : "\0");
+            push @pool, $e;
+            $at{$b} = $pool_len / 2;
+            $pool_len += length $e;
         }
-        die "$code: the pool is over 64 KB\n" if $at{$b} >= 0xFFFE;
+        die "$code: the pool is over 128 KB\n" if $at{$b} >= 0xFFFE;
         return $at{$b};
     };
     my @fixed = map { $p && same($r->{fixed}[$_], $p->{fixed}[$_]) ? 0xFFFF : $str->($r->{fixed}[$_]) } 0 .. $#{ $r->{fixed} };
@@ -486,10 +493,14 @@ sub section {
         my ($skel, $letter) = split /\0/, $k;
         push @ival, [ $str->($skel), ord($letter), $str->($r->{ival}{$k}) ];
     }
-    my @head = (($pc ? $code_id{$pc} : 0xFFFF), scalar(@fixed), scalar(@skel), scalar(@zones), scalar(@metas),
+    my $inherit_fixed = $p && !grep { $_ != 0xFFFF } @fixed;
+    my $inherit_words = $p && !grep { $_ != 0xFFFF } @words;
+    @fixed = () if $inherit_fixed;
+    @words = () if $inherit_words;
+    my @head = (($pc ? $code_id{$pc} : 0xFFFF), ($inherit_fixed ? 0xFFFF : scalar(@fixed)), scalar(@skel), scalar(@zones), scalar(@metas),
                 scalar(@terrs), ($inherit_rules ? 0xFFFF : scalar(@rules)), @{ $r->{head} },
-                scalar(@words), scalar(@ival), @{ $r->{tail} });
-    return 'TKL3' . pack('v*', @head, @fixed, map({ @$_ } @skel, @zones, @metas, @terrs, @rules), @words, map({ @$_ } @ival)) . join('', @pool);
+                ($inherit_words ? 0xFFFF : scalar(@words)), scalar(@ival), @{ $r->{tail} });
+    return 'TKL4' . pack('v*', @head, @fixed, map({ @$_ } @skel, @zones, @metas, @terrs, @rules), @words, map({ @$_ } @ival)) . join('', @pool);
 
 }
 

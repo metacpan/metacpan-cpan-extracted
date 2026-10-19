@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<tube name="Hannover S-Bahn and U-Bahn/Tram">
+  <lines>
+    <!-- U-Bahn/Tram -->
+    <line id="HAN_1" name="1" color="#EF3E23"/>
+    <line id="HAN_10" name="10" color="#71BF44"/>
+    <line id="HAN_11" name="11" color="#FBA51D"/>
+    <line id="HAN_12" name="12" color="#71BF44"/>
+    <line id="HAN_13" name="13" color="#0071BB"/>
+    <line id="HAN_17" name="17" color="#71BF44"/>
+    <line id="HAN_2" name="2" color="#EF3E23"/>
+    <line id="HAN_3" name="3" color="#0071BB"/>
+    <line id="HAN_4" name="4" color="#FBA51D"/>
+    <line id="HAN_5" name="5" color="#FBA51D"/>
+    <line id="HAN_6" name="6" color="#FBA51D"/>
+    <line id="HAN_7" name="7" color="#0071BB"/>
+    <line id="HAN_8" name="8" color="#EF3E23"/>
+    <line id="HAN_9" name="9" color="#0071BB"/>
+    <!-- S-Bahn -->
+    <line id="HAN_S1" name="S1" color="#7A6CAC"/>
+    <line id="HAN_S2" name="S2" color="#00834A"/>
+    <line id="HAN_S21" name="S21" color="#00834A"/>
+    <line id="HAN_S3" name="S3" color="#C66AAB"/>
+    <line id="HAN_S4" name="S4" color="#973050"/>
+    <line id="HAN_S5" name="S5" color="#F68B1F"/>
+    <line id="HAN_S51" name="S51" color="#F68B1F"/>
+    <line id="HAN_S6" name="S6" color="#015BAA"/>
+    <line id="HAN_S7" name="S7" color="#A5CE43"/>
+  </lines>
+  <stations>
+    <!-- 1 -->
+    <station id="han_101" name="Langenhagen" line="HAN_1:1" link="han_102"/>
+    <station id="han_102" name="Langenhagen/Kurt-Schumacher-Allee" line="HAN_1:2" link="han_101,han_103"/>
+    <station id="han_103" name="Langenhagen/Zentrum" line="HAN_1:3" link="han_102,han_104"/>
+    <station id="han_104" name="Langenhagen/Langenforther Platz" line="HAN_1:4" link="han_103,han_105"/>
+    <station id="han_105" name="Langenhagen/Angerstr." line="HAN_1:5" link="han_104,han_106"/>
+    <station id="han_106" name="Berliner Platz" line="HAN_1:6" link="han_105,han_107"/>
+    <station id="han_107" name="Wiesenau" line="HAN_1:7" link="han_106,han_108"/>
+    <station id="han_108" name="Alter Flughafen" line="HAN_1:8" link="han_107,han_109"/>
+    <station id="han_109" name="Kabelkamp" line="HAN_1:9" link="han_108,han_110"/>
+    <station id="han_110" name="Windausstr." line="HAN_1:10" link="han_109,han_111"/>
+    <station id="han_111" name="Büttnerstr." line="HAN_1:11,HAN_2:9" link="han_110,han_112,han_208"/>
+    <station id="han_112" name="Niedersachsenring" line="HAN_1:12,HAN_2:10" link="han_111,han_113"/>
+    <station id="han_113" name="Dragonerstr." line="HAN_1:13,HAN_2:11,HAN_8:1" link="han_112,han_114"/>
+    <station id="han_114" name="Vahrenwalder Platz" line="HAN_1:14,HAN_2:12,HAN_8:2" link="han_113,han_115"/>
+    <station id="han_115" name="Werderstr." line="HAN_1:15,HAN_2:13,HAN_8:3" link="han_114,han_s113"/>
+    <station id="han_s113" name="Hannover Hbf" line="HAN_1:16,HAN_12:15,HAN_13:16,HAN_2:14,HAN_3:15,HAN_7:15,HAN_8:4,HAN_9:16,HAN_S1:13,HAN_S2:13,HAN_S21:1,HAN_S3:1,HAN_S4:10,HAN_S5:7,HAN_S51:5,HAN_S6:1,HAN_S7:1" link="han_115,han_117,han_316,han_s112,han_s114,han_s302,han_s303" other_link="han_hbf:han_1013,han_hbf:han_1014"/>
+    <station id="han_117" name="Kröpcke" line="HAN_1:17,HAN_11:6,HAN_12:14,HAN_13:15,HAN_2:15,HAN_3:14,HAN_4:21,HAN_5:14,HAN_6:12,HAN_7:14,HAN_8:5,HAN_9:15" link="han_118,han_313,han_420,han_s113"/>
+    <station id="han_118" name="Aegidientorplatz" line="HAN_1:18,HAN_11:7,HAN_2:16,HAN_4:22,HAN_5:15,HAN_6:13,HAN_8:6" link="han_117,han_119,han_423"/>
+    <station id="han_119" name="Schlägerstr." line="HAN_1:19,HAN_2:17,HAN_8:7" link="han_118,han_120"/>
+    <station id="han_120" name="Geibelstr." line="HAN_1:20,HAN_2:18,HAN_8:8" link="han_119,han_121"/>
+    <station id="han_121" name="Altenbekener Damm" line="HAN_1:21,HAN_2:19,HAN_8:9" link="han_120,han_122"/>
+    <station id="han_122" name="Döhrener Turm" line="HAN_1:22,HAN_2:20,HAN_8:10" link="han_121,han_123"/>
+    <station id="han_123" name="Fiedelerstr." line="HAN_1:23,HAN_2:21,HAN_8:11" link="han_122,han_124"/>
+    <station id="han_124" name="Peiner Str." line="HAN_1:24,HAN_2:22,HAN_8:12" link="han_123,han_125,han_237"/>
+    <station id="han_125" name="Bothmerstr." line="HAN_1:25,HAN_2:23,HAN_8:13" link="han_124,han_126,han_814"/>
+    <station id="han_126" name="Wiehbergstr." line="HAN_1:26,HAN_2:24" link="han_125,han_127"/>
+    <station id="han_127" name="Am Brabrinke" line="HAN_1:27,HAN_2:25" link="han_126,han_128"/>
+    <station id="han_128" name="Laatzen/Birkenstr." line="HAN_1:28,HAN_2:26" link="han_127,han_129" other_link="laatzen_messe:han_s412"/>
+    <station id="han_129" name="Laatzen/Eichstr." line="HAN_1:29,HAN_2:27" link="han_128,han_130,han_228"/>
+    <station id="han_130" name="Laatzen/Park der Sinne" line="HAN_1:30" link="han_129,han_131"/>
+    <station id="han_131" name="Laatzen/Zentrum" line="HAN_1:31" link="han_130,han_132"/>
+    <station id="han_132" name="Laatzen" line="HAN_1:32" link="han_131,han_133"/>
+    <station id="han_133" name="Laatzen/Rethener Winkel" line="HAN_1:33" link="han_132,han_134"/>
+    <station id="han_134" name="Rethen/Pattenser Str." line="HAN_1:34,HAN_2:33" link="han_133,han_135,han_232"/>
+    <station id="han_135" name="Rethen/Bahnhof" line="HAN_1:35,HAN_2:34" link="han_134,han_136"/>
+    <station id="han_136" name="Rethen/Galgenbergweg" line="HAN_1:36,HAN_2:35" link="han_135,han_137"/>
+    <station id="han_137" name="Gleidingen" line="HAN_1:37,HAN_2:36" link="han_136,han_138"/>
+    <station id="han_138" name="Gleidingen/Thorstr." line="HAN_1:38" link="han_137,han_139"/>
+    <station id="han_139" name="Gleidingen/Am Leinkamp" line="HAN_1:39" link="han_138,han_140"/>
+    <station id="han_140" name="Heisede/Marienburger Str." line="HAN_1:40" link="han_139,han_141"/>
+    <station id="han_141" name="Heisede/Langer Kamp" line="HAN_1:41" link="han_140,han_142"/>
+    <station id="han_142" name="Sarstedt/Am Boksberg" line="HAN_1:42" link="han_141,han_143"/>
+    <station id="han_143" name="Sarstedt/Röntgenstr." line="HAN_1:43" link="han_142,han_s414"/>
+    <station id="han_s414" name="Sarstedt" line="HAN_1:44,HAN_S4:14" link="han_143,han_s413,han_s415"/>
+    <!-- 10 -->
+    <station id="han_1001" name="Ahlem" line="HAN_10:1,HAN_12:1" link="han_1002"/>
+    <station id="han_1002" name="Gedenkstätte Ahlem" line="HAN_10:2,HAN_12:2" link="han_1001,han_1003"/>
+    <station id="han_1003" name="Brunnenstr." line="HAN_10:3,HAN_12:3" link="han_1002,han_1004"/>
+    <station id="han_1004" name="Harenberger Str." line="HAN_10:4,HAN_12:4" link="han_1003,han_1005"/>
+    <station id="han_1005" name="Wunstorfer Str." line="HAN_10:5,HAN_12:5" link="han_1004,han_1006"/>
+    <station id="han_1006" name="Freizeitheim Linden" line="HAN_10:6,HAN_12:6" link="han_1005,han_1007"/>
+    <station id="han_1007" name="Leinaustr." line="HAN_10:7,HAN_12:7" link="han_1006,han_1008"/>
+    <station id="han_1008" name="Am Küchengarten" line="HAN_10:8,HAN_12:8" link="han_1007,han_1009"/>
+    <station id="han_1009" name="Glocksee/Bhf." line="HAN_10:9,HAN_12:9" link="han_1008,han_1010"/>
+    <station id="han_1010" name="Glocksee" line="HAN_10:10,HAN_12:10" link="han_1009,han_1011,han_1211"/>
+    <station id="han_1011" name="Goetheplatz" line="HAN_10:11,HAN_17:9" link="han_1010,han_1211,han_420"/>
+    <station id="han_420" name="Steintor" line="HAN_10:12,HAN_11:5,HAN_17:10,HAN_4:20,HAN_5:13,HAN_6:11" link="han_1011,han_1013,han_117,han_419,han_610"/>
+    <station id="han_1013" name="Hannover Hbf/Rosenstr." line="HAN_10:13,HAN_17:11" link="han_1014,han_420" other_link="han_hbf:han_s113"/>
+    <station id="han_1014" name="Hannover Hbf/ZOB" line="HAN_10:14,HAN_17:12" link="han_1013" other_link="han_hbf:han_s113"/>
+    <!-- 11 -->
+    <station id="han_1101" name="Haltenhoffstr." line="HAN_11:1" link="han_608"/>
+    <station id="han_608" name="An der Strangriede" line="HAN_11:2,HAN_6:8" link="han_1101,han_607,han_609"/>
+    <station id="han_609" name="Kopernikusstr." line="HAN_11:3,HAN_6:9" link="han_608,han_610"/>
+    <station id="han_610" name="Christuskirche" line="HAN_11:4,HAN_6:10" link="han_420,han_609"/>
+    <station id="han_423" name="Marienstr." line="HAN_11:8,HAN_4:23,HAN_5:16,HAN_6:14" link="han_118,han_424"/>
+    <station id="han_424" name="Braunschweiger Platz" line="HAN_11:9,HAN_4:24,HAN_5:17,HAN_6:15" link="han_423,han_425,han_616"/>
+    <station id="han_425" name="Clausewitzstr." line="HAN_11:10,HAN_4:25,HAN_5:18" link="han_1111,han_424,han_426"/>
+    <station id="han_1111" name="Hannover Congress Centrum" line="HAN_11:11" link="han_1112,han_425"/>
+    <station id="han_1112" name="Zoo" line="HAN_11:12" link="han_1111"/>
+    <!-- 12 -->
+    <station id="han_1211" name="Humboldtstr." line="HAN_12:11,HAN_17:8" link="han_1010,han_1011,han_312,han_912"/>
+    <station id="han_312" name="Waterloo" line="HAN_12:12,HAN_13:13,HAN_3:12,HAN_7:12,HAN_9:13" link="han_1211,han_311,han_313,han_912"/>
+    <station id="han_313" name="Markthalle/Landtag" line="HAN_12:13,HAN_13:14,HAN_3:13,HAN_7:13,HAN_9:14" link="han_117,han_312"/>
+    <!-- 13 -->
+    <station id="han_1301" name="Hemmingen" line="HAN_13:1" link="han_1302"/>
+    <station id="han_1302" name="Hemmingen/Berliner Str." line="HAN_13:2" link="han_1301,han_1303"/>
+    <station id="han_1303" name="Hemmingen/Zentrum" line="HAN_13:3" link="han_1302,han_1304"/>
+    <station id="han_1304" name="Hemmingen/Saarstr." line="HAN_13:4" link="han_1303,han_1305"/>
+    <station id="han_1305" name="Stadtfriedhof Ricklingen" line="HAN_13:5" link="han_1304,han_1306"/>
+    <station id="han_1306" name="Unter den Birken" line="HAN_13:6" link="han_1305,han_306"/>
+    <station id="han_306" name="Wallensteinstr." line="HAN_13:7,HAN_17:1,HAN_3:6,HAN_7:6" link="han_1306,han_305,han_307"/>
+    <station id="han_307" name="Beekestr." line="HAN_13:8,HAN_17:2,HAN_3:7,HAN_7:7" link="han_306,han_308"/>
+    <station id="han_308" name="Schünemannplatz" line="HAN_13:9,HAN_17:3,HAN_3:8,HAN_7:8" link="han_307,han_s115"/>
+    <station id="han_s115" name="Linden/Fischerhof" line="HAN_13:10,HAN_17:4,HAN_3:9,HAN_7:9,HAN_S1:15,HAN_S2:15,HAN_S21:3,HAN_S5:9,HAN_S51:7" link="han_308,han_310,han_s114,han_s116"/>
+    <station id="han_310" name="Stadionbrücke" line="HAN_13:11,HAN_17:5,HAN_3:10,HAN_7:10" link="han_311,han_s115"/>
+    <station id="han_311" name="Allerweg" line="HAN_13:12,HAN_17:6,HAN_3:11,HAN_7:11" link="han_310,han_312,han_912"/>
+    <station id="han_316" name="Sedanstr./Lister Meile" line="HAN_13:17,HAN_3:16,HAN_7:16" link="han_317,han_s113"/>
+    <station id="han_317" name="Lister Platz" line="HAN_13:18,HAN_3:17,HAN_7:17" link="han_316,han_318"/>
+    <station id="han_318" name="Lortzingstr." line="HAN_13:19,HAN_3:18,HAN_7:18" link="han_317,han_319"/>
+    <station id="han_319" name="Vier Grenzen" line="HAN_13:20,HAN_3:19,HAN_7:19" link="han_318,han_320"/>
+    <station id="han_320" name="Pelikanstr." line="HAN_13:21,HAN_3:20,HAN_7:20" link="han_319,han_321"/>
+    <station id="han_321" name="Spannhagengarten" line="HAN_13:22,HAN_3:21,HAN_7:21" link="han_320,han_322"/>
+    <station id="han_322" name="Klingerstr." line="HAN_13:23,HAN_3:22,HAN_7:22" link="han_321,han_323"/>
+    <station id="han_323" name="Noltemeyerbrücke" line="HAN_13:24,HAN_3:23,HAN_7:23" link="han_1325,han_1330,han_322,han_324"/>
+    <station id="han_1325" name="Bothfelder Kirchweg" line="HAN_13:25" link="han_1326,han_323"/>
+    <station id="han_1326" name="Bothfeld" line="HAN_13:26" link="han_1325,han_1327"/>
+    <station id="han_1327" name="Kurze-Kamp-Str." line="HAN_13:27" link="han_1326,han_1328"/>
+    <station id="han_1328" name="Stadtfriedhof Bothfeld" line="HAN_13:28" link="han_1327,han_1329"/>
+    <station id="han_1329" name="Fasanenkrug" line="HAN_13:29" link="han_1328"/>
+    <station id="han_1330" name="Buchholz/Bhf." line="HAN_13:30" link="han_323"/>
+    <!-- 17 -->
+    <station id="han_912" name="Schwarzer Bär" line="HAN_17:7,HAN_9:12" link="han_1211,han_311,han_312,han_911"/>
+    <!-- 2 -->
+    <station id="han_201" name="Alte Heide" line="HAN_2:1" link="han_202"/>
+    <station id="han_202" name="Bahnstrift" line="HAN_2:2" link="han_201,han_203"/>
+    <station id="han_203" name="Tempelhofweg" line="HAN_2:3" link="han_202,han_204"/>
+    <station id="han_204" name="Zehlendorfweg" line="HAN_2:4" link="han_203,han_205"/>
+    <station id="han_205" name="Papenwinkel" line="HAN_2:5" link="han_204,han_206"/>
+    <station id="han_206" name="Vahrenheider Markt" line="HAN_2:6" link="han_205,han_207"/>
+    <station id="han_207" name="Reiterstadion" line="HAN_2:7" link="han_206,han_208"/>
+    <station id="han_208" name="Großer Kolonnenweg" line="HAN_2:8" link="han_111,han_207"/>
+    <station id="han_228" name="Laatzen/aquaLaatzium" line="HAN_2:28" link="han_129,han_229"/>
+    <station id="han_229" name="Laatzen/Krankenhaus" line="HAN_2:29" link="han_228,han_230"/>
+    <station id="han_230" name="Laatzen/Neuer Schlag" line="HAN_2:30" link="han_229,han_231"/>
+    <station id="han_231" name="Laatzen/Ginsterweg" line="HAN_2:31" link="han_230,han_232"/>
+    <station id="han_232" name="Rethen/Steinfeld" line="HAN_2:32" link="han_134,han_231"/>
+    <station id="han_237" name="Döhren/Bhf." line="HAN_2:37" link="han_124"/>
+    <!-- 3 -->
+    <station id="han_301" name="Wettbergen" line="HAN_3:1,HAN_7:1" link="han_302"/>
+    <station id="han_302" name="Tresckowstr." line="HAN_3:2,HAN_7:2" link="han_301,han_303"/>
+    <station id="han_303" name="Mühlenberger Markt" line="HAN_3:3,HAN_7:3" link="han_302,han_304"/>
+    <station id="han_304" name="Am Sauerwinkel" line="HAN_3:4,HAN_7:4" link="han_303,han_305"/>
+    <station id="han_305" name="Bartold-Knaust-Str." line="HAN_3:5,HAN_7:5" link="han_304,han_306"/>
+    <station id="han_324" name="In den sieben Stücken" line="HAN_3:24,HAN_7:24" link="han_323,han_325"/>
+    <station id="han_325" name="Paracelsusweg" line="HAN_3:25,HAN_7:25" link="han_324,han_326,han_726"/>
+    <station id="han_326" name="Stadtfriedhof Lahe" line="HAN_3:26" link="han_325,han_327"/>
+    <station id="han_327" name="Oldenburger Allee" line="HAN_3:27" link="han_326,han_328"/>
+    <station id="han_328" name="Altwarmbüchen/Opelstr." line="HAN_3:28" link="han_327,han_329"/>
+    <station id="han_329" name="Altwarmbüchen/Ernst-Grote-Str." line="HAN_3:29" link="han_328,han_330"/>
+    <station id="han_330" name="Altwarmbüchen/Zentrum" line="HAN_3:30" link="han_329,han_331"/>
+    <station id="han_331" name="Altwarmbüchen" line="HAN_3:31" link="han_330"/>
+    <!-- 4 -->
+    <station id="han_401" name="Garbsen" line="HAN_4:1" link="han_402"/>
+    <station id="han_402" name="Auf der Horst/Marshof" line="HAN_4:2" link="han_401,han_403"/>
+    <station id="han_403" name="Auf der Horst/Skorpiongasse" line="HAN_4:3" link="han_402,han_404"/>
+    <station id="han_404" name="Schönebecker Allee" line="HAN_4:4" link="han_403,han_405"/>
+    <station id="han_405" name="Pascalstr." line="HAN_4:5" link="han_404,han_406"/>
+    <station id="han_406" name="Wissenschaftspark Marienwerder" line="HAN_4:6" link="han_405,han_407"/>
+    <station id="han_407" name="Jädekamp" line="HAN_4:7" link="han_406,han_408"/>
+    <station id="han_408" name="Auf der Klappenburg" line="HAN_4:8" link="han_407,han_409"/>
+    <station id="han_409" name="Lauckerhof" line="HAN_4:9" link="han_408,han_410"/>
+    <station id="han_410" name="Freudenthalstr." line="HAN_4:10,HAN_5:3" link="han_409,han_411,han_502"/>
+    <station id="han_411" name="Stadtfriedhof Stöcken" line="HAN_4:11,HAN_5:4" link="han_410,han_s111"/>
+    <station id="han_s111" name="Leinhausen" line="HAN_4:12,HAN_5:5,HAN_S1:11,HAN_S2:11,HAN_S51:3" link="han_411,han_413,han_434,han_s110,han_s112"/>
+    <station id="han_413" name="Herrenhäuser Markt" line="HAN_4:13,HAN_5:6" link="han_414,han_s111"/>
+    <station id="han_414" name="Schaumburgstr." line="HAN_4:14,HAN_5:7" link="han_413,han_415"/>
+    <station id="han_415" name="Herrenhäuser Gärten" line="HAN_4:15,HAN_5:8" link="han_414,han_416"/>
+    <station id="han_416" name="Appelstr." line="HAN_4:16,HAN_5:9" link="han_415,han_417"/>
+    <station id="han_417" name="Schneiderberg/W.-Busch-Museum" line="HAN_4:17,HAN_5:10" link="han_416,han_418"/>
+    <station id="han_418" name="Leibniz Universität" line="HAN_4:18,HAN_5:11" link="han_417,han_419"/>
+    <station id="han_419" name="Königsworther Platz" line="HAN_4:19,HAN_5:12" link="han_418,han_420"/>
+    <station id="han_426" name="Kantplatz" line="HAN_4:26,HAN_5:19" link="han_425,han_427"/>
+    <station id="han_427" name="Uhlhornstr." line="HAN_4:27,HAN_5:20" link="han_426,han_428" other_link="kleefeld:han_s302"/>
+    <station id="han_428" name="Nackenberg" line="HAN_4:28,HAN_5:21" link="han_427,han_522,han_s303"/>
+    <station id="han_s303" name="Karl-Wiechert-Allee" line="HAN_4:29,HAN_S3:3,HAN_S6:2,HAN_S7:3" link="han_428,han_430,han_s113,han_s302,han_s304,han_s603"/>
+    <station id="han_430" name="Misburger Str." line="HAN_4:30" link="han_431,han_s303"/>
+    <station id="han_431" name="Medizinische Hochschule" line="HAN_4:31" link="han_430,han_432"/>
+    <station id="han_432" name="Roderbruchmarkt" line="HAN_4:32" link="han_431,han_433"/>
+    <station id="han_433" name="Roderbruch" line="HAN_4:33" link="han_432"/>
+    <station id="han_434" name="Fuhsestr." line="HAN_4:34,HAN_5:30" link="han_435,han_s111"/>
+    <station id="han_435" name="Fuhsestr./Bhf." line="HAN_4:35,HAN_5:31" link="han_434"/>
+    <!-- 5 -->
+    <station id="han_501" name="Stöcken" line="HAN_5:1" link="han_502"/>
+    <station id="han_502" name="Stöckener Markt" line="HAN_5:2" link="han_410,han_501"/>
+    <station id="han_522" name="Annastift" line="HAN_5:22" link="han_428,han_523"/>
+    <station id="han_523" name="Bleekstr." line="HAN_5:23" link="han_522,han_524"/>
+    <station id="han_524" name="Saarbrückener Str." line="HAN_5:24" link="han_523,han_525"/>
+    <station id="han_525" name="Großer Hillen" line="HAN_5:25" link="han_524,han_526"/>
+    <station id="han_526" name="Tiergarten" line="HAN_5:26" link="han_525,han_527"/>
+    <station id="han_527" name="Ostfeldstr." line="HAN_5:27" link="han_526,han_528"/>
+    <station id="han_528" name="Königsbergwer Str." line="HAN_5:28" link="han_527,han_529"/>
+    <station id="han_529" name="Anderten" line="HAN_5:29" link="han_528"/>
+    <!-- 6 -->
+    <station id="han_601" name="Nordhafen" line="HAN_6:1" link="han_602"/>
+    <station id="han_602" name="Mecklenheidestr." line="HAN_6:2" link="han_601,han_603"/>
+    <station id="han_603" name="Beneckeallee" line="HAN_6:3" link="han_602,han_604"/>
+    <station id="han_604" name="Friedenauer Str." line="HAN_6:4" link="han_603,han_605"/>
+    <station id="han_605" name="Krepenstr." line="HAN_6:5" link="han_604,han_606"/>
+    <station id="han_606" name="Hainhölzer Markt" line="HAN_6:6" link="han_605,han_607"/>
+    <station id="han_607" name="Fenskestr." line="HAN_6:7" link="han_606,han_608"/>
+    <station id="han_616" name="Freundallee" line="HAN_6:16" link="han_424,han_617"/>
+    <station id="han_617" name="Kerstingstr." line="HAN_6:17" link="han_616,han_618"/>
+    <station id="han_618" name="Kinderkrankenhaus auf der Bult" line="HAN_6:18" link="han_617,han_619"/>
+    <station id="han_619" name="Zuschlagstr." line="HAN_6:19" link="han_618,han_620"/>
+    <station id="han_620" name="Bünteweg/TiHo" line="HAN_6:20" link="han_619,han_621"/>
+    <station id="han_621" name="August-Madsack-Str." line="HAN_6:21" link="han_620,han_622"/>
+    <station id="han_622" name="Seelhorster Allee" line="HAN_6:22" link="han_621,han_623"/>
+    <station id="han_623" name="Emslandstr." line="HAN_6:23" link="han_622,han_624"/>
+    <station id="han_624" name="Brabeckstr." line="HAN_6:24" link="han_623,han_625"/>
+    <station id="han_625" name="Feldbuschwende" line="HAN_6:25" link="han_624,han_626"/>
+    <station id="han_626" name="Kronsberg" line="HAN_6:26" link="han_625,han_627"/>
+    <station id="han_627" name="Krügerskamp" line="HAN_6:27" link="han_626,han_628"/>
+    <station id="han_628" name="Stockholmer Allee" line="HAN_6:28" link="han_627,han_629"/>
+    <station id="han_629" name="Messe/Ost (Expo-Plaza)" line="HAN_6:29" link="han_628"/>
+    <!-- 7 -->
+    <station id="han_726" name="Pappelwiese" line="HAN_7:26" link="han_325,han_727"/>
+    <station id="han_727" name="Schierholzstr." line="HAN_7:27" link="han_726,han_728"/>
+    <station id="han_728" name="Kafkastr." line="HAN_7:28" link="han_727,han_729"/>
+    <station id="han_729" name="Am Forstkamp" line="HAN_7:29" link="han_728,han_730"/>
+    <station id="han_730" name="Misburg" line="HAN_7:30" link="han_729"/>
+    <!-- 8 -->
+    <station id="han_814" name="Stadtfriedhof Seelhorst" line="HAN_8:14" link="han_125,han_815"/>
+    <station id="han_815" name="Am Mittelfelde" line="HAN_8:15" link="han_814,han_816"/>
+    <station id="han_816" name="Messe/Nord" line="HAN_8:16" link="han_815"/>
+    <!-- 9 -->
+    <station id="han_s117" name="Empelde" line="HAN_9:1,HAN_S1:17,HAN_S2:17,HAN_S21:5,HAN_S5:11,HAN_S51:9" link="han_902,han_s116,han_s118"/>
+    <station id="han_902" name="Hermann-Ehlers-Allee" line="HAN_9:2" link="han_903,han_s117"/>
+    <station id="han_903" name="Safariweg" line="HAN_9:3" link="han_902,han_904"/>
+    <station id="han_904" name="Riecherstr." line="HAN_9:4" link="han_903,han_905"/>
+    <station id="han_905" name="Am Soltekampe" line="HAN_9:5" link="han_904,han_906"/>
+    <station id="han_906" name="Körtingsdorfer Weg" line="HAN_9:6" link="han_905,han_907"/>
+    <station id="han_907" name="Bauweg" line="HAN_9:7" link="han_906,han_908"/>
+    <station id="han_908" name="Am Lindener Hafen" line="HAN_9:8" link="han_907,han_909"/>
+    <station id="han_909" name="Bernhard-Caspar-Str." line="HAN_9:9" link="han_908,han_910"/>
+    <station id="han_910" name="Nieschlagstr." line="HAN_9:10" link="han_909,han_911"/>
+    <station id="han_911" name="Lindener Marktplatz" line="HAN_9:11" link="han_910,han_912"/>
+    <!-- S1 -->
+    <station id="han_s101" name="Minden" line="HAN_S1:1" link="han_s102"/>
+    <station id="han_s102" name="Bückeburg" line="HAN_S1:2" link="han_s101,han_s103"/>
+    <station id="han_s103" name="Kirchhorsten" line="HAN_S1:3" link="han_s102,han_s104"/>
+    <station id="han_s104" name="Stadthagen" line="HAN_S1:4" link="han_s103,han_s105"/>
+    <station id="han_s105" name="Lindhorst" line="HAN_S1:5" link="han_s104,han_s106"/>
+    <station id="han_s106" name="Haste" line="HAN_S1:6,HAN_S2:28" link="han_s105,han_s107,han_s127"/>
+    <station id="han_s107" name="Wunstorf" line="HAN_S1:7,HAN_S2:7" link="han_s106,han_s108,han_s206"/>
+    <station id="han_s108" name="Dedensen/Gümmer" line="HAN_S1:8,HAN_S2:8" link="han_s107,han_s109"/>
+    <station id="han_s109" name="Seelze" line="HAN_S1:9,HAN_S2:9,HAN_S51:1" link="han_s108,han_s110"/>
+    <station id="han_s110" name="Letter" line="HAN_S1:10,HAN_S2:10,HAN_S51:2" link="han_s109,han_s111"/>
+    <station id="han_s112" name="Nordstadt" line="HAN_S1:12,HAN_S2:12,HAN_S4:9,HAN_S5:6,HAN_S51:4" link="han_s111,han_s113,han_s408"/>
+    <station id="han_s114" name="Bismarckstr." line="HAN_S1:14,HAN_S2:14,HAN_S21:2,HAN_S4:11,HAN_S5:8,HAN_S51:6" link="han_s113,han_s115,han_s412"/>
+    <station id="han_s116" name="Bornum" line="HAN_S1:16,HAN_S2:16,HAN_S21:4,HAN_S5:10,HAN_S51:8" link="han_s115,han_s117"/>
+    <station id="han_s118" name="Ronnenberg" line="HAN_S1:18,HAN_S2:18,HAN_S21:6,HAN_S5:12,HAN_S51:10" link="han_s117,han_s119"/>
+    <station id="han_s119" name="Weetzen" line="HAN_S1:19,HAN_S2:19,HAN_S21:7,HAN_S5:13,HAN_S51:11" link="han_s118,han_s120,han_s514"/>
+    <station id="han_s120" name="Lemmie" line="HAN_S1:20,HAN_S2:20,HAN_S21:8" link="han_s119,han_s121"/>
+    <station id="han_s121" name="Wennigsen (Deister)" line="HAN_S1:21,HAN_S2:21,HAN_S21:9" link="han_s120,han_s122"/>
+    <station id="han_s122" name="Egestorf (Deister)" line="HAN_S1:22,HAN_S2:22,HAN_S21:10" link="han_s121,han_s123"/>
+    <station id="han_s123" name="Kirchdorf (Deister)" line="HAN_S1:23,HAN_S2:23,HAN_S21:11" link="han_s122,han_s124"/>
+    <station id="han_s124" name="Barsinghausen" line="HAN_S1:24,HAN_S2:24,HAN_S21:12" link="han_s123,han_s125"/>
+    <station id="han_s125" name="Winninghausen" line="HAN_S1:25,HAN_S2:25" link="han_s124,han_s126"/>
+    <station id="han_s126" name="Bantorf" line="HAN_S1:26,HAN_S2:26" link="han_s125,han_s127"/>
+    <station id="han_s127" name="Bad Nenndorf" line="HAN_S1:27,HAN_S2:27" link="han_s106,han_s126"/>
+    <!-- S2 -->
+    <station id="han_s201" name="Nienburg" line="HAN_S2:1" link="han_s202"/>
+    <station id="han_s202" name="Linsburg" line="HAN_S2:2" link="han_s201,han_s203"/>
+    <station id="han_s203" name="Hagen (Han)" line="HAN_S2:3" link="han_s202,han_s204"/>
+    <station id="han_s204" name="Eilvese" line="HAN_S2:4" link="han_s203,han_s205"/>
+    <station id="han_s205" name="Neustadt am Rübenberge" line="HAN_S2:5" link="han_s204,han_s206"/>
+    <station id="han_s206" name="Poggenhagen" line="HAN_S2:6" link="han_s107,han_s205"/>
+    <!-- S21 -->
+    <!-- S3 -->
+    <station id="han_s302" name="Kleefeld" line="HAN_S3:2,HAN_S7:2" link="han_s113,han_s303" other_link="kleefeld:han_427"/>
+    <station id="han_s304" name="Anderten/Misburg" line="HAN_S3:4,HAN_S7:4" link="han_s303,han_s305"/>
+    <station id="han_s305" name="Ahlten" line="HAN_S3:5,HAN_S7:5" link="han_s304,han_s306"/>
+    <station id="han_s306" name="Lehrte" line="HAN_S3:6,HAN_S7:6" link="han_s305,han_s307,han_s603"/>
+    <station id="han_s307" name="Sehnde" line="HAN_S3:7" link="han_s306,han_s308"/>
+    <station id="han_s308" name="Algermissen" line="HAN_S3:8" link="han_s307,han_s309"/>
+    <station id="han_s309" name="Harsum" line="HAN_S3:9" link="han_s308,han_s310"/>
+    <station id="han_s310" name="Hildesheim Hbf" line="HAN_S3:10,HAN_S4:17" link="han_s309,han_s416"/>
+    <!-- S4 -->
+    <station id="han_s401" name="Bennemühlen" line="HAN_S4:1" link="han_s402"/>
+    <station id="han_s402" name="Mellendorf" line="HAN_S4:2" link="han_s401,han_s403"/>
+    <station id="han_s403" name="Bissendorf" line="HAN_S4:3" link="han_s402,han_s404"/>
+    <station id="han_s404" name="Langenhagen-Kaltenweide" line="HAN_S4:4" link="han_s403,han_s405"/>
+    <station id="han_s405" name="Langenhagen-Pferdemarkt" line="HAN_S4:5,HAN_S5:2" link="han_s404,han_s406,han_s501"/>
+    <station id="han_s406" name="Langenhagen-Mitte" line="HAN_S4:6,HAN_S5:3" link="han_s405,han_s407"/>
+    <station id="han_s407" name="Vinnhorst" line="HAN_S4:7,HAN_S5:4" link="han_s406,han_s408"/>
+    <station id="han_s408" name="Ledeburg" line="HAN_S4:8,HAN_S5:5" link="han_s112,han_s407"/>
+    <station id="han_s412" name="Messe/Laatzen" line="HAN_S4:12" link="han_s114,han_s413" other_link="laatzen_messe:han_128"/>
+    <station id="han_s413" name="Rethen (Leine)" line="HAN_S4:13" link="han_s412,han_s414"/>
+    <station id="han_s415" name="Barnten" line="HAN_S4:15" link="han_s414,han_s416"/>
+    <station id="han_s416" name="Emmerke" line="HAN_S4:16" link="han_s310,han_s415"/>
+    <!-- S5 -->
+    <station id="han_s501" name="Flughafen" line="HAN_S5:1" link="han_s405"/>
+    <station id="han_s514" name="Holtensen/Linderte" line="HAN_S5:14,HAN_S51:12" link="han_s119,han_s515"/>
+    <station id="han_s515" name="Bennigsen" line="HAN_S5:15,HAN_S51:13" link="han_s514,han_s516"/>
+    <station id="han_s516" name="Völksen/Eldagsen" line="HAN_S5:16,HAN_S51:14" link="han_s515,han_s517"/>
+    <station id="han_s517" name="Springe" line="HAN_S5:17,HAN_S51:15" link="han_s516,han_s518"/>
+    <station id="han_s518" name="Bad Münder" line="HAN_S5:18,HAN_S51:16" link="han_s517,han_s519"/>
+    <station id="han_s519" name="Hameln" line="HAN_S5:19,HAN_S51:17" link="han_s518,han_s520"/>
+    <station id="han_s520" name="Emmerthal" line="HAN_S5:20" link="han_s519,han_s521"/>
+    <station id="han_s521" name="Bad Pyrmont" line="HAN_S5:21" link="han_s520,han_s522"/>
+    <station id="han_s522" name="Lügde" line="HAN_S5:22" link="han_s521,han_s523"/>
+    <station id="han_s523" name="Schieder" line="HAN_S5:23" link="han_s522,han_s524"/>
+    <station id="han_s524" name="Steinheim (Westf)" line="HAN_S5:24" link="han_s523,han_s525"/>
+    <station id="han_s525" name="Altenbeken" line="HAN_S5:25" link="han_s524,han_s526"/>
+    <station id="han_s526" name="Paderborn Hbf" line="HAN_S5:26" link="han_s525"/>
+    <!-- S51 -->
+    <!-- S6 -->
+    <station id="han_s603" name="Aligse" line="HAN_S6:3,HAN_S7:7" link="han_s303,han_s306,han_s604"/>
+    <station id="han_s604" name="Burgdorf" line="HAN_S6:4,HAN_S7:8" link="han_s603,han_s605"/>
+    <station id="han_s605" name="Otze" line="HAN_S6:5,HAN_S7:9" link="han_s604,han_s606"/>
+    <station id="han_s606" name="Ehlershausen" line="HAN_S6:6,HAN_S7:10" link="han_s605,han_s607"/>
+    <station id="han_s607" name="Celle" line="HAN_S6:7,HAN_S7:11" link="han_s606"/>
+    <!-- S7 -->
+  </stations>
+</tube>

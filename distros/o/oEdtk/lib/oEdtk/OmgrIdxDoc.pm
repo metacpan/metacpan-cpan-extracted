@@ -2,7 +2,7 @@ package oEdtk::OmgrIdxDoc;
 use strict;
 use warnings;
 
-our $VERSION = 2.1109;
+our $VERSION = 2.1126;
 
 use base 'oEdtk::Doc';
 use oEdtk::Config  qw(config_read);
@@ -80,3 +80,56 @@ sub dump {
 }
 
 1;
+
+=head1 NAME
+
+oEdtk::OmgrIdxDoc - Outmngr index document (CSV lines)
+
+=head1 SYNOPSIS
+
+    use oEdtk::OmgrIdxDoc;
+
+    my $doc = oEdtk::OmgrIdxDoc->new;
+    $doc->mktag('ED_IDLDOC', $idldoc);
+    $doc->dump;   # one CSV line, in @INDEX_COLS order
+
+=head1 DESCRIPTION
+
+An C<oEdtk::Doc> subclass that produces the index records consumed by
+Outmngr. The column list and order come from C<@INDEX_COLS> in
+C<oEdtk::DBAdmin>; each emitted document is a single CSV line built with
+C<Text::CSV>.
+
+=head1 METHODS
+
+=head2 new
+
+    my $doc = oEdtk::OmgrIdxDoc->new;
+
+Build the document, creating the C<Text::CSV> writer and the header line from
+C<@INDEX_COLS>, and clear the tag hash.
+
+=head2 mktag
+
+    my $name = $doc->mktag($name, $value);
+
+Record the index value C<$value> under the column C<$name> and return C<$name>.
+
+=head2 reset
+
+    $doc->reset;
+
+Clear the recorded tag values.
+
+=head2 dump
+
+    my $line = $doc->dump;
+
+Return the recorded values, in C<@INDEX_COLS> order, combined into one CSV
+line.
+
+=head1 AUTHOR
+
+The oEdtk team.
+
+=cut

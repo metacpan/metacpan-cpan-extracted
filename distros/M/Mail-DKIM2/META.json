@@ -35,6 +35,7 @@
             "Mail::AuthenticationResults" : "0",
             "Mail::Milter::Authentication" : "0",
             "Net::SMTP" : "0",
+            "Net::SSLeay" : "1.38",
             "Sendmail::PMilter" : "1.28",
             "Sys::Syslog" : "0"
          },
@@ -74,6 +75,6 @@
          "web" : "https://github.com/dkim2wg/interop"
       }
    },
-   "version" : "0.21",
+   "version" : "0.22",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

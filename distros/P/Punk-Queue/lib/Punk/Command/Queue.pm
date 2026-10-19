@@ -6,7 +6,7 @@ use warnings;
 use Punk::Command ();
 use Punk::Queue::Command ();
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 # The seam bin/punk probes on an unknown command: loading this module is the
 # registration. `punk queue X ...` forwards raw argv to the punk-queue

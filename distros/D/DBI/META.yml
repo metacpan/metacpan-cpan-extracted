@@ -6,6 +6,14 @@ build_requires:
   perl: '5.008001'
 configure_requires:
   ExtUtils::MakeMaker: '6.48'
+conflicts:
+  DBD::Amazon: <= 0.10
+  DBD::AnyData: <= 0.110
+  DBD::CSV: <= 0.36
+  DBD::Google: <= 0.51
+  DBD::PO: <= 2.10
+  DBD::RAM: <= 0.072
+  SQL::Statement: <= 1.33
 dynamic_config: 1
 generated_by: Author, CPAN::Meta::Converter version 2.150015
 license: perl
@@ -19,13 +27,13 @@ provides:
     version: '12.008696'
   DBD::DBM:
     file: lib/DBD/DBM.pm
-    version: '0.08'
+    version: '1.656'
   DBD::ExampleP:
     file: lib/DBD/ExampleP.pm
     version: '12.014311'
   DBD::File:
     file: lib/DBD/File.pm
-    version: '0.45'
+    version: '1.656'
   DBD::Gofer:
     file: lib/DBD/Gofer.pm
     version: '0.015327'
@@ -70,7 +78,7 @@ provides:
     version: '12.010003'
   DBI:
     file: DBI.pm
-    version: '1.655'
+    version: '1.656'
   DBI::Const::GetInfo::ANSI:
     file: lib/DBI/Const/GetInfo/ANSI.pm
     version: '2.008697'
@@ -91,7 +99,7 @@ provides:
     version: '2.014214'
   DBI::DBD::SqlEngine:
     file: lib/DBI/DBD/SqlEngine.pm
-    version: '0.06'
+    version: '1.656'
   DBI::Gofer::Execute:
     file: lib/DBI/Gofer/Execute.pm
     version: '0.014283'
@@ -159,4 +167,4 @@ resources:
   bugtracker: https://github.com/perl5-dbi/dbi/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/perl5-dbi/dbi
-version: '1.655'
+version: '1.656'

@@ -11,19 +11,20 @@ enum {
     TK_A_WEEK, TK_A_LOCALE, TK_A_DAY_OF_WEEK, TK_A_OR_SAME, TK_A_N, TK_A_TO,
     TK_A_INCREMENT, TK_A_MODE, TK_A_LARGEST, TK_A_SMALLEST, TK_A_RELATIVE_TO, TK_A_UNIT,
     TK_A_STYLE, TK_A_NUMERIC, TK_A_UNITS, TK_A_SKELETON, TK_A_WEEK_START, TK_A_BY, TK_A_STEP, TK_A_INCLUSIVE,
-    TK_A_END_OF_MONTH, TK_A_COUNT
+    TK_A_END_OF_MONTH, TK_A_CALENDAR, TK_A_ERA, TK_A_ERA_YEAR, TK_A_MONTH_CODE, TK_A_COUNT
 };
 
 static const char *const tk_arg_names[TK_A_COUNT] = {
     "year", "month", "day", "hour", "minute", "second",
     "nanosecond", "zone", "gap", "overlap", "day_of_year", "week", "locale",
     "day_of_week", "or_same", "n", "to", "increment", "mode", "largest", "smallest",
-    "relative_to", "unit", "style", "numeric", "units", "skeleton", "week_start", "by", "step", "inclusive", "end_of_month"
+    "relative_to", "unit", "style", "numeric", "units", "skeleton", "week_start", "by", "step", "inclusive", "end_of_month", "calendar", "era", "era_year", "month_code"
 };
 
-#define TK_A(bit) (1u << (bit))
+#define TK_A(bit) ((uint64_t)1 << (bit))
 #define TK_A_TIME (TK_A(TK_A_HOUR) | TK_A(TK_A_MINUTE) | TK_A(TK_A_SECOND) | TK_A(TK_A_NANOSECOND))
 #define TK_A_RESOLVE (TK_A(TK_A_ZONE) | TK_A(TK_A_GAP) | TK_A(TK_A_OVERLAP))
+#define TK_A_CAL (TK_A(TK_A_CALENDAR) | TK_A(TK_A_ERA) | TK_A(TK_A_ERA_YEAR) | TK_A(TK_A_MONTH_CODE))
 
 /* The locale asked for, or English. */
 #define tk_args_locale(a, what) ((a)->v[TK_A_LOCALE] ? tk_locale_id_from_sv(aTHX_ (a)->v[TK_A_LOCALE], what) : 0)
@@ -33,7 +34,7 @@ typedef struct tk_args {
 } tk_args;
 
 static void
-tk_args_parse(pTHX_ SV **st, I32 n, unsigned allowed, tk_args *a, const char *what)
+tk_args_parse(pTHX_ SV **st, I32 n, uint64_t allowed, tk_args *a, const char *what)
 {
     I32 i;
     Zero(a, 1, tk_args);

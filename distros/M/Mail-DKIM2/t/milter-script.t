@@ -554,6 +554,41 @@ sub info_values {
     my ($ar) = inserted($mods || [], 'Authentication-Results');
     like($ar ? $ar->{value} : '', qr/dkim2=temperror/, 'verifier fault: A-R says temperror, not pass');
     like(milter_log(), qr/verify .*injected verifier fault/, 'verifier fault: logged');
+
+    # The verifier starts at the end of the headers, so its key lookups
+    # overlap the body's arrival: it has the header fields before the
+    # milter reaches end of message.
+    path("$dir/inject/DKIM2TestMarkHeaders.pm")->spew(
+        "package DKIM2TestMarkHeaders; require Mail::DKIM2::Verifier;\n"
+      . "no warnings 'redefine';\n"
+      . "my \$orig = \\&Mail::DKIM2::Verifier::finish_header;\n"
+      . "*Mail::DKIM2::Verifier::finish_header = sub { warn \"TEST verifier has the headers\\n\"; goto &\$orig };\n1;\n");
+    my (undef, $sock_m) = spawn_milter(perl => ["-I$dir/inject", '-MDKIM2TestMarkHeaders'],
+                                      extra => ['--mode', 'inbound']);
+    my $before = length milter_log();
+    ($verdict, $mods) = eval { run_milter(sock => $sock_m,
+        from => 'author@test1.dkim2.com', rcpt => ['list@test2.dkim2.com'],
+        message => originator_signed()) };
+    my $run = substr(milter_log(), $before);
+    like($run, qr/TEST verifier has the headers\n(?s:.*)dkim2-milter: processing /,
+        'streaming: the verifier has the headers before end of message');
+    ($ar) = inserted($mods || [], 'Authentication-Results');
+    like($ar ? $ar->{value} : '', qr/dkim2=pass/, 'streaming: and the message passes');
+
+    # A fault at the end of the headers is the same temperror at the end.
+    path("$dir/inject/DKIM2TestDieHeaders.pm")->spew(
+        "package DKIM2TestDieHeaders; require Mail::DKIM2::Verifier;\n"
+      . "no warnings 'redefine';\n"
+      . "*Mail::DKIM2::Verifier::finish_header = sub { die \"injected header fault\\n\" };\n1;\n");
+    my (undef, $sock_h) = spawn_milter(perl => ["-I$dir/inject", '-MDKIM2TestDieHeaders'],
+                                      extra => ['--mode', 'inbound']);
+    ($verdict, $mods) = eval { run_milter(sock => $sock_h,
+        from => 'author@test1.dkim2.com', rcpt => ['list@test2.dkim2.com'],
+        message => originator_signed()) };
+    is($@, '', 'header fault: the milter answers');
+    ($ar) = inserted($mods || [], 'Authentication-Results');
+    like($ar ? $ar->{value} : '', qr/dkim2=temperror/, 'header fault: A-R says temperror');
+    like(milter_log(), qr/verify .*injected header fault/, 'header fault: logged');
 }
 
 # --- 9. An out-of-range Message-Instance m= at the inbound MI step ---

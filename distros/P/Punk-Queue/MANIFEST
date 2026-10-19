@@ -42,7 +42,10 @@ include/pq_sql.h
 include/pq_sqlite.h
 include/pq_super.h
 include/pq_time.h
+include/pq_tkr.h
 include/pq_worker.h
+include/time_keeper_abi.h
+include/time_keeper_recurrence_abi.h
 lib/Punk/Command/Queue.pm
 lib/Punk/Plugin/Queue.pm
 lib/Punk/Plugin/Queue/assets/VENDORED.md
@@ -150,6 +153,7 @@ t/80-cron-parse.t
 t/81-cron-leader.t
 t/82-cron-supervisor.t
 t/83-cron-keyword.t
+t/84-cron-zones.t
 t/90-punk-subcommand.t
 t/lib/PQConform.pm
 t/lib/PQSpawn.pm

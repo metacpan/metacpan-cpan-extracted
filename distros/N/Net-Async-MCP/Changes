@@ -1,3 +1,38 @@
+0.006     2026-10-19 02:08:03Z
+  - The test phase requires JSON::MaybeXS 1.004 now. t/30_http.t spells JSON
+    booleans as JSON::MaybeXS::false, which only exists since 1.004000, and
+    with an older one installed the file died at compile time - which was all
+    that kept 0.005 from installing on perl 5.20 (k33)
+  - t/15_client.t no longer fails on perls before 5.24. Future::AsyncAwait
+    passes a cancel of an async sub's future on to the future it awaits only
+    on 5.24 and later, so there a cancelled request stays pending in the
+    transport; the two checks for that are skipped on older perls, and the
+    documentation says so (k34)
+  - The test phase declares Mojolicious 9.41. The stdio test server
+    t/bin/test_mcp_server.pl is a Mojo::Base script, and Mojolicious only came
+    along with MCP instead of being required where it is used (k35)
+
+0.005     2026-10-18 23:49:38Z
+  - Fixed the test suite dying instead of testing wherever MCP is not
+    installed, which is every smoker that installs only what a distribution
+    requires. MCP is a recommendation and not a requirement because only the
+    in-process transport touches any part of it, and the two others should not
+    drag Mojolicious and CryptX into an installation that never uses them - but
+    almost every test needs a real MCP::Server, and 0.004 dropped MCP from the
+    test phase, where it had been since the first commit. It is a test
+    requirement again, so a smoker installs it and the suite tests rather than
+    skips, and the tests that cannot run without it - the in-process, client
+    and stdio ones - now skip on its absence instead of failing at compile time
+  - Transport::InProcess no longer needs MCP to be loadable. It loaded
+    MCP::Server::Context with a plain use, so the module could not be compiled
+    at all where MCP was missing, which is what took t/00_load.t and
+    t/40_errors.t down with it. The context class is loaded at the first
+    request now, and where it cannot be loaded handle() is called with the
+    request as its only argument. That costs an MCP::Server nothing, because
+    without MCP there is no MCP::Server to hand this transport in the first
+    place - only some other object with a handle() method, which never had a
+    context coming
+
 0.004     2026-08-15 16:13:38Z
   - Added an on_subscription_end event, so a caller is told when a
     subscription's stream ends on its own - the server closing it, the

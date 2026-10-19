@@ -111,7 +111,7 @@ Readonly::Hash our %OPERATORS => (
 	},
 );
 
-our $VERSION = 0.09;
+our $VERSION = 0.10;
 
 sub can_be_standalone {
 	my $type = shift;
@@ -208,7 +208,7 @@ sub can_precede_number {
 
 	if ($type eq 'AUX_GROUP') {
 		my $subtype = group_subtype($value);
-		return $subtype eq 'AUX_FORM' ? 1 : 0;
+		return $subtype eq 'AUX_FORM' || $subtype eq 'AUX_OTHER' ? 1 : 0;
 	}
 
 	if ($type eq 'AUX_TIME' || $type eq 'AUX_LANG') {

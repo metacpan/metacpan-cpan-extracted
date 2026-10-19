@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Mail::Milter::Authentication::Pragmas;
 # ABSTRACT: Handler class for DKIM2 signature verification
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 use base 'Mail::Milter::Authentication::Handler';
 
 use Mail::DKIM2::Common qw(extract_mi_version parse_dkim_pubkey fold_header parse_mime);
@@ -49,6 +49,7 @@ sub envfrom_callback {
     $self->{'headers'}     = [];
     $self->{'body'}        = [];
     $self->{'has_dkim2'}   = 0;
+    $self->{'has_mi'}      = 0;
     $self->{'carry'}       = q{};
     $self->{'env_from'}    = $env_from;
     $self->destroy_object('dkim2_verifier');
@@ -64,6 +65,9 @@ sub header_callback {
 
     if ( lc($header) eq 'dkim2-signature' ) {
         $self->{'has_dkim2'} = 1;
+    }
+    elsif ( lc($header) eq 'message-instance' ) {
+        $self->{'has_mi'} = 1;
     }
 }
 
@@ -117,6 +121,12 @@ sub eoh_callback {
     }
 
     $self->{'carry'} = q{};
+
+    # The verifier hashes the body as it arrives and keeps none of it. Keep
+    # a copy only for what _add_mi_and_store builds from it: a snapshot, or
+    # a first Message-Instance.
+    $self->{'keep_body'} = $config->{'add_message_instance'}
+        && ( $config->{'snapshot_directory'} || !$self->{'has_mi'} );
 }
 
 sub body_callback {
@@ -144,7 +154,7 @@ sub body_callback {
 
     $chunk =~ s/\015?\012/$EOL/g;
 
-    push @{$self->{'body'}}, $chunk;
+    push @{$self->{'body'}}, $chunk if $self->{'keep_body'};
 
     eval {
         $verifier->PRINT( $chunk );
@@ -298,6 +308,7 @@ sub close_callback {
     delete $self->{'headers'};
     delete $self->{'body'};
     delete $self->{'carry'};
+    delete $self->{'keep_body'};
     delete $self->{'has_dkim2'};
     delete $self->{'env_from'};
     $self->destroy_object('dkim2_verifier');
@@ -426,7 +437,10 @@ Authentication-Results header.
 
 =head2 body_callback($body_chunk)
 
-Feeds body data to the verifier, normalizing line endings to CRLF.
+Feeds body data to the verifier, normalizing line endings to CRLF. The
+verifier hashes it as it arrives and keeps none of it; the handler keeps a
+copy only when C<add_message_instance> has something to build from it: a
+snapshot to store, or a first Message-Instance to compute.
 
 =head2 eom_callback()
 

@@ -336,6 +336,37 @@ static unsigned long long sen_walk(struct sen_board *b, const struct sen_rules *
     return sen_walk_from(b, r, depth, 0);
 }
 
+/* ---- what a house is ------------------------------------------------------------
+ *
+ * The same rules the generator applies, asked of one house. A run is measured
+ * from the piece that stands there, so an empty house is refused first: the
+ * run of empty houses around it is no run of anybody's.
+ */
+
+static int sen_held(const struct sen_board *b, const struct sen_rules *r, int house)
+{
+    int p;
+    if (house < 1 || house > SEN_HOUSES) return 0;
+    if (!(SEN->rules_ok)(r)) return 0;
+    p = (SEN->at)(b, house);
+    return p == SEN_PIECE_OF(SEN_SIDE_LIGHT) || p == SEN_PIECE_OF(SEN_SIDE_DARK);
+}
+
+static int sen_protected_house(const struct sen_board *b, const struct sen_rules *r, int house)
+{
+    if (!sen_held(b, r, house)) return 0;
+    return sen_protected_at(b, r, house);
+}
+
+static int sen_in_blockade(const struct sen_board *b, const struct sen_rules *r, int house)
+{
+    int lo, hi;
+    if (!sen_held(b, r, house)) return 0;
+    if (r->blockade == 0) return 0;
+    sen_run_of(b, house, &lo, &hi);
+    return hi - lo + 1 >= r->blockade;
+}
+
 /* ---- the table -------------------------------------------------------------- */
 
 void sen_moves_install(struct sen_abi *t)
@@ -350,4 +381,6 @@ void sen_moves_install(struct sen_abi *t)
     t->winner  = sen_winner;
     t->ply_cap = sen_ply_cap;
     t->walk    = sen_walk;
+    t->protected_at = sen_protected_house;
+    t->in_blockade  = sen_in_blockade;
 }

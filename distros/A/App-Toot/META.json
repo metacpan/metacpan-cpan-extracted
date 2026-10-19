@@ -4,7 +4,7 @@
       "Blaine Motsinger <blaine@renderorange.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -45,6 +45,7 @@
          "requires" : {
             "File::Find" : "0",
             "File::Spec" : "0",
+            "File::Temp" : "0",
             "FindBin" : "0",
             "Test::Exception" : "0.42",
             "Test::More" : "0.98",
@@ -63,6 +64,6 @@
          "web" : "https://github.com/renderorange/app-toot"
       }
    },
-   "version" : "0.04",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

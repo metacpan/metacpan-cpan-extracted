@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Scalar::Util qw(blessed);
-our $VERSION = 2.1109;
+our $VERSION = 2.1126;
 
 sub debug {
 	my ($self) = @_;
@@ -133,3 +133,78 @@ sub bind_all {
 }
 
 1;
+
+=head1 NAME
+
+oEdtk::Record - a fixed-width record made of typed fields
+
+=head1 SYNOPSIS
+
+    use oEdtk::Record;
+
+    my $rec = oEdtk::Record->new(@fields);   # oEdtk::Field objects
+    $rec->bind_all;
+    my %vals = $rec->parse($line);
+
+=head1 DESCRIPTION
+
+A record is an ordered sequence of typed fields (L<oEdtk::Field> objects). It
+builds an C<unpack> template from the field lengths, unpacks a raw line, and
+runs each bound field's C<process> to produce a name-to-value hash.
+
+=head1 METHODS
+
+=head2 new
+
+    my $rec = oEdtk::Record->new(@fields);
+
+Build a record from C<@fields>. Every argument must be an C<oEdtk::Field>, and a
+catch-all field (length C<*>) must come last.
+
+=head2 debug
+
+    $rec->debug;
+
+Turn on the verbose C<bind_all> output.
+
+=head2 set_seek_key
+
+    $rec->set_seek_key($seek_key);
+
+Set the regex used to find this record in the stream; defaults to the
+C<LIGNE...> form.
+
+=head2 set_fields_offset
+
+    $rec->set_fields_offset($offset);
+
+Set the offset at which the fields start.
+
+=head2 parse
+
+    my %values = $rec->parse($line);
+
+Unpack C<$line> and run each bound field's C<process>, returning a hash of
+name-to-value pairs.
+
+=head2 bind
+
+    $rec->bind(%rename);
+    $rec->bind;              # bind every field under its current name
+
+Bind fields onto the record. With a name-to-new-name map, rename the matching
+fields; with no argument, bind every field so L</parse> returns them all.
+Returns the record.
+
+=head2 bind_all
+
+    $rec->bind_all;
+
+Name each field after its longest C<->-separated component and bind all of
+them.
+
+=head1 AUTHOR
+
+The oEdtk team.
+
+=cut

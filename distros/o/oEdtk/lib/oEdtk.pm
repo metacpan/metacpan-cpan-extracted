@@ -7,7 +7,7 @@ BEGIN {
 	use vars qw($VERSION $YEAR @ISA @EXPORT @EXPORT_OK);    # %EXPORT_TAGS);
 
 	# a.ammr a.a elapsed years, mm months, r release
-	$VERSION = '2.1120';
+	$VERSION = '2.1126';
 	$YEAR    = '2026';
 	@ISA     = qw(Exporter);
 	@EXPORT  = qw(oEdtk_release);
@@ -49,18 +49,17 @@ here.
 
     oEdtk Copyright (C) 2005-2026 G Chaillou Domingo, D Aunay, M Henrion, G Ballin
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the Artistic License 2.0.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+    or FITNESS FOR A PARTICULAR PURPOSE.  See the Artistic License 2.0 for
+    more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+    You should have received a copy of the Artistic License 2.0 with this
+    program (see the COPYING file).  If not, see
+    <https://www.perlfoundation.org/artistic-license-20.html>.
 
 
 =head1 SYNOPSIS
@@ -383,8 +382,8 @@ Perl by Larry Wall and the C<perl5-porters>.
 The oEdtk module is Copyright (c) .
 All rights reserved.
 
-You may distribute under the terms of either the GNU General Public
-License or the Artistic License, as specified in the Perl README file.
+You may distribute under the terms of the Artistic License 2.0,
+as specified in the COPYING file.
 
 =head1 SUPPORT / WARRANTY
 

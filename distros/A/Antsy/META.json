@@ -53,6 +53,6 @@
          "web" : "https://github.com/briandfoy/antsy"
       }
    },
-   "version" : "0.907",
+   "version" : "0.908",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

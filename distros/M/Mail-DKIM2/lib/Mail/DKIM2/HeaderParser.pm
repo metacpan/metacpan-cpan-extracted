@@ -2,7 +2,7 @@ package Mail::DKIM2::HeaderParser;
 use strict;
 use warnings;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 # Thin base class for streaming message parsing.
 # Replaces the deep Mail::DKIM::Common → Mail::DKIM::MessageParser
@@ -51,26 +51,31 @@ sub load {
         die $@ if ref $@;
         return $r;
     };
-    my $text;
+    # Through a reference: a message given as a string is not copied unless
+    # its line endings need normalising (and then the copy is ours).
+    my $tref;
     if (ref $input eq 'SCALAR') {
-        $text = $$input;
+        $tref = $input;
     }
     elsif ($can->('as_string')) {
-        $text = $input->as_string;
+        $tref = \$input->as_string;
     }
     elsif (ref $input eq 'GLOB' || ref \$input eq 'GLOB' || $can->('getline')) {
         local $/;
-        $text = readline($input);
+        $tref = \readline($input);
     }
     elsif (ref $input) {
         croak "load: cannot read a message from a " . ref($input) . " reference";
     }
     else {
-        $text = $input;
+        $tref = \$_[1];
     }
-    croak "load requires a message" unless defined $text;
-    $text =~ s/\r?\n/\r\n/g;
-    $self->PRINT($text);
+    croak "load requires a message" unless defined $$tref;
+    if ($$tref =~ /(?<!\r)\n/) {
+        (my $text = $$tref) =~ s/\r?\n/\r\n/g;
+        $tref = \$text;
+    }
+    $self->PRINT($$tref);
     $self->CLOSE;
     return $self;
 }
@@ -87,8 +92,16 @@ sub PRINT {
     my $self = shift;
     return 1 if $self->{_stopped};
     # print FH LIST hands every item over; so does a direct PRINT($a, $b).
-    my $data = @_ > 1 ? join('', map { $_ // '' } @_) : ($_[0] // '');
-    $self->{_buf} .= $data;
+    # Through a reference, so one big piece is not copied on the way in.
+    my $dref = @_ > 1 ? \join('', map { $_ // '' } @_) : defined $_[0] ? \$_[0] : \'';
+
+    # A body sink set in finish_header takes the body as it comes, never
+    # held here.
+    if (!$self->{_in_header} && $self->{_body_sink}) {
+        $self->{_body_sink}->($$dref) if length $$dref;
+        return 1;
+    }
+    $self->{_buf} .= $$dref;
 
     if ($self->{_in_header}) {
         # Look for end-of-headers (blank line), resuming where the last chunk's
@@ -109,7 +122,12 @@ sub PRINT {
             $self->{_header_scan} = $scanned > 0 ? $scanned : 0;
         }
     }
-    # Body data accumulates in buffer until CLOSE
+    # Body data accumulates in buffer until CLOSE, unless a subclass has
+    # set a sink in finish_header to take it as it comes.
+    if (!$self->{_in_header} && $self->{_body_sink} && length $self->{_buf}) {
+        $self->{_body_sink}->($self->{_buf});
+        $self->{_buf} = '';
+    }
     return 1;
 }
 

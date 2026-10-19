@@ -4,7 +4,7 @@ use warnings;
 use File::Object;
 use MARC::File::XML (BinaryEncoding => 'utf8', RecordFormat => 'MARC21');
 use MARC::Validator::Plugin::Field080;
-use Test::More 'tests' => 117;
+use Test::More 'tests' => 149;
 use Test::NoWarnings;
 use Unicode::UTF8 qw(decode_utf8);
 
@@ -42,6 +42,8 @@ is($errors->[0]->errors->[0]->error, "Field 080a has trailing space.",
 	"Get error (Field 080a has trailing space.).");
 is($errors->[0]->errors->[0]->params->{'field_080_a'}, "677.062 +65.01] :687.1(082)",
 	'Get error parameter (field_080_a => 677.062 +65.01] :687.1(082)).');
+is($errors->[0]->errors->[0]->params->{'position'}, 7,
+	'Get error parameter (position => 7).');
 
 # Test.
 $obj = MARC::Validator::Plugin::Field080->new(
@@ -61,6 +63,8 @@ is($errors->[0]->errors->[0]->error, "Field 080a has name standalone.",
 	"Get error (Field 080a has name standalone.).");
 is($errors->[0]->errors->[0]->params->{'field_080_a'}, decode_utf8('Kružberk (Česko)'),
 	'Get error parameter (field_080_a => Kružberk (Česko)).');
+is($errors->[0]->errors->[0]->params->{'position'}, 0,
+	'Get error parameter (position => 0).');
 
 # Test.
 $obj = MARC::Validator::Plugin::Field080->new(
@@ -80,6 +84,8 @@ is($errors->[0]->errors->[0]->error, "Field 080a has bad apostrophe character.",
 	"Get error (Field 080a has bad apostrophe character.).");
 is($errors->[0]->errors->[0]->params->{'field_080_a'}, decode_utf8('81’1'),
 	'Get error parameter (field_080_a => 81’1).');
+is($errors->[0]->errors->[0]->params->{'position'}, 2,
+	'Get error parameter (position => 2).');
 
 # Test.
 $obj = MARC::Validator::Plugin::Field080->new(
@@ -99,6 +105,8 @@ is($errors->[0]->errors->[0]->error, "Field 080a has bad apostrophe character.",
 	"Get error (Field 080a has bad apostrophe character.).");
 is($errors->[0]->errors->[0]->params->{'field_080_a'}, decode_utf8('81`35'),
 	'Get error parameter (field_080_a => 81`35).');
+is($errors->[0]->errors->[0]->params->{'position'}, 2,
+	'Get error parameter (position => 2).');
 
 # Test.
 $obj = MARC::Validator::Plugin::Field080->new(
@@ -118,6 +126,8 @@ is($errors->[0]->errors->[0]->error, "Field 080a has bad apostrophe character.",
 	"Get error (Field 080a has bad apostrophe character.).");
 is($errors->[0]->errors->[0]->params->{'field_080_a'}, decode_utf8('81&apos;374'),
 	'Get error parameter (field_080_a => 81&apos;374).');
+is($errors->[0]->errors->[0]->params->{'position'}, 2,
+	'Get error parameter (position => 2).');
 
 # Test.
 $obj = MARC::Validator::Plugin::Field080->new(
@@ -137,6 +147,8 @@ is($errors->[0]->errors->[0]->error, "Field 080a has bad apostrophe character.",
 	"Get error (Field 080a has bad apostrophe character.).");
 is($errors->[0]->errors->[0]->params->{'field_080_a'}, decode_utf8('81´37-021.6'),
 	'Get error parameter (field_080_a => 81´37-021.6).');
+is($errors->[0]->errors->[0]->params->{'position'}, 2,
+	'Get error parameter (position => 2).');
 
 # Test.
 $obj = MARC::Validator::Plugin::Field080->new(
@@ -156,6 +168,8 @@ is($errors->[0]->errors->[0]->error, "Field 080a has bad quotation mark characte
 	"Get error (Field 080a has bad quotation mark character.).");
 is($errors->[0]->errors->[0]->params->{'field_080_a'}, decode_utf8('94(470.23)”1941/1944”'),
 	'Get error parameter (field_080_a => 94(470.23)”1941/1944”).');
+is($errors->[0]->errors->[0]->params->{'position'}, 10,
+	'Get error parameter (position => 10).');
 
 # Test.
 $obj = MARC::Validator::Plugin::Field080->new(
@@ -175,6 +189,8 @@ is($errors->[0]->errors->[0]->error, "Field 080a has bad quotation mark characte
 	"Get error (Field 080a has bad quotation mark character.).");
 is($errors->[0]->errors->[0]->params->{'field_080_a'}, decode_utf8('355.483(966.2)“1944”'),
 	'Get error parameter (field_080_a => 355.483(966.2)“1944”).');
+is($errors->[0]->errors->[0]->params->{'position'}, 14,
+	'Get error parameter (position => 14).');
 
 # Test.
 $obj = MARC::Validator::Plugin::Field080->new(
@@ -194,6 +210,8 @@ is($errors->[0]->errors->[0]->error, "Field 080a has bad quotation mark characte
 	"Get error (Field 080a has bad quotation mark character.).");
 is($errors->[0]->errors->[0]->params->{'field_080_a'}, qq(32(437)"1918/1938''(061.3)),
 	'Get error parameter (field_080_a => 32(437)"1918/1938\'\'(061.3)).');
+is($errors->[0]->errors->[0]->params->{'position'}, 17,
+	'Get error parameter (position => 17).');
 
 # Test.
 $obj = MARC::Validator::Plugin::Field080->new(
@@ -213,6 +231,8 @@ is($errors->[0]->errors->[0]->error, "Field 080a has bad quotation mark characte
 	"Get error (Field 080a has bad quotation mark character.).");
 is($errors->[0]->errors->[0]->params->{'field_080_a'}, decode_utf8('017.092:027.53(437.1Ústí n. Labem)\'\'1969"'),
 	'Get error parameter (field_080_a => 017.092:027.53(437.1Ústí n. Labem)\'\'1969").');
+is($errors->[0]->errors->[0]->params->{'position'}, 34,
+	'Get error parameter (position => 34).');
 
 # Test.
 $obj = MARC::Validator::Plugin::Field080->new(
@@ -232,6 +252,8 @@ is($errors->[0]->errors->[0]->error, "Field 080a has bad dot character.",
 	"Get error (Field 080a has bad dot character.).");
 is($errors->[0]->errors->[0]->params->{'field_080_a'}, '351,7',
 	'Get error parameter (field_080_a => 351,7).');
+is($errors->[0]->errors->[0]->params->{'position'}, 3,
+	'Get error parameter (position => 3).');
 
 # Test.
 $obj = MARC::Validator::Plugin::Field080->new(
@@ -251,6 +273,8 @@ is($errors->[0]->errors->[0]->error, "Field 080a has trailing space.",
 	"Get error (Field 080a has trailing space.).");
 is($errors->[0]->errors->[0]->params->{'field_080_a'}, '784.71- 044.357',
 	'Get error parameter (field_080_a => 784.71- 044.357).');
+is($errors->[0]->errors->[0]->params->{'position'}, 7,
+	'Get error parameter (position => 7).');
 
 # Test.
 $obj = MARC::Validator::Plugin::Field080->new(
@@ -270,6 +294,8 @@ is($errors->[0]->errors->[0]->error, "Field 080a has trailing space.",
 	"Get error (Field 080a has trailing space.).");
 is($errors->[0]->errors->[0]->params->{'field_080_a'}, '885-93-343.4 = 393',
 	'Get error parameter (field_080_a => 885-93-343.4 = 393).');
+is($errors->[0]->errors->[0]->params->{'position'}, 12,
+	'Get error parameter (position => 12).');
 
 # Test.
 $obj = MARC::Validator::Plugin::Field080->new(
@@ -289,6 +315,8 @@ is($errors->[0]->errors->[0]->error, "Field 080a has missing opening parenthesis
 	"Get error (Field 080a has missing opening parenthesis '('.).");
 is($errors->[0]->errors->[0]->params->{'field_080_a'}, '086.7)08',
 	'Get error parameter (field_080_a => 086.7)08).');
+is($errors->[0]->errors->[0]->params->{'position'}, 0,
+	'Get error parameter (position => 0).');
 
 # Test.
 $obj = MARC::Validator::Plugin::Field080->new(
@@ -308,6 +336,8 @@ is($errors->[0]->errors->[0]->error, "Field 080a has missing closing parenthesis
 	"Get error (Field 080a has missing closing parenthesis ')'.).");
 is($errors->[0]->errors->[0]->params->{'field_080_a'}, '(035',
 	'Get error parameter (field_080_a => (035).');
+is($errors->[0]->errors->[0]->params->{'position'}, 4,
+	'Get error parameter (position => 4).');
 
 # Test.
 $obj = MARC::Validator::Plugin::Field080->new(
@@ -327,3 +357,47 @@ is($errors->[0]->errors->[0]->error, "Field 080a has extra closing parenthesis '
 	"Get error (Field 080a has extra closing parenthesis ')'.).");
 is($errors->[0]->errors->[0]->params->{'field_080_a'}, '(437.3))',
 	'Get error parameter (field_080_a => (437.3))).');
+is($errors->[0]->errors->[0]->params->{'position'}, 7,
+	'Get error parameter (position => 7).');
+
+# Test.
+$obj = MARC::Validator::Plugin::Field080->new(
+	'record_id_def' => '015a',
+);
+$obj->init;
+$marc_record = MARC::File::XML->in($data_dir->file('cnb000457509-missing_closing_quotation_mark_in_080a.xml')->s)->next;
+$obj->process($marc_record);
+$ret = $obj->report;
+isa_ok($ret, 'Data::MARC::Validator::Report::Plugin');
+ok(defined $ret->module_name, 'Module name is defined.');
+ok(defined $ret->version, 'Version is defined.');
+is($ret->name, 'field_080', 'Get name (field_080).');
+$errors = $ret->plugin_errors;
+is($errors->[0]->record_id, 'cnb000457509', 'Get record id (cnb000457509).');
+is($errors->[0]->errors->[0]->error, "Field 080a has missing closing quotation mark '\"'.",
+	"Get error (Field 080a has missing closing quotation mark '\"'.).");
+is($errors->[0]->errors->[0]->params->{'field_080_a'}, '016:794.1"1960/1972',
+	'Get error parameter (field_080_a => 016:794.1"1960/1972).');
+is($errors->[0]->errors->[0]->params->{'position'}, 9,
+	'Get error parameter (position => 9).');
+
+# Test.
+$obj = MARC::Validator::Plugin::Field080->new(
+	'record_id_def' => '015a',
+);
+$obj->init;
+$marc_record = MARC::File::XML->in($data_dir->file('cnb000638859-extra_opening_parenthesis_in_080a.xml')->s)->next;
+$obj->process($marc_record);
+$ret = $obj->report;
+isa_ok($ret, 'Data::MARC::Validator::Report::Plugin');
+ok(defined $ret->module_name, 'Module name is defined.');
+ok(defined $ret->version, 'Version is defined.');
+is($ret->name, 'field_080', 'Get name (field_080).');
+$errors = $ret->plugin_errors;
+is($errors->[0]->record_id, 'cnb000638859', 'Get record id (cnb000638859).');
+is($errors->[0]->errors->[0]->error, "Field 080a has extra opening parenthesis '('.",
+	"Get error (Field 080a has extra opening parenthesis '('.).");
+is($errors->[0]->errors->[0]->params->{'field_080_a'}, '(94(437)',
+	'Get error parameter (field_080_a => (94(437)).');
+is($errors->[0]->errors->[0]->params->{'position'}, 0,
+	'Get error parameter (position => 0).');

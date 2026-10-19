@@ -103,6 +103,7 @@ my $data = join '', map { chr($_ % 256) } 1 .. 300_000;
 print {$fh} $data;
 close $fh;
 open my $in, '<:raw', $file or die;
+
 seek $in, 5, 0;
 my $std = AWS::Signature::V4->new(service => 'service', region => 'r',
    credentials => {access_key_id => 'A', secret_access_key => 'S'});

@@ -2,7 +2,7 @@ package DBIx::QuickDB::Watcher;
 use strict;
 use warnings;
 
-our $VERSION = '0.000065';
+our $VERSION = '0.000066';
 
 use Carp qw/croak/;
 use Cwd qw/abs_path/;
@@ -77,6 +77,10 @@ sub init {
 sub start {
     my $self = shift;
     return if $self->{+SERVER_PID};
+
+    # Pseudo-fork would keep running the caller's code in a second thread.
+    croak "DBIx::QuickDB::Watcher needs Unix process control (setsid, a real fork) and is not supported on MSWin32"
+        if $^O eq 'MSWin32';
 
     my ($rh, $wh);
     pipe($rh, $wh) or die "Could not open pipe: $!";

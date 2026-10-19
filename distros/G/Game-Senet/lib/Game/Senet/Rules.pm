@@ -10,7 +10,7 @@ use Object::Proto::Sugar;
 
 use Game::Senet::Engine qw(SIDE_LIGHT SIDE_DARK LIGHT DARK WON DRAWN BY_HOME BY_PLY_CAP);
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 my $E = 'Game::Senet::Engine';
 
@@ -80,6 +80,10 @@ sub home {
     Carp::croak("Game::Senet::Rules: a side is 'light' or 'dark'") unless exists $SIDE_OF{ $side // '' };
     return $self->_engine->home($SIDE_OF{$side});
 }
+
+sub protected { $_[0]->_engine->protected($_[1], $_[0]->_given) }
+
+sub in_blockade { $_[0]->_engine->in_blockade($_[1], $_[0]->_given) }
 
 sub status {
     my ($self) = @_;
@@ -151,7 +155,7 @@ Game::Senet::Rules - a game of Senet as a position and how it changes, given rol
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 
@@ -225,6 +229,15 @@ A copy of the board, a L<Game::Senet::Engine>.
     my $n = $game->home('light');
 
 How many of a side's pieces have borne off.
+
+=head2 protected
+
+=head2 in_blockade
+
+    print "protected\n" if $game->protected(12);
+
+Whether the piece on a house cannot be swapped, and whether it is part of a
+blockade, under this game's rules. See L<Game::Senet::Engine/protected>.
 
 =head2 status
 

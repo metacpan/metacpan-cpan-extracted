@@ -2,9 +2,8 @@ package DBIx::QuickDB::Driver::Percona;
 use strict;
 use warnings;
 
-our $VERSION = '0.000065';
+our $VERSION = '0.000066';
 
-use IPC::Cmd qw/can_run/;
 use Capture::Tiny qw/capture/;
 
 use parent 'DBIx::QuickDB::Driver::MySQLCom';

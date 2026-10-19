@@ -131,7 +131,7 @@ foreach my $row (@$rows) {
 	# push (@tlist, printf ("%-16s %9s %9s %9s %8s %8s %7s %-10s %s\n", @$row));
 }
 
-warn sprintf "%9s %-7s %-15s %-16s %s  from EDTK_STATS_OUTMNGR\n", "NB_DOCS", "STATUS", "REFIDDOC",
+printf "%9s %-7s %-15s %-16s %s  from EDTK_STATS_OUTMNGR\n", "NB_DOCS", "STATUS", "REFIDDOC",
 	"IDLDOC", $col;
 
 ################################################################################

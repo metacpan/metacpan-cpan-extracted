@@ -202,10 +202,10 @@ tk_format_interval(pTHX_ tk_out *o, SV *asv, tk_value *a, SV *bsv, tk_value *b, 
         }
         ta.sv = sv_2mortal(newSVpvs(""));
         ta.utf8 = 0;
-        ta.digits = NULL;
+        ta.digits = NULL; ta.nums = NULL; ta.nums_len = 0;
         tb.sv = sv_2mortal(newSVpvs(""));
         tb.utf8 = 0;
-        tb.digits = NULL;
+        tb.digits = NULL; tb.nums = NULL; tb.nums_len = 0;
         if (date_pat) {
             const char *dt = loc->s.datetime_formats[TK_LEN_MEDIUM];
             tk_format_cldr(aTHX_ &ta, asv, a, loc, dt, strlen(dt), date_pat, wpat);

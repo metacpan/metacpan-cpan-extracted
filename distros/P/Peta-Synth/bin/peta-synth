@@ -1,0 +1,470 @@
+#!perl
+# peta-synth: MIDI files to sound, with the synthesizer of Peta::Synth.
+#
+#   peta-synth render song.mid song.flac [options]
+#   peta-synth play song.mid
+#   peta-synth info song.mid
+#   peta-synth profile song.mid
+#   peta-synth serve --midi ~/music --bank my-bank.json
+#   peta-synth engines
+#
+# Run with no arguments, or with --help, for the options.
+use v5.36;
+use Cwd qw(abs_path);
+use Getopt::Long qw(GetOptionsFromArray);
+use List::Util qw(max min sum0);
+use Time::HiRes ();
+use Peta::Synth;
+use Peta::Synth::MIDI;
+use Peta::Synth::Engine;
+use Peta::Synth::Output;
+use Peta::Synth::Patch;
+use Peta::Synth::Profile;
+
+my $USAGE = <<'END';
+usage:
+  peta-synth render IN.mid OUT.{wav,flac,mp3,ogg,opus} [options]
+      --rate N        sample rate (48000)
+      --partials N    most partials per voice: quality and cost (48)
+      --fidelity F    low, mid or high: what may be left out that is hardly heard
+                      (voices end sooner as they fade, fewer at once) (high)
+      --engine NAME   perl, pdl, gpu, or auto: the fastest here, measured (auto)
+      --workers N     processes the notes are shared among (1)
+      --bits N        16, 24 or 32 (32: float WAV) (16)
+      --normalize DB  peak to scale to, in dBFS (-1); 'off' to leave it
+      --quality Q     FLAC: level 0-8 (5); MP3: kbit/s (192) or V0-V9 (VBR);
+                      Ogg: Vorbis quality 0-10 (6); Opus: kbit/s (160)
+      --ffmpeg-gapless  MP3: name the encoder LavfPeta in the Info tag, so that
+                      FFmpeg plays the file gapless (it reads the encoder delay only
+                      for names beginning LAME, Lavf or Lavc); not made by FFmpeg
+      --length S      only the first S seconds of the file
+      --bank FILE     instrument changes saved by the web page (JSON)
+      --no-waves      every partial turned one by one: none read from wave sequences
+                      (--waves: harmonic ones read from them; by default as the engine
+                      fares better: the perl and pdl engines read them, gpu turns them)
+      --quiet         no progress
+  peta-synth play IN.mid [options]   play it on the sound server as it renders
+      --latency S     seconds the server holds ahead (0.15)
+      --output NAME   pipewire (pperl, through libpipewire), pulse (the PulseAudio
+                      protocol, which PipeWire serves too), or auto (auto)
+      --fixed         keep the partials; do not lower them when the machine lags
+      --fidelity F    as for render (mid)
+      --rate N, --partials N, --engine NAME, --length S, --bank FILE, --no-waves   as for render
+                      (the wave sequences the file needs are made before it plays)
+  peta-synth live [options]   play MIDI as it comes in: keyboards, sequencers
+      --in WHAT       all: every MIDI source, and those plugged in later (all);
+                      none: a port for others to connect to; sources by
+                      address or name (20:0, Keystation), joined by commas;
+                      or the path of a raw MIDI device or a pipe
+      --latency S     seconds the server holds ahead (0.03)
+      --quantum N     samples rendered at a time, a multiple of 64 (256)
+      --output NAME, --fixed, --fidelity F, --rate N, --partials N, --engine NAME, --bank FILE, --no-waves   as for play
+  peta-synth inputs           the MIDI sources there are
+  peta-synth serve [options]  the synthesizer behind a web page
+      --port N        8360
+      --host ADDR     127.0.0.1: this machine only
+      --midi DIR      where MIDI files are played from and dropped into
+                      (examples/midi beside this script if it is there, else .)
+      --bank FILE     instrument changes: read at the start, written by the page
+      --in WHAT       MIDI as it is played, besides the page's: as for live
+      --fidelity F    as for render (mid)
+      --quantum N     samples rendered at a time, a multiple of 64 (512): larger, less
+                      work for each (on the GPU, fewer round trips), a little later
+      --rate N, --partials N, --engine NAME   as for render
+  peta-synth info IN.mid      what a MIDI file holds
+  peta-synth profile IN.mid [options]   what rendering it will cost, step by step
+      --engine NAME   the engine whose costs are measured (auto)
+      --step S        seconds a line (5)
+      --measure       render it too, and show beside what each step took
+      --rate N, --partials N, --length S, --bank FILE, --no-waves   as for render
+  peta-synth engines          what this perl and machine have
+END
+
+# The options most commands take, and their defaults.
+my @SYNTH_OPTIONS = ('rate=i', 'partials=i', 'engine=s', 'bank=s', 'waves!', 'fidelity=s');
+my %SYNTH_DEFAULT = (rate => 48000, partials => 48, engine => 'auto');
+
+my %COMMAND = (
+    render  => \&render,
+    play    => \&play,
+    live    => \&live,
+    inputs  => \&inputs,
+    serve   => \&serve,
+    info    => \&info,
+    profile => \&profile,
+    engines => \&engines,
+);
+
+my $command = shift @ARGV // '';
+my $run     = $COMMAND{$command};
+if (!$run) {
+    print STDERR $USAGE;
+    exit($command eq '--help' || $command eq 'help' ? 0 : 2);
+}
+exit $run->(@ARGV);
+
+sub render (@args) {
+    my %opt = (%SYNTH_DEFAULT, workers => 1, bits => 16, normalize => -1);
+    GetOptionsFromArray(\@args, \%opt, @SYNTH_OPTIONS, 'workers=i', 'bits=i', 'normalize=s', 'quality=s',
+        'ffmpeg_gapless|ffmpeg-gapless', 'length=f', 'quiet') or die $USAGE;
+    my ($in, $out) = @args;
+    die $USAGE unless defined $out;
+    $opt{normalize} = undef if $opt{normalize} eq 'off';
+    $opt{bank}      = read_bank($opt{bank}) if defined $opt{bank};
+
+    my $quiet = delete $opt{quiet};
+    my $last  = -1;
+    $opt{progress} = sub ($done, $all) {
+        my $percent = $all > 0 ? int(100 * $done / $all) : 100;
+        $percent = 100 if $percent > 100;
+        return if $percent == $last;
+        $last = $percent;
+        printf STDERR "\r%3d%%  %6.1f s", $percent, $done;
+    } unless $quiet;
+
+    my $done = Peta::Synth->render_file($in, $out, %opt);
+    print STDERR "\r" unless $quiet;
+    printf "%s: %.1f s of sound in %.1f s (%.2fx real time); %d notes, engine %s, %d partials, %d worker%s\n",
+        $out,
+        $done->{seconds}, $done->{took}, $done->{seconds} / ($done->{took} || 1e-9),
+        $done->{notes}, $done->{engine}, $opt{partials},
+        $done->{workers}, $done->{workers} == 1 ? '' : 's';
+    return 0;
+}
+
+# Plays as it renders; Ctrl-C stops at once.
+sub play (@args) {
+    my %opt = (%SYNTH_DEFAULT, fidelity => 'mid', latency => 0.15);
+    GetOptionsFromArray(\@args, \%opt, @SYNTH_OPTIONS, 'latency=f', 'output=s', 'length=f', 'fixed', 'quiet')
+        or die $USAGE;
+    my ($in) = @args;
+    die $USAGE unless defined $in;
+    my $quiet = playing(\%opt);
+
+    my $shown = -1;
+    $opt{progress} = sub ($done, $all, $synth) {
+        my $tenth = int($done * 10);
+        return if $tenth == $shown;
+        $shown = $tenth;
+        printf STDERR "\r%6.1f / %.1f s   %3d voices   %2d partials   load %3d%%  ",
+            $done, $all, $synth->active, $synth->{partials}, 100 * $synth->load;
+    } unless $quiet;
+    $opt{prepared} = sub ($stats, $seconds) {
+        printf STDERR "%d wave sequences prepared in %.1f s\n", $stats->{made}, $seconds;
+    } unless $quiet;
+
+    my $done = Peta::Synth->play_file($in, %opt);
+    return 0 if $quiet;
+    print STDERR "\n";
+    printf "%s: %.1f s played%s through %s; %d notes, engine %s, partials at the end %d\n",
+        $in, $done->{seconds}, $done->{stopped} ? ' (stopped)' : '', $done->{output},
+        $done->{notes}, $done->{engine}, $done->{partials};
+    return 0;
+}
+
+# Plays what comes in, until Ctrl-C.
+sub live (@args) {
+    my %opt = (%SYNTH_DEFAULT, fidelity => 'mid');
+    GetOptionsFromArray(\@args, \%opt, @SYNTH_OPTIONS, 'latency=f', 'quantum=i', 'output=s', 'in=s', 'fixed', 'quiet')
+        or die $USAGE;
+    die $USAGE if @args;
+    my $quiet = playing(\%opt);
+
+    my $shown = -1;
+    $opt{progress} = sub ($synth, $in) {
+        my $tenth = int($synth->now / $synth->rate * 10);
+        return if $tenth == $shown;
+        if ($shown < 0) {
+            my @from = $in->connected;
+            printf STDERR "listening at %s%s; Ctrl-C ends\n", $in->address, @from ? ' to ' . join(', ', @from) : '';
+        }
+        $shown = $tenth;
+        printf STDERR "\r%3d voices   %2d partials   load %3d%%  ", $synth->active, $synth->{partials}, 100 * $synth->load;
+    } unless $quiet;
+
+    my $done = Peta::Synth->play_live(%opt);
+    printf STDERR "\n%d notes in %.1f s through %s; engine %s\n",
+        $done->{notes}, $done->{seconds}, $done->{output}, $done->{engine} unless $quiet;
+    return 0;
+}
+
+# What play and live share: the bank read, partials lowered when the
+# machine lags unless --fixed, and Ctrl-C (or TERM) to stop. Returns
+# whether to be quiet.
+sub playing ($opt) {
+    $opt->{bank} = read_bank($opt->{bank}) if defined $opt->{bank};
+    $opt->{auto} = !delete $opt->{fixed};
+
+    my $stop = 0;
+    $SIG{INT} = $SIG{TERM} = sub { $stop = 1 };
+    $opt->{stop} = sub { $stop };
+    return delete $opt->{quiet};
+}
+
+# The MIDI sources: the sequencer's, and raw devices.
+sub inputs () {
+    require Peta::Synth::Input;
+    my @sources = eval { Peta::Synth::Input::sources() };
+    print 'ALSA sequencer: ', ($@ =~ s/\n//r), "\n" if $@;
+    printf "%-8s %s: %s\n", $_->{address}, $_->{client}, $_->{port} for @sources;
+    print "no sources on the ALSA sequencer\n" if !@sources && !$@;
+    print "$_ (raw)\n" for glob '/dev/snd/midiC*D*';
+    return 0;
+}
+
+# Where serve plays MIDI files from and saves those dropped on the page,
+# unless told: the demo pieces, where they are beside this script (a
+# checkout); else the directory it is run in.
+sub midi_default () {
+    my $examples = "$RealBin/../examples/midi";
+    return -d $examples ? abs_path($examples) : '.';
+}
+
+sub serve (@args) {
+    my %opt = (%SYNTH_DEFAULT, fidelity => 'mid', port => 8360, host => '127.0.0.1', midi => midi_default());
+    GetOptionsFromArray(\@args, \%opt, 'port=i', 'host=s', 'midi=s', 'bank=s', 'rate=i', 'partials=i', 'engine=s', 'in=s', 'fidelity=s', 'quantum=i')
+        or die $USAGE;
+
+    # The page is served by Mojolicious, which pperl loads from 0.6.24 on.
+    eval { require Peta::Synth::Server; 1 } or do {
+        die $@ if $@ !~ m{Mojo|Hash/Util/FieldHash|Hash::Util::FieldHash};
+        my $pperl = $^V =~ /\.99\z/;
+        die 'serve needs Mojolicious, which ' . ($pperl ? "this pperl $ENV{PPERL}" : 'this perl') . ' cannot load'
+          . ($pperl ? ' (the web page runs on pperl 0.6.24 or later)' : ' (cpanm Mojolicious)')
+          . ":\n  " . ($@ =~ s/\n.*//sr) . "\n";
+    };
+    my $server = Peta::Synth::Server->new(
+        port     => $opt{port},
+        host     => $opt{host},
+        midi_dir => $opt{midi},
+        bank     => $opt{bank},
+        rate     => $opt{rate},
+        partials => $opt{partials},
+        engine   => $opt{engine},
+        in       => $opt{in},
+        fidelity => $opt{fidelity},
+        quantum  => $opt{quantum},
+    );
+    $SIG{INT} = $SIG{TERM} = sub { $server->stop };
+    print STDERR 'open ', $server->url, " in a browser; Ctrl-C ends\n";
+    $server->run;
+    return 0;
+}
+
+sub info (@args) {
+    my $file     = shift @args // die $USAGE;
+    my $midi     = Peta::Synth::MIDI->read($file);
+    my $timeline = $midi->timeline;
+
+    my (%notes, %program, %name, $tempo);
+    for my $event (@$timeline) {
+        my $type = $event->{type};
+        $notes{ $event->{channel} }++                              if $type eq 'note_on';
+        $program{ $event->{channel} }{ $event->{program} } = 1     if $type eq 'program';
+        $tempo //= 60e6 / $event->{usec}                           if $type eq 'tempo';
+        $name{ $event->{track} } //= $event->{data}
+            if $type eq 'meta' && $event->{meta} == 3 && length $event->{data};    # a track's name
+    }
+
+    printf "%s: format %d, %d tracks, %.1f s, %d notes%s\n",
+        $file, $midi->format, scalar @{ $midi->tracks },
+        @$timeline ? $timeline->[-1]{time} : 0,
+        scalar(grep { $_->{type} eq 'note_on' } @$timeline),
+        $tempo ? sprintf(', %.0f bpm at the start', $tempo) : '';
+    for my $channel (sort { $a <=> $b } keys %notes) {
+        my @programs = sort { $a <=> $b } keys %{ $program{$channel} // { 0 => 1 } };
+        printf "  channel %2d: %5d notes, %s\n", $channel + 1, $notes{$channel},
+            $channel == 9 ? 'drums' : join ', ', map { "program $_" } @programs;
+    }
+    for my $track (sort { $a <=> $b } keys %name) {
+        printf "  track %2d: %s\n", $track, $name{$track};
+    }
+    return 0;
+}
+
+# What rendering a file will cost, step by step: what sounds, and the
+# seconds of rendering a second takes with the engine's costs measured
+# (and, with --measure, what it took).
+sub profile (@args) {
+    my %opt = (%SYNTH_DEFAULT, step => 5);
+    GetOptionsFromArray(\@args, \%opt, @SYNTH_OPTIONS, 'step=f', 'measure', 'length=f') or die $USAGE;
+    my $file = shift @args // die $USAGE;
+    $opt{bank} = read_bank($opt{bank}) if defined $opt{bank};
+
+    my $engine = Peta::Synth::Engine::create($opt{engine}, rate => $opt{rate}, partials => $opt{partials});
+    $opt{waves} //= $engine->can('reads_waves') ? $engine->reads_waves : 1;    # as the engine fares better
+
+    my $started  = Time::HiRes::time();
+    my @given    = grep { defined $opt{$_} } qw(rate partials length bank waves);
+    my $profile  = Peta::Synth->profile_file($file, map { $_ => $opt{$_} } @given);
+    my $foreseen = Time::HiRes::time() - $started;
+    my $costs    = Peta::Synth::Profile::calibrate(
+        engine   => $engine,
+        rate     => $opt{rate},
+        partials => $opt{partials},
+        bank     => $opt{bank},
+        waves    => $opt{waves},
+        programs => $profile->programs,
+        drums    => $profile->drums,
+    );
+    printf "%s: %.1f s, %d voices, foreseen in %.1f s\n", $file, $profile->seconds, scalar @{ $profile->voices }, $foreseen;
+    printf "%s on %s: a quantum (%d samples) %.2f ms; each voice in it %.3f ms, a partial %.4f (under a filter %.4f more),\n"
+        . "  a copy read from a wave sequence %.3f, a string %.3f, FM %.3f, a band of noise %.3f\n",
+        $costs->{engine}, Peta::Synth::Engine::perl_info()->{perl} // 'perl', Peta::Synth::Profile::QUANTUM,
+        map { 1000 * $costs->{$_} } qw(quantum voice partial filter copy string fm band);
+
+    my $step      = $opt{step};
+    my $predicted = $profile->predict($costs, $step);
+    my $measured  = $opt{measure} ? $profile->measure($engine, $step) : undef;
+    steps($predicted, $profile->load($step), $measured, $step);
+    if ($measured && @$measured) {
+        my $p = sum0 map { $_->{load} } @$predicted;
+        my $m = sum0 map { $_->{load} } @$measured;
+        printf "rendering took %.1f s, foreseen %.1f s (%+.0f%%)\n", $m * $step, $p * $step, $m ? 100 * ($p - $m) / $m : 0;
+    }
+
+    # How few notes (program, key, velocity) sound most of the time.
+    my $notes   = $profile->notes;
+    my $seconds = sum0 map { $_->{seconds} } @$notes;
+    my $covered = 0;
+    my $top     = 0;
+    for my $note (@$notes) {
+        last if $covered >= 0.8 * $seconds;
+        $covered += $note->{seconds};
+        $top++;
+    }
+    printf "notes: %d different (program, key, velocity); %d of them sound for 80%% of the voices' seconds\n",
+        scalar @$notes, $top;
+    return 0;
+}
+
+# The profile's table: a line a step, its voices, partials and load foreseen
+# (and measured), a bar of the load (20 marks: real time); then the most.
+sub steps ($predicted, $load, $measured, $step) {
+    printf "%7s %7s %9s %6s%s\n", 'time', 'voices', 'partials', 'load', $measured ? '  measured' : '';
+    my ($over, $peak, $peak_at) = (0, 0, 0);
+    for my $i (0 .. $#$predicted) {
+        my $p = $predicted->[$i];
+        my $l = $load->[$i];
+        my $m = $measured && $measured->[$i];
+        ($peak, $peak_at) = ($p->{load}, $p->{at}) if $p->{load} > $peak;
+        $over += $step if $p->{load} > 1;
+
+        my $bar    = min(60, int(0.5 + 20 * max($p->{load}, $m ? $m->{load} : 0)));
+        my $column = $m ? sprintf('  %8.2f', $m->{load}) : $measured ? ' ' x 10 : '';
+        printf "%4d:%02d %7.1f %9.0f %6.2f%s  %s\n",
+            int($p->{at} / 60), $p->{at} % 60, $l->{voices}, $l->{partials}, $p->{load}, $column, '#' x $bar;
+    }
+    printf "the most: %.2f at %d:%02d; %s\n", $peak, int($peak_at / 60), $peak_at % 60,
+        $over ? sprintf('over real time (1) for some %.0f s', $over) : 'in real time throughout';
+    return;
+}
+
+sub engines () {
+    my $info    = Peta::Synth::Engine::perl_info();
+    my $formats = Peta::Synth::Output::formats();
+    my @speeds  = map { sprintf '%s %.1fx real time', $_->{name}, $_->{speed} } Peta::Synth::Engine::measure();
+    printf "perl:     %s %s, %d processors\n", $info->{perl}, $info->{version}, $info->{cpus};
+    printf "jit:      %s\n", $info->{jit} ? 'yes' : 'no';
+    printf "pdl:      %s\n", $info->{pdl} ? 'yes' : 'no';
+    printf "gpu:      %s\n", $info->{gpu} ? 'yes' : 'no';
+    printf "engines:  %s\n", join ', ', @speeds;
+    print  "          (a chord of 16 notes and 3 drums, 48 partials, 48 kHz; auto takes the first)\n";
+    printf "formats:  %s\n", join ' ', map { "$_ ($formats->{$_})" } sort keys %$formats;
+    return 0;
+}
+
+# Instrument changes as the web page saves them.
+sub read_bank ($file) {
+    require JSON::PP;
+    open my $fh, '<:raw', $file or die "cannot read '$file': $!\n";
+    local $/;
+    return JSON::PP->new->decode(scalar <$fh>);
+}
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+peta-synth - MIDI files to sound, with the synthesizer of Peta::Synth
+
+=head1 VERSION
+
+version 0.2610180
+
+=head1 SYNOPSIS
+
+    peta-synth render song.mid song.flac                  # wav, flac, mp3, ogg, opus
+    peta-synth render song.mid song.mp3 --quality V2 --workers 4
+    peta-synth play song.mid                              # as it renders
+    peta-synth live                                       # what keyboards and sequencers send
+    peta-synth serve --midi ~/music --bank my-bank.json   # behind a web page
+    peta-synth inputs
+    peta-synth info song.mid
+    peta-synth profile song.mid
+    peta-synth engines
+    peta-synth --help                                     # every command's options
+
+=head1 DESCRIPTION
+
+=over
+
+=item render
+
+A MIDI file into a sound file, its peak normalized; the format from the
+name's extension. C<--partials> sets the quality (and the cost),
+C<--workers> shares the notes among processes. C<--fidelity> (C<low>, C<mid>,
+C<high>) what may be left out that is hardly heard: high, as ever, by
+default; C<play>, C<live> and C<serve> take C<mid>, for playing as it
+renders on a machine that might not keep up.
+
+=item play
+
+Plays a MIDI file on the sound server (PipeWire, or the PulseAudio
+protocol) as it renders, giving new notes fewer partials when the machine
+falls behind (unless C<--fixed>).
+
+=item live
+
+Plays MIDI as it comes in: from the ALSA sequencer's sources (keyboards,
+sequencers, other programs), a raw MIDI device or a pipe.
+
+=item serve
+
+The synthesizer behind a web page (L<Peta::Synth::Server>): played from the
+page's keyboard or Web MIDI, its patches, channels, reverb and equalizers
+changed while it sounds. It listens on 127.0.0.1 unless C<--host> says
+otherwise. MIDI files are played from, and those dropped on the page saved
+into, C<--midi>: by default F<examples/midi> beside the script where it is
+there (a checkout), else the directory it is run in.
+
+=item inputs, info, profile, engines
+
+The MIDI sources there are; what a MIDI file holds; what rendering it will
+cost, step by step (L<Peta::Synth::Profile>); what this perl and machine
+have, the engines measured.
+
+=back
+
+C<--bank> takes the instrument changes the web page saves.
+
+=head1 SEE ALSO
+
+L<Peta::Synth>, L<Peta::Synth::Server>, L<peta-analyze>.
+
+=head1 AUTHOR
+
+PetaMem s.r.o. E<lt>info@petamem.comE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2026 PetaMem s.r.o.
+
+=head1 LICENSE
+
+This package is free software, dual-licensed under the Artistic License 2.0
+and the BSD 2-Clause License. See the LICENSE file of the distribution.
+
+=cut

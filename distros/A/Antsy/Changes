@@ -1,5 +1,28 @@
 # Changes for Antsy
 
+0.908 2026-10-18T18:48:39Z
+	* BREAKING: reset and reverse are no longer exported because they replaced Perl's builtins. Use reset_all or normal, and inverse or reverse_video.
+	* BREAKING: removed the stray _black through _white functions, which emitted SGR 0-7 instead of colors
+	* BREAKING: removed the bogus %s export tag
+	* fix hide_cursor and show_cursor, which were swapped
+	* counted cursor and scroll moves no longer move for a count of 0, and default to 1 instead of dying without an argument
+	* define erase_in_display, erase_in_line, and bg_orange, which were exported but missing
+	* :text and :bg now include the basic and bright colors
+	* iterm_start_link now uses the link ID, and the ID in iterm_linked_text is optional
+	* added several logical aliases, including:
+	* add text_gray and bg_gray for text_bright_black and bg_bright_black
+	* add erase_to_end_of_screen, erase_to_start_of_screen, erase_screen, erase_screen_and_scrollback, erase_to_end_of_line, erase_to_start_of_line, and erase_line
+	* add normal_intensity (also no_bold, no_dark, no_faint, no_dim), no_italic, no_underline, no_blink, no_reverse (also no_inverse, no_reverse_video), reveal, text_default, and bg_default
+	* add faint and dim as aliases for dark
+	* add cursor_row, cursor_left, cursor_right, cursor_prev_line, cursor_position, cursor_home, cursor_line_start, cursor_hide, and cursor_show
+	* add DEC cursor save and restore: cursor_save_state and cursor_restore_state (also decsc, decrc)
+	* add cursor_save and cursor_restore for the SCO sequences
+	* add strikethrough, no_strikethrough, rapid_blink, cursor_tab_forward, cursor_tab_back, cursor_position_request, and cursor_get_position
+	* deprecate hide_cursor, show_cursor, save_cursor, and restore_cursor in favor of the cursor_ names
+	* add a "Saving and restoring the cursor" doc section, and remove the docs for the nonexistent text_blink and text_concealed
+	* add examples/subtasks.pl to show an advanced example
+	* almost all of this work was done by Claude Opus 5.5
+
 0.907 2025-09-02T20:35:37Z
 	* add bg_orange and text_orange
 

@@ -7,7 +7,7 @@ BEGIN {
 	use vars     qw($VERSION @ISA @EXPORT @EXPORT_OK $LOGGERLEVEL $WARN2LOGGER)
 		;    #backward compatibility for Perls under 5.6
 
-	$VERSION   = 2.1109;
+	$VERSION   = 2.1126;
 	@ISA       = qw(Exporter);
 	@EXPORT    = qw(logger);
 	@EXPORT_OK = qw($LOGGERLEVEL $WARN2LOGGER);
@@ -105,3 +105,58 @@ sub logger {
 
 END { }
 return 1;
+
+=head1 NAME
+
+oEdtk::logger - the oEdtk diagnostic logger
+
+=head1 SYNOPSIS
+
+    use oEdtk::logger;
+
+    logger(2, 'a routine message');
+    logger(-1, 'fatal: cannot open the config file');   # for die()
+
+=head1 DESCRIPTION
+
+The single live logger of the toolkit. It writes a formatted diagnostic line
+(timestamp, level label, PID, message, file handle) to STDERR and returns the
+line so a caller can reuse it in a C<die>. The contract -- which logger is
+live, the event-to-level table, and the fd2 routing -- is recorded in
+F<docs/integration/LOGGER.md> and pinned by F<t/int/67_logger_normalization.t>.
+
+Do not change the exports: the public API is frozen against C<snap/M.json> by
+F<t/int/01_api_M.t>.
+
+=head1 FUNCTIONS
+
+=head2 logger
+
+    my ($line, $eol) = logger(2, $message, $modify);
+
+Emit a diagnostic line at the given level. The first argument is the level, a
+number from C<-1> (fatal) to C<8> (user); levels up to C<4> always emit
+(through C<warn>), while higher levels emit only up to the current
+C<$LOGGERLEVEL>. An optional third argument adjusts C<$LOGGERLEVEL>: an integer
+delta in C<1..4>, or one of the letters C<U> C<D> C<I> C<P> C<W>. The message is
+collapsed to single spaces and its file handle is appended. The formatted line
+and a newline are returned.
+
+=head2 $LOGGERLEVEL
+
+    our $LOGGERLEVEL;
+
+The emission ceiling, default C<4>. Messages above it are suppressed unless the
+level is raised.
+
+=head2 $WARN2LOGGER
+
+    our $WARN2LOGGER;
+
+Flag reserved to route C<warn> messages through the logger; off by default.
+
+=head1 AUTHOR
+
+The oEdtk team.
+
+=cut

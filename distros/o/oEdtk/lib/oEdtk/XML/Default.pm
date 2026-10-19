@@ -11,7 +11,7 @@ use XML::LibXML;
 use charnames ':full';
 
 use Exporter;
-our $VERSION   = 0.02;
+our $VERSION   = 2.1126;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(cameleon_open cameleon_extract);
 
@@ -114,6 +114,9 @@ Return the C<bpTypeDonnee> / C<bpValeur> pairs of the C<ItemSalesBreakdownLine>
 whose C<cpe> attribute is C<$path>, or C<undef> when a pair is incomplete. Values
 are encoded to ISO-8859-15, with the typographic apostrophe and ellipsis folded to
 their ASCII equivalents.
+
+The internal helper C<my_encode>, which encodes a value to ISO-8859-15 while
+warning about any character it cannot map, is not part of the public API.
 
 =head1 AUTHOR
 

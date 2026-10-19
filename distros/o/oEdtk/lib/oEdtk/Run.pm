@@ -23,7 +23,7 @@ use PDF::Tk;
 
 use Exporter;
 
-our $VERSION   = 2.1109;
+our $VERSION   = 2.1126;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(
 	oe_status_to_msg
@@ -551,3 +551,77 @@ sub oe_outmngr_output_run_tex {
 }
 
 1;
+
+=head1 NAME
+
+oEdtk::Run - orchestrate a composition run: LaTeX, post-processing and output
+
+=head1 SYNOPSIS
+
+    use oEdtk::Run qw(oe_compo_run oe_after_compo);
+
+    oe_compo_run($app, { mode => 'pdf' });
+    oe_after_compo($app, { outfile => $pdf });
+
+=head1 DESCRIPTION
+
+Runs one composition: it launches the LaTeX executable in the configured mode,
+post-processes the result (dvipdfm, cleanup, index import), and packs or exports
+the output through L<oEdtk::Outmngr> and L<oEdtk::EDMS>. It also provides the
+command helpers used throughout the oEdtk runtime.
+
+=head1 FUNCTIONS
+
+=head2 oe_status_to_msg
+
+    my $msg = oe_status_to_msg($status);
+
+Translate a process wait status into a human message, or return nothing when the
+status is zero.
+
+=head2 oe_compo_run
+
+    oe_compo_run($app, \%options);
+
+Run the LaTeX composition of C<$app> in the configured mode. C<%options> may
+carry C<mode>, C<jobname>, C<extrapkgs>, C<incdirs>, C<fifo> and C<cldstatus>;
+in FIFO mode the process runs in the background and its pid is returned.
+
+=head2 oe_after_compo
+
+    oe_after_compo($app, \%options);
+
+Post-process the composition: run C<dvipdfm> in DVI+PDF mode, print the path of
+the generated PDF, clean up the intermediate files, and import the index or build
+the EDMS pack when one was requested.
+
+=head2 oe_csv_to_doc
+
+    my $doc = oe_csv_to_doc($input, $endtag);
+
+Build an L<oEdtk::TexDoc> from a two-column CSV: each numbered group becomes a
+table, and C<$endtag> ends every record.
+
+=head2 oe_outmngr_output_run_tex
+
+    my @lots = oe_outmngr_output_run_tex(\%filter, $type);
+
+Export the matching lots, compose each one into a PDF, pad recto-verso lots, and
+pack each lot's index and PDF into a zip archive; return the lots.
+
+=head2 oe_cmd_run
+
+    oe_cmd_run($cmd);
+
+Run C<$cmd>, with its stdout redirected to stderr, and die with the translated
+status when it fails.
+
+The following subs are internal helpers and are not part of the public API:
+C<oe_cmd_run_bg>, C<listing_depository>, C<update_idx>, C<oe_background_pdf>
+and C<_filiere_is_rectoverso>.
+
+=head1 AUTHOR
+
+The oEdtk team.
+
+=cut

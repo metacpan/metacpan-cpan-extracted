@@ -7,7 +7,7 @@ use Test::More;
 use Game::Terminal;
 
 my @rows = Game::Terminal::games();
-is scalar @rows, 23, 'twenty-three rows';
+is scalar @rows, 24, 'twenty-four rows';
 
 my (%seen, @names);
 for my $row (@rows) {

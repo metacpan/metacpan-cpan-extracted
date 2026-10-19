@@ -11,7 +11,7 @@ use oEdtk::Config qw(config_read);
 
 use Exporter;
 
-our $VERSION = 2.1109;
+our $VERSION = 2.1126;
 our @ISA     = qw(Exporter);
 our @EXPORT  = qw(prod_Xls_Init
 	prod_Xls_New		prod_Xls_Insert_Val
@@ -441,3 +441,104 @@ END {
 }
 
 1;
+
+=head1 NAME
+
+oEdtk::libXls - build paginated Excel workbooks from tabular data
+
+=head1 SYNOPSIS
+
+    use oEdtk::libXls;
+
+    prod_Xls_Init('', 'Title', '');
+    prod_Xls_Col_Init('AL20', 'AC10');
+    prod_Xls_Insert_Val(@row);
+    prod_Xls_Edit_Ligne();
+    prod_Xls_Close();
+
+=head1 DESCRIPTION
+
+Builds Excel workbooks from tabular data with C<Spreadsheet::WriteExcel>: it
+opens numbered output files, applies the named cell formats of C<%XLS_FORMAT>,
+writes rows and pages, and prints the list of the files produced. The module is
+loaded in UTF-8.
+
+=head1 FUNCTIONS
+
+=head2 prod_Xls_Init
+
+    my $workbook = prod_Xls_Init($left, $center, $right);
+
+Open a new workbook and its first worksheet, set the page header from the three
+texts, and register the file name in the produced-files list. Returns a
+reference to the workbook.
+
+=head2 prod_Xls_New
+
+    prod_Xls_New($option);
+
+Start a new workbook. When C<$option> is C<HEAD>, the table head is repeated
+first.
+
+=head2 prod_Xls_Insert_Val
+
+    prod_Xls_Insert_Val(@values);
+
+Append one or more values to the pending row buffer.
+
+=head2 prod_Xls_Col_Init
+
+    prod_Xls_Col_Init(@columns);
+
+Initialise the style and width of the columns from C<STYLEwidth> pairs, for
+example C<AL20>.
+
+=head2 prod_Xls_Edit_Ligne
+
+    prod_Xls_Edit_Ligne($format, $head);
+
+Flush the pending values as one row, with an optional per-row format and an
+optional C<HEAD> column-head flag.
+
+=head2 prod_Xls_Row_Height
+
+    prod_Xls_Row_Height($height);
+
+Set the height of the next row, in points.
+
+=head2 prod_Xls_Add_Sheet
+
+    my $sheet = prod_Xls_Add_Sheet($name);
+
+Add a worksheet to the open workbook, print the head if one was defined, and
+return the worksheet.
+
+=head2 prod_Xls_Close
+
+    prod_Xls_Close();
+
+Flush the last row, print the list of the files produced, and close the
+workbook. It is also called automatically at the end of the program through an
+C<END> block.
+
+=head2 prod_Xls_Liste_Output
+
+    my @files = prod_Xls_Liste_Output();
+
+Return the list of the Excel files produced so far.
+
+=head2 %XLS_FORMAT
+
+    $worksheet->write($row, $col, $value, $XLS_FORMAT{'AC'});
+
+The table of the named cell formats (alignment, font, borders) referenced by the
+column initialisation and the row editor.
+
+The following subs are internal helpers and are not part of the public API:
+C<prod_Xls_Set_Sheet>, C<prod_Xls_Head> and C<prod_Xls_Set_Format>.
+
+=head1 AUTHOR
+
+The oEdtk team.
+
+=cut

@@ -1,6 +1,6 @@
 Time-Keeper
 
-Dates and times with time zones, leap seconds and every locale.
+Dates and times with time zones, leap seconds, every locale and every calendar CLDR knows.
 
 INSTALLATION
 

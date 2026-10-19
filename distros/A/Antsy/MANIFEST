@@ -1,7 +1,9 @@
 Changes
+examples/back_up_three_lines.pl
 examples/fg_bg_colors.pl
 examples/fireworks.pl
 examples/query.pl
+examples/subtasks.pl
 INSTALL.SKIP
 lib/Antsy.pm
 LICENSE
@@ -10,6 +12,12 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README.pod
 SECURITY.md
+t/aliases.t
+t/attributes.t
+t/colors.t
+t/cursor.t
+t/erase.t
+t/iterm.t
 t/load.t
 t/pod.t
 t/pod_coverage.t

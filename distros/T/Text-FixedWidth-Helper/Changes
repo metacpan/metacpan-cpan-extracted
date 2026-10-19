@@ -1,5 +1,9 @@
 Revision history for Perl module Text::FixedWidth::Helper
 
+0.03 Sun Oct 18 09:29:56 PM EDT 2026
+    - No change in functionality.  Modernized Makefile.PL and 
+      handling of metadata.
+
 0.02 Sun Oct 30 09:03:00 2011
     - add 'LICENSE' to Makefile.PL
 

@@ -1,5 +1,5 @@
 TODO list for Perl module Text::FixedWidth::Helper
 
-- Nothing yet
+- In testing, replace IO::CaptureOutput with Capture::Tiny
 
 

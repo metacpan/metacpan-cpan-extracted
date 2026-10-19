@@ -3,7 +3,6 @@ use strict;
 use warnings;
 use Carp;
 use Cwd;
-use Data::Dumper;$Data::Dumper::Indent=1;
 use File::Basename;
 use File::Temp qw( tempdir );
 use IO::CaptureOutput qw( capture );

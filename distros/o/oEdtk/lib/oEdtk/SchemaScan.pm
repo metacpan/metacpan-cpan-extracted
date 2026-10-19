@@ -16,7 +16,7 @@ use warnings;
 use Exporter 'import';
 our @EXPORT_OK = qw( scan_schema driver_of size_from_type );
 
-our $VERSION = 2.1114;
+our $VERSION = 2.1126;
 
 # The driver name from a DSN, in the tool's vocabulary (undef when unsupported).
 sub driver_of {
@@ -234,3 +234,55 @@ sub scan_schema {
 }
 
 1;
+
+=head1 NAME
+
+oEdtk::SchemaScan - driver-neutral database schema introspection
+
+=head1 SYNOPSIS
+
+    use oEdtk::SchemaScan qw(scan_schema);
+
+    my $schema = scan_schema($dbh);
+    # { driver => 'Pg', tables => { 'T' => { columns => [...], indexes => [...] } } }
+
+=head1 DESCRIPTION
+
+Introspects a live database handle and returns a plain data structure: for each
+table, the ordered columns (name, declared type and size, nullability, default,
+position, key rank) and the secondary indexes. It supports PostgreSQL,
+MySQL/MariaDB and SQLite. It loads no oEdtk code on purpose, so a snapshot tool
+can use it without the load banner. It is shared by C<tools/schema_snapshot.pl>
+and C<oEdtk::DBAdmin>'s schema detection.
+
+=head1 FUNCTIONS
+
+=head2 scan_schema
+
+    my $schema = scan_schema($dbh);
+
+Introspect C<$dbh> and return a hash reference with the C<driver> and C<tables>
+keys. An unsupported driver is an error.
+
+=head2 driver_of
+
+    my $driver = driver_of($dsn);
+
+Return the tool's driver name (C<Pg>, C<mysql> or C<SQLite>) for a DSN, or undef
+when the DSN is not supported.
+
+=head2 size_from_type
+
+    my $size = size_from_type($type);
+
+Return the declared length of a type such as C<VARCHAR2(36)>, or undef when the
+type carries no length.
+
+The per-driver scanners C<_scan_pg>, C<_scan_mysql> and C<_scan_sqlite>, and the
+C<_driver_of_dbh> helper, are internal and are not part of the public API.
+
+=head1 AUTHOR
+
+The oEdtk team.
+
+=cut

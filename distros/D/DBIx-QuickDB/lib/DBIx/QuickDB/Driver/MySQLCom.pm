@@ -2,9 +2,8 @@ package DBIx::QuickDB::Driver::MySQLCom;
 use strict;
 use warnings;
 
-our $VERSION = '0.000065';
+our $VERSION = '0.000066';
 
-use IPC::Cmd qw/can_run/;
 use Capture::Tiny qw/capture/;
 
 use parent 'DBIx::QuickDB::Driver::MySQL';
@@ -40,7 +39,13 @@ sub verify_provider {
 
     my ($v, $stderr) = capture { system($bin, '-V') };
     return 1 if $v =~ m/$provider/i;
-    return 0;
+
+    # Distro builds of Oracle MySQL (Ubuntu, Debian, Homebrew, ports) print
+    # their own marker instead of the provider name. MariaDB and Percona always
+    # name themselves, so anything else is Oracle MySQL.
+    return 0 unless $provider eq __PACKAGE__->provider;
+    return 0 if $v =~ m/MariaDB|Percona/i;
+    return $v =~ m/\bVer\s+\d/ ? 1 : 0;
 }
 
 sub viable {
@@ -53,6 +58,8 @@ sub viable {
 
     push @bad => "Could not load either 'DBD::MariaDB' or 'DBD::mysql', needed for everything"
         unless $this->dbd_driver;
+
+    push @bad => $this->_watcher_unsupported_reason($spec) // ();
 
     if (!keys %{$this->provider_info}) {
         push @bad => "Installed MySQL is not " . $this->provider;
@@ -122,7 +129,6 @@ sub _default_config {
     return %config;
 }
 
-
 1;
 
 __END__
@@ -133,11 +139,16 @@ __END__
 
 =head1 NAME
 
-DBIx::QuickDB::Driver::MySQL - MySQL MySQL driver for DBIx::QuickDB.
+DBIx::QuickDB::Driver::MySQLCom - Oracle MySQL driver for DBIx::QuickDB.
 
 =head1 DESCRIPTION
 
-MySQL MySQL driver for L<DBIx::QuickDB>.
+Oracle MySQL driver for L<DBIx::QuickDB>.
+
+Accepts Oracle's own builds and distribution builds of Oracle MySQL (Ubuntu,
+Debian, Homebrew and similar), which do not call themselves "MySQL Community
+Server". Any C<mysqld> that does not identify as MariaDB or Percona is treated
+as Oracle MySQL.
 
 =head1 SYNOPSIS
 

@@ -12,11 +12,12 @@ now(class, ...)
         tk_instant t;
         tk_value v;
     CODE:
-        tk_args_parse(aTHX_ &ST(1), items - 1, TK_A(TK_A_ZONE) | TK_A(TK_A_LOCALE), &a, "Time::Keeper->now");
+        tk_args_parse(aTHX_ &ST(1), items - 1, TK_A(TK_A_ZONE) | TK_A(TK_A_LOCALE) | TK_A(TK_A_CALENDAR), &a, "Time::Keeper->now");
         tk_zone_spec_from_sv(aTHX_ a.v[TK_A_ZONE], &z, "Time::Keeper->now");
         tk_now_sv(aTHX_ &t);
         tk_value_init(aTHX_ &v, &t, &z);
         v.locale = tk_args_locale(&a, "Time::Keeper->now");
+        v.calendar = (uint8_t)tk_args_calendar(&a, "Time::Keeper->now");
         RETVAL = tk_value_new_sv(aTHX_ tk_stash_for(aTHX_ class), &v);
     OUTPUT:
         RETVAL
@@ -30,12 +31,13 @@ today(class, ...)
         tk_instant t;
         tk_value v, day;
     CODE:
-        tk_args_parse(aTHX_ &ST(1), items - 1, TK_A(TK_A_ZONE) | TK_A(TK_A_LOCALE), &a, "Time::Keeper->today");
+        tk_args_parse(aTHX_ &ST(1), items - 1, TK_A(TK_A_ZONE) | TK_A(TK_A_LOCALE) | TK_A(TK_A_CALENDAR), &a, "Time::Keeper->today");
         tk_zone_spec_from_sv(aTHX_ a.v[TK_A_ZONE], &z, "Time::Keeper->today");
         tk_now_sv(aTHX_ &t);
         tk_value_init(aTHX_ &v, &t, &z);
         tk_value_start_of_day(aTHX_ &day, &v, "Time::Keeper->today");
         day.locale = tk_args_locale(&a, "Time::Keeper->today");
+        day.calendar = (uint8_t)tk_args_calendar(&a, "Time::Keeper->today");
         RETVAL = tk_value_new_sv(aTHX_ tk_stash_for(aTHX_ class), &day);
     OUTPUT:
         RETVAL
@@ -52,11 +54,11 @@ new(class, ...)
             "Time::Keeper->new", "Time::Keeper->last_day_of_month",
             "Time::Keeper->from_day_of_year", "Time::Keeper->from_iso_week"
         };
-        static const unsigned allowed[] = {
-            TK_A(TK_A_YEAR) | TK_A(TK_A_MONTH) | TK_A(TK_A_DAY) | TK_A_TIME | TK_A_RESOLVE | TK_A(TK_A_LOCALE),
-            TK_A(TK_A_YEAR) | TK_A(TK_A_MONTH) | TK_A_TIME | TK_A_RESOLVE | TK_A(TK_A_LOCALE),
-            TK_A(TK_A_YEAR) | TK_A(TK_A_DAY_OF_YEAR) | TK_A_TIME | TK_A_RESOLVE | TK_A(TK_A_LOCALE),
-            TK_A(TK_A_YEAR) | TK_A(TK_A_WEEK) | TK_A(TK_A_DAY) | TK_A_TIME | TK_A_RESOLVE | TK_A(TK_A_LOCALE)
+        static const uint64_t allowed[] = {
+            TK_A(TK_A_YEAR) | TK_A(TK_A_MONTH) | TK_A(TK_A_DAY) | TK_A_TIME | TK_A_RESOLVE | TK_A(TK_A_LOCALE) | TK_A_CAL,
+            TK_A(TK_A_YEAR) | TK_A(TK_A_MONTH) | TK_A_TIME | TK_A_RESOLVE | TK_A(TK_A_LOCALE) | TK_A_CAL,
+            TK_A(TK_A_YEAR) | TK_A(TK_A_DAY_OF_YEAR) | TK_A_TIME | TK_A_RESOLVE | TK_A(TK_A_LOCALE) | TK_A_CAL,
+            TK_A(TK_A_YEAR) | TK_A(TK_A_WEEK) | TK_A(TK_A_DAY) | TK_A_TIME | TK_A_RESOLVE | TK_A(TK_A_LOCALE) | TK_A(TK_A_CALENDAR)
         };
         const char *what = whats[ix];
         tk_args a;
@@ -65,17 +67,24 @@ new(class, ...)
         int64_t y, h, mi, s;
         int32_t ns;
         unsigned mm, dd;
+        int cal_id;
         tk_value v;
     CODE:
         tk_args_parse(aTHX_ &ST(1), items - 1, allowed[ix], &a, what);
-        if (!a.v[TK_A_YEAR])
-            croak("%s: year is required", what);
-        y = tk_args_int(aTHX_ &a, TK_A_YEAR, 0, TK_YEAR_MIN, TK_YEAR_MAX, what);
-        tk_args_ymd(aTHX_ &a, ix, &y, &mm, &dd, what);
+        cal_id = tk_args_calendar(&a, what);
+        if (ix != 3 && (cal_id != TK_CAL_GREGORY || a.v[TK_A_ERA] || a.v[TK_A_ERA_YEAR] || a.v[TK_A_MONTH_CODE]))
+            tk_cal_new_date(aTHX_ &tk_calendars[cal_id], &a, ix, &y, &mm, &dd, what);
+        else {
+            if (!a.v[TK_A_YEAR])
+                croak("%s: year is required", what);
+            y = tk_args_int(aTHX_ &a, TK_A_YEAR, 0, TK_YEAR_MIN, TK_YEAR_MAX, what);
+            tk_args_ymd(aTHX_ &a, ix, &y, &mm, &dd, what);
+        }
         tk_args_time(aTHX_ &a, &h, &mi, &s, &ns, what);
         tk_args_resolve(aTHX_ &a, &z, &gap, &overlap, what);
         tk_value_from_local(aTHX_ &v, &z, y, mm, dd, h, mi, s, ns, gap, overlap, what);
         v.locale = tk_args_locale(&a, what);
+        v.calendar = (uint8_t)cal_id;
         RETVAL = tk_value_new_sv(aTHX_ tk_stash_for(aTHX_ class), &v);
     OUTPUT:
         RETVAL
@@ -145,13 +154,14 @@ from_epoch(class, epoch, ...)
         tk_instant t;
         tk_value v;
     CODE:
-        tk_args_parse(aTHX_ &ST(2), items - 2, TK_A(TK_A_ZONE) | TK_A(TK_A_LOCALE), &a, "Time::Keeper->from_epoch");
+        tk_args_parse(aTHX_ &ST(2), items - 2, TK_A(TK_A_ZONE) | TK_A(TK_A_LOCALE) | TK_A(TK_A_CALENDAR), &a, "Time::Keeper->from_epoch");
         tk_zone_spec_from_sv(aTHX_ a.v[TK_A_ZONE], &z, "Time::Keeper->from_epoch");
         tk_epoch_from_sv(aTHX_ epoch, &t, "Time::Keeper->from_epoch");
         if (!tk_instant_valid(&t))
             croak("Time::Keeper->from_epoch: out of range");
         tk_value_init(aTHX_ &v, &t, &z);
         v.locale = tk_args_locale(&a, "Time::Keeper->from_epoch");
+        v.calendar = (uint8_t)tk_args_calendar(&a, "Time::Keeper->from_epoch");
         RETVAL = tk_value_new_sv(aTHX_ tk_stash_for(aTHX_ class), &v);
     OUTPUT:
         RETVAL
@@ -173,13 +183,14 @@ from_epoch_millis(class, n, ...)
         tk_instant t;
         tk_value v;
     CODE:
-        tk_args_parse(aTHX_ &ST(2), items - 2, TK_A(TK_A_ZONE) | TK_A(TK_A_LOCALE), &a, what);
+        tk_args_parse(aTHX_ &ST(2), items - 2, TK_A(TK_A_ZONE) | TK_A(TK_A_LOCALE) | TK_A(TK_A_CALENDAR), &a, what);
         tk_zone_spec_from_sv(aTHX_ a.v[TK_A_ZONE], &z, what);
         tk_epoch_scaled_from_sv(aTHX_ n, ix == 0 ? 3 : ix == 1 ? 6 : 9, &t, what);
         if (!tk_instant_valid(&t))
             croak("%s: out of range", what);
         tk_value_init(aTHX_ &v, &t, &z);
         v.locale = tk_args_locale(&a, what);
+        v.calendar = (uint8_t)tk_args_calendar(&a, what);
         RETVAL = tk_value_new_sv(aTHX_ tk_stash_for(aTHX_ class), &v);
     OUTPUT:
         RETVAL
@@ -270,7 +281,9 @@ year(self, ...)
         }
         else {
             c = tk_value_civil(v);
-            switch (ix) {
+            if (v->calendar != TK_CAL_GREGORY && tk_cal_field_is_calendars(ix))
+                RETVAL = tk_cal_field(aTHX_ v, ix, c->dow);
+            else switch (ix) {
             case 0:  RETVAL = c->year; break;
             case 24: RETVAL = c->hour % 12 ? c->hour % 12 : 12; break;
             case 25: case 26: {
@@ -448,9 +461,12 @@ with(self, ...)
         tk_args_parse(aTHX_ &ST(1), items - 1,
                       TK_A(TK_A_YEAR) | TK_A(TK_A_MONTH) | TK_A(TK_A_DAY) | TK_A_TIME
                       | TK_A(TK_A_GAP) | TK_A(TK_A_OVERLAP) | TK_A(TK_A_DAY_OF_WEEK)
-                      | TK_A(TK_A_DAY_OF_YEAR) | TK_A(TK_A_WEEK), &a, what);
+                      | TK_A(TK_A_DAY_OF_YEAR) | TK_A(TK_A_WEEK) | TK_A(TK_A_ERA) | TK_A(TK_A_ERA_YEAR) | TK_A(TK_A_MONTH_CODE), &a, what);
         c = tk_value_civil(v);
-        tk_args_with_date(aTHX_ &a, c, &y, &mm, &dd, what);
+        if (v->calendar != TK_CAL_GREGORY || a.v[TK_A_ERA] || a.v[TK_A_ERA_YEAR] || a.v[TK_A_MONTH_CODE])
+            tk_cal_with_date(aTHX_ v, &a, &y, &mm, &dd, what);
+        else
+            tk_args_with_date(aTHX_ &a, c, &y, &mm, &dd, what);
         h  = tk_args_int(aTHX_ &a, TK_A_HOUR, c->hour, 0, 23, what);
         mi = tk_args_int(aTHX_ &a, TK_A_MINUTE, c->minute, 0, 59, what);
         s  = tk_args_int(aTHX_ &a, TK_A_SECOND, c->second, 0, 60, what);
@@ -459,6 +475,7 @@ with(self, ...)
         tk_args_gap_overlap(aTHX_ &a, &gap, &overlap, what);
         tk_value_from_local(aTHX_ &nv, &z, y, mm, dd, h, mi, s, ns, gap, overlap, what);
         nv.locale = v->locale;
+        nv.calendar = v->calendar;
         RETVAL = tk_value_new_sv(aTHX_ SvSTASH(SvRV(self)), &nv);
     OUTPUT:
         RETVAL
@@ -501,6 +518,7 @@ in_zone(self, ...)
         else
             tk_value_init(aTHX_ &nv, &v->inst, &z);
         nv.locale = v->locale;
+        nv.calendar = v->calendar;
         RETVAL = tk_value_new_sv(aTHX_ SvSTASH(SvRV(self)), &nv);
     OUTPUT:
         RETVAL
@@ -539,6 +557,7 @@ next_transition(self)
         tk_value_zone(v, &z);
         tk_value_init(aTHX_ &nv, &t, &z);
         nv.locale = v->locale;
+        nv.calendar = v->calendar;
         RETVAL = tk_value_new_sv(aTHX_ SvSTASH(SvRV(self)), &nv);
     OUTPUT:
         RETVAL
@@ -585,6 +604,7 @@ other_reading(self)
         tk_value_zone(v, &z);
         tk_value_init(aTHX_ &nv, &t, &z);
         nv.locale = v->locale;
+        nv.calendar = v->calendar;
         RETVAL = tk_value_new_sv(aTHX_ SvSTASH(SvRV(self)), &nv);
     OUTPUT:
         RETVAL
@@ -630,6 +650,11 @@ in_locale(self, locale)
         v = tk_value_rw(self, "Time::Keeper->in_locale");
         nv = *v;
         nv.locale = tk_locale_id_from_sv(aTHX_ locale, "Time::Keeper->in_locale");
+        {
+            int ca = tk_cal_from_locale_sv(aTHX_ locale, "Time::Keeper->in_locale");
+            if (ca >= 0)
+                tk_value_set_calendar(&nv, ca);
+        }
         RETVAL = tk_value_new_sv(aTHX_ SvSTASH(SvRV(self)), &nv);
     OUTPUT:
         RETVAL
@@ -712,7 +737,8 @@ from_object(class, ...)
     PREINIT:
         const char *what = "Time::Keeper->from_object";
         SV *obj = NULL, *zone = NULL, *locale = NULL;
-        SV *tzname = NULL;
+        SV *calendar_sv = NULL;
+        SV *zone_sv = NULL;
         SV *got[3];
         I32 i;
         int count, via_epoch = 0;
@@ -728,6 +754,7 @@ from_object(class, ...)
             if (strEQ(k, "object")) obj = ST(i + 1);
             else if (strEQ(k, "zone")) zone = ST(i + 1);
             else if (strEQ(k, "locale")) locale = ST(i + 1);
+            else if (strEQ(k, "calendar")) calendar_sv = ST(i + 1);
             else croak("%s: unknown argument '%s'", what, k);
         }
         if (!obj || !sv_isobject(obj))
@@ -784,7 +811,7 @@ from_object(class, ...)
                     char ob[16];
                     if (off <= -86400 || off >= 86400)
                         croak("%s: tzoffset gave %" IVdf " seconds", what, off);
-                    tzname = newSVpvn(ob, tk_fmt_offset(ob, (int32_t)off, 1));   /* a zero offset reads as UTC */
+                    zone_sv = newSVpvn(ob, tk_fmt_offset(ob, (int32_t)off, 1));   /* a zero offset reads as UTC */
                 }
             }
             PUTBACK;
@@ -831,10 +858,10 @@ from_object(class, ...)
                             count = call_method("name", G_SCALAR);
                             SPAGAIN;
                             if (count == 1)
-                                tzname = newSVsv(POPs);
+                                zone_sv = newSVsv(POPs);
                         }
                         else if (SvOK(tz) && !SvROK(tz))
-                            tzname = newSVsv(tz);
+                            zone_sv = newSVsv(tz);
                     }
                 }
             }
@@ -842,8 +869,8 @@ from_object(class, ...)
             FREETMPS;
             LEAVE;
         }
-        if (tzname)
-            zone = sv_2mortal(tzname);
+        if (zone_sv)
+            zone = sv_2mortal(zone_sv);
         if (!via_epoch) {
             if (secs < 0 || secs > 86400 || ns < 0 || ns >= TK_NSECS_PER_SEC)
                 croak("%s: utc_rd_values gave seconds or nanoseconds out of range", what);
@@ -862,6 +889,8 @@ from_object(class, ...)
         tk_value_init(aTHX_ &v, &t, &z);
         if (locale)
             v.locale = tk_locale_id_from_sv(aTHX_ locale, what);
+        if (calendar_sv)
+            v.calendar = (uint8_t)tk_cal_arg(aTHX_ calendar_sv, what);
         RETVAL = tk_value_new_sv(aTHX_ tk_stash_for(aTHX_ class), &v);
     OUTPUT:
         RETVAL

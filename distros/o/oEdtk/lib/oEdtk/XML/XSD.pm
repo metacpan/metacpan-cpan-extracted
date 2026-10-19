@@ -4,6 +4,7 @@ use warnings;
 
 use Carp;
 use XML::LibXML;
+our $VERSION = '2.1126';
 
 # Validate a file against an XSD schema. XML::LibXML::Schema::validate returns a
 # false value when the document is valid and dies with the validation errors when

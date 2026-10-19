@@ -15,7 +15,7 @@ use constant {
    # faster), otherwise from the slicing-by-4 code below: $T0[$b] is the
    # effect of byte $b on the register, $T1 to $T3 that of the same byte
    # followed by 1 to 3 zeros
-   CRC32C_XS => eval { require String::CRC32C; \&String::CRC32C::crc32c },
+   CRC32C_XS => scalar eval {; require String::CRC32C; \&String::CRC32C::crc32c },
 };
 
 use namespace::clean;
@@ -55,7 +55,9 @@ sub add ($self, $ref) {    # $ref: reference to a byte string
 
 # register after the data; String::CRC32C wants and gives it inverted
 sub _crc32c ($crc, $ref) {
-   return CRC32C_XS->($$ref, $crc ^ 0xFFFFFFFF) ^ 0xFFFFFFFF if CRC32C_XS;
+   if (my $xs = CRC32C_XS) {
+      return $xs->($$ref, $crc ^ 0xFFFFFFFF) ^ 0xFFFFFFFF;
+   }
 
    state $T0 = [
       map {

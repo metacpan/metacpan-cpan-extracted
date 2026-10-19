@@ -17,6 +17,7 @@ Changes
 lib/App/Netdisco.pm
 lib/App/Netdisco/AnyEvent/Nbtstat.pm
 lib/App/Netdisco/Backend/Job.pm
+lib/App/Netdisco/Backend/Queues.pm
 lib/App/Netdisco/Backend/Role/Manager.pm
 lib/App/Netdisco/Backend/Role/Poller.pm
 lib/App/Netdisco/Backend/Role/Scheduler.pm
@@ -702,6 +703,12 @@ xt/136-vrf-context-discovery.t
 xt/137-job-log-device-filter.t
 xt/138-device-port-delete-node-set.t
 xt/139-api-object-relations-to-json.t
+xt/140-worker-queues.t
+xt/141-manager-worker-queues.t
+xt/142-portname-check-matches-view.t
+xt/143-api-custom-field-role-scope.t
+xt/144-portctl-topology-gate.t
+xt/145-topology-del-only-matched.t
 xt/20-checkacl.t
 xt/21-check_acl_no_ipaddr_only.t
 xt/30-backend-workers.t
@@ -799,6 +806,7 @@ xt/js/request-helper.test.js
 xt/js/snmp-tree-control.test.js
 xt/js/snmp-tree-dblclick.test.js
 xt/js/sort-types.test.js
+xt/js/statistics-panel.test.js
 xt/js/sticky-header.test.js
 xt/js/stranded-popovers.test.js
 xt/js/submit-dispatch.test.js
@@ -806,6 +814,7 @@ xt/js/swagger-spec-url.test.js
 xt/js/tab-request-sync.test.js
 xt/js/tables-registry.test.js
 xt/js/theme-resolver.test.js
+xt/js/theme-switch.test.js
 xt/js/toast.test.js
 xt/js/toggle-build.test.js
 xt/js/tooltip-dismissal.test.js

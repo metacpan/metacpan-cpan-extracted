@@ -3,7 +3,7 @@ package oEdtk::Keycloak;
 use strict;
 use warnings;
 
-our $VERSION   = 2.1111;
+our $VERSION   = 2.1126;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(get_token);
 

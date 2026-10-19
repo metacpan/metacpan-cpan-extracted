@@ -1,3 +1,9 @@
+0.24 2026-10-19T08:22:58+02:00
+ - Add position to error parameters in 080 plugin.
+ - Add support for extra opening parenthesis in 080a.
+ - Add support for missing quotation mark in 080a ("1960/1972).
+ - Remove error 'character' parameter from some errors.
+
 0.23 2026-10-11T11:27:59+02:00
  - Add another case of whitespace issue in 080a ( = ).
  - Add another case of whitespace issue in 080a (- 044).

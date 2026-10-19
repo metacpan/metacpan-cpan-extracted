@@ -1,0 +1,77 @@
+--- lib/Atomic/Pipe.pm	2026-06-09 23:54:11.194289215 -0700
++++ lib/Atomic/Pipe.pm	2026-10-16 11:02:14.762164351 -0700
+@@ -561,12 +561,21 @@
+ 
+     while (1) {
+         $self->throw_invalid('Incomplete message received before EOF')
+-            if $self->eof && (keys(%{$self->{+STATE}->{buffers}}) || keys (%{$self->{+STATE}->{parts}}));
++            if ($ENV{AP_FIX_EOF} ? ($self->{+EOF} && !$self->{+IN_BUFFER_SIZE} && !length($buffer->{lines} // '') && !length($buffer->{burst} // '')) : $self->eof) && (keys(%{$self->{+STATE}->{buffers}}) || keys (%{$self->{+STATE}->{parts}}));
+ 
+         if($buffer->{lines} || length($buffer->{lines})) {
+             # Look for a complete line
+             my ($line, $term);
++            if ($ENV{AP_FIX_LINES}) {
++                if ($buffer->{lines} =~ /\r?\n|\r\n?/) {
++                    my $out = substr($buffer->{lines}, 0, $+[0], '');
++                    return (line => $out);
++                }
++                $line = $buffer->{lines};
++            }
++            else {
+             ($line, $term, $buffer->{lines}) = split /(\r?\n|\r\n?)/, $buffer->{lines}, 2;
++            }
+ 
+             return (line => "${line}${term}") if $term;
+             return (line => $line) if $self->{+EOF} && !$self->{+IN_BUFFER_SIZE} && defined($line) && length($line);
+@@ -625,8 +634,18 @@
+ 
+             $buffer->{burst} //= '';
+             my ($burst_data, $term);
++            if ($ENV{AP_FIX_SPLIT}) {
++                my $at = index($self->{+IN_BUFFER}, $postfix);
++                if ($at < 0) { $buffer->{burst} .= $self->{+IN_BUFFER}; $self->{+IN_BUFFER} = '' }
++                else {
++                    $buffer->{burst} .= substr($self->{+IN_BUFFER}, 0, $at, '');
++                    $term = substr($self->{+IN_BUFFER}, 0, length($postfix), '');
++                }
++            }
++            else {
+             ($burst_data, $term, $self->{+IN_BUFFER}) = split /(\Q$postfix\E)/, $self->{+IN_BUFFER}, 2;
+             $buffer->{burst} .= $burst_data;
++            }
+ 
+             if ($term) {
+                 $self->{+IN_BUFFER_SIZE} = length($self->{+IN_BUFFER});
+@@ -660,6 +679,21 @@
+         }
+ 
+         # Look for the start of a burst, anything before a burst is line data
++        if ($ENV{AP_FIX_SPLIT}) {
++            my $at = index($self->{+IN_BUFFER}, $prefix);
++            if ($at < 0) {
++                $buffer->{lines} .= $self->{+IN_BUFFER};
++                $self->{+IN_BUFFER} = '';
++                $self->{+IN_BUFFER_SIZE} = 0;
++            }
++            else {
++                $buffer->{lines} .= substr($self->{+IN_BUFFER}, 0, $at, '') if $at;
++                substr($self->{+IN_BUFFER}, 0, length($prefix), '');
++                $buffer->{in_burst} = $prefix;
++                $self->{+IN_BUFFER_SIZE} = length($self->{+IN_BUFFER});
++            }
++            next;
++        }
+         my $linedata;
+         ($linedata, $buffer->{in_burst}, $self->{+IN_BUFFER}) = split /(\Q$prefix\E)/, $self->{+IN_BUFFER}, 2;
+         $buffer->{lines} .= $linedata if defined $linedata;
+@@ -1105,7 +1139,10 @@
+         my $id   = $key->{id};
+         my $tag  = join ':' => @{$key}{qw/pid tid/};
+         push @{$state->{parts}->{$tag} //= []} => $id;
++        if ($ENV{AP_FIX_CAT}) { $state->{buffers}->{$tag} .= $data }
++        else {
+         $state->{buffers}->{$tag} = $state->{buffers}->{$tag} ? $state->{buffers}->{$tag} . $data : $data;
++        }
+ 
+         delete $state->{key};
+ 

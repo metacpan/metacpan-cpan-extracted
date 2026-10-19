@@ -10,7 +10,7 @@ use Object::Proto::Sugar;
 
 use Game::Senet::Engine ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 my (@FIELDS, @IDENTITY, %NAMED, %ALLOWED);
 BEGIN {
@@ -136,7 +136,7 @@ Game::Senet::Variant - a rule set of Senet, as a value
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

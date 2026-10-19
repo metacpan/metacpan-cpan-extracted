@@ -22,7 +22,7 @@ no warnings 'experimental::signatures';
 use Exporter 'import';
 our @EXPORT_OK = qw( call_named_callable load_named_callable require_optional );
 
-our $VERSION = 2.1111;
+our $VERSION = 2.1126;
 
 use Carp qw(croak);
 use Readonly;
@@ -135,6 +135,29 @@ C<call_named_callable> resolves and calls in one step.
 The configuration file is trusted administration data: a name that passes the
 regular expression is required explicitly, and the loaded module is responsible
 for its own behaviour.
+
+=head1 FUNCTIONS
+
+=head2 require_optional
+
+    my $ok = require_optional($module);
+
+Load a companion module by its fixed name; return 1 on success, 0 when it is not
+installed. A missing extension is a documented default, not an error.
+
+=head2 load_named_callable
+
+    my $code = load_named_callable($cfg, $key);
+
+Resolve the C<Module::function> name read from C<$cfg> under C<$key> and return
+the coderef, or C<undef> when the value is absent or empty. A syntactically
+invalid name, or a valid name that cannot be resolved, is an error.
+
+=head2 call_named_callable
+
+    call_named_callable($cfg, $key, @args);
+
+Resolve the callable named by C<$key> and call it with C<@args>.
 
 =head1 AUTHOR
 

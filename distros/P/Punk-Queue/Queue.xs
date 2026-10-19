@@ -41,6 +41,8 @@
 #include "pq_queue.h"           /* the Punk::Queue front (needs pq_hm:
                                  * perform's timeout layers pick alarm or
                                  * a loop timer by whether a loop is live) */
+#include "time_keeper_recurrence_abi.h"  /* Time::Keeper::Recurrence's ABI, vendored (soft dep) */
+#include "pq_tkr.h"             /* ...and the optional lazy resolver      */
 #include "pq_cron.h"            /* the cron parser + next-occurrence walk */
 #include "pq_sched.h"           /* cron storage + the leader tick         */
 #include "pq_worker.h"          /* the worker child state machine         */

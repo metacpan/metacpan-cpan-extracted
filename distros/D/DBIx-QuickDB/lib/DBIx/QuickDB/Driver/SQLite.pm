@@ -2,10 +2,10 @@ package DBIx::QuickDB::Driver::SQLite;
 use strict;
 use warnings;
 
-use IPC::Cmd qw/can_run/;
 use Scalar::Util qw/reftype/;
+use DBIx::QuickDB::Util qw/find_bin/;
 
-our $VERSION = '0.000065';
+our $VERSION = '0.000066';
 
 use parent 'DBIx::QuickDB::Driver';
 
@@ -16,7 +16,7 @@ my ($SQLITE, $DBDSQLITE);
 BEGIN {
     local $@;
 
-    $SQLITE = can_run('sqlite3');
+    $SQLITE = find_bin('sqlite3');
     $DBDSQLITE = eval { require DBD::SQLite; 'DBD::SQLite' };
 }
 

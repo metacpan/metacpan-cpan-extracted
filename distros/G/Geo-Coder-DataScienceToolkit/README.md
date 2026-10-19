@@ -5,7 +5,7 @@ http://www.datasciencetoolkit.org/
 
 ## Version
 
-Version 0.03
+Version 0.04
 
 ## Synopsis
 
@@ -31,6 +31,14 @@ my $ua = LWP::UserAgent->new();
 $ua->env_proxy(1);
 $geocoder = Geo::Coder::DataScienceToolkit->new(ua => $ua);
 ```
+
+A hashref of the same arguments is accepted as well:
+
+```perl
+$geocoder = Geo::Coder::DataScienceToolkit->new({ ua => $ua });
+```
+
+An odd number of arguments is refused rather than read as a key with no value.
 
 ### Geocode
 

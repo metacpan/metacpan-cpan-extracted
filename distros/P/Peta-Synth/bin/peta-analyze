@@ -1,0 +1,304 @@
+#!perl
+# peta-analyze: what a note's partials are and do, how loud and how bright
+# it is over time; this synthesizer's note, a recording's, FluidSynth's.
+#
+#   peta-analyze --program 0 --key 60              this synthesizer's note
+#   peta-analyze --program 0 --key 60 --fluid      and FluidSynth's, and what differs
+#   peta-analyze --drum 38 --fluid                 a drum: its level and brightness
+#   peta-analyze note.wav --key 60                 a recording (WAV)
+#   peta-analyze --program 40 --response 55-88 --fluid   the body's resonances
+#
+# Run with --help for the options.
+use v5.36;
+use Getopt::Long qw(GetOptions);
+use JSON::PP;
+use Peta::Synth::Analysis;
+use Peta::Synth::Engine;
+use Peta::Synth::Patch;
+use Peta::Synth::Synth;
+
+my $USAGE = <<'END';
+peta-analyze: what a note's partials are and do, how loud and bright it is.
+
+  peta-analyze --program N --key K [options]   this synthesizer's note
+  peta-analyze --drum K [options]              a drum of the kit
+  peta-analyze FILE.wav --key K [options]      a recording (WAV)
+  peta-analyze --program N --response LOW-HIGH [options]
+                                               what the body does to the harmonics
+
+  --velocity N    100
+  --hold S        seconds the key is held (3); the sound runs a second longer
+  --fluid         FluidSynth's note too (General MIDI SoundFont), and what differs
+  --soundfont F   FluidSynth's SoundFont (/usr/share/soundfonts/FluidR3_GM.sf2)
+  --bank FILE     instrument changes (JSON, as the web page saves them)
+  --partials N    how many partials (16)
+  --times LIST    seconds into the note they are measured at (0.02,0.1,0.3,1,2.5)
+  --grid K        the partials measured as harmonics of key K (the key played): an
+                  octave below it finds what sounds an octave under the note
+  --response LOW-HIGH[/STEP]
+                  a note at every STEP keys (2) from LOW to HIGH, their partials
+                  (at --times, 0.5,1 here) less a sawtooth's 1/k (--source), by
+                  frequency in third octaves: the resonances of a body (a
+                  violin's, a reed's chamber), the loudest band 0 dB
+  --source SLOPE  the source's fall, amplitude k^-SLOPE (1)
+  --start S       a WAV: where the note begins (0)
+  --engine NAME   perl (the reference), pdl, gpu, auto
+  --rate N        48000
+
+Levels of partials are dB under the fundamental's first; cents are from k
+times the fundamental; dB/s is the slope over the times. The level is the
+RMS every 0.25 s, dB under its loudest; brightness the spectral centroid.
+END
+
+my %opt = (
+    velocity => 100,
+    hold     => 3,
+    partials => 16,
+    source   => 1,
+    start    => 0,
+    engine   => 'perl',
+    rate     => 48000,
+);
+GetOptions(\%opt, 'program=i', 'drum=i', 'key=i', 'velocity=i', 'hold=f', 'fluid', 'soundfont=s', 'bank=s', 'partials=i',
+    'times=s', 'grid=i', 'response=s', 'source=f', 'start=f', 'engine=s', 'rate=i', 'help') or die $USAGE;
+if ($opt{help}) {
+    print $USAGE;
+    exit 0;
+}
+my $file = shift @ARGV;
+die $USAGE                 if !defined $file && !defined $opt{program} && !defined $opt{drum};
+die "a note needs --key\n" if !defined $opt{drum} && !defined $opt{key} && !defined $opt{response};
+
+$opt{times} //= $opt{response} ? '0.5,1' : '0.02,0.1,0.3,1,2.5';
+my @times = split /,/, $opt{times};
+my $bank  = defined $opt{bank} ? read_bank($opt{bank}) : undef;
+
+if (defined $opt{response}) {
+    response();
+    exit 0;
+}
+my @sounds   = defined $file ? recording($file) : the_note();
+my @measured = map { measure(@$_) } @sounds;
+report($_) for @measured;
+difference(@measured) if @measured == 2;
+exit 0;
+
+# The body's resonances (--response): the curves of this synthesizer's notes
+# (and FluidSynth's), band by band.
+sub response () {
+    die "--response wants a program\n" if !defined $opt{program};
+    my ($low, $high, $step) = $opt{response} =~ m{^(\d+)-(\d+)(?:/(\d+))?$} or die "--response LOW-HIGH[/STEP]\n";
+    $step ||= 2;
+
+    my @notes;    # by sound: [ [samples, rate, f0], ... ]
+    for (my $key = $low; $key <= $high; $key += $step) {
+        my @sounds = play($key);
+        for my $s (0 .. $#sounds) {
+            my (undef, $x, $rate) = @{ $sounds[$s] };
+            push @{ $notes[$s] }, [ $x, $rate, hz($key) ];
+        }
+    }
+    my @curves = map {
+        Peta::Synth::Analysis::response($_, count => $opt{partials}, times => \@times, slope => $opt{source})
+    } @notes;
+
+    printf "%s, keys %d to %d by %d, velocity %d: the harmonics less k^-%g, dB by third octave\n\n",
+        Peta::Synth::Patch::program_name($opt{program}), $low, $high, $step, $opt{velocity}, $opt{source};
+    my %at;    # band centre => [ the band of each curve ]
+    for my $c (0 .. $#curves) {
+        $at{ sprintf '%.0f', $_->{centre} }[$c] = $_ for @{ $curves[$c] };
+    }
+    my @labels = ('this synthesizer', $opt{fluid} ? ('FluidSynth', 'difference') : ());
+    printf "  %7s %s\n", 'Hz', join(' ', map { sprintf '%17s', $_ } @labels);
+    for my $centre (sort { $a <=> $b } keys %at) {
+        my @levels = map { $_ && $_->{level} } @{ $at{$centre} }[ 0 .. $#curves ];
+        push @levels, less($levels[1], $levels[0]) if @curves == 2;
+        printf "  %7d %s\n", $centre, join(' ', map { defined $_ ? sprintf('%17.1f', $_) : ' ' x 17 } @levels);
+    }
+    return;
+}
+
+# A WAV file's sound, from --start: [label, samples, rate].
+sub recording ($file) {
+    my $wav = Peta::Synth::Analysis::read_wav($file);
+    my $x   = Peta::Synth::Analysis::mono(@{ $wav->{channels} });
+    splice @$x, 0, int($opt{start} * $wav->{rate});
+    return [ $file, $x, $wav->{rate} ];
+}
+
+# The note (or drum) asked for, its name shown.
+sub the_note () {
+    my $drum = defined $opt{drum};
+    my $key  = $drum ? $opt{drum} : $opt{key};
+    my $name = $drum ? Peta::Synth::Patch::drum_name($key) : Peta::Synth::Patch::program_name($opt{program});
+    printf "%s, key %d%s, velocity %d, held %g s\n\n",
+        $name, $key, $drum ? '' : sprintf(' (%.1f Hz)', hz($key)), $opt{velocity}, $opt{hold};
+    return play($key);
+}
+
+# A note (or the drum) from 0, alone, no reverb, no chorus: [label, samples,
+# rate] of this synthesizer's, and of FluidSynth's with --fluid.
+sub play ($key) {
+    my $rate    = $opt{rate};
+    my $drum    = defined $opt{drum};
+    my $channel = $drum ? 9 : 0;
+    my @events  = (
+        { time => 0, type => 'controller', channel => $channel, number => 91, value => 0 },    # no reverb
+        { time => 0, type => 'controller', channel => $channel, number => 93, value => 0 },    # no chorus
+        $drum ? () : { time => 0, type => 'program', channel => $channel, program => $opt{program} },
+        { time => 0,          type => 'note_on',  channel => $channel, key => $key, velocity => $opt{velocity} },
+        { time => $opt{hold}, type => 'note_off', channel => $channel, key => $key, velocity => 64 },
+    );
+    my $length = int(($opt{hold} + 1) * $rate);
+
+    my $engine = Peta::Synth::Engine::create($opt{engine}, rate => $rate);
+    my $synth  = Peta::Synth::Synth->new(rate => $rate, gain => 1, limiter => 0, engine => $engine);
+    $synth->apply_edits($bank) if $bank;
+    $synth->schedule(\@events);
+    my @sounds = ([ 'this synthesizer', Peta::Synth::Analysis::mono($synth->render_frames($length)), $rate ]);
+
+    if ($opt{fluid}) {
+        require Peta::Synth::Fluid;
+        my $why = Peta::Synth::Fluid::unavailable($opt{soundfont} // ());
+        die "no FluidSynth: $why\n" if $why;
+        my ($left, $right) = Peta::Synth::Fluid::render(\@events, rate => $rate, soundfont => $opt{soundfont}, length => $length);
+        push @sounds, [ 'FluidSynth', Peta::Synth::Analysis::mono($left, $right), $rate ];
+    }
+    return @sounds;
+}
+
+# A sound measured: its level every 0.25 s (dB under its loudest), its
+# brightness at the times, and for a note its partials at the times.
+sub measure ($label, $x, $rate) {
+    my $envelope = Peta::Synth::Analysis::envelope($x, $rate, 0.25);
+    my $loudest  = (sort { $b <=> $a } @$envelope)[0];
+    my %m        = (
+        label  => $label,
+        level  => [ map { $_ - $loudest } @$envelope ],
+        bright => [ map {
+            my $at = int($_ * $rate);
+            $at + 4096 <= @$x ? Peta::Synth::Analysis::centroid($x, $rate, $at) : undef
+        } @times ],
+    );
+    return \%m if !defined $opt{key} || defined $opt{drum};
+
+    my $f0    = hz($opt{grid} // $opt{key});
+    my $p     = Peta::Synth::Analysis::partials($x, rate => $rate, f0 => $f0, count => $opt{partials}, times => \@times);
+    my $first = $p->{level}[1][0];
+    for my $k (1 .. $opt{partials}) {
+        push @{ $m{partials} }, {
+            k      => $k,
+            cents  => 1200 * log($p->{freq}[$k][0] / ($k * $f0)) / log(2),
+            levels => [ map { $_ - $first } @{ $p->{level}[$k] } ],
+            decay  => Peta::Synth::Analysis::slope($p->{times}, $p->{level}[$k]),
+        };
+    }
+    @m{qw(B f)} = Peta::Synth::Analysis::stretch(map { $_ && $_->[0] } @{ $p->{freq} });
+    $m{times}   = $p->{times};
+    return \%m;
+}
+
+sub report ($m) {
+    print "$m->{label}\n";
+    print '  level      ', row(@{ $m->{level} }), "\n";
+    print '  brightness ', row(@{ $m->{bright} }), '   (Hz, at ', join(', ', @times), " s)\n";
+    if (!$m->{partials}) {
+        print "\n";
+        return;
+    }
+    partials_head($m->{times});
+    for my $p (@{ $m->{partials} }) {
+        printf "  %2d %6.0f %s\n", $p->{k}, $p->{cents}, row(@{ $p->{levels} }, $p->{decay});
+    }
+    printf "  stiffness B %.5f (fundamental %.1f Hz)\n\n", $m->{B}, $m->{f};
+    return;
+}
+
+# FluidSynth's note less this synthesizer's, measure by measure.
+sub difference ($ours, $theirs) {
+    print "$theirs->{label} less $ours->{label}\n";
+    print '  level      ', row(map { less($theirs->{level}[$_], $ours->{level}[$_]) } 0 .. $#{ $ours->{level} }), "\n";
+    print '  brightness ', row(map { less($theirs->{bright}[$_], $ours->{bright}[$_]) } 0 .. $#times), "\n";
+    return if !$ours->{partials} || !$theirs->{partials};
+
+    partials_head($ours->{times});
+    for my $i (0 .. $#{ $ours->{partials} }) {
+        my $o      = $ours->{partials}[$i];
+        my $t      = $theirs->{partials}[$i];
+        my @levels = map { less($t->{levels}[$_], $o->{levels}[$_]) } 0 .. $#{ $o->{levels} };
+        printf "  %2d %6.0f %s\n", $o->{k}, $t->{cents} - $o->{cents}, row(@levels, $t->{decay} - $o->{decay});
+    }
+    printf "  stiffness B %+.5f\n", $theirs->{B} - $ours->{B};
+    return;
+}
+
+sub partials_head ($times) {
+    printf "  %2s %6s %s %6s\n", 'k', 'cents', join(' ', map { sprintf '%6s', "${_}s" } @$times), 'dB/s';
+    return;
+}
+
+sub row (@cells) { return join ' ', map { defined $_ ? sprintf('%6.0f', $_) : ' ' x 6 } @cells }
+
+# $x - $y, if both are there.
+sub less ($x, $y) { return defined $x && defined $y ? $x - $y : undef }
+
+# A key's frequency, equally tempered, A 440 Hz.
+sub hz ($key) { return 440 * 2**(($key - 69) / 12) }
+
+sub read_bank ($file) {
+    open my $fh, '<:raw', $file or die "cannot read '$file': $!\n";
+    return JSON::PP->new->decode(do { local $/; scalar <$fh> });
+}
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+peta-analyze - a note's partials, level and brightness; beside FluidSynth's
+
+=head1 VERSION
+
+version 0.2610180
+
+=head1 SYNOPSIS
+
+    peta-analyze --program 0 --key 60                       # this synthesizer's note
+    peta-analyze --program 0 --key 60 --fluid               # and FluidSynth's, and what differs
+    peta-analyze --drum 38 --fluid                          # a drum: its level and brightness
+    peta-analyze note.wav --key 60                          # a recording (WAV)
+    peta-analyze --program 40 --response 55-88 --fluid      # the body's resonances
+    peta-analyze --help                                     # the options
+
+=head1 DESCRIPTION
+
+Plays one note of this synthesizer alone (no reverb, no chorus), or reads a
+recording, and measures it with L<Peta::Synth::Analysis>: its level every
+quarter of a second, its brightness (spectral centroid), and for a note
+each partial's tuning in cents and its level at the times asked for, how
+fast it falls, and the stiffness the partials' stretch says.
+
+With C<--fluid>, FluidSynth plays the same note from a General MIDI
+SoundFont (L<Peta::Synth::Fluid>), and what differs is shown beneath.
+C<--response> plays notes across a range and shows what the instrument's
+body does to the harmonics, band by band.
+
+=head1 SEE ALSO
+
+L<Peta::Synth::Analysis>, L<Peta::Synth::Fluid>, L<peta-synth>.
+
+=head1 AUTHOR
+
+PetaMem s.r.o. E<lt>info@petamem.comE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2026 PetaMem s.r.o.
+
+=head1 LICENSE
+
+This package is free software, dual-licensed under the Artistic License 2.0
+and the BSD 2-Clause License. See the LICENSE file of the distribution.
+
+=cut

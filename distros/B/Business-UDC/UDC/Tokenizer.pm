@@ -10,10 +10,11 @@ use Unicode::UTF8 qw(decode_utf8);
 
 Readonly::Array our @EXPORT_OK => qw(tokenize);
 
-our $VERSION = 0.09;
+our $VERSION = 0.10;
 
 sub tokenize {
 	my ($input, $position_offset) = @_;
+
 	$position_offset //= 0;
 	my @tokens;
 	my $left_double_quote = decode_utf8('“');
@@ -42,6 +43,11 @@ sub tokenize {
 
 		if ($input =~ /\G(\d+(?:[\.,]\d+)*)/gc) {
 			_push_token(\@tokens, 'NUMBER', $1, $start);
+			next;
+		}
+
+		if ($input =~ /\G(\.)(?=\s)/gc) {
+			_push_token(\@tokens, 'AUX_DOT', $1, $start, 1);
 			next;
 		}
 
@@ -99,6 +105,16 @@ sub tokenize {
 			next;
 		}
 
+		if (substr($input, $start, 1) eq '"'
+			&& index($input, '"', $start + 1) < 0
+			&& index($input, "''", $start + 1) < 0
+			&& index($input, $right_double_quote, $start + 1) < 0) {
+			err "Missing closing quotation mark '\"'.",
+				'position' => $position_offset + $start,
+				'character' => '"',
+			;
+		}
+
 		if ($input =~ /\G(($time_quote)(?:(?!$time_quote)[\s\S])*$time_quote)/gc) {
 			my $value = $1;
 			if ($value =~ /\p{L}/u) {
@@ -126,6 +142,11 @@ sub tokenize {
 
 		my $a = decode_utf8('’');
 		my $acute = decode_utf8('´');
+		if ($input =~ /\G(')(?=\s)/gc) {
+			_push_token(\@tokens, 'APOS_AUX', $1, $start, 1);
+			next;
+		}
+
 		if ($input =~ /\G((?:'|`|&apos;|$a|$acute)\d+(?:\.\d+)*)/gc) {
 			_push_token(\@tokens, 'APOS_AUX', $1, $start);
 			next;
@@ -142,8 +163,8 @@ sub tokenize {
 
 sub _find_parenthesis_end {
 	my ($input, $start) = @_;
-	my $depth = 0;
 
+	my $depth = 0;
 	for (my $pos = $start; $pos < length($input); $pos++) {
 		my $character = substr($input, $pos, 1);
 		if ($character eq '(') {
@@ -158,9 +179,9 @@ sub _find_parenthesis_end {
 }
 
 sub _offset_token_positions {
-	my ($tokens, $offset) = @_;
+	my ($tokens_ar, $offset) = @_;
 
-	foreach my $token (@{$tokens}) {
+	foreach my $token (@{$tokens_ar}) {
 		$token->{'pos'} += $offset;
 		if ($token->{'tokens'}) {
 			_offset_token_positions($token->{'tokens'}, $offset);

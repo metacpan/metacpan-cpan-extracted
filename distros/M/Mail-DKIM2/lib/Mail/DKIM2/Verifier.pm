@@ -2,13 +2,14 @@ package Mail::DKIM2::Verifier;
 use strict;
 use warnings;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 use base 'Mail::DKIM2::HeaderParser';
 use Crypt::Digest::SHA256 qw(sha256);
 use MIME::Base64 qw(encode_base64 decode_base64);
 use Carp;
 use POSIX qw();
+use Time::HiRes ();
 
 use Mail::DKIM2::Common qw(
     parse_mime
@@ -31,6 +32,8 @@ use Mail::DKIM2::Common qw(
 use Email::MIME;
 use Mail::DKIM2::Signature;
 use Mail::DKIM2::MessageInstance;
+use Mail::DKIM2::BodyPlan;
+use Mail::DKIM2::HeaderPlan;
 
 # The signing algorithms this verifier implements (spec-06 §3.2, §3.3), and
 # the key class each needs. Every other s= item is ignored (§3.4).
@@ -38,6 +41,12 @@ my %IMPLEMENTED_ALG = (
     'rsa-sha256'     => 'Crypt::PK::RSA',
     'ed25519-sha256' => 'Crypt::PK::Ed25519',
 );
+
+# How long a key lookup sent in the background at the end of the headers is
+# waited for, from when it was sent, before it is asked again the ordinary
+# way (with the resolver's retries and other servers): Net::DNS's own first
+# retransmit interval.
+our $PREFETCH_WAIT = 5;
 
 sub _extract_mi_hash_sets {
     my ($raw) = @_;
@@ -49,7 +58,7 @@ sub _extract_mi_hash_sets {
 
 sub known_options {
     return qw(SkipTimestampCheck AllowUnsignedMI MidProcess HeadersOnly
-              PubkeyCallback Resolver IgnorePrefixes NextDomainOK);
+              PubkeyCallback Resolver IgnorePrefixes NextDomainOK StreamBody);
 }
 
 sub init {
@@ -62,6 +71,7 @@ sub init {
     $self->{details}             = undef;
     # Options the constructor was given stay; the rest get their defaults.
     $self->{$_} //= 0 for qw(SkipTimestampCheck MidProcess AllowUnsignedMI HeadersOnly);
+    $self->{StreamBody} //= 1;
     check_ignore_prefixes($self->{IgnorePrefixes});
 }
 
@@ -122,6 +132,16 @@ sub headers_only {
     my ($self, $val) = @_;
     $self->{HeadersOnly} = $val if defined $val;
     return $self->{HeadersOnly};
+}
+
+# stream_body: hash every instance's body as the body arrives, and work out
+# every header hash from the fields as received (Mail::DKIM2::BodyPlan and
+# HeaderPlan), instead of keeping the body and undoing each instance. On by
+# default; off is the undo walk, kept to check the plans against.
+sub stream_body {
+    my ($self, $val) = @_;
+    $self->{StreamBody} = $val if defined $val;
+    return $self->{StreamBody};
 }
 
 sub handle_header {
@@ -206,7 +226,42 @@ sub finish_header {
     unless (%{$self->{_dk2_headers}}) {
         $self->finish_body;
         $self->stop;
+        return;
     }
+
+    $self->_prefetch_keys;
+
+    $self->_start_plans if $self->{StreamBody} && !$self->{HeadersOnly};
+}
+
+# StreamBody: from the header fields, parsed once as the undo walk's parser
+# parses them, work out every instance's header hash (HeaderPlan) and plan
+# its body (BodyPlan), then hash the body as it arrives rather than keeping
+# it. The instances are parsed once, highest m= first, stopping at one that
+# does not parse; the chain walk reports that one in verify()'s words.
+sub _start_plans {
+    my ($self) = @_;
+    my $hplan  = Mail::DKIM2::HeaderPlan->new($self->{headers},
+        IgnorePrefixes => $self->{IgnorePrefixes});
+    my @values = $hplan->values('Message-Instance');
+    my %by_v   = map { (extract_mi_version($_) // 0) => $_ } @values;
+
+    my (@parsed, %parsed, %parse_error);
+    for my $v (sort { $b <=> $a } grep { $_ } keys %by_v) {
+        my $obj = eval { Mail::DKIM2::MessageInstance->parse($by_v{$v}) };
+        die $@ if ref $@;
+        unless ($obj) {
+            $parse_error{$v} = Mail::DKIM2::MessageInstance::_parse_error($@);
+            last;
+        }
+        push @parsed, $obj;
+        $parsed{$v} = $obj;
+    }
+    $self->{_planned} = { values => \@values, by_v => \%by_v,
+                          parsed => \%parsed, parse_error => \%parse_error };
+    $self->{_header_plan} = $hplan->plan(@parsed);
+    my $plan = $self->{_body_plan} = Mail::DKIM2::BodyPlan->new(@parsed);
+    $self->{_body_sink} = sub { $plan->add($_[0]) };
 }
 
 sub finish_body {
@@ -461,6 +516,15 @@ sub _verify_top_mi_headers {
 sub _verify_mi_chain {
     my ($self) = @_;
 
+    # With a BodyPlan the body was hashed as it arrived and is not here: the
+    # walk checks and undoes the headers, and takes each body hash, and each
+    # body Recipe's verdict, from the plan.
+    my $plan = $self->{_body_plan};
+    $plan->finish if $plan;
+    my $hplan = $self->{_header_plan};
+    return $self->_verify_mi_chain_planned
+        if $hplan && !$hplan->rewrites_instances;
+
     my $raw = join('', @{$self->{headers}}) . "\r\n" . ($self->{_buf} // '');
     my $msg = parse_mime($raw);
 
@@ -471,22 +535,15 @@ sub _verify_mi_chain {
         my $num = %by_v ? (sort { $b <=> $a } keys %by_v)[0] : 0;
         last unless $num;
 
-        my ($ok, $err) = Mail::DKIM2::MessageInstance->verify($msg,
-            IgnorePrefixes => $self->{IgnorePrefixes},
-            HeadersOnly    => $headers_only);
-        unless ($ok) {
-            # A malformed instance is a PERMERROR in its own words (§11.2
-            # names the strings); a hash that does not match is a fail.
-            if (($err // '') =~ /^PERMERROR/) {
-                $self->{result}  = 'permerror';
-                $self->{details} = $err;
-                return 0;
-            }
-            $self->{result}  = 'fail';
-            $self->{details} = "Message-Instance m=$num does not match content"
-                             . ($err ? " ($err)" : '');
-            return 0;
+        my %body = (HeadersOnly => $headers_only);
+        if ($plan && !$headers_only) {
+            my %hashes = map { my $h = $plan->body_hash($num, $_); defined $h ? ($_ => $h) : () }
+                         keys %{ Mail::DKIM2::MessageInstance::hash_algs() };
+            %body = %hashes ? (BodyHashes => \%hashes) : (HeadersOnly => 1);
         }
+        my ($ok, $err) = Mail::DKIM2::MessageInstance->verify($msg,
+            IgnorePrefixes => $self->{IgnorePrefixes}, %body);
+        return $self->_mi_mismatch($num, $err) unless $ok;
 
         last if $num <= 1;
 
@@ -497,19 +554,77 @@ sub _verify_mi_chain {
         $headers_only = 1 if $mi_obj->unrecoverable;
 
         my $prev = eval {
-            Mail::DKIM2::MessageInstance->undo($msg, HeadersOnly => $headers_only)
+            if ($plan && (my $e = $plan->recipe_error($num))) {
+                die $e;
+            }
+            Mail::DKIM2::MessageInstance->undo($msg, HeadersOnly => $headers_only || $plan)
         };
         die $@ if ref $@;
-        if ($@ || !$prev) {
-            $self->{result}  = 'fail';
-            $self->{details} = "Message-Instance m=$num did not undo cleanly"
-                             . ($@ ? ": $@" : '');
-            return 0;
-        }
+        return $self->_mi_undo_failed($num, $@) if $@ || !$prev;
         $msg = $prev;
     }
 
     return 1;
+}
+
+# _verify_mi_chain with both plans: the same walk and the same verdicts,
+# but every hash and every Recipe's verdict is the plans' -- nothing is
+# rebuilt. (Unless a header Recipe names Message-Instance, which changes
+# the instances below it: _verify_mi_chain walks that itself.)
+sub _verify_mi_chain_planned {
+    my ($self) = @_;
+    my ($plan, $hplan) = @{$self}{qw(_body_plan _header_plan)};
+    my $p = $self->{_planned};
+    my @nums = sort { $b <=> $a } grep { $_ } keys %{$p->{by_v}};
+    return 1 unless @nums;
+
+    if (my $err = Mail::DKIM2::MessageInstance::_chain_error_fields($p->{values},
+            $self->{_chain_counts}{'dkim2-signature'} // 0)) {
+        return $self->_mi_mismatch($nums[0], $err);
+    }
+
+    my $headers_only = 0;
+    for my $num (@nums) {
+        my $mi = $p->{parsed}{$num};
+        my ($ok, $err) = $mi
+            ? $mi->_check_hashes($num,
+                  sub { $hplan->header_hash($num, $_[0]) // '' },
+                  $headers_only ? undef : sub { $plan->body_hash($num, $_[0]) // '' })
+            : (0, $p->{parse_error}{$num});
+        return $self->_mi_mismatch($num, $err) unless $ok;
+
+        last if $num <= 1;
+
+        $headers_only = 1 if $mi->unrecoverable;
+        if (my $e = $plan->recipe_error($num) // $hplan->recipe_error($num)) {
+            return $self->_mi_undo_failed($num, $e);
+        }
+    }
+    return 1;
+}
+
+# Instance $num does not match the content it describes.
+sub _mi_mismatch {
+    my ($self, $num, $err) = @_;
+    # A malformed instance is a PERMERROR in its own words (§11.2 names the
+    # strings); a hash that does not match is a fail.
+    if (($err // '') =~ /^PERMERROR/) {
+        $self->{result}  = 'permerror';
+        $self->{details} = $err;
+        return 0;
+    }
+    $self->{result}  = 'fail';
+    $self->{details} = "Message-Instance m=$num does not match content"
+                     . ($err ? " ($err)" : '');
+    return 0;
+}
+
+sub _mi_undo_failed {
+    my ($self, $num, $err) = @_;
+    $self->{result}  = 'fail';
+    $self->{details} = "Message-Instance m=$num did not undo cleanly"
+                     . ($err ? ": $err" : '');
+    return 0;
 }
 
 sub _verify_signature {
@@ -913,14 +1028,10 @@ sub fetch_public_key {
     my $dom = $signature->domain;
     croak "missing selector or domain" unless $sel && $dom;
 
-    my $resolver = $self->{Resolver} //= do {
-        require Net::DNS::Resolver;
-        Net::DNS::Resolver->new;
-    };
     my $fqdn = "$sel._domainkey.$dom";
-    my $reply = $resolver->query($fqdn, 'TXT');
+    my ($reply, $err) = @{ $self->{_key_replies}{lc $fqdn} //= $self->_key_reply($fqdn) };
     unless ($reply) {
-        my $err = $resolver->errorstring // '';
+        $err //= '';
         return if $err =~ /^(?:NXDOMAIN|NOERROR|NODATA)\s*$/i;
         croak "TEMPERROR: DNS lookup for $fqdn failed: $err";
     }
@@ -938,6 +1049,66 @@ sub fetch_public_key {
     croak "PERMERROR: algorithm mismatch\n"
         if $IMPLEMENTED_ALG{$alg} && !$key->isa($IMPLEMENTED_ALG{$alg});
     return $key;
+}
+
+sub _resolver {
+    my ($self) = @_;
+    return $self->{Resolver} //= do {
+        require Net::DNS::Resolver;
+        Net::DNS::Resolver->new;
+    };
+}
+
+# Every key the signatures name, asked for at once, in the background, as
+# soon as the header fields are in: the answers come back while the body
+# arrives and is hashed. Only with a resolver that can (Net::DNS's bgsend),
+# and not when a PubkeyCallback fetches the keys. Never fatal: a key not
+# asked for here is asked for when it is wanted.
+sub _prefetch_keys {
+    my ($self) = @_;
+    return if $self->{PubkeyCallback};
+    my $resolver = $self->_resolver;
+    return unless $resolver->can('bgsend');
+    for my $entry (sort { $b->{sig}->sequence <=> $a->{sig}->sequence }
+                   values %{$self->{_dk2_headers}}) {
+        my $sig = $entry->{sig};
+        eval {
+            my $dom = $sig->domain or return;
+            for my $idx (0 .. ($sig->sig_count || 0) - 1) {
+                next unless $IMPLEMENTED_ALG{$sig->algorithm($idx) // ''};
+                my $sel = $sig->selector($idx) or next;
+                my $fqdn = "$sel._domainkey.$dom";
+                next if $self->{_key_queries}{lc $fqdn};
+                my $handle = $resolver->bgsend($fqdn, 'TXT') or next;
+                $self->{_key_queries}{lc $fqdn} =
+                    [$handle, Time::HiRes::time() + $PREFETCH_WAIT];
+            }
+        };
+        die $@ if ref $@;
+    }
+}
+
+# The DNS answer for $fqdn as [$reply] or [undef, $error], query()'s
+# results: from the background query if it gave one that settles it (an
+# answer, NXDOMAIN, or NOERROR with none), else from query().
+sub _key_reply {
+    my ($self, $fqdn) = @_;
+    my $resolver = $self->_resolver;
+    if (my $q = delete $self->{_key_queries}{lc $fqdn}) {
+        my $ready = 1;
+        while ($resolver->bgbusy($q->[0])) {    # may swap in a TCP handle
+            next if Time::HiRes::time() < $q->[1];
+            $ready = 0;
+            last;
+        }
+        if (my $packet = $ready && $resolver->bgread($q->[0])) {
+            my $rcode = $packet->header->rcode;
+            return [$packet] if $packet->header->ancount;
+            return [undef, $rcode] if $rcode eq 'NXDOMAIN' || $rcode eq 'NOERROR';
+        }
+    }
+    my $reply = $resolver->query($fqdn, 'TXT');
+    return [$reply, $reply ? undef : $resolver->errorstring];
 }
 
 sub resolver {
@@ -1054,6 +1225,15 @@ A L<Net::DNS::Resolver> (or anything with the same C<query> and
 C<errorstring> methods) for the default public-key lookup. Created on
 demand if not given. A milter host passes its own so its timeouts apply.
 
+If it also has Net::DNS's C<bgsend>, C<bgbusy> and C<bgread>, every key
+the signatures name is asked for at once, in the background, as soon as
+the header fields are in, and the answers are read when the signatures
+are checked: the lookups overlap each other, the body's arrival and the
+hashing. An answer that settles nothing -- none within
+C<$Mail::DKIM2::Verifier::PREFETCH_WAIT> seconds (5) of being sent, or
+SERVFAIL -- is asked again with C<query>, so the verdicts are those of
+one C<query> at a time. Not with a C<PubkeyCallback>.
+
 =item PubkeyCallback
 
 A code reference that replaces the DNS lookup. Called as
@@ -1094,6 +1274,15 @@ The verifier is looking at a partial view of the chain, with higher
 signatures stripped (as the validator does walking the chain top-down), so
 the highest remaining signature is not the true top and the checks that
 apply only to the top are suppressed. Implies C<AllowUnsignedMI>.
+
+=item StreamBody
+
+On (the default): hash every Message-Instance's body as the body arrives,
+in one pass (L<Mail::DKIM2::BodyPlan>), and every header hash from the
+fields as received (L<Mail::DKIM2::HeaderPlan>); the body is never held
+and no previous version of the message is rebuilt. Off (C<0>): keep the
+body and undo each instance in turn. The verdicts, and their words, are
+the same.
 
 =item HeadersOnly
 
@@ -1172,7 +1361,9 @@ C<header.d> and C<header.i> for Authentication-Results.
 =head2 fetch_public_key($signature, $index)
 
 The default key source: a TXT lookup of
-C<< <selector>._domainkey.<d=> >> through the C<Resolver>. Returns a key
+C<< <selector>._domainkey.<d=> >> through the C<Resolver> (the answer to
+the background lookup sent at the end of the headers, if there was one; see
+C<Resolver>). Each name is looked up once per message. Returns a key
 object, undef when the answer positively says there is no such record
 (NXDOMAIN, NOERROR or NODATA), and dies with a C<TEMPERROR:> message for
 anything else, including a resolver error string it has never seen. The
@@ -1187,7 +1378,7 @@ strings in one RR are joined), C<has a syntax error> and C<has been
 revoked> (see L<Mail::DKIM2::Common/parse_dkim_key_record>), or
 C<algorithm mismatch> (a C<k=> that is not the signature algorithm's).
 
-=head2 resolver([$resolver]), set_pubkey_callback(\&cb), skip_timestamp_check([$bool]), allow_unsigned_mi([$bool]), next_domain_ok([$domain]), mid_process([$bool]), headers_only([$bool])
+=head2 resolver([$resolver]), set_pubkey_callback(\&cb), skip_timestamp_check([$bool]), allow_unsigned_mi([$bool]), next_domain_ok([$domain]), mid_process([$bool]), headers_only([$bool]), stream_body([$bool])
 
 Get or set the constructor options of the same names.
 

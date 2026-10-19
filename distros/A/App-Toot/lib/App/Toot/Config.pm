@@ -5,7 +5,7 @@ use warnings;
 
 use Config::Tiny;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 sub load {
     my $class   = shift;
@@ -15,13 +15,7 @@ sub load {
         die 'section is required';
     }
 
-    my $config = _load_and_verify();
-
-    if ( !exists $config->{$section} ) {
-        die "$section section was not found in the config";
-    }
-
-    return $config->{$section};
+    return _load_and_verify($section)->{$section};
 }
 
 sub _get_conf_dir {
@@ -42,6 +36,8 @@ sub _get_conf_dir {
 }
 
 sub _load_and_verify {
+    my $section = shift;
+
     my $rc = _get_conf_dir() . '/config.ini';
 
     unless ( -e $rc && -r $rc ) {
@@ -50,15 +46,17 @@ sub _load_and_verify {
 
     my $config = Config::Tiny->read($rc);
 
-    unless ( defined $config->{'default'} ) {
-        die "default section in $rc is not defined\n";
+    if ( !defined $config ) {
+        die "error: unable to parse $rc: " . Config::Tiny->errstr . "\n";
     }
 
-    foreach my $section ( keys %$config ) {
-        foreach my $key (qw{ instance username client_id client_secret access_token }) {
-            unless ( defined $config->{$section}{$key} ) {
-                die "$key key for $section section in $rc is not defined\n";
-            }
+    if ( !exists $config->{$section} ) {
+        die "$section section was not found in the config\n";
+    }
+
+    foreach my $key (qw{ instance username client_id client_secret access_token }) {
+        if ( !defined $config->{$section}{$key} ) {
+            die "$key key for $section section in $rc is not defined\n";
         }
     }
 
@@ -116,6 +114,8 @@ To set up the configuration file, copy C<config.ini.example> into one of the fol
 
 After creating the file, edit and update the values in the C<default> section to match the account's oauth credentials.
 
+The C<default> section is the section loaded when no other section is requested, but it is not required to exist.  Any section name can be used.
+
  [default]
  instance = mastodon.social
  username = youruser
@@ -127,7 +127,7 @@ B<NOTE:> If the C<$ENV{HOME}/.config/toot/> directory exists, C<config.ini> will
 
 =head2 Required keys
 
-The following keys are required for each section:
+The following keys are required for the section being loaded:
 
 =over
 
@@ -155,7 +155,7 @@ The C<access_token> as provided for the C<username> on the C<instance>.
 
 =head2 Additional accounts
 
-Multiple accounts can be configured with different sections after the C<default> section.
+Multiple accounts can be configured with different sections in any order.  The C<default> section is not required.
 
  [default]
  instance = mastodon.social
@@ -170,7 +170,7 @@ Multiple accounts can be configured with different sections after the C<default>
  client_secret = u7hhd_STILLNOTAREALCLIENTSECRET
  access_token = D873_SKILLNOTAREALACCESSTOKEN
 
-The section name, C<development> in the example above, can be named anything as long as it's unique with the other section names.
+The section name, C<development> in the example above, can be named anything as long as it's unique with the other section names.  A section only needs the required keys when it is loaded.
 
 =head1 COPYRIGHT AND LICENSE
 

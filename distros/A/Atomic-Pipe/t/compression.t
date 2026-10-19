@@ -1,6 +1,8 @@
 use Test2::V0;
+use Test2::Util qw/CAN_REALLY_FORK/;
 use Atomic::Pipe;
 use IO::Handle;
+use POSIX ();
 
 plan skip_all => 'Compress::Zstd not installed'
     unless eval { require Compress::Zstd; 1 };
@@ -86,10 +88,22 @@ subtest message_roundtrip_compression => sub {
 
     # Random bytes are incompressible; this guarantees a multi-part message
     # after compression (zstd can't shrink random data significantly).
-    my $multi = '';
-    $multi .= chr(int(rand(256))) for 1 .. (Atomic::Pipe->PIPE_BUF * 4);
-    $w->write_message($multi);
-    is($r->read_message, $multi, 'multi-part compressed message round-trips');
+    # PIPE_BUF * 4 can exceed a pipe's whole buffer (illumos: PIPE_BUF 5120,
+    # about a 20 KB pipe), so the writer runs in a child; writing it all
+    # before reading would deadlock.
+    SKIP: {
+        skip 'multi-part check needs a real fork()', 1 unless CAN_REALLY_FORK;
+        my $multi = '';
+        $multi .= chr(int(rand(256))) for 1 .. (Atomic::Pipe->PIPE_BUF * 4);
+        my $pid = fork // die "fork: $!";
+        unless ($pid) {
+            $w->write_message($multi);
+            $w->close;
+            POSIX::_exit(0);
+        }
+        is($r->read_message, $multi, 'multi-part compressed message round-trips');
+        waitpid($pid, 0);
+    }
 
     my $small = "tiny";
     $w->write_message($small);
@@ -386,6 +400,10 @@ subtest fifo_set_compression_after_open => sub {
     require POSIX;
     POSIX::mkfifo($fifo, 0600) or plan skip_all => "mkfifo failed: $!";
 
+    # Open the reader before forking: on Cygwin a reader and a writer opening
+    # the fifo at the same moment can fail with EBUSY.
+    my $r = Atomic::Pipe->read_fifo($fifo);
+
     my $pid = fork;
     die "fork failed: $!" unless defined $pid;
     if (!$pid) {
@@ -395,7 +413,6 @@ subtest fifo_set_compression_after_open => sub {
         exit 0;
     }
 
-    my $r = Atomic::Pipe->read_fifo($fifo);
     $r->set_compression('zstd');
     is($r->read_message, "fifo-msg", 'roundtrip via fifo with set_compression');
 

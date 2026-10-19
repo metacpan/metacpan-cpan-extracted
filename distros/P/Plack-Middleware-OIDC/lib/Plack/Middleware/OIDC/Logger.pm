@@ -4,6 +4,9 @@ use utf8;
 use strict;
 use warnings;
 
+use feature 'signatures';
+no warnings 'experimental::signatures';
+
 =encoding utf8
 
 =head1 NAME
@@ -31,9 +34,7 @@ set, messages are sent there instead of C<STDERR>.
 
 =cut
 
-sub new {
-  my ($class, %args) = @_;
-
+sub new ($class, %args) {
   return bless { env => $args{env} }, $class;
 }
 
@@ -48,17 +49,13 @@ mechanism provided by the PSGI application server.
 
 =cut
 
-sub set_env {
-  my ($self, $env) = @_;
-
+sub set_env ($self, $env) {
   $self->{env} = $env;
-
   return $self;
 }
 
 
-sub _log {
-  my ($self, $level, $message) = @_;
+sub _log ($self, $level, $message) {
 
   my $env = $self->{env};
   if ($env && $env->{'psgix.logger'}) {
@@ -93,10 +90,10 @@ Logs a message at the C<error> level.
 
 =cut
 
-sub debug   { my $self = shift; $self->_log('debug', @_); return; }
-sub info    { my $self = shift; $self->_log('info',  @_); return; }
-sub warning { my $self = shift; $self->_log('warn',  @_); return; }
-sub warn    { my $self = shift; $self->_log('warn',  @_); return; }
-sub error   { my $self = shift; $self->_log('error', @_); return; }
+sub debug   ($self, $message) { $self->_log('debug', $message); return; }
+sub info    ($self, $message) { $self->_log('info',  $message); return; }
+sub warning ($self, $message) { $self->_log('warn',  $message); return; }
+sub warn    ($self, $message) { $self->_log('warn',  $message); return; }
+sub error   ($self, $message) { $self->_log('error', $message); return; }
 
 1;

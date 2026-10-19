@@ -1,0 +1,47 @@
+Time-Keeper-Sun
+
+Sunrise, sunset, twilight, solar noon, moonrise, moonset and the moon's phase, for a
+place and a day, in a time zone, as Time::Keeper values.
+
+Time::Keeper::Sun gives the moments the sun rises, sets, reaches its height and passes
+through the three depths of twilight on a civil day at a place; the sun's altitude and
+bearing at an instant; the equinoxes and solstices; and, in Time::Keeper::Moon, the
+phases of the moon, its place, its age, the fraction lit, and the moments it rises and
+sets. A day is the zone's own day, 23, 24 or 25 hours where the clocks change, and it
+holds whatever crossings fall in it, which near the poles can be two sunsets or none.
+The astronomy is Meeus's; the results are measured against the U.S. Naval Observatory's
+published data and the Jet Propulsion Laboratory's ephemeris, and the POD says how close
+they come.
+
+    use Time::Keeper::Sun;
+
+    my $sun = Time::Keeper::Sun->new(latitude => 51.5074, longitude => -0.1278,
+                                     zone => 'Europe/London');
+    my $day = $sun->on(year => 2026, month => 10, day => 15);
+    print $day->sunrise, "\n";      # 2026-10-15T07:24:22+01:00
+    print $day->sunset, "\n";       # 2026-10-15T18:07:21+01:00
+
+INSTALLATION
+
+Time::Keeper must be installed first: this distribution is configured against the C
+header it installs. Then:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Time::Keeper::Sun
+    perldoc Time::Keeper::Moon
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)

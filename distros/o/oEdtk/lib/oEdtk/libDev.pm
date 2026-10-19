@@ -21,7 +21,7 @@ BEGIN {
 	use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %hListeId);    # %EXPORT_TAGS);
 	use warnings;
 
-	$VERSION = 0.316;
+	$VERSION = 2.1126;
 	@ISA     = qw(Exporter);
 	@EXPORT  = qw(
 		$NOK
@@ -461,3 +461,112 @@ ITEMS: for ( ; $key ; ) {
 END {
 }
 1;
+
+=head1 NAME
+
+oEdtk::libDev - helpers for running an application in the development environment
+
+=head1 SYNOPSIS
+
+    use oEdtk::libDev;
+
+    run_Edtk_dev();
+
+=head1 DESCRIPTION
+
+Development-run helpers: check the C<EDTK_DIR> directory tree, prepare the input
+data, launch the composition in a development environment, and the small string
+helpers used along the way (unique identifiers, longest and shortest token, space
+removal).
+
+=head1 FUNCTIONS
+
+=head2 $NOK
+
+The conventional "not OK" return code, C<-1>.
+
+=head2 run_Edtk_dev
+
+    run_Edtk_dev();
+
+Run an application in the development environment: load the configuration, check
+the directory tree, prepare the data and launch the composition, with the start
+and stop screens.
+
+=head2 IdUniqueSur7
+
+    IdUniqueSur7(\$id);
+
+Make C<$id> unique over seven characters: the first six characters are taken, and
+on a clash the first four followed by a three-digit counter are used, falling
+back to the first three characters padded with a letter. The optional second
+argument is a reference to the counter to seed.
+
+=head2 lastLong
+
+    my $token = lastLong($string);
+
+Return the longest token of C<$string>, where tokens are separated by spaces,
+underscores or hyphens.
+
+=head2 lastCourt
+
+    my $token = lastCourt($string);
+
+Return the shortest token of C<$string>, with the same separators as
+L</lastLong>.
+
+=head2 delSp
+
+    my $count = delSp($string);
+
+Remove every space from C<$string>, in place, and return the number of characters
+removed.
+
+=head2 check_EDTK_DIR
+
+    check_EDTK_DIR();
+
+Expand every C<EDTK_DIR> environment variable and create the matching directory
+tree.
+
+=head2 wait_Enter
+
+    wait_Enter();
+
+Print a pause prompt and wait for the enter key.
+
+=head2 tree_Directory_Completion
+
+    tree_Directory_Completion($path);
+
+Create, if needed, every directory of C<$path>.
+
+=head2 clean_full_dir
+
+    clean_full_dir($dir, $option);
+
+Recursively delete the files under C<$dir>. With C<--dry-run> nothing is removed;
+with C<--verbose> each deletion is reported.
+
+=head2 file_list
+
+    my @files = file_list($dir, $pattern, $option);
+
+Recursively collect the files under C<$dir> whose path matches C<$pattern>.
+
+=head2 prep_Edtk_Data
+
+    my $ok = prep_Edtk_Data($input, $output, $option);
+
+Trigger the data-extraction step of the current application; return C<$NOK> on
+failure.
+
+The deprecated C<IdUniqueSur6> sub is kept only for reference and is not part of
+the public API.
+
+=head1 AUTHOR
+
+The oEdtk team.
+
+=cut

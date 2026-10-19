@@ -1,5 +1,9 @@
 Revision history for App::Toot
 
+0.05 2026-10-19
+ - Make the default config section optional
+ - Fix the perltidy vertical tightness option
+
 0.04 2023-03-30
  - Fix path cleanup for 00_load.t
  - Add .github dir to MANIFEST.SKIP

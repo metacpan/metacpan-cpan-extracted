@@ -16,7 +16,7 @@ use Game::Senet::Notation ();
 use Game::Senet::Error;
 use Game::Senet::Result;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 my $E = 'Game::Senet::Engine';
 my $X = 'Game::Senet::Error';
@@ -399,6 +399,22 @@ sub at {
     return $piece == EMPTY ? undef : $piece == LIGHT ? 'light' : 'dark';
 }
 
+sub protected {
+    my ($self, $house) = @_;
+    Carp::croak("Game::Senet: there is no house " . ($house // 'undef'))
+        unless Game::Senet::Notation::house_ok($house);
+    return $self->_game->protected($house);
+}
+
+sub in_blockade {
+    my ($self, $house) = @_;
+    Carp::croak("Game::Senet: there is no house " . ($house // 'undef'))
+        unless Game::Senet::Notation::house_ok($house);
+    return $self->_game->in_blockade($house);
+}
+
+sub rules_revision { 1 }
+
 sub chances {
     return map {
         my ($roll, $weight, $denominator) = @$_;
@@ -512,11 +528,11 @@ __END__
 
 =head1 NAME
 
-Game::Senet - Senet, the Egyptian game of passing, with an XS engine
+Game::Senet - Senet, the Egyptian game of passing
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 
@@ -807,6 +823,27 @@ The position's key: sixteen hex characters.
 =head2 at
 
     my $who = $game->at(15);    # 'light', 'dark' or undef
+
+=head2 protected
+
+=head2 in_blockade
+
+    print "safe from a swap\n"  if $game->protected(12);
+    print "nobody passes it\n"  if $game->in_blockade(12);
+
+Whether the piece on a house cannot be swapped, because it stands in a run of
+its own side the rules protect, and whether it is part of a run the other side
+may not pass. Each is 0 for an empty house, so a page can draw both and know
+no rule. A house that is not 1 to 30 croaks.
+
+=head2 rules_revision
+
+    my $rev = Game::Senet->rules_revision;    # 1
+
+A number that goes up when a release changes what a game does: a different
+move allowed, refused or made, from the same seed. A game stored under one
+revision is a different game under another. A release that changes nothing a
+game does keeps the number, whatever its version.
 
 =head2 chances
 

@@ -104,4 +104,19 @@ like(iv('P1D/P2D'), qr/two durations and no time/, 'two durations');
 like(iv('2026-10-01'), qr/two parts with a \/ between/, 'no /');
 like(iv('2026-10-01/2026-13-01'), qr/no month 13/, 'a bad end');
 
+# A pattern literal that shares its first byte with the text's character: the
+# offset is the character's, and nothing warns of malformed UTF-8.
+{
+    require Time::Keeper::Time;
+    my @warned;
+    local $SIG{__WARN__} = sub { push @warned, @_ };
+    my $v = eval { Time::Keeper::Time->parse_cldr('10月15日', 'H時', locale => 'ja') };
+    ok(!defined $v, 'ja: a date is not an hour and its literal');
+    like($@, qr/at offset 2: /, 'and the offset is the character after the hour');
+    is_deeply([ grep { /Malformed/ } @warned ], [], 'with no malformed UTF-8 warning') or diag(join '', @warned);
+    $v = eval { $K->parse_cldr('10月15日 15:30', 'y年M月d日 H:mm', locale => 'ja', zone => 'UTC') };
+    like($@, qr/at offset 2: /, 'a date pattern the same');
+    is_deeply([ grep { /Malformed/ } @warned ], [], 'and still none');
+}
+
 done_testing;

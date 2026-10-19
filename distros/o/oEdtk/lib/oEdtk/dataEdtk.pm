@@ -10,7 +10,7 @@ BEGIN {
 	use Exporter ();
 	use vars     qw ($VERSION @ISA @EXPORT @EXPORT_OK);
 
-	$VERSION = 2.1109;
+	$VERSION = 2.1126;
 	@ISA     = qw (Exporter);
 	@EXPORT  = qw (unpackCopygroup cpyOccurs);
 }
@@ -169,13 +169,13 @@ sub unpackCopygroup () {    # NO LONGER USED? dependency on the old gen_appEdtk.
 		push( @{$rLignesTab}, " * START TRT IN $rLignesTab" );
 
 	DEFS: while ( $ligne = shift @{$rLignesTab} ) {
-			&logger( 9, " 150 line=$ligne" );
+			&logger( 7, " 150 line=$ligne" );
 			if ( $ligne eq " * START TRT IN $rLignesTab" ) {
 				last DEFS;
 			}
 
 			$ligne =~ /^\s*(\d+)/;
-			&logger( 9, " 156 line=$ligne" );
+			&logger( 7, " 156 line=$ligne" );
 			$rangCol = $1 if $1;
 
 			if ( $flagOccur > 0 && $rangCol <= $lastRangCol ) {
@@ -185,8 +185,8 @@ sub unpackCopygroup () {    # NO LONGER USED? dependency on the old gen_appEdtk.
 			if ( $flagOccur == 0 && $ligne =~ /OCCURS\s+(\d+)/i ) {
 				$occurBuff = $1;
 				$flagOccur = 1;
-				&logger( 8, "Nesting=$nbOccursImbriquees flagOcc=$flagOccur && OCC line" );
-				&logger( 9, " 167 line=$ligne" );
+				&logger( 7, "Nesting=$nbOccursImbriquees flagOcc=$flagOccur && OCC line" );
+				&logger( 7, " 167 line=$ligne" );
 				$ligne =~ s/(.*)(OCCURS\s+\d+)(.*)/$1$3/io;
 				push( @{$rLignesTab}, $ligne );
 				$lastRangCol = $rangCol;
@@ -198,26 +198,26 @@ sub unpackCopygroup () {    # NO LONGER USED? dependency on the old gen_appEdtk.
 					# COMMENTED LINES COME BEFORE THE FIELD DESCRIPTORS,
 					# KEEP THEM IN MEMORY TO OUTPUT THEM WITH THE OCCURS
 					$buffComment .= $ligne;
-					&logger( 9, " 177 line=$ligne" );
+					&logger( 7, " 177 line=$ligne" );
 				}
 				else {
 					if ( $ligne =~ /OCCURS/ ) {
 						$nbOccursImbriquees++;
-						&logger( 8, " * Nesting=$nbOccursImbriquees : $ligne" );
+						&logger( 7, " * Nesting=$nbOccursImbriquees : $ligne" );
 					}
 					$buff .= $ligne;
-					&logger( 9, " 184 line=$ligne" );
+					&logger( 7, " 184 line=$ligne" );
 				}
 
 			}
 			else {
 				push( @{$rLignesTab}, $ligne );
-				&logger( 9, " 189 line=$ligne" );
+				&logger( 7, " 189 line=$ligne" );
 			}
 		}
 
 		&cpyEditOccurs() if ($buff);
-		&logger( 8, "nbOccursImbriquees = $nbOccursImbriquees" );
+		&logger( 7, "nbOccursImbriquees = $nbOccursImbriquees" );
 		return $nbOccursImbriquees;
 	}
 
@@ -229,7 +229,7 @@ sub unpackCopygroup () {    # NO LONGER USED? dependency on the old gen_appEdtk.
 		#push (@{$rLignesTab}, split (/\n/, $buff x $occurBuff)."\n");
 		foreach my $element ( split( /\n/, $buff x $occurBuff ) ) {
 			push( @{$rLignesTab}, "$element\n" );
-			&logger( 9, " 205 element=$element" );
+			&logger( 7, " 205 element=$element" );
 		}
 
 		$buffComment = "";
@@ -241,3 +241,42 @@ sub unpackCopygroup () {    # NO LONGER USED? dependency on the old gen_appEdtk.
 
 END { }
 1;
+
+=head1 NAME
+
+oEdtk::dataEdtk - legacy COBOL descriptor helpers
+
+=head1 SYNOPSIS
+
+    use oEdtk::dataEdtk qw(unpackCopygroup cpyOccurs);
+
+=head1 DESCRIPTION
+
+Legacy helpers that reformat COBOL C<PIC> descriptors into Perl C<unpack> and
+C<printf> descriptions and expand C<OCCURS> blocks. They depend on the old
+C<gen_appEdtk.pl> generator and are believed to be no longer used; they are
+kept for reference.
+
+=head1 FUNCTIONS
+
+=head2 unpackCopygroup
+
+    my @parts = unpackCopygroup(\$record);
+
+Read a COBOL C<PIC> string (C<X>, C<9> or C<S9>, with C<V9(n)> and C<OCCURS>
+clauses) and return the column rank, name, length, Perl type, decimals, sign,
+remaining text and occurrence count. An unhandled C<OCCURS> clause is an error.
+
+=head2 cpyOccurs
+
+    my $n = cpyOccurs($rLignesTab);
+
+Expand the C<OCCURS> blocks in the array of lines referenced by C<$rLignesTab>
+and return the number of nested C<OCCURS>. The internal helper C<cpyEditOccurs>
+duplicates the buffered lines; it is not part of the public API.
+
+=head1 AUTHOR
+
+The oEdtk team.
+
+=cut

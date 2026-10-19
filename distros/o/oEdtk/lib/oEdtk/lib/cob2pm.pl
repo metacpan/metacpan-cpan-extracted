@@ -8,7 +8,7 @@ use oEdtk::libDev qw ( lastCourt );
 
 sub usage() {
 	my $PROG = basename( $0, "" );
-	print STDOUT <<"EOF";
+	print STDERR <<"EOF";
 
 Usage:
 	$PROG recorder_descriptor.cob > record_ID.pm

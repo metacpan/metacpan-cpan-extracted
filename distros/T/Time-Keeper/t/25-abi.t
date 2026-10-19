@@ -17,7 +17,7 @@ my $p = Time::Keeper::_abi_ptr();
 ok($p, '_abi_ptr gives an address');
 is($p, Time::Keeper::_abi_ptr(), 'the same one every call');
 like($p, qr/^\d+$/, 'as an unsigned integer');
-is(Time::Keeper::_abi_version(), 1, 'the table is version 1');
+is(Time::Keeper::_abi_version(), 2, 'the table is version 2');
 
 my ($step, $t) = Time::Keeper::_abi_selftest($p);
 is($step, 0, 'every entry answered as the header says')

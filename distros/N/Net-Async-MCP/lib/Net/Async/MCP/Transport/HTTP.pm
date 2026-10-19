@@ -705,7 +705,7 @@ Net::Async::MCP::Transport::HTTP - Streamable HTTP MCP transport via Net::Async:
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 

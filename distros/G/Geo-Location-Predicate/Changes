@@ -1,0 +1,14 @@
+Revision history for Geo-Location-Predicate
+
+0.02	Sun Oct 18 08:56:13 PM EDT 2026
+	MIN_PERL_VERSION is 5.8.3, the first perl whose Exporter supports
+	"use Exporter qw(import)"; 0.01 claimed 5.8.0 and could not load there.
+	META licence is gpl_2, matching LICENSE (it said open_source).
+	The rule is unchanged in behaviour.  Its documentation now says it answers
+	exactly 1 or 0, that "digit" means Unicode Nd, and lists its LIMITATIONS.
+	New tests pin the debatable cases (whitespace, numeric stringification,
+	overloaded objects), freedom from side effects, and locale independence.
+
+0.01	Sun Oct 18 11:44:43 AM EDT 2026
+	First release: the location rule moved out of Geo-Coder-Free 0.48, under a
+	name of its own.

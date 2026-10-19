@@ -14,10 +14,13 @@ bin/validate.pl
 build-fraud-test.pl
 contrib/strip.pl
 lib/Mail/DKIM2.pm
+lib/Mail/DKIM2/BodyPlan.pm
 lib/Mail/DKIM2/Common.pm
 lib/Mail/DKIM2/DSN.pm
+lib/Mail/DKIM2/Digest.pm
 lib/Mail/DKIM2/Gate.pm
 lib/Mail/DKIM2/HeaderParser.pm
+lib/Mail/DKIM2/HeaderPlan.pm
 lib/Mail/DKIM2/MessageInstance.pm
 lib/Mail/DKIM2/MessageStore.pm
 lib/Mail/DKIM2/Reflector.pm
@@ -34,6 +37,8 @@ spec-review-notes.md
 t/body-canon.t
 t/body-diff-vectors.t
 t/body-diff.t
+t/body-plan-corpus.t
+t/body-plan.t
 t/chain-length.t
 t/chain-number-bound.t
 t/common.t
@@ -63,6 +68,7 @@ t/data/keys/sel3._domainkey.test2.dkim2.com.pem
 t/data/keys/sel3._domainkey.test3.dkim2.com.pem
 t/data/keys/sel3._domainkey.test4.dkim2.com.pem
 t/data/keys/sel3._domainkey.test5.dkim2.com.pem
+t/digest.t
 t/dns-temperror.t
 t/dsn.t
 t/duplicate-checks.t
@@ -78,11 +84,13 @@ t/gate-null-top.t
 t/gate-one-walk.t
 t/guide-links.t
 t/hash-agility.t
+t/header-plan.t
 t/headerparser.t
 t/ignore-prefixes.t
 t/interop.t
 t/invalid-json.t
 t/key-record.t
+t/lib/ChainPlanReference.pm
 t/lib/DKIM2SignedFixture.pm
 t/lib/DKIM2TestKeys.pm
 t/lib/MockAuthMilter.pm
@@ -134,7 +142,9 @@ t/validate-null-body.t
 t/validate-report.t
 t/verifier-accessors.t
 t/verifier-algorithms.t
+t/verifier-key-prefetch.t
 t/verifier-mi-coverage.t
+t/verifier-stream-body.t
 t/verifier-streaming.t
 t/verifier-unkeyable.t
 t/verifier_flags.t

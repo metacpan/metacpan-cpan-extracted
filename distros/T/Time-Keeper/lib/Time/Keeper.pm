@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 our $CLOCK;
 
@@ -25,6 +25,7 @@ use Time::Keeper::Date;
 use Time::Keeper::YearMonth;
 use Time::Keeper::MonthDay;
 use Time::Keeper::Time;
+use Time::Keeper::Calendar;
 
 1;
 
@@ -38,7 +39,7 @@ Time::Keeper - dates and times with time zones, leap seconds and locales
 
 =head1 VERSION
 
-Version 0.04
+Version 0.06
 
 =head1 SYNOPSIS
 
@@ -97,7 +98,8 @@ that names it.
 The current time, to the nanosecond where the system gives it, or the
 clock a test pinned (see L</TESTING>). C<zone> is
 described under L</TIME ZONES>. Every constructor also takes C<locale>, as
-described under L</LOCALES>.
+described under L</LOCALES>, and C<calendar>, as described under
+L</CALENDARS>.
 
 =head2 today
 
@@ -668,6 +670,31 @@ and undef after the last, for ranges too long to hold at once. Each
 iterator keeps its own place; a copy made for a thread continues on its
 own.
 
+=head2 In another calendar
+
+    my $t = Time::Keeper->new(year => 5784, month => 6, day => 30, calendar => 'hebrew');   # 30 Adar I
+    $t->plus(months => 1);                           # 29 Adar II, wrapped to 1 Nisan
+    $t->plus(months => 13, end_of_month => 'limit'); # 29 Adar 5785
+    $t->plus(years => 1);                            # Adar 5785: a year without Adar I
+    $t->plus(years => 3)->month_code;                # M05L: 5787 has one again
+    $b - $t;                                         # months then days, the calendar's months
+    $t->truncate(to => 'year');                      # 1 Tishri
+
+In a calendar other than the Gregorian a month is the calendar's ordinal
+month (L</CALENDARS>), so twelve months on from a day in a thirteen-month
+Hebrew year is the month before the same month next year. C<years>, given
+by name to L</plus> or L</minus>, are added first and keep the month by
+its code: a day in Adar I moved to a year with no Adar I lands in Adar, as
+ICU and Temporal have it, and C<end_of_month> says what a day the month
+has not does. A L<Time::Keeper::Duration> has no years of its own: its
+months are months, and L</minus>, L</until> and L</delta_md> give months
+and days, so C<< $a + ($b - $a) >> is C<$b> in every calendar. L</truncate>,
+L</round> and L</end_of> work on the calendar's years, quarters (three
+ordinal months, a thirteenth month alone in quarter 5) and months, and on
+the units below a week as ever; L</nth_in_month> and L</last_in_month> use
+the calendar's month; L</next>, L</previous> and L</range> are days and are
+the same in every calendar.
+
 =head2 Months and the end of the month
 
 A month added to 31 January has no 31st to land on. A duration says what to
@@ -814,6 +841,8 @@ C<long>, C<medium> (the default) or C<short>.
 The locale's format for a skeleton: the fields wanted, without their order
 or punctuation, which are the locale's. A skeleton the locale has no format
 for is an error.
+In another calendar the calendar's own skeletons come first (a C<y> matches
+the C<yyyy> they are keyed by), then the Gregorian ones; see L</CALENDARS>.
 
 =head2 format_relative
 
@@ -915,6 +944,8 @@ RFC 3339 with the zone's name after it in brackets, as RFC 9557 extends it:
 the offset and the zone together, so a reader has the zone's rules as
 well as the offset at that moment. UTC is C<+00:00[UTC]> and a fixed offset
 names itself. Floating time has neither.
+A value in another calendar ends C<[u-ca=hebrew]>, which L</parse> reads
+back (see L</CALENDARS>).
 
 =head2 http_date
 
@@ -983,6 +1014,8 @@ field the pattern does not give takes L<Time::Piece>'s default: the year
 C<GMT>, C<UT> and C<Z> are UTC; any other could mean more than one zone and
 is checked against C<zone>, which must be given, and in an overlap it says
 which of the two times was meant.
+With C<calendar>, the date conversions read that calendar's months and
+years; see L</CALENDARS>.
 
 =head2 try_strptime
 
@@ -1002,6 +1035,9 @@ location, or the GMT format in the locale's words or in plain C<GMT> or
 C<UTC>. A name read gives the value its zone; a specific name says
 standard or daylight time, which chooses between the two readings of a time
 in an overlap. C<b> and C<B> make a 12-hour time AM or PM.
+With C<calendar>, the eras, years and months are the calendar's, as
+L</CALENDARS> describes; an RFC 9557 C<[u-ca=]> annotation in the text must
+agree with it.
 
 =head2 try_parse_cldr
 
@@ -1224,6 +1260,161 @@ kind. They share the arithmetic, the locales, the formats and the parsers.
 L</to_date>, L</to_time>, L</to_year_month> and L</to_month_day> take them
 from a value; C<at>, C<on> and C<in_year> give a value or a date back.
 
+=head1 CALENDARS
+
+    my $t = Time::Keeper->new(year => 5787, month => 1, day => 1, calendar => 'hebrew');
+    my $h = $t->in_calendar('hebrew');        # the same instant, read in another calendar
+    $h->calendar;                             # hebrew
+    $h->year;  $h->month;  $h->day;           # 5787, 1, 1: the calendar's
+    $h->era;  $h->era_year;                   # am, 5787
+    $h->month_code;  $h->is_leap_month;       # M01, 0
+    $h->months_in_year;  $h->days_in_month;   # 13, 30
+    $h->iso8601;  $h->epoch;  $h <=> $t;      # the instant, calendar blind
+
+A value is an instant in a zone, and the calendar is how its wall-clock
+date is read. Every constructor takes C<calendar>, and L</in_calendar> gives
+the same instant read in another; the default is the Gregorian, never the
+territory's. The accessors that name a date (L</year>, L</month>, L</day>,
+L</day_of_year>, L</quarter>, L</day_of_quarter>, L</week_of_month>,
+L</is_leap_year>, L</days_in_month>, L</days_in_year>, L</days_in_quarter>)
+answer in the value's calendar; L</week> and L</week_year> are ISO 8601's
+and stay Gregorian; the clock, the zone, the epoch, the comparisons and the
+ISO 8601 strings are the same in every calendar.
+
+Months are counted from the first month of the year as Temporal counts
+them, so in a Hebrew leap year Adar I is the sixth month and Nisan the
+eighth; L</month_code> gives the name that does not move, C<M07> for Nisan
+and C<M05L> for Adar I. Quarters run over the ordinal months, three to a
+quarter, so a thirteenth month is quarter 5. Years are continuous and may be
+zero or negative; the era is a reading of the year:
+
+    gregory          astronomical year            bce, ce
+    buddhist         the Gregorian year + 543     be
+    japanese         the Gregorian year           237 eras from Taika: era0 .. era231, meiji, taisho, showa, heisei, reiwa
+    roc              the Gregorian year - 1911    broc, roc
+    coptic           Anno Martyrum                before-am, am
+    ethiopic         Amete Mihret                 aa (the year + 5500), am
+    ethioaa          Amete Alem                   aa
+    hebrew           Anno Mundi                   am
+    islamic-*        Anno Hegirae                 ah, the years before it 0 and less, as ICU reads them
+    persian          Anno Persico                 ap
+    indian           Saka                         shaka
+    chinese, dangi   the Gregorian year it begins in; era_year is ICU's count from 2637 BCE; cyclic_year 1 to 60
+
+A Japanese day before Taika (645) is in the first era with a year of 0 or
+less, as ICU reads it. The calendars are proleptic: the Buddhist, Japanese
+and Minguo calendars are the Gregorian under another year count even before
+1582, where ICU reads the Julian. The Persian calendar is ICU's 33-year
+arithmetic with ICU's corrections, not the equinox; Umm al-Qura is Saudi
+Arabia's table for 1300 to 1600 AH and the civil arithmetic outside it.
+The four that follow the moon and the sun, C<chinese>, C<dangi>, C<islamic>
+and C<islamic-rgsa>, are read from tables of what ICU computes, the Chinese
+and Korean years 1000 to 3000 (1000 to 3000 is also the span ICU itself
+warrants) and the Hijri years 390 to 2452 AH that lie within them; a day or
+a year outside the tables is an error that names them. A Chinese or Dangi
+year is named by the Gregorian year it begins in, its L</cyclic_year> is
+its place in the cycle of sixty (1984 began one), and its leap month takes
+the number of the month before it with an L: 2033's leap eleventh month is
+C<M11L>, the twelfth ordinal month. The tables are ICU's and keep its few
+disagreements with the Hong Kong Observatory, which has 2027's New Year on
+6 February where ICU's new moon, at 23:56 Beijing time, gives the 7th.
+
+Arithmetic in a calendar is described under L</ARITHMETIC>.
+
+    $h->in_locale('he')->format('d MMMM y');              # ד׳ בחשוון תשפ״ז
+    $t->in_calendar('japanese')->in_locale('ja')->format('Gy年M月d日');   # 令和8年10月15日
+    $t->in_calendar('chinese')->format('U r');            # bing-wu 2026
+    $h->format_date('full');  $h->month_name;  $h->era_abbr;
+    $h->rfc9557;                                          # 2026-10-15T09:00:00+00:00[UTC][u-ca=hebrew]
+    Time::Keeper->parse_cldr('24 Tishri 5787', 'd MMMM y', calendar => 'hebrew');
+
+L</format>, L</strftime>, L</format_date>, L</format_datetime>,
+L</format_skeleton>, L</ymd> and the name accessors write the value's
+calendar: CLDR's month and era names for it in the value's locale, the
+calendar's own date formats and skeletons, and its leap-month pattern
+(C<Sixth Monthbis>, C<闰六月>). A locale with no names of its own for a
+calendar inherits its parent's, then the root's; English is built in, so
+every calendar works before the names file is read, and the file is read
+on the first use of another locale. In a pattern C<G> is the calendar's
+era, C<y> the year of the era, C<u> the continuous year, C<r> the Gregorian
+year the calendar's year began in, C<U> the name of the cyclic year, and
+C<M> or C<L> the month: as a number the ordinal month, as ICU writes it (the
+Hebrew Iyar is 8 in a common year and 9 in a leap year), save that the
+Chinese calendars write the number in the month code, the leap month in its
+pattern (C<6bis>). A Chinese or Dangi year has four numbers:
+
+    year, u       2026       the Gregorian year it began in
+    y             43         its place in the cycle of sixty (cyclic_year)
+    U             bing-wu    the cycle year's name (cyclic_year_name)
+    r             2026       the related Gregorian year
+    era_year, %Y  4663       ICU's continuous count from 2637 BCE
+
+The numbering systems CLDR attaches to a calendar's patterns are honoured
+when those patterns are used: a Hebrew date in C<he> is written in Hebrew
+letters (C<ד׳ בחשוון תשפ״ז>, the thousands of the year dropped between
+5001 and 5999 as ICU drops them), the day of a Chinese month in C<zh> in its
+own numerals (C<初六>), the first year of a Japanese era in C<ja> as C<元>.
+A pattern of your own is written in the locale's digits. The date
+conversions of L</strftime> (C<%Y %y %C %m %d %e %j %B %b %x %c>) are the
+calendar's and C<%G %V %g> stay ISO 8601: C<in_calendar('gregory')> first
+for the Gregorian date. L</rfc9557> appends C<[u-ca=id]> for a value in
+another calendar; L</parse> reads any known one (the date in the string is
+always ISO 8601, as the RFC says) and refuses one that disagrees with a
+C<calendar> argument. L</strptime> and L</parse_cldr> take C<calendar>:
+C<G> matches the calendar's eras, C<y> and C<u> read the year of the era or
+the continuous year, C<r> the related year, C<U> the cyclic year beside an
+C<r> that fixes the cycle, and C<M>, C<L>, C<%m> and C<%B> the calendar's
+month number or names and its leap pattern; a Chinese date needs a year.
+
+The default calendar is the Gregorian everywhere, never the territory's;
+L<Time::Keeper::Calendar/preferred> gives a territory's or a locale's
+calendars in CLDR's order of preference, and a locale code may carry a
+C<-u-ca-> extension naming a calendar, C<th-u-ca-buddhist>, which every
+constructor, L</in_locale> and the parsers read as C<calendar> when none is
+given and which L<Time::Keeper::Locale/code> strips. The day an era began is
+L<Time::Keeper::Calendar/era_start>.
+
+The plain classes in a calendar other than the Gregorian, L</format_relative>,
+L</format_interval> and C<< largest => 'years' >> in L</until>, come in a
+later release: each dies saying so on such a value.
+L<Time::Keeper::Calendar> answers questions about a calendar that need no
+value.
+
+=head2 calendar
+
+The id of the value's calendar: C<gregory> unless it was made or read in
+another.
+
+=head2 in_calendar
+
+    my $h = $t->in_calendar('hebrew');
+
+The same instant, zone and locale, read in the calendar given (an id or an
+alias; see L<Time::Keeper::Calendar/ids>).
+
+=head2 era
+
+=head2 era_year
+
+=head2 month_code
+
+=head2 is_leap_month
+
+=head2 months_in_year
+
+=head2 related_year
+
+=head2 cyclic_year
+
+=head2 cyclic_year_name
+
+The era's code and the year within it; the month's code (C<M01> to C<M13>,
+C<L> after a leap month) and whether the month is a leap month; the months
+in the year; the Gregorian year the calendar's year began in (CLDR's related
+year); the year in the sixty-year cycle in the Chinese and Dangi calendars,
+and its name in the value's locale (C<bing-wu>, C<丙午> in C<zh>), both undef
+in the others.
+
 =head1 SERIALISATION
 
 A value freezes with L<Storable> as text: its instant, its zone by name
@@ -1267,7 +1458,11 @@ module. A consuming distribution finds it with L<ExtUtils::Depends>:
 
 and resolves the table once, when it first needs it; the header shows how.
 Nothing is linked against, and the table is versioned, so the two
-distributions can be upgraded independently. It is at version 1.
+distributions can be upgraded independently. It is at version 2: the
+second version appended the calendars (an instant's fields read in any
+calendar and back, formatting in one, the calendar a value is read in, a
+calendar by its id) after the first version's entries, so a consumer built
+against version 1 keeps working.
 
 =head1 THREADS
 

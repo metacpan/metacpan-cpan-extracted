@@ -1,0 +1,3 @@
+   10  PRINT "HELLO"
+   20  GOTO 40
+   30  PRINT "NOT HERE"

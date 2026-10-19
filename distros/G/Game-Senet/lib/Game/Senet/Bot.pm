@@ -11,7 +11,7 @@ use Object::Proto::Sugar;
 use Game::Senet::Engine ();
 use Game::Senet::Variant;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 my %LADDER;
 BEGIN {
@@ -109,7 +109,7 @@ Game::Senet::Bot - an opponent for Senet, in levels
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

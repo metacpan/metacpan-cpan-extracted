@@ -105,6 +105,76 @@ tk_match_month(tk_cursor *c, const tk_locale_data *loc)
     return hit < 0 ? 0 : (unsigned)(hit % 12) + 1;
 }
 
+/* A month's name in a calendar other than the Gregorian, in either context,
+ * wide or abbreviated, or wrapped in the leap pattern ({0}bis) for a leap
+ * month; the Hebrew Adar II is the leap-year name of slot 7. CLDR's slot,
+ * or 0; the leap flag goes to the fields. */
+static unsigned
+tk_match_cal_month(tk_cursor *c, tk_fields *f, const tk_locale_data *loc)
+{
+    const tk_cal_names *cn = (const tk_cal_names *)f->cal_names;
+    int ctx, w, leap, best_leap = 0;
+    unsigned slot, best = 0;
+    STRLEN best_len = 0;
+    for (leap = 0; leap < 2; leap++) {
+        for (ctx = 0; ctx < TK_CTX_COUNT; ctx++) {
+            for (w = 0; w < 2; w++) {
+                const char *pat = leap ? tk_cal_leap_pattern(cn, ctx, w, 0) : NULL;
+                const char *at = pat ? strstr(pat, "{0}") : NULL;
+                STRLEN pre = at ? (STRLEN)(at - pat) : 0;
+                if (leap && !at)
+                    continue;
+                for (slot = 1; slot <= 14; slot++) {
+                    const char *name;
+                    STRLEN save = c->i, took, total;
+                    unsigned which = slot == 14 ? 7 : slot;
+                    if (slot == 14)
+                        name = leap ? NULL : cn->slot[TK_CN_MONTHS_LEAP + ctx * 3 + w];
+                    else {
+                        name = cn->slot[TK_CN_MONTHS + (ctx * 3 + w) * 13 + slot - 1];
+                        if (!name && slot <= 12)
+                            name = loc->s.months[ctx][w][slot - 1];
+                    }
+                    if (!name || !*name)
+                        continue;
+                    if (pre) {
+                        took = tk_name_at(c, pat, pre);
+                        if (!took)
+                            continue;
+                        c->i += took;
+                    }
+                    took = tk_name_at(c, name, strlen(name));
+                    if (!took) {
+                        c->i = save;
+                        continue;
+                    }
+                    c->i += took;
+                    if (leap && at[3]) {
+                        took = tk_name_at(c, at + 3, strlen(at + 3));
+                        if (!took) {
+                            c->i = save;
+                            continue;
+                        }
+                        c->i += took;
+                    }
+                    total = c->i - save;
+                    c->i = save;
+                    if (total > best_len) {
+                        best_len = total;
+                        best = which;
+                        best_leap = leap;
+                    }
+                }
+            }
+        }
+    }
+    if (!best)
+        return 0;
+    c->i += best_len;
+    f->leap_month_text = best_leap;
+    return best;
+}
+
 static unsigned
 tk_match_day(tk_cursor *c, const tk_locale_data *loc)
 {
@@ -496,9 +566,9 @@ tk_strptime_part(tk_cursor *c, tk_fields *f, const tk_locale_data *loc, const ch
                 break;
             }
             case 'b': case 'B': case 'h': {
-                unsigned m = tk_match_month(c, loc);
+                unsigned m = f->calendar ? tk_match_cal_month(c, f, loc) : tk_match_month(c, loc);
                 if (!m) return tk_fail(c, "a month's name was wanted");
-                f->has_month = 1; f->month = m;
+                f->has_month = 1; f->month = m; f->month_slot = f->calendar != 0;
                 break;
             }
             case 'C': if (!tk_signed(c, 2, &v)) return 0; f->has_century = 1; f->century = v; break;
@@ -630,13 +700,49 @@ tk_parse_cldr(tk_cursor *c, tk_fields *f, const tk_locale_data *loc, const char 
             case 'G': {
                 const char *all[6];
                 int w, m = 0, hit;
+                if (f->calendar) {
+                    const tk_calendar *cal = &tk_calendars[f->calendar - 1];
+                    const tk_cal_names *cn = (const tk_cal_names *)f->cal_names;
+                    const char *names[3 * 237];
+                    unsigned k;
+                    for (w = 0; w < TK_W_COUNT; w++)
+                        for (k = 0; k < cal->n_eras; k++)
+                            names[w * cal->n_eras + k] = tk_cal_era_name(cn, cal, k, w);
+                    hit = tk_match_name(c, names, (int)(3 * cal->n_eras));
+                    if (hit < 0) return tk_fail(c, "an era was wanted");
+                    f->has_era = 1;
+                    f->era_index = (unsigned)hit % cal->n_eras;
+                    break;
+                }
                 for (w = 0; w < TK_W_COUNT; w++) { all[m++] = loc->s.eras[w][0]; all[m++] = loc->s.eras[w][1]; }
                 hit = tk_match_name(c, all, m);
                 if (hit < 0) return tk_fail(c, "an era was wanted");
                 f->era_bc = hit % 2 == 0;   /* applied to the year when the value is made */
                 break;
             }
+            case 'r':
+                if (!tk_signed(c, 9, &v)) return 0;
+                f->has_related = 1;
+                f->related = v;
+                break;
+            case 'U':
+                if (f->calendar && (f->calendar - 1 == TK_CAL_CHINESE || f->calendar - 1 == TK_CAL_DANGI)) {
+                    const tk_cal_names *cn = (const tk_cal_names *)f->cal_names;
+                    const char *names[180];
+                    int w, k, hit;
+                    for (w = 0; w < 3; w++)
+                        for (k = 1; k <= 60; k++)
+                            names[w * 60 + k - 1] = tk_cal_cyclic_name(cn, k, w);
+                    hit = tk_match_name(c, names, 180);
+                    if (hit < 0) return tk_fail(c, "a cyclic year's name was wanted");
+                    f->has_cyclic = 1;
+                    f->cyclic = (unsigned)(hit % 60) + 1;
+                    break;
+                }
+                /* fall through: a year */
             case 'y': case 'u':
+                if (f->calendar)
+                    f->year_kind = ch == 'u' ? 2 : 1;
                 if (n == 2) {
                     if (!tk_digits(c, 2, &v)) return 0;
                     f->has_y2 = 1; f->y2 = (int)v;
@@ -668,7 +774,39 @@ tk_parse_cldr(tk_cursor *c, tk_fields *f, const tk_locale_data *loc, const char 
                 }
                 break;   /* a quarter alone fixes no date: read and passed over */
             case 'M': case 'L':
-                if (n <= 2) {
+                if (f->calendar && n <= 2) {
+                    /* a slot number, perhaps wrapped in the numeric leap pattern ({0}bis) */
+                    const tk_cal_names *cn = (const tk_cal_names *)f->cal_names;
+                    const char *pat = tk_cal_leap_pattern(cn, TK_CTX_FORMAT, TK_W_ABBR, 1);
+                    const char *at = pat ? strstr(pat, "{0}") : NULL;
+                    STRLEN save = c->i;
+                    int leap = 0;
+                    if (at) {
+                        STRLEN pre = (STRLEN)(at - pat), took = pre ? tk_name_at(c, pat, pre) : 0;
+                        if (!pre || took) {
+                            c->i += took;
+                            if (tk_cldr_digits(c, n, adjacent, 2, &v)) {
+                                STRLEN sl = at[3] ? tk_name_at(c, at + 3, strlen(at + 3)) : 0;
+                                if (!at[3] || sl) {
+                                    c->i += sl;
+                                    leap = 1;
+                                }
+                            }
+                        }
+                        if (!leap) {
+                            c->i = save;
+                            c->err = NULL;
+                        }
+                    }
+                    if (!leap && !tk_cldr_digits(c, n, adjacent, 2, &v)) return 0;
+                    f->has_month = 1; f->month = (unsigned)v; f->leap_month_text = leap; f->month_slot = 0;
+                }
+                else if (f->calendar) {
+                    unsigned m = tk_match_cal_month(c, f, loc);
+                    if (!m) return tk_fail(c, "a month's name was wanted");
+                    f->has_month = 1; f->month = m; f->month_slot = 1;
+                }
+                else if (n <= 2) {
                     if (!tk_cldr_digits(c, n, adjacent, 2, &v)) return 0;
                     f->has_month = 1; f->month = (unsigned)v;
                 }

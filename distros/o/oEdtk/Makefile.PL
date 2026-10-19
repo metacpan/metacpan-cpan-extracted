@@ -3,7 +3,7 @@
 #
 #	SEE README FILE
 #	*******************************************************************
-#	These modules are under GNU GENERAL PUBLIC LICENSE (see COPYING file)
+#	These modules are under the Artistic License 2.0 (see COPYING file)
 #	You can use oEdtk as is without any warranty.
 #
 #	Copyright (c) 2005-2026  David AUNAY - GJ CHAILLOU DOMINGO
@@ -30,7 +30,7 @@ use ExtUtils::MakeMaker 6.64;
 WriteMakefile(
 	# be careful at this level perl version are odd V5.10 should be defined as 5.010 ...
 	MIN_PERL_VERSION	=> 5.028,
-	LICENSE 			=> 'perl',
+	LICENSE 			=> 'artistic_2',
 	NAME				=> 'oEdtk',
 	VERSION_FROM		=> 'lib/oEdtk.pm',
 	# The companion oEUser distributions now live inside this repository.

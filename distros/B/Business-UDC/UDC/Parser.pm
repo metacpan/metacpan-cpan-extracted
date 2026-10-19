@@ -13,7 +13,7 @@ use Readonly;
 
 Readonly::Array our @EXPORT_OK => qw(parse);
 
-our $VERSION = 0.09;
+our $VERSION = 0.10;
 
 sub parse {
 	my $input = shift;
@@ -25,11 +25,11 @@ sub parse {
 		err 'Empty input.';
 	}
 
-	my $tokens = tokenize($input);
-	_check_parentheses($tokens);
-	my $has_alpha_spec = any { $_->{'type'} eq 'ALPHA_SPEC' } @{$tokens};
-	my $normalized_tokens = [];
-	foreach my $tok_hr (@{$tokens}) {
+	my $tokens_ar = tokenize($input);
+	_check_parentheses($tokens_ar, length($input));
+	my $has_alpha_spec = _has_alpha_spec($tokens_ar);
+	my $normalized_tokens_ar = [];
+	foreach my $tok_hr (@{$tokens_ar}) {
 		my %parse_tok = %{$tok_hr};
 		_check_whitespace_token(\%parse_tok, $has_alpha_spec);
 		_check_apos_aux_tokens(\%parse_tok);
@@ -37,58 +37,95 @@ sub parse {
 		_check_number_token(\%parse_tok);
 		_check_aux_group_token(\%parse_tok);
 		_normalize_alpha_spec_token(\%parse_tok);
-		push @{$normalized_tokens}, \%parse_tok;
+		push @{$normalized_tokens_ar}, \%parse_tok;
 	}
-	my $state = {
-		'tokens' => $normalized_tokens,
+	my $state_hr = {
+		'tokens' => $normalized_tokens_ar,
 		'pos' => 0,
 	};
 
-	my $ast = _parse_expression($state);
+	my $ast = _parse_expression($state_hr);
 
-	if ($state->{'pos'} < @{$state->{'tokens'}}) {
-		my $tok = $state->{'tokens'}[$state->{'pos'}];
+	if ($state_hr->{'pos'} < @{$state_hr->{'tokens'}}) {
+		my $tok = $state_hr->{'tokens'}[$state_hr->{'pos'}];
 		err "Unexpected token '$tok->{'value'}'.",
 			'position' => $tok->{'pos'},
 		;
 	}
 
 	return {
-		'tokens' => $tokens,
+		'tokens' => $tokens_ar,
 		'ast' => $ast,
 	};
 }
 
 sub _check_parentheses {
-	my $tokens = shift;
-	my $left;
-	my $previous;
+	my ($tokens_ar, $input_length) = @_;
 
-	foreach my $tok (@{$tokens}) {
+	my (@left, $previous, $has_operator_after_left, $operator_position,
+		$has_alpha_after_left, $has_time_after_alpha, $time_position);
+	foreach my $tok (@{$tokens_ar}) {
 		if ($tok->{'type'} eq 'LPAREN') {
-			$left = $tok;
+			push @left, $tok;
 			$previous = $tok;
+			$has_operator_after_left = 0;
+			$operator_position = undef;
+			$has_alpha_after_left = 0;
+			$has_time_after_alpha = 0;
+			$time_position = undef;
 			next;
 		}
 		if ($tok->{'type'} eq 'RPAREN') {
-			if (! $left) {
-				my $message = $previous && $previous->{'type'} eq 'AUX_GROUP'
-					? "Extra closing parenthesis ')'."
-					: "Missing opening parenthesis '('.";
+			if (! @left) {
+				return if $tokens_ar->[0]
+					&& $tokens_ar->[0]{'type'} eq 'OP';
+				my $missing_opening = ! $previous || $previous->{'type'} ne 'AUX_GROUP';
+				my $message = $missing_opening
+					? "Missing opening parenthesis '('."
+					: "Extra closing parenthesis ')'.";
 				err $message,
-					'position' => $tok->{'pos'},
-					'character' => ')',
+					'position' => $missing_opening ? $tokens_ar->[0]{'pos'} : $tok->{'pos'},
+					'character' => $missing_opening ? '(' : ')',
 				;
 			}
-			$left = undef;
+			pop @left;
 		}
+		if (@left && $tok->{'type'} eq 'OP') {
+			$has_operator_after_left = 1;
+			if (! defined $operator_position) {
+				$operator_position = $tok->{'pos'};
+			}
+		}
+		if (@left && $tok->{'type'} eq 'ALPHA_SPEC'
+			&& $tok->{'value'} =~ /([+:\/])/) {
+			$has_operator_after_left = 1;
+			$operator_position = $tok->{'pos'} + index($tok->{'value'}, $1)
+				if ! defined $operator_position;
+		}
+		$has_alpha_after_left = 1 if @left && $tok->{'type'} eq 'ALPHA_SPEC';
+		$has_time_after_alpha = 1
+			if @left && $has_alpha_after_left && $tok->{'type'} eq 'AUX_TIME';
+		$time_position = $tok->{'pos'}
+			if $has_time_after_alpha && ! defined $time_position;
 		$previous = $tok;
 	}
 
-	if ($left) {
-		err "Missing closing parenthesis ')'.",
-			'position' => $left->{'pos'},
-			'character' => '(',
+	if (@left) {
+		my $left = $left[-1];
+		my $missing_closing = $has_operator_after_left || $has_time_after_alpha;
+		my $extra_opening = @left > 1
+			|| ! $missing_closing
+			&& $previous && $previous->{'type'} eq 'AUX_GROUP';
+		my $message = $extra_opening
+			? "Extra opening parenthesis '('."
+			: "Missing closing parenthesis ')'.";
+		err $message,
+			'position' => $extra_opening
+				? $left->{'pos'}
+				: defined $time_position ? $time_position
+				: defined $operator_position ? $operator_position
+				: $input_length,
+			'character' => $extra_opening ? '(' : ')',
 		;
 	}
 
@@ -111,16 +148,37 @@ sub _check_whitespace_token {
 	;
 }
 
+sub _has_alpha_spec {
+	my $tokens_ar = shift;
+
+	foreach my $token (@{$tokens_ar}) {
+		return 1 if $token->{'type'} eq 'ALPHA_SPEC';
+		if ($token->{'tokens'} && _has_alpha_spec($token->{'tokens'})) {
+			return 1;
+		}
+	}
+
+	return 0;
+}
+
 sub _check_aux_group_token {
 	my ($tok, $position_offset) = @_;
+
 	$position_offset //= 0;
 
-	return if $tok->{'type'} ne 'AUX_GROUP';
+	if ($tok->{'type'} ne 'AUX_GROUP') {
+		return;
+	}
 
 	my $inner_tokens = $tok->{'tokens'};
 	my $inner_position_offset = 0;
+	my $has_alpha_spec = _has_alpha_spec($inner_tokens);
 
 	foreach my $inner_tok (@{$inner_tokens}) {
+		if ($inner_tok->{'type'} eq 'WHITESPACE') {
+			_check_whitespace_token($inner_tok, $has_alpha_spec);
+			next;
+		}
 		if ($inner_tok->{'type'} eq 'AUX_GROUP') {
 			_check_aux_group_token($inner_tok, $inner_position_offset);
 			next;
@@ -154,6 +212,7 @@ sub _check_apos_aux_tokens {
 
 sub _check_aux_time_tokens {
 	my ($tok, $position_offset) = @_;
+
 	$position_offset //= 0;
 
 	if ($tok->{'type'} ne 'AUX_TIME') {
@@ -181,6 +240,7 @@ sub _check_aux_time_tokens {
 
 sub _check_number_token {
 	my ($tok, $position_offset) = @_;
+
 	$position_offset //= 0;
 
 	if ($tok->{'type'} ne 'NUMBER') {
@@ -217,15 +277,15 @@ sub _time_quote_at_end {
 }
 
 sub _consume {
-	my $state = shift;
+	my $state_hr = shift;
 
-	return $state->{'tokens'}[$state->{'pos'}++];
+	return $state_hr->{'tokens'}[$state_hr->{'pos'}++];
 }
 
 sub _expect {
-	my ($state, $type) = @_;
+	my ($state_hr, $type) = @_;
 
-	my $tok = _peek($state);
+	my $tok = _peek($state_hr);
 	if (! $tok) {
 		err "Expected '$type' but reached end of input.";
 	}
@@ -235,14 +295,14 @@ sub _expect {
 		;
 	}
 
-	return _consume($state);
+	return _consume($state_hr);
 }
 
 sub _parse_expression {
-	my $state = shift;
+	my $state_hr = shift;
 
-	my $left = _parse_term($state);
-	while (my $tok = _peek($state)) {
+	my $left = _parse_term($state_hr);
+	while (my $tok = _peek($state_hr)) {
 		if (! is_operator_token($tok->{'type'})) {
 			last;
 		}
@@ -250,13 +310,13 @@ sub _parse_expression {
 			last;
 		}
 
-		my $op = _consume($state);
-		my $next = _peek($state)
+		my $op = _consume($state_hr);
+		my $next = _peek($state_hr)
 			or err "Expected term after operator '$op->{'value'}'.";
 		err "Token '$next->{'value'}' is not allowed after operator '$op->{'value'}'."
 			if $next->{'type'} ne 'LBRACK'
 			&& ! can_follow_operator($op->{'value'}, $next->{'type'});
-		my $right = _parse_term_after_operator($state, $op->{'value'});
+		my $right = _parse_term_after_operator($state_hr, $op->{'value'});
 
 		if ($op->{'value'} eq '/' && $right->{'type'} eq 'APOS_AUX') {
 			my ($base, $from) = _split_trailing_apos_aux($left);
@@ -290,7 +350,7 @@ sub _parse_expression {
 			my $current_type = 'NUMBER';
 			my $current_value = undef;
 
-			while (my $next_tok = _peek($state)) {
+			while (my $next_tok = _peek($state_hr)) {
 				if (! can_follow_primary(
 					$next_tok->{'type'},
 					$next_tok->{'value'},
@@ -308,7 +368,7 @@ sub _parse_expression {
 				$current_type = $next_tok->{'type'};
 				$current_value = $next_tok->{'value'};
 
-				_consume($state);
+				_consume($state_hr);
 			}
 			if (@modifiers) {
 				$left = {
@@ -324,17 +384,17 @@ sub _parse_expression {
 }
 
 sub _parse_primary {
-	my $state = shift;
+	my $state_hr = shift;
 
-	my $tok = _peek($state)
+	my $tok = _peek($state_hr)
 		or err 'Expected term but reached end of input.';
 
 	if ($tok->{'type'} eq 'LBRACK') {
-		return _parse_subgroup($state);
+		return _parse_subgroup($state_hr);
 	}
 
 	if (is_primary_token($tok->{'type'})) {
-		_consume($state);
+		_consume($state_hr);
 		return {
 			'type' => $tok->{'type'},
 			'value' => $tok->{'value'},
@@ -358,12 +418,12 @@ sub _parse_primary {
 }
 
 sub _parse_subgroup {
-	my $state = shift;
+	my $state_hr = shift;
 
-	my $lbrack = _expect($state, 'LBRACK');
-	my $expr = _parse_expression($state);
+	my $lbrack = _expect($state_hr, 'LBRACK');
+	my $expr = _parse_expression($state_hr);
 
-	my $end = _peek($state);
+	my $end = _peek($state_hr);
 	if (! $end) {
 		err "Unclosed subgroup '['.",
 			'position' => $lbrack->{'pos'},
@@ -374,7 +434,7 @@ sub _parse_subgroup {
 			'position' => $end->{'pos'},
 		;
 	}
-	_consume($state);
+	_consume($state_hr);
 
 	return {
 		'type' => 'SUBGROUP',
@@ -383,24 +443,24 @@ sub _parse_subgroup {
 }
 
 sub _parse_term {
-	my $state = shift;
+	my $state_hr = shift;
 
-	my $primary = _parse_primary($state);
+	my $primary = _parse_primary($state_hr);
 	if ($primary->{'type'} ne 'NUMBER') {
-		my $next = _peek($state);
+		my $next = _peek($state_hr);
 		if ($next && $next->{'type'} eq 'NUMBER') {
 			if (! can_precede_number($primary->{'type'}, $primary->{'value'})) {
 				my $what = defined $primary->{'value'} ? $primary->{'value'} : $primary->{'type'};
 				err "NUMBER cannot follow '$what'.";
 			}
 
-			my $number = _consume($state);
+			my $number = _consume($state_hr);
 
 			my @modifiers;
 			my $current_type = 'NUMBER';
 			my $current_value = $number->{'value'};
 			my $has_main_number = 1;
-			while (my $tok = _peek($state)) {
+			while (my $tok = _peek($state_hr)) {
 				if (any { $tok->{'type'} eq $_ } qw(APOS_AUX AUX_DOT)) {
 					if (! $has_main_number) {
 						last;
@@ -422,7 +482,7 @@ sub _parse_term {
 				$current_type = $tok->{'type'};
 				$current_value = $tok->{'value'};
 
-				_consume($state);
+				_consume($state_hr);
 			}
 
 			return {
@@ -446,9 +506,9 @@ sub _parse_term {
 	my $current_type = $primary->{'type'};
 	my $current_value = $primary->{'value'};
 	my $allow_dot_aux = any { $primary->{'type'} eq $_ } qw(NUMBER SUBGROUP);
-	while (my $tok = _peek($state)) {
+	while (my $tok = _peek($state_hr)) {
 		if ($tok->{'type'} eq 'LBRACK') {
-			my $subgroup = _parse_primary($state);
+			my $subgroup = _parse_primary($state_hr);
 
 			push @modifiers, $subgroup;
 
@@ -480,7 +540,7 @@ sub _parse_term {
 		$current_type = $tok->{'type'};
 		$current_value = $tok->{'value'};
 
-		_consume($state);
+		_consume($state_hr);
 	}
 
 	return {
@@ -491,13 +551,13 @@ sub _parse_term {
 }
 
 sub _parse_term_after_operator {
-	my ($state, $op) = @_;
+	my ($state_hr, $op) = @_;
 
-	my $tok = _peek($state)
+	my $tok = _peek($state_hr)
 		or err "Expected term after operator '$op'.";
 
 	if ($op eq '/' && $tok->{'type'} eq 'AUX_DOT') {
-		_consume($state);
+		_consume($state_hr);
 		return {
 			type => 'PARTIAL_NUMBER',
 			value => $tok->{'value'},
@@ -505,7 +565,7 @@ sub _parse_term_after_operator {
 	}
 
 	if ($op eq '/' && $tok->{'type'} eq 'FORM') {
-		_consume($state);
+		_consume($state_hr);
 		return {
 			type => 'PARTIAL_FORM',
 			value => $tok->{'value'},
@@ -513,20 +573,20 @@ sub _parse_term_after_operator {
 	}
 
 	if ($op eq '/' && $tok->{'type'} eq 'APOS_AUX') {
-		_consume($state);
+		_consume($state_hr);
 		return {
 			type => 'APOS_AUX',
 			value => $tok->{'value'},
 		};
 	}
 
-	return _parse_term($state);
+	return _parse_term($state_hr);
 }
 
 sub _peek {
-	my $state = shift;
+	my $state_hr = shift;
 
-	return $state->{'tokens'}[$state->{'pos'}];
+	return $state_hr->{'tokens'}[$state_hr->{'pos'}];
 }
 
 sub _normalize_alpha_spec_token {
@@ -545,6 +605,7 @@ sub _normalize_alpha_spec_token {
 
 sub _trim_alpha_spec_value {
 	my $tok = shift;
+
 	my $value = $tok->{'value'};
 	my $pos = $tok->{'pos'};
 

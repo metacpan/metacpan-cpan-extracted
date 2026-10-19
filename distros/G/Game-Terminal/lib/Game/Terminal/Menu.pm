@@ -13,7 +13,7 @@ use Game::Terminal::Kit::Run;
 use Game::Terminal::Kit::Screen;
 use Text::ParseWords ();
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 my %WORD = (0 => 'won or drew', 1 => 'lost', 2 => 'bad option');
 

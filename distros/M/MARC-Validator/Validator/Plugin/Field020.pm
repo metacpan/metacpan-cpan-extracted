@@ -11,7 +11,7 @@ use English;
 use Error::Pure::Utils qw(clean err_get);
 use MARC::Leader;
 
-our $VERSION = 0.23;
+our $VERSION = 0.24;
 
 sub module_name {
 	my $self = shift;

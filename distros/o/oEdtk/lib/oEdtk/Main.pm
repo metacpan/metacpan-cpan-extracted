@@ -6,7 +6,7 @@ use warnings;
 use feature 'state';
 
 use Exporter;
-our $VERSION = 2.1109;
+our $VERSION = 2.1126;
 
 our @ISA    = qw(Exporter);
 our @EXPORT = qw(
@@ -414,6 +414,22 @@ sub oe_round {
 	return sprintf( $motif, $value );
 }
 
+# Signed-amount digit map. Read in the substitution below, where "$HX_VAL{$1}"
+# interpolates as a hash element. Hoisted out of oe_num_sign_x, which rebuilt it
+# on every call (17609 on the document path, ~13x the cost of a single lookup).
+my %HX_VAL = (
+	'p' => 0,
+	'q' => 1,
+	'r' => 2,
+	's' => 3,
+	't' => 4,
+	'u' => 5,
+	'v' => 6,
+	'w' => 7,
+	'x' => 8,
+	'y' => 9,
+);
+
 ## no critic (ProhibitSubroutinePrototypes)
 sub oe_num_sign_x(\$;$) {    # migrate oe_num_sign_x
 		# processing of alphanumeric signed amounts
@@ -435,19 +451,7 @@ sub oe_num_sign_x(\$;$) {    # migrate oe_num_sign_x
 		return -1;
 	}
 
-	my %hXVal;
-	$hXVal{'p'} = 0;
-	$hXVal{'q'} = 1;
-	$hXVal{'r'} = 2;
-	$hXVal{'s'} = 3;
-	$hXVal{'t'} = 4;
-	$hXVal{'u'} = 5;
-	$hXVal{'v'} = 6;
-	$hXVal{'w'} = 7;
-	$hXVal{'x'} = 8;
-	$hXVal{'y'} = 9;
-
-	if ( ${$refMontant} =~ s/(\D{1})$/$hXVal{$1}/ ) {
+	if ( ${$refMontant} =~ s/(\D{1})$/$HX_VAL{$1}/ ) {
 
 		# a value with an alphanumeric negative sign 213y => -2139
 		${$refMontant} = ( ${$refMontant} * (-1) );
@@ -1742,3 +1746,391 @@ END {
 }
 
 1;
+
+=head1 NAME
+
+oEdtk::Main - core helpers for the oEdtk document pipeline
+
+=head1 SYNOPSIS
+
+    use oEdtk::Main;
+
+    oe_simple_job(@ARGV);            # options, input and output files
+    oe_rec_motif($key, $pattern);    # describe a record
+    oe_process_ref_rec($off, $len, \$line);
+
+=head1 DESCRIPTION
+
+The central module of the toolkit. It provides the record template engine
+(describe a record, match it in a line, unpack and process it), the address,
+text, date and number helpers, the input/output file handling, the
+document-batch id generation, and the job run lifecycle (option parsing,
+FIFO/LaTeX composition, dissemination). The exported globals C<*IN>, C<*OUT>,
+C<@DATATAB> and the C<%motifs>, C<%ouTags>, C<%evalSsTrt> hashes carry the run
+state.
+
+=head1 FUNCTIONS
+
+=head2 date2time
+
+    date2time($date);
+
+Deprecated: turn a C<YYYYMMDD> date into an epoch time through C<gmtime>.
+
+=head2 prodEdtk_Current_Rec
+
+    my $key = prodEdtk_Current_Rec();
+
+Return the current record identifier.
+
+=head2 prodEdtk_Previous_Rec
+
+    my $key = prodEdtk_Previous_Rec();
+
+Return the previous record identifier.
+
+=head2 prodEtk_rec_cdata_join
+
+    prodEtk_rec_cdata_join($text);
+
+Append C<$text> to the pending push value.
+
+=head2 recEdtk_erase
+
+    recEdtk_erase($key);
+
+Remove every piece of processing registered for the record C<$key>.
+
+=head2 recEdtk_join_tmplte
+
+    recEdtk_join_tmplte($key, $pattern, $output);
+
+Register a record's unpack pattern and output format together.
+
+=head2 recEdtk_post_process
+
+    recEdtk_post_process($key, $code);
+
+Attach the post-reformat processing C<$code> for the record C<$key>.
+
+=head2 recEdtk_redefine
+
+    recEdtk_redefine($key, $pattern);
+
+Reset and redefine the unpack pattern of the record C<$key>.
+
+=head2 oe_app_usage
+
+    oe_app_usage();
+
+Print the application usage and exit.
+
+=head2 oe_backgrounds_apps
+
+    my $set = oe_backgrounds_apps($section);
+
+Look up the application's background set from C<EDTK_APPS_BACKGROUNDS>.
+
+=head2 oe_CAP_sans_accents
+
+    oe_CAP_sans_accents(\$string);
+
+Strip the accents from C<$string> and uppercase it, in place.
+
+=head2 oe_char_xlate
+
+    my $out = oe_char_xlate($string);
+
+Apply the character-translation dictionary to C<$string>.
+
+=head2 oe_clean_addr
+
+    oe_clean_addr(\$string);
+
+A stricter address cleanup (extra trims and C<\W> removal), in place.
+
+=head2 oe_clean_addr_line
+
+    oe_clean_addr_line(\$string);
+
+Clean a 38-character address line (trim, translate, C<EDTK_DICO_POST>), in
+place.
+
+=head2 oe_close_fo
+
+    oe_close_fo($fh);
+
+Close the output file handle.
+
+=head2 oe_compo_link
+
+    oe_compo_link(@options);
+
+Close the files, run (or wait for) LaTeX, and run the post-composition step.
+
+=head2 oe_corporation_get
+
+    my $corp = oe_corporation_get();
+
+Return the current corporation.
+
+=head2 oe_corporation_set
+
+    oe_corporation_set($value);
+
+Translate and set the corporation from C<$value>.
+
+=head2 oe_corporation_tag
+
+    my $tag = oe_corporation_tag();
+
+Return the corporation tag.
+
+=head2 oe_data_build
+
+    oe_data_build($name, $value);
+
+Emit a document tag string for C<$name> and C<$value>.
+
+=head2 oe_date_biggest
+
+    my $date = oe_date_biggest($d1, $d2);
+
+Return the later of two C<DD/MM/YYYY> dates.
+
+=head2 oe_date_smallest
+
+    my $date = oe_date_smallest($d1, $d2);
+
+Return the earlier of two C<DD/MM/YYYY> dates.
+
+=head2 oe_define_TeX_output
+
+    oe_define_TeX_output();
+
+Set the output tag delimiters (default backslash, empty, percent).
+
+=head2 oe_env_var_completion
+
+    oe_env_var_completion(\$path);
+
+Expand C<$ENV> references inside the path C<$path>, in place.
+
+=head2 oe_fmt_date
+
+    my $date = oe_fmt_date($date);
+
+Normalise a C<DD/MM/YY> or C<DD/MM/YYYY> date.
+
+=head2 oe_get_handle_to_input_file
+
+    my $fh = oe_get_handle_to_input_file();
+
+Return the input file handle, croaking when it is not open.
+
+=head2 oe_ID_LDOC
+
+    my $id = oe_ID_LDOC($force);
+
+Return the memoised document-batch id, optionally forcing a value.
+
+=head2 oe_is_IDLDOC
+
+    my $ok = oe_is_IDLDOC($value);
+
+Return true when C<$value> is a valid document-batch id.
+
+=head2 oe_iso_country
+
+    my $label = oe_iso_country($country);
+
+Translate a country through the ISO dictionary.
+
+=head2 oe_list_encodings
+
+    oe_list_encodings();
+
+Print the encodings available from C<Encode>.
+
+=head2 oe_new_ID_LDOC
+
+    my $id = oe_new_ID_LDOC();
+
+Generate a fresh document-batch id (a UUID).
+
+=head2 oe_new_job
+
+    oe_new_job();
+
+Legacy job bootstrap: parse the options, open the input, create the output and
+emit the header tags.
+
+=head2 oe_new_job_input_file
+
+    oe_new_job_input_file();
+
+Open the input file using the run parameters.
+
+=head2 oe_now_time
+
+    my $stamp = oe_now_time();
+
+Deprecated: return a C<YYYYMMDDHHMMSS> timestamp.
+
+=head2 oe_num_sign_x
+
+    my $value = oe_num_sign_x(\$amount, $decimals);
+
+Decode an alphanumeric signed amount (a trailing C<p>..C<y> letter), in place.
+
+=head2 oe_num2txt_us
+
+    oe_num2txt_us(\$amount);
+
+Normalise a display-formatted amount (comma to dot), in place.
+
+=head2 oe_open_fi_IN
+
+    oe_open_fi_IN($file, $encoding);
+
+Open the input file (C<IN>), optionally with a given encoding.
+
+=head2 oe_open_fo_OUT
+
+    oe_open_fo_OUT($file, $encoding);
+
+Open the output file (C<OUT>), optionally with a given encoding.
+
+=head2 oe_options
+
+    my ($params, $cfg) = oe_options(@args);
+
+Parse the command-line options into the run parameters and return them along
+with the configuration.
+
+=head2 oe_params
+
+    my $params = oe_params($params);
+
+Get, or set, the run parameters.
+
+=head2 oe_print_to_output_file
+
+    oe_print_to_output_file($text);
+
+Print C<$text> to the output file.
+
+=head2 oe_process_ref_rec
+
+    oe_process_ref_rec($key_off, $key_len, \$line, $rec_off, $rec_len);
+
+Match a record key in C<$line> and process the referenced record.
+
+=head2 oe_rec_motif
+
+    oe_rec_motif($key, $pattern);
+
+Register the unpack pattern of the record C<$key>.
+
+=head2 oe_rec_output
+
+    oe_rec_output($key, $format);
+
+Register the C<sprintf> output format of the record C<$key>.
+
+=head2 oe_rec_pre_process
+
+    oe_rec_pre_process($key, $code);
+
+Attach the pre-processing C<$code> for the record C<$key>.
+
+=head2 oe_rec_process
+
+    oe_rec_process($key, $code);
+
+Attach the post-load processing C<$code> for the record C<$key>.
+
+=head2 oe_round
+
+    my $value = oe_round($value, $multiple);
+
+Round C<$value> to a multiple, inferring the decimals.
+
+=head2 oe_set_sys_date
+
+    oe_set_sys_date($date);
+
+Set the system date, remembering the original for restoration at exit.
+
+=head2 oe_simple_job
+
+    my ($params, $cfg) = oe_simple_job(@args);
+
+Convenience bootstrap: options, then the input and output files.
+
+=head2 oe_to_date
+
+    oe_to_date(\$date);
+
+Rewrite a C<YYYYMMDD> date as C<DD/MM/YYYY>, in place.
+
+=head2 oe_trimp_space
+
+    oe_trimp_space(\$string);
+
+Collapse consecutive spaces in C<$string>, in place.
+
+=head2 oe_trt_ref_rec
+
+    oe_trt_ref_rec($id, \$line, $rec_off, $rec_len);
+
+The core record processor: pre-process, unpack, process, reformat and
+post-process the referenced record.
+
+=head2 oe_uc_sans_accents
+
+    oe_uc_sans_accents(\$string);
+
+Strip the accents from C<$string> and uppercase it, in place.
+
+=head2 oe_unique_data_name
+
+    my $name = oe_unique_data_name($n, $id, $counter);
+
+Generate a unique name of C<$n> characters.
+
+=head1 EXPORTED VARIABLES
+
+=head2 *IN
+
+The input file handle.
+
+=head2 *OUT
+
+The output file handle.
+
+=head2 @DATATAB
+
+The array into which the records are distributed.
+
+=head2 $LAST_ENR
+
+The last processed record marker.
+
+=head2 %motifs
+
+The record-to-unpack-pattern table.
+
+=head2 %ouTags
+
+The record-to-output-tag table.
+
+=head2 %evalSsTrt
+
+The record-to-post-processing table.
+
+=head1 AUTHOR
+
+The oEdtk team.
+
+=cut

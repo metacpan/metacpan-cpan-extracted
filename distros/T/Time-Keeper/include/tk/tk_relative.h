@@ -144,14 +144,14 @@ tk_out_list(pTHX_ tk_out *o, const tk_locale_data *loc, int type, SV **items, in
         tk_out t;
         t.sv = sv_2mortal(newSVpvs(""));
         t.utf8 = 0;
-        t.digits = NULL;
+        t.digits = NULL; t.nums = NULL; t.nums_len = 0;
         tk_out_fill(aTHX_ &t, lp[TK_LS_END] ? lp[TK_LS_END] : "{0}, {1}", SvPVX(items[n - 2]), SvPVX(items[n - 1]));
         acc = t.sv;
         for (i = n - 3; i >= 0; i--) {
             tk_out u;
             u.sv = sv_2mortal(newSVpvs(""));
             u.utf8 = 0;
-            u.digits = NULL;
+            u.digits = NULL; u.nums = NULL; u.nums_len = 0;
             tk_out_fill(aTHX_ &u, lp[i == 0 ? TK_LS_START : TK_LS_MIDDLE] ? lp[i == 0 ? TK_LS_START : TK_LS_MIDDLE] : "{0}, {1}",
                         SvPVX(items[i]), SvPVX(acc));
             acc = u.sv;
@@ -220,7 +220,7 @@ tk_out_duration_words(pTHX_ tk_out *o, const tk_locale_data *loc, const tk_durat
         cat = tk_plural_of(loc, parts[u]);
         t.sv = sv_2mortal(newSVpvs(""));
         t.utf8 = 0;
-        t.digits = o->digits;
+        t.digits = o->digits; t.nums = o->nums; t.nums_len = o->nums_len;
         tk_out_count(aTHX_ &t, w->count[cat] ? w->count[cat] : w->count[TK_PL_OTHER], parts[u]);
         if (t.utf8) o->utf8 = 1;
         items[n++] = t.sv;

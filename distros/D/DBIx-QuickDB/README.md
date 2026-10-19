@@ -174,6 +174,25 @@ Here is an overview of all options allowed:
     Defaults to false. When set to true the database will not be available globally
     by the name passed into `build_db()`.
 
+# PLATFORM NOTES
+
+- MSWin32 (Strawberry Perl)
+
+    Server drivers (PostgreSQL, MariaDB, MySQL, Percona) are not supported: every
+    server runs under a watcher process that needs Unix process control. They
+    report themselves not viable there. SQLite and DuckDB, which need no watcher,
+    are not affected.
+
+- Cygwin
+
+    Native Windows database binaries cannot run a server under Cygwin, so
+    directories under `/cygdrive` on `$PATH` are ignored when looking for them;
+    install the Cygwin packages instead.
+
+    PostgreSQL needs System V shared memory, which Cygwin provides only while
+    `cygserver` runs. Without it the PostgreSQL driver reports itself not viable
+    and says so.
+
 # SOURCE
 
 The source code repository for DBIx-QuickDB can be found at

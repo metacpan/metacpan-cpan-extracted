@@ -30,5 +30,14 @@ svndiff/
 ^init
 ^results
 ^htmlify
-\.git/
-MYMETA.yml$
+^MYMETA.*
+nytprof/
+nytprof.out
+\.travis.yml
+^README.md
+^.README.pod
+\.appveyor.yml
+.version_info.pl
+^.gitignore
+\B\.git\b
+\B\.github\b

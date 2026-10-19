@@ -1,0 +1,12 @@
+# shape=event reader=fast writers=8 msgs/writer=8797 MB/writer=14.4
+PIPE	event	fast	w=8	raw_lp    	0.046s	 2507.2 MB/s
+PIPE	event	fast	w=8	raw_zs    	0.157s	  736.3 MB/s
+PIPE	event	fast	w=8	ap_plain  	0.209s	  551.8 MB/s
+PIPE	event	fast	w=8	ap_zstd   	0.402s	  287.4 MB/s
+PIPE	event	fast	w=8	apm_plain 	250.435s	    0.5 MB/s
+PIPE	event	fast	w=8	apm_zstd  	63.050s	    1.8 MB/s
+# shape=event reader=json writers=8 msgs/writer=8797 MB/writer=14.4
+PIPE	event	json	w=8	raw_lp    	0.555s	  208.2 MB/s
+PIPE	event	json	w=8	raw_zs    	0.684s	  169.0 MB/s
+PIPE	event	json	w=8	ap_plain  	0.740s	  156.1 MB/s
+PIPE	event	json	w=8	ap_zstd   	0.955s	  121.0 MB/s

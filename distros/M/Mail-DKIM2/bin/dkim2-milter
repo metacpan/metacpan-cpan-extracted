@@ -295,6 +295,8 @@ sub cb_header {
 
 sub cb_eoh {
     my ($ctx) = @_;
+    my $priv = $ctx->getpriv;
+    $priv->{verify} = _start_verify($priv->{raw_hdrs}) if $do_verify;
     return SMFIS_CONTINUE;
 }
 
@@ -304,6 +306,7 @@ sub cb_body {
     my $EOL = "\015\012";
     $chunk =~ s/\015?\012/$EOL/g;
     $priv->{body} .= $chunk;
+    _feed_verify($priv->{verify}, $chunk) if $priv->{verify};
     return SMFIS_CONTINUE;
 }
 
@@ -338,7 +341,12 @@ sub cb_eom {
 
     # --- Inbound: verify and cache snapshot ---
     if ($do_verify) {
-        $verify_result = _do_verify($message);
+        # Started at the end of the headers; should no eoh have come, here.
+        $verify_result = _finish_verify($priv->{verify} // do {
+            my $state = _start_verify($priv->{raw_hdrs});
+            _feed_verify($state, $priv->{body});
+            $state;
+        });
         my $result = $verify_result;
         warn "dkim2-milter: verify $msgid result=$result\n";
 
@@ -709,29 +717,46 @@ sub _gate_pubkey_cb {
     });
 }
 
-# _do_verify($message, %opts): run the Verifier over a reconstructed message.
-#   allow_unsigned_mi => 1   permit a Message-Instance above the top signature
-#                            (outbound only: it is the instance we are about to
-#                            sign -- see the sign block in cb_eom).
-sub _do_verify {
-    my ($message, %o) = @_;
+# Verification runs as the message arrives: the Verifier gets the header
+# fields at the end of the headers -- and sends for every signature's key
+# then, so the answers come back while the body is still arriving -- then
+# each body chunk, and its verdict at the end of the message. The fields
+# are the message's less any X-DKIM2-Snapshot, which cb_eom strips.
+#
+# Fail closed: a verifier exception, at any step, is reported as temperror
+# (never pass) and logged at the end, rather than killing the callback.
+sub _start_verify {
+    my ($raw_hdrs) = @_;
+    my $state = {};
+    eval {
+        my $verifier = Mail::DKIM2::Verifier->new();
+        my %cb = _gate_pubkey_cb();
+        $verifier->set_pubkey_callback($cb{PubkeyCallback}) if $cb{PubkeyCallback};
+        $state->{verifier} = $verifier;
+        $verifier->PRINT(join('', grep { !/\AX-DKIM2-Snapshot[ \t]*:/i } @$raw_hdrs)
+                         . "\015\012");
+        1;
+    } or $state->{error} = $@;
+    return $state;
+}
 
-    my $verifier = Mail::DKIM2::Verifier->new();
-    $verifier->allow_unsigned_mi(1) if $o{allow_unsigned_mi};
+sub _feed_verify {
+    my ($state, $chunk) = @_;
+    return if defined $state->{error} || $state->{verifier}->stopped;
+    eval { $state->{verifier}->PRINT($chunk); 1 } or $state->{error} = $@;
+}
 
-    my %cb = _gate_pubkey_cb();
-    $verifier->set_pubkey_callback($cb{PubkeyCallback}) if $cb{PubkeyCallback};
-
-    # Fail closed: a verifier exception is reported as temperror (never
-    # pass) and logged, rather than killing the milter callback.
-    my $ok = eval { $verifier->PRINT($message); $verifier->CLOSE(); 1 };
-    unless ($ok) {
+sub _finish_verify {
+    my ($state) = @_;
+    unless (defined $state->{error}) {
+        eval { $state->{verifier}->CLOSE(); 1 } or $state->{error} = $@;
+    }
+    if (defined $state->{error}) {
         warn "dkim2-milter: verify failed with an internal error: "
-           . _error_text($@) . "\n";
+           . _error_text($state->{error}) . "\n";
         return 'temperror (internal error)';
     }
-
-    return $verifier->result_detail();
+    return $state->{verifier}->result_detail();
 }
 
 # One line of an exception, for the log.

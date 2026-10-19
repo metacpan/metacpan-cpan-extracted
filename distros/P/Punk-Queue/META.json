@@ -38,7 +38,8 @@
             "DBD::SQLite" : "1.60",
             "DBI" : "1.614",
             "Punk" : "0.04",
-            "Template::Stencil" : "0.04"
+            "Template::Stencil" : "0.04",
+            "Time::Keeper::Recurrence" : "0.01"
          },
          "requires" : {
             "File::Raw::JSON" : "0.05",
@@ -54,6 +55,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

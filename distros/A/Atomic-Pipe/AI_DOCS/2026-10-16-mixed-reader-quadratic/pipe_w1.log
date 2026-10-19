@@ -1,0 +1,28 @@
+# shape=event reader=fast writers=1 msgs/writer=8797 MB/writer=14.4
+PIPE	event	fast	w=1	raw_lp    	0.008s	 1815.6 MB/s
+PIPE	event	fast	w=1	raw_zs    	0.041s	  348.4 MB/s
+PIPE	event	fast	w=1	ap_plain  	0.024s	  594.3 MB/s
+PIPE	event	fast	w=1	ap_zstd   	0.089s	  162.3 MB/s
+PIPE	event	fast	w=1	apm_plain 	1.241s	   11.6 MB/s
+PIPE	event	fast	w=1	apm_zstd  	0.271s	   53.2 MB/s
+# shape=event reader=json writers=1 msgs/writer=8797 MB/writer=14.4
+PIPE	event	json	w=1	raw_lp    	0.072s	  201.7 MB/s
+PIPE	event	json	w=1	raw_zs    	0.085s	  169.1 MB/s
+PIPE	event	json	w=1	ap_plain  	0.092s	  156.6 MB/s
+PIPE	event	json	w=1	ap_zstd   	0.114s	  126.2 MB/s
+PIPE	event	json	w=1	apm_plain 	1.353s	   10.7 MB/s
+PIPE	event	json	w=1	apm_zstd  	0.448s	   32.3 MB/s
+# shape=frame reader=fast writers=1 msgs/writer=9 MB/writer=14.5
+PIPE	frame	fast	w=1	raw_lp    	0.009s	 1636.7 MB/s
+PIPE	frame	fast	w=1	raw_zs    	0.027s	  539.2 MB/s
+PIPE	frame	fast	w=1	ap_plain  	0.099s	  146.3 MB/s
+PIPE	frame	fast	w=1	ap_zstd   	0.024s	  610.0 MB/s
+PIPE	frame	fast	w=1	apm_plain 	0.560s	   25.9 MB/s
+PIPE	frame	fast	w=1	apm_zstd  	0.029s	  501.9 MB/s
+# shape=frame reader=json writers=1 msgs/writer=9 MB/writer=14.5
+PIPE	frame	json	w=1	raw_lp    	0.069s	  210.3 MB/s
+PIPE	frame	json	w=1	raw_zs    	0.077s	  187.4 MB/s
+PIPE	frame	json	w=1	ap_plain  	0.159s	   91.3 MB/s
+PIPE	frame	json	w=1	ap_zstd   	0.072s	  200.6 MB/s
+PIPE	frame	json	w=1	apm_plain 	0.611s	   23.7 MB/s
+PIPE	frame	json	w=1	apm_zstd  	0.080s	  182.2 MB/s

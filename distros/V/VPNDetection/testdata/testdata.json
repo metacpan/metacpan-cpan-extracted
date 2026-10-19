@@ -493,11 +493,13 @@
         "mobproxy": {},
         "pubproxy": {
           "entry": true,
-          "exit": false,
+          "exit": true,
           "protocols": [
             "http",
             "https"
           ],
+          "num_ports": 3,
+          "num_proxies": 2,
           "last_seen": "2026-10-17",
           "last_usable": ""
         }
@@ -528,11 +530,13 @@
         },
         "pubproxy": {
           "entry": true,
-          "exit": false,
+          "exit": true,
           "protocols": [
             "http",
             "https"
           ],
+          "num_ports": 3,
+          "num_proxies": 2,
           "last_seen": "2026-10-17",
           "last_usable": ""
         }
@@ -5503,6 +5507,8 @@
             "protocols": [
               "socks5"
             ],
+            "num_ports": 1,
+            "num_proxies": 0,
             "last_seen": "2026-10-17",
             "last_usable": "2026-10-16"
           }
@@ -5562,6 +5568,8 @@
             "protocols": [
               "socks5"
             ],
+            "num_ports": 1,
+            "num_proxies": 0,
             "last_seen": "2026-10-17",
             "last_usable": "2026-10-16"
           }

@@ -21,6 +21,25 @@ plus(self, ...)
             tk_value_difference(aTHX_ &d, v, tk_value_rw(ST(1), what), 1);
             RETVAL = tk_dur_new_sv(aTHX_ tk_dur_stash(aTHX), &d);
         }
+        else if (v->calendar != TK_CAL_GREGORY && !(items >= 2 && tk_is_dur(aTHX_ ST(1)))) {
+            /* in another calendar, years go first by month code; a duration's months are the calendar's months */
+            tk_dur_args da;
+            tk_value mid;
+            int64_t years;
+            tk_dur_args_parse(aTHX_ &ST(1), items - 1, TK_D_UNITS | TK_D(TK_D_GAP) | TK_D(TK_D_OVERLAP), &da, what);
+            years = tk_dur_int(aTHX_ &da, TK_D_YEARS, what);
+            da.v[TK_D_YEARS] = NULL;
+            tk_dur_from_args(aTHX_ &da, &d, what);
+            gap = da.v[TK_D_GAP] ? tk_opt_gap(aTHX_ da.v[TK_D_GAP], what) : TK_GAP_DEFAULT;
+            overlap = da.v[TK_D_OVERLAP] ? tk_opt_overlap(aTHX_ da.v[TK_D_OVERLAP], what) : TK_OVERLAP_DEFAULT;
+            if (ix) {
+                years = -years;
+                tk_dur_negate(&d, da.v[TK_D_EOM] != NULL);
+            }
+            tk_value_plus_years(aTHX_ &mid, v, years, da.v[TK_D_EOM] ? d.eom : tk_dur_default_eom(years), gap, overlap, what);
+            tk_value_plus(aTHX_ &out, &mid, &d, gap, overlap, what);
+            RETVAL = tk_value_new_sv(aTHX_ SvSTASH(SvRV(self)), &out);
+        }
         else {
             tk_plus_args(aTHX_ &ST(1), items - 1, &d, &gap, &overlap, what);
             if (ix) {
@@ -85,6 +104,8 @@ minus_absolute(self, other)
                                 TKZ_GAP_CROAK, TK_OVERLAP_DEFAULT, what);
             tk_value_from_local(aTHX_ &fa, &fl, ca->year, ca->month, ca->day, 0, 0, 0, 0,
                                 TKZ_GAP_CROAK, TK_OVERLAP_DEFAULT, what);
+            fb.calendar = b->calendar;
+            fa.calendar = a->calendar;
             if (tk_value_cmp(&fb, &fa) >= 0)
                 tk_value_difference(aTHX_ &d, &fb, &fa, 1);
             else

@@ -1,0 +1,53 @@
+---
+abstract: 'An SQLite handle with its schema applied, its updates run, and its pragmas set'
+author:
+  - 'George S. Baugh <george@troglodyne.net>'
+build_requires:
+  File::Slurper::Temp: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  FindBin::libs: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test2::Plugin::NoWarnings: '0'
+  Test2::V1: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Trog-SQLite
+no_index:
+  directory:
+    - docs
+    - t
+    - templates
+provides:
+  Trog::SQLite:
+    file: lib/Trog/SQLite.pm
+    version: '0.001'
+requires:
+  DBD::SQLite: '0'
+  DBD::SQLite::Constants: '0'
+  DBI: '0'
+  File::Basename: '0'
+  File::Find: '0'
+  File::Slurper: '0'
+  List::Util: '0'
+  POSIX: '0'
+  perl: '5.014'
+  re: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/Troglodyne-Internet-Widgets/Trog-SQLite/issues
+  homepage: https://github.com/Troglodyne-Internet-Widgets/Trog-SQLite
+  repository: https://github.com/Troglodyne-Internet-Widgets/Trog-SQLite.git
+version: '0.001'
+x_generated_by_perl: v5.44.0
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: MIT

@@ -199,6 +199,8 @@ struct net_quic_connection {
     int stream_tx_buffer_limit_enabled;
     uint64_t stream_tx_buffer_limit;
     uint64_t stream_tx_buffered_bytes;
+    uint64_t stream_tx_unsent_bytes;
+    size_t stream_tx_capacity_waiters;
 
     ptls_context_t ptls_ctx;
     ngtcp2_crypto_picotls_ctx picotls_ctx;

@@ -331,7 +331,7 @@ tk_plain_format_sv(pTHX_ SV *self, tk_value *v, int cldr, int check, const char 
     o.sv = newSV(len * 2 + 40);
     sv_setpvs(o.sv, "");
     o.utf8 = 0;
-    o.digits = NULL;
+    o.digits = NULL; o.nums = NULL; o.nums_len = 0;
     if (cldr)
         tk_format_cldr(aTHX_ &o, self, v, tk_locale_of(v), p, len, NULL, NULL);
     else

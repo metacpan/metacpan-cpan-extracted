@@ -34,6 +34,10 @@ tk_locale_find(const char *s, STRLEN len)
     char key[64];
     STRLEN i;
     int lo = 0, hi = TK_LOCALE_LOOKUP - 1;
+    STRLEN code_len, ca_len;
+    const char *ca;
+    tk_locale_split_ca(s, len, &code_len, &ca, &ca_len);   /* a -u-ca- extension is not part of the code */
+    len = code_len;
     if (len == 0 || len >= sizeof key)
         return -1;
     for (i = 0; i < len; i++) {
@@ -88,7 +92,9 @@ tk_u32(const unsigned char *p)
 
 #define TK_SECTION_HEAD 36
 
-/* A pool string, or NULL; 0 when the offset is past the pool. */
+/* A pool string, or NULL; 0 when the offset is past the pool. An offset
+ * counts two-byte units since archive section version 4, so a pool may
+ * reach 128 KB. */
 static int
 tk_section_str(const char *pool, size_t pool_len, unsigned off, const char **out)
 {
@@ -96,9 +102,9 @@ tk_section_str(const char *pool, size_t pool_len, unsigned off, const char **out
         *out = NULL;
         return 1;
     }
-    if (off >= pool_len)
+    if ((size_t)off * 2 >= pool_len)
         return 0;
-    *out = pool + off;
+    *out = pool + (size_t)off * 2;
     return 1;
 }
 
@@ -155,7 +161,7 @@ tk_section_decode(const unsigned char *b, size_t len, const tk_locale_data *pare
     tk_terr_name *tn;
     tk_interval *iv;
 
-    if (len < TK_SECTION_HEAD || memNE(b, "TKL3", 4)) {
+    if (len < TK_SECTION_HEAD || memNE(b, "TKL4", 4)) {
         *err = "the section is not one this Time::Keeper reads";
         return NULL;
     }
@@ -172,7 +178,7 @@ tk_section_decode(const unsigned char *b, size_t len, const tk_locale_data *pare
     nwords = tk_u16(b + 26);
     nival  = tk_u16(b + 28);
     plural = tk_u16(b + 34);
-    if (nfixed != TK_LOCALE_SLOTS || nwords != TK_WORD_SLOTS) {
+    if ((nfixed != TK_LOCALE_SLOTS && nfixed != TK_LOCALE_INHERIT) || (nwords != TK_WORD_SLOTS && nwords != TK_LOCALE_INHERIT)) {
         *err = "the section has a different number of names";
         return NULL;
     }
@@ -181,8 +187,9 @@ tk_section_decode(const unsigned char *b, size_t len, const tk_locale_data *pare
         return NULL;
     }
     idx = TK_SECTION_HEAD;
-    pool_at = idx + 2 * ((size_t)nfixed + 2 * nskel + 8 * nzone + 7 * nmeta + 2 * nterr
-                         + (nrule == TK_LOCALE_INHERIT ? 0 : 3 * (size_t)nrule) + nwords + 3 * (size_t)nival);
+    pool_at = idx + 2 * ((nfixed == TK_LOCALE_INHERIT ? 0 : (size_t)nfixed) + 2 * nskel + 8 * nzone + 7 * nmeta + 2 * nterr
+                         + (nrule == TK_LOCALE_INHERIT ? 0 : 3 * (size_t)nrule)
+                         + (nwords == TK_LOCALE_INHERIT ? 0 : (size_t)nwords) + 3 * (size_t)nival);
     if (pool_at > len || (len > pool_at && b[len - 1] != '\0')) {
         *err = "the section is cut short";
         return NULL;
@@ -204,6 +211,11 @@ tk_section_decode(const unsigned char *b, size_t len, const tk_locale_data *pare
 
     p = b + idx;
     slot = (const char **)&d->s;
+    if (nfixed == TK_LOCALE_INHERIT) {          /* every name the parent's: no table (section version 4) */
+        if (!parent) goto bad;
+        d->s = parent->s;
+        nfixed = 0;
+    }
     pslot = parent ? (const char *const *)&parent->s : NULL;
     for (i = 0; i < nfixed; i++, p += 2) {
         unsigned off = tk_u16(p);
@@ -310,6 +322,11 @@ tk_section_decode(const unsigned char *b, size_t len, const tk_locale_data *pare
         d->n_rules = (uint16_t)nrule;
     }
     slot = (const char **)&d->w;
+    if (nwords == TK_LOCALE_INHERIT) {          /* every word the parent's: no table */
+        if (!parent) goto bad;
+        d->w = parent->w;
+        nwords = 0;
+    }
     pslot = parent ? (const char *const *)&parent->w : NULL;
     for (i = 0; i < nwords; i++, p += 2) {
         unsigned off = tk_u16(p);

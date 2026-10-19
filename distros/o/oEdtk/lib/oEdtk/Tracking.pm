@@ -45,7 +45,7 @@ use DBI;
 #use JSON;
 use Exporter;
 
-our $VERSION   = 2.1120;
+our $VERSION   = 2.1126;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(stats_iddest stats_week stats_month);
 
@@ -72,7 +72,7 @@ sub new {
 
 	my $mode = uc( $cfg->{'EDTK_TRACK_MODE'} );
 	if ( $mode eq 'NONE' ) {
-		&logger( 3, "Tracking is currently disabled... (see EDTK_TRACK_MODE in config file)" );
+		&logger( 6, "Tracking is currently disabled... (see EDTK_TRACK_MODE in config file)" );
 
 		# Return a dummy object if tracking is disabled.
 		return bless { dict => $dict, mode => $mode }, $class;
@@ -96,7 +96,7 @@ sub new {
 		my $key = uc($_);
 		if ( length($key) > 8 ) {
 			$key =~ s/^(.{8}).*$/$1/;
-			&logger( 5, "column too long, truncated to '$key'" );
+			&logger( 4, "column too long, truncated to '$key'" );
 		}
 		if ( exists( $seen{$key} ) ) {
 			die "ERROR: duplicate column \"$key\"";
@@ -161,7 +161,7 @@ sub new {
 	if ( $dbh->{'Driver'}->{'Name'} eq 'SQLite' ) {
 		eval { create_table_TRACKING( $dbh, $table, $cfg->{'EDTK_MAX_USER_KEY'} ); };
 		if ($@) {
-			&logger( 4, "Table already exist : $@" );
+			&logger( 6, "Table already exist : $@" );
 		}
 	}
 
@@ -203,7 +203,7 @@ sub track {
 	if ( @data > ( @usercols + 1 ) ) {
 
 		# max is @usercols nbcol + 1 for message col
-		&logger( 4,
+		&logger( 3,
 			"Too much values : got " . @data . ", expected " . ( @usercols + 1 ) . " maximum" );
 	}
 
@@ -323,7 +323,7 @@ sub set_entity {
 	my ( $self, $entity ) = @_;
 
 	if ( !defined($entity) || length($entity) == 0 ) {
-		&logger( 4, "Tracking::set_entity() called with an undefined entity!" );
+		&logger( 3, "Tracking::set_entity() called with an undefined entity!" );
 		return;
 	}
 
@@ -539,3 +539,88 @@ sub _validate_edmode {
 #}
 
 1;
+
+=head1 NAME
+
+oEdtk::Tracking - object-oriented production tracking
+
+=head1 SYNOPSIS
+
+    use oEdtk::Tracking qw(stats_week);
+
+    my $trk = oEdtk::Tracking->new($source, user => 'utest', entity => 'Corp');
+    $trk->track('Job', 1, @values);
+    $trk->end;
+
+=head1 DESCRIPTION
+
+Records tracking events (job, spool, document, warn, halt) for a batch run into
+the table named by the C<EDTK_DB> configuration, and offers a few statistics
+queries over that table. When C<EDTK_TRACK_MODE> is C<NONE> the constructor
+returns an inert object and every method becomes a no-op. This is the current
+module; C<Tracking2.pm> is the older, warn-based duplicate that declares the same
+package C<oEdtk::Tracking>.
+
+=head1 METHODS
+
+=head2 new
+
+    my $trk = oEdtk::Tracking->new($source, %params);
+
+Build a tracker. C<$source> names the input, and C<%params> may carry C<user>,
+C<entity>, C<keys>, C<edmode>, C<account>, C<obj_typ>, C<child_typ>,
+C<child_id> and C<parent_id>. Dies when there are too many keys or a duplicate
+key.
+
+=head2 track
+
+    $trk->track($job, $count, @data);
+
+Record one event: the job event, the number of objects, and the values of the
+configured user keys (an optional trailing value is the message). Values longer
+than the schema allows are truncated.
+
+=head2 set_entity
+
+    $trk->set_entity($entity);
+
+Normalise C<$entity> through the dictionary and store it.
+
+=head2 end
+
+    $trk->end;
+
+Record the final C<Halt> event.
+
+=head1 FUNCTIONS
+
+=head2 stats_iddest
+
+    my $rows = stats_iddest($dbh, $cfg, $start, $end, $excluded_users, $ed_app);
+
+Per recipient destination, per week, the number of documents tracked between
+C<$start> and C<$end>.
+
+=head2 stats_week
+
+    my $rows = stats_week($dbh, $cfg, $start, $end, $excluded_users);
+
+Per application, per legal entity and per ISO week, the number of documents
+tracked during the period.
+
+=head2 stats_month
+
+    my $rows = stats_month($dbh, $cfg, $start, $end, $excluded_users);
+
+Per application, per legal entity and per month, the number of documents tracked
+during the period.
+
+The following subs are internal helpers and are not part of the public API:
+C<_tracking_insert>, C<_tracking_schema_warn>, C<_validate_event> and
+C<_validate_edmode>.
+
+=head1 AUTHOR
+
+The oEdtk team.
+
+=cut

@@ -1,0 +1,227 @@
+---
+abstract: 'a software synthesizer in Perl'
+author:
+  - 'PetaMem s.r.o. <info@petamem.com>'
+build_requires:
+  IO::Socket::INET: '0'
+  Test::More: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.040, CPAN::Meta::Converter version 2.150010'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Peta-Synth
+no_index:
+  directory:
+    - doc
+    - examples
+    - t
+provides:
+  Peta::Hearing:
+    file: lib/Peta/Hearing.pm
+    version: '0.2610180'
+  Peta::MIDI:
+    file: lib/Peta/MIDI.pm
+    version: '0.2610180'
+  Peta::MIDI::ALSA:
+    file: lib/Peta/MIDI/ALSA.pm
+    version: '0.2610180'
+  Peta::MIDI::Decoder:
+    file: lib/Peta/MIDI/Decoder.pm
+    version: '0.2610180'
+  Peta::MIDI::Device:
+    file: lib/Peta/MIDI/Device.pm
+    version: '0.2610180'
+  Peta::MIDI::Device::In:
+    file: lib/Peta/MIDI/Device/In.pm
+    version: '0.2610180'
+  Peta::MIDI::Device::Out:
+    file: lib/Peta/MIDI/Device/Out.pm
+    version: '0.2610180'
+  Peta::MIDI::Encoder:
+    file: lib/Peta/MIDI/Encoder.pm
+    version: '0.2610180'
+  Peta::MIDI::Event:
+    file: lib/Peta/MIDI/Event.pm
+    version: '0.2610180'
+  Peta::MP3::Encode:
+    file: lib/Peta/MP3/Encode.pm
+    version: '0.2610180'
+  Peta::MP3::Encode::Bits:
+    file: lib/Peta/MP3/Encode.pm
+    version: '0.2610180'
+  Peta::MP3::Encode::Filterbank:
+    file: lib/Peta/MP3/Encode/Filterbank.pm
+    version: '0.2610180'
+  Peta::MP3::Encode::Filterbank::PDL:
+    file: lib/Peta/MP3/Encode/Filterbank/PDL.pm
+    version: '0.2610180'
+  Peta::MP3::Encode::Filterbank::PDL::Imports:
+    file: lib/Peta/MP3/Encode/Filterbank/PDL.pm
+    version: '0.2610180'
+  Peta::MP3::Encode::Psy:
+    file: lib/Peta/MP3/Encode/Psy.pm
+    version: '0.2610180'
+  Peta::MP3::Encode::Quantize:
+    file: lib/Peta/MP3/Encode/Quantize.pm
+    version: '0.2610180'
+  Peta::MP3::Encode::Tables:
+    file: lib/Peta/MP3/Encode/Tables.pm
+    version: '0.2610180'
+  Peta::Synth:
+    file: lib/Peta/Synth.pm
+    version: '0.2610180'
+  Peta::Synth::Analysis:
+    file: lib/Peta/Synth/Analysis.pm
+    version: '0.2610180'
+  Peta::Synth::Arpeggiator:
+    file: lib/Peta/Synth/Arpeggiator.pm
+    version: '0.2610180'
+  Peta::Synth::EQ:
+    file: lib/Peta/Synth/EQ.pm
+    version: '0.2610180'
+  Peta::Synth::Engine:
+    file: lib/Peta/Synth/Engine.pm
+    version: '0.2610180'
+  Peta::Synth::Engine::GPU:
+    file: lib/Peta/Synth/Engine/GPU.pm
+    version: '0.2610180'
+  Peta::Synth::Engine::PDL:
+    file: lib/Peta/Synth/Engine/PDL.pm
+    version: '0.2610180'
+  Peta::Synth::Engine::PDL::Imports:
+    file: lib/Peta/Synth/Engine/PDL.pm
+    version: '0.2610180'
+  Peta::Synth::Engine::Perl:
+    file: lib/Peta/Synth/Engine/Perl.pm
+    version: '0.2610180'
+  Peta::Synth::FFT:
+    file: lib/Peta/Synth/FFT.pm
+    version: '0.2610180'
+  Peta::Synth::Fluid:
+    file: lib/Peta/Synth/Fluid.pm
+    version: '0.2610180'
+  Peta::Synth::Input:
+    file: lib/Peta/Synth/Input.pm
+    version: '0.2610180'
+  Peta::Synth::Input::Raw:
+    file: lib/Peta/Synth/Input/Raw.pm
+    version: '0.2610180'
+  Peta::Synth::MIDI:
+    file: lib/Peta/Synth/MIDI.pm
+    version: '0.2610180'
+  Peta::Synth::MIDI::Stream:
+    file: lib/Peta/Synth/MIDI/Stream.pm
+    version: '0.2610180'
+  Peta::Synth::Output:
+    file: lib/Peta/Synth/Output.pm
+    version: '0.2610180'
+  Peta::Synth::Output::FLAC:
+    file: lib/Peta/Synth/Output/FLAC.pm
+    version: '0.2610180'
+  Peta::Synth::Output::MP3:
+    file: lib/Peta/Synth/Output.pm
+    version: '0.2610180'
+  Peta::Synth::Output::Pipe:
+    file: lib/Peta/Synth/Output.pm
+    version: '0.2610180'
+  Peta::Synth::Output::PipeWire:
+    file: lib/Peta/Synth/Output/PipeWire.pm
+    version: '0.2610180'
+  Peta::Synth::Output::Pulse:
+    file: lib/Peta/Synth/Output/Pulse.pm
+    version: '0.2610180'
+  Peta::Synth::Output::Vorbis:
+    file: lib/Peta/Synth/Output.pm
+    version: '0.2610180'
+  Peta::Synth::Output::WAV:
+    file: lib/Peta/Synth/Output.pm
+    version: '0.2610180'
+  Peta::Synth::Patch:
+    file: lib/Peta/Synth/Patch.pm
+    version: '0.2610180'
+  Peta::Synth::Profile:
+    file: lib/Peta/Synth/Profile.pm
+    version: '0.2610180'
+  Peta::Synth::Reverb:
+    file: lib/Peta/Synth/Reverb.pm
+    version: '0.2610180'
+  Peta::Synth::Server:
+    file: lib/Peta/Synth/Server.pm
+    version: '0.2610180'
+  Peta::Synth::Synth:
+    file: lib/Peta/Synth/Synth.pm
+    version: '0.2610180'
+  Peta::Synth::Voice:
+    file: lib/Peta/Synth/Voice.pm
+    version: '0.2610180'
+  Peta::Synth::Wavetable:
+    file: lib/Peta/Synth/Wavetable.pm
+    version: '0.2610180'
+  Peta::Vorbis::Encode:
+    file: lib/Peta/Vorbis/Encode.pm
+    version: '0.2610180'
+  Peta::Vorbis::Encode::Bits:
+    file: lib/Peta/Vorbis/Encode/Ogg.pm
+    version: '0.2610180'
+  Peta::Vorbis::Encode::Book:
+    file: lib/Peta/Vorbis/Encode/Book.pm
+    version: '0.2610180'
+  Peta::Vorbis::Encode::MDCT:
+    file: lib/Peta/Vorbis/Encode/MDCT.pm
+    version: '0.2610180'
+  Peta::Vorbis::Encode::MDCT::PDL:
+    file: lib/Peta/Vorbis/Encode/MDCT/PDL.pm
+    version: '0.2610180'
+  Peta::Vorbis::Encode::MDCT::PDL::Imports:
+    file: lib/Peta/Vorbis/Encode/MDCT/PDL.pm
+    version: '0.2610180'
+  Peta::Vorbis::Encode::Ogg:
+    file: lib/Peta/Vorbis/Encode/Ogg.pm
+    version: '0.2610180'
+  Peta::Vorbis::Encode::Psy:
+    file: lib/Peta/Vorbis/Encode/Psy.pm
+    version: '0.2610180'
+  Peta::Vorbis::Encode::Weights:
+    file: lib/Peta/Vorbis/Encode/Weights.pm
+    version: '0.2610180'
+recommends:
+  AnyEvent: '0'
+  PDL: '0'
+requires:
+  Carp: '0'
+  Cwd: '0'
+  Digest::MD5: '0'
+  Encode: '0'
+  Exporter: '0'
+  Fcntl: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  Getopt::Long: '0'
+  IO::Select: '0'
+  IO::Socket::UNIX: '0'
+  JSON::PP: '0'
+  List::Util: '0'
+  Mojo::IOLoop: '0'
+  Mojo::Server::Daemon: '0'
+  Mojolicious: '0'
+  POSIX: '0'
+  Scalar::Util: '0'
+  Time::HiRes: '0'
+  constant: '0'
+  integer: '0'
+  parent: '0'
+  perl: v5.36.0
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://metacpan.org/author/PETAMEM
+version: '0.2610180'
+x_generated_by_perl: v5.42.2
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: 'Artistic-2.0 OR BSD-2-Clause'

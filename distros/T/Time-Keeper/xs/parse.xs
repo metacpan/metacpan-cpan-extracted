@@ -22,7 +22,7 @@ parse(class, text, ...)
         SV *t, *scan, *pat = NULL;
         STRLEN len, plen = 0;
         const char *s, *p = NULL;
-        int first = ix ? 3 : 2, gap, overlap, ok;
+        int first = ix ? 3 : 2, gap, overlap, ok, cal_id;
         uint16_t lid;
     CODE:
         if (ix) {
@@ -31,8 +31,9 @@ parse(class, text, ...)
             pat = tk_utf8_text(aTHX_ ST(2));
             p = SvPV(pat, plen);
         }
-        tk_args_parse(aTHX_ &ST(first), items - first, TK_A_RESOLVE | TK_A(TK_A_LOCALE), &a, what);
+        tk_args_parse(aTHX_ &ST(first), items - first, TK_A_RESOLVE | TK_A(TK_A_LOCALE) | TK_A(TK_A_CALENDAR), &a, what);
         lid = tk_args_locale(&a, what);
+        cal_id = tk_args_calendar(&a, what);
         gap = a.v[TK_A_GAP] ? tk_opt_gap(aTHX_ a.v[TK_A_GAP], what) : TK_GAP_DEFAULT;
         overlap = a.v[TK_A_OVERLAP] ? tk_opt_overlap(aTHX_ a.v[TK_A_OVERLAP], what) : TK_OVERLAP_DEFAULT;
         if (!SvOK(text))
@@ -42,6 +43,11 @@ parse(class, text, ...)
         s = SvPV(scan, len);
         tk_cursor_init(&c, s, len);
         Zero(&f, 1, tk_fields);
+        if (ix && cal_id != TK_CAL_GREGORY) {
+            /* the pattern's names and years are the calendar's */
+            f.calendar = cal_id + 1;
+            f.cal_names = tk_cal_names_get(aTHX_ tk_locale_get(aTHX_ lid), cal_id);
+        }
         if (ix == 0)
             ok = tk_parse_any(&c, &f);
         else if (ix == 1)
@@ -50,8 +56,18 @@ parse(class, text, ...)
             ok = tk_parse_cldr(&c, &f, tk_locale_get(aTHX_ lid), p, plen) && (tk_at_end(&c) || tk_fail(&c, "text was left over"));
         if (!ok)
             tk_parse_croak(aTHX_ what, t, scan, &c);
+        if (f.calendar_text) {
+            /* [u-ca=hebrew] names the calendar the ISO fields are read in; the fields stay ISO */
+            if ((a.v[TK_A_CALENDAR] || (a.v[TK_A_LOCALE] && tk_cal_from_locale_sv(aTHX_ a.v[TK_A_LOCALE], what) >= 0)) && f.calendar_text - 1 != cal_id)
+                croak("%s: '%s' names the %s calendar and calendar => names %s", what, SvPV_nolen(t), tk_calendars[f.calendar_text - 1].id, tk_calendars[cal_id].id);
+            cal_id = f.calendar_text - 1;
+            tk_cal_check_built(aTHX_ cal_id, what);
+        }
+        if (ix && cal_id != TK_CAL_GREGORY)
+            tk_cal_fields_resolve(aTHX_ &f, cal_id, what, SvPV_nolen(t));
         tk_fields_to_value(aTHX_ &v, &f, a.v[TK_A_ZONE], gap, overlap, what, SvPV_nolen(t));
         v.locale = lid;
+        v.calendar = (uint8_t)cal_id;
         RETVAL = tk_value_new_sv(aTHX_ tk_stash_for(aTHX_ class), &v);
     OUTPUT:
         RETVAL

@@ -100,8 +100,9 @@ sub rel { my ($t, @o) = @_; $t->format_relative(to => $now, @o) }
     is($now->minus(hours => 10)->format_relative(to => $tokyo), 'yesterday', 'to in another zone is brought into the value\'s');
     my $f = $K->new(year => 2026, month => 10, day => 18, hour => 9, zone => 'floating');
     is($f->minus(days => 1)->format_relative(to => $f), 'yesterday', 'floating time');
-    like($K->now->minus(hours => 3)->format_relative, qr/^3 hours ago$/, 'to defaults to now');
-    like($K->now->plus(days => 400)->format_relative, qr/^in 1 year$|^next year$/, 'and the words follow');
+    local $Time::Keeper::CLOCK = $K->parse('2026-10-18T12:00:00Z');
+    is($K->now->in_zone('UTC')->minus(hours => 3)->format_relative, '3 hours ago', 'to defaults to now');
+    like($K->now->in_zone('UTC')->plus(days => 400)->format_relative, qr/^in 1 year$|^next year$/, 'and the words follow');
 }
 
 # Bad arguments.

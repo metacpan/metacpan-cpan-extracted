@@ -46,6 +46,10 @@
  * without looking ahead, and a search through the sticks that is bounded in
  * nodes and never in seconds.
  *
+ * AT VERSION 6, WHAT A HOUSE IS: whether the piece on a house is protected
+ * from a swap, and whether it is part of a blockade, so that a page can draw
+ * both without knowing a rule.
+ *
  * `put` and `lift` are STRUCTURE PRIMITIVES and JUDGE NOTHING.
  *
  * ---- units and conventions ----------------------------------------------------
@@ -87,7 +91,7 @@
  * boards, which exists for a leak test and is not synchronised.
  */
 
-#define SEN_ABI_VERSION 5
+#define SEN_ABI_VERSION 6
 
 /* ---- houses. SEN_EMPTY is 0 so a zeroed house is an empty house -------------- */
 
@@ -454,6 +458,19 @@ struct sen_abi {
      * deep, `only` bounding that first throw. For tests worked by hand. */
     int  (*expect)(const struct sen_board *b, const struct sen_rules *r,
                    const struct sen_weights *w, int only, int depth, int side);
+
+    /* ---- version 6: what a house is ---------------------------------------- */
+
+    /* 1 when the piece on `house` may not be swapped by the other side under
+     * `r`: it stands in a run of its own side that the rule set protects. 0
+     * for an empty house, a house out of range, or a rule set that is not ok.
+     * Whether the HOUSE is safe is another question, which r->safe answers. */
+    int  (*protected_at)(const struct sen_board *b, const struct sen_rules *r, int house);
+
+    /* 1 when the piece on `house` is part of a run of its own side at least
+     * r->blockade long, which no piece of the other side may pass. 0 when the
+     * rule set has no blockade, for an empty house and out of range. */
+    int  (*in_blockade)(const struct sen_board *b, const struct sen_rules *r, int house);
 };
 
 const struct sen_abi *sen_abi_table(void);

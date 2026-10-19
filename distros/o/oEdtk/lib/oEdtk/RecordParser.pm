@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Data::Dumper;
 use Scalar::Util qw(blessed);
-our $VERSION = 2.1109;
+our $VERSION = 2.1126;
 
 # FINE-TUNE PARAMETRIZATION
 my $_denormalized_record = "OPTION";
@@ -15,6 +15,16 @@ sub dumper {
 	my $self = shift;
 
 	return Dumper(shift);
+}
+
+# Build the seek plan from the seek-key table: the keys in lexicographic order,
+# each paired with its compiled match. next() iterates this instead of sorting
+# and re-compiling the keys on every record. The pattern is identical to the
+# one next() used to build inline (/^$key(.*)$/), so the captures ($1 the key --
+# or its innermost group -- $2 the remainder) are unchanged.
+sub _seek_plan {
+	my ($seek_keys) = @_;
+	return [ map { [ $_, qr/^$_(.*)$/ ] } sort keys %$seek_keys ];
 }
 
 sub new {
@@ -52,6 +62,7 @@ sub new {
 		input                    => $fh,
 		records                  => \%records,
 		seek_keys                => \%seek_keys,
+		seek_plan                => _seek_plan( \%seek_keys ),
 		line                     => '',
 		skip_line                => 'FLUX',
 		mute_record              => 'ENTETE',
@@ -169,6 +180,7 @@ sub next {
 	my $denormalized             = $self->{'denormalized'};
 	my $records                  = $self->{'records'};
 	my $seek_keys                = $self->{'seek_keys'};
+	my $seek_plan                = $self->{'seek_plan'} // _seek_plan($seek_keys);
 	my $skip_line                = $self->{'skip_line'};
 	my $mute_record              = $self->{'mute_record'};
 	my $line_record              = $self->{'line_record'};
@@ -205,16 +217,16 @@ sub next {
 
 			}
 			else {
-				foreach my $search_key ( sort keys %{$seek_keys} ) {
+				foreach my $entry ( @{$seek_plan} ) {
 
-					#					warn "DEBUG: seek => $search_key line $.\n";
-					if ( $line =~ /^$search_key(.*)$/ ) {
+					#					warn "DEBUG: seek => $entry->[0] line $.\n";
+					if ( $line =~ $entry->[1] ) {
 						( $id, $data ) = ( $1, $2 );
 						$id =~ s/\s*//g;
 
 					 #						if (exists $records->{$key}){
 					 #							($id, $data) = ($key, $right);
-					 #							warn "DEBUG: success search_key = $search_key, for keys $id line $.\n";
+					 #							warn "DEBUG: success search_key = $entry->[0], for keys $id line $.\n";
 						last SEEK;
 
 						#						} else {
@@ -222,7 +234,7 @@ sub next {
 					}
 				}
 
-		#					warn "DEBUG: search_key = $search_key, for keys : ".  $seek_keys->{$search_key} ."\n";
+		#					warn "DEBUG: search_key = $entry->[0], for keys : ".  $seek_keys->{$entry->[0]} ."\n";
 			}
 			warn "INFO: UNKNOWN RECORD (line $.)=>$line\n";
 			warn "INFO: IGNORING UNKNOWN RECORD (line $.)\n";
@@ -268,3 +280,123 @@ sub next {
 }
 
 1;
+
+=head1 NAME
+
+oEdtk::RecordParser - stream reader and dispatcher over an Infinite flux
+
+=head1 SYNOPSIS
+
+    use oEdtk::RecordParser;
+
+    my $p = oEdtk::RecordParser->new($fh, %records);
+    while ( my ($id, $vals) = $p->next ) {
+        # $id is the record identifier, $vals a hashref (or an arrayref
+        # for the denormalized record)
+    }
+
+=head1 DESCRIPTION
+
+Reads records from an Infinite flux and dispatches each line to the matching
+C<oEdtk::Record>. A compiled seek plan (the keys in lexicographic order, each
+paired with its compiled match) is built once in L</new>, so L</next> does not
+re-sort or re-compile the keys on every record.
+
+=head1 METHODS
+
+=head2 new
+
+    my $p = oEdtk::RecordParser->new($fh, %records);
+
+Build a parser over the file handle C<$fh> and the C<%records> table
+(identifier to C<oEdtk::Record>). Undef records are ignored; a non-record value
+is an error.
+
+=head2 next
+
+    my ($id, $vals) = $p->next;
+
+Read and dispatch the next record. C<FLUX> lines are skipped; the denormalized
+record returns an array reference of split fields, any other record returns a
+hash reference of parsed values. An exhausted stream returns an empty list.
+
+=head2 dumper
+
+    my $text = $p->dumper($value);
+
+Return C<Data::Dumper::Dumper> of C<$value> (debug helper).
+
+=head2 set_skip_line
+
+    $p->set_skip_line($value);
+
+Append C<$value> to the prefix that marks a line to skip.
+
+=head2 set_mute_record
+
+    $p->set_mute_record($value);
+
+Append C<$value> to the muted-record name.
+
+=head2 set_mute_id
+
+    $p->set_mute_id($value);
+
+Append C<$value> to the muted-record identifier.
+
+=head2 set_line_record
+
+    $p->set_line_record($value);
+
+Append C<$value> to the line-record name.
+
+=head2 set_key_offset
+
+    $p->set_key_offset($value);
+
+Append C<$value> to the key offset.
+
+=head2 set_key_size
+
+    $p->set_key_size($value);
+
+Append C<$value> to the key size.
+
+=head2 set_denormalized_record
+
+    $p->set_denormalized_record($value);
+
+Set the denormalized-record name on both the mainline and the fork keys.
+
+=head2 set_denormalized_option_record
+
+    $p->set_denormalized_option_record($value);
+
+Set the fork's denormalized-option key only.
+
+=head2 set_denormalized_on_record
+
+    $p->set_denormalized_on_record($value);
+
+Set the fork's denormalized-on key only.
+
+=head2 add_motif_to_denormalized_split
+
+    $p->add_motif_to_denormalized_split($motif);
+
+Append C<$motif> to the split pattern used for the denormalized record.
+
+=head2 set_motif_to_denormalized_split
+
+    $p->set_motif_to_denormalized_split($motif);
+
+Replace the split pattern used for the denormalized record.
+
+The private helpers C<_seek_plan> and C<_kill_non_latin_chars> build the seek
+plan and gate the non-Latin-1 cleanup; they are not part of the public API.
+
+=head1 AUTHOR
+
+The oEdtk team.
+
+=cut

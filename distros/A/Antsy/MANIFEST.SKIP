@@ -89,3 +89,9 @@ nytprof
 \.icloud$
 \A\.github\b
 \.gitattributes\b
+
+.downstream.json
+
+.downstream.json
+cpan_tester_reports
+\ACLAUDE\.md\z

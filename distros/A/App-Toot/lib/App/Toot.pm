@@ -6,7 +6,7 @@ use warnings;
 use App::Toot::Config;
 use Mastodon::Client;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 sub new {
     my $class = shift;

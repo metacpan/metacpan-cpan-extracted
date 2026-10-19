@@ -1,0 +1,216 @@
+{{$NEXT}}
+
+    - Fix quadratic reads in get_line_burst_or_data(): the reader no longer pulls the whole pipe into memory or copies the rest of the buffer per burst (100 MB mixed-mode stream: ~0.3 MB/s -> ~530 MB/s).
+    - Fix quadratic reassembly of multi-part messages (~6x faster on 1.6 MB messages).
+    - Take message parts that are already fully buffered in one step (about 1.3x-1.6x faster reads).
+    - Bursts that span several reads are no longer returned partly as line data.
+    - The message key is only special at the start of a burst, not inside one.
+    - Multi-byte burst_prefix / burst_postfix now work across reads and as the message terminator.
+    - A non-blocking reader waiting on the rest of a burst returns empty instead of spinning.
+    - A blocking read_message() with a small read_size no longer returns undef partway through the stream.
+    - New compress_large_only option: compress only messages too big for one atomic part, and only when that shrinks them; it turns on zstd by itself.
+    - New compression_threshold option to change that cut-off (default: one atomic part, 4080 bytes on Linux).
+    - compress_large_only uses a new flag in the message header; mixing versions on the two ends is not supported (an older reader stalls or hangs).
+    - Bursts are not compressed under compress_large_only, and keep_compressed only reports messages that were sent compressed.
+    - Turning compress_large_only off also turns off the compression it switched on.
+    - A reader decompresses flagged messages even without compression configured, when Compress::Zstd is installed.
+    - Rewrite the Performance documentation: its large compression speedups came mostly from the quadratic reader.
+    - Fix unresolved internal POD links.
+
+0.032     2026-06-09 23:53:57-07:00 America/Los_Angeles
+
+    - _get_from_buffer() no longer drops its parameters, so the eof_invalid guards actually fire: a message truncated by EOF now throws instead of being mistaken for a clean EOF.
+    - read_message() on a message whose payload is cut short by EOF now throws instead of returning undef (silent data loss).
+    - get_line_burst_or_data() no longer spins forever at 100% CPU inside a single call when a message is truncated by EOF (it throws) or still in flight on a non-blocking pipe (it returns empty so the caller can select and retry).
+
+0.031     2026-06-09 20:43:38-07:00 America/Los_Angeles
+
+    - Fix infinite retry loop in _write_burst() on hard syswrite errors such as EBADF; the pipe is now marked invalid and throws.
+    - Only consult $! when syswrite actually fails, avoiding misreads of stale errno after a successful write.
+    - Treat EWOULDBLOCK like EAGAIN on platforms where they differ.
+    - close() and reader() now flush output buffered by non-blocking writes instead of silently dropping it and croaking in DESTROY.
+    - DESTROY now localizes $., $@, $!, $^E and $? so a destructor flush cannot clobber the caller's error state.
+    - A truncated message header at EOF now throws instead of reading as a clean EOF.
+    - Fix eof() mixed-mode buffer check that inspected the wrong slot (lines vs burst).
+    - from_fh() and from_fd() now accept the same %params as the other constructors, as the docs already claimed.
+    - mixed_data_mode => 1 is now honored as a constructor param by all constructors, not just pair().
+    - fits_in_burst() followed by write_burst() no longer compresses the payload twice.
+    - SSIZE_MAX fallback raised from 512 to 32767 (_POSIX_SSIZE_MAX).
+    - Remove dead code (unused debug() helper, do_extra_loop bookkeeping).
+    - Documentation fixes: correct 16-byte chunk header description, max_size() fallback behavior, byte-string payload note, typos.
+
+0.030     2026-06-08 15:09:48-07:00 America/Los_Angeles
+
+    - Fix Windows test FAILs: test include shim now matches "\" as a path separator, so it no longer strips the t/ dir from __FILE__.
+    - t/resize.t: don't fail on environmental EINVAL from the raw fcntl(F_SETPIPE_SZ) probe; the regression is now caught via a deterministic max_size() numeric check (GitHub issue #4).
+    - t/write_block.t: skip the IO::Select path and pipe-full probe on cygwin, whose select() doesn't report a saturated pipe.
+
+0.029     2026-04-30 09:15:03-07:00 America/Los_Angeles
+
+    - Add [PruneCruft] to dist.ini so build artifacts (blib/,
+      pm_to_blib, MYMETA.*) no longer leak into release tarballs.
+
+0.028     2026-04-26 20:20:00-07:00 America/Los_Angeles
+
+    - Broaden environmental skip in t/resize.t for the raw
+      fcntl(F_SETPIPE_SZ) sentinel: any non-EINVAL errno is treated as
+      environmental (smoker pipe-page budget, EBUSY, etc.) and
+      skipped. EINVAL stays a hard failure since that is the
+      chomp-string regression the sentinel exists to catch. Adds the
+      failing errno to diag output for future debugging.
+
+    - Load IO::Handle explicitly in Atomic::Pipe and t/compression.t
+      so $w->wh->autoflush(1) works on perls (e.g. 5.12) that do not
+      autoload IO::Handle methods on pipe filehandles. Fixes the
+      mixed_mode_compression FAIL in t/compression.t under perl 5.12.5.
+
+0.027     2026-04-26 05:22:21-07:00 America/Los_Angeles
+
+    - Skip dictionary subtests in t/compression.t when the
+      Compress::Zstd::{Compression,Decompression}{Context,Dictionary}
+      submodules are unavailable. Older Compress::Zstd releases ship
+      without them, which caused four CPAN-Testers FAIL reports under
+      perl 5.20/5.22/5.24.
+
+    - Free the first pipe in t/resize.t before opening the second fifo
+      for the raw fcntl(F_SETPIPE_SZ) sentinel, so the per-user
+      pipe-pages budget is released. Fixes intermittent test 7 FAILs
+      on smokers running multiple pipes in parallel.
+
+0.026     2026-04-26 01:25:04-07:00 America/Los_Angeles
+
+    - Add optional Zstd compression (with optional shared dictionary, supplied
+      as raw bytes or a file path) for bursts and messages, plus a
+      `keep_compressed` flag that exposes the on-wire compressed bytes
+      alongside the decompressed payload. Compress::Zstd is a soft dependency
+      loaded only when compression is enabled.
+
+    - Fix write_blocking() so it actually toggles O_NONBLOCK
+      correctly. Previously fcntl(F_GETFL) was treated as filling an
+      lvalue, so the existing flags were never read, and the
+      "blocking" branch used XOR instead of AND-NOT, which caused
+      write_blocking(1) to silently put the pipe into non-blocking
+      mode.
+
+0.025     2026-04-25 10:08:57-07:00 America/Los_Angeles
+
+    - Fix max_size returning a chomped string from
+      /proc/sys/fs/pipe-max-size, which silently broke
+      resize/resize_or_max on Linux. resize() now numifies $size
+      defensively, and max_size() returns an integer.
+
+0.024     2026-04-12 18:28:48-07:00 America/Los_Angeles
+
+    - Use IO::Select in fill_buffer() for efficient readability polling
+    - IO::Select is now an optional (recommended) dependency
+    - Added use_io_select attribute to toggle IO::Select on/off per instance
+    - Added HAVE_IO_SELECT constant
+    - Falls back to blocking sysread with EINTR retry when IO::Select is unavailable or disabled
+
+0.023     2026-03-31 18:57:05-07:00 America/Los_Angeles
+
+    - Fix test lockup on omnios and other 16k pipe buffer systems
+
+0.022     2024-04-10 13:24:30-07:00 America/Los_Angeles
+
+    - Fix rarely seen EOF race condition in mixed data mode
+
+0.021     2023-12-28 09:03:42-08:00 America/Los_Angeles
+
+    - Make peek test more reliable, and provide more diagnostics on fail
+
+0.020     2023-04-06 09:41:11-07:00 America/Los_Angeles
+
+    - Add ability to peek at a line that is being buffered
+
+0.019     2021-01-04 23:13:09-08:00 America/Los_Angeles
+
+    - Add 'pending_data' method
+    - Avoid infinite loop on disconnected pipe with a non-fatal SIGPIPE handler
+    - Detect reader disconnect on windows
+    - Better reader disconnect detection all around
+
+0.018     2020-12-29 15:29:31-08:00 America/Los_Angeles
+
+    - Fix windows bug
+
+0.017     2020-12-28 23:26:25-08:00 America/Los_Angeles
+
+    - Fix off-by-1 bug in get_line_burst_or_data
+    - Pick a better default read size
+    - Make read size configurable
+    - expose fill_buffer()
+
+0.016     2020-12-25 23:43:43-08:00 America/Los_Angeles
+
+    - MASSIVE PERFORMANCE IMPROVEMENTS
+    - Rewrite to use an internal buffer to reduce sysread calls
+    - Fix incorrect assumptions about data recieved from pipe (it is always treated as bytes)
+    - If internal state is messed up all future operations throw the error.
+
+0.015     2020-12-24 19:53:36-08:00 America/Los_Angeles
+
+    - Fix some bugs in mixed_data mode
+    - Better EOF detection (not trustworthy before this fix)
+    - get_line_burst_or_data fixes:
+        - Return partial lines at EOF (line without newline termination)
+        - Report incomplete messages or partial bursts (as exceptions)
+
+0.014     2020-12-21 19:44:01-08:00 America/Los_Angeles
+
+    - Add mixed_data_mode (get_line_burst_or_data)
+
+0.013     2020-12-15 00:07:22-08:00 America/Los_Angeles
+
+    - Add non-blocking write (*nix, and windows too!)
+
+0.012     2020-12-13 18:30:33-08:00 America/Los_Angeles
+
+    - Fix some tests that were breaking Test2's IPC
+    - Fix missing PIPE->autoflush() on some platforms
+
+0.011     2020-12-12 22:01:30-08:00 America/Los_Angeles
+
+    - Fix non-blocking mode in windows
+    - Single implementation of IPC tests where fork or threads are picked as
+      needed.
+
+0.010     2020-12-12 15:18:53-08:00 America/Los_Angeles
+
+    - Fix win32
+
+0.009     2020-12-10 22:46:18-08:00 America/Los_Angeles
+
+    - Add fifo support
+
+0.008     2020-12-10 20:35:19-08:00 America/Los_Angeles
+
+    - Add write_burst, fits_in_burst(), and parts_needed()
+
+0.007     2020-12-10 19:05:37-08:00 America/Los_Angeles
+
+    - Fix takeover for non-linux platforms
+
+0.006     2020-12-09 22:53:06-08:00 America/Los_Angeles
+
+    - Make it possible to takeover an existing pipe
+
+0.005     2020-12-09 21:12:51-08:00 America/Los_Angeles
+
+    - Do not attempt to run on windows, dos, or os2
+
+0.004     2020-12-08 20:22:17-08:00 America/Los_Angeles
+
+    - Add stress test
+
+0.003     2020-12-08 19:52:27-08:00 America/Los_Angeles
+
+    - Work around POSIX undefined exceptions
+
+0.002     2020-12-08 08:20:20-08:00 America/Los_Angeles
+
+    - Only use ERESTART when present
+
+0.001     2020-12-07 22:54:24-08:00 America/Los_Angeles
+
+    - Initial Release (Lets see what platforms it breaks on!)

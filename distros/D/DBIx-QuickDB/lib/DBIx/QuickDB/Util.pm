@@ -2,7 +2,7 @@ package DBIx::QuickDB::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.000065';
+our $VERSION = '0.000066';
 
 use Errno qw/EEXIST/;
 use File::Path qw/remove_tree/;
@@ -12,7 +12,7 @@ use Time::HiRes qw/sleep/;
 
 use Importer Importer => 'import';
 
-our @EXPORT_OK = qw/clone_dir strip_hash_defaults env_timeout remove_tree_robust remove_tree_or_quarantine disconnect_dbi_handles/;
+our @EXPORT_OK = qw/clone_dir strip_hash_defaults env_timeout find_bin remove_tree_robust remove_tree_or_quarantine disconnect_dbi_handles/;
 
 my @DEFERRED_REMOVE;
 
@@ -191,6 +191,23 @@ sub env_timeout {
     my $val = $ENV{$name};
     return $val if defined($val) && $val =~ /^\d+$/ && $val > 0;
     return $default;
+}
+
+# can_run() for database binaries. Cygwin inherits the Windows PATH, and a
+# native Windows server or helper found there cannot work under Cygwin (POSIX
+# paths, Unix sockets), so skip anything under /cygdrive on that platform.
+sub find_bin {
+    my ($cmd) = @_;
+    return can_run($cmd) unless $^O eq 'cygwin';
+
+    for my $dir (split /:/, $ENV{PATH} // '') {
+        next unless length($dir);
+        next if $dir =~ m{^/cygdrive/};
+        my $path = "$dir/$cmd";
+        return $path if -f $path && -x _;
+    }
+
+    return undef;
 }
 
 my ($RSYNC, $CP);

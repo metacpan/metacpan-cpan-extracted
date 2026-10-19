@@ -3,7 +3,7 @@ package oEdtk::TexTag;
 use strict;
 use utf8;
 
-our $VERSION = '2.1109';
+our $VERSION = '2.1126';
 my $_FLAG_DIGITS = 1;
 
 # A SIMPLE OBJECT THAT DESCRIBES A TEX TAG.
@@ -137,3 +137,48 @@ sub escape_0 {    # NOT CLEAN use inheritance! TexTag->TexDoc
 #}
 
 1;
+
+=head1 NAME
+
+oEdtk::TexTag - a single LaTeX tag
+
+=head1 SYNOPSIS
+
+    use oEdtk::TexTag;
+
+    my $tag = oEdtk::TexTag->new('NOM', 'value');
+    print $tag->emit;   # \long\gdef\NOM{value}
+
+=head1 DESCRIPTION
+
+A small object describing one LaTeX tag: a name and a value. The value may be a
+scalar, an array reference (emitted as a list macro), a hash reference (emitted
+as nested tags), or an C<oEdtk::TexDoc> object.
+
+=head1 METHODS
+
+=head2 new
+
+    my $tag = oEdtk::TexTag->new($name, $val);
+
+Build a tag of name C<$name> and value C<$val>. A value that is not a scalar,
+an array, a hash or an C<oEdtk::TexDoc> is an error; a name containing digits
+raises a one-time warning.
+
+=head2 emit
+
+    my $latex = $tag->emit;
+
+Return the LaTeX rendering: an C<\input{}> for an C<_include_> tag, a list
+macro for an array value, a C<\long\gdef\name{...}> for a scalar or nested
+value, or a bare C<\name> command when there is no value.
+
+The C<escape_0> sub is a deprecated, not-clean duplicate of
+L<oEdtk::TexDoc/escape>; it is kept for reference only and is not part of the
+public API.
+
+=head1 AUTHOR
+
+The oEdtk team.
+
+=cut

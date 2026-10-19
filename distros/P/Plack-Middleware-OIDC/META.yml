@@ -29,13 +29,13 @@ name: Plack-Middleware-OIDC
 provides:
   Plack::Middleware::OIDC:
     file: lib/Plack/Middleware/OIDC.pm
-    version: '1.00'
+    version: '1.01'
   Plack::Middleware::OIDC::Logger:
     file: lib/Plack/Middleware/OIDC/Logger.pm
-    version: '1.00'
+    version: '1.01'
   Plack::Middleware::OIDC::Redirect:
     file: lib/Plack/Middleware/OIDC/Redirect.pm
-    version: '1.00'
+    version: '1.01'
 requires:
   Carp: '0'
   Clone: '0'
@@ -54,7 +54,7 @@ resources:
   bugtracker: https://github.com/sebmourlhou/plack-middleware-oidc/issues
   homepage: https://github.com/sebmourlhou/plack-middleware-oidc
   repository: https://github.com/sebmourlhou/plack-middleware-oidc.git
-version: '1.00'
+version: '1.01'
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: Artistic-2.0

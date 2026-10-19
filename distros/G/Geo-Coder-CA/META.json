@@ -31,6 +31,9 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Geo::Location::Predicate" : "0.01"
+         },
          "requires" : {
             "Encode" : "0",
             "JSON::MaybeXS" : "0",
@@ -42,6 +45,7 @@
       },
       "test" : {
          "requires" : {
+            "Geo::Location::Predicate" : "0",
             "IPC::System::Simple" : "0",
             "Test::Carp" : "0",
             "Test::DescribeMe" : "0",
@@ -69,6 +73,6 @@
          "x_repository" : "https://github.com/nigelhorne/Geo-Coder-CA"
       }
    },
-   "version" : "0.16",
+   "version" : "0.17",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

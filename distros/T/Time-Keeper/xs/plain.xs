@@ -20,7 +20,7 @@ new(class, ...)
             "Time::Keeper::Date->from_day_of_year", "Time::Keeper::Date->from_iso_week",
             "Time::Keeper::YearMonth->new", "Time::Keeper::MonthDay->new"
         };
-        static const unsigned allowed[] = {
+        static const uint64_t allowed[] = {
             TK_A(TK_A_YEAR) | TK_A(TK_A_MONTH) | TK_A(TK_A_DAY) | TK_A(TK_A_LOCALE),
             TK_A(TK_A_YEAR) | TK_A(TK_A_MONTH) | TK_A(TK_A_LOCALE),
             TK_A(TK_A_YEAR) | TK_A(TK_A_DAY_OF_YEAR) | TK_A(TK_A_LOCALE),
@@ -252,7 +252,7 @@ with(self, ...)
     PREINIT:
         static const int kinds[] = { TK_KIND_DATE, TK_KIND_YEAR_MONTH, TK_KIND_MONTH_DAY, TK_KIND_TIME };
         static const char *const whats[] = { "Time::Keeper::Date->with", "Time::Keeper::YearMonth->with", "Time::Keeper::MonthDay->with" };
-        static const unsigned allowed[] = {
+        static const uint64_t allowed[] = {
             TK_A(TK_A_YEAR) | TK_A(TK_A_MONTH) | TK_A(TK_A_DAY) | TK_A(TK_A_DAY_OF_WEEK) | TK_A(TK_A_DAY_OF_YEAR) | TK_A(TK_A_WEEK),
             TK_A(TK_A_YEAR) | TK_A(TK_A_MONTH),
             TK_A(TK_A_MONTH) | TK_A(TK_A_DAY)
@@ -988,6 +988,7 @@ to_date(self)
         tk_value *v, out;
     CODE:
         v = tk_value_rw(self, whats[ix]);
+        tk_value_gregorian_only(aTHX_ v, whats[ix]);
         tk_plain_project(aTHX_ &out, kinds[ix], v, whats[ix]);
         RETVAL = tk_value_new_sv(aTHX_ tk_plain_stash(aTHX_ kinds[ix]), &out);
     OUTPUT:

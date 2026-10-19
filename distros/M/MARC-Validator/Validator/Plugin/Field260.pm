@@ -8,7 +8,7 @@ use Data::MARC::Validator::Report::Error 0.02;
 use Data::MARC::Validator::Report::Plugin::Errors 0.02;
 use MARC::Validator::Utils qw(check_260c_year);
 
-our $VERSION = 0.23;
+our $VERSION = 0.24;
 
 sub module_name {
 	my $self = shift;

@@ -1,0 +1,182 @@
+System Variables:
+4009    00  VERSN
+400A  0000  E_PPC
+400C  407D  D_FILE
+400E  407E  DF_CC
+4010  4396  VARS
+4012  0000  DEST
+4014  4397  E_LINE
+4016  4398  CH_ADD
+4018  0000  X_PTR
+401A  4399  STKBOT
+401C  4399  STKEND
+401E    00  BREG
+401F  405D  MEM
+4021    00  FREE1
+4022    02  DF_SZ
+4023  0000  S_TOP
+4025  FFFF  LAST_K
+4027    0F  DEBOUNCE
+4028    37  MARGIN
+4029  407D  NXTLIN
+402B  0000  OLDPPC
+402D    00  FLAGX
+402E  0000  STRLEN
+4030  0C6B  T_ADDR
+4032  0000  SEED
+4034  FFFF  FRAMES
+4036    00  COORDS_X
+4037    00  COORDS_Y
+4038    BC  PR_CC
+4039    21  S_POSN_COL
+403A    18  S_POSN_ROW
+403B    40  CDFLAG
+403C        PRBUFF
+403C        00 00 00 00 00 00 00 00                     
+4044        00 00 00 00 00 00 00 00                     
+404C        00 00 00 00 00 00 00 00                     
+4054        00 00 00 00 00 00 00 00                     
+405C        76                          \76 
+405D        MEM[0] = 0
+405D        00 00 00 00 00                        
+4062        MEM[1] = 0
+4062        00 00 00 00 00                        
+4067        MEM[2] = 0
+4067        00 00 00 00 00                        
+406C        MEM[3] = 0
+406C        00 00 00 00 00                        
+4071        MEM[4] = 0
+4071        00 00 00 00 00                        
+4076        MEM[5] = 0
+4076        00 00 00 00 00                        
+407B  0000  FREE2
+
+BASIC Program:
+
+D_FILE Section:
+407D        D_FILE
+407D        76                          \76 
+407E        31 2E 33 2A 16 1C 1D 1B     L I N E - 0 1 . 
+4086        31 2E 33 2A 16 1C 1D 1B     L I N E - 0 1 . 
+408E        31 2E 33 2A 16 1C 1D 1B     L I N E - 0 1 . 
+4096        31 2E 33 2A 16 1C 1D 1B     L I N E - 0 1 . 
+409E        76                          \76 
+409F        31 2E 33 2A 16 1C 1E 1B     L I N E - 0 2 . 
+40A7        31 2E 33 2A 16 1C 1E 1B     L I N E - 0 2 . 
+40AF        31 2E 33 2A 16 1C 1E 1B     L I N E - 0 2 . 
+40B7        31 2E 33 2A 16 1C 1E 1B     L I N E - 0 2 . 
+40BF        76                          \76 
+40C0        31 2E 33 2A 16 1C 1F 1B     L I N E - 0 3 . 
+40C8        31 2E 33 2A 16 1C 1F 1B     L I N E - 0 3 . 
+40D0        31 2E 33 2A 16 1C 1F 1B     L I N E - 0 3 . 
+40D8        31 2E 33 2A 16 1C 1F 1B     L I N E - 0 3 . 
+40E0        76                          \76 
+40E1        31 2E 33 2A 16 1C 20 1B     L I N E - 0 4 . 
+40E9        31 2E 33 2A 16 1C 20 1B     L I N E - 0 4 . 
+40F1        31 2E 33 2A 16 1C 20 1B     L I N E - 0 4 . 
+40F9        31 2E 33 2A 16 1C 20 1B     L I N E - 0 4 . 
+4101        76                          \76 
+4102        31 2E 33 2A 16 1C 21 1B     L I N E - 0 5 . 
+410A        31 2E 33 2A 16 1C 21 1B     L I N E - 0 5 . 
+4112        31 2E 33 2A 16 1C 21 1B     L I N E - 0 5 . 
+411A        31 2E 33 2A 16 1C 21 1B     L I N E - 0 5 . 
+4122        76                          \76 
+4123        31 2E 33 2A 16 1C 22 1B     L I N E - 0 6 . 
+412B        31 2E 33 2A 16 1C 22 1B     L I N E - 0 6 . 
+4133        31 2E 33 2A 16 1C 22 1B     L I N E - 0 6 . 
+413B        31 2E 33 2A 16 1C 22 1B     L I N E - 0 6 . 
+4143        76                          \76 
+4144        31 2E 33 2A 16 1C 23 1B     L I N E - 0 7 . 
+414C        31 2E 33 2A 16 1C 23 1B     L I N E - 0 7 . 
+4154        31 2E 33 2A 16 1C 23 1B     L I N E - 0 7 . 
+415C        31 2E 33 2A 16 1C 23 1B     L I N E - 0 7 . 
+4164        76                          \76 
+4165        31 2E 33 2A 16 1C 24 1B     L I N E - 0 8 . 
+416D        31 2E 33 2A 16 1C 24 1B     L I N E - 0 8 . 
+4175        31 2E 33 2A 16 1C 24 1B     L I N E - 0 8 . 
+417D        31 2E 33 2A 16 1C 24 1B     L I N E - 0 8 . 
+4185        76                          \76 
+4186        31 2E 33 2A 16 1C 25 1B     L I N E - 0 9 . 
+418E        31 2E 33 2A 16 1C 25 1B     L I N E - 0 9 . 
+4196        31 2E 33 2A 16 1C 25 1B     L I N E - 0 9 . 
+419E        31 2E 33 2A 16 1C 25 1B     L I N E - 0 9 . 
+41A6        76                          \76 
+41A7        31 2E 33 2A 16 1D 1C 1B     L I N E - 1 0 . 
+41AF        31 2E 33 2A 16 1D 1C 1B     L I N E - 1 0 . 
+41B7        31 2E 33 2A 16 1D 1C 1B     L I N E - 1 0 . 
+41BF        31 2E 33 2A 16 1D 1C 1B     L I N E - 1 0 . 
+41C7        76                          \76 
+41C8        31 2E 33 2A 16 1D 1D 1B     L I N E - 1 1 . 
+41D0        31 2E 33 2A 16 1D 1D 1B     L I N E - 1 1 . 
+41D8        31 2E 33 2A 16 1D 1D 1B     L I N E - 1 1 . 
+41E0        31 2E 33 2A 16 1D 1D 1B     L I N E - 1 1 . 
+41E8        76                          \76 
+41E9        31 2E 33 2A 16 1D 1E 1B     L I N E - 1 2 . 
+41F1        31 2E 33 2A 16 1D 1E 1B     L I N E - 1 2 . 
+41F9        31 2E 33 2A 16 1D 1E 1B     L I N E - 1 2 . 
+4201        31 2E 33 2A 16 1D 1E 1B     L I N E - 1 2 . 
+4209        76                          \76 
+420A        31 2E 33 2A 16 1D 1F 1B     L I N E - 1 3 . 
+4212        31 2E 33 2A 16 1D 1F 1B     L I N E - 1 3 . 
+421A        31 2E 33 2A 16 1D 1F 1B     L I N E - 1 3 . 
+4222        31 2E 33 2A 16 1D 1F 1B     L I N E - 1 3 . 
+422A        76                          \76 
+422B        31 2E 33 2A 16 1D 20 1B     L I N E - 1 4 . 
+4233        31 2E 33 2A 16 1D 20 1B     L I N E - 1 4 . 
+423B        31 2E 33 2A 16 1D 20 1B     L I N E - 1 4 . 
+4243        31 2E 33 2A 16 1D 20 1B     L I N E - 1 4 . 
+424B        76                          \76 
+424C        31 2E 33 2A 16 1D 21 1B     L I N E - 1 5 . 
+4254        31 2E 33 2A 16 1D 21 1B     L I N E - 1 5 . 
+425C        31 2E 33 2A 16 1D 21 1B     L I N E - 1 5 . 
+4264        31 2E 33 2A 16 1D 21 1B     L I N E - 1 5 . 
+426C        76                          \76 
+426D        31 2E 33 2A 16 1D 22 1B     L I N E - 1 6 . 
+4275        31 2E 33 2A 16 1D 22 1B     L I N E - 1 6 . 
+427D        31 2E 33 2A 16 1D 22 1B     L I N E - 1 6 . 
+4285        31 2E 33 2A 16 1D 22 1B     L I N E - 1 6 . 
+428D        76                          \76 
+428E        31 2E 33 2A 16 1D 23 1B     L I N E - 1 7 . 
+4296        31 2E 33 2A 16 1D 23 1B     L I N E - 1 7 . 
+429E        31 2E 33 2A 16 1D 23 1B     L I N E - 1 7 . 
+42A6        31 2E 33 2A 16 1D 23 1B     L I N E - 1 7 . 
+42AE        76                          \76 
+42AF        31 2E 33 2A 16 1D 24 1B     L I N E - 1 8 . 
+42B7        31 2E 33 2A 16 1D 24 1B     L I N E - 1 8 . 
+42BF        31 2E 33 2A 16 1D 24 1B     L I N E - 1 8 . 
+42C7        31 2E 33 2A 16 1D 24 1B     L I N E - 1 8 . 
+42CF        76                          \76 
+42D0        31 2E 33 2A 16 1D 25 1B     L I N E - 1 9 . 
+42D8        31 2E 33 2A 16 1D 25 1B     L I N E - 1 9 . 
+42E0        31 2E 33 2A 16 1D 25 1B     L I N E - 1 9 . 
+42E8        31 2E 33 2A 16 1D 25 1B     L I N E - 1 9 . 
+42F0        76                          \76 
+42F1        31 2E 33 2A 16 1E 1C 1B     L I N E - 2 0 . 
+42F9        31 2E 33 2A 16 1E 1C 1B     L I N E - 2 0 . 
+4301        31 2E 33 2A 16 1E 1C 1B     L I N E - 2 0 . 
+4309        31 2E 33 2A 16 1E 1C 1B     L I N E - 2 0 . 
+4311        76                          \76 
+4312        31 2E 33 2A 16 1E 1D 1B     L I N E - 2 1 . 
+431A        31 2E 33 2A 16 1E 1D 1B     L I N E - 2 1 . 
+4322        31 2E 33 2A 16 1E 1D 1B     L I N E - 2 1 . 
+432A        31 2E 33 2A 16 1E 1D 1B     L I N E - 2 1 . 
+4332        76                          \76 
+4333        31 2E 33 2A 16 1E 1E 1B     L I N E - 2 2 . 
+433B        31 2E 33 2A 16 1E 1E 1B     L I N E - 2 2 . 
+4343        31 2E 33 2A 16 1E 1E 1B     L I N E - 2 2 . 
+434B        31 2E 33 2A 16 1E 1E 1B     L I N E - 2 2 . 
+4353        76                          \76 
+4354        31 2E 33 2A 16 1E 1F 1B     L I N E - 2 3 . 
+435C        31 2E 33 2A 16 1E 1F 1B     L I N E - 2 3 . 
+4364        31 2E 33 2A 16 1E 1F 1B     L I N E - 2 3 . 
+436C        31 2E 33 2A 16 1E 1F 1B     L I N E - 2 3 . 
+4374        76                          \76 
+4375        31 2E 33 2A 16 1E 20 1B     L I N E - 2 4 . 
+437D        31 2E 33 2A 16 1E 20 1B     L I N E - 2 4 . 
+4385        31 2E 33 2A 16 1E 20 1B     L I N E - 2 4 . 
+438D        31 2E 33 2A 16 1E 20 1B     L I N E - 2 4 . 
+4395        76                          \76 
+
+VARS Section:
+4396        end marker
+4396        80                          %  

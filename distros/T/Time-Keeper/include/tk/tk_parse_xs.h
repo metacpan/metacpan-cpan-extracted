@@ -69,7 +69,14 @@ tk_parse_croak(pTHX_ const char *what, SV *shown, SV *scanned, const tk_cursor *
     STRLEN len;
     const char *s = SvPV(scanned, len);
     STRLEN at = c->err_at > len ? len : c->err_at;
-    STRLEN chars = SvUTF8(scanned) ? (STRLEN)utf8_length((const U8 *)s, (const U8 *)s + at) : at;
+    STRLEN chars;
+    /* A literal in the pattern is matched byte by byte, so a failure can leave
+     * the cursor inside a character whose first byte it shared (ja's 時 and
+     * 月 both begin 0xE6): back up to the character's start before counting. */
+    if (SvUTF8(scanned))
+        while (at > 0 && at < len && UTF8_IS_CONTINUATION((U8)s[at]))
+            at--;
+    chars = SvUTF8(scanned) ? (STRLEN)utf8_length((const U8 *)s, (const U8 *)s + at) : at;
     croak("%s: cannot parse '%" SVf "' at offset %lu: %s", what, SVfARG(shown), (unsigned long)chars,
           c->err ? c->err : "it is not a date and time");
 }

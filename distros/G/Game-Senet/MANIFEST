@@ -55,6 +55,7 @@ t/30-bin.t
 t/31-options.t
 t/32-history.t
 t/33-synopsis.t
+t/34-house-flags.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

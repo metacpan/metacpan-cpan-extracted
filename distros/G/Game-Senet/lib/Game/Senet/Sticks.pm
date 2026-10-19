@@ -8,7 +8,7 @@ use Carp ();
 use Digest::SHA ();
 use Exporter 'import';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 our @EXPORT_OK = qw(throw_for light_of roll_of roll_for extra_throw);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
@@ -64,7 +64,7 @@ Game::Senet::Sticks - the four throwing sticks of Senet, as a pure function of a
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

@@ -6,7 +6,7 @@ use English;
 use Error::Pure::Utils qw(clean);
 use Tags::HTML::Footer;
 use Tags::Output::Structure;
-use Test::More 'tests' => 10;
+use Test::More 'tests' => 11;
 use Test::NoWarnings;
 use Unicode::UTF8 qw(decode_utf8);
 
@@ -192,6 +192,44 @@ is_deeply(
 		['e', 'footer'],
 	],
 	'Get Tags code (with all).',
+);
+
+# Test.
+$tags = Tags::Output::Structure->new;
+$obj = Tags::HTML::Footer->new(
+	'tags' => $tags,
+);
+$footer = Data::HTML::Footer->new(
+	'author' => 'John',
+	'author_url' => 'https://example.com',
+	'version' => 0.07,
+	'version_url' => '/changes',
+);
+$obj->init($footer);
+$obj->process;
+$ret_ar = $tags->flush(1);
+is_deeply(
+	$ret_ar,
+	[
+		['b', 'footer'],
+		['b', 'span'],
+		['a', 'class', 'version'],
+		['b', 'a'],
+		['a', 'href', '/changes'],
+		['d', 'Version: 0.07'],
+		['e', 'a'],
+		['e', 'span'],
+		['d', ',&nbsp;'],
+		['b', 'span'],
+		['a', 'class', 'author'],
+		['b', 'a'],
+		['a', 'href', 'https://example.com'],
+		['d', 'John'],
+		['e', 'a'],
+		['e', 'span'],
+		['e', 'footer'],
+	],
+	'Get Tags code (author + version).',
 );
 
 # Test.

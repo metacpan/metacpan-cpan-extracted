@@ -22,6 +22,11 @@ if($ENV{'AUTHOR_TESTING'}) {
 }
 
 my $test_requires = {
+	# The tests assert the rule's own answer, so they need it even though the
+	# module does not: Geo-Location-Predicate is a recommendation for runtime
+	# (META_MERGE below), and t/reference.t skips the comparisons it cannot
+	# make when it is absent.
+	'Geo::Location::Predicate' => 0,
 	'Test::DescribeMe' => 0,
 	'Test::LWP::UserAgent' => 0,
 	'Test::Most' => 0,
@@ -56,7 +61,7 @@ WriteMakefile(
     ABSTRACT_FROM       => 'lib/Geo/Coder/GeoApify.pm',
     ((defined($ExtUtils::MakeMaker::VERSION) &&
      ($ExtUtils::MakeMaker::VERSION >= 6.3002))
-      ? ('LICENSE'=> 'GPL')
+      ? ('LICENSE'=> 'gpl_2')
       : ()),
     PL_FILES	=> {},
 	TEST_REQUIRES => $test_requires,
@@ -68,13 +73,24 @@ WriteMakefile(
 	'HTTP::Request' => 0,
 	'LWP::UserAgent' => 0,
 	'LWP::Protocol::https' => 0,
-	'Params::Get' => 0,
+	'Params::Get' => 0.04,
+	'Params::Validate::Strict' => 0,
 	'Time::HiRes' => 0,
 	'URI' => 0,
     }, dist => $dist,
     clean		=> { FILES => 'Geo-Coder-GeoApify-*' },
     META_MERGE		=> {
     	'meta-spec' => { version => 2 },
+	# A real optional dependency: an installer fetches it by default, and an
+	# install that leaves it out still gets the reference refusal.  The code
+	# looks for it the first time it is needed, not when the module loads.
+	prereqs => {
+		runtime => {
+			recommends => {
+				'Geo::Location::Predicate' => '0.01',
+			},
+		},
+	},
     	resources => {
     		repository => {
 			type => 'git',

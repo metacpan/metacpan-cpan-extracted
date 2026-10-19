@@ -13,18 +13,20 @@
 #   --additive     in-place additive update (S51c): ADD COLUMN, widening and
 #                  CREATE ... IF NOT EXISTS only -- never a DROP, a narrowing or a
 #                  rename; --with-constraints also changes the key (after a
-#                  duplicate pre-check)
+#                  duplicate pre-check). Combined with --dry-run it prints the
+#                  same update as a READ-ONLY preview and writes nothing.
 #
 # --historize never modifies the service schema in place and never drops. It is
 # the recommended procedure when the key or the types change. --additive is
 # strictly monotone and is suited to the cases without a key change.
 #
 # Usage:
-#   perl lib/db_migrate.pl --check-only --dsn <dsn> [--user U] [--pass P]
-#   perl lib/db_migrate.pl --dry-run    --dsn <dsn>
-#   perl lib/db_migrate.pl --historize  --dsn <dsn> [--stamp YYYYMMDD_HHMMSS]
-#   perl lib/db_migrate.pl --revert     --dsn <dsn> --stamp YYYYMMDD_HHMMSS
-#   perl lib/db_migrate.pl --additive   --dsn <dsn> [--with-constraints]
+#   perl lib/db_migrate.pl --check-only      --dsn <dsn> [--user U] [--pass P]
+#   perl lib/db_migrate.pl --dry-run         --dsn <dsn>
+#   perl lib/db_migrate.pl --historize       --dsn <dsn> [--stamp YYYYMMDD_HHMMSS]
+#   perl lib/db_migrate.pl --revert          --dsn <dsn> --stamp YYYYMMDD_HHMMSS
+#   perl lib/db_migrate.pl --additive        --dsn <dsn> [--with-constraints]
+#   perl lib/db_migrate.pl --additive --dry-run --dsn <dsn>
 #
 # READ-ONLY for --check-only / --dry-run. The password is never printed.
 
@@ -41,13 +43,14 @@ use oEdtk::DBAdmin qw(
 	schema_Historize
 	schema_Revert
 	schema_Additive
+	schema_AdditivePlan
 	schema_Report
 );
 
 sub usage {
 	print STDERR "usage: $0 <mode> --dsn <dsn> [--user U] [--pass P]\n"
 		. "  modes: --check-only | --dry-run | --historize [--force] | --revert --stamp S"
-		. " | --additive [--with-constraints]\n";
+		. " | --additive [--with-constraints | --dry-run]\n";
 	exit 1;
 }
 
@@ -74,11 +77,25 @@ GetOptions(
 ) or usage();
 
 my @modes = grep { $_ } ( $check, $dry, $historize, $revert, $additive );
-usage() unless @modes == 1;
+
+# --additive --dry-run previews the in-place update read-only; it is the only
+# two-mode combination allowed.
+my $additive_preview = ( $additive && $dry && @modes == 2 ) ? 1 : 0;
+usage() unless @modes == 1 || $additive_preview;
 usage() unless defined $dsn;
 
 my $dbh = DBI->connect( $dsn, $user, $pass, { RaiseError => 1, PrintError => 0, AutoCommit => 1 } )
 	or die "db_migrate: cannot connect to " . mask_dsn($dsn) . ": $DBI::errstr\n";
+
+if ($additive_preview) {
+	my $plan =
+		schema_AdditivePlan( $dbh, ( $with_constraints ? ( with_constraints => 1 ) : () ) );
+	print join( "\n", @{ $plan->{report} } ), "\n";
+	print "\n-- in-place DDL (illustrative; nothing is written) --\n";
+	print "  $_;\n" for @{ $plan->{add_sql} }, @{ $plan->{widen_sql} };
+	$dbh->disconnect;
+	exit 0;
+}
 
 if ( $check || $dry ) {
 	my $plan = schema_MigrationPlan( $dbh, ( defined $stamp ? ( stamp => $stamp ) : () ) );

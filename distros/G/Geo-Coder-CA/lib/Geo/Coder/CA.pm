@@ -11,16 +11,20 @@ use JSON::MaybeXS;
 use LWP::UserAgent;
 use URI;
 
-# Geo::Coder::Free::Validate holds the one definition of what counts as a
-# location.  Look for it when this module is loaded, so that a site with
-# Geo::Coder::Free installed gets that definition and not a second copy of it.
-# It is not a prerequisite: without it a reference is refused here, which is
-# the case this module used to get wrong by testing the string the reference
-# turns into instead of testing the value.
-my $have_validate = eval {
-	require Geo::Coder::Free::Validate;
-	Geo::Coder::Free::Validate->can('_valid_location') ? 1 : 0;
-};
+# One definition of what counts as a location: Geo::Location::Predicate holds
+# the rule the facade and its backends apply, so what is refused here is refused
+# there for the same reason.  It is called by name rather than imported - an
+# import copies the code reference into this package, and then a test could not
+# swap the rule for a spy to prove that it is the rule being consulted.
+#
+# The rule is an optional dependency, not a prerequisite: it is a distribution of
+# its own (Geo-Location-Predicate), declared in Makefile.PL under META_MERGE's
+# recommends, so an installer fetches it by default and a standalone install that
+# leaves it out still gets the one answer this module can give alone - a
+# reference is refused.  It is looked for when it is first needed rather than
+# when this module is loaded, so importing this module reads no file it may not
+# need, and a rule installed after this module is loaded is still found.
+my $HAVE_RULE;	# undef until the rule is first looked for
 
 =head1 NAME
 
@@ -28,11 +32,11 @@ Geo::Coder::CA - Provides a Geo-Coding functionality using L<https://geocoder.ca
 
 =head1 VERSION
 
-Version 0.16
+Version 0.17
 
 =cut
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 =head1 SYNOPSIS
 
@@ -88,6 +92,32 @@ sub new {
 
 =cut
 
+# The rule when it is installed, and the one thing that can be said without it.
+# A reference is not a location however it would print: when the rule is there it
+# says so, and when it is not this refuses it - the hole this module used to have
+# was testing the string a reference turns into.  Whether a string of digits is a
+# place is the rule's question, so without the rule it is not asked: the string
+# is looked up, as it was before the rule existed.
+sub _could_be_a_location {
+	my $location = shift;
+
+	if(!defined($HAVE_RULE)) {
+		$HAVE_RULE = eval {
+			require Geo::Location::Predicate;
+			Geo::Location::Predicate->can('_valid_location') ? 1 : 0;
+		} ? 1 : 0;
+	}
+
+	# When the rule is installed it decides everything, references included, so
+	# that this module cannot be stricter or looser than the facade.  Without it
+	# there are two answers this module can give on its own.
+	return Geo::Location::Predicate::_valid_location($location) ? 1 : 0 if $HAVE_RULE;
+
+	return 0 if ref($location);
+	return 0 unless defined($location) && length($location);
+	return 1;
+}
+
 sub geocode {
 	my $self = shift;
 	my $params = $self->_get_params('location', @_);
@@ -104,15 +134,14 @@ sub geocode {
 		return;
 	}
 
-	# A reference is not a location, however it would print
-	if(ref($location) && !_could_be_a_location($location)) {
-		Carp::croak('Usage: ', __PACKAGE__, ': invalid input to geocode(), a reference is not a location');
-		return;
-	}
-
-	# Fail when the input is just a set of numbers
-	if($location !~ /\D/) {
-		Carp::croak('Usage: ', __PACKAGE__, ': invalid input to geocode(), ', $location);
+	# What counts as a location is Geo::Location::Predicate's answer, not a
+	# second copy of it here: a reference is not a location however it would
+	# print, and a string of digits is what a numeric column holds when the wrong
+	# one has been read.  The two messages above and here only choose the words;
+	# the rule itself decides.
+	if(!_could_be_a_location($location)) {
+		Carp::croak('Usage: ', __PACKAGE__, ': invalid input to geocode(), ',
+			ref($location) ? 'a reference is not a location' : $location);
 		return;
 	}
 
@@ -265,17 +294,6 @@ sub _get_params
 	}
 
 	return \%rc;
-}
-
-# Could the value handed to it be a location?  Only a reference gets asked here,
-# and the answer is whatever Geo::Coder::Free::Validate says when it is
-# installed.  Without it, a reference is refused: only a string can name a
-# place, and there is nothing in this module that could make sense of a
-# reference that claims otherwise.
-sub _could_be_a_location {
-	my $value = shift;
-
-	return $have_validate ? Geo::Coder::Free::Validate::_valid_location($value) : 0;
 }
 
 =head1 AUTHOR

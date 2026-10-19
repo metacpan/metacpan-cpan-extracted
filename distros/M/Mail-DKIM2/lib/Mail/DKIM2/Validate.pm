@@ -1,7 +1,7 @@
 package Mail::DKIM2::Validate;
 use strict; use warnings; use 5.020;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 use Email::MIME;
 use List::Util qw(max);

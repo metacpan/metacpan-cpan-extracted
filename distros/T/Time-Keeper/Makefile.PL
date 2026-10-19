@@ -48,6 +48,7 @@ File::Find::find(sub {
     $dep{PM}{$File::Find::name} = "\$(INST_LIB)/$rel";
 }, 'lib');
 $dep{PM}{'share/locales.tkd'} = '$(INST_LIB)/Time/Keeper/locales.tkd';
+$dep{PM}{'share/calendars.tkd'} = '$(INST_LIB)/Time/Keeper/calendars.tkd';
 
 # Neither the INCLUDEd xs/ fragments nor the headers are rescanned by
 # MakeMaker. The globs run at CONFIGURE time.

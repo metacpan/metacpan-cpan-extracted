@@ -1,3 +1,22 @@
+0.033     2026-10-18 11:15:32-07:00 America/Los_Angeles
+
+    - Fix quadratic reads in get_line_burst_or_data(): the reader no longer pulls the whole pipe into memory or copies the rest of the buffer per burst (100 MB mixed-mode stream: ~0.3 MB/s -> ~530 MB/s).
+    - Fix quadratic reassembly of multi-part messages (~6x faster on 1.6 MB messages).
+    - Take message parts that are already fully buffered in one step (about 1.3x-1.6x faster reads).
+    - Bursts that span several reads are no longer returned partly as line data.
+    - The message key is only special at the start of a burst, not inside one.
+    - Multi-byte burst_prefix / burst_postfix now work across reads and as the message terminator.
+    - A non-blocking reader waiting on the rest of a burst returns empty instead of spinning.
+    - A blocking read_message() with a small read_size no longer returns undef partway through the stream.
+    - New compress_large_only option: compress only messages too big for one atomic part, and only when that shrinks them; it turns on zstd by itself.
+    - New compression_threshold option to change that cut-off (default: one atomic part, 4080 bytes on Linux).
+    - compress_large_only uses a new flag in the message header; mixing versions on the two ends is not supported (an older reader stalls or hangs).
+    - Bursts are not compressed under compress_large_only, and keep_compressed only reports messages that were sent compressed.
+    - Turning compress_large_only off also turns off the compression it switched on.
+    - A reader decompresses flagged messages even without compression configured, when Compress::Zstd is installed.
+    - Rewrite the Performance documentation: its large compression speedups came mostly from the quadratic reader.
+    - Fix unresolved internal POD links.
+
 0.032     2026-06-09 23:53:57-07:00 America/Los_Angeles
 
     - _get_from_buffer() no longer drops its parameters, so the eof_invalid guards actually fire: a message truncated by EOF now throws instead of being mistaken for a clean EOF.

@@ -1,0 +1,24 @@
+Time-Keeper-Business
+
+Business days, business hours and holidays on Time::Keeper: the next or the
+nth business day, the business days or hours between two instants, SLA
+deadlines, with holidays from the locale's weekend, from Date::Holidays and
+its adapters, from rules, and from your own lists.
+
+INSTALLATION
+
+Time-Keeper 0.05 or later must be installed first: Time::Keeper::Business
+builds against it.
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)

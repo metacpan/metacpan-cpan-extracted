@@ -9,7 +9,7 @@ use warnings;
 use Carp qw(carp croak);
 
 use Exporter;
-our $VERSION   = 2.1115;
+our $VERSION   = 2.1126;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(
 	EDMS_edidx_build
@@ -640,3 +640,100 @@ sub EDMS_edidx_write(\%) {    ## no critic (ProhibitSubroutinePrototypes)
 }
 
 1;
+
+=head1 NAME
+
+oEdtk::EDMS - electronic document management output: index files and archive transfer
+
+=head1 SYNOPSIS
+
+    use oEdtk::EDMS qw(EDMS_process EDMS_import);
+
+    my @files = EDMS_process($app, $idldoc, $doc, $index, $outdir);
+    EDMS_import($index, @files) or die "transfer failed\n";
+
+=head1 DESCRIPTION
+
+Builds the index files that feed an electronic document management system and
+transfers them to it. A document and its per-page index are packed into a zip
+archive, then unpacked and processed: PDF pages are burst or concatenated with
+the configured helpers, and the index is rewritten in the format the site
+expects (C<DOCUBASE> CSV or C<SCOPMASTER> XML). C<EDMS_import> uploads the
+result over FTP, the index last so that the documents are already in place.
+
+=head1 FUNCTIONS
+
+=head2 EDMS_edidx_build
+
+    EDMS_edidx_build(\%options);
+
+Fill the required ECM index keys of one document from the raw request
+parameters. Dies when a required key is missing, and computes the derived keys
+(the edition date, the document id, the page sequence and the file name).
+
+=head2 EDMS_edidx_write
+
+    EDMS_edidx_write(\%options);
+
+Append one index line, in the C<EDMS_INDEX_COLS> order, to the per-document
+index file.
+
+=head2 EDMS_idldoc_seqpg
+
+    my $id = EDMS_idldoc_seqpg($idldoc, $page);
+
+Build the C<idldoc_NNNNNNN> identifier that names one page of a document.
+
+=head2 EDMS_idx_create_csv
+
+    my @files = EDMS_idx_create_csv($cfg, $idx, $app, $idldoc, $keys);
+
+Build the C<DOCUBASE> index in CSV form, one line per document, and return the
+index file first followed by each document file name.
+
+=head2 EDMS_import
+
+    EDMS_import($index, @docs) or die;
+
+Upload the documents and then the index to the EDMS application over FTP.
+Returns true on success, so callers can guard with C<or die>.
+
+=head2 EDMS_package
+
+    EDMS_package($app, $idldoc, @elements);
+
+Pack some documents together with one index into the standard out zip archive
+and print the path of the archive. Returns true on success.
+
+=head2 EDMS_prepare
+
+    EDMS_prepare($app, $idldoc, $doc_path, $idx_path);
+
+Pack a document and its index into the standard out zip archive, or stop when
+either file is missing. Returns true on success.
+
+=head2 EDMS_process
+
+    my @files = EDMS_process($app, $idldoc, $doc, $index, $outdir);
+
+Burst or move the document, build its index in the configured format, and
+return the produced files. The optional C<$outdir> is used as a working
+directory and restored afterwards.
+
+=head2 EDMS_process_zip
+
+    my @files = EDMS_process_zip($zipfile, $outdir);
+
+Read a standard out zip archive, extract its document and index, and return
+L</EDMS_process> of the pair.
+
+The following subs are internal helpers and are not part of the public API:
+C<_log>, C<my_system>, C<EDMS_idx_process>, C<EDMS_merge_docs>,
+C<EDMS_idx_create_xml>, C<_docubase_file_name> and
+C<preprend_alfresco_header_if_needed>.
+
+=head1 AUTHOR
+
+The oEdtk team.
+
+=cut

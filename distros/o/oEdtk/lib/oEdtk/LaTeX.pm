@@ -18,6 +18,8 @@ use Roman        qw( roman );
 use oEdtk::Utils qw( IDX_FORMAT );
 use charnames ':full';
 
+our $VERSION = 2.1126;
+
 our @EXPORT_OK =
 	qw( tag tag_args ged_tag make_index demo demo_write demo_expected_write latex_escape_string translate_unit concat_string latex_boolean unfold_list
 	);
@@ -514,6 +516,95 @@ Ported from the fork's C<oEdtk::LaTeX> at S23. The latin-9 character table
 fork exported C<demo_write>, C<demo_expected_write> and C<unfold_list> without
 defining them; this port defines all three, so every exported symbol is
 callable.
+
+=head1 FUNCTIONS
+
+=head2 tag
+
+    my $latex = tag($name, \%pairs);
+
+Return the LaTeX definition of one index tag from a hash of key/value pairs, or
+a one-line error list when the tag or a value is invalid.
+
+=head2 tag_args
+
+    my $latex = tag_args($name, @args);
+
+Build the backslash-tag call for C<$name> and the argument list, where an
+argument may be a coderef paired with its own arguments.
+
+=head2 ged_tag
+
+    my $latex = ged_tag($name, $value);
+
+Return a LaTeX C<gdef> definition of C<$name> holding the escaped C<$value>, or
+an error list when the tag is invalid.
+
+=head2 make_index
+
+    my $index = make_index(\%index_variables, %extra);
+
+Turn an index-variables hash, plus an optional extra hash, into the LaTeX index
+text, one definition per key.
+
+=head2 demo
+
+    demo();
+
+Write a LaTeX character table for the latin-9 ordinals to F</tmp/demo_chars.tex>
+(a diagnostic helper).
+
+=head2 demo_write
+
+    demo_write();
+
+Write the same character table, with unmapped characters replaced, to
+F</tmp/demo_write.tex>.
+
+=head2 demo_expected_write
+
+    demo_expected_write();
+
+Write the expected character table to F</tmp/expected_write.txt>, for a human to
+diff against L</demo_write>.
+
+=head2 latex_escape_string
+
+    my $escaped = latex_escape_string($string);
+
+Escape a string to the latin-9 output encoding.
+
+=head2 translate_unit
+
+    my $latex = translate_unit($unit);
+
+Translate a unit (C<EUR> or a percent sign) to its LaTeX form; an unknown unit is
+an error.
+
+=head2 concat_string
+
+    my $string = concat_string(@parts);
+
+Concatenate the arguments into one string, escaping scalars and calling coderef
+arguments.
+
+=head2 latex_boolean
+
+    my $word = latex_boolean($bool);
+
+Return C<true> or C<false> for the boolean.
+
+=head2 unfold_list
+
+    my @flat = unfold_list(@list);
+
+Unfold the list one level, replacing each array reference element with its items.
+
+The unexported helpers C<latex_escape_character>, C<latex_escape_string_no_byte_a6>,
+C<latex_list>, C<special_colored_address>, C<latex_xkeyval_value>,
+C<remove_roman_numbering>, C<sanitize_csv>, C<index_value>,
+C<check_index_is_complete>, C<is_valid_tag>, C<interpret_argument>, the
+C<compute_character_cache*> builders and C<@ORDS> are not part of the public API.
 
 =head1 AUTHOR
 

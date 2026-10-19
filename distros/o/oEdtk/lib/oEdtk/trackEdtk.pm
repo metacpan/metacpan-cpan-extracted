@@ -13,7 +13,7 @@ BEGIN {
 	use Exporter;
 	use vars qw($VERSION @ISA  @EXPORT_OK);    # @EXPORT %EXPORT_TAGS);
 
-	$VERSION = 2.1109;         # eventually this library should be taken over by oEdtk::Tracking
+	$VERSION = 2.1126;         # eventually this library should be taken over by oEdtk::Tracking
 	@ISA     = qw(Exporter);
 
 	#		@EXPORT		= qw(
@@ -604,6 +604,121 @@ END {
 	}
 }
 1;
+
+=head1 NAME
+
+oEdtk::trackEdtk - production tracking: configuration, environment and insert
+
+=head1 SYNOPSIS
+
+    use oEdtk::trackEdtk qw(init_Tracking track_Obj);
+
+    init_Tracking($mod_ed, $job_evt, $job_user, @keys);
+    # ... run the job ...
+    track_Obj($count, $job_evt, @key_values);
+
+=head1 DESCRIPTION
+
+Legacy production-tracking helper. It locates and loads the site configuration
+into C<%ENV>, then records tracking events either in a database (C<DB>), in a
+per-process SQLite file (C<FDB>) or in flat log files (C<LOG>), following
+C<EDTK_TRACK_MODE>. L<oEdtk::Tracking> is its object-oriented successor; this
+library is meant to be taken over by it.
+
+=head1 FUNCTIONS
+
+=head2 ini_Edtk_Conf
+
+    my $ini = ini_Edtk_Conf();
+
+Locate and return the valid configuration file, following the C<iniEdtk> chain
+declared in the hostname section, and set C<$ENV{EDTK_INIEDTK}>.
+
+=head2 conf_To_Env
+
+    conf_To_Env($confIni, $section);
+
+Load a section of the configuration file into C<%ENV>, with the hostname section
+overriding the section values when it exists.
+
+=head2 env_Var_Completion
+
+    env_Var_Completion(\$script);
+
+Expand the environment variables nested inside C<$script>, level by level, until
+none remains.
+
+=head2 init_Tracking
+
+    my $single_id = init_Tracking($mod_ed, $job_evt, $job_user, @keys);
+
+Initialise the tracking environment: define the edition mode, the job event and
+the user, then the optional keys, and return the single identifier of the run.
+
+=head2 track_Obj
+
+    track_Obj($count, $job_evt, @key_values);
+
+Record one tracked object with the current settings. C<$count> defaults to one,
+and the optional key values follow the order given to L</init_Tracking>.
+
+=head2 define_Mod_Ed
+
+    my $code = define_Mod_Ed($value);
+
+Set the edition mode (Undef, Batch, Tp, Web or Mail) and return its one-letter
+code (C<U> by default).
+
+=head2 define_Job_Evt
+
+    my $code = define_Job_Evt($value);
+
+Set the job event (Job, Spool, Document, Line, Warning, Error, Halt or Reject)
+and return its one-letter code (C<J> by default).
+
+=head2 define_Track_Key
+
+    my $name = define_Track_Key($value, $index);
+
+Define the column name of the C<$index>-th optional tracking key. The name is
+truncated to five characters and upper-cased without accents, and refused when
+the index exceeds C<EDTK_MAX_USER_KEY>.
+
+=head2 edit_Track_Table
+
+    edit_Track_Table($request);
+
+Run a C<SELECT> against the tracking table and display the resulting rows.
+
+=head2 create_Track_Table
+
+    create_Track_Table();
+
+Create the tracking table for the current DSN, with one name/value column pair
+per configured user key.
+
+=head2 prepare_Tracking_Env
+
+    prepare_Tracking_Env();
+
+Load the tracking configuration and normalise the tracking mode.
+
+=head2 drop_Track_Table
+
+    drop_Track_Table();
+
+Drop the tracking table for the current DSN, if it exists.
+
+The following subs are internal helpers and are not part of the public API:
+C<open_Tracking_Env>, C<open_DBI>, C<define_Job_User>, C<subInsert_Log>,
+C<subInsert_DB>, C<noSub>, C<test_exist_table>, C<fetchall_DBI>,
+C<edit_All_rTab> and C<subClose_DB>.
+
+=head1 AUTHOR
+
+The oEdtk team.
+
+=cut
 
 # NOTES
 #

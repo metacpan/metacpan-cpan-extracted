@@ -1,7 +1,7 @@
 package oEdtk::Doc;
 use strict;
 
-our $VERSION = '2.1109';
+our $VERSION = '2.1126';
 
 use Scalar::Util qw(blessed);
 use overload '""' => \&dump;
@@ -118,3 +118,90 @@ sub escape {
 }
 
 1;
+
+=head1 NAME
+
+oEdtk::Doc - abstract base class for emitted documents
+
+=head1 SYNOPSIS
+
+    use oEdtk::Doc;        # usually used through a subclass, e.g. oEdtk::TexDoc
+
+    my $doc = oEdtk::TexDoc->new;
+    $doc->append('NOM', 'value');
+    print $doc;            # dump(), through the "" overload
+
+=head1 DESCRIPTION
+
+The base class for a document built as an ordered list of tags. It stores the
+tags, dumps them as a string, inserting a line break once the running length
+exceeds the line cutoff, and stringifies to C<dump> through the C<""> overload.
+The tag factory and the escaping rules are provided by subclasses
+(C<oEdtk::TexDoc>).
+
+=head1 METHODS
+
+=head2 new
+
+    my $doc = oEdtk::Doc->new;
+
+Create an empty document.
+
+=head2 reset
+
+    $doc->reset;
+
+Clear the tag list and the emitted-length counter, and return the object.
+
+=head2 append
+
+    $doc->append($name, $value);
+
+Append a tag. C<$name> may be an C<oEdtk::Doc> (its tags are appended), a hash
+reference (each key is appended in turn), or a tag name paired with C<$value>
+(built through L</mktag>). Returns the object.
+
+=head2 dump
+
+    my $out = $doc->dump;
+
+Concatenate the emitted tags, inserting L</line_break> whenever the running
+length would cross the line cutoff (default C<120>, overridable with the
+C<EDTK_LINE_CUTOFF> key of the C<COMPO> section). This is also the C<"">
+overload.
+
+=head2 include
+
+    $doc->include($file, $path);
+
+Append an C<_include_> tag for C<$file> under C<$path>. A C<$path> naming an
+C<EDTK_DIR_*> key is resolved through the C<ENVDESC> section; a missing file is
+an error. Returns the object.
+
+=head2 mktag
+
+Abstract: build the tag object for C<$name> and C<$value>. Unimplemented here
+(it C<die>s); a concrete subclass such as L<oEdtk::TexDoc> provides it.
+
+=head2 append_table
+
+Abstract: append a table under C<$name>. Unimplemented here (it C<die>s).
+
+=head2 line_break
+
+Abstract: return the string inserted at a line break. Unimplemented here (it
+C<die>s).
+
+=head2 escape
+
+Abstract: escape a string for the target format. Unimplemented here (it
+C<die>s).
+
+The private helper C<_line_cutoff> resolves and caches the effective line
+cutoff; it is not part of the public API.
+
+=head1 AUTHOR
+
+The oEdtk team.
+
+=cut

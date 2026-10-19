@@ -4,7 +4,7 @@ use warnings;
 
 use Config::IniFiles;
 use Exporter;
-our $VERSION = 2.1109;
+our $VERSION = 2.1126;
 our @ISA     = qw(Exporter);
 
 # Create a dictionary from an INI file.
@@ -84,3 +84,51 @@ sub substitue {
 }
 
 1;
+
+=head1 NAME
+
+oEdtk::Dict - INI-backed translation dictionary
+
+=head1 SYNOPSIS
+
+    use oEdtk::Dict;
+
+    my $dict  = oEdtk::Dict->new('countries.ini', { section => 'COUNTRIES' });
+    my $label = $dict->translate('FR');
+    my $text  = $dict->substitue('Payable a FR');
+
+=head1 DESCRIPTION
+
+Loads a dictionary from one section of an INI file and offers word lookup and
+global substitution. It backs the corporate-entity, character translation and
+country dictionaries used across the toolkit.
+
+=head1 METHODS
+
+=head2 new
+
+    my $dict = oEdtk::Dict->new($path, $options);
+
+Read the C<$path> INI file and build the dictionary. C<$options> accepts:
+C<invert> (swap keys and values, default off), C<section> (INI section to read,
+default C<DEFAULT>) and C<ignore_case> (fold keys to lowercase, default on).
+
+=head2 translate
+
+    my $value = $dict->translate($word, $check);
+
+Look up C<$word> and return its translation. When C<$check> is true an unknown
+word yields C<undef>; otherwise the word is returned unchanged.
+
+=head2 substitue
+
+    my $text = $dict->substitue($var);
+
+Case-insensitively replace every dictionary entry found in C<$var> and return
+the result. (The name keeps the historical spelling.)
+
+=head1 AUTHOR
+
+The oEdtk team.
+
+=cut

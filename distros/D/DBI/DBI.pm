@@ -16,7 +16,7 @@ use warnings;
 
 our ($XS_VERSION, $VERSION);
 BEGIN {
-$VERSION = "1.655"; # ==> ALSO update the version in the pod text below!
+$VERSION = "1.656"; # ==> ALSO update the version in the pod text below!
 $XS_VERSION = $VERSION;
 $VERSION =~ tr/_//d;
 }
@@ -148,7 +148,7 @@ sure that your issue isn't related to the driver you're using.
 
 =head2 NOTES
 
-This is the DBI specification that corresponds to DBI version 1.655
+This is the DBI specification that corresponds to DBI version 1.656
 (see L<DBI::Changes> for details).
 
 The DBI is evolving at a steady pace, so it's good to check that
@@ -7487,7 +7487,7 @@ can cause problems. You have been warned.
 
 Using DBI with perl threads is not yet recommended for production
 environments. For more information see
-L<https://www.perlmonks.org/index.pl?node_id=288022>
+https://www.perlmonks.org/index.pl?node_id=288022
 
 =head2 Signal Handling and Canceling Operations
 

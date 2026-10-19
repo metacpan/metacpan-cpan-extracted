@@ -5,7 +5,7 @@ use warnings;
 
 use oEdtk::Main 0.42;
 
-our $VERSION = 2.1109;
+our $VERSION = 2.1126;
 
 # The maximum number of characters we emit before inserting
 # a newline.
@@ -143,7 +143,7 @@ oEdtk::Spool - Helper module for parsing printer spool files
 
   sub process($$) {
     my ($s, $line) = @_;
-    
+
     if ($s->{'inres'} eq 'XYZ') {
       ...
     } else {
@@ -209,6 +209,10 @@ resource block.
 =head1 SEE ALSO
 
 L<oEdtk::Main|oEdtk>
+
+=head1 AUTHOR
+
+The oEdtk team.
 
 =head1 COPYRIGHT
 

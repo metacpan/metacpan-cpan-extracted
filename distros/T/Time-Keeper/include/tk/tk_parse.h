@@ -37,6 +37,14 @@ typedef struct tk_fields {
     const char *abbr;                        /* an abbreviation to be checked */
     STRLEN   abbr_len;
     int      dst_hint;                       /* 1 standard, 2 daylight, from a zone's name */
+    /* in a calendar other than the Gregorian (tk_cal_parse.h) */
+    int      calendar;                       /* the calendar's id plus one; 0 for the Gregorian */
+    const void *cal_names;                   /* its tk_cal_names */
+    int      calendar_text;                  /* the id plus one named by [u-ca=], or 0 */
+    int      has_era, has_related, has_cyclic, leap_month_text, month_slot;
+    int      year_kind;                      /* 1 the era's year (y), 2 the extended year (u) */
+    unsigned era_index, cyclic;
+    int64_t  related;
 } tk_fields;
 
 static int
@@ -265,8 +273,10 @@ tk_iso_suffix(tk_cursor *c, tk_fields *f)
             STRLEN klen = eq - start, vlen = c->i - eq - 1;
             const char *k = c->s + start, *v = c->s + eq + 1;
             if (klen == 4 && memEQ(k, "u-ca", 4)) {
-                if (!((vlen == 7 && memEQ(v, "gregory", 7)) || (vlen == 7 && memEQ(v, "iso8601", 7))))
-                    return tk_fail(c, "only the Gregorian calendar is known");
+                int id = tk_cal_find(v, vlen);
+                if (id < 0)
+                    return tk_fail(c, "a calendar that is not known");
+                f->calendar_text = id + 1;
             }
             else if (critical)
                 return tk_fail(c, "a critical annotation that is not known");

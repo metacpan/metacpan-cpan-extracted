@@ -1,0 +1,14 @@
+Revision history for Time-Keeper-Sun
+
+0.02    2026-10-19
+        - Faster: on() computes sunrise, sunset and the transits, and each twilight the first time it is asked for. 
+        - Time::Keeper::Moon->position: the moon's apparent longitude, latitude, right ascension, declination, distance and parallax at an instant.
+        - Time::Keeper::Moon: illumination and phase_angle are computed from the moon's and the sun's places (Meeus 48.2, 48.3), no longer approximated.
+        - place => on the moon's methods: a Time::Keeper::Sun place gives the zone and locale position with a place adds altitude, apparent_altitude, azimuth and hour_angle
+        - Moonrise, moonset and the moon's upper transit: Moon->on($date, place => $sun) gives them for the civil day (moonrise, moonrises, is_moon_up_all_day, events and kin)
+        - Fix: on() and Moon->on() read a Time::Keeper::Date wrongly on perls before 5.38.
+        - Fix: latitude, longitude and elevation come back exactly as given on perls with long doubles.
+        - Fix: an angle of exactly 0 (an azimuth due north, an hour angle at the meridian) is 0, not -0, on perls before 5.14.
+
+0.01    2026-10-18
+	- First version

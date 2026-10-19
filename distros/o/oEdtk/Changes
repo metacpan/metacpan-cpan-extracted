@@ -1,5 +1,25 @@
 Revision history for oEdtk
 
+2.1126      2026-10-18
+    - oEdtk::DBAdmin: new caller parameter force_copy (true) forces the parsed PostgreSQL COPY path ahead of pg_copy_staging, burst_mo and EDTK_DB_BURST_MO, so an operator can bypass the ELT staging path before a large import starts. The decision reason is logged as 'force_copy => 1'. The packaged tracker exposes it as --forceCopy for --csvInsert, --csvDistrib and --csvIdCheck.
+    - POD: EDTK_DB_BURST_MO now documents the shipped 50 MiB default; the old '0 is the shipped value' claim was stale.
+    - tests: t/30_dbadmin_pure.t pins the force_copy precedence without a database, and t/int/d21_burst_threshold.t gains a PostgreSQL facet proving the COPY path is taken even when pg_copy_staging and burst_mo would select ELT.
+    - oEdtk::DBAdmin: the edtk_admin action duration is now truncated to whole seconds through the new _elapsed_seconds helper. DBAdmin imports time() from Time::HiRes, so the raw time - $time delta was fractional and PostgreSQL rejected it on the integer column edtk_admin.ed_action_duration, leaving the action open in START. The three update sites (acheck_request_for_db, acheck_db_admin_on_connect and _db_with_lock) go through the helper; t/30_dbadmin_pure.t pins it without a database.
+    - All modules of the oEdtk package are realigned on the package version 2.1126; the frozen duplicate lib/oEdtk/logger2.pm follows, so its sha256 pin in t/int/67_logger_normalization.t is re-baselined.
+
+2.1125      2026-10-17
+    - The stale-schema remediation hint is now portable and copy-pasteable. oEdtk::DBAdmin::_schema_fix_command single-quotes the DSN and the user (an unquoted 'dbi:...;host=...' was split by the shell on its semicolons) and honours a host-registered renderer, the package variable $SCHEMA_FIX_HINT: when set to a code ref, it renders the hint instead, so a packaged host can name a command it can actually run. The default form is otherwise unchanged and the password stays a bare '<pass>' placeholder. A host hook that dies or returns nothing falls back to the default form.
+    - New READ-ONLY schema_AdditivePlan($dbh, %opt): the in-place additive update as a plan -- the missing columns, the wider ones, the missing tables, the key and the unsupported widens -- computed without writing anything. Exported alongside schema_Additive. db_migrate.pl gains the matching '--additive --dry-run' preview.
+    - The packaged tracker (tracker/dev/tracker.pl) gains an in-place '--upgradeSchema --additive' sub-mode with a '--additive --dryRun' read-only preview, and registers $oEdtk::DBAdmin::SCHEMA_FIX_HINT so the stale-schema hint it may log names 'edtk-track --upgradeSchema --additive' rather than the source-only lib/db_migrate.pl.
+    - tests: new t/int/68_schema_additive_plan.t (T68) pins the plan shapes and proves the base is untouched; t/int/66_schema_stale_warn.t (T66) gains facets for the quoted default hint and for the host override.
+    - All modules of the oEdtk package are realigned on the package version 2.1125: oEdtk.pm goes 2.1124 -> 2.1125 and the other 51 modules, which carried 2.1124, follow it, each keeping its own style (quoted or bare). The frozen duplicate lib/oEdtk/logger2.pm follows too, so its sha256 pin in t/int/67_logger_normalization.t is re-baselined.
+
+2.1124      2026-10-16
+    - Performance pass over oEdtk and oEUser, driven by Devel::NYTProf: four measured hotspots are optimised, each proven semantics-preserving by an in-process A/B and the golden witnesses -- the oEdtk::RecordParser seek plan, the oEdtk::Config ini memoisation, the oEdtk::Main signed-amount table hoisted out of the per-call build, and the oEUser::Descriptor::load id -> descriptor dispatch. Two further plan targets were measured and deliberately left as they were, and one (oEdtk::TexTag::escape_0) was found to be unreachable dead code. Per-item before/after and the reproduction commands are in docs/perf/P80-rapport.md.
+    - All modules of the oEdtk package now carry the package version 2.1124: oEdtk.pm goes 2.1120 -> 2.1124 and the other modules, which carried a mix of 0.01, 0.14, 1.0, 1.5NNN, 1.9NNN and 2.11NN, are aligned on it.
+    - Documentation updated: the performance campaign (docs/perf/) and the integration, DBAdmin and logger contracts (docs/integration/) are brought in step with the released tree.
+    - Licence: the text shipped as lib/oEdtk/COPYING is the Artistic License 2.0 named by the oEdtk POD.
+
 2.1110      2026-10-13
     - Integration of the 0.8032 fork, phase S10 (declarative metadata only; no behaviour change).
     - oEdtk.pm: $VERSION 2.1109 -> 2.1110.

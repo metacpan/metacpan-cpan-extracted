@@ -1,5 +1,9 @@
 Revision history for Punk::Queue
 
+0.10    2026-10-19
+        - A cron's tz may be a time zone name (America/New_York) when
+          Time::Keeper::Recurrence is installedi
+
 0.09    2026-09-03
         - t/42 enqueued the delayed job before the worker existed, so a
           slow box's worker boot counted as horizon-clamp lag.

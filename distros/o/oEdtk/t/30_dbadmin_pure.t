@@ -11,7 +11,8 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 use lib "$FindBin::Bin/lib";
 use Test::More;
-use TestOEdtk qw(quiet_require);
+use Time::HiRes ();
+use TestOEdtk   qw(quiet_require);
 
 quiet_require($_) for qw(oEdtk::DBAdmin oEdtk::Util);
 
@@ -51,6 +52,26 @@ is( $clean->( 'DATE',    '' ),       undef,   '_make_clean_val empty date become
 is( $clean->( 'TXT',     'abcdef' ), 'abcde', '_make_clean_val truncates to the column size' );
 is( $clean->( 'TXT',     'abc' ),    'abc',   '_make_clean_val keeps short values' );
 is( $clean->( 'UNKNOWN', 'x' ),      'x',     '_make_clean_val leaves unknown columns untouched' );
+
+# --- oEdtk::DBAdmin::_clean_row : positional plan, same contract (plan D61 O3) -
+# The row-by-row loops clean each field through a positional plan (_clean_row)
+# instead of a closure call per field. This guards that the fast path returns
+# exactly what the _make_clean_val closure returns, on the same metadata.
+my @pcols = qw(TXT NUM DATE UNKNOWN);
+my $plan  = oEdtk::DBAdmin::_make_clean_plan( $col_meta, \@pcols );
+my @rows  = (
+	[ undef,    '',          'x',    'y' ],    # undef / blank / passthrough
+	[ 'abcdef', '123456789', '',     '' ],     # truncation, size, blank -> NULL
+	[ 'ab',     '7',         '2025', 'z' ],    # short values
+	['ab'],                                    # short row: missing fields -> NULL
+);
+for my $r (@rows) {
+	is_deeply(
+		[ oEdtk::DBAdmin::_clean_row( $plan, $r ) ],
+		[ map { $clean->( $pcols[$_], $r->[$_] ) } 0 .. $#pcols ],
+		'_clean_row matches _make_clean_val for row [' . join( ',', map { $_ // '~' } @$r ) . ']'
+	);
+}
 
 # --- oEdtk::DBAdmin::_norm_identifiers : driver-dependent identifier case ----
 {
@@ -145,5 +166,39 @@ my %h   = ( aa => 1, BB => 2 );
 my $ref = oEdtk::Util::_uc_hash_keys( \%h );
 is( $ref, \%h, '_uc_hash_keys returns the same reference' );
 is_deeply( \%h, { AA => 1, BB => 2 }, '_uc_hash_keys upper-cases every key in place' );
+
+# --- oEdtk::DBAdmin::_pg_burst_decision : force_copy precedence --------------
+{
+	my ( $elt, $why ) =
+		oEdtk::DBAdmin::_pg_burst_decision( { force_copy => 1 }, {}, '/nonexistent.csv' );
+	is( $elt, 0,                 '_pg_burst_decision: force_copy selects COPY' );
+	is( $why, 'force_copy => 1', '_pg_burst_decision: force_copy reason is explicit' );
+
+	( $elt, $why ) = oEdtk::DBAdmin::_pg_burst_decision(
+		{ force_copy => 1, pg_copy_staging => 1, burst_mo => 0.001 },
+		{}, '/nonexistent.csv' );
+	is( $elt, 0,                 'force_copy wins over pg_copy_staging => 1' );
+	is( $why, 'force_copy => 1', 'force_copy wins before burst_mo' );
+
+	( $elt, $why ) = oEdtk::DBAdmin::_pg_burst_decision( { force_copy => 0, pg_copy_staging => 1 },
+		{}, '/nonexistent.csv' );
+	is( $elt, 1,                      'a false force_copy leaves pg_copy_staging in charge' );
+	is( $why, 'pg_copy_staging => 1', 'the pg_copy_staging reason is unchanged' );
+
+	( $elt, $why ) =
+		oEdtk::DBAdmin::_pg_burst_decision( { pg_copy_staging => 0 }, {}, '/nonexistent.csv' );
+	is( $elt, 0, 'an absent force_copy leaves the existing decision unchanged' );
+	is( $why, 'pg_copy_staging => 0', 'the existing COPY reason is unchanged' );
+}
+
+# --- oEdtk::DBAdmin::_elapsed_seconds : whole seconds for edtk_admin ---------
+# DBAdmin imports time() from Time::HiRes, so a raw delta is fractional;
+# edtk_admin.ed_action_duration is integer and PostgreSQL rejects it.
+{
+	my $t0 = Time::HiRes::time();
+	my $d  = oEdtk::DBAdmin::_elapsed_seconds( $t0 - 5.5 );
+	like( $d, qr/\A[0-9]+\z/, '_elapsed_seconds returns an integer' );
+	is( $d, 5, '_elapsed_seconds truncates the fractional part' );
+}
 
 done_testing();

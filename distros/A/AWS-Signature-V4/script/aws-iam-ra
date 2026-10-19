@@ -1,0 +1,270 @@
+#!/usr/bin/env perl
+# vim: ts=3 sts=3 sw=3 et ai :
+use v5.24;
+use warnings;
+use English qw< -no_match_vars >;
+use experimental qw< signatures >;
+use Pod::Usage qw< pod2usage >;
+use Getopt::Long qw< GetOptionsFromArray :config gnu_getopt >;
+use AWS::Signature::V4;
+use HTTP::Tiny;
+use JSON::PP qw< decode_json encode_json >;
+
+my $VERSION = '0.1';
+
+my $config = get_options(
+   [
+      {
+         getopt => 'certificate|c=s',
+         environment => 'CERT_FILE',
+         required => 1,
+      },
+      {
+         getopt => 'duration|d=i',
+         environment => 'DURATION',
+         default => 3600,
+      },
+      {
+         getopt => 'full!',
+         default => 0,
+      },
+      {
+         getopt => 'key|k=s',
+         environment => 'KEY_FILE',
+         required => 1,
+      },
+      {
+         getopt => 'key-type|K=s',
+         environment => 'KEY_TYPE',
+         default => 'RSA',
+      },
+      {
+         getopt => 'profile-arn|p=s',
+         environment => 'PROFILE_ARN',
+         required => 1,
+      },
+      {
+         getopt => 'region|R=s',
+         environment => 'AWS_REGION',
+         required => 1,
+      },
+      {
+         getopt => 'role-arn|r=s',
+         environment => 'ROLE_ARN',
+         required => 1,
+      },
+      {
+         getopt => 'trust-anchor-arn|t=s',
+         environment => 'TRUST_ANCHOR_ARN',
+         required => 1,
+      },
+   ],
+   @ARGV,
+);
+
+die "invalid region: letters, digits and dashes only\n"
+   unless $config->{region} =~ m{\A[a-z0-9-]+\z};
+
+my $signer = AWS::Signature::V4->new(
+   service => 'rolesanywhere',
+   region  => $config->{region},
+   x509    => {
+      key_type         => $config->{'key-type'},
+      certificate_file => $config->{certificate},
+      private_key_file => $config->{key},
+   },
+);
+
+my $url  = "https://rolesanywhere.$config->{region}.amazonaws.com/sessions";
+my $body = encode_json(
+   {
+      trustAnchorArn  => $config->{'trust-anchor-arn'},
+      profileArn      => $config->{'profile-arn'},
+      roleArn         => $config->{'role-arn'},
+      durationSeconds => $config->{duration},
+   }
+);
+my $r = $signer->sign(
+   method  => 'POST',
+   url     => $url,
+   headers => {'Content-Type' => 'application/json'},
+   body    => $body,
+);
+# beside Authorization, the headers now include X-Amz-X509 (the
+# certificate) and, if there is one, X-Amz-X509-Chain
+
+# HTTP::Tiny adds the Host header itself, from the URL, and refuses to be
+# given one: it is signed all the same, and it will have the same value
+my %headers = $r->{headers}->%*;
+delete $headers{host};
+
+my $ua = HTTP::Tiny->new(verify_SSL => 1);
+my $response = $ua->request(POST => $url,
+   {headers => \%headers, content => $body});
+say {*STDERR} "$response->{status} $response->{reason}";
+
+if (!$response->{success}) {
+   say {*STDERR} $response->{content};    # this says what went wrong
+   die "the request failed\n";
+}
+else {
+   my $data = decode_json($response->{content});
+   $data = $data->{credentialSet}[0]{credentials}
+      unless $config->{full};
+   say {*STDOUT} JSON::PP->new->ascii->canonical->pretty->encode($data);
+}
+
+sub get_options ($specs, @args) {
+   my (%cmdline, %environment, %default);
+   my @cmdline_options = qw< help! man! usage! version! >;
+   my @required;
+   for my $spec ($specs->@*) {
+      my ($optnames, $default, $env_var, $required) =
+        ref $spec
+        ? $spec->@{qw< getopt default environment required >}
+        : ($spec, undef, undef, undef);
+      push @cmdline_options, $optnames;
+      my $name = $optnames =~ s{[^-\w].*}{}rmxs;
+      $default{$name}     = $default       if defined $default;
+      $environment{$name} = $ENV{$env_var}
+         if defined $env_var && exists $ENV{$env_var};
+      push @required, $name if $required;
+   } ## end for my $spec ($specs->@*)
+
+   GetOptionsFromArray(\@args, \%cmdline, @cmdline_options)
+     or pod2usage(-verbose => 99, -sections => 'USAGE');
+
+   pod2usage(message => "$0 $VERSION", -verbose => 99, -sections => ' ')
+     if $cmdline{version};
+   pod2usage(-verbose => 99, -sections => 'USAGE') if $cmdline{usage};
+   pod2usage(-verbose => 99, -sections => 'USAGE|EXAMPLES|OPTIONS')
+     if $cmdline{help};
+   pod2usage(-verbose => 2) if $cmdline{man};
+
+   my %overall = (%default, %environment, %cmdline);
+   if (my @missing = grep { ! exists($overall{$_}) } @required) {
+      my $list = join ', ', @missing;
+      pod2usage(message => "missing: $list", -verbose => 99,
+         -sections => ' ');
+   }
+
+   return bless {%overall, _args => \@args}, __PACKAGE__;
+} ## end sub get_options
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+aws-iam-ra - get credentials from AWS IAM Roles Anywhere
+
+=head1 USAGE
+
+   aws-iam-ra [--help] [--man] [--usage] [--version]
+
+   aws-iam-ra --certificate|-c <path>
+              [--duration|-d <duration-in-sec>]
+              [--full]
+              --key|-k <path>
+              [--key-type|-K <RSA|ECDSA>]
+              --profile-arn|-p <string>
+              --region|-R <region-name>
+              --role-arn|-r <string>
+              --trust-anchor-arn|-t <string>
+
+=head1 EXAMPLES
+
+   aws-iam-ra \
+      --certificate /path/to/certificate.pem \
+      --key /path/to/key.pem \
+      --profile-arn 'arn:aws:rolesanywhere:eu-south-1:1234:profile/12...' \
+      --role-arn 'arn:aws:iam::1234:role/test1234...' \
+      --trust-anchor 'arn:aws:rolesanywhere:eu-south-1:1234:trust-anc...' \
+      --region eu-south-1
+
+
+=head1 DESCRIPTION
+
+Program to fetch credentials for assuming a specific role using AWS IAM
+Roles Anywhere. It's meant as a replacement for C<aws_credential_helper>.
+
+It's basically everything in the example.
+
+You can restrict the duration by providing option C<--duration>, use a value
+that is at least 900 or you will get an error.
+
+By default it prints out only the credentials; you can use C<--full> to
+print the whole response from AWS.
+
+The key type is assumed to be C<RSA> by default. Set it to C<ECDSA> in case
+you are using the other type.
+
+=head1 CONFIGURATION
+
+Most of the command-line parameters can be set using environment variables:
+
+=over
+
+=item *
+
+C<CERT_FILE> corresponds to C<--certificate|-c>
+
+=item *
+
+C<DURATION> corresponds to C<--duration|-d>
+
+=item *
+
+C<KEY_FILE> corresponds to C<--key|-k>
+
+=item *
+
+C<KEY_TYPE> corresponds to C<--key-type|-K>
+
+=item *
+
+C<PROFILE_ARN> corresponds to C<--profile-arn|-p>
+
+=item *
+
+C<REGION> corresponds to C<--region|-R>
+
+=item *
+
+C<ROLE_ARN> corresponds to C<--role-arn|-r>
+
+=item *
+
+C<TRUST_ANCHOR_ARN> corresponds to C<--trust-anchor-arn|-t>
+
+=back
+
+When set, command-line parameters take precedence over environment
+variables.
+
+=head1 AUTHOR
+
+Flavio Poletti C<flavio@polettix.it>.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2026 by Flavio Poletti C<flavio@polettix.it>.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+or look for file C<LICENSE> in this project's root directory.
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+=cut

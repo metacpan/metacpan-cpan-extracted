@@ -4,7 +4,7 @@ use 5.022;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 # FreezeThaw is required because Storable::dclone cannot serialize CODE references
 # stored in the configuration hash (such as custom sorters, parsers, and callbacks).
@@ -57,7 +57,19 @@ sub _default_directive_parser {
 
         if ($directive eq 'target_section') {
             my ($basename, $ns) = ($args =~ /(\w+)(?:\s+in\s+(\w+))?/);
+            push @{$fab->{target_stack} //= []}, [ @{$fab->{current_target}} ];
             $fab->out__target_section($basename, $ns);
+        }
+        elsif ($directive eq 'end_section') {
+            if ($fab->{target_stack} && @{$fab->{target_stack}}) {
+                $fab->{current_target} = pop @{$fab->{target_stack}};
+            } else {
+                $fab->{current_target} = ['_main', 'body'];
+            }
+        }
+        elsif ($directive eq 'create_section') {
+            my ($basename, $ns) = ($args =~ /(\w+)(?:\s+in\s+(\w+))?/);
+            $fab->out__create_section($basename, $ns);
         }
         elsif ($directive eq 'set') {
             my ($key, $value) = split /=/, $args, 2;
@@ -67,16 +79,29 @@ sub _default_directive_parser {
             my ($key, @values) = split /\s+/, $args;
             $fab->cfg__append($key, @values);
         }
+        elsif ($directive eq 'prepend') {
+            my ($key, @values) = split /\s+/, $args;
+            $fab->cfg__prepend($key, @values);
+        }
+        elsif ($directive eq 'pop') {
+            my ($key, @rest) = split /\s+/, $args;
+            $fab->cfg__pop($key, @rest);
+        }
         elsif ($directive eq 'set_parents') {
             my ($ns, @parents) = split /\s+/, $args;
             $fab->NS__set_parents($ns, @parents);
         }
         elsif ($directive eq 'emb') {
-            # Grammar: #emb <basename> [in <namespace>] [asiffrom <StartNamespace>] [with_blinder <SubName>]
-            my ($basename) = ($args =~ /^(\S+)/);
-            my ($ns)        = ($args =~ /\bin\s+(\S+)/);
-            my ($asiffrom)  = ($args =~ /\basiffrom\s+(\S+)/);
-            my ($blinder)   = ($args =~ /\bwith_blinder\s+(\S+)/);
+            # Grammar: #emb [namespace:]<basename> [in <namespace>] [asiffrom <StartNamespace>] [with_blinder <SubName>]
+            my ($first_token) = ($args =~ /^(\S+)/);
+            my ($ns)          = ($args =~ /\bin\s+(\S+)/);
+            my ($asiffrom)    = ($args =~ /\basiffrom\s+(\S+)/);
+            my ($blinder)     = ($args =~ /\bwith_blinder\s+(\S+)/);
+
+            my $basename = $first_token;
+            if (!defined $ns && defined $first_token && $first_token =~ /^([^:]+):([^:]+)$/) {
+                ($ns, $basename) = ($1, $2);
+            }
 
             my %options;
             $options{asiffrom}     = $asiffrom if defined $asiffrom;
@@ -158,7 +183,7 @@ sub _default_comment_recognizer {
 # Fail-fast error handler.
 sub _default_error_handler {
     my ($fab, $type, $details) = @_;
-    die "Fab Error ($type): $details->{line}\n";
+    die "E_SYNTAX_ERROR: Fab Error ($type): $details->{line}\n";
 }
 
 # =========================================================================
@@ -186,9 +211,11 @@ sub new {
         },
         'Fab/inheritance_graph'   => {},
         'opened_groups'           => [],
+        'opened_includes'         => [],
     };
     $self->{sections}       = {}; # { namespace => { basename => [ [type, data...], ... ] } }
     $self->{current_target} = ['_main', 'body'];
+    $self->{target_stack}   = []; # Stack of target sections for #end_section
     $self->{group_stack}    = []; # Stack of active group frames for rollback
     $self->{include_stack}  = []; # Active include path chain for cycle detection
 
@@ -286,15 +313,18 @@ sub include__text {
         close $fh;
 
         push @{$self->{include_stack}}, $data;
+        $self->{config}{'opened_includes'} = [ @{$self->{include_stack}} ];
         eval {
             $self->process_string($content);
             1;
         } or do {
             my $err = $@;
             pop @{$self->{include_stack}};
+            $self->{config}{'opened_includes'} = [ @{$self->{include_stack}} ];
             die $err;
         };
         pop @{$self->{include_stack}};
+        $self->{config}{'opened_includes'} = [ @{$self->{include_stack}} ];
     }
     else {
         $self->process_string($data);
@@ -548,6 +578,32 @@ sub cfg__get_joined {
 # =========================================================================
 # Configuration Prefix & Uplevel API
 # =========================================================================
+
+# Pushes a new prefix onto the call stack, optionally tracking the filter name.
+sub call_stack__push {
+    my ($self, $prefix, $filter_name) = @_;
+    die "E_TYPE_MISMATCH: Call stack prefix must be defined\n" unless defined $prefix;
+
+    push @{$self->{config}{'Fab/call_stack_prefixes'}}, $prefix;
+    if (defined $filter_name) {
+        push @{$self->{config}{'Fab/call_stack_filter_name'} //= []}, $filter_name;
+    }
+}
+
+# Pops the topmost prefix from the call stack, preventing underflow below the root prefix.
+sub call_stack__pop {
+    my ($self) = @_;
+    my $prefixes = $self->{config}{'Fab/call_stack_prefixes'} // [];
+    if (@$prefixes <= 1) {
+        die "E_UPLEVEL_TOO_DEEP: Cannot pop root prefix from call stack\n";
+    }
+
+    my $popped = pop @$prefixes;
+    if ($self->{config}{'Fab/call_stack_filter_name'} && @{$self->{config}{'Fab/call_stack_filter_name'}}) {
+        pop @{$self->{config}{'Fab/call_stack_filter_name'}};
+    }
+    return $popped;
+}
 
 # Inspects only the topmost prefix on the call stack (CURRENT_PREFIX/$key).
 sub cfg__get_prefixed {
@@ -1072,7 +1128,7 @@ __END__
 
 =head1 NAME
 
-Text::Fab - A powerful, general-purpose document expansion framework (currently Control Flow, Loops, Caching, Root Directives unimplemented, and the test suite not checked by humans;)
+Text::Fab - A powerful, general-purpose document expansion framework (currently Control Flow, Loops, Caching, and Lenses are unimplemented {???})
 
 =head1 SYNOPSIS
 
@@ -1141,15 +1197,153 @@ Furthermore, as an extra configurable step, the De-Interleaver may need to repor
 
 Finally, this “structured” (see below) pre-processed data created this way is “merged” into the final output text stream following flexible “hierarchical” rules.
 
+=head1 Preview of architecture
+
+To explain what this engine is supposed to simplify, consider a (somewhat contrived) example of document preparation.  You have a
+prepared source of a document; it may consists of several files which should be joined by certain rules; each file is a mix of
+(recognizable) chunks of markup, LaTeX and HTML; etc.  You want to produce a best-effort PDF file, several LaTeX files prepared for
+publication in various outlets, a readable plain-text version, and a web page.
+
+To add insult to injury, many parts of the document should be displayed I<differently> in different parts of the output.  (For
+example, a section header may be quadriplicated: as a TOC entry, a running page header, as a PDF’s TOC entry, and its rendition in
+the main text.)  And the details of prepocessing some embedded promise (say, C<MathChunk> with the “content” C<x²>) may need to
+be “massaged” into (the same) string C<x²> for the PDF header, or to C<$x^2$> when handled inside TOC (or running headers), or to
+C<$$x^2$$> in the header rendered “as a part of main text” (well, I warned you that the example is contrived!).
+
+On top of this, the rendition may depend on a mix of recipes inherited from different sources: the default solution
+“from the vendor”, the enhancements designed by your organization, enhancements found on the web, the requirements of the journal,
+the legal requirements of the country, your personal enhancements to these etc.
+
+How to handle processing of all this mess through one pass over the initial document?  The architecture of C<Text::Fab> encodes the
+intermediate steps of processing into 6 components,  One of them — The Configuration — is very special since all other components
+(except the content of output sections) are in fact encoded inside it.  The aim of these components is to provide carpets under
+which one can I<conveniently> sweep all the parts of complexity-dust which “require coding” — leaving only “the elementary core
+dependencies” exposed to both the user and the developer.  The intent is that after this sweeping all the necessary configuration /
+fine-tuning is done not by writing/editing new code, but by issuing I<processing directives>.
+
+=over
+
+=item Configuration
+
+A multi-level hash with all the control data needed to process the flow, as well as the temporary variables.
+
+=item Undo engine
+
+The (structured) list of undo actions to execute at the end of certain processing steps (possibly including undoing changes to
+the configuration).
+
+=item Input chain
+
+The inclusion-chain of input files currently in processing (but not yet finished).
+
+=item Output sections
+
+They are named, and encode chunks of semi-digested input.  Each consists of plain text strings and of “promises” to be
+resolved later, all in one (1-dimensional) list.  Each promise contains a name of recipe and the name of section to process (and
+possibly hints on the “name resolution” of recipes).
+
+=item Namespaces
+
+They form a DAG encoding “which namespace overrides what” (with the root overriding them all, etc.).  Each one resolves certain
+recipe names to the code to implement these recipes.  (Note that if C<A> overrides C<B>, this may be interpreted as “C<B> contains
+the default actions for C<A>”. — Following the metaphor of inheritance, we call C<B> “a parent” for C<A>.)
+
+=item A chain of “lenses”
+
+Each lens encodes “the aim of the currently active pipeline” of processing the promises in the sections.  Each request to set a
+new aim is translated (see L<"Lens names">) to just a particular vertex in the DAG of namespaces, a “virtual root” — so the name
+resolution is restricted to it and “its defaults”: whatever namespaces it overrides.  The resulting vertex is appended the chain of
+lenses.
+
+=back
+
+=head2 Example of usage
+
+With our still contrived example, suppose that the initial pass over the document converted to an output section C<§base> with 4
+promises (and nothing else):
+
+	### Double-check that this conforms to the format documented below! ???
+
+    #emb secname §sec1name
+    #emb sectext §sec1text
+    #emb secname §sec2name
+    #emb sectext §sec2text
+
+(with C<§sec1name> etc. being the names of other sections), and 4 “referenced above” sections — as well as some other sections
+which may be referenced from those 4 — etc.  (These 4 sections are minimally preprocessed — just enough to recognize what region in
+the input files goes where (but one can as well also run the preprocessing steps common for all output formats).  When processing to
+C<LaTeX>: one of the first calls would establish the outermost lens to be C<LaTeX>.  When one needs to produce TOC, one processes
+C<§base> as
+
+    #emb as_TOC §base asiffrom as_TOC_lens   ???
+
+The installed “recipes for lenses” would (presumably) change the requested root C<as_TOC_lens> to C<LaTeX/as_TOC_lens>.  The
+resulting stack of lenses is now C<LaTeX LaTeX/as_TOC_lens>.  And the active lens C<LaTeX/as_TOC_lens> is (presumably) set up to
+inherit from C<as_TOC_lens> — which sets the name resolution to process C<sectext> promises to completely ignore the corresponding
+output sections (which are now I<read for input>!), while processing sections of C<secname> promises into their “maximally compact
+output format”.  And on top of this, C<LaTeX/as_TOC_lens> would also arrange to wrap the result into the necessary C<LaTeX> macros.
+
+    Should not we list how exactly it is done ???  A promise C<MathChunk> inside §sec2name would be (presumably) resolved to a
+    C<LaTeX/as_TOC_lens/MathChunk> recipe.  This recipe would pass the content (HOW???  How can it delegate to
+    C<as_TOC_lens/MathChunk>?  By another C<asiffrom>?) into a promise C<compact/MathChunk>, and wrap the result into a suitable
+    LaTeX macro.
+
+One processes to PDF_TOC likewise — however, here one needs to transform from the content of §sec2name not to LaTeX macros, but to
+Unicode plain text. — This may be arranged as above, through a certain installed sub-preprocessor used as a pipe in
+“an output section” → “an output section”.
+
+When one processes “the main body” of the output, one calls
+
+    #emb as_BODY §base asiffrom as_BODY_lens  ???
+
+which would lead (likewise) to the output sections of both C<secname>s and C<sectext>s to be fully processed (with suitable macros
+wrapping section names — which are also processed into a compact form to be put into the running headers).
+
+Note that how the fact “that the output is to LaTeX” is set up by one top-level call (inside a certain 1-liner output
+section — WHICH???)!  If one wants conversion to PDF or HTML instead I<and the necessary translators of ”elementary subblocks” are
+already present and configured>, all that one needs to do is to replace this 1-liner by another one.  Due to a change to the
+toplevel lens, the names of the following lenses on the stack would change accordingly (although the specified “aims” when
+installing these lenses did not change!) — which would change the namespace resolution “as needed”, so the same promises have a
+chance to depend completely differently.  In particular, they may insert “the same promises as for C<LaTeX>” (but which may now
+depend differently), or they may replace/enhance them by absolutely different promises specialized for HTML processing.
+
+When one need to reformat the C<LaTeX> output for a particular journal, one may override how the names of promises are converted to
+their “implementation” by including the needed implementations/enhancements into a new namespace(s), inserting them accordingly into
+the DAG of namespaces.
+
+=head2 Massaging of lens names
+
+The translation aim → lens above defaults to id (then the names of lenses conincide with “the request”).  More generally, it depends
+on the current chain of lenses — controlled on the registered list of “which lenses affect which”.  If a lens C<Foo> affects C<Bar>,
+then the result is the lens C<Foo/Bar>; additionally, in the longer chain C<A, B, Foo, C, D, Bar>, if C<A> affects C<Foo/Bar>, then
+the result is¹⁾ C<A/Foo/Bar>.
+
+    ¹⁾ Caveat usor: in the chain C<A, Foo, Foo/Baz> a request for C<Bar> may result in²⁾ C<(Foo/Baz)/Bar>.
+       (May later propagate to C<((Foo/Baz)/Bar)/Gee>.)  Since it is only the user/developer who could declare such “affections”,
+       it is their responsibility to insert
+    ²⁾ May we ever need to clean C<Foo/(Foo/Baz)/Bar>???
+
+TODO: DAG affecting affections — need inheritance on C<Foo> above???
+
+TODO: If a new aim C<PDF3.0> appears, and one declared that it affects C<PDFbookmarks> — which has been affecting C<TeXmath>: if the
+inheritance of C<PDF3.0/PDFbookmarks> on C<PDFbookmarks> is declared, then it is fine: the request to C<TeXmath> inside such a chain
+would still create C<PDFbookmarks/TeXmath> — which (hopefully) would be processing things correctly.  (And if not, then it is the
+responsibility of whoever implemented this “new aim” to recode how C<TeXmath> behaves in presence of C<PDF3.0/PDFbookmarks>, and
+declare the corresponding “affects” declaration).
+
+On the othe hand, if the inheritance of C<PDF3.0/PDFbookmarks> on C<PDFbookmarks> is B<not> declared (this may happen for example
+when the recipes in this namespace are ), then to enable the transparent handling (as above) one should use the other mechanism for
+“affecting to C<PDFbookmarks/TeXmath>” (now with C<TeXmath> “being a joker”): declare ???
+
 =head1 THE PROCESSING MODEL
 
-First of all, the inclusion mechanism handles a stack of currently opened-for-processing files; these files are “combined as usual” into one input stream. In addition to this, the Fab uses three more data collections.
+First of all, the inclusion mechanism handles a stack of currently opened-for-processing files; these files are “combined as usual” into one input stream. The active file chain is reflected in the configuration key C<opened_includes>. In addition to this, the Fab uses three more data collections.
 
-The configuration directives may affect how the preprocessor handles the chunks of its input, whether “the comments interleaved into the stream” split these chunks etc., and may modify how the “directinves interleaved into the input stream” are recongnized (and even what these directives mean). The grouping directives control which changes to configuration are undone and when. The output directives may insert into the output section "an order to inline another section" (a promise, which is not executed until much later). Another kind of output directive allows switching the target section for the output of the preprocessor.
+The configuration directives may affect how the preprocessor handles the chunks of its input, whether “the comments interleaved into the stream” split these chunks etc., and may modify how the “directives interleaved into the input stream” are recognized (and even what these directives mean). The grouping directives control which changes to configuration are undone and when. The output directives may insert into the output section "an order to inline another section" (a promise, which is not executed until much later). Another kind of output directive allows switching the target section for the output of the preprocessor.
 
-(It makes sense to also focus on specific parts of the Configuration Hash: the B<Control Stack> which manages conditional handling and looping, B<Grouping Stack> which handles undoing changes to configuration, and B<Caching Engine> which helps to avoid the penalties of constantly recalculating data dependent only on the configuration stack.)
+(It makes sense to also focus on specific parts of the Configuration Hash: the B<Control Stack> which manages conditional handling and looping [Planned], B<Grouping Stack> which handles undoing changes to configuration, and B<Caching Engine> which helps to avoid the penalties of constantly recalculating data dependent only on the configuration stack [Planned].)
 
-After all the sections has been constructed, they may be “joined arbitrarily” into the final document. This assembly process is controlled by the rules how to choose a named section if “multiple flavors” have been defined. This allows a flexible hierarchical system of “overridable templates”. Such templates together with the rules of “namespace resolution” build the B<logic of processing> that ultimately generates the final document(s).
+After all the sections have been constructed, they may be “joined arbitrarily” into the final document. This assembly process is controlled by the rules how to choose a named section if “multiple flavors” have been defined. This allows a flexible hierarchical system of “overridable templates”. Such templates together with the rules of “namespace resolution” build the B<logic of processing> that ultimately generates the final document(s).
 
 =head2 The Configuration Hash
 
@@ -1171,7 +1365,25 @@ Plain text chunks, which have been processed by the Chunk Preprocessor.
 
 =item 2.
 
-C<embed> placeholders, which are promises to inline another section during the final Assembly Phase. This other section is described by its basename as well as some extra data (these data is used in the calculation of its namespace, which is going to be performed later).
+C<embed> placeholders, which are promises to inline another section during the final Assembly Phase. This other section is described by its basename as well as some extra data (these data are used in the calculation of its namespace, which is going to be performed later).
+
+=back
+
+=head2 Target Section Stacking and Scoping
+
+=over 4
+
+=item B<< C<#target_section <basename> [in <namespace>]> >>
+
+Switches the active output target to the specified section, pushing the previous target onto an internal target stack. If C<namespace> is omitted, defaults to the current target's namespace (initially C<_main>). Autovivifies the section buffer if it does not already exist.
+
+=item B<< C<#end_section> >>
+
+Pops the previous target section from the target stack, restoring the output stream to the enclosing section. If the stack is exhausted, falls back to C<_main:body>.
+
+=item B<< C<#create_section <basename> [in <namespace>]> >>
+
+Initializes or clears the specified section buffer without redirecting current preprocessor output.
 
 =back
 
@@ -1189,6 +1401,7 @@ under C<Fab/group_flavors/$flavor_name/keys> (an array reference). If this key l
 not defined for the flavor, the default behavior is to snapshot the entire Configuration hash.
 Validates nesting constraints against the enclosing group flavor via
 C<Fab/group_nesting/$flavor/allowed_parents>, halting with C<E_INVALID_GROUP_NESTING> if violated.
+The active group flavor chain is mirrored in C<opened_groups>.
 
 =item B<< C<#end_group [flavor_name]> >>
 
@@ -1201,6 +1414,66 @@ Executes all postponed undo actions and restores the configuration snapshot.
 =back
 
 B<Note:> The nesting behavior of groups (e.g., whether flavor C<A> must be nested within flavor C<B>) is itself controlled by the Configuration hash.
+
+=head1 DEFAULT DIRECTIVES REFERENCE
+
+The default parser (C<_default_directive_parser>) recognizes the following directives interleaved into the input stream:
+
+=over 4
+
+=item B<< C<#set <key>=<value>> >>
+
+Sets a scalar configuration variable.
+
+=item B<< C<#append <key> <values...>> >>
+
+Appends values to a list key, appends string values to a scalar key, or merges an even-sized list of key-value pairs into a hash key.
+
+=item B<< C<#prepend <key> <values...>> >>
+
+Prepends values to a list key (preserving their order at the front of the list) or prepends string values to a scalar key. Prohibited on hash keys.
+
+=item B<< C<#pop <key> [<count_or_subkeys...>]> >>
+
+Pops elements from a list key by count (defaulting to 1), or deletes specified subkeys from a hash key.
+
+=item B<< C<#target_section <basename> [in <namespace>]> >>
+
+Redirects output to the specified section, pushing the previous target onto the target stack.
+
+=item B<< C<#end_section> >>
+
+Pops the target stack and restores the enclosing output target.
+
+=item B<< C<#create_section <basename> [in <namespace>]> >>
+
+Clears or creates a section buffer without redirecting output.
+
+=item B<< C<#emb [namespace:]<basename> [in <namespace>] [asiffrom <StartNamespace>] [with_blinder <SubName>]> >>
+
+Inserts an unresolved embed placeholder into the current section. Supports qualified syntax (e.g. C<#emb ChapterLayout:title>) or explicit C<in <namespace>>.
+
+=item B<< C<#set_parents <namespace> <parents...>> >>
+
+Declares inheritance edges in the DAG. Validates cycle freedom (halting with C<E_CYCLIC_INHERITANCE>).
+
+=item B<< C<#start_group [flavor]> >> / B<< C<#end_group [flavor]> >>
+
+Scoped configuration management and rollback boundaries.
+
+=item B<< C<#include [how] <data>> >>
+
+Slurps and processes input. C<how> defaults to C<filename>. State changes persist into the caller.
+
+=item B<< C<#include_scoped [how] <data> <flavor>> >>
+
+Wraps inclusion in a group named C<flavor>, guaranteeing complete rollback of configuration modifications upon EOF.
+
+=item B<< C<## [comment]> >>
+
+Comment line recognized by C<_default_comment_recognizer>. Fuses preceding and succeeding text chunks across the comment boundary.
+
+=back
 
 =head1 PRIMITIVE API REFERENCE
 
@@ -1221,6 +1494,10 @@ Creates a section, clearing its content if it already exists.
 =item C<out__embed( $basename, $namespace, \%options )>
 
 Places an C<embed> placeholder into the current target section. The C<%options> hash can contain advanced features like C<asiffrom> or C<with_blinder>.
+
+=item C<out__get_joined( $spec, \@joiners, \%options )>
+
+A utility for converting a section (representable as a list of text-parts and embed-promises) into a single string by joining text chunks and filtering embeds.
 
 =back
 
@@ -1262,13 +1539,16 @@ For hashes, joiner 0 binds key to value while subsequent joiners cycle between p
 can control complex formatting, for example specify permitted numbers of joiners modulo
 C<scalar @joiners>. (E.g., if “joiners come in pairs”, then the number of emitted joiners must be even!)
 
+=item C<cfg__pop( $key, [@args] )>
+
+Pops C<count> elements from a list key (defaulting to 1), or deletes one or more subkeys from a hash value when keys are passed.
+
+=item C<cfg__prepend_elt( $key, $offset, $value )>
+
+Inserts C<$value> at array index C<$offset> for list keys, or inserts/updates a key-value pair C<[$k, $v]> for hash keys.
+(The parser for directive may implement only the flavors with C<$offset> in 0 and -1 only, e.g., “as if” in C<cfg__prepend_last( $key, $value )> etc. {???})
+
 =back
-
-An analogous C<out__get_joined> exists for converting a section (representable as a list of text-parts and embed-promises) into a single string.
-
-Additionally, one can use C<cfg__pop($key, [$count])>, C<cfg__prepend_elt( $key, $offset, $value )> etc. on a list key.
-C<cfg__pop()> also can be used to C<delete()> one or more subkeys from a hash value (then the C<$count> is replaced by the list of these keys).
-(The parser for directive may implement only the flavors with C<$offset> in 0 and -1 only, e.g., “as if” in C<cfg__prepend_last( $key, $value )> etc.)
 
 =head3 Working with Hashes
 
@@ -1342,9 +1622,10 @@ is C<-1000.0>, distance 999 is C<-1999.0>, and distance C<< >= 1000 >> is C<-200
 =item C<include__text( $how, $data )>
 
 Processes included input. If C<$how> is C<'filename'>, C<$data> is read from disk and processed.
-Recursion is tracked on an inclusion stack; attempting to include a file currently in progress
-halts with C<E_CYCLIC_INCLUDE>. An unreadable file halts with C<E_FILE_READ_ERROR>.
-If C<$how> is not C<'filename'>, C<$data> is processed directly as an in-memory string.
+Recursion is tracked on an inclusion stack and mirrored in the configuration key C<opened_includes>;
+attempting to include a file currently in progress halts with C<E_CYCLIC_INCLUDE>. An unreadable
+file halts with C<E_FILE_READ_ERROR>. If C<$how> is not C<'filename'>, C<$data> is processed
+directly as an in-memory string.
 
 =back
 
@@ -1359,15 +1640,30 @@ Registers the list of immediate parent namespaces for C<$namespace> in the inher
 is validated for cycles; adding a parent that would create a directed cycle halts with
 C<E_CYCLIC_INHERITANCE>.
 
+=item C<assemble( $root_spec )>
+
+Assembles and expands the section specified by C<$root_spec> (e.g. C<Namespace:Basename> or bare
+C<Basename> defaulting to namespace C<_main>).
+
 =back
 
-=head2 Configuration Prefix API
+=head2 Configuration Prefix and Call Stack API
 
 For recursive processing, the Configuration contains a stack of prefixes at C<Fab/call_stack_prefixes>. Primitives are provided to safely interact with keys relative to this stack.
 
-(We list only the most basic retreaval primitives; the rest follows the same principle.)
+(We list only the most basic retrieval primitives; the rest follows the same principle.)
 
 =over 4
+
+=item C<call_stack__push( $prefix, [$filter_name] )>
+
+Pushes a new configuration prefix onto the call stack at C<Fab/call_stack_prefixes>. If C<$filter_name>
+is provided, pushes it onto C<Fab/call_stack_filter_name>.
+
+=item C<call_stack__pop()>
+
+Pops the topmost prefix from C<Fab/call_stack_prefixes> and pops C<Fab/call_stack_filter_name>.
+Guards the root prefix C<'Fab/'> from being popped, halting with C<E_UPLEVEL_TOO_DEEP> on underflow.
 
 =item C<cfg__get_prefixed( $key )>
 
@@ -1393,12 +1689,12 @@ For setting things “uplevel on this stack”, there are two methods matching t
 
 =item C<cfg__set_prefixed_uplevel( $level, $key, @values )>
 
-As C<cfg__set_prefixed()>, but goes back C<$level> steps on the stack of prefixes.  This matches retreaval via C<cfg__get_prefixed()>.
+As C<cfg__set_prefixed()>, but goes back C<$level> steps on the stack of prefixes. This matches retrieval via C<cfg__get_prefixed()>.
 
 =item C<cfg__set_prefixed_uplevel_fixup( $level, $key, @values )>
 
 As C<cfg__set_prefixed_uplevel()>, but first runs “fixup”: copying the preceding value at C<$level> to the levels between this one
-and the current level — stopping when value is found on a particular level.  This matches retreaval via C<cfg__get_prefixed()>: this
+and the current level — stopping when value is found on a particular level. This matches retrieval via C<cfg__get_prefixed()>: this
 call won’t change the results of these calls on the levels between C<$level> and the current one.
 
 =back
@@ -1407,9 +1703,9 @@ call won’t change the results of these calls on the levels between C<$level> a
 
 =head2 Input Processing and Recursion
 
-The primitive to support the C<#include> directive is C<include__text($how, $data)>. If C<$how> is C<filename>, the file C<$data> is searched for and slurped; if not, C<$data> is the input string to be processed. A special form C<#include_scoped> ensures that configuration changes made by the included file are temporary by wrapping the call in a group named by the last argument.
+The primitive to support the C<#include> directive is C<include__text($how, $data)>. If C<$how> is C<filename>, the file C<$data> is searched for and slurped; if not, C<$data> is the input string to be processed. A special form C<#include_scoped> ensures that configuration changes made by the included file are temporary by wrapping the call in a group named by the last argument. Active inclusion paths are mirrored in C<opened_includes>.
 
-Recursive processing (e.g., using one C<Text::Fab> “process” to filter data for another) is managed entirely within the Configuration hash. A stack of configuration prefixes is maintained in C<Fab/call_stack_prefixes> (which usually starts as just C<Fab/>). When a named recursive filter is invoked, its name is pushed to the filter name stack C<Fab/call_stack_filter_name>. This also pushes a certain prefix onto C<Fab/call_stack_prefixes>. Since it is the last prefix on this stack which is actually used by C<Text::Fab> for its operation, this allows a special predefined configuration (e.g., C<Fab/myList2ScalarFilter>) to take precedence without conflicting with the “normal” operation of the Fab.
+Recursive processing (e.g., using one C<Text::Fab> “process” to filter data for another) is managed entirely within the Configuration hash. A stack of configuration prefixes is maintained in C<Fab/call_stack_prefixes> (which usually starts as just C<Fab/>). When a named recursive filter is invoked, its name is pushed to the filter name stack C<Fab/call_stack_filter_name>. This also pushes a certain prefix onto C<Fab/call_stack_prefixes> via C<call_stack__push()>. Since it is the last prefix on this stack which is actually used by C<Text::Fab> for its operation, this allows a special predefined configuration (e.g., C<Fab/myList2ScalarFilter>) to take precedence without conflicting with the “normal” operation of the Fab.
 
 The C<uplevel> family of configuration directives operates with respect to both the group stack and this call stack, allowing for powerful, controlled communication between different layers of processing.
 
@@ -1431,7 +1727,7 @@ The B<Assembly Phase> uses this graph to resolve embed placeholders in the outpu
 
 =item B<< C<#emb E<lt>basenameE<gt> in E<lt>namespaceE<gt> asiffrom E<lt>StartNamespaceE<gt>> >>
 
-This performs a "static" embed. It resolves the namespace of the section by starting the search directly from C<StartNamespace>'s context. When this context is not the root, this makes it "blind" to any “override sections” up the tree/DAG. C<StartNamespace> defaults to the root namespace in the DAG — which typically contains the most specific overrides.
+This performs a "static" embed. It resolves the namespace of the section by starting the search directly from C<StartNamespace>'s context. When this context is not the root, this makes it "blind" to any “override sections” up the tree/DAG. C<StartNamespace> defaults to the root namespace in the DAG — which typically contains the most specific overrides. {??? In the current implementation, if asiffrom is omitted, resolution starts at the embed's target namespace, not the root namespace of the assembly.}
 
 =item B<< C<#emb E<lt>basenameE<gt> ... with_blinder E<lt>SubNameE<gt>> >>
 
@@ -1497,7 +1793,7 @@ The API to deal with these stacks is:
 
 =over 4
 
-=item C<control__start( $type, $is_skipping, $label)>
+=item C<control__start( $type, $is_skipping, $label)> [Planned]
 
 Pushes a new frame onto the Control Stack.
 
@@ -1513,7 +1809,7 @@ The initial C<skipping_state> for the new frame is computed as follows: if the p
 
 =back
 
-=item C<control__set_skipping( 'flip' | $boolean )>
+=item C<control__set_skipping( 'flip' | $boolean )> [Planned]
 
 Modifies the C<skipping_state> of the current control block.
 
@@ -1529,15 +1825,15 @@ If a boolean is provided, the state is set accordingly, again respecting the imm
 
 =back
 
-=item C<control__end( $expected_type )>
+=item C<control__end( $expected_type )> [Planned]
 
 Pops the top frame from the Control Stack. For error-checking, the Parser must provide the C<$expected_type>. (Typically, this is used for loop-like constructs only when they are in “skipping mode”; see the next API.) C<Fab/control__loop_indices> is changed accordingly.
 
-=item control__define_invalidation_pointer($expected_type)
+=item control__define_invalidation_pointer($expected_type) [Planned]
 
 Mark the next position as “First postion not in the loop”. When this position “is activated”, or the jump is performed past this position (or before the starting position), the effect should be the same as C<control__end( $expected_type )>.
 
-=item C<control__set_pointer( $pointer_name, [$before}, [$force] )>
+=item C<control__set_pointer( $pointer_name, [$before], [$force] )> [Planned]
 
 Records the current position in the input stream (file or buffer) (if C<$before>, this is the position I<before the directive>) and stores it under C<$pointer_name> in the "Custom Pointers" hash of the current control block. This is the B<sole mechanism> for defining loop start points, C<continue> targets, or any other labeled position. For all loop-like constructs, the Parser is expected to call this at the beginning of the loop body to define a C<'body_start'> pointer.
 
@@ -1545,7 +1841,7 @@ These pointers B<form I<the structural geometry> of the loop>. One must keep in 
 
 By default, this condition is auto-enforced: this call is ignored on the “replay passes” of “loop-like” constructs (i.e., if the current portion of the loop’s body “has already been read” — inside the current I<instance>). This filtering may be disabled by the C<$force> flag. (A similar flag C<$is_replay> is passed to the parser — just in case.)
 
-=item C<control__jump_to( $pointer_name, [$block_label] , [$incr_loop_counter])>
+=item C<control__jump_to( $pointer_name, [$block_label] , [$incr_loop_counter])> [Planned]
 
 This is the primitive for all control flow transfers. It instructs the C<Fab> core's main processing loop to B<change its read position>.
 
@@ -1576,7 +1872,7 @@ The C<loop_counter> is incremented by the number in C<$incr_loop_counter> (when 
 =head2 Support of Caching configuration-related data [Planned]
 
 Sometimes a callback may need a computationally expensive combination of individual entries from a configuration hash. (On may
-thingk of a regular expression depending on several values in this hash.) To avoid recalculating it every time, the callback may
+think of a regular expression depending on several values in this hash.) To avoid recalculating it every time, the callback may
 use the logic like this:
 
     unless ($cache_at_count == (my $new_cnt = $fab->{config}{cnt__parser_REx})) {
@@ -1589,7 +1885,7 @@ This assumes that C<$fab-E<gt>{config}{cnt__parser_REx}> changes every time one 
 
 =over 4
 
-=item * config__append_dependent_counter($counter_key, $KEY1, ...)
+=item * config__append_dependent_counter($counter_key, $KEY1, ...) [Planned]
 
 =back
 
@@ -1606,11 +1902,11 @@ In many cases one needs to allow the configuration driving the logic of work of 
 
 The design of Fab’s API can make this (seem to be?) hard: (due it its up→down approach to the search of directives) the directive above would B<interrupt> the input to the preprocessor; — but sometimes the preprocessor may need a non-local view on the input to decide how to deal with it. “Just seeing what comes I<before> the directive”, then “Just seeing what comes I<after> the directive” (in a separate invocation!) may be not enough for such a non-local view.
 
-On the other hand, one should be ready for the situation when I<the input after> this directive B<should> be handled differently than I<the input before> this directive. So if the target domain I<requires> handling such situations, then I<any implementation> of such a preprocessor B<must> be ready to deal with such hiccups when processing the input (either by handling the update of its config, or bulking out with an error message). While doing this with a bottom→up design may  seem easier, the experience shows that often it is prohibitively hard to implement.  (E.g., when nested constructions are dealt with by recursive calls, the calls to C<reconfigure_me()> would happen deep inside the stack of recursive calls!)
+On the other hand, one should be ready for the situation when I<the input after> this directive B<should> be handled differently than I<the input before> this directive. So if the target domain I<requires> handling such situations, then I<any implementation> of such a preprocessor B<must> be ready to deal with such hiccups when processing the input (either by handling the update of its config, or bulking out with an error message). While doing this with a bottom→up design may seem easier, the experience shows that often it is prohibitively hard to implement. (E.g., when nested constructions are dealt with by recursive calls, the calls to C<reconfigure_me()> would happen deep inside the stack of recursive calls!)
 
 B<In short:> to implement such a design through C<Text::Fab> the only possible complication is: how to I<preserve the internal representation> of the “preceding not-yet-fully-digested input” within the preprocessor “when the preprocessor is reentered” after handling such a directive?
 
-With the bottom→up approach (when the preprocessor may “call some API” to handle the directive) this is easy: it is easy to make sure that such a call may update “the configuration” of the preprocessor while keeping “the internal representation of the already-read-input-to-preprocess” fully intact. However, when the preprocessor is controlled from a Fab, what happens instead of “calling the API” is: “exit the preprocessor”, then somebody else (the Fab!) calling the API, then “reenter the preprocessor again”. Therefore when the preprocessor can see that the chunk it obtained is a part of “some larger construct” (so it is not ready to be C<flush()>'ed to the output section yet), it must preserve its internal state “somewhere”, then read it back when it is reentered (B<if> it is ever reentered).  This is B<the price to pay> for (a lot of) work offloaded to Fab.
+With the bottom→up approach (when the preprocessor may “call some API” to handle the directive) this is easy: it is easy to make sure that such a call may update “the configuration” of the preprocessor while keeping “the internal representation of the already-read-input-to-preprocess” fully intact. However, when the preprocessor is controlled from a Fab, what happens instead of “calling the API” is: “exit the preprocessor”, then somebody else (the Fab!) calling the API, then “reenter the preprocessor again”. Therefore when the preprocessor can see that the chunk it obtained is a part of “some larger construct” (so it is not ready to be C<flush()>'ed to the output section yet), it must preserve its internal state “somewhere”, then read it back when it is reentered (B<if> it is ever reentered). This is B<the price to pay> for (a lot of) work offloaded to Fab.
 
 B<CONCLUSION:>
 
@@ -1628,7 +1924,7 @@ Its internal data should be easily translatable to/from formats supported by the
 
 (Indeed, this hash is the only supported storage provided by Fab’s API.)
 
-In other words: the preprocessor cannot be stateless now, but as far as the state may be (de)serialized easily, it is not a big deal. So oen possible tacit assumption about designs using C<Text::Fab> may be:
+In other words: the preprocessor cannot be stateless now, but as far as the state may be (de)serialized easily, it is not a big deal. So one possible tacit assumption about designs using C<Text::Fab> may be:
 
 =over 4
 
@@ -1646,11 +1942,11 @@ B<Example B:> We have a text which may contain nested “blocks”, each block m
 
 In addition to this we allow #define directives which take a whole line — but are not considered as interrupting the logic of indentation-which-defines-nested-depth.
 
-B<Implementation:> To implement “reenteracy”, the stored data consists of the stack of already-preprocessed text of non-yet-finished blocks. When preprocessing a chunk of input finishes a block, the preprocessor can inspect its start and end, determine its class, C<pop()>'s the known “intermediate textural representation” from the stack, and converts it to the final representation in the way suitable for this class. When this was the outermost block, the result is put into the output section. Otherwise it is appended to the preceding entry on the stack (the containing block).
+B<Implementation:> To implement “reenterancy”, the stored data consists of the stack of already-preprocessed text of non-yet-finished blocks. When preprocessing a chunk of input finishes a block, the preprocessor can inspect its start and end, determine its class, C<pop()>'s the known “intermediate textural representation” from the stack, and converts it to the final representation in the way suitable for this class. When this was the outermost block, the result is put into the output section. Otherwise it is appended to the preceding entry on the stack (the containing block).
 
 B<————————————————————————————————————>
 
-B<Example H:> As above, but the rules for massaging a block depend not only on its class, but also on the classes of its parents.  This requires “the most general” I<hierarchical model> of the pipeline of not-yet-fully-processed input.
+B<Example H:> As above, but the rules for massaging a block depend not only on its class, but also on the classes of its parents. This requires “the most general” I<hierarchical model> of the pipeline of not-yet-fully-processed input.
 
 In this case again the handled data may be C<flush()>'ed to an output section only when the outermost encountered block is terminated. Until then, one should maintain the stack of “live blocks” (not yet terminated), as well as a forest of “dead” (already terminated, but waiting the finite processing) blocks. Each terminated block has its class and the list of content, elements are either “a literal text” (preprocessed-except-the-final-step), or another (nested) terminated sub-block. The live blocks are likewise, but the class is not yet fully known, and the last nested sub-block may be live.
 
@@ -1712,7 +2008,7 @@ The preprocessor will halt with one of the following error codes if a fatal cond
 
 =item *
 
-C<E_SYNTAX_ERROR>: A directive does not conform to the grammar.
+C<E_SYNTAX_ERROR>: A directive does not conform to the grammar, or an unrecognized directive is encountered.
 
 =item *
 
@@ -1742,7 +2038,7 @@ C<E_INVALID_GROUP_NESTING>: An attempt to nest groups in a way forbidden by the 
 
 =item *
 
-C<E_UPLEVEL_TOO_DEEP>: An C<uplevel> directive targets a group or call stack level that does not exist.
+C<E_UPLEVEL_TOO_DEEP>: An C<uplevel> directive or call stack pop targets a level that does not exist.
 
 =back
 
@@ -1770,15 +2066,15 @@ C<E_CYCLIC_INHERITANCE>: An C<#set_parents> directive creates a loop in the inhe
 
 =item *
 
-C<E_UNDEFINED_PARENT>: An C<#set_parents> directive refers to a non-existent namespace.
+C<E_UNDEFINED_PARENT>: An C<#set_parents> directive refers to a non-existent namespace. {??? Documented in error specification, but NS__set_parents currently validates cycle freedom without requiring candidate parents to pre-exist.}
 
 =item *
 
-C<E_ROOT_NOT_FOUND>: A section specified via C<#set_root> does not exist.
+C<E_ROOT_NOT_FOUND>: A section specified via C<#set_root> does not exist. {??? Planned root directive; currently assemble() accepts the target spec as an argument.}
 
 =item *
 
-C<E_NO_ROOTS_SPECIFIED>: The assembly phase is triggered, but no roots were ever defined.
+C<E_NO_ROOTS_SPECIFIED>: The assembly phase is triggered, but no roots were ever defined. {??? Planned root directive; currently assemble() accepts the target spec as an argument.}
 
 =item *
 
@@ -1870,13 +2166,13 @@ On the gripping hand, this may be also
 	= = = = = filterbuffer(raw) __default__
 	= = = = = filterbuffer(raw) __default__post
 
-With (initially) empty buffers C<__default__pre> and C<__default__post> (to which one has a chance to write later!).  And what one
-writes to these buffers may be triplicated likewise.  Etc.
+With (initially) empty buffers C<__default__pre> and C<__default__post> (to which one has a chance to write later!). And what one
+writes to these buffers may be triplicated likewise. Etc.
 
 For postponed actions need an extra argument "ignore errors": with 2 would just put into eval, with 1 converted to a warning,
 negative values stop the remaining undo actions for that many frames (with -2 stopping for the current frame and one more).
 
-One needs to prohibit C<__get()>ing a reference.  Use C<__getref>() when you expect a reference (but no checks for reference are
+One needs to prohibit C<__get()>ing a reference. Use C<__getref>() when you expect a reference (but no checks for reference are
 performed).
 
 B<MISS:> C<input__end($n)> with C<$n==0> ending the current input stream, or also C<$n> enclosing streams.
@@ -1885,9 +2181,9 @@ B<MISS:> need to specify what happens with a group on C<input__end()>: survives 
 
 B<MISS:> C<input__end_to($group_type)>: end input of the files opened up to the the opened-latest-group of the given type.
 
-  Likewise for “closing enclosed groups”???  Join together into 1 API by introducing suitable groups???
+  Likewise for “closing enclosed groups”??? Join together into 1 API by introducing suitable groups???
 
-    May run forever???  Even the language if group__start, group_end, group__postpone (with the arguments to the last command
+    May run forever??? Even the language if group__start, group_end, group__postpone (with the arguments to the last command
     restricted to these 3 calls) is probably Turing complete???
 
 B<MISS:> _-prefixed versions of C<config__*()> which check the prefix C<_ __ ___> of the key and make it read/write only.
@@ -1901,13 +2197,13 @@ allow not 1 active preprocessor engine, but a stack of them, chained, and have a
 
 Macros are templates marked as OK-to-be-ignored.
 
-Hash to mark macros as “types”, with per-type-warning configurable?  Which way to hash, types to macros, or macros to types, or
+Hash to mark macros as “types”, with per-type-warning configurable? Which way to hash, types to macros, or macros to types, or
 pairs???
 
-An extra parameter C<$is_replay> for the syntax callbacks for the non-first pass.  (Probably, the boundary of the preceding pass cannot
+An extra parameter C<$is_replay> for the syntax callbacks for the non-first pass. (Probably, the boundary of the preceding pass cannot
 be part of this???
 
-hash keys.  Setting/getting them employs a serialization method, by default JSON???
+hash keys. Setting/getting them employs a serialization method, by default JSON???
 
      !!!!!!!!!!!!!!!!!!!!!!!!!!!!	THIS IS TOO DANGEROUS.
 					Access control to Fab/* keys should be guarded by ungettable/settable types of values ???
@@ -1923,9 +2219,12 @@ Recursive invocation is needed for massaging data between different levels:
 
 A top→down approach to recognizing the “reconfiguration directives”: but cannot
 we support a bottom→up approach too, when the preprocessor recognizes interlaced
-directives?  How to deal with recursion: return an indicator that the state
-changed?  But it is changing permanently, one needs to filter out changes — but how
+directives? How to deal with recursion: return an indicator that the state
+changed? But it is changing permanently, one needs to filter out changes — but how
 the internal calls know the filters needed for the enclosing calls???
+
+Resolving to C<_main> namespace is broken (too early); it should be left undefined, so the resolver knows it should do the late
+resolution — at runtime, when the lenses may be set up differently.
 
 the preprocessor needs a guarantee that it is going to be reentered
 

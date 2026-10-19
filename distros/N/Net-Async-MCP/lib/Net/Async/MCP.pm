@@ -9,7 +9,7 @@ use Future::AsyncAwait;
 use Carp qw( croak );
 use Scalar::Util qw( blessed looks_like_number weaken );
 
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 
 
 # The protocol revisions this client speaks, newest first: the first of them is
@@ -697,7 +697,7 @@ Net::Async::MCP - Async MCP (Model Context Protocol) client for IO::Async
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -778,6 +778,13 @@ handshake with a single C<server/discover> request of the revision this client
 speaks (see L</protocol_version>; the legacy C<initialize> request no longer
 exists in it), carrying the client's protocol version, capabilities, and info
 in C<_meta>.
+
+Cancelling the L<Future> of a request cancels the request itself - the
+transport drops it and, over Stdio, tells the server - on perl 5.24 and later.
+On older perls L<Future::AsyncAwait> does not hand a cancel on to the future an
+C<async sub> is waiting on: the caller's future is cancelled, but the request
+stays pending in the transport until its answer, its timeout or the end of the
+connection.
 
 =head2 protocol_version
 

@@ -1,3 +1,13 @@
+0.000066  2026-10-18 20:22:29-07:00 America/Los_Angeles
+
+    - PostgreSQL start() on an already-running server is now a no-op instead of probing it, which could stop a server whose connections were all in use.
+    - MariaDB, MySQL and Percona start() now returns only once the server accepts connections, not merely once its socket file exists.
+    - On MSWin32 (Strawberry Perl) the server drivers now report themselves not viable instead of crashing in the watcher and running caller code twice.
+    - On Cygwin, the PostgreSQL driver now reports itself not viable, naming cygserver, when System V shared memory is unavailable.
+    - On Cygwin, native Windows database binaries on PATH are now ignored instead of being picked and failing to start.
+    - MariaDB servers now start on Cygwin, which could not map the default 8T innodb_buffer_pool_size_max.
+    - The MySQL driver now accepts distribution builds of Oracle MySQL (Ubuntu, Debian, Homebrew), not only builds calling themselves MySQL Community Server.
+
 0.000065  2026-08-11 10:03:34-07:00 America/Los_Angeles
 
     - Release tarballs no longer carry the internal agent and developer

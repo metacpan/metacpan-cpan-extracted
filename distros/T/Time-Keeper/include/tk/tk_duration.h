@@ -12,9 +12,6 @@
  * own sign. A Time::Keeper::Duration is a blessed read-only string of one
  * tk_duration, as a value is of a tk_value. */
 
-#define TK_EOM_WRAP     0
-#define TK_EOM_LIMIT    1
-#define TK_EOM_PRESERVE 2
 
 /* No unit may go past this, so sums and products of a few can be checked
  * before they overflow. */

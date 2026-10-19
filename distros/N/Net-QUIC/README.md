@@ -415,6 +415,46 @@ $driver->writable;
 
 Driver then continues where it stopped.
 
+## Bounded reliable Stream sending
+
+Net::QUIC lets applications impose an optional hard bound on the bytes it
+retains in its reliable Stream transmit queue:
+
+```perl
+$connection->send_buffer_limit(8192);
+my $accepted = $stream->send_some($bytes);
+```
+
+The default `send_some` behavior is unchanged: it can queue bytes beyond
+the peer's current QUIC flow-control window, provided the shared buffer
+has space. It returns how many prefix bytes were accepted. The application
+must never resend the accepted prefix just because the result was short.
+
+When many streams share a small buffer, advanced protocol engines can opt
+into credit-aware admission **per call**:
+
+```perl
+my $accepted = $stream->send_some(
+    $bytes, limit_to_credit => 1,
+);
+```
+
+This limits new accepted bytes to currently available **stream and
+connection peer receive credit**, after subtracting bytes already queued
+for transport. Bytes belonging to a peer-blocked stream will not fill the
+shared queue while other streams can make progress. Ordinary callers do
+not need to opt in.
+
+When fewer bytes are accepted, pause writing that Stream. The existing
+`$connection->on_stream_activity(sub { ... })` callback wakes advanced
+integrations when its flow credit increases or ACKs on other Streams return
+shared transmit capacity. Use `next_active_stream_id` to identify which
+Streams to retry. These callbacks are independent of HTTP and the event
+loop; they are notifications, not instructions to spin until writable.
+
+Neither mode bounds kernel buffers or TLS/QUIC internal packet allocations.
+The configured limit concerns Net::QUIC's retained Stream transmit data.
+
 ## QUIC DATAGRAM (RFC 9221)
 
 QUIC DATAGRAM carries unreliable, unordered application bytes inside a QUIC

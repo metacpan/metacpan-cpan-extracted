@@ -35,7 +35,7 @@ use warnings;
 use base qw( DBI::DBD::SqlEngine );
 use Carp;
 
-our $VERSION = "0.45";
+our $VERSION = "1.656";
 
 our $drh = undef;		# holds driver handle(s) once initialized
 
@@ -483,7 +483,7 @@ our @ISA = "DBI::DBD::SqlEngine::DataSource";
 my $locking = eval {
     my $fh;
     my $nulldevice = File::Spec->devnull ();
-    open $fh, ">", $nulldevice or croak "Can't open $nulldevice: $!";
+    open  $fh, ">", $nulldevice or croak "Can't open $nulldevice: $!";
     flock $fh, 0;
     close $fh;
     1;
@@ -916,17 +916,23 @@ sub open_data {
 sub drop ($) {
     my ($self, $data) = @_;
     my $meta = $self->{meta};
-    # We have to close the file before unlinking it: Some OS'es will
-    # refuse the unlink otherwise.
-    $meta->{fh} and $meta->{fh}->close ();
-    $meta->{lockfh} and $meta->{lockfh}->close ();
-    undef $meta->{fh};
-    undef $meta->{lockfh};
+    $self->_release_lock($meta);
     $meta->{f_fqfn} and unlink $meta->{f_fqfn}; # XXX ==> sql_data_source
     $meta->{f_fqln} and unlink $meta->{f_fqln}; # XXX ==> sql_data_source
     delete $data->{Database}{sql_meta}{$self->{table}};
     return 1;
     } # drop
+
+sub _release_lock {
+    my ($self, $meta) = @_;
+    # We have to close the file before unlinking it: Some OS'es will
+    # refuse the unlink otherwise.
+    $meta->{fh}     and $meta->{fh}->close ();
+    $meta->{lockfh} and eval { flock $meta->{lockfh}, 0 };
+    $meta->{lockfh} and $meta->{lockfh}->close ();
+    undef $meta->{fh};
+    undef $meta->{lockfh};
+    } # _release_lock
 
 sub seek ($$$$) {
     my ($self, $data, $pos, $whence) = @_;
@@ -953,10 +959,7 @@ sub truncate ($$) {
 sub DESTROY {
     my $self = shift;
     my $meta = $self->{meta};
-    $meta->{fh} and $meta->{fh}->close ();
-    $meta->{lockfh} and $meta->{lockfh}->close ();
-    undef $meta->{fh};
-    undef $meta->{lockfh};
+    $self->_release_lock($meta);
 
     $self->SUPER::DESTROY();
     } # DESTROY

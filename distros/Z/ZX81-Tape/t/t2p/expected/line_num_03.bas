@@ -1,0 +1,3 @@
+   10  FOR I=1 TO 10
+   90  PRINT I,I*I
+  100  NEXT I

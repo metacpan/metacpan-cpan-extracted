@@ -1,5 +1,9 @@
 Changes for Plack-Middleware-OIDC distribution
 
+1.01 2026-10-18
+  - used method signatures
+  - Added clarifications to the documentation
+
 1.00 2026-10-14
   - added a fix to write logs to the 'psgix.logger' when available
   - the exception implements an as_psgi() method, so that it can be rethrown by frameworks which support it

@@ -6,7 +6,12 @@ use Future;
 use IO::Async::Loop;
 use Scalar::Util qw( weaken );
 use Net::Async::MCP;
-use MCP::Server;
+
+# The stub servers below are scripted by hand, but the client behaviour they
+# script is pinned against a real MCP::Server, and MCP is a recommendation of
+# this distribution rather than a requirement.
+skip_all 'MCP is required for the client tests'
+  unless eval { require MCP::Server; 1 };
 
 # Transport-independent client behaviour: request building, retries,
 # renegotiation and event dispatch that do not depend on which transport
@@ -932,10 +937,18 @@ else {
 
   $f->cancel;
   ok($f->is_cancelled, 'the caller future is cancelled');
-  is(scalar keys %{ $transport->{pending} }, 0,
-    'cancelling the client future drops the transport pending entry');
-  is($transport->{cancelled}, 1,
-    'and fires the transport on_cancel, so the request really is cancelled');
+
+  # Future::AsyncAwait hands the cancel of an async sub's future on to the
+  # future it awaits on perl 5.24 and later only (its Changes, 0.24): before
+  # that the caller's future is cancelled and the request stays pending
+  SKIP: {
+    skip 'a cancel reaches the transport on perl 5.24 and later only', 2
+      if "$]" < 5.024;
+    is(scalar keys %{ $transport->{pending} }, 0,
+      'cancelling the client future drops the transport pending entry');
+    is($transport->{cancelled}, 1,
+      'and fires the transport on_cancel, so the request really is cancelled');
+  }
 }
 
 done_testing;

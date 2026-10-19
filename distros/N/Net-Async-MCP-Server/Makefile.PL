@@ -18,13 +18,17 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Future" => "0.49",
     "Future::AsyncAwait" => "0.66",
+    "HTTP::Server::PSGI" => 0,
     "IO::Async" => "0.78",
-    "JSON::MaybeXS" => 0
+    "JSON::MaybeXS" => "1.004",
+    "Plack" => "1.0"
   },
   "TEST_REQUIRES" => {
+    "HTTP::Request::Common" => 0,
+    "Plack::Test" => 0,
     "Test2::V0" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -34,8 +38,12 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Future" => "0.49",
   "Future::AsyncAwait" => "0.66",
+  "HTTP::Request::Common" => 0,
+  "HTTP::Server::PSGI" => 0,
   "IO::Async" => "0.78",
-  "JSON::MaybeXS" => 0,
+  "JSON::MaybeXS" => "1.004",
+  "Plack" => "1.0",
+  "Plack::Test" => 0,
   "Test2::V0" => 0
 );
 

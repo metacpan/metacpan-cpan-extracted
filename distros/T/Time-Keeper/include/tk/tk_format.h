@@ -45,6 +45,8 @@ typedef struct tk_out {
     SV  *sv;
     int  utf8;
     const char *const *digits;   /* the locale's 0 to 9, or NULL for ASCII */
+    const char *nums;            /* the numbering spec of the pattern being written, or NULL */
+    STRLEN nums_len;
 } tk_out;
 
 static void
@@ -69,6 +71,20 @@ tk_out_str(pTHX_ tk_out *o, const char *s)
 }
 
 /* ASCII digits written in the locale's digits, when it has its own. */
+/* The text with the leap pattern round it ({0}bis), or as it is. */
+static void
+tk_out_leap_wrap(pTHX_ tk_out *o, const char *pattern, const char *text, STRLEN len)
+{
+    const char *at = pattern ? strstr(pattern, "{0}") : NULL;
+    if (!at) {
+        tk_out_cat(aTHX_ o, text, len);
+        return;
+    }
+    tk_out_cat(aTHX_ o, pattern, (STRLEN)(at - pattern));
+    tk_out_cat(aTHX_ o, text, len);
+    tk_out_str(aTHX_ o, at + 3);
+}
+
 static void
 tk_out_digits(pTHX_ tk_out *o, const char *s, STRLEN len)
 {
@@ -160,6 +176,8 @@ tk_hour12(unsigned h)
     return h % 12 == 0 ? 12 : h % 12;
 }
 
+#include "tk/tk_numbering.h"
+
 /* The nanoseconds truncated to n digits, or padded with zeros past nine. */
 static void
 tk_out_fraction_digits(pTHX_ tk_out *o, int32_t nsec, int n)
@@ -183,6 +201,20 @@ tk_strftime(pTHX_ tk_out *o, SV *self, tk_value *v, const tk_locale_data *loc,
 {
     const tk_civil *c = tk_value_civil(v);
     STRLEN i = 0;
+    const tk_calendar *cal = tk_cal_of(v);
+    int other = v->calendar != TK_CAL_GREGORY;
+    tk_calfields cf;
+    const tk_cal_names *cn = NULL;
+    int64_t year = c->year;
+    unsigned month = c->month, day = c->day, doy = c->doy;
+    if (other) {
+        tk_value_calfields(aTHX_ v, &cf, "Time::Keeper->strftime");
+        cn = tk_cal_names_get(aTHX_ loc, v->calendar);
+        year = cf.era_year;
+        month = tk_cal_month_slot(cal, &cf);
+        day = cf.day;
+        doy = cf.doy;
+    }
 
     while (i < len) {
         STRLEN start = i, mark;
@@ -262,19 +294,33 @@ tk_strftime(pTHX_ tk_out *o, SV *self, tk_value *v, const tk_locale_data *loc,
         case 'a': tk_out_str(aTHX_ o, loc->s.days[TK_CTX_FORMAT][TK_W_ABBR][c->dow - 1]); break;
         case 'A': tk_out_str(aTHX_ o, loc->s.days[TK_CTX_FORMAT][TK_W_WIDE][c->dow - 1]); break;
         case 'b':
-        case 'h': tk_out_str(aTHX_ o, loc->s.months[TK_CTX_FORMAT][TK_W_ABBR][c->month - 1]); break;
-        case 'B': tk_out_str(aTHX_ o, loc->s.months[TK_CTX_FORMAT][TK_W_WIDE][c->month - 1]); break;
-        case 'c':
-            tk_format_cldr(aTHX_ o, self, v, loc, loc->s.datetime_formats[TK_LEN_MEDIUM],
-                           strlen(loc->s.datetime_formats[TK_LEN_MEDIUM]),
-                           loc->s.date_formats[TK_LEN_MEDIUM], loc->s.time_formats[TK_LEN_MEDIUM]);
+        case 'h':
+        case 'B': {
+            int w = spec == 'B' ? TK_W_WIDE : TK_W_ABBR;
+            if (other) {
+                const char *name = tk_cal_month_name(cn, loc, cal, &cf, TK_CTX_FORMAT, w);
+                tk_out_leap_wrap(aTHX_ o, cf.leap_month ? tk_cal_leap_pattern(cn, TK_CTX_FORMAT, w, 0) : NULL, name, strlen(name));
+            }
+            else
+                tk_out_str(aTHX_ o, loc->s.months[TK_CTX_FORMAT][w][c->month - 1]);
             break;
-        case 'x': tk_format_cldr(aTHX_ o, self, v, loc, loc->s.date_formats[TK_LEN_MEDIUM], strlen(loc->s.date_formats[TK_LEN_MEDIUM]), NULL, NULL); break;
+        }
+        case 'c': {
+            const char *dt = other ? tk_cal_date_format(cn, loc, TK_LEN_MEDIUM, 1) : loc->s.datetime_formats[TK_LEN_MEDIUM];
+            const char *df = other ? tk_cal_date_format(cn, loc, TK_LEN_MEDIUM, 0) : loc->s.date_formats[TK_LEN_MEDIUM];
+            tk_format_cldr(aTHX_ o, self, v, loc, dt, strlen(dt), df, loc->s.time_formats[TK_LEN_MEDIUM]);
+            break;
+        }
+        case 'x': {
+            const char *df = other ? tk_cal_date_format(cn, loc, TK_LEN_MEDIUM, 0) : loc->s.date_formats[TK_LEN_MEDIUM];
+            tk_format_cldr(aTHX_ o, self, v, loc, df, strlen(df), NULL, NULL);
+            break;
+        }
         case 'X': tk_format_cldr(aTHX_ o, self, v, loc, loc->s.time_formats[TK_LEN_MEDIUM], strlen(loc->s.time_formats[TK_LEN_MEDIUM]), NULL, NULL); break;
-        case 'C': TK_NUM(c->year / 100, 0, 0); break;
-        case 'd': TK_NUM(c->day, 2, '0'); break;
+        case 'C': TK_NUM(year / 100, 0, 0); break;
+        case 'd': TK_NUM(day, 2, '0'); break;
         case 'D': tk_strftime(aTHX_ o, self, v, loc, "%m/%d/%y", 8); break;
-        case 'e': TK_NUM(c->day, 2, ' '); break;
+        case 'e': TK_NUM(day, 2, ' '); break;
         case 'F': tk_strftime(aTHX_ o, self, v, loc, "%Y-%m-%d", 8); break;
         case 'g':
         case 'G': {
@@ -292,10 +338,10 @@ tk_strftime(pTHX_ tk_out *o, SV *self, tk_value *v, const tk_locale_data *loc,
         }
         case 'H': TK_NUM(c->hour, 2, '0'); break;
         case 'I': TK_NUM(tk_hour12(c->hour), 2, '0'); break;
-        case 'j': TK_NUM(c->doy, 3, '0'); break;
+        case 'j': TK_NUM(doy, 3, '0'); break;
         case 'k': TK_NUM(c->hour, 2, ' '); break;
         case 'l': TK_NUM(tk_hour12(c->hour), 2, ' '); break;
-        case 'm': TK_NUM(c->month, 2, '0'); break;
+        case 'm': TK_NUM(month, 2, '0'); break;
         case 'M': TK_NUM(c->minute, 2, '0'); break;
         case 'n': tk_out_cat(aTHX_ o, "\n", 1); break;
         case 'N': tk_out_fraction_digits(aTHX_ o, c->nsec, has_width ? (width ? width : 9) : 9); break;
@@ -327,15 +373,15 @@ tk_strftime(pTHX_ tk_out *o, SV *self, tk_value *v, const tk_locale_data *loc,
         case 'w': TK_NUM(c->dow % 7, 0, 0); break;
         case 'W': TK_NUM(tk_week_number_monday(c->year, c->month, c->day), 2, '0'); break;
         case 'y': {
-            int64_t a = c->year < 0 ? -(int64_t)c->year : c->year;
+            int64_t a = year < 0 ? -year : year;
             TK_NUM(a % 100, 2, '0');
             break;
         }
         case 'Y':
-            if (!has_width && !flag && c->year >= 1000 && c->year <= 9999)
-                TK_NUM(c->year, 4, '0');
+            if (!has_width && !flag && year >= 1000 && year <= 9999)
+                TK_NUM(year, 4, '0');
             else
-                TK_NUM(c->year, 0, 0);
+                TK_NUM(year, 0, 0);
             break;
         case 'z': tk_out_offset(aTHX_ o, v->utoff, 0, 1); break;
         case 'Z': {
@@ -388,7 +434,7 @@ tk_out_gmt(pTHX_ tk_out *o, const tk_locale_data *loc, int32_t off, int long_for
     }
     t.sv = sv_2mortal(newSVpvs(""));
     t.utf8 = 0;
-    t.digits = o->digits;
+    t.digits = o->digits; t.nums = o->nums; t.nums_len = o->nums_len;
     while (p < end) {
         int n = 0;
         char ch = *p;
@@ -750,65 +796,122 @@ tk_cldr_field(pTHX_ tk_out *o, SV *self, tk_value *v, const tk_locale_data *loc,
     int64_t wy;
     unsigned wk;
     int ctx;
+    /* in another calendar the date letters read its fields and names */
+    const tk_calendar *cal = tk_cal_of(v);
+    int other = v->calendar != TK_CAL_GREGORY;
+    int lunisolar = v->calendar == TK_CAL_CHINESE || v->calendar == TK_CAL_DANGI;
+    tk_calfields cf;
+    const tk_cal_names *cn = NULL;
+    int w = n == 4 ? TK_W_WIDE : n == 5 ? TK_W_NARROW : TK_W_ABBR;
     PERL_UNUSED_VAR(self);
+    if (other) {
+        tk_value_calfields(aTHX_ v, &cf, "Time::Keeper->format");
+        cn = tk_cal_names_get(aTHX_ loc, v->calendar);
+    }
 
     switch (ch) {
     case 'G':
-        tk_out_str(aTHX_ o, loc->s.eras[n == 4 ? TK_W_WIDE : n == 5 ? TK_W_NARROW : TK_W_ABBR][era]);
+        if (other)
+            tk_out_str(aTHX_ o, tk_cal_era_name(cn, cal, cf.era, w));
+        else
+            tk_out_str(aTHX_ o, loc->s.eras[w][era]);
         break;
+    case 'U':
+        if (lunisolar) {
+            tk_out_str(aTHX_ o, tk_cal_cyclic_name(cn, tk_lunisolar_cyclic_year(cf.year), n == 4 ? TK_W_WIDE : n == 5 ? TK_W_NARROW : TK_W_ABBR));
+            break;
+        }
+        /* fall through: a calendar with no cycle writes the year */
     case 'y':
+        if (other) {
+            int64_t yy = lunisolar ? tk_lunisolar_cyclic_year(cf.year) : cf.era_year;
+            if (n == 2)
+                tk_out_field_num(aTHX_ o, ch, (yy < 0 ? -yy : yy) % 100, 2);
+            else
+                tk_out_field_num(aTHX_ o, ch, yy, n);
+            break;
+        }
         if (n == 2) {
             int64_t a = c->year < 0 ? -(int64_t)c->year : c->year;
-            tk_out_num(aTHX_ o, a % 100, 2, '0');
+            tk_out_field_num(aTHX_ o, ch, a % 100, 2);
         }
         else
-            tk_out_num(aTHX_ o, c->year, n, '0');
+            tk_out_field_num(aTHX_ o, ch, c->year, n);
         break;
     case 'u':
-        tk_out_num(aTHX_ o, c->year, n, '0');
+        tk_out_field_num(aTHX_ o, ch, other ? (lunisolar ? cf.era_year : cf.year) : c->year, n);
+        break;
+    case 'r':
+        tk_out_field_num(aTHX_ o, ch, other ? tk_cal_related_year(cal, cf.year) : c->year, n);
         break;
     case 'Y':
         tk_locale_week(loc, c, &wy, &wk);
         if (n == 2)
-            tk_out_num(aTHX_ o, (wy < 0 ? -wy : wy) % 100, 2, '0');
+            tk_out_field_num(aTHX_ o, ch, (wy < 0 ? -wy : wy) % 100, 2);
         else
-            tk_out_num(aTHX_ o, wy, n, '0');
+            tk_out_field_num(aTHX_ o, ch, wy, n);
         break;
     case 'Q':
     case 'q':
         ctx = ch == 'Q' ? TK_CTX_FORMAT : TK_CTX_STANDALONE;
+        if (other) {
+            unsigned q = (cf.month - 1) / 3 + 1;
+            if (n <= 2 || q > 4)
+                tk_out_field_num(aTHX_ o, ch, q, n <= 2 ? n : 1);
+            else
+                tk_out_str(aTHX_ o, loc->s.quarters[ctx][n == 3 ? TK_W_ABBR : n == 4 ? TK_W_WIDE : TK_W_NARROW][q - 1]);
+            break;
+        }
         if (n <= 2)
-            tk_out_num(aTHX_ o, tk_quarter(c->month), n, '0');
+            tk_out_field_num(aTHX_ o, ch, tk_quarter(c->month), n);
         else
             tk_out_str(aTHX_ o, loc->s.quarters[ctx][n == 3 ? TK_W_ABBR : n == 4 ? TK_W_WIDE : TK_W_NARROW][tk_quarter(c->month) - 1]);
         break;
     case 'M':
     case 'L':
         ctx = ch == 'M' ? TK_CTX_FORMAT : TK_CTX_STANDALONE;
+        if (other) {
+            int mw = n == 3 ? TK_W_ABBR : n == 4 ? TK_W_WIDE : TK_W_NARROW;
+            const char *leap = cf.leap_month ? tk_cal_leap_pattern(cn, ctx, mw, n <= 2) : NULL;
+            if (n <= 2) {
+                STRLEN at = SvCUR(o->sv);
+                tk_out_field_num(aTHX_ o, ch, tk_cal_month_numeric(cal, &cf), n);
+                if (leap) {
+                    SV *num = sv_2mortal(newSVpvn(SvPVX(o->sv) + at, SvCUR(o->sv) - at));
+                    SvCUR_set(o->sv, at);
+                    tk_out_leap_wrap(aTHX_ o, leap, SvPVX(num), SvCUR(num));
+                }
+            }
+            else {
+                const char *name = tk_cal_month_name(cn, loc, cal, &cf, ctx, mw);
+                tk_out_leap_wrap(aTHX_ o, leap, name, strlen(name));
+            }
+            break;
+        }
         if (n <= 2)
-            tk_out_num(aTHX_ o, c->month, n, '0');
+            tk_out_field_num(aTHX_ o, ch, c->month, n);
         else
             tk_out_str(aTHX_ o, loc->s.months[ctx][n == 3 ? TK_W_ABBR : n == 4 ? TK_W_WIDE : TK_W_NARROW][c->month - 1]);
         break;
     case 'w':
         tk_locale_week(loc, c, &wy, &wk);
-        tk_out_num(aTHX_ o, wk, n, '0');
+        tk_out_field_num(aTHX_ o, ch, wk, n);
         break;
     case 'W':
-        tk_out_num(aTHX_ o, tk_locale_week_of_month(loc, c), n, '0');
+        tk_out_field_num(aTHX_ o, ch, tk_locale_week_of_month(loc, c), n);
         break;
     case 'd':
-        tk_out_num(aTHX_ o, c->day, n, '0');
+        tk_out_field_num(aTHX_ o, ch, other ? cf.day : c->day, n);
         break;
     case 'D':
-        tk_out_num(aTHX_ o, c->doy, n, '0');
+        tk_out_field_num(aTHX_ o, ch, other ? cf.doy : c->doy, n);
         break;
     case 'F':
-        tk_out_num(aTHX_ o, (c->day + 6) / 7, n, '0');
+        tk_out_field_num(aTHX_ o, ch, ((other ? cf.day : c->day) + 6) / 7, n);
         break;
     case 'g':
         /* CLDR's modified Julian day counts local days, from local midnight */
-        tk_out_num(aTHX_ o, tk_days_from_civil(c->year, c->month, c->day) + 40587, n, '0');
+        tk_out_field_num(aTHX_ o, ch, tk_days_from_civil(c->year, c->month, c->day) + 40587, n);
         break;
     case 'E':
         tk_out_str(aTHX_ o, loc->s.days[TK_CTX_FORMAT][n == 4 ? TK_W_WIDE : n == 5 ? TK_W_NARROW : n == 6 ? TK_W_SHORT : TK_W_ABBR][c->dow - 1]);
@@ -817,7 +920,7 @@ tk_cldr_field(pTHX_ tk_out *o, SV *self, tk_value *v, const tk_locale_data *loc,
     case 'c':
         ctx = ch == 'e' ? TK_CTX_FORMAT : TK_CTX_STANDALONE;
         if (n <= 2)
-            tk_out_num(aTHX_ o, local_dow, n, '0');
+            tk_out_field_num(aTHX_ o, ch, local_dow, n);
         else
             tk_out_str(aTHX_ o, loc->s.days[ctx][n == 3 ? TK_W_ABBR : n == 4 ? TK_W_WIDE : n == 5 ? TK_W_NARROW : TK_W_SHORT][c->dow - 1]);
         break;
@@ -828,17 +931,17 @@ tk_cldr_field(pTHX_ tk_out *o, SV *self, tk_value *v, const tk_locale_data *loc,
     case 'B':
         tk_out_period(aTHX_ o, loc, c, ch, n);
         break;
-    case 'h': tk_out_num(aTHX_ o, tk_hour12(c->hour), n, '0'); break;
-    case 'H': tk_out_num(aTHX_ o, c->hour, n, '0'); break;
-    case 'K': tk_out_num(aTHX_ o, c->hour % 12, n, '0'); break;
-    case 'k': tk_out_num(aTHX_ o, c->hour == 0 ? 24 : c->hour, n, '0'); break;
-    case 'j': tk_out_num(aTHX_ o, loc->hour_cycle_24 ? c->hour : tk_hour12(c->hour), n, '0'); break;
-    case 'm': tk_out_num(aTHX_ o, c->minute, n, '0'); break;
-    case 's': tk_out_num(aTHX_ o, c->second, n, '0'); break;
+    case 'h': tk_out_field_num(aTHX_ o, ch, tk_hour12(c->hour), n); break;
+    case 'H': tk_out_field_num(aTHX_ o, ch, c->hour, n); break;
+    case 'K': tk_out_field_num(aTHX_ o, ch, c->hour % 12, n); break;
+    case 'k': tk_out_field_num(aTHX_ o, ch, c->hour == 0 ? 24 : c->hour, n); break;
+    case 'j': tk_out_field_num(aTHX_ o, ch, loc->hour_cycle_24 ? c->hour : tk_hour12(c->hour), n); break;
+    case 'm': tk_out_field_num(aTHX_ o, ch, c->minute, n); break;
+    case 's': tk_out_field_num(aTHX_ o, ch, c->second, n); break;
     case 'S': tk_out_fraction_digits(aTHX_ o, c->nsec, n); break;
     case 'A': {
         int64_t ms = ((int64_t)c->hour * 3600 + c->minute * 60 + c->second) * 1000 + c->nsec / 1000000;
-        tk_out_num(aTHX_ o, ms, n, '0');
+        tk_out_field_num(aTHX_ o, ch, ms, n);
         break;
     }
     case 'z':
@@ -877,6 +980,17 @@ tk_format_cldr(pTHX_ tk_out *o, SV *self, tk_value *v, const tk_locale_data *loc
 {
     STRLEN i = 0;
     const char *const *saved = o->digits;
+    const char *saved_nums = o->nums;
+    STRLEN saved_nums_len = o->nums_len;
+    /* a numbering spec in front of the pattern holds for the pattern */
+    {
+        const char *spec;
+        STRLEN spec_len;
+        if (tk_nums_prefix(&p, &len, &spec, &spec_len)) {
+            o->nums = spec;
+            o->nums_len = spec_len;
+        }
+    }
     o->digits = loc->ascii_digits ? NULL : loc->s.digits;
     while (i < len) {
         char ch = p[i];
@@ -922,6 +1036,8 @@ tk_format_cldr(pTHX_ tk_out *o, SV *self, tk_value *v, const tk_locale_data *loc
         i++;
     }
     o->digits = saved;
+    o->nums = saved_nums;
+    o->nums_len = saved_nums_len;
 }
 
 /* ---- the fixed forms -------------------------------------------------- */

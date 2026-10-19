@@ -2,7 +2,7 @@ package DBIx::QuickDB;
 use strict;
 use warnings;
 
-our $VERSION = '0.000065';
+our $VERSION = '0.000066';
 
 use Carp;
 use List::Util qw/first/;
@@ -315,6 +315,29 @@ load, or a structure with driver specific files to load.
 
 Defaults to false. When set to true the database will not be available globally
 by the name passed into C<build_db()>.
+
+=back
+
+=head1 PLATFORM NOTES
+
+=over 4
+
+=item MSWin32 (Strawberry Perl)
+
+Server drivers (PostgreSQL, MariaDB, MySQL, Percona) are not supported: every
+server runs under a watcher process that needs Unix process control. They
+report themselves not viable there. SQLite and DuckDB, which need no watcher,
+are not affected.
+
+=item Cygwin
+
+Native Windows database binaries cannot run a server under Cygwin, so
+directories under F</cygdrive> on C<$PATH> are ignored when looking for them;
+install the Cygwin packages instead.
+
+PostgreSQL needs System V shared memory, which Cygwin provides only while
+C<cygserver> runs. Without it the PostgreSQL driver reports itself not viable
+and says so.
 
 =back
 

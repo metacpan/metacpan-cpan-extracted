@@ -14,6 +14,7 @@ tk_thaw_value(pTHX_ SV *frozen, tk_value *v, const char *what)
     tk_zone_spec z;
     SV *num, *zone;
     uint16_t lid = 0;
+    int cal = TK_CAL_GREGORY;
     long ns;
 
     s = SvPV(frozen, len);
@@ -31,13 +32,22 @@ tk_thaw_value(pTHX_ SV *frozen, tk_value *v, const char *what)
     t.nsec = (int32_t)ns;
     lsep = strchr(p + 1, ' ');
     zone = sv_2mortal(newSVpvn(p + 1, (lsep ? lsep : s + len) - (p + 1)));
-    if (lsep)
-        lid = tk_locale_id_from_sv(aTHX_ sv_2mortal(newSVpvn(lsep + 1, len - (lsep + 1 - s))), what);
+    if (lsep) {
+        const char *csep = strchr(lsep + 1, ' ');
+        lid = tk_locale_id_from_sv(aTHX_ sv_2mortal(newSVpvn(lsep + 1, (csep ? csep : s + len) - (lsep + 1))), what);
+        if (csep) {
+            cal = tk_cal_find(csep + 1, len - (csep + 1 - s));
+            if (cal < 0)
+                croak("%s: not a frozen Time::Keeper value: unknown calendar", what);
+            tk_cal_check_built(aTHX_ cal, what);
+        }
+    }
     tk_zone_spec_from_sv(aTHX_ zone, &z, what);
     if (!tk_instant_valid(&t))
         croak("%s: out of range", what);
     tk_value_init(aTHX_ v, &t, &z);
     v->locale = lid;
+    v->calendar = (uint8_t)cal;
 }
 
 /* The frozen value with its locale: what STORABLE_freeze and FREEZE give. */
@@ -45,7 +55,9 @@ static SV *
 tk_freeze_full_sv(pTHX_ const tk_value *v)
 {
     SV *out = tk_freeze_sv(aTHX_ v);
-    if (v->locale && v->locale < TK_LOCALE_COUNT)
+    if (v->calendar)
+        sv_catpvf(out, " %s %s", tk_locale_codes[v->locale < TK_LOCALE_COUNT ? v->locale : 0].code, tk_cal_of(v)->id);
+    else if (v->locale && v->locale < TK_LOCALE_COUNT)
         sv_catpvf(out, " %s", tk_locale_codes[v->locale].code);
     return out;
 }

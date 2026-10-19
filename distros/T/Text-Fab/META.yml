@@ -1,9 +1,10 @@
 ---
-abstract: 'A powerful, general-purpose document expansion framework'
+abstract: 'A powerful, general-purpose document expansion framework (currently Control Flow, Loops, Caching, and Lenses are unimplemented {???})'
 author:
   - 'Ilya Zakharevich <ilyaz@cpan.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::Exception: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -19,5 +20,5 @@ no_index:
     - inc
 requires:
   FreezeThaw: '0'
-version: '0.03'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

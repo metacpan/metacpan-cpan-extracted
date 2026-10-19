@@ -3,6 +3,8 @@ package oEdtk::FatalsToEmail;
 use strict;
 use warnings;
 
+our $VERSION = '2.1126';
+
 # by Randal L. Schwartz http://www.stonehenge.com/merlyn/LinuxMag/col14.html
 
 #require oEdtk::FatalsToEmail;
@@ -100,3 +102,46 @@ sub send_mail {
 		die "ERROR: $message(send_mail saw $@)\n";
 	}
 }
+
+=head1 NAME
+
+oEdtk::FatalsToEmail - turn fatal errors into an email
+
+=head1 SYNOPSIS
+
+    use oEdtk::FatalsToEmail
+        Address  => 'admin@example.com',
+        Mailhost => 'smtp.example.com';
+
+=head1 DESCRIPTION
+
+Installs a C<__DIE__> handler that prefixes the fatal message with its location,
+prints a short apology, mails the details and then re-dies. The C<Address>,
+C<Mailhost>, C<Cache> and C<Seconds> parameters are given at load time; when a
+C<Cache> file is set, messages that arrive within C<Seconds> are coalesced into a
+single email. Adapted from Randal L. Schwartz (Stonehenge).
+
+=head1 FUNCTIONS
+
+=head2 import
+
+    use oEdtk::FatalsToEmail Address => $address, Mailhost => $smtp;
+
+Set the module parameters at load time. An unknown key or a missing value is an
+error.
+
+=head2 send_mail
+
+    send_mail($message);
+
+Email C<$message> to the configured address through C<Net::SMTP>, optionally
+through the cache file. Dies when the transfer fails.
+
+The C<trapper> sub is the internal handler installed as C<$SIG{__DIE__}>; it is
+not part of the public API.
+
+=head1 AUTHOR
+
+The oEdtk team.
+
+=cut

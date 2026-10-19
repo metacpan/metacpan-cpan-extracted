@@ -47,8 +47,10 @@ my $watcher = Test::PostgreSQL::StartupWatcher->new($launch_log);
 my $db = bless {
     +DBIx::QuickDB::Driver::DIR()     => $dir,
     +DBIx::QuickDB::Driver::PostgreSQL::SOCKET() => "$dir/.s.PGSQL.5432",
-    +DBIx::QuickDB::Driver::WATCHER() => $watcher,
 }, 'DBIx::QuickDB::Driver::PostgreSQL';
+
+# Stands in for the base start(), which creates the watcher.
+sub launched { $_[0]->{+DBIx::QuickDB::Driver::WATCHER()} = $watcher; return }
 
 subtest readiness_probe_disconnects => sub {
     my $base_start_calls = 0;
@@ -56,7 +58,7 @@ subtest readiness_probe_disconnects => sub {
     my @connect_args;
 
     no warnings 'redefine';
-    local *DBIx::QuickDB::Driver::start = sub { $base_start_calls++; return };
+    local *DBIx::QuickDB::Driver::start   = sub { $base_start_calls++; launched($_[0]) };
     local *DBIx::QuickDB::Driver::connect = sub {
         shift;
         @connect_args = @_;
@@ -75,8 +77,11 @@ subtest readiness_probe_disconnects => sub {
 };
 
 subtest failed_probe_preserves_error_and_early_logs => sub {
+    # The previous subtest left the stub server running; start() would no-op.
+    delete $db->{+DBIx::QuickDB::Driver::WATCHER()};
+
     no warnings 'redefine';
-    local *DBIx::QuickDB::Driver::start = sub { return };
+    local *DBIx::QuickDB::Driver::start   = sub { launched($_[0]) };
     local *DBIx::QuickDB::Driver::connect = sub {
         die "DBI connect failed: Unix socket disappeared\n";
     };

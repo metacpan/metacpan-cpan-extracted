@@ -126,7 +126,7 @@ my $b = t(year => 2026, month => 3, day => 4, hour => 1, minute => 30, second =>
     is(units($x->until($y, largest => 'minutes'), 'minutes', 'seconds'), '1,30', 'as minutes: one 60-second minute, then 30 seconds');
     is($x->plus($x->until($y, largest => 'seconds')) . '', "$y", 'both add back');
     is($x->plus($x->until($y, largest => 'minutes')) . '', "$y", 'to the same instant');
-    is($x->until($y, largest => 'seconds')->total('minutes'), 91 / 60, 'total counts it');
+    cmp_ok(abs($x->until($y, largest => 'seconds')->total('minutes') - 91 / 60), '<', 1e-12, 'total counts it');
 }
 
 # Across a change of the clocks.
@@ -170,13 +170,13 @@ my $b = t(year => 2026, month => 3, day => 4, hour => 1, minute => 30, second =>
     is($D->new(months => 1)->total('days', relative_to => $jan31), 31, 'a month from 31 January is 31 days (it lands on 3 March)');
     is($D->new(months => 1)->total('days', relative_to => t(year => 2026, month => 2, day => 1)), 28, 'and 28 from 1 February');
     is($D->new(days => 45)->total('months', relative_to => t(year => 2026)), 1.5, '45 days from 1 January 2026 is a month and half of February');
-    is($D->new(days => 45)->total('years', relative_to => t(year => 2026)), 45 / 365, 'or 45/365 of the year');
+    cmp_ok(abs($D->new(days => 45)->total('years', relative_to => t(year => 2026)) - 45 / 365), '<', 1e-12, 'or 45/365 of the year');
     is($D->new(months => -1)->total('days', relative_to => t(year => 2026, month => 3, day => 3)), -28, 'a month back from 3 March is 28 days back');
     is($D->new(days => 1)->total('hours', relative_to => t(year => 2026, month => 3, day => 7, hour => 12, zone => 'America/New_York')), 23,
        'a day from noon on 7 March in New York is 23 hours');
     is($D->new(hours => 23)->total('days', relative_to => t(year => 2026, month => 3, day => 7, hour => 12, zone => 'America/New_York')), 1,
        'and 23 hours from there is a day');
-    is($D->new(months => 1, days => 2)->total('weeks', relative_to => $jan31), 33 / 7, 'a month and two days from 31 January in weeks');
+    cmp_ok(abs($D->new(months => 1, days => 2)->total('weeks', relative_to => $jan31) - 33 / 7), '<', 1e-12, 'a month and two days from 31 January in weeks');
     dies_like(sub { $D->new(days => 1, hours => 12)->total('hours') }, qr/a day is not always 24 hours; give relative_to/, 'days need a start for hours');
     dies_like(sub { $D->new(months => 1)->total('days') }, qr/months have no fixed length; give relative_to/, 'months need a start');
     dies_like(sub { $D->new(hours => 1)->total('months') }, qr/months have no fixed length; give relative_to/, 'as does a total in months');

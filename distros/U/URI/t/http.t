@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 16;
+use Test::More;
 
 use URI ();
 
@@ -51,3 +51,16 @@ $u
 is($u->canonical, "http://example.com/pub/a/2001/08/27/bjornstad.html");
 
 ok($u->has_recognized_scheme);
+
+# An empty port must not leave a trailing colon on host()
+for my $str (
+    'http://www.example.com:/',           'http://www.example.com:',
+    'http://user:pass@www.example.com:/', 'https://www.example.com:/',
+    )
+{
+    is(URI->new($str)->host, 'www.example.com', "host() for $str");
+}
+is(URI->new('https://www.example.com:/')->port,
+    443, 'empty port falls back to the scheme default');
+
+done_testing();

@@ -27,7 +27,7 @@ our @EXPORT_OK = qw(
 	parse_yyyymmdd scalar_dump track track_begin track_end trim_list
 );
 
-our $VERSION = 2.1111;
+our $VERSION = 2.1126;
 
 use Carp         qw(carp croak);
 use Cwd          qw(abs_path);
@@ -370,6 +370,104 @@ which call L<oEUser::Lib> or name corporate schema identifiers -- lives in
 L<oEUser::Utils>. Their old names are kept here as delegates: they forward to
 the companion distribution, which is loaded on demand, and a missing oEUser
 fails with a clear message. This module itself never depends on oEUser.
+
+=head1 FUNCTIONS
+
+=head2 delete_useless_whitespaces
+
+    my $clean = delete_useless_whitespaces($string);
+
+Remove the surrounding whitespace and collapse internal runs to a single space.
+Croaks on an undef argument.
+
+=head2 IDX_FORMAT
+
+    my $format = IDX_FORMAT();
+
+Return the current index format, an array reference of C<[ old_tag, new_field,
+offset ]> entries.
+
+=head2 kill_non_latin_1_9_chars_in_place
+
+    kill_non_latin_1_9_chars_in_place(\$string);
+
+Replace, in place, the DEL and C1 control bytes of C<$string> with spaces.
+
+=head2 alert
+
+    alert($flow_file, $line_number, $message, @objects);
+
+Carp an alert carrying the flow file, the line number and the objects.
+
+=head2 flatten_index_variables
+
+    my $index = flatten_index_variables($record);
+
+Return a hash reference of the C<index_variables> sub-hash, each key prefixed
+with C<index>.
+
+=head2 max_value
+
+    my $max = max_value(\@values);
+
+Return the greatest value of the list reference, compared as strings.
+
+=head2 parse_jjmmaaaa
+
+    my $parts = parse_jjmmaaaa($string, $flow_file, $line_number);
+
+Parse a dd/mm/yyyy string into C<[ day, "month_name year" ]>, or raise an alert
+and return.
+
+=head2 parse_price
+
+    my $price = parse_price($number, $flow_file, $line_number);
+
+Return the price unchanged when it is valid, otherwise raise an alert.
+
+=head2 parse_yyyymmdd
+
+    my $parts = parse_yyyymmdd($string, $flow_file, $line_number);
+
+Parse a yyyymmdd string into C<[ day, "month_name year" ]>, or raise an alert
+and return.
+
+=head2 scalar_dump
+
+    my $readable = scalar_dump($string);
+
+Render the non-printable bytes of C<$string> as hexadecimal escapes, for display.
+
+=head2 track
+
+    track($tracking, \@fields, $type);
+
+Track one document on the given tracking object, with an optional event type.
+
+=head2 track_begin
+
+    my $tracking = track_begin($job, $user, \@fields, $mode);
+
+Start tracking and return the tracking object. The tracking class and the
+toolkit are loaded on demand.
+
+=head2 track_end
+
+    track_end($tracking);
+
+Record the end-of-run tracking event on the given object.
+
+=head2 trim_list
+
+    my $string = trim_list(@parts);
+
+Join the list with single spaces, collapsing runs of whitespace.
+
+The unexported helpers C<check_date>, C<convert_date>, C<month_to_name>,
+C<my_dumper>, C<latest_idx1_in_directory>, C<comment_index_file>,
+C<TRACK_MODE_BATCH> and C<_delegate>, and the corporate accessors C<init> and the
+C<INDEX_*> names, are not part of the public API; the accessors delegate on
+demand to the companion C<oEUser::Utils>.
 
 =head1 AUTHOR
 

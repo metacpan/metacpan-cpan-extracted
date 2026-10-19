@@ -1,3 +1,15 @@
+0.004  2026-10-18 16:02:01 CEST
+   - Fix position of experimental signatures in X509.pm
+   - Fix using a missing optional function (only gave warnings, but
+     still...)
+   - Fix a check for filehandle's "raw-ness" that was always failing in
+     Windows due to how PerlIO is managed there (crlf is not removed, just
+     disabled).
+
+0.003  2026-09-21 08:48:45 CEST
+   - Fixes for a couple of tests that fail in Windows
+   - Added program aws-iam-ra to get IAM Roles Anywhere credentials
+
 0.001  2026-09-20 22:42:38 CEST
    - Initial release
    - Code structure, initial test suites and examples generated with

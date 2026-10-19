@@ -216,7 +216,7 @@ else {
 	);
 }
 
-# --- Oracle: CREATE TABLE but no DROP ANY TABLE ------------------------------
+# --- Oracle: CREATE TABLE, no DROP ANY TABLE (H11: the owner drops its own) --
 {
 	my $dbh = MockDBH->new(
 		driver => 'Oracle',
@@ -225,12 +225,11 @@ else {
 	my $r = probe($dbh);
 	is( $r->{driver},   'Oracle', 'oracle: driver reported' );
 	is( $r->{create},   1,        'oracle: CREATE allowed' );
-	is( $r->{drop},     0,        'oracle: DROP denied' );
+	is( $r->{drop},     1,        'oracle: DROP allowed (owns the tables)' );
 	is( $r->{index},    1,        'oracle: INDEX allowed (owns the tables)' );
 	is( $r->{alter},    1,        'oracle: ALTER allowed (owns the tables)' );
 	is( $r->{sequence}, 0,        'oracle: SEQUENCE denied' );
-	is_deeply( $r->{missing}, [ 'DROP', 'SEQUENCE' ],
-		'oracle: DROP and SEQUENCE reported missing' );
+	is_deeply( $r->{missing}, ['SEQUENCE'], 'oracle: only SEQUENCE reported missing' );
 }
 
 # --- Oracle: both system privileges -----------------------------------------

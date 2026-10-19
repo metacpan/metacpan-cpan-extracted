@@ -1,0 +1,23 @@
+#AUTOSTART=1
+#AUTOSTART_LINE=10
+#VARS A=2.5
+#VARS AB=1.25
+#VARS ABC=6.25
+#VARS A$="HELLO"
+#VARS M(2,3)=11,12,13,21,22,23
+#VARS M$(2,3,2)="AA","AB","AC","BA","BB","BC"
+
+   10  PRINT A;" ";AB;" ";ABC
+   20  PRINT A$
+   30  FOR I=1 TO 2
+   40  FOR J=1 TO 3
+   50  PRINT M(I,J);" ";
+   60  NEXT J
+   70  PRINT 
+   80  NEXT I
+   90  FOR I=1 TO 2
+  100  FOR J=1 TO 3
+  110  PRINT M$(I,J);" ";
+  120  NEXT J
+  130  PRINT 
+  140  NEXT I

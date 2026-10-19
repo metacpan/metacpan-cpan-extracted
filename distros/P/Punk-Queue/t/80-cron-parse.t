@@ -143,9 +143,12 @@ for my $b (@bad) {
 }
 
 {
+    # without Time::Keeper::Recurrence: the switch forces the built-in parser
+    # alone (t/84 covers zone names with it)
+    local $ENV{PUNK_QUEUE_NO_RECURRENCE} = 1;
     my $ok = eval { $next->('0 3 * * *', 0, 'PST8PDT'); 1 };
-    ok(!$ok, 'a tz that is not UTC/local/+HHMM is rejected');
-    like($@, qr/cron tz must be/, '  by the tz parser');
+    ok(!$ok, 'a tz that is not UTC/local/+HHMM is rejected without Time::Keeper::Recurrence');
+    like($@, qr/cron tz must be 'UTC', 'local' or '\+HHMM', not 'PST8PDT'/, '  by the tz parser, in its own words');
 }
 
 # ---- the horizon ------------------------------------------------------------

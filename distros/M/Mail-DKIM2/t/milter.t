@@ -162,6 +162,22 @@ diag("=== DKIM2Verify milter tests ===");
     run_verify($signed_msg, _bare => 1, snapshot_directory => $snap0, add_message_instance => 0);
     my @none = $files_in->($snap0);
     is(scalar @none, 0, 'defaults: an explicit add_message_instance => 0 still wins');
+
+    # The verifier hashes the body as it arrives; the handler keeps a copy
+    # only when it has something to build from it: a snapshot to store, or
+    # a first Message-Instance to compute.
+    my $kept = sub {
+        my $h = shift;
+        my $v = $h->get_object('dkim2_verifier');
+        return (length(join '', @{ $h->{body} || [] }), length($v->{_buf} // ''));
+    };
+    my ($copy, $buf) = $kept->(run_verify($signed_msg, add_message_instance => 0));
+    is($copy, 0, 'add_message_instance off: the handler keeps no body');
+    is($buf,  0, 'add_message_instance off: the verifier keeps no body');
+    ($copy) = $kept->(run_verify($signed_msg, _bare => 1));
+    is($copy, 0, 'an instance present and no snapshot_directory: no body kept');
+    ($copy) = $kept->(run_verify($signed_msg, _bare => 1, snapshot_directory => tempdir(CLEANUP => 1)));
+    ok($copy > 0, 'a snapshot to store: the body is kept for it');
 }
 
 # Test 3: Message with no DKIM2-Signature

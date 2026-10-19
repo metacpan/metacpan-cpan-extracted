@@ -764,6 +764,32 @@ _sample_walk(count, seed, pieces)
 # ---- version 5: choosing a move ------------------------------------------------
 
 int
+_protected(u, rules, house)
+        UV u
+        SV *rules
+        int house
+    PREINIT:
+        struct sen_rules r;
+    CODE:
+        sen_rules_of_sv(aTHX_ rules, &r);
+        RETVAL = (SEN->protected_at)(BOARD(u), &r, house);
+    OUTPUT:
+        RETVAL
+
+int
+_in_blockade(u, rules, house)
+        UV u
+        SV *rules
+        int house
+    PREINIT:
+        struct sen_rules r;
+    CODE:
+        sen_rules_of_sv(aTHX_ rules, &r);
+        RETVAL = (SEN->in_blockade)(BOARD(u), &r, house);
+    OUTPUT:
+        RETVAL
+
+int
 _evaluate(u, rules, weights, side)
         UV u
         SV *rules

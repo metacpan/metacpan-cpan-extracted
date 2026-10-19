@@ -83,14 +83,16 @@ names(class, locale, what, ...)
         const char *me = "Time::Keeper::Locale->names";
         const tk_locale_data *d;
         int wi, ci, k, n = 0;
-        const char *list[TK_DP_COUNT > 12 ? TK_DP_COUNT : 12];
+        const char *list[3 * 237];
+        int cal = TK_CAL_GREGORY;
     PPCODE:
         PERL_UNUSED_VAR(class);
         d = tk_locale_get(aTHX_ tk_locale_id_from_sv(aTHX_ locale, me));
         if (items > 3) w = SvPV_nolen(ST(3));
         if (items > 4) ctx = SvPV_nolen(ST(4));
-        if (items > 5)
-            croak("%s: the arguments are the locale, what, a width and a context", me);
+        if (items > 5) cal = tk_cal_arg(aTHX_ ST(5), me);
+        if (items > 6)
+            croak("%s: the arguments are the locale, what, a width, a context and a calendar", me);
         wi = strEQ(w, "wide") ? TK_W_WIDE : strEQ(w, "abbreviated") ? TK_W_ABBR
            : strEQ(w, "narrow") ? TK_W_NARROW : strEQ(w, "short") ? TK_W_SHORT : -1;
         ci = strEQ(ctx, "format") ? TK_CTX_FORMAT : strEQ(ctx, "stand-alone") ? TK_CTX_STANDALONE : -1;
@@ -98,7 +100,26 @@ names(class, locale, what, ...)
             croak("%s: the width is 'wide', 'abbreviated' or 'narrow' ('short' too for days), not '%s'", me, w);
         if (ci < 0)
             croak("%s: the context is 'format' or 'stand-alone', not '%s'", me, ctx);
-        if (strEQ(what, "months"))
+        if (cal != TK_CAL_GREGORY && (strEQ(what, "months") || strEQ(what, "eras") || strEQ(what, "cyclic_years"))) {
+            /* the calendar's: months by CLDR's slot (13 where it has them, the leap-year name of a slot after them), its eras, the cycle's years */
+            const tk_cal_names *cn = tk_cal_names_get(aTHX_ d, cal);
+            const tk_calendar *c = &tk_calendars[cal];
+            if (strEQ(what, "months")) {
+                for (k = 0; k < (int)c->max_months; k++) {
+                    const char *s = cn->slot[TK_CN_MONTHS + (ci * 3 + wi) * 13 + k];
+                    list[n++] = s ? s : k < 12 ? d->s.months[ci][wi][k] : "";
+                }
+                if (cn->slot[TK_CN_MONTHS_LEAP + ci * 3 + wi])
+                    list[n++] = cn->slot[TK_CN_MONTHS_LEAP + ci * 3 + wi];
+            }
+            else if (strEQ(what, "eras"))
+                for (k = 0; k < (int)c->n_eras; k++) list[n++] = tk_cal_era_name(cn, c, (unsigned)k, wi);
+            else
+                for (k = 1; k <= 60; k++) list[n++] = tk_cal_cyclic_name(cn, k, wi);
+        }
+        else if (strEQ(what, "cyclic_years"))
+            croak("%s: cyclic_years are the Chinese and Dangi calendars'", me);
+        else if (strEQ(what, "months"))
             for (k = 0; k < 12; k++) list[n++] = d->s.months[ci][wi][k];
         else if (strEQ(what, "days"))
             for (k = 0; k < 7; k++) list[n++] = d->s.days[ci][wi][k];
@@ -109,7 +130,7 @@ names(class, locale, what, ...)
         else if (strEQ(what, "am_pm"))
             for (k = 0; k < 2; k++) list[n++] = d->s.periods[wi][k];
         else
-            croak("%s: what is 'months', 'days', 'quarters', 'eras' or 'am_pm', not '%s'", me, what);
+            croak("%s: what is 'months', 'days', 'quarters', 'eras', 'am_pm' or 'cyclic_years', not '%s'", me, what);
         EXTEND(SP, n);
         for (k = 0; k < n; k++) {
             SV *sv = newSVpv(list[k], 0);
@@ -119,7 +140,7 @@ names(class, locale, what, ...)
         }
 
 void
-formats(class, locale, kind)
+formats(class, locale, kind, ...)
         SV *class
         SV *locale
         const char *kind
@@ -127,39 +148,55 @@ formats(class, locale, kind)
         const char *me = "Time::Keeper::Locale->formats";
         const tk_locale_data *d;
         const char *const *f;
-        int k;
+        const tk_cal_names *cn = NULL;
+        int k, cal = TK_CAL_GREGORY;
     PPCODE:
         PERL_UNUSED_VAR(class);
         d = tk_locale_get(aTHX_ tk_locale_id_from_sv(aTHX_ locale, me));
+        if (items > 3) cal = tk_cal_arg(aTHX_ ST(3), me);
+        if (cal != TK_CAL_GREGORY) cn = tk_cal_names_get(aTHX_ d, cal);
         if (strEQ(kind, "date")) f = d->s.date_formats;
         else if (strEQ(kind, "time")) f = d->s.time_formats;
         else if (strEQ(kind, "datetime")) f = d->s.datetime_formats;
         else croak("%s: the kind is 'date', 'time' or 'datetime', not '%s'", me, kind);
         EXTEND(SP, TK_LEN_COUNT);
         for (k = 0; k < TK_LEN_COUNT; k++) {
-            SV *sv = newSVpv(f[k], 0);
-            if (!tk_is_ascii(f[k]))
+            const char *p = tk_pattern_body(cn && strNE(kind, "time") ? tk_cal_date_format(cn, d, k, strEQ(kind, "datetime")) : f[k]);
+            SV *sv = newSVpv(p, 0);
+            if (!tk_is_ascii(p))
                 SvUTF8_on(sv);
             mPUSHs(sv);
         }
 
 SV *
-available_formats(class, locale)
+available_formats(class, locale, ...)
         SV *class
         SV *locale
     PREINIT:
         const tk_locale_data *d;
         HV *hv;
         unsigned k;
+        int cal = TK_CAL_GREGORY;
     CODE:
         PERL_UNUSED_VAR(class);
         d = tk_locale_get(aTHX_ tk_locale_id_from_sv(aTHX_ locale, "Time::Keeper::Locale->available_formats"));
+        if (items > 2) cal = tk_cal_arg(aTHX_ ST(2), "Time::Keeper::Locale->available_formats");
         hv = newHV();
         for (k = 0; k < d->n_skeletons; k++) {
-            SV *sv = newSVpv(d->skeletons[k].value, 0);
-            if (!tk_is_ascii(d->skeletons[k].value))
+            SV *sv = newSVpv(tk_pattern_body(d->skeletons[k].value), 0);
+            if (!tk_is_ascii(tk_pattern_body(d->skeletons[k].value)))
                 SvUTF8_on(sv);
             (void)hv_store(hv, d->skeletons[k].key, (I32)strlen(d->skeletons[k].key), sv, 0);
+        }
+        if (cal != TK_CAL_GREGORY) {
+            /* the calendar's own, over the Gregorian's */
+            const tk_cal_names *cn = tk_cal_names_get(aTHX_ d, cal);
+            for (k = 0; k < cn->n_skeletons; k++) {
+                SV *sv = newSVpv(tk_pattern_body(cn->skeletons[k].value), 0);
+                if (!tk_is_ascii(tk_pattern_body(cn->skeletons[k].value)))
+                    SvUTF8_on(sv);
+                (void)hv_store(hv, cn->skeletons[k].key, (I32)strlen(cn->skeletons[k].key), sv, 0);
+            }
         }
         RETVAL = newRV_noinc((SV *)hv);
     OUTPUT:
@@ -255,7 +292,8 @@ relative_names(class, locale, field, ...)
         SV *locale
         const char *field
     PREINIT:
-        static const char *const fields[TK_RF_COUNT] = { "year", "quarter", "month", "week", "day", "hour", "minute", "second" };
+        static const char *const fields[TK_RF_COUNT] = { "year", "quarter", "month", "week", "day", "hour", "minute", "second",
+                                                         "mon", "tue", "wed", "thu", "fri", "sat", "sun" };
         static const char *const widths[TK_RW_COUNT] = { "long", "short", "narrow" };
         static const char *const cats[TK_PL_COUNT] = { "zero", "one", "two", "few", "many", "other" };
         const char *me = "Time::Keeper::Locale->relative_names";
@@ -270,7 +308,7 @@ relative_names(class, locale, field, ...)
         if (items > 3) w = SvPV_nolen(ST(3));
         for (fi = 0; fi < TK_RF_COUNT && strNE(field, fields[fi]); fi++) ;
         if (fi == TK_RF_COUNT)
-            croak("%s: the field is year, quarter, month, week, day, hour, minute or second, not '%s'", me, field);
+            croak("%s: the field is year, quarter, month, week, day, hour, minute, second, or a weekday mon to sun, not '%s'", me, field);
         for (wi = 0; wi < TK_RW_COUNT && strNE(w, widths[wi]); wi++) ;
         if (wi == TK_RW_COUNT)
             croak("%s: the width is 'long', 'short' or 'narrow', not '%s'", me, w);
@@ -412,6 +450,59 @@ interval_formats(class, locale, ...)
         RETVAL
 
 SV *
+day_periods(class, locale, ...)
+        SV *class
+        SV *locale
+    PREINIT:
+        static const char *const names[TK_DP_COUNT] = { "am", "pm", "midnight", "noon", "morning1", "morning2", "afternoon1",
+                                                        "afternoon2", "evening1", "evening2", "night1", "night2" };
+        const char *me = "Time::Keeper::Locale->day_periods";
+        const char *w = "wide";
+        const tk_locale_data *d;
+        int wi, k;
+        HV *hv;
+    CODE:
+        PERL_UNUSED_VAR(class);
+        d = tk_locale_get(aTHX_ tk_locale_id_from_sv(aTHX_ locale, me));
+        if (items > 2) w = SvPV_nolen(ST(2));
+        wi = strEQ(w, "wide") ? TK_W_WIDE : strEQ(w, "abbreviated") ? TK_W_ABBR : strEQ(w, "narrow") ? TK_W_NARROW : -1;
+        if (wi < 0)
+            croak("%s: the width is 'wide', 'abbreviated' or 'narrow', not '%s'", me, w);
+        hv = newHV();
+        for (k = 0; k < TK_DP_COUNT; k++)
+            if (d->s.periods[wi][k])
+                (void)hv_store(hv, names[k], (I32)strlen(names[k]), tk_newSVstr(aTHX_ d->s.periods[wi][k]), 0);
+        RETVAL = newRV_noinc((SV *)hv);
+    OUTPUT:
+        RETVAL
+
+void
+day_period_rules(class, locale)
+        SV *class
+        SV *locale
+    PREINIT:
+        static const char *const names[TK_DP_COUNT] = { "am", "pm", "midnight", "noon", "morning1", "morning2", "afternoon1",
+                                                        "afternoon2", "evening1", "evening2", "night1", "night2" };
+        const tk_locale_data *d;
+        unsigned i;
+    PPCODE:
+        PERL_UNUSED_VAR(class);
+        d = tk_locale_get(aTHX_ tk_locale_id_from_sv(aTHX_ locale, "Time::Keeper::Locale->day_period_rules"));
+        EXTEND(SP, (SSize_t)d->n_rules);
+        for (i = 0; i < d->n_rules; i++) {
+            const tk_period_rule *r = &d->rules[i];
+            HV *hv = newHV();
+            (void)hv_stores(hv, "period", newSVpv(names[r->period], 0));
+            if (r->from == r->before)
+                (void)hv_stores(hv, "at", newSViv(r->from));
+            else {
+                (void)hv_stores(hv, "from", newSViv(r->from));
+                (void)hv_stores(hv, "before", newSViv(r->before));
+            }
+            mPUSHs(newRV_noinc((SV *)hv));
+        }
+
+SV *
 interval_fallback(class, locale)
         SV *class
         SV *locale
@@ -423,3 +514,20 @@ interval_fallback(class, locale)
         RETVAL = tk_newSVstr(aTHX_ d->w.interval_fallback);
     OUTPUT:
         RETVAL
+
+void
+calendars(class, locale)
+        SV *class
+        SV *locale
+    PREINIT:
+        const char *ids, *p;
+    PPCODE:
+        PERL_UNUSED_VAR(class);
+        ids = tk_cal_preferred_ids(aTHX_ locale, "Time::Keeper::Locale->calendars");
+        for (p = ids; *p; ) {
+            const char *e = p;
+            while (*e && *e != ' ')
+                e++;
+            XPUSHs(sv_2mortal(newSVpvn(p, (STRLEN)(e - p))));
+            p = *e ? e + 1 : e;
+        }

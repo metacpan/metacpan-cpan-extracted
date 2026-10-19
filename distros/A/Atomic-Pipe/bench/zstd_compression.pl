@@ -123,6 +123,7 @@ sub run_scenario {
     if ($compressed) {
         push @pair_args, compression => 'zstd', keep_compressed => 1;
         push @pair_args, compression_level => $opts{level} if defined $opts{level};
+        push @pair_args, compress_large_only => 1 if $opts{large_only};
     }
 
     my ($r, $w) = Atomic::Pipe->pair(@pair_args);
@@ -203,6 +204,7 @@ my @MODES = (
     { name => 'L-3',   compression => 1, level => -3 },
     { name => 'L1',    compression => 1, level => 1 },
     { name => 'L3',    compression => 1, level => 3 },
+    { name => 'large', compression => 1, large_only => 1 },
 );
 
 my @results;
@@ -212,6 +214,7 @@ for my $psize (@PIPE_SIZES) {
         my $r = run_scenario(
             compression => $mode->{compression},
             (defined $mode->{level} ? (level => $mode->{level}) : ()),
+            large_only => $mode->{large_only},
             pipe_size => $psize,
         );
         $r->{mode} = $mode->{name};

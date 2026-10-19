@@ -5,7 +5,7 @@ use warnings;
 
 use Carp ();
 
-our $VERSION = '3.7.0';
+our $VERSION = '3.8.0';
 
 our @FLAGS = qw(
     is_vpn is_hosting is_relay is_tor is_cdn is_resproxy is_dcproxy is_mobproxy
@@ -125,8 +125,10 @@ listens on the address or sends its traffic out from it.
 
 The detail objects, as plain hash references, or C<undef> when your plan omits
 them. C<pubproxy> carries C<entry>, C<exit>, C<protocols> (an array
-reference), C<last_seen> and C<last_usable>, the last an empty string when no
-request through a proxy on the address was answered.
+reference), C<num_ports>, C<num_proxies>, C<last_seen> and C<last_usable>.
+C<num_ports> is 0 when the address is only an exit and C<num_proxies> 0 when it
+is only an entry; C<last_usable> is an empty string when no request through a
+proxy on the address was answered.
 
 =head2 has($field)
 

@@ -13,6 +13,8 @@ t/07-group-api.t
 t/08-include-and-pipeline.t
 t/09-inheritance-and-embed.t
 t/10-corner-cases.t
+t/11-coverage-expansion.t
+t/12-parser-and-prefix-lifecycle.t
 lib/Text/Fab.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

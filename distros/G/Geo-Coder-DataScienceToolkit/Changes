@@ -1,5 +1,36 @@
 Revision history for Geo-Coder-DataScienceToolkit
 
+0.04	Sat Oct 17 09:10:00 PM EDT 2026
+	geocode(): the location rule is Geo::Location::Predicate's, which is a
+		distribution of its own now, so this module declares it as a recommendation in
+		META instead of requiring Geo::Coder::Free, and nothing here decides the rule
+		again.  It is looked for when it is first needed rather than when this module
+		loads, so importing this module reads no file it may not need.  Without it a
+		reference is still refused and a string of digits is looked up as it was
+		before the rule existed; with it the rule decides everything, and it is called
+		by name rather than imported, which is what lets t/reference.t swap it for a
+		spy and prove that it is the rule being consulted.
+	[ CI ]
+	.github/workflows/location-predicates.yml runs the location-predicate fuzz
+		here, on a schedule and on a push, with --sibling
+		Geo-Coder-DataScienceToolkit: this distribution is graded against
+		Geo::Location::Predicate and the other five are not, so a drift here fails
+		in the repository that would have to fix it rather than only in
+		Geo-Coder-Free's daily run.
+	new(ua => $ua) works, which is the calling form the POD documents.  It used
+		to die with "Not a HASH reference": Object::Configure::configure() takes
+		a hashref of the caller's values and was handed the argument list
+		instead, so every call that passed a value failed.  A hashref of values
+		is accepted as well, and an odd number of arguments is refused rather
+		than silently dropped.
+	t/10-new.t covers the constructor's calling conventions: no arguments, a
+		caller's own agent, the same arguments in a hashref, that a key with no
+		value is refused rather than read as an argument of its own, that the
+		agent handed in is the agent the object then uses - the lookup is shown
+		going through it, with a stub agent that answers instead of asking - and
+		the ua() accessor's documented getter and setter.  The POD documents the
+		hashref form and the refusal.
+
 0.03	Sat Oct 17 07:58:42 PM EDT 2026
 	geocode(): croak when input is just a set of numbers
 	Use JSON::MaybeXS instead of JSON
@@ -9,7 +40,7 @@ Revision history for Geo-Coder-DataScienceToolkit
 	Handle broken smokers
 	geocode(): refuse a reference; it used to be accepted because the string it
 		turns into contains a non-digit
-	Check a reference against Geo::Coder::Free::Validate's rule when that module
+	Check a reference against Geo::Location::Predicate's rule when that module
 		is installed, so that the check cannot drift away from Geo::Coder::Free
 	Added t/reference.t, the same test as the other Geo::Coder distributions
 

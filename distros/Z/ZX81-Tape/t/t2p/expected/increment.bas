@@ -1,0 +1,6 @@
+   10  PRINT 10
+   20  PRINT 20
+   21  PRINT 21
+   22  PRINT 22
+   27  PRINT 27
+   32  PRINT 32

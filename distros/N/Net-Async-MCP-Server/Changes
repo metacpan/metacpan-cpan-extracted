@@ -1,5 +1,179 @@
 Revision history for Net-Async-MCP-Server
 
+0.003     2026-10-19 02:13:42Z
+
+  - Requires JSON::MaybeXS 1.004 now. The results are built with
+    JSON::MaybeXS::true and ::false, which only exist since 1.004000; with an
+    older one the server installed and then died at its first tool call
+    instead of refusing to install (k46)
+
+0.002     2026-10-18 23:30:05Z
+
+  - StreamableHTTP: an Mcp-Param-* header whose body argument is null or
+    missing no longer emits an 'uninitialized value' warning; the request
+    is still answered 400 / -32020.
+
+  - legacy_compat tools/call: params.arguments that is defined but not an
+    object now returns -32602 'Invalid params: arguments must be an object'
+    with the request id instead of being passed to the tool; missing
+    arguments still default to {}.
+
+  - tools/call: a tool result carrying its own resultType (e.g. MRTR
+    input_required) now has isError normalized to a JSON boolean, like the
+    rich-content branch; the tool's own hash is no longer mutated.
+
+  - register_tool/register_resource/register_prompt croak when the key
+    (tool/prompt name, resource uri) is already registered, instead of
+    appending a second entry that tools/list advertised but nothing could
+    call.
+
+  - Stdio transport: responses go through an IO::Async::Stream when
+    write_handle has an OS file descriptor, so a full stdout pipe no longer
+    blocks the event loop; the stream is flushed at stdin EOF before
+    handle_requests returns. In-memory handles keep the blocking print. The
+    stream puts the handle into O_NONBLOCK (documented).
+
+  - Documentation: handle() POD lists all seven dispatched methods;
+    register_tool/list_tools document title, annotations and outputSchema;
+    StreamableHTTP and Stdio comments corrected; README documents
+    x-mcp-header enforcement.
+
+  - prompts/get checks required arguments: a registered argument with a true
+    "required" that is not defined in params.arguments returns -32602
+    "Invalid params: missing required argument 'x'" before the prompt code
+    runs.
+
+  - tools/call: a tool result carrying structuredContent but no content
+    array now gets a text content block with the JSON-serialized
+    structuredContent (CallToolResult requires content; the spec asks for
+    the backwards-compatible text block).
+
+  - StreamableHTTP enforces x-mcp-header from the registered inputSchema: an
+    annotated argument with a non-null value but no Mcp-Param-{Name} header
+    is rejected with 400/-32020. Only chains of "properties" keys are
+    walked (nested allowed); items/oneOf/anyOf/allOf/not/if/$ref are ignored.
+    The value comparison uses the declared type, so a string-typed param
+    compares as a string ("42" no longer matches "42.0"). New public
+    Net::Async::MCP::Server->find_tool($name).
+
+  - legacy_compat tools/call with non-object params returns -32602 Invalid
+    params instead of dying out of handle(); a context without a transport
+    key no longer warns.
+  - tools/call: isError is now a JSON boolean on the 2026-07-28 wire (was
+    1/0 as a number). The tool-error branch emits true; a rich-content result's
+    own isError is normalised to true/false.
+  - Breaking protocol migration to MCP 2026-07-28 (stateless, _meta-based)
+    remains the default. initialize, notifications/initialized and ping return
+    -32601 Method not found unless legacy_compat is enabled.
+  - Add opt-in legacy_compat for Stdio-only MCP 2025-11-25 clients. Its
+    initialize/ping/tools/list/tools/call responses use legacy result shapes;
+    2026 requests keep their stateless resultType and _meta wire format.
+  - Every request must carry _meta.io.modelcontextprotocol/protocolVersion
+    and _meta.io.modelcontextprotocol/clientCapabilities; missing fields
+    return -32602, an unsupported version returns -32022 with the server's
+    supported list in data.supported.
+  - Every successful result carries resultType and an
+    _meta.io.modelcontextprotocol/serverInfo entry (injected by
+    _jsonrpc_response, not by callers).
+  - Add server/discover RPC — the new pre-flight RPC; clients can probe with
+    it to learn the server's supported versions, capabilities and identity
+    without any prior handshake.
+  - tools/list returns the new wire shape: resultType "complete", tools
+    using inputSchema (camelCase), and ttlMs / cacheScope caching hints.
+  - tools/call wraps a tool's plain return value in a text content block;
+    tool execution errors become isError: true results (the model can
+    self-correct) while protocol-level errors (unknown tool) return a
+    JSON-RPC -32602. A tool whose code returns a Future is awaited before
+    the wrapping.
+  - MRTR-ready call_tool: a tool that returns a hashref with
+    resultType "input_required" and inputRequests / requestState is passed
+    through unchanged, so multi round-trip requests work without further
+    changes when a tool needs them.
+  - tools/call: a tool may return a hashref carrying its own content arrayref
+    and/or structuredContent (without a resultType) and have it passed through
+    verbatim, so tools can emit image / audio / resource-link blocks and
+    structured output instead of only a single text block.
+  - tools/list now carries a registered tool's annotations and outputSchema
+    through to the wire when register_tool was given them; both were silently
+    dropped before.
+  - Resources: register_resource / resources / list_resources / read_resource,
+    with resources/list and resources/read dispatch. read_resource wraps a
+    bare return in a { contents => [ { uri, mimeType?, text } ] } block, or
+    passes through a hashref already carrying a contents arrayref; an unknown
+    uri returns -32602. A code ref returning a Future is awaited before the
+    wrapping; a dying code ref or a registered-but-codeless resource returns
+    -32603 Internal error. Advertised in discover capabilities only when at
+    least one resource is registered; capabilities are rebuilt per discover,
+    so resources registered after the first discover are advertised too.
+  - Prompts: register_prompt / prompts / list_prompts / get_prompt, with
+    prompts/list and prompts/get dispatch. get_prompt wraps a bare return in a
+    single user text message, or passes through a hashref already carrying a
+    messages arrayref; an unknown name returns -32602. A code ref returning a
+    Future is awaited before the wrapping; a dying code ref or a
+    registered-but-codeless prompt returns -32603 Internal error. Advertised
+    only when at least one prompt is registered; capabilities are rebuilt per
+    discover, so prompts registered after the first discover are advertised
+    too.
+  - Server::configure now calls SUPER::configure, so unknown parameters
+    surface through IO::Async::Notifier instead of being silently dropped.
+  - register_tool now requires an inputSchema; the legacy input_schema key
+    is accepted and normalised at registration time.
+  - Drop the unused $context parameter from handle($request) and
+    call_tool($name, $arguments). Under the stateless 2026-07-28 protocol
+    per-request state arrives in the request's _meta block, which handle()
+    validates itself; no caller ever passed a third argument.
+  - New error codes -32020 (HeaderMismatch) and -32022
+    (UnsupportedProtocolVersion) are wired into _jsonrpc_error
+    (HeaderMismatch is raised by the Streamable HTTP transport, -32022 by
+    handle()).
+  - Stdio transport: handle_requests no longer reads through <STDIN>. It
+    reads via an IO::Async::Stream registered as a child of the transport and
+    waits on an EOF Future, so the caller still blocks until EOF while every
+    other notifier in the same loop keeps running. If the transport is not in
+    a loop yet, one is created and the transport added to it.
+  - Stdio transport: new read_handle / write_handle parameters and accessors,
+    defaulting to \*STDIN / \*STDOUT, so the transport can be driven from a
+    pipe. Line handling is unchanged — empty lines skipped, invalid JSON
+    answered with -32700, notifications write nothing, a final line without a
+    trailing newline is still dispatched, EOF is the graceful-shutdown signal
+    and the read handle is left open.
+  - Stdio transport: handle_requests switches autoflush on for the write
+    handle, once on entry. Without it a finished response could sit in Perl's
+    block buffer while the client waited for it and the transport waited for
+    the next request — a deadlock that only broke once 4-8K had piled up or
+    the process exited. The write itself is still a blocking print.
+  - Streamable HTTP transport for MCP 2026-07-28: new
+    Net::Async::MCP::Server::Transport::StreamableHTTP module exposes a
+    single HTTP POST endpoint (default /mcp), validates the spec's
+    request-metadata headers (MCP-Protocol-Version, Mcp-Method, Mcp-Name,
+    Mcp-Param-{Name}) against the JSON-RPC body, and answers each request
+    as application/json or text/event-stream. Notifications return 202
+    Accepted; header/body divergences return JSON-RPC -32020 HeaderMismatch.
+    New runtime dep on Plack; new test file t/03-streamable-http.t.
+  - Streamable HTTP transport: Mcp-Param-{Name} parity compares a body value
+    by its JSON type instead of a raw string eq. A boolean is matched against
+    'true'/'false' and a number numerically (so a '42.0' header agrees with an
+    integer 42), fixing spurious -32020 HeaderMismatch rejections against the
+    Net::Async::MCP client's spec-conformant header encoding.
+  - Streamable HTTP transport: a spec-mandated JSON-RPC error now carries the
+    HTTP status the spec requires instead of a blanket 200 -- -32601 answers
+    404 Not Found and the -32020/-32021/-32022 protocol-parity codes answer
+    400 Bad Request. A request missing io.modelcontextprotocol/clientCapabilities
+    in its body _meta is rejected up front with 400 -32602 (a required field,
+    checked in the transport so the shared handle() and Stdio are unchanged).
+    Every other error handle() returns for a request that reached a real
+    method -- an unknown tool/resource/prompt (-32602), an internal failure
+    (-32603) -- still answers 200 with the JSON-RPC error in the body.
+  - subscriptions/listen is not implemented in this release: it returns -32601
+    in both transports, so Stdio and Streamable HTTP agree. Real server->client
+    push delivery (subscription change notifications, logging, progress) is a
+    future ticket.
+  - Document the Streamable HTTP origin_allow default: an empty list means
+    "allow any Origin", which does not by itself satisfy the spec's
+    DNS-rebinding guard — set origin_allow to your known web origins for any
+    browser-reachable deployment. Behaviour is unchanged; this is a
+    documentation and SYNOPSIS clarification only.
+
 0.001     2026-04-26 03:50:13Z
 
   - Initial release

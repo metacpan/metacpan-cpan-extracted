@@ -11,6 +11,14 @@ use Scalar::Util qw( weaken );
 
 my $server_script = dirname(__FILE__) . '/bin/test_mcp_server.pl';
 
+# The stdio transport needs no part of MCP, but the server it speaks to here is
+# a real MCP::Server in a subprocess, and MCP is a recommendation of this
+# distribution rather than a requirement. Without it that subprocess dies at
+# compile time, and every request below then waits on an answer that is never
+# coming - so the absence has to be found here rather than on the first one.
+skip_all 'MCP is required for the stdio transport tests'
+  unless eval { require MCP::Server; 1 };
+
 # Create MCP client with Stdio transport
 my $loop = IO::Async::Loop->new;
 my $mcp = Net::Async::MCP->new(

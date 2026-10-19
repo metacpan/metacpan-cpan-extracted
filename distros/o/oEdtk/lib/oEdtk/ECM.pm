@@ -29,7 +29,7 @@ use Time::Piece;
 use oEdtk::Config qw(config_read);
 use oEdtk::Net    qw(make_ua);
 
-our $VERSION = 2.1111;
+our $VERSION = 2.1126;
 
 # The wire contract, unchanged from the fork.
 use constant USER_AGENT      => 'oEUser';
@@ -146,6 +146,26 @@ takes an optional trailing configuration hashref -- the fork's two-argument form
 still works, defaulting to L<oEdtk::Config/config_read>.
 
 The fork's own name L<oEUser::ECM> remains available as a delegate to this module.
+
+=head1 FUNCTIONS
+
+=head2 send_document
+
+    my $response = send_document($file_url, \%metadatas, $cfg);
+
+Upload C<$file_url> with its index metadata as a JSON form part, and return the
+decoded JSON of the C<201> response.
+
+=head2 http_put_envoidate_for_iddoc
+
+    my $response = http_put_envoidate_for_iddoc($docid, $date, $cfg);
+
+Stamp the C<MAILED> state and the mailed date on document C<$docid>, and return
+the decoded JSON of the C<200> response.
+
+Both calls take an optional trailing configuration hash reference, defaulting to
+L<oEdtk::Config/config_read>. The internal helpers C<_config>, C<_url>,
+C<_headers> and C<_get_file_content> are not part of the public API.
 
 =head1 AUTHOR
 

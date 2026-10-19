@@ -20,6 +20,7 @@ use File::Path qw(mkpath);
 use File::Spec;
 use File::Temp qw(tempdir);
 use Test::More;
+use Fcntl qw(:flock);
 
 my $dir = tempdir( CLEANUP => 1 );
 my $dbdir = File::Spec->catdir( $dir, 'db' );
@@ -46,6 +47,7 @@ my $have_mldbm = eval { require 'MLDBM.pm'; 1 };
     eval { $dbh->do("CREATE TABLE t_reject (id INT, v CHAR(8))"); 1 };
     ok( !$::DBM_PLANT_LOADED,
         "a path-shaped dbm_type does not load the file it names" );
+    eval { $dbh->do( "DROP TABLE t_reject" ); 1 };
     $dbh->disconnect;
 }
 
@@ -62,6 +64,7 @@ my $have_mldbm = eval { require 'MLDBM.pm'; 1 };
     eval { $dbh->do("CREATE TABLE t_reject_pm (id INT, v CHAR(8))"); 1 };
     ok( !$::DBM_PLANT_LOADED,
         "a dbm_type naming a .pm file directly does not load it" );
+    eval { $dbh->do( "DROP TABLE t_reject_pm" ); 1 };
     $dbh->disconnect;
 }
 
@@ -69,10 +72,11 @@ my $have_mldbm = eval { require 'MLDBM.pm'; 1 };
 {
     my $dbh = DBI->connect( "dbi:DBM:f_dir=$dbdir;dbm_type=SDBM_File", undef, undef,
                             { RaiseError => 1, PrintError => 0 } );
-    $dbh->do("CREATE TABLE t_ok (id INT, v CHAR(8))");
-    $dbh->do("INSERT INTO t_ok VALUES (1, 'hello')");
+    ok( $dbh->do("CREATE TABLE t_ok (id INT, v CHAR(8))"), "CREATE" );
+    ok( $dbh->do("INSERT INTO t_ok VALUES (1, 'hello')"), "INSERT" );
     my ($v) = $dbh->selectrow_array("SELECT v FROM t_ok WHERE id = 1");
     is( $v, 'hello', "dbm_type=SDBM_File still round-trips a row" );
+    ok( $dbh->do("DROP TABLE t_ok"), "DROP" );
     $dbh->disconnect;
 }
 
@@ -101,6 +105,21 @@ SKIP: {
     };
     ok( !$::DBM_PLANT_LOADED,
         "a dbm_mldbm that traverses out of MLDBM::Serializer:: does not load the file it names" );
+
+    # The rejection must happen before the table's lock file is created and
+    # flock()ed.  Otherwise the lock outlives the failed CREATE and every
+    # later open of the table in this process blocks on it: the DROP below
+    # hung under DBI_AUTOPROXY=dbi:Gofer:transport=null, where the dbh that
+    # serves the DROP is not the one holding the stale lock.
+    my $lck  = File::Spec->catfile( $dbdir, "t_ser.lck" );
+    my $free = 1;
+    if ( -f $lck and open( my $lfh, "<", $lck ) )
+    {
+        $free = flock( $lfh, LOCK_EX | LOCK_NB ) ? 1 : 0;
+        close($lfh);
+    }
+    ok( $free, "a rejected dbm_mldbm does not leave the table's lock file locked" );
+    eval { $dbh->do( "DROP TABLE t_ser" ); 1 };
     $dbh->disconnect;
 }
 

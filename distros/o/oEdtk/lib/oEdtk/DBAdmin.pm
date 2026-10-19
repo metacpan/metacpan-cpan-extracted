@@ -6,9 +6,10 @@ use oEdtk::logger qw(logger $LOGGERLEVEL $WARN2LOGGER);
 use POSIX         qw(strftime);
 use Scalar::Util  qw(looks_like_number);
 use Digest::MD5   ();
+use Time::HiRes   qw(time);
 use strict;
 use Text::CSV;
-use Encode qw(encode find_encoding);
+use Encode qw(encode decode find_encoding);
 use warnings;
 use Data::Dumper qw(Dumper);
 
@@ -16,7 +17,7 @@ use Data::Dumper qw(Dumper);
 # SHOW CREATE DATABASE oEdtk;
 
 use Exporter;
-our $VERSION     = 2.1120;
+our $VERSION     = 2.1126;
 our $VERSION_TXT = $VERSION =~ s/\./_/gr;
 our @ISA         = qw(Exporter);
 our @EXPORT_OK   = qw(
@@ -34,6 +35,7 @@ our @EXPORT_OK   = qw(
 	schema_Historize
 	schema_Revert
 	schema_Additive
+	schema_AdditivePlan
 	schema_StaleWarning
 	create_lot_sequence
 	create_table_TRACKING
@@ -75,14 +77,37 @@ our @EXPORT_OK   = qw(
 
 my $_LOCAL_EDTK_WAITRUN = 0;
 my $CONNECT_COUNT       = 0;
+
+# Re-entrancy guards (package variables so `local` can scope them per call).
+our $IN_ACHECK    = 0;    # acheck_db_admin_on_connect
+our $IN_RECONCILE = 0;    # db_reconcile_backup
 our %_csv_import_type_cache;
 my $_DB_ENGINE_CACHE;
+my $_PG_STG_SEQ = 0;      # ELT staging-table sequence (D60)
 
 # PostgreSQL bulk-load tuning (used by _load_csv_pg_copy / _pg_load_tx).
 use constant PG_COPY_SYNC_OFF =>
 	'SET LOCAL synchronous_commit = off';    # relax fsync for this transaction only
 use constant PG_COPY_ANALYZE    => 'ANALYZE %s';    # refresh planner stats after a bulk load
 use constant PG_COPY_BLOCK_SIZE => 1 << 20;         # bytes fed per pg_putcopydata call
+
+# Index-deferral policy (H4 / O4): dropping and rebuilding the secondary indexes
+# and unique / foreign-key constraints takes an exclusive lock for the whole COPY,
+# so it is opt-in and gated on the incoming volume (see _pg_should_defer).
+use constant PG_COPY_LOCK_TIMEOUT      => '5s';      # cap the lock wait for the deferral
+use constant PG_DEFER_DEFAULT_RATIO    => 0.1;       # defer if incoming >= 10% of the table
+use constant PG_DEFER_DEFAULT_MIN_ROWS => 10_000;    # ... and at least this many rows
+use constant PG_DEFER_SAMPLE_BYTES     => 65_536;    # header sample used to size the import
+use constant PG_ANALYZE_TABLE_SHARE    => 0.1;       # ANALYZE only if rows added >= 10% (O5)
+
+# ELT staging path (D60): above EDTK_DB_BURST_MO megabytes a PostgreSQL insert
+# loads into an unconstrained TEMP staging table with one raw COPY and moves the
+# rows with a single INSERT ... SELECT, skipping the per-row Perl parse. The
+# default threshold is 50 MiB; see _pg_burst_decision.
+use constant PG_BURST_MO_DEFAULT   => 50;             # default threshold, in MiB; 0 disables ELT
+use constant PG_BURST_BYTES_PER_MO => 1_048_576;      # bytes per MiB
+use constant PG_STG_PREFIX         => 'edtk_stg_';    # staging table name prefix
+use constant PG_BURST_MAINT_MEM    => '256MB';        # maintenance_work_mem during an index rebuild
 
 # Positions in the acknowledgement (ACQUIT) file, the fork's format (D-S53).
 # _acquit_table_INDEX and _acquit_API read these fields; together they locate the
@@ -119,7 +144,7 @@ sub copy_table {
 	}
 
 	# preparing the data copy from source to target
-	&logger( 4, "Data from $table_source will be copyed into $table_cible" );
+	&logger( 5, "Data from $table_source will be copyed into $table_cible" );
 
 	if ( $create_option =~ /-create/i ) {
 		my $sql_create = "CREATE TABLE " . $table_cible . " AS SELECT * FROM " . $table_source;
@@ -145,68 +170,8 @@ sub copy_table {
 		);
 	}
 
-	&logger( 4, "Insert DONE into $table_cible" );
+	&logger( 6, "Insert DONE into $table_cible" );
 	1;
-}
-
-sub _load_csv_mysql_infile {
-	my ( $dbh, $tablename, $fi, $params ) = @_;
-
-	# read the header line: it holds the field names and the insert order
-	open( my $fh, '<', $fi ) or die "ERROR: Cannot open file \"$fi\": $!\n";
-	my $fields = <$fh>;
-	chomp($fields);
-	$fields =~ s/\"+//g;
-	close($fh);
-
-	# https://www.perlmonks.org/?node_id=1058110  => insert data inline
-
-	# https://docstore.mik.ua/orelly/linux/dbi/ch04_05.htm
-	# https://metacpan.org/pod/DBI
-
-# https://metacpan.org/pod/DBD::mysql
-# http://samisd2003.free.fr/WinLAMP/MYSQL/load-data.html
-# https://tecfa.unige.ch/guides/mysql/man/manuel_LOAD_DATA.html
-# https://dev.mysql.com/doc/refman/8.0/en/load-data.html
-# https://stackoverflow.com/questions/59993844/error-loading-local-data-is-disabled-this-must-be-enabled-on-both-the-client
-# https://dzone.com/articles/mysql-57-utf8mb4-and-the-load-data-infile
-# => mysql> set global local_infile=true; + in the DSN config ";mysql_local_infile=true"
-# -1 - 1062-Duplicate entry
-
-	my $sep       = $params->{'sep_char'};
-	my $local_opt = $params->{'local_opt'} || "";
-	if ( $local_opt !~ m/local/i ) {
-		$local_opt = "";
-	}
-	else {
-		$local_opt = "LOCAL";
-	}
-
-	$local_opt = $params->{'local_opt'} || "";
-	my $sql =
-		  "LOAD DATA $local_opt INFILE ? INTO TABLE $tablename CHARACTER SET latin1 "
-		. " FIELDS TERMINATED BY '"
-		. $sep
-		. "' ENCLOSED BY '"
-		. $params->{'quote_char'} . "' "
-		. " LINES TERMINATED BY '" . '\n' . "'"
-		. " IGNORE 1 LINES "
-		. "($fields)";
-
-	##  OPTIONALLY ENCLOSED BY '"'
-	##  REPLACE
-
-	&logger( 7, "_load_csv_mysql_local_infile trying : $sql" );
-
-	my $count = _db_do_log( $dbh, $sql, "SQL execute failed", bind => [$fi] );
-
-	if ( $count !~ m/^\d+$/ ) {    # or $count = "0E0") {
-		return ( -1, &logger( 3, "$count-ERROR LOAD INFILE-$@ $!" . $dbh::errstr ) );
-	}
-
-	my $rows = _count_csv_rows( $fi, $params );
-	&logger( 4, "bulk insert into $tablename via LOAD DATA INFILE: $rows rows" );
-	return ( $count, " lines inserted" );
 }
 
 sub _load_csv_mysql_local_infile {
@@ -218,6 +183,21 @@ sub _load_csv_mysql_local_infile {
 	chomp($fields);
 	$fields =~ s/\"+//g;
 	close($fh);
+
+	# H9 : validate the header columns before building the LOAD statement.
+	my ( $norm_id, $norm_table, @cols ) =
+		_norm_identifiers( $dbh, $tablename, [ split( /,/, $fields ) ] );
+	my $col_meta = _get_col_meta( $dbh, $norm_table, $norm_id );
+	my $unknown  = keys %$col_meta ? _unknown_csv_columns( \@cols, $col_meta ) : [];
+	if (@$unknown) {
+		return (
+			-1,
+			&logger(
+				3,
+				"LOAD DATA: unknown column(s) " . join( ', ', @$unknown ) . " for table $tablename"
+			)
+		);
+	}
 
 	my $sep = $params->{'sep_char'};
 	my $sql =
@@ -238,10 +218,8 @@ sub _load_csv_mysql_local_infile {
 
 	my $count = _db_do_log( $dbh, $sql, "SQL execute failed", bind => [$fi] );
 
-	if ( $count !~ m/^\d+$/ ) {    # or $count = "0E0") {
-
-		#		&logger (3, "$count-ERROR LOAD INFILE-$@ $!".$dbh::errstr);
-		return ( -1, &logger( 3, "$count-ERROR LOAD INFILE-$@ $!" . ( $dbh::errstr || "" ) ) );
+	if ( !defined $count || ( $count !~ m/^\d+$/ && $count ne '0E0' ) ) {
+		return ( -1, &logger( 3, "$count-ERROR LOAD INFILE-$@ $!" . ( $dbh->errstr // '' ) ) );
 	}
 
 	# Refresh the planner statistics after the bulk load (parity with the PG COPY path).
@@ -249,7 +227,7 @@ sub _load_csv_mysql_local_infile {
 		or &logger( 7, "_load_csv_mysql_local_infile: analyze table $tablename failed: $@" );
 
 	my $rows = _count_csv_rows( $fi, $params );
-	&logger( 4, "bulk insert into $tablename via LOAD DATA LOCAL INFILE: $rows rows" );
+	&logger( 5, "bulk insert into $tablename via LOAD DATA LOCAL INFILE: $rows rows" );
 	return ( $count, " lines inserted" );
 }
 
@@ -318,7 +296,7 @@ sub _pg_csv_row {
 # concatenative, so encoding whole blocks is equivalent to encoding each row.
 # ============================================================
 sub _pg_csv_supplier {
-	my ( $fi, $params, $cols, $blank_to_null, $col_size, $count_ref, $enc ) = @_;
+	my ( $fi, $params, $cols, $blank_to_null, $col_size, $count_ref, $enc, $src_enc ) = @_;
 	my $sep = $params->{'sep_char'};
 	my $quo = $params->{'quote_char'};
 
@@ -365,7 +343,22 @@ sub _pg_csv_supplier {
 		if ($eof) { $closed = 1; close($fh); }
 		return unless @rows;
 		my $chunk = join( "\n", @rows ) . "\n";
-		$chunk = encode( $enc, $chunk ) if defined $enc;
+
+		if ( defined $src_enc ) {
+
+			# The bytes on disk are declared to be in $src_enc. Text::CSV may
+			# have upgraded a valid-UTF-8 field to a character string; re-encode
+			# it to recover the true file bytes before decoding them.
+			utf8::encode($chunk)                                if Encode::is_utf8($chunk);
+			$chunk = encode( $enc, decode( $src_enc, $chunk ) ) if defined $enc;
+		}
+		else {
+
+			# No explicit source encoding: keep the historical behaviour, where
+			# Text::CSV's own detection (a valid-UTF-8 field is upgraded) plus
+			# the Latin-1 reading of raw bytes round-trips both file flavours.
+			$chunk = encode( $enc, $chunk ) if defined $enc;
+		}
 		return $chunk;
 	};
 }
@@ -395,6 +388,38 @@ sub _pg_encoding_name {
 	return "CP$1"   if $n =~ /^WIN(\d+)$/;
 	return $n       if $n ne '' && defined find_encoding($n);
 	return 'UTF-8';
+}
+
+# True when $pg names an encoding we recognize: a PostgreSQL alias
+# (UTF8, UNICODE, LATIN1..LATIN10), a WIN<n> code page, or any name Encode
+# knows. Used to reject a typo in EDTK_DB_COPY_ENCODING instead of silently
+# reading it as UTF-8.
+sub _pg_encoding_known {
+	my ($pg) = @_;
+	my $n = uc( $pg // '' );
+	$n =~ s/[^A-Z0-9]//g;
+	return 0 if $n eq '';
+	return 1 if $n =~ /^(?:UTF8|UNICODE|LATIN(?:10|[1-9]))$/;
+	return 1 if $n =~ /^WIN\d+$/;
+	return 1 if defined find_encoding($n);
+	return 1 if defined find_encoding( $pg // '' );
+	return 0;
+}
+
+# Resolve the source encoding of the bytes fed to COPY (H8). The caller's
+# pg_copy_encoding wins, then EDTK_DB_COPY_ENCODING, then LATIN1 (the
+# historical assumption). EDTK_OUT_ENCODING is deliberately not consulted:
+# it governs output files, not the COPY input, and honouring it here would
+# silently re-read Latin-1 acquittal files as UTF-8. Returns
+# ( $encode_name, $error ); $error is set (and $encode_name undef) on a
+# name we do not recognize.
+sub _pg_source_encoding {
+	my ( $params, $cfg ) = @_;
+	my $raw = $params->{'pg_copy_encoding'};
+	$raw = $cfg->{'EDTK_DB_COPY_ENCODING'} unless defined $raw && $raw ne '';
+	$raw = 'LATIN1'                        unless defined $raw && $raw ne '';
+	return ( undef, "unknown copy encoding '$raw'" ) unless _pg_encoding_known($raw);
+	return ( ( defined find_encoding($raw) ? $raw : _pg_encoding_name($raw) ), undef );
 }
 
 # ============================================================
@@ -518,20 +543,97 @@ sub _pg_deferrable_ddl {
 }
 
 # ============================================================
+# PRIVATE : estimate the number of data rows a file will insert, from its byte
+# size and a bounded header sample (the mean record size), without parsing the
+# whole file. Returns 0 when the file cannot be sampled.
+# ============================================================
+sub _pg_estimate_rows {
+	my ($fi) = @_;
+	my $size = -s $fi;
+	return 0 unless defined $size && $size > 0;
+	open( my $fh, '<', $fi ) or return 0;
+	binmode($fh);
+	my $got = read( $fh, my $buf, PG_DEFER_SAMPLE_BYTES );
+	close($fh);
+	return 0 unless $got;
+	my $cut = rindex( $buf, "\n" );    # ignore the truncated last line
+	return 0 if $cut < 0;
+	my $sample = substr( $buf, 0, $cut + 1 );
+	my $lines  = () = $sample =~ /\n/g;
+	return 0 unless $lines;
+	my $mean = length($sample) / $lines;
+	return 0 unless $mean > 0;
+	return int( $size / $mean );
+}
+
+# ============================================================
+# PRIVATE : live row estimate of a table from the planner's pg_class.reltuples.
+# 0 when unknown (empty or never analyzed), which makes any non-trivial import
+# count as "large relative to the table".
+# ============================================================
+sub _pg_table_rows {
+	my ( $dbh, $table ) = @_;
+	my ($n) = eval {
+		$dbh->selectrow_array(
+			'SELECT GREATEST(reltuples, 0) FROM pg_class WHERE oid = to_regclass(?)',
+			undef, $table );
+	};
+	return 0 unless defined $n;
+	return $n < 0 ? 0 : int($n);
+}
+
+# ============================================================
+# PRIVATE : H4 / O4 -- is deferring the indexes worth it? The deferral is
+# OPT-IN: it only happens when a threshold is declared (the caller params
+# pg_defer_index_ratio / pg_defer_index_min_rows, or the ini keys
+# EDTK_DB_DEFER_INDEX_RATIO / EDTK_DB_DEFER_INDEX_MIN_ROWS). With none declared
+# it never defers. The measured benefit is in NOT deferring -- a small file on a
+# large table loads ~35x faster and takes no exclusive lock -- so the deferral,
+# which locks the whole table for the COPY, must be asked for explicitly.
+# ============================================================
+sub _pg_should_defer {
+	my ( $params, $cfg, $incoming, $table_rows ) = @_;
+	my $ratio = $params->{'pg_defer_index_ratio'};
+	$ratio = $cfg->{'EDTK_DB_DEFER_INDEX_RATIO'} unless defined $ratio && $ratio ne '';
+	my $min = $params->{'pg_defer_index_min_rows'};
+	$min = $cfg->{'EDTK_DB_DEFER_INDEX_MIN_ROWS'} unless defined $min && $min ne '';
+	return 0 unless ( defined $ratio && $ratio ne '' ) || ( defined $min && $min ne '' );
+	$ratio = PG_DEFER_DEFAULT_RATIO    unless defined $ratio && $ratio ne '';
+	$min   = PG_DEFER_DEFAULT_MIN_ROWS unless defined $min   && $min ne '';
+	return 0 unless $incoming >= $min;
+	return 1 if $table_rows <= 0;    # empty or unknown table: nothing to weigh against
+	return $incoming >= $ratio * $table_rows ? 1 : 0;
+}
+
+# ============================================================
 # PRIVATE : load into $tablename inside one transaction from $make_supplier
 # (called once per attempt to obtain a fresh COPY byte supplier), optionally
 # after dropping the deferrable DDL and relaxing synchronous_commit for that
 # transaction only (SET LOCAL). Rebuilds the DDL and commits ; a failure rolls
-# the data AND the DDL back. A caller-managed transaction (AutoCommit already
-# off) is left open. Returns ('ok',''), ('defer',$err) when the DDL could not be
-# dropped, or ('fail',$err) on any other error.
+# the data AND the DDL back. When the caller manages the transaction (AutoCommit
+# already off) the work runs under a SAVEPOINT so a failure can be undone without
+# poisoning the caller's transaction (H14). %opt: lock_timeout => 'Ns' bounds the
+# wait for the exclusive lock the DDL drop needs. Returns ('ok',''), ('defer',$err)
+# when the DDL could not be dropped, or ('fail',$err) on any other error.
 # ============================================================
 sub _pg_load_tx {
-	my ( $dbh, $tablename, $sql, $make_supplier, $ddl ) = @_;
+	my ( $dbh, $tablename, $sql, $make_supplier, $ddl, %opt ) = @_;
 	my $own   = $dbh->{AutoCommit} ? 1 : 0;
+	my $sp    = 'edtk_pg_load';               # savepoint used when the caller owns the transaction
 	my $phase = 'begin';
 	my $ok    = eval {
-		$dbh->begin_work if $own;
+		if   ($own) { $dbh->begin_work }
+		else        { $dbh->do("SAVEPOINT $sp") }
+
+		# Bound the wait for the exclusive lock a deferral needs (O4): on timeout
+		# the DROP fails and the caller retries without deferring.
+		if ( $opt{lock_timeout} ) {
+			eval {
+				local $dbh->{PrintError} = 0;
+				$dbh->do("SET LOCAL lock_timeout = '$opt{lock_timeout}'");
+				1;
+			} or &logger( 4, "_pg_load_tx: SET LOCAL lock_timeout failed: $@" );
+		}
 		eval { local $dbh->{PrintError} = 0; $dbh->do(PG_COPY_SYNC_OFF); 1 }
 			or &logger( 4, "_pg_load_tx: SET LOCAL failed: $@" );
 		$phase = 'defer';
@@ -545,15 +647,339 @@ sub _pg_load_tx {
 		foreach my $s ( @{ $ddl->{create} } ) {
 			$dbh->do($s) or die( $dbh->errstr || "create failed: $s" );
 		}
-		$dbh->commit if $own;
+		if   ($own) { $dbh->commit }
+		else        { $dbh->do("RELEASE SAVEPOINT $sp") }
 		1;
 	};
 	return ( 'ok', '' ) if $ok;
 
 	my $err = $@ // '';
-	eval { $dbh->rollback } if $own && !$dbh->{AutoCommit};
+	if ($own) {
+		eval { $dbh->rollback } if !$dbh->{AutoCommit};
+	}
+	else {
+		# H14: undo to the savepoint, leaving the caller's transaction usable.
+		eval {
+			local $dbh->{PrintError} = 0;
+			$dbh->do("ROLLBACK TO SAVEPOINT $sp");
+			$dbh->do("RELEASE SAVEPOINT $sp");
+			1;
+		};
+	}
 	$err =~ s/\s+\z//;
 	return ( $phase eq 'defer' ? 'defer' : 'fail', $err );
+}
+
+# ============================================================
+# PRIVATE : D60 -- choose between the raw COPY path and the ELT staging path.
+# The ELT path is used only on PostgreSQL, in insert mode (the caller dispatches
+# it), when the file reaches the threshold EDTK_DB_BURST_MO megabytes. 0 disables
+# it; an explicit caller param pg_copy_staging (0 or 1) overrides the threshold,
+# which is what the tests use to exercise either path on a small fixture.
+# force_copy (true) forces the COPY path ahead of every other setting.
+# Returns ($use_elt, $reason).
+# ============================================================
+sub _pg_burst_decision {
+	my ( $params, $cfg, $fi ) = @_;
+
+	# Operator override: COPY even when ELT would be selected, ahead of
+	# pg_copy_staging / burst_mo / EDTK_DB_BURST_MO.
+	return ( 0, 'force_copy => 1' ) if $params->{'force_copy'};
+	if ( defined $params->{'pg_copy_staging'} ) {
+		return $params->{'pg_copy_staging'}
+			? ( 1, 'pg_copy_staging => 1' )
+			: ( 0, 'pg_copy_staging => 0' );
+	}
+	my $mo = $params->{'burst_mo'};
+	$mo = $cfg->{'EDTK_DB_BURST_MO'} unless defined $mo && $mo ne '';
+	if    ( !defined $mo || $mo eq '' ) { $mo = PG_BURST_MO_DEFAULT; }
+	elsif ( $mo !~ /^\s*[0-9]+(?:\.[0-9]+)?\s*$/ ) {
+		&logger( 3,
+			"_pg_burst_decision: invalid EDTK_DB_BURST_MO '$mo', using default "
+				. PG_BURST_MO_DEFAULT );
+		$mo = PG_BURST_MO_DEFAULT;
+	}
+	return ( 0, 'EDTK_DB_BURST_MO=0 (ELT disabled)' ) if $mo == 0;
+	my $size = -s $fi;
+	$size = 0 unless defined $size && $size > 0;
+	my $limit = $mo * PG_BURST_BYTES_PER_MO;
+	return ( 1, "file ${size}B >= ${mo}Mo threshold" ) if $size >= $limit;
+	return ( 0, "file ${size}B < ${mo}Mo threshold" );
+}
+
+# ============================================================
+# PRIVATE : the DDL a bulk load may drop up-front and rebuild afterwards, honouring
+# the opt-in deferral policy (H4 / O4). Shared by the COPY and ELT paths.
+# Returns { drop => [sql...], create => [sql...] } (empty when nothing is deferred).
+# ============================================================
+sub _pg_defer_plan {
+	my ( $dbh, $tablename, $params, $cfg, $fi, $rows_before ) = @_;
+	return { drop => [], create => [] } unless $params->{'pg_copy_optimize'} // 1;
+	my $incoming = _pg_estimate_rows($fi);
+	unless ( _pg_should_defer( $params, $cfg, $incoming, $rows_before ) ) {
+		&logger( 5, "_pg_defer_plan: not deferring (~$incoming incoming, $rows_before rows)" );
+		return { drop => [], create => [] };
+	}
+	my $ddl = eval { _pg_deferrable_ddl( $dbh, $tablename, $params->{'pg_copy_defer_pk'} ) };
+	&logger( 4, "_pg_defer_plan: deferral lookup failed: $@" ) unless $ddl;
+	$ddl ||= { drop => [], create => [] };
+	&logger( 5, "_pg_defer_plan: deferring indexes (~$incoming incoming vs $rows_before rows)" )
+		if @{ $ddl->{drop} };
+	return $ddl;
+}
+
+# ============================================================
+# PRIVATE : per-column staging type. A character column (text / varchar / bpchar
+# / char / name) is staged as text, so an empty field stays an empty string and a
+# long value is not rejected by the COPY (the target truncation is applied by the
+# transfer INSERT). Every other column keeps the target's declared type, so a bad
+# numeric or date still fails with the COPY's line number. Returns undef when the
+# catalogue cannot be read (the caller then falls back to the COPY path).
+# ============================================================
+sub _pg_column_types {
+	my ( $dbh, $table, $cols ) = @_;
+	my $rows = eval {
+		$dbh->selectall_arrayref(
+			"SELECT a.attname, t.typname, format_type(a.atttypid, a.atttypmod)"
+				. " FROM pg_attribute a JOIN pg_type t ON t.oid = a.atttypid"
+				. " WHERE a.attrelid = to_regclass(?) AND a.attnum > 0 AND NOT a.attisdropped",
+			undef, $table
+		);
+	};
+	return undef unless $rows;    ## no critic (ProhibitExplicitReturnUndef)
+	my %seen = map { lc( $_->[0] ) => { typname => $_->[1], ftype => $_->[2] } } @$rows;
+	my %type;
+	for my $c (@$cols) {
+		my $t = $seen{ lc $c } or return undef;    ## no critic (ProhibitExplicitReturnUndef)
+		$type{$c} = $t->{typname} =~ /^(?:text|varchar|bpchar|char|name)$/ ? 'text' : $t->{ftype};
+	}
+	return \%type;
+}
+
+# ============================================================
+# PRIVATE : D60 SQL builders (no side effect, so they are easy to read and test).
+#   _pg_stg_name      : a session-unique staging table name.
+#   _pg_stg_ddl       : CREATE TEMP TABLE without LIKE, so the staging table
+#                       carries no NOT NULL constraint and no default.
+#   _pg_stg_copy_sql  : the raw COPY into the staging table (HEADER true,
+#                       ENCODING, FORCE_NOT_NULL on the text columns).
+#   _pg_stg_insert_sql: the transfer INSERT ... SELECT with the same substr
+#                       truncation as the row-by-row path.
+# ============================================================
+sub _pg_stg_name {
+	return PG_STG_PREFIX . $$ . '_' . ++$_PG_STG_SEQ;
+}
+
+sub _pg_stg_ddl {
+	my ( $stg, $cols, $types ) = @_;
+	my $list = join( ', ', map { _pg_quote_ident($_) . ' ' . $types->{$_} } @$cols );
+	return 'CREATE TEMP TABLE ' . _pg_quote_ident($stg) . " ( $list ) ON COMMIT DROP";
+}
+
+sub _pg_stg_copy_sql {
+	my ( $stg, $cols, $types, $sep, $quo, $src_enc ) = @_;
+	my $opts = "FORMAT csv, HEADER true, DELIMITER '$sep', QUOTE '$quo'";
+	$opts .= ", ENCODING '$src_enc'" if defined $src_enc && $src_enc ne '';
+	my @text = grep { $types->{$_} eq 'text' } @$cols;
+	$opts .= ', FORCE_NOT_NULL (' . join( ',', map { _pg_quote_ident($_) } @text ) . ')' if @text;
+	return
+		  'COPY '
+		. _pg_quote_ident($stg) . ' ('
+		. join( ',', map { _pg_quote_ident($_) } @$cols )
+		. ") FROM STDIN WITH ($opts)";
+}
+
+sub _pg_stg_insert_sql {
+	my ( $copy_table, $cols, $col_meta, $stg ) = @_;
+	my $ins = join( ', ', map { _pg_quote_ident($_) } @$cols );
+	my $sel = join(
+		', ',
+		map {
+			my $size = ( $col_meta->{$_} // {} )->{size} // 0;
+			$size > 0 ? 'substr(' . _pg_quote_ident($_) . ", 1, $size)" : _pg_quote_ident($_);
+		} @$cols
+	);
+	return "INSERT INTO $copy_table ( $ins ) SELECT $sel FROM " . _pg_quote_ident($stg);
+}
+
+# ============================================================
+# PRIVATE : a byte supplier that streams the file in 1 MiB blocks, with no Perl
+# CSV parse (the raw bytes go straight to COPY). Closes the handle at EOF.
+# ============================================================
+sub _pg_raw_supplier {
+	my ($fi) = @_;
+	return sub {
+		open my $fh, '<:raw', $fi or die "cannot open \"$fi\": $!";
+		return sub {
+			my $r = read( $fh, my $buf, PG_COPY_BLOCK_SIZE );
+			die "read \"$fi\": $!" unless defined $r;
+			if ( $r == 0 ) { close $fh; return undef; }    ## no critic (ProhibitExplicitReturnUndef)
+			return $buf;
+		};
+	};
+}
+
+# ============================================================
+# PRIVATE : D60 -- the ELT path. Loads $fi into an unconstrained TEMP staging
+# table with one raw COPY (no per-row Perl parse), then moves the rows with a
+# single INSERT ... SELECT that applies the same substr truncation as the
+# row-by-row path. Everything runs in one transaction (SAVEPOINT when the caller
+# already owns one), so a failure leaves no row and no staging table. A missing
+# TEMPORARY right or an unreadable catalogue is reported as 'fallback' so the
+# caller retries on the COPY path. Returns ( 'ok', $rows ), ( 'defer', $err ),
+# ( 'fallback', $err ) or ( 'fail', $err ).
+# ============================================================
+sub _pg_stage_and_insert {
+	my (%a)      = @_;
+	my $dbh      = $a{dbh};
+	my $cols     = $a{cols};
+	my $col_meta = $a{col_meta};
+	my $ddl      = $a{ddl};
+	my $own      = $dbh->{AutoCommit} ? 1 : 0;
+	my $sp       = 'edtk_pg_elt';
+	my $phase    = 'begin';
+	my $rows     = 0;
+	my $t0       = time;
+	my $ok       = eval {
+		if   ($own) { $dbh->begin_work }
+		else        { $dbh->do("SAVEPOINT $sp") }
+
+		# Bound the wait for the exclusive lock a deferral needs (O4), and give the
+		# index rebuild a larger maintenance_work_mem (plan 3.2).
+		if ( $a{lock_timeout} ) {
+			eval {
+				local $dbh->{PrintError} = 0;
+				$dbh->do("SET LOCAL lock_timeout = '$a{lock_timeout}'");
+				1;
+			} or &logger( 4, "_pg_stage_and_insert: SET LOCAL lock_timeout failed: $@" );
+		}
+		eval { local $dbh->{PrintError} = 0; $dbh->do(PG_COPY_SYNC_OFF); 1 }
+			or &logger( 4, "_pg_stage_and_insert: SET LOCAL failed: $@" );
+		if ( @{ $ddl->{drop} } ) {
+			eval {
+				local $dbh->{PrintError} = 0;
+				$dbh->do( "SET LOCAL maintenance_work_mem = '" . PG_BURST_MAINT_MEM . "'" );
+				1;
+			}
+				or &logger( 4, "_pg_stage_and_insert: SET LOCAL maintenance_work_mem failed: $@" );
+		}
+
+		$phase = 'defer';
+		foreach my $s ( @{ $ddl->{drop} } ) {
+			$dbh->do($s) or die( $dbh->errstr || "drop failed: $s" );
+		}
+
+		$phase = 'stage';
+		my $types = _pg_column_types( $dbh, $a{tablename}, $cols );
+		die "ELT_FALLBACK: column types unavailable\n" unless $types;
+		my $stg = _pg_stg_name();
+		my $cre =
+			eval { local $dbh->{PrintError} = 0; $dbh->do( _pg_stg_ddl( $stg, $cols, $types ) ); 1 };
+		die 'ELT_FALLBACK: CREATE TEMP TABLE refused: ' . ( $@ || $dbh->errstr ) . "\n" unless $cre;
+		my $err = _pg_copy_stdin(
+			$dbh,
+			_pg_stg_copy_sql( $stg, $cols, $types, $a{sep}, $a{quo}, $a{src_enc} ),
+			_pg_raw_supplier( $a{fi} )->()
+		);
+		die $err if defined $err;
+		my $t_stage = time;
+
+		$phase = 'insert';
+		$rows  = $dbh->do( _pg_stg_insert_sql( $a{copy_table}, $cols, $col_meta, $stg ) );
+		defined $rows or die( $dbh->errstr || "insert failed" );
+		my $t_ins = time;
+
+		$phase = 'rebuild';
+		foreach my $s ( @{ $ddl->{create} } ) {
+			$dbh->do($s) or die( $dbh->errstr || "create failed: $s" );
+		}
+		if   ($own) { $dbh->commit }
+		else        { $dbh->do("RELEASE SAVEPOINT $sp") }
+		&logger(
+			4,
+			sprintf(
+				'_pg_stage_and_insert: stage %.3fs insert %.3fs rebuild %.3fs',
+				$t_stage - $t0,
+				$t_ins - $t_stage,
+				time - $t_ins
+			)
+		);
+		1;
+	};
+	return ( 'ok', $rows ) if $ok;
+
+	my $err = $@ // '';
+	if ($own) {
+		eval { $dbh->rollback } if !$dbh->{AutoCommit};
+	}
+	else {
+
+		# H14: undo to the savepoint, leaving the caller's transaction usable.
+		eval {
+			local $dbh->{PrintError} = 0;
+			$dbh->do("ROLLBACK TO SAVEPOINT $sp");
+			$dbh->do("RELEASE SAVEPOINT $sp");
+			1;
+		};
+	}
+	$err =~ s/\s+\z//;
+	return ( 'fallback', $err ) if $err =~ /^ELT_FALLBACK:/;
+	return ( $phase eq 'defer' ? 'defer' : 'fail', $err );
+}
+
+# ============================================================
+# PRIVATE : D60 -- drive the ELT path: deferral plan, the staging load, the
+# retry without deferral on lock_timeout, and the conditional ANALYZE (O5).
+# Returns ( 'ok', $rows ), ( 'fallback', $err ) or ( 'fail', $err ).
+# ============================================================
+sub _pg_elt_load {
+	my (
+		$dbh, $tablename, $fi,  $params,  $cols,       $col_meta,
+		$sep, $quo,       $enc, $src_enc, $copy_table, $cfg
+	) = @_;
+	my $rows_before = _pg_table_rows( $dbh, $tablename );
+	my $defer_ddl   = _pg_defer_plan( $dbh, $tablename, $params, $cfg, $fi, $rows_before );
+	my %lt          = ( @{ $defer_ddl->{drop} } ? ( lock_timeout => PG_COPY_LOCK_TIMEOUT ) : () );
+
+	# The ELT COPY declares the file encoding and lets the server convert, with no
+	# per-field Perl re-encode. That is equivalent to the COPY path only when the
+	# source encoding is EXPLICITLY declared (pg_copy_encoding / EDTK_DB_COPY_ENCODING):
+	# the COPY path's default is a per-field heuristic (raw bytes read as Latin-1,
+	# but a field that is valid UTF-8 kept as-is) that no single server-side ENCODING
+	# reproduces -- declaring LATIN1 by default double-encoded a UTF-8 file (TD20).
+	# An undeclared encoding therefore falls back to the COPY path.
+	return ( 'fallback', 'ELT needs an explicit source encoding' )
+		unless defined $src_enc && $src_enc ne '';
+	my $decl = $src_enc;
+
+	my %common = (
+		dbh        => $dbh,
+		tablename  => $tablename,
+		copy_table => $copy_table,
+		fi         => $fi,
+		cols       => $cols,
+		col_meta   => $col_meta,
+		sep        => $sep,
+		quo        => $quo,
+		src_enc    => $decl,
+	);
+	my ( $status, $res ) = _pg_stage_and_insert( %common, ddl => $defer_ddl, %lt );
+	if ( $status eq 'defer' ) {
+		&logger( 4, "_pg_elt_load: deferral unavailable ($res), retrying without it" );
+		( $status, $res ) =
+			_pg_stage_and_insert( %common, ddl => { drop => [], create => [] } );
+	}
+	return ( $status, $res ) unless $status eq 'ok';
+
+	# Refresh the planner statistics only when the load is significant (O5).
+	if ( $rows_before <= 0 || $res >= PG_ANALYZE_TABLE_SHARE * $rows_before ) {
+		eval { local $dbh->{PrintError} = 0; $dbh->do( sprintf( PG_COPY_ANALYZE, $tablename ) ); 1 }
+			or &logger( 4, "_pg_elt_load: ANALYZE $tablename failed: $@" );
+	}
+	else {
+		&logger( 5, "_pg_elt_load: ANALYZE $tablename skipped ($res rows added to $rows_before)" );
+	}
+	return ( 'ok', $res );
 }
 
 # ============================================================
@@ -576,6 +1002,17 @@ sub _load_csv_pg_copy {
 	my $enc = _pg_encoding_name( eval { $dbh->selectrow_array('SHOW client_encoding') } );
 	&logger( 7, "_load_csv_pg_copy: client_encoding=" . ( $enc // 'raw' ) );
 
+	# H8 : source encoding of the file bytes. Only an explicit declaration
+	# (the caller param or EDTK_DB_COPY_ENCODING) overrides the historical
+	# default; otherwise $src_enc stays undef and the supplier keeps the
+	# previous behaviour byte-for-byte.
+	my $cfg = eval { config_read('EDTK_DB') } || {};
+	my ( $src_enc, $src_err ) = _pg_source_encoding( $params, $cfg );
+	return ( -1, &logger( 3, "_load_csv_pg_copy: $src_err" ) ) if $src_err;
+	my $decl = $params->{'pg_copy_encoding'};
+	$decl    = $cfg->{'EDTK_DB_COPY_ENCODING'} unless defined $decl && $decl ne '';
+	$src_enc = undef                           unless defined $decl && $decl ne '';
+
 	# Read the header record for column names and insertion order.
 	# getline (not parse) so a quoted field may span several physical lines.
 	open( my $fh, '<', $fi )
@@ -597,14 +1034,48 @@ sub _load_csv_pg_copy {
 
 	# Same column metadata as the row-by-row path, flattened into positional
 	# arrays so the per-row loop does no hash lookup.
-	my $col_meta      = _get_col_meta( $dbh, $tablename, $norm_id );
+	my $col_meta = _get_col_meta( $dbh, $tablename, $norm_id );
+
+	# H9 : refuse a header column that is not in the table before building SQL,
+	# so a third-party header cannot inject an identifier.
+	my $unknown = keys %$col_meta ? _unknown_csv_columns( \@cols, $col_meta ) : [];
+	if (@$unknown) {
+		return (
+			-1,
+			&logger(
+				3,
+				"_load_csv_pg_copy: unknown column(s) "
+					. join( ', ', @$unknown )
+					. " for table $tablename"
+			)
+		);
+	}
 	my @blank_to_null = map { ( $col_meta->{$_} // {} )->{blank_to_null} ? 1 : 0 } @cols;
 	my @col_size      = map { ( $col_meta->{$_} // {} )->{size} // 0 } @cols;
 
 	# COPY ... FROM STDIN : NULL '' makes an unquoted empty field a NULL.
+	my $copy_table = join( '.', map { _pg_quote_ident($_) } split( /\./, $tablename, 2 ) );
+
+	# D60 : above the threshold (EDTK_DB_BURST_MO, default 50 MiB) the file
+	# is loaded through the ELT staging path. A 'fallback' (no TEMPORARY right, an
+	# unreadable catalogue) silently retries below on the COPY path.
+	my ( $use_elt, $why ) = _pg_burst_decision( $params, $cfg, $fi );
+	&logger( 5, "_load_csv_pg_copy: path " . ( $use_elt ? 'ELT' : 'COPY' ) . " ($why)" );
+	if ($use_elt) {
+		my ( $status, $res ) = _pg_elt_load(
+			$dbh, $tablename, $fi,  $params,  \@cols,      $col_meta,
+			$sep, $quo,       $enc, $src_enc, $copy_table, $cfg
+		);
+		&logger( 5, "bulk insert into $tablename via ELT staging: $res rows" ) if $status eq 'ok';
+		return ( $res, " lines inserted" ) if $status eq 'ok';
+		return ( -1, &logger( 3, "_load_csv_pg_copy: ELT into $tablename failed: $res" ) )
+			if $status eq 'fail';
+		&logger( 3, "_load_csv_pg_copy: ELT unavailable ($res), using COPY" );
+	}
+
 	my $sql =
-		  "COPY $tablename ("
-		. join( ',', @cols ) . ")"
+		  "COPY $copy_table ("
+		. join( ',', map { _pg_quote_ident($_) } @cols ) . ")"
 		. " FROM STDIN WITH (FORMAT csv, DELIMITER '"
 		. $sep . "',"
 		. " QUOTE '"
@@ -617,31 +1088,29 @@ sub _load_csv_pg_copy {
 	my $count         = 0;
 	my $make_supplier = sub {
 		$count = 0;
-		_pg_csv_supplier( $fi, $params, \@cols, \@blank_to_null, \@col_size, \$count, $enc );
+		_pg_csv_supplier( $fi, $params, \@cols, \@blank_to_null, \@col_size, \$count, $enc,
+			$src_enc );
 	};
 
-	# Default path (pg_copy_optimize unset or true) : load inside one
-	# transaction, dropping the target table's secondary indexes and unique /
-	# foreign-key constraints (plus the primary key when pg_copy_defer_pk is
-	# set) for the duration of the COPY, relaxing synchronous_commit for that
-	# transaction only and refreshing the planner statistics at the end. If the
-	# DDL cannot be dropped, the load is retried once without deferral. Passing
-	# pg_copy_optimize => 0 keeps the historical plain COPY.
-	my ( $status, $emsg ) = ( 'ok', '' );
-	if ( $params->{'pg_copy_optimize'} // 1 ) {
-		my $ddl = eval { _pg_deferrable_ddl( $dbh, $tablename, $params->{'pg_copy_defer_pk'} ) };
-		&logger( 4, "_load_csv_pg_copy: deferral lookup failed: $@" ) unless $ddl;
-		$ddl ||= { drop => [], create => [] };
-		( $status, $emsg ) = _pg_load_tx( $dbh, $tablename, $sql, $make_supplier, $ddl );
-		if ( $status eq 'defer' ) {
-			&logger( 4, "_load_csv_pg_copy: deferral unavailable ($emsg), retrying without it" );
-			( $status, $emsg ) =
-				_pg_load_tx( $dbh, $tablename, $sql, $make_supplier, { drop => [], create => [] } );
-		}
-	}
-	else {
-		my $err = _pg_copy_stdin( $dbh, $sql, $make_supplier->() );
-		( $status, $emsg ) = defined $err ? ( 'fail', $err ) : ( 'ok', '' );
+	# Default path (pg_copy_optimize unset or true) : load inside one transaction,
+	# dropping the target table's secondary indexes and unique / foreign-key
+	# constraints (plus the primary key when pg_copy_defer_pk is set) -- but ONLY
+	# when the deferral is enabled AND the incoming volume justifies the exclusive
+	# lock (H4 / O4; the deferral is opt-in, see _pg_should_defer). Otherwise the
+	# indexes are left in place and the load stays non-blocking. Either way the
+	# COPY runs inside one transaction (H7), with synchronous_commit relaxed for
+	# that transaction only, and the planner statistics are refreshed when the
+	# volume warrants it (O5). pg_copy_optimize => 0 never defers.
+	my $rows_before = _pg_table_rows( $dbh, $tablename );
+	my $defer_ddl   = _pg_defer_plan( $dbh, $tablename, $params, $cfg, $fi, $rows_before );
+
+	# lock_timeout only matters when there is DDL to drop (the exclusive lock).
+	my %lt = ( @{ $defer_ddl->{drop} } ? ( lock_timeout => PG_COPY_LOCK_TIMEOUT ) : () );
+	my ( $status, $emsg ) = _pg_load_tx( $dbh, $tablename, $sql, $make_supplier, $defer_ddl, %lt );
+	if ( $status eq 'defer' ) {
+		&logger( 4, "_load_csv_pg_copy: deferral unavailable ($emsg), retrying without it" );
+		( $status, $emsg ) =
+			_pg_load_tx( $dbh, $tablename, $sql, $make_supplier, { drop => [], create => [] } );
 	}
 
 	if ( $status ne 'ok' ) {
@@ -649,12 +1118,30 @@ sub _load_csv_pg_copy {
 		return ( -1, &logger( 3, "_load_csv_pg_copy: COPY into $tablename failed: $emsg" ) );
 	}
 
-	# Refresh the planner statistics for the freshly loaded table (best effort).
-	eval { local $dbh->{PrintError} = 0; $dbh->do( sprintf( PG_COPY_ANALYZE, $tablename ) ); 1 }
-		or &logger( 4, "_load_csv_pg_copy: ANALYZE $tablename failed: $@" );
+	# Refresh the planner statistics only when the load is significant for the
+	# table (O5): a small append to a large table does not move the estimate.
+	if ( $rows_before <= 0 || $count >= PG_ANALYZE_TABLE_SHARE * $rows_before ) {
+		eval { local $dbh->{PrintError} = 0; $dbh->do( sprintf( PG_COPY_ANALYZE, $tablename ) ); 1 }
+			or &logger( 4, "_load_csv_pg_copy: ANALYZE $tablename failed: $@" );
+	}
+	else {
+		&logger( 5,
+			"_load_csv_pg_copy: ANALYZE $tablename skipped ($count rows added to $rows_before)" );
+	}
 
-	&logger( 4, "bulk insert into $tablename via COPY ... FROM STDIN: $count rows" );
+	&logger( 5, "bulk insert into $tablename via COPY ... FROM STDIN: $count rows" );
 	return ( $count, " lines inserted" );
+}
+
+# ============================================================
+# PRIVATE : header columns that are not in the target table. The caller has
+# normalized the columns and holds the table metadata; a column absent from
+# the metadata is refused before any SQL is built, so a third-party header
+# cannot inject an identifier. Empty list => every column is known.
+# ============================================================
+sub _unknown_csv_columns {
+	my ( $cols, $col_meta ) = @_;
+	return [ grep { !exists $col_meta->{$_} } @$cols ];
 }
 
 # ============================================================
@@ -678,6 +1165,27 @@ sub _norm_identifiers {
 	my @norm_cols = map { $norm_id->($_) } @{ $cols_ref // [] };
 
 	return ( $norm_id, $norm_table, @norm_cols );
+}
+
+# ============================================================
+# PRIVATE: column metadata read from the statement NAME list.
+# Used when column_info is unsupported, or is supported but returns no
+# usable column name (DBD::SQLite under FetchHashKeyName=NAME_uc).
+# Degraded mode: column names only, without type or size.
+# ============================================================
+
+sub _col_meta_from_names {
+	my ( $dbh, $table, $norm_id ) = @_;
+
+	my %meta;
+	my $sth = $dbh->prepare("SELECT * FROM $table WHERE 1=0");
+	$sth->execute();
+	for my $col ( @{ $sth->{NAME} } ) {
+		my $norm_col = $norm_id->($col);
+		$meta{$norm_col} = { numeric => 0, size => 0 };
+		&logger( 7, "_get_col_meta (fallback): col=$norm_col" );
+	}
+	return \%meta;
 }
 
 # ============================================================
@@ -713,13 +1221,7 @@ sub _get_col_meta {
 		unless ( defined $sth ) {
 			&logger( 5,
 				"_get_col_meta: column_info unsupported for '$table_name', fallback SELECT" );
-			my $sth2 = $dbh->prepare("SELECT * FROM $table WHERE 1=0");
-			$sth2->execute();
-			for my $col ( @{ $sth2->{NAME} } ) {
-				my $norm_col = $norm_id->($col);
-				$meta{$norm_col} = { numeric => 0, size => 0 };
-				&logger( 7, "_get_col_meta (fallback): col=$norm_col" );
-			}
+			%meta = %{ _col_meta_from_names( $dbh, $table, $norm_id ) };
 			$_csv_import_type_cache{$cache_key} = \%meta;
 			return;
 		}
@@ -727,8 +1229,13 @@ sub _get_col_meta {
 		my %num_codes = map { $_ => 1 } ( 2, 3, 4, 5, 6, 7, 8, -5, -6, -7 );
 		my $found     = 0;
 		while ( my $row = $sth->fetchrow_hashref ) {
+
+			# Some drivers (DBD::SQLite under FetchHashKeyName=NAME_uc) return
+			# rows whose COLUMN_NAME is empty; skip them so the metadata never
+			# carries a nameless column.
+			next unless defined $row->{COLUMN_NAME} && $row->{COLUMN_NAME} ne '';
 			$found++;
-			my $col  = $norm_id->( $row->{COLUMN_NAME} // '' );
+			my $col  = $norm_id->( $row->{COLUMN_NAME} );
 			my $type = $row->{DATA_TYPE} // 0;
 			my $name = lc( $row->{TYPE_NAME} // '' );
 			my $size = $row->{COLUMN_SIZE} // 0;
@@ -775,7 +1282,20 @@ sub _get_col_meta {
 "_get_col_meta: col=$col TYPE=$name($size) is_num=$is_num is_text=$is_text blank_to_null=$blank_to_null"
 			);
 		}
-		&logger( 5, "_get_col_meta: $found columns for '$table_name'" );
+		if ( !$found ) {
+
+			# column_info is supported but returned no usable column name (e.g.
+			# DBD::SQLite under FetchHashKeyName=NAME_uc): fall back to the
+			# statement NAME list so the header check still has names to
+			# validate against. Types and sizes stay degraded.
+			&logger( 5,
+"_get_col_meta: column_info returned no usable column for '$table_name', fallback SELECT"
+			);
+			%meta = %{ _col_meta_from_names( $dbh, $table, $norm_id ) };
+		}
+		else {
+			&logger( 5, "_get_col_meta: $found columns for '$table_name'" );
+		}
 	};
 	if ($@) {
 		&logger( 3, "_get_col_meta: column_info failed for $table: $@" );
@@ -823,6 +1343,77 @@ sub _make_clean_val {
 	};
 }
 
+# ============================================================
+# PRIVATE: prepare the per-column cleaning plan once for a row loop.
+# Each entry is [ name, max_size (0 = none), blank_to_null ]; _clean_row
+# applies it with one test sequence per field and no per-field call (plan O3,
+# the row-by-row analogue of _pg_csv_row).
+# ============================================================
+sub _make_clean_plan {
+	my ( $col_meta, $cols ) = @_;
+	return [
+		map {
+			my $m = $col_meta->{$_} // {};
+			[ $_, ( $m->{size} // 0 ), ( $m->{blank_to_null} ? 1 : 0 ) ]
+		} @$cols
+	];
+}
+
+# ============================================================
+# PRIVATE: clean one CSV row against a plan, positionally. One test sequence
+# per field, no closure call and no name-keyed lookup (plan O3). A field past
+# the end of $data cleans to NULL, like the _make_clean_val contract; the log
+# lines match it too.
+# ============================================================
+sub _clean_row {
+	my ( $plan, $data ) = @_;
+	my @out;
+	for my $i ( 0 .. $#$plan ) {
+		my $v = $data->[$i];
+		my $p = $plan->[$i];
+		if ( !defined $v ) { push @out, undef; next; }
+		if ( $v eq '' ) {
+			if ( $p->[2] ) {
+				&logger( 7, "clean_val: col '$p->[0]' numeric/date, '' => undef" )
+					if $LOGGERLEVEL >= 7;
+				push @out, undef;
+			}
+			else { push @out, $v; }
+			next;
+		}
+		if ( $p->[1] && length($v) > $p->[1] ) {
+			&logger( 6,
+				"clean_val: col '$p->[0]' truncated from " . length($v) . " to $p->[1] chars" )
+				if $LOGGERLEVEL >= 6;
+			push @out, substr( $v, 0, $p->[1] );
+			next;
+		}
+		push @out, $v;
+	}
+	return @out;
+}
+
+# ============================================================
+# PRIVATE: the CSV paths go through Text::CSV. Without its XS backend
+# (Text::CSV_XS) the per-line parse dominates the load (plan O1), so warn once
+# (3-ALERT) and point at the blocking prerequisite. Text::CSV->backend is
+# 'Text::CSV_PP' when the XS module is missing.
+# ============================================================
+my $_CSV_BACKEND_WARNED = 0;
+
+sub _check_csv_backend {
+	return if $_CSV_BACKEND_WARNED;
+	my $backend = eval { Text::CSV->backend };
+	unless ( defined $backend && $backend eq 'Text::CSV_XS' ) {
+		$_CSV_BACKEND_WARNED = 1;
+		&logger( 3,
+				  "csv_import: Text::CSV backend is '"
+				. ( $backend // 'unknown' )
+				. "', not Text::CSV_XS - install Text::CSV_XS (plan O1)" );
+	}
+	return;
+}
+
 sub insert_tData {
 
 	# Example call:
@@ -837,8 +1428,8 @@ sub insert_tData {
 	my ( $norm_id, $norm_table, @norm_cols ) =
 		_norm_identifiers( $p{'dbh'}, $p{'table'}, $p{'tCols'} );
 
-	my $col_meta  = _get_col_meta( $p{'dbh'}, $norm_table, $norm_id );
-	my $clean_val = _make_clean_val($col_meta);
+	my $col_meta = _get_col_meta( $p{'dbh'}, $norm_table, $norm_id );
+	my $plan     = _make_clean_plan( $col_meta, \@norm_cols );
 
 	&logger( 7, "Table : $norm_table" );
 	&logger( 7, "NB Data : " . scalar @{ $p{'tData'} } );
@@ -855,7 +1446,7 @@ sub insert_tData {
 	my $sth = $p{'dbh'}->prepare_cached($sql);
 	do {
 		local $sth->{PrintError} = 0;
-		$sth->execute( map { $clean_val->( $norm_cols[$_], $p{'tData'}[$_] ) } 0 .. $#norm_cols );
+		$sth->execute( _clean_row( $plan, $p{'tData'} ) );
 		}
 		or &logger( 3, "SQL execute failed " . $sth->err . "-" . $sth->errstr );
 	1;
@@ -872,6 +1463,9 @@ sub csv_import {
 	$params->{'quote_char'}   = $params->{'quote_char'}   || '"';
 	$params->{'local_infile'} = $params->{'local_infile'} || "no";
 	$params->{'ref_col'}      = $params->{'ref_col'}      || 0;         # merge match column (D-S53)
+
+	# O1: the CSV parse paths need the Text::CSV_XS backend; warn once otherwise.
+	_check_csv_backend();
 
 	# Normalize the driver and the table name
 	# $norm_id is kept to normalize the CSV columns after reading the header
@@ -891,8 +1485,15 @@ sub csv_import {
 	if ( $params->{'mode'} !~ /merge/i
 		&& _db_check_driver_name($dbh) eq "PostgreSQL" )
 	{
-		&logger( 7, "PostgreSQL driver detected by csv_import, trying COPY FROM STDIN" );
-		return _load_csv_pg_copy( $dbh, $norm_table, $in, $params, $norm_id );
+		if ( defined $params->{'header'} || defined $params->{'ignore_first_line'} ) {
+			&logger( 5,
+"csv_import: header/ignore_first_line requested, using the row-by-row path (COPY ignores them)"
+			);
+		}
+		else {
+			&logger( 7, "PostgreSQL driver detected by csv_import, trying COPY FROM STDIN" );
+			return _load_csv_pg_copy( $dbh, $norm_table, $in, $params, $norm_id );
+		}
 	}
 
 	open( my $fh, '<', $in ) or die "ERROR: Cannot open index file \"$in\": $!\n";
@@ -923,8 +1524,26 @@ sub csv_import {
 
 	# $norm_table and $norm_id are consistent: the %$col_meta keys
 	# are in the same case as @cols
-	my $col_meta  = _get_col_meta( $dbh, $norm_table, $norm_id );
-	my $clean_val = _make_clean_val($col_meta);
+	my $col_meta = _get_col_meta( $dbh, $norm_table, $norm_id );
+
+	# H9 : refuse a header column that is not in the table before any SQL.
+	my $unknown = keys %$col_meta ? _unknown_csv_columns( \@cols, $col_meta ) : [];
+	if (@$unknown) {
+		close($fh);
+		return (
+			-1,
+			&logger(
+				3,
+				"csv_import: unknown column(s) "
+					. join( ', ', @$unknown )
+					. " for table $norm_table"
+			)
+		);
+	}
+
+	# The column metadata is prepared once into a positional plan (plan O3), so
+	# each field of every row costs one test sequence, not a closure call.
+	my $plan = _make_clean_plan( $col_meta, \@cols );
 
 	# The merge looks up the existing row on the column named by ref_col (D-S53;
 	# the fork hard-coded the first column). The default 0 keeps M's behaviour.
@@ -933,7 +1552,8 @@ sub csv_import {
 	while (<$fh>) {
 		$lines_inserted++;
 		$csv->parse($_);
-		my @data = $csv->fields();
+		my @data  = $csv->fields();
+		my @clean = _clean_row( $plan, \@data );
 		my ( $sql, $sth, $seqlot );
 
 		if ( $params->{'mode'} =~ /merge/i ) {
@@ -944,11 +1564,11 @@ sub csv_import {
 				. $norm_table
 				. " WHERE "
 				. $cols[$refcol] . " = ?";
-			&logger( 8, "Select from $norm_table : $sql" );
+			&logger( 7, "Select from $norm_table : $sql" );
 			$sth = $dbh->prepare_cached($sql);
 			do {
 				local $sth->{PrintError} = 0;
-				$sth->execute( $clean_val->( $cols[$refcol], $data[$refcol] ) );
+				$sth->execute( $clean[$refcol] );
 				}
 				or &logger( 3, "SQL execute failed " . $sth->err . "-" . $sth->errstr );
 			$seqlot = $sth->fetchrow_hashref();
@@ -967,12 +1587,11 @@ sub csv_import {
 				. join( '=?, ', @cols ) . "=? "
 				. " WHERE "
 				. $cols[$refcol] . " = ?";
-			&logger( 8, "Update $norm_table : $sql" );
+			&logger( 7, "Update $norm_table : $sql" );
 			$sth = $dbh->prepare_cached($sql);
 			do {
 				local $sth->{PrintError} = 0;
-				$sth->execute( ( map { $clean_val->( $cols[$_], $data[$_] ) } 0 .. $#cols ),
-					$clean_val->( $cols[$refcol], $data[$refcol] ) );
+				$sth->execute( @clean, $clean[$refcol] );
 				}
 				or &logger( 3, "SQL execute failed " . $sth->err . "-" . $sth->errstr );
 		}
@@ -987,7 +1606,7 @@ sub csv_import {
 			$sth = $dbh->prepare_cached($sql);
 			do {
 				local $sth->{PrintError} = 0;
-				$sth->execute( map { $clean_val->( $cols[$_], $data[$_] ) } 0 .. $#cols );
+				$sth->execute(@clean);
 				}
 				or &logger( 3, "SQL execute failed " . $sth->err . "-" . $sth->errstr );
 		}
@@ -1077,16 +1696,20 @@ sub _db_connect1 {
 	# connection handled in a timed loop: 3 attempts with an increasing pause
 	for ( my $i = 0 ; $i < 3 ; $i++ ) {
 		sleep( $_LOCAL_EDTK_WAITRUN * $i );
+		$dbh = undef;
 		eval {
 			$dbh = DBI->connect( $dsn, $cfg->{"${dsnvar}_USER"}, $cfg->{"${dsnvar}_PASS"}, $dbargs )
 				;    ## xxxx
 		};
 
-		if ($@) {
+		# H5: a driver may fail without raising (RaiseError=0, the reason left in
+		# $DBI::errstr only). Only a defined handle counts as a success, so a silent
+		# miss is retried instead of being mistaken for an established connection.
+		if ( $@ || !defined $dbh ) {
 
 			# on a connection failure, try again
 			&logger( 4, "DBI connection missmatch to $dsnvar, we try 3 times" );
-			&logger( 4, "Error message was : $@" );
+			&logger( 4, "Error message was : " . ( $@ || $DBI::errstr || 'no handle returned' ) );
 
 		}
 		else {
@@ -1095,6 +1718,12 @@ sub _db_connect1 {
 			if (
 					$CONNECT_COUNT == 1
 				and $dsnvar ne "EDTK_DBI_PARAM"
+
+				# H1: never run the automatic check on the backup buffer. Its handle
+				# is opened while the counter still reads 1 (the check runs on the
+				# second connection, before the counter is bumped), so without this
+				# guard every backup handle would re-enter the reconcile.
+				and $dsnvar !~ /_BAK\z/
 
 				#and ($cfg->{EDTK_DB_CHECK_AUTO}||"YES")!~/NO/i
 				#and (defined $cfg->{EDTK_DB_CHECK_AUTO} && $cfg->{EDTK_DB_CHECK_AUTO} =~/YES/i)
@@ -1177,6 +1806,13 @@ sub db_connect {
 	return $dbh;
 }
 
+# Elapsed whole seconds since $since. DBAdmin imports time() from Time::HiRes,
+# so a raw difference is fractional; edtk_admin.ed_action_duration is integer.
+sub _elapsed_seconds {
+	my ($since) = @_;
+	return int( time - $since );
+}
+
 # Run a DML statement, routing any driver error through the logger (see the
 # &logger calls below) rather than letting DBI's PrintError dump the raw message
 # to STDERR. Returns do()'s result (truthy even for 0 rows, "0E0", as DBI does)
@@ -1211,27 +1847,6 @@ sub _table_exists {
 	return @info ? 1 : 0;
 }
 
-# Job on request
-sub acheck_db_admin2 {
-	my (%p) = @_;
-	my $date = strftime( "%Y-%m-%d", localtime );
-
-	my $dbh = db_connect( $p{CFG}, 'EDTK_DBI_DSN' );
-	eval { schema_StaleWarning( $dbh, cfg => $p{CFG} ); };
-	my ($last) =
-		$dbh->selectrow_array( 'select 1 from edtk_admin where ed_action_date = ?', undef, $date );
-	$dbh->disconnect;
-	return if $last;
-
-	_db_with_lock(
-		CFG  => $p{CFG},
-		code => sub {
-			my $dbh = shift;
-			_db_maintenance( DBH => $dbh, CFG => $p{CFG}, rotate => 1, purge => 1 );
-		}
-	);
-}
-
 sub acheck_db_admin {
 
 	# EXAMPLE CALL:
@@ -1247,7 +1862,7 @@ sub acheck_db_admin {
 	#	my $time =time;
 	my $date = strftime "%Y-%m-%d", localtime;
 	my ( $sth, $sql );
-	&logger( 4, "ACHECK lookup" );
+	&logger( 6, "ACHECK lookup" );
 
 	# LOOK FOR THE LAST ACTION ON THE ADMIN TABLE
 	$sql =
@@ -1342,7 +1957,7 @@ sub _acheck_request_for_db {
 	}
 
 	# End of the run
-	$time = time - $time;
+	$time = _elapsed_seconds($time);
 	$sql =
 'update edtk_admin set ed_action_status = ?, ed_action_duration = ? where ed_action_date = ?';
 	&logger( 7, $sql );
@@ -1462,7 +2077,7 @@ sub _acheck_db_purges {
 	&logger( 6, "RESULT = " . ( $result || 0 ) . " for $sql" );
 	$reportActions .= "-PURGE EDTK_ID=" . ( $result || 0 );
 
-	return &logger( 4, $reportActions );
+	return &logger( 6, $reportActions );
 }
 
 sub _acheck_db_rotate {
@@ -1711,6 +2326,13 @@ sub acheck_db_admin_on_connect {
 	my $dbh = shift;
 	my $cfg = shift;
 
+	# H1: this check must not re-enter itself. It reconciles the backup buffer,
+	# which opens a backup handle through _db_connect1(); did that fire the check
+	# again the calls would nest without bound. A dedicated guard is used rather
+	# than moving $CONNECT_COUNT, which would change when the check first fires.
+	return ( 5, "ACHECK already running in this process" ) if $IN_ACHECK;
+	local $IN_ACHECK = 1;
+
 	eval { schema_StaleWarning( $dbh, cfg => $cfg ); };
 
 	my $time = time;
@@ -1730,7 +2352,7 @@ sub acheck_db_admin_on_connect {
 	# Repatriate any pending backup rows before the maintenance check.
 	eval { _db_maybe_reconcile( $dbh, $cfg ); };
 
-	&logger( 4, "ACHECK Check START" );
+	&logger( 6, "ACHECK Check START" );
 
 	#LOOK FOR THE LAST ACTION ON THE ADMIN TABLE
 	$sql =
@@ -1967,7 +2589,7 @@ sub acheck_db_admin_on_connect {
 	$reportActions .= "-PURGE edtk_id=" . ( $result // 0 );
 
 	# End of the run
-	$time = time - $time;
+	$time = _elapsed_seconds($time);
 	$sql =
 'update edtk_admin set ed_action_status = ?, ed_action_duration = ? where ed_action_date = ?';
 	_db_do_log(
@@ -2021,14 +2643,14 @@ sub create_table_TRACKING {
 	$sql .= " )";
 	$sql .= _db_engine_clause($dbh);
 	&logger( 7, $sql );
-	_db_do_ddl( $dbh, $sql ) or &logger( 4, $dbh->errstr );
+	_db_do_ddl( $dbh, $sql ) or &logger( 3, $dbh->errstr );
 
 	#	my $idx = "ix_".$table."_".$VERSION_TXT;
 	my $idx = "ix_" . $table;
 	$sql = "create index if not exists $idx on $table " . " (ed_tstamp);";
 	&logger( 7, $sql );
 	_db_do_ddl( $dbh, $sql )
-		or &logger( 4, $dbh->errstr )
+		or &logger( 3, $dbh->errstr )
 		if ( _db_check_driver_name($dbh) ne "SQLite" );
 
 }
@@ -2037,7 +2659,7 @@ sub db_drop_table {
 	my ( $dbh, $table ) = @_;
 	my $sql = "drop table $table";
 
-	_db_do_ddl( $dbh, $sql ) or &logger( 4, $dbh->errstr );
+	_db_do_ddl( $dbh, $sql ) or &logger( 3, $dbh->errstr );
 }
 
 # ============================================================
@@ -2072,11 +2694,64 @@ sub db_on_backup {
 	return ( defined $dbh && $dbh->{'private_oEdtk_on_backup'} ) ? 1 : 0;
 }
 
+# Canonical identity of the database behind a handle, so two handles opened from
+# different DSN strings that resolve to the SAME database can be told apart from
+# genuinely distinct ones. Returns a string key, or undef when the driver cannot
+# be interrogated (Oracle, "NC"): the caller then cannot prove sameness.
+sub _db_identity {
+	my ($dbh) = @_;
+	return unless defined $dbh;
+	my $drv = eval { _db_check_driver_name($dbh) };
+	return unless defined $drv;
+	return do {
+		local $dbh->{PrintError} = 0;
+		local $dbh->{RaiseError} = 0;
+		my @parts;
+		if ( $drv eq 'SQLite' ) {
+
+			# PRAGMA database_list canonicalizes the file path, so ".../main.db"
+			# and "..././main.db" resolve to the same absolute path.
+			my $rows = eval { $dbh->selectall_arrayref('pragma database_list') };
+			my ($main) = grep { $_->[1] eq 'main' } @{ $rows || [] };
+			push @parts, 'sqlite', ( $main ? ( $main->[2] // '' ) : '' );
+		}
+		elsif ( $drv eq 'PostgreSQL' ) {
+			my ( $d, $h, $p ) = eval {
+				$dbh->selectrow_array(
+					'select current_database(), inet_server_addr()::text, inet_server_port()');
+			};
+			push @parts, 'pg', ( $d // '' ), ( $h // '' ), ( $p // '' );
+		}
+		elsif ( $drv eq 'mysql' ) {
+			my ( $d, $h, $p ) =
+				eval { $dbh->selectrow_array('select database(), @@hostname, @@port') };
+			push @parts, 'mysql', ( $d // '' ), ( $h // '' ), ( $p // '' );
+		}
+		else { return }
+		return join "\0", @parts;
+	};
+}
+
+# True when the two handles designate the same physical database. Conservative:
+# when either identity cannot be established, the answer is "different" so a
+# legitimate reconcile is never refused on a mere guess.
+sub _db_same_database {
+	my ( $a, $b ) = @_;
+	my $ka = _db_identity($a);
+	my $kb = _db_identity($b);
+	return 0 unless defined $ka && defined $kb;
+	return $ka eq $kb ? 1 : 0;
+}
+
 # Open the backup buffer (never fatal, never blocking).
 sub _db_backup_connect {
 	my ($cfg) = @_;
 	return unless db_backup_available($cfg);
-	my %bcfg = ( %$cfg, EDTK_WAITRUN => 0 );    # no retry loop for a probe
+
+	# H1: the probe must not trigger the automatic maintenance check (it would
+	# reconcile the very buffer we are about to read) and must not pause: no
+	# retry loop, and the check forced off on this connection.
+	my %bcfg = ( %$cfg, EDTK_WAITRUN => 0, EDTK_DB_CHECK_AUTO => 'NO' );
 	my $bak  = eval {
 		_db_connect1(
 			\%bcfg,
@@ -2087,6 +2762,10 @@ sub _db_backup_connect {
 			}
 		);
 	};
+
+	# H1/H3: flag the handle the moment it is opened, so db_on_backup() stops a
+	# reconcile from running against the buffer itself.
+	$bak->{'private_oEdtk_on_backup'} = 1 if defined $bak;
 	return $bak;
 }
 
@@ -2205,6 +2884,17 @@ sub _reconcile_one_table {
 	my $sth_ins = $main->prepare($sql_insert);
 	&logger( 7, "_reconcile_one_table: $table exists=[$sql_exists]" );
 
+	# Buffer-side raw name of each natural-key element, matched by normalized
+	# name (the buffer and the registry may differ in case). The drain deletes
+	# ONLY the rows we read, key by key (H3): an unconditional "delete from
+	# <table>" would also erase a row written by a process still on backup during
+	# our read, losing it for good.
+	my %norm2raw;
+	for my $i ( 0 .. $#$raw_cols ) { $norm2raw{ $norm_id->( $raw_cols->[$i] ) } = $raw_cols->[$i]; }
+	my @del_cols = map { $norm2raw{ $norm_id->($_) } // $_ } @keys;
+	my $sql_del  = "delete from $table where " . join( ' and ', map { "$_ = ?" } @del_cols );
+	my @read_keys;
+
 	while ( my $row = $sth_rd->fetchrow_arrayref ) {
 		$out->{read}++;
 
@@ -2212,6 +2902,7 @@ sub _reconcile_one_table {
 		# between the buffer and the main schema cannot corrupt the data.
 		my %by_name;
 		for my $i ( 0 .. $#$raw_cols ) { $by_name{ $norm_id->( $raw_cols->[$i] ) } = $row->[$i]; }
+		push @read_keys, [ map { $by_name{ $norm_id->($_) } } @keys ];
 
 		my $dup = eval {
 			local $sth_chk->{PrintError} = 0;
@@ -2237,13 +2928,37 @@ sub _reconcile_one_table {
 	}
 	$sth_rd->finish;
 
-	# Drain the buffer table only when the whole batch was written.
+	# Drain the buffer table only when the whole batch was written, and only the
+	# rows we actually read (H3). The count is checked first: a mismatch aborts the
+	# drain rather than erasing rows we never copied.
 	if ( $out->{ok} && !$p{keep_backup} ) {
-		my $d = eval { local $bak->{PrintError} = 0; $bak->do("delete from $table"); };
-		unless ( defined $d ) {
-			&logger( 3,
-				"_reconcile_one_table: could not drain '$table': " . ( $bak->errstr // '' ) );
+		if ( @read_keys != $out->{read} ) {
+			&logger( 3, "_reconcile_one_table: '$table' read/key mismatch, buffer not drained" );
 			$out->{ok} = 0;
+		}
+		else {
+			# Atomic drain when we own the transaction; if the caller manages it,
+			# the deletes just join that transaction.
+			my $own_tx = eval { $bak->{AutoCommit} };
+			eval { $bak->begin_work } if $own_tx;
+			my $bad;
+			for my $kv (@read_keys) {
+				my $ok = eval {
+					local $bak->{PrintError} = 0;
+					local $bak->{RaiseError} = 0;
+					$bak->do( $sql_del, undef, @$kv );
+					1;
+				};
+				unless ($ok) { $bad = $bak->errstr // $@ // 'unknown error'; last; }
+			}
+			if ( defined $bad ) {
+				eval { $bak->rollback } if $own_tx;
+				&logger( 3, "_reconcile_one_table: could not drain '$table': $bad" );
+				$out->{ok} = 0;
+			}
+			else {
+				eval { $bak->commit } if $own_tx;
+			}
 		}
 	}
 	return $out;
@@ -2256,6 +2971,14 @@ sub db_reconcile_backup {
 	my ( $main_dbh, %p ) = @_;
 	my $cfg = $p{CFG} || config_read('EDTK_DB');
 	my $res = { driver => _db_check_driver_name($main_dbh), tables => {}, written => 0, ok => 1 };
+
+	# H1: never nest a reconcile with itself. This is reached from the on-connect
+	# check, which may itself be running on a connection an outer reconcile opened.
+	if ($IN_RECONCILE) {
+		&logger( 7, "db_reconcile_backup: already running in this process, skipping" );
+		return $res;
+	}
+	local $IN_RECONCILE = 1;
 
 	unless ( db_backup_available($cfg) ) {
 		&logger( 7, "db_reconcile_backup: no distinct backup database configured, nothing to do" );
@@ -2274,8 +2997,20 @@ sub db_reconcile_backup {
 		return $res;
 	}
 
+	# H3: refuse when both handles designate the SAME database (the anti-loop
+	# guard only compares the DSN strings, so two spellings of one database slip
+	# through). Reconciling a database with itself would drain the main table.
+	if ( _db_same_database( $main_dbh, $bak ) ) {
+		&logger( 3,
+			"db_reconcile_backup: main and backup handles designate the same database, refusing" );
+		$res->{ok}    = 0;
+		$res->{error} = 'main and backup are the same database';
+		eval { $bak->disconnect };
+		return $res;
+	}
+
 	my @tables = $p{tables} ? @{ $p{tables} } : _backup_table_registry($cfg);
-	&logger( 4, "checking if backup data needs reconciliation ..." );
+	&logger( 6, "checking if backup data needs reconciliation ..." );
 
 	for my $t (@tables) {
 		my $r = _reconcile_one_table( $main_dbh, $bak, $t, %p );
@@ -2332,7 +3067,7 @@ sub create_table_ADMIN {
 	$sql .= _db_engine_clause($dbh);
 	&logger( 7, $sql );
 
-	_db_do_ddl( $dbh, $sql ) or &logger( 4, $dbh->errstr );
+	_db_do_ddl( $dbh, $sql ) or &logger( 3, $dbh->errstr );
 }
 
 sub create_table_ID {
@@ -2349,13 +3084,13 @@ sub create_table_ID {
 
 	&logger( 7, $sql );
 
-	_db_do_ddl( $dbh, $sql ) or &logger( 4, $dbh->errstr );
+	_db_do_ddl( $dbh, $sql ) or &logger( 3, $dbh->errstr );
 
 	#	my $idx = "ix_".$table."_".$VERSION_TXT;
 	my $idx = "ix_" . $table;
 	$sql = "create index if not exists $idx on $table (ed_id_date);";
 	&logger( 7, $sql );
-	_db_do_ddl( $dbh, $sql ) or &logger( 4, $dbh->errstr );
+	_db_do_ddl( $dbh, $sql ) or &logger( 3, $dbh->errstr );
 
 }
 
@@ -2390,7 +3125,7 @@ sub create_table_FILIERES {
 	$sql .= _db_engine_clause($dbh);
 	&logger( 7, $sql );
 
-	_db_do_ddl( $dbh, $sql ) or &logger( 4, $dbh->errstr );
+	_db_do_ddl( $dbh, $sql ) or &logger( 3, $dbh->errstr );
 }
 
 sub create_table_LOTS {
@@ -2416,7 +3151,7 @@ sub create_table_LOTS {
 	$sql .= _db_engine_clause($dbh);
 	&logger( 7, $sql );
 
-	_db_do_ddl( $dbh, $sql ) or &logger( 4, $dbh->errstr );
+	_db_do_ddl( $dbh, $sql ) or &logger( 3, $dbh->errstr );
 }
 
 sub create_table_REFIDDOC {
@@ -2443,7 +3178,7 @@ sub create_table_REFIDDOC {
 	$sql .= _db_engine_clause($dbh);
 	&logger( 7, $sql );
 
-	_db_do_ddl( $dbh, $sql ) or &logger( 4, $dbh->errstr );
+	_db_do_ddl( $dbh, $sql ) or &logger( 3, $dbh->errstr );
 }
 
 sub create_table_SUPPORTS {
@@ -2467,7 +3202,7 @@ sub create_table_SUPPORTS {
 	$sql .= _db_engine_clause($dbh);
 	&logger( 7, $sql );
 
-	_db_do_ddl( $dbh, $sql ) or &logger( 4, $dbh->errstr );
+	_db_do_ddl( $dbh, $sql ) or &logger( 3, $dbh->errstr );
 }
 
 our @DISTRIB_COLS = (
@@ -2503,7 +3238,7 @@ sub create_table_DISTRIB {
 	$sql .= _db_engine_clause($dbh);
 	&logger( 7, $sql );
 
-	_db_do_ddl( $dbh, $sql ) or &logger( 4, $dbh->errstr );
+	_db_do_ddl( $dbh, $sql ) or &logger( 3, $dbh->errstr );
 
 	#	my $idx = "ix_".$table."_".$VERSION_TXT;
 	my $idx = "ix_" . $table;
@@ -2511,7 +3246,7 @@ sub create_table_DISTRIB {
 	$sql = "create index if not exists $idx on $table "
 		. " (ed_idldoc, ed_seqdoc, ed_idseqpg, ed_idjob, ed_chanel_out, ed_dtlot);";
 	&logger( 7, $sql );
-	_db_do_ddl( $dbh, $sql ) or &logger( 4, $dbh->errstr );
+	_db_do_ddl( $dbh, $sql ) or &logger( 3, $dbh->errstr );
 
 	# Rotation / maintenance predicates. Rows are selected and deleted by job
 	# (agrege_idJob, _acheck_db_rotate) and by batch date (rotation). The composite
@@ -2521,7 +3256,7 @@ sub create_table_DISTRIB {
 		my ( $sfx, $col ) = @$spec;
 		$sql = "create index if not exists ${idx}_$sfx on $table ($col);";
 		&logger( 7, $sql );
-		_db_do_ddl( $dbh, $sql ) or &logger( 4, $dbh->errstr );
+		_db_do_ddl( $dbh, $sql ) or &logger( 3, $dbh->errstr );
 	}
 
 }
@@ -2552,14 +3287,14 @@ sub create_table_AGREGE {
 	$sql .= _db_engine_clause($dbh);
 	&logger( 7, $sql );
 
-	_db_do_ddl( $dbh, $sql ) or &logger( 4, $dbh->errstr );
+	_db_do_ddl( $dbh, $sql ) or &logger( 3, $dbh->errstr );
 
 	#	my $idx = "ix_".$table."_".$VERSION_TXT;
 	my $idx = "ix_" . $table;
 	$sql = "create index if not exists $idx on $table "
 		. " (ed_source, ed_chanel_out, ed_refiddoc, ed_idproduct, ed_dtedtion, ed_dtlot, ed_idlot);";
 	&logger( 7, $sql );
-	_db_do_ddl( $dbh, $sql ) or &logger( 4, $dbh->errstr );
+	_db_do_ddl( $dbh, $sql ) or &logger( 3, $dbh->errstr );
 
 }
 
@@ -2578,7 +3313,7 @@ sub create_table_PARA {
 	$sql .= _db_engine_clause($dbh);
 	&logger( 7, $sql );
 
-	_db_do_ddl( $dbh, $sql ) or &logger( 4, $dbh->errstr );
+	_db_do_ddl( $dbh, $sql ) or &logger( 3, $dbh->errstr );
 }
 
 sub create_table_DATAGROUPS {
@@ -2600,7 +3335,7 @@ sub create_table_DATAGROUPS {
 	my $idx = "ix_" . $table;
 	$sql = "create index if not exists $idx on $table " . " (ed_dgps_refiddoc, ed_id);";
 	&logger( 7, $sql );
-	_db_do_ddl( $dbh, $sql ) or &logger( 4, $dbh->errstr );
+	_db_do_ddl( $dbh, $sql ) or &logger( 3, $dbh->errstr );
 
 }
 
@@ -2626,7 +3361,7 @@ sub create_table_ACQUIT {
 
 	&logger( 7, $sql );
 
-	_db_do_ddl( $dbh, $sql ) or &logger( 4, $dbh->errstr );
+	_db_do_ddl( $dbh, $sql ) or &logger( 3, $dbh->errstr );
 }
 
 # Acquittal, step 1 (D-S53): stamp the mailing-out date and the acknowledgement
@@ -2818,13 +3553,13 @@ sub create_table_OUTMNGR {
 	$sql .= _db_engine_clause($dbh);
 	&logger( 7, $sql );
 
-	_db_do_ddl( $dbh, $sql ) or &logger( 4, $dbh->errstr );
+	_db_do_ddl( $dbh, $sql ) or &logger( 3, $dbh->errstr );
 
 	#	my $idx = "ix_".$table."_".$VERSION_TXT;
 	my $idx = "ix_" . $table;
 	$sql = "create index if not exists $idx on $table " . " (ed_dtedtion, ed_seqlot, ed_typprod);";
 	&logger( 7, $sql );
-	_db_do_ddl( $dbh, $sql ) or &logger( 4, $dbh->errstr );
+	_db_do_ddl( $dbh, $sql ) or &logger( 3, $dbh->errstr );
 }
 
 sub create_lot_sequence {
@@ -2838,20 +3573,20 @@ sub create_lot_sequence {
 		# table cycling 0..999 (read back by _get_seqlot in Outmngr.pm). MySQL uses
 		# its own AUTO_INCREMENT emulation and is skipped by the caller.
 		_db_do_ddl( $dbh, "create table if not exists edtk_idlot_seq (id_val integer not null)" )
-			or &logger( 4, $dbh->errstr );
+			or &logger( 3, $dbh->errstr );
 		do {
 			local $dbh->{PrintError} = 0;
 			$dbh->do(
 "insert into edtk_idlot_seq (id_val) select 0 where not exists (select 1 from edtk_idlot_seq)"
 			);
 			}
-			or &logger( 4, $dbh->errstr );
+			or &logger( 3, $dbh->errstr );
 		return 1;
 	}
 
 	# method valid for most DBMS except MySQL
 	my $sql = "create sequence if not exists edtk_idlot minvalue 0 maxvalue 999 cycle";
-	_db_do_ddl( $dbh, $sql ) or &logger( 4, $dbh->errstr );
+	_db_do_ddl( $dbh, $sql ) or &logger( 3, $dbh->errstr );
 	return 1;
 }
 
@@ -2977,7 +3712,7 @@ sub _create_table_extra {
 	$sql .= " )";
 	$sql .= _db_engine_clause($dbh);
 	&logger( 7, $sql );
-	_db_do_ddl( $dbh, $sql ) or &logger( 4, $dbh->errstr );
+	_db_do_ddl( $dbh, $sql ) or &logger( 3, $dbh->errstr );
 	return 1;
 }
 
@@ -3220,16 +3955,39 @@ sub _schema_diff_text {
 		. ( @$shrink ? join( ',', @$shrink ) : 'none' ) . ')';
 }
 
-# The remediation hint. The password VALUE is never printed.
+# Quote a value for a copy-paste command line (single quotes, embedded quotes
+# escaped). An undefined/empty value is returned unchanged.
+sub _shell_quote {
+	my ($s) = @_;
+	return $s unless defined $s && length $s;
+	$s =~ s/'/'\\''/g;
+	return "'$s'";
+}
+
+# A host program may register a renderer here so the remediation hint names a
+# command it can actually run (the packaged tracker has no lib/db_migrate.pl);
+# coderef ($cfg) -> $hint_string. Defaults to the shipped lib/db_migrate.pl.
+our $SCHEMA_FIX_HINT;
+
+# The remediation hint. The password VALUE is never printed. Values are
+# shell-quoted so the hint is copy-pasteable. A failing host hook falls back to
+# the default form.
 sub _schema_fix_command {
 	my ($cfg) = @_;
+
+	if ( ref $SCHEMA_FIX_HINT eq 'CODE' ) {
+		my $hint = eval { $SCHEMA_FIX_HINT->($cfg) };
+		return $hint if defined $hint && length $hint;
+	}
+
 	my $dsn = $cfg->{EDTK_DBI_DSN} // '';
 	$dsn =~ s/(pass(word)?=)[^;]*/$1***/gi;    # mask an inline secret, if any
 	$dsn = '<dsn>' unless length $dsn;
+	$dsn = _shell_quote($dsn);
 	my $user = $cfg->{EDTK_DBI_DSN_USER};
 	my $cmd  = "perl lib/db_migrate.pl --check-only --dsn $dsn ; then";
 	$cmd .= " perl lib/db_migrate.pl --additive --dsn $dsn";
-	$cmd .= " --user $user" if defined $user && length $user;
+	$cmd .= ' --user ' . _shell_quote($user) if defined $user && length $user;
 	$cmd .= ' --pass <pass>';
 	return $cmd;
 }
@@ -3293,7 +4051,7 @@ sub create_table_SCHEMA_HISTORY {
 	$sql .= _db_engine_clause($dbh);
 	&logger( 7, $sql );
 
-	_db_do_ddl( $dbh, $sql ) or &logger( 4, $dbh->errstr );
+	_db_do_ddl( $dbh, $sql ) or &logger( 3, $dbh->errstr );
 	return 0;
 }
 
@@ -3325,7 +4083,7 @@ sub schema_History_add {
 			. "values (?,?,?,?,?,?)",
 		undef, $date, $p{from}, $p{to}, $p{mode}, $tool, $ctext
 	);
-	&logger( 4, $dbh->errstr ) unless $ok;
+	&logger( 3, $dbh->errstr ) unless $ok;
 	return $ok ? 1 : 0;
 }
 
@@ -3709,7 +4467,7 @@ sub schema_Historize {
 				};
 			}
 		}
-		&logger( 4, "schema_Historize: aborted, service schema untouched: $err" );
+		&logger( 3, "schema_Historize: aborted, service schema untouched: $err" );
 		return {
 			ok      => 0,
 			from    => $detect->{level},
@@ -3766,7 +4524,7 @@ sub schema_Revert {
 	unless ($ok) {
 		my $err = $@ // 'unknown error';
 		eval { $dbh->rollback } if $own && $txn;
-		&logger( 4, "schema_Revert: aborted: $err" );
+		&logger( 3, "schema_Revert: aborted: $err" );
 		return { ok => 0, stamp => $stamp, error => $err };
 	}
 	schema_History_add(
@@ -3917,6 +4675,134 @@ sub _schema_change_key {
 	return ( 1, undef );
 }
 
+# READ-ONLY preview of the in-place additive update: exactly what schema_Additive
+# would add, widen, create or change, without writing anything (every statement is
+# a SELECT / PRAGMA). Options: manifest, with_constraints (0|1). Returns a plan
+# hash: ok, level, driver, detect, create (list), add (table => [cols]), widen
+# (table => [ {col,from,to} ]), key (list), add_sql (list), widen_sql (list),
+# violations (list) and report (list of lines).
+sub schema_AdditivePlan {
+	my ( $dbh, %opt ) = @_;
+	my $cfg      = eval { config_read('EDTK_DB') } || {};
+	my $manifest = $opt{manifest} // [ schema_Manifest($cfg) ];
+	my $detect   = schema_Detect( $dbh, %opt );
+	my $driver   = _db_check_driver_name($dbh);
+
+	my $target = _schema_target_scan($cfg);
+
+	require oEdtk::SchemaScan;
+	my $scan = oEdtk::SchemaScan::scan_schema($dbh);
+
+	my @create;
+	my %add;
+	my %widen;
+	my @key;
+	my @violations;
+	my @add_sql;
+	my @widen_sql;
+
+	for my $t (@$manifest) {
+		my $tbl = $target->{$t} or next;
+
+		# A table absent from the base is created, not altered.
+		my $live = $scan->{tables}{$t};
+		if ( !$live ) {
+			push @create, $t;
+			next;
+		}
+
+		my %sc = map { lc( $_->{name} ) => $_ } @{ $live->{columns} // [] };
+		my ($nrows) = $dbh->selectrow_array("select count(*) from $t");
+		$nrows += 0;
+
+		for my $col ( @{ $tbl->{columns} // [] } ) {
+			my $key = lc $col->{name};
+			if ( !exists $sc{$key} ) {
+				my $notnull = ( defined $col->{nullable} && !$col->{nullable} ) ? 1 : 0;
+				if ( $notnull && !defined $col->{default} && $nrows > 0 ) {
+					push @violations,
+						"$t.$col->{name}: NOT NULL without a default on a populated table";
+					next;
+				}
+				push @{ $add{$t} }, $col->{name};
+				push @add_sql,      _schema_add_column_sql( $driver, $t, $col );
+				next;
+			}
+			my $s = $sc{$key};
+			next unless defined $col->{size} && defined $s->{size};
+			if ( $col->{size} > $s->{size} ) {
+				push @{ $widen{$t} },
+					{ col => $col->{name}, from => $s->{size}, to => $col->{size} };
+				my $sql = _schema_widen_sql( $driver, $t, $col, $col->{size} );
+				if ( defined $sql ) {
+					push @widen_sql, $sql;
+				}
+				else {
+					push @violations,
+"$t.$col->{name}: widening $s->{size}->$col->{size} not supported on $driver";
+				}
+			}
+			elsif ( $col->{size} < $s->{size} ) {
+				push @violations, "narrowing refused: $t.$col->{name} $s->{size}->$col->{size}";
+			}
+		}
+
+		my @spk = _schema_pk_of($live);
+		my @tpk = _schema_pk_of($tbl);
+		if ( @tpk && join( ',', @spk ) ne join( ',', @tpk ) ) {
+			push @key, { table => $t, from => join( ',', @spk ), to => join( ',', @tpk ) };
+			push @violations,
+				  "$t: key differs ( "
+				. join( ',', @spk ) . " -> "
+				. join( ',', @tpk )
+				. " ); use --with-constraints"
+				unless $opt{with_constraints};
+		}
+	}
+
+	my @report;
+	push @report, "schema level: $detect->{level}";
+	push @report, "driver: $driver";
+	push @report, "target level: T";
+	push @report, "mode: additive (in place, read-only preview)";
+	push @report, sprintf( "tables to create: %d", scalar @create );
+	push @report, sprintf( "columns to add: %d",   scalar( map { @$_ } values %add ) );
+	push @report, sprintf( "columns to widen: %d", scalar( map { @$_ } values %widen ) );
+	push @report, sprintf( "key changes: %d",      scalar @key );
+	push @report, sprintf( "violations: %d",       scalar @violations );
+	push @report, sprintf( "  create %s",          $_ ) for @create;
+
+	for my $t ( sort keys %add ) {
+		push @report, sprintf( "  add    %-28s %s", $t, join( ',', @{ $add{$t} } ) );
+	}
+	for my $t ( sort keys %widen ) {
+		push @report,
+			sprintf(
+			"  widen  %-28s %s",
+			$t,
+			join( ',',
+				map { sprintf( '%s %s->%s', $_->{col}, $_->{from}, $_->{to} ) } @{ $widen{$t} } )
+			);
+	}
+	push @report, sprintf( "  key    %s ( %s -> %s )", $_->{table}, $_->{from}, $_->{to} ) for @key;
+	push @report, "  violation: $_" for @violations;
+
+	return {
+		ok         => 1,
+		level      => $detect->{level},
+		driver     => $driver,
+		detect     => $detect,
+		create     => \@create,
+		add        => \%add,
+		widen      => \%widen,
+		key        => \@key,
+		add_sql    => \@add_sql,
+		widen_sql  => \@widen_sql,
+		violations => \@violations,
+		report     => \@report,
+	};
+}
+
 # Perform the in-place additive update. Options: manifest, with_constraints (0|1),
 # checkpoint (a code ref called after each table) and force. A base that already
 # conforms to T with nothing to add or widen is a no-op (result field noop => 1).
@@ -4024,7 +4910,7 @@ sub schema_Additive {
 	unless ($ok) {
 		my $err = $@ // 'unknown error';
 		eval { $dbh->rollback } if $own && $txn;
-		&logger( 4, "schema_Additive: aborted: $err" );
+		&logger( 3, "schema_Additive: aborted: $err" );
 		return {
 			ok          => 0,
 			from        => $detect->{level},
@@ -4132,7 +5018,7 @@ sub db_check_privileges {
 	};
 	unless ($ok) {
 		$res{error} = $@ || 'unknown error';
-		&logger( 4, "db_check_privileges: privilege probe failed: $res{error}" );
+		&logger( 3, "db_check_privileges: privilege probe failed: $res{error}" );
 		return \%res;
 	}
 
@@ -4239,7 +5125,7 @@ sub _db_priv_oracle {
 	my $create_table = ( $priv{'CREATE TABLE'} || $priv{'CREATE ANY TABLE'} ) ? 1 : 0;
 	return (
 		create   => $create_table,
-		drop     => $priv{'DROP ANY TABLE'} ? 1 : 0,
+		drop     => ( $create_table            || $priv{'DROP ANY TABLE'} )      ? 1 : 0,
 		index    => ( $create_table            || $priv{'CREATE ANY INDEX'} )    ? 1 : 0,
 		alter    => ( $create_table            || $priv{'ALTER ANY TABLE'} )     ? 1 : 0,
 		sequence => ( $priv{'CREATE SEQUENCE'} || $priv{'CREATE ANY SEQUENCE'} ) ? 1 : 0,
@@ -4252,74 +5138,41 @@ sub schema_Upgrade {
 	# schema_Upgrade (CFG => $cfg);
 	my %p = @_;
 
+	# D50 (H2): schema_Upgrade is now an envelope of schema_Historize, which
+	# frees the index names before schema_Create (so the ix_* indexes are really
+	# rebuilt on the new table instead of being silently skipped while the
+	# renamed table still holds their names), copies the rows by NAMED columns
+	# (never positionally) and inverts the renames if a step fails. The call form
+	# schema_Upgrade(CFG => $cfg) is unchanged.
+	#
 	# PREREQUISITES FOR THIS OPERATION:
-	#- DISK SPACE
+	#- DISK SPACE (the previous schema is kept as history, see below)
 	#- HISTORIZATION
-	#- DATABASE || TABLE OPTIMIZATION
-
-	my @tListeTables = (
-		"edtk_acq",
-		"edtk_admin",
-		"edtk_agrege",
-		"edtk_filieres",
-		"edtk_id",
-		"edtk_lots",
-		"edtk_refiddoc",
-		"edtk_supports",
-
-		#		"edtk_datagroups",
-		#		"edtk_para",
-		$p{CFG}->{EDTK_DBI_DISTRIB},
-		$p{CFG}->{EDTK_DBI_DISTRIB_STATS},
-		$p{CFG}->{EDTK_DBI_OUTMNGR},
-		$p{CFG}->{EDTK_DBI_OUTMNGR_STATS}
-	);
-
-	my $stamp = strftime "%Y%m%d_%H%M", localtime;
-	$p{DBH} = db_connect( $p{CFG}, 'EDTK_DBI_DSN' );
+	my $dbh = db_connect( $p{CFG}, 'EDTK_DBI_DSN' );
 
 	# Repatriate any pending backup rows before renaming / copying the schema.
-	eval { _db_maybe_reconcile( $p{DBH}, $p{CFG} ); };
+	eval { _db_maybe_reconcile( $dbh, $p{CFG} ); };
 
 	# Best effort: alert (never block) when the DB user cannot CREATE/DROP.
-	eval { db_check_privileges( $p{DBH} ) };
+	eval { db_check_privileges($dbh) };
 
-	my $sep = "";
-	if ( _db_check_driver_name( $p{DBH} ) =~ m/SQLite/i ) {
-		$sep = "'";
-	}
+	# force => the upgrade always rebuilds (as before), even on an already
+	# conformant base; the current schema is set aside as <table>_hist_<stamp>.
+	&logger( 3,
+			  "schema_Upgrade: the previous schema is kept as history "
+			. "(<table>_hist_<stamp>) and consumes disk space" );
 
-	foreach my $table (@tListeTables) {
-		my $sql = sprintf( "alter table %s rename to " . "$sep" . "%s_%s" . "$sep" . " ;",
-			$table, $stamp, $table );
-		&logger( 7, $sql );
+	my $result = schema_Historize(
+		$dbh,
+		manifest => [ schema_Manifest( $p{CFG} ) ],
+		keep_old => 1,
+		force    => 1,
+	);
 
-		#$p{DBH}->do(                   $sql, undef, )  or die &logger( -1, "ERROR: can't $sql");
-		_db_do_log( $p{DBH}, _sql_fixup( $p{DBH}, $sql, 'casse' ), "ERROR: can't $sql",
-			fatal => 1 );
-
-	}
-
-	# if ok:
-	schema_Create( $p{DBH} );
-
-	#if ok:
-	foreach my $table (@tListeTables) {
-		my $sql = sprintf( "insert into %s select * from " . "$sep" . "%s_%s" . "$sep" . " ;",
-			$table, $stamp, $table );
-		&logger( 7, $sql );
-		_db_do_log( $p{DBH}, _sql_fixup( $p{DBH}, $sql, undef ), "ERROR: can't $sql", fatal => 1 );
-		my $drop = sprintf( "drop table " . "$sep" . "%s_%s" . "$sep" . " ;", $stamp, $table );
-		&logger( 7, $drop );
-		_db_do_log(
-			$p{DBH},
-			_sql_fixup( $p{DBH}, $drop, 'casse' ),
-			"ERROR: can't $drop",
-			fatal => 1
-		);
-	}
-
+	die "schema_Upgrade: " . ( $result->{error} // 'unknown error' ) . "\n"
+		unless $result->{ok};
 	db_invalidate_meta_cache();
+	return $result;
 }
 
 sub schema_Create {
@@ -4366,17 +5219,6 @@ sub schema_Create {
 	db_invalidate_meta_cache();
 }
 
-sub _db_maintenance {
-	my (%p) = @_;    # CFG, DBH, [rotate => 1], [purge => 1]
-	my $dbh = $p{DBH} // db_connect( $p{CFG}, 'EDTK_DBI_DSN' );
-
-	_db_rotate( $dbh, $p{CFG} ) if $p{rotate};
-	_db_purge( $dbh, $p{CFG} )  if $p{purge};
-
-	$dbh->disconnect unless $p{DBH};    # do not disconnect when a $dbh was passed to us
-	return 1;
-}
-
 sub _db_with_lock {
 	my (%p)  = @_;                                      # CFG, CODE-REF
 	my $dbh  = db_connect( $p{CFG}, 'EDTK_DBI_DSN' );
@@ -4410,7 +5252,7 @@ sub _db_with_lock {
 	my $err = $@;
 
 	# Mark the end
-	my $duration = time - $^T;
+	my $duration = _elapsed_seconds($^T);
 	$dbh->do(
 'update edtk_admin set ed_action_status = ?, ed_action_duration = ? where ed_action_date = ?',
 		undef, 'DONE', $duration, $date
@@ -4642,19 +5484,8 @@ sub _db_maintenance_run {
 		eval { $dbh->do($sql) };
 	};
 	return 1 if defined $res;
-	&logger( 4, "can't $what: " . ( $dbh->errstr // $@ // 'unknown error' ) );
+	&logger( 3, "can't $what: " . ( $dbh->errstr // $@ // 'unknown error' ) );
 	return 0;
-}
-
-sub _sql_fixup_v1 {
-	my ( $dbh, $sql ) = @_;
-
-	# invert the logic: standard SQL => Oracle-specific
-	if ( $dbh->{'Driver'}->{'Name'} ne 'Oracle' ) {
-		$sql =~ s/varchar2 *(\(\d+\))/varchar$1/gi;
-	}
-
-	return $sql;
 }
 
 sub _sql_fixup {
@@ -4703,7 +5534,7 @@ sub db_backup_agent {
 	my ( $dbh, $cfg ) = @_;
 	$cfg ||= config_read('EDTK_DB');
 	unless ( defined( $cfg->{'EDTK_ENTIRE_YEARS_KEPT'} ) && $cfg->{'EDTK_ENTIRE_YEARS_KEPT'} > 0 ) {
-		&logger( 4,
+		&logger( 6,
 			"EDTK_ENTIRE_YEARS_KEPT not defined for optimization purge. db_backup_agent not needed."
 		);
 		return 1;
@@ -4740,7 +5571,19 @@ sub db_backup_agent {
 		my $exists = _db_object_exists( $dbh, 'table', $cible )
 			|| _db_object_exists( $dbh, 'table', uc $cible );
 		if ($exists) {
-			&logger( 4, "db_backup_agent: archive $cible already exists for today, keeping it" );
+			&logger( 6, "db_backup_agent: archive $cible already exists for today, keeping it" );
+
+			# H13: a row older than the threshold may have arrived since the archive was
+			# made. Archive the rows we are about to purge, so none is deleted without
+			# first being saved (the same-day re-run used to purge them unarchived).
+			my $arch  = ( _db_check_driver_name($dbh) eq 'mysql' ) ? uc $cible : $cible;
+			my $sql_a = "insert into $arch select * from $table where $datecol < ?";
+			_db_do_log(
+				$dbh, _sql_fixup( $dbh, $sql_a, 'casse' ),
+				"ERROR: can't archive into $cible",
+				bind  => [$check],
+				fatal => 1
+			);
 		}
 		else {
 			copy_table( $dbh, $table, $cible, '-create' );
@@ -4754,10 +5597,252 @@ sub db_backup_agent {
 			fatal => 1
 		);
 
-		&logger( 4, "db_backup_agent DONE with $table for data older than $check." );
+		&logger( 6, "db_backup_agent DONE with $table for data older than $check." );
 	}
 
 	return 1;
 }
 
 1;
+
+=head1 NAME
+
+oEdtk::DBAdmin - oEdtk database administration, schema upkeep and bulk CSV loading
+
+=head1 SYNOPSIS
+
+  use oEdtk::DBAdmin qw(db_connect schema_Create csv_import);
+
+  my $dbh = db_connect( $cfg, 'EDTK_DBI_DSN' );
+  schema_Create($dbh);                          # build the whole schema
+  csv_import( $dbh, $table, $file, ref_col => 'id' );
+
+=head1 DESCRIPTION
+
+oEdtk::DBAdmin creates, detects, upgrades and maintains the oEdtk database and
+loads CSV data into it, across PostgreSQL, MySQL / MariaDB, Oracle and SQLite.
+The hardening work of the DBAdmin chantier (see F<docs/dbadmin/>) added the
+tuning keys and the schema-detection / staleness helpers documented below. The
+public entry points are grouped by area; the private helpers are not listed.
+
+=head1 CONNECTION
+
+=head2 db_connect( $cfg, $key )
+
+Connect to the database named by the configuration key I<$key> (for example
+C<EDTK_DBI_DSN>), applying the per-driver normalisation the module expects.
+
+=head2 db_check_privileges( $dbh, %opt )
+
+Read-only probe of the privileges the account holds (CREATE, DROP, INDEX, ALTER,
+SEQUENCE); never blocking. Returns a hash with the granted set, the missing one
+and an optional error. Option C<table> targets the ownership checks (PostgreSQL).
+
+=head2 db_invalidate_meta_cache
+
+Drop the column-metadata cache used by C<csv_import>. Call it after a schema
+change (C<schema_Create> / C<schema_Upgrade>) so the next import re-reads the
+columns instead of reusing a stale description.
+
+=head1 SCHEMA
+
+=head2 schema_Create( $dbh )
+
+Create the whole T schema: the base tables, the configuration-driven tables and
+the tracking table.
+
+=head2 schema_Upgrade( $dbh, %opt )
+
+Bring an existing base up to the current schema (delegates to the historisation
+path, see C<schema_Historize>).
+
+=head2 schema_Detect( $dbh, %opt )
+
+Inspect a live base and report its detected level against the T definitions.
+Option C<index_table> names the index table (defaults to C<EDTK_DBI_OUTMNGR>).
+READ-ONLY: every statement is a SELECT / PRAGMA; nothing is written.
+
+=head2 schema_Report( $dbh, %opt )
+
+The C<schema_Detect> result as printable text.
+
+=head2 schema_Manifest( ... )
+
+The ordered, de-duplicated list of tables the migration covers: the fixed base
+tables, the configuration-driven ones, the tracking table and any extension
+table.
+
+=head2 schema_MigrationPlan( $dbh, %opt )
+
+Read-only plan of an update by historisation (C<--check-only> / C<--dry-run>):
+the detected level, the per-table column sets and the copy SQL. Writes nothing.
+
+=head2 schema_Historize( $dbh, %opt )
+
+Perform the update by historisation. Options: C<stamp>, C<manifest>,
+C<checkpoint> (a code ref called after each table's copy; a die aborts and rolls
+back), C<keep_old> (default 1, the stamped tables are kept) and C<force>. An
+already-T base is a no-op (result field C<noop>). Returns a result hash.
+
+=head2 schema_Revert( $dbh, %opt )
+
+Invert a historisation before resuming the service: put the stamped tables back
+under their original names, dropping the current target. Option C<stamp>
+(required) is the one the migration used.
+
+=head2 schema_AdditivePlan( $dbh, %opt )
+
+Read-only preview of the in-place additive update: what C<schema_Additive> would
+add, widen, create or change. Option C<with_constraints> (0|1). Writes nothing
+(every statement is a SELECT / PRAGMA). Returns a plan hash: C<ok>, C<level>,
+C<driver>, C<detect>, C<create>, C<add>, C<widen>, C<key>, C<add_sql>, C<widen_sql>,
+C<violations> and C<report>.
+
+=head2 schema_Additive( $dbh, %opt )
+
+Perform the in-place additive update. Options: C<manifest>, C<with_constraints>
+(0|1), C<checkpoint> and C<force>. A base that already conforms to T with
+nothing to add or widen is a no-op (result field C<noop>). Returns a result hash:
+C<created>, C<added>, C<widened>, C<key_changed>, C<violations> and C<error>.
+
+=head2 schema_StaleWarning( $dbh, %opt )
+
+Report a stale schema ONCE, READ-ONLY, never fatal. Options: C<cfg>,
+C<index_table>, C<tracking_table> (all default to the EDTK_DB configuration).
+Returns the probe when a warning was emitted, undef otherwise. It never writes.
+
+=head2 schema_History_add( $dbh, %named )
+
+Append one history row: C<date>, C<from>, C<to>, C<mode>, C<tool> and C<counts>
+(a hash ref, stored as a compact "k=v;k=v" string).
+
+=head2 historicize_table( $dbh, %opt )
+
+Historise one table (used by the migration).
+
+=head2 create_SCHEMA( $dbh, $table, $maxkeys )
+
+Legacy entry point kept for the fork: it creates the whole schema (the canonical
+C<schema_Create>) plus the TRACKING table the fork also created.
+
+=head2 create_lot_sequence( $dbh )
+
+Create the lot-sequence counter table (needed by SQLite, which has no SEQUENCE).
+
+=head2 create_table_TRACKING / OUTMNGR / DISTRIB / ACQUIT / ACQMGENTECH / ... ( $dbh, ... )
+
+Create one table of the schema: TRACKING, OUTMNGR, DISTRIB, ACQUIT, ACQMGENTECH,
+SCHEMA_HISTORY, ADMIN, AGREGE, DATAGROUPS, FILIERES, ID, INDEX, LOTS, PARA,
+REFIDDOC, SUPPORTS. C<create_table_INDEX> is a fork alias of
+C<create_table_OUTMNGR>; C<create_table_ACQMGENTECH> targets the optional oEUser
+extension and is a silent no-op when it is not installed.
+
+=head1 LOADING DATA
+
+=head2 csv_import( $dbh, $table, $file, %opt )
+
+Import a CSV file into a table (the historic row-by-row API, unchanged). The
+keys and parameters that tune the PostgreSQL bulk path are below.
+
+=head2 insert_tData( $dbh, %opt )
+
+Insert one row (used by the C<csv_import> row-by-row path).
+
+=head1 BULK LOAD TUNING (PostgreSQL)
+
+=head2 EDTK_DB_BURST_MO
+
+Above this size, in MiB, a PostgreSQL insert switches to the ELT staging path:
+the file is copied raw into an unconstrained TEMP table and moved with a single
+INSERT ... SELECT, skipping the per-row Perl parse. 0 disables the path; the
+shipped default is 50 MiB. The caller parameter C<burst_mo> overrides it,
+C<pg_copy_staging> (0 or 1) forces either path regardless of size, and
+C<force_copy> (true) forces the parsed COPY path ahead of every other setting
+(the packaged tracker exposes it as C<--forceCopy>).
+
+=head2 EDTK_DB_COPY_ENCODING
+
+Source encoding declared to the PostgreSQL COPY. When unset, the historical
+LATIN1 is used; an unknown value is rejected with a message instead of being
+passed silently. The caller parameter C<pg_copy_encoding> takes precedence.
+
+=head2 EDTK_DB_DEFER_INDEX_RATIO, EDTK_DB_DEFER_INDEX_MIN_ROWS
+
+A PostgreSQL bulk insert drops the secondary indexes up-front and rebuilds them
+afterwards only when the incoming row count is at least
+C<EDTK_DB_DEFER_INDEX_RATIO> times the table's estimated row count (default
+0.1) and at least C<EDTK_DB_DEFER_INDEX_MIN_ROWS> rows (default 10000). The
+caller parameters C<pg_defer_index_ratio> and C<pg_defer_index_min_rows> take
+precedence.
+
+=head1 MAINTENANCE
+
+=head2 acheck_db_admin( %opt )
+
+The daily "first process of the day" maintenance, driven by the edtk_admin day
+row.
+
+=head2 acheck_db_admin_on_connect( $dbh, $cfg )
+
+Claim the day lock on connect and run the maintenance once per day.
+
+=head2 admin_optimize_db( $dbh, %opt )
+
+Dispatch a per-engine REPAIR / OPTIMIZE (VACUUM ANALYZE on PostgreSQL) over the
+maintenance tables, on a single connection.
+
+=head2 agrege_idJob( %opt )
+
+Aggregate one job's distribution rows.
+
+=head2 copy_table / move_table / db_drop_table ( $dbh, $table, $target, %opt )
+
+Copy a table, move it (copy then drop) or drop it.
+
+=head2 get_columns_names( $dbh, $table )
+
+Read the driver-neutral column catalogue; the names keep the catalogue's case.
+
+=head1 BACKUP BUFFER
+
+=head2 db_backup_available( $dbh ) / db_on_backup( $dbh )
+
+Whether a distinct backup database is configured, and whether this handle points
+at the backup buffer.
+
+=head2 db_backup_pending( $dbh )
+
+Count the pending rows per buffer table (read-only).
+
+=head2 db_backup_prepare( $dbh )
+
+Guarantee the backup buffer can hold the event tables.
+
+=head2 db_backup_agent( %opt )
+
+Archive the event tables into the buffer, then purge them (the daily backup job).
+It is not deprecated: it archives three tables and then purges.
+
+=head2 db_reconcile_backup( %opt )
+
+Copy every pending row of the backup buffer back into the main database. Never
+dies; returns a report hashref. Options: C<CFG>, C<tables>, C<dry_run>,
+C<keep_backup>.
+
+=head1 EXPORTED VARIABLES
+
+=head2 @INDEX_COLS / @TRACKER_COLS
+
+The ordered C<[ name, ddl-type ]> lists of the index table's and the tracking
+table's columns.
+
+=head1 SEE ALSO
+
+F<docs/dbadmin/>, F<dbadmin_optim.md>,
+F<PLAN-DBAdmin-optimisation-durcissement.md>.
+
+=head1 AUTHOR
+
+The oEdtk team.
+
+=cut

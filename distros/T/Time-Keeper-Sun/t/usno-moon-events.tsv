@@ -1,0 +1,167 @@
+# USNO api/rstt/oneday (https://aa.usno.navy.mil/api/rstt/oneday?date=D&coords=LAT,LON&tz=TZ), the Moon, fetched 19 October 2026.
+# tz is the zone offset at local noon, from Time::Keeper; moondata lists USNO's phenomena in its order as phen=time (local to tz, to the minute), notes with an empty time.
+# place	date	lat	lon	zone	tz	moondata
+London	2026-10-15	51.5074	-0.1278	Europe/London	1	Rise=13:15;Upper Transit=16:36;Set=19:56
+London	2026-06-21	51.5074	-0.1278	Europe/London	1	Set=00:35;Rise=12:41;Upper Transit=18:51
+London	2026-12-21	51.5074	-0.1278	Europe/London	0	Set=05:07;Rise=13:09;Upper Transit=21:43
+London	2026-03-29	51.5074	-0.1278	Europe/London	1	Set=05:34;Rise=15:22;Upper Transit=22:45
+London	2026-10-25	51.5074	-0.1278	Europe/London	0	Set=05:49;Rise=16:01;Upper Transit=23:28
+London	2026-01-01	51.5074	-0.1278	Europe/London	0	Set=06:29;Rise=13:26;Upper Transit=22:33
+London	2100-01-15	51.5074	-0.1278	Europe/London	0	Rise=10:06;Upper Transit=15:59;Set=22:07
+Utqiagvik	2026-05-09	71.2906	-156.7886	America/Anchorage	-8	Rise=07:16;Upper Transit=08:37;Set=10:18
+Utqiagvik	2026-05-10	71.2906	-156.7886	America/Anchorage	-8	Rise=06:06;Upper Transit=09:22;Set=13:04
+Utqiagvik	2026-05-11	71.2906	-156.7886	America/Anchorage	-8	Rise=05:27;Upper Transit=10:06;Set=15:18
+Utqiagvik	2026-05-12	71.2906	-156.7886	America/Anchorage	-8	Rise=04:55;Upper Transit=10:51;Set=17:29
+Utqiagvik	2026-08-01	71.2906	-156.7886	America/Anchorage	-8	Upper Transit=04:42;Set=09:58;Rise=23:27
+Utqiagvik	2026-08-02	71.2906	-156.7886	America/Anchorage	-8	Upper Transit=05:25;Set=12:02;Rise=22:56
+Utqiagvik	2026-08-03	71.2906	-156.7886	America/Anchorage	-8	Upper Transit=06:08;Set=14:12;Rise=22:21
+Utqiagvik	2026-08-04	71.2906	-156.7886	America/Anchorage	-8	Upper Transit=06:55;Set=16:47;Rise=21:26
+Utqiagvik	2026-11-17	71.2906	-156.7886	America/Anchorage	-9	Rise=16:04;Upper Transit=20:00
+Utqiagvik	2026-11-18	71.2906	-156.7886	America/Anchorage	-9	Set=00:24;Rise=15:32;Upper Transit=20:43
+Utqiagvik	2026-11-19	71.2906	-156.7886	America/Anchorage	-9	Set=02:28;Rise=15:03;Upper Transit=21:27
+Utqiagvik	2026-01-21	71.2906	-156.7886	America/Anchorage	-9	Rise=11:51;Upper Transit=16:07;Set=20:55
+Utqiagvik	2026-01-22	71.2906	-156.7886	America/Anchorage	-9	Rise=11:17;Upper Transit=16:52;Set=23:04
+Utqiagvik	2026-01-23	71.2906	-156.7886	America/Anchorage	-9	Rise=10:46;Upper Transit=17:37
+Utqiagvik	2026-06-21	71.2906	-156.7886	America/Anchorage	-8	Set=02:09;Rise=15:00;Upper Transit=20:36
+Utqiagvik	2026-12-21	71.2906	-156.7886	America/Anchorage	-9	Object continuously above the Horizon=;Lower Transit=11:06;Upper Transit=23:38
+Longyearbyen	2026-04-18	78.2232	15.6267	Arctic/Longyearbyen	2	Object continuously above the Horizon=;Lower Transit=01:16;Upper Transit=13:44
+Longyearbyen	2026-04-19	78.2232	15.6267	Arctic/Longyearbyen	2	Object continuously above the Horizon=;Lower Transit=02:14;Upper Transit=14:44
+Longyearbyen	2026-04-20	78.2232	15.6267	Arctic/Longyearbyen	2	Object continuously above the Horizon=;Lower Transit=03:16;Upper Transit=15:48
+Longyearbyen	2026-08-23	78.2232	15.6267	Arctic/Longyearbyen	2	Object continuously below the Horizon=
+Longyearbyen	2026-08-24	78.2232	15.6267	Arctic/Longyearbyen	2	Object continuously below the Horizon=
+Longyearbyen	2026-08-25	78.2232	15.6267	Arctic/Longyearbyen	2	Object continuously below the Horizon=
+Longyearbyen	2026-06-21	78.2232	15.6267	Arctic/Longyearbyen	2	Set=01:17;Rise=12:29;Upper Transit=18:46
+Longyearbyen	2026-12-21	78.2232	15.6267	Arctic/Longyearbyen	1	Object continuously above the Horizon=;Lower Transit=09:07;Upper Transit=21:37
+Longyearbyen	2026-02-15	78.2232	15.6267	Arctic/Longyearbyen	1	Object continuously below the Horizon=
+Longyearbyen	2026-02-16	78.2232	15.6267	Arctic/Longyearbyen	1	Object continuously below the Horizon=
+Longyearbyen	2026-10-26	78.2232	15.6267	Arctic/Longyearbyen	1	Object continuously above the Horizon=;Lower Transit=11:49
+Longyearbyen	2026-10-27	78.2232	15.6267	Arctic/Longyearbyen	1	Object continuously above the Horizon=;Upper Transit=00:17;Lower Transit=12:46
+Tromso	2026-05-19	69.6492	18.9553	Europe/Oslo	2	Object continuously above the Horizon=;Lower Transit=02:55;Upper Transit=15:28
+Tromso	2026-05-20	69.6492	18.9553	Europe/Oslo	2	Object continuously above the Horizon=;Lower Transit=04:00;Upper Transit=16:31
+Tromso	2026-07-22	69.6492	18.9553	Europe/Oslo	2	Object continuously below the Horizon=
+Tromso	2026-07-23	69.6492	18.9553	Europe/Oslo	2	Object continuously below the Horizon=
+Tromso	2026-11-27	69.6492	18.9553	Europe/Oslo	1	Object continuously above the Horizon=;Upper Transit=02:00;Lower Transit=14:32
+Tromso	2026-01-15	69.6492	18.9553	Europe/Oslo	1	Object continuously below the Horizon=
+Tromso	2026-06-21	69.6492	18.9553	Europe/Oslo	2	Set=00:37;Rise=12:18;Upper Transit=18:33
+McMurdo	2026-10-24	-77.8419	166.6863	Antarctica/McMurdo	13	Set=05:03;Rise=19:46
+McMurdo	2026-10-25	-77.8419	166.6863	Antarctica/McMurdo	13	Upper Transit=00:08;Set=03:43
+McMurdo	2026-02-20	-77.8419	166.6863	Antarctica/McMurdo	13	Rise=10:40;Upper Transit=16:05;Set=20:35
+McMurdo	2026-02-21	-77.8419	166.6863	Antarctica/McMurdo	13	Rise=14:23;Upper Transit=16:52;Set=18:38
+McMurdo	2026-04-24	-77.8419	166.6863	Antarctica/McMurdo	12	Object continuously below the Horizon=
+McMurdo	2026-04-25	-77.8419	166.6863	Antarctica/McMurdo	12	Object continuously below the Horizon=
+McMurdo	2026-08-19	-77.8419	166.6863	Antarctica/McMurdo	12	Object continuously above the Horizon=;Lower Transit=05:30;Upper Transit=17:53
+McMurdo	2026-08-20	-77.8419	166.6863	Antarctica/McMurdo	12	Object continuously above the Horizon=;Lower Transit=06:17;Upper Transit=18:41
+McMurdo	2026-06-21	-77.8419	166.6863	Antarctica/McMurdo	12	Rise=13:10;Upper Transit=18:24
+McMurdo	2026-12-21	-77.8419	166.6863	Antarctica/McMurdo	13	Object continuously below the Horizon=
+Quito	2026-03-20	-0.1807	-78.4678	America/Guayaquil	-5	Rise=07:28;Upper Transit=13:40;Set=19:52
+Quito	2026-06-21	-0.1807	-78.4678	America/Guayaquil	-5	Rise=12:04;Upper Transit=18:14
+Quito	2026-12-21	-0.1807	-78.4678	America/Guayaquil	-5	Set=03:23;Rise=15:56;Upper Transit=22:10
+Kiritimati	2026-01-15	1.8721	-157.4278	Pacific/Kiritimati	14	Rise=03:14;Upper Transit=09:22;Set=15:30
+Kiritimati	2026-07-15	1.8721	-157.4278	Pacific/Kiritimati	14	Rise=06:53;Upper Transit=13:11;Set=19:28
+Santiago	2026-04-04	-33.4489	-70.6693	America/Santiago	-3	Upper Transit=03:14;Set=10:22;Rise=20:45
+Santiago	2026-04-05	-33.4489	-70.6693	America/Santiago	-4	Upper Transit=03:00;Set=10:22;Rise=20:22
+Santiago	2026-09-05	-33.4489	-70.6693	America/Santiago	-4	Rise=02:48;Upper Transit=07:37;Set=12:26
+Santiago	2026-09-06	-33.4489	-70.6693	America/Santiago	-3	Rise=04:47;Upper Transit=09:39;Set=14:35
+Santiago	2026-09-07	-33.4489	-70.6693	America/Santiago	-3	Rise=05:37;Upper Transit=10:39;Set=15:47
+LordHowe	2026-04-05	-31.5553	159.0821	Australia/Lord_Howe	10.5	Upper Transit=01:41;Set=08:50;Rise=19:14
+LordHowe	2026-10-04	-31.5553	159.0821	Australia/Lord_Howe	11	Rise=01:37;Upper Transit=06:36;Set=11:38
+Sydney	2026-01-01	-33.8688	151.2093	Australia/Sydney	11	Set=02:52;Rise=18:08;Upper Transit=22:59
+Sydney	2026-07-01	-33.8688	151.2093	Australia/Sydney	10	Upper Transit=00:30;Set=07:58;Rise=17:54
+Reykjavik	2026-06-21	64.1466	-21.9426	Atlantic/Reykjavik	0	Set=01:11;Rise=13:14;Upper Transit=19:21
+Reykjavik	2026-12-21	64.1466	-21.9426	Atlantic/Reykjavik	0	Set=08:42;Rise=12:32;Upper Transit=23:14
+Kashgar	2026-06-21	39.4704	75.9898	Asia/Shanghai	8	Set=02:20;Rise=14:22;Upper Transit=20:38
+Kashgar	2026-12-21	39.4704	75.9898	Asia/Shanghai	8	Set=06:59;Rise=16:46
+Anchorage	2026-11-01	61.2181	-149.9003	America/Anchorage	-9	Upper Transit=06:54;Set=15:42;Rise=23:17
+Anchorage	2026-03-08	61.2181	-149.9003	America/Anchorage	-8	Rise=02:41;Upper Transit=05:47;Set=08:41
+Honolulu	2026-03-10	21.3069	-157.8583	Pacific/Honolulu	-10	Rise=00:33;Upper Transit=05:57;Set=11:20
+Graze65.7	2026-06-21	65.7	0	UTC	0	Rise=11:40;Upper Transit=17:51;Set=23:34
+Graze65.7	2026-06-20	65.7	0	UTC	0	Rise=09:54;Upper Transit=17:07;Set=23:46
+Graze65.9	2026-06-21	65.9	0	UTC	0	Rise=11:40;Upper Transit=17:51;Set=23:34
+Graze66.1	2026-06-21	66.1	0	UTC	0	Rise=11:40;Upper Transit=17:51;Set=23:33
+Graze65.5	2026-06-21	65.5	0	UTC	0	Rise=11:40;Upper Transit=17:51;Set=23:34
+London	1800-06-15	51.5074	-0.1278	Europe/London	0	Rise=00:47;Upper Transit=06:55;Set=13:18
+London	1700-03-01	51.5074	-0.1278	Europe/London	0	Set=03:57;Rise=13:07;Upper Transit=21:01
+Dateline	2026-10-15	0	180	UTC	0	Upper Transit=03:10;Set=09:22;Rise=21:49
+Pole	2026-03-19	89.99	0	UTC	0	Object continuously above the Horizon=;Lower Transit=00:03;Upper Transit=12:26
+Pole	2026-09-25	89.99	0	UTC	0	Object continuously below the Horizon=
+East90	2026-10-15	0	90	UTC	0	Rise=03:10;Upper Transit=09:23;Set=15:35
+East90	2026-06-21	0	90	UTC	0	Rise=05:30;Upper Transit=11:40;Set=17:50
+London	2026-10-01	51.5074	-0.1278	Europe/London	1	Upper Transit=04:34;Set=13:35;Rise=20:30
+London	2026-10-02	51.5074	-0.1278	Europe/London	1	Upper Transit=05:36;Set=14:45;Rise=21:31
+London	2026-10-03	51.5074	-0.1278	Europe/London	1	Upper Transit=06:39;Set=15:37;Rise=22:47
+London	2026-10-04	51.5074	-0.1278	Europe/London	1	Upper Transit=07:39;Set=16:13
+London	2026-10-05	51.5074	-0.1278	Europe/London	1	Rise=00:13;Upper Transit=08:36;Set=16:38
+London	2026-10-06	51.5074	-0.1278	Europe/London	1	Rise=01:40;Upper Transit=09:29;Set=16:57
+London	2026-10-07	51.5074	-0.1278	Europe/London	1	Rise=03:05;Upper Transit=10:18;Set=17:11
+London	2026-10-08	51.5074	-0.1278	Europe/London	1	Rise=04:27;Upper Transit=11:04;Set=17:24
+London	2026-10-09	51.5074	-0.1278	Europe/London	1	Rise=05:47;Upper Transit=11:49;Set=17:36
+London	2026-10-10	51.5074	-0.1278	Europe/London	1	Rise=07:05;Upper Transit=12:34;Set=17:48
+London	2026-10-11	51.5074	-0.1278	Europe/London	1	Rise=08:23;Upper Transit=13:19;Set=18:02
+London	2026-10-12	51.5074	-0.1278	Europe/London	1	Rise=09:41;Upper Transit=14:06;Set=18:20
+London	2026-10-13	51.5074	-0.1278	Europe/London	1	Rise=10:58;Upper Transit=14:54;Set=18:43
+London	2026-10-14	51.5074	-0.1278	Europe/London	1	Rise=12:11;Upper Transit=15:45;Set=19:14
+London	2026-10-15	51.5074	-0.1278	Europe/London	1	Rise=13:15;Upper Transit=16:36;Set=19:56
+London	2026-10-16	51.5074	-0.1278	Europe/London	1	Rise=14:07;Upper Transit=17:28;Set=20:50
+London	2026-10-17	51.5074	-0.1278	Europe/London	1	Rise=14:47;Upper Transit=18:18;Set=21:54
+London	2026-10-18	51.5074	-0.1278	Europe/London	1	Rise=15:17;Upper Transit=19:07;Set=23:04
+London	2026-10-19	51.5074	-0.1278	Europe/London	1	Rise=15:38;Upper Transit=19:54
+London	2026-10-20	51.5074	-0.1278	Europe/London	1	Set=00:19;Rise=15:55;Upper Transit=20:39
+London	2026-10-21	51.5074	-0.1278	Europe/London	1	Set=01:34;Rise=16:09;Upper Transit=21:22
+London	2026-10-22	51.5074	-0.1278	Europe/London	1	Set=02:50;Rise=16:21;Upper Transit=22:06
+London	2026-10-23	51.5074	-0.1278	Europe/London	1	Set=04:07;Rise=16:33;Upper Transit=22:51
+London	2026-10-24	51.5074	-0.1278	Europe/London	1	Set=05:26;Rise=16:46;Upper Transit=23:38
+London	2026-10-25	51.5074	-0.1278	Europe/London	0	Set=05:49;Rise=16:01;Upper Transit=23:28
+London	2026-10-26	51.5074	-0.1278	Europe/London	0	Set=07:16;Rise=16:21
+London	2026-10-27	51.5074	-0.1278	Europe/London	0	Upper Transit=00:23;Set=08:47;Rise=16:47
+London	2026-10-28	51.5074	-0.1278	Europe/London	0	Upper Transit=01:22;Set=10:16;Rise=17:26
+London	2026-10-29	51.5074	-0.1278	Europe/London	0	Upper Transit=02:26;Set=11:33;Rise=18:22
+London	2026-10-30	51.5074	-0.1278	Europe/London	0	Upper Transit=03:30;Set=12:33;Rise=19:36
+London	2026-10-31	51.5074	-0.1278	Europe/London	0	Upper Transit=04:33;Set=13:14;Rise=21:01
+Longyearbyen	2026-12-01	78.2232	15.6267	Arctic/Longyearbyen	1	Upper Transit=05:55;Set=13:51;Rise=23:38
+Longyearbyen	2026-12-03	78.2232	15.6267	Arctic/Longyearbyen	1	Rise=02:40;Upper Transit=07:24;Set=11:21
+Longyearbyen	2026-12-05	78.2232	15.6267	Arctic/Longyearbyen	1	Object continuously below the Horizon=
+Longyearbyen	2026-12-07	78.2232	15.6267	Arctic/Longyearbyen	1	Object continuously below the Horizon=
+Longyearbyen	2026-12-09	78.2232	15.6267	Arctic/Longyearbyen	1	Object continuously below the Horizon=
+Longyearbyen	2026-12-11	78.2232	15.6267	Arctic/Longyearbyen	1	Object continuously below the Horizon=
+Longyearbyen	2026-12-13	78.2232	15.6267	Arctic/Longyearbyen	1	Object continuously below the Horizon=
+Longyearbyen	2026-12-15	78.2232	15.6267	Arctic/Longyearbyen	1	Rise=14:03;Upper Transit=16:48;Set=20:14
+Longyearbyen	2026-12-17	78.2232	15.6267	Arctic/Longyearbyen	1	Rise=11:27;Upper Transit=18:12
+Longyearbyen	2026-12-19	78.2232	15.6267	Arctic/Longyearbyen	1	Object continuously above the Horizon=;Lower Transit=07:20;Upper Transit=19:45
+Longyearbyen	2026-12-21	78.2232	15.6267	Arctic/Longyearbyen	1	Object continuously above the Horizon=;Lower Transit=09:07;Upper Transit=21:37
+Longyearbyen	2026-12-23	78.2232	15.6267	Arctic/Longyearbyen	1	Object continuously above the Horizon=;Lower Transit=11:16;Upper Transit=23:50
+Longyearbyen	2026-12-25	78.2232	15.6267	Arctic/Longyearbyen	1	Object continuously above the Horizon=;Upper Transit=00:57;Lower Transit=13:29
+Longyearbyen	2026-12-27	78.2232	15.6267	Arctic/Longyearbyen	1	Object continuously above the Horizon=;Upper Transit=02:57;Lower Transit=15:23
+Longyearbyen	2026-12-29	78.2232	15.6267	Arctic/Longyearbyen	1	Upper Transit=04:36;Set=11:10;Rise=23:54
+Tromso	2026-11-03	69.6492	18.9553	Europe/Oslo	1	Upper Transit=06:57;Set=15:02
+Tromso	2026-11-06	69.6492	18.9553	Europe/Oslo	1	Rise=04:06;Upper Transit=09:11;Set=13:49
+Tromso	2026-11-09	69.6492	18.9553	Europe/Oslo	1	Object continuously below the Horizon=
+Tromso	2026-11-12	69.6492	18.9553	Europe/Oslo	1	Object continuously below the Horizon=
+Tromso	2026-11-15	69.6492	18.9553	Europe/Oslo	1	Object continuously below the Horizon=
+Tromso	2026-11-18	69.6492	18.9553	Europe/Oslo	1	Rise=13:55;Upper Transit=18:39;Set=23:51
+Tromso	2026-11-21	69.6492	18.9553	Europe/Oslo	1	Set=03:49;Rise=12:43;Upper Transit=20:54
+Tromso	2026-11-24	69.6492	18.9553	Europe/Oslo	1	Object continuously above the Horizon=;Lower Transit=11:15;Upper Transit=23:47
+Tromso	2026-11-27	69.6492	18.9553	Europe/Oslo	1	Object continuously above the Horizon=;Upper Transit=02:00;Lower Transit=14:32
+Tromso	2026-11-30	69.6492	18.9553	Europe/Oslo	1	Upper Transit=04:53;Set=13:20;Rise=21:43
+Utqiagvik	2026-06-03	71.2906	-156.7886	America/Anchorage	-8	Object continuously below the Horizon=
+Utqiagvik	2026-06-06	71.2906	-156.7886	America/Anchorage	-8	Rise=04:32;Upper Transit=07:17;Set=10:28
+Utqiagvik	2026-06-09	71.2906	-156.7886	America/Anchorage	-8	Rise=02:46;Upper Transit=09:29;Set=16:59
+Utqiagvik	2026-06-12	71.2906	-156.7886	America/Anchorage	-8	Object continuously above the Horizon=;Upper Transit=12:04
+Utqiagvik	2026-06-15	71.2906	-156.7886	America/Anchorage	-8	Object continuously above the Horizon=;Lower Transit=02:48;Upper Transit=15:22
+Utqiagvik	2026-06-18	71.2906	-156.7886	America/Anchorage	-8	Set=04:32;Rise=07:40;Upper Transit=18:20
+Utqiagvik	2026-06-21	71.2906	-156.7886	America/Anchorage	-8	Set=02:09;Rise=15:00;Upper Transit=20:36
+Utqiagvik	2026-06-24	71.2906	-156.7886	America/Anchorage	-8	Set=00:16
+Sydney	2026-10-10	-33.8688	151.2093	Australia/Sydney	11	Rise=05:45;Upper Transit=12:10;Set=18:44
+Sydney	2026-10-11	-33.8688	151.2093	Australia/Sydney	11	Rise=06:12;Upper Transit=12:55;Set=19:46
+Sydney	2026-10-12	-33.8688	151.2093	Australia/Sydney	11	Rise=06:42;Upper Transit=13:41;Set=20:48
+Sydney	2026-10-25	-33.8688	151.2093	Australia/Sydney	11	Set=05:00;Rise=18:22
+Sydney	2026-10-26	-33.8688	151.2093	Australia/Sydney	11	Upper Transit=00:01;Set=05:32;Rise=19:32
+Quito	2026-10-09	-0.1807	-78.4678	America/Guayaquil	-5	Rise=05:02;Upper Transit=11:12;Set=17:23
+Quito	2026-10-10	-0.1807	-78.4678	America/Guayaquil	-5	Rise=05:46;Upper Transit=11:57;Set=18:08
+Quito	2026-10-11	-0.1807	-78.4678	America/Guayaquil	-5	Rise=06:31;Upper Transit=12:42;Set=18:54
+Quito	2026-10-24	-0.1807	-78.4678	America/Guayaquil	-5	Set=04:25;Rise=16:50;Upper Transit=23:02
+Quito	2026-10-25	-0.1807	-78.4678	America/Guayaquil	-5	Set=05:13;Rise=17:40;Upper Transit=23:53
+Tromso	2026-05-28	69.6492	18.9553	Europe/Oslo	2	Set=00:58;Rise=21:11;Upper Transit=22:43;Set=23:57
+Tromso	2026-06-11	69.6492	18.9553	Europe/Oslo	2	Rise=00:24;Upper Transit=08:59;Set=18:48;Rise=23:39
+Reykjavik	2026-07-07	64.1466	-21.9426	Atlantic/Reykjavik	0	Rise=00:04;Upper Transit=06:54;Set=14:15;Rise=23:55
+Reykjavik	2026-06-26	64.1466	-21.9426	Atlantic/Reykjavik	0	Set=00:17;Rise=22:27;Upper Transit=23:03;Set=23:31
+Longyearbyen	2026-06-10	78.2232	15.6267	Arctic/Longyearbyen	2	Rise=00:16;Upper Transit=08:23;Set=18:50;Rise=22:02

@@ -1,11 +1,10 @@
-.gitignore
 Changes
 examples/d2fw_sample.pl
 examples/fw2d_sample.pl
 lib/Text/FixedWidth/Helper.pm
 LICENSE
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 MANIFEST.SKIP
 README
 t/001-d2fw.t
@@ -19,4 +18,5 @@ t/testlib/06-toolong.txt
 t/testlib/07-toomanyrecords.txt
 t/testlib/08-badmetadata.txt
 Todo
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

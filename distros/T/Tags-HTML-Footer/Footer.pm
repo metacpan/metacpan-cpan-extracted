@@ -14,7 +14,7 @@ use Unicode::UTF8 qw(decode_utf8);
 
 Readonly::Scalar our $DEFAULT_HEIGHT => '40px';
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -96,10 +96,14 @@ sub _process {
 				['e', 'a'],
 			) : (),
 			['e', 'span'],
+
+			($self->{'_footer'}->copyright_years || $self->{'_footer'}->author)
+				? ['d', ',&nbsp;']
+				: (),
 		) : (),
 
+
 		defined $self->{'_footer'}->copyright_years ? (
-			defined $self->{'_footer'}->version ? ['d', ',&nbsp;'] : (),
 			['d', decode_utf8('©').' '.$self->{'_footer'}->copyright_years],
 			defined $self->{'_footer'}->author ? ['d', ' '] : (),
 		) : (),
@@ -526,18 +530,18 @@ L<https://github.com/michal-josef-spacek/Tags-HTML-Footer>
 
 =head1 AUTHOR
 
-Michal Josef Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:michal.josef.spacek@gmail.com>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2024-2025 Michal Josef Špaček
+© 2024-2026 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

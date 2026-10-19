@@ -97,12 +97,25 @@ SYNOPSIS
     
         done_testing;
 
-    Optional Zstd compression for bursts and messages (both ends must
-    agree):
+    Optional Zstd compression, only for messages too big for one atomic
+    write (the recommended way to use compression):
+
+        my ($r, $w) = Atomic::Pipe->pair(compress_large_only => 1);
+    
+        # Fits in one atomic part: sent as-is, no compression cost.
+        $w->write_message($small_payload);
+    
+        # Larger than one atomic part (4080 bytes on Linux by default): compressed
+        # first, then split only if it is still too big.
+        $w->write_message($big_payload);
+    
+        my $msg = $r->read_message;    # decompressed transparently when needed
+
+    Pass compression_threshold => $bytes to use a different cut-off.
+
+    Or compress every burst and message (both ends must agree):
 
         my ($r, $w) = Atomic::Pipe->pair(compression => 'zstd');
-        $w->write_message($big_payload);   # compressed on the wire
-        my $msg = $r->read_message;        # decompressed transparently
 
     See "COMPRESSION" for details and options.
 
@@ -239,16 +252,99 @@ COMPRESSION
     keep_compressed => $bool
 
       When set together with compression, reads expose the on-wire
-      compressed bytes alongside the decompressed payload. See
-      "read_message" and "get_line_burst_or_data" for the exact
-      return-shape changes. Has no effect without compression.
+      compressed bytes alongside the decompressed payload. See read_message
+      and get_line_burst_or_data for the exact return-shape changes. Has no
+      effect without compression.
+
+      Under "compress_large_only" only messages that were actually
+      compressed report a compressed form; messages sent plain return just
+      the payload.
+
+    compress_large_only => $bool
+
+      Compress only messages too big for one atomic part, and send the rest
+      plain. Turns on compression => 'zstd' when no compression is given,
+      so this one option is all most users need. See "Compressing only
+      large messages".
+
+    compression_threshold => $bytes
+
+      Optional. Messages longer than $bytes are compressed.
+
+      Default: the largest payload that fits in one atomic part, PIPE_BUF
+      minus framing. That is 4080 bytes on Linux (4077 in mixed-data mode),
+      so exactly the messages that would otherwise be split get compressed.
+
+      0 compresses every message that compression makes smaller. Unlike
+      plain compression, this still uses the flagged format, so
+      incompressible messages go out as-is.
+
+      Setting this also turns on compress_large_only (and compression). The
+      "compression_threshold" accessor reports the threshold in use.
+
+ Compressing only large messages
+
+    With plain compression every burst and message is compressed. For small
+    messages that is pure CPU cost: they already fit in one atomic write,
+    and decompressing on a single reader is slower than reading them as-is.
+    compress_large_only compresses a message only when it is longer than
+    "compression_threshold", and only keeps the compressed form when it is
+    actually smaller (already-compressed or random payloads go out plain).
+
+        my ($r, $w) = Atomic::Pipe->pair(compress_large_only => 1);
+
+    That is the whole setup. It turns on zstd and uses the default
+    threshold:
+
+      * A message that fits in one atomic part (up to 4080 bytes on Linux,
+      4077 in mixed-data mode) is sent as-is.
+
+      * A larger message is compressed first, then split into parts only if
+      it is still too big for one.
+
+      * If compressing does not make it smaller, it is sent as-is (and
+      split as usual).
+
+    To use a different cut-off:
+
+        my ($r, $w) = Atomic::Pipe->pair(compression_threshold => 16_384);
+
+    Each compressed message is marked by the high bit of the part-size
+    field in its headers, so the reader knows which messages to decompress.
+    Consequences:
+
+      * Mixing versions is not supported. Both ends must run this version
+      or later. An older reader takes the flagged size field as a ~2 GB
+      part: on a plain pipe it stalls until EOF and then throws EOF before
+      end of message, and on a FIFO that stays open it hangs forever with
+      no error. Atomic::Pipe is almost always used between forked processes
+      running the same code, so this should not come up; just don't enable
+      compress_large_only on a writer that older readers consume.
+
+      * Configure compress_large_only on the reader too (or leave
+      compression off there, see the next point). A reader with plain
+      compression and no compress_large_only still tries to decompress
+      every unflagged message.
+
+      * A reader without compression configured still decompresses flagged
+      messages, as long as Compress::Zstd is installed. A custom dictionary
+      must still be configured on both ends.
+
+      * Bursts (write_burst) are never compressed in this mode, and the
+      reader does not try to decompress them.
+
+      * With keep_compressed, only messages that were sent compressed
+      report a compressed form.
+
+    Plain compression without compress_large_only keeps the original wire
+    format, so it stays compatible with older versions.
 
  Custom dictionary
 
     Custom Zstd dictionaries can dramatically reduce frame size for small,
     repetitive payloads. Either form (bytes or file) may be supplied at
-    construction or via "set_compression_dictionary" /
-    "set_compression_dictionary_file".
+    construction or via set_compression_dictionary /
+    set_compression_dictionary_file.
 
     Caveat: raw zstd dictionaries do not embed a dict-ID. As a result a
     mismatched peer dictionary will silently decode to garbage rather than
@@ -258,101 +354,93 @@ COMPRESSION
 
  Performance
 
-    Compression is not just a wire-size optimization for Atomic::Pipe: when
-    messages exceed PIPE_BUF (typically 4096 bytes on Linux) the writer
-    must fragment them into multiple non-atomic chunks, and the reader must
-    reassemble them. Compressing the payload first frequently collapses a
-    multi-part message back into a single atomic burst, which avoids that
-    per-message protocol overhead entirely. As a result, on workloads
-    dominated by larger-than-PIPE_BUF messages, compression is often much
-    faster end-to-end than no compression, even after accounting for the
-    CPU cost of compress/decompress.
+    Compression trades CPU for wire size. Whether it is also faster depends
+    on where the bottleneck is:
 
-    The kernel pipe buffer size (see "resize") does not affect this --
-    fragmentation is keyed on the POSIX PIPE_BUF atomic-write threshold,
-    not on the buffer capacity.
+      * Small messages (that already fit in one atomic part) are always
+      faster plain. Compressing them only adds work on both ends.
+
+      * Large messages with one writer are also faster plain: the reader
+      does the same work either way, and decompression is extra.
+
+      * Large messages from many writers into one reader can be faster
+      compressed in mixed-data mode, where each part costs the reader more.
+      Compression runs in parallel in the writers, decompression is cheap,
+      and the reader handles fewer parts. This is the case
+      "compress_large_only" is for. With plain read_message the reader is
+      fast enough that plain still wins.
+
+    Versions before 0.033 had a reader bug that made reading large streams
+    quadratic, especially in mixed-data mode. Compression shrank the stream
+    and so hid most of it, which is why older versions of this
+    documentation reported compression as up to ~1000x faster. That advice
+    no longer applies.
+
+    The kernel pipe buffer size (see resize) has little effect on
+    throughput.
 
   Benchmark: streaming JSON objects
 
-    Numbers below are from bench/zstd_compression.pl in the distribution.
-    The workload is a synthetic but representative stream of JSON log/event
-    objects sent in mixed-data mode via write_message. The corpus is
-    generated once and reused across all runs; sizes are JSON-encoded byte
-    counts.
+    From bench/zstd_compression.pl in the distribution: one writer, one
+    reader, mixed-data mode, 100 MB of synthetic JSON objects of 187 ..
+    10000 bytes (average ~5.1 KB, so most are larger than PIPE_BUF), 1 MB
+    pipe:
 
-    Two corpora were measured:
+      mode        raw MB/s   wire MB    ratio
+      plain         530.70    100.00       -
+      L-3           276.39     35.61    2.81x
+      L1            240.18     30.56    3.27x
+      L3 (def)      208.35     30.25    3.31x
+      large-only    244.90     40.67    2.46x
 
-    Small JSON (10 MB total, 11785 objects)
+    ("large-only" is compress_large_only at the default threshold and
+    level.)
 
-      Object sizes 181 .. 1977 bytes, average ~890 B; ~37% of objects under
-      500 B. Most messages fit in a single PIPE_BUF burst regardless of
-      compression.
+    A separate run with 1 and 8 writers into one reader, MB/s. Large
+    messages are ~1.6 MB:
 
-        level     raw MB/s   wire MB    ratio   saved
-        plain         9.74    10.00       -        -
-        L-3          15.98     6.68    1.50x    33.2%
-        L1           24.55     4.92    2.03x    50.8%
-        L3 (def)     27.79     4.91    2.04x    50.9%
-        L5           46.34     4.87    2.05x    51.3%
-        L7           63.72     4.87    2.05x    51.3%
-        L12          27.02     4.85    2.06x    51.5%
-        L22          14.43     4.84    2.07x    51.6%
+      large messages        plain    zstd   large-only
+      1 writer, mixed         883     482          503
+      1 writer, read_msg     1337     530          520
+      8 writers, mixed        878    1143         1112
+      8 writers, read_msg    1339    1148         1171
 
-      For this size distribution, levels 1..7 are all faster than no
-      compression (pipe back-pressure on the uncompressed run still
-      dominates).
+    Small messages are ~1.2 KB, so large-only sends them all plain:
 
-    Larger JSON (100 MB total, 20407 objects)
-
-      Object sizes 187 .. 10000 bytes, average ~5.1 KB, evenly distributed
-      across the 1..10 KB range. Most objects exceed PIPE_BUF, so the
-      uncompressed path pays the multi-part fragmentation cost on nearly
-      every message.
-
-        level     raw MB/s   wire MB    ratio   saved
-        plain         0.29   100.00       -        -
-        L-3         287.85    35.61    2.81x    64.4%
-        L-1         273.56    33.92    2.95x    66.1%
-        L1          237.04    30.56    3.27x    69.4%
-        L3 (def)    207.61    30.25    3.31x    69.7%
-        L5          113.02    30.01    3.33x    70.0%
-        L9           39.35    29.93    3.34x    70.1%
-        L18           7.81    28.14    3.55x    71.9%
-        L22           7.85    28.14    3.55x    71.9%
-
-      Here the uncompressed run collapses to ~0.29 MB/s, while even modest
-      compression levels achieve 200+ MB/s -- a ~1000x throughput
-      improvement driven almost entirely by avoided fragmentation. Levels
-      above ~5 trade significant CPU for negligible additional ratio.
-
-    Pipe buffer size has minimal impact
-
-      The same 100 MB corpus, holding mode constant and varying the kernel
-      pipe buffer (32 KB, 128 KB, 512 KB, 1 MB), shows almost no movement
-      in either direction. The bottleneck is PIPE_BUF-aligned framing, not
-      buffer fill, so calling "resize" with a larger size will not rescue
-      an uncompressed large-message workload.
+      small messages        plain    zstd   large-only
+      1 writer, mixed         359     121          335
+      1 writer, read_msg      555     129          477
+      8 writers, mixed        344     119          334
+      8 writers, read_msg     649     140          587
 
   Practical guidance
 
-      * If your messages are routinely larger than PIPE_BUF (~4 KB),
-      enabling compression is almost always a throughput win, not just a
-      bandwidth win.
+      * Leave compression off unless wire size matters, or many writers
+      feed one reader with large messages in mixed-data mode. With one
+      writer, compression of any kind is slower: about half the speed for
+      large messages.
 
-      * For mixed JSON-like payloads, level 1 or the default level 3 are
-      good starting points. Level -3 is the throughput champion when CPU is
-      precious and some ratio can be sacrificed.
+      * A reader that is slowed down by other work (for example, it writes
+      every message to a database) gains nothing from compression either;
+      the pipe is not its bottleneck.
 
-      * Levels above ~7 buy single-digit-percent ratio gains for multi-x
-      CPU cost; in an IPC path they are rarely worth it.
+      * If you do enable it, prefer "compress_large_only" over plain
+      compression: small messages go out plain, so they keep their speed,
+      and large ones are compressed. With many writers it stays within
+      about 15% of the faster of plain and full compression in the runs
+      above.
+
+      * For JSON-like payloads, level 1 or the default level 3 are good
+      starting points. Levels above ~7 buy single-digit-percent ratio gains
+      for multi-x CPU cost; in an IPC path they are rarely worth it.
 
       * A custom dictionary ("Custom dictionary") helps most when payloads
       are small and share structure -- e.g. identical JSON keys across
       every message.
 
-    These results depend heavily on payload entropy and CPU. Re-run
-    bench/zstd_compression.pl against a representative slice of your own
-    data before committing to a level.
+    These results depend heavily on payload entropy, CPU and topology.
+    Re-run bench/zstd_compression.pl against a representative slice of your
+    own data before deciding.
 
 METHODS
 
@@ -484,6 +572,9 @@ METHODS
       In debug => 1 mode the returned hashref gains a compressed key
       holding the raw compressed bytes. Scalar-context calls always return
       just the decompressed message, regardless of keep_compressed.
+
+      Under "compress_large_only" only messages that were sent compressed
+      carry the extra value; plain messages return just the message.
 
     $p->blocking($bool)
 
@@ -684,6 +775,9 @@ METHODS
           (burst   => $decompressed, compressed => $raw)
           (message => $decompressed, compressed => $raw)
 
+      Under "compress_large_only" bursts and plain messages never include a
+      compressed key; only messages that were sent compressed do.
+
       The line and peek paths never include a compressed key. The 2-tuple
       idiom
 
@@ -703,8 +797,14 @@ METHODS
 
     $bool = $p->keep_compressed
 
+    $bool = $p->compress_large_only
+
+    $bytes_or_undef = $p->compression_threshold
+
       Read-only accessors for the corresponding compression settings. See
-      "COMPRESSION".
+      "COMPRESSION". compression_threshold returns the threshold in use
+      while compress_large_only is on, including the default (4080 bytes on
+      Linux, 4077 in mixed-data mode), and undef when it is off.
 
     $p->set_compression('zstd', $level)
 
@@ -739,6 +839,20 @@ METHODS
 
       Toggle whether reads expose the raw compressed bytes alongside the
       decompressed payload.
+
+    $p->set_compress_large_only($bool)
+
+    $p->set_compress_large_only(1, $threshold)
+
+      Turn "Compressing only large messages" on or off. $threshold is
+      optional; without it the default is used (one atomic part, 4080 bytes
+      on Linux). Turning it on enables zstd compression if it is not
+      already enabled.
+
+      Turning it off undoes that: it clears the threshold, and if
+      compression was only on because of compress_large_only, compression
+      goes off too. If you set compression yourself, it stays on and the
+      pipe goes back to compressing every burst and message.
 
 SOURCE
 

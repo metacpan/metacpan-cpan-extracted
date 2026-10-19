@@ -1,5 +1,5 @@
 package AWS::Signature::V4;
-{ our $VERSION = '0.001' }
+{ our $VERSION = '0.004' }
 
 use v5.24;
 use Moo;
@@ -282,11 +282,39 @@ sub _body_hash ($args) {
    return sha256_hex($copy);
 }
 
+sub _is_fh_raw ($fh) {
+   my @layers = PerlIO::get_layers($fh, details => 1);
+   while (@layers > 0) {
+      my ($name, $arg, $flags) = splice(@layers, 0, 3);
+      return if ($arg // '') =~ m{ utf | encode }imxs;
+      return if ($flags & 0x00008000); # PERLIO_F_UTF8 flag
+
+      # in Windows, crlf is not removed by "<:raw" but just disabled by
+      # a flag set to 0. If it's still set to 1 we have a problem.
+      #
+      # From https://metacpan.org/pod/PerlIO#:crlf
+      #    On DOS/Windows like architectures where this layer is part of
+      #    the defaults, it also acts like the :perlio layer, and removing
+      #    the CRLF translation (such as with :raw) will only unset the
+      #    CRLF translation flag.
+      return if ($name eq 'crlf') && ($flags & 0x00000010); 
+   }
+   return 'raw!';
+}
+
+
 # the handle is hashed from where it is to its end, then put back there
 sub _fh_hash ($fh) {
    openhandle($fh) or fail 400, '"body_fh" must be an open filehandle';
+
+   # I eventually discovered that this protection check actually fails in
+   # Windows as the crlf is never really stripped away by mode "<:raw" nor
+   # by binmode, it's just "silenced". Moving the test over to a more
+   # accurate function.
    fail 400, '"body_fh" must be a binary handle: binmode it'
-      if grep { m{\A(?:encoding|utf8|crlf)} } PerlIO::get_layers($fh);
+      unless _is_fh_raw($fh);
+
+
    my $pos = tell $fh;
    fail 400, '"body_fh" must be seekable (a file, not a pipe or a socket)'
       unless $pos >= 0 && seek $fh, $pos, 0;

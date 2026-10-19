@@ -2,12 +2,11 @@ package DBIx::QuickDB::Driver::MySQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.000065';
+our $VERSION = '0.000066';
 
 use Capture::Tiny qw/capture/;
 use Carp qw/confess croak/;
-use DBIx::QuickDB::Util qw/strip_hash_defaults/;
-use IPC::Cmd qw/can_run/;
+use DBIx::QuickDB::Util qw/strip_hash_defaults find_bin/;
 use Scalar::Util qw/reftype blessed/;
 
 use parent 'DBIx::QuickDB::Driver';
@@ -54,7 +53,7 @@ sub provider_info {
 
     my $viable = 0;
     for my $bin ($this->server_bin_list) {
-        if (my $mysqld = can_run($bin)) {
+        if (my $mysqld = find_bin($bin)) {
             $found{server_bin} = $mysqld if $this->verify_provider($mysqld);
             last if $found{server_bin};
         }
@@ -63,7 +62,7 @@ sub provider_info {
     return $PROVIDER_CACHE{$class} = {} unless $found{server_bin};
 
     for my $bin ($this->client_bin_list) {
-        if (my $mysql = can_run($bin)) {
+        if (my $mysql = find_bin($bin)) {
             $found{client_bin} = $mysql;
             last;
         }
@@ -72,7 +71,7 @@ sub provider_info {
     return $PROVIDER_CACHE{$class} = {} unless $found{client_bin};
 
     for my $bin ($this->install_bin_list) {
-        if (my $install = can_run($bin)) {
+        if (my $install = find_bin($bin)) {
             my ($stdout, $stderr) = capture { system($install, '--help') };
             my $output = $stdout . "\n" .  $stderr;
             unless ($output =~ m/is deprecated/) {
@@ -254,6 +253,12 @@ sub _default_config {
             'secure_file_priv'               => $dir,
             'default_storage_engine'         => 'InnoDB',
             'innodb_buffer_pool_size'        => '20M',
+
+            # MariaDB 10.11+ reserves address space for the maximum, default
+            # 8T, which Cygwin cannot map. The server raises the max to match
+            # a larger configured size on its own.
+            'loose-innodb_buffer_pool_size_max' => '20M',
+
             'key_buffer_size'                => '20M',
             'max_connections'                => '100',
             'server-id'                      => '1',
@@ -439,6 +444,18 @@ sub start_command {
 
     my $cfg_file = $self->{+CFG_FILE};
     return ($self->server_bin, "--defaults-file=$cfg_file", '--skip-grant-tables');
+}
+
+# The 'mysql' schema exists from install time; 'quickdb' may not yet (MySQL's
+# --initialize bootstrap starts the server before loading the SQL creating it).
+sub start {
+    my $self = shift;
+    return if $self->started;
+
+    $self->SUPER::start(@_);
+    $self->_wait_for_connect('mysql');
+
+    return;
 }
 
 sub connect_string {

@@ -137,6 +137,63 @@ tk_abi_selftest(pTHX_ const time_keeper_abi *T, SV **made)
     u.nsec = 0;
     TKA_CHECK((T->tai_minus_utc)(&u, &k) == TIME_KEEPER_RANGE);                       /* 55 */
     TKA_CHECK((T->tai_minus_utc)(NULL, &k) == TIME_KEEPER_BAD);
+    {                                                                             /* version 2: the calendars */
+        time_keeper_calfields cf, cg;
+        const char *id = NULL;
+        int heb = (T->calendar_find)("hebrew", 6), chi = (T->calendar_find)("chinese", 7), wc = -1;
+        SV *hv;
+        TKA_CHECK(heb > 0 && chi > 0 && (T->calendar_find)("gregorian", 9) == 0 && (T->calendar_find)("ISO8601", 7) == 0);
+        TKA_CHECK((T->calendar_find)("klingon", 7) == -1 && (T->calendar_find)(NULL, 0) == -1);
+        TKA_CHECK((T->calendar_id)(heb, &id) == TIME_KEEPER_OK && strEQ(id, "hebrew"));
+        TKA_CHECK((T->calendar_id)(0, &id) == TIME_KEEPER_OK && strEQ(id, "gregory"));                 /* 60 */
+        TKA_CHECK((T->calendar_id)(999, &id) == TIME_KEEPER_BAD && (T->calendar_id)(-1, &id) == TIME_KEEPER_BAD
+                  && (T->calendar_id)(heb, NULL) == TIME_KEEPER_BAD);
+        TKA_CHECK((T->cal_fields)(aTHX_ &t, &tokyo, heb, &cf) == TIME_KEEPER_OK);
+        TKA_CHECK(cf.calendar == heb && cf.year == 5786 && cf.era_year == 5786 && cf.era == 0 && cf.month == 1 && cf.day == 17
+                  && cf.month_number == 1 && !cf.leap_month && !cf.leap_year && cf.months_in_year == 12 && cf.days_in_month == 30
+                  && cf.days_in_year == 354 && cf.day_of_year == 17 && cf.hour == 17 && cf.minute == 53 && cf.second == 20
+                  && cf.nanosecond == 250000000 && cf.offset == 32400 && cf.is_dst == 0);
+        TKA_CHECK((T->cal_fields)(aTHX_ &t, &tokyo, chi, &cf) == TIME_KEEPER_OK && cf.year == 2025 && cf.month == 9 && cf.day == 18
+                  && cf.era_year == 4662 && cf.month_number == 8 && cf.leap_year && cf.months_in_year == 13);
+        TKA_CHECK((T->cal_fields)(aTHX_ &t, &tokyo, 999, &cf) == TIME_KEEPER_BAD && (T->cal_fields)(aTHX_ &t, &tokyo, heb, NULL) == TIME_KEEPER_BAD);   /* 65 */
+        u.sec = INT64_C(-40000000000);                                                /* the year 702 */
+        u.nsec = 0;
+        TKA_CHECK((T->cal_fields)(aTHX_ &u, NULL, chi, &cf) == TIME_KEEPER_RANGE);
+        TKA_CHECK((T->cal_fields)(aTHX_ &u, NULL, heb, &cf) == TIME_KEEPER_OK && cf.year == 4462);
+        (T->cal_fields)(aTHX_ &t, &tokyo, heb, &cf);
+        TKA_CHECK((T->cal_from_fields)(aTHX_ &cf, &tokyo, TIME_KEEPER_GAP_FAIL, TIME_KEEPER_OVERLAP_EARLIER, &u) == TIME_KEEPER_OK
+                  && u.sec == t.sec && u.nsec == t.nsec);
+        cg = cf; cg.month = 13;                                                       /* 5786 is a common year */
+        TKA_CHECK((T->cal_from_fields)(aTHX_ &cg, &tokyo, TIME_KEEPER_GAP_FAIL, TIME_KEEPER_OVERLAP_EARLIER, &u) == TIME_KEEPER_BAD);
+        cg = cf; cg.day = 31;
+        TKA_CHECK((T->cal_from_fields)(aTHX_ &cg, &tokyo, TIME_KEEPER_GAP_FAIL, TIME_KEEPER_OVERLAP_EARLIER, &u) == TIME_KEEPER_BAD);   /* 70 */
+        cg = cf; cg.calendar = 999;
+        TKA_CHECK((T->cal_from_fields)(aTHX_ &cg, &tokyo, TIME_KEEPER_GAP_FAIL, TIME_KEEPER_OVERLAP_EARLIER, &u) == TIME_KEEPER_BAD);
+        cg = cf; cg.calendar = chi; cg.year = 900; cg.month = 1; cg.day = 1;
+        TKA_CHECK((T->cal_from_fields)(aTHX_ &cg, &tokyo, TIME_KEEPER_GAP_FAIL, TIME_KEEPER_OVERLAP_EARLIER, &u) == TIME_KEEPER_RANGE);
+        cg = cf; cg.year = INT64_C(2000000000);
+        TKA_CHECK((T->cal_from_fields)(aTHX_ &cg, &tokyo, TIME_KEEPER_GAP_FAIL, TIME_KEEPER_OVERLAP_EARLIER, &u) == TIME_KEEPER_RANGE);
+        cg = cf; cg.calendar = 0; cg.year = 2025; cg.month = 10; cg.day = 9;         /* the Gregorian through the calendar entry */
+        TKA_CHECK((T->cal_from_fields)(aTHX_ &cg, &tokyo, TIME_KEEPER_GAP_FAIL, TIME_KEEPER_OVERLAP_EARLIER, &u) == TIME_KEEPER_OK
+                  && u.sec == t.sec);
+        TKA_CHECK((T->cal_from_fields)(aTHX_ NULL, &tokyo, TIME_KEEPER_GAP_FAIL, TIME_KEEPER_OVERLAP_EARLIER, &u) == TIME_KEEPER_BAD);   /* 75 */
+        n = (T->format_cal)(aTHX_ buf, sizeof buf, "d MMMM y", 8, &t, &tokyo, 0, heb);
+        TKA_CHECK(n == 14 && strEQ(buf, "17 Tishri 5786"));
+        n = (T->strftime_cal)(aTHX_ buf, sizeof buf, "%Y-%m-%d", 8, &t, &tokyo, 0, heb);
+        TKA_CHECK(n == 10 && strEQ(buf, "5786-01-17"));
+        n = (T->format_cal)(aTHX_ buf, sizeof buf, "d MMMM y", 8, &t, &tokyo, 0, 999);
+        TKA_CHECK(n == 0 && buf[0] == '\0');
+        n = (T->format_cal)(aTHX_ buf, sizeof buf, "d MMMM y", 8, &t, &tokyo, 0, 0);
+        TKA_CHECK(n == 14 && strEQ(buf, "9 October 2025"));
+        hv = (T->new_sv_cal)(aTHX_ &t, &tokyo, k, heb);
+        TKA_CHECK(hv && SvREFCNT(hv) == 1 && sv_isa(hv, "Time::Keeper"));                         /* 80 */
+        TKA_CHECK((T->from_sv_cal)(aTHX_ hv, NULL, NULL, NULL, &wc) == TIME_KEEPER_OK && wc == heb);
+        TKA_CHECK((T->from_sv_cal)(aTHX_ sv, NULL, NULL, NULL, &wc) == TIME_KEEPER_OK && wc == 0);
+        TKA_CHECK((T->from_sv_cal)(aTHX_ hv, NULL, NULL, NULL, NULL) == TIME_KEEPER_OK
+                  && (T->from_sv_cal)(aTHX_ &PL_sv_undef, NULL, NULL, NULL, &wc) == TIME_KEEPER_BAD);
+        SvREFCNT_dec(hv);
+        TKA_CHECK((T->new_sv_cal)(aTHX_ &t, &tokyo, k, 999) == NULL);
+    }
     {
         time_keeper_abi other = *T;
         other.abi_version = TIME_KEEPER_ABI_VERSION - 1;

@@ -30,6 +30,7 @@ WriteMakefile(
     TEST_REQUIRES => {
         'File::Find' => 0,
         'File::Spec' => 0,
+        'File::Temp' => 0,
         'FindBin' => 0,
         'Test::Exception' => '0.42',  # recommended by Test2
         'Test::More' => '0.98',  # for subtest()

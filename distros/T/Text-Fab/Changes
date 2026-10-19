@@ -22,3 +22,36 @@ Revision history for Perl extension Text::Fab.
 	Fix the scalar set/append with multiple arguments (only one allowed), allow string "offset" for hashes.
 	Implement priority-based group__postpone; support insertion of undo actions from undo actions.
 	Even if errors happen, all the postponed actions are performed.
+
+	  t/10-corner-cases.t		New file
+
+0.04    Better coverage:
+
+	  t/11-coverage-expansion.t	New file
+
+0.05    POD: Preview of the architecture on a (contrived) example.  (Might not map 100% to the current implementation.)
+		Completeness of Directive Parser:
+	Added handlers for #prepend, #pop, and #create_section, wiring them to cfg__prepend, cfg__pop, and out__create_section.
+	Added target section tracking stack ($fab->{target_stack}) to support #end_section (as shown in the SYNOPSIS), restoring
+	  the target section to the enclosing context.
+	Extended #emb parsing to support qualified namespace:basename syntax (e.g., #emb ChapterLayout:title and #emb _main:title).
+	Standardized default directive syntax errors to include E_SYNTAX_ERROR while maintaining compatibility with _handle_error.
+		Prefix Call Stack Lifecycle & Prefix-Aware Types:
+	Implemented call_stack__push($prefix, [$filter_name]) and call_stack__pop(), with underflow protection for the base prefix
+	  'Fab/'.
+	Updated _get_key_type to resolve hash_keys and list_keys using cfg__get_prefixed_scan (without redundant fallbacks),
+	  enabling localized prefix-scoped type definitions.
+		Introspection of Inclusion State:
+	Initialized and maintained $self->{config}{'opened_includes'} alongside 'opened_groups' inside include__text, cleanly
+	  exposing the include path chain.
+
+	  Makefile.PL		put
+	    use 5.022000;
+            TEST_REQUIRES => {
+                'Test::Exception' => 0,	## Present (?) since Perl 5.18 (which bundles MakeMaker 6.90 >= 6.64)
+            },
+
+	Better coverage:
+
+	  t/12-parser-and-prefix-lifecycle.t New file
+

@@ -53,6 +53,7 @@ my %WriteMakefileArgs = (
                     'DBD::SQLite' => '1.60',   # Backend::SQLite
                     'Punk'        => '0.04',
                     'Template::Stencil' => '0.04',
+                    'Time::Keeper::Recurrence' => '0.01',   # a cron tz as a time zone name
                 },
             },
         },

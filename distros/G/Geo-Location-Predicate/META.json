@@ -1,0 +1,66 @@
+{
+   "abstract" : "The rule that decides whether a string could be a location",
+   "author" : [
+      "Nigel Horne <njh@nigelhorne.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
+   "license" : [
+      "gpl_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Geo-Location-Predicate",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008003"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Errno" : "0",
+            "POSIX" : "0",
+            "Scalar::Util" : "0",
+            "Test::DescribeMe" : "0",
+            "Test::Most" : "0",
+            "Test::Needs" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Geo-Location-Predicate@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Location-Predicate",
+         "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Location-Predicate"
+      },
+      "homepage" : "https://metacpan.org/pod/Geo::Location::Predicate",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/nigelhorne/Geo-Location-Predicate.git",
+         "web" : "https://github.com/nigelhorne/Geo-Location-Predicate",
+         "x_repository" : "https://github.com/nigelhorne/Geo-Location-Predicate"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.18"
+}

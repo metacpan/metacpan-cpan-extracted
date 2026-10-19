@@ -37,6 +37,7 @@ my %WriteMakefileArgs = (
         'Game::Reversi'        => '0.04',
         'Game::RoyalUr'        => '0.03',
         'Game::Schnapsen'      => '0.04',
+        'Game::Senet'          => '0.02',
         'Game::Shogi'          => '0.01',
         'Game::Snake'          => '0.13',
         'Game::Sternhalma'     => '0.01',

@@ -1,0 +1,142 @@
+{
+   "programs" : {
+      "24" : {
+         "partials" : [],
+         "release" : 0.15,
+         "string" : 1,
+         "string_bright" : 0.3,
+         "string_damp" : 0.5,
+         "string_decay" : 2.5,
+         "string_key" : 0.6,
+         "string_noise" : 0.2,
+         "string_pick" : 0.16,
+         "string_vel" : 1.2,
+         "sustain" : 1
+      },
+      "25" : {
+         "partials" : [],
+         "release" : 0.2,
+         "string" : 1,
+         "string_bright" : 0.6,
+         "string_damp" : 0.18,
+         "string_decay" : 5,
+         "string_key" : 0.5,
+         "string_noise" : 0.3,
+         "string_pick" : 0.11,
+         "string_vel" : 1,
+         "sustain" : 1
+      },
+      "38" : {
+         "cutoff" : 16000,
+         "env2_attack" : 0.002,
+         "env2_decay" : 0.18,
+         "env2_release" : 0.1,
+         "env2_sustain" : 0.1,
+         "filter" : "lp24",
+         "filter_cutoff" : 180,
+         "filter_env" : 4,
+         "filter_q" : 3.5,
+         "filter_track" : 0.5,
+         "filter_vel" : 1.5
+      },
+      "4" : {
+         "attack" : 0.001,
+         "fm" : 1,
+         "fm_alg" : 5,
+         "op1_decay" : 2.5,
+         "op1_level" : 0.8,
+         "op1_release" : 0.4,
+         "op1_sustain" : 0,
+         "op1_vel" : 0.3,
+         "op2_decay" : 1.2,
+         "op2_level" : 1.1,
+         "op2_release" : 0.4,
+         "op2_sustain" : 0.15,
+         "op2_vel" : 0.7,
+         "op3_decay" : 0.8,
+         "op3_level" : 0.35,
+         "op3_release" : 0.3,
+         "op3_sustain" : 0,
+         "op3_vel" : 0.5,
+         "op4_decay" : 0.06,
+         "op4_level" : 2.2,
+         "op4_ratio" : 14,
+         "op4_sustain" : 0,
+         "op4_vel" : 0.9,
+         "partials" : [],
+         "release" : 0.4,
+         "sustain" : 1
+      },
+      "62" : {
+         "cutoff" : 16000,
+         "env2_attack" : 0.09,
+         "env2_decay" : 0.6,
+         "env2_release" : 0.2,
+         "env2_sustain" : 0.55,
+         "filter" : "lp12",
+         "filter_cutoff" : 450,
+         "filter_env" : 3,
+         "filter_q" : 1.4
+      },
+      "73" : {
+         "noise2" : 0.12,
+         "noise2_attack" : 0.03,
+         "noise2_center" : 900,
+         "noise2_mode" : "low",
+         "noise2_sustain" : 0.6,
+         "rough" : 0.12,
+         "rough_rate" : 25
+      },
+      "81" : {
+         "cutoff" : 16000,
+         "env2_attack" : 0.01,
+         "env2_decay" : 0.5,
+         "env2_sustain" : 0.4,
+         "filter" : "lp24",
+         "filter_cutoff" : 700,
+         "filter_env" : 2.5,
+         "filter_q" : 2.5,
+         "lfo1_delay" : 0.6,
+         "lfo1_rate" : 5.5,
+         "mods" : [
+            [
+               "wheel",
+               "cutoff",
+               2
+            ],
+            [
+               "pressure",
+               "cutoff",
+               2
+            ],
+            [
+               "lfo1",
+               "pitch",
+               0.12
+            ]
+         ],
+         "vibrato" : 0
+      },
+      "89" : {
+         "cutoff" : 16000,
+         "filter" : "lp12",
+         "filter_cutoff" : 900,
+         "filter_q" : 1.8,
+         "lfo1_rate" : 0.15,
+         "lfo1_shape" : "triangle",
+         "lfo2_rate" : 0.11,
+         "mods" : [
+            [
+               "lfo1",
+               "cutoff",
+               1.2
+            ],
+            [
+               "lfo2",
+               "pan",
+               0.5
+            ]
+         ]
+      }
+   }
+}

@@ -48,16 +48,18 @@ subtest 'the status words' => sub {
 };
 
 subtest 'a letter jumps, and jumps again' => sub {
-	plan tests => 4;
+	plan tests => 5;
 	my ($menu) = menu('');
 	$menu->jump('x');
 	is $menu->games->[$menu->at]{key}, 'xiangqi', 'x finds xiangqi';
 	$menu->jump('s');
 	is $menu->games->[$menu->at]{key}, 'schnapsen', 's finds schnapsen';
 	$menu->jump('s');
-	is $menu->games->[$menu->at]{key}, 'shogi', 'and s again finds shogi';
+	is $menu->games->[$menu->at]{key}, 'senet', 'and s again finds senet';
 	$menu->jump('s');
-	is $menu->games->[$menu->at]{key}, 'sixtysix', 'and s a third time finds sixtysix';
+	is $menu->games->[$menu->at]{key}, 'shogi', 'and s a third time finds shogi';
+	$menu->jump('s');
+	is $menu->games->[$menu->at]{key}, 'sixtysix', 'and s a fourth time finds sixtysix';
 };
 
 subtest 'the cursor skips what is not installed' => sub {

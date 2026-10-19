@@ -1,5 +1,46 @@
 Revision history for Mail::DKIM2
 
+0.22    2026-10-18
+        - Message hashes (every Message-Instance's header and body hashes)
+          go through the new Mail::DKIM2::Digest: OpenSSL's SHA-2, through
+          Net::SSLeay, when that is installed (recommended, not required),
+          else CryptX's as before. The digests are the same; OpenSSL uses
+          the CPU's SHA instructions where there are some -- about 7 times
+          CryptX's speed on an Apple M-series, 1.8 times on an older x86.
+        - The body is hashed where it lies, in whole runs, with fewer
+          copies: load() normalises line endings only when there is a bare
+          LF and never changes the caller's string; PRINT hands body chunks
+          straight to the Verifier's body plan.
+        - The Verifier checks the Message-Instance chain without rebuilding
+          any previous version of the message. New: Mail::DKIM2::BodyPlan
+          composes the body Recipes into, for each instance, the runs of
+          current body lines and Recipe literals its body was, and hashes
+          every instance's body in one pass as the body arrives; the body is
+          not kept. New: Mail::DKIM2::HeaderPlan does the same for header
+          fields, canonicalizing each hashed value once. Same verdicts, in
+          the same words; about 40% less time on list mail, all of it in
+          the chain check. Verifier option StreamBody (on by default); 0 is
+          the undo walk.
+        - DKIM2Verify keeps a copy of the body only when it builds something
+          from it (a snapshot, or a first Message-Instance).
+        - The Verifier sends for every signature's public key, all at once and
+          in the background (Net::DNS bgsend), as soon as it has the header
+          fields, and reads the answers when it checks the signatures; an
+          answer that settles nothing (none within 5 seconds, SERVFAIL) is
+          asked again with query(). Each key name is looked up once per
+          message. A chain of five signing domains verified about four times
+          faster against live DNS.
+        - dkim2-milter verifies as the message arrives (headers at end of
+          headers, then each body chunk), so the key lookups overlap the
+          body's transfer.
+        - MessageInstance->verify takes BodyHashes, body hashes computed
+          elsewhere.
+        - Behaviour change: a body Recipe may copy the body's trailing blank
+          lines. They are not hashed (spec-06 section 6.1), but they are lines,
+          as C, Go, Python and the browser verifier already number them; undo
+          used to stop counting at the last non-blank line and refuse such a
+          copy.
+
 0.21    2026-10-14
         - Mail::DKIM2::Wrap::wrap_single_part, in list context, also returns
           why it wrapped nothing: multipart (the normal case), no-header-end,

@@ -60,7 +60,7 @@ subtest 'list' => sub {
 	my ($out, $err, $status) = run('list');
 	is $status, 0, 'status 0';
 	my @lines = split /\n/, $out;
-	is scalar @lines, 23, 'twenty-three rows';
+	is scalar @lines, 24, 'twenty-four rows';
 	like $out, qr/^checkers .*Game::Checkers::Terminal 9\.99$/m, 'the shadow in t/lib is the checkers found';
 };
 

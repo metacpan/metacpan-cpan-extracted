@@ -112,11 +112,10 @@ use strict;
 BEGIN {
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT_OK);
-    $VERSION     = '0.02';
+    $VERSION     = '0.03';
     @ISA         = qw(Exporter);
     @EXPORT_OK   = qw( d2fw fw2d );
 }
-use Data::Dumper;$Data::Dumper::Indent=1;
 use Carp;
 use Cwd;
 use IO::File;
@@ -309,7 +308,7 @@ sub fw2d {
 
     James E Keenan
     CPAN ID: jkeenan
-    jkeenan@cpan.org
+    jkeenan@pobox.com
     http://thenceforward.net/perl/modules/Text-FixedWidth-Helper
 
 Thanks to Natasha Salam for describing the need for this functionality.

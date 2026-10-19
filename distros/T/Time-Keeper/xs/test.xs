@@ -104,11 +104,13 @@ _today_at(self)
 void
 _value_layout()
     PPCODE:
-        EXTEND(SP, 4);
+        EXTEND(SP, 6);
         mPUSHi(STRUCT_OFFSET(tk_value, inst) + STRUCT_OFFSET(tk_instant, nsec));
         mPUSHi(STRUCT_OFFSET(tk_value, utoff));
         mPUSHi(STRUCT_OFFSET(tk_value, zone));
         mPUSHi(STRUCT_OFFSET(tk_value, kind));
+        mPUSHi(STRUCT_OFFSET(tk_value, cal));
+        mPUSHi(sizeof(tk_value));
 
 # About how many values range would give, before it gives any.
 NV
@@ -120,5 +122,107 @@ _range_estimate(self, end, ...)
     CODE:
         tk_range_init(aTHX_ &it, self, end, &ST(2), items - 2, "Time::Keeper->range");
         RETVAL = tk_range_estimate(&it);
+    OUTPUT:
+        RETVAL
+
+# The fields of a day in a calendar, by the engine alone: year, month, day,
+# day of the year, era index, year of the era, months in the year, days in
+# the month and year, leap year, month number and leap month.
+void
+_cal_fields(id, days)
+        SV *id
+        IV days
+    PREINIT:
+        int k;
+        tk_calfields f;
+    PPCODE:
+        k = tk_cal_id_from_sv(aTHX_ id, "_cal_fields");
+        tk_cal_check_built(aTHX_ k, "_cal_fields");
+        tk_cal_fields(&tk_calendars[k], (int64_t)days, &f);
+        EXTEND(SP, 12);
+        mPUSHs(tk_newSVi64(aTHX_ f.year));
+        mPUSHi(f.month);
+        mPUSHi(f.day);
+        mPUSHi(f.doy);
+        mPUSHi(f.era);
+        mPUSHs(tk_newSVi64(aTHX_ f.era_year));
+        mPUSHi(f.months_in_year);
+        mPUSHi(f.days_in_month);
+        mPUSHi(f.days_in_year);
+        mPUSHi(f.leap_year);
+        mPUSHi(f.month_number);
+        mPUSHi(f.leap_month);
+
+IV
+_cal_to_days(id, y, m, d)
+        SV *id
+        IV y
+        IV m
+        IV d
+    PREINIT:
+        int k;
+    CODE:
+        k = tk_cal_id_from_sv(aTHX_ id, "_cal_to_days");
+        tk_cal_check_built(aTHX_ k, "_cal_to_days");
+        RETVAL = (IV)tk_calendars[k].to_days((int64_t)y, (unsigned)m, (unsigned)d);
+    OUTPUT:
+        RETVAL
+
+# Every day from one to another: from_days then to_days gives the day back,
+# the fields step as they should (the next day is day + 1 of the month, or
+# the first of the next month, or the first of the next year), the month
+# lengths and year lengths add up. Returns the count of days that fail.
+IV
+_cal_sweep(id, from, to)
+        SV *id
+        IV from
+        IV to
+    PREINIT:
+        int k;
+        const tk_calendar *cal;
+        int64_t days, py = 0;
+        unsigned pm = 0, pd = 0;
+        IV bad = 0;
+    CODE:
+        k = tk_cal_id_from_sv(aTHX_ id, "_cal_sweep");
+        tk_cal_check_built(aTHX_ k, "_cal_sweep");
+        cal = &tk_calendars[k];
+        for (days = (int64_t)from; days <= (int64_t)to; days++) {
+            int64_t y;
+            unsigned m, d;
+            cal->from_days(days, &y, &m, &d);
+            if (cal->to_days(y, m, d) != days || m < 1 || m > cal->months_in_year(y) || d < 1 || d > cal->days_in_month(y, m))
+                bad++;
+            else if (days > (int64_t)from) {
+                int ok;
+                if (y == py && m == pm) ok = d == pd + 1;
+                else if (y == py) ok = m == pm + 1 && d == 1 && pd == cal->days_in_month(py, pm);
+                else ok = y == py + 1 && m == 1 && d == 1 && pm == cal->months_in_year(py) && pd == cal->days_in_month(py, pm);
+                if (!ok) bad++;
+            }
+            if (d == 1 && m == 1) {
+                unsigned sum = 0, i;
+                for (i = 1; i <= cal->months_in_year(y); i++)
+                    sum += cal->days_in_month(y, i);
+                if (sum != tk_cal_days_in_year(cal, y))
+                    bad++;
+            }
+            py = y; pm = m; pd = d;
+        }
+        RETVAL = bad;
+    OUTPUT:
+        RETVAL
+
+# The absolute index of a month in a calendar: months before the year plus the month.
+IV
+_cal_months_index(id, y, m)
+        SV *id
+        IV y
+        IV m
+    PREINIT:
+        int k;
+    CODE:
+        k = tk_cal_id_from_sv(aTHX_ id, "_cal_months_index");
+        RETVAL = (IV)(tk_cal_months_before(&tk_calendars[k], (int64_t)y) + m);
     OUTPUT:
         RETVAL

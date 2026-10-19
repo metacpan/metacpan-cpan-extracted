@@ -73,15 +73,15 @@
    "provides" : {
       "Plack::Middleware::OIDC" : {
          "file" : "lib/Plack/Middleware/OIDC.pm",
-         "version" : "1.00"
+         "version" : "1.01"
       },
       "Plack::Middleware::OIDC::Logger" : {
          "file" : "lib/Plack/Middleware/OIDC/Logger.pm",
-         "version" : "1.00"
+         "version" : "1.01"
       },
       "Plack::Middleware::OIDC::Redirect" : {
          "file" : "lib/Plack/Middleware/OIDC/Redirect.pm",
-         "version" : "1.00"
+         "version" : "1.01"
       }
    },
    "release_status" : "stable",
@@ -96,7 +96,7 @@
          "web" : "https://github.com/sebmourlhou/plack-middleware-oidc"
       }
    },
-   "version" : "1.00",
+   "version" : "1.01",
    "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
    "x_spdx_expression" : "Artistic-2.0"

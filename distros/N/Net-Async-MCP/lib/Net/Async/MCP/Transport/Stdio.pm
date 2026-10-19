@@ -285,7 +285,7 @@ Net::Async::MCP::Transport::Stdio - Stdio MCP transport via subprocess JSON-RPC
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 

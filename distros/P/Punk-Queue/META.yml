@@ -28,8 +28,9 @@ recommends:
   DBI: '1.614'
   Punk: '0.04'
   Template::Stencil: '0.04'
+  Time::Keeper::Recurrence: '0.01'
 requires:
   File::Raw::JSON: '0.05'
   perl: '5.010000'
-version: '0.09'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

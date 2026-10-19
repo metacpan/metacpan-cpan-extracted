@@ -47,6 +47,25 @@ sub undo_error {
     ok($ok, 'a Recipe within the body undoes cleanly') or diag($why);
 }
 
+# Trailing blank lines are lines a Recipe may copy, as every other
+# implementation in the interop set numbers them: they are not hashed
+# (spec-06 §6.1), but they are there. The body here is "line one",
+# "line two", "footer" and two blank lines: five lines.
+{
+    my $cur = Email::MIME->new($with1);
+    $cur->body_set($cur->body_raw . "footer\r\n\r\n\r\n");
+    my $mi2 = Mail::DKIM2::MessageInstance->calculate($cur, Email::MIME->new($with1));
+    for my $case ([[[1, 2], [4, 5]], undef, 'a copy of the trailing blank lines undoes'],
+                  [[[1, 6]], qr/^body Recipe copies lines 1-6 of 5$/,
+                   'one line past them is past the end']) {
+        my ($recipe, $error, $name) = @$case;
+        $mi2->set_tag('rb', $recipe);
+        my $text = "Message-Instance: " . $mi2->as_string . "\r\n" . $cur->as_string;
+        my $got = undo_error($text);
+        $error ? like($got, $error, $name) : is($got, undef, $name);
+    }
+}
+
 my @bogus = (
     [ [[1, 1000000000]],     qr/^body Recipe copies lines 1-1000000000 of 3$/,
       'a range past the end' ],

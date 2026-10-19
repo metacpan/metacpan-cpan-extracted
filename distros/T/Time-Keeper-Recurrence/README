@@ -1,0 +1,28 @@
+Time-Keeper-Recurrence
+
+Rules that say when something happens again: RFC 5545 recurrence rules, cron
+expressions in Punk::Queue's grammar, and named arguments such as
+every(2, 'weeks', on => [qw(tue thu)]), walked in any time zone and in any
+calendar Time::Keeper has (RFC 7529). A rule with dates added and removed,
+or several rules, is a set; sets are read and written as iCalendar text;
+rules and sets are stored as text with their zone by name. A C ABI lets a
+scheduler written in C compile a rule and walk it, or ask for a cron's next
+occurrence in one call.
+
+INSTALLATION
+
+Time::Keeper::Zone and Time::Keeper must be installed first: this builds
+against their headers.
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)

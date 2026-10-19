@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Peta::Synth</title>
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="bar">
+  <div class="brand"><span class="logo">Peta::Synth</span><span class="sub" id="perl">connecting…</span></div>
+  <div class="pills">
+    <span class="pill" title="the engine that renders the voices">engine <b id="engine">–</b></span>
+    <span class="pill" title="sample rate">rate <b id="rate">–</b></span>
+    <span class="pill" title="voices sounding">voices <b id="voices">&#8199;&#8199;0</b></span>
+    <span class="pill" title="partials per voice for new notes (the quality)">partials <b id="partials">&#8199;&#8199;–</b></span>
+    <span class="pill load" title="the time a quantum takes to render (waiting for the GPU included), against the time it plays">load <span class="meter"><i id="load-bar"></i></span><b id="load">&#8199;&#8199;0%</b></span>
+    <span class="dot" id="link" title="connection"></span>
+  </div>
+  <button id="audio" class="primary">▶ Start sound</button>
+</header>
+
+<section class="transport card">
+  <div class="row">
+    <select id="files" title="MIDI files in the server's directory"></select>
+    <button id="play" class="symbol" title="play">&#9654;&#xFE0E;</button>
+    <button id="stop" class="symbol" title="stop">&#9632;</button>
+    <button id="panic" title="silence everything now">Panic</button>
+    <button id="reset" title="everything as the server started: channels, mixer, effects, arpeggiators; the instruments keep their changes">Reset</button>
+    <button id="record" title="record what is played live (keys, controls, MIDI in) into a MIDI file">● Record</button>
+    <div class="progress" id="seek" title="click or drag: play from there"><i id="progress"></i><span id="position"></span></div>
+  </div>
+  <div class="row small">
+    <label class="drop" id="drop">Drop a MIDI file here, or <u>choose one</u><input type="file" id="upload" accept=".mid,.midi,.kar,.rmi" hidden></label>
+    <label>MIDI in <select id="midi-in"><option value="">none</option></select></label>
+    <span class="hint" id="midi-note"></span>
+  </div>
+</section>
+
+<main class="grid">
+  <section class="card mixer">
+    <h2>Channels</h2>
+    <div id="channels"></div>
+  </section>
+
+  <section class="card side">
+    <div class="fold" data-fold="master"><h2>Master</h2><div class="fold-body"><div id="master"></div></div></div>
+    <div class="fold" data-fold="reverb"><h2>Reverb</h2><div class="fold-body"><div id="reverb"></div></div></div>
+    <div class="fold" data-fold="eq"><h2>Equalizer</h2><div class="fold-body">
+      <canvas id="eq-curve" width="300" height="90"></canvas>
+      <div id="eq"></div>
+    </div></div>
+    <div class="fold closed" data-fold="channel-eq"><h2 id="channel-eq-title">Channel equalizer</h2><div class="fold-body">
+      <canvas id="channel-eq-curve" width="300" height="90"></canvas>
+      <div id="channel-eq"></div>
+    </div></div>
+    <div class="fold" data-fold="arp"><h2 id="arp-title">Arpeggiator</h2><div class="fold-body"><div id="arp"></div></div></div>
+    <div class="fold" data-fold="sound"><h2>Sound</h2><div class="fold-body">
+      <canvas id="scope" width="300" height="90"></canvas>
+      <canvas id="analyser" width="300" height="90"></canvas>
+    </div></div>
+  </section>
+</main>
+
+<section class="card keys">
+  <div class="row small">
+    <label>channel <select id="key-channel"></select></label>
+    <label>velocity <input type="range" id="velocity" min="1" max="127" value="100"><b id="velocity-value">100</b></label>
+    <button id="octave-down">◀ octave</button><b id="octave">C3</b><button id="octave-up">octave ▶</button>
+    <label class="wheel">bend <input type="range" id="bend" min="-8192" max="8191" value="0"></label>
+    <label class="wheel">mod <input type="range" id="mod" min="0" max="127" value="0"></label>
+    <span class="hint">computer keys: A W S E D F T G Y H U J K O L P</span>
+  </div>
+  <div id="keyboard"></div>
+</section>
+
+<section class="card editor">
+  <div class="editor-head">
+    <h2 id="patch-title">Instrument</h2>
+    <select id="drum-key" hidden title="the drum to edit"></select>
+    <div class="spacer"></div>
+    <button id="patch-reset" title="this instrument back to its defaults">Reset</button>
+    <button id="bank-save" title="save every change to the server's bank file">Save bank</button>
+  </div>
+  <div class="editor-body">
+    <div class="previews">
+      <figure><canvas id="spectrum-preview" width="360" height="110"></canvas><figcaption>spectrum at middle C</figcaption></figure>
+      <figure><canvas id="envelope-preview" width="360" height="110"></canvas><figcaption>envelope: a note held one second</figcaption></figure>
+    </div>
+    <div id="fields"></div>
+  </div>
+</section>
+
+<div id="toast"></div>
+<script src="app.js"></script>
+</body>
+</html>

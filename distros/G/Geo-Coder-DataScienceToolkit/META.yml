@@ -4,13 +4,12 @@ author:
   - 'Nigel Horne <njh@bandsman.co.uk>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  Test::Carp: '0'
+  Geo::Location::Predicate: '0'
+  HTTP::Response: '0'
   Test::DescribeMe: '0'
-  Test::LWP::UserAgent: '0'
   Test::Most: '0'
   Test::Needs: '0'
   Test::NoWarnings: '0'
-  Test::Number::Delta: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -24,6 +23,8 @@ no_index:
   directory:
     - t
     - inc
+recommends:
+  Geo::Location::Predicate: '0.01'
 requires:
   Encode: '0'
   HTTP::Request: '0'
@@ -36,5 +37,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-DataScienceToolkit
   repository: git://github.com/nigelhorne/Geo-Coder-DataScienceToolkit.git
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

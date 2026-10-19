@@ -69,8 +69,61 @@ sub dies_like {
     is($L->relative_names('fr-CA', 'day')->{at}{-1}, 'hier', 'inherited by a child');
     is($L->relative_names('ru', 'day')->{past}{many}, '{0} дней назад', 'Russian many');
     is($L->relative_names('ar', 'day')->{future}{two}, 'خلال يومين', 'Arabic two');
-    dies_like(sub { $L->relative_names('en', 'fortnight') }, qr/the field is year, quarter, month, week, day, hour, minute or second, not 'fortnight'/, 'a field it does not know');
+    dies_like(sub { $L->relative_names('en', 'fortnight') }, qr/the field is year, quarter, month, week, day, hour, minute, second, or a weekday mon to sun, not 'fortnight'/, 'a field it does not know');
     dies_like(sub { $L->relative_names('en', 'day', 'wide') }, qr/the width is 'long', 'short' or 'narrow', not 'wide'/, 'a width it does not know');
+}
+
+# The weekdays are fields too (archive version 4).
+{
+    my $t = $L->relative_names('en', 'tue');
+    ok(!defined $t->{display}, 'a weekday has no display name');
+    is_deeply($t->{at}, { -1 => 'last Tuesday', 0 => 'this Tuesday', 1 => 'next Tuesday' }, 'last, this and next Tuesday');
+    is($t->{future}{one}, 'in {0} Tuesday', 'in a Tuesday');
+    is($t->{future}{other}, 'in {0} Tuesdays', 'in Tuesdays');
+    is($t->{past}{other}, '{0} Tuesdays ago', 'Tuesdays ago');
+    is($L->relative_names('en', 'tue', 'short')->{at}{1}, 'next Tue.', 'short');
+    is($L->relative_names('en', 'tue', 'narrow')->{at}{1}, 'next Tu', 'narrow');
+    is($L->relative_names('en', 'sun')->{at}{-1}, 'last Sunday', 'the seventh');
+    is($L->relative_names('en', 'mon')->{at}{0}, 'this Monday', 'the first');
+    is($L->relative_names('ja', 'tue')->{at}{1}, '来週の火曜日', 'Japanese, the day name inside');
+    is($L->relative_names('ja', 'tue')->{future}{other}, '{0} 個後の火曜日', 'and its one pattern');
+    is($L->relative_names('en-GB', 'tue')->{at}{1}, 'next Tuesday', 'inherited by a child');
+    for my $loc (qw(fr de ru ar zh he)) {
+        for my $d (qw(mon tue wed thu fri sat sun)) {
+            my $r = $L->relative_names($loc, $d);
+            is_deeply([sort { $a <=> $b } keys %{ $r->{at} }], [-1, 0, 1], "$loc $d: last, this and next, nothing further");
+            ok($r->{future}{other} && $r->{past}{other}, "$loc $d: a future and a past pattern");
+        }
+    }
+    is($L->relative_names('ru', 'tue')->{past}{many}, $L->relative_names('ru', 'tue')->{past}{many}, 'Russian has its categories');
+    ok(exists $L->relative_names('ar', 'fri')->{future}{two}, 'Arabic has its dual');
+}
+
+# The parts of a day, and when they are.
+{
+    my $p = $L->day_periods('en');
+    is($p->{noon}, 'noon', 'noon');
+    is($p->{midnight}, 'midnight', 'midnight');
+    is($p->{afternoon1}, 'in the afternoon', 'in the afternoon');
+    is($p->{am}, 'AM', 'am, as names gives it');
+    is_deeply([$L->names('en', 'am_pm')], [@{$p}{qw(am pm)}], 'the same two strings');
+    ok(!exists $p->{morning2}, 'English has one morning');
+    ok(exists $L->day_periods('zh')->{morning2}, 'Chinese has two');
+    is($L->day_periods('en', 'abbreviated')->{noon}, 'noon', 'abbreviated');
+    ok(defined $L->day_periods('en', 'narrow')->{noon}, 'narrow');
+    dies_like(sub { $L->day_periods('en', 'long') }, qr/the width is 'wide', 'abbreviated' or 'narrow', not 'long'/, 'a width it does not know');
+    my @r = $L->day_period_rules('en');
+    ok(@r >= 5, 'English has rules: ' . scalar @r);
+    my %by = map { $_->{period} => $_ } @r;
+    is($by{noon}{at}, 720, 'noon is at 12:00');
+    is_deeply([@{ $by{morning1} }{qw(from before)}], [0, 720], 'the morning is 00:00 to 12:00, as CLDR 48 has it');
+    is_deeply([@{ $by{afternoon1} }{qw(from before)}], [720, 1080], 'the afternoon 12:00 to 18:00');
+    is_deeply([@{ $by{night1} }{qw(from before)}], [1260, 1440], 'the night 21:00 to 24:00: nothing crosses midnight');
+    my %zh = map { $_->{period} => $_ } $L->day_period_rules('zh');
+    is_deeply([@{ $zh{morning2} }{qw(from before)}], [480, 720], 'Chinese: the second morning 08:00 to 12:00');
+    ok(!exists $by{noon}{from}, 'an at rule has no span');
+    is_deeply([$L->day_period_rules('en-GB')], [@r], 'shared with a child');
+    dies_like(sub { $L->day_period_rules('xx-YY') }, qr/there is no locale 'xx-YY'/, 'a locale that is not there');
 }
 
 # Duration units.

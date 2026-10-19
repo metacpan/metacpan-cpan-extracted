@@ -18,8 +18,30 @@
 
 #define TK_F_CIVIL 0x01   /* civil holds the local fields */
 #define TK_F_DST   0x02
+#define TK_F_CAL   0x04   /* cal holds the fields read in the value's calendar */
 
 #define TK_MAX_FIXED_OFFSET (24 * 3600 - 1)
+
+/* The fields of a day read in the value's calendar, packed: a year fits
+ * int32 (years run to a thousand million), the rest in a byte or two. Filled
+ * once, like civil, since the instant, zone and calendar never change; a copy
+ * that changes its calendar drops it (tk_value_set_calendar). */
+typedef struct tk_calcache {
+    int32_t  year;
+    int32_t  era_year;
+    uint16_t doy;
+    uint16_t days_in_year;
+    uint8_t  month;             /* ordinal */
+    uint8_t  day;
+    uint8_t  month_number;      /* the number in the month code */
+    uint8_t  era;
+    uint8_t  months_in_year;
+    uint8_t  days_in_month;
+    uint8_t  flags;             /* TK_CC_* */
+    uint8_t  pad;
+} tk_calcache;
+#define TK_CC_LEAP_MONTH 0x01
+#define TK_CC_LEAP_YEAR  0x02
 
 typedef struct tk_value {
     tk_instant inst;    /* UTC; for a floating value, the wall time read as UTC */
@@ -28,9 +50,10 @@ typedef struct tk_value {
     uint16_t   locale;  /* Phase 10; 0 is English */
     uint8_t    flags;
     uint8_t    kind;     /* TK_KIND_*: 0 for a Time::Keeper value */
-    uint8_t    calendar; /* 0, the Gregorian calendar, until a later release */
+    uint8_t    calendar; /* TK_CAL_*: 0 is the Gregorian */
     uint8_t    pad;
     tk_civil   civil;
+    tk_calcache cal;    /* the calendar's fields, filled on the first read (R14a) */
 } tk_value;
 
 /* The plain classes share the struct: a floating value at midnight of the
@@ -263,7 +286,7 @@ tk_value_of(pTHX_ SV *sv, const char *what)
         || (v->zone >= TK_ZONE_NAMED && v->zone - TK_ZONE_NAMED >= (tk_zone_abi(aTHX)->zone_count)())
         || (v->zone == TK_ZONE_FIXED && (v->utoff < -TK_MAX_FIXED_OFFSET || v->utoff > TK_MAX_FIXED_OFFSET))
         || (v->zone < TK_ZONE_FIXED && v->utoff != 0)
-        || v->kind != TK_KIND_DATETIME || v->calendar != 0)
+        || v->kind != TK_KIND_DATETIME || v->calendar >= TK_CAL_COUNT)
         croak("%s: a damaged Time::Keeper value", what);
     return v;
 }

@@ -1,5 +1,17 @@
 Revision history for Time-Keeper
 
+0.06    2026-10-19
+        - The locale archive carries CLDR's weekday relative words ("last Tuesday", "next Tuesday", "in {0} Tuesdays")
+        - Time::Keeper::Locale: day_periods, the names of the parts of a day, and day_period_rules, when each is.
+        - Fix: a parse_cldr or strptime error after a pattern literal that shared the first byte of the text's character warned of malformed UTF-8 and misplaced its offset.
+        - Tests: t/37-relative.t pins the clock (it failed between midnight and 03:00); t/29-until.t compares totals within a tolerance (it failed on long-double perls).
+
+0.05    2026-10-18
+        - Calendars: a value is read in any of thirteen calendars (calendar => on every constructor, in_calendar, era, era_year, month_code, is_leap_month, months_in_year, related_year and Time::Keeper::Calendar.
+        - Arithmetic in a calendar: plus, minus, the difference, until, truncate, round, end_of, the weekday adjusters and range count the calendar's months; years by name keep the month by its code.
+        - The Chinese, Dangi and astronomical Hijri calendars (islamic, islamic-rgsa), from tables of what ICU computes for the years 1000 to 3000; cyclic_year.
+        - Builds on Strawberry Perl: a local in from_object was named tzname, which MinGW's time.h defines as a macro.
+
 0.04    2026-10-18
         - Time::Keeper::Date, Time::Keeper::YearMonth and Time::Keeper::MonthDay: a date with no time, a year and month, a month and day; to_date, to_year_month and to_month_day on a value.
         - Time::Keeper::Time: a time of day on no date, wrapping at midnight; to_time on a value; Date->at takes one.

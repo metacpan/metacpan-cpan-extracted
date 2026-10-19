@@ -6,6 +6,7 @@ use oEdtk;
 use oEdtk::Config    qw(config_read get_ini_path);
 use oEdtk::DBAdmin   qw(db_connect);
 use oEdtk::Messenger qw(oe_send_mail);
+use oEdtk::logger    qw(logger);
 
 if ( @ARGV > 0 or ( $ARGV[0] and $ARGV[0] =~ /-h/i ) ) {
 	die "Usage: $0 \n\n\tthis will check configuration key in oEdtk.ini setup\n";
@@ -104,10 +105,13 @@ else {
 warn "\nSTART CHECK db_connect FROM oEdtk.ini...\n";
 warn "\t check DB_BAKUP : \n";
 my $dbh1 = db_connect( $cfg, 'EDTK_DBI_DSN_BAK' )
-	or printf " BAD, error connecting EDTK_DBI_DSN_BAK\n";
+	or logger( 3, " BAD, error connecting EDTK_DBI_DSN_BAK\n" );
 warn "\n\t check DB_PARAM : \n";
-my $dbh2 = db_connect( $cfg, 'EDTK_DBI_PARAM' ) or printf " BAD, error connecting EDTK_DBI_PARAM\n";
+my $dbh2 = db_connect( $cfg, 'EDTK_DBI_PARAM' )
+	or logger( 3, " BAD, error connecting EDTK_DBI_PARAM\n" );
 warn "\n\t check DB_STATS : \n";
-my $dbh3 = db_connect( $cfg, 'EDTK_DBI_STATS' ) or printf " BAD, error connecting EDTK_DBI_STAT\n";
+my $dbh3 = db_connect( $cfg, 'EDTK_DBI_STATS' )
+	or logger( 3, " BAD, error connecting EDTK_DBI_STAT\n" );
 warn "\n\t check DB_MAIN : \n";
-my $dbh4 = db_connect( $cfg, 'EDTK_DBI_DSN' ) or printf " BAD, error connecting EDTK_DBI_DSN\n";
+my $dbh4 = db_connect( $cfg, 'EDTK_DBI_DSN' )
+	or logger( 3, " BAD, error connecting EDTK_DBI_DSN\n" );

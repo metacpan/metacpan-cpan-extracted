@@ -3,7 +3,7 @@ package oEdtk::Infinite;
 use strict;
 use warnings;
 
-our $VERSION = 2.1111;
+our $VERSION = 2.1126;
 
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw( import_cobol_X import_cobol_S9V9
@@ -96,6 +96,75 @@ C<oEUser::Infinite> and returns its result:
 =item compute_pic, compute_value, map_sub, sub_list
 
 =back
+
+=head1 FUNCTIONS
+
+=head2 import_cobol_X
+
+    my $value = import_cobol_X(\$line, $position, $length);
+
+Import C<$length> characters from C<$line> at the 1-based C<$position>, with the
+trailing spaces removed.
+
+=head2 import_cobol_S9V9
+
+    my $value = import_cobol_S9V9(\$line, $position, $int_len, $frac_len);
+
+Import a signed decimal Cobol field, C<int_len> digits and C<frac_len> decimals,
+from C<$line> at C<$position>.
+
+=head2 is_entete
+
+    my $bool = is_entete(\$line);
+
+True when the line is a header (C<ENTETE>) record.
+
+=head2 is_flux
+
+    my $bool = is_flux(\$line);
+
+True when the line is a flux (C<FLUX>) record.
+
+=head2 is_ligne
+
+    my $bool = is_ligne(\$line);
+
+True when the line is a detail (C<LIGNE>) record.
+
+=head2 is_option
+
+    my $bool = is_option(\$line);
+
+True when the line is an option record.
+
+=head2 id_ligne
+
+    my $id = id_ligne(\$line);
+
+Return the two-character identifier of a detail line.
+
+=head2 is_asspri
+
+    my $flag = is_asspri(\$line);
+
+Return the associate/insured indicator of the line.
+
+=head2 record_values
+
+    my @errors = record_values(\%record, \%map, \$line);
+
+Populate C<%record> by applying C<%map> to C<$line>, and return the list of
+errors (empty on success).
+
+=head2 extract_options
+
+    my $options = extract_options(\$line);
+
+Split an option line into its option list.
+
+Every function forwards its arguments to the same-named function of the
+companion C<oEUser::Infinite>, loaded on demand; a missing oEUser fails with a
+clear message.
 
 =head1 AUTHOR
 

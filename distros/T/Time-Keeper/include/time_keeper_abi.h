@@ -72,12 +72,26 @@
  * len. A named zone needs Time::Keeper::Zone, loaded the first time one is
  * used; if it cannot be loaded, the entry croaks, as the Perl methods do.
  * Running out of memory croaks, as perl's own allocator does. Nothing else
- * croaks. */
+ * croaks.
+ *
+ * ---- calendars (version 2) ---------------------------------------------
+ *
+ * A calendar is an id from calendar_find, 0 for the Gregorian; ids are those
+ * of this build, so store a calendar's ID STRING (calendar_id gives it), not
+ * its number. cal_fields reads an instant's wall clock in a calendar: the
+ * calendar's continuous year, its era and the year within it, the ordinal
+ * month and the number in its month code, the day, and the shape of the
+ * month and year; cal_from_fields goes back from the calendar, year, month,
+ * day and clock. A calendar read from a table (chinese, dangi, islamic,
+ * islamic-rgsa) answers TIME_KEEPER_RANGE outside its years. format_cal and
+ * strftime_cal write a pattern in a calendar as the methods do on a value
+ * read in one. Version 1's civil, from_civil, strftime and format stay
+ * Gregorian, and time_keeper_civil never widens. */
 
 #include <stdint.h>
 #include <stddef.h>
 
-#define TIME_KEEPER_ABI_VERSION 1
+#define TIME_KEEPER_ABI_VERSION 2
 
 #define TIME_KEEPER_ABI_OK(t) ((t) && (t)->abi_version >= TIME_KEEPER_ABI_VERSION)
 
@@ -121,6 +135,22 @@ typedef struct time_keeper_civil {
     int32_t offset;                     /* seconds east of UTC */
     int     is_dst;
 } time_keeper_civil;
+
+typedef struct time_keeper_calfields {
+    int     calendar;                   /* from calendar_find; 0 the Gregorian */
+    int64_t year;                       /* the calendar's continuous year */
+    int64_t era_year;                   /* the year within the era */
+    int     era;                        /* an index into the calendar's eras, in Time::Keeper::Calendar->eras' order */
+    int     month, day;                 /* the ordinal month, 1 .. months_in_year; the day */
+    int     month_number;               /* the number in the month code: M05 and M05L are both 5 */
+    int     leap_month, leap_year;
+    int     months_in_year, days_in_month, days_in_year, day_of_year;
+    int     hour, minute, second;       /* second 60 only in a leap second */
+    int32_t nanosecond;
+    /* filled by cal_fields, read by nothing: */
+    int32_t offset;                     /* seconds east of UTC */
+    int     is_dst;
+} time_keeper_calfields;
 
 typedef struct time_keeper_abi {
     int abi_version;
@@ -175,6 +205,35 @@ typedef struct time_keeper_abi {
     /* TAI minus UTC at an instant, in seconds: 10 in 1972 to 37 since 2017.
      * TIME_KEEPER_RANGE before 1972. */
     int    (*tai_minus_utc)(const time_keeper_instant *in, int *out);
+
+    /* ---- version 2 ---- */
+
+    /* A calendar's id by its id string or an alias ("hebrew", "gregorian",
+     * "iso8601", "islamicc"), any case; -1 if none. */
+    int    (*calendar_find)(const char *id, size_t len);
+
+    /* The id string of a calendar; TIME_KEEPER_BAD if there is no such id. */
+    int    (*calendar_id)(int calendar, const char **out);
+
+    /* An instant's wall clock in a zone, read in a calendar. */
+    int    (*cal_fields)(pTHX_ const time_keeper_instant *in, const time_keeper_zone *zone, int calendar,
+                         time_keeper_calfields *out);
+
+    /* The instant a calendar's wall clock shows: calendar, year, month, day
+     * and the clock are read, the rest ignored; gap and overlap as from_civil. */
+    int    (*cal_from_fields)(pTHX_ const time_keeper_calfields *in, const time_keeper_zone *zone,
+                              int gap, int overlap, time_keeper_instant *out);
+
+    /* format and strftime with the value read in a calendar. */
+    size_t (*format_cal)(pTHX_ char *buf, size_t len, const char *pattern, size_t plen,
+                         const time_keeper_instant *in, const time_keeper_zone *zone, int locale, int calendar);
+    size_t (*strftime_cal)(pTHX_ char *buf, size_t len, const char *pattern, size_t plen,
+                           const time_keeper_instant *in, const time_keeper_zone *zone, int locale, int calendar);
+
+    /* new_sv and from_sv with the calendar: a value read in one, and the
+     * calendar a value is read in (0 for one version 1 made). */
+    SV *   (*new_sv_cal)(pTHX_ const time_keeper_instant *in, const time_keeper_zone *zone, int locale, int calendar);
+    int    (*from_sv_cal)(pTHX_ SV *sv, time_keeper_instant *out, time_keeper_zone *zone, int *locale, int *calendar);
 } time_keeper_abi;
 
 #endif

@@ -1,6 +1,8 @@
 package oEdtk::IBAN;
 use warnings;
 use strict;
+
+our $VERSION = '2.1126';
 use bigint;
 use experimental 'switch';
 use Carp    qw( carp croak );

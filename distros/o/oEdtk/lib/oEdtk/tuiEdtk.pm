@@ -9,7 +9,7 @@ BEGIN {
 	use Term::ReadKey;
 	use oEdtk::trackEdtk qw(env_Var_Completion);
 
-	$VERSION = 2.1109;
+	$VERSION = 2.1126;
 	@ISA     = qw(Exporter);
 	@EXPORT  = qw(
 		clear_Screen	start_Screen	stop_Screen
@@ -575,3 +575,65 @@ END { }
 # =end comment
 
 #perl -d:ptkdb
+
+=head1 NAME
+
+oEdtk::tuiEdtk - simple terminal screens for the oEdtk launcher
+
+=head1 SYNOPSIS
+
+    use oEdtk::tuiEdtk;
+
+    start_Screen();
+    # ... run the application ...
+    stop_Screen();
+
+=head1 DESCRIPTION
+
+Draws the simple terminal screens of the oEdtk command-line launcher: the start
+screen, the administration menu and the exit pause. The screens are driven by the
+C<EDTK_*> environment variables; key reads go through C<Term::ReadKey> and path
+expansion through L<oEdtk::trackEdtk>.
+
+=head1 FUNCTIONS
+
+=head2 clear_Screen
+
+    clear_Screen();
+
+Clear the terminal with C<clear> on Unix or C<cls> on Windows.
+
+=head2 start_Screen
+
+    start_Screen();
+
+Display the application launcher and read the user's choice.
+
+=head2 stop_Screen
+
+    stop_Screen();
+
+Pause at the end of a run and, on request, open the produced document.
+
+=head2 admin_Screen
+
+    admin_Screen();
+
+Display the simple administration menu and dispatch to the chosen action.
+
+=head2 not_Configured
+
+    not_Configured();
+
+Display the "function not configured" screen and exit.
+
+The following subs are internal helpers and are not part of the public API:
+C<show_INIEDTK>, C<readKey_Wait>, C<delivery_Screen>, and the version-control
+helpers C<VCS_Screen>, C<VCS_merge>, C<VCS_commit>, C<VCS_missing>, C<VCS_add>,
+C<VCS_update>, C<VCS_to>, C<VCS_log> and C<VCS_rename>.
+
+=head1 AUTHOR
+
+The oEdtk team.
+
+=cut

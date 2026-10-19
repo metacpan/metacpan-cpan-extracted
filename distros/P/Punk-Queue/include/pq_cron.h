@@ -45,6 +45,9 @@ typedef struct pq_cron {
     U8  dom_restricted;      /* the vixie OR flags                       */
     U8  dow_restricted;
     IV  every;               /* @every interval seconds; 0 = field mode  */
+    const char *src;         /* the expression's text, for a named zone's walk:
+                              * it points into the caller's SV, valid for the call */
+    STRLEN srclen;
 } pq_cron;
 
 #define PQ_CRON_ALL_MIN  ((pq_u64)0xFFFFFFFFFFFFFFFULL)   /* 60 bits */
@@ -152,6 +155,8 @@ static void pq_cron_parse(pTHX_ const char *expr, STRLEN len, pq_cron *c) {
     int i;
 
     memset(c, 0, sizeof *c);
+    c->src = expr;
+    c->srclen = len;
 
     while (p < end && isSPACE((U8)*p)) p++;
     while (end > p && isSPACE((U8)end[-1])) end--;
@@ -260,22 +265,28 @@ static void pq_cron_parse(pTHX_ const char *expr, STRLEN len, pq_cron *c) {
  * tz is 'UTC' (default), 'local' (POSIX mktime/localtime_r, honouring the
  * process TZ), or a fixed '+HHMM'/'-HHMM'. No timezone database: UTC and
  * fixed offsets use our own civil-date arithmetic; only 'local' touches
- * libc, because only 'local' has DST. */
+ * libc, because only 'local' has DST. With Time::Keeper::Recurrence
+ * installed (pq_tkr.h), any other tz is tried as an IANA zone name, and a
+ * cron in one is walked by it. */
 
 typedef struct pq_civil {
     int year, mon, mday, hour, min, wday;   /* mon 1-12, wday 0=Sun */
 } pq_civil;
 
-enum { PQ_TZ_UTC, PQ_TZ_LOCAL, PQ_TZ_FIXED };
+enum { PQ_TZ_UTC, PQ_TZ_LOCAL, PQ_TZ_FIXED, PQ_TZ_NAMED };
 
 typedef struct pq_tz {
     int kind;
     IV  offset;              /* seconds east of UTC, PQ_TZ_FIXED only */
+    const char *name;        /* PQ_TZ_NAMED: the zone name, in the caller's SV */
+    STRLEN nlen;
 } pq_tz;
 
 static void pq_tz_parse(pTHX_ const char *tz, STRLEN len, pq_tz *out) {
     out->kind = PQ_TZ_UTC;
     out->offset = 0;
+    out->name = NULL;
+    out->nlen = 0;
     if (!tz || !len || (len == 3 && memEQ(tz, "UTC", 3))) return;
     if (len == 5 && memEQ(tz, "local", 5)) { out->kind = PQ_TZ_LOCAL; return; }
     if (len == 5 && (tz[0] == '+' || tz[0] == '-')
@@ -287,6 +298,21 @@ static void pq_tz_parse(pTHX_ const char *tz, STRLEN len, pq_tz *out) {
             out->kind = PQ_TZ_FIXED;
             out->offset = (hh * 3600 + mm * 60) * (tz[0] == '-' ? -1 : 1);
             return;
+        }
+    }
+    {
+        const time_keeper_recurrence_abi *T = pq_tkr(aTHX);
+        if (T) {
+            double d;
+            char err[160];
+            if ((T->cron_next)(aTHX_ "* * * * *", 9, tz, len, 0.0, &d, err, sizeof err) == TIME_KEEPER_RECURRENCE_OK) {
+                out->kind = PQ_TZ_NAMED;
+                out->name = tz;
+                out->nlen = len;
+                return;
+            }
+            croak("Punk::Queue: cron tz must be 'UTC', 'local', '+HHMM' or a "
+                  "time zone name, not '%.*s'", (int)len, tz);
         }
     }
     croak("Punk::Queue: cron tz must be 'UTC', 'local' or '+HHMM', "
@@ -383,6 +409,25 @@ static double pq_cron_next(pTHX_ const pq_cron *c, double from,
 
     if (c->every > 0)
         return from + (double)c->every;
+
+    if (tz->kind == PQ_TZ_NAMED) {
+        /* a zone name: Time::Keeper::Recurrence walks the same grammar
+         * through the zone database */
+        const time_keeper_recurrence_abi *T = pq_tkr(aTHX);
+        double out;
+        char err[200];
+        int rc;
+        if (!T)
+            croak("Punk::Queue: cron tz '%.*s' needs Time::Keeper::Recurrence",
+                  (int)tz->nlen, tz->name);
+        rc = (T->cron_next)(aTHX_ c->src, c->srclen, tz->name, tz->nlen, from, &out, err, sizeof err);
+        if (rc == TIME_KEEPER_RECURRENCE_OK)
+            return out;
+        if (rc == TIME_KEEPER_RECURRENCE_NONE)
+            return -1;
+        croak("Punk::Queue: cron '%.*s' in '%.*s': %s", (int)c->srclen, c->src,
+              (int)tz->nlen, tz->name, err);
+    }
 
     pq_civil_of(aTHX_ from, tz, &fromcv);
 

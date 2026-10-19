@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver;
 use strict;
 use warnings;
 
-our $VERSION = '0.000065';
+our $VERSION = '0.000066';
 
 use Carp qw/croak confess/;
 use File::Temp qw/tempdir/;
@@ -375,6 +375,16 @@ sub _server_exit_status {
     return "exit value " . ($status >> 8);
 }
 
+# viable() reason for server drivers, which all run under the watcher. Only
+# starting a server needs one.
+sub _watcher_unsupported_reason {
+    my $this = shift;
+    my ($spec) = @_;
+    return undef unless $^O eq 'MSWin32';
+    return undef unless $spec->{bootstrap} || $spec->{autostart};
+    return "Starting a " . $this->name . " server is not supported on MSWin32 (Strawberry Perl): the watcher that owns each server needs Unix process control";
+}
+
 sub started {
     my $self = shift;
 
@@ -455,6 +465,72 @@ sub start {
     }
 
     return;
+}
+
+# The socket file exists before the server accepts on it, so a connect right
+# after it appears can be refused. Retry a real connection (the base connect,
+# not a driver's startup-tolerant override) until one works. A failure appends
+# the launch log too: errors from before a server's own logging starts (such as
+# resource exhaustion, which test helpers match on) land only there.
+sub _wait_for_connect {
+    my $self = shift;
+    my ($db_name) = @_;
+
+    my $timeout = env_timeout(QDB_START_TIMEOUT => 10);
+    my $start = time;
+    my ($dbh, $err, $ok);
+    while (1) {
+        {
+            local $@;
+            $ok = eval {
+                $dbh = $self->DBIx::QuickDB::Driver::connect(
+                    $db_name,
+                    AutoCommit => 1,
+                    RaiseError => 1,
+                    PrintError => 0,
+                );
+                1;
+            };
+            $err = $ok ? undef : $@;
+        }
+
+        last if $ok;
+        last if $self->_server_exit_status;
+        last unless -S $self->socket;
+        last if time - $start > $timeout;
+        sleep 0.01;
+    }
+
+    if ($ok) {
+        $dbh->disconnect;
+        return;
+    }
+
+    my $watcher    = $self->{+WATCHER};
+    my $launch_log = $watcher ? $self->_read_file($watcher->log_file) : '';
+    my $error_log  = $self->read_error_log;
+
+    my $msg = $err;
+    $msg .= "\n=== server launch log ===\n$launch_log" if length $launch_log;
+    $msg .= "\n=== error log ===\n$error_log"          if length $error_log;
+
+    # A failed start must not leave the object permanently reporting
+    # started() merely because it still holds a watcher. Stop and reap the
+    # server without stop()'s checkpoint (it never became ready), keeping the
+    # original startup error.
+    if ($watcher) {
+        delete $self->{+WATCHER};
+        my $stopped = eval {
+            $watcher->stop;
+            $watcher->wait;
+            my $socket = $self->socket;
+            unlink($socket) if $socket && -S $socket;
+            1;
+        };
+        warn $@ unless $stopped;
+    }
+
+    die $msg;
 }
 
 # Disconnect this process's DBI handles to this instance's server. Must run
@@ -767,7 +843,8 @@ true then the database directory will be deleted when the program ends.
 =item $db->start
 
 Start the database. Most drivers will make this a no-op if the db is already
-running.
+running. The PostgreSQL and MySQL-family drivers return only once the server
+accepts connections.
 
 =item $db->stop
 

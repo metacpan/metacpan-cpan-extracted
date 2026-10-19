@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+  xmlns="http://www.loc.gov/MARC21/slim">
+
+<record>
+  <leader>01261nam a2200361 i 4500</leader>
+  <controlfield tag="001">nos190126551</controlfield>
+  <controlfield tag="003">CZ PrNK</controlfield>
+  <controlfield tag="005">20220224084228.0</controlfield>
+  <controlfield tag="007">ta</controlfield>
+  <controlfield tag="008">000725s1922    xr acf g      000 0 cze  </controlfield>
+  <datafield tag="015" ind1=" " ind2=" ">
+    <subfield code="a">cnb000638859</subfield>
+  </datafield>
+  <datafield tag="020" ind1=" " ind2=" ">
+    <subfield code="q">(Brožováno)</subfield>
+  </datafield>
+  <datafield tag="040" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+    <subfield code="b">cze</subfield>
+    <subfield code="c">LIA001</subfield>
+    <subfield code="d">ABA001</subfield>
+    <subfield code="e">rda</subfield>
+  </datafield>
+  <datafield tag="043" ind1=" " ind2=" ">
+    <subfield code="a">e-xr---</subfield>
+    <subfield code="a">e-xo---</subfield>
+    <subfield code="a">e-cs---</subfield>
+  </datafield>
+  <datafield tag="072" ind1=" " ind2="7">
+    <subfield code="a">94(437)</subfield>
+    <subfield code="x">Dějiny Česka a Slovenska</subfield>
+    <subfield code="2">Konspekt</subfield>
+    <subfield code="9">8</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">94(437.3)</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">94(437.6)</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">(94(437)</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">(048.8)</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="100" ind1="1" ind2=" ">
+    <subfield code="a">Loubal, František,</subfield>
+    <subfield code="d">1893-1950</subfield>
+    <subfield code="7">jk01072468</subfield>
+    <subfield code="4">aut</subfield>
+  </datafield>
+  <datafield tag="245" ind1="1" ind2="0">
+    <subfield code="a">Malá kronika národa československého /</subfield>
+    <subfield code="c">napsal Frant. Loubal</subfield>
+  </datafield>
+  <datafield tag="264" ind1=" " ind2="1">
+    <subfield code="a">V Praze :</subfield>
+    <subfield code="b">Nakladatelství Volné myšlenky československé,</subfield>
+    <subfield code="c">1922</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">118 stran, 12 nečíslovaných listů obrazových příloh</subfield>
+    <subfield code="b">ilustrace, portréty ;</subfield>
+    <subfield code="c">16 cm</subfield>
+  </datafield>
+  <datafield tag="336" ind1=" " ind2=" ">
+    <subfield code="a">text</subfield>
+    <subfield code="b">txt</subfield>
+    <subfield code="2">rdacontent</subfield>
+  </datafield>
+  <datafield tag="337" ind1=" " ind2=" ">
+    <subfield code="a">bez média</subfield>
+    <subfield code="b">n</subfield>
+    <subfield code="2">rdamedia</subfield>
+  </datafield>
+  <datafield tag="338" ind1=" " ind2=" ">
+    <subfield code="a">svazek</subfield>
+    <subfield code="b">nc</subfield>
+    <subfield code="2">rdacarrier</subfield>
+  </datafield>
+  <datafield tag="651" ind1=" " ind2="7">
+    <subfield code="a">Česko</subfield>
+    <subfield code="7">ge128065</subfield>
+    <subfield code="x">dějiny</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="651" ind1=" " ind2="7">
+    <subfield code="a">Slovensko</subfield>
+    <subfield code="7">ge128580</subfield>
+    <subfield code="x">dějiny</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="651" ind1=" " ind2="7">
+    <subfield code="a">Československo</subfield>
+    <subfield code="7">ge131689</subfield>
+    <subfield code="x">dějiny</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">přehledy</subfield>
+    <subfield code="7">fd133202</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="910" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+  </datafield>
+  <datafield tag="928" ind1="9" ind2=" ">
+    <subfield code="a">Volná myšlenka československá</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="a">000638859</subfield>
+  </datafield>
+</record>
+
+</collection>

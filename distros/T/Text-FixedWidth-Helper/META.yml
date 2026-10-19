@@ -1,27 +1,32 @@
---- #YAML:1.0
-name:               Text-FixedWidth-Helper
-version:            0.02
-abstract:           Create or verify samples of fixed-width data
+---
+abstract: 'Create or verify samples of fixed-width data'
 author:
-    - James E Keenan (jkeenan@cpan.org)
-license:            perl
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'James E Keenan (jkeenan@pobox.com)'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    Carp:               0
-    Cwd:                0
-    IO::CaptureOutput:  0
-    IO::File:           0
-    Scalar::Util:       0
-    Test::Simple:       0.44
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.57_05
+  ExtUtils::MakeMaker: '0'
+  IO::CaptureOutput: '0'
+  Test::Simple: '0.44'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
+license: perl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-FixedWidth-Helper
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Cwd: '0'
+  IO::File: '0'
+  Scalar::Util: '0'
+resources:
+  bugtracker: https://github.com/jkeenan/Text-FixedWidth-Helper/issues
+  homepage: http://thenceforward.net/perl/modules/Text-FixedWidth-Helper/
+  repository: https://github.com/jkeenan/Text-FixedWidth-Helper.git
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

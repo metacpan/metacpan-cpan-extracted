@@ -1,0 +1,33 @@
+---
+abstract: 'The rule that decides whether a string could be a location'
+author:
+  - 'Nigel Horne <njh@nigelhorne.com>'
+build_requires:
+  Errno: '0'
+  ExtUtils::MakeMaker: '0'
+  POSIX: '0'
+  Scalar::Util: '0'
+  Test::DescribeMe: '0'
+  Test::Most: '0'
+  Test::Needs: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Geo-Location-Predicate
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.008003'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Location-Predicate
+  homepage: https://metacpan.org/pod/Geo::Location::Predicate
+  repository: git://github.com/nigelhorne/Geo-Location-Predicate.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

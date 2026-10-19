@@ -182,13 +182,12 @@ Check that `state` came back as you sent it before you exchange `code`, which wo
 
 ### Register a client
 
-An app with no client ID, and no client metadata document to use as one, registers itself and signs in with the `client_id` it gets back:
+An app with no client ID, and no client metadata document to use as one, registers itself, then signs in with the `client_id` it gets back as the client ID for `authorization_url` and `exchange_authorization_code`:
 
 ```perl
 my $client = InternetData->new;
 my $registration = $client->oauth->register(
     ['http://127.0.0.1:8765/callback'], client_name => 'Your App');
-# $registration->{client_id} is the client ID for authorization_url and exchange_authorization_code.
 ```
 
 Each redirect URI must be https on a public host name, or http on a loopback address, which then matches any port. Nothing is kept until a person approves the client, so an app with no client ID saved can simply register again.

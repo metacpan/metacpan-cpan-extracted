@@ -2,10 +2,10 @@ package DBIx::QuickDB::Driver::DuckDB;
 use strict;
 use warnings;
 
-use IPC::Cmd qw/can_run/;
 use Scalar::Util qw/reftype/;
+use DBIx::QuickDB::Util qw/find_bin/;
 
-our $VERSION = '0.000065';
+our $VERSION = '0.000066';
 
 use parent 'DBIx::QuickDB::Driver';
 
@@ -16,7 +16,7 @@ my ($DUCKDB, $DBDDUCKDB);
 BEGIN {
     local $@;
 
-    $DUCKDB = can_run('duckdb');
+    $DUCKDB = find_bin('duckdb');
     $DBDDUCKDB = eval { require DBD::DuckDB; 'DBD::DuckDB' };
 }
 

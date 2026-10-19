@@ -13,7 +13,7 @@ use Text::CSV qw( csv );
 use Data::Dumper;
 use Readonly;
 
-our $VERSION   = 1.0;
+our $VERSION   = 2.1126;
 our @EXPORT_OK = qw( make_docs_even_numbered );
 
 # An index (CSV .idx file) is a list of "docs"

@@ -1,7 +1,7 @@
 ---
 abstract: 'Tags helper for HTML footer.'
 author:
-  - 'Michal Josef Spacek <skim@cpan.org>'
+  - 'Michal Josef Spacek <michal.josef.spacek@gmail.com>'
 build_requires:
   CSS::Struct::Output::Structure: 0
   Data::HTML::Footer: 0
@@ -43,4 +43,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Tags-HTML-Footer
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Tags-HTML-Footer
-version: '0.04'
+version: '0.05'

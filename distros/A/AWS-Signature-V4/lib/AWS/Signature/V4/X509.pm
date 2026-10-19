@@ -1,7 +1,7 @@
 package AWS::Signature::V4::X509;
 use v5.24;
-use experimental qw< signatures >;
 use Moo;
+use experimental qw< signatures >;
 use MIME::Base64 qw< encode_base64 decode_base64 >;
 use Math::BigInt;
 

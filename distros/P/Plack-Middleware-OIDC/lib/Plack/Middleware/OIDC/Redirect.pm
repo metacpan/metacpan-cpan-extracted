@@ -4,6 +4,9 @@ use utf8;
 use strict;
 use warnings;
 
+use feature 'signatures';
+no warnings 'experimental::signatures';
+
 use Plack::Response;
 
 =encoding utf8
@@ -51,9 +54,7 @@ the browser must be redirected to.
 
 =cut
 
-sub new {
-  my ($class, %args) = @_;
-
+sub new ($class, %args) {
   return bless { url => $args{url} }, $class;
 }
 
@@ -66,7 +67,9 @@ Returns the URL to redirect to.
 
 =cut
 
-sub url { return $_[0]->{url} }
+sub url ($self) {
+  return $self->{url}
+}
 
 
 =head2 as_psgi()
@@ -87,8 +90,7 @@ exception happened to reach it.
 
 =cut
 
-sub as_psgi {
-  my ($self) = @_;
+sub as_psgi ($self) {
 
   my $res = Plack::Response->new();
   $res->redirect($self->url);

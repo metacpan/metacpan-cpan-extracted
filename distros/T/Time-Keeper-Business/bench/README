@@ -1,0 +1,20 @@
+Benchmarks: Time::Keeper::Business against its marks, and against the CPAN
+modules that do part of what it does where they are installed.
+
+From the dist's top, after `perl Makefile.PL && make`, with Time::Keeper
+built beside it or installed:
+
+    perl -Mblib bench/run.pl               # every mark
+    perl -Mblib bench/03-plus-days.pl      # one
+
+Each line says PASS or FAIL, our rate and the mark set in
+plan_time_keeper_business/00-overview.md (B14) before any number was seen;
+a comparison line adds the other module's rate and the ratio. A rate is
+calls a second over a fixed CPU time, the best of five.
+
+    TK_BENCH_SECONDS   seconds a run (0.5)
+    TK_BENCH_RUNS      runs, the best kept (5)
+    TK_BENCH_LOADS     fresh processes for the load time (41)
+    TK_BENCH_LIB       directories searched last, for Date::Business,
+                       DateTime::BusinessHours, Business::Hours and
+                       Date::Holidays, which are never installed in site

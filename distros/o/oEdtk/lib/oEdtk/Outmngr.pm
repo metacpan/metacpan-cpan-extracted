@@ -17,7 +17,7 @@ use DBI;
 # use Sys::Hostname;
 
 use Exporter;
-our $VERSION   = 2.1115;         # release number : Y.YSSS -> Year, Sequence
+our $VERSION   = 2.1126;         # release number : Y.YSSS -> Year, Sequence
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(
 	omgr_check_acquit
@@ -889,7 +889,7 @@ sub omgr_export {
 					# meet the lower limits of the production line, if any.
 					my $min_feuilles = $fil->{'ED_MINFEUIL_L'} || 1;
 					if ( $selpgs < $min_feuilles ) {
-						&logger( 4,
+						&logger( 5,
 								  "INFO: Not enough pages for production line \"$idfiliere\" : "
 								. "got $selpgs, need $min_feuilles\n" );
 						$more = 1;    # TODO check that we really need it
@@ -912,7 +912,7 @@ sub omgr_export {
 					}
 					my $minplis = $fil->{'ED_MINPLIS'} || 1;
 					if ( $selplis < $minplis ) {
-						&logger( 4,
+						&logger( 5,
 							"INFO: Not enough folded items for production line \"$idfiliere\" : "
 								. "got $selplis, need $minplis\n" );
 						$more = 1;    # TODO check that we really need it
@@ -1425,7 +1425,7 @@ sub omgr_purge_fs {
 	unless ( defined( $cfg->{'EDTK_DCLIB_PURGE_WEEKS_KEPT'} )
 		&& $cfg->{'EDTK_DCLIB_PURGE_WEEKS_KEPT'} > 0 )
 	{
-		&logger( 4, "INFO: EDTK_DCLIB_PURGE_WEEKS_KEPT not defined for optimization purge.\n" );
+		&logger( 6, "INFO: EDTK_DCLIB_PURGE_WEEKS_KEPT not defined for optimization purge.\n" );
 	}
 	else {
 		$weeks_kept = $cfg->{'EDTK_DCLIB_PURGE_WEEKS_KEPT'};
@@ -1454,7 +1454,7 @@ sub omgr_purge_fs {
 			}
 		}
 		else {
-			&logger( 4, "INFO: Unexpected filename : \"$file\"\n" );
+			&logger( 3, "INFO: Unexpected filename : \"$file\"\n" );
 		}
 	}
 
@@ -1538,3 +1538,115 @@ END {
 }
 
 1;
+
+=head1 NAME
+
+oEdtk::Outmngr - output management for printed document batches
+
+=head1 SYNOPSIS
+
+    use oEdtk::Outmngr qw(omgr_import omgr_export);
+
+    omgr_import($app, $index_file, $corp);   # insert the index, assign lot/filiere
+    my @lots = omgr_export(%conds);          # batch and export the print lots
+
+=head1 DESCRIPTION
+
+Output Management. It inserts the composition index into the Outmngr database,
+assigns each document a lot and a production line, batches and exports print
+lots (writing the C<.idx> and C<.job> files per lot), and provides the
+statistics, purge and acknowledgment tooling around that pipeline. The
+processing steps (insert and enrich, assign the lot, infer the manufacturer,
+export) are described in the module source.
+
+=head1 FUNCTIONS
+
+=head2 omgr_import
+
+    omgr_import($app, $in, $corp);
+
+Read an index file into the C<EDTK_DBI_OUTMNGR> database, then assign the lot
+and the production line (rolling back on error).
+
+=head2 omgr_export
+
+    my @lots = omgr_export(%conds);
+
+Group the pending documents under the batch constraints, build the batch
+sequence, and write the C<.idx> and C<.job> files for each lot. Returns the
+list of name and doclib pairs.
+
+=head2 omgr_check_acquit
+
+    omgr_check_acquit($dbh, $nb_j_historique);
+
+Reconcile the acknowledgment status and counts in the C<EDTK_ACQ> tables;
+returns the number of rows updated.
+
+=head2 omgr_check_seqlot_ref
+
+    omgr_check_seqlot_ref($dbh, $value, $idseqpg);
+
+Report, per batch or per document id, the status of its documents, pages and
+plis.
+
+=head2 omgr_check_doclibs
+
+    omgr_check_doclibs($dbh);
+
+Die when a needed document library is missing from C<EDTK_DIR_DOCLIB>.
+
+=head2 omgr_depot_poste
+
+    omgr_depot_poste($dbh, $seqlot, $dt_depot);
+
+Set the posting date (C<ED_STATUS>) for a batch.
+
+=head2 omgr_lot_pending
+
+    omgr_lot_pending($dbh);
+
+List the documents that are still pending batching.
+
+=head2 omgr_purge_fs
+
+    omgr_purge_fs($dbh);
+
+List the document-library PDFs that are safe to purge (older than the keep
+window).
+
+=head2 omgr_stats
+
+    omgr_stats($dbh, $pdbh, $period, $typeRqt);
+
+Report batch, pli, document, sheet and face statistics for a period, optionally
+filtered by manufacturer.
+
+=head2 omgr_stats_referent
+
+    omgr_stats_referent($dbh, $pdbh);
+
+Report the mailing referent and document listing.
+
+=head2 omgr_track_folds
+
+    omgr_track_folds($dbh, $nb_j_historique);
+
+Produce the batch status tracking report.
+
+=head2 omgr_track_report
+
+    omgr_track_report($dbh);
+
+Produce the per-referent and manufacturer faces and plis report.
+
+The internal subs C<_omgr_insert>, C<_omgr_lot>, C<_get_next_filiere>,
+C<_omgr_filiere>, C<_omgr_purge_db>, C<_stats_manufact>, C<_get_seqlot>,
+C<_is_IDLDOC>, C<_filled_rows> and C<_print_All_rTab>, and the empty
+C<omgr_track_no_omgr> stub, are not part of the public API.
+
+=head1 AUTHOR
+
+The oEdtk team.
+
+=cut

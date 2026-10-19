@@ -90,6 +90,13 @@ subtest 'load() is PRINT+CLOSE with line-ending normalisation' => sub {
     is($v2->load($lf), $v2, 'load returns the object');
     is($v2->result, 'pass', 'bare LF through load() passes');
 
+    # One bare LF among CRLFs, in the body: still normalised.
+    (my $mixed = $SIGNED) =~ s/Body line one\.\r\n/Body line one.\n/ or die;
+    is(new_verifier()->load($mixed)->result, 'pass', 'one bare LF among CRLFs through load() passes');
+    my $copy = $mixed;
+    new_verifier()->load(\$mixed);
+    is($mixed, $copy, "load() leaves the caller's string as it was");
+
     my $v3 = new_verifier()->load(\$SIGNED);
     is($v3->result, 'pass', 'scalar ref');
 

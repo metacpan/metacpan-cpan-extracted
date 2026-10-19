@@ -2,11 +2,10 @@ package Mail::DKIM2::MessageInstance;
 use strict;
 use warnings;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 
-use Crypt::Digest::SHA256;
-use Crypt::Digest::SHA512 qw(sha512 sha512_b64);
+use Mail::DKIM2::Digest;
 use Email::MIME;
 use MIME::Base64 qw(encode_base64 decode_base64);
 use List::Util qw(max);
@@ -36,10 +35,19 @@ our $DEBUG = 0;
 # chain, or undef.
 sub _chain_error {
     my ($msg) = @_;
-    my @mi = $msg->header_raw('Message-Instance');
+    return _chain_error_fields([ $msg->header_raw('Message-Instance') ],
+                               scalar(my @sigs = $msg->header_raw('DKIM2-Signature')));
+}
+
+# The same from the Message-Instance field values and the number of
+# DKIM2-Signature fields, for a caller that has no Email::MIME.
+sub _chain_error_fields {
+    my ($fields, $signatures) = @_;
+    my @mi = @$fields;
     my ($range) = grep { defined }
                   map { chain_number_error('Message-Instance', 'm', mi_version_tag($_)) } @mi;
-    return chain_length_error($msg)
+    return chain_length_error({ 'message-instance' => scalar @mi,
+                                'dkim2-signature'  => $signatures })
         // ((grep { !defined mi_version_tag($_) } @mi)
                ? 'PERMERROR Message-Instance without m= tag' : undef)
         // $range
@@ -47,11 +55,12 @@ sub _chain_error {
 }
 
 # spec-06 §3.1: two hashing algorithms are defined. Verifiers MUST implement
-# both; Signers MAY implement either or both (we default to sha256).
-my %HASH_ALGS = (
-    sha256 => \&Crypt::Digest::SHA256::sha256,
-    sha512 => \&Crypt::Digest::SHA512::sha512,
-);
+# both; Signers MAY implement either or both (we default to sha256). Each
+# is a function of the data to its raw digest, by Mail::DKIM2::Digest.
+my %HASH_ALGS = map {
+    my $alg = $_;
+    $alg => sub { Mail::DKIM2::Digest::digest_data($alg, $_[0]) };
+} qw(sha256 sha512);
 
 sub hash_algs { return { %HASH_ALGS } }
 
@@ -138,17 +147,13 @@ sub body_hash { return $_[0]->{bits}{b1} }
 # Streams the body through the digest a megabyte at a time (each piece
 # ending at a LF, so a CRLF is never split): a large body is never copied
 # whole.
-my %DIGEST_CLASS = (
-    sha256 => 'Crypt::Digest::SHA256',
-    sha512 => 'Crypt::Digest::SHA512',
-);
 use constant BODY_CHUNK => 1 << 20;
 
 sub body_digest_raw {
     # Through a reference: "my ($body) = @_" would copy the body.
     my $bref = defined $_[0] ? \$_[0] : \'';
     my $alg = lc($_[1] // 'sha256');
-    my $class = $DIGEST_CLASS{$alg} or croak "unsupported hash algorithm: $alg";
+    my $d = Mail::DKIM2::Digest->new($alg);    # croaks on an unknown $alg
     my $len = length $$bref;
 
     # $end: the body without its trailing line breaks, each a LF with an
@@ -159,7 +164,6 @@ sub body_digest_raw {
         $end-- if $end > 0 && substr($$bref, $end - 1, 1) eq "\r";
     }
 
-    my $d = $class->new;
     for (my $pos = 0; $pos < $end; ) {
         my $n = $end - $pos;
         if ($n > BODY_CHUNK) {
@@ -989,7 +993,7 @@ sub calculate {
 sub verify {
     my ($class, $msg, %opts) = @_;
     Mail::DKIM2::Common::_check_options("$class->verify", \%opts,
-        qw(HeadersOnly IgnorePrefixes));
+        qw(HeadersOnly IgnorePrefixes BodyHashes));
     croak "need a message" unless $msg;
     check_ignore_prefixes($opts{IgnorePrefixes});
 
@@ -1011,10 +1015,36 @@ sub verify {
     my $self = eval { $class->parse($map{$num}) };
     unless ($self) {
         die $@ if ref $@;
-        (my $err = $@) =~ s/\s+at\s+\S+\s+line\s+\d+\.?\s*\z//;
-        $err =~ s/\s+\z//;
+        my $err = _parse_error($@);
         return wantarray ? (0, $err) : 0;
     }
+
+    my ($ok, $err) = $self->_check_hashes($num,
+        sub { h_digest($msg, $_[0], $opts{IgnorePrefixes}) },
+        # HeadersOnly: below a null body Recipe the body this instance
+        # hashed is gone; its header hashes are still checkable.
+        # BodyHashes: computed already (Mail::DKIM2::BodyPlan), from a body
+        # $msg does not carry.
+        $opts{HeadersOnly} ? undef
+      : $opts{BodyHashes}  ? sub { $opts{BodyHashes}{$_[0]} // '' }
+      :                      sub { b_digest($msg, $_[0]) });
+    return wantarray ? (0, $err) : 0 unless $ok;
+    return $num;
+}
+
+# A parse() failure in the words verify() reports it.
+sub _parse_error {
+    my ($err) = @_;
+    $err =~ s/\s+at\s+\S+\s+line\s+\d+\.?\s*\z//;
+    $err =~ s/\s+\z//;
+    return $err;
+}
+
+# Instance $num's hash-sets against the header and body hashes the two
+# callbacks give for an algorithm ($body undef: headers only). Returns 1,
+# or (0, $reason) at the first mismatch.
+sub _check_hashes {
+    my ($self, $num, $header, $body) = @_;
 
     # spec-06 §3.4: verify every hash-set whose algorithm we implement; ALL
     # of them must match. If none names an implemented algorithm, fail
@@ -1025,26 +1055,17 @@ sub verify {
     my $impl = hash_algs();
     my @usable = sort grep { $impl->{$_} } keys %$hashes;
 
-    unless (@usable) {
-        return wantarray ? (0, "Message-Instance m=$num no supported hash algorithm") : 0;
-    }
+    return (0, "Message-Instance m=$num no supported hash algorithm") unless @usable;
 
     for my $alg (@usable) {
         my ($h1, $b1) = @{ $hashes->{$alg} };
-        my $hd = h_digest($msg, $alg, $opts{IgnorePrefixes});
-        if ($h1 ne $hd) {
-            return wantarray ? (0, "$alg header hash mismatch ($h1 != $hd)") : 0;
-        }
-        # HeadersOnly: below a null body Recipe the body this instance
-        # hashed is gone; its header hashes are still checkable.
-        next if $opts{HeadersOnly};
-        my $bd = b_digest($msg, $alg);
-        if ($b1 ne $bd) {
-            return wantarray ? (0, "$alg body hash mismatch ($b1 != $bd)") : 0;
-        }
+        my $hd = $header->($alg);
+        return (0, "$alg header hash mismatch ($h1 != $hd)") if $h1 ne $hd;
+        next unless $body;
+        my $bd = $body->($alg);
+        return (0, "$alg body hash mismatch ($b1 != $bd)") if $b1 ne $bd;
     }
-
-    return $num;
+    return 1;
 }
 
 # --- Undo ---
@@ -1149,7 +1170,12 @@ sub undo {
     my $rh = $self->get_tag('rh');
 
     if ($rb && !$opts{HeadersOnly}) {
-        my @old = split /\r?\n/, $msg->body_raw;
+        # Every line, trailing blank ones too: they are not hashed (§6.1),
+        # but a Recipe may number and copy them, as the other
+        # implementations in the interop set allow. Only the empty piece
+        # after the last line break is not a line.
+        my @old = split /\r?\n/, $msg->body_raw, -1;
+        pop @old if @old && $old[-1] eq '';
         my @new = _apply_recipe('body', $rb, \@old);
         _body_raw_set($msg, join("\r\n", @new, ''));
     } elsif ($rb) {
@@ -1366,6 +1392,10 @@ scalar context and C<(0, $reason)> in list context. Never dies.
 With C<HeadersOnly =E<gt> 1> only the header hashes are checked and the body
 hash is skipped; this is how instances below a null body Recipe are checked,
 since the body they hashed is gone.
+
+With C<BodyHashes =E<gt> { $alg =E<gt> $base64, ... }> the body hashes are
+those given, computed elsewhere (L<Mail::DKIM2::BodyPlan>), not those of
+C<$msg>'s body.
 
 =head2 undo($msg, %options)
 

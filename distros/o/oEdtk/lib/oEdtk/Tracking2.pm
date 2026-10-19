@@ -52,7 +52,7 @@ use DBI;
 #use JSON;
 use Exporter;
 
-our $VERSION   = 1.5062;
+our $VERSION   = 2.1126;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(stats_iddest stats_week stats_month);
 
@@ -535,3 +535,85 @@ sub _validate_edmode {
 #}
 
 1;
+
+=head1 NAME
+
+oEdtk::Tracking2 - legacy warn-based production tracking
+
+=head1 SYNOPSIS
+
+    use oEdtk::Tracking;
+
+    my $trk = oEdtk::Tracking->new($source, entity => 'Corp');
+    $trk->track('Job', 1, @values);
+    $trk->end;
+
+=head1 DESCRIPTION
+
+Legacy, warn-based duplicate of L<oEdtk::Tracking>. It declares the same package
+C<oEdtk::Tracking> and the same public interface, but reports its diagnostics
+through C<warn> instead of the logger, and reads the user keys from the
+configuration rather than from the constructor arguments. It is kept for
+reference; use L<oEdtk::Tracking> for new code.
+
+=head1 METHODS
+
+=head2 new
+
+    my $trk = oEdtk::Tracking->new($source, %params);
+
+Build a tracker. C<$source> names the input, and C<%params> may carry C<entity>,
+C<edmode>, C<account>, C<obj_typ>, C<child_typ>, C<child_id> and C<parent_id>.
+The user keys come from the C<EDTK_TRACKING_KEYS> configuration. When
+C<EDTK_TRACK_MODE> is C<NONE> an inert object is returned.
+
+=head2 track
+
+    $trk->track($job, $count, @data);
+
+Record one event: the job event, the number of objects, and the values of the
+configured user keys (an optional trailing value is the message).
+
+=head2 set_entity
+
+    $trk->set_entity($entity);
+
+Normalise C<$entity> through the dictionary and store it.
+
+=head2 end
+
+    $trk->end;
+
+Record the final C<Halt> event.
+
+=head1 FUNCTIONS
+
+=head2 stats_iddest
+
+    my $rows = stats_iddest($dbh, $cfg, $start, $end, $excluded_users, $ed_app);
+
+Per recipient destination, per week, the number of documents tracked between
+C<$start> and C<$end>.
+
+=head2 stats_week
+
+    my $rows = stats_week($dbh, $cfg, $start, $end, $excluded_users);
+
+Per application, per legal entity and per ISO week, the number of documents
+tracked during the period.
+
+=head2 stats_month
+
+    my $rows = stats_month($dbh, $cfg, $start, $end, $excluded_users);
+
+Per application, per legal entity and per month, the number of documents tracked
+during the period.
+
+The following subs are internal helpers and are not part of the public API:
+C<_validate_event> and C<_validate_edmode>.
+
+=head1 AUTHOR
+
+The oEdtk team.
+
+=cut

@@ -1,0 +1,123 @@
+Peta-Synth 0.2610180
+
+a software synthesizer in Perl
+
+MIDI to sound, every instrument synthesized from code: no samples, no
+SoundFonts, no plugins. Each voice is a bank of sine partials, a string
+plucked or struck (Karplus-Strong), four FM operators and up to three
+bands of noise under envelopes, with a filter that moves over the
+partials, noise that moves their amplitude, and routes of modulation (a
+second envelope, two LFOs, the controllers); the 128 General MIDI
+instruments and the drum kit are descriptions of that, which can be
+changed while they sound.
+
+It is the capstone of pperl, and runs on perl5 too. What a
+machine and a perl can do decides how much it does: the number of partials
+per voice (the quality), the number of voices, the sample rate, and for
+playing the fidelity (what may be left out that is hardly heard: voices
+end sooner as they fade).
+
+USAGE
+
+    peta-synth render song.mid song.flac                   # a file: wav, flac, mp3, ogg, opus
+    peta-synth render song.mid song.mp3 --quality V2      # MP3 at a variable bitrate, as LAME -V2
+    peta-synth render song.mid song.ogg --bank my-bank.json --workers 4
+    peta-synth play song.mid                               # play it as it renders (PipeWire, PulseAudio)
+    peta-synth live                                        # play what keyboards and sequencers send
+    peta-synth serve --midi ~/music --bank my-bank.json    # the synthesizer behind a web page
+    peta-synth inputs                                      # the MIDI sources there are
+    peta-synth info song.mid
+    peta-synth engines                                     # what this perl and machine have
+    peta-synth profile song.mid                            # what rendering it will cost, step by step
+    peta-analyze --program 0 --key 60 --fluid              # a note's partials, level, brightness; beside FluidSynth's
+
+Installed by pperl, peta-synth runs on pperl; unpacked and not installed:
+pperl -Ilib bin/peta-synth ...
+
+MODULES
+
+    Peta::Hearing                            the Bark scale, the threshold in quiet, masking
+    Peta::MIDI                               MIDI in and out in real time, as MIDI::RtMidi::FFI has it, with no library
+    Peta::MIDI::ALSA                         a client of the ALSA sequencer, with no library
+    Peta::MIDI::Decoder                      MIDI bytes into events
+    Peta::MIDI::Device                       MIDI devices as MIDI::RtMidi::FFI::Device has them, on the ALSA sequencer
+    Peta::MIDI::Device::In                   a MIDI input as MIDI::RtMidi::FFI::Device::In has it
+    Peta::MIDI::Device::Out                  a MIDI output as MIDI::RtMidi::FFI::Device::Out has it
+    Peta::MIDI::Encoder                      events into MIDI bytes
+    Peta::MIDI::Event                        a MIDI message as an event: its name and fields
+    Peta::MP3::Encode                        MP3 (MPEG-1 and MPEG-2 Layer III) encoder
+    Peta::MP3::Encode::Filterbank            samples into Layer III's frequency lines
+    Peta::MP3::Encode::Filterbank::PDL       Layer III's filterbank with PDL
+    Peta::MP3::Encode::Psy                   how much noise a granule's bands can take
+    Peta::MP3::Encode::Quantize              a granule's lines into Layer III's integers and codes
+    Peta::MP3::Encode::Tables                the tables of ISO 11172-3 an MP3 encoder needs
+    Peta::Synth                              a software synthesizer in Perl
+    Peta::Synth::Analysis                    measuring sound: a note's partials, its level and brightness over time
+    Peta::Synth::Arpeggiator                 the keys held, played one after another in a pattern
+    Peta::Synth::EQ                          the master equalizer
+    Peta::Synth::Engine                      the engines that render voices
+    Peta::Synth::Engine::GPU                 the voices rendered on the graphics card
+    Peta::Synth::Engine::PDL                 the voices rendered with PDL
+    Peta::Synth::Engine::Perl                the voices rendered in Perl
+    Peta::Synth::FFT                         the discrete Fourier transform: radix 2, in place
+    Peta::Synth::Fluid                       FluidSynth as a reference: the same events, played from a SoundFont
+    Peta::Synth::Input                       MIDI as it is played: the ALSA sequencer, raw devices
+    Peta::Synth::Input::Raw                  MIDI bytes from a device or a pipe
+    Peta::Synth::MIDI                        Standard MIDI Files, read and written
+    Peta::Synth::MIDI::Stream                MIDI bytes as a device sends them, into events
+    Peta::Synth::Output                      sound to WAV, FLAC, MP3, Ogg Vorbis and Opus files
+    Peta::Synth::Output::FLAC                a FLAC encoder in Perl
+    Peta::Synth::Output::PipeWire            sound to PipeWire as it plays (pperl)
+    Peta::Synth::Output::Pulse               sound to the sound server as it plays (PulseAudio or PipeWire)
+    Peta::Synth::Patch                       the General MIDI instruments, their variations, and the drum kits
+    Peta::Synth::Profile                     what a piece will cost to render, second by second, before it is rendered
+    Peta::Synth::Reverb                      a feedback delay network reverb
+    Peta::Synth::Server                      the synthesizer behind a web page
+    Peta::Synth::Synth                       the synthesizer: channels, voices, engine, reverb
+    Peta::Synth::Voice                       a sounding note: partials, noise, envelope, pitch
+    Peta::Synth::Wavetable                   partials compiled into wave sequences, made once and kept
+    Peta::Vorbis::Encode                     Ogg Vorbis encoder
+    Peta::Vorbis::Encode::Book               a Vorbis codebook
+    Peta::Vorbis::Encode::MDCT               Vorbis' MDCT through an FFT
+    Peta::Vorbis::Encode::MDCT::PDL          Vorbis' MDCT with PDL
+    Peta::Vorbis::Encode::Ogg                Ogg pages around Vorbis packets
+    Peta::Vorbis::Encode::Psy                how coarsely each MDCT bin may be quantized
+    Peta::Vorbis::Encode::Weights            how often Peta::Vorbis::Encode's codebook entries are written
+
+INSTALLATION
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Perl 5.36 or later, or pperl, and nothing else for WAV, FLAC, MP3 and Ogg
+Vorbis, which are written here. The web page needs Mojolicious, and on
+pperl 0.6.24 or later. Optional: PDL (the pdl engine; faster MP3 and
+Vorbis encoding), ffmpeg (Opus), a graphics card with pperl (the gpu
+engine), AnyEvent (Peta::MIDI's callbacks in an event loop). Playing needs
+a sound server: PipeWire or PulseAudio. MIDI as it is played needs Linux's
+ALSA sequencer, or a raw MIDI device.
+
+DOCUMENTATION
+
+    doc/midi.md          what of MIDI it plays
+    doc/synthesis.md     the voice model and every field of a patch
+    doc/rendering.md     files, formats, playing, the web page
+    doc/backends.md      the engines, sound out, MIDI in
+
+    perldoc Peta::Synth
+    peta-synth --help
+
+The example piece and its bank:
+
+    peta-synth render examples/midi/new-synthesis.mid out.ogg --bank examples/new-synthesis-bank.json
+
+LICENSE
+
+    This package is free software, dual-licensed under the
+    Artistic License 2.0 and the BSD 2-Clause License.
+    https://opensource.org/licenses/Artistic-2.0
+    https://opensource.org/licenses/BSD-2-Clause
+
+Copyright (c) 2026 PetaMem s.r.o.
